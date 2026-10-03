@@ -598,21 +598,38 @@
           break;
         }
         if (String(args[0]).toLowerCase() === "all"){
-          const n = summonHelp("Summoned by "+plainName(sender)+".", sender, true, "summon");
-          R(n ? "🔗 Summoned "+n+", hon!" : "Nobody's available right now, sugar. They're all on cooldown, or nobody's on call.");
+          const n = summonHelp("Summoned by "+plainName(sender)+".", sender, true, "staff");
+          R(n ? "🔗 Summoned "+n+", hon! They'll land at the staff spot." : "Nobody's available right now, sugar. They're all on cooldown, or nobody's on call.");
           break;
         }
         const t = resolveTarget(args[0]);
-        if (!t){ R("Summon who, sugar? Say ?summon, then a name or member number, then a spot if you like (leave it out and they land at the summon spot). Or ?summon all for everybody on call. For example: ?summon Daisy  or  ?summon 800 barn"); break; }
+        if (!t){ R("Summon who, sugar? Say ?summon and a name or member number. Folks already here come right to your side; on-call staff in other rooms get pulled to the staff spot. Add a spot name to send 'em there instead. For example: ?summon Daisy  or  ?summon 800 barn"); break; }
+        const sp = args[1] ? String(args[1]).toLowerCase() : null;
+        if (sp && !spotFor(sp)){ R("There's no spot called '"+sp+"', sugar. Say ?spot for the list, or leave the spot off."); break; }
         const r = rec(t);
-        if (!r || (!r.forced && !isMandated(t))){
-          R(plainName(t)+" ain't on call, hon. They'd have to set it themselves with ?forced."); break;
+        // already in the room: bring 'em right over (or to the spot you named)
+        if (charFor(t)){
+          const pt = sp ? spotFor(sp) : spotBeside(sender);
+          if (!pt){ R("I can't see where you're standin', sugar. Step onto the map and try again."); break; }
+          if (!teleport(t, pt, true)){ R("I can't move folks right now, hon. I've lost my room admin rights."); break; }
+          tell(t, "🔗 "+plainName(sender)+" called you over, sugar.");
+          audit(sender, "SUMMON_HERE", t+(sp ? " "+sp : ""));
+          R("🔗 Brought "+plainName(t)+(sp ? " to the "+sp+" spot." : " right over beside you."));
+          break;
         }
-        const sp = args[1] ? String(args[1]).toLowerCase() : "summon";
-        if (args[1] && !spotFor(sp)){ R("There's no spot called '"+sp+"', sugar. Say ?spot for the list, or leave the spot off to use the summon spot."); break; }
-        R(summon(t, "Summoned by "+plainName(sender)+".", sender, sp)
-          ? "🔗 Summoned "+plainName(t)+(spotFor(sp) ? "! They'll land at the "+sp+" spot." : "!")
-          : "They were summoned real recent, hon. Give it a few minutes.");
+        // away, and on call: pulled in with their BCX or BC+ summon rule, landin' at the staff spot
+        if (r && isStaff(t) && (r.forced || isMandated(t))){
+          const to = sp || "staff";
+          R(summon(t, "Summoned by "+plainName(sender)+".", sender, to)
+            ? "🔗 Summoned "+plainName(t)+"! They'll land at the "+(spotFor(to) ? to : "summon")+" spot."
+            : "They were summoned real recent, hon. Give it a few minutes.");
+          break;
+        }
+        if (!r){ R(plainName(t)+" isn't on the books, sugar, so I won't go callin' 'em."); break; }
+        // away, and not on call: a friendly invite, nobody gets pulled
+        beep(t, "🌾 "+plainName(sender)+" would like you at "+currentRoomName()+" when you can, hon. No rush, and nobody's pullin' you.");
+        audit(sender, "SUMMON_INVITE", String(t));
+        R("💌 "+plainName(t)+" isn't here and isn't on call, so I sent 'em a friendly invite instead, sugar.");
         break;
       }
 

@@ -578,8 +578,11 @@ COMMANDS
   ?forced · put yourself on call, or take yourself off
      (proprietors: ?forced <who>; mandated hands always are)
   ?summon · who's on call
-  ?summon <who> [spot] · pull 'em in (herdmasters and up)
-  ?summon all · everybody on call
+  ?summon <who> [spot] · herdmasters and up:
+      here already → right beside you (or the spot you name)
+      on call, elsewhere → pulled in to the staff spot
+      anybody else → a friendly invite, nobody's pulled
+  ?summon all · everybody on call, to the staff spot
 
 GOOD TO KNOW
   • Summons use BCX: add the bot's number to your

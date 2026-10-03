@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.9.26
+// @version      0.9.27
 // @description  B&B Farm: beeps, keys, ledger, roster, herds, summoning, anti-idle
 // @author       Laynie & Alexia
 // @match        *://*.bondageprojects.elementfx.com/*
@@ -35,7 +35,7 @@
   }
 
   // bot/src/version.js
-  var VERSION = "0.9.26";
+  var VERSION = "0.9.27";
 
   // bot-parts:farmhand-bot-parts
   (function() {
@@ -1152,6 +1152,23 @@
         Target: mn
       }, urgent);
       return true;
+    }
+    function spotBeside(mn) {
+      const C = charFor(mn), p = C && C.MapData && C.MapData.Pos;
+      if (!p) return null;
+      const taken = new Set((W.ChatRoomCharacter || []).filter((c) => c.MapData && c.MapData.Pos).map((c) => c.MapData.Pos.X + "," + c.MapData.Pos.Y));
+      const wide = W.ChatRoomMapViewWidth || 40, high = W.ChatRoomMapViewHeight || 40;
+      for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1], [1, 1], [-1, 1], [1, -1], [-1, -1]]) {
+        const x = p.X + dx, y = p.Y + dy;
+        if (x < 0 || y < 0 || x >= wide || y >= high || taken.has(x + "," + y)) continue;
+        let blocked = false;
+        try {
+          if (typeof W.ChatRoomMapViewPositionIsBlocked === "function") blocked = !!W.ChatRoomMapViewPositionIsBlocked(x, y);
+        } catch (e) {
+        }
+        if (!blocked) return { X: x, Y: y };
+      }
+      return { X: p.X, Y: p.Y };
     }
     function rescueTeleport(mn) {
       const pt = firstSpot("rescue", "stuck") || CFG.RESCUE_POINT;
@@ -4612,8 +4629,11 @@ COMMANDS
   ?forced · put yourself on call, or take yourself off
      (proprietors: ?forced <who>; mandated hands always are)
   ?summon · who's on call
-  ?summon <who> [spot] · pull 'em in (herdmasters and up)
-  ?summon all · everybody on call
+  ?summon <who> [spot] · herdmasters and up:
+      here already → right beside you (or the spot you name)
+      on call, elsewhere → pulled in to the staff spot
+      anybody else → a friendly invite, nobody's pulled
+  ?summon all · everybody on call, to the staff spot
 
 GOOD TO KNOW
   • Summons use BCX: add the bot's number to your
@@ -6026,26 +6046,48 @@ Welcome to B&B Farm. Mind the ruts! 🌾`,
             break;
           }
           if (String(args[0]).toLowerCase() === "all") {
-            const n = summonHelp("Summoned by " + plainName(sender) + ".", sender, true, "summon");
-            R(n ? "🔗 Summoned " + n + ", hon!" : "Nobody's available right now, sugar. They're all on cooldown, or nobody's on call.");
+            const n = summonHelp("Summoned by " + plainName(sender) + ".", sender, true, "staff");
+            R(n ? "🔗 Summoned " + n + ", hon! They'll land at the staff spot." : "Nobody's available right now, sugar. They're all on cooldown, or nobody's on call.");
             break;
           }
           const t = resolveTarget(args[0]);
           if (!t) {
-            R("Summon who, sugar? Say ?summon, then a name or member number, then a spot if you like (leave it out and they land at the summon spot). Or ?summon all for everybody on call. For example: ?summon Daisy  or  ?summon 800 barn");
+            R("Summon who, sugar? Say ?summon and a name or member number. Folks already here come right to your side; on-call staff in other rooms get pulled to the staff spot. Add a spot name to send 'em there instead. For example: ?summon Daisy  or  ?summon 800 barn");
+            break;
+          }
+          const sp = args[1] ? String(args[1]).toLowerCase() : null;
+          if (sp && !spotFor(sp)) {
+            R("There's no spot called '" + sp + "', sugar. Say ?spot for the list, or leave the spot off.");
             break;
           }
           const r = rec(t);
-          if (!r || !r.forced && !isMandated(t)) {
-            R(plainName(t) + " ain't on call, hon. They'd have to set it themselves with ?forced.");
+          if (charFor(t)) {
+            const pt = sp ? spotFor(sp) : spotBeside(sender);
+            if (!pt) {
+              R("I can't see where you're standin', sugar. Step onto the map and try again.");
+              break;
+            }
+            if (!teleport(t, pt, true)) {
+              R("I can't move folks right now, hon. I've lost my room admin rights.");
+              break;
+            }
+            tell(t, "🔗 " + plainName(sender) + " called you over, sugar.");
+            audit(sender, "SUMMON_HERE", t + (sp ? " " + sp : ""));
+            R("🔗 Brought " + plainName(t) + (sp ? " to the " + sp + " spot." : " right over beside you."));
             break;
           }
-          const sp = args[1] ? String(args[1]).toLowerCase() : "summon";
-          if (args[1] && !spotFor(sp)) {
-            R("There's no spot called '" + sp + "', sugar. Say ?spot for the list, or leave the spot off to use the summon spot.");
+          if (r && isStaff(t) && (r.forced || isMandated(t))) {
+            const to = sp || "staff";
+            R(summon(t, "Summoned by " + plainName(sender) + ".", sender, to) ? "🔗 Summoned " + plainName(t) + "! They'll land at the " + (spotFor(to) ? to : "summon") + " spot." : "They were summoned real recent, hon. Give it a few minutes.");
             break;
           }
-          R(summon(t, "Summoned by " + plainName(sender) + ".", sender, sp) ? "🔗 Summoned " + plainName(t) + (spotFor(sp) ? "! They'll land at the " + sp + " spot." : "!") : "They were summoned real recent, hon. Give it a few minutes.");
+          if (!r) {
+            R(plainName(t) + " isn't on the books, sugar, so I won't go callin' 'em.");
+            break;
+          }
+          beep(t, "🌾 " + plainName(sender) + " would like you at " + currentRoomName() + " when you can, hon. No rush, and nobody's pullin' you.");
+          audit(sender, "SUMMON_INVITE", String(t));
+          R("💌 " + plainName(t) + " isn't here and isn't on call, so I sent 'em a friendly invite instead, sugar.");
           break;
         }
         /* ── PERSONAL ── */

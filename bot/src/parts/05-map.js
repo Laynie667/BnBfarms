@@ -82,6 +82,22 @@
     return true;
   }
 
+  // a free tile right beside someone: not a wall, nobody standin' on it. Falls back to their own tile.
+  function spotBeside(mn){
+    const C = charFor(mn), p = C && C.MapData && C.MapData.Pos;
+    if (!p) return null;
+    const taken = new Set((W.ChatRoomCharacter||[]).filter(c => c.MapData && c.MapData.Pos).map(c => c.MapData.Pos.X+","+c.MapData.Pos.Y));
+    const wide = W.ChatRoomMapViewWidth || 40, high = W.ChatRoomMapViewHeight || 40;
+    for (const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1],[1,1],[-1,1],[1,-1],[-1,-1]]){
+      const x = p.X+dx, y = p.Y+dy;
+      if (x < 0 || y < 0 || x >= wide || y >= high || taken.has(x+","+y)) continue;
+      let blocked = false;
+      try { if (typeof W.ChatRoomMapViewPositionIsBlocked === "function") blocked = !!W.ChatRoomMapViewPositionIsBlocked(x, y); } catch(e){}
+      if (!blocked) return { X:x, Y:y };
+    }
+    return { X:p.X, Y:p.Y };
+  }
+
   function rescueTeleport(mn){
     const pt = firstSpot("rescue","stuck") || CFG.RESCUE_POINT;
     if (!botIsAdmin()){

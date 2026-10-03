@@ -507,8 +507,10 @@
     if (!L.studbook) L.studbook = [];
     L.studbook.push({ t:Date.now(), dam:mn, sires:g.sires.slice(), kids });
     if (L.studbook.length > 1000) L.studbook = L.studbook.slice(-1000);
+    const sires = g.sires.slice();
     p.preg = null; p.freshUntil = Date.now() + CFG.PROD.FRESH_DAYS*86400000;
     saveLedger(); audit(CFG.BOT_MEMBER,"BIRTH",mn+" "+JSON.stringify(kids));
+    later(() => addonsEmit("birth", mn, kids, sires), 1500);   // midwives, pregnancy add-on
     const parts = [];
     if (kids.male)   parts.push(kids.male+" male");
     if (kids.female) parts.push(kids.female+" female");

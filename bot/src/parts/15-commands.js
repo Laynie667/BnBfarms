@@ -1917,12 +1917,17 @@ Welcome to B&B Farm, hon. 🌾`);
       case "pedigree": {
         const t = args[0] ? resolveTarget(args[0]) : sender;
         if (!t){ R("I don't know that one, sugar. Just ?pedigree shows your own stud book; add a name or member number for somebody else's, like ?pedigree Bessie or ?pedigree 123456."); break; }
-        const rows = (L.studbook||[]).filter(e => e.dam === t || e.sires.includes(t)).slice(-10);
-        R(rows.length
-          ? "📜 STUD BOOK — "+plainName(t)+"\n\n"+rows.map(e =>
-              new Date(e.t).toLocaleDateString()+": "+plainName(e.dam)+" × "+e.sires.map(plainName).join(" & ")+
-              (e.eggs ? " · laid "+e.eggs+" eggs" : " · "+e.kids.male+"m "+e.kids.female+"f "+e.kids.futa+"x")).join("\n")
-          : plainName(t)+" has no entries in the stud book yet, hon.");
+        // kept simple: who they had litters with, and how many, as a dam and as a sire
+        const book = L.studbook||[], kidsIn = e => e.eggs ? e.eggs : e.kids.male+e.kids.female+e.kids.futa;
+        const withWhom = (rows, who) => { const m = new Map(); for (const e of rows) for (const w of who(e)) m.set(w, (m.get(w)||0) + 1);
+          return [...m].sort((a,b) => b[1]-a[1]).map(([w,n]) => plainName(w)+" ×"+n).join(", "); };
+        const asDam = book.filter(e => e.dam === t), asSire = book.filter(e => e.sires.includes(t));
+        const line = (rows, label, who) => rows.length ? label+": "+rows.length+" litter"+(rows.length===1?"":"s")+", "+rows.reduce((a,e)=>a+kidsIn(e),0)+" young · with "+withWhom(rows, who) : "";
+        const out = [line(asDam, "🐄 As dam", e => e.sires), line(asSire, "🐂 As sire", e => [e.dam])].filter(Boolean);
+        const last = book.filter(e => e.dam === t || e.sires.includes(t)).slice(-1)[0];
+        R(out.length
+          ? "📜 PEDIGREE — "+plainName(t)+"\n"+out.join("\n")+(last ? "\nLatest: "+plainName(last.dam)+" × "+last.sires.map(plainName).join(" & ")+", "+new Date(last.t).toLocaleDateString() : "")
+          : plainName(t)+" has no litters in the stud book yet, hon.");
         break;
       }
 

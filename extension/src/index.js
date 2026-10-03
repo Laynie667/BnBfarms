@@ -71,6 +71,16 @@ function collect(m) {
   return got.join("\n");
 }
 
+// a line in YOUR chat log only (nobody else sees it); text goes in as text, never as code
+function toChat(text, color, italic) {
+  if (typeof window.ChatRoomSendLocal !== "function") return false;
+  const p = window.document.createElement("div");
+  p.style.cssText = "color:" + color + ";white-space:pre-wrap;margin:0.25em 0" + (italic ? ";font-style:italic" : "");
+  p.textContent = text;
+  window.ChatRoomSendLocal(p.outerHTML);
+  return true;
+}
+
 function onFarmMsg(m) {
   if (m.from !== BOT_MEMBER) return;     // only the farm bot gets to talk to the panel
   if (m.type !== "ping" && m.type !== "state") st.lastHeard = Date.now();
@@ -96,7 +106,11 @@ function onFarmMsg(m) {
     case "reply":
     case "notice": {
       const text = collect(m);
-      if (text !== null) st.panel.add(text, m.type);
+      if (text === null) break;
+      st.panel.add(text, m.type);
+      // farm messages you didn't ask for (tease lines, heat, summons…) also land in your chat,
+      // so you see them even when the panel's closed (Toggles → "Farm messages in chat too")
+      if (m.type === "notice" && st.panel.prefs.chatToo !== false) toChat(text, "#c9a35b");
       break;
     }
     case "doc": {
@@ -106,23 +120,21 @@ function onFarmMsg(m) {
     }
     case "ask":
       st.panel.addAsk({ kind: String(m.kind || ""), text: String(m.text || "") });
+      toChat(String(m.text || "") + "  (Yes / No in your 🌾 panel)", "#c9a35b");
       break;
     case "choose":
       st.panel.setChoose({ text: String(m.text || ""), choices: Array.isArray(m.choices) ? m.choices.map(String).slice(0, 30) : [] });
+      toChat(String(m.text || "") + "  (pick in your 🌾 panel)", "#c9a35b");
       break;
     case "outfit":
       st.panel.setOutfit({ slot: String(m.slot || ""), label: String(m.label || "farm outfit"), data: String(m.data || ""),
         keys: Array.isArray(m.keys) ? m.keys.filter(Number.isInteger) : [], why: String(m.why || "") });
+      toChat("👗 The farm's offerin' you your " + String(m.label || "outfit") + ". Yes or Not now in your 🌾 panel.", "#c9a35b");
       break;
     case "voice": {
       // only you see it, like a thought; nothin' goes to the room
       const line = String(m.text || "").slice(0, 300);
-      if (typeof window.ChatRoomSendLocal === "function") {
-        const p = window.document.createElement("p");
-        p.style.cssText = "color:#a67fd4;font-style:italic;margin:0.25em 0";
-        p.textContent = "[Voice] " + line;
-        window.ChatRoomSendLocal(p.outerHTML);
-      } else st.panel.add("[Voice] " + line, "notice");
+      if (!toChat("[Voice] " + line, "#a67fd4", true)) st.panel.add("[Voice] " + line, "notice");
       break;
     }
     case "roomline": {

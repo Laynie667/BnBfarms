@@ -5,7 +5,7 @@
   "type": "module",
   "versions": {
     "bot": "0.9.36",
-    "companion": "0.6.2"
+    "companion": "0.6.3"
   },
   "scripts": {
     "build": "node build.mjs",

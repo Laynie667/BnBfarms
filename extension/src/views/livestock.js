@@ -105,7 +105,8 @@ export function farmSwitches(ctx, list) {
 }
 export function panelPrefs(ctx) {
   return card(title("This panel"), muted("Only on your computer."),
-    [["compact", "Compact cards", "Smaller text, more on screen"], ["chime", "Chime on notices", "A soft sound when the farm messages you"],
+    [["chatToo", "Farm messages in chat too", "Tease lines, heat, summons and other farm messages also show in your chat log"],
+     ["compact", "Compact cards", "Smaller text, more on screen"], ["chime", "Chime on notices", "A soft sound when the farm messages you"],
      ["popopen", "Open on new notice", "Pop the panel open by itself"],
      ["btnPinned", "Pin the 🌾 button", "Unpinned, you can drag it anywhere (mouse or finger). Pin it so it stays put."]].map(([k, label, desc]) =>
       toggle(label, desc, !!ctx.prefs[k], () => ctx.setPref(k, !ctx.prefs[k]))),

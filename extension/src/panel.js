@@ -34,6 +34,7 @@ export class Panel {
     this.feed = []; this.docs = []; this.asks = []; this.choose = null;
     this.ui = {};
     this.prefs = loadPrefs();
+    if (this.prefs.chatToo === undefined) this.prefs.chatToo = true;   // farm messages show in chat too, unless they switch it off
     this.status = "…";
     const doc = window.document;
 

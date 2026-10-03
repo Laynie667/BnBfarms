@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.6.2
+// @version      0.6.3
 // @description  Your B&B Farm panel: the farm girl's answers, stat cards and guides, right in the game.
 // @author       Laynie & Alexia
 // @match        *://*.bondageprojects.elementfx.com/*
@@ -224,7 +224,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.6.2";
+  var VERSION = "0.6.3";
 
   // extension/src/config.js
   var BOT_MEMBER = 260239;
@@ -542,6 +542,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       title("This panel"),
       muted("Only on your computer."),
       [
+        ["chatToo", "Farm messages in chat too", "Tease lines, heat, summons and other farm messages also show in your chat log"],
         ["compact", "Compact cards", "Smaller text, more on screen"],
         ["chime", "Chime on notices", "A soft sound when the farm messages you"],
         ["popopen", "Open on new notice", "Pop the panel open by itself"],
@@ -2836,6 +2837,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       this.choose = null;
       this.ui = {};
       this.prefs = loadPrefs();
+      if (this.prefs.chatToo === void 0) this.prefs.chatToo = true;
       this.status = "…";
       const doc = window.document;
       const style = doc.createElement("style");
@@ -3362,6 +3364,14 @@ One of mods you are using is using an old version of SDK. It will work for now b
     st.parts.delete(m.id);
     return got.join("\n");
   }
+  function toChat(text, color, italic) {
+    if (typeof window.ChatRoomSendLocal !== "function") return false;
+    const p = window.document.createElement("div");
+    p.style.cssText = "color:" + color + ";white-space:pre-wrap;margin:0.25em 0" + (italic ? ";font-style:italic" : "");
+    p.textContent = text;
+    window.ChatRoomSendLocal(p.outerHTML);
+    return true;
+  }
   function onFarmMsg(m) {
     if (m.from !== BOT_MEMBER) return;
     if (m.type !== "ping" && m.type !== "state") st.lastHeard = Date.now();
@@ -3391,7 +3401,9 @@ One of mods you are using is using an old version of SDK. It will work for now b
       case "reply":
       case "notice": {
         const text = collect(m);
-        if (text !== null) st.panel.add(text, m.type);
+        if (text === null) break;
+        st.panel.add(text, m.type);
+        if (m.type === "notice" && st.panel.prefs.chatToo !== false) toChat(text, "#c9a35b");
         break;
       }
       case "doc": {
@@ -3401,9 +3413,11 @@ One of mods you are using is using an old version of SDK. It will work for now b
       }
       case "ask":
         st.panel.addAsk({ kind: String(m.kind || ""), text: String(m.text || "") });
+        toChat(String(m.text || "") + "  (Yes / No in your 🌾 panel)", "#c9a35b");
         break;
       case "choose":
         st.panel.setChoose({ text: String(m.text || ""), choices: Array.isArray(m.choices) ? m.choices.map(String).slice(0, 30) : [] });
+        toChat(String(m.text || "") + "  (pick in your 🌾 panel)", "#c9a35b");
         break;
       case "outfit":
         st.panel.setOutfit({
@@ -3413,15 +3427,11 @@ One of mods you are using is using an old version of SDK. It will work for now b
           keys: Array.isArray(m.keys) ? m.keys.filter(Number.isInteger) : [],
           why: String(m.why || "")
         });
+        toChat("👗 The farm's offerin' you your " + String(m.label || "outfit") + ". Yes or Not now in your 🌾 panel.", "#c9a35b");
         break;
       case "voice": {
         const line = String(m.text || "").slice(0, 300);
-        if (typeof window.ChatRoomSendLocal === "function") {
-          const p = window.document.createElement("p");
-          p.style.cssText = "color:#a67fd4;font-style:italic;margin:0.25em 0";
-          p.textContent = "[Voice] " + line;
-          window.ChatRoomSendLocal(p.outerHTML);
-        } else st.panel.add("[Voice] " + line, "notice");
+        if (!toChat("[Voice] " + line, "#a67fd4", true)) st.panel.add("[Voice] " + line, "notice");
         break;
       }
       case "roomline": {

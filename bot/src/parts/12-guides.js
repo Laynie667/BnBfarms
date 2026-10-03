@@ -321,6 +321,7 @@ COMMANDS
   ?size <part> <size> · set one, e.g. ?size udder DD · ?size penis 9
   ?measure · I measure you out loud for the room
   ?futa on|off · cock and vulva both, milk and semen both
+  ?gender female|male|futa|femboy · how the farm sees you (picks your outfit)
 
 THE PARTS
   Udder · bra cup, AA to H. Bigger makes and holds more milk.
@@ -646,7 +647,7 @@ UPKEEP
     o += group("📖 You & the farm", "record · keys · who · herd · notice · weather · feeding · curfew · beg");
     o += group("🥛 Milk",        "stats · board · milkable · quota");
     o += group("🐂 Breedin'",    "breedable · fertile · freeuse · yes · no · naturalheat · breed · cum · wash · tally · eggs · praise · degrade · rights · accept · pedigree");
-    o += group("📏 Body",        "size · measure · penis · futa");
+    o += group("📏 Body",        "size · measure · penis · futa · gender");
     o += group("🎪 Fun",         "fair · enter · teaseme");
     if (isStaff(mn)){
       o += "\n\n🧑‍🌾 STAFF";

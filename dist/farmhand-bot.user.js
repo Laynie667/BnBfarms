@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.9.28
+// @version      0.9.29
 // @description  B&B Farm: beeps, keys, ledger, roster, herds, summoning, anti-idle
 // @author       Laynie & Alexia
 // @match        *://*.bondageprojects.elementfx.com/*
@@ -1599,9 +1599,10 @@
     { key: "1m", label: "1 month", min: 43200, words: ["1m", "month", "1 month", "a month", "30 days", "a season", "season"] },
     { key: "perm", label: "Permanent", min: 0, words: ["perm", "permanent", "forever", "for good", "until released"] }
   ];
+  var hasWords = (t, w) => new RegExp("(^|[^a-z0-9])" + w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "($|[^a-z0-9])").test(t);
   function durationFrom(text) {
     const t = String(text || "").trim().toLowerCase();
-    return DURATIONS.find((d) => d.key === t || d.words.includes(t) || d.label.toLowerCase() === t) || DURATIONS.find((d) => d.words.some((w) => w.length > 3 && t.includes(w))) || null;
+    return DURATIONS.find((d) => d.key === t || d.words.includes(t) || d.label.toLowerCase() === t) || DURATIONS.find((d) => d.words.some((w) => w.length > 3 && hasWords(t, w))) || null;
   }
   var DEPTHS = [
     { key: "fun", label: "Fun", words: ["fun", "playful", "light", "silly"] },
@@ -1610,7 +1611,7 @@
   ];
   function depthFrom(text) {
     const t = String(text || "").trim().toLowerCase();
-    return DEPTHS.find((d) => d.key === t || d.words.includes(t)) || DEPTHS.find((d) => d.words.some((w) => t.includes(w))) || null;
+    return DEPTHS.find((d) => d.key === t || d.words.includes(t)) || DEPTHS.find((d) => d.words.some((w) => hasWords(t, w))) || null;
   }
   var ANIMALS = {
     cow: "Cow",
@@ -1771,7 +1772,7 @@
   }
 
   // bot/src/version.js
-  var VERSION = "0.9.28";
+  var VERSION = "0.9.29";
 
   // bot-parts:farmhand-bot-parts
   (function() {
@@ -3677,6 +3678,7 @@
         roles: r.roles.slice(),
         tier: tierOf(mn) || "",
         species: r.species || "",
+        gender: r.gender || "",
         staff: isStaff(mn),
         herdmaster: isHerdmaster(mn),
         proprietor: isProprietor(mn),
@@ -5918,8 +5920,7 @@
       const mine = L.contracts.filter((x) => x.mn === t && (x.status === "signed" || x.status === "offered"));
       if (mine.filter((x) => x.status === "signed").length >= LIMITS.MAX_ACTIVE) return plainName(t) + " already holds " + LIMITS.MAX_ACTIVE + " farm contracts, and BC+ won't take more.";
       enqueue(offerMsg(c, t, CFG.ROOM_NAME));
-      L.contracts.push({
-        key: Date.now().toString(36),
+      const entry = {
         mn: t,
         by: sender,
         tpl: String(tplName).toLowerCase(),
@@ -5930,7 +5931,10 @@
         rules: Object.keys(c.rules),
         status: "offered",
         at: Date.now()
-      });
+      };
+      const prepared = trackedContract(t, null, ["prepared"]);
+      if (prepared) Object.assign(prepared, entry);
+      else L.contracts.push(Object.assign({ key: Date.now().toString(36) }, entry));
       if (L.contracts.length > 300) L.contracts = L.contracts.slice(-300);
       saveLedger();
       audit(sender, "CONTRACT_OFFER", t + " " + c.title + " " + d.key);
@@ -6389,6 +6393,7 @@ COMMANDS
   ?size <part> <size> · set one, e.g. ?size udder DD · ?size penis 9
   ?measure · I measure you out loud for the room
   ?futa on|off · cock and vulva both, milk and semen both
+  ?gender female|male|futa|femboy · how the farm sees you (picks your outfit)
 
 THE PARTS
   Udder · bra cup, AA to H. Bigger makes and holds more milk.
@@ -6732,7 +6737,7 @@ UPKEEP
       o += group("📖 You & the farm", "record · keys · who · herd · notice · weather · feeding · curfew · beg");
       o += group("🥛 Milk", "stats · board · milkable · quota");
       o += group("🐂 Breedin'", "breedable · fertile · freeuse · yes · no · naturalheat · breed · cum · wash · tally · eggs · praise · degrade · rights · accept · pedigree");
-      o += group("📏 Body", "size · measure · penis · futa");
+      o += group("📏 Body", "size · measure · penis · futa · gender");
       o += group("🎪 Fun", "fair · enter · teaseme");
       if (isStaff(mn)) {
         o += "\n\n🧑‍🌾 STAFF";
@@ -6853,37 +6858,82 @@ HOW LONG A night, a week, a season. Your call, hon.
 Say ?apply and pick 'luxury guest'.
 
 ⚠️ Fair warnin', sugar — folks book the cabin meanin' to watch, and end up in the barn by Thursday. Happens more than you'd think! 😉`;
+    const GENDERS = ["female", "male", "futa", "femboy"];
+    const SPECIES_ALIAS = { kitten: "kitt", kitty: "kitt", puppy: "pup", horse: "horse", cattle: "cow", heifer: "cow", piggy: "pig", lamb: "sheep", doe: "deer", bunny: "bunny" };
+    function speciesFrom(text) {
+      const t = String(text || "").trim().toLowerCase().replace(/^(a|an)\s+/, "");
+      if (!t) return null;
+      const kinds = Object.keys(CFG.SPECIES).filter((k) => k !== "default");
+      if (kinds.includes(t)) return t;
+      if (SPECIES_ALIAS[t]) return SPECIES_ALIAS[t];
+      const s = t.replace(/s$/, "");
+      if (kinds.includes(s)) return s;
+      const other = t.match(/^other[:\s]+(.{2,30})$/);
+      if (other) return other[1].trim();
+      return null;
+    }
+    const notSure = (t) => /^(not sure|unsure|don'?t know|dunno|idk|n\/a|na|none|skip)$/i.test(String(t || "").trim());
     const QUESTIONS = [
-      "1/12 — First things first, sweetie: what do we call you, and how do you like bein' addressed?",
-      "2/12 — What are you here as?  livestock / staff / guest / luxury guest / not sure yet\n(Both's an option, hon. Plenty here wear two collars!)",
-      "3/12 — If you're stock, what kind of animal are you? ?species shows the list. 'Other' is welcome too!",
-      "4/12 — How long you plannin' on stayin' with us?  a night / a week / a season / permanent / don't know",
-      "5/12 — How far under do you wanna go, sugar?  playful / deep / no human left",
-      "6/12 — What sounds good to you here? Milkin', breedin', the pens, trainin', restraint, bein' displayed.\n(This is the one we read closest, sugar, so take your time.)",
-      "7/12 — Anything here you're curious about but a little nervous over? We'll go nice and slow on it.",
-      "8/12 — 🔴 HARD LIMITS. What must never happen? Please be specific. This is binding, and we enforce it.",
-      "9/12 — Soft limits: anything you'd like us to ask about first?",
-      "10/12 — Triggers, or anything staff should steer clear of, in character or out? Only staff see this one.",
-      "11/12 — What do you need after a heavy scene, hon? Warmth, quiet, praise, company, or to be left alone?",
-      "12/12 — Last one! Anything else Laynie and Alexia should know?"
+      { key: "name", text: "First things first, sweetie: what do we call you, and how do you like bein' addressed?" },
+      { key: "role", text: "What are you here as?  livestock / staff / guest / luxury guest / not sure yet\n(Both's an option, hon. Plenty here wear two collars!)" },
+      {
+        key: "species",
+        text: "If you're stock, what kind of animal are you?",
+        choices: () => Object.keys(CFG.SPECIES).filter((k) => k !== "default").concat(["not stock"]),
+        check: (t) => notSure(t) || /^not stock$/i.test(t) ? { value: "" } : speciesFrom(t) ? { value: speciesFrom(t) } : { err: "I don't know that animal, sugar. Pick one of: " + Object.keys(CFG.SPECIES).filter((k) => k !== "default").join(", ") + ". Or say other <animal>, or not stock." }
+      },
+      {
+        key: "gender",
+        text: "How should the farm see you?  female / male / futa / femboy",
+        choices: () => GENDERS,
+        check: (t) => {
+          const g = String(t).trim().toLowerCase();
+          return GENDERS.includes(g) ? { value: g } : { err: "Just one of these, hon: female, male, futa or femboy." };
+        }
+      },
+      {
+        key: "stay",
+        text: "How long you plannin' on stayin' with us?  1 hour / 12 hours / 1 day / 1 week / 2 weeks / 1 month / permanent / not sure",
+        choices: () => DURATIONS.map((d) => d.label).concat(["not sure"]),
+        check: (t) => notSure(t) ? { value: "" } : durationFrom(t) ? { value: durationFrom(t).key } : { err: "Pick one, sugar: 1 hour, 12 hours, 1 day, 1 week, 2 weeks, 1 month, permanent, or not sure." }
+      },
+      {
+        key: "depth",
+        text: "How far under do you wanna go, sugar?  fun / deep / no human left / not sure",
+        choices: () => DEPTHS.map((d) => d.label).concat(["not sure"]),
+        check: (t) => notSure(t) ? { value: "" } : depthFrom(t) ? { value: depthFrom(t).key } : { err: "Pick one, hon: fun, deep, no human left, or not sure." }
+      },
+      { key: "likes", text: "What sounds good to you here? Milkin', breedin', the pens, trainin', restraint, bein' displayed.\n(This is the one we read closest, sugar, so take your time.)" },
+      { key: "curious", text: "Anything here you're curious about but a little nervous over? We'll go nice and slow on it." },
+      { key: "limits", text: "🔴 HARD LIMITS. What must never happen? Please be specific. This is binding, and we enforce it." },
+      { key: "soft", text: "Soft limits: anything you'd like us to ask about first?" },
+      { key: "triggers", text: "Triggers: anything that upsets you, that staff should steer clear of, in character or out? Only staff see this one." },
+      { key: "aftercare", text: "What do you need after a heavy scene, hon? Warmth, quiet, praise, company, or to be left alone?" },
+      { key: "else", text: "Last one! Anything else Laynie and Alexia should know?" }
     ];
     const STAFF_QUESTIONS = [
-      "13/15 — Ooh, a hand! What have you handled before?",
-      "14/15 — What would you like to be responsible for here?",
-      "15/15 — Are you comfortable steppin' in when somethin' goes sideways?"
+      { key: "handled", text: "Ooh, a hand! What have you handled before?" },
+      { key: "duties", text: "What would you like to be responsible for here?" },
+      { key: "sideways", text: "Are you comfortable steppin' in when somethin' goes sideways?" }
     ];
+    const OLD_ORDER = ["name", "role", "species", "stay", "depth", "likes", "curious", "limits", "soft", "triggers", "aftercare", "else"];
+    function appAnswer(a, key) {
+      if (a.byKey) return a.byKey[key] || "";
+      const i = OLD_ORDER.indexOf(key);
+      return i >= 0 ? a.answers[i] || "" : "";
+    }
     function startApplication(mn, ch) {
       if (state.sessions.has(mn)) {
         reply(mn, "We're already halfway through your paperwork, sugar! Just answer the last question I asked, or say 'quit' to tear it up and start over later.", ch);
         return;
       }
       const useCh = ch === "beep" || (ch === "chat" || ch === "bot") && isFriend(mn) ? "beep" : "whisper";
-      state.sessions.set(mn, { mn, step: 0, answers: [], staffTrack: false, started: Date.now(), ch: useCh });
+      state.sessions.set(mn, { mn, step: 0, answers: [], byKey: {}, staffTrack: false, started: Date.now(), ch: useCh });
       reply(
         mn,
         `🌾 B&B FARM — INTAKE 🌾
 
-Twelve questions, sugar (fifteen if you're signin' on as staff)! Short's fine, rambly's fine.
+` + QUESTIONS.length + ` questions, sugar (` + (QUESTIONS.length + STAFF_QUESTIONS.length) + ` if you're signin' on as staff)! Short's fine, rambly's fine.
 Say 'skip' to pass one. Say 'quit' to stop. Nothin' saves till you're done.
 
 Answer me ` + (useCh === "beep" ? "by beep" : "by whisper") + ` — no ? needed from here on.
@@ -6900,23 +6950,39 @@ Chat in the room all you like; I'll only count what you send me direct.`,
         finishApplication(mn);
         return;
       }
-      reply(mn, list[s.step], s.ch);
+      const q = list[s.step], text = s.step + 1 + "/" + list.length + " — " + q.text;
+      if (q.choices && hasCompanion(mn)) enqueue(makeMsg("choose", { text, choices: q.choices(), id: ++companionSeq }, mn));
+      else reply(mn, text, s.ch);
     }
     function handleApplicationAnswer(mn, text, channel) {
       const s = state.sessions.get(mn);
       if (!s) return false;
       if (channel === "chat") return false;
-      if (s.ch === "beep" && channel !== "beep") return false;
+      if (s.ch === "beep" && channel !== "beep" && channel !== "companion") return false;
       if (s.ch === "whisper" && channel !== "whisper" && channel !== "bot" && channel !== "companion") return false;
-      const low = String(text).trim().toLowerCase();
+      const raw = String(text).trim().replace(/^[?!.\-\/]/, "");
+      const low = raw.toLowerCase();
       if (low === "quit" || low === "cancel") {
         state.sessions.delete(mn);
         reply(mn, "All torn up, " + plainName(mn) + ". No hard feelin's! Say ?apply any time you change your mind.", s.ch);
         return true;
       }
-      s.answers.push(low === "skip" ? "(skipped)" : String(text).trim());
+      const list = s.staffTrack ? QUESTIONS.concat(STAFF_QUESTIONS) : QUESTIONS;
+      const q = list[s.step];
+      let answer = low === "skip" ? "(skipped)" : raw;
+      if (q && q.check && low !== "skip") {
+        const got = q.check(raw);
+        if (got.err) {
+          reply(mn, "🌾 " + got.err, s.ch);
+          later(() => askNext(mn), 900);
+          return true;
+        }
+        answer = got.value;
+      }
+      s.answers.push(answer);
+      if (q) s.byKey[q.key] = answer;
       s.last = Date.now();
-      if (s.step === 1 && /staff|farmhand|work/i.test(s.answers[1] || "")) s.staffTrack = true;
+      if (q && q.key === "role" && /staff|farmhand|work/i.test(answer)) s.staffTrack = true;
       s.step++;
       later(() => askNext(mn), 1200);
       return true;
@@ -6931,7 +6997,8 @@ Chat in the room all you like; I'll only count what you send me direct.`,
         name: plainName(mn),
         at: Date.now(),
         staffTrack: s.staffTrack,
-        answers: s.answers.slice()
+        answers: s.answers.slice(),
+        byKey: Object.assign({}, s.byKey)
       });
       const r = rec(mn, true);
       r.name = plainName(mn);
@@ -6947,6 +7014,24 @@ Welcome to B&B Farm. Mind the ruts! 🌾`,
         s.ch
       );
       notifyStaff("📋 Ooh, a new application from " + plainName(mn) + " (" + mn + ")! Say ?queue to read it.", true);
+    }
+    function applyApplication(t, a) {
+      const r = rec(t, true);
+      r.limits = appAnswer(a, "limits");
+      r.triggers = appAnswer(a, "triggers");
+      r.aftercare = appAnswer(a, "aftercare");
+      const sp = a.byKey ? appAnswer(a, "species") : speciesFrom(appAnswer(a, "species"));
+      if (sp) r.species = sp;
+      const g = appAnswer(a, "gender");
+      if (GENDERS.includes(g)) {
+        r.gender = g;
+        if (g === "futa") r.futa = true;
+      }
+      const stay = a.byKey ? appAnswer(a, "stay") : (durationFrom(appAnswer(a, "stay")) || {}).key || "";
+      const depth = a.byKey ? appAnswer(a, "depth") : (depthFrom(appAnswer(a, "depth")) || {}).key || "";
+      r.stayType = stay;
+      r.wantDepth = depth;
+      return { stay, depth };
     }
     function notifyStaff(msg, routine) {
       const present = [];
@@ -7065,6 +7150,7 @@ Welcome to B&B Farm. Mind the ruts! 🌾`,
       "accept",
       "freeuse",
       "jarok",
+      "gender",
       "tally",
       "eggs",
       "yes",
@@ -8496,7 +8582,7 @@ Welcome to B&B Farm. Mind the ruts! 🌾`,
           }
           let o = "📋 PENDING APPLICATIONS (" + L.applications.length + ")\n";
           L.applications.forEach((a, i) => {
-            o += "\n" + (i + 1) + ". " + a.name + " (" + a.mn + ")" + (a.staffTrack ? " [staff]" : "") + "\n   " + (a.answers[1] || "?") + " • " + (a.answers[2] || "?") + " • " + (a.answers[3] || "?");
+            o += "\n" + (i + 1) + ". " + a.name + " (" + a.mn + ")" + (a.staffTrack ? " [staff]" : "") + "\n   " + ["role", "species", "gender", "stay", "depth"].map((k) => appAnswer(a, k) || "?").join(" • ");
           });
           o += "\n\nSay ?app and the number to read one, like ?app 1.";
           R(o);
@@ -8510,9 +8596,11 @@ Welcome to B&B Farm. Mind the ruts! 🌾`,
           }
           const list = a.staffTrack ? QUESTIONS.concat(STAFF_QUESTIONS) : QUESTIONS;
           let o = "📋 APPLICATION — " + a.name + " (" + a.mn + ")\n" + new Date(a.at).toLocaleString() + "\n";
-          a.answers.forEach((ans, qi) => {
-            const q = String(list[qi] || "").split("\n")[0].replace(/^\d+\/\d+ — /, "");
-            o += "\n▸ " + q + "\n   " + ans + "\n";
+          if (a.byKey) list.forEach((q) => {
+            o += "\n▸ " + q.text.split("\n")[0] + "\n   " + (a.byKey[q.key] || "—") + "\n";
+          });
+          else a.answers.forEach((ans, qi) => {
+            o += "\n▸ " + (OLD_ORDER[qi] || "question " + (qi + 1)) + "\n   " + ans + "\n";
           });
           o += "\n?approve " + a.mn + " livestock\n?deny " + a.mn;
           R(o);
@@ -8543,20 +8631,36 @@ Welcome to B&B Farm. Mind the ruts! 🌾`,
           r.registeredAt = Date.now();
           for (const role of roles) if (!r.roles.includes(role)) r.roles.push(role);
           const idx = L.applications.findIndex((a) => a.mn === t);
+          let wants = null;
           if (idx >= 0) {
-            const a = L.applications[idx];
-            r.limits = a.answers[7] || "";
-            r.triggers = a.answers[9] || "";
-            r.aftercare = a.answers[10] || "";
-            r.species = String(a.answers[2] || "").toLowerCase().trim();
-            r.stayType = String(a.answers[3] || "").toLowerCase().trim();
+            wants = applyApplication(t, L.applications[idx]);
             L.applications.splice(idx, 1);
           }
           saveLedger();
           audit(sender, "APPROVE", t + " " + roles.join("+"));
           syncKeys(t, true);
           if (CFG.FRIEND_ON_REGISTER) addFriend(t, true);
-          R("✅ " + plainName(t) + " — " + roleString(t) + "\n🔑 " + keyString(t));
+          let ready = "";
+          if (wants && wants.depth && wants.stay && roles.includes(ROLE.LIVESTOCK)) {
+            const d = durationFrom(wants.stay), dp = depthFrom(wants.depth);
+            contractsLedger();
+            L.contracts.push({
+              key: Date.now().toString(36),
+              mn: t,
+              by: sender,
+              tpl: dp.key,
+              title: "B&B Farm · " + dp.label,
+              depth: dp.key,
+              durationMin: d.min,
+              policy: dp.key === "fun" ? "either" : "author",
+              rules: [],
+              status: "prepared",
+              at: Date.now()
+            });
+            saveLedger();
+            ready = "\n\n📜 They asked for " + dp.label + ", " + d.label + ". It's ready when you are: ?contract show " + dp.key + " " + t + " to look it over, then ?contract offer " + dp.key + " " + t + " " + d.key + " to send it.";
+          }
+          R("✅ " + plainName(t) + " — " + roleString(t) + "\n🔑 " + keyString(t) + (r.species ? "\n🐾 " + r.species : "") + (r.gender ? " · " + r.gender : "") + ready);
           beep(
             t,
             `🌾 You're in, ` + plainName(t) + `! Welcome to the family, sweetie. 💕
@@ -9058,6 +9162,43 @@ Welcome to B&B Farm, hon. 🌾`
           saveLedger();
           audit(sender, "MILKABLE", now ? "on" : "off");
           R(now ? "🥛 You're milkable now, darlin'! You'll start fillin' up by the hour. ?stats to watch it, and ?help barn for how grades work." : "Alrighty, no more milk for you. ?milkable on whenever you change your mind. 💛");
+          break;
+        }
+        case "gender": {
+          let t = sender, g = String(args[0] || "").toLowerCase();
+          if (args.length > 1) {
+            t = resolveTarget(args[0]);
+            g = String(args[1] || "").toLowerCase();
+            if (t !== sender && !isStaff(sender)) {
+              R("Only staff can set somebody else's, sugar.");
+              break;
+            }
+          }
+          const r = t && rec(t);
+          if (!r || !r.roles.length) {
+            R("That's just for folks on the books, sugar. ?apply first!");
+            break;
+          }
+          if (!g) {
+            R((t === sender ? "You're" : plainName(t) + " is") + " down as " + (r.gender || "not set yet") + ", hon. Pick one with ?gender female, male, futa or femboy.");
+            break;
+          }
+          if (!GENDERS.includes(g)) {
+            R("Just one of these, hon: ?gender female, male, futa or femboy.");
+            break;
+          }
+          if (g === "futa" && limitBlocks(t, "futa")) {
+            R("Their hard limits rule out futa, sugar, so I'll leave it.");
+            break;
+          }
+          const was = r.gender;
+          r.gender = g;
+          if (g === "futa") r.futa = true;
+          else if (was === "futa") r.futa = false;
+          prodOf(t);
+          saveLedger();
+          audit(sender, "GENDER", t + " " + g);
+          R("🌸 " + (t === sender ? "You're" : plainName(t) + " is") + " down as " + g + " now, sugar." + (g === "futa" ? " Futa makes milk and semen both." : "") + " It picks your farm outfit, too.");
           break;
         }
         case "futa": {

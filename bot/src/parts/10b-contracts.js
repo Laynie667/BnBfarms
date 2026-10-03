@@ -81,8 +81,10 @@
     const mine = L.contracts.filter(x => x.mn === t && (x.status === "signed" || x.status === "offered"));
     if (mine.filter(x => x.status === "signed").length >= BCPLUS.LIMITS.MAX_ACTIVE) return plainName(t)+" already holds "+BCPLUS.LIMITS.MAX_ACTIVE+" farm contracts, and BC+ won't take more.";
     enqueue(BCPLUS.offerMsg(c, t, CFG.ROOM_NAME));
-    L.contracts.push({ key: Date.now().toString(36), mn: t, by: sender, tpl: String(tplName).toLowerCase(), title: c.title, depth: tpl.base || "custom",
-                       durationMin: c.durationMin, policy: c.policy, rules: Object.keys(c.rules), status: "offered", at: Date.now() });
+    const entry = { mn: t, by: sender, tpl: String(tplName).toLowerCase(), title: c.title, depth: tpl.base || "custom",
+                    durationMin: c.durationMin, policy: c.policy, rules: Object.keys(c.rules), status: "offered", at: Date.now() };
+    const prepared = trackedContract(t, null, ["prepared"]);   // the one their application asked for
+    if (prepared) Object.assign(prepared, entry); else L.contracts.push(Object.assign({ key: Date.now().toString(36) }, entry));
     if (L.contracts.length > 300) L.contracts = L.contracts.slice(-300);
     saveLedger(); audit(sender, "CONTRACT_OFFER", t+" "+c.title+" "+d.key);
     tell(t, "📜 "+plainName(sender)+" offers you the farm contract \""+c.title+"\" ("+d.label+"). Read it on your BC+ Contracts page, and only sign if you want it. Nothin' applies till you do.");

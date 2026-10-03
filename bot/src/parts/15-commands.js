@@ -905,7 +905,7 @@
         let o = "📋 PENDING APPLICATIONS ("+L.applications.length+")\n";
         L.applications.forEach((a,i)=>{
           o += "\n"+(i+1)+". "+a.name+" ("+a.mn+")"+(a.staffTrack?" [staff]":"")+
-               "\n   "+(a.answers[1]||"?")+" • "+(a.answers[2]||"?")+" • "+(a.answers[3]||"?");
+               "\n   "+["role","species","gender","stay","depth"].map(k => appAnswer(a, k) || "?").join(" • ");
         });
         o += "\n\nSay ?app and the number to read one, like ?app 1.";
         R(o);
@@ -917,10 +917,8 @@
         if (!a){ R("There's no application by that number, sugar. Say ?app and a number from the ?queue list, like ?app 1."); break; }
         const list = a.staffTrack ? QUESTIONS.concat(STAFF_QUESTIONS) : QUESTIONS;
         let o = "📋 APPLICATION — "+a.name+" ("+a.mn+")\n"+new Date(a.at).toLocaleString()+"\n";
-        a.answers.forEach((ans,qi)=>{
-          const q = String(list[qi]||"").split("\n")[0].replace(/^\d+\/\d+ — /,"");
-          o += "\n▸ "+q+"\n   "+ans+"\n";
-        });
+        if (a.byKey) list.forEach(q => { o += "\n▸ "+q.text.split("\n")[0]+"\n   "+(a.byKey[q.key] || "—")+"\n"; });
+        else a.answers.forEach((ans,qi)=>{ o += "\n▸ "+(OLD_ORDER[qi] || "question "+(qi+1))+"\n   "+ans+"\n"; });   // an older application
         o += "\n?approve "+a.mn+" livestock\n?deny "+a.mn;
         R(o);
         break;
@@ -944,18 +942,25 @@
         r.name = plainName(t); r.registeredAt = Date.now();
         for (const role of roles) if (!r.roles.includes(role)) r.roles.push(role);
         const idx = L.applications.findIndex(a=>a.mn===t);
+        let wants = null;
         if (idx>=0){
-          const a = L.applications[idx];
-          r.limits = a.answers[7]||""; r.triggers = a.answers[9]||"";
-          r.aftercare = a.answers[10]||"";
-          r.species = String(a.answers[2]||"").toLowerCase().trim();
-          r.stayType = String(a.answers[3]||"").toLowerCase().trim();
+          wants = applyApplication(t, L.applications[idx]);
           L.applications.splice(idx,1);
         }
         saveLedger(); audit(sender,"APPROVE",t+" "+roles.join("+"));
         syncKeys(t, true);
         if (CFG.FRIEND_ON_REGISTER) addFriend(t, true);
-        R("✅ "+plainName(t)+" — "+roleString(t)+"\n🔑 "+keyString(t));
+        // the contract they asked for, ready for staff to look over and send
+        let ready = "";
+        if (wants && wants.depth && wants.stay && roles.includes(ROLE.LIVESTOCK)){
+          const d = BCPLUS.durationFrom(wants.stay), dp = BCPLUS.depthFrom(wants.depth);
+          contractsLedger();
+          L.contracts.push({ key: Date.now().toString(36), mn: t, by: sender, tpl: dp.key, title: "B&B Farm · "+dp.label, depth: dp.key,
+                             durationMin: d.min, policy: dp.key === "fun" ? "either" : "author", rules: [], status: "prepared", at: Date.now() });
+          saveLedger();
+          ready = "\n\n📜 They asked for "+dp.label+", "+d.label+". It's ready when you are: ?contract show "+dp.key+" "+t+" to look it over, then ?contract offer "+dp.key+" "+t+" "+d.key+" to send it.";
+        }
+        R("✅ "+plainName(t)+" — "+roleString(t)+"\n🔑 "+keyString(t)+(r.species ? "\n🐾 "+r.species : "")+(r.gender ? " · "+r.gender : "")+ready);
         beep(t,
 `🌾 You're in, `+plainName(t)+`! Welcome to the family, sweetie. 💕
 
@@ -1332,6 +1337,22 @@ Welcome to B&B Farm, hon. 🌾`);
         r.milkable = now; prodOf(sender); saveLedger(); audit(sender,"MILKABLE",now?"on":"off");
         R(now ? "🥛 You're milkable now, darlin'! You'll start fillin' up by the hour. ?stats to watch it, and ?help barn for how grades work."
               : "Alrighty, no more milk for you. ?milkable on whenever you change your mind. 💛");
+        break;
+      }
+
+      case "gender": {
+        // ?gender → yours · ?gender <female|male|futa|femboy> · staff: ?gender <who> <gender>
+        let t = sender, g = String(args[0]||"").toLowerCase();
+        if (args.length > 1){ t = resolveTarget(args[0]); g = String(args[1]||"").toLowerCase(); if (t !== sender && !isStaff(sender)){ R("Only staff can set somebody else's, sugar."); break; } }
+        const r = t && rec(t);
+        if (!r || !r.roles.length){ R("That's just for folks on the books, sugar. ?apply first!"); break; }
+        if (!g){ R((t === sender ? "You're" : plainName(t)+" is")+" down as "+(r.gender || "not set yet")+", hon. Pick one with ?gender female, male, futa or femboy."); break; }
+        if (!GENDERS.includes(g)){ R("Just one of these, hon: ?gender female, male, futa or femboy."); break; }
+        if (g === "futa" && limitBlocks(t,"futa")){ R("Their hard limits rule out futa, sugar, so I'll leave it."); break; }
+        const was = r.gender; r.gender = g;
+        if (g === "futa") r.futa = true; else if (was === "futa") r.futa = false;
+        prodOf(t); saveLedger(); audit(sender, "GENDER", t+" "+g);
+        R("🌸 "+(t === sender ? "You're" : plainName(t)+" is")+" down as "+g+" now, sugar."+(g === "futa" ? " Futa makes milk and semen both." : "")+" It picks your farm outfit, too.");
         break;
       }
 

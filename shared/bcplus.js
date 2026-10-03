@@ -31,10 +31,12 @@ export const DURATIONS = [
   { key: "1m", label: "1 month", min: 43_200, words: ["1m", "month", "1 month", "a month", "30 days", "a season", "season"] },
   { key: "perm", label: "Permanent", min: 0, words: ["perm", "permanent", "forever", "for good", "until released"] },
 ];
+// a whole word or phrase inside the text ("fortnight" must not count as "night")
+const hasWords = (t, w) => new RegExp("(^|[^a-z0-9])" + w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "($|[^a-z0-9])").test(t);
 export function durationFrom(text) {
   const t = String(text || "").trim().toLowerCase();
   return DURATIONS.find((d) => d.key === t || d.words.includes(t) || d.label.toLowerCase() === t)
-    || DURATIONS.find((d) => d.words.some((w) => w.length > 3 && t.includes(w))) || null;
+    || DURATIONS.find((d) => d.words.some((w) => w.length > 3 && hasWords(t, w))) || null;
 }
 
 export const DEPTHS = [
@@ -44,7 +46,7 @@ export const DEPTHS = [
 ];
 export function depthFrom(text) {
   const t = String(text || "").trim().toLowerCase();
-  return DEPTHS.find((d) => d.key === t || d.words.includes(t)) || DEPTHS.find((d) => d.words.some((w) => t.includes(w))) || null;
+  return DEPTHS.find((d) => d.key === t || d.words.includes(t)) || DEPTHS.find((d) => d.words.some((w) => hasWords(t, w))) || null;
 }
 
 // farm species → BC+ pet sound set (the rest use Custom with their own sounds)

@@ -72,7 +72,7 @@
                        "ping","apply","record","keys","who","herd","safe","safeword","red","report",
                        "staff","stuck","friend","notice","teaseme",
                        "stats","board","pedigree","breedable","fertile","naturalheat","breed","cum","milkable","futa","size","sizes","measure","penis","cock","rights","accept",
-                       "freeuse","jarok","tally","eggs","yes","no","wash","quota","praise","degrade",
+                       "freeuse","jarok","gender","tally","eggs","yes","no","wash","quota","praise","degrade",
                        "weather","feeding","curfew","beg","please","fair","enter"];
   const STAFF_CMDS  = ["queue","app","approve","deny","register","unregister","grant","revoke",
                        "claim","release","myherd","herdname","herdcall","herdsummon","turnout","letup","goldkey",

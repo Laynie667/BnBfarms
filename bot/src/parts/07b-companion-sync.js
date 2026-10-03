@@ -13,7 +13,7 @@
     const base = { name: plainName(mn), onBooks: !!(r && r.roles && r.roles.length) };
     if (!base.onBooks) return base;
     const s = Object.assign(base, {
-      roles: r.roles.slice(), tier: tierOf(mn) || "", species: r.species || "",
+      roles: r.roles.slice(), tier: tierOf(mn) || "", species: r.species || "", gender: r.gender || "",
       staff: isStaff(mn), herdmaster: isHerdmaster(mn), proprietor: isProprietor(mn), mandated: isMandated(mn),
       onDuty: r.onDuty !== false, onCall: isStaff(mn) && (isMandated(mn) || !!r.forced),
       pastureLock: r.pastureLock ? plainName(r.pastureLock.by) : null,

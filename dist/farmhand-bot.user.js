@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.9.30
+// @version      0.9.31
 // @description  B&B Farm: beeps, keys, ledger, roster, herds, summoning, anti-idle
 // @author       Laynie & Alexia
 // @match        *://*.bondageprojects.elementfx.com/*
@@ -1772,7 +1772,7 @@
   }
 
   // bot/src/version.js
-  var VERSION = "0.9.30";
+  var VERSION = "0.9.31";
 
   // bot-parts:farmhand-bot-parts
   (function() {
@@ -3091,7 +3091,7 @@
     };
     W.FarmhandExport = exportLedger;
     W.FarmhandLedger = () => L;
-    if (W.__FARMHAND_TEST__) Object.assign(W, { __st: () => state, __cfg: CFG, __pt: prodTick, __qt: quotaTick, __lt: leashTick, __ms: milkingStallTick });
+    if (W.__FARMHAND_TEST__) Object.assign(W, { __st: () => state, __cfg: CFG, __pt: prodTick, __qt: quotaTick, __lt: leashTick, __ms: milkingStallTick, __vt: voiceTick, __sync: syncCompanions });
     W.FarmhandSyncKeys = () => syncAllPresent(true);
     W.FarmhandFriends = () => W.Player.FriendList;
     W.FarmhandAddFriend = (mn) => addFriend(mn, false);
@@ -3675,7 +3675,8 @@
       degrade: "degrade",
       tally: "tally",
       teaseOptIn: "teaseme",
-      forced: "forced"
+      forced: "forced",
+      hypno: "hypno"
     };
     const DOC_CMDS = ["record", "stats", "vet", "quota", "keys", "size", "measure", "pedigree"];
     function stateFor(mn) {
@@ -3710,6 +3711,7 @@
         if (quotaOf(mn)) s.quota = { ml: Math.round(milkedOn(mn, dayKey())), goal: Math.round(quotaOf(mn)), streak: r.quotaStreak || 0 };
         s.today = { tally: tallyToday(mn), naughty: r.naughtyMarks || 0, praised: r.praised || 0, degraded: r.degraded || 0 };
         s.at = now;
+        if (isStaff(mn)) Object.assign(s, staffStateFor(mn));
         if (isProprietor(mn)) {
           outfitsLedger();
           s.outfits = {};
@@ -3720,6 +3722,48 @@
         dbg("stateFor:", e);
       }
       return s;
+    }
+    function staffStateFor(mn) {
+      const out = {}, here = (W.ChatRoomCharacter || []).map((c) => c.MemberNumber).filter((m) => m !== CFG.BOT_MEMBER && rec(m) && rec(m).roles.length);
+      out.herd = here.slice(0, 40).map((m) => {
+        const r2 = rec(m), p = prodOf(m);
+        return {
+          mn: m,
+          name: plainName(m),
+          role: (r2.roles[0] || "").toLowerCase(),
+          where: whereName(m) || "",
+          milk: makesMilk(m) ? Math.round(100 * p.milk / Math.max(1, milkCap(m))) : null,
+          heat: inHeat(p),
+          preg: !!p.preg,
+          denied: milkDenied(m),
+          mine: herdLeaderOf(m) === mn,
+          onDuty: r2.onDuty !== false
+        };
+      });
+      const r = rec(mn), wk = weekKey(), week = r.shift && r.shift.week && r.shift.week.key === wk ? r.shift.week.ms : 0;
+      out.shift = {
+        clocked: clockedIn(mn),
+        weekH: Math.round(10 * (week + (clockedIn(mn) ? Date.now() - r.shift.in : 0)) / 36e5) / 10,
+        onDuty: here.filter((m) => isStaff(m) && onDuty(m)).map(plainName),
+        onCall: forcedStaff().map((m) => ({ name: plainName(m), mandated: isMandated(m), here: !!charFor(m) }))
+      };
+      if (isHerdmaster(mn)) {
+        zonesLedger();
+        out.zones = L.zones;
+        out.spots = Object.keys(L.spots || {});
+        out.tease = (L.tease || []).slice(0, 60).map((x) => x.text);
+        out.teaseOpted = Object.values(L.people).filter((x) => x.teaseOptIn).length;
+        out.log = (L.log || []).slice(-10).reverse().map((e) => ({ t: e.t, a: e.a, by: plainName(e.by), d: String(e.d || "").slice(0, 40) }));
+      }
+      if (canHoldHerd(mn)) {
+        voiceLedger();
+        const members = Object.keys(L.people).map(Number).filter((m) => herdLeaderOf(m) === mn);
+        out.voice = {
+          herd: L.voice.herd[mn] || { on: false, lines: [], every: "15" },
+          members: members.slice(0, 40).map((m) => Object.assign({ mn: m, name: plainName(m), hypno: !!rec(m).hypno }, L.voice.member[m] || { on: false, lines: [], every: "15" }))
+        };
+      }
+      return out;
     }
     function syncCompanions(force) {
       for (const [mn, c] of state.companions) {
@@ -6125,6 +6169,64 @@
       } else if (m.answer === "declined") audit(mn, "OUTFIT_DECLINED", String(m.slot || ""));
       else if (m.answer === "back") audit(mn, "OUTFIT_BACK", "");
     }
+    function zonesLedger() {
+      L.zones = L.zones || {};
+    }
+    function inZone(z, p) {
+      if (!z || !z.a || !z.b || !p) return false;
+      return p.X >= Math.min(z.a.X, z.b.X) && p.X <= Math.max(z.a.X, z.b.X) && p.Y >= Math.min(z.a.Y, z.b.Y) && p.Y <= Math.max(z.a.Y, z.b.Y);
+    }
+    function whereName(mn) {
+      const C = charFor(mn), p = C && C.MapData && C.MapData.Pos;
+      if (!p) return null;
+      zonesLedger();
+      for (const [n, z] of Object.entries(L.zones)) if (inZone(z, p)) return z.group || n;
+      for (const [n, s] of Object.entries(L.spots || {})) if (Math.abs(s.X - p.X) <= 1 && Math.abs(s.Y - p.Y) <= 1) return n;
+      return null;
+    }
+    const zoneText = (n, z) => n + (z.group && z.group !== n ? " (part of " + z.group + ")" : "") + " · A " + (z.a ? z.a.X + "," + z.a.Y : "not set") + " → B " + (z.b ? z.b.X + "," + z.b.Y : "not set");
+    function voiceLedger() {
+      L.voice = L.voice || {};
+      L.voice.herd = L.voice.herd || {};
+      L.voice.member = L.voice.member || {};
+    }
+    function voiceFor(mn) {
+      voiceLedger();
+      const r = rec(mn);
+      if (!r || !r.hypno) return null;
+      const m = L.voice.member[mn];
+      if (m && m.on && m.lines.length) return m;
+      const lead = herdLeaderOf(mn), h = lead && L.voice.herd[lead];
+      return h && h.on && h.lines.length ? h : null;
+    }
+    function voiceTick() {
+      voiceLedger();
+      state.voiceNext = state.voiceNext || /* @__PURE__ */ new Map();
+      const now = Date.now();
+      for (const C of W.ChatRoomCharacter || []) {
+        const mn = C.MemberNumber, v = mn !== CFG.BOT_MEMBER && voiceFor(mn);
+        if (!v) {
+          state.voiceNext.delete(mn);
+          continue;
+        }
+        if (v.every === "chores" && !clockedIn(mn) && !whereName(mn)?.startsWith("milking")) continue;
+        const mins = v.every === "chores" ? 10 : parseInt(v.every, 10) || 15;
+        const next = state.voiceNext.get(mn);
+        if (!next) {
+          state.voiceNext.set(mn, now + mins * 6e4 * (0.5 + Math.random() * 0.5));
+          continue;
+        }
+        if (now < next) continue;
+        state.voiceNext.set(mn, now + mins * 6e4 * (0.8 + Math.random() * 0.4));
+        const line = fill(v.lines[Math.floor(Math.random() * v.lines.length)], mn);
+        if (hasCompanion(mn)) enqueue(makeMsg("voice", { text: line }, mn));
+        else enqueue({ Content: "[Voice] " + line, Type: "Whisper", Target: mn });
+      }
+    }
+    function canVoice(sender, t) {
+      if (t === "herd") return canHoldHerd(sender);
+      return isProprietor(sender) || herdLeaderOf(t) === sender;
+    }
     function clockedIn(mn) {
       const r = rec(mn);
       return !!(r && r.shift && r.shift.in);
@@ -7251,6 +7353,7 @@ Welcome to B&B Farm. Mind the ruts! 🌾`,
       "outfit",
       "outfits",
       "uniform",
+      "hypno",
       "tally",
       "eggs",
       "yes",
@@ -7341,7 +7444,10 @@ Welcome to B&B Farm. Mind the ruts! 🌾`,
       "inspect",
       "edge",
       "contract",
-      "contracts"
+      "contracts",
+      "zone",
+      "zones",
+      "voice"
     ];
     const SAFETY_CMDS = ["safe", "safeword", "red", "stuck"];
     const PRIVATE_REPLY = [
@@ -7961,6 +8067,165 @@ Welcome to B&B Farm. Mind the ruts! 🌾`,
             break;
           }
           R("?outfit · ?outfit offer <who> [slot] · ?outfit back · ?outfit clear <slot> · ?outfit keys staff|leader|owners · ?outfit rule approve|clockin|changeback on|off");
+          break;
+        }
+        case "zone":
+        case "zones": {
+          zonesLedger();
+          const sub = String(args[0] || "").toLowerCase(), name = String(args[1] || "").toLowerCase();
+          if (!sub || sub === "list") {
+            const ks = Object.keys(L.zones);
+            R("🗺️ ZONES\n" + (ks.length ? ks.map((n) => "  " + zoneText(n, L.zones[n])).join("\n") : "  none yet") + "\n\nHerdmasters: stand on a corner and ?zone a <name>, the opposite corner and ?zone b <name>. ?zone pair <name> <group> joins boxes into one place. ?zone who shows who's where.");
+            break;
+          }
+          if (sub === "who") {
+            const here = (W.ChatRoomCharacter || []).filter((c) => c.MemberNumber !== CFG.BOT_MEMBER && rec(c.MemberNumber));
+            const by = {};
+            for (const c of here) {
+              const w = whereName(c.MemberNumber) || "out in the open";
+              (by[w] = by[w] || []).push(plainName(c.MemberNumber));
+            }
+            R("🗺️ WHO'S WHERE\n" + (Object.keys(by).length ? Object.entries(by).map(([w, ns]) => "  " + w + ": " + ns.join(", ")).join("\n") : "  nobody on the books is here"));
+            break;
+          }
+          if (!isHerdmaster(sender)) {
+            R("Settin' zones is for herdmasters and proprietors, sugar. ?zone shows them.");
+            break;
+          }
+          if (!/^[a-z][a-z0-9_-]{1,19}$/.test(name)) {
+            R("Give the zone a one-word name, sugar, like ?zone a barn-1.");
+            break;
+          }
+          if (sub === "a" || sub === "b") {
+            const C = charFor(sender), p2 = C && C.MapData && C.MapData.Pos;
+            if (!p2) {
+              R("Step onto the map first, hon, so I can see where you're standin'.");
+              break;
+            }
+            const z2 = L.zones[name] = L.zones[name] || { group: name };
+            z2[sub] = { X: p2.X, Y: p2.Y };
+            saveLedger();
+            audit(sender, "ZONE_SET", name + " " + sub + " " + p2.X + "," + p2.Y);
+            R("🗺️ " + zoneText(name, z2) + (z2.a && z2.b ? "" : "\nNow stand on the opposite corner and ?zone " + (sub === "a" ? "b" : "a") + " " + name + "."));
+            break;
+          }
+          const z = L.zones[name];
+          if (!z) {
+            R("There's no zone called '" + name + "', sugar.");
+            break;
+          }
+          if (sub === "pair") {
+            const g = String(args[2] || "").toLowerCase();
+            if (!/^[a-z][a-z0-9_-]{1,19}$/.test(g)) {
+              R("Pair it into which place, hon? ?zone pair " + name + " barn");
+              break;
+            }
+            z.group = g;
+            saveLedger();
+            R("🗺️ " + name + " is part of " + g + " now. Everything in a group counts as one place.");
+            break;
+          }
+          if (sub === "unpair") {
+            z.group = name;
+            saveLedger();
+            R("🗺️ " + name + " stands on its own again.");
+            break;
+          }
+          if (sub === "clear") {
+            delete L.zones[name];
+            saveLedger();
+            audit(sender, "ZONE_CLEAR", name);
+            R("🗺️ Cleared " + name + ".");
+            break;
+          }
+          R("?zone · ?zone who · ?zone a|b <name> · ?zone pair <name> <group> · ?zone unpair <name> · ?zone clear <name>");
+          break;
+        }
+        case "hypno": {
+          const r = rec(sender);
+          if (!r || !r.roles.length) {
+            R("That's just for folks on the books, sugar.");
+            break;
+          }
+          const v = String(args[0] || "").toLowerCase();
+          if (v && !["on", "off"].includes(v)) {
+            R("?hypno on lets your herd leader's voice lines reach you · ?hypno off stops them.");
+            break;
+          }
+          r.hypno = v ? v === "on" : !r.hypno;
+          saveLedger();
+          audit(sender, "HYPNO", r.hypno ? "on" : "off");
+          R(r.hypno ? "🌀 Hypno: ON. If your herd leader sets voice lines for you, they'll drift in now and then, just for you. ?hypno off stops them any time." : "🌀 Hypno: off. No voice lines will reach you.");
+          break;
+        }
+        case "voice": {
+          voiceLedger();
+          const sub = String(args[0] || "").toLowerCase(), who = String(args[1] || "").toLowerCase();
+          const key = who === "herd" ? "herd" : resolveTarget(args[1]);
+          const slotOf = (k) => k === "herd" ? L.voice.herd[sender] = L.voice.herd[sender] || { on: false, lines: [], every: "15" } : L.voice.member[k] = L.voice.member[k] || { on: false, lines: [], every: "15", by: sender };
+          if (!sub) {
+            const h = L.voice.herd[sender], mine = Object.entries(L.voice.member).filter(([m, v2]) => v2.by === sender || herdLeaderOf(+m) === sender);
+            R("🌀 LISTEN TO MY VOICE\nYour herd: " + (h ? (h.on ? "on" : "off") + " · " + h.lines.length + " lines · every " + h.every : "not set") + (mine.length ? "\n" + mine.map(([m, v2]) => plainName(+m) + ": " + (v2.on ? "on" : "off") + " · " + v2.lines.length + " lines · every " + v2.every + (rec(+m) && rec(+m).hypno ? "" : " (they haven't said ?hypno on)")).join("\n") : "") + "\n\n?voice add herd|<who> <line> · ?voice on|off herd|<who> · ?voice list herd|<who> · ?voice remove herd|<who> <n> · ?voice every herd|<who> 5|15|30|chores");
+            break;
+          }
+          if (!key) {
+            R("For your herd or who, sugar? ?voice " + sub + " herd … or ?voice " + sub + " <name> …");
+            break;
+          }
+          if (!canVoice(sender, key)) {
+            R(key === "herd" ? "You need a herd of your own for that, hon." : "Only " + plainName(key) + "'s herd leader (or a proprietor) can set their voice, sugar.");
+            break;
+          }
+          const v = slotOf(key), label = key === "herd" ? "your herd" : plainName(key);
+          if (sub === "on" || sub === "off") {
+            v.on = sub === "on";
+            saveLedger();
+            audit(sender, "VOICE_" + sub.toUpperCase(), String(key));
+            R("🌀 Voice for " + label + ": " + sub + "." + (sub === "on" && key !== "herd" && !(rec(key) || {}).hypno ? " (They still have to say ?hypno on before any reach 'em.)" : ""));
+            break;
+          }
+          if (sub === "add") {
+            const line = args.slice(2).join(" ").trim();
+            if (!line || line.length > 200) {
+              R("Give me a line up to 200 characters, sugar. %name% becomes their name.");
+              break;
+            }
+            if (v.lines.length >= 30) {
+              R("That's 30 lines already, hon. Take one out first.");
+              break;
+            }
+            v.lines.push(line);
+            saveLedger();
+            R("🌀 Added for " + label + " (" + v.lines.length + " lines)." + (v.on ? "" : " It's off right now: ?voice on " + (key === "herd" ? "herd" : args[1])));
+            break;
+          }
+          if (sub === "list") {
+            R("🌀 " + label + " (" + (v.on ? "on" : "off") + ", every " + v.every + ")\n" + (v.lines.length ? v.lines.map((l, i) => i + 1 + ". " + l).join("\n") : "no lines yet"));
+            break;
+          }
+          if (sub === "remove") {
+            const i = parseInt(args[2], 10) - 1;
+            if (!(i >= 0 && i < v.lines.length)) {
+              R("Which number, hon? ?voice list " + (key === "herd" ? "herd" : args[1]) + " shows them.");
+              break;
+            }
+            v.lines.splice(i, 1);
+            saveLedger();
+            R("🌀 Took that one out.");
+            break;
+          }
+          if (sub === "every") {
+            const e = String(args[2] || "").toLowerCase();
+            if (!["5", "15", "30", "chores"].includes(e)) {
+              R("How often, sugar? 5, 15 or 30 (minutes), or chores (only while they're workin' or bein' milked).");
+              break;
+            }
+            v.every = e;
+            saveLedger();
+            R("🌀 " + label + ": " + (e === "chores" ? "only during chores and milkin'" : "about every " + e + " minutes") + ".");
+            break;
+          }
+          R("?voice · on|off · add · list · remove · every");
           break;
         }
         case "jarok": {
@@ -10583,6 +10848,7 @@ Welcome to B&B Farm, hon. 🌾`
           syncAllPresent(true);
         }
         teaseTick();
+        voiceTick();
         rutTick();
         quotaTick();
         prodTick();

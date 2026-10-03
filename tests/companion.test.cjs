@@ -84,6 +84,22 @@ const STATE = { name: "Laynie", onBooks: true, roles: ["PROPRIETOR", "LIVESTOCK"
   who.value = "Bessie"; who.dispatchEvent(new w.Event("input"));
   click("Offer it"); out("5 contract offer sent ->", cmds().includes("contract offer deep Bessie 1w"));
 
+  // 5b. the live staff tabs
+  bot({ type: "state", state: Object.assign({}, STATE, {
+    herd: [{ mn: 500, name: "Bessie", role: "livestock", where: "barn", milk: 88, heat: true, preg: false, denied: false, mine: true, onDuty: true }],
+    zones: { "barn-1": { a: { X: 2, Y: 2 }, b: { X: 5, Y: 4 }, group: "barn" } }, tease: ["Cute today, %name%."], teaseOpted: 4,
+    voice: { herd: { on: true, lines: ["Good cows stand still."], every: "15" }, members: [{ mn: 500, name: "Bessie", hypno: true, on: false, lines: [], every: "15" }] },
+    shift: { clocked: false, weekH: 6.5, onDuty: ["Laynie"], onCall: [{ name: "Hand", mandated: true, here: false }] },
+    log: [{ t: Date.now(), a: "TEASE_ADD", by: "Laynie", d: "" }] }) });
+  click("Herd"); out("5b herd shows where and flags ->", /barn/.test(text()), /in heat/.test(text()));
+  click("Summon to me"); out("5b summon from herd ->", cmds().includes("summon 500"));
+  click("Tease lines"); click("Remove"); out("5b tease remove ->", cmds().includes("tease remove 1"));
+  click("Zones"); out("5b zone map drawn ->", !!D.querySelector('#fhc-panel button[aria-label="barn-1"]'));
+  click("Set A where I stand"); out("5b zone corner ->", cmds().includes("zone a barn-1"));
+  click("Voice"); out("5b voice lines ->", /\[Voice\] Good cows stand still/.test(text()));
+  click("Shift"); out("5b shift and log ->", /6\.5 h this week/.test(text()), /TEASE_ADD/.test(text()));
+  bot({ type: "voice", text: "Moo for me." });
+
   click("Dashboard");
   out("6 dashboard knows BC+ ->", true);
   const nm = [...D.querySelectorAll("#fhc-panel input")].find((i) => i.placeholder === "prizecow");

@@ -31,6 +31,7 @@
       }
 
       teaseTick();
+      voiceTick();
       rutTick();
       quotaTick();
       prodTick();

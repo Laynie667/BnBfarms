@@ -4,6 +4,7 @@ import { guidesTab } from "./common.js";
 import { panelPrefs } from "./livestock.js";
 import { DURATIONS } from "../../../shared/bcplus.js";
 import { summonReady } from "../addons.js";
+import { herd, tease, zones, voice, shift } from "./staffdata.js";
 import { BOT_MEMBER } from "../config.js";
 
 // the most recent answer from the bot, shown under the forms so staff needn't flip to the Inbox
@@ -110,9 +111,14 @@ function toggles(ctx) {
 
 export const STAFF_TABS = [
   { id: "me", label: "Me", render: me },
+  { id: "herd", label: "Herd", render: herd },
   { id: "office", label: "Office", render: office, badge: (ctx) => ctx.docs.length },
   { id: "contracts", label: "Contracts", render: contracts },
-  { id: "barn", label: "Barn & herd", render: barn },
+  { id: "barn", label: "Barn", render: barn },
+  { id: "tease", label: "Tease lines", render: tease },
+  { id: "voice", label: "Voice", render: voice },
+  { id: "zones", label: "Zones", render: zones },
+  { id: "shift", label: "Shift", render: shift },
   { id: "guides", label: "Guides", render: (ctx) => guidesTab(ctx, true) },
   { id: "toggles", label: "Toggles", render: toggles },
 ];

@@ -72,7 +72,7 @@
                        "ping","apply","record","keys","who","herd","safe","safeword","red","report",
                        "staff","stuck","friend","notice","teaseme",
                        "stats","board","pedigree","breedable","fertile","naturalheat","breed","cum","milkable","futa","size","sizes","measure","penis","cock","rights","accept",
-                       "freeuse","jarok","gender","outfit","outfits","uniform","tally","eggs","yes","no","wash","quota","praise","degrade",
+                       "freeuse","jarok","gender","outfit","outfits","uniform","hypno","tally","eggs","yes","no","wash","quota","praise","degrade",
                        "weather","feeding","curfew","beg","please","fair","enter"];
   const STAFF_CMDS  = ["queue","app","approve","deny","register","unregister","grant","revoke",
                        "claim","release","myherd","herdname","herdcall","herdsummon","turnout","letup","goldkey",
@@ -84,7 +84,7 @@
                        "milk","collect","heat","heatline","shotlog",
                        "stocks","unstock","walk","tourstop","clockin","clockout","hours","done","chore","chores",
                        "wheel","spin","begphrase","score","drain","denial","ruin","jars","inseminate","nomilk","inspect","edge",
-                       "contract","contracts"];
+                       "contract","contracts","zone","zones","voice"];
 
   const SAFETY_CMDS = ["safe","safeword","red","stuck"];
   const PRIVATE_REPLY = ["record","keys","find","app","queue","roster","stock","health",

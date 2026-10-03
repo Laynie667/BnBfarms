@@ -4,7 +4,7 @@
   // ledger field → the command that flips it
   const SWITCH_CMDS = { breedable:"breedable", fertile:"fertile", jarok:"jarok", freeuse:"freeuse", futa:"futa",
                         milkable:"milkable", naturalHeat:"naturalheat", praise:"praise", degrade:"degrade",
-                        tally:"tally", teaseOptIn:"teaseme", forced:"forced" };
+                        tally:"tally", teaseOptIn:"teaseme", forced:"forced", hypno:"hypno" };
   // staff lookups about somebody else go to the Companion's Office tab
   const DOC_CMDS = ["record","stats","vet","quota","keys","size","measure","pedigree"];
 
@@ -34,6 +34,7 @@
       if (quotaOf(mn)) s.quota = { ml: Math.round(milkedOn(mn, dayKey())), goal: Math.round(quotaOf(mn)), streak: r.quotaStreak || 0 };
       s.today = { tally: tallyToday(mn), naughty: r.naughtyMarks || 0, praised: r.praised || 0, degraded: r.degraded || 0 };
       s.at = now;
+      if (isStaff(mn)) Object.assign(s, staffStateFor(mn));
       if (isProprietor(mn)){   // the Dashboard's outfit slots (no outfit data, just what's there)
         outfitsLedger();
         s.outfits = {}; for (const [k, o] of Object.entries(L.outfits)) s.outfits[k] = { items: o.items, locks: o.locks, at: o.at };
@@ -41,6 +42,35 @@
       }
     } catch(e){ dbg("stateFor:", e); }
     return s;
+  }
+
+  // what the Staff panel's Herd, Shift, Zones, Tease lines and Voice tabs show
+  function staffStateFor(mn){
+    const out = {}, here = (W.ChatRoomCharacter||[]).map(c => c.MemberNumber).filter(m => m !== CFG.BOT_MEMBER && rec(m) && rec(m).roles.length);
+    out.herd = here.slice(0, 40).map(m => {
+      const r = rec(m), p = prodOf(m);
+      return { mn: m, name: plainName(m), role: (r.roles[0]||"").toLowerCase(), where: whereName(m) || "",
+               milk: makesMilk(m) ? Math.round(100*p.milk/Math.max(1, milkCap(m))) : null, heat: inHeat(p), preg: !!p.preg,
+               denied: milkDenied(m), mine: herdLeaderOf(m) === mn, onDuty: r.onDuty !== false };
+    });
+    const r = rec(mn), wk = weekKey(), week = (r.shift && r.shift.week && r.shift.week.key === wk) ? r.shift.week.ms : 0;
+    out.shift = { clocked: clockedIn(mn), weekH: Math.round(10*(week + (clockedIn(mn) ? Date.now() - r.shift.in : 0))/3600000)/10,
+                  onDuty: here.filter(m => isStaff(m) && onDuty(m)).map(plainName),
+                  onCall: forcedStaff().map(m => ({ name: plainName(m), mandated: isMandated(m), here: !!charFor(m) })) };
+    if (isHerdmaster(mn)){
+      zonesLedger();
+      out.zones = L.zones; out.spots = Object.keys(L.spots || {});
+      out.tease = (L.tease || []).slice(0, 60).map(x => x.text);
+      out.teaseOpted = Object.values(L.people).filter(x => x.teaseOptIn).length;
+      out.log = (L.log || []).slice(-10).reverse().map(e => ({ t: e.t, a: e.a, by: plainName(e.by), d: String(e.d||"").slice(0, 40) }));
+    }
+    if (canHoldHerd(mn)){
+      voiceLedger();
+      const members = Object.keys(L.people).map(Number).filter(m => herdLeaderOf(m) === mn);
+      out.voice = { herd: L.voice.herd[mn] || { on:false, lines:[], every:"15" },
+                    members: members.slice(0, 40).map(m => Object.assign({ mn: m, name: plainName(m), hypno: !!rec(m).hypno }, L.voice.member[m] || { on:false, lines:[], every:"15" })) };
+    }
+    return out;
   }
 
   // send each connected Companion its state, if it changed since last time (force: send anyway)

@@ -74,6 +74,7 @@ export const SWITCH_INFO = [
   ["naturalheat", "Natural heat", "Come into heat on your own every 7 days"], ["praise", "Praise", "Let staff's praise count"],
   ["degrade", "Degrade", "Let staff's degradin' count"], ["tally", "Tally marks", "Show your tally on ?who and the board"],
   ["teaseme", "Tease me", "Let staff tease lines name you"],
+  ["hypno", "Hypno", "Let your herd leader's voice lines reach you, privately"],
 ];
 export function farmSwitches(ctx, list) {
   const sw = ctx.s.switches || {};

@@ -91,6 +91,17 @@ function onFarmMsg(m) {
       st.panel.setOutfit({ slot: String(m.slot || ""), label: String(m.label || "farm outfit"), data: String(m.data || ""),
         keys: Array.isArray(m.keys) ? m.keys.filter(Number.isInteger) : [], why: String(m.why || "") });
       break;
+    case "voice": {
+      // only you see it, like a thought; nothin' goes to the room
+      const line = String(m.text || "").slice(0, 300);
+      if (typeof window.ChatRoomSendLocal === "function") {
+        const p = window.document.createElement("p");
+        p.style.cssText = "color:#a67fd4;font-style:italic;margin:0.25em 0";
+        p.textContent = "[Voice] " + line;
+        window.ChatRoomSendLocal(p.outerHTML);
+      } else st.panel.add("[Voice] " + line, "notice");
+      break;
+    }
     case "outfitBack": {
       const r = changeBack();
       st.panel.add(r.ok ? "👗 Back in your own clothes" + (r.stillLocked ? " (farm-locked pieces stay till a keyholder opens 'em)" : "") + "." : "👗 " + r.why + ".", "notice");

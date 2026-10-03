@@ -33,6 +33,7 @@
       const p = prodOf(mn), now = Date.now();
       // milk rounds to 10 mL so a slowly fillin' udder doesn't resend every minute
       if (makesMilk(mn)) s.milk = { ml: Math.round(p.milk/10)*10, cap: Math.round(milkCap(mn)), grade: milkGrade(mn), lastAt: p.lastMilkAt || 0 };
+      if (p.stall && p.stall.until) s.stallUntil = Math.ceil(p.stall.until / 60000) * 60000;   // milkin' stall timer (to the minute)
       if (makesSemen(mn)) s.semen = { ml: Math.round(p.semen), cap: Math.round(semenCap(mn)) };
       s.holding = { ml: Math.round(heldTotal(p)), cap: Math.round(capacity(mn)) };
       s.body = bodyParts(mn).filter(k => CFG.SIZES[k]).map(k => ({ part: k, label: CFG.SIZES[k].label, size: sizeName(mn, k) }));
@@ -44,6 +45,7 @@
       s.today = { tally: tallyToday(mn), naughty: r.naughtyMarks || 0, praised: r.praised || 0, degraded: r.degraded || 0 };
       s.at = now;
       if (isStaff(mn)) Object.assign(s, staffStateFor(mn));
+      const mods = addonStateFor(mn); if (mods) s.mods = mods;   // add-on cards for the "Farm extras" tab
       if (isProprietor(mn)){   // the Dashboard's outfit slots (no outfit data, just what's there)
         outfitsLedger();
         s.outfits = {}; for (const [k, o] of Object.entries(L.outfits)) s.outfits[k] = { items: o.items, locks: o.locks, at: o.at };
@@ -68,7 +70,7 @@
                   onCall: forcedStaff().map(m => ({ name: plainName(m), mandated: isMandated(m), here: !!charFor(m) })) };
     if (isHerdmaster(mn)){
       zonesLedger();
-      out.zones = L.zones; out.spots = Object.keys(L.spots || {});
+      out.zones = L.zones; out.spots = L.spots || {};   // name → {X,Y}, drawn on the Zones map
       out.tease = (L.tease || []).slice(0, 60).map(x => x.text);
       out.teaseOpted = Object.values(L.people).filter(x => x.teaseOptIn).length;
       out.log = (L.log || []).slice(-10).reverse().map(e => ({ t: e.t, a: e.a, by: plainName(e.by), d: String(e.d||"").slice(0, 40) }));

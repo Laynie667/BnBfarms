@@ -1,7 +1,7 @@
 // npm run build  → makes dist/farmhand-bot.user.js and dist/farmhand-companion.user.js
 // npm run watch  → same, and rebuilds every time you save a file
 import * as esbuild from "esbuild";
-import { readFileSync, readdirSync, mkdirSync } from "node:fs";
+import { readFileSync, readdirSync, mkdirSync, existsSync } from "node:fs";
 import { resolve } from "node:path";
 
 const pkg = JSON.parse(readFileSync("package.json", "utf8"));
@@ -30,11 +30,21 @@ const targets = [
   { name: "companion", entry: "extension/src/index.js", header: "extension/header.txt", out: "dist/farmhand-companion.user.js", version: pkg.versions.companion },
 ];
 
+// Add-ons: every folder in addons/ with an addon.json becomes dist/farmhand-<name>.user.js
+// (separate scripts that run on the bot's computer and plug into the bot; folders starting with _ are shared code)
+const addonHeader = readFileSync("addons/_lib/header.txt", "utf8");
+for (const dir of readdirSync("addons", { withFileTypes: true })) {
+  if (!dir.isDirectory() || dir.name.startsWith("_") || !existsSync("addons/" + dir.name + "/addon.json")) continue;
+  const meta = JSON.parse(readFileSync("addons/" + dir.name + "/addon.json", "utf8"));
+  targets.push({ name: "add-on " + dir.name, entry: "addons/" + dir.name + "/index.js", out: "dist/farmhand-" + dir.name + ".user.js", version: meta.version,
+    headerText: addonHeader.replace("{{LABEL}}", meta.label).replace("{{DESCRIPTION}}", meta.description || "") });
+}
+
 mkdirSync("dist", { recursive: true });
 const watch = process.argv.includes("--watch");
 
 for (const t of targets) {
-  const header = readFileSync(t.header, "utf8").replace("{{VERSION}}", t.version);
+  const header = (t.headerText || readFileSync(t.header, "utf8")).replace("{{VERSION}}", t.version);
   const options = {
     entryPoints: [t.entry],
     bundle: true,
@@ -51,4 +61,5 @@ for (const t of targets) {
   if (watch) await (await esbuild.context(options)).watch();
   else await esbuild.build(options);
 }
-if (!watch) console.log("✅ Built bot v" + pkg.versions.bot + " and companion v" + pkg.versions.companion + " into dist/");
+if (!watch) console.log("✅ Built bot v" + pkg.versions.bot + ", companion v" + pkg.versions.companion +
+  (targets.length > 2 ? " and " + (targets.length - 2) + " add-on(s)" : "") + " into dist/");

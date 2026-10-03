@@ -51,18 +51,43 @@ export function zones(ctx) {
         Object.entries(zs).filter(([, z]) => z.a && z.b).map(([n, z]) => h("button", { type: "button", title: n, "aria-label": n, onclick: () => ctx.setUi({ zone: n }),
           style: { position: "absolute", padding: "0", left: Math.min(z.a.X, z.b.X) * PX + "px", top: Math.min(z.a.Y, z.b.Y) * PX + "px",
             width: (Math.abs(z.a.X - z.b.X) + 1) * PX + "px", height: (Math.abs(z.a.Y - z.b.Y) + 1) * PX + "px",
-            background: color(z.group) + "44", border: (n === sel ? "3px solid var(--fh-text)" : "1px solid " + color(z.group)) } }))),
+            background: color(z.group) + "44", border: (n === sel ? "3px solid var(--fh-text)" : "1px solid " + color(z.group)) } })),
+        // spots: little dots, hover for the name
+        Object.entries(ctx.s.spots || {}).filter(([, p]) => p && Number.isFinite(p.X)).map(([n, p]) => h("span", { title: n + " · " + p.X + "," + p.Y,
+          style: { position: "absolute", left: p.X * PX + 1 + "px", top: p.Y * PX + 1 + "px", width: PX - 2 + "px", height: PX - 2 + "px", borderRadius: "50%",
+            background: /^speaker/.test(n) ? "#7fa8c9" : n === "home" ? "#c9a35b" : "var(--fh-text)", pointerEvents: "auto" } }))),
       h("div", { style: { marginTop: "6px" } }, groups.map((g) => h("span", { class: "fhc-chip", style: { borderColor: color(g) } }, g)))),
     card(title("Zones"), Object.keys(zs).length ? Object.entries(zs).map(([n, z]) => h("button", { type: "button", class: "fhc-doc" + (n === sel ? " on" : ""), style: { width: "100%", marginBottom: "4px" }, onclick: () => ctx.setUi({ zone: n }) },
         h("b", null, n), h("div", { class: "fhc-muted" }, "part of " + z.group + " · A " + (z.a ? z.a.X + "," + z.a.Y : "—") + " → B " + (z.b ? z.b.X + "," + z.b.Y : "—")))) : muted("No zones yet."),
       btn("Who's where", () => ctx.send("zone who"))),
     card(title(sel ? "Editin' " + sel : "New zone"),
       h("label", { class: "fhc-label" }, "Zone name (one word)", h("input", { class: "fhc-in", value: ctx.ui.zoneName || sel || "", oninput: (e) => ctx.setUi({ zoneName: e.target.value }, true) })),
+      h("div", null, btn("Draw it on the map", () => {
+          const n = name(); if (!n) return ctx.hint("Name the zone first.");
+          ctx.api.pickTiles(2, "zone '" + n + "'", ([a, b]) => ctx.send("zone box " + n + " " + a.X + " " + a.Y + " " + b.X + " " + b.Y));
+        }, true)),
+      muted("Or walk it: stand on one corner, then the other."),
       h("div", null, btn("Set A where I stand", () => name() ? ctx.send("zone a " + name()) : ctx.hint("Name the zone first.")), btn("Set B where I stand", () => name() ? ctx.send("zone b " + name()) : ctx.hint("Name the zone first."))),
       h("label", { class: "fhc-label" }, "Pair with (one place, odd shapes)", h("input", { class: "fhc-in", placeholder: "barn", value: ctx.ui.zonePair || "", oninput: (e) => ctx.setUi({ zonePair: e.target.value }, true) })),
       h("div", null, btn("Pair", () => (name() && ctx.ui.zonePair) ? ctx.send("zone pair " + name() + " " + ctx.ui.zonePair.trim().toLowerCase()) : ctx.hint("Name the zone, and the place to pair it with.")),
         btn("Unpair", () => name() ? ctx.send("zone unpair " + name()) : ctx.hint("Name the zone first.")), btn("Delete", () => name() ? ctx.send("zone clear " + name()) : ctx.hint("Name the zone first.")))),
+    spotsCard(ctx),
   ];
+}
+
+// named spots: home, speakers, troughs, stalls, placards… pick one on the map or stand on it
+function spotsCard(ctx) {
+  const sp = Object.entries(ctx.s.spots || {});
+  const nm = () => (ctx.ui.spotName || "").trim().toLowerCase();
+  const ok = () => /^[a-z][a-z0-9_-]{1,19}$/.test(nm()) || (ctx.hint("Give the spot a one-word name, like speaker-barn, trough-1 or glory-1."), false);
+  return card(title("Spots"), muted("home · speaker-… (the bot talks from these) · trough-… · water-… · glory-1 and glory-1-visitor · placard-…"),
+    sp.length ? sp.map(([n, p]) => h("div", { class: "fhc-kv" }, h("span", null, h("b", null, n), " ", h("span", { class: "fhc-muted" }, p.X + "," + p.Y)),
+      h("span", null, h("button", { type: "button", class: "fhc-b", onclick: () => ctx.setUi({ spotName: n }) }, "Pick"),
+        h("button", { type: "button", class: "fhc-b", onclick: () => ctx.send("spot clear " + n) }, "Clear")))) : muted("No spots yet."),
+    h("label", { class: "fhc-label" }, "Spot name", h("input", { class: "fhc-in", placeholder: "speaker-barn", value: ctx.ui.spotName || "", oninput: (e) => ctx.setUi({ spotName: e.target.value }, true) })),
+    h("div", null,
+      btn("Click it on the map", () => { if (!ok()) return; const n = nm(); ctx.api.pickTiles(1, "spot '" + n + "'", ([p]) => ctx.send("spot place " + n + " " + p.X + " " + p.Y)); }, true),
+      btn("Set where I stand", () => ok() && ctx.send("spot set " + nm()))));
 }
 
 export function voice(ctx) {

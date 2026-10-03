@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.6.3
+// @version      0.7.0
 // @description  Your B&B Farm panel: the farm girl's answers, stat cards and guides, right in the game.
 // @author       Laynie & Alexia
 // @match        *://*.bondageprojects.elementfx.com/*
@@ -224,7 +224,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.6.3";
+  var VERSION = "0.7.0";
 
   // extension/src/config.js
   var BOT_MEMBER = 260239;
@@ -479,6 +479,12 @@ One of mods you are using is using an old version of SDK. It will work for now b
       s.quota && card(title("Quota"), bar("Today", ml(s.quota.ml) + " of " + ml(s.quota.goal), pct(s.quota.ml, s.quota.goal), "good")),
       s.semen && card(title("Seed"), bar("Stored", ml(s.semen.ml) + " of " + ml(s.semen.cap), pct(s.semen.ml, s.semen.cap))),
       gearCard(s),
+      s.stallUntil && card(h(
+        "div",
+        { class: "fhc-kv" },
+        title("Milkin' stall"),
+        chip(Math.max(0, Math.round((s.stallUntil - Date.now()) / 6e4)) + " min left", "acc")
+      ), muted("It drains you down to a quarter of what you hold, then lets go.")),
       h("div", null, btn("Quota", () => ctx.send("quota")), btn("Milk board", () => ctx.send("board")))
     ];
   }
@@ -2284,6 +2290,20 @@ One of mods you are using is using an old version of SDK. It will work for now b
               background: color(z.group) + "44",
               border: n === sel ? "3px solid var(--fh-text)" : "1px solid " + color(z.group)
             }
+          })),
+          // spots: little dots, hover for the name
+          Object.entries(ctx.s.spots || {}).filter(([, p]) => p && Number.isFinite(p.X)).map(([n, p]) => h("span", {
+            title: n + " · " + p.X + "," + p.Y,
+            style: {
+              position: "absolute",
+              left: p.X * PX + 1 + "px",
+              top: p.Y * PX + 1 + "px",
+              width: PX - 2 + "px",
+              height: PX - 2 + "px",
+              borderRadius: "50%",
+              background: /^speaker/.test(n) ? "#7fa8c9" : n === "home" ? "#c9a35b" : "var(--fh-text)",
+              pointerEvents: "auto"
+            }
           }))
         ),
         h("div", { style: { marginTop: "6px" } }, groups.map((g) => h("span", { class: "fhc-chip", style: { borderColor: color(g) } }, g)))
@@ -2301,6 +2321,12 @@ One of mods you are using is using an old version of SDK. It will work for now b
       card(
         title(sel ? "Editin' " + sel : "New zone"),
         h("label", { class: "fhc-label" }, "Zone name (one word)", h("input", { class: "fhc-in", value: ctx.ui.zoneName || sel || "", oninput: (e) => ctx.setUi({ zoneName: e.target.value }, true) })),
+        h("div", null, btn("Draw it on the map", () => {
+          const n = name();
+          if (!n) return ctx.hint("Name the zone first.");
+          ctx.api.pickTiles(2, "zone '" + n + "'", ([a, b]) => ctx.send("zone box " + n + " " + a.X + " " + a.Y + " " + b.X + " " + b.Y));
+        }, true)),
+        muted("Or walk it: stand on one corner, then the other."),
         h("div", null, btn("Set A where I stand", () => name() ? ctx.send("zone a " + name()) : ctx.hint("Name the zone first.")), btn("Set B where I stand", () => name() ? ctx.send("zone b " + name()) : ctx.hint("Name the zone first."))),
         h("label", { class: "fhc-label" }, "Pair with (one place, odd shapes)", h("input", { class: "fhc-in", placeholder: "barn", value: ctx.ui.zonePair || "", oninput: (e) => ctx.setUi({ zonePair: e.target.value }, true) })),
         h(
@@ -2310,8 +2336,40 @@ One of mods you are using is using an old version of SDK. It will work for now b
           btn("Unpair", () => name() ? ctx.send("zone unpair " + name()) : ctx.hint("Name the zone first.")),
           btn("Delete", () => name() ? ctx.send("zone clear " + name()) : ctx.hint("Name the zone first."))
         )
-      )
+      ),
+      spotsCard(ctx)
     ];
+  }
+  function spotsCard(ctx) {
+    const sp = Object.entries(ctx.s.spots || {});
+    const nm = () => (ctx.ui.spotName || "").trim().toLowerCase();
+    const ok = () => /^[a-z][a-z0-9_-]{1,19}$/.test(nm()) || (ctx.hint("Give the spot a one-word name, like speaker-barn, trough-1 or glory-1."), false);
+    return card(
+      title("Spots"),
+      muted("home · speaker-… (the bot talks from these) · trough-… · water-… · glory-1 and glory-1-visitor · placard-…"),
+      sp.length ? sp.map(([n, p]) => h(
+        "div",
+        { class: "fhc-kv" },
+        h("span", null, h("b", null, n), " ", h("span", { class: "fhc-muted" }, p.X + "," + p.Y)),
+        h(
+          "span",
+          null,
+          h("button", { type: "button", class: "fhc-b", onclick: () => ctx.setUi({ spotName: n }) }, "Pick"),
+          h("button", { type: "button", class: "fhc-b", onclick: () => ctx.send("spot clear " + n) }, "Clear")
+        )
+      )) : muted("No spots yet."),
+      h("label", { class: "fhc-label" }, "Spot name", h("input", { class: "fhc-in", placeholder: "speaker-barn", value: ctx.ui.spotName || "", oninput: (e) => ctx.setUi({ spotName: e.target.value }, true) })),
+      h(
+        "div",
+        null,
+        btn("Click it on the map", () => {
+          if (!ok()) return;
+          const n = nm();
+          ctx.api.pickTiles(1, "spot '" + n + "'", ([p]) => ctx.send("spot place " + n + " " + p.X + " " + p.Y));
+        }, true),
+        btn("Set where I stand", () => ok() && ctx.send("spot set " + nm()))
+      )
+    );
   }
   function voice(ctx) {
     const v = ctx.s.voice;
@@ -2803,6 +2861,52 @@ One of mods you are using is using an old version of SDK. It will work for now b
     { id: "addons", label: "Other addons", render: addons }
   ];
 
+  // extension/src/views/extras.js
+  function modsFor(ctx, view) {
+    const mods = ctx.s.mods || {};
+    return Object.entries(mods).filter(([, m]) => m && typeof m === "object" && (!Array.isArray(m.views) || m.views.includes(view)) && Array.isArray(m.cards) && m.cards.length);
+  }
+  function drawCard(ctx, name, c, i) {
+    const key = "x_" + name + "_" + i;
+    return card(
+      c.title && title(String(c.title)),
+      c.text && h("div", { class: "fhc-card", style: { whiteSpace: "pre-wrap" } }, String(c.text)),
+      Array.isArray(c.lines) && c.lines.map((l) => h("div", { class: "fhc-kv" }, h("span", null, String(l[0] ?? l)), l[1] !== void 0 ? h("b", null, String(l[1])) : null)),
+      Array.isArray(c.bars) && c.bars.map((b) => bar(String(b.label || ""), String(b.value ?? ""), Number(b.pct) || 0, b.kind)),
+      Array.isArray(c.chips) && c.chips.length ? h("div", null, c.chips.map((x) => chip(String(x.text ?? x), x.kind))) : null,
+      Array.isArray(c.toggles) && c.toggles.map((t) => toggle(String(t.label || ""), t.desc ? String(t.desc) : "", !!t.on, () => ctx.send(String(t.cmd)))),
+      c.input && h(
+        "div",
+        null,
+        h("input", { class: "fhc-in", placeholder: String(c.input.placeholder || ""), value: ctx.ui[key] || "", oninput: (e) => ctx.setUi({ [key]: e.target.value }, true) }),
+        btn(String(c.input.label || "Send"), () => {
+          const v = (ctx.ui[key] || "").trim();
+          if (!v) return ctx.hint("Type somethin' in the box first.");
+          ctx.send(String(c.input.cmd) + " " + v);
+          ctx.setUi({ [key]: "" });
+        }, true)
+      ),
+      Array.isArray(c.buttons) && c.buttons.length ? h("div", { style: { marginTop: "6px" } }, c.buttons.map((b) => btn(String(b.label || b.cmd), () => ctx.send(String(b.cmd)), !!b.accent))) : null,
+      c.note && muted(String(c.note))
+    );
+  }
+  function render(ctx, view) {
+    const list = modsFor(ctx, view);
+    if (!list.length) return [muted("No farm extras for you right now.")];
+    return list.map(([name, m]) => h(
+      "div",
+      null,
+      h("div", { class: "fhc-muted", style: { margin: "8px 2px 2px" } }, "🧩 " + String(m.label || name)),
+      m.cards.map((c, i) => drawCard(ctx, name, c, i))
+    ));
+  }
+  function withExtras(tabs, view, ctx) {
+    if (!modsFor(ctx, view).length) return tabs;
+    const t = { id: "extras", label: "Farm extras", render: (c) => render(c, view) };
+    const at = tabs.findIndex((x) => x.id === "guides");
+    return at < 0 ? tabs.concat(t) : tabs.slice(0, at).concat(t, tabs.slice(at));
+  }
+
   // extension/src/panel.js
   var VIEWS = {
     guest: { label: "Guest", tabs: GUEST_TABS },
@@ -3049,7 +3153,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
     }
     render() {
       const ctx = this.ctx(), view = this.view(), V = VIEWS[view];
-      const tabKey = "tab_" + view, tab = V.tabs.find((t) => t.id === this.ui[tabKey]) || V.tabs[0];
+      const tabs = view === "guest" ? V.tabs : withExtras(V.tabs, view, ctx);
+      const tabKey = "tab_" + view, tab = tabs.find((t) => t.id === this.ui[tabKey]) || tabs[0];
       const scroll = this.el.querySelector(".fhc-body"), keep = scroll ? scroll.scrollTop : 0;
       const box = this.el.querySelector("#fhc-input"), typed = box ? box.value : "", hadFocus = box && window.document.activeElement === box;
       this.el.classList.toggle("compact", !!this.prefs.compact);
@@ -3077,7 +3182,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
           h("button", { type: "button", class: "fhc-safe", onclick: () => this.ask("stuck") }, "I'm stuck"),
           h("button", { type: "button", class: "fhc-safe", style: { borderColor: "var(--fh-line)" }, onclick: () => this.ask("staff") }, "Call staff")
         ),
-        h("nav", { class: "fhc-row", "aria-label": "Panel sections" }, V.tabs.map((t) => {
+        h("nav", { class: "fhc-row", "aria-label": "Panel sections" }, tabs.map((t) => {
           const n = t.badge ? t.badge(ctx) : 0;
           return h("button", { type: "button", class: "fhc-pill" + (t === tab ? " on" : ""), onclick: () => {
             this.ui[tabKey] = t.id;
@@ -3484,8 +3589,48 @@ One of mods you are using is using an old version of SDK. It will work for now b
       }
       toBot("outfitSave", { slot, data: c.data, items: c.items, locks: c.locks });
     },
-    hasBackup
+    hasBackup,
+    // map tool: the next `count` clicks on the game's map pick tiles instead of walkin' you there
+    pickTiles(count, what, done) {
+      if (typeof window.ChatRoomMapViewIsActive === "function" && !window.ChatRoomMapViewIsActive()) {
+        st.panel.add(`🗺️ Switch the room to map view first, then press the button again. (Walkin' to the spot and using the "where I stand" buttons still works too.)`, "notice");
+        return;
+      }
+      if (typeof window.ChatRoomMapViewPixelToTileCoordinates !== "function") {
+        st.panel.add(`🗺️ This version of the game doesn't let me read map clicks. Use the "where I stand" buttons instead.`, "notice");
+        return;
+      }
+      st.pick = { count, what, done, got: [] };
+      st.panel.add("🗺️ Click " + (count > 1 ? "one corner of " : "the tile for ") + what + " on the map. You won't walk there. (Esc cancels.)", "notice");
+      st.panel.toggle(false);
+    },
+    cancelPick() {
+      if (st.pick) {
+        st.pick = null;
+        st.panel.add("🗺️ Map pickin' cancelled.", "notice");
+      }
+    }
   };
+  function pickClick() {
+    if (!st.pick || window.MouseX > 1e3) return false;
+    if (window.MouseX >= 790 && window.MouseY >= 860) return false;
+    const tile = window.ChatRoomMapViewPixelToTileCoordinates(window.MouseX, window.MouseY);
+    if (!tile) return true;
+    const p = st.pick;
+    p.got.push({ X: tile.X, Y: tile.Y });
+    if (p.got.length < p.count) {
+      st.panel.add("🗺️ Got " + tile.X + "," + tile.Y + ". Now click the opposite corner.", "notice");
+      return true;
+    }
+    st.pick = null;
+    try {
+      p.done(p.got);
+    } catch (e) {
+      console.warn("[Farmhand Companion]", e);
+    }
+    st.panel.toggle(true);
+    return true;
+  }
   function start() {
     st.panel = new Panel(sendCommand, api);
     st.panel.setStatus("waitin' for the farm girl");
@@ -3500,6 +3645,23 @@ One of mods you are using is using an old version of SDK. It will work for now b
         return;
       }
       return next(args);
+    });
+    try {
+      mod.hookFunction("ChatRoomMapViewClick", 10, (args, next) => {
+        let took = false;
+        try {
+          took = pickClick();
+        } catch (e) {
+          console.warn("[Farmhand Companion]", e);
+          st.pick = null;
+        }
+        return took ? void 0 : next(args);
+      });
+    } catch (e) {
+      console.warn("[Farmhand Companion] map clicks unavailable:", e);
+    }
+    window.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && st.pick) api.cancelPick();
     });
     if (typeof window.CommandCombine === "function") {
       window.CommandCombine([{

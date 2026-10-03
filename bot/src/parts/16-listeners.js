@@ -35,8 +35,8 @@
 
         if (data.Sender) state.lastSpoke.set(data.Sender, Date.now());
         if (data.Type === "Activity" && data.Content === "BCPAction"){ try { onBCPAction(data); } catch(e){ warn("bc+:",e); } return; }
-        if (data.Type === "Activity"){ try { onActivity(data); } catch(e){ warn("activity:",e); } return; }
-        if (data.Type === "Emote" || data.Type === "Chat"){ try { onRoleplay(data.Sender, String(data.Content||""), data.Type); } catch(e){ warn("rp:",e); } }
+        if (data.Type === "Activity"){ try { onActivity(data); } catch(e){ warn("activity:",e); } addonsEmit("activity", data); return; }
+        if (data.Type === "Emote" || data.Type === "Chat"){ try { onRoleplay(data.Sender, String(data.Content||""), data.Type); } catch(e){ warn("rp:",e); } addonsEmit("roleplay", data.Sender, String(data.Content||""), data.Type); }
         if (data.Type!=="Chat" && data.Type!=="Whisper") return;
         if (typeof data.Content!=="string") return;
 
@@ -71,11 +71,13 @@
         state.lastHealthy = Date.now();
         greet(mn);
         onArrive(mn);
+        addonsEmit("join", mn);
         if (CFG.KEY_SYNC_ON_JOIN) later(()=>syncKeys(mn,true), CFG.KEY_JOIN_DELAY_MS);
         if (CFG.FRIEND_ON_JOIN && rec(mn)) later(()=>addFriend(mn,true), 6000);
       } catch(e){ warn("join:",e); }
     });
 
+    W.ServerSocket.on("ChatRoomSyncMemberLeave",(data)=>{ try { if (data && data.SourceMemberNumber) addonsEmit("leave", data.SourceMemberNumber); } catch(e){ warn("leave:",e); } });
     W.ServerSocket.on("ChatRoomSync", ()=>{ state.lastHealthy = Date.now(); later(()=>pingCompanions(false), 4000); });
 
     W.ServerSocket.on("ChatRoomSearchResponse",(d)=>{

@@ -176,7 +176,35 @@ const api = {
     toBot("outfitSave", { slot, data: c.data, items: c.items, locks: c.locks });
   },
   hasBackup,
+  // map tool: the next `count` clicks on the game's map pick tiles instead of walkin' you there
+  pickTiles(count, what, done) {
+    if (typeof window.ChatRoomMapViewIsActive === "function" && !window.ChatRoomMapViewIsActive()) {
+      st.panel.add("🗺️ Switch the room to map view first, then press the button again. (Walkin' to the spot and using the \"where I stand\" buttons still works too.)", "notice"); return;
+    }
+    if (typeof window.ChatRoomMapViewPixelToTileCoordinates !== "function") {
+      st.panel.add("🗺️ This version of the game doesn't let me read map clicks. Use the \"where I stand\" buttons instead.", "notice"); return;
+    }
+    st.pick = { count, what, done, got: [] };
+    st.panel.add("🗺️ Click " + (count > 1 ? "one corner of " : "the tile for ") + what + " on the map. You won't walk there. (Esc cancels.)", "notice");
+    st.panel.toggle(false);   // out of the way of the map
+  },
+  cancelPick() { if (st.pick) { st.pick = null; st.panel.add("🗺️ Map pickin' cancelled.", "notice"); } },
 };
+
+// a map click while pickin': grab the tile, don't move the player
+function pickClick() {
+  if (!st.pick || window.MouseX > 1000) return false;                 // the right side is chat and buttons
+  if (window.MouseX >= 790 && window.MouseY >= 860) return false;       // the game's move arrows
+  const tile = window.ChatRoomMapViewPixelToTileCoordinates(window.MouseX, window.MouseY);
+  if (!tile) return true;                                               // off the edge: swallow it, keep pickin'
+  const p = st.pick;
+  p.got.push({ X: tile.X, Y: tile.Y });
+  if (p.got.length < p.count) { st.panel.add("🗺️ Got " + tile.X + "," + tile.Y + ". Now click the opposite corner.", "notice"); return true; }
+  st.pick = null;
+  try { p.done(p.got); } catch (e) { console.warn("[Farmhand Companion]", e); }
+  st.panel.toggle(true);
+  return true;
+}
 
 function start() {
   st.panel = new Panel(sendCommand, api);
@@ -187,6 +215,17 @@ function start() {
     if (m) { try { onFarmMsg(m); } catch (e) { console.warn("[Farmhand Companion]", e); } return; }
     return next(args);
   });
+
+  // map pickin' (Zones tab): a click on the map picks a tile instead of walkin'
+  // (an older game without the map view mustn't stop the rest of the Companion from startin')
+  try {
+    mod.hookFunction("ChatRoomMapViewClick", 10, (args, next) => {
+      let took = false;
+      try { took = pickClick(); } catch (e) { console.warn("[Farmhand Companion]", e); st.pick = null; }
+      return took ? undefined : next(args);
+    });
+  } catch (e) { console.warn("[Farmhand Companion] map clicks unavailable:", e); }
+  window.addEventListener("keydown", (e) => { if (e.key === "Escape" && st.pick) api.cancelPick(); });
 
   // /farm stats, /farm size... (BC eats lines that start with / otherwise)
   if (typeof window.CommandCombine === "function") {

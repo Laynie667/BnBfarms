@@ -12,6 +12,7 @@ import { LIVESTOCK_TABS } from "./views/livestock.js";
 import { GUEST_TABS } from "./views/guest.js";
 import { STAFF_TABS } from "./views/staff.js";
 import { DASHBOARD_TABS } from "./views/dashboard.js";
+import { withExtras } from "./views/extras.js";
 
 const VIEWS = {
   guest: { label: "Guest", tabs: GUEST_TABS },
@@ -158,7 +159,8 @@ export class Panel {
   }
   render() {
     const ctx = this.ctx(), view = this.view(), V = VIEWS[view];
-    const tabKey = "tab_" + view, tab = V.tabs.find((t) => t.id === this.ui[tabKey]) || V.tabs[0];
+    const tabs = view === "guest" ? V.tabs : withExtras(V.tabs, view, ctx);   // + "Farm extras" when an add-on has somethin'
+    const tabKey = "tab_" + view, tab = tabs.find((t) => t.id === this.ui[tabKey]) || tabs[0];
     const scroll = this.el.querySelector(".fhc-body"), keep = scroll ? scroll.scrollTop : 0;
     // a message arrivin' mid-sentence mustn't eat what they're typin'
     const box = this.el.querySelector("#fhc-input"), typed = box ? box.value : "", hadFocus = box && window.document.activeElement === box;
@@ -173,7 +175,7 @@ export class Panel {
         h("button", { type: "button", class: "fhc-safe red", onclick: () => this.ask("safe") }, "Safe word"),
         h("button", { type: "button", class: "fhc-safe", onclick: () => this.ask("stuck") }, "I'm stuck"),
         h("button", { type: "button", class: "fhc-safe", style: { borderColor: "var(--fh-line)" }, onclick: () => this.ask("staff") }, "Call staff")),
-      h("nav", { class: "fhc-row", "aria-label": "Panel sections" }, V.tabs.map((t) => {
+      h("nav", { class: "fhc-row", "aria-label": "Panel sections" }, tabs.map((t) => {
         const n = t.badge ? t.badge(ctx) : 0;
         return h("button", { type: "button", class: "fhc-pill" + (t === tab ? " on" : ""), onclick: () => { this.ui[tabKey] = t.id; this.render(); } }, t.label + (n ? " · " + n : ""));
       })),

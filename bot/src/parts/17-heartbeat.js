@@ -44,6 +44,7 @@
       homeTick();
       lifeTick();
       workTick();
+      addonsEmit("tick");          // add-on scripts (10f-addons.js)
       for (const [mn,a] of state.arrivals) if (Date.now() > a.until) state.arrivals.delete(mn);
       if (Date.now() - (state.lastSync||0) > 60000){ state.lastSync = Date.now(); syncCompanions(); }
 

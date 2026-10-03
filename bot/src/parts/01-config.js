@@ -123,6 +123,7 @@
       OVERFULL_H: 24, LEAK_EMOTE_MIN: 30,
       HEAT_H: 12, NATURAL_HEAT_EVERY_D: 7, HEAT_EMOTE_MIN: 20,
       STALL_MILK_PER_MIN: 250, STALL_SEMEN_PER_MIN: 5,
+      STALL_LEAVE_SHARE: 0.25,     // milkin' stalls drain you down to this much of your capacity, then stop
       WEEKLY_PRIZE: true                           // top producer each week goes prize tier
     },
     /* ── MILK GRADE ── each milking session is scored 0-100; the grade is the

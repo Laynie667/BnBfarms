@@ -348,7 +348,7 @@
     if (tierOf(mn) === "prize") r *= 1.25;
     if (boosted(p,"hungry")) r *= CFG.HUNGRY_X;
     if (p.nursed && p.nursed.week === weekKey()) r *= 1 + Math.min(CFG.NURSE_SUPPLY_MAX, CFG.NURSE_SUPPLY_STEP * p.nursed.n);
-    return r;
+    return r * addonRateX(mn, "milk");   // add-ons (barn life: fed and groomed stock milk better)
   }
   function semenRate(mn){
     const p = prodOf(mn);
@@ -356,7 +356,7 @@
     if (boosted(p,"semen")) r *= 2;
     if (wornTags(mn).has("virility")) r *= 1.5;
     if (boosted(p,"hungry")) r *= CFG.HUNGRY_X;
-    return r;
+    return r * addonRateX(mn, "semen");
   }
 
   // yield board: today and this week
@@ -746,11 +746,21 @@
       const pos = C.MapData && C.MapData.Pos;
       if (!pos || C.MemberNumber === CFG.BOT_MEMBER) continue;
       const on = stalls.some(([,s]) => Math.abs(s.X-pos.X) <= 1 && Math.abs(s.Y-pos.Y) <= 1);
-      if (!on || !rec(C.MemberNumber)) continue;
-      const mn = C.MemberNumber, p = prodOf(mn);
-      // wearin' a pump in the stall? the pump does the milkin' (gearTick), so it isn't counted twice
-      const gotM = makesMilk(mn) && !milkDenied(mn) && !gearOf(mn).milk ? drainMilk(mn, CFG.PROD.STALL_MILK_PER_MIN*dtMin) : 0;
-      const gotS = makesSemen(mn) ? drainSemen(mn, CFG.PROD.STALL_SEMEN_PER_MIN*dtMin) : 0;
+      if (!on || !rec(C.MemberNumber)){ const p0 = rec(C.MemberNumber) && prodOf(C.MemberNumber); if (p0) p0.stall = null; continue; }
+      const mn = C.MemberNumber, p = prodOf(mn), now = Date.now();
+      // the stall drains down to a quarter of what they can hold, then stops (CFG.PROD.STALL_LEAVE_SHARE)
+      const keepM = milkCap(mn) * CFG.PROD.STALL_LEAVE_SHARE, keepS = semenCap(mn) * CFG.PROD.STALL_LEAVE_SHARE;
+      const doM = makesMilk(mn) && !milkDenied(mn) && !gearOf(mn).milk && p.milk > keepM;   // a pump they're wearin' does its own milkin' (gearTick)
+      const doS = makesSemen(mn) && p.semen > keepS;
+      // the stall timer: minutes till they're down to a quarter
+      const mins = Math.ceil(Math.max(doM ? (p.milk - keepM) / CFG.PROD.STALL_MILK_PER_MIN : 0, doS ? (p.semen - keepS) / CFG.PROD.STALL_SEMEN_PER_MIN : 0));
+      if (!p.stall && (doM || doS)){
+        p.stall = { since: now };
+        tell(mn, "🥛 The stall latches on. About "+mins+" minute"+(mins === 1 ? "" : "s")+" to drain you down to a quarter, sugar. Stay put.");
+      }
+      if (p.stall) p.stall.until = now + mins*60000;
+      const gotM = doM ? drainMilk(mn, Math.min(CFG.PROD.STALL_MILK_PER_MIN*dtMin, p.milk - keepM)) : 0;
+      const gotS = doS ? drainSemen(mn, Math.min(CFG.PROD.STALL_SEMEN_PER_MIN*dtMin, p.semen - keepS)) : 0;
       const got = gotM + gotS;
       // a stud in the stall gets their own show
       if (gotS > 0 && Date.now() - (p.stallSaid||0) > 5*60000*(0.75+Math.random()*0.5)){
@@ -761,9 +771,14 @@
                     "A warm vibrating cup hugs "+n+"'s balls while the sleeve sucks their cock. "+n+" is a moanin', drippin' mess in the stall."];
         emote("🐂 "+L1[Math.floor(Math.random()*L1.length)]);
       }
-      if (got > 0 && p.milk < 1 && p.semen < 1) emote(makesSemen(mn) && !makesMilk(mn)
-        ? "🐂 The stall wrings one last shaky spurt out of "+plainName(mn)+" and lets go. Balls emptied, legs wobbly. Good stud!"
-        : "🥛 The milkin' stall drains "+plainName(mn)+" plumb dry. Good job, sweetie! Off you go.");
+      const doneM = !makesMilk(mn) || milkDenied(mn) || gearOf(mn).milk || p.milk <= keepM + 1;
+      const doneS = !makesSemen(mn) || p.semen <= keepS + 0.5;
+      if (p.stall && doneM && doneS){
+        p.stall = null;
+        if (got > 0) emote(makesSemen(mn) && !makesMilk(mn)
+          ? "🐂 The stall wrings "+plainName(mn)+" down to the last quarter and lets go. Balls aching and light, legs wobbly. Good stud!"
+          : "🥛 The milkin' stall eases off once "+plainName(mn)+" is down to a quarter, teats sore and drippin'. Good job, sweetie! Off you go.");
+      }
     }
   }
 

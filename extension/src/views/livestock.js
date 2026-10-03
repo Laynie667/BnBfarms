@@ -55,6 +55,8 @@ function milking(ctx) {
     s.quota && card(title("Quota"), bar("Today", ml(s.quota.ml) + " of " + ml(s.quota.goal), pct(s.quota.ml, s.quota.goal), "good")),
     s.semen && card(title("Seed"), bar("Stored", ml(s.semen.ml) + " of " + ml(s.semen.cap), pct(s.semen.ml, s.semen.cap))),
     gearCard(s),
+    s.stallUntil && card(h("div", { class: "fhc-kv" }, title("Milkin' stall"),
+      chip(Math.max(0, Math.round((s.stallUntil - Date.now()) / 60000)) + " min left", "acc")), muted("It drains you down to a quarter of what you hold, then lets go.")),
     h("div", null, btn("Quota", () => ctx.send("quota")), btn("Milk board", () => ctx.send("board"))),
   ];
 }

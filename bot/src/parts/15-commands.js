@@ -42,7 +42,8 @@
     const p = parseCommand(raw, isWhisper, isBeep);
     if (!p){ huh("I didn't catch a command in that, sugar. Try ?help, or just say what you'd like, like stats or keys."); return; }
     const { cmd, args, rest } = p;
-    if (!PUBLIC_CMDS.includes(cmd) && !STAFF_CMDS.includes(cmd)){ huh("I don't know ?"+cmd+", hon. ?help lists what I can do."); return; }
+    const addonCmd = ADDON_CMDS.get(cmd) || null;   // a command from an add-on script (10f-addons.js)
+    if (!PUBLIC_CMDS.includes(cmd) && !STAFF_CMDS.includes(cmd) && !addonCmd){ huh("I don't know ?"+cmd+", hon. ?help lists what I can do."); return; }
     if (STAFF_CMDS.includes(cmd) && !isStaff(sender)){ huh("?"+cmd+" is just for farm staff, sugar."); return; }
     if (onCooldown(sender, cmd, channel)){ if (channel !== "chat") waitYourTurn(sender, raw, channel); return; }
 
@@ -57,7 +58,7 @@
       return;
     }
     // Files, rosters and keys are nobody else's business: never said out loud.
-    const replyCh = (channel === "chat" && PRIVATE_REPLY.includes(cmd))
+    const replyCh = (channel === "chat" && (PRIVATE_REPLY.includes(cmd) || (addonCmd && addonCmd.def.private)))
       ? (isFriend(sender) ? "beep" : "whisper") : channel;
     // staff lookin' up somebody else from the Companion: the answer goes in their Office, not the feed
     const docAbout = (channel === "companion" && DOC_CMDS.includes(cmd) && args[0] && isStaff(sender)) ? resolveTarget(args[0]) : null;
@@ -65,7 +66,23 @@
       ? (txt) => toCompanion(sender, txt, "doc", false, { kind: cmd, who: plainName(docAbout), about: docAbout })
       : (txt) => reply(sender, txt, replyCh);
 
+    if (addonCmd){ runAddonCommand(addonCmd, sender, args, rest, channel, R); return; }
+
     switch (cmd) {
+
+      case "addons": case "addon": {
+        // ?addons · ?addons <name> · proprietors: ?addons on|off <name>
+        const sub = String(args[0]||"").toLowerCase();
+        if ((sub === "on" || sub === "off") && args[1]){
+          if (!isProprietor(sender)){ R("Only proprietors switch add-ons on and off, sugar."); break; }
+          const a = ADDONS.get(String(args[1]).toLowerCase());
+          if (!a){ R("There's no add-on called '"+args[1]+"', hon. ?addons lists 'em."); break; }
+          a.enabled = sub === "on"; L.addonsOff = L.addonsOff || {}; if (a.enabled) delete L.addonsOff[a.name]; else L.addonsOff[a.name] = true;
+          saveLedger(); audit(sender, "ADDON_"+sub.toUpperCase(), a.name);
+          R("🧩 "+a.label+" is "+(a.enabled ? "on" : "off")+"."); syncCompanions(true); break;
+        }
+        R(addonsText(args[0])); break;
+      }
 
       case "help": case "commands": case "info": case "guide":
         R(helpFor(sender, args[0]));
@@ -351,6 +368,15 @@
         }
         if (!isHerdmaster(sender)){ R("Settin' zones is for herdmasters and proprietors, sugar. ?zone shows them."); break; }
         if (!/^[a-z][a-z0-9_-]{1,19}$/.test(name)){ R("Give the zone a one-word name, sugar, like ?zone a barn-1."); break; }
+        if (sub === "box"){
+          // ?zone box <name> <ax> <ay> <bx> <by>: both corners at once (the Companion's map clicks send this)
+          const n = args.slice(2, 6).map(v => parseInt(v, 10)), wide = W.ChatRoomMapViewWidth || 40, high = W.ChatRoomMapViewHeight || 40;
+          if (n.length < 4 || n.some((v, i) => !(v >= 0 && v < (i % 2 ? high : wide)))){ R("I need two corners on the map, sugar: ?zone box "+name+" <ax> <ay> <bx> <by>."); break; }
+          const z = L.zones[name] = L.zones[name] || { group: name };
+          z.a = { X: n[0], Y: n[1] }; z.b = { X: n[2], Y: n[3] }; saveLedger(); audit(sender, "ZONE_SET", name+" box");
+          R("🗺️ "+zoneText(name, z));
+          break;
+        }
         if (sub === "a" || sub === "b"){
           const C = charFor(sender), p = C && C.MapData && C.MapData.Pos;
           if (!p){ R("Step onto the map first, hon, so I can see where you're standin'."); break; }
@@ -1371,6 +1397,13 @@ Welcome to B&B Farm, hon. 🌾`);
           L.spots[name] = { X:pos.X, Y:pos.Y, by:sender, at:Date.now() };
           saveLedger(); audit(sender,"SPOT",name+" "+pos.X+","+pos.Y);
           R("📍 '"+name+"' is set to "+pos.X+","+pos.Y+", sugar!");
+        } else if (sub === "place"){
+          // ?spot place <name> <x> <y>: from the Companion's map clicks (or typed), no walkin' needed
+          const x = parseInt(args[2], 10), y = parseInt(args[3], 10), wide = W.ChatRoomMapViewWidth || 40, high = W.ChatRoomMapViewHeight || 40;
+          if (!(x >= 0 && y >= 0 && x < wide && y < high)){ R("I need a tile on the map, sugar: ?spot place "+name+" <x> <y>, like ?spot place speaker-barn 12 7."); break; }
+          L.spots[name] = { X:x, Y:y, by:sender, at:Date.now() };
+          saveLedger(); audit(sender,"SPOT",name+" "+x+","+y);
+          R("📍 '"+name+"' is set to "+x+","+y+", sugar!");
         } else if (sub === "clear"){
           if (!L.spots[name]){ R("There's no spot called '"+name+"', hon. Plain ?spot shows the list."); break; }
           delete L.spots[name]; saveLedger(); audit(sender,"SPOT_CLEAR",name);
@@ -2210,6 +2243,7 @@ Welcome to B&B Farm, hon. 🌾`);
     if (!pc){
       const low0 = String(raw).trim().toLowerCase().replace(/^[?!.\-\/]/,"").replace(/^bot\s+/,"");
       if ((low0 === "yes" || low0 === "no") && (state.breedAsks.has(sender) || state.jarAsks.has(sender))) return answerPending(sender, low0 === "yes");
+      if ((low0 === "yes" || low0 === "no") && addonAsks.has(sender)) return addonYesNo(sender, low0 === "yes");
       return false;
     }
     if (Date.now() - pc.at > CFG.CLAIM_ASK_TIMEOUT_MIN*60000){

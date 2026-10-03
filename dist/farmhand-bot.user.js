@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.9.36
+// @version      0.10.0
 // @description  B&B Farm: beeps, keys, ledger, roster, herds, summoning, anti-idle
 // @author       Laynie & Alexia
 // @match        *://*.bondageprojects.elementfx.com/*
@@ -1772,7 +1772,7 @@
   }
 
   // bot/src/version.js
-  var VERSION = "0.9.36";
+  var VERSION = "0.10.0";
 
   // bot-parts:farmhand-bot-parts
   (function() {
@@ -1928,6 +1928,8 @@
         HEAT_EMOTE_MIN: 20,
         STALL_MILK_PER_MIN: 250,
         STALL_SEMEN_PER_MIN: 5,
+        STALL_LEAVE_SHARE: 0.25,
+        // milkin' stalls drain you down to this much of your capacity, then stop
         WEEKLY_PRIZE: true
         // top producer each week goes prize tier
       },
@@ -3110,7 +3112,7 @@
     };
     W.FarmhandExport = exportLedger;
     W.FarmhandLedger = () => L;
-    if (W.__FARMHAND_TEST__) Object.assign(W, { __st: () => state, __cfg: CFG, __pt: prodTick, __qt: quotaTick, __lt: leashTick, __ms: milkingStallTick, __vt: voiceTick, __sync: syncCompanions, __gt: gearTick, __ht: homeTick });
+    if (W.__FARMHAND_TEST__) Object.assign(W, { __st: () => state, __cfg: CFG, __pt: prodTick, __qt: quotaTick, __lt: leashTick, __ms: milkingStallTick, __vt: voiceTick, __sync: syncCompanions, __gt: gearTick, __ht: homeTick, __addons: (h, ...a) => addonsEmit(h, ...a), __stateFor: (mn) => stateFor(mn) });
     W.FarmhandSyncKeys = () => syncAllPresent(true);
     W.FarmhandFriends = () => W.Player.FriendList;
     W.FarmhandAddFriend = (mn) => addFriend(mn, false);
@@ -3634,6 +3636,7 @@
       }
     }
     function plainName(mn) {
+      if (mn === ANON_STUD) return "an anonymous stranger at the glory stalls";
       const C = charFor(mn);
       if (C) {
         try {
@@ -3791,6 +3794,7 @@
       try {
         const p = prodOf(mn), now = Date.now();
         if (makesMilk(mn)) s.milk = { ml: Math.round(p.milk / 10) * 10, cap: Math.round(milkCap(mn)), grade: milkGrade(mn), lastAt: p.lastMilkAt || 0 };
+        if (p.stall && p.stall.until) s.stallUntil = Math.ceil(p.stall.until / 6e4) * 6e4;
         if (makesSemen(mn)) s.semen = { ml: Math.round(p.semen), cap: Math.round(semenCap(mn)) };
         s.holding = { ml: Math.round(heldTotal(p)), cap: Math.round(capacity(mn)) };
         s.body = bodyParts(mn).filter((k) => CFG.SIZES[k]).map((k) => ({ part: k, label: CFG.SIZES[k].label, size: sizeName(mn, k) }));
@@ -3802,6 +3806,8 @@
         s.today = { tally: tallyToday(mn), naughty: r.naughtyMarks || 0, praised: r.praised || 0, degraded: r.degraded || 0 };
         s.at = now;
         if (isStaff(mn)) Object.assign(s, staffStateFor(mn));
+        const mods = addonStateFor(mn);
+        if (mods) s.mods = mods;
         if (isProprietor(mn)) {
           outfitsLedger();
           s.outfits = {};
@@ -3840,7 +3846,7 @@
       if (isHerdmaster(mn)) {
         zonesLedger();
         out.zones = L.zones;
-        out.spots = Object.keys(L.spots || {});
+        out.spots = L.spots || {};
         out.tease = (L.tease || []).slice(0, 60).map((x) => x.text);
         out.teaseOpted = Object.values(L.people).filter((x) => x.teaseOptIn).length;
         out.log = (L.log || []).slice(-10).reverse().map((e) => ({ t: e.t, a: e.a, by: plainName(e.by), d: String(e.d || "").slice(0, 40) }));
@@ -4282,7 +4288,7 @@
       if (tierOf(mn) === "prize") r *= 1.25;
       if (boosted(p, "hungry")) r *= CFG.HUNGRY_X;
       if (p.nursed && p.nursed.week === weekKey()) r *= 1 + Math.min(CFG.NURSE_SUPPLY_MAX, CFG.NURSE_SUPPLY_STEP * p.nursed.n);
-      return r;
+      return r * addonRateX(mn, "milk");
     }
     function semenRate(mn) {
       const p = prodOf(mn);
@@ -4290,7 +4296,7 @@
       if (boosted(p, "semen")) r *= 2;
       if (wornTags(mn).has("virility")) r *= 1.5;
       if (boosted(p, "hungry")) r *= CFG.HUNGRY_X;
-      return r;
+      return r * addonRateX(mn, "semen");
     }
     function dayKey(d) {
       d = d || /* @__PURE__ */ new Date();
@@ -4707,10 +4713,23 @@
         const pos = C.MapData && C.MapData.Pos;
         if (!pos || C.MemberNumber === CFG.BOT_MEMBER) continue;
         const on = stalls.some(([, s]) => Math.abs(s.X - pos.X) <= 1 && Math.abs(s.Y - pos.Y) <= 1);
-        if (!on || !rec(C.MemberNumber)) continue;
-        const mn = C.MemberNumber, p = prodOf(mn);
-        const gotM = makesMilk(mn) && !milkDenied(mn) && !gearOf(mn).milk ? drainMilk(mn, CFG.PROD.STALL_MILK_PER_MIN * dtMin) : 0;
-        const gotS = makesSemen(mn) ? drainSemen(mn, CFG.PROD.STALL_SEMEN_PER_MIN * dtMin) : 0;
+        if (!on || !rec(C.MemberNumber)) {
+          const p0 = rec(C.MemberNumber) && prodOf(C.MemberNumber);
+          if (p0) p0.stall = null;
+          continue;
+        }
+        const mn = C.MemberNumber, p = prodOf(mn), now = Date.now();
+        const keepM = milkCap(mn) * CFG.PROD.STALL_LEAVE_SHARE, keepS = semenCap(mn) * CFG.PROD.STALL_LEAVE_SHARE;
+        const doM = makesMilk(mn) && !milkDenied(mn) && !gearOf(mn).milk && p.milk > keepM;
+        const doS = makesSemen(mn) && p.semen > keepS;
+        const mins = Math.ceil(Math.max(doM ? (p.milk - keepM) / CFG.PROD.STALL_MILK_PER_MIN : 0, doS ? (p.semen - keepS) / CFG.PROD.STALL_SEMEN_PER_MIN : 0));
+        if (!p.stall && (doM || doS)) {
+          p.stall = { since: now };
+          tell(mn, "🥛 The stall latches on. About " + mins + " minute" + (mins === 1 ? "" : "s") + " to drain you down to a quarter, sugar. Stay put.");
+        }
+        if (p.stall) p.stall.until = now + mins * 6e4;
+        const gotM = doM ? drainMilk(mn, Math.min(CFG.PROD.STALL_MILK_PER_MIN * dtMin, p.milk - keepM)) : 0;
+        const gotS = doS ? drainSemen(mn, Math.min(CFG.PROD.STALL_SEMEN_PER_MIN * dtMin, p.semen - keepS)) : 0;
         const got = gotM + gotS;
         if (gotS > 0 && Date.now() - (p.stallSaid || 0) > 5 * 6e4 * (0.75 + Math.random() * 0.5)) {
           p.stallSaid = Date.now();
@@ -4722,7 +4741,12 @@
           ];
           emote("🐂 " + L1[Math.floor(Math.random() * L1.length)]);
         }
-        if (got > 0 && p.milk < 1 && p.semen < 1) emote(makesSemen(mn) && !makesMilk(mn) ? "🐂 The stall wrings one last shaky spurt out of " + plainName(mn) + " and lets go. Balls emptied, legs wobbly. Good stud!" : "🥛 The milkin' stall drains " + plainName(mn) + " plumb dry. Good job, sweetie! Off you go.");
+        const doneM = !makesMilk(mn) || milkDenied(mn) || gearOf(mn).milk || p.milk <= keepM + 1;
+        const doneS = !makesSemen(mn) || p.semen <= keepS + 0.5;
+        if (p.stall && doneM && doneS) {
+          p.stall = null;
+          if (got > 0) emote(makesSemen(mn) && !makesMilk(mn) ? "🐂 The stall wrings " + plainName(mn) + " down to the last quarter and lets go. Balls aching and light, legs wobbly. Good stud!" : "🥛 The milkin' stall eases off once " + plainName(mn) + " is down to a quarter, teats sore and drippin'. Good job, sweetie! Off you go.");
+        }
       }
     }
     function doCum(stud, t, hole, R, auto, opt) {
@@ -5472,6 +5496,7 @@
           if (!pm.nursed || pm.nursed.week !== wk) pm.nursed = { week: wk, n: 0 };
           pm.nursed.n++;
         }
+        if (got >= 1 && drinker) addonsEmit("nurse", milker, drinker, got, milkGrade(milker));
         if (got >= 1 && drinker && rec(drinker)) {
           const pd = prodOf(drinker), dk = dayKey();
           if (!pd.drank || pd.drank.day !== dk) pd.drank = { day: dk, ml: 0, said: false };
@@ -6458,6 +6483,303 @@
           }
         }
       }
+    }
+    const ADDONS = /* @__PURE__ */ new Map();
+    const ADDON_CMDS = /* @__PURE__ */ new Map();
+    const addonAsks = /* @__PURE__ */ new Map();
+    const ADDON_NAME = /^[a-z][a-z0-9-]{1,23}$/;
+    const RANKS = { anyone: 0, staff: 1, herdmaster: 2, proprietor: 3 };
+    const ANON_STUD = -1;
+    function staffPoints(mn, n, why) {
+      if (!mn || mn < 0) return;
+      const S = L.staffScore = L.staffScore || {}, wk = weekKey();
+      const x = S[mn] = S[mn] || { week: wk, pts: 0, total: 0, why: {} };
+      if (x.week !== wk) {
+        x.week = wk;
+        x.pts = 0;
+        x.why = {};
+      }
+      x.pts += n;
+      x.total += n;
+      if (why) x.why[why] = (x.why[why] || 0) + n;
+      saveLedger();
+    }
+    function rankOf(mn) {
+      return isProprietor(mn) ? 3 : isHerdmaster(mn) ? 2 : isStaff(mn) ? 1 : 0;
+    }
+    function addonData(name) {
+      L.mods = L.mods || {};
+      return L.mods[name] = L.mods[name] || {};
+    }
+    function addonCall(a, what, fn, ...args) {
+      try {
+        return fn(...args);
+      } catch (e) {
+        warn("add-on " + a.name + " (" + what + "):", e);
+        a.errors = (a.errors || 0) + 1;
+        a.lastError = String(e && e.message || e).slice(0, 200);
+        return void 0;
+      }
+    }
+    function addonsEmit(hook, ...args) {
+      for (const a of ADDONS.values()) if (a.on && typeof a.on[hook] === "function" && a.enabled !== false) addonCall(a, hook, a.on[hook], ...args);
+    }
+    function posOf(mn) {
+      const C = charFor(mn);
+      return C && C.MapData && C.MapData.Pos ? { X: C.MapData.Pos.X, Y: C.MapData.Pos.Y } : null;
+    }
+    function onSpot(mn, name, reach) {
+      const p = posOf(mn), s = L.spots && L.spots[name];
+      if (!p || !s) return false;
+      return Math.max(Math.abs(p.X - s.X), Math.abs(p.Y - s.Y)) <= (reach || 0);
+    }
+    function whoOnSpot(name, reach) {
+      return (W.ChatRoomCharacter || []).map((c) => c.MemberNumber).filter((m) => m !== CFG.BOT_MEMBER && onSpot(m, name, reach));
+    }
+    function zonesOf(mn) {
+      zonesLedger();
+      const p = posOf(mn);
+      return p ? Object.entries(L.zones).filter(([, z]) => z.a && z.b && inZone(z, p)).map(([n, z]) => ({ name: n, group: z.group })) : [];
+    }
+    function inZoneNamed(mn, name) {
+      return zonesOf(mn).some((z) => z.name === name || z.group === name);
+    }
+    function privateLine(mn, text, kind, urgent) {
+      const line = (kind === "emote" ? "*" : "") + String(text);
+      if (hasCompanion(mn)) {
+        enqueue(makeMsg("roomline", { text: line, kind: kind === "emote" ? "emote" : "chat" }, mn), urgent);
+        return;
+      }
+      const ooc = mapRoom();
+      for (const c of splitMessage(line, 900)) enqueue({ Content: ooc ? "(" + c.replace(/\)/g, "]") : c, Type: "Whisper", Target: mn }, urgent);
+    }
+    function addonRateX(mn, kind) {
+      let x = 1;
+      for (const a of ADDONS.values()) {
+        if (a.enabled === false || !a.rates || typeof a.rates[kind] !== "function") continue;
+        const v = Number(addonCall(a, "rates." + kind, a.rates[kind], mn));
+        if (v > 0 && isFinite(v)) x *= v;
+      }
+      return Math.max(0.25, Math.min(3, x));
+    }
+    function activityInfo(data) {
+      const dict = Array.isArray(data && data.Dictionary) ? data.Dictionary : [];
+      const pk = (k) => {
+        const e = dict.find((d) => d && d[k] !== void 0);
+        return e ? e[k] : void 0;
+      };
+      let src = pk("SourceCharacter"), tgt = pk("TargetCharacter");
+      if (typeof src !== "number") src = data.Sender;
+      if (typeof tgt !== "number") {
+        const old = dict.find((d) => d && d.Tag === "TargetCharacter");
+        tgt = old ? old.MemberNumber : src;
+      }
+      return {
+        act: String(pk("ActivityName") || (String(data.Content || "").match(/-([A-Za-z_]+)$/) || [])[1] || ""),
+        src,
+        tgt,
+        focus: String(pk("FocusGroupName") || String(data.Content || "").split("-")[1] || "")
+      };
+    }
+    function addonApi(a) {
+      return Object.freeze({
+        name: a.name,
+        version: VERSION,
+        cfg: CFG,
+        data: () => addonData(a.name),
+        save: () => saveLedger(),
+        log: (...x) => log("[" + a.name + "]", ...x),
+        audit: (by, action, detail) => audit(by, a.name.toUpperCase() + "_" + action, detail),
+        // talkin'
+        say: (t, urgent, who) => say(t, urgent, who),
+        emote: (t, who) => emote(t, who),
+        whisper: (mn, t) => whisper(mn, t),
+        privateEmote: (mn, t) => privateLine(mn, t, "emote"),
+        privateSay: (mn, t) => privateLine(mn, t, "chat"),
+        tell: (mn, t) => tell(mn, t),
+        notice: (mn, t) => hasCompanion(mn) ? toCompanion(mn, t, "notice") : whisper(mn, t),
+        reply: (mn, t, ch) => reply(mn, t, ch),
+        notifyStaff: (t, routine) => notifyStaff(t, routine),
+        ask: (mn, text, cb) => {
+          addonAsks.set(mn, { addon: a.name, cb, at: Date.now() });
+          askCard(mn, a.name, text);
+        },
+        // people
+        name: plainName,
+        char: charFor,
+        find: resolveTarget,
+        here: () => (W.ChatRoomCharacter || []).map((c) => c.MemberNumber).filter((m) => m !== CFG.BOT_MEMBER),
+        onMap,
+        rec: (mn) => rec(mn),
+        isStaff,
+        isHerdmaster,
+        isProprietor,
+        hasRole,
+        ROLE,
+        onDuty,
+        herdLeaderOf,
+        herdMembers,
+        species: speciesKey,
+        gender: genderOf,
+        hasCompanion,
+        limitBlocks,
+        rank: rankOf,
+        // bodies
+        prod: prodOf,
+        HOLES,
+        holeBlocked,
+        hasVulva,
+        makesSemen,
+        makesMilk,
+        capacity,
+        milkCap,
+        heldTotal,
+        drainMilk,
+        drainSemen,
+        tally,
+        ml,
+        ANON_STUD,
+        staffPoints,
+        staffScores: () => JSON.parse(JSON.stringify(L.staffScore || {})),
+        inHeat,
+        startHeat,
+        rollConception,
+        gearOf,
+        funnelOn,
+        // the map
+        pos: posOf,
+        spot: (n) => L.spots && L.spots[n] || null,
+        spots: () => Object.assign({}, L.spots || {}),
+        onSpot,
+        whoOnSpot,
+        zonesOf,
+        inZone: inZoneNamed,
+        zones: () => {
+          zonesLedger();
+          return L.zones;
+        },
+        teleport,
+        spotBeside,
+        activityInfo,
+        // time
+        later,
+        dayKey,
+        weekKey
+      });
+    }
+    function registerAddon(def) {
+      if (!def || typeof def !== "object") throw new Error("register() needs { name, ... }");
+      const name = String(def.name || "").toLowerCase();
+      if (!ADDON_NAME.test(name)) throw new Error("add-on name must be lowercase letters, numbers or dashes, like 'glory-stalls'");
+      if (ADDONS.has(name)) {
+        warn("add-on " + name + " registered twice; the newer one replaces it");
+        unregisterAddon(name);
+      }
+      const a = {
+        name,
+        label: String(def.label || name),
+        version: String(def.version || "0"),
+        on: def.on || {},
+        companion: def.companion,
+        rates: def.rates || null,
+        guide: def.guide || "",
+        commands: {},
+        enabled: !(L.addonsOff && L.addonsOff[name]),
+        errors: 0
+      };
+      a.api = addonApi(a);
+      for (const [word0, c] of Object.entries(def.commands || {})) {
+        const word = String(word0).toLowerCase();
+        if (PUBLIC_CMDS.includes(word) || STAFF_CMDS.includes(word) || ["addons", "addon"].includes(word)) {
+          warn("add-on " + name + ": ?" + word + " belongs to the bot, skipped");
+          continue;
+        }
+        if (ADDON_CMDS.has(word)) {
+          warn("add-on " + name + ": ?" + word + " is already taken by " + ADDON_CMDS.get(word).addon.name + ", skipped");
+          continue;
+        }
+        if (!c || typeof c.run !== "function") continue;
+        a.commands[word] = c;
+        ADDON_CMDS.set(word, { addon: a, def: c });
+      }
+      ADDONS.set(name, a);
+      if (typeof def.setup === "function") addonCall(a, "setup", def.setup, a.api);
+      log("Add-on loaded: " + a.label + " v" + a.version + " (" + Object.keys(a.commands).map((c) => "?" + c).join(" ") + ")");
+      return a.api;
+    }
+    function unregisterAddon(name) {
+      const a = ADDONS.get(name);
+      if (!a) return false;
+      for (const w of Object.keys(a.commands)) ADDON_CMDS.delete(w);
+      ADDONS.delete(name);
+      return true;
+    }
+    function runAddonCommand(hit, sender, args, rest, channel, R) {
+      const { addon: a, def } = hit;
+      if (a.enabled === false) {
+        R(a.label + " is switched off right now, sugar.");
+        return;
+      }
+      const need = RANKS[def.rank || "anyone"] || 0;
+      if (rankOf(sender) < need) {
+        R("Sorry, sugar, that one's for " + (def.rank === "proprietor" ? "proprietors" : def.rank === "herdmaster" ? "herdmasters and proprietors" : "farm staff") + ".");
+        return;
+      }
+      let answered = false;
+      const ctx = { sender, args, rest, channel, api: a.api, reply: (t) => {
+        answered = true;
+        R(t);
+      } };
+      addonCall(a, "?" + Object.keys(a.commands).find((w) => a.commands[w] === def), def.run, ctx);
+      if (!answered && channel !== "chat" && !(state.cmdWatch && state.cmdWatch.emotes.length))
+        R("👍 Done.");
+    }
+    function addonYesNo(sender, yes) {
+      const ask = addonAsks.get(sender);
+      if (!ask) return false;
+      addonAsks.delete(sender);
+      if (Date.now() - ask.at > 15 * 6e4) {
+        tell(sender, "That question timed out, sugar, so nothin' happened.");
+        return true;
+      }
+      const a = ADDONS.get(ask.addon);
+      if (a) addonCall(a, "ask", ask.cb, yes);
+      return true;
+    }
+    function addonStateFor(mn) {
+      const out = {};
+      for (const a of ADDONS.values()) {
+        if (a.enabled === false || typeof a.companion !== "function") continue;
+        const v = addonCall(a, "companion", a.companion, mn);
+        if (v && typeof v === "object") out[a.name] = Object.assign({ label: a.label }, v);
+      }
+      return Object.keys(out).length ? out : void 0;
+    }
+    function addonsText(topic) {
+      if (topic) {
+        const a = ADDONS.get(String(topic).toLowerCase()) || [...ADDONS.values()].find((x) => x.label.toLowerCase() === String(topic).toLowerCase());
+        if (!a) return "There's no add-on called '" + topic + "', hon. ?addons lists 'em.";
+        return "🧩 " + a.label + " v" + a.version + (a.enabled === false ? " (switched off)" : "") + "\n" + (a.guide || "No guide written yet.") + "\n\nCommands: " + (Object.keys(a.commands).map((c) => "?" + c).join(" · ") || "none");
+      }
+      if (!ADDONS.size) return "🧩 No add-ons are runnin' on the farm right now.";
+      return "🧩 FARM ADD-ONS\n" + [...ADDONS.values()].map((a) => "• " + a.label + " (" + a.name + ")" + (a.enabled === false ? " · off" : "") + (a.errors ? " · " + a.errors + " errors" : "") + ": " + (Object.keys(a.commands).map((c) => "?" + c).join(" ") || "no commands")).join("\n") + "\n?addons <name> shows one add-on's guide.";
+    }
+    function addonsBoot() {
+      if (W.Farmhand && W.Farmhand.__bot === true) return;
+      W.Farmhand = Object.freeze({
+        api: 1,
+        version: VERSION,
+        __bot: true,
+        // returns the add-on's helpers; the same helpers are also handed to setup(api)
+        register: (def) => registerAddon(def),
+        list: () => [...ADDONS.values()].map((a) => ({ name: a.name, label: a.label, version: a.version, enabled: a.enabled !== false, errors: a.errors }))
+      });
+      try {
+        W.dispatchEvent(new W.CustomEvent("farmhand:ready", { detail: { api: 1, version: VERSION } }));
+      } catch (e) {
+        warn("farmhand:ready:", e);
+      }
+      log("Add-on door open (window.Farmhand).");
     }
     function clockedIn(mn) {
       const r = rec(mn);
@@ -7623,7 +7945,9 @@ Welcome to B&B Farm. Mind the ruts! 🌾`,
       "beg",
       "please",
       "fair",
-      "enter"
+      "enter",
+      "addons",
+      "addon"
     ];
     const STAFF_CMDS = [
       "queue",
@@ -7867,7 +8191,8 @@ Welcome to B&B Farm. Mind the ruts! 🌾`,
         return;
       }
       const { cmd, args, rest } = p;
-      if (!PUBLIC_CMDS.includes(cmd) && !STAFF_CMDS.includes(cmd)) {
+      const addonCmd = ADDON_CMDS.get(cmd) || null;
+      if (!PUBLIC_CMDS.includes(cmd) && !STAFF_CMDS.includes(cmd) && !addonCmd) {
         huh("I don't know ?" + cmd + ", hon. ?help lists what I can do.");
         return;
       }
@@ -7885,10 +8210,40 @@ Welcome to B&B Farm. Mind the ruts! 🌾`,
         audit(sender, "SAFETY_OUTSIDE", cmd);
         return;
       }
-      const replyCh = channel === "chat" && PRIVATE_REPLY.includes(cmd) ? isFriend(sender) ? "beep" : "whisper" : channel;
+      const replyCh = channel === "chat" && (PRIVATE_REPLY.includes(cmd) || addonCmd && addonCmd.def.private) ? isFriend(sender) ? "beep" : "whisper" : channel;
       const docAbout = channel === "companion" && DOC_CMDS.includes(cmd) && args[0] && isStaff(sender) ? resolveTarget(args[0]) : null;
       const R = docAbout && docAbout !== sender ? (txt) => toCompanion(sender, txt, "doc", false, { kind: cmd, who: plainName(docAbout), about: docAbout }) : (txt) => reply(sender, txt, replyCh);
+      if (addonCmd) {
+        runAddonCommand(addonCmd, sender, args, rest, channel, R);
+        return;
+      }
       switch (cmd) {
+        case "addons":
+        case "addon": {
+          const sub = String(args[0] || "").toLowerCase();
+          if ((sub === "on" || sub === "off") && args[1]) {
+            if (!isProprietor(sender)) {
+              R("Only proprietors switch add-ons on and off, sugar.");
+              break;
+            }
+            const a = ADDONS.get(String(args[1]).toLowerCase());
+            if (!a) {
+              R("There's no add-on called '" + args[1] + "', hon. ?addons lists 'em.");
+              break;
+            }
+            a.enabled = sub === "on";
+            L.addonsOff = L.addonsOff || {};
+            if (a.enabled) delete L.addonsOff[a.name];
+            else L.addonsOff[a.name] = true;
+            saveLedger();
+            audit(sender, "ADDON_" + sub.toUpperCase(), a.name);
+            R("🧩 " + a.label + " is " + (a.enabled ? "on" : "off") + ".");
+            syncCompanions(true);
+            break;
+          }
+          R(addonsText(args[0]));
+          break;
+        }
         case "help":
         case "commands":
         case "info":
@@ -8373,6 +8728,20 @@ Welcome to B&B Farm. Mind the ruts! 🌾`,
           }
           if (!/^[a-z][a-z0-9_-]{1,19}$/.test(name)) {
             R("Give the zone a one-word name, sugar, like ?zone a barn-1.");
+            break;
+          }
+          if (sub === "box") {
+            const n = args.slice(2, 6).map((v) => parseInt(v, 10)), wide = W.ChatRoomMapViewWidth || 40, high = W.ChatRoomMapViewHeight || 40;
+            if (n.length < 4 || n.some((v, i) => !(v >= 0 && v < (i % 2 ? high : wide)))) {
+              R("I need two corners on the map, sugar: ?zone box " + name + " <ax> <ay> <bx> <by>.");
+              break;
+            }
+            const z2 = L.zones[name] = L.zones[name] || { group: name };
+            z2.a = { X: n[0], Y: n[1] };
+            z2.b = { X: n[2], Y: n[3] };
+            saveLedger();
+            audit(sender, "ZONE_SET", name + " box");
+            R("🗺️ " + zoneText(name, z2));
             break;
           }
           if (sub === "a" || sub === "b") {
@@ -9718,6 +10087,16 @@ Welcome to B&B Farm, hon. 🌾`
             saveLedger();
             audit(sender, "SPOT", name + " " + pos.X + "," + pos.Y);
             R("📍 '" + name + "' is set to " + pos.X + "," + pos.Y + ", sugar!");
+          } else if (sub === "place") {
+            const x = parseInt(args[2], 10), y = parseInt(args[3], 10), wide = W.ChatRoomMapViewWidth || 40, high = W.ChatRoomMapViewHeight || 40;
+            if (!(x >= 0 && y >= 0 && x < wide && y < high)) {
+              R("I need a tile on the map, sugar: ?spot place " + name + " <x> <y>, like ?spot place speaker-barn 12 7.");
+              break;
+            }
+            L.spots[name] = { X: x, Y: y, by: sender, at: Date.now() };
+            saveLedger();
+            audit(sender, "SPOT", name + " " + x + "," + y);
+            R("📍 '" + name + "' is set to " + x + "," + y + ", sugar!");
           } else if (sub === "clear") {
             if (!L.spots[name]) {
               R("There's no spot called '" + name + "', hon. Plain ?spot shows the list.");
@@ -10982,6 +11361,7 @@ Welcome to B&B Farm, hon. 🌾`
       if (!pc) {
         const low0 = String(raw).trim().toLowerCase().replace(/^[?!.\-\/]/, "").replace(/^bot\s+/, "");
         if ((low0 === "yes" || low0 === "no") && (state.breedAsks.has(sender) || state.jarAsks.has(sender))) return answerPending(sender, low0 === "yes");
+        if ((low0 === "yes" || low0 === "no") && addonAsks.has(sender)) return addonYesNo(sender, low0 === "yes");
         return false;
       }
       if (Date.now() - pc.at > CFG.CLAIM_ASK_TIMEOUT_MIN * 6e4) {
@@ -11061,6 +11441,7 @@ Welcome to B&B Farm, hon. 🌾`
             } catch (e) {
               warn("activity:", e);
             }
+            addonsEmit("activity", data);
             return;
           }
           if (data.Type === "Emote" || data.Type === "Chat") {
@@ -11069,6 +11450,7 @@ Welcome to B&B Farm, hon. 🌾`
             } catch (e) {
               warn("rp:", e);
             }
+            addonsEmit("roleplay", data.Sender, String(data.Content || ""), data.Type);
           }
           if (data.Type !== "Chat" && data.Type !== "Whisper") return;
           if (typeof data.Content !== "string") return;
@@ -11104,10 +11486,18 @@ Welcome to B&B Farm, hon. 🌾`
           state.lastHealthy = Date.now();
           greet(mn);
           onArrive(mn);
+          addonsEmit("join", mn);
           if (CFG.KEY_SYNC_ON_JOIN) later(() => syncKeys(mn, true), CFG.KEY_JOIN_DELAY_MS);
           if (CFG.FRIEND_ON_JOIN && rec(mn)) later(() => addFriend(mn, true), 6e3);
         } catch (e) {
           warn("join:", e);
+        }
+      });
+      W.ServerSocket.on("ChatRoomSyncMemberLeave", (data) => {
+        try {
+          if (data && data.SourceMemberNumber) addonsEmit("leave", data.SourceMemberNumber);
+        } catch (e) {
+          warn("leave:", e);
         }
       });
       W.ServerSocket.on("ChatRoomSync", () => {
@@ -11181,6 +11571,7 @@ Welcome to B&B Farm, hon. 🌾`
         homeTick();
         lifeTick();
         workTick();
+        addonsEmit("tick");
         for (const [mn, a] of state.arrivals) if (Date.now() > a.until) state.arrivals.delete(mn);
         if (Date.now() - (state.lastSync || 0) > 6e4) {
           state.lastSync = Date.now();
@@ -11204,6 +11595,7 @@ Welcome to B&B Farm, hon. 🌾`
       if (state.booted) return;
       state.booted = true;
       loadLedger();
+      addonsBoot();
       makeBadge();
       setBadge("waiting for game…");
       attachListeners();

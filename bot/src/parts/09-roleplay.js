@@ -104,6 +104,7 @@
         if (!pm.nursed || pm.nursed.week !== wk) pm.nursed = { week:wk, n:0 };
         pm.nursed.n++;
       }
+      if (got >= 1 && drinker) addonsEmit("nurse", milker, drinker, got, milkGrade(milker));   // milk-drunk etc. (add-ons)
       if (got >= 1 && drinker && rec(drinker)){
         const pd = prodOf(drinker), dk = dayKey();
         if (!pd.drank || pd.drank.day !== dk) pd.drank = { day:dk, ml:0, said:false };

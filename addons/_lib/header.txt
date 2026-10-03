@@ -1,0 +1,16 @@
+// ==UserScript==
+// @name         BnB Farm add-on: {{LABEL}}
+// @namespace    bnbfarm
+// @version      {{VERSION}}
+// @description  {{DESCRIPTION}} Runs on the farm bot's computer, next to the Farmhand Bot script.
+// @author       Laynie & Alexia
+// @match        *://*.bondageprojects.elementfx.com/*
+// @match        *://bondageprojects.elementfx.com/*
+// @match        *://*.bondage-europe.com/*
+// @match        *://bondage-europe.com/*
+// @match        *://*.bondageprojects.com/*
+// @match        *://bondageprojects.com/*
+// @match        *://*.bondage-asia.com/*
+// @grant        unsafeWindow
+// @run-at       document-idle
+// ==/UserScript==

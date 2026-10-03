@@ -61,3 +61,47 @@ Instead of growing the bot forever, big features become **separate scripts that 
 2. The module API (`window.Farmhand.register`), then move one feature (the fair) into a module to prove it works.
 3. Farm bucks, since auctions, stud fees and debt all need it.
 4. Pregnancy stages, which pairs with your belly art.
+
+---
+
+## 6. Approved add-on plan (Laynie, 2026-10-03)
+
+Each add-on is its own userscript on the bot's PC. Players only need the Companion, which gets one "Farm extras" tab that draws whatever each add-on describes. No farm bucks anywhere.
+
+- **0. Add-on support:** `window.Farmhand.register` in the bot, plus the general "Farm extras" Companion tab. Needed by everything below.
+- **Map tools:**
+  - **Approved:** click-to-build zones and spots, with walking kept as the backup. Pens with fences, stall timers, heat map, guided tours, door overlay.
+  - **Placard spots:** visitors stand at one and read its text with `?placard`. Replaces display cases.
+- **Barn life:**
+  - **On or off:** the whole feed system has a switch, so it isn't whispering at people who don't use the Companion.
+  - **Trough and water:** food at a trough spot and water at a water spot. Ties into BC+'s Pet module and MPA's virtual pet: their bowl activities (`BCP_BowlEat`, `BCP_BowlDrink`, `MPA_BowlEat`, `MPA_BowlDrink`) count when done on the spot. Water spots never run empty.
+  - **Grooming:** only counts next to a staff member.
+  - **No:** vet rounds, animal speech.
+- **Stud book and pregnancy:**
+  - **Pregnancy stages:** stages with belly sizes, plus belly emotes.
+  - **Pedigree:** kept simple: sire, dam, and a total count for each sire and dam.
+  - **Stud bookings:** no fee. Only staff add someone to the queue.
+  - **Breeding week:** once a month.
+- **Dairy:**
+  - **Approved:** richer, more varied milking emotes in less clinical language, and milk-drunk effects.
+  - **Certificate:** each week's certificate replaces the one before.
+  - **No:** the induction plan (too complicated).
+- **Work:**
+  - **Shift tasks:** a task only completes when you're standing in its zone or spot.
+  - **Staff leaderboard:** ranks staff by performance.
+  - **Write-ups:** made by proprietors and herdmasters. The full text is seen only by the writer and the person written up; everyone else sees a count.
+  - **Inspections:** approved, but optional. Only staff who switch inspections on get the warnings and share the score.
+- **Gloryhole stalls:**
+  - **Approved:** shifts, records, the board, opt-in, and punishment shifts.
+  - **Herd leaders:** each use adds to the herd leader's staff score.
+  - **Glory stall spots** (`glory-1`, `glory-2`…): build the booths with walls in the map editor, since walls block sight. BC has no special "hole" tile.
+  - **No visitor needed:** if nobody is on that stall's visitor spot (`glory-1-visitor`), the stall runs a random scene every 10–30 minutes. It's delivered as whispers and whisper emotes to the person on the stall spot, and it adds to their numbers.
+  - **Six scenes:** two each for mouth, pussy and ass, in plain, non-clinical language. Each one ends with the stranger finishing.
+  - **The scenes respect the person:** blocked holes are skipped, and a funnel gag counts as the mouth. Limits are followed. A pussy finish counts toward breeding only if they're breedable.
+- **Conditioning (hypno):** session sets for each species and each level.
+- **Shows and fairs:**
+  - **Events:** udder judging, breeding stand, pony cart race and obedience trial.
+  - **Ribbons:** every ribbon stays on the record, but only the most recent one gets the ribbon emote.
+- **Breeding week:** the third week of each month.
+- **Stall timers:** the goal is to drain the occupant to 75% of their total capacity over time.
+- **No:** farm bucks, auctions.

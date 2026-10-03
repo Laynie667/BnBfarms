@@ -8,6 +8,7 @@
     if (state.booted) return;
     state.booted = true;
     loadLedger();
+    addonsBoot();       // add-on scripts can plug in from here on (10f-addons.js)
     makeBadge();
     setBadge("waiting for game…");
     attachListeners();

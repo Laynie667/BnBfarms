@@ -113,8 +113,11 @@
       whisper: (mn, t) => whisper(mn, t),
       privateEmote: (mn, t) => privateLine(mn, t, "emote"),
       privateSay: (mn, t) => privateLine(mn, t, "chat"),
+      // a "listen to my voice" line: purple and private in the Companion, an out-of-character whisper otherwise
+      voice: (mn, t) => hasCompanion(mn) ? enqueue(makeMsg("voice", { text: String(t) }, mn)) : whisper(mn, "[Voice] "+t),
       tell: (mn, t) => tell(mn, t),
-      notice: (mn, t) => hasCompanion(mn) ? toCompanion(mn, t, "notice") : whisper(mn, t),
+      // a private note: the Companion if they have it, otherwise a beep (friends) or a whisper
+      notice: (mn, t) => hasCompanion(mn) ? toCompanion(mn, t, "notice") : tell(mn, t),
       reply: (mn, t, ch) => reply(mn, t, ch),
       notifyStaff: (t, routine) => notifyStaff(t, routine),
       ask: (mn, text, cb) => { addonAsks.set(mn, { addon:a.name, cb, at:Date.now() }); askCard(mn, a.name, text); },
@@ -125,7 +128,12 @@
       // bodies
       prod: prodOf, HOLES, holeBlocked, hasVulva, makesSemen, makesMilk, capacity, milkCap, heldTotal,
       drainMilk, drainSemen, tally, ml, ANON_STUD, milkGrade, gradeLetter,
-      staffPoints, staffScores: () => JSON.parse(JSON.stringify(L.staffScore || {})), inHeat, startHeat, rollConception, gearOf, funnelOn,
+      staffPoints, staffScores: () => JSON.parse(JSON.stringify(L.staffScore || {})),
+      // another add-on's saved data, read-only (a copy), so add-ons can work together
+      peek: (other) => JSON.parse(JSON.stringify((L.mods && L.mods[other]) || {})),
+      yieldWeek: (mn) => { rollBoard(); return (L.yield && L.yield.w && L.yield.w[mn]) || 0; },   // milk (and seed) given this week
+      studbook: () => JSON.parse(JSON.stringify(L.studbook || [])),
+      clockedIn, isMandated, hoursThisWeek: (mn) => { const r = rec(mn); return r && r.shift && r.shift.week && r.shift.week.key === weekKey() ? r.shift.week.ms / 3600000 : 0; }, inHeat, startHeat, rollConception, gearOf, funnelOn,
       // the map
       pos: posOf, spot: (n) => (L.spots && L.spots[n]) || null, spots: () => Object.assign({}, L.spots||{}),
       onSpot, whoOnSpot, zonesOf, inZone: inZoneNamed, zones: () => { zonesLedger(); return L.zones; }, teleport, spotBeside,

@@ -33,7 +33,8 @@
       if (!r.chore && L.chores.length && (!r.nextChore || now >= r.nextChore)){
         const c = L.chores[Math.floor(Math.random()*L.chores.length)];
         r.chore = { text:c.text, at:now }; r.nextChore = now + CFG.CHORE_EVERY_MIN*60000; saveLedger();
-        beep(r.mn, "🧹 Got a chore for ya, sweetie: "+c.text+"\nSay ?done when it's finished.");
+        const at = (String(c.text).match(/@([a-z0-9_-]+)\s*$/i)||[])[1];   // a chore with a place only counts done there
+        beep(r.mn, "🧹 Got a chore for ya, sweetie: "+c.text.replace(/\s*@[a-z0-9_-]+\s*$/i, "")+(at ? " (at "+at+")" : "")+"\nSay ?done when it's finished"+(at ? ", standin' at "+at : "")+".");
       }
     }
     // weekly hours report to proprietors

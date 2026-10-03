@@ -51,20 +51,20 @@
 
   const GEAR_LINES = {
     pump: [
-      ["The lactation pump on %n%'s nipples gives a soft, steady little tug. Milk beads and drips into the bottles. (+%ml%)",
-       "%n%'s pump hums along nice and gentle, coaxin' out warm milk a drop at a time. (+%ml%)"],
-      ["The lactation pump pulls in a slow, firm rhythm, and %n%'s teats stretch into the cups with every draw. (+%ml%)",
-       "Milk runs in steady streams down the pump's tubes from %n%'s swollen nipples. (+%ml%)"],
-      ["The pump on %n% sucks hard, stretchin' those nipples long, and the bottles fill fast. %n% squirms in it. (+%ml%)",
-       "%n%'s lactation pump is cranked up high. Every pull wrings a hot spurt of milk out of 'em. (+%ml%)"],
+      ["The lactation pump on %n%'s nipples gives a soft, steady little tug. Milk beads and drips into the bottles, +%ml%.",
+       "%n%'s pump hums along nice and gentle, coaxin' out warm milk a drop at a time, +%ml%."],
+      ["The lactation pump pulls in a slow, firm rhythm, and %n%'s teats stretch into the cups with every draw, +%ml%.",
+       "Milk runs in steady streams down the pump's tubes from %n%'s swollen nipples, +%ml%."],
+      ["The pump on %n% sucks hard, stretchin' those nipples long, and the bottles fill fast. %n% squirms in it, +%ml%.",
+       "%n%'s lactation pump is cranked up high. Every pull wrings a hot spurt of milk out of 'em, +%ml%."],
     ],
     echo: [
-      ["The %g% on %n% sighs along, and a thin line of milk creeps up the hose. (+%ml%)",
-       "%n%'s %g% works slow and patient. Drip, drip, into the tank. (+%ml%)"],
-      ["Milk flows steady up the %g%'s hose from %n%'s teats, and the tank's fillin' nicely. (+%ml%)",
-       "The %g% has %n% let down good now: warm milk pulses up the line with every pull. (+%ml%)"],
-      ["%n% is so worked up the %g% can barely keep up. Milk gushes up the hoses into the tank. (+%ml%)",
-       "The %g%'s tank sloshes as %n%, flushed and needy, pours milk into it. (+%ml%)"],
+      ["The %g% on %n% sighs along, and a thin line of milk creeps up the hose, +%ml%.",
+       "%n%'s %g% works slow and patient. Drip, drip, into the tank, +%ml%."],
+      ["Milk flows steady up the %g%'s hose from %n%'s teats, and the tank's fillin' nicely, +%ml%.",
+       "The %g% has %n% let down good now: warm milk pulses up the line with every pull, +%ml%."],
+      ["%n% is so worked up the %g% can barely keep up. Milk gushes up the hoses into the tank, +%ml%.",
+       "The %g%'s tank sloshes as %n%, flushed and needy, pours milk into it, +%ml%."],
     ],
     machine: [
       "The %g% under %n% ticks over slow, just enough to keep 'em squirmin'.",

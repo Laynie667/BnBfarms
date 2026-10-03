@@ -95,6 +95,28 @@ function barn(ctx) {
   ];
 }
 
+// applications waitin' for a yes or no, and how the bot's messages are doin'
+function queue(ctx) {
+  const apps = ctx.s.apps || [], m = ctx.s.mail;
+  const role = (a) => (ctx.ui["role" + a.mn] || (a.staffTrack ? "farmhand" : "livestock"));
+  return [
+    card(h("div", { class: "fhc-kv" }, title("Applications"), chip(apps.length + " waitin'", apps.length ? "alert" : null)),
+      apps.length ? apps.map((a) => h("div", { class: "fhc-box", style: { margin: "6px 0" } },
+        h("div", { class: "fhc-kv" }, h("b", null, a.n + ". " + a.name), h("span", { class: "fhc-muted" }, new Date(a.at).toLocaleDateString())),
+        muted(a.sum + (a.staffTrack ? " · wants to be staff" : "")),
+        h("label", { class: "fhc-label" }, "Approve as", h("select", { class: "fhc-sel", onchange: (e) => ctx.setUi({ ["role" + a.mn]: e.target.value }, true) },
+          ["livestock", "guest", "luxury", "gloryhole", "farmhand", "mandated", "herdmaster"].map((r) => h("option", { value: r, selected: role(a) === r ? "selected" : null }, r)))),
+        h("div", null, btn("Read it", () => ctx.send("app " + a.n)), btn("Approve", () => ctx.send("approve " + a.mn + " " + role(a)), true), btn("Deny", () => ctx.send("deny " + a.mn)))))
+        : muted("Nobody's waitin'. New ones beep you as well as showin' here.")),
+    m && card(title("The bot's messages"),
+      h("div", { class: "fhc-kv" }, h("span", null, "Waitin' to send"), h("b", null, String(m.sending))),
+      h("div", { class: "fhc-kv" }, h("span", null, "People with messages held (away or unreachable)"), h("b", null, String(m.held))),
+      h("div", { class: "fhc-kv" }, h("span", null, "Online and beep-able (friends both ways)"), h("b", null, m.beepable === null ? "checkin'…" : String(m.beepable))),
+      muted("Held messages turn into one short summary when that person's back.")),
+    latest(ctx),
+  ];
+}
+
 // on call only works if your summon rule lets the bot pull you
 function summonCheck() {
   const r = summonReady(BOT_MEMBER);
@@ -117,6 +139,7 @@ export const STAFF_TABS = [
   { id: "me", label: "Me", render: me },
   { id: "herd", label: "Herd", render: herd },
   { id: "office", label: "Office", render: office, badge: (ctx) => ctx.docs.length },
+  { id: "queue", label: "Queue", render: queue, badge: (ctx) => (ctx.s.apps || []).length },
   { id: "contracts", label: "Contracts", render: contracts },
   { id: "barn", label: "Barn", render: barn },
   { id: "tease", label: "Tease lines", render: tease },

@@ -59,7 +59,7 @@
     }
     // Files, rosters and keys are nobody else's business: never said out loud.
     const replyCh = (channel === "chat" && (PRIVATE_REPLY.includes(cmd) || (addonCmd && addonCmd.def.private)))
-      ? (isFriend(sender) ? "beep" : "whisper") : channel;
+      ? (canBeep(sender) ? "beep" : "whisper") : channel;
     // staff lookin' up somebody else from the Companion: the answer goes in their Office, not the feed
     const docAbout = (channel === "companion" && DOC_CMDS.includes(cmd) && args[0] && isStaff(sender)) ? resolveTarget(args[0]) : null;
     const R = (docAbout && docAbout !== sender)
@@ -619,12 +619,13 @@
       case "apply":   startApplication(sender, channel); break;
 
       case "friend": {
-        if (isFriend(sender)) R("You're already on my list, sugar! Beep me any time.");
-        else if (addFriend(sender, true))
-          R("🌾 Done, hon! You're on the farm office's list now.\n\n"+
-            "Beep me from anywhere on the property. Wedged, gagged, it don't matter.\n"+
-            "🔴 Beep 'safe' and everything stops.");
-        else R("Shoot, I couldn't manage that just now, sugar. Try ?friend again in a little bit.");
+        // beeps need BOTH lists: mine lets your beeps reach me, yours lets mine reach you
+        const mine = isFriend(sender) || addFriend(sender, true);
+        later(askMutual, 1500);
+        if (!mine) R("Shoot, I couldn't manage that just now, sugar. Try ?friend again in a little bit.");
+        else if (canBeep(sender)) R("We're friends both ways, sugar! Beep me any time, from anywhere.\n🔴 Beep 'safe' and everything stops.");
+        else R("🌾 You're on my list, hon, so your beeps reach me. For mine to reach you, add me ("+CFG.BOT_MEMBER+") to YOUR friend list too. "+
+               "Until then I'll whisper while you're here, and keep anything else for when you come back.\n🔴 Beep 'safe' and everything stops.");
         break;
       }
 
@@ -1041,6 +1042,7 @@
         beep(sender, "I've got you, "+plainName(sender)+". Everything's stopped and I'm fetchin' somebody for you right now. You don't owe anybody an explanation. 🔴", true);
         notifyStaff("🔴 SAFEWORD from "+plainName(sender)+" ("+sender+"). Please go to them now.", false);
         audit(sender,"SAFEWORD",channel);
+        addonsEmit("safe", sender);   // add-ons stop anything they're doin' to this person (scenes, sessions…)
         dropLeashes(sender); state.tours.delete(sender);
         { const r0 = rec(sender); if (r0 && r0.prod){ r0.prod.pin = null; r0.prod.unpinUntil = Date.now() + CFG.PROD.SAFEWORD_UNPIN_MIN*60000; saveLedger(); } }
         if (rec(sender) && rec(sender).stocked){ rec(sender).stocked = null; saveLedger(); }
@@ -1089,7 +1091,7 @@
 
       case "staff": {
         R("I've sent word, sugar. Somebody'll be right over to help.");
-        notifyStaff("🙋 "+plainName(sender)+" ("+sender+") is askin' for a hand.", true);
+        notifyStaff("🙋 "+plainName(sender)+" ("+sender+") is askin' for a hand.", true, true);
         if (CFG.SUMMON_ON_STAFF_CALL && !forcedStaff().some(m=>charFor(m))){
           summonHelp("🙋 "+plainName(sender)+" asked for a hand.", sender, false, "staff");
         }
@@ -2073,10 +2075,16 @@ Welcome to B&B Farm, hon. 🌾`);
       case "done": {
         const r = rec(sender);
         if (!r || !r.chore){ R("You don't have a chore right now, hon. They come by beep while you're clocked in."); break; }
+        // a chore with a place (?chore add Muck out the pens @pens) only counts done there: a zone or a spot
+        const place = r.chore.place || (String(r.chore.text).match(/@([a-z0-9_-]+)\s*$/i)||[])[1];
+        if (place && !inZoneNamed(sender, place.toLowerCase()) && !onSpot(sender, place.toLowerCase(), 1)){
+          R("🧹 That one gets done at "+place+", sugar. Head over there and say ?done once you're standin' in it."); break;
+        }
         const wk = weekKey();
         r.choreWeek = (r.choreWeek && r.choreWeek.key === wk) ? r.choreWeek : { key:wk, n:0 };
         r.choreWeek.n++; r.choreTotal = (r.choreTotal||0) + 1;
         audit(sender,"CHORE",r.chore.text.slice(0,50)); r.chore = null; saveLedger();
+        staffPoints(sender, 1, "chore");
         R("✅ Thank you, sweetie! That's "+r.choreWeek.n+" this week.");
         break;
       }
@@ -2084,7 +2092,7 @@ Welcome to B&B Farm, hon. 🌾`);
         const sub = String(args[0]||"").toLowerCase();
         if (sub === "add"){
           const text = args.slice(1).join(" ").trim();
-          if (!text){ R("What's the job, sugar? Say ?chore add and the job, like ?chore add Polish the cowbells."); break; }
+          if (!text){ R("What's the job, sugar? Say ?chore add and the job, like ?chore add Polish the cowbells. Add @place to make it count only there, like ?chore add Muck out the pens @pens."); break; }
           L.chores.push({ text, by:sender }); saveLedger(); R("Added! "+L.chores.length+" chores on the board now.");
         } else if (sub === "remove"){
           const i = parseInt(args[1],10)-1;

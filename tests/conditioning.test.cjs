@@ -1,12 +1,12 @@
-// Dairy add-on: the milking stall uses its warmer lines (and the bot's own come back when it's off), and the
-// weekly certificate replaces last week's.
+// Conditioning add-on: only with ?hypno on, never deeper than they allow, only their herd leader (or a
+// proprietor) runs it, species words fill the script, sessions count toward tiers, ?wake and ?safe stop it.
 const fs=require('fs'), path=require('path');
 const store={}; const sent=[]; const handlers={};
 store.bnb_ledger_v1=JSON.stringify({v:4,people:{
  "221397":{mn:221397,name:"Laynie",roles:["PROPRIETOR"],species:"cow",onDuty:true,herds:[],tempKeys:[],cover:[]},
- "500":{mn:500,name:"Moo",roles:["LIVESTOCK"],species:"cow",onDuty:true,herds:[{leader:221397,type:"perm",since:1}],tempKeys:[],cover:[],breedable:true,fertile:true,degradeMe:true},
+ "500":{mn:500,name:"Moo",roles:["LIVESTOCK"],species:"cow",onDuty:true,herds:[{leader:221397,type:"perm",since:1}],tempKeys:[],cover:[],breedable:true,fertile:true,degradeMe:true,hypno:true},
  "600":{mn:600,name:"Hana",roles:["LIVESTOCK"],species:"cow",onDuty:true,herds:[],tempKeys:[],cover:[],futa:true}
-},applications:[],archive:{},log:[],stuckLog:[],spots:{"milking1":{X:5,Y:5}}});
+},applications:[],archive:{},log:[],stuckLog:[],spots:{"glory-1":{X:5,Y:5},"glory-1-visitor":{X:5,Y:6}}});
 global.GM_getValue=(k,d)=>k in store?store[k]:d; global.GM_setValue=(k,v)=>store[k]=v; global.GM_registerMenuCommand=()=>{};
 const doc={body:{appendChild(){}},createElement(){return {style:{},addEventListener(){}}},addEventListener(){},getElementById(){return null},visibilityState:'visible'};
 const at=(m,X,Y)=>({MemberNumber:m,Name:'N'+m,MapData:{Pos:{X,Y},PrivateState:{}},Appearance:[]});
@@ -32,28 +32,37 @@ const toWhom=(k,mn)=>sent.slice(k).filter(([e,d])=>d&&d.Target===mn&&(d.Type==='
 const beepsTo=(k,mn)=>sent.slice(k).filter(([e,d])=>e==='AccountBeep'&&d.MemberNumber===mn).map(([e,d])=>d.Message);
 (async()=>{ await wait(3500);
   chars[1].Name='Laynie'; chars[2].Name='Moo'; chars[3].Name='Hana';
-  eval(fs.readFileSync(path.join(__dirname,'../dist/farmhand-dairy.user.js'),'utf8')); await wait(200);
-  ok(W.Farmhand.list().some(a=>a.name==='dairy'), 'dairy registered');
-  let k=sent.length; handlers.AccountBeep({MemberNumber:500,Message:'stats'}); await drain(1500);
-  const p=L().people[500].prod; p.milk=50000; p.stallSaid=0;
-  k=sent.length; W.__ms(); await drain();
-  const em=sent.slice(k).filter(([e,x])=>x&&x.Type==='Emote').map(([e,x])=>x.Content).join(' | ');
-  ok(/udder|teats|bucket|moo|rail/.test(em) && /Moo/.test(em), 'the milking stall uses a dairy line ('+em.slice(0,140)+')');
-  ok(!/(lactat|mammary|secret)/i.test(em), 'no medical words');
-  // certificate: a week passes
-  const d=()=>L().mods['dairy'];
-  W.__addons('tick'); p.totals.milked+=1500; W.__addons('tick');
-  ok(d().week.ml['500']>=1500, 'this week'+"'"+'s milk is counted');
-  d().week.key='2000-W01'; d().cert['500']={week:'1999-W52',grade:'D',ml:1,award:'x'};
-  k=sent.length; W.__addons('tick'); await drain();
-  ok(d().cert['500'].week==='2000-W01' && d().cert['500'].ml>=1500, 'the new certificate replaces the old one');
-  ok(beepsTo(k,500).concat(toWhom(k,500)).some(m=>/certificate/.test(m)), 'they are told privately');
-  k=sent.length; handlers.AccountBeep({MemberNumber:500,Message:'certificate'}); await drain(5500);
-  ok(/Grade/.test(beepsTo(k,500).join(' ')), '?certificate shows it');
-  // switched off: the bot's own lines come back
-  k=sent.length; handlers.AccountBeep({MemberNumber:221397,Message:'addons off dairy'}); await drain(1500);
-  p.milk=50000; p.stallSaid=0; p.stall=null; k=sent.length; W.__ms(); await drain();
-  ok(sent.slice(k).some(([e,x])=>x&&x.Type==='Emote'&&/stall's cups pull|streams from/.test(x.Content)), 'with dairy off, the bot'+"'"+'s own line is used');
+  eval(fs.readFileSync(path.join(__dirname,'../dist/farmhand-conditioning.user.js'),'utf8')); await wait(200);
+  ok(W.Farmhand.list().some(a=>a.name==='conditioning'), 'conditioning registered');
+  const d=()=>L().mods['conditioning'];
+  let k=sent.length; handlers.AccountBeep({MemberNumber:221397,Message:'condition Hana'}); await drain(1500);
+  ok(/herd leader|hypno on/.test(beepsTo(k,221397).join(' ')), 'no session without ?hypno on');
+  k=sent.length; handlers.AccountBeep({MemberNumber:221397,Message:'condition Moo deep'}); await drain(5500);
+  ok(/only allows Fun/.test(beepsTo(k,221397).join(' ')), 'never deeper than they allow');
+  k=sent.length; handlers.AccountBeep({MemberNumber:500,Message:'hypnolevel deep'}); await drain(1500);
+  ok(d().people['500'].max==='deep', '?hypnolevel deep');
+  global.setTimeout=(f,ms,...a)=>realTimeout(f, ms>=5000?15:ms, ...a);
+  k=sent.length; handlers.AccountBeep({MemberNumber:221397,Message:'condition Moo deep'}); await drain(5500);
+  const lines=toWhom(k,500).filter(c=>/\[Voice\]/.test(c));
+  ok(lines.length>=12, 'a whole deep session reached Moo as voice lines ('+lines.length+')');
+  ok(lines.some(c=>/cow|moo/i.test(c)), 'cow words fill the script');
+  ok(!sent.slice(k).some(([e,x])=>x&&x.Type==='Emote'), 'nothing in the public room');
+  ok(d().people['500'].total===1 && d().people['500'].sessions.deep===1, 'the session counted');
+  // ?wake stops one part way
+  global.setTimeout=(f,ms,...a)=>realTimeout(f, ms>=5000?400:ms, ...a);
+  k=sent.length; handlers.AccountBeep({MemberNumber:221397,Message:'condition Moo fun'}); await wait(300);
+  handlers.ChatRoomMessage({Sender:500,Type:'Whisper',Content:'wake',Target:260239}); await drain(1500);
+  await wait(2000); ok(d().people['500'].total===1, '?wake ends it without counting');
+  // safeword stops it too
+  d().people['500'].total=2;
+  k=sent.length; handlers.AccountBeep({MemberNumber:221397,Message:'condition Moo fun'}); await wait(300);
+  handlers.AccountBeep({MemberNumber:500,Message:'safe'}); await drain(1500); await wait(2000);
+  ok(d().people['500'].total===2, '?safe stops it');
+  // tiers
+  global.setTimeout=(f,ms,...a)=>realTimeout(f, ms>=5000?15:ms, ...a);
+  k=sent.length; handlers.AccountBeep({MemberNumber:221397,Message:'condition Moo fun'}); await drain(5500);
+  ok(d().people['500'].tier===1, 'three sessions: tier 1');
+  const st=W.__stateFor(500); ok(st.mods && st.mods.conditioning, 'the Companion gets a conditioning card');
   const errs=warns.filter(w=>/add-on/.test(w)); ok(!errs.length, 'no add-on errors logged '+errs.join(' | '));
   out(fails ? fails+' FAILED' : 'ALL PASSED'); process.exit(fails?1:0);
 })();

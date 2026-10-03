@@ -4,9 +4,19 @@
   */
   /* ═══════════ FRIENDS ═══════════ */
 
+  // on the BOT's friend list (that's what lets their beeps reach the bot)
   function isFriend(mn){
     try { return (W.Player.FriendList||[]).includes(mn); } catch(e){ return false; }
   }
+  // Can a beep from the bot actually reach them? The server only delivers a beep if THEY have the bot on
+  // THEIR friend list. The server's "OnlineFriends" answer lists exactly the people who are friends both
+  // ways and online, so the bot asks for it every minute (askMutual) and trusts that.
+  function canBeep(mn){
+    const m = state.mutual;
+    if (m && Date.now() - m.at < 5*60000) return m.set.has(mn);
+    return false;   // not heard from the server yet: don't guess, a lost beep is a silent failure
+  }
+  function askMutual(){ try { W.ServerSend("AccountQuery", { Query:"OnlineFriends" }); } catch(e){ warn("friends query:", e); } }
 
   function findCommand(tag){
     try {

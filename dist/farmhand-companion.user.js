@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.7.0
+// @version      0.8.0
 // @description  Your B&B Farm panel: the farm girl's answers, stat cards and guides, right in the game.
 // @author       Laynie & Alexia
 // @match        *://*.bondageprojects.elementfx.com/*
@@ -224,7 +224,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.7.0";
+  var VERSION = "0.8.0";
 
   // extension/src/config.js
   var BOT_MEMBER = 260239;
@@ -2601,6 +2601,35 @@ One of mods you are using is using an old version of SDK. It will work for now b
       latest(ctx)
     ];
   }
+  function queue(ctx) {
+    const apps = ctx.s.apps || [], m = ctx.s.mail;
+    const role = (a) => ctx.ui["role" + a.mn] || (a.staffTrack ? "farmhand" : "livestock");
+    return [
+      card(
+        h("div", { class: "fhc-kv" }, title("Applications"), chip(apps.length + " waitin'", apps.length ? "alert" : null)),
+        apps.length ? apps.map((a) => h(
+          "div",
+          { class: "fhc-box", style: { margin: "6px 0" } },
+          h("div", { class: "fhc-kv" }, h("b", null, a.n + ". " + a.name), h("span", { class: "fhc-muted" }, new Date(a.at).toLocaleDateString())),
+          muted(a.sum + (a.staffTrack ? " · wants to be staff" : "")),
+          h("label", { class: "fhc-label" }, "Approve as", h(
+            "select",
+            { class: "fhc-sel", onchange: (e) => ctx.setUi({ ["role" + a.mn]: e.target.value }, true) },
+            ["livestock", "guest", "luxury", "gloryhole", "farmhand", "mandated", "herdmaster"].map((r) => h("option", { value: r, selected: role(a) === r ? "selected" : null }, r))
+          )),
+          h("div", null, btn("Read it", () => ctx.send("app " + a.n)), btn("Approve", () => ctx.send("approve " + a.mn + " " + role(a)), true), btn("Deny", () => ctx.send("deny " + a.mn)))
+        )) : muted("Nobody's waitin'. New ones beep you as well as showin' here.")
+      ),
+      m && card(
+        title("The bot's messages"),
+        h("div", { class: "fhc-kv" }, h("span", null, "Waitin' to send"), h("b", null, String(m.sending))),
+        h("div", { class: "fhc-kv" }, h("span", null, "People with messages held (away or unreachable)"), h("b", null, String(m.held))),
+        h("div", { class: "fhc-kv" }, h("span", null, "Online and beep-able (friends both ways)"), h("b", null, m.beepable === null ? "checkin'…" : String(m.beepable))),
+        muted("Held messages turn into one short summary when that person's back.")
+      ),
+      latest(ctx)
+    ];
+  }
   function summonCheck() {
     const r = summonReady(BOT_MEMBER);
     if (r === null) return muted("BCX isn't loaded here. If you use BC+'s Ready to be summoned instead, add the farm bot (" + BOT_MEMBER + ") to it.");
@@ -2623,6 +2652,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     { id: "me", label: "Me", render: me2 },
     { id: "herd", label: "Herd", render: herd },
     { id: "office", label: "Office", render: office, badge: (ctx) => ctx.docs.length },
+    { id: "queue", label: "Queue", render: queue, badge: (ctx) => (ctx.s.apps || []).length },
     { id: "contracts", label: "Contracts", render: contracts },
     { id: "barn", label: "Barn", render: barn },
     { id: "tease", label: "Tease lines", render: tease },

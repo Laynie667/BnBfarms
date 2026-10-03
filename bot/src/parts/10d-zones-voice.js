@@ -52,7 +52,7 @@
       state.voiceNext.set(mn, now + mins*60000*(0.8 + Math.random()*0.4));
       const line = fill(v.lines[Math.floor(Math.random()*v.lines.length)], mn);
       if (hasCompanion(mn)) enqueue(makeMsg("voice", { text: line }, mn));
-      else enqueue({ Content: "[Voice] "+line, Type: "Whisper", Target: mn });
+      else whisper(mn, "[Voice] "+line);   // out-of-character in map rooms, so it reaches them anywhere on the map
     }
   }
   // may this person set the voice for that target ("herd" = their own herd)?

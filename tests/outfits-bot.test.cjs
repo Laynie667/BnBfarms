@@ -12,7 +12,7 @@ global.GM_getValue=(k,d)=>k in store?store[k]:d; global.GM_setValue=(k,v)=>store
 const doc={body:{appendChild(){}},createElement(){return {style:{},addEventListener(){}}},addEventListener(){},getElementById(){return null},visibilityState:'visible'};
 const chars=[260239,221397,700,800,900].map(m=>({MemberNumber:m,Name:'N'+m,MapData:{Pos:{X:1,Y:1},PrivateState:{}}}));
 const W={document:doc,addEventListener(){},location:{reload(){}},alert(){},prompt(){},
-  ServerSend:(ev,d)=>sent.push([ev,d]), ServerSocket:{connected:true,on:(e,f)=>handlers[e]=f},
+  ServerSend:(ev,d)=>{ sent.push([ev,d]); if(ev==="AccountQuery"&&d.Query==="OnlineFriends"&&handlers.AccountQueryResult) setTimeout(()=>handlers.AccountQueryResult({Query:"OnlineFriends",Result:(W.__mutual||W.Player.FriendList).map(m=>({MemberNumber:m}))}),0); }, ServerSocket:{connected:true,on:(e,f)=>handlers[e]=f},
   Player:{MemberNumber:260239,FriendList:[221397,700,800,900]},
   ChatRoomData:{Name:'B&B Farm',Admin:[260239],MapData:{Type:'Always'}}, ChatRoomCharacter:chars,
   ChatRoomPlayerIsAdmin:()=>true, Commands:[]};

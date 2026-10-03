@@ -125,7 +125,15 @@
     try { W.ServerSend(m.ev, m.data); } catch(e){ warn("send:",e); }
     later(()=>{ state.sending=false; pump(); }, CFG.SEND_INTERVAL_MS);
   }
-  function enqueue(m, urgent){ send("ChatRoomChat", m, urgent); }
+  // In BC, everything after a "(" is out-of-character, and on a map out-of-character text reaches the WHOLE
+  // map. So a room emote or chat line must never carry round brackets: they become square ones here, for
+  // every line the bot or an add-on says out loud. (Private whispers are different: those start with "("
+  // on purpose, so they reach the person anywhere on the map.)
+  const inCharacter = (s) => String(s).replace(/\(/g, "[").replace(/\)/g, "]");
+  function enqueue(m, urgent){
+    if (m && (m.Type === "Emote" || m.Type === "Chat") && typeof m.Content === "string") m = Object.assign({}, m, { Content: inCharacter(m.Content) });
+    send("ChatRoomChat", m, urgent);
+  }
   // spoken out loud: only heard in hearing range of me on a map, so I step over to whoever it's about
   function say(t, urgent, who){
     if (speakersOn() && speakerSend(who || aboutWhom(t), t, "chat", urgent)) return;   // the speaker spot talks for me
@@ -222,6 +230,8 @@
   function missing(...mns){ return mns.find(m => m && !onMap(m)) || null; }
   function whisper(target,text,urgent){
     if (hasCompanion(target)){ toCompanion(target, text, "notice", urgent); return; }
+    // the server only delivers a whisper to someone in this room; anyone else gets a beep (or the summary later)
+    if (!charFor(target)){ if (canBeep(target)) for (const c of splitMessage(text,900)) send("AccountBeep",{ MemberNumber:target, BeepType:"", Message:c }, urgent); else holdMail(target, text); return; }
     // in a map room a whisper only reaches someone within 1 tile, unless it's out-of-character:
     // everything after a "(" gets through, so I open one and keep any ")" in the text from closin' it
     const ooc = mapRoom();
@@ -288,9 +298,21 @@
     }
   }
   function beep(mn,msg,urgent){
-    if (hasCompanion(mn)){ toCompanion(mn, msg, "notice", urgent); return; }
+    if (hasCompanion(mn)){
+      toCompanion(mn, msg, "notice", urgent);
+      // urgent ones (safewords, summons, staff calls, new applications) ALSO pop a real beep: it makes a
+      // sound and shows even when the panel's closed or the tab's in the background. Routine lines don't.
+      if (urgent && canBeep(mn)) send("AccountBeep", { MemberNumber:mn, BeepType:"", Message:String(msg).split("\n")[0].slice(0, 300) }, urgent);
+      return;
+    }
     // standin' right here on the map? a whisper reaches 'em, so no beep
     if (CFG.WHISPER_FIRST && inRoom() && onMap(mn)){ whisper(mn, msg, urgent); return; }
+    // a beep only arrives if they have the bot on THEIR friend list (canBeep); here in the room a whisper
+    // still works, and otherwise it's kept for them and handed over when they next come to the farm
+    if (!canBeep(mn)){
+      if (inRoom() && charFor(mn)){ whisper(mn, msg, urgent); return; }
+      holdMail(mn, msg); return;
+    }
     const chunks = splitMessage(msg, 900);
     const max = CFG.BEEP_MAX_CHUNKS;
     for (const c of chunks.slice(0,max)) send("AccountBeep",{ MemberNumber:mn, BeepType:"", Message:c }, urgent);
@@ -298,16 +320,38 @@
       send("AccountBeep",{ MemberNumber:mn, BeepType:"", Message:"(…I had to cut that one short, sugar. It's a long one! Try narrowin' it down.)" }, urgent);
   }
 
+  // Messages that couldn't reach somebody (offline, or no beep route and not here) aren't replayed one by
+  // one: most of them (tease lines, heat notices) only mattered at the time. The last 10 are kept, and when
+  // they're back they get ONE short summary: how many, and the gist of the latest few.
+  function holdMail(mn, msg){
+    L.mailbox = L.mailbox || {};
+    const gist = String(msg).split("\n")[0].replace(/\s+/g, " ").trim().slice(0, 90);
+    const box = L.mailbox[mn] = (L.mailbox[mn] || []).concat({ t: Date.now(), gist }).slice(-10);
+    saveLedger(); dbg("held for "+mn+": "+box.length);
+  }
+  function deliverMail(mn){
+    const box = L.mailbox && L.mailbox[mn];
+    if (!box || !box.length) return;
+    const latest = box.slice(-3).reverse(), more = box.length - latest.length;
+    const text = "📬 "+box.length+" farm message"+(box.length === 1 ? "" : "s")+" while you were away. The latest:\n"+
+                 latest.map(x => "• "+x.gist).join("\n")+(more > 0 ? "\n…and "+more+" older." : "");
+    if (hasCompanion(mn)) toCompanion(mn, text, "notice");
+    else if (charFor(mn)) whisper(mn, text);
+    else if (canBeep(mn)) send("AccountBeep", { MemberNumber:mn, BeepType:"", Message:text.slice(0, 1000) });
+    else return;   // still can't reach them: keep it
+    delete L.mailbox[mn]; saveLedger();
+  }
+
   function reply(mn, text, channel){
     if (channel === "companion" || (channel !== "chat" && hasCompanion(mn))){ toCompanion(mn, text, "reply"); return; }
     if (channel === "beep"){ beep(mn, text); return; }
-    if (channel === "bot"){ if (isFriend(mn)) beep(mn, text); else whisper(mn, text); return; }
+    if (channel === "bot"){ if (canBeep(mn)) beep(mn, text); else whisper(mn, text); return; }
     if (channel === "chat"){
-      if (CFG.CHAT_REPLY_BEEP && isFriend(mn)) { beep(mn, text); return; }
+      if (CFG.CHAT_REPLY_BEEP && canBeep(mn)) { beep(mn, text); return; }
       if (String(text).length <= CFG.CHAT_REPLY_SAY_MAX) { say(text); return; }
       whisper(mn, text);
-      if (!isFriend(mn)) {
-        say(plainName(mn) + ", I whispered that one to you, hon! Say ?friend and I'll hop on your friend list so I can reach you anywhere.");
+      if (!canBeep(mn)) {
+        say(plainName(mn) + ", I whispered that one to you, hon! Add me ("+CFG.BOT_MEMBER+") to your friend list and say ?friend, and I can reach you anywhere.");
       }
       return;
     }

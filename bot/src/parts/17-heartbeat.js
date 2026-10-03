@@ -23,6 +23,7 @@
                (admin?"":" ⚠️NOT ADMIN"), admin ? "#b8ff9b" : "#ffc49b");
 
       keepalive();
+      if (Date.now() - (state.lastMutualAsk||0) > 60000){ state.lastMutualAsk = Date.now(); askMutual(); }
       nudge();
       expireHerdClaims();
       snapshotRoom(false);

@@ -16,7 +16,7 @@ const evts={};
 const W={document:doc,addEventListener(e,f){(evts[e]=evts[e]||[]).push(f)},dispatchEvent(ev){(evts[ev.type]||[]).forEach(f=>f(ev))},
   CustomEvent:class{constructor(t,o){this.type=t;this.detail=o&&o.detail}},
   location:{reload(){}},alert(){},prompt(){},
-  ServerSend:(ev,d)=>sent.push([ev,d]), ServerSocket:{connected:true,on:(e,f)=>handlers[e]=f},
+  ServerSend:(ev,d)=>{ sent.push([ev,d]); if(ev==="AccountQuery"&&d.Query==="OnlineFriends"&&handlers.AccountQueryResult) setTimeout(()=>handlers.AccountQueryResult({Query:"OnlineFriends",Result:(W.__mutual||W.Player.FriendList).map(m=>({MemberNumber:m}))}),0); }, ServerSocket:{connected:true,on:(e,f)=>handlers[e]=f},
   Player:{MemberNumber:260239,FriendList:[221397,500]},
   ChatRoomData:{Name:'B&B Farm',Admin:[260239],MapData:{Type:'Always'}}, ChatRoomCharacter:chars,
   ChatRoomPlayerIsAdmin:()=>true, Commands:[]};
@@ -28,7 +28,7 @@ const realTimeout=setTimeout, wait=ms=>new Promise(r=>realTimeout(r,ms));
 const out=(...a)=>process.stdout.write(a.join(' ')+'\n');
 // wait till the bot's send queue is empty (it paces messages), plus the 5 s per-person command gap
 const drain=async(min)=>{ await wait(min||300); for(let i=0;i<400;i++){ const s=W.__st(); if(!s.queue.length&&!s.urgent.length&&!s.sending) break; await wait(100);} await wait(200); };
-let fails=0; const ok=(c,msg)=>{ out((c?'PASS ':'FAIL ')+msg); if(!c) fails++; };
+let fails=0; const ok=(c,msg)=>{ out(msg+' -> '+(c?'true':'false')); if(!c) fails++; };
 const toWhom=(k,mn)=>sent.slice(k).filter(([e,d])=>d&&d.Target===mn&&(d.Type==='Whisper'||d.Type==='Hidden')).map(([e,d])=>d.Content);
 const beepsTo=(k,mn)=>sent.slice(k).filter(([e,d])=>e==='AccountBeep'&&d.MemberNumber===mn).map(([e,d])=>d.Message);
 (async()=>{ await wait(3500);

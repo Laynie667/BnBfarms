@@ -71,6 +71,7 @@
         state.lastHealthy = Date.now();
         greet(mn);
         onArrive(mn);
+        later(()=>deliverMail(mn), 8000);   // anything kept for them while they were away
         addonsEmit("join", mn);
         if (CFG.KEY_SYNC_ON_JOIN) later(()=>syncKeys(mn,true), CFG.KEY_JOIN_DELAY_MS);
         if (CFG.FRIEND_ON_JOIN && rec(mn)) later(()=>addFriend(mn,true), 6000);
@@ -78,6 +79,14 @@
     });
 
     W.ServerSocket.on("ChatRoomSyncMemberLeave",(data)=>{ try { if (data && data.SourceMemberNumber) addonsEmit("leave", data.SourceMemberNumber); } catch(e){ warn("leave:",e); } });
+    // who's friends with the bot both ways (and online): the only people a beep can reach
+    W.ServerSocket.on("AccountQueryResult",(d)=>{
+      try {
+        if (!d || d.Query !== "OnlineFriends" || !Array.isArray(d.Result)) return;
+        state.mutual = { at: Date.now(), set: new Set(d.Result.map(x => x && x.MemberNumber).filter(Number.isFinite)) };
+        for (const mn of state.mutual.set) if (L.mailbox && L.mailbox[mn]) deliverMail(mn);
+      } catch(e){ warn("friends result:", e); }
+    });
     W.ServerSocket.on("ChatRoomSync", ()=>{ state.lastHealthy = Date.now(); later(()=>pingCompanions(false), 4000); });
 
     W.ServerSocket.on("ChatRoomSearchResponse",(d)=>{

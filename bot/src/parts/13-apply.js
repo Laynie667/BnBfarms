@@ -57,7 +57,7 @@
       return;
     }
     // never out loud: these questions are private
-    const useCh = (ch === "beep" || ((ch === "chat" || ch === "bot") && isFriend(mn))) ? "beep" : "whisper";
+    const useCh = (ch === "beep" || ((ch === "chat" || ch === "bot") && canBeep(mn))) ? "beep" : "whisper";
     state.sessions.set(mn, { mn, step:0, answers:[], byKey:{}, staffTrack:false, started:Date.now(), ch:useCh });
     reply(mn,
 `🌾 B&B FARM — INTAKE 🌾
@@ -128,7 +128,7 @@ Chat in the room all you like; I'll only count what you send me direct.`, useCh)
 I'll put it in front of the proprietors and somebody'll come find you. Might be an hour, might be a day — we read every single one proper.
 
 Welcome to B&B Farm. Mind the ruts! 🌾`, s.ch);
-    notifyStaff("📋 Ooh, a new application from "+plainName(mn)+" ("+mn+")! Say ?queue to read it.", true);
+    notifyStaff("📋 Ooh, a new application from "+plainName(mn)+" ("+mn+")! Say ?queue to read it.", true, true);
   }
 
   // what approvin' someone sets up from their answers
@@ -145,17 +145,18 @@ Welcome to B&B Farm. Mind the ruts! 🌾`, s.ch);
     return { stay, depth };
   }
 
-  function notifyStaff(msg, routine){
+  // routine: only staff on duty here (proprietors too if nobody is). ping: also a real beep for Companion users.
+  function notifyStaff(msg, routine, ping){
     const present = [];
     for (const k in L.people){
       const m = parseInt(k,10);
       if (isStaff(m) && onDuty(m) && charFor(m)) present.push(m);
     }
-    for (const m of present) beep(m, "🌾 "+msg, !routine);
+    for (const m of present) beep(m, "🌾 "+msg, !routine || !!ping);
     if (!routine || present.length===0){
       for (const p of CFG.PROPRIETORS){
         if (present.includes(p)) continue;
-        beep(p, "[B&B Farm] "+msg, !routine);
+        beep(p, "[B&B Farm] "+msg, !routine || !!ping);
       }
     }
   }

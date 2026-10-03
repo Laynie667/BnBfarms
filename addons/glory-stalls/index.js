@@ -267,6 +267,14 @@ function cmdStall(c) {
     (staff ? " · ?stall shift <who> <minutes> · ?stall punish <who> <minutes> · ?stall release <who>" : ""));
 }
 
+// ── safeword: everything stops for them, right away ────────
+function onSafe(mn) {
+  const d = D();
+  for (const [id, run] of running) if (run.mn === mn) { running.delete(id); const s = d.stalls[id] = d.stalls[id] || {}; s.next = Date.now() + 60 * 60000; }
+  if (d.shifts[mn]) delete d.shifts[mn];
+  api.save();
+}
+
 // ── the Companion's "Farm extras" cards ────────────────────
 function companion(mn) {
   const d = D(), r = api.rec(mn);
@@ -299,6 +307,6 @@ connect({
     stall: { private: true, run: cmdStall },
     stalls: { private: true, run: (c) => c.reply(board(c.api.isStaff(c.sender))) },
   },
-  on: { tick },
+  on: { tick, safe: onSafe },
   companion,
 });

@@ -13,7 +13,7 @@ const doc={body:{appendChild(){}},createElement(){return {style:{},addEventListe
 const at=(m,X,Y)=>({MemberNumber:m,Name:'N'+m,MapData:{Pos:{X,Y},PrivateState:{}},Appearance:[]});
 const chars=[at(260239,1,1),at(221397,20,20),at(500,21,20),at(600,30,5)];
 const W={document:doc,addEventListener(){},location:{reload(){}},alert(){},prompt(){},
-  ServerSend:(ev,d)=>sent.push([ev,d]), ServerSocket:{connected:true,on:(e,f)=>handlers[e]=f},
+  ServerSend:(ev,d)=>{ sent.push([ev,d]); if(ev==="AccountQuery"&&d.Query==="OnlineFriends"&&handlers.AccountQueryResult) setTimeout(()=>handlers.AccountQueryResult({Query:"OnlineFriends",Result:(W.__mutual||W.Player.FriendList).map(m=>({MemberNumber:m}))}),0); }, ServerSocket:{connected:true,on:(e,f)=>handlers[e]=f},
   Player:{MemberNumber:260239,FriendList:[221397,500]},
   ChatRoomData:{Name:'B&B Farm',Admin:[260239],MapData:{Type:'Always'}}, ChatRoomCharacter:chars,
   ChatRoomPlayerIsAdmin:()=>true, Commands:[]};

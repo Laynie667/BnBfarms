@@ -99,7 +99,8 @@
     return out;
   }
   // a message that reaches them anywhere on the map: beep if we're friends, whisper otherwise
-  function tell(mn, text){ if (isFriend(mn)) beep(mn, text); else whisper(mn, text); }
+  // a private word: a beep if it can reach them, otherwise a whisper (or held for later, see beep())
+  function tell(mn, text){ if (canBeep(mn)) beep(mn, text); else if (charFor(mn)) whisper(mn, text); else beep(mn, text); }
   const wornCache = new Map();
   function wornTags(mn){
     const hit = wornCache.get(mn), now = Date.now();

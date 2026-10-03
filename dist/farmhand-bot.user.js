@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.10.0
+// @version      0.11.0
 // @description  B&B Farm: beeps, keys, ledger, roster, herds, summoning, anti-idle
 // @author       Laynie & Alexia
 // @match        *://*.bondageprojects.elementfx.com/*
@@ -1772,7 +1772,7 @@
   }
 
   // bot/src/version.js
-  var VERSION = "0.10.0";
+  var VERSION = "0.11.0";
 
   // bot-parts:farmhand-bot-parts
   (function() {
@@ -2991,6 +2991,18 @@
         return false;
       }
     }
+    function canBeep(mn) {
+      const m = state.mutual;
+      if (m && Date.now() - m.at < 5 * 6e4) return m.set.has(mn);
+      return false;
+    }
+    function askMutual() {
+      try {
+        W.ServerSend("AccountQuery", { Query: "OnlineFriends" });
+      } catch (e) {
+        warn("friends query:", e);
+      }
+    }
     function findCommand(tag) {
       try {
         return (W.Commands || []).find((x) => x && x.Tag && x.Tag.toLowerCase().replace(/^\//, "") === tag.toLowerCase());
@@ -3411,7 +3423,9 @@
         pump();
       }, CFG.SEND_INTERVAL_MS);
     }
+    const inCharacter = (s) => String(s).replace(/\(/g, "[").replace(/\)/g, "]");
     function enqueue(m, urgent) {
+      if (m && (m.Type === "Emote" || m.Type === "Chat") && typeof m.Content === "string") m = Object.assign({}, m, { Content: inCharacter(m.Content) });
       send("ChatRoomChat", m, urgent);
     }
     function say(t, urgent, who) {
@@ -3500,6 +3514,11 @@
         toCompanion(target, text, "notice", urgent);
         return;
       }
+      if (!charFor(target)) {
+        if (canBeep(target)) for (const c of splitMessage(text, 900)) send("AccountBeep", { MemberNumber: target, BeepType: "", Message: c }, urgent);
+        else holdMail(target, text);
+        return;
+      }
       const ooc = mapRoom();
       for (const c of splitMessage(text, 900)) enqueue({ Content: ooc ? "(" + c.replace(/\)/g, "]") : c, Type: "Whisper", Target: target }, urgent);
     }
@@ -3585,10 +3604,19 @@
     function beep(mn, msg, urgent) {
       if (hasCompanion(mn)) {
         toCompanion(mn, msg, "notice", urgent);
+        if (urgent && canBeep(mn)) send("AccountBeep", { MemberNumber: mn, BeepType: "", Message: String(msg).split("\n")[0].slice(0, 300) }, urgent);
         return;
       }
       if (CFG.WHISPER_FIRST && inRoom() && onMap(mn)) {
         whisper(mn, msg, urgent);
+        return;
+      }
+      if (!canBeep(mn)) {
+        if (inRoom() && charFor(mn)) {
+          whisper(mn, msg, urgent);
+          return;
+        }
+        holdMail(mn, msg);
         return;
       }
       const chunks = splitMessage(msg, 900);
@@ -3596,6 +3624,25 @@
       for (const c of chunks.slice(0, max)) send("AccountBeep", { MemberNumber: mn, BeepType: "", Message: c }, urgent);
       if (chunks.length > max)
         send("AccountBeep", { MemberNumber: mn, BeepType: "", Message: "(…I had to cut that one short, sugar. It's a long one! Try narrowin' it down.)" }, urgent);
+    }
+    function holdMail(mn, msg) {
+      L.mailbox = L.mailbox || {};
+      const gist = String(msg).split("\n")[0].replace(/\s+/g, " ").trim().slice(0, 90);
+      const box = L.mailbox[mn] = (L.mailbox[mn] || []).concat({ t: Date.now(), gist }).slice(-10);
+      saveLedger();
+      dbg("held for " + mn + ": " + box.length);
+    }
+    function deliverMail(mn) {
+      const box = L.mailbox && L.mailbox[mn];
+      if (!box || !box.length) return;
+      const latest = box.slice(-3).reverse(), more = box.length - latest.length;
+      const text = "📬 " + box.length + " farm message" + (box.length === 1 ? "" : "s") + " while you were away. The latest:\n" + latest.map((x) => "• " + x.gist).join("\n") + (more > 0 ? "\n…and " + more + " older." : "");
+      if (hasCompanion(mn)) toCompanion(mn, text, "notice");
+      else if (charFor(mn)) whisper(mn, text);
+      else if (canBeep(mn)) send("AccountBeep", { MemberNumber: mn, BeepType: "", Message: text.slice(0, 1e3) });
+      else return;
+      delete L.mailbox[mn];
+      saveLedger();
     }
     function reply(mn, text, channel) {
       if (channel === "companion" || channel !== "chat" && hasCompanion(mn)) {
@@ -3607,12 +3654,12 @@
         return;
       }
       if (channel === "bot") {
-        if (isFriend(mn)) beep(mn, text);
+        if (canBeep(mn)) beep(mn, text);
         else whisper(mn, text);
         return;
       }
       if (channel === "chat") {
-        if (CFG.CHAT_REPLY_BEEP && isFriend(mn)) {
+        if (CFG.CHAT_REPLY_BEEP && canBeep(mn)) {
           beep(mn, text);
           return;
         }
@@ -3621,8 +3668,8 @@
           return;
         }
         whisper(mn, text);
-        if (!isFriend(mn)) {
-          say(plainName(mn) + ", I whispered that one to you, hon! Say ?friend and I'll hop on your friend list so I can reach you anywhere.");
+        if (!canBeep(mn)) {
+          say(plainName(mn) + ", I whispered that one to you, hon! Add me (" + CFG.BOT_MEMBER + ") to your friend list and say ?friend, and I can reach you anywhere.");
         }
         return;
       }
@@ -3859,6 +3906,19 @@
           members: members.slice(0, 40).map((m) => Object.assign({ mn: m, name: plainName(m), hypno: !!rec(m).hypno }, L.voice.member[m] || { on: false, lines: [], every: "15" }))
         };
       }
+      out.apps = (L.applications || []).slice(0, 30).map((a, i) => ({
+        n: i + 1,
+        mn: a.mn,
+        name: a.name,
+        at: a.at,
+        staffTrack: !!a.staffTrack,
+        sum: ["role", "species", "gender", "stay", "depth"].map((k) => appAnswer(a, k) || "?").join(" · ")
+      }));
+      out.mail = {
+        sending: state.queue.length + state.urgent.length,
+        held: Object.keys(L.mailbox || {}).length,
+        beepable: state.mutual ? state.mutual.set.size : null
+      };
       return out;
     }
     function syncCompanions(force) {
@@ -3878,8 +3938,10 @@
       }
     }
     function askCard(mn, kind, text) {
-      if (hasCompanion(mn)) enqueue(makeMsg("ask", { kind, text, id: ++companionSeq }, mn));
-      else tell(mn, text);
+      if (hasCompanion(mn)) {
+        enqueue(makeMsg("ask", { kind, text, id: ++companionSeq }, mn));
+        if (canBeep(mn)) send("AccountBeep", { MemberNumber: mn, BeepType: "", Message: "❓ A yes/no question is waitin' in your 🌾 panel: " + String(text).slice(0, 160) });
+      } else tell(mn, text);
     }
     const LIMIT_WORDS = {
       breed: /\b(breed\w*|pregnan\w*|impregnat\w*|inflat\w*|cum\w*|creampie\w*|seed\w*)\b/i,
@@ -3996,8 +4058,9 @@
       return out;
     }
     function tell(mn, text) {
-      if (isFriend(mn)) beep(mn, text);
-      else whisper(mn, text);
+      if (canBeep(mn)) beep(mn, text);
+      else if (charFor(mn)) whisper(mn, text);
+      else beep(mn, text);
     }
     const wornCache = /* @__PURE__ */ new Map();
     function wornTags(mn) {
@@ -6377,7 +6440,7 @@
         state.voiceNext.set(mn, now + mins * 6e4 * (0.8 + Math.random() * 0.4));
         const line = fill(v.lines[Math.floor(Math.random() * v.lines.length)], mn);
         if (hasCompanion(mn)) enqueue(makeMsg("voice", { text: line }, mn));
-        else enqueue({ Content: "[Voice] " + line, Type: "Whisper", Target: mn });
+        else whisper(mn, "[Voice] " + line);
       }
     }
     function canVoice(sender, t) {
@@ -6422,30 +6485,30 @@
     const GEAR_LINES = {
       pump: [
         [
-          "The lactation pump on %n%'s nipples gives a soft, steady little tug. Milk beads and drips into the bottles. (+%ml%)",
-          "%n%'s pump hums along nice and gentle, coaxin' out warm milk a drop at a time. (+%ml%)"
+          "The lactation pump on %n%'s nipples gives a soft, steady little tug. Milk beads and drips into the bottles, +%ml%.",
+          "%n%'s pump hums along nice and gentle, coaxin' out warm milk a drop at a time, +%ml%."
         ],
         [
-          "The lactation pump pulls in a slow, firm rhythm, and %n%'s teats stretch into the cups with every draw. (+%ml%)",
-          "Milk runs in steady streams down the pump's tubes from %n%'s swollen nipples. (+%ml%)"
+          "The lactation pump pulls in a slow, firm rhythm, and %n%'s teats stretch into the cups with every draw, +%ml%.",
+          "Milk runs in steady streams down the pump's tubes from %n%'s swollen nipples, +%ml%."
         ],
         [
-          "The pump on %n% sucks hard, stretchin' those nipples long, and the bottles fill fast. %n% squirms in it. (+%ml%)",
-          "%n%'s lactation pump is cranked up high. Every pull wrings a hot spurt of milk out of 'em. (+%ml%)"
+          "The pump on %n% sucks hard, stretchin' those nipples long, and the bottles fill fast. %n% squirms in it, +%ml%.",
+          "%n%'s lactation pump is cranked up high. Every pull wrings a hot spurt of milk out of 'em, +%ml%."
         ]
       ],
       echo: [
         [
-          "The %g% on %n% sighs along, and a thin line of milk creeps up the hose. (+%ml%)",
-          "%n%'s %g% works slow and patient. Drip, drip, into the tank. (+%ml%)"
+          "The %g% on %n% sighs along, and a thin line of milk creeps up the hose, +%ml%.",
+          "%n%'s %g% works slow and patient. Drip, drip, into the tank, +%ml%."
         ],
         [
-          "Milk flows steady up the %g%'s hose from %n%'s teats, and the tank's fillin' nicely. (+%ml%)",
-          "The %g% has %n% let down good now: warm milk pulses up the line with every pull. (+%ml%)"
+          "Milk flows steady up the %g%'s hose from %n%'s teats, and the tank's fillin' nicely, +%ml%.",
+          "The %g% has %n% let down good now: warm milk pulses up the line with every pull, +%ml%."
         ],
         [
-          "%n% is so worked up the %g% can barely keep up. Milk gushes up the hoses into the tank. (+%ml%)",
-          "The %g%'s tank sloshes as %n%, flushed and needy, pours milk into it. (+%ml%)"
+          "%n% is so worked up the %g% can barely keep up. Milk gushes up the hoses into the tank, +%ml%.",
+          "The %g%'s tank sloshes as %n%, flushed and needy, pours milk into it, +%ml%."
         ]
       ],
       machine: [
@@ -6629,8 +6692,11 @@
         whisper: (mn, t) => whisper(mn, t),
         privateEmote: (mn, t) => privateLine(mn, t, "emote"),
         privateSay: (mn, t) => privateLine(mn, t, "chat"),
+        // a "listen to my voice" line: purple and private in the Companion, an out-of-character whisper otherwise
+        voice: (mn, t) => hasCompanion(mn) ? enqueue(makeMsg("voice", { text: String(t) }, mn)) : whisper(mn, "[Voice] " + t),
         tell: (mn, t) => tell(mn, t),
-        notice: (mn, t) => hasCompanion(mn) ? toCompanion(mn, t, "notice") : whisper(mn, t),
+        // a private note: the Companion if they have it, otherwise a beep (friends) or a whisper
+        notice: (mn, t) => hasCompanion(mn) ? toCompanion(mn, t, "notice") : tell(mn, t),
         reply: (mn, t, ch) => reply(mn, t, ch),
         notifyStaff: (t, routine) => notifyStaff(t, routine),
         ask: (mn, text, cb) => {
@@ -6676,6 +6742,20 @@
         gradeLetter,
         staffPoints,
         staffScores: () => JSON.parse(JSON.stringify(L.staffScore || {})),
+        // another add-on's saved data, read-only (a copy), so add-ons can work together
+        peek: (other) => JSON.parse(JSON.stringify(L.mods && L.mods[other] || {})),
+        yieldWeek: (mn) => {
+          rollBoard();
+          return L.yield && L.yield.w && L.yield.w[mn] || 0;
+        },
+        // milk (and seed) given this week
+        studbook: () => JSON.parse(JSON.stringify(L.studbook || [])),
+        clockedIn,
+        isMandated,
+        hoursThisWeek: (mn) => {
+          const r = rec(mn);
+          return r && r.shift && r.shift.week && r.shift.week.key === weekKey() ? r.shift.week.ms / 36e5 : 0;
+        },
         inHeat,
         startHeat,
         rollConception,
@@ -6852,7 +6932,8 @@
           r.chore = { text: c.text, at: now };
           r.nextChore = now + CFG.CHORE_EVERY_MIN * 6e4;
           saveLedger();
-          beep(r.mn, "🧹 Got a chore for ya, sweetie: " + c.text + "\nSay ?done when it's finished.");
+          const at = (String(c.text).match(/@([a-z0-9_-]+)\s*$/i) || [])[1];
+          beep(r.mn, "🧹 Got a chore for ya, sweetie: " + c.text.replace(/\s*@[a-z0-9_-]+\s*$/i, "") + (at ? " (at " + at + ")" : "") + "\nSay ?done when it's finished" + (at ? ", standin' at " + at : "") + ".");
         }
       }
       const wk = weekKey();
@@ -7720,7 +7801,7 @@ Say ?apply and pick 'luxury guest'.
         reply(mn, "We're already halfway through your paperwork, sugar! Just answer the last question I asked, or say 'quit' to tear it up and start over later.", ch);
         return;
       }
-      const useCh = ch === "beep" || (ch === "chat" || ch === "bot") && isFriend(mn) ? "beep" : "whisper";
+      const useCh = ch === "beep" || (ch === "chat" || ch === "bot") && canBeep(mn) ? "beep" : "whisper";
       state.sessions.set(mn, { mn, step: 0, answers: [], byKey: {}, staffTrack: false, started: Date.now(), ch: useCh });
       reply(
         mn,
@@ -7806,7 +7887,7 @@ I'll put it in front of the proprietors and somebody'll come find you. Might be 
 Welcome to B&B Farm. Mind the ruts! 🌾`,
         s.ch
       );
-      notifyStaff("📋 Ooh, a new application from " + plainName(mn) + " (" + mn + ")! Say ?queue to read it.", true);
+      notifyStaff("📋 Ooh, a new application from " + plainName(mn) + " (" + mn + ")! Say ?queue to read it.", true, true);
     }
     function applyApplication(t, a) {
       const r = rec(t, true);
@@ -7826,17 +7907,17 @@ Welcome to B&B Farm. Mind the ruts! 🌾`,
       r.wantDepth = depth;
       return { stay, depth };
     }
-    function notifyStaff(msg, routine) {
+    function notifyStaff(msg, routine, ping) {
       const present = [];
       for (const k in L.people) {
         const m = parseInt(k, 10);
         if (isStaff(m) && onDuty(m) && charFor(m)) present.push(m);
       }
-      for (const m of present) beep(m, "🌾 " + msg, !routine);
+      for (const m of present) beep(m, "🌾 " + msg, !routine || !!ping);
       if (!routine || present.length === 0) {
         for (const p of CFG.PROPRIETORS) {
           if (present.includes(p)) continue;
-          beep(p, "[B&B Farm] " + msg, !routine);
+          beep(p, "[B&B Farm] " + msg, !routine || !!ping);
         }
       }
     }
@@ -8246,7 +8327,7 @@ Welcome to B&B Farm. Mind the ruts! 🌾`,
         audit(sender, "SAFETY_OUTSIDE", cmd);
         return;
       }
-      const replyCh = channel === "chat" && (PRIVATE_REPLY.includes(cmd) || addonCmd && addonCmd.def.private) ? isFriend(sender) ? "beep" : "whisper" : channel;
+      const replyCh = channel === "chat" && (PRIVATE_REPLY.includes(cmd) || addonCmd && addonCmd.def.private) ? canBeep(sender) ? "beep" : "whisper" : channel;
       const docAbout = channel === "companion" && DOC_CMDS.includes(cmd) && args[0] && isStaff(sender) ? resolveTarget(args[0]) : null;
       const R = docAbout && docAbout !== sender ? (txt) => toCompanion(sender, txt, "doc", false, { kind: cmd, who: plainName(docAbout), about: docAbout }) : (txt) => reply(sender, txt, replyCh);
       if (addonCmd) {
@@ -9180,10 +9261,11 @@ Welcome to B&B Farm. Mind the ruts! 🌾`,
           startApplication(sender, channel);
           break;
         case "friend": {
-          if (isFriend(sender)) R("You're already on my list, sugar! Beep me any time.");
-          else if (addFriend(sender, true))
-            R("🌾 Done, hon! You're on the farm office's list now.\n\nBeep me from anywhere on the property. Wedged, gagged, it don't matter.\n🔴 Beep 'safe' and everything stops.");
-          else R("Shoot, I couldn't manage that just now, sugar. Try ?friend again in a little bit.");
+          const mine = isFriend(sender) || addFriend(sender, true);
+          later(askMutual, 1500);
+          if (!mine) R("Shoot, I couldn't manage that just now, sugar. Try ?friend again in a little bit.");
+          else if (canBeep(sender)) R("We're friends both ways, sugar! Beep me any time, from anywhere.\n🔴 Beep 'safe' and everything stops.");
+          else R("🌾 You're on my list, hon, so your beeps reach me. For mine to reach you, add me (" + CFG.BOT_MEMBER + ") to YOUR friend list too. Until then I'll whisper while you're here, and keep anything else for when you come back.\n🔴 Beep 'safe' and everything stops.");
           break;
         }
         case "addfriend": {
@@ -9667,6 +9749,7 @@ Welcome to B&B Farm. Mind the ruts! 🌾`,
           beep(sender, "I've got you, " + plainName(sender) + ". Everything's stopped and I'm fetchin' somebody for you right now. You don't owe anybody an explanation. 🔴", true);
           notifyStaff("🔴 SAFEWORD from " + plainName(sender) + " (" + sender + "). Please go to them now.", false);
           audit(sender, "SAFEWORD", channel);
+          addonsEmit("safe", sender);
           dropLeashes(sender);
           state.tours.delete(sender);
           {
@@ -9727,7 +9810,7 @@ Welcome to B&B Farm. Mind the ruts! 🌾`,
         }
         case "staff": {
           R("I've sent word, sugar. Somebody'll be right over to help.");
-          notifyStaff("🙋 " + plainName(sender) + " (" + sender + ") is askin' for a hand.", true);
+          notifyStaff("🙋 " + plainName(sender) + " (" + sender + ") is askin' for a hand.", true, true);
           if (CFG.SUMMON_ON_STAFF_CALL && !forcedStaff().some((m) => charFor(m))) {
             summonHelp("🙋 " + plainName(sender) + " asked for a hand.", sender, false, "staff");
           }
@@ -11141,6 +11224,11 @@ Welcome to B&B Farm, hon. 🌾`
             R("You don't have a chore right now, hon. They come by beep while you're clocked in.");
             break;
           }
+          const place = r.chore.place || (String(r.chore.text).match(/@([a-z0-9_-]+)\s*$/i) || [])[1];
+          if (place && !inZoneNamed(sender, place.toLowerCase()) && !onSpot(sender, place.toLowerCase(), 1)) {
+            R("🧹 That one gets done at " + place + ", sugar. Head over there and say ?done once you're standin' in it.");
+            break;
+          }
           const wk = weekKey();
           r.choreWeek = r.choreWeek && r.choreWeek.key === wk ? r.choreWeek : { key: wk, n: 0 };
           r.choreWeek.n++;
@@ -11148,6 +11236,7 @@ Welcome to B&B Farm, hon. 🌾`
           audit(sender, "CHORE", r.chore.text.slice(0, 50));
           r.chore = null;
           saveLedger();
+          staffPoints(sender, 1, "chore");
           R("✅ Thank you, sweetie! That's " + r.choreWeek.n + " this week.");
           break;
         }
@@ -11157,7 +11246,7 @@ Welcome to B&B Farm, hon. 🌾`
           if (sub === "add") {
             const text = args.slice(1).join(" ").trim();
             if (!text) {
-              R("What's the job, sugar? Say ?chore add and the job, like ?chore add Polish the cowbells.");
+              R("What's the job, sugar? Say ?chore add and the job, like ?chore add Polish the cowbells. Add @place to make it count only there, like ?chore add Muck out the pens @pens.");
               break;
             }
             L.chores.push({ text, by: sender });
@@ -11531,6 +11620,7 @@ Welcome to B&B Farm, hon. 🌾`
           state.lastHealthy = Date.now();
           greet(mn);
           onArrive(mn);
+          later(() => deliverMail(mn), 8e3);
           addonsEmit("join", mn);
           if (CFG.KEY_SYNC_ON_JOIN) later(() => syncKeys(mn, true), CFG.KEY_JOIN_DELAY_MS);
           if (CFG.FRIEND_ON_JOIN && rec(mn)) later(() => addFriend(mn, true), 6e3);
@@ -11543,6 +11633,15 @@ Welcome to B&B Farm, hon. 🌾`
           if (data && data.SourceMemberNumber) addonsEmit("leave", data.SourceMemberNumber);
         } catch (e) {
           warn("leave:", e);
+        }
+      });
+      W.ServerSocket.on("AccountQueryResult", (d) => {
+        try {
+          if (!d || d.Query !== "OnlineFriends" || !Array.isArray(d.Result)) return;
+          state.mutual = { at: Date.now(), set: new Set(d.Result.map((x) => x && x.MemberNumber).filter(Number.isFinite)) };
+          for (const mn of state.mutual.set) if (L.mailbox && L.mailbox[mn]) deliverMail(mn);
+        } catch (e) {
+          warn("friends result:", e);
         }
       });
       W.ServerSocket.on("ChatRoomSync", () => {
@@ -11598,6 +11697,10 @@ Welcome to B&B Farm, hon. 🌾`
         const oc = forcedStaff().length;
         setBadge("on duty — " + Object.keys(L.people).length + " reg · " + fl + " friends · " + oc + " on call" + (admin ? "" : " ⚠️NOT ADMIN"), admin ? "#b8ff9b" : "#ffc49b");
         keepalive();
+        if (Date.now() - (state.lastMutualAsk || 0) > 6e4) {
+          state.lastMutualAsk = Date.now();
+          askMutual();
+        }
         nudge();
         expireHerdClaims();
         snapshotRoom(false);

@@ -81,6 +81,11 @@
       out.voice = { herd: L.voice.herd[mn] || { on:false, lines:[], every:"15" },
                     members: members.slice(0, 40).map(m => Object.assign({ mn: m, name: plainName(m), hypno: !!rec(m).hypno }, L.voice.member[m] || { on:false, lines:[], every:"15" })) };
     }
+    // the Queue tab: applications waitin', and how the bot's messages are doin'
+    out.apps = (L.applications || []).slice(0, 30).map((a, i) => ({ n: i + 1, mn: a.mn, name: a.name, at: a.at, staffTrack: !!a.staffTrack,
+      sum: ["role","species","gender","stay","depth"].map(k => appAnswer(a, k) || "?").join(" · ") }));
+    out.mail = { sending: state.queue.length + state.urgent.length, held: Object.keys(L.mailbox || {}).length,
+                 beepable: state.mutual ? state.mutual.set.size : null };
     return out;
   }
 
@@ -98,7 +103,11 @@
 
   // a yes/no question: buttons in the Companion, a plain message for everybody else
   function askCard(mn, kind, text){
-    if (hasCompanion(mn)) enqueue(makeMsg("ask", { kind, text, id: ++companionSeq }, mn));
+    if (hasCompanion(mn)){
+      enqueue(makeMsg("ask", { kind, text, id: ++companionSeq }, mn));
+      // a question can't wait for them to open the panel: a short beep points them at it
+      if (canBeep(mn)) send("AccountBeep", { MemberNumber:mn, BeepType:"", Message:"❓ A yes/no question is waitin' in your 🌾 panel: "+String(text).slice(0, 160) });
+    }
     else tell(mn, text);
   }
 

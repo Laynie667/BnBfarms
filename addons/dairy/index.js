@@ -88,8 +88,8 @@ const tail = (i) => (i.degrade && Math.random() < 0.5 ? pick(DEGRADE) : i.praise
 const tier = (level) => (level <= 1 ? 0 : level <= 2 ? 1 : 2);
 
 const lines = {
-  pump: (i) => say(pick(PUMP[tier(i.level)]) + fullness(i) + ". (+" + i.ml + ")" + tail(i), i),
-  echo: (i) => say(pick(ECHO[tier(i.level)]) + fullness(i) + ". (+" + i.ml + ")" + tail(i), i),
+  pump: (i) => say(pick(PUMP[tier(i.level)]) + fullness(i) + ". +" + i.ml + "." + tail(i), i),
+  echo: (i) => say(pick(ECHO[tier(i.level)]) + fullness(i) + ". +" + i.ml + "." + tail(i), i),
   stallMilk: (i) => say(pick(STALL_MILK) + fullness(i) + "." + tail(i), i),
   stallSemen: (i) => say(pick(STALL_SEMEN) + "." + tail(i), i),
   stallDone: (i) => say(pick(DONE), i),

@@ -125,6 +125,18 @@ function onFarmMsg(m) {
       } else st.panel.add("[Voice] " + line, "notice");
       break;
     }
+    case "roomline": {
+      // a farm line said from a speaker spot near you: shown in your chat like any emote or chat line
+      const line = String(m.text || "").slice(0, 1200);
+      if (typeof window.ChatRoomSendLocal === "function") {
+        const p = window.document.createElement("div");
+        p.className = m.kind === "emote" ? "ChatMessage ChatMessageEmote" : "ChatMessage ChatMessageChat";
+        p.style.cssText = m.kind === "emote" ? "font-style:italic" : "";
+        p.textContent = m.kind === "emote" ? line : "Farm girl: " + line;
+        window.ChatRoomSendLocal(p.outerHTML);
+      } else st.panel.add(line, "notice");
+      break;
+    }
     case "outfitBack": {
       const r = changeBack();
       st.panel.add(r.ok ? "👗 Back in your own clothes" + (r.stillLocked ? " (farm-locked pieces stay till a keyholder opens 'em)" : "") + "." : "👗 " + r.why + ".", "notice");

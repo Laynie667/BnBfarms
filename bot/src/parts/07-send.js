@@ -127,7 +127,10 @@
   }
   function enqueue(m, urgent){ send("ChatRoomChat", m, urgent); }
   // spoken out loud: only heard in hearing range of me on a map, so I step over to whoever it's about
-  function say(t, urgent, who){ walkTo(who || aboutWhom(t), urgent); enqueue({ Content:t, Type:"Chat" }, urgent); }
+  function say(t, urgent, who){
+    if (speakersOn() && speakerSend(who || aboutWhom(t), t, "chat", urgent)) return;   // the speaker spot talks for me
+    walkTo(who || aboutWhom(t), urgent); enqueue({ Content:t, Type:"Chat" }, urgent);
+  }
   // a room emote everybody nearby sees (no name in front; I write the whole line)
   /* MAP ROOMS: a player only sees my emotes while I'm in their sight, hears my chat inside their
      hearing range, and gets my whispers within 1 tile (BC's "map room hearing distances").
@@ -177,8 +180,34 @@
   // who: the person it's about (worked out from the names in it if left out)
   function emote(t, who){
     if (state.cmdWatch) state.cmdWatch.emotes.push(String(t));
+    if (speakersOn() && speakerSend(who || aboutWhom(t), t, "emote")) return;   // the speaker spot emotes for me
     walkTo(who || aboutWhom(t));
     for (const c of splitMessage(t, 900)) enqueue({ Content:"*"+c, Type:"Emote" });
+  }
+
+  /* SPEAKER SPOTS AS MY VOICE (CFG.SPEAKER_MODE "voice"): I stay put. The speaker spot nearest the action
+     "says" it: everybody within CFG.SPEAKER_RANGE tiles of that spot (or of whoever it's about), plus
+     everyone the line names, gets it. Companion users see a normal-lookin' emote line in their chat;
+     everyone else gets it as a private out-of-character whisper (the map never filters those). */
+  const speakersOn = () => mapRoom() && CFG.SPEAKER_MODE === "voice" && Object.keys(L.spots || {}).some(n => n.startsWith("speaker"));
+  function speakerSend(anchor, text, kind, urgent){
+    const here = (W.ChatRoomCharacter||[]).filter(c => c.MemberNumber !== CFG.BOT_MEMBER && c.MapData && c.MapData.Pos);
+    const pos = mn => { const c = charFor(mn); return c && c.MapData && c.MapData.Pos; };
+    const at = anchor && pos(anchor);
+    if (!at) return false;   // nobody to anchor it to: fall back to the room
+    const speakers = Object.entries(L.spots).filter(([n]) => n.startsWith("speaker")).map(([, s]) => s);
+    const dist = (p, q) => Math.max(Math.abs(p.X-q.X), Math.abs(p.Y-q.Y));
+    const spot = speakers.reduce((x, y) => dist(y, at) < dist(x, at) ? y : x);
+    const R = CFG.SPEAKER_RANGE;
+    const named = here.map(c => c.MemberNumber).filter(m => namedIn(String(text), [m]));
+    const who = new Set([anchor].concat(named));
+    for (const c of here) if (dist(c.MapData.Pos, spot) <= R || dist(c.MapData.Pos, at) <= R) who.add(c.MemberNumber);
+    const line = (kind === "emote" ? "*" : "")+String(text);
+    for (const mn of who){
+      if (hasCompanion(mn)) enqueue(makeMsg("roomline", { text: line, kind }, mn), urgent);
+      else for (const c of splitMessage(line, 900)) enqueue({ Content: "("+c.replace(/\)/g, "]"), Type:"Whisper", Target: mn }, urgent);
+    }
+    return true;
   }
   // are they in the room and standin' on the map right now?
   function onMap(mn){

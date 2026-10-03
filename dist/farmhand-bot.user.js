@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.9.35
+// @version      0.9.36
 // @description  B&B Farm: beeps, keys, ledger, roster, herds, summoning, anti-idle
 // @author       Laynie & Alexia
 // @match        *://*.bondageprojects.elementfx.com/*
@@ -1772,7 +1772,7 @@
   }
 
   // bot/src/version.js
-  var VERSION = "0.9.35";
+  var VERSION = "0.9.36";
 
   // bot-parts:farmhand-bot-parts
   (function() {
@@ -1802,7 +1802,10 @@
       USER_COOLDOWN_S: 5,
       COMPANION_COOLDOWN_S: 1,
       HOME_AFTER_S: 90,
-      // after walkin' over to somethin', I head back to my home tile (?spot set home) this long after       // panel buttons: a short gap, and a click that comes too quick waits its turn
+      SPEAKER_MODE: "voice",
+      // with speaker-* spots set: "voice" = the spot speaks for me and I never move · "walk" = I go stand on the nearest one
+      SPEAKER_RANGE: 8,
+      // how far (tiles) from the speaker spot, or from whoever it's about, folks get the line              // after walkin' over to somethin', I head back to my home tile (?spot set home) this long after       // panel buttons: a short gap, and a click that comes too quick waits its turn
       APPLY_TIMEOUT_MIN: 0,
       // 0 = interviews never time out (staff can ?appclear a stale one)
       CLAIM_ASK_TIMEOUT_MIN: 60,
@@ -3410,6 +3413,7 @@
       send("ChatRoomChat", m, urgent);
     }
     function say(t, urgent, who) {
+      if (speakersOn() && speakerSend(who || aboutWhom(t), t, "chat", urgent)) return;
       walkTo(who || aboutWhom(t), urgent);
       enqueue({ Content: t, Type: "Chat" }, urgent);
     }
@@ -3451,8 +3455,32 @@
     }
     function emote(t, who) {
       if (state.cmdWatch) state.cmdWatch.emotes.push(String(t));
+      if (speakersOn() && speakerSend(who || aboutWhom(t), t, "emote")) return;
       walkTo(who || aboutWhom(t));
       for (const c of splitMessage(t, 900)) enqueue({ Content: "*" + c, Type: "Emote" });
+    }
+    const speakersOn = () => mapRoom() && CFG.SPEAKER_MODE === "voice" && Object.keys(L.spots || {}).some((n) => n.startsWith("speaker"));
+    function speakerSend(anchor, text, kind, urgent) {
+      const here = (W.ChatRoomCharacter || []).filter((c) => c.MemberNumber !== CFG.BOT_MEMBER && c.MapData && c.MapData.Pos);
+      const pos = (mn) => {
+        const c = charFor(mn);
+        return c && c.MapData && c.MapData.Pos;
+      };
+      const at = anchor && pos(anchor);
+      if (!at) return false;
+      const speakers = Object.entries(L.spots).filter(([n]) => n.startsWith("speaker")).map(([, s]) => s);
+      const dist = (p, q) => Math.max(Math.abs(p.X - q.X), Math.abs(p.Y - q.Y));
+      const spot = speakers.reduce((x, y) => dist(y, at) < dist(x, at) ? y : x);
+      const R = CFG.SPEAKER_RANGE;
+      const named = here.map((c) => c.MemberNumber).filter((m) => namedIn(String(text), [m]));
+      const who = new Set([anchor].concat(named));
+      for (const c of here) if (dist(c.MapData.Pos, spot) <= R || dist(c.MapData.Pos, at) <= R) who.add(c.MemberNumber);
+      const line = (kind === "emote" ? "*" : "") + String(text);
+      for (const mn of who) {
+        if (hasCompanion(mn)) enqueue(makeMsg("roomline", { text: line, kind }, mn), urgent);
+        else for (const c of splitMessage(line, 900)) enqueue({ Content: "(" + c.replace(/\)/g, "]"), Type: "Whisper", Target: mn }, urgent);
+      }
+      return true;
     }
     function onMap(mn) {
       const C = charFor(mn);
@@ -6980,7 +7008,7 @@ GOOD TO KNOW
 SPOTS · stand on it, then ?spot set <name>
   home · where I stand when nothin's happenin'
   speaker-<name> · places I talk from (speaker-barn, speaker-pens…): set a few
-      and I'll emote from the nearest one instead of steppin' beside folks
+      and the nearest one speaks for me: folks near it get the line, and I never move
   summon · where summoned folks land
   safe · where safeword help lands
   staff · where staff-call help lands

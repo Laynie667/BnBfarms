@@ -518,7 +518,7 @@ GOOD TO KNOW
 SPOTS · stand on it, then ?spot set <name>
   home · where I stand when nothin's happenin'
   speaker-<name> · places I talk from (speaker-barn, speaker-pens…): set a few
-      and I'll emote from the nearest one instead of steppin' beside folks
+      and the nearest one speaks for me: folks near it get the line, and I never move
   summon · where summoned folks land
   safe · where safeword help lands
   staff · where staff-call help lands

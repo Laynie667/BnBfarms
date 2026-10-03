@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.6.1
+// @version      0.6.2
 // @description  Your B&B Farm panel: the farm girl's answers, stat cards and guides, right in the game.
 // @author       Laynie & Alexia
 // @match        *://*.bondageprojects.elementfx.com/*
@@ -224,7 +224,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.6.1";
+  var VERSION = "0.6.2";
 
   // extension/src/config.js
   var BOT_MEMBER = 260239;
@@ -3422,6 +3422,17 @@ One of mods you are using is using an old version of SDK. It will work for now b
           p.textContent = "[Voice] " + line;
           window.ChatRoomSendLocal(p.outerHTML);
         } else st.panel.add("[Voice] " + line, "notice");
+        break;
+      }
+      case "roomline": {
+        const line = String(m.text || "").slice(0, 1200);
+        if (typeof window.ChatRoomSendLocal === "function") {
+          const p = window.document.createElement("div");
+          p.className = m.kind === "emote" ? "ChatMessage ChatMessageEmote" : "ChatMessage ChatMessageChat";
+          p.style.cssText = m.kind === "emote" ? "font-style:italic" : "";
+          p.textContent = m.kind === "emote" ? line : "Farm girl: " + line;
+          window.ChatRoomSendLocal(p.outerHTML);
+        } else st.panel.add(line, "notice");
         break;
       }
       case "outfitBack": {

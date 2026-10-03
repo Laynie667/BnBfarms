@@ -1,3 +1,8 @@
+  /* WHAT'S IN THIS FILE (07-send.js)
+     Everything the bot SENDS: the paced send queue (so the server never kicks it), anti-idle, map-room
+     walkin' (speaker spots, home tile), emotes, chat, whispers (out-of-character on maps so they get
+     through), beeps, the Companion link, names, greetings.
+  */
   /* ═══════════ ANTI-IDLE ═══════════ */
 
   function keepalive(){
@@ -134,6 +139,18 @@
     const me = charFor(CFG.BOT_MEMBER), them = charFor(mn);
     const a = me && me.MapData && me.MapData.Pos, b = them && them.MapData && them.MapData.Pos;
     if (!a || !b || b.X < 0 || b.Y < 0) return;
+    // speaker spots (?spot set speaker-barn, speaker-pens…): if any are set, I only ever stand on those,
+    // pickin' the one nearest the action, so I'm not poppin' up beside people and spookin' 'em
+    const speakers = Object.entries(L.spots || {}).filter(([n]) => n.startsWith("speaker")).map(([, s]) => s);
+    if (speakers.length){
+      const d = s => Math.max(Math.abs(s.X-b.X), Math.abs(s.Y-b.Y));
+      const best = speakers.reduce((x, y) => d(y) < d(x) ? y : x);
+      if (best.X === a.X && best.Y === a.Y) return;   // already on the best one: stay put
+      me.MapData.Pos = { X: best.X, Y: best.Y };
+      send("ChatRoomCharacterMapDataUpdate", me.MapData, urgent);
+      state.walkedAt = Date.now();
+      return;
+    }
     if (Math.max(Math.abs(a.X-b.X), Math.abs(a.Y-b.Y)) <= 2) return;   // close enough already
     const to = spotBeside(mn);
     if (!to) return;
@@ -145,6 +162,8 @@
   function homeTick(){
     const home = spotFor("home"), me = charFor(CFG.BOT_MEMBER), p = me && me.MapData && me.MapData.Pos;
     if (!home || !p || !mapRoom()) return;
+    // with speaker spots set I just stay on the last one I used (less hoppin' about)
+    if (Object.keys(L.spots || {}).some(n => n.startsWith("speaker"))) return;
     if (p.X === home.X && p.Y === home.Y) return;
     if (Date.now() - (state.walkedAt||0) < CFG.HOME_AFTER_S*1000) return;
     me.MapData.Pos = { X: home.X, Y: home.Y };

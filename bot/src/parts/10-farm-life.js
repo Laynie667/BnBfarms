@@ -1,3 +1,6 @@
+  /* WHAT'S IN THIS FILE (10-farm-life.js)
+     Farm life: feedin', curfew, the stocks, leashes, the tour, weather.
+  */
   /* ═══════════ FARM LIFE: feeding, curfew, stocks, leash, tour, weather ═══════════
      Times are the bot machine's local clock (set the VPS timezone to yours). */
 

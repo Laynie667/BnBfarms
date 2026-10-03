@@ -1,3 +1,7 @@
+  /* WHAT'S IN THIS FILE (17-heartbeat.js)
+     The heartbeat: every 20 seconds, everything that runs on its own (milk fillin', gear, heat, teasin',
+     voice, goin' home, keepin' the Companions in sync).
+  */
   /* ───────────── heartbeat ───────────── */
 
   function heartbeat(){

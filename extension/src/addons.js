@@ -1,3 +1,7 @@
+/* WHAT'S IN THIS FILE (addons.js)
+   Checks on other addons from your page: which BC+ you run, and whether BCX's Ready to be summoned
+   lets the bot pull you.
+*/
 // What other addons this player is running, read straight from the page.
 import { BCPLUS_VERSION } from "../../shared/bcplus.js";
 

@@ -1,3 +1,6 @@
+/* WHAT'S IN THIS FILE (guest.js)
+   The Guest panel for folks not on the books yet: Welcome, The farm, Rules, Inbox, Guides, Settings.
+*/
 // The guest panel: for anybody not on the books yet.
 import { h, card, title, muted, btn } from "../dom.js";
 import { guidesTab, AREAS } from "./common.js";

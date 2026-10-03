@@ -1,3 +1,7 @@
+  /* WHAT'S IN THIS FILE (06-login.js)
+     Friends, loggin' the bot in, findin' or rebuildin' the farm room, the on-screen badge, and the hooks
+     the tests use.
+  */
   /* ═══════════ FRIENDS ═══════════ */
 
   function isFriend(mn){

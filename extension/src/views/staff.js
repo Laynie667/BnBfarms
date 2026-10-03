@@ -1,3 +1,7 @@
+/* WHAT'S IN THIS FILE (staff.js)
+   The Staff panel: Me (duty and pasture), Office (lookups and safeword cards), Contracts, Barn,
+   Guides, Toggles (on call and the summon check).
+*/
 // The staff panel: duty, the Office (lookups about other people land here), contracts, the barn, guides, switches.
 import { h, card, title, muted, btn, chip, toggle } from "../dom.js";
 import { guidesTab } from "./common.js";

@@ -1,3 +1,8 @@
+  /* WHAT'S IN THIS FILE (08-production.js)
+     The farm's body systems: milk and semen, sizes, holes and what blocks them, breedin' asks and
+     consent, jar insemination (always asks), pregnancy, heat, milkin' stalls, belly rubs, praise and
+     degradation, quotas.
+  */
   /* ═══════════ PRODUCTION, BREEDING, HEAT ═══════════
      Per person, in r.prod. Everything is opt-in and limit-checked.
      Rates are per hour; amounts are mL. */

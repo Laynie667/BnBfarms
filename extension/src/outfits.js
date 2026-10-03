@@ -1,3 +1,7 @@
+/* WHAT'S IN THIS FILE (outfits.js)
+   Farm outfits on YOUR side: savin' what you wear, puttin' an outfit on after you say yes (high
+   security padlocks on the locked pieces), and changin' back.
+*/
 // Farm outfits, done on the player's own screen after they say yes (so the game always allows it).
 // Saved outfits hold clothes and restraints, plus which pieces were locked. Puttin' one on:
 //   1. keep what they're wearin' now (for "change back")

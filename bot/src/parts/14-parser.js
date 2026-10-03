@@ -1,3 +1,7 @@
+  /* WHAT'S IN THIS FILE (14-parser.js)
+     Readin' commands out of chat, whispers, beeps and /bot; which commands are public or staff-only;
+     cooldowns (private commands wait their turn instead of bein' dropped).
+  */
   /* ───────────── PARSER ───────────── */
 
   // FIX: safety commands never get throttled

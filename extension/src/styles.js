@@ -1,3 +1,6 @@
+/* WHAT'S IN THIS FILE (styles.js)
+   How the panel looks: colours (as variables, so themes are easy) and layout.
+*/
 // The panel's look. Colours are variables, so a player's own theme can swap them later.
 export const THEME = {
   ground: "#21170f", card: "#2f2216", line: "#5a432a", accent: "#c9a35b", text: "#f3e9d8",

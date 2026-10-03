@@ -1,3 +1,7 @@
+  /* WHAT'S IN THIS FILE (02-core.js)
+     The page handle (W), logging, the role names, and `state`: everything the bot remembers only while
+     it's runnin' (cooldowns, scenes, asks, Companions connected, queues).
+  */
   /* ═══════════════════════════════════════════════════════════ */
 
   const W = (typeof unsafeWindow !== "undefined" && unsafeWindow) ? unsafeWindow : window;

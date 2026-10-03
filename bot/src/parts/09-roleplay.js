@@ -1,3 +1,7 @@
+  /* WHAT'S IN THIS FILE (09-roleplay.js)
+     Readin' the room: roleplay words in chat and emotes (cum words, belly touches), the game's own
+     actions (penetrate, suckle, rub, inject), shots and what they do, stats text.
+  */
   /* ── ROLEPLAY TRIGGERS ──
      Breedin': while a stud has a ?breed scene open, sayin' cum in their own chat or
      emotes fills the scene's hole (whoever they name, or the first partner).

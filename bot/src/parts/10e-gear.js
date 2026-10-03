@@ -1,3 +1,8 @@
+  /* WHAT'S IN THIS FILE (10e-gear.js)
+     Milkin' gear read off people: BC Lactation Pump, Echo's pump and milk vendor (only when switched
+     on), fuck machine / Sybian (and a jar loaded into them), funnel gags. Milks at matchin' rates with
+     emotes.
+  */
   /* ═══════════ MILKING GEAR ═══════════
      What people are wearin' anywhere on the farm, read straight off them:
        BC Lactation Pump (ItemNipples) · Echo's portable breast pump (ItemTorso "便携乳泵") ·
@@ -23,13 +28,19 @@
       const lv = Math.min(4, Number(pump.Property && pump.Property.SuctionLevel) || Number(typeRec(pump).typed) || 0);
       if (lv > 0) g.milk = { kind: "pump", name: "lactation pump", level: lv, ml: CFG.GEAR.PUMP_ML[lv] };
     }
+    // Echo's pump and vendor: the cup bein' attached ("s"/"m" module) isn't the same as runnin'.
+    // They're vibratin'-type items, so the strength they're set to (Intensity, -1 = off) is what counts.
     const arousal = Math.max(0, Math.min(100, (C.ArousalSettings && C.ArousalSettings.Progress) || 0));
-    const echo = (name) => ({ kind: "echo", name, level: 1 + Math.round(3*arousal/100),
-                              ml: Math.round(CFG.GEAR.ECHO_ML_MIN + (CFG.GEAR.ECHO_ML_MAX - CFG.GEAR.ECHO_ML_MIN)*arousal/100) });
+    const intensityOf = it => (it && it.Property && typeof it.Property.Intensity === "number") ? it.Property.Intensity : -1;
+    const echo = (name, it) => {
+      const i = intensityOf(it);   // 0-3 once it's switched on
+      const mix = Math.min(1, 0.6*i/3 + 0.4*arousal/100);   // mostly the setting, a bit how worked up they are
+      return { kind: "echo", name, level: i + 1, ml: Math.round(CFG.GEAR.ECHO_ML_MIN + (CFG.GEAR.ECHO_ML_MAX - CFG.GEAR.ECHO_ML_MIN)*mix) };
+    };
     const ep = wornItem(mn, "ItemTorso", "便携乳泵");
-    if (!g.milk && ep && typeRec(ep).s === 0) g.milk = echo("portable breast pump");
+    if (!g.milk && ep && typeRec(ep).s === 0 && intensityOf(ep) >= 0) g.milk = echo("portable breast pump", ep);
     const ev = wornItem(mn, "ItemDevices", "奶贩");
-    if (!g.milk && ev && typeRec(ev).m === 1) g.milk = echo("milk vendor");
+    if (!g.milk && ev && typeRec(ev).m === 1 && intensityOf(ev) >= 0) g.milk = echo("milk vendor", ev);
     for (const [n, label] of [["FuckMachine", "fuck machine"], ["Sybian", "Sybian"]]){
       const m = wornItem(mn, "ItemDevices", n), i = m && m.Property && typeof m.Property.Intensity === "number" ? m.Property.Intensity : -1;
       if (m) g.machine = { name: label, intensity: i };

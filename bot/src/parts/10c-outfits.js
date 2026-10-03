@@ -1,3 +1,7 @@
+  /* WHAT'S IN THIS FILE (10c-outfits.js)
+     Outfits and uniforms: slots by species × gender, fallbacks, who holds the keys to farm locks,
+     offerin' an outfit to someone's Companion, savin' one a proprietor is wearin'.
+  */
   /* ═══════════ OUTFITS & UNIFORMS ═══════════
      A proprietor dresses themselves (clothes, restraints, and locks on whatever should be locked) and
      saves it from their Companion. I keep it in the ledger and offer it to folks' Companions:

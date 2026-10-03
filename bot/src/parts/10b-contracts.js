@@ -1,3 +1,7 @@
+  /* WHAT'S IN THIS FILE (10b-contracts.js)
+     BC+ contracts: templates, buildin' a contract for one person, offerin' it the way BC+ expects,
+     noticin' when they sign or decline, askin' their BC+ what they hold, releasin' it.
+  */
   /* ═══════════ BC+ CONTRACTS ═══════════
      The farm writes BC+ contracts and I offer them, so BC+ records the farm as the author and only
      the farm can release 'em early. Nobody's bound till they read it in their own BC+ and countersign.

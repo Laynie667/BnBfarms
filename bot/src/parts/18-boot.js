@@ -1,3 +1,7 @@
+  /* WHAT'S IN THIS FILE (18-boot.js)
+     Start-up: wait for the game, load the ledger, attach the hooks, start the heartbeat. Closes the big
+     function.
+  */
   /* ───────────── boot ───────────── */
 
   function boot(){

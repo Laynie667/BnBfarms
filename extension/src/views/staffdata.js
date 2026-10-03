@@ -1,3 +1,6 @@
+/* WHAT'S IN THIS FILE (staffdata.js)
+   Staff tabs built from live bot data: Herd, Tease lines, Zones (the little map), Voice, Shift.
+*/
 // Staff tabs that show the farm's live picture: who's here, tease lines, zones, voice lines, shifts.
 import { h, card, title, muted, btn, chip } from "../dom.js";
 

@@ -1,3 +1,7 @@
+/* WHAT'S IN THIS FILE (dashboard.js)
+   The proprietors' Dashboard: the BC+ contract builder (every rule and setting from BC+'s own list),
+   Outfits & uniforms, Other addons.
+*/
 // The proprietors' dashboard: write BC+ contracts rule by rule, and check the addons the farm leans on.
 // The rule picker is built from BC+'s own rule list (shared/bcplus-rules.json), so every setting gets
 // the right kind of control and only values BC+ accepts.

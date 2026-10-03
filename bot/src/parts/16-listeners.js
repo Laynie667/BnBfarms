@@ -1,3 +1,7 @@
+  /* WHAT'S IN THIS FILE (16-listeners.js)
+     Hooks into the game: chat, whispers, emotes, actions, hidden messages (Companion and BC+), beeps,
+     people joinin', room events.
+  */
   /* ───────────── listeners ───────────── */
 
   function attachListeners(){

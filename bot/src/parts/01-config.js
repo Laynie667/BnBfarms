@@ -1,3 +1,8 @@
+  /* WHAT'S IN THIS FILE (01-config.js)
+     CFG: every setting you can change without touchin' code. Room name, admins, proprietors, cooldowns,
+     summoning, herds, tiers, teasing, milking gear rates, production and breedin' numbers, sizes,
+     species, texts.
+  */
   /* ═══════════════════════════════════════════════════════════
      CONFIGURATION
      ═══════════════════════════════════════════════════════════ */

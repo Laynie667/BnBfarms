@@ -1,3 +1,7 @@
+  /* WHAT'S IN THIS FILE (13-apply.js)
+     Applications: the ?apply interview (species, gender, length and depth are checked and re-asked),
+     savin' it, and what ?approve sets up from it. Also tellin' staff things.
+  */
   /* ───────────── APPLICATION ───────────── */
 
   // Each question has a key. Some take only certain answers (check), and those offer buttons in the Companion (choices).

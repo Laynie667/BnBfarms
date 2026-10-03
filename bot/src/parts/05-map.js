@@ -1,3 +1,7 @@
+  /* WHAT'S IN THIS FILE (05-map.js)
+     The map: pasture locks, key sync (which doors open for whom), named spots (?spot), teleportin'
+     people, findin' a free tile beside someone, and summoning.
+  */
   /* ═══════════ PASTURE LOCK ═══════════ */
 
   function canLockOut(actor, t){

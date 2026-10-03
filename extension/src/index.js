@@ -1,3 +1,8 @@
+/* WHAT'S IN THIS FILE (index.js)
+   The Companion's front door: connects to the farm bot with hidden messages, sends your commands,
+   routes what comes back (answers, notices, yes/no, docs, outfits, voice) to the panel, and says so if
+   nothin' comes back.
+*/
 // Farmhand Companion: the player-side extension for B&B Farm.
 // When the farm bot is in my room, I tell it I'm here; from then on it sends me your live state
 // (roles, keys, switches, numbers), its answers, yes/no questions, and staff lookups as hidden

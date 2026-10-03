@@ -1,3 +1,8 @@
+/* WHAT'S IN THIS FILE (panel.js)
+   The panel itself: the 🌾 button (drag it, pin it), the panel (drag it), the panel switch
+   (Livestock/Guest, Staff, Dashboard), the safety bar, tabs, banners for questions, the latest answer
+   on every tab, and your own settings.
+*/
 // The farm panel: a 🌾 button that opens a panel with a view for each hat you wear
 // (Livestock or Guest, Staff, Dashboard), tabs inside each, and a command box.
 import { HISTORY_MAX, PREFS_KEY } from "./config.js";

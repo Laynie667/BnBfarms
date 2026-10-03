@@ -1,3 +1,7 @@
+  /* WHAT'S IN THIS FILE (12-guides.js)
+     Every help text and guide the bot can show (?help and its topics, rules, consent, tour, doors,
+     species, luxury).
+  */
   /* ───────────── text ───────────── */
 
   const TEXT = {};
@@ -512,7 +516,9 @@ GOOD TO KNOW
     lifestaff: `🗺️ FARM LIFE (staff)
 
 SPOTS · stand on it, then ?spot set <name>
-  home · where I stand when nothin's happenin' (I walk over to the action, then come back)
+  home · where I stand when nothin's happenin'
+  speaker-<name> · places I talk from (speaker-barn, speaker-pens…): set a few
+      and I'll emote from the nearest one instead of steppin' beside folks
   summon · where summoned folks land
   safe · where safeword help lands
   staff · where staff-call help lands

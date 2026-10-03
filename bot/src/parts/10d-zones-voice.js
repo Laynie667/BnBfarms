@@ -1,3 +1,7 @@
+  /* WHAT'S IN THIS FILE (10d-zones-voice.js)
+     Zones (boxes from two corners, paired into one place) and "who's where"; the farm's own Listen to my
+     voice (herd leaders' lines, only for folks who said ?hypno on).
+  */
   /* ═══════════ ZONES ═══════════
      Spots are single tiles. Zones are boxes: stand on one corner and ?zone a <name>, the opposite
      corner and ?zone b <name>. Boxes paired into one group count as one place, for odd shapes

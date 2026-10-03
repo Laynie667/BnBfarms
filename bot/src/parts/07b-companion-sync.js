@@ -1,3 +1,7 @@
+  /* WHAT'S IN THIS FILE (07b-companion-sync.js)
+     What the Companion panel is told about you: roles, keys, switches, milk, body, gear, plus the staff
+     data (herd, zones, tease lines, voice, shift). Sent only when it changes.
+  */
   /* ── Companion sync: the panel's picture of you, kept fresh ──
      Every Companion in the room gets a `state` snapshot: roles, keys, switches and numbers.
      I only send it again when somethin' in it changed. */

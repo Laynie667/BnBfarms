@@ -1,3 +1,7 @@
+  /* WHAT'S IN THIS FILE (04-people.js)
+     Who's who: roles (proprietor, herdmaster, farmhand, stock…), keys each role gets, tiers, and herds
+     (who leads whom).
+  */
   /* ───────────── ROLES & KEYS ───────────── */
 
   function hasRole(mn, role){ const r = rec(mn); return !!r && r.roles.includes(role); }

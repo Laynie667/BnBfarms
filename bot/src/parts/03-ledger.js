@@ -1,3 +1,7 @@
+  /* WHAT'S IN THIS FILE (03-ledger.js)
+     The ledger (L): everything saved between restarts. Loadin' it, fixin' up old saves, and savin' it (a
+     little after each change).
+  */
   /* ───────────── LEDGER ───────────── */
 
   const LEDGER_KEY = "bnb_ledger_v1";

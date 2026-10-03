@@ -1,3 +1,6 @@
+/* WHAT'S IN THIS FILE (common.js)
+   Pieces several panels share: the Guides tab and the farm's areas.
+*/
 // Pieces more than one view uses: the guides tab, and the guest panel.
 import { h, card, title, muted, btn } from "../dom.js";
 import { BOOKS, PUBLIC_GROUPS, STAFF_GROUPS, OWNER_GROUPS, needsInput, cmdStem } from "../../../shared/guides.js";

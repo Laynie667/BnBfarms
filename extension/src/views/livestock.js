@@ -1,3 +1,7 @@
+/* WHAT'S IN THIS FILE (livestock.js)
+   The Livestock panel (your own): Me, Milking (with your gear), Breeding, Inbox, Guides, Toggles (farm
+   switches, gender, panel settings).
+*/
 // The livestock panel: your own record, milk, breeding, inbox, guides and switches.
 // Also the "Livestock" view staff and proprietors switch to for their own personal info.
 import { h, card, title, muted, btn, chip, bar, toggle, ml } from "../dom.js";

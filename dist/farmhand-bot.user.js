@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.9.34
+// @version      0.9.35
 // @description  B&B Farm: beeps, keys, ledger, roster, herds, summoning, anti-idle
 // @author       Laynie & Alexia
 // @match        *://*.bondageprojects.elementfx.com/*
@@ -1772,7 +1772,7 @@
   }
 
   // bot/src/version.js
-  var VERSION = "0.9.34";
+  var VERSION = "0.9.35";
 
   // bot-parts:farmhand-bot-parts
   (function() {
@@ -3419,6 +3419,16 @@
       const me = charFor(CFG.BOT_MEMBER), them = charFor(mn);
       const a = me && me.MapData && me.MapData.Pos, b = them && them.MapData && them.MapData.Pos;
       if (!a || !b || b.X < 0 || b.Y < 0) return;
+      const speakers = Object.entries(L.spots || {}).filter(([n]) => n.startsWith("speaker")).map(([, s]) => s);
+      if (speakers.length) {
+        const d = (s) => Math.max(Math.abs(s.X - b.X), Math.abs(s.Y - b.Y));
+        const best = speakers.reduce((x, y) => d(y) < d(x) ? y : x);
+        if (best.X === a.X && best.Y === a.Y) return;
+        me.MapData.Pos = { X: best.X, Y: best.Y };
+        send("ChatRoomCharacterMapDataUpdate", me.MapData, urgent);
+        state.walkedAt = Date.now();
+        return;
+      }
       if (Math.max(Math.abs(a.X - b.X), Math.abs(a.Y - b.Y)) <= 2) return;
       const to = spotBeside(mn);
       if (!to) return;
@@ -3429,6 +3439,7 @@
     function homeTick() {
       const home = spotFor("home"), me = charFor(CFG.BOT_MEMBER), p = me && me.MapData && me.MapData.Pos;
       if (!home || !p || !mapRoom()) return;
+      if (Object.keys(L.spots || {}).some((n) => n.startsWith("speaker"))) return;
       if (p.X === home.X && p.Y === home.Y) return;
       if (Date.now() - (state.walkedAt || 0) < CFG.HOME_AFTER_S * 1e3) return;
       me.MapData.Pos = { X: home.X, Y: home.Y };
@@ -6326,16 +6337,16 @@
         if (lv > 0) g.milk = { kind: "pump", name: "lactation pump", level: lv, ml: CFG.GEAR.PUMP_ML[lv] };
       }
       const arousal = Math.max(0, Math.min(100, C.ArousalSettings && C.ArousalSettings.Progress || 0));
-      const echo = (name) => ({
-        kind: "echo",
-        name,
-        level: 1 + Math.round(3 * arousal / 100),
-        ml: Math.round(CFG.GEAR.ECHO_ML_MIN + (CFG.GEAR.ECHO_ML_MAX - CFG.GEAR.ECHO_ML_MIN) * arousal / 100)
-      });
+      const intensityOf = (it) => it && it.Property && typeof it.Property.Intensity === "number" ? it.Property.Intensity : -1;
+      const echo = (name, it) => {
+        const i = intensityOf(it);
+        const mix = Math.min(1, 0.6 * i / 3 + 0.4 * arousal / 100);
+        return { kind: "echo", name, level: i + 1, ml: Math.round(CFG.GEAR.ECHO_ML_MIN + (CFG.GEAR.ECHO_ML_MAX - CFG.GEAR.ECHO_ML_MIN) * mix) };
+      };
       const ep = wornItem(mn, "ItemTorso", "便携乳泵");
-      if (!g.milk && ep && typeRec(ep).s === 0) g.milk = echo("portable breast pump");
+      if (!g.milk && ep && typeRec(ep).s === 0 && intensityOf(ep) >= 0) g.milk = echo("portable breast pump", ep);
       const ev = wornItem(mn, "ItemDevices", "奶贩");
-      if (!g.milk && ev && typeRec(ev).m === 1) g.milk = echo("milk vendor");
+      if (!g.milk && ev && typeRec(ev).m === 1 && intensityOf(ev) >= 0) g.milk = echo("milk vendor", ev);
       for (const [n, label] of [["FuckMachine", "fuck machine"], ["Sybian", "Sybian"]]) {
         const m = wornItem(mn, "ItemDevices", n), i = m && m.Property && typeof m.Property.Intensity === "number" ? m.Property.Intensity : -1;
         if (m) g.machine = { name: label, intensity: i };
@@ -6967,7 +6978,9 @@ GOOD TO KNOW
       lifestaff: `🗺️ FARM LIFE (staff)
 
 SPOTS · stand on it, then ?spot set <name>
-  home · where I stand when nothin's happenin' (I walk over to the action, then come back)
+  home · where I stand when nothin's happenin'
+  speaker-<name> · places I talk from (speaker-barn, speaker-pens…): set a few
+      and I'll emote from the nearest one instead of steppin' beside folks
   summon · where summoned folks land
   safe · where safeword help lands
   staff · where staff-call help lands

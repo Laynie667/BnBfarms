@@ -1,3 +1,7 @@
+/* WHAT'S IN THIS FILE (dom.js)
+   A tiny helper for buildin' the panel safely (text always goes in as text, never as code), plus small
+   pieces: cards, buttons, bars, switches.
+*/
 // A tiny element builder: h("div", { class: "x", onclick: fn }, "text", child, [more]).
 // Text always goes in as text, never as HTML, so nothing the bot or another player sends can run as code.
 export function h(tag, props, ...kids) {

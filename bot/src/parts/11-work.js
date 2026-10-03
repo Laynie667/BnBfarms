@@ -1,3 +1,6 @@
+  /* WHAT'S IN THIS FILE (11-work.js)
+     Work: the shift clock (clock in/out, hours), chores, the wheel, beggin', the fair.
+  */
   /* ═══════════ WORK & PLAY: shift clock, chores, wheel, begging, fair ═══════════ */
 
   function clockedIn(mn){ const r = rec(mn); return !!(r && r.shift && r.shift.in); }

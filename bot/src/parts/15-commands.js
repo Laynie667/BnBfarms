@@ -1,3 +1,7 @@
+  /* WHAT'S IN THIS FILE (15-commands.js)
+     What every ?command does. One big switch: find a command with `case "name":`. Also: never goin'
+     quiet on a private message, and copyin' emotes to the Companion.
+  */
   /* ───────────── COMMAND DISPATCH ───────────── */
 
   function handleCommand(sender, raw, channel){

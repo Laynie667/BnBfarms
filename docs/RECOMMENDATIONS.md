@@ -46,6 +46,9 @@ Matches the mockup. The big changes underneath:
   - `doc`: a staff lookup about someone else, which goes to the Office tab instead of chat
   - `outfit`: an outfit offer (section 4)
 - **Role-based tabs**: livestock, guest and staff versions, and proprietors get the Dashboard.
+  Staff get everything a player has too: **Me** (their own record, keys, hours, herd size, and their own
+  milk or seed if they're also on the books as stock), **Guides** (the public commands, then the staff ones),
+  and **Toggles** (on call, plus the same personal switches stock have).
 - **The safety bar is always visible**: Safe word / I'm stuck / Call staff on every tab.
 - **The Office**: when a staff member with the Companion runs `?record`, `?vet`, `?quota` or `?inspect` on someone else,
   the answer is sent as a `doc`. It stays until closed, with Pin and Add note.

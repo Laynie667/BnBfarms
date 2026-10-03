@@ -189,7 +189,8 @@ OPT IN FIRST · nobody gets bred who hasn't, sweetie
   ?breedable on|off · you can be bred and filled
   ?fertile on|off · you can catch (separate on purpose)
   ?freeuse on|off · any stud may have you without askin'
-  ?yes / ?no · answer a stud who asked (whisper or beep works too)
+  ?jarok on|off · jar insemination (on: staff ask every time · off: never)
+  ?yes / ?no · answer a stud or staff member who asked (whisper or beep works too)
   ?tally on|off · your tally marks on ?who and the board
   ?wash · clean off a paintin'
   ?praise on|off · ?degrade on|off · let staff's words count
@@ -484,7 +485,7 @@ MILKIN' & COLLECTIN'
 
 SEED JARS
   ?jars · what's on the shelf
-  ?inseminate <who> <jar> [hole] · put a jar in 'em
+  ?inseminate <who> <jar> [hole] · asks them, then puts a jar in 'em on their yes
 
 CONTROL
   ?edge <stud> · to the brink and stop; +25% next load, 3 = pent up

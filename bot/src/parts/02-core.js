@@ -20,7 +20,7 @@
     booted:false, loginTried:0, lastLoginAttempt:0, lastRoomAttempt:0,
     greeted:new Map(), cooldowns:new Map(), queue:[], urgent:[], sending:false, badge:null,
     lastSnapshot:0,
-    sessions:new Map(), pendingClaims:new Map(), breedAsks:new Map(), breedOk:new Map(),
+    sessions:new Map(), pendingClaims:new Map(), breedAsks:new Map(), breedOk:new Map(), jarAsks:new Map(),
     lastSynced:new Map(), lastFullSync:0,
     stuckCooldown:new Map(), summonCooldown:new Map(),
     heard:0, lastKeepalive:0, lastNudge:0, lastHealthy:Date.now(),

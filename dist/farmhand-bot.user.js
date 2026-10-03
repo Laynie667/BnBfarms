@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.9.25
+// @version      0.9.26
 // @description  B&B Farm: beeps, keys, ledger, roster, herds, summoning, anti-idle
 // @author       Laynie & Alexia
 // @match        *://*.bondageprojects.elementfx.com/*
@@ -35,7 +35,7 @@
   }
 
   // bot/src/version.js
-  var VERSION = "0.9.25";
+  var VERSION = "0.9.26";
 
   // bot-parts:farmhand-bot-parts
   (function() {
@@ -737,6 +737,7 @@
       pendingClaims: /* @__PURE__ */ new Map(),
       breedAsks: /* @__PURE__ */ new Map(),
       breedOk: /* @__PURE__ */ new Map(),
+      jarAsks: /* @__PURE__ */ new Map(),
       lastSynced: /* @__PURE__ */ new Map(),
       lastFullSync: 0,
       stuckCooldown: /* @__PURE__ */ new Map(),
@@ -2975,6 +2976,76 @@
       tell(stud, "🐂 " + plainName(t) + " said yes! Your scene's open (" + holeText(hole) + "). Say cum (or orgasm, breed, fill them up) in your chat or emotes.");
       return true;
     }
+    function jarOk(t) {
+      const r = rec(t);
+      return !!r && r.jarok !== false;
+    }
+    function inseminateProblem(t, jar, hole) {
+      const rt = rec(t);
+      if (!rt || !rt.breedable || limitBlocks(t)) return plainName(t) + " ain't breedable, hon. They'd have to say ?breedable on themselves (and their limits have to allow it).";
+      if (!onMap(t)) return plainName(t) + " needs to be here on the map for that, hon.";
+      if (hole === "vulva" && !hasVulva(t)) return plainName(t) + " doesn't have a vulva, sugar. Try butt or mouth.";
+      const blk = holeBlocked(t, hole);
+      if (blk) return plainName(t) + "'s " + hole + " is blocked by " + blk + ". That has to come off first.";
+      if (!jar) return "that jar's gone off the shelf, sugar.";
+      return "";
+    }
+    function askJar(staff, t, jarId, hole) {
+      state.jarAsks.set(t, { staff, jar: jarId, hole, at: Date.now() });
+      tell(t, "💉 " + plainName(staff) + " wants to inseminate you from jar #" + jarId + " (" + holeText(hole) + "), sugar. Say yes or no (?yes or ?no works too). Say ?jarok off if you'd rather never be asked.");
+    }
+    function answerJar(t, yes) {
+      const a = state.jarAsks.get(t);
+      if (!a || Date.now() - a.at > CFG.BREED_ASK_MIN * 6e4) {
+        state.jarAsks.delete(t);
+        return false;
+      }
+      state.jarAsks.delete(t);
+      if (!yes) {
+        tell(t, "Understood, hon. I told " + plainName(a.staff) + " no.");
+        tell(a.staff, "💉 " + plainName(t) + " said no to the jar, sugar. Please leave it be.");
+        return true;
+      }
+      const err = inseminate(a.staff, t, a.jar, a.hole);
+      if (err) {
+        tell(t, "You said yes, hon, but it can't happen right now: " + err);
+        tell(a.staff, "💉 " + plainName(t) + " said yes, but " + err);
+      }
+      return true;
+    }
+    function inseminate(sender, t, jarId, hole) {
+      L.jars = (L.jars || []).filter((j) => Date.now() - j.t < CFG.JAR_DAYS * 864e5);
+      const jar = L.jars.find((j) => String(j.id) === String(jarId));
+      const err = inseminateProblem(t, jar, hole);
+      if (err) return err;
+      const tp = prodOf(t);
+      const room = Math.max(0, capacity(t) - heldTotal(tp)), kept = Math.min(jar.ml, room);
+      tp.held[hole] = (tp.held[hole] || 0) + kept;
+      tp.totals.received += kept;
+      tp.lastStud = jar.stud;
+      L.jars = L.jars.filter((j) => j !== jar);
+      emote("💉 " + plainName(sender) + " fills the syringe from jar #" + jar.id + " and slides it deep into " + plainName(t) + "'s " + (hole === "mouth" ? "throat" : hole) + ", pushin' " + ml(kept) + " of " + plainName(jar.stud) + "'s seed all the way in.");
+      if (hole === "vulva") {
+        const caught = rollConception(t, jar.stud, kept, onBreedingStand(t) ? CFG.BREEDING_STAND_X : 1);
+        if (caught) {
+          const sp = prodOf(jar.stud);
+          sp.totals.conceived = (sp.totals.conceived || 0) + 1;
+          rollBoard();
+          const Y = L.yield;
+          Y.s = Y.s || {};
+          Y.s[jar.stud] = (Y.s[jar.stud] || 0) + 1;
+          emote("🍼 It took! A soft, warm glow settles over " + plainName(t) + ": they're carryin' " + plainName(jar.stud) + "'s young now, no stud required.");
+        }
+      }
+      saveLedger();
+      audit(sender, "INSEMINATE", t + " jar" + jar.id + " " + Math.round(kept));
+      return "";
+    }
+    function answerPending(t, yes) {
+      const j = state.jarAsks.get(t), b = state.breedAsks.get(t);
+      if (j && (!b || j.at >= b.at)) return answerJar(t, yes) || answerBreed(t, yes);
+      return answerBreed(t, yes) || answerJar(t, yes);
+    }
     const PAINT_AREAS = {
       face: "face",
       tits: "tits",
@@ -4168,7 +4239,8 @@ OPT IN FIRST · nobody gets bred who hasn't, sweetie
   ?breedable on|off · you can be bred and filled
   ?fertile on|off · you can catch (separate on purpose)
   ?freeuse on|off · any stud may have you without askin'
-  ?yes / ?no · answer a stud who asked (whisper or beep works too)
+  ?jarok on|off · jar insemination (on: staff ask every time · off: never)
+  ?yes / ?no · answer a stud or staff member who asked (whisper or beep works too)
   ?tally on|off · your tally marks on ?who and the board
   ?wash · clean off a paintin'
   ?praise on|off · ?degrade on|off · let staff's words count
@@ -4452,7 +4524,7 @@ MILKIN' & COLLECTIN'
 
 SEED JARS
   ?jars · what's on the shelf
-  ?inseminate <who> <jar> [hole] · put a jar in 'em
+  ?inseminate <who> <jar> [hole] · asks them, then puts a jar in 'em on their yes
 
 CONTROL
   ?edge <stud> · to the brink and stop; +25% next load, 3 = pent up
@@ -4966,6 +5038,7 @@ Welcome to B&B Farm. Mind the ruts! 🌾`,
       "rights",
       "accept",
       "freeuse",
+      "jarok",
       "tally",
       "eggs",
       "yes",
@@ -5325,7 +5398,7 @@ Welcome to B&B Farm. Mind the ruts! 🌾`,
         }
         case "jars": {
           L.jars = (L.jars || []).filter((j) => Date.now() - j.t < CFG.JAR_DAYS * 864e5);
-          R(L.jars.length ? "🫙 SEED JARS\n" + L.jars.map((j) => "#" + j.id + ": " + ml(j.ml) + " of " + plainName(j.stud) + "'s, bottled " + new Date(j.t).toLocaleString()).join("\n") + "\n?inseminate <who> <jar> [hole] uses one." : "🫙 No seed jars on the shelf, hon. ?collect a stud to bottle some.");
+          R(L.jars.length ? "🫙 SEED JARS\n" + L.jars.map((j) => "#" + j.id + ": " + ml(j.ml) + " of " + plainName(j.stud) + "'s, bottled " + new Date(j.t).toLocaleString()).join("\n") + "\n?inseminate <who> <jar> [hole] asks them, and uses one on their yes." : "🫙 No seed jars on the shelf, hon. ?collect a stud to bottle some.");
           break;
         }
         case "inseminate": {
@@ -5334,48 +5407,47 @@ Welcome to B&B Farm. Mind the ruts! 🌾`,
           const jar = L.jars.find((j) => String(j.id) === String(args[1] || "").replace(/^#/, ""));
           const hole = args[2] ? holeFrom(args[2]) : "vulva";
           if (!t || !jar || !hole) {
-            R("Here's how, sugar: ?inseminate <who> <jar number> [hole]. ?jars shows what's on the shelf. For example: ?inseminate Bessie 3");
+            R("Here's how, sugar: ?inseminate <who> <jar number> [hole]. ?jars shows what's on the shelf. They always get asked first. For example: ?inseminate Bessie 3");
             break;
           }
-          const rt = rec(t);
-          if (!rt || !rt.breedable || limitBlocks(t)) {
-            R(plainName(t) + " ain't breedable, hon. They'd have to say ?breedable on themselves (and their limits have to allow it).");
+          if (!jarOk(t)) {
+            R(plainName(t) + " has said never to jar insemination, sugar (?jarok off). That's their call, so I won't even ask.");
             break;
           }
-          if (!onMap(t)) {
-            R(plainName(t) + " needs to be here on the map for that, hon.");
+          const err = inseminateProblem(t, jar, hole);
+          if (err) {
+            R(err);
             break;
           }
-          if (hole === "vulva" && !hasVulva(t)) {
-            R(plainName(t) + " doesn't have a vulva, sugar. Try butt or mouth.");
+          if (t === sender) {
+            inseminate(sender, t, jar.id, hole);
             break;
           }
-          const blk = holeBlocked(t, hole);
-          if (blk) {
-            R(plainName(t) + "'s " + hole + " is blocked by " + blk + ". That has to come off first.");
+          askJar(sender, t, jar.id, hole);
+          R("💉 I've asked " + plainName(t) + " first, sugar. If they say yes, I'll do it right then. If they say no, please leave it be.");
+          break;
+        }
+        case "jarok": {
+          const r = rec(sender);
+          if (!r || !r.roles.length) {
+            R("That's just for folks on the books, sugar. Say ?apply first!");
             break;
           }
-          const tp = prodOf(t);
-          const room = Math.max(0, capacity(t) - heldTotal(tp)), kept = Math.min(jar.ml, room);
-          tp.held[hole] = (tp.held[hole] || 0) + kept;
-          tp.totals.received += kept;
-          tp.lastStud = jar.stud;
-          L.jars = L.jars.filter((j) => j !== jar);
-          emote("💉 " + plainName(sender) + " fills the syringe from jar #" + jar.id + " and slides it deep into " + plainName(t) + "'s " + (hole === "mouth" ? "throat" : hole) + ", pushin' " + ml(kept) + " of " + plainName(jar.stud) + "'s seed all the way in.");
-          if (hole === "vulva") {
-            const caught = rollConception(t, jar.stud, kept, onBreedingStand(t) ? CFG.BREEDING_STAND_X : 1);
-            if (caught) {
-              const sp = prodOf(jar.stud);
-              sp.totals.conceived = (sp.totals.conceived || 0) + 1;
-              rollBoard();
-              const Y = L.yield;
-              Y.s = Y.s || {};
-              Y.s[jar.stud] = (Y.s[jar.stud] || 0) + 1;
-              emote("🍼 It took! A soft, warm glow settles over " + plainName(t) + ": they're carryin' " + plainName(jar.stud) + "'s young now, no stud required.");
-            }
+          const v = String(args[0] || "").toLowerCase();
+          if (v && !["on", "off", "yes", "no"].includes(v)) {
+            R("Just say ?jarok on or ?jarok off, sweetie. Leave it blank and it flips.");
+            break;
           }
+          const on = v ? v === "on" || v === "yes" : r.jarok === false;
+          if (on && limitBlocks(sender, "breed")) {
+            R("Your hard limits rule that out, sugar, so I'll keep it off. If you want it, change your limits with staff first.");
+            break;
+          }
+          r.jarok = on;
+          if (!on) state.jarAsks.delete(sender);
           saveLedger();
-          audit(sender, "INSEMINATE", t + " jar" + jar.id + " " + Math.round(kept));
+          audit(sender, "JAROK", on ? "on" : "off");
+          R(on ? "💉 Jar insemination: ON. Staff still have to ask you every single time, and no is always a fine answer." : "💉 Jar insemination: OFF. Nobody puts a jar in you, and staff can't even ask. ?jarok on turns it back on.");
           break;
         }
         case "rights": {
@@ -6924,7 +6996,7 @@ Welcome to B&B Farm, hon. 🌾`
         }
         case "yes":
         case "no": {
-          if (!answerBreed(sender, cmd === "yes")) R("There's nothin' waitin' on a yes or no from you right now, hon.");
+          if (!answerPending(sender, cmd === "yes")) R("There's nothin' waitin' on a yes or no from you right now, hon.");
           break;
         }
         case "wash": {
@@ -7703,7 +7775,7 @@ Welcome to B&B Farm, hon. 🌾`
       const pc = state.pendingClaims.get(sender);
       if (!pc) {
         const low0 = String(raw).trim().toLowerCase().replace(/^[?!.\-\/]/, "").replace(/^bot\s+/, "");
-        if ((low0 === "yes" || low0 === "no") && state.breedAsks.has(sender)) return answerBreed(sender, low0 === "yes");
+        if ((low0 === "yes" || low0 === "no") && (state.breedAsks.has(sender) || state.jarAsks.has(sender))) return answerPending(sender, low0 === "yes");
         return false;
       }
       if (Date.now() - pc.at > CFG.CLAIM_ASK_TIMEOUT_MIN * 6e4) {

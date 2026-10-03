@@ -41,7 +41,11 @@
     // Files, rosters and keys are nobody else's business: never said out loud.
     const replyCh = (channel === "chat" && PRIVATE_REPLY.includes(cmd))
       ? (isFriend(sender) ? "beep" : "whisper") : channel;
-    const R = (txt) => reply(sender, txt, replyCh);
+    // staff lookin' up somebody else from the Companion: the answer goes in their Office, not the feed
+    const docAbout = (channel === "companion" && DOC_CMDS.includes(cmd) && args[0] && isStaff(sender)) ? resolveTarget(args[0]) : null;
+    const R = (docAbout && docAbout !== sender)
+      ? (txt) => toCompanion(sender, txt, "doc", false, { kind: cmd, who: plainName(docAbout), about: docAbout })
+      : (txt) => reply(sender, txt, replyCh);
 
     switch (cmd) {
 

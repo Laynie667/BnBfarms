@@ -210,7 +210,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
 
   // shared/protocol.js
   var FARM_MSG = "FarmhandMsg";
-  var PROTOCOL = 1;
+  var PROTOCOL = 2;
   function makeMsg(type, data = {}, target) {
     const m = { Content: FARM_MSG, Type: "Hidden", Dictionary: { v: PROTOCOL, type, ...data } };
     if (target) m.Target = target;

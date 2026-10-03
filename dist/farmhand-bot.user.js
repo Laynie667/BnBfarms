@@ -21,7 +21,7 @@
 (() => {
   // shared/protocol.js
   var FARM_MSG = "FarmhandMsg";
-  var PROTOCOL = 1;
+  var PROTOCOL = 2;
   function makeMsg(type, data = {}, target) {
     const m = { Content: FARM_MSG, Type: "Hidden", Dictionary: { v: PROTOCOL, type, ...data } };
     if (target) m.Target = target;
@@ -1713,9 +1713,9 @@
       return n;
     }
     let companionSeq = 0;
-    function toCompanion(mn, text, kind, urgent) {
+    function toCompanion(mn, text, kind, urgent, extra) {
       const parts = splitMessage(text, 1800), id = ++companionSeq;
-      parts.forEach((t, i) => enqueue(makeMsg(kind, { text: t, id, part: i + 1, of: parts.length }, mn), urgent));
+      parts.forEach((t, i) => enqueue(makeMsg(kind, Object.assign({ text: t, id, part: i + 1, of: parts.length }, extra || {}), mn), urgent));
     }
     function pingCompanions(force) {
       if (!inRoom() || !force && Date.now() - state.lastPing < 10 * 60 * 1e3) return;
@@ -1728,7 +1728,8 @@
       if (m.type === "hello") {
         state.companions.set(mn, { at: Date.now(), ver: String(m.ver || "?") });
         log("Companion hello from " + mn + " (v" + (m.ver || "?") + ")");
-        enqueue(makeMsg("welcome", { ver: VERSION, name: plainName(mn), staff: isStaff(mn) }, mn));
+        enqueue(makeMsg("welcome", { ver: VERSION, proto: PROTOCOL, name: plainName(mn), staff: isStaff(mn) }, mn));
+        later(() => syncCompanions(), 800);
         return;
       }
       if (m.type === "bye") {
@@ -1744,8 +1745,8 @@
         state.heard++;
         state.lastHealthy = Date.now();
         log("HEARD [companion] " + mn + ": " + text.slice(0, 70));
-        if (handleYesNo(mn, text)) return;
-        handleCommand(mn, text, "companion");
+        if (!handleYesNo(mn, text)) handleCommand(mn, text, "companion");
+        later(() => syncCompanions(), 1500);
       }
     }
     function beep(mn, msg, urgent) {
@@ -1916,6 +1917,70 @@
         const line = L.tease[Math.floor(Math.random() * L.tease.length)];
         whisper(mn, "😈 " + fill(line.text, mn));
       }
+    }
+    const SWITCH_CMDS = {
+      breedable: "breedable",
+      fertile: "fertile",
+      jarok: "jarok",
+      freeuse: "freeuse",
+      futa: "futa",
+      milkable: "milkable",
+      naturalHeat: "naturalheat",
+      praise: "praise",
+      degrade: "degrade",
+      tally: "tally",
+      teaseOptIn: "teaseme",
+      forced: "forced"
+    };
+    const DOC_CMDS = ["record", "stats", "vet", "quota", "keys", "size", "measure", "pedigree"];
+    function stateFor(mn) {
+      const r = rec(mn);
+      const base = { name: plainName(mn), onBooks: !!(r && r.roles && r.roles.length) };
+      if (!base.onBooks) return base;
+      const s = Object.assign(base, {
+        roles: r.roles.slice(),
+        tier: tierOf(mn) || "",
+        species: r.species || "",
+        staff: isStaff(mn),
+        herdmaster: isHerdmaster(mn),
+        proprietor: isProprietor(mn),
+        mandated: isMandated(mn),
+        onDuty: r.onDuty !== false,
+        onCall: isStaff(mn) && (isMandated(mn) || !!r.forced),
+        pastureLock: r.pastureLock ? plainName(r.pastureLock.by) : null,
+        keys: keysOf(mn),
+        herdLeader: herdLeaderOf(mn) ? plainName(herdLeaderOf(mn)) : null,
+        switches: {}
+      });
+      for (const k in SWITCH_CMDS) s.switches[SWITCH_CMDS[k]] = k === "jarok" ? r.jarok !== false : k === "milkable" ? makesMilk(mn) : !!r[k];
+      try {
+        const p = prodOf(mn), now = Date.now();
+        if (makesMilk(mn)) s.milk = { ml: Math.round(p.milk / 10) * 10, cap: Math.round(milkCap(mn)), grade: milkGrade(mn), lastAt: p.lastMilkAt || 0 };
+        if (makesSemen(mn)) s.semen = { ml: Math.round(p.semen), cap: Math.round(semenCap(mn)) };
+        s.holding = { ml: Math.round(heldTotal(p)), cap: Math.round(capacity(mn)) };
+        s.body = bodyParts(mn).filter((k) => CFG.SIZES[k]).map((k) => ({ part: k, label: CFG.SIZES[k].label, size: sizeName(mn, k) }));
+        if (inHeat(p)) s.heatUntil = p.heat.until;
+        if (p.preg) s.preg = { due: p.preg.due, sires: p.preg.sires.map(plainName) };
+        if (quotaOf(mn)) s.quota = { ml: Math.round(milkedOn(mn, dayKey())), goal: Math.round(quotaOf(mn)), streak: r.quotaStreak || 0 };
+        s.today = { tally: tallyToday(mn), naughty: r.naughtyMarks || 0, praised: r.praised || 0, degraded: r.degraded || 0 };
+        s.at = now;
+      } catch (e) {
+        dbg("stateFor:", e);
+      }
+      return s;
+    }
+    function syncCompanions(force) {
+      for (const [mn, c] of state.companions) {
+        if (!hasCompanion(mn)) continue;
+        const s = stateFor(mn), key = JSON.stringify(Object.assign({}, s, { at: 0 }));
+        if (!force && c.lastState === key) continue;
+        c.lastState = key;
+        enqueue(makeMsg("state", { state: s }, mn));
+      }
+    }
+    function askCard(mn, kind, text) {
+      if (hasCompanion(mn)) enqueue(makeMsg("ask", { kind, text, id: ++companionSeq }, mn));
+      else tell(mn, text);
     }
     const LIMIT_WORDS = {
       breed: /\b(breed\w*|pregnan\w*|impregnat\w*|inflat\w*|cum\w*|creampie\w*|seed\w*)\b/i,
@@ -2966,7 +3031,7 @@
       const a = state.breedAsks.get(t), now = Date.now();
       if (a && a.stud === stud && now - a.at < 6e4) return;
       state.breedAsks.set(t, { stud, hole: hole || null, at: now });
-      tell(t, "🐂 " + plainName(stud) + " wants to breed you" + (hole ? " (" + holeText(hole) + ")" : "") + ", sugar. Say yes or no (?yes or ?no works too). Say ?freeuse on if you'd rather never be asked.");
+      askCard(t, "breed", "🐂 " + plainName(stud) + " wants to breed you" + (hole ? " (" + holeText(hole) + ")" : "") + ", sugar. Say yes or no (?yes or ?no works too). Say ?freeuse on if you'd rather never be asked.");
     }
     function answerBreed(t, yes) {
       const a = state.breedAsks.get(t);
@@ -3009,7 +3074,7 @@
     }
     function askJar(staff, t, jarId, hole) {
       state.jarAsks.set(t, { staff, jar: jarId, hole, at: Date.now() });
-      tell(t, "💉 " + plainName(staff) + " wants to inseminate you from jar #" + jarId + " (" + holeText(hole) + "), sugar. Say yes or no (?yes or ?no works too). Say ?jarok off if you'd rather never be asked.");
+      askCard(t, "jar", "💉 " + plainName(staff) + " wants to inseminate you from jar #" + jarId + " (" + holeText(hole) + "), sugar. Say yes or no (?yes or ?no works too). Say ?jarok off if you'd rather never be asked.");
     }
     function answerJar(t, yes) {
       const a = state.jarAsks.get(t);
@@ -5306,7 +5371,8 @@ Welcome to B&B Farm. Mind the ruts! 🌾`,
         return;
       }
       const replyCh = channel === "chat" && PRIVATE_REPLY.includes(cmd) ? isFriend(sender) ? "beep" : "whisper" : channel;
-      const R = (txt) => reply(sender, txt, replyCh);
+      const docAbout = channel === "companion" && DOC_CMDS.includes(cmd) && args[0] && isStaff(sender) ? resolveTarget(args[0]) : null;
+      const R = docAbout && docAbout !== sender ? (txt) => toCompanion(sender, txt, "doc", false, { kind: cmd, who: plainName(docAbout), about: docAbout }) : (txt) => reply(sender, txt, replyCh);
       switch (cmd) {
         case "help":
         case "commands":
@@ -8002,6 +8068,10 @@ Welcome to B&B Farm, hon. 🌾`
         lifeTick();
         workTick();
         for (const [mn, a] of state.arrivals) if (Date.now() > a.until) state.arrivals.delete(mn);
+        if (Date.now() - (state.lastSync || 0) > 6e4) {
+          state.lastSync = Date.now();
+          syncCompanions();
+        }
         const cutoff = Date.now() - CFG.APPLY_TIMEOUT_MIN * 6e4;
         for (const [mn, s] of state.sessions) {
           if (CFG.APPLY_TIMEOUT_MIN > 0 && (s.last || s.started) < cutoff) {

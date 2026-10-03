@@ -912,7 +912,7 @@
     const a = state.breedAsks.get(t), now = Date.now();
     if (a && a.stud === stud && now - a.at < 60000) return;
     state.breedAsks.set(t, { stud, hole: hole || null, at: now });
-    tell(t, "🐂 "+plainName(stud)+" wants to breed you"+(hole ? " ("+holeText(hole)+")" : "")+", sugar. Say yes or no (?yes or ?no works too). "+
+    askCard(t, "breed", "🐂 "+plainName(stud)+" wants to breed you"+(hole ? " ("+holeText(hole)+")" : "")+", sugar. Say yes or no (?yes or ?no works too). "+
             "Say ?freeuse on if you'd rather never be asked.");
   }
   function answerBreed(t, yes){
@@ -950,7 +950,7 @@
   }
   function askJar(staff, t, jarId, hole){
     state.jarAsks.set(t, { staff, jar: jarId, hole, at: Date.now() });
-    tell(t, "💉 "+plainName(staff)+" wants to inseminate you from jar #"+jarId+" ("+holeText(hole)+"), sugar. Say yes or no (?yes or ?no works too). "+
+    askCard(t, "jar", "💉 "+plainName(staff)+" wants to inseminate you from jar #"+jarId+" ("+holeText(hole)+"), sugar. Say yes or no (?yes or ?no works too). "+
             "Say ?jarok off if you'd rather never be asked.");
   }
   function answerJar(t, yes){

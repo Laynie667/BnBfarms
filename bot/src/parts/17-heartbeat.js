@@ -38,6 +38,7 @@
       lifeTick();
       workTick();
       for (const [mn,a] of state.arrivals) if (Date.now() > a.until) state.arrivals.delete(mn);
+      if (Date.now() - (state.lastSync||0) > 60000){ state.lastSync = Date.now(); syncCompanions(); }
 
       const cutoff = Date.now()-CFG.APPLY_TIMEOUT_MIN*60000;
       for (const [mn,s] of state.sessions){

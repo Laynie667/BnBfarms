@@ -2,18 +2,24 @@
 //
 // Every message is a BC "Hidden" chat message: players never see it, only
 // code does. Content is always FARM_MSG so we can tell ours apart from
-// BCX ("BCXMsg"), BC+ ("BCP"), LSCG ("LSCGMsg") and friends.
+// BCX ("BCXMsg"), BC+ ("BCP"), LSCG ("LSCGMsg"), ECHS ("HypnoMsg") and friends.
 //
-//   bot  -> everyone   ping     { ver }                 "anyone runnin' the companion?"
-//   ext  -> bot        hello    { ver }                 "I am!"
-//   bot  -> ext        welcome  { ver, name, staff }    "howdy, here's who you are to me"
-//   ext  -> bot        cmd      { text }                a command, same as typin' ?stats
-//   bot  -> ext        reply    { text, id, part, of }  an answer to a command
-//   bot  -> ext        notice   { text, id, part, of }  anything I'd normally beep or whisper
-//   ext  -> bot        bye      {}                      extension turned off
+//   bot  -> everyone   ping     { ver }                       "anyone runnin' the companion?"
+//   ext  -> bot        hello    { ver }                       "I am!"
+//   bot  -> ext        welcome  { ver, proto, name, staff }   "howdy, here's who you are to me"
+//   bot  -> ext        state    { state }                     your roles, keys, switches and numbers (v2)
+//   ext  -> bot        cmd      { text }                      a command, same as typin' ?stats
+//   bot  -> ext        reply    { text, id, part, of }        an answer to a command
+//   bot  -> ext        notice   { text, id, part, of }        anything I'd normally beep or whisper
+//   bot  -> ext        ask      { kind, text, id }            a yes/no question; the answer is a plain "yes"/"no" cmd (v2)
+//   bot  -> ext        doc      { text, id, part, of, kind, who, about }
+//                                                             a staff lookup about somebody else, for the Office (v2)
+//   ext  -> bot        bye      {}                            extension turned off
+//
+// Older Companions ignore the v2 types, and older bots never send them, so either side can update first.
 
 export const FARM_MSG = "FarmhandMsg";
-export const PROTOCOL = 1;
+export const PROTOCOL = 2;
 
 export function makeMsg(type, data = {}, target) {
   const m = { Content: FARM_MSG, Type: "Hidden", Dictionary: { v: PROTOCOL, type, ...data } };

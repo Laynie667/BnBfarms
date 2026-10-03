@@ -162,9 +162,10 @@
   }
   function companionCount(){ let n = 0; for (const mn of state.companions.keys()) if (hasCompanion(mn)) n++; return n; }
   let companionSeq = 0;
-  function toCompanion(mn, text, kind, urgent){
+  // extra: more fields for every piece (a doc's kind and who it's about)
+  function toCompanion(mn, text, kind, urgent, extra){
     const parts = splitMessage(text, 1800), id = ++companionSeq;
-    parts.forEach((t, i) => enqueue(makeMsg(kind, { text:t, id, part:i+1, of:parts.length }, mn), urgent));
+    parts.forEach((t, i) => enqueue(makeMsg(kind, Object.assign({ text:t, id, part:i+1, of:parts.length }, extra||{}), mn), urgent));
   }
   function pingCompanions(force){
     if (!inRoom() || (!force && Date.now() - state.lastPing < 10*60*1000)) return;
@@ -177,7 +178,8 @@
     if (m.type === "hello"){
       state.companions.set(mn, { at:Date.now(), ver:String(m.ver||"?") });
       log("Companion hello from "+mn+" (v"+(m.ver||"?")+")");
-      enqueue(makeMsg("welcome", { ver:VERSION, name:plainName(mn), staff:isStaff(mn) }, mn));
+      enqueue(makeMsg("welcome", { ver:VERSION, proto:PROTOCOL, name:plainName(mn), staff:isStaff(mn) }, mn));
+      later(()=>syncCompanions(), 800);
       return;
     }
     if (m.type === "bye"){ state.companions.delete(mn); return; }
@@ -188,8 +190,8 @@
       if (c) c.at = Date.now(); else state.companions.set(mn, { at:Date.now(), ver:"?" });
       state.heard++; state.lastHealthy = Date.now();
       log("HEARD [companion] "+mn+": "+text.slice(0,70));
-      if (handleYesNo(mn, text)) return;
-      handleCommand(mn, text, "companion");
+      if (!handleYesNo(mn, text)) handleCommand(mn, text, "companion");
+      later(()=>syncCompanions(), 1500);   // their switches or numbers may have just changed
     }
   }
   function beep(mn,msg,urgent){

@@ -90,6 +90,8 @@ function toggles(ctx) {
           card(title("Gender"), muted("How the farm sees you. It picks your farm outfit."),
             h("div", { style: { marginTop: "6px" } }, ["female", "male", "futa", "femboy"].map((g) =>
               h("button", { type: "button", class: "fhc-pill" + (ctx.s.gender === g ? " on" : ""), onclick: () => ctx.send("gender " + g) }, g)))),
+          ctx.api.hasBackup && ctx.api.hasBackup() ? card(title("Farm outfit"), muted("The farm dressed you, and your own clothes are kept on this computer."),
+            btn("Change back into my own clothes", () => ctx.api.back && ctx.api.back())) : null,
           panelPrefs(ctx)];
 }
 

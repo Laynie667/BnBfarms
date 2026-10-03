@@ -7,6 +7,7 @@ import { makeMsg, readMsg } from "../../shared/protocol.js";
 import { VERSION } from "./version.js";
 import { BOT_MEMBER, HELLO_EVERY_MS } from "./config.js";
 import { Panel } from "./panel.js";
+import { captureOutfit, wearOutfit, changeBack, hasBackup } from "./outfits.js";
 
 // the SDK ships as an old-style module; this digs the real thing out either way
 const bcModSdk = sdkModule.default || sdkModule;
@@ -86,11 +87,41 @@ function onFarmMsg(m) {
     case "choose":
       st.panel.setChoose({ text: String(m.text || ""), choices: Array.isArray(m.choices) ? m.choices.map(String).slice(0, 30) : [] });
       break;
+    case "outfit":
+      st.panel.setOutfit({ slot: String(m.slot || ""), label: String(m.label || "farm outfit"), data: String(m.data || ""),
+        keys: Array.isArray(m.keys) ? m.keys.filter(Number.isInteger) : [], why: String(m.why || "") });
+      break;
+    case "outfitBack": {
+      const r = changeBack();
+      st.panel.add(r.ok ? "👗 Back in your own clothes" + (r.stillLocked ? " (farm-locked pieces stay till a keyholder opens 'em)" : "") + "." : "👗 " + r.why + ".", "notice");
+      if (r.ok) toBot("outfitAnswer", { answer: "back" });
+      break;
+    }
   }
 }
 
+// what the panel can do besides send commands
+const api = {
+  wear(o) {
+    let r;
+    try { r = wearOutfit(o.data, o.keys); } catch (e) { r = { ok: false, why: "the game wouldn't take it (" + e.message + ")" }; }
+    st.panel.add(r.ok ? "👗 Dressed in " + o.label + ": " + r.worn + " pieces" + (r.locks ? ", " + r.locks + " locked with high security padlocks" : "") +
+      (r.skipped ? ". " + r.skipped + " spots were already locked, so I left 'em be" : "") + "." : "👗 Couldn't dress you: " + r.why + ".", "notice");
+    if (r.ok) toBot("outfitAnswer", { answer: "worn", slot: o.slot, locks: r.locks });
+  },
+  decline(o) { toBot("outfitAnswer", { answer: "declined", slot: o.slot }); },
+  back() { onFarmMsg({ from: BOT_MEMBER, type: "outfitBack" }); },
+  save(slot) {
+    let c;
+    try { c = captureOutfit(); } catch (e) { st.panel.add("👗 Couldn't read what you're wearin': " + e.message, "notice"); return; }
+    if (!c.items) { st.panel.add("👗 You're not wearin' any clothes or restraints to save, sugar.", "notice"); return; }
+    toBot("outfitSave", { slot, data: c.data, items: c.items, locks: c.locks });
+  },
+  hasBackup,
+};
+
 function start() {
-  st.panel = new Panel(sendCommand);
+  st.panel = new Panel(sendCommand, api);
   st.panel.setStatus("waitin' for the farm girl");
 
   mod.hookFunction("ChatRoomMessage", 10, (args, next) => {

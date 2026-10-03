@@ -109,6 +109,10 @@
       const x = trackedContract(mn, m[1], ["offered"]);
       if (x){ x.status = "signed"; x.signedAt = Date.now(); x.until = x.durationMin ? Date.now() + x.durationMin*60000 : null; saveLedger(); audit(mn, "CONTRACT_SIGNED", x.title); }
       notifyStaff("📜 "+plainName(mn)+" signed the farm contract \""+m[1]+"\".", true);
+      // the outfit that goes with it: "auto" picks theirs by species and gender
+      const tpl = x && contractTemplate(x.tpl), dress = tpl ? (tpl.outfit === undefined ? "auto" : tpl.outfit) : "";
+      const slot = dress === "auto" ? outfitSlotFor(mn) : dress;
+      if (slot) later(() => offerOutfit(mn, slot, "It goes with your new contract"), 3000);
       later(() => enqueue(BCPLUS.queryMsg(mn)), 2000);   // fetch BC+'s id for it, so we can release it later
       return true;
     }

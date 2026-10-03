@@ -93,8 +93,53 @@ function addons(ctx) {
   ];
 }
 
+const SPECIES = ["cow", "bull", "pony", "horse", "goat", "sheep", "pig", "bunny", "rabbit", "pup", "dog", "kitt", "cat", "fox", "wolf", "deer", "goblin"];
+const GENDERS = ["female", "male", "futa", "femboy"];
+const KEYS_TEXT = { staff: "farm staff + their herd leader", leader: "their herd leader only", owners: "the proprietors only" };
+
+function outfits(ctx) {
+  const saved = ctx.s.outfits || {}, rules = ctx.s.outfitRules || {};
+  const sp = ctx.ui.oSp || "cow";
+  const slotBox = (key, label) => h("div", { class: "fhc-box", style: { padding: "8px", borderColor: saved[key] ? "var(--fh-good)" : "var(--fh-line)", borderStyle: saved[key] ? "solid" : "dashed" } },
+    h("b", null, label),
+    muted(saved[key] ? saved[key].items + " pieces" + (saved[key].locks ? ", " + saved[key].locks + " locked" : "") : "Not set · uses the fallback"),
+    h("div", { style: { marginTop: "6px" } }, btn("Save what I'm wearin'", () => ctx.api.save && ctx.api.save(key)),
+      saved[key] ? btn("Clear", () => ctx.send("outfit clear " + key.replace("uniform:", "").replace("special:", "special ").replace("|", " ").replace("*", "any"))) : null));
+  const specials = Object.keys(saved).filter((k) => k.startsWith("special:"));
+  return [
+    card(title("What gets saved"), chip("Clothes", "good"), chip("Restraints", "good"), chip("Locks", "good"), chip("never bodies or hair"),
+      muted("Dress yourself (or a willin' helper), lock the pieces that should stay locked, then save it to a slot. Every saved lock goes on as a high security padlock.")),
+    card(title("New stock, by species and gender"),
+      h("label", { class: "fhc-label" }, "Species", h("select", { class: "fhc-sel", onchange: (e) => ctx.setUi({ oSp: e.target.value }) },
+        SPECIES.map((x) => h("option", { value: x, selected: x === sp ? "selected" : null }, x)))),
+      h("div", { class: "fhc-grid", style: { gridTemplateColumns: "repeat(2,minmax(0,1fr))" } },
+        GENDERS.map((g) => slotBox(sp + "|" + g, sp + " · " + g)).concat([slotBox(sp + "|*", sp + " · any gender")])),
+      h("div", { class: "fhc-grid", style: { gridTemplateColumns: "repeat(2,minmax(0,1fr))", marginTop: "8px" } },
+        GENDERS.map((g) => slotBox("*|" + g, "any species · " + g)).concat([slotBox("stock", "Any new stock")])),
+      muted("No exact match? The farm falls back: this species + gender → this species → this gender → any new stock.")),
+    card(title("Staff uniforms"), h("div", { class: "fhc-grid", style: { gridTemplateColumns: "repeat(2,minmax(0,1fr))" } },
+      ["farmhand", "mandated", "herdmaster", "proprietor"].map((r) => slotBox("uniform:" + r, r)))),
+    card(title("Specials"), specials.map((k) => slotBox(k, k.slice(8))),
+      h("label", { class: "fhc-label" }, "New special (one word: luxury, fairday, prizecow…)",
+        h("input", { class: "fhc-in", value: ctx.ui.oSpecial || "", oninput: (e) => ctx.setUi({ oSpecial: e.target.value }, true) })),
+      btn("Save what I'm wearin' as this special", () => { const n = (ctx.ui.oSpecial || "").trim().toLowerCase().replace(/[^a-z0-9_-]/g, ""); if (n.length > 1) ctx.api.save && ctx.api.save("special:" + n); })),
+    card(title("Locks"), h("div", { class: "fhc-kv" }, h("b", null, "High security padlock"), chip("every farm lock", "good")),
+      h("label", { class: "fhc-label" }, "Who holds the keys", h("select", { class: "fhc-sel", onchange: (e) => ctx.send("outfit keys " + e.target.value) },
+        Object.entries(KEYS_TEXT).map(([k, v]) => h("option", { value: k, selected: (rules.keys || "staff") === k ? "selected" : null }, v))))),
+    card(title("When to dress people"),
+      [["approve", "onApprove", "Offer the stock outfit on approval", "Picked by species and gender"],
+       ["clockin", "onClockIn", "Offer the uniform at clock-in", "Mandated staff get theirs every shift"],
+       ["changeback", "changeBack", "Change back at clock-out", "Their own clothes were kept and go back on"]].map(([cmd, k, label, desc]) =>
+        h("div", { class: "fhc-tog" }, h("div", null, h("div", { class: "fhc-tog-l" }, label), muted(desc)),
+          h("button", { type: "button", class: "fhc-sw" + (rules[k] ? " on" : ""), "aria-pressed": rules[k] ? "true" : "false", "aria-label": label,
+            onclick: () => ctx.send("outfit rule " + cmd + " " + (rules[k] ? "off" : "on")) }, h("span")))),
+      muted("Contracts offer an outfit when they're signed, too: ?contract outfit <name> auto|none|<slot>.")),
+    latest(ctx),
+  ];
+}
+
 export const DASHBOARD_TABS = [
   { id: "contracts", label: "BC+ contracts", render: contracts },
-  { id: "outfits", label: "Outfits", render: () => [card(title("Outfits & uniforms"), muted("Next on the build list: species × gender outfits (female, male, futa, femboy), staff uniforms, saved with restraints and high security locks."))] },
+  { id: "outfits", label: "Outfits", render: outfits },
   { id: "addons", label: "Other addons", render: addons },
 ];

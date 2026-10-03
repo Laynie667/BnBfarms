@@ -8,7 +8,7 @@ export const PUBLIC_GROUPS = [
   { name: "You and the farm", cmds: ["record", "keys", "who", "herd", "notice", "weather", "feeding", "curfew", "beg"] },
   { name: "Milk", cmds: ["stats", "board", "milkable", "quota"] },
   { name: "Breedin'", cmds: ["breedable", "fertile", "freeuse", "jarok", "yes", "no", "naturalheat", "breed <who>", "cum <who>", "wash", "tally", "eggs", "praise", "degrade", "rights", "accept", "pedigree"] },
-  { name: "Body", cmds: ["size", "measure", "penis", "futa", "gender"] },
+  { name: "Body", cmds: ["size", "measure", "penis", "futa", "gender", "outfit back"] },
   { name: "Fun", cmds: ["fair", "enter", "teaseme"] },
 ];
 
@@ -17,6 +17,7 @@ export const STAFF_GROUPS = [
   { name: "Herd", cmds: ["claim <who>", "release <who>", "myherd", "herdname <name>", "herdcall", "herdsummon", "turnout <who>", "letup <who>", "brand <who>", "walk <who>"] },
   { name: "Stock", cmds: ["tier <who> <tier>", "stocks <who>", "unstock <who>", "vet <who>", "inspect <who>", "tease list"] },
   { name: "Contracts", cmds: ["contract list", "contract show deep <who>", "contract offer deep <who> 1w", "contract check <who>", "contract release <who>", "contract rules"] },
+  { name: "Outfits", cmds: ["outfit", "outfit offer <who>", "outfit offer <who> <species> <gender>"] },
   { name: "Barn", cmds: ["milk <who>", "collect <who>", "jars", "inseminate <who> <jar>", "drain <who>", "edge <who>", "denial <who>", "ruin <who>", "nomilk <who> <hours>", "quota <who>", "heat <who>", "heatline", "shotlog"] },
   { name: "Farm", cmds: ["spot", "tourstop", "setrescue", "where", "stucklog"] },
   { name: "Work and play", cmds: ["clockin", "clockout", "hours", "done", "chores", "chore", "wheel", "spin", "begphrase", "score"] },

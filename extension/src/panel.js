@@ -19,8 +19,10 @@ function loadPrefs() { try { return JSON.parse(window.localStorage.getItem(PREFS
 function savePrefs(p) { try { window.localStorage.setItem(PREFS_KEY, JSON.stringify(p)); } catch (e) { /* private window: fine */ } }
 
 export class Panel {
-  constructor(onCommand) {
+  constructor(onCommand, api) {
     this.onCommand = onCommand;
+    this.api = api || {};
+    this.outfit = null;
     this.unread = 0;
     this.welcome = {};
     this.s = { name: "", onBooks: false };
@@ -62,6 +64,7 @@ export class Panel {
   }
   addAsk(a) { this.asks = this.asks.filter((x) => Date.now() - x.at < 10 * 60000).concat([Object.assign({ at: Date.now() }, a)]); this.ping(true); this.render(); }
   setChoose(c) { this.choose = c; this.ping(true); this.render(); }
+  setOutfit(o) { this.outfit = o; this.ping(true); this.render(); }
   ask(cmd) { this.add(cmd, "mine"); this.onCommand(cmd); }
 
   toggle(open = !this.el.classList.contains("open")) {
@@ -93,7 +96,7 @@ export class Panel {
   view() { const v = this.views(); return v.includes(this.prefs.view) ? this.prefs.view : v[v.length > 1 && this.s.staff ? 1 : 0]; }
   ctx() {
     return {
-      s: this.s, welcome: this.welcome, feed: this.feed, docs: this.docs, ui: this.ui, prefs: this.prefs,
+      s: this.s, welcome: this.welcome, feed: this.feed, docs: this.docs, ui: this.ui, prefs: this.prefs, api: this.api,
       send: (cmd) => this.ask(cmd),
       fillBox: (text) => { const i = this.el.querySelector("#fhc-input"); if (i) { i.value = text; i.focus(); } },
       setUi: (patch, quiet) => { Object.assign(this.ui, patch); if (!quiet) this.render(); },
@@ -134,6 +137,14 @@ export class Panel {
   // questions waitin' on you, on every tab
   banners() {
     const out = [];
+    const o = this.outfit;
+    if (o) out.push(h("div", { class: "fhc-box ask" },
+      h("b", null, "👗 " + (o.why ? o.why + ": " : "") + "put on your " + o.label + "?"),
+      h("div", { class: "fhc-muted" }, "Your own clothes are kept so you can change back. Body and hair aren't touched, and nothin' already locked on you moves." +
+        (o.keys.length ? " Any locked pieces get high security padlocks the farm's keyholders can open." : "")),
+      h("div", { style: { marginTop: "8px" } },
+        btn("Yes, dress me", () => { this.outfit = null; this.api.wear && this.api.wear(o); this.render(); }, true),
+        btn("Not now", () => { this.outfit = null; this.api.decline && this.api.decline(o); this.render(); }))));
     if (this.choose) out.push(h("div", { class: "fhc-box ask" }, h("div", { style: { whiteSpace: "pre-wrap" } }, this.choose.text),
       h("div", { style: { marginTop: "8px" } }, (this.choose.choices || []).map((c) => btn(c, () => { this.choose = null; this.ask(c); }, true)))));
     for (const a of this.asks) out.push(h("div", { class: "fhc-box ask" }, h("div", null, a.text),

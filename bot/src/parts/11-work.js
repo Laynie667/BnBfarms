@@ -9,6 +9,9 @@
     r.shift.week = r.shift.week && r.shift.week.key === wk ? r.shift.week : { key:wk, ms:0 };
     r.shift.week.ms += ms; r.shift.total = (r.shift.total||0) + ms; r.shift.in = null;
     saveLedger(); audit(mn,"CLOCKOUT",why||"");
+    // back into their own clothes, if the farm does that (their Companion kept them)
+    outfitsLedger();
+    if (L.outfitRules.changeBack && hasCompanion(mn)) enqueue(makeMsg("outfitBack", { why: "shift's over" }, mn));
     return ms;
   }
   const hrs = ms => (ms/3600000).toFixed(1)+"h";

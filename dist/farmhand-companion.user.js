@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.2.0
+// @version      0.3.0
 // @description  Your B&B Farm panel: the farm girl's answers, stat cards and guides, right in the game.
 // @author       Laynie & Alexia
 // @match        *://*.bondageprojects.elementfx.com/*
@@ -224,7 +224,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.2.0";
+  var VERSION = "0.3.0";
 
   // extension/src/config.js
   var BOT_MEMBER = 260239;
@@ -354,7 +354,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     { name: "You and the farm", cmds: ["record", "keys", "who", "herd", "notice", "weather", "feeding", "curfew", "beg"] },
     { name: "Milk", cmds: ["stats", "board", "milkable", "quota"] },
     { name: "Breedin'", cmds: ["breedable", "fertile", "freeuse", "jarok", "yes", "no", "naturalheat", "breed <who>", "cum <who>", "wash", "tally", "eggs", "praise", "degrade", "rights", "accept", "pedigree"] },
-    { name: "Body", cmds: ["size", "measure", "penis", "futa", "gender"] },
+    { name: "Body", cmds: ["size", "measure", "penis", "futa", "gender", "outfit back"] },
     { name: "Fun", cmds: ["fair", "enter", "teaseme"] }
   ];
   var STAFF_GROUPS = [
@@ -362,6 +362,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     { name: "Herd", cmds: ["claim <who>", "release <who>", "myherd", "herdname <name>", "herdcall", "herdsummon", "turnout <who>", "letup <who>", "brand <who>", "walk <who>"] },
     { name: "Stock", cmds: ["tier <who> <tier>", "stocks <who>", "unstock <who>", "vet <who>", "inspect <who>", "tease list"] },
     { name: "Contracts", cmds: ["contract list", "contract show deep <who>", "contract offer deep <who> 1w", "contract check <who>", "contract release <who>", "contract rules"] },
+    { name: "Outfits", cmds: ["outfit", "outfit offer <who>", "outfit offer <who> <species> <gender>"] },
     { name: "Barn", cmds: ["milk <who>", "collect <who>", "jars", "inseminate <who> <jar>", "drain <who>", "edge <who>", "denial <who>", "ruin <who>", "nomilk <who> <hours>", "quota <who>", "heat <who>", "heatline", "shotlog"] },
     { name: "Farm", cmds: ["spot", "tourstop", "setrescue", "where", "stucklog"] },
     { name: "Work and play", cmds: ["clockin", "clockout", "hours", "done", "chores", "chore", "wheel", "spin", "begphrase", "score"] },
@@ -531,6 +532,11 @@ One of mods you are using is using an old version of SDK. It will work for now b
         muted("How the farm sees you. It picks your farm outfit."),
         h("div", { style: { marginTop: "6px" } }, ["female", "male", "futa", "femboy"].map((g) => h("button", { type: "button", class: "fhc-pill" + (ctx.s.gender === g ? " on" : ""), onclick: () => ctx.send("gender " + g) }, g)))
       ),
+      ctx.api.hasBackup && ctx.api.hasBackup() ? card(
+        title("Farm outfit"),
+        muted("The farm dressed you, and your own clothes are kept on this computer."),
+        btn("Change back into my own clothes", () => ctx.api.back && ctx.api.back())
+      ) : null,
       panelPrefs(ctx)
     ];
   }
@@ -2146,9 +2152,9 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
   function summonReady(bot) {
     try {
-      const api = window.bcx && window.bcx.getModApi && window.bcx.getModApi("FarmhandCompanion");
-      if (!api) return null;
-      const r = api.getRuleState("alt_forced_summoning");
+      const api2 = window.bcx && window.bcx.getModApi && window.bcx.getModApi("FarmhandCompanion");
+      if (!api2) return null;
+      const r = api2.getRuleState("alt_forced_summoning");
       if (!r || !r.inEffect) return { ok: false, why: "BCX's Ready to be summoned rule is off" };
       const allowed = r.customData && r.customData.allowedMembers || [];
       return allowed.includes(bot) ? { ok: true, why: "ready" } : { ok: false, why: "the farm bot (" + bot + ") isn't on the rule's allowed list" };
@@ -2450,9 +2456,107 @@ One of mods you are using is using an old version of SDK. It will work for now b
       card(title("Comin' soon"), muted("Echo's pumps and milk vendor, outfits by species and gender with high security locks, and the farm's own Listen to my voice (ECHS first)."))
     ];
   }
+  var SPECIES = ["cow", "bull", "pony", "horse", "goat", "sheep", "pig", "bunny", "rabbit", "pup", "dog", "kitt", "cat", "fox", "wolf", "deer", "goblin"];
+  var GENDERS = ["female", "male", "futa", "femboy"];
+  var KEYS_TEXT = { staff: "farm staff + their herd leader", leader: "their herd leader only", owners: "the proprietors only" };
+  function outfits(ctx) {
+    const saved = ctx.s.outfits || {}, rules = ctx.s.outfitRules || {};
+    const sp = ctx.ui.oSp || "cow";
+    const slotBox = (key, label) => h(
+      "div",
+      { class: "fhc-box", style: { padding: "8px", borderColor: saved[key] ? "var(--fh-good)" : "var(--fh-line)", borderStyle: saved[key] ? "solid" : "dashed" } },
+      h("b", null, label),
+      muted(saved[key] ? saved[key].items + " pieces" + (saved[key].locks ? ", " + saved[key].locks + " locked" : "") : "Not set · uses the fallback"),
+      h(
+        "div",
+        { style: { marginTop: "6px" } },
+        btn("Save what I'm wearin'", () => ctx.api.save && ctx.api.save(key)),
+        saved[key] ? btn("Clear", () => ctx.send("outfit clear " + key.replace("uniform:", "").replace("special:", "special ").replace("|", " ").replace("*", "any"))) : null
+      )
+    );
+    const specials = Object.keys(saved).filter((k) => k.startsWith("special:"));
+    return [
+      card(
+        title("What gets saved"),
+        chip("Clothes", "good"),
+        chip("Restraints", "good"),
+        chip("Locks", "good"),
+        chip("never bodies or hair"),
+        muted("Dress yourself (or a willin' helper), lock the pieces that should stay locked, then save it to a slot. Every saved lock goes on as a high security padlock.")
+      ),
+      card(
+        title("New stock, by species and gender"),
+        h("label", { class: "fhc-label" }, "Species", h(
+          "select",
+          { class: "fhc-sel", onchange: (e) => ctx.setUi({ oSp: e.target.value }) },
+          SPECIES.map((x) => h("option", { value: x, selected: x === sp ? "selected" : null }, x))
+        )),
+        h(
+          "div",
+          { class: "fhc-grid", style: { gridTemplateColumns: "repeat(2,minmax(0,1fr))" } },
+          GENDERS.map((g) => slotBox(sp + "|" + g, sp + " · " + g)).concat([slotBox(sp + "|*", sp + " · any gender")])
+        ),
+        h(
+          "div",
+          { class: "fhc-grid", style: { gridTemplateColumns: "repeat(2,minmax(0,1fr))", marginTop: "8px" } },
+          GENDERS.map((g) => slotBox("*|" + g, "any species · " + g)).concat([slotBox("stock", "Any new stock")])
+        ),
+        muted("No exact match? The farm falls back: this species + gender → this species → this gender → any new stock.")
+      ),
+      card(title("Staff uniforms"), h(
+        "div",
+        { class: "fhc-grid", style: { gridTemplateColumns: "repeat(2,minmax(0,1fr))" } },
+        ["farmhand", "mandated", "herdmaster", "proprietor"].map((r) => slotBox("uniform:" + r, r))
+      )),
+      card(
+        title("Specials"),
+        specials.map((k) => slotBox(k, k.slice(8))),
+        h(
+          "label",
+          { class: "fhc-label" },
+          "New special (one word: luxury, fairday, prizecow…)",
+          h("input", { class: "fhc-in", value: ctx.ui.oSpecial || "", oninput: (e) => ctx.setUi({ oSpecial: e.target.value }, true) })
+        ),
+        btn("Save what I'm wearin' as this special", () => {
+          const n = (ctx.ui.oSpecial || "").trim().toLowerCase().replace(/[^a-z0-9_-]/g, "");
+          if (n.length > 1) ctx.api.save && ctx.api.save("special:" + n);
+        })
+      ),
+      card(
+        title("Locks"),
+        h("div", { class: "fhc-kv" }, h("b", null, "High security padlock"), chip("every farm lock", "good")),
+        h("label", { class: "fhc-label" }, "Who holds the keys", h(
+          "select",
+          { class: "fhc-sel", onchange: (e) => ctx.send("outfit keys " + e.target.value) },
+          Object.entries(KEYS_TEXT).map(([k, v]) => h("option", { value: k, selected: (rules.keys || "staff") === k ? "selected" : null }, v))
+        ))
+      ),
+      card(
+        title("When to dress people"),
+        [
+          ["approve", "onApprove", "Offer the stock outfit on approval", "Picked by species and gender"],
+          ["clockin", "onClockIn", "Offer the uniform at clock-in", "Mandated staff get theirs every shift"],
+          ["changeback", "changeBack", "Change back at clock-out", "Their own clothes were kept and go back on"]
+        ].map(([cmd, k, label, desc]) => h(
+          "div",
+          { class: "fhc-tog" },
+          h("div", null, h("div", { class: "fhc-tog-l" }, label), muted(desc)),
+          h("button", {
+            type: "button",
+            class: "fhc-sw" + (rules[k] ? " on" : ""),
+            "aria-pressed": rules[k] ? "true" : "false",
+            "aria-label": label,
+            onclick: () => ctx.send("outfit rule " + cmd + " " + (rules[k] ? "off" : "on"))
+          }, h("span"))
+        )),
+        muted("Contracts offer an outfit when they're signed, too: ?contract outfit <name> auto|none|<slot>.")
+      ),
+      latest(ctx)
+    ];
+  }
   var DASHBOARD_TABS = [
     { id: "contracts", label: "BC+ contracts", render: contracts2 },
-    { id: "outfits", label: "Outfits", render: () => [card(title("Outfits & uniforms"), muted("Next on the build list: species × gender outfits (female, male, futa, femboy), staff uniforms, saved with restraints and high security locks."))] },
+    { id: "outfits", label: "Outfits", render: outfits },
     { id: "addons", label: "Other addons", render: addons }
   ];
 
@@ -2477,8 +2581,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
     }
   }
   var Panel = class {
-    constructor(onCommand) {
+    constructor(onCommand, api2) {
       this.onCommand = onCommand;
+      this.api = api2 || {};
+      this.outfit = null;
       this.unread = 0;
       this.welcome = {};
       this.s = { name: "", onBooks: false };
@@ -2539,6 +2645,11 @@ One of mods you are using is using an old version of SDK. It will work for now b
       this.ping(true);
       this.render();
     }
+    setOutfit(o) {
+      this.outfit = o;
+      this.ping(true);
+      this.render();
+    }
     ask(cmd) {
       this.add(cmd, "mine");
       this.onCommand(cmd);
@@ -2596,6 +2707,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
         docs: this.docs,
         ui: this.ui,
         prefs: this.prefs,
+        api: this.api,
         send: (cmd) => this.ask(cmd),
         fillBox: (text) => {
           const i = this.el.querySelector("#fhc-input");
@@ -2685,6 +2797,27 @@ One of mods you are using is using an old version of SDK. It will work for now b
     // questions waitin' on you, on every tab
     banners() {
       const out = [];
+      const o = this.outfit;
+      if (o) out.push(h(
+        "div",
+        { class: "fhc-box ask" },
+        h("b", null, "👗 " + (o.why ? o.why + ": " : "") + "put on your " + o.label + "?"),
+        h("div", { class: "fhc-muted" }, "Your own clothes are kept so you can change back. Body and hair aren't touched, and nothin' already locked on you moves." + (o.keys.length ? " Any locked pieces get high security padlocks the farm's keyholders can open." : "")),
+        h(
+          "div",
+          { style: { marginTop: "8px" } },
+          btn("Yes, dress me", () => {
+            this.outfit = null;
+            this.api.wear && this.api.wear(o);
+            this.render();
+          }, true),
+          btn("Not now", () => {
+            this.outfit = null;
+            this.api.decline && this.api.decline(o);
+            this.render();
+          })
+        )
+      ));
       if (this.choose) out.push(h(
         "div",
         { class: "fhc-box ask" },
@@ -2736,6 +2869,127 @@ One of mods you are using is using an old version of SDK. It will work for now b
       return h("div", { class: "fhc-box alert" }, "This tab hit a snag. The rest of the panel still works.");
     }
   }
+
+  // extension/src/outfits.js
+  var BACKUP_KEY = "fhc-outfit-backup";
+  var LOCK_FIELDS = [
+    "LockedBy",
+    "LockMemberNumber",
+    "LockMemberName",
+    "LockMessage",
+    "CombinationNumber",
+    "Password",
+    "Hint",
+    "LockSet",
+    "LockPickSeed",
+    "RemoveTimer",
+    "RemoveItem",
+    "ShowTimer",
+    "EnableRandomInput",
+    "MemberNumberList",
+    "MemberNumberListKeys",
+    "RemoveOnUnlock"
+  ];
+  var P = () => window.Player;
+  var groupOf = (name) => typeof window.AssetGroupGet === "function" ? window.AssetGroupGet(P().AssetFamily, name) : null;
+  var isClothes = (g) => !!(g && g.Clothing);
+  var isItem = (g) => !!(g && g.Category === "Item");
+  var lockedGroups = () => new Set(P().Appearance.filter((it) => it.Property && it.Property.LockedBy).map((it) => it.Asset.Group.Name));
+  function unlocked(prop) {
+    const c = Object.assign({}, prop || {});
+    for (const k of LOCK_FIELDS) delete c[k];
+    if (Array.isArray(c.Effect)) c.Effect = c.Effect.filter((e) => e !== "Lock");
+    return c;
+  }
+  function commit(bundle) {
+    window.ServerAppearanceLoadFromBundle(P(), P().AssetFamily, bundle, P().MemberNumber);
+    if (typeof window.CharacterRefresh === "function") window.CharacterRefresh(P());
+    window.ChatRoomCharacterUpdate(P());
+  }
+  function captureOutfit() {
+    const items = [];
+    let locks = 0;
+    for (const it of P().Appearance) {
+      const g = it.Asset && it.Asset.Group;
+      if (!g || !(isClothes(g) || isItem(g))) continue;
+      const b = window.ServerBundledItemFromAppearanceItem(it);
+      const locked = !!(it.Property && it.Property.LockedBy);
+      if (locked) locks++;
+      items.push(Object.assign({}, b, { Property: unlocked(b.Property), locked }));
+    }
+    return { data: window.LZString.compressToBase64(JSON.stringify({ v: 1, items })), items: items.length, locks };
+  }
+  function wearOutfit(data, keys) {
+    const outfit = JSON.parse(window.LZString.decompressFromBase64(String(data)) || "null");
+    if (!outfit || !Array.isArray(outfit.items)) return { ok: false, why: "that outfit didn't come through right" };
+    const cur = window.ServerAppearanceBundle(P().Appearance), stuck = lockedGroups();
+    const mine = new Set(outfit.items.map((i) => i.Group));
+    const next = cur.filter((b) => {
+      if (stuck.has(b.Group)) return true;
+      const g = groupOf(b.Group);
+      if (isClothes(g)) return false;
+      return !mine.has(b.Group);
+    });
+    let worn = 0, locks = 0, skipped = 0;
+    const added = [];
+    for (const it of outfit.items) {
+      const g = groupOf(it.Group);
+      if (!g || !(isClothes(g) || isItem(g))) continue;
+      if (stuck.has(it.Group)) {
+        skipped++;
+        continue;
+      }
+      const b = { Group: it.Group, Name: it.Name, Color: it.Color, Difficulty: it.Difficulty, Craft: it.Craft, Property: unlocked(it.Property) };
+      if (it.locked && keys && keys.length) {
+        b.Property.Effect = (b.Property.Effect || []).concat(["Lock"]);
+        Object.assign(b.Property, { LockedBy: "HighSecurityPadlock", LockMemberNumber: P().MemberNumber, MemberNumberListKeys: keys.join(",") });
+        locks++;
+      }
+      next.push(b);
+      worn++;
+      if (isItem(g)) added.push(it.Group);
+    }
+    try {
+      window.localStorage.setItem(BACKUP_KEY, JSON.stringify({ at: Date.now(), bundle: cur, added }));
+    } catch (e) {
+    }
+    commit(next);
+    return { ok: true, worn, locks, skipped };
+  }
+  function changeBack() {
+    let bk = null;
+    try {
+      bk = JSON.parse(window.localStorage.getItem(BACKUP_KEY));
+    } catch (e) {
+    }
+    if (!bk || !Array.isArray(bk.bundle)) return { ok: false, why: "I don't have your own clothes saved on this computer" };
+    const stuck = lockedGroups();
+    const next = window.ServerAppearanceBundle(P().Appearance).filter((b) => {
+      if (stuck.has(b.Group)) return true;
+      const g = groupOf(b.Group);
+      if (isClothes(g)) return false;
+      return !(bk.added || []).includes(b.Group);
+    });
+    const have = new Set(next.map((b) => b.Group));
+    for (const b of bk.bundle) {
+      const g = groupOf(b.Group);
+      if (have.has(b.Group) || stuck.has(b.Group)) continue;
+      if (isClothes(g) || isItem(g) && (bk.added || []).includes(b.Group)) next.push(b);
+    }
+    commit(next);
+    try {
+      window.localStorage.removeItem(BACKUP_KEY);
+    } catch (e) {
+    }
+    return { ok: true, stillLocked: stuck.size };
+  }
+  var hasBackup = () => {
+    try {
+      return !!window.localStorage.getItem(BACKUP_KEY);
+    } catch (e) {
+      return false;
+    }
+  };
 
   // extension/src/index.js
   var bcModSdk = import_bondage_club_mod_sdk.default.default || import_bondage_club_mod_sdk.default;
@@ -2804,10 +3058,58 @@ One of mods you are using is using an old version of SDK. It will work for now b
       case "choose":
         st.panel.setChoose({ text: String(m.text || ""), choices: Array.isArray(m.choices) ? m.choices.map(String).slice(0, 30) : [] });
         break;
+      case "outfit":
+        st.panel.setOutfit({
+          slot: String(m.slot || ""),
+          label: String(m.label || "farm outfit"),
+          data: String(m.data || ""),
+          keys: Array.isArray(m.keys) ? m.keys.filter(Number.isInteger) : [],
+          why: String(m.why || "")
+        });
+        break;
+      case "outfitBack": {
+        const r = changeBack();
+        st.panel.add(r.ok ? "👗 Back in your own clothes" + (r.stillLocked ? " (farm-locked pieces stay till a keyholder opens 'em)" : "") + "." : "👗 " + r.why + ".", "notice");
+        if (r.ok) toBot("outfitAnswer", { answer: "back" });
+        break;
+      }
     }
   }
+  var api = {
+    wear(o) {
+      let r;
+      try {
+        r = wearOutfit(o.data, o.keys);
+      } catch (e) {
+        r = { ok: false, why: "the game wouldn't take it (" + e.message + ")" };
+      }
+      st.panel.add(r.ok ? "👗 Dressed in " + o.label + ": " + r.worn + " pieces" + (r.locks ? ", " + r.locks + " locked with high security padlocks" : "") + (r.skipped ? ". " + r.skipped + " spots were already locked, so I left 'em be" : "") + "." : "👗 Couldn't dress you: " + r.why + ".", "notice");
+      if (r.ok) toBot("outfitAnswer", { answer: "worn", slot: o.slot, locks: r.locks });
+    },
+    decline(o) {
+      toBot("outfitAnswer", { answer: "declined", slot: o.slot });
+    },
+    back() {
+      onFarmMsg({ from: BOT_MEMBER, type: "outfitBack" });
+    },
+    save(slot) {
+      let c;
+      try {
+        c = captureOutfit();
+      } catch (e) {
+        st.panel.add("👗 Couldn't read what you're wearin': " + e.message, "notice");
+        return;
+      }
+      if (!c.items) {
+        st.panel.add("👗 You're not wearin' any clothes or restraints to save, sugar.", "notice");
+        return;
+      }
+      toBot("outfitSave", { slot, data: c.data, items: c.items, locks: c.locks });
+    },
+    hasBackup
+  };
   function start() {
-    st.panel = new Panel(sendCommand);
+    st.panel = new Panel(sendCommand, api);
     st.panel.setStatus("waitin' for the farm girl");
     mod.hookFunction("ChatRoomMessage", 10, (args, next) => {
       const m = readMsg(args[0]);

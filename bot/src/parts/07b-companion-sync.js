@@ -34,6 +34,11 @@
       if (quotaOf(mn)) s.quota = { ml: Math.round(milkedOn(mn, dayKey())), goal: Math.round(quotaOf(mn)), streak: r.quotaStreak || 0 };
       s.today = { tally: tallyToday(mn), naughty: r.naughtyMarks || 0, praised: r.praised || 0, degraded: r.degraded || 0 };
       s.at = now;
+      if (isProprietor(mn)){   // the Dashboard's outfit slots (no outfit data, just what's there)
+        outfitsLedger();
+        s.outfits = {}; for (const [k, o] of Object.entries(L.outfits)) s.outfits[k] = { items: o.items, locks: o.locks, at: o.at };
+        s.outfitRules = Object.assign({}, L.outfitRules);
+      }
     } catch(e){ dbg("stateFor:", e); }
     return s;
   }

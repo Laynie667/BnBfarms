@@ -105,6 +105,42 @@ const STATE = { name: "Laynie", onBooks: true, roles: ["PROPRIETOR", "LIVESTOCK"
   bot({ type: "notice", text: "a new notice", id: 5, part: 1, of: 1 });
   out("7 typing survives a new message ->", D.getElementById("fhc-input").value === "half typed");
 
+  // 9. outfits: save, wear (with high security padlocks), leave locked spots alone, change back
+  const G = { Cloth: { Name: "Cloth", Clothing: true, Category: "Appearance" }, HairFront: { Name: "HairFront", Clothing: false, Category: "Appearance" },
+              ItemArms: { Name: "ItemArms", Clothing: false, Category: "Item" }, ItemNeck: { Name: "ItemNeck", Clothing: false, Category: "Item" } };
+  const item = (g, n, p) => ({ Asset: { Name: n, Group: G[g] }, Property: p || {} });
+  const fromBundle = (b) => b.map((x) => item(x.Group, x.Name, x.Property));
+  let loaded = null, updates = 0;
+  w.LZString = { compressToBase64: (s) => w.btoa(unescape(encodeURIComponent(s))), decompressFromBase64: (s) => decodeURIComponent(escape(w.atob(s))) };
+  w.AssetGroupGet = (f, n) => G[n] || null;
+  w.ServerBundledItemFromAppearanceItem = (it) => ({ Group: it.Asset.Group.Name, Name: it.Asset.Name, Property: JSON.parse(JSON.stringify(it.Property || {})) });
+  w.ServerAppearanceBundle = (a) => a.map(w.ServerBundledItemFromAppearanceItem);
+  w.ServerAppearanceLoadFromBundle = (C, f, b) => { loaded = b; C.Appearance = fromBundle(b); };
+  w.ChatRoomCharacterUpdate = () => updates++;
+  w.Player = { MemberNumber: 221397, AssetFamily: "Female3DCG", Appearance: [item("Cloth", "Shirt"), item("ItemArms", "HempRope", { LockedBy: "MetalPadlock", Effect: ["Lock"] }), item("HairFront", "Hair1")] };
+  w.ChatRoomCharacter = [{ MemberNumber: 221397 }, { MemberNumber: 260239 }];
+  click("Dashboard"); click("Outfits");
+  const before9 = sent.length;
+  [...D.querySelectorAll("#fhc-panel button")].find((b) => b.textContent === "Save what I'm wearin'").click();
+  const save = sent.slice(before9).map((s) => s[1].Dictionary).find((d) => d && d.type === "outfitSave") || {};
+  out("9 saves clothes and restraints, not hair ->", save.items === 2, save.locks === 1, save.slot === "cow|female");
+  w.Player.Appearance = [item("Cloth", "Dress"), item("HairFront", "Hair2"), item("ItemNeck", "Collar", { LockedBy: "OwnerPadlock", Effect: ["Lock"] })];
+  const outfitData = w.LZString.compressToBase64(JSON.stringify({ v: 1, items: [
+    { Group: "Cloth", Name: "Shirt", Property: {}, locked: false }, { Group: "ItemArms", Name: "HempRope", Property: {}, locked: true },
+    { Group: "ItemNeck", Name: "Choker", Property: {}, locked: false }] }));
+  bot({ type: "outfit", slot: "cow|female", label: "cow · female", data: outfitData, keys: [700, 800], why: "Welcome to the farm", id: 9 });
+  out("9 offer banner ->", /put on your cow · female/.test(text()));
+  click("Yes, dress me");
+  const by = (g) => (loaded || []).find((b) => b.Group === g) || {};
+  out("9 clothes swapped, hair kept ->", by("Cloth").Name === "Shirt", by("HairFront").Name === "Hair2");
+  out("9 locked piece gets a high security padlock ->", by("ItemArms").Property.LockedBy === "HighSecurityPadlock", by("ItemArms").Property.MemberNumberListKeys === "700,800");
+  out("9 already-locked spot left alone ->", by("ItemNeck").Name === "Collar");
+  out("9 room told, bot told ->", updates > 0, toBot("outfitAnswer").some((s) => s[1].Dictionary.answer === "worn"));
+  bot({ type: "outfitBack", why: "shift's over" });
+  const by2 = (g) => (loaded || []).find((b) => b.Group === g) || {};
+  out("9 change back: own dress back on ->", by2("Cloth").Name === "Dress");
+  out("9 farm-locked rope stays till a keyholder opens it ->", by2("ItemArms").Name === "HempRope");
+
   commands.find((c) => c.Tag === "farm").Action("size");
   out("8 /farm size sends cmd ->", cmds().includes("size"));
   w.ChatRoomCharacter = [{ MemberNumber: 221397 }];

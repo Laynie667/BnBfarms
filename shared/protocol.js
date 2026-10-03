@@ -14,6 +14,12 @@
 //   bot  -> ext        ask      { kind, text, id }            a yes/no question; the answer is a plain "yes"/"no" cmd (v2)
 //   bot  -> ext        doc      { text, id, part, of, kind, who, about }
 //                                                             a staff lookup about somebody else, for the Office (v2)
+//   bot  -> ext        choose   { text, choices, id }         an application question with buttons; the answer is a plain cmd (v2)
+//   bot  -> ext        outfit   { slot, label, data, keys, why, id }
+//                                                             "put on your farm outfit?" (data = the saved outfit) (v2)
+//   bot  -> ext        outfitBack { why }                     change back into your own clothes (v2)
+//   ext  -> bot        outfitSave { slot, data, items, locks } a proprietor saves what they're wearin' (v2)
+//   ext  -> bot        outfitAnswer { answer, slot, locks }   worn / declined / back (v2)
 //   ext  -> bot        bye      {}                            extension turned off
 //
 // Older Companions ignore the v2 types, and older bots never send them, so either side can update first.

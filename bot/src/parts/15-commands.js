@@ -246,6 +246,16 @@
             tpl.policy = v === "either" ? "either" : "author"; saveLedger(); R("📜 '"+name+"' can be ended early by "+(tpl.policy === "either" ? "either side" : "the farm only")+".");
             break;
           }
+          case "outfit": {
+            if (!owner){ needOwner(); break; }
+            const tpl = tplFor(name), how = args.slice(2);
+            if (!tpl || !how.length){ R("Here's how: ?contract outfit <name> auto (theirs, by species and gender) · none · or a slot, like cow female, any femboy, stock, luxury."); break; }
+            const v = String(how[0]).toLowerCase();
+            tpl.outfit = v === "auto" ? "auto" : v === "none" ? "" : outfitSlotFrom(how);
+            if (tpl.outfit === null){ R("I don't know that outfit slot, sugar. ?outfit lists them."); break; }
+            saveLedger(); R("📜 When somebody signs '"+name+"', they'll be offered "+(tpl.outfit === "auto" ? "their own outfit (by species and gender)" : tpl.outfit ? slotLabel(tpl.outfit) : "no outfit")+".");
+            break;
+          }
           case "delete": {
             if (!owner){ needOwner(); break; }
             if (!tplFor(name)){ R("There's no saved contract called '"+name+"', sugar."); break; }
@@ -254,6 +264,52 @@
           }
           default: R("?contract list · show · offer · release · check · rules"+(owner ? " · new · add · set · remove · title · terms · policy · delete" : ""));
         }
+        break;
+      }
+
+      case "outfit": case "outfits": case "uniform": {
+        // ?outfit · ?outfit offer <who> [slot] · ?outfit back · proprietors: ?outfit clear <slot> · ?outfit keys … · ?outfit rule …
+        outfitsLedger();
+        const sub = String(args[0]||"").toLowerCase();
+        if (!sub || sub === "list"){
+          const ks = Object.keys(L.outfits);
+          R("👗 FARM OUTFITS\n"+(ks.length ? ks.map(k => "  "+slotLabel(k)+" · "+L.outfits[k].items+" pieces"+(L.outfits[k].locks ? ", "+L.outfits[k].locks+" locked" : "")).join("\n") : "  none saved yet")+
+            "\n\nKeys to farm locks: "+({ staff:"farm staff + their herd leader", leader:"their herd leader", owners:"the proprietors" }[L.outfitRules.keys])+
+            "\nOffered on approval: "+(L.outfitRules.onApprove?"yes":"no")+" · uniforms at clock-in: "+(L.outfitRules.onClockIn?"yes":"no")+" · change back at clock-out: "+(L.outfitRules.changeBack?"yes":"no")+
+            "\n\nProprietors save outfits from the Companion's Dashboard. ?outfit offer <who> [slot] hands one over.");
+          break;
+        }
+        if (sub === "back"){ if (!hasCompanion(sender)){ R("That needs the Companion, sugar: it's the one keepin' your own clothes."); break; } enqueue(makeMsg("outfitBack", { why: "you asked" }, sender)); break; }
+        if (sub === "offer"){
+          if (!isStaff(sender)){ R("Handin' out outfits is for staff, sugar."); break; }
+          const t = resolveTarget(args[1]);
+          if (!t || !rec(t)){ R("Offer to who, sugar? ?outfit offer <who> [slot]. Leave the slot off and I'll pick theirs by species and gender."); break; }
+          const slot = args.length > 2 ? outfitSlotFrom(args.slice(2)) : (rec(t).roles.some(x => [ROLE.FARMHAND, ROLE.MANDATED, ROLE.HERDMASTER, ROLE.PROPRIETOR].includes(x)) && clockedIn(t) ? uniformSlotFor(t) : outfitSlotFor(t));
+          const err = offerOutfit(t, slot, "From "+plainName(sender));
+          R(err || "👗 Offered "+plainName(t)+" "+slotLabel(slot)+". They'll say yes or not now on their own screen.");
+          break;
+        }
+        if (!isProprietor(sender)){ R("That one's for the proprietors, sugar. ?outfit shows what's saved."); break; }
+        if (sub === "clear"){
+          const slot = outfitSlotFrom(args.slice(1));
+          if (!slot || !L.outfits[slot]){ R("There's no outfit saved there, sugar."); break; }
+          delete L.outfits[slot]; saveLedger(); audit(sender, "OUTFIT_CLEAR", slot); R("👗 Cleared "+slotLabel(slot)+"."); syncCompanions(true);
+          break;
+        }
+        if (sub === "keys"){
+          const v = String(args[1]||"").toLowerCase();
+          if (!["staff","leader","owners"].includes(v)){ R("Who holds the keys to farm locks? ?outfit keys staff (farm staff + their herd leader), leader (their herd leader only) or owners (proprietors only)."); break; }
+          L.outfitRules.keys = v; saveLedger(); R("🔒 Farm locks open for: "+({ staff:"farm staff + their herd leader", leader:"their herd leader", owners:"the proprietors" }[v])+"."); syncCompanions(true);
+          break;
+        }
+        if (sub === "rule"){
+          const k = { onapprove:"onApprove", approve:"onApprove", onclockin:"onClockIn", clockin:"onClockIn", changeback:"changeBack", clockout:"changeBack" }[String(args[1]||"").toLowerCase()];
+          const v = String(args[2]||"").toLowerCase();
+          if (!k || !["on","off"].includes(v)){ R("?outfit rule approve on|off · clockin on|off · changeback on|off"); break; }
+          L.outfitRules[k] = v === "on"; saveLedger(); R("👗 Got it."); syncCompanions(true);
+          break;
+        }
+        R("?outfit · ?outfit offer <who> [slot] · ?outfit back · ?outfit clear <slot> · ?outfit keys staff|leader|owners · ?outfit rule approve|clockin|changeback on|off");
         break;
       }
 
@@ -961,6 +1017,8 @@
           ready = "\n\n📜 They asked for "+dp.label+", "+d.label+". It's ready when you are: ?contract show "+dp.key+" "+t+" to look it over, then ?contract offer "+dp.key+" "+t+" "+d.key+" to send it.";
         }
         R("✅ "+plainName(t)+" — "+roleString(t)+"\n🔑 "+keyString(t)+(r.species ? "\n🐾 "+r.species : "")+(r.gender ? " · "+r.gender : "")+ready);
+        outfitsLedger();
+        if (L.outfitRules.onApprove && roles.includes(ROLE.LIVESTOCK) && outfitSlotFor(t)) later(() => offerOutfit(t, outfitSlotFor(t), "Welcome to the farm"), 4000);
         beep(t,
 `🌾 You're in, `+plainName(t)+`! Welcome to the family, sweetie. 💕
 
@@ -1815,6 +1873,8 @@ Welcome to B&B Farm, hon. 🌾`);
         r.nextChore = Date.now() + 2*60000;
         saveLedger(); audit(sender,"CLOCKIN","");
         R("⏱️ You're on the clock, sweetie! Keep chattin', or I'll clock you out after "+CFG.SHIFT_IDLE_MIN+" quiet minutes.");
+        outfitsLedger();
+        if (L.outfitRules.onClockIn && uniformSlotFor(sender)) later(() => offerOutfit(sender, uniformSlotFor(sender), "Your shift's startin'"), 1500);
         break;
       }
       case "clockout": {

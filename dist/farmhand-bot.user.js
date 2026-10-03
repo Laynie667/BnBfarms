@@ -37,7 +37,7 @@
   // bot/src/version.js
   var VERSION = "0.9.25";
 
-  // bot/src/farmhand.js
+  // bot-parts:farmhand-bot-parts
   (function() {
     "use strict";
     const CFG = {

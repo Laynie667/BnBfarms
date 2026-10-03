@@ -20,6 +20,10 @@ Why: one script that whispers and beeps everything is hard for players to read (
 
 ## Stage 2: split the bot into topic files (no new features)
 
+**Step 1 done (2026-10-03):** the bot now lives in `bot/src/parts/` (19 files, see the README there). The build joins
+them back into one function, the built bot is the same, and all tests pass. Next step: turn the parts into
+real modules one at a time.
+
 Move pieces of `bot/src/farmhand.js` into their own files, one topic at a time, and run `npm test` after each move so nothing breaks:
 
 `config.js` · `send.js` (queue, beep, whisper, emote) · `ledger.js` · `people.js` (roles, tiers, herds) · `map.js` (keys, spots, leashes) · `production.js` (milk, semen, quota) · `breeding.js` (scenes, knots, pregnancy, eggs) · `shots.js` · `guides.js` · `commands.js` · `listeners.js`

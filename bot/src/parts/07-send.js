@@ -1,0 +1,336 @@
+  /* ═══════════ ANTI-IDLE ═══════════ */
+
+  function keepalive(){
+    const now = Date.now();
+    if (now - state.lastKeepalive < CFG.KEEPALIVE_MIN*60000) return;
+    state.lastKeepalive = now;
+    // invisible server traffic — resets any idle timer, shows nothing in chat
+    send("ChatRoomChat", { Content:"BnBKeepAlive", Type:"Hidden" });
+    dbg("keepalive sent");
+  }
+
+  function nudge(){
+    if (!CFG.KEEPALIVE_NUDGE) return;
+    const now = Date.now();
+    if (now - state.lastNudge < CFG.NUDGE_MIN*60000) return;
+    state.lastNudge = now;
+    try {
+      const C = charFor(CFG.BOT_MEMBER);
+      const pos = C && C.MapData && C.MapData.Pos;
+      if (!pos) return;
+      const back = { X: pos.X, Y: pos.Y };
+      const tryDirs = [[1,0],[-1,0],[0,1],[0,-1]];
+      for (const [dx,dy] of tryDirs){
+        const nx = pos.X+dx, ny = pos.Y+dy;
+        if (typeof W.ChatRoomMapViewIsWall === "function" && W.ChatRoomMapViewIsWall(nx,ny)) continue;
+        if (nx<0||ny<0||nx>=40||ny>=40) continue;
+        // The server stores exactly what we send as MapData, so send MapData itself.
+        // (v0.9.0 wrapped it as { MapData: ... }, which gave everyone a Pos-less bot.)
+        C.MapData.Pos = { X:nx, Y:ny };
+        send("ChatRoomCharacterMapDataUpdate", C.MapData);
+        later(()=>{
+          try {
+            C.MapData.Pos = back;
+            send("ChatRoomCharacterMapDataUpdate", C.MapData);
+          } catch(e){}
+        }, 2500);
+        dbg("nudged");
+        return;
+      }
+    } catch(e){ dbg("nudge failed (harmless):", e); }
+  }
+
+  function watchdog(){
+    if (!CFG.WATCHDOG_ENABLED || state.reloading) return;
+    const stale = Date.now() - state.lastHealthy;
+    if (stale > CFG.WATCHDOG_MIN*60000){
+      state.reloading = true;
+      warn("WATCHDOG: unhealthy for "+Math.round(stale/60000)+" min. Reloading.");
+      setBadge("watchdog reload…","#ff9b9b");
+      try { for (const p of CFG.PROPRIETORS) beep(p, "⚠️ Oops, the farm office tripped over its own boots. Reloadin' now, back in a jiffy!"); } catch(e){}
+      later(()=>{ try { W.location.reload(); } catch(e){} }, 3000);
+    }
+  }
+
+  // Browsers slow down normal timers in a background tab (down to once a MINUTE after
+  // a few minutes), which made replies and milkin' look stalled. Timers that live in a
+  // Worker don't get slowed, so every delay in the script runs through here.
+  const wTimers = new Map(); let wSeq = 0;
+  function later(fn, ms){
+    if (!state.worker) return setTimeout(fn, ms);
+    const id = ++wSeq; wTimers.set(id, { fn, every:false });
+    state.worker.postMessage({ set:id, ms:Math.max(0, ms|0), every:false });
+    return id;
+  }
+  function every(fn, ms){
+    if (!state.worker) return setInterval(fn, ms);
+    const id = ++wSeq; wTimers.set(id, { fn, every:true });
+    state.worker.postMessage({ set:id, ms:Math.max(1, ms|0), every:true });
+    return id;
+  }
+  function startWorkerTimer(){
+    if (!CFG.USE_WORKER_TIMER) return false;
+    try {
+      const src = "let hb=null;const T={};onmessage=function(e){var d=e.data;" +
+                  "if(d==='start'){if(hb)clearInterval(hb);hb=setInterval(function(){postMessage('tick');}," + CFG.HEARTBEAT_MS + ");return;}" +
+                  "if(d&&d.set){T[d.set]=(d.every?setInterval:setTimeout)(function(){if(!d.every)delete T[d.set];postMessage({fire:d.set});},d.ms);}};";
+      const blob = new Blob([src], { type:"application/javascript" });
+      const w = new Worker(URL.createObjectURL(blob));
+      w.onmessage = (e)=>{
+        if (e.data === "tick"){ try { heartbeat(); } catch(err){ warn("worker heartbeat:",err); } return; }
+        const id = e.data && e.data.fire, t = id && wTimers.get(id);
+        if (!t) return;
+        if (!t.every) wTimers.delete(id);
+        try { t.fn(); } catch(err){ warn("timer:", err); }
+      };
+      w.postMessage("start");
+      state.worker = w;
+      log("Worker timer started — background throttling defeated (heartbeat, send queue and every delay).");
+      return true;
+    } catch(e){ warn("Worker timer failed, falling back:", e); return false; }
+  }
+
+  /* ───────────── messaging ───────────── */
+
+  // EVERYTHING the bot sends in-room goes through here: chat, whispers, beeps,
+  // key pushes, teleports, map moves. The server disconnects anyone sending more
+  // than 20 messages in a second, so one paced queue keeps us safe. Urgent items
+  // (safeword, stuck, summons) jump ahead of routine ones.
+  // three lanes: urgent (safety), replies to whoever just asked, then everything else
+  // (key syncs, ambient emotes), so a busy room never makes a command feel slow
+  function send(ev, data, urgent){
+    if (urgent) state.urgent.push({ ev, data });
+    else if (state.inReply) (state.replies || (state.replies = [])).push({ ev, data });
+    else {
+      state.queue.push({ ev, data });
+      if (state.queue.length > CFG.QUEUE_MAX){
+        state.queue.splice(0, state.queue.length - CFG.QUEUE_MAX);
+        warn("send queue overflow — dropped oldest routine messages");
+      }
+    }
+    pump();
+  }
+  function pump(){
+    if (state.sending) return;
+    const m = state.urgent.shift() || (state.replies && state.replies.shift()) || state.queue.shift();
+    if (!m) return;
+    state.sending = true;
+    try { W.ServerSend(m.ev, m.data); } catch(e){ warn("send:",e); }
+    later(()=>{ state.sending=false; pump(); }, CFG.SEND_INTERVAL_MS);
+  }
+  function enqueue(m, urgent){ send("ChatRoomChat", m, urgent); }
+  function say(t, urgent){ enqueue({ Content:t, Type:"Chat" }, urgent); }
+  // a room emote everybody nearby sees (no name in front; I write the whole line)
+  function emote(t){ for (const c of splitMessage(t, 900)) enqueue({ Content:"*"+c, Type:"Emote" }); }
+  // are they in the room and standin' on the map right now?
+  function onMap(mn){
+    const C = charFor(mn);
+    if (!C) return false;
+    const mapRoom = !!(W.ChatRoomData && W.ChatRoomData.MapData && W.ChatRoomData.MapData.Type && W.ChatRoomData.MapData.Type !== "Never");
+    if (!mapRoom) return true;
+    const pos = C.MapData && C.MapData.Pos;
+    return !!(pos && pos.X >= 0 && pos.Y >= 0);
+  }
+  // the first of these people who isn't here, or null when everybody is
+  function missing(...mns){ return mns.find(m => m && !onMap(m)) || null; }
+  function whisper(target,text,urgent){
+    if (hasCompanion(target)){ toCompanion(target, text, "notice", urgent); return; }
+    for (const c of splitMessage(text,900)) enqueue({ Content:c, Type:"Whisper", Target:target }, urgent);
+  }
+  function splitMessage(text,max){
+    text = String(text);
+    if (text.length<=max) return [text];
+    const out=[]; let buf="";
+    for (let line of text.split("\n")){
+      // a single huge line (a long application answer) gets hard-cut, or the
+      // server silently drops anything over 2000 characters
+      while (line.length > max){
+        if (buf){ out.push(buf.trimEnd()); buf=""; }
+        out.push(line.slice(0,max)); line = line.slice(max);
+      }
+      if ((buf+line+"\n").length>max){ if(buf) out.push(buf.trimEnd()); buf=""; }
+      buf += line+"\n";
+    }
+    if (buf.trim()) out.push(buf.trimEnd());
+    return out;
+  }
+  /* ── Farmhand Companion: folks runnin' the extension get my answers in their farm panel ── */
+  const COMPANION_TTL_MS = 3*60*60*1000;
+  function hasCompanion(mn){
+    const c = state.companions.get(mn);
+    return !!(c && Date.now() - c.at < COMPANION_TTL_MS && inRoom() && charFor(mn));
+  }
+  function companionCount(){ let n = 0; for (const mn of state.companions.keys()) if (hasCompanion(mn)) n++; return n; }
+  let companionSeq = 0;
+  function toCompanion(mn, text, kind, urgent){
+    const parts = splitMessage(text, 1800), id = ++companionSeq;
+    parts.forEach((t, i) => enqueue(makeMsg(kind, { text:t, id, part:i+1, of:parts.length }, mn), urgent));
+  }
+  function pingCompanions(force){
+    if (!inRoom() || (!force && Date.now() - state.lastPing < 10*60*1000)) return;
+    state.lastPing = Date.now();
+    enqueue(makeMsg("ping", { ver:VERSION }));
+  }
+  function onCompanion(m){
+    const mn = m.from;
+    if (!mn) return;
+    if (m.type === "hello"){
+      state.companions.set(mn, { at:Date.now(), ver:String(m.ver||"?") });
+      log("Companion hello from "+mn+" (v"+(m.ver||"?")+")");
+      enqueue(makeMsg("welcome", { ver:VERSION, name:plainName(mn), staff:isStaff(mn) }, mn));
+      return;
+    }
+    if (m.type === "bye"){ state.companions.delete(mn); return; }
+    if (m.type === "cmd"){
+      const text = String(m.text||"").trim().replace(/^[?\-!.]/, "").slice(0, 900);
+      if (!text) return;
+      const c = state.companions.get(mn);
+      if (c) c.at = Date.now(); else state.companions.set(mn, { at:Date.now(), ver:"?" });
+      state.heard++; state.lastHealthy = Date.now();
+      log("HEARD [companion] "+mn+": "+text.slice(0,70));
+      if (handleYesNo(mn, text)) return;
+      handleCommand(mn, text, "companion");
+    }
+  }
+  function beep(mn,msg,urgent){
+    if (hasCompanion(mn)){ toCompanion(mn, msg, "notice", urgent); return; }
+    // standin' right here on the map? a whisper reaches 'em, so no beep
+    if (CFG.WHISPER_FIRST && inRoom() && onMap(mn)){ whisper(mn, msg, urgent); return; }
+    const chunks = splitMessage(msg, 900);
+    const max = CFG.BEEP_MAX_CHUNKS;
+    for (const c of chunks.slice(0,max)) send("AccountBeep",{ MemberNumber:mn, BeepType:"", Message:c }, urgent);
+    if (chunks.length > max)
+      send("AccountBeep",{ MemberNumber:mn, BeepType:"", Message:"(…I had to cut that one short, sugar. It's a long one! Try narrowin' it down.)" }, urgent);
+  }
+
+  function reply(mn, text, channel){
+    if (channel === "companion" || (channel !== "chat" && hasCompanion(mn))){ toCompanion(mn, text, "reply"); return; }
+    if (channel === "beep"){ beep(mn, text); return; }
+    if (channel === "bot"){ if (isFriend(mn)) beep(mn, text); else whisper(mn, text); return; }
+    if (channel === "chat"){
+      if (CFG.CHAT_REPLY_BEEP && isFriend(mn)) { beep(mn, text); return; }
+      if (String(text).length <= CFG.CHAT_REPLY_SAY_MAX) { say(text); return; }
+      whisper(mn, text);
+      if (!isFriend(mn)) {
+        say(plainName(mn) + ", I whispered that one to you, hon! Say ?friend and I'll hop on your friend list so I can reach you anywhere.");
+      }
+      return;
+    }
+    whisper(mn, text);
+  }
+
+  /* ───────────── names ───────────── */
+
+  function charFor(mn){ try { return (W.ChatRoomCharacter||[]).find(c=>c.MemberNumber===mn)||null; } catch(e){ return null; } }
+  function plainName(mn){
+    const C = charFor(mn);
+    if (C){ try { if (typeof W.CharacterNickname==="function") return W.CharacterNickname(C); } catch(e){}
+            return C.Nickname||C.Name||"stranger"; }
+    const r = rec(mn); return (r&&r.name)?r.name:("#"+mn);
+  }
+  function titledName(mn){
+    const C = charFor(mn), n = plainName(mn);
+    if (!C) return n;
+    const t = (C.Title && C.Title!=="None") ? C.Title : "";
+    return t ? t+" "+n : n;
+  }
+  function fill(t,mn){ return String(t).replace(/%titled_name%/g,titledName(mn)).replace(/%name%/g,plainName(mn)); }
+  // every name somebody goes by: account name, nickname, and the name on the books
+  function namesOf(mn){
+    const C = charFor(mn), r = rec(mn), out = [];
+    for (const n of [C && C.Nickname, C && C.Name, r && r.name]) if (n) out.push(String(n).toLowerCase());
+    return out;
+  }
+  // a member number, a name or nickname, or the start of one ("bess" finds Bessie Mae),
+  // as long as it only fits one person. Folks in the room count first, then the books.
+  function resolveTarget(arg){
+    if (!arg) return null;
+    arg = String(arg).replace(/^@/,"").replace(/[,.!?:;]+$/,"");
+    if (/^#?\d+$/.test(arg)) return parseInt(arg.replace("#",""),10);
+    const low = arg.toLowerCase();
+    if (!low) return null;
+    const room = (W.ChatRoomCharacter||[]).map(c => c.MemberNumber).filter(m => m !== CFG.BOT_MEMBER);
+    const books = Object.keys(L.people).map(k => parseInt(k,10));
+    for (const pool of [room, books]){
+      const exact = pool.filter(m => namesOf(m).includes(low));
+      if (exact.length === 1) return exact[0];
+      const starts = pool.filter(m => namesOf(m).some(n => n.startsWith(low) || n.split(/\s+/).some(w => w.startsWith(low))));
+      if (low.length >= 3 && starts.length === 1) return starts[0];
+    }
+    return null;
+  }
+
+  /* ───────────── greeting ───────────── */
+
+  const GREETINGS = [
+    "Evenin', %titled_name%! Gate's open, come on in, sugar. 🌻",
+    "Well hey there, %titled_name%! Wipe your boots and make yourself at home.",
+    "%titled_name%! Didn't even hear the truck pull up. Welcome to B&B Farm, sweetie!",
+    "Welcome, %titled_name%! If you're new 'round here, say ?rules out loud and I'll fill you in.",
+    "Mornin', %titled_name%! Coffee's fresh and so's the hay. ☕",
+    "Afternoon, %titled_name%! Mind the ruts on your way in, darlin'.",
+    "Hey there, %titled_name%! Say ?help any time, hon. I keep the books 'round here."
+  ];
+  const RETURN_GREETINGS = [
+    "Well look who's back! Told ya the gate swings both ways, %titled_name%. 💕",
+    "%titled_name%! I just knew you'd turn up again, sugar.",
+    "Back for more, %titled_name%? Straw's still warm and I saved you a spot."
+  ];
+
+  function greet(mn){
+    if (!CFG.GREET_ENABLED || mn===CFG.BOT_MEMBER) return;
+    const last = state.greeted.get(mn)||0;
+    if (Date.now()-last < CFG.GREET_COOLDOWN_MIN*60000) return;
+    state.greeted.set(mn, Date.now());
+    const r0 = rec(mn);
+    const known = L.archive[mn] || (r0 && r0.roles && r0.roles.length);
+    const pool = known ? RETURN_GREETINGS : GREETINGS;
+    const line = pool[Math.floor(Math.random()*pool.length)];
+    later(()=>say(fill(line,mn)), 1500);
+    const r = rec(mn); if (r){ r.name = plainName(mn); saveLedger(); }
+  }
+
+  // Things that happen when somebody walks in, after the greeting.
+  function onArrive(mn){
+    // summoned? put them where they were called to
+    const a = state.arrivals.get(mn);
+    if (a){
+      state.arrivals.delete(mn);
+      if (Date.now() < a.until){
+        const pt = firstSpot(a.spot, "summon");
+        if (pt) later(()=>teleport(mn, pt, true), 2500);
+      }
+    }
+    // the notice board, once per visit
+    if (CFG.NOTICE_ON_JOIN && L.notice && state.greeted.get(mn) > Date.now()-5000)
+      later(()=>whisper(mn, "📌 "+L.notice.text), 3500);
+    // anniversaries
+    const r = rec(mn);
+    if (CFG.ANNIVERSARY_ENABLED && r && r.roles.length && r.registeredAt){
+      const d0 = new Date(r.registeredAt), now = new Date();
+      const years = now.getFullYear() - d0.getFullYear();
+      if (years >= 1 && d0.getMonth() === now.getMonth() && d0.getDate() === now.getDate() && r.annivYear !== now.getFullYear()){
+        r.annivYear = now.getFullYear(); saveLedger();
+        later(()=>say("🎉 "+years+" year"+(years===1?"":"s")+" on the books today, "+plainName(mn)+"! Somebody fetch this sweetie a ribbon!"), 4500);
+      }
+    }
+  }
+
+  // Opted-in folks on the farm get a teasing whisper now and then.
+  function teaseTick(){
+    if (!CFG.TEASE_ENABLED || !L.tease.length) return;
+    const now = Date.now();
+    const gap = () => (CFG.TEASE_MIN_GAP_MIN + Math.random()*(CFG.TEASE_MAX_GAP_MIN-CFG.TEASE_MIN_GAP_MIN))*60000;
+    for (const C of (W.ChatRoomCharacter||[])){
+      const mn = C.MemberNumber;
+      const r = rec(mn);
+      if (!r || !r.teaseOptIn) { state.teaseNext.delete(mn); continue; }
+      const next = state.teaseNext.get(mn);
+      if (!next){ state.teaseNext.set(mn, now + gap()); continue; }   // first one comes a while after they arrive
+      if (now < next) continue;
+      state.teaseNext.set(mn, now + gap());
+      const line = L.tease[Math.floor(Math.random()*L.tease.length)];
+      whisper(mn, "😈 "+fill(line.text, mn));
+    }
+  }
+

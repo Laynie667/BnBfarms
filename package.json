@@ -1,0 +1,20 @@
+{
+  "name": "bnb-farm-farmhand",
+  "private": true,
+  "description": "B&B Farm: the Farmhand bot and the Farmhand Companion extension for Bondage Club",
+  "type": "module",
+  "versions": {
+    "bot": "0.9.25",
+    "companion": "0.1.0"
+  },
+  "scripts": {
+    "build": "node build.mjs",
+    "watch": "node build.mjs --watch",
+    "test": "node tests/run-all.mjs"
+  },
+  "devDependencies": {
+    "bondage-club-mod-sdk": "1.2.0",
+    "esbuild": "^0.24.0",
+    "jsdom": "^25.0.1"
+  }
+}

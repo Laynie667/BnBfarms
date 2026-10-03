@@ -1,0 +1,16 @@
+// ==UserScript==
+// @name         BnB Farm — Farmhand Companion
+// @namespace    bnbfarm
+// @version      {{VERSION}}
+// @description  Your B&B Farm panel: the farm girl's answers, stat cards and guides, right in the game.
+// @author       Laynie & Alexia
+// @match        *://*.bondageprojects.elementfx.com/*
+// @match        *://bondageprojects.elementfx.com/*
+// @match        *://*.bondage-europe.com/*
+// @match        *://bondage-europe.com/*
+// @match        *://*.bondageprojects.com/*
+// @match        *://bondageprojects.com/*
+// @match        *://*.bondage-asia.com/*
+// @grant        none
+// @run-at       document-end
+// ==/UserScript==

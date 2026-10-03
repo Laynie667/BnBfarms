@@ -1,0 +1,5 @@
+node_modules/
+# never commit logins or ledger backups (they hold member numbers and private play data)
+.env
+*.ledger.json
+ledger-backup*.json

@@ -83,13 +83,14 @@
                        "tier","vet","brand","tease","spot","spots","appclear",
                        "milk","collect","heat","heatline","shotlog",
                        "stocks","unstock","walk","tourstop","clockin","clockout","hours","done","chore","chores",
-                       "wheel","spin","begphrase","score","drain","denial","ruin","jars","inseminate","nomilk","inspect","edge"];
+                       "wheel","spin","begphrase","score","drain","denial","ruin","jars","inseminate","nomilk","inspect","edge",
+                       "contract","contracts"];
 
   const SAFETY_CMDS = ["safe","safeword","red","stuck"];
   const PRIVATE_REPLY = ["record","keys","find","app","queue","roster","stock","health",
                          "myherd","herd","stucklog","keydump","summon","where","cover",
                          "vet","spot","spots","tease","teaseme","stats","pedigree",
-                         "hours","chores","wheel","tourstop","quota"];
+                         "hours","chores","wheel","tourstop","quota","contract","contracts"];
 
   function parseRoles(args){
     const out=[];

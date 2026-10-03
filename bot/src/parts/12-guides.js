@@ -653,6 +653,7 @@ UPKEEP
       o += group("📖 Books",     "queue · app · approve · deny · appclear · roster · stock · find · record <who> · note · signed · addfriend · unregister");
       o += group("🐄 Herd",      "claim · release · myherd · herdname · herdcall · herdsummon · turnout · letup · brand · walk");
       o += group("🎀 Stock",     "tier · stocks · unstock · vet · inspect · tease");
+      o += group("📜 Contracts", "contract list · contract show · contract offer · contract release · contract check · contract rules");
       o += group("🥛 Barn",      "milk · collect · jars · inseminate · drain · edge · denial · ruin · nomilk · quota <who> · heat · heatline · shotlog");
       o += group("🗺️ Farm",      "spot · tourstop · setrescue · where · stucklog");
       o += group("⏱️ Work & play", "clockin · clockout · hours · done · chores · chore · wheel · spin · begphrase · score");

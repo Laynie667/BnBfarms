@@ -11,6 +11,8 @@
         if (data.Type === "Hidden"){
           const fm = readMsg(data);
           if (fm){ onCompanion(fm); return; }
+          const bm = BCPLUS.readBCP(data);
+          if (bm){ onBCPMessage(bm); return; }
           if (typeof data.Content === "string" && data.Content.startsWith("ChatRoomBot ")){
             const text = data.Content.slice("ChatRoomBot ".length).trim().replace(/^\(+/,"").replace(/\)+$/,"");
             if (!text) return;
@@ -28,6 +30,7 @@
         }
 
         if (data.Sender) state.lastSpoke.set(data.Sender, Date.now());
+        if (data.Type === "Activity" && data.Content === "BCPAction"){ try { onBCPAction(data); } catch(e){ warn("bc+:",e); } return; }
         if (data.Type === "Activity"){ try { onActivity(data); } catch(e){ warn("activity:",e); } return; }
         if (data.Type === "Emote" || data.Type === "Chat"){ try { onRoleplay(data.Sender, String(data.Content||""), data.Type); } catch(e){ warn("rp:",e); } }
         if (data.Type!=="Chat" && data.Type!=="Whisper") return;

@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.9.27
+// @version      0.9.28
 // @description  B&B Farm: beeps, keys, ledger, roster, herds, summoning, anti-idle
 // @author       Laynie & Alexia
 // @match        *://*.bondageprojects.elementfx.com/*
@@ -34,8 +34,1744 @@
     return { ...d, from: data.Sender };
   }
 
+  // shared/bcplus-rules.json
+  var bcplus_rules_default = {
+    bcplusVersion: "0.14.0",
+    made: "2026-10-03",
+    rules: [
+      {
+        id: "speech.forbidWhisper",
+        name: "Forbid whispering",
+        category: "Speech",
+        description: "The player cannot send whispers to other people in the room.",
+        bcxEquivalent: "speech_restrict_whisper_send",
+        settings: [
+          {
+            type: "checkbox",
+            name: "allowLover",
+            label: "Still allow whispering to Lover-ranked roles and above",
+            default: true
+          }
+        ]
+      },
+      {
+        id: "speech.forbidOOC",
+        name: "Forbid OOC messages",
+        category: "Speech",
+        description: "The player cannot send messages containing out-of-character (parenthesized) text. Whispers are not affected.",
+        bcxEquivalent: "speech_block_ooc",
+        settings: []
+      },
+      {
+        id: "speech.gaggedOOC",
+        name: "Block OOC while gagged",
+        category: "Speech",
+        description: "The player cannot use out-of-character (parenthesized) text while gagged - a gag should not be so easy to talk around.",
+        bcxEquivalent: "speech_block_gagged_ooc",
+        settings: []
+      },
+      {
+        id: "speech.forbiddenWords",
+        name: "Forbidden words",
+        category: "Speech",
+        description: "The player cannot use the configured words in chat or whispers.",
+        bcxEquivalent: "speech_ban_words",
+        settings: [
+          {
+            type: "stringList",
+            name: "words",
+            label: "Forbidden words:",
+            default: [],
+            maxChars: 100,
+            entryLabel: "word"
+          },
+          {
+            type: "checkbox",
+            name: "includeOOC",
+            label: "Also forbid the words in OOC (parentheses)",
+            default: false
+          }
+        ]
+      },
+      {
+        id: "speech.mandatoryWords",
+        name: "Mandatory words",
+        category: "Speech",
+        description: 'Every chat message must contain at least one of the configured words (e.g. "Miss, please, humbly"). Purely out-of-character messages are exempt.',
+        bcxEquivalent: "speech_mandatory_words",
+        settings: [
+          {
+            type: "stringList",
+            name: "words",
+            label: "Required words:",
+            default: [],
+            maxChars: 100,
+            entryLabel: "word"
+          },
+          {
+            type: "checkbox",
+            name: "includeWhispers",
+            label: "Also apply to whispers",
+            default: false
+          }
+        ]
+      },
+      {
+        id: "speech.minimumWords",
+        name: "Require detailed speech",
+        category: "Speech",
+        description: "Every chat message must contain at least the configured number of words - doll talk in reverse, for detailed roleplay. Purely out-of-character messages and emotes are exempt.",
+        settings: [
+          {
+            type: "option",
+            name: "minWords",
+            label: "Minimum words per message:",
+            options: [
+              "2",
+              "3",
+              "4",
+              "5",
+              "6",
+              "8",
+              "10",
+              "15",
+              "20"
+            ],
+            default: "5"
+          },
+          {
+            type: "checkbox",
+            name: "includeWhispers",
+            label: "Also apply to whispers",
+            default: false
+          }
+        ]
+      },
+      {
+        id: "speech.restrainedSpeech",
+        name: "Restrained speech",
+        category: "Speech",
+        description: "The player can only say the configured phrases, nothing else (case and end punctuation are ignored). Purely out-of-character messages are exempt.",
+        bcxEquivalent: "speech_restrained_speech",
+        settings: [
+          {
+            type: "stringList",
+            name: "phrases",
+            label: "Allowed phrases:",
+            default: [
+              "Yes Miss",
+              "No Miss",
+              "Thank you Miss",
+              "Please Miss"
+            ],
+            maxChars: 120,
+            entryLabel: "phrase"
+          }
+        ]
+      },
+      {
+        id: "speech.dollTalk",
+        name: "Doll talk",
+        category: "Speech",
+        description: "The player can only speak in short, simple phrases: limited words per message and letters per word. Out-of-character text is not affected.",
+        bcxEquivalent: "speech_doll_talk",
+        settings: [
+          {
+            type: "option",
+            name: "maxWords",
+            label: "Maximum words per message",
+            options: [
+              "3",
+              "5",
+              "7",
+              "10"
+            ],
+            default: "5"
+          },
+          {
+            type: "option",
+            name: "maxWordLength",
+            label: "Maximum letters per word",
+            options: [
+              "4",
+              "5",
+              "6",
+              "7",
+              "8"
+            ],
+            default: "6"
+          }
+        ]
+      },
+      {
+        id: "speech.wordReplace",
+        name: "Replace spoken words",
+        category: "Speech",
+        description: 'Configured words are replaced in everything the player says. Each entry is word:replacement (e.g. "i:this doll"). Out-of-character text is not affected.',
+        bcxEquivalent: "speech_replace_spoken_words",
+        settings: [
+          {
+            type: "stringList",
+            name: "replacements",
+            label: "Replacements:",
+            default: [],
+            maxChars: 120,
+            entryLabel: "word:replacement"
+          }
+        ]
+      },
+      {
+        id: "speech.faltering",
+        name: "Enforce faltering speech",
+        category: "Speech",
+        description: "The player's spoken messages come out st-st-stuttering. Out-of-character text is not affected.",
+        bcxEquivalent: "speech_alter_faltering",
+        settings: []
+      },
+      {
+        id: "speech.forbidShouting",
+        name: "Forbid shouting",
+        category: "Speech",
+        description: "All-caps chat messages are lowered to normal speech when enforced.",
+        settings: []
+      },
+      {
+        id: "speech.forbidEmotes",
+        name: "Forbid emotes",
+        category: "Speech",
+        description: "The player cannot send emote messages to the room.",
+        bcxEquivalent: "speech_forbid_emotes",
+        settings: []
+      },
+      {
+        id: "social.forbidBeepMessages",
+        name: "Forbid beep messages",
+        category: "Social",
+        description: "The player cannot send beeps with message content to friends.",
+        bcxEquivalent: "speech_restrict_beep_send",
+        settings: [
+          {
+            type: "checkbox",
+            name: "allowPlainBeeps",
+            label: "Still allow plain beeps without a message",
+            default: true
+          }
+        ]
+      },
+      {
+        id: "social.forbidBeeps",
+        name: "Forbid sending beeps",
+        category: "Social",
+        description: "The player cannot send any beeps at all, with or without a message. Hidden mod-to-mod beeps (leashes, summons, BCX) are unaffected, and configured members can still be beeped.",
+        settings: [
+          {
+            type: "members",
+            name: "allowedMembers",
+            label: "Members who may still be beeped:",
+            default: []
+          }
+        ]
+      },
+      {
+        id: "social.friendListChanges",
+        name: "Forbid friend-list changes",
+        category: "Social",
+        description: "The player cannot add or remove BC friends; each direction can be toggled separately. Covers the friend list screen and in-room dialogs.",
+        settings: [
+          {
+            type: "checkbox",
+            name: "blockAdding",
+            label: "Block adding friends",
+            default: true
+          },
+          {
+            type: "checkbox",
+            name: "blockRemoving",
+            label: "Block removing friends",
+            default: true
+          }
+        ]
+      },
+      {
+        id: "chat.forbidLeaving",
+        name: "Forbid leaving the room",
+        category: "Other",
+        description: "The player cannot leave the chat room they are in - the exit button and leave commands from other mods are both blocked. Forced moves (leashes, kicks, BC's safeword release) and disconnects are not prevented.",
+        bcxEquivalent: "block_leaving_room",
+        settings: []
+      },
+      {
+        id: "rooms.create",
+        name: "Forbid creating new rooms",
+        category: "Rooms",
+        description: "The player cannot open the room creation screen. Changing settings of an existing room they administrate is unaffected.",
+        bcxEquivalent: "block_creating_rooms",
+        settings: []
+      },
+      {
+        id: "rooms.entry",
+        name: "Restrict entering rooms",
+        category: "Rooms",
+        description: 'The player can only join rooms whose name is on the configured list (case-insensitive). As a safety measure the rule does nothing while the list is empty. Being moved by a BC+ command or summon is not restricted. Combines well with "Forbid creating new rooms".',
+        bcxEquivalent: "block_entering_rooms",
+        settings: [
+          {
+            type: "stringList",
+            name: "allowedRooms",
+            label: "Allowed room names:",
+            default: [],
+            maxChars: 60,
+            entryLabel: "room name"
+          }
+        ]
+      },
+      {
+        id: "rooms.adminUI",
+        name: "Forbid room admin UI while blind",
+        category: "Rooms",
+        description: "The player cannot open the room administration screen while unable to see - it would disclose the room background and admin member numbers. Admin chat commands still work.",
+        bcxEquivalent: "block_room_admin_UI",
+        settings: []
+      },
+      {
+        id: "social.greetRoom",
+        name: "Order to greet the room",
+        category: "Social",
+        description: "On entering a chat room, the player automatically says the configured greeting.",
+        bcxEquivalent: "greet_room_order",
+        settings: [
+          {
+            type: "text",
+            name: "greeting",
+            label: "Greeting:",
+            default: "Hello everyone!",
+            maxChars: 200
+          }
+        ]
+      },
+      {
+        id: "social.farewell",
+        name: "Farewell on leave",
+        category: "Social",
+        description: "When leaving a chat room, the player automatically says the configured farewell first.",
+        bcxEquivalent: "farewell_on_slow_leave",
+        settings: [
+          {
+            type: "text",
+            name: "farewell",
+            label: "Farewell:",
+            default: "Goodbye everyone!",
+            maxChars: 200
+          }
+        ]
+      },
+      {
+        id: "other.listenToMyVoice",
+        name: "Listen to my voice",
+        category: "Other",
+        description: "One of the configured sentences appears to the player at random, at the set interval, while they are in a chat room. Only they can see it.",
+        bcxEquivalent: "other_constant_reminder",
+        settings: [
+          {
+            type: "stringList",
+            name: "sentences",
+            label: "Sentences:",
+            default: [],
+            maxChars: 200,
+            entryLabel: "sentence",
+            legacySeparator: "|"
+          },
+          {
+            type: "option",
+            name: "frequency",
+            label: "Minutes between sentences",
+            options: [
+              "2",
+              "5",
+              "10",
+              "15",
+              "30"
+            ],
+            default: "15"
+          }
+        ]
+      },
+      {
+        id: "other.summon",
+        name: "Ready to be summoned",
+        category: "Other",
+        description: `Configured members can summon the player from anywhere in the club with a beep whose message starts with the summon text (or just "summon"). After the delay, the player is pulled to the summoner's room - ignoring leashes and locked doors. If the target room is full, they end up in the lobby. The summoner must be in a room and leave "attach room" enabled when writing the beep, or it carries no room to move to.`,
+        bcxEquivalent: "alt_forced_summoning",
+        settings: [
+          {
+            type: "members",
+            name: "allowedMembers",
+            label: "Members who may summon:",
+            default: []
+          },
+          {
+            type: "text",
+            name: "summonText",
+            label: "Summon text:",
+            default: "Come to my room immediately",
+            maxChars: 100
+          },
+          {
+            type: "option",
+            name: "delay",
+            label: "Seconds before enforcing",
+            options: [
+              "10",
+              "15",
+              "30",
+              "60"
+            ],
+            default: "15"
+          }
+        ]
+      },
+      {
+        id: "protect.ownerChanges",
+        name: "Forbid club owner changes",
+        category: "Protection",
+        description: "The player cannot leave their current club owner or submit to a new one. Advancing a trial to full ownership is unaffected, and their owner can still release them.",
+        bcxEquivalent: "rc_club_owner",
+        settings: []
+      },
+      {
+        id: "protect.newLovers",
+        name: "Forbid getting new lovers",
+        category: "Protection",
+        description: "The player cannot start dating anyone new. Advancing an existing lovership (dating to engagement to marriage) is unaffected.",
+        bcxEquivalent: "rc_lover_new",
+        settings: []
+      },
+      {
+        id: "protect.breakup",
+        name: "Forbid breaking up with lovers",
+        category: "Protection",
+        description: "The player cannot leave any of their lovers, at any lovership stage - neither through the Management mistress nor directly in a chat room. Their lovers can still break up with them.",
+        bcxEquivalent: "rc_lover_leave",
+        settings: []
+      },
+      {
+        id: "protect.newSubs",
+        name: "Forbid taking new submissives",
+        category: "Protection",
+        description: "The player cannot offer an ownership trial to a new submissive. Advancing an existing trial to full ownership is unaffected.",
+        bcxEquivalent: "rc_sub_new",
+        settings: []
+      },
+      {
+        id: "protect.disowning",
+        name: "Forbid disowning submissives",
+        category: "Protection",
+        description: "The player cannot let go of any of their submissives (trial or full ownership). Their submissives can still break the bond themselves.",
+        bcxEquivalent: "rc_sub_leave",
+        settings: []
+      },
+      {
+        id: "protect.blacklist",
+        name: "Prevent blacklisting",
+        category: "Protection",
+        description: "The player cannot add people holding the configured role (or higher) to their BC blacklist or ghostlist.",
+        bcxEquivalent: "block_blacklisting",
+        settings: [
+          {
+            type: "option",
+            name: "minRole",
+            label: "Protect this role and higher",
+            options: [
+              "BC Owner",
+              "Co-Owner",
+              "Lover",
+              "Mistress",
+              "Whitelist",
+              "Friend"
+            ],
+            default: "Mistress"
+          }
+        ]
+      },
+      {
+        id: "protect.whitelist",
+        name: "Prevent whitelisting",
+        category: "Protection",
+        description: "The player can only add people holding the configured role (or higher) to their BC whitelist.",
+        bcxEquivalent: "block_whitelisting",
+        settings: [
+          {
+            type: "option",
+            name: "minRole",
+            label: "Lowest role allowed on the whitelist",
+            options: [
+              "BC Owner",
+              "Co-Owner",
+              "Lover",
+              "Mistress",
+              "Whitelist",
+              "Friend"
+            ],
+            default: "Mistress"
+          }
+        ]
+      },
+      {
+        id: "protect.hardcore",
+        name: "Hardcore Mode",
+        category: "Protection",
+        description: "Forces both hardcore options from the General page on while this rule is in effect, locked: the player cannot open their own BC+ while their hands are bound, and people whose hands are bound are refused when they try to change anything in the player's BC+. The player's own choice of the two options is untouched underneath and returns the moment the rule ends. Requires enforcement to have any effect.",
+        settings: []
+      },
+      {
+        id: "items.tyingSelf",
+        name: "Forbid tying up self",
+        category: "Items",
+        description: "The player cannot use items on their own body, including swapping worn items.",
+        bcxEquivalent: "block_tying_self",
+        settings: []
+      },
+      {
+        id: "items.tyingOthers",
+        name: "Forbid tying up others",
+        category: "Items",
+        description: "The player cannot use items on other characters. Can be limited to characters with a higher dominant score than the player.",
+        bcxEquivalent: "block_tying_others",
+        settings: [
+          {
+            type: "checkbox",
+            name: "onlyDominants",
+            label: "Only forbid using items on more dominant characters",
+            default: true
+          }
+        ]
+      },
+      {
+        id: "items.freeingSelf",
+        name: "Forbid freeing self",
+        category: "Items",
+        description: "The player cannot remove, struggle out of or escape items on their own body. Others can still remove them. Low-difficulty items (hand-held toys, plushies...) can optionally stay removable.",
+        bcxEquivalent: "block_freeing_self",
+        settings: [
+          {
+            type: "checkbox",
+            name: "allowEasy",
+            label: "Still allow removing low-difficulty items",
+            default: false
+          }
+        ]
+      },
+      {
+        id: "items.freeingOthers",
+        name: "Forbid freeing others",
+        category: "Items",
+        description: "The player cannot remove items from other characters. Low-difficulty items (hand-held toys, plushies...) can optionally stay removable.",
+        bcxEquivalent: "block_freeing_others",
+        settings: [
+          {
+            type: "checkbox",
+            name: "allowEasy",
+            label: "Still allow removing low-difficulty items",
+            default: false
+          }
+        ]
+      },
+      {
+        id: "items.wardrobeSelf",
+        name: "Forbid wardrobe use on self",
+        category: "Items",
+        description: "The player cannot change their own clothes. Others can still change them.",
+        bcxEquivalent: "block_wardrobe_access_self",
+        settings: []
+      },
+      {
+        id: "items.wardrobeOthers",
+        name: "Forbid wardrobe use on others",
+        category: "Items",
+        description: "The player cannot change the clothes of other club members.",
+        bcxEquivalent: "block_wardrobe_access_others",
+        settings: []
+      },
+      {
+        id: "locks.remotesSelf",
+        name: "Forbid using remotes on self",
+        category: "Items",
+        description: "The player cannot use a vibrator remote on their own body. Others can still use remotes on them.",
+        bcxEquivalent: "block_remoteuse_self",
+        settings: []
+      },
+      {
+        id: "locks.remotesOthers",
+        name: "Forbid using remotes on others",
+        category: "Items",
+        description: "The player cannot use a vibrator remote on anyone else.",
+        bcxEquivalent: "block_remoteuse_others",
+        settings: []
+      },
+      {
+        id: "locks.keysSelf",
+        name: "Forbid using keys on self",
+        category: "Items",
+        description: "The player cannot unlock locks on their own body, even with the key.",
+        bcxEquivalent: "block_keyuse_self",
+        settings: []
+      },
+      {
+        id: "locks.keysOthers",
+        name: "Forbid using keys on others",
+        category: "Items",
+        description: "The player cannot unlock locks on anyone else.",
+        bcxEquivalent: "block_keyuse_others",
+        settings: []
+      },
+      {
+        id: "locks.pickSelf",
+        name: "Forbid picking locks on self",
+        category: "Items",
+        description: "The player cannot pick locks on their own body.",
+        bcxEquivalent: "block_lockpicking_self",
+        settings: []
+      },
+      {
+        id: "locks.pickOthers",
+        name: "Forbid picking locks on others",
+        category: "Items",
+        description: "The player cannot pick locks on anyone else.",
+        bcxEquivalent: "block_lockpicking_others",
+        settings: []
+      },
+      {
+        id: "locks.lockSelf",
+        name: "Forbid using locks on self",
+        category: "Items",
+        description: "The player cannot apply locks to their own body.",
+        bcxEquivalent: "block_lockuse_self",
+        settings: []
+      },
+      {
+        id: "locks.lockOthers",
+        name: "Forbid using locks on others",
+        category: "Items",
+        description: "The player cannot apply locks to anyone else.",
+        bcxEquivalent: "block_lockuse_others",
+        settings: []
+      },
+      {
+        id: "sensory.sound",
+        name: "Sensory deprivation: Sound",
+        category: "Sensory",
+        description: "Impacts the player's natural hearing the same way items do, independent of them. Strength is adjustable; stacks with worn items.",
+        bcxEquivalent: "alt_restrict_hearing",
+        settings: [
+          {
+            type: "option",
+            name: "strength",
+            label: "Hearing impairment",
+            options: [
+              "Light",
+              "Medium",
+              "Heavy"
+            ],
+            default: "Light"
+          }
+        ]
+      },
+      {
+        id: "sensory.hearingWhitelist",
+        name: "Hearing whitelist",
+        category: "Sensory",
+        description: "The listed members are always understood clearly, no matter how deafened the player is (by items or rules). Optionally even when those members are gagged.",
+        bcxEquivalent: "alt_hearing_whitelist",
+        settings: [
+          {
+            type: "members",
+            name: "members",
+            label: "Members always heard:",
+            default: []
+          },
+          {
+            type: "checkbox",
+            name: "includeGagged",
+            label: "Understand them even while they are gagged",
+            default: false
+          }
+        ]
+      },
+      {
+        id: "sensory.sight",
+        name: "Sensory deprivation: Sight",
+        category: "Sensory",
+        description: "Impacts the player's natural eyesight the same way items do, independent of them. Strength is adjustable; stacks with worn items.",
+        bcxEquivalent: "alt_restrict_sight",
+        settings: [
+          {
+            type: "option",
+            name: "strength",
+            label: "Eyesight impairment",
+            options: [
+              "Light",
+              "Medium",
+              "Heavy"
+            ],
+            default: "Light"
+          }
+        ]
+      },
+      {
+        id: "sensory.seeingWhitelist",
+        name: "Seeing whitelist",
+        category: "Sensory",
+        description: "The listed members are always seen normally, no matter how blinded the player is (by items or rules).",
+        bcxEquivalent: "alt_seeing_whitelist",
+        settings: [
+          {
+            type: "members",
+            name: "members",
+            label: "Members always seen:",
+            default: []
+          }
+        ]
+      },
+      {
+        id: "body.forbidPoses",
+        name: "Forbid changing poses",
+        category: "Body",
+        description: "The player cannot change their own body pose unaided - kneeling, standing up, spreading and every other pose stays as it is. Others (and items) can still pose them.",
+        bcxEquivalent: "block_restrict_allowed_poses",
+        settings: []
+      },
+      {
+        id: "body.forbiddenPoses",
+        name: "Forbid specific poses",
+        category: "Body",
+        description: "The player cannot change into the listed poses by themselves. Pose names: BaseUpper, BackBoxTie, BackCuffs, BackElbowTouch, OverTheHead, Yoked, BaseLower, Kneel, KneelingSpread, LegsClosed, Spread, Hogtied, AllFours, Suspension, TapedHands.",
+        bcxEquivalent: "block_restrict_allowed_poses",
+        settings: [
+          {
+            type: "stringList",
+            name: "poses",
+            label: "Forbidden poses:",
+            default: [],
+            maxChars: 30,
+            entryLabel: "pose name"
+          }
+        ]
+      },
+      {
+        id: "body.forceKneel",
+        name: "Forced to kneel",
+        category: "Body",
+        description: "The player must stay on their knees: choosing a standing lower-body pose is blocked, and if they end up standing they are put back down. Poses that need aid (restraints forcing them upright) are left alone rather than fought.",
+        settings: []
+      },
+      {
+        id: "body.forcedPosition",
+        name: "Forced position",
+        category: "Body",
+        description: "The player is held in a chosen position: pick an arms pose, a legs pose, or both (e.g. hands behind back with legs spread), or a full-body position (hogtied or all fours) that overrides the other two. Changing away is blocked and any deviation is corrected. Poses held by restraints are left alone rather than fought.",
+        settings: [
+          {
+            type: "option",
+            name: "fullPose",
+            label: "Full body (overrides arms/legs)",
+            options: [
+              "Any",
+              "Hogtied",
+              "All fours"
+            ],
+            default: "Any"
+          },
+          {
+            type: "option",
+            name: "armsPose",
+            label: "Arms",
+            options: [
+              "Any",
+              "Free",
+              "Hands behind back",
+              "Elbows behind back",
+              "Wrists behind back",
+              "Yoked",
+              "Arms overhead"
+            ],
+            default: "Any"
+          },
+          {
+            type: "option",
+            name: "legsPose",
+            label: "Legs",
+            options: [
+              "Any",
+              "Standing",
+              "Legs closed",
+              "Legs spread",
+              "Kneeling",
+              "Kneeling spread"
+            ],
+            default: "Any"
+          }
+        ]
+      },
+      {
+        id: "body.afkBehavior",
+        name: "Forced AFK behavior",
+        category: "Body",
+        description: "When the player goes idle, the configured behaviors apply automatically: the Afk emoticon, closed eyes, kneeling, and an automatic reply to whispers. Emoticon and eyes are restored the moment the player is back; a forced kneel is left for them to stand up from.",
+        settings: [
+          {
+            type: "option",
+            name: "idleMinutes",
+            label: "Minutes until idle",
+            options: [
+              "2",
+              "5",
+              "10",
+              "15",
+              "30"
+            ],
+            default: "5"
+          },
+          {
+            type: "checkbox",
+            name: "afkEmoticon",
+            label: "Show the Afk emoticon",
+            default: true
+          },
+          {
+            type: "checkbox",
+            name: "closeEyes",
+            label: "Close the eyes",
+            default: false
+          },
+          {
+            type: "checkbox",
+            name: "kneel",
+            label: "Kneel down",
+            default: false
+          },
+          {
+            type: "checkbox",
+            name: "autoReply",
+            label: "Auto-reply to whispers",
+            default: false
+          },
+          {
+            type: "text",
+            name: "replyText",
+            label: "Auto-reply text:",
+            default: "I am away from the club right now.",
+            maxChars: 150
+          }
+        ]
+      },
+      {
+        id: "pet.speech",
+        name: "Speak like a pet",
+        category: "Pet",
+        description: "The player's speech turns pet-like: Sprinkle mode weaves animal sounds between the words, Replace mode swaps words for sounds outright - up to fully non-verbal at Max intensity. Pick an animal sound set or provide custom sounds. Out-of-character text is never touched.",
+        settings: [
+          {
+            type: "option",
+            name: "animal",
+            label: "Sound set",
+            options: [
+              "Bunny",
+              "Cat",
+              "Cow",
+              "Dog",
+              "Fox",
+              "Mouse",
+              "Pony",
+              "Wolf",
+              "Custom"
+            ],
+            default: "Cat"
+          },
+          {
+            type: "stringList",
+            name: "sounds",
+            label: "Custom sounds (used with the Custom set):",
+            default: [],
+            maxChars: 24,
+            maxEntries: 20,
+            entryLabel: "sound"
+          },
+          {
+            type: "option",
+            name: "mode",
+            label: "Mode",
+            options: [
+              "Sprinkle",
+              "Replace"
+            ],
+            default: "Sprinkle"
+          },
+          {
+            type: "option",
+            name: "intensity",
+            label: "Intensity",
+            options: [
+              "Low",
+              "Medium",
+              "High",
+              "Max"
+            ],
+            default: "Medium"
+          }
+        ]
+      },
+      {
+        id: "pet.hearing",
+        name: "Hear like a pet",
+        category: "Pet",
+        description: `Pet words - commands, praise, the pet's own name, the chosen animal's vocabulary and any custom extras - always come through clearly, while the rest of what the player hears garbles away. "Only when deafened" merely lets the pet words pierce existing deafness (item- or hunger-induced); Light and Heavy garble everything else all the time. Out-of-character text is never touched.`,
+        settings: [
+          {
+            type: "option",
+            name: "animal",
+            label: "Vocabulary set",
+            options: [
+              "Bunny",
+              "Cat",
+              "Cow",
+              "Dog",
+              "Fox",
+              "Mouse",
+              "Pony",
+              "Wolf",
+              "Custom"
+            ],
+            default: "Cat"
+          },
+          {
+            type: "stringList",
+            name: "words",
+            label: "Extra understood words:",
+            default: [],
+            maxChars: 32,
+            maxEntries: 30,
+            entryLabel: "word"
+          },
+          {
+            type: "option",
+            name: "strength",
+            label: "Everything else garbles",
+            options: [
+              "Only when deafened",
+              "Light",
+              "Heavy"
+            ],
+            default: "Light"
+          }
+        ]
+      },
+      {
+        id: "body.controlOrgasms",
+        name: "Control orgasms",
+        category: "Body",
+        description: "Controls what happens when the player's arousal peaks, independent of items: Edge keeps the meter just below the top so the orgasm never starts; Ruin starts the orgasm screen but denies the actual climax; No resisting removes the option to fight an orgasm off. Requires the arousal meter to be enabled.",
+        bcxEquivalent: "alt_control_orgasms",
+        settings: [
+          {
+            type: "option",
+            name: "mode",
+            label: "Orgasm attempts are:",
+            options: [
+              "Edged",
+              "Ruined",
+              "Unresistable"
+            ],
+            default: "Edged"
+          }
+        ]
+      },
+      {
+        id: "body.secretOrgasms",
+        name: "Secret arousal meter",
+        category: "Body",
+        description: "The player cannot see their own arousal meter even while it is active - the orgasm quick-time event comes as a surprise. Whether others can see the meter is unchanged (that stays a BC setting).",
+        bcxEquivalent: "alt_secret_orgasms",
+        settings: []
+      },
+      {
+        id: "control.difficulty",
+        name: "Forbid changing difficulty",
+        category: "Other",
+        description: "The player cannot change their Bondage Club multiplayer difficulty, whatever it currently is.",
+        bcxEquivalent: "block_difficulty_change",
+        settings: []
+      },
+      {
+        id: "control.activities",
+        name: "Forbid using activities",
+        category: "Other",
+        description: "The player cannot use any (sexual) activities on anyone - the activities button vanishes from the item dialogs. Others can still use activities on the player; the arousal system itself stays untouched.",
+        bcxEquivalent: "block_activities",
+        settings: []
+      },
+      {
+        id: "control.emoticon",
+        name: "Forbid changing emoticon",
+        category: "Social",
+        description: "The player cannot show, change or remove the emoticon (afk, sleep, ...) over their own head.",
+        bcxEquivalent: "block_changing_emoticon",
+        settings: []
+      },
+      {
+        id: "control.leash",
+        name: "Restrict who may leash",
+        category: "Protection",
+        description: "Only people of at least the configured BC+ role can take the player onto a leash; everyone else's leash slips off with a room message.",
+        bcxEquivalent: "alt_restrict_leashability",
+        settings: [
+          {
+            type: "option",
+            name: "minimumRole",
+            label: "Leashing needs at least:",
+            options: [
+              "BC Owner",
+              "Co-Owner",
+              "Lover",
+              "Mistress",
+              "Whitelist",
+              "Friend"
+            ],
+            default: "Co-Owner"
+          }
+        ]
+      },
+      {
+        id: "control.nickname",
+        name: "Control nickname",
+        category: "Social",
+        description: "Locks the player's BC nickname: with a nickname configured it is forced to that; with the field left empty the nickname the player had when the rule took hold is kept. The nickname stays as-is when the rule ends.",
+        bcxEquivalent: "alt_set_nickname",
+        settings: [
+          {
+            type: "text",
+            name: "nickname",
+            label: "Forced nickname (empty = lock current):",
+            default: "",
+            maxChars: 20
+          }
+        ]
+      },
+      {
+        id: "control.profile",
+        name: "Lock profile description",
+        category: "Social",
+        description: "Freezes the player's online profile description: any change is reverted to the text it had when the rule took hold. The description stays as-is when the rule ends.",
+        bcxEquivalent: "alt_set_profile_description",
+        settings: []
+      },
+      {
+        id: "settings.itemPermission",
+        name: "Force 'Item permission'",
+        category: "Settings",
+        description: "Pins who is allowed to use items on the player. While enforced, the 'Item permission' setting is held at the configured value - changes snap back within seconds. With the restore option on, the value from before the rule took hold returns when the rule stops applying.",
+        bcxEquivalent: "setting_item_permission",
+        settings: [
+          {
+            type: "option",
+            name: "value",
+            label: "Forced value",
+            options: [
+              "Everyone, no exceptions",
+              "Everyone, except blacklist",
+              "Owner, Lovers, whitelist & Dominants",
+              "Owner, Lovers and whitelist only",
+              "Owner and Lovers only",
+              "Owner only"
+            ],
+            default: "Everyone, no exceptions"
+          },
+          {
+            type: "checkbox",
+            name: "restore",
+            label: "Restore the previous value when the rule ends",
+            default: true
+          }
+        ]
+      },
+      {
+        id: "settings.lockpickingSelf",
+        name: "Force 'Locks on you can't be picked'",
+        category: "Settings",
+        description: "Pins whether locks on the player can be picked at all. While enforced, the 'Locks on you can't be picked' setting is held at the configured value - changes snap back within seconds. With the restore option on, the value from before the rule took hold returns when the rule stops applying.",
+        bcxEquivalent: "setting_forbid_lockpicking",
+        settings: [
+          {
+            type: "option",
+            name: "value",
+            label: "Forced value",
+            options: [
+              "Locks cannot be picked",
+              "Locks can be picked"
+            ],
+            default: "Locks cannot be picked"
+          },
+          {
+            type: "checkbox",
+            name: "restore",
+            label: "Restore the previous value when the rule ends",
+            default: true
+          }
+        ]
+      },
+      {
+        id: "settings.spRooms",
+        name: "Force 'Cannot enter single-player rooms when restrained'",
+        category: "Settings",
+        description: "Pins whether being restrained blocks entering single-player rooms. While enforced, the 'Cannot enter single-player rooms when restrained' setting is held at the configured value - changes snap back within seconds. With the restore option on, the value from before the rule took hold returns when the rule stops applying.",
+        bcxEquivalent: "setting_forbid_SP_rooms",
+        settings: [
+          {
+            type: "option",
+            name: "value",
+            label: "Forced value",
+            options: [
+              "Blocked while restrained",
+              "Always allowed"
+            ],
+            default: "Blocked while restrained"
+          },
+          {
+            type: "checkbox",
+            name: "restore",
+            label: "Restore the previous value when the rule ends",
+            default: true
+          }
+        ]
+      },
+      {
+        id: "settings.safeword",
+        name: "Force 'Allow safeword use'",
+        category: "Settings",
+        description: "Pins BC's safeword setting. Forcing it off removes the player's in-game safeword release - use with care and consent. While enforced, the 'Allow safeword use' setting is held at the configured value - changes snap back within seconds. With the restore option on, the value from before the rule took hold returns when the rule stops applying.",
+        bcxEquivalent: "setting_forbid_safeword",
+        settings: [
+          {
+            type: "option",
+            name: "value",
+            label: "Forced value",
+            options: [
+              "Safeword allowed",
+              "Safeword disabled"
+            ],
+            default: "Safeword disabled"
+          },
+          {
+            type: "checkbox",
+            name: "restore",
+            label: "Restore the previous value when the rule ends",
+            default: true
+          }
+        ]
+      },
+      {
+        id: "settings.arousalMeter",
+        name: "Force 'Arousal meter'",
+        category: "Settings",
+        description: "Pins the arousal meter's activation mode. While enforced, the 'Arousal meter' setting is held at the configured value - changes snap back within seconds. With the restore option on, the value from before the rule took hold returns when the rule stops applying.",
+        bcxEquivalent: "setting_arousal_meter",
+        settings: [
+          {
+            type: "option",
+            name: "value",
+            label: "Forced value",
+            options: [
+              "Disable sexual activities",
+              "Allow without a meter",
+              "Allow with a manual meter",
+              "Allow with a hybrid meter",
+              "Allow with a locked meter"
+            ],
+            default: "Allow with a hybrid meter"
+          },
+          {
+            type: "checkbox",
+            name: "restore",
+            label: "Restore the previous value when the rule ends",
+            default: true
+          }
+        ]
+      },
+      {
+        id: "settings.arousalStutter",
+        name: "Force 'Arousal speech stuttering'",
+        category: "Settings",
+        description: "Pins when arousal makes the player's speech stutter. While enforced, the 'Arousal speech stuttering' setting is held at the configured value - changes snap back within seconds. With the restore option on, the value from before the rule took hold returns when the rule stops applying.",
+        bcxEquivalent: "setting_arousal_stutter",
+        settings: [
+          {
+            type: "option",
+            name: "value",
+            label: "Forced value",
+            options: [
+              "Never stutter",
+              "When aroused",
+              "When vibrated",
+              "Aroused & vibrated"
+            ],
+            default: "Aroused & vibrated"
+          },
+          {
+            type: "checkbox",
+            name: "restore",
+            label: "Restore the previous value when the rule ends",
+            default: true
+          }
+        ]
+      },
+      {
+        id: "settings.vibeModes",
+        name: "Force 'Block advanced vibrator modes'",
+        category: "Settings",
+        description: "Pins whether advanced (escalating/random/edging) vibrator modes work on the player. While enforced, the 'Block advanced vibrator modes' setting is held at the configured value - changes snap back within seconds. With the restore option on, the value from before the rule took hold returns when the rule stops applying.",
+        bcxEquivalent: "setting_block_vibe_modes",
+        settings: [
+          {
+            type: "option",
+            name: "value",
+            label: "Forced value",
+            options: [
+              "Advanced modes blocked",
+              "Advanced modes allowed"
+            ],
+            default: "Advanced modes allowed"
+          },
+          {
+            type: "checkbox",
+            name: "restore",
+            label: "Restore the previous value when the rule ends",
+            default: true
+          }
+        ]
+      },
+      {
+        id: "settings.afkBubble",
+        name: "Force 'Show AFK bubble'",
+        category: "Settings",
+        description: "Pins whether the player shows the automatic AFK bubble when idle. While enforced, the 'Show AFK bubble' setting is held at the configured value - changes snap back within seconds. With the restore option on, the value from before the rule took hold returns when the rule stops applying.",
+        bcxEquivalent: "setting_show_afk",
+        settings: [
+          {
+            type: "option",
+            name: "value",
+            label: "Forced value",
+            options: [
+              "AFK bubble shown",
+              "AFK bubble hidden"
+            ],
+            default: "AFK bubble shown"
+          },
+          {
+            type: "checkbox",
+            name: "restore",
+            label: "Restore the previous value when the rule ends",
+            default: true
+          }
+        ]
+      },
+      {
+        id: "settings.bodyMod",
+        name: "Force 'Allow others to alter your whole appearance'",
+        category: "Settings",
+        description: "Pins whether people with wardrobe access may change the player's whole appearance including body parts. While enforced, the 'Allow others to alter your whole appearance' setting is held at the configured value - changes snap back within seconds. With the restore option on, the value from before the rule took hold returns when the rule stops applying.",
+        bcxEquivalent: "setting_allow_body_mod",
+        settings: [
+          {
+            type: "option",
+            name: "value",
+            label: "Forced value",
+            options: [
+              "Full appearance access",
+              "Body is off-limits"
+            ],
+            default: "Full appearance access"
+          },
+          {
+            type: "checkbox",
+            name: "restore",
+            label: "Restore the previous value when the rule ends",
+            default: true
+          }
+        ]
+      },
+      {
+        id: "settings.cosplayChange",
+        name: "Force 'Prevent others from changing cosplay items'",
+        category: "Settings",
+        description: "Pins whether others may change the player's cosplay items (ears, tails, wings). While enforced, the 'Prevent others from changing cosplay items' setting is held at the configured value - changes snap back within seconds. With the restore option on, the value from before the rule took hold returns when the rule stops applying.",
+        bcxEquivalent: "setting_forbid_cosplay_change",
+        settings: [
+          {
+            type: "option",
+            name: "value",
+            label: "Forced value",
+            options: [
+              "Cosplay items protected",
+              "Cosplay items changeable"
+            ],
+            default: "Cosplay items changeable"
+          },
+          {
+            type: "checkbox",
+            name: "restore",
+            label: "Restore the previous value when the rule ends",
+            default: true
+          }
+        ]
+      },
+      {
+        id: "settings.sensdep",
+        name: "Force 'Sensory deprivation setting'",
+        category: "Settings",
+        description: "Pins how strongly blindness items affect the player. While enforced, the 'Sensory deprivation setting' setting is held at the configured value - changes snap back within seconds. With the restore option on, the value from before the rule took hold returns when the rule stops applying.",
+        bcxEquivalent: "setting_sensdep",
+        settings: [
+          {
+            type: "option",
+            name: "value",
+            label: "Forced value",
+            options: [
+              "Light",
+              "Normal",
+              "Hide names",
+              "Heavy",
+              "Total"
+            ],
+            default: "Normal"
+          },
+          {
+            type: "checkbox",
+            name: "restore",
+            label: "Restore the previous value when the rule ends",
+            default: true
+          }
+        ]
+      },
+      {
+        id: "settings.hideNonAdjacent",
+        name: "Force 'Hide non-adjacent players while partially blind'",
+        category: "Settings",
+        description: "Pins whether partial blindness hides everyone not standing next to the player. While enforced, the 'Hide non-adjacent players while partially blind' setting is held at the configured value - changes snap back within seconds. With the restore option on, the value from before the rule took hold returns when the rule stops applying.",
+        bcxEquivalent: "setting_hide_non_adjecent",
+        settings: [
+          {
+            type: "option",
+            name: "value",
+            label: "Forced value",
+            options: [
+              "Hidden while blind",
+              "Always visible"
+            ],
+            default: "Hidden while blind"
+          },
+          {
+            type: "checkbox",
+            name: "restore",
+            label: "Restore the previous value when the rule ends",
+            default: true
+          }
+        ]
+      },
+      {
+        id: "settings.blindRoomGarbling",
+        name: "Force 'Garble chatroom names and descriptions while blind'",
+        category: "Settings",
+        description: "Pins whether room names and descriptions garble while the player is blind. While enforced, the 'Garble chatroom names and descriptions while blind' setting is held at the configured value - changes snap back within seconds. With the restore option on, the value from before the rule took hold returns when the rule stops applying.",
+        bcxEquivalent: "setting_blind_room_garbling",
+        settings: [
+          {
+            type: "option",
+            name: "value",
+            label: "Forced value",
+            options: [
+              "Garbled while blind",
+              "Always readable"
+            ],
+            default: "Garbled while blind"
+          },
+          {
+            type: "checkbox",
+            name: "restore",
+            label: "Restore the previous value when the rule ends",
+            default: true
+          }
+        ]
+      },
+      {
+        id: "settings.relogKeepsRestraints",
+        name: "Force 'Keep all restraints when relogging'",
+        category: "Settings",
+        description: "Pins whether restraints stay on through a relog. While enforced, the 'Keep all restraints when relogging' setting is held at the configured value - changes snap back within seconds. With the restore option on, the value from before the rule took hold returns when the rule stops applying.",
+        bcxEquivalent: "setting_relog_keeps_restraints",
+        settings: [
+          {
+            type: "option",
+            name: "value",
+            label: "Forced value",
+            options: [
+              "Restraints kept",
+              "Restraints removed"
+            ],
+            default: "Restraints kept"
+          },
+          {
+            type: "checkbox",
+            name: "restore",
+            label: "Restore the previous value when the rule ends",
+            default: true
+          }
+        ]
+      },
+      {
+        id: "settings.leashedRoomChange",
+        name: "Force 'Players can drag you to rooms when leashed'",
+        category: "Settings",
+        description: "Pins whether leash holders can drag the player between rooms. While enforced, the 'Players can drag you to rooms when leashed' setting is held at the configured value - changes snap back within seconds. With the restore option on, the value from before the rule took hold returns when the rule stops applying.",
+        bcxEquivalent: "setting_leashed_roomchange",
+        settings: [
+          {
+            type: "option",
+            name: "value",
+            label: "Forced value",
+            options: [
+              "Dragging allowed",
+              "Dragging blocked"
+            ],
+            default: "Dragging allowed"
+          },
+          {
+            type: "checkbox",
+            name: "restore",
+            label: "Restore the previous value when the rule ends",
+            default: true
+          }
+        ]
+      },
+      {
+        id: "settings.roomRejoin",
+        name: "Force 'Return to chatrooms on relog'",
+        category: "Settings",
+        description: "Pins whether the player returns to the room they were in when they relog. While enforced, the 'Return to chatrooms on relog' setting is held at the configured value - changes snap back within seconds. With the restore option on, the value from before the rule took hold returns when the rule stops applying.",
+        bcxEquivalent: "setting_room_rejoin",
+        settings: [
+          {
+            type: "option",
+            name: "value",
+            label: "Forced value",
+            options: [
+              "Returns to the room",
+              "Starts in the main hall"
+            ],
+            default: "Returns to the room"
+          },
+          {
+            type: "checkbox",
+            name: "restore",
+            label: "Restore the previous value when the rule ends",
+            default: true
+          }
+        ]
+      },
+      {
+        id: "settings.plugVibeEvents",
+        name: "Force 'Events while plugged or vibed'",
+        category: "Settings",
+        description: "Pins whether worn plugs and vibrators cause random immersive chat events. While enforced, the 'Events while plugged or vibed' setting is held at the configured value - changes snap back within seconds. With the restore option on, the value from before the rule took hold returns when the rule stops applying.",
+        bcxEquivalent: "setting_plug_vibe_events",
+        settings: [
+          {
+            type: "option",
+            name: "value",
+            label: "Forced value",
+            options: [
+              "Events enabled",
+              "Events disabled"
+            ],
+            default: "Events enabled"
+          },
+          {
+            type: "checkbox",
+            name: "restore",
+            label: "Restore the previous value when the rule ends",
+            default: true
+          }
+        ]
+      },
+      {
+        id: "settings.tintEffects",
+        name: "Force 'Allow item tint effects'",
+        category: "Settings",
+        description: "Pins whether items may tint the player's vision (colored hoods etc.). While enforced, the 'Allow item tint effects' setting is held at the configured value - changes snap back within seconds. With the restore option on, the value from before the rule took hold returns when the rule stops applying.",
+        bcxEquivalent: "setting_allow_tint_effects",
+        settings: [
+          {
+            type: "option",
+            name: "value",
+            label: "Forced value",
+            options: [
+              "Tints allowed",
+              "Tints disabled"
+            ],
+            default: "Tints allowed"
+          },
+          {
+            type: "checkbox",
+            name: "restore",
+            label: "Restore the previous value when the rule ends",
+            default: true
+          }
+        ]
+      },
+      {
+        id: "settings.blurEffects",
+        name: "Force 'Allow item blur effects'",
+        category: "Settings",
+        description: "Pins whether items may blur the player's vision. While enforced, the 'Allow item blur effects' setting is held at the configured value - changes snap back within seconds. With the restore option on, the value from before the rule took hold returns when the rule stops applying.",
+        bcxEquivalent: "setting_allow_blur_effects",
+        settings: [
+          {
+            type: "option",
+            name: "value",
+            label: "Forced value",
+            options: [
+              "Blur allowed",
+              "Blur disabled"
+            ],
+            default: "Blur allowed"
+          },
+          {
+            type: "checkbox",
+            name: "restore",
+            label: "Restore the previous value when the rule ends",
+            default: true
+          }
+        ]
+      },
+      {
+        id: "settings.upsideDownView",
+        name: "Force 'Flip room vertically when upside-down'",
+        category: "Settings",
+        description: "Pins whether hanging upside-down flips the player's view of the room. While enforced, the 'Flip room vertically when upside-down' setting is held at the configured value - changes snap back within seconds. With the restore option on, the value from before the rule took hold returns when the rule stops applying.",
+        bcxEquivalent: "setting_upsidedown_view",
+        settings: [
+          {
+            type: "option",
+            name: "value",
+            label: "Forced value",
+            options: [
+              "View flips",
+              "View stays upright"
+            ],
+            default: "View flips"
+          },
+          {
+            type: "checkbox",
+            name: "restore",
+            label: "Restore the previous value when the rule ends",
+            default: true
+          }
+        ]
+      }
+    ]
+  };
+
+  // shared/bcplus.js
+  var BCPLUS_VERSION = bcplus_rules_default.bcplusVersion;
+  var RULES = new Map(bcplus_rules_default.rules.map((r) => [r.id, r]));
+  var LIMITS = { MAX_RULES: 30, MAX_ACTIVE: 3, MAX_DURATION_MIN: 43200, MAX_SETTINGS: 32, TITLE: 60, TERMS: 1e3 };
+  var NEVER = {
+    "settings.safeword": "turns off their safeword",
+    "social.forbidBeeps": "stops them beepin' the farm for help",
+    "social.forbidBeepMessages": "stops them beepin' the farm for help",
+    "speech.forbidOOC": "stops them speakin' out of character",
+    "speech.gaggedOOC": "stops them speakin' out of character"
+  };
+  var DURATIONS = [
+    { key: "1h", label: "1 hour", min: 60, words: ["1h", "hour", "1 hour", "an hour"] },
+    { key: "12h", label: "12 hours", min: 720, words: ["12h", "12 hours", "half a day", "a night", "night", "overnight"] },
+    { key: "1d", label: "1 day", min: 1440, words: ["1d", "day", "1 day", "a day"] },
+    { key: "1w", label: "1 week", min: 10080, words: ["1w", "week", "1 week", "a week"] },
+    { key: "2w", label: "2 weeks", min: 20160, words: ["2w", "2 weeks", "two weeks", "fortnight"] },
+    { key: "1m", label: "1 month", min: 43200, words: ["1m", "month", "1 month", "a month", "30 days", "a season", "season"] },
+    { key: "perm", label: "Permanent", min: 0, words: ["perm", "permanent", "forever", "for good", "until released"] }
+  ];
+  function durationFrom(text) {
+    const t = String(text || "").trim().toLowerCase();
+    return DURATIONS.find((d) => d.key === t || d.words.includes(t) || d.label.toLowerCase() === t) || DURATIONS.find((d) => d.words.some((w) => w.length > 3 && t.includes(w))) || null;
+  }
+  var DEPTHS = [
+    { key: "fun", label: "Fun", words: ["fun", "playful", "light", "silly"] },
+    { key: "deep", label: "Deep", words: ["deep", "properly kept", "kept"] },
+    { key: "nhl", label: "No human left", words: ["nhl", "no human left", "all animal", "total"] }
+  ];
+  function depthFrom(text) {
+    const t = String(text || "").trim().toLowerCase();
+    return DEPTHS.find((d) => d.key === t || d.words.includes(t)) || DEPTHS.find((d) => d.words.some((w) => t.includes(w))) || null;
+  }
+  var ANIMALS = {
+    cow: "Cow",
+    bull: "Cow",
+    pony: "Pony",
+    horse: "Pony",
+    pup: "Dog",
+    dog: "Dog",
+    kitt: "Cat",
+    cat: "Cat",
+    bunny: "Bunny",
+    rabbit: "Bunny",
+    fox: "Fox",
+    wolf: "Wolf",
+    mouse: "Mouse"
+  };
+  var SOUNDS = {
+    pig: ["oink", "snort", "squee", "grunt"],
+    goat: ["maa", "meh-eh", "bleat"],
+    sheep: ["baa", "baaah", "meh"],
+    deer: ["bleat", "snort", "huff"],
+    goblin: ["heh", "gnuk", "skree", "hrrk"]
+  };
+  function petFor(species) {
+    const s = String(species || "").toLowerCase();
+    if (ANIMALS[s]) return { animal: ANIMALS[s], sounds: [] };
+    return { animal: "Custom", sounds: SOUNDS[s] || ["moo"] };
+  }
+  var SOUND_WORD = { Cow: "Moo", Pony: "Neigh", Dog: "Woof", Cat: "Mew", Bunny: "Eep", Fox: "Yip", Wolf: "Awoo", Mouse: "Squeak" };
+  function settingProblem(setting, value) {
+    switch (setting.type) {
+      case "checkbox":
+        return typeof value === "boolean" ? "" : "needs on or off";
+      case "option":
+        return typeof value === "string" && setting.options.includes(value) ? "" : "must be one of: " + setting.options.join(", ");
+      case "text": {
+        const max = Math.min(setting.maxChars ?? 256, 1e3);
+        return typeof value === "string" && value.length <= max ? "" : "must be text, " + max + " characters at most";
+      }
+      case "members":
+        return Array.isArray(value) && value.length <= 100 && value.every((m) => Number.isInteger(m) && m >= 0) ? "" : "must be a list of member numbers";
+      case "stringList": {
+        const n = Math.min(setting.maxEntries ?? 50, 100), len = Math.min(setting.maxChars ?? 200, 200);
+        return Array.isArray(value) && value.length <= n && value.every((s) => typeof s === "string" && s.length <= len) ? "" : "must be a list of up to " + n + " entries, " + len + " characters each";
+      }
+      default:
+        return "unknown setting type";
+    }
+  }
+  function makeSpec(ruleId, settings = {}, opts = {}) {
+    const def = RULES.get(ruleId);
+    const base = {};
+    for (const s of def ? def.settings : []) base[s.name] = Array.isArray(s.default) ? s.default.slice() : s.default;
+    const spec = {
+      active: true,
+      enforce: opts.enforce !== false,
+      log: opts.log !== false,
+      announce: opts.announce !== false,
+      settings: Object.assign(base, settings)
+    };
+    if (opts.conditions) {
+      spec.useGlobal = false;
+      spec.conditions = opts.conditions;
+    } else spec.useGlobal = false;
+    return spec;
+  }
+  function checkContract(c) {
+    const out = [];
+    if (!c || typeof c !== "object") return ["not a contract"];
+    if (typeof c.title !== "string" || !c.title.trim()) out.push("it needs a title");
+    else if (c.title.trim().length > LIMITS.TITLE) out.push("the title is longer than " + LIMITS.TITLE + " characters");
+    if (typeof c.terms === "string" && c.terms.length > LIMITS.TERMS) out.push("the terms are longer than " + LIMITS.TERMS + " characters");
+    if (!Number.isInteger(c.durationMin) || c.durationMin < 0 || c.durationMin > LIMITS.MAX_DURATION_MIN) out.push("the length must be up to 30 days, or permanent");
+    if (c.policy !== "author" && c.policy !== "either") out.push("who may end it must be the farm or either side");
+    const ids = Object.keys(c.rules || {});
+    const active = ids.filter((id) => c.rules[id] && c.rules[id].active);
+    if (!active.length) out.push("it has no rules switched on");
+    if (ids.length > LIMITS.MAX_RULES) out.push("BC+ takes " + LIMITS.MAX_RULES + " rules at most");
+    for (const id of ids) {
+      const def = RULES.get(id), spec = c.rules[id];
+      if (!def) {
+        out.push(id + ": BC+ " + BCPLUS_VERSION + " has no rule by that name");
+        continue;
+      }
+      if (NEVER[id] && spec.active) {
+        out.push(def.name + ": the farm never uses this one (it " + NEVER[id] + ")");
+        continue;
+      }
+      const names = Object.keys(spec.settings || {});
+      if (names.length > LIMITS.MAX_SETTINGS) out.push(def.name + ": too many settings");
+      for (const name of names) {
+        const s = def.settings.find((x) => x.name === name);
+        if (!s) {
+          out.push(def.name + ": BC+ has no setting called " + name);
+          continue;
+        }
+        const p = settingProblem(s, spec.settings[name]);
+        if (p) out.push(def.name + " · " + (s.label || name).replace(/:$/, "") + ": " + p);
+      }
+    }
+    return out;
+  }
+  function templateRules(depth, who, farm) {
+    const pet = petFor(who.species), word = SOUND_WORD[pet.animal] || (pet.sounds[0] || "Moo").replace(/^./, (x) => x.toUpperCase());
+    const kind = String(who.species || "").replace(/^./, (x) => x.toUpperCase());
+    const nick = (who.name + (kind ? " the " + kind : "")).slice(0, 20);
+    const summoners = [farm.bot].concat(farm.staff || []).filter((m) => Number.isInteger(m)).slice(0, 100);
+    const speech = (mode, intensity) => makeSpec("pet.speech", { animal: pet.animal, sounds: pet.sounds, mode, intensity });
+    const rules = {};
+    if (depth === "fun") {
+      rules["pet.speech"] = speech("Sprinkle", "Low");
+      rules["social.greetRoom"] = makeSpec("social.greetRoom", { greeting: word + "! Mornin', y'all." });
+      rules["social.farewell"] = makeSpec("social.farewell", { farewell: word + "! Back to the barn with me." });
+      rules["control.nickname"] = makeSpec("control.nickname", { nickname: nick });
+    } else if (depth === "deep") {
+      rules["pet.speech"] = speech("Replace", "Medium");
+      rules["pet.hearing"] = makeSpec("pet.hearing", { animal: pet.animal, strength: "Light" });
+      rules["body.controlOrgasms"] = makeSpec("body.controlOrgasms", { mode: "Edged" });
+      rules["control.leash"] = makeSpec("control.leash", { minimumRole: "Whitelist" });
+      rules["other.summon"] = makeSpec("other.summon", { allowedMembers: summoners, summonText: "summon", delay: "15" });
+      rules["control.nickname"] = makeSpec("control.nickname", { nickname: nick });
+      rules["social.greetRoom"] = makeSpec("social.greetRoom", { greeting: word + "! Mornin', y'all." });
+    } else if (depth === "nhl") {
+      rules["pet.speech"] = speech("Replace", "Max");
+      rules["pet.hearing"] = makeSpec("pet.hearing", { animal: pet.animal, strength: "Heavy" });
+      rules["body.forcedPosition"] = makeSpec("body.forcedPosition", { fullPose: "All fours" });
+      rules["body.secretOrgasms"] = makeSpec("body.secretOrgasms");
+      rules["body.controlOrgasms"] = makeSpec("body.controlOrgasms", { mode: "Edged" });
+      rules["chat.forbidLeaving"] = makeSpec("chat.forbidLeaving");
+      if ((farm.rooms || []).length) rules["rooms.entry"] = makeSpec("rooms.entry", { allowedRooms: farm.rooms.slice(0, 50) });
+      rules["other.summon"] = makeSpec("other.summon", { allowedMembers: summoners, summonText: "summon", delay: "10" });
+      rules["control.leash"] = makeSpec("control.leash", { minimumRole: "Whitelist" });
+      rules["control.nickname"] = makeSpec("control.nickname", { nickname: nick });
+      rules["control.profile"] = makeSpec("control.profile");
+      rules["protect.hardcore"] = makeSpec("protect.hardcore");
+    }
+    return rules;
+  }
+  function makeContract({ title, terms = "", duration, depth, policy, rules, who, farm }) {
+    const d = typeof duration === "string" ? durationFrom(duration) : duration;
+    return {
+      title: String(title || "B&B Farm contract").trim().slice(0, LIMITS.TITLE),
+      terms: String(terms || "").slice(0, LIMITS.TERMS),
+      durationMin: d ? d.min : 0,
+      policy: policy || (depth === "fun" ? "either" : "author"),
+      rules: rules || templateRules(depth, who, farm)
+    };
+  }
+  var BCP = "BCP";
+  var offerMsg = (contract, target, authorName) => ({ Content: BCP, Type: "Hidden", Target: target, Dictionary: { message: "ContractOffer", payload: Object.assign({ author: 0, authorName: authorName || "B&B Farm" }, contract) } });
+  var queryMsg = (target) => ({ Content: BCP, Type: "Hidden", Target: target, Dictionary: { message: "ContractQuery" } });
+  var releaseMsg = (target, id) => ({ Content: BCP, Type: "Hidden", Target: target, Dictionary: { message: "ContractCommand", action: "release", id } });
+  function readBCP(data) {
+    if (!data || data.Type !== "Hidden" || data.Content !== BCP) return null;
+    const d = data.Dictionary;
+    if (!d || typeof d !== "object" || Array.isArray(d) || typeof d.message !== "string") return null;
+    return Object.assign({}, d, { from: data.Sender });
+  }
+
   // bot/src/version.js
-  var VERSION = "0.9.27";
+  var VERSION = "0.9.28";
 
   // bot-parts:farmhand-bot-parts
   (function() {
@@ -4087,6 +5823,210 @@
       step();
       return true;
     }
+    const DEFAULT_TERMS = {
+      fun: "A light little contract with B&B Farm, %name%. You'll moo and wave, and you can end it whenever you like.",
+      deep: "You're properly kept by B&B Farm for the length of this contract, %name%. Only the farm can end it early, and a safeword always reaches staff.",
+      nhl: "No human left, %name%. You belong to B&B Farm as an animal for the length of this contract, and only the farm can end it early. A safeword always reaches staff, and they'll come check on you."
+    };
+    function contractsLedger() {
+      L.contractTemplates = L.contractTemplates || {};
+      L.contracts = L.contracts || [];
+    }
+    function farmInfo() {
+      const staff = Object.keys(L.people).map(Number).filter((m) => isStaff(m));
+      return { bot: CFG.BOT_MEMBER, staff, rooms: CFG.CONTRACT_ROOMS && CFG.CONTRACT_ROOMS.length ? CFG.CONTRACT_ROOMS : [CFG.ROOM_NAME] };
+    }
+    function contractTemplate(name) {
+      contractsLedger();
+      const n = String(name || "").toLowerCase();
+      if (L.contractTemplates[n]) return L.contractTemplates[n];
+      const d = depthFrom(n);
+      if (d && d.key === n) return { title: "B&B Farm · " + d.label, terms: DEFAULT_TERMS[d.key], base: d.key, add: {}, remove: [] };
+      return null;
+    }
+    function buildContract(tpl, mn, durKey) {
+      const r = rec(mn) || {};
+      const who = { name: plainName(mn), species: r.species || "" };
+      const rules = tpl.base ? templateRules(tpl.base, who, farmInfo()) : {};
+      for (const id of tpl.remove || []) delete rules[id];
+      for (const [id, set] of Object.entries(tpl.add || {}))
+        rules[id] = makeSpec(id, Object.assign({}, rules[id] ? rules[id].settings : {}, set));
+      return makeContract({
+        title: tpl.title,
+        terms: fill(tpl.terms || "", mn),
+        duration: durationFrom(durKey),
+        depth: tpl.base,
+        policy: tpl.policy,
+        rules
+      });
+    }
+    function settingValue(setting, raw) {
+      const t = String(raw == null ? "" : raw).trim();
+      switch (setting.type) {
+        case "checkbox":
+          if (/^(on|yes|true|1)$/i.test(t)) return { value: true };
+          if (/^(off|no|false|0)$/i.test(t)) return { value: false };
+          return { err: "say on or off" };
+        case "option": {
+          const o = setting.options.find((x) => x.toLowerCase() === t.toLowerCase());
+          return o ? { value: o } : { err: "pick one of: " + setting.options.join(", ") };
+        }
+        case "text":
+          return { value: t };
+        case "stringList":
+          return { value: t ? t.split("|").map((s) => s.trim()).filter(Boolean) : [] };
+        case "members": {
+          if (/^farm$/i.test(t)) {
+            const f = farmInfo();
+            return { value: [f.bot].concat(f.staff) };
+          }
+          if (/^staff$/i.test(t)) return { value: farmInfo().staff };
+          const v = t.split(/[,\s]+/).filter(Boolean).map((x) => resolveTarget(x));
+          return v.every(Number.isInteger) ? { value: v } : { err: "member numbers or names, separated by commas (or farm, or staff)" };
+        }
+      }
+      return { err: "I don't know that kind of setting" };
+    }
+    function parsePairs(text) {
+      const out = {};
+      const rx = /(\w+)=(?:"([^"]*)"|(\S+))/g;
+      let m;
+      while (m = rx.exec(text)) out[m[1]] = m[2] !== void 0 ? m[2] : m[3];
+      return out;
+    }
+    function describeContract(c) {
+      const d = DURATIONS.find((x) => x.min === c.durationMin);
+      const lines = ["📜 " + c.title + " · " + (d ? d.label : Math.round(c.durationMin / 60) + " h") + " · ends early: " + (c.policy === "either" ? "either side" : "only the farm")];
+      if (c.terms) lines.push("“" + c.terms + "”");
+      for (const [id, spec] of Object.entries(c.rules)) {
+        const def = RULES.get(id);
+        const set = Object.entries(spec.settings || {}).filter(([, v]) => !(Array.isArray(v) && !v.length) && v !== "").map(([k, v]) => k + "=" + (Array.isArray(v) ? v.join("|") : v)).join(" ");
+        lines.push("  • " + (def ? def.name : id) + (set ? " · " + set : ""));
+      }
+      return lines.join("\n");
+    }
+    function offerContract(sender, tplName, t, durText) {
+      contractsLedger();
+      const tpl = contractTemplate(tplName);
+      if (!tpl) return "There's no contract called '" + tplName + "', sugar. ?contract list shows them (fun, deep and nhl are always there).";
+      const d = durationFrom(durText);
+      if (!d) return "How long, hon? Say 1h, 12h, 1d, 1w, 2w, 1m or perm.";
+      if (!charFor(t)) return plainName(t) + " has to be here in the room for a contract offer, sugar. BC+ only takes 'em in person.";
+      const c = buildContract(tpl, t, d.key);
+      const problems = checkContract(c);
+      if (problems.length) return "That one wouldn't work in BC+, sugar, so I didn't send it:\n• " + problems.join("\n• ");
+      const mine = L.contracts.filter((x) => x.mn === t && (x.status === "signed" || x.status === "offered"));
+      if (mine.filter((x) => x.status === "signed").length >= LIMITS.MAX_ACTIVE) return plainName(t) + " already holds " + LIMITS.MAX_ACTIVE + " farm contracts, and BC+ won't take more.";
+      enqueue(offerMsg(c, t, CFG.ROOM_NAME));
+      L.contracts.push({
+        key: Date.now().toString(36),
+        mn: t,
+        by: sender,
+        tpl: String(tplName).toLowerCase(),
+        title: c.title,
+        depth: tpl.base || "custom",
+        durationMin: c.durationMin,
+        policy: c.policy,
+        rules: Object.keys(c.rules),
+        status: "offered",
+        at: Date.now()
+      });
+      if (L.contracts.length > 300) L.contracts = L.contracts.slice(-300);
+      saveLedger();
+      audit(sender, "CONTRACT_OFFER", t + " " + c.title + " " + d.key);
+      tell(t, "📜 " + plainName(sender) + ' offers you the farm contract "' + c.title + '" (' + d.label + "). Read it on your BC+ Contracts page, and only sign if you want it. Nothin' applies till you do.");
+      return "";
+    }
+    function trackedContract(mn, title, statuses) {
+      contractsLedger();
+      for (let i = L.contracts.length - 1; i >= 0; i--) {
+        const x = L.contracts[i];
+        if (x.mn === mn && (!title || x.title === title) && (!statuses || statuses.includes(x.status))) return x;
+      }
+      return null;
+    }
+    function onBCPAction(data) {
+      const d = Array.isArray(data.Dictionary) ? data.Dictionary.find((e) => e && typeof e.Text === "string") : null;
+      if (!d) return false;
+      const text = d.Text, mn = data.Sender;
+      let m;
+      if (m = text.match(/has signed your contract "(.+)"\./)) {
+        const x = trackedContract(mn, m[1], ["offered"]);
+        if (x) {
+          x.status = "signed";
+          x.signedAt = Date.now();
+          x.until = x.durationMin ? Date.now() + x.durationMin * 6e4 : null;
+          saveLedger();
+          audit(mn, "CONTRACT_SIGNED", x.title);
+        }
+        notifyStaff("📜 " + plainName(mn) + ' signed the farm contract "' + m[1] + '".', true);
+        later(() => enqueue(queryMsg(mn)), 2e3);
+        return true;
+      }
+      if (m = text.match(/declined the contract "(.+)"\./)) {
+        const x = trackedContract(mn, m[1], ["offered"]);
+        if (x) {
+          x.status = "declined";
+          saveLedger();
+        }
+        return true;
+      }
+      if (m = text.match(/is no longer bound by the contract "(.+)"\./)) {
+        const x = trackedContract(mn, m[1], ["signed", "releasing"]);
+        if (x) {
+          x.status = "ended";
+          x.endedAt = Date.now();
+          saveLedger();
+        }
+        return true;
+      }
+      return false;
+    }
+    function onBCPMessage(m) {
+      if (m.message !== "ContractList" || !Array.isArray(m.contracts)) return;
+      const mn = m.from, held = m.contracts;
+      contractsLedger();
+      for (const bc of held) {
+        const x = trackedContract(mn, bc.title, ["offered", "signed", "releasing"]) || (L.contracts.push({
+          key: Date.now().toString(36),
+          mn,
+          title: bc.title,
+          depth: "unknown",
+          durationMin: bc.durationMin,
+          policy: bc.policy,
+          rules: Object.keys(bc.rules || {}),
+          status: "signed",
+          at: bc.signedAt
+        }), L.contracts[L.contracts.length - 1]);
+        if (x.status === "offered") x.status = "signed";
+        x.bcpId = bc.id;
+        x.signedAt = bc.signedAt;
+        x.until = bc.until;
+      }
+      for (const x of L.contracts) if (x.mn === mn && (x.status === "signed" || x.status === "releasing") && x.bcpId && !held.some((bc) => bc.id === x.bcpId)) {
+        x.status = "ended";
+        x.endedAt = Date.now();
+      }
+      saveLedger();
+    }
+    function releaseContract(sender, t, title) {
+      const x = trackedContract(t, title || null, ["signed", "releasing"]);
+      if (!x) return plainName(t) + " doesn't hold " + (title ? 'a farm contract called "' + title + '"' : "any farm contract") + " that I know of, hon. ?contract check " + plainName(t) + " asks their BC+.";
+      if (!charFor(t)) return plainName(t) + " has to be here in the room, sugar. BC+ only listens in person.";
+      if (!x.bcpId) {
+        enqueue(queryMsg(t));
+        return "I'm askin' their BC+ for that contract's number first. Try again in a few seconds, sugar.";
+      }
+      enqueue(releaseMsg(t, x.bcpId));
+      x.status = "releasing";
+      saveLedger();
+      audit(sender, "CONTRACT_RELEASE", t + " " + x.title);
+      return "";
+    }
+    function contractLine(x) {
+      const left = x.until ? Math.max(0, Math.round((x.until - Date.now()) / 36e5)) + " h left" : x.status === "signed" ? "permanent" : "";
+      return plainName(x.mn) + ' · "' + x.title + '" · ' + x.status + (left ? " · " + left : "");
+    }
     function clockedIn(mn) {
       const r = rec(mn);
       return !!(r && r.shift && r.shift.in);
@@ -4799,6 +6739,7 @@ UPKEEP
         o += group("📖 Books", "queue · app · approve · deny · appclear · roster · stock · find · record <who> · note · signed · addfriend · unregister");
         o += group("🐄 Herd", "claim · release · myherd · herdname · herdcall · herdsummon · turnout · letup · brand · walk");
         o += group("🎀 Stock", "tier · stocks · unstock · vet · inspect · tease");
+        o += group("📜 Contracts", "contract list · contract show · contract offer · contract release · contract check · contract rules");
         o += group("🥛 Barn", "milk · collect · jars · inseminate · drain · edge · denial · ruin · nomilk · quota <who> · heat · heatline · shotlog");
         o += group("🗺️ Farm", "spot · tourstop · setrescue · where · stucklog");
         o += group("⏱️ Work & play", "clockin · clockout · hours · done · chores · chore · wheel · spin · begphrase · score");
@@ -5212,7 +7153,9 @@ Welcome to B&B Farm. Mind the ruts! 🌾`,
       "inseminate",
       "nomilk",
       "inspect",
-      "edge"
+      "edge",
+      "contract",
+      "contracts"
     ];
     const SAFETY_CMDS = ["safe", "safeword", "red", "stuck"];
     const PRIVATE_REPLY = [
@@ -5242,7 +7185,9 @@ Welcome to B&B Farm. Mind the ruts! 🌾`,
       "chores",
       "wheel",
       "tourstop",
-      "quota"
+      "quota",
+      "contract",
+      "contracts"
     ];
     function parseRoles(args) {
       const out = [];
@@ -5511,6 +7456,227 @@ Welcome to B&B Farm. Mind the ruts! 🌾`,
           }
           askJar(sender, t, jar.id, hole);
           R("💉 I've asked " + plainName(t) + " first, sugar. If they say yes, I'll do it right then. If they say no, please leave it be.");
+          break;
+        }
+        case "contract":
+        case "contracts": {
+          contractsLedger();
+          const sub = String(args[0] || "list").toLowerCase(), name = String(args[1] || "").toLowerCase();
+          const owner = isProprietor(sender), boss = isHerdmaster(sender);
+          const needOwner = () => {
+            R("Writin' farm contracts is for the proprietors, sugar.");
+            return false;
+          };
+          const tplFor = (n) => L.contractTemplates[n];
+          switch (sub) {
+            case "list": {
+              const saved = Object.keys(L.contractTemplates);
+              const live = L.contracts.filter((x) => x.status === "signed" || x.status === "offered" || x.status === "releasing");
+              R("📜 FARM CONTRACTS\nReady-made: fun · deep · nhl" + (saved.length ? "\nYours: " + saved.join(" · ") : "") + "\n\nIN FORCE OR OFFERED\n" + (live.length ? live.map(contractLine).join("\n") : "  none right now") + "\n\n?contract show <name> [who] · ?contract offer <name> <who> <1h|12h|1d|1w|2w|1m|perm> · ?contract release <who> · ?contract check <who>" + (owner ? "\n?contract new <name> [from fun|deep|nhl] · add · set · remove · title · terms · policy · delete · ?contract rules" : ""));
+              break;
+            }
+            case "show": {
+              const tpl = contractTemplate(name);
+              if (!tpl) {
+                R("There's no contract called '" + name + "', hon. ?contract list shows them.");
+                break;
+              }
+              const who = args[2] ? resolveTarget(args[2]) : sender;
+              const c = buildContract(tpl, who || sender, "1w");
+              const problems = checkContract(c);
+              R(describeContract(c) + "\n\n" + (problems.length ? "⚠️ BC+ wouldn't take it yet:\n• " + problems.join("\n• ") : "✅ BC+ " + BCPLUS_VERSION + " will take this one as it is."));
+              break;
+            }
+            case "offer": {
+              if (!boss) {
+                R("Offerin' contracts is for herdmasters and proprietors, sugar.");
+                break;
+              }
+              const t = resolveTarget(args[2]);
+              if (!name || !t || !args[3]) {
+                R("Here's how, sugar: ?contract offer <contract> <who> <how long>. How long is 1h, 12h, 1d, 1w, 2w, 1m or perm. For example: ?contract offer deep Bessie 1w");
+                break;
+              }
+              const err = offerContract(sender, name, t, args.slice(3).join(" "));
+              R(err || "📜 Offered to " + plainName(t) + "! It's on their BC+ Contracts page now. I'll tell you when they sign.");
+              break;
+            }
+            case "release":
+            case "cancel": {
+              if (!boss) {
+                R("Only herdmasters and proprietors can release a farm contract, sugar. I've told 'em you asked.");
+                notifyStaff("📜 " + plainName(sender) + " asks for a farm contract release: " + rest, true);
+                break;
+              }
+              const t = resolveTarget(args[1]);
+              if (!t) {
+                R("Release whose, sugar? ?contract release <who> [title]");
+                break;
+              }
+              const err = releaseContract(sender, t, args.slice(2).join(" ") || null);
+              R(err || "📜 Released! BC+ is puttin' " + plainName(t) + "'s rules back how they were.");
+              break;
+            }
+            case "check": {
+              const t = resolveTarget(args[1]);
+              if (!t || !charFor(t)) {
+                R("They need to be here in the room for me to ask their BC+, hon.");
+                break;
+              }
+              enqueue(queryMsg(t));
+              later(() => {
+                const mine = L.contracts.filter((x) => x.mn === t && x.status !== "declined");
+                reply(sender, mine.length ? "📜 " + mine.map(contractLine).join("\n") : plainName(t) + " holds no farm contracts.", replyCh);
+              }, 4e3);
+              break;
+            }
+            case "rules":
+            case "rule": {
+              if (sub === "rule" || RULES.has(name)) {
+                const def = RULES.get(name);
+                if (!def) {
+                  R("BC+ has no rule called '" + name + "', sugar. ?contract rules lists them.");
+                  break;
+                }
+                R("📘 " + def.name + " (" + def.id + ") · " + def.category + "\n" + def.description + (def.settings.length ? "\n\nSETTINGS\n" + def.settings.map((s) => "  " + s.name + " · " + s.type + (s.options ? ": " + s.options.join(" / ") : "") + " · default " + JSON.stringify(s.default)).join("\n") : "\n\nNo settings.") + (NEVER[def.id] ? "\n\n🚫 The farm never uses this one: it " + NEVER[def.id] + "." : ""));
+                break;
+              }
+              const cats = {};
+              for (const d of RULES.values()) if (!name || d.category.toLowerCase() === name) (cats[d.category] = cats[d.category] || []).push(d.id + (NEVER[d.id] ? " 🚫" : ""));
+              R("📘 BC+ " + BCPLUS_VERSION + " RULES" + (name ? " · " + name : "") + "\n" + Object.entries(cats).map(([c, ids]) => c + ": " + ids.join(", ")).join("\n") + "\n\n?contract rule <id> shows its settings.");
+              break;
+            }
+            case "new": {
+              if (!owner) {
+                needOwner();
+                break;
+              }
+              if (!/^[a-z][a-z0-9_-]{1,19}$/.test(name) || depthFrom(name) && ["fun", "deep", "nhl"].includes(name)) {
+                R("Give it a one-word name, sugar (2 to 20 letters or numbers, not fun, deep or nhl). For example: ?contract new prizecow from deep");
+                break;
+              }
+              const base = String(args[2] || "").toLowerCase() === "from" ? (depthFrom(args[3] || "") || {}).key || null : null;
+              L.contractTemplates[name] = { title: "B&B Farm · " + name, terms: base ? DEFAULT_TERMS[base] : "", base, add: {}, remove: [], by: sender, at: Date.now() };
+              saveLedger();
+              audit(sender, "CONTRACT_NEW", name);
+              R("📜 Made '" + name + "'" + (base ? " from " + base : " (empty)") + ". Now ?contract add " + name + " <rule> key=value…, ?contract title " + name + " <text>, ?contract terms " + name + " <text>, then ?contract show " + name + ".");
+              break;
+            }
+            case "add":
+            case "set": {
+              if (!owner) {
+                needOwner();
+                break;
+              }
+              const tpl = tplFor(name), id = String(args[2] || "");
+              if (!tpl) {
+                R("There's no saved contract called '" + name + "', sugar. ?contract new " + name + " makes one.");
+                break;
+              }
+              const def = RULES.get(id);
+              if (!def) {
+                R("BC+ has no rule called '" + id + "', sugar. ?contract rules lists them all.");
+                break;
+              }
+              if (NEVER[id]) {
+                R("🚫 The farm never puts " + def.name + " in a contract, hon: it " + NEVER[id] + ".");
+                break;
+              }
+              const pairs = parsePairs(args.slice(3).join(" ")), set = Object.assign({}, tpl.add[id] || {}), bad = [];
+              for (const [k, v] of Object.entries(pairs)) {
+                const s = def.settings.find((x) => x.name.toLowerCase() === k.toLowerCase());
+                if (!s) {
+                  bad.push(k + ": no such setting (it has " + (def.settings.map((x) => x.name).join(", ") || "none") + ")");
+                  continue;
+                }
+                const got = settingValue(s, v);
+                if (got.err) bad.push(s.name + ": " + got.err);
+                else set[s.name] = got.value;
+              }
+              if (bad.length) {
+                R("Not saved, sugar:\n• " + bad.join("\n• "));
+                break;
+              }
+              tpl.add[id] = set;
+              tpl.remove = (tpl.remove || []).filter((x) => x !== id);
+              saveLedger();
+              audit(sender, "CONTRACT_EDIT", name + " +" + id);
+              R("📜 " + def.name + " is in '" + name + "'" + (Object.keys(set).length ? " (" + Object.entries(set).map(([k, v]) => k + "=" + (Array.isArray(v) ? v.join("|") : v)).join(" ") + ")" : "") + ".");
+              break;
+            }
+            case "remove": {
+              if (!owner) {
+                needOwner();
+                break;
+              }
+              const tpl = tplFor(name), id = String(args[2] || "");
+              if (!tpl) {
+                R("There's no saved contract called '" + name + "', sugar.");
+                break;
+              }
+              delete tpl.add[id];
+              if (!tpl.remove.includes(id)) tpl.remove.push(id);
+              saveLedger();
+              R("📜 Took " + id + " out of '" + name + "'.");
+              break;
+            }
+            case "title":
+            case "terms": {
+              if (!owner) {
+                needOwner();
+                break;
+              }
+              const tpl = tplFor(name), text = args.slice(2).join(" ");
+              if (!tpl || !text) {
+                R("Here's how: ?contract " + sub + " <name> <text>. %name% becomes their name in the terms.");
+                break;
+              }
+              if (sub === "title" && text.length > LIMITS.TITLE) {
+                R("Titles can be " + LIMITS.TITLE + " characters at most in BC+, sugar.");
+                break;
+              }
+              if (sub === "terms" && text.length > LIMITS.TERMS) {
+                R("Terms can be " + LIMITS.TERMS + " characters at most in BC+, sugar.");
+                break;
+              }
+              tpl[sub] = text;
+              saveLedger();
+              R("📜 Saved the " + sub + " for '" + name + "'.");
+              break;
+            }
+            case "policy": {
+              if (!owner) {
+                needOwner();
+                break;
+              }
+              const tpl = tplFor(name), v = String(args[2] || "").toLowerCase();
+              if (!tpl || !/^(farm|author|either)$/.test(v)) {
+                R("Here's how: ?contract policy <name> farm (only the farm ends it early) or either (they can end it too).");
+                break;
+              }
+              tpl.policy = v === "either" ? "either" : "author";
+              saveLedger();
+              R("📜 '" + name + "' can be ended early by " + (tpl.policy === "either" ? "either side" : "the farm only") + ".");
+              break;
+            }
+            case "delete": {
+              if (!owner) {
+                needOwner();
+                break;
+              }
+              if (!tplFor(name)) {
+                R("There's no saved contract called '" + name + "', sugar.");
+                break;
+              }
+              delete L.contractTemplates[name];
+              saveLedger();
+              audit(sender, "CONTRACT_DELETE", name);
+              R("📜 Deleted '" + name + "'. Contracts already signed keep goin' till they end.");
+              break;
+            }
+            default:
+              R("?contract list · show · offer · release · check · rules" + (owner ? " · new · add · set · remove · title · terms · policy · delete" : ""));
+          }
           break;
         }
         case "jarok": {
@@ -7927,6 +10093,11 @@ Welcome to B&B Farm, hon. 🌾`
               onCompanion(fm);
               return;
             }
+            const bm = readBCP(data);
+            if (bm) {
+              onBCPMessage(bm);
+              return;
+            }
             if (typeof data.Content === "string" && data.Content.startsWith("ChatRoomBot ")) {
               const text = data.Content.slice("ChatRoomBot ".length).trim().replace(/^\(+/, "").replace(/\)+$/, "");
               if (!text) return;
@@ -7944,6 +10115,14 @@ Welcome to B&B Farm, hon. 🌾`
             return;
           }
           if (data.Sender) state.lastSpoke.set(data.Sender, Date.now());
+          if (data.Type === "Activity" && data.Content === "BCPAction") {
+            try {
+              onBCPAction(data);
+            } catch (e) {
+              warn("bc+:", e);
+            }
+            return;
+          }
           if (data.Type === "Activity") {
             try {
               onActivity(data);

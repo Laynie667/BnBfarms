@@ -130,6 +130,133 @@
         break;
       }
 
+      case "contract": case "contracts": {
+        // staff look · herdmasters offer and release · proprietors write the templates
+        contractsLedger();
+        const sub = String(args[0]||"list").toLowerCase(), name = String(args[1]||"").toLowerCase();
+        const owner = isProprietor(sender), boss = isHerdmaster(sender);
+        const needOwner = () => { R("Writin' farm contracts is for the proprietors, sugar."); return false; };
+        const tplFor = (n) => L.contractTemplates[n];
+        switch (sub){
+          case "list": {
+            const saved = Object.keys(L.contractTemplates);
+            const live = L.contracts.filter(x => x.status === "signed" || x.status === "offered" || x.status === "releasing");
+            R("📜 FARM CONTRACTS\nReady-made: fun · deep · nhl"+(saved.length ? "\nYours: "+saved.join(" · ") : "")+
+              "\n\nIN FORCE OR OFFERED\n"+(live.length ? live.map(contractLine).join("\n") : "  none right now")+
+              "\n\n?contract show <name> [who] · ?contract offer <name> <who> <1h|12h|1d|1w|2w|1m|perm> · ?contract release <who> · ?contract check <who>"+
+              (owner ? "\n?contract new <name> [from fun|deep|nhl] · add · set · remove · title · terms · policy · delete · ?contract rules" : ""));
+            break;
+          }
+          case "show": {
+            const tpl = contractTemplate(name);
+            if (!tpl){ R("There's no contract called '"+name+"', hon. ?contract list shows them."); break; }
+            const who = args[2] ? resolveTarget(args[2]) : sender;
+            const c = buildContract(tpl, who || sender, "1w");
+            const problems = BCPLUS.checkContract(c);
+            R(describeContract(c)+"\n\n"+(problems.length ? "⚠️ BC+ wouldn't take it yet:\n• "+problems.join("\n• ") : "✅ BC+ "+BCPLUS.BCPLUS_VERSION+" will take this one as it is."));
+            break;
+          }
+          case "offer": {
+            if (!boss){ R("Offerin' contracts is for herdmasters and proprietors, sugar."); break; }
+            const t = resolveTarget(args[2]);
+            if (!name || !t || !args[3]){ R("Here's how, sugar: ?contract offer <contract> <who> <how long>. How long is 1h, 12h, 1d, 1w, 2w, 1m or perm. For example: ?contract offer deep Bessie 1w"); break; }
+            const err = offerContract(sender, name, t, args.slice(3).join(" "));
+            R(err || "📜 Offered to "+plainName(t)+"! It's on their BC+ Contracts page now. I'll tell you when they sign.");
+            break;
+          }
+          case "release": case "cancel": {
+            if (!boss){ R("Only herdmasters and proprietors can release a farm contract, sugar. I've told 'em you asked."); notifyStaff("📜 "+plainName(sender)+" asks for a farm contract release: "+rest, true); break; }
+            const t = resolveTarget(args[1]);
+            if (!t){ R("Release whose, sugar? ?contract release <who> [title]"); break; }
+            const err = releaseContract(sender, t, args.slice(2).join(" ") || null);
+            R(err || "📜 Released! BC+ is puttin' "+plainName(t)+"'s rules back how they were.");
+            break;
+          }
+          case "check": {
+            const t = resolveTarget(args[1]);
+            if (!t || !charFor(t)){ R("They need to be here in the room for me to ask their BC+, hon."); break; }
+            enqueue(BCPLUS.queryMsg(t));
+            later(() => { const mine = L.contracts.filter(x => x.mn === t && x.status !== "declined"); reply(sender, mine.length ? "📜 "+mine.map(contractLine).join("\n") : plainName(t)+" holds no farm contracts.", replyCh); }, 4000);
+            break;
+          }
+          case "rules": case "rule": {
+            if (sub === "rule" || BCPLUS.RULES.has(name)){
+              const def = BCPLUS.RULES.get(name);
+              if (!def){ R("BC+ has no rule called '"+name+"', sugar. ?contract rules lists them."); break; }
+              R("📘 "+def.name+" ("+def.id+") · "+def.category+"\n"+def.description+
+                (def.settings.length ? "\n\nSETTINGS\n"+def.settings.map(s => "  "+s.name+" · "+s.type+(s.options ? ": "+s.options.join(" / ") : "")+" · default "+JSON.stringify(s.default)).join("\n") : "\n\nNo settings.")+
+                (BCPLUS.NEVER[def.id] ? "\n\n🚫 The farm never uses this one: it "+BCPLUS.NEVER[def.id]+"." : ""));
+              break;
+            }
+            const cats = {};
+            for (const d of BCPLUS.RULES.values()) if (!name || d.category.toLowerCase() === name) (cats[d.category] = cats[d.category] || []).push(d.id+(BCPLUS.NEVER[d.id] ? " 🚫" : ""));
+            R("📘 BC+ "+BCPLUS.BCPLUS_VERSION+" RULES"+(name ? " · "+name : "")+"\n"+Object.entries(cats).map(([c, ids]) => c+": "+ids.join(", ")).join("\n")+"\n\n?contract rule <id> shows its settings.");
+            break;
+          }
+          case "new": {
+            if (!owner){ needOwner(); break; }
+            if (!/^[a-z][a-z0-9_-]{1,19}$/.test(name) || BCPLUS.depthFrom(name) && ["fun","deep","nhl"].includes(name)){ R("Give it a one-word name, sugar (2 to 20 letters or numbers, not fun, deep or nhl). For example: ?contract new prizecow from deep"); break; }
+            const base = String(args[2]||"").toLowerCase() === "from" ? (BCPLUS.depthFrom(args[3]||"") || {}).key || null : null;
+            L.contractTemplates[name] = { title: "B&B Farm · "+name, terms: base ? DEFAULT_TERMS[base] : "", base, add: {}, remove: [], by: sender, at: Date.now() };
+            saveLedger(); audit(sender, "CONTRACT_NEW", name);
+            R("📜 Made '"+name+"'"+(base ? " from "+base : " (empty)")+". Now ?contract add "+name+" <rule> key=value…, ?contract title "+name+" <text>, ?contract terms "+name+" <text>, then ?contract show "+name+".");
+            break;
+          }
+          case "add": case "set": {
+            if (!owner){ needOwner(); break; }
+            const tpl = tplFor(name), id = String(args[2]||"");
+            if (!tpl){ R("There's no saved contract called '"+name+"', sugar. ?contract new "+name+" makes one."); break; }
+            const def = BCPLUS.RULES.get(id);
+            if (!def){ R("BC+ has no rule called '"+id+"', sugar. ?contract rules lists them all."); break; }
+            if (BCPLUS.NEVER[id]){ R("🚫 The farm never puts "+def.name+" in a contract, hon: it "+BCPLUS.NEVER[id]+"."); break; }
+            const pairs = parsePairs(args.slice(3).join(" ")), set = Object.assign({}, tpl.add[id] || {}), bad = [];
+            for (const [k, v] of Object.entries(pairs)){
+              const s = def.settings.find(x => x.name.toLowerCase() === k.toLowerCase());
+              if (!s){ bad.push(k+": no such setting (it has "+(def.settings.map(x => x.name).join(", ") || "none")+")"); continue; }
+              const got = settingValue(s, v);
+              if (got.err) bad.push(s.name+": "+got.err); else set[s.name] = got.value;
+            }
+            if (bad.length){ R("Not saved, sugar:\n• "+bad.join("\n• ")); break; }
+            tpl.add[id] = set; tpl.remove = (tpl.remove||[]).filter(x => x !== id);
+            saveLedger(); audit(sender, "CONTRACT_EDIT", name+" +"+id);
+            R("📜 "+def.name+" is in '"+name+"'"+(Object.keys(set).length ? " ("+Object.entries(set).map(([k,v]) => k+"="+(Array.isArray(v) ? v.join("|") : v)).join(" ")+")" : "")+".");
+            break;
+          }
+          case "remove": {
+            if (!owner){ needOwner(); break; }
+            const tpl = tplFor(name), id = String(args[2]||"");
+            if (!tpl){ R("There's no saved contract called '"+name+"', sugar."); break; }
+            delete tpl.add[id]; if (!tpl.remove.includes(id)) tpl.remove.push(id);
+            saveLedger(); R("📜 Took "+id+" out of '"+name+"'.");
+            break;
+          }
+          case "title": case "terms": {
+            if (!owner){ needOwner(); break; }
+            const tpl = tplFor(name), text = args.slice(2).join(" ");
+            if (!tpl || !text){ R("Here's how: ?contract "+sub+" <name> <text>. %name% becomes their name in the terms."); break; }
+            if (sub === "title" && text.length > BCPLUS.LIMITS.TITLE){ R("Titles can be "+BCPLUS.LIMITS.TITLE+" characters at most in BC+, sugar."); break; }
+            if (sub === "terms" && text.length > BCPLUS.LIMITS.TERMS){ R("Terms can be "+BCPLUS.LIMITS.TERMS+" characters at most in BC+, sugar."); break; }
+            tpl[sub] = text; saveLedger(); R("📜 Saved the "+sub+" for '"+name+"'.");
+            break;
+          }
+          case "policy": {
+            if (!owner){ needOwner(); break; }
+            const tpl = tplFor(name), v = String(args[2]||"").toLowerCase();
+            if (!tpl || !/^(farm|author|either)$/.test(v)){ R("Here's how: ?contract policy <name> farm (only the farm ends it early) or either (they can end it too)."); break; }
+            tpl.policy = v === "either" ? "either" : "author"; saveLedger(); R("📜 '"+name+"' can be ended early by "+(tpl.policy === "either" ? "either side" : "the farm only")+".");
+            break;
+          }
+          case "delete": {
+            if (!owner){ needOwner(); break; }
+            if (!tplFor(name)){ R("There's no saved contract called '"+name+"', sugar."); break; }
+            delete L.contractTemplates[name]; saveLedger(); audit(sender, "CONTRACT_DELETE", name); R("📜 Deleted '"+name+"'. Contracts already signed keep goin' till they end.");
+            break;
+          }
+          default: R("?contract list · show · offer · release · check · rules"+(owner ? " · new · add · set · remove · title · terms · policy · delete" : ""));
+        }
+        break;
+      }
+
       case "jarok": {
         const r = rec(sender);
         if (!r || !r.roles.length){ R("That's just for folks on the books, sugar. Say ?apply first!"); break; }

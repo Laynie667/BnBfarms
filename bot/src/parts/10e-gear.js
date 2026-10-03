@@ -74,6 +74,8 @@
     ],
   };
   function gearLine(mn, kind, level, name, mlGot){
+    const alt = addonLine(kind, lineInfo(mn, { level, gear: name, ml: ml(mlGot || 0) }));   // the dairy add-on's lines, if it's in
+    if (alt) return alt;
     const set = kind === "machine" ? GEAR_LINES.machine : GEAR_LINES[kind][level <= 1 ? 0 : level <= 2 ? 1 : 2];
     const raw = kind === "machine" ? set[Math.max(0, Math.min(3, level))] : set[Math.floor(Math.random()*set.length)];
     return raw.replace(/%n%/g, plainName(mn)).replace(/%g%/g, name).replace(/%ml%/g, ml(mlGot || 0));
@@ -91,7 +93,7 @@
         const got = drainMilk(mn, g.milk.ml * dtMin);
         p.gearMl = (p.gearMl || 0) + got;
         if (got > 0 && now >= (p.gearNext || 0)){ p.gearNext = now + jitter(); emote("🥛 "+gearLine(mn, g.milk.kind, g.milk.level, g.milk.name, p.gearMl)); p.gearMl = 0; }
-        if (got > 0 && p.milk < 1 && !p.gearDry){ p.gearDry = true; emote("🥛 The "+g.milk.name+" pulls "+plainName(mn)+" plumb dry. Every last drop's in the tank, sugar."); }
+        if (got > 0 && p.milk < 1 && !p.gearDry){ p.gearDry = true; emote("🥛 "+(addonLine("gearDry", lineInfo(mn, { gear: g.milk.name })) || "The "+g.milk.name+" pulls "+plainName(mn)+" plumb dry. Every last drop's in the tank, sugar.")); }
         if (p.milk >= 1) p.gearDry = false;
       }
       if (g.machine && g.machine.intensity >= 0){

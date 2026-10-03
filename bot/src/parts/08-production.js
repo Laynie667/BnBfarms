@@ -764,20 +764,29 @@
       const gotM = doM ? drainMilk(mn, Math.min(CFG.PROD.STALL_MILK_PER_MIN*dtMin, p.milk - keepM)) : 0;
       const gotS = doS ? drainSemen(mn, Math.min(CFG.PROD.STALL_SEMEN_PER_MIN*dtMin, p.semen - keepS)) : 0;
       const got = gotM + gotS;
+      // a cow in the stall gets a line now and then too
+      if (gotM > 0 && !gotS && Date.now() - (p.stallSaid||0) > 5*60000*(0.75+Math.random()*0.5)){
+        p.stallSaid = Date.now();
+        const n = plainName(mn);
+        emote("🥛 "+(addonLine("stallMilk", lineInfo(mn, { ml: ml(gotM) })) || ["The stall's cups pull at "+n+"'s teats in a slow rhythm, and warm milk runs down the lines into the bucket.",
+          "Milk streams from "+n+" into the stall's bucket. They shift their weight and moo softly."][Math.floor(Math.random()*2)]));
+      }
       // a stud in the stall gets their own show
       if (gotS > 0 && Date.now() - (p.stallSaid||0) > 5*60000*(0.75+Math.random()*0.5)){
         p.stallSaid = Date.now();
         const n = plainName(mn), c = penisLabel(mn);
+        const alt = addonLine("stallSemen", lineInfo(mn, { ml: ml(gotS), cock: c }));
         const L1 = [n+"'s "+c+" cock is sealed in the stall's wet suction sleeve, and it pumps and pulls in a slow, steady rhythm. Their hips twitch every time it squeezes.",
                     "The machine strokes "+n+" from root to tip, milkin' that "+c+" cock for every drop. Seed spurts into the collection jar in thick pulses.",
                     "A warm vibrating cup hugs "+n+"'s balls while the sleeve sucks their cock. "+n+" is a moanin', drippin' mess in the stall."];
-        emote("🐂 "+L1[Math.floor(Math.random()*L1.length)]);
+        emote("🐂 "+(alt || L1[Math.floor(Math.random()*L1.length)]));
       }
       const doneM = !makesMilk(mn) || milkDenied(mn) || gearOf(mn).milk || p.milk <= keepM + 1;
       const doneS = !makesSemen(mn) || p.semen <= keepS + 0.5;
       if (p.stall && doneM && doneS){
         p.stall = null;
-        if (got > 0) emote(makesSemen(mn) && !makesMilk(mn)
+        const altDone = got > 0 && addonLine(makesSemen(mn) && !makesMilk(mn) ? "stallDoneSemen" : "stallDone", lineInfo(mn));
+        if (got > 0) emote(altDone ? (makesSemen(mn) && !makesMilk(mn) ? "🐂 " : "🥛 ")+altDone : makesSemen(mn) && !makesMilk(mn)
           ? "🐂 The stall wrings "+plainName(mn)+" down to the last quarter and lets go. Balls aching and light, legs wobbly. Good stud!"
           : "🥛 The milkin' stall eases off once "+plainName(mn)+" is down to a quarter, teats sore and drippin'. Good job, sweetie! Off you go.");
       }

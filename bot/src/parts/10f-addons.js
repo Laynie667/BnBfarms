@@ -72,6 +72,22 @@
     return Math.max(0.25, Math.min(3, x));
   }
 
+  // add-ons can write the farm's lines: lines: { pump(info), echo(info), stallMilk(info), … } return a line
+  // (or nothin' to keep the bot's own). info: { mn, name, level, gear, ml, full (0–1), degrade, praise }
+  function addonLine(kind, info){
+    for (const a of ADDONS.values()){
+      if (a.enabled === false || !a.lines || typeof a.lines[kind] !== "function") continue;
+      const v = addonCall(a, "lines."+kind, a.lines[kind], info);
+      if (typeof v === "string" && v.trim()) return v.slice(0, 900);
+    }
+    return null;
+  }
+  function lineInfo(mn, extra){
+    const r = rec(mn) || {}, p = prodOf(mn);
+    return Object.assign({ mn, name: plainName(mn), full: p && makesMilk(mn) ? Math.min(1, p.milk / Math.max(1, milkCap(mn))) : 0,
+                           degrade: !!r.degradeMe, praise: !!r.praiseMe, species: speciesKey(mn) }, extra || {});
+  }
+
   // a game activity, read the same way onActivity reads it: { act, src, tgt, focus }
   function activityInfo(data){
     const dict = Array.isArray(data && data.Dictionary) ? data.Dictionary : [];
@@ -108,7 +124,7 @@
       species: speciesKey, gender: genderOf, hasCompanion, limitBlocks, rank: rankOf,
       // bodies
       prod: prodOf, HOLES, holeBlocked, hasVulva, makesSemen, makesMilk, capacity, milkCap, heldTotal,
-      drainMilk, drainSemen, tally, ml, ANON_STUD,
+      drainMilk, drainSemen, tally, ml, ANON_STUD, milkGrade, gradeLetter,
       staffPoints, staffScores: () => JSON.parse(JSON.stringify(L.staffScore || {})), inHeat, startHeat, rollConception, gearOf, funnelOn,
       // the map
       pos: posOf, spot: (n) => (L.spots && L.spots[n]) || null, spots: () => Object.assign({}, L.spots||{}),
@@ -124,7 +140,7 @@
     const name = String(def.name||"").toLowerCase();
     if (!ADDON_NAME.test(name)) throw new Error("add-on name must be lowercase letters, numbers or dashes, like 'glory-stalls'");
     if (ADDONS.has(name)) { warn("add-on "+name+" registered twice; the newer one replaces it"); unregisterAddon(name); }
-    const a = { name, label: String(def.label || name), version: String(def.version || "0"), on: def.on || {}, companion: def.companion, rates: def.rates || null,
+    const a = { name, label: String(def.label || name), version: String(def.version || "0"), on: def.on || {}, companion: def.companion, rates: def.rates || null, lines: def.lines || null,
                 guide: def.guide || "", commands: {}, enabled: !(L.addonsOff && L.addonsOff[name]), errors: 0 };
     a.api = addonApi(a);
     for (const [word0, c] of Object.entries(def.commands || {})){

@@ -258,12 +258,12 @@ SkyzHypno (public API on the page) and HSC (trigger words from allowed speakers)
 
 ## Suggested build order
 
-1. Jar insemination asks, plus the `?jarok` switch (small, and it's consent)
-2. Summon to the staff member's side, and the staff spot for forced staff from other rooms
+1. ✅ Jar insemination asks, plus the `?jarok` switch (done, bot v0.9.26)
+2. ✅ Summon to the staff member's side, and the staff spot for on-call staff from other rooms (done, bot v0.9.27)
 3. Protocol v2 + role-based tabs (livestock first)
 4. Staff tabs + the Office
 5. Dashboard: BC+ contracts
 6. Dashboard: outfits and uniforms (species × gender, restraints and locks) + ?gender with femboy
 7. Milking gear integration (`milking-gear.md`)
-8. Split the bot into files (can also go first if the features start to get tangled)
+8. ✅ Split the bot into topic files (done first: `bot/src/parts/`); turning them into real modules comes bit by bit
 9. Public home + FUSAM listing

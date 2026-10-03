@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.6.0
+// @version      0.6.1
 // @description  Your B&B Farm panel: the farm girl's answers, stat cards and guides, right in the game.
 // @author       Laynie & Alexia
 // @match        *://*.bondageprojects.elementfx.com/*
@@ -224,7 +224,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.6.0";
+  var VERSION = "0.6.1";
 
   // extension/src/config.js
   var BOT_MEMBER = 260239;
@@ -3371,11 +3371,22 @@ One of mods you are using is using an old version of SDK. It will work for now b
         break;
       case "welcome":
         st.welcomed = true;
-        st.panel.setStatus("connected · farm girl v" + m.ver);
         st.panel.setWelcome(m);
+        if (!m.proto || m.proto < 2) {
+          st.panel.setStatus("connected · farm girl v" + m.ver + " (needs updatin')");
+          st.panel.add("The farm girl is runnin' an older bot (v" + m.ver + ") that doesn't send this panel your roles, keys or numbers, so only the basic panel shows. Update farmhand-bot.user.js on HER browser (the bot's account), then reload her page.", "notice");
+        } else {
+          st.panel.setStatus("connected · farm girl v" + m.ver);
+          setTimeout(() => {
+            if (!st.gotState) st.panel.add("Connected, but the farm girl hasn't sent your roles yet. If Staff or Dashboard don't show up, reload the page.", "notice");
+          }, 12e3);
+        }
         break;
       case "state":
-        if (m.state && typeof m.state === "object") st.panel.setState(m.state);
+        if (m.state && typeof m.state === "object") {
+          st.gotState = true;
+          st.panel.setState(m.state);
+        }
         break;
       case "reply":
       case "notice": {

@@ -73,11 +73,20 @@ function onFarmMsg(m) {
     case "ping": hello(); break;
     case "welcome":
       st.welcomed = true;
-      st.panel.setStatus("connected · farm girl v" + m.ver);
       st.panel.setWelcome(m);
+      if (!m.proto || m.proto < 2) {
+        // an older bot never sends the panel your roles, so Staff and Dashboard can't show: say so
+        st.panel.setStatus("connected · farm girl v" + m.ver + " (needs updatin')");
+        st.panel.add("The farm girl is runnin' an older bot (v" + m.ver + ") that doesn't send this panel your roles, keys or numbers, " +
+          "so only the basic panel shows. Update farmhand-bot.user.js on HER browser (the bot's account), then reload her page.", "notice");
+      } else {
+        st.panel.setStatus("connected · farm girl v" + m.ver);
+        // the bot sends your state right after hello; if it doesn't come, say so
+        setTimeout(() => { if (!st.gotState) st.panel.add("Connected, but the farm girl hasn't sent your roles yet. If Staff or Dashboard don't show up, reload the page.", "notice"); }, 12000);
+      }
       break;
     case "state":
-      if (m.state && typeof m.state === "object") st.panel.setState(m.state);
+      if (m.state && typeof m.state === "object") { st.gotState = true; st.panel.setState(m.state); }
       break;
     case "reply":
     case "notice": {

@@ -7,7 +7,7 @@ store.bnb_ledger_v1=JSON.stringify({v:4,people:{
  "700":{mn:700,name:"Rex",roles:["HERDMASTER"],onDuty:true,herds:[],tempKeys:[],cover:[]},
  "800":{mn:800,name:"Hand",roles:["FARMHAND"],onDuty:true,herds:[],tempKeys:[],cover:[]},
  "500":{mn:500,name:"Moo",roles:["LIVESTOCK"],species:"cow",onDuty:true,herds:[{leader:700,type:"perm",at:1}],tempKeys:[],cover:[]}
-},applications:[],archive:{},log:[],stuckLog:[]});
+},applications:[],archive:{},log:[],stuckLog:[],zones:{pens:{a:{X:20,Y:20},b:{X:25,Y:25},group:"pens"}}});
 global.GM_getValue=(k,d)=>k in store?store[k]:d; global.GM_setValue=(k,v)=>store[k]=v; global.GM_registerMenuCommand=()=>{};
 const doc={body:{appendChild(){}},createElement(){return {style:{},addEventListener(){}}},addEventListener(){},getElementById(){return null},visibilityState:'visible'};
 const at=(m,X,Y)=>({MemberNumber:m,Name:'N'+m,MapData:{Pos:{X,Y},PrivateState:{}}});
@@ -30,6 +30,7 @@ const farmTo=(mn,type,n)=>sent.slice(n||0).filter(s=>s[1]&&s[1].Content==='Farmh
 const C=mn=>chars.find(c=>c.MemberNumber===mn);
 (async()=>{ await wait(3500);
   C(500).Name='Moo';
+  out('0 zones saved before a restart are still there ->', !!(L().zones&&L().zones.pens));
   // 1. zones from two corners, paired into one place
   await B(700,'zone a barn-1'); C(700).MapData.Pos={X:5,Y:4}; await B(700,'zone b barn-1');
   out('1 corners set ->', JSON.stringify(L().zones['barn-1'].a)==='{"X":2,"Y":2}', JSON.stringify(L().zones['barn-1'].b)==='{"X":5,"Y":4}');

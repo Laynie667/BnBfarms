@@ -9,8 +9,11 @@
   const DOC_CMDS = ["record","stats","vet","quota","keys","size","measure","pedigree"];
 
   function stateFor(mn){
-    const r = rec(mn);
-    const base = { name: plainName(mn), onBooks: !!(r && r.roles && r.roles.length) };
+    // proprietors named in CFG.PROPRIETORS are staff even if their record lists no roles (or they have no record yet)
+    const staff = isStaff(mn);
+    const r = rec(mn, staff);
+    if (r && !r.roles) r.roles = [];
+    const base = { name: plainName(mn), onBooks: !!(r && (r.roles.length || staff)) };
     if (!base.onBooks) return base;
     const s = Object.assign(base, {
       roles: r.roles.slice(), tier: tierOf(mn) || "", species: r.species || "", gender: r.gender || "",
@@ -79,7 +82,8 @@
   function syncCompanions(force){
     for (const [mn, c] of state.companions){
       if (!hasCompanion(mn)) continue;
-      const s = stateFor(mn), key = JSON.stringify(Object.assign({}, s, { at: 0 }));
+      let s; try { s = stateFor(mn); } catch(e){ warn("state for "+mn+":", e); continue; }   // one bad record never stalls everyone's panel
+      const key = JSON.stringify(Object.assign({}, s, { at: 0 }));
       if (!force && c.lastState === key) continue;
       c.lastState = key;
       enqueue(makeMsg("state", { state: s }, mn));

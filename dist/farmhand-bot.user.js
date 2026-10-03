@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.9.33
+// @version      0.9.34
 // @description  B&B Farm: beeps, keys, ledger, roster, herds, summoning, anti-idle
 // @author       Laynie & Alexia
 // @match        *://*.bondageprojects.elementfx.com/*
@@ -1772,7 +1772,7 @@
   }
 
   // bot/src/version.js
-  var VERSION = "0.9.33";
+  var VERSION = "0.9.34";
 
   // bot-parts:farmhand-bot-parts
   (function() {
@@ -2543,7 +2543,7 @@
       if (!L.life) L.life = { feedingOn: true, curfewOn: true };
       if (!Array.isArray(L.chores)) L.chores = CFG.CHORES.map((text) => ({ text, by: 0 }));
       if (!Array.isArray(L.wheel)) L.wheel = [];
-      delete L.zones;
+      if (L.zones && (typeof L.zones !== "object" || Object.values(L.zones).some((z) => !z || typeof z !== "object" || !("group" in z)))) delete L.zones;
       for (const k in L.people) {
         const r = L.people[k];
         if (r.forced === void 0) r.forced = false;
@@ -3727,8 +3727,10 @@
     };
     const DOC_CMDS = ["record", "stats", "vet", "quota", "keys", "size", "measure", "pedigree"];
     function stateFor(mn) {
-      const r = rec(mn);
-      const base = { name: plainName(mn), onBooks: !!(r && r.roles && r.roles.length) };
+      const staff = isStaff(mn);
+      const r = rec(mn, staff);
+      if (r && !r.roles) r.roles = [];
+      const base = { name: plainName(mn), onBooks: !!(r && (r.roles.length || staff)) };
       if (!base.onBooks) return base;
       const s = Object.assign(base, {
         roles: r.roles.slice(),
@@ -3817,7 +3819,14 @@
     function syncCompanions(force) {
       for (const [mn, c] of state.companions) {
         if (!hasCompanion(mn)) continue;
-        const s = stateFor(mn), key = JSON.stringify(Object.assign({}, s, { at: 0 }));
+        let s;
+        try {
+          s = stateFor(mn);
+        } catch (e) {
+          warn("state for " + mn + ":", e);
+          continue;
+        }
+        const key = JSON.stringify(Object.assign({}, s, { at: 0 }));
         if (!force && c.lastState === key) continue;
         c.lastState = key;
         enqueue(makeMsg("state", { state: s }, mn));

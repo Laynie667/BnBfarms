@@ -27,7 +27,8 @@
     if (!L.life) L.life = { feedingOn:true, curfewOn:true };
     if (!Array.isArray(L.chores)) L.chores = CFG.CHORES.map(text => ({ text, by:0 }));
     if (!Array.isArray(L.wheel)) L.wheel = [];
-    delete L.zones;
+    // old-style zones (before the A/B corner zones) are cleared; the new ones are kept
+    if (L.zones && (typeof L.zones !== "object" || Object.values(L.zones).some(z => !z || typeof z !== "object" || !("group" in z)))) delete L.zones;
 
     // migrate records to v5: one herd → a list of herd memberships
     for (const k in L.people){

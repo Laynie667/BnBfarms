@@ -36,6 +36,8 @@ const STATE = { name: "Laynie", onBooks: true, roles: ["PROPRIETOR", "LIVESTOCK"
   out("1 panel built ->", !!D.getElementById("fhc-panel"));
   out("1 said hello ->", toBot("hello").length > 0);
   out("1 /farm command added ->", commands.some((c) => c.Tag === "farm"));
+  bot({ type: "welcome", ver: "0.9.25", name: "Laynie" });
+  out("1 an old bot is called out, not silent ->", /older bot \(v0\.9\.25\)/.test(text()), /needs updatin/.test(D.getElementById("fhc-status").textContent));
   bot({ type: "welcome", ver: "0.9.29", name: "Laynie", proto: 2 });
   out("1 status ->", /connected/.test(D.getElementById("fhc-status").textContent));
   out("1 guest view before state ->", /Apply to join/.test(text()));

@@ -36,6 +36,7 @@
       quotaTick();
       prodTick();
       milkingStallTick();
+      gearTick();
       lifeTick();
       workTick();
       for (const [mn,a] of state.arrivals) if (Date.now() > a.until) state.arrivals.delete(mn);

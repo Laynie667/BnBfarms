@@ -487,6 +487,7 @@ MILKIN' & COLLECTIN'
 SEED JARS
   ?jars · what's on the shelf
   ?inseminate <who> <jar> [hole] · asks them, then puts a jar in 'em on their yes
+  ?machine load <who> <jar> [hole] · asks, then their fuck machine or Sybian empties it in while it runs
 
 CONTROL
   ?edge <stud> · to the brink and stop; +25% next load, 3 = pent up

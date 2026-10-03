@@ -310,7 +310,9 @@
            items.find(x => grp(x) === "ItemButt");
     } else if (hole === "mouth"){
       const MOUTH = ["ItemMouth","ItemMouth2","ItemMouth3"];
-      it = items.find(x => MOUTH.includes(grp(x)) && eff(x).includes("BlockMouth") && !eff(x).includes("OpenMouth")) ||
+      // a fitted funnel gag is an open target, not a block
+      const funnel = x => x.Asset.Name === "FunnelGag" && x.Property && (x.Property.Type === "Funnel" || (x.Property.TypeRecord && x.Property.TypeRecord.typed === 1));
+      it = items.find(x => MOUTH.includes(grp(x)) && eff(x).includes("BlockMouth") && !eff(x).includes("OpenMouth") && !funnel(x)) ||
            items.find(x => !MOUTH.includes(grp(x)) && blk(x).includes("ItemMouth"));
     } else if (hole === "penis"){
       it = items.find(x => FRONT.includes(grp(x)) && (eff(x).includes("Chaste") || /chastity|cage/i.test(x.Asset.Name||"")));
@@ -741,7 +743,8 @@
       const on = stalls.some(([,s]) => Math.abs(s.X-pos.X) <= 1 && Math.abs(s.Y-pos.Y) <= 1);
       if (!on || !rec(C.MemberNumber)) continue;
       const mn = C.MemberNumber, p = prodOf(mn);
-      const gotM = makesMilk(mn) && !milkDenied(mn) ? drainMilk(mn, CFG.PROD.STALL_MILK_PER_MIN*dtMin) : 0;
+      // wearin' a pump in the stall? the pump does the milkin' (gearTick), so it isn't counted twice
+      const gotM = makesMilk(mn) && !milkDenied(mn) && !gearOf(mn).milk ? drainMilk(mn, CFG.PROD.STALL_MILK_PER_MIN*dtMin) : 0;
       const gotS = makesSemen(mn) ? drainSemen(mn, CFG.PROD.STALL_SEMEN_PER_MIN*dtMin) : 0;
       const got = gotM + gotS;
       // a stud in the stall gets their own show
@@ -800,7 +803,8 @@
     const pen = sizeOf(stud, "penis"), need = penisNeeds(pen);
     // a throat that's not ready for it gags and drools some back out, but it learns
     let gagged = 0, trained = false;
-    if (hole === "mouth" && makesSemen(stud) && need > sizeOf(t,"throat")){
+    const funnel = hole === "mouth" && funnelOn(t);   // straight down the funnel: no gaggin'
+    if (hole === "mouth" && !funnel && makesSemen(stud) && need > sizeOf(t,"throat")){
       gagged = load * (1 - sizeOf(t,"throat") / need);
       tp.throatTrain = (tp.throatTrain||0) + (T.throatX || 1);
       if (tp.throatTrain >= CFG.THROAT_TRAIN_EVERY && sizeBase(t,"throat") < CFG.SIZES.throat.natural){
@@ -821,7 +825,7 @@
     tp.lastStud = stud;
     const flavor = { equine:" That flared head swells wide with every pulse.", feline:" Those barbs make sure every last drop counts.",
                      draconic:" Every ridge drags deliciously on the way.", double:opt.load || opt.half ? " Both cocks throb and unload at once." : "" }[penisType(stud)] || "";
-    let o = "💦 "+(pent ? "All pent up, " : "")+plainName(stud)+" empties "+loadWord(load)+" ("+ml(load)+") into "+plainName(t)+"'s "+(hole === "mouth" ? "throat" : hole)+"."+(makesSemen(stud) ? flavor : "")+" "+
+    let o = "💦 "+(pent ? "All pent up, " : "")+plainName(stud)+" empties "+loadWord(load)+" ("+ml(load)+") "+(funnel ? "down "+plainName(t)+"'s funnel gag, and it pours straight to their belly" : "into "+plainName(t)+"'s "+(hole === "mouth" ? "throat" : hole))+"."+(makesSemen(stud) ? flavor : "")+" "+
             plainName(t)+" is "+Math.round(100*heldTotal(tp)/capacity(t))+"% full"+(spilt>0 ? ", and "+ml(spilt)+" spills out" : "")+".";
     if (opt.edged) o += " Edged "+opt.edged+" time"+(opt.edged === 1 ? "" : "s")+" first, it just keeps on comin'.";
     if (hole === "mouth" && makesSemen(stud)) o += " "+seedTaste(stud, pent);
@@ -948,9 +952,9 @@
     if (!jar) return "that jar's gone off the shelf, sugar.";
     return "";
   }
-  function askJar(staff, t, jarId, hole){
-    state.jarAsks.set(t, { staff, jar: jarId, hole, at: Date.now() });
-    askCard(t, "jar", "💉 "+plainName(staff)+" wants to inseminate you from jar #"+jarId+" ("+holeText(hole)+"), sugar. Say yes or no (?yes or ?no works too). "+
+  function askJar(staff, t, jarId, hole, machine){
+    state.jarAsks.set(t, { staff, jar: jarId, hole, machine: !!machine, at: Date.now() });
+    askCard(t, "jar", "💉 "+plainName(staff)+" wants to "+(machine ? "load jar #"+jarId+" into the machine for you ("+holeText(hole)+"), so it empties into you while it runs" : "inseminate you from jar #"+jarId+" ("+holeText(hole)+")")+", sugar. Say yes or no (?yes or ?no works too). "+
             "Say ?jarok off if you'd rather never be asked.");
   }
   function answerJar(t, yes){
@@ -962,12 +966,18 @@
       tell(a.staff, "💉 "+plainName(t)+" said no to the jar, sugar. Please leave it be.");
       return true;
     }
+    if (a.machine){   // it happens when the machine runs (gearTick)
+      state.machineLoads = state.machineLoads || new Map();
+      state.machineLoads.set(t, { staff: a.staff, jar: a.jar, hole: a.hole, at: Date.now() });
+      tell(a.staff, "⚙️ "+plainName(t)+" said yes. Jar #"+a.jar+" is loaded; it goes in when their machine runs (within "+CFG.GEAR.MACHINE_LOAD_MIN+" minutes).");
+      return true;
+    }
     const err = inseminate(a.staff, t, a.jar, a.hole);
     if (err){ tell(t, "You said yes, hon, but it can't happen right now: "+err); tell(a.staff, "💉 "+plainName(t)+" said yes, but "+err); }
     return true;
   }
   // does it, after checkin' everything again; returns "" when done, or why not
-  function inseminate(sender, t, jarId, hole){
+  function inseminate(sender, t, jarId, hole, machine){
     L.jars = (L.jars||[]).filter(j => Date.now() - j.t < CFG.JAR_DAYS*86400000);
     const jar = L.jars.find(j => String(j.id) === String(jarId));
     const err = inseminateProblem(t, jar, hole);
@@ -976,7 +986,9 @@
     const room = Math.max(0, capacity(t) - heldTotal(tp)), kept = Math.min(jar.ml, room);
     tp.held[hole] = (tp.held[hole]||0) + kept; tp.totals.received += kept; tp.lastStud = jar.stud;
     L.jars = L.jars.filter(j => j !== jar);
-    emote("💉 "+plainName(sender)+" fills the syringe from jar #"+jar.id+" and slides it deep into "+plainName(t)+"'s "+(hole === "mouth" ? "throat" : hole)+", pushin' "+ml(kept)+" of "+plainName(jar.stud)+"'s seed all the way in.");
+    emote(machine
+      ? "⚙️ The "+machine+" under "+plainName(t)+" gives a wet click and empties jar #"+jar.id+" deep into their "+(hole === "mouth" ? "throat" : hole)+": "+ml(kept)+" of "+plainName(jar.stud)+"'s seed, pumped in with every stroke."
+      : "💉 "+plainName(sender)+" fills the syringe from jar #"+jar.id+" and slides it deep into "+plainName(t)+"'s "+(hole === "mouth" ? "throat" : hole)+", pushin' "+ml(kept)+" of "+plainName(jar.stud)+"'s seed all the way in.");
     if (hole === "vulva"){
       const caught = rollConception(t, jar.stud, kept, onBreedingStand(t) ? CFG.BREEDING_STAND_X : 1);
       if (caught){ const sp = prodOf(jar.stud); sp.totals.conceived = (sp.totals.conceived||0) + 1;

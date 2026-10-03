@@ -26,7 +26,7 @@
     const { cmd, args, rest } = p;
     if (!PUBLIC_CMDS.includes(cmd) && !STAFF_CMDS.includes(cmd)) return;
     if (STAFF_CMDS.includes(cmd) && !isStaff(sender)) return;
-    if (onCooldown(sender, cmd)) return;
+    if (onCooldown(sender, cmd, channel)){ if (channel !== "chat") waitYourTurn(sender, raw, channel); return; }
 
     dbg("CMD:", cmd, "from", sender, "via", channel);
 
@@ -404,6 +404,33 @@
           break;
         }
         R("?voice · on|off · add · list · remove · every");
+        break;
+      }
+
+      case "machine": {
+        // staff: ?machine load <who> <jar> [hole] · ?machine unload <who> · ?machine (what's runnin')
+        state.machineLoads = state.machineLoads || new Map();
+        const sub = String(args[0]||"").toLowerCase();
+        if (!sub){
+          const on = (W.ChatRoomCharacter||[]).map(c => c.MemberNumber).filter(m => rec(m) && gearOf(m).machine);
+          R("⚙️ MACHINES\n"+(on.length ? on.map(m => { const g = gearOf(m).machine, l = state.machineLoads.get(m);
+              return "  "+plainName(m)+" · "+g.name+" · "+(g.intensity < 0 ? "off" : "intensity "+g.intensity)+(l ? " · jar #"+l.jar+" loaded" : ""); }).join("\n") : "  nobody's on one")+
+            "\n\n?machine load <who> <jar> [hole] asks them first, then the machine empties it into 'em while it runs.");
+          break;
+        }
+        const t = resolveTarget(args[1]);
+        if (sub === "unload"){ if (t && state.machineLoads.delete(t)) R("⚙️ Unloaded."); else R("Nothin' loaded for them, hon."); break; }
+        if (sub !== "load"){ R("?machine · ?machine load <who> <jar> [hole] · ?machine unload <who>"); break; }
+        L.jars = (L.jars||[]).filter(j => Date.now() - j.t < CFG.JAR_DAYS*86400000);
+        const jar = L.jars.find(j => String(j.id) === String(args[2]||"").replace(/^#/,""));
+        const hole = args[3] ? holeFrom(args[3]) : "vulva";
+        if (!t || !jar || !hole){ R("Here's how, sugar: ?machine load <who> <jar number> [hole]. ?jars shows the shelf."); break; }
+        if (!gearOf(t).machine){ R(plainName(t)+" isn't on a fuck machine or a Sybian, hon."); break; }
+        if (!jarOk(t)){ R(plainName(t)+" has said never to jar insemination (?jarok off), so I won't even ask."); break; }
+        const err = inseminateProblem(t, jar, hole);
+        if (err){ R(err); break; }
+        askJar(sender, t, jar.id, hole, true);
+        R("⚙️ I've asked "+plainName(t)+" first. On their yes it's loaded, and the machine does the rest.");
         break;
       }
 

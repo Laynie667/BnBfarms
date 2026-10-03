@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.9.31
+// @version      0.9.32
 // @description  B&B Farm: beeps, keys, ledger, roster, herds, summoning, anti-idle
 // @author       Laynie & Alexia
 // @match        *://*.bondageprojects.elementfx.com/*
@@ -1772,7 +1772,7 @@
   }
 
   // bot/src/version.js
-  var VERSION = "0.9.31";
+  var VERSION = "0.9.32";
 
   // bot-parts:farmhand-bot-parts
   (function() {
@@ -1800,6 +1800,8 @@
       // drop oldest routine messages past this
       BEEP_MAX_CHUNKS: 8,
       USER_COOLDOWN_S: 5,
+      COMPANION_COOLDOWN_S: 1,
+      // panel buttons: a short gap, and a click that comes too quick waits its turn
       APPLY_TIMEOUT_MIN: 0,
       // 0 = interviews never time out (staff can ?appclear a stale one)
       CLAIM_ASK_TIMEOUT_MIN: 60,
@@ -1864,6 +1866,19 @@
       TEASE_MAX_GAP_MIN: 70,
       // ...and usually by this
       /* ── PRODUCTION & BREEDING ── amounts in mL, rates per hour. See doc section 16. */
+      /* ── MILKING GEAR ── worn anywhere on the farm, it milks at a rate to match the gear.
+         Echo's pumps top out near 40 mL a minute, so the farm does too. */
+      GEAR: {
+        PUMP_ML: [0, 10, 20, 30, 40],
+        // BC Lactation Pump: Off, Low, Medium, High, Maximum (mL a minute)
+        ECHO_ML_MIN: 15,
+        ECHO_ML_MAX: 40,
+        // Echo's portable pump and milk vendor: calm → fully aroused
+        EMOTE_MIN: 5,
+        // a gear emote about this often per person (with some wobble)
+        MACHINE_LOAD_MIN: 30
+        // a jar loaded into a machine waits this long for it to run
+      },
       PROD: {
         MILK_PER_H: 500,
         MILK_CAP: 8e3,
@@ -3091,7 +3106,7 @@
     };
     W.FarmhandExport = exportLedger;
     W.FarmhandLedger = () => L;
-    if (W.__FARMHAND_TEST__) Object.assign(W, { __st: () => state, __cfg: CFG, __pt: prodTick, __qt: quotaTick, __lt: leashTick, __ms: milkingStallTick, __vt: voiceTick, __sync: syncCompanions });
+    if (W.__FARMHAND_TEST__) Object.assign(W, { __st: () => state, __cfg: CFG, __pt: prodTick, __qt: quotaTick, __lt: leashTick, __ms: milkingStallTick, __vt: voiceTick, __sync: syncCompanions, __gt: gearTick });
     W.FarmhandSyncKeys = () => syncAllPresent(true);
     W.FarmhandFriends = () => W.Player.FriendList;
     W.FarmhandAddFriend = (mn) => addFriend(mn, false);
@@ -3671,8 +3686,8 @@
       futa: "futa",
       milkable: "milkable",
       naturalHeat: "naturalheat",
-      praise: "praise",
-      degrade: "degrade",
+      praiseMe: "praise",
+      degradeMe: "degrade",
       tally: "tally",
       teaseOptIn: "teaseme",
       forced: "forced",
@@ -3709,6 +3724,8 @@
         if (inHeat(p)) s.heatUntil = p.heat.until;
         if (p.preg) s.preg = { due: p.preg.due, sires: p.preg.sires.map(plainName) };
         if (quotaOf(mn)) s.quota = { ml: Math.round(milkedOn(mn, dayKey())), goal: Math.round(quotaOf(mn)), streak: r.quotaStreak || 0 };
+        const g = gearOf(mn);
+        if (g.milk || g.machine || g.funnel) s.gear = { milk: g.milk || null, machine: g.machine || null, funnel: !!g.funnel };
         s.today = { tally: tallyToday(mn), naughty: r.naughtyMarks || 0, praised: r.praised || 0, degraded: r.degraded || 0 };
         s.at = now;
         if (isStaff(mn)) Object.assign(s, staffStateFor(mn));
@@ -4146,7 +4163,8 @@
         it = items.find((x) => eff(x).includes("ButtChaste")) || items.find((x) => grp(x) !== "ItemButt" && blk(x).includes("ItemButt")) || items.find((x) => grp(x) === "ItemButt");
       } else if (hole === "mouth") {
         const MOUTH = ["ItemMouth", "ItemMouth2", "ItemMouth3"];
-        it = items.find((x) => MOUTH.includes(grp(x)) && eff(x).includes("BlockMouth") && !eff(x).includes("OpenMouth")) || items.find((x) => !MOUTH.includes(grp(x)) && blk(x).includes("ItemMouth"));
+        const funnel = (x) => x.Asset.Name === "FunnelGag" && x.Property && (x.Property.Type === "Funnel" || x.Property.TypeRecord && x.Property.TypeRecord.typed === 1);
+        it = items.find((x) => MOUTH.includes(grp(x)) && eff(x).includes("BlockMouth") && !eff(x).includes("OpenMouth") && !funnel(x)) || items.find((x) => !MOUTH.includes(grp(x)) && blk(x).includes("ItemMouth"));
       } else if (hole === "penis") {
         it = items.find((x) => FRONT.includes(grp(x)) && (eff(x).includes("Chaste") || /chastity|cage/i.test(x.Asset.Name || "")));
       }
@@ -4611,7 +4629,7 @@
         const on = stalls.some(([, s]) => Math.abs(s.X - pos.X) <= 1 && Math.abs(s.Y - pos.Y) <= 1);
         if (!on || !rec(C.MemberNumber)) continue;
         const mn = C.MemberNumber, p = prodOf(mn);
-        const gotM = makesMilk(mn) && !milkDenied(mn) ? drainMilk(mn, CFG.PROD.STALL_MILK_PER_MIN * dtMin) : 0;
+        const gotM = makesMilk(mn) && !milkDenied(mn) && !gearOf(mn).milk ? drainMilk(mn, CFG.PROD.STALL_MILK_PER_MIN * dtMin) : 0;
         const gotS = makesSemen(mn) ? drainSemen(mn, CFG.PROD.STALL_SEMEN_PER_MIN * dtMin) : 0;
         const got = gotM + gotS;
         if (gotS > 0 && Date.now() - (p.stallSaid || 0) > 5 * 6e4 * (0.75 + Math.random() * 0.5)) {
@@ -4704,7 +4722,8 @@
       sp.totals.given += load;
       const pen = sizeOf(stud, "penis"), need = penisNeeds(pen);
       let gagged = 0, trained = false;
-      if (hole === "mouth" && makesSemen(stud) && need > sizeOf(t, "throat")) {
+      const funnel = hole === "mouth" && funnelOn(t);
+      if (hole === "mouth" && !funnel && makesSemen(stud) && need > sizeOf(t, "throat")) {
         gagged = load * (1 - sizeOf(t, "throat") / need);
         tp.throatTrain = (tp.throatTrain || 0) + (T.throatX || 1);
         if (tp.throatTrain >= CFG.THROAT_TRAIN_EVERY && sizeBase(t, "throat") < CFG.SIZES.throat.natural) {
@@ -4736,7 +4755,7 @@
         draconic: " Every ridge drags deliciously on the way.",
         double: opt.load || opt.half ? " Both cocks throb and unload at once." : ""
       }[penisType(stud)] || "";
-      let o = "💦 " + (pent ? "All pent up, " : "") + plainName(stud) + " empties " + loadWord(load) + " (" + ml(load) + ") into " + plainName(t) + "'s " + (hole === "mouth" ? "throat" : hole) + "." + (makesSemen(stud) ? flavor : "") + " " + plainName(t) + " is " + Math.round(100 * heldTotal(tp) / capacity(t)) + "% full" + (spilt > 0 ? ", and " + ml(spilt) + " spills out" : "") + ".";
+      let o = "💦 " + (pent ? "All pent up, " : "") + plainName(stud) + " empties " + loadWord(load) + " (" + ml(load) + ") " + (funnel ? "down " + plainName(t) + "'s funnel gag, and it pours straight to their belly" : "into " + plainName(t) + "'s " + (hole === "mouth" ? "throat" : hole)) + "." + (makesSemen(stud) ? flavor : "") + " " + plainName(t) + " is " + Math.round(100 * heldTotal(tp) / capacity(t)) + "% full" + (spilt > 0 ? ", and " + ml(spilt) + " spills out" : "") + ".";
       if (opt.edged) o += " Edged " + opt.edged + " time" + (opt.edged === 1 ? "" : "s") + " first, it just keeps on comin'.";
       if (hole === "mouth" && makesSemen(stud)) o += " " + seedTaste(stud, pent);
       if (gagged >= 1) o += " " + plainName(t) + " gags on that " + pen + '" cock and drools ' + ml(gagged) + " back up" + (trained ? ", but that throat's learnin': it's " + sizeWord("throat", sizeOf(t, "throat")) + " now" : "") + ".";
@@ -4868,9 +4887,9 @@
       if (!jar) return "that jar's gone off the shelf, sugar.";
       return "";
     }
-    function askJar(staff, t, jarId, hole) {
-      state.jarAsks.set(t, { staff, jar: jarId, hole, at: Date.now() });
-      askCard(t, "jar", "💉 " + plainName(staff) + " wants to inseminate you from jar #" + jarId + " (" + holeText(hole) + "), sugar. Say yes or no (?yes or ?no works too). Say ?jarok off if you'd rather never be asked.");
+    function askJar(staff, t, jarId, hole, machine) {
+      state.jarAsks.set(t, { staff, jar: jarId, hole, machine: !!machine, at: Date.now() });
+      askCard(t, "jar", "💉 " + plainName(staff) + " wants to " + (machine ? "load jar #" + jarId + " into the machine for you (" + holeText(hole) + "), so it empties into you while it runs" : "inseminate you from jar #" + jarId + " (" + holeText(hole) + ")") + ", sugar. Say yes or no (?yes or ?no works too). Say ?jarok off if you'd rather never be asked.");
     }
     function answerJar(t, yes) {
       const a = state.jarAsks.get(t);
@@ -4884,6 +4903,12 @@
         tell(a.staff, "💉 " + plainName(t) + " said no to the jar, sugar. Please leave it be.");
         return true;
       }
+      if (a.machine) {
+        state.machineLoads = state.machineLoads || /* @__PURE__ */ new Map();
+        state.machineLoads.set(t, { staff: a.staff, jar: a.jar, hole: a.hole, at: Date.now() });
+        tell(a.staff, "⚙️ " + plainName(t) + " said yes. Jar #" + a.jar + " is loaded; it goes in when their machine runs (within " + CFG.GEAR.MACHINE_LOAD_MIN + " minutes).");
+        return true;
+      }
       const err = inseminate(a.staff, t, a.jar, a.hole);
       if (err) {
         tell(t, "You said yes, hon, but it can't happen right now: " + err);
@@ -4891,7 +4916,7 @@
       }
       return true;
     }
-    function inseminate(sender, t, jarId, hole) {
+    function inseminate(sender, t, jarId, hole, machine) {
       L.jars = (L.jars || []).filter((j) => Date.now() - j.t < CFG.JAR_DAYS * 864e5);
       const jar = L.jars.find((j) => String(j.id) === String(jarId));
       const err = inseminateProblem(t, jar, hole);
@@ -4902,7 +4927,7 @@
       tp.totals.received += kept;
       tp.lastStud = jar.stud;
       L.jars = L.jars.filter((j) => j !== jar);
-      emote("💉 " + plainName(sender) + " fills the syringe from jar #" + jar.id + " and slides it deep into " + plainName(t) + "'s " + (hole === "mouth" ? "throat" : hole) + ", pushin' " + ml(kept) + " of " + plainName(jar.stud) + "'s seed all the way in.");
+      emote(machine ? "⚙️ The " + machine + " under " + plainName(t) + " gives a wet click and empties jar #" + jar.id + " deep into their " + (hole === "mouth" ? "throat" : hole) + ": " + ml(kept) + " of " + plainName(jar.stud) + "'s seed, pumped in with every stroke." : "💉 " + plainName(sender) + " fills the syringe from jar #" + jar.id + " and slides it deep into " + plainName(t) + "'s " + (hole === "mouth" ? "throat" : hole) + ", pushin' " + ml(kept) + " of " + plainName(jar.stud) + "'s seed all the way in.");
       if (hole === "vulva") {
         const caught = rollConception(t, jar.stud, kept, onBreedingStand(t) ? CFG.BREEDING_STAND_X : 1);
         if (caught) {
@@ -6227,6 +6252,118 @@
       if (t === "herd") return canHoldHerd(sender);
       return isProprietor(sender) || herdLeaderOf(t) === sender;
     }
+    const typeRec = (it) => it && it.Property && it.Property.TypeRecord || {};
+    function wornItem(mn, group, name) {
+      const C = charFor(mn);
+      return C && Array.isArray(C.Appearance) ? C.Appearance.find((x) => x && x.Asset && x.Asset.Group && x.Asset.Group.Name === group && x.Asset.Name === name) || null : null;
+    }
+    function funnelOn(mn) {
+      const C = charFor(mn);
+      return !!(C && Array.isArray(C.Appearance) && C.Appearance.find((x) => x && x.Asset && x.Asset.Name === "FunnelGag" && x.Property && (x.Property.Type === "Funnel" || typeRec(x).typed === 1)));
+    }
+    function gearOf(mn) {
+      const C = charFor(mn), g = {};
+      if (!C) return g;
+      const pump2 = wornItem(mn, "ItemNipples", "LactationPump");
+      if (pump2) {
+        const lv = Math.min(4, Number(pump2.Property && pump2.Property.SuctionLevel) || Number(typeRec(pump2).typed) || 0);
+        if (lv > 0) g.milk = { kind: "pump", name: "lactation pump", level: lv, ml: CFG.GEAR.PUMP_ML[lv] };
+      }
+      const arousal = Math.max(0, Math.min(100, C.ArousalSettings && C.ArousalSettings.Progress || 0));
+      const echo = (name) => ({
+        kind: "echo",
+        name,
+        level: 1 + Math.round(3 * arousal / 100),
+        ml: Math.round(CFG.GEAR.ECHO_ML_MIN + (CFG.GEAR.ECHO_ML_MAX - CFG.GEAR.ECHO_ML_MIN) * arousal / 100)
+      });
+      const ep = wornItem(mn, "ItemTorso", "便携乳泵");
+      if (!g.milk && ep && typeRec(ep).s === 0) g.milk = echo("portable breast pump");
+      const ev = wornItem(mn, "ItemDevices", "奶贩");
+      if (!g.milk && ev && typeRec(ev).m === 1) g.milk = echo("milk vendor");
+      for (const [n, label] of [["FuckMachine", "fuck machine"], ["Sybian", "Sybian"]]) {
+        const m = wornItem(mn, "ItemDevices", n), i = m && m.Property && typeof m.Property.Intensity === "number" ? m.Property.Intensity : -1;
+        if (m) g.machine = { name: label, intensity: i };
+      }
+      g.funnel = funnelOn(mn);
+      return g;
+    }
+    const GEAR_LINES = {
+      pump: [
+        [
+          "The lactation pump on %n%'s nipples gives a soft, steady little tug. Milk beads and drips into the bottles. (+%ml%)",
+          "%n%'s pump hums along nice and gentle, coaxin' out warm milk a drop at a time. (+%ml%)"
+        ],
+        [
+          "The lactation pump pulls in a slow, firm rhythm, and %n%'s teats stretch into the cups with every draw. (+%ml%)",
+          "Milk runs in steady streams down the pump's tubes from %n%'s swollen nipples. (+%ml%)"
+        ],
+        [
+          "The pump on %n% sucks hard, stretchin' those nipples long, and the bottles fill fast. %n% squirms in it. (+%ml%)",
+          "%n%'s lactation pump is cranked up high. Every pull wrings a hot spurt of milk out of 'em. (+%ml%)"
+        ]
+      ],
+      echo: [
+        [
+          "The %g% on %n% sighs along, and a thin line of milk creeps up the hose. (+%ml%)",
+          "%n%'s %g% works slow and patient. Drip, drip, into the tank. (+%ml%)"
+        ],
+        [
+          "Milk flows steady up the %g%'s hose from %n%'s teats, and the tank's fillin' nicely. (+%ml%)",
+          "The %g% has %n% let down good now: warm milk pulses up the line with every pull. (+%ml%)"
+        ],
+        [
+          "%n% is so worked up the %g% can barely keep up. Milk gushes up the hoses into the tank. (+%ml%)",
+          "The %g%'s tank sloshes as %n%, flushed and needy, pours milk into it. (+%ml%)"
+        ]
+      ],
+      machine: [
+        "The %g% under %n% ticks over slow, just enough to keep 'em squirmin'.",
+        "The %g% works %n% in a steady rhythm. They can't sit still.",
+        "The %g% pounds away at %n%. They're a moanin', shakin' mess on it.",
+        "The %g% is flat out, and %n% is wailin'. Somebody's gonna have to peel 'em off it."
+      ]
+    };
+    function gearLine(mn, kind, level, name, mlGot) {
+      const set = kind === "machine" ? GEAR_LINES.machine : GEAR_LINES[kind][level <= 1 ? 0 : level <= 2 ? 1 : 2];
+      const raw = kind === "machine" ? set[Math.max(0, Math.min(3, level))] : set[Math.floor(Math.random() * set.length)];
+      return raw.replace(/%n%/g, plainName(mn)).replace(/%g%/g, name).replace(/%ml%/g, ml(mlGot || 0));
+    }
+    function gearTick() {
+      const dtMin = CFG.HEARTBEAT_MS / 6e4, now = Date.now();
+      state.machineLoads = state.machineLoads || /* @__PURE__ */ new Map();
+      for (const C of W.ChatRoomCharacter || []) {
+        const mn = C.MemberNumber;
+        if (mn === CFG.BOT_MEMBER || !rec(mn)) continue;
+        const g = gearOf(mn), p = prodOf(mn), jitter = () => CFG.GEAR.EMOTE_MIN * 6e4 * (0.75 + Math.random() * 0.5);
+        if (g.milk && makesMilk(mn) && !milkDenied(mn)) {
+          const got = drainMilk(mn, g.milk.ml * dtMin);
+          p.gearMl = (p.gearMl || 0) + got;
+          if (got > 0 && now >= (p.gearNext || 0)) {
+            p.gearNext = now + jitter();
+            emote("🥛 " + gearLine(mn, g.milk.kind, g.milk.level, g.milk.name, p.gearMl));
+            p.gearMl = 0;
+          }
+          if (got > 0 && p.milk < 1 && !p.gearDry) {
+            p.gearDry = true;
+            emote("🥛 The " + g.milk.name + " pulls " + plainName(mn) + " plumb dry. Every last drop's in the tank, sugar.");
+          }
+          if (p.milk >= 1) p.gearDry = false;
+        }
+        if (g.machine && g.machine.intensity >= 0) {
+          const load = state.machineLoads.get(mn);
+          if (load && now - load.at > CFG.GEAR.MACHINE_LOAD_MIN * 6e4) state.machineLoads.delete(mn);
+          else if (load) {
+            state.machineLoads.delete(mn);
+            const err = inseminate(load.staff, mn, load.jar, load.hole, g.machine.name);
+            if (err) tell(load.staff, "⚙️ The " + g.machine.name + " couldn't do it: " + err);
+          }
+          if (now >= (p.machineNext || 0)) {
+            p.machineNext = now + jitter();
+            emote("⚙️ " + gearLine(mn, "machine", g.machine.intensity, g.machine.name));
+          }
+        }
+      }
+    }
     function clockedIn(mn) {
       const r = rec(mn);
       return !!(r && r.shift && r.shift.in);
@@ -6750,6 +6887,7 @@ MILKIN' & COLLECTIN'
 SEED JARS
   ?jars · what's on the shelf
   ?inseminate <who> <jar> [hole] · asks them, then puts a jar in 'em on their yes
+  ?machine load <who> <jar> [hole] · asks, then their fuck machine or Sybian empties it in while it runs
 
 CONTROL
   ?edge <stud> · to the brink and stop; +25% next load, 3 = pent up
@@ -7247,12 +7385,31 @@ Welcome to B&B Farm. Mind the ruts! 🌾`,
       }
     }
     const NO_COOLDOWN = ["safe", "safeword", "red", "stuck", "report", "staff"];
-    function onCooldown(mn, cmd) {
+    const cooldownMs = (channel) => (channel === "companion" ? CFG.COMPANION_COOLDOWN_S : CFG.USER_COOLDOWN_S) * 1e3;
+    function onCooldown(mn, cmd, channel) {
       if (NO_COOLDOWN.includes(cmd)) return false;
       const last = state.cooldowns.get(mn) || 0;
-      if (Date.now() - last < CFG.USER_COOLDOWN_S * 1e3) return true;
+      if (Date.now() - last < cooldownMs(channel)) return true;
       state.cooldowns.set(mn, Date.now());
       return false;
+    }
+    function waitYourTurn(mn, raw, channel) {
+      state.cmdWaiting = state.cmdWaiting || /* @__PURE__ */ new Map();
+      const q = state.cmdWaiting.get(mn) || [];
+      if (q.length >= 5) return;
+      q.push({ raw, channel });
+      state.cmdWaiting.set(mn, q);
+      if (q.length > 1) return;
+      const next = () => {
+        const left = cooldownMs(channel) - (Date.now() - (state.cooldowns.get(mn) || 0));
+        later(() => {
+          const item = q.shift();
+          if (!q.length) state.cmdWaiting.delete(mn);
+          else next();
+          if (item) handleCommand(mn, item.raw, item.channel);
+        }, Math.max(50, left + 50));
+      };
+      next();
     }
     const NATURAL = [
       [/^(who|what) are you\b/, "help"],
@@ -7447,7 +7604,8 @@ Welcome to B&B Farm. Mind the ruts! 🌾`,
       "contracts",
       "zone",
       "zones",
-      "voice"
+      "voice",
+      "machine"
     ];
     const SAFETY_CMDS = ["safe", "safeword", "red", "stuck"];
     const PRIVATE_REPLY = [
@@ -7600,7 +7758,10 @@ Welcome to B&B Farm. Mind the ruts! 🌾`,
       const { cmd, args, rest } = p;
       if (!PUBLIC_CMDS.includes(cmd) && !STAFF_CMDS.includes(cmd)) return;
       if (STAFF_CMDS.includes(cmd) && !isStaff(sender)) return;
-      if (onCooldown(sender, cmd)) return;
+      if (onCooldown(sender, cmd, channel)) {
+        if (channel !== "chat") waitYourTurn(sender, raw, channel);
+        return;
+      }
       dbg("CMD:", cmd, "from", sender, "via", channel);
       if (CFG.SAFETY_REQUIRE_IN_ROOM && SAFETY_CMDS.includes(cmd) && !charFor(sender)) {
         reply(sender, "🔴 I hear you, " + plainName(sender) + ". The farm office only covers the farm, and you're not here right now, so I can't stop anything where you are. Please use the club's own safeword and your room's admins.\n\n?staff still reaches our people if you'd like a hand.", channel);
@@ -8226,6 +8387,51 @@ Welcome to B&B Farm. Mind the ruts! 🌾`,
             break;
           }
           R("?voice · on|off · add · list · remove · every");
+          break;
+        }
+        case "machine": {
+          state.machineLoads = state.machineLoads || /* @__PURE__ */ new Map();
+          const sub = String(args[0] || "").toLowerCase();
+          if (!sub) {
+            const on = (W.ChatRoomCharacter || []).map((c) => c.MemberNumber).filter((m) => rec(m) && gearOf(m).machine);
+            R("⚙️ MACHINES\n" + (on.length ? on.map((m) => {
+              const g = gearOf(m).machine, l = state.machineLoads.get(m);
+              return "  " + plainName(m) + " · " + g.name + " · " + (g.intensity < 0 ? "off" : "intensity " + g.intensity) + (l ? " · jar #" + l.jar + " loaded" : "");
+            }).join("\n") : "  nobody's on one") + "\n\n?machine load <who> <jar> [hole] asks them first, then the machine empties it into 'em while it runs.");
+            break;
+          }
+          const t = resolveTarget(args[1]);
+          if (sub === "unload") {
+            if (t && state.machineLoads.delete(t)) R("⚙️ Unloaded.");
+            else R("Nothin' loaded for them, hon.");
+            break;
+          }
+          if (sub !== "load") {
+            R("?machine · ?machine load <who> <jar> [hole] · ?machine unload <who>");
+            break;
+          }
+          L.jars = (L.jars || []).filter((j) => Date.now() - j.t < CFG.JAR_DAYS * 864e5);
+          const jar = L.jars.find((j) => String(j.id) === String(args[2] || "").replace(/^#/, ""));
+          const hole = args[3] ? holeFrom(args[3]) : "vulva";
+          if (!t || !jar || !hole) {
+            R("Here's how, sugar: ?machine load <who> <jar number> [hole]. ?jars shows the shelf.");
+            break;
+          }
+          if (!gearOf(t).machine) {
+            R(plainName(t) + " isn't on a fuck machine or a Sybian, hon.");
+            break;
+          }
+          if (!jarOk(t)) {
+            R(plainName(t) + " has said never to jar insemination (?jarok off), so I won't even ask.");
+            break;
+          }
+          const err = inseminateProblem(t, jar, hole);
+          if (err) {
+            R(err);
+            break;
+          }
+          askJar(sender, t, jar.id, hole, true);
+          R("⚙️ I've asked " + plainName(t) + " first. On their yes it's loaded, and the machine does the rest.");
           break;
         }
         case "jarok": {
@@ -10853,6 +11059,7 @@ Welcome to B&B Farm, hon. 🌾`
         quotaTick();
         prodTick();
         milkingStallTick();
+        gearTick();
         lifeTick();
         workTick();
         for (const [mn, a] of state.arrivals) if (Date.now() > a.until) state.arrivals.delete(mn);

@@ -29,6 +29,19 @@ function me(ctx) {
   ];
 }
 
+// what you're hooked up to right now, read off you by the farm
+function gearCard(s) {
+  const g = s.gear || {};
+  const steps = (lv) => h("div", { style: { display: "flex", gap: "4px", marginTop: "6px" } },
+    [1, 2, 3, 4].map((n) => h("div", { style: { flex: "1", height: "9px", borderRadius: "3px", background: n <= lv ? "var(--fh-accent)" : "var(--fh-line)" } })));
+  return card(title("Milkin' gear"),
+    g.milk ? [h("div", { class: "fhc-kv" }, h("b", null, g.milk.name), h("span", null, g.milk.ml + " mL a minute")), steps(g.milk.level),
+              muted(["", "Gentle", "Steady", "Hard", "Max"][g.milk.level] + (g.milk.kind === "echo" ? " · the more worked up you are, the faster it draws" : ""))]
+      : muted("No pump on right now. A lactation pump, Echo's portable pump, the milk vendor or a milkin' stall all milk you here."),
+    g.machine && h("div", { class: "fhc-kv" }, h("span", null, "⚙️ " + g.machine.name), h("span", { class: "fhc-muted" }, g.machine.intensity < 0 ? "off" : "intensity " + g.machine.intensity)),
+    g.funnel && h("div", { class: "fhc-kv" }, h("span", null, "Funnel gag"), h("span", { class: "fhc-muted" }, "fitted, and it counts as open")));
+}
+
 function milking(ctx) {
   const s = ctx.s;
   if (!s.milk && !s.semen) return [card(title("Milking"), muted("You're not makin' milk right now. Flip Milkable on in Toggles if you'd like to."))];
@@ -37,7 +50,7 @@ function milking(ctx) {
       muted("Grade " + s.milk.grade + (s.milk.lastAt ? " · last milked " + Math.round((Date.now() - s.milk.lastAt) / 60000) + " min ago" : ""))),
     s.quota && card(title("Quota"), bar("Today", ml(s.quota.ml) + " of " + ml(s.quota.goal), pct(s.quota.ml, s.quota.goal), "good")),
     s.semen && card(title("Seed"), bar("Stored", ml(s.semen.ml) + " of " + ml(s.semen.cap), pct(s.semen.ml, s.semen.cap))),
-    card(title("Milkin' gear"), muted("Pumps, stalls and the milk vendor show up here once the farm reads your gear (comin' soon).")),
+    gearCard(s),
     h("div", null, btn("Quota", () => ctx.send("quota")), btn("Milk board", () => ctx.send("board"))),
   ];
 }

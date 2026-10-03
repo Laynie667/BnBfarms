@@ -26,6 +26,7 @@
     QUEUE_MAX: 300,              // drop oldest routine messages past this
     BEEP_MAX_CHUNKS: 8,
     USER_COOLDOWN_S: 5,
+    COMPANION_COOLDOWN_S: 1,       // panel buttons: a short gap, and a click that comes too quick waits its turn
     APPLY_TIMEOUT_MIN: 0,        // 0 = interviews never time out (staff can ?appclear a stale one)
     CLAIM_ASK_TIMEOUT_MIN: 60,   // unanswered ?claim requests lapse after this
     ROOM_SNAPSHOT_MIN: 10,       // remember the map so a rebuilt room keeps it
@@ -87,6 +88,14 @@
     TEASE_MAX_GAP_MIN: 70,     // ...and usually by this
 
     /* ── PRODUCTION & BREEDING ── amounts in mL, rates per hour. See doc section 16. */
+    /* ── MILKING GEAR ── worn anywhere on the farm, it milks at a rate to match the gear.
+       Echo's pumps top out near 40 mL a minute, so the farm does too. */
+    GEAR: {
+      PUMP_ML: [0, 10, 20, 30, 40],          // BC Lactation Pump: Off, Low, Medium, High, Maximum (mL a minute)
+      ECHO_ML_MIN: 15, ECHO_ML_MAX: 40,      // Echo's portable pump and milk vendor: calm → fully aroused
+      EMOTE_MIN: 5,                          // a gear emote about this often per person (with some wobble)
+      MACHINE_LOAD_MIN: 30,                  // a jar loaded into a machine waits this long for it to run
+    },
     PROD: {
       MILK_PER_H: 500, MILK_CAP: 8000,            // per species "milk" multiplier below
       SEMEN_PER_H: 5,  SEMEN_CAP: 60,

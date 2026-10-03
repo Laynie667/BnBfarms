@@ -3,7 +3,7 @@
      I only send it again when somethin' in it changed. */
   // ledger field → the command that flips it
   const SWITCH_CMDS = { breedable:"breedable", fertile:"fertile", jarok:"jarok", freeuse:"freeuse", futa:"futa",
-                        milkable:"milkable", naturalHeat:"naturalheat", praise:"praise", degrade:"degrade",
+                        milkable:"milkable", naturalHeat:"naturalheat", praiseMe:"praise", degradeMe:"degrade",
                         tally:"tally", teaseOptIn:"teaseme", forced:"forced", hypno:"hypno" };
   // staff lookups about somebody else go to the Companion's Office tab
   const DOC_CMDS = ["record","stats","vet","quota","keys","size","measure","pedigree"];
@@ -32,6 +32,8 @@
       if (inHeat(p)) s.heatUntil = p.heat.until;
       if (p.preg) s.preg = { due: p.preg.due, sires: p.preg.sires.map(plainName) };
       if (quotaOf(mn)) s.quota = { ml: Math.round(milkedOn(mn, dayKey())), goal: Math.round(quotaOf(mn)), streak: r.quotaStreak || 0 };
+      const g = gearOf(mn);   // the milkin' gear they're in right now
+      if (g.milk || g.machine || g.funnel) s.gear = { milk: g.milk || null, machine: g.machine || null, funnel: !!g.funnel };
       s.today = { tally: tallyToday(mn), naughty: r.naughtyMarks || 0, praised: r.praised || 0, degraded: r.degraded || 0 };
       s.at = now;
       if (isStaff(mn)) Object.assign(s, staffStateFor(mn));

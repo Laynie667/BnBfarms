@@ -3,12 +3,32 @@
   // FIX: safety commands never get throttled
   const NO_COOLDOWN = ["safe","safeword","red","stuck","report","staff"];
 
-  function onCooldown(mn, cmd){
+  // how long someone waits between commands: panel clicks come quick, so they get a short gap
+  const cooldownMs = (channel) => (channel === "companion" ? CFG.COMPANION_COOLDOWN_S : CFG.USER_COOLDOWN_S) * 1000;
+  function onCooldown(mn, cmd, channel){
     if (NO_COOLDOWN.includes(cmd)) return false;
     const last = state.cooldowns.get(mn)||0;
-    if (Date.now()-last < CFG.USER_COOLDOWN_S*1000) return true;
+    if (Date.now()-last < cooldownMs(channel)) return true;
     state.cooldowns.set(mn, Date.now());
     return false;
+  }
+  // A private command (panel, whisper, beep, /bot) that came too soon waits its turn instead of
+  // vanishin'. Only room-chat spam is dropped. Up to 5 wait per person, run one per gap.
+  function waitYourTurn(mn, raw, channel){
+    state.cmdWaiting = state.cmdWaiting || new Map();
+    const q = state.cmdWaiting.get(mn) || [];
+    if (q.length >= 5) return;
+    q.push({ raw, channel }); state.cmdWaiting.set(mn, q);
+    if (q.length > 1) return;   // a timer's already runnin' for 'em
+    const next = () => {
+      const left = cooldownMs(channel) - (Date.now() - (state.cooldowns.get(mn)||0));
+      later(() => {
+        const item = q.shift();
+        if (!q.length) state.cmdWaiting.delete(mn); else next();
+        if (item) handleCommand(mn, item.raw, item.channel);
+      }, Math.max(50, left + 50));
+    };
+    next();
   }
 
   // Plain-English questions sent straight to the bot (whisper, beep, /bot).
@@ -84,7 +104,7 @@
                        "milk","collect","heat","heatline","shotlog",
                        "stocks","unstock","walk","tourstop","clockin","clockout","hours","done","chore","chores",
                        "wheel","spin","begphrase","score","drain","denial","ruin","jars","inseminate","nomilk","inspect","edge",
-                       "contract","contracts","zone","zones","voice"];
+                       "contract","contracts","zone","zones","voice","machine"];
 
   const SAFETY_CMDS = ["safe","safeword","red","stuck"];
   const PRIVATE_REPLY = ["record","keys","find","app","queue","roster","stock","health",

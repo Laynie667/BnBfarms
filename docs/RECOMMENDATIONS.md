@@ -260,9 +260,9 @@ SkyzHypno (public API on the page) and HSC (trigger words from allowed speakers)
 
 1. ✅ Jar insemination asks, plus the `?jarok` switch (done, bot v0.9.26)
 2. ✅ Summon to the staff member's side, and the staff spot for on-call staff from other rooms (done, bot v0.9.27)
-3. Protocol v2 + role-based tabs (livestock first)
-4. Staff tabs + the Office
-5. Dashboard: BC+ contracts
+3. ✅ Protocol v2 + role-based panels (bot v0.9.27+, Companion v0.2.0): Livestock/Guest, Staff, Dashboard
+4. 🟡 Staff panel + the Office (done: Me, Office, Contracts, Barn & herd, Guides, Toggles · still to come: Herd list, Zones, Tease lines, Voice, Shift, which need more data from the bot)
+5. ✅ BC+ contracts (bot v0.9.28): catalog from BC+'s source, tested against BC+'s own sanitizer; ?contract commands; Dashboard rule builder; application asks species, gender, length, depth (v0.9.29)
 6. Dashboard: outfits and uniforms (species × gender, restraints and locks) + ?gender with femboy
 7. Milking gear integration (`milking-gear.md`)
 8. ✅ Split the bot into topic files (done first: `bot/src/parts/`); turning them into real modules comes bit by bit

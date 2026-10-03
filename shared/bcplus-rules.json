@@ -1,0 +1,1543 @@
+{
+ "bcplusVersion": "0.14.0",
+ "made": "2026-10-03",
+ "rules": [
+  {
+   "id": "speech.forbidWhisper",
+   "name": "Forbid whispering",
+   "category": "Speech",
+   "description": "The player cannot send whispers to other people in the room.",
+   "bcxEquivalent": "speech_restrict_whisper_send",
+   "settings": [
+    {
+     "type": "checkbox",
+     "name": "allowLover",
+     "label": "Still allow whispering to Lover-ranked roles and above",
+     "default": true
+    }
+   ]
+  },
+  {
+   "id": "speech.forbidOOC",
+   "name": "Forbid OOC messages",
+   "category": "Speech",
+   "description": "The player cannot send messages containing out-of-character (parenthesized) text. Whispers are not affected.",
+   "bcxEquivalent": "speech_block_ooc",
+   "settings": []
+  },
+  {
+   "id": "speech.gaggedOOC",
+   "name": "Block OOC while gagged",
+   "category": "Speech",
+   "description": "The player cannot use out-of-character (parenthesized) text while gagged - a gag should not be so easy to talk around.",
+   "bcxEquivalent": "speech_block_gagged_ooc",
+   "settings": []
+  },
+  {
+   "id": "speech.forbiddenWords",
+   "name": "Forbidden words",
+   "category": "Speech",
+   "description": "The player cannot use the configured words in chat or whispers.",
+   "bcxEquivalent": "speech_ban_words",
+   "settings": [
+    {
+     "type": "stringList",
+     "name": "words",
+     "label": "Forbidden words:",
+     "default": [],
+     "maxChars": 100,
+     "entryLabel": "word"
+    },
+    {
+     "type": "checkbox",
+     "name": "includeOOC",
+     "label": "Also forbid the words in OOC (parentheses)",
+     "default": false
+    }
+   ]
+  },
+  {
+   "id": "speech.mandatoryWords",
+   "name": "Mandatory words",
+   "category": "Speech",
+   "description": "Every chat message must contain at least one of the configured words (e.g. \"Miss, please, humbly\"). Purely out-of-character messages are exempt.",
+   "bcxEquivalent": "speech_mandatory_words",
+   "settings": [
+    {
+     "type": "stringList",
+     "name": "words",
+     "label": "Required words:",
+     "default": [],
+     "maxChars": 100,
+     "entryLabel": "word"
+    },
+    {
+     "type": "checkbox",
+     "name": "includeWhispers",
+     "label": "Also apply to whispers",
+     "default": false
+    }
+   ]
+  },
+  {
+   "id": "speech.minimumWords",
+   "name": "Require detailed speech",
+   "category": "Speech",
+   "description": "Every chat message must contain at least the configured number of words - doll talk in reverse, for detailed roleplay. Purely out-of-character messages and emotes are exempt.",
+   "settings": [
+    {
+     "type": "option",
+     "name": "minWords",
+     "label": "Minimum words per message:",
+     "options": [
+      "2",
+      "3",
+      "4",
+      "5",
+      "6",
+      "8",
+      "10",
+      "15",
+      "20"
+     ],
+     "default": "5"
+    },
+    {
+     "type": "checkbox",
+     "name": "includeWhispers",
+     "label": "Also apply to whispers",
+     "default": false
+    }
+   ]
+  },
+  {
+   "id": "speech.restrainedSpeech",
+   "name": "Restrained speech",
+   "category": "Speech",
+   "description": "The player can only say the configured phrases, nothing else (case and end punctuation are ignored). Purely out-of-character messages are exempt.",
+   "bcxEquivalent": "speech_restrained_speech",
+   "settings": [
+    {
+     "type": "stringList",
+     "name": "phrases",
+     "label": "Allowed phrases:",
+     "default": [
+      "Yes Miss",
+      "No Miss",
+      "Thank you Miss",
+      "Please Miss"
+     ],
+     "maxChars": 120,
+     "entryLabel": "phrase"
+    }
+   ]
+  },
+  {
+   "id": "speech.dollTalk",
+   "name": "Doll talk",
+   "category": "Speech",
+   "description": "The player can only speak in short, simple phrases: limited words per message and letters per word. Out-of-character text is not affected.",
+   "bcxEquivalent": "speech_doll_talk",
+   "settings": [
+    {
+     "type": "option",
+     "name": "maxWords",
+     "label": "Maximum words per message",
+     "options": [
+      "3",
+      "5",
+      "7",
+      "10"
+     ],
+     "default": "5"
+    },
+    {
+     "type": "option",
+     "name": "maxWordLength",
+     "label": "Maximum letters per word",
+     "options": [
+      "4",
+      "5",
+      "6",
+      "7",
+      "8"
+     ],
+     "default": "6"
+    }
+   ]
+  },
+  {
+   "id": "speech.wordReplace",
+   "name": "Replace spoken words",
+   "category": "Speech",
+   "description": "Configured words are replaced in everything the player says. Each entry is word:replacement (e.g. \"i:this doll\"). Out-of-character text is not affected.",
+   "bcxEquivalent": "speech_replace_spoken_words",
+   "settings": [
+    {
+     "type": "stringList",
+     "name": "replacements",
+     "label": "Replacements:",
+     "default": [],
+     "maxChars": 120,
+     "entryLabel": "word:replacement"
+    }
+   ]
+  },
+  {
+   "id": "speech.faltering",
+   "name": "Enforce faltering speech",
+   "category": "Speech",
+   "description": "The player's spoken messages come out st-st-stuttering. Out-of-character text is not affected.",
+   "bcxEquivalent": "speech_alter_faltering",
+   "settings": []
+  },
+  {
+   "id": "speech.forbidShouting",
+   "name": "Forbid shouting",
+   "category": "Speech",
+   "description": "All-caps chat messages are lowered to normal speech when enforced.",
+   "settings": []
+  },
+  {
+   "id": "speech.forbidEmotes",
+   "name": "Forbid emotes",
+   "category": "Speech",
+   "description": "The player cannot send emote messages to the room.",
+   "bcxEquivalent": "speech_forbid_emotes",
+   "settings": []
+  },
+  {
+   "id": "social.forbidBeepMessages",
+   "name": "Forbid beep messages",
+   "category": "Social",
+   "description": "The player cannot send beeps with message content to friends.",
+   "bcxEquivalent": "speech_restrict_beep_send",
+   "settings": [
+    {
+     "type": "checkbox",
+     "name": "allowPlainBeeps",
+     "label": "Still allow plain beeps without a message",
+     "default": true
+    }
+   ]
+  },
+  {
+   "id": "social.forbidBeeps",
+   "name": "Forbid sending beeps",
+   "category": "Social",
+   "description": "The player cannot send any beeps at all, with or without a message. Hidden mod-to-mod beeps (leashes, summons, BCX) are unaffected, and configured members can still be beeped.",
+   "settings": [
+    {
+     "type": "members",
+     "name": "allowedMembers",
+     "label": "Members who may still be beeped:",
+     "default": []
+    }
+   ]
+  },
+  {
+   "id": "social.friendListChanges",
+   "name": "Forbid friend-list changes",
+   "category": "Social",
+   "description": "The player cannot add or remove BC friends; each direction can be toggled separately. Covers the friend list screen and in-room dialogs.",
+   "settings": [
+    {
+     "type": "checkbox",
+     "name": "blockAdding",
+     "label": "Block adding friends",
+     "default": true
+    },
+    {
+     "type": "checkbox",
+     "name": "blockRemoving",
+     "label": "Block removing friends",
+     "default": true
+    }
+   ]
+  },
+  {
+   "id": "chat.forbidLeaving",
+   "name": "Forbid leaving the room",
+   "category": "Other",
+   "description": "The player cannot leave the chat room they are in - the exit button and leave commands from other mods are both blocked. Forced moves (leashes, kicks, BC's safeword release) and disconnects are not prevented.",
+   "bcxEquivalent": "block_leaving_room",
+   "settings": []
+  },
+  {
+   "id": "rooms.create",
+   "name": "Forbid creating new rooms",
+   "category": "Rooms",
+   "description": "The player cannot open the room creation screen. Changing settings of an existing room they administrate is unaffected.",
+   "bcxEquivalent": "block_creating_rooms",
+   "settings": []
+  },
+  {
+   "id": "rooms.entry",
+   "name": "Restrict entering rooms",
+   "category": "Rooms",
+   "description": "The player can only join rooms whose name is on the configured list (case-insensitive). As a safety measure the rule does nothing while the list is empty. Being moved by a BC+ command or summon is not restricted. Combines well with \"Forbid creating new rooms\".",
+   "bcxEquivalent": "block_entering_rooms",
+   "settings": [
+    {
+     "type": "stringList",
+     "name": "allowedRooms",
+     "label": "Allowed room names:",
+     "default": [],
+     "maxChars": 60,
+     "entryLabel": "room name"
+    }
+   ]
+  },
+  {
+   "id": "rooms.adminUI",
+   "name": "Forbid room admin UI while blind",
+   "category": "Rooms",
+   "description": "The player cannot open the room administration screen while unable to see - it would disclose the room background and admin member numbers. Admin chat commands still work.",
+   "bcxEquivalent": "block_room_admin_UI",
+   "settings": []
+  },
+  {
+   "id": "social.greetRoom",
+   "name": "Order to greet the room",
+   "category": "Social",
+   "description": "On entering a chat room, the player automatically says the configured greeting.",
+   "bcxEquivalent": "greet_room_order",
+   "settings": [
+    {
+     "type": "text",
+     "name": "greeting",
+     "label": "Greeting:",
+     "default": "Hello everyone!",
+     "maxChars": 200
+    }
+   ]
+  },
+  {
+   "id": "social.farewell",
+   "name": "Farewell on leave",
+   "category": "Social",
+   "description": "When leaving a chat room, the player automatically says the configured farewell first.",
+   "bcxEquivalent": "farewell_on_slow_leave",
+   "settings": [
+    {
+     "type": "text",
+     "name": "farewell",
+     "label": "Farewell:",
+     "default": "Goodbye everyone!",
+     "maxChars": 200
+    }
+   ]
+  },
+  {
+   "id": "other.listenToMyVoice",
+   "name": "Listen to my voice",
+   "category": "Other",
+   "description": "One of the configured sentences appears to the player at random, at the set interval, while they are in a chat room. Only they can see it.",
+   "bcxEquivalent": "other_constant_reminder",
+   "settings": [
+    {
+     "type": "stringList",
+     "name": "sentences",
+     "label": "Sentences:",
+     "default": [],
+     "maxChars": 200,
+     "entryLabel": "sentence",
+     "legacySeparator": "|"
+    },
+    {
+     "type": "option",
+     "name": "frequency",
+     "label": "Minutes between sentences",
+     "options": [
+      "2",
+      "5",
+      "10",
+      "15",
+      "30"
+     ],
+     "default": "15"
+    }
+   ]
+  },
+  {
+   "id": "other.summon",
+   "name": "Ready to be summoned",
+   "category": "Other",
+   "description": "Configured members can summon the player from anywhere in the club with a beep whose message starts with the summon text (or just \"summon\"). After the delay, the player is pulled to the summoner's room - ignoring leashes and locked doors. If the target room is full, they end up in the lobby. The summoner must be in a room and leave \"attach room\" enabled when writing the beep, or it carries no room to move to.",
+   "bcxEquivalent": "alt_forced_summoning",
+   "settings": [
+    {
+     "type": "members",
+     "name": "allowedMembers",
+     "label": "Members who may summon:",
+     "default": []
+    },
+    {
+     "type": "text",
+     "name": "summonText",
+     "label": "Summon text:",
+     "default": "Come to my room immediately",
+     "maxChars": 100
+    },
+    {
+     "type": "option",
+     "name": "delay",
+     "label": "Seconds before enforcing",
+     "options": [
+      "10",
+      "15",
+      "30",
+      "60"
+     ],
+     "default": "15"
+    }
+   ]
+  },
+  {
+   "id": "protect.ownerChanges",
+   "name": "Forbid club owner changes",
+   "category": "Protection",
+   "description": "The player cannot leave their current club owner or submit to a new one. Advancing a trial to full ownership is unaffected, and their owner can still release them.",
+   "bcxEquivalent": "rc_club_owner",
+   "settings": []
+  },
+  {
+   "id": "protect.newLovers",
+   "name": "Forbid getting new lovers",
+   "category": "Protection",
+   "description": "The player cannot start dating anyone new. Advancing an existing lovership (dating to engagement to marriage) is unaffected.",
+   "bcxEquivalent": "rc_lover_new",
+   "settings": []
+  },
+  {
+   "id": "protect.breakup",
+   "name": "Forbid breaking up with lovers",
+   "category": "Protection",
+   "description": "The player cannot leave any of their lovers, at any lovership stage - neither through the Management mistress nor directly in a chat room. Their lovers can still break up with them.",
+   "bcxEquivalent": "rc_lover_leave",
+   "settings": []
+  },
+  {
+   "id": "protect.newSubs",
+   "name": "Forbid taking new submissives",
+   "category": "Protection",
+   "description": "The player cannot offer an ownership trial to a new submissive. Advancing an existing trial to full ownership is unaffected.",
+   "bcxEquivalent": "rc_sub_new",
+   "settings": []
+  },
+  {
+   "id": "protect.disowning",
+   "name": "Forbid disowning submissives",
+   "category": "Protection",
+   "description": "The player cannot let go of any of their submissives (trial or full ownership). Their submissives can still break the bond themselves.",
+   "bcxEquivalent": "rc_sub_leave",
+   "settings": []
+  },
+  {
+   "id": "protect.blacklist",
+   "name": "Prevent blacklisting",
+   "category": "Protection",
+   "description": "The player cannot add people holding the configured role (or higher) to their BC blacklist or ghostlist.",
+   "bcxEquivalent": "block_blacklisting",
+   "settings": [
+    {
+     "type": "option",
+     "name": "minRole",
+     "label": "Protect this role and higher",
+     "options": [
+      "BC Owner",
+      "Co-Owner",
+      "Lover",
+      "Mistress",
+      "Whitelist",
+      "Friend"
+     ],
+     "default": "Mistress"
+    }
+   ]
+  },
+  {
+   "id": "protect.whitelist",
+   "name": "Prevent whitelisting",
+   "category": "Protection",
+   "description": "The player can only add people holding the configured role (or higher) to their BC whitelist.",
+   "bcxEquivalent": "block_whitelisting",
+   "settings": [
+    {
+     "type": "option",
+     "name": "minRole",
+     "label": "Lowest role allowed on the whitelist",
+     "options": [
+      "BC Owner",
+      "Co-Owner",
+      "Lover",
+      "Mistress",
+      "Whitelist",
+      "Friend"
+     ],
+     "default": "Mistress"
+    }
+   ]
+  },
+  {
+   "id": "protect.hardcore",
+   "name": "Hardcore Mode",
+   "category": "Protection",
+   "description": "Forces both hardcore options from the General page on while this rule is in effect, locked: the player cannot open their own BC+ while their hands are bound, and people whose hands are bound are refused when they try to change anything in the player's BC+. The player's own choice of the two options is untouched underneath and returns the moment the rule ends. Requires enforcement to have any effect.",
+   "settings": []
+  },
+  {
+   "id": "items.tyingSelf",
+   "name": "Forbid tying up self",
+   "category": "Items",
+   "description": "The player cannot use items on their own body, including swapping worn items.",
+   "bcxEquivalent": "block_tying_self",
+   "settings": []
+  },
+  {
+   "id": "items.tyingOthers",
+   "name": "Forbid tying up others",
+   "category": "Items",
+   "description": "The player cannot use items on other characters. Can be limited to characters with a higher dominant score than the player.",
+   "bcxEquivalent": "block_tying_others",
+   "settings": [
+    {
+     "type": "checkbox",
+     "name": "onlyDominants",
+     "label": "Only forbid using items on more dominant characters",
+     "default": true
+    }
+   ]
+  },
+  {
+   "id": "items.freeingSelf",
+   "name": "Forbid freeing self",
+   "category": "Items",
+   "description": "The player cannot remove, struggle out of or escape items on their own body. Others can still remove them. Low-difficulty items (hand-held toys, plushies...) can optionally stay removable.",
+   "bcxEquivalent": "block_freeing_self",
+   "settings": [
+    {
+     "type": "checkbox",
+     "name": "allowEasy",
+     "label": "Still allow removing low-difficulty items",
+     "default": false
+    }
+   ]
+  },
+  {
+   "id": "items.freeingOthers",
+   "name": "Forbid freeing others",
+   "category": "Items",
+   "description": "The player cannot remove items from other characters. Low-difficulty items (hand-held toys, plushies...) can optionally stay removable.",
+   "bcxEquivalent": "block_freeing_others",
+   "settings": [
+    {
+     "type": "checkbox",
+     "name": "allowEasy",
+     "label": "Still allow removing low-difficulty items",
+     "default": false
+    }
+   ]
+  },
+  {
+   "id": "items.wardrobeSelf",
+   "name": "Forbid wardrobe use on self",
+   "category": "Items",
+   "description": "The player cannot change their own clothes. Others can still change them.",
+   "bcxEquivalent": "block_wardrobe_access_self",
+   "settings": []
+  },
+  {
+   "id": "items.wardrobeOthers",
+   "name": "Forbid wardrobe use on others",
+   "category": "Items",
+   "description": "The player cannot change the clothes of other club members.",
+   "bcxEquivalent": "block_wardrobe_access_others",
+   "settings": []
+  },
+  {
+   "id": "locks.remotesSelf",
+   "name": "Forbid using remotes on self",
+   "category": "Items",
+   "description": "The player cannot use a vibrator remote on their own body. Others can still use remotes on them.",
+   "bcxEquivalent": "block_remoteuse_self",
+   "settings": []
+  },
+  {
+   "id": "locks.remotesOthers",
+   "name": "Forbid using remotes on others",
+   "category": "Items",
+   "description": "The player cannot use a vibrator remote on anyone else.",
+   "bcxEquivalent": "block_remoteuse_others",
+   "settings": []
+  },
+  {
+   "id": "locks.keysSelf",
+   "name": "Forbid using keys on self",
+   "category": "Items",
+   "description": "The player cannot unlock locks on their own body, even with the key.",
+   "bcxEquivalent": "block_keyuse_self",
+   "settings": []
+  },
+  {
+   "id": "locks.keysOthers",
+   "name": "Forbid using keys on others",
+   "category": "Items",
+   "description": "The player cannot unlock locks on anyone else.",
+   "bcxEquivalent": "block_keyuse_others",
+   "settings": []
+  },
+  {
+   "id": "locks.pickSelf",
+   "name": "Forbid picking locks on self",
+   "category": "Items",
+   "description": "The player cannot pick locks on their own body.",
+   "bcxEquivalent": "block_lockpicking_self",
+   "settings": []
+  },
+  {
+   "id": "locks.pickOthers",
+   "name": "Forbid picking locks on others",
+   "category": "Items",
+   "description": "The player cannot pick locks on anyone else.",
+   "bcxEquivalent": "block_lockpicking_others",
+   "settings": []
+  },
+  {
+   "id": "locks.lockSelf",
+   "name": "Forbid using locks on self",
+   "category": "Items",
+   "description": "The player cannot apply locks to their own body.",
+   "bcxEquivalent": "block_lockuse_self",
+   "settings": []
+  },
+  {
+   "id": "locks.lockOthers",
+   "name": "Forbid using locks on others",
+   "category": "Items",
+   "description": "The player cannot apply locks to anyone else.",
+   "bcxEquivalent": "block_lockuse_others",
+   "settings": []
+  },
+  {
+   "id": "sensory.sound",
+   "name": "Sensory deprivation: Sound",
+   "category": "Sensory",
+   "description": "Impacts the player's natural hearing the same way items do, independent of them. Strength is adjustable; stacks with worn items.",
+   "bcxEquivalent": "alt_restrict_hearing",
+   "settings": [
+    {
+     "type": "option",
+     "name": "strength",
+     "label": "Hearing impairment",
+     "options": [
+      "Light",
+      "Medium",
+      "Heavy"
+     ],
+     "default": "Light"
+    }
+   ]
+  },
+  {
+   "id": "sensory.hearingWhitelist",
+   "name": "Hearing whitelist",
+   "category": "Sensory",
+   "description": "The listed members are always understood clearly, no matter how deafened the player is (by items or rules). Optionally even when those members are gagged.",
+   "bcxEquivalent": "alt_hearing_whitelist",
+   "settings": [
+    {
+     "type": "members",
+     "name": "members",
+     "label": "Members always heard:",
+     "default": []
+    },
+    {
+     "type": "checkbox",
+     "name": "includeGagged",
+     "label": "Understand them even while they are gagged",
+     "default": false
+    }
+   ]
+  },
+  {
+   "id": "sensory.sight",
+   "name": "Sensory deprivation: Sight",
+   "category": "Sensory",
+   "description": "Impacts the player's natural eyesight the same way items do, independent of them. Strength is adjustable; stacks with worn items.",
+   "bcxEquivalent": "alt_restrict_sight",
+   "settings": [
+    {
+     "type": "option",
+     "name": "strength",
+     "label": "Eyesight impairment",
+     "options": [
+      "Light",
+      "Medium",
+      "Heavy"
+     ],
+     "default": "Light"
+    }
+   ]
+  },
+  {
+   "id": "sensory.seeingWhitelist",
+   "name": "Seeing whitelist",
+   "category": "Sensory",
+   "description": "The listed members are always seen normally, no matter how blinded the player is (by items or rules).",
+   "bcxEquivalent": "alt_seeing_whitelist",
+   "settings": [
+    {
+     "type": "members",
+     "name": "members",
+     "label": "Members always seen:",
+     "default": []
+    }
+   ]
+  },
+  {
+   "id": "body.forbidPoses",
+   "name": "Forbid changing poses",
+   "category": "Body",
+   "description": "The player cannot change their own body pose unaided - kneeling, standing up, spreading and every other pose stays as it is. Others (and items) can still pose them.",
+   "bcxEquivalent": "block_restrict_allowed_poses",
+   "settings": []
+  },
+  {
+   "id": "body.forbiddenPoses",
+   "name": "Forbid specific poses",
+   "category": "Body",
+   "description": "The player cannot change into the listed poses by themselves. Pose names: BaseUpper, BackBoxTie, BackCuffs, BackElbowTouch, OverTheHead, Yoked, BaseLower, Kneel, KneelingSpread, LegsClosed, Spread, Hogtied, AllFours, Suspension, TapedHands.",
+   "bcxEquivalent": "block_restrict_allowed_poses",
+   "settings": [
+    {
+     "type": "stringList",
+     "name": "poses",
+     "label": "Forbidden poses:",
+     "default": [],
+     "maxChars": 30,
+     "entryLabel": "pose name"
+    }
+   ]
+  },
+  {
+   "id": "body.forceKneel",
+   "name": "Forced to kneel",
+   "category": "Body",
+   "description": "The player must stay on their knees: choosing a standing lower-body pose is blocked, and if they end up standing they are put back down. Poses that need aid (restraints forcing them upright) are left alone rather than fought.",
+   "settings": []
+  },
+  {
+   "id": "body.forcedPosition",
+   "name": "Forced position",
+   "category": "Body",
+   "description": "The player is held in a chosen position: pick an arms pose, a legs pose, or both (e.g. hands behind back with legs spread), or a full-body position (hogtied or all fours) that overrides the other two. Changing away is blocked and any deviation is corrected. Poses held by restraints are left alone rather than fought.",
+   "settings": [
+    {
+     "type": "option",
+     "name": "fullPose",
+     "label": "Full body (overrides arms/legs)",
+     "options": [
+      "Any",
+      "Hogtied",
+      "All fours"
+     ],
+     "default": "Any"
+    },
+    {
+     "type": "option",
+     "name": "armsPose",
+     "label": "Arms",
+     "options": [
+      "Any",
+      "Free",
+      "Hands behind back",
+      "Elbows behind back",
+      "Wrists behind back",
+      "Yoked",
+      "Arms overhead"
+     ],
+     "default": "Any"
+    },
+    {
+     "type": "option",
+     "name": "legsPose",
+     "label": "Legs",
+     "options": [
+      "Any",
+      "Standing",
+      "Legs closed",
+      "Legs spread",
+      "Kneeling",
+      "Kneeling spread"
+     ],
+     "default": "Any"
+    }
+   ]
+  },
+  {
+   "id": "body.afkBehavior",
+   "name": "Forced AFK behavior",
+   "category": "Body",
+   "description": "When the player goes idle, the configured behaviors apply automatically: the Afk emoticon, closed eyes, kneeling, and an automatic reply to whispers. Emoticon and eyes are restored the moment the player is back; a forced kneel is left for them to stand up from.",
+   "settings": [
+    {
+     "type": "option",
+     "name": "idleMinutes",
+     "label": "Minutes until idle",
+     "options": [
+      "2",
+      "5",
+      "10",
+      "15",
+      "30"
+     ],
+     "default": "5"
+    },
+    {
+     "type": "checkbox",
+     "name": "afkEmoticon",
+     "label": "Show the Afk emoticon",
+     "default": true
+    },
+    {
+     "type": "checkbox",
+     "name": "closeEyes",
+     "label": "Close the eyes",
+     "default": false
+    },
+    {
+     "type": "checkbox",
+     "name": "kneel",
+     "label": "Kneel down",
+     "default": false
+    },
+    {
+     "type": "checkbox",
+     "name": "autoReply",
+     "label": "Auto-reply to whispers",
+     "default": false
+    },
+    {
+     "type": "text",
+     "name": "replyText",
+     "label": "Auto-reply text:",
+     "default": "I am away from the club right now.",
+     "maxChars": 150
+    }
+   ]
+  },
+  {
+   "id": "pet.speech",
+   "name": "Speak like a pet",
+   "category": "Pet",
+   "description": "The player's speech turns pet-like: Sprinkle mode weaves animal sounds between the words, Replace mode swaps words for sounds outright - up to fully non-verbal at Max intensity. Pick an animal sound set or provide custom sounds. Out-of-character text is never touched.",
+   "settings": [
+    {
+     "type": "option",
+     "name": "animal",
+     "label": "Sound set",
+     "options": [
+      "Bunny",
+      "Cat",
+      "Cow",
+      "Dog",
+      "Fox",
+      "Mouse",
+      "Pony",
+      "Wolf",
+      "Custom"
+     ],
+     "default": "Cat"
+    },
+    {
+     "type": "stringList",
+     "name": "sounds",
+     "label": "Custom sounds (used with the Custom set):",
+     "default": [],
+     "maxChars": 24,
+     "maxEntries": 20,
+     "entryLabel": "sound"
+    },
+    {
+     "type": "option",
+     "name": "mode",
+     "label": "Mode",
+     "options": [
+      "Sprinkle",
+      "Replace"
+     ],
+     "default": "Sprinkle"
+    },
+    {
+     "type": "option",
+     "name": "intensity",
+     "label": "Intensity",
+     "options": [
+      "Low",
+      "Medium",
+      "High",
+      "Max"
+     ],
+     "default": "Medium"
+    }
+   ]
+  },
+  {
+   "id": "pet.hearing",
+   "name": "Hear like a pet",
+   "category": "Pet",
+   "description": "Pet words - commands, praise, the pet's own name, the chosen animal's vocabulary and any custom extras - always come through clearly, while the rest of what the player hears garbles away. \"Only when deafened\" merely lets the pet words pierce existing deafness (item- or hunger-induced); Light and Heavy garble everything else all the time. Out-of-character text is never touched.",
+   "settings": [
+    {
+     "type": "option",
+     "name": "animal",
+     "label": "Vocabulary set",
+     "options": [
+      "Bunny",
+      "Cat",
+      "Cow",
+      "Dog",
+      "Fox",
+      "Mouse",
+      "Pony",
+      "Wolf",
+      "Custom"
+     ],
+     "default": "Cat"
+    },
+    {
+     "type": "stringList",
+     "name": "words",
+     "label": "Extra understood words:",
+     "default": [],
+     "maxChars": 32,
+     "maxEntries": 30,
+     "entryLabel": "word"
+    },
+    {
+     "type": "option",
+     "name": "strength",
+     "label": "Everything else garbles",
+     "options": [
+      "Only when deafened",
+      "Light",
+      "Heavy"
+     ],
+     "default": "Light"
+    }
+   ]
+  },
+  {
+   "id": "body.controlOrgasms",
+   "name": "Control orgasms",
+   "category": "Body",
+   "description": "Controls what happens when the player's arousal peaks, independent of items: Edge keeps the meter just below the top so the orgasm never starts; Ruin starts the orgasm screen but denies the actual climax; No resisting removes the option to fight an orgasm off. Requires the arousal meter to be enabled.",
+   "bcxEquivalent": "alt_control_orgasms",
+   "settings": [
+    {
+     "type": "option",
+     "name": "mode",
+     "label": "Orgasm attempts are:",
+     "options": [
+      "Edged",
+      "Ruined",
+      "Unresistable"
+     ],
+     "default": "Edged"
+    }
+   ]
+  },
+  {
+   "id": "body.secretOrgasms",
+   "name": "Secret arousal meter",
+   "category": "Body",
+   "description": "The player cannot see their own arousal meter even while it is active - the orgasm quick-time event comes as a surprise. Whether others can see the meter is unchanged (that stays a BC setting).",
+   "bcxEquivalent": "alt_secret_orgasms",
+   "settings": []
+  },
+  {
+   "id": "control.difficulty",
+   "name": "Forbid changing difficulty",
+   "category": "Other",
+   "description": "The player cannot change their Bondage Club multiplayer difficulty, whatever it currently is.",
+   "bcxEquivalent": "block_difficulty_change",
+   "settings": []
+  },
+  {
+   "id": "control.activities",
+   "name": "Forbid using activities",
+   "category": "Other",
+   "description": "The player cannot use any (sexual) activities on anyone - the activities button vanishes from the item dialogs. Others can still use activities on the player; the arousal system itself stays untouched.",
+   "bcxEquivalent": "block_activities",
+   "settings": []
+  },
+  {
+   "id": "control.emoticon",
+   "name": "Forbid changing emoticon",
+   "category": "Social",
+   "description": "The player cannot show, change or remove the emoticon (afk, sleep, ...) over their own head.",
+   "bcxEquivalent": "block_changing_emoticon",
+   "settings": []
+  },
+  {
+   "id": "control.leash",
+   "name": "Restrict who may leash",
+   "category": "Protection",
+   "description": "Only people of at least the configured BC+ role can take the player onto a leash; everyone else's leash slips off with a room message.",
+   "bcxEquivalent": "alt_restrict_leashability",
+   "settings": [
+    {
+     "type": "option",
+     "name": "minimumRole",
+     "label": "Leashing needs at least:",
+     "options": [
+      "BC Owner",
+      "Co-Owner",
+      "Lover",
+      "Mistress",
+      "Whitelist",
+      "Friend"
+     ],
+     "default": "Co-Owner"
+    }
+   ]
+  },
+  {
+   "id": "control.nickname",
+   "name": "Control nickname",
+   "category": "Social",
+   "description": "Locks the player's BC nickname: with a nickname configured it is forced to that; with the field left empty the nickname the player had when the rule took hold is kept. The nickname stays as-is when the rule ends.",
+   "bcxEquivalent": "alt_set_nickname",
+   "settings": [
+    {
+     "type": "text",
+     "name": "nickname",
+     "label": "Forced nickname (empty = lock current):",
+     "default": "",
+     "maxChars": 20
+    }
+   ]
+  },
+  {
+   "id": "control.profile",
+   "name": "Lock profile description",
+   "category": "Social",
+   "description": "Freezes the player's online profile description: any change is reverted to the text it had when the rule took hold. The description stays as-is when the rule ends.",
+   "bcxEquivalent": "alt_set_profile_description",
+   "settings": []
+  },
+  {
+   "id": "settings.itemPermission",
+   "name": "Force 'Item permission'",
+   "category": "Settings",
+   "description": "Pins who is allowed to use items on the player. While enforced, the 'Item permission' setting is held at the configured value - changes snap back within seconds. With the restore option on, the value from before the rule took hold returns when the rule stops applying.",
+   "bcxEquivalent": "setting_item_permission",
+   "settings": [
+    {
+     "type": "option",
+     "name": "value",
+     "label": "Forced value",
+     "options": [
+      "Everyone, no exceptions",
+      "Everyone, except blacklist",
+      "Owner, Lovers, whitelist & Dominants",
+      "Owner, Lovers and whitelist only",
+      "Owner and Lovers only",
+      "Owner only"
+     ],
+     "default": "Everyone, no exceptions"
+    },
+    {
+     "type": "checkbox",
+     "name": "restore",
+     "label": "Restore the previous value when the rule ends",
+     "default": true
+    }
+   ]
+  },
+  {
+   "id": "settings.lockpickingSelf",
+   "name": "Force 'Locks on you can't be picked'",
+   "category": "Settings",
+   "description": "Pins whether locks on the player can be picked at all. While enforced, the 'Locks on you can't be picked' setting is held at the configured value - changes snap back within seconds. With the restore option on, the value from before the rule took hold returns when the rule stops applying.",
+   "bcxEquivalent": "setting_forbid_lockpicking",
+   "settings": [
+    {
+     "type": "option",
+     "name": "value",
+     "label": "Forced value",
+     "options": [
+      "Locks cannot be picked",
+      "Locks can be picked"
+     ],
+     "default": "Locks cannot be picked"
+    },
+    {
+     "type": "checkbox",
+     "name": "restore",
+     "label": "Restore the previous value when the rule ends",
+     "default": true
+    }
+   ]
+  },
+  {
+   "id": "settings.spRooms",
+   "name": "Force 'Cannot enter single-player rooms when restrained'",
+   "category": "Settings",
+   "description": "Pins whether being restrained blocks entering single-player rooms. While enforced, the 'Cannot enter single-player rooms when restrained' setting is held at the configured value - changes snap back within seconds. With the restore option on, the value from before the rule took hold returns when the rule stops applying.",
+   "bcxEquivalent": "setting_forbid_SP_rooms",
+   "settings": [
+    {
+     "type": "option",
+     "name": "value",
+     "label": "Forced value",
+     "options": [
+      "Blocked while restrained",
+      "Always allowed"
+     ],
+     "default": "Blocked while restrained"
+    },
+    {
+     "type": "checkbox",
+     "name": "restore",
+     "label": "Restore the previous value when the rule ends",
+     "default": true
+    }
+   ]
+  },
+  {
+   "id": "settings.safeword",
+   "name": "Force 'Allow safeword use'",
+   "category": "Settings",
+   "description": "Pins BC's safeword setting. Forcing it off removes the player's in-game safeword release - use with care and consent. While enforced, the 'Allow safeword use' setting is held at the configured value - changes snap back within seconds. With the restore option on, the value from before the rule took hold returns when the rule stops applying.",
+   "bcxEquivalent": "setting_forbid_safeword",
+   "settings": [
+    {
+     "type": "option",
+     "name": "value",
+     "label": "Forced value",
+     "options": [
+      "Safeword allowed",
+      "Safeword disabled"
+     ],
+     "default": "Safeword disabled"
+    },
+    {
+     "type": "checkbox",
+     "name": "restore",
+     "label": "Restore the previous value when the rule ends",
+     "default": true
+    }
+   ]
+  },
+  {
+   "id": "settings.arousalMeter",
+   "name": "Force 'Arousal meter'",
+   "category": "Settings",
+   "description": "Pins the arousal meter's activation mode. While enforced, the 'Arousal meter' setting is held at the configured value - changes snap back within seconds. With the restore option on, the value from before the rule took hold returns when the rule stops applying.",
+   "bcxEquivalent": "setting_arousal_meter",
+   "settings": [
+    {
+     "type": "option",
+     "name": "value",
+     "label": "Forced value",
+     "options": [
+      "Disable sexual activities",
+      "Allow without a meter",
+      "Allow with a manual meter",
+      "Allow with a hybrid meter",
+      "Allow with a locked meter"
+     ],
+     "default": "Allow with a hybrid meter"
+    },
+    {
+     "type": "checkbox",
+     "name": "restore",
+     "label": "Restore the previous value when the rule ends",
+     "default": true
+    }
+   ]
+  },
+  {
+   "id": "settings.arousalStutter",
+   "name": "Force 'Arousal speech stuttering'",
+   "category": "Settings",
+   "description": "Pins when arousal makes the player's speech stutter. While enforced, the 'Arousal speech stuttering' setting is held at the configured value - changes snap back within seconds. With the restore option on, the value from before the rule took hold returns when the rule stops applying.",
+   "bcxEquivalent": "setting_arousal_stutter",
+   "settings": [
+    {
+     "type": "option",
+     "name": "value",
+     "label": "Forced value",
+     "options": [
+      "Never stutter",
+      "When aroused",
+      "When vibrated",
+      "Aroused & vibrated"
+     ],
+     "default": "Aroused & vibrated"
+    },
+    {
+     "type": "checkbox",
+     "name": "restore",
+     "label": "Restore the previous value when the rule ends",
+     "default": true
+    }
+   ]
+  },
+  {
+   "id": "settings.vibeModes",
+   "name": "Force 'Block advanced vibrator modes'",
+   "category": "Settings",
+   "description": "Pins whether advanced (escalating/random/edging) vibrator modes work on the player. While enforced, the 'Block advanced vibrator modes' setting is held at the configured value - changes snap back within seconds. With the restore option on, the value from before the rule took hold returns when the rule stops applying.",
+   "bcxEquivalent": "setting_block_vibe_modes",
+   "settings": [
+    {
+     "type": "option",
+     "name": "value",
+     "label": "Forced value",
+     "options": [
+      "Advanced modes blocked",
+      "Advanced modes allowed"
+     ],
+     "default": "Advanced modes allowed"
+    },
+    {
+     "type": "checkbox",
+     "name": "restore",
+     "label": "Restore the previous value when the rule ends",
+     "default": true
+    }
+   ]
+  },
+  {
+   "id": "settings.afkBubble",
+   "name": "Force 'Show AFK bubble'",
+   "category": "Settings",
+   "description": "Pins whether the player shows the automatic AFK bubble when idle. While enforced, the 'Show AFK bubble' setting is held at the configured value - changes snap back within seconds. With the restore option on, the value from before the rule took hold returns when the rule stops applying.",
+   "bcxEquivalent": "setting_show_afk",
+   "settings": [
+    {
+     "type": "option",
+     "name": "value",
+     "label": "Forced value",
+     "options": [
+      "AFK bubble shown",
+      "AFK bubble hidden"
+     ],
+     "default": "AFK bubble shown"
+    },
+    {
+     "type": "checkbox",
+     "name": "restore",
+     "label": "Restore the previous value when the rule ends",
+     "default": true
+    }
+   ]
+  },
+  {
+   "id": "settings.bodyMod",
+   "name": "Force 'Allow others to alter your whole appearance'",
+   "category": "Settings",
+   "description": "Pins whether people with wardrobe access may change the player's whole appearance including body parts. While enforced, the 'Allow others to alter your whole appearance' setting is held at the configured value - changes snap back within seconds. With the restore option on, the value from before the rule took hold returns when the rule stops applying.",
+   "bcxEquivalent": "setting_allow_body_mod",
+   "settings": [
+    {
+     "type": "option",
+     "name": "value",
+     "label": "Forced value",
+     "options": [
+      "Full appearance access",
+      "Body is off-limits"
+     ],
+     "default": "Full appearance access"
+    },
+    {
+     "type": "checkbox",
+     "name": "restore",
+     "label": "Restore the previous value when the rule ends",
+     "default": true
+    }
+   ]
+  },
+  {
+   "id": "settings.cosplayChange",
+   "name": "Force 'Prevent others from changing cosplay items'",
+   "category": "Settings",
+   "description": "Pins whether others may change the player's cosplay items (ears, tails, wings). While enforced, the 'Prevent others from changing cosplay items' setting is held at the configured value - changes snap back within seconds. With the restore option on, the value from before the rule took hold returns when the rule stops applying.",
+   "bcxEquivalent": "setting_forbid_cosplay_change",
+   "settings": [
+    {
+     "type": "option",
+     "name": "value",
+     "label": "Forced value",
+     "options": [
+      "Cosplay items protected",
+      "Cosplay items changeable"
+     ],
+     "default": "Cosplay items changeable"
+    },
+    {
+     "type": "checkbox",
+     "name": "restore",
+     "label": "Restore the previous value when the rule ends",
+     "default": true
+    }
+   ]
+  },
+  {
+   "id": "settings.sensdep",
+   "name": "Force 'Sensory deprivation setting'",
+   "category": "Settings",
+   "description": "Pins how strongly blindness items affect the player. While enforced, the 'Sensory deprivation setting' setting is held at the configured value - changes snap back within seconds. With the restore option on, the value from before the rule took hold returns when the rule stops applying.",
+   "bcxEquivalent": "setting_sensdep",
+   "settings": [
+    {
+     "type": "option",
+     "name": "value",
+     "label": "Forced value",
+     "options": [
+      "Light",
+      "Normal",
+      "Hide names",
+      "Heavy",
+      "Total"
+     ],
+     "default": "Normal"
+    },
+    {
+     "type": "checkbox",
+     "name": "restore",
+     "label": "Restore the previous value when the rule ends",
+     "default": true
+    }
+   ]
+  },
+  {
+   "id": "settings.hideNonAdjacent",
+   "name": "Force 'Hide non-adjacent players while partially blind'",
+   "category": "Settings",
+   "description": "Pins whether partial blindness hides everyone not standing next to the player. While enforced, the 'Hide non-adjacent players while partially blind' setting is held at the configured value - changes snap back within seconds. With the restore option on, the value from before the rule took hold returns when the rule stops applying.",
+   "bcxEquivalent": "setting_hide_non_adjecent",
+   "settings": [
+    {
+     "type": "option",
+     "name": "value",
+     "label": "Forced value",
+     "options": [
+      "Hidden while blind",
+      "Always visible"
+     ],
+     "default": "Hidden while blind"
+    },
+    {
+     "type": "checkbox",
+     "name": "restore",
+     "label": "Restore the previous value when the rule ends",
+     "default": true
+    }
+   ]
+  },
+  {
+   "id": "settings.blindRoomGarbling",
+   "name": "Force 'Garble chatroom names and descriptions while blind'",
+   "category": "Settings",
+   "description": "Pins whether room names and descriptions garble while the player is blind. While enforced, the 'Garble chatroom names and descriptions while blind' setting is held at the configured value - changes snap back within seconds. With the restore option on, the value from before the rule took hold returns when the rule stops applying.",
+   "bcxEquivalent": "setting_blind_room_garbling",
+   "settings": [
+    {
+     "type": "option",
+     "name": "value",
+     "label": "Forced value",
+     "options": [
+      "Garbled while blind",
+      "Always readable"
+     ],
+     "default": "Garbled while blind"
+    },
+    {
+     "type": "checkbox",
+     "name": "restore",
+     "label": "Restore the previous value when the rule ends",
+     "default": true
+    }
+   ]
+  },
+  {
+   "id": "settings.relogKeepsRestraints",
+   "name": "Force 'Keep all restraints when relogging'",
+   "category": "Settings",
+   "description": "Pins whether restraints stay on through a relog. While enforced, the 'Keep all restraints when relogging' setting is held at the configured value - changes snap back within seconds. With the restore option on, the value from before the rule took hold returns when the rule stops applying.",
+   "bcxEquivalent": "setting_relog_keeps_restraints",
+   "settings": [
+    {
+     "type": "option",
+     "name": "value",
+     "label": "Forced value",
+     "options": [
+      "Restraints kept",
+      "Restraints removed"
+     ],
+     "default": "Restraints kept"
+    },
+    {
+     "type": "checkbox",
+     "name": "restore",
+     "label": "Restore the previous value when the rule ends",
+     "default": true
+    }
+   ]
+  },
+  {
+   "id": "settings.leashedRoomChange",
+   "name": "Force 'Players can drag you to rooms when leashed'",
+   "category": "Settings",
+   "description": "Pins whether leash holders can drag the player between rooms. While enforced, the 'Players can drag you to rooms when leashed' setting is held at the configured value - changes snap back within seconds. With the restore option on, the value from before the rule took hold returns when the rule stops applying.",
+   "bcxEquivalent": "setting_leashed_roomchange",
+   "settings": [
+    {
+     "type": "option",
+     "name": "value",
+     "label": "Forced value",
+     "options": [
+      "Dragging allowed",
+      "Dragging blocked"
+     ],
+     "default": "Dragging allowed"
+    },
+    {
+     "type": "checkbox",
+     "name": "restore",
+     "label": "Restore the previous value when the rule ends",
+     "default": true
+    }
+   ]
+  },
+  {
+   "id": "settings.roomRejoin",
+   "name": "Force 'Return to chatrooms on relog'",
+   "category": "Settings",
+   "description": "Pins whether the player returns to the room they were in when they relog. While enforced, the 'Return to chatrooms on relog' setting is held at the configured value - changes snap back within seconds. With the restore option on, the value from before the rule took hold returns when the rule stops applying.",
+   "bcxEquivalent": "setting_room_rejoin",
+   "settings": [
+    {
+     "type": "option",
+     "name": "value",
+     "label": "Forced value",
+     "options": [
+      "Returns to the room",
+      "Starts in the main hall"
+     ],
+     "default": "Returns to the room"
+    },
+    {
+     "type": "checkbox",
+     "name": "restore",
+     "label": "Restore the previous value when the rule ends",
+     "default": true
+    }
+   ]
+  },
+  {
+   "id": "settings.plugVibeEvents",
+   "name": "Force 'Events while plugged or vibed'",
+   "category": "Settings",
+   "description": "Pins whether worn plugs and vibrators cause random immersive chat events. While enforced, the 'Events while plugged or vibed' setting is held at the configured value - changes snap back within seconds. With the restore option on, the value from before the rule took hold returns when the rule stops applying.",
+   "bcxEquivalent": "setting_plug_vibe_events",
+   "settings": [
+    {
+     "type": "option",
+     "name": "value",
+     "label": "Forced value",
+     "options": [
+      "Events enabled",
+      "Events disabled"
+     ],
+     "default": "Events enabled"
+    },
+    {
+     "type": "checkbox",
+     "name": "restore",
+     "label": "Restore the previous value when the rule ends",
+     "default": true
+    }
+   ]
+  },
+  {
+   "id": "settings.tintEffects",
+   "name": "Force 'Allow item tint effects'",
+   "category": "Settings",
+   "description": "Pins whether items may tint the player's vision (colored hoods etc.). While enforced, the 'Allow item tint effects' setting is held at the configured value - changes snap back within seconds. With the restore option on, the value from before the rule took hold returns when the rule stops applying.",
+   "bcxEquivalent": "setting_allow_tint_effects",
+   "settings": [
+    {
+     "type": "option",
+     "name": "value",
+     "label": "Forced value",
+     "options": [
+      "Tints allowed",
+      "Tints disabled"
+     ],
+     "default": "Tints allowed"
+    },
+    {
+     "type": "checkbox",
+     "name": "restore",
+     "label": "Restore the previous value when the rule ends",
+     "default": true
+    }
+   ]
+  },
+  {
+   "id": "settings.blurEffects",
+   "name": "Force 'Allow item blur effects'",
+   "category": "Settings",
+   "description": "Pins whether items may blur the player's vision. While enforced, the 'Allow item blur effects' setting is held at the configured value - changes snap back within seconds. With the restore option on, the value from before the rule took hold returns when the rule stops applying.",
+   "bcxEquivalent": "setting_allow_blur_effects",
+   "settings": [
+    {
+     "type": "option",
+     "name": "value",
+     "label": "Forced value",
+     "options": [
+      "Blur allowed",
+      "Blur disabled"
+     ],
+     "default": "Blur allowed"
+    },
+    {
+     "type": "checkbox",
+     "name": "restore",
+     "label": "Restore the previous value when the rule ends",
+     "default": true
+    }
+   ]
+  },
+  {
+   "id": "settings.upsideDownView",
+   "name": "Force 'Flip room vertically when upside-down'",
+   "category": "Settings",
+   "description": "Pins whether hanging upside-down flips the player's view of the room. While enforced, the 'Flip room vertically when upside-down' setting is held at the configured value - changes snap back within seconds. With the restore option on, the value from before the rule took hold returns when the rule stops applying.",
+   "bcxEquivalent": "setting_upsidedown_view",
+   "settings": [
+    {
+     "type": "option",
+     "name": "value",
+     "label": "Forced value",
+     "options": [
+      "View flips",
+      "View stays upright"
+     ],
+     "default": "View flips"
+    },
+    {
+     "type": "checkbox",
+     "name": "restore",
+     "label": "Restore the previous value when the rule ends",
+     "default": true
+    }
+   ]
+  }
+ ]
+}

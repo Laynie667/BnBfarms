@@ -46,11 +46,25 @@ Matches the mockup. The big changes underneath:
   - `doc`: a staff lookup about someone else, which goes to the Office tab instead of chat
   - `outfit`: an outfit offer (section 4)
 - **Role-based tabs**: livestock, guest and staff versions, and proprietors get the Dashboard.
-  Staff can switch between the **Staff panel** and **their own livestock panel** with one click (header switch).
+  A **Panel switch** at the top lets people move between every panel they're allowed and back again:
+  staff see Livestock and Staff, proprietors see Livestock, Staff and Dashboard. Livestock is their own personal
+  record, milk, breeding and switches.
+  **Pasture and duty:** `?pasture` already sets them off duty, adds the livestock role for the visit (unless they're
+  already stock), takes them off call (mandated staff stay summonable), and puts silver and gold keys away (bronze only).
+  `?onduty` undoes it. Neither locks anything. Only `?turnout` from their herd leader (or whoever the farm lists for them)
+  locks them out of `?onduty` and `?clockin` until a `?letup`. The panel's Me tab has a Go to pasture / Back on duty
+  button, and shows the lock and who holds it when there is one.
   Staff get everything a player has too: **Me** (their own record, keys, hours, herd size, and their own
   milk or seed if they're also on the books as stock), **Guides** (the public commands, then the staff ones),
   and **Toggles** (on call, plus the same personal switches stock have).
 - **The safety bar is always visible**: Safe word / I'm stuck / Call staff on every tab.
+- **Safeword calls go to staff, not straight to releasing things.** `?safe` keeps doing what it does today:
+  pause, beep staff, summon on-call staff, drop leashes and unpin. It also puts a **safeword card** at the top of
+  every staff Office, with buttons for "I'm goin' to them", "Release their farm contract", "Take off the farm outfit"
+  and "All okay, close it". Staff check whether it's really a problem before anything is cancelled.
+  The game's own safeword and BC+'s are never touched by farm contracts, so a player can always use those too.
+- **Contracts tab for staff and proprietors:** who holds which farm contract, its level, length, time left and rules.
+  Herdmasters and proprietors can release or extend one. Farmhands can ask for a release.
 - **The Office**: when a staff member with the Companion runs `?record`, `?vet`, `?quota` or `?inspect` on someone else,
   the answer is sent as a `doc`. It stays until closed, with Pin and Add note.
 - **Panel comfort**: draggable, resizable, remembers if it was open, compact mode, optional chime, and a colour theme
@@ -101,12 +115,32 @@ A proprietor-only Dashboard tab in the Companion, where the farm writes BC+ cont
   Pig, goat, sheep, deer and goblin use Custom with their own sounds (oink, maa, baa…).
 - **Never in a farm contract:** `settings.safeword` (turning off their safeword), `social.forbidBeeps` and
   `social.forbidBeepMessages` (they must always be able to reach the farm), `speech.forbidOOC` and `speech.gaggedOOC`.
-- **?safe releases every farm contract on them** (the bot sends `ContractCommand` release). That matters most for
-  Permanent and No human left.
+- **?safe doesn't release contracts by itself.** It calls staff (section 2), and staff release one if it's actually needed.
+
+### Custom contracts
+Besides the three ready-made levels there's a **Custom** level: a title, the terms they'll read, and any of the farm's
+rules switched on one by one, each with its own setting (animal and strength, greeting text, nickname,
+must-say words, Listen to my voice lines and how often, allowed rooms, who may leash or summon…).
+"Customize this one" starts from a ready-made level.
+
+The same thing works from chat, so the farm bot can build contracts without the panel:
+
+```
+?contract new prizecow "Prize cow contract"
+?contract terms prizecow You belong to B&B Farm for the length of this contract…
+?contract add prizecow pet.speech animal=Cow intensity=Medium
+?contract add prizecow other.listenToMyVoice sentences="Good cows stand still.|Moo for me." frequency=15
+?contract remove prizecow social.greetRoom
+?contract show prizecow
+?contract offer prizecow Bessie 2w        (1h, 12h, 1d, 1w, 2w, 1m, perm)
+?contract list            · ?contract release Bessie
+```
+
+Templates live in the ledger (`L.contractTemplates`). Proprietors make and offer them. Herdmasters can offer existing templates to their own herd.
 
 ### The dashboard
-- Pick a depth, a duration, who it's for, and who may end it. Then **Offer in the room** (best) or **Make a code**.
-  Save favourites as templates (in the ledger, `L.contractTemplates`).
+- Pick a depth (or Custom), a duration, who it's for, and who may end it. Then **Offer in the room** (best) or **Make a code**.
+  Save favourites as templates.
 - **Farm contracts in force:** the bot keeps its own list and checks it with `ContractQuery`. Release buttons, plus the time left on each.
 - Everything goes in the audit log.
 
@@ -134,17 +168,14 @@ On yes, the Companion:
 
 1. saves what they're wearing now, so "Change back" works
 2. applies the clothes and restraints, and never touches bodies or hair. Anything already locked on them stays put.
-3. locks it the way the Dashboard says:
-   - a **High Security Padlock** whose key list is the farm's staff (any farmhand can let them out)
-   - a **timer padlock** that matches their contract
-   - the locks exactly as saved
-   - no locks
+3. locks every farm lock with a **High Security Padlock**. The key list is set in the Dashboard:
+   farm staff + their herd leader (default), their herd leader only, or proprietors only.
 4. updates the room (`ChatRoomCharacterUpdate(Player)`)
 
 They put it on themselves after saying yes, so the game allows it.
 
 **When:** on approval (new stock), at clock-in (staff), "change back" at clock-out. Each of these can be switched on or off in the Dashboard.
-**?safe takes it all off:** it unlocks and removes farm outfits, and releases farm contracts.
+**?safe** calls staff (section 2). Staff decide whether the outfit comes off. Anyone on the key list can unlock it.
 
 **Who's who:** species from `r.species`, gender from the new `r.gender`. If that isn't set, use futa from `r.futa`,
 and male or female from the body the bot already reads (`hasVulva`, penis checks).
@@ -174,17 +205,41 @@ rest of the outfit. Don't copy Echo's art. Their cow outfit is one of the items 
 **On call means mandated staff, plus staff who turned it on with `?forced`.** It doesn't mean all staff. Only those
 people can be pulled in from other rooms, and only they get the summon-rule health check.
 
-### Hypnosis: worth exploring (all opt-in, and ?safe always wakes them)
-The bot already has a `triggers` field on each record, which is a good place to start.
+### Triggers: the record's `triggers` field is NOT for hypnosis
+`r.triggers` (next to `limits` and `aftercare`) is **what upsets someone**: "I say this, you get mad". Staff should see it
+on every record in the Office, and nothing in the farm should ever use it as a hypnosis trigger.
+Hypnosis lines get their own field (`r.hypno`).
 
-| Addon | What it offers | Farm idea |
+### Hypnosis: ECHS first, plus the farm's own "Listen to my voice"
+All of it is opt-in (`?hypno on`). ECHS's own safeword always ends a trance.
+
+**ECHS** (`reference/addons/ECHS`) is the main pick. How it works today (v0.41):
+- A hypnotist attempts an induction. The subject privately chooses **agree, ignore or fight**, and then a roll decides
+  how deep they go. **Trust** (built over time, with floors for BC friends, lovers and owners) decides how far a hypnotist can reach.
+- Suggestions are **spoken in normal chat**, and ECHS recognises them. Sessions time out after 30 minutes.
+- Its hidden channel is `HypnoMsg` (`session-attempt`, `session-query`, `session-wake`, `remote-request`, `trigger-status`…).
+- Five depth tiers gate what's possible (`src/depth.ts`), and they line up with the farm's contract levels:
+
+| Farm level | ECHS tiers | What becomes possible |
 |---|---|---|
-| **SkyzHypno** | A public API on the page: `window.SkyzHypno` has `addDepth`, `trance`, `wake`, `emergencyStop`, `installSuggestion`, `runSuggestion` and `startSession`. It also listens to BCX messages. | With the player's OK, the Companion deepens trance at farm moments (stall milking, clock-in, praise) and installs a small "farm" suggestion pack. `?safe` calls `emergencyStop`. |
-| **ECHS** | Its own hidden channel `HypnoMsg` with sessions the subject agrees to (`session-query`, `remote-request`, `trigger-status`…). It checks consent on the subject's own client. | Never pushes anything. The farm only joins a session the player starts with the farm. |
-| **HSC** | Trigger words from speakers the player allows (`window.Liko`). Docs are in Chinese. | Players add the farm bot as an allowed speaker, and the bot says farm triggers at the right moments. Works with any addon that reacts to chat. |
+| Fun | Drifting · Yielding | Not noticing clothes, bondage or touches; can't move; can't speak; posture control; can't touch yourself; made to act |
+| Deep | Entranced | Follow and leash, made to speak, hears only one voice (the herd leader's), sight, undressing, arousal and orgasm |
+| No human left | Deep · Blank | Clothing illusion, planted triggers, suggestions that last after waking. ECHS only allows these from depth that was *earned*, not from arousal. |
 
-The simplest first step needs no code in their addons: `?hypno on`, plus a list of trigger phrases on the player's record.
-The bot says them at farm moments, only to people who opted in, with the same quiet hours and gaps as tease lines.
+**Still to investigate:** custom session combinations for each level. Which of the subject's ECHS feature switches
+each farm level expects to be on. Whether a herd leader runs the session themselves (simplest, and ECHS already supports it)
+or the bot acts as a hypnotist over `HypnoMsg`. And how trust floors apply to herd leaders.
+
+**The farm's own "Listen to my voice"** (in the Companion, works with or without ECHS):
+- Herd leaders (herdmasters and proprietors) switch it on or off for their **whole herd** or **one member**, and write
+  the lines. `%name%` works.
+- On the subject's screen a line appears privately now and then, like a voice in their head. It's hidden from everyone else.
+  BC+ does the same thing with its `other.listenToMyVoice` rule, which can also go in a contract.
+- Choose how often: every 5, 15 or 30 minutes, or only during milking and chores.
+- Only for stock who said `?hypno on`. They can see that it's on, and it stops when their herd leader turns it off,
+  when they leave the herd, or when staff handle a safeword.
+
+SkyzHypno (public API on the page) and HSC (trigger words from allowed speakers) can come later, for players who use them instead.
 
 ---
 

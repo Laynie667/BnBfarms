@@ -31,10 +31,13 @@ Move pieces of `bot/src/farmhand.js` into their own files, one topic at a time, 
 - Guides live inside the Companion, so ?help opens instantly without me sendin' anything.
 - The panel can be dragged, resized, and remembers if it was open.
 
-## Stage 4: staff tabs (waitin' on your pick: every player, staff only, or both)
+## Stage 4: a panel for each role (Laynie's pick, 2026-10-02: separate versions for staff, livestock and guests)
 
-- When a staff member opens the panel, they see extra tabs: who's on the map, applications waitin', on-call staff, tiers, and quick buttons (tier, brand, drain, edge, summon).
-- Every button just sends me a normal staff command, so I still check who's allowed.
+- The bot's `welcome` sends the player's roles (not just `staff: true/false`), and sends an update when a role changes. The Companion builds its tabs from that. Someone with several roles gets every tab they qualify for.
+- **Livestock** (and Luxury): My Body card (fullness bars, sizes), Milking (gear I'm in, rate, tank, quota), Breeding (heat, pregnancy, Yes/No on breed asks), Chores/Tally, Help.
+- **Staff** (Farmhand, Mandated, Herdmaster, Proprietor): Herd tab (who's on the map, how full, which gear they're in), quick actions (milk, drain, edge, tier, brand, summon), jar shelf with an inseminate picker, applications waitin', on-call staff. Proprietor gets settings on top.
+- **Guests**: welcome and tour, map guide, house rules and consent, an Apply button.
+- The tabs only hide and show things. Every button still sends a normal command, and the bot still checks who's allowed.
 
 ## Stage 5: easy install for players
 

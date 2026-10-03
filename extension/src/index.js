@@ -1,7 +1,7 @@
 // Farmhand Companion: the player-side extension for B&B Farm.
-// When the farm bot is in my room, I tell it I'm here; from then on it sends its
-// answers to me as hidden messages and I show 'em in the farm panel, so nothin'
-// gets lost in whispers or beeps.
+// When the farm bot is in my room, I tell it I'm here; from then on it sends me your live state
+// (roles, keys, switches, numbers), its answers, yes/no questions, and staff lookups as hidden
+// messages, and the panel shows them in the right place instead of whispers and beeps.
 import sdkModule from "bondage-club-mod-sdk";
 import { makeMsg, readMsg } from "../../shared/protocol.js";
 import { VERSION } from "./version.js";
@@ -58,12 +58,16 @@ function collect(m) {
 }
 
 function onFarmMsg(m) {
-  if (m.from !== BOT_MEMBER) return;
+  if (m.from !== BOT_MEMBER) return;     // only the farm bot gets to talk to the panel
   switch (m.type) {
     case "ping": hello(); break;
     case "welcome":
       st.welcomed = true;
-      st.panel.setStatus("connected · bot v" + m.ver);
+      st.panel.setStatus("connected · farm girl v" + m.ver);
+      st.panel.setWelcome(m);
+      break;
+    case "state":
+      if (m.state && typeof m.state === "object") st.panel.setState(m.state);
       break;
     case "reply":
     case "notice": {
@@ -71,6 +75,17 @@ function onFarmMsg(m) {
       if (text !== null) st.panel.add(text, m.type);
       break;
     }
+    case "doc": {
+      const text = collect(m);
+      if (text !== null) st.panel.addDoc({ text, kind: String(m.kind || "record"), who: String(m.who || "?"), about: m.about });
+      break;
+    }
+    case "ask":
+      st.panel.addAsk({ kind: String(m.kind || ""), text: String(m.text || "") });
+      break;
+    case "choose":
+      st.panel.setChoose({ text: String(m.text || ""), choices: Array.isArray(m.choices) ? m.choices.map(String).slice(0, 30) : [] });
+      break;
   }
 }
 

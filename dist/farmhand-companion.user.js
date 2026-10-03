@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.1.0
+// @version      0.2.0
 // @description  Your B&B Farm panel: the farm girl's answers, stat cards and guides, right in the game.
 // @author       Laynie & Alexia
 // @match        *://*.bondageprojects.elementfx.com/*
@@ -189,14 +189,14 @@ Was the mod loaded multiple times?`), u(a2));
           }) }, g2 = { name: o2.name, fullName: o2.fullName, version: o2.version, repository: o2.repository, allowReplace: i2, api: p2, loaded: true, patching: /* @__PURE__ */ new Map() };
           return f.set(o2.name, g2), Object.freeze(p2);
         }
-        function h() {
+        function h2() {
           const o2 = [];
           for (const e2 of f.values()) o2.push({ name: e2.name, fullName: e2.fullName, version: e2.version, repository: e2.repository });
           return o2;
         }
         let m;
         const y = void 0 === window.bcModSdk ? window.bcModSdk = function() {
-          const e2 = { version: o, apiVersion: 1, registerMod: g, getModsInfo: h, getPatchingInfo: p, errorReporterHooks: Object.seal({ apiEndpointEnter: null, hookEnter: null, hookChainExit: null }) };
+          const e2 = { version: o, apiVersion: 1, registerMod: g, getModsInfo: h2, getPatchingInfo: p, errorReporterHooks: Object.seal({ apiEndpointEnter: null, hookEnter: null, hookChainExit: null }) };
           return m = e2, Object.freeze(e2);
         }() : (n(window.bcModSdk) || e("Failed to init Mod SDK: Name already in use"), 1 !== window.bcModSdk.apiVersion && e(`Failed to init Mod SDK: Different version already loaded ('1.2.0' vs '${window.bcModSdk.version}')`), window.bcModSdk.version !== o && alert(`Mod SDK warning: Loading different but compatible versions ('1.2.0' vs '${window.bcModSdk.version}')
 One of mods you are using is using an old version of SDK. It will work for now but please inform author to update`), window.bcModSdk);
@@ -224,78 +224,2320 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.1.0";
+  var VERSION = "0.2.0";
 
   // extension/src/config.js
   var BOT_MEMBER = 260239;
   var HELLO_EVERY_MS = 30 * 60 * 1e3;
-  var HISTORY_MAX = 40;
-  var QUICK = [
-    // buttons along the top of the panel
-    ["📋 Stats", "stats"],
-    ["📏 Size", "size"],
-    ["🥛 Quota", "quota"],
-    ["✏️ Tally", "tally"],
-    ["❓ Help", "help me"]
+  var HISTORY_MAX = 60;
+  var PREFS_KEY = "fhc-prefs";
+
+  // extension/src/styles.js
+  var THEME = {
+    ground: "#21170f",
+    card: "#2f2216",
+    line: "#5a432a",
+    accent: "#c9a35b",
+    text: "#f3e9d8",
+    muted: "#bfae95",
+    good: "#8fbf6a",
+    alert: "#b8403a",
+    well: "#140e09"
+  };
+  var CSS = `
+#fhc-btn{position:fixed;right:12px;bottom:12px;z-index:9999;width:46px;height:46px;border-radius:50%;
+  border:2px solid var(--fh-accent);background:#3b2a1a;color:#fff;font-size:22px;cursor:pointer;box-shadow:0 2px 8px #0008}
+#fhc-btn[data-unread]:after{content:attr(data-unread);position:absolute;top:-4px;right:-4px;background:var(--fh-alert);
+  color:#fff;border-radius:9px;font-size:11px;padding:1px 5px;font-family:sans-serif}
+#fhc-panel{position:fixed;right:12px;bottom:66px;z-index:9999;width:min(440px,calc(100vw - 24px));height:min(640px,78vh);
+  display:none;flex-direction:column;background:var(--fh-ground);color:var(--fh-text);border:2px solid var(--fh-accent);border-radius:12px;
+  font:14px/1.4 "Source Sans 3","Segoe UI",sans-serif;box-shadow:0 4px 18px #000a;overflow:hidden}
+#fhc-panel.open{display:flex}
+#fhc-panel.compact{font-size:12.5px}
+#fhc-panel button{font:inherit;cursor:pointer}
+.fhc-head{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 12px;border-bottom:1px solid var(--fh-line);cursor:move}
+.fhc-title{font-family:Bitter,Georgia,serif;font-weight:700;font-size:17px;color:var(--fh-accent)}
+.fhc-row{display:flex;align-items:center;gap:6px;padding:7px 12px;border-bottom:1px solid var(--fh-line);flex-wrap:wrap}
+.fhc-grow{flex:1}
+.fhc-safe{flex:1;min-height:38px;border-radius:8px;border:1px solid var(--fh-alert);background:transparent;color:var(--fh-text);font-weight:600}
+.fhc-safe.red{background:var(--fh-alert);color:#fff;font-weight:700}
+.fhc-pill{min-height:32px;padding:0 11px;border-radius:999px;border:1px solid var(--fh-line);background:transparent;color:var(--fh-text);font-weight:600}
+.fhc-pill.on{background:var(--fh-accent);border-color:var(--fh-accent);color:var(--fh-ground)}
+.fhc-body{flex:1;min-height:0;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:10px}
+.fhc-box{background:var(--fh-card);border:1px solid var(--fh-line);border-radius:10px;padding:11px}
+.fhc-box.ask{border-color:var(--fh-accent)}
+.fhc-box.alert{border:2px solid var(--fh-alert)}
+.fhc-h{font-family:Bitter,Georgia,serif;font-weight:700;color:var(--fh-accent);margin-bottom:6px}
+.fhc-muted{color:var(--fh-muted);font-size:12px}
+.fhc-chip{display:inline-block;font-size:12px;padding:2px 9px;border-radius:999px;border:1px solid var(--fh-line);margin:0 4px 4px 0}
+.fhc-chip-good{border-color:var(--fh-good)} .fhc-chip-alert{border-color:var(--fh-alert)} .fhc-chip-acc{border-color:var(--fh-accent)}
+.fhc-b{min-height:36px;padding:0 12px;border-radius:8px;border:1px solid var(--fh-accent);background:var(--fh-line);color:var(--fh-text);font-weight:600;margin:0 6px 6px 0}
+.fhc-b-acc{background:var(--fh-accent);color:var(--fh-ground);font-weight:700}
+.fhc-cmd{min-height:32px;padding:0 9px;border-radius:6px;border:1px solid var(--fh-line);background:var(--fh-well);color:var(--fh-text);
+  font-family:ui-monospace,Consolas,monospace;font-size:12px;margin:0 5px 5px 0}
+.fhc-bar{margin:6px 0}
+.fhc-bar-row{display:flex;justify-content:space-between}
+.fhc-bar-track{height:9px;border-radius:5px;background:var(--fh-line);overflow:hidden;margin-top:3px}
+.fhc-bar-fill{height:100%;background:var(--fh-accent)} .fhc-fill-good{background:var(--fh-good)} .fhc-fill-alert{background:var(--fh-alert)}
+.fhc-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.fhc-kv{display:flex;justify-content:space-between;gap:8px;padding:5px 0;border-bottom:1px solid var(--fh-line)}
+.fhc-tog{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--fh-line)}
+.fhc-tog-l{font-weight:600}
+.fhc-sw{flex-shrink:0;position:relative;width:48px;height:28px;border-radius:14px;border:1px solid var(--fh-line);background:var(--fh-well);padding:0}
+.fhc-sw span{position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:10px;background:var(--fh-muted);transition:left .15s}
+.fhc-sw.on{background:var(--fh-good);border-color:var(--fh-good)} .fhc-sw.on span{left:23px;background:var(--fh-ground)}
+.fhc-card{background:var(--fh-card);border-left:3px solid var(--fh-accent);border-radius:6px;padding:6px 8px;white-space:pre-wrap;
+  font-family:ui-monospace,Consolas,monospace;font-size:12px}
+.fhc-card.notice{border-left-color:var(--fh-good)}
+.fhc-card.mine{background:transparent;border-left-color:#7a6a55;color:var(--fh-muted);font-family:inherit}
+.fhc-time{display:block;font-family:sans-serif;font-size:10px;color:var(--fh-muted);margin-bottom:2px}
+.fhc-form{display:flex;gap:6px;padding:8px 12px;border-top:1px solid var(--fh-line)}
+.fhc-in,.fhc-sel{flex:1;min-height:36px;box-sizing:border-box;background:var(--fh-well);color:var(--fh-text);border:1px solid var(--fh-line);border-radius:8px;padding:4px 8px;font:inherit}
+.fhc-sel{flex:none;width:100%}
+.fhc-label{display:flex;flex-direction:column;gap:3px;font-size:12px;color:var(--fh-muted);margin:6px 0}
+.fhc-split{display:flex;gap:8px;align-items:flex-start}
+.fhc-docs{width:130px;flex-shrink:0;display:flex;flex-direction:column;gap:5px}
+.fhc-doc{text-align:left;min-height:40px;padding:5px 8px;border-radius:8px;border:1px solid var(--fh-line);background:transparent;color:var(--fh-text)}
+.fhc-doc.on{border-color:var(--fh-accent);background:var(--fh-card)}
+.fhc-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+`;
+
+  // extension/src/dom.js
+  function h(tag, props, ...kids) {
+    const el = window.document.createElement(tag);
+    for (const [k, v] of Object.entries(props || {})) {
+      if (v === void 0 || v === null || v === false) continue;
+      if (k.startsWith("on") && typeof v === "function") el.addEventListener(k.slice(2), v);
+      else if (k === "class") el.className = v;
+      else if (k === "style" && typeof v === "object") Object.assign(el.style, v);
+      else if (k === "value") el.value = v;
+      else el.setAttribute(k, v === true ? "" : String(v));
+    }
+    add(el, kids);
+    return el;
+  }
+  function add(el, kids) {
+    for (const k of kids) {
+      if (k === null || k === void 0 || k === false) continue;
+      if (Array.isArray(k)) add(el, k);
+      else el.appendChild(typeof k === "object" ? k : window.document.createTextNode(String(k)));
+    }
+  }
+  var card = (...kids) => h("div", { class: "fhc-box" }, ...kids);
+  var title = (text) => h("div", { class: "fhc-h" }, text);
+  var muted = (text) => h("div", { class: "fhc-muted" }, text);
+  var btn = (label, onclick, accent) => h("button", { type: "button", class: accent ? "fhc-b fhc-b-acc" : "fhc-b", onclick }, label);
+  var chip = (text, kind) => h("span", { class: "fhc-chip" + (kind ? " fhc-chip-" + kind : "") }, text);
+  function bar(label, value, pct2, kind) {
+    return h(
+      "div",
+      { class: "fhc-bar" },
+      h("div", { class: "fhc-bar-row" }, h("span", null, label), h("span", { class: "fhc-muted" }, value)),
+      h("div", { class: "fhc-bar-track" }, h("div", { class: "fhc-bar-fill" + (kind ? " fhc-fill-" + kind : ""), style: { width: Math.max(0, Math.min(100, pct2)) + "%" } }))
+    );
+  }
+  function toggle(label, desc, on, onflip) {
+    return h(
+      "div",
+      { class: "fhc-tog" },
+      h("div", null, h("div", { class: "fhc-tog-l" }, label), desc ? h("div", { class: "fhc-muted" }, desc) : null),
+      h("button", { type: "button", class: "fhc-sw" + (on ? " on" : ""), "aria-pressed": on ? "true" : "false", "aria-label": label, onclick: onflip }, h("span"))
+    );
+  }
+  var ml = (n) => n >= 1e3 ? (n / 1e3).toFixed(1) + " L" : Math.round(n) + " mL";
+
+  // shared/guides.js
+  var BOOKS = [["Rules", "rules"], ["Consent", "consent"], ["Tour", "tour"], ["Doors", "doors"], ["Species", "species"], ["Help", "help"]];
+  var PUBLIC_GROUPS = [
+    { name: "Safety", cmds: ["safe", "stuck", "staff", "report"] },
+    { name: "Gettin' started", cmds: ["help", "rules", "consent", "tour", "apply", "friend", "species", "luxury", "doors"] },
+    { name: "You and the farm", cmds: ["record", "keys", "who", "herd", "notice", "weather", "feeding", "curfew", "beg"] },
+    { name: "Milk", cmds: ["stats", "board", "milkable", "quota"] },
+    { name: "Breedin'", cmds: ["breedable", "fertile", "freeuse", "jarok", "yes", "no", "naturalheat", "breed <who>", "cum <who>", "wash", "tally", "eggs", "praise", "degrade", "rights", "accept", "pedigree"] },
+    { name: "Body", cmds: ["size", "measure", "penis", "futa", "gender"] },
+    { name: "Fun", cmds: ["fair", "enter", "teaseme"] }
+  ];
+  var STAFF_GROUPS = [
+    { name: "Books", cmds: ["queue", "app <n>", "approve <who> livestock", "deny <who>", "appclear", "roster", "stock", "find <who>", "record <who>", "note <who>", "signed", "addfriend <who>", "unregister <who>"] },
+    { name: "Herd", cmds: ["claim <who>", "release <who>", "myherd", "herdname <name>", "herdcall", "herdsummon", "turnout <who>", "letup <who>", "brand <who>", "walk <who>"] },
+    { name: "Stock", cmds: ["tier <who> <tier>", "stocks <who>", "unstock <who>", "vet <who>", "inspect <who>", "tease list"] },
+    { name: "Contracts", cmds: ["contract list", "contract show deep <who>", "contract offer deep <who> 1w", "contract check <who>", "contract release <who>", "contract rules"] },
+    { name: "Barn", cmds: ["milk <who>", "collect <who>", "jars", "inseminate <who> <jar>", "drain <who>", "edge <who>", "denial <who>", "ruin <who>", "nomilk <who> <hours>", "quota <who>", "heat <who>", "heatline", "shotlog"] },
+    { name: "Farm", cmds: ["spot", "tourstop", "setrescue", "where", "stucklog"] },
+    { name: "Work and play", cmds: ["clockin", "clockout", "hours", "done", "chores", "chore", "wheel", "spin", "begphrase", "score"] },
+    { name: "Keys and calls", cmds: ["keys <who>", "keysync", "keydump", "grant <who> <tier>", "revoke <who>", "forced", "summon <who>", "summon all", "pasture", "onduty", "cover"] }
+  ];
+  var OWNER_GROUPS = [
+    { name: "Proprietors", cmds: ["staffadd <who> <role>", "staffremove <who>", "goldkey <who>", "notice <text>", "feeding on", "curfew on", "fair open", "backup", "health"] }
+  ];
+  var needsInput = (cmd) => /</.test(cmd);
+  var cmdStem = (cmd) => cmd.replace(/\s*<.*$/, "").trim();
+
+  // extension/src/views/common.js
+  function guidesTab(ctx, staff) {
+    const q2 = (ctx.ui.search || "").toLowerCase();
+    const groups = PUBLIC_GROUPS.concat(staff ? STAFF_GROUPS : [], staff && ctx.s.proprietor ? OWNER_GROUPS : []);
+    const shown = groups.map((g) => ({ name: g.name, cmds: g.cmds.filter((c) => !q2 || c.includes(q2) || g.name.toLowerCase().includes(q2)) })).filter((g) => g.cmds.length);
+    const input2 = h("input", {
+      class: "fhc-in",
+      placeholder: "milk, breed, keys…",
+      value: ctx.ui.search || "",
+      oninput: (e) => ctx.setUi({ search: e.target.value }, true)
+    });
+    return [
+      h("label", { class: "fhc-label" }, "Search guides and commands", input2),
+      h("div", null, BOOKS.map(([label, cmd]) => btn(label, () => ctx.send(cmd), true))),
+      shown.map((g) => card(title(g.name), h("div", null, g.cmds.map((c) => h("button", {
+        type: "button",
+        class: "fhc-cmd",
+        title: needsInput(c) ? "Fill in the rest, then send" : "Send it",
+        onclick: () => needsInput(c) ? ctx.fillBox(cmdStem(c) + " ") : ctx.send(c)
+      }, "?" + c))))),
+      staff ? null : muted("Staff see their own commands on the Staff panel.")
+    ];
+  }
+  var AREAS = [
+    ["The pasture", "Open", "Open ground, good grass, the heart of the place. Four milkin' stalls along the side."],
+    ["The barn", "Open", "Warm and dim. Where the stock sleeps and the machines live."],
+    ["Barn safe room", "Bronze", "Quiet and soft, off the back of the barn. Nobody follows you through it."],
+    ["The pens", "Open", "Gloryhole stalls, for punishment, breedin', or leavin' somethin' out for guests."],
+    ["Kennel and ring", "Open", "Pets, trainin' and the show ring, with a locker room attached."],
+    ["Medical", "Silver", "Checkups, injections, and watchin' what develops."],
+    ["Staff room", "Silver", "Interviews and staff business, back of the pasture."],
+    ["Security wing", "Gold", "Permanent displays down the back hall."],
+    ["The cabin", "Booking", "Laynie and Alexia's home, unless somebody books it."]
+  ];
+
+  // extension/src/views/livestock.js
+  var pct = (a, b) => b ? 100 * a / b : 0;
+  var hoursLeft = (t) => Math.max(0, Math.ceil((t - Date.now()) / 36e5));
+  function me(ctx) {
+    const s = ctx.s;
+    const chips = [
+      s.tier && chip(s.tier, "acc"),
+      s.species && chip(s.species),
+      s.gender && chip(s.gender),
+      ...(s.keys || []).map((k) => chip(k + " key")),
+      s.heatUntil && chip("in heat", "alert"),
+      s.preg && chip("carryin'", "good")
+    ];
+    const bars = [
+      s.milk && bar("Milk", ml(s.milk.ml) + " of " + ml(s.milk.cap) + " · grade " + s.milk.grade, pct(s.milk.ml, s.milk.cap)),
+      s.quota && bar("Today's quota", ml(s.quota.ml) + " of " + ml(s.quota.goal) + (s.quota.streak ? " · streak " + s.quota.streak : ""), pct(s.quota.ml, s.quota.goal), "good"),
+      s.semen && bar("Seed", ml(s.semen.ml) + " of " + ml(s.semen.cap), pct(s.semen.ml, s.semen.cap)),
+      s.holding && s.holding.ml > 0 && bar("Holding", ml(s.holding.ml) + " of " + ml(s.holding.cap), pct(s.holding.ml, s.holding.cap), "alert")
+    ];
+    return [
+      card(h("div", { class: "fhc-title" }, s.name), h("div", { style: { marginTop: "6px" } }, chips)),
+      bars.some(Boolean) && card(
+        title("Today"),
+        bars,
+        s.heatUntil && muted("In heat for " + hoursLeft(s.heatUntil) + " more hours"),
+        s.preg && muted("Carryin' for " + s.preg.sires.join(" & ") + " · due in " + Math.max(0, Math.ceil((s.preg.due - Date.now()) / 864e5)) + " day(s)")
+      ),
+      (s.body || []).length && card(title("Body"), h(
+        "div",
+        { class: "fhc-grid" },
+        s.body.map((b) => h("div", null, muted(b.label), h("div", { style: { fontWeight: 600 } }, b.size)))
+      )),
+      s.today && card(title("Marks"), h(
+        "div",
+        { class: "fhc-grid" },
+        [["Used today", s.today.tally], ["Naughty marks", s.today.naughty], ["Praised", s.today.praised]].map(([k, v]) => h("div", null, muted(k), h("div", { style: { fontWeight: 600 } }, v)))
+      )),
+      h("div", { class: "fhc-quick" }, ["stats", "measure", "record", "pedigree", "keys"].map((c) => btn(c[0].toUpperCase() + c.slice(1), () => ctx.send(c))))
+    ];
+  }
+  function milking(ctx) {
+    const s = ctx.s;
+    if (!s.milk && !s.semen) return [card(title("Milking"), muted("You're not makin' milk right now. Flip Milkable on in Toggles if you'd like to."))];
+    return [
+      s.milk && card(
+        title("Milk"),
+        bar("In your udder", ml(s.milk.ml) + " of " + ml(s.milk.cap), pct(s.milk.ml, s.milk.cap)),
+        muted("Grade " + s.milk.grade + (s.milk.lastAt ? " · last milked " + Math.round((Date.now() - s.milk.lastAt) / 6e4) + " min ago" : ""))
+      ),
+      s.quota && card(title("Quota"), bar("Today", ml(s.quota.ml) + " of " + ml(s.quota.goal), pct(s.quota.ml, s.quota.goal), "good")),
+      s.semen && card(title("Seed"), bar("Stored", ml(s.semen.ml) + " of " + ml(s.semen.cap), pct(s.semen.ml, s.semen.cap))),
+      card(title("Milkin' gear"), muted("Pumps, stalls and the milk vendor show up here once the farm reads your gear (comin' soon).")),
+      h("div", null, btn("Quota", () => ctx.send("quota")), btn("Milk board", () => ctx.send("board")))
+    ];
+  }
+  function breeding(ctx) {
+    const s = ctx.s, sw = s.switches || {};
+    const rows = [
+      ["Breedable", sw.breedable],
+      ["Fertile", sw.fertile],
+      ["Jar insemination", sw.jarok ? "asks first" : "never"],
+      ["Free use", sw.freeuse],
+      ["Natural heat", sw.naturalheat]
+    ];
+    return [
+      card(
+        title("Breedin'"),
+        rows.map(([k, v]) => h("div", { class: "fhc-kv" }, h("span", null, k), h("span", { class: "fhc-muted" }, v === true ? "on" : v === false ? "off" : v))),
+        s.heatUntil && muted("🔥 In heat · " + hoursLeft(s.heatUntil) + " h left"),
+        s.preg && muted("🍼 Carryin' for " + s.preg.sires.join(" & "))
+      ),
+      h("div", null, btn("My tally", () => ctx.send("tally")), btn("Eggs", () => ctx.send("eggs")), btn("Wash up", () => ctx.send("wash")), btn("Pedigree", () => ctx.send("pedigree")))
+    ];
+  }
+  function inbox(ctx) {
+    const f = ctx.ui.filter || "all";
+    const items = ctx.feed.filter((x) => f === "all" || x.kind === f);
+    return [
+      h("div", null, [["all", "All"], ["notice", "From the farm"], ["reply", "Answers"], ["mine", "You asked"]].map(([id, label]) => h("button", { type: "button", class: "fhc-pill" + (f === id ? " on" : ""), onclick: () => ctx.setUi({ filter: id }) }, label))),
+      items.length ? items.slice().reverse().map((x) => h(
+        "div",
+        { class: "fhc-card " + x.kind },
+        h("span", { class: "fhc-time" }, new Date(x.at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) + (x.kind === "notice" ? " · from the farm" : x.kind === "mine" ? " · you asked" : "")),
+        x.text
+      )) : muted("Nothin' here yet.")
+    ];
+  }
+  var SWITCH_INFO = [
+    ["breedable", "Breedable", "You can be bred and filled"],
+    ["fertile", "Fertile", "You can catch"],
+    ["jarok", "Jar insemination", "On: staff still ask every time · Off: never"],
+    ["freeuse", "Free use", "Any stud may have you without askin'"],
+    ["futa", "Futa", "Cock and vulva both, milk and semen both"],
+    ["milkable", "Milkable", "Make milk"],
+    ["naturalheat", "Natural heat", "Come into heat on your own every 7 days"],
+    ["praise", "Praise", "Let staff's praise count"],
+    ["degrade", "Degrade", "Let staff's degradin' count"],
+    ["tally", "Tally marks", "Show your tally on ?who and the board"],
+    ["teaseme", "Tease me", "Let staff tease lines name you"]
+  ];
+  function farmSwitches(ctx, list) {
+    const sw = ctx.s.switches || {};
+    return list.map(([cmd, label, desc]) => toggle(label, desc, !!sw[cmd], () => ctx.send(cmd + " " + (sw[cmd] ? "off" : "on"))));
+  }
+  function panelPrefs(ctx) {
+    return card(
+      title("This panel"),
+      muted("Only on your computer."),
+      [
+        ["compact", "Compact cards", "Smaller text, more on screen"],
+        ["chime", "Chime on notices", "A soft sound when the farm messages you"],
+        ["popopen", "Open on new notice", "Pop the panel open by itself"]
+      ].map(([k, label, desc]) => toggle(label, desc, !!ctx.prefs[k], () => ctx.setPref(k, !ctx.prefs[k])))
+    );
+  }
+  function toggles(ctx) {
+    return [
+      card(title("Farm settings"), muted("Saved by the farm girl. Your limits still win."), farmSwitches(ctx, SWITCH_INFO)),
+      card(
+        title("Gender"),
+        muted("How the farm sees you. It picks your farm outfit."),
+        h("div", { style: { marginTop: "6px" } }, ["female", "male", "futa", "femboy"].map((g) => h("button", { type: "button", class: "fhc-pill" + (ctx.s.gender === g ? " on" : ""), onclick: () => ctx.send("gender " + g) }, g)))
+      ),
+      panelPrefs(ctx)
+    ];
+  }
+  var LIVESTOCK_TABS = [
+    { id: "me", label: "Me", render: me },
+    { id: "milk", label: "Milking", render: milking },
+    { id: "breed", label: "Breeding", render: breeding },
+    { id: "inbox", label: "Inbox", render: inbox },
+    { id: "guides", label: "Guides", render: (ctx) => guidesTab(ctx, false) },
+    { id: "toggles", label: "Toggles", render: toggles }
+  ];
+
+  // extension/src/views/guest.js
+  var GUEST_TABS = [
+    { id: "welcome", label: "Welcome", render: (ctx) => [
+      card(
+        h("div", { class: "fhc-title" }, "Howdy, " + (ctx.welcome.name || "sugar") + "!"),
+        h("p", null, "Welcome to B&B Farm. Everybody here chose to be here and signed to say so. Have a look around, mind the ruts, and holler if you need a hand."),
+        btn("Take the tour", () => ctx.send("tour"), true),
+        btn("Apply to join", () => ctx.send("apply")),
+        btn("Luxury stay", () => ctx.send("luxury"))
+      ),
+      card(title("Your keys"), muted("Guests don't carry keys. Staff can let you through any door."))
+    ] },
+    { id: "farm", label: "The farm", render: () => AREAS.map(([n, key, d]) => card(h("div", { class: "fhc-kv" }, h("b", null, n), h("span", { class: "fhc-muted" }, key)), muted(d))) },
+    { id: "rules", label: "Rules", render: (ctx) => [
+      h(
+        "div",
+        { class: "fhc-box alert" },
+        h("b", null, "Safe word stops everything"),
+        muted("Anywhere, from anybody. No contract overrides it. Beepin' the farm girl works from anywhere on the property, too.")
+      ),
+      card(title("On consent"), h("p", null, "Every animal and every hand here chose to be here, and signed for it. What you see in the pens, stalls and barn was asked for. The contract's a fence that holds both ways: what ain't in it, don't happen.")),
+      h("div", null, btn("Full rules", () => ctx.send("rules")), btn("Consent", () => ctx.send("consent")), btn("What opens what", () => ctx.send("doors")))
+    ] },
+    { id: "inbox", label: "Inbox", render: inbox },
+    { id: "guides", label: "Guides", render: (ctx) => guidesTab(ctx, false) },
+    { id: "settings", label: "Settings", render: (ctx) => [card(title("Farm settings"), muted("Once you're on the books, your milkin', breedin' and teasin' switches show up here."), btn("Apply to join", () => ctx.send("apply"), true)), panelPrefs(ctx)] }
+  ];
+
+  // shared/bcplus-rules.json
+  var bcplus_rules_default = {
+    bcplusVersion: "0.14.0",
+    made: "2026-10-03",
+    rules: [
+      {
+        id: "speech.forbidWhisper",
+        name: "Forbid whispering",
+        category: "Speech",
+        description: "The player cannot send whispers to other people in the room.",
+        bcxEquivalent: "speech_restrict_whisper_send",
+        settings: [
+          {
+            type: "checkbox",
+            name: "allowLover",
+            label: "Still allow whispering to Lover-ranked roles and above",
+            default: true
+          }
+        ]
+      },
+      {
+        id: "speech.forbidOOC",
+        name: "Forbid OOC messages",
+        category: "Speech",
+        description: "The player cannot send messages containing out-of-character (parenthesized) text. Whispers are not affected.",
+        bcxEquivalent: "speech_block_ooc",
+        settings: []
+      },
+      {
+        id: "speech.gaggedOOC",
+        name: "Block OOC while gagged",
+        category: "Speech",
+        description: "The player cannot use out-of-character (parenthesized) text while gagged - a gag should not be so easy to talk around.",
+        bcxEquivalent: "speech_block_gagged_ooc",
+        settings: []
+      },
+      {
+        id: "speech.forbiddenWords",
+        name: "Forbidden words",
+        category: "Speech",
+        description: "The player cannot use the configured words in chat or whispers.",
+        bcxEquivalent: "speech_ban_words",
+        settings: [
+          {
+            type: "stringList",
+            name: "words",
+            label: "Forbidden words:",
+            default: [],
+            maxChars: 100,
+            entryLabel: "word"
+          },
+          {
+            type: "checkbox",
+            name: "includeOOC",
+            label: "Also forbid the words in OOC (parentheses)",
+            default: false
+          }
+        ]
+      },
+      {
+        id: "speech.mandatoryWords",
+        name: "Mandatory words",
+        category: "Speech",
+        description: 'Every chat message must contain at least one of the configured words (e.g. "Miss, please, humbly"). Purely out-of-character messages are exempt.',
+        bcxEquivalent: "speech_mandatory_words",
+        settings: [
+          {
+            type: "stringList",
+            name: "words",
+            label: "Required words:",
+            default: [],
+            maxChars: 100,
+            entryLabel: "word"
+          },
+          {
+            type: "checkbox",
+            name: "includeWhispers",
+            label: "Also apply to whispers",
+            default: false
+          }
+        ]
+      },
+      {
+        id: "speech.minimumWords",
+        name: "Require detailed speech",
+        category: "Speech",
+        description: "Every chat message must contain at least the configured number of words - doll talk in reverse, for detailed roleplay. Purely out-of-character messages and emotes are exempt.",
+        settings: [
+          {
+            type: "option",
+            name: "minWords",
+            label: "Minimum words per message:",
+            options: [
+              "2",
+              "3",
+              "4",
+              "5",
+              "6",
+              "8",
+              "10",
+              "15",
+              "20"
+            ],
+            default: "5"
+          },
+          {
+            type: "checkbox",
+            name: "includeWhispers",
+            label: "Also apply to whispers",
+            default: false
+          }
+        ]
+      },
+      {
+        id: "speech.restrainedSpeech",
+        name: "Restrained speech",
+        category: "Speech",
+        description: "The player can only say the configured phrases, nothing else (case and end punctuation are ignored). Purely out-of-character messages are exempt.",
+        bcxEquivalent: "speech_restrained_speech",
+        settings: [
+          {
+            type: "stringList",
+            name: "phrases",
+            label: "Allowed phrases:",
+            default: [
+              "Yes Miss",
+              "No Miss",
+              "Thank you Miss",
+              "Please Miss"
+            ],
+            maxChars: 120,
+            entryLabel: "phrase"
+          }
+        ]
+      },
+      {
+        id: "speech.dollTalk",
+        name: "Doll talk",
+        category: "Speech",
+        description: "The player can only speak in short, simple phrases: limited words per message and letters per word. Out-of-character text is not affected.",
+        bcxEquivalent: "speech_doll_talk",
+        settings: [
+          {
+            type: "option",
+            name: "maxWords",
+            label: "Maximum words per message",
+            options: [
+              "3",
+              "5",
+              "7",
+              "10"
+            ],
+            default: "5"
+          },
+          {
+            type: "option",
+            name: "maxWordLength",
+            label: "Maximum letters per word",
+            options: [
+              "4",
+              "5",
+              "6",
+              "7",
+              "8"
+            ],
+            default: "6"
+          }
+        ]
+      },
+      {
+        id: "speech.wordReplace",
+        name: "Replace spoken words",
+        category: "Speech",
+        description: 'Configured words are replaced in everything the player says. Each entry is word:replacement (e.g. "i:this doll"). Out-of-character text is not affected.',
+        bcxEquivalent: "speech_replace_spoken_words",
+        settings: [
+          {
+            type: "stringList",
+            name: "replacements",
+            label: "Replacements:",
+            default: [],
+            maxChars: 120,
+            entryLabel: "word:replacement"
+          }
+        ]
+      },
+      {
+        id: "speech.faltering",
+        name: "Enforce faltering speech",
+        category: "Speech",
+        description: "The player's spoken messages come out st-st-stuttering. Out-of-character text is not affected.",
+        bcxEquivalent: "speech_alter_faltering",
+        settings: []
+      },
+      {
+        id: "speech.forbidShouting",
+        name: "Forbid shouting",
+        category: "Speech",
+        description: "All-caps chat messages are lowered to normal speech when enforced.",
+        settings: []
+      },
+      {
+        id: "speech.forbidEmotes",
+        name: "Forbid emotes",
+        category: "Speech",
+        description: "The player cannot send emote messages to the room.",
+        bcxEquivalent: "speech_forbid_emotes",
+        settings: []
+      },
+      {
+        id: "social.forbidBeepMessages",
+        name: "Forbid beep messages",
+        category: "Social",
+        description: "The player cannot send beeps with message content to friends.",
+        bcxEquivalent: "speech_restrict_beep_send",
+        settings: [
+          {
+            type: "checkbox",
+            name: "allowPlainBeeps",
+            label: "Still allow plain beeps without a message",
+            default: true
+          }
+        ]
+      },
+      {
+        id: "social.forbidBeeps",
+        name: "Forbid sending beeps",
+        category: "Social",
+        description: "The player cannot send any beeps at all, with or without a message. Hidden mod-to-mod beeps (leashes, summons, BCX) are unaffected, and configured members can still be beeped.",
+        settings: [
+          {
+            type: "members",
+            name: "allowedMembers",
+            label: "Members who may still be beeped:",
+            default: []
+          }
+        ]
+      },
+      {
+        id: "social.friendListChanges",
+        name: "Forbid friend-list changes",
+        category: "Social",
+        description: "The player cannot add or remove BC friends; each direction can be toggled separately. Covers the friend list screen and in-room dialogs.",
+        settings: [
+          {
+            type: "checkbox",
+            name: "blockAdding",
+            label: "Block adding friends",
+            default: true
+          },
+          {
+            type: "checkbox",
+            name: "blockRemoving",
+            label: "Block removing friends",
+            default: true
+          }
+        ]
+      },
+      {
+        id: "chat.forbidLeaving",
+        name: "Forbid leaving the room",
+        category: "Other",
+        description: "The player cannot leave the chat room they are in - the exit button and leave commands from other mods are both blocked. Forced moves (leashes, kicks, BC's safeword release) and disconnects are not prevented.",
+        bcxEquivalent: "block_leaving_room",
+        settings: []
+      },
+      {
+        id: "rooms.create",
+        name: "Forbid creating new rooms",
+        category: "Rooms",
+        description: "The player cannot open the room creation screen. Changing settings of an existing room they administrate is unaffected.",
+        bcxEquivalent: "block_creating_rooms",
+        settings: []
+      },
+      {
+        id: "rooms.entry",
+        name: "Restrict entering rooms",
+        category: "Rooms",
+        description: 'The player can only join rooms whose name is on the configured list (case-insensitive). As a safety measure the rule does nothing while the list is empty. Being moved by a BC+ command or summon is not restricted. Combines well with "Forbid creating new rooms".',
+        bcxEquivalent: "block_entering_rooms",
+        settings: [
+          {
+            type: "stringList",
+            name: "allowedRooms",
+            label: "Allowed room names:",
+            default: [],
+            maxChars: 60,
+            entryLabel: "room name"
+          }
+        ]
+      },
+      {
+        id: "rooms.adminUI",
+        name: "Forbid room admin UI while blind",
+        category: "Rooms",
+        description: "The player cannot open the room administration screen while unable to see - it would disclose the room background and admin member numbers. Admin chat commands still work.",
+        bcxEquivalent: "block_room_admin_UI",
+        settings: []
+      },
+      {
+        id: "social.greetRoom",
+        name: "Order to greet the room",
+        category: "Social",
+        description: "On entering a chat room, the player automatically says the configured greeting.",
+        bcxEquivalent: "greet_room_order",
+        settings: [
+          {
+            type: "text",
+            name: "greeting",
+            label: "Greeting:",
+            default: "Hello everyone!",
+            maxChars: 200
+          }
+        ]
+      },
+      {
+        id: "social.farewell",
+        name: "Farewell on leave",
+        category: "Social",
+        description: "When leaving a chat room, the player automatically says the configured farewell first.",
+        bcxEquivalent: "farewell_on_slow_leave",
+        settings: [
+          {
+            type: "text",
+            name: "farewell",
+            label: "Farewell:",
+            default: "Goodbye everyone!",
+            maxChars: 200
+          }
+        ]
+      },
+      {
+        id: "other.listenToMyVoice",
+        name: "Listen to my voice",
+        category: "Other",
+        description: "One of the configured sentences appears to the player at random, at the set interval, while they are in a chat room. Only they can see it.",
+        bcxEquivalent: "other_constant_reminder",
+        settings: [
+          {
+            type: "stringList",
+            name: "sentences",
+            label: "Sentences:",
+            default: [],
+            maxChars: 200,
+            entryLabel: "sentence",
+            legacySeparator: "|"
+          },
+          {
+            type: "option",
+            name: "frequency",
+            label: "Minutes between sentences",
+            options: [
+              "2",
+              "5",
+              "10",
+              "15",
+              "30"
+            ],
+            default: "15"
+          }
+        ]
+      },
+      {
+        id: "other.summon",
+        name: "Ready to be summoned",
+        category: "Other",
+        description: `Configured members can summon the player from anywhere in the club with a beep whose message starts with the summon text (or just "summon"). After the delay, the player is pulled to the summoner's room - ignoring leashes and locked doors. If the target room is full, they end up in the lobby. The summoner must be in a room and leave "attach room" enabled when writing the beep, or it carries no room to move to.`,
+        bcxEquivalent: "alt_forced_summoning",
+        settings: [
+          {
+            type: "members",
+            name: "allowedMembers",
+            label: "Members who may summon:",
+            default: []
+          },
+          {
+            type: "text",
+            name: "summonText",
+            label: "Summon text:",
+            default: "Come to my room immediately",
+            maxChars: 100
+          },
+          {
+            type: "option",
+            name: "delay",
+            label: "Seconds before enforcing",
+            options: [
+              "10",
+              "15",
+              "30",
+              "60"
+            ],
+            default: "15"
+          }
+        ]
+      },
+      {
+        id: "protect.ownerChanges",
+        name: "Forbid club owner changes",
+        category: "Protection",
+        description: "The player cannot leave their current club owner or submit to a new one. Advancing a trial to full ownership is unaffected, and their owner can still release them.",
+        bcxEquivalent: "rc_club_owner",
+        settings: []
+      },
+      {
+        id: "protect.newLovers",
+        name: "Forbid getting new lovers",
+        category: "Protection",
+        description: "The player cannot start dating anyone new. Advancing an existing lovership (dating to engagement to marriage) is unaffected.",
+        bcxEquivalent: "rc_lover_new",
+        settings: []
+      },
+      {
+        id: "protect.breakup",
+        name: "Forbid breaking up with lovers",
+        category: "Protection",
+        description: "The player cannot leave any of their lovers, at any lovership stage - neither through the Management mistress nor directly in a chat room. Their lovers can still break up with them.",
+        bcxEquivalent: "rc_lover_leave",
+        settings: []
+      },
+      {
+        id: "protect.newSubs",
+        name: "Forbid taking new submissives",
+        category: "Protection",
+        description: "The player cannot offer an ownership trial to a new submissive. Advancing an existing trial to full ownership is unaffected.",
+        bcxEquivalent: "rc_sub_new",
+        settings: []
+      },
+      {
+        id: "protect.disowning",
+        name: "Forbid disowning submissives",
+        category: "Protection",
+        description: "The player cannot let go of any of their submissives (trial or full ownership). Their submissives can still break the bond themselves.",
+        bcxEquivalent: "rc_sub_leave",
+        settings: []
+      },
+      {
+        id: "protect.blacklist",
+        name: "Prevent blacklisting",
+        category: "Protection",
+        description: "The player cannot add people holding the configured role (or higher) to their BC blacklist or ghostlist.",
+        bcxEquivalent: "block_blacklisting",
+        settings: [
+          {
+            type: "option",
+            name: "minRole",
+            label: "Protect this role and higher",
+            options: [
+              "BC Owner",
+              "Co-Owner",
+              "Lover",
+              "Mistress",
+              "Whitelist",
+              "Friend"
+            ],
+            default: "Mistress"
+          }
+        ]
+      },
+      {
+        id: "protect.whitelist",
+        name: "Prevent whitelisting",
+        category: "Protection",
+        description: "The player can only add people holding the configured role (or higher) to their BC whitelist.",
+        bcxEquivalent: "block_whitelisting",
+        settings: [
+          {
+            type: "option",
+            name: "minRole",
+            label: "Lowest role allowed on the whitelist",
+            options: [
+              "BC Owner",
+              "Co-Owner",
+              "Lover",
+              "Mistress",
+              "Whitelist",
+              "Friend"
+            ],
+            default: "Mistress"
+          }
+        ]
+      },
+      {
+        id: "protect.hardcore",
+        name: "Hardcore Mode",
+        category: "Protection",
+        description: "Forces both hardcore options from the General page on while this rule is in effect, locked: the player cannot open their own BC+ while their hands are bound, and people whose hands are bound are refused when they try to change anything in the player's BC+. The player's own choice of the two options is untouched underneath and returns the moment the rule ends. Requires enforcement to have any effect.",
+        settings: []
+      },
+      {
+        id: "items.tyingSelf",
+        name: "Forbid tying up self",
+        category: "Items",
+        description: "The player cannot use items on their own body, including swapping worn items.",
+        bcxEquivalent: "block_tying_self",
+        settings: []
+      },
+      {
+        id: "items.tyingOthers",
+        name: "Forbid tying up others",
+        category: "Items",
+        description: "The player cannot use items on other characters. Can be limited to characters with a higher dominant score than the player.",
+        bcxEquivalent: "block_tying_others",
+        settings: [
+          {
+            type: "checkbox",
+            name: "onlyDominants",
+            label: "Only forbid using items on more dominant characters",
+            default: true
+          }
+        ]
+      },
+      {
+        id: "items.freeingSelf",
+        name: "Forbid freeing self",
+        category: "Items",
+        description: "The player cannot remove, struggle out of or escape items on their own body. Others can still remove them. Low-difficulty items (hand-held toys, plushies...) can optionally stay removable.",
+        bcxEquivalent: "block_freeing_self",
+        settings: [
+          {
+            type: "checkbox",
+            name: "allowEasy",
+            label: "Still allow removing low-difficulty items",
+            default: false
+          }
+        ]
+      },
+      {
+        id: "items.freeingOthers",
+        name: "Forbid freeing others",
+        category: "Items",
+        description: "The player cannot remove items from other characters. Low-difficulty items (hand-held toys, plushies...) can optionally stay removable.",
+        bcxEquivalent: "block_freeing_others",
+        settings: [
+          {
+            type: "checkbox",
+            name: "allowEasy",
+            label: "Still allow removing low-difficulty items",
+            default: false
+          }
+        ]
+      },
+      {
+        id: "items.wardrobeSelf",
+        name: "Forbid wardrobe use on self",
+        category: "Items",
+        description: "The player cannot change their own clothes. Others can still change them.",
+        bcxEquivalent: "block_wardrobe_access_self",
+        settings: []
+      },
+      {
+        id: "items.wardrobeOthers",
+        name: "Forbid wardrobe use on others",
+        category: "Items",
+        description: "The player cannot change the clothes of other club members.",
+        bcxEquivalent: "block_wardrobe_access_others",
+        settings: []
+      },
+      {
+        id: "locks.remotesSelf",
+        name: "Forbid using remotes on self",
+        category: "Items",
+        description: "The player cannot use a vibrator remote on their own body. Others can still use remotes on them.",
+        bcxEquivalent: "block_remoteuse_self",
+        settings: []
+      },
+      {
+        id: "locks.remotesOthers",
+        name: "Forbid using remotes on others",
+        category: "Items",
+        description: "The player cannot use a vibrator remote on anyone else.",
+        bcxEquivalent: "block_remoteuse_others",
+        settings: []
+      },
+      {
+        id: "locks.keysSelf",
+        name: "Forbid using keys on self",
+        category: "Items",
+        description: "The player cannot unlock locks on their own body, even with the key.",
+        bcxEquivalent: "block_keyuse_self",
+        settings: []
+      },
+      {
+        id: "locks.keysOthers",
+        name: "Forbid using keys on others",
+        category: "Items",
+        description: "The player cannot unlock locks on anyone else.",
+        bcxEquivalent: "block_keyuse_others",
+        settings: []
+      },
+      {
+        id: "locks.pickSelf",
+        name: "Forbid picking locks on self",
+        category: "Items",
+        description: "The player cannot pick locks on their own body.",
+        bcxEquivalent: "block_lockpicking_self",
+        settings: []
+      },
+      {
+        id: "locks.pickOthers",
+        name: "Forbid picking locks on others",
+        category: "Items",
+        description: "The player cannot pick locks on anyone else.",
+        bcxEquivalent: "block_lockpicking_others",
+        settings: []
+      },
+      {
+        id: "locks.lockSelf",
+        name: "Forbid using locks on self",
+        category: "Items",
+        description: "The player cannot apply locks to their own body.",
+        bcxEquivalent: "block_lockuse_self",
+        settings: []
+      },
+      {
+        id: "locks.lockOthers",
+        name: "Forbid using locks on others",
+        category: "Items",
+        description: "The player cannot apply locks to anyone else.",
+        bcxEquivalent: "block_lockuse_others",
+        settings: []
+      },
+      {
+        id: "sensory.sound",
+        name: "Sensory deprivation: Sound",
+        category: "Sensory",
+        description: "Impacts the player's natural hearing the same way items do, independent of them. Strength is adjustable; stacks with worn items.",
+        bcxEquivalent: "alt_restrict_hearing",
+        settings: [
+          {
+            type: "option",
+            name: "strength",
+            label: "Hearing impairment",
+            options: [
+              "Light",
+              "Medium",
+              "Heavy"
+            ],
+            default: "Light"
+          }
+        ]
+      },
+      {
+        id: "sensory.hearingWhitelist",
+        name: "Hearing whitelist",
+        category: "Sensory",
+        description: "The listed members are always understood clearly, no matter how deafened the player is (by items or rules). Optionally even when those members are gagged.",
+        bcxEquivalent: "alt_hearing_whitelist",
+        settings: [
+          {
+            type: "members",
+            name: "members",
+            label: "Members always heard:",
+            default: []
+          },
+          {
+            type: "checkbox",
+            name: "includeGagged",
+            label: "Understand them even while they are gagged",
+            default: false
+          }
+        ]
+      },
+      {
+        id: "sensory.sight",
+        name: "Sensory deprivation: Sight",
+        category: "Sensory",
+        description: "Impacts the player's natural eyesight the same way items do, independent of them. Strength is adjustable; stacks with worn items.",
+        bcxEquivalent: "alt_restrict_sight",
+        settings: [
+          {
+            type: "option",
+            name: "strength",
+            label: "Eyesight impairment",
+            options: [
+              "Light",
+              "Medium",
+              "Heavy"
+            ],
+            default: "Light"
+          }
+        ]
+      },
+      {
+        id: "sensory.seeingWhitelist",
+        name: "Seeing whitelist",
+        category: "Sensory",
+        description: "The listed members are always seen normally, no matter how blinded the player is (by items or rules).",
+        bcxEquivalent: "alt_seeing_whitelist",
+        settings: [
+          {
+            type: "members",
+            name: "members",
+            label: "Members always seen:",
+            default: []
+          }
+        ]
+      },
+      {
+        id: "body.forbidPoses",
+        name: "Forbid changing poses",
+        category: "Body",
+        description: "The player cannot change their own body pose unaided - kneeling, standing up, spreading and every other pose stays as it is. Others (and items) can still pose them.",
+        bcxEquivalent: "block_restrict_allowed_poses",
+        settings: []
+      },
+      {
+        id: "body.forbiddenPoses",
+        name: "Forbid specific poses",
+        category: "Body",
+        description: "The player cannot change into the listed poses by themselves. Pose names: BaseUpper, BackBoxTie, BackCuffs, BackElbowTouch, OverTheHead, Yoked, BaseLower, Kneel, KneelingSpread, LegsClosed, Spread, Hogtied, AllFours, Suspension, TapedHands.",
+        bcxEquivalent: "block_restrict_allowed_poses",
+        settings: [
+          {
+            type: "stringList",
+            name: "poses",
+            label: "Forbidden poses:",
+            default: [],
+            maxChars: 30,
+            entryLabel: "pose name"
+          }
+        ]
+      },
+      {
+        id: "body.forceKneel",
+        name: "Forced to kneel",
+        category: "Body",
+        description: "The player must stay on their knees: choosing a standing lower-body pose is blocked, and if they end up standing they are put back down. Poses that need aid (restraints forcing them upright) are left alone rather than fought.",
+        settings: []
+      },
+      {
+        id: "body.forcedPosition",
+        name: "Forced position",
+        category: "Body",
+        description: "The player is held in a chosen position: pick an arms pose, a legs pose, or both (e.g. hands behind back with legs spread), or a full-body position (hogtied or all fours) that overrides the other two. Changing away is blocked and any deviation is corrected. Poses held by restraints are left alone rather than fought.",
+        settings: [
+          {
+            type: "option",
+            name: "fullPose",
+            label: "Full body (overrides arms/legs)",
+            options: [
+              "Any",
+              "Hogtied",
+              "All fours"
+            ],
+            default: "Any"
+          },
+          {
+            type: "option",
+            name: "armsPose",
+            label: "Arms",
+            options: [
+              "Any",
+              "Free",
+              "Hands behind back",
+              "Elbows behind back",
+              "Wrists behind back",
+              "Yoked",
+              "Arms overhead"
+            ],
+            default: "Any"
+          },
+          {
+            type: "option",
+            name: "legsPose",
+            label: "Legs",
+            options: [
+              "Any",
+              "Standing",
+              "Legs closed",
+              "Legs spread",
+              "Kneeling",
+              "Kneeling spread"
+            ],
+            default: "Any"
+          }
+        ]
+      },
+      {
+        id: "body.afkBehavior",
+        name: "Forced AFK behavior",
+        category: "Body",
+        description: "When the player goes idle, the configured behaviors apply automatically: the Afk emoticon, closed eyes, kneeling, and an automatic reply to whispers. Emoticon and eyes are restored the moment the player is back; a forced kneel is left for them to stand up from.",
+        settings: [
+          {
+            type: "option",
+            name: "idleMinutes",
+            label: "Minutes until idle",
+            options: [
+              "2",
+              "5",
+              "10",
+              "15",
+              "30"
+            ],
+            default: "5"
+          },
+          {
+            type: "checkbox",
+            name: "afkEmoticon",
+            label: "Show the Afk emoticon",
+            default: true
+          },
+          {
+            type: "checkbox",
+            name: "closeEyes",
+            label: "Close the eyes",
+            default: false
+          },
+          {
+            type: "checkbox",
+            name: "kneel",
+            label: "Kneel down",
+            default: false
+          },
+          {
+            type: "checkbox",
+            name: "autoReply",
+            label: "Auto-reply to whispers",
+            default: false
+          },
+          {
+            type: "text",
+            name: "replyText",
+            label: "Auto-reply text:",
+            default: "I am away from the club right now.",
+            maxChars: 150
+          }
+        ]
+      },
+      {
+        id: "pet.speech",
+        name: "Speak like a pet",
+        category: "Pet",
+        description: "The player's speech turns pet-like: Sprinkle mode weaves animal sounds between the words, Replace mode swaps words for sounds outright - up to fully non-verbal at Max intensity. Pick an animal sound set or provide custom sounds. Out-of-character text is never touched.",
+        settings: [
+          {
+            type: "option",
+            name: "animal",
+            label: "Sound set",
+            options: [
+              "Bunny",
+              "Cat",
+              "Cow",
+              "Dog",
+              "Fox",
+              "Mouse",
+              "Pony",
+              "Wolf",
+              "Custom"
+            ],
+            default: "Cat"
+          },
+          {
+            type: "stringList",
+            name: "sounds",
+            label: "Custom sounds (used with the Custom set):",
+            default: [],
+            maxChars: 24,
+            maxEntries: 20,
+            entryLabel: "sound"
+          },
+          {
+            type: "option",
+            name: "mode",
+            label: "Mode",
+            options: [
+              "Sprinkle",
+              "Replace"
+            ],
+            default: "Sprinkle"
+          },
+          {
+            type: "option",
+            name: "intensity",
+            label: "Intensity",
+            options: [
+              "Low",
+              "Medium",
+              "High",
+              "Max"
+            ],
+            default: "Medium"
+          }
+        ]
+      },
+      {
+        id: "pet.hearing",
+        name: "Hear like a pet",
+        category: "Pet",
+        description: `Pet words - commands, praise, the pet's own name, the chosen animal's vocabulary and any custom extras - always come through clearly, while the rest of what the player hears garbles away. "Only when deafened" merely lets the pet words pierce existing deafness (item- or hunger-induced); Light and Heavy garble everything else all the time. Out-of-character text is never touched.`,
+        settings: [
+          {
+            type: "option",
+            name: "animal",
+            label: "Vocabulary set",
+            options: [
+              "Bunny",
+              "Cat",
+              "Cow",
+              "Dog",
+              "Fox",
+              "Mouse",
+              "Pony",
+              "Wolf",
+              "Custom"
+            ],
+            default: "Cat"
+          },
+          {
+            type: "stringList",
+            name: "words",
+            label: "Extra understood words:",
+            default: [],
+            maxChars: 32,
+            maxEntries: 30,
+            entryLabel: "word"
+          },
+          {
+            type: "option",
+            name: "strength",
+            label: "Everything else garbles",
+            options: [
+              "Only when deafened",
+              "Light",
+              "Heavy"
+            ],
+            default: "Light"
+          }
+        ]
+      },
+      {
+        id: "body.controlOrgasms",
+        name: "Control orgasms",
+        category: "Body",
+        description: "Controls what happens when the player's arousal peaks, independent of items: Edge keeps the meter just below the top so the orgasm never starts; Ruin starts the orgasm screen but denies the actual climax; No resisting removes the option to fight an orgasm off. Requires the arousal meter to be enabled.",
+        bcxEquivalent: "alt_control_orgasms",
+        settings: [
+          {
+            type: "option",
+            name: "mode",
+            label: "Orgasm attempts are:",
+            options: [
+              "Edged",
+              "Ruined",
+              "Unresistable"
+            ],
+            default: "Edged"
+          }
+        ]
+      },
+      {
+        id: "body.secretOrgasms",
+        name: "Secret arousal meter",
+        category: "Body",
+        description: "The player cannot see their own arousal meter even while it is active - the orgasm quick-time event comes as a surprise. Whether others can see the meter is unchanged (that stays a BC setting).",
+        bcxEquivalent: "alt_secret_orgasms",
+        settings: []
+      },
+      {
+        id: "control.difficulty",
+        name: "Forbid changing difficulty",
+        category: "Other",
+        description: "The player cannot change their Bondage Club multiplayer difficulty, whatever it currently is.",
+        bcxEquivalent: "block_difficulty_change",
+        settings: []
+      },
+      {
+        id: "control.activities",
+        name: "Forbid using activities",
+        category: "Other",
+        description: "The player cannot use any (sexual) activities on anyone - the activities button vanishes from the item dialogs. Others can still use activities on the player; the arousal system itself stays untouched.",
+        bcxEquivalent: "block_activities",
+        settings: []
+      },
+      {
+        id: "control.emoticon",
+        name: "Forbid changing emoticon",
+        category: "Social",
+        description: "The player cannot show, change or remove the emoticon (afk, sleep, ...) over their own head.",
+        bcxEquivalent: "block_changing_emoticon",
+        settings: []
+      },
+      {
+        id: "control.leash",
+        name: "Restrict who may leash",
+        category: "Protection",
+        description: "Only people of at least the configured BC+ role can take the player onto a leash; everyone else's leash slips off with a room message.",
+        bcxEquivalent: "alt_restrict_leashability",
+        settings: [
+          {
+            type: "option",
+            name: "minimumRole",
+            label: "Leashing needs at least:",
+            options: [
+              "BC Owner",
+              "Co-Owner",
+              "Lover",
+              "Mistress",
+              "Whitelist",
+              "Friend"
+            ],
+            default: "Co-Owner"
+          }
+        ]
+      },
+      {
+        id: "control.nickname",
+        name: "Control nickname",
+        category: "Social",
+        description: "Locks the player's BC nickname: with a nickname configured it is forced to that; with the field left empty the nickname the player had when the rule took hold is kept. The nickname stays as-is when the rule ends.",
+        bcxEquivalent: "alt_set_nickname",
+        settings: [
+          {
+            type: "text",
+            name: "nickname",
+            label: "Forced nickname (empty = lock current):",
+            default: "",
+            maxChars: 20
+          }
+        ]
+      },
+      {
+        id: "control.profile",
+        name: "Lock profile description",
+        category: "Social",
+        description: "Freezes the player's online profile description: any change is reverted to the text it had when the rule took hold. The description stays as-is when the rule ends.",
+        bcxEquivalent: "alt_set_profile_description",
+        settings: []
+      },
+      {
+        id: "settings.itemPermission",
+        name: "Force 'Item permission'",
+        category: "Settings",
+        description: "Pins who is allowed to use items on the player. While enforced, the 'Item permission' setting is held at the configured value - changes snap back within seconds. With the restore option on, the value from before the rule took hold returns when the rule stops applying.",
+        bcxEquivalent: "setting_item_permission",
+        settings: [
+          {
+            type: "option",
+            name: "value",
+            label: "Forced value",
+            options: [
+              "Everyone, no exceptions",
+              "Everyone, except blacklist",
+              "Owner, Lovers, whitelist & Dominants",
+              "Owner, Lovers and whitelist only",
+              "Owner and Lovers only",
+              "Owner only"
+            ],
+            default: "Everyone, no exceptions"
+          },
+          {
+            type: "checkbox",
+            name: "restore",
+            label: "Restore the previous value when the rule ends",
+            default: true
+          }
+        ]
+      },
+      {
+        id: "settings.lockpickingSelf",
+        name: "Force 'Locks on you can't be picked'",
+        category: "Settings",
+        description: "Pins whether locks on the player can be picked at all. While enforced, the 'Locks on you can't be picked' setting is held at the configured value - changes snap back within seconds. With the restore option on, the value from before the rule took hold returns when the rule stops applying.",
+        bcxEquivalent: "setting_forbid_lockpicking",
+        settings: [
+          {
+            type: "option",
+            name: "value",
+            label: "Forced value",
+            options: [
+              "Locks cannot be picked",
+              "Locks can be picked"
+            ],
+            default: "Locks cannot be picked"
+          },
+          {
+            type: "checkbox",
+            name: "restore",
+            label: "Restore the previous value when the rule ends",
+            default: true
+          }
+        ]
+      },
+      {
+        id: "settings.spRooms",
+        name: "Force 'Cannot enter single-player rooms when restrained'",
+        category: "Settings",
+        description: "Pins whether being restrained blocks entering single-player rooms. While enforced, the 'Cannot enter single-player rooms when restrained' setting is held at the configured value - changes snap back within seconds. With the restore option on, the value from before the rule took hold returns when the rule stops applying.",
+        bcxEquivalent: "setting_forbid_SP_rooms",
+        settings: [
+          {
+            type: "option",
+            name: "value",
+            label: "Forced value",
+            options: [
+              "Blocked while restrained",
+              "Always allowed"
+            ],
+            default: "Blocked while restrained"
+          },
+          {
+            type: "checkbox",
+            name: "restore",
+            label: "Restore the previous value when the rule ends",
+            default: true
+          }
+        ]
+      },
+      {
+        id: "settings.safeword",
+        name: "Force 'Allow safeword use'",
+        category: "Settings",
+        description: "Pins BC's safeword setting. Forcing it off removes the player's in-game safeword release - use with care and consent. While enforced, the 'Allow safeword use' setting is held at the configured value - changes snap back within seconds. With the restore option on, the value from before the rule took hold returns when the rule stops applying.",
+        bcxEquivalent: "setting_forbid_safeword",
+        settings: [
+          {
+            type: "option",
+            name: "value",
+            label: "Forced value",
+            options: [
+              "Safeword allowed",
+              "Safeword disabled"
+            ],
+            default: "Safeword disabled"
+          },
+          {
+            type: "checkbox",
+            name: "restore",
+            label: "Restore the previous value when the rule ends",
+            default: true
+          }
+        ]
+      },
+      {
+        id: "settings.arousalMeter",
+        name: "Force 'Arousal meter'",
+        category: "Settings",
+        description: "Pins the arousal meter's activation mode. While enforced, the 'Arousal meter' setting is held at the configured value - changes snap back within seconds. With the restore option on, the value from before the rule took hold returns when the rule stops applying.",
+        bcxEquivalent: "setting_arousal_meter",
+        settings: [
+          {
+            type: "option",
+            name: "value",
+            label: "Forced value",
+            options: [
+              "Disable sexual activities",
+              "Allow without a meter",
+              "Allow with a manual meter",
+              "Allow with a hybrid meter",
+              "Allow with a locked meter"
+            ],
+            default: "Allow with a hybrid meter"
+          },
+          {
+            type: "checkbox",
+            name: "restore",
+            label: "Restore the previous value when the rule ends",
+            default: true
+          }
+        ]
+      },
+      {
+        id: "settings.arousalStutter",
+        name: "Force 'Arousal speech stuttering'",
+        category: "Settings",
+        description: "Pins when arousal makes the player's speech stutter. While enforced, the 'Arousal speech stuttering' setting is held at the configured value - changes snap back within seconds. With the restore option on, the value from before the rule took hold returns when the rule stops applying.",
+        bcxEquivalent: "setting_arousal_stutter",
+        settings: [
+          {
+            type: "option",
+            name: "value",
+            label: "Forced value",
+            options: [
+              "Never stutter",
+              "When aroused",
+              "When vibrated",
+              "Aroused & vibrated"
+            ],
+            default: "Aroused & vibrated"
+          },
+          {
+            type: "checkbox",
+            name: "restore",
+            label: "Restore the previous value when the rule ends",
+            default: true
+          }
+        ]
+      },
+      {
+        id: "settings.vibeModes",
+        name: "Force 'Block advanced vibrator modes'",
+        category: "Settings",
+        description: "Pins whether advanced (escalating/random/edging) vibrator modes work on the player. While enforced, the 'Block advanced vibrator modes' setting is held at the configured value - changes snap back within seconds. With the restore option on, the value from before the rule took hold returns when the rule stops applying.",
+        bcxEquivalent: "setting_block_vibe_modes",
+        settings: [
+          {
+            type: "option",
+            name: "value",
+            label: "Forced value",
+            options: [
+              "Advanced modes blocked",
+              "Advanced modes allowed"
+            ],
+            default: "Advanced modes allowed"
+          },
+          {
+            type: "checkbox",
+            name: "restore",
+            label: "Restore the previous value when the rule ends",
+            default: true
+          }
+        ]
+      },
+      {
+        id: "settings.afkBubble",
+        name: "Force 'Show AFK bubble'",
+        category: "Settings",
+        description: "Pins whether the player shows the automatic AFK bubble when idle. While enforced, the 'Show AFK bubble' setting is held at the configured value - changes snap back within seconds. With the restore option on, the value from before the rule took hold returns when the rule stops applying.",
+        bcxEquivalent: "setting_show_afk",
+        settings: [
+          {
+            type: "option",
+            name: "value",
+            label: "Forced value",
+            options: [
+              "AFK bubble shown",
+              "AFK bubble hidden"
+            ],
+            default: "AFK bubble shown"
+          },
+          {
+            type: "checkbox",
+            name: "restore",
+            label: "Restore the previous value when the rule ends",
+            default: true
+          }
+        ]
+      },
+      {
+        id: "settings.bodyMod",
+        name: "Force 'Allow others to alter your whole appearance'",
+        category: "Settings",
+        description: "Pins whether people with wardrobe access may change the player's whole appearance including body parts. While enforced, the 'Allow others to alter your whole appearance' setting is held at the configured value - changes snap back within seconds. With the restore option on, the value from before the rule took hold returns when the rule stops applying.",
+        bcxEquivalent: "setting_allow_body_mod",
+        settings: [
+          {
+            type: "option",
+            name: "value",
+            label: "Forced value",
+            options: [
+              "Full appearance access",
+              "Body is off-limits"
+            ],
+            default: "Full appearance access"
+          },
+          {
+            type: "checkbox",
+            name: "restore",
+            label: "Restore the previous value when the rule ends",
+            default: true
+          }
+        ]
+      },
+      {
+        id: "settings.cosplayChange",
+        name: "Force 'Prevent others from changing cosplay items'",
+        category: "Settings",
+        description: "Pins whether others may change the player's cosplay items (ears, tails, wings). While enforced, the 'Prevent others from changing cosplay items' setting is held at the configured value - changes snap back within seconds. With the restore option on, the value from before the rule took hold returns when the rule stops applying.",
+        bcxEquivalent: "setting_forbid_cosplay_change",
+        settings: [
+          {
+            type: "option",
+            name: "value",
+            label: "Forced value",
+            options: [
+              "Cosplay items protected",
+              "Cosplay items changeable"
+            ],
+            default: "Cosplay items changeable"
+          },
+          {
+            type: "checkbox",
+            name: "restore",
+            label: "Restore the previous value when the rule ends",
+            default: true
+          }
+        ]
+      },
+      {
+        id: "settings.sensdep",
+        name: "Force 'Sensory deprivation setting'",
+        category: "Settings",
+        description: "Pins how strongly blindness items affect the player. While enforced, the 'Sensory deprivation setting' setting is held at the configured value - changes snap back within seconds. With the restore option on, the value from before the rule took hold returns when the rule stops applying.",
+        bcxEquivalent: "setting_sensdep",
+        settings: [
+          {
+            type: "option",
+            name: "value",
+            label: "Forced value",
+            options: [
+              "Light",
+              "Normal",
+              "Hide names",
+              "Heavy",
+              "Total"
+            ],
+            default: "Normal"
+          },
+          {
+            type: "checkbox",
+            name: "restore",
+            label: "Restore the previous value when the rule ends",
+            default: true
+          }
+        ]
+      },
+      {
+        id: "settings.hideNonAdjacent",
+        name: "Force 'Hide non-adjacent players while partially blind'",
+        category: "Settings",
+        description: "Pins whether partial blindness hides everyone not standing next to the player. While enforced, the 'Hide non-adjacent players while partially blind' setting is held at the configured value - changes snap back within seconds. With the restore option on, the value from before the rule took hold returns when the rule stops applying.",
+        bcxEquivalent: "setting_hide_non_adjecent",
+        settings: [
+          {
+            type: "option",
+            name: "value",
+            label: "Forced value",
+            options: [
+              "Hidden while blind",
+              "Always visible"
+            ],
+            default: "Hidden while blind"
+          },
+          {
+            type: "checkbox",
+            name: "restore",
+            label: "Restore the previous value when the rule ends",
+            default: true
+          }
+        ]
+      },
+      {
+        id: "settings.blindRoomGarbling",
+        name: "Force 'Garble chatroom names and descriptions while blind'",
+        category: "Settings",
+        description: "Pins whether room names and descriptions garble while the player is blind. While enforced, the 'Garble chatroom names and descriptions while blind' setting is held at the configured value - changes snap back within seconds. With the restore option on, the value from before the rule took hold returns when the rule stops applying.",
+        bcxEquivalent: "setting_blind_room_garbling",
+        settings: [
+          {
+            type: "option",
+            name: "value",
+            label: "Forced value",
+            options: [
+              "Garbled while blind",
+              "Always readable"
+            ],
+            default: "Garbled while blind"
+          },
+          {
+            type: "checkbox",
+            name: "restore",
+            label: "Restore the previous value when the rule ends",
+            default: true
+          }
+        ]
+      },
+      {
+        id: "settings.relogKeepsRestraints",
+        name: "Force 'Keep all restraints when relogging'",
+        category: "Settings",
+        description: "Pins whether restraints stay on through a relog. While enforced, the 'Keep all restraints when relogging' setting is held at the configured value - changes snap back within seconds. With the restore option on, the value from before the rule took hold returns when the rule stops applying.",
+        bcxEquivalent: "setting_relog_keeps_restraints",
+        settings: [
+          {
+            type: "option",
+            name: "value",
+            label: "Forced value",
+            options: [
+              "Restraints kept",
+              "Restraints removed"
+            ],
+            default: "Restraints kept"
+          },
+          {
+            type: "checkbox",
+            name: "restore",
+            label: "Restore the previous value when the rule ends",
+            default: true
+          }
+        ]
+      },
+      {
+        id: "settings.leashedRoomChange",
+        name: "Force 'Players can drag you to rooms when leashed'",
+        category: "Settings",
+        description: "Pins whether leash holders can drag the player between rooms. While enforced, the 'Players can drag you to rooms when leashed' setting is held at the configured value - changes snap back within seconds. With the restore option on, the value from before the rule took hold returns when the rule stops applying.",
+        bcxEquivalent: "setting_leashed_roomchange",
+        settings: [
+          {
+            type: "option",
+            name: "value",
+            label: "Forced value",
+            options: [
+              "Dragging allowed",
+              "Dragging blocked"
+            ],
+            default: "Dragging allowed"
+          },
+          {
+            type: "checkbox",
+            name: "restore",
+            label: "Restore the previous value when the rule ends",
+            default: true
+          }
+        ]
+      },
+      {
+        id: "settings.roomRejoin",
+        name: "Force 'Return to chatrooms on relog'",
+        category: "Settings",
+        description: "Pins whether the player returns to the room they were in when they relog. While enforced, the 'Return to chatrooms on relog' setting is held at the configured value - changes snap back within seconds. With the restore option on, the value from before the rule took hold returns when the rule stops applying.",
+        bcxEquivalent: "setting_room_rejoin",
+        settings: [
+          {
+            type: "option",
+            name: "value",
+            label: "Forced value",
+            options: [
+              "Returns to the room",
+              "Starts in the main hall"
+            ],
+            default: "Returns to the room"
+          },
+          {
+            type: "checkbox",
+            name: "restore",
+            label: "Restore the previous value when the rule ends",
+            default: true
+          }
+        ]
+      },
+      {
+        id: "settings.plugVibeEvents",
+        name: "Force 'Events while plugged or vibed'",
+        category: "Settings",
+        description: "Pins whether worn plugs and vibrators cause random immersive chat events. While enforced, the 'Events while plugged or vibed' setting is held at the configured value - changes snap back within seconds. With the restore option on, the value from before the rule took hold returns when the rule stops applying.",
+        bcxEquivalent: "setting_plug_vibe_events",
+        settings: [
+          {
+            type: "option",
+            name: "value",
+            label: "Forced value",
+            options: [
+              "Events enabled",
+              "Events disabled"
+            ],
+            default: "Events enabled"
+          },
+          {
+            type: "checkbox",
+            name: "restore",
+            label: "Restore the previous value when the rule ends",
+            default: true
+          }
+        ]
+      },
+      {
+        id: "settings.tintEffects",
+        name: "Force 'Allow item tint effects'",
+        category: "Settings",
+        description: "Pins whether items may tint the player's vision (colored hoods etc.). While enforced, the 'Allow item tint effects' setting is held at the configured value - changes snap back within seconds. With the restore option on, the value from before the rule took hold returns when the rule stops applying.",
+        bcxEquivalent: "setting_allow_tint_effects",
+        settings: [
+          {
+            type: "option",
+            name: "value",
+            label: "Forced value",
+            options: [
+              "Tints allowed",
+              "Tints disabled"
+            ],
+            default: "Tints allowed"
+          },
+          {
+            type: "checkbox",
+            name: "restore",
+            label: "Restore the previous value when the rule ends",
+            default: true
+          }
+        ]
+      },
+      {
+        id: "settings.blurEffects",
+        name: "Force 'Allow item blur effects'",
+        category: "Settings",
+        description: "Pins whether items may blur the player's vision. While enforced, the 'Allow item blur effects' setting is held at the configured value - changes snap back within seconds. With the restore option on, the value from before the rule took hold returns when the rule stops applying.",
+        bcxEquivalent: "setting_allow_blur_effects",
+        settings: [
+          {
+            type: "option",
+            name: "value",
+            label: "Forced value",
+            options: [
+              "Blur allowed",
+              "Blur disabled"
+            ],
+            default: "Blur allowed"
+          },
+          {
+            type: "checkbox",
+            name: "restore",
+            label: "Restore the previous value when the rule ends",
+            default: true
+          }
+        ]
+      },
+      {
+        id: "settings.upsideDownView",
+        name: "Force 'Flip room vertically when upside-down'",
+        category: "Settings",
+        description: "Pins whether hanging upside-down flips the player's view of the room. While enforced, the 'Flip room vertically when upside-down' setting is held at the configured value - changes snap back within seconds. With the restore option on, the value from before the rule took hold returns when the rule stops applying.",
+        bcxEquivalent: "setting_upsidedown_view",
+        settings: [
+          {
+            type: "option",
+            name: "value",
+            label: "Forced value",
+            options: [
+              "View flips",
+              "View stays upright"
+            ],
+            default: "View flips"
+          },
+          {
+            type: "checkbox",
+            name: "restore",
+            label: "Restore the previous value when the rule ends",
+            default: true
+          }
+        ]
+      }
+    ]
+  };
+
+  // shared/bcplus.js
+  var BCPLUS_VERSION = bcplus_rules_default.bcplusVersion;
+  var RULES = new Map(bcplus_rules_default.rules.map((r) => [r.id, r]));
+  var NEVER = {
+    "settings.safeword": "turns off their safeword",
+    "social.forbidBeeps": "stops them beepin' the farm for help",
+    "social.forbidBeepMessages": "stops them beepin' the farm for help",
+    "speech.forbidOOC": "stops them speakin' out of character",
+    "speech.gaggedOOC": "stops them speakin' out of character"
+  };
+  var DURATIONS = [
+    { key: "1h", label: "1 hour", min: 60, words: ["1h", "hour", "1 hour", "an hour"] },
+    { key: "12h", label: "12 hours", min: 720, words: ["12h", "12 hours", "half a day", "a night", "night", "overnight"] },
+    { key: "1d", label: "1 day", min: 1440, words: ["1d", "day", "1 day", "a day"] },
+    { key: "1w", label: "1 week", min: 10080, words: ["1w", "week", "1 week", "a week"] },
+    { key: "2w", label: "2 weeks", min: 20160, words: ["2w", "2 weeks", "two weeks", "fortnight"] },
+    { key: "1m", label: "1 month", min: 43200, words: ["1m", "month", "1 month", "a month", "30 days", "a season", "season"] },
+    { key: "perm", label: "Permanent", min: 0, words: ["perm", "permanent", "forever", "for good", "until released"] }
+  ];
+
+  // extension/src/addons.js
+  function bcplusStatus() {
+    const b = window.BCPlus;
+    if (!b || !b.loaded) return { has: false, text: "not loaded" };
+    const v = b.version || {};
+    const ver = [v.major, v.minor, v.patch].join(".");
+    return { has: true, ver, match: ver === BCPLUS_VERSION, text: ver === BCPLUS_VERSION ? "BC+ " + ver + " matches the farm" : "BC+ " + ver + " (the farm knows " + BCPLUS_VERSION + ")" };
+  }
+  function summonReady(bot) {
+    try {
+      const api = window.bcx && window.bcx.getModApi && window.bcx.getModApi("FarmhandCompanion");
+      if (!api) return null;
+      const r = api.getRuleState("alt_forced_summoning");
+      if (!r || !r.inEffect) return { ok: false, why: "BCX's Ready to be summoned rule is off" };
+      const allowed = r.customData && r.customData.allowedMembers || [];
+      return allowed.includes(bot) ? { ok: true, why: "ready" } : { ok: false, why: "the farm bot (" + bot + ") isn't on the rule's allowed list" };
+    } catch (e) {
+      return null;
+    }
+  }
+
+  // extension/src/views/staff.js
+  function latest(ctx) {
+    const r = ctx.feed.filter((x) => x.kind === "reply").slice(-1)[0];
+    return r ? card(title("Latest answer"), h("div", { class: "fhc-card" }, r.text)) : null;
+  }
+  var field = (label, input2) => h("label", { class: "fhc-label" }, label, input2);
+  var input = (ph, key, ctx) => h("input", { class: "fhc-in", placeholder: ph, value: ctx.ui[key] || "", oninput: (e) => ctx.setUi({ [key]: e.target.value }, true) });
+  var select = (key, opts, ctx) => h(
+    "select",
+    { class: "fhc-sel", onchange: (e) => ctx.setUi({ [key]: e.target.value }, true) },
+    opts.map(([v, l]) => h("option", { value: v, selected: (ctx.ui[key] || opts[0][0]) === v ? "selected" : null }, l))
+  );
+  function me2(ctx) {
+    const s = ctx.s;
+    return [
+      card(
+        h("div", { class: "fhc-title" }, s.name),
+        h(
+          "div",
+          { style: { marginTop: "6px" } },
+          (s.roles || []).map((r) => chip(r.toLowerCase(), "acc")),
+          (s.keys || []).map((k) => chip(k + " key")),
+          s.onCall && chip("on call", "alert"),
+          s.herdLeader && chip("herd: " + s.herdLeader)
+        )
+      ),
+      card(
+        h(
+          "div",
+          { class: "fhc-kv" },
+          h("div", null, title("Duty"), muted(s.onDuty ? "On duty · silver and gold keys out" : "Out to pasture · bronze key only · your Livestock panel is yours")),
+          s.pastureLock ? chip("kept out by " + s.pastureLock, "alert") : btn(s.onDuty ? "Go to pasture" : "Back on duty", () => ctx.send(s.onDuty ? "pasture" : "onduty"), !s.onDuty)
+        ),
+        muted("Pasture puts your silver and gold keys away, makes you livestock for the visit, and takes you off call (mandated staff stay summonable). It doesn't lock you out. Only a ?turnout from your herd leader does that.")
+      ),
+      h("div", null, ["record", "hours", "myherd", "keys", "chores"].map((c) => btn(c[0].toUpperCase() + c.slice(1), () => ctx.send(c)))),
+      latest(ctx)
+    ];
+  }
+  function safeCards(ctx) {
+    const recent = ctx.feed.filter((x) => x.kind === "notice" && /SAFEWORD/.test(x.text) && Date.now() - x.at < 60 * 6e4 && !ctx.ui["done" + x.at]);
+    return recent.map((x) => h(
+      "div",
+      { class: "fhc-box alert" },
+      h("b", null, x.text),
+      muted("Everything's paused and on-call staff were summoned. Nothin' has been released. Check on them first, then decide."),
+      h(
+        "div",
+        { style: { marginTop: "8px" } },
+        btn("I'm goin' to them", () => ctx.send("where"), true),
+        btn("All okay, close it", () => ctx.setUi({ ["done" + x.at]: true }))
+      )
+    ));
+  }
+  function office(ctx) {
+    const docs = ctx.docs.slice().reverse();
+    const sel = docs.find((d) => d.id === ctx.ui.doc) || docs[0];
+    return [
+      safeCards(ctx),
+      muted("Anything you look up about somebody else lands here, not in the chat: record, stats, vet, quota, keys, size, pedigree."),
+      h("div", null, h("input", {
+        class: "fhc-in",
+        placeholder: "Look somebody up: vet Bessie",
+        value: ctx.ui.look || "",
+        oninput: (e) => ctx.setUi({ look: e.target.value }, true),
+        onkeydown: (e) => {
+          if (e.key === "Enter" && ctx.ui.look) {
+            ctx.send(ctx.ui.look);
+            ctx.setUi({ look: "" });
+          }
+        }
+      })),
+      docs.length ? h(
+        "div",
+        { class: "fhc-split" },
+        h("div", { class: "fhc-docs" }, docs.map((d) => h(
+          "button",
+          { type: "button", class: "fhc-doc" + (sel && d.id === sel.id ? " on" : ""), onclick: () => ctx.setUi({ doc: d.id }) },
+          h("b", null, d.who),
+          h("div", { class: "fhc-muted" }, d.kind + " · " + new Date(d.at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }))
+        ))),
+        sel && h(
+          "div",
+          { class: "fhc-box", style: { flex: "1", minWidth: "0" } },
+          h("div", { class: "fhc-card" }, sel.text),
+          h("div", { style: { marginTop: "8px" } }, btn("Refresh", () => ctx.send(sel.kind + " " + sel.about)), btn("Close", () => ctx.closeDoc(sel.id)))
+        )
+      ) : card(title("Nothin' on the desk"), muted("Try ?vet, ?record or ?stats with somebody's name."))
+    ];
+  }
+  function contracts(ctx) {
+    const tpl = () => (ctx.ui.ctTpl || "deep").trim(), who = () => (ctx.ui.ctWho || "").trim(), dur = () => ctx.ui.ctDur || "1w";
+    return [
+      card(
+        title("Offer a BC+ contract"),
+        muted("They read it in their own BC+ and only sign if they want it. Herdmasters and proprietors can offer."),
+        field("Contract", h("input", { class: "fhc-in", value: ctx.ui.ctTpl || "deep", placeholder: "fun, deep, nhl, or one of yours", oninput: (e) => ctx.setUi({ ctTpl: e.target.value }, true) })),
+        field("For (name or member number, here in the room)", input("Bessie", "ctWho", ctx)),
+        field("How long", select("ctDur", DURATIONS.map((d) => [d.key, d.label]), ctx)),
+        h(
+          "div",
+          null,
+          btn("Preview", () => ctx.send("contract show " + tpl() + (who() ? " " + who() : ""))),
+          btn("Offer it", () => who() && ctx.send("contract offer " + tpl() + " " + who() + " " + dur()), true)
+        )
+      ),
+      card(
+        title("In force"),
+        btn("List farm contracts", () => ctx.send("contract list")),
+        field("Somebody's contracts", input("Bessie", "ctLook", ctx)),
+        h(
+          "div",
+          null,
+          btn("Ask their BC+", () => ctx.ui.ctLook && ctx.send("contract check " + ctx.ui.ctLook)),
+          btn("Release", () => ctx.ui.ctLook && ctx.send("contract release " + ctx.ui.ctLook))
+        )
+      ),
+      latest(ctx)
+    ];
+  }
+  function barn(ctx) {
+    const who = () => (ctx.ui.barnWho || "").trim();
+    const act = (c) => () => who() && ctx.send(c + " " + who());
+    return [
+      card(
+        title("Barn work"),
+        field("Who", input("Bessie", "barnWho", ctx)),
+        h("div", null, ["milk", "collect", "drain", "edge", "denial", "ruin", "inspect", "vet", "quota"].map((c) => btn(c[0].toUpperCase() + c.slice(1), act(c))))
+      ),
+      card(
+        title("Jars"),
+        btn("The jar shelf", () => ctx.send("jars")),
+        muted("To inseminate: ?inseminate <who> <jar> [hole]. They always get asked first, and anyone with jar insemination off can't be."),
+        h("div", null, btn("Inseminate…", () => ctx.fillBox("inseminate " + (who() ? who() + " " : ""))))
+      ),
+      card(
+        title("Herd"),
+        h("div", null, ["myherd", "herdcall", "herdsummon", "roster", "stock", "queue"].map((c) => btn(c, () => ctx.send(c)))),
+        h("div", null, btn("Summon to me", act("summon")), btn("Claim", act("claim")), btn("Turn out", act("turnout")), btn("Let up", act("letup")))
+      ),
+      latest(ctx)
+    ];
+  }
+  function summonCheck() {
+    const r = summonReady(BOT_MEMBER);
+    if (r === null) return muted("BCX isn't loaded here. If you use BC+'s Ready to be summoned instead, add the farm bot (" + BOT_MEMBER + ") to it.");
+    return h("div", { class: "fhc-kv" }, h("span", null, "Summon rule"), chip(r.ok ? "ready" : r.why, r.ok ? "good" : "alert"));
+  }
+  function toggles2(ctx) {
+    const s = ctx.s, sw = s.switches || {};
+    return [
+      card(
+        title("Work"),
+        muted("Most staff leave this off. Mandated farmhands are always on call."),
+        s.mandated ? h("div", { class: "fhc-kv" }, h("span", null, "On call"), chip("always (mandated)", "alert")) : toggle("On call", "Let the office summon you from anywhere with BCX or BC+ summoning", !!sw.forced, () => ctx.send("forced")),
+        s.onCall && summonCheck()
+      ),
+      muted("Your own milkin' and breedin' switches are on your Livestock panel."),
+      panelPrefs(ctx)
+    ];
+  }
+  var STAFF_TABS = [
+    { id: "me", label: "Me", render: me2 },
+    { id: "office", label: "Office", render: office, badge: (ctx) => ctx.docs.length },
+    { id: "contracts", label: "Contracts", render: contracts },
+    { id: "barn", label: "Barn & herd", render: barn },
+    { id: "guides", label: "Guides", render: (ctx) => guidesTab(ctx, true) },
+    { id: "toggles", label: "Toggles", render: toggles2 }
+  ];
+
+  // extension/src/views/dashboard.js
+  var field2 = (label, el) => h("label", { class: "fhc-label" }, label, el);
+  var q = (v) => '"' + String(v).replace(/"/g, "'") + '"';
+  function settingControl(ctx, rule, s) {
+    const key = "set:" + rule.id + ":" + s.name, cur = ctx.ui[key];
+    const set = (v) => ctx.setUi({ [key]: v }, true);
+    const def = Array.isArray(s.default) ? s.default.join("\n") : String(s.default);
+    switch (s.type) {
+      case "checkbox":
+        return h(
+          "select",
+          { class: "fhc-sel", onchange: (e) => set(e.target.value) },
+          ["on", "off"].map((v) => h("option", { value: v, selected: (cur || (s.default ? "on" : "off")) === v ? "selected" : null }, v))
+        );
+      case "option":
+        return h(
+          "select",
+          { class: "fhc-sel", onchange: (e) => set(e.target.value) },
+          s.options.map((o) => h("option", { value: o, selected: (cur || s.default) === o ? "selected" : null }, o))
+        );
+      case "stringList":
+        return h("textarea", {
+          class: "fhc-in",
+          rows: 3,
+          placeholder: "one " + (s.entryLabel || "entry") + " per line" + (s.maxEntries ? " · up to " + s.maxEntries : ""),
+          oninput: (e) => set(e.target.value)
+        }, cur !== void 0 ? cur : def);
+      case "members":
+        return h("input", { class: "fhc-in", placeholder: "farm, staff, or member numbers", value: cur !== void 0 ? cur : "farm", oninput: (e) => set(e.target.value) });
+      default:
+        return h("input", { class: "fhc-in", maxlength: s.maxChars || 256, value: cur !== void 0 ? cur : def, oninput: (e) => set(e.target.value) });
+    }
+  }
+  function addCommand(ctx, name, rule) {
+    const pairs = rule.settings.map((s) => {
+      const key = "set:" + rule.id + ":" + s.name;
+      let v = ctx.ui[key];
+      if (v === void 0) v = s.type === "checkbox" ? s.default ? "on" : "off" : s.type === "members" ? "farm" : Array.isArray(s.default) ? s.default.join("\n") : s.default;
+      if (s.type === "stringList") v = String(v).split("\n").map((x) => x.trim()).filter(Boolean).join("|");
+      return s.name + "=" + q(v);
+    });
+    return ("contract add " + name + " " + rule.id + " " + pairs.join(" ")).trim();
+  }
+  function contracts2(ctx) {
+    const nm = () => (ctx.ui.dName || "").trim().toLowerCase();
+    const name = nm();
+    const cats = [...new Set([...RULES.values()].map((r) => r.category))];
+    const cat = ctx.ui.dCat || cats[0];
+    const inCat = [...RULES.values()].filter((r) => r.category === cat);
+    const rule = RULES.get(ctx.ui.dRule) && RULES.get(ctx.ui.dRule).category === cat ? RULES.get(ctx.ui.dRule) : inCat[0];
+    const need = () => !nm() && (ctx.setUi({ dWarn: true }), true);
+    return [
+      card(
+        title("Your contract"),
+        field2("Name (one word)", h("input", { class: "fhc-in", placeholder: "prizecow", value: ctx.ui.dName || "", oninput: (e) => ctx.setUi({ dName: e.target.value }, true) })),
+        ctx.ui.dWarn && !name ? muted("Give it a name first, sugar.") : null,
+        h(
+          "div",
+          null,
+          ["fun", "deep", "nhl"].map((b) => btn("New from " + b, () => !need() && ctx.send("contract new " + nm() + " from " + b))),
+          btn("New, empty", () => !need() && ctx.send("contract new " + nm()))
+        ),
+        field2("Title", h("input", { class: "fhc-in", maxlength: 60, value: ctx.ui.dTitle || "", oninput: (e) => ctx.setUi({ dTitle: e.target.value }, true) })),
+        field2("Terms they'll read (%name% becomes their name)", h("textarea", { class: "fhc-in", rows: 3, maxlength: 1e3, oninput: (e) => ctx.setUi({ dTerms: e.target.value }, true) }, ctx.ui.dTerms || "")),
+        h(
+          "div",
+          null,
+          btn("Save title", () => !need() && ctx.ui.dTitle && ctx.send("contract title " + nm() + " " + ctx.ui.dTitle)),
+          btn("Save terms", () => !need() && ctx.ui.dTerms && ctx.send("contract terms " + nm() + " " + ctx.ui.dTerms)),
+          btn("Farm ends it", () => !need() && ctx.send("contract policy " + nm() + " farm")),
+          btn("Either side ends it", () => !need() && ctx.send("contract policy " + nm() + " either"))
+        )
+      ),
+      card(
+        title("Add a BC+ rule"),
+        muted("Every rule and setting BC+ " + BCPLUS_VERSION + " has. Only values BC+ accepts can be picked."),
+        field2("Kind", h(
+          "select",
+          { class: "fhc-sel", onchange: (e) => ctx.setUi({ dCat: e.target.value, dRule: "" }) },
+          cats.map((c) => h("option", { value: c, selected: c === cat ? "selected" : null }, c))
+        )),
+        field2("Rule", h(
+          "select",
+          { class: "fhc-sel", onchange: (e) => ctx.setUi({ dRule: e.target.value }) },
+          inCat.map((r) => h("option", { value: r.id, selected: r === rule ? "selected" : null }, r.name + (NEVER[r.id] ? " (never on the farm)" : "")))
+        )),
+        rule && muted(rule.description),
+        rule && NEVER[rule.id] ? h("div", { class: "fhc-box alert" }, "The farm never uses this one: it " + NEVER[rule.id] + ".") : rule && [
+          rule.settings.map((s) => field2((s.label || s.name).replace(/:$/, ""), settingControl(ctx, rule, s))),
+          h(
+            "div",
+            null,
+            btn("Add to " + (name || "contract"), () => !need() && ctx.send(addCommand(ctx, nm(), rule)), true),
+            btn("Take it out", () => !need() && ctx.send("contract remove " + nm() + " " + rule.id))
+          )
+        ]
+      ),
+      card(title("Check and send"), h(
+        "div",
+        null,
+        btn("Preview", () => !need() && ctx.send("contract show " + nm())),
+        btn("All contracts", () => ctx.send("contract list")),
+        btn("Delete", () => !need() && ctx.send("contract delete " + nm()))
+      ), muted("Offer it from the Staff panel's Contracts tab.")),
+      latest(ctx)
+    ];
+  }
+  function addons(ctx) {
+    const b = bcplusStatus(), s = summonReady(BOT_MEMBER);
+    return [
+      card(
+        title("BC+"),
+        chip(b.text, b.has ? b.match ? "good" : "alert" : "alert"),
+        muted("Contracts are checked against BC+ " + BCPLUS_VERSION + ". If the club's BC+ moves on, re-run the catalog tool and rebuild.")
+      ),
+      card(
+        title("BCX summoning (you)"),
+        s === null ? muted("BCX isn't loaded here.") : chip(s.ok ? "Ready to be summoned · the farm bot is allowed" : s.why, s.ok ? "good" : "alert"),
+        muted("On-call staff see the same check on their Staff panel.")
+      ),
+      card(title("Comin' soon"), muted("Echo's pumps and milk vendor, outfits by species and gender with high security locks, and the farm's own Listen to my voice (ECHS first)."))
+    ];
+  }
+  var DASHBOARD_TABS = [
+    { id: "contracts", label: "BC+ contracts", render: contracts2 },
+    { id: "outfits", label: "Outfits", render: () => [card(title("Outfits & uniforms"), muted("Next on the build list: species × gender outfits (female, male, futa, femboy), staff uniforms, saved with restraints and high security locks."))] },
+    { id: "addons", label: "Other addons", render: addons }
   ];
 
   // extension/src/panel.js
-  var CSS = `
-#fhc-btn{position:fixed;right:12px;bottom:12px;z-index:9999;width:44px;height:44px;border-radius:50%;
-  border:2px solid #c9a35b;background:#3b2a1a;color:#fff;font-size:22px;cursor:pointer;box-shadow:0 2px 8px #0008}
-#fhc-btn[data-unread]:after{content:attr(data-unread);position:absolute;top:-4px;right:-4px;background:#d9534f;
-  color:#fff;border-radius:9px;font-size:11px;padding:1px 5px;font-family:sans-serif}
-#fhc-panel{position:fixed;right:12px;bottom:64px;z-index:9999;width:min(420px,calc(100vw - 24px));height:min(560px,70vh);
-  display:none;flex-direction:column;background:#21170f;color:#f3e9d8;border:2px solid #c9a35b;border-radius:10px;
-  font:13px/1.35 sans-serif;box-shadow:0 4px 18px #000a}
-#fhc-panel.open{display:flex}
-#fhc-head{padding:8px 10px;font-weight:bold;border-bottom:1px solid #5a432a;display:flex;justify-content:space-between}
-#fhc-quick{display:flex;flex-wrap:wrap;gap:4px;padding:6px 8px;border-bottom:1px solid #5a432a}
-#fhc-quick button,#fhc-form button{background:#5a432a;color:#f3e9d8;border:1px solid #c9a35b;border-radius:6px;padding:3px 7px;cursor:pointer}
-#fhc-feed{flex:1;overflow-y:auto;padding:8px;display:flex;flex-direction:column;gap:8px}
-.fhc-card{background:#2f2216;border-left:3px solid #c9a35b;border-radius:6px;padding:6px 8px;white-space:pre-wrap;
-  font-family:ui-monospace,Consolas,monospace;font-size:12px}
-.fhc-card.notice{border-left-color:#8fbf6a}
-.fhc-card.mine{background:transparent;border-left-color:#7a6a55;color:#bfae95;font-family:sans-serif}
-.fhc-time{display:block;font-family:sans-serif;font-size:10px;color:#9c8a70;margin-bottom:2px}
-#fhc-form{display:flex;gap:4px;padding:6px 8px;border-top:1px solid #5a432a}
-#fhc-input{flex:1;background:#140e09;color:#f3e9d8;border:1px solid #5a432a;border-radius:6px;padding:4px 6px}
-`;
+  var VIEWS = {
+    guest: { label: "Guest", tabs: GUEST_TABS },
+    livestock: { label: "Livestock", tabs: LIVESTOCK_TABS },
+    staff: { label: "Staff", tabs: STAFF_TABS },
+    dashboard: { label: "Dashboard", tabs: DASHBOARD_TABS }
+  };
+  function loadPrefs() {
+    try {
+      return JSON.parse(window.localStorage.getItem(PREFS_KEY)) || {};
+    } catch (e) {
+      return {};
+    }
+  }
+  function savePrefs(p) {
+    try {
+      window.localStorage.setItem(PREFS_KEY, JSON.stringify(p));
+    } catch (e) {
+    }
+  }
   var Panel = class {
     constructor(onCommand) {
       this.onCommand = onCommand;
       this.unread = 0;
+      this.welcome = {};
+      this.s = { name: "", onBooks: false };
+      this.feed = [];
+      this.docs = [];
+      this.asks = [];
+      this.choose = null;
+      this.ui = {};
+      this.prefs = loadPrefs();
+      this.status = "…";
       const doc = window.document;
       const style = doc.createElement("style");
-      style.textContent = CSS;
+      style.textContent = CSS + ":root{" + Object.entries(THEME).map(([k, v]) => "--fh-" + k + ":" + v).join(";") + "}";
       doc.head.appendChild(style);
-      this.btn = doc.createElement("button");
-      this.btn.id = "fhc-btn";
-      this.btn.title = "B&B Farm";
-      this.btn.textContent = "🌾";
-      this.btn.addEventListener("click", () => this.toggle());
-      this.el = doc.createElement("div");
-      this.el.id = "fhc-panel";
-      this.el.innerHTML = '<div id="fhc-head"><span>🌾 B&amp;B Farm</span><span id="fhc-status">…</span></div><div id="fhc-quick"></div><div id="fhc-feed"></div><form id="fhc-form"><input id="fhc-input" placeholder="Ask the farm girl… (stats, size, help me)" autocomplete="off"><button>Send</button></form>';
-      const quick = this.el.querySelector("#fhc-quick");
-      for (const [label, cmd] of QUICK) {
-        const b = doc.createElement("button");
-        b.type = "button";
-        b.textContent = label;
-        b.addEventListener("click", () => this.ask(cmd));
-        quick.appendChild(b);
-      }
-      this.feed = this.el.querySelector("#fhc-feed");
-      this.status = this.el.querySelector("#fhc-status");
-      const input = this.el.querySelector("#fhc-input");
-      this.el.querySelector("#fhc-form").addEventListener("submit", (e) => {
-        e.preventDefault();
-        if (input.value.trim()) this.ask(input.value.trim());
-        input.value = "";
-      });
+      this.btn = h("button", { id: "fhc-btn", type: "button", title: "B&B Farm", "aria-label": "B&B Farm panel", onclick: () => this.toggle() }, "🌾");
+      this.el = h("div", { id: "fhc-panel", role: "dialog", "aria-label": "B&B Farm" });
       this.el.addEventListener("keydown", (e) => e.stopPropagation());
+      if (this.prefs.pos) Object.assign(this.el.style, { left: this.prefs.pos.x + "px", top: this.prefs.pos.y + "px", right: "auto", bottom: "auto" });
       doc.body.appendChild(this.btn);
       doc.body.appendChild(this.el);
+      this.render();
+    }
+    /* ── what the rest of the Companion calls ── */
+    setStatus(text) {
+      this.status = text;
+      const s = this.el.querySelector("#fhc-status");
+      if (s) s.textContent = text;
+    }
+    setWelcome(w) {
+      this.welcome = w || {};
+      this.render();
+    }
+    setState(s) {
+      this.s = s || this.s;
+      this.render();
+    }
+    add(text, kind = "reply") {
+      this.feed.push({ text: String(text), kind, at: Date.now() });
+      while (this.feed.length > HISTORY_MAX) this.feed.shift();
+      if (kind !== "mine") this.ping();
+      this.render();
+    }
+    addDoc(d) {
+      this.docs = this.docs.filter((x) => !(x.about === d.about && x.kind === d.kind));
+      this.docs.push(Object.assign({ id: "d" + Date.now() + Math.random().toString(36).slice(2, 6), at: Date.now() }, d));
+      this.ui.doc = this.docs[this.docs.length - 1].id;
+      if (this.view() === "staff") this.ui.tab_staff = "office";
+      this.ping();
+      this.render();
+    }
+    addAsk(a) {
+      this.asks = this.asks.filter((x) => Date.now() - x.at < 10 * 6e4).concat([Object.assign({ at: Date.now() }, a)]);
+      this.ping(true);
+      this.render();
+    }
+    setChoose(c) {
+      this.choose = c;
+      this.ping(true);
+      this.render();
     }
     ask(cmd) {
       this.add(cmd, "mine");
@@ -312,26 +2554,188 @@ One of mods you are using is using an old version of SDK. It will work for now b
       this.btn.style.display = visible ? "" : "none";
       if (!visible) this.toggle(false);
     }
-    setStatus(text) {
-      this.status.textContent = text;
+    /* ── inside ── */
+    ping(important) {
+      if (this.el.classList.contains("open")) return;
+      this.unread++;
+      this.btn.setAttribute("data-unread", String(this.unread));
+      if (this.prefs.popopen || important) {
+        if (this.prefs.popopen) this.toggle(true);
+      }
+      if (this.prefs.chime) this.chime();
     }
-    add(text, kind = "reply") {
-      const card = window.document.createElement("div");
-      card.className = "fhc-card " + kind;
-      const time = window.document.createElement("span");
-      time.className = "fhc-time";
-      time.textContent = (/* @__PURE__ */ new Date()).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) + (kind === "notice" ? " · from the farm" : kind === "mine" ? " · you asked" : "");
-      card.appendChild(time);
-      card.appendChild(window.document.createTextNode(text));
-      this.feed.appendChild(card);
-      while (this.feed.children.length > HISTORY_MAX) this.feed.firstChild.remove();
-      this.feed.scrollTop = this.feed.scrollHeight;
-      if (kind !== "mine" && !this.el.classList.contains("open")) {
-        this.unread++;
-        this.btn.setAttribute("data-unread", String(this.unread));
+    chime() {
+      try {
+        const A = window.AudioContext || window.webkitAudioContext;
+        if (!A) return;
+        const a = new A(), o = a.createOscillator(), g = a.createGain();
+        o.frequency.value = 660;
+        g.gain.value = 0.05;
+        o.connect(g);
+        g.connect(a.destination);
+        o.start();
+        o.stop(a.currentTime + 0.15);
+      } catch (e) {
       }
     }
+    views() {
+      const s = this.s, v = [s.onBooks ? "livestock" : "guest"];
+      if (s.staff) v.push("staff");
+      if (s.proprietor) v.push("dashboard");
+      return v;
+    }
+    view() {
+      const v = this.views();
+      return v.includes(this.prefs.view) ? this.prefs.view : v[v.length > 1 && this.s.staff ? 1 : 0];
+    }
+    ctx() {
+      return {
+        s: this.s,
+        welcome: this.welcome,
+        feed: this.feed,
+        docs: this.docs,
+        ui: this.ui,
+        prefs: this.prefs,
+        send: (cmd) => this.ask(cmd),
+        fillBox: (text) => {
+          const i = this.el.querySelector("#fhc-input");
+          if (i) {
+            i.value = text;
+            i.focus();
+          }
+        },
+        setUi: (patch, quiet) => {
+          Object.assign(this.ui, patch);
+          if (!quiet) this.render();
+        },
+        setPref: (k, v) => {
+          this.prefs[k] = v;
+          savePrefs(this.prefs);
+          this.render();
+        },
+        closeDoc: (id) => {
+          this.docs = this.docs.filter((d) => d.id !== id);
+          this.render();
+        }
+      };
+    }
+    render() {
+      const ctx = this.ctx(), view = this.view(), V = VIEWS[view];
+      const tabKey = "tab_" + view, tab = V.tabs.find((t) => t.id === this.ui[tabKey]) || V.tabs[0];
+      const scroll = this.el.querySelector(".fhc-body"), keep = scroll ? scroll.scrollTop : 0;
+      const box = this.el.querySelector("#fhc-input"), typed = box ? box.value : "", hadFocus = box && window.document.activeElement === box;
+      this.el.classList.toggle("compact", !!this.prefs.compact);
+      this.el.replaceChildren(
+        h(
+          "div",
+          { class: "fhc-head", onmousedown: (e) => this.drag(e) },
+          h("div", null, h("div", { class: "fhc-title" }, "🌾 B&B Farm"), h("div", { id: "fhc-status", class: "fhc-muted" }, this.status)),
+          h("button", { type: "button", class: "fhc-pill", "aria-label": "Close the panel", onclick: () => this.toggle(false) }, "✕")
+        ),
+        this.views().length > 1 && h(
+          "div",
+          { class: "fhc-row" },
+          h("span", { class: "fhc-grow fhc-muted" }, "Panel"),
+          this.views().map((v) => h("button", { type: "button", class: "fhc-pill" + (v === view ? " on" : ""), onclick: () => {
+            this.prefs.view = v;
+            savePrefs(this.prefs);
+            this.render();
+          } }, VIEWS[v].label))
+        ),
+        h(
+          "div",
+          { class: "fhc-row" },
+          h("button", { type: "button", class: "fhc-safe red", onclick: () => this.ask("safe") }, "Safe word"),
+          h("button", { type: "button", class: "fhc-safe", onclick: () => this.ask("stuck") }, "I'm stuck"),
+          h("button", { type: "button", class: "fhc-safe", style: { borderColor: "var(--fh-line)" }, onclick: () => this.ask("staff") }, "Call staff")
+        ),
+        h("nav", { class: "fhc-row", "aria-label": "Panel sections" }, V.tabs.map((t) => {
+          const n = t.badge ? t.badge(ctx) : 0;
+          return h("button", { type: "button", class: "fhc-pill" + (t === tab ? " on" : ""), onclick: () => {
+            this.ui[tabKey] = t.id;
+            this.render();
+          } }, t.label + (n ? " · " + n : ""));
+        })),
+        h("div", { class: "fhc-body" }, this.banners(), safeRender(tab, ctx)),
+        h(
+          "form",
+          { class: "fhc-form", onsubmit: (e) => {
+            e.preventDefault();
+            const i = e.target.querySelector("#fhc-input");
+            if (i.value.trim()) this.ask(i.value.trim());
+            i.value = "";
+          } },
+          h(
+            "label",
+            { class: "fhc-grow", style: { display: "flex" } },
+            h("span", { class: "fhc-sr" }, "Ask the farm girl"),
+            h("input", { id: "fhc-input", class: "fhc-in", placeholder: "Ask the farm girl… (stats, size, help me)", autocomplete: "off" })
+          ),
+          h("button", { type: "submit", class: "fhc-b fhc-b-acc", style: { margin: "0" } }, "Send")
+        )
+      );
+      const body = this.el.querySelector(".fhc-body");
+      if (body) body.scrollTop = keep;
+      const box2 = this.el.querySelector("#fhc-input");
+      if (box2) {
+        box2.value = typed;
+        if (hadFocus) box2.focus();
+      }
+    }
+    // questions waitin' on you, on every tab
+    banners() {
+      const out = [];
+      if (this.choose) out.push(h(
+        "div",
+        { class: "fhc-box ask" },
+        h("div", { style: { whiteSpace: "pre-wrap" } }, this.choose.text),
+        h("div", { style: { marginTop: "8px" } }, (this.choose.choices || []).map((c) => btn(c, () => {
+          this.choose = null;
+          this.ask(c);
+        }, true)))
+      ));
+      for (const a of this.asks) out.push(h(
+        "div",
+        { class: "fhc-box ask" },
+        h("div", null, a.text),
+        h(
+          "div",
+          { style: { marginTop: "8px" } },
+          btn("Yes", () => {
+            this.asks = this.asks.filter((x) => x !== a);
+            this.ask("yes");
+          }, true),
+          btn("No", () => {
+            this.asks = this.asks.filter((x) => x !== a);
+            this.ask("no");
+          })
+        )
+      ));
+      return out;
+    }
+    drag(e) {
+      if (e.target.closest("button")) return;
+      const r = this.el.getBoundingClientRect(), dx = e.clientX - r.left, dy = e.clientY - r.top;
+      const move = (ev) => Object.assign(this.el.style, { left: Math.max(0, ev.clientX - dx) + "px", top: Math.max(0, ev.clientY - dy) + "px", right: "auto", bottom: "auto" });
+      const up = () => {
+        window.removeEventListener("mousemove", move);
+        window.removeEventListener("mouseup", up);
+        const b = this.el.getBoundingClientRect();
+        this.prefs.pos = { x: Math.round(b.left), y: Math.round(b.top) };
+        savePrefs(this.prefs);
+      };
+      window.addEventListener("mousemove", move);
+      window.addEventListener("mouseup", up);
+    }
   };
+  function safeRender(tab, ctx) {
+    try {
+      return tab.render(ctx);
+    } catch (e) {
+      console.warn("[Farmhand Companion]", e);
+      return h("div", { class: "fhc-box alert" }, "This tab hit a snag. The rest of the panel still works.");
+    }
+  }
 
   // extension/src/index.js
   var bcModSdk = import_bondage_club_mod_sdk.default.default || import_bondage_club_mod_sdk.default;
@@ -377,7 +2781,11 @@ One of mods you are using is using an old version of SDK. It will work for now b
         break;
       case "welcome":
         st.welcomed = true;
-        st.panel.setStatus("connected · bot v" + m.ver);
+        st.panel.setStatus("connected · farm girl v" + m.ver);
+        st.panel.setWelcome(m);
+        break;
+      case "state":
+        if (m.state && typeof m.state === "object") st.panel.setState(m.state);
         break;
       case "reply":
       case "notice": {
@@ -385,6 +2793,17 @@ One of mods you are using is using an old version of SDK. It will work for now b
         if (text !== null) st.panel.add(text, m.type);
         break;
       }
+      case "doc": {
+        const text = collect(m);
+        if (text !== null) st.panel.addDoc({ text, kind: String(m.kind || "record"), who: String(m.who || "?"), about: m.about });
+        break;
+      }
+      case "ask":
+        st.panel.addAsk({ kind: String(m.kind || ""), text: String(m.text || "") });
+        break;
+      case "choose":
+        st.panel.setChoose({ text: String(m.text || ""), choices: Array.isArray(m.choices) ? m.choices.map(String).slice(0, 30) : [] });
+        break;
     }
   }
   function start() {

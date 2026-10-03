@@ -3474,7 +3474,7 @@
         return;
       }
       if (m.type === "cmd") {
-        const text = String(m.text || "").trim().replace(/^[?\-!.]/, "").slice(0, 900);
+        const text = String(m.text || "").trim().replace(/^[?\-!.]/, "").slice(0, 2e3);
         if (!text) return;
         const c = state.companions.get(mn);
         if (c) c.at = Date.now();

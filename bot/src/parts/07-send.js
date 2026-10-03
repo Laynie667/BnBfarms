@@ -184,7 +184,7 @@
     }
     if (m.type === "bye"){ state.companions.delete(mn); return; }
     if (m.type === "cmd"){
-      const text = String(m.text||"").trim().replace(/^[?\-!.]/, "").slice(0, 900);
+      const text = String(m.text||"").trim().replace(/^[?\-!.]/, "").slice(0, 2000);   // contract terms can run to 1,000
       if (!text) return;
       const c = state.companions.get(mn);
       if (c) c.at = Date.now(); else state.companions.set(mn, { at:Date.now(), ver:"?" });

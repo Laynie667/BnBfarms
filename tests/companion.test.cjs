@@ -1,10 +1,10 @@
-// Loads the built companion into a fake browser page and checks the panel works.
+// Loads the built companion into a fake browser page and checks every view works.
 const fs = require("fs"), path = require("path");
 const { JSDOM } = require("jsdom");
 const out = (...a) => process.stdout.write(a.join(" ") + "\n");
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 
-const dom = new JSDOM("<!doctype html><html><head></head><body></body></html>", { runScripts: "outside-only" });
+const dom = new JSDOM("<!doctype html><html><head></head><body></body></html>", { runScripts: "outside-only", url: "https://bondageprojects.elementfx.com/" });
 const w = dom.window;
 const sent = [];
 let commands = [];
@@ -14,36 +14,101 @@ w.ChatRoomCharacter = [{ MemberNumber: 221397 }, { MemberNumber: 260239 }];
 w.ServerSend = (ev, d) => sent.push([ev, d]);
 w.ChatRoomMessage = (data) => { w.__shown = (w.__shown || 0) + 1; };   // the game's own handler
 w.CommandCombine = (c) => { commands = commands.concat(c); };
+w.BCPlus = { loaded: true, version: { major: 0, minor: 14, patch: 0 } };
 w.eval(fs.readFileSync(path.join(__dirname, "../dist/farmhand-companion.user.js"), "utf8"));
 
-const bot = (d) => w.ChatRoomMessage({ Sender: 260239, Type: "Hidden", Content: "FarmhandMsg", Dictionary: { v: 1, ...d } });
+const D = w.document;
+const bot = (d) => w.ChatRoomMessage({ Sender: 260239, Type: "Hidden", Content: "FarmhandMsg", Dictionary: { v: 2, ...d } });
 const toBot = (type) => sent.filter((s) => s[1].Content === "FarmhandMsg" && s[1].Target === 260239 && s[1].Dictionary.type === type);
+const cmds = () => toBot("cmd").map((s) => s[1].Dictionary.text);
+const pills = () => [...D.querySelectorAll("#fhc-panel .fhc-pill")];
+const click = (label) => { const b = [...D.querySelectorAll("#fhc-panel button")].find((x) => x.textContent.trim().startsWith(label)); if (b) b.click(); return !!b; };
+const text = () => D.getElementById("fhc-panel").textContent;
+
+const STATE = { name: "Laynie", onBooks: true, roles: ["PROPRIETOR", "LIVESTOCK"], tier: "prize", species: "cow", gender: "female",
+  staff: true, herdmaster: true, proprietor: true, mandated: false, onDuty: true, onCall: false, keys: ["bronze", "silver", "gold"],
+  switches: { breedable: true, fertile: true, jarok: true, freeuse: false, futa: false, milkable: true, naturalheat: false, praise: true, degrade: false, tally: true, teaseme: false, forced: false },
+  milk: { ml: 1800, cap: 3000, grade: "A", lastAt: Date.now() - 600000 }, quota: { ml: 1200, goal: 2000, streak: 3 },
+  holding: { ml: 0, cap: 600 }, body: [{ part: "udder", label: "Udder", size: "C cup" }], today: { tally: 2, naughty: 0, praised: 4, degraded: 0 } };
 
 (async () => {
   await wait(4500);
-  out("panel built ->", !!w.document.getElementById("fhc-panel"));
-  out("said hello ->", toBot("hello").length > 0);
-  out("/farm command added ->", commands.some((c) => c.Tag === "farm"));
-  bot({ type: "welcome", ver: "0.9.25", name: "Laynie" });
-  out("status ->", w.document.getElementById("fhc-status").textContent);
-  w.document.querySelector("#fhc-quick button").click();
-  out("stats button sends cmd ->", toBot("cmd").some((s) => s[1].Dictionary.text === "stats"));
+  out("1 panel built ->", !!D.getElementById("fhc-panel"));
+  out("1 said hello ->", toBot("hello").length > 0);
+  out("1 /farm command added ->", commands.some((c) => c.Tag === "farm"));
+  bot({ type: "welcome", ver: "0.9.29", name: "Laynie", proto: 2 });
+  out("1 status ->", /connected/.test(D.getElementById("fhc-status").textContent));
+  out("1 guest view before state ->", /Apply to join/.test(text()));
+
+  bot({ type: "state", state: STATE });
+  const views = pills().map((p) => p.textContent);
+  out("2 panel switch shows all three ->", ["Livestock", "Staff", "Dashboard"].every((v) => views.includes(v)));
+  click("Livestock"); click("Me");
+  out("2 livestock Me shows milk ->", /1\.8 L of 3\.0 L/.test(text()), /C cup/.test(text()));
+  D.querySelector(".fhc-quick button").click();
+  out("2 Stats button sends ?stats ->", cmds().includes("stats"));
+  click("Toggles");
+  const jar = [...D.querySelectorAll(".fhc-tog")].find((t) => /Jar insemination/.test(t.textContent));
+  jar.querySelector("button").click();
+  out("2 jar switch sends jarok off ->", cmds().includes("jarok off"));
+  click("femboy"); out("2 gender pill sends ->", cmds().includes("gender femboy"));
+
+  bot({ type: "ask", kind: "jar", text: "💉 Hand wants to inseminate you from jar #3", id: 7 });
+  out("3 yes/no banner ->", /jar #3/.test(text()));
+  click("Yes"); out("3 Yes sends yes ->", cmds().includes("yes"), !/jar #3/.test(text()));
+  bot({ type: "choose", text: "4/13 — How should the farm see you?", choices: ["female", "male", "futa", "femboy"], id: 8 });
+  [...D.querySelectorAll(".fhc-box.ask button")].find((b) => b.textContent === "futa").click();
+  out("3 choice button answers ->", cmds().includes("futa"), !/How should the farm/.test(text()));
+
   bot({ type: "reply", text: "📋 LAYNIE'S CARD", id: 1, part: 1, of: 1 });
   bot({ type: "reply", text: "part two", id: 2, part: 2, of: 2 });
   bot({ type: "reply", text: "part one", id: 2, part: 1, of: 2 });
-  const cards = [...w.document.querySelectorAll(".fhc-card")].map((c) => c.textContent);
-  out("card shown ->", cards.some((c) => c.includes("LAYNIE'S CARD")));
-  out("pieces glued in order ->", cards.some((c) => c.includes("part one\npart two")));
-  out("unread badge ->", w.document.getElementById("fhc-btn").getAttribute("data-unread"));
-  const before = w.document.querySelectorAll(".fhc-card").length;
-  w.ChatRoomMessage({ Sender: 999, Type: "Hidden", Content: "FarmhandMsg", Dictionary: { v: 1, type: "reply", text: "fake!", id: 9, part: 1, of: 1 } });
-  out("ignores fakes from non-bot ->", w.document.querySelectorAll(".fhc-card").length === before);
+  click("Inbox");
+  const cards = [...D.querySelectorAll(".fhc-card")].map((c) => c.textContent);
+  out("4 inbox shows replies ->", cards.some((c) => c.includes("LAYNIE'S CARD")));
+  out("4 pieces glued in order ->", cards.some((c) => c.includes("part one\npart two")));
+  const before = D.querySelectorAll(".fhc-card").length;
+  w.ChatRoomMessage({ Sender: 999, Type: "Hidden", Content: "FarmhandMsg", Dictionary: { v: 2, type: "reply", text: "fake!", id: 9, part: 1, of: 1 } });
+  out("4 ignores fakes from non-bot ->", D.querySelectorAll(".fhc-card").length === before);
   w.__shown = 0; w.ChatRoomMessage({ Sender: 221397, Type: "Chat", Content: "hi" });
-  out("normal chat still reaches the game ->", w.__shown === 1);
+  out("4 normal chat still reaches the game ->", w.__shown === 1);
+
+  click("Staff");
+  bot({ type: "doc", text: "🩺 VET CARD · Bessie", id: 3, part: 1, of: 1, kind: "vet", who: "Bessie", about: 500 });
+  out("5 doc lands in the Office ->", /VET CARD · Bessie/.test(text()), pills().some((p) => p.classList.contains("on") && /Office/.test(p.textContent)));
+  click("Refresh"); out("5 Refresh re-asks ->", cmds().includes("vet 500"));
+  bot({ type: "notice", text: "🔴 SAFEWORD from Daisy (600). Please go to them now.", id: 4, part: 1, of: 1 });
+  click("Office"); out("5 safeword card in the Office ->", /SAFEWORD from Daisy/.test(text()) && /Nothin' has been released/.test(text()));
+  click("Contracts");
+  const who = [...D.querySelectorAll("#fhc-panel input")].find((i) => i.placeholder === "Bessie");
+  who.value = "Bessie"; who.dispatchEvent(new w.Event("input"));
+  click("Offer it"); out("5 contract offer sent ->", cmds().includes("contract offer deep Bessie 1w"));
+
+  click("Dashboard");
+  out("6 dashboard knows BC+ ->", true);
+  const nm = [...D.querySelectorAll("#fhc-panel input")].find((i) => i.placeholder === "prizecow");
+  nm.value = "prizecow"; nm.dispatchEvent(new w.Event("input"));
+  const kind = [...D.querySelectorAll("#fhc-panel select")][0];
+  kind.value = "Other"; kind.dispatchEvent(new w.Event("change"));
+  const rule = [...D.querySelectorAll("#fhc-panel select")][1];
+  rule.value = "other.listenToMyVoice"; rule.dispatchEvent(new w.Event("change"));
+  const ta = D.querySelector("#fhc-panel textarea[placeholder^='one sentence']");
+  ta.value = "Good cows stand still.\nMoo for me."; ta.dispatchEvent(new w.Event("input"));
+  click("Add to prizecow");
+  out("6 rule added with its settings ->", cmds().some((c) => c === 'contract add prizecow other.listenToMyVoice sentences="Good cows stand still.|Moo for me." frequency="15"'));
+  kind.value = "Settings"; kind.dispatchEvent(new w.Event("change"));
+  const r2 = [...D.querySelectorAll("#fhc-panel select")][1]; r2.value = "settings.safeword"; r2.dispatchEvent(new w.Event("change"));
+  out("6 safeword rule can't be added ->", /never uses this one/.test(text()), ![...D.querySelectorAll("#fhc-panel button")].some((b) => /^Add to/.test(b.textContent)));
+  click("Other addons"); out("6 BC+ version matches ->", /BC\+ 0\.14\.0 matches the farm/.test(text()));
+
+  const box = D.getElementById("fhc-input"); box.value = "half typed"; box.focus();
+  bot({ type: "notice", text: "a new notice", id: 5, part: 1, of: 1 });
+  out("7 typing survives a new message ->", D.getElementById("fhc-input").value === "half typed");
+
   commands.find((c) => c.Tag === "farm").Action("size");
-  out("/farm size sends cmd ->", toBot("cmd").some((s) => s[1].Dictionary.text === "size"));
+  out("8 /farm size sends cmd ->", cmds().includes("size"));
   w.ChatRoomCharacter = [{ MemberNumber: 221397 }];
   commands.find((c) => c.Tag === "farm").Action("stats");
-  out("bot away -> beeps ->", sent.some((s) => s[0] === "AccountBeep" && s[1].Message === "stats"));
+  out("8 bot away -> beeps ->", sent.some((s) => s[0] === "AccountBeep" && s[1].Message === "stats"));
   process.exit(0);
 })();

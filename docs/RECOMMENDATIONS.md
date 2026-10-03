@@ -46,6 +46,7 @@ Matches the mockup. The big changes underneath:
   - `doc`: a staff lookup about someone else, which goes to the Office tab instead of chat
   - `outfit`: an outfit offer (section 4)
 - **Role-based tabs**: livestock, guest and staff versions, and proprietors get the Dashboard.
+  Staff can switch between the **Staff panel** and **their own livestock panel** with one click (header switch).
   Staff get everything a player has too: **Me** (their own record, keys, hours, herd size, and their own
   milk or seed if they're also on the books as stock), **Guides** (the public commands, then the staff ones),
   and **Toggles** (on call, plus the same personal switches stock have).
@@ -58,42 +59,95 @@ Matches the mockup. The big changes underneath:
 
 ---
 
-## 3. Bot dashboard: offer codes
+## 3. Bot dashboard: BC+ contracts
 
-A proprietor-only Dashboard tab in the Companion. The bot runs in Tampermonkey (or a VPS later), so a separate
-website would need hosting. A Companion tab needs none.
+A proprietor-only Dashboard tab in the Companion, where the farm writes BC+ contracts and the **bot** offers them.
+(Laynie confirmed "offer codes" means BC+ contract offers.)
 
-- **Make an offer**: kind + uses + expiry, and the bot makes a short code like `FARM-7K2Q` (no look-alike letters).
-  Kinds: staff job (Farmhand, Mandated, Herdmaster), livestock contract, luxury stay, cabin booking, shot or boost voucher.
-- **Send it**: beep it to a member, or hand it out in the room.
-- **Redeem**: the player types `?redeem FARM-7K2Q`, reads the terms for that kind, and says yes. Then the role and perks
-  apply. Mandated offers check the BCX summon rule first.
-- **Track it**: live offers with uses left, who redeemed, and expiry. Everything goes in the audit log.
-- Stored in the ledger as `L.offers`, the same way jars and tease lines are stored.
+### How BC+ contracts work (from `reference/bc-plus/src/modules/Contracts.ts`)
+- A contract is a bundle of BC+ rules with settings, a title, free-text terms, a duration and an end policy.
+- It only takes effect when the target reviews it in **their own** BC+ and countersigns. Their client checks everything.
+- Two ways to deliver one:
+  - **In-room offer:** a hidden chat message `{ Content: "BCP", Type: "Hidden", Dictionary: { message: "ContractOffer", payload } }`
+    sent to them. BC+ replaces the claimed author with the **real sender**, so if the bot sends it, the farm is the verified author.
+  - **Code:** `BCP1:contract:<LZString base64 of the payload>`, pasted on their BC+ Contracts page. Authorship is only claimed.
+    Prefer in-room offers.
+- The author can later ask which of its contracts someone holds (`ContractQuery` → `ContractList`) and release one
+  (`ContractCommand` with `action: "release"`). Only the recorded author can release remotely, so **the bot must be the sender.**
+- BC+ does **not** need to be installed on the bot. It only has to send and read `"BCP"` hidden messages.
+- Limits: 30 rules per contract, 3 contracts per person at once, longest timed contract 30 days.
+  `durationMin: 0` means open-ended, "until released".
 
-> Laynie, check this matches what you meant by "offer codes". If you meant outfit codes, see section 4.
+### Durations
+| Button | `durationMin` |
+|---|---|
+| 1 hour | 60 |
+| 12 hours | 720 |
+| 1 day | 1,440 |
+| 1 week | 10,080 |
+| 2 weeks | 20,160 |
+| 1 month | 43,200 (BC+'s cap: 30 days) |
+| Permanent | 0 (until the farm releases it) |
+
+### Depth levels (real BC+ rule ids, tailored by species)
+| Level | Ends early | Rules |
+|---|---|---|
+| **Fun** | Either side | `pet.speech` (low, sprinkled), `social.greetRoom`, `social.farewell`, `control.nickname` |
+| **Deep** | Farm only | `pet.speech` (medium), `pet.hearing`, `body.controlOrgasms`, `control.leash` (staff only), `other.summon` (farm + staff), `control.nickname`, `social.greetRoom` |
+| **No human left** | Farm only | `pet.speech` (max, moos only), `pet.hearing` (strong), `body.forcedPosition` (all fours), `body.secretOrgasms`, `body.controlOrgasms`, `chat.forbidLeaving`, `rooms.entry` (farm rooms), `other.summon`, `control.profile`, `protect.hardcore` |
+
+- **Species:** BC+ pet speech knows Bunny, Cat, Cow, Dog, Fox, Mouse, Pony, Wolf and Custom. Map the farm's species onto
+  those: cow/bull → Cow, pony/horse → Pony, pup/dog → Dog, kitt/cat → Cat, bunny/rabbit → Bunny, fox → Fox, wolf → Wolf.
+  Pig, goat, sheep, deer and goblin use Custom with their own sounds (oink, maa, baa…).
+- **Never in a farm contract:** `settings.safeword` (turning off their safeword), `social.forbidBeeps` and
+  `social.forbidBeepMessages` (they must always be able to reach the farm), `speech.forbidOOC` and `speech.gaggedOOC`.
+- **?safe releases every farm contract on them** (the bot sends `ContractCommand` release). That matters most for
+  Permanent and No human left.
+
+### The dashboard
+- Pick a depth, a duration, who it's for, and who may end it. Then **Offer in the room** (best) or **Make a code**.
+  Save favourites as templates (in the ledger, `L.contractTemplates`).
+- **Farm contracts in force:** the bot keeps its own list and checks it with `ContractQuery`. Release buttons, plus the time left on each.
+- Everything goes in the audit log.
 
 ---
 
 ## 4. Outfits and uniforms
 
-**Slots:** new stock (female, male, futa), staff uniforms (Farmhand, Herdmaster, Proprietor), and specials
-(luxury guest, prize cow, fair day).
+**Slots:** new stock outfits by **species × gender** (genders: female, male, futa, **femboy**), staff uniforms
+(Farmhand, Mandated, Herdmaster, Proprietor), and specials (luxury guest, prize cow, fair day).
+With 15 species and 4 genders, nobody should have to fill 60 slots, so the farm falls back:
+this species + this gender → this species, any gender → this gender, any species → the plain farm outfit.
 
-**Saving one:** the proprietor dresses themselves, then presses "Save what I'm wearing". The Companion takes the
-game's own outfit bundle (`ServerAppearanceBundle(Player.Appearance)`), keeps only clothing groups, compresses it
-(`LZString`, which BC already loads) and sends it to the bot for the ledger.
+**Femboy** is a new gender option the farm doesn't have yet. Add it to the record (`r.gender`: female / male / futa / femboy),
+set with `?gender`. Production goes by body (a femboy with a penis makes semen, like the bot already works out),
+and gender picks the outfit and flavour text.
 
-**Putting it on:** the bot sends an `outfit` offer to that player's Companion: "Put on your Farmhand uniform? Yes / Not now".
+**What's saved:** clothes, **restraints and locks**. Restraints keep their settings and colours. Bodies and hair are never saved.
+
+**Saving one:** the proprietor dresses themselves (or a willing helper), then presses "Save what I'm wearing". The Companion takes the
+game's own outfit bundle (`ServerAppearanceBundle(Player.Appearance)`), keeps clothing and item (restraint) groups,
+compresses it (`LZString`, which BC already loads) and sends it to the bot for the ledger.
+
+**Putting it on:** the bot sends an `outfit` offer to that player's Companion: "Put on your new-stock outfit? Yes / Not now".
 On yes, the Companion:
 
 1. saves what they're wearing now, so "Change back" works
-2. applies only clothing groups, and never touches bodies, hair, or anything locked
-3. updates the room (`ChatRoomCharacterUpdate(Player)`)
+2. applies the clothes and restraints, and never touches bodies or hair. Anything already locked on them stays put.
+3. locks it the way the Dashboard says:
+   - a **High Security Padlock** whose key list is the farm's staff (any farmhand can let them out)
+   - a **timer padlock** that matches their contract
+   - the locks exactly as saved
+   - no locks
+4. updates the room (`ChatRoomCharacterUpdate(Player)`)
+
+They put it on themselves after saying yes, so the game allows it.
 
 **When:** on approval (new stock), at clock-in (staff), "change back" at clock-out. Each of these can be switched on or off in the Dashboard.
+**?safe takes it all off:** it unlocks and removes farm outfits, and releases farm contracts.
 
-**Who's who:** futa from the existing `r.futa`. Male and female from the body the bot already reads (`hasVulva`, penis checks).
+**Who's who:** species from `r.species`, gender from the new `r.gender`. If that isn't set, use futa from `r.futa`,
+and male or female from the body the bot already reads (`hasVulva`, penis checks).
 
 **Why the Companion and not the bot:** the game checks every change against the wearer's permissions
 (`ServerAppearanceLoadFromBundle` → `ValidationCreateDiffParams`). A player changing their own clothes always passes.
@@ -109,12 +163,28 @@ rest of the outfit. Don't copy Echo's art. Their cow outfit is one of the items 
 
 | Addon | What it adds to the farm | How |
 |---|---|---|
-| **BCX** | Reliable forced summons, and a health check for each on-call staff member | `bcx.getModApi(...)`: `getRuleState("alt_forced_summoning")`; later maybe opt-in curses for shift uniforms (`sendQuery`) |
-| **Echo's Clothing Mod** | Portable pump and milk vendor as milking gear | See `milking-gear.md`. Farmhand counts; the Companion keeps their tank picture in step. |
+| **BC+** | Farm contracts | Section 3. BC+ also has its own "Ready to be summoned" rule (`other.summon`), which counts the same as BCX's. |
+| **BCX** | Reliable forced summons, and a health check for each **on-call** staff member | `bcx.getModApi(...)`: `getRuleState("alt_forced_summoning")`; later maybe opt-in curses for shift uniforms (`sendQuery`) |
+| **Echo's Clothing Mod** | Portable pump and milk vendor as milking gear; Echo clothes in outfits | See `milking-gear.md`. Farmhand counts; the Companion keeps their tank picture in step. |
 | **BC built-ins** | Lactation Pump, Fuck Machine, Sybian, Funnel Gag | Read from what people wear (group + asset name + `Property`) |
-| **Hypnosis addons (ECHS, HSC, SkyzHypno)** | Opt-in farm trigger words | Phase 3. Only for players who already run one and turn it on. |
-| **WCE / BC+ / LSCG** | Compatibility | Check that their chat changes don't hide farm notices for players without the Companion |
+| **Hypnosis addons** | Opt-in farm hypnosis | See below |
+| **WCE / LSCG** | Compatibility | Check that their chat changes don't hide farm notices for players without the Companion |
 | **FUSAM** | One-click install for players | After the Companion has a public home (PLAN.md stage 5) |
+
+**On call means mandated staff, plus staff who turned it on with `?forced`.** It doesn't mean all staff. Only those
+people can be pulled in from other rooms, and only they get the summon-rule health check.
+
+### Hypnosis: worth exploring (all opt-in, and ?safe always wakes them)
+The bot already has a `triggers` field on each record, which is a good place to start.
+
+| Addon | What it offers | Farm idea |
+|---|---|---|
+| **SkyzHypno** | A public API on the page: `window.SkyzHypno` has `addDepth`, `trance`, `wake`, `emergencyStop`, `installSuggestion`, `runSuggestion` and `startSession`. It also listens to BCX messages. | With the player's OK, the Companion deepens trance at farm moments (stall milking, clock-in, praise) and installs a small "farm" suggestion pack. `?safe` calls `emergencyStop`. |
+| **ECHS** | Its own hidden channel `HypnoMsg` with sessions the subject agrees to (`session-query`, `remote-request`, `trigger-status`…). It checks consent on the subject's own client. | Never pushes anything. The farm only joins a session the player starts with the farm. |
+| **HSC** | Trigger words from speakers the player allows (`window.Liko`). Docs are in Chinese. | Players add the farm bot as an allowed speaker, and the bot says farm triggers at the right moments. Works with any addon that reacts to chat. |
+
+The simplest first step needs no code in their addons: `?hypno on`, plus a list of trigger phrases on the player's record.
+The bot says them at farm moments, only to people who opted in, with the same quiet hours and gaps as tease lines.
 
 ---
 
@@ -137,8 +207,8 @@ rest of the outfit. Don't copy Echo's art. Their cow outfit is one of the items 
 2. Summon to the staff member's side, and the staff spot for forced staff from other rooms
 3. Protocol v2 + role-based tabs (livestock first)
 4. Staff tabs + the Office
-5. Dashboard: offer codes
-6. Dashboard: outfits and uniforms
+5. Dashboard: BC+ contracts
+6. Dashboard: outfits and uniforms (species × gender, restraints and locks) + ?gender with femboy
 7. Milking gear integration (`milking-gear.md`)
 8. Split the bot into files (can also go first if the features start to get tangled)
 9. Public home + FUSAM listing

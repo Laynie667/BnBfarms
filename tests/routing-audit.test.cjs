@@ -73,7 +73,7 @@ const FM=async(mn,d)=>{handlers.ChatRoomMessage({Sender:mn,Type:'Hidden',Content
   k=sent.length; await B(700,'breed hana');     expect('C1 breed ask, non-friend, no Companion → whisper', routes(k,166990), 'WHISPER');
   out('C1 …and it says what to answer -> '+/Say yes or no/.test(textTo(k,166990)));
   await SAY(166990,'yes','Whisper',260239);
-  k=sent.length; await B(700,'breed moo');      expect('C2 breed ask to a Companion user → panel only', routes(k,500), 'HIDDEN');
+  k=sent.length; await B(700,'breed moo');      expect('C2 breed ask to a Companion user → panel, plus a beep pointing at it', routes(k,500), 'BEEP+HIDDEN');
   out('C2 …as a yes/no card -> '+/"type":"ask"/.test(textTo(k,500)));
 
   // D. staff lookups

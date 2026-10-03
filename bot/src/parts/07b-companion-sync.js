@@ -45,7 +45,8 @@
       s.today = { tally: tallyToday(mn), naughty: r.naughtyMarks || 0, praised: r.praised || 0, degraded: r.degraded || 0 };
       s.at = now;
       if (isStaff(mn)) Object.assign(s, staffStateFor(mn));
-      const mods = addonStateFor(mn); if (mods) s.mods = mods;   // add-on cards for the "Farm extras" tab
+      const mods = addonStateFor(mn); if (mods) s.mods = mods;
+      const ac = addonCommandGroups(mn); if (ac.length) s.addonCmds = ac;   // the Guides tab lists these too   // add-on cards for the "Farm extras" tab
       if (isProprietor(mn)){   // the Dashboard's outfit slots (no outfit data, just what's there)
         outfitsLedger();
         s.outfits = {}; for (const [k, o] of Object.entries(L.outfits)) s.outfits[k] = { items: o.items, locks: o.locks, at: o.at };

@@ -118,11 +118,22 @@
     pump();
   }
   function pump(){
+    // a pacing timer that never fired would freeze sendin' for good; after a few seconds, unstick it
+    if (state.sending && Date.now() - (state.sentAt||0) > CFG.SEND_INTERVAL_MS*5 + 3000) state.sending = false;
     if (state.sending) return;
-    const m = state.urgent.shift() || (state.replies && state.replies.shift()) || state.queue.shift();
+    const lane = state.urgent.length ? state.urgent : (state.replies && state.replies.length) ? state.replies : state.queue;
+    const m = lane[0];
     if (!m) return;
-    state.sending = true;
-    try { W.ServerSend(m.ev, m.data); } catch(e){ warn("send:",e); }
+    // the connection's down: keep it, and try again shortly (instead of sendin' it into nothin')
+    if (!socketAlive()){ if (!state.sendRetry) state.sendRetry = later(()=>{ state.sendRetry = null; pump(); }, 2000); return; }
+    lane.shift();
+    state.sending = true; state.sentAt = Date.now();
+    try { W.ServerSend(m.ev, m.data); }
+    catch(e){
+      warn("send:",e);
+      m.tries = (m.tries||0) + 1;
+      if (m.tries < 3) lane.unshift(m);   // put it back and try again
+    }
     later(()=>{ state.sending=false; pump(); }, CFG.SEND_INTERVAL_MS);
   }
   // In BC, everything after a "(" is out-of-character, and on a map out-of-character text reaches the WHOLE

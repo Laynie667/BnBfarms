@@ -4,11 +4,24 @@
   */
   /* ───────────── COMMAND DISPATCH ───────────── */
 
-  function handleCommand(sender, raw, channel){
+  function handleCommand(sender, raw, channel, fromQueue){
+    // the same command twice within a second and a half (a double-tapped button, a beep that arrived twice): once is enough
+    if (!fromQueue){
+      state.lastCmd = state.lastCmd || new Map();
+      const prev = state.lastCmd.get(sender), key = channel+"|"+String(raw).trim().toLowerCase();
+      if (prev && prev.key === key && Date.now() - prev.at < 1500) return;
+      state.lastCmd.set(sender, { key, at: Date.now() });
+    }
     state.inReply = true;
     // from the Companion: if the only thing a command does is a room emote, the panel gets a copy too
     const watch = channel === "companion" ? (state.cmdWatch = { mn: sender, replied: false, emotes: [] }) : null;
     try { return handleCommandInner(sender, raw, channel); }
+    catch(e){
+      // a command that breaks still gets an answer, and the log says which one and why
+      warn("command failed: ?"+String(raw).slice(0,60)+" from "+sender+":", e);
+      audit(sender, "CMD_ERROR", String(raw).slice(0,60)+" · "+String(e && e.message || e).slice(0,120));
+      try { reply(sender, "Oops, sugar, ?"+String(raw).slice(0,40)+" hit a snag on my end. It's written in the farm log for the proprietors. Try again in a bit, or ask staff.", channel); } catch(e2){}
+    }
     finally {
       state.inReply = false; state.cmdWatch = null;
       if (watch && !watch.replied && watch.emotes.length) toCompanion(sender, "(in the room) "+watch.emotes.join("\n"), "reply");
@@ -45,7 +58,7 @@
     const addonCmd = ADDON_CMDS.get(cmd) || null;   // a command from an add-on script (10f-addons.js)
     if (!PUBLIC_CMDS.includes(cmd) && !STAFF_CMDS.includes(cmd) && !addonCmd){ huh("I don't know ?"+cmd+", hon. ?help lists what I can do."); return; }
     if (STAFF_CMDS.includes(cmd) && !isStaff(sender)){ huh("?"+cmd+" is just for farm staff, sugar."); return; }
-    if (onCooldown(sender, cmd, channel)){ if (channel !== "chat") waitYourTurn(sender, raw, channel); return; }
+    if (onCooldown(sender, cmd, channel)){ waitYourTurn(sender, raw, channel); return; }   // waits its turn (14-parser.js)
 
     dbg("CMD:", cmd, "from", sender, "via", channel);
 
@@ -1125,13 +1138,15 @@
 
       /* ── PAPERWORK ── */
       case "queue": {
-        if (!L.applications.length){ R("Queue's empty, hon. Quiet week!"); break; }
+        const mailLine = "📮 Messages: "+(state.queue.length + state.urgent.length)+" waitin' to send · "+Object.keys(L.mailbox||{}).length+
+          " people with messages held · "+(state.mutual ? state.mutual.set.size : "?")+" online and beep-able";
+        if (!L.applications.length){ R("Queue's empty, hon. Quiet week!\n" + mailLine); break; }
         let o = "📋 PENDING APPLICATIONS ("+L.applications.length+")\n";
         L.applications.forEach((a,i)=>{
           o += "\n"+(i+1)+". "+a.name+" ("+a.mn+")"+(a.staffTrack?" [staff]":"")+
                "\n   "+["role","species","gender","stay","depth"].map(k => appAnswer(a, k) || "?").join(" • ");
         });
-        o += "\n\nSay ?app and the number to read one, like ?app 1.";
+        o += "\n\nSay ?app and the number to read one, like ?app 1.\n" + mailLine;
         R(o);
         break;
       }

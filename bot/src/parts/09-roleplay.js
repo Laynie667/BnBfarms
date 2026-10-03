@@ -334,7 +334,8 @@
     ]);
     if (makesMilk(mn)) sec("🍼 MILK", [
       (p.milk < 1 ? "Dry · " : "")+ml(p.milk)+" of "+ml(milkCap(mn))+" · grade "+milkGrade(mn)+(p.milk >= milkCap(mn)-1 ? " · full and achin'" : ""),
-      "Last milked "+ago(p.lastMilkAt)
+      "Last milked "+ago(p.lastMilkAt),
+      p.stall && p.stall.until && "In the milkin' stall: "+Math.max(0, Math.ceil((p.stall.until - Date.now())/60000))+" min till you're down to a quarter"
     ]);
     if (makesSemen(mn)) sec("💦 SEMEN", [
       ml(p.semen)+" of "+ml(semenCap(mn))+" · last collected "+ago(p.lastCollectAt),

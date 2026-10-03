@@ -57,7 +57,11 @@
     outfitsLedger();
     const o = slot && L.outfits[slot];
     if (!o) return "There's no outfit saved for that, sugar. ?outfit shows what's saved.";
-    if (!hasCompanion(mn)) return plainName(mn)+" isn't runnin' the Companion, so I can't hand 'em an outfit. They can still dress by hand.";
+    if (!hasCompanion(mn)){
+      // they still hear about it, so nothin' happens behind their back
+      tell(mn, "👗 The farm has your "+slotLabel(slot)+" ready"+(why ? " ("+why+")" : "")+". The Companion can put it on you in one tap; without it, staff can help you dress by hand.");
+      return plainName(mn)+" isn't runnin' the Companion, so I can't hand 'em an outfit. I've told 'em it's ready, and they can dress by hand.";
+    }
     enqueue(makeMsg("outfit", { slot, label: slotLabel(slot), data: o.data, keys: outfitKeysFor(mn), why: why || "", id: ++companionSeq }, mn));
     audit(CFG.BOT_MEMBER, "OUTFIT_OFFER", mn+" "+slot);
     return "";

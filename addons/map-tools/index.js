@@ -7,7 +7,7 @@
      wandering out of that zone gets them tugged back to it (the bot needs room admin) and a naughty mark.
      ?pen <who> off lets them out. Without ?fence on, a pen is just where they belong; nothing is enforced.
    • Heat map: where people spend their time and where the action happens, by zone, this week.
-     ?heatmap shows it (staff). It counts minutes in each zone, and activities and emotes made there.
+     ?busy shows it (staff). It counts minutes in each zone, and activities and emotes made there.
 */
 import { connect } from "../_lib/connect.js";
 
@@ -85,17 +85,17 @@ connect({
   name: "map-tools",
   label: "Map tools",
   version: "1.0.0",
-  guide: "Pens: staff ?pen <who> <zone> (or off). With ?fence on, wandering out tugs you back with a naughty mark. Staff: ?heatmap shows where people spend time and where things happen this week.",
+  guide: "Pens: staff ?pen <who> <zone> (or off). With ?fence on, wandering out tugs you back with a naughty mark. Staff: ?busy shows where people spend time and where things happen this week.",
   setup(a) { api = a; D(); },
   commands: {
-    pen: { rank: "staff", private: true, run: cmdPen },
-    fence: { private: true, run: (c) => {
+    pen: { usage: "pen <who> <zone>", rank: "staff", private: true, run: cmdPen },
+    fence: { usage: "fence on|off", private: true, run: (c) => {
       const d = D(), w = String(c.args[0] || "").toLowerCase();
       if (w !== "on" && w !== "off") return c.reply("🐄 Fence: " + (d.fence[c.sender] ? "ON" : "off") + ". ?fence on lets a pen hold you; ?fence off and pens are just a suggestion.");
       if (w === "on") d.fence[c.sender] = true; else delete d.fence[c.sender];
       c.api.save(); c.reply(w === "on" ? "🐄 Fence ON. If staff pen you, you'll be tugged back when you wander." : "🐄 Fence off. Pens won't hold you.");
     } },
-    heatmap: { rank: "staff", private: true, run: (c) => c.reply(heatText()) },
+    busy: { usage: "busy", aliases: ["heatmap"], rank: "staff", private: true, run: (c) => c.reply(heatText()) },
   },
   on: { tick, activity: (data) => { const a = api.activityInfo(data); if (a.src) onAction(a.src); }, roleplay: (mn, text, type) => { if (type === "Emote") onAction(mn); } },
   companion,

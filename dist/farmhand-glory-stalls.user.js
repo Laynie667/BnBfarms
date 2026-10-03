@@ -518,9 +518,9 @@
       D();
     },
     commands: {
-      glory: { private: true, run: cmdGlory },
-      stall: { private: true, run: cmdStall },
-      stalls: { private: true, run: (c) => c.reply(board(c.api.isStaff(c.sender))) }
+      glory: { usage: "glory on|off", private: true, run: cmdGlory },
+      stall: { usage: "stall use|shift|punish|release", private: true, run: cmdStall },
+      stalls: { usage: "stalls", private: true, run: (c) => c.reply(board(c.api.isStaff(c.sender))) }
     },
     on: { tick, safe: onSafe },
     companion

@@ -77,7 +77,12 @@ Chat in the room all you like; I'll only count what you send me direct.`, useCh)
     if (s.step >= list.length){ finishApplication(mn); return; }
     const q = list[s.step], text = (s.step+1)+"/"+list.length+" — "+q.text;
     if (q.choices && hasCompanion(mn)) enqueue(makeMsg("choose", { text, choices: q.choices(), id: ++companionSeq }, mn));
-    else reply(mn, text, s.ch);
+    else {
+      // no Companion buttons: spell the choices out, unless the question already does
+      const ch = q.choices ? q.choices() : [];
+      const listed = ch.length && ch.every(c => text.toLowerCase().includes(String(c).toLowerCase()));
+      reply(mn, text+(ch.length && !listed ? "\nPick one: "+ch.join(" / ") : ""), s.ch);
+    }
   }
 
   // FIX: only consume answers from the channel they applied on (the Companion counts as theirs too)

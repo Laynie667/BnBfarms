@@ -1,18 +1,18 @@
 /* WHAT'S IN THIS FILE (work/index.js)
    Work, an add-on for the farm bot: the staff leaderboard, write-ups, and inspections.
 
-   • Leaderboard (?leaderboard): staff points this week, from everything the farm counts: chores done in
+   • Leaderboard (?top): staff points this week, from everything the farm counts: chores done in
      the right place, trough refills, grooming, midwifing, stud bookings, glory stall uses by their herd,
      inspections. Hours clocked show beside them.
-   • Write-ups (herdmasters and proprietors): ?writeup <who> <what happened>. Only the one who wrote it and
-     the one who got it can read it; everyone else just sees how many someone has. ?writeups [who],
-     ?writeup remove <#> (the writer or a proprietor).
-   • Inspections (herdmasters and proprietors start them): ?inspection start [minutes, default 10].
-     Only staff who switched inspections on (?inspections on) are warned and share the score; not
+   • Write-ups (herdmasters and proprietors): ?wu <who> <what happened>. Only the one who wrote it and
+     the one who got it can read it; everyone else just sees how many someone has. ?wu [who],
+     ?wu remove <#> (the writer or a proprietor).
+   • Inspections (herdmasters and proprietors start them): ?insp start [minutes, default 10].
+     Only staff who switched inspections on (?insp on) are warned and share the score; not
      everybody has time for them. When it begins, the bot builds the checklist from what it knows
      (stock fed and watered, nobody overfull with milk, troughs stocked, chores done, somebody on duty).
-     The inspector adds their own with ?inspection fail <what> or ?inspection pass <what>, and finishes
-     with ?inspection end: a score out of 10, a report, and points for the staff who were on duty.
+     The inspector adds their own with ?insp fail <what> or ?insp pass <what>, and finishes
+     with ?insp end: a score out of 10, a report, and points for the staff who were on duty.
 */
 import { connect } from "../_lib/connect.js";
 
@@ -41,17 +41,17 @@ function cmdWriteup(c) {
   const { sender, args, rest, api: A } = c, d = D();
   if (String(args[0] || "").toLowerCase() === "remove") {
     const i = d.writeups.findIndex((w) => String(w.id) === String(args[1] || "").replace(/^#/, ""));
-    if (i < 0) return c.reply("Which one, sugar? ?writeups shows the numbers you can see.");
+    if (i < 0) return c.reply("Which one, sugar? ?wu shows the numbers you can see.");
     if (d.writeups[i].by !== sender && !A.isProprietor(sender)) return c.reply("Only whoever wrote it, or a proprietor, can take a write-up off, hon.");
     d.writeups.splice(i, 1); A.save(); return c.reply("📝 Write-up taken off.");
   }
   const t = A.find(args[0]), text = rest.split(/\s+/).slice(1).join(" ").trim();
-  if (!t || !A.rec(t) || !text) return c.reply("Here's how: ?writeup <who> <what happened>. Only you and they can read it; everybody else sees a count.");
+  if (!t || !A.rec(t) || !text) return c.reply("Here's how: ?wu <who> <what happened>. Only you and they can read it; everybody else sees a count.");
   if (t === sender) return c.reply("You can't write yourself up, sugar.");
   d.seq = (d.seq || 0) + 1;
   d.writeups.push({ id: d.seq, to: t, by: sender, text: text.slice(0, 500), at: Date.now() });
   A.save(); A.audit(sender, "WRITEUP", String(t));
-  A.notice(t, "📝 " + A.name(sender) + " wrote you up: " + text.slice(0, 500) + "\n(Only you and they can read this. ?writeups shows yours.)");
+  A.notice(t, "📝 " + A.name(sender) + " wrote you up: " + text.slice(0, 500) + "\n(Only you and they can read this. ?wu shows yours.)");
   c.reply("📝 Written up (#" + d.seq + "). Only you and " + A.name(t) + " can read it.");
 }
 function writeupsText(viewer, who) {
@@ -95,7 +95,7 @@ function inspText() {
   if (!x) return "No inspection under way.";
   if (!x.items) return "🔍 Inspection by " + api.name(x.by) + " starts in " + Math.max(0, Math.ceil((x.startAt - Date.now()) / 60000)) + " min.";
   return "🔍 INSPECTION by " + api.name(x.by) + "\n" + x.items.map((it, i) => (i + 1) + ". " + (it.ok ? "✅ " : "❌ ") + it.what + (it.note ? " (" + it.note + ")" : "")).join("\n") +
-    "\n?inspection pass|fail <what> adds one · ?inspection end finishes";
+    "\n?insp pass|fail <what> adds one · ?insp end finishes";
 }
 function cmdInspection(c) {
   const { sender, args, rest, api: A } = c, d = D(), w = String(args[0] || "").toLowerCase();
@@ -114,7 +114,7 @@ function cmdInspection(c) {
     if (!d.insp || !d.insp.items) return c.reply("There's no inspection under way, hon.");
     if (d.insp.by !== sender && !A.isProprietor(sender)) return c.reply("Only the inspector marks the checklist, sugar.");
     const what = rest.split(/\s+/).slice(1).join(" ").trim();
-    if (!what) return c.reply("What did you check, sugar? ?inspection fail pen 2 gate left open");
+    if (!what) return c.reply("What did you check, sugar? ?insp fail pen 2 gate left open");
     d.insp.items.push({ what: what.slice(0, 120), ok: w === "pass", note: "" }); A.save();
     return c.reply(inspText());
   }
@@ -123,7 +123,7 @@ function cmdInspection(c) {
     if (d.insp.by !== sender && !A.isProprietor(sender)) return c.reply("Only the inspector finishes it, sugar.");
     if (!d.insp.items) begin();
     const x = d.insp, total = x.items.length, ok = x.items.filter((i) => i.ok).length, score = total ? Math.round((ok / total) * 10) : 10;
-    const report = inspText().split("\n?inspection")[0] + "\n\nScore: " + score + "/10";
+    const report = inspText().split("\n?insp")[0] + "\n\nScore: " + score + "/10";
     // the staff who were on duty and signed up for inspections share the result
     for (const mn of x.staff) { if (score >= 5) A.staffPoints(mn, Math.round(score / 2), "inspection"); A.notice(mn, "🔍 Inspection's done: " + score + "/10." + (score >= 5 ? " Points to everybody on duty!" : " Let's tidy up, y'all.")); }
     A.staffPoints(sender, 1, "inspecting");
@@ -137,7 +137,7 @@ function cmdInspection(c) {
     return c.reply(w === "on" ? "🔍 You'll be warned about inspections and share their score." : "🔍 You're out of inspections. No warnings, no score.");
   }
   c.reply(inspText() + (d.last ? "\nLast one: " + d.last.score + "/10 by " + A.name(d.last.by) + ", " + new Date(d.last.at).toLocaleDateString() : "") +
-    "\n\n?inspections on|off · ?inspection start [minutes] · pass|fail <what> · end");
+    "\n\n?insp on|off · ?insp start [minutes] · pass|fail <what> · end");
 }
 function begin() {
   const d = D(), x = d.insp; if (!x || x.items) return;
@@ -152,15 +152,15 @@ function tick() { const x = D().insp; if (x && !x.items && Date.now() >= x.start
 function companion(mn) {
   if (!api.isStaff(mn)) {
     const n = D().writeups.filter((w) => w.to === mn).length;
-    return n ? { cards: [{ title: "Write-ups", text: n + " on your record. Only you and whoever wrote each one can read it.", buttons: [{ label: "Read mine", cmd: "writeups" }] }] } : null;
+    return n ? { cards: [{ title: "Write-ups", text: n + " on your record. Only you and whoever wrote each one can read it.", buttons: [{ label: "Read mine", cmd: "wu" }] }] } : null;
   }
   const d = D(), S = api.staffScores()[mn], wk = api.weekKey();
   const cards = [{ title: "My work this week", lines: [["Points", S && S.week === wk ? S.pts : 0], ["Hours", api.hoursThisWeek(mn).toFixed(1)]],
-    buttons: [{ label: "Leaderboard", cmd: "leaderboard" }, { label: "Write-ups", cmd: "writeups" }] }];
-  cards.push({ title: "Inspections", toggles: [{ label: "Take part in inspections", desc: "Warnings before one starts, and a share of the score.", on: !!d.optIn[mn], cmd: "inspections " + (d.optIn[mn] ? "off" : "on") }],
+    buttons: [{ label: "Leaderboard", cmd: "top" }, { label: "Write-ups", cmd: "wu" }] }];
+  cards.push({ title: "Inspections", toggles: [{ label: "Take part in inspections", desc: "Warnings before one starts, and a share of the score.", on: !!d.optIn[mn], cmd: "insp " + (d.optIn[mn] ? "off" : "on") }],
     text: d.insp ? inspText() : undefined,
-    buttons: (api.isHerdmaster(mn) || api.isProprietor(mn)) ? (d.insp ? [{ label: "Finish inspection", cmd: "inspection end", accent: true }] : [{ label: "Start inspection (10 min)", cmd: "inspection start" }]) : undefined });
-  if (api.isHerdmaster(mn) || api.isProprietor(mn)) cards.push({ title: "Write somebody up", input: { placeholder: "Bessie late for milking again", label: "Write up", cmd: "writeup" },
+    buttons: (api.isHerdmaster(mn) || api.isProprietor(mn)) ? (d.insp ? [{ label: "Finish inspection", cmd: "insp end", accent: true }] : [{ label: "Start inspection (10 min)", cmd: "insp start" }]) : undefined });
+  if (api.isHerdmaster(mn) || api.isProprietor(mn)) cards.push({ title: "Write somebody up", input: { placeholder: "Bessie late for milking again", label: "Write up", cmd: "wu" },
     note: "Only you and they can read it. Everybody else sees a count." });
   return { cards };
 }
@@ -169,19 +169,22 @@ connect({
   name: "work",
   label: "Work",
   version: "1.0.0",
-  guide: "?leaderboard shows staff points this week (chores done at their place, refills, grooming, midwifing, bookings, inspections, glory stalls). " +
-    "Herdmasters and proprietors: ?writeup <who> <what> (only you and they can read it), ?inspection start [minutes] / pass|fail <what> / end. Staff: ?inspections on|off.",
+  guide: "?top shows staff points this week (chores done at their place, refills, grooming, midwifing, bookings, inspections, glory stalls). " +
+    "Herdmasters and proprietors: ?wu <who> <what> (only you and they can read it), ?insp start [minutes] / pass|fail <what> / end. Staff: ?insp on|off.",
   setup(a) { api = a; D(); },
   commands: {
-    leaderboard: { rank: "staff", private: true, run: (c) => c.reply(leaderboard()) },
-    writeup: { rank: "herdmaster", private: true, run: cmdWriteup },
-    writeups: { private: true, run: (c) => {
+    top: { usage: "top", aliases: ["leaderboard"], rank: "staff", private: true, run: (c) => c.reply(leaderboard()) },
+    // ?wu lists the ones you can read · ?wu <who> theirs (a count for anybody else's) · ?wu <who> <what> writes one (herdmasters)
+    wu: { usage: "wu [<who> <what happened>]", aliases: ["writeup", "writeups"], private: true, run: (c) => {
+      if (c.args.length >= 2 && String(c.args[0]).toLowerCase() !== "remove" || String(c.args[0] || "").toLowerCase() === "remove") {
+        if (!(c.api.isHerdmaster(c.sender) || c.api.isProprietor(c.sender))) return c.reply("Write-ups are written by herdmasters and proprietors, sugar.");
+        return cmdWriteup(c);
+      }
       const who = c.args[0] ? c.api.find(c.args[0]) : null;
       if (c.args[0] && !who) return c.reply("Who's that, hon?");
       c.reply(writeupsText(c.sender, who));
     } },
-    inspection: { rank: "staff", private: true, run: cmdInspection },
-    inspections: { rank: "staff", private: true, run: (c) => cmdInspection(Object.assign({}, c, { args: [c.args[0] || "status"] })) },
+    insp: { usage: "insp start|pass|fail|end|on|off", aliases: ["inspection", "inspections"], rank: "staff", private: true, run: cmdInspection },
   },
   on: { tick },
   companion,

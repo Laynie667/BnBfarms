@@ -23,6 +23,7 @@
                (admin?"":" ⚠️NOT ADMIN"), admin ? "#b8ff9b" : "#ffc49b");
 
       keepalive();
+      runWaiting(); pump();        // safety net: waitin' commands and messages move even if a timer was lost
       if (Date.now() - (state.lastMutualAsk||0) > 60000){ state.lastMutualAsk = Date.now(); askMutual(); }
       nudge();
       expireHerdClaims();

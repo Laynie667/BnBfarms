@@ -41,7 +41,7 @@ W.InventoryGroupIsBlocked=()=>true;   // what the live game does
   const inject=async(giver,target,name)=>{C(giver).Appearance=(C(giver).Appearance||[]).filter(x=>x.Asset.Group.Name!=='ItemHandheld').concat([{Asset:{Name:'MedicalInjector',Group:{Name:'ItemHandheld'}},Craft:{Name:name,Description:''}}]); await ACT(giver,target,'ItemArms','Inject');};
   const P=mn=>L().people[mn].prod; let n;
   await B(221397,'breedable on'); await B(221397,'fertile on'); await B(700,'stats'); await B(232922,'stats'); await B(221397,'stats');
-  const typ=k=>sent.slice(k).map(x=>x[0]==='AccountBeep'?'BEEP':x[1].Type).join(',');
+  const typ=k=>sent.slice(k).filter(x=>x[0]!=='AccountQuery').map(x=>x[0]==='AccountBeep'?'BEEP':x[1].Type).join(',');
   let k=sent.length; await B(221397,'ping'); out('beep ping ->',typ(k));
   k=sent.length; handlers.ChatRoomMessage({Sender:221397,Type:'Hidden',Content:'ChatRoomBot health'}); await wait(5200); out('/bot health ->',typ(k));
   k=sent.length; handlers.ChatRoomMessage({Sender:166990,Type:'Hidden',Content:'ChatRoomBot ping'}); await wait(5200); out('/bot nonfriend ->',typ(k));
@@ -63,7 +63,7 @@ W.InventoryGroupIsBlocked=()=>true;   // what the live game does
   const keep=chars.splice(chars.findIndex(c=>c.MemberNumber===221397),1);
   k=sent.length; await B(221397,'ping'); out('left room -> beep ->', typ(k)==='BEEP');
   chars.push(...keep);
-  k=sent.length; FM(221397,{type:'bye'}); await B(221397,'ping'); out('after bye -> beep ->', typ(k)==='BEEP');
+  k=sent.length; FM(221397,{type:'bye'}); await B(221397,'ping'); out('after bye -> beep ->', typ(k)==='BEEP', typ(k));
   k=sent.length; await RP(221397,'Chat','?health'); await wait(2000); out('health shows companions ->', /Companions:/.test(sent.slice(k).map(x=>x[1].Content||x[1].Message||'').join('')));
   process.exit(0);
 })();

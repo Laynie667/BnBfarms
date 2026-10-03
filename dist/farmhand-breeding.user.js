@@ -152,14 +152,14 @@
     const { sender, args, api: A } = c, d = D(), w = String(args[0] || "").toLowerCase();
     if (w === "done" || w === "remove" || w === "cancel") {
       const i = d.bookings.findIndex((b2) => String(b2.id) === String(args[1] || "").replace(/^#/, ""));
-      if (i < 0) return c.reply("Which booking, sugar? ?bookings shows the numbers.");
+      if (i < 0) return c.reply("Which booking, sugar? ?book shows the numbers.");
       const b = d.bookings.splice(i, 1)[0];
       A.save();
       if (w === "done") A.staffPoints(sender, 1, "booking");
       return c.reply("🐂 Booking #" + b.id + " (" + A.name(b.stud) + " × " + A.name(b.dam) + ") " + (w === "done" ? "done. Good work!" : "taken off the list."));
     }
     const stud = A.find(args[0]), dam = A.find(args[1]);
-    if (!stud || !dam || !A.rec(stud) || !A.rec(dam)) return c.reply("Here's how, sugar: ?book <stud> <who>, like ?book Rex Bessie. ?bookings shows the list.");
+    if (!stud || !dam || !A.rec(stud) || !A.rec(dam)) return c.reply("Here's how, sugar: ?book <stud> <who>, like ?book Rex Bessie. ?book shows the list.");
     const rd = A.rec(dam);
     if (!rd.breedable || A.limitBlocks(dam, "breed")) return c.reply(A.name(dam) + " isn't breedable, hon, so they can't be booked.");
     if (d.bookings.some((b) => b.stud === stud && b.dam === dam)) return c.reply("That pair's already booked, sugar.");
@@ -180,7 +180,7 @@
     if (d.week.month !== mk) d.week = { month: mk };
     if (now.getDate() === 14 && !d.week.warned && here.length) {
       d.week.warned = true;
-      api.say("📅 Breeding week starts tomorrow, y'all! Anybody who said ?breedweek on will come into heat for it.");
+      api.say("📅 Breeding week starts tomorrow, y'all! Anybody who said ?season on will come into heat for it.");
       api.save();
     }
     if (!isBreedWeek(now)) return;
@@ -249,7 +249,7 @@
       A.save();
       return c.reply(w === "on" ? "🔥 You're in for breeding week (the 15th to the 21st each month). You'll come into heat for it" + (A.rec(sender).breedable && A.rec(sender).fertile ? "." : ", once you're ?breedable on and ?fertile on.") : "Breeding week: you're out. No heat from it.");
     }
-    c.reply("🔥 Breeding week is the 15th to the 21st each month" + (isBreedWeek() ? ", and it's on right now!" : ".") + " You're " + (d.optIn[sender] ? "in" : "out") + " (?breedweek on / off).");
+    c.reply("🔥 Breeding week is the 15th to the 21st each month" + (isBreedWeek() ? ", and it's on right now!" : ".") + " You're " + (d.optIn[sender] ? "in" : "out") + " (?season on / off).");
   }
   function companion(mn) {
     const r = api.rec(mn);
@@ -266,7 +266,7 @@
     cards.push({
       title: "Breeding week",
       note: "The 15th to the 21st each month. You come into heat for it if you're breedable and fertile.",
-      toggles: [{ label: "Join breeding week", on: !!d.optIn[mn], cmd: "breedweek " + (d.optIn[mn] ? "off" : "on") }],
+      toggles: [{ label: "Join breeding week", on: !!d.optIn[mn], cmd: "season " + (d.optIn[mn] ? "off" : "on") }],
       chips: isBreedWeek() ? [{ text: "on now", kind: "alert" }] : void 0,
       buttons: [{ label: "My pedigree", cmd: "pedigree" }]
     });
@@ -279,16 +279,27 @@
     name: "breeding",
     label: "Breeding",
     version: "1.0.0",
-    guide: "Pregnancy now has stages (early, showin', heavy, nestin') with a belly size 1–5, cravings, and kicks nearby people can see. Breeding week is the 15th–21st of each month: ?breedweek on to come into heat for it. Staff: ?book <stud> <who>, ?bookings, ?book done <#>, and ?midwife <who> during labour.",
+    guide: "Pregnancy now has stages (early, showin', heavy, nestin') with a belly size 1–5, cravings, and kicks nearby people can see. Breeding week is the 15th–21st of each month: ?season on to come into heat for it. Staff: ?book <stud> <who>, ?book, ?book done <#>, and ?midwife <who> during labour.",
     setup(a) {
       api = a;
       D();
     },
     commands: {
-      book: { rank: "staff", private: true, run: (c) => c.args.length ? cmdBook(c) : c.reply(bookingsText()) },
-      bookings: { private: true, run: (c) => c.reply(bookingsText()) },
-      breedweek: { private: true, run: cmdBreedweek },
-      midwife: { rank: "staff", run: cmdMidwife }
+      // ?book lists them (anyone) · staff: ?book <stud> <who> adds one, ?book done|remove <#>
+      book: { usage: "book [<stud> <who>]", aliases: ["bookings"], private: true, run: (c) => {
+        if (!c.args.length) return c.reply(bookingsText());
+        if (!c.api.isStaff(c.sender)) return c.reply("Only staff add stud bookings, sugar. ?book shows the list.");
+        cmdBook(c);
+      } },
+      // the "Expectin'" card, for people without the Companion
+      belly: { usage: "belly", private: true, run: (c) => {
+        const t = c.args[0] ? c.api.find(c.args[0]) : c.sender, p = t && c.api.prod(t), f = along(p);
+        if (f === null) return c.reply((t === c.sender ? "You're" : c.api.name(t) + " is") + " not expectin' right now, sugar.");
+        const days = Math.max(0, Math.ceil((p.preg.due - Date.now()) / 864e5));
+        c.reply("🤰 " + c.api.name(t) + ": " + stageOf(f).label + " · belly size " + bellySize(f) + " of 5 · " + Math.round(f * 100) + "% along · due " + (days ? "in " + days + " day" + (days === 1 ? "" : "s") : "any time now") + " · sired by " + p.preg.sires.map(c.api.name).join(" & "));
+      } },
+      season: { usage: "season on|off", aliases: ["breedweek"], private: true, run: cmdBreedweek },
+      midwife: { usage: "midwife <who>", rank: "staff", run: cmdMidwife }
     },
     on: { tick: () => {
       watchLabour();

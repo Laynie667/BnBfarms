@@ -29,6 +29,8 @@ Well hey there, %name%! I'm the gal behind the desk. 💕
     body · cocks · shots
   Farm life
     life · fair
+  Farm extras
+    ?addons lists them · ?help <name> explains one
   Everything
     me (every command you can use)`;
 
@@ -645,32 +647,23 @@ UPKEEP
     if (t === "staffmenu") return isStaff(sender) ? TEXT.staffhelp : fill(TEXT.help, sender);
     if (t === "me") return myCommands(sender);
     if (STAFF_GUIDES.includes(t) && !isStaff(sender)) return GUIDES[t+"s"] || "Aw, that guide's just for staff, sugar. Say ?help to see the ones for you.";
-    return GUIDES[t] ? GUIDES[t] : "Hmm, I don't have a guide called '"+t0+"', hon. Try one of these: start, safety, keys, herds, tiers, barn, breeding, pregnancy, heat, body, cocks, shots, life, fair or me. For example: ?help breeding";
+    if (GUIDES[t]) return GUIDES[t];
+    // an add-on, by its name, its label, or one of its commands (?help glory, ?help stalls)
+    const a = ADDONS.get(t) || [...ADDONS.values()].find(x => x.label.toLowerCase() === t || x.commands[t]);
+    if (a) return addonsText(a.name);
+    return "Hmm, I don't have a guide called '"+t0+"', hon. Try one of these: start, safety, keys, herds, tiers, barn, breeding, pregnancy, heat, body, cocks, shots, life, fair or me"+
+           (ADDONS.size ? ", or an add-on: "+[...ADDONS.keys()].join(", ") : "")+". For example: ?help breeding";
   }
+  // every command they can use: the same groups the Companion's Guides tab shows (shared/guides.js),
+  // plus the commands of whatever add-ons are runnin', for their rank
   function myCommands(mn){
-    const group = (title, list) => "\n"+title+"\n  "+list;
-    let o = "📋 EVERYTHING YOU CAN ASK ME, SUGAR\n";
-    o += group("🔴 Safety",      "safe · stuck · staff · report");
-    o += group("🌾 Gettin' started", "help · rules · consent · tour · apply · friend · species · luxury · doors");
-    o += group("📖 You & the farm", "record · keys · who · herd · notice · weather · feeding · curfew · beg");
-    o += group("🥛 Milk",        "stats · board · milkable · quota");
-    o += group("🐂 Breedin'",    "breedable · fertile · freeuse · yes · no · naturalheat · breed · cum · wash · tally · eggs · praise · degrade · rights · accept · pedigree");
-    o += group("📏 Body",        "size · measure · penis · futa · gender");
-    o += group("🎪 Fun",         "fair · enter · teaseme");
-    if (isStaff(mn)){
-      o += "\n\n🧑‍🌾 STAFF";
-      o += group("📖 Books",     "queue · app · approve · deny · appclear · roster · stock · find · record <who> · note · signed · addfriend · unregister");
-      o += group("🐄 Herd",      "claim · release · myherd · herdname · herdcall · herdsummon · turnout · letup · brand · walk");
-      o += group("🎀 Stock",     "tier · stocks · unstock · vet · inspect · tease");
-      o += group("📜 Contracts", "contract list · contract show · contract offer · contract release · contract check · contract rules");
-      o += group("👗 Outfits",   "outfit · outfit offer <who> [slot] · outfit back");
-      o += group("🥛 Barn",      "milk · collect · jars · inseminate · drain · edge · denial · ruin · nomilk · quota <who> · heat · heatline · shotlog");
-      o += group("🗺️ Farm",      "spot · tourstop · setrescue · where · stucklog");
-      o += group("⏱️ Work & play", "clockin · clockout · hours · done · chores · chore · wheel · spin · begphrase · score");
-      o += group("🔑 Keys & calls", "keys <who> · keysync · keydump · grant · revoke · forced · summon · pasture · onduty · cover");
-    }
-    if (isProprietor(mn)) o += "\n\n👑 PROPRIETOR"+group("", "staffadd · staffremove · goldkey · notice <text> · feeding on|off · curfew on|off · fair open|close · backup · health").replace(/^\n\n/,"\n");
-    return o+"\n\nSay ?help and a topic (like ?help breeding) and I'll explain any of it, hon.";
+    const line = (g) => "\n"+g.name+"\n  "+g.cmds.join(" · ");
+    let o = "📋 EVERYTHING YOU CAN ASK ME, SUGAR\n"+PUBLIC_GROUPS.map(line).join("");
+    if (isStaff(mn)) o += "\n\n🧑‍🌾 STAFF"+STAFF_GROUPS.map(line).join("");
+    if (isProprietor(mn)) o += "\n\n👑 PROPRIETOR"+OWNER_GROUPS.map(line).join("");
+    const extras = addonCommandGroups(mn);
+    if (extras.length) o += "\n\n🧩 FARM EXTRAS (add-ons)"+extras.map(line).join("");
+    return o+"\n\nSay ?help and a topic (like ?help breeding) and I'll explain any of it, hon. ?addons <name> explains an add-on.";
   }
 
   TEXT.rules = `🌾 B&B FARM — HOUSE RULES 🌾 (v1.0)

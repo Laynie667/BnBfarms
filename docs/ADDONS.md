@@ -18,12 +18,12 @@ Add-ons are separate scripts that run **on the bot's computer**, in Tampermonkey
 |---|---|---|
 | glory-stalls | Stall spots, about 5-minute scenes every 10–30 minutes, real visitors, shifts, punishment shifts, a board | `?glory on`, `?stalls`, `?stall use/shift/punish/release` |
 | barn-life | Opt-in food, water and grooming; troughs and water spots (BC+/MPA bowls count); milk-drunk | `?needs on`, `?eat`, `?drink`, `?groom`, `?refill` |
-| breeding | Pregnancy stages, belly size 1–5, cravings, kicks, midwives, stud bookings, breeding week (15th–21st) | `?breedweek on`, `?book`, `?bookings`, `?midwife` |
-| dairy | Warmer, more varied milking lines; weekly milk certificate | `?certificate` |
-| work | Staff leaderboard, private write-ups, opt-in inspections | `?leaderboard`, `?writeup`, `?inspection` |
-| conditioning | Trance sessions for each species and level, tiers, nicknames | `?hypnolevel`, `?condition`, `?wake` |
-| shows | Udder judging, breeding stand, cart race, obedience trial, ribbons, placards | `?show`, `?ribbons`, `?placard` |
-| map-tools | Opt-in fenced pens, weekly heat map | `?pen`, `?fence on`, `?heatmap` |
+| breeding | Pregnancy stages, belly size 1–5, cravings, kicks, midwives, stud bookings, breeding week (15th–21st) | `?season on`, `?belly`, `?book`, `?midwife` |
+| dairy | Warmer, more varied milking lines; weekly milk certificate | `?cert` |
+| work | Staff leaderboard, private write-ups, opt-in inspections | `?top`, `?wu`, `?insp` |
+| conditioning | Trance sessions for each species and level, tiers, nicknames | `?depth`, `?hyp`, `?trance`, `?wake` |
+| shows | Udder judging, breeding stand, cart race, obedience trial, ribbons, placards | `?show`, `?ribbons`, `?sign` |
+| map-tools | Opt-in fenced pens, weekly heat map | `?pen`, `?fence on`, `?busy` |
 
 ## Spots and zones the add-ons use
 
@@ -148,3 +148,13 @@ These rules are checked against the game's own code (`ChatRoom.js`, `Speech.js`,
 - **Daily report card:**
   - One morning beep per person summarising yesterday: milk, loads taken, chores, ribbons, needs.
   - This reuses the summary-beep idea, so nobody gets spammed.
+
+## The command queue
+
+Every command goes through one queue, so none get lost:
+- **Commands sent too quickly** wait their turn, in order: up to 10 per person, or 2 for room chat so nobody floods the room. Past that, the person is told to slow down instead of being ignored.
+- **A double tap** of the same command within a second and a half runs once.
+- **Stale commands:** anything that has waited over 5 minutes is dropped, and the person is told so.
+- **Errors:** a command that breaks, in the bot or an add-on, still answers ("hit a snag"), and the farm log records which command it was and why.
+- **Disconnects:** messages wait out a dropped connection and go out once it's back. A message that fails to send is retried twice.
+- **Stuck timers:** a pacing timer that never fires can't freeze sending. Each heartbeat also moves anything waiting.

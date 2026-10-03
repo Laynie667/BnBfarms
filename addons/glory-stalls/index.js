@@ -303,9 +303,9 @@ connect({
     "?stalls is the board. Staff: ?stall shift <who> <minutes>, ?stall punish <who> <minutes>, ?stall release <who>. Step off the spot to stop; ?safe always works.",
   setup(a) { api = a; D(); },
   commands: {
-    glory: { private: true, run: cmdGlory },
-    stall: { private: true, run: cmdStall },
-    stalls: { private: true, run: (c) => c.reply(board(c.api.isStaff(c.sender))) },
+    glory: { usage: "glory on|off", private: true, run: cmdGlory },
+    stall: { usage: "stall use|shift|punish|release", private: true, run: cmdStall },
+    stalls: { usage: "stalls", private: true, run: (c) => c.reply(board(c.api.isStaff(c.sender))) },
   },
   on: { tick, safe: onSafe },
   companion,

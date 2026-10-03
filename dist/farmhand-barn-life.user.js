@@ -276,11 +276,11 @@
       D();
     },
     commands: {
-      needs: { private: true, run: cmdNeeds },
-      eat: { run: (c) => eat(c.sender, c.reply) },
-      drink: { run: (c) => drink(c.sender, c.reply) },
-      refill: { rank: "staff", run: cmdRefill },
-      groom: { rank: "staff", run: cmdGroom }
+      needs: { usage: "needs on|off", private: true, run: cmdNeeds },
+      eat: { usage: "eat", run: (c) => eat(c.sender, c.reply) },
+      drink: { usage: "drink", run: (c) => drink(c.sender, c.reply) },
+      refill: { usage: "refill <trough>", rank: "staff", run: cmdRefill },
+      groom: { usage: "groom <who>", rank: "staff", run: cmdGroom }
     },
     on: { tick, activity: onActivity, nurse: milkDrunk },
     rates: { milk: rate },

@@ -16,23 +16,42 @@
     state.cooldowns.set(mn, Date.now());
     return false;
   }
-  // A private command (panel, whisper, beep, /bot) that came too soon waits its turn instead of
-  // vanishin'. Only room-chat spam is dropped. Up to 5 wait per person, run one per gap.
+  /* THE COMMAND QUEUE. A command that comes too soon after that person's last one waits its turn, in
+     order, instead of vanishin'. Up to 10 wait per person (2 for room chat, so nobody floods the room);
+     past that they're told to slow down. One runner handles everybody: a short timer, plus the heartbeat
+     as a safety net, so a lost timer can never strand a command. Anything waitin' over 5 minutes is
+     dropped as stale, and they're told. */
   function waitYourTurn(mn, raw, channel){
     state.cmdWaiting = state.cmdWaiting || new Map();
     const q = state.cmdWaiting.get(mn) || [];
-    if (q.length >= 5) return;
-    q.push({ raw, channel }); state.cmdWaiting.set(mn, q);
-    if (q.length > 1) return;   // a timer's already runnin' for 'em
-    const next = () => {
-      const left = cooldownMs(channel) - (Date.now() - (state.cooldowns.get(mn)||0));
-      later(() => {
-        const item = q.shift();
-        if (!q.length) state.cmdWaiting.delete(mn); else next();
-        if (item) handleCommand(mn, item.raw, item.channel);
-      }, Math.max(50, left + 50));
-    };
-    next();
+    const cap = channel === "chat" ? 2 : 10;
+    if (q.length >= cap){
+      if (channel !== "chat") reply(mn, "Whoa there, sugar, that's a lot at once! I've got "+q.length+" of yours lined up already. Let me catch up, then send that one again.", channel);
+      return;
+    }
+    q.push({ raw, channel, at: Date.now() }); state.cmdWaiting.set(mn, q);
+    scheduleCommands();
+  }
+  function scheduleCommands(ms){
+    if (state.cmdTimer) return;
+    state.cmdTimer = later(() => { state.cmdTimer = null; runWaiting(); }, ms || 250);
+  }
+  function runWaiting(){
+    const m = state.cmdWaiting; if (!m || !m.size) return;
+    let more = false;
+    for (const [mn, q] of m){
+      if (!q.length){ m.delete(mn); continue; }
+      const item = q[0];
+      if (Date.now() - item.at > 5*60000){   // gone stale (the bot was busy or offline): say so
+        q.shift(); more = more || q.length > 0;
+        reply(mn, "Sorry, sugar, ?"+String(item.raw).slice(0,40)+" waited too long and I let it go. Send it again if you still need it.", item.channel);
+        continue;
+      }
+      if (Date.now() - (state.cooldowns.get(mn)||0) < cooldownMs(item.channel)){ more = true; continue; }
+      q.shift(); if (q.length) more = true; else m.delete(mn);
+      handleCommand(mn, item.raw, item.channel, true);
+    }
+    if (more) scheduleCommands();
   }
 
   // Plain-English questions sent straight to the bot (whisper, beep, /bot).

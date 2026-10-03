@@ -1771,6 +1771,34 @@
     return Object.assign({}, d, { from: data.Sender });
   }
 
+  // shared/guides.js
+  var PUBLIC_GROUPS = [
+    { name: "Safety", cmds: ["safe", "stuck", "staff", "report"] },
+    { name: "Gettin' started", cmds: ["help", "help me", "rules", "consent", "tour", "apply", "friend", "species", "luxury", "doors", "addons"] },
+    { name: "You and the farm", cmds: ["record", "keys", "who", "herd", "notice", "weather", "feeding", "curfew", "beg"] },
+    { name: "Milk", cmds: ["stats", "board", "milkable", "quota"] },
+    { name: "Breedin'", cmds: ["breedable", "fertile", "freeuse", "jarok", "yes", "no", "naturalheat", "breed <who>", "cum <who>", "wash", "tally", "eggs", "praise", "degrade", "rights", "accept", "pedigree"] },
+    { name: "Body", cmds: ["size", "measure", "penis", "futa", "gender <word>"] },
+    { name: "Clothes", cmds: ["outfit", "outfits", "uniform", "outfit back"] },
+    { name: "Mind", cmds: ["hypno", "teaseme"] },
+    { name: "Fun", cmds: ["fair", "enter"] }
+  ];
+  var STAFF_GROUPS = [
+    { name: "Books", cmds: ["queue", "app <n>", "approve <who> livestock", "deny <who>", "appclear", "roster", "stock", "find <who>", "record <who>", "note <who>", "signed", "addfriend <who>", "unregister <who>"] },
+    { name: "Herd", cmds: ["claim <who>", "release <who>", "myherd", "herdname <name>", "herdcall", "herdsummon", "turnout <who>", "letup <who>", "brand <who>", "walk <who>"] },
+    { name: "Stock", cmds: ["tier <who> <tier>", "stocks <who>", "unstock <who>", "vet <who>", "inspect <who>", "tease list"] },
+    { name: "Contracts", cmds: ["contract list", "contract show deep <who>", "contract offer deep <who> 1w", "contract check <who>", "contract release <who>", "contract rules", "contracts"] },
+    { name: "Outfits", cmds: ["outfit", "outfit offer <who>", "outfit offer <who> <species> <gender>"] },
+    { name: "Barn", cmds: ["milk <who>", "collect <who>", "jars", "inseminate <who> <jar>", "machine <who> <jar>", "drain <who>", "edge <who>", "denial <who>", "ruin <who>", "nomilk <who> <hours>", "quota <who>", "heat <who>", "heatline", "shotlog"] },
+    { name: "Map", cmds: ["spot", "spot set <name>", "spot place <name> <x> <y>", "zone", "zone who", "zone a <name>", "zone b <name>", "zone box <name> <ax> <ay> <bx> <by>", "zone pair <name> <group>", "tourstop", "setrescue", "where", "stucklog"] },
+    { name: "Voice", cmds: ["voice", "voice on herd", "voice add herd <line>", "voice every herd 15"] },
+    { name: "Work and play", cmds: ["clockin", "clockout", "hours", "done", "chores", "chore add <job> @<place>", "wheel", "spin", "begphrase", "score"] },
+    { name: "Keys and calls", cmds: ["keys <who>", "keysync", "keydump", "grant <who> <tier>", "revoke <who>", "forced", "summon <who>", "summon all", "pasture", "onduty", "cover"] }
+  ];
+  var OWNER_GROUPS = [
+    { name: "Proprietors", cmds: ["staffadd <who> <role>", "staffremove <who>", "goldkey <who>", "notice <text>", "feeding on", "curfew on", "fair open", "addons off <name>", "addons on <name>", "backup", "health"] }
+  ];
+
   // bot/src/version.js
   var VERSION = "0.11.0";
 
@@ -3409,14 +3437,27 @@
       pump();
     }
     function pump() {
+      if (state.sending && Date.now() - (state.sentAt || 0) > CFG.SEND_INTERVAL_MS * 5 + 3e3) state.sending = false;
       if (state.sending) return;
-      const m = state.urgent.shift() || state.replies && state.replies.shift() || state.queue.shift();
+      const lane = state.urgent.length ? state.urgent : state.replies && state.replies.length ? state.replies : state.queue;
+      const m = lane[0];
       if (!m) return;
+      if (!socketAlive()) {
+        if (!state.sendRetry) state.sendRetry = later(() => {
+          state.sendRetry = null;
+          pump();
+        }, 2e3);
+        return;
+      }
+      lane.shift();
       state.sending = true;
+      state.sentAt = Date.now();
       try {
         W.ServerSend(m.ev, m.data);
       } catch (e) {
         warn("send:", e);
+        m.tries = (m.tries || 0) + 1;
+        if (m.tries < 3) lane.unshift(m);
       }
       later(() => {
         state.sending = false;
@@ -3855,6 +3896,8 @@
         if (isStaff(mn)) Object.assign(s, staffStateFor(mn));
         const mods = addonStateFor(mn);
         if (mods) s.mods = mods;
+        const ac = addonCommandGroups(mn);
+        if (ac.length) s.addonCmds = ac;
         if (isProprietor(mn)) {
           outfitsLedger();
           s.outfits = {};
@@ -5898,7 +5941,8 @@
       ]);
       if (makesMilk(mn)) sec("🍼 MILK", [
         (p.milk < 1 ? "Dry · " : "") + ml(p.milk) + " of " + ml(milkCap(mn)) + " · grade " + milkGrade(mn) + (p.milk >= milkCap(mn) - 1 ? " · full and achin'" : ""),
-        "Last milked " + ago(p.lastMilkAt)
+        "Last milked " + ago(p.lastMilkAt),
+        p.stall && p.stall.until && "In the milkin' stall: " + Math.max(0, Math.ceil((p.stall.until - Date.now()) / 6e4)) + " min till you're down to a quarter"
       ]);
       if (makesSemen(mn)) sec("💦 SEMEN", [
         ml(p.semen) + " of " + ml(semenCap(mn)) + " · last collected " + ago(p.lastCollectAt),
@@ -6356,7 +6400,10 @@
       outfitsLedger();
       const o = slot && L.outfits[slot];
       if (!o) return "There's no outfit saved for that, sugar. ?outfit shows what's saved.";
-      if (!hasCompanion(mn)) return plainName(mn) + " isn't runnin' the Companion, so I can't hand 'em an outfit. They can still dress by hand.";
+      if (!hasCompanion(mn)) {
+        tell(mn, "👗 The farm has your " + slotLabel(slot) + " ready" + (why ? " (" + why + ")" : "") + ". The Companion can put it on you in one tap; without it, staff can help you dress by hand.");
+        return plainName(mn) + " isn't runnin' the Companion, so I can't hand 'em an outfit. I've told 'em it's ready, and they can dress by hand.";
+      }
       enqueue(makeMsg("outfit", { slot, label: slotLabel(slot), data: o.data, keys: outfitKeysFor(mn), why: why || "", id: ++companionSeq }, mn));
       audit(CFG.BOT_MEMBER, "OUTFIT_OFFER", mn + " " + slot);
       return "";
@@ -6817,6 +6864,11 @@
         if (!c || typeof c.run !== "function") continue;
         a.commands[word] = c;
         ADDON_CMDS.set(word, { addon: a, def: c });
+        for (const al0 of c.aliases || []) {
+          const al = String(al0).toLowerCase();
+          if (PUBLIC_CMDS.includes(al) || STAFF_CMDS.includes(al) || ADDON_CMDS.has(al)) continue;
+          ADDON_CMDS.set(al, { addon: a, def: c });
+        }
       }
       ADDONS.set(name, a);
       if (typeof def.setup === "function") addonCall(a, "setup", def.setup, a.api);
@@ -6826,7 +6878,7 @@
     function unregisterAddon(name) {
       const a = ADDONS.get(name);
       if (!a) return false;
-      for (const w of Object.keys(a.commands)) ADDON_CMDS.delete(w);
+      for (const [w, hit] of [...ADDON_CMDS]) if (hit.addon === a) ADDON_CMDS.delete(w);
       ADDONS.delete(name);
       return true;
     }
@@ -6846,7 +6898,13 @@
         answered = true;
         R(t);
       } };
+      const errs = a.errors || 0;
       addonCall(a, "?" + Object.keys(a.commands).find((w) => a.commands[w] === def), def.run, ctx);
+      if ((a.errors || 0) > errs) {
+        audit(sender, "ADDON_ERROR", a.name + " · " + (a.lastError || ""));
+        R("Oops, sugar, that one hit a snag in the " + a.label + " add-on. It's in the farm log for the proprietors. Try again in a bit, or ask staff.");
+        return;
+      }
       if (!answered && channel !== "chat" && !(state.cmdWatch && state.cmdWatch.emotes.length))
         R("👍 Done.");
     }
@@ -6871,11 +6929,20 @@
       }
       return Object.keys(out).length ? out : void 0;
     }
+    function addonCommandGroups(mn) {
+      const rank = rankOf(mn), out = [];
+      for (const a of ADDONS.values()) {
+        if (a.enabled === false) continue;
+        const cmds = Object.entries(a.commands).filter(([, c]) => rank >= (RANKS[c.rank || "anyone"] || 0)).map(([w, c]) => c.usage || w);
+        if (cmds.length) out.push({ name: a.label, cmds });
+      }
+      return out;
+    }
     function addonsText(topic) {
       if (topic) {
         const a = ADDONS.get(String(topic).toLowerCase()) || [...ADDONS.values()].find((x) => x.label.toLowerCase() === String(topic).toLowerCase());
         if (!a) return "There's no add-on called '" + topic + "', hon. ?addons lists 'em.";
-        return "🧩 " + a.label + " v" + a.version + (a.enabled === false ? " (switched off)" : "") + "\n" + (a.guide || "No guide written yet.") + "\n\nCommands: " + (Object.keys(a.commands).map((c) => "?" + c).join(" · ") || "none");
+        return "🧩 " + a.label + " v" + a.version + (a.enabled === false ? " (switched off)" : "") + "\n" + (a.guide || "No guide written yet.") + "\n\nCommands: " + (Object.entries(a.commands).map(([w, c]) => "?" + (c.usage || w) + (c.rank && c.rank !== "anyone" ? " (" + c.rank + ")" : "")).join(" · ") || "none");
       }
       if (!ADDONS.size) return "🧩 No add-ons are runnin' on the farm right now.";
       return "🧩 FARM ADD-ONS\n" + [...ADDONS.values()].map((a) => "• " + a.label + " (" + a.name + ")" + (a.enabled === false ? " · off" : "") + (a.errors ? " · " + a.errors + " errors" : "") + ": " + (Object.keys(a.commands).map((c) => "?" + c).join(" ") || "no commands")).join("\n") + "\n?addons <name> shows one add-on's guide.";
@@ -6980,6 +7047,8 @@ Well hey there, %name%! I'm the gal behind the desk. 💕
     body · cocks · shots
   Farm life
     life · fair
+  Farm extras
+    ?addons lists them · ?help <name> explains one
   Everything
     me (every command you can use)`;
     TEXT.staffhelp = `🌾 STAFF GUIDES · say ?help and a topic, like ?help herd 🌾
@@ -7600,32 +7669,19 @@ UPKEEP
       if (t === "staffmenu") return isStaff(sender) ? TEXT.staffhelp : fill(TEXT.help, sender);
       if (t === "me") return myCommands(sender);
       if (STAFF_GUIDES.includes(t) && !isStaff(sender)) return GUIDES[t + "s"] || "Aw, that guide's just for staff, sugar. Say ?help to see the ones for you.";
-      return GUIDES[t] ? GUIDES[t] : "Hmm, I don't have a guide called '" + t0 + "', hon. Try one of these: start, safety, keys, herds, tiers, barn, breeding, pregnancy, heat, body, cocks, shots, life, fair or me. For example: ?help breeding";
+      if (GUIDES[t]) return GUIDES[t];
+      const a = ADDONS.get(t) || [...ADDONS.values()].find((x) => x.label.toLowerCase() === t || x.commands[t]);
+      if (a) return addonsText(a.name);
+      return "Hmm, I don't have a guide called '" + t0 + "', hon. Try one of these: start, safety, keys, herds, tiers, barn, breeding, pregnancy, heat, body, cocks, shots, life, fair or me" + (ADDONS.size ? ", or an add-on: " + [...ADDONS.keys()].join(", ") : "") + ". For example: ?help breeding";
     }
     function myCommands(mn) {
-      const group = (title, list) => "\n" + title + "\n  " + list;
-      let o = "📋 EVERYTHING YOU CAN ASK ME, SUGAR\n";
-      o += group("🔴 Safety", "safe · stuck · staff · report");
-      o += group("🌾 Gettin' started", "help · rules · consent · tour · apply · friend · species · luxury · doors");
-      o += group("📖 You & the farm", "record · keys · who · herd · notice · weather · feeding · curfew · beg");
-      o += group("🥛 Milk", "stats · board · milkable · quota");
-      o += group("🐂 Breedin'", "breedable · fertile · freeuse · yes · no · naturalheat · breed · cum · wash · tally · eggs · praise · degrade · rights · accept · pedigree");
-      o += group("📏 Body", "size · measure · penis · futa · gender");
-      o += group("🎪 Fun", "fair · enter · teaseme");
-      if (isStaff(mn)) {
-        o += "\n\n🧑‍🌾 STAFF";
-        o += group("📖 Books", "queue · app · approve · deny · appclear · roster · stock · find · record <who> · note · signed · addfriend · unregister");
-        o += group("🐄 Herd", "claim · release · myherd · herdname · herdcall · herdsummon · turnout · letup · brand · walk");
-        o += group("🎀 Stock", "tier · stocks · unstock · vet · inspect · tease");
-        o += group("📜 Contracts", "contract list · contract show · contract offer · contract release · contract check · contract rules");
-        o += group("👗 Outfits", "outfit · outfit offer <who> [slot] · outfit back");
-        o += group("🥛 Barn", "milk · collect · jars · inseminate · drain · edge · denial · ruin · nomilk · quota <who> · heat · heatline · shotlog");
-        o += group("🗺️ Farm", "spot · tourstop · setrescue · where · stucklog");
-        o += group("⏱️ Work & play", "clockin · clockout · hours · done · chores · chore · wheel · spin · begphrase · score");
-        o += group("🔑 Keys & calls", "keys <who> · keysync · keydump · grant · revoke · forced · summon · pasture · onduty · cover");
-      }
-      if (isProprietor(mn)) o += "\n\n👑 PROPRIETOR" + group("", "staffadd · staffremove · goldkey · notice <text> · feeding on|off · curfew on|off · fair open|close · backup · health").replace(/^\n\n/, "\n");
-      return o + "\n\nSay ?help and a topic (like ?help breeding) and I'll explain any of it, hon.";
+      const line = (g) => "\n" + g.name + "\n  " + g.cmds.join(" · ");
+      let o = "📋 EVERYTHING YOU CAN ASK ME, SUGAR\n" + PUBLIC_GROUPS.map(line).join("");
+      if (isStaff(mn)) o += "\n\n🧑‍🌾 STAFF" + STAFF_GROUPS.map(line).join("");
+      if (isProprietor(mn)) o += "\n\n👑 PROPRIETOR" + OWNER_GROUPS.map(line).join("");
+      const extras = addonCommandGroups(mn);
+      if (extras.length) o += "\n\n🧩 FARM EXTRAS (add-ons)" + extras.map(line).join("");
+      return o + "\n\nSay ?help and a topic (like ?help breeding) and I'll explain any of it, hon. ?addons <name> explains an add-on.";
     }
     TEXT.rules = `🌾 B&B FARM — HOUSE RULES 🌾 (v1.0)
 
@@ -7826,7 +7882,11 @@ Chat in the room all you like; I'll only count what you send me direct.`,
       }
       const q = list[s.step], text = s.step + 1 + "/" + list.length + " — " + q.text;
       if (q.choices && hasCompanion(mn)) enqueue(makeMsg("choose", { text, choices: q.choices(), id: ++companionSeq }, mn));
-      else reply(mn, text, s.ch);
+      else {
+        const ch = q.choices ? q.choices() : [];
+        const listed = ch.length && ch.every((c) => text.toLowerCase().includes(String(c).toLowerCase()));
+        reply(mn, text + (ch.length && !listed ? "\nPick one: " + ch.join(" / ") : ""), s.ch);
+      }
     }
     function handleApplicationAnswer(mn, text, channel) {
       const s = state.sessions.get(mn);
@@ -7933,20 +7993,48 @@ Welcome to B&B Farm. Mind the ruts! 🌾`,
     function waitYourTurn(mn, raw, channel) {
       state.cmdWaiting = state.cmdWaiting || /* @__PURE__ */ new Map();
       const q = state.cmdWaiting.get(mn) || [];
-      if (q.length >= 5) return;
-      q.push({ raw, channel });
+      const cap = channel === "chat" ? 2 : 10;
+      if (q.length >= cap) {
+        if (channel !== "chat") reply(mn, "Whoa there, sugar, that's a lot at once! I've got " + q.length + " of yours lined up already. Let me catch up, then send that one again.", channel);
+        return;
+      }
+      q.push({ raw, channel, at: Date.now() });
       state.cmdWaiting.set(mn, q);
-      if (q.length > 1) return;
-      const next = () => {
-        const left = cooldownMs(channel) - (Date.now() - (state.cooldowns.get(mn) || 0));
-        later(() => {
-          const item = q.shift();
-          if (!q.length) state.cmdWaiting.delete(mn);
-          else next();
-          if (item) handleCommand(mn, item.raw, item.channel);
-        }, Math.max(50, left + 50));
-      };
-      next();
+      scheduleCommands();
+    }
+    function scheduleCommands(ms) {
+      if (state.cmdTimer) return;
+      state.cmdTimer = later(() => {
+        state.cmdTimer = null;
+        runWaiting();
+      }, ms || 250);
+    }
+    function runWaiting() {
+      const m = state.cmdWaiting;
+      if (!m || !m.size) return;
+      let more = false;
+      for (const [mn, q] of m) {
+        if (!q.length) {
+          m.delete(mn);
+          continue;
+        }
+        const item = q[0];
+        if (Date.now() - item.at > 5 * 6e4) {
+          q.shift();
+          more = more || q.length > 0;
+          reply(mn, "Sorry, sugar, ?" + String(item.raw).slice(0, 40) + " waited too long and I let it go. Send it again if you still need it.", item.channel);
+          continue;
+        }
+        if (Date.now() - (state.cooldowns.get(mn) || 0) < cooldownMs(item.channel)) {
+          more = true;
+          continue;
+        }
+        q.shift();
+        if (q.length) more = true;
+        else m.delete(mn);
+        handleCommand(mn, item.raw, item.channel, true);
+      }
+      if (more) scheduleCommands();
     }
     const NATURAL = [
       [/^(who|what) are you\b/, "help"],
@@ -8262,11 +8350,24 @@ Welcome to B&B Farm. Mind the ruts! 🌾`,
       if (oncall.length) o += "\n\n🔗 On call, away: " + oncall.length + " — ?summon to fetch 'em, sugar";
       return o;
     }
-    function handleCommand(sender, raw, channel) {
+    function handleCommand(sender, raw, channel, fromQueue) {
+      if (!fromQueue) {
+        state.lastCmd = state.lastCmd || /* @__PURE__ */ new Map();
+        const prev = state.lastCmd.get(sender), key = channel + "|" + String(raw).trim().toLowerCase();
+        if (prev && prev.key === key && Date.now() - prev.at < 1500) return;
+        state.lastCmd.set(sender, { key, at: Date.now() });
+      }
       state.inReply = true;
       const watch = channel === "companion" ? state.cmdWatch = { mn: sender, replied: false, emotes: [] } : null;
       try {
         return handleCommandInner(sender, raw, channel);
+      } catch (e) {
+        warn("command failed: ?" + String(raw).slice(0, 60) + " from " + sender + ":", e);
+        audit(sender, "CMD_ERROR", String(raw).slice(0, 60) + " · " + String(e && e.message || e).slice(0, 120));
+        try {
+          reply(sender, "Oops, sugar, ?" + String(raw).slice(0, 40) + " hit a snag on my end. It's written in the farm log for the proprietors. Try again in a bit, or ask staff.", channel);
+        } catch (e2) {
+        }
       } finally {
         state.inReply = false;
         state.cmdWatch = null;
@@ -8318,7 +8419,7 @@ Welcome to B&B Farm. Mind the ruts! 🌾`,
         return;
       }
       if (onCooldown(sender, cmd, channel)) {
-        if (channel !== "chat") waitYourTurn(sender, raw, channel);
+        waitYourTurn(sender, raw, channel);
         return;
       }
       dbg("CMD:", cmd, "from", sender, "via", channel);
@@ -9851,15 +9952,16 @@ Welcome to B&B Farm. Mind the ruts! 🌾`,
         }
         /* ── PAPERWORK ── */
         case "queue": {
+          const mailLine = "📮 Messages: " + (state.queue.length + state.urgent.length) + " waitin' to send · " + Object.keys(L.mailbox || {}).length + " people with messages held · " + (state.mutual ? state.mutual.set.size : "?") + " online and beep-able";
           if (!L.applications.length) {
-            R("Queue's empty, hon. Quiet week!");
+            R("Queue's empty, hon. Quiet week!\n" + mailLine);
             break;
           }
           let o = "📋 PENDING APPLICATIONS (" + L.applications.length + ")\n";
           L.applications.forEach((a, i) => {
             o += "\n" + (i + 1) + ". " + a.name + " (" + a.mn + ")" + (a.staffTrack ? " [staff]" : "") + "\n   " + ["role", "species", "gender", "stay", "depth"].map((k) => appAnswer(a, k) || "?").join(" • ");
           });
-          o += "\n\nSay ?app and the number to read one, like ?app 1.";
+          o += "\n\nSay ?app and the number to read one, like ?app 1.\n" + mailLine;
           R(o);
           break;
         }
@@ -11697,6 +11799,8 @@ Welcome to B&B Farm, hon. 🌾`
         const oc = forcedStaff().length;
         setBadge("on duty — " + Object.keys(L.people).length + " reg · " + fl + " friends · " + oc + " on call" + (admin ? "" : " ⚠️NOT ADMIN"), admin ? "#b8ff9b" : "#ffc49b");
         keepalive();
+        runWaiting();
+        pump();
         if (Date.now() - (state.lastMutualAsk || 0) > 6e4) {
           state.lastMutualAsk = Date.now();
           askMutual();

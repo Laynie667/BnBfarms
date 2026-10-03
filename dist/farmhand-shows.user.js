@@ -253,7 +253,7 @@
     if (String(args[0] || "").toLowerCase() === "set") {
       if (!A.isStaff(sender)) return c.reply("Staff write the placards, sugar.");
       const name = String(args[1] || "").toLowerCase().replace(/^placard-/, ""), text = rest.split(/\s+/).slice(2).join(" ").trim();
-      if (!name || !text) return c.reply("?placard set <name> <text>, for a spot called placard-<name>.");
+      if (!name || !text) return c.reply("?sign set <name> <text>, for a spot called placard-<name>.");
       d.placards[name] = text.slice(0, 400);
       A.save();
       return c.reply("🪧 Placard " + name + " written." + (A.spot("placard-" + name) ? "" : " (Set a spot called placard-" + name + " so people can read it there.)"));
@@ -282,18 +282,18 @@
     name: "shows",
     label: "Shows",
     version: "1.0.0",
-    guide: "Staff: ?show open udder | breeding | race | obedience, ?show score <who> <1-10>, ?show cue <who> <cue>, ?show go (race), ?show close. Stock: ?show enter. Ribbons stay on your record (?ribbons); your latest one gets shown off. Placards: ?placard by a placard spot; staff ?placard set <name> <text>.",
+    guide: "Staff: ?show open udder | breeding | race | obedience, ?show score <who> <1-10>, ?show cue <who> <cue>, ?show go (race), ?show close. Stock: ?show enter. Ribbons stay on your record (?ribbons); your latest one gets shown off. Placards: ?sign by a placard spot; staff ?sign set <name> <text>.",
     setup(a) {
       api = a;
       D();
     },
     commands: {
-      show: { private: true, run: cmdShow },
-      ribbons: { private: true, run: (c) => {
+      show: { usage: "show open|enter|score|cue|go|close", private: true, run: cmdShow },
+      ribbons: { usage: "ribbons", private: true, run: (c) => {
         const t = c.args[0] ? c.api.find(c.args[0]) : c.sender, r = t && D().ribbons[t] || [];
         c.reply(r.length ? "🎀 RIBBONS — " + c.api.name(t) + "\n" + r.map((x) => PLACES[x.place] + " · " + EVENTS[x.event] + " · " + new Date(x.at).toLocaleDateString()).join("\n") : t ? c.api.name(t) + " has no ribbons yet." : "Who's that, hon?");
       } },
-      placard: { private: true, run: cmdPlacard }
+      sign: { usage: "sign [set <name> <text>]", aliases: ["placard"], private: true, run: cmdPlacard }
     },
     on: { join: onJoin, roleplay: onRoleplay },
     companion

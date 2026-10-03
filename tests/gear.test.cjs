@@ -42,7 +42,7 @@ const lastTo=mn=>{const w=sent.filter(s=>(s[0]==='AccountBeep'&&s[1].MemberNumbe
   C(500).Appearance=[I('ItemNipples','LactationPump',{SuctionLevel:0,TypeRecord:{typed:0}})]; m0=P(500).milk; await tick();
   out('1 pump Off milks nothin\' ->', P(500).milk===m0);
   // 2. Echo's portable pump: faster when aroused
-  C(500).Appearance=[I('ItemTorso','便携乳泵',{TypeRecord:{s:0}})]; C(500).ArousalSettings={Progress:100};
+  C(500).Appearance=[I('ItemTorso','便携乳泵',{TypeRecord:{s:0},Intensity:0})]; C(500).ArousalSettings={Progress:100};
   m0=P(500).milk; await tick();
   out('2 Echo pump at full arousal: 40 mL a minute ->', Math.round((m0-P(500).milk)*3)===40);
   C(500).ArousalSettings={Progress:0}; m0=P(500).milk; await tick();

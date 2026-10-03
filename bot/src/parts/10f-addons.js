@@ -158,6 +158,12 @@
       if (!c || typeof c.run !== "function") continue;
       a.commands[word] = c;
       ADDON_CMDS.set(word, { addon:a, def:c });
+      // longer spellings that also work (?leaderboard for ?top); lists only show the short one
+      for (const al0 of (c.aliases || [])){
+        const al = String(al0).toLowerCase();
+        if (PUBLIC_CMDS.includes(al) || STAFF_CMDS.includes(al) || ADDON_CMDS.has(al)) continue;
+        ADDON_CMDS.set(al, { addon:a, def:c });
+      }
     }
     ADDONS.set(name, a);
     if (typeof def.setup === "function") addonCall(a, "setup", def.setup, a.api);
@@ -166,7 +172,7 @@
   }
   function unregisterAddon(name){
     const a = ADDONS.get(name); if (!a) return false;
-    for (const w of Object.keys(a.commands)) ADDON_CMDS.delete(w);
+    for (const [w, hit] of [...ADDON_CMDS]) if (hit.addon === a) ADDON_CMDS.delete(w);   // its commands and their aliases
     ADDONS.delete(name); return true;
   }
 
@@ -178,7 +184,13 @@
     if (rankOf(sender) < need){ R("Sorry, sugar, that one's for "+(def.rank === "proprietor" ? "proprietors" : def.rank === "herdmaster" ? "herdmasters and proprietors" : "farm staff")+"."); return; }
     let answered = false;
     const ctx = { sender, args, rest, channel, api: a.api, reply: (t) => { answered = true; R(t); } };
+    const errs = a.errors || 0;
     addonCall(a, "?"+Object.keys(a.commands).find(w => a.commands[w] === def), def.run, ctx);
+    if ((a.errors || 0) > errs){   // it broke: say so, never "Done"
+      audit(sender, "ADDON_ERROR", a.name+" · "+(a.lastError||""));
+      R("Oops, sugar, that one hit a snag in the "+a.label+" add-on. It's in the farm log for the proprietors. Try again in a bit, or ask staff.");
+      return;
+    }
     if (!answered && channel !== "chat" && !(state.cmdWatch && state.cmdWatch.emotes.length))
       R("👍 Done.");   // an add-on that forgot to answer still gets a word back
   }
@@ -205,12 +217,23 @@
     return Object.keys(out).length ? out : undefined;
   }
 
+  // the add-on commands this person may use, as groups like the shared ones ({ name, cmds })
+  function addonCommandGroups(mn){
+    const rank = rankOf(mn), out = [];
+    for (const a of ADDONS.values()){
+      if (a.enabled === false) continue;
+      const cmds = Object.entries(a.commands).filter(([, c]) => rank >= (RANKS[c.rank || "anyone"] || 0)).map(([w, c]) => c.usage || w);
+      if (cmds.length) out.push({ name: a.label, cmds });
+    }
+    return out;
+  }
+
   function addonsText(topic){
     if (topic){
       const a = ADDONS.get(String(topic).toLowerCase()) || [...ADDONS.values()].find(x => x.label.toLowerCase() === String(topic).toLowerCase());
       if (!a) return "There's no add-on called '"+topic+"', hon. ?addons lists 'em.";
       return "🧩 "+a.label+" v"+a.version+(a.enabled === false ? " (switched off)" : "")+"\n"+(a.guide || "No guide written yet.")+
-             "\n\nCommands: "+(Object.keys(a.commands).map(c => "?"+c).join(" · ") || "none");
+             "\n\nCommands: "+(Object.entries(a.commands).map(([w, c]) => "?"+(c.usage || w)+(c.rank && c.rank !== "anyone" ? " ("+c.rank+")" : "")).join(" · ") || "none");
     }
     if (!ADDONS.size) return "🧩 No add-ons are runnin' on the farm right now.";
     return "🧩 FARM ADD-ONS\n"+[...ADDONS.values()].map(a => "• "+a.label+" ("+a.name+")"+(a.enabled === false ? " · off" : "")+

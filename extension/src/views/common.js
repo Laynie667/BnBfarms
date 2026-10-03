@@ -7,7 +7,9 @@ import { BOOKS, PUBLIC_GROUPS, STAFF_GROUPS, OWNER_GROUPS, needsInput, cmdStem }
 
 export function guidesTab(ctx, staff) {
   const q = (ctx.ui.search || "").toLowerCase();
-  const groups = PUBLIC_GROUPS.concat(staff ? STAFF_GROUPS : [], staff && ctx.s.proprietor ? OWNER_GROUPS : []);
+  // the same groups the bot's "?help me" lists, plus the running add-ons' commands for this person's rank
+  const groups = PUBLIC_GROUPS.concat(staff ? STAFF_GROUPS : [], staff && ctx.s.proprietor ? OWNER_GROUPS : [],
+    (ctx.s.addonCmds || []).map((g) => ({ name: "🧩 " + g.name, cmds: (g.cmds || []).map(String) })));
   const shown = groups.map((g) => ({ name: g.name, cmds: g.cmds.filter((c) => !q || c.includes(q) || g.name.toLowerCase().includes(q)) }))
     .filter((g) => g.cmds.length);
   const input = h("input", { class: "fhc-in", placeholder: "milk, breed, keys…", value: ctx.ui.search || "",

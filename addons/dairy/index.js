@@ -7,7 +7,7 @@
      praise or degradation for people who switched those on. Plain farm talk, no medical words.
      Switch this add-on off (?addons off dairy) and the bot's own lines come back.
    • Certificate: every week each person who was milked gets a certificate with their grade and how much
-     they gave. The new one replaces last week's. ?certificate shows yours (or somebody's, for staff).
+     they gave. The new one replaces last week's. ?cert shows yours (or somebody's, for staff).
 */
 import { connect, pick } from "../_lib/connect.js";
 
@@ -135,13 +135,14 @@ connect({
   label: "Dairy",
   version: "1.0.0",
   guide: "Warmer, more varied milking lines (pumps, Echo's pump and vendor, the milking stall), with a touch of praise or degradation if you switched those on. " +
-    "Every week you get a milk certificate with your grade and how much you gave; the new one replaces last week's. ?certificate shows yours.",
+    "Every week you get a milk certificate with your grade and how much you gave; the new one replaces last week's. ?cert shows yours.",
   setup(a) { api = a; D(); },
   commands: {
-    certificate: { private: true, run: (c) => {
+    cert: { usage: "cert", aliases: ["certificate"], private: true, run: (c) => {
       const t = c.args[0] ? c.api.find(c.args[0]) : c.sender;
       if (t !== c.sender && !c.api.isStaff(c.sender)) return c.reply("Only staff look at somebody else's certificate, sugar.");
-      c.reply("📜 " + (t ? (certText(t) || c.api.name(t) + " doesn't have a certificate yet.") : "Who's that, hon?"));
+      if (!t) return c.reply("Who's that, hon?");
+      c.reply("📜 " + (certText(t) || c.api.name(t) + " doesn't have a certificate yet.") + " · so far this week: " + c.api.ml(D().week.ml[t] || 0));
     } },
   },
   on: { tick },

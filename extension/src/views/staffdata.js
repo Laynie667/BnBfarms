@@ -30,7 +30,7 @@ export function tease(ctx) {
         h("button", { type: "button", class: "fhc-b", onclick: () => ctx.send("tease remove " + (i + 1)) }, "Remove"))) : muted("No lines yet.")),
     card(h("label", { class: "fhc-label" }, "New line · %name% becomes their name",
         h("textarea", { class: "fhc-in", rows: 2, oninput: (e) => ctx.setUi({ teaseDraft: e.target.value }, true) }, ctx.ui.teaseDraft || "")),
-      btn("Add line", () => { const t = (ctx.ui.teaseDraft || "").trim(); if (t) { ctx.send("tease add " + t); ctx.setUi({ teaseDraft: "" }); } }, true)),
+      btn("Add line", () => { const t = (ctx.ui.teaseDraft || "").trim(); if (!t) return ctx.hint("Write the line first."); ctx.send("tease add " + t); ctx.setUi({ teaseDraft: "" }); }, true)),
   ];
 }
 
@@ -55,10 +55,10 @@ export function zones(ctx) {
       btn("Who's where", () => ctx.send("zone who"))),
     card(title(sel ? "Editin' " + sel : "New zone"),
       h("label", { class: "fhc-label" }, "Zone name (one word)", h("input", { class: "fhc-in", value: ctx.ui.zoneName || sel || "", oninput: (e) => ctx.setUi({ zoneName: e.target.value }, true) })),
-      h("div", null, btn("Set A where I stand", () => name() && ctx.send("zone a " + name())), btn("Set B where I stand", () => name() && ctx.send("zone b " + name()))),
+      h("div", null, btn("Set A where I stand", () => name() ? ctx.send("zone a " + name()) : ctx.hint("Name the zone first.")), btn("Set B where I stand", () => name() ? ctx.send("zone b " + name()) : ctx.hint("Name the zone first."))),
       h("label", { class: "fhc-label" }, "Pair with (one place, odd shapes)", h("input", { class: "fhc-in", placeholder: "barn", value: ctx.ui.zonePair || "", oninput: (e) => ctx.setUi({ zonePair: e.target.value }, true) })),
-      h("div", null, btn("Pair", () => name() && ctx.ui.zonePair && ctx.send("zone pair " + name() + " " + ctx.ui.zonePair.trim().toLowerCase())),
-        btn("Unpair", () => name() && ctx.send("zone unpair " + name())), btn("Delete", () => name() && ctx.send("zone clear " + name())))),
+      h("div", null, btn("Pair", () => (name() && ctx.ui.zonePair) ? ctx.send("zone pair " + name() + " " + ctx.ui.zonePair.trim().toLowerCase()) : ctx.hint("Name the zone, and the place to pair it with.")),
+        btn("Unpair", () => name() ? ctx.send("zone unpair " + name()) : ctx.hint("Name the zone first.")), btn("Delete", () => name() ? ctx.send("zone clear " + name()) : ctx.hint("Name the zone first.")))),
   ];
 }
 
@@ -80,7 +80,7 @@ export function voice(ctx) {
       (cur.lines || []).length ? cur.lines.map((l, i) => h("div", { class: "fhc-kv" }, h("i", { style: { color: "#c9a3e6" } }, "[Voice] " + l),
         h("button", { type: "button", class: "fhc-b", onclick: () => ctx.send("voice remove " + who + " " + (i + 1)) }, "Remove"))) : muted("No lines yet."),
       h("label", { class: "fhc-label" }, "New line · %name% works", h("input", { class: "fhc-in", maxlength: 200, value: ctx.ui.vDraft || "", oninput: (e) => ctx.setUi({ vDraft: e.target.value }, true) })),
-      btn("Add", () => { const t = (ctx.ui.vDraft || "").trim(); if (t) { ctx.send("voice add " + who + " " + t); ctx.setUi({ vDraft: "" }); } }, true),
+      btn("Add", () => { const t = (ctx.ui.vDraft || "").trim(); if (!t) return ctx.hint("Write the line first."); ctx.send("voice add " + who + " " + t); ctx.setUi({ vDraft: "" }); }, true),
       h("label", { class: "fhc-label" }, "How often", h("select", { class: "fhc-sel", onchange: (e) => ctx.send("voice every " + who + " " + e.target.value) },
         [["5", "Every 5 minutes"], ["15", "Every 15 minutes"], ["30", "Every 30 minutes"], ["chores", "Only during milkin' and chores"]].map(([k, l]) =>
           h("option", { value: k, selected: String(cur.every) === k ? "selected" : null }, l))))),

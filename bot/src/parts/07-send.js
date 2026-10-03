@@ -30,6 +30,8 @@
         send("ChatRoomCharacterMapDataUpdate", C.MapData);
         later(()=>{
           try {
+            // only step back if I haven't walked over to somebody since
+            if (C.MapData.Pos.X !== nx || C.MapData.Pos.Y !== ny) return;
             C.MapData.Pos = back;
             send("ChatRoomCharacterMapDataUpdate", C.MapData);
           } catch(e){}
@@ -119,9 +121,46 @@
     later(()=>{ state.sending=false; pump(); }, CFG.SEND_INTERVAL_MS);
   }
   function enqueue(m, urgent){ send("ChatRoomChat", m, urgent); }
-  function say(t, urgent){ enqueue({ Content:t, Type:"Chat" }, urgent); }
+  // spoken out loud: only heard in hearing range of me on a map, so I step over to whoever it's about
+  function say(t, urgent, who){ walkTo(who || aboutWhom(t), urgent); enqueue({ Content:t, Type:"Chat" }, urgent); }
   // a room emote everybody nearby sees (no name in front; I write the whole line)
-  function emote(t){ for (const c of splitMessage(t, 900)) enqueue({ Content:"*"+c, Type:"Emote" }); }
+  /* MAP ROOMS: a player only sees my emotes while I'm in their sight, hears my chat inside their
+     hearing range, and gets my whispers within 1 tile (BC's "map room hearing distances").
+     So I walk over to whoever the emote is about before I make it, and my whispers start with "("
+     because out-of-character text is never range-filtered. */
+  const mapRoom = () => !!(W.ChatRoomData && W.ChatRoomData.MapData && W.ChatRoomData.MapData.Type && W.ChatRoomData.MapData.Type !== "Never");
+  function walkTo(mn, urgent){
+    if (!mn || !mapRoom()) return;
+    const me = charFor(CFG.BOT_MEMBER), them = charFor(mn);
+    const a = me && me.MapData && me.MapData.Pos, b = them && them.MapData && them.MapData.Pos;
+    if (!a || !b || b.X < 0 || b.Y < 0) return;
+    if (Math.max(Math.abs(a.X-b.X), Math.abs(a.Y-b.Y)) <= 2) return;   // close enough already
+    const to = spotBeside(mn);
+    if (!to) return;
+    me.MapData.Pos = { X: to.X, Y: to.Y };
+    send("ChatRoomCharacterMapDataUpdate", me.MapData, urgent);
+    state.walkedAt = Date.now();
+  }
+  // back to my home tile (?spot set home) once things have been quiet a little while
+  function homeTick(){
+    const home = spotFor("home"), me = charFor(CFG.BOT_MEMBER), p = me && me.MapData && me.MapData.Pos;
+    if (!home || !p || !mapRoom()) return;
+    if (p.X === home.X && p.Y === home.Y) return;
+    if (Date.now() - (state.walkedAt||0) < CFG.HOME_AFTER_S*1000) return;
+    me.MapData.Pos = { X: home.X, Y: home.Y };
+    send("ChatRoomCharacterMapDataUpdate", me.MapData);
+  }
+  // the first person on the map an emote is about (named in it)
+  function aboutWhom(text){
+    const here = (W.ChatRoomCharacter||[]).map(c => c.MemberNumber).filter(m => m !== CFG.BOT_MEMBER && onMap(m));
+    return here.length ? namedIn(String(text), here) : null;
+  }
+  // who: the person it's about (worked out from the names in it if left out)
+  function emote(t, who){
+    if (state.cmdWatch) state.cmdWatch.emotes.push(String(t));
+    walkTo(who || aboutWhom(t));
+    for (const c of splitMessage(t, 900)) enqueue({ Content:"*"+c, Type:"Emote" });
+  }
   // are they in the room and standin' on the map right now?
   function onMap(mn){
     const C = charFor(mn);
@@ -135,7 +174,10 @@
   function missing(...mns){ return mns.find(m => m && !onMap(m)) || null; }
   function whisper(target,text,urgent){
     if (hasCompanion(target)){ toCompanion(target, text, "notice", urgent); return; }
-    for (const c of splitMessage(text,900)) enqueue({ Content:c, Type:"Whisper", Target:target }, urgent);
+    // in a map room a whisper only reaches someone within 1 tile, unless it's out-of-character:
+    // everything after a "(" gets through, so I open one and keep any ")" in the text from closin' it
+    const ooc = mapRoom();
+    for (const c of splitMessage(text,900)) enqueue({ Content: ooc ? "("+c.replace(/\)/g, "]") : c, Type:"Whisper", Target:target }, urgent);
   }
   function splitMessage(text,max){
     text = String(text);
@@ -164,6 +206,7 @@
   let companionSeq = 0;
   // extra: more fields for every piece (a doc's kind and who it's about)
   function toCompanion(mn, text, kind, urgent, extra){
+    if (state.cmdWatch && state.cmdWatch.mn === mn) state.cmdWatch.replied = true;
     const parts = splitMessage(text, 1800), id = ++companionSeq;
     parts.forEach((t, i) => enqueue(makeMsg(kind, Object.assign({ text:t, id, part:i+1, of:parts.length }, extra||{}), mn), urgent));
   }

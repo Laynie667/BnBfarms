@@ -26,7 +26,7 @@ const wait=ms=>new Promise(r=>setTimeout(r,ms));
 const out=(...a)=>process.stdout.write(a.join(' ')+'\n');
 const FM=(mn,d)=>handlers.ChatRoomMessage({Sender:mn,Type:'Hidden',Content:'FarmhandMsg',Dictionary:{v:2,...d}});
 // did anything come back to them, or out to the room?
-const answered=(k,mn)=>sent.slice(k).some(([ev,d])=>d&&((d.Type==='Hidden'&&d.Content==='FarmhandMsg'&&d.Target===mn&&['reply','notice','doc','ask','choose','outfit'].includes(d.Dictionary.type))||
+const answered=(k,mn)=>sent.slice(k).some(([ev,d])=>d&&((d.Type==='Hidden'&&d.Content==='FarmhandMsg'&&d.Target===mn&&['reply','notice','doc','ask','choose','outfit','outfitBack'].includes(d.Dictionary.type))||
   (d.Type==='Emote'&&!d.Target)||(d.Type==='Chat'&&!d.Target)));
 const latestState=(mn)=>{const s=sent.filter(([e,d])=>d&&d.Content==='FarmhandMsg'&&d.Target===mn&&d.Dictionary.type==='state').pop(); return s?s[1].Dictionary.state:{};};
 const silent=[];
@@ -41,7 +41,7 @@ async function press(mn, cmd){
   L().people[500].prod && (L().people[500].prod.milk=1500);
 
   // 1. every switch on the Toggles tabs: press it, and the panel's switch must flip
-  const SW=['breedable','fertile','jarok','freeuse','futa','milkable','naturalheat','praise','degrade','tally','teaseme','hypno'];
+  const SW=['fertile','jarok','freeuse','futa','milkable','naturalheat','praise','degrade','tally','teaseme','hypno','breedable'];   // free use needs breedable, so breedable goes last
   const stuck=[];
   for (const sw of SW){
     W.__sync(true); await wait(400);

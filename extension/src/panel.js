@@ -36,14 +36,54 @@ export class Panel {
     style.textContent = CSS + ":root{" + Object.entries(THEME).map(([k, v]) => "--fh-" + k + ":" + v).join(";") + "}";
     doc.head.appendChild(style);
 
-    this.btn = h("button", { id: "fhc-btn", type: "button", title: "B&B Farm", "aria-label": "B&B Farm panel", onclick: () => this.toggle() }, "🌾");
+    this.btn = h("button", { id: "fhc-btn", type: "button", title: "B&B Farm", "aria-label": "B&B Farm panel" }, "🌾");
+    this.btn.style.touchAction = "none";
+    this.btn.addEventListener("pointerdown", (e) => this.dragButton(e));
+    this.btn.addEventListener("click", () => { if (!this.btnDragged) this.toggle(); this.btnDragged = false; });
     this.el = h("div", { id: "fhc-panel", role: "dialog", "aria-label": "B&B Farm" });
     this.el.addEventListener("keydown", (e) => e.stopPropagation());   // keep BC from treatin' panel typin' as game keys
-    if (this.prefs.pos) Object.assign(this.el.style, { left: this.prefs.pos.x + "px", top: this.prefs.pos.y + "px", right: "auto", bottom: "auto" });
     doc.body.appendChild(this.btn);
     doc.body.appendChild(this.el);
+    this.placeButton();
     this.render();
   }
+
+  /* ── the 🌾 button: drag it anywhere (mouse or finger), pin it to keep it put ── */
+  placeButton() {
+    const p = this.prefs.btnPos;
+    if (p) Object.assign(this.btn.style, { left: this.clampX(p.x, 46) + "px", top: this.clampY(p.y, 46) + "px", right: "auto", bottom: "auto" });
+    else Object.assign(this.btn.style, { left: "", top: "", right: "12px", bottom: "12px" });
+  }
+  clampX(x, w) { return Math.max(0, Math.min(window.innerWidth - w, x)); }
+  clampY(y, hgt) { return Math.max(0, Math.min(window.innerHeight - hgt, y)); }
+  dragButton(e) {
+    if (this.prefs.btnPinned) return;
+    const r = this.btn.getBoundingClientRect(), dx = e.clientX - r.left, dy = e.clientY - r.top, x0 = e.clientX, y0 = e.clientY;
+    let moving = false;
+    const move = (ev) => {
+      if (!moving && Math.hypot(ev.clientX - x0, ev.clientY - y0) < 8) return;   // a tap is a tap, not a drag
+      moving = true; this.btnDragged = true;
+      Object.assign(this.btn.style, { left: this.clampX(ev.clientX - dx, 46) + "px", top: this.clampY(ev.clientY - dy, 46) + "px", right: "auto", bottom: "auto" });
+    };
+    const up = () => {
+      window.removeEventListener("pointermove", move); window.removeEventListener("pointerup", up);
+      if (!moving) return;
+      const b = this.btn.getBoundingClientRect();
+      this.prefs.btnPos = { x: Math.round(b.left), y: Math.round(b.top) }; savePrefs(this.prefs);
+      if (this.el.classList.contains("open") && !this.prefs.pos) this.placePanel();
+    };
+    window.addEventListener("pointermove", move); window.addEventListener("pointerup", up);
+  }
+  // the panel opens beside the button (unless you've dragged the panel somewhere yourself)
+  placePanel() {
+    if (this.prefs.pos) { Object.assign(this.el.style, { left: this.clampX(this.prefs.pos.x, 120) + "px", top: this.clampY(this.prefs.pos.y, 60) + "px", right: "auto", bottom: "auto" }); return; }
+    if (!this.prefs.btnPos) { Object.assign(this.el.style, { left: "", top: "", right: "12px", bottom: "66px" }); return; }
+    const b = this.btn.getBoundingClientRect(), pw = Math.min(440, window.innerWidth - 24), ph = Math.min(640, window.innerHeight * 0.78);
+    const left = this.clampX(b.left + 46 - pw, pw);
+    const top = b.top - ph - 8 >= 0 ? b.top - ph - 8 : this.clampY(b.bottom + 8, ph);
+    Object.assign(this.el.style, { left: left + "px", top: top + "px", right: "auto", bottom: "auto" });
+  }
+  resetPlaces() { delete this.prefs.btnPos; delete this.prefs.pos; savePrefs(this.prefs); this.placeButton(); this.placePanel(); this.render(); }
 
   /* ── what the rest of the Companion calls ── */
   setStatus(text) { this.status = text; const s = this.el.querySelector("#fhc-status"); if (s) s.textContent = text; }
@@ -51,6 +91,8 @@ export class Panel {
   setState(s) { this.s = s || this.s; this.render(); }
   add(text, kind = "reply") {
     this.feed.push({ text: String(text), kind, at: Date.now() });
+    // the newest answer shows on whatever tab you're on, so a button never looks like it did nothin'
+    if (kind !== "mine") this.fresh = { text: String(text), kind };
     while (this.feed.length > HISTORY_MAX) this.feed.shift();
     if (kind !== "mine") this.ping();
     this.render();
@@ -68,6 +110,7 @@ export class Panel {
   ask(cmd) { this.add(cmd, "mine"); this.onCommand(cmd); }
 
   toggle(open = !this.el.classList.contains("open")) {
+    if (open) this.placePanel();
     this.el.classList.toggle("open", open);
     if (open) { this.unread = 0; this.btn.removeAttribute("data-unread"); }
   }
@@ -98,10 +141,13 @@ export class Panel {
     return {
       s: this.s, welcome: this.welcome, feed: this.feed, docs: this.docs, ui: this.ui, prefs: this.prefs, api: this.api,
       send: (cmd) => this.ask(cmd),
-      fillBox: (text) => { const i = this.el.querySelector("#fhc-input"); if (i) { i.value = text; i.focus(); } },
+      // a button that can't do anything yet says why, instead of quietly doin' nothin'
+      hint: (msg) => this.add("👉 " + msg, "notice"),
+      fillBox: (text) => { this.add("👉 Finish it in the box at the bottom, then press Send: ?" + text + "…", "notice"); const i = this.el.querySelector("#fhc-input"); if (i) { i.value = text; i.focus(); } },
       setUi: (patch, quiet) => { Object.assign(this.ui, patch); if (!quiet) this.render(); },
       setPref: (k, v) => { this.prefs[k] = v; savePrefs(this.prefs); this.render(); },
       closeDoc: (id) => { this.docs = this.docs.filter((d) => d.id !== id); this.render(); },
+      resetPlaces: () => { this.resetPlaces(); this.add("👉 The 🌾 button and panel are back in the corner.", "notice"); },
     };
   }
   render() {
@@ -112,7 +158,7 @@ export class Panel {
     const box = this.el.querySelector("#fhc-input"), typed = box ? box.value : "", hadFocus = box && window.document.activeElement === box;
     this.el.classList.toggle("compact", !!this.prefs.compact);
     this.el.replaceChildren(
-      h("div", { class: "fhc-head", onmousedown: (e) => this.drag(e) },
+      h("div", { class: "fhc-head", style: { touchAction: "none" }, onpointerdown: (e) => this.drag(e) },
         h("div", null, h("div", { class: "fhc-title" }, "🌾 B&B Farm"), h("div", { id: "fhc-status", class: "fhc-muted" }, this.status)),
         h("button", { type: "button", class: "fhc-pill", "aria-label": "Close the panel", onclick: () => this.toggle(false) }, "✕")),
       this.views().length > 1 && h("div", { class: "fhc-row" }, h("span", { class: "fhc-grow fhc-muted" }, "Panel"),
@@ -137,6 +183,12 @@ export class Panel {
   // questions waitin' on you, on every tab
   banners() {
     const out = [];
+    const view = this.view(), tabNow = this.ui["tab_" + view];
+    if (this.fresh && tabNow !== "inbox") out.push(h("div", { class: "fhc-box", style: { borderColor: this.fresh.kind === "notice" ? "var(--fh-good)" : "var(--fh-accent)" } },
+      h("div", { class: "fhc-kv", style: { borderBottom: "none", padding: "0" } },
+        h("span", { class: "fhc-muted" }, this.fresh.kind === "notice" ? "From the farm" : "Answer"),
+        h("button", { type: "button", class: "fhc-pill", "aria-label": "Dismiss", onclick: () => { this.fresh = null; this.render(); } }, "✕")),
+      h("div", { class: "fhc-card" + (this.fresh.kind === "notice" ? " notice" : ""), style: { maxHeight: "180px", overflowY: "auto" } }, this.fresh.text)));
     const o = this.outfit;
     if (o) out.push(h("div", { class: "fhc-box ask" },
       h("b", null, "👗 " + (o.why ? o.why + ": " : "") + "put on your " + o.label + "?"),
@@ -156,10 +208,11 @@ export class Panel {
   drag(e) {
     if (e.target.closest("button")) return;
     const r = this.el.getBoundingClientRect(), dx = e.clientX - r.left, dy = e.clientY - r.top;
-    const move = (ev) => Object.assign(this.el.style, { left: Math.max(0, ev.clientX - dx) + "px", top: Math.max(0, ev.clientY - dy) + "px", right: "auto", bottom: "auto" });
-    const up = () => { window.removeEventListener("mousemove", move); window.removeEventListener("mouseup", up);
+    // pointer events: a mouse and a finger both drag it
+    const move = (ev) => Object.assign(this.el.style, { left: this.clampX(ev.clientX - dx, 120) + "px", top: this.clampY(ev.clientY - dy, 60) + "px", right: "auto", bottom: "auto" });
+    const up = () => { window.removeEventListener("pointermove", move); window.removeEventListener("pointerup", up);
       const b = this.el.getBoundingClientRect(); this.prefs.pos = { x: Math.round(b.left), y: Math.round(b.top) }; savePrefs(this.prefs); };
-    window.addEventListener("mousemove", move); window.addEventListener("mouseup", up);
+    window.addEventListener("pointermove", move); window.addEventListener("pointerup", up);
   }
 }
 

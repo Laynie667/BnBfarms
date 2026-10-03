@@ -512,6 +512,7 @@ GOOD TO KNOW
     lifestaff: `🗺️ FARM LIFE (staff)
 
 SPOTS · stand on it, then ?spot set <name>
+  home · where I stand when nothin's happenin' (I walk over to the action, then come back)
   summon · where summoned folks land
   safe · where safeword help lands
   staff · where staff-call help lands

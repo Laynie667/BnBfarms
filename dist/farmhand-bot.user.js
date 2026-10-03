@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.9.32
+// @version      0.9.33
 // @description  B&B Farm: beeps, keys, ledger, roster, herds, summoning, anti-idle
 // @author       Laynie & Alexia
 // @match        *://*.bondageprojects.elementfx.com/*
@@ -1772,7 +1772,7 @@
   }
 
   // bot/src/version.js
-  var VERSION = "0.9.32";
+  var VERSION = "0.9.33";
 
   // bot-parts:farmhand-bot-parts
   (function() {
@@ -1801,7 +1801,8 @@
       BEEP_MAX_CHUNKS: 8,
       USER_COOLDOWN_S: 5,
       COMPANION_COOLDOWN_S: 1,
-      // panel buttons: a short gap, and a click that comes too quick waits its turn
+      HOME_AFTER_S: 90,
+      // after walkin' over to somethin', I head back to my home tile (?spot set home) this long after       // panel buttons: a short gap, and a click that comes too quick waits its turn
       APPLY_TIMEOUT_MIN: 0,
       // 0 = interviews never time out (staff can ?appclear a stale one)
       CLAIM_ASK_TIMEOUT_MIN: 60,
@@ -3106,7 +3107,7 @@
     };
     W.FarmhandExport = exportLedger;
     W.FarmhandLedger = () => L;
-    if (W.__FARMHAND_TEST__) Object.assign(W, { __st: () => state, __cfg: CFG, __pt: prodTick, __qt: quotaTick, __lt: leashTick, __ms: milkingStallTick, __vt: voiceTick, __sync: syncCompanions, __gt: gearTick });
+    if (W.__FARMHAND_TEST__) Object.assign(W, { __st: () => state, __cfg: CFG, __pt: prodTick, __qt: quotaTick, __lt: leashTick, __ms: milkingStallTick, __vt: voiceTick, __sync: syncCompanions, __gt: gearTick, __ht: homeTick });
     W.FarmhandSyncKeys = () => syncAllPresent(true);
     W.FarmhandFriends = () => W.Player.FriendList;
     W.FarmhandAddFriend = (mn) => addFriend(mn, false);
@@ -3297,6 +3298,7 @@
           send("ChatRoomCharacterMapDataUpdate", C.MapData);
           later(() => {
             try {
+              if (C.MapData.Pos.X !== nx || C.MapData.Pos.Y !== ny) return;
               C.MapData.Pos = back;
               send("ChatRoomCharacterMapDataUpdate", C.MapData);
             } catch (e) {
@@ -3407,17 +3409,45 @@
     function enqueue(m, urgent) {
       send("ChatRoomChat", m, urgent);
     }
-    function say(t, urgent) {
+    function say(t, urgent, who) {
+      walkTo(who || aboutWhom(t), urgent);
       enqueue({ Content: t, Type: "Chat" }, urgent);
     }
-    function emote(t) {
+    const mapRoom = () => !!(W.ChatRoomData && W.ChatRoomData.MapData && W.ChatRoomData.MapData.Type && W.ChatRoomData.MapData.Type !== "Never");
+    function walkTo(mn, urgent) {
+      if (!mn || !mapRoom()) return;
+      const me = charFor(CFG.BOT_MEMBER), them = charFor(mn);
+      const a = me && me.MapData && me.MapData.Pos, b = them && them.MapData && them.MapData.Pos;
+      if (!a || !b || b.X < 0 || b.Y < 0) return;
+      if (Math.max(Math.abs(a.X - b.X), Math.abs(a.Y - b.Y)) <= 2) return;
+      const to = spotBeside(mn);
+      if (!to) return;
+      me.MapData.Pos = { X: to.X, Y: to.Y };
+      send("ChatRoomCharacterMapDataUpdate", me.MapData, urgent);
+      state.walkedAt = Date.now();
+    }
+    function homeTick() {
+      const home = spotFor("home"), me = charFor(CFG.BOT_MEMBER), p = me && me.MapData && me.MapData.Pos;
+      if (!home || !p || !mapRoom()) return;
+      if (p.X === home.X && p.Y === home.Y) return;
+      if (Date.now() - (state.walkedAt || 0) < CFG.HOME_AFTER_S * 1e3) return;
+      me.MapData.Pos = { X: home.X, Y: home.Y };
+      send("ChatRoomCharacterMapDataUpdate", me.MapData);
+    }
+    function aboutWhom(text) {
+      const here = (W.ChatRoomCharacter || []).map((c) => c.MemberNumber).filter((m) => m !== CFG.BOT_MEMBER && onMap(m));
+      return here.length ? namedIn(String(text), here) : null;
+    }
+    function emote(t, who) {
+      if (state.cmdWatch) state.cmdWatch.emotes.push(String(t));
+      walkTo(who || aboutWhom(t));
       for (const c of splitMessage(t, 900)) enqueue({ Content: "*" + c, Type: "Emote" });
     }
     function onMap(mn) {
       const C = charFor(mn);
       if (!C) return false;
-      const mapRoom = !!(W.ChatRoomData && W.ChatRoomData.MapData && W.ChatRoomData.MapData.Type && W.ChatRoomData.MapData.Type !== "Never");
-      if (!mapRoom) return true;
+      const mapRoom2 = !!(W.ChatRoomData && W.ChatRoomData.MapData && W.ChatRoomData.MapData.Type && W.ChatRoomData.MapData.Type !== "Never");
+      if (!mapRoom2) return true;
       const pos = C.MapData && C.MapData.Pos;
       return !!(pos && pos.X >= 0 && pos.Y >= 0);
     }
@@ -3429,7 +3459,8 @@
         toCompanion(target, text, "notice", urgent);
         return;
       }
-      for (const c of splitMessage(text, 900)) enqueue({ Content: c, Type: "Whisper", Target: target }, urgent);
+      const ooc = mapRoom();
+      for (const c of splitMessage(text, 900)) enqueue({ Content: ooc ? "(" + c.replace(/\)/g, "]") : c, Type: "Whisper", Target: target }, urgent);
     }
     function splitMessage(text, max) {
       text = String(text);
@@ -3466,6 +3497,7 @@
     }
     let companionSeq = 0;
     function toCompanion(mn, text, kind, urgent, extra) {
+      if (state.cmdWatch && state.cmdWatch.mn === mn) state.cmdWatch.replied = true;
       const parts = splitMessage(text, 1800), id = ++companionSeq;
       parts.forEach((t, i) => enqueue(makeMsg(kind, Object.assign({ text: t, id, part: i + 1, of: parts.length }, extra || {}), mn), urgent));
     }
@@ -5113,7 +5145,7 @@
       else if (heldTotal(p) > capacity(t)) line = a + " presses on " + n + "'s cum-swollen belly, and it gurgles. A warm trickle squeezes out of 'em. Messy!";
       if (!line) return;
       p.rubAt = now;
-      emote("🤰 " + line);
+      emote("🤰 " + line, t);
     }
     function praiseOrDegrade(by, t, praise, text) {
       const r = rec(t), p = prodOf(t), now = Date.now();
@@ -5299,9 +5331,24 @@
       if (found.length >= 2 && found.includes("vulva") && found.includes("butt") && makesSemen(stud) && typeInfo(stud).double) return ["vulva", "butt"];
       return [found[0]];
     }
+    const BELLY_WORDS = /\b(belly|bellies|tummy|tum|stomach|womb|bump|baby bump)\b/i;
+    const TOUCH_WORDS = /\b(rub\w*|stroke\w*|strok\w*|touch\w*|press\w*|pat\w*|pet\w*|caress\w*|feel\w*|felt|kiss\w*|nuzzl\w*|cuddl\w*|hug\w*|rest\w*|lay\w*|lean\w*|grind\w*|cradl\w*|hold\w*|massag\w*)\b/i;
+    function bellyTouchFromRP(sender, text) {
+      if (!BELLY_WORDS.test(text) || !TOUCH_WORDS.test(text)) return;
+      const others = (W.ChatRoomCharacter || []).map((c) => c.MemberNumber).filter((m) => m !== sender && m !== CFG.BOT_MEMBER);
+      const t = namedIn(text, others);
+      if (t) bellyRub(sender, t);
+    }
     function onRoleplay(sender, text, type) {
       if (!text || /^[?!.\-\/]/.test(text.trim())) return;
       const now = Date.now();
+      if (type === "Emote") {
+        try {
+          bellyTouchFromRP(sender, text);
+        } catch (e) {
+          warn("belly rp:", e);
+        }
+      }
       const sc = state.scenes.get(sender);
       if (sc && now - (sc.lastSeen || sc.at) > CFG.SCENE_IDLE_MIN * 6e4) {
         state.scenes.delete(sender);
@@ -5401,7 +5448,7 @@
         stud = tgt;
         bred = src;
         hole = /pussy/i.test(act) ? "vulva" : "butt";
-      } else if (/^(caress|rub|massage|kiss|lick|pet|pat|nuzzle|cuddle)/i.test(act) && ["ItemTorso", "ItemTorso2", "ItemPelvis"].includes(focus)) {
+      } else if (/^(caress|rub|massage|kiss|gaggedkiss|lick|pet|pat|nuzzle|cuddle|grope|tickle|scratch|hug|press|rest)/i.test(act) && ["ItemTorso", "ItemTorso2", "ItemPelvis"].includes(focus)) {
         bellyRub(src, tgt);
         return;
       } else if (/^(suck|suckle|nibble|nurse|drink)/i.test(act) && (focus === "ItemNipples" || focus === "ItemBreast")) {
@@ -6911,6 +6958,7 @@ GOOD TO KNOW
       lifestaff: `🗺️ FARM LIFE (staff)
 
 SPOTS · stand on it, then ?spot set <name>
+  home · where I stand when nothin's happenin' (I walk over to the action, then come back)
   summon · where summoned folks land
   safe · where safeword help lands
   staff · where staff-call help lands
@@ -7725,10 +7773,13 @@ Welcome to B&B Farm. Mind the ruts! 🌾`,
     }
     function handleCommand(sender, raw, channel) {
       state.inReply = true;
+      const watch = channel === "companion" ? state.cmdWatch = { mn: sender, replied: false, emotes: [] } : null;
       try {
         return handleCommandInner(sender, raw, channel);
       } finally {
         state.inReply = false;
+        state.cmdWatch = null;
+        if (watch && !watch.replied && watch.emotes.length) toCompanion(sender, "(in the room) " + watch.emotes.join("\n"), "reply");
       }
     }
     function handleCommandInner(sender, raw, channel) {
@@ -7753,11 +7804,27 @@ Welcome to B&B Farm. Mind the ruts! 🌾`,
         ].includes(p0.cmd) || ["safe", "safeword", "red", "stuck"].includes(lone);
         if (!pass && handleApplicationAnswer(sender, raw, channel)) return;
       }
+      const huh = (msg) => {
+        if (channel === "chat") return;
+        state.huhAt = state.huhAt || /* @__PURE__ */ new Map();
+        if (Date.now() - (state.huhAt.get(sender) || 0) < 6e4) return;
+        state.huhAt.set(sender, Date.now());
+        reply(sender, msg, channel);
+      };
       const p = parseCommand(raw, isWhisper, isBeep);
-      if (!p) return;
+      if (!p) {
+        huh("I didn't catch a command in that, sugar. Try ?help, or just say what you'd like, like stats or keys.");
+        return;
+      }
       const { cmd, args, rest } = p;
-      if (!PUBLIC_CMDS.includes(cmd) && !STAFF_CMDS.includes(cmd)) return;
-      if (STAFF_CMDS.includes(cmd) && !isStaff(sender)) return;
+      if (!PUBLIC_CMDS.includes(cmd) && !STAFF_CMDS.includes(cmd)) {
+        huh("I don't know ?" + cmd + ", hon. ?help lists what I can do.");
+        return;
+      }
+      if (STAFF_CMDS.includes(cmd) && !isStaff(sender)) {
+        huh("?" + cmd + " is just for farm staff, sugar.");
+        return;
+      }
       if (onCooldown(sender, cmd, channel)) {
         if (channel !== "chat") waitYourTurn(sender, raw, channel);
         return;
@@ -7977,6 +8044,7 @@ Welcome to B&B Farm. Mind the ruts! 🌾`,
                 break;
               }
               enqueue(queryMsg(t));
+              R("📜 Askin' " + plainName(t) + "'s BC+ what farm contracts they hold…");
               later(() => {
                 const mine = L.contracts.filter((x) => x.mn === t && x.status !== "declined");
                 reply(sender, mine.length ? "📜 " + mine.map(contractLine).join("\n") : plainName(t) + " holds no farm contracts.", replyCh);
@@ -9140,7 +9208,7 @@ Welcome to B&B Farm. Mind the ruts! 🌾`,
         case "safe":
         case "safeword":
         case "red": {
-          say("🔴 PAUSE CALLED. Everything stops, right now, everybody.", true);
+          say("🔴 PAUSE CALLED. Everything stops, right now, everybody.", true, sender);
           beep(sender, "I've got you, " + plainName(sender) + ". Everything's stopped and I'm fetchin' somebody for you right now. You don't owe anybody an explanation. 🔴", true);
           notifyStaff("🔴 SAFEWORD from " + plainName(sender) + " (" + sender + "). Please go to them now.", false);
           audit(sender, "SAFEWORD", channel);
@@ -11060,6 +11128,7 @@ Welcome to B&B Farm, hon. 🌾`
         prodTick();
         milkingStallTick();
         gearTick();
+        homeTick();
         lifeTick();
         workTick();
         for (const [mn, a] of state.arrivals) if (Date.now() > a.until) state.arrivals.delete(mn);

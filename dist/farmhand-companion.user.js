@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.5.0
+// @version      0.6.0
 // @description  Your B&B Farm panel: the farm girl's answers, stat cards and guides, right in the game.
 // @author       Laynie & Alexia
 // @match        *://*.bondageprojects.elementfx.com/*
@@ -224,7 +224,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.5.0";
+  var VERSION = "0.6.0";
 
   // extension/src/config.js
   var BOT_MEMBER = 260239;
@@ -528,9 +528,14 @@ One of mods you are using is using an old version of SDK. It will work for now b
     ["teaseme", "Tease me", "Let staff tease lines name you"],
     ["hypno", "Hypno", "Let your herd leader's voice lines reach you, privately"]
   ];
+  var NEEDS = { freeuse: ["breedable", "Turn Breedable on first"] };
   function farmSwitches(ctx, list) {
     const sw = ctx.s.switches || {};
-    return list.map(([cmd, label, desc]) => toggle(label, desc, !!sw[cmd], () => ctx.send(cmd + " " + (sw[cmd] ? "off" : "on"))));
+    return list.map(([cmd, label, desc]) => {
+      const need = NEEDS[cmd];
+      if (need && !sw[need[0]] && !sw[cmd]) return toggle(label, need[1] + " · " + desc, false, () => ctx.send(cmd + " on"));
+      return toggle(label, desc, !!sw[cmd], () => ctx.send(cmd + " " + (sw[cmd] ? "off" : "on")));
+    });
   }
   function panelPrefs(ctx) {
     return card(
@@ -539,8 +544,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
       [
         ["compact", "Compact cards", "Smaller text, more on screen"],
         ["chime", "Chime on notices", "A soft sound when the farm messages you"],
-        ["popopen", "Open on new notice", "Pop the panel open by itself"]
-      ].map(([k, label, desc]) => toggle(label, desc, !!ctx.prefs[k], () => ctx.setPref(k, !ctx.prefs[k])))
+        ["popopen", "Open on new notice", "Pop the panel open by itself"],
+        ["btnPinned", "Pin the 🌾 button", "Unpinned, you can drag it anywhere (mouse or finger). Pin it so it stays put."]
+      ].map(([k, label, desc]) => toggle(label, desc, !!ctx.prefs[k], () => ctx.setPref(k, !ctx.prefs[k]))),
+      btn("Put the button and panel back in the corner", () => ctx.resetPlaces && ctx.resetPlaces())
     );
   }
   function toggles(ctx) {
@@ -2240,10 +2247,9 @@ One of mods you are using is using an old version of SDK. It will work for now b
         ),
         btn("Add line", () => {
           const t = (ctx.ui.teaseDraft || "").trim();
-          if (t) {
-            ctx.send("tease add " + t);
-            ctx.setUi({ teaseDraft: "" });
-          }
+          if (!t) return ctx.hint("Write the line first.");
+          ctx.send("tease add " + t);
+          ctx.setUi({ teaseDraft: "" });
         }, true)
       )
     ];
@@ -2294,14 +2300,14 @@ One of mods you are using is using an old version of SDK. It will work for now b
       card(
         title(sel ? "Editin' " + sel : "New zone"),
         h("label", { class: "fhc-label" }, "Zone name (one word)", h("input", { class: "fhc-in", value: ctx.ui.zoneName || sel || "", oninput: (e) => ctx.setUi({ zoneName: e.target.value }, true) })),
-        h("div", null, btn("Set A where I stand", () => name() && ctx.send("zone a " + name())), btn("Set B where I stand", () => name() && ctx.send("zone b " + name()))),
+        h("div", null, btn("Set A where I stand", () => name() ? ctx.send("zone a " + name()) : ctx.hint("Name the zone first.")), btn("Set B where I stand", () => name() ? ctx.send("zone b " + name()) : ctx.hint("Name the zone first."))),
         h("label", { class: "fhc-label" }, "Pair with (one place, odd shapes)", h("input", { class: "fhc-in", placeholder: "barn", value: ctx.ui.zonePair || "", oninput: (e) => ctx.setUi({ zonePair: e.target.value }, true) })),
         h(
           "div",
           null,
-          btn("Pair", () => name() && ctx.ui.zonePair && ctx.send("zone pair " + name() + " " + ctx.ui.zonePair.trim().toLowerCase())),
-          btn("Unpair", () => name() && ctx.send("zone unpair " + name())),
-          btn("Delete", () => name() && ctx.send("zone clear " + name()))
+          btn("Pair", () => name() && ctx.ui.zonePair ? ctx.send("zone pair " + name() + " " + ctx.ui.zonePair.trim().toLowerCase()) : ctx.hint("Name the zone, and the place to pair it with.")),
+          btn("Unpair", () => name() ? ctx.send("zone unpair " + name()) : ctx.hint("Name the zone first.")),
+          btn("Delete", () => name() ? ctx.send("zone clear " + name()) : ctx.hint("Name the zone first."))
         )
       )
     ];
@@ -2346,10 +2352,9 @@ One of mods you are using is using an old version of SDK. It will work for now b
         h("label", { class: "fhc-label" }, "New line · %name% works", h("input", { class: "fhc-in", maxlength: 200, value: ctx.ui.vDraft || "", oninput: (e) => ctx.setUi({ vDraft: e.target.value }, true) })),
         btn("Add", () => {
           const t = (ctx.ui.vDraft || "").trim();
-          if (t) {
-            ctx.send("voice add " + who + " " + t);
-            ctx.setUi({ vDraft: "" });
-          }
+          if (!t) return ctx.hint("Write the line first.");
+          ctx.send("voice add " + who + " " + t);
+          ctx.setUi({ vDraft: "" });
         }, true),
         h("label", { class: "fhc-label" }, "How often", h(
           "select",
@@ -2497,7 +2502,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
           "div",
           null,
           btn("Preview", () => ctx.send("contract show " + tpl() + (who() ? " " + who() : ""))),
-          btn("Offer it", () => who() && ctx.send("contract offer " + tpl() + " " + who() + " " + dur()), true)
+          btn("Offer it", () => who() ? ctx.send("contract offer " + tpl() + " " + who() + " " + dur()) : ctx.hint("Type who it's for first, in the For box."), true)
         )
       ),
       card(
@@ -2507,8 +2512,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
         h(
           "div",
           null,
-          btn("Ask their BC+", () => ctx.ui.ctLook && ctx.send("contract check " + ctx.ui.ctLook)),
-          btn("Release", () => ctx.ui.ctLook && ctx.send("contract release " + ctx.ui.ctLook))
+          btn("Ask their BC+", () => ctx.ui.ctLook ? ctx.send("contract check " + ctx.ui.ctLook) : ctx.hint("Type whose contracts first.")),
+          btn("Release", () => ctx.ui.ctLook ? ctx.send("contract release " + ctx.ui.ctLook) : ctx.hint("Type whose contract to release first."))
         )
       ),
       latest(ctx)
@@ -2516,7 +2521,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
   function barn(ctx) {
     const who = () => (ctx.ui.barnWho || "").trim();
-    const act = (c) => () => who() && ctx.send(c + " " + who());
+    const act = (c) => () => who() ? ctx.send(c + " " + who()) : ctx.hint("Type who first, in the Who box.");
     return [
       card(
         title("Barn work"),
@@ -2619,7 +2624,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     const cat = ctx.ui.dCat || cats[0];
     const inCat = [...RULES.values()].filter((r) => r.category === cat);
     const rule = RULES.get(ctx.ui.dRule) && RULES.get(ctx.ui.dRule).category === cat ? RULES.get(ctx.ui.dRule) : inCat[0];
-    const need = () => !nm() && (ctx.setUi({ dWarn: true }), true);
+    const need = () => !nm() && (ctx.hint("Give your contract a name first (one word, like prizecow)."), true);
     return [
       card(
         title("Your contract"),
@@ -2636,8 +2641,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
         h(
           "div",
           null,
-          btn("Save title", () => !need() && ctx.ui.dTitle && ctx.send("contract title " + nm() + " " + ctx.ui.dTitle)),
-          btn("Save terms", () => !need() && ctx.ui.dTerms && ctx.send("contract terms " + nm() + " " + ctx.ui.dTerms)),
+          btn("Save title", () => !need() && (ctx.ui.dTitle ? ctx.send("contract title " + nm() + " " + ctx.ui.dTitle) : ctx.hint("Type the title first."))),
+          btn("Save terms", () => !need() && (ctx.ui.dTerms ? ctx.send("contract terms " + nm() + " " + ctx.ui.dTerms) : ctx.hint("Write the terms first."))),
           btn("Farm ends it", () => !need() && ctx.send("contract policy " + nm() + " farm")),
           btn("Either side ends it", () => !need() && ctx.send("contract policy " + nm() + " either"))
         )
@@ -2755,7 +2760,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
         ),
         btn("Save what I'm wearin' as this special", () => {
           const n = (ctx.ui.oSpecial || "").trim().toLowerCase().replace(/[^a-z0-9_-]/g, "");
-          if (n.length > 1) ctx.api.save && ctx.api.save("special:" + n);
+          if (n.length < 2) return ctx.hint("Name the special first (one word, like luxury).");
+          ctx.api.save && ctx.api.save("special:" + n);
         })
       ),
       card(
@@ -2835,12 +2841,75 @@ One of mods you are using is using an old version of SDK. It will work for now b
       const style = doc.createElement("style");
       style.textContent = CSS + ":root{" + Object.entries(THEME).map(([k, v]) => "--fh-" + k + ":" + v).join(";") + "}";
       doc.head.appendChild(style);
-      this.btn = h("button", { id: "fhc-btn", type: "button", title: "B&B Farm", "aria-label": "B&B Farm panel", onclick: () => this.toggle() }, "🌾");
+      this.btn = h("button", { id: "fhc-btn", type: "button", title: "B&B Farm", "aria-label": "B&B Farm panel" }, "🌾");
+      this.btn.style.touchAction = "none";
+      this.btn.addEventListener("pointerdown", (e) => this.dragButton(e));
+      this.btn.addEventListener("click", () => {
+        if (!this.btnDragged) this.toggle();
+        this.btnDragged = false;
+      });
       this.el = h("div", { id: "fhc-panel", role: "dialog", "aria-label": "B&B Farm" });
       this.el.addEventListener("keydown", (e) => e.stopPropagation());
-      if (this.prefs.pos) Object.assign(this.el.style, { left: this.prefs.pos.x + "px", top: this.prefs.pos.y + "px", right: "auto", bottom: "auto" });
       doc.body.appendChild(this.btn);
       doc.body.appendChild(this.el);
+      this.placeButton();
+      this.render();
+    }
+    /* ── the 🌾 button: drag it anywhere (mouse or finger), pin it to keep it put ── */
+    placeButton() {
+      const p = this.prefs.btnPos;
+      if (p) Object.assign(this.btn.style, { left: this.clampX(p.x, 46) + "px", top: this.clampY(p.y, 46) + "px", right: "auto", bottom: "auto" });
+      else Object.assign(this.btn.style, { left: "", top: "", right: "12px", bottom: "12px" });
+    }
+    clampX(x, w) {
+      return Math.max(0, Math.min(window.innerWidth - w, x));
+    }
+    clampY(y, hgt) {
+      return Math.max(0, Math.min(window.innerHeight - hgt, y));
+    }
+    dragButton(e) {
+      if (this.prefs.btnPinned) return;
+      const r = this.btn.getBoundingClientRect(), dx = e.clientX - r.left, dy = e.clientY - r.top, x0 = e.clientX, y0 = e.clientY;
+      let moving = false;
+      const move = (ev) => {
+        if (!moving && Math.hypot(ev.clientX - x0, ev.clientY - y0) < 8) return;
+        moving = true;
+        this.btnDragged = true;
+        Object.assign(this.btn.style, { left: this.clampX(ev.clientX - dx, 46) + "px", top: this.clampY(ev.clientY - dy, 46) + "px", right: "auto", bottom: "auto" });
+      };
+      const up = () => {
+        window.removeEventListener("pointermove", move);
+        window.removeEventListener("pointerup", up);
+        if (!moving) return;
+        const b = this.btn.getBoundingClientRect();
+        this.prefs.btnPos = { x: Math.round(b.left), y: Math.round(b.top) };
+        savePrefs(this.prefs);
+        if (this.el.classList.contains("open") && !this.prefs.pos) this.placePanel();
+      };
+      window.addEventListener("pointermove", move);
+      window.addEventListener("pointerup", up);
+    }
+    // the panel opens beside the button (unless you've dragged the panel somewhere yourself)
+    placePanel() {
+      if (this.prefs.pos) {
+        Object.assign(this.el.style, { left: this.clampX(this.prefs.pos.x, 120) + "px", top: this.clampY(this.prefs.pos.y, 60) + "px", right: "auto", bottom: "auto" });
+        return;
+      }
+      if (!this.prefs.btnPos) {
+        Object.assign(this.el.style, { left: "", top: "", right: "12px", bottom: "66px" });
+        return;
+      }
+      const b = this.btn.getBoundingClientRect(), pw = Math.min(440, window.innerWidth - 24), ph = Math.min(640, window.innerHeight * 0.78);
+      const left = this.clampX(b.left + 46 - pw, pw);
+      const top = b.top - ph - 8 >= 0 ? b.top - ph - 8 : this.clampY(b.bottom + 8, ph);
+      Object.assign(this.el.style, { left: left + "px", top: top + "px", right: "auto", bottom: "auto" });
+    }
+    resetPlaces() {
+      delete this.prefs.btnPos;
+      delete this.prefs.pos;
+      savePrefs(this.prefs);
+      this.placeButton();
+      this.placePanel();
       this.render();
     }
     /* ── what the rest of the Companion calls ── */
@@ -2859,6 +2928,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     }
     add(text, kind = "reply") {
       this.feed.push({ text: String(text), kind, at: Date.now() });
+      if (kind !== "mine") this.fresh = { text: String(text), kind };
       while (this.feed.length > HISTORY_MAX) this.feed.shift();
       if (kind !== "mine") this.ping();
       this.render();
@@ -2891,6 +2961,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       this.onCommand(cmd);
     }
     toggle(open = !this.el.classList.contains("open")) {
+      if (open) this.placePanel();
       this.el.classList.toggle("open", open);
       if (open) {
         this.unread = 0;
@@ -2945,7 +3016,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
         prefs: this.prefs,
         api: this.api,
         send: (cmd) => this.ask(cmd),
+        // a button that can't do anything yet says why, instead of quietly doin' nothin'
+        hint: (msg) => this.add("👉 " + msg, "notice"),
         fillBox: (text) => {
+          this.add("👉 Finish it in the box at the bottom, then press Send: ?" + text + "…", "notice");
           const i = this.el.querySelector("#fhc-input");
           if (i) {
             i.value = text;
@@ -2964,6 +3038,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
         closeDoc: (id) => {
           this.docs = this.docs.filter((d) => d.id !== id);
           this.render();
+        },
+        resetPlaces: () => {
+          this.resetPlaces();
+          this.add("👉 The 🌾 button and panel are back in the corner.", "notice");
         }
       };
     }
@@ -2976,7 +3054,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       this.el.replaceChildren(
         h(
           "div",
-          { class: "fhc-head", onmousedown: (e) => this.drag(e) },
+          { class: "fhc-head", style: { touchAction: "none" }, onpointerdown: (e) => this.drag(e) },
           h("div", null, h("div", { class: "fhc-title" }, "🌾 B&B Farm"), h("div", { id: "fhc-status", class: "fhc-muted" }, this.status)),
           h("button", { type: "button", class: "fhc-pill", "aria-label": "Close the panel", onclick: () => this.toggle(false) }, "✕")
         ),
@@ -3033,6 +3111,21 @@ One of mods you are using is using an old version of SDK. It will work for now b
     // questions waitin' on you, on every tab
     banners() {
       const out = [];
+      const view = this.view(), tabNow = this.ui["tab_" + view];
+      if (this.fresh && tabNow !== "inbox") out.push(h(
+        "div",
+        { class: "fhc-box", style: { borderColor: this.fresh.kind === "notice" ? "var(--fh-good)" : "var(--fh-accent)" } },
+        h(
+          "div",
+          { class: "fhc-kv", style: { borderBottom: "none", padding: "0" } },
+          h("span", { class: "fhc-muted" }, this.fresh.kind === "notice" ? "From the farm" : "Answer"),
+          h("button", { type: "button", class: "fhc-pill", "aria-label": "Dismiss", onclick: () => {
+            this.fresh = null;
+            this.render();
+          } }, "✕")
+        ),
+        h("div", { class: "fhc-card" + (this.fresh.kind === "notice" ? " notice" : ""), style: { maxHeight: "180px", overflowY: "auto" } }, this.fresh.text)
+      ));
       const o = this.outfit;
       if (o) out.push(h(
         "div",
@@ -3085,16 +3178,16 @@ One of mods you are using is using an old version of SDK. It will work for now b
     drag(e) {
       if (e.target.closest("button")) return;
       const r = this.el.getBoundingClientRect(), dx = e.clientX - r.left, dy = e.clientY - r.top;
-      const move = (ev) => Object.assign(this.el.style, { left: Math.max(0, ev.clientX - dx) + "px", top: Math.max(0, ev.clientY - dy) + "px", right: "auto", bottom: "auto" });
+      const move = (ev) => Object.assign(this.el.style, { left: this.clampX(ev.clientX - dx, 120) + "px", top: this.clampY(ev.clientY - dy, 60) + "px", right: "auto", bottom: "auto" });
       const up = () => {
-        window.removeEventListener("mousemove", move);
-        window.removeEventListener("mouseup", up);
+        window.removeEventListener("pointermove", move);
+        window.removeEventListener("pointerup", up);
         const b = this.el.getBoundingClientRect();
         this.prefs.pos = { x: Math.round(b.left), y: Math.round(b.top) };
         savePrefs(this.prefs);
       };
-      window.addEventListener("mousemove", move);
-      window.addEventListener("mouseup", up);
+      window.addEventListener("pointermove", move);
+      window.addEventListener("pointerup", up);
     }
   };
   function safeRender(tab, ctx) {
@@ -3249,6 +3342,12 @@ One of mods you are using is using an old version of SDK. It will work for now b
     if (botHere()) {
       if (!st.welcomed) hello();
       toBot("cmd", { text });
+      const sentAt = Date.now();
+      st.lastSent = sentAt;
+      setTimeout(() => {
+        if (st.lastHeard >= sentAt || st.lastSent !== sentAt) return;
+        st.panel.add('No answer to "' + text + `" yet. The farm girl may be busy, or not runnin' the newest bot. ` + (st.welcomed ? "If it keeps happenin', tell staff which button it was." : "She hasn't said hello to this panel yet: is her script on?"), "notice");
+      }, 1e4);
     } else {
       window.ServerSend("AccountBeep", { MemberNumber: BOT_MEMBER, BeepType: "", Message: text });
       st.panel.add("The farm girl isn't in your room, so I beeped her. Her answer comes back as a beep.", "notice");
@@ -3265,6 +3364,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
   function onFarmMsg(m) {
     if (m.from !== BOT_MEMBER) return;
+    if (m.type !== "ping" && m.type !== "state") st.lastHeard = Date.now();
     switch (m.type) {
       case "ping":
         hello();

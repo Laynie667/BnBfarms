@@ -40,6 +40,14 @@ function sendCommand(text) {
   if (botHere()) {
     if (!st.welcomed) hello();
     toBot("cmd", { text });
+    // if nothin' comes back, say so: a quiet failure is the hardest kind to find
+    const sentAt = Date.now();
+    st.lastSent = sentAt;
+    setTimeout(() => {
+      if (st.lastHeard >= sentAt || st.lastSent !== sentAt) return;
+      st.panel.add("No answer to \"" + text + "\" yet. The farm girl may be busy, or not runnin' the newest bot. " +
+        (st.welcomed ? "If it keeps happenin', tell staff which button it was." : "She hasn't said hello to this panel yet: is her script on?"), "notice");
+    }, 10000);
   } else {
     // not in the farm right now: a beep still reaches the bot, and it beeps back
     window.ServerSend("AccountBeep", { MemberNumber: BOT_MEMBER, BeepType: "", Message: text });
@@ -60,6 +68,7 @@ function collect(m) {
 
 function onFarmMsg(m) {
   if (m.from !== BOT_MEMBER) return;     // only the farm bot gets to talk to the panel
+  if (m.type !== "ping" && m.type !== "state") st.lastHeard = Date.now();
   switch (m.type) {
     case "ping": hello(); break;
     case "welcome":

@@ -89,15 +89,23 @@ export const SWITCH_INFO = [
   ["teaseme", "Tease me", "Let staff tease lines name you"],
   ["hypno", "Hypno", "Let your herd leader's voice lines reach you, privately"],
 ];
+// some switches only work once another is on; say so instead of lettin' a click do nothin'
+const NEEDS = { freeuse: ["breedable", "Turn Breedable on first"] };
 export function farmSwitches(ctx, list) {
   const sw = ctx.s.switches || {};
-  return list.map(([cmd, label, desc]) => toggle(label, desc, !!sw[cmd], () => ctx.send(cmd + " " + (sw[cmd] ? "off" : "on"))));
+  return list.map(([cmd, label, desc]) => {
+    const need = NEEDS[cmd];
+    if (need && !sw[need[0]] && !sw[cmd]) return toggle(label, need[1] + " · " + desc, false, () => ctx.send(cmd + " on"));
+    return toggle(label, desc, !!sw[cmd], () => ctx.send(cmd + " " + (sw[cmd] ? "off" : "on")));
+  });
 }
 export function panelPrefs(ctx) {
   return card(title("This panel"), muted("Only on your computer."),
     [["compact", "Compact cards", "Smaller text, more on screen"], ["chime", "Chime on notices", "A soft sound when the farm messages you"],
-     ["popopen", "Open on new notice", "Pop the panel open by itself"]].map(([k, label, desc]) =>
-      toggle(label, desc, !!ctx.prefs[k], () => ctx.setPref(k, !ctx.prefs[k]))));
+     ["popopen", "Open on new notice", "Pop the panel open by itself"],
+     ["btnPinned", "Pin the 🌾 button", "Unpinned, you can drag it anywhere (mouse or finger). Pin it so it stays put."]].map(([k, label, desc]) =>
+      toggle(label, desc, !!ctx.prefs[k], () => ctx.setPref(k, !ctx.prefs[k]))),
+    btn("Put the button and panel back in the corner", () => ctx.resetPlaces && ctx.resetPlaces()));
 }
 function toggles(ctx) {
   return [card(title("Farm settings"), muted("Saved by the farm girl. Your limits still win."), farmSwitches(ctx, SWITCH_INFO)),

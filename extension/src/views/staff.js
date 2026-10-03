@@ -67,18 +67,18 @@ function contracts(ctx) {
       field("For (name or member number, here in the room)", input("Bessie", "ctWho", ctx)),
       field("How long", select("ctDur", DURATIONS.map((d) => [d.key, d.label]), ctx)),
       h("div", null, btn("Preview", () => ctx.send("contract show " + tpl() + (who() ? " " + who() : ""))),
-        btn("Offer it", () => who() && ctx.send("contract offer " + tpl() + " " + who() + " " + dur()), true))),
+        btn("Offer it", () => who() ? ctx.send("contract offer " + tpl() + " " + who() + " " + dur()) : ctx.hint("Type who it's for first, in the For box."), true))),
     card(title("In force"), btn("List farm contracts", () => ctx.send("contract list")),
       field("Somebody's contracts", input("Bessie", "ctLook", ctx)),
-      h("div", null, btn("Ask their BC+", () => ctx.ui.ctLook && ctx.send("contract check " + ctx.ui.ctLook)),
-        btn("Release", () => ctx.ui.ctLook && ctx.send("contract release " + ctx.ui.ctLook)))),
+      h("div", null, btn("Ask their BC+", () => ctx.ui.ctLook ? ctx.send("contract check " + ctx.ui.ctLook) : ctx.hint("Type whose contracts first.")),
+        btn("Release", () => ctx.ui.ctLook ? ctx.send("contract release " + ctx.ui.ctLook) : ctx.hint("Type whose contract to release first.")))),
     latest(ctx),
   ];
 }
 
 function barn(ctx) {
   const who = () => (ctx.ui.barnWho || "").trim();
-  const act = (c) => () => who() && ctx.send(c + " " + who());
+  const act = (c) => () => (who() ? ctx.send(c + " " + who()) : ctx.hint("Type who first, in the Who box."));
   return [
     card(title("Barn work"), field("Who", input("Bessie", "barnWho", ctx)),
       h("div", null, ["milk", "collect", "drain", "edge", "denial", "ruin", "inspect", "vet", "quota"].map((c) => btn(c[0].toUpperCase() + c.slice(1), act(c))))),

@@ -2,8 +2,13 @@
 
   function handleCommand(sender, raw, channel){
     state.inReply = true;
+    // from the Companion: if the only thing a command does is a room emote, the panel gets a copy too
+    const watch = channel === "companion" ? (state.cmdWatch = { mn: sender, replied: false, emotes: [] }) : null;
     try { return handleCommandInner(sender, raw, channel); }
-    finally { state.inReply = false; }
+    finally {
+      state.inReply = false; state.cmdWatch = null;
+      if (watch && !watch.replied && watch.emotes.length) toCompanion(sender, "(in the room) "+watch.emotes.join("\n"), "reply");
+    }
   }
   function handleCommandInner(sender, raw, channel){
     const isWhisper = channel === "whisper" || channel === "bot" || channel === "companion";
@@ -21,11 +26,20 @@
       if (!pass && handleApplicationAnswer(sender, raw, channel)) return;
     }
 
+    // Never go quiet on somebody talkin' to me in private: a silent bot is harder to fix than a chatty one.
+    // (Room chat is everyone's conversation, so there I only answer real commands.)
+    const huh = (msg) => {
+      if (channel === "chat") return;
+      state.huhAt = state.huhAt || new Map();
+      if (Date.now() - (state.huhAt.get(sender)||0) < 60000) return;
+      state.huhAt.set(sender, Date.now());
+      reply(sender, msg, channel);
+    };
     const p = parseCommand(raw, isWhisper, isBeep);
-    if (!p) return;
+    if (!p){ huh("I didn't catch a command in that, sugar. Try ?help, or just say what you'd like, like stats or keys."); return; }
     const { cmd, args, rest } = p;
-    if (!PUBLIC_CMDS.includes(cmd) && !STAFF_CMDS.includes(cmd)) return;
-    if (STAFF_CMDS.includes(cmd) && !isStaff(sender)) return;
+    if (!PUBLIC_CMDS.includes(cmd) && !STAFF_CMDS.includes(cmd)){ huh("I don't know ?"+cmd+", hon. ?help lists what I can do."); return; }
+    if (STAFF_CMDS.includes(cmd) && !isStaff(sender)){ huh("?"+cmd+" is just for farm staff, sugar."); return; }
     if (onCooldown(sender, cmd, channel)){ if (channel !== "chat") waitYourTurn(sender, raw, channel); return; }
 
     dbg("CMD:", cmd, "from", sender, "via", channel);
@@ -176,6 +190,7 @@
             const t = resolveTarget(args[1]);
             if (!t || !charFor(t)){ R("They need to be here in the room for me to ask their BC+, hon."); break; }
             enqueue(BCPLUS.queryMsg(t));
+            R("📜 Askin' "+plainName(t)+"'s BC+ what farm contracts they hold…");
             later(() => { const mine = L.contracts.filter(x => x.mn === t && x.status !== "declined"); reply(sender, mine.length ? "📜 "+mine.map(contractLine).join("\n") : plainName(t)+" holds no farm contracts.", replyCh); }, 4000);
             break;
           }
@@ -992,7 +1007,7 @@
 
       /* ── SAFETY ── */
       case "safe": case "safeword": case "red": {
-        say("🔴 PAUSE CALLED. Everything stops, right now, everybody.", true);
+        say("🔴 PAUSE CALLED. Everything stops, right now, everybody.", true, sender);   // I go stand by them, so everyone near them hears it
         beep(sender, "I've got you, "+plainName(sender)+". Everything's stopped and I'm fetchin' somebody for you right now. You don't owe anybody an explanation. 🔴", true);
         notifyStaff("🔴 SAFEWORD from "+plainName(sender)+" ("+sender+"). Please go to them now.", false);
         audit(sender,"SAFEWORD",channel);

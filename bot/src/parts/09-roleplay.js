@@ -20,9 +20,19 @@
     if (found.length >= 2 && found.includes("vulva") && found.includes("butt") && makesSemen(stud) && typeInfo(stud).double) return ["vulva","butt"];
     return [found[0]];
   }
+  // "*rubs against Laynie's belly", "*presses close to Moo and feels her tummy": a belly touch in words
+  const BELLY_WORDS = /\b(belly|bellies|tummy|tum|stomach|womb|bump|baby bump)\b/i;
+  const TOUCH_WORDS = /\b(rub\w*|stroke\w*|strok\w*|touch\w*|press\w*|pat\w*|pet\w*|caress\w*|feel\w*|felt|kiss\w*|nuzzl\w*|cuddl\w*|hug\w*|rest\w*|lay\w*|lean\w*|grind\w*|cradl\w*|hold\w*|massag\w*)\b/i;
+  function bellyTouchFromRP(sender, text){
+    if (!BELLY_WORDS.test(text) || !TOUCH_WORDS.test(text)) return;
+    const others = (W.ChatRoomCharacter||[]).map(c => c.MemberNumber).filter(m => m !== sender && m !== CFG.BOT_MEMBER);
+    const t = namedIn(text, others);
+    if (t) bellyRub(sender, t);
+  }
   function onRoleplay(sender, text, type){
     if (!text || /^[?!.\-\/]/.test(text.trim())) return;          // commands aren't roleplay
     const now = Date.now();
+    if (type === "Emote") { try { bellyTouchFromRP(sender, text); } catch(e){ warn("belly rp:", e); } }
     // breedin'
     const sc = state.scenes.get(sender);
     if (sc && now - (sc.lastSeen||sc.at) > CFG.SCENE_IDLE_MIN*60000){ state.scenes.delete(sender); }
@@ -116,7 +126,7 @@
       stud = src; bred = tgt; hole = { ItemVulva:"vulva", ItemButt:"butt", ItemMouth:"mouth" }[focus];
     } else if (/^fuckwith(pussy|ass)$/i.test(act) && focus === "ItemPenis"){
       stud = tgt; bred = src; hole = /pussy/i.test(act) ? "vulva" : "butt";
-    } else if (/^(caress|rub|massage|kiss|lick|pet|pat|nuzzle|cuddle)/i.test(act) && ["ItemTorso","ItemTorso2","ItemPelvis"].includes(focus)){
+    } else if (/^(caress|rub|massage|kiss|gaggedkiss|lick|pet|pat|nuzzle|cuddle|grope|tickle|scratch|hug|press|rest)/i.test(act) && ["ItemTorso","ItemTorso2","ItemPelvis"].includes(focus)){
       bellyRub(src, tgt); return;
     } else if (/^(suck|suckle|nibble|nurse|drink)/i.test(act) && (focus === "ItemNipples" || focus === "ItemBreast")){
       if (rec(tgt) && makesMilk(tgt)) nurse(tgt, src);

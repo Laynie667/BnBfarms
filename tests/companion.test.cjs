@@ -157,6 +157,19 @@ const STATE = { name: "Laynie", onBooks: true, roles: ["PROPRIETOR", "LIVESTOCK"
   out("9 change back: own dress back on ->", by2("Cloth").Name === "Dress");
   out("9 farm-locked rope stays till a keyholder opens it ->", by2("ItemArms").Name === "HempRope");
 
+  // 10. the 🌾 button: drag it (mouse or finger), a tap still opens, pin keeps it put
+  const fb = D.getElementById("fhc-btn"), ev = (t, x, y, el) => (el || w).dispatchEvent(new w.MouseEvent(t, { clientX: x, clientY: y, bubbles: true }));
+  w.innerWidth = 800; w.innerHeight = 600;
+  ev("pointerdown", 5, 5, fb); ev("pointermove", 200, 150); ev("pointerup", 200, 150); fb.click();
+  const saved = JSON.parse(w.localStorage.getItem("fhc-prefs") || "{}");
+  out("10 dragged button moves and is remembered ->", fb.style.left === "195px", !!saved.btnPos);
+  const wasOpen = D.getElementById("fhc-panel").classList.contains("open");
+  fb.click(); out("10 a plain tap still opens/closes ->", D.getElementById("fhc-panel").classList.contains("open") !== wasOpen);
+  click("Livestock"); click("Toggles");
+  const pin = [...D.querySelectorAll(".fhc-tog")].find((t) => /Pin the/.test(t.textContent)); pin.querySelector("button").click();
+  ev("pointerdown", 200, 150, fb); ev("pointermove", 400, 400); ev("pointerup", 400, 400);
+  out("10 pinned button stays put ->", fb.style.left === "195px");
+
   commands.find((c) => c.Tag === "farm").Action("size");
   out("8 /farm size sends cmd ->", cmds().includes("size"));
   w.ChatRoomCharacter = [{ MemberNumber: 221397 }];

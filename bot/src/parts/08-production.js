@@ -1116,7 +1116,7 @@
     else if (heldTotal(p) > capacity(t)) line = a+" presses on "+n+"'s cum-swollen belly, and it gurgles. A warm trickle squeezes out of 'em. Messy!";
     if (!line) return;
     p.rubAt = now;
-    emote("🤰 "+line);
+    emote("🤰 "+line, t);   // I step over to them, so the one rubbin' (and everybody close) sees it
   }
 
   /* PRAISE & DEGRADATION */

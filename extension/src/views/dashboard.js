@@ -51,7 +51,7 @@ function contracts(ctx) {
   const cat = ctx.ui.dCat || cats[0];
   const inCat = [...RULES.values()].filter((r) => r.category === cat);
   const rule = RULES.get(ctx.ui.dRule) && RULES.get(ctx.ui.dRule).category === cat ? RULES.get(ctx.ui.dRule) : inCat[0];
-  const need = () => !nm() && (ctx.setUi({ dWarn: true }), true);
+  const need = () => !nm() && (ctx.hint("Give your contract a name first (one word, like prizecow)."), true);
   return [
     card(title("Your contract"),
       field("Name (one word)", h("input", { class: "fhc-in", placeholder: "prizecow", value: ctx.ui.dName || "", oninput: (e) => ctx.setUi({ dName: e.target.value }, true) })),
@@ -62,8 +62,8 @@ function contracts(ctx) {
       field("Title", h("input", { class: "fhc-in", maxlength: 60, value: ctx.ui.dTitle || "", oninput: (e) => ctx.setUi({ dTitle: e.target.value }, true) })),
       field("Terms they'll read (%name% becomes their name)", h("textarea", { class: "fhc-in", rows: 3, maxlength: 1000, oninput: (e) => ctx.setUi({ dTerms: e.target.value }, true) }, ctx.ui.dTerms || "")),
       h("div", null,
-        btn("Save title", () => !need() && ctx.ui.dTitle && ctx.send("contract title " + nm() + " " + ctx.ui.dTitle)),
-        btn("Save terms", () => !need() && ctx.ui.dTerms && ctx.send("contract terms " + nm() + " " + ctx.ui.dTerms)),
+        btn("Save title", () => !need() && (ctx.ui.dTitle ? ctx.send("contract title " + nm() + " " + ctx.ui.dTitle) : ctx.hint("Type the title first."))),
+        btn("Save terms", () => !need() && (ctx.ui.dTerms ? ctx.send("contract terms " + nm() + " " + ctx.ui.dTerms) : ctx.hint("Write the terms first."))),
         btn("Farm ends it", () => !need() && ctx.send("contract policy " + nm() + " farm")),
         btn("Either side ends it", () => !need() && ctx.send("contract policy " + nm() + " either")))),
     card(title("Add a BC+ rule"), muted("Every rule and setting BC+ " + BCPLUS_VERSION + " has. Only values BC+ accepts can be picked."),
@@ -122,7 +122,7 @@ function outfits(ctx) {
     card(title("Specials"), specials.map((k) => slotBox(k, k.slice(8))),
       h("label", { class: "fhc-label" }, "New special (one word: luxury, fairday, prizecow…)",
         h("input", { class: "fhc-in", value: ctx.ui.oSpecial || "", oninput: (e) => ctx.setUi({ oSpecial: e.target.value }, true) })),
-      btn("Save what I'm wearin' as this special", () => { const n = (ctx.ui.oSpecial || "").trim().toLowerCase().replace(/[^a-z0-9_-]/g, ""); if (n.length > 1) ctx.api.save && ctx.api.save("special:" + n); })),
+      btn("Save what I'm wearin' as this special", () => { const n = (ctx.ui.oSpecial || "").trim().toLowerCase().replace(/[^a-z0-9_-]/g, ""); if (n.length < 2) return ctx.hint("Name the special first (one word, like luxury)."); ctx.api.save && ctx.api.save("special:" + n); })),
     card(title("Locks"), h("div", { class: "fhc-kv" }, h("b", null, "High security padlock"), chip("every farm lock", "good")),
       h("label", { class: "fhc-label" }, "Who holds the keys", h("select", { class: "fhc-sel", onchange: (e) => ctx.send("outfit keys " + e.target.value) },
         Object.entries(KEYS_TEXT).map(([k, v]) => h("option", { value: k, selected: (rules.keys || "staff") === k ? "selected" : null }, v))))),

@@ -26,7 +26,8 @@
     QUEUE_MAX: 300,              // drop oldest routine messages past this
     BEEP_MAX_CHUNKS: 8,
     USER_COOLDOWN_S: 5,
-    COMPANION_COOLDOWN_S: 1,       // panel buttons: a short gap, and a click that comes too quick waits its turn
+    COMPANION_COOLDOWN_S: 1,
+    HOME_AFTER_S: 90,              // after walkin' over to somethin', I head back to my home tile (?spot set home) this long after       // panel buttons: a short gap, and a click that comes too quick waits its turn
     APPLY_TIMEOUT_MIN: 0,        // 0 = interviews never time out (staff can ?appclear a stale one)
     CLAIM_ASK_TIMEOUT_MIN: 60,   // unanswered ?claim requests lapse after this
     ROOM_SNAPSHOT_MIN: 10,       // remember the map so a rebuilt room keeps it

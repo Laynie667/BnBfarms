@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.13.2
+// @version      0.13.3
 // @description  B&B Farm: beeps, keys, ledger, roster, herds, summoning, anti-idle
 // @author       Laynie & Alexia
 // @match        *://*.bondageprojects.elementfx.com/*
@@ -1800,7 +1800,7 @@
   ];
 
   // bot/src/version.js
-  var VERSION = "0.13.2";
+  var VERSION = "0.13.3";
 
   // bot-parts:farmhand-bot-parts
   (function() {
@@ -3161,7 +3161,7 @@
     };
     W.FarmhandExport = exportLedger;
     W.FarmhandLedger = () => L;
-    if (W.__FARMHAND_TEST__) Object.assign(W, { __st: () => state, __cfg: CFG, __pt: prodTick, __qt: quotaTick, __lt: leashTick, __ms: milkingStallTick, __vt: voiceTick, __sync: syncCompanions, __gt: gearTick, __ht: homeTick, __addons: (h, ...a) => addonsEmit(h, ...a), __stateFor: (mn) => stateFor(mn), __leadTick: () => leadTick(), __ambient: () => ambientTick() });
+    if (W.__FARMHAND_TEST__) Object.assign(W, { __st: () => state, __cfg: CFG, __pt: prodTick, __qt: quotaTick, __lt: leashTick, __ms: milkingStallTick, __vt: voiceTick, __sync: syncCompanions, __gt: gearTick, __ht: homeTick, __addons: (h, ...a) => addonsEmit(h, ...a), __stateFor: (mn) => stateFor(mn), __leadTick: () => leadTick(), __ambient: () => ambientTick(), __about: (t) => aboutWhom(t), __announce: (t) => announce(t), __reply: (mn, t, ch) => reply(mn, t, ch) });
     W.FarmhandSyncKeys = () => syncAllPresent(true);
     W.FarmhandFriends = () => W.Player.FriendList;
     W.FarmhandAddFriend = (mn) => addFriend(mn, false);
@@ -3493,8 +3493,20 @@
       if (m && (m.Type === "Emote" || m.Type === "Chat") && typeof m.Content === "string") m = Object.assign({}, m, { Content: inCharacter(m.Content) });
       send("ChatRoomChat", m, urgent);
     }
+    function waitPlaced(mn, go, last) {
+      if (!mn || !mapRoom() || onMap(mn) || !charFor(mn)) return false;
+      let n = 0;
+      const tryIt = () => {
+        if (onMap(mn)) return go();
+        if (++n < 5 && charFor(mn)) return later(tryIt, 2e3);
+        last();
+      };
+      later(tryIt, 2e3);
+      return true;
+    }
     function say(t, urgent, who) {
       const subject = who || aboutWhom(t);
+      if (subject && waitPlaced(subject, () => say(t, urgent, subject), () => privateTo(subject, t, "chat"))) return;
       if (speakersOn() && speakerSend(subject, t, "chat", urgent)) return;
       if (mapRoom() && CFG.SPEAKER_MODE !== "walk") {
         if (subject && speakerSend(subject, t, "chat", urgent)) return;
@@ -3539,12 +3551,43 @@
       send("ChatRoomCharacterMapDataUpdate", me.MapData);
     }
     function aboutWhom(text) {
-      const here = (W.ChatRoomCharacter || []).map((c) => c.MemberNumber).filter((m) => m !== CFG.BOT_MEMBER && onMap(m));
-      return here.length ? namedIn(String(text), here) : null;
+      text = String(text);
+      let best = null, at = Infinity;
+      for (const c of W.ChatRoomCharacter || []) {
+        const mn = c.MemberNumber;
+        if (mn === CFG.BOT_MEMBER) continue;
+        const r = rec(mn), names = [...new Set([plainName(mn), c.Nickname, c.Name, r && r.name].filter((n) => n && String(n).length > 1))];
+        for (const n of names) {
+          const i = indexOfWord(text, String(n));
+          if (i >= 0 && (i < at || i === at && best !== null && String(n).length > 1)) {
+            at = i;
+            best = mn;
+          }
+        }
+      }
+      return best;
+    }
+    function indexOfWord(text, word) {
+      let from = 0;
+      for (; ; ) {
+        const i = text.indexOf(word, from);
+        if (i < 0) return -1;
+        const before = text[i - 1], after = text[i + word.length];
+        if (!(before && /[\p{L}\p{N}]/u.test(before)) && !(after && /[\p{L}\p{N}]/u.test(after))) return i;
+        from = i + 1;
+      }
+    }
+    function announce(t, urgent) {
+      if (mapRoom() && CFG.SPEAKER_MODE !== "walk") {
+        toEveryone(t, "chat", urgent);
+        return;
+      }
+      enqueue({ Content: t, Type: "Chat" }, urgent);
     }
     function emote(t, who) {
       if (state.cmdWatch) state.cmdWatch.emotes.push(String(t));
       const subject = who || aboutWhom(t);
+      if (subject && waitPlaced(subject, () => emote(t, subject), () => privateTo(subject, t, "emote"))) return;
       if (mapRoom() && subject) {
         const parties = [subject].concat(namesHere(t).filter((m) => m !== subject));
         const by = parties.find((m) => canRelay(m) && namedIn(String(t), [m]));
@@ -3651,6 +3694,7 @@
       const who = new Set([anchor].concat(named));
       if (sightOf(anchor) && !speakersOn()) for (const m of audience(anchor, kind === "chat" ? "hear" : "see")) who.add(m);
       else for (const c of here) if (dist(c.MapData.Pos, spot) <= R || dist(c.MapData.Pos, at) <= R) who.add(c.MemberNumber);
+      for (const m of [...who]) if (m !== anchor && !named.includes(m) && !hasCompanion(m)) who.delete(m);
       return who;
     }
     function onMap(mn) {
@@ -3854,12 +3898,13 @@
           return;
         }
         if (String(text).length <= CFG.CHAT_REPLY_SAY_MAX) {
-          say(text);
+          if (mapRoom()) privateTo(mn, text, "chat");
+          else say(text, false, mn);
           return;
         }
         whisper(mn, text);
         if (!canBeep(mn)) {
-          say(plainName(mn) + ", I whispered that one to you, hon! Add me (" + CFG.BOT_MEMBER + ") to your friend list and say ?friend, and I can reach you anywhere.");
+          say(plainName(mn) + ", I whispered that one to you, hon! Add me (" + CFG.BOT_MEMBER + ") to your friend list and say ?friend, and I can reach you anywhere.", false, mn);
         }
         return;
       }
@@ -3938,7 +3983,7 @@
       const known = L.archive[mn] || r0 && r0.roles && r0.roles.length;
       const pool = known ? RETURN_GREETINGS : GREETINGS;
       const line = pool[Math.floor(Math.random() * pool.length)];
-      later(() => say(fill(line, mn)), 1500);
+      later(() => say(fill(line, mn), false, mn), 1500);
       const r = rec(mn);
       if (r) {
         r.name = plainName(mn);
@@ -3963,7 +4008,7 @@
         if (years >= 1 && d0.getMonth() === now.getMonth() && d0.getDate() === now.getDate() && r.annivYear !== now.getFullYear()) {
           r.annivYear = now.getFullYear();
           saveLedger();
-          later(() => say("🎉 " + years + " year" + (years === 1 ? "" : "s") + " on the books today, " + plainName(mn) + "! Somebody fetch this sweetie a ribbon!"), 4500);
+          later(() => say("🎉 " + years + " year" + (years === 1 ? "" : "s") + " on the books today, " + plainName(mn) + "! Somebody fetch this sweetie a ribbon!", false, mn), 4500);
         }
       }
     }
@@ -4434,7 +4479,7 @@
         L.rutDay = dayKey();
         L.rutSaid = now;
         saveLedger();
-        say("🔥 RUT DAY, y'all! All day today every fill is twice as likely to take, and studs get pent up twice as fast. Get breedin'! 🐂");
+        announce("🔥 RUT DAY, y'all! All day today every fill is twice as likely to take, and studs get pent up twice as fast. Get breedin'! 🐂");
         return;
       }
       if (now - (L.rutSaid || 0) > CFG.RUT_EMOTE_MIN * 6e4 * (0.75 + Math.random() * 0.5)) {
@@ -4580,7 +4625,7 @@
             r.tier = "prize";
             audit(CFG.BOT_MEMBER, "TIER", mn + " → prize (top producer " + Y.week + ")");
             beep(mn, "🏆 Top producer of the week, with " + ml(top[1]) + "! You're prize stock now, sugar. So proud of you!");
-            if (inRoom()) say("🏆 Y'all give it up for this week's top producer: " + plainName(mn) + ", with " + ml(top[1]) + "! Prize stock now.");
+            if (inRoom()) announce("🏆 Y'all give it up for this week's top producer: " + plainName(mn) + ", with " + ml(top[1]) + "! Prize stock now.");
           }
         }
         if (CFG.GRADE.WEEKLY_PRIZE && Y.g) {
@@ -4591,13 +4636,13 @@
               r.tier = "prize";
               audit(CFG.BOT_MEMBER, "TIER", best[0] + " → prize (best milk " + Y.week + ")");
               beep(best[0], "🏆 Best milk on the farm this week, grade " + gradeLetter(best[1]) + "! You're prize stock now, sweetie. 🥛");
-              if (inRoom()) say("🏆 Best milk of the week goes to " + plainName(best[0]) + ", grade " + gradeLetter(best[1]) + "! Prize stock, y'all. 🥛");
+              if (inRoom()) announce("🏆 Best milk of the week goes to " + plainName(best[0]) + ", grade " + gradeLetter(best[1]) + "! Prize stock, y'all. 🥛");
             }
           }
         }
         const sires = Object.entries(Y.s || {}).sort((a, b) => b[1] - a[1]).slice(0, CFG.TOP_SIRES);
         if (sires.length && inRoom())
-          say("🐂 This week's top sires, y'all: " + sires.map(([m, n], i) => i + 1 + ". " + plainName(parseInt(m, 10)) + " (" + n + " caught)").join(", ") + ". Somebody's been busy! 🍼");
+          announce("🐂 This week's top sires, y'all: " + sires.map(([m, n], i) => i + 1 + ". " + plainName(parseInt(m, 10)) + " (" + n + " caught)").join(", ") + ". Somebody's been busy! 🍼");
         for (const [m] of sires.slice(0, 1)) beep(parseInt(m, 10), "🐂 You're the top sire on the farm this week, sugar! Proud of you.");
         Y.w = {};
         Y.g = {};
@@ -5011,14 +5056,14 @@
             "The machine strokes " + n + " from root to tip, milkin' that " + c + " cock for every drop. Seed spurts into the collection jar in thick pulses.",
             "A warm vibrating cup hugs " + n + "'s balls while the sleeve sucks their cock. " + n + " is a moanin', drippin' mess in the stall."
           ];
-          emote("🐂 " + (alt || L1[Math.floor(Math.random() * L1.length)]));
+          emote("🐂 " + (alt || L1[Math.floor(Math.random() * L1.length)]), mn);
         }
         const doneM = !makesMilk(mn) || milkDenied(mn) || gearOf(mn).milk || p.milk <= keepM + 1;
         const doneS = !makesSemen(mn) || p.semen <= keepS + 0.5;
         if (p.stall && doneM && doneS) {
           p.stall = null;
           const altDone = got > 0 && addonLine(makesSemen(mn) && !makesMilk(mn) ? "stallDoneSemen" : "stallDone", lineInfo(mn));
-          if (got > 0) emote(altDone ? (makesSemen(mn) && !makesMilk(mn) ? "🐂 " : "🥛 ") + altDone : makesSemen(mn) && !makesMilk(mn) ? "🐂 The stall wrings " + plainName(mn) + " down to the last quarter and lets go. Balls aching and light, legs wobbly. Good stud!" : "🥛 The milkin' stall eases off once " + plainName(mn) + " is down to a quarter, teats sore and drippin'. Good job, sweetie! Off you go.");
+          if (got > 0) emote(altDone ? (makesSemen(mn) && !makesMilk(mn) ? "🐂 " : "🥛 ") + altDone : makesSemen(mn) && !makesMilk(mn) ? "🐂 The stall wrings " + plainName(mn) + " down to the last quarter and lets go. Balls aching and light, legs wobbly. Good stud!" : "🥛 The milkin' stall eases off once " + plainName(mn) + " is down to a quarter, teats sore and drippin'. Good job, sweetie! Off you go.", mn);
         }
       }
     }
@@ -5183,7 +5228,7 @@
       }
       saveLedger();
       audit(stud, "CUM", stud + "→" + t + " " + hole + " " + Math.round(load));
-      emote(o);
+      emote(o, t);
       if (clutch) emote("🥚 Deep inside " + plainName(t) + ", something takes hold: " + plainName(stud) + "'s draconic seed has left a clutch of " + clutch + " eggs growin' in there. They'll be layin' in a few days.");
       if (sc0) sc0.lastCum = Date.now();
       if (knot && !opt.second) {
@@ -5484,7 +5529,7 @@
       ][Math.floor(Math.random() * 2)];
       if (!line) return;
       p.sloshAt = now;
-      emote("💦 " + line);
+      emote("💦 " + line, mn);
     }
     function bellyRub(src, t) {
       if (!rec(t) || !onMap(t)) return;
@@ -5521,7 +5566,7 @@
         'The word "' + word + '" lands, and ' + n + " squirms, cheeks burnin' and thighs pressed together.",
         n + " bites their lip and nods. A " + word + ". Yes. That's exactly what they are."
       ];
-      emote((praise ? "💗 " : "🥀 ") + lines[Math.floor(Math.random() * lines.length)]);
+      emote((praise ? "💗 " : "🥀 ") + lines[Math.floor(Math.random() * lines.length)], t);
     }
     function earnedTitle(mn, key) {
       const r = rec(mn), p = prodOf(mn);
@@ -6182,7 +6227,7 @@
         L.life.weather = { day: d, key: w.key, line: w.line, indoors: !!w.indoors };
         for (const r of Object.values(L.people)) delete r.begged;
         saveLedger();
-        if (inRoom()) say("🌤️ " + w.line);
+        if (inRoom()) announce("🌤️ " + w.line);
       }
       return L.life.weather;
     }
@@ -6196,7 +6241,7 @@
         const pt = w.indoors ? firstSpot("barn", "trough") : firstSpot("trough");
         const stock = presentStock().filter((m) => !stockedNow(m));
         for (const m of stock) sound(m, "bell");
-        say("🔔 Soo-eee! Feedin' time" + (w.indoors ? ", in the barn on account of the weather" : " at the trough") + ". Come and get it, sweeties!");
+        announce("🔔 Soo-eee! Feedin' time" + (w.indoors ? ", in the barn on account of the weather" : " at the trough") + ". Come and get it, sweeties!");
         if (pt) for (const m of stock) teleport(m, pt, false);
       }
       const cur = inCurfew();
@@ -6204,14 +6249,14 @@
         L.life.curfewActive = cur;
         saveLedger();
         if (cur) {
-          say("🌙 Curfew, y'all! Stock to the barn and snuggle in" + (CFG.CURFEW_TAKES_BRONZE ? ", and I'll hold onto those bronze keys till mornin'" : "") + ". Sweet dreams!");
+          announce("🌙 Curfew, y'all! Stock to the barn and snuggle in" + (CFG.CURFEW_TAKES_BRONZE ? ", and I'll hold onto those bronze keys till mornin'" : "") + ". Sweet dreams!");
           const pt = firstSpot("barn");
           for (const m of presentStock()) if (!stockedNow(m)) {
             if (pt) teleport(m, pt, false);
             syncKeys(m, true);
           }
         } else {
-          say("🌅 Rise and shine, sweeties! Curfew's lifted.");
+          announce("🌅 Rise and shine, sweeties! Curfew's lifted.");
           for (const r of Object.values(L.people)) delete r.begged;
           syncAllPresent(true);
         }
@@ -6756,7 +6801,7 @@
           }
           if (got > 0 && p.milk < 1 && !p.gearDry) {
             p.gearDry = true;
-            emote("🥛 " + (addonLine("gearDry", lineInfo(mn, { gear: g.milk.name })) || "The " + g.milk.name + " pulls " + plainName(mn) + " plumb dry. Every last drop's in the tank, sugar."));
+            emote("🥛 " + (addonLine("gearDry", lineInfo(mn, { gear: g.milk.name })) || "The " + g.milk.name + " pulls " + plainName(mn) + " plumb dry. Every last drop's in the tank, sugar."), mn);
           }
           if (p.milk >= 1) p.gearDry = false;
         }
@@ -6903,6 +6948,8 @@
         audit: (by, action, detail) => audit(by, a.name.toUpperCase() + "_" + action, detail),
         // talkin'
         say: (t, urgent, who) => say(t, urgent, who),
+        announce: (t, urgent) => announce(t, urgent),
+        // for the whole farm, even when it names somebody
         emote: (t, who) => emote(t, who),
         whisper: (mn, t) => whisper(mn, t),
         privateEmote: (mn, t) => privateLine(mn, t, "emote"),
@@ -9017,7 +9064,7 @@ Welcome to B&B Farm. Mind the ruts! 🌾`,
           if (p2.pin && !sizePinned(t)) p2.pin = null;
           saveLedger();
           audit(sender, "DRAIN", t + " " + Math.round(out));
-          if (charFor(t)) emote("🪣 " + plainName(sender) + " presses down on " + plainName(t) + "'s belly and pumps 'em out: " + ml(out) + " of seed gushes into the bucket, splashin' everywhere. What a beautiful mess.");
+          if (charFor(t)) emote("🪣 " + plainName(sender) + " presses down on " + plainName(t) + "'s belly and pumps 'em out: " + ml(out) + " of seed gushes into the bucket, splashin' everywhere. What a beautiful mess.", t);
           else R("🪣 Drained " + ml(out) + " out of " + plainName(t) + ".");
           break;
         }
@@ -9043,7 +9090,7 @@ Welcome to B&B Farm. Mind the ruts! 🌾`,
           p2.deniedUntil = Date.now() + h * 36e5;
           saveLedger();
           audit(sender, "DENIAL", t + " " + h + "h");
-          if (charFor(t)) emote("🚫 " + plainName(sender) + " taps " + plainName(t) + " right where it aches: no fillin' anybody for " + h + " hours. Every drop stays in, sugar.");
+          if (charFor(t)) emote("🚫 " + plainName(sender) + " taps " + plainName(t) + " right where it aches: no fillin' anybody for " + h + " hours. Every drop stays in, sugar.", t);
           R("🚫 " + plainName(t) + " is denied for " + h + " hours. When it's up they'll be pent up for sure.");
           break;
         }
@@ -9068,7 +9115,7 @@ Welcome to B&B Farm. Mind the ruts! 🌾`,
           p2.semenFullSince = 0;
           saveLedger();
           audit(sender, "RUIN", t + " " + Math.round(lost));
-          emote("😈 " + plainName(sender) + " takes " + plainName(t) + " right to the edge, then lets go at the last second. " + ml(lost) + " dribbles out, wasted on the hay, and " + plainName(t) + " whimpers for it. Ruined.");
+          emote("😈 " + plainName(sender) + " takes " + plainName(t) + " right to the edge, then lets go at the last second. " + ml(lost) + " dribbles out, wasted on the hay, and " + plainName(t) + " whimpers for it. Ruined.", t);
           break;
         }
         case "jars": {
@@ -9754,7 +9801,7 @@ Welcome to B&B Farm. Mind the ruts! 🌾`,
           r.rights = { stud: ask.stud, until: Date.now() + (ask.days || CFG.RIGHTS_DAYS) * 864e5, since: Date.now(), allow: [] };
           saveLedger();
           audit(sender, "RIGHTS", ask.stud + "");
-          if (onMap(sender) && onMap(ask.stud)) emote("🔏 " + plainName(sender) + " gives " + plainName(ask.stud) + " breedin' rights for " + (ask.days || CFG.RIGHTS_DAYS) + " day(s). Only " + plainName(ask.stud) + "'s seed can take 'em now. Everybody else is just for fun.");
+          if (onMap(sender) && onMap(ask.stud)) emote("🔏 " + plainName(sender) + " gives " + plainName(ask.stud) + " breedin' rights for " + (ask.days || CFG.RIGHTS_DAYS) + " day(s). Only " + plainName(ask.stud) + "'s seed can take 'em now. Everybody else is just for fun.", ask.stud);
           else {
             tell(ask.stud, "🔏 " + plainName(sender) + " said yes! You hold their breedin' rights for " + (ask.days || CFG.RIGHTS_DAYS) + " day(s).");
           }
@@ -9856,7 +9903,7 @@ Welcome to B&B Farm. Mind the ruts! 🌾`,
           R(TEXT.doors);
           break;
         case "ping":
-          if (channel === "chat") say("Right here and mindin' the books, " + plainName(sender) + "! 🌾");
+          if (channel === "chat") say("Right here and mindin' the books, " + plainName(sender) + "! 🌾", false, sender);
           else R("Right here and mindin' the books, " + plainName(sender) + "! 🌾");
           break;
         case "apply":
@@ -10388,7 +10435,7 @@ Welcome to B&B Farm. Mind the ruts! 🌾`,
           if (L.stuckLog.length > 300) L.stuckLog = L.stuckLog.slice(-300);
           saveLedger();
           audit(sender, "STUCK", where);
-          say("Hold still, " + plainName(sender) + ". I'm gettin' you some help.", true);
+          say("Hold still, " + plainName(sender) + ". I'm gettin' you some help.", true, sender);
           const staffHere = [];
           for (const k in L.people) {
             const m = parseInt(k, 10);
@@ -11229,7 +11276,7 @@ Welcome to B&B Farm, hon. 🌾`
           if (holes.length) say2.push("checks how much they'll take: " + holes.join(", "));
           const belly = bellyWord(t);
           if (belly) say2.push("pats a belly that's " + belly);
-          emote("📏 The farm girl pulls out her tape measure and gets right up close with " + nm + ". She " + say2.join("; she ") + ". She jots it all down with a wicked little grin.");
+          emote("📏 The farm girl pulls out her tape measure and gets right up close with " + nm + ". She " + say2.join("; she ") + ". She jots it all down with a wicked little grin.", t);
           break;
         }
         case "freeuse":
@@ -11323,10 +11370,10 @@ Welcome to B&B Farm, hon. 🌾`
             by + " works " + n + " until they're beggin' and shakin', then stops cold. A desperate, whiny groan. That's " + k + ".",
             n + " bucks into " + by + "'s hand, so close, so close, and " + by + " pulls away with a grin. Edge number " + k + "."
           ];
-          emote("😈 " + lines[Math.floor(Math.random() * lines.length)]);
+          emote("😈 " + lines[Math.floor(Math.random() * lines.length)], t);
           if (sp.edges >= CFG.EDGE_PENT && !sp.pentUp) {
             sp.pentUp = true;
-            emote("😤 " + n + " is edged so raw their balls ache. All pent up now, and the next load's gonna be enormous.");
+            emote("😤 " + n + " is edged so raw their balls ache. All pent up now, and the next load's gonna be enormous.", t);
           }
           saveLedger();
           audit(sender, "EDGE", t + " " + sp.edges);
@@ -11371,7 +11418,7 @@ Welcome to B&B Farm, hon. 🌾`
           const was = paintedText(t);
           p2.painted = null;
           saveLedger();
-          if (onMap(t)) emote("🚿 " + plainName(t) + " gets hosed down at the trough, washin' the " + was + " clean. Shame, it was a good look.");
+          if (onMap(t)) emote("🚿 " + plainName(t) + " gets hosed down at the trough, washin' the " + was + " clean. Shame, it was a good look.", t);
           else R("All washed up, sugar.");
           break;
         }
@@ -11455,7 +11502,7 @@ Welcome to B&B Farm, hon. 🌾`
           saveLedger();
           audit(sender, "NOMILK", t + " " + hh + "h");
           R("🚫 Capped " + plainName(t) + " for " + hh + " hours.");
-          if (onMap(t)) emote("🚫 " + plainName(sender) + " snaps little caps over " + plainName(t) + "'s nipples. No milkin' for " + hh + " hours, no matter how full and achy those udders get.");
+          if (onMap(t)) emote("🚫 " + plainName(sender) + " snaps little caps over " + plainName(t) + "'s nipples. No milkin' for " + hh + " hours, no matter how full and achy those udders get.", t);
           else tell(t, "🚫 " + plainName(sender) + " capped your teats for " + hh + " hours, sugar. No milkin' till then.");
           break;
         }
@@ -11484,7 +11531,7 @@ Welcome to B&B Farm, hon. 🌾`
           if (paintedText(t)) bits.push("Notes the dried seed on their " + paintedText(t) + ".");
           if (inHeat(p2)) bits.push("Sniffs: in heat, and dripping for it.");
           bits.push(I0 + " marks the card" + (makesMilk(t) ? ": milk grade " + milkGrade(t) : "") + ". Good stock.");
-          emote("🔍 " + bits.join(" "));
+          emote("🔍 " + bits.join(" "), t);
           break;
         }
         case "breedable":
@@ -11571,7 +11618,7 @@ Welcome to B&B Farm, hon. 🌾`
           }
           if (asked.length) R("I've asked " + asked.map(plainName).join(" and ") + " first; they'll join when they say yes.");
           state.scenes.set(stud, { with: ready, hole: hole0, at: Date.now(), by: sender, lastCum: 0 });
-          emote("🐂 The farm girl leads " + plainName(stud) + " over and puts 'em to " + ready.map(plainName).join(" and ") + " (" + holeText(hole0) + ").");
+          emote("🐂 The farm girl leads " + plainName(stud) + " over and puts 'em to " + ready.map(plainName).join(" and ") + " (" + holeText(hole0) + ").", stud);
           R("Your scene's open, sugar. Just roleplay it: every time you say cum (or orgasm, climax, breed, fill them up) I'll fill " + (ready.length > 1 ? "whoever you name, or the first one," : "'em") + " in the " + hole0 + ". Name a hole in your emote (pussy, ass, mouth) to switch, or say on her face (tits, belly…) to paint 'em. ?breed status shows your scene, ?breed stop ends it.");
           break;
         }
@@ -11628,7 +11675,7 @@ Welcome to B&B Farm, hon. 🌾`
           }
           const scene = (cmd === "milk" ? "milk" : "collect") + (t === sender ? "Self" : "");
           if (!runScene(scene, t, { n: plainName(t), b: plainName(sender), bMn: sender, ml: ml(got), icon: cmd === "milk" ? "🥛" : "🧪" }))
-            emote(cmd === "milk" ? "🥛 " + (t === sender ? plainName(t) + " milks " + ml(got) + " into the pail" : plainName(sender) + " milks " + plainName(t) + ": " + ml(got) + " into the pail") + ". Good job, hon!" : "🧪 " + (t === sender ? plainName(t) + " fills the collection jar with " + ml(got) : plainName(sender) + " collects " + ml(got) + " from " + plainName(t)) + ". Good job, hon!");
+            emote(cmd === "milk" ? "🥛 " + (t === sender ? plainName(t) + " milks " + ml(got) + " into the pail" : plainName(sender) + " milks " + plainName(t) + ": " + ml(got) + " into the pail") + ". Good job, hon!" : "🧪 " + (t === sender ? plainName(t) + " fills the collection jar with " + ml(got) : plainName(sender) + " collects " + ml(got) + " from " + plainName(t)) + ". Good job, hon!", t);
           break;
         }
         case "stats": {
@@ -11796,7 +11843,7 @@ Welcome to B&B Farm, hon. 🌾`
           }
           state.leashes.set(t, sender);
           audit(sender, "WALK", String(t));
-          say("🦮 " + plainName(sender) + " clips a lead on " + plainName(t) + ". Aww!");
+          say("🦮 " + plainName(sender) + " clips a lead on " + plainName(t) + ". Aww!", false, t);
           whisper(t, "You're on " + plainName(sender) + "'s lead now, sweetie. Wherever they go, you go. Safeword ends it.");
           break;
         }
@@ -11970,7 +12017,7 @@ Welcome to B&B Farm, hon. 🌾`
           }
           const e = pool[Math.floor(Math.random() * pool.length)];
           audit(sender, "SPIN", t + " " + e.text.slice(0, 50));
-          say("🎡 Round and round she goes! " + plainName(sender) + " spins the wheel for " + plainName(t) + "… " + (e.kind === "reward" ? "🍬 " : "🔻 ") + fill(e.text, t));
+          say("🎡 Round and round she goes! " + plainName(sender) + " spins the wheel for " + plainName(t) + "… " + (e.kind === "reward" ? "🍬 " : "🔻 ") + fill(e.text, t), false, t);
           break;
         }
         case "beg":
@@ -12046,7 +12093,7 @@ Welcome to B&B Farm, hon. 🌾`
             };
             L.life.fair = { open: true, at: Date.now(), entrants: {}, cls, loads: {}, title: rest2.join(" ") || CLASS_TITLE[cls] };
             saveLedger();
-            say("🎪 Y'all, the " + L.life.fair.title + " is open! " + (cls === "show" ? "Stock: say ?enter to show. Staff: ?score <who> <1-10>, like ?score Bessie 8." : cls === "load" ? "Studs: say ?enter, then give it your best ?cum. Biggest single load wins!" : "Say ?enter and I'll measure you up when it closes. Biggest wins, and judges' scores break a tie!"));
+            announce("🎪 Y'all, the " + L.life.fair.title + " is open! " + (cls === "show" ? "Stock: say ?enter to show. Staff: ?score <who> <1-10>, like ?score Bessie 8." : cls === "load" ? "Studs: say ?enter, then give it your best ?cum. Biggest single load wins!" : "Say ?enter and I'll measure you up when it closes. Biggest wins, and judges' scores break a tie!"));
           } else if (sub === "close") {
             if (!isProprietor(sender)) {
               R("Only the proprietors can close the fair, sugar.");
@@ -12068,7 +12115,7 @@ Welcome to B&B Farm, hon. 🌾`
             F.open = false;
             saveLedger();
             if (!ranked.length) {
-              say("🎪 The fair's closed, y'all. Nobody " + (cls === "show" ? "got judged" : "placed") + " this time.");
+              announce("🎪 The fair's closed, y'all. Nobody " + (cls === "show" ? "got judged" : "placed") + " this time.");
               break;
             }
             const [win, score] = ranked[0], r = rec(win);
@@ -12080,7 +12127,7 @@ Welcome to B&B Farm, hon. 🌾`
             }
             saveLedger();
             audit(sender, "FAIR_WIN", win + " " + cls + " " + score);
-            say("🎪🏆 And the " + F.title + " goes to... " + plainName(win) + " (" + shown(win, score) + ")! Blue ribbon" + (r.tierUntil ? " and prize tier for a week" : "") + "." + (ranked[1] ? " Runner-up: " + plainName(ranked[1][0]) + " (" + shown(ranked[1][0], ranked[1][1]) + ")." : ""));
+            announce("🎪🏆 And the " + F.title + " goes to... " + plainName(win) + " (" + shown(win, score) + ")! Blue ribbon" + (r.tierUntil ? " and prize tier for a week" : "") + "." + (ranked[1] ? " Runner-up: " + plainName(ranked[1][0]) + " (" + shown(ranked[1][0], ranked[1][1]) + ")." : ""));
           } else {
             if (!F || !F.open) {
               R("There's no fair runnin' right now, sugar. Proprietors can start one with ?fair open, a class if they like (show, udder, balls, penis, gape, throat or load), and a title, like ?fair open Harvest Show or ?fair open udder Moo Off.");
@@ -12118,7 +12165,7 @@ Welcome to B&B Farm, hon. 🌾`
           }
           F.entrants[sender] = F.entrants[sender] || { scores: {} };
           saveLedger();
-          say("🎪 Lookin' good! " + plainName(sender) + " steps into the show ring.");
+          say("🎪 Lookin' good! " + plainName(sender) + " steps into the show ring.", false, sender);
           break;
         }
         case "score": {

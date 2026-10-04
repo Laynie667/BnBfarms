@@ -180,13 +180,13 @@
     if (d.week.month !== mk) d.week = { month: mk };
     if (now.getDate() === 14 && !d.week.warned && here.length) {
       d.week.warned = true;
-      api.say("📅 Breeding week starts tomorrow, y'all! Anybody who said ?season on will come into heat for it.");
+      api.announce("📅 Breeding week starts tomorrow, y'all! Anybody who said ?season on will come into heat for it.");
       api.save();
     }
     if (!isBreedWeek(now)) return;
     if (!d.week.said && here.length) {
       d.week.said = true;
-      api.say("🔥 It's breeding week on the farm! Everybody signed up is comin' into heat. Studs, behave. Or don't. 🐂");
+      api.announce("🔥 It's breeding week on the farm! Everybody signed up is comin' into heat. Studs, behave. Or don't. 🐂");
       api.save();
     }
     d.week.heated = d.week.heated || {};

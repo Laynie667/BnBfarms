@@ -24,7 +24,7 @@
       L.life.weather = { day:d, key:w.key, line:w.line, indoors:!!w.indoors };
       for (const r of Object.values(L.people)) delete r.begged;   // a new day: begged favours lapse
       saveLedger();
-      if (inRoom()) say("🌤️ "+w.line);
+      if (inRoom()) announce("🌤️ "+w.line);
     }
     return L.life.weather;
   }
@@ -39,7 +39,7 @@
       const pt = w.indoors ? firstSpot("barn","trough") : firstSpot("trough");
       const stock = presentStock().filter(m => !stockedNow(m));
       for (const m of stock) sound(m, "bell");
-      say("🔔 Soo-eee! Feedin' time"+(w.indoors ? ", in the barn on account of the weather" : " at the trough")+". Come and get it, sweeties!");
+      announce("🔔 Soo-eee! Feedin' time"+(w.indoors ? ", in the barn on account of the weather" : " at the trough")+". Come and get it, sweeties!");
       if (pt) for (const m of stock) teleport(m, pt, false);
     }
     // curfew starts / ends
@@ -47,11 +47,11 @@
     if (cur !== !!L.life.curfewActive){
       L.life.curfewActive = cur; saveLedger();
       if (cur){
-        say("🌙 Curfew, y'all! Stock to the barn and snuggle in"+(CFG.CURFEW_TAKES_BRONZE ? ", and I'll hold onto those bronze keys till mornin'" : "")+". Sweet dreams!");
+        announce("🌙 Curfew, y'all! Stock to the barn and snuggle in"+(CFG.CURFEW_TAKES_BRONZE ? ", and I'll hold onto those bronze keys till mornin'" : "")+". Sweet dreams!");
         const pt = firstSpot("barn");
         for (const m of presentStock()) if (!stockedNow(m)) { if (pt) teleport(m, pt, false); syncKeys(m, true); }
       } else {
-        say("🌅 Rise and shine, sweeties! Curfew's lifted.");
+        announce("🌅 Rise and shine, sweeties! Curfew's lifted.");
         for (const r of Object.values(L.people)) delete r.begged;
         syncAllPresent(true);
       }

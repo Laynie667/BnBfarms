@@ -143,10 +143,10 @@ function breedWeekTick(here) {
   const d = D(), now = new Date(), mk = monthKey(now);
   if (d.week.month !== mk) d.week = { month: mk };
   if (now.getDate() === 14 && !d.week.warned && here.length) {
-    d.week.warned = true; api.say("📅 Breeding week starts tomorrow, y'all! Anybody who said ?season on will come into heat for it."); api.save();
+    d.week.warned = true; api.announce("📅 Breeding week starts tomorrow, y'all! Anybody who said ?season on will come into heat for it."); api.save();
   }
   if (!isBreedWeek(now)) return;
-  if (!d.week.said && here.length) { d.week.said = true; api.say("🔥 It's breeding week on the farm! Everybody signed up is comin' into heat. Studs, behave. Or don't. 🐂"); api.save(); }
+  if (!d.week.said && here.length) { d.week.said = true; api.announce("🔥 It's breeding week on the farm! Everybody signed up is comin' into heat. Studs, behave. Or don't. 🐂"); api.save(); }
   d.week.heated = d.week.heated || {};
   for (const mn of here) {
     const r = api.rec(mn), p = api.prod(mn);

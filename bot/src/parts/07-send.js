@@ -159,8 +159,18 @@
     send("ChatRoomChat", m, urgent);
   }
   // spoken out loud: only heard in hearing range of me on a map, so I step over to whoever it's about
+  // somebody who just walked in isn't on the map for a moment; hold their line till they are (up to ~10 s),
+  // then it goes to them alone
+  function waitPlaced(mn, go, last){
+    if (!mn || !mapRoom() || onMap(mn) || !charFor(mn)) return false;
+    let n = 0;
+    const tryIt = () => { if (onMap(mn)) return go(); if (++n < 5 && charFor(mn)) return later(tryIt, 2000); last(); };
+    later(tryIt, 2000);
+    return true;
+  }
   function say(t, urgent, who){
     const subject = who || aboutWhom(t);
+    if (subject && waitPlaced(subject, () => say(t, urgent, subject), () => privateTo(subject, t, "chat"))) return;
     if (speakersOn() && speakerSend(subject, t, "chat", urgent)) return;   // the speaker spot talks for me
     // on a map I don't walk over (unless CFG.SPEAKER_MODE is "walk"): it goes privately to the people near
     // whoever it's about, or, if it's about nobody (an announcement), to everybody on the map
@@ -211,15 +221,43 @@
     me.MapData.Pos = { X: home.X, Y: home.Y };
     send("ChatRoomCharacterMapDataUpdate", me.MapData);
   }
-  // the first person on the map an emote is about (named in it)
+  // who a line is about: the person named EARLIEST in it, matched exactly the way the bot writes names
+  // (their nickname or name, as a whole word, capitals and all), so "sugar" or "honey" in the bot's own
+  // talk never matches somebody called Sugar or Honey. Anyone in the room counts, placed on the map or not.
   function aboutWhom(text){
-    const here = (W.ChatRoomCharacter||[]).map(c => c.MemberNumber).filter(m => m !== CFG.BOT_MEMBER && onMap(m));
-    return here.length ? namedIn(String(text), here) : null;
+    text = String(text);
+    let best = null, at = Infinity;
+    for (const c of (W.ChatRoomCharacter||[])){
+      const mn = c.MemberNumber; if (mn === CFG.BOT_MEMBER) continue;
+      const r = rec(mn), names = [...new Set([plainName(mn), c.Nickname, c.Name, r && r.name].filter(n => n && String(n).length > 1))];
+      for (const n of names){
+        const i = indexOfWord(text, String(n));
+        if (i >= 0 && (i < at || (i === at && best !== null && String(n).length > 1))){ at = i; best = mn; }
+      }
+    }
+    return best;
+  }
+  function indexOfWord(text, word){
+    let from = 0;
+    for (;;){
+      const i = text.indexOf(word, from);
+      if (i < 0) return -1;
+      const before = text[i-1], after = text[i+word.length];
+      if (!(before && /[\p{L}\p{N}]/u.test(before)) && !(after && /[\p{L}\p{N}]/u.test(after))) return i;
+      from = i + 1;
+    }
+  }
+  // an announcement for the whole farm (weather, feedin' time, curfew, winners…): everybody hears it,
+  // even when it names somebody. On a map that's privately to each person; otherwise plain room chat.
+  function announce(t, urgent){
+    if (mapRoom() && CFG.SPEAKER_MODE !== "walk"){ toEveryone(t, "chat", urgent); return; }
+    enqueue({ Content:t, Type:"Chat" }, urgent);
   }
   // who: the person it's about (worked out from the names in it if left out)
   function emote(t, who){
     if (state.cmdWatch) state.cmdWatch.emotes.push(String(t));
     const subject = who || aboutWhom(t);
+    if (subject && waitPlaced(subject, () => emote(t, subject), () => privateTo(subject, t, "emote"))) return;
     if (mapRoom() && subject){
       // 1. FROM THEM: a line about somebody with the Companion is posted by their own Companion as their own
       //    emote (no name in front), so the game shows it to exactly the people who can see them. Only ever
@@ -325,6 +363,9 @@
     // their Companion said exactly who can see (or hear) them: those people. Otherwise everyone within range.
     if (sightOf(anchor) && !speakersOn()) for (const m of audience(anchor, kind === "chat" ? "hear" : "see")) who.add(m);
     else for (const c of here) if (dist(c.MapData.Pos, spot) <= R || dist(c.MapData.Pos, at) <= R) who.add(c.MemberNumber);
+    // the one it's about and anyone it names always get it; onlookers only if their Companion can draw it as a
+    // normal room line (a whisper about somebody else just looks like a message sent to the wrong person)
+    for (const m of [...who]) if (m !== anchor && !named.includes(m) && !hasCompanion(m)) who.delete(m);
     return who;
   }
   // are they in the room and standin' on the map right now?
@@ -474,10 +515,11 @@
     if (channel === "bot"){ if (canBeep(mn)) beep(mn, text); else whisper(mn, text); return; }
     if (channel === "chat"){
       if (CFG.CHAT_REPLY_BEEP && canBeep(mn)) { beep(mn, text); return; }
-      if (String(text).length <= CFG.CHAT_REPLY_SAY_MAX) { say(text); return; }
+      // an answer belongs to whoever asked: on a map, just to them (not to whoever it happens to mention)
+      if (String(text).length <= CFG.CHAT_REPLY_SAY_MAX){ if (mapRoom()) privateTo(mn, text, "chat"); else say(text, false, mn); return; }
       whisper(mn, text);
       if (!canBeep(mn)) {
-        say(plainName(mn) + ", I whispered that one to you, hon! Add me ("+CFG.BOT_MEMBER+") to your friend list and say ?friend, and I can reach you anywhere.");
+        say(plainName(mn) + ", I whispered that one to you, hon! Add me ("+CFG.BOT_MEMBER+") to your friend list and say ?friend, and I can reach you anywhere.", false, mn);
       }
       return;
     }
@@ -552,7 +594,7 @@
     const known = L.archive[mn] || (r0 && r0.roles && r0.roles.length);
     const pool = known ? RETURN_GREETINGS : GREETINGS;
     const line = pool[Math.floor(Math.random()*pool.length)];
-    later(()=>say(fill(line,mn)), 1500);
+    later(()=>say(fill(line,mn), false, mn), 1500);   // addressed to them: never guessed from the names on the map
     const r = rec(mn); if (r){ r.name = plainName(mn); saveLedger(); }
   }
 
@@ -577,7 +619,7 @@
       const years = now.getFullYear() - d0.getFullYear();
       if (years >= 1 && d0.getMonth() === now.getMonth() && d0.getDate() === now.getDate() && r.annivYear !== now.getFullYear()){
         r.annivYear = now.getFullYear(); saveLedger();
-        later(()=>say("🎉 "+years+" year"+(years===1?"":"s")+" on the books today, "+plainName(mn)+"! Somebody fetch this sweetie a ribbon!"), 4500);
+        later(()=>say("🎉 "+years+" year"+(years===1?"":"s")+" on the books today, "+plainName(mn)+"! Somebody fetch this sweetie a ribbon!", false, mn), 4500);
       }
     }
   }

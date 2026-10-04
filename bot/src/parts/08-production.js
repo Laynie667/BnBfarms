@@ -245,7 +245,7 @@
     if (!isRut() || !inRoom()) return;
     const now = Date.now();
     if (L.rutDay !== dayKey()){ L.rutDay = dayKey(); L.rutSaid = now; saveLedger();
-      say("🔥 RUT DAY, y'all! All day today every fill is twice as likely to take, and studs get pent up twice as fast. Get breedin'! 🐂"); return; }
+      announce("🔥 RUT DAY, y'all! All day today every fill is twice as likely to take, and studs get pent up twice as fast. Get breedin'! 🐂"); return; }
     if (now - (L.rutSaid||0) > CFG.RUT_EMOTE_MIN*60000*(0.75+Math.random()*0.5)){
       L.rutSaid = now; emote(RUT_LINES[Math.floor(Math.random()*RUT_LINES.length)].replace(/^🔥 /,"🔥 "));
     }
@@ -380,7 +380,7 @@
           r.tier = "prize";
           audit(CFG.BOT_MEMBER,"TIER",mn+" → prize (top producer "+Y.week+")");
           beep(mn, "🏆 Top producer of the week, with "+ml(top[1])+"! You're prize stock now, sugar. So proud of you!");
-          if (inRoom()) say("🏆 Y'all give it up for this week's top producer: "+plainName(mn)+", with "+ml(top[1])+"! Prize stock now.");
+          if (inRoom()) announce("🏆 Y'all give it up for this week's top producer: "+plainName(mn)+", with "+ml(top[1])+"! Prize stock now.");
         }
       }
       if (CFG.GRADE.WEEKLY_PRIZE && Y.g){
@@ -392,13 +392,13 @@
             r.tier = "prize";
             audit(CFG.BOT_MEMBER,"TIER",best[0]+" → prize (best milk "+Y.week+")");
             beep(best[0], "🏆 Best milk on the farm this week, grade "+gradeLetter(best[1])+"! You're prize stock now, sweetie. 🥛");
-            if (inRoom()) say("🏆 Best milk of the week goes to "+plainName(best[0])+", grade "+gradeLetter(best[1])+"! Prize stock, y'all. 🥛");
+            if (inRoom()) announce("🏆 Best milk of the week goes to "+plainName(best[0])+", grade "+gradeLetter(best[1])+"! Prize stock, y'all. 🥛");
           }
         }
       }
       const sires = Object.entries(Y.s||{}).sort((a,b)=>b[1]-a[1]).slice(0, CFG.TOP_SIRES);
       if (sires.length && inRoom())
-        say("🐂 This week's top sires, y'all: "+sires.map(([m,n],i)=>(i+1)+". "+plainName(parseInt(m,10))+" ("+n+" caught)").join(", ")+". Somebody's been busy! 🍼");
+        announce("🐂 This week's top sires, y'all: "+sires.map(([m,n],i)=>(i+1)+". "+plainName(parseInt(m,10))+" ("+n+" caught)").join(", ")+". Somebody's been busy! 🍼");
       for (const [m] of sires.slice(0,1)) beep(parseInt(m,10), "🐂 You're the top sire on the farm this week, sugar! Proud of you.");
       Y.w = {}; Y.g = {}; Y.s = {}; Y.week = weekKey();
     }
@@ -783,7 +783,7 @@
         const L1 = [n+"'s "+c+" cock is sealed in the stall's wet suction sleeve, and it pumps and pulls in a slow, steady rhythm. Their hips twitch every time it squeezes.",
                     "The machine strokes "+n+" from root to tip, milkin' that "+c+" cock for every drop. Seed spurts into the collection jar in thick pulses.",
                     "A warm vibrating cup hugs "+n+"'s balls while the sleeve sucks their cock. "+n+" is a moanin', drippin' mess in the stall."];
-        emote("🐂 "+(alt || L1[Math.floor(Math.random()*L1.length)]));
+        emote("🐂 "+(alt || L1[Math.floor(Math.random()*L1.length)]), mn);
       }
       const doneM = !makesMilk(mn) || milkDenied(mn) || gearOf(mn).milk || p.milk <= keepM + 1;
       const doneS = !makesSemen(mn) || p.semen <= keepS + 0.5;
@@ -792,7 +792,7 @@
         const altDone = got > 0 && addonLine(makesSemen(mn) && !makesMilk(mn) ? "stallDoneSemen" : "stallDone", lineInfo(mn));
         if (got > 0) emote(altDone ? (makesSemen(mn) && !makesMilk(mn) ? "🐂 " : "🥛 ")+altDone : makesSemen(mn) && !makesMilk(mn)
           ? "🐂 The stall wrings "+plainName(mn)+" down to the last quarter and lets go. Balls aching and light, legs wobbly. Good stud!"
-          : "🥛 The milkin' stall eases off once "+plainName(mn)+" is down to a quarter, teats sore and drippin'. Good job, sweetie! Off you go.");
+          : "🥛 The milkin' stall eases off once "+plainName(mn)+" is down to a quarter, teats sore and drippin'. Good job, sweetie! Off you go.", mn);
       }
     }
   }
@@ -910,7 +910,7 @@
       tp.eggs = { n:clutch, by:stud, since:Date.now(), layAt: Date.now() + (dl + Math.random()*(dh-dl))*86400000 };
     }
     saveLedger(); audit(stud,"CUM",stud+"→"+t+" "+hole+" "+Math.round(load));
-    emote(o);
+    emote(o, t);   // about the one bred (the stud is named too, so both get it)
     if (clutch) emote("🥚 Deep inside "+plainName(t)+", something takes hold: "+plainName(stud)+"'s draconic seed has left a clutch of "+clutch+" eggs growin' in there. They'll be layin' in a few days.");
     if (sc0) sc0.lastCum = Date.now();
     // the knot ties 'em: leashed together till it goes down
@@ -1145,7 +1145,7 @@
                             n+" tries to walk without jigglin' those full, achin' breasts, and fails completely."][Math.floor(Math.random()*2)];
     if (!line) return;
     p.sloshAt = now;
-    emote("💦 "+line);
+    emote("💦 "+line, mn);
   }
 
   /* BELLY RUBS: a full or expectin' belly answers back */
@@ -1181,7 +1181,7 @@
       : [n+" flushes red to the ears at bein' called a "+word+", and can't quite look "+a+" in the eye. They don't argue, either.",
          "The word \""+word+"\" lands, and "+n+" squirms, cheeks burnin' and thighs pressed together.",
          n+" bites their lip and nods. A "+word+". Yes. That's exactly what they are."];
-    emote((praise ? "💗 " : "🥀 ")+lines[Math.floor(Math.random()*lines.length)]);
+    emote((praise ? "💗 " : "🥀 ")+lines[Math.floor(Math.random()*lines.length)], t);
   }
 
   /* TITLES */

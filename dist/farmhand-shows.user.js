@@ -162,7 +162,7 @@
     const ranked = scores(sh).filter((x) => x[1] > 0).sort((a, b) => b[1] - a[1]).slice(0, 3);
     d.show = null;
     if (!ranked.length) {
-      api.say("🎀 The " + EVENTS[sh.event] + " is over, y'all. Nobody placed this time.");
+      api.announce("🎀 The " + EVENTS[sh.event] + " is over, y'all. Nobody placed this time.");
       api.save();
       return "Closed. Nobody placed.";
     }
@@ -170,7 +170,7 @@
       (d.ribbons[mn] = d.ribbons[mn] || []).push({ event: sh.event, place, at: Date.now() });
       delete d.ribbonSaid[mn];
     });
-    api.say("🎀 " + EVENTS[sh.event].toUpperCase() + " RESULTS: " + ranked.map(([mn, v], i) => PLACES[i] + " " + api.name(mn) + " (" + shown(sh, mn, v) + ")").join(" · "));
+    api.announce("🎀 " + EVENTS[sh.event].toUpperCase() + " RESULTS: " + ranked.map(([mn, v], i) => PLACES[i] + " " + api.name(mn) + " (" + shown(sh, mn, v) + ")").join(" · "));
     api.emote("🎀 The judge pins a " + RIBBON[0] + " ribbon on " + api.name(ranked[0][0]) + ". Best in show!", ranked[0][0]);
     api.save();
     return "Closed and ribbons handed out.";
@@ -185,7 +185,7 @@
       if (ev === "race" && !checkpoints().length) return c.reply("Set up the course first: zones or spots called race-1, race-2, race-3… in order.");
       d.show = { event: ev, by: sender, entrants: {}, start: 0, at: Date.now() };
       A.save();
-      A.say("🎀 The " + EVENTS[ev] + " is open, y'all! Stock, say ?show enter." + (ev === "race" ? " Staff start the clock with ?show go." : ev === "obedience" ? " Judges: ?show cue <who> sit|stay|heel|speak|beg." : " Judges: ?show score <who> <1-10>."));
+      A.announce("🎀 The " + EVENTS[ev] + " is open, y'all! Stock, say ?show enter." + (ev === "race" ? " Staff start the clock with ?show go." : ev === "obedience" ? " Judges: ?show cue <who> sit|stay|heel|speak|beg." : " Judges: ?show score <who> <1-10>."));
       return;
     }
     if (w === "enter") {
@@ -203,7 +203,7 @@
       if (!Object.keys(sh.entrants).length) return c.reply("Nobody's entered yet.");
       sh.start = Date.now();
       A.save();
-      A.say("🏁 Ready… set… GO! Through " + checkpoints().join(", ") + " in order!");
+      A.announce("🏁 Ready… set… GO! Through " + checkpoints().join(", ") + " in order!");
       if (!raceTimer) raceTimer = A.later(raceTick, 1e3);
       return;
     }

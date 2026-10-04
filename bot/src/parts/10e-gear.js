@@ -93,7 +93,7 @@
         const got = drainMilk(mn, g.milk.ml * dtMin);
         p.gearMl = (p.gearMl || 0) + got;
         if (got > 0 && now >= (p.gearNext || 0)){ p.gearNext = now + jitter(); emote("🥛 "+gearLine(mn, g.milk.kind, g.milk.level, g.milk.name, p.gearMl), mn); sound(mn, "pump"); p.gearMl = 0; }
-        if (got > 0 && p.milk < 1 && !p.gearDry){ p.gearDry = true; emote("🥛 "+(addonLine("gearDry", lineInfo(mn, { gear: g.milk.name })) || "The "+g.milk.name+" pulls "+plainName(mn)+" plumb dry. Every last drop's in the tank, sugar.")); }
+        if (got > 0 && p.milk < 1 && !p.gearDry){ p.gearDry = true; emote("🥛 "+(addonLine("gearDry", lineInfo(mn, { gear: g.milk.name })) || "The "+g.milk.name+" pulls "+plainName(mn)+" plumb dry. Every last drop's in the tank, sugar."), mn); }
         if (p.milk >= 1) p.gearDry = false;
       }
       if (g.machine && g.machine.intensity >= 0){

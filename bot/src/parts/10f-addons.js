@@ -109,6 +109,7 @@
       audit: (by, action, detail) => audit(by, a.name.toUpperCase()+"_"+action, detail),
       // talkin'
       say: (t, urgent, who) => say(t, urgent, who),
+      announce: (t, urgent) => announce(t, urgent),   // for the whole farm, even when it names somebody
       emote: (t, who) => emote(t, who),
       whisper: (mn, t) => whisper(mn, t),
       privateEmote: (mn, t) => privateLine(mn, t, "emote"),

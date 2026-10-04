@@ -102,7 +102,7 @@ function step(id) {
     api.face(mn, beat.inside ? "bred" : "afterglow", 45); api.sound(mn, "wet");
   }
   run.i++;
-  api.later(() => step(id), between(22, 32) * 1000);
+  api.later(() => step(id), between(15, 21) * 1000);   // 13–20 beats: about 4–6 minutes
 }
 
 // the finish counts everywhere: their record, the stall, the herd leader's score, maybe a pregnancy.

@@ -3,7 +3,7 @@
      arrival → who comes through the hole (their kind of cock, and its size) → teasing → entry →
      rhythm → build-up → the finish (where, and how much) → aftermath → the stranger leaves,
    with atmosphere (smells, sounds, the stall itself) and, for ?degrade or ?praise people, voices
-   through the wall woven in between. About 11–14 beats, 22–32 seconds apart: five minutes or so.
+   through the wall woven in between. About 13–20 beats, 15–21 seconds apart: five minutes or so.
 
    Kinds of cock (the farm's own types): human, canine (knot, ties), equine (flared, floods),
    feline (barbed), draconic (ridged), double (two at once, pussy and ass).
@@ -54,11 +54,15 @@ const ARRIVE = [
   "A low voice on the other side: \"This one free?\" Nobody answers. The footsteps come closer anyway.",
   "Something sniffs at the hole in %n's stall, long and curious, warm breath puffing through.",
   "The stall row goes quiet for a moment, then hooves, or boots, %n can't tell, clop right up to the hole.",
+  "%n hears someone stop, groan softly at what they see through the hole, and start undoing their trousers in a hurry.",
+  "A hand reaches through the hole first and squeezes whatever of %n it can find, rough and possessive, before letting go.",
+  "Somebody outside laughs low and says, \"Oh, that one's ready,\" and %n's whole body flushes hot.",
 ];
 const REVEAL = {
-  human:    ["A %size cock pushes through the hole, flushed dark and already hard, a bead of precum shining at the tip.",
-             "Through the hole comes a %size cock, veined and twitching, the foreskin sliding back as it nudges toward %n."],
-  canine:   ["A slick red canine cock slides through, tapered to a point and dripping, %size, with a knot already swelling thick at the base.",
+  human:    ["A %size cock pushes through the hole, flushed dark and rock hard, a bead of wet already shining at the tip.",
+             "Through the hole comes a %size cock, veined and twitching, so hard it bobs, nudging blindly toward %n.",
+             "A %size cock slides through the hole and just hangs there, throbbing, dripping on the straw, waiting for %n to want it."],
+  canine:   ["A slick red dog cock slides through, tapered and dripping, %size, with a fat knot already swelling at the base.",
              "Something pink-red and pointed pokes through the hole, %size and slick, pulsing little spurts of clear fluid, the knot behind it fat and promising."],
   equine:   ["A horse cock shoves through the hole, %size, mottled pink and black, the broad flat head twitching and starting to flare.",
              "The hole barely fits it: a long, heavy horse cock, %size, the flared head bobbing an inch from %n and dripping on the straw."],
@@ -69,7 +73,7 @@ const REVEAL = {
   double:   ["Two cocks slide through a widened hole, one above the other, %size, both hard, both looking for somewhere to go.",
              "The stranger has two, stacked and twitching, %size each, and they press through the hole together."],
 };
-const SIZE_WORD = { modest: "neat, modest", thick: "thick", huge: "huge", hyper: "absurdly huge" };
+const SIZE_WORD = { modest: "neat little", thick: "thick, heavy", huge: "huge", hyper: "absurdly huge" };
 const TEASE = {
   mouth: ["It rubs across %n's lips, smearing precum until they shine, then slaps wetly against %n's cheek.",
           "It rests on %n's tongue, heavy and salty, letting %n taste it before doing anything else.",
@@ -101,6 +105,23 @@ const ENTRY = {
   double:   { vulva: ["Both press in at once, one into %n's pussy, one into %n's ass, and %n is stuffed full twice over."],
               butt:  ["Both press in at once, one into %n's pussy, one into %n's ass, and %n is stuffed full twice over."],
               mouth: ["One slides into %n's mouth while the other slaps wetly against %n's cheek, waiting its turn."] },
+};
+const REACT = {
+  mouth: ["%n moans around it, the sound muffled and wet, and sucks harder.",
+          "%n's eyes water but %n doesn't pull back. If anything %n leans in, greedy for more.",
+          "%n hollows their cheeks and works their tongue along the underside until the stranger swears.",
+          "%n whimpers, mouth stuffed full, drool running freely now.",
+          "%n bobs on it eagerly, chasing every inch the wall will let them have."],
+  vulva: ["%n gasps and pushes back against the wall, wanting it deeper.",
+          "%n's pussy clenches around it and a helpless moan slips out.",
+          "%n is so wet the sound is obscene, and %n can't stop rocking back onto it.",
+          "%n bites their lip and shakes, already close, already begging under their breath.",
+          "%n grinds back against the boards, desperate to be filled."],
+  butt:  ["%n moans into the straw, pushing their ass back against the hole for more.",
+          "%n's ass squeezes around it and %n groans, stretched and full and wanting it.",
+          "%n whines, hips rolling back to meet every stroke.",
+          "%n's legs tremble, but %n holds still and takes it, breath coming in little gasps.",
+          "%n presses their hot face to the wood and begs for it harder."],
 };
 const RHYTHM = {
   mouth: ["It fucks %n's mouth with long strokes, pulling almost all the way out before sliding back over %n's tongue.",
@@ -134,15 +155,15 @@ const BUILD = [
   "\"Fuck, fuck, here it comes,\" from the other side of the wall, barely a whisper.",
   "Everything goes tight and still for one long second, the stranger trembling against the boards.",
 ];
-const AMOUNT = (ml) => ml < 15 ? "a thin little dribble" : ml < 30 ? "a decent, warm load" : ml < 60 ? "a thick, heavy load" : ml < 100 ? "a huge, pumping flood" : "an absurd, never-ending flood";
+const AMOUNT = (ml) => ml < 15 ? "a hot little spurt" : ml < 30 ? "a warm, creamy load" : ml < 60 ? "a thick, heavy load that just keeps pulsing" : ml < 100 ? "a huge, pumping flood" : "an absurd, never-ending flood";
 const HOLE_PLACE = { mouth: "%n's throat", vulva: "%n's pussy", butt: "%n's ass" };
 const OUTSIDE = { mouth: ["%n's face", "%n's lips and chin", "%n's tongue and cheeks", "%n's hair and face"],
                   vulva: ["%n's ass and thighs", "%n's back", "the lips of %n's pussy", "%n's ass cheeks"],
                   butt: ["%n's back", "%n's ass cheeks", "the small of %n's back", "%n's thighs"] };
 function finishLine(v, hole, ml, inside, funnel) {
-  const amt = AMOUNT(ml) + ", about " + Math.round(ml) + " mL";
+  const amt = AMOUNT(ml) + ", easily " + Math.round(ml) + " mL of it";
   if (hole === "mouth" && funnel) return "The stranger cums straight into the funnel: " + amt + ", pouring down the tube and into %n's throat whether %n swallows or not.";
-  if (!inside) return "At the last second it pulls out and paints " + pick(OUTSIDE[hole]) + ": " + amt + ", hot ropes landing one after another.";
+  if (!inside) return "At the last second it pulls out and paints " + pick(OUTSIDE[hole]) + ": " + amt + ", hot ropes landing one after another while %n gasps.";
   const place = HOLE_PLACE[hole];
   switch (v.type) {
     case "canine": return "The knot shoves in and locks, and the stranger cums deep into " + place + ": " + amt + ", pumped in pulse after pulse while they're tied together.";
@@ -150,7 +171,7 @@ function finishLine(v, hole, ml, inside, funnel) {
     case "feline": return "It cums in quick hard jerks deep in " + place + ": " + amt + ", and the barbs rake every inch of %n on the way out.";
     case "draconic": return "Every ridge swells and throbs at once as it empties into " + place + ": " + amt + ", hot as bathwater.";
     case "double": return "Both cocks unload at once, one into %n's pussy and one into %n's ass: " + amt + " between them, filling %n from both ends.";
-    default: return "It buries itself to the hilt and cums deep in " + place + ": " + amt + ", throbbing with every spurt.";
+    default: return "It buries itself to the hilt and cums deep in " + place + ": " + amt + ", throbbing with every spurt while %n shudders around it.";
   }
 }
 const KNOT_TIE = ["The knot won't come free. %n is stuck to the wall, tied, the stranger panting on the other side, cum trapped deep inside.",
@@ -221,8 +242,11 @@ export function buildScene({ hole, visitor, funnel, degrade, praise }) {
   if (chance(0.5)) add(pick(TEASE[hole]));
   add(pick((ENTRY[v.type] || ENTRY.human)[hole] || ENTRY.human[hole]));
   const rh = RHYTHM[hole].slice().sort(() => Math.random() - 0.5);
-  add(rh[0]); add(pick(TYPE_RHYTHM[v.type])); add(voice() || atmos()); add(rh[1]);
+  const re = REACT[hole].slice().sort(() => Math.random() - 0.5);
+  add(re[0]);
+  add(rh[0]); add(pick(TYPE_RHYTHM[v.type])); add(re[1]); add(voice() || atmos()); add(rh[1]);
   if (chance(0.5)) add(rh[2]);
+  if (chance(0.5)) add(re[2]);
   add(pick(BUILD));
   // where it ends: inside most of the time, sometimes pulled out (never for a knot or a funnel)
   const inside = funnel || v.type === "canine" || v.type === "double" || chance(0.75);

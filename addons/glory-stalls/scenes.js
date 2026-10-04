@@ -1,36 +1,43 @@
 /* WHAT'S IN THIS FILE (glory-stalls/scenes.js)
-   The glory stall scenes, built fresh every time from pools of lines, so they rarely repeat:
-     arrival → who comes through the hole (their kind of cock, and its size) → teasing → entry →
-     rhythm → build-up → the finish (where, and how much) → aftermath → the stranger leaves,
-   with atmosphere (smells, sounds, the stall itself) and, for ?degrade or ?praise people, voices
-   through the wall woven in between. Beats come 22–32 seconds apart. Most scenes are one stranger (5–9
-   minutes); some take their time over extra rounds (10–15); now and then a queue of three or four
-   strangers takes turns (20–40 minutes). The person can step off the spot to stop at any time.
+   The glory stall scenes, built fresh every time and always told as a story, in order:
+
+     arrival → who comes through the hole → teasing → entry (stretching, if they're big) →
+     early → middle → (another round, maybe moving to another hole) → late → build-up →
+     the finish (where, and how much) → a knot tie, if there's a knot → aftermath → they leave
+
+   Every stranger has one CHARACTER for the whole scene (greedy, slow, a talker, nervous, a regular, a
+   breeder, on their break): their arrival, the way they talk, the pace and the way they leave all match.
+   Reactions from the person in the stall are early, middle or late, so "right on the edge" never comes
+   before the stranger is even inside. No line plays twice in one scene. A funnel gag gets its own scene.
 
    Kinds of cock (the farm's own types): human, canine (knot, ties), equine (flared, floods),
-   feline (barbed), draconic (ridged), double (two at once, pussy and ass).
-   Sizes: modest, thick, huge, hyper. The load follows both.
+   feline (barbed), draconic (ridged), double (two at once, pussy and ass). Sizes: modest, thick, huge,
+   hyper. The load follows both.
 
-   Writing more: add lines to any pool below. %n is the person in the stall. In a line with d: the d text
-   is used for people with ?degrade on; p: for ?praise on. Every line should name %n, or be about the
-   stall around them. No round brackets (they'd make the line out-of-character).
+   Lengths: most scenes are one stranger (6–9 minutes); some take extra rounds (9–16); now and then a
+   queue of three or four strangers takes turns (20–45). Beats come 22–32 seconds apart; the person can
+   step off the spot to stop at any time.
+
+   Writing more: add a line to any pool. %n is the person in the stall; %from and %to are hole words in
+   SWITCH lines. Every line should name %n or be about the stall around them. No round brackets.
 */
 
-const pick = (a) => a[Math.floor(Math.random() * a.length)];
+const pickFrom = (a) => a[Math.floor(Math.random() * a.length)];
 const between = (lo, hi) => lo + Math.random() * (hi - lo);
 const chance = (p) => Math.random() < p;
 
 // ── who comes to the hole ─────────────────────────────────
 export const TYPES = {
-  human:    { w: 34, word: "cock" },
-  canine:   { w: 18, word: "canine cock", knot: true },
-  equine:   { w: 14, word: "horse cock", flare: true },
-  feline:   { w: 10, word: "barbed cock" },
-  draconic: { w: 10, word: "ridged cock" },
-  double:   { w: 6,  word: "pair of cocks" },
+  human:    { w: 34 },
+  canine:   { w: 18, knot: true },
+  equine:   { w: 14, flare: true },
+  feline:   { w: 10 },
+  draconic: { w: 10 },
+  double:   { w: 6 },
 };
 export const SIZES = { modest: { w: 30, ml: [10, 20] }, thick: { w: 34, ml: [18, 35] }, huge: { w: 24, ml: [30, 60] }, hyper: { w: 12, ml: [60, 140] } };
 const LOAD_X = { human: 1, canine: 1.2, equine: 1.6, feline: 0.9, draconic: 1.3, double: 1.5 };
+const BIG = (v) => v.size === "huge" || v.size === "hyper" || v.type === "equine";
 
 export function pickVisitor(holes) {
   const types = Object.entries(TYPES).filter(([k]) => k !== "double" || (holes.includes("vulva") && holes.includes("butt")));
@@ -43,58 +50,158 @@ export function pickVisitor(holes) {
 }
 // a real visitor's own cock, in the same words
 export function sizeFromInches(inches) { return inches >= 13 ? "hyper" : inches >= 9 ? "huge" : inches >= 6 ? "thick" : "modest"; }
+const SIZE_WORD = { modest: "neat little", thick: "thick, heavy", huge: "huge", hyper: "absurdly huge" };
+const HOLE_WORD = { mouth: "mouth", vulva: "pussy", butt: "ass" };
+
+// ── strangers: one character for the whole scene ──────────
+const PERSONAS = {
+  greedy: {
+    arrive: ["Somebody practically runs up to %n's stall, already fumbling with their belt before they reach the hole.",
+             "Heavy, quick footsteps, and the wall in front of %n jolts as someone slams up against it, breathing hard.",
+             "A fist bangs on the boards next to %n. \"Open up. I haven't got all day.\""],
+    talk:   ["\"Fuck, yes. Take it. All of it.\"", "\"Don't you dare slow down on me.\"", "\"That's it, that's what I came for.\"", "\"Harder. You can take harder than that.\""],
+    leave:  ["They yank free, zip up and stomp off without a word, already done with %n.",
+             "A last rough slap on the boards, and the greedy one is gone as fast as they came."],
+    pace: "rough",
+  },
+  slow: {
+    arrive: ["Unhurried footsteps. Someone settles in outside %n's stall like they've got all afternoon.",
+             "A bench creaks on the other side of the wall. Whoever it is means to take their time with %n.",
+             "Somebody stops at the hole and just looks for a long, long moment before doing anything at all."],
+    talk:   ["\"Slow. I want to feel every bit of you.\"", "\"Mm. No rush. None at all.\"", "\"There. Stay right there. Just like that.\"", "\"You feel that? I'm going to make this last.\""],
+    leave:  ["They stay a long while afterward, just resting against the boards, before finally strolling off.",
+             "A gentle pat on the wall, almost tender, and the slow footsteps fade away."],
+    pace: "slow",
+  },
+  talker: {
+    arrive: ["\"Well, look at what they've got waiting for me,\" says a voice outside %n's stall, delighted.",
+             "Someone strolls up humming, stops at the hole and lets out a low whistle. \"Oh, you're lovely.\"",
+             "A cheerful voice right at the hole: \"Hello in there. Ready for me?\" It doesn't wait for an answer."],
+    talk:   ["\"God, you're so warm. Do you know how good this feels?\"", "\"I've been thinking about this all morning, you know.\"", "\"Listen to that. Listen to how wet that sounds.\"",
+             "\"Tell me you want it. Go on. I can hear you.\"", "\"You're going to feel me for hours after this.\"", "\"Fuck, I could stay in here all day.\""],
+    leave:  ["\"Same time tomorrow,\" the voice says, and they actually laugh as they walk off.",
+             "They chat the whole way out, half to %n and half to themselves, until the door bangs shut."],
+    pace: "steady",
+  },
+  nervous: {
+    arrive: ["Hesitant footsteps. They stop, start, stop again outside %n's stall. Someone's working up the nerve.",
+             "A shaky breath on the other side of the boards. \"Is this, um. Is this okay?\" a quiet voice asks.",
+             "Someone peers through the gap under the door, then at the hole, then fumbles for a long time with a zipper."],
+    talk:   ["\"Oh. Oh god. Oh, that's good.\"", "\"Sorry, I, sorry, I don't, oh fuck.\"", "\"Is this, does it feel okay? It feels so good.\"", "\"I can't, I'm not going to last, I'm sorry.\""],
+    leave:  ["\"Thank you,\" whispers the nervous one, sounding dazed, and the footsteps hurry off.",
+             "A breathless little laugh, a mumbled thanks, and they're gone, probably blushing all the way home."],
+    pace: "nervous",
+  },
+  regular: {
+    arrive: ["Familiar footsteps. Whoever it is knows exactly which stall they want, and it's %n's.",
+             "\"There you are,\" murmurs a voice at the hole. \"Missed this one.\"",
+             "Someone knocks their usual knock on %n's wall, two slow, one quick, like they've done it a hundred times."],
+    talk:   ["\"Still the best stall on the farm.\"", "\"You remember me, don't you. I can tell.\"", "\"Just how I like it. You never change.\"", "\"Same as always. Good.\""],
+    leave:  ["\"See you next week,\" says the regular, and taps their knock on the wall on the way out.",
+             "The regular lingers a moment, gives the boards a fond pat, and heads off like they own the place."],
+    pace: "steady",
+  },
+  breeder: {
+    arrive: ["Somebody stops outside %n's stall and sniffs the air, slow and deliberate, like they're checking if %n's ripe.",
+             "A low voice: \"Fertile ones in this row, they said.\" Footsteps stop at %n's hole.",
+             "Someone comes up to %n's stall with a purpose, the kind who isn't here for a quick one."],
+    talk:   ["\"Hold still. I want this deep.\"", "\"You're getting bred. Every drop stays in.\"", "\"Good. Take it. Take my seed.\"", "\"Don't waste a drop of it.\""],
+    leave:  ["The breeder stays buried until the very last moment, then slips out and presses a thumb over %n to keep it all in before leaving.",
+             "\"That one'll take,\" the breeder says with total certainty, and walks away satisfied."],
+    pace: "deep", alwaysInside: true, prefers: "vulva",
+  },
+  quickie: {
+    arrive: ["Quick footsteps, a glance up and down the row. Somebody on a short break, muttering about only having five minutes.",
+             "A farmhand, by the sound of the boots, ducks in from the yard. \"Quick one. Quick one, then back to work.\"",
+             "The outer door bangs open and someone rushes straight to %n's hole, still pulling off their work gloves."],
+    talk:   ["\"No time, no time, just, fuck, yes.\"", "\"Nobody's coming. Keep going.\"", "\"I've got to be back in a minute.\""],
+    leave:  ["They're gone before %n's even stopped shaking, boots hurrying back out to the yard.",
+             "A zipper, a hurried \"thanks,\" and the door bangs shut. Break's over."],
+    pace: "rough", short: true,
+  },
+};
+function pickPersona(hole) {
+  const keys = Object.keys(PERSONAS).filter((k) => !PERSONAS[k].prefers || PERSONAS[k].prefers === hole || chance(0.3));
+  return keys[Math.floor(Math.random() * keys.length)];
+}
 
 // ── the pools ──────────────────────────────────────────────
 const ARRIVE = [
   "Footsteps slow outside %n's stall, stop, shuffle closer. Someone is reading the chalk on the door.",
   "The latch on the outer door clacks. Heavy boots, then breathing right up against the boards in front of %n.",
   "A shadow slides across the slats of %n's stall. It stops at the hole and stays there.",
-  "Two knocks on the wall beside %n's head, then a third, impatient. Somebody wants service.",
+  "Two knocks on the wall beside %n's head, then a third. Somebody wants service.",
   "A belt buckle jingles on the other side of the wall. Then a zipper, slow, like they want %n to hear it.",
   "Someone spits into their palm outside %n's stall. The wet sound of a hand working, getting ready.",
-  "The boards in front of %n creak as somebody leans their whole weight against them, already breathing hard.",
+  "The boards in front of %n creak as somebody leans their whole weight against them.",
   "A low voice on the other side: \"This one free?\" Nobody answers. The footsteps come closer anyway.",
   "Something sniffs at the hole in %n's stall, long and curious, warm breath puffing through.",
-  "The stall row goes quiet for a moment, then hooves, or boots, %n can't tell, clop right up to the hole.",
-  "%n hears someone stop, groan softly at what they see through the hole, and start undoing their trousers in a hurry.",
-  "A hand reaches through the hole first and squeezes whatever of %n it can find, rough and possessive, before letting go.",
-  "Somebody outside laughs low and says, \"Oh, that one's ready,\" and %n's whole body flushes hot.",
+  "Hooves, or boots, %n can't tell, clop right up to the hole and stop.",
+  "%n hears someone stop, groan softly at what they see, and start undoing their trousers in a hurry.",
+  "A hand reaches through the hole first and squeezes whatever of %n it can find, possessive, before letting go.",
+  "Somebody outside laughs low: \"Oh, that one's ready,\" and %n's whole body flushes hot.",
+  "A coin rattles into the honesty tin by %n's door, then a hand slaps the wall: paid and waiting.",
+  "The stall row goes quiet, and in the hush %n hears one set of footsteps coming straight for them.",
 ];
 const REVEAL = {
   human:    ["A %size cock pushes through the hole, flushed dark and rock hard, a bead of wet already shining at the tip.",
              "Through the hole comes a %size cock, veined and twitching, so hard it bobs, nudging blindly toward %n.",
-             "A %size cock slides through the hole and just hangs there, throbbing, dripping on the straw, waiting for %n to want it."],
+             "A %size cock slides through the hole and just hangs there, throbbing, dripping on the straw, waiting for %n to want it.",
+             "A %size cock pokes through, the stranger's hand still wrapped around the base, stroking it slowly an inch from %n."],
   canine:   ["A slick red dog cock slides through, tapered and dripping, %size, with a fat knot already swelling at the base.",
-             "Something pink-red and pointed pokes through the hole, %size and slick, pulsing little spurts of clear fluid, the knot behind it fat and promising."],
+             "Something pink-red and pointed pokes through the hole, %size and slick, pulsing little spurts of clear wet, the knot behind it fat and promising.",
+             "A %size dog cock pushes through, glossy and hot, already twitching and dribbling, the knot just behind the hole."],
   equine:   ["A horse cock shoves through the hole, %size, mottled pink and black, the broad flat head twitching and starting to flare.",
-             "The hole barely fits it: a long, heavy horse cock, %size, the flared head bobbing an inch from %n and dripping on the straw."],
+             "The hole barely fits it: a long, heavy horse cock, %size, the flared head bobbing an inch from %n and dripping on the straw.",
+             "Inch after inch of %size horse cock slides through the hole and keeps coming, heavy enough to sag, the blunt head blooming."],
   feline:   ["A short, thick cock pokes through, %size, ringed with soft little barbs that catch the light like velvet thorns.",
-             "Through the hole comes a cat-like cock, %size, its barbed sides glistening, twitching with quick little throbs."],
+             "Through the hole comes a cat-like cock, %size, its barbed sides glistening, twitching with quick little throbs.",
+             "A %size barbed cock slips through, the soft spines bristling as it pulses, eager and quick."],
   draconic: ["A ridged cock slides through the hole, %size, scaled at the base, its ridges stacked like rungs all the way to a tapered tip.",
-             "Something warm and ridged pushes through, %size, hot as a stove, the ridges flexing as it searches for %n."],
+             "Something warm and ridged pushes through, %size, hot as a stove, the ridges flexing as it searches for %n.",
+             "A %size dragon's cock eases through, ridge after ridge, slick and glistening, radiating heat into the stall."],
   double:   ["Two cocks slide through a widened hole, one above the other, %size, both hard, both looking for somewhere to go.",
-             "The stranger has two, stacked and twitching, %size each, and they press through the hole together."],
+             "The stranger has two, stacked and twitching, %size each, and they press through the hole together.",
+             "A pair of %size cocks push through side by side, rubbing against each other, both dripping."],
 };
-const SIZE_WORD = { modest: "neat little", thick: "thick, heavy", huge: "huge", hyper: "absurdly huge" };
 const TEASE = {
-  mouth: ["It rubs across %n's lips, smearing precum until they shine, then slaps wetly against %n's cheek.",
+  mouth: ["It rubs across %n's lips, smearing wet until they shine, then slaps softly against %n's cheek.",
           "It rests on %n's tongue, heavy and salty, letting %n taste it before doing anything else.",
           "The tip traces %n's lips around and around, teasing, pulling back every time %n leans in.",
-          "It pushes against %n's mouth until %n's lips part, then holds there, throbbing, making %n wait."],
+          "It pushes against %n's mouth until %n's lips part, then holds there, throbbing, making %n wait.",
+          "It drags slowly across %n's face, from cheek to lips, marking %n with its scent.",
+          "%n kisses the tip without being asked, and the stranger groans and pushes a little closer.",
+          "The stranger taps it against %n's tongue, once, twice, three times, like ringing a bell."],
   vulva: ["The head drags up and down through %n's pussy, slow, gathering wet, bumping %n's clit on every pass.",
           "It slaps against %n's pussy a few times, wet little smacks, before settling at the entrance.",
-          "It nudges %n's folds apart and rubs there, teasing the entrance until %n's hips push back on their own.",
-          "The stranger grinds the shaft along %n's slit without going in, and %n can feel every inch of it."],
+          "It nudges %n's folds apart and rubs there, teasing until %n's hips push back on their own.",
+          "The stranger grinds the shaft along %n's slit without going in, and %n can feel every inch of it.",
+          "Just the tip presses in, then pulls back out, then presses in again, until %n is whining for it.",
+          "It circles %n's clit in slow, slick little rings until %n's legs start to tremble.",
+          "A thumb spreads %n open first, and the stranger takes a long look before lining up."],
   butt:  ["Spit, then the tip circles %n's ass, pressing, easing off, pressing again until the ring starts to give.",
           "Slick, cold lube drips down %n's crack before the head presses against their ass, patient and insistent.",
           "It rubs against %n's ass in slow circles, working the rim soft before it even tries.",
-          "The head pushes and pulls back, pushes and pulls back, coaxing %n's ass open one little bit at a time."],
+          "The head pushes and pulls back, pushes and pulls back, coaxing %n's ass open one little bit at a time.",
+          "A slick finger works into %n's ass first, then a second, stretching them while the cock waits its turn.",
+          "It slides up and down between %n's cheeks, slow and slick, until %n is pushing back for it."],
 };
+// for a funnel gag: the cock can't go in, so it's all about the funnel
+const FUNNEL = [
+  "The stranger sees the funnel strapped in %n's mouth and laughs softly. \"Oh, that's convenient.\"",
+  "The tip comes to rest on the rim of the funnel, dripping into it, and %n can taste every drop trickling down.",
+  "The stranger strokes themselves over the funnel, slow and steady, letting %n listen to it.",
+  "Every stroke squeezes a bead of wet into the funnel. %n has no choice but to swallow it.",
+  "The stranger rubs the head around and around the funnel's mouth, teasing, close, so close.",
+  "%n's throat works helplessly around the tube as the stranger's breathing gets heavier above it.",
+];
 const ENTRY = {
-  human:    { mouth: ["It slides over %n's tongue and keeps going until %n's lips meet the wood."], vulva: ["It sinks into %n's pussy in one long push, the stranger groaning through the boards."], butt: ["It pushes past %n's ring with a slow, burning stretch and settles deep."] },
+  human:    { mouth: ["It slides over %n's tongue and keeps going until %n's lips meet the wood.", "It pushes past %n's lips in one smooth stroke and settles heavy on %n's tongue."],
+              vulva: ["It sinks into %n's pussy in one long push, the stranger groaning through the boards.", "It eases into %n's pussy slow and deep, stretching %n around every inch."],
+              butt:  ["It pushes past %n's ring with a slow, burning stretch and settles deep.", "It works into %n's ass inch by inch until the stranger's hips press flush to the wall."] },
   canine:   { mouth: ["The pointed tip slips straight to the back of %n's throat, quick and eager, already spurting little warm jets."],
-              vulva: ["It plunges into %n's pussy in one quick thrust and starts at once, hot little spurts with every jab."],
-              butt:  ["It jabs into %n's ass with no warning at all and starts going, the knot bumping against the rim with every push."] },
+              vulva: ["It plunges into %n's pussy in one quick thrust and starts at once, hot little spurts with every jab.", "It finds %n's pussy on the first try and drives in, the knot bumping against %n's lips."],
+              butt:  ["It jabs into %n's ass with no warning at all and starts going, the knot bumping the rim with every push."] },
   equine:   { mouth: ["The flat head forces %n's jaw wide, wider, and slides in only as far as %n's mouth can possibly take."],
               vulva: ["The broad head stretches %n's pussy wide, so slowly, a few inches at a time, until %n is stuffed and gasping."],
               butt:  ["The blunt head presses and presses until %n's ass gives around it with a gasp, stretched past anything %n is used to."] },
@@ -108,54 +215,102 @@ const ENTRY = {
               butt:  ["Both press in at once, one into %n's pussy, one into %n's ass, and %n is stuffed full twice over."],
               mouth: ["One slides into %n's mouth while the other slaps wetly against %n's cheek, waiting its turn."] },
 };
-const REACT = {
-  mouth: ["%n moans around it, the sound muffled and wet, and sucks harder.",
-          "%n's eyes water but %n doesn't pull back. If anything %n leans in, greedy for more.",
-          "%n hollows their cheeks and works their tongue along the underside until the stranger swears.",
-          "%n whimpers, mouth stuffed full, drool running freely now.",
-          "%n bobs on it eagerly, chasing every inch the wall will let them have."],
-  vulva: ["%n gasps and pushes back against the wall, wanting it deeper.",
-          "%n's pussy clenches around it and a helpless moan slips out.",
-          "%n is so wet the sound is obscene, and %n can't stop rocking back onto it.",
-          "%n bites their lip and shakes, already close, already begging under their breath.",
-          "%n grinds back against the boards, desperate to be filled."],
-  butt:  ["%n moans into the straw, pushing their ass back against the hole for more.",
-          "%n's ass squeezes around it and %n groans, stretched and full and wanting it.",
-          "%n whines, hips rolling back to meet every stroke.",
-          "%n's legs tremble, but %n holds still and takes it, breath coming in little gasps.",
-          "%n presses their hot face to the wood and begs for it harder."],
+// only for the big ones, right after it goes in
+const STRETCH = {
+  mouth: ["%n's jaw aches already. It's so big %n can only take the head and a little more.", "%n's lips are stretched tight around it, drool spilling from the corners."],
+  vulva: ["%n's pussy is stretched wide around it, so full %n can barely breathe.", "%n can feel it pressing up inside, deep enough to make their belly flutter."],
+  butt:  ["%n's ass is stretched so wide it burns, and %n has to breathe slow to take it.", "It fills %n so deep %n swears they can feel it in their stomach."],
 };
 const RHYTHM = {
-  mouth: ["It fucks %n's mouth with long strokes, pulling almost all the way out before sliding back over %n's tongue.",
-          "The stranger holds deep and grinds, rocking against the back of %n's throat, letting %n choke a little.",
-          "Drool runs down %n's chin and drips onto their chest as the pace picks up.",
-          "It pulls out to let %n gasp, slaps their tongue twice, and slides right back in.",
-          "Fingers curl through the hole and catch in %n's hair, keeping %n's face pressed to the wood."],
-  vulva: ["It pumps into %n's pussy with steady, deep strokes, the wall creaking in time.",
-          "The stranger finds the angle that makes %n gasp and stays right there, hammering it.",
-          "Wet, slapping sounds fill the stall. %n's thighs are slick and shaking.",
-          "It slows to deep, grinding circles, buried as far as it'll go, then speeds back up without warning.",
-          "Every thrust rocks %n forward against the stall. %n has to brace on the rail to keep still."],
-  butt:  ["It works %n's ass with long, steady strokes, dragging almost out before sinking back to the root.",
-          "The pace turns rough. %n's ass is used hard, the boards thumping against their frame.",
-          "It holds deep in %n's ass, grinding, letting %n feel how full they are.",
-          "Short, quick thrusts, then a long slow one that makes %n moan into the straw.",
-          "The stranger's hips slap against the wall again and again, driving every stroke deep into %n."],
+  mouth: {
+    early: ["It starts slow, sliding in and out over %n's tongue, getting a feel for %n's mouth.",
+            "The stranger pushes a little deeper with each stroke, testing how much %n can take.",
+            "It pulls back to let %n breathe, then slides right back in, a little further this time."],
+    mid:   ["It fucks %n's mouth with long strokes, pulling almost all the way out before sliding back over %n's tongue.",
+            "Drool runs down %n's chin and drips onto their chest as the pace picks up.",
+            "It pulls out to let %n gasp, taps their tongue twice, and slides right back in.",
+            "Fingers curl through the hole and catch in %n's hair, keeping %n's face pressed to the wood."],
+    late:  ["The stranger holds deep and grinds, rocking against the back of %n's throat, %n's eyes watering.",
+            "It's fucking %n's throat now, fast and sloppy, the wall rattling.",
+            "Every stroke goes all the way, %n's nose pressed to the boards, the stranger groaning on every one."],
+  },
+  vulva: {
+    early: ["It starts with slow, shallow strokes, letting %n's pussy open up around it.",
+            "It rocks gently into %n, deeper each time, until it's all the way in.",
+            "The stranger finds a lazy rhythm, sliding in and out of %n's pussy with wet little sounds."],
+    mid:   ["It pumps into %n's pussy with steady, deep strokes, the wall creaking in time.",
+            "The stranger finds the angle that makes %n gasp and stays right there, working it.",
+            "Wet, slapping sounds fill the stall. %n's thighs are slick and shaking.",
+            "It slows to deep, grinding circles, buried as far as it'll go, then speeds back up without warning."],
+    late:  ["Every thrust rocks %n forward against the stall. %n has to brace on the rail to keep still.",
+            "It's pounding %n now, hard and fast, the boards banging against their frame.",
+            "The stranger is slamming into %n's pussy with everything they've got, chasing it."],
+  },
+  butt: {
+    early: ["It starts gentle, short little strokes, letting %n's ass get used to it.",
+            "It eases in and out of %n's ass, slow and slick, a little deeper each time.",
+            "The stranger holds still a moment, buried in %n, then begins to move."],
+    mid:   ["It works %n's ass with long, steady strokes, dragging almost out before sinking back to the root.",
+            "It holds deep in %n's ass, grinding, letting %n feel how full they are.",
+            "Short, quick thrusts, then a long slow one that makes %n moan into the straw.",
+            "The stranger's hips slap against the wall again and again, driving every stroke deep into %n."],
+    late:  ["The pace turns rough. %n's ass is used hard, the boards thumping against their frame.",
+            "It's pounding %n's ass now, fast and relentless, the whole stall shaking.",
+            "Every stroke goes to the hilt, hard enough to push little gasps out of %n."],
+  },
+};
+const PACE_LINE = {
+  rough:   ["There's nothing gentle about it. The stranger uses %n like they paid for it.", "The wall shudders with every rough, impatient thrust into %n."],
+  slow:    ["The stranger refuses to hurry, every stroke long and lingering, until %n is squirming for more.", "It's slow, almost torturously slow, and %n can feel every single inch."],
+  steady:  ["The stranger keeps a steady, comfortable rhythm in %n, settling in for the long haul.", "Stroke after stroke into %n, unhurried and certain, like they know exactly what they're doing."],
+  nervous: ["The rhythm is clumsy at first, stopping and starting, then the stranger finds their courage and %n feels it get better fast.", "They gasp at every stroke into %n, like they can't believe how good it feels."],
+  deep:    ["The stranger doesn't pull back far. They stay deep in %n, grinding, pressing as far as they can reach.", "Every stroke ends buried to the hilt in %n, held there, pushing deep."],
 };
 const TYPE_RHYTHM = {
-  human:    ["The stranger grunts with every thrust, the sound muffled by the boards.", "A hand slaps the wall above %n, holding on for leverage."],
-  canine:   ["It humps in a frantic, blurring rhythm, the knot slapping against %n with every jab, swelling bigger.", "Little hot spurts keep coming with every thrust, making %n slicker and slicker."],
-  equine:   ["Each stroke is slow and heavy, like being worked by a piston, and %n feels every inch of it all the way down.", "The flare is already blooming, catching and dragging inside %n on every pull back."],
-  feline:   ["Short, sharp thrusts, the barbs raking softly every time it pulls back, making %n jerk and gasp.", "It's quick and relentless, all hips, and those barbs make every stroke feel like ten."],
-  draconic: ["The ridges drag in and out, in and out, each one catching on its way through %n with a thick little pop.", "It's hot inside %n, hotter than any cock should be, and it seems to swell with every stroke."],
-  double:   ["The two cocks take turns, one pushing in as the other pulls back, so %n is never empty for a second.", "Both thrust together, and %n is pinned between them against the wall."],
+  human:    ["The stranger grunts with every thrust into %n, the sound muffled by the boards.", "A hand slaps the wall above %n, holding on for leverage.", "%n can feel it throbbing, getting harder still."],
+  canine:   ["It humps in a frantic, blurring rhythm, the knot slapping against %n with every jab, swelling bigger.", "Little hot spurts keep coming with every thrust, making %n slicker and slicker.", "The knot is getting fat now, bumping against %n, threatening to push in."],
+  equine:   ["Each stroke is slow and heavy, like being worked by a piston, and %n feels every inch of it all the way down.", "The flare is already blooming, catching and dragging inside %n on every pull back.", "It's so heavy the stranger has to brace with both hands to keep thrusting into %n."],
+  feline:   ["Short, sharp thrusts, the barbs raking softly every time it pulls back, making %n jerk and gasp.", "It's quick and relentless, all hips, and those barbs make every stroke feel like ten to %n.", "The barbs prickle and drag on every pull, and %n can't decide if it's too much or not enough."],
+  draconic: ["The ridges drag in and out, in and out, each one catching on its way through %n with a thick little pop.", "It's hot inside %n, hotter than any cock should be, and it seems to swell with every stroke.", "%n can count the ridges by feel, every single one, on every single stroke."],
+  double:   ["The two cocks take turns, one pushing in as the other pulls back, so %n is never empty for a second.", "Both thrust together, and %n is pinned between them against the wall.", "%n is so full, twice over, that every movement makes them gasp."],
 };
+const REACT = {
+  mouth: {
+    early: ["%n hums around it, testing the weight on their tongue.", "%n's lips close tight and %n starts to suck, curious and eager."],
+    mid:   ["%n moans around it, the sound muffled and wet, and sucks harder.", "%n hollows their cheeks and works their tongue along the underside until the stranger swears.", "%n bobs on it eagerly, chasing every inch the wall will let them have."],
+    late:  ["%n's eyes water but %n doesn't pull back. If anything %n leans in, greedy for more.", "%n whimpers, mouth stuffed full, drool running freely now.", "%n's throat flutters around it, and %n swallows like they're begging for it."],
+  },
+  vulva: {
+    early: ["%n gasps softly as it slides in.", "%n's breath catches, and their hips tilt to take it deeper."],
+    mid:   ["%n gasps and pushes back against the wall, wanting it deeper.", "%n's pussy clenches around it and a helpless moan slips out.", "%n is so wet the sound is obscene, and %n can't stop rocking back onto it."],
+    late:  ["%n bites their lip and shakes, right on the edge, begging under their breath.", "%n grinds back against the boards, desperate to be filled.", "%n is trembling all over, moaning with every thrust."],
+  },
+  butt: {
+    early: ["%n breathes out slow and lets it in, a soft groan escaping.", "%n's ass tightens, then relaxes, taking it deeper."],
+    mid:   ["%n moans into the straw, pushing their ass back against the hole for more.", "%n's ass squeezes around it and %n groans, stretched and full and wanting it.", "%n whines, hips rolling back to meet every stroke."],
+    late:  ["%n's legs tremble, but %n holds still and takes it, breath coming in little gasps.", "%n presses their hot face to the wood and begs for it harder.", "%n is moaning out loud now, past caring who hears."],
+  },
+};
+// another round, maybe in another hole
+const SECOND_WIND = [
+  "The stranger pulls out, breathing hard, and just rubs it against %n for a while, letting %n ache for it.",
+  "It slows right down, almost lazy, savouring %n, every stroke long enough that %n squirms.",
+  "The stranger shifts their stance, gets a better grip on the wall, and starts into %n again harder than before.",
+  "It pulls nearly all the way out and stays there, just the tip, until %n pushes back and begs for the rest.",
+  "The stranger wants it to last. The pace drops to slow, deep grinding into %n, and it goes on and on.",
+];
+const SWITCH = [
+  "It slides out of %n's %from with a wet sound, and a moment later presses into %n's %to instead.",
+  "The stranger pulls out of %n's %from and lines up somewhere new: %n's %to.",
+  "\"Let's try the other one,\" mutters the stranger, and it leaves %n's %from to push into %n's %to.",
+];
 const BUILD = [
-  "The stranger's breathing goes ragged and fast. The wall shudders.",
-  "A groan rolls through the boards, deep and desperate. They're close.",
-  "The thrusts lose their rhythm, short and jerky. Hands clamp the edges of the hole.",
-  "\"Fuck, fuck, here it comes,\" from the other side of the wall, barely a whisper.",
-  "Everything goes tight and still for one long second, the stranger trembling against the boards.",
+  "The stranger's breathing goes ragged and fast. The wall in front of %n shudders.",
+  "A groan rolls through the boards, deep and desperate. They're close, and %n can feel it.",
+  "The thrusts into %n lose their rhythm, short and jerky. Hands clamp the edges of the hole.",
+  "\"Fuck, fuck, here it comes,\" from the other side of %n's wall, barely a whisper.",
+  "Everything goes tight and still for one long second, the stranger trembling against %n's boards.",
+  "It swells even harder inside %n, and %n knows it's coming.",
 ];
 const AMOUNT = (ml) => ml < 15 ? "a hot little spurt" : ml < 30 ? "a warm, creamy load" : ml < 60 ? "a thick, heavy load that just keeps pulsing" : ml < 100 ? "a huge, pumping flood" : "an absurd, never-ending flood";
 const HOLE_PLACE = { mouth: "%n's throat", vulva: "%n's pussy", butt: "%n's ass" };
@@ -165,7 +320,7 @@ const OUTSIDE = { mouth: ["%n's face", "%n's lips and chin", "%n's tongue and ch
 function finishLine(v, hole, ml, inside, funnel) {
   const amt = AMOUNT(ml) + ", easily " + Math.round(ml) + " mL of it";
   if (hole === "mouth" && funnel) return "The stranger cums straight into the funnel: " + amt + ", pouring down the tube and into %n's throat whether %n swallows or not.";
-  if (!inside) return "At the last second it pulls out and paints " + pick(OUTSIDE[hole]) + ": " + amt + ", hot ropes landing one after another while %n gasps.";
+  if (!inside) return "At the last second it pulls out and paints " + pickFrom(OUTSIDE[hole]) + ": " + amt + ", hot ropes landing one after another while %n gasps.";
   const place = HOLE_PLACE[hole];
   switch (v.type) {
     case "canine": return "The knot shoves in and locks, and the stranger cums deep into " + place + ": " + amt + ", pumped in pulse after pulse while they're tied together.";
@@ -173,28 +328,31 @@ function finishLine(v, hole, ml, inside, funnel) {
     case "feline": return "It cums in quick hard jerks deep in " + place + ": " + amt + ", and the barbs rake every inch of %n on the way out.";
     case "draconic": return "Every ridge swells and throbs at once as it empties into " + place + ": " + amt + ", hot as bathwater.";
     case "double": return "Both cocks unload at once, one into %n's pussy and one into %n's ass: " + amt + " between them, filling %n from both ends.";
-    default: return "It buries itself to the hilt and cums deep in " + place + ": " + amt + ", throbbing with every spurt while %n shudders around it.";
+    default: return pickFrom(["It buries itself to the hilt and cums deep in " + place + ": " + amt + ", throbbing with every spurt while %n shudders around it.",
+                              "With a strangled groan it empties into " + place + ": " + amt + ", pulse after pulse, until %n can feel the heat of it spreading."]);
   }
 }
 const KNOT_TIE = ["The knot won't come free. %n is stuck to the wall, tied, the stranger panting on the other side, cum trapped deep inside.",
-                  "Tied fast. Every little shift of the stranger tugs at %n from the inside, and there's nothing to do but wait for the knot to go down."];
+                  "Tied fast. Every little shift of the stranger tugs at %n from the inside, and there's nothing to do but wait for the knot to go down.",
+                  "Minutes pass, %n and the stranger locked together through the wall. The knot throbs and pumps out a little more every so often.",
+                  "Finally the knot softens and slips free with a wet pop, and a gush follows it out of %n."];
 const AFTER = {
-  inside: { mouth: ["%n swallows and swallows, and still some escapes down their chin.", "The taste lingers, thick and salty, coating %n's tongue."],
-            vulva: ["When it slides out, warm cum runs down %n's thighs in slow, sticky trails.", "%n's pussy twitches and leaks, the load sitting heavy and warm inside them."],
-            butt:  ["It pulls out with a wet pop and %n's ass gapes for a moment before it starts to leak.", "%n can feel it settle deep in their belly, warm and heavy."] },
-  outside: ["%n is left sticky and dripping, cum cooling on their skin.", "It drips slowly off %n onto the straw. Nobody's coming to wipe it off."],
+  inside: { mouth: ["%n swallows and swallows, and still some escapes down their chin.", "The taste lingers, thick and salty, coating %n's tongue.", "%n licks their lips clean, slow, savouring it."],
+            vulva: ["When it slides out, warm cum runs down %n's thighs in slow, sticky trails.", "%n's pussy twitches and leaks, the load sitting heavy and warm inside them.", "%n clenches, trying to hold it all in, and still it drips."],
+            butt:  ["It pulls out with a wet pop and %n's ass gapes for a moment before it starts to leak.", "%n can feel it settle deep in their belly, warm and heavy.", "A slow, warm trickle starts down the back of %n's thigh."] },
+  outside: ["%n is left sticky and dripping, cum cooling on their skin.", "It drips slowly off %n onto the straw. Nobody's coming to wipe it off.", "%n can feel it running down, warm and then cool, marking them."],
 };
+const FUNNEL_AFTER = ["%n gulps it all down, the funnel gurgling empty.", "The last of it trickles down the tube, and %n swallows, flushed and dazed."];
 const LEAVE = [
-  "A zipper, a satisfied sigh, and the footsteps fade down the row.",
+  "A zipper, a satisfied sigh, and the footsteps fade down the row away from %n's stall.",
   "A pat on the boards above %n's head, almost fond, and the stranger is gone.",
-  "\"Good stall,\" mutters the stranger, and walks off whistling.",
-  "Hooves clatter away down the aisle. Someone's already shuffling up to take their place.",
+  "\"Good stall,\" mutters the stranger to %n's wall, and walks off whistling.",
+  "Hooves clatter away down the aisle. Someone's already shuffling up to take their place at %n's hole.",
   "The outer door bangs shut. %n is alone again, dripping, waiting for whoever's next.",
-  "Somebody chalks another mark on the outside of %n's stall before they go.",
 ];
 // the stall around them: smells, sounds, the feel of the place (also when nobody's at the hole)
 export const ATMOS = [
-  "The stall smells of sweat, straw and old cum, thick in the warm air.",
+  "The stall smells of sweat, straw and old cum, thick in the warm air around %n.",
   "Somebody's cheap strawberry lube is drifting in from the next stall over.",
   "A muffled moan from further down the row, then a rhythmic thump against the boards.",
   "Rain drums on the tin roof above the stalls, and the air in %n's booth turns damp and close.",
@@ -202,98 +360,231 @@ export const ATMOS = [
   "A cool draft blows in through the hole and raises goosebumps across %n's skin.",
   "The boards under %n's knees are worn smooth and a little sticky.",
   "Light falls through the slats in thin gold stripes across %n's body.",
-  "Two voices chat right outside, as if nobody's in here at all, then move along.",
+  "Two voices chat right outside %n's stall, as if nobody's in here at all, then move along.",
   "Musk hangs in the air, heavy and animal. Somebody's been busy all afternoon.",
-  "A farmhand's broom swishes past outside, then stops, then moves on.",
+  "A farmhand's broom swishes past outside %n's stall, then stops, then moves on.",
   "The stall next door creaks and rattles in a steady rhythm. Someone's getting used hard.",
   "A fly buzzes lazily around %n's stall and settles on the rail.",
   "The faint smell of hay, leather and somebody's cologne drifts in through the hole.",
-  "Shadows of legs shuffle past the gap under the door: somebody's waiting their turn.",
+  "Shadows of legs shuffle past the gap under %n's door: somebody's waiting their turn.",
   "Somewhere a door latch clicks, and %n's stomach flips, waiting to see if it's for them.",
+  "The afternoon heat makes the stall close and drowsy, %n's skin damp with sweat.",
+  "A wet slap and a gasp from the stall across the aisle, then laughter.",
+  "The smell of the milking barn drifts over, warm and sweet, mixing with the musk.",
+  "A rooster crows somewhere, absurdly, in the middle of it all.",
+  "The tin cup by %n's door rattles in the breeze. Nobody's filled it in a while.",
 ];
-export const TAUNTS = [
-  "\"Fuck, you're good at this.\"",
-  "\"They keep you well used in here, don't they.\"",
-  "\"Look at that. Made for a wall.\"",
-  "\"Whose cow is this? I'm coming back for more.\"",
-  "\"Dripping already. Desperate little thing.\"",
-  "\"Hold still. You're just somewhere warm to finish.\"",
-  "\"I'm telling everyone about this stall.\"",
-  "\"Moo for me. Go on.\"",
-  "\"Doesn't even need a face. Just this.\"",
-  "\"You'll be leaking all day, and you'll love it.\"",
-];
-export const PRAISES = [
-  "\"God, you're good. Thank you.\"",
-  "\"Best stall on the farm, honestly.\"",
-  "\"That's it, that's perfect, you're perfect.\"",
-  "\"So good. So, so good.\"",
-];
-
-// a stranger catchin' their breath and goin' again, or changin' pace
-const SECOND_WIND = [
-  "The stranger pulls out, breathing hard, and just rubs it against %n for a while, letting %n ache for it.",
-  "It slows right down, almost lazy, savouring %n, every stroke long enough that %n squirms.",
-  "The stranger shifts their stance, gets a better grip on the wall, and starts again harder than before.",
-  "A pause. Then two fingers push into %n alongside it, stretching %n even wider, before the thrusting starts again.",
-  "It pulls nearly all the way out and stays there, just the tip, until %n pushes back and begs for the rest.",
-  "The stranger wants it to last. The pace drops to slow, deep grinding, and it goes on and on.",
-];
-// the next stranger in the queue
 const NEXT_UP = [
   "Before %n can even catch their breath, the next stranger is already at the hole.",
   "There's a line now. %n can hear them outside, shuffling, impatient, one stepping forward the moment the last one leaves.",
-  "Somebody was waiting and watching the whole time, and now it's their turn.",
+  "Somebody was waiting and watching the whole time, and now it's their turn with %n.",
   "A new set of footsteps, a new smell, a new shape pressing against the boards. %n's stall isn't getting a rest today.",
-  "The door hasn't even swung shut behind the last one before someone else steps up, already hard.",
+  "The door hasn't even swung shut behind the last one before someone else steps up to %n's hole, already hard.",
+  "\"My turn,\" says somebody outside %n's stall, and %n hears the last one laugh as they make room.",
 ];
+export const TAUNTS = [
+  "\"Fuck, you're good at this.\"", "\"They keep you well used in here, don't they.\"", "\"Look at that. Made for a wall.\"",
+  "\"Whose cow is this? I'm coming back for more.\"", "\"Dripping already. Desperate little thing.\"", "\"Hold still. You're just somewhere warm to finish.\"",
+  "\"I'm telling everyone about this stall.\"", "\"Moo for me. Go on.\"", "\"Doesn't even need a face. Just this.\"", "\"You'll be leaking all day, and you'll love it.\"",
+];
+export const PRAISES = ["\"God, you're good. Thank you.\"", "\"Best stall on the farm, honestly.\"", "\"That's it, that's perfect, you're perfect.\"", "\"So good. So, so good.\""];
 
-// one stranger, start to finish. rounds = extra rhythm blocks before they finish (a longer go)
-function oneVisitor(beats, { hole, visitor, funnel, degrade, praise, rounds, first }) {
-  const v = visitor;
-  const voice = () => (degrade && chance(0.4) ? "A voice through the boards: " + pick(TAUNTS) : praise && chance(0.4) ? "A voice through the boards: " + pick(PRAISES) : null);
-  const atmos = () => (chance(0.35) ? pick(ATMOS) : null);
-  const add = (t, extra) => { if (t) beats.push(Object.assign({ t }, extra || {})); };
-  add(first ? pick(ARRIVE) : pick(NEXT_UP));
-  add(atmos());
-  add(pick(REVEAL[v.type]).replace("%size", SIZE_WORD[v.size]));
-  add(pick(TEASE[hole]));
-  if (chance(0.5)) add(pick(TEASE[hole]));
-  add(pick((ENTRY[v.type] || ENTRY.human)[hole] || ENTRY.human[hole]));
-  for (let r = 0; r <= rounds; r++) {
-    if (r > 0) add(pick(SECOND_WIND));
-    const rh = RHYTHM[hole].slice().sort(() => Math.random() - 0.5);
-    const re = REACT[hole].slice().sort(() => Math.random() - 0.5);
-    add(re[0]);
-    add(rh[0]); add(pick(TYPE_RHYTHM[v.type])); add(re[1]); add(voice() || atmos()); add(rh[1]);
-    if (chance(0.5)) add(rh[2]);
-    if (chance(0.5)) add(re[2]);
-  }
-  add(pick(BUILD));
-  // where it ends: inside most of the time, sometimes pulled out (never for a knot or a funnel)
-  const inside = funnel || v.type === "canine" || v.type === "double" || chance(0.75);
-  const [lo, hi] = SIZES[v.size].ml;
-  const ml = Math.round(between(lo, hi) * (LOAD_X[v.type] || 1));
-  add(finishLine(v, hole, ml, inside, funnel), { finish: true, inside, ml, hole, visitor: v });
-  if (inside && v.type === "canine") add(pick(KNOT_TIE));
-  add(inside ? pick(AFTER.inside[hole]) : pick(AFTER.outside));
-  add(voice());
-  add(pick(LEAVE));
+
+// ── more lines (each batch is pushed into its pool; add your own the same way) ──
+ARRIVE.push(
+  "Somebody whistles low at the sight of %n's stall and comes straight over.",
+  "The smell reaches %n first, sweat and musk, and then the shape of someone filling the hole.",
+  "A rough hand tests the edge of the hole, feels around until it brushes %n, then pulls back to make room for something else.",
+  "Somebody leans in close to the boards and breathes, \"Oh, you're already wet for me,\" before %n even sees them.",
+  "Boots scrape to a stop. A long pause, like the stranger is deciding which of %n's holes they want first.",
+);
+TEASE.mouth.push(
+  "It paints a slick line across %n's lips, slow, then pulls back just out of reach of %n's tongue.",
+  "The stranger feeds %n just the head, in and out, in and out, until %n is chasing it.",
+  "%n's tongue flicks out to taste it, and the stranger groans and lets %n lick the whole length.",
+  "It rubs slow circles on %n's tongue, smearing it with salt, making %n's mouth water.",
+);
+TEASE.vulva.push(
+  "It rocks against %n's clit, slick and heavy, until %n is twitching on every bump.",
+  "The stranger slaps it wetly against %n's pussy, one, two, three, then rubs the sting away with the tip.",
+  "It slips in an inch and stops, holding there, until %n's whole body is begging for the rest.",
+  "Two fingers spread %n wide and the stranger drags the head through the wet, taking their time.",
+);
+TEASE.butt.push(
+  "A thumb presses against %n's ass and circles there while the cock rubs between %n's cheeks.",
+  "Warm spit, then the head presses, retreats, presses, until %n's ass starts to open on its own.",
+  "It nudges at %n's ass so slowly that %n ends up pushing back onto it first.",
+  "The stranger works lube into %n with two fingers, stretching and teasing, before lining up.",
+);
+STRETCH.mouth.push("%n's jaw creaks around it, so wide, so full, every breath through the nose.");
+STRETCH.vulva.push("It's so big %n's pussy aches around it, a deep, delicious stretch that won't let up.");
+STRETCH.butt.push("%n's ass grips it like a fist, stretched to the limit, every inch a slow burn.");
+RHYTHM.mouth.early.push("It rocks gently on %n's tongue, letting %n learn the shape of it.", "Shallow, slow strokes, the stranger sighing every time %n's lips close around it.");
+RHYTHM.mouth.mid.push("It slides deeper, tapping the back of %n's throat, then back, then deeper again.", "The stranger holds %n's head still through the hole and fucks %n's mouth in long, wet strokes.", "Every stroke drags %n's lips along the length of it, spit stringing back with each pull.");
+RHYTHM.mouth.late.push("%n's throat is used hard now, the stranger past caring about anything but finishing.", "It hammers into %n's mouth so fast %n can only hold on and take it.");
+RHYTHM.vulva.early.push("It slides in and out of %n's pussy slow and sure, getting wetter with every stroke.", "The stranger eases in deep and grinds there, warming %n up.");
+RHYTHM.vulva.mid.push("The stranger angles up and hits a spot that makes %n's knees buckle, again and again.", "It slides almost all the way out, then slams back in, over and over, a rhythm %n can't keep quiet through.", "It fucks %n in long, rolling strokes, the boards creaking like a bed.");
+RHYTHM.vulva.late.push("It's relentless now, every stroke deep and hard, %n's pussy squelching around it.", "The stranger holds %n's hips through the hole and fucks %n like they mean to break the wall.");
+RHYTHM.butt.early.push("It moves in %n's ass so slowly, barely rocking, letting %n stretch around it.", "The stranger gives %n's ass a few patient strokes, then a few more, a little deeper each time.");
+RHYTHM.butt.mid.push("It works %n's ass in steady, filling strokes, every one ending buried.", "The stranger finds a good, deep rhythm in %n's ass and settles into it.", "It pulls out until just the head is in %n, then sinks all the way back, slow and heavy.");
+RHYTHM.butt.late.push("%n's ass is getting fucked hard and fast now, slapping, rough, the stall rattling.", "It drives into %n's ass with short, brutal thrusts, chasing the finish.");
+REACT.mouth.early.push("%n's tongue swirls around the head, tasting.", "%n relaxes their throat and lets it slide a little deeper.");
+REACT.mouth.mid.push("%n's moans vibrate around it, and the stranger shudders at the feel.", "%n sucks like they're starving for it, cheeks hollow, lips tight.");
+REACT.mouth.late.push("%n is gagging softly and still pushing forward for more.", "%n's hands grip the rail so hard their knuckles go white as their throat is used.");
+REACT.vulva.early.push("%n lets out a shaky sigh as it fills them.", "%n's pussy flutters around it, already eager.");
+REACT.vulva.mid.push("%n's moans come faster, high and needy, every time it bottoms out.", "%n reaches down between their own legs, rubbing, chasing it.");
+REACT.vulva.late.push("%n is clenching and shaking, right on the brink, pleading for it.", "A broken, desperate whimper spills out of %n with every thrust.");
+REACT.butt.early.push("%n groans low and deep as their ass is opened up.", "%n's breath shudders out of them as it settles in deep.");
+REACT.butt.mid.push("%n pushes back to meet it, ass taking every inch.", "%n's moans turn into soft, rhythmic little grunts with every stroke.");
+REACT.butt.late.push("%n is shaking all over, ass clenching around it, begging not to stop.", "%n's knees slip on the straw and they don't even care.");
+TYPE_RHYTHM.human.push("The stranger's hips slap the boards with every stroke into %n, steady as a metronome.", "%n hears the stranger's belt buckle rattle against the wall in time.");
+TYPE_RHYTHM.canine.push("It's pure frantic rutting now, and %n can feel the knot swelling bigger by the second.", "The dog cock pulses with every jab, filling %n with little warm bursts.");
+TYPE_RHYTHM.equine.push("The horse cock pushes deeper than anything should, and %n's whole body rocks with it.", "%n can feel the flare dragging, catching, swelling inside on every stroke.");
+TYPE_RHYTHM.feline.push("Quick, hard little thrusts, and every one of them leaves %n tingling from the barbs.", "The barbs make %n gasp each time it pulls back, a sharp sweet scrape.");
+TYPE_RHYTHM.draconic.push("The ridges ripple inside %n, a slow wave that makes %n's toes curl.", "It's like being filled with something molten, and %n can't stop moaning.");
+TYPE_RHYTHM.double.push("One slides deep while the other teases, then they switch, and %n loses track of which is which.", "Being filled twice over makes %n gasp on every single stroke.");
+PACE_LINE.rough.push("They're not making love to %n's stall, they're using it, hard and fast and selfish.");
+PACE_LINE.slow.push("Every stroke into %n is unhurried, deliberate, savouring, like they've got all the time in the world.");
+PACE_LINE.steady.push("It settles into a rhythm with %n so even and comfortable it's almost hypnotic.");
+PACE_LINE.nervous.push("Every little sound %n makes seems to surprise the stranger, and they push in harder each time.");
+PACE_LINE.deep.push("Buried as deep in %n as it'll go, the stranger just grinds there, slow and possessive.");
+SECOND_WIND.push("The stranger stops, buried deep in %n, and just breathes for a moment before starting again.",
+  "A hand slaps the wall above %n, the stranger laughs breathlessly, and the pace picks right back up.",
+  "It slows to almost nothing, teasing %n with tiny strokes, until %n whimpers, and then it speeds up again.");
+BUILD.push("The stranger's thighs are shaking against the wall in front of %n now.", "\"Don't move, don't you move,\" breathes the stranger, holding %n still.",
+  "It throbs once, hard, inside %n, and the stranger lets out a long, broken groan.", "The boards in front of %n creak as the stranger's whole weight sags against them.");
+AFTER.inside.mouth.push("%n opens their mouth to show it's all gone, even though nobody can see.", "It leaves %n's tongue coated and their lips swollen and shining.");
+AFTER.inside.vulva.push("%n's pussy is so full that a little more spills out every time they breathe.", "Warm and heavy, it sits low in %n's belly, and %n squeezes their thighs together to keep it.");
+AFTER.inside.butt.push("%n's ass stays open and slick, leaking slowly onto the straw.", "%n can feel every drop of it inside, warm and heavy and theirs now.");
+AFTER.outside.push("It slides slowly down %n's skin, sticky and cooling, and there's nowhere to wipe it.", "%n is a glistening mess, marked, and everyone who walks past will smell it.");
+LEAVE.push("Someone pockets their gloves, pats %n's wall twice, and strolls back out into the sunshine.",
+  "\"Thanks, gorgeous,\" through the boards, and then the stranger is gone, leaving %n dripping.",
+  "The stranger stays leaning on the wall a while, catching their breath, then wanders off without a word.",
+  "A low laugh, a zipper, and the footsteps fade, leaving %n shaking in the quiet.");
+NEXT_UP.push("The next one doesn't even wait for the last one's footsteps to fade before stepping up to %n's hole.",
+  "Somebody in the queue has clearly been watching %n through a crack, because they're hard and ready the second they step up.",
+  "%n barely has time to swallow before another shape fills the hole.");
+FUNNEL.push("The stranger tilts the funnel with one finger so it points straight down %n's throat, and grins.",
+  "Drops patter into the funnel as the stranger strokes faster, each one making %n's throat work.",
+  "%n can hear the slick, quick sounds of the stranger's hand right above the funnel, getting faster.");
+ATMOS.push(
+  "The straw under %n is damp and warm and smells of everything that's happened in this stall.",
+  "Somebody in the next stall is counting out loud, slow, and then the counting turns into moaning.",
+  "A horse whinnies somewhere out in the yard, and the whole row of stalls laughs at once.",
+  "Sunlight catches the dust hanging in the air of %n's stall, drifting, golden.",
+  "The wood of the wall is warm under %n's cheek, rubbed smooth by a hundred faces before.",
+  "Someone's left a bucket of cold water just outside %n's door. %n can hear it slosh in the breeze.",
+  "The low drone of the milking pumps drifts over from the barn, steady as a heartbeat.",
+  "%n's own breathing sounds loud in the little stall, quick and shallow, waiting.",
+  "A chalk tally by %n's door gets a little longer every hour. %n can hear the stub scratch it.",
+  "The air in %n's stall is heavy and sweet, sweat and leather and something warmer underneath.",
+);
+for (const k of Object.keys(PERSONAS)) {
+  const add = { greedy: ["\"Mine. This one's mine right now.\"", "\"You're going to take every bit of this.\""],
+                slow: ["\"Beautiful. Just beautiful.\"", "\"Breathe for me. Slow. That's it.\""],
+                talker: ["\"I can feel you squeezing me. Do that again.\"", "\"I'm going to tell everyone about you.\""],
+                nervous: ["\"I've never, I mean, oh, oh god.\"", "\"Is it, can I, I'm so close already.\""],
+                regular: ["\"That's my good one.\"", "\"I always save myself for this stall.\""],
+                breeder: ["\"Keep it in. I mean it.\"", "\"You'll be round with it in a month.\""],
+                quickie: ["\"God, I needed this.\"", "\"Faster, faster, I've got to go.\""] }[k];
+  if (add) PERSONAS[k].talk.push(...add);
 }
 
-// a whole scene. Most are one stranger (5–9 minutes); some take their time over extra rounds (10–15);
-// now and then there's a queue, and three or four strangers take turns (20–40 minutes).
+// ── put a scene together, in order ─────────────────────────
+// a picker that never repeats a line inside one scene
+// (in a queue, every stranger shares it, so lines nobody's used yet come first)
+function freshPicker() {
+  const used = new Set();
+  return (list) => { const pool = list.filter((x) => !used.has(x)); const v = pickFrom(pool.length ? pool : list); used.add(v); return v; };
+}
+
+// one stranger, start to finish, as a little story
+function oneVisitor(beats, { hole, visitor, funnel, degrade, praise, rounds, first, holes, pick }) {
+  const v = visitor, persona = PERSONAS[pickPersona(hole)];
+  const add = (t, extra) => { if (t) beats.push(Object.assign({ t }, extra || {})); };
+  const talk = () => (chance(0.6) ? "A voice through the boards: " + pick(persona.talk) : null);
+  const voice = () => (degrade && chance(0.35) ? "A voice through the boards: " + pick(TAUNTS) : praise && chance(0.35) ? "A voice through the boards: " + pick(PRAISES) : null);
+  const atmos = () => (chance(0.3) ? pick(ATMOS) : null);
+  if (persona.short) rounds = 0;
+
+  // 1. arrival, and who it is
+  add(first ? (chance(0.6) ? pick(persona.arrive) : pick(ARRIVE)) : pick(NEXT_UP));
+  if (!first && chance(0.5)) add(pick(persona.arrive));
+  add(atmos());
+  add(pick(REVEAL[v.type]).replace("%size", SIZE_WORD[v.size]));
+
+  // a funnel gag: the cock can't go in, so it's a scene of its own
+  if (hole === "mouth" && funnel) {
+    add(pick(FUNNEL)); add(pick(FUNNEL)); add(talk()); add(pick(FUNNEL)); add(voice() || atmos()); add(pick(FUNNEL));
+    add(pick(BUILD));
+    const [lo, hi] = SIZES[v.size].ml, ml = Math.round(between(lo, hi) * (LOAD_X[v.type] || 1));
+    add(finishLine(v, hole, ml, true, true), { finish: true, inside: true, ml, hole, visitor: v });
+    add(pick(FUNNEL_AFTER));
+    add(chance(0.6) ? pick(persona.leave) : pick(LEAVE));
+    return;
+  }
+
+  // 2. teasing, then in (and how it feels if they're big)
+  add(pick(TEASE[hole]));
+  if (!persona.short && chance(0.6)) add(pick(TEASE[hole]));
+  add(pick((ENTRY[v.type] || ENTRY.human)[hole] || ENTRY.human[hole]));
+  if (BIG(v) && STRETCH[hole]) add(pick(STRETCH[hole]));
+
+  // 3. early → middle
+  let h = hole;
+  add(pick(REACT[h].early));
+  add(pick(RHYTHM[h].early));
+  add(pick(PACE_LINE[persona.pace]));
+  add(pick(RHYTHM[h].mid));
+  add(pick(TYPE_RHYTHM[v.type]));
+  add(pick(REACT[h].mid));
+  add(talk());
+  if (!persona.short) { add(pick(RHYTHM[h].mid)); add(voice() || atmos()); }
+
+  // 4. more rounds for the ones who take their time, sometimes moving to another hole
+  for (let r = 0; r < rounds; r++) {
+    const others = (holes || []).filter((x) => x !== h);
+    if (v.type !== "double" && others.length && chance(0.4)) {
+      const to = pickFrom(others);
+      add(pick(SWITCH).replace("%from", HOLE_WORD[h]).replace("%to", HOLE_WORD[to]));
+      h = to;
+      add(pick(REACT[h].early));
+    } else add(pick(SECOND_WIND));
+    add(pick(RHYTHM[h].mid));
+    add(pick(TYPE_RHYTHM[v.type]));
+    add(pick(REACT[h].mid));
+    add(talk() || voice());
+  }
+
+  // 5. late, build-up, finish
+  add(pick(RHYTHM[h].late));
+  add(pick(REACT[h].late));
+  add(talk());
+  add(pick(BUILD));
+  const inside = persona.alwaysInside || v.type === "canine" || v.type === "double" || chance(0.75);
+  const [lo, hi] = SIZES[v.size].ml;
+  const ml = Math.round(between(lo, hi) * (LOAD_X[v.type] || 1));
+  add(finishLine(v, h, ml, inside, false), { finish: true, inside, ml, hole: h, visitor: v });
+
+  // 6. after: the knot, the mess, the goodbye
+  if (inside && v.type === "canine") { add(pick(KNOT_TIE.slice(0, 3))); add(KNOT_TIE[3]); }
+  add(inside ? pick(AFTER.inside[h]) : pick(AFTER.outside));
+  add(voice());
+  add(chance(0.65) ? pick(persona.leave) : pick(LEAVE));
+}
+
+// a whole scene. Most are one stranger; some take extra rounds; now and then a queue takes turns.
 export function buildScene({ hole, visitor, funnel, degrade, praise, holes, length }) {
-  const beats = [], open = holes && holes.length ? holes : [hole];
+  const beats = [], open = holes && holes.length ? holes : [hole], pick = freshPicker();
   const r = Math.random(), kind = length || (r < 0.55 ? "single" : r < 0.85 ? "long" : "marathon");
   const rounds = () => (kind === "single" ? 0 : 1 + Math.floor(Math.random() * 2));
-  oneVisitor(beats, { hole, visitor, funnel, degrade, praise, rounds: rounds(), first: true });
+  oneVisitor(beats, { hole, visitor, funnel, degrade, praise, rounds: rounds(), first: true, holes: open, pick });
   if (kind === "marathon") {
     const more = 2 + Math.floor(Math.random() * 2);   // two or three more strangers
     for (let i = 0; i < more; i++) {
       const v = pickVisitor(open);
-      const h = v.type === "double" ? "vulva" : pick(open);
-      oneVisitor(beats, { hole: h, visitor: v, funnel: funnel && h === "mouth", degrade, praise, rounds: Math.random() < 0.4 ? 1 : 0, first: false });
+      const h = v.type === "double" ? "vulva" : pickFrom(open);
+      oneVisitor(beats, { hole: h, visitor: v, funnel: funnel && h === "mouth", degrade, praise, rounds: Math.random() < 0.4 ? 1 : 0, first: false, holes: open, pick });
     }
   }
   const finishes = beats.filter((b) => b.finish);
@@ -302,10 +593,12 @@ export function buildScene({ hole, visitor, funnel, degrade, praise, holes, leng
 
 // a real visitor: a shorter scene from the same pools, with their own cock and their own load
 export function buildRealScene({ hole, visitor, funnel, ml, inside }) {
+  const pick = freshPicker();
+  if (hole === "mouth" && funnel) return [pick(REVEAL[visitor.type]).replace("%size", SIZE_WORD[visitor.size]), pick(FUNNEL), pick(FUNNEL), finishLine(visitor, hole, ml, true, true)];
   return [
     pick(REVEAL[visitor.type]).replace("%size", SIZE_WORD[visitor.size]),
     pick((ENTRY[visitor.type] || ENTRY.human)[hole] || ENTRY.human[hole]),
-    pick(RHYTHM[hole]),
+    pick(RHYTHM[hole].mid),
     pick(TYPE_RHYTHM[visitor.type]),
     finishLine(visitor, hole, ml, inside, funnel),
   ];

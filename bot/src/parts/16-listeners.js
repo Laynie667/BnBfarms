@@ -10,7 +10,14 @@
 
     W.ServerSocket.on("ChatRoomMessage",(data)=>{
       try {
-        if (!data || data.Sender===CFG.BOT_MEMBER) return;
+        if (!data) return;
+        if (data.Sender===CFG.BOT_MEMBER){
+          // a Companion runnin' on the bot's own account talks to the bot like any other panel;
+          // everything else from the bot is its own echo, ignored
+          const own = data.Type === "Hidden" && readMsg(data);
+          if (own && ["hello","bye","cmd","outfitSave","outfitAnswer"].includes(own.type)) onCompanion(own);
+          return;
+        }
 
         if (data.Type === "Hidden"){
           const fm = readMsg(data);
@@ -100,6 +107,13 @@
     W.ServerSocket.on("disconnect", ()=>{ warn("Socket disconnected."); setBadge("disconnected","#ff9b9b"); });
     W.ServerSocket.on("connect", ()=>{ log("Socket reconnected."); state.lastHealthy = Date.now(); });
 
+    // /office <command>: run any farm command as the bot itself (a proprietor), answers on this screen
+    try {
+      if (typeof W.CommandCombine === "function" && !(W.Commands||[]).some(c => c && c.Tag === "office")){
+        W.CommandCombine([{ Tag:"office", Description:"<command>: run a farm command as the farm bot (proprietor), e.g. /office zone a barn",
+          Action:(args)=>{ const t = String(args||"").trim(); if (!t) return selfLine("Type a farm command after /office, like /office help me or /office zone a barn."); handleCommand(CFG.BOT_MEMBER, t, "local"); } }]);
+      }
+    } catch(e){ warn("/office:", e); }
     attachListeners._done = true;
     log("Listeners attached (chat + beeps + friends + sync).");
     return true;

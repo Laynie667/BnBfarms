@@ -2660,7 +2660,7 @@
       return !!r && r.roles.includes(role);
     }
     function isProprietor(mn) {
-      return CFG.PROPRIETORS.includes(mn) || hasRole(mn, ROLE.PROPRIETOR);
+      return mn === CFG.BOT_MEMBER || CFG.PROPRIETORS.includes(mn) || hasRole(mn, ROLE.PROPRIETOR);
     }
     function isHerdmaster(mn) {
       return isProprietor(mn) || hasRole(mn, ROLE.HERDMASTER);
@@ -3555,6 +3555,10 @@
         toCompanion(target, text, "notice", urgent);
         return;
       }
+      if (target === CFG.BOT_MEMBER) {
+        selfLine(text);
+        return;
+      }
       if (!charFor(target)) {
         if (canBeep(target)) for (const c of splitMessage(text, 900)) send("AccountBeep", { MemberNumber: target, BeepType: "", Message: c }, urgent);
         else holdMail(target, text);
@@ -3643,6 +3647,10 @@
       }
     }
     function beep(mn, msg, urgent) {
+      if (mn === CFG.BOT_MEMBER && !hasCompanion(mn)) {
+        selfLine(msg);
+        return;
+      }
       if (hasCompanion(mn)) {
         toCompanion(mn, msg, "notice", urgent);
         if (urgent && canBeep(mn)) send("AccountBeep", { MemberNumber: mn, BeepType: "", Message: String(msg).split("\n")[0].slice(0, 300) }, urgent);
@@ -3685,9 +3693,24 @@
       delete L.mailbox[mn];
       saveLedger();
     }
+    function selfLine(text) {
+      try {
+        if (typeof W.ChatRoomSendLocal !== "function") return log("[to self] " + text);
+        const p = W.document.createElement("div");
+        p.style.cssText = "color:#c9a35b;white-space:pre-wrap;margin:0.25em 0";
+        p.textContent = String(text);
+        W.ChatRoomSendLocal(p.outerHTML);
+      } catch (e) {
+        warn("self line:", e);
+      }
+    }
     function reply(mn, text, channel) {
       if (channel === "companion" || channel !== "chat" && hasCompanion(mn)) {
         toCompanion(mn, text, "reply");
+        return;
+      }
+      if (mn === CFG.BOT_MEMBER) {
+        selfLine(text);
         return;
       }
       if (channel === "beep") {
@@ -7971,7 +7994,7 @@ Welcome to B&B Farm. Mind the ruts! 🌾`,
       const present = [];
       for (const k in L.people) {
         const m = parseInt(k, 10);
-        if (isStaff(m) && onDuty(m) && charFor(m)) present.push(m);
+        if (m !== CFG.BOT_MEMBER && isStaff(m) && onDuty(m) && charFor(m)) present.push(m);
       }
       for (const m of present) beep(m, "🌾 " + msg, !routine || !!ping);
       if (!routine || present.length === 0) {
@@ -7982,7 +8005,7 @@ Welcome to B&B Farm. Mind the ruts! 🌾`,
       }
     }
     const NO_COOLDOWN = ["safe", "safeword", "red", "stuck", "report", "staff"];
-    const cooldownMs = (channel) => (channel === "companion" ? CFG.COMPANION_COOLDOWN_S : CFG.USER_COOLDOWN_S) * 1e3;
+    const cooldownMs = (channel) => (channel === "companion" || channel === "local" ? CFG.COMPANION_COOLDOWN_S : CFG.USER_COOLDOWN_S) * 1e3;
     function onCooldown(mn, cmd, channel) {
       if (NO_COOLDOWN.includes(cmd)) return false;
       const last = state.cooldowns.get(mn) || 0;
@@ -8375,7 +8398,7 @@ Welcome to B&B Farm. Mind the ruts! 🌾`,
       }
     }
     function handleCommandInner(sender, raw, channel) {
-      const isWhisper = channel === "whisper" || channel === "bot" || channel === "companion";
+      const isWhisper = channel === "whisper" || channel === "bot" || channel === "companion" || channel === "local";
       const isBeep = channel === "beep";
       if (state.sessions.has(sender)) {
         const p0 = parseCommand(raw, false, false, true);
@@ -11634,7 +11657,12 @@ Welcome to B&B Farm, hon. 🌾`
       if (!W.ServerSocket || typeof W.ServerSocket.on !== "function") return false;
       W.ServerSocket.on("ChatRoomMessage", (data) => {
         try {
-          if (!data || data.Sender === CFG.BOT_MEMBER) return;
+          if (!data) return;
+          if (data.Sender === CFG.BOT_MEMBER) {
+            const own = data.Type === "Hidden" && readMsg(data);
+            if (own && ["hello", "bye", "cmd", "outfitSave", "outfitAnswer"].includes(own.type)) onCompanion(own);
+            return;
+          }
           if (data.Type === "Hidden") {
             const fm = readMsg(data);
             if (fm) {
@@ -11764,6 +11792,21 @@ Welcome to B&B Farm, hon. 🌾`
         log("Socket reconnected.");
         state.lastHealthy = Date.now();
       });
+      try {
+        if (typeof W.CommandCombine === "function" && !(W.Commands || []).some((c) => c && c.Tag === "office")) {
+          W.CommandCombine([{
+            Tag: "office",
+            Description: "<command>: run a farm command as the farm bot (proprietor), e.g. /office zone a barn",
+            Action: (args) => {
+              const t = String(args || "").trim();
+              if (!t) return selfLine("Type a farm command after /office, like /office help me or /office zone a barn.");
+              handleCommand(CFG.BOT_MEMBER, t, "local");
+            }
+          }]);
+        }
+      } catch (e) {
+        warn("/office:", e);
+      }
       attachListeners._done = true;
       log("Listeners attached (chat + beeps + friends + sync).");
       return true;

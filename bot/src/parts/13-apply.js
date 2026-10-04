@@ -155,7 +155,7 @@ Welcome to B&B Farm. Mind the ruts! 🌾`, s.ch);
     const present = [];
     for (const k in L.people){
       const m = parseInt(k,10);
-      if (isStaff(m) && onDuty(m) && charFor(m)) present.push(m);
+      if (m !== CFG.BOT_MEMBER && isStaff(m) && onDuty(m) && charFor(m)) present.push(m);
     }
     for (const m of present) beep(m, "🌾 "+msg, !routine || !!ping);
     if (!routine || present.length===0){

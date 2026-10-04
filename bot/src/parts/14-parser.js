@@ -8,7 +8,7 @@
   const NO_COOLDOWN = ["safe","safeword","red","stuck","report","staff"];
 
   // how long someone waits between commands: panel clicks come quick, so they get a short gap
-  const cooldownMs = (channel) => (channel === "companion" ? CFG.COMPANION_COOLDOWN_S : CFG.USER_COOLDOWN_S) * 1000;
+  const cooldownMs = (channel) => (channel === "companion" || channel === "local" ? CFG.COMPANION_COOLDOWN_S : CFG.USER_COOLDOWN_S) * 1000;
   function onCooldown(mn, cmd, channel){
     if (NO_COOLDOWN.includes(cmd)) return false;
     const last = state.cooldowns.get(mn)||0;

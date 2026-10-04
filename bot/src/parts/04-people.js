@@ -5,7 +5,9 @@
   /* ───────────── ROLES & KEYS ───────────── */
 
   function hasRole(mn, role){ const r = rec(mn); return !!r && r.roles.includes(role); }
-  function isProprietor(mn){ return CFG.PROPRIETORS.includes(mn) || hasRole(mn, ROLE.PROPRIETOR); }
+  // the bot's own account counts as a proprietor, so the farm can be run from the bot's login too
+  // (/office <command> in its chat, or the Companion on its account)
+  function isProprietor(mn){ return mn === CFG.BOT_MEMBER || CFG.PROPRIETORS.includes(mn) || hasRole(mn, ROLE.PROPRIETOR); }
   function isHerdmaster(mn){ return isProprietor(mn) || hasRole(mn, ROLE.HERDMASTER); }
   function isMandated(mn){ return hasRole(mn, ROLE.MANDATED); }
   function isStaff(mn){ return isHerdmaster(mn) || hasRole(mn, ROLE.FARMHAND) || isMandated(mn); }

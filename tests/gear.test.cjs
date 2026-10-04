@@ -42,11 +42,11 @@ const lastTo=mn=>{const w=sent.filter(s=>(s[0]==='AccountBeep'&&s[1].MemberNumbe
   C(500).Appearance=[I('ItemNipples','LactationPump',{SuctionLevel:0,TypeRecord:{typed:0}})]; m0=P(500).milk; await tick();
   out('1 pump Off milks nothin\' ->', P(500).milk===m0);
   // 2. Echo's portable pump: faster when aroused
-  C(500).Appearance=[I('ItemTorso','便携乳泵',{TypeRecord:{s:0},Intensity:0})]; C(500).ArousalSettings={Progress:100};
+  C(500).Appearance=[I('ItemTorso','便携乳泵',{TypeRecord:{s:0},Intensity:3})]; C(500).ArousalSettings={Progress:100};   // turned all the way up, and worked up
   m0=P(500).milk; await tick();
-  out('2 Echo pump at full arousal: 40 mL a minute ->', Math.round((m0-P(500).milk)*3)===40);
-  C(500).ArousalSettings={Progress:0}; m0=P(500).milk; await tick();
-  out('2 …and 15 when calm ->', Math.round((m0-P(500).milk)*3)===15);
+  out('2 Echo pump on high and worked up: 40 mL a minute ->', Math.round((m0-P(500).milk)*3)===40);
+  C(500).Appearance[0].Property.Intensity=0; C(500).ArousalSettings={Progress:0}; m0=P(500).milk; await tick();   // lowest setting, calm
+  out('2 …and 15 on low and calm ->', Math.round((m0-P(500).milk)*3)===15);
   C(500).Appearance=[I('ItemDevices','奶贩',{TypeRecord:{m:0}})]; m0=P(500).milk; await tick();
   out('2 milk vendor switched off: nothin\' ->', P(500).milk===m0);
   // 3. in a stall AND wearin' a pump: counted once

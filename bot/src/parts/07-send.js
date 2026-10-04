@@ -241,6 +241,7 @@
   function missing(...mns){ return mns.find(m => m && !onMap(m)) || null; }
   function whisper(target,text,urgent){
     if (hasCompanion(target)){ toCompanion(target, text, "notice", urgent); return; }
+    if (target === CFG.BOT_MEMBER){ selfLine(text); return; }   // a whisper to itself would never arrive
     // the server only delivers a whisper to someone in this room; anyone else gets a beep (or the summary later)
     if (!charFor(target)){ if (canBeep(target)) for (const c of splitMessage(text,900)) send("AccountBeep",{ MemberNumber:target, BeepType:"", Message:c }, urgent); else holdMail(target, text); return; }
     // in a map room a whisper only reaches someone within 1 tile, unless it's out-of-character:
@@ -309,6 +310,7 @@
     }
   }
   function beep(mn,msg,urgent){
+    if (mn === CFG.BOT_MEMBER && !hasCompanion(mn)){ selfLine(msg); return; }
     if (hasCompanion(mn)){
       toCompanion(mn, msg, "notice", urgent);
       // urgent ones (safewords, summons, staff calls, new applications) ALSO pop a real beep: it makes a
@@ -353,8 +355,19 @@
     delete L.mailbox[mn]; saveLedger();
   }
 
+  // the bot's own account (someone at the bot's keyboard): shown on its own screen only
+  function selfLine(text){
+    try {
+      if (typeof W.ChatRoomSendLocal !== "function") return log("[to self] "+text);
+      const p = W.document.createElement("div");
+      p.style.cssText = "color:#c9a35b;white-space:pre-wrap;margin:0.25em 0";
+      p.textContent = String(text);
+      W.ChatRoomSendLocal(p.outerHTML);
+    } catch(e){ warn("self line:", e); }
+  }
   function reply(mn, text, channel){
     if (channel === "companion" || (channel !== "chat" && hasCompanion(mn))){ toCompanion(mn, text, "reply"); return; }
+    if (mn === CFG.BOT_MEMBER){ selfLine(text); return; }
     if (channel === "beep"){ beep(mn, text); return; }
     if (channel === "bot"){ if (canBeep(mn)) beep(mn, text); else whisper(mn, text); return; }
     if (channel === "chat"){

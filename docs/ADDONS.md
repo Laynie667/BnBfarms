@@ -158,3 +158,10 @@ Every command goes through one queue, so none get lost:
 - **Errors:** a command that breaks, in the bot or an add-on, still answers ("hit a snag"), and the farm log records which command it was and why.
 - **Disconnects:** messages wait out a dropped connection and go out once it's back. A message that fails to send is retried twice.
 - **Stuck timers:** a pacing timer that never fires can't freeze sending. Each heartbeat also moves anything waiting.
+
+## Running the farm from the bot's own account
+
+The bot's account counts as a proprietor. On the bot's own screen:
+- **`/office <command>`** runs any farm command as the bot, for example `/office zone a barn`, `/office spot set speaker-barn` or `/office addons`. Answers show only on the bot's screen.
+- **Zones and spots** use where the bot is standing, so you can walk the bot to a corner and set it.
+- **Or install the Companion on the bot's account too.** It connects to the bot like any player's would, and shows the Staff and Dashboard panels. That includes drawing zones and placing spots by clicking the map.

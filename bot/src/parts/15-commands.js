@@ -28,7 +28,7 @@
     }
   }
   function handleCommandInner(sender, raw, channel){
-    const isWhisper = channel === "whisper" || channel === "bot" || channel === "companion";
+    const isWhisper = channel === "whisper" || channel === "bot" || channel === "companion" || channel === "local";   // local = /office on the bot's own screen
     const isBeep    = channel === "beep";
 
     if (state.sessions.has(sender)){

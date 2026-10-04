@@ -3544,7 +3544,17 @@
           return;
         }
         if (speakersOn() && speakerSend(subject, t, "emote")) return;
-        if (CFG.SPEAKER_MODE !== "walk" && speakerSend(subject, t, "emote")) return;
+        if (CFG.SPEAKER_MODE !== "walk") {
+          const who2 = /* @__PURE__ */ new Set();
+          for (const a of parties) {
+            const s = audienceFor(a, t, "emote");
+            if (s) for (const m of s) who2.add(m);
+          }
+          if (who2.size) {
+            for (const m of who2) privateTo(m, t, "emote");
+            return;
+          }
+        }
       } else if (mapRoom() && CFG.SPEAKER_MODE !== "walk") {
         toEveryone(t, "emote");
         return;
@@ -3570,6 +3580,7 @@
       state.relays = state.relays || /* @__PURE__ */ new Map();
       const id = ++companionSeq;
       state.relays.set(id, { text, subject: subject || mn, at: Date.now() });
+      state.relays.get(id).by = mn;
       enqueue(makeMsg("relay", { text: String(text).slice(0, 900), id }, mn));
       for (const [k, r] of state.relays) if (Date.now() - r.at > 12e4) state.relays.delete(k);
     }
@@ -3577,7 +3588,16 @@
       const r = state.relays && state.relays.get(id);
       if (!r) return;
       state.relays.delete(id);
-      if (!speakerSend(r.subject, r.text, "emote")) for (const c of splitMessage(r.text, 900)) enqueue({ Content: "*" + c, Type: "Emote" });
+      const who = /* @__PURE__ */ new Set();
+      for (const a of /* @__PURE__ */ new Set([r.by, r.subject])) {
+        const s = a && audienceFor(a, r.text, "emote");
+        if (s) for (const m of s) who.add(m);
+      }
+      if (!who.size) {
+        for (const c of splitMessage(r.text, 900)) enqueue({ Content: "*" + c, Type: "Emote" });
+        return;
+      }
+      for (const m of who) privateTo(m, r.text, "emote");
     }
     function privateTo(mn, text, kind) {
       const line = (kind === "emote" ? "*" : "") + String(text);
@@ -3595,13 +3615,23 @@
     }
     const speakersOn = () => mapRoom() && CFG.SPEAKER_MODE === "voice" && Object.keys(L.spots || {}).some((n) => n.startsWith("speaker"));
     function speakerSend(anchor, text, kind, urgent) {
+      const who = audienceFor(anchor, text, kind);
+      if (!who) return false;
+      const line = (kind === "emote" ? "*" : "") + String(text);
+      for (const mn of who) {
+        if (hasCompanion(mn)) enqueue(makeMsg("roomline", { text: line, kind }, mn), urgent);
+        else for (const c of splitMessage(line, 900)) enqueue({ Content: "(" + c.replace(/\)/g, "]"), Type: "Whisper", Target: mn }, urgent);
+      }
+      return true;
+    }
+    function audienceFor(anchor, text, kind) {
       const here = (W.ChatRoomCharacter || []).filter((c) => c.MemberNumber !== CFG.BOT_MEMBER && c.MapData && c.MapData.Pos);
       const pos = (mn) => {
         const c = charFor(mn);
         return c && c.MapData && c.MapData.Pos;
       };
       const at = anchor && pos(anchor);
-      if (!at) return false;
+      if (!at) return null;
       const speakers = Object.entries(L.spots || {}).filter(([n]) => n.startsWith("speaker")).map(([, s]) => s);
       const dist = (p, q) => Math.max(Math.abs(p.X - q.X), Math.abs(p.Y - q.Y));
       const spot = speakers.length ? speakers.reduce((x, y) => dist(y, at) < dist(x, at) ? y : x) : at;
@@ -3610,12 +3640,7 @@
       const who = new Set([anchor].concat(named));
       if (sightOf(anchor) && !speakersOn()) for (const m of audience(anchor, kind === "chat" ? "hear" : "see")) who.add(m);
       else for (const c of here) if (dist(c.MapData.Pos, spot) <= R || dist(c.MapData.Pos, at) <= R) who.add(c.MemberNumber);
-      const line = (kind === "emote" ? "*" : "") + String(text);
-      for (const mn of who) {
-        if (hasCompanion(mn)) enqueue(makeMsg("roomline", { text: line, kind }, mn), urgent);
-        else for (const c of splitMessage(line, 900)) enqueue({ Content: "(" + c.replace(/\)/g, "]"), Type: "Whisper", Target: mn }, urgent);
-      }
-      return true;
+      return who;
     }
     function onMap(mn) {
       const C = charFor(mn);

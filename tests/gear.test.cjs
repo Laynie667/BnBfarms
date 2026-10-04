@@ -26,8 +26,15 @@ const B=async(mn,msg)=>{handlers.AccountBeep({MemberNumber:mn,Message:msg});awai
 const out=(...a)=>process.stdout.write(a.join(' ')+'\n');
 const C=mn=>chars.find(c=>c.MemberNumber===mn);
 const I=(g,a,prop,eff)=>({Asset:{Name:a,Description:a,Group:{Name:g},Effect:eff||[],Block:[]},Property:prop||{}});
-const ems=n=>sent.slice(n).filter(s=>s[1]&&s[1].Type==='Emote').map(s=>s[1].Content).join(' | ');
-const lastTo=mn=>{const w=sent.filter(s=>(s[0]==='AccountBeep'&&s[1].MemberNumber===mn)||(s[1].Type==='Whisper'&&s[1].Target===mn)).map(s=>s[1].Message||s[1].Content);return w[w.length-1]||'';};
+const ems=n=>sent.slice(n).map(s=>roomText(s)).filter(Boolean).join(' | ');
+// the last thing said TO them (room lines whispered to the people around, "(*…", don't count)
+const lastTo=mn=>{const w=sent.filter(s=>(s[0]==='AccountBeep'&&s[1].MemberNumber===mn)||(s[1].Type==='Whisper'&&s[1].Target===mn&&!/^\(\*/.test(s[1].Content))).map(s=>s[1].Message||s[1].Content);return w[w.length-1]||'';};
+// a line heard in the room: public, or (map rooms) privately to the people around: "(*…" whispers, Companion roomlines and relays
+const roomText=s=>{ const d=s&&s[1]; if(!d) return null;
+  if(!d.Target&&(d.Type==='Emote'||d.Type==='Chat')) return d.Content;
+  if(d.Type==='Whisper'&&typeof d.Content==='string'&&/^\(\*/.test(d.Content)) return d.Content.slice(1);
+  if(d.Type==='Hidden'&&d.Content==='FarmhandMsg'&&d.Dictionary&&(d.Dictionary.type==='roomline'||d.Dictionary.type==='relay')) return '*'+String(d.Dictionary.text).replace(/^\*/,'');
+  return null; };
 (async()=>{ await wait(3500);
   C(500).Name='Moo'; C(600).Name='Hana'; C(700).Name='Rex';
   C(600).Appearance=[I('Pussy','Pussy2')]; C(700).Appearance=[{Asset:{Name:'Penis',Group:{Name:'Pussy'}}}];

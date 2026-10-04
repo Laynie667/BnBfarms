@@ -25,6 +25,12 @@ const B=async(mn,msg)=>{handlers.AccountBeep({MemberNumber:mn,Message:msg});awai
 const H=async(mn,d)=>{handlers.ChatRoomMessage({Sender:mn,Type:'Hidden',Content:'FarmhandMsg',Dictionary:{v:2,...d}});await wait(400);};
 const out=(...a)=>process.stdout.write(a.join(' ')+'\n');
 const farmTo=(mn,type,n)=>sent.slice(n||0).filter(s=>s[1]&&s[1].Content==='FarmhandMsg'&&s[1].Target===mn&&s[1].Dictionary.type===type).map(s=>s[1].Dictionary);
+// a line heard in the room: public, or (map rooms) privately to the people around: "(*…" whispers, Companion roomlines and relays
+const roomText=s=>{ const d=s&&s[1]; if(!d) return null;
+  if(!d.Target&&(d.Type==='Emote'||d.Type==='Chat')) return d.Content;
+  if(d.Type==='Whisper'&&typeof d.Content==='string'&&/^\(\*/.test(d.Content)) return d.Content.slice(1);
+  if(d.Type==='Hidden'&&d.Content==='FarmhandMsg'&&d.Dictionary&&(d.Dictionary.type==='roomline'||d.Dictionary.type==='relay')) return '*'+String(d.Dictionary.text).replace(/^\*/,'');
+  return null; };
 (async()=>{ await wait(3500);
   for (const mn of [221397,700,800,900]) await H(mn,{type:'hello',ver:'0.3.0'});
   // 1. saving
@@ -49,7 +55,7 @@ const farmTo=(mn,type,n)=>sent.slice(n||0).filter(s=>s[1]&&s[1].Content==='Farmh
   out('4 keys to proprietors only ->', o2.keys && o2.keys.includes(221397) && !o2.keys.includes(800));
   // 5. answers are logged and emoted
   n=sent.length; await H(900,{type:'outfitAnswer',answer:'worn',slot:'goat|*',locks:2});
-  out('5 worn is announced ->', sent.slice(n).some(s=>s[1]&&s[1].Type==='Emote'&&/padlocks click shut/.test(s[1].Content)));
+  out('5 worn is announced ->', sent.slice(n).some(s=>/padlocks click shut/.test(roomText(s)||'')));
   // 6. list and clear
   await B(221397,'outfit clear goat any');
   out('6 cleared ->', !L().outfits['goat|*']);

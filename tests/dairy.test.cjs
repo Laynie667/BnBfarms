@@ -30,6 +30,12 @@ const drain=async(min)=>{ await wait(min||300); for(let i=0;i<400;i++){ const s=
 let fails=0; const ok=(c,msg)=>{ out(msg+' -> '+(c?'true':'false')); if(!c) fails++; };
 const toWhom=(k,mn)=>sent.slice(k).filter(([e,d])=>d&&d.Target===mn&&(d.Type==='Whisper'||d.Type==='Hidden')).map(([e,d])=>d.Content);
 const beepsTo=(k,mn)=>sent.slice(k).filter(([e,d])=>e==='AccountBeep'&&d.MemberNumber===mn).map(([e,d])=>d.Message);
+// a line heard in the room: public, or (map rooms) privately to the people around: "(*…" whispers, Companion roomlines and relays
+const roomText=s=>{ const d=s&&s[1]; if(!d) return null;
+  if(!d.Target&&(d.Type==='Emote'||d.Type==='Chat')) return d.Content;
+  if(d.Type==='Whisper'&&typeof d.Content==='string'&&/^\(\*/.test(d.Content)) return d.Content.slice(1);
+  if(d.Type==='Hidden'&&d.Content==='FarmhandMsg'&&d.Dictionary&&(d.Dictionary.type==='roomline'||d.Dictionary.type==='relay')) return '*'+String(d.Dictionary.text).replace(/^\*/,'');
+  return null; };
 (async()=>{ await wait(3500);
   chars[1].Name='Laynie'; chars[2].Name='Moo'; chars[3].Name='Hana';
   eval(fs.readFileSync(path.join(__dirname,'../dist/farmhand-dairy.user.js'),'utf8')); await wait(200);
@@ -37,7 +43,7 @@ const beepsTo=(k,mn)=>sent.slice(k).filter(([e,d])=>e==='AccountBeep'&&d.MemberN
   let k=sent.length; handlers.AccountBeep({MemberNumber:500,Message:'stats'}); await drain(1500);
   const p=L().people[500].prod; p.milk=50000; p.stallSaid=0;
   k=sent.length; W.__ms(); await drain();
-  const em=sent.slice(k).filter(([e,x])=>x&&x.Type==='Emote').map(([e,x])=>x.Content).join(' | ');
+  const em=sent.slice(k).map(s=>roomText(s)).filter(Boolean).join(' | ');
   ok(/udder|teats|bucket|moo|rail/.test(em) && /Moo/.test(em), 'the milking stall uses a dairy line ('+em.slice(0,140)+')');
   ok(!/(lactat|mammary|secret)/i.test(em), 'no medical words');
   // certificate: a week passes
@@ -53,7 +59,7 @@ const beepsTo=(k,mn)=>sent.slice(k).filter(([e,d])=>e==='AccountBeep'&&d.MemberN
   // switched off: the bot's own lines come back
   k=sent.length; handlers.AccountBeep({MemberNumber:221397,Message:'addons off dairy'}); await drain(1500);
   p.milk=50000; p.stallSaid=0; p.stall=null; k=sent.length; W.__ms(); await drain();
-  ok(sent.slice(k).some(([e,x])=>x&&x.Type==='Emote'&&/stall's cups pull|streams from/.test(x.Content)), 'with dairy off, the bot'+"'"+'s own line is used');
+  ok(sent.slice(k).some(s=>/stall's cups pull|streams from/.test(roomText(s)||'')), 'with dairy off, the bot'+"'"+'s own line is used');
   const errs=warns.filter(w=>/add-on/.test(w)); ok(!errs.length, 'no add-on errors logged '+errs.join(' | '));
   out(fails ? fails+' FAILED' : 'ALL PASSED'); process.exit(fails?1:0);
 })();

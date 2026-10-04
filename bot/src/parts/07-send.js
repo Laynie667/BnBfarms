@@ -227,7 +227,12 @@
       }
       // 2. otherwise: the speaker spot near them, or privately to whoever's near them. No walkin' over.
       if (speakersOn() && speakerSend(subject, t, "emote")) return;
-      if (CFG.SPEAKER_MODE !== "walk" && speakerSend(subject, t, "emote")) return;
+      if (CFG.SPEAKER_MODE !== "walk"){
+        // everybody around ANY of the people it's about (a breedin' names two), each once
+        const who = new Set();
+        for (const a of parties){ const s = audienceFor(a, t, "emote"); if (s) for (const m of s) who.add(m); }
+        if (who.size){ for (const m of who) privateTo(m, t, "emote"); return; }
+      }
     } else if (mapRoom() && CFG.SPEAKER_MODE !== "walk"){ toEveryone(t, "emote"); return; }   // about nobody: everybody hears it
     walkTo(subject);
     for (const c of splitMessage(t, 900)) enqueue({ Content:"*"+c, Type:"Emote" });
@@ -252,6 +257,7 @@
     state.relays = state.relays || new Map();
     const id = ++companionSeq;
     state.relays.set(id, { text, subject: subject || mn, at: Date.now() });
+    state.relays.get(id).by = mn;
     enqueue(makeMsg("relay", { text: String(text).slice(0, 900), id }, mn));
     for (const [k, r] of state.relays) if (Date.now() - r.at > 120000) state.relays.delete(k);
   }
@@ -259,7 +265,10 @@
     const r = state.relays && state.relays.get(id);
     if (!r) return;
     state.relays.delete(id);
-    if (!speakerSend(r.subject, r.text, "emote")) for (const c of splitMessage(r.text, 900)) enqueue({ Content:"*"+c, Type:"Emote" });
+    const who = new Set();
+    for (const a of new Set([r.by, r.subject])){ const s = a && audienceFor(a, r.text, "emote"); if (s) for (const m of s) who.add(m); }
+    if (!who.size){ for (const c of splitMessage(r.text, 900)) enqueue({ Content:"*"+c, Type:"Emote" }); return; }
+    for (const m of who) privateTo(m, r.text, "emote");
   }
   // one line, privately, drawn in their chat (Companion) or whispered out-of-character
   function privateTo(mn, text, kind){
@@ -284,10 +293,22 @@
      everyone else gets it as a private out-of-character whisper (the map never filters those). */
   const speakersOn = () => mapRoom() && CFG.SPEAKER_MODE === "voice" && Object.keys(L.spots || {}).some(n => n.startsWith("speaker"));
   function speakerSend(anchor, text, kind, urgent){
+    const who = audienceFor(anchor, text, kind);
+    if (!who) return false;   // nobody to anchor it to: fall back to the room
+    const line = (kind === "emote" ? "*" : "")+String(text);
+    for (const mn of who){
+      if (hasCompanion(mn)) enqueue(makeMsg("roomline", { text: line, kind }, mn), urgent);
+      else for (const c of splitMessage(line, 900)) enqueue({ Content: "("+c.replace(/\)/g, "]"), Type:"Whisper", Target: mn }, urgent);
+    }
+    return true;
+  }
+  // everybody a line about someone should reach: them, whoever it names, and whoever can see/hear them
+  // (their Companion's report) or is near them and the nearest speaker spot
+  function audienceFor(anchor, text, kind){
     const here = (W.ChatRoomCharacter||[]).filter(c => c.MemberNumber !== CFG.BOT_MEMBER && c.MapData && c.MapData.Pos);
     const pos = mn => { const c = charFor(mn); return c && c.MapData && c.MapData.Pos; };
     const at = anchor && pos(anchor);
-    if (!at) return false;   // nobody to anchor it to: fall back to the room
+    if (!at) return null;
     const speakers = Object.entries(L.spots || {}).filter(([n]) => n.startsWith("speaker")).map(([, s]) => s);
     const dist = (p, q) => Math.max(Math.abs(p.X-q.X), Math.abs(p.Y-q.Y));
     const spot = speakers.length ? speakers.reduce((x, y) => dist(y, at) < dist(x, at) ? y : x) : at;   // no speakers: just around them
@@ -297,12 +318,7 @@
     // their Companion said exactly who can see (or hear) them: those people. Otherwise everyone within range.
     if (sightOf(anchor) && !speakersOn()) for (const m of audience(anchor, kind === "chat" ? "hear" : "see")) who.add(m);
     else for (const c of here) if (dist(c.MapData.Pos, spot) <= R || dist(c.MapData.Pos, at) <= R) who.add(c.MemberNumber);
-    const line = (kind === "emote" ? "*" : "")+String(text);
-    for (const mn of who){
-      if (hasCompanion(mn)) enqueue(makeMsg("roomline", { text: line, kind }, mn), urgent);
-      else for (const c of splitMessage(line, 900)) enqueue({ Content: "("+c.replace(/\)/g, "]"), Type:"Whisper", Target: mn }, urgent);
-    }
-    return true;
+    return who;
   }
   // are they in the room and standin' on the map right now?
   function onMap(mn){

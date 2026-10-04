@@ -42,12 +42,18 @@ function routes(k, mn){
   return [...r].sort().join('+')||'none';
 }
 const textTo=(k,mn)=>sent.slice(k).filter(([ev,d])=>(ev==='AccountBeep'&&d.MemberNumber===mn)||(d&&d.Target===mn&&(d.Type==='Whisper'||d.Type==='Hidden'))).map(([ev,d])=>d.Message||d.Content+' '+JSON.stringify(d.Dictionary||'')).join(' | ');
-const chatEm=k=>sent.slice(k).filter(([ev,d])=>d&&!d.Target&&(d.Type==='Chat'||d.Type==='Emote')).map(([ev,d])=>d.Content).join(' | ');
+const chatEm=k=>sent.slice(k).map(s=>roomText(s)).filter(Boolean).join(' | ');
 const expect=(label, got, want)=>out(label+' -> '+(got===want)+' ('+got+(got===want?'':' · wanted '+want)+')');
 const B=async(mn,msg)=>{handlers.AccountBeep({MemberNumber:mn,Message:msg});await wait(5200);};
 const SAY=async(mn,msg,type='Chat',target)=>{handlers.ChatRoomMessage({Sender:mn,Type:type,Content:msg,Target:target});await wait(5200);};
 const BOT=async(mn,msg)=>{handlers.ChatRoomMessage({Sender:mn,Type:'Hidden',Content:'ChatRoomBot '+msg});await wait(5200);};
 const FM=async(mn,d)=>{handlers.ChatRoomMessage({Sender:mn,Type:'Hidden',Content:'FarmhandMsg',Dictionary:{v:2,...d}});await wait(1500);};
+// a line heard in the room: public, or (map rooms) privately to the people around: "(*…" whispers, Companion roomlines and relays
+const roomText=s=>{ const d=s&&s[1]; if(!d) return null;
+  if(!d.Target&&(d.Type==='Emote'||d.Type==='Chat')) return d.Content;
+  if(d.Type==='Whisper'&&typeof d.Content==='string'&&/^\(\*/.test(d.Content)) return d.Content.slice(1);
+  if(d.Type==='Hidden'&&d.Content==='FarmhandMsg'&&d.Dictionary&&(d.Dictionary.type==='roomline'||d.Dictionary.type==='relay')) return '*'+String(d.Dictionary.text).replace(/^\*/,'');
+  return null; };
 (async()=>{ await wait(3500);
   C(221397).Name='Laynie'; C(700).Name='Rex'; C(166990).Name='Hana'; C(500).Name='Moo';
   C(700).Appearance=[PEN]; C(166990).Appearance=[{Asset:{Name:'Pussy2',Group:{Name:'Pussy'}}}]; C(500).Appearance=[{Asset:{Name:'Pussy2',Group:{Name:'Pussy'}}}];
@@ -56,7 +62,7 @@ const FM=async(mn,d)=>{handlers.ChatRoomMessage({Sender:mn,Type:'Hidden',Content
 
   // A. answers go back the way they should, for folks without the Companion
   k=sent.length; await SAY(700,'?weather');     expect('A1 room ?weather from a friend → beep', routes(k,700), 'BEEP');
-  k=sent.length; await SAY(166990,'?ping');     expect('A2 room ?ping from a non-friend → said in chat (ping is meant to be public)', chatEm(k).includes('Right here')&&!routes(k,166990).includes('WHISPER'), true);
+  k=sent.length; await SAY(166990,'?ping');     expect('A2 room ?ping from a non-friend → heard in the room (privately to the people around, on a map)', chatEm(k).includes('Right here'), true);
   k=sent.length; await SAY(166990,'?record');   expect('A3 private ?record in room chat → whisper, never chat', routes(k,166990)+(/RECORD|record/i.test(chatEm(k))?'+LEAKED':''), 'WHISPER');
   k=sent.length; await SAY(166990,'stats','Whisper',260239); expect('A4 whispered stats → whisper back', routes(k,166990), 'WHISPER');
   k=sent.length; await BOT(700,'ping');         expect('A5 /bot from a friend → beep', routes(k,700), 'BEEP');
@@ -84,7 +90,7 @@ const FM=async(mn,d)=>{handlers.ChatRoomMessage({Sender:mn,Type:'Hidden',Content
   // E. things the room should see are emotes; private things never are
   L().jars=[{id:4,ml:20,stud:700,t:Date.now()}];
   k=sent.length; await B(700,'inseminate hana 4'); await SAY(166990,'yes','Whisper',260239);
-  out('E1 jar insemination is a public emote -> '+/fills the syringe/.test(chatEm(k)));
+  out('E1 jar insemination is seen in the room -> '+/fills the (long )?syringe/.test(chatEm(k)));
   k=sent.length; await B(700,'summon hana');    out('E2 summon moves them and tells them privately -> '+sent.slice(k).some(([e,d])=>d&&d.Content==='ChatRoomMapViewTeleport'&&d.Target===166990)+' '+routes(k,166990));
   L().people[166990].hypno=true; await B(700,'voice add hana Quiet now, %name%.'); await B(700,'voice on hana');
   W.__st().voiceNext=new Map([[166990,1]]); k=sent.length; W.__vt(); await wait(800);

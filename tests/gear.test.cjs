@@ -63,7 +63,7 @@ const lastTo=mn=>{const w=sent.filter(s=>(s[0]==='AccountBeep'&&s[1].MemberNumbe
   out('5 she\'s asked first ->', /load jar #5 into the machine/.test(lastTo(600)));
   out('5 nothin\' happens before her yes ->', !(P(600)&&P(600).held&&P(600).held.vulva>0));
   await B(600,'yes'); n=sent.length; await tick();
-  out('5 on her yes, the machine empties it in ->', /wet click and empties jar #5/.test(ems(n)), P(600).held.vulva>0);
+  out('5 on her yes, the machine starts its breeding scene ->', /loads the jar of .*seed into the .*reservoir/.test(ems(n)), P(600).held.vulva>0);
   out('5 jar used up ->', !(L().jars||[]).some(j=>j.id===5));
   out('5 machine emote while it runs ->', /fuck machine/.test(ems(n)));
   await B(600,'jarok off'); L().jars=[{id:6,ml:25,stud:700,t:Date.now()}];

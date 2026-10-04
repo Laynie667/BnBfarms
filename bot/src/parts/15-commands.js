@@ -1055,7 +1055,8 @@
         beep(sender, "I've got you, "+plainName(sender)+". Everything's stopped and I'm fetchin' somebody for you right now. You don't owe anybody an explanation. 🔴", true);
         notifyStaff("🔴 SAFEWORD from "+plainName(sender)+" ("+sender+"). Please go to them now.", false);
         audit(sender,"SAFEWORD",channel);
-        addonsEmit("safe", sender);   // add-ons stop anything they're doin' to this person (scenes, sessions…)
+        addonsEmit("safe", sender);
+        stopScene(sender);            // a milkin', breedin' or edgin' scene stops mid-beat   // add-ons stop anything they're doin' to this person (scenes, sessions…)
         dropLeashes(sender); state.tours.delete(sender);
         { const r0 = rec(sender); if (r0 && r0.prod){ r0.prod.pin = null; r0.prod.unpinUntil = Date.now() + CFG.PROD.SAFEWORD_UNPIN_MIN*60000; saveLedger(); } }
         if (rec(sender) && rec(sender).stocked){ rec(sender).stocked = null; saveLedger(); }
@@ -1399,13 +1400,30 @@ Welcome to B&B Farm, hon. 🌾`);
         const name = String(args[1]||"").toLowerCase();
         if (!sub || sub === "list"){
           const names = Object.keys(L.spots).sort();
+          const age = s => s.at ? Math.floor((Date.now() - s.at)/86400000) : null;
           R(names.length
-            ? "📍 SPOTS\n\n"+names.map(n=>"  • "+n+" — "+L.spots[n].X+","+L.spots[n].Y).join("\n")+
-              "\n\n?spot set <name> where you stand · ?spot clear <name> · ?spot go <name>"
+            ? "📍 SPOTS\n\n"+names.map(n=>"  • "+n+" — "+L.spots[n].X+","+L.spots[n].Y+(age(L.spots[n]) !== null ? " · set "+(age(L.spots[n]) ? age(L.spots[n])+"d ago" : "today") : "")).join("\n")+
+              "\n\n?spot set <name> where you stand · ?spot clear <name> [more names] · ?spot clear speaker-* · ?spot clear all · ?spot go <name>"
             : "No spots set yet, hon. Stand somewhere and say ?spot set summon (or safe, staff, rescue, trough, barn, stocks, milking1).");
           break;
         }
         if (!isHerdmaster(sender)){ R("Sorry, sugar, settin' and usin' spots is for herdmasters and proprietors. Plain ?spot shows the list."); break; }
+        // clearin' old ones: several names at once, a pattern (speaker-*), or all of them (proprietors, with a yes)
+        if (sub === "clear" || sub === "remove" || sub === "delete"){
+          const words = args.slice(1).map(w => String(w).toLowerCase()).filter(Boolean);
+          if (!words.length){ R("Which spot, sugar? ?spot clear <name> (or several names), ?spot clear speaker-* for all the speakers, or ?spot clear all."); break; }
+          let hit;
+          if (words[0] === "all"){
+            if (!isProprietor(sender)){ R("Clearin' every spot is for proprietors, sugar. You can clear them by name."); break; }
+            hit = Object.keys(L.spots);
+            if (words[1] !== "yes"){ R("That would clear all "+hit.length+" spots ("+hit.join(", ")+"). Say ?spot clear all yes to be sure."); break; }
+          } else hit = Object.keys(L.spots).filter(n => words.some(w => w.endsWith("*") ? n.startsWith(w.slice(0, -1)) : n === w));
+          if (!hit.length){ R("No spots match "+words.join(" ")+", hon. Plain ?spot shows the list."); break; }
+          for (const n of hit) delete L.spots[n];
+          saveLedger(); audit(sender, "SPOT_CLEAR", hit.join(" ").slice(0, 200));
+          R("📍 Cleared "+hit.length+" spot"+(hit.length === 1 ? "" : "s")+": "+hit.join(", ")+".");
+          break;
+        }
         if (!/^[a-z][a-z0-9_-]{1,19}$/.test(name)){ R("Here's how spots work, sugar: ?spot (or ?spot list) shows them all · ?spot set <name> marks where you're standin' · ?spot clear <name> removes one · ?spot go <name> takes you there. A name is one word, 2 to 20 letters, numbers, - or _, startin' with a letter. The ones the farm uses: summon, safe, staff, rescue, trough, barn, stocks, milking1, milking2 and on. For example: ?spot set barn"); break; }
         if (sub === "set"){
           const C = charFor(sender);
@@ -1700,11 +1718,28 @@ Welcome to B&B Farm, hon. 🌾`);
 
       case "edge": {
         const t = resolveTarget(args[0]);
-        if (!t || !rec(t)){ R("Who're we edgin', sugar? ?edge <stud>, like ?edge Rex. Each edge makes their next load bigger; three and they're pent up."); break; }
-        if (!makesSemen(t)){ R(plainName(t)+" hasn't got a cock to edge, hon."); break; }
+        if (!t || !rec(t)){ R("Who're we edgin', sugar? ?edge <who>, like ?edge Rex or ?edge Bessie. A stud's next load gets bigger; a pussy edged gets likelier to take the next breedin'. Futa: ?edge <who> cock or pussy."); break; }
         if (limitBlocks(t)){ R("Their limits rule that out, sugar."); break; }
         const away = missing(sender, t);
         if (away){ R(away === sender ? "You've gotta be here on the map, sugar." : plainName(t)+" has to be here on the map, hon."); break; }
+        // which to edge: what they asked for, else a cock if they've got one, else a pussy
+        const want = String(args[1]||"").toLowerCase();
+        const pussy = /^(pussy|vulva|cunt|clit)$/.test(want) || (!/^(cock|penis|dick)$/.test(want) && !makesSemen(t));
+        if (pussy){
+          if (!hasVulva(t)){ R(plainName(t)+" hasn't got a pussy to edge, hon."); break; }
+          if (holeBlocked(t, "vulva")){ R(plainName(t)+"'s pussy is locked away under "+holeBlocked(t, "vulva")+", sugar."); break; }
+          const vp = prodOf(t), now = Date.now();
+          if (now - (vp.vEdgeAt||0) < 60000){ R("Let 'em catch their breath a minute, sugar."); break; }
+          if (now - (vp.vEdgeAt||0) > CFG.VEDGE_HOURS*3600000) vp.vEdges = 0;   // old edges have worn off
+          vp.vEdgeAt = now; vp.vEdges = Math.min(CFG.EDGE_MAX, (vp.vEdges||0) + 1);
+          if (!runScene("edgeVulva", t, { n: plainName(t), b: plainName(sender), k: vp.vEdges, icon: "😈" }))
+            emote("😈 "+plainName(sender)+" works "+plainName(t)+"'s pussy right to the brink, then pulls away. Edge number "+vp.vEdges+".", t);
+          if (vp.vEdges >= CFG.EDGE_PENT) later(() => emote("😤 "+plainName(t)+" is edged so raw they're drippin' down their thighs, achin' to be bred. The next one's gonna take, sure as anything.", t), 60000);
+          saveLedger(); audit(sender, "EDGE", t+" pussy "+vp.vEdges);
+          R("😈 Edged "+plainName(t)+"'s pussy ("+vp.vEdges+"). Their next breedin' is "+Math.round(100*CFG.VEDGE_X*vp.vEdges)+"% likelier to take, for the next "+CFG.VEDGE_HOURS+" hours.");
+          break;
+        }
+        if (!makesSemen(t)){ R(plainName(t)+" hasn't got a cock to edge, hon."); break; }
         const sp = prodOf(t), now = Date.now();
         if (now - (sp.edgeAt||0) < 60000){ R("Let 'em catch their breath a minute, sugar."); break; }
         sp.edgeAt = now; sp.edges = (sp.edges||0) + 1;
@@ -1905,8 +1940,11 @@ Welcome to B&B Farm, hon. 🌾`);
           saveLedger();
           R("🫙 Bottled as jar #"+L.nextJar+" ("+ml(got)+" of "+plainName(t)+"'s). Staff can ?inseminate <who> "+L.nextJar+" [hole] within "+CFG.JAR_DAYS+" days.");
         }
-        emote(cmd === "milk" ? "🥛 "+(t === sender ? plainName(t)+" milks "+ml(got)+" into the pail" : plainName(sender)+" milks "+plainName(t)+": "+ml(got)+" into the pail")+". Good job, hon!"
-                             : "🧪 "+(t === sender ? plainName(t)+" fills the collection jar with "+ml(got) : plainName(sender)+" collects "+ml(got)+" from "+plainName(t))+". Good job, hon!");
+        // a little scene, beat by beat (10g-scenes.js); if one's already playin' for them, just the one line
+        const scene = (cmd === "milk" ? "milk" : "collect") + (t === sender ? "Self" : "");
+        if (!runScene(scene, t, { n: plainName(t), b: plainName(sender), ml: ml(got), icon: cmd === "milk" ? "🥛" : "🧪" }))
+          emote(cmd === "milk" ? "🥛 "+(t === sender ? plainName(t)+" milks "+ml(got)+" into the pail" : plainName(sender)+" milks "+plainName(t)+": "+ml(got)+" into the pail")+". Good job, hon!"
+                               : "🧪 "+(t === sender ? plainName(t)+" fills the collection jar with "+ml(got) : plainName(sender)+" collects "+ml(got)+" from "+plainName(t))+". Good job, hon!");
         break;
       }
 

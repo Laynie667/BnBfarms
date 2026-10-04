@@ -482,6 +482,9 @@
     if (wornTags(mother).has("fertility")) chance *= 1.5;
     if (bonus) chance *= bonus;
     if (isRut()) chance *= 2;
+    // edged and achin' for it (?edge <who> pussy): likelier to take, and the edges are used up by this fill
+    if (p.vEdges && now - (p.vEdgeAt||0) < CFG.VEDGE_HOURS*3600000) chance *= 1 + CFG.VEDGE_X * p.vEdges;
+    p.vEdges = 0;
     // breedin' rights: only the rights-holder's loads can take
     if (r.rights && r.rights.until > now && r.rights.stud !== stud && !(r.rights.allow||[]).includes(stud)) return null;
     if (p.preg) chance *= CFG.PROD.EXTRA_SIRE_X;
@@ -1018,14 +1021,20 @@
     const room = Math.max(0, capacity(t) - heldTotal(tp)), kept = Math.min(jar.ml, room);
     tp.held[hole] = (tp.held[hole]||0) + kept; tp.totals.received += kept; tp.lastStud = jar.stud;
     L.jars = L.jars.filter(j => j !== jar);
-    emote(machine
-      ? "⚙️ The "+machine+" under "+plainName(t)+" gives a wet click and empties jar #"+jar.id+" deep into their "+(hole === "mouth" ? "throat" : hole)+": "+ml(kept)+" of "+plainName(jar.stud)+"'s seed, pumped in with every stroke."
-      : "💉 "+plainName(sender)+" fills the syringe from jar #"+jar.id+" and slides it deep into "+plainName(t)+"'s "+(hole === "mouth" ? "throat" : hole)+", pushin' "+ml(kept)+" of "+plainName(jar.stud)+"'s seed all the way in.");
+    // counted now; told as a scene (10g-scenes.js), with the news at the end if it took
+    let caught = null;
     if (hole === "vulva"){
-      const caught = rollConception(t, jar.stud, kept, onBreedingStand(t) ? CFG.BREEDING_STAND_X : 1);
+      caught = rollConception(t, jar.stud, kept, onBreedingStand(t) ? CFG.BREEDING_STAND_X : 1);
       if (caught){ const sp = prodOf(jar.stud); sp.totals.conceived = (sp.totals.conceived||0) + 1;
-                   rollBoard(); const Y = L.yield; Y.s = Y.s || {}; Y.s[jar.stud] = (Y.s[jar.stud]||0) + 1;
-                   emote("🍼 It took! A soft, warm glow settles over "+plainName(t)+": they're carryin' "+plainName(jar.stud)+"'s young now, no stud required."); }
+                   rollBoard(); const Y = L.yield; Y.s = Y.s || {}; Y.s[jar.stud] = (Y.s[jar.stud]||0) + 1; }
+    }
+    const tookLine = () => caught && emote("🍼 It took! A soft, warm glow settles over "+plainName(t)+": they're carryin' "+plainName(jar.stud)+"'s young now, no stud required.", t);
+    const vars = { n: plainName(t), b: plainName(sender), m: machine || "", h: HOLE_WORD[hole] || hole, ml: ml(kept), stud: plainName(jar.stud), jar: jar.id, icon: machine ? "⚙️" : "💉" };
+    if (!runScene(machine ? "machine" : "syringe", t, vars, tookLine)){
+      emote(machine
+        ? "⚙️ The "+machine+" under "+plainName(t)+" gives a wet click and empties jar #"+jar.id+" deep into their "+vars.h+": "+ml(kept)+" of "+plainName(jar.stud)+"'s seed, pumped in with every stroke."
+        : "💉 "+plainName(sender)+" fills the syringe from jar #"+jar.id+" and slides it deep into "+plainName(t)+"'s "+vars.h+", pushin' "+ml(kept)+" of "+plainName(jar.stud)+"'s seed all the way in.", t);
+      tookLine();
     }
     saveLedger(); audit(sender, "INSEMINATE", t+" jar"+jar.id+" "+Math.round(kept));
     return "";

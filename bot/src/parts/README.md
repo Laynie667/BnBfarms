@@ -22,6 +22,9 @@ That means:
 | 08-production.js | milk, semen, breeding, pregnancy, heat, shots |
 | 09-roleplay.js | roleplay triggers and flavour lines |
 | 10-farm-life.js | feeding, curfew, stocks, leash, tour, weather |
+| 10b–10e | contracts, outfits, zones and voice, milking gear |
+| 10f-addons.js | add-on support: window.Farmhand.register for the separate add-on scripts |
+| 10g-scenes.js | the beat-by-beat scenes for milkin', collectin', machine and syringe breedin', edgin' |
 | 11-work.js | shift clock, chores, wheel, begging, fair |
 | 12-guides.js | help texts and guides |
 | 13-apply.js | applications |

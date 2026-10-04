@@ -87,7 +87,13 @@ function spotsCard(ctx) {
     h("label", { class: "fhc-label" }, "Spot name", h("input", { class: "fhc-in", placeholder: "speaker-barn", value: ctx.ui.spotName || "", oninput: (e) => ctx.setUi({ spotName: e.target.value }, true) })),
     h("div", null,
       btn("Click it on the map", () => { if (!ok()) return; const n = nm(); ctx.api.pickTiles(1, "spot '" + n + "'", ([p]) => ctx.send("spot place " + n + " " + p.X + " " + p.Y)); }, true),
-      btn("Set where I stand", () => ok() && ctx.send("spot set " + nm()))));
+      btn("Set where I stand", () => ok() && ctx.send("spot set " + nm()))),
+    // clearin' old ones: everything with a name startin' like the box (speaker- clears every speaker), or all, with a second press
+    sp.length ? h("div", { style: { marginTop: "6px" } },
+      btn("Clear all startin' with the name", () => { const n = nm(); if (!n) return ctx.hint("Type the start of the names first, like speaker-"); ctx.send("spot clear " + n + "*"); }),
+      ctx.s.proprietor && (ctx.ui.clearAllSpots
+        ? btn("Yes, clear all " + sp.length + " spots", () => { ctx.setUi({ clearAllSpots: false }); ctx.send("spot clear all yes"); }, true)
+        : btn("Clear all spots…", () => ctx.setUi({ clearAllSpots: true })))) : null);
 }
 
 export function voice(ctx) {

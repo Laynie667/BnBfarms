@@ -2323,6 +2323,9 @@
       EDGE_MAX: 4,
       EDGE_PENT: 3,
       // each edge adds 25% to the next load (up to 4); 3 edges = pent up
+      VEDGE_X: 0.2,
+      VEDGE_HOURS: 3,
+      // a pussy edged: each edge makes the next breedin' 20% likelier to take, for 3 hours
       RP_PRAISE: /\bgood (girl|boy|cow|pet|pup|puppy|kitty|kitten|heifer|breeder|stud|pony|piggy|toy|slut|bitch|bull|mare|doll|thing|little \w+)\b/i,
       RP_DEGRADE: /\b(slut|whore|cumdump|cum dump|breeder|cow|heifer|bitch|cocksleeve|cock sleeve|fucktoy|fuck toy|sow|pig|breeding stock|brood ?mare|milk ?bag|onahole|cumrag|cum rag)\b/i,
       TITLES: [
@@ -4562,6 +4565,8 @@
       if (wornTags(mother).has("fertility")) chance *= 1.5;
       if (bonus) chance *= bonus;
       if (isRut()) chance *= 2;
+      if (p.vEdges && now - (p.vEdgeAt || 0) < CFG.VEDGE_HOURS * 36e5) chance *= 1 + CFG.VEDGE_X * p.vEdges;
+      p.vEdges = 0;
       if (r.rights && r.rights.until > now && r.rights.stud !== stud && !(r.rights.allow || []).includes(stud)) return null;
       if (p.preg) chance *= CFG.PROD.EXTRA_SIRE_X;
       chance = Math.min(0.95, chance);
@@ -5172,9 +5177,9 @@
       tp.totals.received += kept;
       tp.lastStud = jar.stud;
       L.jars = L.jars.filter((j) => j !== jar);
-      emote(machine ? "⚙️ The " + machine + " under " + plainName(t) + " gives a wet click and empties jar #" + jar.id + " deep into their " + (hole === "mouth" ? "throat" : hole) + ": " + ml(kept) + " of " + plainName(jar.stud) + "'s seed, pumped in with every stroke." : "💉 " + plainName(sender) + " fills the syringe from jar #" + jar.id + " and slides it deep into " + plainName(t) + "'s " + (hole === "mouth" ? "throat" : hole) + ", pushin' " + ml(kept) + " of " + plainName(jar.stud) + "'s seed all the way in.");
+      let caught = null;
       if (hole === "vulva") {
-        const caught = rollConception(t, jar.stud, kept, onBreedingStand(t) ? CFG.BREEDING_STAND_X : 1);
+        caught = rollConception(t, jar.stud, kept, onBreedingStand(t) ? CFG.BREEDING_STAND_X : 1);
         if (caught) {
           const sp = prodOf(jar.stud);
           sp.totals.conceived = (sp.totals.conceived || 0) + 1;
@@ -5182,8 +5187,13 @@
           const Y = L.yield;
           Y.s = Y.s || {};
           Y.s[jar.stud] = (Y.s[jar.stud] || 0) + 1;
-          emote("🍼 It took! A soft, warm glow settles over " + plainName(t) + ": they're carryin' " + plainName(jar.stud) + "'s young now, no stud required.");
         }
+      }
+      const tookLine = () => caught && emote("🍼 It took! A soft, warm glow settles over " + plainName(t) + ": they're carryin' " + plainName(jar.stud) + "'s young now, no stud required.", t);
+      const vars = { n: plainName(t), b: plainName(sender), m: machine || "", h: HOLE_WORD[hole] || hole, ml: ml(kept), stud: plainName(jar.stud), jar: jar.id, icon: machine ? "⚙️" : "💉" };
+      if (!runScene(machine ? "machine" : "syringe", t, vars, tookLine)) {
+        emote(machine ? "⚙️ The " + machine + " under " + plainName(t) + " gives a wet click and empties jar #" + jar.id + " deep into their " + vars.h + ": " + ml(kept) + " of " + plainName(jar.stud) + "'s seed, pumped in with every stroke." : "💉 " + plainName(sender) + " fills the syringe from jar #" + jar.id + " and slides it deep into " + plainName(t) + "'s " + vars.h + ", pushin' " + ml(kept) + " of " + plainName(jar.stud) + "'s seed all the way in.", t);
+        tookLine();
       }
       saveLedger();
       audit(sender, "INSEMINATE", t + " jar" + jar.id + " " + Math.round(kept));
@@ -6986,6 +6996,122 @@
         warn("farmhand:ready:", e);
       }
       log("Add-on door open (window.Farmhand).");
+    }
+    const HOLE_WORD = { vulva: "pussy", butt: "ass", mouth: "throat" };
+    const SCENES = {
+      milk: [
+        { t: "%b kneels beside %n with the pail and warms their hands, then cups a heavy breast and gives it a slow, testing squeeze." },
+        {
+          t: "A first thin stream rings against the bottom of the pail. %n lets out a shaky breath as the milk starts to let down.",
+          d: 'A first thin stream rings against the pail. "Listen to that," %b says. "Good little dairy animal, leaking for me already."'
+        },
+        {
+          t: "%b finds the rhythm: squeeze, pull, release. Warm milk spurts into the pail in steady, foaming streams.",
+          p: '%b finds the rhythm, murmuring praise with every pull. "There you go, sweet thing. So much. So good."'
+        },
+        { say: true, t: "That's it, %n. Let it all down for the farm, hon." },
+        {
+          t: "%b switches sides. The second breast is so full it sprays the moment it's touched, and %n moans and arches into the hands.",
+          d: `%b switches sides, and %n sprays the moment they're touched. "Can't even hold it in. Pathetic, leaky cow."`
+        },
+        { t: "The pail's warm and heavy now. %b strips the last drops out with long, firm pulls until %n's teats are soft and tender: %ml in the pail." }
+      ],
+      milkSelf: [
+        { t: "%n settles over the pail and cups their own breast, squeezing slow and steady." },
+        { t: "Milk starts to spurt into the pail, and %n sighs at the relief of it." },
+        { t: "%n works one side, then the other, rocking a little with the rhythm, warm milk foaming in the pail." },
+        { t: "%n squeezes out the last drops and sits back, flushed and lighter: %ml in the pail." }
+      ],
+      collect: [
+        { t: "%b sets the collection jar in place and wraps a slick, gloved hand around %n's cock, stroking slow from root to tip." },
+        {
+          t: "%n's hips start to twitch. %b keeps the pace steady and patient, thumb rubbing under the head each time.",
+          d: `%n's hips start to twitch. "Look at you, humping air for it," %b says. "Breeding stock with no one to breed."`
+        },
+        { say: true, t: "Easy, %n. Every drop goes in the jar, hon." },
+        { t: "%b squeezes tighter and speeds up, other hand cupping and rolling %n's balls. %n is panting and leaking." },
+        {
+          t: "%n groans and bucks as they spill, thick ropes pumping into the jar while %b milks every pulse out of them.",
+          p: '%n groans and bucks as they spill, and %b murmurs "good stud, good stud" while milking out every pulse.'
+        },
+        { t: "%b caps the jar and holds it up to the light: %ml of %n's seed, labelled and on the shelf." }
+      ],
+      collectSelf: [
+        { t: "%n sets the collection jar in place and takes themselves in hand." },
+        { t: "%n strokes faster, breath hitching, aiming carefully at the jar." },
+        { t: "%n spills into the jar with a groan, every pulse caught: %ml bottled for the farm." }
+      ],
+      machine: [
+        { t: "%b loads the jar of %stud's seed into the %m's reservoir and checks the fit. The machine hums and the attachment slides into %n's %h." },
+        {
+          t: "The %m starts slow, deep strokes, letting %n get used to it. Every push nudges the seed reservoir with a soft, wet click.",
+          d: `The %m starts slow and deep. "Don't look so surprised," %b says. "This is how we breed the ones nobody wants to touch."`
+        },
+        { say: true, t: "Breedin' machine's runnin', y'all. %n's gettin' %stud's seed whether %stud's here or not." },
+        { t: "The pace picks up. %n rocks with the %m, breath coming in gasps, the whole frame creaking." },
+        {
+          t: "%b turns the dial up. The %m pounds into %n's %h, hard and relentless, and %n can't stay quiet.",
+          p: `%b turns the dial up and strokes %n's hair. "You're doing so well. Take it all. Good breeder."`
+        },
+        { t: "The reservoir gurgles. The %m holds deep and pumps, flooding %n's %h with %stud's seed in long, warm surges." },
+        { t: "It keeps going a while longer, slow and deep, working every drop as far in as it'll go." },
+        { t: "The %m eases off and slides out. %n is left shaking and full: %ml of %stud's seed, all of it inside." }
+      ],
+      syringe: [
+        { t: "%b fills the long syringe from jar #%jar and lays a firm hand on %n's hip to hold them still." },
+        {
+          t: "The tip slides into %n's %h, slow and deep, and %b takes a moment to settle it just right.",
+          d: `The tip slides into %n's %h. "Hold still, breeder. You don't get a stud, you get a syringe."`
+        },
+        { t: "%b pushes the plunger down slowly. %n gasps at the warm, heavy fill." },
+        { t: "%b slides it out and keeps a hand pressed over %n's %h a moment so nothing leaks: %ml of %stud's seed, all the way in." }
+      ],
+      edgeVulva: [
+        { t: "%b slips a hand between %n's thighs and starts slow circles, teasing, until %n's hips start to follow." },
+        {
+          t: "%b works two fingers into %n's pussy and curls them, thumb rubbing faster. %n's breath goes ragged and high.",
+          d: `%b works two fingers into %n's dripping pussy. "Listen to how wet you are. Desperate little breeding hole."`
+        },
+        {
+          t: "%n is right there, trembling, about to tip over, and %b pulls their hand away and steps back. Edge number %k.",
+          p: `%n is right there, and %b pulls away gently. "Not yet, sweet thing. You're being so good for me. Edge number %k."`
+        }
+      ]
+    };
+    function runScene(key, t, vars, onEnd) {
+      state.sceneRun = state.sceneRun || /* @__PURE__ */ new Map();
+      const beats = SCENES[key], r = rec(t) || {};
+      if (!beats || state.sceneRun.has(t)) return false;
+      const id = Symbol(key);
+      state.sceneRun.set(t, id);
+      const fillV = (s) => String(s).replace(/%(\w+)/g, (m, k) => vars[k] !== void 0 ? vars[k] : m);
+      let i = 0;
+      const step = () => {
+        if (state.sceneRun.get(t) !== id) return;
+        if (!onMap(t)) {
+          state.sceneRun.delete(t);
+          return;
+        }
+        const b = beats[i++];
+        if (!b) {
+          state.sceneRun.delete(t);
+          if (onEnd) try {
+            onEnd();
+          } catch (e) {
+            warn("scene end:", e);
+          }
+          return;
+        }
+        const line = fillV(r.degradeMe && b.d || r.praiseMe && b.p || b.t);
+        if (b.say) say(line, false, t);
+        else emote(vars.icon + " " + line, t);
+        later(step, (15 + Math.random() * 10) * 1e3);
+      };
+      step();
+      return true;
+    }
+    function stopScene(t) {
+      if (state.sceneRun) state.sceneRun.delete(t);
     }
     function clockedIn(mn) {
       const r = rec(mn);
@@ -9874,6 +10000,7 @@ Welcome to B&B Farm. Mind the ruts! 🌾`,
           notifyStaff("🔴 SAFEWORD from " + plainName(sender) + " (" + sender + "). Please go to them now.", false);
           audit(sender, "SAFEWORD", channel);
           addonsEmit("safe", sender);
+          stopScene(sender);
           dropLeashes(sender);
           state.tours.delete(sender);
           {
@@ -10309,11 +10436,40 @@ Welcome to B&B Farm, hon. 🌾`
           const name = String(args[1] || "").toLowerCase();
           if (!sub || sub === "list") {
             const names = Object.keys(L.spots).sort();
-            R(names.length ? "📍 SPOTS\n\n" + names.map((n) => "  • " + n + " — " + L.spots[n].X + "," + L.spots[n].Y).join("\n") + "\n\n?spot set <name> where you stand · ?spot clear <name> · ?spot go <name>" : "No spots set yet, hon. Stand somewhere and say ?spot set summon (or safe, staff, rescue, trough, barn, stocks, milking1).");
+            const age = (s) => s.at ? Math.floor((Date.now() - s.at) / 864e5) : null;
+            R(names.length ? "📍 SPOTS\n\n" + names.map((n) => "  • " + n + " — " + L.spots[n].X + "," + L.spots[n].Y + (age(L.spots[n]) !== null ? " · set " + (age(L.spots[n]) ? age(L.spots[n]) + "d ago" : "today") : "")).join("\n") + "\n\n?spot set <name> where you stand · ?spot clear <name> [more names] · ?spot clear speaker-* · ?spot clear all · ?spot go <name>" : "No spots set yet, hon. Stand somewhere and say ?spot set summon (or safe, staff, rescue, trough, barn, stocks, milking1).");
             break;
           }
           if (!isHerdmaster(sender)) {
             R("Sorry, sugar, settin' and usin' spots is for herdmasters and proprietors. Plain ?spot shows the list.");
+            break;
+          }
+          if (sub === "clear" || sub === "remove" || sub === "delete") {
+            const words = args.slice(1).map((w) => String(w).toLowerCase()).filter(Boolean);
+            if (!words.length) {
+              R("Which spot, sugar? ?spot clear <name> (or several names), ?spot clear speaker-* for all the speakers, or ?spot clear all.");
+              break;
+            }
+            let hit;
+            if (words[0] === "all") {
+              if (!isProprietor(sender)) {
+                R("Clearin' every spot is for proprietors, sugar. You can clear them by name.");
+                break;
+              }
+              hit = Object.keys(L.spots);
+              if (words[1] !== "yes") {
+                R("That would clear all " + hit.length + " spots (" + hit.join(", ") + "). Say ?spot clear all yes to be sure.");
+                break;
+              }
+            } else hit = Object.keys(L.spots).filter((n) => words.some((w) => w.endsWith("*") ? n.startsWith(w.slice(0, -1)) : n === w));
+            if (!hit.length) {
+              R("No spots match " + words.join(" ") + ", hon. Plain ?spot shows the list.");
+              break;
+            }
+            for (const n of hit) delete L.spots[n];
+            saveLedger();
+            audit(sender, "SPOT_CLEAR", hit.join(" ").slice(0, 200));
+            R("📍 Cleared " + hit.length + " spot" + (hit.length === 1 ? "" : "s") + ": " + hit.join(", ") + ".");
             break;
           }
           if (!/^[a-z][a-z0-9_-]{1,19}$/.test(name)) {
@@ -10759,11 +10915,7 @@ Welcome to B&B Farm, hon. 🌾`
         case "edge": {
           const t = resolveTarget(args[0]);
           if (!t || !rec(t)) {
-            R("Who're we edgin', sugar? ?edge <stud>, like ?edge Rex. Each edge makes their next load bigger; three and they're pent up.");
-            break;
-          }
-          if (!makesSemen(t)) {
-            R(plainName(t) + " hasn't got a cock to edge, hon.");
+            R("Who're we edgin', sugar? ?edge <who>, like ?edge Rex or ?edge Bessie. A stud's next load gets bigger; a pussy edged gets likelier to take the next breedin'. Futa: ?edge <who> cock or pussy.");
             break;
           }
           if (limitBlocks(t)) {
@@ -10773,6 +10925,37 @@ Welcome to B&B Farm, hon. 🌾`
           const away = missing(sender, t);
           if (away) {
             R(away === sender ? "You've gotta be here on the map, sugar." : plainName(t) + " has to be here on the map, hon.");
+            break;
+          }
+          const want = String(args[1] || "").toLowerCase();
+          const pussy = /^(pussy|vulva|cunt|clit)$/.test(want) || !/^(cock|penis|dick)$/.test(want) && !makesSemen(t);
+          if (pussy) {
+            if (!hasVulva(t)) {
+              R(plainName(t) + " hasn't got a pussy to edge, hon.");
+              break;
+            }
+            if (holeBlocked(t, "vulva")) {
+              R(plainName(t) + "'s pussy is locked away under " + holeBlocked(t, "vulva") + ", sugar.");
+              break;
+            }
+            const vp = prodOf(t), now2 = Date.now();
+            if (now2 - (vp.vEdgeAt || 0) < 6e4) {
+              R("Let 'em catch their breath a minute, sugar.");
+              break;
+            }
+            if (now2 - (vp.vEdgeAt || 0) > CFG.VEDGE_HOURS * 36e5) vp.vEdges = 0;
+            vp.vEdgeAt = now2;
+            vp.vEdges = Math.min(CFG.EDGE_MAX, (vp.vEdges || 0) + 1);
+            if (!runScene("edgeVulva", t, { n: plainName(t), b: plainName(sender), k: vp.vEdges, icon: "😈" }))
+              emote("😈 " + plainName(sender) + " works " + plainName(t) + "'s pussy right to the brink, then pulls away. Edge number " + vp.vEdges + ".", t);
+            if (vp.vEdges >= CFG.EDGE_PENT) later(() => emote("😤 " + plainName(t) + " is edged so raw they're drippin' down their thighs, achin' to be bred. The next one's gonna take, sure as anything.", t), 6e4);
+            saveLedger();
+            audit(sender, "EDGE", t + " pussy " + vp.vEdges);
+            R("😈 Edged " + plainName(t) + "'s pussy (" + vp.vEdges + "). Their next breedin' is " + Math.round(100 * CFG.VEDGE_X * vp.vEdges) + "% likelier to take, for the next " + CFG.VEDGE_HOURS + " hours.");
+            break;
+          }
+          if (!makesSemen(t)) {
+            R(plainName(t) + " hasn't got a cock to edge, hon.");
             break;
           }
           const sp = prodOf(t), now = Date.now();
@@ -11091,7 +11274,9 @@ Welcome to B&B Farm, hon. 🌾`
             saveLedger();
             R("🫙 Bottled as jar #" + L.nextJar + " (" + ml(got) + " of " + plainName(t) + "'s). Staff can ?inseminate <who> " + L.nextJar + " [hole] within " + CFG.JAR_DAYS + " days.");
           }
-          emote(cmd === "milk" ? "🥛 " + (t === sender ? plainName(t) + " milks " + ml(got) + " into the pail" : plainName(sender) + " milks " + plainName(t) + ": " + ml(got) + " into the pail") + ". Good job, hon!" : "🧪 " + (t === sender ? plainName(t) + " fills the collection jar with " + ml(got) : plainName(sender) + " collects " + ml(got) + " from " + plainName(t)) + ". Good job, hon!");
+          const scene = (cmd === "milk" ? "milk" : "collect") + (t === sender ? "Self" : "");
+          if (!runScene(scene, t, { n: plainName(t), b: plainName(sender), ml: ml(got), icon: cmd === "milk" ? "🥛" : "🧪" }))
+            emote(cmd === "milk" ? "🥛 " + (t === sender ? plainName(t) + " milks " + ml(got) + " into the pail" : plainName(sender) + " milks " + plainName(t) + ": " + ml(got) + " into the pail") + ". Good job, hon!" : "🧪 " + (t === sender ? plainName(t) + " fills the collection jar with " + ml(got) : plainName(sender) + " collects " + ml(got) + " from " + plainName(t)) + ". Good job, hon!");
           break;
         }
         case "stats": {

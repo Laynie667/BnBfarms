@@ -241,6 +241,7 @@
     RP_GENTLE: /\b(slow\w*|gentl\w*|tender\w*|soft\w*|loving\w*|careful\w*|sweet\w*)\b/i,
     SLOSH_MIN: 8,                 // a full, sloshin' body gets a waddle emote about this often when it moves
     EDGE_X: 0.25, EDGE_MAX: 4, EDGE_PENT: 3,   // each edge adds 25% to the next load (up to 4); 3 edges = pent up
+    VEDGE_X: 0.2, VEDGE_HOURS: 3,              // a pussy edged: each edge makes the next breedin' 20% likelier to take, for 3 hours
     RP_PRAISE: /\bgood (girl|boy|cow|pet|pup|puppy|kitty|kitten|heifer|breeder|stud|pony|piggy|toy|slut|bitch|bull|mare|doll|thing|little \w+)\b/i,
     RP_DEGRADE: /\b(slut|whore|cumdump|cum dump|breeder|cow|heifer|bitch|cocksleeve|cock sleeve|fucktoy|fuck toy|sow|pig|breeding stock|brood ?mare|milk ?bag|onahole|cumrag|cum rag)\b/i,
     TITLES: [

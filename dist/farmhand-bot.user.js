@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.13.6
+// @version      0.13.7
 // @description  B&B Farm: beeps, keys, ledger, roster, herds, summoning, anti-idle
 // @author       Laynie & Alexia
 // @match        *://*.bondageprojects.elementfx.com/*
@@ -1803,7 +1803,7 @@
   ];
 
   // bot/src/version.js
-  var VERSION = "0.13.6";
+  var VERSION = "0.13.7";
 
   // bot-parts:farmhand-bot-parts
   (function() {
@@ -3999,13 +3999,24 @@
       if (!low) return null;
       const room = (W.ChatRoomCharacter || []).map((c) => c.MemberNumber).filter((m) => m !== CFG.BOT_MEMBER);
       const books = Object.keys(L.people).map((k) => parseInt(k, 10));
-      for (const pool of [room, books]) {
-        const exact = pool.filter((m) => namesOf(m).includes(low));
-        if (exact.length === 1) return exact[0];
-        const starts = pool.filter((m) => namesOf(m).some((n) => n.startsWith(low) || n.split(/\s+/).some((w) => w.startsWith(low))));
-        if (low.length >= 3 && starts.length === 1) return starts[0];
-      }
-      return null;
+      const all = [...new Set(room.concat(books))];
+      const onBooks = (m) => {
+        const r = rec(m);
+        return !!(r && r.roles && r.roles.length);
+      };
+      const score = (m) => (onBooks(m) ? 2 : 0) + (charFor(m) ? 1 : 0);
+      const choose = (list) => {
+        if (list.length <= 1) return list[0] || null;
+        const best = Math.max(...list.map(score)), top = list.filter((m) => score(m) === best);
+        if (top.length === 1) return top[0];
+        state.ambiguous = { arg, list: top };
+        return null;
+      };
+      const exact = all.filter((m) => namesOf(m).includes(low));
+      if (exact.length) return choose(exact);
+      if (low.length < 3) return null;
+      const starts = all.filter((m) => namesOf(m).some((n) => n.startsWith(low) || n.split(/\s+/).some((w) => w.startsWith(low))));
+      return choose(starts);
     }
     const GREETINGS = [
       "Evenin', %titled_name%! Gate's open, come on in, sugar. 🌻",
@@ -8946,6 +8957,7 @@ Welcome to B&B Farm. Mind the ruts! 🌾`,
         state.lastCmd.set(sender, { key, at: Date.now() });
       }
       state.inReply = true;
+      state.ambiguous = null;
       const watch = channel === "companion" ? state.cmdWatch = { mn: sender, replied: false, emotes: [] } : null;
       try {
         return handleCommandInner(sender, raw, channel);
@@ -8957,6 +8969,14 @@ Welcome to B&B Farm. Mind the ruts! 🌾`,
         } catch (e2) {
         }
       } finally {
+        if (state.ambiguous) {
+          const a = state.ambiguous;
+          state.ambiguous = null;
+          try {
+            reply(sender, 'More than one person goes by "' + a.arg + '", sugar: ' + a.list.slice(0, 6).map((m) => plainName(m) + " (" + m + (rec(m) && rec(m).roles && rec(m).roles.length ? ", on the books" : "") + (charFor(m) ? ", here" : "") + ")").join(", ") + ". Use the member number instead, like ?" + String(raw).trim().split(/\s+/)[0].replace(/^[?!.\/-]/, "") + " " + a.list[0] + ".", channel);
+          } catch (e) {
+          }
+        }
         if (!state.syncSoon) {
           state.syncSoon = true;
           later(() => {

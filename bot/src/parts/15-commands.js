@@ -13,6 +13,7 @@
       state.lastCmd.set(sender, { key, at: Date.now() });
     }
     state.inReply = true;
+    state.ambiguous = null;
     // from the Companion: if the only thing a command does is a room emote, the panel gets a copy too
     const watch = channel === "companion" ? (state.cmdWatch = { mn: sender, replied: false, emotes: [] }) : null;
     try { return handleCommandInner(sender, raw, channel); }
@@ -23,6 +24,14 @@
       try { reply(sender, "Oops, sugar, ?"+String(raw).slice(0,40)+" hit a snag on my end. It's written in the farm log for the proprietors. Try again in a bit, or ask staff.", channel); } catch(e2){}
     }
     finally {
+      // a name that fit more than one person: list them, so they can use the member number
+      if (state.ambiguous){
+        const a = state.ambiguous; state.ambiguous = null;
+        try {
+          reply(sender, "More than one person goes by \""+a.arg+"\", sugar: "+a.list.slice(0, 6).map(m => plainName(m)+" ("+m+(rec(m) && rec(m).roles && rec(m).roles.length ? ", on the books" : "")+(charFor(m) ? ", here" : "")+")").join(", ")+
+                ". Use the member number instead, like ?"+String(raw).trim().split(/\s+/)[0].replace(/^[?!.\/-]/,"")+" "+a.list[0]+".", channel);
+        } catch(e){}
+      }
       // whatever changed (a zone drawn from the bot's own screen, a spot, a switch) reaches every
       // Companion in a moment, not at the next once-a-minute sync. Only changed panels are sent.
       if (!state.syncSoon){ state.syncSoon = true; later(() => { state.syncSoon = false; syncCompanions(); whitelistSync(true); }, 1500); }

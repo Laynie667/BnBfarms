@@ -559,6 +559,10 @@
   }
   // a member number, a name or nickname, or the start of one ("bess" finds Bessie Mae),
   // as long as it only fits one person. Folks in the room count first, then the books.
+  // A name could fit more than one person (another account, someone in the room with the same name).
+  // Everyone it could be is looked at together: an exact name beats the start of one; then somebody on the
+  // farm's books beats somebody who isn't; then somebody here beats somebody away. If it's still a real
+  // tie, nobody's picked: the command says so and lists them with their member numbers (see handleCommand).
   function resolveTarget(arg){
     if (!arg) return null;
     arg = String(arg).replace(/^@/,"").replace(/[,.!?:;]+$/,"");
@@ -567,13 +571,21 @@
     if (!low) return null;
     const room = (W.ChatRoomCharacter||[]).map(c => c.MemberNumber).filter(m => m !== CFG.BOT_MEMBER);
     const books = Object.keys(L.people).map(k => parseInt(k,10));
-    for (const pool of [room, books]){
-      const exact = pool.filter(m => namesOf(m).includes(low));
-      if (exact.length === 1) return exact[0];
-      const starts = pool.filter(m => namesOf(m).some(n => n.startsWith(low) || n.split(/\s+/).some(w => w.startsWith(low))));
-      if (low.length >= 3 && starts.length === 1) return starts[0];
-    }
-    return null;
+    const all = [...new Set(room.concat(books))];
+    const onBooks = m => { const r = rec(m); return !!(r && r.roles && r.roles.length); };
+    const score = m => (onBooks(m) ? 2 : 0) + (charFor(m) ? 1 : 0);
+    const choose = (list) => {
+      if (list.length <= 1) return list[0] || null;
+      const best = Math.max(...list.map(score)), top = list.filter(m => score(m) === best);
+      if (top.length === 1) return top[0];
+      state.ambiguous = { arg, list: top };   // a real tie: handleCommand tells them
+      return null;
+    };
+    const exact = all.filter(m => namesOf(m).includes(low));
+    if (exact.length) return choose(exact);
+    if (low.length < 3) return null;
+    const starts = all.filter(m => namesOf(m).some(n => n.startsWith(low) || n.split(/\s+/).some(w => w.startsWith(low))));
+    return choose(starts);
   }
 
   /* ───────────── greeting ───────────── */

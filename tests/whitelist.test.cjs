@@ -56,6 +56,17 @@ const beepsTo=(k,mn)=>sent.slice(k).filter(([e,d])=>e==='AccountBeep'&&d.MemberN
   ok(L().people[221397] && WL().includes(221397) && beepsTo(k,221397).some(m=>/can't unregister a proprietor/.test(m)), 'a proprietor can\'t be unregistered');
   await wait(5200); k=sent.length; handlers.AccountBeep({MemberNumber:221397,Message:'unregister Laynie proprietor'}); await drain(1500);
   ok(L().people[221397].roles.includes('PROPRIETOR'), '...or lose the proprietor role');
+  // staff who are also livestock keep both through pasture and back on duty; staff-only lose the borrowed livestock
+  L().people[700]={mn:700,name:'Jo',roles:['FARMHAND','LIVESTOCK'],onDuty:true,herds:[],tempKeys:[],cover:[]};
+  L().people[701]={mn:701,name:'Kit',roles:['FARMHAND'],onDuty:true,herds:[],tempKeys:[],cover:[]};
+  chars.push(at(700,12,12),at(701,13,13)); chars[chars.length-2].Name='Jo'; chars[chars.length-1].Name='Kit';
+  for (const mn of [700,701]){ handlers.AccountBeep({MemberNumber:mn,Message:'pasture'}); await drain(1500); }
+  await wait(5200); for (const mn of [700,701]){ handlers.AccountBeep({MemberNumber:mn,Message:'onduty'}); await drain(1500); }
+  ok(L().people[700].roles.includes('LIVESTOCK') && L().people[700].roles.includes('FARMHAND'), 'staff who are really livestock stay livestock after pasture and back on duty');
+  ok(!L().people[701].roles.includes('LIVESTOCK'), 'staff who only borrowed livestock for pasture lose it again');
+  // removing staff from someone who's also livestock leaves them livestock (and whitelisted)
+  await wait(5200); handlers.AccountBeep({MemberNumber:221397,Message:'unregister Jo farmhand'}); await drain(2500);
+  ok(L().people[700].roles.join()==='LIVESTOCK' && WL().includes(700), 'taking staff from Jo leaves her livestock, still whitelisted');
   // the hand-whitelisted one is still there after all that
   ok(WL().includes(777), 'the hand-whitelisted person was never touched');
   out(fails ? fails+' FAILED' : 'ALL PASSED'); process.exit(fails?1:0);

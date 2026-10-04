@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.13.5
+// @version      0.13.6
 // @description  B&B Farm: beeps, keys, ledger, roster, herds, summoning, anti-idle
 // @author       Laynie & Alexia
 // @match        *://*.bondageprojects.elementfx.com/*
@@ -1803,7 +1803,7 @@
   ];
 
   // bot/src/version.js
-  var VERSION = "0.13.5";
+  var VERSION = "0.13.6";
 
   // bot-parts:farmhand-bot-parts
   (function() {
@@ -10807,7 +10807,7 @@ Welcome to B&B Farm, hon. 🌾`
             break;
           }
           r.onDuty = true;
-          const strip = r.pastureStock === true || r.pastureStock === void 0 && isStaff(sender);
+          const strip = r.pastureStock === true;
           if (strip) r.roles = r.roles.filter((x) => x !== ROLE.LIVESTOCK);
           r.pastureStock = false;
           r.pastureNote = "";
@@ -11975,7 +11975,7 @@ Welcome to B&B Farm, hon. 🌾`
           r.shift.in = Date.now();
           if (r.onDuty === false) {
             r.onDuty = true;
-            if (r.pastureStock === true || r.pastureStock === void 0 && isStaff(sender)) r.roles = r.roles.filter((x) => x !== ROLE.LIVESTOCK);
+            if (r.pastureStock === true) r.roles = r.roles.filter((x) => x !== ROLE.LIVESTOCK);
             r.pastureStock = false;
             r.pastureNote = "";
             syncKeys(sender, true);

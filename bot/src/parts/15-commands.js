@@ -1337,7 +1337,7 @@ Welcome to B&B Farm, hon. 🌾`);
           break;
         }
         r.onDuty = true;
-        const strip = r.pastureStock === true || (r.pastureStock === undefined && isStaff(sender));
+        const strip = r.pastureStock === true;   // only the livestock ?pasture added; never a livestock role they really have
         if (strip) r.roles = r.roles.filter(x=>x!==ROLE.LIVESTOCK);
         r.pastureStock = false;
         r.pastureNote = "";
@@ -2124,7 +2124,7 @@ Welcome to B&B Farm, hon. 🌾`);
         if (r.onDuty === false){
           // same clean-up as ?onduty
           r.onDuty = true;
-          if (r.pastureStock === true || (r.pastureStock === undefined && isStaff(sender))) r.roles = r.roles.filter(x=>x!==ROLE.LIVESTOCK);
+          if (r.pastureStock === true) r.roles = r.roles.filter(x=>x!==ROLE.LIVESTOCK);   // only what ?pasture added
           r.pastureStock = false; r.pastureNote = "";
           syncKeys(sender, true);
         }

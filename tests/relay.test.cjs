@@ -48,13 +48,14 @@ const beepsTo=(k,mn)=>sent.slice(k).filter(([e,d])=>e==='AccountBeep'&&d.MemberN
   ok(!sent.slice(k).some(([e,d])=>d&&d.Type==='Emote'), 'the bot posts no room emote itself');
   ok(moves(k)===0, 'and the bot never moves');
   // Moo's Companion refuses one: it goes privately to the people near Moo
+  FM(600,{type:'hello',ver:'0.8.0'}); await drain(600);   // Hana, standing by, has the Companion
   k=sent.length; FM(500,{type:'relayNo',id:r[0].id}); await drain(600);
-  ok(sent.slice(k).some(([e,d])=>d&&d.Type==='Whisper'&&d.Target===600&&/^\(\*/.test(d.Content)), 'a refused one is whispered to Hana, who is near Moo');
+  ok(sent.slice(k).some(([e,d])=>d&&d.Type==='Hidden'&&d.Target===600&&d.Dictionary.type==='roomline'), 'a refused one reaches Hana, who is near Moo, drawn in her chat');
   // Moo turns relaying off: lines about Moo go privately to people near instead
   FM(500,{type:'hello',ver:'0.9.0',relay:false}); await drain(800);
   L().people[500].prod.milk=5000; await wait(5200);
   k=sent.length; handlers.AccountBeep({MemberNumber:221397,Message:'milk Moo 300'}); await drain(2000);
-  ok(!relaysTo(k,500).length && sent.slice(k).some(([e,d])=>d&&d.Type==='Whisper'&&d.Target===600), 'with the switch off, nothing is posted as Moo; Hana gets it privately');
+  ok(!relaysTo(k,500).length && sent.slice(k).some(([e,d])=>d&&d.Type==='Hidden'&&d.Target===600&&d.Dictionary.type==='roomline'), 'with the switch off, nothing is posted as Moo; Hana sees it drawn in her chat');
   ok(moves(k)===0, 'still no walking over');
   // an old Companion (v0.8) never gets asked
   FM(500,{type:'hello',ver:'0.8.0',relay:true}); await drain(800);

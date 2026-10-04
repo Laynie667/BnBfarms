@@ -59,6 +59,7 @@ const beepsTo=(k,mn)=>sent.slice(k).filter(([e,d])=>e==='AccountBeep'&&d.MemberN
   FM(500,{type:'hello',ver:'0.10.0',relay:false,off:{}}); FM(500,{type:'sight',see:[600],hear:[600,221397]}); await drain(600);
   chars[3].MapData.Pos={X:30,Y:30};   // far by distance, but Moo's Companion says Hana can see her
   var P=(mn)=>L().people[mn].prod; P(500).rubAt=0;
+  FM(600,{type:'hello',ver:'0.8.0'}); await drain(400);   // Hana has the Companion (onlookers without it get nothing)
   k=sent.length; handlers.AccountBeep({MemberNumber:221397,Message:'notice'}); await drain(300);
   k=sent.length; W.__addons('noop');
   // ask the bot to say something about Moo the way any farm line would

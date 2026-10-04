@@ -119,6 +119,14 @@
     }
     if (ev === "AccountBeep" && data && typeof data.Message === "string") data = Object.assign({}, data, { Message: noEmoji(data.Message) });
     else if (ev === "ChatRoomChat" && data && data.Type !== "Hidden" && typeof data.Content === "string") data = Object.assign({}, data, { Content: noEmoji(data.Content) });
+    // a panel's state update replaces one for the same person still waitin' in the queue: only the newest
+    // matters, and a pile of stale ones would make every panel lag behind
+    if (ev === "ChatRoomChat" && data && data.Type === "Hidden" && data.Dictionary && data.Dictionary.type === "state"){
+      for (const lane of [state.urgent, state.replies || [], state.queue]){
+        const i = lane.findIndex(x => x.ev === ev && x.data && x.data.Type === "Hidden" && x.data.Target === data.Target && x.data.Dictionary && x.data.Dictionary.type === "state");
+        if (i >= 0){ lane[i] = { ev, data }; pump(); return; }
+      }
+    }
     if (urgent) state.urgent.push({ ev, data });
     else if (state.inReply) (state.replies || (state.replies = [])).push({ ev, data });
     else {

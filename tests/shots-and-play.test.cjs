@@ -83,7 +83,8 @@ W.InventoryGroupIsBlocked=()=>true;   // what the live game does
   C(221397).Appearance=[I('Pussy','Pussy2')];
   // I milk-in ask + labour, eggs
   W.__cfg.PROD.CONCEIVE_BASE=50; await B(221397,'milkable off'); W.__st().scenes.delete(232922);
-  fillUp(); n=sent.length; await B(232922,'cum laynie'); out('I caught ->', !!P(221397).preg, '| ask:', lastTo(221397).slice(0,70));
+  fillUp(); n=sent.length; { const r0=Math.random; Math.random=()=>0.001; setTimeout(()=>{ Math.random=r0; }, 1500); }   // the chance is 95%: make it certain so the test isn't a coin toss
+  await B(232922,'cum laynie'); out('I caught ->', !!P(221397).preg, '| ask:', lastTo(221397).slice(0,70));
   P(221397).preg.due=Date.now()-1000; n=sent.length; W.__pt(); await wait(2500); out('L labour ->', !!P(221397).labour, ems(n).join(' / ').slice(0,100));
   P(221397).labour.until=Date.now()-1; n=sent.length; W.__pt(); await wait(2500); out('L birth ->', ems(n).join(' / ').slice(0,120));
   await B(232922,'penis draconic'); await B(221397,'eggs on'); W.__cfg.EGG_CHANCE=1; P(232922).semen=60; P(221397).preg=null;

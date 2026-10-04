@@ -304,7 +304,7 @@ function companion(mn) {
   const me = d.people[mn], sh = d.shifts[mn], cards = [];
   cards.push({
     title: "Glory stalls",
-    toggles: [{ label: "Strangers can use me in the stalls", desc: "Also lets staff give you punishment shifts. Your limits and whatever's locked on you still count.", on: !!d.optIn[mn], cmd: "glory " + (d.optIn[mn] ? "off" : "on") }],
+    toggles: [{ label: "Glory stalls: strangers can use me", desc: "Also lets staff give you punishment shifts. Your limits and whatever's locked on you still count.", on: !!d.optIn[mn], cmd: "glory " + (d.optIn[mn] ? "off" : "on") }],
     lines: me ? [["Today", me.day === today() ? me.today : 0], ["All time", me.total || 0], ["Mouth · pussy · ass", (me.holes.mouth || 0) + " · " + (me.holes.vulva || 0) + " · " + (me.holes.butt || 0)]] : undefined,
     chips: sh ? [{ text: (sh.punish ? "punishment shift" : "on shift") + " · " + Math.max(0, Math.ceil((sh.until - Date.now()) / 60000)) + " min", kind: sh.punish ? "alert" : "acc" }] : undefined,
     buttons: [{ label: "The board", cmd: "stalls" }],

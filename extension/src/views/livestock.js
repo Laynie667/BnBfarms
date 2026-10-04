@@ -124,8 +124,17 @@ export function panelPrefs(ctx) {
       toggle(label, desc, !ctx.prefs[k], () => { ctx.setPref(k, !ctx.prefs[k]); ctx.api.rehello && ctx.api.rehello(); })),
     btn("Put the button and panel back in the corner", () => ctx.resetPlaces && ctx.resetPlaces()));
 }
+// every switch the farm's add-ons offer (glory stalls, barn life, breeding week, fences…), in one place
+function extraSwitches(ctx) {
+  const list = [];
+  for (const m of Object.values(ctx.s.mods || {})) for (const c of (m.cards || [])) for (const t of (c.toggles || [])) list.push([m.label, t]);
+  if (!list.length) return null;
+  return card(title("Farm extras"), muted("The farm's add-ons. Each one is off until you switch it on."),
+    list.map(([label, t]) => toggle(String(t.label), (t.desc ? String(t.desc) + " " : "") + "(" + label + ")", !!t.on, () => ctx.send(String(t.cmd)))));
+}
 function toggles(ctx) {
   return [card(title("Farm settings"), muted("Saved by the farm girl. Your limits still win."), farmSwitches(ctx, SWITCH_INFO)),
+          extraSwitches(ctx),
           card(title("Gender"), muted("How the farm sees you. It picks your farm outfit."),
             h("div", { style: { marginTop: "6px" } }, ["female", "male", "futa", "femboy"].map((g) =>
               h("button", { type: "button", class: "fhc-pill" + (ctx.s.gender === g ? " on" : ""), onclick: () => ctx.send("gender " + g) }, g)))),

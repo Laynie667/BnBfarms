@@ -230,5 +230,12 @@ const STATE = { name: "Laynie", onBooks: true, roles: ["PROPRIETOR", "LIVESTOCK"
   bot({ type: "trance", level: 0 }); await wait(50);
   out("12 ...and lifts ->", !D.getElementById("fhc-trance"));
   out("12 hello lists which cues are on ->", typeof toBot("hello").slice(-1)[0][1].Dictionary.off === "object");
+  // 13. add-on switches (?glory and friends) show in the Toggles tab too
+  bot({ type: "state", state: Object.assign({}, STATE, { mods: { "glory-stalls": { label: "Glory stalls", cards: [{ title: "Glory stalls", toggles: [{ label: "Glory stalls: strangers can use me", on: false, cmd: "glory on" }] }] } } }) });
+  click("Livestock"); await wait(50); click("Toggles"); await wait(100);
+  const gsw = [...D.querySelectorAll("#fhc-panel .fhc-tog")].find((x) => /Glory stalls: strangers can use me/.test(x.textContent));
+  out("13 the glory switch is in Toggles ->", !!gsw);
+  const n13 = cmds().length; if (gsw) gsw.querySelector("button").click(); await wait(100);
+  out("13 flipping it sends ?glory on ->", cmds().slice(n13).includes("glory on"));
   process.exit(0);
 })();

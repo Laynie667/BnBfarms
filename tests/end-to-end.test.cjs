@@ -33,6 +33,11 @@ const dom = new JSDOM("<!doctype html><html><head></head><body></body></html>", 
 const w = dom.window, D = w.document;
 w.TextEncoder = TextEncoder; w.TextDecoder = TextDecoder;
 w.CurrentScreen = "ChatRoom"; w.ChatRoomCharacter = [{ MemberNumber: ME }, { MemberNumber: BOT }];
+// a dressed player, so the outfit "Save" buttons really save (otherwise every one gives the same "couldn't read" note)
+w.Player = { MemberNumber: ME, Name: "Laynie", Appearance: [{ Asset: { Name: "Dress", Group: { Name: "Cloth", Category: "Appearance", Clothing: true, AllowNone: true }, Category: [] }, Color: "Default" }] };
+w.ServerBundledItemFromAppearanceItem = (x) => ({ Group: x.Asset.Group.Name, Name: x.Asset.Name, Color: x.Color, Property: x.Property });
+w.ServerAppearanceBundle = (a) => a.map((x) => ({ Group: x.Asset.Group.Name, Name: x.Asset.Name, Color: x.Color }));
+w.LZString = { compressToBase64: (s) => Buffer.from(String(s)).toString("base64"), decompressFromBase64: (s) => Buffer.from(String(s), "base64").toString() };
 w.ChatRoomMessage = () => {}; w.CommandCombine = () => {};
 w.ChatRoomSendLocal = () => {};
 w.BCPlus = { loaded: true, version: { major: 0, minor: 14, patch: 0 } };

@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.10.1
+// @version      0.10.2
 // @description  Your B&B Farm panel: the farm girl's answers, stat cards and guides, right in the game.
 // @author       Laynie & Alexia
 // @match        *://*.bondageprojects.elementfx.com/*
@@ -224,7 +224,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.10.1";
+  var VERSION = "0.10.2";
 
   // extension/src/config.js
   var BOT_MEMBER = 260239;
@@ -310,8 +310,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
       if (k.startsWith("on") && typeof v === "function") el.addEventListener(k.slice(2), v);
       else if (k === "class") el.className = v;
       else if (k === "style" && typeof v === "object") Object.assign(el.style, v);
-      else if (k === "value") el.value = v;
-      else el.setAttribute(k, v === true ? "" : String(v));
+      else if (k === "value") {
+        el.value = v;
+        el.setAttribute("value", v);
+      } else el.setAttribute(k, v === true ? "" : String(v));
     }
     add(el, kids);
     return el;
@@ -585,9 +587,20 @@ One of mods you are using is using an old version of SDK. It will work for now b
       btn("Put the button and panel back in the corner", () => ctx2.resetPlaces && ctx2.resetPlaces())
     );
   }
+  function extraSwitches(ctx2) {
+    const list = [];
+    for (const m of Object.values(ctx2.s.mods || {})) for (const c of m.cards || []) for (const t of c.toggles || []) list.push([m.label, t]);
+    if (!list.length) return null;
+    return card(
+      title("Farm extras"),
+      muted("The farm's add-ons. Each one is off until you switch it on."),
+      list.map(([label, t]) => toggle(String(t.label), (t.desc ? String(t.desc) + " " : "") + "(" + label + ")", !!t.on, () => ctx2.send(String(t.cmd))))
+    );
+  }
   function toggles(ctx2) {
     return [
       card(title("Farm settings"), muted("Saved by the farm girl. Your limits still win."), farmSwitches(ctx2, SWITCH_INFO)),
+      extraSwitches(ctx2),
       card(
         title("Gender"),
         muted("How the farm sees you. It picks your farm outfit."),

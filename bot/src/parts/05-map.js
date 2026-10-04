@@ -87,19 +87,23 @@
     const wl = new Set((W.ChatRoomData.Whitelist || []).map(Number));
     L.wlAdded = L.wlAdded || {};
     let changed = 0;
+    // what was just asked for isn't asked again for 2 minutes, even if the room's list hasn't caught up yet
+    state.wlSent = state.wlSent || new Map();
+    const recent = (mn, act) => { const s = state.wlSent.get(mn); return s && s.act === act && Date.now() - s.at < 120000; };
+    const ask = (mn, act) => { send("ChatRoomAdmin", { MemberNumber: mn, Action: act }); state.wlSent.set(mn, { act, at: Date.now() }); changed++; };
     const people = new Set(Object.keys(L.people).map(Number).concat(CFG.PROPRIETORS));
     for (const mn of people){
       if (changed >= 15) break;   // a few at a time; the rest next time round
       if (isOnBooks(mn) && !wl.has(mn)){
-        send("ChatRoomAdmin", { MemberNumber: mn, Action: "Whitelist" });
-        L.wlAdded[mn] = Date.now(); wl.add(mn); changed++;
+        L.wlAdded[mn] = L.wlAdded[mn] || Date.now(); wl.add(mn);
+        if (!recent(mn, "Whitelist")) ask(mn, "Whitelist");
       }
     }
     for (const k of Object.keys(L.wlAdded)){
       const mn = Number(k);
       if (changed >= 15) break;
       if (isOnBooks(mn)) continue;
-      if (wl.has(mn)){ send("ChatRoomAdmin", { MemberNumber: mn, Action: "Unwhitelist" }); changed++; }
+      if (wl.has(mn) && !recent(mn, "Unwhitelist")) ask(mn, "Unwhitelist");
       delete L.wlAdded[k];
     }
     if (changed) saveLedger();

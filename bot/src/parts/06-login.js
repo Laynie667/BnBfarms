@@ -136,7 +136,7 @@
   W.FarmhandExport   = exportLedger;
   W.FarmhandLedger   = ()=>L;
   // the tests in tests/ peek inside through these; the live game never sets __FARMHAND_TEST__
-  if (W.__FARMHAND_TEST__) Object.assign(W, { __st:()=>state, __cfg:CFG, __pt:prodTick, __qt:quotaTick, __lt:leashTick, __ms:milkingStallTick, __vt:voiceTick, __sync:syncCompanions, __gt:gearTick, __ht:homeTick, __addons:(h, ...a)=>addonsEmit(h, ...a), __stateFor:(mn)=>stateFor(mn), __leadTick:()=>leadTick(), __ambient:()=>ambientTick(), __about:(t)=>aboutWhom(t), __announce:(t)=>announce(t), __reply:(mn,t,ch)=>reply(mn,t,ch) });
+  if (W.__FARMHAND_TEST__) Object.assign(W, { __st:()=>state, __cfg:CFG, __pt:prodTick, __qt:quotaTick, __lt:leashTick, __ms:milkingStallTick, __vt:voiceTick, __sync:syncCompanions, __gt:gearTick, __ht:homeTick, __addons:(h, ...a)=>addonsEmit(h, ...a), __stateFor:(mn)=>stateFor(mn), __leadTick:()=>leadTick(), __ambient:()=>ambientTick(), __about:(t)=>aboutWhom(t), __announce:(t)=>announce(t), __reply:(mn,t,ch)=>reply(mn,t,ch), __office:()=>officeCheck() });
   W.FarmhandSyncKeys = ()=>syncAllPresent(true);
   W.FarmhandFriends  = ()=>W.Player.FriendList;
   W.FarmhandAddFriend= (mn)=>addFriend(mn, false);
@@ -158,6 +158,32 @@
   function setBadge(t,c){ if(!state.badge) return; state.badge.textContent="🌾 "+t; state.badge.style.color=c||"#ffd98a"; }
 
   /* ───────────── probes / login / room ───────────── */
+
+  /* ONE FARM OFFICE. The bot only runs as the bot's own account (CFG.BOT_MEMBER), and only one copy at a
+     time: copies in other tabs or browsers on this computer check in through a shared lock, and the ones
+     that aren't in charge stay quiet (no answers, no saves). Otherwise a second copy, holding an older copy
+     of the books, answers commands and saves over the real books: people "vanish" from the ledger. */
+  const INSTANCE_ID = Math.random().toString(36).slice(2) + Date.now().toString(36);
+  const LOCK_KEY = "bnb_office_lock", LOCK_FRESH_MS = 45000;
+  function officeCheck(){
+    // wrong account: never run
+    let me = 0; try { me = W.Player && W.Player.MemberNumber; } catch(e){}
+    if (me && me !== CFG.BOT_MEMBER){
+      if (state.dormant !== "account"){ state.dormant = "account"; warn("This is account "+me+", not the farm bot ("+CFG.BOT_MEMBER+"). The Farmhand Bot script stays off here."); }
+      return false;
+    }
+    // another copy is in charge: stay quiet
+    let lock = null; try { lock = JSON.parse(GM_getValue(LOCK_KEY, "null")); } catch(e){}
+    const now = Date.now();
+    if (lock && lock.id !== INSTANCE_ID && now - lock.at < LOCK_FRESH_MS){
+      if (state.dormant !== "copy"){ state.dormant = "copy"; warn("Another copy of the Farmhand Bot is already running the farm (another tab or browser). This one stays quiet."); }
+      return false;
+    }
+    // we're in charge (again): if we were quiet, re-read the books first so nothing newer is lost
+    if (state.dormant){ const was = state.dormant; state.dormant = null; if (was === "copy"){ loadLedger(); log("Took over the farm office; re-read the books."); } }
+    try { GM_setValue(LOCK_KEY, JSON.stringify({ id: INSTANCE_ID, at: now })); } catch(e){}
+    return true;
+  }
 
   function isLoggedIn(){ try { return !!(W.Player && W.Player.MemberNumber); } catch(e){ return false; } }
   function currentRoomName(){

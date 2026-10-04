@@ -711,7 +711,16 @@
         const spq = String(rest||"").toLowerCase().trim();
         const herd = Object.values(L.people).filter(r=>r.roles && r.roles.includes(ROLE.LIVESTOCK) &&
                        (!spq || (r.species||"").toLowerCase().includes(spq)));
-        if (!herd.length){ R(spq ? "No "+spq+" on the books, sugar. Just ?stock shows every species." : "No stock on the books yet, sugar."); break; }
+        if (spq && !herd.length){
+          // not a species: maybe a person (?stock Auri, ?stock 180836) — show their record instead of "not on the books"
+          state.ambiguous = null;
+          const who = resolveTarget(rest);
+          if (who && rec(who)){ R(recordText(who, true, true)); break; }
+          if (state.ambiguous) break;   // handleCommand lists who it could be
+          R("No species called \""+spq+"\" in the herd, and nobody by that name on the books, sugar. ?stock shows every species; ?record <who> shows one person.");
+          break;
+        }
+        if (!herd.length){ R("No stock on the books yet, sugar."); break; }
         const bySpecies = {};
         for (const r of herd){
           const s = (r.species||"unspecified").toLowerCase();

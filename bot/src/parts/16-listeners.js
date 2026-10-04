@@ -10,7 +10,7 @@
 
     W.ServerSocket.on("ChatRoomMessage",(data)=>{
       try {
-        if (!data) return;
+        if (!data || state.dormant) return;   // a quiet copy (see officeCheck) answers nothing
         if (data.Sender===CFG.BOT_MEMBER){
           // a Companion runnin' on the bot's own account talks to the bot like any other panel;
           // everything else from the bot is its own echo, ignored
@@ -60,7 +60,7 @@
 
     W.ServerSocket.on("AccountBeep",(data)=>{
       try {
-        if (!data || data.MemberNumber===CFG.BOT_MEMBER) return;
+        if (!data || data.MemberNumber===CFG.BOT_MEMBER || state.dormant) return;
         if (data.BeepType) return;
         if (!data.Message) return;
         state.lastHealthy = Date.now();

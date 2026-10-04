@@ -10,8 +10,12 @@
       attachListeners();
 
       if (!isLoggedIn()){ setBadge("logging in…","#ffc49b"); tryLogin(); watchdog(); return; }
+      // one farm office: the wrong account, or a second copy, stays quiet (and never walks into the room)
+      if (!officeCheck()){
+        setBadge(state.dormant === "account" ? "off: not the bot's account" : "standing by: another copy is running the farm", "#ffc49b");
+        return;
+      }
       if (!inRoom()){ setBadge("joining room…","#ffc49b"); tryEnterRoom(); watchdog(); return; }
-
       // healthy
       state.lastHealthy = Date.now();
       state.reloading = false;

@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.13.7
+// @version      0.13.9
 // @description  B&B Farm: beeps, keys, ledger, roster, herds, summoning, anti-idle
 // @author       Laynie & Alexia
 // @match        *://*.bondageprojects.elementfx.com/*
@@ -1803,7 +1803,7 @@
   ];
 
   // bot/src/version.js
-  var VERSION = "0.13.7";
+  var VERSION = "0.13.9";
 
   // bot-parts:farmhand-bot-parts
   (function() {
@@ -2614,9 +2614,11 @@
     }
     let saveTimer = null;
     function saveLedger() {
+      if (state.dormant) return;
       if (saveTimer) return;
       saveTimer = later(() => {
         saveTimer = null;
+        if (!officeCheck()) return;
         try {
           GM_setValue(LEDGER_KEY, JSON.stringify(L));
         } catch (e) {
@@ -2948,24 +2950,30 @@
       const wl = new Set((W.ChatRoomData.Whitelist || []).map(Number));
       L.wlAdded = L.wlAdded || {};
       let changed = 0;
+      state.wlSent = state.wlSent || /* @__PURE__ */ new Map();
+      const recent = (mn, act) => {
+        const s = state.wlSent.get(mn);
+        return s && s.act === act && Date.now() - s.at < 12e4;
+      };
+      const ask = (mn, act) => {
+        send("ChatRoomAdmin", { MemberNumber: mn, Action: act });
+        state.wlSent.set(mn, { act, at: Date.now() });
+        changed++;
+      };
       const people = new Set(Object.keys(L.people).map(Number).concat(CFG.PROPRIETORS));
       for (const mn of people) {
         if (changed >= 15) break;
         if (isOnBooks(mn) && !wl.has(mn)) {
-          send("ChatRoomAdmin", { MemberNumber: mn, Action: "Whitelist" });
-          L.wlAdded[mn] = Date.now();
+          L.wlAdded[mn] = L.wlAdded[mn] || Date.now();
           wl.add(mn);
-          changed++;
+          if (!recent(mn, "Whitelist")) ask(mn, "Whitelist");
         }
       }
       for (const k of Object.keys(L.wlAdded)) {
         const mn = Number(k);
         if (changed >= 15) break;
         if (isOnBooks(mn)) continue;
-        if (wl.has(mn)) {
-          send("ChatRoomAdmin", { MemberNumber: mn, Action: "Unwhitelist" });
-          changed++;
-        }
+        if (wl.has(mn) && !recent(mn, "Unwhitelist")) ask(mn, "Unwhitelist");
         delete L.wlAdded[k];
       }
       if (changed) saveLedger();
@@ -3198,7 +3206,7 @@
     };
     W.FarmhandExport = exportLedger;
     W.FarmhandLedger = () => L;
-    if (W.__FARMHAND_TEST__) Object.assign(W, { __st: () => state, __cfg: CFG, __pt: prodTick, __qt: quotaTick, __lt: leashTick, __ms: milkingStallTick, __vt: voiceTick, __sync: syncCompanions, __gt: gearTick, __ht: homeTick, __addons: (h, ...a) => addonsEmit(h, ...a), __stateFor: (mn) => stateFor(mn), __leadTick: () => leadTick(), __ambient: () => ambientTick(), __about: (t) => aboutWhom(t), __announce: (t) => announce(t), __reply: (mn, t, ch) => reply(mn, t, ch) });
+    if (W.__FARMHAND_TEST__) Object.assign(W, { __st: () => state, __cfg: CFG, __pt: prodTick, __qt: quotaTick, __lt: leashTick, __ms: milkingStallTick, __vt: voiceTick, __sync: syncCompanions, __gt: gearTick, __ht: homeTick, __addons: (h, ...a) => addonsEmit(h, ...a), __stateFor: (mn) => stateFor(mn), __leadTick: () => leadTick(), __ambient: () => ambientTick(), __about: (t) => aboutWhom(t), __announce: (t) => announce(t), __reply: (mn, t, ch) => reply(mn, t, ch), __office: () => officeCheck() });
     W.FarmhandSyncKeys = () => syncAllPresent(true);
     W.FarmhandFriends = () => W.Player.FriendList;
     W.FarmhandAddFriend = (mn) => addFriend(mn, false);
@@ -3231,6 +3239,48 @@
       if (!state.badge) return;
       state.badge.textContent = "🌾 " + t;
       state.badge.style.color = c || "#ffd98a";
+    }
+    const INSTANCE_ID = Math.random().toString(36).slice(2) + Date.now().toString(36);
+    const LOCK_KEY = "bnb_office_lock", LOCK_FRESH_MS = 45e3;
+    function officeCheck() {
+      let me = 0;
+      try {
+        me = W.Player && W.Player.MemberNumber;
+      } catch (e) {
+      }
+      if (me && me !== CFG.BOT_MEMBER) {
+        if (state.dormant !== "account") {
+          state.dormant = "account";
+          warn("This is account " + me + ", not the farm bot (" + CFG.BOT_MEMBER + "). The Farmhand Bot script stays off here.");
+        }
+        return false;
+      }
+      let lock = null;
+      try {
+        lock = JSON.parse(GM_getValue(LOCK_KEY, "null"));
+      } catch (e) {
+      }
+      const now = Date.now();
+      if (lock && lock.id !== INSTANCE_ID && now - lock.at < LOCK_FRESH_MS) {
+        if (state.dormant !== "copy") {
+          state.dormant = "copy";
+          warn("Another copy of the Farmhand Bot is already running the farm (another tab or browser). This one stays quiet.");
+        }
+        return false;
+      }
+      if (state.dormant) {
+        const was = state.dormant;
+        state.dormant = null;
+        if (was === "copy") {
+          loadLedger();
+          log("Took over the farm office; re-read the books.");
+        }
+      }
+      try {
+        GM_setValue(LOCK_KEY, JSON.stringify({ id: INSTANCE_ID, at: now }));
+      } catch (e) {
+      }
+      return true;
     }
     function isLoggedIn() {
       try {
@@ -3403,7 +3453,7 @@
       }
     }
     function watchdog() {
-      if (!CFG.WATCHDOG_ENABLED || state.reloading) return;
+      if (!CFG.WATCHDOG_ENABLED || state.reloading || state.dormant) return;
       const stale = Date.now() - state.lastHealthy;
       if (stale > CFG.WATCHDOG_MIN * 6e4) {
         state.reloading = true;
@@ -3755,8 +3805,8 @@
     function missing(...mns) {
       return mns.find((m) => m && !onMap(m)) || null;
     }
-    function whisper(target, text, urgent) {
-      if (hasCompanion(target)) {
+    function whisper(target, text, urgent, plain) {
+      if (!plain && hasCompanion(target)) {
         toCompanion(target, text, "notice", urgent);
         return;
       }
@@ -3815,6 +3865,18 @@
       if (!inRoom() || !force && Date.now() - state.lastPing < 10 * 60 * 1e3) return;
       state.lastPing = Date.now();
       enqueue(makeMsg("ping", { ver: VERSION }));
+    }
+    function probeCompanion(mn) {
+      if (!state.companions.has(mn)) return;
+      const t0 = Date.now();
+      enqueue(makeMsg("ping", { ver: VERSION }, mn), true);
+      later(() => {
+        const c = state.companions.get(mn);
+        if (c && c.at < t0) {
+          state.companions.delete(mn);
+          log("Companion of " + mn + " didn't answer; sendin' plain text from now on.");
+        }
+      }, 3e4);
     }
     function onCompanion(m) {
       const mn = m.from;
@@ -6265,6 +6327,7 @@
       return out.join("\n");
     }
     function hourNow() {
+      if (W.__FARMHAND_TEST__) return W.__hour != null ? W.__hour : 14;
       return (/* @__PURE__ */ new Date()).getHours();
     }
     function presentStock() {
@@ -6290,7 +6353,7 @@
       return L.life.weather;
     }
     function lifeTick() {
-      const now = /* @__PURE__ */ new Date(), h = now.getHours(), d = dayKey();
+      const h = hourNow(), d = dayKey();
       weatherToday();
       if (L.life.feedingOn && CFG.FEED_HOURS.includes(h) && L.life.lastFeed !== d + "@" + h) {
         L.life.lastFeed = d + "@" + h;
@@ -8031,7 +8094,7 @@ APPLICATIONS
 THE ROSTER
   ?roster [group] · everybody, or one group: proprietor, herdmaster,
      mandated, farmhand, livestock, luxury, guest, gloryhole
-  ?stock [species] · all the stock, or one kind
+  ?stock [species or who] · all the stock, one kind, or one animal
   ?find <name, number or species>
 
 RECORDS
@@ -8453,23 +8516,48 @@ Say ?apply and pick 'luxury guest'.
     }
     function startApplication(mn, ch) {
       if (state.sessions.has(mn)) {
-        reply(mn, "We're already halfway through your paperwork, sugar! Just answer the last question I asked, or say 'quit' to tear it up and start over later.", ch);
+        const s0 = state.sessions.get(mn);
+        s0.textAsked = s0.step;
+        s0.plainOnly = true;
+        appSay(mn, "We're already halfway through your paperwork, sugar! Here's where we were. Just type your answer, or say 'quit' to tear it up and start over later.", s0);
+        later(() => askNext(mn), 1200);
         return;
       }
       const useCh = ch === "beep" || (ch === "chat" || ch === "bot") && canBeep(mn) ? "beep" : "whisper";
       state.sessions.set(mn, { mn, step: 0, answers: [], byKey: {}, staffTrack: false, started: Date.now(), ch: useCh });
-      reply(
+      probeCompanion(mn);
+      const how = useCh === "beep" ? "by beep" : mapRoom() ? "with /bot <your answer> (works from anywhere in the room), or a whisper if you're standin' right by me" : "by whisper";
+      appSay(
         mn,
         `🌾 B&B FARM — INTAKE 🌾
 
 ` + QUESTIONS.length + ` questions, sugar (` + (QUESTIONS.length + STAFF_QUESTIONS.length) + ` if you're signin' on as staff)! Short's fine, rambly's fine.
 Say 'skip' to pass one. Say 'quit' to stop. Nothin' saves till you're done.
 
-Answer me ` + (useCh === "beep" ? "by beep" : "by whisper") + ` — no ? needed from here on.
+Answer me ` + how + ` — no ? needed from here on.
 Chat in the room all you like; I'll only count what you send me direct.`,
-        useCh
+        state.sessions.get(mn)
       );
       later(() => askNext(mn), 1800);
+    }
+    function appSay(mn, text, s) {
+      if (s && panelLive(mn, s)) {
+        toCompanion(mn, text, "reply");
+        return;
+      }
+      if (mn === CFG.BOT_MEMBER) {
+        selfLine(text);
+        return;
+      }
+      if (s && s.ch === "beep" && canBeep(mn)) {
+        for (const c of splitMessage(text, 900)) send("AccountBeep", { MemberNumber: mn, BeepType: "", Message: c });
+        return;
+      }
+      whisper(mn, text, false, true);
+    }
+    function panelLive(mn, s) {
+      const c = state.companions.get(mn);
+      return !!(!s.plainOnly && c && hasCompanion(mn) && c.at >= s.started - 1e3);
     }
     function askNext(mn) {
       const s = state.sessions.get(mn);
@@ -8480,12 +8568,21 @@ Chat in the room all you like; I'll only count what you send me direct.`,
         return;
       }
       const q = list[s.step], text = s.step + 1 + "/" + list.length + " — " + q.text;
-      if (q.choices && hasCompanion(mn)) enqueue(makeMsg("choose", { text, choices: q.choices(), id: ++companionSeq }, mn));
-      else {
+      const asText = () => {
         const ch = q.choices ? q.choices() : [];
         const listed = ch.length && ch.every((c) => text.toLowerCase().includes(String(c).toLowerCase()));
-        reply(mn, text + (ch.length && !listed ? "\nPick one: " + ch.join(" / ") : ""), s.ch);
-      }
+        appSay(mn, text + (ch.length && !listed ? "\nPick one: " + ch.join(" / ") + " (just type it)" : ""), s);
+      };
+      if (q.choices && panelLive(mn, s)) {
+        enqueue(makeMsg("choose", { text, choices: q.choices(), id: ++companionSeq }, mn));
+        const step = s.step;
+        later(() => {
+          const now = state.sessions.get(mn);
+          if (now !== s || now.step !== step || now.textAsked === step) return;
+          now.textAsked = step;
+          asText();
+        }, 9e4);
+      } else asText();
     }
     function handleApplicationAnswer(mn, text, channel) {
       const s = state.sessions.get(mn);
@@ -8497,7 +8594,11 @@ Chat in the room all you like; I'll only count what you send me direct.`,
       const low = raw.toLowerCase();
       if (low === "quit" || low === "cancel") {
         state.sessions.delete(mn);
-        reply(mn, "All torn up, " + plainName(mn) + ". No hard feelin's! Say ?apply any time you change your mind.", s.ch);
+        appSay(mn, "All torn up, " + plainName(mn) + ". No hard feelin's! Say ?apply any time you change your mind.", s);
+        return true;
+      }
+      if (low === "apply") {
+        startApplication(mn, channel);
         return true;
       }
       const list = s.staffTrack ? QUESTIONS.concat(STAFF_QUESTIONS) : QUESTIONS;
@@ -8506,7 +8607,7 @@ Chat in the room all you like; I'll only count what you send me direct.`,
       if (q && q.check && low !== "skip") {
         const got = q.check(raw);
         if (got.err) {
-          reply(mn, "🌾 " + got.err, s.ch);
+          appSay(mn, "🌾 " + got.err, s);
           later(() => askNext(mn), 900);
           return true;
         }
@@ -8537,14 +8638,14 @@ Chat in the room all you like; I'll only count what you send me direct.`,
       r.name = plainName(mn);
       saveLedger();
       audit(mn, "APPLY", "");
-      reply(
+      appSay(
         mn,
         `That's the lot, ` + plainName(mn) + `! Thank you, sweetie.
 
 I'll put it in front of the proprietors and somebody'll come find you. Might be an hour, might be a day — we read every single one proper.
 
 Welcome to B&B Farm. Mind the ruts! 🌾`,
-        s.ch
+        s
       );
       notifyStaff("📋 Ooh, a new application from " + plainName(mn) + " (" + mn + ")! Say ?queue to read it.", true, true);
     }
@@ -10052,8 +10153,19 @@ Welcome to B&B Farm. Mind the ruts! 🌾`,
         case "stock": {
           const spq = String(rest || "").toLowerCase().trim();
           const herd = Object.values(L.people).filter((r) => r.roles && r.roles.includes(ROLE.LIVESTOCK) && (!spq || (r.species || "").toLowerCase().includes(spq)));
+          if (spq && !herd.length) {
+            state.ambiguous = null;
+            const who = resolveTarget(rest);
+            if (who && rec(who)) {
+              R(recordText(who, true, true));
+              break;
+            }
+            if (state.ambiguous) break;
+            R('No species called "' + spq + '" in the herd, and nobody by that name on the books, sugar. ?stock shows every species; ?record <who> shows one person.');
+            break;
+          }
           if (!herd.length) {
-            R(spq ? "No " + spq + " on the books, sugar. Just ?stock shows every species." : "No stock on the books yet, sugar.");
+            R("No stock on the books yet, sugar.");
             break;
           }
           const bySpecies = {};
@@ -12343,7 +12455,7 @@ Welcome to B&B Farm, hon. 🌾`
       if (!W.ServerSocket || typeof W.ServerSocket.on !== "function") return false;
       W.ServerSocket.on("ChatRoomMessage", (data) => {
         try {
-          if (!data) return;
+          if (!data || state.dormant) return;
           if (data.Sender === CFG.BOT_MEMBER) {
             const own = data.Type === "Hidden" && typeof W.__farmhandOwnPanel !== "function" && readMsg(data);
             if (own && ["hello", "bye", "cmd", "outfitSave", "outfitAnswer", "relayNo", "sight", "leadOk", "leadNo"].includes(own.type)) onCompanion(own);
@@ -12425,7 +12537,7 @@ Welcome to B&B Farm, hon. 🌾`
       });
       W.ServerSocket.on("AccountBeep", (data) => {
         try {
-          if (!data || data.MemberNumber === CFG.BOT_MEMBER) return;
+          if (!data || data.MemberNumber === CFG.BOT_MEMBER || state.dormant) return;
           if (data.BeepType) return;
           if (!data.Message) return;
           state.lastHealthy = Date.now();
@@ -12518,6 +12630,10 @@ Welcome to B&B Farm, hon. 🌾`
           setBadge("logging in…", "#ffc49b");
           tryLogin();
           watchdog();
+          return;
+        }
+        if (!officeCheck()) {
+          setBadge(state.dormant === "account" ? "off: not the bot's account" : "standing by: another copy is running the farm", "#ffc49b");
           return;
         }
         if (!inRoom()) {

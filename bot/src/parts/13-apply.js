@@ -53,21 +53,44 @@
 
   function startApplication(mn, ch){
     if (state.sessions.has(mn)) {
-      reply(mn, "We're already halfway through your paperwork, sugar! Just answer the last question I asked, or say 'quit' to tear it up and start over later.", ch);
+      // stuck? (a question went to a panel they can't see) ask it again as plain text
+      const s0 = state.sessions.get(mn);
+      s0.textAsked = s0.step; s0.plainOnly = true;
+      appSay(mn, "We're already halfway through your paperwork, sugar! Here's where we were. Just type your answer, or say 'quit' to tear it up and start over later.", s0);
+      later(()=>askNext(mn), 1200);
       return;
     }
     // never out loud: these questions are private
     const useCh = (ch === "beep" || ((ch === "chat" || ch === "bot") && canBeep(mn))) ? "beep" : "whisper";
     state.sessions.set(mn, { mn, step:0, answers:[], byKey:{}, staffTrack:false, started:Date.now(), ch:useCh });
-    reply(mn,
+    // the bot remembers a Companion for hours; make sure it's really still there before any question is a panel button
+    // (it answers a ping with a hello, which marks it fresh; see panelLive)
+    probeCompanion(mn);
+    // on a map a plain whisper only reaches the bot from the next tile over; /bot reaches it from anywhere in the room
+    const how = useCh === "beep" ? "by beep" : (mapRoom() ? "with /bot <your answer> (works from anywhere in the room), or a whisper if you're standin' right by me" : "by whisper");
+    appSay(mn,
 `🌾 B&B FARM — INTAKE 🌾
 
 `+QUESTIONS.length+` questions, sugar (`+(QUESTIONS.length+STAFF_QUESTIONS.length)+` if you're signin' on as staff)! Short's fine, rambly's fine.
 Say 'skip' to pass one. Say 'quit' to stop. Nothin' saves till you're done.
 
-Answer me ` + (useCh === "beep" ? "by beep" : "by whisper") + ` — no ? needed from here on.
-Chat in the room all you like; I'll only count what you send me direct.`, useCh);
+Answer me `+how+` — no ? needed from here on.
+Chat in the room all you like; I'll only count what you send me direct.`, state.sessions.get(mn));
     later(()=>askNext(mn), 1800);
+  }
+
+  // everything in the interview goes as plain text until their panel has answered (see panelLive)
+  function appSay(mn, text, s){
+    if (s && panelLive(mn, s)){ toCompanion(mn, text, "reply"); return; }
+    if (mn === CFG.BOT_MEMBER){ selfLine(text); return; }
+    if (s && s.ch === "beep" && canBeep(mn)){ for (const c of splitMessage(text, 900)) send("AccountBeep", { MemberNumber:mn, BeepType:"", Message:c }); return; }
+    whisper(mn, text, false, true);   // not here at all: whisper() keeps it for them
+  }
+
+  // a Companion that has spoken up since this application started (a hello answerin' the ping, or a command)
+  function panelLive(mn, s){
+    const c = state.companions.get(mn);
+    return !!(!s.plainOnly && c && hasCompanion(mn) && c.at >= s.started - 1000);
   }
 
   function askNext(mn){
@@ -76,13 +99,24 @@ Chat in the room all you like; I'll only count what you send me direct.`, useCh)
     const list = s.staffTrack ? QUESTIONS.concat(STAFF_QUESTIONS) : QUESTIONS;
     if (s.step >= list.length){ finishApplication(mn); return; }
     const q = list[s.step], text = (s.step+1)+"/"+list.length+" — "+q.text;
-    if (q.choices && hasCompanion(mn)) enqueue(makeMsg("choose", { text, choices: q.choices(), id: ++companionSeq }, mn));
-    else {
+    const asText = () => {
       // no Companion buttons: spell the choices out, unless the question already does
       const ch = q.choices ? q.choices() : [];
       const listed = ch.length && ch.every(c => text.toLowerCase().includes(String(c).toLowerCase()));
-      reply(mn, text+(ch.length && !listed ? "\nPick one: "+ch.join(" / ") : ""), s.ch);
+      appSay(mn, text+(ch.length && !listed ? "\nPick one: "+ch.join(" / ")+" (just type it)" : ""), s);
+    };
+    if (q.choices && panelLive(mn, s)){
+      enqueue(makeMsg("choose", { text, choices: q.choices(), id: ++companionSeq }, mn));
+      // safety net: buttons nobody presses in 90 seconds (panel closed, script turned off) come again as a plain question
+      const step = s.step;
+      later(()=>{
+        const now = state.sessions.get(mn);
+        if (now !== s || now.step !== step || now.textAsked === step) return;
+        now.textAsked = step;
+        asText();
+      }, 90000);
     }
+    else asText();
   }
 
   // FIX: only consume answers from the channel they applied on (the Companion counts as theirs too)
@@ -97,15 +131,16 @@ Chat in the room all you like; I'll only count what you send me direct.`, useCh)
     const low = raw.toLowerCase();
     if (low==="quit"||low==="cancel"){
       state.sessions.delete(mn);
-      reply(mn, "All torn up, "+plainName(mn)+". No hard feelin's! Say ?apply any time you change your mind.", s.ch);
+      appSay(mn, "All torn up, "+plainName(mn)+". No hard feelin's! Say ?apply any time you change your mind.", s);
       return true;
     }
+    if (low === "apply"){ startApplication(mn, channel); return true; }   // stuck? ?apply again picks up where we were, in plain text
     const list = s.staffTrack ? QUESTIONS.concat(STAFF_QUESTIONS) : QUESTIONS;
     const q = list[s.step];
     let answer = low === "skip" ? "(skipped)" : raw;
     if (q && q.check && low !== "skip"){
       const got = q.check(raw);
-      if (got.err){ reply(mn, "🌾 "+got.err, s.ch); later(()=>askNext(mn), 900); return true; }   // ask the same one again
+      if (got.err){ appSay(mn, "🌾 "+got.err, s); later(()=>askNext(mn), 900); return true; }   // ask the same one again
       answer = got.value;
     }
     s.answers.push(answer);
@@ -127,12 +162,12 @@ Chat in the room all you like; I'll only count what you send me direct.`, useCh)
     });
     const r = rec(mn,true); r.name = plainName(mn);
     saveLedger(); audit(mn,"APPLY","");
-    reply(mn,
+    appSay(mn,
 `That's the lot, `+plainName(mn)+`! Thank you, sweetie.
 
 I'll put it in front of the proprietors and somebody'll come find you. Might be an hour, might be a day — we read every single one proper.
 
-Welcome to B&B Farm. Mind the ruts! 🌾`, s.ch);
+Welcome to B&B Farm. Mind the ruts! 🌾`, s);
     notifyStaff("📋 Ooh, a new application from "+plainName(mn)+" ("+mn+")! Say ?queue to read it.", true, true);
   }
 

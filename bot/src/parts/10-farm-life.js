@@ -4,7 +4,8 @@
   /* ═══════════ FARM LIFE: feeding, curfew, stocks, leash, tour, weather ═══════════
      Times are the bot machine's local clock (set the VPS timezone to yours). */
 
-  function hourNow(){ return new Date().getHours(); }
+  // tests run on a quiet 2 pm (no curfew, no feedin') unless they set W.__hour, so results never depend on the real clock
+  function hourNow(){ if (W.__FARMHAND_TEST__) return W.__hour != null ? W.__hour : 14; return new Date().getHours(); }
   function presentStock(){
     return (W.ChatRoomCharacter||[]).map(c=>c.MemberNumber)
       .filter(m => m !== CFG.BOT_MEMBER && hasRole(m, ROLE.LIVESTOCK) && !(isStaff(m) && onDuty(m)));
@@ -30,7 +31,7 @@
   }
 
   function lifeTick(){
-    const now = new Date(), h = now.getHours(), d = dayKey();
+    const h = hourNow(), d = dayKey();
     weatherToday();
     // feeding: once per listed hour per day
     if (L.life.feedingOn && CFG.FEED_HOURS.includes(h) && L.life.lastFeed !== d+"@"+h){

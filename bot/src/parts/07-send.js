@@ -48,7 +48,7 @@
   }
 
   function watchdog(){
-    if (!CFG.WATCHDOG_ENABLED || state.reloading) return;
+    if (!CFG.WATCHDOG_ENABLED || state.reloading || state.dormant) return;   // a quiet copy isn't stuck, it's standing by
     const stale = Date.now() - state.lastHealthy;
     if (stale > CFG.WATCHDOG_MIN*60000){
       state.reloading = true;
@@ -387,8 +387,8 @@
   }
   // the first of these people who isn't here, or null when everybody is
   function missing(...mns){ return mns.find(m => m && !onMap(m)) || null; }
-  function whisper(target,text,urgent){
-    if (hasCompanion(target)){ toCompanion(target, text, "notice", urgent); return; }
+  function whisper(target,text,urgent,plain){
+    if (!plain && hasCompanion(target)){ toCompanion(target, text, "notice", urgent); return; }
     if (target === CFG.BOT_MEMBER){ selfLine(text); return; }   // a whisper to itself would never arrive
     // the server only delivers a whisper to someone in this room; anyone else gets a beep (or the summary later)
     if (!charFor(target)){ if (canBeep(target)) for (const c of splitMessage(text,900)) send("AccountBeep",{ MemberNumber:target, BeepType:"", Message:c }, urgent); else holdMail(target, text); return; }
@@ -432,6 +432,14 @@
     if (!inRoom() || (!force && Date.now() - state.lastPing < 10*60*1000)) return;
     state.lastPing = Date.now();
     enqueue(makeMsg("ping", { ver:VERSION }));
+  }
+  // is their Companion really still there? It answers a ping with a hello; no answer in 30 s and the bot stops
+  // sendin' them things only a panel can show (a closed tab or a turned-off script never says bye)
+  function probeCompanion(mn){
+    if (!state.companions.has(mn)) return;
+    const t0 = Date.now();
+    enqueue(makeMsg("ping", { ver:VERSION }, mn), true);
+    later(()=>{ const c = state.companions.get(mn); if (c && c.at < t0){ state.companions.delete(mn); log("Companion of "+mn+" didn't answer; sendin' plain text from now on."); } }, 30000);
   }
   function onCompanion(m){
     const mn = m.from;

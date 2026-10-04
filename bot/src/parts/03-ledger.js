@@ -59,9 +59,11 @@
 
   let saveTimer = null;
   function saveLedger(){
+    if (state.dormant) return;   // a quiet copy (wrong account, or another copy in charge) never writes the books
     if (saveTimer) return;
     saveTimer = later(()=>{
       saveTimer = null;
+      if (!officeCheck()) return;   // checked again at the moment of writing: a copy that just opened never saves over the one in charge
       try { GM_setValue(LEDGER_KEY, JSON.stringify(L)); } catch(e){ warn("save:",e); }
     }, 1500);   // a burst of changes saves once (the ledger gets big)
   }

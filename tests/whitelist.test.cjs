@@ -16,7 +16,10 @@ const evts={};
 const W={document:doc,addEventListener(e,f){(evts[e]=evts[e]||[]).push(f)},dispatchEvent(ev){(evts[ev.type]||[]).forEach(f=>f(ev))},
   CustomEvent:class{constructor(t,o){this.type=t;this.detail=o&&o.detail}},
   location:{reload(){}},alert(){},prompt(){},
-  ServerSend:(ev,d)=>{ sent.push([ev,d]); if(ev==="AccountQuery"&&d.Query==="OnlineFriends"&&handlers.AccountQueryResult) setTimeout(()=>handlers.AccountQueryResult({Query:"OnlineFriends",Result:(W.__mutual||W.Player.FriendList).map(m=>({MemberNumber:m}))}),0); }, ServerSocket:{connected:true,on:(e,f)=>handlers[e]=f},
+  ServerSend:(ev,d)=>{ sent.push([ev,d]);
+    // the fake server keeps the room's whitelist like the real one does, from the very first message
+    if(ev==='ChatRoomAdmin'){ const wl=W.ChatRoomData.Whitelist; if(d.Action==='Whitelist'&&!wl.includes(d.MemberNumber)) wl.push(d.MemberNumber); if(d.Action==='Unwhitelist'&&wl.includes(d.MemberNumber)) wl.splice(wl.indexOf(d.MemberNumber),1);}
+    if(ev==="AccountQuery"&&d.Query==="OnlineFriends"&&handlers.AccountQueryResult) setTimeout(()=>handlers.AccountQueryResult({Query:"OnlineFriends",Result:(W.__mutual||W.Player.FriendList).map(m=>({MemberNumber:m}))}),0); }, ServerSocket:{connected:true,on:(e,f)=>handlers[e]=f},
   Player:{MemberNumber:260239,FriendList:[221397,500]},
   ChatRoomData:{Name:'B&B Farm',Admin:[260239],Whitelist:[777],MapData:{Type:'Always'}}, ChatRoomCharacter:chars,
   ChatRoomPlayerIsAdmin:()=>true, Commands:[]};
@@ -33,8 +36,6 @@ const toWhom=(k,mn)=>sent.slice(k).filter(([e,d])=>d&&d.Target===mn&&(d.Type==='
 const beepsTo=(k,mn)=>sent.slice(k).filter(([e,d])=>e==='AccountBeep'&&d.MemberNumber===mn).map(([e,d])=>d.Message);
 (async()=>{ await wait(3500);
   chars[1].Name='Laynie'; chars[2].Name='Moo'; chars[3].Name='Hana';
-  // the fake server keeps the room's whitelist like the real one does
-  const realSend=W.ServerSend; W.ServerSend=(ev,d)=>{ realSend(ev,d); if(ev==='ChatRoomAdmin'){ const wl=W.ChatRoomData.Whitelist; if(d.Action==='Whitelist'&&!wl.includes(d.MemberNumber)) wl.push(d.MemberNumber); if(d.Action==='Unwhitelist'&&wl.includes(d.MemberNumber)) wl.splice(wl.indexOf(d.MemberNumber),1);} };
   const WL=()=>W.ChatRoomData.Whitelist;
   let k=sent.length; handlers.AccountBeep({MemberNumber:221397,Message:'record'}); await drain(2500);
   ok(WL().includes(500) && WL().includes(221397), 'everyone already on the books goes on the whitelist');

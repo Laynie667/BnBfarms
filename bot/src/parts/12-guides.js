@@ -432,7 +432,7 @@ APPLICATIONS
 THE ROSTER
   ?roster [group] · everybody, or one group: proprietor, herdmaster,
      mandated, farmhand, livestock, luxury, guest, gloryhole
-  ?stock [species] · all the stock, or one kind
+  ?stock [species or who] · all the stock, one kind, or one animal
   ?find <name, number or species>
 
 RECORDS

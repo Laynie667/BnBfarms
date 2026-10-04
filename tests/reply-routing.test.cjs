@@ -57,7 +57,7 @@ W.InventoryGroupIsBlocked=()=>true;   // what the live game does
   out('companion stats reply ->', rs.length>0 && /LAYNIE|Laynie/i.test(rs.map(x=>x[1].Dictionary.text).join('')), 'no beep', !sent.slice(k).some(x=>x[0]==='AccountBeep'));
   k=sent.length; await B(221397,'ping'); out('companion beep cmd ->', typ(k), hid(k).length>0);
   k=sent.length; FM(221397,{type:'cmd',text:'help me'}); await wait(5200);
-  const parts=hid(k).map(x=>x[1].Dictionary); out('companion long card parts ok ->', parts.length>0 && parts.every(d=>d.of===parts.length && d.text.length<=1800));
+  const parts=hid(k).map(x=>x[1].Dictionary).filter(d=>d.type==='reply'); out('companion long card parts ok ->', parts.length>0 && parts.every(d=>d.of===parts.length && d.text.length<=1800));
   k=sent.length; FM(166990,{type:'cmd',text:'ping'}); await wait(5200); out('nonfriend companion ->', hid(k).some(x=>x[1].Target===166990));
   // someone else can't fake a bot message, and a player who leaves gets beeps again
   const keep=chars.splice(chars.findIndex(c=>c.MemberNumber===221397),1);

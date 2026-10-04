@@ -4,7 +4,7 @@
 // old walk-over-and-home behaviour still works with CFG.SPEAKER_MODE "walk".
 const fs=require('fs');
 const store={}; const sent=[]; const handlers={};
-store.bnb_ledger_v1=JSON.stringify({v:4,people:{
+store.bnb_ledger_v1=JSON.stringify({v:4,life:{feedingOn:false,curfewOn:false},people:{
  "221397":{mn:221397,name:"Laynie",roles:["PROPRIETOR","LIVESTOCK"],species:"cow",onDuty:true,herds:[],tempKeys:[],cover:[]},
  "500":{mn:500,name:"Moo",roles:["LIVESTOCK"],species:"cow",onDuty:true,herds:[],tempKeys:[],cover:[]},
  "600":{mn:600,name:"Hana",roles:["LIVESTOCK"],species:"cow",onDuty:true,herds:[],tempKeys:[],cover:[]}

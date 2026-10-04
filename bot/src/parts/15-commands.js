@@ -1732,7 +1732,7 @@ Welcome to B&B Farm, hon. 🌾`);
           if (now - (vp.vEdgeAt||0) < 60000){ R("Let 'em catch their breath a minute, sugar."); break; }
           if (now - (vp.vEdgeAt||0) > CFG.VEDGE_HOURS*3600000) vp.vEdges = 0;   // old edges have worn off
           vp.vEdgeAt = now; vp.vEdges = Math.min(CFG.EDGE_MAX, (vp.vEdges||0) + 1);
-          if (!runScene("edgeVulva", t, { n: plainName(t), b: plainName(sender), k: vp.vEdges, icon: "😈" }))
+          if (!runScene("edgeVulva", t, { n: plainName(t), b: plainName(sender), bMn: sender, k: vp.vEdges, icon: "😈" }))
             emote("😈 "+plainName(sender)+" works "+plainName(t)+"'s pussy right to the brink, then pulls away. Edge number "+vp.vEdges+".", t);
           if (vp.vEdges >= CFG.EDGE_PENT) later(() => emote("😤 "+plainName(t)+" is edged so raw they're drippin' down their thighs, achin' to be bred. The next one's gonna take, sure as anything.", t), 60000);
           saveLedger(); audit(sender, "EDGE", t+" pussy "+vp.vEdges);
@@ -1942,7 +1942,7 @@ Welcome to B&B Farm, hon. 🌾`);
         }
         // a little scene, beat by beat (10g-scenes.js); if one's already playin' for them, just the one line
         const scene = (cmd === "milk" ? "milk" : "collect") + (t === sender ? "Self" : "");
-        if (!runScene(scene, t, { n: plainName(t), b: plainName(sender), ml: ml(got), icon: cmd === "milk" ? "🥛" : "🧪" }))
+        if (!runScene(scene, t, { n: plainName(t), b: plainName(sender), bMn: sender, ml: ml(got), icon: cmd === "milk" ? "🥛" : "🧪" }))
           emote(cmd === "milk" ? "🥛 "+(t === sender ? plainName(t)+" milks "+ml(got)+" into the pail" : plainName(sender)+" milks "+plainName(t)+": "+ml(got)+" into the pail")+". Good job, hon!"
                                : "🧪 "+(t === sender ? plainName(t)+" fills the collection jar with "+ml(got) : plainName(sender)+" collects "+ml(got)+" from "+plainName(t))+". Good job, hon!");
         break;

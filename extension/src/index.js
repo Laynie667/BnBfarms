@@ -13,6 +13,7 @@ import { VERSION } from "./version.js";
 import { BOT_MEMBER, HELLO_EVERY_MS } from "./config.js";
 import { Panel } from "./panel.js";
 import { captureOutfit, wearOutfit, changeBack, hasBackup } from "./outfits.js";
+import { initCues, cueOff, lead, face, sound, trance, drawMarkers } from "./cues.js";
 
 // the SDK ships as an old-style module; this digs the real thing out either way
 const bcModSdk = sdkModule.default || sdkModule;
@@ -37,7 +38,7 @@ function toBot(type, data) {
 function hello() {
   st.lastHello = Date.now();
   // relay: whether this Companion posts farm emotes about you as your own (Toggles, on unless you switch it off)
-  toBot("hello", { ver: VERSION, relay: !(st.panel && st.panel.prefs.noRelay) });
+  toBot("hello", { ver: VERSION, relay: !(st.panel && st.panel.prefs.noRelay), off: st.panel ? cueOff() : {} });
 }
 
 // emojis break in BC's chat, and round brackets make a line out-of-character (seen map-wide): chat lines get neither
@@ -154,6 +155,10 @@ function onFarmMsg(m) {
       toChat("👗 The farm's offerin' you your " + String(m.label || "outfit") + ". Yes or Not now in your 🌾 panel.", "#c9a35b");
       break;
     case "relay": relay(m); break;
+    case "lead": lead(m); break;       // walk me there (cues.js)
+    case "face": face(m); break;
+    case "sound": sound(m); break;
+    case "trance": trance(m); break;
     case "voice": {
       // only you see it, like a thought; nothin' goes to the room
       const line = String(m.text || "").slice(0, 300);
@@ -233,6 +238,10 @@ function pickClick() {
 function start() {
   st.panel = new Panel(sendCommand, api);
   st.panel.setStatus("waitin' for the farm girl");
+  initCues({ toBot, panel: st.panel, local: toChat });
+  // staff map markers, drawn over the game's own map (never breaks the game's drawing)
+  try { mod.hookFunction("ChatRoomMapViewDraw", 0, (args, next) => { const r = next(args); drawMarkers(); return r; }); }
+  catch (e) { console.warn("[Farmhand Companion] map markers unavailable:", e); }
 
   mod.hookFunction("ChatRoomMessage", 10, (args, next) => {
     const m = readMsg(args[0]);

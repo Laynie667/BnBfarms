@@ -96,7 +96,7 @@ function step(id) {
   if (!beat) { running.delete(id); scheduleNext(id, mn); return; }
   const line = (run.funnel && beat.f) || (run.deg && beat.d) || beat.t;
   api.privateEmote(mn, fill(line, { name: api.name(mn) }));
-  if (beat.finish) finish(id, mn, scene.hole, between(18, 45));
+  if (beat.finish) { finish(id, mn, scene.hole, between(18, 45)); api.face(mn, "bred", 45); api.sound(mn, "wet"); }
   else if (run.deg && Math.random() < 0.3 && run.i > 0) api.later(() => running.get(id) === run && api.privateEmote(mn, fill(pick(TAUNTS), { name: api.name(mn) })), 9000);
   run.i++;
   api.later(() => step(id), between(22, 32) * 1000);

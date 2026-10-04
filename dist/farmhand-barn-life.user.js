@@ -165,6 +165,7 @@
     const before = x.lvl;
     x.lvl = Math.min(3, x.lvl + (/^A/.test(grade || "") || ml >= 150 ? 2 : 1));
     x.t = Date.now();
+    api.face(drinker, "milkdrunk", x.lvl * 7 * 60);
     if (x.lvl !== before) {
       const line = fill(pick(DRUNK_LINES[x.lvl]), { name: api.name(drinker) });
       if (x.lvl === 3) api.emote("🥛 " + line, drinker);

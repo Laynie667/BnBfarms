@@ -176,20 +176,38 @@ The bot's account counts as a proprietor. On the bot's own screen:
 - **The bot stays put.** It only walks over and back home if `CFG.SPEAKER_MODE` is `"walk"`.
 - **No emojis** in anything that lands in chat: emotes, whispers, beeps, and the Companion's chat lines. The panel keeps them.
 
-### Ideas that build on it (not built yet)
+### Built in v0.10 (Companion) / v0.13 (bot)
 - **Who can really see me:**
-  - The Companion asks the game itself which characters can see its player, and tells the bot.
-  - Private lines then go to exactly those people instead of "everyone within 8 tiles".
+  - Every Companion tells the bot who its player can see and hear, measured by the game itself.
+  - Private farm lines about them go to exactly those people. People named in a line still get it even if they're out of sight.
+  - Without that report, the bot falls back to everyone within range.
 - **Walk, don't teleport:**
-  - The Companion can move its own player across the map, a step at a time, with no admin rights needed.
-  - Summons, pens, feeding time and tours could lead people there instead of teleporting them.
-- **Orgasms and edges detected automatically:**
-  - The game fires orgasm, resisted and denied events on the player's own screen, and the Companion can report them.
-  - That allows automatic edge counting, milk let-down on orgasm, and "it took" timed to the moment.
-- **Their own face:** dazed eyes when milk-drunk, a flush in heat, eyes rolling in a trance. Only ever their own character.
-- **Feelings only they get:** private lines tied to what they're actually wearing and their real arousal. For example a plug's pressure, a cage's ache, milk prickling, a full belly sloshing. The Companion can read all of that exactly.
-- **Sounds only they hear:** the pump, a heartbeat, a moo, the stall door.
-- **Trance on their screen:** a soft dim and blur at the edges during conditioning sessions, fading as they wake.
-- **Both sides of a breeding:** the stud's Companion posts the stud's line and the bred one's posts theirs, so each line comes from the right person.
-- **Visible consent:** saying yes to a breeding posts a small emote ("Moo nods eagerly") so everyone around sees the consent.
-- **Staff overlay:** small icons over each animal on the staff's own map (needs milking, in heat, due soon, fenced).
+  - The bot asks the person's Companion to lead them there, step by step, at their own speed (bound people walk slower), finding a way around walls.
+  - If there's no way through, they're enclosed or suspended, they've switched it off, or they haven't arrived in 90 seconds, the bot teleports them after all.
+  - Stuck rescues, someone pinned in place, and the stocks still teleport.
+  - Led instead: feeding time, curfew, into the stocks, tours, summons, `?spot go`, glory punishment, pens.
+- **Orgasms and edges:** the game already tells the room about every orgasm, resisted orgasm and ruined one, so the farm counts them for everyone, no Companion needed.
+  - A resisted or ruined orgasm counts as an edge, for a cock or a pussy.
+  - When someone cums, their milk lets down: into the tank if they're wearing a pump, otherwise spurting.
+  - A stud spends what they've built up.
+  - Cumming within 15 minutes of being bred gives it one more chance to take.
+- **Faces:** dazed when milk-drunk, flushed in heat, a trance stare, the afterglow, bred, milked, edged. Only their own character, and only for a while.
+- **Sounds only they hear:** the pump, the breeding machine, the stall door, the feeding bell, wet sounds. These are the game's own sound files, played at their game volume.
+- **Trance haze:** a soft vignette that deepens through a conditioning session and lifts on waking. No human left lingers a couple of minutes.
+- **Private feelings:** every 7 to 13 minutes, a line only they see, built from their actual gear and state: a plug, a cage while aroused, full udders, a sloshing belly, heat, the litter, a gag, being near the edge.
+- **Both sides:** in milking, collecting, breeding and edging scenes, lines that start with whoever is doing it are posted by that person's Companion, and the rest by the person it's done to.
+- **Visible consent:** saying yes to a breeding or a jar shows as a little emote from them.
+- **Ambient moments:** two animals standing close share a small, harmless moment every 15 to 25 minutes (nuzzling, jostling, dozing against each other), seen by whoever can see them.
+- **Never the same line twice in a row** from the same pool.
+- **Staff map markers:** badges over stock on the staff's own map. M needs milking, H in heat, B expecting, X teats capped.
+- **Switches:** every cue has a switch in Toggles → "This panel". All are on by default.
+
+### More ideas
+- **Witness reactions:** someone who can see a breeding or a milking gets a quiet private nudge ("Daisy can't look away") with one-tap reaction emotes in their panel.
+- **Scent trails:** after a breeding, the stud's scent clings to the bred one for an hour. Studs who come near get a private line, and rutty ones a nudge to `?breed`.
+- **Weight of a full belly:** at high fill or late pregnancy, their own Companion slows their walking slightly (the game already has slow levels), shown by a private line.
+- **Milk let-down on touch:** a teat squeeze or nipple activity from someone else triggers a small let-down, posted from the one squeezed.
+- **Body clock:** the morning and evening feeding, the night barn and dawn milking, with private wake-up lines and a gentle lead to the stalls at dawn, for those who opt in.
+- **Group scenes:** a herd milking at the stalls together, with one shared scene naming everyone present and each person's line posted by them.
+- **Herd leader's call:** `?herdcall` could lead the whole herd on foot to their leader instead of teleporting them.
+- **Echo of the room:** when a lot is happening (three or more scenes at once), a single "the barn is loud with…" line for everyone instead of three separate ones.

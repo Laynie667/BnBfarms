@@ -194,5 +194,41 @@ const STATE = { name: "Laynie", onBooks: true, roles: ["PROPRIETOR", "LIVESTOCK"
   out("11 switching it off tells the bot ->", toBot("hello").slice(-1)[0][1].Dictionary.relay === false);
   n0 = sent.length; bot({ type: "relay", id: 43, text: "Laynie sways." });
   out("11 switched off: refused ->", !sent.slice(n0).some((s) => s[1].Type === "Emote") && toBot("relayNo").some((s) => s[1].Dictionary.id === 43));
+  // 12. cues on her own screen: walking there, telling the bot who she can see, face, sound, trance haze
+  // a tiny fake map: 10×10, a wall across x=3 except a gap at y=4
+  w.Player.MapData = { Pos: { X: 1, Y: 1 } }; w.ChatRoomMapViewWidth = 10; w.ChatRoomMapViewHeight = 10;
+  w.ChatRoomMapViewIsActive = () => true; w.ChatRoomMapViewMovement = null;
+  w.ChatRoomMapViewCanEnterTile = (x, y) => (x < 0 || y < 0 || x > 9 || y > 9 || (x === 3 && y !== 4)) ? 0 : 1;
+  const steps = [];
+  w.ChatRoomMapViewMove = (d) => { const p = w.Player.MapData.Pos; steps.push(d);
+    w.Player.MapData.Pos = { X: p.X + (d === "East" ? 1 : d === "West" ? -1 : 0), Y: p.Y + (d === "South" ? 1 : d === "North" ? -1 : 0) }; };
+  w.ChatRoomSendLocal = () => {};
+  bot({ type: "lead", X: 6, Y: 1, id: 77, why: "to the trough" });
+  await wait(4000);
+  out("12 led around the wall, through the gap, step by step ->", w.Player.MapData.Pos.X === 6 && w.Player.MapData.Pos.Y === 1, steps.length, toBot("leadOk").some((s) => s[1].Dictionary.id === 77));
+  w.ChatRoomMapViewCanEnterTile = (x, y) => (x === 1 && y === 1) ? 1 : 0;   // boxed in
+  w.Player.MapData.Pos = { X: 1, Y: 1 };
+  bot({ type: "lead", X: 6, Y: 6, id: 78 }); await wait(300);
+  out("12 no way through: the bot is told ->", toBot("leadNo").some((s) => s[1].Dictionary.id === 78));
+  // sight
+  w.ChatRoomCharacter = [{ MemberNumber: 221397 }, { MemberNumber: 260239 }, { MemberNumber: 500 }, { MemberNumber: 600 }];
+  w.Player.MemberNumber = 221397;
+  w.ChatRoomMapViewCharacterIsVisible = (c) => c.MemberNumber === 500;
+  w.ChatRoomMapViewCharacterIsHearable = (c) => c.MemberNumber === 500 || c.MemberNumber === 600;
+  await wait(4500);
+  const sg = toBot("sight").slice(-1)[0];
+  out("12 tells the bot who she can see and hear ->", !!sg && sg[1].Dictionary.see.join() === "500" && sg[1].Dictionary.hear.join() === "500,600");
+  // face, sound, trance
+  const faces = []; w.CharacterSetFacialExpression = (C, g, e, s) => faces.push(g + ":" + e);
+  bot({ type: "face", mood: "heat", secs: 30 });
+  out("12 face set on her own character ->", faces.includes("Blush:High") && faces.includes("Eyes:Horny") && faces.includes("Eyes2:Horny"));
+  const played = []; w.AudioPlayInstantSound = (src) => played.push(src); w.Player.AudioSettings = { Volume: 1 };
+  bot({ type: "sound", name: "pump" });
+  out("12 a farm sound plays for her ->", played[0] === "Audio/SciFiPump.mp3");
+  bot({ type: "trance", level: 2 }); await wait(50);
+  out("12 trance haze appears ->", !!D.getElementById("fhc-trance"));
+  bot({ type: "trance", level: 0 }); await wait(50);
+  out("12 ...and lifts ->", !D.getElementById("fhc-trance"));
+  out("12 hello lists which cues are on ->", typeof toBot("hello").slice(-1)[0][1].Dictionary.off === "object");
   process.exit(0);
 })();

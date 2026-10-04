@@ -38,6 +38,7 @@
       const w = weatherToday();
       const pt = w.indoors ? firstSpot("barn","trough") : firstSpot("trough");
       const stock = presentStock().filter(m => !stockedNow(m));
+      for (const m of stock) sound(m, "bell");
       say("🔔 Soo-eee! Feedin' time"+(w.indoors ? ", in the barn on account of the weather" : " at the trough")+". Come and get it, sweeties!");
       if (pt) for (const m of stock) teleport(m, pt, false);
     }
@@ -62,7 +63,7 @@
       if (Date.now() >= s.until){ r.stocked = null; saveLedger(); whisper(r.mn, "🔓 Time's up, "+plainName(r.mn)+"! Out of the stocks you come, sugar."); continue; }
       const C = charFor(r.mn), pos = C && C.MapData && C.MapData.Pos, pt = spotFor("stocks");
       if (pt && pos && (Math.abs(pos.X-pt.X) > 1 || Math.abs(pos.Y-pt.Y) > 1)){
-        teleport(r.mn, pt, false);
+        teleport(r.mn, pt, false, true);   // the stocks hold you: straight back
         whisper(r.mn, "Uh-uh, back in the stocks you go, hon! "+Math.ceil((s.until-Date.now())/60000)+" minutes left.");
       }
     }

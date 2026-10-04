@@ -127,6 +127,7 @@ function milkDrunk(milker, drinker, ml, grade) {
   const d = D(), x = d.drunk[drinker] = d.drunk[drinker] || { lvl: 0, t: Date.now() };
   const before = x.lvl;
   x.lvl = Math.min(3, x.lvl + (/^A/.test(grade || "") || ml >= 150 ? 2 : 1)); x.t = Date.now();
+  api.face(drinker, "milkdrunk", x.lvl * 7 * 60);
   if (x.lvl !== before) {
     const line = fill(pick(DRUNK_LINES[x.lvl]), { name: api.name(drinker) });
     if (x.lvl === 3) api.emote("🥛 " + line, drinker); else api.privateEmote(drinker, line);

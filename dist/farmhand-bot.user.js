@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.12.0
+// @version      0.13.0
 // @description  B&B Farm: beeps, keys, ledger, roster, herds, summoning, anti-idle
 // @author       Laynie & Alexia
 // @match        *://*.bondageprojects.elementfx.com/*
@@ -1800,7 +1800,7 @@
   ];
 
   // bot/src/version.js
-  var VERSION = "0.12.0";
+  var VERSION = "0.13.0";
 
   // bot-parts:farmhand-bot-parts
   (function() {
@@ -2325,7 +2325,8 @@
       // each edge adds 25% to the next load (up to 4); 3 edges = pent up
       VEDGE_X: 0.2,
       VEDGE_HOURS: 3,
-      // a pussy edged: each edge makes the next breedin' 20% likelier to take, for 3 hours
+      AMBIENT_ON: true,
+      // two animals standin' close share a small moment every 15–25 minutes              // a pussy edged: each edge makes the next breedin' 20% likelier to take, for 3 hours
       RP_PRAISE: /\bgood (girl|boy|cow|pet|pup|puppy|kitty|kitten|heifer|breeder|stud|pony|piggy|toy|slut|bitch|bull|mare|doll|thing|little \w+)\b/i,
       RP_DEGRADE: /\b(slut|whore|cumdump|cum dump|breeder|cow|heifer|bitch|cocksleeve|cock sleeve|fucktoy|fuck toy|sow|pig|breeding stock|brood ?mare|milk ?bag|onahole|cumrag|cum rag)\b/i,
       TITLES: [
@@ -2932,7 +2933,12 @@
       }
       return null;
     }
-    function teleport(mn, pt, urgent) {
+    function teleport(mn, pt, urgent, force) {
+      if (!pt || !charFor(mn)) return false;
+      if (!force && mn !== CFG.BOT_MEMBER && canLead(mn)) return lead(mn, pt, urgent);
+      return teleportNow(mn, pt, urgent);
+    }
+    function teleportNow(mn, pt, urgent) {
       if (!pt || !botIsAdmin() || !charFor(mn)) return false;
       send("ChatRoomChat", {
         Content: "ChatRoomMapViewTeleport",
@@ -2965,7 +2971,7 @@
         beep(mn, "I'm sorry, hon, I can't move you right now because I've lost my room admin rights. Please call a proprietor or staff and they'll get you out.");
         return false;
       }
-      return teleport(mn, pt, true);
+      return teleport(mn, pt, true, true);
     }
     function forcedStaff() {
       const out = [];
@@ -3155,7 +3161,7 @@
     };
     W.FarmhandExport = exportLedger;
     W.FarmhandLedger = () => L;
-    if (W.__FARMHAND_TEST__) Object.assign(W, { __st: () => state, __cfg: CFG, __pt: prodTick, __qt: quotaTick, __lt: leashTick, __ms: milkingStallTick, __vt: voiceTick, __sync: syncCompanions, __gt: gearTick, __ht: homeTick, __addons: (h, ...a) => addonsEmit(h, ...a), __stateFor: (mn) => stateFor(mn) });
+    if (W.__FARMHAND_TEST__) Object.assign(W, { __st: () => state, __cfg: CFG, __pt: prodTick, __qt: quotaTick, __lt: leashTick, __ms: milkingStallTick, __vt: voiceTick, __sync: syncCompanions, __gt: gearTick, __ht: homeTick, __addons: (h, ...a) => addonsEmit(h, ...a), __stateFor: (mn) => stateFor(mn), __leadTick: () => leadTick(), __ambient: () => ambientTick() });
     W.FarmhandSyncKeys = () => syncAllPresent(true);
     W.FarmhandFriends = () => W.Player.FriendList;
     W.FarmhandAddFriend = (mn) => addFriend(mn, false);
@@ -3533,6 +3539,8 @@
         const by = parties.find((m) => canRelay(m) && namedIn(String(t), [m]));
         if (by) {
           relayEmote(by, t, subject);
+          const seen = sightOf(by) ? new Set(audience(by, "see")) : null;
+          for (const m of parties) if (m !== by && seen && !seen.has(m)) privateTo(m, t, "emote");
           return;
         }
         if (speakersOn() && speakerSend(subject, t, "emote")) return;
@@ -3571,6 +3579,11 @@
       state.relays.delete(id);
       if (!speakerSend(r.subject, r.text, "emote")) for (const c of splitMessage(r.text, 900)) enqueue({ Content: "*" + c, Type: "Emote" });
     }
+    function privateTo(mn, text, kind) {
+      const line = (kind === "emote" ? "*" : "") + String(text);
+      if (hasCompanion(mn)) enqueue(makeMsg("roomline", { text: line, kind }, mn));
+      else for (const part of splitMessage(line, 900)) enqueue({ Content: "(" + part.replace(/\)/g, "]"), Type: "Whisper", Target: mn });
+    }
     function toEveryone(text, kind, urgent) {
       const line = (kind === "emote" ? "*" : "") + String(text);
       for (const c of W.ChatRoomCharacter || []) {
@@ -3595,7 +3608,8 @@
       const R = CFG.SPEAKER_RANGE;
       const named = here.map((c) => c.MemberNumber).filter((m) => namedIn(String(text), [m]));
       const who = new Set([anchor].concat(named));
-      for (const c of here) if (dist(c.MapData.Pos, spot) <= R || dist(c.MapData.Pos, at) <= R) who.add(c.MemberNumber);
+      if (sightOf(anchor) && !speakersOn()) for (const m of audience(anchor, kind === "chat" ? "hear" : "see")) who.add(m);
+      else for (const c of here) if (dist(c.MapData.Pos, spot) <= R || dist(c.MapData.Pos, at) <= R) who.add(c.MemberNumber);
       const line = (kind === "emote" ? "*" : "") + String(text);
       for (const mn of who) {
         if (hasCompanion(mn)) enqueue(makeMsg("roomline", { text: line, kind }, mn), urgent);
@@ -3682,8 +3696,16 @@
         relayRefused(m.id);
         return;
       }
+      if (m.type === "sight") {
+        onSight(mn, m);
+        return;
+      }
+      if (m.type === "leadOk" || m.type === "leadNo") {
+        leadAnswer(mn, m);
+        return;
+      }
       if (m.type === "hello") {
-        state.companions.set(mn, { at: Date.now(), ver: String(m.ver || "?"), relay: m.relay !== false });
+        state.companions.set(mn, { at: Date.now(), ver: String(m.ver || "?"), relay: m.relay !== false, off: m.off && typeof m.off === "object" ? m.off : {} });
         log("Companion hello from " + mn + " (v" + (m.ver || "?") + ")");
         enqueue(makeMsg("welcome", { ver: VERSION, proto: PROTOCOL, name: plainName(mn), staff: isStaff(mn) }, mn));
         later(() => syncCompanions(), 800);
@@ -4607,7 +4629,10 @@
       p.heat = { until: Date.now() + (hours || CFG.PROD.HEAT_H) * 36e5, by };
       p.nextHeatAt = Date.now() + CFG.PROD.NATURAL_HEAT_EVERY_D * 864e5;
       if (!already) {
-        if (charFor(mn)) enqueue({ Content: "*" + plainName(mn) + " flushes hot all over, comin' into heat. 🔥", Type: "Emote" });
+        if (charFor(mn)) {
+          emote(plainName(mn) + " flushes hot all over, comin' into heat.", mn);
+          face(mn, "heat", 90);
+        }
         tell(mn, "🔥 Ooh, you've come into heat, " + plainName(mn) + "! Gonna be mighty hard to miss for the next " + (hours || CFG.PROD.HEAT_H) + " hours, sweetie.");
         for (const h of herdsOf(mn)) beep(h.leader, "🔥 Heads up, hon: " + plainName(mn) + " just came into heat.");
       }
@@ -4882,7 +4907,7 @@
             } else whisper(mn, bySize ? "🎈 Oh my, your " + (bySize === "udder" ? "udder is" : "balls are") + " just too big to move with, " + plainName(mn) + "! You'll stay put right here till somebody gives you " + (bySize === "udder" ? "an udder" : "a ball") + " reducer shot." : "🎈 Oh my, you're too full to move, " + plainName(mn) + "! You'll stay put right here till you're milked down or somebody gives you a reducin' shot.");
           } else if (pos.X !== p.pin.X || pos.Y !== p.pin.Y) {
             if (p.tieUntil > now) p.pin = { X: pos.X, Y: pos.Y };
-            else teleport(mn, p.pin, false);
+            else teleport(mn, p.pin, false, true);
           }
         } else if (p.pin && !pinned) {
           p.pin = null;
@@ -4895,13 +4920,13 @@
         } else p.fullSince = 0;
         if (p.fullSince && now - p.fullSince > CFG.PROD.OVERFULL_H * 36e5 && charFor(mn) && now - (p.lastLeak || 0) > CFG.PROD.LEAK_EMOTE_MIN * 6e4 * (0.75 + Math.random() * 0.5)) {
           p.lastLeak = now;
-          enqueue({ Content: "*" + fill(CFG.LEAK_LINES[Math.floor(Math.random() * CFG.LEAK_LINES.length)], mn), Type: "Emote" });
+          emote(fill(pickFresh("leak", CFG.LEAK_LINES), mn), mn);
         }
         if (inHeat(p) && charFor(mn) && now - p.lastHeatEmote > CFG.PROD.HEAT_EMOTE_MIN * 6e4 * (0.75 + Math.random() * 0.5)) {
           p.lastHeatEmote = now;
           const lines = heatLines();
           const line = lines[Math.floor(Math.random() * lines.length)];
-          enqueue({ Content: "*" + fill(line, mn), Type: "Emote" });
+          emote(fill(line, mn), mn);
         }
       }
       saveLedger();
@@ -4926,6 +4951,7 @@
         const mins = Math.ceil(Math.max(doM ? (p.milk - keepM) / CFG.PROD.STALL_MILK_PER_MIN : 0, doS ? (p.semen - keepS) / CFG.PROD.STALL_SEMEN_PER_MIN : 0));
         if (!p.stall && (doM || doS)) {
           p.stall = { since: now };
+          sound(mn, "stall");
           tell(mn, "🥛 The stall latches on. About " + mins + " minute" + (mins === 1 ? "" : "s") + " to drain you down to a quarter, sugar. Stay put.");
         }
         if (p.stall) p.stall.until = now + mins * 6e4;
@@ -5087,6 +5113,7 @@
       let caught = null;
       if (hole === "vulva") {
         const bonus = (pent ? CFG.PENTUP_FERT_X : 1) * (knot ? CFG.KNOT_FERT_X : 1) * (T.heat && !inHeat(tp) ? 3 : 1) * (onBreedingStand(t) ? CFG.BREEDING_STAND_X : 1);
+        tp.lastFill = { at: Date.now(), stud, ml: kept };
         caught = rollConception(t, stud, kept, bonus);
         sp.totals.covers = (sp.totals.covers || 0) + 1;
         if (caught) {
@@ -5098,6 +5125,8 @@
         }
       }
       okBreed(stud, t);
+      face(t, "bred", 40);
+      sound(t, "wet");
       if (!opt.second) {
         tally(t);
         tp.scent = { stud, until: Date.now() + CFG.SCENT_H * 36e5 };
@@ -5218,6 +5247,7 @@
         tell(a.staff, "💉 " + plainName(t) + " said no to the jar, sugar. Please leave it be.");
         return true;
       }
+      showConsent(t, a.staff, a.machine ? "the breedin' machine" : "the jar");
       if (a.machine) {
         state.machineLoads = state.machineLoads || /* @__PURE__ */ new Map();
         state.machineLoads.set(t, { staff: a.staff, jar: a.jar, hole: a.hole, at: Date.now() });
@@ -5244,6 +5274,7 @@
       L.jars = L.jars.filter((j) => j !== jar);
       let caught = null;
       if (hole === "vulva") {
+        tp.lastFill = { at: Date.now(), stud: jar.stud, ml: kept };
         caught = rollConception(t, jar.stud, kept, onBreedingStand(t) ? CFG.BREEDING_STAND_X : 1);
         if (caught) {
           const sp = prodOf(jar.stud);
@@ -5255,7 +5286,7 @@
         }
       }
       const tookLine = () => caught && emote("🍼 It took! A soft, warm glow settles over " + plainName(t) + ": they're carryin' " + plainName(jar.stud) + "'s young now, no stud required.", t);
-      const vars = { n: plainName(t), b: plainName(sender), m: machine || "", h: HOLE_WORD[hole] || hole, ml: ml(kept), stud: plainName(jar.stud), jar: jar.id, icon: machine ? "⚙️" : "💉" };
+      const vars = { n: plainName(t), b: plainName(sender), bMn: sender, m: machine || "", h: HOLE_WORD[hole] || hole, ml: ml(kept), stud: plainName(jar.stud), jar: jar.id, icon: machine ? "⚙️" : "💉" };
       if (!runScene(machine ? "machine" : "syringe", t, vars, tookLine)) {
         emote(machine ? "⚙️ The " + machine + " under " + plainName(t) + " gives a wet click and empties jar #" + jar.id + " deep into their " + vars.h + ": " + ml(kept) + " of " + plainName(jar.stud) + "'s seed, pumped in with every stroke." : "💉 " + plainName(sender) + " fills the syringe from jar #" + jar.id + " and slides it deep into " + plainName(t) + "'s " + vars.h + ", pushin' " + ml(kept) + " of " + plainName(jar.stud) + "'s seed all the way in.", t);
         tookLine();
@@ -6128,6 +6159,7 @@
         const w = weatherToday();
         const pt = w.indoors ? firstSpot("barn", "trough") : firstSpot("trough");
         const stock = presentStock().filter((m) => !stockedNow(m));
+        for (const m of stock) sound(m, "bell");
         say("🔔 Soo-eee! Feedin' time" + (w.indoors ? ", in the barn on account of the weather" : " at the trough") + ". Come and get it, sweeties!");
         if (pt) for (const m of stock) teleport(m, pt, false);
       }
@@ -6159,7 +6191,7 @@
         }
         const C = charFor(r.mn), pos = C && C.MapData && C.MapData.Pos, pt = spotFor("stocks");
         if (pt && pos && (Math.abs(pos.X - pt.X) > 1 || Math.abs(pos.Y - pt.Y) > 1)) {
-          teleport(r.mn, pt, false);
+          teleport(r.mn, pt, false, true);
           whisper(r.mn, "Uh-uh, back in the stocks you go, hon! " + Math.ceil((s.until - Date.now()) / 6e4) + " minutes left.");
         }
       }
@@ -6186,8 +6218,8 @@
       whisper(mn, "⛓️ Into the stocks with you for " + minutes + " minutes, sugar." + (pt ? "" : " (Nobody's set a stocks spot yet, so just stay put right where you are.)"));
     }
     function leashTick() {
-      for (const [follower, lead] of state.leashes) {
-        const F = charFor(follower), Lc = charFor(lead);
+      for (const [follower, lead2] of state.leashes) {
+        const F = charFor(follower), Lc = charFor(lead2);
         if (!F || !Lc) {
           state.leashes.delete(follower);
           continue;
@@ -6199,9 +6231,9 @@
         state.leashPos.set(follower, { f: { X: fp.X, Y: fp.Y }, l: { X: lp.X, Y: lp.Y } });
         if (Math.abs(fp.X - lp.X) <= 1 && Math.abs(fp.Y - lp.Y) <= 1) continue;
         const fpr = prodOf(follower);
-        if (was && fpr && fpr.tieUntil > Date.now() && fpr.tiedTo === lead && was.l.X === lp.X && was.l.Y === lp.Y && Date.now() - (fpr.tugAt || 0) > 6e4) {
+        if (was && fpr && fpr.tieUntil > Date.now() && fpr.tiedTo === lead2 && was.l.X === lp.X && was.l.Y === lp.Y && Date.now() - (fpr.tugAt || 0) > 6e4) {
           fpr.tugAt = Date.now();
-          emote("🔒 " + plainName(follower) + " tries to pull away, but " + plainName(lead) + "'s knot holds fast and yanks 'em right back with a wet tug. " + plainName(lead) + " gasps at the squeeze. Not goin' anywhere yet, sugar.");
+          emote("🔒 " + plainName(follower) + " tries to pull away, but " + plainName(lead2) + "'s knot holds fast and yanks 'em right back with a wet tug. " + plainName(lead2) + " gasps at the squeeze. Not goin' anywhere yet, sugar.");
         }
         for (const [dx, dy] of [[0, 1], [1, 0], [-1, 0], [0, -1], [1, 1], [-1, 1], [1, -1], [-1, -1]]) {
           const x = lp.X + dx, y = lp.Y + dy;
@@ -6561,7 +6593,7 @@
       if (!r || !r.hypno) return null;
       const m = L.voice.member[mn];
       if (m && m.on && m.lines.length) return m;
-      const lead = herdLeaderOf(mn), h = lead && L.voice.herd[lead];
+      const lead2 = herdLeaderOf(mn), h = lead2 && L.voice.herd[lead2];
       return h && h.on && h.lines.length ? h : null;
     }
     function voiceTick() {
@@ -6682,7 +6714,8 @@
           p.gearMl = (p.gearMl || 0) + got;
           if (got > 0 && now >= (p.gearNext || 0)) {
             p.gearNext = now + jitter();
-            emote("🥛 " + gearLine(mn, g.milk.kind, g.milk.level, g.milk.name, p.gearMl));
+            emote("🥛 " + gearLine(mn, g.milk.kind, g.milk.level, g.milk.name, p.gearMl), mn);
+            sound(mn, "pump");
             p.gearMl = 0;
           }
           if (got > 0 && p.milk < 1 && !p.gearDry) {
@@ -6701,7 +6734,8 @@
           }
           if (now >= (p.machineNext || 0)) {
             p.machineNext = now + jitter();
-            emote("⚙️ " + gearLine(mn, "machine", g.machine.intensity, g.machine.name));
+            emote("⚙️ " + gearLine(mn, "machine", g.machine.intensity, g.machine.name), mn);
+            sound(mn, "machine");
           }
         }
       }
@@ -6921,6 +6955,10 @@
         teleport,
         spotBeside,
         activityInfo,
+        // little cues their own Companion plays (v0.10+): a face, a sound for whoever's around, the trance haze
+        face: (mn, mood, secs) => face(mn, mood, secs),
+        sound: (mn, name) => sound(mn, name),
+        trance: (mn, level) => trance(mn, level),
         // time
         later,
         dayKey,
@@ -7149,6 +7187,19 @@
       if (!beats || state.sceneRun.has(t)) return false;
       const id = Symbol(key);
       state.sceneRun.set(t, id);
+      const cue = {
+        milk: ["milked", "pail"],
+        milkSelf: ["milked", "pail"],
+        collect: ["milked", "wet"],
+        collectSelf: ["milked", "wet"],
+        machine: ["bred", "machine"],
+        syringe: ["bred", "wet"],
+        edgeVulva: ["edged", null]
+      }[key];
+      if (cue) {
+        face(t, cue[0], 120);
+        if (cue[1]) sound(t, cue[1]);
+      }
       const fillV = (s) => String(s).replace(/%(\w+)/g, (m, k) => vars[k] !== void 0 ? vars[k] : m);
       let i = 0;
       const step = () => {
@@ -7168,8 +7219,9 @@
           return;
         }
         const line = fillV(r.degradeMe && b.d || r.praiseMe && b.p || b.t);
+        const from = vars.bMn && vars.b && line.startsWith(vars.b) ? vars.bMn : t;
         if (b.say) say(line, false, t);
-        else emote(vars.icon + " " + line, t);
+        else emote(vars.icon + " " + line, from);
         later(step, (15 + Math.random() * 10) * 1e3);
       };
       step();
@@ -7177,6 +7229,173 @@
     }
     function stopScene(t) {
       if (state.sceneRun) state.sceneRun.delete(t);
+    }
+    function cueable(mn, pref) {
+      const c = state.companions.get(mn);
+      return !!(hasCompanion(mn) && c && verAtLeast(c.ver, "0.10.0") && !(c.off && c.off[pref]));
+    }
+    function face(mn, mood, secs) {
+      if (cueable(mn, "face")) enqueue(makeMsg("face", { mood, secs: secs || 30 }, mn));
+    }
+    function trance(mn, level) {
+      if (cueable(mn, "trance")) enqueue(makeMsg("trance", { level: level || 0 }, mn));
+    }
+    function sound(anchor, name) {
+      const who = new Set([anchor].concat(audience(anchor, "hear")));
+      for (const mn of who) if (cueable(mn, "sound")) enqueue(makeMsg("sound", { name }, mn));
+    }
+    function sightOf(mn) {
+      const s = state.sight && state.sight.get(mn);
+      return s && Date.now() - s.at < 3e4 ? s : null;
+    }
+    function audience(mn, kind) {
+      const s = sightOf(mn);
+      if (!s) return [];
+      return (kind === "hear" ? s.hear : s.see).filter((m) => m !== CFG.BOT_MEMBER && charFor(m));
+    }
+    function onSight(mn, m) {
+      state.sight = state.sight || /* @__PURE__ */ new Map();
+      const ok = (a) => Array.isArray(a) ? a.map(Number).filter(Number.isFinite).slice(0, 60) : [];
+      state.sight.set(mn, { see: ok(m.see), hear: ok(m.hear), at: Date.now() });
+    }
+    function canLead(mn) {
+      return cueable(mn, "lead") && onMap(mn);
+    }
+    function lead(mn, pt, urgent, why) {
+      state.leads = state.leads || /* @__PURE__ */ new Map();
+      for (const [id2, l] of state.leads) if (l.mn === mn) state.leads.delete(id2);
+      const id = ++companionSeq;
+      state.leads.set(id, { mn, pt: { X: pt.X, Y: pt.Y }, at: Date.now(), urgent });
+      enqueue(makeMsg("lead", { X: pt.X, Y: pt.Y, id, why: why || "" }, mn), urgent);
+      return true;
+    }
+    function leadAnswer(mn, m) {
+      const l = state.leads && state.leads.get(m.id);
+      if (!l || l.mn !== mn) return;
+      state.leads.delete(m.id);
+      if (m.type === "leadNo") teleportNow(mn, l.pt, l.urgent);
+    }
+    function leadTick() {
+      if (!state.leads) return;
+      for (const [id, l] of state.leads) {
+        const p = posOf(l.mn);
+        if (p && Math.max(Math.abs(p.X - l.pt.X), Math.abs(p.Y - l.pt.Y)) <= 1) {
+          state.leads.delete(id);
+          continue;
+        }
+        if (Date.now() - l.at > 9e4) {
+          state.leads.delete(id);
+          teleportNow(l.mn, l.pt, l.urgent);
+        }
+      }
+    }
+    function onClimax(mn, content) {
+      const r = rec(mn), p = r && prodOf(mn);
+      if (!p || limitBlocks(mn)) return;
+      const now = Date.now(), d = dayKey(), n = plainName(mn);
+      if (!p.climax || p.climax.day !== d) p.climax = { day: d, came: 0, edged: 0, ruined: 0 };
+      if (/^OrgasmResist/.test(content)) {
+        p.climax.edged++;
+        if (makesSemen(mn)) {
+          p.edges = Math.min(CFG.EDGE_MAX, (p.edges || 0) + 1);
+          if (p.edges >= CFG.EDGE_PENT) p.pentUp = true;
+        }
+        if (hasVulva(mn)) {
+          if (now - (p.vEdgeAt || 0) > CFG.VEDGE_HOURS * 36e5) p.vEdges = 0;
+          p.vEdges = Math.min(CFG.EDGE_MAX, (p.vEdges || 0) + 1);
+          p.vEdgeAt = now;
+        }
+        face(mn, "edged", 25);
+        if (now - (p.edgeSaid || 0) > 12e4) {
+          p.edgeSaid = now;
+          emote(pickFresh("edge", [
+            n + " holds it back, trembling right on the edge. The farm counts that one.",
+            n + " fights it off with a shaky groan and stays right on the brink. Another edge on the tally.",
+            n + " clenches up and refuses to tip over. Good. That's " + p.climax.edged + " today."
+          ]), mn);
+        }
+      } else if (/^OrgasmFail/.test(content)) {
+        p.climax.ruined++;
+        if (hasVulva(mn)) {
+          if (now - (p.vEdgeAt || 0) > CFG.VEDGE_HOURS * 36e5) p.vEdges = 0;
+          p.vEdges = Math.min(CFG.EDGE_MAX, (p.vEdges || 0) + 1);
+          p.vEdgeAt = now;
+        }
+        if (makesSemen(mn) && p.semen >= 2) {
+          const lost = Math.min(p.semen, p.semen * 0.2);
+          p.semen -= lost;
+        }
+        face(mn, "edged", 25);
+        emote(pickFresh("ruin", [
+          n + " whimpers as it slips away, ruined and leaking, nowhere near enough.",
+          n + "'s release fizzles out into a sad, twitching dribble. Ruined.",
+          n + " sags with a frustrated whine. So close, and nothin' to show for it."
+        ]), mn);
+      } else if (/^Orgasm\d/.test(content)) {
+        p.climax.came++;
+        face(mn, "afterglow", 40);
+        const bits = [];
+        if (makesMilk(mn) && !milkDenied(mn) && p.milk > 1) {
+          const g = gearOf(mn);
+          const out = g.milk ? drainMilk(mn, Math.min(p.milk, milkRate(mn) * 0.25)) : Math.min(p.milk, milkRate(mn) * 0.1);
+          if (!g.milk) p.milk -= out;
+          if (out >= 1) bits.push(g.milk ? "milk gushes down the pump's lines with every spasm (+" + ml(out) + " in the tank)" : "milk spurts from both teats as they shake");
+        }
+        if (makesSemen(mn) && !holeBlocked(mn, "penis") && p.semen >= 2) {
+          const spent = Math.min(p.semen, p.semen * CFG.PROD.LOAD_SHARE * 0.5 * (1 + CFG.EDGE_X * Math.min(p.edges || 0, CFG.EDGE_MAX)));
+          p.semen -= spent;
+          p.edges = 0;
+          p.pentUp = false;
+          bits.push("their cock pulses out " + ml(spent) + " of wasted seed");
+        }
+        emote(n + " comes apart, gasping and shaking" + (bits.length ? ": " + bits.join(", and ") : "") + ".", mn);
+        const f = p.lastFill;
+        if (f && now - f.at < 15 * 6e4 && !f.rerolled && !p.preg && hasVulva(mn)) {
+          f.rerolled = true;
+          if (rollConception(mn, f.stud, f.ml, 0.5)) later(() => emote("🍼 Right as " + n + " peaks, somethin' deep inside catches. " + plainName(f.stud) + "'s seed took after all.", mn), 4e3);
+        }
+      }
+      saveLedger();
+    }
+    function showConsent(t, to, what) {
+      emote(pickFresh("yes", [
+        plainName(t) + " nods eagerly at " + plainName(to) + ". Yes. Please.",
+        plainName(t) + " flushes and gives " + plainName(to) + " a shy little nod: yes to " + what + ".",
+        plainName(t) + " presents for " + plainName(to) + " without a word. That's a yes."
+      ]), t);
+    }
+    function pickFresh(key, list) {
+      state.lastPick = state.lastPick || /* @__PURE__ */ new Map();
+      const last = state.lastPick.get(key);
+      const pool = list.length > 1 ? list.filter((x) => x !== last) : list;
+      const v = pool[Math.floor(Math.random() * pool.length)];
+      state.lastPick.set(key, v);
+      return v;
+    }
+    const AMBIENT = [
+      "%a and %b jostle shoulder to shoulder at the rail, neither willing to give up their spot.",
+      "%a nuzzles into %b's neck and gets a sleepy nuzzle back.",
+      "%a rests their head on %b's back and lets out a long, contented sigh.",
+      "%a licks a stray drip of milk off %b's chin, and %b pretends not to like it.",
+      "%a and %b doze off leaning against each other in the straw.",
+      "%a bumps %b with their hip, and the two of them tussle in the hay for a moment.",
+      "%a grooms %b's hair with careful fingers while %b stays perfectly still.",
+      "%a and %b trade soft little animal noises, a whole conversation without a single word."
+    ];
+    function ambientTick() {
+      if (!CFG.AMBIENT_ON || !mapRoom()) return;
+      const now = Date.now();
+      if (now < (state.ambientAt || 0)) return;
+      state.ambientAt = now + (15 + Math.random() * 10) * 6e4;
+      const stock = presentStock().filter((m) => onMap(m) && !stockedNow(m) && !(state.sceneRun && state.sceneRun.has(m)));
+      const pairs = [];
+      for (let i = 0; i < stock.length; i++) for (let j = i + 1; j < stock.length; j++) {
+        const a2 = posOf(stock[i]), b2 = posOf(stock[j]);
+        if (a2 && b2 && Math.max(Math.abs(a2.X - b2.X), Math.abs(a2.Y - b2.Y)) <= 2) pairs.push([stock[i], stock[j]]);
+      }
+      if (!pairs.length) return;
+      const [a, b] = pairs[Math.floor(Math.random() * pairs.length)];
+      emote(pickFresh("ambient", AMBIENT).replace(/%a/g, plainName(a)).replace(/%b/g, plainName(b)), Math.random() < 0.5 ? a : b);
     }
     function clockedIn(mn) {
       const r = rec(mn);
@@ -11011,7 +11230,7 @@ Welcome to B&B Farm, hon. 🌾`
             if (now2 - (vp.vEdgeAt || 0) > CFG.VEDGE_HOURS * 36e5) vp.vEdges = 0;
             vp.vEdgeAt = now2;
             vp.vEdges = Math.min(CFG.EDGE_MAX, (vp.vEdges || 0) + 1);
-            if (!runScene("edgeVulva", t, { n: plainName(t), b: plainName(sender), k: vp.vEdges, icon: "😈" }))
+            if (!runScene("edgeVulva", t, { n: plainName(t), b: plainName(sender), bMn: sender, k: vp.vEdges, icon: "😈" }))
               emote("😈 " + plainName(sender) + " works " + plainName(t) + "'s pussy right to the brink, then pulls away. Edge number " + vp.vEdges + ".", t);
             if (vp.vEdges >= CFG.EDGE_PENT) later(() => emote("😤 " + plainName(t) + " is edged so raw they're drippin' down their thighs, achin' to be bred. The next one's gonna take, sure as anything.", t), 6e4);
             saveLedger();
@@ -11340,7 +11559,7 @@ Welcome to B&B Farm, hon. 🌾`
             R("🫙 Bottled as jar #" + L.nextJar + " (" + ml(got) + " of " + plainName(t) + "'s). Staff can ?inseminate <who> " + L.nextJar + " [hole] within " + CFG.JAR_DAYS + " days.");
           }
           const scene = (cmd === "milk" ? "milk" : "collect") + (t === sender ? "Self" : "");
-          if (!runScene(scene, t, { n: plainName(t), b: plainName(sender), ml: ml(got), icon: cmd === "milk" ? "🥛" : "🧪" }))
+          if (!runScene(scene, t, { n: plainName(t), b: plainName(sender), bMn: sender, ml: ml(got), icon: cmd === "milk" ? "🥛" : "🧪" }))
             emote(cmd === "milk" ? "🥛 " + (t === sender ? plainName(t) + " milks " + ml(got) + " into the pail" : plainName(sender) + " milks " + plainName(t) + ": " + ml(got) + " into the pail") + ". Good job, hon!" : "🧪 " + (t === sender ? plainName(t) + " fills the collection jar with " + ml(got) : plainName(sender) + " collects " + ml(got) + " from " + plainName(t)) + ". Good job, hon!");
           break;
         }
@@ -11910,7 +12129,7 @@ Welcome to B&B Farm, hon. 🌾`
           if (!data) return;
           if (data.Sender === CFG.BOT_MEMBER) {
             const own = data.Type === "Hidden" && readMsg(data);
-            if (own && ["hello", "bye", "cmd", "outfitSave", "outfitAnswer", "relayNo"].includes(own.type)) onCompanion(own);
+            if (own && ["hello", "bye", "cmd", "outfitSave", "outfitAnswer", "relayNo", "sight", "leadOk", "leadNo"].includes(own.type)) onCompanion(own);
             return;
           }
           if (data.Type === "Hidden") {
@@ -11947,6 +12166,15 @@ Welcome to B&B Farm, hon. 🌾`
             } catch (e) {
               warn("bc+:", e);
             }
+            return;
+          }
+          if (data.Type === "Activity" && /^(Orgasm\d|OrgasmResist|OrgasmFail)/.test(String(data.Content || ""))) {
+            try {
+              onClimax(data.Sender, String(data.Content));
+            } catch (e) {
+              warn("climax:", e);
+            }
+            addonsEmit("climax", data.Sender, String(data.Content));
             return;
           }
           if (data.Type === "Activity") {
@@ -12116,6 +12344,8 @@ Welcome to B&B Farm, hon. 🌾`
         homeTick();
         lifeTick();
         workTick();
+        leadTick();
+        ambientTick();
         addonsEmit("tick");
         for (const [mn, a] of state.arrivals) if (Date.now() > a.until) state.arrivals.delete(mn);
         if (Date.now() - (state.lastSync || 0) > 6e4) {

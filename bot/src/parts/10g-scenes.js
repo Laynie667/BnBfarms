@@ -81,6 +81,9 @@
     if (!beats || state.sceneRun.has(t)) return false;
     const id = Symbol(key);
     state.sceneRun.set(t, id);
+    const cue = { milk:["milked","pail"], milkSelf:["milked","pail"], collect:["milked","wet"], collectSelf:["milked","wet"],
+                  machine:["bred","machine"], syringe:["bred","wet"], edgeVulva:["edged",null] }[key];
+    if (cue){ face(t, cue[0], 120); if (cue[1]) sound(t, cue[1]); }
     const fillV = s => String(s).replace(/%(\w+)/g, (m, k) => vars[k] !== undefined ? vars[k] : m);
     let i = 0;
     const step = () => {
@@ -89,7 +92,9 @@
       const b = beats[i++];
       if (!b){ state.sceneRun.delete(t); if (onEnd) try { onEnd(); } catch(e){ warn("scene end:", e); } return; }
       const line = fillV((r.degradeMe && b.d) || (r.praiseMe && b.p) || b.t);
-      if (b.say) say(line, false, t); else emote(vars.icon+" "+line, t);
+      // a line that starts with whoever's doin' it comes from them (their Companion posts it); the rest from the one it's done to
+      const from = vars.bMn && vars.b && line.startsWith(vars.b) ? vars.bMn : t;
+      if (b.say) say(line, false, t); else emote(vars.icon+" "+line, from);
       later(step, (15 + Math.random()*10)*1000);
     };
     step();

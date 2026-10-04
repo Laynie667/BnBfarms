@@ -138,6 +138,8 @@
       pos: posOf, spot: (n) => (L.spots && L.spots[n]) || null, spots: () => Object.assign({}, L.spots||{}),
       onSpot, whoOnSpot, zonesOf, inZone: inZoneNamed, zones: () => { zonesLedger(); return L.zones; }, teleport, spotBeside,
       activityInfo,
+      // little cues their own Companion plays (v0.10+): a face, a sound for whoever's around, the trance haze
+      face: (mn, mood, secs) => face(mn, mood, secs), sound: (mn, name) => sound(mn, name), trance: (mn, level) => trance(mn, level),
       // time
       later, dayKey, weekKey,
     });

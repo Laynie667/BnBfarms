@@ -114,6 +114,14 @@ export function panelPrefs(ctx) {
       toggle(label, desc, !!ctx.prefs[k], () => ctx.setPref(k, !ctx.prefs[k]))),
     toggle("Farm emotes about me come from me", "Belly kicks, milkin', breedin'… are posted as your own emote (no name in front), so the people who can see you see them and the farm girl needn't move. Only lines about you.",
       !ctx.prefs.noRelay, () => { ctx.setPref("noRelay", !ctx.prefs.noRelay); ctx.api.rehello && ctx.api.rehello(); }),
+    // the farm's little cues on your own screen (cues.js); each one on unless you switch it off
+    [["noLead", "Lead me instead of teleportin'", "When the farm moves you (feedin' time, the stocks, a summon), you walk there yourself, step by step"],
+     ["noFace", "Farm can set my face", "Dazed when milk-drunk, flushed in heat, a trance stare… for a little while"],
+     ["noSound", "Farm sounds", "The pump, the stall door, the feedin' bell. Only you hear them, at your game volume"],
+     ["noTrance", "Trance haze", "A soft haze at the edges of your screen during conditioning sessions"],
+     ["noFeelings", "Private feelings", "Now and then, a line only you see about what you're feelin' (your gear, your arousal, how full you are)"],
+     ["noMarkers", "Map markers (staff)", "Small badges over stock on your map: M needs milkin', H in heat, B expectin', X teats capped"]].map(([k, label, desc]) =>
+      toggle(label, desc, !ctx.prefs[k], () => { ctx.setPref(k, !ctx.prefs[k]); ctx.api.rehello && ctx.api.rehello(); })),
     btn("Put the button and panel back in the corner", () => ctx.resetPlaces && ctx.resetPlaces()));
 }
 function toggles(ctx) {

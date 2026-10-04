@@ -219,7 +219,12 @@
       //    someone the line is about (them, the other one in a breedin', whoever acted on them).
       const parties = [subject].concat(namesHere(t).filter(m => m !== subject));
       const by = parties.find(m => canRelay(m) && namedIn(String(t), [m]));
-      if (by){ relayEmote(by, t, subject); return; }
+      if (by){
+        relayEmote(by, t, subject);
+        const seen = sightOf(by) ? new Set(audience(by, "see")) : null;
+        for (const m of parties) if (m !== by && seen && !seen.has(m)) privateTo(m, t, "emote");
+        return;
+      }
       // 2. otherwise: the speaker spot near them, or privately to whoever's near them. No walkin' over.
       if (speakersOn() && speakerSend(subject, t, "emote")) return;
       if (CFG.SPEAKER_MODE !== "walk" && speakerSend(subject, t, "emote")) return;
@@ -256,6 +261,12 @@
     state.relays.delete(id);
     if (!speakerSend(r.subject, r.text, "emote")) for (const c of splitMessage(r.text, 900)) enqueue({ Content:"*"+c, Type:"Emote" });
   }
+  // one line, privately, drawn in their chat (Companion) or whispered out-of-character
+  function privateTo(mn, text, kind){
+    const line = (kind === "emote" ? "*" : "")+String(text);
+    if (hasCompanion(mn)) enqueue(makeMsg("roomline", { text: line, kind }, mn));
+    else for (const part of splitMessage(line, 900)) enqueue({ Content: "("+part.replace(/\)/g, "]"), Type:"Whisper", Target: mn });
+  }
   // an announcement about nobody in particular, on a map: privately to everybody here
   function toEveryone(text, kind, urgent){
     const line = (kind === "emote" ? "*" : "")+String(text);
@@ -283,7 +294,9 @@
     const R = CFG.SPEAKER_RANGE;
     const named = here.map(c => c.MemberNumber).filter(m => namedIn(String(text), [m]));
     const who = new Set([anchor].concat(named));
-    for (const c of here) if (dist(c.MapData.Pos, spot) <= R || dist(c.MapData.Pos, at) <= R) who.add(c.MemberNumber);
+    // their Companion said exactly who can see (or hear) them: those people. Otherwise everyone within range.
+    if (sightOf(anchor) && !speakersOn()) for (const m of audience(anchor, kind === "chat" ? "hear" : "see")) who.add(m);
+    else for (const c of here) if (dist(c.MapData.Pos, spot) <= R || dist(c.MapData.Pos, at) <= R) who.add(c.MemberNumber);
     const line = (kind === "emote" ? "*" : "")+String(text);
     for (const mn of who){
       if (hasCompanion(mn)) enqueue(makeMsg("roomline", { text: line, kind }, mn), urgent);
@@ -352,8 +365,10 @@
     const mn = m.from;
     if (!mn) return;
     if (m.type === "relayNo"){ relayRefused(m.id); return; }
+    if (m.type === "sight"){ onSight(mn, m); return; }
+    if (m.type === "leadOk" || m.type === "leadNo"){ leadAnswer(mn, m); return; }
     if (m.type === "hello"){
-      state.companions.set(mn, { at:Date.now(), ver:String(m.ver||"?"), relay: m.relay !== false });
+      state.companions.set(mn, { at:Date.now(), ver:String(m.ver||"?"), relay: m.relay !== false, off: (m.off && typeof m.off === "object") ? m.off : {} });
       log("Companion hello from "+mn+" (v"+(m.ver||"?")+")");
       enqueue(makeMsg("welcome", { ver:VERSION, proto:PROTOCOL, name:plainName(mn), staff:isStaff(mn) }, mn));
       later(()=>syncCompanions(), 800);

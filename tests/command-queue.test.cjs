@@ -40,7 +40,7 @@ const beepsTo=(k,mn)=>sent.slice(k).filter(([e,d])=>e==='AccountBeep'&&d.MemberN
   await wait(4000); await drain();
   const got=beepsTo(k,500);
   ok(got.length>=6, 'six quick commands all answered ('+got.length+' beeps)');
-  const firstKeys=got.findIndex(m=>/^🔑 Moo/.test(m)), firstRules=got.findIndex(m=>/HOUSE RULES/.test(m));
+  const firstKeys=got.findIndex(m=>/^Moo Livestock/.test(m)), firstRules=got.findIndex(m=>/HOUSE RULES/.test(m));
   ok(firstKeys>=0 && firstRules>firstKeys, 'in the order they were sent');
   // 2. a flood: past ten waiting, they are told to slow down
   W.__cfg.USER_COOLDOWN_S=30;

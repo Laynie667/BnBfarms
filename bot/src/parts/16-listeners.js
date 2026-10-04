@@ -15,7 +15,7 @@
           // a Companion runnin' on the bot's own account talks to the bot like any other panel;
           // everything else from the bot is its own echo, ignored
           const own = data.Type === "Hidden" && readMsg(data);
-          if (own && ["hello","bye","cmd","outfitSave","outfitAnswer","relayNo"].includes(own.type)) onCompanion(own);
+          if (own && ["hello","bye","cmd","outfitSave","outfitAnswer","relayNo","sight","leadOk","leadNo"].includes(own.type)) onCompanion(own);
           return;
         }
 
@@ -42,6 +42,7 @@
 
         if (data.Sender) state.lastSpoke.set(data.Sender, Date.now());
         if (data.Type === "Activity" && data.Content === "BCPAction"){ try { onBCPAction(data); } catch(e){ warn("bc+:",e); } return; }
+        if (data.Type === "Activity" && /^(Orgasm\d|OrgasmResist|OrgasmFail)/.test(String(data.Content||""))){ try { onClimax(data.Sender, String(data.Content)); } catch(e){ warn("climax:",e); } addonsEmit("climax", data.Sender, String(data.Content)); return; }
         if (data.Type === "Activity"){ try { onActivity(data); } catch(e){ warn("activity:",e); } addonsEmit("activity", data); return; }
         if (data.Type === "Emote" || data.Type === "Chat"){ try { onRoleplay(data.Sender, String(data.Content||""), data.Type); } catch(e){ warn("rp:",e); } addonsEmit("roleplay", data.Sender, String(data.Content||""), data.Type); }
         if (data.Type!=="Chat" && data.Type!=="Whisper") return;

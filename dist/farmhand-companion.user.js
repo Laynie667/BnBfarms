@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.9.0
+// @version      0.10.0
 // @description  Your B&B Farm panel: the farm girl's answers, stat cards and guides, right in the game.
 // @author       Laynie & Alexia
 // @match        *://*.bondageprojects.elementfx.com/*
@@ -224,7 +224,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.9.0";
+  var VERSION = "0.10.0";
 
   // extension/src/config.js
   var BOT_MEMBER = 260239;
@@ -378,28 +378,28 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var cmdStem = (cmd) => cmd.replace(/\s*<.*$/, "").trim();
 
   // extension/src/views/common.js
-  function guidesTab(ctx, staff) {
-    const q2 = (ctx.ui.search || "").toLowerCase();
+  function guidesTab(ctx2, staff) {
+    const q2 = (ctx2.ui.search || "").toLowerCase();
     const groups = PUBLIC_GROUPS.concat(
       staff ? STAFF_GROUPS : [],
-      staff && ctx.s.proprietor ? OWNER_GROUPS : [],
-      (ctx.s.addonCmds || []).map((g) => ({ name: "🧩 " + g.name, cmds: (g.cmds || []).map(String) }))
+      staff && ctx2.s.proprietor ? OWNER_GROUPS : [],
+      (ctx2.s.addonCmds || []).map((g) => ({ name: "🧩 " + g.name, cmds: (g.cmds || []).map(String) }))
     );
     const shown = groups.map((g) => ({ name: g.name, cmds: g.cmds.filter((c) => !q2 || c.includes(q2) || g.name.toLowerCase().includes(q2)) })).filter((g) => g.cmds.length);
     const input2 = h("input", {
       class: "fhc-in",
       placeholder: "milk, breed, keys…",
-      value: ctx.ui.search || "",
-      oninput: (e) => ctx.setUi({ search: e.target.value }, true)
+      value: ctx2.ui.search || "",
+      oninput: (e) => ctx2.setUi({ search: e.target.value }, true)
     });
     return [
       h("label", { class: "fhc-label" }, "Search guides and commands", input2),
-      h("div", null, BOOKS.map(([label, cmd]) => btn(label, () => ctx.send(cmd), true))),
+      h("div", null, BOOKS.map(([label, cmd]) => btn(label, () => ctx2.send(cmd), true))),
       shown.map((g) => card(title(g.name), h("div", null, g.cmds.map((c) => h("button", {
         type: "button",
         class: "fhc-cmd",
         title: needsInput(c) ? "Fill in the rest, then send" : "Send it",
-        onclick: () => needsInput(c) ? ctx.fillBox(cmdStem(c) + " ") : ctx.send(c)
+        onclick: () => needsInput(c) ? ctx2.fillBox(cmdStem(c) + " ") : ctx2.send(c)
       }, "?" + c))))),
       staff ? null : muted("Staff see their own commands on the Staff panel.")
     ];
@@ -419,8 +419,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
   // extension/src/views/livestock.js
   var pct = (a, b) => b ? 100 * a / b : 0;
   var hoursLeft = (t) => Math.max(0, Math.ceil((t - Date.now()) / 36e5));
-  function me(ctx) {
-    const s = ctx.s;
+  function me(ctx2) {
+    const s = ctx2.s;
     const chips = [
       s.tier && chip(s.tier, "acc"),
       s.species && chip(s.species),
@@ -453,7 +453,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
         { class: "fhc-grid" },
         [["Used today", s.today.tally], ["Naughty marks", s.today.naughty], ["Praised", s.today.praised]].map(([k, v]) => h("div", null, muted(k), h("div", { style: { fontWeight: 600 } }, v)))
       )),
-      h("div", { class: "fhc-quick" }, ["stats", "measure", "record", "pedigree", "keys"].map((c) => btn(c[0].toUpperCase() + c.slice(1), () => ctx.send(c))))
+      h("div", { class: "fhc-quick" }, ["stats", "measure", "record", "pedigree", "keys"].map((c) => btn(c[0].toUpperCase() + c.slice(1), () => ctx2.send(c))))
     ];
   }
   function gearCard(s) {
@@ -474,8 +474,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
       g.funnel && h("div", { class: "fhc-kv" }, h("span", null, "Funnel gag"), h("span", { class: "fhc-muted" }, "fitted, and it counts as open"))
     );
   }
-  function milking(ctx) {
-    const s = ctx.s;
+  function milking(ctx2) {
+    const s = ctx2.s;
     if (!s.milk && !s.semen) return [card(title("Milking"), muted("You're not makin' milk right now. Flip Milkable on in Toggles if you'd like to."))];
     return [
       s.milk && card(
@@ -492,11 +492,11 @@ One of mods you are using is using an old version of SDK. It will work for now b
         title("Milkin' stall"),
         chip(Math.max(0, Math.round((s.stallUntil - Date.now()) / 6e4)) + " min left", "acc")
       ), muted("It drains you down to a quarter of what you hold, then lets go.")),
-      h("div", null, btn("Quota", () => ctx.send("quota")), btn("Milk board", () => ctx.send("board")))
+      h("div", null, btn("Quota", () => ctx2.send("quota")), btn("Milk board", () => ctx2.send("board")))
     ];
   }
-  function breeding(ctx) {
-    const s = ctx.s, sw = s.switches || {};
+  function breeding(ctx2) {
+    const s = ctx2.s, sw = s.switches || {};
     const rows = [
       ["Breedable", sw.breedable],
       ["Fertile", sw.fertile],
@@ -511,14 +511,14 @@ One of mods you are using is using an old version of SDK. It will work for now b
         s.heatUntil && muted("🔥 In heat · " + hoursLeft(s.heatUntil) + " h left"),
         s.preg && muted("🍼 Carryin' for " + s.preg.sires.join(" & "))
       ),
-      h("div", null, btn("My tally", () => ctx.send("tally")), btn("Eggs", () => ctx.send("eggs")), btn("Wash up", () => ctx.send("wash")), btn("Pedigree", () => ctx.send("pedigree")))
+      h("div", null, btn("My tally", () => ctx2.send("tally")), btn("Eggs", () => ctx2.send("eggs")), btn("Wash up", () => ctx2.send("wash")), btn("Pedigree", () => ctx2.send("pedigree")))
     ];
   }
-  function inbox(ctx) {
-    const f = ctx.ui.filter || "all";
-    const items = ctx.feed.filter((x) => f === "all" || x.kind === f);
+  function inbox(ctx2) {
+    const f = ctx2.ui.filter || "all";
+    const items = ctx2.feed.filter((x) => f === "all" || x.kind === f);
     return [
-      h("div", null, [["all", "All"], ["notice", "From the farm"], ["reply", "Answers"], ["mine", "You asked"]].map(([id, label]) => h("button", { type: "button", class: "fhc-pill" + (f === id ? " on" : ""), onclick: () => ctx.setUi({ filter: id }) }, label))),
+      h("div", null, [["all", "All"], ["notice", "From the farm"], ["reply", "Answers"], ["mine", "You asked"]].map(([id, label]) => h("button", { type: "button", class: "fhc-pill" + (f === id ? " on" : ""), onclick: () => ctx2.setUi({ filter: id }) }, label))),
       items.length ? items.slice().reverse().map((x) => h(
         "div",
         { class: "fhc-card " + x.kind },
@@ -542,15 +542,15 @@ One of mods you are using is using an old version of SDK. It will work for now b
     ["hypno", "Hypno", "Let your herd leader's voice lines reach you, privately"]
   ];
   var NEEDS = { freeuse: ["breedable", "Turn Breedable on first"] };
-  function farmSwitches(ctx, list) {
-    const sw = ctx.s.switches || {};
+  function farmSwitches(ctx2, list) {
+    const sw = ctx2.s.switches || {};
     return list.map(([cmd, label, desc]) => {
       const need = NEEDS[cmd];
-      if (need && !sw[need[0]] && !sw[cmd]) return toggle(label, need[1] + " · " + desc, false, () => ctx.send(cmd + " on"));
-      return toggle(label, desc, !!sw[cmd], () => ctx.send(cmd + " " + (sw[cmd] ? "off" : "on")));
+      if (need && !sw[need[0]] && !sw[cmd]) return toggle(label, need[1] + " · " + desc, false, () => ctx2.send(cmd + " on"));
+      return toggle(label, desc, !!sw[cmd], () => ctx2.send(cmd + " " + (sw[cmd] ? "off" : "on")));
     });
   }
-  function panelPrefs(ctx) {
+  function panelPrefs(ctx2) {
     return card(
       title("This panel"),
       muted("Only on your computer."),
@@ -560,33 +560,45 @@ One of mods you are using is using an old version of SDK. It will work for now b
         ["chime", "Chime on notices", "A soft sound when the farm messages you"],
         ["popopen", "Open on new notice", "Pop the panel open by itself"],
         ["btnPinned", "Pin the 🌾 button", "Unpinned, you can drag it anywhere (mouse or finger). Pin it so it stays put."]
-      ].map(([k, label, desc]) => toggle(label, desc, !!ctx.prefs[k], () => ctx.setPref(k, !ctx.prefs[k]))),
+      ].map(([k, label, desc]) => toggle(label, desc, !!ctx2.prefs[k], () => ctx2.setPref(k, !ctx2.prefs[k]))),
       toggle(
         "Farm emotes about me come from me",
         "Belly kicks, milkin', breedin'… are posted as your own emote (no name in front), so the people who can see you see them and the farm girl needn't move. Only lines about you.",
-        !ctx.prefs.noRelay,
+        !ctx2.prefs.noRelay,
         () => {
-          ctx.setPref("noRelay", !ctx.prefs.noRelay);
-          ctx.api.rehello && ctx.api.rehello();
+          ctx2.setPref("noRelay", !ctx2.prefs.noRelay);
+          ctx2.api.rehello && ctx2.api.rehello();
         }
       ),
-      btn("Put the button and panel back in the corner", () => ctx.resetPlaces && ctx.resetPlaces())
+      // the farm's little cues on your own screen (cues.js); each one on unless you switch it off
+      [
+        ["noLead", "Lead me instead of teleportin'", "When the farm moves you (feedin' time, the stocks, a summon), you walk there yourself, step by step"],
+        ["noFace", "Farm can set my face", "Dazed when milk-drunk, flushed in heat, a trance stare… for a little while"],
+        ["noSound", "Farm sounds", "The pump, the stall door, the feedin' bell. Only you hear them, at your game volume"],
+        ["noTrance", "Trance haze", "A soft haze at the edges of your screen during conditioning sessions"],
+        ["noFeelings", "Private feelings", "Now and then, a line only you see about what you're feelin' (your gear, your arousal, how full you are)"],
+        ["noMarkers", "Map markers (staff)", "Small badges over stock on your map: M needs milkin', H in heat, B expectin', X teats capped"]
+      ].map(([k, label, desc]) => toggle(label, desc, !ctx2.prefs[k], () => {
+        ctx2.setPref(k, !ctx2.prefs[k]);
+        ctx2.api.rehello && ctx2.api.rehello();
+      })),
+      btn("Put the button and panel back in the corner", () => ctx2.resetPlaces && ctx2.resetPlaces())
     );
   }
-  function toggles(ctx) {
+  function toggles(ctx2) {
     return [
-      card(title("Farm settings"), muted("Saved by the farm girl. Your limits still win."), farmSwitches(ctx, SWITCH_INFO)),
+      card(title("Farm settings"), muted("Saved by the farm girl. Your limits still win."), farmSwitches(ctx2, SWITCH_INFO)),
       card(
         title("Gender"),
         muted("How the farm sees you. It picks your farm outfit."),
-        h("div", { style: { marginTop: "6px" } }, ["female", "male", "futa", "femboy"].map((g) => h("button", { type: "button", class: "fhc-pill" + (ctx.s.gender === g ? " on" : ""), onclick: () => ctx.send("gender " + g) }, g)))
+        h("div", { style: { marginTop: "6px" } }, ["female", "male", "futa", "femboy"].map((g) => h("button", { type: "button", class: "fhc-pill" + (ctx2.s.gender === g ? " on" : ""), onclick: () => ctx2.send("gender " + g) }, g)))
       ),
-      ctx.api.hasBackup && ctx.api.hasBackup() ? card(
+      ctx2.api.hasBackup && ctx2.api.hasBackup() ? card(
         title("Farm outfit"),
         muted("The farm dressed you, and your own clothes are kept on this computer."),
-        btn("Change back into my own clothes", () => ctx.api.back && ctx.api.back())
+        btn("Change back into my own clothes", () => ctx2.api.back && ctx2.api.back())
       ) : null,
-      panelPrefs(ctx)
+      panelPrefs(ctx2)
     ];
   }
   var LIVESTOCK_TABS = [
@@ -594,24 +606,24 @@ One of mods you are using is using an old version of SDK. It will work for now b
     { id: "milk", label: "Milking", render: milking },
     { id: "breed", label: "Breeding", render: breeding },
     { id: "inbox", label: "Inbox", render: inbox },
-    { id: "guides", label: "Guides", render: (ctx) => guidesTab(ctx, false) },
+    { id: "guides", label: "Guides", render: (ctx2) => guidesTab(ctx2, false) },
     { id: "toggles", label: "Toggles", render: toggles }
   ];
 
   // extension/src/views/guest.js
   var GUEST_TABS = [
-    { id: "welcome", label: "Welcome", render: (ctx) => [
+    { id: "welcome", label: "Welcome", render: (ctx2) => [
       card(
-        h("div", { class: "fhc-title" }, "Howdy, " + (ctx.welcome.name || "sugar") + "!"),
+        h("div", { class: "fhc-title" }, "Howdy, " + (ctx2.welcome.name || "sugar") + "!"),
         h("p", null, "Welcome to B&B Farm. Everybody here chose to be here and signed to say so. Have a look around, mind the ruts, and holler if you need a hand."),
-        btn("Take the tour", () => ctx.send("tour"), true),
-        btn("Apply to join", () => ctx.send("apply")),
-        btn("Luxury stay", () => ctx.send("luxury"))
+        btn("Take the tour", () => ctx2.send("tour"), true),
+        btn("Apply to join", () => ctx2.send("apply")),
+        btn("Luxury stay", () => ctx2.send("luxury"))
       ),
       card(title("Your keys"), muted("Guests don't carry keys. Staff can let you through any door."))
     ] },
     { id: "farm", label: "The farm", render: () => AREAS.map(([n, key, d]) => card(h("div", { class: "fhc-kv" }, h("b", null, n), h("span", { class: "fhc-muted" }, key)), muted(d))) },
-    { id: "rules", label: "Rules", render: (ctx) => [
+    { id: "rules", label: "Rules", render: (ctx2) => [
       h(
         "div",
         { class: "fhc-box alert" },
@@ -619,11 +631,11 @@ One of mods you are using is using an old version of SDK. It will work for now b
         muted("Anywhere, from anybody. No contract overrides it. Beepin' the farm girl works from anywhere on the property, too.")
       ),
       card(title("On consent"), h("p", null, "Every animal and every hand here chose to be here, and signed for it. What you see in the pens, stalls and barn was asked for. The contract's a fence that holds both ways: what ain't in it, don't happen.")),
-      h("div", null, btn("Full rules", () => ctx.send("rules")), btn("Consent", () => ctx.send("consent")), btn("What opens what", () => ctx.send("doors")))
+      h("div", null, btn("Full rules", () => ctx2.send("rules")), btn("Consent", () => ctx2.send("consent")), btn("What opens what", () => ctx2.send("doors")))
     ] },
     { id: "inbox", label: "Inbox", render: inbox },
-    { id: "guides", label: "Guides", render: (ctx) => guidesTab(ctx, false) },
-    { id: "settings", label: "Settings", render: (ctx) => [card(title("Farm settings"), muted("Once you're on the books, your milkin', breedin' and teasin' switches show up here."), btn("Apply to join", () => ctx.send("apply"), true)), panelPrefs(ctx)] }
+    { id: "guides", label: "Guides", render: (ctx2) => guidesTab(ctx2, false) },
+    { id: "settings", label: "Settings", render: (ctx2) => [card(title("Farm settings"), muted("Once you're on the books, your milkin', breedin' and teasin' switches show up here."), btn("Apply to join", () => ctx2.send("apply"), true)), panelPrefs(ctx2)] }
   ];
 
   // shared/bcplus-rules.json
@@ -2215,11 +2227,11 @@ One of mods you are using is using an old version of SDK. It will work for now b
   // extension/src/views/staffdata.js
   var MAP = 40;
   var PX = 7;
-  function herd(ctx) {
-    const f = ctx.ui.herdF || "all", list = (ctx.s.herd || []).filter((x) => f === "all" || f === "mine" && x.mine || f === "milk" && x.milk !== null && x.milk >= 75 || f === "heat" && x.heat);
-    const act = (c, x) => () => ctx.send(c + " " + x.mn);
+  function herd(ctx2) {
+    const f = ctx2.ui.herdF || "all", list = (ctx2.s.herd || []).filter((x) => f === "all" || f === "mine" && x.mine || f === "milk" && x.milk !== null && x.milk >= 75 || f === "heat" && x.heat);
+    const act = (c, x) => () => ctx2.send(c + " " + x.mn);
     return [
-      h("div", null, [["all", "On the map"], ["mine", "My herd"], ["milk", "Needs milkin'"], ["heat", "In heat"]].map(([id, l]) => h("button", { type: "button", class: "fhc-pill" + (f === id ? " on" : ""), onclick: () => ctx.setUi({ herdF: id }) }, l))),
+      h("div", null, [["all", "On the map"], ["mine", "My herd"], ["milk", "Needs milkin'"], ["heat", "In heat"]].map(([id, l]) => h("button", { type: "button", class: "fhc-pill" + (f === id ? " on" : ""), onclick: () => ctx2.setUi({ herdF: id }) }, l))),
       list.length ? list.map((x) => card(
         h("div", { class: "fhc-kv" }, h("b", null, x.name), h("span", { class: "fhc-muted" }, x.role + (x.where ? " · " + x.where : ""))),
         x.milk !== null ? h(
@@ -2248,17 +2260,17 @@ One of mods you are using is using an old version of SDK. It will work for now b
       )) : muted("Nobody matches right now.")
     ];
   }
-  function tease(ctx) {
-    const lines = ctx.s.tease;
+  function tease(ctx2) {
+    const lines = ctx2.s.tease;
     if (!lines) return [muted("Tease lines are for herdmasters and proprietors.")];
     return [
       card(
-        h("div", { class: "fhc-kv" }, title("Tease lines"), h("span", { class: "fhc-muted" }, lines.length + " lines · " + (ctx.s.teaseOpted || 0) + " opted in")),
+        h("div", { class: "fhc-kv" }, title("Tease lines"), h("span", { class: "fhc-muted" }, lines.length + " lines · " + (ctx2.s.teaseOpted || 0) + " opted in")),
         lines.length ? lines.map((t, i) => h(
           "div",
           { class: "fhc-kv" },
           h("span", null, h("b", null, i + 1 + ". "), t),
-          h("button", { type: "button", class: "fhc-b", onclick: () => ctx.send("tease remove " + (i + 1)) }, "Remove")
+          h("button", { type: "button", class: "fhc-b", onclick: () => ctx2.send("tease remove " + (i + 1)) }, "Remove")
         )) : muted("No lines yet.")
       ),
       card(
@@ -2266,25 +2278,25 @@ One of mods you are using is using an old version of SDK. It will work for now b
           "label",
           { class: "fhc-label" },
           "New line · %name% becomes their name",
-          h("textarea", { class: "fhc-in", rows: 2, oninput: (e) => ctx.setUi({ teaseDraft: e.target.value }, true) }, ctx.ui.teaseDraft || "")
+          h("textarea", { class: "fhc-in", rows: 2, oninput: (e) => ctx2.setUi({ teaseDraft: e.target.value }, true) }, ctx2.ui.teaseDraft || "")
         ),
         btn("Add line", () => {
-          const t = (ctx.ui.teaseDraft || "").trim();
-          if (!t) return ctx.hint("Write the line first.");
-          ctx.send("tease add " + t);
-          ctx.setUi({ teaseDraft: "" });
+          const t = (ctx2.ui.teaseDraft || "").trim();
+          if (!t) return ctx2.hint("Write the line first.");
+          ctx2.send("tease add " + t);
+          ctx2.setUi({ teaseDraft: "" });
         }, true)
       )
     ];
   }
   var COLORS = ["#8fbf6a", "#c9a35b", "#b8403a", "#7fa8c9", "#c48bd9", "#d98c6a"];
-  function zones(ctx) {
-    const zs = ctx.s.zones;
+  function zones(ctx2) {
+    const zs = ctx2.s.zones;
     if (!zs) return [muted("Zones are for herdmasters and proprietors.")];
     const groups = [...new Set(Object.values(zs).map((z) => z.group))];
     const color = (g) => COLORS[groups.indexOf(g) % COLORS.length];
-    const sel = ctx.ui.zone && zs[ctx.ui.zone] ? ctx.ui.zone : Object.keys(zs)[0];
-    const name = () => (ctx.ui.zoneName || sel || "").trim().toLowerCase();
+    const sel = ctx2.ui.zone && zs[ctx2.ui.zone] ? ctx2.ui.zone : Object.keys(zs)[0];
+    const name = () => (ctx2.ui.zoneName || sel || "").trim().toLowerCase();
     return [
       card(
         title("Farm map"),
@@ -2295,7 +2307,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
             type: "button",
             title: n,
             "aria-label": n,
-            onclick: () => ctx.setUi({ zone: n }),
+            onclick: () => ctx2.setUi({ zone: n }),
             style: {
               position: "absolute",
               padding: "0",
@@ -2308,7 +2320,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
             }
           })),
           // spots: little dots, hover for the name
-          Object.entries(ctx.s.spots || {}).filter(([, p]) => p && Number.isFinite(p.X)).map(([n, p]) => h("span", {
+          Object.entries(ctx2.s.spots || {}).filter(([, p]) => p && Number.isFinite(p.X)).map(([n, p]) => h("span", {
             title: n + " · " + p.X + "," + p.Y,
             style: {
               position: "absolute",
@@ -2328,38 +2340,38 @@ One of mods you are using is using an old version of SDK. It will work for now b
         title("Zones"),
         Object.keys(zs).length ? Object.entries(zs).map(([n, z]) => h(
           "button",
-          { type: "button", class: "fhc-doc" + (n === sel ? " on" : ""), style: { width: "100%", marginBottom: "4px" }, onclick: () => ctx.setUi({ zone: n }) },
+          { type: "button", class: "fhc-doc" + (n === sel ? " on" : ""), style: { width: "100%", marginBottom: "4px" }, onclick: () => ctx2.setUi({ zone: n }) },
           h("b", null, n),
           h("div", { class: "fhc-muted" }, "part of " + z.group + " · A " + (z.a ? z.a.X + "," + z.a.Y : "—") + " → B " + (z.b ? z.b.X + "," + z.b.Y : "—"))
         )) : muted("No zones yet."),
-        btn("Who's where", () => ctx.send("zone who"))
+        btn("Who's where", () => ctx2.send("zone who"))
       ),
       card(
         title(sel ? "Editin' " + sel : "New zone"),
-        h("label", { class: "fhc-label" }, "Zone name (one word)", h("input", { class: "fhc-in", value: ctx.ui.zoneName || sel || "", oninput: (e) => ctx.setUi({ zoneName: e.target.value }, true) })),
+        h("label", { class: "fhc-label" }, "Zone name (one word)", h("input", { class: "fhc-in", value: ctx2.ui.zoneName || sel || "", oninput: (e) => ctx2.setUi({ zoneName: e.target.value }, true) })),
         h("div", null, btn("Draw it on the map", () => {
           const n = name();
-          if (!n) return ctx.hint("Name the zone first.");
-          ctx.api.pickTiles(2, "zone '" + n + "'", ([a, b]) => ctx.send("zone box " + n + " " + a.X + " " + a.Y + " " + b.X + " " + b.Y));
+          if (!n) return ctx2.hint("Name the zone first.");
+          ctx2.api.pickTiles(2, "zone '" + n + "'", ([a, b]) => ctx2.send("zone box " + n + " " + a.X + " " + a.Y + " " + b.X + " " + b.Y));
         }, true)),
         muted("Or walk it: stand on one corner, then the other."),
-        h("div", null, btn("Set A where I stand", () => name() ? ctx.send("zone a " + name()) : ctx.hint("Name the zone first.")), btn("Set B where I stand", () => name() ? ctx.send("zone b " + name()) : ctx.hint("Name the zone first."))),
-        h("label", { class: "fhc-label" }, "Pair with (one place, odd shapes)", h("input", { class: "fhc-in", placeholder: "barn", value: ctx.ui.zonePair || "", oninput: (e) => ctx.setUi({ zonePair: e.target.value }, true) })),
+        h("div", null, btn("Set A where I stand", () => name() ? ctx2.send("zone a " + name()) : ctx2.hint("Name the zone first.")), btn("Set B where I stand", () => name() ? ctx2.send("zone b " + name()) : ctx2.hint("Name the zone first."))),
+        h("label", { class: "fhc-label" }, "Pair with (one place, odd shapes)", h("input", { class: "fhc-in", placeholder: "barn", value: ctx2.ui.zonePair || "", oninput: (e) => ctx2.setUi({ zonePair: e.target.value }, true) })),
         h(
           "div",
           null,
-          btn("Pair", () => name() && ctx.ui.zonePair ? ctx.send("zone pair " + name() + " " + ctx.ui.zonePair.trim().toLowerCase()) : ctx.hint("Name the zone, and the place to pair it with.")),
-          btn("Unpair", () => name() ? ctx.send("zone unpair " + name()) : ctx.hint("Name the zone first.")),
-          btn("Delete", () => name() ? ctx.send("zone clear " + name()) : ctx.hint("Name the zone first."))
+          btn("Pair", () => name() && ctx2.ui.zonePair ? ctx2.send("zone pair " + name() + " " + ctx2.ui.zonePair.trim().toLowerCase()) : ctx2.hint("Name the zone, and the place to pair it with.")),
+          btn("Unpair", () => name() ? ctx2.send("zone unpair " + name()) : ctx2.hint("Name the zone first.")),
+          btn("Delete", () => name() ? ctx2.send("zone clear " + name()) : ctx2.hint("Name the zone first."))
         )
       ),
-      spotsCard(ctx)
+      spotsCard(ctx2)
     ];
   }
-  function spotsCard(ctx) {
-    const sp = Object.entries(ctx.s.spots || {});
-    const nm = () => (ctx.ui.spotName || "").trim().toLowerCase();
-    const ok = () => /^[a-z][a-z0-9_-]{1,19}$/.test(nm()) || (ctx.hint("Give the spot a one-word name, like speaker-barn, trough-1 or glory-1."), false);
+  function spotsCard(ctx2) {
+    const sp = Object.entries(ctx2.s.spots || {});
+    const nm = () => (ctx2.ui.spotName || "").trim().toLowerCase();
+    const ok = () => /^[a-z][a-z0-9_-]{1,19}$/.test(nm()) || (ctx2.hint("Give the spot a one-word name, like speaker-barn, trough-1 or glory-1."), false);
     return card(
       title("Spots"),
       muted("home · speaker-… (the bot talks from these) · trough-… · water-… · glory-1 and glory-1-visitor · placard-…"),
@@ -2370,20 +2382,20 @@ One of mods you are using is using an old version of SDK. It will work for now b
         h(
           "span",
           null,
-          h("button", { type: "button", class: "fhc-b", onclick: () => ctx.setUi({ spotName: n }) }, "Pick"),
-          h("button", { type: "button", class: "fhc-b", onclick: () => ctx.send("spot clear " + n) }, "Clear")
+          h("button", { type: "button", class: "fhc-b", onclick: () => ctx2.setUi({ spotName: n }) }, "Pick"),
+          h("button", { type: "button", class: "fhc-b", onclick: () => ctx2.send("spot clear " + n) }, "Clear")
         )
       )) : muted("No spots yet."),
-      h("label", { class: "fhc-label" }, "Spot name", h("input", { class: "fhc-in", placeholder: "speaker-barn", value: ctx.ui.spotName || "", oninput: (e) => ctx.setUi({ spotName: e.target.value }, true) })),
+      h("label", { class: "fhc-label" }, "Spot name", h("input", { class: "fhc-in", placeholder: "speaker-barn", value: ctx2.ui.spotName || "", oninput: (e) => ctx2.setUi({ spotName: e.target.value }, true) })),
       h(
         "div",
         null,
         btn("Click it on the map", () => {
           if (!ok()) return;
           const n = nm();
-          ctx.api.pickTiles(1, "spot '" + n + "'", ([p]) => ctx.send("spot place " + n + " " + p.X + " " + p.Y));
+          ctx2.api.pickTiles(1, "spot '" + n + "'", ([p]) => ctx2.send("spot place " + n + " " + p.X + " " + p.Y));
         }, true),
-        btn("Set where I stand", () => ok() && ctx.send("spot set " + nm()))
+        btn("Set where I stand", () => ok() && ctx2.send("spot set " + nm()))
       ),
       // clearin' old ones: everything with a name startin' like the box (speaker- clears every speaker), or all, with a second press
       sp.length ? h(
@@ -2391,20 +2403,20 @@ One of mods you are using is using an old version of SDK. It will work for now b
         { style: { marginTop: "6px" } },
         btn("Clear all startin' with the name", () => {
           const n = nm();
-          if (!n) return ctx.hint("Type the start of the names first, like speaker-");
-          ctx.send("spot clear " + n + "*");
+          if (!n) return ctx2.hint("Type the start of the names first, like speaker-");
+          ctx2.send("spot clear " + n + "*");
         }),
-        ctx.s.proprietor && (ctx.ui.clearAllSpots ? btn("Yes, clear all " + sp.length + " spots", () => {
-          ctx.setUi({ clearAllSpots: false });
-          ctx.send("spot clear all yes");
-        }, true) : btn("Clear all spots…", () => ctx.setUi({ clearAllSpots: true })))
+        ctx2.s.proprietor && (ctx2.ui.clearAllSpots ? btn("Yes, clear all " + sp.length + " spots", () => {
+          ctx2.setUi({ clearAllSpots: false });
+          ctx2.send("spot clear all yes");
+        }, true) : btn("Clear all spots…", () => ctx2.setUi({ clearAllSpots: true })))
       ) : null
     );
   }
-  function voice(ctx) {
-    const v = ctx.s.voice;
+  function voice(ctx2) {
+    const v = ctx2.s.voice;
     if (!v) return [muted("Listen to my voice is for herd leaders.")];
-    const target = ctx.ui.vTarget || "herd";
+    const target = ctx2.ui.vTarget || "herd";
     const member = v.members.find((m) => String(m.mn) === String(target));
     const cur = target === "herd" ? v.herd : member || { on: false, lines: [], every: "15" };
     const who = target === "herd" ? "herd" : String(target);
@@ -2419,16 +2431,16 @@ One of mods you are using is using an old version of SDK. It will work for now b
             class: "fhc-sw" + (cur.on ? " on" : ""),
             "aria-pressed": cur.on ? "true" : "false",
             "aria-label": "Voice on or off",
-            onclick: () => ctx.send("voice " + (cur.on ? "off" : "on") + " " + who)
+            onclick: () => ctx2.send("voice " + (cur.on ? "off" : "on") + " " + who)
           }, h("span"))
         ),
         h(
           "div",
           { style: { marginTop: "6px" } },
-          h("button", { type: "button", class: "fhc-pill" + (target === "herd" ? " on" : ""), onclick: () => ctx.setUi({ vTarget: "herd" }) }, "Whole herd"),
+          h("button", { type: "button", class: "fhc-pill" + (target === "herd" ? " on" : ""), onclick: () => ctx2.setUi({ vTarget: "herd" }) }, "Whole herd"),
           v.members.map((m) => h(
             "button",
-            { type: "button", class: "fhc-pill" + (String(target) === String(m.mn) ? " on" : ""), onclick: () => ctx.setUi({ vTarget: m.mn }) },
+            { type: "button", class: "fhc-pill" + (String(target) === String(m.mn) ? " on" : ""), onclick: () => ctx2.setUi({ vTarget: m.mn }) },
             m.name + (m.hypno ? "" : " (no ?hypno)")
           ))
         ),
@@ -2436,18 +2448,18 @@ One of mods you are using is using an old version of SDK. It will work for now b
           "div",
           { class: "fhc-kv" },
           h("i", { style: { color: "#c9a3e6" } }, "[Voice] " + l),
-          h("button", { type: "button", class: "fhc-b", onclick: () => ctx.send("voice remove " + who + " " + (i + 1)) }, "Remove")
+          h("button", { type: "button", class: "fhc-b", onclick: () => ctx2.send("voice remove " + who + " " + (i + 1)) }, "Remove")
         )) : muted("No lines yet."),
-        h("label", { class: "fhc-label" }, "New line · %name% works", h("input", { class: "fhc-in", maxlength: 200, value: ctx.ui.vDraft || "", oninput: (e) => ctx.setUi({ vDraft: e.target.value }, true) })),
+        h("label", { class: "fhc-label" }, "New line · %name% works", h("input", { class: "fhc-in", maxlength: 200, value: ctx2.ui.vDraft || "", oninput: (e) => ctx2.setUi({ vDraft: e.target.value }, true) })),
         btn("Add", () => {
-          const t = (ctx.ui.vDraft || "").trim();
-          if (!t) return ctx.hint("Write the line first.");
-          ctx.send("voice add " + who + " " + t);
-          ctx.setUi({ vDraft: "" });
+          const t = (ctx2.ui.vDraft || "").trim();
+          if (!t) return ctx2.hint("Write the line first.");
+          ctx2.send("voice add " + who + " " + t);
+          ctx2.setUi({ vDraft: "" });
         }, true),
         h("label", { class: "fhc-label" }, "How often", h(
           "select",
-          { class: "fhc-sel", onchange: (e) => ctx.send("voice every " + who + " " + e.target.value) },
+          { class: "fhc-sel", onchange: (e) => ctx2.send("voice every " + who + " " + e.target.value) },
           [["5", "Every 5 minutes"], ["15", "Every 15 minutes"], ["30", "Every 30 minutes"], ["chores", "Only during milkin' and chores"]].map(([k, l]) => h("option", { value: k, selected: String(cur.every) === k ? "selected" : null }, l))
         ))
       ),
@@ -2462,14 +2474,14 @@ One of mods you are using is using an old version of SDK. It will work for now b
       )
     ];
   }
-  function shift(ctx) {
-    const sh = ctx.s.shift || {};
+  function shift(ctx2) {
+    const sh = ctx2.s.shift || {};
     return [
       card(h(
         "div",
         { class: "fhc-kv" },
         h("div", null, title("Your shift"), muted((sh.clocked ? "On the clock" : "Off the clock") + " · " + (sh.weekH || 0) + " h this week")),
-        btn(sh.clocked ? "Clock out" : "Clock in", () => ctx.send(sh.clocked ? "clockout" : "clockin"), !sh.clocked)
+        btn(sh.clocked ? "Clock out" : "Clock in", () => ctx2.send(sh.clocked ? "clockout" : "clockin"), !sh.clocked)
       )),
       card(title("On duty"), (sh.onDuty || []).length ? sh.onDuty.map((n) => chip(n)) : muted("Nobody on duty here.")),
       card(
@@ -2477,31 +2489,31 @@ One of mods you are using is using an old version of SDK. It will work for now b
         muted("Mandated farmhands, plus staff who switched it on. Only these can be pulled in from other rooms."),
         (sh.onCall || []).length ? sh.onCall.map((o) => chip(o.name + (o.mandated ? " · mandated" : "") + (o.here ? " · here" : " · away"), o.here ? "good" : null)) : muted("Nobody's on call.")
       ),
-      ctx.s.log && card(title("Farm log"), ctx.s.log.map((e) => h(
+      ctx2.s.log && card(title("Farm log"), ctx2.s.log.map((e) => h(
         "div",
         { class: "fhc-kv", style: { fontFamily: "ui-monospace,Consolas,monospace", fontSize: "11px" } },
         h("span", { class: "fhc-muted" }, new Date(e.t).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })),
         h("span", { style: { color: "var(--fh-accent)" } }, e.a),
         h("span", null, e.by + (e.d ? " · " + e.d : ""))
       ))),
-      h("div", null, btn("Hours", () => ctx.send("hours")), btn("Chores", () => ctx.send("chores")), btn("Spin the wheel", () => ctx.send("spin")))
+      h("div", null, btn("Hours", () => ctx2.send("hours")), btn("Chores", () => ctx2.send("chores")), btn("Spin the wheel", () => ctx2.send("spin")))
     ];
   }
 
   // extension/src/views/staff.js
-  function latest(ctx) {
-    const r = ctx.feed.filter((x) => x.kind === "reply").slice(-1)[0];
+  function latest(ctx2) {
+    const r = ctx2.feed.filter((x) => x.kind === "reply").slice(-1)[0];
     return r ? card(title("Latest answer"), h("div", { class: "fhc-card" }, r.text)) : null;
   }
   var field = (label, input2) => h("label", { class: "fhc-label" }, label, input2);
-  var input = (ph, key, ctx) => h("input", { class: "fhc-in", placeholder: ph, value: ctx.ui[key] || "", oninput: (e) => ctx.setUi({ [key]: e.target.value }, true) });
-  var select = (key, opts, ctx) => h(
+  var input = (ph, key, ctx2) => h("input", { class: "fhc-in", placeholder: ph, value: ctx2.ui[key] || "", oninput: (e) => ctx2.setUi({ [key]: e.target.value }, true) });
+  var select = (key, opts, ctx2) => h(
     "select",
-    { class: "fhc-sel", onchange: (e) => ctx.setUi({ [key]: e.target.value }, true) },
-    opts.map(([v, l]) => h("option", { value: v, selected: (ctx.ui[key] || opts[0][0]) === v ? "selected" : null }, l))
+    { class: "fhc-sel", onchange: (e) => ctx2.setUi({ [key]: e.target.value }, true) },
+    opts.map(([v, l]) => h("option", { value: v, selected: (ctx2.ui[key] || opts[0][0]) === v ? "selected" : null }, l))
   );
-  function me2(ctx) {
-    const s = ctx.s;
+  function me2(ctx2) {
+    const s = ctx2.s;
     return [
       card(
         h("div", { class: "fhc-title" }, s.name),
@@ -2519,16 +2531,16 @@ One of mods you are using is using an old version of SDK. It will work for now b
           "div",
           { class: "fhc-kv" },
           h("div", null, title("Duty"), muted(s.onDuty ? "On duty · silver and gold keys out" : "Out to pasture · bronze key only · your Livestock panel is yours")),
-          s.pastureLock ? chip("kept out by " + s.pastureLock, "alert") : btn(s.onDuty ? "Go to pasture" : "Back on duty", () => ctx.send(s.onDuty ? "pasture" : "onduty"), !s.onDuty)
+          s.pastureLock ? chip("kept out by " + s.pastureLock, "alert") : btn(s.onDuty ? "Go to pasture" : "Back on duty", () => ctx2.send(s.onDuty ? "pasture" : "onduty"), !s.onDuty)
         ),
         muted("Pasture puts your silver and gold keys away, makes you livestock for the visit, and takes you off call (mandated staff stay summonable). It doesn't lock you out. Only a ?turnout from your herd leader does that.")
       ),
-      h("div", null, ["record", "hours", "myherd", "keys", "chores"].map((c) => btn(c[0].toUpperCase() + c.slice(1), () => ctx.send(c)))),
-      latest(ctx)
+      h("div", null, ["record", "hours", "myherd", "keys", "chores"].map((c) => btn(c[0].toUpperCase() + c.slice(1), () => ctx2.send(c)))),
+      latest(ctx2)
     ];
   }
-  function safeCards(ctx) {
-    const recent = ctx.feed.filter((x) => x.kind === "notice" && /SAFEWORD/.test(x.text) && Date.now() - x.at < 60 * 6e4 && !ctx.ui["done" + x.at]);
+  function safeCards(ctx2) {
+    const recent = ctx2.feed.filter((x) => x.kind === "notice" && /SAFEWORD/.test(x.text) && Date.now() - x.at < 60 * 6e4 && !ctx2.ui["done" + x.at]);
     return recent.map((x) => h(
       "div",
       { class: "fhc-box alert" },
@@ -2537,26 +2549,26 @@ One of mods you are using is using an old version of SDK. It will work for now b
       h(
         "div",
         { style: { marginTop: "8px" } },
-        btn("I'm goin' to them", () => ctx.send("where"), true),
-        btn("All okay, close it", () => ctx.setUi({ ["done" + x.at]: true }))
+        btn("I'm goin' to them", () => ctx2.send("where"), true),
+        btn("All okay, close it", () => ctx2.setUi({ ["done" + x.at]: true }))
       )
     ));
   }
-  function office(ctx) {
-    const docs = ctx.docs.slice().reverse();
-    const sel = docs.find((d) => d.id === ctx.ui.doc) || docs[0];
+  function office(ctx2) {
+    const docs = ctx2.docs.slice().reverse();
+    const sel = docs.find((d) => d.id === ctx2.ui.doc) || docs[0];
     return [
-      safeCards(ctx),
+      safeCards(ctx2),
       muted("Anything you look up about somebody else lands here, not in the chat: record, stats, vet, quota, keys, size, pedigree."),
       h("div", null, h("input", {
         class: "fhc-in",
         placeholder: "Look somebody up: vet Bessie",
-        value: ctx.ui.look || "",
-        oninput: (e) => ctx.setUi({ look: e.target.value }, true),
+        value: ctx2.ui.look || "",
+        oninput: (e) => ctx2.setUi({ look: e.target.value }, true),
         onkeydown: (e) => {
-          if (e.key === "Enter" && ctx.ui.look) {
-            ctx.send(ctx.ui.look);
-            ctx.setUi({ look: "" });
+          if (e.key === "Enter" && ctx2.ui.look) {
+            ctx2.send(ctx2.ui.look);
+            ctx2.setUi({ look: "" });
           }
         }
       })),
@@ -2565,7 +2577,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
         { class: "fhc-split" },
         h("div", { class: "fhc-docs" }, docs.map((d) => h(
           "button",
-          { type: "button", class: "fhc-doc" + (sel && d.id === sel.id ? " on" : ""), onclick: () => ctx.setUi({ doc: d.id }) },
+          { type: "button", class: "fhc-doc" + (sel && d.id === sel.id ? " on" : ""), onclick: () => ctx2.setUi({ doc: d.id }) },
           h("b", null, d.who),
           h("div", { class: "fhc-muted" }, d.kind + " · " + new Date(d.at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }))
         ))),
@@ -2573,67 +2585,67 @@ One of mods you are using is using an old version of SDK. It will work for now b
           "div",
           { class: "fhc-box", style: { flex: "1", minWidth: "0" } },
           h("div", { class: "fhc-card" }, sel.text),
-          h("div", { style: { marginTop: "8px" } }, btn("Refresh", () => ctx.send(sel.kind + " " + sel.about)), btn("Close", () => ctx.closeDoc(sel.id)))
+          h("div", { style: { marginTop: "8px" } }, btn("Refresh", () => ctx2.send(sel.kind + " " + sel.about)), btn("Close", () => ctx2.closeDoc(sel.id)))
         )
       ) : card(title("Nothin' on the desk"), muted("Try ?vet, ?record or ?stats with somebody's name."))
     ];
   }
-  function contracts(ctx) {
-    const tpl = () => (ctx.ui.ctTpl || "deep").trim(), who = () => (ctx.ui.ctWho || "").trim(), dur = () => ctx.ui.ctDur || "1w";
+  function contracts(ctx2) {
+    const tpl = () => (ctx2.ui.ctTpl || "deep").trim(), who = () => (ctx2.ui.ctWho || "").trim(), dur = () => ctx2.ui.ctDur || "1w";
     return [
       card(
         title("Offer a BC+ contract"),
         muted("They read it in their own BC+ and only sign if they want it. Herdmasters and proprietors can offer."),
-        field("Contract", h("input", { class: "fhc-in", value: ctx.ui.ctTpl || "deep", placeholder: "fun, deep, nhl, or one of yours", oninput: (e) => ctx.setUi({ ctTpl: e.target.value }, true) })),
-        field("For (name or member number, here in the room)", input("Bessie", "ctWho", ctx)),
-        field("How long", select("ctDur", DURATIONS.map((d) => [d.key, d.label]), ctx)),
+        field("Contract", h("input", { class: "fhc-in", value: ctx2.ui.ctTpl || "deep", placeholder: "fun, deep, nhl, or one of yours", oninput: (e) => ctx2.setUi({ ctTpl: e.target.value }, true) })),
+        field("For (name or member number, here in the room)", input("Bessie", "ctWho", ctx2)),
+        field("How long", select("ctDur", DURATIONS.map((d) => [d.key, d.label]), ctx2)),
         h(
           "div",
           null,
-          btn("Preview", () => ctx.send("contract show " + tpl() + (who() ? " " + who() : ""))),
-          btn("Offer it", () => who() ? ctx.send("contract offer " + tpl() + " " + who() + " " + dur()) : ctx.hint("Type who it's for first, in the For box."), true)
+          btn("Preview", () => ctx2.send("contract show " + tpl() + (who() ? " " + who() : ""))),
+          btn("Offer it", () => who() ? ctx2.send("contract offer " + tpl() + " " + who() + " " + dur()) : ctx2.hint("Type who it's for first, in the For box."), true)
         )
       ),
       card(
         title("In force"),
-        btn("List farm contracts", () => ctx.send("contract list")),
-        field("Somebody's contracts", input("Bessie", "ctLook", ctx)),
+        btn("List farm contracts", () => ctx2.send("contract list")),
+        field("Somebody's contracts", input("Bessie", "ctLook", ctx2)),
         h(
           "div",
           null,
-          btn("Ask their BC+", () => ctx.ui.ctLook ? ctx.send("contract check " + ctx.ui.ctLook) : ctx.hint("Type whose contracts first.")),
-          btn("Release", () => ctx.ui.ctLook ? ctx.send("contract release " + ctx.ui.ctLook) : ctx.hint("Type whose contract to release first."))
+          btn("Ask their BC+", () => ctx2.ui.ctLook ? ctx2.send("contract check " + ctx2.ui.ctLook) : ctx2.hint("Type whose contracts first.")),
+          btn("Release", () => ctx2.ui.ctLook ? ctx2.send("contract release " + ctx2.ui.ctLook) : ctx2.hint("Type whose contract to release first."))
         )
       ),
-      latest(ctx)
+      latest(ctx2)
     ];
   }
-  function barn(ctx) {
-    const who = () => (ctx.ui.barnWho || "").trim();
-    const act = (c) => () => who() ? ctx.send(c + " " + who()) : ctx.hint("Type who first, in the Who box.");
+  function barn(ctx2) {
+    const who = () => (ctx2.ui.barnWho || "").trim();
+    const act = (c) => () => who() ? ctx2.send(c + " " + who()) : ctx2.hint("Type who first, in the Who box.");
     return [
       card(
         title("Barn work"),
-        field("Who", input("Bessie", "barnWho", ctx)),
+        field("Who", input("Bessie", "barnWho", ctx2)),
         h("div", null, ["milk", "collect", "drain", "edge", "denial", "ruin", "inspect", "vet", "quota"].map((c) => btn(c[0].toUpperCase() + c.slice(1), act(c))))
       ),
       card(
         title("Jars"),
-        btn("The jar shelf", () => ctx.send("jars")),
+        btn("The jar shelf", () => ctx2.send("jars")),
         muted("To inseminate: ?inseminate <who> <jar> [hole]. They always get asked first, and anyone with jar insemination off can't be."),
-        h("div", null, btn("Inseminate…", () => ctx.fillBox("inseminate " + (who() ? who() + " " : ""))))
+        h("div", null, btn("Inseminate…", () => ctx2.fillBox("inseminate " + (who() ? who() + " " : ""))))
       ),
       card(
         title("Herd"),
-        h("div", null, ["myherd", "herdcall", "herdsummon", "roster", "stock", "queue"].map((c) => btn(c, () => ctx.send(c)))),
+        h("div", null, ["myherd", "herdcall", "herdsummon", "roster", "stock", "queue"].map((c) => btn(c, () => ctx2.send(c)))),
         h("div", null, btn("Summon to me", act("summon")), btn("Claim", act("claim")), btn("Turn out", act("turnout")), btn("Let up", act("letup")))
       ),
-      latest(ctx)
+      latest(ctx2)
     ];
   }
-  function queue(ctx) {
-    const apps = ctx.s.apps || [], m = ctx.s.mail;
-    const role = (a) => ctx.ui["role" + a.mn] || (a.staffTrack ? "farmhand" : "livestock");
+  function queue(ctx2) {
+    const apps = ctx2.s.apps || [], m = ctx2.s.mail;
+    const role = (a) => ctx2.ui["role" + a.mn] || (a.staffTrack ? "farmhand" : "livestock");
     return [
       card(
         h("div", { class: "fhc-kv" }, title("Applications"), chip(apps.length + " waitin'", apps.length ? "alert" : null)),
@@ -2644,10 +2656,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
           muted(a.sum + (a.staffTrack ? " · wants to be staff" : "")),
           h("label", { class: "fhc-label" }, "Approve as", h(
             "select",
-            { class: "fhc-sel", onchange: (e) => ctx.setUi({ ["role" + a.mn]: e.target.value }, true) },
+            { class: "fhc-sel", onchange: (e) => ctx2.setUi({ ["role" + a.mn]: e.target.value }, true) },
             ["livestock", "guest", "luxury", "gloryhole", "farmhand", "mandated", "herdmaster"].map((r) => h("option", { value: r, selected: role(a) === r ? "selected" : null }, r))
           )),
-          h("div", null, btn("Read it", () => ctx.send("app " + a.n)), btn("Approve", () => ctx.send("approve " + a.mn + " " + role(a)), true), btn("Deny", () => ctx.send("deny " + a.mn)))
+          h("div", null, btn("Read it", () => ctx2.send("app " + a.n)), btn("Approve", () => ctx2.send("approve " + a.mn + " " + role(a)), true), btn("Deny", () => ctx2.send("deny " + a.mn)))
         )) : muted("Nobody's waitin'. New ones beep you as well as showin' here.")
       ),
       m && card(
@@ -2657,7 +2669,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
         h("div", { class: "fhc-kv" }, h("span", null, "Online and beep-able (friends both ways)"), h("b", null, m.beepable === null ? "checkin'…" : String(m.beepable))),
         muted("Held messages turn into one short summary when that person's back.")
       ),
-      latest(ctx)
+      latest(ctx2)
     ];
   }
   function summonCheck() {
@@ -2665,40 +2677,40 @@ One of mods you are using is using an old version of SDK. It will work for now b
     if (r === null) return muted("BCX isn't loaded here. If you use BC+'s Ready to be summoned instead, add the farm bot (" + BOT_MEMBER + ") to it.");
     return h("div", { class: "fhc-kv" }, h("span", null, "Summon rule"), chip(r.ok ? "ready" : r.why, r.ok ? "good" : "alert"));
   }
-  function toggles2(ctx) {
-    const s = ctx.s, sw = s.switches || {};
+  function toggles2(ctx2) {
+    const s = ctx2.s, sw = s.switches || {};
     return [
       card(
         title("Work"),
         muted("Most staff leave this off. Mandated farmhands are always on call."),
-        s.mandated ? h("div", { class: "fhc-kv" }, h("span", null, "On call"), chip("always (mandated)", "alert")) : toggle("On call", "Let the office summon you from anywhere with BCX or BC+ summoning", !!sw.forced, () => ctx.send("forced")),
+        s.mandated ? h("div", { class: "fhc-kv" }, h("span", null, "On call"), chip("always (mandated)", "alert")) : toggle("On call", "Let the office summon you from anywhere with BCX or BC+ summoning", !!sw.forced, () => ctx2.send("forced")),
         s.onCall && summonCheck()
       ),
       muted("Your own milkin' and breedin' switches are on your Livestock panel."),
-      panelPrefs(ctx)
+      panelPrefs(ctx2)
     ];
   }
   var STAFF_TABS = [
     { id: "me", label: "Me", render: me2 },
     { id: "herd", label: "Herd", render: herd },
-    { id: "office", label: "Office", render: office, badge: (ctx) => ctx.docs.length },
-    { id: "queue", label: "Queue", render: queue, badge: (ctx) => (ctx.s.apps || []).length },
+    { id: "office", label: "Office", render: office, badge: (ctx2) => ctx2.docs.length },
+    { id: "queue", label: "Queue", render: queue, badge: (ctx2) => (ctx2.s.apps || []).length },
     { id: "contracts", label: "Contracts", render: contracts },
     { id: "barn", label: "Barn", render: barn },
     { id: "tease", label: "Tease lines", render: tease },
     { id: "voice", label: "Voice", render: voice },
     { id: "zones", label: "Zones", render: zones },
     { id: "shift", label: "Shift", render: shift },
-    { id: "guides", label: "Guides", render: (ctx) => guidesTab(ctx, true) },
+    { id: "guides", label: "Guides", render: (ctx2) => guidesTab(ctx2, true) },
     { id: "toggles", label: "Toggles", render: toggles2 }
   ];
 
   // extension/src/views/dashboard.js
   var field2 = (label, el) => h("label", { class: "fhc-label" }, label, el);
   var q = (v) => '"' + String(v).replace(/"/g, "'") + '"';
-  function settingControl(ctx, rule, s) {
-    const key = "set:" + rule.id + ":" + s.name, cur = ctx.ui[key];
-    const set = (v) => ctx.setUi({ [key]: v }, true);
+  function settingControl(ctx2, rule, s) {
+    const key = "set:" + rule.id + ":" + s.name, cur = ctx2.ui[key];
+    const set = (v) => ctx2.setUi({ [key]: v }, true);
     const def = Array.isArray(s.default) ? s.default.join("\n") : String(s.default);
     switch (s.type) {
       case "checkbox":
@@ -2726,44 +2738,44 @@ One of mods you are using is using an old version of SDK. It will work for now b
         return h("input", { class: "fhc-in", maxlength: s.maxChars || 256, value: cur !== void 0 ? cur : def, oninput: (e) => set(e.target.value) });
     }
   }
-  function addCommand(ctx, name, rule) {
+  function addCommand(ctx2, name, rule) {
     const pairs = rule.settings.map((s) => {
       const key = "set:" + rule.id + ":" + s.name;
-      let v = ctx.ui[key];
+      let v = ctx2.ui[key];
       if (v === void 0) v = s.type === "checkbox" ? s.default ? "on" : "off" : s.type === "members" ? "farm" : Array.isArray(s.default) ? s.default.join("\n") : s.default;
       if (s.type === "stringList") v = String(v).split("\n").map((x) => x.trim()).filter(Boolean).join("|");
       return s.name + "=" + q(v);
     });
     return ("contract add " + name + " " + rule.id + " " + pairs.join(" ")).trim();
   }
-  function contracts2(ctx) {
-    const nm = () => (ctx.ui.dName || "").trim().toLowerCase();
+  function contracts2(ctx2) {
+    const nm = () => (ctx2.ui.dName || "").trim().toLowerCase();
     const name = nm();
     const cats = [...new Set([...RULES.values()].map((r) => r.category))];
-    const cat = ctx.ui.dCat || cats[0];
+    const cat = ctx2.ui.dCat || cats[0];
     const inCat = [...RULES.values()].filter((r) => r.category === cat);
-    const rule = RULES.get(ctx.ui.dRule) && RULES.get(ctx.ui.dRule).category === cat ? RULES.get(ctx.ui.dRule) : inCat[0];
-    const need = () => !nm() && (ctx.hint("Give your contract a name first (one word, like prizecow)."), true);
+    const rule = RULES.get(ctx2.ui.dRule) && RULES.get(ctx2.ui.dRule).category === cat ? RULES.get(ctx2.ui.dRule) : inCat[0];
+    const need = () => !nm() && (ctx2.hint("Give your contract a name first (one word, like prizecow)."), true);
     return [
       card(
         title("Your contract"),
-        field2("Name (one word)", h("input", { class: "fhc-in", placeholder: "prizecow", value: ctx.ui.dName || "", oninput: (e) => ctx.setUi({ dName: e.target.value }, true) })),
-        ctx.ui.dWarn && !name ? muted("Give it a name first, sugar.") : null,
+        field2("Name (one word)", h("input", { class: "fhc-in", placeholder: "prizecow", value: ctx2.ui.dName || "", oninput: (e) => ctx2.setUi({ dName: e.target.value }, true) })),
+        ctx2.ui.dWarn && !name ? muted("Give it a name first, sugar.") : null,
         h(
           "div",
           null,
-          ["fun", "deep", "nhl"].map((b) => btn("New from " + b, () => !need() && ctx.send("contract new " + nm() + " from " + b))),
-          btn("New, empty", () => !need() && ctx.send("contract new " + nm()))
+          ["fun", "deep", "nhl"].map((b) => btn("New from " + b, () => !need() && ctx2.send("contract new " + nm() + " from " + b))),
+          btn("New, empty", () => !need() && ctx2.send("contract new " + nm()))
         ),
-        field2("Title", h("input", { class: "fhc-in", maxlength: 60, value: ctx.ui.dTitle || "", oninput: (e) => ctx.setUi({ dTitle: e.target.value }, true) })),
-        field2("Terms they'll read (%name% becomes their name)", h("textarea", { class: "fhc-in", rows: 3, maxlength: 1e3, oninput: (e) => ctx.setUi({ dTerms: e.target.value }, true) }, ctx.ui.dTerms || "")),
+        field2("Title", h("input", { class: "fhc-in", maxlength: 60, value: ctx2.ui.dTitle || "", oninput: (e) => ctx2.setUi({ dTitle: e.target.value }, true) })),
+        field2("Terms they'll read (%name% becomes their name)", h("textarea", { class: "fhc-in", rows: 3, maxlength: 1e3, oninput: (e) => ctx2.setUi({ dTerms: e.target.value }, true) }, ctx2.ui.dTerms || "")),
         h(
           "div",
           null,
-          btn("Save title", () => !need() && (ctx.ui.dTitle ? ctx.send("contract title " + nm() + " " + ctx.ui.dTitle) : ctx.hint("Type the title first."))),
-          btn("Save terms", () => !need() && (ctx.ui.dTerms ? ctx.send("contract terms " + nm() + " " + ctx.ui.dTerms) : ctx.hint("Write the terms first."))),
-          btn("Farm ends it", () => !need() && ctx.send("contract policy " + nm() + " farm")),
-          btn("Either side ends it", () => !need() && ctx.send("contract policy " + nm() + " either"))
+          btn("Save title", () => !need() && (ctx2.ui.dTitle ? ctx2.send("contract title " + nm() + " " + ctx2.ui.dTitle) : ctx2.hint("Type the title first."))),
+          btn("Save terms", () => !need() && (ctx2.ui.dTerms ? ctx2.send("contract terms " + nm() + " " + ctx2.ui.dTerms) : ctx2.hint("Write the terms first."))),
+          btn("Farm ends it", () => !need() && ctx2.send("contract policy " + nm() + " farm")),
+          btn("Either side ends it", () => !need() && ctx2.send("contract policy " + nm() + " either"))
         )
       ),
       card(
@@ -2771,36 +2783,36 @@ One of mods you are using is using an old version of SDK. It will work for now b
         muted("Every rule and setting BC+ " + BCPLUS_VERSION + " has. Only values BC+ accepts can be picked."),
         field2("Kind", h(
           "select",
-          { class: "fhc-sel", onchange: (e) => ctx.setUi({ dCat: e.target.value, dRule: "" }) },
+          { class: "fhc-sel", onchange: (e) => ctx2.setUi({ dCat: e.target.value, dRule: "" }) },
           cats.map((c) => h("option", { value: c, selected: c === cat ? "selected" : null }, c))
         )),
         field2("Rule", h(
           "select",
-          { class: "fhc-sel", onchange: (e) => ctx.setUi({ dRule: e.target.value }) },
+          { class: "fhc-sel", onchange: (e) => ctx2.setUi({ dRule: e.target.value }) },
           inCat.map((r) => h("option", { value: r.id, selected: r === rule ? "selected" : null }, r.name + (NEVER[r.id] ? " (never on the farm)" : "")))
         )),
         rule && muted(rule.description),
         rule && NEVER[rule.id] ? h("div", { class: "fhc-box alert" }, "The farm never uses this one: it " + NEVER[rule.id] + ".") : rule && [
-          rule.settings.map((s) => field2((s.label || s.name).replace(/:$/, ""), settingControl(ctx, rule, s))),
+          rule.settings.map((s) => field2((s.label || s.name).replace(/:$/, ""), settingControl(ctx2, rule, s))),
           h(
             "div",
             null,
-            btn("Add to " + (name || "contract"), () => !need() && ctx.send(addCommand(ctx, nm(), rule)), true),
-            btn("Take it out", () => !need() && ctx.send("contract remove " + nm() + " " + rule.id))
+            btn("Add to " + (name || "contract"), () => !need() && ctx2.send(addCommand(ctx2, nm(), rule)), true),
+            btn("Take it out", () => !need() && ctx2.send("contract remove " + nm() + " " + rule.id))
           )
         ]
       ),
       card(title("Check and send"), h(
         "div",
         null,
-        btn("Preview", () => !need() && ctx.send("contract show " + nm())),
-        btn("All contracts", () => ctx.send("contract list")),
-        btn("Delete", () => !need() && ctx.send("contract delete " + nm()))
+        btn("Preview", () => !need() && ctx2.send("contract show " + nm())),
+        btn("All contracts", () => ctx2.send("contract list")),
+        btn("Delete", () => !need() && ctx2.send("contract delete " + nm()))
       ), muted("Offer it from the Staff panel's Contracts tab.")),
-      latest(ctx)
+      latest(ctx2)
     ];
   }
-  function addons(ctx) {
+  function addons(ctx2) {
     const b = bcplusStatus(), s = summonReady(BOT_MEMBER);
     return [
       card(
@@ -2819,9 +2831,9 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var SPECIES = ["cow", "bull", "pony", "horse", "goat", "sheep", "pig", "bunny", "rabbit", "pup", "dog", "kitt", "cat", "fox", "wolf", "deer", "goblin"];
   var GENDERS = ["female", "male", "futa", "femboy"];
   var KEYS_TEXT = { staff: "farm staff + their herd leader", leader: "their herd leader only", owners: "the proprietors only" };
-  function outfits(ctx) {
-    const saved = ctx.s.outfits || {}, rules = ctx.s.outfitRules || {};
-    const sp = ctx.ui.oSp || "cow";
+  function outfits(ctx2) {
+    const saved = ctx2.s.outfits || {}, rules = ctx2.s.outfitRules || {};
+    const sp = ctx2.ui.oSp || "cow";
     const slotBox = (key, label) => h(
       "div",
       { class: "fhc-box", style: { padding: "8px", borderColor: saved[key] ? "var(--fh-good)" : "var(--fh-line)", borderStyle: saved[key] ? "solid" : "dashed" } },
@@ -2830,8 +2842,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
       h(
         "div",
         { style: { marginTop: "6px" } },
-        btn("Save what I'm wearin'", () => ctx.api.save && ctx.api.save(key)),
-        saved[key] ? btn("Clear", () => ctx.send("outfit clear " + key.replace("uniform:", "").replace("special:", "special ").replace("|", " ").replace("*", "any"))) : null
+        btn("Save what I'm wearin'", () => ctx2.api.save && ctx2.api.save(key)),
+        saved[key] ? btn("Clear", () => ctx2.send("outfit clear " + key.replace("uniform:", "").replace("special:", "special ").replace("|", " ").replace("*", "any"))) : null
       )
     );
     const specials = Object.keys(saved).filter((k) => k.startsWith("special:"));
@@ -2848,7 +2860,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
         title("New stock, by species and gender"),
         h("label", { class: "fhc-label" }, "Species", h(
           "select",
-          { class: "fhc-sel", onchange: (e) => ctx.setUi({ oSp: e.target.value }) },
+          { class: "fhc-sel", onchange: (e) => ctx2.setUi({ oSp: e.target.value }) },
           SPECIES.map((x) => h("option", { value: x, selected: x === sp ? "selected" : null }, x))
         )),
         h(
@@ -2875,12 +2887,12 @@ One of mods you are using is using an old version of SDK. It will work for now b
           "label",
           { class: "fhc-label" },
           "New special (one word: luxury, fairday, prizecow…)",
-          h("input", { class: "fhc-in", value: ctx.ui.oSpecial || "", oninput: (e) => ctx.setUi({ oSpecial: e.target.value }, true) })
+          h("input", { class: "fhc-in", value: ctx2.ui.oSpecial || "", oninput: (e) => ctx2.setUi({ oSpecial: e.target.value }, true) })
         ),
         btn("Save what I'm wearin' as this special", () => {
-          const n = (ctx.ui.oSpecial || "").trim().toLowerCase().replace(/[^a-z0-9_-]/g, "");
-          if (n.length < 2) return ctx.hint("Name the special first (one word, like luxury).");
-          ctx.api.save && ctx.api.save("special:" + n);
+          const n = (ctx2.ui.oSpecial || "").trim().toLowerCase().replace(/[^a-z0-9_-]/g, "");
+          if (n.length < 2) return ctx2.hint("Name the special first (one word, like luxury).");
+          ctx2.api.save && ctx2.api.save("special:" + n);
         })
       ),
       card(
@@ -2888,7 +2900,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
         h("div", { class: "fhc-kv" }, h("b", null, "High security padlock"), chip("every farm lock", "good")),
         h("label", { class: "fhc-label" }, "Who holds the keys", h(
           "select",
-          { class: "fhc-sel", onchange: (e) => ctx.send("outfit keys " + e.target.value) },
+          { class: "fhc-sel", onchange: (e) => ctx2.send("outfit keys " + e.target.value) },
           Object.entries(KEYS_TEXT).map(([k, v]) => h("option", { value: k, selected: (rules.keys || "staff") === k ? "selected" : null }, v))
         ))
       ),
@@ -2907,12 +2919,12 @@ One of mods you are using is using an old version of SDK. It will work for now b
             class: "fhc-sw" + (rules[k] ? " on" : ""),
             "aria-pressed": rules[k] ? "true" : "false",
             "aria-label": label,
-            onclick: () => ctx.send("outfit rule " + cmd + " " + (rules[k] ? "off" : "on"))
+            onclick: () => ctx2.send("outfit rule " + cmd + " " + (rules[k] ? "off" : "on"))
           }, h("span"))
         )),
         muted("Contracts offer an outfit when they're signed, too: ?contract outfit <name> auto|none|<slot>.")
       ),
-      latest(ctx)
+      latest(ctx2)
     ];
   }
   var DASHBOARD_TABS = [
@@ -2922,11 +2934,11 @@ One of mods you are using is using an old version of SDK. It will work for now b
   ];
 
   // extension/src/views/extras.js
-  function modsFor(ctx, view) {
-    const mods = ctx.s.mods || {};
+  function modsFor(ctx2, view) {
+    const mods = ctx2.s.mods || {};
     return Object.entries(mods).filter(([, m]) => m && typeof m === "object" && (!Array.isArray(m.views) || m.views.includes(view)) && Array.isArray(m.cards) && m.cards.length);
   }
-  function drawCard(ctx, name, c, i) {
+  function drawCard(ctx2, name, c, i) {
     const key = "x_" + name + "_" + i;
     return card(
       c.title && title(String(c.title)),
@@ -2934,34 +2946,34 @@ One of mods you are using is using an old version of SDK. It will work for now b
       Array.isArray(c.lines) && c.lines.map((l) => h("div", { class: "fhc-kv" }, h("span", null, String(l[0] ?? l)), l[1] !== void 0 ? h("b", null, String(l[1])) : null)),
       Array.isArray(c.bars) && c.bars.map((b) => bar(String(b.label || ""), String(b.value ?? ""), Number(b.pct) || 0, b.kind)),
       Array.isArray(c.chips) && c.chips.length ? h("div", null, c.chips.map((x) => chip(String(x.text ?? x), x.kind))) : null,
-      Array.isArray(c.toggles) && c.toggles.map((t) => toggle(String(t.label || ""), t.desc ? String(t.desc) : "", !!t.on, () => ctx.send(String(t.cmd)))),
+      Array.isArray(c.toggles) && c.toggles.map((t) => toggle(String(t.label || ""), t.desc ? String(t.desc) : "", !!t.on, () => ctx2.send(String(t.cmd)))),
       c.input && h(
         "div",
         null,
-        h("input", { class: "fhc-in", placeholder: String(c.input.placeholder || ""), value: ctx.ui[key] || "", oninput: (e) => ctx.setUi({ [key]: e.target.value }, true) }),
+        h("input", { class: "fhc-in", placeholder: String(c.input.placeholder || ""), value: ctx2.ui[key] || "", oninput: (e) => ctx2.setUi({ [key]: e.target.value }, true) }),
         btn(String(c.input.label || "Send"), () => {
-          const v = (ctx.ui[key] || "").trim();
-          if (!v) return ctx.hint("Type somethin' in the box first.");
-          ctx.send(String(c.input.cmd) + " " + v);
-          ctx.setUi({ [key]: "" });
+          const v = (ctx2.ui[key] || "").trim();
+          if (!v) return ctx2.hint("Type somethin' in the box first.");
+          ctx2.send(String(c.input.cmd) + " " + v);
+          ctx2.setUi({ [key]: "" });
         }, true)
       ),
-      Array.isArray(c.buttons) && c.buttons.length ? h("div", { style: { marginTop: "6px" } }, c.buttons.map((b) => btn(String(b.label || b.cmd), () => ctx.send(String(b.cmd)), !!b.accent))) : null,
+      Array.isArray(c.buttons) && c.buttons.length ? h("div", { style: { marginTop: "6px" } }, c.buttons.map((b) => btn(String(b.label || b.cmd), () => ctx2.send(String(b.cmd)), !!b.accent))) : null,
       c.note && muted(String(c.note))
     );
   }
-  function render(ctx, view) {
-    const list = modsFor(ctx, view);
+  function render(ctx2, view) {
+    const list = modsFor(ctx2, view);
     if (!list.length) return [muted("No farm extras for you right now.")];
     return list.map(([name, m]) => h(
       "div",
       null,
       h("div", { class: "fhc-muted", style: { margin: "8px 2px 2px" } }, "🧩 " + String(m.label || name)),
-      m.cards.map((c, i) => drawCard(ctx, name, c, i))
+      m.cards.map((c, i) => drawCard(ctx2, name, c, i))
     ));
   }
-  function withExtras(tabs, view, ctx) {
-    if (!modsFor(ctx, view).length) return tabs;
+  function withExtras(tabs, view, ctx2) {
+    if (!modsFor(ctx2, view).length) return tabs;
     const t = { id: "extras", label: "Farm extras", render: (c) => render(c, view) };
     const at = tabs.findIndex((x) => x.id === "guides");
     return at < 0 ? tabs.concat(t) : tabs.slice(0, at).concat(t, tabs.slice(at));
@@ -3212,8 +3224,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
       };
     }
     render() {
-      const ctx = this.ctx(), view = this.view(), V = VIEWS[view];
-      const tabs = view === "guest" ? V.tabs : withExtras(V.tabs, view, ctx);
+      const ctx2 = this.ctx(), view = this.view(), V = VIEWS[view];
+      const tabs = view === "guest" ? V.tabs : withExtras(V.tabs, view, ctx2);
       const tabKey = "tab_" + view, tab = tabs.find((t) => t.id === this.ui[tabKey]) || tabs[0];
       const scroll = this.el.querySelector(".fhc-body"), keep = scroll ? scroll.scrollTop : 0;
       const box = this.el.querySelector("#fhc-input"), typed = box ? box.value : "", hadFocus = box && window.document.activeElement === box;
@@ -3243,13 +3255,13 @@ One of mods you are using is using an old version of SDK. It will work for now b
           h("button", { type: "button", class: "fhc-safe", style: { borderColor: "var(--fh-line)" }, onclick: () => this.ask("staff") }, "Call staff")
         ),
         h("nav", { class: "fhc-row", "aria-label": "Panel sections" }, tabs.map((t) => {
-          const n = t.badge ? t.badge(ctx) : 0;
+          const n = t.badge ? t.badge(ctx2) : 0;
           return h("button", { type: "button", class: "fhc-pill" + (t === tab ? " on" : ""), onclick: () => {
             this.ui[tabKey] = t.id;
             this.render();
           } }, t.label + (n ? " · " + n : ""));
         })),
-        h("div", { class: "fhc-body" }, this.banners(), safeRender(tab, ctx)),
+        h("div", { class: "fhc-body" }, this.banners(), safeRender(tab, ctx2)),
         h(
           "form",
           { class: "fhc-form", onsubmit: (e) => {
@@ -3357,9 +3369,9 @@ One of mods you are using is using an old version of SDK. It will work for now b
       window.addEventListener("pointerup", up);
     }
   };
-  function safeRender(tab, ctx) {
+  function safeRender(tab, ctx2) {
     try {
-      return tab.render(ctx);
+      return tab.render(ctx2);
     } catch (e) {
       console.warn("[Farmhand Companion]", e);
       return h("div", { class: "fhc-box alert" }, "This tab hit a snag. The rest of the panel still works.");
@@ -3487,6 +3499,248 @@ One of mods you are using is using an old version of SDK. It will work for now b
     }
   };
 
+  // extension/src/cues.js
+  var W = window;
+  var ctx = null;
+  function initCues(c) {
+    ctx = c;
+    setInterval(sightTick, 4e3);
+    setInterval(feelTick, 6e4);
+  }
+  var pref = (k) => !ctx.panel.prefs[k];
+  var cueOff = () => ({
+    face: !pref("noFace") || void 0,
+    sound: !pref("noSound") || void 0,
+    trance: !pref("noTrance") || void 0,
+    lead: !pref("noLead") || void 0
+  });
+  var mapOn = () => typeof W.ChatRoomMapViewIsActive === "function" && W.ChatRoomMapViewIsActive() && W.Player && W.Player.MapData && W.Player.MapData.Pos;
+  var others = () => (W.ChatRoomCharacter || []).filter((c) => c && c.MemberNumber !== (W.Player && W.Player.MemberNumber));
+  var lastSight = "";
+  function sightTick() {
+    try {
+      if (W.CurrentScreen !== "ChatRoom" || !mapOn() || typeof W.ChatRoomMapViewCharacterIsVisible !== "function") return;
+      const see = others().filter((c) => W.ChatRoomMapViewCharacterIsVisible(c)).map((c) => c.MemberNumber).sort();
+      const hear = others().filter((c) => typeof W.ChatRoomMapViewCharacterIsHearable === "function" && W.ChatRoomMapViewCharacterIsHearable(c)).map((c) => c.MemberNumber).sort();
+      const key = see.join(",") + "|" + hear.join(",");
+      if (key === lastSight && Date.now() - (sightTick.at || 0) < 2e4) return;
+      lastSight = key;
+      sightTick.at = Date.now();
+      ctx.toBot("sight", { see, hear });
+    } catch (e) {
+      console.warn("[Farmhand Companion] sight:", e);
+    }
+  }
+  var walk = null;
+  var DIRS = [["North", 0, -1], ["South", 0, 1], ["West", -1, 0], ["East", 1, 0]];
+  function canStep(x, y) {
+    try {
+      return W.ChatRoomMapViewCanEnterTile(x, y) > 0;
+    } catch (e) {
+      return false;
+    }
+  }
+  function findPath(from, to) {
+    const wide = W.ChatRoomMapViewWidth || 40, high = W.ChatRoomMapViewHeight || 40, key = (x, y) => x + "," + y;
+    const goal = (x, y) => Math.max(Math.abs(x - to.X), Math.abs(y - to.Y)) <= (canStep(to.X, to.Y) ? 0 : 1);
+    const prev = /* @__PURE__ */ new Map([[key(from.X, from.Y), null]]), q2 = [[from.X, from.Y]];
+    while (q2.length) {
+      const [x, y] = q2.shift();
+      if (goal(x, y)) {
+        const path = [];
+        let k = key(x, y);
+        while (prev.get(k)) {
+          const [px, py, d] = prev.get(k);
+          path.unshift(d);
+          k = key(px, py);
+        }
+        return path;
+      }
+      if (prev.size > 4e3) break;
+      for (const [d, dx, dy] of DIRS) {
+        const nx = x + dx, ny = y + dy;
+        if (nx < 0 || ny < 0 || nx >= wide || ny >= high || prev.has(key(nx, ny)) || !canStep(nx, ny)) continue;
+        prev.set(key(nx, ny), [x, y, d]);
+        q2.push([nx, ny]);
+      }
+    }
+    return null;
+  }
+  function lead(m) {
+    const no = () => {
+      walk = null;
+      ctx.toBot("leadNo", { id: m.id });
+    };
+    if (!pref("noLead") || !mapOn() || typeof W.ChatRoomMapViewMove !== "function") return no();
+    const from = W.Player.MapData.Pos, to = { X: m.X, Y: m.Y };
+    const path = findPath(from, to);
+    if (!path) return no();
+    if (!path.length) {
+      ctx.toBot("leadOk", { id: m.id });
+      return;
+    }
+    ctx.local("You're led " + (m.why ? m.why : "along") + "…", "#c9a35b", true);
+    walk = { id: m.id, to, path, i: 0, last: { X: from.X, Y: from.Y }, stuck: Date.now(), retried: false };
+    stepWalk();
+  }
+  function stepWalk() {
+    if (!walk) return;
+    const w = walk, p = W.Player && W.Player.MapData && W.Player.MapData.Pos;
+    if (!p) {
+      walk = null;
+      return;
+    }
+    if (p.X !== w.last.X || p.Y !== w.last.Y) {
+      w.last = { X: p.X, Y: p.Y };
+      w.stuck = Date.now();
+      w.i++;
+    }
+    if (w.i >= w.path.length || Math.max(Math.abs(p.X - w.to.X), Math.abs(p.Y - w.to.Y)) <= 0) {
+      walk = null;
+      ctx.toBot("leadOk", { id: w.id });
+      return;
+    }
+    if (Date.now() - w.stuck > 3e3) {
+      if (w.retried) {
+        walk = null;
+        ctx.toBot("leadNo", { id: w.id });
+        return;
+      }
+      const path = findPath(p, w.to);
+      if (!path) {
+        walk = null;
+        ctx.toBot("leadNo", { id: w.id });
+        return;
+      }
+      Object.assign(w, { path, i: 0, stuck: Date.now(), retried: true });
+    }
+    if (W.ChatRoomMapViewMovement == null) {
+      try {
+        W.ChatRoomMapViewMove(w.path[w.i]);
+      } catch (e) {
+      }
+    }
+    setTimeout(stepWalk, 150);
+  }
+  var FACES = {
+    milkdrunk: { Eyes: "Dazed", Blush: "Medium", Mouth: "HalfOpen" },
+    heat: { Eyes: "Horny", Blush: "High", Mouth: "LipBite" },
+    trance: { Eyes: "Daydream", Blush: "Low", Mouth: "HalfOpen" },
+    afterglow: { Eyes: "Dazed", Blush: "VeryHigh", Mouth: "Open" },
+    bred: { Eyes: "Lewd", Blush: "High", Mouth: "Moan" },
+    milked: { Eyes: "Closed", Blush: "Medium", Mouth: "HalfOpen" },
+    edged: { Eyes: "Horny", Blush: "VeryHigh", Mouth: "Pained" },
+    clear: { Eyes: null, Blush: null, Mouth: null }
+  };
+  function face(m) {
+    const f = FACES[m.mood];
+    if (!f || !pref("noFace") || typeof W.CharacterSetFacialExpression !== "function" || !W.Player) return;
+    const secs = m.mood === "clear" ? null : Math.max(5, Math.min(1800, Number(m.secs) || 30));
+    for (const [g, e] of Object.entries(f)) {
+      try {
+        W.CharacterSetFacialExpression(W.Player, g, e, secs);
+        if (g === "Eyes") W.CharacterSetFacialExpression(W.Player, "Eyes2", e, secs);
+      } catch (e2) {
+      }
+    }
+  }
+  var SOUNDS = {
+    pump: "SciFiPump",
+    machine: "Sybian",
+    bell: "BellMedium",
+    cowbell: "BellSmall",
+    stall: "CageClose",
+    gate: "CageOpen",
+    bowl: "PlaceBowl",
+    wet: "Slime",
+    chain: "ChainShort",
+    lock: "LockSmall",
+    vibe: "VibratorShort",
+    spank: "SpankSkin1"
+  };
+  function sound(m) {
+    const f = SOUNDS[m.name];
+    if (!f || !pref("noSound") || typeof W.AudioPlayInstantSound !== "function") return;
+    const vol = W.Player && W.Player.AudioSettings && W.Player.AudioSettings.Volume || 0;
+    try {
+      W.AudioPlayInstantSound("Audio/" + f + ".mp3", vol * 0.6);
+    } catch (e) {
+    }
+  }
+  function trance(m) {
+    let el = W.document.getElementById("fhc-trance");
+    const lvl = pref("noTrance") ? Math.max(0, Math.min(3, Number(m.level) || 0)) : 0;
+    if (!lvl) {
+      if (el) el.remove();
+      return;
+    }
+    if (!el) {
+      el = W.document.createElement("div");
+      el.id = "fhc-trance";
+      el.style.cssText = "position:fixed;inset:0;pointer-events:none;z-index:9998;transition:opacity 4s;opacity:0;animation:fhcTrance 6s ease-in-out infinite";
+      if (!W.document.getElementById("fhc-trance-css")) {
+        const s = W.document.createElement("style");
+        s.id = "fhc-trance-css";
+        s.textContent = "@keyframes fhcTrance{0%,100%{filter:brightness(1)}50%{filter:brightness(0.85)}}";
+        W.document.head.appendChild(s);
+      }
+      W.document.body.appendChild(el);
+    }
+    const edge = [0, 0.25, 0.45, 0.65][lvl], inner = [0, 55, 42, 30][lvl];
+    el.style.background = "radial-gradient(ellipse at center, transparent " + inner + "%, rgba(70,20,90," + edge + ") 100%)";
+    (W.requestAnimationFrame || ((f) => setTimeout(f, 16)))(() => {
+      el.style.opacity = "1";
+    });
+  }
+  var lastFeel = "";
+  function feelTick() {
+    try {
+      if (!pref("noFeelings") || W.CurrentScreen !== "ChatRoom" || !W.Player || !ctx.panel.s || !ctx.panel.s.onBooks) return;
+      if (Date.now() < (feelTick.next || 0)) return;
+      feelTick.next = Date.now() + (7 + Math.random() * 6) * 6e4;
+      const s = ctx.panel.s, items = (W.Player.Appearance || []).filter((x) => x && x.Asset && x.Asset.Group);
+      const grp = (g) => items.find((x) => x.Asset.Group.Name === g);
+      const eff = (x) => [].concat(x.Property && x.Property.Effect || [], x.Asset.Effect || []);
+      const arousal = W.Player.ArousalSettings && W.Player.ArousalSettings.Progress || 0;
+      const lines = [];
+      if (grp("ItemButt")) lines.push("The plug shifts inside you every time you move, a full, stubborn pressure you can't ignore.");
+      if (items.some((x) => eff(x).includes("Chaste")) && arousal > 40) lines.push("Your chastity aches. You're throbbing against it and it doesn't give an inch.");
+      if (s.milk && s.milk.cap && s.milk.ml / s.milk.cap > 0.8) lines.push("Your udders are tight and heavy, prickling with milk. Any squeeze at all would make them leak.");
+      if (s.holding && s.holding.cap && s.holding.ml / s.holding.cap > 0.6) lines.push("Everything they put in you sloshes when you shift your weight. You can feel how full you are.");
+      if (s.heatUntil && s.heatUntil > Date.now()) lines.push("Heat rolls through you in slow waves. Every brush of fabric is almost too much.");
+      if (s.preg) lines.push("Something shifts low in your belly, slow and heavy. The litter is settling in.");
+      if (grp("ItemMouth") && items.some((x) => ["ItemMouth", "ItemMouth2", "ItemMouth3"].includes(x.Asset.Group.Name) && eff(x).includes("BlockMouth"))) lines.push("Drool gathers around the gag and slips down your chin. You can't stop it.");
+      if (arousal > 85) lines.push("You're right on the edge and everyone around you can probably tell.");
+      const pool = lines.filter((l) => l !== lastFeel);
+      if (!pool.length) return;
+      lastFeel = pool[Math.floor(Math.random() * pool.length)];
+      ctx.local(lastFeel, "#b58ad9", true);
+    } catch (e) {
+      console.warn("[Farmhand Companion] feelings:", e);
+    }
+  }
+  function drawMarkers() {
+    try {
+      const s = ctx.panel.s;
+      if (!s || !s.staff || !Array.isArray(s.herd) || !pref("noMarkers") || !mapOn() || typeof W.DrawText !== "function") return;
+      const R = W.ChatRoomMapViewPerceptionRange || 6, tile = 1e3 / (R * 2 + 1), me3 = W.Player.MapData.Pos;
+      for (const x of s.herd) {
+        const C = (W.ChatRoomCharacter || []).find((c) => c.MemberNumber === x.mn);
+        if (!C || !C.MapData || !C.MapData.Pos || !W.ChatRoomMapViewCharacterIsVisible(C)) continue;
+        const tags = [];
+        if (x.milk !== null && x.milk >= 75) tags.push(["M", "#7fa8c9"]);
+        if (x.heat) tags.push(["H", "#d9534f"]);
+        if (x.preg) tags.push(["B", "#8fbf6a"]);
+        if (x.denied) tags.push(["X", "#c9a35b"]);
+        if (!tags.length) continue;
+        const sx = (C.MapData.Pos.X - me3.X + R) * tile, sy = (C.MapData.Pos.Y - me3.Y) * tile + R * tile;
+        if (sx < 0 || sy < 0 || sx > 1e3 || sy > 1e3) continue;
+        tags.forEach(([t, col], i) => W.DrawText(t, sx + tile * 0.2 + i * tile * 0.22, sy + tile * 0.15, col, "black"));
+      }
+    } catch (e) {
+    }
+  }
+
   // extension/src/index.js
   var bcModSdk = import_bondage_club_mod_sdk.default.default || import_bondage_club_mod_sdk.default;
   var mod = bcModSdk.registerMod({
@@ -3501,7 +3755,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
   function hello() {
     st.lastHello = Date.now();
-    toBot("hello", { ver: VERSION, relay: !(st.panel && st.panel.prefs.noRelay) });
+    toBot("hello", { ver: VERSION, relay: !(st.panel && st.panel.prefs.noRelay), off: st.panel ? cueOff() : {} });
   }
   var EMOJI = /(?:\p{Extended_Pictographic}|\p{Regional_Indicator}|[\uFE0F\u200D\u20E3])/gu;
   var forChat = (s) => String(s).replace(EMOJI, "").replace(/[ \t]{2,}/g, " ").replace(/^([*]?)[ \t]+/gm, "$1").trim();
@@ -3620,6 +3874,19 @@ One of mods you are using is using an old version of SDK. It will work for now b
       case "relay":
         relay(m);
         break;
+      case "lead":
+        lead(m);
+        break;
+      // walk me there (cues.js)
+      case "face":
+        face(m);
+        break;
+      case "sound":
+        sound(m);
+        break;
+      case "trance":
+        trance(m);
+        break;
       case "voice": {
         const line = String(m.text || "").slice(0, 300);
         if (!toChat("[Voice] " + line, "#a67fd4", true)) st.panel.add("[Voice] " + line, "notice");
@@ -3722,6 +3989,16 @@ One of mods you are using is using an old version of SDK. It will work for now b
   function start() {
     st.panel = new Panel(sendCommand, api);
     st.panel.setStatus("waitin' for the farm girl");
+    initCues({ toBot, panel: st.panel, local: toChat });
+    try {
+      mod.hookFunction("ChatRoomMapViewDraw", 0, (args, next) => {
+        const r = next(args);
+        drawMarkers();
+        return r;
+      });
+    } catch (e) {
+      console.warn("[Farmhand Companion] map markers unavailable:", e);
+    }
     mod.hookFunction("ChatRoomMessage", 10, (args, next) => {
       const m = readMsg(args[0]);
       if (m) {

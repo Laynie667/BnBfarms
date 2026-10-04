@@ -75,7 +75,14 @@
   // the first of these names that has been set, or null
   function firstSpot(...names){ for (const n of names){ const p = spotFor(n); if (p) return p; } return null; }
 
-  function teleport(mn, pt, urgent){
+  // move somebody: with a v0.10 Companion they're LED there on foot (10h-body.js); force = teleport anyway
+  // (stuck rescues, someone pinned or in the stocks)
+  function teleport(mn, pt, urgent, force){
+    if (!pt || !charFor(mn)) return false;
+    if (!force && mn !== CFG.BOT_MEMBER && canLead(mn)) return lead(mn, pt, urgent);
+    return teleportNow(mn, pt, urgent);
+  }
+  function teleportNow(mn, pt, urgent){
     if (!pt || !botIsAdmin() || !charFor(mn)) return false;
     // The game reads entry.Position — {X,Y} at the top level was silently ignored.
     send("ChatRoomChat", {
@@ -108,7 +115,7 @@
       beep(mn, "I'm sorry, hon, I can't move you right now because I've lost my room admin rights. Please call a proprietor or staff and they'll get you out.");
       return false;
     }
-    return teleport(mn, pt, true);
+    return teleport(mn, pt, true, true);   // stuck: no walkin', straight out
   }
 
   /* ═══════════ SUMMONING ═══════════ */

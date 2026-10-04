@@ -25,6 +25,7 @@ That means:
 | 10b–10e | contracts, outfits, zones and voice, milking gear |
 | 10f-addons.js | add-on support: window.Farmhand.register for the separate add-on scripts |
 | 10g-scenes.js | the beat-by-beat scenes for milkin', collectin', machine and syringe breedin', edgin' |
+| 10h-body.js | Companion cues (sight, leading, faces, sounds, trance), orgasms and edges, visible consent, ambient moments |
 | 11-work.js | shift clock, chores, wheel, begging, fair |
 | 12-guides.js | help texts and guides |
 | 13-apply.js | applications |

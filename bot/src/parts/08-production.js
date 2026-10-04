@@ -457,7 +457,7 @@
     p.heat = { until: Date.now() + (hours||CFG.PROD.HEAT_H)*3600000, by };
     p.nextHeatAt = Date.now() + CFG.PROD.NATURAL_HEAT_EVERY_D*86400000;
     if (!already){
-      if (charFor(mn)) enqueue({ Content:"*"+plainName(mn)+" flushes hot all over, comin' into heat. 🔥", Type:"Emote" });
+      if (charFor(mn)){ emote(plainName(mn)+" flushes hot all over, comin' into heat.", mn); face(mn, "heat", 90); }
       tell(mn, "🔥 Ooh, you've come into heat, "+plainName(mn)+"! Gonna be mighty hard to miss for the next "+(hours||CFG.PROD.HEAT_H)+" hours, sweetie.");
       for (const h of herdsOf(mn)) beep(h.leader, "🔥 Heads up, hon: "+plainName(mn)+" just came into heat.");
     }
@@ -717,7 +717,7 @@
             : "🎈 Oh my, you're too full to move, "+plainName(mn)+"! You'll stay put right here till you're milked down or somebody gives you a reducin' shot."); }
         else if (pos.X !== p.pin.X || pos.Y !== p.pin.Y){
           if (p.tieUntil > now) p.pin = { X:pos.X, Y:pos.Y };   // tied: the knot drags 'em along, the pin moves with 'em
-          else teleport(mn, p.pin, false);
+          else teleport(mn, p.pin, false, true);   // pinned: held in place
         }
       } else if (p.pin && !pinned){
         p.pin = null; if (Cp) whisper(mn, "You can move again, "+plainName(mn)+"! Go on and stretch those legs.");
@@ -730,14 +730,14 @@
       if (p.fullSince && now - p.fullSince > CFG.PROD.OVERFULL_H*3600000 && charFor(mn) &&
           now - (p.lastLeak||0) > CFG.PROD.LEAK_EMOTE_MIN*60000*(0.75+Math.random()*0.5)){
         p.lastLeak = now;
-        enqueue({ Content:"*"+fill(CFG.LEAK_LINES[Math.floor(Math.random()*CFG.LEAK_LINES.length)], mn), Type:"Emote" });
+        emote(fill(pickFresh("leak", CFG.LEAK_LINES), mn), mn);   // from them, if their Companion can
       }
       // heat emotes for folks in heat on the farm
       if (inHeat(p) && charFor(mn) && now - p.lastHeatEmote > CFG.PROD.HEAT_EMOTE_MIN*60000*(0.75+Math.random()*0.5)){
         p.lastHeatEmote = now;
         const lines = heatLines();
         const line = lines[Math.floor(Math.random()*lines.length)];
-        enqueue({ Content:"*"+fill(line, mn), Type:"Emote" });
+        emote(fill(line, mn), mn);
       }
     }
     saveLedger();
@@ -761,7 +761,7 @@
       // the stall timer: minutes till they're down to a quarter
       const mins = Math.ceil(Math.max(doM ? (p.milk - keepM) / CFG.PROD.STALL_MILK_PER_MIN : 0, doS ? (p.semen - keepS) / CFG.PROD.STALL_SEMEN_PER_MIN : 0));
       if (!p.stall && (doM || doS)){
-        p.stall = { since: now };
+        p.stall = { since: now }; sound(mn, "stall");
         tell(mn, "🥛 The stall latches on. About "+mins+" minute"+(mins === 1 ? "" : "s")+" to drain you down to a quarter, sugar. Stay put.");
       }
       if (p.stall) p.stall.until = now + mins*60000;
@@ -881,12 +881,14 @@
     if (hole === "vulva"){
       const bonus = (pent ? CFG.PENTUP_FERT_X : 1) * (knot ? CFG.KNOT_FERT_X : 1) *
                     (T.heat && !inHeat(tp) ? 3 : 1) * (onBreedingStand(t) ? CFG.BREEDING_STAND_X : 1);
+      tp.lastFill = { at: Date.now(), stud, ml: kept };
       caught = rollConception(t, stud, kept, bonus);
       sp.totals.covers = (sp.totals.covers||0) + 1;
       if (caught){ sp.totals.conceived = (sp.totals.conceived||0) + 1;
                    rollBoard(); const Y = L.yield; Y.s = Y.s || {}; Y.s[stud] = (Y.s[stud]||0) + 1; }
     }
     okBreed(stud, t);
+    face(t, "bred", 40); sound(t, "wet");
     if (!opt.second){
       tally(t);
       tp.scent = { stud, until: Date.now() + CFG.SCENT_H*3600000 };
@@ -1001,6 +1003,7 @@
       tell(a.staff, "💉 "+plainName(t)+" said no to the jar, sugar. Please leave it be.");
       return true;
     }
+    showConsent(t, a.staff, a.machine ? "the breedin' machine" : "the jar");
     if (a.machine){   // it happens when the machine runs (gearTick)
       state.machineLoads = state.machineLoads || new Map();
       state.machineLoads.set(t, { staff: a.staff, jar: a.jar, hole: a.hole, at: Date.now() });
@@ -1024,12 +1027,13 @@
     // counted now; told as a scene (10g-scenes.js), with the news at the end if it took
     let caught = null;
     if (hole === "vulva"){
+      tp.lastFill = { at: Date.now(), stud: jar.stud, ml: kept };
       caught = rollConception(t, jar.stud, kept, onBreedingStand(t) ? CFG.BREEDING_STAND_X : 1);
       if (caught){ const sp = prodOf(jar.stud); sp.totals.conceived = (sp.totals.conceived||0) + 1;
                    rollBoard(); const Y = L.yield; Y.s = Y.s || {}; Y.s[jar.stud] = (Y.s[jar.stud]||0) + 1; }
     }
     const tookLine = () => caught && emote("🍼 It took! A soft, warm glow settles over "+plainName(t)+": they're carryin' "+plainName(jar.stud)+"'s young now, no stud required.", t);
-    const vars = { n: plainName(t), b: plainName(sender), m: machine || "", h: HOLE_WORD[hole] || hole, ml: ml(kept), stud: plainName(jar.stud), jar: jar.id, icon: machine ? "⚙️" : "💉" };
+    const vars = { n: plainName(t), b: plainName(sender), bMn: sender, m: machine || "", h: HOLE_WORD[hole] || hole, ml: ml(kept), stud: plainName(jar.stud), jar: jar.id, icon: machine ? "⚙️" : "💉" };
     if (!runScene(machine ? "machine" : "syringe", t, vars, tookLine)){
       emote(machine
         ? "⚙️ The "+machine+" under "+plainName(t)+" gives a wet click and empties jar #"+jar.id+" deep into their "+vars.h+": "+ml(kept)+" of "+plainName(jar.stud)+"'s seed, pumped in with every stroke."

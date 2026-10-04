@@ -115,12 +115,18 @@ function step(mn) {
   if (!api.char(mn)) { running.delete(mn); return; }          // they left
   const line = run.lines[run.i];
   if (!line) { finish(mn, run); return; }
+  // the haze on their screen follows the session: settle 1, deeper 2 (3 for No human left), then lifts
+  const s = SCRIPT.settle.length, d = SCRIPT.deeper[run.level].length, g = SCRIPT.suggest[run.level].length;
+  const haze = run.i < s ? 1 : run.i < s + d ? (run.level === "nhl" ? 3 : 2) : run.i < s + d + g ? { fun: 1, deep: 2, nhl: 3 }[run.level] : (run.level === "nhl" ? 1 : 0);
+  if (haze !== run.haze) { run.haze = haze; api.trance(mn, haze); api.face(mn, haze ? "trance" : "clear", haze ? 600 : 1); }
   api.voice(mn, say(mn, line));
   run.i++;
   api.later(() => step(mn), between(35, 50) * 1000);
 }
 function finish(mn, run) {
   running.delete(mn);
+  // No human left lingers a couple of minutes, then clears
+  api.later(() => { if (!running.has(mn)) { api.trance(mn, 0); api.face(mn, "clear", 1); } }, run.level === "nhl" ? 120000 : 3000);
   const x = me(mn);
   x.sessions[run.level] = (x.sessions[run.level] || 0) + 1; x.total++;
   const tier = MILESTONES.filter((m) => x.total >= m).length;
@@ -134,6 +140,7 @@ function finish(mn, run) {
 function stop(mn, why) {
   if (!running.has(mn)) return false;
   running.delete(mn);
+  api.trance(mn, 0); api.face(mn, "clear", 1);
   if (why) api.voice(mn, why);
   return true;
 }

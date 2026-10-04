@@ -54,5 +54,12 @@ const beepsTo=(k,mn)=>sent.slice(k).filter(([e,d])=>e==='AccountBeep'&&d.MemberN
   // the bot's own broadcast ping echo is ignored
   handlers.ChatRoomMessage({Sender:260239,Type:'Hidden',Content:'FarmhandMsg',Dictionary:{v:2,type:'ping',ver:'x'}}); await wait(200);
   ok(true, 'own ping echo ignored (no crash)');
+  // a zone drawn from the bot's own screen reaches another staff member's Companion in a moment
+  handlers.ChatRoomMessage({Sender:221397,Type:'Hidden',Content:'FarmhandMsg',Dictionary:{v:2,type:'hello',ver:'0.10.1'}}); await drain(2500);
+  const kz=sent.length;
+  chars[0].MapData.Pos={X:4,Y:4}; office.Action('zone a pens'); await drain(1300);
+  chars[0].MapData.Pos={X:6,Y:6}; office.Action('zone b pens'); await drain(2500);
+  const st=sent.slice(kz).filter(([e,d])=>d&&d.Type==='Hidden'&&d.Target===221397&&d.Dictionary.type==='state').map(([e,d])=>d.Dictionary.state).pop();
+  ok(st && st.zones && st.zones.pens && st.zones.pens.b && st.zones.pens.b.X===6, "Laynie's panel gets the new zone within seconds");
   out(fails ? fails+' FAILED' : 'ALL PASSED'); process.exit(fails?1:0);
 })();

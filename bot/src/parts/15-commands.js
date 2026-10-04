@@ -23,6 +23,9 @@
       try { reply(sender, "Oops, sugar, ?"+String(raw).slice(0,40)+" hit a snag on my end. It's written in the farm log for the proprietors. Try again in a bit, or ask staff.", channel); } catch(e2){}
     }
     finally {
+      // whatever changed (a zone drawn from the bot's own screen, a spot, a switch) reaches every
+      // Companion in a moment, not at the next once-a-minute sync. Only changed panels are sent.
+      if (!state.syncSoon){ state.syncSoon = true; later(() => { state.syncSoon = false; syncCompanions(); }, 1500); }
       state.inReply = false; state.cmdWatch = null;
       if (watch && !watch.replied && watch.emotes.length) toCompanion(sender, "(in the room) "+watch.emotes.join("\n"), "reply");
     }

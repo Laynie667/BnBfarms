@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.13.1
+// @version      0.13.2
 // @description  B&B Farm: beeps, keys, ledger, roster, herds, summoning, anti-idle
 // @author       Laynie & Alexia
 // @match        *://*.bondageprojects.elementfx.com/*
@@ -1800,7 +1800,7 @@
   ];
 
   // bot/src/version.js
-  var VERSION = "0.13.1";
+  var VERSION = "0.13.2";
 
   // bot-parts:farmhand-bot-parts
   (function() {
@@ -8849,6 +8849,13 @@ Welcome to B&B Farm. Mind the ruts! 🌾`,
         } catch (e2) {
         }
       } finally {
+        if (!state.syncSoon) {
+          state.syncSoon = true;
+          later(() => {
+            state.syncSoon = false;
+            syncCompanions();
+          }, 1500);
+        }
         state.inReply = false;
         state.cmdWatch = null;
         if (watch && !watch.replied && watch.emotes.length) toCompanion(sender, "(in the room) " + watch.emotes.join("\n"), "reply");

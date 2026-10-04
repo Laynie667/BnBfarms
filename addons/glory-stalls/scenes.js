@@ -3,7 +3,9 @@
      arrival → who comes through the hole (their kind of cock, and its size) → teasing → entry →
      rhythm → build-up → the finish (where, and how much) → aftermath → the stranger leaves,
    with atmosphere (smells, sounds, the stall itself) and, for ?degrade or ?praise people, voices
-   through the wall woven in between. About 13–20 beats, 15–21 seconds apart: five minutes or so.
+   through the wall woven in between. Beats come 22–32 seconds apart. Most scenes are one stranger (5–9
+   minutes); some take their time over extra rounds (10–15); now and then a queue of three or four
+   strangers takes turns (20–40 minutes). The person can step off the spot to stop at any time.
 
    Kinds of cock (the farm's own types): human, canine (knot, ties), equine (flared, floods),
    feline (barbed), draconic (ridged), double (two at once, pussy and ass).
@@ -228,36 +230,74 @@ export const PRAISES = [
   "\"So good. So, so good.\"",
 ];
 
-// ── put a scene together ───────────────────────────────────
-export function buildScene({ hole, visitor, funnel, degrade, praise }) {
-  const v = visitor, beats = [];
+// a stranger catchin' their breath and goin' again, or changin' pace
+const SECOND_WIND = [
+  "The stranger pulls out, breathing hard, and just rubs it against %n for a while, letting %n ache for it.",
+  "It slows right down, almost lazy, savouring %n, every stroke long enough that %n squirms.",
+  "The stranger shifts their stance, gets a better grip on the wall, and starts again harder than before.",
+  "A pause. Then two fingers push into %n alongside it, stretching %n even wider, before the thrusting starts again.",
+  "It pulls nearly all the way out and stays there, just the tip, until %n pushes back and begs for the rest.",
+  "The stranger wants it to last. The pace drops to slow, deep grinding, and it goes on and on.",
+];
+// the next stranger in the queue
+const NEXT_UP = [
+  "Before %n can even catch their breath, the next stranger is already at the hole.",
+  "There's a line now. %n can hear them outside, shuffling, impatient, one stepping forward the moment the last one leaves.",
+  "Somebody was waiting and watching the whole time, and now it's their turn.",
+  "A new set of footsteps, a new smell, a new shape pressing against the boards. %n's stall isn't getting a rest today.",
+  "The door hasn't even swung shut behind the last one before someone else steps up, already hard.",
+];
+
+// one stranger, start to finish. rounds = extra rhythm blocks before they finish (a longer go)
+function oneVisitor(beats, { hole, visitor, funnel, degrade, praise, rounds, first }) {
+  const v = visitor;
   const voice = () => (degrade && chance(0.4) ? "A voice through the boards: " + pick(TAUNTS) : praise && chance(0.4) ? "A voice through the boards: " + pick(PRAISES) : null);
   const atmos = () => (chance(0.35) ? pick(ATMOS) : null);
   const add = (t, extra) => { if (t) beats.push(Object.assign({ t }, extra || {})); };
-  // double needs both pussy and ass; if it's the mouth, the second one waits outside
-  add(pick(ARRIVE));
+  add(first ? pick(ARRIVE) : pick(NEXT_UP));
   add(atmos());
   add(pick(REVEAL[v.type]).replace("%size", SIZE_WORD[v.size]));
   add(pick(TEASE[hole]));
   if (chance(0.5)) add(pick(TEASE[hole]));
   add(pick((ENTRY[v.type] || ENTRY.human)[hole] || ENTRY.human[hole]));
-  const rh = RHYTHM[hole].slice().sort(() => Math.random() - 0.5);
-  const re = REACT[hole].slice().sort(() => Math.random() - 0.5);
-  add(re[0]);
-  add(rh[0]); add(pick(TYPE_RHYTHM[v.type])); add(re[1]); add(voice() || atmos()); add(rh[1]);
-  if (chance(0.5)) add(rh[2]);
-  if (chance(0.5)) add(re[2]);
+  for (let r = 0; r <= rounds; r++) {
+    if (r > 0) add(pick(SECOND_WIND));
+    const rh = RHYTHM[hole].slice().sort(() => Math.random() - 0.5);
+    const re = REACT[hole].slice().sort(() => Math.random() - 0.5);
+    add(re[0]);
+    add(rh[0]); add(pick(TYPE_RHYTHM[v.type])); add(re[1]); add(voice() || atmos()); add(rh[1]);
+    if (chance(0.5)) add(rh[2]);
+    if (chance(0.5)) add(re[2]);
+  }
   add(pick(BUILD));
   // where it ends: inside most of the time, sometimes pulled out (never for a knot or a funnel)
   const inside = funnel || v.type === "canine" || v.type === "double" || chance(0.75);
   const [lo, hi] = SIZES[v.size].ml;
   const ml = Math.round(between(lo, hi) * (LOAD_X[v.type] || 1));
-  add(finishLine(v, hole, ml, inside, funnel), { finish: true, inside, ml });
+  add(finishLine(v, hole, ml, inside, funnel), { finish: true, inside, ml, hole, visitor: v });
   if (inside && v.type === "canine") add(pick(KNOT_TIE));
   add(inside ? pick(AFTER.inside[hole]) : pick(AFTER.outside));
   add(voice());
   add(pick(LEAVE));
-  return { beats, ml, inside };
+}
+
+// a whole scene. Most are one stranger (5–9 minutes); some take their time over extra rounds (10–15);
+// now and then there's a queue, and three or four strangers take turns (20–40 minutes).
+export function buildScene({ hole, visitor, funnel, degrade, praise, holes, length }) {
+  const beats = [], open = holes && holes.length ? holes : [hole];
+  const r = Math.random(), kind = length || (r < 0.55 ? "single" : r < 0.85 ? "long" : "marathon");
+  const rounds = () => (kind === "single" ? 0 : 1 + Math.floor(Math.random() * 2));
+  oneVisitor(beats, { hole, visitor, funnel, degrade, praise, rounds: rounds(), first: true });
+  if (kind === "marathon") {
+    const more = 2 + Math.floor(Math.random() * 2);   // two or three more strangers
+    for (let i = 0; i < more; i++) {
+      const v = pickVisitor(open);
+      const h = v.type === "double" ? "vulva" : pick(open);
+      oneVisitor(beats, { hole: h, visitor: v, funnel: funnel && h === "mouth", degrade, praise, rounds: Math.random() < 0.4 ? 1 : 0, first: false });
+    }
+  }
+  const finishes = beats.filter((b) => b.finish);
+  return { beats, kind, ml: finishes.reduce((a, b) => a + b.ml, 0), inside: finishes.some((b) => b.inside) };
 }
 
 // a real visitor: a shorter scene from the same pools, with their own cock and their own load

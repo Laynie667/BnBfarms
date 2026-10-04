@@ -79,9 +79,9 @@ function startScene(id, mn) {
   // a double takes pussy and ass together; everyone else picks one open hole
   const hole = visitor.type === "double" ? "vulva" : pick(holes);
   const r = api.rec(mn) || {}, funnel = hole === "mouth" && api.funnelOn(mn);
-  const scene = buildScene({ hole, visitor, funnel, degrade: !!r.degradeMe, praise: !!r.praiseMe });
+  const scene = buildScene({ hole, visitor, funnel, degrade: !!r.degradeMe, praise: !!r.praiseMe, holes });
   running.set(id, { mn, scene, hole, visitor, i: 0 });
-  api.log("stall " + id + ": " + visitor.size + " " + visitor.type + " in the " + hole + " for " + mn);
+  api.log("stall " + id + ": " + scene.kind + ", " + visitor.size + " " + visitor.type + " in the " + hole + " for " + mn);
   step(id);
 }
 function step(id) {
@@ -98,11 +98,11 @@ function step(id) {
   if (!beat) { running.delete(id); scheduleNext(id, mn); return; }
   api.privateEmote(mn, fill(beat.t.replace(/%n/g, "%name%"), { name: api.name(mn) }));
   if (beat.finish) {
-    finish(id, mn, run.hole, beat.ml, beat.inside, run.visitor);
+    finish(id, mn, beat.hole || run.hole, beat.ml, beat.inside, beat.visitor || run.visitor);
     api.face(mn, beat.inside ? "bred" : "afterglow", 45); api.sound(mn, "wet");
   }
   run.i++;
-  api.later(() => step(id), between(15, 21) * 1000);   // 13–20 beats: about 4–6 minutes
+  api.later(() => step(id), between(22, 32) * 1000);   // most scenes 5–9 min, longer ones up to ~35
 }
 
 // the finish counts everywhere: their record, the stall, the herd leader's score, maybe a pregnancy.

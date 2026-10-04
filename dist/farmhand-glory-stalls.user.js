@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm add-on: Glory stalls
 // @namespace    bnbfarm
-// @version      1.1.0
+// @version      1.2.0
 // @description  Glory stall spots: simulated ~5 minute scenes every 10-30 minutes, real visitors, shifts, punishment shifts and a board. Runs on the farm bot's computer, next to the Farmhand Bot script.
 // @author       Laynie & Alexia
 // @match        *://*.bondageprojects.elementfx.com/*
@@ -317,39 +317,72 @@
     `"That's it, that's perfect, you're perfect."`,
     '"So good. So, so good."'
   ];
-  function buildScene({ hole, visitor, funnel, degrade, praise }) {
-    const v = visitor, beats = [];
+  var SECOND_WIND = [
+    "The stranger pulls out, breathing hard, and just rubs it against %n for a while, letting %n ache for it.",
+    "It slows right down, almost lazy, savouring %n, every stroke long enough that %n squirms.",
+    "The stranger shifts their stance, gets a better grip on the wall, and starts again harder than before.",
+    "A pause. Then two fingers push into %n alongside it, stretching %n even wider, before the thrusting starts again.",
+    "It pulls nearly all the way out and stays there, just the tip, until %n pushes back and begs for the rest.",
+    "The stranger wants it to last. The pace drops to slow, deep grinding, and it goes on and on."
+  ];
+  var NEXT_UP = [
+    "Before %n can even catch their breath, the next stranger is already at the hole.",
+    "There's a line now. %n can hear them outside, shuffling, impatient, one stepping forward the moment the last one leaves.",
+    "Somebody was waiting and watching the whole time, and now it's their turn.",
+    "A new set of footsteps, a new smell, a new shape pressing against the boards. %n's stall isn't getting a rest today.",
+    "The door hasn't even swung shut behind the last one before someone else steps up, already hard."
+  ];
+  function oneVisitor(beats, { hole, visitor, funnel, degrade, praise, rounds, first }) {
+    const v = visitor;
     const voice = () => degrade && chance(0.4) ? "A voice through the boards: " + pick2(TAUNTS) : praise && chance(0.4) ? "A voice through the boards: " + pick2(PRAISES) : null;
     const atmos = () => chance(0.35) ? pick2(ATMOS) : null;
     const add = (t, extra) => {
       if (t) beats.push(Object.assign({ t }, extra || {}));
     };
-    add(pick2(ARRIVE));
+    add(first ? pick2(ARRIVE) : pick2(NEXT_UP));
     add(atmos());
     add(pick2(REVEAL[v.type]).replace("%size", SIZE_WORD[v.size]));
     add(pick2(TEASE[hole]));
     if (chance(0.5)) add(pick2(TEASE[hole]));
     add(pick2((ENTRY[v.type] || ENTRY.human)[hole] || ENTRY.human[hole]));
-    const rh = RHYTHM[hole].slice().sort(() => Math.random() - 0.5);
-    const re = REACT[hole].slice().sort(() => Math.random() - 0.5);
-    add(re[0]);
-    add(rh[0]);
-    add(pick2(TYPE_RHYTHM[v.type]));
-    add(re[1]);
-    add(voice() || atmos());
-    add(rh[1]);
-    if (chance(0.5)) add(rh[2]);
-    if (chance(0.5)) add(re[2]);
+    for (let r = 0; r <= rounds; r++) {
+      if (r > 0) add(pick2(SECOND_WIND));
+      const rh = RHYTHM[hole].slice().sort(() => Math.random() - 0.5);
+      const re = REACT[hole].slice().sort(() => Math.random() - 0.5);
+      add(re[0]);
+      add(rh[0]);
+      add(pick2(TYPE_RHYTHM[v.type]));
+      add(re[1]);
+      add(voice() || atmos());
+      add(rh[1]);
+      if (chance(0.5)) add(rh[2]);
+      if (chance(0.5)) add(re[2]);
+    }
     add(pick2(BUILD));
     const inside = funnel || v.type === "canine" || v.type === "double" || chance(0.75);
     const [lo, hi] = SIZES[v.size].ml;
     const ml = Math.round(between2(lo, hi) * (LOAD_X[v.type] || 1));
-    add(finishLine(v, hole, ml, inside, funnel), { finish: true, inside, ml });
+    add(finishLine(v, hole, ml, inside, funnel), { finish: true, inside, ml, hole, visitor: v });
     if (inside && v.type === "canine") add(pick2(KNOT_TIE));
     add(inside ? pick2(AFTER.inside[hole]) : pick2(AFTER.outside));
     add(voice());
     add(pick2(LEAVE));
-    return { beats, ml, inside };
+  }
+  function buildScene({ hole, visitor, funnel, degrade, praise, holes, length }) {
+    const beats = [], open = holes && holes.length ? holes : [hole];
+    const r = Math.random(), kind = length || (r < 0.55 ? "single" : r < 0.85 ? "long" : "marathon");
+    const rounds = () => kind === "single" ? 0 : 1 + Math.floor(Math.random() * 2);
+    oneVisitor(beats, { hole, visitor, funnel, degrade, praise, rounds: rounds(), first: true });
+    if (kind === "marathon") {
+      const more = 2 + Math.floor(Math.random() * 2);
+      for (let i = 0; i < more; i++) {
+        const v = pickVisitor(open);
+        const h = v.type === "double" ? "vulva" : pick2(open);
+        oneVisitor(beats, { hole: h, visitor: v, funnel: funnel && h === "mouth", degrade, praise, rounds: Math.random() < 0.4 ? 1 : 0, first: false });
+      }
+    }
+    const finishes = beats.filter((b) => b.finish);
+    return { beats, kind, ml: finishes.reduce((a, b) => a + b.ml, 0), inside: finishes.some((b) => b.inside) };
   }
   function buildRealScene({ hole, visitor, funnel, ml, inside }) {
     return [
@@ -413,9 +446,9 @@
     const visitor = pickVisitor(holes);
     const hole = visitor.type === "double" ? "vulva" : pick(holes);
     const r = api.rec(mn) || {}, funnel = hole === "mouth" && api.funnelOn(mn);
-    const scene = buildScene({ hole, visitor, funnel, degrade: !!r.degradeMe, praise: !!r.praiseMe });
+    const scene = buildScene({ hole, visitor, funnel, degrade: !!r.degradeMe, praise: !!r.praiseMe, holes });
     running.set(id, { mn, scene, hole, visitor, i: 0 });
-    api.log("stall " + id + ": " + visitor.size + " " + visitor.type + " in the " + hole + " for " + mn);
+    api.log("stall " + id + ": " + scene.kind + ", " + visitor.size + " " + visitor.type + " in the " + hole + " for " + mn);
     step(id);
   }
   function step(id) {
@@ -435,12 +468,12 @@
     }
     api.privateEmote(mn, fill(beat.t.replace(/%n/g, "%name%"), { name: api.name(mn) }));
     if (beat.finish) {
-      finish(id, mn, run.hole, beat.ml, beat.inside, run.visitor);
+      finish(id, mn, beat.hole || run.hole, beat.ml, beat.inside, beat.visitor || run.visitor);
       api.face(mn, beat.inside ? "bred" : "afterglow", 45);
       api.sound(mn, "wet");
     }
     run.i++;
-    api.later(() => step(id), between(15, 21) * 1e3);
+    api.later(() => step(id), between(22, 32) * 1e3);
   }
   function finish(id, mn, hole, ml, inside, visitor) {
     const d = D(), p = api.prod(mn);

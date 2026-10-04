@@ -53,7 +53,7 @@ const beepsTo=(k,mn)=>sent.slice(k).filter(([e,d])=>e==='AccountBeep'&&d.MemberN
   W.__addons('tick'); await wait(1500); await drain();
   const lines=toWhom(k,500).filter(c=>/^\(\*/.test(c));
   ok(lines.length>=9, 'a whole scene played to Moo in private out-of-character emotes ('+lines.length+' lines)');
-  ok(lines.some(c=>/about \d+ mL/.test(c)), 'the finish says where and how much');
+  ok(lines.some(c=>/\d+ mL/.test(c)), 'the finish says where and how much');
   ok(!sent.slice(k).some(([e,d])=>d&&d.Type==='Emote'), 'nothing went to the public room');
   ok(d().people['500'] && d().people['500'].total===1, 'the finish counted on Moo');
   const p=L().people[500].prod; ok(p && ((p.held.mouth+p.held.vulva+p.held.butt)>0 || lines.some(c=>/pulls out and paints/.test(c))), 'the cum is tracked in what Moo is holding (unless it was pulled out over her)');

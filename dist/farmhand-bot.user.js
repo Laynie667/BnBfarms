@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.13.0
+// @version      0.13.1
 // @description  B&B Farm: beeps, keys, ledger, roster, herds, summoning, anti-idle
 // @author       Laynie & Alexia
 // @match        *://*.bondageprojects.elementfx.com/*
@@ -1800,7 +1800,7 @@
   ];
 
   // bot/src/version.js
-  var VERSION = "0.13.0";
+  var VERSION = "0.13.1";
 
   // bot-parts:farmhand-bot-parts
   (function() {
@@ -3436,6 +3436,17 @@
     const EMOJI = /(?:\p{Extended_Pictographic}|\p{Regional_Indicator}|[\uFE0F\u200D\u20E3])/gu;
     const noEmoji = (s) => String(s).replace(EMOJI, "").replace(/[ \t]{2,}/g, " ").replace(/^([*(]?)[ \t]+/gm, "$1").replace(/[ \t]+$/gm, "");
     function send(ev, data, urgent) {
+      if (ev === "ChatRoomChat" && data && data.Type === "Hidden" && data.Target === CFG.BOT_MEMBER && typeof W.__farmhandOwnPanel === "function") {
+        const copy = JSON.parse(JSON.stringify(Object.assign({}, data, { Sender: CFG.BOT_MEMBER })));
+        setTimeout(() => {
+          try {
+            W.__farmhandOwnPanel(copy);
+          } catch (e) {
+            warn("own panel:", e);
+          }
+        }, 0);
+        return;
+      }
       if (ev === "AccountBeep" && data && typeof data.Message === "string") data = Object.assign({}, data, { Message: noEmoji(data.Message) });
       else if (ev === "ChatRoomChat" && data && data.Type !== "Hidden" && typeof data.Content === "string") data = Object.assign({}, data, { Content: noEmoji(data.Content) });
       if (urgent) state.urgent.push({ ev, data });
@@ -7116,7 +7127,18 @@
         __bot: true,
         // returns the add-on's helpers; the same helpers are also handed to setup(api)
         register: (def) => registerAddon(def),
-        list: () => [...ADDONS.values()].map((a) => ({ name: a.name, label: a.label, version: a.version, enabled: a.enabled !== false, errors: a.errors }))
+        list: () => [...ADDONS.values()].map((a) => ({ name: a.name, label: a.label, version: a.version, enabled: a.enabled !== false, errors: a.errors })),
+        // the Companion on the bot's own account talks to the bot here, on the page
+        own: (dict) => {
+          try {
+            if (!dict || typeof dict !== "object" || !["hello", "bye", "cmd", "outfitSave", "outfitAnswer", "relayNo", "sight", "leadOk", "leadNo"].includes(dict.type)) return false;
+            onCompanion(Object.assign({}, JSON.parse(JSON.stringify(dict)), { from: CFG.BOT_MEMBER }));
+            return true;
+          } catch (e) {
+            warn("own panel:", e);
+            return false;
+          }
+        }
       });
       try {
         W.dispatchEvent(new W.CustomEvent("farmhand:ready", { detail: { api: 1, version: VERSION } }));
@@ -12153,7 +12175,7 @@ Welcome to B&B Farm, hon. 🌾`
         try {
           if (!data) return;
           if (data.Sender === CFG.BOT_MEMBER) {
-            const own = data.Type === "Hidden" && readMsg(data);
+            const own = data.Type === "Hidden" && typeof W.__farmhandOwnPanel !== "function" && readMsg(data);
             if (own && ["hello", "bye", "cmd", "outfitSave", "outfitAnswer", "relayNo", "sight", "leadOk", "leadNo"].includes(own.type)) onCompanion(own);
             return;
           }

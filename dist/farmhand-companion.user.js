@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.10.0
+// @version      0.10.1
 // @description  Your B&B Farm panel: the farm girl's answers, stat cards and guides, right in the game.
 // @author       Laynie & Alexia
 // @match        *://*.bondageprojects.elementfx.com/*
@@ -224,7 +224,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.10.0";
+  var VERSION = "0.10.1";
 
   // extension/src/config.js
   var BOT_MEMBER = 260239;
@@ -3750,7 +3750,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
   });
   var st = { panel: null, welcomed: false, lastHello: 0, parts: /* @__PURE__ */ new Map() };
   var botHere = () => window.CurrentScreen === "ChatRoom" && Array.isArray(window.ChatRoomCharacter) && window.ChatRoomCharacter.some((c) => c.MemberNumber === BOT_MEMBER);
+  var onBotAccount = () => !!(window.Player && window.Player.MemberNumber === BOT_MEMBER);
+  var direct = () => onBotAccount() && window.Farmhand && typeof window.Farmhand.own === "function";
   function toBot(type, data) {
+    if (direct() && window.Farmhand.own(Object.assign({}, data, { type }))) return;
     window.ServerSend("ChatRoomChat", makeMsg(type, data, BOT_MEMBER));
   }
   function hello() {
@@ -3990,6 +3993,20 @@ One of mods you are using is using an old version of SDK. It will work for now b
     st.panel = new Panel(sendCommand, api);
     st.panel.setStatus("waitin' for the farm girl");
     initCues({ toBot, panel: st.panel, local: toChat });
+    window.__farmhandOwnPanel = (data) => {
+      if (!onBotAccount()) return;
+      const m = readMsg(data);
+      if (m) {
+        try {
+          onFarmMsg(m);
+        } catch (e) {
+          console.warn("[Farmhand Companion]", e);
+        }
+      }
+    };
+    setTimeout(() => {
+      if (onBotAccount() && !st.gotState) st.panel.add("This is the farm bot's own account. " + (window.Farmhand ? "The bot (v" + window.Farmhand.version + ") hasn't sent this panel your roles yet; update farmhand-bot.user.js to v0.13.1 or newer and reload." : "The bot script isn't running on this page. Install farmhand-bot.user.js here (it runs next to the Companion), then reload."), "notice");
+    }, 3e4);
     try {
       mod.hookFunction("ChatRoomMapViewDraw", 0, (args, next) => {
         const r = next(args);

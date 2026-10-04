@@ -31,7 +31,11 @@ const botHere = () =>
   Array.isArray(window.ChatRoomCharacter) &&
   window.ChatRoomCharacter.some((c) => c.MemberNumber === BOT_MEMBER);
 
+// the Companion on the bot's OWN account (both scripts on one page): talk to the bot directly
+const onBotAccount = () => !!(window.Player && window.Player.MemberNumber === BOT_MEMBER);
+const direct = () => onBotAccount() && window.Farmhand && typeof window.Farmhand.own === "function";
 function toBot(type, data) {
+  if (direct() && window.Farmhand.own(Object.assign({}, data, { type }))) return;
   window.ServerSend("ChatRoomChat", makeMsg(type, data, BOT_MEMBER));
 }
 
@@ -239,6 +243,13 @@ function start() {
   st.panel = new Panel(sendCommand, api);
   st.panel.setStatus("waitin' for the farm girl");
   initCues({ toBot, panel: st.panel, local: toChat });
+  // the bot hands this page's own-account messages straight here (see toBot above)
+  window.__farmhandOwnPanel = (data) => { if (!onBotAccount()) return; const m = readMsg(data); if (m) { try { onFarmMsg(m); } catch (e) { console.warn("[Farmhand Companion]", e); } } };
+  // on the bot's account with a bot too old for the direct link: say so instead of sittin' on the guest panel
+  setTimeout(() => {
+    if (onBotAccount() && !st.gotState) st.panel.add("This is the farm bot's own account. " + (window.Farmhand ? "The bot (v" + window.Farmhand.version + ") hasn't sent this panel your roles yet; update farmhand-bot.user.js to v0.13.1 or newer and reload." :
+      "The bot script isn't running on this page. Install farmhand-bot.user.js here (it runs next to the Companion), then reload."), "notice");
+  }, 30000);
   // staff map markers, drawn over the game's own map (never breaks the game's drawing)
   try { mod.hookFunction("ChatRoomMapViewDraw", 0, (args, next) => { const r = next(args); drawMarkers(); return r; }); }
   catch (e) { console.warn("[Farmhand Companion] map markers unavailable:", e); }

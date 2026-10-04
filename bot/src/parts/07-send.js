@@ -110,6 +110,13 @@
   const EMOJI = /(?:\p{Extended_Pictographic}|\p{Regional_Indicator}|[\uFE0F\u200D\u20E3])/gu;
   const noEmoji = (s) => String(s).replace(EMOJI, "").replace(/[ \t]{2,}/g, " ").replace(/^([*(]?)[ \t]+/gm, "$1").replace(/[ \t]+$/gm, "");
   function send(ev, data, urgent){
+    // the Companion on the bot's OWN account sits on this same page: hand its messages over directly
+    // (no trip to the server and back, which the game may not do for messages to yourself)
+    if (ev === "ChatRoomChat" && data && data.Type === "Hidden" && data.Target === CFG.BOT_MEMBER && typeof W.__farmhandOwnPanel === "function"){
+      const copy = JSON.parse(JSON.stringify(Object.assign({}, data, { Sender: CFG.BOT_MEMBER })));
+      setTimeout(() => { try { W.__farmhandOwnPanel(copy); } catch(e){ warn("own panel:", e); } }, 0);
+      return;
+    }
     if (ev === "AccountBeep" && data && typeof data.Message === "string") data = Object.assign({}, data, { Message: noEmoji(data.Message) });
     else if (ev === "ChatRoomChat" && data && data.Type !== "Hidden" && typeof data.Content === "string") data = Object.assign({}, data, { Content: noEmoji(data.Content) });
     if (urgent) state.urgent.push({ ev, data });

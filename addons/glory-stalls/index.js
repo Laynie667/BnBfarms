@@ -20,7 +20,7 @@
    mouth.
 */
 import { connect, pick, between, fill } from "../_lib/connect.js";
-import { SCENES, TAUNTS } from "./scenes.js";
+import { buildScene, buildRealScene, pickVisitor, sizeFromInches, ATMOS, TYPES } from "./scenes.js";
 
 const HOLE_WORDS = { mouth: "mouth", vulva: "pussy", butt: "ass" };
 const holeFrom = (w) => {
@@ -71,15 +71,17 @@ function whyNot(mn) {
   return null;
 }
 
-// ── a scene, beat by beat ──────────────────────────────────
+// ── a scene, beat by beat (built fresh each time in scenes.js) ──
 function startScene(id, mn) {
   const holes = openHoles(mn);
-  const scenes = SCENES.filter((s) => holes.includes(s.hole));
-  if (!scenes.length) return;
-  const scene = pick(scenes);
-  const deg = !!(api.rec(mn) || {}).degradeMe;
-  running.set(id, { mn, scene, i: 0, deg, funnel: scene.hole === "mouth" && api.funnelOn(mn) });
-  api.log("stall " + id + ": " + scene.id + " for " + mn);
+  if (!holes.length) return;
+  const visitor = pickVisitor(holes);
+  // a double takes pussy and ass together; everyone else picks one open hole
+  const hole = visitor.type === "double" ? "vulva" : pick(holes);
+  const r = api.rec(mn) || {}, funnel = hole === "mouth" && api.funnelOn(mn);
+  const scene = buildScene({ hole, visitor, funnel, degrade: !!r.degradeMe, praise: !!r.praiseMe });
+  running.set(id, { mn, scene, hole, visitor, i: 0 });
+  api.log("stall " + id + ": " + visitor.size + " " + visitor.type + " in the " + hole + " for " + mn);
   step(id);
 }
 function step(id) {
@@ -89,36 +91,42 @@ function step(id) {
   // they stepped off the stall: the stranger gives up, nothin' counted
   if (!api.onSpot(mn, "glory-" + id, 0)) {
     running.delete(id);
-    api.privateEmote(mn, "Behind you, the stranger at stall " + id + " grumbles at the empty hole and wanders off.");
+    api.privateEmote(mn, "Behind " + api.name(mn) + ", the stranger at the hole grumbles at the empty stall and wanders off.");
     return;
   }
   const beat = scene.beats[run.i];
   if (!beat) { running.delete(id); scheduleNext(id, mn); return; }
-  const line = (run.funnel && beat.f) || (run.deg && beat.d) || beat.t;
-  api.privateEmote(mn, fill(line, { name: api.name(mn) }));
-  if (beat.finish) { finish(id, mn, scene.hole, between(18, 45)); api.face(mn, "bred", 45); api.sound(mn, "wet"); }
-  else if (run.deg && Math.random() < 0.3 && run.i > 0) api.later(() => running.get(id) === run && api.privateEmote(mn, fill(pick(TAUNTS), { name: api.name(mn) })), 9000);
+  api.privateEmote(mn, fill(beat.t.replace(/%n/g, "%name%"), { name: api.name(mn) }));
+  if (beat.finish) {
+    finish(id, mn, run.hole, beat.ml, beat.inside, run.visitor);
+    api.face(mn, beat.inside ? "bred" : "afterglow", 45); api.sound(mn, "wet");
+  }
   run.i++;
   api.later(() => step(id), between(22, 32) * 1000);
 }
 
-// the finish counts everywhere: their record, the stall, the herd leader's score, maybe a pregnancy
-function finish(id, mn, hole, ml) {
+// the finish counts everywhere: their record, the stall, the herd leader's score, maybe a pregnancy.
+// Inside: it's held (and a pussy load can take). Pulled out over them: it counts, but nothin's held.
+function finish(id, mn, hole, ml, inside, visitor) {
   const d = D(), p = api.prod(mn);
-  if (p) {
-    p.held[hole] = (p.held[hole] || 0) + ml;
+  const holes = visitor && visitor.type === "double" ? ["vulva", "butt"] : [hole];
+  if (p && inside) {
+    for (const h of holes) p.held[h] = (p.held[h] || 0) + ml / holes.length;
     p.totals.received = (p.totals.received || 0) + ml;
     p.last = p.last || Date.now();
   }
   api.tally(mn);
   const me = d.people[mn] = d.people[mn] || { holes: {}, ml: 0 };
-  bump(me, 1); me.holes[hole] = (me.holes[hole] || 0) + 1; me.ml = (me.ml || 0) + ml;
+  bump(me, 1); for (const h of holes) me.holes[h] = (me.holes[h] || 0) + 1; me.ml = (me.ml || 0) + ml;
+  me.biggest = Math.max(me.biggest || 0, ml);
+  if (visitor) { me.kinds = me.kinds || {}; me.kinds[visitor.type] = (me.kinds[visitor.type] || 0) + 1; }
   bump(d.stalls[id] = d.stalls[id] || {}, 1);
   const leader = api.herdLeaderOf(mn);
   if (leader) api.staffPoints(leader, 1, "glory");
   const r = api.rec(mn);
-  if (hole === "vulva" && r && r.breedable && r.fertile && !api.limitBlocks(mn, "breed")) {
-    const took = api.rollConception(mn, api.ANON_STUD, ml);
+  if (inside && holes.includes("vulva") && r && r.breedable && r.fertile && !api.limitBlocks(mn, "breed")) {
+    if (p) p.lastFill = { at: Date.now(), stud: api.ANON_STUD, ml: ml / holes.length };   // cummin' soon after can still make it take
+    const took = api.rollConception(mn, api.ANON_STUD, ml / holes.length);
     if (took === "new") api.later(() => api.notice(mn, "🍼 A warm, heavy feelin' settles low in your belly… somethin' from the stalls took, sugar. (?stats shows it)"), 20000);
   }
   api.save();
@@ -162,7 +170,12 @@ function tick() {
       if (prompted.get(v) !== id) { prompted.set(v, id); api.notice(v, "🕳️ Stall " + id + " is occupied. ?stall use mouth, ?stall use pussy or ?stall use ass. Whoever's inside never learns your name."); }
       continue;
     }
-    if (now >= (s.next || 0) && !whyNot(mn)) startScene(id, mn);
+    if (now >= (s.next || 0) && !whyNot(mn)) { startScene(id, mn); continue; }
+    // waitin' between visitors: the stall around them, every 3–6 minutes
+    if (!whyNot(mn) && now >= (s.atmosAt || 0)) {
+      if (s.atmosAt) api.privateEmote(mn, fill(pick(ATMOS).replace(/%n/g, "%name%"), { name: api.name(mn) }));
+      s.atmosAt = now + between(3, 6) * 60000;
+    }
   }
   for (const [v, id] of prompted) if (!api.onSpot(v, "glory-" + id + "-visitor", 0)) prompted.delete(v);
 }
@@ -181,7 +194,9 @@ function cmdGlory(c) {
   const me = d.people[sender];
   c.reply("🕳️ Glory stalls: " + (d.optIn[sender] ? "ON" : "OFF") + " (?glory on / ?glory off)" +
     (me ? "\nToday: " + (me.day === today() ? me.today : 0) + " · all time: " + (me.total || 0) +
-      " (mouth " + (me.holes.mouth || 0) + ", pussy " + (me.holes.vulva || 0) + ", ass " + (me.holes.butt || 0) + ")" : "") +
+      " (mouth " + (me.holes.mouth || 0) + ", pussy " + (me.holes.vulva || 0) + ", ass " + (me.holes.butt || 0) + ")" +
+      (me.biggest ? " · biggest load " + Math.round(me.biggest) + " mL" : "") +
+      (me.kinds ? " · most often: " + Object.entries(me.kinds).sort((a, b) => b[1] - a[1])[0][0] : "") : "") +
     (d.shifts[sender] ? "\nOn " + (d.shifts[sender].punish ? "a punishment " : "") + "shift for " + Math.ceil((d.shifts[sender].until - Date.now()) / 60000) + " more minutes." : ""));
 }
 
@@ -214,9 +229,16 @@ function cmdStall(c) {
     const load = A.makesSemen(sender) && sp ? A.drainSemen(sender, Math.max(sp.semen * A.cfg.PROD.LOAD_SHARE, Math.min(sp.semen, A.cfg.PROD.MIN_LOAD))) : 0;
     if (sp && load) sp.totals.given = (sp.totals.given || 0) + load;
     const w = HOLE_WORDS[hole];
-    A.privateEmote(sender, "You step up to stall " + id + " and use the " + w + " waiting at the hole until you finish" + (load ? ", leaving " + A.ml(load) + " behind" : "") + ". Nobody inside knows who you are.");
-    A.privateEmote(mn, "Someone real steps up to the hole this time. They use your " + w + " without a word, steady and greedy, until they finish" + (load ? " deep inside" : "") + " and walk away. You never see who.");
-    finish(id, mn, hole, load);
+    const kind = A.makesSemen(sender) ? (A.penisType(sender) || "human") : "human";
+    const visitor = { type: TYPES[kind] ? kind : "human", size: sizeFromInches(A.cockInches(sender) || 7) };
+    // a double cock only goes in two at once when both pussy and ass are open and they picked one of them
+    if (visitor.type === "double" && !(hole !== "mouth" && openHoles(mn).includes("vulva") && openHoles(mn).includes("butt"))) visitor.type = "human";
+    const inside = true, funnel = hole === "mouth" && A.funnelOn(mn);
+    A.privateEmote(sender, "You step up to the hole and push through into the " + w + " waiting on the other side. You finish " + (load >= 1 ? "deep inside, about " + Math.round(load) + " mL" : "with a shudder") + ". Whoever's in there never sees your face.");
+    const lines = load >= 1 ? buildRealScene({ hole, visitor, funnel, ml: load, inside })
+      : buildRealScene({ hole, visitor, funnel, ml: 0, inside }).slice(0, 4).concat(["The stranger shudders and finishes against the wall, then pulls away."]);
+    lines.forEach((l, i) => A.later(() => A.privateEmote(mn, fill(l.replace(/%n/g, "%name%"), { name: A.name(mn) })), i * 5000));
+    A.later(() => finish(id, mn, hole, load, inside, visitor), (lines.length - 1) * 5000);
     scheduleNext(id, mn);
     A.audit(sender, "USE", "stall " + id);
     return;

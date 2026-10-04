@@ -6991,6 +6991,20 @@
         teleport,
         spotBeside,
         activityInfo,
+        penisType: (mn) => {
+          try {
+            return penisType(mn);
+          } catch (e) {
+            return "human";
+          }
+        },
+        cockInches: (mn) => {
+          try {
+            return sizeOf(mn, "penis");
+          } catch (e) {
+            return 7;
+          }
+        },
         // little cues their own Companion plays (v0.10+): a face, a sound for whoever's around, the trance haze
         face: (mn, mood, secs) => face(mn, mood, secs),
         sound: (mn, name) => sound(mn, name),

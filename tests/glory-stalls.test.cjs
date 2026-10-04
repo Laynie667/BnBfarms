@@ -53,9 +53,10 @@ const beepsTo=(k,mn)=>sent.slice(k).filter(([e,d])=>e==='AccountBeep'&&d.MemberN
   W.__addons('tick'); await wait(1500); await drain();
   const lines=toWhom(k,500).filter(c=>/^\(\*/.test(c));
   ok(lines.length>=9, 'a whole scene played to Moo in private out-of-character emotes ('+lines.length+' lines)');
+  ok(lines.some(c=>/about \d+ mL/.test(c)), 'the finish says where and how much');
   ok(!sent.slice(k).some(([e,d])=>d&&d.Type==='Emote'), 'nothing went to the public room');
   ok(d().people['500'] && d().people['500'].total===1, 'the finish counted on Moo');
-  const p=L().people[500].prod; ok(p && (p.held.mouth+p.held.vulva+p.held.butt)>0, 'the cum is tracked in what Moo is holding');
+  const p=L().people[500].prod; ok(p && ((p.held.mouth+p.held.vulva+p.held.butt)>0 || lines.some(c=>/pulls out and paints/.test(c))), 'the cum is tracked in what Moo is holding (unless it was pulled out over her)');
   ok(L().staffScore && L().staffScore['221397'] && L().staffScore['221397'].pts===1, "Moo's herd leader got a staff point");
   ok(lines.some(c=>/Moo/.test(c)) && !lines.some(c=>/Hana|Laynie/.test(c)), 'the scene names Moo and never the stranger');
 
@@ -65,7 +66,7 @@ const beepsTo=(k,mn)=>sent.slice(k).filter(([e,d])=>e==='AccountBeep'&&d.MemberN
   ok(toWhom(k,500).filter(c=>/^\(\*/.test(c)).length===0, 'no simulated scene while a real visitor is at the hole');
   ok(toWhom(k,600).join(' ').includes('Stall 1 is occupied'), 'the visitor is told how to use it');
   k=sent.length; handlers.ChatRoomMessage({Sender:600,Type:'Whisper',Content:'stall use mouth',Target:260239}); await drain(1500);
-  ok(toWhom(k,500).some(c=>/Someone real/.test(c)), "the occupant gets the real visitor's lines");
+  ok(toWhom(k,500).filter(c=>/^\(\*/.test(c)).length>=4, "the occupant gets the real visitor's scene, told with their own cock");
   ok(!toWhom(k,500).some(c=>/Hana/.test(c)), "...without the visitor's name");
   ok(d().people['500'].total===2, 'the real use counted too');
 

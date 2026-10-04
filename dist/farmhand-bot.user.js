@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.13.3
+// @version      0.13.4
 // @description  B&B Farm: beeps, keys, ledger, roster, herds, summoning, anti-idle
 // @author       Laynie & Alexia
 // @match        *://*.bondageprojects.elementfx.com/*
@@ -11,6 +11,9 @@
 // @match        *://*.bondageprojects.com/*
 // @match        *://bondageprojects.com/*
 // @match        *://*.bondage-asia.com/*
+// @match        *://bondage-asia.com/*
+// @match        *://*.bondageeurope.com/*
+// @match        *://bondageeurope.com/*
 // @grant        GM_setValue
 // @grant        GM_getValue
 // @grant        GM_registerMenuCommand
@@ -1800,7 +1803,7 @@
   ];
 
   // bot/src/version.js
-  var VERSION = "0.13.3";
+  var VERSION = "0.13.4";
 
   // bot-parts:farmhand-bot-parts
   (function() {

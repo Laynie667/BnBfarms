@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.10.2
+// @version      0.10.3
 // @description  Your B&B Farm panel: the farm girl's answers, stat cards and guides, right in the game.
 // @author       Laynie & Alexia
 // @match        *://*.bondageprojects.elementfx.com/*
@@ -11,6 +11,9 @@
 // @match        *://*.bondageprojects.com/*
 // @match        *://bondageprojects.com/*
 // @match        *://*.bondage-asia.com/*
+// @match        *://bondage-asia.com/*
+// @match        *://*.bondageeurope.com/*
+// @match        *://bondageeurope.com/*
 // @grant        none
 // @run-at       document-end
 // ==/UserScript==
@@ -224,7 +227,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.10.2";
+  var VERSION = "0.10.3";
 
   // extension/src/config.js
   var BOT_MEMBER = 260239;

@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm add-on: Map tools
 // @namespace    bnbfarm
-// @version      1.0.0
+// @version      1.0.1
 // @description  Opt-in fenced pens (wander out, get tugged back with a naughty mark) and a weekly heat map of time and action by zone. Runs on the farm bot's computer, next to the Farmhand Bot script.
 // @author       Laynie & Alexia
 // @match        *://*.bondageprojects.elementfx.com/*
@@ -11,6 +11,9 @@
 // @match        *://*.bondageprojects.com/*
 // @match        *://bondageprojects.com/*
 // @match        *://*.bondage-asia.com/*
+// @match        *://bondage-asia.com/*
+// @match        *://*.bondageeurope.com/*
+// @match        *://bondageeurope.com/*
 // @grant        unsafeWindow
 // @run-at       document-idle
 // ==/UserScript==

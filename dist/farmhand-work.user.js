@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm add-on: Work
 // @namespace    bnbfarm
-// @version      1.0.0
+// @version      1.0.1
 // @description  Staff leaderboard, private write-ups (writer and recipient only; others see a count) and opt-in inspections with an automatic checklist. Runs on the farm bot's computer, next to the Farmhand Bot script.
 // @author       Laynie & Alexia
 // @match        *://*.bondageprojects.elementfx.com/*
@@ -11,6 +11,9 @@
 // @match        *://*.bondageprojects.com/*
 // @match        *://bondageprojects.com/*
 // @match        *://*.bondage-asia.com/*
+// @match        *://bondage-asia.com/*
+// @match        *://*.bondageeurope.com/*
+// @match        *://bondageeurope.com/*
 // @grant        unsafeWindow
 // @run-at       document-idle
 // ==/UserScript==

@@ -177,5 +177,22 @@ const STATE = { name: "Laynie", onBooks: true, roles: ["PROPRIETOR", "LIVESTOCK"
   w.ChatRoomCharacter = [{ MemberNumber: 221397 }];
   commands.find((c) => c.Tag === "farm").Action("stats");
   out("8 bot away -> beeps ->", sent.some((s) => s[0] === "AccountBeep" && s[1].Message === "stats"));
+  // 11. farm emotes about her, posted as her own emote (no name in front), only if they name her
+  w.Player = { Name: "Laynie", Nickname: "Laynie", MemberNumber: 221397 };
+  out("11 hello says it relays ->", toBot("hello").slice(-1)[0][1].Dictionary.relay === true);
+  let n0 = sent.length;
+  bot({ type: "relay", id: 41, text: "🤰 Laynie's belly jumps as the litter kicks (hard)." });
+  const posted = sent.slice(n0).filter((s) => s[1].Type === "Emote");
+  out("11 a line about her is posted as her emote ->", posted.length === 1 && posted[0][1].Content === "*Laynie's belly jumps as the litter kicks [hard].", posted[0] && posted[0][1].Content);
+  n0 = sent.length; bot({ type: "relay", id: 42, text: "Moo's belly jumps." });
+  out("11 a line not about her is refused, and the bot told ->", !sent.slice(n0).some((s) => s[1].Type === "Emote") && toBot("relayNo").some((s) => s[1].Dictionary.id === 42));
+  click("Toggles"); await wait(100);
+  const sw = [...D.querySelectorAll("#fhc-panel .fhc-tog")].find((x) => /come from me/.test(x.textContent));
+  out("11 the switch is in Toggles ->", !!sw);
+  if (sw) sw.querySelector("button").click();
+  await wait(100);
+  out("11 switching it off tells the bot ->", toBot("hello").slice(-1)[0][1].Dictionary.relay === false);
+  n0 = sent.length; bot({ type: "relay", id: 43, text: "Laynie sways." });
+  out("11 switched off: refused ->", !sent.slice(n0).some((s) => s[1].Type === "Emote") && toBot("relayNo").some((s) => s[1].Dictionary.id === 43));
   process.exit(0);
 })();

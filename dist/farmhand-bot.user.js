@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.11.0
+// @version      0.12.0
 // @description  B&B Farm: beeps, keys, ledger, roster, herds, summoning, anti-idle
 // @author       Laynie & Alexia
 // @match        *://*.bondageprojects.elementfx.com/*
@@ -1800,7 +1800,7 @@
   ];
 
   // bot/src/version.js
-  var VERSION = "0.11.0";
+  var VERSION = "0.12.0";
 
   // bot-parts:farmhand-bot-parts
   (function() {
@@ -3427,7 +3427,11 @@
         return false;
       }
     }
+    const EMOJI = /(?:\p{Extended_Pictographic}|\p{Regional_Indicator}|[\uFE0F\u200D\u20E3])/gu;
+    const noEmoji = (s) => String(s).replace(EMOJI, "").replace(/[ \t]{2,}/g, " ").replace(/^([*(]?)[ \t]+/gm, "$1").replace(/[ \t]+$/gm, "");
     function send(ev, data, urgent) {
+      if (ev === "AccountBeep" && data && typeof data.Message === "string") data = Object.assign({}, data, { Message: noEmoji(data.Message) });
+      else if (ev === "ChatRoomChat" && data && data.Type !== "Hidden" && typeof data.Content === "string") data = Object.assign({}, data, { Content: noEmoji(data.Content) });
       if (urgent) state.urgent.push({ ev, data });
       else if (state.inReply) (state.replies || (state.replies = [])).push({ ev, data });
       else {
@@ -3473,8 +3477,16 @@
       send("ChatRoomChat", m, urgent);
     }
     function say(t, urgent, who) {
-      if (speakersOn() && speakerSend(who || aboutWhom(t), t, "chat", urgent)) return;
-      walkTo(who || aboutWhom(t), urgent);
+      const subject = who || aboutWhom(t);
+      if (speakersOn() && speakerSend(subject, t, "chat", urgent)) return;
+      if (mapRoom() && CFG.SPEAKER_MODE !== "walk") {
+        if (subject && speakerSend(subject, t, "chat", urgent)) return;
+        if (!subject) {
+          toEveryone(t, "chat", urgent);
+          return;
+        }
+      }
+      walkTo(subject, urgent);
       enqueue({ Content: t, Type: "Chat" }, urgent);
     }
     const mapRoom = () => !!(W.ChatRoomData && W.ChatRoomData.MapData && W.ChatRoomData.MapData.Type && W.ChatRoomData.MapData.Type !== "Never");
@@ -3515,9 +3527,58 @@
     }
     function emote(t, who) {
       if (state.cmdWatch) state.cmdWatch.emotes.push(String(t));
-      if (speakersOn() && speakerSend(who || aboutWhom(t), t, "emote")) return;
-      walkTo(who || aboutWhom(t));
+      const subject = who || aboutWhom(t);
+      if (mapRoom() && subject) {
+        const parties = [subject].concat(namesHere(t).filter((m) => m !== subject));
+        const by = parties.find((m) => canRelay(m) && namedIn(String(t), [m]));
+        if (by) {
+          relayEmote(by, t, subject);
+          return;
+        }
+        if (speakersOn() && speakerSend(subject, t, "emote")) return;
+        if (CFG.SPEAKER_MODE !== "walk" && speakerSend(subject, t, "emote")) return;
+      } else if (mapRoom() && CFG.SPEAKER_MODE !== "walk") {
+        toEveryone(t, "emote");
+        return;
+      }
+      walkTo(subject);
       for (const c of splitMessage(t, 900)) enqueue({ Content: "*" + c, Type: "Emote" });
+    }
+    function namesHere(text) {
+      return (W.ChatRoomCharacter || []).map((c) => c.MemberNumber).filter((m) => m !== CFG.BOT_MEMBER && onMap(m) && namedIn(String(text), [m]));
+    }
+    function canRelay(mn) {
+      const c = state.companions.get(mn);
+      return !!(hasCompanion(mn) && c && c.relay !== false && verAtLeast(c.ver, "0.9.0"));
+    }
+    function verAtLeast(v, min) {
+      const a = String(v || "0").split(".").map(Number), b = min.split(".").map(Number);
+      for (let i = 0; i < 3; i++) {
+        if ((a[i] || 0) !== b[i]) return (a[i] || 0) > b[i];
+      }
+      return true;
+    }
+    function relayEmote(mn, text, subject) {
+      state.relays = state.relays || /* @__PURE__ */ new Map();
+      const id = ++companionSeq;
+      state.relays.set(id, { text, subject: subject || mn, at: Date.now() });
+      enqueue(makeMsg("relay", { text: String(text).slice(0, 900), id }, mn));
+      for (const [k, r] of state.relays) if (Date.now() - r.at > 12e4) state.relays.delete(k);
+    }
+    function relayRefused(id) {
+      const r = state.relays && state.relays.get(id);
+      if (!r) return;
+      state.relays.delete(id);
+      if (!speakerSend(r.subject, r.text, "emote")) for (const c of splitMessage(r.text, 900)) enqueue({ Content: "*" + c, Type: "Emote" });
+    }
+    function toEveryone(text, kind, urgent) {
+      const line = (kind === "emote" ? "*" : "") + String(text);
+      for (const c of W.ChatRoomCharacter || []) {
+        const mn = c.MemberNumber;
+        if (mn === CFG.BOT_MEMBER) continue;
+        if (hasCompanion(mn)) enqueue(makeMsg("roomline", { text: line, kind }, mn), urgent);
+        else for (const part of splitMessage(line, 900)) enqueue({ Content: "(" + part.replace(/\)/g, "]"), Type: "Whisper", Target: mn }, urgent);
+      }
     }
     const speakersOn = () => mapRoom() && CFG.SPEAKER_MODE === "voice" && Object.keys(L.spots || {}).some((n) => n.startsWith("speaker"));
     function speakerSend(anchor, text, kind, urgent) {
@@ -3528,9 +3589,9 @@
       };
       const at = anchor && pos(anchor);
       if (!at) return false;
-      const speakers = Object.entries(L.spots).filter(([n]) => n.startsWith("speaker")).map(([, s]) => s);
+      const speakers = Object.entries(L.spots || {}).filter(([n]) => n.startsWith("speaker")).map(([, s]) => s);
       const dist = (p, q) => Math.max(Math.abs(p.X - q.X), Math.abs(p.Y - q.Y));
-      const spot = speakers.reduce((x, y) => dist(y, at) < dist(x, at) ? y : x);
+      const spot = speakers.length ? speakers.reduce((x, y) => dist(y, at) < dist(x, at) ? y : x) : at;
       const R = CFG.SPEAKER_RANGE;
       const named = here.map((c) => c.MemberNumber).filter((m) => namedIn(String(text), [m]));
       const who = new Set([anchor].concat(named));
@@ -3617,8 +3678,12 @@
     function onCompanion(m) {
       const mn = m.from;
       if (!mn) return;
+      if (m.type === "relayNo") {
+        relayRefused(m.id);
+        return;
+      }
       if (m.type === "hello") {
-        state.companions.set(mn, { at: Date.now(), ver: String(m.ver || "?") });
+        state.companions.set(mn, { at: Date.now(), ver: String(m.ver || "?"), relay: m.relay !== false });
         log("Companion hello from " + mn + " (v" + (m.ver || "?") + ")");
         enqueue(makeMsg("welcome", { ver: VERSION, proto: PROTOCOL, name: plainName(mn), staff: isStaff(mn) }, mn));
         later(() => syncCompanions(), 800);
@@ -7003,11 +7068,11 @@
         { t: "%b kneels beside %n with the pail and warms their hands, then cups a heavy breast and gives it a slow, testing squeeze." },
         {
           t: "A first thin stream rings against the bottom of the pail. %n lets out a shaky breath as the milk starts to let down.",
-          d: 'A first thin stream rings against the pail. "Listen to that," %b says. "Good little dairy animal, leaking for me already."'
+          d: 'A first thin stream rings against the pail. "Listen to that, %n," %b says. "Good little dairy animal, leaking for me already."'
         },
         {
-          t: "%b finds the rhythm: squeeze, pull, release. Warm milk spurts into the pail in steady, foaming streams.",
-          p: '%b finds the rhythm, murmuring praise with every pull. "There you go, sweet thing. So much. So good."'
+          t: "%b finds the rhythm on %n: squeeze, pull, release. Warm milk spurts into the pail in steady, foaming streams.",
+          p: '%b finds the rhythm, murmuring praise with every pull. "There you go, %n, sweet thing. So much. So good."'
         },
         { say: true, t: "That's it, %n. Let it all down for the farm, hon." },
         {
@@ -7045,7 +7110,7 @@
         { t: "%b loads the jar of %stud's seed into the %m's reservoir and checks the fit. The machine hums and the attachment slides into %n's %h." },
         {
           t: "The %m starts slow, deep strokes, letting %n get used to it. Every push nudges the seed reservoir with a soft, wet click.",
-          d: `The %m starts slow and deep. "Don't look so surprised," %b says. "This is how we breed the ones nobody wants to touch."`
+          d: `The %m starts slow and deep in %n. "Don't look so surprised," %b says. "This is how we breed the ones nobody wants to touch."`
         },
         { say: true, t: "Breedin' machine's runnin', y'all. %n's gettin' %stud's seed whether %stud's here or not." },
         { t: "The pace picks up. %n rocks with the %m, breath coming in gasps, the whole frame creaking." },
@@ -7054,7 +7119,7 @@
           p: `%b turns the dial up and strokes %n's hair. "You're doing so well. Take it all. Good breeder."`
         },
         { t: "The reservoir gurgles. The %m holds deep and pumps, flooding %n's %h with %stud's seed in long, warm surges." },
-        { t: "It keeps going a while longer, slow and deep, working every drop as far in as it'll go." },
+        { t: "The %m keeps going in %n a while longer, slow and deep, working every drop as far in as it'll go." },
         { t: "The %m eases off and slides out. %n is left shaking and full: %ml of %stud's seed, all of it inside." }
       ],
       syringe: [
@@ -11845,7 +11910,7 @@ Welcome to B&B Farm, hon. 🌾`
           if (!data) return;
           if (data.Sender === CFG.BOT_MEMBER) {
             const own = data.Type === "Hidden" && readMsg(data);
-            if (own && ["hello", "bye", "cmd", "outfitSave", "outfitAnswer"].includes(own.type)) onCompanion(own);
+            if (own && ["hello", "bye", "cmd", "outfitSave", "outfitAnswer", "relayNo"].includes(own.type)) onCompanion(own);
             return;
           }
           if (data.Type === "Hidden") {

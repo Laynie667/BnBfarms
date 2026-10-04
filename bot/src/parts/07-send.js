@@ -105,7 +105,13 @@
   // (safeword, stuck, summons) jump ahead of routine ones.
   // three lanes: urgent (safety), replies to whoever just asked, then everything else
   // (key syncs, ambient emotes), so a busy room never makes a command feel slow
+  // emojis break in BC's chat (boxes, odd spacing): stripped from everything that lands in chat or a beep.
+  // (Hidden messages to the Companion keep them; its panel shows them fine.)
+  const EMOJI = /(?:\p{Extended_Pictographic}|\p{Regional_Indicator}|[\uFE0F\u200D\u20E3])/gu;
+  const noEmoji = (s) => String(s).replace(EMOJI, "").replace(/[ \t]{2,}/g, " ").replace(/^([*(]?)[ \t]+/gm, "$1").replace(/[ \t]+$/gm, "");
   function send(ev, data, urgent){
+    if (ev === "AccountBeep" && data && typeof data.Message === "string") data = Object.assign({}, data, { Message: noEmoji(data.Message) });
+    else if (ev === "ChatRoomChat" && data && data.Type !== "Hidden" && typeof data.Content === "string") data = Object.assign({}, data, { Content: noEmoji(data.Content) });
     if (urgent) state.urgent.push({ ev, data });
     else if (state.inReply) (state.replies || (state.replies = [])).push({ ev, data });
     else {
@@ -147,8 +153,15 @@
   }
   // spoken out loud: only heard in hearing range of me on a map, so I step over to whoever it's about
   function say(t, urgent, who){
-    if (speakersOn() && speakerSend(who || aboutWhom(t), t, "chat", urgent)) return;   // the speaker spot talks for me
-    walkTo(who || aboutWhom(t), urgent); enqueue({ Content:t, Type:"Chat" }, urgent);
+    const subject = who || aboutWhom(t);
+    if (speakersOn() && speakerSend(subject, t, "chat", urgent)) return;   // the speaker spot talks for me
+    // on a map I don't walk over (unless CFG.SPEAKER_MODE is "walk"): it goes privately to the people near
+    // whoever it's about, or, if it's about nobody (an announcement), to everybody on the map
+    if (mapRoom() && CFG.SPEAKER_MODE !== "walk"){
+      if (subject && speakerSend(subject, t, "chat", urgent)) return;
+      if (!subject){ toEveryone(t, "chat", urgent); return; }
+    }
+    walkTo(subject, urgent); enqueue({ Content:t, Type:"Chat" }, urgent);
   }
   // a room emote everybody nearby sees (no name in front; I write the whole line)
   /* MAP ROOMS: a player only sees my emotes while I'm in their sight, hears my chat inside their
@@ -199,9 +212,59 @@
   // who: the person it's about (worked out from the names in it if left out)
   function emote(t, who){
     if (state.cmdWatch) state.cmdWatch.emotes.push(String(t));
-    if (speakersOn() && speakerSend(who || aboutWhom(t), t, "emote")) return;   // the speaker spot emotes for me
-    walkTo(who || aboutWhom(t));
+    const subject = who || aboutWhom(t);
+    if (mapRoom() && subject){
+      // 1. FROM THEM: a line about somebody with the Companion is posted by their own Companion as their own
+      //    emote (no name in front), so the game shows it to exactly the people who can see them. Only ever
+      //    someone the line is about (them, the other one in a breedin', whoever acted on them).
+      const parties = [subject].concat(namesHere(t).filter(m => m !== subject));
+      const by = parties.find(m => canRelay(m) && namedIn(String(t), [m]));
+      if (by){ relayEmote(by, t, subject); return; }
+      // 2. otherwise: the speaker spot near them, or privately to whoever's near them. No walkin' over.
+      if (speakersOn() && speakerSend(subject, t, "emote")) return;
+      if (CFG.SPEAKER_MODE !== "walk" && speakerSend(subject, t, "emote")) return;
+    } else if (mapRoom() && CFG.SPEAKER_MODE !== "walk"){ toEveryone(t, "emote"); return; }   // about nobody: everybody hears it
+    walkTo(subject);
     for (const c of splitMessage(t, 900)) enqueue({ Content:"*"+c, Type:"Emote" });
+  }
+  // everybody on the map the line names
+  function namesHere(text){
+    return (W.ChatRoomCharacter||[]).map(c => c.MemberNumber).filter(m => m !== CFG.BOT_MEMBER && onMap(m) && namedIn(String(text), [m]));
+  }
+  // has a Companion that can post farm emotes for them (v0.9+), and they haven't switched that off
+  function canRelay(mn){
+    const c = state.companions.get(mn);
+    return !!(hasCompanion(mn) && c && c.relay !== false && verAtLeast(c.ver, "0.9.0"));
+  }
+  function verAtLeast(v, min){
+    const a = String(v||"0").split(".").map(Number), b = min.split(".").map(Number);
+    for (let i = 0; i < 3; i++){ if ((a[i]||0) !== b[i]) return (a[i]||0) > b[i]; }
+    return true;
+  }
+  // ask their Companion to post it; if it can't (switched off, an owner rule blocks emotes, too many at once),
+  // it says so and the line goes out privately to the people near them instead
+  function relayEmote(mn, text, subject){
+    state.relays = state.relays || new Map();
+    const id = ++companionSeq;
+    state.relays.set(id, { text, subject: subject || mn, at: Date.now() });
+    enqueue(makeMsg("relay", { text: String(text).slice(0, 900), id }, mn));
+    for (const [k, r] of state.relays) if (Date.now() - r.at > 120000) state.relays.delete(k);
+  }
+  function relayRefused(id){
+    const r = state.relays && state.relays.get(id);
+    if (!r) return;
+    state.relays.delete(id);
+    if (!speakerSend(r.subject, r.text, "emote")) for (const c of splitMessage(r.text, 900)) enqueue({ Content:"*"+c, Type:"Emote" });
+  }
+  // an announcement about nobody in particular, on a map: privately to everybody here
+  function toEveryone(text, kind, urgent){
+    const line = (kind === "emote" ? "*" : "")+String(text);
+    for (const c of (W.ChatRoomCharacter||[])){
+      const mn = c.MemberNumber;
+      if (mn === CFG.BOT_MEMBER) continue;
+      if (hasCompanion(mn)) enqueue(makeMsg("roomline", { text: line, kind }, mn), urgent);
+      else for (const part of splitMessage(line, 900)) enqueue({ Content: "("+part.replace(/\)/g, "]"), Type:"Whisper", Target: mn }, urgent);
+    }
   }
 
   /* SPEAKER SPOTS AS MY VOICE (CFG.SPEAKER_MODE "voice"): I stay put. The speaker spot nearest the action
@@ -214,9 +277,9 @@
     const pos = mn => { const c = charFor(mn); return c && c.MapData && c.MapData.Pos; };
     const at = anchor && pos(anchor);
     if (!at) return false;   // nobody to anchor it to: fall back to the room
-    const speakers = Object.entries(L.spots).filter(([n]) => n.startsWith("speaker")).map(([, s]) => s);
+    const speakers = Object.entries(L.spots || {}).filter(([n]) => n.startsWith("speaker")).map(([, s]) => s);
     const dist = (p, q) => Math.max(Math.abs(p.X-q.X), Math.abs(p.Y-q.Y));
-    const spot = speakers.reduce((x, y) => dist(y, at) < dist(x, at) ? y : x);
+    const spot = speakers.length ? speakers.reduce((x, y) => dist(y, at) < dist(x, at) ? y : x) : at;   // no speakers: just around them
     const R = CFG.SPEAKER_RANGE;
     const named = here.map(c => c.MemberNumber).filter(m => namedIn(String(text), [m]));
     const who = new Set([anchor].concat(named));
@@ -288,8 +351,9 @@
   function onCompanion(m){
     const mn = m.from;
     if (!mn) return;
+    if (m.type === "relayNo"){ relayRefused(m.id); return; }
     if (m.type === "hello"){
-      state.companions.set(mn, { at:Date.now(), ver:String(m.ver||"?") });
+      state.companions.set(mn, { at:Date.now(), ver:String(m.ver||"?"), relay: m.relay !== false });
       log("Companion hello from "+mn+" (v"+(m.ver||"?")+")");
       enqueue(makeMsg("welcome", { ver:VERSION, proto:PROTOCOL, name:plainName(mn), staff:isStaff(mn) }, mn));
       later(()=>syncCompanions(), 800);

@@ -165,3 +165,31 @@ The bot's account counts as a proprietor. On the bot's own screen:
 - **`/office <command>`** runs any farm command as the bot, for example `/office zone a barn`, `/office spot set speaker-barn` or `/office addons`. Answers show only on the bot's screen.
 - **Zones and spots** use where the bot is standing, so you can walk the bot to a corner and set it.
 - **Or install the Companion on the bot's account too.** It connects to the bot like any player's would, and shows the Staff and Dashboard panels. That includes drawing zones and placing spots by clicking the map.
+
+## The Companion as the farm's voice (v0.9)
+
+- **From the person it's about:** a farm emote about someone with the Companion (v0.9+) is posted by their own Companion as their own emote, the same as typing `**…` in BC: no name in front, and seen by exactly the people who can see them.
+  - It only posts lines that name them: their own scenes, breeding where they're one of the pair, or someone acting on them.
+  - Having the Companion counts as opting in. Toggles → "Farm emotes about me come from me" turns it off.
+- **It refuses and hands the line back** when: the switch is off, an owner rule blocks their emotes, or more than 8 arrive in a minute. The bot then sends the line privately to the people near them.
+- **Nobody involved has the Companion:** the line goes privately to the people near them. Companion users see it drawn in their chat; everyone else gets an out-of-character whisper. Lines about nobody in particular (announcements) go to everyone on the map.
+- **The bot stays put.** It only walks over and back home if `CFG.SPEAKER_MODE` is `"walk"`.
+- **No emojis** in anything that lands in chat: emotes, whispers, beeps, and the Companion's chat lines. The panel keeps them.
+
+### Ideas that build on it (not built yet)
+- **Who can really see me:**
+  - The Companion asks the game itself which characters can see its player, and tells the bot.
+  - Private lines then go to exactly those people instead of "everyone within 8 tiles".
+- **Walk, don't teleport:**
+  - The Companion can move its own player across the map, a step at a time, with no admin rights needed.
+  - Summons, pens, feeding time and tours could lead people there instead of teleporting them.
+- **Orgasms and edges detected automatically:**
+  - The game fires orgasm, resisted and denied events on the player's own screen, and the Companion can report them.
+  - That allows automatic edge counting, milk let-down on orgasm, and "it took" timed to the moment.
+- **Their own face:** dazed eyes when milk-drunk, a flush in heat, eyes rolling in a trance. Only ever their own character.
+- **Feelings only they get:** private lines tied to what they're actually wearing and their real arousal. For example a plug's pressure, a cage's ache, milk prickling, a full belly sloshing. The Companion can read all of that exactly.
+- **Sounds only they hear:** the pump, a heartbeat, a moo, the stall door.
+- **Trance on their screen:** a soft dim and blur at the edges during conditioning sessions, fading as they wake.
+- **Both sides of a breeding:** the stud's Companion posts the stud's line and the bred one's posts theirs, so each line comes from the right person.
+- **Visible consent:** saying yes to a breeding posts a small emote ("Moo nods eagerly") so everyone around sees the consent.
+- **Staff overlay:** small icons over each animal on the staff's own map (needs milking, in heat, due soon, fenced).

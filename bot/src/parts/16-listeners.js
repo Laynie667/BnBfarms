@@ -15,7 +15,7 @@
           // a Companion runnin' on the bot's own account talks to the bot like any other panel;
           // everything else from the bot is its own echo, ignored
           const own = data.Type === "Hidden" && readMsg(data);
-          if (own && ["hello","bye","cmd","outfitSave","outfitAnswer"].includes(own.type)) onCompanion(own);
+          if (own && ["hello","bye","cmd","outfitSave","outfitAnswer","relayNo"].includes(own.type)) onCompanion(own);
           return;
         }
 

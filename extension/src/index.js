@@ -36,7 +36,29 @@ function toBot(type, data) {
 
 function hello() {
   st.lastHello = Date.now();
-  toBot("hello", { ver: VERSION });
+  // relay: whether this Companion posts farm emotes about you as your own (Toggles, on unless you switch it off)
+  toBot("hello", { ver: VERSION, relay: !(st.panel && st.panel.prefs.noRelay) });
+}
+
+// emojis break in BC's chat, and round brackets make a line out-of-character (seen map-wide): chat lines get neither
+const EMOJI = /(?:\p{Extended_Pictographic}|\p{Regional_Indicator}|[\uFE0F\u200D\u20E3])/gu;
+const forChat = (s) => String(s).replace(EMOJI, "").replace(/[ \t]{2,}/g, " ").replace(/^([*]?)[ \t]+/gm, "$1").trim();
+const inCharacter = (s) => String(s).replace(/\(/g, "[").replace(/\)/g, "]");
+
+// The bot asks this Companion to post a farm emote about YOU as your own emote ("**…" in BC: no name in
+// front), so exactly the people who can see you see it. Only ever a line that names you; never speech.
+// If it can't (you switched it off, an owner rule blocks emotes, or too many at once), the bot is told
+// and sends it privately to the people near you instead.
+function relay(m) {
+  const text = inCharacter(forChat(m.text || "")).slice(0, 900);
+  const P = window.Player || {}, names = [P.Nickname, P.Name].filter(Boolean).map((n) => String(n).toLowerCase());
+  const now = Date.now();
+  st.relayed = (st.relayed || []).filter((t) => now - t < 60000);
+  const blocked = typeof window.ChatRoomOwnerPresenceRule === "function" && (() => { try { return window.ChatRoomOwnerPresenceRule("BlockEmote", null); } catch (e) { return false; } })();
+  const ok = text && names.some((n) => text.toLowerCase().includes(n)) && !st.panel.prefs.noRelay && !blocked && st.relayed.length < 8;
+  if (!ok) { toBot("relayNo", { id: m.id }); return; }
+  st.relayed.push(now);
+  window.ServerSend("ChatRoomChat", { Type: "Emote", Content: "*" + text });
 }
 
 function sendCommand(text) {
@@ -76,7 +98,7 @@ function toChat(text, color, italic) {
   if (typeof window.ChatRoomSendLocal !== "function") return false;
   const p = window.document.createElement("div");
   p.style.cssText = "color:" + color + ";white-space:pre-wrap;margin:0.25em 0" + (italic ? ";font-style:italic" : "");
-  p.textContent = text;
+  p.textContent = forChat(text);
   window.ChatRoomSendLocal(p.outerHTML);
   return true;
 }
@@ -131,6 +153,7 @@ function onFarmMsg(m) {
         keys: Array.isArray(m.keys) ? m.keys.filter(Number.isInteger) : [], why: String(m.why || "") });
       toChat("👗 The farm's offerin' you your " + String(m.label || "outfit") + ". Yes or Not now in your 🌾 panel.", "#c9a35b");
       break;
+    case "relay": relay(m); break;
     case "voice": {
       // only you see it, like a thought; nothin' goes to the room
       const line = String(m.text || "").slice(0, 300);
@@ -144,7 +167,7 @@ function onFarmMsg(m) {
         const p = window.document.createElement("div");
         p.className = m.kind === "emote" ? "ChatMessage ChatMessageEmote" : "ChatMessage ChatMessageChat";
         p.style.cssText = m.kind === "emote" ? "font-style:italic" : "";
-        p.textContent = m.kind === "emote" ? line : "Farm girl: " + line;
+        p.textContent = forChat(m.kind === "emote" ? line : "Farm girl: " + line);
         window.ChatRoomSendLocal(p.outerHTML);
       } else st.panel.add(line, "notice");
       break;
@@ -176,6 +199,7 @@ const api = {
     toBot("outfitSave", { slot, data: c.data, items: c.items, locks: c.locks });
   },
   hasBackup,
+  rehello: () => hello(),   // tell the bot a setting changed (the relay switch)
   // map tool: the next `count` clicks on the game's map pick tiles instead of walkin' you there
   pickTiles(count, what, done) {
     if (typeof window.ChatRoomMapViewIsActive === "function" && !window.ChatRoomMapViewIsActive()) {

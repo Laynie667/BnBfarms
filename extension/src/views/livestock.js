@@ -112,6 +112,8 @@ export function panelPrefs(ctx) {
      ["popopen", "Open on new notice", "Pop the panel open by itself"],
      ["btnPinned", "Pin the 🌾 button", "Unpinned, you can drag it anywhere (mouse or finger). Pin it so it stays put."]].map(([k, label, desc]) =>
       toggle(label, desc, !!ctx.prefs[k], () => ctx.setPref(k, !ctx.prefs[k]))),
+    toggle("Farm emotes about me come from me", "Belly kicks, milkin', breedin'… are posted as your own emote (no name in front), so the people who can see you see them and the farm girl needn't move. Only lines about you.",
+      !ctx.prefs.noRelay, () => { ctx.setPref("noRelay", !ctx.prefs.noRelay); ctx.api.rehello && ctx.api.rehello(); }),
     btn("Put the button and panel back in the corner", () => ctx.resetPlaces && ctx.resetPlaces()));
 }
 function toggles(ctx) {

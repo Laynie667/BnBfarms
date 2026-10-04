@@ -1,6 +1,7 @@
 // Map rooms: players only see the bot's emotes when the bot is in sight, and only get its whispers within
-// 1 tile, unless they're out-of-character. So the bot walks over before emotes, whispers start with "(",
-// belly rubs (game actions AND typed emotes) answer back, and the bot goes home afterwards.
+// 1 tile, unless they're out-of-character. So lines about someone go privately (whispers start with "(") to
+// the people near them and the bot stays put; belly rubs (game actions AND typed emotes) answer back; and the
+// old walk-over-and-home behaviour still works with CFG.SPEAKER_MODE "walk".
 const fs=require('fs');
 const store={}; const sent=[]; const handlers={};
 store.bnb_ledger_v1=JSON.stringify({v:4,people:{
@@ -44,27 +45,34 @@ function walkedThenEmoted(k, pos, rx){
   let k=sent.length;
   handlers.ChatRoomMessage({Sender:500,Type:'Activity',Content:'ChatOther-ItemPelvis-Rub',Dictionary:[{SourceCharacter:500},{TargetCharacter:221397},{FocusGroupName:'ItemPelvis'},{ActivityName:'Rub'}]});
   await wait(1500);
-  out('1 game action: bot walks to Laynie, then the kick emote ->', walkedThenEmoted(k, C(221397).MapData.Pos, /kicks|flutters/));
+  // nobody here has the Companion, so lines about Laynie go privately to the people near her; the bot stays put
+  const priv=(k0,mn,rx)=>sent.slice(k0).some(([e,d])=>d&&d.Type==='Whisper'&&d.Target===mn&&d.Content.startsWith('(')&&rx.test(d.Content));
+  const moved=k0=>sent.slice(k0).some(([e])=>e==='ChatRoomCharacterMapDataUpdate');
+  out('1 game action: the kick reaches Moo (right beside her) privately ->', priv(k,500,/kicks|flutters/), priv(k,221397,/kicks|flutters/));
+  out('1 ...and the bot never moves ->', !moved(k));
   // 2. Moo types it instead
   P(221397).rubAt=0; k=sent.length;
   handlers.ChatRoomMessage({Sender:500,Type:'Emote',Content:'presses close against Laynie, rubbing her round belly'}); await wait(1500);
-  out('2 typed emote counts as a belly rub ->', sent.slice(k).some(([e,d])=>d&&d.Type==='Emote'&&/kicks|flutters/.test(d.Content)));
+  out('2 typed emote counts as a belly rub ->', priv(k,500,/kicks|flutters/));
   P(221397).rubAt=0; k=sent.length;
   handlers.ChatRoomMessage({Sender:500,Type:'Activity',Content:'ChatOther-ItemTorso-Grope',Dictionary:[{SourceCharacter:500},{TargetCharacter:221397},{FocusGroupName:'ItemTorso'},{ActivityName:'Grope'}]});
   await wait(1500);
-  out('2 grope counts too ->', sent.slice(k).some(([e,d])=>d&&d.Type==='Emote'&&/kicks|flutters/.test(d.Content)));
+  out('2 grope counts too ->', priv(k,500,/kicks|flutters/));
+  out('2 Hana, far away, does not get it ->', !priv(k,600,/kicks|flutters/));
   // 3. a whisper to someone far away (Hana isn't a friend) is out-of-character, so it gets through
   k=sent.length; handlers.ChatRoomMessage({Sender:600,Type:'Whisper',Content:'stats',Target:260239}); await wait(5300);
   const wh=sent.slice(k).filter(([e,d])=>d&&d.Type==='Whisper'&&d.Target===600).map(([e,d])=>d.Content);
   out('3 map-room whispers start with ( and never close it ->', wh.length>0 && wh.every(c=>c.startsWith('(')&&!c.includes(')')));
-  // 4. safeword: the bot goes to them first, at top priority, then calls the pause
+  // 4. safeword: the pause reaches them privately at once, without the bot jumping over
   k=sent.length; handlers.ChatRoomMessage({Sender:600,Type:'Chat',Content:'?safe'}); await wait(2000);
-  let moved=null, ok=false;
-  for (const [ev,d] of sent.slice(k)){ if (ev==='ChatRoomCharacterMapDataUpdate') moved=d.Pos; if (d&&d.Type==='Chat'&&/PAUSE CALLED/.test(d.Content)){ ok=!!(moved&&near(moved,C(600).MapData.Pos,2)); break; } }
-  out('4 safeword pause is said next to them ->', ok);
-  // 5. and home again once it's quiet
+  out('4 safeword pause reaches them ->', priv(k,600,/PAUSE CALLED/), !moved(k));
+  // 5. the old way still works if the farm wants it: CFG.SPEAKER_MODE "walk"
+  W.__cfg.SPEAKER_MODE='walk'; P(221397).rubAt=0; k=sent.length;
+  handlers.ChatRoomMessage({Sender:500,Type:'Activity',Content:'ChatOther-ItemPelvis-Rub',Dictionary:[{SourceCharacter:500},{TargetCharacter:221397},{FocusGroupName:'ItemPelvis'},{ActivityName:'Rub'}]});
+  await wait(1500);
+  out('5 walk mode: bot walks to Laynie, then the kick emote ->', walkedThenEmoted(k, C(221397).MapData.Pos, /kicks|flutters/));
   W.__cfg.HOME_AFTER_S=0; k=sent.length; W.__ht(); await wait(800);
   const back=sent.slice(k).filter(([e])=>e==='ChatRoomCharacterMapDataUpdate').map(([e,d])=>d.Pos).pop()||{};
-  out('5 bot walks back to its home tile ->', back.X===1 && back.Y===1);
+  out('5 and walks back to its home tile ->', back.X===1 && back.Y===1);
   process.exit(0);
 })();

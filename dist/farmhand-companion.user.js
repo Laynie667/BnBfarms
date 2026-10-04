@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.8.0
+// @version      0.9.0
 // @description  Your B&B Farm panel: the farm girl's answers, stat cards and guides, right in the game.
 // @author       Laynie & Alexia
 // @match        *://*.bondageprojects.elementfx.com/*
@@ -224,7 +224,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.8.0";
+  var VERSION = "0.9.0";
 
   // extension/src/config.js
   var BOT_MEMBER = 260239;
@@ -561,6 +561,15 @@ One of mods you are using is using an old version of SDK. It will work for now b
         ["popopen", "Open on new notice", "Pop the panel open by itself"],
         ["btnPinned", "Pin the 🌾 button", "Unpinned, you can drag it anywhere (mouse or finger). Pin it so it stays put."]
       ].map(([k, label, desc]) => toggle(label, desc, !!ctx.prefs[k], () => ctx.setPref(k, !ctx.prefs[k]))),
+      toggle(
+        "Farm emotes about me come from me",
+        "Belly kicks, milkin', breedin'… are posted as your own emote (no name in front), so the people who can see you see them and the farm girl needn't move. Only lines about you.",
+        !ctx.prefs.noRelay,
+        () => {
+          ctx.setPref("noRelay", !ctx.prefs.noRelay);
+          ctx.api.rehello && ctx.api.rehello();
+        }
+      ),
       btn("Put the button and panel back in the corner", () => ctx.resetPlaces && ctx.resetPlaces())
     );
   }
@@ -3492,7 +3501,30 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
   function hello() {
     st.lastHello = Date.now();
-    toBot("hello", { ver: VERSION });
+    toBot("hello", { ver: VERSION, relay: !(st.panel && st.panel.prefs.noRelay) });
+  }
+  var EMOJI = /(?:\p{Extended_Pictographic}|\p{Regional_Indicator}|[\uFE0F\u200D\u20E3])/gu;
+  var forChat = (s) => String(s).replace(EMOJI, "").replace(/[ \t]{2,}/g, " ").replace(/^([*]?)[ \t]+/gm, "$1").trim();
+  var inCharacter = (s) => String(s).replace(/\(/g, "[").replace(/\)/g, "]");
+  function relay(m) {
+    const text = inCharacter(forChat(m.text || "")).slice(0, 900);
+    const P2 = window.Player || {}, names = [P2.Nickname, P2.Name].filter(Boolean).map((n) => String(n).toLowerCase());
+    const now = Date.now();
+    st.relayed = (st.relayed || []).filter((t) => now - t < 6e4);
+    const blocked = typeof window.ChatRoomOwnerPresenceRule === "function" && (() => {
+      try {
+        return window.ChatRoomOwnerPresenceRule("BlockEmote", null);
+      } catch (e) {
+        return false;
+      }
+    })();
+    const ok = text && names.some((n) => text.toLowerCase().includes(n)) && !st.panel.prefs.noRelay && !blocked && st.relayed.length < 8;
+    if (!ok) {
+      toBot("relayNo", { id: m.id });
+      return;
+    }
+    st.relayed.push(now);
+    window.ServerSend("ChatRoomChat", { Type: "Emote", Content: "*" + text });
   }
   function sendCommand(text) {
     text = String(text || "").trim();
@@ -3524,7 +3556,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     if (typeof window.ChatRoomSendLocal !== "function") return false;
     const p = window.document.createElement("div");
     p.style.cssText = "color:" + color + ";white-space:pre-wrap;margin:0.25em 0" + (italic ? ";font-style:italic" : "");
-    p.textContent = text;
+    p.textContent = forChat(text);
     window.ChatRoomSendLocal(p.outerHTML);
     return true;
   }
@@ -3585,6 +3617,9 @@ One of mods you are using is using an old version of SDK. It will work for now b
         });
         toChat("👗 The farm's offerin' you your " + String(m.label || "outfit") + ". Yes or Not now in your 🌾 panel.", "#c9a35b");
         break;
+      case "relay":
+        relay(m);
+        break;
       case "voice": {
         const line = String(m.text || "").slice(0, 300);
         if (!toChat("[Voice] " + line, "#a67fd4", true)) st.panel.add("[Voice] " + line, "notice");
@@ -3596,7 +3631,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
           const p = window.document.createElement("div");
           p.className = m.kind === "emote" ? "ChatMessage ChatMessageEmote" : "ChatMessage ChatMessageChat";
           p.style.cssText = m.kind === "emote" ? "font-style:italic" : "";
-          p.textContent = m.kind === "emote" ? line : "Farm girl: " + line;
+          p.textContent = forChat(m.kind === "emote" ? line : "Farm girl: " + line);
           window.ChatRoomSendLocal(p.outerHTML);
         } else st.panel.add(line, "notice");
         break;
@@ -3641,6 +3676,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
       toBot("outfitSave", { slot, data: c.data, items: c.items, locks: c.locks });
     },
     hasBackup,
+    rehello: () => hello(),
+    // tell the bot a setting changed (the relay switch)
     // map tool: the next `count` clicks on the game's map pick tiles instead of walkin' you there
     pickTiles(count, what, done) {
       if (typeof window.ChatRoomMapViewIsActive === "function" && !window.ChatRoomMapViewIsActive()) {

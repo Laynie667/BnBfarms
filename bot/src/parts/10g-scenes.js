@@ -7,6 +7,7 @@
 
      A beat: t = the line · d = instead, for people with ?degrade on · p = instead, for ?praise on ·
      say: true = the farm girl says it out loud instead of an emote.
+     Every emote line must say %n: it's posted by that person's own Companion, which only posts lines naming them.
      %n = them · %b = whoever's doin' it · %m = the machine · %h = the hole · %ml = how much · %stud = the jar's stud
   */
   /* ───────────── SCENES ───────────── */
@@ -16,9 +17,9 @@
     milk: [
       { t:"%b kneels beside %n with the pail and warms their hands, then cups a heavy breast and gives it a slow, testing squeeze." },
       { t:"A first thin stream rings against the bottom of the pail. %n lets out a shaky breath as the milk starts to let down.",
-        d:"A first thin stream rings against the pail. \"Listen to that,\" %b says. \"Good little dairy animal, leaking for me already.\"" },
-      { t:"%b finds the rhythm: squeeze, pull, release. Warm milk spurts into the pail in steady, foaming streams.",
-        p:"%b finds the rhythm, murmuring praise with every pull. \"There you go, sweet thing. So much. So good.\"" },
+        d:"A first thin stream rings against the pail. \"Listen to that, %n,\" %b says. \"Good little dairy animal, leaking for me already.\"" },
+      { t:"%b finds the rhythm on %n: squeeze, pull, release. Warm milk spurts into the pail in steady, foaming streams.",
+        p:"%b finds the rhythm, murmuring praise with every pull. \"There you go, %n, sweet thing. So much. So good.\"" },
       { say:true, t:"That's it, %n. Let it all down for the farm, hon." },
       { t:"%b switches sides. The second breast is so full it sprays the moment it's touched, and %n moans and arches into the hands.",
         d:"%b switches sides, and %n sprays the moment they're touched. \"Can't even hold it in. Pathetic, leaky cow.\"" },
@@ -48,13 +49,13 @@
     machine: [
       { t:"%b loads the jar of %stud's seed into the %m's reservoir and checks the fit. The machine hums and the attachment slides into %n's %h." },
       { t:"The %m starts slow, deep strokes, letting %n get used to it. Every push nudges the seed reservoir with a soft, wet click.",
-        d:"The %m starts slow and deep. \"Don't look so surprised,\" %b says. \"This is how we breed the ones nobody wants to touch.\"" },
+        d:"The %m starts slow and deep in %n. \"Don't look so surprised,\" %b says. \"This is how we breed the ones nobody wants to touch.\"" },
       { say:true, t:"Breedin' machine's runnin', y'all. %n's gettin' %stud's seed whether %stud's here or not." },
       { t:"The pace picks up. %n rocks with the %m, breath coming in gasps, the whole frame creaking." },
       { t:"%b turns the dial up. The %m pounds into %n's %h, hard and relentless, and %n can't stay quiet.",
         p:"%b turns the dial up and strokes %n's hair. \"You're doing so well. Take it all. Good breeder.\"" },
       { t:"The reservoir gurgles. The %m holds deep and pumps, flooding %n's %h with %stud's seed in long, warm surges." },
-      { t:"It keeps going a while longer, slow and deep, working every drop as far in as it'll go." },
+      { t:"The %m keeps going in %n a while longer, slow and deep, working every drop as far in as it'll go." },
       { t:"The %m eases off and slides out. %n is left shaking and full: %ml of %stud's seed, all of it inside." },
     ],
     syringe: [

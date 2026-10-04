@@ -25,7 +25,7 @@
     finally {
       // whatever changed (a zone drawn from the bot's own screen, a spot, a switch) reaches every
       // Companion in a moment, not at the next once-a-minute sync. Only changed panels are sent.
-      if (!state.syncSoon){ state.syncSoon = true; later(() => { state.syncSoon = false; syncCompanions(); }, 1500); }
+      if (!state.syncSoon){ state.syncSoon = true; later(() => { state.syncSoon = false; syncCompanions(); whitelistSync(true); }, 1500); }
       state.inReply = false; state.cmdWatch = null;
       if (watch && !watch.replied && watch.emotes.length) toCompanion(sender, "(in the room) "+watch.emotes.join("\n"), "reply");
     }
@@ -1233,13 +1233,35 @@ Welcome to B&B Farm, hon. 🌾`);
       }
 
       case "unregister": {
+        // ?unregister <who> · off the books entirely (and off the room whitelist)
+        // ?unregister <who> <role> [role…] · just those roles (the last one takes them off the books)
         const t = resolveTarget(args[0]);
-        if (!t){ R("Unregister who, sugar? Say ?unregister and their name or member number, like ?unregister Bessie or ?unregister 123456. Their paperwork gets archived, never shredded."); break; }
+        if (!t){ R("Unregister who, sugar? ?unregister <who> takes them off the books entirely, or ?unregister <who> <role> takes away just that role, like ?unregister Bessie luxury. Their paperwork gets archived, never shredded."); break; }
         if (!isHerdmaster(sender)){ R("Sorry, hon, that's for herdmasters and proprietors to decide."); break; }
-        if (CFG.PROPRIETORS.includes(t)){ R("I can't unregister a proprietor, sugar!"); break; }
+        if (t === CFG.BOT_MEMBER || CFG.PROPRIETORS.includes(t) || hasRole(t, ROLE.PROPRIETOR)){ R("I can't unregister a proprietor, sugar, or take that role away. That's for good."); break; }
         const r = rec(t);
-        if (!r){ R("They're not on the books, hon."); break; }
-        // clear anyone they were holding
+        if (!r || !r.roles || !r.roles.length){ R("They're not on the books, hon."); break; }
+        const words = args.slice(1).map(w => String(w).toLowerCase());
+        if (words.some(w => /^(proprietor|owner)s?$/.test(w))){ R("The proprietor role can't be taken away, sugar."); break; }
+        let full = !words.length;
+        if (words.length){
+          const roles = parseRoles(words);
+          if (!roles.length){ R("I don't know that role, hon. Roles: livestock, guest, luxury, gloryhole, farmhand, mandated, herdmaster."); break; }
+          const staffRoles = [ROLE.FARMHAND, ROLE.MANDATED, ROLE.HERDMASTER];
+          if (roles.some(x => staffRoles.includes(x)) && !isProprietor(sender)){ R("Only the proprietors take away staff roles, sugar."); break; }
+          const had = roles.filter(x => r.roles.includes(x));
+          if (!had.length){ R(plainName(t)+" doesn't have "+(roles.length === 1 ? "that role" : "those roles")+", hon."); break; }
+          r.roles = r.roles.filter(x => !roles.includes(x));
+          if (r.roles.length){
+            saveLedger(); audit(sender, "UNREGISTER_ROLE", t+" "+had.join(","));
+            syncKeys(t, true);
+            R("Done, sugar: "+plainName(t)+" is no longer "+had.map(x => x.toLowerCase()).join(" or ")+". They're still on the books as "+roleString(t)+".");
+            tell(t, "Your "+had.map(x => x.toLowerCase()).join(" and ")+" standing was taken off, sugar. You're still on the farm's books as "+roleString(t)+".");
+            break;
+          }
+          full = true;   // that was their last role
+        }
+        // off the books entirely: clear anyone they were holding, archive the paperwork, pull keys, off the whitelist
         for (const k in L.people){
           const p = L.people[k];
           if ((p.herds||[]).some(h=>h.leader===t)) p.herds = p.herds.filter(h=>h.leader!==t);
@@ -1248,8 +1270,9 @@ Welcome to B&B Farm, hon. 🌾`);
         delete L.people[t];
         saveLedger(); audit(sender,"UNREGISTER",String(t));
         pushKeys(t, [], true);
-        R("All done, sugar. Their keys are pulled and their paperwork's tucked safe in the drawer.");
-        beep(t,"Your contract's up, "+plainName(t)+". Your keys are pulled, but the gate swings both ways, sweetie. I'll keep your paperwork safe in the drawer. 🌾");
+        whitelistSync(true);
+        R((words.length ? "That was their last role, so " : "")+"all done, sugar. "+plainName(t)+"'s keys are pulled, they're off the room whitelist, and their paperwork's tucked safe in the drawer.");
+        beep(t,"Your contract's up, "+plainName(t)+". Your keys are pulled, but the gate swings both ways, sweetie. I'll keep your paperwork safe in the drawer.");
         break;
       }
 

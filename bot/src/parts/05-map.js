@@ -75,6 +75,36 @@
   // the first of these names that has been set, or null
   function firstSpot(...names){ for (const n of names){ const p = spotFor(n); if (p) return p; } return null; }
 
+  /* THE ROOM WHITELIST follows the books: everyone registered (any role) is on it, so the farm can be
+     closed to the public without locking out its own. When someone's unregistered they come off it again.
+     The bot only ever takes off people IT put on; anyone whitelisted by hand stays put. Runs after every
+     command and every few minutes (needs room admin). */
+  function isOnBooks(mn){ if (mn === CFG.BOT_MEMBER) return false; const r = rec(mn); return CFG.PROPRIETORS.includes(mn) || !!(r && r.roles && r.roles.length); }
+  function whitelistSync(force){
+    if (!inRoom() || !botIsAdmin() || !W.ChatRoomData) return;
+    if (!force && Date.now() - (state.wlAt||0) < 20000) return;
+    state.wlAt = Date.now();
+    const wl = new Set((W.ChatRoomData.Whitelist || []).map(Number));
+    L.wlAdded = L.wlAdded || {};
+    let changed = 0;
+    const people = new Set(Object.keys(L.people).map(Number).concat(CFG.PROPRIETORS));
+    for (const mn of people){
+      if (changed >= 15) break;   // a few at a time; the rest next time round
+      if (isOnBooks(mn) && !wl.has(mn)){
+        send("ChatRoomAdmin", { MemberNumber: mn, Action: "Whitelist" });
+        L.wlAdded[mn] = Date.now(); wl.add(mn); changed++;
+      }
+    }
+    for (const k of Object.keys(L.wlAdded)){
+      const mn = Number(k);
+      if (changed >= 15) break;
+      if (isOnBooks(mn)) continue;
+      if (wl.has(mn)){ send("ChatRoomAdmin", { MemberNumber: mn, Action: "Unwhitelist" }); changed++; }
+      delete L.wlAdded[k];
+    }
+    if (changed) saveLedger();
+  }
+
   // move somebody: with a v0.10 Companion they're LED there on foot (10h-body.js); force = teleport anyway
   // (stuck rescues, someone pinned or in the stocks)
   function teleport(mn, pt, urgent, force){

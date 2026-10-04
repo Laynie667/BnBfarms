@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.13.4
+// @version      0.13.5
 // @description  B&B Farm: beeps, keys, ledger, roster, herds, summoning, anti-idle
 // @author       Laynie & Alexia
 // @match        *://*.bondageprojects.elementfx.com/*
@@ -1787,7 +1787,7 @@
     { name: "Fun", cmds: ["fair", "enter"] }
   ];
   var STAFF_GROUPS = [
-    { name: "Books", cmds: ["queue", "app <n>", "approve <who> livestock", "deny <who>", "appclear", "roster", "stock", "find <who>", "record <who>", "note <who>", "signed", "addfriend <who>", "unregister <who>"] },
+    { name: "Books", cmds: ["queue", "app <n>", "approve <who> livestock", "deny <who>", "appclear", "roster", "stock", "find <who>", "record <who>", "note <who>", "signed", "addfriend <who>", "unregister <who>", "unregister <who> <role>"] },
     { name: "Herd", cmds: ["claim <who>", "release <who>", "myherd", "herdname <name>", "herdcall", "herdsummon", "turnout <who>", "letup <who>", "brand <who>", "walk <who>"] },
     { name: "Stock", cmds: ["tier <who> <tier>", "stocks <who>", "unstock <who>", "vet <who>", "inspect <who>", "tease list"] },
     { name: "Contracts", cmds: ["contract list", "contract show deep <who>", "contract offer deep <who> 1w", "contract check <who>", "contract release <who>", "contract rules", "contracts"] },
@@ -1803,7 +1803,7 @@
   ];
 
   // bot/src/version.js
-  var VERSION = "0.13.4";
+  var VERSION = "0.13.5";
 
   // bot-parts:farmhand-bot-parts
   (function() {
@@ -2935,6 +2935,40 @@
         if (p) return p;
       }
       return null;
+    }
+    function isOnBooks(mn) {
+      if (mn === CFG.BOT_MEMBER) return false;
+      const r = rec(mn);
+      return CFG.PROPRIETORS.includes(mn) || !!(r && r.roles && r.roles.length);
+    }
+    function whitelistSync(force) {
+      if (!inRoom() || !botIsAdmin() || !W.ChatRoomData) return;
+      if (!force && Date.now() - (state.wlAt || 0) < 2e4) return;
+      state.wlAt = Date.now();
+      const wl = new Set((W.ChatRoomData.Whitelist || []).map(Number));
+      L.wlAdded = L.wlAdded || {};
+      let changed = 0;
+      const people = new Set(Object.keys(L.people).map(Number).concat(CFG.PROPRIETORS));
+      for (const mn of people) {
+        if (changed >= 15) break;
+        if (isOnBooks(mn) && !wl.has(mn)) {
+          send("ChatRoomAdmin", { MemberNumber: mn, Action: "Whitelist" });
+          L.wlAdded[mn] = Date.now();
+          wl.add(mn);
+          changed++;
+        }
+      }
+      for (const k of Object.keys(L.wlAdded)) {
+        const mn = Number(k);
+        if (changed >= 15) break;
+        if (isOnBooks(mn)) continue;
+        if (wl.has(mn)) {
+          send("ChatRoomAdmin", { MemberNumber: mn, Action: "Unwhitelist" });
+          changed++;
+        }
+        delete L.wlAdded[k];
+      }
+      if (changed) saveLedger();
     }
     function teleport(mn, pt, urgent, force) {
       if (!pt || !charFor(mn)) return false;
@@ -8928,6 +8962,7 @@ Welcome to B&B Farm. Mind the ruts! 🌾`,
           later(() => {
             state.syncSoon = false;
             syncCompanions();
+            whitelistSync(true);
           }, 1500);
         }
         state.inReply = false;
@@ -10638,21 +10673,54 @@ Welcome to B&B Farm, hon. 🌾`
         case "unregister": {
           const t = resolveTarget(args[0]);
           if (!t) {
-            R("Unregister who, sugar? Say ?unregister and their name or member number, like ?unregister Bessie or ?unregister 123456. Their paperwork gets archived, never shredded.");
+            R("Unregister who, sugar? ?unregister <who> takes them off the books entirely, or ?unregister <who> <role> takes away just that role, like ?unregister Bessie luxury. Their paperwork gets archived, never shredded.");
             break;
           }
           if (!isHerdmaster(sender)) {
             R("Sorry, hon, that's for herdmasters and proprietors to decide.");
             break;
           }
-          if (CFG.PROPRIETORS.includes(t)) {
-            R("I can't unregister a proprietor, sugar!");
+          if (t === CFG.BOT_MEMBER || CFG.PROPRIETORS.includes(t) || hasRole(t, ROLE.PROPRIETOR)) {
+            R("I can't unregister a proprietor, sugar, or take that role away. That's for good.");
             break;
           }
           const r = rec(t);
-          if (!r) {
+          if (!r || !r.roles || !r.roles.length) {
             R("They're not on the books, hon.");
             break;
+          }
+          const words = args.slice(1).map((w) => String(w).toLowerCase());
+          if (words.some((w) => /^(proprietor|owner)s?$/.test(w))) {
+            R("The proprietor role can't be taken away, sugar.");
+            break;
+          }
+          let full = !words.length;
+          if (words.length) {
+            const roles = parseRoles(words);
+            if (!roles.length) {
+              R("I don't know that role, hon. Roles: livestock, guest, luxury, gloryhole, farmhand, mandated, herdmaster.");
+              break;
+            }
+            const staffRoles = [ROLE.FARMHAND, ROLE.MANDATED, ROLE.HERDMASTER];
+            if (roles.some((x) => staffRoles.includes(x)) && !isProprietor(sender)) {
+              R("Only the proprietors take away staff roles, sugar.");
+              break;
+            }
+            const had = roles.filter((x) => r.roles.includes(x));
+            if (!had.length) {
+              R(plainName(t) + " doesn't have " + (roles.length === 1 ? "that role" : "those roles") + ", hon.");
+              break;
+            }
+            r.roles = r.roles.filter((x) => !roles.includes(x));
+            if (r.roles.length) {
+              saveLedger();
+              audit(sender, "UNREGISTER_ROLE", t + " " + had.join(","));
+              syncKeys(t, true);
+              R("Done, sugar: " + plainName(t) + " is no longer " + had.map((x) => x.toLowerCase()).join(" or ") + ". They're still on the books as " + roleString(t) + ".");
+              tell(t, "Your " + had.map((x) => x.toLowerCase()).join(" and ") + " standing was taken off, sugar. You're still on the farm's books as " + roleString(t) + ".");
+              break;
+            }
+            full = true;
           }
           for (const k in L.people) {
             const p2 = L.people[k];
@@ -10663,8 +10731,9 @@ Welcome to B&B Farm, hon. 🌾`
           saveLedger();
           audit(sender, "UNREGISTER", String(t));
           pushKeys(t, [], true);
-          R("All done, sugar. Their keys are pulled and their paperwork's tucked safe in the drawer.");
-          beep(t, "Your contract's up, " + plainName(t) + ". Your keys are pulled, but the gate swings both ways, sweetie. I'll keep your paperwork safe in the drawer. 🌾");
+          whitelistSync(true);
+          R((words.length ? "That was their last role, so " : "") + "all done, sugar. " + plainName(t) + "'s keys are pulled, they're off the room whitelist, and their paperwork's tucked safe in the drawer.");
+          beep(t, "Your contract's up, " + plainName(t) + ". Your keys are pulled, but the gate swings both ways, sweetie. I'll keep your paperwork safe in the drawer.");
           break;
         }
         case "grant": {
@@ -12472,6 +12541,10 @@ Welcome to B&B Farm, hon. 🌾`
         homeTick();
         lifeTick();
         workTick();
+        if (Date.now() - (state.wlTick || 0) > 5 * 6e4) {
+          state.wlTick = Date.now();
+          whitelistSync(true);
+        }
         leadTick();
         ambientTick();
         addonsEmit("tick");

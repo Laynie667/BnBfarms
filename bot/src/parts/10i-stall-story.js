@@ -329,16 +329,17 @@
   }
   function stallFill(mn, st, line){
     const sounds = STALL_SOUNDS[speciesKey(mn)] || STALL_SOUNDS.default;
+    // the long names first: %c would eat the start of %cup, and %s the start of %size (seen live: "up-cup chest")
     return String(line)
-      .replace(/%n/g, plainName(mn))
-      .replace(/%c/g, makesSemen(mn) ? penisLabel(mn) : "")
-      .replace(/%s/g, () => sounds[Math.floor(Math.random()*sounds.length)])
-      .replace(/%ml/g, ml(st.kind === "cock" ? st.got.s : st.got.m))
-      .replace(/%ms/g, ml(st.got.s))
       .replace(/%size/g, () => CFG.SIZES.udder.names[udderLevel(mn)-1] || "full")
       .replace(/%cup/g, () => CFG.SIZES.udder.cups[udderLevel(mn)-1] || "D")
       .replace(/%balls/g, () => CFG.SIZES.testes.names[sizeOf(mn, "testes")-1] || "full")
-      .replace(/%len/g, () => sizeOf(mn, "penis")+"-inch");
+      .replace(/%len/g, () => sizeOf(mn, "penis")+"-inch")
+      .replace(/%ml/g, ml(st.kind === "cock" ? st.got.s : st.got.m))
+      .replace(/%ms/g, ml(st.got.s))
+      .replace(/%s/g, () => sounds[Math.floor(Math.random()*sounds.length)])
+      .replace(/%c/g, makesSemen(mn) ? penisLabel(mn) : "")
+      .replace(/%n/g, plainName(mn));
   }
   // the next line of their story (finish: the last one, with how much came out)
   function stallBeat(mn, st, finish){

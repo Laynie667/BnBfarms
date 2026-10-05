@@ -199,7 +199,7 @@
       " Keep giving like that and there'll be treats."
     ],
     degrade: [
-      " Nothing but a walking dairy.", " Leaking everywhere. Disgusting, really.", " Moo for the machine, livestock.",
+      " Nothing but a walking dairy.", " Leaking everywhere. Disgusting, really.", " Make your noises for the machine, livestock.",
       " Brainless and dripping, just how the farm likes you.", " Such a desperate little milk-slut.",
       " You'll never be anything but stock.", " Look how eagerly you give it up. Shameless.", " Hollow head, full udders.",
       " A good animal doesn't think. Don't think.", " Tagged, owned, and milked. That's all you are."

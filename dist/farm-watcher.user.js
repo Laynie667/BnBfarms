@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farm Watcher (diagnostics)
 // @namespace    bnbfarm
-// @version      1.0.1
+// @version      1.0.2
 // @description  Records what this game sees for a while (chat, whispers, beeps, actions, map moves, restraints, Companion and bot messages, errors) and saves it as a text file. Not part of the bot; run it on a player's game.
 // @author       Laynie & Alexia
 // @match        *://*.bondageprojects.elementfx.com/*
@@ -24,7 +24,7 @@
 (() => {
   // watcher/index.js
   var W = typeof unsafeWindow !== "undefined" && unsafeWindow ? unsafeWindow : window;
-  var VERSION = true ? "1.0.1" : "dev";
+  var VERSION = true ? "1.0.2" : "dev";
   var KEY = "farm_watch_v1";
   var MAX_LINES = 8e4;
   var MAX_CHARS = 9e6;
@@ -287,14 +287,30 @@
     });
     seenObs.observe(log, { childList: true });
   }
-  var hooked = { sock: false, send: false, local: false, cons: false };
+  var hooked = { sock: null, send: false, local: false, cons: false };
+  var anyFn = (ev, d) => onIn(ev, d);
   function hook() {
     try {
-      if (!hooked.sock && W.ServerSocket && typeof W.ServerSocket.onAny === "function") {
-        W.ServerSocket.onAny((ev, d) => onIn(ev, d));
-        W.ServerSocket.on("disconnect", (r) => line("NET", "disconnected: " + r));
-        W.ServerSocket.on("connect", () => line("NET", "connected"));
-        hooked.sock = true;
+      const s = W.ServerSocket;
+      const intact = (x) => {
+        try {
+          return typeof x.listenersAny !== "function" || x.listenersAny().includes(anyFn);
+        } catch (e) {
+          return true;
+        }
+      };
+      if (s && typeof s.onAny === "function" && (hooked.sock !== s || !intact(s))) {
+        if (hooked.sock) {
+          try {
+            hooked.sock.offAny(anyFn);
+          } catch (e) {
+          }
+          line("NET", hooked.sock !== s ? "the game swapped its connection; listening on the new one" : "our listener was taken off the connection; put it back");
+        }
+        s.onAny(anyFn);
+        s.on("disconnect", (r) => line("NET", "disconnected: " + r));
+        s.on("connect", () => line("NET", "connected"));
+        hooked.sock = s;
       }
       if (!hooked.send && typeof W.ServerSend === "function" && !W.ServerSend.__farmWatch) {
         const orig = W.ServerSend;

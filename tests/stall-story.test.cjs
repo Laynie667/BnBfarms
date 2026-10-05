@@ -54,6 +54,8 @@ async function session(mn, x){
   ok(/massive|enormous|huge|extra-wide|colossal|vast|dinner plates|half the stall|padded shelf|sling/i.test(mooAll), 'Moo: her huge breasts come into it');
   ok(/ring|piercing|jewelry|metal/i.test(mooAll) || moo.length<45, 'Moo: her nipple piercings come into it');
   ok(!/%\w/.test(mooAll), 'Moo: no placeholder left in any line');
+  // seen live: "up-cup chest" (%c ate the start of %cup), and %s would do the same to %size
+  ok(!/\bup-cup\b|(moo|moan|whimper|gasp|bleat|whinny|nicker|grunt|whine|yip|mewl|purr|mew|snort|bellow|giggle)ize\b/i.test(mooAll), 'Moo: sizes and cups come out as words ("massive", "J-cup")');
   // Rex: a dog, cock only (milkable off), knotted canine, big balls
   L().people[600].prod.hasPenis=true; P(600).size={testes:8,penis:9}; P(600).semen=1e9;
   const rex=await session(600, 15);

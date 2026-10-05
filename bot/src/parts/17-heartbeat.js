@@ -8,6 +8,13 @@
     try {
       if (typeof W.ServerSend!=="function"){ setBadge("game not found","#ff9b9b"); watchdog(); return; }
       attachListeners();
+      // a busy room and not a sound from the game for 20 minutes: listen again, just in case (harmless if all's well)
+      const others = (W.ChatRoomCharacter||[]).filter(c => c.MemberNumber !== CFG.BOT_MEMBER).length;
+      if (others && inRoom() && Date.now() - (state.lastIn || Date.now()) > 20*60000 && Date.now() - (state.relistenAt||0) > 20*60000){
+        state.relistenAt = Date.now(); warn("Nothin' heard from the game for 20 minutes with folks in the room: listenin' again.");
+        attachListeners._force = true; attachListeners();
+      }
+      if (!state.lastIn) state.lastIn = Date.now();
 
       if (!isLoggedIn()){ setBadge("logging in…","#ffc49b"); tryLogin(); watchdog(); return; }
       // one farm office: the wrong account, or a second copy, stays quiet (and never walks into the room)

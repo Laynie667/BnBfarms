@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.14.8
+// @version      0.14.9
 // @description  B&B Farm: beeps, keys, ledger, roster, herds, summoning, anti-idle
 // @author       Laynie & Alexia
 // @match        *://*.bondageprojects.elementfx.com/*
@@ -1803,7 +1803,7 @@
   ];
 
   // bot/src/version.js
-  var VERSION = "0.14.8";
+  var VERSION = "0.14.9";
 
   // bot-parts:farmhand-bot-parts
   (function() {
@@ -3236,7 +3236,7 @@
     };
     W.FarmhandExport = exportLedger;
     W.FarmhandLedger = () => L;
-    if (W.__FARMHAND_TEST__) Object.assign(W, { __st: () => state, __cfg: CFG, __pt: prodTick, __qt: quotaTick, __lt: leashTick, __ms: milkingStallTick, __vt: voiceTick, __sync: syncCompanions, __gt: gearTick, __ht: homeTick, __addons: (h, ...a) => addonsEmit(h, ...a), __stateFor: (mn) => stateFor(mn), __leadTick: () => leadTick(), __ambient: () => ambientTick(), __about: (t) => aboutWhom(t), __announce: (t) => announce(t), __reply: (mn, t, ch) => reply(mn, t, ch), __office: () => officeCheck(), __namesHere: (t) => namesHere(t), __speciesCheck: (t) => QUESTIONS.find((q) => q.key === "species").check(t) });
+    if (W.__FARMHAND_TEST__) Object.assign(W, { __st: () => state, __cfg: CFG, __pt: prodTick, __qt: quotaTick, __lt: leashTick, __ms: milkingStallTick, __vt: voiceTick, __sync: syncCompanions, __gt: gearTick, __ht: homeTick, __addons: (h, ...a) => addonsEmit(h, ...a), __stateFor: (mn) => stateFor(mn), __leadTick: () => leadTick(), __ambient: () => ambientTick(), __about: (t) => aboutWhom(t), __announce: (t) => announce(t), __reply: (mn, t, ch) => reply(mn, t, ch), __office: () => officeCheck(), __namesHere: (t) => namesHere(t), __speciesCheck: (t) => QUESTIONS.find((q) => q.key === "species").check(t), __attach: () => attachListeners() });
     W.FarmhandSyncKeys = () => syncAllPresent(true);
     W.FarmhandFriends = () => W.Player.FriendList;
     W.FarmhandAddFriend = (mn) => addFriend(mn, false);
@@ -8106,7 +8106,7 @@
     }
     function stallFill(mn, st, line) {
       const sounds = STALL_SOUNDS[speciesKey(mn)] || STALL_SOUNDS.default;
-      return String(line).replace(/%n/g, plainName(mn)).replace(/%c/g, makesSemen(mn) ? penisLabel(mn) : "").replace(/%s/g, () => sounds[Math.floor(Math.random() * sounds.length)]).replace(/%ml/g, ml(st.kind === "cock" ? st.got.s : st.got.m)).replace(/%ms/g, ml(st.got.s)).replace(/%size/g, () => CFG.SIZES.udder.names[udderLevel(mn) - 1] || "full").replace(/%cup/g, () => CFG.SIZES.udder.cups[udderLevel(mn) - 1] || "D").replace(/%balls/g, () => CFG.SIZES.testes.names[sizeOf(mn, "testes") - 1] || "full").replace(/%len/g, () => sizeOf(mn, "penis") + "-inch");
+      return String(line).replace(/%size/g, () => CFG.SIZES.udder.names[udderLevel(mn) - 1] || "full").replace(/%cup/g, () => CFG.SIZES.udder.cups[udderLevel(mn) - 1] || "D").replace(/%balls/g, () => CFG.SIZES.testes.names[sizeOf(mn, "testes") - 1] || "full").replace(/%len/g, () => sizeOf(mn, "penis") + "-inch").replace(/%ml/g, ml(st.kind === "cock" ? st.got.s : st.got.m)).replace(/%ms/g, ml(st.got.s)).replace(/%s/g, () => sounds[Math.floor(Math.random() * sounds.length)]).replace(/%c/g, makesSemen(mn) ? penisLabel(mn) : "").replace(/%n/g, plainName(mn));
     }
     function stallBeat(mn, st, finish) {
       const S = STALL_STORY, r = rec(mn) || {};
@@ -8545,7 +8545,7 @@
       degrade: [
         " Nothing but a walking dairy.",
         " Leaking everywhere. Disgusting, really.",
-        " Moo for the machine, livestock.",
+        " Make your noises for the machine, livestock.",
         " Brainless and dripping, just how the farm likes you.",
         " Such a desperate little milk-slut.",
         " You'll never be anything but stock.",
@@ -13560,10 +13560,38 @@ Welcome to B&B Farm, hon. \u{1F33E}`
       beep(pc.by, "\u2705 " + plainName(sender) + " said yes! " + herdLabel(h) + ". " + herdMembers(pc.by).length + "/" + herdCap(pc.by) + " in your " + herdWord(pc.by) + ".");
       return true;
     }
+    function listenersIntact(s) {
+      try {
+        return typeof s.listeners !== "function" || s.listeners("ChatRoomMessage").includes(attachListeners._msgFn);
+      } catch (e) {
+        return true;
+      }
+    }
     function attachListeners() {
-      if (attachListeners._done) return true;
-      if (!W.ServerSocket || typeof W.ServerSocket.on !== "function") return false;
-      W.ServerSocket.on("ChatRoomMessage", (data) => {
+      const s = W.ServerSocket;
+      if (!s || typeof s.on !== "function") return false;
+      if (attachListeners._sock === s && listenersIntact(s) && !attachListeners._force) return true;
+      attachListeners._force = false;
+      if (attachListeners._sock) {
+        warn(attachListeners._sock !== s ? "The game swapped its connection: listenin' on the new one." : "The bot's listeners were taken off the connection: puttin' them back.");
+        try {
+          for (const [ev, fn] of attachListeners._fns || []) attachListeners._sock.off(ev, fn);
+        } catch (e) {
+        }
+        state.relistened = (state.relistened || 0) + 1;
+      }
+      attachListeners._sock = s;
+      attachListeners._fns = [];
+      const on = (ev, fn0) => {
+        const fn = (...a) => {
+          state.lastIn = Date.now();
+          return fn0(...a);
+        };
+        s.on(ev, fn);
+        attachListeners._fns.push([ev, fn]);
+        return fn;
+      };
+      attachListeners._msgFn = on("ChatRoomMessage", (data) => {
         try {
           if (!data || state.dormant) return;
           if (data.Sender === CFG.BOT_MEMBER) {
@@ -13645,7 +13673,7 @@ Welcome to B&B Farm, hon. \u{1F33E}`
           warn("msg:", e);
         }
       });
-      W.ServerSocket.on("AccountBeep", (data) => {
+      on("AccountBeep", (data) => {
         try {
           if (!data || data.MemberNumber === CFG.BOT_MEMBER || state.dormant) return;
           if (data.BeepType) return;
@@ -13659,7 +13687,7 @@ Welcome to B&B Farm, hon. \u{1F33E}`
           warn("beep handler:", e);
         }
       });
-      W.ServerSocket.on("ChatRoomSyncMemberJoin", (data) => {
+      on("ChatRoomSyncMemberJoin", (data) => {
         try {
           if (!data || !data.Character) return;
           const mn = data.Character.MemberNumber;
@@ -13675,14 +13703,14 @@ Welcome to B&B Farm, hon. \u{1F33E}`
           warn("join:", e);
         }
       });
-      W.ServerSocket.on("ChatRoomSyncMemberLeave", (data) => {
+      on("ChatRoomSyncMemberLeave", (data) => {
         try {
           if (data && data.SourceMemberNumber) addonsEmit("leave", data.SourceMemberNumber);
         } catch (e) {
           warn("leave:", e);
         }
       });
-      W.ServerSocket.on("AccountQueryResult", (d) => {
+      on("AccountQueryResult", (d) => {
         try {
           if (!d || d.Query !== "OnlineFriends" || !Array.isArray(d.Result)) return;
           state.mutual = { at: Date.now(), set: new Set(d.Result.map((x) => x && x.MemberNumber).filter(Number.isFinite)) };
@@ -13691,21 +13719,21 @@ Welcome to B&B Farm, hon. \u{1F33E}`
           warn("friends result:", e);
         }
       });
-      W.ServerSocket.on("ChatRoomSync", () => {
+      on("ChatRoomSync", () => {
         state.lastHealthy = Date.now();
         later(() => pingCompanions(false), 4e3);
       });
-      W.ServerSocket.on("ChatRoomSearchResponse", (d) => {
+      on("ChatRoomSearchResponse", (d) => {
         log("SearchResponse:", d);
         if (d === "CannotFindRoom" || d === "RoomNotFound") later(tryCreateRoom, 1500);
         if (d === "JoinedRoom") later(() => snapshotRoom(true), 5e3);
       });
-      W.ServerSocket.on("ChatRoomCreateResponse", (d) => log("CreateResponse:", d));
-      W.ServerSocket.on("disconnect", () => {
+      on("ChatRoomCreateResponse", (d) => log("CreateResponse:", d));
+      on("disconnect", () => {
         warn("Socket disconnected.");
         setBadge("disconnected", "#ff9b9b");
       });
-      W.ServerSocket.on("connect", () => {
+      on("connect", () => {
         log("Socket reconnected.");
         state.lastHealthy = Date.now();
       });
@@ -13725,7 +13753,7 @@ Welcome to B&B Farm, hon. \u{1F33E}`
         warn("/office:", e);
       }
       attachListeners._done = true;
-      log("Listeners attached (chat + beeps + friends + sync).");
+      log("Listeners attached (chat + beeps + friends + sync)" + (state.relistened ? ", again (" + state.relistened + ")" : "") + ".");
       return true;
     }
     function heartbeat() {
@@ -13736,6 +13764,14 @@ Welcome to B&B Farm, hon. \u{1F33E}`
           return;
         }
         attachListeners();
+        const others = (W.ChatRoomCharacter || []).filter((c) => c.MemberNumber !== CFG.BOT_MEMBER).length;
+        if (others && inRoom() && Date.now() - (state.lastIn || Date.now()) > 20 * 6e4 && Date.now() - (state.relistenAt || 0) > 20 * 6e4) {
+          state.relistenAt = Date.now();
+          warn("Nothin' heard from the game for 20 minutes with folks in the room: listenin' again.");
+          attachListeners._force = true;
+          attachListeners();
+        }
+        if (!state.lastIn) state.lastIn = Date.now();
         if (!isLoggedIn()) {
           setBadge("logging in\u2026", "#ffc49b");
           tryLogin();

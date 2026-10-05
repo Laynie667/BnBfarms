@@ -4,11 +4,30 @@
   */
   /* ───────────── listeners ───────────── */
 
+  /* Seen live: the game (or a mod on the bot's account) swapped its connection for a new one after the page
+     loaded, and the bot kept listenin' to the old, dead one. It still sent (sendin' always goes through the
+     current connection) but heard nothin': no commands, no greetings, no Companions, for an hour. So every
+     heartbeat checks it's listenin' to the connection the game uses now, with its listeners still on it, and
+     puts them back if not. */
+  function listenersIntact(s){
+    try { return typeof s.listeners !== "function" || s.listeners("ChatRoomMessage").includes(attachListeners._msgFn); } catch(e){ return true; }
+  }
   function attachListeners(){
-    if (attachListeners._done) return true;
-    if (!W.ServerSocket || typeof W.ServerSocket.on !== "function") return false;
+    const s = W.ServerSocket;
+    if (!s || typeof s.on !== "function") return false;
+    if (attachListeners._sock === s && listenersIntact(s) && !attachListeners._force) return true;
+    attachListeners._force = false;
+    if (attachListeners._sock){
+      warn(attachListeners._sock !== s ? "The game swapped its connection: listenin' on the new one." : "The bot's listeners were taken off the connection: puttin' them back.");
+      // off the old one, so nothin' is ever heard twice
+      try { for (const [ev, fn] of attachListeners._fns || []) attachListeners._sock.off(ev, fn); } catch(e){}
+      state.relistened = (state.relistened || 0) + 1;
+    }
+    attachListeners._sock = s; attachListeners._fns = [];
+    // every handler notes that somethin' came in (the heartbeat notices a long silence; see 17-heartbeat.js)
+    const on = (ev, fn0) => { const fn = (...a) => { state.lastIn = Date.now(); return fn0(...a); }; s.on(ev, fn); attachListeners._fns.push([ev, fn]); return fn; };
 
-    W.ServerSocket.on("ChatRoomMessage",(data)=>{
+    attachListeners._msgFn = on("ChatRoomMessage",(data)=>{
       try {
         if (!data || state.dormant) return;   // a quiet copy (see officeCheck) answers nothing
         if (data.Sender===CFG.BOT_MEMBER){
@@ -58,7 +77,7 @@
       } catch(e){ warn("msg:",e); }
     });
 
-    W.ServerSocket.on("AccountBeep",(data)=>{
+    on("AccountBeep",(data)=>{
       try {
         if (!data || data.MemberNumber===CFG.BOT_MEMBER || state.dormant) return;
         if (data.BeepType) return;
@@ -71,7 +90,7 @@
       } catch(e){ warn("beep handler:",e); }
     });
 
-    W.ServerSocket.on("ChatRoomSyncMemberJoin",(data)=>{
+    on("ChatRoomSyncMemberJoin",(data)=>{
       try {
         if (!data || !data.Character) return;
         const mn = data.Character.MemberNumber;
@@ -86,27 +105,27 @@
       } catch(e){ warn("join:",e); }
     });
 
-    W.ServerSocket.on("ChatRoomSyncMemberLeave",(data)=>{ try { if (data && data.SourceMemberNumber) addonsEmit("leave", data.SourceMemberNumber); } catch(e){ warn("leave:",e); } });
+    on("ChatRoomSyncMemberLeave",(data)=>{ try { if (data && data.SourceMemberNumber) addonsEmit("leave", data.SourceMemberNumber); } catch(e){ warn("leave:",e); } });
     // who's friends with the bot both ways (and online): the only people a beep can reach
-    W.ServerSocket.on("AccountQueryResult",(d)=>{
+    on("AccountQueryResult",(d)=>{
       try {
         if (!d || d.Query !== "OnlineFriends" || !Array.isArray(d.Result)) return;
         state.mutual = { at: Date.now(), set: new Set(d.Result.map(x => x && x.MemberNumber).filter(Number.isFinite)) };
         for (const mn of state.mutual.set) if (L.mailbox && L.mailbox[mn]) deliverMail(mn);
       } catch(e){ warn("friends result:", e); }
     });
-    W.ServerSocket.on("ChatRoomSync", ()=>{ state.lastHealthy = Date.now(); later(()=>pingCompanions(false), 4000); });
+    on("ChatRoomSync", ()=>{ state.lastHealthy = Date.now(); later(()=>pingCompanions(false), 4000); });
 
-    W.ServerSocket.on("ChatRoomSearchResponse",(d)=>{
+    on("ChatRoomSearchResponse",(d)=>{
       log("SearchResponse:",d);
       // the server's word for it is "CannotFindRoom" (v0.9.0 waited for "RoomNotFound",
       // which never comes, so the room was never rebuilt)
       if (d==="CannotFindRoom" || d==="RoomNotFound") later(tryCreateRoom,1500);
       if (d==="JoinedRoom") later(()=>snapshotRoom(true), 5000);
     });
-    W.ServerSocket.on("ChatRoomCreateResponse", d=>log("CreateResponse:",d));
-    W.ServerSocket.on("disconnect", ()=>{ warn("Socket disconnected."); setBadge("disconnected","#ff9b9b"); });
-    W.ServerSocket.on("connect", ()=>{ log("Socket reconnected."); state.lastHealthy = Date.now(); });
+    on("ChatRoomCreateResponse", d=>log("CreateResponse:",d));
+    on("disconnect", ()=>{ warn("Socket disconnected."); setBadge("disconnected","#ff9b9b"); });
+    on("connect", ()=>{ log("Socket reconnected."); state.lastHealthy = Date.now(); });
 
     // /office <command>: run any farm command as the bot itself (a proprietor), answers on this screen
     try {
@@ -116,7 +135,7 @@
       }
     } catch(e){ warn("/office:", e); }
     attachListeners._done = true;
-    log("Listeners attached (chat + beeps + friends + sync).");
+    log("Listeners attached (chat + beeps + friends + sync)"+(state.relistened ? ", again ("+state.relistened+")" : "")+".");
     return true;
   }
 

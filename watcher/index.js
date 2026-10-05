@@ -185,14 +185,20 @@ function watchChatLog() {
 }
 
 // ── hooking into the game (once it's there) ──────────────────
-let hooked = { sock: false, send: false, local: false, cons: false };
+let hooked = { sock: null, send: false, local: false, cons: false };
+const anyFn = (ev, d) => onIn(ev, d);
 function hook() {
   try {
-    if (!hooked.sock && W.ServerSocket && typeof W.ServerSocket.onAny === "function") {
-      W.ServerSocket.onAny((ev, d) => onIn(ev, d));
-      W.ServerSocket.on("disconnect", (r) => line("NET", "disconnected: " + r));
-      W.ServerSocket.on("connect", () => line("NET", "connected"));
-      hooked.sock = true;
+    // the game can swap its connection for a new one after the page loads (seen live: an hour of nothing coming in),
+    // so follow whichever one it's using now, and put our listener back if it was taken off
+    const s = W.ServerSocket;
+    const intact = (x) => { try { return typeof x.listenersAny !== "function" || x.listenersAny().includes(anyFn); } catch (e) { return true; } };
+    if (s && typeof s.onAny === "function" && (hooked.sock !== s || !intact(s))) {
+      if (hooked.sock) { try { hooked.sock.offAny(anyFn); } catch (e) {} line("NET", hooked.sock !== s ? "the game swapped its connection; listening on the new one" : "our listener was taken off the connection; put it back"); }
+      s.onAny(anyFn);
+      s.on("disconnect", (r) => line("NET", "disconnected: " + r));
+      s.on("connect", () => line("NET", "connected"));
+      hooked.sock = s;
     }
     if (!hooked.send && typeof W.ServerSend === "function" && !W.ServerSend.__farmWatch) {
       const orig = W.ServerSend;

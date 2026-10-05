@@ -57,7 +57,7 @@
     const line = (kind === "emote" ? "*" : "") + String(text);
     if (hasCompanion(mn)) { enqueue(makeMsg("roomline", { text: line, kind: kind === "emote" ? "emote" : "chat" }, mn), urgent); return; }
     const ooc = mapRoom();
-    for (const c of splitMessage(line, 900)) enqueue({ Content: ooc ? "("+c.replace(/\)/g, "]") : c, Type:"Whisper", Target: mn }, urgent);
+    for (const c of splitMessage(line, 900)) enqueue({ Content: ooc ? "("+c.replace(/\(/g, "[").replace(/\)/g, "]") : c, Type:"Whisper", Target: mn }, urgent);
   }
 
   // add-ons can nudge production: rates: { milk(mn), semen(mn) } return a multiplier (1 = no change).
@@ -233,9 +233,19 @@
     return out;
   }
 
+  // "barn-life", "Barn life", "barnlife" or just "barn" (if only one starts that way)
+  function findAddon(text){
+    const q = String(text||"").toLowerCase().trim(); if (!q) return null;
+    const norm = s => String(s||"").toLowerCase().replace(/[\s_-]+/g, "");
+    const all = [...ADDONS.values()];
+    const exact = ADDONS.get(q) || all.find(a => norm(a.name) === norm(q) || norm(a.label) === norm(q));
+    if (exact) return exact;
+    const hits = all.filter(a => norm(a.name).startsWith(norm(q)) || norm(a.label).startsWith(norm(q)));
+    return hits.length === 1 ? hits[0] : null;
+  }
   function addonsText(topic){
     if (topic){
-      const a = ADDONS.get(String(topic).toLowerCase()) || [...ADDONS.values()].find(x => x.label.toLowerCase() === String(topic).toLowerCase());
+      const a = findAddon(topic);
       if (!a) return "There's no add-on called '"+topic+"', hon. ?addons lists 'em.";
       return "🧩 "+a.label+" v"+a.version+(a.enabled === false ? " (switched off)" : "")+"\n"+(a.guide || "No guide written yet.")+
              "\n\nCommands: "+(Object.entries(a.commands).map(([w, c]) => "?"+(c.usage || w)+(c.rank && c.rank !== "anyone" ? " ("+c.rank+")" : "")).join(" · ") || "none");

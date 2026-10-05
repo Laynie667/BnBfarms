@@ -77,6 +77,19 @@
     return null;
   }
 
+  // the command they probably meant: a stray letter in front ("a-addons"), or one or two letters off ("adons")
+  function nearestCommand(cmd, sender){
+    const pool = PUBLIC_CMDS.concat(isStaff(sender) ? STAFF_CMDS : [], [...ADDON_CMDS.keys()]);
+    const strip = cmd.replace(/^[a-z][-.]/, "");
+    if (strip !== cmd && pool.includes(strip)) return strip;
+    if (cmd.length < 4) return null;
+    const dist = (a, b) => { const d = Array.from({ length: a.length + 1 }, (_, i) => [i]); for (let j = 1; j <= b.length; j++) d[0][j] = j;
+      for (let i = 1; i <= a.length; i++) for (let j = 1; j <= b.length; j++) d[i][j] = Math.min(d[i-1][j]+1, d[i][j-1]+1, d[i-1][j-1]+(a[i-1] === b[j-1] ? 0 : 1));
+      return d[a.length][b.length]; };
+    let best = null, bd = 3;
+    for (const c of pool){ const x = dist(cmd, c); if (x < bd){ bd = x; best = c; } }
+    return bd <= (cmd.length >= 6 ? 2 : 1) ? best : null;
+  }
   function parseCommand(raw, isWhisper, isBeep, noNatural){
     let text = String(raw).trim();
     if (!text) return null;

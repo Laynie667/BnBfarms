@@ -185,6 +185,10 @@
     if (mapRoom() && CFG.SPEAKER_MODE !== "walk"){
       if (subject && speakerSend(subject, t, "chat", urgent)) return;
       if (!subject){ toEveryone(t, "chat", urgent); return; }
+      // about somebody, but nobody to send it round (they're mid-join, or just left): only to them, never out
+      // loud (seen live: a greeting said to the whole room when someone rejoined)
+      if (charFor(subject)) privateTo(subject, t, "chat");
+      return;
     }
     walkTo(subject, urgent); enqueue({ Content:t, Type:"Chat" }, urgent);
   }
@@ -295,6 +299,8 @@
         if (who.size){ for (const m of who) privateTo(m, t, "emote"); return; }
       }
     } else if (mapRoom() && CFG.SPEAKER_MODE !== "walk"){ toEveryone(t, "emote"); return; }   // about nobody: everybody hears it
+    // about somebody on a map, and nobody around them to tell: only them, never a public emote
+    if (mapRoom() && subject && CFG.SPEAKER_MODE !== "walk"){ if (charFor(subject)) privateTo(subject, t, "emote"); return; }
     walkTo(subject);
     for (const c of splitMessage(t, 900)) enqueue({ Content:"*"+c, Type:"Emote" });
   }
@@ -350,7 +356,7 @@
   function privateTo(mn, text, kind){
     const line = (kind === "emote" ? "*" : "")+String(text);
     if (hasCompanion(mn)) enqueue(makeMsg("roomline", { text: line, kind }, mn));
-    else for (const part of splitMessage(line, 900)) enqueue({ Content: "("+part.replace(/\)/g, "]"), Type:"Whisper", Target: mn });
+    else for (const part of splitMessage(line, 900)) enqueue({ Content: "("+part.replace(/\(/g, "[").replace(/\)/g, "]"), Type:"Whisper", Target: mn });
   }
   // an announcement about nobody in particular, on a map: privately to everybody here
   function toEveryone(text, kind, urgent){
@@ -359,7 +365,7 @@
       const mn = c.MemberNumber;
       if (mn === CFG.BOT_MEMBER) continue;
       if (hasCompanion(mn)) enqueue(makeMsg("roomline", { text: line, kind }, mn), urgent);
-      else for (const part of splitMessage(line, 900)) enqueue({ Content: "("+part.replace(/\)/g, "]"), Type:"Whisper", Target: mn }, urgent);
+      else for (const part of splitMessage(line, 900)) enqueue({ Content: "("+part.replace(/\(/g, "[").replace(/\)/g, "]"), Type:"Whisper", Target: mn }, urgent);
     }
   }
 
@@ -374,7 +380,7 @@
     const line = (kind === "emote" ? "*" : "")+String(text);
     for (const mn of who){
       if (hasCompanion(mn)) enqueue(makeMsg("roomline", { text: line, kind }, mn), urgent);
-      else for (const c of splitMessage(line, 900)) enqueue({ Content: "("+c.replace(/\)/g, "]"), Type:"Whisper", Target: mn }, urgent);
+      else for (const c of splitMessage(line, 900)) enqueue({ Content: "("+c.replace(/\(/g, "[").replace(/\)/g, "]"), Type:"Whisper", Target: mn }, urgent);
     }
     return true;
   }
@@ -418,7 +424,7 @@
     // in a map room a whisper only reaches someone within 1 tile, unless it's out-of-character:
     // everything after a "(" gets through, so I open one and keep any ")" in the text from closin' it
     const ooc = mapRoom();
-    for (const c of splitMessage(text,900)) enqueue({ Content: ooc ? "("+c.replace(/\)/g, "]") : c, Type:"Whisper", Target:target }, urgent);
+    for (const c of splitMessage(text,900)) enqueue({ Content: ooc ? "("+c.replace(/\(/g, "[").replace(/\)/g, "]") : c, Type:"Whisper", Target:target }, urgent);
   }
   function splitMessage(text,max){
     text = String(text);
@@ -481,7 +487,7 @@
     if (m.type === "outfitSave"){ saveOutfit(mn, m); return; }
     if (m.type === "outfitAnswer"){ outfitAnswer(mn, m); return; }
     if (m.type === "cmd"){
-      const text = String(m.text||"").trim().replace(/^[?\-!.]/, "").slice(0, 2000);   // contract terms can run to 1,000
+      const text = String(m.text||"").trim().replace(/^[?\-!.\/]+/, "").slice(0, 2000);   // "/record Alexia" works too   // contract terms can run to 1,000
       if (!text) return;
       const c = state.companions.get(mn);
       if (c) c.at = Date.now(); else state.companions.set(mn, { at:Date.now(), ver:"?" });

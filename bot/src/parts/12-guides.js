@@ -638,6 +638,7 @@ UPKEEP
                         inflation:"cocks", cumflation:"cocks", knot:"cocks", knots:"cocks", penis:"cocks", cock:"cocks",
                         injector:"shots", injectors:"shots", tags:"shots", size:"body", sizes:"body", futa:"body", gape:"body", udder:"body",
                         feeding:"life", curfew:"life", beg:"life", tour:"life", staff:"staffmenu" };
+  function guideTopic(t){ t = String(t||"").toLowerCase(); return !!(GUIDES[GUIDE_ALIAS[t] || t]); }
   const STAFF_GUIDES = ["books","herd","stock","barnstaff","lifestaff","work","play","keysstaff","oncall","setup","owner"];
 
   function helpFor(sender, topic){

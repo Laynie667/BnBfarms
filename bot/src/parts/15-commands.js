@@ -66,9 +66,20 @@
     };
     const p = parseCommand(raw, isWhisper, isBeep);
     if (!p){ huh("I didn't catch a command in that, sugar. Try ?help, or just say what you'd like, like stats or keys."); return; }
-    const { cmd, args, rest } = p;
-    const addonCmd = ADDON_CMDS.get(cmd) || null;   // a command from an add-on script (10f-addons.js)
-    if (!PUBLIC_CMDS.includes(cmd) && !STAFF_CMDS.includes(cmd) && !addonCmd){ huh("I don't know ?"+cmd+", hon. ?help lists what I can do."); return; }
+    let { cmd, args, rest } = p;
+    let addonCmd = ADDON_CMDS.get(cmd) || null;   // a command from an add-on script (10f-addons.js)
+    if (!PUBLIC_CMDS.includes(cmd) && !STAFF_CMDS.includes(cmd) && !addonCmd){
+      // a guide's name on its own opens that guide (?play, ?herd2, ?barnstaff)
+      if (guideTopic(cmd)){ args = [cmd]; rest = cmd; cmd = "help"; }
+      else {
+        const words = String(raw).trim().split(/\s+/).length;
+        if (channel === "companion" && words >= 3){ huh("That looked like chat, hon, not a farm command, so it wasn't sent anywhere. This box talks to me (try ?help); chat goes in the game's own chat box."); return; }
+        const near = nearestCommand(cmd, sender);
+        // in the room only a near miss gets an answer (privately); talkin' to me direct always does
+        if (channel === "chat"){ if (near){ state.huhAt = state.huhAt || new Map(); if (Date.now() - (state.huhAt.get(sender)||0) > 60000){ state.huhAt.set(sender, Date.now()); reply(sender, "Did you mean ?"+near+", sugar?", canBeep(sender) ? "beep" : "whisper"); } } return; }
+        huh("I don't know ?"+cmd+", hon."+(near ? " Did you mean ?"+near+"?" : "")+" ?help lists what I can do."); return;
+      }
+    }
     if (STAFF_CMDS.includes(cmd) && !isStaff(sender)){ huh("?"+cmd+" is just for farm staff, sugar."); return; }
     if (onCooldown(sender, cmd, channel)){ waitYourTurn(sender, raw, channel); return; }   // waits its turn (14-parser.js)
 
@@ -100,13 +111,13 @@
         const sub = String(args[0]||"").toLowerCase();
         if ((sub === "on" || sub === "off") && args[1]){
           if (!isProprietor(sender)){ R("Only proprietors switch add-ons on and off, sugar."); break; }
-          const a = ADDONS.get(String(args[1]).toLowerCase());
+          const a = findAddon(args.slice(1).join(" "));
           if (!a){ R("There's no add-on called '"+args[1]+"', hon. ?addons lists 'em."); break; }
           a.enabled = sub === "on"; L.addonsOff = L.addonsOff || {}; if (a.enabled) delete L.addonsOff[a.name]; else L.addonsOff[a.name] = true;
           saveLedger(); audit(sender, "ADDON_"+sub.toUpperCase(), a.name);
           R("🧩 "+a.label+" is "+(a.enabled ? "on" : "off")+"."); syncCompanions(true); break;
         }
-        R(addonsText(args[0])); break;
+        R(addonsText(rest)); break;
       }
 
       case "help": case "commands": case "info": case "guide":

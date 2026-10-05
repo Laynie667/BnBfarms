@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.14.9
+// @version      0.15.0
 // @description  B&B Farm: beeps, keys, ledger, roster, herds, summoning, anti-idle
 // @author       Laynie & Alexia
 // @match        *://*.bondageprojects.elementfx.com/*
@@ -1803,7 +1803,7 @@
   ];
 
   // bot/src/version.js
-  var VERSION = "0.14.9";
+  var VERSION = "0.15.0";
 
   // bot-parts:farmhand-bot-parts
   (function() {
@@ -3641,6 +3641,8 @@
           toEveryone(t, "chat", urgent);
           return;
         }
+        if (charFor(subject)) privateTo(subject, t, "chat");
+        return;
       }
       walkTo(subject, urgent);
       enqueue({ Content: t, Type: "Chat" }, urgent);
@@ -3747,6 +3749,10 @@
         toEveryone(t, "emote");
         return;
       }
+      if (mapRoom() && subject && CFG.SPEAKER_MODE !== "walk") {
+        if (charFor(subject)) privateTo(subject, t, "emote");
+        return;
+      }
       walkTo(subject);
       for (const c of splitMessage(t, 900)) enqueue({ Content: "*" + c, Type: "Emote" });
     }
@@ -3804,7 +3810,7 @@
     function privateTo(mn, text, kind) {
       const line = (kind === "emote" ? "*" : "") + String(text);
       if (hasCompanion(mn)) enqueue(makeMsg("roomline", { text: line, kind }, mn));
-      else for (const part of splitMessage(line, 900)) enqueue({ Content: "(" + part.replace(/\)/g, "]"), Type: "Whisper", Target: mn });
+      else for (const part of splitMessage(line, 900)) enqueue({ Content: "(" + part.replace(/\(/g, "[").replace(/\)/g, "]"), Type: "Whisper", Target: mn });
     }
     function toEveryone(text, kind, urgent) {
       const line = (kind === "emote" ? "*" : "") + String(text);
@@ -3812,7 +3818,7 @@
         const mn = c.MemberNumber;
         if (mn === CFG.BOT_MEMBER) continue;
         if (hasCompanion(mn)) enqueue(makeMsg("roomline", { text: line, kind }, mn), urgent);
-        else for (const part of splitMessage(line, 900)) enqueue({ Content: "(" + part.replace(/\)/g, "]"), Type: "Whisper", Target: mn }, urgent);
+        else for (const part of splitMessage(line, 900)) enqueue({ Content: "(" + part.replace(/\(/g, "[").replace(/\)/g, "]"), Type: "Whisper", Target: mn }, urgent);
       }
     }
     const speakersOn = () => mapRoom() && CFG.SPEAKER_MODE === "voice" && Object.keys(L.spots || {}).some((n) => n.startsWith("speaker"));
@@ -3822,7 +3828,7 @@
       const line = (kind === "emote" ? "*" : "") + String(text);
       for (const mn of who) {
         if (hasCompanion(mn)) enqueue(makeMsg("roomline", { text: line, kind }, mn), urgent);
-        else for (const c of splitMessage(line, 900)) enqueue({ Content: "(" + c.replace(/\)/g, "]"), Type: "Whisper", Target: mn }, urgent);
+        else for (const c of splitMessage(line, 900)) enqueue({ Content: "(" + c.replace(/\(/g, "[").replace(/\)/g, "]"), Type: "Whisper", Target: mn }, urgent);
       }
       return true;
     }
@@ -3871,7 +3877,7 @@
         return;
       }
       const ooc = mapRoom();
-      for (const c of splitMessage(text, 900)) enqueue({ Content: ooc ? "(" + c.replace(/\)/g, "]") : c, Type: "Whisper", Target: target }, urgent);
+      for (const c of splitMessage(text, 900)) enqueue({ Content: ooc ? "(" + c.replace(/\(/g, "[").replace(/\)/g, "]") : c, Type: "Whisper", Target: target }, urgent);
     }
     function splitMessage(text, max) {
       text = String(text);
@@ -3964,7 +3970,7 @@
         return;
       }
       if (m.type === "cmd") {
-        const text = String(m.text || "").trim().replace(/^[?\-!.]/, "").slice(0, 2e3);
+        const text = String(m.text || "").trim().replace(/^[?\-!.\/]+/, "").slice(0, 2e3);
         if (!text) return;
         const c = state.companions.get(mn);
         if (c) c.at = Date.now();
@@ -7149,7 +7155,7 @@
         return;
       }
       const ooc = mapRoom();
-      for (const c of splitMessage(line, 900)) enqueue({ Content: ooc ? "(" + c.replace(/\)/g, "]") : c, Type: "Whisper", Target: mn }, urgent);
+      for (const c of splitMessage(line, 900)) enqueue({ Content: ooc ? "(" + c.replace(/\(/g, "[").replace(/\)/g, "]") : c, Type: "Whisper", Target: mn }, urgent);
     }
     function addonRateX(mn, kind) {
       let x = 1;
@@ -7432,9 +7438,19 @@
       }
       return out;
     }
+    function findAddon(text) {
+      const q = String(text || "").toLowerCase().trim();
+      if (!q) return null;
+      const norm = (s) => String(s || "").toLowerCase().replace(/[\s_-]+/g, "");
+      const all = [...ADDONS.values()];
+      const exact = ADDONS.get(q) || all.find((a) => norm(a.name) === norm(q) || norm(a.label) === norm(q));
+      if (exact) return exact;
+      const hits = all.filter((a) => norm(a.name).startsWith(norm(q)) || norm(a.label).startsWith(norm(q)));
+      return hits.length === 1 ? hits[0] : null;
+    }
     function addonsText(topic) {
       if (topic) {
-        const a = ADDONS.get(String(topic).toLowerCase()) || [...ADDONS.values()].find((x) => x.label.toLowerCase() === String(topic).toLowerCase());
+        const a = findAddon(topic);
         if (!a) return "There's no add-on called '" + topic + "', hon. ?addons lists 'em.";
         return "\u{1F9E9} " + a.label + " v" + a.version + (a.enabled === false ? " (switched off)" : "") + "\n" + (a.guide || "No guide written yet.") + "\n\nCommands: " + (Object.entries(a.commands).map(([w, c]) => "?" + (c.usage || w) + (c.rank && c.rank !== "anyone" ? " (" + c.rank + ")" : "")).join(" \xB7 ") || "none");
       }
@@ -9302,6 +9318,10 @@ UPKEEP
       tour: "life",
       staff: "staffmenu"
     };
+    function guideTopic(t) {
+      t = String(t || "").toLowerCase();
+      return !!GUIDES[GUIDE_ALIAS[t] || t];
+    }
     const STAFF_GUIDES = ["books", "herd", "stock", "barnstaff", "lifestaff", "work", "play", "keysstaff", "oncall", "setup", "owner"];
     function helpFor(sender, topic) {
       const t0 = String(topic || "").toLowerCase();
@@ -9842,6 +9862,27 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
       for (const [re, cmd] of NATURAL) if (re.test(low)) return { cmd, args: [], rest: "" };
       return null;
     }
+    function nearestCommand(cmd, sender) {
+      const pool = PUBLIC_CMDS.concat(isStaff(sender) ? STAFF_CMDS : [], [...ADDON_CMDS.keys()]);
+      const strip = cmd.replace(/^[a-z][-.]/, "");
+      if (strip !== cmd && pool.includes(strip)) return strip;
+      if (cmd.length < 4) return null;
+      const dist = (a, b) => {
+        const d = Array.from({ length: a.length + 1 }, (_, i) => [i]);
+        for (let j = 1; j <= b.length; j++) d[0][j] = j;
+        for (let i = 1; i <= a.length; i++) for (let j = 1; j <= b.length; j++) d[i][j] = Math.min(d[i - 1][j] + 1, d[i][j - 1] + 1, d[i - 1][j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+        return d[a.length][b.length];
+      };
+      let best = null, bd = 3;
+      for (const c of pool) {
+        const x = dist(cmd, c);
+        if (x < bd) {
+          bd = x;
+          best = c;
+        }
+      }
+      return bd <= (cmd.length >= 6 ? 2 : 1) ? best : null;
+    }
     function parseCommand(raw, isWhisper, isBeep, noNatural) {
       let text = String(raw).trim();
       if (!text) return null;
@@ -10217,11 +10258,33 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
         huh("I didn't catch a command in that, sugar. Try ?help, or just say what you'd like, like stats or keys.");
         return;
       }
-      const { cmd, args, rest } = p;
-      const addonCmd = ADDON_CMDS.get(cmd) || null;
+      let { cmd, args, rest } = p;
+      let addonCmd = ADDON_CMDS.get(cmd) || null;
       if (!PUBLIC_CMDS.includes(cmd) && !STAFF_CMDS.includes(cmd) && !addonCmd) {
-        huh("I don't know ?" + cmd + ", hon. ?help lists what I can do.");
-        return;
+        if (guideTopic(cmd)) {
+          args = [cmd];
+          rest = cmd;
+          cmd = "help";
+        } else {
+          const words = String(raw).trim().split(/\s+/).length;
+          if (channel === "companion" && words >= 3) {
+            huh("That looked like chat, hon, not a farm command, so it wasn't sent anywhere. This box talks to me (try ?help); chat goes in the game's own chat box.");
+            return;
+          }
+          const near = nearestCommand(cmd, sender);
+          if (channel === "chat") {
+            if (near) {
+              state.huhAt = state.huhAt || /* @__PURE__ */ new Map();
+              if (Date.now() - (state.huhAt.get(sender) || 0) > 6e4) {
+                state.huhAt.set(sender, Date.now());
+                reply(sender, "Did you mean ?" + near + ", sugar?", canBeep(sender) ? "beep" : "whisper");
+              }
+            }
+            return;
+          }
+          huh("I don't know ?" + cmd + ", hon." + (near ? " Did you mean ?" + near + "?" : "") + " ?help lists what I can do.");
+          return;
+        }
       }
       if (STAFF_CMDS.includes(cmd) && !isStaff(sender)) {
         huh("?" + cmd + " is just for farm staff, sugar.");
@@ -10253,7 +10316,7 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
               R("Only proprietors switch add-ons on and off, sugar.");
               break;
             }
-            const a = ADDONS.get(String(args[1]).toLowerCase());
+            const a = findAddon(args.slice(1).join(" "));
             if (!a) {
               R("There's no add-on called '" + args[1] + "', hon. ?addons lists 'em.");
               break;
@@ -10268,7 +10331,7 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
             syncCompanions(true);
             break;
           }
-          R(addonsText(args[0]));
+          R(addonsText(rest));
           break;
         }
         case "help":

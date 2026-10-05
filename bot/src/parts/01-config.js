@@ -122,9 +122,10 @@
       PREG_DAYS: 5, SEX_SPLIT: [45, 45],           // male %, female %, the rest futa
       OVERFULL_H: 24, LEAK_EMOTE_MIN: 30,
       HEAT_H: 12, NATURAL_HEAT_EVERY_D: 7, HEAT_EMOTE_MIN: 20,
-      STALL_MILK_PER_MIN: 250, STALL_SEMEN_PER_MIN: 5,   // the slowest a stall goes; bigger loads go faster (STALL_SESSION_MIN)
-      STALL_SESSION_MIN: 10,       // a stall session takes about this long, however much they hold
-      STALL_LINE_MIN: 6,           // at most one line in the room this often (with a little jitter) while they're in the stall
+      STALL_MILK_PER_MIN: 250, STALL_SEMEN_PER_MIN: 5,   // only for a session started before an update; new ones pace themselves (STALL_SESSION_RANGE)
+      STALL_SESSION_RANGE: [5, 30], // a stall session takes 5 minutes (just over a quarter full) up to 30 (full)
+      STALL_LINE_MIN: 5,           // an open line in the room at most this often while they're in the stall (their own story is private)
+      STALL_OPEN_MAX: 20,          // ...and at most this many in one session
       STALL_AWAY_GRACE_S: 60,
       STALL_REST_MIN: [10, 20],    // after a session, the stall rests this many minutes (random in between) before it takes them again      // steppin' off for less than this pauses the session instead of endin' it
       STALL_LEAVE_SHARE: 0.25,     // milkin' stalls drain you down to this much of your capacity, then stop

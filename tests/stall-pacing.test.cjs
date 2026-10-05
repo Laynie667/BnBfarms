@@ -37,10 +37,16 @@ const roomLines=k=>sent.slice(k).filter(([e,d])=>d&&(d.Type==='Emote'||(d.Type==
   // run it in 20-second ticks until done
   let ticks=0; k=sent.length;
   while (p().stall && ticks<200){ skew+=20000; W.__ms(); ticks++; }
+  await wait(4000);
   const mins=ticks*20/60;
-  ok(mins>=8 && mins<=12, 'a full big udder takes about 10 minutes ('+mins.toFixed(1)+' min)');
-  const lines=roomLines(k);
-  ok(lines>=1 && lines<=3, 'only a few lines on the way, finish included ('+lines+')');
+  ok(mins>=27 && mins<=32, 'a full udder takes about 30 minutes ('+mins.toFixed(1)+' min)');
+  const toMoo=sent.slice(k).filter(([e,d])=>d&&d.Type==='Whisper'&&d.Target===500).map(([e,d])=>String(d.Content));
+  const OPEN=/cups pull at .*breasts in a slow rhythm|Milk streams from .* into the stall's bucket|milkin' stall eases off/;
+  const opens=toMoo.filter(c=>OPEN.test(c)), story=toMoo.filter(c=>!OPEN.test(c)&&/^\(\*/.test(c));
+  ok(opens.length>=4 && opens.length<=7, 'the room gets an open line about every 5 minutes, finish included ('+opens.length+')');
+  ok(story.length>=40, 'their own story comes privately, about every 25 seconds ('+story.length+' lines)');
+  ok(/cups|latch|seal/i.test(story[0]) && /\d+(\.\d)? (L|mL)/.test(story[story.length-1]), 'it starts with the cups going on and ends with how much came out');
+  ok(new Set(story).size===story.length, 'no line twice in one session');
   ok(p().milk <= 24000*0.25+400, 'drained down to about a quarter');
   // the stall rests now
   ok(p().stallRest > Date.now()+9*60000 && p().stallRest < Date.now()+21*60000, 'the stall rests 10-20 minutes');

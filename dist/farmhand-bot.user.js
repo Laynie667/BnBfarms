@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.14.3
+// @version      0.14.4
 // @description  B&B Farm: beeps, keys, ledger, roster, herds, summoning, anti-idle
 // @author       Laynie & Alexia
 // @match        *://*.bondageprojects.elementfx.com/*
@@ -1803,7 +1803,7 @@
   ];
 
   // bot/src/version.js
-  var VERSION = "0.14.3";
+  var VERSION = "0.14.4";
 
   // bot-parts:farmhand-bot-parts
   (function() {
@@ -1959,11 +1959,13 @@
         HEAT_EMOTE_MIN: 20,
         STALL_MILK_PER_MIN: 250,
         STALL_SEMEN_PER_MIN: 5,
-        // the slowest a stall goes; bigger loads go faster (STALL_SESSION_MIN)
-        STALL_SESSION_MIN: 10,
-        // a stall session takes about this long, however much they hold
-        STALL_LINE_MIN: 6,
-        // at most one line in the room this often (with a little jitter) while they're in the stall
+        // only for a session started before an update; new ones pace themselves (STALL_SESSION_RANGE)
+        STALL_SESSION_RANGE: [5, 30],
+        // a stall session takes 5 minutes (just over a quarter full) up to 30 (full)
+        STALL_LINE_MIN: 5,
+        // an open line in the room at most this often while they're in the stall (their own story is private)
+        STALL_OPEN_MAX: 20,
+        // ...and at most this many in one session
         STALL_AWAY_GRACE_S: 60,
         STALL_REST_MIN: [10, 20],
         // after a session, the stall rests this many minutes (random in between) before it takes them again      // steppin' off for less than this pauses the session instead of endin' it
@@ -5202,7 +5204,7 @@
             p0.stallSeen = 0;
             p0.stallWhyTold = false;
             if (p0.stall && now - (p0.stall.seenAt || now) > CFG.PROD.STALL_AWAY_GRACE_S * 1e3) {
-              p0.stallPaused = { until: now + 6e5, rateM: p0.stall.rateM, rateS: p0.stall.rateS, since: p0.stall.since };
+              p0.stallPaused = { until: now + 6e5, st: p0.stall };
               p0.stall = null;
             }
           }
@@ -5241,59 +5243,84 @@
         if (!p.stall && (doM || doS)) {
           p.stallSeen = (p.stallSeen || 0) + 1;
           if (p.stallSeen < 2) continue;
-          if (p.stallPaused && p.stallPaused.until > now) {
-            p.stall = { since: p.stallPaused.since || now, seenAt: now, rateM: p.stallPaused.rateM, rateS: p.stallPaused.rateS };
-            p.stallPaused = null;
+          if (p.stallPaused && p.stallPaused.until > now && p.stallPaused.st) {
+            p.stall = p.stallPaused.st;
+            p.stall.seenAt = now;
           }
+          p.stallPaused = null;
         }
         if (!p.stall && (doM || doS)) {
-          const S = CFG.PROD.STALL_SESSION_MIN;
+          const [lo, hi] = CFG.PROD.STALL_SESSION_RANGE;
+          const fracM = doM ? (p.milk - keepM) / Math.max(1, milkCap(mn) - keepM) : 0;
+          const fracS = doS ? (p.semen - keepS) / Math.max(1, semenCap(mn) - keepS) : 0;
+          const mins = Math.round(lo + (hi - lo) * Math.min(1, Math.max(fracM, fracS)));
+          const total = { m: doM ? p.milk - keepM : 0, s: doS ? p.semen - keepS : 0 };
           p.stall = {
             since: now,
             seenAt: now,
-            rateM: Math.max(CFG.PROD.STALL_MILK_PER_MIN, (p.milk - keepM) / S),
-            rateS: Math.max(CFG.PROD.STALL_SEMEN_PER_MIN, (p.semen - keepS) / S)
+            mins,
+            total,
+            got: { m: 0, s: 0 },
+            rateM: total.m / mins,
+            rateS: total.s / mins,
+            kind: doM && doS ? "both" : doM ? "milk" : "cock",
+            nextBeat: now + 15e3,
+            nextOpen: now + CFG.PROD.STALL_LINE_MIN * 6e4,
+            opens: 0
           };
-          p.stallSaid = now;
-          const mins = Math.ceil(Math.max(doM ? (p.milk - keepM) / p.stall.rateM : 0, doS ? (p.semen - keepS) / p.stall.rateS : 0));
           sound(mn, "stall");
-          tell(mn, "\u{1F95B} The stall latches on. About " + mins + " minute" + (mins === 1 ? "" : "s") + " to drain you down to a quarter, sugar. Stay put.");
+          tell(mn, "\u{1F95B} The stall latches on. About " + mins + " minutes to drain you down to a quarter, sugar. Stay put.");
         }
         if (!p.stall) continue;
-        p.stall.seenAt = now;
-        const rateM = p.stall.rateM || CFG.PROD.STALL_MILK_PER_MIN, rateS = p.stall.rateS || CFG.PROD.STALL_SEMEN_PER_MIN;
-        p.stall.until = now + Math.ceil(Math.max(doM ? (p.milk - keepM) / rateM : 0, doS ? (p.semen - keepS) / rateS : 0)) * 6e4;
+        const st = p.stall;
+        st.seenAt = now;
+        st.got = st.got || { m: 0, s: 0 };
+        st.total = st.total || { m: Math.max(0, p.milk - keepM), s: Math.max(0, p.semen - keepS) };
+        st.kind = st.kind || (doM && doS ? "both" : doM ? "milk" : "cock");
+        const rateM = st.rateM || CFG.PROD.STALL_MILK_PER_MIN, rateS = st.rateS || CFG.PROD.STALL_SEMEN_PER_MIN;
+        st.until = now + Math.ceil(Math.max(doM ? (p.milk - keepM) / rateM : 0, doS ? (p.semen - keepS) / rateS : 0)) * 6e4;
         const gotM = doM ? drainMilk(mn, Math.min(rateM * dtMin, p.milk - keepM)) : 0;
         const gotS = doS ? drainSemen(mn, Math.min(rateS * dtMin, p.semen - keepS)) : 0;
-        const got = gotM + gotS;
-        if (gotM > 0 && !gotS && Date.now() - (p.stallSaid || 0) > CFG.PROD.STALL_LINE_MIN * 6e4 * (0.85 + Math.random() * 0.3)) {
-          p.stallSaid = Date.now();
-          const n = plainName(mn);
-          emote("\u{1F95B} " + (addonLine("stallMilk", lineInfo(mn, { ml: ml(gotM) })) || [
-            "The stall's cups pull at " + n + "'s teats in a slow rhythm, and warm milk runs down the lines into the bucket.",
-            "Milk streams from " + n + " into the stall's bucket. They shift their weight and moo softly."
-          ][Math.floor(Math.random() * 2)]));
-        }
-        if (gotS > 0 && Date.now() - (p.stallSaid || 0) > CFG.PROD.STALL_LINE_MIN * 6e4 * (0.85 + Math.random() * 0.3)) {
-          p.stallSaid = Date.now();
-          const n = plainName(mn), c = penisLabel(mn);
-          const alt = addonLine("stallSemen", lineInfo(mn, { ml: ml(gotS), cock: c }));
-          const L1 = [
-            n + "'s " + c + " cock is sealed in the stall's wet suction sleeve, and it pumps and pulls in a slow, steady rhythm. Their hips twitch every time it squeezes.",
-            "The machine strokes " + n + " from root to tip, milkin' that " + c + " cock for every drop. Seed spurts into the collection jar in thick pulses.",
-            "A warm vibrating cup hugs " + n + "'s balls while the sleeve sucks their cock. " + n + " is a moanin', drippin' mess in the stall."
-          ];
-          emote("\u{1F402} " + (alt || L1[Math.floor(Math.random() * L1.length)]), mn);
-        }
+        st.got.m += gotM;
+        st.got.s += gotS;
         const doneM = !makesMilk(mn) || milkDenied(mn) || gearOf(mn).milk || p.milk <= keepM + 1;
         const doneS = !makesSemen(mn) || p.semen <= keepS + 0.5;
-        if (p.stall && doneM && doneS) {
+        const done = doneM && doneS;
+        if (!done && now >= (st.nextBeat || 0)) {
+          st.nextBeat = now + (15 + Math.random() * 10) * 1e3;
+          privateTo(mn, (st.kind === "cock" ? "\u{1F402} " : "\u{1F95B} ") + stallBeat(mn, st), "emote");
+        }
+        if (!done && now >= (st.nextOpen || 0) && (st.opens || 0) < CFG.PROD.STALL_OPEN_MAX) {
+          st.nextOpen = now + CFG.PROD.STALL_LINE_MIN * 6e4;
+          st.opens = (st.opens || 0) + 1;
+          const n = plainName(mn);
+          if (st.kind !== "cock") {
+            emote("\u{1F95B} " + (addonLine("stallMilk", lineInfo(mn, { ml: ml(st.got.m) })) || [
+              "The stall's cups pull at " + n + "'s breasts in a slow rhythm, and warm milk runs down the lines into the bucket.",
+              "Milk streams from " + n + " into the stall's bucket. They shift their weight and let out a soft, happy sound."
+            ][Math.floor(Math.random() * 2)]), mn);
+          } else {
+            const c = penisLabel(mn);
+            const alt = addonLine("stallSemen", lineInfo(mn, { ml: ml(st.got.s), cock: c }));
+            const L1 = [
+              n + "'s " + c + " cock is sealed in the stall's wet suction sleeve, and it pumps and pulls in a slow, steady rhythm. Their hips twitch every time it squeezes.",
+              "The machine strokes " + n + " from root to tip, milkin' that " + c + " cock for every drop. Seed spurts into the collection jar in thick pulses.",
+              "A warm vibrating cup hugs " + n + "'s balls while the sleeve sucks their cock. " + n + " is a moanin', drippin' mess in the stall."
+            ];
+            emote("\u{1F402} " + (alt || L1[Math.floor(Math.random() * L1.length)]), mn);
+          }
+        }
+        if (done) {
           p.stall = null;
           p.stallPaused = null;
           const R = CFG.PROD.STALL_REST_MIN;
           p.stallRest = now + (R[0] + Math.random() * (R[1] - R[0])) * 6e4;
-          const altDone = got > 0 && addonLine(makesSemen(mn) && !makesMilk(mn) ? "stallDoneSemen" : "stallDone", lineInfo(mn));
-          if (got > 0) emote(altDone ? (makesSemen(mn) && !makesMilk(mn) ? "\u{1F402} " : "\u{1F95B} ") + altDone : makesSemen(mn) && !makesMilk(mn) ? "\u{1F402} The stall wrings " + plainName(mn) + " down to the last quarter and lets go. Balls aching and light, legs wobbly. Good stud!" : "\u{1F95B} The milkin' stall eases off once " + plainName(mn) + " is down to a quarter, teats sore and drippin'. Good job, sweetie! Off you go.", mn);
+          if (st.got.m + st.got.s > 0) {
+            privateTo(mn, (st.kind === "cock" ? "\u{1F402} " : "\u{1F95B} ") + stallBeat(mn, st, true), "emote");
+            const semenOnly = st.kind === "cock";
+            const altDone = addonLine(semenOnly ? "stallDoneSemen" : "stallDone", lineInfo(mn));
+            emote(altDone ? (semenOnly ? "\u{1F402} " : "\u{1F95B} ") + altDone : semenOnly ? "\u{1F402} The stall wrings " + plainName(mn) + " down to the last quarter and lets go. Balls aching and light, legs wobbly. Good stud!" : "\u{1F95B} The milkin' stall eases off once " + plainName(mn) + " is down to a quarter, sore and drippin'. Good job, sweetie! Off you go.", mn);
+          }
         }
       }
     }
@@ -7737,6 +7764,580 @@
       if (!pairs.length) return;
       const [a, b] = pairs[Math.floor(Math.random() * pairs.length)];
       emote(pickFresh("ambient", AMBIENT).replace(/%a/g, plainName(a)).replace(/%b/g, plainName(b)), Math.random() < 0.5 ? a : b);
+    }
+    const STALL_SOUNDS = {
+      cow: ["a low, needy moo", "a soft moo", "a long, shaky moo"],
+      bull: ["a deep, rumbling snort", "a low bellow", "a heavy, shuddering snort"],
+      pony: ["a breathy whinny", "a soft nicker", "a shaky little whinny"],
+      horse: ["a breathy whinny", "a low nicker", "a long, trembling whinny"],
+      deer: ["a thin, wavering bleat", "a soft bleat"],
+      pig: ["a needy little oink", "a soft grunt", "a squealing gasp"],
+      pup: ["a high, needy whine", "a soft whimper", "a breathless yip"],
+      dog: ["a needy whine", "a low whimper", "a shaky yip"],
+      kitt: ["a needy mewl", "a soft, broken purr", "a breathy mew"],
+      cat: ["a needy mewl", "a rumbling purr", "a breathy mew"],
+      goblin: ["a ragged little cackle that turns into a moan", "a breathless giggle"],
+      default: ["a soft moan", "a needy whimper", "a shaky gasp"]
+    };
+    const STALL_STORY = {
+      milk: {
+        open: [
+          "The stall's cups swing down and settle over %n's breasts, cool for a heartbeat before the suction takes hold and pulls their nipples deep.",
+          "Soft rubber cups seal over %n's nipples with a wet little kiss, and the pump hums to life somewhere behind the boards.",
+          "The machine finds %n's breasts the way it's found a hundred others: a firm seal, a gentle tug, a quiet hiss as the lines open.",
+          "A strap cinches gently across %n's back to hold them still, and the cups latch onto both nipples at once.",
+          "The stall clicks, the cups lift, and in one smooth motion they're on %n, drawing those nipples down into the warm dark of the liners.",
+          "%n's breath catches as the cups latch on. The first pull is gentle, testing, like the machine is getting to know them.",
+          "The cups slide into place over %n's breasts and the vacuum takes hold, tugging their nipples long and stiff.",
+          "There's a hiss, a click, and then that familiar, insistent pull at %n's nipples. The stall has them now."
+        ],
+        start: [
+          "Nothing at first, just the slow pull and release. Then %n feels it: that deep, tingling ache as the milk starts to let down.",
+          "A first thin stream runs down the clear line from %n's left breast, then the right catches up.",
+          "%n shivers. The let-down hits all at once, a warm rush that makes their knees go soft.",
+          "The rhythm is slow to start, pull and rest, pull and rest, coaxing the milk out of %n instead of taking it.",
+          "Their nipples swell inside the cups, dark and tender, and the first milk beads and runs.",
+          "%n lets out %s as the pressure in their breasts finally starts to ease.",
+          "Little pulses of white chase each other down the tubes. The bucket below gives its first soft patter.",
+          "The cups squeeze in time with the pump, a soft rolling pressure that draws a little more out of %n every time.",
+          "%n's hands curl around the rail. It always feels a bit too good when the milk starts flowing.",
+          "The machine settles into its pace and %n settles with it, breathing in time with the pull.",
+          "Warmth spreads through %n's chest as the milk comes, a heavy, liquid relief.",
+          "Drip, then trickle, then a steady stream. %n's breasts give it up for the stall."
+        ],
+        rhythm: [
+          "Pull, hold, release. The stall works %n with patient, mechanical devotion.",
+          "Milk runs in steady ribbons down the lines, and the bucket fills with a soft, foaming hiss.",
+          "%n's nipples are drawn long and stiff inside the cups, every pull sending a little jolt down their spine.",
+          "The pump keeps its slow heartbeat, and %n's breasts answer it, stream after stream.",
+          "%n sways a little with the rhythm, head bowed, lost in the pull.",
+          "A bead of milk escapes the seal and runs down the curve of %n's breast. The cup tugs harder, as if to scold it.",
+          "%n lets out %s without meaning to.",
+          "Each squeeze of the liners rolls down %n's nipples like a warm mouth, patient and greedy.",
+          "The bucket's note gets lower as it fills, a deep, wet drum under %n.",
+          "%n's breathing has gone slow and heavy, matched to the machine.",
+          "The cups pulse faster for a moment, then ease back, and %n's whole body follows.",
+          "Milk foams at the top of the bucket. %n can smell it, sweet and warm, filling the stall.",
+          "Something about the steady pull makes %n's thoughts go soft and simple. Stand still. Give milk.",
+          "%n shifts their weight, and the cups follow, never losing their grip.",
+          "Their breasts feel lighter and heavier at once: emptying, and still so sensitive.",
+          "The lines thrum with each pulse, warm against %n's belly where they run.",
+          "%n catches themself rocking forward into the cups, chasing the pull.",
+          "Pull, release. Pull, release. Time stops meaning much in the stall.",
+          "A soft, wet suckling sound comes from the cups every time they ease off.",
+          "%n's nipples tingle and ache in the best way, worked and worked and worked.",
+          "The pump stutters, catches, and drives on, drawing a fresh rush out of %n.",
+          "%n lets their head hang. The milk keeps coming, and so does the pull.",
+          "Warm milk sloshes in the bucket as %n shifts, and the sound makes them flush.",
+          "The stall has found exactly the pace %n gives most at, and it keeps it.",
+          "Every pull is a little deeper now, drawing from somewhere further back in %n's chest.",
+          "%n gives %s as the cups tug in perfect unison.",
+          "The milk runs thick and steady, and %n can feel every drop leave them.",
+          "Their skin is flushed pink around the edges of the cups, warm and damp.",
+          "%n's toes curl against the straw. The suction just doesn't let up.",
+          "A shiver runs through %n each time the liners squeeze down to the tip."
+        ],
+        build: [
+          "The machine picks up its pace. %n gasps as the cups start to pull in quick, hungry pulses.",
+          "Deep in the session now, %n's nipples are swollen and tender, and every pull lands like a spark.",
+          "%n's knees tremble. The stall isn't gentle any more. It's thorough.",
+          "The suction deepens, drawing %n's nipples further into the cups than they thought they'd go.",
+          "%n moans openly now, past caring who might hear.",
+          "Their breasts throb in time with the pump, hot and full and aching to give more.",
+          "The bucket's well past half. %n can hear how much of themself is in it.",
+          "%n's hips start to sway with the rhythm, a slow, helpless roll.",
+          "Every pull sends a hot little pulse straight down between %n's thighs.",
+          "%n bites their lip as the cups give a long, slow, merciless draw.",
+          "The machine finds a second wind and so does %n's milk, streaming hard down both lines.",
+          "%n gives %s, long and shaky, and presses into the cups.",
+          "Sweat beads at %n's temple. The stall keeps working, steady as the seasons.",
+          "%n's nipples are so sensitive now that even the pause between pulls makes them twitch.",
+          "The cups tug hard, and %n's breath stutters out of them in little gasps.",
+          "%n's grip on the rail goes white-knuckled as the stall drives on."
+        ],
+        heavy: [
+          "The bucket is heavy now, warm milk lapping near the rim.",
+          "%n's breasts are softer, emptier, but the cups don't stop pulling.",
+          "The streams thin from ribbons to pulses. The stall works harder for every drop.",
+          "%n sags against the rail, flushed and dazed, nipples aching from the long pull.",
+          "Only short spurts now, each one drawn out by a long, slow squeeze.",
+          "%n whimpers as the cups dig for what's left.",
+          "The milk is thinner, sweeter. The stall takes it all the same.",
+          "%n can feel how much lighter they are. The pull on their nipples feels bigger for it.",
+          "The pump's note changes, lower and slower, searching.",
+          "%n's breathing evens out into long, tired sighs between pulls.",
+          "A last good rush runs down the lines, and %n shudders all the way through it.",
+          "Their nipples are deep pink and puffy inside the cups, worked tender and loving it."
+        ],
+        ending: [
+          "The stall slows. Long, deliberate pulls, stripping the last of it out of %n.",
+          "One more squeeze, then another, then a pause. The machine is listening for anything left.",
+          "%n's nipples twitch in the cups as the suction eases little by little.",
+          "The final drops bead and fall. The bucket gives one last soft plink.",
+          "The cups give a slow, lingering pull, almost tender, then rest.",
+          "%n lets out %s as the pump winds down.",
+          "The lines go quiet, a last trickle running into the bucket.",
+          "The pressure fades from %n's nipples a breath at a time.",
+          "The stall holds %n there a moment longer, as if admiring its work.",
+          "A gentle hiss as the seal breaks on one cup, then the other."
+        ],
+        finish: [
+          "The cups let go of %n with a soft, wet pop. %ml in the bucket, and they're down to a quarter. Sore, light, and very well milked.",
+          "The stall releases %n and swings its cups away. %ml of warm milk sits foaming in the bucket.",
+          "Done. %n's breasts hang soft and tender, nipples still pouting from the cups. The bucket holds %ml.",
+          "With a last hiss the stall lets %n go. %ml milked out of them, and a quarter left to start over with.",
+          "The pump falls silent. %n blinks slowly at the bucket: %ml, all of it theirs.",
+          "The strap loosens and the cups lift away, leaving %n flushed and dripping. %ml in the pail.",
+          "The stall's done with %n for now: %ml in the bucket, and two very sore, very satisfied nipples.",
+          "Cups off, lines quiet, %ml in the bucket. %n wobbles a little as they straighten up."
+        ]
+      },
+      cock: {
+        open: [
+          "A warm, wet sleeve slides down over %n's %c cock and seals at the base with a soft, sucking kiss.",
+          "The stall's sleeve finds %n's cock and swallows it to the root, snug and slick.",
+          "A padded cup settles around %n's balls while the sleeve eases down their %c cock, warm and tight.",
+          "%n's breath hitches as the sleeve takes them. The machine is in no hurry, but it doesn't let go.",
+          "A strap settles across %n's hips to keep them still, and the sleeve slides home over their %c cock.",
+          "The sleeve is warm, wet and ribbed inside, and it closes around %n's cock like it was made for it.",
+          "With a hiss the suction takes hold, drawing %n's %c cock deep into the sleeve.",
+          "The stall latches on to %n below the belt: a slick sleeve on their cock, a soft cup cradling their balls."
+        ],
+        start: [
+          "The sleeve starts slow, one long stroke from tip to root, then back again.",
+          "%n's cock swells hard inside the sleeve, and the machine adjusts its grip to match.",
+          "The cup around %n's balls begins to hum, a low, steady vibration that goes straight through them.",
+          "Slick and warm, the sleeve works %n's %c cock in long, unhurried pulls.",
+          "A bead of precum is drawn out of %n and down the line, the first of many.",
+          "%n lets out %s as the sleeve finds its rhythm.",
+          "The ribbed inside of the sleeve drags over every inch of %n on each stroke.",
+          "Pull, squeeze, release. The machine is learning exactly what %n's cock likes.",
+          "%n's hips twitch forward into the sleeve before they can stop them.",
+          "The suction pulses softly at the tip, coaxing, patient.",
+          "Warmth floods %n's belly. The sleeve isn't rushing them, and that's almost worse.",
+          "%n's %c cock throbs in the sleeve, already leaking."
+        ],
+        rhythm: [
+          "The sleeve strokes %n steadily, wet sounds rising from the stall with every pull.",
+          "%n's hips roll in time with the machine, helpless to keep still.",
+          "Precum strings down the clear line in slow, glossy drips.",
+          "The cup around %n's balls squeezes gently, then lets go, then squeezes again.",
+          "%n gives %s as the sleeve sucks hard at their tip.",
+          "Root to tip, tip to root. The sleeve never tires, never hurries.",
+          "%n's cock is flushed and slick, twitching inside the sleeve with every pass.",
+          "The vibration in the ball cup shifts up a notch, and %n's thighs shake.",
+          "The machine edges %n with lazy, perfect strokes, easing off just when it gets good.",
+          "%n's breath comes short and ragged. The sleeve just keeps going.",
+          "A warm, wet suckling sound fills the stall, the machine savoring every stroke.",
+          "%n grips the rail and pushes back into the sleeve, wanting more of it.",
+          "The sleeve tightens around %n's %c cock, then relaxes, then tightens again.",
+          "Little spurts of precum pulse down the line. The machine takes every drop.",
+          "%n's balls draw up tight in the vibrating cup, aching and full.",
+          "The stall's rhythm is slow and deep, and %n's whole body is rocking to it.",
+          "%n moans low in their throat as the sleeve sucks them down to the root.",
+          "Their cock throbs so hard they can feel their own pulse in the sleeve.",
+          "The suction at the tip pulses in a quick little flutter that makes %n gasp.",
+          "%n sways in the strap, flushed, mouth open, completely given over to the machine.",
+          "The sleeve picks up a little speed, slick and relentless.",
+          "%n's toes curl in the straw as the sleeve drags over their most sensitive spot again and again.",
+          "The machine milks %n's %c cock the way it milks everything: thoroughly.",
+          "%n gives %s and their hips stutter forward.",
+          "Wet heat, steady pulls, a gentle squeeze at the base. %n can't think past it.",
+          "The ball cup's hum climbs and falls in waves, and %n rides every one.",
+          "%n's cock leaks steadily now, and the line carries it all away.",
+          "The sleeve slows to a long, torturous stroke, and %n whimpers.",
+          "Every pull draws a shiver from the base of %n's spine to the tip of their cock.",
+          "%n can hear the slick rhythm of the sleeve over their own heartbeat."
+        ],
+        build: [
+          "The sleeve speeds up, pumping %n in short, hungry strokes.",
+          "%n's cock swells even harder. They're close, and the machine knows it.",
+          "%n's moans come louder now, raw and needy.",
+          "The ball cup squeezes in time with the sleeve, and %n's knees nearly buckle.",
+          "%n's hips buck into the sleeve, chasing it.",
+          "The suction at the tip turns greedy, pulling hard and fast.",
+          "%n gives %s, high and desperate.",
+          "%n's legs shake. The sleeve is merciless and slick and perfect."
+        ],
+        // played in order: the climaxes tell a story
+        climax: [
+          "%n's %c cock jerks in the sleeve and the first thick pulse shoots down the line.",
+          "They cum hard, the sleeve milking every throb out of them. The machine doesn't stop.",
+          "Through the aftershocks the sleeve keeps stroking, and %n whines at how sensitive they are.",
+          "Cum runs thick down the clear line into the collection jar.",
+          "The machine eases off just long enough for %n to breathe, then starts building them up again.",
+          "Over-sensitive and twitching, %n can only hang in the strap and take it.",
+          "Another wave builds, and the ball cup hums them right up to the edge of it.",
+          "%n's second load comes slower and deeper, wrenched out of them by the relentless sleeve.",
+          "%n gasps and shakes as the sleeve keeps stroking, wringing out every last pulse.",
+          "The sleeve slows to a crawl, and %n sags, panting, cock still throbbing."
+        ],
+        heavy: [
+          "The jar is filling. Thick, pearly seed, all of it %n's.",
+          "%n's balls feel lighter, emptier, but the cup keeps humming.",
+          "The loads come thinner now, each one drawn out by a long, slow pull.",
+          "%n sags against the rail, spent and twitching.",
+          "%n whimpers as the sleeve strokes their over-worked cock again.",
+          "Another weak spurt, and the machine takes that too.",
+          "The sleeve slows, searching for what's left.",
+          "%n's cock aches sweetly in the sleeve, wrung out and still hard.",
+          "One more shaky climax rolls through %n, thin and long.",
+          "The jar's contents glisten, and %n can't believe all that came out of them.",
+          "%n's breathing is ragged, their hips barely moving now.",
+          "The ball cup's hum turns soft and slow, like a petting hand."
+        ],
+        ending: [
+          "The sleeve gives one last long stroke, root to tip, and holds.",
+          "A final drop beads at %n's tip and is drawn away.",
+          "The suction eases a breath at a time.",
+          "The ball cup's hum fades to nothing.",
+          "The machine strokes %n gently, almost kindly, winding down.",
+          "%n lets out %s as the stall slows to a stop.",
+          "The line goes quiet. The jar is still.",
+          "The sleeve loosens its grip, slowly, letting %n's cock soften.",
+          "One last little squeeze at the base, and the stall rests.",
+          "A soft hiss as the seal at the root lets go."
+        ],
+        finish: [
+          "The sleeve slides off %n's spent cock with a wet pop. %ml in the jar, balls down to a quarter. Good stud.",
+          "The stall releases %n: legs wobbly, cock twitching, %ml of seed in the jar.",
+          "Done. %n hangs in the strap, drained and glowing, %ml collected.",
+          "The ball cup lifts away and the sleeve follows. %ml of %n's seed sits in the jar.",
+          "The machine lets %n go. %ml milked from their %c cock, and they're down to a quarter.",
+          "The strap loosens. %n staggers, spent: %ml in the jar.",
+          "Sleeve off, cup off, jar heavy: %ml. %n won't be walking straight for a while.",
+          "The stall's done with %n's cock for now: %ml collected, and one very satisfied stud."
+        ]
+      },
+      // somebody who makes both: lines about both at once, mixed in with the breast and cock lines
+      both: [
+        "Cups on %n's breasts and a sleeve on their %c cock: the stall works both at once, and %n doesn't know which to moan about first.",
+        "Milk runs down one line and precum down the other, and %n is shaking between them.",
+        "The breast cups and the cock sleeve pulse together, and %n's whole body follows the rhythm.",
+        "%n's nipples are pulled long while their cock is stroked deep, and they give %s.",
+        "Both lines are full: white milk, pearly cum. The stall takes everything %n has.",
+        "When the sleeve squeezes, %n's breasts let down harder. The machine has noticed.",
+        "%n cums, and their milk spurts harder at the same moment, both lines pulsing at once.",
+        "Every part of %n that can be milked is being milked, and they're dazed with it.",
+        "The cups tug and the sleeve strokes in perfect counterpoint, a slow double rhythm.",
+        "%n's legs tremble. Too much, too good, from both ends of the stall's attention.",
+        "The bucket and the jar fill side by side, and %n can't stop looking.",
+        "The stall drains %n's breasts and balls in lockstep, steady as a heartbeat."
+      ],
+      bothFinish: [
+        "The cups and the sleeve let go together. %ml of milk and %ms of seed: the stall took everything %n had.",
+        "Both lines fall quiet. %n is down to a quarter top and bottom: %ml in the bucket, %ms in the jar.",
+        "Done with them at last. %n sways in the strap, nipples puffy and cock spent: %ml of milk, %ms of cum.",
+        "The stall releases %n from cups and sleeve both. %ml and %ms, and one very dazed, very milked animal."
+      ],
+      atmos: [
+        "Straw rustles somewhere down the row. Another stall hums to life.",
+        "Warm barn air hangs heavy around %n's stall, smelling of hay, milk and skin.",
+        "A fly drones lazily past %n and out through a gap in the boards.",
+        "Somewhere outside a gate creaks, and the barn settles back into its slow rhythm.",
+        "Light falls in dusty stripes across %n's stall, moving slow.",
+        "The pump's motor ticks and hums behind the boards, warm and steady.",
+        "Someone walks past the stall. Their steps slow, just for a moment, then move on.",
+        "The rail under %n's hands is worn smooth by everyone who stood here before them.",
+        "The barn cat watches %n from a beam overhead, utterly unimpressed.",
+        "Distant laughter drifts in from the pasture.",
+        "A breeze through the slats cools the sweat on %n's back.",
+        "The stall's little brass plate reads 'Property of B&B Farm'. %n can see it from here.",
+        "Somebody's boots scuff the floor nearby. %n doesn't look up.",
+        "A tap drips somewhere. The barn breathes around %n.",
+        "Down the row, someone else lets out a long, happy sigh.",
+        "The lines creak softly where they hang from their hooks.",
+        "A bucket clanks as a farmhand carries a full one past.",
+        "%n can hear their own heartbeat, slow and loud, under the hum of the machine.",
+        "The straw under %n is warm from their own body.",
+        "Outside, the wind shifts and the barn doors knock softly against their latch.",
+        "The clock on the barn wall ticks on. %n has stopped counting.",
+        "A farmhand leans in, checks the gauges, gives %n a pat, and moves on.",
+        "The stall light flickers, then steadies.",
+        "Somewhere, someone is humming. It might be the farm girl."
+      ],
+      praise: [
+        " Such a good, giving animal.",
+        " The farm is so proud of you.",
+        " You're doing so well, sweetheart.",
+        " Look how much you give. Perfect.",
+        " Such a good, obedient animal.",
+        " That's it. Just like that. Good.",
+        " You were made for this stall.",
+        " Every drop makes the farm happier.",
+        " So productive. So good.",
+        " Somebody's earning a ribbon today."
+      ],
+      degrade: [
+        " Look at you, a leaky little farm animal.",
+        " This is all you're good for, and you love it.",
+        " Dripping like a broken tap. Pathetic.",
+        " Just a dumb, needy dairy animal.",
+        " Moaning for a machine. How shameless.",
+        " Livestock doesn't think. Livestock gives.",
+        " Such a greedy, leaky thing.",
+        " You'd stand here all day if they let you, wouldn't you?",
+        " Mindless, milky, and owned.",
+        " Good for one thing, and it's this."
+      ]
+    };
+    function stallProgress(st) {
+      const m = st.total.m > 0 ? st.got.m / st.total.m : 0, s = st.total.s > 0 ? st.got.s / st.total.s : 0;
+      return Math.min(1, Math.max(m, s));
+    }
+    function stallPick(st, key, list, inOrder) {
+      st.used = st.used || {};
+      const used = st.used[key] = st.used[key] || [];
+      if (inOrder) {
+        const i2 = used.length;
+        if (i2 >= list.length) return null;
+        used.push(i2);
+        return list[i2];
+      }
+      let free = list.map((_, i2) => i2).filter((i2) => !used.includes(i2));
+      if (!free.length) {
+        st.used[key] = [];
+        free = list.map((_, i2) => i2);
+      }
+      const i = free[Math.floor(Math.random() * free.length)];
+      st.used[key].push(i);
+      return list[i];
+    }
+    function stallFill(mn, st, line) {
+      const sounds = STALL_SOUNDS[speciesKey(mn)] || STALL_SOUNDS.default;
+      return String(line).replace(/%n/g, plainName(mn)).replace(/%c/g, makesSemen(mn) ? penisLabel(mn) : "").replace(/%s/g, () => sounds[Math.floor(Math.random() * sounds.length)]).replace(/%ml/g, ml(st.kind === "cock" ? st.got.s : st.got.m)).replace(/%ms/g, ml(st.got.s)).replace(/%size/g, () => CFG.SIZES.udder.names[udderLevel(mn) - 1] || "full").replace(/%cup/g, () => CFG.SIZES.udder.cups[udderLevel(mn) - 1] || "D").replace(/%balls/g, () => CFG.SIZES.testes.names[sizeOf(mn, "testes") - 1] || "full").replace(/%len/g, () => sizeOf(mn, "penis") + "-inch");
+    }
+    function stallBeat(mn, st, finish) {
+      const S = STALL_STORY, r = rec(mn) || {};
+      st.beats = (st.beats || 0) + 1;
+      let line;
+      if (finish) line = st.kind === "both" ? stallPick(st, "bothFinish", S.bothFinish) : stallPick(st, st.kind + "Finish", S[st.kind].finish);
+      else if (st.beats === 1) line = stallPick(st, "open", S[st.kind === "cock" ? "cock" : "milk"].open);
+      else {
+        const prog = stallProgress(st);
+        let part = st.kind === "both" ? Math.random() < 0.5 ? "milk" : "cock" : st.kind;
+        const phase = prog < 0.08 ? "start" : prog < 0.45 ? "rhythm" : prog < 0.75 ? part === "cock" && prog >= 0.55 ? "climax" : "build" : prog < 0.92 ? "heavy" : "ending";
+        const trait = ["rhythm", "build", "heavy"].includes(phase) && st.lastKind !== "trait" && Math.random() < 0.33 ? stallTraitLine(mn, st, part) : null;
+        if (trait) {
+          line = trait;
+          st.lastKind = "trait";
+        } else if (phase === "climax" && st.peakNext) {
+          line = stallPeakLine(mn);
+          st.peakNext = false;
+          st.lastKind = "climax";
+        } else if (["rhythm", "build", "heavy"].includes(phase) && st.lastKind !== "atmos" && Math.random() < 0.15) {
+          line = stallPick(st, "atmos", S.atmos);
+          st.lastKind = "atmos";
+        } else if (st.kind === "both" && ["rhythm", "build"].includes(phase) && Math.random() < 0.3) {
+          line = stallPick(st, "both", S.both);
+          st.lastKind = "both";
+        } else {
+          line = phase === "climax" ? stallPick(st, "climax", S.cock.climax, true) : null;
+          if (phase === "climax" && line && st.used.climax.length === 1) st.peakNext = true;
+          if (!line) line = stallPick(st, part + "-" + (phase === "climax" ? "build" : phase), S[part][phase === "climax" ? "build" : phase]);
+          st.lastKind = phase;
+        }
+      }
+      let out = stallFill(mn, st, line);
+      if (!finish && st.beats > 1 && Math.random() < 0.25) {
+        if (r.degradeMe) out += stallPick(st, "degrade", S.degrade);
+        else if (r.praiseMe) out += stallPick(st, "praise", S.praise);
+      }
+      return out;
+    }
+    const STALL_TRAITS = {
+      udderSmall: { part: "milk", when: (mn) => udderLevel(mn) <= 3, lines: [
+        "%n's %size little breasts barely fill the cups, but the stall pulls at them just as greedily.",
+        "The cups are almost too big for %n's %cup-cup chest, and the suction draws every bit of them inside.",
+        "Small as they are, %n's breasts give and give. The machine doesn't care about size, only about milk.",
+        "%n's perky nipples are drawn out long and pink, the whole of their small breasts tugged up into the liners.",
+        "There isn't much of %n's chest for the cups to hold, so they hold all of it."
+      ] },
+      udderMid: { part: "milk", when: (mn) => udderLevel(mn) >= 4 && udderLevel(mn) <= 6, lines: [
+        "%n's %size breasts sway heavily with every pull, filling the cups to the rim.",
+        "The cups are sized just right for %n's %cup-cup breasts, sealing snug all the way round.",
+        "%n's breasts jiggle softly as the pump pulses, full and warm in the cups.",
+        "Each pull lifts the soft weight of %n's breasts a little, then lets them settle back down.",
+        "%n's %size breasts are flushed and tight with milk, the skin shiny where the cups grip."
+      ] },
+      udderBig: { part: "milk", when: (mn) => udderLevel(mn) >= 7 && udderLevel(mn) <= 10, lines: [
+        "%n's %size breasts hang heavy in the stall's sling, so full the cups look small on them.",
+        "It takes the extra-wide cups to fit %n's %cup-cup breasts, and even those strain at the seal.",
+        "%n's huge breasts slosh with every pull. There's so much milk in there the stall has to work for it.",
+        "The sling under %n's chest creaks as their %size breasts sway with the pump.",
+        "Milk runs from %n's enormous breasts in thick, endless streams, the lines barely keeping up.",
+        "%n's breasts are so heavy they rest on the padded shelf, and the cups pull at them from below."
+      ] },
+      udderHyper: { part: "milk", when: (mn) => udderLevel(mn) >= 11, lines: [
+        "%n's %size breasts fill half the stall, propped on padded shelves while the oversized cups work them.",
+        "The stall had to be fitted with the special cups for %n: wide as dinner plates, and they still struggle to seal.",
+        "%n can't see past their own breasts. They can only feel them: vast, aching, and pouring milk.",
+        "The bucket under %n's colossal breasts fills like a rain barrel. The stall will be at this a while.",
+        "Every pull sends a slow wave through %n's massive breasts, and the milk just keeps coming."
+      ] },
+      preg: { part: "milk", when: (mn, p) => !!p.preg, lines: [
+        "The milk comes rich and creamy, the way it does when there's a litter on the way. %n's round belly presses against the rail.",
+        "%n's belly is round and taut beneath the cups, and something in there kicks as the milk lets down.",
+        "Carrying makes everything more sensitive, and %n feels every single pull.",
+        "%n cradles their swollen belly with one hand while the stall milks them, flushed and glowing.",
+        "The pump hums, the milk flows, and %n's belly gives a lazy little roll from within."
+      ] },
+      fresh: { part: "milk", when: (mn, p) => !p.preg && p.freshUntil > Date.now(), lines: [
+        "%n is still in full fresh-mother flow, and the milk pours out like it's meant for a whole litter.",
+        "Freshened and overflowing, %n gives milk faster than the stall can pull it.",
+        "There's a little one somewhere who'd want this milk. Today the stall gets it instead.",
+        "%n's breasts have been making milk for their young, and they don't hold back now."
+      ] },
+      pierced: { part: "milk", when: (mn) => {
+        const C = charFor(mn);
+        return !!(C && (C.Appearance || []).some((x) => x && x.Asset && x.Asset.Group && x.Asset.Group.Name === "ItemNipplesPiercings"));
+      }, lines: [
+        "The rings through %n's nipples tug and clink inside the cups with every pull.",
+        "%n's nipple piercings catch the suction just so, and they gasp each time the liners squeeze.",
+        "Metal glints inside the clear cups where %n's pierced nipples are drawn long.",
+        "Each pull drags at %n's nipple jewelry, a sharp little sweetness on top of the ache."
+      ] },
+      heat: { part: "any", when: (mn, p) => inHeat(p), lines: [
+        "%n is in heat, and the stall's pull goes straight between their legs. They're dripping on the straw.",
+        "Heat-dazed and needy, %n rocks against nothing as the machine works them.",
+        "%n's heat makes every pull feel like a touch, and they can't keep quiet about it.",
+        "Their skin is fever-warm with heat, flushed all over, and the stall just keeps going."
+      ] },
+      equine: { part: "cock", when: (mn) => penisType(mn) === "equine", lines: [
+        "%n's flared %len horse cock fills the long sleeve, the broad head throbbing at the far end.",
+        "The sleeve has to stretch around the flare of %n's equine cock on every stroke, and it drags deliciously.",
+        "%n's horse cock hangs long and heavy, the sleeve working it from flare to sheath.",
+        "The flare swells and spreads inside the sleeve, and %n stamps a foot."
+      ] },
+      canine: { part: "cock", when: (mn) => penisType(mn) === "canine", lines: [
+        "%n's red, tapered canine cock slides in and out of the sleeve, slick and pointed.",
+        "The sleeve squeezes around the base of %n's canine cock where the knot is starting to swell.",
+        "%n's pointed tip pulses steady little spurts down the line, the way a dog's does.",
+        "The sleeve's grip settles behind %n's knot like a tight fist, and they whine."
+      ] },
+      knot: { part: "cock", when: (mn) => knotted(mn) && penisType(mn) !== "canine", lines: [
+        "A ring inside the sleeve clamps around %n's swelling knot and holds it there.",
+        "%n's knot swells fat and tight in the sleeve's grip, and they shake with it.",
+        "The machine strokes everything above %n's knot and squeezes the knot itself in slow pulses.",
+        "Locked in the sleeve by their own knot, %n isn't going anywhere."
+      ] },
+      feline: { part: "cock", when: (mn) => penisType(mn) === "feline", lines: [
+        "The soft barbs along %n's feline cock catch on the ribbed sleeve, and they shiver all the way down.",
+        "%n's barbed cock throbs in the sleeve, every stroke dragging those little nubs the wrong way.",
+        "%n purrs, then yowls, as the sleeve works their barbed shaft.",
+        "The sleeve is lined soft for barbed cocks, and it still makes %n's tail lash."
+      ] },
+      draconic: { part: "cock", when: (mn) => penisType(mn) === "draconic", lines: [
+        "The ridges along %n's draconic cock bump through the sleeve one by one on every stroke.",
+        "%n's ridged cock is thick and textured, and the sleeve works every ridge.",
+        "Heat rolls off %n's draconic cock inside the sleeve, the liner warming to match.",
+        "%n growls low as the sleeve squeezes ridge after ridge."
+      ] },
+      double: { part: "cock", when: (mn) => penisType(mn) === "double", lines: [
+        "Two sleeves for two cocks: the stall works both of %n's shafts in alternating strokes.",
+        "%n's twin cocks throb side by side in their sleeves, leaking together.",
+        "The left sleeve strokes while the right one sucks, and %n can't keep track of either.",
+        "Both of %n's cocks jerk at once, and two lines fill with precum."
+      ] },
+      bigCock: { part: "cock", when: (mn) => sizeOf(mn, "penis") >= 12, lines: [
+        "%n's %len cock is too long for the standard sleeve, so the stall uses the long one, and it swallows every inch.",
+        "There's so much of %n's cock that the sleeve strokes it in two long passes.",
+        "%n's huge cock throbs against the sleeve's walls, stretching it.",
+        "The sleeve's ribs drag down all %len of %n, and it takes a while to get to the end."
+      ] },
+      smallCock: { part: "cock", when: (mn) => sizeOf(mn, "penis") <= 5, lines: [
+        "%n's little cock disappears completely in the sleeve, which sucks at it greedily all the same.",
+        "The sleeve is tight enough to grip even %n's small cock, and it milks it like any other.",
+        "Small as it is, %n's cock leaks just as much as anyone's in the sleeve."
+      ] },
+      ballsSmall: { part: "cock", when: (mn) => sizeOf(mn, "testes") <= 2, lines: [
+        "%n's small, tight balls are cupped snugly, the vibration humming right through them.",
+        "The cup closes around %n's little balls, gentle, and squeezes them in rhythm."
+      ] },
+      ballsBig: { part: "cock", when: (mn) => sizeOf(mn, "testes") >= 6 && sizeOf(mn, "testes") <= 10, lines: [
+        "%n's %balls balls fill the cup to bursting, heavy and sloshing as it squeezes.",
+        "The ball cup strains around %n's big sack, vibrating against all that weight.",
+        "%n's balls are so full they ache, and every squeeze of the cup makes them gasp.",
+        "The cup lifts %n's heavy balls and kneads them in slow, insistent waves."
+      ] },
+      ballsHyper: { part: "cock", when: (mn) => sizeOf(mn, "testes") >= 11, lines: [
+        "%n's %balls balls rest in a padded cradle of their own, far too big for the cup, so the stall massages them instead.",
+        "There's a sea of seed sloshing in %n's colossal balls, and the stall means to have its share.",
+        "Every pump sends a shiver across the vast curve of %n's balls."
+      ] },
+      cow: { part: "any", when: (mn) => speciesKey(mn) === "cow", lines: [
+        "%n lets out a long, contented moo, tail swishing behind them.",
+        "%n's cowbell clinks softly with every pull.",
+        "%n chews slowly at nothing, eyes half-closed, the very picture of a happy dairy cow.",
+        "%n's ear flicks at a fly, and they shift their hooves in the straw."
+      ] },
+      bull: { part: "any", when: (mn) => speciesKey(mn) === "bull", lines: [
+        "%n snorts and paws the straw, nostrils flaring with every pump.",
+        "%n tosses their head and bellows low, nose ring catching the light.",
+        "%n's tail lashes, heavy and impatient, then stills as the machine drags at them."
+      ] },
+      equid: { part: "any", when: (mn) => ["pony", "horse"].includes(speciesKey(mn)), lines: [
+        "%n stamps a hoof and tosses their mane, breath snorting through their nose.",
+        "%n's tail flicks high, and they let out a soft nicker.",
+        "%n's ears swivel back toward the pump's hum."
+      ] },
+      deer: { part: "any", when: (mn) => speciesKey(mn) === "deer", lines: [
+        "%n's ears twitch at every sound, and their little tail flicks.",
+        "%n stands delicately in the straw, trembling like a fawn."
+      ] },
+      pig: { part: "any", when: (mn) => speciesKey(mn) === "pig", lines: [
+        "%n grunts happily, snout twitching, wriggling deeper into the straw.",
+        "%n's curly tail wiggles every time the pump pulls."
+      ] },
+      canid: { part: "any", when: (mn) => ["pup", "dog"].includes(speciesKey(mn)), lines: [
+        "%n's tail wags helplessly, thumping against the stall's boards.",
+        "%n pants, tongue lolling, and lets out a happy little whine.",
+        "%n's ears flatten, then perk, as the machine changes pace."
+      ] },
+      felid: { part: "any", when: (mn) => ["kitt", "cat"].includes(speciesKey(mn)), lines: [
+        "%n's tail lashes and curls, and a purr rumbles out of them despite themself.",
+        "%n kneads the padded rail, purring.",
+        "%n's ears flatten back as the machine pulls, then relax again."
+      ] },
+      goblin: { part: "any", when: (mn) => speciesKey(mn) === "goblin", lines: [
+        "%n cackles breathlessly, then moans, then cackles again.",
+        "%n's long ears droop and twitch as the stall works them.",
+        "%n mutters a curse at the machine, then begs it not to stop."
+      ] }
+    };
+    const STALL_PEAK = {
+      equine: "%n's flare blooms wide inside the sleeve as they cum, ropes of seed pumping down the line in huge, heavy surges.",
+      canine: "%n's knot swells to its fullest and locks in the sleeve's grip, and they pump load after load, the way a dog does.",
+      feline: "%n yowls as they cum, barbs flaring, seed spurting in short, hot bursts.",
+      draconic: "%n roars as they cum, ridges pulsing in waves, a scalding flood rushing down the line.",
+      double: "Both of %n's cocks cum at once, two lines filling side by side.",
+      knot: "%n's knot swells and locks in the sleeve, and they cum in long, pulsing throbs.",
+      human: "%n cries out as they cum, hips jerking into the sleeve, thick spurts pulsing down the line."
+    };
+    function stallTraitLine(mn, st, part) {
+      const p = prodOf(mn);
+      st.used = st.used || {};
+      const fits = Object.entries(STALL_TRAITS).filter(([k, t2]) => {
+        if (t2.part !== part && t2.part !== "any") return false;
+        if ((st.used["trait-" + k] || []).length >= t2.lines.length) return false;
+        try {
+          return !!t2.when(mn, p);
+        } catch (e) {
+          return false;
+        }
+      });
+      if (!fits.length) return null;
+      st.traitUses = st.traitUses || {};
+      const least = Math.min(...fits.map(([k]) => st.traitUses[k] || 0));
+      const pool = fits.filter(([k]) => (st.traitUses[k] || 0) === least);
+      const [key, t] = pool[Math.floor(Math.random() * pool.length)];
+      st.traitUses[key] = (st.traitUses[key] || 0) + 1;
+      return stallPick(st, "trait-" + key, t.lines);
+    }
+    function stallPeakLine(mn) {
+      const t = penisType(mn);
+      if (STALL_PEAK[t] && t !== "human") return STALL_PEAK[t];
+      return knotted(mn) ? STALL_PEAK.knot : STALL_PEAK.human;
     }
     function clockedIn(mn) {
       const r = rec(mn);

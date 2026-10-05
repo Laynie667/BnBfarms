@@ -61,8 +61,8 @@ W.InventoryGroupIsBlocked=()=>true;   // what the live game does
   W.__lt(); C(221397).MapData.Pos={X:4,Y:4}; n=sent.length; W.__lt(); await wait(1500); out('K tug ->', ems(n).join(' / ').slice(0,120));
   P(221397).tieUntil=0; W.__st().leashes.delete(221397); C(221397).MapData.Pos={X:1,Y:1};
   // stud stall
-  L().spots=Object.assign(L().spots||{},{milking1:{X:1,Y:1}}); P(232922).semen=60; P(232922).stallSaid=0;
-  n=sent.length; W.__ms(); await wait(1500); out('ST stall ->', ems(n).join(' / ').slice(0,120)); delete L().spots.milking1;
+  L().spots=Object.assign(L().spots||{},{milking1:{X:1,Y:1}}); P(232922).semen=60;
+  n=sent.length; W.__ms(); W.__ms(); if (P(232922).stall) P(232922).stall.nextOpen=0; W.__ms(); await wait(1500); out('ST stall ->', ems(n).join(' / ').slice(0,120)); delete L().spots.milking1;
   // belly rub
   P(221397).preg={since:Date.now()-86400000,due:Date.now()+86400000*4,sires:[232922],count:2,warned:false}; P(221397).rubAt=0;
   n=sent.length; await ACT(800,221397,'ItemTorso','Caress'); out('B rub ->', ems(n).join(' / ').slice(0,120));

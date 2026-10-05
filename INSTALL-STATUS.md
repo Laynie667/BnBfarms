@@ -5,7 +5,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 | Script | File in `dist/` | Where it runs | Current |
 |---|---|---|---|
-| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.15.0** |
+| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.15.1** |
 | Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.4.0** |
 | Barn life, Breeding, Conditioning, Dairy, Map tools, Shows, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.2** |
 | Farmhand Companion | `farmhand-companion.user.js` | each player | **0.10.7** |
@@ -19,6 +19,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 ## Latest changes (newest first)
 
+- **Bot 0.15.1**: a saved login the game refuses is not tried again (it was retrying a wrong password every 20 seconds, which can lock an account); the login boxes are left alone while someone types; repeated tries slow to one every two minutes. If the bot's badge says "saved login refused", save the right one from the Tampermonkey menu.
 - **Bot 0.15.0**: a line about somebody is never said out loud on a map; `/record` works in the Companion box; chat typed into the Companion box is told where chat goes; add-ons found by their shown name; a typo'd command gets a private "did you mean"; a guide's name opens that guide; `[brackets]` in whispers.
 - **Bot 0.14.9, Watcher 1.0.2**: the bot (and watcher) follow the game's connection when it's swapped (the cause of the "half loads": an hour deaf to everything while still sending).
 - **Glory stalls 1.4.0**: two or three strangers at once through different holes, each with their own cock.

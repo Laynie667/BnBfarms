@@ -124,6 +124,8 @@
       if (d==="JoinedRoom") later(()=>snapshotRoom(true), 5000);
     });
     on("ChatRoomCreateResponse", d=>log("CreateResponse:",d));
+    // a login answer that's a word, not an account, is a refusal ("InvalidNamePassword")
+    on("LoginResponse", d=>{ if (typeof d === "string" && /invalid|password|banned|locked/i.test(d)) loginRefused(); else if (d && typeof d === "object") state.loginTried = 0; });
     on("disconnect", ()=>{ warn("Socket disconnected."); setBadge("disconnected","#ff9b9b"); });
     on("connect", ()=>{ log("Socket reconnected."); state.lastHealthy = Date.now(); });
 

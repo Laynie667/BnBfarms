@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.15.0
+// @version      0.15.1
 // @description  B&B Farm: beeps, keys, ledger, roster, herds, summoning, anti-idle
 // @author       Laynie & Alexia
 // @match        *://*.bondageprojects.elementfx.com/*
@@ -1803,7 +1803,7 @@
   ];
 
   // bot/src/version.js
-  var VERSION = "0.15.0";
+  var VERSION = "0.15.1";
 
   // bot-parts:farmhand-bot-parts
   (function() {
@@ -3181,6 +3181,7 @@
       if (p === null) return;
       GM_setValue("bnb_user", u.trim());
       GM_setValue("bnb_pass", p);
+      GM_setValue("bnb_login_bad", "");
       W.alert("Saved. Reload the page.");
     }
     function clearCreds() {
@@ -3236,7 +3237,7 @@
     };
     W.FarmhandExport = exportLedger;
     W.FarmhandLedger = () => L;
-    if (W.__FARMHAND_TEST__) Object.assign(W, { __st: () => state, __cfg: CFG, __pt: prodTick, __qt: quotaTick, __lt: leashTick, __ms: milkingStallTick, __vt: voiceTick, __sync: syncCompanions, __gt: gearTick, __ht: homeTick, __addons: (h, ...a) => addonsEmit(h, ...a), __stateFor: (mn) => stateFor(mn), __leadTick: () => leadTick(), __ambient: () => ambientTick(), __about: (t) => aboutWhom(t), __announce: (t) => announce(t), __reply: (mn, t, ch) => reply(mn, t, ch), __office: () => officeCheck(), __namesHere: (t) => namesHere(t), __speciesCheck: (t) => QUESTIONS.find((q) => q.key === "species").check(t), __attach: () => attachListeners() });
+    if (W.__FARMHAND_TEST__) Object.assign(W, { __st: () => state, __cfg: CFG, __pt: prodTick, __qt: quotaTick, __lt: leashTick, __ms: milkingStallTick, __vt: voiceTick, __sync: syncCompanions, __gt: gearTick, __ht: homeTick, __addons: (h, ...a) => addonsEmit(h, ...a), __stateFor: (mn) => stateFor(mn), __leadTick: () => leadTick(), __ambient: () => ambientTick(), __about: (t) => aboutWhom(t), __announce: (t) => announce(t), __reply: (mn, t, ch) => reply(mn, t, ch), __office: () => officeCheck(), __namesHere: (t) => namesHere(t), __speciesCheck: (t) => QUESTIONS.find((q) => q.key === "species").check(t), __attach: () => attachListeners(), __tryLogin: () => tryLogin() });
     W.FarmhandSyncKeys = () => syncAllPresent(true);
     W.FarmhandFriends = () => W.Player.FriendList;
     W.FarmhandAddFriend = (mn) => addFriend(mn, false);
@@ -3342,14 +3343,37 @@
         return false;
       }
     }
+    const credPrint = (user, pass) => {
+      let h = 5381;
+      for (const ch of String(user) + "\n" + String(pass)) h = (h << 5) + h + ch.charCodeAt(0) | 0;
+      return String(h);
+    };
+    function loginRefused() {
+      const { user, pass } = getCreds();
+      if (!user || !pass || Date.now() - state.lastLoginAttempt > 2e4) return;
+      GM_setValue("bnb_login_bad", credPrint(user, pass));
+      warn("The game refused the saved login (wrong name or password). The bot won't try it again; log in by hand, or save the right one in the Tampermonkey menu.");
+    }
     function tryLogin() {
       const { user, pass } = getCreds();
       if (!user || !pass) {
         setBadge("no login saved \u2014 click me", "#ff9b9b");
         return;
       }
+      if (GM_getValue("bnb_login_bad", "") === credPrint(user, pass)) {
+        setBadge("saved login refused \u2014 log in by hand, or fix it in the Tampermonkey menu", "#ff9b9b");
+        return;
+      }
       const now = Date.now();
-      if (now - state.lastLoginAttempt < 15e3) return;
+      if (now - state.lastLoginAttempt < (state.loginTried >= 3 ? 12e4 : 15e3)) return;
+      try {
+        const a = W.document.activeElement;
+        if (a && (a.id === "InputName" || a.id === "InputPassword")) {
+          setBadge("waitin' while somebody logs in\u2026");
+          return;
+        }
+      } catch (e) {
+      }
       state.lastLoginAttempt = now;
       state.loginTried++;
       setBadge("logging in\u2026 (" + state.loginTried + ")");
@@ -13792,6 +13816,10 @@ Welcome to B&B Farm, hon. \u{1F33E}`
         if (d === "JoinedRoom") later(() => snapshotRoom(true), 5e3);
       });
       on("ChatRoomCreateResponse", (d) => log("CreateResponse:", d));
+      on("LoginResponse", (d) => {
+        if (typeof d === "string" && /invalid|password|banned|locked/i.test(d)) loginRefused();
+        else if (d && typeof d === "object") state.loginTried = 0;
+      });
       on("disconnect", () => {
         warn("Socket disconnected.");
         setBadge("disconnected", "#ff9b9b");

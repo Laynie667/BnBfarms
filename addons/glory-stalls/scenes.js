@@ -573,10 +573,228 @@ function oneVisitor(beats, { hole, visitor, funnel, degrade, praise, rounds, fir
   add(chance(0.65) ? pick(persona.leave) : pick(LEAVE));
 }
 
+// ── more than one at once: strangers at different holes together ──────────
+// Two (mouth and one behind, or pussy and ass), sometimes three. Each brings their own cock; the story moves
+// between them, with lines about takin' them together, and every finish counts on its own.
+const JOIN2 = [
+  "Another set of footsteps stops outside. A second hatch in %n's stall creaks open.",
+  "%n is still busy when the board %where slides aside. Somebody else wants a turn, and they're not waiting.",
+  "\"Room for one more?\" a new voice asks. Nobody says no, least of all %n.",
+  "A second stranger has been watching through the slats. Now they step up to the hatch %where.",
+  "The stall's other hatch clacks open. Someone's been waiting their turn and decided they don't have to.",
+  "Two sets of boots now. The second one stops right at the hatch %where.",
+  "A low whistle from outside: \"Look at that. Both ends free?\" Not for long.",
+  "A hand slaps the board %where, then the hatch there swings open. %n isn't getting a break.",
+  "The first stranger laughs as a second steps up: \"Go on, there's plenty of %n to go round.\"",
+  "Somebody new jingles a coin into the tin and heads straight for the free hatch %where.",
+  "A second shadow falls over the slats, and the hatch %where opens without so much as a knock.",
+  "\"Don't mind me,\" says a new voice, and the hatch %where swings wide.",
+];
+const JOIN3 = [
+  "A third shadow falls across the slats. Every hatch in %n's stall is spoken for now.",
+  "\"Make room,\" says a third voice, and the last hatch opens.",
+  "%n hears a third zipper. There's one hatch left, and it doesn't stay empty.",
+  "A third stranger squeezes in at the last hatch, and %n is completely surrounded.",
+  "Word has gotten around the barn. A third one steps up, already hard.",
+  "The stall rocks as a third stranger leans on it. %n has three now.",
+];
+// %a and %b: two of the holes in use (mouth, pussy, ass)
+const TOGETHER = {
+  any: [
+    "Both strangers find a rhythm together, and %n is pushed back and forth between them like a toy.",
+    "When one pushes in, the other pulls back. %n is never empty for a second.",
+    "They thrust at the same moment, and %n is pinned in the middle, filled at both ends.",
+    "%n's %a and %b are both stuffed full, and every sound %n makes is a moan.",
+    "The stall shakes from two sides now, two rhythms that never quite match.",
+    "%n can feel both of them throbbing at once, one in their %a, one in their %b.",
+    "One stranger slows down so the other can speed up. They're working %n like a team.",
+    "\"Feel that?\" one asks the other through the boards. They both laugh, and both push deeper into %n.",
+    "%n has stopped knowing which way to rock. Either way, someone's buried in them.",
+    "Every thrust into %n's %b drives them forward onto the cock in their %a.",
+    "The two of them settle into it, unhurried, using %n's %a and %b like they've done this together before.",
+    "%n is so full of the two of them that there's no room left to think.",
+  ],
+  // the mouth and one behind
+  spit: [
+    "Spitroasted between the two hatches, %n rocks forward onto one cock and back onto the other.",
+    "Drool runs from %n's stuffed mouth with every push from behind.",
+    "The one behind thrusts hard, and it shoves %n's face all the way down onto the one in front.",
+    "%n can't moan properly with their mouth full, so the moans come out muffled and wet around the cock in their throat.",
+    "Hands from the front hatch hold %n's head steady while the one behind sets the pace.",
+    "Front and back, in and out, and %n is the thing in the middle that makes it work.",
+    "\"Hold still for me,\" says the one behind. \"No, for me,\" says the one in front, and %n can't hold still for either of them.",
+    "The one in front pulls out to let %n breathe, just as the one behind slams deep, and the gasp is all for them.",
+    "%n's whole body is stretched between two hatches, a cock at each end and nowhere to go.",
+    "Every stroke from behind pushes %n's lips to the root of the cock in front.",
+  ],
+  // pussy and ass
+  dp: [
+    "Both lower holes are full, and %n can feel the two cocks rubbing against each other through them.",
+    "They take turns, one in as the other slides out, so %n is stretched in a rolling, endless wave.",
+    "Stuffed in both pussy and ass at once, %n can barely breathe.",
+    "The two cocks thrust together, and %n's legs nearly give out from the fullness.",
+    "%n is double-stuffed and dripping, and the strangers haven't even sped up yet.",
+    "%n's pussy and ass squeeze around the two of them in turn, and both strangers groan.",
+    "The thin wall inside %n is all that separates the two cocks, and %n feels every ridge and throb of both.",
+    "They find each other's rhythm through %n, and %n is the thing that ties it together.",
+  ],
+  // three at once
+  three: [
+    "Three strangers, three hatches, and %n in the middle of all of it.",
+    "There isn't a part of %n that isn't being used now, mouth, pussy and ass all at once.",
+    "The stall rattles from three sides, and %n just hangs there and takes it.",
+    "Whenever %n tries to focus on one of them, the other two drag them back.",
+    "%n is stuffed at every end, and they've stopped being a person for a while. They're just the middle of the stall.",
+    "Three cocks, three rhythms, and %n stretched across all of them.",
+    "The three strangers laugh to each other through the boards, and keep going.",
+    "Muffled moans, wet sounds from three directions, and the stall shaking on its frame.",
+  ],
+};
+const FIRST_DONE = [
+  "One stranger is spent, but the other is nowhere near done with %n.",
+  "One pulls out, finished, and the other takes it as a cue to really go to town on %n.",
+  "With one hatch empty now, all of %n's attention lands on the one still going.",
+  "\"My turn to finish,\" growls the one still at it, and %n braces.",
+  "The finished one hangs around at the hatch to watch the other use %n.",
+  "One down. The other is still pounding away like nothing happened.",
+  "%n barely has time to feel the first load before the other stranger picks up the pace.",
+  "The first one zips up and leaves %n to the other, who isn't slowing down.",
+];
+const BOTH_AT_ONCE = [
+  "They finish at the same moment, both hatches shaking, and %n is flooded at both ends at once.",
+  "One groans, then the other, and then they're both cumming into %n together.",
+  "\"Now,\" one of them gasps, and they let go together, pumping %n full from both sides.",
+  "Both of them bury themselves as deep as they can go and empty into %n at the same time.",
+  "The stall goes still and tight, both strangers shuddering, and %n feels it from two places at once.",
+  "Two loads at once. %n doesn't know which to feel first.",
+];
+const ALL_DONE = [
+  "Every hatch is empty now. %n sags in the stall, dripping from more than one place.",
+  "The hatches close one by one. %n is left used, full, and trembling.",
+  "Nobody's left at the holes. %n slumps against the boards, leaking, breathing hard.",
+  "Quiet again, at last. %n hangs there, full of strangers, legs shaking.",
+  "The strangers leave together, laughing low. %n can feel what they left behind for a long time.",
+];
+const SIDE = { mouth: "in front of %n", vulva: "behind %n", butt: "behind %n" };
+const HOLE_SAYS = { mouth: /mouth|throat|tongue|lips/i, vulva: /pussy/i, butt: /\bass\b/i };
+// a line about what one stranger is doin', saying which one when the line doesn't: the hatch in front or behind,
+// or the hole itself when both strangers are behind (pussy and ass)
+function atHole(h, line, bothBehind) {
+  if (!line || HOLE_SAYS[h].test(line)) return line;
+  const lead = h !== "mouth" && bothBehind ? "In %n's " + HOLE_WORD[h] + ", " : "At the hatch " + SIDE[h] + ", ";
+  return lead + line.charAt(0).toLowerCase() + line.slice(1);
+}
+// a cock showin' up at a particular hatch
+function revealAt(h, v, pick) {
+  const line = pick(REVEAL[v.type]).replace("%size", SIZE_WORD[v.size]);
+  return "At the hatch " + SIDE[h] + ", " + line.charAt(0).toLowerCase() + line.slice(1);
+}
+const say = (h, line) => (h === "mouth" ? "From the hatch in front of %n: " : "From behind %n: ") + line;
+
+function together(beats, { hole, visitor, holes, degrade, praise, pick }) {
+  const add = (t, extra) => { if (t) beats.push(Object.assign({ t }, extra || {})); };
+  // who goes where: the first one keeps their hole; the next take others (mouth + one behind, or both behind)
+  const back = holes.filter((h) => h !== "mouth"), order = [hole];
+  if (hole === "mouth") order.push(pickFrom(back));
+  else order.push(holes.includes("mouth") && chance(0.65) ? "mouth" : back.find((h) => h !== hole) || "mouth");
+  const third = holes.find((h) => !order.includes(h));
+  if (third && chance(0.35)) order.push(third);
+  const bothBehind = order.includes("vulva") && order.includes("butt");   // two strangers behind: say which hole
+  const at = (h, line) => atHole(h, line, bothBehind);
+  const vis = order.map((h, i) => i === 0 ? visitor : (() => { let v; do { v = pickVisitor(holes); } while (v.type === "double"); return v; })());
+  const pers = order.map((h) => PERSONAS[pickPersona(h)]);
+  const talk = (i) => chance(0.5) ? say(order[i], pick(pers[i].talk)) : null;
+  const voice = () => (degrade && chance(0.3) ? "A voice through the boards: " + pick(TAUNTS) : praise && chance(0.3) ? "A voice through the boards: " + pick(PRAISES) : null);
+  const pool = () => {
+    const both = order.slice(0, 2), lines = TOGETHER.any.slice();
+    if (both.includes("mouth")) lines.push(...TOGETHER.spit, ...TOGETHER.spit); else lines.push(...TOGETHER.dp, ...TOGETHER.dp);
+    return pick(lines).replace(/%a/g, HOLE_WORD[both[0]]).replace(/%b/g, HOLE_WORD[both[1]]);
+  };
+  const first = order.length === 3 ? () => pick(TOGETHER.three) : pool;
+
+  // 1. the first one arrives and gets started
+  add(chance(0.6) ? pick(pers[0].arrive) : pick(ARRIVE));
+  add(revealAt(order[0], vis[0], pick), { reveal: true });
+  add(at(order[0], pick(TEASE[order[0]])));
+  add(at(order[0], pick((ENTRY[vis[0].type] || ENTRY.human)[order[0]] || ENTRY.human[order[0]])));
+  if (BIG(vis[0]) && STRETCH[order[0]]) add(at(order[0], pick(STRETCH[order[0]])));
+  add(at(order[0], pick(RHYTHM[order[0]].early)));
+  add(pick(REACT[order[0]].early));
+
+  // 2. the others join, one at a time
+  for (let i = 1; i < order.length; i++) {
+    add((i === 1 ? pick(JOIN2) : pick(JOIN3)).replace("%where", SIDE[order[i]]));
+    add(revealAt(order[i], vis[i], pick), { reveal: true });
+    add(at(order[i], pick((ENTRY[vis[i].type] || ENTRY.human)[order[i]] || ENTRY.human[order[i]])));
+    if (BIG(vis[i]) && STRETCH[order[i]]) add(at(order[i], pick(STRETCH[order[i]])));
+    add(i === 2 ? pick(TOGETHER.three) : pool());
+  }
+
+  // 3. the middle: movin' between them, with lines about all of them at once
+  const rounds = 4 + Math.floor(Math.random() * 4);
+  for (let r = 0; r < rounds; r++) {
+    const i = r % order.length, h = order[i];
+    add(at(h, pick(RHYTHM[h].mid)));
+    if (chance(0.6)) add(at(h, pick(TYPE_RHYTHM[vis[i].type])));
+    add(pick(REACT[h].mid));
+    add(chance(0.6) ? first() : talk(i));
+    if (chance(0.3)) add(voice() || (chance(0.5) ? pick(ATMOS) : null));
+  }
+
+  // 4. late: everyone speeds up
+  for (let i = 0; i < order.length; i++) add(at(order[i], pick(RHYTHM[order[i]].late)));
+  add(pick(REACT[order[0]].late));
+  add(pick(BUILD));
+
+  // 5. the finishes, in an order that makes sense: sometimes two together, otherwise one after another
+  const load = (v) => { const [lo, hi] = SIZES[v.size].ml; return Math.round(between(lo, hi) * (LOAD_X[v.type] || 1)); };
+  const finishOne = (i) => {
+    const v = vis[i], h = order[i], inside = v.type === "canine" || chance(0.8), ml = load(v);
+    add(finishLine(v, h, ml, inside, false), { finish: true, inside, ml, hole: h, visitor: v });
+    return inside;
+  };
+  const insides = [];
+  let i0 = 0;
+  if (order.length >= 2 && chance(0.3)) {
+    add(pick(BOTH_AT_ONCE));
+    insides.push(finishOne(0), finishOne(1));
+    i0 = 2;
+  } else {
+    insides.push(finishOne(0));
+    i0 = 1;
+  }
+  for (let i = i0; i < order.length; i++) {
+    add(pick(FIRST_DONE));
+    add(at(order[i], pick(RHYTHM[order[i]].late)));
+    if (chance(0.5)) add(talk(i));
+    add(pick(BUILD));
+    insides.push(finishOne(i));
+  }
+
+  // 6. after: a knot that ties, the mess at each hole, and they leave
+  const knotted = order.findIndex((h, i) => vis[i].type === "canine" && insides[i]);
+  if (knotted >= 0) add(pick(KNOT_TIE.slice(0, 3)));
+  for (let i = 0; i < order.length; i++) if (insides[i] && chance(0.7)) add(pick(AFTER.inside[order[i]]));
+  if (knotted >= 0) add(KNOT_TIE[3]);
+  add(voice());
+  add(pick(ALL_DONE));
+}
+
 // a whole scene. Most are one stranger; some take extra rounds; now and then a queue takes turns.
+// And sometimes, when they have more than one hole open, two or three strangers use them at once (together).
 export function buildScene({ hole, visitor, funnel, degrade, praise, holes, length }) {
   const beats = [], open = holes && holes.length ? holes : [hole], pick = freshPicker();
-  const r = Math.random(), kind = length || (r < 0.55 ? "single" : r < 0.85 ? "long" : "marathon");
+  // together needs two holes a cock can get into (a funnel gag keeps the mouth out of it) and a single-cock first stranger
+  const usable = open.filter((h) => h !== "mouth" || !funnel);
+  const canTogether = usable.length >= 2 && visitor.type !== "double" && usable.includes(hole);
+  const r = Math.random();
+  let kind = length || (r < 0.45 ? "single" : r < 0.7 ? "long" : r < 0.88 && canTogether ? "together" : r < 0.88 ? "long" : "marathon");
+  if (kind === "together" && !canTogether) kind = "long";
+  if (kind === "together") {
+    together(beats, { hole, visitor, holes: usable, degrade, praise, pick });
+    const fin = beats.filter((b) => b.finish);
+    return { beats, kind, ml: fin.reduce((a, b) => a + b.ml, 0), inside: fin.some((b) => b.inside) };
+  }
   const rounds = () => (kind === "single" ? 0 : 1 + Math.floor(Math.random() * 2));
   oneVisitor(beats, { hole, visitor, funnel, degrade, praise, rounds: rounds(), first: true, holes: open, pick });
   if (kind === "marathon") {

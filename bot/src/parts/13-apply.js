@@ -6,24 +6,52 @@
 
   // Each question has a key. Some take only certain answers (check), and those offer buttons in the Companion (choices).
   const GENDERS = ["female","male","futa","femboy"];
-  const SPECIES_ALIAS = { kitten:"kitt", kitty:"kitt", puppy:"pup", horse:"horse", cattle:"cow", heifer:"cow", piggy:"pig", lamb:"sheep", doe:"deer", bunny:"bunny" };
+  // farm words and pet names for each kind (cowgirl, pupgirl and ponyboy work too: the girl/boy ending is dropped)
+  const SPECIES_ALIAS = { kitten:"kitt", kitty:"kitt", kittie:"kitt", kit:"kitt", puppy:"pup", pupper:"pup", doggy:"dog", doggie:"dog", hound:"dog",
+    cattle:"cow", heifer:"cow", hucow:"cow", bovine:"cow", calf:"cow", dairy:"cow", moo:"cow", ox:"bull", steer:"bull",
+    piggy:"pig", piglet:"pig", sow:"pig", hog:"pig", swine:"pig", oink:"pig", lamb:"sheep", ewe:"sheep", doe:"deer", fawn:"deer",
+    mare:"horse", stallion:"horse", filly:"pony", foal:"pony", colt:"pony", equine:"horse", vixen:"fox", bunny:"bunny", bun:"bunny",
+    feline:"cat", canine:"dog", gob:"goblin", nanny:"goat", billy:"goat", kid:"goat", lupine:"wolf" };
+  // words that mean "I'm not stock" (staff, guests, people who don't want to pick)
+  const NOT_STOCK = /\b(no|nope|nah|not stock|not livestock|not an animal|not one|human|person|staff|farmhand|guest|luxury|visitor|none|skip|n\/?a)\b/;
+  // words that are never an animal on their own ("yes", "ok"...): asked again instead of becomin' their species
+  const NOT_ANIMAL = /^(yes|yeah|yep|ok|okay|sure|maybe|what|huh|help|hi|hello|stock|livestock|animal|both|me|it|idk)$/;
+  // their animal from what they typed: "Cow.", "a cowgirl!", "I'm a hucow please", "puppy girl", "other dragon"
   function speciesFrom(text){
-    const t = String(text||"").trim().toLowerCase().replace(/^(a|an)\s+/,"");
-    if (!t) return null;
     const kinds = Object.keys(CFG.SPECIES).filter(k => k !== "default");
-    if (kinds.includes(t)) return t;
-    if (SPECIES_ALIAS[t]) return SPECIES_ALIAS[t];
-    const s = t.replace(/s$/,""); if (kinds.includes(s)) return s;
-    const other = t.match(/^other[:\s]+(.{2,30})$/); if (other) return other[1].trim();
+    const low = String(text||"").toLowerCase().replace(/[^a-z\s\/-]/g, " ").replace(/\s+/g, " ").trim();
+    if (!low) return null;
+    const other = low.match(/^other[:\s]+([a-z -]{2,30})$/); if (other) return other[1].trim();
+    const known = w => {
+      if (kinds.includes(w)) return w;
+      if (SPECIES_ALIAS[w]) return SPECIES_ALIAS[w];
+      for (const s of [w.replace(/ves$/, "f"), w.replace(/es$/, ""), w.replace(/s$/, "")]){ if (kinds.includes(s)) return s; if (SPECIES_ALIAS[s]) return SPECIES_ALIAS[s]; }
+      const g = w.replace(/(girl|boy|gal|guy|kin)$/, ""); if (g !== w && g.length > 1) return known(g);
+      return null;
+    };
+    const words = low.split(/[\s\/-]+/).filter(Boolean);
+    for (const w of words){ const k = known(w); if (k) return k; }
+    // somethin' we don't have a kind for, said plainly ("dragon", "red panda"): it's theirs
+    const filler = new Set(["i","im","am","a","an","the","my","please","pls","just","really","think","maybe","so"]);
+    const rest = words.filter(w => !filler.has(w));
+    if (rest.length >= 1 && rest.length <= 2 && !NOT_ANIMAL.test(rest.join(" ")) && rest.every(w => w.length >= 2)) return rest.join(" ");
     return null;
   }
-  const notSure = t => /^(not sure|unsure|don'?t know|dunno|idk|n\/a|na|none|skip)$/i.test(String(t||"").trim());
+  const notSure = t => /\b(not sure|unsure|don'?t know|dont know|dunno|idk|undecided)\b/i.test(String(t||"").trim()) || /^(n\/a|na|none|skip)$/i.test(String(t||"").trim());
+  // "I'm not stock": staff, guests, a plain no (but "no" inside "not sure" or an animal answer doesn't count)
+  const notStock = t => { const low = String(t||"").toLowerCase().replace(/[^a-z\s\/]/g, " ").replace(/\s+/g, " ").trim(); return NOT_STOCK.test(low); };
   const QUESTIONS = [
     { key:"name",   text:"First things first, sweetie: what do we call you, and how do you like bein' addressed?" },
     { key:"role",   text:"What are you here as?  livestock / staff / guest / luxury guest / not sure yet\n(Both's an option, hon. Plenty here wear two collars!)" },
     { key:"species", text:"If you're stock, what kind of animal are you?", choices: () => Object.keys(CFG.SPECIES).filter(k => k !== "default").concat(["not stock"]),
-      check: t => (notSure(t) || /^not stock$/i.test(t)) ? { value:"" } : (speciesFrom(t) ? { value: speciesFrom(t) }
-                 : { err:"I don't know that animal, sugar. Pick one of: "+Object.keys(CFG.SPECIES).filter(k => k !== "default").join(", ")+". Or say other <animal>, or not stock." }) },
+      // an animal wins over everything else ("no, a cow"); then "not stock" or "not sure"; anything else is asked again
+      check: t => { const sp = speciesFrom(t), known = sp && Object.keys(CFG.SPECIES).includes(sp);
+                    if (known) return { value: sp };
+                    if (notSure(t) || notStock(t)) return { value: "" };
+                    if (sp) return { value: sp };
+                    return { err:"I didn't catch an animal there, sugar. Just type one, like cow, pony, pup or kitten (or any other animal), or say not stock." }; },
+      // stock only: somebody who said they're just staff or a guest isn't asked
+      skip: (s) => { const role = String((s.byKey||{}).role||"").toLowerCase(); return !!role && !/stock|cow|animal|both|not sure|unsure|undecided|pet/.test(role) && /staff|farmhand|guest|luxury|visit|hand/.test(role); } },
     { key:"gender", text:"How should the farm see you?  female / male / futa / femboy", choices: () => GENDERS,
       check: t => { const g = String(t).trim().toLowerCase(); return GENDERS.includes(g) ? { value:g } : { err:"Just one of these, hon: female, male, futa or femboy." }; } },
     { key:"stay",   text:"How long you plannin' on stayin' with us?  1 hour / 12 hours / 1 day / 1 week / 2 weeks / 1 month / permanent / not sure",
@@ -98,6 +126,8 @@ Chat in the room all you like; I'll only count what you send me direct.`, state.
     if (!s) return;
     const list = s.staffTrack ? QUESTIONS.concat(STAFF_QUESTIONS) : QUESTIONS;
     if (s.step >= list.length){ finishApplication(mn); return; }
+    // a question that doesn't apply to them (the animal one, for staff and guests) is skipped
+    if (list[s.step].skip && list[s.step].skip(s)){ s.byKey[list[s.step].key] = ""; s.answers.push(""); s.step++; askNext(mn); return; }
     const q = list[s.step], text = (s.step+1)+"/"+list.length+" — "+q.text;
     const asText = () => {
       // no Companion buttons: spell the choices out, unless the question already does

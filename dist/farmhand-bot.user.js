@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.14.7
+// @version      0.14.8
 // @description  B&B Farm: beeps, keys, ledger, roster, herds, summoning, anti-idle
 // @author       Laynie & Alexia
 // @match        *://*.bondageprojects.elementfx.com/*
@@ -1803,7 +1803,7 @@
   ];
 
   // bot/src/version.js
-  var VERSION = "0.14.7";
+  var VERSION = "0.14.8";
 
   // bot-parts:farmhand-bot-parts
   (function() {
@@ -3236,7 +3236,7 @@
     };
     W.FarmhandExport = exportLedger;
     W.FarmhandLedger = () => L;
-    if (W.__FARMHAND_TEST__) Object.assign(W, { __st: () => state, __cfg: CFG, __pt: prodTick, __qt: quotaTick, __lt: leashTick, __ms: milkingStallTick, __vt: voiceTick, __sync: syncCompanions, __gt: gearTick, __ht: homeTick, __addons: (h, ...a) => addonsEmit(h, ...a), __stateFor: (mn) => stateFor(mn), __leadTick: () => leadTick(), __ambient: () => ambientTick(), __about: (t) => aboutWhom(t), __announce: (t) => announce(t), __reply: (mn, t, ch) => reply(mn, t, ch), __office: () => officeCheck(), __namesHere: (t) => namesHere(t) });
+    if (W.__FARMHAND_TEST__) Object.assign(W, { __st: () => state, __cfg: CFG, __pt: prodTick, __qt: quotaTick, __lt: leashTick, __ms: milkingStallTick, __vt: voiceTick, __sync: syncCompanions, __gt: gearTick, __ht: homeTick, __addons: (h, ...a) => addonsEmit(h, ...a), __stateFor: (mn) => stateFor(mn), __leadTick: () => leadTick(), __ambient: () => ambientTick(), __about: (t) => aboutWhom(t), __announce: (t) => announce(t), __reply: (mn, t, ch) => reply(mn, t, ch), __office: () => officeCheck(), __namesHere: (t) => namesHere(t), __speciesCheck: (t) => QUESTIONS.find((q) => q.key === "species").check(t) });
     W.FarmhandSyncKeys = () => syncAllPresent(true);
     W.FarmhandFriends = () => W.Player.FriendList;
     W.FarmhandAddFriend = (mn) => addFriend(mn, false);
@@ -9430,20 +9430,86 @@ Say ?apply and pick 'luxury guest'.
 
 \u26A0\uFE0F Fair warnin', sugar \u2014 folks book the cabin meanin' to watch, and end up in the barn by Thursday. Happens more than you'd think! \u{1F609}`;
     const GENDERS = ["female", "male", "futa", "femboy"];
-    const SPECIES_ALIAS = { kitten: "kitt", kitty: "kitt", puppy: "pup", horse: "horse", cattle: "cow", heifer: "cow", piggy: "pig", lamb: "sheep", doe: "deer", bunny: "bunny" };
+    const SPECIES_ALIAS = {
+      kitten: "kitt",
+      kitty: "kitt",
+      kittie: "kitt",
+      kit: "kitt",
+      puppy: "pup",
+      pupper: "pup",
+      doggy: "dog",
+      doggie: "dog",
+      hound: "dog",
+      cattle: "cow",
+      heifer: "cow",
+      hucow: "cow",
+      bovine: "cow",
+      calf: "cow",
+      dairy: "cow",
+      moo: "cow",
+      ox: "bull",
+      steer: "bull",
+      piggy: "pig",
+      piglet: "pig",
+      sow: "pig",
+      hog: "pig",
+      swine: "pig",
+      oink: "pig",
+      lamb: "sheep",
+      ewe: "sheep",
+      doe: "deer",
+      fawn: "deer",
+      mare: "horse",
+      stallion: "horse",
+      filly: "pony",
+      foal: "pony",
+      colt: "pony",
+      equine: "horse",
+      vixen: "fox",
+      bunny: "bunny",
+      bun: "bunny",
+      feline: "cat",
+      canine: "dog",
+      gob: "goblin",
+      nanny: "goat",
+      billy: "goat",
+      kid: "goat",
+      lupine: "wolf"
+    };
+    const NOT_STOCK = /\b(no|nope|nah|not stock|not livestock|not an animal|not one|human|person|staff|farmhand|guest|luxury|visitor|none|skip|n\/?a)\b/;
+    const NOT_ANIMAL = /^(yes|yeah|yep|ok|okay|sure|maybe|what|huh|help|hi|hello|stock|livestock|animal|both|me|it|idk)$/;
     function speciesFrom(text) {
-      const t = String(text || "").trim().toLowerCase().replace(/^(a|an)\s+/, "");
-      if (!t) return null;
       const kinds = Object.keys(CFG.SPECIES).filter((k) => k !== "default");
-      if (kinds.includes(t)) return t;
-      if (SPECIES_ALIAS[t]) return SPECIES_ALIAS[t];
-      const s = t.replace(/s$/, "");
-      if (kinds.includes(s)) return s;
-      const other = t.match(/^other[:\s]+(.{2,30})$/);
+      const low = String(text || "").toLowerCase().replace(/[^a-z\s\/-]/g, " ").replace(/\s+/g, " ").trim();
+      if (!low) return null;
+      const other = low.match(/^other[:\s]+([a-z -]{2,30})$/);
       if (other) return other[1].trim();
+      const known = (w) => {
+        if (kinds.includes(w)) return w;
+        if (SPECIES_ALIAS[w]) return SPECIES_ALIAS[w];
+        for (const s of [w.replace(/ves$/, "f"), w.replace(/es$/, ""), w.replace(/s$/, "")]) {
+          if (kinds.includes(s)) return s;
+          if (SPECIES_ALIAS[s]) return SPECIES_ALIAS[s];
+        }
+        const g = w.replace(/(girl|boy|gal|guy|kin)$/, "");
+        if (g !== w && g.length > 1) return known(g);
+        return null;
+      };
+      const words = low.split(/[\s\/-]+/).filter(Boolean);
+      for (const w of words) {
+        const k = known(w);
+        if (k) return k;
+      }
+      const filler = /* @__PURE__ */ new Set(["i", "im", "am", "a", "an", "the", "my", "please", "pls", "just", "really", "think", "maybe", "so"]);
+      const rest = words.filter((w) => !filler.has(w));
+      if (rest.length >= 1 && rest.length <= 2 && !NOT_ANIMAL.test(rest.join(" ")) && rest.every((w) => w.length >= 2)) return rest.join(" ");
       return null;
     }
-    const notSure = (t) => /^(not sure|unsure|don'?t know|dunno|idk|n\/a|na|none|skip)$/i.test(String(t || "").trim());
+    const notSure = (t) => /\b(not sure|unsure|don'?t know|dont know|dunno|idk|undecided)\b/i.test(String(t || "").trim()) || /^(n\/a|na|none|skip)$/i.test(String(t || "").trim());
+    const notStock = (t) => {
+      const low = String(t || "").toLowerCase().replace(/[^a-z\s\/]/g, " ").replace(/\s+/g, " ").trim();
+      return NOT_STOCK.test(low);
+    };
     const QUESTIONS = [
       { key: "name", text: "First things first, sweetie: what do we call you, and how do you like bein' addressed?" },
       { key: "role", text: "What are you here as?  livestock / staff / guest / luxury guest / not sure yet\n(Both's an option, hon. Plenty here wear two collars!)" },
@@ -9451,7 +9517,19 @@ Say ?apply and pick 'luxury guest'.
         key: "species",
         text: "If you're stock, what kind of animal are you?",
         choices: () => Object.keys(CFG.SPECIES).filter((k) => k !== "default").concat(["not stock"]),
-        check: (t) => notSure(t) || /^not stock$/i.test(t) ? { value: "" } : speciesFrom(t) ? { value: speciesFrom(t) } : { err: "I don't know that animal, sugar. Pick one of: " + Object.keys(CFG.SPECIES).filter((k) => k !== "default").join(", ") + ". Or say other <animal>, or not stock." }
+        // an animal wins over everything else ("no, a cow"); then "not stock" or "not sure"; anything else is asked again
+        check: (t) => {
+          const sp = speciesFrom(t), known = sp && Object.keys(CFG.SPECIES).includes(sp);
+          if (known) return { value: sp };
+          if (notSure(t) || notStock(t)) return { value: "" };
+          if (sp) return { value: sp };
+          return { err: "I didn't catch an animal there, sugar. Just type one, like cow, pony, pup or kitten (or any other animal), or say not stock." };
+        },
+        // stock only: somebody who said they're just staff or a guest isn't asked
+        skip: (s) => {
+          const role = String((s.byKey || {}).role || "").toLowerCase();
+          return !!role && !/stock|cow|animal|both|not sure|unsure|undecided|pet/.test(role) && /staff|farmhand|guest|luxury|visit|hand/.test(role);
+        }
       },
       {
         key: "gender",
@@ -9544,6 +9622,13 @@ Chat in the room all you like; I'll only count what you send me direct.`,
       const list = s.staffTrack ? QUESTIONS.concat(STAFF_QUESTIONS) : QUESTIONS;
       if (s.step >= list.length) {
         finishApplication(mn);
+        return;
+      }
+      if (list[s.step].skip && list[s.step].skip(s)) {
+        s.byKey[list[s.step].key] = "";
+        s.answers.push("");
+        s.step++;
+        askNext(mn);
         return;
       }
       const q = list[s.step], text = s.step + 1 + "/" + list.length + " \u2014 " + q.text;

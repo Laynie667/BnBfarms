@@ -55,5 +55,14 @@ const roomLines=k=>sent.slice(k).filter(([e,d])=>d&&(d.Type==='Emote'||(d.Type==
   ok(!p().stall && p().stallPaused, 'gone two minutes: the session is on hold');
   chars[1].MapData.Pos={X:5,Y:5}; k=sent.length; skew+=20000; W.__ms(); skew+=20000; W.__ms(); await wait(3000);
   ok(!!p().stall && !sent.slice(k).some(([e,d])=>d&&/latches on/.test(String(d.Content||d.Message||''))), '...and coming back picks it up quietly');
+  // reported live: a cow milked dry by hand stood in the stall and nothing happened, not even a message.
+  // Now she's told once per visit why, and when to come back
+  chars[1].MapData.Pos={X:9,Y:9}; skew+=20000; W.__ms();
+  p().stall=null; p().stallPaused=null; p().stallRest=0; p().milk=500;
+  chars[1].MapData.Pos={X:5,Y:5}; k=sent.length; skew+=20000; W.__ms(); skew+=20000; W.__ms(); skew+=20000; W.__ms(); await wait(3000);
+  const why=sent.slice(k).filter(([e,d])=>d&&/give you a sniff/.test(String(d.Content||d.Message||'')));
+  ok(!p().stall && why.length===1 && /quarter/.test(String(why[0][1].Content||why[0][1].Message)) && /Come back in about/.test(String(why[0][1].Content||why[0][1].Message)), 'too empty: told once why, and when to come back');
+  chars[1].MapData.Pos={X:9,Y:9}; skew+=20000; W.__ms(); chars[1].MapData.Pos={X:5,Y:5}; k=sent.length; skew+=20000; W.__ms(); skew+=20000; W.__ms(); await wait(3000);
+  ok(sent.slice(k).filter(([e,d])=>d&&/give you a sniff/.test(String(d.Content||d.Message||''))).length===1, '...and again on the next visit');
   out(fails ? fails+' FAILED' : 'ALL PASSED'); process.exit(fails?1:0);
 })();

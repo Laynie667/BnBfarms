@@ -762,7 +762,7 @@
         // walked past, or stepped off: a session in progress just pauses for a minute before it ends
         const p0 = rec(mn) && prodOf(mn);
         if (p0){
-          p0.stallSeen = 0;
+          p0.stallSeen = 0; p0.stallWhyTold = false;   // next visit they're told again
           if (p0.stall && now - (p0.stall.seenAt||now) > CFG.PROD.STALL_AWAY_GRACE_S*1000){
             // gone a while: the session's put on hold for 10 minutes, and comin' back picks it up quietly
             // (seen live: steppin' off for two minutes started a whole new session with a new announcement)
@@ -777,6 +777,28 @@
       const keepM = milkCap(mn) * CFG.PROD.STALL_LEAVE_SHARE, keepS = semenCap(mn) * CFG.PROD.STALL_LEAVE_SHARE;
       const doM = makesMilk(mn) && !milkDenied(mn) && !gearOf(mn).milk && p.milk > keepM;   // a pump they're wearin' does its own milkin' (gearTick)
       const doS = makesSemen(mn) && p.semen > keepS;
+      // standin' in the stall and it won't milk them: say why, once per visit (it used to say nothin' at all,
+      // and folks thought the stall was broken)
+      if (!p.stall && !doM && !doS){
+        p.stallSeen = (p.stallSeen||0) + 1;
+        if (p.stallSeen >= 2 && !p.stallWhyTold){
+          p.stallWhyTold = true;
+          let why;
+          if (!makesMilk(mn) && !makesSemen(mn)) why = "you're not makin' milk right now. Say ?milkable on if you'd like to.";
+          else if (makesMilk(mn) && milkDenied(mn)) why = "your teats are capped. Nothin' comes out till staff let it.";
+          else if (makesMilk(mn) && gearOf(mn).milk) why = "the pump you're wearin' is already doin' the milkin'.";
+          else {
+            const rate = makesMilk(mn) ? milkRate(mn) : 0;
+            const mins = rate > 0 ? Math.ceil((keepM - p.milk) / rate * 60) : 0;
+            const when = mins > 0 ? (mins >= 90 ? " Come back in about "+Math.round(mins/60)+" hours." : " Come back in about "+Math.max(1, mins)+" minutes.") : "";
+            why = makesMilk(mn)
+              ? "you've only got "+ml(p.milk)+" in there, and the stall leaves you a quarter ("+ml(keepM)+"), so there's nothin' to take yet."+when
+              : "there's not enough built up in you yet. The stall leaves you a quarter.";
+          }
+          tell(mn, "🥛 The stall's cups give you a sniff and let go, sugar: "+why);
+        }
+        continue;
+      }
       // a stall that just finished with them rests a while; they're told once
       if (!p.stall && (doM || doS) && p.stallRest > now){
         if (p.stallRestTold !== p.stallRest){

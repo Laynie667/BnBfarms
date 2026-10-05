@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.14.2
+// @version      0.14.3
 // @description  B&B Farm: beeps, keys, ledger, roster, herds, summoning, anti-idle
 // @author       Laynie & Alexia
 // @match        *://*.bondageprojects.elementfx.com/*
@@ -1803,7 +1803,7 @@
   ];
 
   // bot/src/version.js
-  var VERSION = "0.14.2";
+  var VERSION = "0.14.3";
 
   // bot-parts:farmhand-bot-parts
   (function() {
@@ -5200,6 +5200,7 @@
           const p0 = rec(mn) && prodOf(mn);
           if (p0) {
             p0.stallSeen = 0;
+            p0.stallWhyTold = false;
             if (p0.stall && now - (p0.stall.seenAt || now) > CFG.PROD.STALL_AWAY_GRACE_S * 1e3) {
               p0.stallPaused = { until: now + 6e5, rateM: p0.stall.rateM, rateS: p0.stall.rateS, since: p0.stall.since };
               p0.stall = null;
@@ -5211,6 +5212,24 @@
         const keepM = milkCap(mn) * CFG.PROD.STALL_LEAVE_SHARE, keepS = semenCap(mn) * CFG.PROD.STALL_LEAVE_SHARE;
         const doM = makesMilk(mn) && !milkDenied(mn) && !gearOf(mn).milk && p.milk > keepM;
         const doS = makesSemen(mn) && p.semen > keepS;
+        if (!p.stall && !doM && !doS) {
+          p.stallSeen = (p.stallSeen || 0) + 1;
+          if (p.stallSeen >= 2 && !p.stallWhyTold) {
+            p.stallWhyTold = true;
+            let why;
+            if (!makesMilk(mn) && !makesSemen(mn)) why = "you're not makin' milk right now. Say ?milkable on if you'd like to.";
+            else if (makesMilk(mn) && milkDenied(mn)) why = "your teats are capped. Nothin' comes out till staff let it.";
+            else if (makesMilk(mn) && gearOf(mn).milk) why = "the pump you're wearin' is already doin' the milkin'.";
+            else {
+              const rate = makesMilk(mn) ? milkRate(mn) : 0;
+              const mins = rate > 0 ? Math.ceil((keepM - p.milk) / rate * 60) : 0;
+              const when = mins > 0 ? mins >= 90 ? " Come back in about " + Math.round(mins / 60) + " hours." : " Come back in about " + Math.max(1, mins) + " minutes." : "";
+              why = makesMilk(mn) ? "you've only got " + ml(p.milk) + " in there, and the stall leaves you a quarter (" + ml(keepM) + "), so there's nothin' to take yet." + when : "there's not enough built up in you yet. The stall leaves you a quarter.";
+            }
+            tell(mn, "\u{1F95B} The stall's cups give you a sniff and let go, sugar: " + why);
+          }
+          continue;
+        }
         if (!p.stall && (doM || doS) && p.stallRest > now) {
           if (p.stallRestTold !== p.stallRest) {
             p.stallRestTold = p.stallRest;

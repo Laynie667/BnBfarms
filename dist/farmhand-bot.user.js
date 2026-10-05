@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.14.5
+// @version      0.14.6
 // @description  B&B Farm: beeps, keys, ledger, roster, herds, summoning, anti-idle
 // @author       Laynie & Alexia
 // @match        *://*.bondageprojects.elementfx.com/*
@@ -1803,7 +1803,7 @@
   ];
 
   // bot/src/version.js
-  var VERSION = "0.14.5";
+  var VERSION = "0.14.6";
 
   // bot-parts:farmhand-bot-parts
   (function() {
@@ -4302,10 +4302,11 @@
         onDuty: here.filter((m) => isStaff(m) && onDuty(m)).map(plainName),
         onCall: forcedStaff().map((m) => ({ name: plainName(m), mandated: isMandated(m), here: !!charFor(m) }))
       };
+      zonesLedger();
+      out.zones = L.zones;
+      out.spots = L.spots || {};
+      out.mapEdit = isHerdmaster(mn);
       if (isHerdmaster(mn)) {
-        zonesLedger();
-        out.zones = L.zones;
-        out.spots = L.spots || {};
         out.tease = (L.tease || []).slice(0, 60).map((x) => x.text);
         out.teaseOpted = Object.values(L.people).filter((x) => x.teaseOptIn).length;
         out.log = (L.log || []).slice(-10).reverse().map((e) => ({ t: e.t, a: e.a, by: plainName(e.by), d: String(e.d || "").slice(0, 40) }));

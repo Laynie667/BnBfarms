@@ -40,7 +40,9 @@ export function tease(ctx) {
 const COLORS = ["#8fbf6a", "#c9a35b", "#b8403a", "#7fa8c9", "#c48bd9", "#d98c6a"];
 export function zones(ctx) {
   const zs = ctx.s.zones;
-  if (!zs) return [muted("Zones are for herdmasters and proprietors.")];
+  if (!zs) return [muted("The farm map is for staff.")];
+  // farmhands see the map, the zones and the spots; only herdmasters and proprietors change them
+  const canEdit = ctx.s.mapEdit !== false;
   const groups = [...new Set(Object.values(zs).map((z) => z.group))];
   const color = (g) => COLORS[groups.indexOf(g) % COLORS.length];
   const sel = ctx.ui.zone && zs[ctx.ui.zone] ? ctx.ui.zone : Object.keys(zs)[0];
@@ -60,7 +62,7 @@ export function zones(ctx) {
     card(title("Zones"), Object.keys(zs).length ? Object.entries(zs).map(([n, z]) => h("button", { type: "button", class: "fhc-doc" + (n === sel ? " on" : ""), style: { width: "100%", marginBottom: "4px" }, onclick: () => ctx.setUi({ zone: n }) },
         h("b", null, n), h("div", { class: "fhc-muted" }, "part of " + z.group + " · A " + (z.a ? z.a.X + "," + z.a.Y : "—") + " → B " + (z.b ? z.b.X + "," + z.b.Y : "—")))) : muted("No zones yet."),
       btn("Who's where", () => ctx.send("zone who"))),
-    card(title(sel ? "Editin' " + sel : "New zone"),
+    canEdit ? card(title(sel ? "Editin' " + sel : "New zone"),
       h("label", { class: "fhc-label" }, "Zone name (one word)", h("input", { class: "fhc-in", value: ctx.ui.zoneName || sel || "", oninput: (e) => ctx.setUi({ zoneName: e.target.value }, true) })),
       h("div", null, btn("Draw it on the map", () => {
           const n = name(); if (!n) return ctx.hint("Name the zone first.");
@@ -70,11 +72,17 @@ export function zones(ctx) {
       h("div", null, btn("Set A where I stand", () => name() ? ctx.send("zone a " + name()) : ctx.hint("Name the zone first.")), btn("Set B where I stand", () => name() ? ctx.send("zone b " + name()) : ctx.hint("Name the zone first."))),
       h("label", { class: "fhc-label" }, "Pair with (one place, odd shapes)", h("input", { class: "fhc-in", placeholder: "barn", value: ctx.ui.zonePair || "", oninput: (e) => ctx.setUi({ zonePair: e.target.value }, true) })),
       h("div", null, btn("Pair", () => (name() && ctx.ui.zonePair) ? ctx.send("zone pair " + name() + " " + ctx.ui.zonePair.trim().toLowerCase()) : ctx.hint("Name the zone, and the place to pair it with.")),
-        btn("Unpair", () => name() ? ctx.send("zone unpair " + name()) : ctx.hint("Name the zone first.")), btn("Delete", () => name() ? ctx.send("zone clear " + name()) : ctx.hint("Name the zone first.")))),
-    spotsCard(ctx),
+        btn("Unpair", () => name() ? ctx.send("zone unpair " + name()) : ctx.hint("Name the zone first.")), btn("Delete", () => name() ? ctx.send("zone clear " + name()) : ctx.hint("Name the zone first.")))) : null,
+    canEdit ? spotsCard(ctx) : spotsList(ctx),
+    canEdit ? null : muted("Zones and spots are set by herdmasters and proprietors."),
   ];
 }
 
+// the spots, just to look at (farmhands)
+function spotsList(ctx) {
+  const sp = Object.entries(ctx.s.spots || {});
+  return card(title("Spots"), sp.length ? sp.map(([n, p]) => h("div", { class: "fhc-kv" }, h("b", null, n), h("span", { class: "fhc-muted" }, p.X + "," + p.Y))) : muted("No spots yet."));
+}
 // named spots: home, speakers, troughs, stalls, placards… pick one on the map or stand on it
 function spotsCard(ctx) {
   const sp = Object.entries(ctx.s.spots || {});

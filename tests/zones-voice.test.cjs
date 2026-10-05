@@ -39,6 +39,9 @@ const C=mn=>chars.find(c=>c.MemberNumber===mn);
   out('1 who is where uses the group ->', /barn: [^\n]*Moo/.test(lastTo(700)));
   await B(800,'zone a sneaky');
   out('1 farmhands cannot set zones ->', !L().zones.sneaky);
+  await B(800,'spot set sneaky');
+  out('1 ...or spots ->', !(L().spots||{}).sneaky);
+  out('1 farmhands get the map to look at ->', !!W.__stateFor(800).zones && W.__stateFor(800).mapEdit===false, W.__stateFor(700).mapEdit===true);
   // 2. voice: herd leader only, opt-in only
   await B(800,'voice add 500 Moo for me.');
   out('2 not their herd leader ->', /herd leader/.test(lastTo(800)), !(L().voice&&L().voice.member[500]));

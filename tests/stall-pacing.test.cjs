@@ -45,7 +45,7 @@ const roomLines=k=>sent.slice(k).filter(([e,d])=>d&&(d.Type==='Emote'||(d.Type==
   const opens=toMoo.filter(c=>OPEN.test(c)), story=toMoo.filter(c=>!OPEN.test(c)&&/^\(\*/.test(c));
   ok(opens.length>=4 && opens.length<=7, 'the room gets an open line about every 5 minutes, finish included ('+opens.length+')');
   ok(story.length>=40, 'their own story comes privately, about every 25 seconds ('+story.length+' lines)');
-  ok(/cups|latch|seal/i.test(story[0]) && /\d+(\.\d)? (L|mL)/.test(story[story.length-1]), 'it starts with the cups going on and ends with how much came out');
+  ok(/cups|latch|seal|liners|vacuum/i.test(story[0]) && /\d+(\.\d)? (L|mL)/.test(story[story.length-1]), 'it starts with the cups going on and ends with how much came out');
   ok(new Set(story).size===story.length, 'no line twice in one session');
   ok(p().milk <= 24000*0.25+400, 'drained down to about a quarter');
   // the stall rests now

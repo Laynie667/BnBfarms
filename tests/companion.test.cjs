@@ -87,17 +87,26 @@ const STATE = { name: "Laynie", onBooks: true, roles: ["PROPRIETOR", "LIVESTOCK"
   click("Offer it"); out("5 contract offer sent ->", cmds().includes("contract offer deep Bessie 1w"));
 
   // 5b. the live staff tabs
-  bot({ type: "state", state: Object.assign({}, STATE, {
+  const STAFF5B = Object.assign({}, STATE, {
     herd: [{ mn: 500, name: "Bessie", role: "livestock", where: "barn", milk: 88, heat: true, preg: false, denied: false, mine: true, onDuty: true }],
     zones: { "barn-1": { a: { X: 2, Y: 2 }, b: { X: 5, Y: 4 }, group: "barn" } }, tease: ["Cute today, %name%."], teaseOpted: 4,
     voice: { herd: { on: true, lines: ["Good cows stand still."], every: "15" }, members: [{ mn: 500, name: "Bessie", hypno: true, on: false, lines: [], every: "15" }] },
     shift: { clocked: false, weekH: 6.5, onDuty: ["Laynie"], onCall: [{ name: "Hand", mandated: true, here: false }] },
-    log: [{ t: Date.now(), a: "TEASE_ADD", by: "Laynie", d: "" }] }) });
+    log: [{ t: Date.now(), a: "TEASE_ADD", by: "Laynie", d: "" }] });
+  bot({ type: "state", state: STAFF5B });
   click("Herd"); out("5b herd shows where and flags ->", /barn/.test(text()), /in heat/.test(text()));
   click("Summon to me"); out("5b summon from herd ->", cmds().includes("summon 500"));
   click("Tease lines"); click("Remove"); out("5b tease remove ->", cmds().includes("tease remove 1"));
   click("Zones"); out("5b zone map drawn ->", !!D.querySelector('#fhc-panel button[aria-label="barn-1"]'));
   click("Set A where I stand"); out("5b zone corner ->", cmds().includes("zone a barn-1"));
+  // a farmhand sees the map, zones and spots, but nothing to change them with
+  bot({ type: "state", state: Object.assign({}, STATE, { herdmaster: false, proprietor: false, mapEdit: false,
+    zones: { "barn-1": { a: { X: 2, Y: 2 }, b: { X: 5, Y: 4 }, group: "barn" } }, spots: { "milking1": { X: 3, Y: 3 } } }) });
+  click("Zones");
+  const btns = [...D.querySelectorAll("#fhc-panel button")].map((b) => b.textContent);
+  out("5b farmhand sees the map ->", !!D.querySelector('#fhc-panel button[aria-label="barn-1"]'), /milking1/.test(text()), btns.includes("Who's where"));
+  out("5b ...but can't change it ->", !btns.some((b) => /Draw it on the map|Set A where I stand|Delete|Clear|Pick|Click it on the map|Set where I stand/.test(b)), /set by herdmasters and proprietors/.test(text()));
+  bot({ type: "state", state: STAFF5B });   // back to a herdmaster for the rest
   click("Voice"); out("5b voice lines ->", /\[Voice\] Good cows stand still/.test(text()));
   click("Shift"); out("5b shift and log ->", /6\.5 h this week/.test(text()), /TEASE_ADD/.test(text()));
   bot({ type: "voice", text: "Moo for me." });

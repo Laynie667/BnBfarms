@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.10.5
+// @version      0.10.6
 // @description  Your B&B Farm panel: the farm girl's answers, stat cards and guides, right in the game.
 // @author       Laynie & Alexia
 // @match        *://*.bondageprojects.elementfx.com/*
@@ -227,7 +227,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.10.5";
+  var VERSION = "0.10.6";
 
   // extension/src/config.js
   var BOT_MEMBER = 260239;
@@ -2308,7 +2308,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var COLORS = ["#8fbf6a", "#c9a35b", "#b8403a", "#7fa8c9", "#c48bd9", "#d98c6a"];
   function zones(ctx2) {
     const zs = ctx2.s.zones;
-    if (!zs) return [muted("Zones are for herdmasters and proprietors.")];
+    if (!zs) return [muted("The farm map is for staff.")];
+    const canEdit = ctx2.s.mapEdit !== false;
     const groups = [...new Set(Object.values(zs).map((z) => z.group))];
     const color = (g) => COLORS[groups.indexOf(g) % COLORS.length];
     const sel = ctx2.ui.zone && zs[ctx2.ui.zone] ? ctx2.ui.zone : Object.keys(zs)[0];
@@ -2362,7 +2363,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
         )) : muted("No zones yet."),
         btn("Who's where", () => ctx2.send("zone who"))
       ),
-      card(
+      canEdit ? card(
         title(sel ? "Editin' " + sel : "New zone"),
         h("label", { class: "fhc-label" }, "Zone name (one word)", h("input", { class: "fhc-in", value: ctx2.ui.zoneName || sel || "", oninput: (e) => ctx2.setUi({ zoneName: e.target.value }, true) })),
         h("div", null, btn("Draw it on the map", () => {
@@ -2380,9 +2381,14 @@ One of mods you are using is using an old version of SDK. It will work for now b
           btn("Unpair", () => name() ? ctx2.send("zone unpair " + name()) : ctx2.hint("Name the zone first.")),
           btn("Delete", () => name() ? ctx2.send("zone clear " + name()) : ctx2.hint("Name the zone first."))
         )
-      ),
-      spotsCard(ctx2)
+      ) : null,
+      canEdit ? spotsCard(ctx2) : spotsList(ctx2),
+      canEdit ? null : muted("Zones and spots are set by herdmasters and proprietors.")
     ];
+  }
+  function spotsList(ctx2) {
+    const sp = Object.entries(ctx2.s.spots || {});
+    return card(title("Spots"), sp.length ? sp.map(([n, p]) => h("div", { class: "fhc-kv" }, h("b", null, n), h("span", { class: "fhc-muted" }, p.X + "," + p.Y))) : muted("No spots yet."));
   }
   function spotsCard(ctx2) {
     const sp = Object.entries(ctx2.s.spots || {});

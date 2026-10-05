@@ -72,9 +72,11 @@
     out.shift = { clocked: clockedIn(mn), weekH: Math.round(10*(week + (clockedIn(mn) ? Date.now() - r.shift.in : 0))/3600000)/10,
                   onDuty: here.filter(m => isStaff(m) && onDuty(m)).map(plainName),
                   onCall: forcedStaff().map(m => ({ name: plainName(m), mandated: isMandated(m), here: !!charFor(m) })) };
+    // the farm map: every staff member sees it; only herdmasters and proprietors change it (the bot checks too)
+    zonesLedger();
+    out.zones = L.zones; out.spots = L.spots || {};   // name → {X,Y}, drawn on the Zones map
+    out.mapEdit = isHerdmaster(mn);
     if (isHerdmaster(mn)){
-      zonesLedger();
-      out.zones = L.zones; out.spots = L.spots || {};   // name → {X,Y}, drawn on the Zones map
       out.tease = (L.tease || []).slice(0, 60).map(x => x.text);
       out.teaseOpted = Object.values(L.people).filter(x => x.teaseOptIn).length;
       out.log = (L.log || []).slice(-10).reverse().map(e => ({ t: e.t, a: e.a, by: plainName(e.by), d: String(e.d||"").slice(0, 40) }));

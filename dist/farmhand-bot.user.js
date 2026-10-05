@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.14.6
+// @version      0.14.7
 // @description  B&B Farm: beeps, keys, ledger, roster, herds, summoning, anti-idle
 // @author       Laynie & Alexia
 // @match        *://*.bondageprojects.elementfx.com/*
@@ -1803,7 +1803,7 @@
   ];
 
   // bot/src/version.js
-  var VERSION = "0.14.6";
+  var VERSION = "0.14.7";
 
   // bot-parts:farmhand-bot-parts
   (function() {
@@ -9600,6 +9600,28 @@ Chat in the room all you like; I'll only count what you send me direct.`,
       later(() => askNext(mn), 1200);
       return true;
     }
+    function keepApplication(mn, a) {
+      const r = rec(mn, true);
+      r.application = {
+        at: a.at,
+        staffTrack: !!a.staffTrack,
+        byKey: Object.assign({}, a.byKey || {}),
+        answers: a.byKey ? void 0 : (a.answers || []).slice()
+      };
+    }
+    function applicationText(a, onRecord) {
+      const list = a.staffTrack ? QUESTIONS.concat(STAFF_QUESTIONS) : QUESTIONS;
+      const skip = onRecord ? ["limits", "triggers", "aftercare"] : [];
+      let o = "\u{1F4CB} Application, " + new Date(a.at).toLocaleDateString() + "\n";
+      if (a.byKey) list.filter((q) => !skip.includes(q.key)).forEach((q) => {
+        o += "\n\u25B8 " + q.text.split("\n")[0].split("  ")[0] + "\n   " + (a.byKey[q.key] || "\u2014") + "\n";
+      });
+      else (a.answers || []).forEach((ans, qi) => {
+        const k = OLD_ORDER[qi];
+        if (!skip.includes(k)) o += "\n\u25B8 " + (k || "question " + (qi + 1)) + "\n   " + ans + "\n";
+      });
+      return o.trimEnd();
+    }
     function finishApplication(mn) {
       const s = state.sessions.get(mn);
       if (!s) return;
@@ -9998,6 +10020,12 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
       if (staffView && r.triggers) o += "\n\n\u26A0\uFE0F Triggers (you and staff only):\n" + r.triggers;
       if (staffView && r.aftercare) o += "\n\n\u{1F90D} Aftercare:\n" + r.aftercare;
       if (notesView && r.notes) o += "\n\n\u{1F4DD} Staff notes:\n" + r.notes;
+      if (staffView && r.prod && r.prod.held) {
+        const p = prodOf(mn), cap = capacity(mn), held = heldTotal(p);
+        const parts = HOLES.filter((h) => h !== "vulva" || hasVulva(mn) || (p.held.vulva || 0) > 0).map((h) => ({ vulva: "Vulva", butt: "Butt", mouth: "Stomach" })[h] + " " + ml(p.held[h] || 0));
+        o += "\n\n\u{1FAD9} Holding: " + parts.join(" \xB7 ") + " (" + Math.round(100 * held / Math.max(1, cap)) + "% full)";
+      }
+      if (staffView && r.application) o += "\n\n" + applicationText(r.application, true);
       return o;
     }
     function whoText() {
@@ -11674,9 +11702,25 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
           break;
         }
         case "app": {
-          const a = L.applications[parseInt(args[0], 10) - 1];
+          const n0 = String(args[0] || "");
+          let a = /^\d{1,3}$/.test(n0) ? L.applications[parseInt(n0, 10) - 1] : null;
+          if (!a && n0) {
+            state.ambiguous = null;
+            const who = resolveTarget(n0);
+            if (who) {
+              a = L.applications.find((x) => x.mn === who) || null;
+              if (!a && rec(who) && rec(who).application) {
+                R("\u{1F4CB} " + plainName(who) + " (" + who + "), approved\n\n" + applicationText(rec(who).application, false));
+                break;
+              }
+              if (!a) {
+                R(plainName(who) + " has no application on file, sugar. (Folks approved before the farm started keepin' them only have their limits, triggers and aftercare on ?record.)");
+                break;
+              }
+            } else if (state.ambiguous) break;
+          }
           if (!a) {
-            R("There's no application by that number, sugar. Say ?app and a number from the ?queue list, like ?app 1.");
+            R("There's no application like that, sugar. Say ?app and a number from the ?queue list (?app 1), or a name or member number (?app Bessie).");
             break;
           }
           const list = a.staffTrack ? QUESTIONS.concat(STAFF_QUESTIONS) : QUESTIONS;
@@ -11719,6 +11763,7 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
           let wants = null;
           if (idx >= 0) {
             wants = applyApplication(t, L.applications[idx]);
+            keepApplication(t, L.applications[idx]);
             L.applications.splice(idx, 1);
           }
           saveLedger();

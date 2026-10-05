@@ -1174,8 +1174,19 @@
       }
 
       case "app": {
-        const a = L.applications[parseInt(args[0],10)-1];
-        if (!a){ R("There's no application by that number, sugar. Say ?app and a number from the ?queue list, like ?app 1."); break; }
+        // ?app <number from the ?queue list>, or ?app <name or member number>: a waiting application, or the one kept on their record
+        const n0 = String(args[0]||"");
+        let a = /^\d{1,3}$/.test(n0) ? L.applications[parseInt(n0,10)-1] : null;
+        if (!a && n0){
+          state.ambiguous = null;
+          const who = resolveTarget(n0);
+          if (who){
+            a = L.applications.find(x => x.mn === who) || null;
+            if (!a && rec(who) && rec(who).application){ R("📋 "+plainName(who)+" ("+who+"), approved\n\n"+applicationText(rec(who).application, false)); break; }
+            if (!a){ R(plainName(who)+" has no application on file, sugar. (Folks approved before the farm started keepin' them only have their limits, triggers and aftercare on ?record.)"); break; }
+          } else if (state.ambiguous) break;
+        }
+        if (!a){ R("There's no application like that, sugar. Say ?app and a number from the ?queue list (?app 1), or a name or member number (?app Bessie)."); break; }
         const list = a.staffTrack ? QUESTIONS.concat(STAFF_QUESTIONS) : QUESTIONS;
         let o = "📋 APPLICATION — "+a.name+" ("+a.mn+")\n"+new Date(a.at).toLocaleString()+"\n";
         if (a.byKey) list.forEach(q => { o += "\n▸ "+q.text.split("\n")[0]+"\n   "+(a.byKey[q.key] || "—")+"\n"; });
@@ -1206,6 +1217,7 @@
         let wants = null;
         if (idx>=0){
           wants = applyApplication(t, L.applications[idx]);
+          keepApplication(t, L.applications[idx]);   // the whole thing stays on their record (it used to be thrown away)
           L.applications.splice(idx,1);
         }
         saveLedger(); audit(sender,"APPROVE",t+" "+roles.join("+"));

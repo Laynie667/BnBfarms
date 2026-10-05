@@ -22,6 +22,7 @@ const wait=ms=>new Promise(r=>setTimeout(r,ms));
 const B=async(mn,msg)=>{handlers.AccountBeep({MemberNumber:mn,Message:msg});await wait(5200);};
 const out=(...a)=>process.stdout.write(a.join(' ')+'\n');
 const lastTo=mn=>{const w=sent.filter(s=>(s[0]==='AccountBeep'&&s[1].MemberNumber===mn)||(s[1].Type==='Whisper'&&s[1].Target===mn)).map(s=>s[1].Message||s[1].Content);return w[w.length-1]||'';};
+const beepsTo=mn=>sent.filter(s=>s[0]==='AccountBeep'&&s[1].MemberNumber===mn).map(s=>s[1].Message);
 const toSince=(mn,n)=>sent.slice(n).filter(s=>(s[0]==='AccountBeep'&&s[1].MemberNumber===mn)).map(s=>s[1].Message).join(' | ');
 (async()=>{ await wait(3500);
   chars.find(c=>c.MemberNumber===900).Name='Daisy';
@@ -50,5 +51,15 @@ const toSince=(mn,n)=>sent.slice(n).filter(s=>(s[0]==='AccountBeep'&&s[1].Member
   const offer=sent.filter(s=>s[1]&&s[1].Content==='BCP'&&s[1].Target===900).map(s=>s[1].Dictionary.payload)[0]||{};
   out('6 goat sounds in their contract ->', offer.rules&&offer.rules['pet.speech'].settings.animal==='Custom' && offer.rules['pet.speech'].settings.sounds.includes('maa'));
   await B(900,'gender futa'); out('7 ?gender futa ->', L().people[900].gender==='futa' && L().people[900].futa===true);
+  // reported: the full application was gone after approval, and the record didn't say what they're holding
+  out('8 the application is kept on their record ->', !!(L().people[900].application && L().people[900].application.byKey.likes==='milkin'));
+  await B(221397,'record 900'); const rec900=beepsTo(221397).slice(-3).join('\n');
+  out('8 ?record shows the application ->', /Application/.test(rec900) && /milkin/.test(rec900) && /ask first/.test(rec900) && /thank you/.test(rec900));
+  out('8 ?record shows what they hold ->', /Holding: Vulva .* · Butt .* · Stomach /.test(rec900));
+  out('8 ...without the option lists ->', !/livestock \/ staff \/ guest/.test(rec900));
+  await B(900,'record'); const own=beepsTo(900).slice(-3).join('\n');
+  out('8 they see their own application ->', /Application/.test(own) && /milkin/.test(own));
+  await B(221397,'app Daisy'); const appD=beepsTo(221397).slice(-3).join('\n');
+  out('8 ?app by name finds a kept application ->', /approved/.test(appD) && /milkin/.test(appD) && /no blood/.test(appD));
   process.exit(0);
 })();

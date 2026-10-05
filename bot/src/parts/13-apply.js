@@ -152,6 +152,22 @@ Chat in the room all you like; I'll only count what you send me direct.`, state.
     return true;
   }
 
+  // the full application, kept on their record when they're approved
+  function keepApplication(mn, a){
+    const r = rec(mn, true);
+    r.application = { at: a.at, staffTrack: !!a.staffTrack, byKey: Object.assign({}, a.byKey || {}),
+                      answers: a.byKey ? undefined : (a.answers || []).slice() };
+  }
+  // an application, question by question. onRecord: leave out what the record already shows (limits, triggers, aftercare)
+  function applicationText(a, onRecord){
+    const list = a.staffTrack ? QUESTIONS.concat(STAFF_QUESTIONS) : QUESTIONS;
+    const skip = onRecord ? ["limits","triggers","aftercare"] : [];
+    let o = "📋 Application, "+new Date(a.at).toLocaleDateString()+"\n";
+    if (a.byKey) list.filter(q => !skip.includes(q.key)).forEach(q => { o += "\n▸ "+q.text.split("\n")[0].split("  ")[0]+"\n   "+(a.byKey[q.key] || "—")+"\n"; });
+    else (a.answers || []).forEach((ans, qi) => { const k = OLD_ORDER[qi]; if (!skip.includes(k)) o += "\n▸ "+(k || "question "+(qi+1))+"\n   "+ans+"\n"; });
+    return o.trimEnd();
+  }
+
   function finishApplication(mn){
     const s = state.sessions.get(mn);
     if (!s) return;

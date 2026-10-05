@@ -174,6 +174,15 @@
     if (staffView && r.triggers)  o += "\n\n⚠️ Triggers (you and staff only):\n"+r.triggers;
     if (staffView && r.aftercare) o += "\n\n🤍 Aftercare:\n"+r.aftercare;
     if (notesView && r.notes)     o += "\n\n📝 Staff notes:\n"+r.notes;
+    // what they're holdin' right now (a mouthful ends up in the stomach)
+    if (staffView && r.prod && r.prod.held){
+      const p = prodOf(mn), cap = capacity(mn), held = heldTotal(p);
+      const parts = HOLES.filter(h => h !== "vulva" || hasVulva(mn) || (p.held.vulva||0) > 0)
+                         .map(h => ({ vulva:"Vulva", butt:"Butt", mouth:"Stomach" })[h]+" "+ml(p.held[h]||0));
+      o += "\n\n🫙 Holding: "+parts.join(" · ")+" ("+Math.round(100*held/Math.max(1, cap))+"% full)";
+    }
+    // the application they filled in, kept when they were approved (staff, and they themselves)
+    if (staffView && r.application) o += "\n\n"+applicationText(r.application, true);
     return o;
   }
 

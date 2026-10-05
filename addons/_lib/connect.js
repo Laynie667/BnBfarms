@@ -15,8 +15,10 @@ export function connect(def) {
   if (W.Farmhand && W.Farmhand.register) go();
   else {
     W.addEventListener("farmhand:ready", go);
-    // belt and braces: check again for a minute in case the signal was missed
+    // belt and braces: check every second for a minute in case the signal was missed, then every 10 seconds
+    // for as long as it takes (a bot that starts late, after a slow page load, still gets every add-on)
     let n = 0; const t = setInterval(() => { go(); if (done || ++n > 60) clearInterval(t); }, 1000);
+    const slow = setInterval(() => { go(); if (done) clearInterval(slow); }, 10000);
   }
 }
 

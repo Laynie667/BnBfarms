@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm add-on: Shows
 // @namespace    bnbfarm
-// @version      1.0.1
+// @version      1.0.2
 // @description  Udder judging, breeding stand, pony cart race (checkpoint zones) and obedience trial (cues), ribbons on records, and placard spots / display cases. Runs on the farm bot's computer, next to the Farmhand Bot script.
 // @author       Laynie & Alexia
 // @match        *://*.bondageprojects.elementfx.com/*
@@ -40,6 +40,10 @@
         go();
         if (done || ++n > 60) clearInterval(t);
       }, 1e3);
+      const slow = setInterval(() => {
+        go();
+        if (done) clearInterval(slow);
+      }, 1e4);
     }
   }
 

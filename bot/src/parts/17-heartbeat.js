@@ -18,6 +18,12 @@
       if (!inRoom()){ setBadge("joining room…","#ffc49b"); tryEnterRoom(); watchdog(); return; }
       // healthy
       state.lastHealthy = Date.now();
+      if (!state.onDutyOnce){
+        // the first time everything's up: what loaded (a "half-loaded" start shows here, or doesn't get here)
+        state.onDutyOnce = Date.now();
+        let addons = []; try { addons = W.Farmhand.list().map(a => a.name); } catch(e){}
+        recStep("on duty", { listeners: !!attachListeners._done, admin: botIsAdmin(), addons, people: (W.ChatRoomCharacter||[]).length, registered: Object.keys(L.people).length });
+      }
       state.reloading = false;
 
       const admin = botIsAdmin();

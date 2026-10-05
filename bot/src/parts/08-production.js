@@ -752,31 +752,57 @@
       const pos = C.MapData && C.MapData.Pos;
       if (!pos || C.MemberNumber === CFG.BOT_MEMBER) continue;
       const on = stalls.some(([,s]) => Math.abs(s.X-pos.X) <= 1 && Math.abs(s.Y-pos.Y) <= 1);
-      if (!on || !rec(C.MemberNumber)){ const p0 = rec(C.MemberNumber) && prodOf(C.MemberNumber); if (p0) p0.stall = null; continue; }
-      const mn = C.MemberNumber, p = prodOf(mn), now = Date.now();
+      const mn = C.MemberNumber, now = Date.now();
+      if (!on || !rec(mn)){
+        // walked past, or stepped off: a session in progress just pauses for a minute before it ends
+        const p0 = rec(mn) && prodOf(mn);
+        if (p0){ p0.stallSeen = 0; if (p0.stall && now - (p0.stall.seenAt||now) > CFG.PROD.STALL_AWAY_GRACE_S*1000) p0.stall = null; }
+        continue;
+      }
+      const p = prodOf(mn);
       // the stall drains down to a quarter of what they can hold, then stops (CFG.PROD.STALL_LEAVE_SHARE)
       const keepM = milkCap(mn) * CFG.PROD.STALL_LEAVE_SHARE, keepS = semenCap(mn) * CFG.PROD.STALL_LEAVE_SHARE;
       const doM = makesMilk(mn) && !milkDenied(mn) && !gearOf(mn).milk && p.milk > keepM;   // a pump they're wearin' does its own milkin' (gearTick)
       const doS = makesSemen(mn) && p.semen > keepS;
-      // the stall timer: minutes till they're down to a quarter
-      const mins = Math.ceil(Math.max(doM ? (p.milk - keepM) / CFG.PROD.STALL_MILK_PER_MIN : 0, doS ? (p.semen - keepS) / CFG.PROD.STALL_SEMEN_PER_MIN : 0));
+      // a stall that just finished with them rests a while; they're told once
+      if (!p.stall && (doM || doS) && p.stallRest > now){
+        if (p.stallRestTold !== p.stallRest){
+          p.stallRestTold = p.stallRest;
+          const left = Math.ceil((p.stallRest - now)/60000);
+          tell(mn, "🥛 The stall's cups are restin' after your last go, sugar. Come back in about "+left+" minute"+(left === 1 ? "" : "s")+".");
+        }
+        continue;
+      }
       if (!p.stall && (doM || doS)){
-        p.stall = { since: now }; sound(mn, "stall");
+        // only someone who stays put gets milked: passin' by the stall does nothin'
+        p.stallSeen = (p.stallSeen||0) + 1;
+        if (p.stallSeen < 2) continue;
+        // however much they hold, a session takes about STALL_SESSION_MIN minutes (never slower than the base rate)
+        const S = CFG.PROD.STALL_SESSION_MIN;
+        p.stall = { since: now, seenAt: now,
+                    rateM: Math.max(CFG.PROD.STALL_MILK_PER_MIN, (p.milk - keepM) / S),
+                    rateS: Math.max(CFG.PROD.STALL_SEMEN_PER_MIN, (p.semen - keepS) / S) };
+        p.stallSaid = now;   // the first line comes a while into the session, not right after the latch
+        const mins = Math.ceil(Math.max(doM ? (p.milk - keepM) / p.stall.rateM : 0, doS ? (p.semen - keepS) / p.stall.rateS : 0));
+        sound(mn, "stall");
         tell(mn, "🥛 The stall latches on. About "+mins+" minute"+(mins === 1 ? "" : "s")+" to drain you down to a quarter, sugar. Stay put.");
       }
-      if (p.stall) p.stall.until = now + mins*60000;
-      const gotM = doM ? drainMilk(mn, Math.min(CFG.PROD.STALL_MILK_PER_MIN*dtMin, p.milk - keepM)) : 0;
-      const gotS = doS ? drainSemen(mn, Math.min(CFG.PROD.STALL_SEMEN_PER_MIN*dtMin, p.semen - keepS)) : 0;
+      if (!p.stall) continue;
+      p.stall.seenAt = now;
+      const rateM = p.stall.rateM || CFG.PROD.STALL_MILK_PER_MIN, rateS = p.stall.rateS || CFG.PROD.STALL_SEMEN_PER_MIN;
+      p.stall.until = now + Math.ceil(Math.max(doM ? (p.milk - keepM) / rateM : 0, doS ? (p.semen - keepS) / rateS : 0))*60000;
+      const gotM = doM ? drainMilk(mn, Math.min(rateM*dtMin, p.milk - keepM)) : 0;
+      const gotS = doS ? drainSemen(mn, Math.min(rateS*dtMin, p.semen - keepS)) : 0;
       const got = gotM + gotS;
       // a cow in the stall gets a line now and then too
-      if (gotM > 0 && !gotS && Date.now() - (p.stallSaid||0) > 5*60000*(0.75+Math.random()*0.5)){
+      if (gotM > 0 && !gotS && Date.now() - (p.stallSaid||0) > CFG.PROD.STALL_LINE_MIN*60000*(0.85+Math.random()*0.3)){
         p.stallSaid = Date.now();
         const n = plainName(mn);
         emote("🥛 "+(addonLine("stallMilk", lineInfo(mn, { ml: ml(gotM) })) || ["The stall's cups pull at "+n+"'s teats in a slow rhythm, and warm milk runs down the lines into the bucket.",
           "Milk streams from "+n+" into the stall's bucket. They shift their weight and moo softly."][Math.floor(Math.random()*2)]));
       }
       // a stud in the stall gets their own show
-      if (gotS > 0 && Date.now() - (p.stallSaid||0) > 5*60000*(0.75+Math.random()*0.5)){
+      if (gotS > 0 && Date.now() - (p.stallSaid||0) > CFG.PROD.STALL_LINE_MIN*60000*(0.85+Math.random()*0.3)){
         p.stallSaid = Date.now();
         const n = plainName(mn), c = penisLabel(mn);
         const alt = addonLine("stallSemen", lineInfo(mn, { ml: ml(gotS), cock: c }));
@@ -789,6 +815,7 @@
       const doneS = !makesSemen(mn) || p.semen <= keepS + 0.5;
       if (p.stall && doneM && doneS){
         p.stall = null;
+        const R = CFG.PROD.STALL_REST_MIN; p.stallRest = now + (R[0] + Math.random()*(R[1]-R[0]))*60000;
         const altDone = got > 0 && addonLine(makesSemen(mn) && !makesMilk(mn) ? "stallDoneSemen" : "stallDone", lineInfo(mn));
         if (got > 0) emote(altDone ? (makesSemen(mn) && !makesMilk(mn) ? "🐂 " : "🥛 ")+altDone : makesSemen(mn) && !makesMilk(mn)
           ? "🐂 The stall wrings "+plainName(mn)+" down to the last quarter and lets go. Balls aching and light, legs wobbly. Good stud!"

@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm add-on: Work
 // @namespace    bnbfarm
-// @version      1.0.1
+// @version      1.0.2
 // @description  Staff leaderboard, private write-ups (writer and recipient only; others see a count) and opt-in inspections with an automatic checklist. Runs on the farm bot's computer, next to the Farmhand Bot script.
 // @author       Laynie & Alexia
 // @match        *://*.bondageprojects.elementfx.com/*
@@ -40,6 +40,10 @@
         go();
         if (done || ++n > 60) clearInterval(t);
       }, 1e3);
+      const slow = setInterval(() => {
+        go();
+        if (done) clearInterval(slow);
+      }, 1e4);
     }
   }
 

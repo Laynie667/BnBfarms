@@ -136,7 +136,7 @@
   W.FarmhandExport   = exportLedger;
   W.FarmhandLedger   = ()=>L;
   // the tests in tests/ peek inside through these; the live game never sets __FARMHAND_TEST__
-  if (W.__FARMHAND_TEST__) Object.assign(W, { __st:()=>state, __cfg:CFG, __pt:prodTick, __qt:quotaTick, __lt:leashTick, __ms:milkingStallTick, __vt:voiceTick, __sync:syncCompanions, __gt:gearTick, __ht:homeTick, __addons:(h, ...a)=>addonsEmit(h, ...a), __stateFor:(mn)=>stateFor(mn), __leadTick:()=>leadTick(), __ambient:()=>ambientTick(), __about:(t)=>aboutWhom(t), __announce:(t)=>announce(t), __reply:(mn,t,ch)=>reply(mn,t,ch), __office:()=>officeCheck() });
+  if (W.__FARMHAND_TEST__) Object.assign(W, { __st:()=>state, __cfg:CFG, __pt:prodTick, __qt:quotaTick, __lt:leashTick, __ms:milkingStallTick, __vt:voiceTick, __sync:syncCompanions, __gt:gearTick, __ht:homeTick, __addons:(h, ...a)=>addonsEmit(h, ...a), __stateFor:(mn)=>stateFor(mn), __leadTick:()=>leadTick(), __ambient:()=>ambientTick(), __about:(t)=>aboutWhom(t), __announce:(t)=>announce(t), __reply:(mn,t,ch)=>reply(mn,t,ch), __office:()=>officeCheck(), __recFile:()=>recFile(), __rec:REC });
   W.FarmhandSyncKeys = ()=>syncAllPresent(true);
   W.FarmhandFriends  = ()=>W.Player.FriendList;
   W.FarmhandAddFriend= (mn)=>addFriend(mn, false);
@@ -155,7 +155,9 @@
     W.document.body.appendChild(d);
     state.badge = d;
   }
-  function setBadge(t,c){ if(!state.badge) return; state.badge.textContent="🌾 "+t; state.badge.style.color=c||"#ffd98a"; }
+  function setBadge(t,c){
+    const k = String(t).replace(/\d+/g, "#"); if (k !== state.badgeKey){ state.badgeKey = k; recStep("badge: "+t); }
+    if(!state.badge) return; state.badge.textContent="🌾 "+t; state.badge.style.color=c||"#ffd98a"; }
 
   /* ───────────── probes / login / room ───────────── */
 

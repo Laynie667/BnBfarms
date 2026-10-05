@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.10.3
+// @version      0.10.4
 // @description  Your B&B Farm panel: the farm girl's answers, stat cards and guides, right in the game.
 // @author       Laynie & Alexia
 // @match        *://*.bondageprojects.elementfx.com/*
@@ -227,7 +227,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.10.3";
+  var VERSION = "0.10.4";
 
   // extension/src/config.js
   var BOT_MEMBER = 260239;
@@ -377,7 +377,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     { name: "Keys and calls", cmds: ["keys <who>", "keysync", "keydump", "grant <who> <tier>", "revoke <who>", "forced", "summon <who>", "summon all", "pasture", "onduty", "cover"] }
   ];
   var OWNER_GROUPS = [
-    { name: "Proprietors", cmds: ["staffadd <who> <role>", "staffremove <who>", "goldkey <who>", "notice <text>", "feeding on", "curfew on", "fair open", "addons off <name>", "addons on <name>", "backup", "health"] }
+    { name: "Proprietors", cmds: ["staffadd <who> <role>", "staffremove <who>", "goldkey <who>", "notice <text>", "feeding on", "curfew on", "fair open", "addons off <name>", "addons on <name>", "backup", "health", "rec", "rec mark <note>"] }
   ];
   var needsInput = (cmd) => /</.test(cmd);
   var cmdStem = (cmd) => cmd.replace(/\s*<.*$/, "").trim();

@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm add-on: Glory stalls
 // @namespace    bnbfarm
-// @version      1.3.2
+// @version      1.3.3
 // @description  Glory stall spots: simulated ~5 minute scenes every 10-30 minutes, real visitors, shifts, punishment shifts and a board. Runs on the farm bot's computer, next to the Farmhand Bot script.
 // @author       Laynie & Alexia
 // @match        *://*.bondageprojects.elementfx.com/*
@@ -40,6 +40,10 @@
         go();
         if (done || ++n > 60) clearInterval(t);
       }, 1e3);
+      const slow = setInterval(() => {
+        go();
+        if (done) clearInterval(slow);
+      }, 1e4);
     }
   }
   var pick = (list) => list[Math.floor(Math.random() * list.length)];

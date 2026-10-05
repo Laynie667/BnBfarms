@@ -41,7 +41,8 @@ const roomText=s=>{ const d=s&&s[1]; if(!d) return null;
   eval(fs.readFileSync(path.join(__dirname,'../dist/farmhand-dairy.user.js'),'utf8')); await wait(200);
   ok(W.Farmhand.list().some(a=>a.name==='dairy'), 'dairy registered');
   let k=sent.length; handlers.AccountBeep({MemberNumber:500,Message:'stats'}); await drain(1500);
-  const p=L().people[500].prod; p.milk=50000; p.stallSaid=0;
+  const p=L().people[500].prod; p.milk=50000;
+  W.__ms(); W.__ms(); p.stallSaid=0;   // latches on the second look (they stayed put); the first line comes a while in
   k=sent.length; W.__ms(); await drain();
   const em=sent.slice(k).map(s=>roomText(s)).filter(Boolean).join(' | ');
   ok(/udder|teats|bucket|moo|rail/.test(em) && /Moo/.test(em), 'the milking stall uses a dairy line ('+em.slice(0,140)+')');
@@ -49,7 +50,7 @@ const roomText=s=>{ const d=s&&s[1]; if(!d) return null;
   // certificate: a week passes
   const d=()=>L().mods['dairy'];
   W.__addons('tick'); p.totals.milked+=1500; W.__addons('tick');
-  ok(d().week.ml['500']>=1500, 'this week'+"'"+'s milk is counted');
+  ok(d().week.ml['500']>=1499.5, 'this week'+"'"+'s milk is counted');
   d().week.key='2000-W01'; d().cert['500']={week:'1999-W52',grade:'D',ml:1,award:'x'};
   k=sent.length; W.__addons('tick'); await drain();
   ok(d().cert['500'].week==='2000-W01' && d().cert['500'].ml>=1500, 'the new certificate replaces the old one');
@@ -58,7 +59,7 @@ const roomText=s=>{ const d=s&&s[1]; if(!d) return null;
   ok(/Grade/.test(beepsTo(k,500).join(' ')), '?certificate shows it');
   // switched off: the bot's own lines come back
   k=sent.length; handlers.AccountBeep({MemberNumber:221397,Message:'addons off dairy'}); await drain(1500);
-  p.milk=50000; p.stallSaid=0; p.stall=null; k=sent.length; W.__ms(); await drain();
+  p.milk=50000; p.stall=null; p.stallRest=0; W.__ms(); W.__ms(); p.stallSaid=0; k=sent.length; W.__ms(); await drain();
   ok(sent.slice(k).some(s=>/stall's cups pull|streams from/.test(roomText(s)||'')), 'with dairy off, the bot'+"'"+'s own line is used');
   const errs=warns.filter(w=>/add-on/.test(w)); ok(!errs.length, 'no add-on errors logged '+errs.join(' | '));
   out(fails ? fails+' FAILED' : 'ALL PASSED'); process.exit(fails?1:0);

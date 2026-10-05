@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm add-on: Dairy
 // @namespace    bnbfarm
-// @version      1.0.1
+// @version      1.0.2
 // @description  Warmer, more varied milking lines (with praise/degrade touches) and a weekly milk certificate that replaces the last one. Runs on the farm bot's computer, next to the Farmhand Bot script.
 // @author       Laynie & Alexia
 // @match        *://*.bondageprojects.elementfx.com/*
@@ -40,6 +40,10 @@
         go();
         if (done || ++n > 60) clearInterval(t);
       }, 1e3);
+      const slow = setInterval(() => {
+        go();
+        if (done) clearInterval(slow);
+      }, 1e4);
     }
   }
   var pick = (list) => list[Math.floor(Math.random() * list.length)];

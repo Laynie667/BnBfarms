@@ -630,7 +630,10 @@ YOU
   ?pasture · step back (bronze only) till ?onduty
 
 UPKEEP
-  ?backup · ?health`
+  ?backup · ?health
+  ?rec · the flight recorder (the last hour of everything)
+  ?rec mark <what just happened> · a note in the recording
+  ?rec save · on the bot's screen: /office rec save downloads it`
   };
   const GUIDE_ALIAS = { new:"start", rules:"start", key:"keys", doors:"keys", herd2:"herds", tier:"tiers", stocks:"tiers",
                         milk:"barn", milking:"barn", stats:"barn", nursing:"barn", breed:"breeding", scene:"breeding",

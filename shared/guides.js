@@ -29,7 +29,7 @@ export const STAFF_GROUPS = [
 ];
 
 export const OWNER_GROUPS = [
-  { name: "Proprietors", cmds: ["staffadd <who> <role>", "staffremove <who>", "goldkey <who>", "notice <text>", "feeding on", "curfew on", "fair open", "addons off <name>", "addons on <name>", "backup", "health"] },
+  { name: "Proprietors", cmds: ["staffadd <who> <role>", "staffremove <who>", "goldkey <who>", "notice <text>", "feeding on", "curfew on", "fair open", "addons off <name>", "addons on <name>", "backup", "health", "rec", "rec mark <note>"] },
 ];
 
 // "breed <who>" needs filling in; "stats" can be sent as it is

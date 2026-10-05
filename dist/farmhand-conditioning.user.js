@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm add-on: Conditioning
 // @namespace    bnbfarm
-// @version      1.0.1
+// @version      1.0.2
 // @description  Guided trance sessions per species and level (fun, deep, no human left) for people with ?hypno on, run by their herd leader; tiers and nicknames grow with sessions. Runs on the farm bot's computer, next to the Farmhand Bot script.
 // @author       Laynie & Alexia
 // @match        *://*.bondageprojects.elementfx.com/*
@@ -40,6 +40,10 @@
         go();
         if (done || ++n > 60) clearInterval(t);
       }, 1e3);
+      const slow = setInterval(() => {
+        go();
+        if (done) clearInterval(slow);
+      }, 1e4);
     }
   }
   var between = (lo, hi) => lo + Math.floor(Math.random() * (hi - lo + 1));

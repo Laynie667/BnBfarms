@@ -235,6 +235,7 @@
     PAINT_H: 6,                   // cum-covered this long unless they ?wash
     SCENT_H: 1,                   // a stud's seed scent lasts this long
     MILK_QUOTA_ML: 1000,          // stock that makes milk should give this much a day (staff: ?quota)
+    QUOTA_MIN_PRESENT: 60,        // the milk quota only counts a day they spent at least this many minutes on the farm
     QUOTA_STREAK_UP: 5,           // this many days in a row on quota moves 'em up a tier (new → trained → prize)
     LABOUR_MIN: 45,               // labour lasts this long before the litter comes
     LABOUR_WAIT_H: 12,            // due but away from the farm this long: the litter comes without the show

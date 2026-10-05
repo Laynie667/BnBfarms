@@ -633,7 +633,12 @@
       if (p.heat && p.heat.until <= now){ p.heat = null; whisper(mn, "Your heat's passed, "+plainName(mn)+". Bet you're feelin' a little calmer now, hon."); }
       if (r.naturalHeat && !limitBlocks(mn,"heat") && !inHeat(p) && p.nextHeatAt && now >= p.nextHeatAt) startHeat(mn, 0);
       if (r.naturalHeat && !p.nextHeatAt) p.nextHeatAt = now + CFG.PROD.NATURAL_HEAT_EVERY_D*86400000;
-      if (charFor(mn)){ p.seenDay = dayKey(); scentTick(mn); sloshTick(mn); }
+      if (charFor(mn)){
+        p.seenDay = dayKey(); scentTick(mn); sloshTick(mn);
+        // minutes on the farm today (the milk quota only counts days they were really here)
+        if (!p.seenMin || p.seenMin.day !== p.seenDay) p.seenMin = { day: p.seenDay, min: 0 };
+        p.seenMin.min += CFG.HEARTBEAT_MS/60000;
+      }
       if (p.painted && p.painted.until <= now) p.painted = null;
       checkTitles(mn);
       // milk denied: full and achin', and everybody can tell
@@ -756,7 +761,15 @@
       if (!on || !rec(mn)){
         // walked past, or stepped off: a session in progress just pauses for a minute before it ends
         const p0 = rec(mn) && prodOf(mn);
-        if (p0){ p0.stallSeen = 0; if (p0.stall && now - (p0.stall.seenAt||now) > CFG.PROD.STALL_AWAY_GRACE_S*1000) p0.stall = null; }
+        if (p0){
+          p0.stallSeen = 0;
+          if (p0.stall && now - (p0.stall.seenAt||now) > CFG.PROD.STALL_AWAY_GRACE_S*1000){
+            // gone a while: the session's put on hold for 10 minutes, and comin' back picks it up quietly
+            // (seen live: steppin' off for two minutes started a whole new session with a new announcement)
+            p0.stallPaused = { until: now + 600000, rateM: p0.stall.rateM, rateS: p0.stall.rateS, since: p0.stall.since };
+            p0.stall = null;
+          }
+        }
         continue;
       }
       const p = prodOf(mn);
@@ -777,6 +790,13 @@
         // only someone who stays put gets milked: passin' by the stall does nothin'
         p.stallSeen = (p.stallSeen||0) + 1;
         if (p.stallSeen < 2) continue;
+        // back to a session they stepped away from: carry on, no new announcement
+        if (p.stallPaused && p.stallPaused.until > now){
+          p.stall = { since: p.stallPaused.since || now, seenAt: now, rateM: p.stallPaused.rateM, rateS: p.stallPaused.rateS };
+          p.stallPaused = null;
+        }
+      }
+      if (!p.stall && (doM || doS)){
         // however much they hold, a session takes about STALL_SESSION_MIN minutes (never slower than the base rate)
         const S = CFG.PROD.STALL_SESSION_MIN;
         p.stall = { since: now, seenAt: now,
@@ -814,7 +834,7 @@
       const doneM = !makesMilk(mn) || milkDenied(mn) || gearOf(mn).milk || p.milk <= keepM + 1;
       const doneS = !makesSemen(mn) || p.semen <= keepS + 0.5;
       if (p.stall && doneM && doneS){
-        p.stall = null;
+        p.stall = null; p.stallPaused = null;
         const R = CFG.PROD.STALL_REST_MIN; p.stallRest = now + (R[0] + Math.random()*(R[1]-R[0]))*60000;
         const altDone = got > 0 && addonLine(makesSemen(mn) && !makesMilk(mn) ? "stallDoneSemen" : "stallDone", lineInfo(mn));
         if (got > 0) emote(altDone ? (makesSemen(mn) && !makesMilk(mn) ? "🐂 " : "🥛 ")+altDone : makesSemen(mn) && !makesMilk(mn)
@@ -1256,6 +1276,10 @@
     for (const k in L.people){
       const mn = parseInt(k,10), r = L.people[k], q = quotaOf(mn), p = r.prod;
       if (!q || !p || p.seenDay !== prev) continue;     // only judged on days they were on the farm
+      // ...for a proper while (seen live: a new cow got a naughty mark for a short first visit), and never the
+      // day they signed up
+      if (!p.seenMin || p.seenMin.day !== prev || p.seenMin.min < CFG.QUOTA_MIN_PRESENT) continue;
+      if (r.registeredAt && dayKey(new Date(r.registeredAt)) === prev) continue;
       const got = milkedOn(mn, prev);
       if (got >= q){
         r.quotaStreak = (r.quotaStreak||0) + 1;

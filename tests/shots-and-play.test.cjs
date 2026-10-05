@@ -93,8 +93,16 @@ W.InventoryGroupIsBlocked=()=>true;   // what the live game does
   // N titles
   P(221397).totals.milked=100000; n=sent.length; W.__pt(); await wait(2500); out('N title ->', ems(n).join(' / ').slice(0,100));
   // J quota: Moo is livestock cow
-  await B(500,'milkable on'); await B(500,'stats'); const mp=P(500); mp.seenDay='2000-01-01'; mp.mday={day:'2000-01-01',ml:10};
+  await B(500,'milkable on'); await B(500,'stats'); const mp=P(500); mp.seenDay='2000-01-01'; mp.seenMin={day:'2000-01-01',min:90}; mp.mday={day:'2000-01-01',ml:10};
   L().quotaDay='2000-01-01'; n=sent.length; W.__qt(); await wait(2500); out('J quota miss ->', L().people[500].naughtyMarks, ems(n).join(' / ').slice(0,90));
+  // from the live recording: a short visit (or the day they signed up) never earns a naughty mark
+  { const before=L().people[500].naughtyMarks||0;
+    mp.seenDay='2000-01-02'; mp.seenMin={day:'2000-01-02',min:10}; mp.mday={day:'2000-01-02',ml:0};
+    L().quotaDay='2000-01-02'; W.__qt();
+    out('J short visit: no mark ->', (L().people[500].naughtyMarks||0)===before);
+    mp.seenDay='2000-01-03'; mp.seenMin={day:'2000-01-03',min:300}; mp.mday={day:'2000-01-03',ml:0}; const reg=L().people[500].registeredAt; L().people[500].registeredAt=Date.parse('2000-01-03T12:00:00Z');
+    L().quotaDay='2000-01-03'; W.__qt(); L().people[500].registeredAt=reg;
+    out('J the day they signed up: no mark ->', (L().people[500].naughtyMarks||0)===before); }
   await B(221397,'stats'); out('STATS\n'+sent.filter(s=>s[1].Type==='Whisper'&&s[1].Target===221397).slice(-2).map(s=>s[1].Content).join('\n'));
   process.exit(0);
 })();

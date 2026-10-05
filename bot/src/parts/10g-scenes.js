@@ -94,7 +94,7 @@
       const line = fillV((r.degradeMe && b.d) || (r.praiseMe && b.p) || b.t);
       // a line that starts with whoever's doin' it comes from them (their Companion posts it); the rest from the one it's done to
       const from = vars.bMn && vars.b && line.startsWith(vars.b) ? vars.bMn : t;
-      if (b.say) say(line, false, t); else emote(vars.icon+" "+line, from);
+      if (b.say) say(line, false, t); else emote(vars.icon+" "+line, from, [t, vars.bMn]);
       later(step, (15 + Math.random()*10)*1000);
     };
     step();

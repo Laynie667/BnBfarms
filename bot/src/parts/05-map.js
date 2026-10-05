@@ -116,7 +116,7 @@
     if (!force && mn !== CFG.BOT_MEMBER && canLead(mn)) return lead(mn, pt, urgent);
     return teleportNow(mn, pt, urgent);
   }
-  function teleportNow(mn, pt, urgent){
+  function teleportNow(mn, pt, urgent, tries){
     if (!pt || !botIsAdmin() || !charFor(mn)) return false;
     // The game reads entry.Position — {X,Y} at the top level was silently ignored.
     send("ChatRoomChat", {
@@ -124,6 +124,17 @@
       Dictionary:[{ Tag:"MapViewTeleport", Position:{ X: pt.X, Y: pt.Y } }],
       Target: mn
     }, urgent);
+    // a teleport the game drops says nothin' (seen live: a summon that only worked the second time), so check
+    // they got there and send it once more if not. A newer teleport for them replaces this check.
+    state.tpCheck = state.tpCheck || new Map();
+    const id = Symbol("tp"); state.tpCheck.set(mn, id);
+    later(() => {
+      if (state.tpCheck.get(mn) !== id) return;
+      const C = charFor(mn), p = C && C.MapData && C.MapData.Pos;
+      if (!C || !p || (Math.abs(p.X-pt.X) <= 1 && Math.abs(p.Y-pt.Y) <= 1)){ state.tpCheck.delete(mn); return; }
+      if ((tries||0) < 1){ log("Teleport of "+mn+" didn't take; sendin' it again."); teleportNow(mn, pt, urgent, (tries||0)+1); }
+      else { state.tpCheck.delete(mn); warn("Teleport of "+mn+" to "+pt.X+","+pt.Y+" didn't take twice (they're at "+p.X+","+p.Y+")."); }
+    }, 12000);
     return true;
   }
 

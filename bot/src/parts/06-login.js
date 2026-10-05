@@ -136,7 +136,7 @@
   W.FarmhandExport   = exportLedger;
   W.FarmhandLedger   = ()=>L;
   // the tests in tests/ peek inside through these; the live game never sets __FARMHAND_TEST__
-  if (W.__FARMHAND_TEST__) Object.assign(W, { __st:()=>state, __cfg:CFG, __pt:prodTick, __qt:quotaTick, __lt:leashTick, __ms:milkingStallTick, __vt:voiceTick, __sync:syncCompanions, __gt:gearTick, __ht:homeTick, __addons:(h, ...a)=>addonsEmit(h, ...a), __stateFor:(mn)=>stateFor(mn), __leadTick:()=>leadTick(), __ambient:()=>ambientTick(), __about:(t)=>aboutWhom(t), __announce:(t)=>announce(t), __reply:(mn,t,ch)=>reply(mn,t,ch), __office:()=>officeCheck() });
+  if (W.__FARMHAND_TEST__) Object.assign(W, { __st:()=>state, __cfg:CFG, __pt:prodTick, __qt:quotaTick, __lt:leashTick, __ms:milkingStallTick, __vt:voiceTick, __sync:syncCompanions, __gt:gearTick, __ht:homeTick, __addons:(h, ...a)=>addonsEmit(h, ...a), __stateFor:(mn)=>stateFor(mn), __leadTick:()=>leadTick(), __ambient:()=>ambientTick(), __about:(t)=>aboutWhom(t), __announce:(t)=>announce(t), __reply:(mn,t,ch)=>reply(mn,t,ch), __office:()=>officeCheck(), __namesHere:(t)=>namesHere(t) });
   W.FarmhandSyncKeys = ()=>syncAllPresent(true);
   W.FarmhandFriends  = ()=>W.Player.FriendList;
   W.FarmhandAddFriend= (mn)=>addFriend(mn, false);

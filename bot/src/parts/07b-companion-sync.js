@@ -12,6 +12,9 @@
   // staff lookups about somebody else go to the Companion's Office tab
   const DOC_CMDS = ["record","stats","vet","quota","keys","size","measure","pedigree"];
 
+  // amounts as the panel shows them (0.1 L steps from a litre up, 50 mL below): milk fillin' a few mL every
+  // tick doesn't send a new panel each time, only when the number they see would change
+  function shownMl(n){ n = Number(n) || 0; return n >= 1000 ? Math.round(n/100)*100 : Math.round(n/50)*50; }
   function stateFor(mn){
     // proprietors named in CFG.PROPRIETORS are staff even if their record lists no roles (or they have no record yet)
     const staff = isStaff(mn);
@@ -32,10 +35,10 @@
     try {
       const p = prodOf(mn), now = Date.now();
       // milk rounds to 10 mL so a slowly fillin' udder doesn't resend every minute
-      if (makesMilk(mn)) s.milk = { ml: Math.round(p.milk/10)*10, cap: Math.round(milkCap(mn)), grade: milkGrade(mn), lastAt: p.lastMilkAt || 0 };
+      if (makesMilk(mn)) s.milk = { ml: shownMl(p.milk), cap: Math.round(milkCap(mn)), grade: milkGrade(mn), lastAt: p.lastMilkAt || 0 };
       if (p.stall && p.stall.until) s.stallUntil = Math.ceil(p.stall.until / 60000) * 60000;   // milkin' stall timer (to the minute)
       if (makesSemen(mn)) s.semen = { ml: Math.round(p.semen), cap: Math.round(semenCap(mn)) };
-      s.holding = { ml: Math.round(heldTotal(p)), cap: Math.round(capacity(mn)) };
+      s.holding = { ml: shownMl(heldTotal(p)), cap: Math.round(capacity(mn)) };
       s.body = bodyParts(mn).filter(k => CFG.SIZES[k]).map(k => ({ part: k, label: CFG.SIZES[k].label, size: sizeName(mn, k) }));
       if (inHeat(p)) s.heatUntil = p.heat.until;
       if (p.preg) s.preg = { due: p.preg.due, sires: p.preg.sires.map(plainName) };

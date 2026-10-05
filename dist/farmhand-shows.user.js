@@ -49,7 +49,7 @@
 
   // addons/shows/index.js
   var EVENTS = { udder: "Udder Judging", breeding: "Breeding Stand", race: "Pony Cart Race", obedience: "Obedience Trial" };
-  var PLACES = ["🥇 1st", "🥈 2nd", "🥉 3rd"];
+  var PLACES = ["\u{1F947} 1st", "\u{1F948} 2nd", "\u{1F949} 3rd"];
   var RIBBON = ["blue", "red", "yellow"];
   var api = null;
   var raceTimer = null;
@@ -118,7 +118,7 @@
         e.cp++;
         if (e.cp >= cps.length) {
           e.done = Date.now();
-          api.emote("🏁 " + api.name(mn) + " thunders across the finish line in " + ((e.done - sh.start) / 1e3).toFixed(1) + " seconds!", mn);
+          api.emote("\u{1F3C1} " + api.name(mn) + " thunders across the finish line in " + ((e.done - sh.start) / 1e3).toFixed(1) + " seconds!", mn);
         } else api.privateEmote(mn, "Checkpoint " + e.cp + " of " + cps.length + "! On to " + cps[e.cp] + ".");
       }
     }
@@ -155,7 +155,7 @@
     e.cues++;
     if (ok) e.passed++;
     api.save();
-    api.emote(ok ? "🎀 " + api.name(mn) + " does it perfectly on cue. The judge marks the card." : "🎀 " + api.name(mn) + " misses the cue. The judge shakes their head and marks it down.", mn);
+    api.emote(ok ? "\u{1F380} " + api.name(mn) + " does it perfectly on cue. The judge marks the card." : "\u{1F380} " + api.name(mn) + " misses the cue. The judge shakes their head and marks it down.", mn);
   }
   function onRoleplay(mn, text) {
     const c = cues.get(mn);
@@ -169,7 +169,7 @@
     const ranked = scores(sh).filter((x) => x[1] > 0).sort((a, b) => b[1] - a[1]).slice(0, 3);
     d.show = null;
     if (!ranked.length) {
-      api.announce("🎀 The " + EVENTS[sh.event] + " is over, y'all. Nobody placed this time.");
+      api.announce("\u{1F380} The " + EVENTS[sh.event] + " is over, y'all. Nobody placed this time.");
       api.save();
       return "Closed. Nobody placed.";
     }
@@ -177,8 +177,8 @@
       (d.ribbons[mn] = d.ribbons[mn] || []).push({ event: sh.event, place, at: Date.now() });
       delete d.ribbonSaid[mn];
     });
-    api.announce("🎀 " + EVENTS[sh.event].toUpperCase() + " RESULTS: " + ranked.map(([mn, v], i) => PLACES[i] + " " + api.name(mn) + " (" + shown(sh, mn, v) + ")").join(" · "));
-    api.emote("🎀 The judge pins a " + RIBBON[0] + " ribbon on " + api.name(ranked[0][0]) + ". Best in show!", ranked[0][0]);
+    api.announce("\u{1F380} " + EVENTS[sh.event].toUpperCase() + " RESULTS: " + ranked.map(([mn, v], i) => PLACES[i] + " " + api.name(mn) + " (" + shown(sh, mn, v) + ")").join(" \xB7 "));
+    api.emote("\u{1F380} The judge pins a " + RIBBON[0] + " ribbon on " + api.name(ranked[0][0]) + ". Best in show!", ranked[0][0]);
     api.save();
     return "Closed and ribbons handed out.";
   }
@@ -189,10 +189,10 @@
       const ev = String(args[1] || "").toLowerCase();
       if (!EVENTS[ev]) return c.reply("Which show? ?show open udder | breeding | race | obedience");
       if (sh) return c.reply("The " + EVENTS[sh.event] + " is already on. ?show close first.");
-      if (ev === "race" && !checkpoints().length) return c.reply("Set up the course first: zones or spots called race-1, race-2, race-3… in order.");
+      if (ev === "race" && !checkpoints().length) return c.reply("Set up the course first: zones or spots called race-1, race-2, race-3\u2026 in order.");
       d.show = { event: ev, by: sender, entrants: {}, start: 0, at: Date.now() };
       A.save();
-      A.announce("🎀 The " + EVENTS[ev] + " is open, y'all! Stock, say ?show enter." + (ev === "race" ? " Staff start the clock with ?show go." : ev === "obedience" ? " Judges: ?show cue <who> sit|stay|heel|speak|beg." : " Judges: ?show score <who> <1-10>."));
+      A.announce("\u{1F380} The " + EVENTS[ev] + " is open, y'all! Stock, say ?show enter." + (ev === "race" ? " Staff start the clock with ?show go." : ev === "obedience" ? " Judges: ?show cue <who> sit|stay|heel|speak|beg." : " Judges: ?show score <who> <1-10>."));
       return;
     }
     if (w === "enter") {
@@ -202,7 +202,7 @@
       if (sh.event === "race" && sh.start) return c.reply("The race has already started, sugar. Next time!");
       sh.entrants[sender] = sh.entrants[sender] || { scores: {}, cues: 0, passed: 0, cp: 0, done: 0 };
       A.save();
-      A.emote("🎀 " + A.name(sender) + " steps into the ring for the " + EVENTS[sh.event] + ".", sender);
+      A.emote("\u{1F380} " + A.name(sender) + " steps into the ring for the " + EVENTS[sh.event] + ".", sender);
       return;
     }
     if (w === "go") {
@@ -210,7 +210,7 @@
       if (!Object.keys(sh.entrants).length) return c.reply("Nobody's entered yet.");
       sh.start = Date.now();
       A.save();
-      A.announce("🏁 Ready… set… GO! Through " + checkpoints().join(", ") + " in order!");
+      A.announce("\u{1F3C1} Ready\u2026 set\u2026 GO! Through " + checkpoints().join(", ") + " in order!");
       if (!raceTimer) raceTimer = A.later(raceTick, 1e3);
       return;
     }
@@ -235,9 +235,9 @@
       if (!staff) return c.reply("Staff close the shows, sugar.");
       return c.reply(closeShow(sender));
     }
-    if (!sh) return c.reply("🎀 No show on right now. Staff: ?show open udder | breeding | race | obedience.");
+    if (!sh) return c.reply("\u{1F380} No show on right now. Staff: ?show open udder | breeding | race | obedience.");
     const now = scores(sh).sort((a, b) => b[1] - a[1]);
-    c.reply("🎀 " + EVENTS[sh.event] + (sh.start ? " (under way)" : "") + "\nEntered: " + (Object.keys(sh.entrants).map((m) => A.name(Number(m))).join(", ") || "nobody yet") + (now.length ? "\nStanding: " + now.slice(0, 3).map(([m, v], i) => i + 1 + ". " + A.name(m) + " " + shown(sh, m, v)).join(", ") : ""));
+    c.reply("\u{1F380} " + EVENTS[sh.event] + (sh.start ? " (under way)" : "") + "\nEntered: " + (Object.keys(sh.entrants).map((m) => A.name(Number(m))).join(", ") || "nobody yet") + (now.length ? "\nStanding: " + now.slice(0, 3).map(([m, v], i) => i + 1 + ". " + A.name(m) + " " + shown(sh, m, v)).join(", ") : ""));
   }
   function onJoin(mn) {
     const x = latestRibbon(mn), d = D();
@@ -246,14 +246,14 @@
     if (d.ribbonSaid[mn] === today) return;
     d.ribbonSaid[mn] = today;
     api.save();
-    api.later(() => api.char(mn) && api.emote("🎀 " + api.name(mn) + " wears their " + ribbonText(x) + " proudly.", mn), 12e3);
+    api.later(() => api.char(mn) && api.emote("\u{1F380} " + api.name(mn) + " wears their " + ribbonText(x) + " proudly.", mn), 12e3);
   }
   function placardText(name) {
     const t = D().placards[name] || "(nothing written yet)";
     const who = api.whoOnSpot("display-" + name, 0)[0];
-    if (!who) return "🪧 " + name + ": " + t;
+    if (!who) return "\u{1FAA7} " + name + ": " + t;
     const r = api.rec(who) || {}, rib = latestRibbon(who);
-    return "🪧 " + name + ": " + t + "\nOn display: " + api.name(who) + (r.species ? ", " + r.species : "") + (rib ? " · " + ribbonText(rib) : "");
+    return "\u{1FAA7} " + name + ": " + t + "\nOn display: " + api.name(who) + (r.species ? ", " + r.species : "") + (rib ? " \xB7 " + ribbonText(rib) : "");
   }
   function cmdPlacard(c) {
     const { sender, args, rest, api: A } = c, d = D();
@@ -263,7 +263,7 @@
       if (!name || !text) return c.reply("?sign set <name> <text>, for a spot called placard-<name>.");
       d.placards[name] = text.slice(0, 400);
       A.save();
-      return c.reply("🪧 Placard " + name + " written." + (A.spot("placard-" + name) ? "" : " (Set a spot called placard-" + name + " so people can read it there.)"));
+      return c.reply("\u{1FAA7} Placard " + name + " written." + (A.spot("placard-" + name) ? "" : " (Set a spot called placard-" + name + " so people can read it there.)"));
     }
     const near = Object.keys(A.spots()).filter((n) => n.startsWith("placard-") && A.onSpot(sender, n, 2));
     if (!near.length) return c.reply("Stand by a placard to read it, sugar.");
@@ -275,7 +275,7 @@
     if (sh || rib.length) cards.push({
       title: "Shows",
       text: sh ? "The " + EVENTS[sh.event] + " is on" + (sh.entrants[mn] ? ", and you're entered." : ".") : void 0,
-      lines: rib.slice(-5).reverse().map((x) => [PLACES[x.place], EVENTS[x.event] + " · " + new Date(x.at).toLocaleDateString()]),
+      lines: rib.slice(-5).reverse().map((x) => [PLACES[x.place], EVENTS[x.event] + " \xB7 " + new Date(x.at).toLocaleDateString()]),
       buttons: sh && !sh.entrants[mn] ? [{ label: "Enter the show", cmd: "show enter", accent: true }] : [{ label: "Show status", cmd: "show" }]
     });
     if (api.isStaff(mn)) cards.push({
@@ -298,7 +298,7 @@
       show: { usage: "show open|enter|score|cue|go|close", private: true, run: cmdShow },
       ribbons: { usage: "ribbons", private: true, run: (c) => {
         const t = c.args[0] ? c.api.find(c.args[0]) : c.sender, r = t && D().ribbons[t] || [];
-        c.reply(r.length ? "🎀 RIBBONS — " + c.api.name(t) + "\n" + r.map((x) => PLACES[x.place] + " · " + EVENTS[x.event] + " · " + new Date(x.at).toLocaleDateString()).join("\n") : t ? c.api.name(t) + " has no ribbons yet." : "Who's that, hon?");
+        c.reply(r.length ? "\u{1F380} RIBBONS \u2014 " + c.api.name(t) + "\n" + r.map((x) => PLACES[x.place] + " \xB7 " + EVENTS[x.event] + " \xB7 " + new Date(x.at).toLocaleDateString()).join("\n") : t ? c.api.name(t) + " has no ribbons yet." : "Who's that, hon?");
       } },
       sign: { usage: "sign [set <name> <text>]", aliases: ["placard"], private: true, run: cmdPlacard }
     },

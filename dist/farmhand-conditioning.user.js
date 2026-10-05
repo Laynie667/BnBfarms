@@ -186,8 +186,8 @@
     const tier = MILESTONES.filter((m) => x.total >= m).length;
     if (tier > x.tier) {
       x.tier = tier;
-      api.notice(mn, "🌀 Conditioning tier " + tier + ". You're a " + petName(mn) + " now, deeper every time.");
-      if (run.by !== mn) api.notice(run.by, "🌀 " + api.name(mn) + " reached conditioning tier " + tier + ".");
+      api.notice(mn, "\u{1F300} Conditioning tier " + tier + ". You're a " + petName(mn) + " now, deeper every time.");
+      if (run.by !== mn) api.notice(run.by, "\u{1F300} " + api.name(mn) + " reached conditioning tier " + tier + ".");
     }
     api.save();
   }
@@ -205,7 +205,7 @@
       const t2 = A.find(args[1]);
       if (!t2) return c.reply("Whose session, sugar? ?hyp stop <who>");
       if (!(A.isProprietor(sender) || A.herdLeaderOf(t2) === sender || running.get(t2)?.by === sender)) return c.reply("That's not your session to stop, hon.");
-      return c.reply(stop(t2, "That's all for now. Come up gently, " + A.name(t2) + ".") ? "🌀 Stopped." : A.name(t2) + " isn't in a session.");
+      return c.reply(stop(t2, "That's all for now. Come up gently, " + A.name(t2) + ".") ? "\u{1F300} Stopped." : A.name(t2) + " isn't in a session.");
     }
     const t = A.find(args[0]);
     if (!t || !A.rec(t)) return c.reply("Here's how: ?hyp <who> [fun|deep|nhl]. They need ?hypno on, and it never goes deeper than they allow.");
@@ -216,19 +216,19 @@
     const want = LEVELS.includes(String(args[1] || "").toLowerCase()) ? String(args[1]).toLowerCase() : me(t).max;
     if (LEVELS.indexOf(want) > LEVELS.indexOf(me(t).max)) return c.reply(A.name(t) + " only allows " + LEVEL_NAME[me(t).max] + " sessions. That's their call.");
     start(sender, t, want);
-    c.reply("🌀 " + LEVEL_NAME[want] + " session started for " + A.name(t) + " (about " + Math.round(scriptFor(want).length * 42 / 60) + " minutes). ?hyp stop " + A.name(t) + " ends it.");
+    c.reply("\u{1F300} " + LEVEL_NAME[want] + " session started for " + A.name(t) + " (about " + Math.round(scriptFor(want).length * 42 / 60) + " minutes). ?hyp stop " + A.name(t) + " ends it.");
   }
   function cmdLevel(c) {
     const { sender, args, api: A } = c, v = String(args[0] || "").toLowerCase();
     if (!A.rec(sender)) return c.reply("That's just for folks on the books, sugar.");
-    if (!LEVELS.includes(v)) return c.reply("🌀 You allow " + LEVEL_NAME[me(sender).max] + " sessions. ?depth fun, deep or nhl (No human left) sets the deepest you'll go.");
+    if (!LEVELS.includes(v)) return c.reply("\u{1F300} You allow " + LEVEL_NAME[me(sender).max] + " sessions. ?depth fun, deep or nhl (No human left) sets the deepest you'll go.");
     me(sender).max = v;
     A.save();
-    c.reply("🌀 The deepest a session can take you is now " + LEVEL_NAME[v] + "." + (A.rec(sender).hypno ? "" : " (Sessions also need ?hypno on.)"));
+    c.reply("\u{1F300} The deepest a session can take you is now " + LEVEL_NAME[v] + "." + (A.rec(sender).hypno ? "" : " (Sessions also need ?hypno on.)"));
   }
   var progressText = (mn) => {
     const x = me(mn), next = MILESTONES.find((m) => x.total < m);
-    return "🌀 Conditioning: tier " + x.tier + " (" + petName(mn) + ") · " + x.total + " sessions (fun " + x.sessions.fun + ", deep " + x.sessions.deep + ", nhl " + x.sessions.nhl + ")" + (next ? " · next tier at " + next : " · top tier") + " · allows " + LEVEL_NAME[x.max];
+    return "\u{1F300} Conditioning: tier " + x.tier + " (" + petName(mn) + ") \xB7 " + x.total + " sessions (fun " + x.sessions.fun + ", deep " + x.sessions.deep + ", nhl " + x.sessions.nhl + ")" + (next ? " \xB7 next tier at " + next : " \xB7 top tier") + " \xB7 allows " + LEVEL_NAME[x.max];
   };
   function companion(mn) {
     const r = api.rec(mn);
@@ -237,7 +237,7 @@
     cards.push({
       title: "Conditioning",
       text: r.hypno ? void 0 : "Sessions need ?hypno on (in your Toggles).",
-      lines: [["Tier", x.tier + " · " + petName(mn)], ["Sessions", x.total], ["Deepest allowed", LEVEL_NAME[x.max]]],
+      lines: [["Tier", x.tier + " \xB7 " + petName(mn)], ["Sessions", x.total], ["Deepest allowed", LEVEL_NAME[x.max]]],
       bars: next ? [{ label: "To the next tier", value: x.total + " / " + next, pct: x.total / next * 100 }] : void 0,
       buttons: LEVELS.map((l) => ({ label: "Allow " + LEVEL_NAME[l], cmd: "depth " + l, accent: l === x.max })).concat(running.has(mn) ? [{ label: "Wake me up", cmd: "wake", accent: true }] : [])
     });
@@ -260,7 +260,7 @@
     commands: {
       hyp: { usage: "hyp <who> [fun|deep|nhl]", aliases: ["condition"], rank: "staff", private: true, run: cmdCondition },
       depth: { usage: "depth fun|deep|nhl", aliases: ["hypnolevel"], private: true, run: cmdLevel },
-      wake: { usage: "wake", private: true, run: (c) => c.reply(stop(c.sender, "Coming up now. Eyes open, " + c.api.name(c.sender) + ". You're alright.") ? "🌀 Session ended." : "You're not in a session, sugar.") },
+      wake: { usage: "wake", private: true, run: (c) => c.reply(stop(c.sender, "Coming up now. Eyes open, " + c.api.name(c.sender) + ". You're alright.") ? "\u{1F300} Session ended." : "You're not in a session, sugar.") },
       trance: { usage: "trance [who]", aliases: ["conditioning"], private: true, run: (c) => {
         const t = c.args[0] ? c.api.find(c.args[0]) : c.sender;
         if (t !== c.sender && !c.api.isStaff(c.sender)) return c.reply("Only staff look at somebody else's, sugar.");

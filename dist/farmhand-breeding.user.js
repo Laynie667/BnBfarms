@@ -74,15 +74,15 @@
   var bellySize = (f) => Math.min(5, 1 + Math.floor(f * 5));
   var STAGE_LINES = {
     showing: {
-      you: "🤰 Your belly's started to round out, %name%. Anybody lookin' can tell now.",
+      you: "\u{1F930} Your belly's started to round out, %name%. Anybody lookin' can tell now.",
       room: "%name%'s belly has started to round out, soft and unmistakable. The litter's showin'."
     },
     heavy: {
-      you: "🤰 You're heavy with it now, %name%: belly full and tight, the litter movin' inside you.",
+      you: "\u{1F930} You're heavy with it now, %name%: belly full and tight, the litter movin' inside you.",
       room: "%name% is heavy with the litter now, belly big and tight, and they move a little slower for it."
     },
     nesting: {
-      you: "🤰 You're nestin', %name%. Restless, achy, and wantin' a soft corner of straw. It won't be long.",
+      you: "\u{1F930} You're nestin', %name%. Restless, achy, and wantin' a soft corner of straw. It won't be long.",
       room: "%name% is restless and nestin', pawing straw into a pile and lowering themselves into it with a groan. It won't be long now."
     }
   };
@@ -130,15 +130,15 @@
       if (st.key !== x.stage && STAGE_LINES[st.key]) {
         x.stage = st.key;
         api.notice(mn, fill(STAGE_LINES[st.key].you, { name: api.name(mn) }));
-        if (api.onMap(mn)) api.emote("🤰 " + fill(STAGE_LINES[st.key].room, { name: api.name(mn) }), mn);
+        if (api.onMap(mn)) api.emote("\u{1F930} " + fill(STAGE_LINES[st.key].room, { name: api.name(mn) }), mn);
         api.save();
       }
       if ((st.key === "showing" || st.key === "heavy") && now >= (x.craveAt || 0)) {
-        if (x.craveAt) api.notice(mn, "🤰 " + fill(pick(CRAVINGS), { name: api.name(mn) }));
+        if (x.craveAt) api.notice(mn, "\u{1F930} " + fill(pick(CRAVINGS), { name: api.name(mn) }));
         x.craveAt = now + between(120, 240) * 6e4;
       }
       if ((st.key === "heavy" || st.key === "nesting") && api.onMap(mn) && now >= (x.kickAt || 0)) {
-        if (x.kickAt) api.emote("🤰 " + fill(pick(KICKS), { name: api.name(mn) }), mn);
+        if (x.kickAt) api.emote("\u{1F930} " + fill(pick(KICKS), { name: api.name(mn) }), mn);
         x.kickAt = now + between(20, 40) * 6e4;
       }
     }
@@ -150,8 +150,8 @@
     for (const b of d.bookings) {
       if (b.told || !set.has(b.stud) || !set.has(b.dam) || !api.onMap(b.stud) || !api.onMap(b.dam)) continue;
       b.told = Date.now();
-      api.notice(b.stud, "🐂 Your booking with " + api.name(b.dam) + " is up, sugar. They're here. Head for the breeding stand.");
-      api.notice(b.dam, "🐄 " + api.name(b.stud) + " is here for your booking, sugar. Head for the breeding stand.");
+      api.notice(b.stud, "\u{1F402} Your booking with " + api.name(b.dam) + " is up, sugar. They're here. Head for the breeding stand.");
+      api.notice(b.dam, "\u{1F404} " + api.name(b.stud) + " is here for your booking, sugar. Head for the breeding stand.");
       api.save();
     }
   }
@@ -163,7 +163,7 @@
       const b = d.bookings.splice(i, 1)[0];
       A.save();
       if (w === "done") A.staffPoints(sender, 1, "booking");
-      return c.reply("🐂 Booking #" + b.id + " (" + A.name(b.stud) + " × " + A.name(b.dam) + ") " + (w === "done" ? "done. Good work!" : "taken off the list."));
+      return c.reply("\u{1F402} Booking #" + b.id + " (" + A.name(b.stud) + " \xD7 " + A.name(b.dam) + ") " + (w === "done" ? "done. Good work!" : "taken off the list."));
     }
     const stud = A.find(args[0]), dam = A.find(args[1]);
     if (!stud || !dam || !A.rec(stud) || !A.rec(dam)) return c.reply("Here's how, sugar: ?book <stud> <who>, like ?book Rex Bessie. ?book shows the list.");
@@ -174,26 +174,26 @@
     d.bookings.push({ id: d.seq, stud, dam, by: sender, at: Date.now(), told: 0 });
     A.save();
     A.audit(sender, "BOOK", stud + "x" + dam);
-    A.notice(stud, "🐂 You've been booked to breed " + A.name(dam) + ". I'll tell you when you're both on the farm.");
-    A.notice(dam, "🐄 You've been booked with " + A.name(stud) + ". I'll tell you when you're both on the farm.");
-    c.reply("🐂 Booked: #" + d.seq + " " + A.name(stud) + " × " + A.name(dam) + ".");
+    A.notice(stud, "\u{1F402} You've been booked to breed " + A.name(dam) + ". I'll tell you when you're both on the farm.");
+    A.notice(dam, "\u{1F404} You've been booked with " + A.name(stud) + ". I'll tell you when you're both on the farm.");
+    c.reply("\u{1F402} Booked: #" + d.seq + " " + A.name(stud) + " \xD7 " + A.name(dam) + ".");
   }
   var bookingsText = () => {
     const b = D().bookings;
-    return b.length ? "🐂 STUD BOOKINGS\n" + b.map((x) => "#" + x.id + " " + api.name(x.stud) + " × " + api.name(x.dam) + (x.told ? " · told, waitin' on 'em" : "")).join("\n") : "🐂 No stud bookings right now. Staff add them with ?book <stud> <who>.";
+    return b.length ? "\u{1F402} STUD BOOKINGS\n" + b.map((x) => "#" + x.id + " " + api.name(x.stud) + " \xD7 " + api.name(x.dam) + (x.told ? " \xB7 told, waitin' on 'em" : "")).join("\n") : "\u{1F402} No stud bookings right now. Staff add them with ?book <stud> <who>.";
   };
   function breedWeekTick(here) {
     const d = D(), now = /* @__PURE__ */ new Date(), mk = monthKey(now);
     if (d.week.month !== mk) d.week = { month: mk };
     if (now.getDate() === 14 && !d.week.warned && here.length) {
       d.week.warned = true;
-      api.announce("📅 Breeding week starts tomorrow, y'all! Anybody who said ?season on will come into heat for it.");
+      api.announce("\u{1F4C5} Breeding week starts tomorrow, y'all! Anybody who said ?season on will come into heat for it.");
       api.save();
     }
     if (!isBreedWeek(now)) return;
     if (!d.week.said && here.length) {
       d.week.said = true;
-      api.announce("🔥 It's breeding week on the farm! Everybody signed up is comin' into heat. Studs, behave. Or don't. 🐂");
+      api.announce("\u{1F525} It's breeding week on the farm! Everybody signed up is comin' into heat. Studs, behave. Or don't. \u{1F402}");
       api.save();
     }
     d.week.heated = d.week.heated || {};
@@ -226,7 +226,7 @@
     if (!me || !them || Math.max(Math.abs(me.X - them.X), Math.abs(me.Y - them.Y)) > 1) return c.reply("Get right down next to " + A.name(t) + " to help, sugar.");
     p.labour.midwife = sender;
     A.save();
-    A.emote("🍼 " + fill(pick(MIDWIFE), { name: A.name(t), by: A.name(sender) }), t);
+    A.emote("\u{1F37C} " + fill(pick(MIDWIFE), { name: A.name(t), by: A.name(sender) }), t);
   }
   function onBirth(mn) {
     const d = D();
@@ -234,7 +234,7 @@
     const m = d.lastMidwife && d.lastMidwife[mn];
     if (m) {
       api.staffPoints(m, 2, "midwife");
-      if (api.onMap(mn)) api.emote("🍼 " + api.name(m) + " cleans the newborns and tucks them against " + api.name(mn) + ", every one of them healthy. Good work, midwife.", mn);
+      if (api.onMap(mn)) api.emote("\u{1F37C} " + api.name(m) + " cleans the newborns and tucks them against " + api.name(mn) + ", every one of them healthy. Good work, midwife.", mn);
       delete d.lastMidwife[mn];
     }
     api.save();
@@ -254,9 +254,9 @@
       if (w === "on") d.optIn[sender] = true;
       else delete d.optIn[sender];
       A.save();
-      return c.reply(w === "on" ? "🔥 You're in for breeding week (the 15th to the 21st each month). You'll come into heat for it" + (A.rec(sender).breedable && A.rec(sender).fertile ? "." : ", once you're ?breedable on and ?fertile on.") : "Breeding week: you're out. No heat from it.");
+      return c.reply(w === "on" ? "\u{1F525} You're in for breeding week (the 15th to the 21st each month). You'll come into heat for it" + (A.rec(sender).breedable && A.rec(sender).fertile ? "." : ", once you're ?breedable on and ?fertile on.") : "Breeding week: you're out. No heat from it.");
     }
-    c.reply("🔥 Breeding week is the 15th to the 21st each month" + (isBreedWeek() ? ", and it's on right now!" : ".") + " You're " + (d.optIn[sender] ? "in" : "out") + " (?season on / off).");
+    c.reply("\u{1F525} Breeding week is the 15th to the 21st each month" + (isBreedWeek() ? ", and it's on right now!" : ".") + " You're " + (d.optIn[sender] ? "in" : "out") + " (?season on / off).");
   }
   function companion(mn) {
     const r = api.rec(mn);
@@ -278,7 +278,7 @@
       buttons: [{ label: "My pedigree", cmd: "pedigree" }]
     });
     const mine = d.bookings.filter((b) => b.stud === mn || b.dam === mn);
-    if (mine.length) cards.push({ title: "My bookings", lines: mine.map((b) => ["#" + b.id, api.name(b.stud) + " × " + api.name(b.dam)]) });
+    if (mine.length) cards.push({ title: "My bookings", lines: mine.map((b) => ["#" + b.id, api.name(b.stud) + " \xD7 " + api.name(b.dam)]) });
     if (api.isStaff(mn)) cards.push({ title: "Stud bookings", text: bookingsText(), input: { placeholder: "Rex Bessie", label: "Book (stud, who)", cmd: "book" } });
     return { cards };
   }
@@ -286,7 +286,7 @@
     name: "breeding",
     label: "Breeding",
     version: "1.0.0",
-    guide: "Pregnancy now has stages (early, showin', heavy, nestin') with a belly size 1–5, cravings, and kicks nearby people can see. Breeding week is the 15th–21st of each month: ?season on to come into heat for it. Staff: ?book <stud> <who>, ?book, ?book done <#>, and ?midwife <who> during labour.",
+    guide: "Pregnancy now has stages (early, showin', heavy, nestin') with a belly size 1\u20135, cravings, and kicks nearby people can see. Breeding week is the 15th\u201321st of each month: ?season on to come into heat for it. Staff: ?book <stud> <who>, ?book, ?book done <#>, and ?midwife <who> during labour.",
     setup(a) {
       api = a;
       D();
@@ -303,7 +303,7 @@
         const t = c.args[0] ? c.api.find(c.args[0]) : c.sender, p = t && c.api.prod(t), f = along(p);
         if (f === null) return c.reply((t === c.sender ? "You're" : c.api.name(t) + " is") + " not expectin' right now, sugar.");
         const days = Math.max(0, Math.ceil((p.preg.due - Date.now()) / 864e5));
-        c.reply("🤰 " + c.api.name(t) + ": " + stageOf(f).label + " · belly size " + bellySize(f) + " of 5 · " + Math.round(f * 100) + "% along · due " + (days ? "in " + days + " day" + (days === 1 ? "" : "s") : "any time now") + " · sired by " + p.preg.sires.map(c.api.name).join(" & "));
+        c.reply("\u{1F930} " + c.api.name(t) + ": " + stageOf(f).label + " \xB7 belly size " + bellySize(f) + " of 5 \xB7 " + Math.round(f * 100) + "% along \xB7 due " + (days ? "in " + days + " day" + (days === 1 ? "" : "s") : "any time now") + " \xB7 sired by " + p.preg.sires.map(c.api.name).join(" & "));
       } },
       season: { usage: "season on|off", aliases: ["breedweek"], private: true, run: cmdBreedweek },
       midwife: { usage: "midwife <who>", rank: "staff", run: cmdMidwife }

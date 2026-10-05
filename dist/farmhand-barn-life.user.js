@@ -121,7 +121,7 @@
       x.t = now;
       if (x.lvl <= 0) {
         delete D().drunk[k];
-        api.notice(Number(k), "🥛 The milk-drunk haze lifts. You're clear-headed again.");
+        api.notice(Number(k), "\u{1F95B} The milk-drunk haze lifts. You're clear-headed again.");
       }
     }
     api.save();
@@ -133,17 +133,17 @@
       if (!lvl || (n.warned[need] || 100) <= lvl) continue;
       n.warned[need] = lvl;
       n.said = Date.now();
-      api.notice(mn, (need === "water" ? "💧 " : need === "food" ? "🌾 " : "🪮 ") + fill(pick(REMIND[need]), { name: api.name(mn) }));
+      api.notice(mn, (need === "water" ? "\u{1F4A7} " : need === "food" ? "\u{1F33E} " : "\u{1FAAE} ") + fill(pick(REMIND[need]), { name: api.name(mn) }));
       return;
     }
   }
   function eat(mn, reply, how) {
     if (!on(mn)) return reply("Barn life isn't on for you, sugar. ?needs on switches it on.");
     const t = near(mn, "trough");
-    if (!t) return reply("You need to be at a trough to eat, sugar (a spot called trough-…).");
+    if (!t) return reply("You need to be at a trough to eat, sugar (a spot called trough-\u2026).");
     const d = D(), left = d.troughs[t] === void 0 ? TROUGH_HELPINGS : d.troughs[t];
     if (left <= 0) {
-      api.notifyStaff("🌾 " + t + " is empty and " + api.name(mn) + " is hungry. ?refill " + t + " standing next to it.", true);
+      api.notifyStaff("\u{1F33E} " + t + " is empty and " + api.name(mn) + " is hungry. ?refill " + t + " standing next to it.", true);
       return reply("The trough's licked clean, hon. I've told staff it needs fillin'.");
     }
     const n = needsOf(mn);
@@ -151,20 +151,20 @@
     d.troughs[t] = left - 1;
     n.food = Math.min(FULL, n.food + 50);
     n.warned.food = 100;
-    api.emote("🌾 " + fill(pick(EAT), { name: api.name(mn) }), mn);
+    api.emote("\u{1F33E} " + fill(pick(EAT), { name: api.name(mn) }), mn);
     api.save();
-    if (how !== "bowl") reply("🌾 Food " + Math.round(n.food) + "% · the trough has " + d.troughs[t] + " helpings left.");
+    if (how !== "bowl") reply("\u{1F33E} Food " + Math.round(n.food) + "% \xB7 the trough has " + d.troughs[t] + " helpings left.");
   }
   function drink(mn, reply, how) {
     if (!on(mn)) return reply("Barn life isn't on for you, sugar. ?needs on switches it on.");
-    if (!near(mn, "water")) return reply("You need to be at a water spot to drink, sugar (a spot called water-…).");
+    if (!near(mn, "water")) return reply("You need to be at a water spot to drink, sugar (a spot called water-\u2026).");
     const n = needsOf(mn);
     if (n.water >= 95) return reply("You're not thirsty right now, hon.");
     n.water = Math.min(FULL, n.water + 60);
     n.warned.water = 100;
-    api.emote("💧 " + fill(pick(DRINK), { name: api.name(mn) }), mn);
+    api.emote("\u{1F4A7} " + fill(pick(DRINK), { name: api.name(mn) }), mn);
     api.save();
-    if (how !== "bowl") reply("💧 Water " + Math.round(n.water) + "%.");
+    if (how !== "bowl") reply("\u{1F4A7} Water " + Math.round(n.water) + "%.");
   }
   function milkDrunk(milker, drinker, ml, grade) {
     if (!on(drinker)) return;
@@ -175,7 +175,7 @@
     api.face(drinker, "milkdrunk", x.lvl * 7 * 60);
     if (x.lvl !== before) {
       const line = fill(pick(DRUNK_LINES[x.lvl]), { name: api.name(drinker) });
-      if (x.lvl === 3) api.emote("🥛 " + line, drinker);
+      if (x.lvl === 3) api.emote("\u{1F95B} " + line, drinker);
       else api.privateEmote(drinker, line);
     }
     api.save();
@@ -196,7 +196,7 @@
       const v = String(args[1] || "").toLowerCase();
       d.farmOff = v ? v === "off" : !d.farmOff;
       A.save();
-      return c.reply("🌾 Barn life for the whole farm: " + (d.farmOff ? "OFF. Nobody gets hungry or reminded." : "ON (for everyone who said ?needs on)."));
+      return c.reply("\u{1F33E} Barn life for the whole farm: " + (d.farmOff ? "OFF. Nobody gets hungry or reminded." : "ON (for everyone who said ?needs on)."));
     }
     if (!A.rec(sender)) return c.reply("You'll need to be on the farm's books first, sugar.");
     if (w === "on" || w === "off") {
@@ -205,11 +205,11 @@
         needsOf(sender).t = Date.now();
       } else delete d.optIn[sender];
       A.save();
-      return c.reply(w === "on" ? "🌾 Barn life ON. You'll get hungry, thirsty and scruffy over time (only while you're here). Eat at a trough, drink at a water spot, and ask staff to groom you. ?needs off any time." : "🌾 Barn life OFF. No more hunger, thirst or reminders.");
+      return c.reply(w === "on" ? "\u{1F33E} Barn life ON. You'll get hungry, thirsty and scruffy over time (only while you're here). Eat at a trough, drink at a water spot, and ask staff to groom you. ?needs off any time." : "\u{1F33E} Barn life OFF. No more hunger, thirst or reminders.");
     }
-    if (!on(sender)) return c.reply("🌾 Barn life is off for you" + (d.farmOff ? " (switched off farm-wide)" : "") + ". ?needs on switches it on.");
+    if (!on(sender)) return c.reply("\u{1F33E} Barn life is off for you" + (d.farmOff ? " (switched off farm-wide)" : "") + ". ?needs on switches it on.");
     const n = needsOf(sender), x = d.drunk[sender];
-    c.reply("🌾 Food " + bar(n.food) + " · 💧 Water " + bar(n.water) + " · 🪮 Grooming " + bar(n.groom) + (x ? " · 🥛 " + DRUNK[x.lvl] : ""));
+    c.reply("\u{1F33E} Food " + bar(n.food) + " \xB7 \u{1F4A7} Water " + bar(n.water) + " \xB7 \u{1FAAE} Grooming " + bar(n.groom) + (x ? " \xB7 \u{1F95B} " + DRUNK[x.lvl] : ""));
   }
   function cmdRefill(c) {
     const { sender, args, api: A } = c, d = D();
@@ -219,7 +219,7 @@
     d.troughs[t] = TROUGH_HELPINGS;
     A.staffPoints(sender, 1, "refill");
     A.save();
-    A.emote("🌾 " + A.name(sender) + " hauls a sack over and fills " + t + " to the brim with fresh feed.", sender);
+    A.emote("\u{1F33E} " + A.name(sender) + " hauls a sack over and fills " + t + " to the brim with fresh feed.", sender);
   }
   function cmdGroom(c) {
     const { sender, args, api: A } = c;
@@ -233,7 +233,7 @@
     n.warned.groom = 100;
     A.staffPoints(sender, 1, "groom");
     A.save();
-    A.emote("🪮 " + fill(pick(GROOM), { name: A.name(t), by: A.name(sender) }), t);
+    A.emote("\u{1FAAE} " + fill(pick(GROOM), { name: A.name(t), by: A.name(sender) }), t);
   }
   function rate(mn) {
     if (!on(mn)) return 1;
@@ -254,11 +254,11 @@
         title: "Barn life",
         toggles: [tg],
         bars: [
-          { label: "🌾 Food", value: bar(n.food), pct: n.food, kind: kind(n.food) },
-          { label: "💧 Water", value: bar(n.water), pct: n.water, kind: kind(n.water) },
-          { label: "🪮 Grooming", value: bar(n.groom), pct: n.groom, kind: kind(n.groom) }
+          { label: "\u{1F33E} Food", value: bar(n.food), pct: n.food, kind: kind(n.food) },
+          { label: "\u{1F4A7} Water", value: bar(n.water), pct: n.water, kind: kind(n.water) },
+          { label: "\u{1FAAE} Grooming", value: bar(n.groom), pct: n.groom, kind: kind(n.groom) }
         ],
-        chips: x ? [{ text: "🥛 " + DRUNK[x.lvl], kind: "acc" }] : void 0,
+        chips: x ? [{ text: "\u{1F95B} " + DRUNK[x.lvl], kind: "acc" }] : void 0,
         buttons: [{ label: "Eat (at a trough)", cmd: "eat" }, { label: "Drink (at water)", cmd: "drink" }],
         note: rate(mn) > 1 ? "Well kept: you're milkin' a little better." : rate(mn) < 1 ? "Hungry or thirsty: your milk's slowin' down." : void 0
       });

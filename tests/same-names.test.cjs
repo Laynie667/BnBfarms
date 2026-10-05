@@ -49,5 +49,13 @@ const beepsTo=(k,mn)=>sent.slice(k).filter(([e,d])=>e==='AccountBeep'&&d.MemberN
   await wait(5200); k=sent.length; handlers.AccountBeep({MemberNumber:221397,Message:'record Auri'}); await drain(2500);
   const said=beepsTo(k,221397).join(' ');
   ok(/More than one person goes by "Auri"/.test(said) && /444/.test(said) && /180836/.test(said), 'a real tie lists them with member numbers ('+said.slice(0,120)+')');
+  // from the live recording: Laynie's nickname is "Alexia's Laynie" and Alexia is in the room too.
+  // A line about Laynie names Laynie, not Alexia (Alexia's Companion was posting Laynie's scene lines)
+  const lay=chars.find(c=>c.MemberNumber===221397); lay.Name='Laynie'; lay.Nickname="Alexia's Laynie";
+  const alx=at(232922,21,20); alx.Name='Alexia'; chars.push(alx);
+  const line="rory is right there, trembling, and Alexia's Laynie pulls their hand away.";
+  ok(!W.__namesHere(line).includes(232922) && W.__namesHere(line).includes(221397), "\"Alexia's Laynie\" names Laynie, not Alexia");
+  ok(W.__namesHere("Alexia rubs Alexia's Laynie's belly.").includes(232922), '...but Alexia on her own still counts');
+  ok(W.__about("Alexia's Laynie kneels beside the pail.")===221397, 'and a line starting with her nickname is about Laynie');
   out(fails ? fails+' FAILED' : 'ALL PASSED'); process.exit(fails?1:0);
 })();

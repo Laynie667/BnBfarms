@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.10.4
+// @version      0.10.5
 // @description  Your B&B Farm panel: the farm girl's answers, stat cards and guides, right in the game.
 // @author       Laynie & Alexia
 // @match        *://*.bondageprojects.elementfx.com/*
@@ -227,7 +227,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.10.4";
+  var VERSION = "0.10.5";
 
   // extension/src/config.js
   var BOT_MEMBER = 260239;
@@ -388,12 +388,12 @@ One of mods you are using is using an old version of SDK. It will work for now b
     const groups = PUBLIC_GROUPS.concat(
       staff ? STAFF_GROUPS : [],
       staff && ctx2.s.proprietor ? OWNER_GROUPS : [],
-      (ctx2.s.addonCmds || []).map((g) => ({ name: "🧩 " + g.name, cmds: (g.cmds || []).map(String) }))
+      (ctx2.s.addonCmds || []).map((g) => ({ name: "\u{1F9E9} " + g.name, cmds: (g.cmds || []).map(String) }))
     );
     const shown = groups.map((g) => ({ name: g.name, cmds: g.cmds.filter((c) => !q2 || c.includes(q2) || g.name.toLowerCase().includes(q2)) })).filter((g) => g.cmds.length);
     const input2 = h("input", {
       class: "fhc-in",
-      placeholder: "milk, breed, keys…",
+      placeholder: "milk, breed, keys\u2026",
       value: ctx2.ui.search || "",
       oninput: (e) => ctx2.setUi({ search: e.target.value }, true)
     });
@@ -435,8 +435,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
       s.preg && chip("carryin'", "good")
     ];
     const bars = [
-      s.milk && bar("Milk", ml(s.milk.ml) + " of " + ml(s.milk.cap) + " · grade " + s.milk.grade, pct(s.milk.ml, s.milk.cap)),
-      s.quota && bar("Today's quota", ml(s.quota.ml) + " of " + ml(s.quota.goal) + (s.quota.streak ? " · streak " + s.quota.streak : ""), pct(s.quota.ml, s.quota.goal), "good"),
+      s.milk && bar("Milk", ml(s.milk.ml) + " of " + ml(s.milk.cap) + " \xB7 grade " + s.milk.grade, pct(s.milk.ml, s.milk.cap)),
+      s.quota && bar("Today's quota", ml(s.quota.ml) + " of " + ml(s.quota.goal) + (s.quota.streak ? " \xB7 streak " + s.quota.streak : ""), pct(s.quota.ml, s.quota.goal), "good"),
       s.semen && bar("Seed", ml(s.semen.ml) + " of " + ml(s.semen.cap), pct(s.semen.ml, s.semen.cap)),
       s.holding && s.holding.ml > 0 && bar("Holding", ml(s.holding.ml) + " of " + ml(s.holding.cap), pct(s.holding.ml, s.holding.cap), "alert")
     ];
@@ -446,7 +446,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
         title("Today"),
         bars,
         s.heatUntil && muted("In heat for " + hoursLeft(s.heatUntil) + " more hours"),
-        s.preg && muted("Carryin' for " + s.preg.sires.join(" & ") + " · due in " + Math.max(0, Math.ceil((s.preg.due - Date.now()) / 864e5)) + " day(s)")
+        s.preg && muted("Carryin' for " + s.preg.sires.join(" & ") + " \xB7 due in " + Math.max(0, Math.ceil((s.preg.due - Date.now()) / 864e5)) + " day(s)")
       ),
       (s.body || []).length && card(title("Body"), h(
         "div",
@@ -473,9 +473,9 @@ One of mods you are using is using an old version of SDK. It will work for now b
       g.milk ? [
         h("div", { class: "fhc-kv" }, h("b", null, g.milk.name), h("span", null, g.milk.ml + " mL a minute")),
         steps(g.milk.level),
-        muted(["", "Gentle", "Steady", "Hard", "Max"][g.milk.level] + (g.milk.kind === "echo" ? " · the more worked up you are, the faster it draws" : ""))
+        muted(["", "Gentle", "Steady", "Hard", "Max"][g.milk.level] + (g.milk.kind === "echo" ? " \xB7 the more worked up you are, the faster it draws" : ""))
       ] : muted("No pump on right now. A lactation pump, Echo's portable pump, the milk vendor or a milkin' stall all milk you here."),
-      g.machine && h("div", { class: "fhc-kv" }, h("span", null, "⚙️ " + g.machine.name), h("span", { class: "fhc-muted" }, g.machine.intensity < 0 ? "off" : "intensity " + g.machine.intensity)),
+      g.machine && h("div", { class: "fhc-kv" }, h("span", null, "\u2699\uFE0F " + g.machine.name), h("span", { class: "fhc-muted" }, g.machine.intensity < 0 ? "off" : "intensity " + g.machine.intensity)),
       g.funnel && h("div", { class: "fhc-kv" }, h("span", null, "Funnel gag"), h("span", { class: "fhc-muted" }, "fitted, and it counts as open"))
     );
   }
@@ -486,7 +486,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       s.milk && card(
         title("Milk"),
         bar("In your udder", ml(s.milk.ml) + " of " + ml(s.milk.cap), pct(s.milk.ml, s.milk.cap)),
-        muted("Grade " + s.milk.grade + (s.milk.lastAt ? " · last milked " + Math.round((Date.now() - s.milk.lastAt) / 6e4) + " min ago" : ""))
+        muted("Grade " + s.milk.grade + (s.milk.lastAt ? " \xB7 last milked " + Math.round((Date.now() - s.milk.lastAt) / 6e4) + " min ago" : ""))
       ),
       s.quota && card(title("Quota"), bar("Today", ml(s.quota.ml) + " of " + ml(s.quota.goal), pct(s.quota.ml, s.quota.goal), "good")),
       s.semen && card(title("Seed"), bar("Stored", ml(s.semen.ml) + " of " + ml(s.semen.cap), pct(s.semen.ml, s.semen.cap))),
@@ -513,8 +513,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
       card(
         title("Breedin'"),
         rows.map(([k, v]) => h("div", { class: "fhc-kv" }, h("span", null, k), h("span", { class: "fhc-muted" }, v === true ? "on" : v === false ? "off" : v))),
-        s.heatUntil && muted("🔥 In heat · " + hoursLeft(s.heatUntil) + " h left"),
-        s.preg && muted("🍼 Carryin' for " + s.preg.sires.join(" & "))
+        s.heatUntil && muted("\u{1F525} In heat \xB7 " + hoursLeft(s.heatUntil) + " h left"),
+        s.preg && muted("\u{1F37C} Carryin' for " + s.preg.sires.join(" & "))
       ),
       h("div", null, btn("My tally", () => ctx2.send("tally")), btn("Eggs", () => ctx2.send("eggs")), btn("Wash up", () => ctx2.send("wash")), btn("Pedigree", () => ctx2.send("pedigree")))
     ];
@@ -527,7 +527,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       items.length ? items.slice().reverse().map((x) => h(
         "div",
         { class: "fhc-card " + x.kind },
-        h("span", { class: "fhc-time" }, new Date(x.at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) + (x.kind === "notice" ? " · from the farm" : x.kind === "mine" ? " · you asked" : "")),
+        h("span", { class: "fhc-time" }, new Date(x.at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) + (x.kind === "notice" ? " \xB7 from the farm" : x.kind === "mine" ? " \xB7 you asked" : "")),
         x.text
       )) : muted("Nothin' here yet.")
     ];
@@ -535,7 +535,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var SWITCH_INFO = [
     ["breedable", "Breedable", "You can be bred and filled"],
     ["fertile", "Fertile", "You can catch"],
-    ["jarok", "Jar insemination", "On: staff still ask every time · Off: never"],
+    ["jarok", "Jar insemination", "On: staff still ask every time \xB7 Off: never"],
     ["freeuse", "Free use", "Any stud may have you without askin'"],
     ["futa", "Futa", "Cock and vulva both, milk and semen both"],
     ["milkable", "Milkable", "Make milk"],
@@ -551,7 +551,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     const sw = ctx2.s.switches || {};
     return list.map(([cmd, label, desc]) => {
       const need = NEEDS[cmd];
-      if (need && !sw[need[0]] && !sw[cmd]) return toggle(label, need[1] + " · " + desc, false, () => ctx2.send(cmd + " on"));
+      if (need && !sw[need[0]] && !sw[cmd]) return toggle(label, need[1] + " \xB7 " + desc, false, () => ctx2.send(cmd + " on"));
       return toggle(label, desc, !!sw[cmd], () => ctx2.send(cmd + " " + (sw[cmd] ? "off" : "on")));
     });
   }
@@ -564,11 +564,11 @@ One of mods you are using is using an old version of SDK. It will work for now b
         ["compact", "Compact cards", "Smaller text, more on screen"],
         ["chime", "Chime on notices", "A soft sound when the farm messages you"],
         ["popopen", "Open on new notice", "Pop the panel open by itself"],
-        ["btnPinned", "Pin the 🌾 button", "Unpinned, you can drag it anywhere (mouse or finger). Pin it so it stays put."]
+        ["btnPinned", "Pin the \u{1F33E} button", "Unpinned, you can drag it anywhere (mouse or finger). Pin it so it stays put."]
       ].map(([k, label, desc]) => toggle(label, desc, !!ctx2.prefs[k], () => ctx2.setPref(k, !ctx2.prefs[k]))),
       toggle(
         "Farm emotes about me come from me",
-        "Belly kicks, milkin', breedin'… are posted as your own emote (no name in front), so the people who can see you see them and the farm girl needn't move. Only lines about you.",
+        "Belly kicks, milkin', breedin'\u2026 are posted as your own emote (no name in front), so the people who can see you see them and the farm girl needn't move. Only lines about you.",
         !ctx2.prefs.noRelay,
         () => {
           ctx2.setPref("noRelay", !ctx2.prefs.noRelay);
@@ -578,7 +578,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       // the farm's little cues on your own screen (cues.js); each one on unless you switch it off
       [
         ["noLead", "Lead me instead of teleportin'", "When the farm moves you (feedin' time, the stocks, a summon), you walk there yourself, step by step"],
-        ["noFace", "Farm can set my face", "Dazed when milk-drunk, flushed in heat, a trance stare… for a little while"],
+        ["noFace", "Farm can set my face", "Dazed when milk-drunk, flushed in heat, a trance stare\u2026 for a little while"],
         ["noSound", "Farm sounds", "The pump, the stall door, the feedin' bell. Only you hear them, at your game volume"],
         ["noTrance", "Trance haze", "A soft haze at the edges of your screen during conditioning sessions"],
         ["noFeelings", "Private feelings", "Now and then, a line only you see about what you're feelin' (your gear, your arousal, how full you are)"],
@@ -2249,7 +2249,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     return [
       h("div", null, [["all", "On the map"], ["mine", "My herd"], ["milk", "Needs milkin'"], ["heat", "In heat"]].map(([id, l]) => h("button", { type: "button", class: "fhc-pill" + (f === id ? " on" : ""), onclick: () => ctx2.setUi({ herdF: id }) }, l))),
       list.length ? list.map((x) => card(
-        h("div", { class: "fhc-kv" }, h("b", null, x.name), h("span", { class: "fhc-muted" }, x.role + (x.where ? " · " + x.where : ""))),
+        h("div", { class: "fhc-kv" }, h("b", null, x.name), h("span", { class: "fhc-muted" }, x.role + (x.where ? " \xB7 " + x.where : ""))),
         x.milk !== null ? h(
           "div",
           { class: "fhc-bar-track", style: { margin: "6px 0" } },
@@ -2281,7 +2281,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     if (!lines) return [muted("Tease lines are for herdmasters and proprietors.")];
     return [
       card(
-        h("div", { class: "fhc-kv" }, title("Tease lines"), h("span", { class: "fhc-muted" }, lines.length + " lines · " + (ctx2.s.teaseOpted || 0) + " opted in")),
+        h("div", { class: "fhc-kv" }, title("Tease lines"), h("span", { class: "fhc-muted" }, lines.length + " lines \xB7 " + (ctx2.s.teaseOpted || 0) + " opted in")),
         lines.length ? lines.map((t, i) => h(
           "div",
           { class: "fhc-kv" },
@@ -2293,7 +2293,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
         h(
           "label",
           { class: "fhc-label" },
-          "New line · %name% becomes their name",
+          "New line \xB7 %name% becomes their name",
           h("textarea", { class: "fhc-in", rows: 2, oninput: (e) => ctx2.setUi({ teaseDraft: e.target.value }, true) }, ctx2.ui.teaseDraft || "")
         ),
         btn("Add line", () => {
@@ -2337,7 +2337,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
           })),
           // spots: little dots, hover for the name
           Object.entries(ctx2.s.spots || {}).filter(([, p]) => p && Number.isFinite(p.X)).map(([n, p]) => h("span", {
-            title: n + " · " + p.X + "," + p.Y,
+            title: n + " \xB7 " + p.X + "," + p.Y,
             style: {
               position: "absolute",
               left: p.X * PX + 1 + "px",
@@ -2358,7 +2358,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
           "button",
           { type: "button", class: "fhc-doc" + (n === sel ? " on" : ""), style: { width: "100%", marginBottom: "4px" }, onclick: () => ctx2.setUi({ zone: n }) },
           h("b", null, n),
-          h("div", { class: "fhc-muted" }, "part of " + z.group + " · A " + (z.a ? z.a.X + "," + z.a.Y : "—") + " → B " + (z.b ? z.b.X + "," + z.b.Y : "—"))
+          h("div", { class: "fhc-muted" }, "part of " + z.group + " \xB7 A " + (z.a ? z.a.X + "," + z.a.Y : "\u2014") + " \u2192 B " + (z.b ? z.b.X + "," + z.b.Y : "\u2014"))
         )) : muted("No zones yet."),
         btn("Who's where", () => ctx2.send("zone who"))
       ),
@@ -2390,7 +2390,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     const ok = () => /^[a-z][a-z0-9_-]{1,19}$/.test(nm()) || (ctx2.hint("Give the spot a one-word name, like speaker-barn, trough-1 or glory-1."), false);
     return card(
       title("Spots"),
-      muted("home · speaker-… (the bot talks from these) · trough-… · water-… · glory-1 and glory-1-visitor · placard-…"),
+      muted("home \xB7 speaker-\u2026 (the bot talks from these) \xB7 trough-\u2026 \xB7 water-\u2026 \xB7 glory-1 and glory-1-visitor \xB7 placard-\u2026"),
       sp.length ? sp.map(([n, p]) => h(
         "div",
         { class: "fhc-kv" },
@@ -2425,7 +2425,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
         ctx2.s.proprietor && (ctx2.ui.clearAllSpots ? btn("Yes, clear all " + sp.length + " spots", () => {
           ctx2.setUi({ clearAllSpots: false });
           ctx2.send("spot clear all yes");
-        }, true) : btn("Clear all spots…", () => ctx2.setUi({ clearAllSpots: true })))
+        }, true) : btn("Clear all spots\u2026", () => ctx2.setUi({ clearAllSpots: true })))
       ) : null
     );
   }
@@ -2466,7 +2466,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
           h("i", { style: { color: "#c9a3e6" } }, "[Voice] " + l),
           h("button", { type: "button", class: "fhc-b", onclick: () => ctx2.send("voice remove " + who + " " + (i + 1)) }, "Remove")
         )) : muted("No lines yet."),
-        h("label", { class: "fhc-label" }, "New line · %name% works", h("input", { class: "fhc-in", maxlength: 200, value: ctx2.ui.vDraft || "", oninput: (e) => ctx2.setUi({ vDraft: e.target.value }, true) })),
+        h("label", { class: "fhc-label" }, "New line \xB7 %name% works", h("input", { class: "fhc-in", maxlength: 200, value: ctx2.ui.vDraft || "", oninput: (e) => ctx2.setUi({ vDraft: e.target.value }, true) })),
         btn("Add", () => {
           const t = (ctx2.ui.vDraft || "").trim();
           if (!t) return ctx2.hint("Write the line first.");
@@ -2483,10 +2483,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
         title("ECHS sessions by depth"),
         muted("Still their ECHS: they agree to every induction, and their own switches and safeword win."),
         [
-          ["Fun", "Drifting · Yielding", "Not noticin' clothes or touches, posture, can't touch yourself, made to act"],
+          ["Fun", "Drifting \xB7 Yielding", "Not noticin' clothes or touches, posture, can't touch yourself, made to act"],
           ["Deep", "Entranced", "Follow and leash, made to speak, hears only your voice, arousal and orgasm"],
-          ["No human left", "Deep · Blank", "Clothing illusion, planted triggers, suggestions that last after wakin'"]
-        ].map(([a, b, c]) => h("div", { class: "fhc-kv", style: { display: "block" } }, h("b", null, a + " · "), h("span", { style: { color: "var(--fh-accent)" } }, b), muted(c)))
+          ["No human left", "Deep \xB7 Blank", "Clothing illusion, planted triggers, suggestions that last after wakin'"]
+        ].map(([a, b, c]) => h("div", { class: "fhc-kv", style: { display: "block" } }, h("b", null, a + " \xB7 "), h("span", { style: { color: "var(--fh-accent)" } }, b), muted(c)))
       )
     ];
   }
@@ -2496,21 +2496,21 @@ One of mods you are using is using an old version of SDK. It will work for now b
       card(h(
         "div",
         { class: "fhc-kv" },
-        h("div", null, title("Your shift"), muted((sh.clocked ? "On the clock" : "Off the clock") + " · " + (sh.weekH || 0) + " h this week")),
+        h("div", null, title("Your shift"), muted((sh.clocked ? "On the clock" : "Off the clock") + " \xB7 " + (sh.weekH || 0) + " h this week")),
         btn(sh.clocked ? "Clock out" : "Clock in", () => ctx2.send(sh.clocked ? "clockout" : "clockin"), !sh.clocked)
       )),
       card(title("On duty"), (sh.onDuty || []).length ? sh.onDuty.map((n) => chip(n)) : muted("Nobody on duty here.")),
       card(
         title("On call"),
         muted("Mandated farmhands, plus staff who switched it on. Only these can be pulled in from other rooms."),
-        (sh.onCall || []).length ? sh.onCall.map((o) => chip(o.name + (o.mandated ? " · mandated" : "") + (o.here ? " · here" : " · away"), o.here ? "good" : null)) : muted("Nobody's on call.")
+        (sh.onCall || []).length ? sh.onCall.map((o) => chip(o.name + (o.mandated ? " \xB7 mandated" : "") + (o.here ? " \xB7 here" : " \xB7 away"), o.here ? "good" : null)) : muted("Nobody's on call.")
       ),
       ctx2.s.log && card(title("Farm log"), ctx2.s.log.map((e) => h(
         "div",
         { class: "fhc-kv", style: { fontFamily: "ui-monospace,Consolas,monospace", fontSize: "11px" } },
         h("span", { class: "fhc-muted" }, new Date(e.t).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })),
         h("span", { style: { color: "var(--fh-accent)" } }, e.a),
-        h("span", null, e.by + (e.d ? " · " + e.d : ""))
+        h("span", null, e.by + (e.d ? " \xB7 " + e.d : ""))
       ))),
       h("div", null, btn("Hours", () => ctx2.send("hours")), btn("Chores", () => ctx2.send("chores")), btn("Spin the wheel", () => ctx2.send("spin")))
     ];
@@ -2546,7 +2546,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
         h(
           "div",
           { class: "fhc-kv" },
-          h("div", null, title("Duty"), muted(s.onDuty ? "On duty · silver and gold keys out" : "Out to pasture · bronze key only · your Livestock panel is yours")),
+          h("div", null, title("Duty"), muted(s.onDuty ? "On duty \xB7 silver and gold keys out" : "Out to pasture \xB7 bronze key only \xB7 your Livestock panel is yours")),
           s.pastureLock ? chip("kept out by " + s.pastureLock, "alert") : btn(s.onDuty ? "Go to pasture" : "Back on duty", () => ctx2.send(s.onDuty ? "pasture" : "onduty"), !s.onDuty)
         ),
         muted("Pasture puts your silver and gold keys away, makes you livestock for the visit, and takes you off call (mandated staff stay summonable). It doesn't lock you out. Only a ?turnout from your herd leader does that.")
@@ -2595,7 +2595,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
           "button",
           { type: "button", class: "fhc-doc" + (sel && d.id === sel.id ? " on" : ""), onclick: () => ctx2.setUi({ doc: d.id }) },
           h("b", null, d.who),
-          h("div", { class: "fhc-muted" }, d.kind + " · " + new Date(d.at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }))
+          h("div", { class: "fhc-muted" }, d.kind + " \xB7 " + new Date(d.at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }))
         ))),
         sel && h(
           "div",
@@ -2649,7 +2649,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
         title("Jars"),
         btn("The jar shelf", () => ctx2.send("jars")),
         muted("To inseminate: ?inseminate <who> <jar> [hole]. They always get asked first, and anyone with jar insemination off can't be."),
-        h("div", null, btn("Inseminate…", () => ctx2.fillBox("inseminate " + (who() ? who() + " " : ""))))
+        h("div", null, btn("Inseminate\u2026", () => ctx2.fillBox("inseminate " + (who() ? who() + " " : ""))))
       ),
       card(
         title("Herd"),
@@ -2669,7 +2669,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
           "div",
           { class: "fhc-box", style: { margin: "6px 0" } },
           h("div", { class: "fhc-kv" }, h("b", null, a.n + ". " + a.name), h("span", { class: "fhc-muted" }, new Date(a.at).toLocaleDateString())),
-          muted(a.sum + (a.staffTrack ? " · wants to be staff" : "")),
+          muted(a.sum + (a.staffTrack ? " \xB7 wants to be staff" : "")),
           h("label", { class: "fhc-label" }, "Approve as", h(
             "select",
             { class: "fhc-sel", onchange: (e) => ctx2.setUi({ ["role" + a.mn]: e.target.value }, true) },
@@ -2682,7 +2682,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
         title("The bot's messages"),
         h("div", { class: "fhc-kv" }, h("span", null, "Waitin' to send"), h("b", null, String(m.sending))),
         h("div", { class: "fhc-kv" }, h("span", null, "People with messages held (away or unreachable)"), h("b", null, String(m.held))),
-        h("div", { class: "fhc-kv" }, h("span", null, "Online and beep-able (friends both ways)"), h("b", null, m.beepable === null ? "checkin'…" : String(m.beepable))),
+        h("div", { class: "fhc-kv" }, h("span", null, "Online and beep-able (friends both ways)"), h("b", null, m.beepable === null ? "checkin'\u2026" : String(m.beepable))),
         muted("Held messages turn into one short summary when that person's back.")
       ),
       latest(ctx2)
@@ -2745,7 +2745,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
         return h("textarea", {
           class: "fhc-in",
           rows: 3,
-          placeholder: "one " + (s.entryLabel || "entry") + " per line" + (s.maxEntries ? " · up to " + s.maxEntries : ""),
+          placeholder: "one " + (s.entryLabel || "entry") + " per line" + (s.maxEntries ? " \xB7 up to " + s.maxEntries : ""),
           oninput: (e) => set(e.target.value)
         }, cur !== void 0 ? cur : def);
       case "members":
@@ -2838,7 +2838,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       ),
       card(
         title("BCX summoning (you)"),
-        s === null ? muted("BCX isn't loaded here.") : chip(s.ok ? "Ready to be summoned · the farm bot is allowed" : s.why, s.ok ? "good" : "alert"),
+        s === null ? muted("BCX isn't loaded here.") : chip(s.ok ? "Ready to be summoned \xB7 the farm bot is allowed" : s.why, s.ok ? "good" : "alert"),
         muted("On-call staff see the same check on their Staff panel.")
       ),
       card(title("Comin' soon"), muted("Echo's pumps and milk vendor, outfits by species and gender with high security locks, and the farm's own Listen to my voice (ECHS first)."))
@@ -2854,7 +2854,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       "div",
       { class: "fhc-box", style: { padding: "8px", borderColor: saved[key] ? "var(--fh-good)" : "var(--fh-line)", borderStyle: saved[key] ? "solid" : "dashed" } },
       h("b", null, label),
-      muted(saved[key] ? saved[key].items + " pieces" + (saved[key].locks ? ", " + saved[key].locks + " locked" : "") : "Not set · uses the fallback"),
+      muted(saved[key] ? saved[key].items + " pieces" + (saved[key].locks ? ", " + saved[key].locks + " locked" : "") : "Not set \xB7 uses the fallback"),
       h(
         "div",
         { style: { marginTop: "6px" } },
@@ -2882,14 +2882,14 @@ One of mods you are using is using an old version of SDK. It will work for now b
         h(
           "div",
           { class: "fhc-grid", style: { gridTemplateColumns: "repeat(2,minmax(0,1fr))" } },
-          GENDERS.map((g) => slotBox(sp + "|" + g, sp + " · " + g)).concat([slotBox(sp + "|*", sp + " · any gender")])
+          GENDERS.map((g) => slotBox(sp + "|" + g, sp + " \xB7 " + g)).concat([slotBox(sp + "|*", sp + " \xB7 any gender")])
         ),
         h(
           "div",
           { class: "fhc-grid", style: { gridTemplateColumns: "repeat(2,minmax(0,1fr))", marginTop: "8px" } },
-          GENDERS.map((g) => slotBox("*|" + g, "any species · " + g)).concat([slotBox("stock", "Any new stock")])
+          GENDERS.map((g) => slotBox("*|" + g, "any species \xB7 " + g)).concat([slotBox("stock", "Any new stock")])
         ),
-        muted("No exact match? The farm falls back: this species + gender → this species → this gender → any new stock.")
+        muted("No exact match? The farm falls back: this species + gender \u2192 this species \u2192 this gender \u2192 any new stock.")
       ),
       card(title("Staff uniforms"), h(
         "div",
@@ -2902,7 +2902,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
         h(
           "label",
           { class: "fhc-label" },
-          "New special (one word: luxury, fairday, prizecow…)",
+          "New special (one word: luxury, fairday, prizecow\u2026)",
           h("input", { class: "fhc-in", value: ctx2.ui.oSpecial || "", oninput: (e) => ctx2.setUi({ oSpecial: e.target.value }, true) })
         ),
         btn("Save what I'm wearin' as this special", () => {
@@ -2984,7 +2984,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     return list.map(([name, m]) => h(
       "div",
       null,
-      h("div", { class: "fhc-muted", style: { margin: "8px 2px 2px" } }, "🧩 " + String(m.label || name)),
+      h("div", { class: "fhc-muted", style: { margin: "8px 2px 2px" } }, "\u{1F9E9} " + String(m.label || name)),
       m.cards.map((c, i) => drawCard(ctx2, name, c, i))
     ));
   }
@@ -3030,12 +3030,12 @@ One of mods you are using is using an old version of SDK. It will work for now b
       this.ui = {};
       this.prefs = loadPrefs();
       if (this.prefs.chatToo === void 0) this.prefs.chatToo = true;
-      this.status = "…";
+      this.status = "\u2026";
       const doc = window.document;
       const style = doc.createElement("style");
       style.textContent = CSS + ":root{" + Object.entries(THEME).map(([k, v]) => "--fh-" + k + ":" + v).join(";") + "}";
       doc.head.appendChild(style);
-      this.btn = h("button", { id: "fhc-btn", type: "button", title: "B&B Farm", "aria-label": "B&B Farm panel" }, "🌾");
+      this.btn = h("button", { id: "fhc-btn", type: "button", title: "B&B Farm", "aria-label": "B&B Farm panel" }, "\u{1F33E}");
       this.btn.style.touchAction = "none";
       this.btn.addEventListener("pointerdown", (e) => this.dragButton(e));
       this.btn.addEventListener("click", () => {
@@ -3211,9 +3211,9 @@ One of mods you are using is using an old version of SDK. It will work for now b
         api: this.api,
         send: (cmd) => this.ask(cmd),
         // a button that can't do anything yet says why, instead of quietly doin' nothin'
-        hint: (msg) => this.add("👉 " + msg, "notice"),
+        hint: (msg) => this.add("\u{1F449} " + msg, "notice"),
         fillBox: (text) => {
-          this.add("👉 Finish it in the box at the bottom, then press Send: ?" + text + "…", "notice");
+          this.add("\u{1F449} Finish it in the box at the bottom, then press Send: ?" + text + "\u2026", "notice");
           const i = this.el.querySelector("#fhc-input");
           if (i) {
             i.value = text;
@@ -3235,7 +3235,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
         },
         resetPlaces: () => {
           this.resetPlaces();
-          this.add("👉 The 🌾 button and panel are back in the corner.", "notice");
+          this.add("\u{1F449} The \u{1F33E} button and panel are back in the corner.", "notice");
         }
       };
     }
@@ -3250,8 +3250,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
         h(
           "div",
           { class: "fhc-head", style: { touchAction: "none" }, onpointerdown: (e) => this.drag(e) },
-          h("div", null, h("div", { class: "fhc-title" }, "🌾 B&B Farm"), h("div", { id: "fhc-status", class: "fhc-muted" }, this.status)),
-          h("button", { type: "button", class: "fhc-pill", "aria-label": "Close the panel", onclick: () => this.toggle(false) }, "✕")
+          h("div", null, h("div", { class: "fhc-title" }, "\u{1F33E} B&B Farm"), h("div", { id: "fhc-status", class: "fhc-muted" }, this.status)),
+          h("button", { type: "button", class: "fhc-pill", "aria-label": "Close the panel", onclick: () => this.toggle(false) }, "\u2715")
         ),
         this.views().length > 1 && h(
           "div",
@@ -3275,7 +3275,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
           return h("button", { type: "button", class: "fhc-pill" + (t === tab ? " on" : ""), onclick: () => {
             this.ui[tabKey] = t.id;
             this.render();
-          } }, t.label + (n ? " · " + n : ""));
+          } }, t.label + (n ? " \xB7 " + n : ""));
         })),
         h("div", { class: "fhc-body" }, this.banners(), safeRender(tab, ctx2)),
         h(
@@ -3290,7 +3290,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
             "label",
             { class: "fhc-grow", style: { display: "flex" } },
             h("span", { class: "fhc-sr" }, "Ask the farm girl"),
-            h("input", { id: "fhc-input", class: "fhc-in", placeholder: "Ask the farm girl… (stats, size, help me)", autocomplete: "off" })
+            h("input", { id: "fhc-input", class: "fhc-in", placeholder: "Ask the farm girl\u2026 (stats, size, help me)", autocomplete: "off" })
           ),
           h("button", { type: "submit", class: "fhc-b fhc-b-acc", style: { margin: "0" } }, "Send")
         )
@@ -3317,7 +3317,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
           h("button", { type: "button", class: "fhc-pill", "aria-label": "Dismiss", onclick: () => {
             this.fresh = null;
             this.render();
-          } }, "✕")
+          } }, "\u2715")
         ),
         h("div", { class: "fhc-card" + (this.fresh.kind === "notice" ? " notice" : ""), style: { maxHeight: "180px", overflowY: "auto" } }, this.fresh.text)
       ));
@@ -3325,7 +3325,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       if (o) out.push(h(
         "div",
         { class: "fhc-box ask" },
-        h("b", null, "👗 " + (o.why ? o.why + ": " : "") + "put on your " + o.label + "?"),
+        h("b", null, "\u{1F457} " + (o.why ? o.why + ": " : "") + "put on your " + o.label + "?"),
         h("div", { class: "fhc-muted" }, "Your own clothes are kept so you can change back. Body and hair aren't touched, and nothin' already locked on you moves." + (o.keys.length ? " Any locked pieces get high security padlocks the farm's keyholders can open." : "")),
         h(
           "div",
@@ -3539,7 +3539,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       const see = others().filter((c) => W.ChatRoomMapViewCharacterIsVisible(c)).map((c) => c.MemberNumber).sort();
       const hear = others().filter((c) => typeof W.ChatRoomMapViewCharacterIsHearable === "function" && W.ChatRoomMapViewCharacterIsHearable(c)).map((c) => c.MemberNumber).sort();
       const key = see.join(",") + "|" + hear.join(",");
-      if (key === lastSight && Date.now() - (sightTick.at || 0) < 2e4) return;
+      if (key === lastSight && Date.now() - (sightTick.at || 0) < 12e4) return;
       lastSight = key;
       sightTick.at = Date.now();
       ctx.toBot("sight", { see, hear });
@@ -3595,7 +3595,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       ctx.toBot("leadOk", { id: m.id });
       return;
     }
-    ctx.local("You're led " + (m.why ? m.why : "along") + "…", "#c9a35b", true);
+    ctx.local("You're led " + (m.why ? m.why : "along") + "\u2026", "#c9a35b", true);
     walk = { id: m.id, to, path, i: 0, last: { X: from.X, Y: from.Y }, stuck: Date.now(), retried: false };
     stepWalk();
   }
@@ -3844,10 +3844,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
         st.welcomed = true;
         st.panel.setWelcome(m);
         if (!m.proto || m.proto < 2) {
-          st.panel.setStatus("connected · farm girl v" + m.ver + " (needs updatin')");
+          st.panel.setStatus("connected \xB7 farm girl v" + m.ver + " (needs updatin')");
           st.panel.add("The farm girl is runnin' an older bot (v" + m.ver + ") that doesn't send this panel your roles, keys or numbers, so only the basic panel shows. Update farmhand-bot.user.js on HER browser (the bot's account), then reload her page.", "notice");
         } else {
-          st.panel.setStatus("connected · farm girl v" + m.ver);
+          st.panel.setStatus("connected \xB7 farm girl v" + m.ver);
           setTimeout(() => {
             if (!st.gotState) st.panel.add("Connected, but the farm girl hasn't sent your roles yet. If Staff or Dashboard don't show up, reload the page.", "notice");
           }, 12e3);
@@ -3874,11 +3874,11 @@ One of mods you are using is using an old version of SDK. It will work for now b
       }
       case "ask":
         st.panel.addAsk({ kind: String(m.kind || ""), text: String(m.text || "") });
-        toChat(String(m.text || "") + "  (Yes / No in your 🌾 panel)", "#c9a35b");
+        toChat(String(m.text || "") + "  (Yes / No in your \u{1F33E} panel)", "#c9a35b");
         break;
       case "choose":
         st.panel.setChoose({ text: String(m.text || ""), choices: Array.isArray(m.choices) ? m.choices.map(String).slice(0, 30) : [] });
-        toChat(String(m.text || "") + "  (pick in your 🌾 panel)", "#c9a35b");
+        toChat(String(m.text || "") + "  (pick in your \u{1F33E} panel)", "#c9a35b");
         break;
       case "outfit":
         st.panel.setOutfit({
@@ -3888,7 +3888,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
           keys: Array.isArray(m.keys) ? m.keys.filter(Number.isInteger) : [],
           why: String(m.why || "")
         });
-        toChat("👗 The farm's offerin' you your " + String(m.label || "outfit") + ". Yes or Not now in your 🌾 panel.", "#c9a35b");
+        toChat("\u{1F457} The farm's offerin' you your " + String(m.label || "outfit") + ". Yes or Not now in your \u{1F33E} panel.", "#c9a35b");
         break;
       case "relay":
         relay(m);
@@ -3924,7 +3924,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       }
       case "outfitBack": {
         const r = changeBack();
-        st.panel.add(r.ok ? "👗 Back in your own clothes" + (r.stillLocked ? " (farm-locked pieces stay till a keyholder opens 'em)" : "") + "." : "👗 " + r.why + ".", "notice");
+        st.panel.add(r.ok ? "\u{1F457} Back in your own clothes" + (r.stillLocked ? " (farm-locked pieces stay till a keyholder opens 'em)" : "") + "." : "\u{1F457} " + r.why + ".", "notice");
         if (r.ok) toBot("outfitAnswer", { answer: "back" });
         break;
       }
@@ -3938,7 +3938,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       } catch (e) {
         r = { ok: false, why: "the game wouldn't take it (" + e.message + ")" };
       }
-      st.panel.add(r.ok ? "👗 Dressed in " + o.label + ": " + r.worn + " pieces" + (r.locks ? ", " + r.locks + " locked with high security padlocks" : "") + (r.skipped ? ". " + r.skipped + " spots were already locked, so I left 'em be" : "") + "." : "👗 Couldn't dress you: " + r.why + ".", "notice");
+      st.panel.add(r.ok ? "\u{1F457} Dressed in " + o.label + ": " + r.worn + " pieces" + (r.locks ? ", " + r.locks + " locked with high security padlocks" : "") + (r.skipped ? ". " + r.skipped + " spots were already locked, so I left 'em be" : "") + "." : "\u{1F457} Couldn't dress you: " + r.why + ".", "notice");
       if (r.ok) toBot("outfitAnswer", { answer: "worn", slot: o.slot, locks: r.locks });
     },
     decline(o) {
@@ -3952,11 +3952,11 @@ One of mods you are using is using an old version of SDK. It will work for now b
       try {
         c = captureOutfit();
       } catch (e) {
-        st.panel.add("👗 Couldn't read what you're wearin': " + e.message, "notice");
+        st.panel.add("\u{1F457} Couldn't read what you're wearin': " + e.message, "notice");
         return;
       }
       if (!c.items) {
-        st.panel.add("👗 You're not wearin' any clothes or restraints to save, sugar.", "notice");
+        st.panel.add("\u{1F457} You're not wearin' any clothes or restraints to save, sugar.", "notice");
         return;
       }
       toBot("outfitSave", { slot, data: c.data, items: c.items, locks: c.locks });
@@ -3967,21 +3967,21 @@ One of mods you are using is using an old version of SDK. It will work for now b
     // map tool: the next `count` clicks on the game's map pick tiles instead of walkin' you there
     pickTiles(count, what, done) {
       if (typeof window.ChatRoomMapViewIsActive === "function" && !window.ChatRoomMapViewIsActive()) {
-        st.panel.add(`🗺️ Switch the room to map view first, then press the button again. (Walkin' to the spot and using the "where I stand" buttons still works too.)`, "notice");
+        st.panel.add(`\u{1F5FA}\uFE0F Switch the room to map view first, then press the button again. (Walkin' to the spot and using the "where I stand" buttons still works too.)`, "notice");
         return;
       }
       if (typeof window.ChatRoomMapViewPixelToTileCoordinates !== "function") {
-        st.panel.add(`🗺️ This version of the game doesn't let me read map clicks. Use the "where I stand" buttons instead.`, "notice");
+        st.panel.add(`\u{1F5FA}\uFE0F This version of the game doesn't let me read map clicks. Use the "where I stand" buttons instead.`, "notice");
         return;
       }
       st.pick = { count, what, done, got: [] };
-      st.panel.add("🗺️ Click " + (count > 1 ? "one corner of " : "the tile for ") + what + " on the map. You won't walk there. (Esc cancels.)", "notice");
+      st.panel.add("\u{1F5FA}\uFE0F Click " + (count > 1 ? "one corner of " : "the tile for ") + what + " on the map. You won't walk there. (Esc cancels.)", "notice");
       st.panel.toggle(false);
     },
     cancelPick() {
       if (st.pick) {
         st.pick = null;
-        st.panel.add("🗺️ Map pickin' cancelled.", "notice");
+        st.panel.add("\u{1F5FA}\uFE0F Map pickin' cancelled.", "notice");
       }
     }
   };
@@ -3993,7 +3993,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     const p = st.pick;
     p.got.push({ X: tile.X, Y: tile.Y });
     if (p.got.length < p.count) {
-      st.panel.add("🗺️ Got " + tile.X + "," + tile.Y + ". Now click the opposite corner.", "notice");
+      st.panel.add("\u{1F5FA}\uFE0F Got " + tile.X + "," + tile.Y + ". Now click the opposite corner.", "notice");
       return true;
     }
     st.pick = null;

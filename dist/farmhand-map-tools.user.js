@@ -76,7 +76,7 @@
       if (to) api.teleport(mn, to, false);
       const r = api.rec(mn);
       if (r) r.naughtyMarks = (r.naughtyMarks || 0) + 1;
-      api.emote("🐄 " + api.name(mn) + " wandered out of the " + pen.zone + " pen and gets tugged right back in by the collar. Naughty!", mn);
+      api.emote("\u{1F404} " + api.name(mn) + " wandered out of the " + pen.zone + " pen and gets tugged right back in by the collar. Naughty!", mn);
     }
     api.save();
   }
@@ -87,26 +87,26 @@
   function heatText() {
     const h = D().heat;
     const zones = [...new Set(Object.keys(h.time).concat(Object.keys(h.action)))];
-    if (!zones.length) return "🗺️ No heat map yet this week. It fills in as people spend time in zones.";
+    if (!zones.length) return "\u{1F5FA}\uFE0F No heat map yet this week. It fills in as people spend time in zones.";
     const rows = zones.map((z) => [z, Math.round(h.time[z] || 0), h.action[z] || 0]).sort((a, b) => b[1] - a[1]);
     const top = Math.max(1, ...rows.map((r) => r[1]));
-    return "🗺️ HEAT MAP (this week)\n" + rows.map(([z, t, a]) => "█".repeat(Math.max(1, Math.round(t / top * 10))) + " " + z + ": " + t + " min · " + a + " actions").join("\n");
+    return "\u{1F5FA}\uFE0F HEAT MAP (this week)\n" + rows.map(([z, t, a]) => "\u2588".repeat(Math.max(1, Math.round(t / top * 10))) + " " + z + ": " + t + " min \xB7 " + a + " actions").join("\n");
   }
   function cmdPen(c) {
     const { sender, args, api: A } = c, d = D();
     const t = A.find(args[0]), z = String(args[1] || "").toLowerCase();
-    if (!t || !A.rec(t)) return c.reply("Here's how: ?pen <who> <zone> puts them in a pen · ?pen <who> off lets them out.");
+    if (!t || !A.rec(t)) return c.reply("Here's how: ?pen <who> <zone> puts them in a pen \xB7 ?pen <who> off lets them out.");
     if (z === "off" || z === "out") {
       delete d.pens[t];
       A.save();
-      A.notice(t, "🐄 You're let out of your pen.");
-      return c.reply("🐄 " + A.name(t) + " is out of their pen.");
+      A.notice(t, "\u{1F404} You're let out of your pen.");
+      return c.reply("\u{1F404} " + A.name(t) + " is out of their pen.");
     }
     if (!A.zones()[z]) return c.reply("There's no zone called '" + z + "', sugar. ?zones lists them.");
     d.pens[t] = { zone: z, by: sender, at: Date.now() };
     A.save();
-    A.notice(t, "🐄 " + A.name(sender) + " put you in the " + z + " pen." + (d.fence[t] ? " Wander out and you'll be tugged back." : " (You haven't said ?fence on, so nothin' stops you leavin'.)"));
-    c.reply("🐄 " + A.name(t) + " is penned in " + z + (d.fence[t] ? ", fenced." : ". They haven't said ?fence on, so it isn't enforced."));
+    A.notice(t, "\u{1F404} " + A.name(sender) + " put you in the " + z + " pen." + (d.fence[t] ? " Wander out and you'll be tugged back." : " (You haven't said ?fence on, so nothin' stops you leavin'.)"));
+    c.reply("\u{1F404} " + A.name(t) + " is penned in " + z + (d.fence[t] ? ", fenced." : ". They haven't said ?fence on, so it isn't enforced."));
   }
   function companion(mn) {
     if (!api.rec(mn)) return null;
@@ -132,11 +132,11 @@
       pen: { usage: "pen <who> <zone>", rank: "staff", private: true, run: cmdPen },
       fence: { usage: "fence on|off", private: true, run: (c) => {
         const d = D(), w = String(c.args[0] || "").toLowerCase();
-        if (w !== "on" && w !== "off") return c.reply("🐄 Fence: " + (d.fence[c.sender] ? "ON" : "off") + ". ?fence on lets a pen hold you; ?fence off and pens are just a suggestion.");
+        if (w !== "on" && w !== "off") return c.reply("\u{1F404} Fence: " + (d.fence[c.sender] ? "ON" : "off") + ". ?fence on lets a pen hold you; ?fence off and pens are just a suggestion.");
         if (w === "on") d.fence[c.sender] = true;
         else delete d.fence[c.sender];
         c.api.save();
-        c.reply(w === "on" ? "🐄 Fence ON. If staff pen you, you'll be tugged back when you wander." : "🐄 Fence off. Pens won't hold you.");
+        c.reply(w === "on" ? "\u{1F404} Fence ON. If staff pen you, you'll be tugged back when you wander." : "\u{1F404} Fence off. Pens won't hold you.");
       } },
       busy: { usage: "busy", aliases: ["heatmap"], rank: "staff", private: true, run: (c) => c.reply(heatText()) }
     },

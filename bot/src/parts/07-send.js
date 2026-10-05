@@ -234,13 +234,14 @@
   // talk never matches somebody called Sugar or Honey. Anyone in the room counts, placed on the map or not.
   function aboutWhom(text){
     text = String(text);
-    let best = null, at = Infinity;
+    // the earliest name in the line; where two start at the same place ("Alexia's Laynie" and "Alexia"), the longer one
+    let best = null, at = Infinity, len = 0;
     for (const c of (W.ChatRoomCharacter||[])){
       const mn = c.MemberNumber; if (mn === CFG.BOT_MEMBER) continue;
       const r = rec(mn), names = [...new Set([plainName(mn), c.Nickname, c.Name, r && r.name].filter(n => n && String(n).length > 1))];
       for (const n of names){
         const i = indexOfWord(text, String(n));
-        if (i >= 0 && (i < at || (i === at && best !== null && String(n).length > 1))){ at = i; best = mn; }
+        if (i >= 0 && (i < at || (i === at && String(n).length > len))){ at = i; best = mn; len = String(n).length; }
       }
     }
     return best;
@@ -262,10 +263,13 @@
     enqueue({ Content:t, Type:"Chat" }, urgent);
   }
   // who: the person it's about (worked out from the names in it if left out)
-  function emote(t, who){
+  // also: people who get every line wherever they're standin' (a scene's two people: whoever's doin' it,
+  // even from across the map, and whoever it's done to)
+  function emote(t, who, also){
     if (state.cmdWatch) state.cmdWatch.emotes.push(String(t));
     const subject = who || aboutWhom(t);
-    if (subject && waitPlaced(subject, () => emote(t, subject), () => privateTo(subject, t, "emote"))) return;
+    if (subject && waitPlaced(subject, () => emote(t, subject, also), () => privateTo(subject, t, "emote"))) return;
+    also = (also || []).filter(m => m && m !== CFG.BOT_MEMBER && onMap(m));
     if (mapRoom() && subject){
       // 1. FROM THEM: a line about somebody with the Companion is posted by their own Companion as their own
       //    emote (no name in front), so the game shows it to exactly the people who can see them. Only ever
@@ -275,7 +279,10 @@
       if (by){
         relayEmote(by, t, subject);
         const seen = sightOf(by) ? new Set(audience(by, "see")) : null;
-        for (const m of parties) if (m !== by && seen && !seen.has(m)) privateTo(m, t, "emote");
+        // (not knowin' who can see them: a scene's other person gets a copy only if they're out of range)
+        const far = m => { const p = charFor(by) && charFor(by).MapData && charFor(by).MapData.Pos, q = charFor(m) && charFor(m).MapData && charFor(m).MapData.Pos;
+                           return !p || !q || Math.max(Math.abs(p.X-q.X), Math.abs(p.Y-q.Y)) > CFG.SPEAKER_RANGE; };
+        for (const m of new Set(parties.concat(also))) if (m !== by && (!seen ? also.includes(m) && far(m) : !seen.has(m))) privateTo(m, t, "emote");
         return;
       }
       // 2. otherwise: the speaker spot near them, or privately to whoever's near them. No walkin' over.
@@ -284,15 +291,31 @@
         // everybody around ANY of the people it's about (a breedin' names two), each once
         const who = new Set();
         for (const a of parties){ const s = audienceFor(a, t, "emote"); if (s) for (const m of s) who.add(m); }
+        for (const m of also) who.add(m);
         if (who.size){ for (const m of who) privateTo(m, t, "emote"); return; }
       }
     } else if (mapRoom() && CFG.SPEAKER_MODE !== "walk"){ toEveryone(t, "emote"); return; }   // about nobody: everybody hears it
     walkTo(subject);
     for (const c of splitMessage(t, 900)) enqueue({ Content:"*"+c, Type:"Emote" });
   }
-  // everybody on the map the line names
+  // everybody on the map the line names. A name that only shows up inside somebody else's longer name
+  // doesn't count: "Alexia's Laynie kneels" names Laynie, not Alexia.
   function namesHere(text){
-    return (W.ChatRoomCharacter||[]).map(c => c.MemberNumber).filter(m => m !== CFG.BOT_MEMBER && onMap(m) && namedIn(String(text), [m]));
+    const people = (W.ChatRoomCharacter||[]).map(c => c.MemberNumber).filter(m => m !== CFG.BOT_MEMBER && onMap(m));
+    return people.filter(m => {
+      const mine = namesOf(m);
+      let t = String(text);
+      for (const o of people){
+        if (o === m) continue;
+        for (const n of namesOf(o)){
+          if (n.length > 3 && mine.some(x => x.length < n.length && n.includes(x))){
+            const i = t.toLowerCase().indexOf(n);
+            if (i >= 0) t = t.split(new RegExp(n.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "ig")).join(" ");
+          }
+        }
+      }
+      return namedIn(t, [m]);
+    });
   }
   // has a Companion that can post farm emotes for them (v0.9+), and they haven't switched that off
   function canRelay(mn){

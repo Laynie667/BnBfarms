@@ -61,5 +61,14 @@ function boot(me, lock){
     await wait(5200);   // the per-person command gap
   }
 
+  // from the live recording: rory whispered "yes thank you" to whoever was at the bot's keyboard; the bot
+  // shouldn't butt in with "nothin' waitin'". An asked-for ?yes still gets the answer.
+  { const k=b.sent.length;
+    b.handlers.ChatRoomMessage({Sender:180836,Type:'Whisper',Content:'yes thank you'}); await wait(2500);
+    ok(!b.sent.slice(k).some(([e,d])=>/nothin' waitin'/.test(String(d&&(d.Content||d.Message)))), 'a plain "yes thank you" gets no reply');
+    await wait(5200); const k2=b.sent.length;
+    b.handlers.ChatRoomMessage({Sender:180836,Type:'Whisper',Content:'?yes'}); await wait(2500);
+    ok(b.sent.slice(k2).some(([e,d])=>/nothin' waitin'/.test(String(d&&(d.Content||d.Message)))), '?yes with nothing pending is still answered'); }
+
   out(fails ? fails+' FAILED' : 'ALL PASS'); process.exit(fails?1:0);
 })();

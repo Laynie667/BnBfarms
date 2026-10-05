@@ -60,8 +60,8 @@
   function leaderboard() {
     const S = api.staffScores(), wk = api.weekKey();
     const rows = Object.entries(S).filter(([, x]) => x.week === wk && x.pts > 0).sort((a, b) => b[1].pts - a[1].pts).slice(0, 10);
-    if (!rows.length) return "🏆 STAFF THIS WEEK\nNobody's earned points yet. Chores at their place, refills, grooming, midwifing and inspections all count.";
-    return "🏆 STAFF THIS WEEK\n" + rows.map(([mn, x], i) => i + 1 + ". " + api.name(Number(mn)) + ": " + x.pts + " pts · " + api.hoursThisWeek(Number(mn)).toFixed(1) + " h" + (Object.keys(x.why || {}).length ? " (" + Object.entries(x.why).map(([k, v]) => k + " " + v).join(", ") + ")" : "")).join("\n");
+    if (!rows.length) return "\u{1F3C6} STAFF THIS WEEK\nNobody's earned points yet. Chores at their place, refills, grooming, midwifing and inspections all count.";
+    return "\u{1F3C6} STAFF THIS WEEK\n" + rows.map(([mn, x], i) => i + 1 + ". " + api.name(Number(mn)) + ": " + x.pts + " pts \xB7 " + api.hoursThisWeek(Number(mn)).toFixed(1) + " h" + (Object.keys(x.why || {}).length ? " (" + Object.entries(x.why).map(([k, v]) => k + " " + v).join(", ") + ")" : "")).join("\n");
   }
   var canSee = (w, mn) => w.by === mn || w.to === mn;
   function cmdWriteup(c) {
@@ -72,7 +72,7 @@
       if (d.writeups[i].by !== sender && !A.isProprietor(sender)) return c.reply("Only whoever wrote it, or a proprietor, can take a write-up off, hon.");
       d.writeups.splice(i, 1);
       A.save();
-      return c.reply("📝 Write-up taken off.");
+      return c.reply("\u{1F4DD} Write-up taken off.");
     }
     const t = A.find(args[0]), text = rest.split(/\s+/).slice(1).join(" ").trim();
     if (!t || !A.rec(t) || !text) return c.reply("Here's how: ?wu <who> <what happened>. Only you and they can read it; everybody else sees a count.");
@@ -81,15 +81,15 @@
     d.writeups.push({ id: d.seq, to: t, by: sender, text: text.slice(0, 500), at: Date.now() });
     A.save();
     A.audit(sender, "WRITEUP", String(t));
-    A.notice(t, "📝 " + A.name(sender) + " wrote you up: " + text.slice(0, 500) + "\n(Only you and they can read this. ?wu shows yours.)");
-    c.reply("📝 Written up (#" + d.seq + "). Only you and " + A.name(t) + " can read it.");
+    A.notice(t, "\u{1F4DD} " + A.name(sender) + " wrote you up: " + text.slice(0, 500) + "\n(Only you and they can read this. ?wu shows yours.)");
+    c.reply("\u{1F4DD} Written up (#" + d.seq + "). Only you and " + A.name(t) + " can read it.");
   }
   function writeupsText(viewer, who) {
     const d = D(), list = who ? d.writeups.filter((w) => w.to === who) : d.writeups.filter((w) => canSee(w, viewer));
     const mine = list.filter((w) => canSee(w, viewer)), hidden = list.length - mine.length;
-    let o = "📝 WRITE-UPS" + (who ? " — " + api.name(who) : "") + "\n";
-    o += mine.length ? mine.map((w) => "#" + w.id + " " + api.name(w.by) + " → " + api.name(w.to) + ", " + new Date(w.at).toLocaleDateString() + ": " + w.text).join("\n") : "None you can read.";
-    if (hidden) o += "\n…and " + hidden + " more written by other people (only they and " + api.name(who) + " can read those).";
+    let o = "\u{1F4DD} WRITE-UPS" + (who ? " \u2014 " + api.name(who) : "") + "\n";
+    o += mine.length ? mine.map((w) => "#" + w.id + " " + api.name(w.by) + " \u2192 " + api.name(w.to) + ", " + new Date(w.at).toLocaleDateString() + ": " + w.text).join("\n") : "None you can read.";
+    if (hidden) o += "\n\u2026and " + hidden + " more written by other people (only they and " + api.name(who) + " can read those).";
     if (!who) {
       const counts = {};
       for (const w of d.writeups) counts[w.to] = (counts[w.to] || 0) + 1;
@@ -123,8 +123,8 @@
   function inspText() {
     const x = D().insp;
     if (!x) return "No inspection under way.";
-    if (!x.items) return "🔍 Inspection by " + api.name(x.by) + " starts in " + Math.max(0, Math.ceil((x.startAt - Date.now()) / 6e4)) + " min.";
-    return "🔍 INSPECTION by " + api.name(x.by) + "\n" + x.items.map((it, i) => i + 1 + ". " + (it.ok ? "✅ " : "❌ ") + it.what + (it.note ? " (" + it.note + ")" : "")).join("\n") + "\n?insp pass|fail <what> adds one · ?insp end finishes";
+    if (!x.items) return "\u{1F50D} Inspection by " + api.name(x.by) + " starts in " + Math.max(0, Math.ceil((x.startAt - Date.now()) / 6e4)) + " min.";
+    return "\u{1F50D} INSPECTION by " + api.name(x.by) + "\n" + x.items.map((it, i) => i + 1 + ". " + (it.ok ? "\u2705 " : "\u274C ") + it.what + (it.note ? " (" + it.note + ")" : "")).join("\n") + "\n?insp pass|fail <what> adds one \xB7 ?insp end finishes";
   }
   function cmdInspection(c) {
     const { sender, args, rest, api: A } = c, d = D(), w = String(args[0] || "").toLowerCase();
@@ -135,9 +135,9 @@
       const n = parseInt(args[1], 10), mins = Math.max(0, Math.min(60, isNaN(n) ? 10 : n));
       d.insp = { by: sender, startAt: Date.now() + mins * 6e4, items: null, staff: [] };
       A.save();
-      for (const mn of A.here()) if (d.optIn[mn] && A.isStaff(mn) && A.onDuty(mn) && mn !== sender) A.notice(mn, "🔍 Heads up: " + A.name(sender) + " is inspectin' the farm in " + mins + " minutes.");
+      for (const mn of A.here()) if (d.optIn[mn] && A.isStaff(mn) && A.onDuty(mn) && mn !== sender) A.notice(mn, "\u{1F50D} Heads up: " + A.name(sender) + " is inspectin' the farm in " + mins + " minutes.");
       if (!mins) begin();
-      return c.reply("🔍 Inspection " + (mins ? "in " + mins + " minutes" : "starts now") + ". Staff who switched inspections on have been warned.");
+      return c.reply("\u{1F50D} Inspection " + (mins ? "in " + mins + " minutes" : "starts now") + ". Staff who switched inspections on have been warned.");
     }
     if (w === "pass" || w === "fail") {
       if (!d.insp || !d.insp.items) return c.reply("There's no inspection under way, hon.");
@@ -156,7 +156,7 @@
       const report = inspText().split("\n?insp")[0] + "\n\nScore: " + score + "/10";
       for (const mn of x.staff) {
         if (score >= 5) A.staffPoints(mn, Math.round(score / 2), "inspection");
-        A.notice(mn, "🔍 Inspection's done: " + score + "/10." + (score >= 5 ? " Points to everybody on duty!" : " Let's tidy up, y'all."));
+        A.notice(mn, "\u{1F50D} Inspection's done: " + score + "/10." + (score >= 5 ? " Points to everybody on duty!" : " Let's tidy up, y'all."));
       }
       A.staffPoints(sender, 1, "inspecting");
       d.last = { at: Date.now(), by: sender, score };
@@ -169,9 +169,9 @@
       if (w === "on") d.optIn[sender] = true;
       else delete d.optIn[sender];
       A.save();
-      return c.reply(w === "on" ? "🔍 You'll be warned about inspections and share their score." : "🔍 You're out of inspections. No warnings, no score.");
+      return c.reply(w === "on" ? "\u{1F50D} You'll be warned about inspections and share their score." : "\u{1F50D} You're out of inspections. No warnings, no score.");
     }
-    c.reply(inspText() + (d.last ? "\nLast one: " + d.last.score + "/10 by " + A.name(d.last.by) + ", " + new Date(d.last.at).toLocaleDateString() : "") + "\n\n?insp on|off · ?insp start [minutes] · pass|fail <what> · end");
+    c.reply(inspText() + (d.last ? "\nLast one: " + d.last.score + "/10 by " + A.name(d.last.by) + ", " + new Date(d.last.at).toLocaleDateString() : "") + "\n\n?insp on|off \xB7 ?insp start [minutes] \xB7 pass|fail <what> \xB7 end");
   }
   function begin() {
     const d = D(), x = d.insp;

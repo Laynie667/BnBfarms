@@ -141,6 +141,7 @@ function scheduleNext(id, mn) {
 }
 
 // ── every heartbeat (about 20 s) ───────────────────────────
+const toldWhy = {};   // member -> when they were last told why a stall does nothing for them
 function tick() {
   const d = D(), now = Date.now();
   // shifts endin'
@@ -158,7 +159,12 @@ function tick() {
     if (s.who !== mn) {
       s.who = mn;
       const why = whyNot(mn);
-      if (why) { api.notice(mn, "🕳️ This is glory stall " + id + ", but nothin' will happen here: " + why + "."); s.next = Infinity; continue; }
+      if (why) {
+        // told once per 10 minutes, not every time they shuffle a tile off and back on (seen live: twice in 40 s)
+        toldWhy[mn] = toldWhy[mn] || 0;
+        if (Date.now() - toldWhy[mn] > 600000) { toldWhy[mn] = Date.now(); api.notice(mn, "🕳️ This is glory stall " + id + ", but nothin' will happen here: " + why + "."); }
+        s.next = Infinity; continue;
+      }
       s.next = now + between(2, 5) * 60000;
       api.notice(mn, "🕳️ You're in glory stall " + id + ". Somebody will come along soon. Step off the spot whenever you want to stop.");
       continue;

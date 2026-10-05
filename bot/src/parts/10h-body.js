@@ -26,10 +26,11 @@
     for (const mn of who) if (cueable(mn, "sound")) enqueue(makeMsg("sound", { name }, mn));
   }
 
-  // who can see / hear somebody, as their Companion last reported it (fresh for 30 s); null if unknown
+  // who can see / hear somebody, as their Companion last reported it; null if unknown. A Companion reports
+  // every change at once and refreshes every 2 minutes, so a report is good for 3.
   function sightOf(mn){
     const s = state.sight && state.sight.get(mn);
-    return s && Date.now() - s.at < 30000 ? s : null;
+    return s && Date.now() - s.at < 180000 ? s : null;
   }
   function audience(mn, kind){
     const s = sightOf(mn);

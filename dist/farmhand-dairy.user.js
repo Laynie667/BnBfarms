@@ -169,7 +169,7 @@
         if (!(ml >= 1)) continue;
         const grade = api.milkGrade(Number(mn)) || "C";
         d.cert[mn] = { week: d.week.key, grade, ml: Math.round(ml), award: AWARDS[grade] || AWARDS.C, at: Date.now() };
-        api.notice(Number(mn), "📜 Your milk certificate for last week: " + certText(Number(mn)));
+        api.notice(Number(mn), "\u{1F4DC} Your milk certificate for last week: " + certText(Number(mn)));
       }
       d.week = { key: wk, ml: {} };
     }
@@ -178,7 +178,7 @@
   }
   var certText = (mn) => {
     const c = D().cert[mn];
-    return c ? "Grade " + c.grade + " · " + api.ml(c.ml) + ' · "' + c.award + '" (week of ' + c.week + ")" : null;
+    return c ? "Grade " + c.grade + " \xB7 " + api.ml(c.ml) + ' \xB7 "' + c.award + '" (week of ' + c.week + ")" : null;
   };
   function companion(mn) {
     const p = api.prod(mn);
@@ -205,7 +205,7 @@
         const t = c.args[0] ? c.api.find(c.args[0]) : c.sender;
         if (t !== c.sender && !c.api.isStaff(c.sender)) return c.reply("Only staff look at somebody else's certificate, sugar.");
         if (!t) return c.reply("Who's that, hon?");
-        c.reply("📜 " + (certText(t) || c.api.name(t) + " doesn't have a certificate yet.") + " · so far this week: " + c.api.ml(D().week.ml[t] || 0));
+        c.reply("\u{1F4DC} " + (certText(t) || c.api.name(t) + " doesn't have a certificate yet.") + " \xB7 so far this week: " + c.api.ml(D().week.ml[t] || 0));
       } }
     },
     on: { tick },

@@ -144,7 +144,7 @@ function onIn(ev, d) {
       case "ChatRoomSyncMemberJoin": if (d && d.Character) { names.set(d.Character.MemberNumber, d.Character.Nickname || d.Character.Name); line("JOIN", nameOf(d.Character.MemberNumber) + (d.Character.MapData && d.Character.MapData.Pos ? " at " + d.Character.MapData.Pos.X + "," + d.Character.MapData.Pos.Y : "")); lookChange(d.Character.MemberNumber, d.Character.Appearance); } return;
       case "ChatRoomSyncMemberLeave": if (d) line("LEAVE", nameOf(d.SourceMemberNumber)); return;
       case "ChatRoomSyncRoomProperties": if (d) line("ROOMPROP", json({ Name: d.Name, Admin: d.Admin, Whitelist: d.Whitelist, Ban: d.Ban, Locked: d.Locked, Private: d.Private }, 400)); return;
-      case "AccountBeep": if (d) line("BEEP-IN", nameOf(d.MemberNumber) + (d.MemberName ? " \"" + d.MemberName + "\"" : "") + (d.BeepType ? " [" + d.BeepType + "]" : "") + (d.ChatRoomName ? " in " + d.ChatRoomName : "") + ": " + short(d.Message, 1000)); return;
+      case "AccountBeep": if (d) line("BEEP-IN", nameOf(d.MemberNumber) + (d.MemberName ? " \"" + d.MemberName + "\"" : "") + (d.BeepType ? " [" + d.BeepType + "]" : "") + (d.ChatRoomName ? " in " + d.ChatRoomName : "") + ": " + (typeof d.Message === "string" ? short(d.Message, 1000) : json(d.Message, 300))); return;
       case "LoginResponse": line("LOGIN", typeof d === "object" ? "logged in" : String(d)); return;   // never the account data
       case "AccountQueryResult": if (d) line("QUERY", d.Query + " · " + (Array.isArray(d.Result) ? d.Result.length + " results" : json(d.Result, 120))); return;
       case "ChatRoomSearchResult": line("SEARCH", (Array.isArray(d) ? d.length : "?") + " rooms"); return;
@@ -163,7 +163,7 @@ function onOut(ev, d) {
       line("SENT", "[" + d.Type + "]" + to + ": " + short(typeof d.Content === "string" ? d.Content : json(d.Content), 1000) + (d.Type === "Activity" || d.Type === "Action" ? " · " + dictText(d.Dictionary) : ""));
       return;
     }
-    if (ev === "AccountBeep" && d) { line("BEEP-OUT", "→ " + nameOf(d.MemberNumber) + ": " + short(d.Message, 1000)); return; }
+    if (ev === "AccountBeep" && d) { line("BEEP-OUT", "→ " + nameOf(d.MemberNumber) + (d.BeepType ? " [" + d.BeepType + "]" : "") + ": " + (typeof d.Message === "string" ? short(d.Message, 1000) : json(d.Message, 300))); return; }
     if (ev === "AccountUpdate") { line("OUT", "AccountUpdate (" + Object.keys(d || {}).join(", ") + ")"); return; }
     if (ev === "ChatRoomCharacterMapDataUpdate") { return; }   // our own steps show up as MOVE from the server
     line("OUT", ev + " " + json(d, 200));

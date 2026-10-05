@@ -52,7 +52,7 @@ for (const t of targets) {
     bundle: true,
     format: "iife",
     target: "es2020",
-    charset: "utf8",
+    charset: "ascii",   // emoji and accents written as \u escapes: the scripts read right whatever encoding the browser guesses at install
     legalComments: "none",
     banner: { js: header },
     define: { __FARMHAND_VERSION__: JSON.stringify(t.version) },

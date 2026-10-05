@@ -1002,7 +1002,7 @@
           if (!teleport(t, pt, true)){ R("I can't move folks right now, hon. I've lost my room admin rights."); break; }
           tell(t, "🔗 "+plainName(sender)+" called you over, sugar.");
           audit(sender, "SUMMON_HERE", t+(sp ? " "+sp : ""));
-          R("🔗 Brought "+plainName(t)+(sp ? " to the "+sp+" spot." : " right over beside you."));
+          R("🔗 Sent for "+plainName(t)+". They'll turn up "+(sp ? "at the "+sp+" spot" : "right beside you")+" in a moment (I check, and send again if the game drops it).");
           break;
         }
         // away, and on call: pulled in with their BCX or BC+ summon rule, landin' at the staff spot
@@ -1815,7 +1815,11 @@ Welcome to B&B Farm, hon. 🌾`);
       }
 
       case "yes": case "no": {
-        if (!answerPending(sender, cmd === "yes")) R("There's nothin' waitin' on a yes or no from you right now, hon.");
+        // a plain "yes thank you" whispered (or said) with nothin' pendin' is most likely meant for a person (whoever's
+        // at the bot's keyboard), so there only an asked-for ?yes / ?no gets the "nothin' waitin'" answer.
+        // A beep or /bot is always meant for the bot.
+        const plainTalk = (channel === "whisper" || channel === "chat") && !/^\s*[?!.\-\/]/.test(String(raw));
+        if (!answerPending(sender, cmd === "yes") && !plainTalk) R("There's nothin' waitin' on a yes or no from you right now, hon.");
         break;
       }
 

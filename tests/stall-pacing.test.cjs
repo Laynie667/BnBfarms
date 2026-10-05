@@ -50,5 +50,10 @@ const roomLines=k=>sent.slice(k).filter(([e,d])=>d&&(d.Type==='Emote'||(d.Type==
   ok(told.length===1, '...they are told once, not every tick');
   skew+=21*60000; W.__ms(); W.__ms();
   ok(!!p().stall, 'after the rest it takes them again');
+  // from the live recording: steppin' off for two minutes and back carries on, without a new announcement
+  await wait(3000); chars[1].MapData.Pos={X:9,Y:9}; skew+=20000; W.__ms(); skew+=120000; W.__ms();
+  ok(!p().stall && p().stallPaused, 'gone two minutes: the session is on hold');
+  chars[1].MapData.Pos={X:5,Y:5}; k=sent.length; skew+=20000; W.__ms(); skew+=20000; W.__ms(); await wait(3000);
+  ok(!!p().stall && !sent.slice(k).some(([e,d])=>d&&/latches on/.test(String(d.Content||d.Message||''))), '...and coming back picks it up quietly');
   out(fails ? fails+' FAILED' : 'ALL PASSED'); process.exit(fails?1:0);
 })();

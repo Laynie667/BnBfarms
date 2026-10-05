@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm add-on: Glory stalls
 // @namespace    bnbfarm
-// @version      1.3.3
+// @version      1.3.4
 // @description  Glory stall spots: simulated ~5 minute scenes every 10-30 minutes, real visitors, shifts, punishment shifts and a board. Runs on the farm bot's computer, next to the Farmhand Bot script.
 // @author       Laynie & Alexia
 // @match        *://*.bondageprojects.elementfx.com/*
@@ -853,7 +853,7 @@
     if (inside && holes.includes("vulva") && r && r.breedable && r.fertile && !api.limitBlocks(mn, "breed")) {
       if (p) p.lastFill = { at: Date.now(), stud: api.ANON_STUD, ml: ml / holes.length };
       const took = api.rollConception(mn, api.ANON_STUD, ml / holes.length);
-      if (took === "new") api.later(() => api.notice(mn, "🍼 A warm, heavy feelin' settles low in your belly… somethin' from the stalls took, sugar. (?stats shows it)"), 2e4);
+      if (took === "new") api.later(() => api.notice(mn, "\u{1F37C} A warm, heavy feelin' settles low in your belly\u2026 somethin' from the stalls took, sugar. (?stats shows it)"), 2e4);
     }
     api.save();
   }
@@ -863,12 +863,13 @@
     s.next = Date.now() + (pun ? between(5, 15) : between(10, 30)) * 6e4;
     api.save();
   }
+  var toldWhy = {};
   function tick() {
     const d = D(), now = Date.now();
     for (const [mn, sh] of Object.entries(d.shifts)) {
       if (sh.until > now) continue;
       delete d.shifts[mn];
-      api.notice(Number(mn), "🕳️ Your " + (sh.punish ? "punishment " : "") + "shift in the glory stalls is over, sugar. You can step out.");
+      api.notice(Number(mn), "\u{1F573}\uFE0F Your " + (sh.punish ? "punishment " : "") + "shift in the glory stalls is over, sugar. You can step out.");
       api.save();
     }
     for (const id of stallIds()) {
@@ -883,12 +884,16 @@
         s.who = mn;
         const why = whyNot(mn);
         if (why) {
-          api.notice(mn, "🕳️ This is glory stall " + id + ", but nothin' will happen here: " + why + ".");
+          toldWhy[mn] = toldWhy[mn] || 0;
+          if (Date.now() - toldWhy[mn] > 6e5) {
+            toldWhy[mn] = Date.now();
+            api.notice(mn, "\u{1F573}\uFE0F This is glory stall " + id + ", but nothin' will happen here: " + why + ".");
+          }
           s.next = Infinity;
           continue;
         }
         s.next = now + between(2, 5) * 6e4;
-        api.notice(mn, "🕳️ You're in glory stall " + id + ". Somebody will come along soon. Step off the spot whenever you want to stop.");
+        api.notice(mn, "\u{1F573}\uFE0F You're in glory stall " + id + ". Somebody will come along soon. Step off the spot whenever you want to stop.");
         continue;
       }
       if (s.next === Infinity) {
@@ -899,7 +904,7 @@
       if (v && v !== mn) {
         if (prompted.get(v) !== id) {
           prompted.set(v, id);
-          api.notice(v, "🕳️ Stall " + id + " is occupied. ?stall use mouth, ?stall use pussy or ?stall use ass. Whoever's inside never learns your name.");
+          api.notice(v, "\u{1F573}\uFE0F Stall " + id + " is occupied. ?stall use mouth, ?stall use pussy or ?stall use ass. Whoever's inside never learns your name.");
         }
         continue;
       }
@@ -921,18 +926,18 @@
       if (w === "on") d.optIn[sender] = true;
       else delete d.optIn[sender];
       A.save();
-      return c.reply(w === "on" ? "🕳️ Glory stalls: ON. Stand on a glory stall spot and strangers will use you, and staff can put you on punishment shifts. Your limits and whatever's locked on you still count. ?glory off any time." : "🕳️ Glory stalls: OFF. Nothin' will happen to you in the stalls, and nobody can put you on a punishment shift.");
+      return c.reply(w === "on" ? "\u{1F573}\uFE0F Glory stalls: ON. Stand on a glory stall spot and strangers will use you, and staff can put you on punishment shifts. Your limits and whatever's locked on you still count. ?glory off any time." : "\u{1F573}\uFE0F Glory stalls: OFF. Nothin' will happen to you in the stalls, and nobody can put you on a punishment shift.");
     }
     const me = d.people[sender];
-    c.reply("🕳️ Glory stalls: " + (d.optIn[sender] ? "ON" : "OFF") + " (?glory on / ?glory off)" + (me ? "\nToday: " + (me.day === today() ? me.today : 0) + " · all time: " + (me.total || 0) + " (mouth " + (me.holes.mouth || 0) + ", pussy " + (me.holes.vulva || 0) + ", ass " + (me.holes.butt || 0) + ")" + (me.biggest ? " · biggest load " + Math.round(me.biggest) + " mL" : "") + (me.kinds ? " · most often: " + Object.entries(me.kinds).sort((a, b) => b[1] - a[1])[0][0] : "") : "") + (d.shifts[sender] ? "\nOn " + (d.shifts[sender].punish ? "a punishment " : "") + "shift for " + Math.ceil((d.shifts[sender].until - Date.now()) / 6e4) + " more minutes." : ""));
+    c.reply("\u{1F573}\uFE0F Glory stalls: " + (d.optIn[sender] ? "ON" : "OFF") + " (?glory on / ?glory off)" + (me ? "\nToday: " + (me.day === today() ? me.today : 0) + " \xB7 all time: " + (me.total || 0) + " (mouth " + (me.holes.mouth || 0) + ", pussy " + (me.holes.vulva || 0) + ", ass " + (me.holes.butt || 0) + ")" + (me.biggest ? " \xB7 biggest load " + Math.round(me.biggest) + " mL" : "") + (me.kinds ? " \xB7 most often: " + Object.entries(me.kinds).sort((a, b) => b[1] - a[1])[0][0] : "") : "") + (d.shifts[sender] ? "\nOn " + (d.shifts[sender].punish ? "a punishment " : "") + "shift for " + Math.ceil((d.shifts[sender].until - Date.now()) / 6e4) + " more minutes." : ""));
   }
   function board(staff) {
     const d = D(), ids = stallIds();
-    if (!ids.length) return "🕳️ No glory stalls are set up yet. Herdmasters: ?spot set glory-1 inside the booth and ?spot set glory-1-visitor outside the hole.";
-    return "🕳️ GLORY STALLS\n" + ids.map((id) => {
+    if (!ids.length) return "\u{1F573}\uFE0F No glory stalls are set up yet. Herdmasters: ?spot set glory-1 inside the booth and ?spot set glory-1-visitor outside the hole.";
+    return "\u{1F573}\uFE0F GLORY STALLS\n" + ids.map((id) => {
       const s = d.stalls[id] || {}, mn = occupantOf(id), n = s.day === today() ? s.today : 0;
       const sh = mn && d.shifts[mn];
-      return "Stall " + id + ": " + (mn ? (staff ? api.name(mn) : "occupied") + (running.has(id) ? " · busy right now" : "") : "empty") + " · " + n + " today" + (staff && sh ? " · " + (sh.punish ? "punishment " : "") + "shift, " + Math.ceil((sh.until - Date.now()) / 6e4) + " min left" : "");
+      return "Stall " + id + ": " + (mn ? (staff ? api.name(mn) : "occupied") + (running.has(id) ? " \xB7 busy right now" : "") : "empty") + " \xB7 " + n + " today" + (staff && sh ? " \xB7 " + (sh.punish ? "punishment " : "") + "shift, " + Math.ceil((sh.until - Date.now()) / 6e4) + " min left" : "");
     }).join("\n");
   }
   function cmdStall(c) {
@@ -978,8 +983,8 @@
       d.shifts[who] = { until: Date.now() + mins * 6e4, by: sender, punish: false };
       A.save();
       A.audit(sender, "SHIFT", who + " " + mins + "m");
-      if (who !== sender) A.notice(who, "🕳️ " + A.name(sender) + " put you on a " + mins + " minute shift in the glory stalls. Find an empty stall, sugar.");
-      return c.reply("🕳️ " + (who === sender ? "You're" : A.name(who) + " is") + " on a " + mins + " minute stall shift.");
+      if (who !== sender) A.notice(who, "\u{1F573}\uFE0F " + A.name(sender) + " put you on a " + mins + " minute shift in the glory stalls. Find an empty stall, sugar.");
+      return c.reply("\u{1F573}\uFE0F " + (who === sender ? "You're" : A.name(who) + " is") + " on a " + mins + " minute stall shift.");
     }
     if (sub === "punish") {
       if (!staff) return c.reply("Punishment shifts are for staff to hand out, sugar.");
@@ -992,8 +997,8 @@
       A.save();
       A.audit(sender, "PUNISH", who + " " + mins + "m");
       if (free && A.onMap(who)) A.teleport(who, A.spot("glory-" + free), true);
-      A.notice(who, "🕳️ " + A.name(sender) + " sentenced you to " + mins + " minutes in the glory stalls" + (free ? ", stall " + free : ". Find a free stall") + ". Strangers come more often on a punishment shift. Your safeword still works.");
-      return c.reply("🕳️ " + A.name(who) + " is on a " + mins + " minute punishment shift" + (free ? " in stall " + free : " (no stall's free right now, they'll have to wait for one)") + ".");
+      A.notice(who, "\u{1F573}\uFE0F " + A.name(sender) + " sentenced you to " + mins + " minutes in the glory stalls" + (free ? ", stall " + free : ". Find a free stall") + ". Strangers come more often on a punishment shift. Your safeword still works.");
+      return c.reply("\u{1F573}\uFE0F " + A.name(who) + " is on a " + mins + " minute punishment shift" + (free ? " in stall " + free : " (no stall's free right now, they'll have to wait for one)") + ".");
     }
     if (sub === "release" || sub === "end") {
       const who = args[1] ? A.find(args[1]) : sender;
@@ -1002,10 +1007,10 @@
       if (who === sender && d.shifts[who].punish) return c.reply("You can't let yourself off a punishment shift, sugar. Ask staff, or use your safeword if you need out.");
       delete d.shifts[who];
       A.save();
-      if (who !== sender) A.notice(who, "🕳️ " + A.name(sender) + " let you off your stall shift.");
-      return c.reply("🕳️ Shift ended.");
+      if (who !== sender) A.notice(who, "\u{1F573}\uFE0F " + A.name(sender) + " let you off your stall shift.");
+      return c.reply("\u{1F573}\uFE0F Shift ended.");
     }
-    c.reply("?stalls shows the board · ?stall use mouth|pussy|ass (from a visitor spot) · ?stall shift <minutes>" + (staff ? " · ?stall shift <who> <minutes> · ?stall punish <who> <minutes> · ?stall release <who>" : ""));
+    c.reply("?stalls shows the board \xB7 ?stall use mouth|pussy|ass (from a visitor spot) \xB7 ?stall shift <minutes>" + (staff ? " \xB7 ?stall shift <who> <minutes> \xB7 ?stall punish <who> <minutes> \xB7 ?stall release <who>" : ""));
   }
   function onSafe(mn) {
     const d = D();
@@ -1024,8 +1029,8 @@
     cards.push({
       title: "Glory stalls",
       toggles: [{ label: "Glory stalls: strangers can use me", desc: "Also lets staff give you punishment shifts. Your limits and whatever's locked on you still count.", on: !!d.optIn[mn], cmd: "glory " + (d.optIn[mn] ? "off" : "on") }],
-      lines: me ? [["Today", me.day === today() ? me.today : 0], ["All time", me.total || 0], ["Mouth · pussy · ass", (me.holes.mouth || 0) + " · " + (me.holes.vulva || 0) + " · " + (me.holes.butt || 0)]] : void 0,
-      chips: sh ? [{ text: (sh.punish ? "punishment shift" : "on shift") + " · " + Math.max(0, Math.ceil((sh.until - Date.now()) / 6e4)) + " min", kind: sh.punish ? "alert" : "acc" }] : void 0,
+      lines: me ? [["Today", me.day === today() ? me.today : 0], ["All time", me.total || 0], ["Mouth \xB7 pussy \xB7 ass", (me.holes.mouth || 0) + " \xB7 " + (me.holes.vulva || 0) + " \xB7 " + (me.holes.butt || 0)]] : void 0,
+      chips: sh ? [{ text: (sh.punish ? "punishment shift" : "on shift") + " \xB7 " + Math.max(0, Math.ceil((sh.until - Date.now()) / 6e4)) + " min", kind: sh.punish ? "alert" : "acc" }] : void 0,
       buttons: [{ label: "The board", cmd: "stalls" }]
     });
     if (api.isStaff(mn) && stallIds().length) {
@@ -1042,7 +1047,7 @@
     name: "glory-stalls",
     label: "Glory stalls",
     version: "1.0.0",
-    guide: "Stand on a glory stall spot (glory-1, glory-2…) after ?glory on, and strangers come by every 10–30 minutes. Each visit is about five minutes of private emotes only you see, and it counts on your record. A real visitor on the stall's visitor spot can ?stall use mouth|pussy|ass. ?stalls is the board. Staff: ?stall shift <who> <minutes>, ?stall punish <who> <minutes>, ?stall release <who>. Step off the spot to stop; ?safe always works.",
+    guide: "Stand on a glory stall spot (glory-1, glory-2\u2026) after ?glory on, and strangers come by every 10\u201330 minutes. Each visit is about five minutes of private emotes only you see, and it counts on your record. A real visitor on the stall's visitor spot can ?stall use mouth|pussy|ass. ?stalls is the board. Staff: ?stall shift <who> <minutes>, ?stall punish <who> <minutes>, ?stall release <who>. Step off the spot to stop; ?safe always works.",
     setup(a) {
       api = a;
       D();

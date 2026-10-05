@@ -80,6 +80,19 @@ const beepsTo=(k,mn)=>sent.slice(k).filter(([e,d])=>e==='AccountBeep'&&d.MemberN
   ok(L().spots.old, '"clear all" asks first');
   await wait(5200); handlers.AccountBeep({MemberNumber:221397,Message:'spot clear all yes'}); await drain(1500);
   ok(!Object.keys(L().spots).length, '...and clears everything with a yes');
+  // from the live recording: Laynie (Companion) milks Moo (none) from across the map. Every beat reaches
+  // Laynie too, the amount at the end included, and Moo gets every beat as well
+  handlers.ChatRoomMessage({Sender:221397,Type:'Hidden',Content:'FarmhandMsg',Dictionary:{v:2,type:'hello',ver:'0.10.4'}}); await drain(1500);
+  chars[1].MapData.Pos={X:40,Y:40}; chars[2].MapData.Pos={X:5,Y:5};
+  L().people[500].prod.milk=5000;
+  await wait(5200); k=sent.length;
+  global.setTimeout=(f,ms,...a)=>realTimeout(f, ms>=10000&&ms<=30000?20:ms, ...a);   // quick beats again
+  handlers.ChatRoomMessage({Sender:221397,Type:'Hidden',Content:'FarmhandMsg',Dictionary:{v:2,type:'cmd',text:'milk 500 600'}}); await drain(2500);
+  global.setTimeout=realTimeout;
+  const farm=(mn)=>sent.slice(k).filter(([e,d])=>d&&d.Type==='Hidden'&&d.Target===mn&&d.Dictionary&&['relay','roomline'].includes(d.Dictionary.type)).map(([e,d])=>d.Dictionary.text);
+  const toMoo=emotesSince(k).filter(c=>/^\(\*/.test(c));
+  ok(farm(221397).length>=5 && farm(221397).some(t=>/600 mL/.test(t)), 'the milker gets every beat from across the map, the amount included ('+farm(221397).length+')');
+  ok(toMoo.length>=5 && toMoo.some(t=>/600 mL/.test(t)), '...and so does the one being milked ('+toMoo.length+')');
   const errs=warns.filter(w=>/scene|command failed/.test(w)); ok(!errs.length, 'no errors logged '+errs.join(' | '));
   out(fails ? fails+' FAILED' : 'ALL PASSED'); process.exit(fails?1:0);
 })();

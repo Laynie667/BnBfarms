@@ -28,6 +28,8 @@ const botParts = {
 const targets = [
   { name: "bot",       entry: "farmhand-bot-parts",     header: "bot/header.txt",       out: "dist/farmhand-bot.user.js",       version: pkg.versions.bot, plugins: [botParts] },
   { name: "companion", entry: "extension/src/index.js", header: "extension/header.txt", out: "dist/farmhand-companion.user.js", version: pkg.versions.companion },
+  // the Farm Watcher: a stand-alone diagnostics recorder for a player's game (not part of the bot)
+  { name: "watcher",   entry: "watcher/index.js",       header: "watcher/header.txt",   out: "dist/farm-watcher.user.js",       version: pkg.versions.watcher },
 ];
 
 // Add-ons: every folder in addons/ with an addon.json becomes dist/farmhand-<name>.user.js
@@ -61,5 +63,6 @@ for (const t of targets) {
   if (watch) await (await esbuild.context(options)).watch();
   else await esbuild.build(options);
 }
-if (!watch) console.log("✅ Built bot v" + pkg.versions.bot + ", companion v" + pkg.versions.companion +
-  (targets.length > 2 ? " and " + (targets.length - 2) + " add-on(s)" : "") + " into dist/");
+const addonCount = targets.filter((t) => t.name.startsWith("add-on ")).length;
+if (!watch) console.log("✅ Built bot v" + pkg.versions.bot + ", companion v" + pkg.versions.companion + ", watcher v" + pkg.versions.watcher +
+  (addonCount ? " and " + addonCount + " add-on(s)" : "") + " into dist/");

@@ -6,10 +6,9 @@
 
   const W = (typeof unsafeWindow !== "undefined" && unsafeWindow) ? unsafeWindow : window;
   const TAG = "[Farmhand]";
-  // (everything logged also goes into the flight recorder, 02b-recorder.js)
-  const log  = (...a) => { console.log(TAG, ...a); try { recNote("log", a); } catch(e){} };
+  const log  = (...a) => console.log(TAG, ...a);
   const dbg  = (...a) => { if (CFG.DEBUG) console.log(TAG, ...a); };
-  const warn = (...a) => { console.warn(TAG, ...a); try { recNote("warn", a); } catch(e){} };
+  const warn = (...a) => console.warn(TAG, ...a);
 
   const ROLE = {
     PROPRIETOR:"PROPRIETOR", HERDMASTER:"HERDMASTER",

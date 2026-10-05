@@ -7,7 +7,6 @@
   function attachListeners(){
     if (attachListeners._done) return true;
     if (!W.ServerSocket || typeof W.ServerSocket.on !== "function") return false;
-    recAttach();   // the flight recorder (02b-recorder.js)
 
     W.ServerSocket.on("ChatRoomMessage",(data)=>{
       try {

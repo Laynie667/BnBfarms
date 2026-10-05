@@ -1,0 +1,22 @@
+// ==UserScript==
+// @name         BnB Farm — Farm Watcher (diagnostics)
+// @namespace    bnbfarm
+// @version      {{VERSION}}
+// @description  Records what this game sees for a while (chat, whispers, beeps, actions, map moves, restraints, Companion and bot messages, errors) and saves it as a text file. Not part of the bot; run it on a player's game.
+// @author       Laynie & Alexia
+// @match        *://*.bondageprojects.elementfx.com/*
+// @match        *://bondageprojects.elementfx.com/*
+// @match        *://*.bondage-europe.com/*
+// @match        *://bondage-europe.com/*
+// @match        *://*.bondageprojects.com/*
+// @match        *://bondageprojects.com/*
+// @match        *://*.bondage-asia.com/*
+// @match        *://bondage-asia.com/*
+// @match        *://*.bondageeurope.com/*
+// @match        *://bondageeurope.com/*
+// @grant        GM_setValue
+// @grant        GM_getValue
+// @grant        GM_registerMenuCommand
+// @grant        unsafeWindow
+// @run-at       document-idle
+// ==/UserScript==

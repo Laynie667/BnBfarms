@@ -95,20 +95,6 @@
 
     switch (cmd) {
 
-      case "rec": {
-        // the flight recorder: ?rec · ?rec save · ?rec mark <what just happened> · ?rec on|off (proprietors)
-        if (!isProprietor(sender)){ R("That's for the proprietors, sugar."); break; }
-        const sub = String(args[0]||"").toLowerCase();
-        if (sub === "mark"){ const note = args.slice(1).join(" ").slice(0, 300); recPush("mark", { by:sender, name:plainName(sender), note }); R("📍 Marked in the recording: "+(note||"(no note)")); break; }
-        if (sub === "on" || sub === "off"){ REC.on = sub === "on"; try { GM_setValue("bnb_flight_on", REC.on); } catch(e){} if (REC.on) recStep("recorder switched on by "+sender); R("🎙️ Flight recorder "+sub+"."); break; }
-        if (sub === "save"){
-          if (sender !== CFG.BOT_MEMBER){ recSave(); R("🎙️ Saved. To download it, open the bot's own screen and type /office rec save (or use the Tampermonkey menu there)."); break; }
-          const f = recDownload(); R(f ? "🎙️ Downloaded "+f+" ("+REC.ev.length+" things, last "+REC.keepMin+" min)." : "🎙️ Couldn't download it; see the console."); break;
-        }
-        const first = REC.ev.length ? Math.round((Date.now()-REC.ev[0][0])/60000) : 0;
-        R("🎙️ Flight recorder "+(REC.on ? "on" : "off")+": "+REC.ev.length+" things over the last "+first+" min ("+Math.round(REC.size/1024)+" KB).\n?rec mark <what just happened> · ?rec save · ?rec on|off");
-        break;
-      }
       case "addons": case "addon": {
         // ?addons · ?addons <name> · proprietors: ?addons on|off <name>
         const sub = String(args[0]||"").toLowerCase();

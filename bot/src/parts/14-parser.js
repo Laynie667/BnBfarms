@@ -116,7 +116,7 @@
                        "staff","stuck","friend","notice","teaseme",
                        "stats","board","pedigree","breedable","fertile","naturalheat","breed","cum","milkable","futa","size","sizes","measure","penis","cock","rights","accept",
                        "freeuse","jarok","gender","outfit","outfits","uniform","hypno","tally","eggs","yes","no","wash","quota","praise","degrade",
-                       "weather","feeding","curfew","beg","please","fair","enter","addons","addon","rec"];
+                       "weather","feeding","curfew","beg","please","fair","enter","addons","addon"];
   const STAFF_CMDS  = ["queue","app","approve","deny","register","unregister","grant","revoke",
                        "claim","release","myherd","herdname","herdcall","herdsummon","turnout","letup","goldkey",
                        "pasture","onduty","cover","staffadd","staffremove",

@@ -131,6 +131,27 @@ const STATE = { name: "Laynie", onBooks: true, roles: ["PROPRIETOR", "LIVESTOCK"
   const box = D.getElementById("fhc-input"); box.value = "half typed"; box.focus();
   bot({ type: "notice", text: "a new notice", id: 5, part: 1, of: 1 });
   out("7 typing survives a new message ->", D.getElementById("fhc-input").value === "half typed");
+  // phones: an update never rebuilds or refocuses the box (that popped the keyboard and zoomed the screen)
+  box.blur(); let focused = 0; box.addEventListener("focus", () => focused++);
+  bot({ type: "notice", text: "another notice", id: 6, part: 1, of: 1 });
+  bot({ type: "state", state: STAFF5B });
+  out("7 updates leave the box alone ->", D.getElementById("fhc-input") === box && focused === 0 && D.activeElement !== box);
+  out("7 boxes are 16px on touch screens (no zoom) ->", /@media \(pointer:coarse\)\{#fhc-panel input,#fhc-panel select,#fhc-panel textarea\{font-size:16px\}\}/.test(D.head.innerHTML));
+  // full screen and back
+  const panelEl = D.getElementById("fhc-panel");
+  const fsBtn = () => [...D.querySelectorAll("#fhc-panel button")].find((b) => /Full screen|Back to a panel/.test(b.getAttribute("aria-label") || ""));
+  fsBtn().click(); out("7 full screen toggle ->", panelEl.classList.contains("full"), fsBtn().getAttribute("aria-label") === "Back to a panel");
+  fsBtn().click(); out("7 ...and back to a panel ->", !panelEl.classList.contains("full"));
+  // the corner grip resizes, and the size is remembered
+  const grip = D.querySelector("#fhc-panel .fhc-grip");
+  panelEl.getBoundingClientRect = () => ({ left: 100, top: 100, width: 440, height: 600, right: 540, bottom: 700 });
+  const pe = (type, x, y) => { const e = new w.Event(type, { bubbles: true }); e.clientX = x; e.clientY = y; return e; };
+  grip.dispatchEvent(pe("pointerdown", 540, 700)); w.dispatchEvent(pe("pointermove", 640, 760));
+  out("7 the grip resizes ->", panelEl.style.width === "540px" && panelEl.style.height === "660px");
+  panelEl.getBoundingClientRect = () => ({ left: 100, top: 100, width: 540, height: 660, right: 640, bottom: 760 });
+  w.dispatchEvent(pe("pointerup", 640, 760));
+  const prefsNow = JSON.parse(w.localStorage.getItem(Object.keys(w.localStorage).find((k) => /fh|farm/i.test(k))) || "{}");
+  out("7 ...and remembers the size ->", prefsNow.size && prefsNow.size.w === 540 && prefsNow.size.h === 660);
 
   // 9. outfits: save, wear (with high security padlocks), leave locked spots alone, change back
   const G = { Cloth: { Name: "Cloth", Clothing: true, Category: "Appearance" }, HairFront: { Name: "HairFront", Clothing: false, Category: "Appearance" },

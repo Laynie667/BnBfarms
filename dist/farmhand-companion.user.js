@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.10.6
+// @version      0.10.7
 // @description  Your B&B Farm panel: the farm girl's answers, stat cards and guides, right in the game.
 // @author       Laynie & Alexia
 // @match        *://*.bondageprojects.elementfx.com/*
@@ -227,7 +227,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.10.6";
+  var VERSION = "0.10.7";
 
   // extension/src/config.js
   var BOT_MEMBER = 260239;
@@ -256,6 +256,14 @@ One of mods you are using is using an old version of SDK. It will work for now b
   display:none;flex-direction:column;background:var(--fh-ground);color:var(--fh-text);border:2px solid var(--fh-accent);border-radius:12px;
   font:14px/1.4 "Source Sans 3","Segoe UI",sans-serif;box-shadow:0 4px 18px #000a;overflow:hidden}
 #fhc-panel.open{display:flex}
+#fhc-panel.full{left:0!important;top:0!important;right:0!important;bottom:0!important;width:100vw!important;height:100vh!important;
+  height:100dvh!important;border-radius:0;border-width:0}
+#fhc-panel.full .fhc-grip{display:none}
+.fhc-top{flex:1;min-height:0;display:flex;flex-direction:column}
+.fhc-grip{position:absolute;right:0;bottom:0;width:22px;height:22px;cursor:nwse-resize;touch-action:none;z-index:2;
+  background:linear-gradient(135deg,transparent 50%,var(--fh-accent) 50%,var(--fh-accent) 58%,transparent 58%,transparent 70%,var(--fh-accent) 70%,var(--fh-accent) 78%,transparent 78%)}
+/* phones: 16px text in boxes, or the browser zooms the whole page in when one gets focus */
+@media (pointer:coarse){#fhc-panel input,#fhc-panel select,#fhc-panel textarea{font-size:16px}}
 #fhc-panel.compact{font-size:12.5px}
 #fhc-panel button{font:inherit;cursor:pointer}
 .fhc-head{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 12px;border-bottom:1px solid var(--fh-line);cursor:move}
@@ -587,7 +595,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
         ctx2.setPref(k, !ctx2.prefs[k]);
         ctx2.api.rehello && ctx2.api.rehello();
       })),
-      btn("Put the button and panel back in the corner", () => ctx2.resetPlaces && ctx2.resetPlaces())
+      btn("Put the button and panel back (size and full screen too)", () => ctx2.resetPlaces && ctx2.resetPlaces())
     );
   }
   function extraSwitches(ctx2) {
@@ -3050,6 +3058,26 @@ One of mods you are using is using an old version of SDK. It will work for now b
       });
       this.el = h("div", { id: "fhc-panel", role: "dialog", "aria-label": "B&B Farm" });
       this.el.addEventListener("keydown", (e) => e.stopPropagation());
+      this.top = h("div", { class: "fhc-top" });
+      this.form = h(
+        "form",
+        { class: "fhc-form", onsubmit: (e) => {
+          e.preventDefault();
+          const i = this.form.querySelector("#fhc-input");
+          if (i.value.trim()) this.ask(i.value.trim());
+          i.value = "";
+        } },
+        h(
+          "label",
+          { class: "fhc-grow", style: { display: "flex" } },
+          h("span", { class: "fhc-sr" }, "Ask the farm girl"),
+          h("input", { id: "fhc-input", class: "fhc-in", placeholder: "Ask the farm girl\u2026 (stats, size, help me)", autocomplete: "off" })
+        ),
+        h("button", { type: "submit", class: "fhc-b fhc-b-acc", style: { margin: "0" } }, "Send")
+      );
+      this.grip = h("div", { class: "fhc-grip", title: "Drag to resize", "aria-hidden": "true" });
+      this.grip.addEventListener("pointerdown", (e) => this.resize(e));
+      this.el.append(this.top, this.form, this.grip);
       doc.body.appendChild(this.btn);
       doc.body.appendChild(this.el);
       this.placeButton();
@@ -3091,6 +3119,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
     }
     // the panel opens beside the button (unless you've dragged the panel somewhere yourself)
     placePanel() {
+      this.el.classList.toggle("full", !!this.prefs.full);
+      const sz = this.prefs.size;
+      if (sz) Object.assign(this.el.style, { width: Math.min(sz.w, window.innerWidth - 8) + "px", height: Math.min(sz.h, window.innerHeight - 8) + "px" });
+      else Object.assign(this.el.style, { width: "", height: "" });
       if (this.prefs.pos) {
         Object.assign(this.el.style, { left: this.clampX(this.prefs.pos.x, 120) + "px", top: this.clampY(this.prefs.pos.y, 60) + "px", right: "auto", bottom: "auto" });
         return;
@@ -3099,7 +3131,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
         Object.assign(this.el.style, { left: "", top: "", right: "12px", bottom: "66px" });
         return;
       }
-      const b = this.btn.getBoundingClientRect(), pw = Math.min(440, window.innerWidth - 24), ph = Math.min(640, window.innerHeight * 0.78);
+      const b = this.btn.getBoundingClientRect(), r0 = this.el.getBoundingClientRect();
+      const pw = r0.width || Math.min(440, window.innerWidth - 24), ph = r0.height || Math.min(640, window.innerHeight * 0.78);
       const left = this.clampX(b.left + 46 - pw, pw);
       const top = b.top - ph - 8 >= 0 ? b.top - ph - 8 : this.clampY(b.bottom + 8, ph);
       Object.assign(this.el.style, { left: left + "px", top: top + "px", right: "auto", bottom: "auto" });
@@ -3107,6 +3140,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
     resetPlaces() {
       delete this.prefs.btnPos;
       delete this.prefs.pos;
+      delete this.prefs.size;
+      delete this.prefs.full;
       savePrefs(this.prefs);
       this.placeButton();
       this.placePanel();
@@ -3220,10 +3255,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
         hint: (msg) => this.add("\u{1F449} " + msg, "notice"),
         fillBox: (text) => {
           this.add("\u{1F449} Finish it in the box at the bottom, then press Send: ?" + text + "\u2026", "notice");
-          const i = this.el.querySelector("#fhc-input");
+          const i = this.form.querySelector("#fhc-input");
           if (i) {
             i.value = text;
-            i.focus();
+            if (!touchScreen()) i.focus();
           }
         },
         setUi: (patch, quiet) => {
@@ -3241,7 +3276,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
         },
         resetPlaces: () => {
           this.resetPlaces();
-          this.add("\u{1F449} The \u{1F33E} button and panel are back in the corner.", "notice");
+          this.add("\u{1F449} The \u{1F33E} button and panel are back in the corner, at their usual size.", "notice");
         }
       };
     }
@@ -3250,14 +3285,30 @@ One of mods you are using is using an old version of SDK. It will work for now b
       const tabs = view === "guest" ? V.tabs : withExtras(V.tabs, view, ctx2);
       const tabKey = "tab_" + view, tab = tabs.find((t) => t.id === this.ui[tabKey]) || tabs[0];
       const scroll = this.el.querySelector(".fhc-body"), keep = scroll ? scroll.scrollTop : 0;
-      const box = this.el.querySelector("#fhc-input"), typed = box ? box.value : "", hadFocus = box && window.document.activeElement === box;
       this.el.classList.toggle("compact", !!this.prefs.compact);
-      this.el.replaceChildren(
+      const full = !!this.prefs.full;
+      this.top.replaceChildren(
         h(
           "div",
           { class: "fhc-head", style: { touchAction: "none" }, onpointerdown: (e) => this.drag(e) },
           h("div", null, h("div", { class: "fhc-title" }, "\u{1F33E} B&B Farm"), h("div", { id: "fhc-status", class: "fhc-muted" }, this.status)),
-          h("button", { type: "button", class: "fhc-pill", "aria-label": "Close the panel", onclick: () => this.toggle(false) }, "\u2715")
+          h(
+            "div",
+            { style: { display: "flex", gap: "6px" } },
+            h("button", {
+              type: "button",
+              class: "fhc-pill",
+              title: full ? "Back to a panel" : "Full screen",
+              "aria-label": full ? "Back to a panel" : "Full screen",
+              onclick: () => {
+                this.prefs.full = !full;
+                savePrefs(this.prefs);
+                this.placePanel();
+                this.render();
+              }
+            }, full ? "\u{1F5D7}" : "\u26F6"),
+            h("button", { type: "button", class: "fhc-pill", "aria-label": "Close the panel", onclick: () => this.toggle(false) }, "\u2715")
+          )
         ),
         this.views().length > 1 && h(
           "div",
@@ -3283,31 +3334,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
             this.render();
           } }, t.label + (n ? " \xB7 " + n : ""));
         })),
-        h("div", { class: "fhc-body" }, this.banners(), safeRender(tab, ctx2)),
-        h(
-          "form",
-          { class: "fhc-form", onsubmit: (e) => {
-            e.preventDefault();
-            const i = e.target.querySelector("#fhc-input");
-            if (i.value.trim()) this.ask(i.value.trim());
-            i.value = "";
-          } },
-          h(
-            "label",
-            { class: "fhc-grow", style: { display: "flex" } },
-            h("span", { class: "fhc-sr" }, "Ask the farm girl"),
-            h("input", { id: "fhc-input", class: "fhc-in", placeholder: "Ask the farm girl\u2026 (stats, size, help me)", autocomplete: "off" })
-          ),
-          h("button", { type: "submit", class: "fhc-b fhc-b-acc", style: { margin: "0" } }, "Send")
-        )
+        h("div", { class: "fhc-body" }, this.banners(), safeRender(tab, ctx2))
       );
       const body = this.el.querySelector(".fhc-body");
       if (body) body.scrollTop = keep;
-      const box2 = this.el.querySelector("#fhc-input");
-      if (box2) {
-        box2.value = typed;
-        if (hadFocus) box2.focus();
-      }
     }
     // questions waitin' on you, on every tab
     banners() {
@@ -3376,8 +3406,30 @@ One of mods you are using is using an old version of SDK. It will work for now b
       ));
       return out;
     }
+    // drag the corner grip: the panel grows or shrinks from its top-left corner, and remembers the size
+    resize(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      const r = this.el.getBoundingClientRect(), x0 = e.clientX, y0 = e.clientY;
+      Object.assign(this.el.style, { left: r.left + "px", top: r.top + "px", right: "auto", bottom: "auto" });
+      const move = (ev) => {
+        const w = Math.max(300, Math.min(window.innerWidth - r.left - 4, r.width + ev.clientX - x0));
+        const hh = Math.max(300, Math.min(window.innerHeight - r.top - 4, r.height + ev.clientY - y0));
+        Object.assign(this.el.style, { width: w + "px", height: hh + "px" });
+      };
+      const up = () => {
+        window.removeEventListener("pointermove", move);
+        window.removeEventListener("pointerup", up);
+        const b = this.el.getBoundingClientRect();
+        this.prefs.size = { w: Math.round(b.width), h: Math.round(b.height) };
+        this.prefs.pos = { x: Math.round(b.left), y: Math.round(b.top) };
+        savePrefs(this.prefs);
+      };
+      window.addEventListener("pointermove", move);
+      window.addEventListener("pointerup", up);
+    }
     drag(e) {
-      if (e.target.closest("button")) return;
+      if (e.target.closest("button") || this.prefs.full) return;
       const r = this.el.getBoundingClientRect(), dx = e.clientX - r.left, dy = e.clientY - r.top;
       const move = (ev) => Object.assign(this.el.style, { left: this.clampX(ev.clientX - dx, 120) + "px", top: this.clampY(ev.clientY - dy, 60) + "px", right: "auto", bottom: "auto" });
       const up = () => {
@@ -3391,6 +3443,13 @@ One of mods you are using is using an old version of SDK. It will work for now b
       window.addEventListener("pointerup", up);
     }
   };
+  function touchScreen() {
+    try {
+      return window.matchMedia("(pointer: coarse)").matches;
+    } catch (e) {
+      return false;
+    }
+  }
   function safeRender(tab, ctx2) {
     try {
       return tab.render(ctx2);

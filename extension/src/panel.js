@@ -49,6 +49,17 @@ export class Panel {
     this.btn.addEventListener("click", () => { if (!this.btnDragged) this.toggle(); this.btnDragged = false; });
     this.el = h("div", { id: "fhc-panel", role: "dialog", "aria-label": "B&B Farm" });
     this.el.addEventListener("keydown", (e) => e.stopPropagation());   // keep BC from treatin' panel typin' as game keys
+    // what changes is redrawn in here; the command box below is built once and never touched again, so a message
+    // arrivin' never steals focus, pops a phone's keyboard back up, or zooms the screen
+    this.top = h("div", { class: "fhc-top" });
+    this.form = h("form", { class: "fhc-form", onsubmit: (e) => { e.preventDefault(); const i = this.form.querySelector("#fhc-input"); if (i.value.trim()) this.ask(i.value.trim()); i.value = ""; } },
+      h("label", { class: "fhc-grow", style: { display: "flex" } }, h("span", { class: "fhc-sr" }, "Ask the farm girl"),
+        h("input", { id: "fhc-input", class: "fhc-in", placeholder: "Ask the farm girl… (stats, size, help me)", autocomplete: "off" })),
+      h("button", { type: "submit", class: "fhc-b fhc-b-acc", style: { margin: "0" } }, "Send"));
+    // drag the corner to resize (mouse or finger)
+    this.grip = h("div", { class: "fhc-grip", title: "Drag to resize", "aria-hidden": "true" });
+    this.grip.addEventListener("pointerdown", (e) => this.resize(e));
+    this.el.append(this.top, this.form, this.grip);
     doc.body.appendChild(this.btn);
     doc.body.appendChild(this.el);
     this.placeButton();
@@ -83,14 +94,19 @@ export class Panel {
   }
   // the panel opens beside the button (unless you've dragged the panel somewhere yourself)
   placePanel() {
+    this.el.classList.toggle("full", !!this.prefs.full);
+    const sz = this.prefs.size;
+    if (sz) Object.assign(this.el.style, { width: Math.min(sz.w, window.innerWidth - 8) + "px", height: Math.min(sz.h, window.innerHeight - 8) + "px" });
+    else Object.assign(this.el.style, { width: "", height: "" });
     if (this.prefs.pos) { Object.assign(this.el.style, { left: this.clampX(this.prefs.pos.x, 120) + "px", top: this.clampY(this.prefs.pos.y, 60) + "px", right: "auto", bottom: "auto" }); return; }
     if (!this.prefs.btnPos) { Object.assign(this.el.style, { left: "", top: "", right: "12px", bottom: "66px" }); return; }
-    const b = this.btn.getBoundingClientRect(), pw = Math.min(440, window.innerWidth - 24), ph = Math.min(640, window.innerHeight * 0.78);
+    const b = this.btn.getBoundingClientRect(), r0 = this.el.getBoundingClientRect();
+    const pw = r0.width || Math.min(440, window.innerWidth - 24), ph = r0.height || Math.min(640, window.innerHeight * 0.78);
     const left = this.clampX(b.left + 46 - pw, pw);
     const top = b.top - ph - 8 >= 0 ? b.top - ph - 8 : this.clampY(b.bottom + 8, ph);
     Object.assign(this.el.style, { left: left + "px", top: top + "px", right: "auto", bottom: "auto" });
   }
-  resetPlaces() { delete this.prefs.btnPos; delete this.prefs.pos; savePrefs(this.prefs); this.placeButton(); this.placePanel(); this.render(); }
+  resetPlaces() { delete this.prefs.btnPos; delete this.prefs.pos; delete this.prefs.size; delete this.prefs.full; savePrefs(this.prefs); this.placeButton(); this.placePanel(); this.render(); }
 
   /* ── what the rest of the Companion calls ── */
   setStatus(text) { this.status = text; const s = this.el.querySelector("#fhc-status"); if (s) s.textContent = text; }
@@ -150,11 +166,11 @@ export class Panel {
       send: (cmd) => this.ask(cmd),
       // a button that can't do anything yet says why, instead of quietly doin' nothin'
       hint: (msg) => this.add("👉 " + msg, "notice"),
-      fillBox: (text) => { this.add("👉 Finish it in the box at the bottom, then press Send: ?" + text + "…", "notice"); const i = this.el.querySelector("#fhc-input"); if (i) { i.value = text; i.focus(); } },
+      fillBox: (text) => { this.add("👉 Finish it in the box at the bottom, then press Send: ?" + text + "…", "notice"); const i = this.form.querySelector("#fhc-input"); if (i) { i.value = text; if (!touchScreen()) i.focus(); } },
       setUi: (patch, quiet) => { Object.assign(this.ui, patch); if (!quiet) this.render(); },
       setPref: (k, v) => { this.prefs[k] = v; savePrefs(this.prefs); this.render(); },
       closeDoc: (id) => { this.docs = this.docs.filter((d) => d.id !== id); this.render(); },
-      resetPlaces: () => { this.resetPlaces(); this.add("👉 The 🌾 button and panel are back in the corner.", "notice"); },
+      resetPlaces: () => { this.resetPlaces(); this.add("👉 The 🌾 button and panel are back in the corner, at their usual size.", "notice"); },
     };
   }
   render() {
@@ -162,13 +178,15 @@ export class Panel {
     const tabs = view === "guest" ? V.tabs : withExtras(V.tabs, view, ctx);   // + "Farm extras" when an add-on has somethin'
     const tabKey = "tab_" + view, tab = tabs.find((t) => t.id === this.ui[tabKey]) || tabs[0];
     const scroll = this.el.querySelector(".fhc-body"), keep = scroll ? scroll.scrollTop : 0;
-    // a message arrivin' mid-sentence mustn't eat what they're typin'
-    const box = this.el.querySelector("#fhc-input"), typed = box ? box.value : "", hadFocus = box && window.document.activeElement === box;
     this.el.classList.toggle("compact", !!this.prefs.compact);
-    this.el.replaceChildren(
+    const full = !!this.prefs.full;
+    this.top.replaceChildren(
       h("div", { class: "fhc-head", style: { touchAction: "none" }, onpointerdown: (e) => this.drag(e) },
         h("div", null, h("div", { class: "fhc-title" }, "🌾 B&B Farm"), h("div", { id: "fhc-status", class: "fhc-muted" }, this.status)),
-        h("button", { type: "button", class: "fhc-pill", "aria-label": "Close the panel", onclick: () => this.toggle(false) }, "✕")),
+        h("div", { style: { display: "flex", gap: "6px" } },
+          h("button", { type: "button", class: "fhc-pill", title: full ? "Back to a panel" : "Full screen", "aria-label": full ? "Back to a panel" : "Full screen",
+            onclick: () => { this.prefs.full = !full; savePrefs(this.prefs); this.placePanel(); this.render(); } }, full ? "🗗" : "⛶"),
+          h("button", { type: "button", class: "fhc-pill", "aria-label": "Close the panel", onclick: () => this.toggle(false) }, "✕"))),
       this.views().length > 1 && h("div", { class: "fhc-row" }, h("span", { class: "fhc-grow fhc-muted" }, "Panel"),
         this.views().map((v) => h("button", { type: "button", class: "fhc-pill" + (v === view ? " on" : ""), onclick: () => { this.prefs.view = v; savePrefs(this.prefs); this.render(); } }, VIEWS[v].label))),
       h("div", { class: "fhc-row" },
@@ -179,14 +197,8 @@ export class Panel {
         const n = t.badge ? t.badge(ctx) : 0;
         return h("button", { type: "button", class: "fhc-pill" + (t === tab ? " on" : ""), onclick: () => { this.ui[tabKey] = t.id; this.render(); } }, t.label + (n ? " · " + n : ""));
       })),
-      h("div", { class: "fhc-body" }, this.banners(), safeRender(tab, ctx)),
-      h("form", { class: "fhc-form", onsubmit: (e) => { e.preventDefault(); const i = e.target.querySelector("#fhc-input"); if (i.value.trim()) this.ask(i.value.trim()); i.value = ""; } },
-        h("label", { class: "fhc-grow", style: { display: "flex" } }, h("span", { class: "fhc-sr" }, "Ask the farm girl"),
-          h("input", { id: "fhc-input", class: "fhc-in", placeholder: "Ask the farm girl… (stats, size, help me)", autocomplete: "off" })),
-        h("button", { type: "submit", class: "fhc-b fhc-b-acc", style: { margin: "0" } }, "Send")));
+      h("div", { class: "fhc-body" }, this.banners(), safeRender(tab, ctx)));
     const body = this.el.querySelector(".fhc-body"); if (body) body.scrollTop = keep;
-    const box2 = this.el.querySelector("#fhc-input");
-    if (box2){ box2.value = typed; if (hadFocus) box2.focus(); }
   }
   // questions waitin' on you, on every tab
   banners() {
@@ -213,8 +225,26 @@ export class Panel {
         btn("No", () => { this.asks = this.asks.filter((x) => x !== a); this.ask("no"); }))));
     return out;
   }
+  // drag the corner grip: the panel grows or shrinks from its top-left corner, and remembers the size
+  resize(e) {
+    e.preventDefault(); e.stopPropagation();
+    const r = this.el.getBoundingClientRect(), x0 = e.clientX, y0 = e.clientY;
+    // pin the top-left corner where it is, so only the size changes
+    Object.assign(this.el.style, { left: r.left + "px", top: r.top + "px", right: "auto", bottom: "auto" });
+    const move = (ev) => {
+      const w = Math.max(300, Math.min(window.innerWidth - r.left - 4, r.width + ev.clientX - x0));
+      const hh = Math.max(300, Math.min(window.innerHeight - r.top - 4, r.height + ev.clientY - y0));
+      Object.assign(this.el.style, { width: w + "px", height: hh + "px" });
+    };
+    const up = () => {
+      window.removeEventListener("pointermove", move); window.removeEventListener("pointerup", up);
+      const b = this.el.getBoundingClientRect();
+      this.prefs.size = { w: Math.round(b.width), h: Math.round(b.height) }; this.prefs.pos = { x: Math.round(b.left), y: Math.round(b.top) }; savePrefs(this.prefs);
+    };
+    window.addEventListener("pointermove", move); window.addEventListener("pointerup", up);
+  }
   drag(e) {
-    if (e.target.closest("button")) return;
+    if (e.target.closest("button") || this.prefs.full) return;
     const r = this.el.getBoundingClientRect(), dx = e.clientX - r.left, dy = e.clientY - r.top;
     // pointer events: a mouse and a finger both drag it
     const move = (ev) => Object.assign(this.el.style, { left: this.clampX(ev.clientX - dx, 120) + "px", top: this.clampY(ev.clientY - dy, 60) + "px", right: "auto", bottom: "auto" });
@@ -223,6 +253,9 @@ export class Panel {
     window.addEventListener("pointermove", move); window.addEventListener("pointerup", up);
   }
 }
+
+// a phone or tablet (no mouse): don't put the cursor in a box by itself, it pops the keyboard and zooms
+function touchScreen() { try { return window.matchMedia("(pointer: coarse)").matches; } catch (e) { return false; } }
 
 // one broken tab mustn't take the whole panel down
 function safeRender(tab, ctx) {

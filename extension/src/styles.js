@@ -16,6 +16,14 @@ export const CSS = `
   display:none;flex-direction:column;background:var(--fh-ground);color:var(--fh-text);border:2px solid var(--fh-accent);border-radius:12px;
   font:14px/1.4 "Source Sans 3","Segoe UI",sans-serif;box-shadow:0 4px 18px #000a;overflow:hidden}
 #fhc-panel.open{display:flex}
+#fhc-panel.full{left:0!important;top:0!important;right:0!important;bottom:0!important;width:100vw!important;height:100vh!important;
+  height:100dvh!important;border-radius:0;border-width:0}
+#fhc-panel.full .fhc-grip{display:none}
+.fhc-top{flex:1;min-height:0;display:flex;flex-direction:column}
+.fhc-grip{position:absolute;right:0;bottom:0;width:22px;height:22px;cursor:nwse-resize;touch-action:none;z-index:2;
+  background:linear-gradient(135deg,transparent 50%,var(--fh-accent) 50%,var(--fh-accent) 58%,transparent 58%,transparent 70%,var(--fh-accent) 70%,var(--fh-accent) 78%,transparent 78%)}
+/* phones: 16px text in boxes, or the browser zooms the whole page in when one gets focus */
+@media (pointer:coarse){#fhc-panel input,#fhc-panel select,#fhc-panel textarea{font-size:16px}}
 #fhc-panel.compact{font-size:12.5px}
 #fhc-panel button{font:inherit;cursor:pointer}
 .fhc-head{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 12px;border-bottom:1px solid var(--fh-line);cursor:move}

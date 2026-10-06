@@ -708,7 +708,10 @@
             (groups[key].length?groups[key].map(line).join("\n"):"  (nobody)"));
           break;
         }
-        let o = "📖 THE BOOKS — "+all.length+" registered\n";
+        // only people with a role count (live: "78 registered" when 45 were; the rest are files with no role left,
+        // like folks who were unregistered or never finished applyin')
+        const registered = all.filter(r => r.roles && r.roles.length).length;
+        let o = "📖 THE BOOKS — "+registered+" registered"+(all.length > registered ? " ("+(all.length-registered)+" more with a file but no role)" : "")+"\n";
         for (const k of ROLE_ORDER){
           if (!groups[k].length) continue;
           o += "\n"+label[k]+" ("+groups[k].length+")\n"+groups[k].map(line).join("\n")+"\n";

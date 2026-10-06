@@ -89,5 +89,21 @@ const beepsTo=(k,mn)=>sent.slice(k).filter(([e,d])=>e==='AccountBeep'&&d.MemberN
   // the Companion gets the add-on's cards
   const st=W.__stateFor(500); ok(st.mods && st.mods['glory-stalls'] && st.mods['glory-stalls'].cards.length>=1, 'the Companion state carries the add-on cards');
   const errs=warns.filter(w=>/add-on/.test(w)); ok(!errs.length, 'no add-on errors logged '+errs.join(' | '));
+  // live: face and back shots counted as loads inside. A pull-out is a splatter: no hole, nothing held, cum-covered
+  { const me=d().people['500'], mouthBefore=me.holes.mouth||0, heldBefore=L().people[500].prod.held.mouth||0, totalBefore=me.total;
+    const kS=sent.length;
+    W.__gloryFinish('1', 500, 'mouth', 25, false, {type:'human',size:'thick'});
+    ok(!sent.slice(kS).some(([e,x])=>x&&/LSCG_Splat/.test(String(x.Content))), 'no LSCG splat for someone whose LSCG has splatters off');
+    chars.find(c=>c.MemberNumber===500).LSCG={SplatterModule:{enabled:true,taker:true}};
+    const kL=sent.length;
+    W.__gloryFinish('1', 500, 'butt', 30, false, {type:'human',size:'thick'});
+    W.__gloryFinish('1', 500, 'mouth', 20, false, {type:'human',size:'thick'});
+    await wait(3000);
+    const splats=sent.slice(kL).filter(([e,x])=>x&&x.Type==='Activity'&&/LSCG_Splat/.test(String(x.Content)));
+    ok(splats.some(([e,x])=>x.Content==='ChatOther-ItemButt-LSCG_Splat') && splats.some(([e,x])=>x.Content==='ChatOther-ItemHead-LSCG_Splat') && splats.some(([e,x])=>x.Content==='ChatOther-ItemMouth-LSCG_Splat'), 'LSCG splatters on their back side and face');
+    ok(splats.every(([e,x])=>x.Target===500 && x.Dictionary.some(d=>d.TargetCharacter===500) && x.Dictionary.some(d=>d.Tag==='SourceCharacter'&&d.Text==='A stranger')), '...sent to them alone, from "A stranger"');
+    ok((me.holes.mouth||0)===mouthBefore && (L().people[500].prod.held.mouth||0)===heldBefore, 'a face shot is not a load in the mouth');
+    ok(me.splatters>=3 && me.total===totalBefore+3, '...each counts as a use, and as a splatter');
+    ok(L().people[500].prod.painted && L().people[500].prod.painted.areas.includes('face'), '...and they are cum-covered (face) till ?wash'); }
   out(fails ? fails+' FAILED' : 'ALL PASSED'); process.exit(fails?1:0);
 })();

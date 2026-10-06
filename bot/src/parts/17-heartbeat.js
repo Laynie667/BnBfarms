@@ -30,7 +30,7 @@
       const admin = botIsAdmin();
       let fl = 0; try { fl = (W.Player.FriendList||[]).length; } catch(e){}
       const oc = forcedStaff().length;
-      setBadge("on duty — "+Object.keys(L.people).length+" reg · "+fl+" friends · "+oc+" on call"+
+      setBadge("on duty — "+Object.values(L.people).filter(r => r.roles && r.roles.length).length+" reg · "+fl+" friends · "+oc+" on call"+
                (admin?"":" ⚠️NOT ADMIN"), admin ? "#b8ff9b" : "#ffc49b");
 
       keepalive();

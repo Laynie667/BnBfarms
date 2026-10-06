@@ -29,6 +29,7 @@
     if (!Array.isArray(L.tease)) L.tease = [];
     if (L.notice === undefined) L.notice = null;
     if (!L.life) L.life = { feedingOn:true, curfewOn:true };
+    for (const r of Object.values(L.people||{})) if (r && r.species === "kitt") r.species = "kitty";   // the short key, written out
     if (!Array.isArray(L.chores)) L.chores = CFG.CHORES.map(text => ({ text, by:0 }));
     if (!Array.isArray(L.wheel)) L.wheel = [];
     // old-style zones (before the A/B corner zones) are cleared; the new ones are kept

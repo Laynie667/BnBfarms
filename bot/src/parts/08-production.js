@@ -1161,6 +1161,7 @@
     const a = PAINT_AREAS[String(area).toLowerCase()] || "body";
     const was = tp.painted && tp.painted.until > now ? tp.painted.areas : [];
     tp.painted = { areas: Array.from(new Set(was.concat(a))), until: now + CFG.PAINT_H*3600000, by: stud };
+    lscgSplat(t, a, plainName(stud));
     tally(t); saveLedger(); audit(stud, "PAINT", stud+"→"+t+" "+a+" "+Math.round(load));
     const lines = {
       face:  "pulls out at the last second and paints %t's face: "+loadWord(load)+" ("+ml(load)+") in thick ropes across their cheeks, lips and lashes.",
@@ -1176,6 +1177,35 @@
     };
     emote("💦 "+(pent ? "All pent up, " : "")+plainName(stud)+" "+lines[a].replace(/%t/g, plainName(t))+" "+plainName(t)+" is marked as "+plainName(stud)+"'s now, for everybody to see.");
     return { load, pent };
+  }
+  /* LSCG SPLATTERS. Players with LSCG's splatter feature on get the real thing drawn on them: LSCG applies a
+     splat on their own game when it sees the "LSCG_Splat" action aimed at them (from someone their LSCG allows:
+     with "lovers only" on, the bot needs to be on their LSCG splatter whitelist). It's sent to them alone, never
+     the room, and only to people whose LSCG says splatters are on (nobody else would know what it is).
+     LSCG's own line reads "<who> sprays all over <them>'s face": who is the stud, or "A stranger". */
+  const SPLAT_SPOTS = { face:["ItemHead","ItemMouth"], hair:["ItemHead"], tits:["ItemBreast"], chest:["ItemBreast"], belly:["ItemPelvis"],
+                        back:["ItemButt"], ass:["ItemButt"], thighs:["ItemVulva"], crotch:["ItemVulva"], feet:["ItemPelvis"], body:["ItemPelvis"] };
+  function lscgSplatsOn(mn){
+    const C = charFor(mn), S = C && C.LSCG && C.LSCG.SplatterModule;
+    return !!(S && S.enabled && S.taker !== false && (!C.LSCG.GlobalModule || C.LSCG.GlobalModule.enabled !== false));
+  }
+  function lscgSplat(mn, area, who){
+    if (!CFG.LSCG_SPLATTERS || !lscgSplatsOn(mn)) return false;
+    for (const group of SPLAT_SPOTS[PAINT_AREAS[String(area||"").toLowerCase()] || "body"] || ["ItemPelvis"]){
+      send("ChatRoomChat", { Content: "ChatOther-"+group+"-LSCG_Splat", Type: "Activity", Target: mn,
+        Dictionary: [ { Tag: "SourceCharacter", Text: who || "A stranger" }, { TargetCharacter: mn },
+                      { Tag: "FocusAssetGroup", FocusGroupName: group }, { ActivityName: "LSCG_Splat" } ] });
+    }
+    return true;
+  }
+  // covered in it, from somewhere other than ?cum (a glory stall stranger who pulls out): shows on ?stats and ?who till ?wash
+  function paintOn(t, area, by){
+    const tp = prodOf(t); if (!tp) return;
+    const now = Date.now(), a = PAINT_AREAS[String(area||"").toLowerCase()] || "body";
+    const was = tp.painted && tp.painted.until > now ? tp.painted.areas : [];
+    tp.painted = { areas: Array.from(new Set(was.concat(a))), until: now + CFG.PAINT_H*3600000, by: by || 0 };
+    lscgSplat(t, a, by ? plainName(by) : null);
+    saveLedger();
   }
   function paintedText(mn){
     const p = prodOf(mn); return p && p.painted && p.painted.until > Date.now() ? p.painted.areas.join(", ") : "";

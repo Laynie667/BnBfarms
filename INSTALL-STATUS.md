@@ -5,8 +5,8 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 | Script | File in `dist/` | Where it runs | Current |
 |---|---|---|---|
-| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.15.3** |
-| Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.4.1** |
+| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.15.4** |
+| Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.4.2** |
 | Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **1.0.3** |
 | Barn life, Breeding, Dairy, Map tools, Shows, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.2** |
 | Farmhand Companion | `farmhand-companion.user.js` | each player | **0.10.8** |
@@ -20,6 +20,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 ## Latest changes (newest first)
 
+- **Bot 0.15.4, Glory stalls 1.4.2** (from the marks in the watch reports): the roster counts only people with a role ("78 registered" was counting old files); "kitty" instead of "kitt"; a stranger who pulls out (face, back) counts as a splatter, not a load inside, and leaves them cum-covered till ?wash; and players whose **LSCG** has splatters on get LSCG's real splatters drawn on them from glory stall pull-outs and ?cum on them (with "lovers only" on in LSCG, add the bot, 260239, to the LSCG splatter whitelist).
 - **Conditioning 1.0.3**: a word dropped in at the start of a sentence gets its capital ("Cows don't need words"). **Watcher 1.0.3**: panel updates show which parts changed, to track down why some players get two or three a minute.
 - **Bot 0.15.3, Glory stalls 1.4.1, Companion 0.10.8**: story lines say a long name in full once, then the short part ("Alexia's Laynie's lips ... Laynie's mouth"); the Companion's private feelings (pregnancy, full udders, plugs, heat...) have several lines each instead of one, and don't repeat the recent ones.
 - **Bot 0.15.2**: hidden mod data some players' beeps carry (`{"messageType":...}`) is taken off before the bot reads them. It had an applicant (Pawz) stuck on the animal question: even "cat" and "not stock" were refused.

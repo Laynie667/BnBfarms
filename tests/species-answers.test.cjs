@@ -23,7 +23,7 @@ let fails=0; const ok=(c,msg)=>{ out(msg+' -> '+(c?'true':'false')); if(!c) fail
   const expect={
     "cow":"cow", "Cow.":"cow", "a cow!":"cow", "cowgirl":"cow", "cow girl":"cow", "I am a cow":"cow", "I'm a hucow please":"cow",
     "dairy cow":"cow", "heifer":"cow", "puppy girl":"pup", "pupgirl":"pup", "doggy":"dog", "horse girl":"horse", "ponyboy":"pony",
-    "mare":"horse", "kitty cat":"kitt", "kitten":"kitt", "bunny girl":"bunny", "vixen":"fox", "fox":"fox", "goats":"goat",
+    "mare":"horse", "kitty cat":"kitty", "kitten":"kitty", "kitty":"kitty", "no, a kitty":"kitty", "bunny girl":"bunny", "vixen":"fox", "fox":"fox", "goats":"goat",
     "piglet":"pig", "ewe":"sheep", "doe":"deer", "wolves":"wolf", "no, a cow":"cow",
     "no":"", "nope":"", "human":"", "staff":"", "Im staff":"", "guest":"", "luxury guest":"", "not stock.":"", "Not Stock!":"",
     "not an animal":"", "n/a":"", "none":"", "not sure":"", "I don't know yet":"",

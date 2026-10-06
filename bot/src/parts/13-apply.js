@@ -6,6 +6,9 @@
 
   // Each question has a key. Some take only certain answers (check), and those offer buttons in the Companion (choices).
   const GENDERS = ["female","male","futa","femboy"];
+  // what a kind is called out loud and on their record ("kitt" is only the farm's own short key: "kitty" still
+  // matches it everywhere; seen live, applicants saw "kitt" and thought it was a typo)
+  const SHOWN_SPECIES = { kitt:"kitty" };
   // farm words and pet names for each kind (cowgirl, pupgirl and ponyboy work too: the girl/boy ending is dropped)
   const SPECIES_ALIAS = { kitten:"kitt", kitty:"kitt", kittie:"kitt", kit:"kitt", puppy:"pup", pupper:"pup", doggy:"dog", doggie:"dog", hound:"dog",
     cattle:"cow", heifer:"cow", hucow:"cow", bovine:"cow", calf:"cow", dairy:"cow", moo:"cow", ox:"bull", steer:"bull",
@@ -30,7 +33,7 @@
       return null;
     };
     const words = low.split(/[\s\/-]+/).filter(Boolean);
-    for (const w of words){ const k = known(w); if (k) return k; }
+    for (const w of words){ const k = known(w); if (k) return SHOWN_SPECIES[k] || k; }
     // somethin' we don't have a kind for, said plainly ("dragon", "red panda"): it's theirs
     const filler = new Set(["i","im","am","a","an","the","my","please","pls","just","really","think","maybe","so"]);
     const rest = words.filter(w => !filler.has(w));
@@ -43,9 +46,9 @@
   const QUESTIONS = [
     { key:"name",   text:"First things first, sweetie: what do we call you, and how do you like bein' addressed?" },
     { key:"role",   text:"What are you here as?  livestock / staff / guest / luxury guest / not sure yet\n(Both's an option, hon. Plenty here wear two collars!)" },
-    { key:"species", text:"If you're stock, what kind of animal are you?", choices: () => Object.keys(CFG.SPECIES).filter(k => k !== "default").concat(["not stock"]),
+    { key:"species", text:"If you're stock, what kind of animal are you?", choices: () => Object.keys(CFG.SPECIES).filter(k => k !== "default").map(k => SHOWN_SPECIES[k] || k).concat(["not stock"]),
       // an animal wins over everything else ("no, a cow"); then "not stock" or "not sure"; anything else is asked again
-      check: t => { const sp = speciesFrom(t), known = sp && Object.keys(CFG.SPECIES).includes(sp);
+      check: t => { const sp = speciesFrom(t), known = sp && (Object.keys(CFG.SPECIES).includes(sp) || Object.values(SHOWN_SPECIES).includes(sp));
                     if (known) return { value: sp };
                     if (notSure(t) || notStock(t)) return { value: "" };
                     if (sp) return { value: sp };

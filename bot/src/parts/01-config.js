@@ -359,6 +359,7 @@
     RESCUE_POINT: { X: 20, Y: 30 },
 
     GREET_ENABLED: true,
+    LSCG_SPLATTERS: true,          // finishes over somebody draw LSCG's splatters on them (if their LSCG has splatters on)
     SHOW_BADGE: true,
     DEBUG: true,
     LOG_HEARD: true

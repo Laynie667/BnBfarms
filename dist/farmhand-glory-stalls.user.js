@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm add-on: Glory stalls
 // @namespace    bnbfarm
-// @version      1.4.1
+// @version      1.4.2
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-glory-stalls.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-glory-stalls.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -1048,8 +1048,14 @@
     api.tally(mn);
     const me = d.people[mn] = d.people[mn] || { holes: {}, ml: 0 };
     bump(me, 1);
-    for (const h of holes) me.holes[h] = (me.holes[h] || 0) + 1;
-    me.ml = (me.ml || 0) + ml;
+    if (inside) {
+      for (const h of holes) me.holes[h] = (me.holes[h] || 0) + 1;
+      me.ml = (me.ml || 0) + ml;
+    } else {
+      me.splatters = (me.splatters || 0) + 1;
+      me.mlOutside = (me.mlOutside || 0) + ml;
+      if (api.paint) api.paint(mn, hole === "mouth" ? "face" : hole === "butt" ? "back" : "ass");
+    }
     me.biggest = Math.max(me.biggest || 0, ml);
     if (visitor) {
       me.kinds = me.kinds || {};
@@ -1065,6 +1071,11 @@
       if (took === "new") api.later(() => api.notice(mn, "\u{1F37C} A warm, heavy feelin' settles low in your belly\u2026 somethin' from the stalls took, sugar. (?stats shows it)"), 2e4);
     }
     api.save();
+  }
+  try {
+    const WW = typeof unsafeWindow !== "undefined" ? unsafeWindow : window;
+    if (WW.__FARMHAND_TEST__) WW.__gloryFinish = (...x) => finish(...x);
+  } catch (e) {
   }
   function scheduleNext(id, mn) {
     const sh = D().shifts[mn], pun = sh && sh.punish && sh.until > Date.now();
@@ -1138,7 +1149,7 @@
       return c.reply(w === "on" ? "\u{1F573}\uFE0F Glory stalls: ON. Stand on a glory stall spot and strangers will use you, and staff can put you on punishment shifts. Your limits and whatever's locked on you still count. ?glory off any time." : "\u{1F573}\uFE0F Glory stalls: OFF. Nothin' will happen to you in the stalls, and nobody can put you on a punishment shift.");
     }
     const me = d.people[sender];
-    c.reply("\u{1F573}\uFE0F Glory stalls: " + (d.optIn[sender] ? "ON" : "OFF") + " (?glory on / ?glory off)" + (me ? "\nToday: " + (me.day === today() ? me.today : 0) + " \xB7 all time: " + (me.total || 0) + " (mouth " + (me.holes.mouth || 0) + ", pussy " + (me.holes.vulva || 0) + ", ass " + (me.holes.butt || 0) + ")" + (me.biggest ? " \xB7 biggest load " + Math.round(me.biggest) + " mL" : "") + (me.kinds ? " \xB7 most often: " + Object.entries(me.kinds).sort((a, b) => b[1] - a[1])[0][0] : "") : "") + (d.shifts[sender] ? "\nOn " + (d.shifts[sender].punish ? "a punishment " : "") + "shift for " + Math.ceil((d.shifts[sender].until - Date.now()) / 6e4) + " more minutes." : ""));
+    c.reply("\u{1F573}\uFE0F Glory stalls: " + (d.optIn[sender] ? "ON" : "OFF") + " (?glory on / ?glory off)" + (me ? "\nToday: " + (me.day === today() ? me.today : 0) + " \xB7 all time: " + (me.total || 0) + " (mouth " + (me.holes.mouth || 0) + ", pussy " + (me.holes.vulva || 0) + ", ass " + (me.holes.butt || 0) + (me.splatters ? ", over them " + me.splatters : "") + ")" + (me.biggest ? " \xB7 biggest load " + Math.round(me.biggest) + " mL" : "") + (me.kinds ? " \xB7 most often: " + Object.entries(me.kinds).sort((a, b) => b[1] - a[1])[0][0] : "") : "") + (d.shifts[sender] ? "\nOn " + (d.shifts[sender].punish ? "a punishment " : "") + "shift for " + Math.ceil((d.shifts[sender].until - Date.now()) / 6e4) + " more minutes." : ""));
   }
   function board(staff) {
     const d = D(), ids = stallIds();
@@ -1238,7 +1249,7 @@
     cards.push({
       title: "Glory stalls",
       toggles: [{ label: "Glory stalls: strangers can use me", desc: "Also lets staff give you punishment shifts. Your limits and whatever's locked on you still count.", on: !!d.optIn[mn], cmd: "glory " + (d.optIn[mn] ? "off" : "on") }],
-      lines: me ? [["Today", me.day === today() ? me.today : 0], ["All time", me.total || 0], ["Mouth \xB7 pussy \xB7 ass", (me.holes.mouth || 0) + " \xB7 " + (me.holes.vulva || 0) + " \xB7 " + (me.holes.butt || 0)]] : void 0,
+      lines: me ? [["Today", me.day === today() ? me.today : 0], ["All time", me.total || 0], ["Inside: mouth \xB7 pussy \xB7 ass", (me.holes.mouth || 0) + " \xB7 " + (me.holes.vulva || 0) + " \xB7 " + (me.holes.butt || 0)], ["Splattered", me.splatters || 0]] : void 0,
       chips: sh ? [{ text: (sh.punish ? "punishment shift" : "on shift") + " \xB7 " + Math.max(0, Math.ceil((sh.until - Date.now()) / 6e4)) + " min", kind: sh.punish ? "alert" : "acc" }] : void 0,
       buttons: [{ label: "The board", cmd: "stalls" }]
     });

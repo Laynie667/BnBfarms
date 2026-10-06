@@ -121,7 +121,14 @@ function finish(id, mn, hole, ml, inside, visitor) {
   }
   api.tally(mn);
   const me = d.people[mn] = d.people[mn] || { holes: {}, ml: 0 };
-  bump(me, 1); for (const h of holes) me.holes[h] = (me.holes[h] || 0) + 1; me.ml = (me.ml || 0) + ml;
+  bump(me, 1);
+  if (inside) { for (const h of holes) me.holes[h] = (me.holes[h] || 0) + 1; me.ml = (me.ml || 0) + ml; }
+  else {
+    // pulled out over them (a face shot, over their back): it counts as a use, never as a load in a hole
+    // (live: face and back shots were showin' up as loads inside); they're cum-covered till ?wash
+    me.splatters = (me.splatters || 0) + 1; me.mlOutside = (me.mlOutside || 0) + ml;
+    if (api.paint) api.paint(mn, hole === "mouth" ? "face" : hole === "butt" ? "back" : "ass");
+  }
   me.biggest = Math.max(me.biggest || 0, ml);
   if (visitor) { me.kinds = me.kinds || {}; me.kinds[visitor.type] = (me.kinds[visitor.type] || 0) + 1; }
   bump(d.stalls[id] = d.stalls[id] || {}, 1);
@@ -135,6 +142,8 @@ function finish(id, mn, hole, ml, inside, visitor) {
   }
   api.save();
 }
+
+try { const WW = typeof unsafeWindow !== "undefined" ? unsafeWindow : window; if (WW.__FARMHAND_TEST__) WW.__gloryFinish = (...x) => finish(...x); } catch (e) {}
 
 // next scene: 10–30 minutes (5–15 on a punishment shift)
 function scheduleNext(id, mn) {
@@ -204,7 +213,7 @@ function cmdGlory(c) {
   const me = d.people[sender];
   c.reply("🕳️ Glory stalls: " + (d.optIn[sender] ? "ON" : "OFF") + " (?glory on / ?glory off)" +
     (me ? "\nToday: " + (me.day === today() ? me.today : 0) + " · all time: " + (me.total || 0) +
-      " (mouth " + (me.holes.mouth || 0) + ", pussy " + (me.holes.vulva || 0) + ", ass " + (me.holes.butt || 0) + ")" +
+      " (mouth " + (me.holes.mouth || 0) + ", pussy " + (me.holes.vulva || 0) + ", ass " + (me.holes.butt || 0) + (me.splatters ? ", over them " + me.splatters : "") + ")" +
       (me.biggest ? " · biggest load " + Math.round(me.biggest) + " mL" : "") +
       (me.kinds ? " · most often: " + Object.entries(me.kinds).sort((a, b) => b[1] - a[1])[0][0] : "") : "") +
     (d.shifts[sender] ? "\nOn " + (d.shifts[sender].punish ? "a punishment " : "") + "shift for " + Math.ceil((d.shifts[sender].until - Date.now()) / 60000) + " more minutes." : ""));
@@ -315,7 +324,7 @@ function companion(mn) {
   cards.push({
     title: "Glory stalls",
     toggles: [{ label: "Glory stalls: strangers can use me", desc: "Also lets staff give you punishment shifts. Your limits and whatever's locked on you still count.", on: !!d.optIn[mn], cmd: "glory " + (d.optIn[mn] ? "off" : "on") }],
-    lines: me ? [["Today", me.day === today() ? me.today : 0], ["All time", me.total || 0], ["Mouth · pussy · ass", (me.holes.mouth || 0) + " · " + (me.holes.vulva || 0) + " · " + (me.holes.butt || 0)]] : undefined,
+    lines: me ? [["Today", me.day === today() ? me.today : 0], ["All time", me.total || 0], ["Inside: mouth · pussy · ass", (me.holes.mouth || 0) + " · " + (me.holes.vulva || 0) + " · " + (me.holes.butt || 0)], ["Splattered", me.splatters || 0]] : undefined,
     chips: sh ? [{ text: (sh.punish ? "punishment shift" : "on shift") + " · " + Math.max(0, Math.ceil((sh.until - Date.now()) / 60000)) + " min", kind: sh.punish ? "alert" : "acc" }] : undefined,
     buttons: [{ label: "The board", cmd: "stalls" }],
   });

@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.15.3
+// @version      0.15.4
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -1806,7 +1806,7 @@
   ];
 
   // bot/src/version.js
-  var VERSION = "0.15.3";
+  var VERSION = "0.15.4";
 
   // bot-parts:farmhand-bot-parts
   (function() {
@@ -2495,6 +2495,8 @@
       STUCK_COOLDOWN_MIN: 3,
       RESCUE_POINT: { X: 20, Y: 30 },
       GREET_ENABLED: true,
+      LSCG_SPLATTERS: true,
+      // finishes over somebody draw LSCG's splatters on them (if their LSCG has splatters on)
       SHOW_BADGE: true,
       DEBUG: true,
       LOG_HEARD: true
@@ -2596,6 +2598,7 @@
       if (!Array.isArray(L.tease)) L.tease = [];
       if (L.notice === void 0) L.notice = null;
       if (!L.life) L.life = { feedingOn: true, curfewOn: true };
+      for (const r of Object.values(L.people || {})) if (r && r.species === "kitt") r.species = "kitty";
       if (!Array.isArray(L.chores)) L.chores = CFG.CHORES.map((text) => ({ text, by: 0 }));
       if (!Array.isArray(L.wheel)) L.wheel = [];
       if (L.zones && (typeof L.zones !== "object" || Object.values(L.zones).some((z) => !z || typeof z !== "object" || !("group" in z)))) delete L.zones;
@@ -5759,6 +5762,7 @@
       const a = PAINT_AREAS[String(area).toLowerCase()] || "body";
       const was = tp.painted && tp.painted.until > now ? tp.painted.areas : [];
       tp.painted = { areas: Array.from(new Set(was.concat(a))), until: now + CFG.PAINT_H * 36e5, by: stud };
+      lscgSplat(t, a, plainName(stud));
       tally(t);
       saveLedger();
       audit(stud, "PAINT", stud + "\u2192" + t + " " + a + " " + Math.round(load));
@@ -5776,6 +5780,49 @@
       };
       emote("\u{1F4A6} " + (pent ? "All pent up, " : "") + plainName(stud) + " " + lines[a].replace(/%t/g, plainName(t)) + " " + plainName(t) + " is marked as " + plainName(stud) + "'s now, for everybody to see.");
       return { load, pent };
+    }
+    const SPLAT_SPOTS = {
+      face: ["ItemHead", "ItemMouth"],
+      hair: ["ItemHead"],
+      tits: ["ItemBreast"],
+      chest: ["ItemBreast"],
+      belly: ["ItemPelvis"],
+      back: ["ItemButt"],
+      ass: ["ItemButt"],
+      thighs: ["ItemVulva"],
+      crotch: ["ItemVulva"],
+      feet: ["ItemPelvis"],
+      body: ["ItemPelvis"]
+    };
+    function lscgSplatsOn(mn) {
+      const C = charFor(mn), S = C && C.LSCG && C.LSCG.SplatterModule;
+      return !!(S && S.enabled && S.taker !== false && (!C.LSCG.GlobalModule || C.LSCG.GlobalModule.enabled !== false));
+    }
+    function lscgSplat(mn, area, who) {
+      if (!CFG.LSCG_SPLATTERS || !lscgSplatsOn(mn)) return false;
+      for (const group of SPLAT_SPOTS[PAINT_AREAS[String(area || "").toLowerCase()] || "body"] || ["ItemPelvis"]) {
+        send("ChatRoomChat", {
+          Content: "ChatOther-" + group + "-LSCG_Splat",
+          Type: "Activity",
+          Target: mn,
+          Dictionary: [
+            { Tag: "SourceCharacter", Text: who || "A stranger" },
+            { TargetCharacter: mn },
+            { Tag: "FocusAssetGroup", FocusGroupName: group },
+            { ActivityName: "LSCG_Splat" }
+          ]
+        });
+      }
+      return true;
+    }
+    function paintOn(t, area, by) {
+      const tp = prodOf(t);
+      if (!tp) return;
+      const now = Date.now(), a = PAINT_AREAS[String(area || "").toLowerCase()] || "body";
+      const was = tp.painted && tp.painted.until > now ? tp.painted.areas : [];
+      tp.painted = { areas: Array.from(new Set(was.concat(a))), until: now + CFG.PAINT_H * 36e5, by: by || 0 };
+      lscgSplat(t, a, by ? plainName(by) : null);
+      saveLedger();
     }
     function paintedText(mn) {
       const p = prodOf(mn);
@@ -7277,6 +7324,7 @@
         // people
         name: plainName,
         nameOnce: (text, mn) => nameOnce(text, mn),
+        paint: (mn, area, by) => paintOn(mn, area, by),
         char: charFor,
         find: resolveTarget,
         here: () => (W.ChatRoomCharacter || []).map((c) => c.MemberNumber).filter((m) => m !== CFG.BOT_MEMBER),
@@ -9493,6 +9541,7 @@ Say ?apply and pick 'luxury guest'.
 
 \u26A0\uFE0F Fair warnin', sugar \u2014 folks book the cabin meanin' to watch, and end up in the barn by Thursday. Happens more than you'd think! \u{1F609}`;
     const GENDERS = ["female", "male", "futa", "femboy"];
+    const SHOWN_SPECIES = { kitt: "kitty" };
     const SPECIES_ALIAS = {
       kitten: "kitt",
       kitty: "kitt",
@@ -9561,7 +9610,7 @@ Say ?apply and pick 'luxury guest'.
       const words = low.split(/[\s\/-]+/).filter(Boolean);
       for (const w of words) {
         const k = known(w);
-        if (k) return k;
+        if (k) return SHOWN_SPECIES[k] || k;
       }
       const filler = /* @__PURE__ */ new Set(["i", "im", "am", "a", "an", "the", "my", "please", "pls", "just", "really", "think", "maybe", "so"]);
       const rest = words.filter((w) => !filler.has(w));
@@ -9579,10 +9628,10 @@ Say ?apply and pick 'luxury guest'.
       {
         key: "species",
         text: "If you're stock, what kind of animal are you?",
-        choices: () => Object.keys(CFG.SPECIES).filter((k) => k !== "default").concat(["not stock"]),
+        choices: () => Object.keys(CFG.SPECIES).filter((k) => k !== "default").map((k) => SHOWN_SPECIES[k] || k).concat(["not stock"]),
         // an animal wins over everything else ("no, a cow"); then "not stock" or "not sure"; anything else is asked again
         check: (t) => {
-          const sp = speciesFrom(t), known = sp && Object.keys(CFG.SPECIES).includes(sp);
+          const sp = speciesFrom(t), known = sp && (Object.keys(CFG.SPECIES).includes(sp) || Object.values(SHOWN_SPECIES).includes(sp));
           if (known) return { value: sp };
           if (notSure(t) || notStock(t)) return { value: "" };
           if (sp) return { value: sp };
@@ -11339,7 +11388,8 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
             R("\u{1F4D6} " + label[key] + " (" + groups[key].length + ")\n\n" + (groups[key].length ? groups[key].map(line).join("\n") : "  (nobody)"));
             break;
           }
-          let o = "\u{1F4D6} THE BOOKS \u2014 " + all.length + " registered\n";
+          const registered = all.filter((r) => r.roles && r.roles.length).length;
+          let o = "\u{1F4D6} THE BOOKS \u2014 " + registered + " registered" + (all.length > registered ? " (" + (all.length - registered) + " more with a file but no role)" : "") + "\n";
           for (const k of ROLE_ORDER) {
             if (!groups[k].length) continue;
             o += "\n" + label[k] + " (" + groups[k].length + ")\n" + groups[k].map(line).join("\n") + "\n";
@@ -13918,7 +13968,7 @@ Welcome to B&B Farm, hon. \u{1F33E}`
         } catch (e) {
         }
         const oc = forcedStaff().length;
-        setBadge("on duty \u2014 " + Object.keys(L.people).length + " reg \xB7 " + fl + " friends \xB7 " + oc + " on call" + (admin ? "" : " \u26A0\uFE0FNOT ADMIN"), admin ? "#b8ff9b" : "#ffc49b");
+        setBadge("on duty \u2014 " + Object.values(L.people).filter((r) => r.roles && r.roles.length).length + " reg \xB7 " + fl + " friends \xB7 " + oc + " on call" + (admin ? "" : " \u26A0\uFE0FNOT ADMIN"), admin ? "#b8ff9b" : "#ffc49b");
         keepalive();
         runWaiting();
         pump();

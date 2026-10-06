@@ -142,8 +142,37 @@ function outfits(ctx) {
   ];
 }
 
+// fix somebody's record: a typo on their application, a new name or species (sends ?edit)
+const EDIT_FIELDS = [["name", "Name"], ["species", "Species"], ["gender", "Gender"], ["stay", "Stay"], ["depth", "Depth"],
+  ["limits", "Hard limits"], ["triggers", "Triggers"], ["aftercare", "Aftercare"], ["notes", "Notes (replaces them)"],
+  ["app.name", "Application: what to call them"], ["app.role", "Application: here as"], ["app.likes", "Application: what sounds good"],
+  ["app.curious", "Application: curious about"], ["app.soft", "Application: soft limits"], ["app.else", "Application: anything else"],
+  ["app.handled", "Application (staff): handled before"], ["app.duties", "Application (staff): duties"], ["app.sideways", "Application (staff): steppin' in"]];
+const EDIT_HINT = { gender: "female, male, futa or femboy", stay: "1 hour, 12 hours, 1 day, 1 week, 2 weeks, 1 month, permanent", depth: "fun, deep or no human left",
+  species: "cow, pony, bunny, kitty… any animal", name: "what the farm calls them; clear goes back to their game nickname" };
+function records(ctx) {
+  const who = () => String(ctx.ui.eWho || "").trim().replace(/\s+/g, " ");
+  const fld = ctx.ui.eField || "species";
+  const need = () => (who() ? false : (ctx.hint("Who? Their member number is safest."), true));
+  return [
+    card(title("Edit a record"),
+      muted("Fix a mistake on somebody's application or change their details. Member numbers are safest; a name works if it's on the books."),
+      field("Who (member number or name)", h("input", { class: "fhc-in", value: ctx.ui.eWho || "", oninput: (e) => ctx.setUi({ eWho: e.target.value }, true) })),
+      btn("Show what's on file", () => !need() && ctx.send("edit " + who())),
+      field("What to change", h("select", { class: "fhc-sel", onchange: (e) => ctx.setUi({ eField: e.target.value }) },
+        EDIT_FIELDS.map(([k, label]) => h("option", { value: k, selected: k === fld ? "selected" : null }, label)))),
+      field("New value", h("input", { class: "fhc-in", placeholder: EDIT_HINT[fld] || "", value: ctx.ui.eVal || "", oninput: (e) => ctx.setUi({ eVal: e.target.value }, true) })),
+      h("div", null,
+        btn("Save", () => { if (need()) return; const v = String(ctx.ui.eVal || "").replace(/\s+/g, " ").trim(); if (!v) return ctx.hint("Type the new value first (or press Clear it)."); ctx.send("edit " + who() + " " + fld + " " + v); ctx.setUi({ eVal: "" }); }),
+        btn("Clear it", () => !need() && ctx.send("edit " + who() + " " + fld + " clear"))),
+      muted("Changes are saved on their record and in the audit log. Typed: ?edit <who> <field> <value>.")),
+    latest(ctx),
+  ];
+}
+
 export const DASHBOARD_TABS = [
   { id: "contracts", label: "BC+ contracts", render: contracts },
   { id: "outfits", label: "Outfits", render: outfits },
   { id: "addons", label: "Other addons", render: addons },
+  { id: "records", label: "Records", render: records },
 ];

@@ -576,6 +576,7 @@
   function charFor(mn){ try { return (W.ChatRoomCharacter||[]).find(c=>c.MemberNumber===mn)||null; } catch(e){ return null; } }
   function plainName(mn){
     if (mn === ANON_STUD) return "an anonymous stranger at the glory stalls";   // add-ons breed with this one
+    const r0 = L.people[mn]; if (r0 && r0.nameSet) return r0.nameSet;   // set by a proprietor with ?edit
     const C = charFor(mn);
     if (C){ try { if (typeof W.CharacterNickname==="function") return W.CharacterNickname(C); } catch(e){}
             return C.Nickname||C.Name||"stranger"; }

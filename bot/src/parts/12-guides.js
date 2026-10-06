@@ -438,6 +438,9 @@ THE ROSTER
 RECORDS
   ?record <who> · full file
   ?note <who> <text> · add a staff note
+  ?edit <who> [field] [value] · fix a record (proprietors):
+     name, species, gender, stay, depth, limits, triggers,
+     aftercare, notes, or app.<question>; clear empties one
   ?signed <who> · flip their contract signed or not
   ?addfriend <who> · friend 'em so my beeps reach 'em
   ?unregister <who> · archive (herdmasters and up)`,

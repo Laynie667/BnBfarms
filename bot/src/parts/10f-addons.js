@@ -103,7 +103,7 @@
   // stays in the bot.
   function addonApi(a){
     return Object.freeze({
-      name: a.name, version: VERSION, cfg: CFG,
+      version: VERSION, cfg: CFG,   // (api.name is the name lookup below, not the add-on's name)
       data: () => addonData(a.name), save: () => saveLedger(),
       log: (...x) => log("["+a.name+"]", ...x),
       audit: (by, action, detail) => audit(by, a.name.toUpperCase()+"_"+action, detail),

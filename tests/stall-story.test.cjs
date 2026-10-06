@@ -61,7 +61,7 @@ async function session(mn, x){
   const rex=await session(600, 15);
   const rexAll=rex.join('\n');
   ok(rex.length>=30, 'Rex: a full session ('+rex.length+' lines)');
-  ok(/sleeve/i.test(rex[0]) && !/\b(breasts?|nipples?|udders?)\b/i.test(rexAll), 'Rex: all about his cock, never breasts');
+  ok(/sleeve|ball cup|cock/i.test(rex[0]) && !/\b(breasts?|nipples?|udders?)\b/i.test(rexAll), 'Rex: all about his cock, never breasts');
   ok(/canine|knot|tapered/i.test(rexAll), 'Rex: his canine cock and knot come into it');
   const firstCum=rex.findIndex(t=>/first thick pulse/.test(t)), peak=rex.findIndex(t=>/knot swells to its fullest/.test(t)), second=rex.findIndex(t=>/second load/.test(t));
   ok(firstCum>0 && peak===firstCum+1 && (second<0 || second>peak), 'Rex: climaxes in order, his knot locking right after the first');

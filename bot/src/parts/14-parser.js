@@ -140,7 +140,7 @@
                        "milk","collect","heat","heatline","shotlog",
                        "stocks","unstock","walk","tourstop","clockin","clockout","hours","done","chore","chores",
                        "wheel","spin","begphrase","score","drain","denial","ruin","jars","inseminate","nomilk","inspect","edge",
-                       "contract","contracts","zone","zones","voice","machine"];
+                       "contract","contracts","zone","zones","voice","machine","edit"];
 
   const SAFETY_CMDS = ["safe","safeword","red","stuck"];
   const PRIVATE_REPLY = ["record","keys","find","app","queue","roster","stock","health",

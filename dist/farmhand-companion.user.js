@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.10.9
+// @version      0.10.10
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -230,7 +230,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.10.9";
+  var VERSION = "0.10.10";
 
   // extension/src/config.js
   var BOT_MEMBER = 260239;
@@ -2979,10 +2979,71 @@ One of mods you are using is using an old version of SDK. It will work for now b
       latest(ctx2)
     ];
   }
+  var EDIT_FIELDS = [
+    ["name", "Name"],
+    ["species", "Species"],
+    ["gender", "Gender"],
+    ["stay", "Stay"],
+    ["depth", "Depth"],
+    ["limits", "Hard limits"],
+    ["triggers", "Triggers"],
+    ["aftercare", "Aftercare"],
+    ["notes", "Notes (replaces them)"],
+    ["app.name", "Application: what to call them"],
+    ["app.role", "Application: here as"],
+    ["app.likes", "Application: what sounds good"],
+    ["app.curious", "Application: curious about"],
+    ["app.soft", "Application: soft limits"],
+    ["app.else", "Application: anything else"],
+    ["app.handled", "Application (staff): handled before"],
+    ["app.duties", "Application (staff): duties"],
+    ["app.sideways", "Application (staff): steppin' in"]
+  ];
+  var EDIT_HINT = {
+    gender: "female, male, futa or femboy",
+    stay: "1 hour, 12 hours, 1 day, 1 week, 2 weeks, 1 month, permanent",
+    depth: "fun, deep or no human left",
+    species: "cow, pony, bunny, kitty\u2026 any animal",
+    name: "what the farm calls them; clear goes back to their game nickname"
+  };
+  function records(ctx2) {
+    const who = () => String(ctx2.ui.eWho || "").trim().replace(/\s+/g, " ");
+    const fld = ctx2.ui.eField || "species";
+    const need = () => who() ? false : (ctx2.hint("Who? Their member number is safest."), true);
+    return [
+      card(
+        title("Edit a record"),
+        muted("Fix a mistake on somebody's application or change their details. Member numbers are safest; a name works if it's on the books."),
+        field2("Who (member number or name)", h("input", { class: "fhc-in", value: ctx2.ui.eWho || "", oninput: (e) => ctx2.setUi({ eWho: e.target.value }, true) })),
+        btn("Show what's on file", () => !need() && ctx2.send("edit " + who())),
+        field2("What to change", h(
+          "select",
+          { class: "fhc-sel", onchange: (e) => ctx2.setUi({ eField: e.target.value }) },
+          EDIT_FIELDS.map(([k, label]) => h("option", { value: k, selected: k === fld ? "selected" : null }, label))
+        )),
+        field2("New value", h("input", { class: "fhc-in", placeholder: EDIT_HINT[fld] || "", value: ctx2.ui.eVal || "", oninput: (e) => ctx2.setUi({ eVal: e.target.value }, true) })),
+        h(
+          "div",
+          null,
+          btn("Save", () => {
+            if (need()) return;
+            const v = String(ctx2.ui.eVal || "").replace(/\s+/g, " ").trim();
+            if (!v) return ctx2.hint("Type the new value first (or press Clear it).");
+            ctx2.send("edit " + who() + " " + fld + " " + v);
+            ctx2.setUi({ eVal: "" });
+          }),
+          btn("Clear it", () => !need() && ctx2.send("edit " + who() + " " + fld + " clear"))
+        ),
+        muted("Changes are saved on their record and in the audit log. Typed: ?edit <who> <field> <value>.")
+      ),
+      latest(ctx2)
+    ];
+  }
   var DASHBOARD_TABS = [
     { id: "contracts", label: "BC+ contracts", render: contracts2 },
     { id: "outfits", label: "Outfits", render: outfits },
-    { id: "addons", label: "Other addons", render: addons }
+    { id: "addons", label: "Other addons", render: addons },
+    { id: "records", label: "Records", render: records }
   ];
 
   // extension/src/views/extras.js

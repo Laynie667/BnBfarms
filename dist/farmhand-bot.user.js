@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.15.5
+// @version      0.15.6
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -1824,7 +1824,7 @@
   ];
 
   // bot/src/version.js
-  var VERSION = "0.15.5";
+  var VERSION = "0.15.6";
 
   // bot-parts:farmhand-bot-parts
   (function() {
@@ -4134,6 +4134,8 @@
     }
     function plainName(mn) {
       if (mn === ANON_STUD) return "an anonymous stranger at the glory stalls";
+      const r0 = L.people[mn];
+      if (r0 && r0.nameSet) return r0.nameSet;
       const C = charFor(mn);
       if (C) {
         try {
@@ -7315,9 +7317,9 @@
     }
     function addonApi(a) {
       return Object.freeze({
-        name: a.name,
         version: VERSION,
         cfg: CFG,
+        // (api.name is the name lookup below, not the add-on's name)
         data: () => addonData(a.name),
         save: () => saveLedger(),
         log: (...x) => log("[" + a.name + "]", ...x),
@@ -9206,6 +9208,9 @@ THE ROSTER
 RECORDS
   ?record <who> \xB7 full file
   ?note <who> <text> \xB7 add a staff note
+  ?edit <who> [field] [value] \xB7 fix a record (proprietors):
+     name, species, gender, stay, depth, limits, triggers,
+     aftercare, notes, or app.<question>; clear empties one
   ?signed <who> \xB7 flip their contract signed or not
   ?addfriend <who> \xB7 friend 'em so my beeps reach 'em
   ?unregister <who> \xB7 archive (herdmasters and up)`,
@@ -10171,7 +10176,8 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
       "zone",
       "zones",
       "voice",
-      "machine"
+      "machine",
+      "edit"
     ];
     const SAFETY_CMDS = ["safe", "safeword", "red", "stuck"];
     const PRIVATE_REPLY = [
@@ -12325,6 +12331,138 @@ Welcome to B&B Farm, hon. \u{1F33E}`
           r.notes = (r.notes ? r.notes + "\n" : "") + "[" + plainName(sender) + "] " + args.slice(1).join(" ");
           saveLedger();
           R("Got it, I've noted that on their file.");
+          break;
+        }
+        case "edit": {
+          if (!isProprietor(sender)) {
+            R("Sorry, sugar, that one's just for the proprietors.");
+            break;
+          }
+          const t = resolveTarget(args[0]), r = t && rec(t);
+          if (!r) {
+            R("Whose record, hon? ?edit <name or member number> shows what I can change. For example: ?edit 123456 species bunny");
+            break;
+          }
+          const raw2 = String(args[1] || "").toLowerCase(), isApp = /^app[.:]/.test(raw2), key = raw2.replace(/^app[.:]/, "");
+          const val = args.slice(2).join(" ").trim(), clear = /^(clear|none|-)$/i.test(val);
+          const appKeys = QUESTIONS.concat(STAFF_QUESTIONS).map((q) => q.key);
+          const keptApp = () => {
+            if (!r.application) r.application = { at: Date.now(), staffTrack: false, byKey: {} };
+            const a = r.application;
+            if (!a.byKey) {
+              a.byKey = {};
+              OLD_ORDER.forEach((k) => {
+                const v = appAnswer(a, k);
+                if (v) a.byKey[k] = v;
+              });
+              delete a.answers;
+            }
+            return a.byKey;
+          };
+          const setApp = (k, v) => {
+            keptApp()[k] = v;
+            for (const a of L.applications) if (a.mn === t) {
+              if (!a.byKey) {
+                a.byKey = {};
+                OLD_ORDER.forEach((k2) => {
+                  const v2 = appAnswer(a, k2);
+                  if (v2) a.byKey[k2] = v2;
+                });
+                a.answers = [];
+              }
+              a.byKey[k] = v;
+            }
+          };
+          const shown = (v) => v ? String(v) : "(not set)";
+          if (!raw2) {
+            const app = {};
+            if (r.application) appKeys.forEach((k) => {
+              const v = appAnswer(r.application, k);
+              if (v) app[k] = v;
+            });
+            R("\u270F\uFE0F EDIT " + plainName(t) + " (" + t + ")\n\nname: " + shown(r.nameSet || r.name) + (r.nameSet ? " (set by hand)" : "") + "\nspecies: " + shown(r.species) + "\ngender: " + shown(r.gender) + "\nstay: " + shown(r.stayType) + "\ndepth: " + shown(r.wantDepth) + "\nlimits: " + shown(r.limits) + "\ntriggers: " + shown(r.triggers) + "\naftercare: " + shown(r.aftercare) + "\nnotes: " + shown(r.notes) + "\n\nApplication answers: " + (appKeys.filter((k) => app[k]).map((k) => "app." + k).join(", ") || "none kept") + "\n\n?edit " + t + ' <field> <new value> \xB7 "clear" empties it \xB7 app.<question> (' + appKeys.join(", ") + ") changes an application answer");
+            break;
+          }
+          if (!val) {
+            R("What should it say, hon? ?edit " + t + " " + raw2 + " <new value>, or clear to empty it.");
+            break;
+          }
+          let said;
+          if (isApp) {
+            if (!appKeys.includes(key)) {
+              R("There's no application question called " + key + ", sugar. They're: " + appKeys.join(", ") + ".");
+              break;
+            }
+            setApp(key, clear ? "" : val.slice(0, 1e3));
+            if (["limits", "triggers", "aftercare"].includes(key)) r[key] = clear ? "" : val.slice(0, 1e3);
+            said = "their application answer for " + key;
+          } else if (key === "name") {
+            if (clear) delete r.nameSet;
+            else r.nameSet = val.replace(/[\r\n]+/g, " ").slice(0, 40);
+            r.name = plainName(t);
+            said = clear ? "their name (back to their game nickname: " + r.name + ")" : "their name";
+          } else if (key === "species") {
+            r.species = clear ? "" : (speciesFrom(val) || val.toLowerCase()).slice(0, 40);
+            setApp("species", r.species);
+            said = "their species";
+          } else if (key === "gender") {
+            const g = val.toLowerCase();
+            if (clear) {
+              if (r.gender === "futa") r.futa = false;
+              r.gender = "";
+            } else {
+              if (!GENDERS.includes(g)) {
+                R("Just one of these, hon: female, male, futa or femboy (or clear).");
+                break;
+              }
+              if (g === "futa" && limitBlocks(t, "futa")) {
+                R("Their hard limits rule out futa, sugar, so I'll leave it.");
+                break;
+              }
+              const was = r.gender;
+              r.gender = g;
+              if (g === "futa") r.futa = true;
+              else if (was === "futa") r.futa = false;
+              prodOf(t);
+            }
+            setApp("gender", r.gender);
+            said = "their gender";
+          } else if (key === "stay") {
+            const d = !clear && durationFrom(val);
+            if (!clear && !d) {
+              R("Pick one, sugar: 1 hour, 12 hours, 1 day, 1 week, 2 weeks, 1 month or permanent (or clear).");
+              break;
+            }
+            r.stayType = d ? d.key : "";
+            setApp("stay", r.stayType);
+            said = "their stay";
+          } else if (key === "depth") {
+            const d = !clear && depthFrom(val);
+            if (!clear && !d) {
+              R("Pick one, hon: fun, deep or no human left (or clear).");
+              break;
+            }
+            r.wantDepth = d ? d.key : "";
+            setApp("depth", r.wantDepth);
+            said = "how deep they want to go";
+          } else if (["limits", "triggers", "aftercare"].includes(key)) {
+            r[key] = clear ? "" : val.slice(0, 1e3);
+            setApp(key, r[key]);
+            said = "their " + key;
+          } else if (key === "notes" || key === "note") {
+            r.notes = clear ? "" : val.slice(0, 2e3);
+            said = "their notes";
+          } else if (appKeys.includes(key)) {
+            setApp(key, clear ? "" : val.slice(0, 1e3));
+            said = "their application answer for " + key;
+          } else {
+            R("I can't change " + raw2 + ", sugar. ?edit " + t + " shows what I can.");
+            break;
+          }
+          saveLedger();
+          audit(sender, "EDIT", t + " " + raw2 + " " + (clear ? "(cleared)" : val).slice(0, 120));
+          syncCompanions(true);
+          R("\u270F\uFE0F Done, sugar: " + said + " " + (clear ? "is cleared" : "now reads: " + (key === "name" && !isApp ? r.name : val.slice(0, 200))) + ".");
           break;
         }
         /* ── SPOTS ── */

@@ -90,6 +90,17 @@ function lookChange(mn, app, by) {
   if (ch.length) line("ITEMS", nameOf(mn) + (by ? " (by " + nameOf(by) + ")" : "") + " · " + ch.join(" · "));
 }
 
+// a panel update from the farm bot: which parts of it changed since the last one (the full thing is long and
+// gets cut off, so the reason for an update was invisible)
+const lastState = new Map();
+function stateDiff(from, s) {
+  const was = lastState.get(from); lastState.set(from, s);
+  if (!was) return "first";
+  const flat = (o, p, out) => { out = out || {}; if (o && typeof o === "object" && !Array.isArray(o)) { for (const k of Object.keys(o)) flat(o[k], p ? p + "." + k : k, out); } else out[p] = JSON.stringify(o); return out; };
+  const a = flat(was), b = flat(s), ch = [];
+  for (const k of new Set(Object.keys(a).concat(Object.keys(b)))) if (k !== "at" && a[k] !== b[k]) ch.push(k + (String(b[k] || "").length < 30 ? "=" + b[k] : ""));
+  return ch.length ? "changed: " + ch.slice(0, 12).join(", ") + (ch.length > 12 ? " +" + (ch.length - 12) : "") : "nothing changed";
+}
 // ── what the server sends this game ──────────────────────────
 const SECRET = /pass(word)?|e-?mail|token|secret|accountname|cookie/i;
 function clean(v, d) {
@@ -124,6 +135,7 @@ function onIn(ev, d) {
         const from = nameOf(d.Sender), to = d.Target ? " → " + nameOf(d.Target) : "";
         const text = typeof d.Content === "string" ? d.Content : json(d.Content);
         if (d.Type === "Hidden") {
+          if (d.Content === "FarmhandMsg" && d.Dictionary && d.Dictionary.type === "state" && d.Dictionary.state) { line("FARM-IN", from + to + " · state (" + stateDiff(d.Sender, d.Dictionary.state) + ")"); return; }
           if (d.Content === "FarmhandMsg") { const m = d.Dictionary || {}; line("FARM-IN", from + to + " · " + (m.type || "?") + (m.text ? ": " + short(m.text, 600) : "") + (m.type && !m.text ? " " + json(m, 250) : "")); }
           else line("HIDDEN", from + to + " · " + short(text, 120) + (d.Dictionary ? " " + json(d.Dictionary, 160) : ""));
           return;

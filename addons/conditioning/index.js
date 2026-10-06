@@ -100,7 +100,9 @@ function petName(mn) {
 function say(mn, line) {
   const w = words(mn);
   return fill(line, { name: api.name(mn) }).replace(/\{a\}/g, w.a).replace(/\{s\}/g, w.s).replace(/\{p\}/g, w.p)
-    .replace(/\{act\}/g, w.act).replace(/\{pose\}/g, w.pose).replace(/\{pet\}/g, petName(mn));
+    .replace(/\{act\}/g, w.act).replace(/\{pose\}/g, w.pose).replace(/\{pet\}/g, petName(mn))
+    // a word dropped in at the start of a sentence gets its capital (live: "That's alright. cows don't need words.")
+    .replace(/(^|[.!?]\s+)([a-z])/g, (m, a, b) => a + b.toUpperCase());
 }
 function scriptFor(level) {
   return [].concat(SCRIPT.settle, SCRIPT.deeper[level], SCRIPT.suggest[level], SCRIPT.wake[level]);

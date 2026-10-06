@@ -46,6 +46,8 @@ const beepsTo=(k,mn)=>sent.slice(k).filter(([e,d])=>e==='AccountBeep'&&d.MemberN
   const lines=toWhom(k,500).filter(c=>/\[Voice\]/.test(c));
   ok(lines.length>=12, 'a whole deep session reached Moo as voice lines ('+lines.length+')');
   ok(lines.some(c=>/cow|moo/i.test(c)), 'cow words fill the script');
+  const lowStart=lines.filter(c=>/(^|[.!?] +)[a-z]/.test(String(c).replace(/^[(*\[]+(Voice\] *)?/,'')));
+  ok(!lowStart.length, 'every sentence starts with a capital '+(lowStart[0]||''));
   ok(!sent.slice(k).some(([e,x])=>x&&x.Type==='Emote'), 'nothing in the public room');
   ok(d().people['500'].total===1 && d().people['500'].sessions.deep===1, 'the session counted');
   // ?wake stops one part way

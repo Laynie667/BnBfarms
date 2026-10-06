@@ -32,6 +32,9 @@ W.eval(fs.readFileSync(path.join(__dirname,'../dist/farm-watcher.user.js'),'utf8
   anyIn('ChatRoomSyncMapData',{MemberNumber:500,MapData:{Pos:{X:7,Y:5}}});
   anyIn('ChatRoomSyncSingle',{Character:{MemberNumber:500,Appearance:[{Group:'ItemNeck',Name:'LeatherCollar',Property:{LockedBy:'MistressPadlock'}},{Group:'ItemArms',Name:'LeatherArmbinder',Craft:{Name:'Barn Binder'}}]}});
   anyIn('AccountBeep',{MemberNumber:260239,MemberName:'Farm Girl',Message:'Feeding time!'});
+  // panel updates say what changed in them
+  anyIn('ChatRoomMessage',{Sender:260239,Type:'Hidden',Target:221397,Content:'FarmhandMsg',Dictionary:{v:2,type:'state',state:{name:'Laynie',milk:{ml:1200,cap:8000},at:1}}});
+  anyIn('ChatRoomMessage',{Sender:260239,Type:'Hidden',Target:221397,Content:'FarmhandMsg',Dictionary:{v:2,type:'state',state:{name:'Laynie',milk:{ml:1300,cap:8000},at:2}}});
   W.ServerSend('AccountLogin',{AccountName:'laynie_acct',Password:'hunter2'});
   W.ServerSend('ChatRoomChat',{Type:'Hidden',Target:260239,Content:'FarmhandMsg',Dictionary:{v:2,type:'cmd',text:'stats'}});
   W.ServerSend('ChatRoomChat',{Type:'Chat',Content:'hi everyone'});
@@ -43,6 +46,7 @@ W.eval(fs.readFileSync(path.join(__dirname,'../dist/farm-watcher.user.js'),'utf8
   const txt=FW.fileText();
   ok(/WHISPER .*Farm|WHISPER .*260239.*80%/.test(txt), 'whispers to this player (non-Companion path)');
   ok(/FARM-IN .*reply: STATS for Laynie/.test(txt), 'farm bot -> Companion messages');
+  ok(/state \(first\)/.test(txt) && /state \(changed: milk\.ml=1300\)/.test(txt), 'panel updates say what changed in them');
   ok(/FARM-OUT .*cmd: stats/.test(txt), 'Companion -> farm bot messages');
   ok(/ACTIVITY .*by Moo\(500\), on Laynie\(221397\), at ItemPelvis, activity Rub/.test(txt), 'actions, with who did what to whom');
   ok(/MOVE +Moo\(500\) → 7,5/.test(txt) && (txt.match(/MOVE +Moo/g)||[]).length===1, 'a run of steps is one line');

@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farm Watcher (diagnostics)
 // @namespace    bnbfarm
-// @version      1.0.2
+// @version      1.0.3
 // @description  Records what this game sees for a while (chat, whispers, beeps, actions, map moves, restraints, Companion and bot messages, errors) and saves it as a text file. Not part of the bot; run it on a player's game.
 // @author       Laynie & Alexia
 // @match        *://*.bondageprojects.elementfx.com/*
@@ -24,7 +24,7 @@
 (() => {
   // watcher/index.js
   var W = typeof unsafeWindow !== "undefined" && unsafeWindow ? unsafeWindow : window;
-  var VERSION = true ? "1.0.2" : "dev";
+  var VERSION = true ? "1.0.3" : "dev";
   var KEY = "farm_watch_v1";
   var MAX_LINES = 8e4;
   var MAX_CHARS = 9e6;
@@ -135,6 +135,22 @@
     }
     if (ch.length) line("ITEMS", nameOf(mn) + (by ? " (by " + nameOf(by) + ")" : "") + " \xB7 " + ch.join(" \xB7 "));
   }
+  var lastState = /* @__PURE__ */ new Map();
+  function stateDiff(from, s) {
+    const was = lastState.get(from);
+    lastState.set(from, s);
+    if (!was) return "first";
+    const flat = (o, p, out) => {
+      out = out || {};
+      if (o && typeof o === "object" && !Array.isArray(o)) {
+        for (const k of Object.keys(o)) flat(o[k], p ? p + "." + k : k, out);
+      } else out[p] = JSON.stringify(o);
+      return out;
+    };
+    const a = flat(was), b = flat(s), ch = [];
+    for (const k of new Set(Object.keys(a).concat(Object.keys(b)))) if (k !== "at" && a[k] !== b[k]) ch.push(k + (String(b[k] || "").length < 30 ? "=" + b[k] : ""));
+    return ch.length ? "changed: " + ch.slice(0, 12).join(", ") + (ch.length > 12 ? " +" + (ch.length - 12) : "") : "nothing changed";
+  }
   var SECRET = /pass(word)?|e-?mail|token|secret|accountname|cookie/i;
   function clean(v, d) {
     if (v === null || typeof v !== "object") return v;
@@ -168,6 +184,10 @@
           const from = nameOf(d.Sender), to = d.Target ? " \u2192 " + nameOf(d.Target) : "";
           const text = typeof d.Content === "string" ? d.Content : json(d.Content);
           if (d.Type === "Hidden") {
+            if (d.Content === "FarmhandMsg" && d.Dictionary && d.Dictionary.type === "state" && d.Dictionary.state) {
+              line("FARM-IN", from + to + " \xB7 state (" + stateDiff(d.Sender, d.Dictionary.state) + ")");
+              return;
+            }
             if (d.Content === "FarmhandMsg") {
               const m = d.Dictionary || {};
               line("FARM-IN", from + to + " \xB7 " + (m.type || "?") + (m.text ? ": " + short(m.text, 600) : "") + (m.type && !m.text ? " " + json(m, 250) : ""));

@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.15.2
+// @version      0.15.3
 // @description  B&B Farm: beeps, keys, ledger, roster, herds, summoning, anti-idle
 // @author       Laynie & Alexia
 // @match        *://*.bondageprojects.elementfx.com/*
@@ -1803,7 +1803,7 @@
   ];
 
   // bot/src/version.js
-  var VERSION = "0.15.2";
+  var VERSION = "0.15.3";
 
   // bot-parts:farmhand-bot-parts
   (function() {
@@ -3237,7 +3237,7 @@
     };
     W.FarmhandExport = exportLedger;
     W.FarmhandLedger = () => L;
-    if (W.__FARMHAND_TEST__) Object.assign(W, { __st: () => state, __cfg: CFG, __pt: prodTick, __qt: quotaTick, __lt: leashTick, __ms: milkingStallTick, __vt: voiceTick, __sync: syncCompanions, __gt: gearTick, __ht: homeTick, __addons: (h, ...a) => addonsEmit(h, ...a), __stateFor: (mn) => stateFor(mn), __leadTick: () => leadTick(), __ambient: () => ambientTick(), __about: (t) => aboutWhom(t), __announce: (t) => announce(t), __reply: (mn, t, ch) => reply(mn, t, ch), __office: () => officeCheck(), __namesHere: (t) => namesHere(t), __speciesCheck: (t) => QUESTIONS.find((q) => q.key === "species").check(t), __attach: () => attachListeners(), __tryLogin: () => tryLogin(), __beepText: (m) => beepText(m) });
+    if (W.__FARMHAND_TEST__) Object.assign(W, { __st: () => state, __cfg: CFG, __pt: prodTick, __qt: quotaTick, __lt: leashTick, __ms: milkingStallTick, __vt: voiceTick, __sync: syncCompanions, __gt: gearTick, __ht: homeTick, __addons: (h, ...a) => addonsEmit(h, ...a), __stateFor: (mn) => stateFor(mn), __leadTick: () => leadTick(), __ambient: () => ambientTick(), __about: (t) => aboutWhom(t), __announce: (t) => announce(t), __reply: (mn, t, ch) => reply(mn, t, ch), __office: () => officeCheck(), __namesHere: (t) => namesHere(t), __speciesCheck: (t) => QUESTIONS.find((q) => q.key === "species").check(t), __attach: () => attachListeners(), __tryLogin: () => tryLogin(), __beepText: (m) => beepText(m), __nameOnce: (t, mn) => nameOnce(t, mn) });
     W.FarmhandSyncKeys = () => syncAllPresent(true);
     W.FarmhandFriends = () => W.Player.FriendList;
     W.FarmhandAddFriend = (mn) => addFriend(mn, false);
@@ -4119,6 +4119,21 @@
       }
       const r = rec(mn);
       return r && r.name ? r.name : "#" + mn;
+    }
+    function shortName(mn) {
+      const full = plainName(mn), parts = String(full).trim().split(/\s+/);
+      return parts.length > 1 && parts[parts.length - 1].length >= 2 ? parts[parts.length - 1] : full;
+    }
+    function nameOnce(text, mn) {
+      const full = plainName(mn), short = shortName(mn);
+      let seen = false;
+      return String(text).replace(/%n/g, () => {
+        if (!seen) {
+          seen = true;
+          return full;
+        }
+        return short;
+      });
     }
     function titledName(mn) {
       const C = charFor(mn), n = plainName(mn);
@@ -7258,6 +7273,7 @@
         },
         // people
         name: plainName,
+        nameOnce: (text, mn) => nameOnce(text, mn),
         char: charFor,
         find: resolveTarget,
         here: () => (W.ChatRoomCharacter || []).map((c) => c.MemberNumber).filter((m) => m !== CFG.BOT_MEMBER),
@@ -8146,7 +8162,7 @@
     }
     function stallFill(mn, st, line) {
       const sounds = STALL_SOUNDS[speciesKey(mn)] || STALL_SOUNDS.default;
-      return String(line).replace(/%size/g, () => CFG.SIZES.udder.names[udderLevel(mn) - 1] || "full").replace(/%cup/g, () => CFG.SIZES.udder.cups[udderLevel(mn) - 1] || "D").replace(/%balls/g, () => CFG.SIZES.testes.names[sizeOf(mn, "testes") - 1] || "full").replace(/%len/g, () => sizeOf(mn, "penis") + "-inch").replace(/%ml/g, ml(st.kind === "cock" ? st.got.s : st.got.m)).replace(/%ms/g, ml(st.got.s)).replace(/%s/g, () => sounds[Math.floor(Math.random() * sounds.length)]).replace(/%c/g, makesSemen(mn) ? penisLabel(mn) : "").replace(/%n/g, plainName(mn));
+      return String(line).replace(/%size/g, () => CFG.SIZES.udder.names[udderLevel(mn) - 1] || "full").replace(/%cup/g, () => CFG.SIZES.udder.cups[udderLevel(mn) - 1] || "D").replace(/%balls/g, () => CFG.SIZES.testes.names[sizeOf(mn, "testes") - 1] || "full").replace(/%len/g, () => sizeOf(mn, "penis") + "-inch").replace(/%ml/g, ml(st.kind === "cock" ? st.got.s : st.got.m)).replace(/%ms/g, ml(st.got.s)).replace(/%s/g, () => sounds[Math.floor(Math.random() * sounds.length)]).replace(/%c/g, makesSemen(mn) ? penisLabel(mn) : "").replace(/^[\s\S]*$/, (all) => nameOnce(all, mn));
     }
     function stallBeat(mn, st, finish) {
       const S = STALL_STORY, r = rec(mn) || {};

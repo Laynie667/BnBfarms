@@ -339,7 +339,7 @@
       .replace(/%ms/g, ml(st.got.s))
       .replace(/%s/g, () => sounds[Math.floor(Math.random()*sounds.length)])
       .replace(/%c/g, makesSemen(mn) ? penisLabel(mn) : "")
-      .replace(/%n/g, plainName(mn));
+      .replace(/^[\s\S]*$/, (all) => nameOnce(all, mn));   // full name once, then the short one
   }
   // the next line of their story (finish: the last one, with how much came out)
   function stallBeat(mn, st, finish){

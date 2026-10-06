@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.10.7
+// @version      0.10.8
 // @description  Your B&B Farm panel: the farm girl's answers, stat cards and guides, right in the game.
 // @author       Laynie & Alexia
 // @match        *://*.bondageprojects.elementfx.com/*
@@ -227,7 +227,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.10.7";
+  var VERSION = "0.10.8";
 
   // extension/src/config.js
   var BOT_MEMBER = 260239;
@@ -3773,7 +3773,72 @@ One of mods you are using is using an old version of SDK. It will work for now b
       el.style.opacity = "1";
     });
   }
-  var lastFeel = "";
+  var FEEL = {
+    plug: [
+      "The plug shifts inside you every time you move, a full, stubborn pressure you can't ignore.",
+      "You sit down carefully. The plug reminds you exactly where it is.",
+      "Every step nudges the plug a little deeper, and your breath catches each time.",
+      "The plug sits snug and heavy, stretching you just enough that you never forget it.",
+      "You clench around the plug without meaning to, and feel your face go warm."
+    ],
+    chaste: [
+      "Your chastity aches. You're throbbing against it and it doesn't give an inch.",
+      "You strain against the cage and it holds you exactly where it wants you.",
+      "A hot pulse of want hits the steel and goes nowhere. It never goes anywhere.",
+      "You shift your hips, hoping for friction. The chastity makes sure there isn't any."
+    ],
+    udders: [
+      "Your udders are tight and heavy, prickling with milk. Any squeeze at all would make them leak.",
+      "Your breasts ache with milk, swollen and warm. You're overdue for the stall.",
+      "A bead of milk slips free and runs down. You're so full it's starting to leak on its own.",
+      "Every movement makes your heavy breasts sway, and every sway reminds you how full they are.",
+      "Your nipples tingle and stiffen, begging for the cups."
+    ],
+    sloshing: [
+      "Everything they put in you sloshes when you shift your weight. You can feel how full you are.",
+      "You're warm and heavy inside, full of what the farm gave you.",
+      "A little trickles out when you move, and you squeeze your thighs together to keep the rest.",
+      "Your belly feels round and full. You put a hand on it without thinking.",
+      "You can still feel every load inside you, sitting warm and heavy."
+    ],
+    heat: [
+      "Heat rolls through you in slow waves. Every brush of fabric is almost too much.",
+      "You're in heat, and the whole farm smells like an invitation.",
+      "Your skin is flushed and sensitive, and you can't stop thinking about being bred.",
+      "You catch yourself rubbing against things. The heat isn't letting up.",
+      "A slow, aching need settles low in your belly and stays there."
+    ],
+    preg: [
+      "Something shifts low in your belly, slow and heavy. The litter is settling in.",
+      "A tiny kick, then another. Somebody in there is awake.",
+      "Your belly feels heavier today. You rest a hand on the curve of it.",
+      "A flutter low inside you, soft as a moth, then gone.",
+      "You catch yourself craving something salty, and something sweet, and then both at once.",
+      "Your back aches pleasantly under the weight you're carrying.",
+      "The little ones roll over inside you, and your whole belly shifts with them.",
+      "You feel round and full and very, very bred.",
+      "A firm little push against your palm, right where your hand was resting."
+    ],
+    drool: [
+      "Drool gathers around the gag and slips down your chin. You can't stop it.",
+      "Your jaw aches around the gag, and a string of drool finally gives way.",
+      "You try to swallow around the gag. It doesn't help. Your chin is wet again.",
+      "The gag fills your mouth, and every breath reminds you you can't say a word."
+    ],
+    edge: [
+      "You're right on the edge and everyone around you can probably tell.",
+      "One more touch, anywhere at all, and you'd tip right over.",
+      "Your breath is coming fast and shallow. You're so close it hurts.",
+      "You squirm in place, aching, hovering right at the brink.",
+      "Every little sensation is too much. You're balanced on a knife's edge."
+    ],
+    milked: [
+      "Your breasts feel light and tender after the milking, nipples still a little puffy.",
+      "There's a pleasant, empty ache in your chest where all that milk used to be.",
+      "Your nipples are still sensitive from the cups. Even your clothes feel like too much."
+    ]
+  };
+  var recentFeel = [];
   function feelTick() {
     try {
       if (!pref("noFeelings") || W.CurrentScreen !== "ChatRoom" || !W.Player || !ctx.panel.s || !ctx.panel.s.onBooks) return;
@@ -3783,19 +3848,22 @@ One of mods you are using is using an old version of SDK. It will work for now b
       const grp = (g) => items.find((x) => x.Asset.Group.Name === g);
       const eff = (x) => [].concat(x.Property && x.Property.Effect || [], x.Asset.Effect || []);
       const arousal = W.Player.ArousalSettings && W.Player.ArousalSettings.Progress || 0;
-      const lines = [];
-      if (grp("ItemButt")) lines.push("The plug shifts inside you every time you move, a full, stubborn pressure you can't ignore.");
-      if (items.some((x) => eff(x).includes("Chaste")) && arousal > 40) lines.push("Your chastity aches. You're throbbing against it and it doesn't give an inch.");
-      if (s.milk && s.milk.cap && s.milk.ml / s.milk.cap > 0.8) lines.push("Your udders are tight and heavy, prickling with milk. Any squeeze at all would make them leak.");
-      if (s.holding && s.holding.cap && s.holding.ml / s.holding.cap > 0.6) lines.push("Everything they put in you sloshes when you shift your weight. You can feel how full you are.");
-      if (s.heatUntil && s.heatUntil > Date.now()) lines.push("Heat rolls through you in slow waves. Every brush of fabric is almost too much.");
-      if (s.preg) lines.push("Something shifts low in your belly, slow and heavy. The litter is settling in.");
-      if (grp("ItemMouth") && items.some((x) => ["ItemMouth", "ItemMouth2", "ItemMouth3"].includes(x.Asset.Group.Name) && eff(x).includes("BlockMouth"))) lines.push("Drool gathers around the gag and slips down your chin. You can't stop it.");
-      if (arousal > 85) lines.push("You're right on the edge and everyone around you can probably tell.");
-      const pool = lines.filter((l) => l !== lastFeel);
+      const kinds = [];
+      if (grp("ItemButt")) kinds.push("plug");
+      if (items.some((x) => eff(x).includes("Chaste")) && arousal > 40) kinds.push("chaste");
+      if (s.milk && s.milk.cap && s.milk.ml / s.milk.cap > 0.8) kinds.push("udders");
+      if (s.milk && s.milk.cap && s.milk.lastAt && Date.now() - s.milk.lastAt < 30 * 6e4 && s.milk.ml / s.milk.cap < 0.35) kinds.push("milked");
+      if (s.holding && s.holding.cap && s.holding.ml / s.holding.cap > 0.6) kinds.push("sloshing");
+      if (s.heatUntil && s.heatUntil > Date.now()) kinds.push("heat");
+      if (s.preg) kinds.push("preg");
+      if (grp("ItemMouth") && items.some((x) => ["ItemMouth", "ItemMouth2", "ItemMouth3"].includes(x.Asset.Group.Name) && eff(x).includes("BlockMouth"))) kinds.push("drool");
+      if (arousal > 85) kinds.push("edge");
+      const pool = [].concat(...kinds.map((k) => FEEL[k])).filter((l) => !recentFeel.includes(l));
       if (!pool.length) return;
-      lastFeel = pool[Math.floor(Math.random() * pool.length)];
-      ctx.local(lastFeel, "#b58ad9", true);
+      const line = pool[Math.floor(Math.random() * pool.length)];
+      recentFeel.push(line);
+      while (recentFeel.length > 8) recentFeel.shift();
+      ctx.local(line, "#b58ad9", true);
     } catch (e) {
       console.warn("[Farmhand Companion] feelings:", e);
     }

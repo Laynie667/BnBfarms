@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm add-on: Glory stalls
 // @namespace    bnbfarm
-// @version      1.4.0
+// @version      1.4.1
 // @description  Glory stall spots: simulated scenes every 10-30 minutes (one stranger, a queue, or two or three at once through different holes), real visitors, shifts, punishment shifts and a board. Runs on the farm bot's computer, next to the Farmhand Bot script.
 // @author       Laynie & Alexia
 // @match        *://*.bondageprojects.elementfx.com/*
@@ -48,7 +48,6 @@
   }
   var pick = (list) => list[Math.floor(Math.random() * list.length)];
   var between = (lo, hi) => lo + Math.floor(Math.random() * (hi - lo + 1));
-  var fill = (text, vars) => String(text).replace(/%(\w+)%/g, (m, k) => vars[k] !== void 0 ? vars[k] : m);
 
   // addons/glory-stalls/scenes.js
   var pickFrom = (a) => a[Math.floor(Math.random() * a.length)];
@@ -999,6 +998,7 @@
     if (!openHoles(mn).length) return "everything's covered up (gag, chastity or plug)";
     return null;
   }
+  var named = (text, mn) => api.nameOnce ? api.nameOnce(String(text), mn) : String(text).replace(/%n/g, api.name(mn));
   function startScene(id, mn) {
     const holes = openHoles(mn);
     if (!holes.length) return;
@@ -1025,7 +1025,7 @@
       scheduleNext(id, mn);
       return;
     }
-    api.privateEmote(mn, fill(beat.t.replace(/%n/g, "%name%"), { name: api.name(mn) }));
+    api.privateEmote(mn, named(beat.t, mn));
     if (beat.finish) {
       finish(id, mn, beat.hole || run.hole, beat.ml, beat.inside, beat.visitor || run.visitor);
       api.face(mn, beat.inside ? "bred" : "afterglow", 45);
@@ -1119,7 +1119,7 @@
         continue;
       }
       if (!whyNot(mn) && now >= (s.atmosAt || 0)) {
-        if (s.atmosAt) api.privateEmote(mn, fill(pick(ATMOS).replace(/%n/g, "%name%"), { name: api.name(mn) }));
+        if (s.atmosAt) api.privateEmote(mn, named(pick(ATMOS), mn));
         s.atmosAt = now + between(3, 6) * 6e4;
       }
     }
@@ -1169,7 +1169,7 @@
       const inside = true, funnel = hole === "mouth" && A.funnelOn(mn);
       A.privateEmote(sender, "You step up to the hole and push through into the " + w + " waiting on the other side. You finish " + (load >= 1 ? "deep inside, about " + Math.round(load) + " mL" : "with a shudder") + ". Whoever's in there never sees your face.");
       const lines = load >= 1 ? buildRealScene({ hole, visitor, funnel, ml: load, inside }) : buildRealScene({ hole, visitor, funnel, ml: 0, inside }).slice(0, 4).concat(["The stranger shudders and finishes against the wall, then pulls away."]);
-      lines.forEach((l, i) => A.later(() => A.privateEmote(mn, fill(l.replace(/%n/g, "%name%"), { name: A.name(mn) })), i * 5e3));
+      lines.forEach((l, i) => A.later(() => A.privateEmote(mn, named(l, mn)), i * 5e3));
       A.later(() => finish(id, mn, hole, load, inside, visitor), (lines.length - 1) * 5e3);
       scheduleNext(id, mn);
       A.audit(sender, "USE", "stall " + id);

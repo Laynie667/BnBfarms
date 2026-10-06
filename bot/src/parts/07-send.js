@@ -581,6 +581,17 @@
             return C.Nickname||C.Name||"stranger"; }
     const r = rec(mn); return (r&&r.name)?r.name:("#"+mn);
   }
+  // a story line names them in full once, then by the last part of their name ("Alexia's Laynie" ... "Laynie's
+  // mouth"): seen live, a long nickname three times in one line reads heavy
+  function shortName(mn){
+    const full = plainName(mn), parts = String(full).trim().split(/\s+/);
+    return parts.length > 1 && parts[parts.length-1].length >= 2 ? parts[parts.length-1] : full;
+  }
+  function nameOnce(text, mn){
+    const full = plainName(mn), short = shortName(mn);
+    let seen = false;
+    return String(text).replace(/%n/g, () => { if (!seen){ seen = true; return full; } return short; });
+  }
   function titledName(mn){
     const C = charFor(mn), n = plainName(mn);
     if (!C) return n;

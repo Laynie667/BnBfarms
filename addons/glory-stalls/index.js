@@ -83,7 +83,11 @@ function startScene(id, mn) {
   // a double takes pussy and ass together; everyone else picks one open hole
   const hole = visitor.type === "double" ? "vulva" : pick(holes);
   const r = api.rec(mn) || {}, funnel = hole === "mouth" && api.funnelOn(mn);
-  const scene = buildScene({ hole, visitor, funnel, degrade: !!r.degradeMe, praise: !!r.praiseMe, holes });
+  // how they're arranged: on a punishment shift, already tied up, or there by choice
+  const sh = D().shifts[mn], C = api.char(mn);
+  const tied = !!(C && (C.Appearance || []).some((x) => x && x.Asset && x.Asset.Group && ["ItemArms", "ItemHands"].includes(x.Asset.Group.Name)));
+  const setup = sh && sh.punish && sh.until > Date.now() ? "punished" : tied ? "bound" : "voluntary";
+  const scene = buildScene({ hole, visitor, funnel, degrade: !!r.degradeMe, praise: !!r.praiseMe, holes, setup });
   running.set(id, { mn, scene, hole, visitor, i: 0 });
   api.log("stall " + id + ": " + scene.kind + ", " + visitor.size + " " + visitor.type + " in the " + hole + " for " + mn);
   step(id);

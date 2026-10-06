@@ -6,7 +6,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 | Script | File in `dist/` | Where it runs | Current |
 |---|---|---|---|
 | Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.15.4** |
-| Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.4.2** |
+| Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.5.0** |
 | Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **1.0.3** |
 | Barn life, Breeding, Dairy, Map tools, Shows, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.2** |
 | Farmhand Companion | `farmhand-companion.user.js` | each player | **0.10.9** |
@@ -20,6 +20,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 ## Latest changes (newest first)
 
+- **Glory stalls 1.5.0**: scenes are about what's done to the person in the stall, not what they do (the reaction lines are rewritten); every scene opens with how they're arranged and follows from it: **punished** on a punishment shift (locked in the frame or stocks, rougher strangers, longer scenes, "the shift isn't over"), **bound** if they came in tied, or **by choice** (kneeling at the hatch, over the bench, on all fours or against the wall).
 - **Companion 0.10.9**: Safe word, I'm stuck and Call staff live in their own 🆘 Safety tab (second tab on the Guest and Livestock panels; staff and proprietors reach it from their Livestock panel). If two copies of the Companion are installed, the second says so in chat, naming both versions, and steps aside instead of failing.
 - **Bot 0.15.4, Glory stalls 1.4.2** (from the marks in the watch reports): the roster counts only people with a role ("78 registered" was counting old files); "kitty" instead of "kitt"; a stranger who pulls out (face, back) counts as a splatter, not a load inside, and leaves them cum-covered till ?wash; and players whose **LSCG** has splatters on get LSCG's real splatters drawn on them from glory stall pull-outs and ?cum on them (with "lovers only" on in LSCG, add the bot, 260239, to the LSCG splatter whitelist).
 - **Conditioning 1.0.3**: a word dropped in at the start of a sentence gets its capital ("Cows don't need words"). **Watcher 1.0.3**: panel updates show which parts changed, to track down why some players get two or three a minute.

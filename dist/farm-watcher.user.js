@@ -2,6 +2,9 @@
 // @name         BnB Farm — Farm Watcher (diagnostics)
 // @namespace    bnbfarm
 // @version      1.0.3
+// @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farm-watcher.user.js
+// @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farm-watcher.user.js
+// @homepageURL  https://github.com/Laynie667/BnBfarms#install
 // @description  Records what this game sees for a while (chat, whispers, beeps, actions, map moves, restraints, Companion and bot messages, errors) and saves it as a text file. Not part of the bot; run it on a player's game.
 // @author       Laynie & Alexia
 // @match        *://*.bondageprojects.elementfx.com/*

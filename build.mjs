@@ -2,7 +2,7 @@
 // npm run watch  → same, and rebuilds every time you save a file
 import * as esbuild from "esbuild";
 import { readFileSync, readdirSync, mkdirSync, existsSync } from "node:fs";
-import { resolve } from "node:path";
+import { resolve, basename } from "node:path";
 
 const pkg = JSON.parse(readFileSync("package.json", "utf8"));
 
@@ -46,7 +46,8 @@ mkdirSync("dist", { recursive: true });
 const watch = process.argv.includes("--watch");
 
 for (const t of targets) {
-  const header = (t.headerText || readFileSync(t.header, "utf8")).replace("{{VERSION}}", t.version);
+  // auto-updates: Tampermonkey checks the same file on GitHub and updates when the version goes up
+  const header = (t.headerText || readFileSync(t.header, "utf8")).replace("{{VERSION}}", t.version).replace(/{{FILE}}/g, basename(t.out));
   const options = {
     entryPoints: [t.entry],
     bundle: true,

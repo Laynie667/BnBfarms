@@ -2,6 +2,9 @@
 // @name         BnB Farm add-on: Work
 // @namespace    bnbfarm
 // @version      1.0.2
+// @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-work.user.js
+// @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-work.user.js
+// @homepageURL  https://github.com/Laynie667/BnBfarms#install
 // @description  Staff leaderboard, private write-ups (writer and recipient only; others see a count) and opt-in inspections with an automatic checklist. Runs on the farm bot's computer, next to the Farmhand Bot script.
 // @author       Laynie & Alexia
 // @match        *://*.bondageprojects.elementfx.com/*

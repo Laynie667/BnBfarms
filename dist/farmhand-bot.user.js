@@ -2,6 +2,9 @@
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
 // @version      0.15.3
+// @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
+// @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
+// @homepageURL  https://github.com/Laynie667/BnBfarms#install
 // @description  B&B Farm: beeps, keys, ledger, roster, herds, summoning, anti-idle
 // @author       Laynie & Alexia
 // @match        *://*.bondageprojects.elementfx.com/*

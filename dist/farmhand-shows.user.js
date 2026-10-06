@@ -2,6 +2,9 @@
 // @name         BnB Farm add-on: Shows
 // @namespace    bnbfarm
 // @version      1.0.2
+// @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-shows.user.js
+// @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-shows.user.js
+// @homepageURL  https://github.com/Laynie667/BnBfarms#install
 // @description  Udder judging, breeding stand, pony cart race (checkpoint zones) and obedience trial (cues), ribbons on records, and placard spots / display cases. Runs on the farm bot's computer, next to the Farmhand Bot script.
 // @author       Laynie & Alexia
 // @match        *://*.bondageprojects.elementfx.com/*

@@ -9,6 +9,36 @@ Two scripts that run the B&B Farm map room in Bondage Club:
 
 Players without the Companion still get beeps and whispers, exactly like before.
 
+## Install
+
+You need **Tampermonkey** in your browser first (Chrome, Edge, Firefox; on a phone, a browser that supports it, like Kiwi or Firefox).
+Then click a link below. Tampermonkey opens its install page; press **Install**. After that the script keeps itself up to date: Tampermonkey checks this repository about once a day and updates when there's a newer version (or right away from Tampermonkey's dashboard: **Utilities → Check for userscript updates**).
+
+**Players**
+
+| Script | What it does |
+|---|---|
+| [**Farmhand Companion**](https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js) | The 🌾 button and panel: your farm life, your record, your herd, the staff tabs for staff. Optional; the farm works without it. |
+| [**Farm Watcher**](https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farm-watcher.user.js) | Diagnostics only: records what your game sees for a while and saves a text file to send in when something's wrong. |
+
+**The farm bot's computer only** (account 260239)
+
+| Script | What it does |
+|---|---|
+| [**Farmhand Bot**](https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js) | The farm girl herself: the books, commands, milking, breeding, keys, summons, scenes. |
+| [Glory stalls](https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-glory-stalls.user.js) | Glory stall scenes, real visitors, shifts. |
+| [Dairy](https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-dairy.user.js) | Warmer milking lines and the weekly milk certificate. |
+| [Breeding](https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-breeding.user.js) | Pregnancy stages, belly, cravings, midwife. |
+| [Barn life](https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-barn-life.user.js) | Hunger, thirst, grooming, troughs. |
+| [Conditioning](https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-conditioning.user.js) | Guided trance sessions (opt-in). |
+| [Work](https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-work.user.js) | Chores and staff points. |
+| [Shows](https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-shows.user.js) | Fairs and shows. |
+| [Map tools](https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-map-tools.user.js) | Zone and spot helpers. |
+
+**Already installed from a file?** Click the link once anyway and press **Reinstall** (or Update): that's what turns on automatic updates. Your settings and the farm's books are kept; they live in the browser, not in the script.
+
+Current versions and what changed lately: [INSTALL-STATUS.md](INSTALL-STATUS.md).
+
 ## What's where
 
 ```
@@ -57,20 +87,16 @@ npm test           builds, then runs the fake-game tests (✅ or ❌ for each ch
 npm run watch      rebuilds by itself every time you save (Ctrl+C stops it)
 ```
 
-Then open the file in `dist/`, copy all of it, and paste it over the old script in Tampermonkey.
+Then commit and push: every installed copy updates itself within a day (Tampermonkey compares the `@version`, so bump it, see below).
 
-When you change the bot, bump `"bot"` under `"versions"` in `package.json` (0.9.25 → 0.9.26) so you can tell versions apart in ?health.
+When you change the bot, bump `"bot"` under `"versions"` in `package.json` (0.9.25 → 0.9.26). The Companion and the watcher have their own entries there; each add-on keeps its version in its `addon.json`. **Without a higher version, Tampermonkey won't pick the change up.**
 
 ## Saving versions with Git
 
 Git keeps every saved version, so you can always go back. In GitHub Desktop: **File → Add local repository**, pick the folder, and it offers to make it a repository. After that: tick your changed files, write a short note like "bigger knot emotes", click **Commit**, then **Push** to send it to GitHub.
 
-Make the GitHub repository **private**. It holds farm rules and adult content, and the bot's member numbers.
+This repository is **public**: that's what lets Tampermonkey install and update the scripts from it. Nothing private lives in it (the bot's login and the farm's books stay in the bot's browser), but the code, the farm's rules and its adult content, and a few member numbers are readable by anyone with the link.
 
-## Installing the Companion (players)
+## After installing the Companion
 
-1. Install Tampermonkey in your browser.
-2. Open `dist/farmhand-companion.user.js`, copy it all, and in Tampermonkey: **Create a new script**, paste, save.
-3. Reload Bondage Club and walk into B&B Farm. The 🌾 button shows bottom right. It says "connected" once the farm girl answers.
-
-Later we can host it so players click one link to install, and it updates itself (see docs/PLAN.md).
+Reload Bondage Club and walk into B&B Farm. The 🌾 button shows bottom right; it says "connected" once the farm girl answers.

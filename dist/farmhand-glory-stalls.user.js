@@ -2,6 +2,9 @@
 // @name         BnB Farm add-on: Glory stalls
 // @namespace    bnbfarm
 // @version      1.4.1
+// @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-glory-stalls.user.js
+// @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-glory-stalls.user.js
+// @homepageURL  https://github.com/Laynie667/BnBfarms#install
 // @description  Glory stall spots: simulated scenes every 10-30 minutes (one stranger, a queue, or two or three at once through different holes), real visitors, shifts, punishment shifts and a board. Runs on the farm bot's computer, next to the Farmhand Bot script.
 // @author       Laynie & Alexia
 // @match        *://*.bondageprojects.elementfx.com/*

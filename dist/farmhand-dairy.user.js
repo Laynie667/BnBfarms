@@ -2,6 +2,9 @@
 // @name         BnB Farm add-on: Dairy
 // @namespace    bnbfarm
 // @version      1.0.2
+// @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-dairy.user.js
+// @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-dairy.user.js
+// @homepageURL  https://github.com/Laynie667/BnBfarms#install
 // @description  Warmer, more varied milking lines (with praise/degrade touches) and a weekly milk certificate that replaces the last one. Runs on the farm bot's computer, next to the Farmhand Bot script.
 // @author       Laynie & Alexia
 // @match        *://*.bondageprojects.elementfx.com/*

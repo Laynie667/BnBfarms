@@ -2,6 +2,9 @@
 // @name         BnB Farm add-on: Breeding
 // @namespace    bnbfarm
 // @version      1.0.2
+// @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-breeding.user.js
+// @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-breeding.user.js
+// @homepageURL  https://github.com/Laynie667/BnBfarms#install
 // @description  Pregnancy stages with belly size 1-5, cravings, kicks, midwives, staff-only stud bookings and breeding week (15th-21st). Runs on the farm bot's computer, next to the Farmhand Bot script.
 // @author       Laynie & Alexia
 // @match        *://*.bondageprojects.elementfx.com/*

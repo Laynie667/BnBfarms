@@ -2,6 +2,9 @@
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
 // @version      0.10.8
+// @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
+// @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
+// @homepageURL  https://github.com/Laynie667/BnBfarms#install
 // @description  Your B&B Farm panel: the farm girl's answers, stat cards and guides, right in the game.
 // @author       Laynie & Alexia
 // @match        *://*.bondageprojects.elementfx.com/*

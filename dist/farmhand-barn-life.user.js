@@ -2,6 +2,9 @@
 // @name         BnB Farm add-on: Barn life
 // @namespace    bnbfarm
 // @version      1.0.2
+// @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-barn-life.user.js
+// @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-barn-life.user.js
+// @homepageURL  https://github.com/Laynie667/BnBfarms#install
 // @description  Opt-in food, water and grooming at trough and water spots (BC+/MPA bowls count), trough refills, grooming by staff, and milk-drunk. Runs on the farm bot's computer, next to the Farmhand Bot script.
 // @author       Laynie & Alexia
 // @match        *://*.bondageprojects.elementfx.com/*

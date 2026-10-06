@@ -12,6 +12,19 @@
   function listenersIntact(s){
     try { return typeof s.listeners !== "function" || s.listeners("ChatRoomMessage").includes(attachListeners._msgFn); } catch(e){ return true; }
   }
+  /* Seen live: some players' mods add hidden extra data to the end of every beep they send, like
+     cat\n\n{"messageType":"Message","messageColor":"#2B59DB"}. Taken as it came, "cat" wasn't an animal and
+     an applicant was stuck on the animal question; every other answer or command by beep would carry it too.
+     Only the words they typed are kept. */
+  function beepText(m){
+    let t = typeof m === "string" ? m : (m && typeof m === "object" && typeof m.Message === "string" ? m.Message : String(m||""));
+    // a trailing {...} of mod data (with any invisible marker characters before it), as many as there are
+    for (let i = 0; i < 3; i++){
+      const cut = t.replace(/[\s\u200B-\u200F\uE000-\uF8FF]*\{[^{}]*"(messageType|messageColor|bceMessageType|type)"[^{}]*\}[\s\u200B-\u200F\uE000-\uF8FF]*$/, "");
+      if (cut === t) break; t = cut;
+    }
+    return t.replace(/[\uE000-\uF8FF]/g, "").trim();
+  }
   function attachListeners(){
     const s = W.ServerSocket;
     if (!s || typeof s.on !== "function") return false;
@@ -82,11 +95,13 @@
         if (!data || data.MemberNumber===CFG.BOT_MEMBER || state.dormant) return;
         if (data.BeepType) return;
         if (!data.Message) return;
+        const msg = beepText(data.Message);
+        if (!msg) return;
         state.lastHealthy = Date.now();
-        log("BEEP from "+data.MemberNumber+": "+String(data.Message).slice(0,70));
+        log("BEEP from "+data.MemberNumber+": "+msg.slice(0,70));
         if (CFG.FRIEND_ON_BEEP) addFriend(data.MemberNumber, true);
-        if (handleYesNo(data.MemberNumber, data.Message)) return;
-        handleCommand(data.MemberNumber, data.Message, "beep");
+        if (handleYesNo(data.MemberNumber, msg)) return;
+        handleCommand(data.MemberNumber, msg, "beep");
       } catch(e){ warn("beep handler:",e); }
     });
 

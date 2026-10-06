@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.15.1
+// @version      0.15.2
 // @description  B&B Farm: beeps, keys, ledger, roster, herds, summoning, anti-idle
 // @author       Laynie & Alexia
 // @match        *://*.bondageprojects.elementfx.com/*
@@ -1803,7 +1803,7 @@
   ];
 
   // bot/src/version.js
-  var VERSION = "0.15.1";
+  var VERSION = "0.15.2";
 
   // bot-parts:farmhand-bot-parts
   (function() {
@@ -3237,7 +3237,7 @@
     };
     W.FarmhandExport = exportLedger;
     W.FarmhandLedger = () => L;
-    if (W.__FARMHAND_TEST__) Object.assign(W, { __st: () => state, __cfg: CFG, __pt: prodTick, __qt: quotaTick, __lt: leashTick, __ms: milkingStallTick, __vt: voiceTick, __sync: syncCompanions, __gt: gearTick, __ht: homeTick, __addons: (h, ...a) => addonsEmit(h, ...a), __stateFor: (mn) => stateFor(mn), __leadTick: () => leadTick(), __ambient: () => ambientTick(), __about: (t) => aboutWhom(t), __announce: (t) => announce(t), __reply: (mn, t, ch) => reply(mn, t, ch), __office: () => officeCheck(), __namesHere: (t) => namesHere(t), __speciesCheck: (t) => QUESTIONS.find((q) => q.key === "species").check(t), __attach: () => attachListeners(), __tryLogin: () => tryLogin() });
+    if (W.__FARMHAND_TEST__) Object.assign(W, { __st: () => state, __cfg: CFG, __pt: prodTick, __qt: quotaTick, __lt: leashTick, __ms: milkingStallTick, __vt: voiceTick, __sync: syncCompanions, __gt: gearTick, __ht: homeTick, __addons: (h, ...a) => addonsEmit(h, ...a), __stateFor: (mn) => stateFor(mn), __leadTick: () => leadTick(), __ambient: () => ambientTick(), __about: (t) => aboutWhom(t), __announce: (t) => announce(t), __reply: (mn, t, ch) => reply(mn, t, ch), __office: () => officeCheck(), __namesHere: (t) => namesHere(t), __speciesCheck: (t) => QUESTIONS.find((q) => q.key === "species").check(t), __attach: () => attachListeners(), __tryLogin: () => tryLogin(), __beepText: (m) => beepText(m) });
     W.FarmhandSyncKeys = () => syncAllPresent(true);
     W.FarmhandFriends = () => W.Player.FriendList;
     W.FarmhandAddFriend = (mn) => addFriend(mn, false);
@@ -13654,6 +13654,15 @@ Welcome to B&B Farm, hon. \u{1F33E}`
         return true;
       }
     }
+    function beepText(m) {
+      let t = typeof m === "string" ? m : m && typeof m === "object" && typeof m.Message === "string" ? m.Message : String(m || "");
+      for (let i = 0; i < 3; i++) {
+        const cut = t.replace(/[\s\u200B-\u200F\uE000-\uF8FF]*\{[^{}]*"(messageType|messageColor|bceMessageType|type)"[^{}]*\}[\s\u200B-\u200F\uE000-\uF8FF]*$/, "");
+        if (cut === t) break;
+        t = cut;
+      }
+      return t.replace(/[\uE000-\uF8FF]/g, "").trim();
+    }
     function attachListeners() {
       const s = W.ServerSocket;
       if (!s || typeof s.on !== "function") return false;
@@ -13765,11 +13774,13 @@ Welcome to B&B Farm, hon. \u{1F33E}`
           if (!data || data.MemberNumber === CFG.BOT_MEMBER || state.dormant) return;
           if (data.BeepType) return;
           if (!data.Message) return;
+          const msg = beepText(data.Message);
+          if (!msg) return;
           state.lastHealthy = Date.now();
-          log("BEEP from " + data.MemberNumber + ": " + String(data.Message).slice(0, 70));
+          log("BEEP from " + data.MemberNumber + ": " + msg.slice(0, 70));
           if (CFG.FRIEND_ON_BEEP) addFriend(data.MemberNumber, true);
-          if (handleYesNo(data.MemberNumber, data.Message)) return;
-          handleCommand(data.MemberNumber, data.Message, "beep");
+          if (handleYesNo(data.MemberNumber, msg)) return;
+          handleCommand(data.MemberNumber, msg, "beep");
         } catch (e) {
           warn("beep handler:", e);
         }

@@ -5,7 +5,7 @@
   "type": "module",
   "versions": {
     "bot": "0.15.4",
-    "companion": "0.10.8",
+    "companion": "0.10.9",
     "watcher": "1.0.3"
   },
   "scripts": {

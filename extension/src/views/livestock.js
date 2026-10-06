@@ -5,7 +5,7 @@
 // The livestock panel: your own record, milk, breeding, inbox, guides and switches.
 // Also the "Livestock" view staff and proprietors switch to for their own personal info.
 import { h, card, title, muted, btn, chip, bar, toggle, ml } from "../dom.js";
-import { guidesTab } from "./common.js";
+import { guidesTab, safetyTab } from "./common.js";
 
 const pct = (a, b) => (b ? (100 * a) / b : 0);
 const hoursLeft = (t) => Math.max(0, Math.ceil((t - Date.now()) / 3600000));
@@ -145,6 +145,7 @@ function toggles(ctx) {
 
 export const LIVESTOCK_TABS = [
   { id: "me", label: "Me", render: me },
+  { id: "safety", label: "🆘 Safety", render: safetyTab },
   { id: "milk", label: "Milking", render: milking },
   { id: "breed", label: "Breeding", render: breeding },
   { id: "inbox", label: "Inbox", render: inbox },

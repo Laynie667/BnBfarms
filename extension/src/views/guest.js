@@ -3,7 +3,7 @@
 */
 // The guest panel: for anybody not on the books yet.
 import { h, card, title, muted, btn } from "../dom.js";
-import { guidesTab, AREAS } from "./common.js";
+import { guidesTab, safetyTab, AREAS } from "./common.js";
 import { inbox, panelPrefs } from "./livestock.js";
 
 export const GUEST_TABS = [
@@ -12,6 +12,7 @@ export const GUEST_TABS = [
       h("p", null, "Welcome to B&B Farm. Everybody here chose to be here and signed to say so. Have a look around, mind the ruts, and holler if you need a hand."),
       btn("Take the tour", () => ctx.send("tour"), true), btn("Apply to join", () => ctx.send("apply")), btn("Luxury stay", () => ctx.send("luxury"))),
     card(title("Your keys"), muted("Guests don't carry keys. Staff can let you through any door.")) ] },
+  { id: "safety", label: "🆘 Safety", render: safetyTab },
   { id: "farm", label: "The farm", render: () => AREAS.map(([n, key, d]) =>
     card(h("div", { class: "fhc-kv" }, h("b", null, n), h("span", { class: "fhc-muted" }, key)), muted(d))) },
   { id: "rules", label: "Rules", render: (ctx) => [

@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.10.8
+// @version      0.10.9
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -230,7 +230,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.10.8";
+  var VERSION = "0.10.9";
 
   // extension/src/config.js
   var BOT_MEMBER = 260239;
@@ -394,6 +394,23 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var cmdStem = (cmd) => cmd.replace(/\s*<.*$/, "").trim();
 
   // extension/src/views/common.js
+  function safetyTab(ctx2) {
+    const big = (label, cmd, red, note) => h(
+      "div",
+      { style: { marginBottom: "10px" } },
+      h("button", { type: "button", class: "fhc-safe" + (red ? " red" : ""), style: { width: "100%", minHeight: "48px", fontSize: "16px" }, onclick: () => ctx2.send(cmd) }, label),
+      muted(note)
+    );
+    return [
+      card(
+        title("Safety"),
+        big("Safe word", "safe", true, "Stops everything at once, from anybody, anywhere on the farm. No contract overrides it. On-call staff are called to you."),
+        big("I'm stuck", "stuck", false, "Can't move, can't reach a door, stuck in somethin'? Staff are told where you are, and you're brought somewhere safe."),
+        big("Call staff", "staff", false, "Just want a hand, or somebody to talk to? This calls whoever's on duty.")
+      ),
+      muted("From chat, without the panel: ?safe \xB7 ?stuck \xB7 ?staff")
+    ];
+  }
   function guidesTab(ctx2, staff) {
     const q2 = (ctx2.ui.search || "").toLowerCase();
     const groups = PUBLIC_GROUPS.concat(
@@ -630,6 +647,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
   var LIVESTOCK_TABS = [
     { id: "me", label: "Me", render: me },
+    { id: "safety", label: "\u{1F198} Safety", render: safetyTab },
     { id: "milk", label: "Milking", render: milking },
     { id: "breed", label: "Breeding", render: breeding },
     { id: "inbox", label: "Inbox", render: inbox },
@@ -649,6 +667,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       ),
       card(title("Your keys"), muted("Guests don't carry keys. Staff can let you through any door."))
     ] },
+    { id: "safety", label: "\u{1F198} Safety", render: safetyTab },
     { id: "farm", label: "The farm", render: () => AREAS.map(([n, key, d]) => card(h("div", { class: "fhc-kv" }, h("b", null, n), h("span", { class: "fhc-muted" }, key)), muted(d))) },
     { id: "rules", label: "Rules", render: (ctx2) => [
       h(
@@ -3323,13 +3342,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
             this.render();
           } }, VIEWS[v].label))
         ),
-        h(
-          "div",
-          { class: "fhc-row" },
-          h("button", { type: "button", class: "fhc-safe red", onclick: () => this.ask("safe") }, "Safe word"),
-          h("button", { type: "button", class: "fhc-safe", onclick: () => this.ask("stuck") }, "I'm stuck"),
-          h("button", { type: "button", class: "fhc-safe", style: { borderColor: "var(--fh-line)" }, onclick: () => this.ask("staff") }, "Call staff")
-        ),
+        // Safe word, I'm stuck and Call staff live in the Safety tab (Guest and Livestock panels; staff reach it from Livestock)
         h("nav", { class: "fhc-row", "aria-label": "Panel sections" }, tabs.map((t) => {
           const n = t.badge ? t.badge(ctx2) : 0;
           return h("button", { type: "button", class: "fhc-pill" + (t === tab ? " on" : ""), onclick: () => {
@@ -3895,11 +3908,31 @@ One of mods you are using is using an old version of SDK. It will work for now b
 
   // extension/src/index.js
   var bcModSdk = import_bondage_club_mod_sdk.default.default || import_bondage_club_mod_sdk.default;
-  var mod = bcModSdk.registerMod({
-    name: "FarmhandCompanion",
-    fullName: "B&B Farm Farmhand Companion",
-    version: VERSION
-  });
+  function twoCopies(running) {
+    const note = "\u{1F33E} Two copies of the Farmhand Companion are installed" + (running ? " (v" + running + " is running, v" + VERSION + " stepped aside)" : "") + ". Open Tampermonkey's dashboard and delete the older one, then reload.";
+    console.warn("[Farmhand Companion] " + note);
+    const t = setInterval(() => {
+      if (window.CurrentScreen !== "ChatRoom" || typeof window.ChatRoomSendLocal !== "function") return;
+      clearInterval(t);
+      try {
+        const p = window.document.createElement("div");
+        p.style.cssText = "color:#c9a35b;white-space:pre-wrap";
+        p.textContent = note;
+        window.ChatRoomSendLocal(p.outerHTML);
+      } catch (e) {
+      }
+    }, 3e3);
+    throw new Error("Farmhand Companion: another copy is already running");
+  }
+  if (window.__farmhandCompanion) twoCopies(window.__farmhandCompanion);
+  var mod;
+  try {
+    mod = bcModSdk.registerMod({ name: "FarmhandCompanion", fullName: "B&B Farm Farmhand Companion", version: VERSION });
+  } catch (e) {
+    if (/already|registered|loaded/i.test(String(e && e.message))) twoCopies(null);
+    throw e;
+  }
+  window.__farmhandCompanion = VERSION;
   var st = { panel: null, welcomed: false, lastHello: 0, parts: /* @__PURE__ */ new Map() };
   var botHere = () => window.CurrentScreen === "ChatRoom" && Array.isArray(window.ChatRoomCharacter) && window.ChatRoomCharacter.some((c) => c.MemberNumber === BOT_MEMBER);
   var onBotAccount = () => !!(window.Player && window.Player.MemberNumber === BOT_MEMBER);

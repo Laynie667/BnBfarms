@@ -18,11 +18,28 @@ import { initCues, cueOff, lead, face, sound, trance, drawMarkers } from "./cues
 // the SDK ships as an old-style module; this digs the real thing out either way
 const bcModSdk = sdkModule.default || sdkModule;
 
-const mod = bcModSdk.registerMod({
-  name: "FarmhandCompanion",
-  fullName: "B&B Farm Farmhand Companion",
-  version: VERSION,
-});
+// Two copies installed (an old pasted one and one from the GitHub link): the second can't start, and the mod
+// loader's own "already loaded" error doesn't say why. Say it plainly, in chat, once, and step aside.
+function twoCopies(running) {
+  const note = "🌾 Two copies of the Farmhand Companion are installed" + (running ? " (v" + running + " is running, v" + VERSION + " stepped aside)" : "") +
+    ". Open Tampermonkey's dashboard and delete the older one, then reload.";
+  console.warn("[Farmhand Companion] " + note);
+  const t = setInterval(() => {
+    if (window.CurrentScreen !== "ChatRoom" || typeof window.ChatRoomSendLocal !== "function") return;
+    clearInterval(t);
+    try { const p = window.document.createElement("div"); p.style.cssText = "color:#c9a35b;white-space:pre-wrap"; p.textContent = note; window.ChatRoomSendLocal(p.outerHTML); } catch (e) { /* the console has it */ }
+  }, 3000);
+  throw new Error("Farmhand Companion: another copy is already running");
+}
+if (window.__farmhandCompanion) twoCopies(window.__farmhandCompanion);
+let mod;
+try {
+  mod = bcModSdk.registerMod({ name: "FarmhandCompanion", fullName: "B&B Farm Farmhand Companion", version: VERSION });
+} catch (e) {
+  if (/already|registered|loaded/i.test(String(e && e.message))) twoCopies(null);
+  throw e;
+}
+window.__farmhandCompanion = VERSION;
 
 const st = { panel: null, welcomed: false, lastHello: 0, parts: new Map() };
 

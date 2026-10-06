@@ -131,6 +131,13 @@ const STATE = { name: "Laynie", onBooks: true, roles: ["PROPRIETOR", "LIVESTOCK"
   const box = D.getElementById("fhc-input"); box.value = "half typed"; box.focus();
   bot({ type: "notice", text: "a new notice", id: 5, part: 1, of: 1 });
   out("7 typing survives a new message ->", D.getElementById("fhc-input").value === "half typed");
+  // asked for: Safe word, I'm stuck and Call staff only in the Safety tab, on no panel's top row
+  const rowSafe = () => [...D.querySelectorAll("#fhc-panel .fhc-row button")].some((b) => /^(Safe word|I'm stuck|Call staff)$/.test(b.textContent.trim()));
+  out("7 no safety row on the staff panel ->", !rowSafe());
+  click("Livestock"); out("7 ...or the livestock panel ->", !rowSafe());
+  const nSafe = cmds().length; click("🆘 Safety");
+  out("7 the Safety tab has all three ->", /Safe word/.test(text()) && /I'm stuck/.test(text()) && /Call staff/.test(text()));
+  click("Safe word"); out("7 ...and the safe word works from it ->", cmds().slice(nSafe).includes("safe"));
   // phones: an update never rebuilds or refocuses the box (that popped the keyboard and zoomed the screen)
   box.blur(); let focused = 0; box.addEventListener("focus", () => focused++);
   bot({ type: "notice", text: "another notice", id: 6, part: 1, of: 1 });

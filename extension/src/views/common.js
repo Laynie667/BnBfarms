@@ -5,6 +5,21 @@
 import { h, card, title, muted, btn } from "../dom.js";
 import { BOOKS, PUBLIC_GROUPS, STAFF_GROUPS, OWNER_GROUPS, needsInput, cmdStem } from "../../../shared/guides.js";
 
+// the safety buttons, in their own tab on the Guest and Livestock panels (asked for: out of the way of
+// everyday use, but one tap from the tab row). ?safe, ?stuck and ?staff work from chat too.
+export function safetyTab(ctx) {
+  const big = (label, cmd, red, note) => h("div", { style: { marginBottom: "10px" } },
+    h("button", { type: "button", class: "fhc-safe" + (red ? " red" : ""), style: { width: "100%", minHeight: "48px", fontSize: "16px" }, onclick: () => ctx.send(cmd) }, label),
+    muted(note));
+  return [
+    card(title("Safety"),
+      big("Safe word", "safe", true, "Stops everything at once, from anybody, anywhere on the farm. No contract overrides it. On-call staff are called to you."),
+      big("I'm stuck", "stuck", false, "Can't move, can't reach a door, stuck in somethin'? Staff are told where you are, and you're brought somewhere safe."),
+      big("Call staff", "staff", false, "Just want a hand, or somebody to talk to? This calls whoever's on duty.")),
+    muted("From chat, without the panel: ?safe · ?stuck · ?staff"),
+  ];
+}
+
 export function guidesTab(ctx, staff) {
   const q = (ctx.ui.search || "").toLowerCase();
   // the same groups the bot's "?help me" lists, plus the running add-ons' commands for this person's rank

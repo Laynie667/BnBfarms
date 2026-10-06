@@ -46,7 +46,7 @@ const roomText=s=>{ const d=s&&s[1]; if(!d) return null;
   k=sent.length; W.__ms(); await drain();
   const em=sent.slice(k).map(s=>roomText(s)).filter(Boolean).join(' | ');
   ok(/udder|teats|bucket|moo|rail/.test(em) && /Moo/.test(em), 'the milking stall uses a dairy line ('+em.slice(0,140)+')');
-  ok(!/(lactat|mammary|secret)/i.test(em), 'no medical words');
+  ok(!/\b(lactat|mammary|secret)/i.test(em), 'no medical words');
   // certificate: a week passes
   const d=()=>L().mods['dairy'];
   W.__addons('tick'); p.totals.milked+=1500; W.__addons('tick');

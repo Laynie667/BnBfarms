@@ -49,7 +49,7 @@ async function session(mn, x){
   const moo=await session(500, 5);
   const mooAll=moo.join('\n');
   ok(moo.length>=40, 'Moo: a full session ('+moo.length+' lines)');
-  ok(/cups|nipple|breast/i.test(moo[0]) && !/b(sleeves?|cocks?)b/i.test(mooAll), 'Moo: all about her breasts, never a cock');
+  ok(/cups|nipple|breast/i.test(moo[0]) && !/\b(sleeves?|cocks?)\b/i.test(mooAll), 'Moo: all about her breasts, never a cock');
   ok(/belly|litter|carrying/i.test(mooAll), "Moo: her pregnancy comes into it");
   ok(/massive|enormous|huge|extra-wide|colossal|vast|dinner plates|half the stall|padded shelf|sling/i.test(mooAll), 'Moo: her huge breasts come into it');
   ok(/ring|piercing|jewelry|metal/i.test(mooAll) || moo.length<45, 'Moo: her nipple piercings come into it');
@@ -61,7 +61,7 @@ async function session(mn, x){
   const rex=await session(600, 15);
   const rexAll=rex.join('\n');
   ok(rex.length>=30, 'Rex: a full session ('+rex.length+' lines)');
-  ok(/sleeve/i.test(rex[0]) && !/b(breasts?|nipples?|udders?)b/i.test(rexAll), 'Rex: all about his cock, never breasts');
+  ok(/sleeve/i.test(rex[0]) && !/\b(breasts?|nipples?|udders?)\b/i.test(rexAll), 'Rex: all about his cock, never breasts');
   ok(/canine|knot|tapered/i.test(rexAll), 'Rex: his canine cock and knot come into it');
   const firstCum=rex.findIndex(t=>/first thick pulse/.test(t)), peak=rex.findIndex(t=>/knot swells to its fullest/.test(t)), second=rex.findIndex(t=>/second load/.test(t));
   ok(firstCum>0 && peak===firstCum+1 && (second<0 || second>peak), 'Rex: climaxes in order, his knot locking right after the first');

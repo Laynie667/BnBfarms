@@ -359,7 +359,8 @@
     RESCUE_POINT: { X: 20, Y: 30 },
 
     GREET_ENABLED: true,
-    LSCG_SPLATTERS: true,          // finishes over somebody draw LSCG's splatters on them (if their LSCG has splatters on)
+    LSCG_SPLATTERS: true,
+    CONTRACT_NICKNAME: "BnB {Species} {name}",   // the nickname the farm's contracts give: {name} {Species} {species} {pet}          // finishes over somebody draw LSCG's splatters on them (if their LSCG has splatters on)
     SHOW_BADGE: true,
     DEBUG: true,
     LOG_HEARD: true

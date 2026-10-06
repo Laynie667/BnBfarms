@@ -5,7 +5,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 | Script | File in `dist/` | Where it runs | Current |
 |---|---|---|---|
-| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.15.4** |
+| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.15.5** |
 | Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.5.0** |
 | Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **1.0.3** |
 | Barn life, Breeding, Dairy, Map tools, Shows, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.2** |
@@ -20,6 +20,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 ## Latest changes (newest first)
 
+- **Bot 0.15.5**: contracts are made for whoever they're offered to. The farm's fun/deep/nhl contracts give the nickname "BnB {Species} {name}" (BnB Cow Vicky; BnB Pet Rya for someone with no animal), and any saved contract can use {name} {Species} {species} {pet} in any text setting, the title or the terms.
 - **Glory stalls 1.5.0**: scenes are about what's done to the person in the stall, not what they do (the reaction lines are rewritten); every scene opens with how they're arranged and follows from it: **punished** on a punishment shift (locked in the frame or stocks, rougher strangers, longer scenes, "the shift isn't over"), **bound** if they came in tied, or **by choice** (kneeling at the hatch, over the bench, on all fours or against the wall).
 - **Companion 0.10.9**: Safe word, I'm stuck and Call staff live in their own 🆘 Safety tab (second tab on the Guest and Livestock panels; staff and proprietors reach it from their Livestock panel). If two copies of the Companion are installed, the second says so in chat, naming both versions, and steps aside instead of failing.
 - **Bot 0.15.4, Glory stalls 1.4.2** (from the marks in the watch reports): the roster counts only people with a role ("78 registered" was counting old files); "kitty" instead of "kitt"; a stranger who pulls out (face, back) counts as a splatter, not a load inside, and leaves them cum-covered till ?wash; and players whose **LSCG** has splatters on get LSCG's real splatters drawn on them from glory stall pull-outs and ?cum on them (with "lovers only" on in LSCG, add the bot, 260239, to the LSCG splatter whitelist).

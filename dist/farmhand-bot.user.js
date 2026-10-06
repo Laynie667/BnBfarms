@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.15.4
+// @version      0.15.5
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -1720,10 +1720,28 @@
     }
     return out;
   }
+  var DEFAULT_NICKNAME = "BnB {Species} {name}";
+  function fillWho(text, who) {
+    const sp = String(who && who.species || "").trim(), cap = (s) => s.replace(/^./, (x) => x.toUpperCase());
+    return String(text).replace(/\{name\}/gi, who && who.name || "").replace(/\{Species\}/g, cap(sp || "pet")).replace(/\{species\}/g, sp || "pet").replace(/\{Pet\}/g, cap(sp || "pet")).replace(/\{pet\}/g, sp || "pet").replace(/\s+/g, " ").trim();
+  }
+  function fillRules(rules, who) {
+    for (const spec of Object.values(rules || {})) {
+      const s = spec && spec.settings;
+      if (!s) continue;
+      for (const [k, v] of Object.entries(s)) {
+        if (typeof v === "string" && /\{\w+\}/.test(v)) s[k] = fillWho(v, who);
+        else if (Array.isArray(v) && v.some((x) => typeof x === "string" && /\{\w+\}/.test(x))) s[k] = v.map((x) => typeof x === "string" ? fillWho(x, who) : x);
+      }
+      if (typeof s.nickname === "string" && s.nickname.length > 20) s.nickname = (who && who.name ? who.name : s.nickname).slice(0, 20);
+    }
+    return rules;
+  }
   function templateRules(depth, who, farm) {
     const pet = petFor(who.species), word = SOUND_WORD[pet.animal] || (pet.sounds[0] || "Moo").replace(/^./, (x) => x.toUpperCase());
     const kind = String(who.species || "").replace(/^./, (x) => x.toUpperCase());
-    const nick = (who.name + (kind ? " the " + kind : "")).slice(0, 20);
+    let nick = fillWho(farm.nickname || DEFAULT_NICKNAME, who);
+    if (nick.length > 20) nick = String(who.name || nick).slice(0, 20);
     const summoners = [farm.bot].concat(farm.staff || []).filter((m) => Number.isInteger(m)).slice(0, 100);
     const speech = (mode, intensity) => makeSpec("pet.speech", { animal: pet.animal, sounds: pet.sounds, mode, intensity });
     const rules = {};
@@ -1806,7 +1824,7 @@
   ];
 
   // bot/src/version.js
-  var VERSION = "0.15.4";
+  var VERSION = "0.15.5";
 
   // bot-parts:farmhand-bot-parts
   (function() {
@@ -2496,7 +2514,8 @@
       RESCUE_POINT: { X: 20, Y: 30 },
       GREET_ENABLED: true,
       LSCG_SPLATTERS: true,
-      // finishes over somebody draw LSCG's splatters on them (if their LSCG has splatters on)
+      CONTRACT_NICKNAME: "BnB {Species} {name}",
+      // the nickname the farm's contracts give: {name} {Species} {species} {pet}          // finishes over somebody draw LSCG's splatters on them (if their LSCG has splatters on)
       SHOW_BADGE: true,
       DEBUG: true,
       LOG_HEARD: true
@@ -3243,7 +3262,7 @@
     };
     W.FarmhandExport = exportLedger;
     W.FarmhandLedger = () => L;
-    if (W.__FARMHAND_TEST__) Object.assign(W, { __st: () => state, __cfg: CFG, __pt: prodTick, __qt: quotaTick, __lt: leashTick, __ms: milkingStallTick, __vt: voiceTick, __sync: syncCompanions, __gt: gearTick, __ht: homeTick, __addons: (h, ...a) => addonsEmit(h, ...a), __stateFor: (mn) => stateFor(mn), __leadTick: () => leadTick(), __ambient: () => ambientTick(), __about: (t) => aboutWhom(t), __announce: (t) => announce(t), __reply: (mn, t, ch) => reply(mn, t, ch), __office: () => officeCheck(), __namesHere: (t) => namesHere(t), __speciesCheck: (t) => QUESTIONS.find((q) => q.key === "species").check(t), __attach: () => attachListeners(), __tryLogin: () => tryLogin(), __beepText: (m) => beepText(m), __nameOnce: (t, mn) => nameOnce(t, mn) });
+    if (W.__FARMHAND_TEST__) Object.assign(W, { __st: () => state, __cfg: CFG, __pt: prodTick, __qt: quotaTick, __lt: leashTick, __ms: milkingStallTick, __vt: voiceTick, __sync: syncCompanions, __gt: gearTick, __ht: homeTick, __addons: (h, ...a) => addonsEmit(h, ...a), __stateFor: (mn) => stateFor(mn), __leadTick: () => leadTick(), __ambient: () => ambientTick(), __about: (t) => aboutWhom(t), __announce: (t) => announce(t), __reply: (mn, t, ch) => reply(mn, t, ch), __office: () => officeCheck(), __namesHere: (t) => namesHere(t), __speciesCheck: (t) => QUESTIONS.find((q) => q.key === "species").check(t), __attach: () => attachListeners(), __tryLogin: () => tryLogin(), __beepText: (m) => beepText(m), __nameOnce: (t, mn) => nameOnce(t, mn), __buildContract: (n, mn, d) => buildContract(contractTemplate(n), mn, d) });
     W.FarmhandSyncKeys = () => syncAllPresent(true);
     W.FarmhandFriends = () => W.Player.FriendList;
     W.FarmhandAddFriend = (mn) => addFriend(mn, false);
@@ -6737,14 +6756,15 @@
     }
     function buildContract(tpl, mn, durKey) {
       const r = rec(mn) || {};
-      const who = { name: plainName(mn), species: r.species || "" };
-      const rules = tpl.base ? templateRules(tpl.base, who, farmInfo()) : {};
+      const who = { name: shortName(mn), species: r.species || "" };
+      const rules = tpl.base ? templateRules(tpl.base, who, Object.assign(farmInfo(), { nickname: CFG.CONTRACT_NICKNAME })) : {};
       for (const id of tpl.remove || []) delete rules[id];
       for (const [id, set] of Object.entries(tpl.add || {}))
-        rules[id] = makeSpec(id, Object.assign({}, rules[id] ? rules[id].settings : {}, set));
+        rules[id] = makeSpec(id, Object.assign({}, rules[id] ? rules[id].settings : {}, JSON.parse(JSON.stringify(set))));
+      fillRules(rules, who);
       return makeContract({
-        title: tpl.title,
-        terms: fill(tpl.terms || "", mn),
+        title: fillWho(tpl.title, who),
+        terms: fillWho(fill(tpl.terms || "", mn), who),
         duration: durationFrom(durKey),
         depth: tpl.base,
         policy: tpl.policy,
@@ -10579,7 +10599,7 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
             case "list": {
               const saved = Object.keys(L.contractTemplates);
               const live = L.contracts.filter((x) => x.status === "signed" || x.status === "offered" || x.status === "releasing");
-              R("\u{1F4DC} FARM CONTRACTS\nReady-made: fun \xB7 deep \xB7 nhl" + (saved.length ? "\nYours: " + saved.join(" \xB7 ") : "") + "\n\nIN FORCE OR OFFERED\n" + (live.length ? live.map(contractLine).join("\n") : "  none right now") + "\n\n?contract show <name> [who] \xB7 ?contract offer <name> <who> <1h|12h|1d|1w|2w|1m|perm> \xB7 ?contract release <who> \xB7 ?contract check <who>" + (owner ? "\n?contract new <name> [from fun|deep|nhl] \xB7 add \xB7 set \xB7 remove \xB7 title \xB7 terms \xB7 policy \xB7 delete \xB7 ?contract rules" : ""));
+              R("\u{1F4DC} FARM CONTRACTS\nReady-made: fun \xB7 deep \xB7 nhl" + (saved.length ? "\nYours: " + saved.join(" \xB7 ") : "") + "\n\nIN FORCE OR OFFERED\n" + (live.length ? live.map(contractLine).join("\n") : "  none right now") + "\n\n?contract show <name> [who] \xB7 ?contract offer <name> <who> <1h|12h|1d|1w|2w|1m|perm> \xB7 ?contract release <who> \xB7 ?contract check <who>" + (owner ? '\n?contract new <name> [from fun|deep|nhl] \xB7 add \xB7 set \xB7 remove \xB7 title \xB7 terms \xB7 policy \xB7 delete \xB7 ?contract rules\nMade for each person when offered: {name} {Species} {species} {pet} in any text, like nickname="BnB {Species} {name}" \u2192 BnB Cow Vicky' : ""));
               break;
             }
             case "show": {

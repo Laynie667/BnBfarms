@@ -34,6 +34,8 @@ const bcpTo=(mn,n)=>sent.slice(n).filter(s=>s[0]==='ChatRoomChat'&&s[1].Content=
   out('1 a week, farm-only ending ->', p.durationMin===10080, p.policy==='author');
   out('1 cow speech, summonable by the farm ->', p.rules&&p.rules['pet.speech'].settings.animal==='Cow', p.rules&&p.rules['other.summon'].settings.allowedMembers.includes(260239));
   out('1 tracked as offered ->', (L().contracts||[]).some(x=>x.mn===500&&x.status==='offered'));
+  // asked for: the nickname made for whoever it's offered to ("BnB Cow Vicky", "BnB Pet Rya")
+  out('1 nickname made for them ->', p.rules&&p.rules['control.nickname'].settings.nickname==='BnB Cow Bessie');
   // 2. farmhands can't offer
   n=sent.length; await B(800,'contract offer deep 500 1w');
   out('2 farmhand refused ->', bcpTo(500,n).length===0, /herdmasters/.test(lastTo(800)));
@@ -61,6 +63,11 @@ const bcpTo=(mn,n)=>sent.slice(n).filter(s=>s[0]==='ChatRoomChat'&&s[1].Content=
   out('5 bad choice refused ->', /Edged, Ruined, Unresistable/.test(lastTo(221397)));
   await B(221397,'contract add prizecow settings.safeword value="Safeword disabled"');
   out('5 safeword rule refused ->', /never/.test(lastTo(221397)));
+  // a saved contract with placeholders fills them in per person
+  await B(221397,'contract add prizecow control.nickname nickname="BnB {Species} {name}"');
+  await B(221397,'contract add prizecow social.greetRoom greeting="{name} the {species} says hi"');
+  const t5=W.__buildContract ? W.__buildContract('prizecow', 500, '1w') : null;
+  out('5 placeholders filled per person ->', !!t5 && t5.rules['control.nickname'].settings.nickname==='BnB Cow Bessie' && t5.rules['social.greetRoom'].settings.greeting==='Bessie the cow says hi');
   n=sent.length; await B(221397,'contract offer prizecow 500 perm');
   const c2=(bcpTo(500,n)[0]||{}).payload||{};
   out('5 custom offer sent, permanent ->', c2.durationMin===0, !!(c2.rules&&c2.rules['other.listenToMyVoice']), c2.rules&&c2.rules['other.listenToMyVoice'].settings.sentences.length===2);

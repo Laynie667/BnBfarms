@@ -29,12 +29,15 @@
   // a template, made real for one person
   function buildContract(tpl, mn, durKey){
     const r = rec(mn) || {};
-    const who = { name: plainName(mn), species: r.species || "" };
-    const rules = tpl.base ? BCPLUS.templateRules(tpl.base, who, farmInfo()) : {};
+    // asked for: one contract, a nickname per person ("BnB Cow Vicky", "BnB Pet Rya"): {name}, {Species}… are
+    // filled in when it's offered (see fillWho in shared/bcplus.js)
+    const who = { name: shortName(mn), species: r.species || "" };
+    const rules = tpl.base ? BCPLUS.templateRules(tpl.base, who, Object.assign(farmInfo(), { nickname: CFG.CONTRACT_NICKNAME })) : {};
     for (const id of tpl.remove || []) delete rules[id];
     for (const [id, set] of Object.entries(tpl.add || {}))
-      rules[id] = BCPLUS.makeSpec(id, Object.assign({}, rules[id] ? rules[id].settings : {}, set));
-    return BCPLUS.makeContract({ title: tpl.title, terms: fill(tpl.terms || "", mn), duration: BCPLUS.durationFrom(durKey),
+      rules[id] = BCPLUS.makeSpec(id, Object.assign({}, rules[id] ? rules[id].settings : {}, JSON.parse(JSON.stringify(set))));
+    BCPLUS.fillRules(rules, who);
+    return BCPLUS.makeContract({ title: BCPLUS.fillWho(tpl.title, who), terms: BCPLUS.fillWho(fill(tpl.terms || "", mn), who), duration: BCPLUS.durationFrom(durKey),
                                  depth: tpl.base, policy: tpl.policy, rules });
   }
   // "value as typed" → what BC+ wants for that setting

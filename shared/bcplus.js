@@ -124,13 +124,41 @@ export function checkContract(c) {
   return out;
 }
 
+/* ── a contract made for one person: placeholders in any setting, title or terms ──
+   {name} their name (the short part: "Vicky" for "BnB Cow Vicky") · {species} their animal · {Species} the same,
+   capitalised · {pet}/{Pet} their animal, or "pet" if they haven't got one. "BnB {Species} {name}" → "BnB Cow Vicky". */
+export const DEFAULT_NICKNAME = "BnB {Species} {name}";
+export function fillWho(text, who) {
+  const sp = String((who && who.species) || "").trim(), cap = (s) => s.replace(/^./, (x) => x.toUpperCase());
+  return String(text)
+    .replace(/\{name\}/gi, (who && who.name) || "")
+    .replace(/\{Species\}/g, cap(sp || "pet")).replace(/\{species\}/g, sp || "pet")
+    .replace(/\{Pet\}/g, cap(sp || "pet")).replace(/\{pet\}/g, sp || "pet")
+    .replace(/\s+/g, " ").trim();
+}
+// every text setting in a set of rules, filled in for this person (nicknames, greetings, farewells…)
+export function fillRules(rules, who) {
+  for (const spec of Object.values(rules || {})) {
+    const s = spec && spec.settings; if (!s) continue;
+    for (const [k, v] of Object.entries(s)) {
+      if (typeof v === "string" && /\{\w+\}/.test(v)) s[k] = fillWho(v, who);
+      else if (Array.isArray(v) && v.some((x) => typeof x === "string" && /\{\w+\}/.test(x))) s[k] = v.map((x) => typeof x === "string" ? fillWho(x, who) : x);
+    }
+    // BC+ nicknames are 20 characters at most: a long one drops to just their name
+    if (typeof s.nickname === "string" && s.nickname.length > 20) s.nickname = (who && who.name ? who.name : s.nickname).slice(0, 20);
+  }
+  return rules;
+}
+
 /* ── the farm's three ready-made levels ── */
 
 // who: { name, species }, farm: { bot, staff: [member numbers], rooms: ["B&B Farm", …] }
 export function templateRules(depth, who, farm) {
   const pet = petFor(who.species), word = SOUND_WORD[pet.animal] || (pet.sounds[0] || "Moo").replace(/^./, (x) => x.toUpperCase());
   const kind = String(who.species || "").replace(/^./, (x) => x.toUpperCase());
-  const nick = (who.name + (kind ? " the " + kind : "")).slice(0, 20);
+  // the farm's nickname style ("BnB Cow Vicky"); farm.nickname changes it, and a long one drops to just their name
+  let nick = fillWho(farm.nickname || DEFAULT_NICKNAME, who);
+  if (nick.length > 20) nick = String(who.name || nick).slice(0, 20);
   const summoners = [farm.bot].concat(farm.staff || []).filter((m) => Number.isInteger(m)).slice(0, 100);
   const speech = (mode, intensity) => makeSpec("pet.speech", { animal: pet.animal, sounds: pet.sounds, mode, intensity });
   const rules = {};

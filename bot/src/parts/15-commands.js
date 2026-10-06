@@ -215,7 +215,8 @@
             R("📜 FARM CONTRACTS\nReady-made: fun · deep · nhl"+(saved.length ? "\nYours: "+saved.join(" · ") : "")+
               "\n\nIN FORCE OR OFFERED\n"+(live.length ? live.map(contractLine).join("\n") : "  none right now")+
               "\n\n?contract show <name> [who] · ?contract offer <name> <who> <1h|12h|1d|1w|2w|1m|perm> · ?contract release <who> · ?contract check <who>"+
-              (owner ? "\n?contract new <name> [from fun|deep|nhl] · add · set · remove · title · terms · policy · delete · ?contract rules" : ""));
+              (owner ? "\n?contract new <name> [from fun|deep|nhl] · add · set · remove · title · terms · policy · delete · ?contract rules"+
+                       "\nMade for each person when offered: {name} {Species} {species} {pet} in any text, like nickname=\"BnB {Species} {name}\" → BnB Cow Vicky" : ""));
             break;
           }
           case "show": {

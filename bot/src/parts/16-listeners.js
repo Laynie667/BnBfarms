@@ -114,6 +114,7 @@
         state.lastHealthy = Date.now();
         greet(mn);
         onArrive(mn);
+        welcomeBack(mn);   // back after hours away: what they missed (10p-lookout.js)
         later(()=>deliverMail(mn), 8000);   // anything kept for them while they were away
         addonsEmit("join", mn);
         if (CFG.KEY_SYNC_ON_JOIN) later(()=>syncKeys(mn,true), CFG.KEY_JOIN_DELAY_MS);
@@ -121,7 +122,7 @@
       } catch(e){ warn("join:",e); }
     });
 
-    on("ChatRoomSyncMemberLeave",(data)=>{ try { if (data && data.SourceMemberNumber) addonsEmit("leave", data.SourceMemberNumber); } catch(e){ warn("leave:",e); } });
+    on("ChatRoomSyncMemberLeave",(data)=>{ try { if (data && data.SourceMemberNumber){ markLeft(data.SourceMemberNumber); addonsEmit("leave", data.SourceMemberNumber); } } catch(e){ warn("leave:",e); } });
     // who's friends with the bot both ways (and online): the only people a beep can reach
     on("AccountQueryResult",(d)=>{
       try {

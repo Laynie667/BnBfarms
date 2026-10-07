@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.11.0
+// @version      0.11.1
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -230,7 +230,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.11.0";
+  var VERSION = "0.11.1";
 
   // extension/src/config.js
   var BOT_MEMBER = 260239;
@@ -374,7 +374,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     { name: "Clothes", cmds: ["outfit", "outfits", "uniform", "outfit back"] },
     { name: "Mind", cmds: ["hypno", "teaseme"] },
     { name: "Fun", cmds: ["fair", "enter"] },
-    { name: "Ribbons and the store", cmds: ["ribbons", "ribbons top", "store", "buy <item>", "gift <who> <potion>", "potions", "potions on", "dares on", "dare", "dared", "dare skip"] }
+    { name: "Ribbons and the store", cmds: ["ribbons", "ribbons top", "store", "buy <item>", "gift <who> <potion>", "potions", "potions on", "dares on", "dare", "dared", "dare skip", "bench", "bench on", "bench me <minutes>", "use <mouth|pussy|ass>", "bench top"] }
   ];
   var STAFF_GROUPS = [
     { name: "Books", cmds: ["queue", "app <n>", "approve <who> livestock", "deny <who>", "appclear", "roster", "stock", "find <who>", "record <who>", "note <who>", "signed", "addfriend <who>", "unregister <who>", "unregister <who> <role>"] },
@@ -386,7 +386,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     { name: "Map", cmds: ["spot", "spot set <name>", "spot place <name> <x> <y>", "zone", "zone who", "zone a <name>", "zone b <name>", "zone box <name> <ax> <ay> <bx> <by>", "zone pair <name> <group>", "tourstop", "setrescue", "where", "stucklog"] },
     { name: "Voice", cmds: ["voice", "voice on herd", "voice add herd <line>", "voice every herd 15"] },
     { name: "Work and play", cmds: ["clockin", "clockout", "hours", "done", "chores", "chore add <job> @<place>", "wheel", "spin", "begphrase", "score"] },
-    { name: "Ribbons, potions, dares", cmds: ["ribbon give <who> <n>", "ribbon fine <who> <n>", "ribbons <who>", "potion give <who> <potion>", "potion end <who>", "dare <who>", "dare <who> reckless", "corral <who> <minutes>", "uncorral <who>", "wheel farm", "store approve <who>"] },
+    { name: "Ribbons, potions, dares", cmds: ["ribbon give <who> <n>", "ribbon fine <who> <n>", "ribbons <who>", "potion give <who> <potion>", "potion end <who>", "dare <who>", "dare <who> reckless", "corral <who> <minutes>", "uncorral <who>", "bench <who> <minutes>", "unbench <who>", "wheel farm", "store approve <who>"] },
     { name: "Keys and calls", cmds: ["keys <who>", "keysync", "keydump", "grant <who> <tier>", "revoke <who>", "forced", "summon <who>", "summon all", "pasture", "onduty", "cover"] }
   ];
   var OWNER_GROUPS = [
@@ -642,7 +642,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
     ["teaseme", "Tease me", "Let staff tease lines name you"],
     ["hypno", "Hypno", "Let your herd leader's voice lines reach you, privately"],
     ["potions", "Potions", "Staff and the wheel can give you potions, and others can gift you one (you're asked first). Your limits still rule some out"],
-    ["dares", "Dares", "Staff and the wheel can hand you a dare to do in half an hour"]
+    ["dares", "Dares", "Staff and the wheel can hand you a dare to do in half an hour"],
+    ["bench", "Use bench", "Staff and the wheel can sentence you to time strapped over the use bench, where anybody can use you. Your safeword ends it at once"]
   ];
   var NEEDS = { freeuse: ["breedable", "Turn Breedable on first"] };
   function farmSwitches(ctx2, list) {
@@ -3164,6 +3165,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/panel.js
+  var left = (t) => {
+    const m = Math.max(0, Math.ceil((t - Date.now()) / 6e4));
+    return m >= 60 ? Math.floor(m / 60) + "h " + m % 60 + "m" : m + "m";
+  };
   var VIEWS = {
     guest: { label: "Guest", tabs: GUEST_TABS },
     livestock: { label: "Livestock", tabs: LIVESTOCK_TABS },
@@ -3287,9 +3292,9 @@ One of mods you are using is using an old version of SDK. It will work for now b
       }
       const b = this.btn.getBoundingClientRect(), r0 = this.el.getBoundingClientRect();
       const pw = r0.width || Math.min(440, window.innerWidth - 24), ph = r0.height || Math.min(640, window.innerHeight * 0.78);
-      const left = this.clampX(b.left + 46 - pw, pw);
+      const left2 = this.clampX(b.left + 46 - pw, pw);
       const top = b.top - ph - 8 >= 0 ? b.top - ph - 8 : this.clampY(b.bottom + 8, ph);
-      Object.assign(this.el.style, { left: left + "px", top: top + "px", right: "auto", bottom: "auto" });
+      Object.assign(this.el.style, { left: left2 + "px", top: top + "px", right: "auto", bottom: "auto" });
     }
     resetPlaces() {
       delete this.prefs.btnPos;
@@ -3356,6 +3361,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
         this.unread = 0;
         this.btn.removeAttribute("data-unread");
       }
+      clearInterval(this.clock);
+      if (open) this.clock = setInterval(() => {
+        if ((this.s.now || []).some((x) => x.until)) this.render();
+      }, 3e4);
     }
     show(visible) {
       this.btn.style.display = visible ? "" : "none";
@@ -3491,6 +3500,19 @@ One of mods you are using is using an old version of SDK. It will work for now b
     banners() {
       const out = [];
       const view = this.view(), tabNow = this.ui["tab_" + view];
+      const now = (this.s.now || []).filter((x) => !x.until || x.until > Date.now());
+      if (now.length) out.push(h(
+        "div",
+        { class: "fhc-row", style: { flexWrap: "wrap", gap: "4px", margin: "0 0 6px" }, "aria-label": "Right now" },
+        now.map((x) => chip(x.icon + " " + x.text + (x.until ? " \xB7 " + left(x.until) : ""), /🚫|🪵|⛓️|🚧|🔥/.test(x.icon) ? "alert" : "acc"))
+      ));
+      for (const b of this.s.benchHere || []) out.push(h(
+        "div",
+        { class: "fhc-box" },
+        h("div", null, h("b", null, "\u{1FAB5} " + b.name + " is on the use bench"), h("span", { class: "fhc-muted" }, " \xB7 used " + b.uses + " time" + (b.uses === 1 ? "" : "s"))),
+        h("div", { style: { marginTop: "6px" } }, (b.holes || []).map((hole) => btn({ mouth: "Use their mouth", vulva: "Use their pussy", butt: "Use their ass" }[hole], () => this.ask("use " + b.mn + " " + { mouth: "mouth", vulva: "pussy", butt: "ass" }[hole]), true))),
+        h("div", { class: "fhc-muted" }, "Get within a couple of steps of the bench first.")
+      ));
       if (this.fresh && tabNow !== "inbox") out.push(h(
         "div",
         { class: "fhc-box", style: { borderColor: this.fresh.kind === "notice" ? "var(--fh-good)" : "var(--fh-accent)" } },

@@ -434,7 +434,16 @@ POTIONS wear off. ?potions lists them all.
 
 DARES · ?dares on
   A dare to do in 30 minutes. ?dared when it's done (on your
-  honor) · ?dare skip to chicken out (a ribbon).`,
+  honor) · ?dare skip to chicken out (a ribbon).
+
+THE USE BENCH · ?bench on
+  Staff and the wheel can strap you over the use bench for a
+  while, out in the open, and anybody standin' by can use you.
+  ?bench me 30 · volunteer · ?bench · who's on it
+  ?use [mouth|pussy|ass] · stand by them first
+  ?bench top · the week's tally (it's on the ?board too)
+  Your limits, your gear and ?breedable still count.
+  Your safeword (or ?bench off) ends it at once.`,
 
     fair: `🎪 THE COUNTY FAIR 🎪
 
@@ -599,11 +608,12 @@ THE PRIZE WHEEL
   ?wheel add reward|punish|silly <text> [=> action]
      the action makes it happen: stocks 20 · pen 30 · milkstall 30 ·
      glory 30 · leash 20 · denial 2 · potion hiccup · dare reckless ·
-     ribbons 3 · fine 2 · luxury 1 · grace · heat · release
+     ribbons 3 · fine 2 · luxury 1 · grace · heat · release ·
+     bench 20
      e.g. ?wheel add punish Off to the pen, %name% => pen 30
   ?wheel remove <n> · ?wheel farm on|off (the farm's own slices)
   ?spin <who> [reward|punish|silly|lucky] · skips anything against
-     their limits or their switches (?potions, ?dares, ?glory)
+     their limits or their switches (?potions, ?dares, ?glory, ?bench)
 
 RIBBONS, POTIONS, DARES, THE CORRAL
   ?ribbon give <who> <n> [why] · ?ribbon fine <who> <n> [why]
@@ -612,6 +622,9 @@ RIBBONS, POTIONS, DARES, THE CORRAL
   ?dare <who> [reckless] [your own dare]
   ?corral <who> [minutes] [milking|spot] · ?uncorral <who>
      corral spots: ?spot set pen (pen-2, pen-3…)
+  ?bench <who> [minutes, 5-120] · ?unbench <who>
+     only for people who said ?bench on · bench spots:
+     ?spot set bench (bench-2, bench-3…)
   ?store approve|reject <who> · a bought greetin'
 
 BEGGIN'
@@ -682,7 +695,7 @@ YOU
 UPKEEP
   ?backup · ?health`
   };
-  const GUIDE_ALIAS = { ribbon:"ribbons", store:"ribbons", shop:"ribbons", potion:"ribbons", potions:"ribbons", dares:"ribbons", dare:"ribbons", new:"start", rules:"start", key:"keys", doors:"keys", herd2:"herds", tier:"tiers", stocks:"tiers",
+  const GUIDE_ALIAS = { ribbon:"ribbons", store:"ribbons", shop:"ribbons", potion:"ribbons", potions:"ribbons", dares:"ribbons", dare:"ribbons", bench:"ribbons", new:"start", rules:"start", key:"keys", doors:"keys", herd2:"herds", tier:"tiers", stocks:"tiers",
                         milk:"barn", milking:"barn", stats:"barn", nursing:"barn", breed:"breeding", scene:"breeding",
                         pregnant:"pregnancy", preg:"pregnancy", rights:"pregnancy", species:"pregnancy", litters:"pregnancy",
                         inflation:"cocks", cumflation:"cocks", knot:"cocks", knots:"cocks", penis:"cocks", cock:"cocks",

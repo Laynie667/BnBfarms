@@ -7,7 +7,10 @@
 // (Livestock or Guest, Staff, Dashboard), tabs inside each, and a command box.
 import { HISTORY_MAX, PREFS_KEY } from "./config.js";
 import { CSS, THEME } from "./styles.js";
-import { h, btn } from "./dom.js";
+import { h, btn, chip } from "./dom.js";
+
+// "12m" or "2h 5m" till then
+const left = (t) => { const m = Math.max(0, Math.ceil((t - Date.now()) / 60000)); return m >= 60 ? Math.floor(m / 60) + "h " + (m % 60) + "m" : m + "m"; };
 import { LIVESTOCK_TABS } from "./views/livestock.js";
 import { GUEST_TABS } from "./views/guest.js";
 import { STAFF_TABS } from "./views/staff.js";
@@ -136,6 +139,8 @@ export class Panel {
     if (open) this.placePanel();
     this.el.classList.toggle("open", open);
     if (open) { this.unread = 0; this.btn.removeAttribute("data-unread"); }
+    clearInterval(this.clock);
+    if (open) this.clock = setInterval(() => { if ((this.s.now || []).some((x) => x.until)) this.render(); }, 30000);   // the right-now clocks tick down
   }
   show(visible) { this.btn.style.display = visible ? "" : "none"; if (!visible) this.toggle(false); }
 
@@ -202,6 +207,16 @@ export class Panel {
   banners() {
     const out = [];
     const view = this.view(), tabNow = this.ui["tab_" + view];
+    // RIGHT NOW: everything with a clock on it (heat, the bench, the stall, potions, a dare…), on every tab
+    const now = (this.s.now || []).filter((x) => !x.until || x.until > Date.now());
+    if (now.length) out.push(h("div", { class: "fhc-row", style: { flexWrap: "wrap", gap: "4px", margin: "0 0 6px" }, "aria-label": "Right now" },
+      now.map((x) => chip(x.icon + " " + x.text + (x.until ? " · " + left(x.until) : ""), /🚫|🪵|⛓️|🚧|🔥/.test(x.icon) ? "alert" : "acc"))));
+    // somebody's on the use bench: tap to use them
+    for (const b of (this.s.benchHere || [])) out.push(h("div", { class: "fhc-box" },
+      h("div", null, h("b", null, "🪵 " + b.name + " is on the use bench"), h("span", { class: "fhc-muted" }, " · used " + b.uses + " time" + (b.uses === 1 ? "" : "s"))),
+      h("div", { style: { marginTop: "6px" } }, (b.holes || []).map((hole) =>
+        btn({ mouth: "Use their mouth", vulva: "Use their pussy", butt: "Use their ass" }[hole], () => this.ask("use " + b.mn + " " + ({ mouth: "mouth", vulva: "pussy", butt: "ass" }[hole])), true))),
+      h("div", { class: "fhc-muted" }, "Get within a couple of steps of the bench first.")));
     if (this.fresh && tabNow !== "inbox") out.push(h("div", { class: "fhc-box", style: { borderColor: this.fresh.kind === "notice" ? "var(--fh-good)" : "var(--fh-accent)" } },
       h("div", { class: "fhc-kv", style: { borderBottom: "none", padding: "0" } },
         h("span", { class: "fhc-muted" }, this.fresh.kind === "notice" ? "From the farm" : "Answer"),

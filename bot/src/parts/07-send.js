@@ -648,8 +648,20 @@
     "Welcome, %titled_name%! If you're new 'round here, say ?rules out loud and I'll fill you in.",
     "Mornin', %titled_name%! Coffee's fresh and so's the hay. ☕",
     "Afternoon, %titled_name%! Mind the ruts on your way in, darlin'.",
-    "Hey there, %titled_name%! Say ?help any time, hon. I keep the books 'round here."
+    "Hey there, %titled_name%! Say ?help any time, hon. I keep the books 'round here.",
+    "Up late, %titled_name%? Barn's quiet, but the lantern's lit. Come on in, sugar. 🏮",
+    "Burnin' the midnight oil, %titled_name%? Hush now, the cows are sleepin'. Welcome in."
   ];
+  // the ones that say what time it is only fit that time of day, on the bot's clock (live, Oct 7: "Afternoon"
+  // at 3 in the mornin')
+  function greetFits(line){
+    const h = new Date().getHours();
+    if (/^Mornin'/.test(line)) return h >= 5 && h < 12;
+    if (/^Afternoon/.test(line)) return h >= 12 && h < 17;
+    if (/^Evenin'/.test(line)) return h >= 17 && h < 22;
+    if (/^(Up late|Burnin' the midnight)/.test(line)) return h >= 22 || h < 5;
+    return true;
+  }
   const RETURN_GREETINGS = [
     "Well look who's back! Told ya the gate swings both ways, %titled_name%. 💕",
     "%titled_name%! I just knew you'd turn up again, sugar.",
@@ -663,7 +675,7 @@
     state.greeted.set(mn, Date.now());
     const r0 = rec(mn);
     const known = L.archive[mn] || (r0 && r0.roles && r0.roles.length);
-    const pool = known ? RETURN_GREETINGS : GREETINGS;
+    const pool = (known ? RETURN_GREETINGS : GREETINGS).filter(greetFits);
     const own = customGreeting(mn);   // one they bought in the store (and staff approved)
     const line = own || pool[Math.floor(Math.random()*pool.length)];
     later(()=>say(fill(line,mn), false, mn), 1500);   // addressed to them: never guessed from the names on the map

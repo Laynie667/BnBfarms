@@ -39,7 +39,9 @@ for (const dir of readdirSync("addons", { withFileTypes: true })) {
   if (!dir.isDirectory() || dir.name.startsWith("_") || !existsSync("addons/" + dir.name + "/addon.json")) continue;
   const meta = JSON.parse(readFileSync("addons/" + dir.name + "/addon.json", "utf8"));
   targets.push({ name: "add-on " + dir.name, entry: "addons/" + dir.name + "/index.js", out: "dist/farmhand-" + dir.name + ".user.js", version: meta.version,
-    headerText: addonHeader.replace("{{LABEL}}", meta.label).replace("{{DESCRIPTION}}", meta.description || "") });
+    // a private add-on (addons/private-*) never auto-updates from GitHub: it isn't there
+    headerText: (meta.private ? addonHeader.replace(/^\/\/ @(updateURL|downloadURL|homepageURL).*\r?\n/gm, "") : addonHeader)
+      .replace("{{LABEL}}", meta.label).replace("{{DESCRIPTION}}", meta.description || "") });
 }
 
 mkdirSync("dist", { recursive: true });

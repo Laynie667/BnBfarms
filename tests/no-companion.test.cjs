@@ -52,7 +52,7 @@ const SKIP=/^(backup|safe|safeword|red|stuck|report|unregister|staffremove|appcl
   out('?help <add-on> explains it ->', sent.slice(k).some(([e,d])=>e==='AccountBeep'&&/Glory stalls/.test(d.Message)));
   k=sent.length; handlers.AccountBeep({MemberNumber:500,Message:'help me'}); await drain(400);
   const stock=sent.slice(k).filter(([e,d])=>e==='AccountBeep'&&d.MemberNumber===500).map(([e,d])=>d.Message).join('\n');
-  out('stock do not see staff-only add-on commands ->', !/(^|\s|·)top($|\s)|hyp <|insp /m.test(stock) && /glory on\|off/.test(stock));
+  out('stock do not see staff-only add-on commands ->', !/(^|·)\s*\??top($|\s|·)|hyp <|insp /m.test(stock) && /glory on\|off/.test(stock));
   // every command, rotating whisper / beep / bot
   const cmds=[...new Set([].concat(...G.PUBLIC_GROUPS.concat(G.STAFF_GROUPS,G.OWNER_GROUPS).map(g=>g.cmds), ...addons.map(a=>[])))];
   // add-on commands, as ?help me shows them

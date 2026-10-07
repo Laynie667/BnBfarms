@@ -25,6 +25,7 @@
     saveLedger();
   }
 
+  function addonVisible(a, mn){ return !a.only || a.only.includes(mn); }
   function rankOf(mn){ return isProprietor(mn) ? 3 : isHerdmaster(mn) ? 2 : isStaff(mn) ? 1 : 0; }
   // each add-on keeps its saved data in L.mods.<name>; it lives in the bot's ledger and survives restarts
   function addonData(name){ L.mods = L.mods || {}; return (L.mods[name] = L.mods[name] || {}); }
@@ -123,7 +124,12 @@
       notifyStaff: (t, routine) => notifyStaff(t, routine),
       ask: (mn, text, cb) => { addonAsks.set(mn, { addon:a.name, cb, at:Date.now() }); askCard(mn, a.name, text); },
       // people
-      name: plainName, nameOnce: (text, mn) => nameOnce(text, mn), paint: (mn, area, by) => paintOn(mn, area, by), ribbons: (mn, n, why) => earnRibbons(mn, n, why), fineRibbons: (mn, n, why) => fineRibbons(mn, n, why, CFG.BOT_MEMBER), splat: (mn, hole, by) => lscgSplatAt(mn, HOLE_SPLAT[hole] || ["ItemVulva"], by ? plainName(by) : null), char: charFor, find: resolveTarget, here: () => (W.ChatRoomCharacter||[]).map(c => c.MemberNumber).filter(m => m !== CFG.BOT_MEMBER),
+      name: plainName, nameOnce: (text, mn) => nameOnce(text, mn), paint: (mn, area, by) => paintOn(mn, area, by), ribbons: (mn, n, why, award) => earnRibbons(mn, n, why, award ? CFG.BOT_MEMBER : undefined),   // award: a prize, past the daily cap
+      // a load that landed somewhere outside the bot (a glory stall): tells every add-on, like the bot's own fills do
+      bred: (mn, stud, hole, mlIn, took) => addonsEmit("bred", stud, mn, hole, mlIn, took || null),
+      // put somebody on the use bench (only if they said ?bench on; same rules as staff and the wheel)
+      bench: (mn, mins, why) => benchIn(mn, Math.max(5, Math.min(CFG.BENCH_MAX_MIN, Number(mins) || 30)), CFG.BOT_MEMBER, why || a.name),
+      fineRibbons: (mn, n, why) => fineRibbons(mn, n, why, CFG.BOT_MEMBER), splat: (mn, hole, by) => lscgSplatAt(mn, HOLE_SPLAT[hole] || ["ItemVulva"], by ? plainName(by) : null), char: charFor, find: resolveTarget, here: () => (W.ChatRoomCharacter||[]).map(c => c.MemberNumber).filter(m => m !== CFG.BOT_MEMBER),
       onMap, rec: (mn) => rec(mn), isStaff, isHerdmaster, isProprietor, hasRole, ROLE, onDuty, herdLeaderOf, herdMembers,
       species: speciesKey, gender: genderOf, hasCompanion, limitBlocks, rank: rankOf,
       // bodies
@@ -153,8 +159,10 @@
     const name = String(def.name||"").toLowerCase();
     if (!ADDON_NAME.test(name)) throw new Error("add-on name must be lowercase letters, numbers or dashes, like 'glory-stalls'");
     if (ADDONS.has(name)) { warn("add-on "+name+" registered twice; the newer one replaces it"); unregisterAddon(name); }
-    const a = { name, label: String(def.label || name), version: String(def.version || "0"), on: def.on || {}, companion: def.companion, rates: def.rates || null, lines: def.lines || null,
-                guide: def.guide || "", commands: {}, enabled: !(L.addonsOff && L.addonsOff[name]), errors: 0 };
+    const a = { name, label: String(def.label || name), version: String(def.version || "0"), on: def.on || {}, companion: def.companion, rates: def.rates || null, lines: def.lines || null, vetoes: def.vetoes || null,
+                guide: def.guide || "", commands: {}, enabled: !(L.addonsOff && L.addonsOff[name]), errors: 0,
+                // a private add-on (only: [member numbers]): nobody else can use it, and it's never listed anywhere
+                only: Array.isArray(def.only) && def.only.length ? def.only.map(Number) : null };
     a.api = addonApi(a);
     for (const [word0, c] of Object.entries(def.commands || {})){
       const word = String(word0).toLowerCase();
@@ -211,11 +219,20 @@
     return true;
   }
 
+  // an add-on sayin' no to somethin' for this person (vetoes: { wash(mn) } returns why, or nothin' to allow it)
+  function addonVeto(kind, mn){
+    for (const a of ADDONS.values()){
+      if (a.enabled === false || !a.vetoes || typeof a.vetoes[kind] !== "function" || !addonVisible(a, mn)) continue;
+      const v = addonCall(a, "vetoes."+kind, a.vetoes[kind], mn);
+      if (typeof v === "string" && v.trim()) return v.slice(0, 600);
+    }
+    return null;
+  }
   // what each add-on wants shown in this person's Companion ("Farm extras" tab)
   function addonStateFor(mn){
     const out = {};
     for (const a of ADDONS.values()){
-      if (a.enabled === false || typeof a.companion !== "function") continue;
+      if (a.enabled === false || typeof a.companion !== "function" || !addonVisible(a, mn)) continue;
       const v = addonCall(a, "companion", a.companion, mn);
       if (v && typeof v === "object") out[a.name] = Object.assign({ label: a.label }, v);
     }
@@ -226,7 +243,7 @@
   function addonCommandGroups(mn){
     const rank = rankOf(mn), out = [];
     for (const a of ADDONS.values()){
-      if (a.enabled === false) continue;
+      if (a.enabled === false || a.only) continue;   // a private add-on's commands are never listed
       const cmds = Object.entries(a.commands).filter(([, c]) => rank >= (RANKS[c.rank || "anyone"] || 0)).map(([w, c]) => c.usage || w);
       if (cmds.length) out.push({ name: a.label, cmds });
     }
@@ -237,8 +254,8 @@
   function findAddon(text){
     const q = String(text||"").toLowerCase().trim(); if (!q) return null;
     const norm = s => String(s||"").toLowerCase().replace(/[\s_-]+/g, "");
-    const all = [...ADDONS.values()];
-    const exact = ADDONS.get(q) || all.find(a => norm(a.name) === norm(q) || norm(a.label) === norm(q));
+    const all = [...ADDONS.values()].filter(a => !a.only);
+    const exact = all.find(a => a.name === q) || all.find(a => norm(a.name) === norm(q) || norm(a.label) === norm(q));
     if (exact) return exact;
     const hits = all.filter(a => norm(a.name).startsWith(norm(q)) || norm(a.label).startsWith(norm(q)));
     return hits.length === 1 ? hits[0] : null;
@@ -250,8 +267,9 @@
       return "🧩 "+a.label+" v"+a.version+(a.enabled === false ? " (switched off)" : "")+"\n"+(a.guide || "No guide written yet.")+
              "\n\nCommands: "+(Object.entries(a.commands).map(([w, c]) => "?"+(c.usage || w)+(c.rank && c.rank !== "anyone" ? " ("+c.rank+")" : "")).join(" · ") || "none");
     }
-    if (!ADDONS.size) return "🧩 No add-ons are runnin' on the farm right now.";
-    return "🧩 FARM ADD-ONS\n"+[...ADDONS.values()].map(a => "• "+a.label+" ("+a.name+")"+(a.enabled === false ? " · off" : "")+
+    const shown = [...ADDONS.values()].filter(a => !a.only);   // a private add-on is never listed
+    if (!shown.length) return "🧩 No add-ons are runnin' on the farm right now.";
+    return "🧩 FARM ADD-ONS\n"+shown.map(a => "• "+a.label+" ("+a.name+")"+(a.enabled === false ? " · off" : "")+
            (a.errors ? " · "+a.errors+" errors" : "")+": "+(Object.keys(a.commands).map(c => "?"+c).join(" ") || "no commands")).join("\n")+
            "\n?addons <name> shows one add-on's guide.";
   }

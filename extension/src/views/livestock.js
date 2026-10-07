@@ -97,6 +97,7 @@ export const SWITCH_INFO = [
   ["hypno", "Hypno", "Let your herd leader's voice lines reach you, privately"],
   ["potions", "Potions", "Staff and the wheel can give you potions, and others can gift you one (you're asked first). Your limits still rule some out"],
   ["dares", "Dares", "Staff and the wheel can hand you a dare to do in half an hour"],
+  ["bench", "Use bench", "Staff and the wheel can sentence you to time strapped over the use bench, where anybody can use you. Your safeword ends it at once"],
 ];
 // some switches only work once another is on; say so instead of lettin' a click do nothin'
 const NEEDS = { freeuse: ["breedable", "Turn Breedable on first"] };

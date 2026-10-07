@@ -5,12 +5,13 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 | Script | File in `dist/` | Where it runs | Current |
 |---|---|---|---|
-| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.16.0** |
-| Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.5.2** |
+| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.17.0** |
+| Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.5.3** |
+| Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.1.0** |
 | Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **1.0.3** |
-| Barn life, Breeding, Dairy, Map tools, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.2** |
+| Barn life, Dairy, Map tools, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.2** |
 | Shows | `farmhand-shows.user.js` | the bot's PC | **1.0.3** |
-| Farmhand Companion | `farmhand-companion.user.js` | each player | **0.11.0** |
+| Farmhand Companion | `farmhand-companion.user.js` | each player | **0.11.1** |
 | Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.3** |
 
 ## Sending a watch report
@@ -20,6 +21,19 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 - Running the watcher on more than one game at once (the bot, yours, a tester's) lets Claude line them up into one timeline.
 
 ## Latest changes (newest first)
+
+- **Bot 0.17.0, Breeding 1.1.0, Glory stalls 1.5.3, Companion 0.11.1: the use bench, breedin' season, the right-now strip, and more.**
+  - **The use bench** (`?bench on` to opt in, or the switch in the Companion's farm settings). Staff `?bench <who> [minutes, 5-120]`, the wheel (two new punishment slices, and `bench <min>` as a staff action slice), or yourself (`?bench me 30`) put you on a bench spot (`?spot set bench`, bench-2, bench-3…). Anybody standin' by says `?use [mouth|pussy|ass]`: the room sees it, a stud's load goes in (or over them if they aren't ?breedable), a pussy load can take, and it's chalked up: their count, the tally marks, `?bench top` for the week, and a Use bench line on the `?board`. One person's turns are a minute apart. Wander off and the farm girl straps you back down. Limits rule it out like the glory stalls, a gag, chastity or plug closes that hole, and **the safeword takes you off at once** (first thing it does), as does `?bench off`. Time served earns a ribbon. `?unbench <who>` for staff; the wheel's early release covers it too.
+  - **Breedin' season** (the breeding add-on's breeding week, 15th to 21st, `?season on`): signed-up stock still come into heat; signed-up studs fill half again faster all week and get pent up after 4 hours full instead of a day. Every load in a signed-up dam's pussy goes in the season's stud book, from a stud's ?cum or breedin', the use bench, or a glory stall stranger (who counts for the dam only). Each night from 9 pm I read the stud book out to the farm (most bred, busiest studs, who caught), and on the last night (the 21st) the most-bred is crowned with 10 ribbons and the busiest stud gets 5. Milestone lines at 3, 5 and 10 breedin's. `?season book` shows it any time; the Companion card has your counts and a Stud book button.
+  - From the Oct 7 watch (bot, 2:46-3:46 am): a futa cow milked down to a quarter was never let out of the milkin' stall ("30 min till you're down to a quarter" for 25 minutes). Her balls drained at half a mL a tick and only whole mLs were ever taken, so they never emptied. Now it adds up and comes out, and no session runs more than 15 minutes past its time. Greetings that say the time of day (Mornin', Afternoon, Evenin') only go out at that time on the bot's clock, with two late-night ones; it was sayin' "Afternoon" at 3 am.
+  - **The Companion's "right now" strip**: on every tab, a row of chips with clocks for everything happening to you: the bench (and how many have used you), the pen, the stocks, the milkin' stall, heat, denial, capped teats, pent up, your dare, every potion, a knot.
+  - **Tap to use the bench**: when somebody's on the use bench, everybody else on the books gets a card with Use their mouth / pussy / ass buttons (you still have to be standin' by it).
+  - **While you were gone**: back on the farm after 3+ hours, I hand you what you missed: litters dropped (and who bred 'em), ribbons won and spent, your breedin' season count, your bench count.
+  - **A nudge for lingerers**: somebody not on the books who's been lookin' around five minutes without sayin' a word to me gets one whisper about ?tour and ?apply (once a week at most).
+  - **The stud book as a card**: the nightly readin' and the crown come as a card in the panel (🥇🥈🥉) for Companion users, a private line for everybody else.
+  - **Private add-ons**: an add-on can be made for one person (`only: [member]`): its commands answer nobody else, and it's never listed in ?addons, ?help, the Guides tab or anybody's panel. Folders named `addons/private-*` stay on the bot's PC and are never pushed. Add-ons can also see farm actions (`audit`), put someone who said ?bench on onto the bench, give a quiet heat nobody's told about, and say no to a ?wash.
+  - From the 4:22 am watch: a bare `?eggs`, `?freeuse`, `?praise`, `?breedable` (any of the personal switches) used to flip it: somebody browsin' commands turned eggs ON and praise OFF without meanin' to. Now a bare word just says how it's set; only `on` or `off` changes it. `?me` shows your record (it was "I don't know ?me").
+  - Seen in that report but not the farm: about 7 "online friends" checks a minute from the bot's account; the bot sends one a minute, the rest come from another mod on that PC.
 
 - **Bot 0.16.0, Companion 0.11.0, Glory stalls 1.5.2, Shows 1.0.3: ribbons, the store, potions, dares, the corral, and a wheel that does things.**
   - **Ribbons** are the farm's scrip and keep day to day. Earned for the milk quota (3), a full stall session (1), a chore (2), a glory shift (3, punishment 1), a dare (2, reckless 4), placin' in a show (5/3/2), best milk or top sire of the week (10), and from staff (`?ribbon give|fine <who> <n> [why]`: farmhands up to 5, herdmasters 15). A missed quota costs 2. Up to 40 a day from farm things. The **Sunday till** names the week's top earner (+5) and biggest spender. `?ribbons`, `?ribbons top`.

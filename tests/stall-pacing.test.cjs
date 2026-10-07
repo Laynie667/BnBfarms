@@ -70,5 +70,14 @@ const roomLines=k=>sent.slice(k).filter(([e,d])=>d&&(d.Type==='Emote'||(d.Type==
   ok(!p().stall && why.length===1 && /quarter/.test(String(why[0][1].Content||why[0][1].Message)) && /Come back in about/.test(String(why[0][1].Content||why[0][1].Message)), 'too empty: told once why, and when to come back');
   chars[1].MapData.Pos={X:9,Y:9}; skew+=20000; W.__ms(); chars[1].MapData.Pos={X:5,Y:5}; k=sent.length; skew+=20000; W.__ms(); skew+=20000; W.__ms(); await wait(3000);
   ok(sent.slice(k).filter(([e,d])=>d&&/give you a sniff/.test(String(d.Content||d.Message||''))).length===1, '...and again on the next visit');
+  // live, Oct 7: a futa cow (small balls, 60 mL) was milked down to a quarter but never let go, "30 min to go"
+  // for 25 minutes: half a mL a tick was never drained. Now the balls empty too and the session ends.
+  chars[1].MapData.Pos={X:9,Y:9}; skew+=20000; W.__ms();
+  L().people[500].futa=true; p().stall=null; p().stallPaused=null; p().stallRest=0; p().milk=24000; p().semen=60;
+  chars[1].MapData.Pos={X:5,Y:5}; skew+=20000; W.__ms(); skew+=20000; W.__ms();
+  ok(!!p().stall && p().stall.kind==='both', 'a futa cow: the stall milks breasts and cock both');
+  ticks=0; while (p().stall && ticks<200){ skew+=20000; W.__ms(); ticks++; }
+  ok(!p().stall && ticks*20/60<=32, 'the session ends ('+(ticks*20/60).toFixed(1)+' min)');
+  ok(p().semen<=16.5, 'the balls are drained to a quarter too ('+p().semen.toFixed(1)+' mL)');
   out(fails ? fails+' FAILED' : 'ALL PASSED'); process.exit(fails?1:0);
 })();

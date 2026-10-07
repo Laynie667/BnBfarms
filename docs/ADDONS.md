@@ -18,7 +18,7 @@ Add-ons are separate scripts that run **on the bot's computer**, in Tampermonkey
 |---|---|---|
 | glory-stalls | Stall spots, about 5-minute scenes every 10–30 minutes, real visitors, shifts, punishment shifts, a board | `?glory on`, `?stalls`, `?stall use/shift/punish/release` |
 | barn-life | Opt-in food, water and grooming; troughs and water spots (BC+/MPA bowls count); milk-drunk | `?needs on`, `?eat`, `?drink`, `?groom`, `?refill` |
-| breeding | Pregnancy stages, belly size 1–5, cravings, kicks, midwives, stud bookings, breeding week (15th–21st) | `?season on`, `?belly`, `?book`, `?midwife` |
+| breeding | Pregnancy stages, belly size 1–5, cravings, kicks, midwives, stud bookings, breedin' season (15th–21st: heat, pent-up studs, a nightly stud book, a crown for the most-bred) | `?season on`, `?season book`, `?belly`, `?book`, `?midwife` |
 | dairy | Warmer, more varied milking lines; weekly milk certificate | `?cert` |
 | work | Staff leaderboard, private write-ups, opt-in inspections | `?top`, `?wu`, `?insp` |
 | conditioning | Trance sessions for each species and level, tiers, nicknames | `?depth`, `?hyp`, `?trance`, `?wake` |
@@ -57,6 +57,7 @@ connect({
     roleplay(mn, text, type) {},                // an emote or chat line
     join(mn) {}, leave(mn) {}, safe(mn) {},     // safe = they used their safeword: stop everything for them
     nurse(milker, drinker, ml, grade) {}, birth(mn, kids, sires) {},
+    bred(stud, mn, hole, ml, took) {},          // a load landed inside somebody (?cum, breedin', the use bench, api.bred from an add-on)
   },
   rates: { milk: (mn) => 1, semen: (mn) => 1 }, // nudge production (0.25×–3× overall)
   lines: { pump: (info) => "…" },               // write the farm's milking lines (pump, echo, stallMilk, stallSemen, stallDone, stallDoneSemen, gearDry)

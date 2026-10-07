@@ -4,6 +4,8 @@
   */
   /* ───────────── COMMAND DISPATCH ───────────── */
 
+  // a switch, as it stands, and how to change it (said for a bare ?breedable, ?eggs…)
+  function switchStatus(cmd, on){ return "🔘 ?"+cmd+" is "+(on ? "ON" : "off")+" for you, sugar. ?"+cmd+" "+(on ? "off" : "on")+" to change it."; }
   function handleCommand(sender, raw, channel, fromQueue){
     // the same command twice within a second and a half (a double-tapped button, a beep that arrived twice): once is enough
     if (!fromQueue){
@@ -67,7 +69,9 @@
     const p = parseCommand(raw, isWhisper, isBeep);
     if (!p){ huh("I didn't catch a command in that, sugar. Try ?help, or just say what you'd like, like stats or keys."); return; }
     let { cmd, args, rest } = p;
+    if (cmd === "me" && !args.length) cmd = "record";   // live, Oct 7: "?me" got "I don't know ?me"
     let addonCmd = ADDON_CMDS.get(cmd) || null;   // a command from an add-on script (10f-addons.js)
+    if (addonCmd && !addonVisible(addonCmd.addon, sender)) addonCmd = null;   // somebody else's private add-on: as if it isn't there
     if (!PUBLIC_CMDS.includes(cmd) && !STAFF_CMDS.includes(cmd) && !addonCmd){
       // a guide's name on its own opens that guide (?play, ?herd2, ?barnstaff)
       if (guideTopic(cmd)){ args = [cmd]; rest = cmd; cmd = "help"; }
@@ -529,8 +533,9 @@
         const r = rec(sender);
         if (!r || !r.roles.length){ R("That's just for folks on the books, sugar. Say ?apply first!"); break; }
         const v = String(args[0]||"").toLowerCase();
-        if (v && !["on","off","yes","no"].includes(v)){ R("Just say ?jarok on or ?jarok off, sweetie. Leave it blank and it flips."); break; }
-        const on = v ? (v === "on" || v === "yes") : r.jarok === false;
+        if (v && !["on","off","yes","no"].includes(v)){ R("Just say ?jarok on or ?jarok off, sweetie."); break; }
+        if (!v){ R(switchStatus("jarok", r.jarok !== false)); break; }
+        const on = v === "on" || v === "yes";
         if (on && limitBlocks(sender, "breed")){ R("Your hard limits rule that out, sugar, so I'll keep it off. If you want it, change your limits with staff first."); break; }
         r.jarok = on;
         if (!on) state.jarAsks.delete(sender);
@@ -1096,6 +1101,7 @@
 
       /* ── SAFETY ── */
       case "safe": case "safeword": case "red": {
+        try { unbench(sender, "safe"); } catch(e){ warn("safeword bench:", e); }   // off the use bench before anything else
         say("🔴 PAUSE CALLED. Everything stops, right now, everybody.", true, sender);   // I go stand by them, so everyone near them hears it
         beep(sender, "I've got you, "+plainName(sender)+". Everything's stopped and I'm fetchin' somebody for you right now. You don't owe anybody an explanation. 🔴", true);
         notifyStaff("🔴 SAFEWORD from "+plainName(sender)+" ("+sender+"). Please go to them now.", false);
@@ -1481,6 +1487,7 @@ Welcome to B&B Farm, hon. 🌾`);
       case "potions": case "potion": potionCommand(cmd, sender, args, R); break;
       case "dares": case "dare": case "dared": dareCommand(cmd, sender, args, R); break;
       case "corral": case "uncorral": penCommand(cmd === "corral" ? "pen" : "unpen", sender, args, R); break;
+      case "bench": case "unbench": case "use": benchCommand(cmd, sender, args, R); break;
 
       case "edit": {
         // proprietors fix somebody's record: ?edit <who> shows what can change · ?edit <who> <field> <new value>
@@ -1771,8 +1778,9 @@ Welcome to B&B Farm, hon. 🌾`);
         const r = rec(sender);
         if (!r || !r.roles.length){ R("You'll need to be on the books first, hon. ?apply and we'll get you sorted. 🌾"); break; }
         const v = String(args[0]||"").toLowerCase();
-        if (v && !["on","off","yes","no"].includes(v)){ R("Just say ?milkable on or ?milkable off, sweetie. Leave it blank and it flips."); break; }
-        const now = v ? (v === "on" || v === "yes") : !makesMilk(sender);
+        if (v && !["on","off","yes","no"].includes(v)){ R("Just say ?milkable on or ?milkable off, sweetie."); break; }
+        if (!v){ R(switchStatus("milkable", makesMilk(sender))); break; }
+        const now = v === "on" || v === "yes";
         if (now && limitBlocks(sender,"milk")){ R("Your hard limits rule that out, sugar, so I'll keep it off. If you want it, change your limits with staff first."); break; }
         r.milkable = now; prodOf(sender); saveLedger(); audit(sender,"MILKABLE",now?"on":"off");
         R(now ? "🥛 You're milkable now, darlin'! You'll start fillin' up by the hour. ?stats to watch it, and ?help barn for how grades work."
@@ -1800,8 +1808,9 @@ Welcome to B&B Farm, hon. 🌾`);
         const r = rec(sender);
         if (!r || !r.roles.length){ R("You'll need to be on the books first, hon. ?apply and we'll get you sorted. 🌾"); break; }
         const v = String(args[0]||"").toLowerCase();
-        if (v && !["on","off","yes","no"].includes(v)){ R("Just say ?futa on or ?futa off, sweetie. Leave it blank and it flips."); break; }
-        const on = v ? (v === "on" || v === "yes") : !r.futa;
+        if (v && !["on","off","yes","no"].includes(v)){ R("Just say ?futa on or ?futa off, sweetie."); break; }
+        if (!v){ R(switchStatus("futa", !!r.futa)); break; }
+        const on = v === "on" || v === "yes";
         if (on && limitBlocks(sender,"futa")){ R("Your hard limits rule that out, sugar, so I'll keep it off. If you want it, change your limits with staff first."); break; }
         r.futa = on; prodOf(sender); saveLedger(); audit(sender,"FUTA",on?"on":"off");
         R(on ? "🌸 Futa it is, darlin'! You'll make milk and semen both, you can breed with ?breed and ?cum, and you can be bred in the vulva too (if you've said ?breedable on). ?futa off whenever you like."
@@ -1876,8 +1885,9 @@ Welcome to B&B Farm, hon. 🌾`);
         const r = rec(sender);
         if (!r || !r.roles.length){ R("That's just for folks on the books, sugar. Say ?apply first!"); break; }
         const v = String(args[0]||"").toLowerCase();
-        if (v && !["on","off","yes","no"].includes(v)){ R("Just say ?"+cmd+" on or ?"+cmd+" off, sweetie. Leave it blank and it flips."); break; }
-        const on = v ? (v === "on" || v === "yes") : !r[cmd];
+        if (v && !["on","off","yes","no"].includes(v)){ R("Just say ?"+cmd+" on or ?"+cmd+" off, sweetie."); break; }
+        if (!v){ R(switchStatus(cmd, !!r[cmd])); break; }
+        const on = v === "on" || v === "yes";
         if (on && (limitBlocks(sender) || (cmd === "eggs" && limitBlocks(sender, "eggs")))){ R("Your hard limits rule that out, sugar, so I'll keep it off."); break; }
         if (on && cmd === "freeuse" && !r.breedable){ R("You'll need ?breedable on first, sugar. Then ?freeuse on lets any stud have you without askin'."); break; }
         r[cmd] = on; saveLedger(); audit(sender, cmd.toUpperCase(), on ? "on" : "off");
@@ -1935,7 +1945,8 @@ Welcome to B&B Farm, hon. 🌾`);
         const v = String(args[0]||"").toLowerCase();
         if (v && !["on","off","yes","no"].includes(v)){ R("Just say ?"+cmd+" on or ?"+cmd+" off, sweetie."); break; }
         const key = cmd === "praise" ? "praiseMe" : "degradeMe";
-        const on = v ? (v === "on" || v === "yes") : !r[key];
+        if (!v){ R(switchStatus(cmd, !!r[key])); break; }
+        const on = v === "on" || v === "yes";
         if (on && cmd === "degrade" && /\\b(degrad\\w*|humiliat\\w*|name.?call\\w*|insult\\w*)\\b/i.test(r.limits||"")){ R("Your hard limits rule that out, sugar."); break; }
         r[key] = on; saveLedger();
         R(cmd === "praise"
@@ -1957,6 +1968,7 @@ Welcome to B&B Farm, hon. 🌾`);
         const t = args[0] && isStaff(sender) ? resolveTarget(args[0]) : sender;
         const p = t && rec(t) ? prodOf(t) : null;
         if (!p || !paintedText(t)){ R((t === sender ? "You're" : plainName(t)+" is")+" clean as a whistle, sugar."); break; }
+        if (t === sender){ const no = addonVeto("wash", t); if (no){ R(no); break; } }   // an add-on can keep somebody messy (their own switch)
         const was = paintedText(t); p.painted = null; saveLedger();
         if (onMap(t)) emote("🚿 "+plainName(t)+" gets hosed down at the trough, washin' the "+was+" clean. Shame, it was a good look.", t);
         else R("All washed up, sugar.");
@@ -2030,13 +2042,14 @@ Welcome to B&B Farm, hon. 🌾`);
         if (!r || !r.roles.length){ R("That's just for folks on the books, sugar. Say ?apply first!"); break; }
         const field = cmd === "naturalheat" ? "naturalHeat" : cmd;
         const v = String(args[0]||"").toLowerCase();
-        if (v && !["on","off","yes","no"].includes(v)){ R("Just say ?"+cmd+" on or ?"+cmd+" off, sweetie. Leave it blank and it flips. For example: ?"+cmd+" on"); break; }
-        const on = v ? (v === "on" || v === "yes") : !r[field];
+        if (v && !["on","off","yes","no"].includes(v)){ R("Just say ?"+cmd+" on or ?"+cmd+" off, sweetie. For example: ?"+cmd+" on"); break; }
+        if (!v){ R(switchStatus(cmd, !!r[field])); break; }
+        const on = v === "on" || v === "yes";
         if (on && limitBlocks(sender, field === "naturalHeat" ? "heat" : "breed")){ R("Your hard limits rule that out, sugar, so I'll keep it off. If you want it, change your limits with staff first."); break; }
         r[field] = on;
         if (field === "naturalHeat" && on) prodOf(sender).nextHeatAt = Date.now() + CFG.PROD.NATURAL_HEAT_EVERY_D*86400000;
         saveLedger(); audit(sender, field.toUpperCase(), on?"on":"off");
-        R({ breedable:"Breedable", fertile:"Fertile (can catch)", naturalHeat:"Natural heat every "+CFG.PROD.NATURAL_HEAT_EVERY_D+" days" }[field]+": "+(on?"ON":"off")+". Say ?"+cmd+" on or ?"+cmd+" off any time to set it, hon; plain ?"+cmd+" flips it.");
+        R({ breedable:"Breedable", fertile:"Fertile (can catch)", naturalHeat:"Natural heat every "+CFG.PROD.NATURAL_HEAT_EVERY_D+" days" }[field]+": "+(on?"ON":"off")+". Say ?"+cmd+" on or ?"+cmd+" off any time to set it, hon.");
         break;
       }
 
@@ -2143,7 +2156,7 @@ Welcome to B&B Farm, hon. 🌾`);
                        .map(([m,n],i)=>"  "+(i+1)+". "+plainName(parseInt(m,10))+" — "+n+" caught").join("\n") || "  (nobody yet)";
         const dump = Object.entries(L.yield.u||{}).sort((a,b)=>b[1]-a[1])[0];
         R("🥛 YIELD BOARD\n\nToday\n"+top(L.yield.d)+"\n\nThis week (top goes prize)\n"+top(L.yield.w)+"\n\n🐂 Top sires this week\n"+sires+
-          (dump ? "\n\n🪣 Farm cumdump of the day: "+plainName(parseInt(dump[0],10))+" ("+dump[1]+" times)" : ""));
+          (dump ? "\n\n🪣 Farm cumdump of the day: "+plainName(parseInt(dump[0],10))+" ("+dump[1]+" times)" : "")+benchBoardLine());
         break;
       }
 
@@ -2205,7 +2218,7 @@ Welcome to B&B Farm, hon. 🌾`);
         }
         const key = cmd === "feeding" ? "feedingOn" : "curfewOn";
         const v = String(args[0]||"").toLowerCase();
-        if (v && !["on","off"].includes(v)){ R("Just say ?"+cmd+" on or ?"+cmd+" off, sugar. Leave it blank and it flips. For example: ?"+cmd+" off"); break; }
+        if (v && !["on","off"].includes(v)){ R("Just say ?"+cmd+" on or ?"+cmd+" off, sugar. For example: ?"+cmd+" off"); break; }
         L.life[key] = v ? v === "on" : !L.life[key]; saveLedger(); audit(sender, cmd.toUpperCase(), L.life[key]?"on":"off");
         if (cmd === "curfew") syncAllPresent(true);
         R((cmd === "feeding" ? "🔔 Feedin' times are " : "🌙 Curfew is ")+(L.life[key] ? "ON" : "off")+" now. ?"+cmd+" on or ?"+cmd+" off sets it; plain ?"+cmd+" flips it.");
@@ -2363,7 +2376,7 @@ Welcome to B&B Farm, hon. 🌾`);
           const { text, act } = wheelAddAct(args.slice(2).join(" ").trim());
           if (!["reward","punish","silly"].includes(kind) || !text){ R("Say whether it's a reward, punish or silly slice, sugar, then the words. "+"?wheel add reward <text> (%name% becomes their name). Add => and an action to make it happen: ?wheel add punish Off to the pen, %name% => pen 30. "+
             "Actions: stocks <min> · pen <min> · milkstall <min> · glory <min> · leash <min> · denial <hours> · potion <name> · dare [reckless] · ribbons <n> · fine <n> · luxury <hours> · grace · heat"); break; }
-          if (act && runAct.length && !["stocks","pen","milkstall","glory","leash","denial","potion","dare","ribbons","fine","luxury","grace","heat","release"].includes(act.split(/\s+/)[0])){ R("I don't know that action, sugar. Actions: stocks · pen · milkstall · glory · leash · denial · potion · dare · ribbons · fine · luxury · grace · heat · release"); break; }
+          if (act && runAct.length && !["stocks","pen","milkstall","glory","bench","leash","denial","potion","dare","ribbons","fine","luxury","grace","heat","release"].includes(act.split(/\s+/)[0])){ R("I don't know that action, sugar. Actions: stocks · pen · milkstall · glory · bench · leash · denial · potion · dare · ribbons · fine · luxury · grace · heat · release"); break; }
           if (act && act.startsWith("potion") && !potionDef(act.split(/\s+/)[1])){ R("There's no potion called that, sugar. ?potions lists 'em."); break; }
           L.wheel.push({ kind, text, act, by:sender }); saveLedger(); R("Added to the wheel! "+L.wheel.length+" slices of your own now"+(act ? ", and that one does somethin' ("+act+")" : "")+".");
         } else if (sub === "remove"){

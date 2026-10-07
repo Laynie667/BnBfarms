@@ -79,7 +79,7 @@
 
   // the command they probably meant: a stray letter in front ("a-addons"), or one or two letters off ("adons")
   function nearestCommand(cmd, sender){
-    const pool = PUBLIC_CMDS.concat(isStaff(sender) ? STAFF_CMDS : [], [...ADDON_CMDS.keys()]);
+    const pool = PUBLIC_CMDS.concat(isStaff(sender) ? STAFF_CMDS : [], [...ADDON_CMDS].filter(([, x]) => addonVisible(x.addon, sender)).map(([w]) => w));
     const strip = cmd.replace(/^[a-z][-.]/, "");
     if (strip !== cmd && pool.includes(strip)) return strip;
     if (cmd.length < 4) return null;
@@ -132,7 +132,7 @@
                        "stats","board","pedigree","breedable","fertile","naturalheat","breed","cum","milkable","futa","size","sizes","measure","penis","cock","rights","accept",
                        "freeuse","jarok","gender","outfit","outfits","uniform","hypno","tally","eggs","yes","no","wash","quota","praise","degrade",
                        "weather","feeding","curfew","beg","please","fair","enter","addons","addon",
-                       "ribbons","ribbon","store","buy","gift","potions","potion","dares","dare","dared"];
+                       "ribbons","ribbon","store","buy","gift","potions","potion","dares","dare","dared","bench","use"];
   const STAFF_CMDS  = ["queue","app","approve","deny","register","unregister","grant","revoke",
                        "claim","release","myherd","herdname","herdcall","herdsummon","turnout","letup","goldkey",
                        "pasture","onduty","cover","staffadd","staffremove",
@@ -143,7 +143,7 @@
                        "milk","collect","heat","heatline","shotlog",
                        "stocks","unstock","walk","tourstop","clockin","clockout","hours","done","chore","chores",
                        "wheel","spin","begphrase","score","drain","denial","ruin","jars","inseminate","nomilk","inspect","edge",
-                       "contract","contracts","zone","zones","voice","machine","edit","corral","uncorral"];
+                       "contract","contracts","zone","zones","voice","machine","edit","corral","uncorral","unbench"];
 
   const SAFETY_CMDS = ["safe","safeword","red","stuck"];
   const PRIVATE_REPLY = ["record","keys","find","app","queue","roster","stock","health",

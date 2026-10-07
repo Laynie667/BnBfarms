@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.16.0
+// @version      0.17.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -1806,7 +1806,7 @@
     { name: "Clothes", cmds: ["outfit", "outfits", "uniform", "outfit back"] },
     { name: "Mind", cmds: ["hypno", "teaseme"] },
     { name: "Fun", cmds: ["fair", "enter"] },
-    { name: "Ribbons and the store", cmds: ["ribbons", "ribbons top", "store", "buy <item>", "gift <who> <potion>", "potions", "potions on", "dares on", "dare", "dared", "dare skip"] }
+    { name: "Ribbons and the store", cmds: ["ribbons", "ribbons top", "store", "buy <item>", "gift <who> <potion>", "potions", "potions on", "dares on", "dare", "dared", "dare skip", "bench", "bench on", "bench me <minutes>", "use <mouth|pussy|ass>", "bench top"] }
   ];
   var STAFF_GROUPS = [
     { name: "Books", cmds: ["queue", "app <n>", "approve <who> livestock", "deny <who>", "appclear", "roster", "stock", "find <who>", "record <who>", "note <who>", "signed", "addfriend <who>", "unregister <who>", "unregister <who> <role>"] },
@@ -1818,7 +1818,7 @@
     { name: "Map", cmds: ["spot", "spot set <name>", "spot place <name> <x> <y>", "zone", "zone who", "zone a <name>", "zone b <name>", "zone box <name> <ax> <ay> <bx> <by>", "zone pair <name> <group>", "tourstop", "setrescue", "where", "stucklog"] },
     { name: "Voice", cmds: ["voice", "voice on herd", "voice add herd <line>", "voice every herd 15"] },
     { name: "Work and play", cmds: ["clockin", "clockout", "hours", "done", "chores", "chore add <job> @<place>", "wheel", "spin", "begphrase", "score"] },
-    { name: "Ribbons, potions, dares", cmds: ["ribbon give <who> <n>", "ribbon fine <who> <n>", "ribbons <who>", "potion give <who> <potion>", "potion end <who>", "dare <who>", "dare <who> reckless", "corral <who> <minutes>", "uncorral <who>", "wheel farm", "store approve <who>"] },
+    { name: "Ribbons, potions, dares", cmds: ["ribbon give <who> <n>", "ribbon fine <who> <n>", "ribbons <who>", "potion give <who> <potion>", "potion end <who>", "dare <who>", "dare <who> reckless", "corral <who> <minutes>", "uncorral <who>", "bench <who> <minutes>", "unbench <who>", "wheel farm", "store approve <who>"] },
     { name: "Keys and calls", cmds: ["keys <who>", "keysync", "keydump", "grant <who> <tier>", "revoke <who>", "forced", "summon <who>", "summon all", "pasture", "onduty", "cover"] }
   ];
   var OWNER_GROUPS = [
@@ -1826,7 +1826,7 @@
   ];
 
   // bot/src/version.js
-  var VERSION = "0.16.0";
+  var VERSION = "0.17.0";
 
   // bot-parts:farmhand-bot-parts
   (function() {
@@ -2527,6 +2527,12 @@
       // per ?ribbon give or fine (proprietors: any)
       RIBBONS_FOR: { quota: 3, stall: 1, chore: 2, gloryShift: 3, gloryPunish: 1, weekBest: 10, showWin: [5, 3, 2] },
       STORE_DAY_LIMIT: { luxury: 1, spin: 5, lucky: 3, grace: 1, greeting: 1, tag: 2 },
+      AWAY_H: 3,
+      LINGER_MIN: 5,
+      // "while you were gone" after 3 hours away · nudge lingerers after 5 minutes
+      BENCH_MAX_MIN: 120,
+      BENCH_REUSE_SEC: 60,
+      // the use bench: longest sentence; one person's turns at least a minute apart
       DARE_MIN: 30,
       DARE_RIBBONS: 2,
       DARE_RIBBONS_RECKLESS: 4,
@@ -2715,6 +2721,10 @@
     }
     function audit(actor, action, detail) {
       L.log.push({ t: Date.now(), by: actor, a: action, d: detail || "" });
+      try {
+        addonsEmit("audit", actor, action, detail || "");
+      } catch (e) {
+      }
       if (L.log.length > 500) L.log = L.log.slice(-500);
       saveLedger();
     }
@@ -3279,7 +3289,7 @@
     };
     W.FarmhandExport = exportLedger;
     W.FarmhandLedger = () => L;
-    if (W.__FARMHAND_TEST__) Object.assign(W, { __st: () => state, __cfg: CFG, __pt: prodTick, __qt: quotaTick, __lt: leashTick, __ms: milkingStallTick, __vt: voiceTick, __sync: syncCompanions, __gt: gearTick, __ht: homeTick, __addons: (h, ...a) => addonsEmit(h, ...a), __stateFor: (mn) => stateFor(mn), __leadTick: () => leadTick(), __ambient: () => ambientTick(), __about: (t) => aboutWhom(t), __announce: (t) => announce(t), __reply: (mn, t, ch) => reply(mn, t, ch), __office: () => officeCheck(), __namesHere: (t) => namesHere(t), __speciesCheck: (t) => QUESTIONS.find((q) => q.key === "species").check(t), __attach: () => attachListeners(), __tryLogin: () => tryLogin(), __beepText: (m) => beepText(m), __nameOnce: (t, mn) => nameOnce(t, mn), __buildContract: (n, mn, d) => buildContract(contractTemplate(n), mn, d), __potionTick: () => potionTick(), __penTick: () => penTick(), __ribbonTick: () => ribbonTick(), __dareTick: () => dareTick(), __potionOn: (mn, id) => potionOn(mn, id), __milkRate: (mn) => milkRate(mn) });
+    if (W.__FARMHAND_TEST__) Object.assign(W, { __st: () => state, __cfg: CFG, __pt: prodTick, __qt: quotaTick, __lt: leashTick, __ms: milkingStallTick, __vt: voiceTick, __sync: syncCompanions, __gt: gearTick, __ht: homeTick, __addons: (h, ...a) => addonsEmit(h, ...a), __stateFor: (mn) => stateFor(mn), __leadTick: () => leadTick(), __ambient: () => ambientTick(), __about: (t) => aboutWhom(t), __announce: (t) => announce(t), __reply: (mn, t, ch) => reply(mn, t, ch), __office: () => officeCheck(), __namesHere: (t) => namesHere(t), __speciesCheck: (t) => QUESTIONS.find((q) => q.key === "species").check(t), __attach: () => attachListeners(), __tryLogin: () => tryLogin(), __beepText: (m) => beepText(m), __nameOnce: (t, mn) => nameOnce(t, mn), __buildContract: (n, mn, d) => buildContract(contractTemplate(n), mn, d), __potionTick: () => potionTick(), __penTick: () => penTick(), __benchTick: () => benchTick(), __lingerTick: () => lingerTick(), __ribbonTick: () => ribbonTick(), __dareTick: () => dareTick(), __potionOn: (mn, id) => potionOn(mn, id), __milkRate: (mn) => milkRate(mn) });
     W.FarmhandSyncKeys = () => syncAllPresent(true);
     W.FarmhandFriends = () => W.Player.FriendList;
     W.FarmhandAddFriend = (mn) => addFriend(mn, false);
@@ -4227,8 +4237,18 @@
       "Welcome, %titled_name%! If you're new 'round here, say ?rules out loud and I'll fill you in.",
       "Mornin', %titled_name%! Coffee's fresh and so's the hay. \u2615",
       "Afternoon, %titled_name%! Mind the ruts on your way in, darlin'.",
-      "Hey there, %titled_name%! Say ?help any time, hon. I keep the books 'round here."
+      "Hey there, %titled_name%! Say ?help any time, hon. I keep the books 'round here.",
+      "Up late, %titled_name%? Barn's quiet, but the lantern's lit. Come on in, sugar. \u{1F3EE}",
+      "Burnin' the midnight oil, %titled_name%? Hush now, the cows are sleepin'. Welcome in."
     ];
+    function greetFits(line) {
+      const h = (/* @__PURE__ */ new Date()).getHours();
+      if (/^Mornin'/.test(line)) return h >= 5 && h < 12;
+      if (/^Afternoon/.test(line)) return h >= 12 && h < 17;
+      if (/^Evenin'/.test(line)) return h >= 17 && h < 22;
+      if (/^(Up late|Burnin' the midnight)/.test(line)) return h >= 22 || h < 5;
+      return true;
+    }
     const RETURN_GREETINGS = [
       "Well look who's back! Told ya the gate swings both ways, %titled_name%. \u{1F495}",
       "%titled_name%! I just knew you'd turn up again, sugar.",
@@ -4241,7 +4261,7 @@
       state.greeted.set(mn, Date.now());
       const r0 = rec(mn);
       const known = L.archive[mn] || r0 && r0.roles && r0.roles.length;
-      const pool = known ? RETURN_GREETINGS : GREETINGS;
+      const pool = (known ? RETURN_GREETINGS : GREETINGS).filter(greetFits);
       const own = customGreeting(mn);
       const line = own || pool[Math.floor(Math.random() * pool.length)];
       later(() => say(fill(line, mn), false, mn), 1500);
@@ -4310,7 +4330,8 @@
       forced: "forced",
       hypno: "hypno",
       potionsOn: "potions",
-      daresOn: "dares"
+      daresOn: "dares",
+      benchOn: "bench"
     };
     const DOC_CMDS = ["record", "stats", "vet", "quota", "keys", "size", "measure", "pedigree"];
     function shownMl(n) {
@@ -4360,6 +4381,9 @@
         s.fx = activePotions(mn).map((f) => ({ id: f.id, name: (potionDef(f.id) || {}).name || f.id, until: Math.ceil(f.until / 6e4) * 6e4 }));
         if (r.dare) s.dare = { text: r.dare.text, until: r.dare.until, reckless: !!r.dare.reckless };
         if (r.penned) s.penned = { until: r.penned.until, at: r.penned.name };
+        s.now = rightNow(mn);
+        const bh = benchHereFor(mn);
+        if (bh.length) s.benchHere = bh;
         s.at = now;
         if (isStaff(mn)) Object.assign(s, staffStateFor(mn));
         const mods = addonStateFor(mn);
@@ -4387,7 +4411,7 @@
           role: (r2.roles[0] || "").toLowerCase(),
           where: whereName(m) || "",
           milk: makesMilk(m) ? Math.round(100 * p.milk / Math.max(1, milkCap(m))) : null,
-          heat: inHeat(p),
+          heat: inHeat(p) && !p.heat.quiet,
           preg: !!p.preg,
           denied: milkDenied(m),
           mine: herdLeaderOf(m) === mn,
@@ -4767,7 +4791,7 @@
       if (!pos) return null;
       for (const O of W.ChatRoomCharacter || []) {
         const om = O.MemberNumber, op = O.MapData && O.MapData.Pos;
-        if (om === mn || !op || !rec(om) || !inHeat(prodOf(om))) continue;
+        if (om === mn || !op || !rec(om) || !inHeat(prodOf(om)) || prodOf(om).heat.quiet) continue;
         if (Math.abs(op.X - pos.X) <= CFG.HEAT_SCENT_TILES && Math.abs(op.Y - pos.Y) <= CFG.HEAT_SCENT_TILES) return om;
       }
       return null;
@@ -5392,13 +5416,17 @@
         st.kind = st.kind || (doM && doS ? "both" : doM ? "milk" : "cock");
         const rateM = st.rateM || CFG.PROD.STALL_MILK_PER_MIN, rateS = st.rateS || CFG.PROD.STALL_SEMEN_PER_MIN;
         st.until = now + Math.ceil(Math.max(doM ? (p.milk - keepM) / rateM : 0, doS ? (p.semen - keepS) / rateS : 0)) * 6e4;
-        const gotM = doM ? drainMilk(mn, Math.min(rateM * dtMin, p.milk - keepM)) : 0;
-        const gotS = doS ? drainSemen(mn, Math.min(rateS * dtMin, p.semen - keepS)) : 0;
+        st.oweM = (st.oweM || 0) + (doM ? Math.max(0, Math.min(rateM * dtMin, p.milk - keepM)) : 0);
+        st.oweS = (st.oweS || 0) + (doS ? Math.max(0, Math.min(rateS * dtMin, p.semen - keepS)) : 0);
+        const gotM = doM && st.oweM >= 1 ? drainMilk(mn, Math.min(st.oweM, p.milk - keepM)) : 0;
+        const gotS = doS && st.oweS >= 1 ? drainSemen(mn, Math.min(st.oweS, p.semen - keepS)) : 0;
+        st.oweM = Math.max(0, st.oweM - gotM);
+        st.oweS = Math.max(0, st.oweS - gotS);
         st.got.m += gotM;
         st.got.s += gotS;
         const doneM = !makesMilk(mn) || milkDenied(mn) || gearOf(mn).milk || p.milk <= keepM + 1;
-        const doneS = !makesSemen(mn) || p.semen <= keepS + 0.5;
-        const done = doneM && doneS;
+        const doneS = !makesSemen(mn) || p.semen <= keepS + 1;
+        const done = doneM && doneS || now - (st.since || now) > ((st.mins || 30) + 15) * 6e4;
         if (!done && now >= (st.nextBeat || 0)) {
           st.nextBeat = now + (15 + Math.random() * 10) * 1e3;
           privateTo(mn, (st.kind === "cock" ? "\u{1F402} " : "\u{1F95B} ") + stallBeat(mn, st), "emote");
@@ -5577,6 +5605,7 @@
           Y.s[stud] = (Y.s[stud] || 0) + 1;
         }
       }
+      if (load - gagged > 0) addonsEmit("bred", stud, t, hole, load - gagged, caught);
       okBreed(stud, t);
       face(t, "bred", 40);
       sound(t, "wet");
@@ -7312,6 +7341,9 @@
       if (why) x.why[why] = (x.why[why] || 0) + n;
       saveLedger();
     }
+    function addonVisible(a, mn) {
+      return !a.only || a.only.includes(mn);
+    }
     function rankOf(mn) {
       return isProprietor(mn) ? 3 : isHerdmaster(mn) ? 2 : isStaff(mn) ? 1 : 0;
     }
@@ -7440,7 +7472,12 @@
         name: plainName,
         nameOnce: (text, mn) => nameOnce(text, mn),
         paint: (mn, area, by) => paintOn(mn, area, by),
-        ribbons: (mn, n, why) => earnRibbons(mn, n, why),
+        ribbons: (mn, n, why, award) => earnRibbons(mn, n, why, award ? CFG.BOT_MEMBER : void 0),
+        // award: a prize, past the daily cap
+        // a load that landed somewhere outside the bot (a glory stall): tells every add-on, like the bot's own fills do
+        bred: (mn, stud, hole, mlIn, took) => addonsEmit("bred", stud, mn, hole, mlIn, took || null),
+        // put somebody on the use bench (only if they said ?bench on; same rules as staff and the wheel)
+        bench: (mn, mins, why) => benchIn(mn, Math.max(5, Math.min(CFG.BENCH_MAX_MIN, Number(mins) || 30)), CFG.BOT_MEMBER, why || a.name),
         fineRibbons: (mn, n, why) => fineRibbons(mn, n, why, CFG.BOT_MEMBER),
         splat: (mn, hole, by) => lscgSplatAt(mn, HOLE_SPLAT[hole] || ["ItemVulva"], by ? plainName(by) : null),
         char: charFor,
@@ -7554,10 +7591,13 @@
         companion: def.companion,
         rates: def.rates || null,
         lines: def.lines || null,
+        vetoes: def.vetoes || null,
         guide: def.guide || "",
         commands: {},
         enabled: !(L.addonsOff && L.addonsOff[name]),
-        errors: 0
+        errors: 0,
+        // a private add-on (only: [member numbers]): nobody else can use it, and it's never listed anywhere
+        only: Array.isArray(def.only) && def.only.length ? def.only.map(Number) : null
       };
       a.api = addonApi(a);
       for (const [word0, c] of Object.entries(def.commands || {})) {
@@ -7629,10 +7669,18 @@
       if (a) addonCall(a, "ask", ask.cb, yes);
       return true;
     }
+    function addonVeto(kind, mn) {
+      for (const a of ADDONS.values()) {
+        if (a.enabled === false || !a.vetoes || typeof a.vetoes[kind] !== "function" || !addonVisible(a, mn)) continue;
+        const v = addonCall(a, "vetoes." + kind, a.vetoes[kind], mn);
+        if (typeof v === "string" && v.trim()) return v.slice(0, 600);
+      }
+      return null;
+    }
     function addonStateFor(mn) {
       const out = {};
       for (const a of ADDONS.values()) {
-        if (a.enabled === false || typeof a.companion !== "function") continue;
+        if (a.enabled === false || typeof a.companion !== "function" || !addonVisible(a, mn)) continue;
         const v = addonCall(a, "companion", a.companion, mn);
         if (v && typeof v === "object") out[a.name] = Object.assign({ label: a.label }, v);
       }
@@ -7641,7 +7689,7 @@
     function addonCommandGroups(mn) {
       const rank = rankOf(mn), out = [];
       for (const a of ADDONS.values()) {
-        if (a.enabled === false) continue;
+        if (a.enabled === false || a.only) continue;
         const cmds = Object.entries(a.commands).filter(([, c]) => rank >= (RANKS[c.rank || "anyone"] || 0)).map(([w, c]) => c.usage || w);
         if (cmds.length) out.push({ name: a.label, cmds });
       }
@@ -7651,8 +7699,8 @@
       const q = String(text || "").toLowerCase().trim();
       if (!q) return null;
       const norm = (s) => String(s || "").toLowerCase().replace(/[\s_-]+/g, "");
-      const all = [...ADDONS.values()];
-      const exact = ADDONS.get(q) || all.find((a) => norm(a.name) === norm(q) || norm(a.label) === norm(q));
+      const all = [...ADDONS.values()].filter((a) => !a.only);
+      const exact = all.find((a) => a.name === q) || all.find((a) => norm(a.name) === norm(q) || norm(a.label) === norm(q));
       if (exact) return exact;
       const hits = all.filter((a) => norm(a.name).startsWith(norm(q)) || norm(a.label).startsWith(norm(q)));
       return hits.length === 1 ? hits[0] : null;
@@ -7663,8 +7711,9 @@
         if (!a) return "There's no add-on called '" + topic + "', hon. ?addons lists 'em.";
         return "\u{1F9E9} " + a.label + " v" + a.version + (a.enabled === false ? " (switched off)" : "") + "\n" + (a.guide || "No guide written yet.") + "\n\nCommands: " + (Object.entries(a.commands).map(([w, c]) => "?" + (c.usage || w) + (c.rank && c.rank !== "anyone" ? " (" + c.rank + ")" : "")).join(" \xB7 ") || "none");
       }
-      if (!ADDONS.size) return "\u{1F9E9} No add-ons are runnin' on the farm right now.";
-      return "\u{1F9E9} FARM ADD-ONS\n" + [...ADDONS.values()].map((a) => "\u2022 " + a.label + " (" + a.name + ")" + (a.enabled === false ? " \xB7 off" : "") + (a.errors ? " \xB7 " + a.errors + " errors" : "") + ": " + (Object.keys(a.commands).map((c) => "?" + c).join(" ") || "no commands")).join("\n") + "\n?addons <name> shows one add-on's guide.";
+      const shown = [...ADDONS.values()].filter((a) => !a.only);
+      if (!shown.length) return "\u{1F9E9} No add-ons are runnin' on the farm right now.";
+      return "\u{1F9E9} FARM ADD-ONS\n" + shown.map((a) => "\u2022 " + a.label + " (" + a.name + ")" + (a.enabled === false ? " \xB7 off" : "") + (a.errors ? " \xB7 " + a.errors + " errors" : "") + ": " + (Object.keys(a.commands).map((c) => "?" + c).join(" ") || "no commands")).join("\n") + "\n?addons <name> shows one add-on's guide.";
     }
     function addonsBoot() {
       if (W.Farmhand && W.Farmhand.__bot === true) return;
@@ -9975,7 +10024,7 @@
       { kind: "reward", text: "\u{1F9EA} Honey Tongue! The farm girl's gonna sweet-talk %name% for a while.", act: "potion honey" },
       { kind: "reward", text: "\u{1F6C1} A luxury hour for %name%: soft straw and the good feed.", act: "luxury 1" },
       { kind: "reward", text: "\u{1F4CB} Quota grace! One bad milk day forgiven, in advance.", act: "grace" },
-      { kind: "reward", text: "\u{1F513} Time off for good behavior: out of the stocks and the pen early.", act: "release" },
+      { kind: "reward", text: "\u{1F513} Time off for good behavior: out of the stocks, the pen and off the bench early.", act: "release" },
       // punishments
       { kind: "punish", text: "\u26D3\uFE0F Into the stocks with %name% for 20 minutes. Bottom up, sugar.", act: "stocks 20" },
       { kind: "punish", text: "\u26D3\uFE0F The stocks, 45 minutes. Somebody's gonna be sore and on display.", act: "stocks 45" },
@@ -9984,6 +10033,8 @@
       { kind: "punish", text: "\u{1F95B} Strapped into the milkin' stall for 30 minutes. Every last drop.", act: "milkstall 30" },
       { kind: "punish", text: "\u{1F573}\uFE0F A 30 minute punishment shift in the glory stalls. Strangers only.", act: "glory 30" },
       { kind: "punish", text: "\u{1F573}\uFE0F A full hour on punishment shift in the glory stalls. Good luck, sugar.", act: "glory 60" },
+      { kind: "punish", text: "\u{1FAB5} Twenty minutes over the use bench, %name%. Anybody who walks by gets a turn.", act: "bench 20" },
+      { kind: "punish", text: "\u{1FAB5} Forty-five minutes on the use bench. Hope you're feelin' generous, sugar.", act: "bench 45" },
       { kind: "punish", text: "\u{1F9AE} On the spinner's lead for 20 minutes. Heel.", act: "leash 20" },
       { kind: "punish", text: "\u{1F6AB} Two hours of denial. Every drop stays in.", act: "denial 2" },
       { kind: "punish", text: "\u{1F9EA} Bitterroot! Thirty minutes of ruined, leakin' frustration.", act: "potion bitterroot" },
@@ -10023,6 +10074,8 @@
           return onMap(t) && penSpots().length > 0 && !r.penned;
         case "milkstall":
           return onMap(t) && milkSpots().length > 0 && !r.penned && (makesMilk(t) || makesSemen(t));
+        case "bench":
+          return !benchWhyNot(t);
         case "glory": {
           const d = addonData("glory-stalls");
           return ADDONS.has("glory-stalls") && onMap(t) && !!(d.optIn && d.optIn[t]) && !(d.shifts && d.shifts[t]);
@@ -10036,7 +10089,7 @@
         case "grace":
           return makesMilk(t) && (r.quotaGrace || 0) < 2;
         case "release":
-          return stockedNow(t) || !!r.penned;
+          return stockedNow(t) || !!r.penned || benchedNow(t);
         case "heat":
           return !/\bheat/i.test(String(r.limits || ""));
         default:
@@ -10070,6 +10123,8 @@
           tell(t, "\u{1F573}\uFE0F The wheel sentenced you to " + mins + " minutes in the glory stalls" + (free ? ", " + free[0].replace("glory-", "stall ") : ". Find a free stall") + ". Strangers come more often on a punishment shift. Your safeword still works.");
           return "";
         }
+        case "bench":
+          return benchIn(t, Math.max(5, Math.min(CFG.BENCH_MAX_MIN, n || 20)), spinner, "the wheel") ? "" : null;
         case "leash": {
           state.leashes.set(t, by);
           const mins = Math.max(5, Math.min(120, n || 20));
@@ -10117,6 +10172,7 @@
           const r = rec(t);
           if (r.stocked) r.stocked = null;
           unpen(t, true);
+          unbench(t, "staff");
           saveLedger();
           return "";
         }
@@ -10151,6 +10207,466 @@
     function wheelAddAct(text) {
       const m = String(text).split(/\s*=>\s*/);
       return { text: m[0].trim(), act: m[1] ? m[1].trim().toLowerCase() : "" };
+    }
+    function benchSpots() {
+      return Object.entries(L.spots || {}).filter(([n]) => n === "bench" || /^bench-[a-z0-9]+$/.test(n));
+    }
+    function benchedNow(mn) {
+      const r = rec(mn);
+      return !!(r && r.benched && r.benched.until > Date.now());
+    }
+    function benchedHere() {
+      return Object.keys(L.people).map(Number).filter((m) => benchedNow(m) && onMap(m));
+    }
+    const BENCH_HOLES = { mouth: "mouth", vulva: "pussy", butt: "ass" };
+    function benchHole(w) {
+      w = String(w || "").toLowerCase();
+      if (/^(mouth|throat|oral|face)$/.test(w)) return "mouth";
+      if (/^(pussy|vulva|cunt|vagina)$/.test(w)) return "vulva";
+      if (/^(ass|butt|anus|anal|arse)$/.test(w)) return "butt";
+      return null;
+    }
+    function benchOpenHoles(mn) {
+      return HOLES.filter((h) => (h !== "vulva" || hasVulva(mn)) && !holeBlocked(mn, h));
+    }
+    function benchWhyNot(mn) {
+      const r = rec(mn);
+      if (!r || !r.roles || !r.roles.length) return plainName(mn) + " isn't on the farm's books, sugar.";
+      if (!r.benchOn) return plainName(mn) + " hasn't said ?bench on, so they can't be put on the bench.";
+      if (limitBlocks(mn, "breed")) return plainName(mn) + "'s limits rule the bench out.";
+      if (!onMap(mn)) return plainName(mn) + " needs to be here on the map for that, hon.";
+      if (benchedNow(mn)) return plainName(mn) + " is already on the bench.";
+      if (stockedNow(mn)) return plainName(mn) + " is in the stocks right now.";
+      if (!benchSpots().length) return "There's no bench set up yet, sugar. Stand on it and say ?spot set bench (bench-2, bench-3\u2026 for more).";
+      return null;
+    }
+    function benchLine(key, list) {
+      state.benchDecks = state.benchDecks || /* @__PURE__ */ new Map();
+      let d = state.benchDecks.get(key);
+      if (!d || !d.length) {
+        d = list.slice().sort(() => Math.random() - 0.5);
+        state.benchDecks.set(key, d);
+      }
+      return d.pop();
+    }
+    const benchFill = (t, v) => String(t).replace(/%t/g, v.t).replace(/%u/g, v.u || "").replace(/%ml/g, v.ml || "").replace(/%n/g, String(v.n || ""));
+    const BENCH_LINES = {
+      on: [
+        "%t is walked to the use bench, bent over the worn wood and strapped down at the waist and ankles, bottom up and open to anybody who wanders by.",
+        `The farm girl leads %t to the bench, pushes them down over it and buckles the straps tight. "Stay put, sugar. Folks'll be by."`,
+        "%t is laid face down over the use bench, wrists cuffed to the legs, knees spread wide by the bar. Everything's on offer now.",
+        "A farmhand drapes %t over the use bench and cinches the strap across their back. A fresh chalk board hangs from the end: zero, for now.",
+        "%t gets strapped over the bench in the middle of the yard, ass in the air, where every passin' animal can see and help themselves."
+      ],
+      mouth: [
+        "%u steps up to the head of the bench, takes a fistful of %t's hair and feeds their cock past those lips, usin' %t's mouth till they spill %ml down %t's throat.",
+        "%u tilts %t's chin up off the bench and fucks their face slow and deep, then holds them there and empties %ml onto their tongue.",
+        "%t's mouth is pried open and %u slides in, pumpin' till they groan and flood it with %ml. %t swallows what they can.",
+        "%u grabs the bench and uses %t's throat like it was built for it, then pulls back just enough to finish %ml across %t's tongue.",
+        "%u stands at the front of the bench and %t's mouth gets used, hard and messy, till %ml of warm cum is dribblin' down their chin."
+      ],
+      vulva: [
+        "%u steps up behind the bench, grips %t's hips and sinks into their pussy, pounding them against the wood till they bury it deep and pump %ml inside.",
+        "%u takes their turn on %t's pussy, slow at first, then rough enough to rattle the straps, and leaves %ml of seed packed deep in them.",
+        "%t's pussy is already slick when %u pushes in. They use it hard and finish deep, %ml of it, and %t can feel every pulse.",
+        "%u spreads %t open with their thumbs, slides in to the hilt and breeds them right there on the bench, %ml of thick seed left behind.",
+        "The bench creaks as %u ruts into %t's pussy from behind, grunting, then holds still and fills them with %ml."
+      ],
+      butt: [
+        "%u spits, lines up with %t's ass and works in inch by inch, then fucks them steady till they unload %ml deep inside.",
+        "%u grabs a handful of %t's ass, spreads it and takes it, rough and greedy, finishin' %ml deep in them.",
+        "%t's ass gets used next. %u pushes in to the root, rides them hard against the bench and leaves %ml behind.",
+        "%u takes %t's ass slow and deep, savouring it, till they shudder and pump %ml inside.",
+        "With a slap on the rump, %u sinks into %t's ass and doesn't stop till %ml is dripping back out of them."
+      ],
+      over: [
+        "%u uses %t's %h till they're close, then pulls out and paints %ml across %t's back.",
+        "%u takes their pleasure from %t's %h, then pulls free at the last second and spills %ml over %t's ass and thighs.",
+        "%u rides %t's %h hard, then pulls out and marks them, %ml splashed across the small of their back."
+      ],
+      dry: [
+        "%u steps up to the bench and has their way with %t's %h, hands and tongue and fingers, till %t is shaking in the straps.",
+        "%u takes a turn on %t's %h, slow and thorough, workin' them over till they're squirmin' against the wood.",
+        "%u leans over the bench and uses %t's %h however they like, and leaves them dripping and pantin'.",
+        "%u gives %t's %h a long, rough goin'-over, then pats their rump and steps aside for the next one."
+      ],
+      tally: [
+        "The farm girl chalks another line on the board hangin' off the bench: %n now, and the line's still growin'.",
+        "Another chalk mark goes up beside %t: %n so far. The board's fillin' up.",
+        "%n marks on the bench board now. %t can hear the chalk squeak every time."
+      ],
+      ambient: [
+        "The straps creak every time you shift on the bench. The wood is warm under your belly now.",
+        "Somebody walks past, slow, and you feel their eyes on everything you've got on show.",
+        "A breeze moves across your bare, spread skin. Nothing to do but wait for the next one.",
+        "You can hear the chalk board tap against the bench leg when you squirm.",
+        "Your thighs are sticky and your knees ache from the spreader bar. Still you wait, bottom up.",
+        "A farmhand gives your rump a slap in passing and laughs when you jump in the straps.",
+        "The yard keeps on around you, voices and hooves and the pump in the barn, and you stay right where you're put.",
+        "You catch yourself listening for footsteps, and you can't tell any more if you're dreadin' them or hopin'."
+      ],
+      back: [
+        '%t gets half a step off the bench before the farm girl catches the strap and buckles them right back down. "Nuh uh, sugar."',
+        "A farmhand hauls %t back over the bench and cinches the strap a notch tighter for tryin'.",
+        `"Where do you think you're goin'?" The farm girl walks %t back to the bench and bends them over it again.`
+      ],
+      off: [
+        "The straps come off and %t climbs stiffly off the use bench, used %n time%s, thighs sticky. The farm girl wipes the chalk board clean.",
+        '%t is unbuckled at last, %n marks on the board and legs wobbly. "Time served, sugar."',
+        "The farm girl frees %t from the bench and helps them up. %n uses chalked up, and they're wearin' every one of 'em."
+      ]
+    };
+    function benchWeek() {
+      const k = weekKey();
+      if (!L.benchBoard || L.benchBoard.week !== k) L.benchBoard = { week: k, n: {}, by: {} };
+      return L.benchBoard;
+    }
+    function benchIn(mn, mins, by, why) {
+      if (benchWhyNot(mn)) return null;
+      const r = rec(mn), spots = benchSpots();
+      const taken = (s2) => (W.ChatRoomCharacter || []).some((c) => c.MemberNumber !== mn && c.MapData && c.MapData.Pos && c.MapData.Pos.X === s2.X && c.MapData.Pos.Y === s2.Y);
+      const [name, s] = spots.find(([, s2]) => !taken(s2)) || spots[0];
+      if (r.penned) r.penned = null;
+      r.benched = { until: Date.now() + mins * 6e4, X: s.X, Y: s.Y, name, by: by || CFG.BOT_MEMBER, uses: 0, since: Date.now(), ambAt: Date.now() + (4 + Math.random() * 4) * 6e4 };
+      saveLedger();
+      audit(by || CFG.BOT_MEMBER, "BENCH", mn + " " + name + " " + mins + "m" + (why ? " (" + why + ")" : ""));
+      teleport(mn, { X: s.X, Y: s.Y }, true);
+      later(() => {
+        if (benchedNow(mn)) emote("\u{1FAB5} " + benchFill(benchLine("on", BENCH_LINES.on), { t: plainName(mn) }), mn);
+      }, 2500);
+      tell(mn, "\u{1FAB5} You're on the use bench for " + mins + " minutes, sugar" + (by && by !== CFG.BOT_MEMBER && by !== mn ? ", courtesy of " + plainName(by) : "") + ". Anybody standin' by can use you. Wander off and I'll strap you back down. Your safeword (or ?bench off) ends it right away.");
+      syncCompanions(true);
+      return name;
+    }
+    function unbench(mn, how) {
+      const r = rec(mn);
+      if (!r || !r.benched) return false;
+      const b = r.benched;
+      r.benched = null;
+      saveLedger();
+      audit(how === "staff" ? 0 : mn, "UNBENCH", mn + " " + how + " " + b.uses + " uses");
+      syncCompanions(true);
+      if (how === "safe") return true;
+      if (how === "time") {
+        if (onMap(mn)) emote("\u{1FAB5} " + benchFill(benchLine("off", BENCH_LINES.off), { t: plainName(mn), n: b.uses }).replace(/%s/g, b.uses === 1 ? "" : "s"), mn);
+        tell(mn, "\u{1FAB5} Time served, sugar. You were used " + b.uses + " time" + (b.uses === 1 ? "" : "s") + " on the bench. Go get cleaned up and have some water.");
+        later(() => earnRibbons(mn, 1, "servin' your time on the use bench"), 2e3);
+      } else if (how === "off") tell(mn, "\u{1FAB5} The straps are off, sugar. You're free, and nobody can put you on the bench till you say ?bench on again.");
+      else if (how === "staff") tell(mn, "\u{1FAB5} Staff let you up off the bench, sugar. You're free to go.");
+      return true;
+    }
+    function benchTick() {
+      const now = Date.now();
+      for (const [k, r] of Object.entries(L.people)) {
+        if (!r.benched) continue;
+        const mn = parseInt(k, 10), b = r.benched;
+        if (!r.benchOn || limitBlocks(mn, "breed")) {
+          unbench(mn, "off");
+          continue;
+        }
+        if (b.until <= now) {
+          unbench(mn, "time");
+          continue;
+        }
+        const C = charFor(mn), pos = C && C.MapData && C.MapData.Pos;
+        if (!pos || pos.X < 0) continue;
+        if (Math.max(Math.abs(pos.X - b.X), Math.abs(pos.Y - b.Y)) > 1) {
+          if (now - (b.pullAt || 0) < 3e4) continue;
+          b.pullAt = now;
+          saveLedger();
+          teleport(mn, { X: b.X, Y: b.Y }, true);
+          emote("\u{1FAB5} " + benchFill(benchLine("back", BENCH_LINES.back), { t: plainName(mn) }), mn);
+          continue;
+        }
+        if (now >= (b.ambAt || 0)) {
+          b.ambAt = now + (4 + Math.random() * 4) * 6e4;
+          privateLine(mn, benchLine("amb", BENCH_LINES.ambient), "emote");
+        }
+      }
+    }
+    function benchUse(sender, args, R) {
+      let t = null, holeArg = null;
+      for (const a of args) {
+        const h = benchHole(a);
+        if (h) {
+          holeArg = h;
+          continue;
+        }
+        const m = resolveTarget(a);
+        if (m && benchedNow(m)) t = m;
+      }
+      const near = (m) => {
+        const p = posOf(sender), q = posOf(m);
+        return p && q && Math.max(Math.abs(p.X - q.X), Math.abs(p.Y - q.Y)) <= 2;
+      };
+      if (!t) t = benchedHere().find(near) || null;
+      if (!t) {
+        R(benchedHere().length ? "Get right up to the bench first, sugar (within a couple of steps). ?bench shows who's on it." : "Nobody's on the use bench right now, sugar.");
+        return;
+      }
+      if (t === sender) {
+        R("You can't use yourself, sugar. Just wait. Somebody'll be along.");
+        return;
+      }
+      if (!rec(sender) || !(rec(sender).roles || []).length) {
+        R("You need to be on the farm's books to use the bench, sugar. ?apply gets you started.");
+        return;
+      }
+      if (!onMap(sender) || !near(t)) {
+        R("Get right up to " + plainName(t) + " on the bench first, sugar.");
+        return;
+      }
+      state.benchBusy = state.benchBusy || /* @__PURE__ */ new Map();
+      const last = state.benchBusy.get(t + ":" + sender) || 0;
+      if (Date.now() - last < CFG.BENCH_REUSE_SEC * 1e3) {
+        R("Give it a minute, sugar. Let somebody else have a turn.");
+        return;
+      }
+      const open = benchOpenHoles(t);
+      if (!open.length) {
+        R(plainName(t) + " is all covered up right now (gag, chastity, a plug), sugar.");
+        return;
+      }
+      const hole = holeArg || open[Math.floor(Math.random() * open.length)];
+      if (!open.includes(hole)) {
+        R("That one's closed off, sugar. Try " + open.map((h) => BENCH_HOLES[h]).join(" or ") + ".");
+        return;
+      }
+      const sp = prodOf(sender), tp = prodOf(t), rt = rec(t);
+      if (makesSemen(sender) && holeBlocked(sender, "penis")) {
+        R("You're locked up, sugar. Can't use the bench like that.");
+        return;
+      }
+      state.benchBusy.set(t + ":" + sender, Date.now());
+      let load = 0, pent = false;
+      if (makesSemen(sender) && sp && !(sp.deniedUntil > Date.now())) {
+        pent = !!sp.pentUp;
+        load = pent ? sp.semen * CFG.PENTUP_LOAD_X : Math.max(sp.semen * CFG.PROD.LOAD_SHARE, Math.min(sp.semen, CFG.PROD.MIN_LOAD));
+        if (load < 1) load = 0;
+        else {
+          sp.semen = pent ? 0 : sp.semen - Math.min(sp.semen, load);
+          if (pent) {
+            sp.pentUp = false;
+            sp.semenFullSince = 0;
+          }
+          sp.totals.given = (sp.totals.given || 0) + load;
+        }
+      }
+      const inside = load >= 1 && (hole === "mouth" || !!rt.breedable);
+      const vars = { t: plainName(t), u: plainName(sender), ml: ml(load) };
+      let line;
+      if (!load) line = benchLine("dry", BENCH_LINES.dry).replace(/%h/g, BENCH_HOLES[hole]);
+      else if (!inside) line = benchLine("over", BENCH_LINES.over).replace(/%h/g, BENCH_HOLES[hole]);
+      else line = benchLine(hole, BENCH_LINES[hole]);
+      if (pent && load) line += " Pent up as %u was, it just kept comin'.";
+      let caught = null;
+      if (inside) {
+        const kept = Math.min(load, Math.max(0, capacity(t) - heldTotal(tp)));
+        tp.held[hole] = (tp.held[hole] || 0) + kept;
+        tp.totals.received = (tp.totals.received || 0) + kept;
+        tp.lastStud = sender;
+        lscgSplatAt(t, HOLE_SPLAT[hole] || ["ItemVulva"], plainName(sender));
+        if (hole === "mouth") tp.milk = Math.min(milkCap(t), tp.milk + kept * CFG.PROD.SWALLOW_TO_MILK);
+        if (hole === "vulva") {
+          sp.totals.covers = (sp.totals.covers || 0) + 1;
+          tp.lastFill = { at: Date.now(), stud: sender, ml: kept };
+          if (rt.fertile && !limitBlocks(t, "breed")) caught = rollConception(t, sender, kept, pent ? CFG.PENTUP_FERT_X : 1);
+          if (caught) {
+            sp.totals.conceived = (sp.totals.conceived || 0) + 1;
+            rollBoard();
+            const Y = L.yield;
+            Y.s = Y.s || {};
+            Y.s[sender] = (Y.s[sender] || 0) + 1;
+          }
+        }
+        addonsEmit("bred", sender, t, hole, load, caught);
+      } else if (load) paintOn(t, hole === "mouth" ? "face" : "back", sender);
+      tally(t);
+      const b = rt.benched;
+      b.uses++;
+      const W0 = benchWeek();
+      W0.n[t] = (W0.n[t] || 0) + 1;
+      W0.by[sender] = (W0.by[sender] || 0) + 1;
+      saveLedger();
+      audit(sender, "BENCH_USE", t + " " + hole + (load ? " " + Math.round(load) + "mL" : ""));
+      emote("\u{1FAB5} " + benchFill(line, vars), t, [sender]);
+      face(t, inside ? "bred" : "afterglow", 40);
+      sound(t, "wet");
+      if (b.uses % 3 === 0) later(() => {
+        if (benchedNow(t)) emote("\u{1FAB5} " + benchFill(benchLine("tally", BENCH_LINES.tally), { t: plainName(t), n: b.uses }), t);
+      }, 4e3);
+      if (caught === "new") later(() => tell(t, "\u{1F37C} A warm, heavy feelin' settles low in your belly, sugar. Somethin' from the bench took. (?stats shows it)"), 2e4);
+    }
+    function benchText(mn) {
+      const r = rec(mn), here = Object.keys(L.people).map(Number).filter(benchedNow);
+      const list = here.length ? here.map((m) => "\u2022 " + plainName(m) + ": " + rec(m).benched.uses + " use" + (rec(m).benched.uses === 1 ? "" : "s") + ", " + Math.max(1, Math.ceil((rec(m).benched.until - Date.now()) / 6e4)) + " min left").join("\n") : "Nobody's on it right now.";
+      const mine = r && r.benched ? "\nYou're on it: " + r.benched.uses + " use" + (r.benched.uses === 1 ? "" : "s") + " so far, " + Math.max(1, Math.ceil((r.benched.until - Date.now()) / 6e4)) + " minutes to go." : "";
+      return "\u{1FAB5} THE USE BENCH\n" + list + mine + "\n\nYou're " + (r && r.benchOn ? "ON" : "off") + " for it (?bench on|off). Stand by somebody on it and ?use [mouth|pussy|ass]. ?bench top for the week.";
+    }
+    function benchTopText() {
+      const B = benchWeek();
+      const top = (o) => Object.entries(o).sort((a, b) => b[1] - a[1]).slice(0, 5).map(([m, n], i) => "  " + (i + 1) + ". " + plainName(parseInt(m, 10)) + ": " + n).join("\n") || "  (nobody yet)";
+      return "\u{1FAB5} THE BENCH THIS WEEK\nMost used\n" + top(B.n) + "\n\nBusiest users\n" + top(B.by);
+    }
+    function benchBoardLine() {
+      const B = benchWeek(), top = Object.entries(B.n).sort((a, b) => b[1] - a[1])[0];
+      const now = Object.keys(L.people).map(Number).filter(benchedNow);
+      if (!top && !now.length) return "";
+      return "\n\n\u{1FAB5} Use bench" + (top ? ": most used this week, " + plainName(parseInt(top[0], 10)) + " (" + top[1] + ")" : "") + (now.length ? (top ? " \xB7 " : ": ") + "on it now, " + now.map((m) => plainName(m) + " (" + rec(m).benched.uses + ")").join(", ") : "");
+    }
+    function benchCommand(cmd, sender, args, R) {
+      if (cmd === "use") {
+        benchUse(sender, args, R);
+        return;
+      }
+      const r = rec(sender), sub = String(args[0] || "").toLowerCase();
+      if (cmd === "unbench") {
+        if (!isStaff(sender)) {
+          R("Only staff let somebody off the bench early, sugar. Your safeword always works for yourself.");
+          return;
+        }
+        const t2 = resolveTarget(args[0]);
+        if (!t2 || !unbench(t2, "staff")) {
+          R("They're not on the bench, hon. ?unbench <who>");
+          return;
+        }
+        R("\u{1FAB5} Let " + plainName(t2) + " up off the bench.");
+        return;
+      }
+      if (sub === "on" || sub === "off") {
+        if (!r || !r.roles || !r.roles.length) {
+          R("The bench is for folks on the books, sugar.");
+          return;
+        }
+        r.benchOn = sub === "on";
+        saveLedger();
+        syncCompanions(true);
+        if (sub === "off" && r.benched) {
+          unbench(sender, "off");
+          R("\u{1FAB5} Bench off. You're unstrapped right now, and nobody can put you back.");
+          return;
+        }
+        R(r.benchOn ? "\u{1FAB5} Use bench ON. Staff and the wheel can sentence you to time on the bench, where anybody can use you. Your limits, your gear and ?breedable still count, and your safeword ends it at once. ?bench off any time." : "\u{1FAB5} Use bench off. Nobody can put you on it.");
+        return;
+      }
+      if (sub === "top" || sub === "board") {
+        R(benchTopText());
+        return;
+      }
+      if (!sub) {
+        R(benchText(sender));
+        return;
+      }
+      let t, minArg;
+      if (sub === "me" || sub === "myself") {
+        t = sender;
+        minArg = args[1];
+      } else {
+        if (!isStaff(sender)) {
+          R("Only staff put somebody on the bench, sugar (the wheel does too). You can volunteer: ?bench me 30.");
+          return;
+        }
+        t = resolveTarget(args[0]);
+        minArg = args[1];
+      }
+      if (!t || !rec(t)) {
+        R("Who's goin' on the bench, sugar? ?bench <who> [minutes, 5-120]");
+        return;
+      }
+      const mins = Math.max(5, Math.min(CFG.BENCH_MAX_MIN, parseInt(minArg, 10) || 30));
+      const why = benchWhyNot(t);
+      if (why) {
+        R(t === sender ? why.replace(plainName(t) + " hasn't said", "You haven't said").replace(plainName(t) + " needs", "You need").replace(plainName(t) + " is already", "You're already").replace(plainName(t) + "'s limits", "Your limits") : why);
+        return;
+      }
+      benchIn(t, mins, sender, t === sender ? "volunteered" : "staff");
+      R(t === sender ? "\u{1FAB5} Strappin' you in for " + mins + " minutes, sugar." : "\u{1FAB5} " + plainName(t) + " is on the use bench for " + mins + " minutes.");
+    }
+    function awayText(mn, since) {
+      const r = rec(mn), out = [];
+      const book = (L.studbook || []).filter((e) => e.t >= since);
+      for (const e of book.slice(-5)) {
+        const n = e.eggs || e.kids.male + e.kids.female + e.kids.futa;
+        out.push("\u{1F37C} " + plainName(e.dam) + " dropped " + n + (e.eggs ? " eggs" : "") + ", bred by " + e.sires.map((s) => s > 0 ? plainName(s) : "a stranger").join(" & ") + (e.dam === mn ? ". That's you, sugar!" : "."));
+      }
+      if (book.length > 5) out.push("\u{1F37C} \u2026and " + (book.length - 5) + " more litters.");
+      const rl = (L.ribbonLog || []).filter((e) => e.mn === mn && e.at >= since);
+      const won = rl.filter((e) => e.n > 0).reduce((a, e) => a + e.n, 0), lost = -rl.filter((e) => e.n < 0).reduce((a, e) => a + e.n, 0);
+      if (won || lost) out.push("\u{1F380} " + (won ? "+" + won + " ribbons" : "") + (won && lost ? ", " : "") + (lost ? lost + " spent or fined" : "") + ". You've got " + (r.ribbons || 0) + ".");
+      const season = L.mods && L.mods.breeding && L.mods.breeding.week;
+      if (season && season.bred && season.bred[mn]) out.push("\u{1F525} You've been bred " + season.bred[mn] + " time" + (season.bred[mn] === 1 ? "" : "s") + " this breedin' season.");
+      const B = L.benchBoard;
+      if (B && B.n && B.n[mn]) out.push("\u{1FAB5} Used " + B.n[mn] + " time" + (B.n[mn] === 1 ? "" : "s") + " on the bench this week.");
+      if (!out.length) return null;
+      const h = Math.round((Date.now() - since) / 36e5);
+      return "\u{1F319} WHILE YOU WERE GONE (" + (h >= 48 ? Math.round(h / 24) + " days" : h + " hours") + ")\n" + out.join("\n");
+    }
+    function welcomeBack(mn) {
+      const r = rec(mn);
+      if (!r || !r.roles || !r.roles.length) return;
+      const since = r.leftAt;
+      r.leftAt = 0;
+      if (!since || Date.now() - since < CFG.AWAY_H * 36e5) return;
+      later(() => {
+        if (!onMap(mn) && !charFor(mn)) return;
+        const t = awayText(mn, since);
+        if (!t) return;
+        if (hasCompanion(mn)) toCompanion(mn, t, "notice");
+        else tell(mn, t);
+      }, 12e3);
+    }
+    function markLeft(mn) {
+      const r = rec(mn);
+      if (r && r.roles && r.roles.length) {
+        r.leftAt = Date.now();
+        saveLedger();
+      }
+    }
+    function lingerTick() {
+      const now = Date.now();
+      state.arrivedAt = state.arrivedAt || /* @__PURE__ */ new Map();
+      for (const c of W.ChatRoomCharacter || []) {
+        const mn = c.MemberNumber;
+        if (mn === CFG.BOT_MEMBER) continue;
+        if (!state.arrivedAt.has(mn)) state.arrivedAt.set(mn, now);
+        const at = state.arrivedAt.get(mn), r = rec(mn);
+        if (now - at < CFG.LINGER_MIN * 6e4 || r && r.roles && r.roles.length) continue;
+        L.nudged = L.nudged || {};
+        if (now - (L.nudged[mn] || 0) < 7 * 864e5) continue;
+        const said = state.lastCmd && state.lastCmd.get(mn);
+        if (said && said.at >= at || state.sessions.has(mn) || (L.applications || []).some((a) => a.mn === mn)) {
+          L.nudged[mn] = now;
+          continue;
+        }
+        L.nudged[mn] = now;
+        saveLedger();
+        whisper(mn, pickFresh("linger", [
+          "Still just lookin', " + plainName(mn) + "? Say ?tour and I'll walk you round: the milkin' stalls, the breedin' pens, the bench. Or ?apply when you want a collar of your own.",
+          "You've been eyein' the stock a while, sugar. ?tour shows you everything we do to 'em, and ?apply puts you on the books.",
+          "Like what you see, " + plainName(mn) + "? ?tour for the whole farm, udders and all. ?apply when you're ready to be one of ours."
+        ]));
+      }
+      for (const mn of [...state.arrivedAt.keys()]) if (!charFor(mn)) state.arrivedAt.delete(mn);
+    }
+    function rightNow(mn) {
+      const r = rec(mn), p = prodOf(mn), now = Date.now(), out = [];
+      if (!r || !p) return out;
+      if (r.benched && r.benched.until > now) out.push({ icon: "\u{1FAB5}", text: "On the bench \xB7 " + r.benched.uses + " used you", until: r.benched.until });
+      if (r.penned && r.penned.until > now) out.push({ icon: "\u{1F6A7}", text: "Penned", until: r.penned.until });
+      if (r.stocked && r.stocked.until > now) out.push({ icon: "\u26D3\uFE0F", text: "In the stocks", until: r.stocked.until });
+      if (p.stall && p.stall.until) out.push({ icon: "\u{1F95B}", text: "In the milkin' stall", until: p.stall.until });
+      if (inHeat(p)) out.push({ icon: "\u{1F525}", text: "In heat", until: p.heat.until });
+      if (p.deniedUntil > now) out.push({ icon: "\u{1F6AB}", text: "Denied", until: p.deniedUntil });
+      if (p.milkDeniedUntil > now) out.push({ icon: "\u{1F6AB}", text: "Teats capped", until: p.milkDeniedUntil });
+      if (p.pentUp) out.push({ icon: "\u{1F624}", text: "Pent up" });
+      if (r.dare && r.dare.until > now) out.push({ icon: "\u{1F3B2}", text: "Dare", until: r.dare.until });
+      for (const f of activePotions(mn)) out.push({ icon: "\u{1F9EA}", text: (potionDef(f.id) || {}).name || f.id, until: f.until });
+      if (p.tieUntil > now) out.push({ icon: "\u{1F512}", text: "Knotted", until: p.tieUntil });
+      return out.map((x) => Object.assign(x, x.until ? { until: Math.ceil(x.until / 6e4) * 6e4 } : {}));
+    }
+    function benchHereFor(mn) {
+      if (!rec(mn) || !(rec(mn).roles || []).length) return [];
+      return benchedHere().filter((m) => m !== mn).map((m) => ({ mn: m, name: plainName(m), uses: rec(m).benched.uses, holes: benchOpenHoles(m) }));
     }
     function clockedIn(mn) {
       const r = rec(mn);
@@ -10623,7 +11139,16 @@ POTIONS wear off. ?potions lists them all.
 
 DARES \xB7 ?dares on
   A dare to do in 30 minutes. ?dared when it's done (on your
-  honor) \xB7 ?dare skip to chicken out (a ribbon).`,
+  honor) \xB7 ?dare skip to chicken out (a ribbon).
+
+THE USE BENCH \xB7 ?bench on
+  Staff and the wheel can strap you over the use bench for a
+  while, out in the open, and anybody standin' by can use you.
+  ?bench me 30 \xB7 volunteer \xB7 ?bench \xB7 who's on it
+  ?use [mouth|pussy|ass] \xB7 stand by them first
+  ?bench top \xB7 the week's tally (it's on the ?board too)
+  Your limits, your gear and ?breedable still count.
+  Your safeword (or ?bench off) ends it at once.`,
       fair: `\u{1F3AA} THE COUNTY FAIR \u{1F3AA}
 
 COMMANDS
@@ -10780,11 +11305,12 @@ THE PRIZE WHEEL
   ?wheel add reward|punish|silly <text> [=> action]
      the action makes it happen: stocks 20 \xB7 pen 30 \xB7 milkstall 30 \xB7
      glory 30 \xB7 leash 20 \xB7 denial 2 \xB7 potion hiccup \xB7 dare reckless \xB7
-     ribbons 3 \xB7 fine 2 \xB7 luxury 1 \xB7 grace \xB7 heat \xB7 release
+     ribbons 3 \xB7 fine 2 \xB7 luxury 1 \xB7 grace \xB7 heat \xB7 release \xB7
+     bench 20
      e.g. ?wheel add punish Off to the pen, %name% => pen 30
   ?wheel remove <n> \xB7 ?wheel farm on|off (the farm's own slices)
   ?spin <who> [reward|punish|silly|lucky] \xB7 skips anything against
-     their limits or their switches (?potions, ?dares, ?glory)
+     their limits or their switches (?potions, ?dares, ?glory, ?bench)
 
 RIBBONS, POTIONS, DARES, THE CORRAL
   ?ribbon give <who> <n> [why] \xB7 ?ribbon fine <who> <n> [why]
@@ -10793,6 +11319,9 @@ RIBBONS, POTIONS, DARES, THE CORRAL
   ?dare <who> [reckless] [your own dare]
   ?corral <who> [minutes] [milking|spot] \xB7 ?uncorral <who>
      corral spots: ?spot set pen (pen-2, pen-3\u2026)
+  ?bench <who> [minutes, 5-120] \xB7 ?unbench <who>
+     only for people who said ?bench on \xB7 bench spots:
+     ?spot set bench (bench-2, bench-3\u2026)
   ?store approve|reject <who> \xB7 a bought greetin'
 
 BEGGIN'
@@ -10867,6 +11396,7 @@ UPKEEP
       potions: "ribbons",
       dares: "ribbons",
       dare: "ribbons",
+      bench: "ribbons",
       new: "start",
       rules: "start",
       key: "keys",
@@ -11469,7 +11999,7 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
       return null;
     }
     function nearestCommand(cmd, sender) {
-      const pool = PUBLIC_CMDS.concat(isStaff(sender) ? STAFF_CMDS : [], [...ADDON_CMDS.keys()]);
+      const pool = PUBLIC_CMDS.concat(isStaff(sender) ? STAFF_CMDS : [], [...ADDON_CMDS].filter(([, x]) => addonVisible(x.addon, sender)).map(([w]) => w));
       const strip = cmd.replace(/^[a-z][-.]/, "");
       if (strip !== cmd && pool.includes(strip)) return strip;
       if (cmd.length < 4) return null;
@@ -11596,7 +12126,9 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
       "potion",
       "dares",
       "dare",
-      "dared"
+      "dared",
+      "bench",
+      "use"
     ];
     const STAFF_CMDS = [
       "queue",
@@ -11679,7 +12211,8 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
       "machine",
       "edit",
       "corral",
-      "uncorral"
+      "uncorral",
+      "unbench"
     ];
     const SAFETY_CMDS = ["safe", "safeword", "red", "stuck"];
     const PRIVATE_REPLY = [
@@ -11803,6 +12336,9 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
       if (oncall.length) o += "\n\n\u{1F517} On call, away: " + oncall.length + " \u2014 ?summon to fetch 'em, sugar";
       return o;
     }
+    function switchStatus(cmd, on) {
+      return "\u{1F518} ?" + cmd + " is " + (on ? "ON" : "off") + " for you, sugar. ?" + cmd + " " + (on ? "off" : "on") + " to change it.";
+    }
     function handleCommand(sender, raw, channel, fromQueue) {
       if (!fromQueue) {
         state.lastCmd = state.lastCmd || /* @__PURE__ */ new Map();
@@ -11879,7 +12415,9 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
         return;
       }
       let { cmd, args, rest } = p;
+      if (cmd === "me" && !args.length) cmd = "record";
       let addonCmd = ADDON_CMDS.get(cmd) || null;
+      if (addonCmd && !addonVisible(addonCmd.addon, sender)) addonCmd = null;
       if (!PUBLIC_CMDS.includes(cmd) && !STAFF_CMDS.includes(cmd) && !addonCmd) {
         if (guideTopic(cmd)) {
           args = [cmd];
@@ -12649,10 +13187,14 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
           }
           const v = String(args[0] || "").toLowerCase();
           if (v && !["on", "off", "yes", "no"].includes(v)) {
-            R("Just say ?jarok on or ?jarok off, sweetie. Leave it blank and it flips.");
+            R("Just say ?jarok on or ?jarok off, sweetie.");
             break;
           }
-          const on = v ? v === "on" || v === "yes" : r.jarok === false;
+          if (!v) {
+            R(switchStatus("jarok", r.jarok !== false));
+            break;
+          }
+          const on = v === "on" || v === "yes";
           if (on && limitBlocks(sender, "breed")) {
             R("Your hard limits rule that out, sugar, so I'll keep it off. If you want it, change your limits with staff first.");
             break;
@@ -13360,6 +13902,11 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
         case "safe":
         case "safeword":
         case "red": {
+          try {
+            unbench(sender, "safe");
+          } catch (e) {
+            warn("safeword bench:", e);
+          }
           say("\u{1F534} PAUSE CALLED. Everything stops, right now, everybody.", true, sender);
           beep(sender, "I've got you, " + plainName(sender) + ". Everything's stopped and I'm fetchin' somebody for you right now. You don't owe anybody an explanation. \u{1F534}", true);
           notifyStaff("\u{1F534} SAFEWORD from " + plainName(sender) + " (" + sender + "). Please go to them now.", false);
@@ -13872,6 +14419,11 @@ Welcome to B&B Farm, hon. \u{1F33E}`
         case "uncorral":
           penCommand(cmd === "corral" ? "pen" : "unpen", sender, args, R);
           break;
+        case "bench":
+        case "unbench":
+        case "use":
+          benchCommand(cmd, sender, args, R);
+          break;
         case "edit": {
           if (!isProprietor(sender)) {
             R("Sorry, sugar, that one's just for the proprietors.");
@@ -14292,10 +14844,14 @@ Welcome to B&B Farm, hon. \u{1F33E}`
           }
           const v = String(args[0] || "").toLowerCase();
           if (v && !["on", "off", "yes", "no"].includes(v)) {
-            R("Just say ?milkable on or ?milkable off, sweetie. Leave it blank and it flips.");
+            R("Just say ?milkable on or ?milkable off, sweetie.");
             break;
           }
-          const now = v ? v === "on" || v === "yes" : !makesMilk(sender);
+          if (!v) {
+            R(switchStatus("milkable", makesMilk(sender)));
+            break;
+          }
+          const now = v === "on" || v === "yes";
           if (now && limitBlocks(sender, "milk")) {
             R("Your hard limits rule that out, sugar, so I'll keep it off. If you want it, change your limits with staff first.");
             break;
@@ -14352,10 +14908,14 @@ Welcome to B&B Farm, hon. \u{1F33E}`
           }
           const v = String(args[0] || "").toLowerCase();
           if (v && !["on", "off", "yes", "no"].includes(v)) {
-            R("Just say ?futa on or ?futa off, sweetie. Leave it blank and it flips.");
+            R("Just say ?futa on or ?futa off, sweetie.");
             break;
           }
-          const on = v ? v === "on" || v === "yes" : !r.futa;
+          if (!v) {
+            R(switchStatus("futa", !!r.futa));
+            break;
+          }
+          const on = v === "on" || v === "yes";
           if (on && limitBlocks(sender, "futa")) {
             R("Your hard limits rule that out, sugar, so I'll keep it off. If you want it, change your limits with staff first.");
             break;
@@ -14465,10 +15025,14 @@ Welcome to B&B Farm, hon. \u{1F33E}`
           }
           const v = String(args[0] || "").toLowerCase();
           if (v && !["on", "off", "yes", "no"].includes(v)) {
-            R("Just say ?" + cmd + " on or ?" + cmd + " off, sweetie. Leave it blank and it flips.");
+            R("Just say ?" + cmd + " on or ?" + cmd + " off, sweetie.");
             break;
           }
-          const on = v ? v === "on" || v === "yes" : !r[cmd];
+          if (!v) {
+            R(switchStatus(cmd, !!r[cmd]));
+            break;
+          }
+          const on = v === "on" || v === "yes";
           if (on && (limitBlocks(sender) || cmd === "eggs" && limitBlocks(sender, "eggs"))) {
             R("Your hard limits rule that out, sugar, so I'll keep it off.");
             break;
@@ -14569,7 +15133,11 @@ Welcome to B&B Farm, hon. \u{1F33E}`
             break;
           }
           const key = cmd === "praise" ? "praiseMe" : "degradeMe";
-          const on = v ? v === "on" || v === "yes" : !r[key];
+          if (!v) {
+            R(switchStatus(cmd, !!r[key]));
+            break;
+          }
+          const on = v === "on" || v === "yes";
           if (on && cmd === "degrade" && /\\b(degrad\\w*|humiliat\\w*|name.?call\\w*|insult\\w*)\\b/i.test(r.limits || "")) {
             R("Your hard limits rule that out, sugar.");
             break;
@@ -14591,6 +15159,13 @@ Welcome to B&B Farm, hon. \u{1F33E}`
           if (!p2 || !paintedText(t)) {
             R((t === sender ? "You're" : plainName(t) + " is") + " clean as a whistle, sugar.");
             break;
+          }
+          if (t === sender) {
+            const no = addonVeto("wash", t);
+            if (no) {
+              R(no);
+              break;
+            }
           }
           const was = paintedText(t);
           p2.painted = null;
@@ -14722,10 +15297,14 @@ Welcome to B&B Farm, hon. \u{1F33E}`
           const field = cmd === "naturalheat" ? "naturalHeat" : cmd;
           const v = String(args[0] || "").toLowerCase();
           if (v && !["on", "off", "yes", "no"].includes(v)) {
-            R("Just say ?" + cmd + " on or ?" + cmd + " off, sweetie. Leave it blank and it flips. For example: ?" + cmd + " on");
+            R("Just say ?" + cmd + " on or ?" + cmd + " off, sweetie. For example: ?" + cmd + " on");
             break;
           }
-          const on = v ? v === "on" || v === "yes" : !r[field];
+          if (!v) {
+            R(switchStatus(cmd, !!r[field]));
+            break;
+          }
+          const on = v === "on" || v === "yes";
           if (on && limitBlocks(sender, field === "naturalHeat" ? "heat" : "breed")) {
             R("Your hard limits rule that out, sugar, so I'll keep it off. If you want it, change your limits with staff first.");
             break;
@@ -14734,7 +15313,7 @@ Welcome to B&B Farm, hon. \u{1F33E}`
           if (field === "naturalHeat" && on) prodOf(sender).nextHeatAt = Date.now() + CFG.PROD.NATURAL_HEAT_EVERY_D * 864e5;
           saveLedger();
           audit(sender, field.toUpperCase(), on ? "on" : "off");
-          R({ breedable: "Breedable", fertile: "Fertile (can catch)", naturalHeat: "Natural heat every " + CFG.PROD.NATURAL_HEAT_EVERY_D + " days" }[field] + ": " + (on ? "ON" : "off") + ". Say ?" + cmd + " on or ?" + cmd + " off any time to set it, hon; plain ?" + cmd + " flips it.");
+          R({ breedable: "Breedable", fertile: "Fertile (can catch)", naturalHeat: "Natural heat every " + CFG.PROD.NATURAL_HEAT_EVERY_D + " days" }[field] + ": " + (on ? "ON" : "off") + ". Say ?" + cmd + " on or ?" + cmd + " off any time to set it, hon.");
           break;
         }
         case "breed": {
@@ -14874,7 +15453,7 @@ Welcome to B&B Farm, hon. \u{1F33E}`
           const top = (o) => Object.entries(o).sort((a, b) => b[1] - a[1]).slice(0, 5).map(([m, v], i) => "  " + (i + 1) + ". " + plainName(parseInt(m, 10)) + " \u2014 " + ml(v) + " (grade " + milkGrade(parseInt(m, 10)) + ")").join("\n") || "  (nobody yet)";
           const sires = Object.entries(L.yield.s || {}).sort((a, b) => b[1] - a[1]).slice(0, 5).map(([m, n], i) => "  " + (i + 1) + ". " + plainName(parseInt(m, 10)) + " \u2014 " + n + " caught").join("\n") || "  (nobody yet)";
           const dump = Object.entries(L.yield.u || {}).sort((a, b) => b[1] - a[1])[0];
-          R("\u{1F95B} YIELD BOARD\n\nToday\n" + top(L.yield.d) + "\n\nThis week (top goes prize)\n" + top(L.yield.w) + "\n\n\u{1F402} Top sires this week\n" + sires + (dump ? "\n\n\u{1FAA3} Farm cumdump of the day: " + plainName(parseInt(dump[0], 10)) + " (" + dump[1] + " times)" : ""));
+          R("\u{1F95B} YIELD BOARD\n\nToday\n" + top(L.yield.d) + "\n\nThis week (top goes prize)\n" + top(L.yield.w) + "\n\n\u{1F402} Top sires this week\n" + sires + (dump ? "\n\n\u{1FAA3} Farm cumdump of the day: " + plainName(parseInt(dump[0], 10)) + " (" + dump[1] + " times)" : "") + benchBoardLine());
           break;
         }
         case "pedigree": {
@@ -14953,7 +15532,7 @@ Welcome to B&B Farm, hon. \u{1F33E}`
           const key = cmd === "feeding" ? "feedingOn" : "curfewOn";
           const v = String(args[0] || "").toLowerCase();
           if (v && !["on", "off"].includes(v)) {
-            R("Just say ?" + cmd + " on or ?" + cmd + " off, sugar. Leave it blank and it flips. For example: ?" + cmd + " off");
+            R("Just say ?" + cmd + " on or ?" + cmd + " off, sugar. For example: ?" + cmd + " off");
             break;
           }
           L.life[key] = v ? v === "on" : !L.life[key];
@@ -15185,8 +15764,8 @@ Welcome to B&B Farm, hon. \u{1F33E}`
               R("Say whether it's a reward, punish or silly slice, sugar, then the words. ?wheel add reward <text> (%name% becomes their name). Add => and an action to make it happen: ?wheel add punish Off to the pen, %name% => pen 30. Actions: stocks <min> \xB7 pen <min> \xB7 milkstall <min> \xB7 glory <min> \xB7 leash <min> \xB7 denial <hours> \xB7 potion <name> \xB7 dare [reckless] \xB7 ribbons <n> \xB7 fine <n> \xB7 luxury <hours> \xB7 grace \xB7 heat");
               break;
             }
-            if (act && runAct.length && !["stocks", "pen", "milkstall", "glory", "leash", "denial", "potion", "dare", "ribbons", "fine", "luxury", "grace", "heat", "release"].includes(act.split(/\s+/)[0])) {
-              R("I don't know that action, sugar. Actions: stocks \xB7 pen \xB7 milkstall \xB7 glory \xB7 leash \xB7 denial \xB7 potion \xB7 dare \xB7 ribbons \xB7 fine \xB7 luxury \xB7 grace \xB7 heat \xB7 release");
+            if (act && runAct.length && !["stocks", "pen", "milkstall", "glory", "bench", "leash", "denial", "potion", "dare", "ribbons", "fine", "luxury", "grace", "heat", "release"].includes(act.split(/\s+/)[0])) {
+              R("I don't know that action, sugar. Actions: stocks \xB7 pen \xB7 milkstall \xB7 glory \xB7 bench \xB7 leash \xB7 denial \xB7 potion \xB7 dare \xB7 ribbons \xB7 fine \xB7 luxury \xB7 grace \xB7 heat \xB7 release");
               break;
             }
             if (act && act.startsWith("potion") && !potionDef(act.split(/\s+/)[1])) {
@@ -15596,6 +16175,7 @@ Welcome to B&B Farm, hon. \u{1F33E}`
           state.lastHealthy = Date.now();
           greet(mn);
           onArrive(mn);
+          welcomeBack(mn);
           later(() => deliverMail(mn), 8e3);
           addonsEmit("join", mn);
           if (CFG.KEY_SYNC_ON_JOIN) later(() => syncKeys(mn, true), CFG.KEY_JOIN_DELAY_MS);
@@ -15606,7 +16186,10 @@ Welcome to B&B Farm, hon. \u{1F33E}`
       });
       on("ChatRoomSyncMemberLeave", (data) => {
         try {
-          if (data && data.SourceMemberNumber) addonsEmit("leave", data.SourceMemberNumber);
+          if (data && data.SourceMemberNumber) {
+            markLeft(data.SourceMemberNumber);
+            addonsEmit("leave", data.SourceMemberNumber);
+          }
         } catch (e) {
           warn("leave:", e);
         }
@@ -15731,6 +16314,8 @@ Welcome to B&B Farm, hon. \u{1F33E}`
         potionTick();
         dareTick();
         penTick();
+        benchTick();
+        lingerTick();
         workTick();
         if (Date.now() - (state.wlTick || 0) > 5 * 6e4) {
           state.wlTick = Date.now();

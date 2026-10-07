@@ -8,7 +8,7 @@
   // ledger field → the command that flips it
   const SWITCH_CMDS = { breedable:"breedable", fertile:"fertile", jarok:"jarok", freeuse:"freeuse", futa:"futa",
                         milkable:"milkable", naturalHeat:"naturalheat", praiseMe:"praise", degradeMe:"degrade",
-                        tally:"tally", teaseOptIn:"teaseme", forced:"forced", hypno:"hypno", potionsOn:"potions", daresOn:"dares" };
+                        tally:"tally", teaseOptIn:"teaseme", forced:"forced", hypno:"hypno", potionsOn:"potions", daresOn:"dares", benchOn:"bench" };
   // staff lookups about somebody else go to the Companion's Office tab
   const DOC_CMDS = ["record","stats","vet","quota","keys","size","measure","pedigree"];
 
@@ -53,6 +53,8 @@
       s.fx = activePotions(mn).map(f => ({ id: f.id, name: (potionDef(f.id) || {}).name || f.id, until: Math.ceil(f.until/60000)*60000 }));
       if (r.dare) s.dare = { text: r.dare.text, until: r.dare.until, reckless: !!r.dare.reckless };
       if (r.penned) s.penned = { until: r.penned.until, at: r.penned.name };
+      s.now = rightNow(mn);                 // the "right now" strip (10p-lookout.js)
+      const bh = benchHereFor(mn); if (bh.length) s.benchHere = bh;   // tap-to-use bench buttons
       s.at = now;
       if (isStaff(mn)) Object.assign(s, staffStateFor(mn));
       const mods = addonStateFor(mn); if (mods) s.mods = mods;
@@ -72,7 +74,7 @@
     out.herd = here.slice(0, 40).map(m => {
       const r = rec(m), p = prodOf(m);
       return { mn: m, name: plainName(m), role: (r.roles[0]||"").toLowerCase(), where: whereName(m) || "",
-               milk: makesMilk(m) ? Math.round(100*p.milk/Math.max(1, milkCap(m))) : null, heat: inHeat(p), preg: !!p.preg,
+               milk: makesMilk(m) ? Math.round(100*p.milk/Math.max(1, milkCap(m))) : null, heat: inHeat(p) && !p.heat.quiet, preg: !!p.preg,
                denied: milkDenied(m), mine: herdLeaderOf(m) === mn, onDuty: r.onDuty !== false };
     });
     const r = rec(mn), wk = weekKey(), week = (r.shift && r.shift.week && r.shift.week.key === wk) ? r.shift.week.ms : 0;

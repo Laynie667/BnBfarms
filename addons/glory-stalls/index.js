@@ -140,11 +140,14 @@ function finish(id, mn, hole, ml, inside, visitor) {
   const leader = api.herdLeaderOf(mn);
   if (leader) api.staffPoints(leader, 1, "glory");
   const r = api.rec(mn);
+  let took = null;
   if (inside && holes.includes("vulva") && r && r.breedable && r.fertile && !api.limitBlocks(mn, "breed")) {
     if (p) p.lastFill = { at: Date.now(), stud: api.ANON_STUD, ml: ml / holes.length };   // cummin' soon after can still make it take
-    const took = api.rollConception(mn, api.ANON_STUD, ml / holes.length);
+    took = api.rollConception(mn, api.ANON_STUD, ml / holes.length);
     if (took === "new") api.later(() => api.notice(mn, "🍼 A warm, heavy feelin' settles low in your belly… somethin' from the stalls took, sugar. (?stats shows it)"), 20000);
   }
+  // breeding season counts stall loads too (a stranger's, so no stud gets the credit)
+  if (inside && api.bred) for (const h of holes) api.bred(mn, api.ANON_STUD, h, ml / holes.length, h === "vulva" ? took : null);
   api.save();
 }
 

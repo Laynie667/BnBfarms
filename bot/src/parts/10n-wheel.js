@@ -1,11 +1,11 @@
   /* WHAT'S IN THIS FILE (10n-wheel.js)
      THE WHEEL, with slices that DO things. Besides the slices staff write (?wheel add), the farm's own slices
-     (?wheel farm on|off) put them in the stocks, the pen, the milkin' stall, a glory stall shift, on a lead,
+     (?wheel farm on|off) put them in the stocks, the pen, the milkin' stall, a glory stall shift, the use bench, on a lead,
      on denial, hand them a potion or a dare, pay or fine ribbons, give a luxury hour… A slice only lands if it
-     can happen to them: their limits, ?potions on, ?dares on, ?glory on, the spots bein' set, all count, and
+     can happen to them: their limits, ?potions on, ?dares on, ?glory on, ?bench on, the spots bein' set, all count, and
      a slice that can't happen is skipped for another one.
      Staff can write action slices too: ?wheel add punish Off to the pen with you, %name% => pen 30
-     Actions: stocks <min> · pen <min> · milkstall <min> · glory <min> · leash <min> · denial <hours>
+     Actions: stocks <min> · pen <min> · milkstall <min> · glory <min> · bench <min> · leash <min> · denial <hours>
               potion <name> · dare [reckless] · ribbons <n> · fine <n> · luxury <hours> · grace · heat
   */
   const FARM_SLICES = [
@@ -18,7 +18,7 @@
     { kind: "reward", text: "🧪 Honey Tongue! The farm girl's gonna sweet-talk %name% for a while.", act: "potion honey" },
     { kind: "reward", text: "🛁 A luxury hour for %name%: soft straw and the good feed.", act: "luxury 1" },
     { kind: "reward", text: "📋 Quota grace! One bad milk day forgiven, in advance.", act: "grace" },
-    { kind: "reward", text: "🔓 Time off for good behavior: out of the stocks and the pen early.", act: "release" },
+    { kind: "reward", text: "🔓 Time off for good behavior: out of the stocks, the pen and off the bench early.", act: "release" },
     // punishments
     { kind: "punish", text: "⛓️ Into the stocks with %name% for 20 minutes. Bottom up, sugar.", act: "stocks 20" },
     { kind: "punish", text: "⛓️ The stocks, 45 minutes. Somebody's gonna be sore and on display.", act: "stocks 45" },
@@ -27,6 +27,8 @@
     { kind: "punish", text: "🥛 Strapped into the milkin' stall for 30 minutes. Every last drop.", act: "milkstall 30" },
     { kind: "punish", text: "🕳️ A 30 minute punishment shift in the glory stalls. Strangers only.", act: "glory 30" },
     { kind: "punish", text: "🕳️ A full hour on punishment shift in the glory stalls. Good luck, sugar.", act: "glory 60" },
+    { kind: "punish", text: "🪵 Twenty minutes over the use bench, %name%. Anybody who walks by gets a turn.", act: "bench 20" },
+    { kind: "punish", text: "🪵 Forty-five minutes on the use bench. Hope you're feelin' generous, sugar.", act: "bench 45" },
     { kind: "punish", text: "🦮 On the spinner's lead for 20 minutes. Heel.", act: "leash 20" },
     { kind: "punish", text: "🚫 Two hours of denial. Every drop stays in.", act: "denial 2" },
     { kind: "punish", text: "🧪 Bitterroot! Thirty minutes of ruined, leakin' frustration.", act: "potion bitterroot" },
@@ -58,12 +60,13 @@
       case "stocks": return onMap(t) && !stockedNow(t);
       case "pen": return onMap(t) && penSpots().length > 0 && !r.penned;
       case "milkstall": return onMap(t) && milkSpots().length > 0 && !r.penned && (makesMilk(t) || makesSemen(t));
+      case "bench": return !benchWhyNot(t);
       case "glory": { const d = addonData("glory-stalls"); return ADDONS.has("glory-stalls") && onMap(t) && !!(d.optIn && d.optIn[t]) && !(d.shifts && d.shifts[t]); }
       case "leash": return !!by && by !== t && by !== CFG.BOT_MEMBER && onMap(t) && onMap(by) && !stockedNow(t);
       case "denial": return makesSemen(t) && !limitBlocks(t, "breed");
       case "luxury": return !hasRole(t, ROLE.LUXURY);
       case "grace": return makesMilk(t) && (r.quotaGrace || 0) < 2;
-      case "release": return stockedNow(t) || !!r.penned;
+      case "release": return stockedNow(t) || !!r.penned || benchedNow(t);
       case "heat": return !/\bheat/i.test(String(r.limits || ""));
       default: return true;
     }
@@ -90,6 +93,7 @@
         tell(t, "🕳️ The wheel sentenced you to "+mins+" minutes in the glory stalls"+(free ? ", "+free[0].replace("glory-", "stall ") : ". Find a free stall")+". Strangers come more often on a punishment shift. Your safeword still works.");
         return "";
       }
+      case "bench": return benchIn(t, Math.max(5, Math.min(CFG.BENCH_MAX_MIN, n || 20)), spinner, "the wheel") ? "" : null;
       case "leash": {
         state.leashes.set(t, by);
         const mins = Math.max(5, Math.min(120, n || 20));
@@ -107,7 +111,7 @@
         return "";
       }
       case "grace": { const r = rec(t); r.quotaGrace = Math.min(2, (r.quotaGrace || 0) + 1); saveLedger(); return ""; }
-      case "release": { const r = rec(t); if (r.stocked) r.stocked = null; unpen(t, true); saveLedger(); return ""; }
+      case "release": { const r = rec(t); if (r.stocked) r.stocked = null; unpen(t, true); unbench(t, "staff"); saveLedger(); return ""; }
       case "heat": startHeat(t, spinner, Math.max(0.25, Math.min(24, n || 1))); return "";
       default: return null;
     }

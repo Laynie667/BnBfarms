@@ -1,11 +1,11 @@
 // ==UserScript==
 // @name         BnB Farm add-on: Breeding
 // @namespace    bnbfarm
-// @version      1.0.2
+// @version      1.1.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-breeding.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-breeding.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
-// @description  Pregnancy stages with belly size 1-5, cravings, kicks, midwives, staff-only stud bookings and breeding week (15th-21st). Runs on the farm bot's computer, next to the Farmhand Bot script.
+// @description  Pregnancy stages with belly size 1-5, cravings, kicks, midwives, staff-only stud bookings and breeding season (15th-21st): heat, pent-up studs, a nightly stud book and a crown for the most-bred. Runs on the farm bot's computer, next to the Farmhand Bot script.
 // @author       Laynie & Alexia
 // @match        *://*.bondageprojects.elementfx.com/*
 // @match        *://bondageprojects.elementfx.com/*
@@ -113,6 +113,10 @@
     "%name% can't stop lookin' toward the scent of heat nearby. Their breathing's gone heavy."
   ];
   var isBreedWeek = (d = /* @__PURE__ */ new Date()) => d.getDate() >= 15 && d.getDate() <= 21;
+  var NIGHT_HOUR = 21;
+  var PENT_H = 4;
+  var PRIZE = { dam: 10, stud: 5 };
+  var localDay = (d = /* @__PURE__ */ new Date()) => d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate();
   var monthKey = (d = /* @__PURE__ */ new Date()) => d.toISOString().slice(0, 7);
   function weekEnd() {
     const d = /* @__PURE__ */ new Date();
@@ -190,15 +194,21 @@
     if (d.week.month !== mk) d.week = { month: mk };
     if (now.getDate() === 14 && !d.week.warned && here.length) {
       d.week.warned = true;
-      api.announce("\u{1F4C5} Breeding week starts tomorrow, y'all! Anybody who said ?season on will come into heat for it.");
+      api.announce("\u{1F4C5} Breedin' season starts tomorrow, y'all! Anybody who said ?season on comes into heat for it, and every breedin' goes in the stud book.");
       api.save();
     }
-    if (!isBreedWeek(now)) return;
+    if (!isBreedWeek(now)) {
+      crownTick(here);
+      return;
+    }
     if (!d.week.said && here.length) {
       d.week.said = true;
-      api.announce("\u{1F525} It's breeding week on the farm! Everybody signed up is comin' into heat. Studs, behave. Or don't. \u{1F402}");
+      api.announce("\u{1F525} It's breedin' season on the farm! Everybody signed up is comin' into heat, the studs are fillin' up fast, and every breedin' goes in the stud book. I read it out every night, and the most-bred gets crowned on the last one. \u{1F402}");
+      for (const mn of here) if (d.optIn[mn] && api.makesSemen(mn)) api.notice(mn, "\u{1F402} Breedin' season's on, sugar. Your balls fill half again faster all week, and four hours full leaves you pent up. Go find somebody in heat.");
       api.save();
     }
+    seasonPentTick(here);
+    nightlyTick(here);
     d.week.heated = d.week.heated || {};
     for (const mn of here) {
       const r = api.rec(mn), p = api.prod(mn);
@@ -207,7 +217,7 @@
       api.startHeat(mn, api.ANON_STUD, Math.max(1, (weekEnd() - Date.now()) / 36e5));
       api.save();
     }
-    const inHeat = here.filter((mn) => api.prod(mn) && api.inHeat(api.prod(mn)));
+    const inHeat = here.filter((mn) => api.prod(mn) && api.inHeat(api.prod(mn)) && !api.prod(mn).heat.quiet);
     if (!inHeat.length) return;
     for (const stud of here) {
       if (!api.makesSemen(stud) || inHeat.includes(stud) || Date.now() - (d.scent[stud] || 0) < 15 * 6e4) continue;
@@ -219,6 +229,101 @@
       d.scent[stud] = Date.now();
       api.privateEmote(stud, fill(pick(RUTTY), { name: api.name(stud) }));
     }
+  }
+  function season() {
+    const d = D(), mk = monthKey();
+    if (d.week.month !== mk) d.week = { month: mk };
+    const w = d.week;
+    w.bred = w.bred || {};
+    w.took = w.took || {};
+    w.covers = w.covers || {};
+    return w;
+  }
+  var BRED_MARKS = {
+    3: [
+      "The farm girl hangs a little red ribbon on %name%'s gate. Three breedin's this season, and countin'.",
+      "%name% gets a chalk mark on the barn door for every breedin'. That's three now."
+    ],
+    5: [
+      "Five times bred this season. The farm girl ties a second ribbon on %name%'s gate and gives their belly a pat.",
+      "%name%'s chalk marks on the barn door have reached five. Folks are startin' to notice."
+    ],
+    10: [
+      "Ten! The barn door's runnin' out of room for %name%'s chalk marks. That's a real breeder.",
+      "Ten loads this season. The farm girl just shakes her head and hangs a whole bunch of ribbons on %name%'s gate."
+    ]
+  };
+  function onBred(stud, dam, hole, mlIn, took) {
+    if (hole !== "vulva" || !isBreedWeek() || !D().optIn[dam] || !(mlIn > 0)) return;
+    const w = season();
+    w.bred[dam] = (w.bred[dam] || 0) + 1;
+    if (took) w.took[dam] = (w.took[dam] || 0) + 1;
+    if (stud > 0 && stud !== dam && D().optIn[stud]) w.covers[stud] = (w.covers[stud] || 0) + 1;
+    api.save();
+    const lines = BRED_MARKS[w.bred[dam]];
+    if (lines && api.onMap(dam)) api.later(() => api.emote("\u{1F525} " + fill(pick(lines), { name: api.name(dam) }), dam), 6e3);
+  }
+  function rankList(o, n, unit) {
+    return Object.entries(o).filter(([m]) => Number(m) > 0).sort((a, b) => b[1] - a[1]).slice(0, n).map(([m, v], i) => "  " + (["\u{1F947}", "\u{1F948}", "\u{1F949}"][i] || i + 1 + ".") + " " + api.name(Number(m)) + ", " + v + " " + unit(v)).join("\n");
+  }
+  function bookText(night) {
+    const w = season();
+    const dams = rankList(w.bred, 5, (v) => v === 1 ? "time" : "times"), studs = rankList(w.covers, 3, (v) => v === 1 ? "cover" : "covers");
+    const caught = Object.keys(w.took).filter((m) => Number(m) > 0).map((m) => api.name(Number(m)));
+    const head = "\u{1F4D6} THE STUD BOOK" + (night ? ", night " + night + " of breedin' season" : "");
+    if (!dams && !studs) return head + "\nNot one breedin' in it yet. Y'all are slackin'. \u{1F402}";
+    return head + "\n\u{1F404} Most bred\n" + (dams || "  (nobody yet)") + "\n\u{1F402} Busiest studs\n" + (studs || "  (nobody yet)") + (caught.length ? "\n\u{1F37C} Caught this season: " + caught.join(", ") : "");
+  }
+  function seasonPentTick(here) {
+    const d = D(), now = Date.now();
+    for (const mn of here) {
+      if (!d.optIn[mn] || !api.makesSemen(mn)) continue;
+      const p = api.prod(mn);
+      if (!p || p.pentUp || !p.semenFullSince || now - p.semenFullSince < PENT_H * 36e5) continue;
+      p.pentUp = true;
+      api.save();
+      api.notice(mn, "\u{1F624} Breedin' season's got you achin', " + api.name(mn) + ". You're all pent up: the next load's a big, potent one.");
+    }
+  }
+  function readOut(here, text) {
+    if (!api.hasCompanion || !api.privateSay) return api.announce(text);
+    for (const mn of here) {
+      if (api.hasCompanion(mn)) api.notice(mn, text);
+      else api.privateSay(mn, text);
+    }
+  }
+  function nightlyTick(here) {
+    const w = season(), now = /* @__PURE__ */ new Date();
+    if (!here.length || now.getHours() < NIGHT_HOUR || w.readDay === localDay(now)) return;
+    if (now.getDate() === 21) {
+      crownTick(here, true);
+      return;
+    }
+    w.readDay = localDay(now);
+    api.save();
+    readOut(here, bookText(now.getDate() - 14));
+  }
+  function crownTick(here, lastNight) {
+    const d = D(), w = season(), now = /* @__PURE__ */ new Date();
+    if (w.prized || !w.said || !here.length) return;
+    if (!lastNight && now.getDate() < 22) return;
+    w.prized = true;
+    w.readDay = localDay(now);
+    const top = (o) => Object.entries(o).filter(([m]) => Number(m) > 0).sort((a, b) => b[1] - a[1] || (w.took[b[0]] || 0) - (w.took[a[0]] || 0))[0];
+    const dam = top(w.bred), stud = top(w.covers);
+    if (!dam) {
+      api.save();
+      readOut(here, "\u{1F4D6} Breedin' season's over, and not a single breedin' made the stud book. Next month, y'all. \u{1F402}");
+      return;
+    }
+    const champ = { month: w.month, dam: Number(dam[0]), times: dam[1], stud: stud ? Number(stud[0]) : 0, covers: stud ? stud[1] : 0 };
+    d.champions = (d.champions || []).concat(champ).slice(-12);
+    api.save();
+    readOut(here, bookText(7) + "\n\n\u{1F451} That's the season, y'all! " + api.name(champ.dam) + " is the farm's most-bred, " + champ.times + " times" + (champ.stud ? ", and " + api.name(champ.stud) + " the busiest stud with " + champ.covers : "") + ". Ribbons for the winners! \u{1F402}");
+    if (api.ribbons) api.ribbons(champ.dam, PRIZE.dam, "bein' the most-bred of breedin' season", true);
+    if (champ.stud && api.ribbons) api.ribbons(champ.stud, PRIZE.stud, "bein' the busiest stud of breedin' season", true);
+    if (api.onMap(champ.dam)) api.later(() => api.emote("\u{1F451} The farm girl pins a big blue rosette on " + api.name(champ.dam) + "'s collar: most bred of the season. Their belly's earned it.", champ.dam), 4e3);
+    api.audit(api.cfg.BOT_MEMBER, "SEASON", w.month + " " + champ.dam + "x" + champ.times + (champ.stud ? " stud " + champ.stud + "x" + champ.covers : ""));
   }
   function cmdMidwife(c) {
     const { sender, args, api: A } = c;
@@ -253,13 +358,20 @@
   function cmdBreedweek(c) {
     const { sender, args, api: A } = c, d = D(), w = String(args[0] || "").toLowerCase();
     if (!A.rec(sender)) return c.reply("You'll need to be on the farm's books first, sugar.");
+    if (w === "book" || w === "top" || w === "board") return c.reply(bookText() + (isBreedWeek() ? "" : "\n(Breedin' season is the 15th to the 21st.)") + champText());
     if (w === "on" || w === "off") {
       if (w === "on") d.optIn[sender] = true;
       else delete d.optIn[sender];
       A.save();
-      return c.reply(w === "on" ? "\u{1F525} You're in for breeding week (the 15th to the 21st each month). You'll come into heat for it" + (A.rec(sender).breedable && A.rec(sender).fertile ? "." : ", once you're ?breedable on and ?fertile on.") : "Breeding week: you're out. No heat from it.");
+      const rs = A.rec(sender);
+      return c.reply(w === "on" ? "\u{1F525} You're in for breedin' season (the 15th to the 21st each month). " + (A.makesSemen(sender) ? "Your balls fill faster that week and you get pent up quicker. " : "") + (rs.breedable && rs.fertile ? "You'll come into heat for it. " : rs.breedable ? "Say ?fertile on to come into heat for it. " : "Say ?breedable on (and ?fertile on) to come into heat for it. ") + "Every time you're bred goes in the stud book, read out to the farm each night." : "Breedin' season: you're out. No heat, and you're not in the stud book.");
     }
-    c.reply("\u{1F525} Breeding week is the 15th to the 21st each month" + (isBreedWeek() ? ", and it's on right now!" : ".") + " You're " + (d.optIn[sender] ? "in" : "out") + " (?season on / off).");
+    const w0 = season();
+    c.reply("\u{1F525} Breedin' season is the 15th to the 21st each month" + (isBreedWeek() ? ", and it's on right now!" : ".") + " You're " + (d.optIn[sender] ? "in" : "out") + " (?season on / off). ?season book shows the stud book." + (isBreedWeek() && d.optIn[sender] ? "\nYou've been bred " + (w0.bred[sender] || 0) + " times this season" + (A.makesSemen(sender) ? " and covered " + (w0.covers[sender] || 0) : "") + "." : "") + champText());
+  }
+  function champText() {
+    const c = (D().champions || []).slice(-1)[0];
+    return c ? "\n\u{1F451} Last season's most-bred: " + api.name(c.dam) + " (" + c.times + ")" + (c.stud ? " \xB7 busiest stud: " + api.name(c.stud) + " (" + c.covers + ")" : "") : "";
   }
   function companion(mn) {
     const r = api.rec(mn);
@@ -273,12 +385,14 @@
         lines: [["Stage", st.label], ["Belly size", bellySize(f) + " of 5"], ["Due", days ? "in " + days + " day" + (days === 1 ? "" : "s") : "any time now"], ["Sired by", p.preg.sires.map(api.name).join(" & ")]]
       });
     }
+    const w = season(), seasonLines = isBreedWeek() && d.optIn[mn] ? [["Bred this season", String(w.bred[mn] || 0)]].concat(api.makesSemen(mn) ? [["Covers this season", String(w.covers[mn] || 0)]] : []) : void 0;
     cards.push({
-      title: "Breeding week",
-      note: "The 15th to the 21st each month. You come into heat for it if you're breedable and fertile.",
-      toggles: [{ label: "Join breeding week", on: !!d.optIn[mn], cmd: "season " + (d.optIn[mn] ? "off" : "on") }],
+      title: "Breedin' season",
+      note: "The 15th to the 21st each month. You come into heat for it if you're breedable and fertile; studs fill faster. Every breedin' goes in the stud book, read out each night, and the most-bred is crowned on the last one.",
+      lines: seasonLines,
+      toggles: [{ label: "Join breedin' season", on: !!d.optIn[mn], cmd: "season " + (d.optIn[mn] ? "off" : "on") }],
       chips: isBreedWeek() ? [{ text: "on now", kind: "alert" }] : void 0,
-      buttons: [{ label: "My pedigree", cmd: "pedigree" }]
+      buttons: [{ label: "My pedigree", cmd: "pedigree" }, { label: "Stud book", cmd: "season book" }]
     });
     const mine = d.bookings.filter((b) => b.stud === mn || b.dam === mn);
     if (mine.length) cards.push({ title: "My bookings", lines: mine.map((b) => ["#" + b.id, api.name(b.stud) + " \xD7 " + api.name(b.dam)]) });
@@ -288,8 +402,8 @@
   connect({
     name: "breeding",
     label: "Breeding",
-    version: "1.0.0",
-    guide: "Pregnancy now has stages (early, showin', heavy, nestin') with a belly size 1\u20135, cravings, and kicks nearby people can see. Breeding week is the 15th\u201321st of each month: ?season on to come into heat for it. Staff: ?book <stud> <who>, ?book, ?book done <#>, and ?midwife <who> during labour.",
+    version: "1.1.0",
+    guide: "Pregnancy now has stages (early, showin', heavy, nestin') with a belly size 1\u20135, cravings, and kicks nearby people can see. Breedin' season is the 15th\u201321st of each month: ?season on to come into heat for it (studs fill faster and get pent up sooner). Every breedin' goes in the stud book, read out each night from 9 pm; the most-bred is crowned on the last night (10 ribbons, 5 for the busiest stud). ?season book shows it. Staff: ?book <stud> <who>, ?book, ?book done <#>, and ?midwife <who> during labour.",
     setup(a) {
       api = a;
       D();
@@ -308,13 +422,15 @@
         const days = Math.max(0, Math.ceil((p.preg.due - Date.now()) / 864e5));
         c.reply("\u{1F930} " + c.api.name(t) + ": " + stageOf(f).label + " \xB7 belly size " + bellySize(f) + " of 5 \xB7 " + Math.round(f * 100) + "% along \xB7 due " + (days ? "in " + days + " day" + (days === 1 ? "" : "s") : "any time now") + " \xB7 sired by " + p.preg.sires.map(c.api.name).join(" & "));
       } },
-      season: { usage: "season on|off", aliases: ["breedweek"], private: true, run: cmdBreedweek },
+      season: { usage: "season on|off|book", aliases: ["breedweek", "studbook"], private: true, run: cmdBreedweek },
       midwife: { usage: "midwife <who>", rank: "staff", run: cmdMidwife }
     },
     on: { tick: () => {
       watchLabour();
       tick();
-    }, birth: onBirth },
+    }, birth: onBirth, bred: onBred },
+    // signed-up studs fill half again faster during breedin' season
+    rates: { semen: (mn) => isBreedWeek() && D().optIn[mn] ? 1.5 : 1 },
     companion
   });
 })();

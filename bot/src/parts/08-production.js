@@ -256,7 +256,7 @@
     if (!pos) return null;
     for (const O of (W.ChatRoomCharacter||[])){
       const om = O.MemberNumber, op = O.MapData && O.MapData.Pos;
-      if (om === mn || !op || !rec(om) || !inHeat(prodOf(om))) continue;
+      if (om === mn || !op || !rec(om) || !inHeat(prodOf(om)) || prodOf(om).heat.quiet) continue;   // a quiet heat (an add-on's) isn't smelled
       if (Math.abs(op.X-pos.X) <= CFG.HEAT_SCENT_TILES && Math.abs(op.Y-pos.Y) <= CFG.HEAT_SCENT_TILES) return om;
     }
     return null;
@@ -848,12 +848,19 @@
       st.kind = st.kind || (doM && doS ? "both" : doM ? "milk" : "cock");
       const rateM = st.rateM || CFG.PROD.STALL_MILK_PER_MIN, rateS = st.rateS || CFG.PROD.STALL_SEMEN_PER_MIN;
       st.until = now + Math.ceil(Math.max(doM ? (p.milk - keepM) / rateM : 0, doS ? (p.semen - keepS) / rateS : 0))*60000;
-      const gotM = doM ? drainMilk(mn, Math.min(rateM*dtMin, p.milk - keepM)) : 0;
-      const gotS = doS ? drainSemen(mn, Math.min(rateS*dtMin, p.semen - keepS)) : 0;
+      // what's owed builds up tick by tick and comes out once it's a whole mL: balls drained at 1.5 mL a minute
+      // owe half a mL a tick, and drainin' only whole mLs meant they never emptied (live, Oct 7: a futa cow
+      // milked down to a quarter stayed strapped in for 25+ minutes, "30 min to go" the whole time)
+      st.oweM = (st.oweM||0) + (doM ? Math.max(0, Math.min(rateM*dtMin, p.milk - keepM)) : 0);
+      st.oweS = (st.oweS||0) + (doS ? Math.max(0, Math.min(rateS*dtMin, p.semen - keepS)) : 0);
+      const gotM = doM && st.oweM >= 1 ? drainMilk(mn, Math.min(st.oweM, p.milk - keepM)) : 0;
+      const gotS = doS && st.oweS >= 1 ? drainSemen(mn, Math.min(st.oweS, p.semen - keepS)) : 0;
+      st.oweM = Math.max(0, st.oweM - gotM); st.oweS = Math.max(0, st.oweS - gotS);
       st.got.m += gotM; st.got.s += gotS;
       const doneM = !makesMilk(mn) || milkDenied(mn) || gearOf(mn).milk || p.milk <= keepM + 1;
-      const doneS = !makesSemen(mn) || p.semen <= keepS + 0.5;
-      const done = doneM && doneS;
+      const doneS = !makesSemen(mn) || p.semen <= keepS + 1;
+      // never more than a quarter hour past what the session was meant to take
+      const done = (doneM && doneS) || now - (st.since||now) > ((st.mins||30) + 15)*60000;
       // their own story, privately (like the glory stalls), about every 25 seconds (10i-stall-story.js)
       if (!done && now >= (st.nextBeat||0)){
         st.nextBeat = now + (15 + Math.random()*10)*1000;   // with 20-second ticks: a line every 20 to 40 seconds, about 27 on average
@@ -982,6 +989,7 @@
       if (caught){ sp.totals.conceived = (sp.totals.conceived||0) + 1;
                    rollBoard(); const Y = L.yield; Y.s = Y.s || {}; Y.s[stud] = (Y.s[stud]||0) + 1; }
     }
+    if (load - gagged > 0) addonsEmit("bred", stud, t, hole, load - gagged, caught);   // breedin' season keeps its stud book from these
     okBreed(stud, t);
     face(t, "bred", 40); sound(t, "wet");
     if (!opt.second){

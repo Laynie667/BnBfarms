@@ -83,6 +83,7 @@
   }
   function audit(actor, action, detail){
     L.log.push({ t:Date.now(), by:actor, a:action, d:detail||"" });
+    try { addonsEmit("audit", actor, action, detail||""); } catch(e){}   // add-ons see farm actions too (Laynie's private log)
     if (L.log.length > 500) L.log = L.log.slice(-500);
     saveLedger();
   }

@@ -1,11 +1,11 @@
 # What to install (current versions)
 
-Updated 2026-10-06. Every file is in the `dist/` folder (it syncs through OneDrive, so the phone app has it too).
+Updated 2026-10-07. Every file is in the `dist/` folder (it syncs through OneDrive, so the phone app has it too).
 In Tampermonkey's dashboard, compare each script's version with this list. Anything already at these versions is up to date.
 
 | Script | File in `dist/` | Where it runs | Current |
 |---|---|---|---|
-| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.15.6** |
+| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.15.7** |
 | Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.5.0** |
 | Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **1.0.3** |
 | Barn life, Breeding, Dairy, Map tools, Shows, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.2** |
@@ -20,6 +20,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 ## Latest changes (newest first)
 
+- **Bot 0.15.7** (from the Oct 6 watch reports): livestock and guests who say ?contract now see their own farm contracts (offered, signed) and how to get one; they were being told it's staff-only, and a second try got no answer at all. "/bot cert" typed into a beep works like "bot cert". The "I whispered that one to you, add me as a friend" tip is no longer said out loud after every command a newcomer types: it's added to their whisper, once every 30 minutes. The command list now says that `safe` stops everything and fetches staff (someone said it just to find out what it does).
 - **Bot 0.15.6, Companion 0.10.10**: proprietors can fix anybody's record. `?edit <who>` shows what's on file; `?edit <who> <field> <new value>` changes it: name, species, gender, stay, depth, limits, triggers, aftercare, notes, or any application answer as `app.<question>` (likes, curious, soft, else...). `clear` as the value empties one. A name set this way is what the farm calls them from then on (greetings no longer overwrite it); `?edit <who> name clear` goes back to their game nickname. Every edit goes in the audit log. In the Companion: Dashboard → **Records**.
 - **Bot 0.15.5**: contracts are made for whoever they're offered to. The farm's fun/deep/nhl contracts give the nickname "BnB {Species} {name}" (BnB Cow Vicky; BnB Pet Rya for someone with no animal), and any saved contract can use {name} {Species} {species} {pet} in any text setting, the title or the terms.
 - **Glory stalls 1.5.0**: scenes are about what's done to the person in the stall, not what they do (the reaction lines are rewritten); every scene opens with how they're arranged and follows from it: **punished** on a punishment shift (locked in the frame or stocks, rougher strangers, longer scenes, "the shift isn't over"), **bound** if they came in tied, or **by choice** (kneeling at the hatch, over the bench, on all fours or against the wall).

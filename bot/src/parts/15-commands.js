@@ -80,6 +80,7 @@
         huh("I don't know ?"+cmd+", hon."+(near ? " Did you mean ?"+near+"?" : "")+" ?help lists what I can do."); return;
       }
     }
+    if ((cmd === "contract" || cmd === "contracts") && !isStaff(sender)){ reply(sender, myContractsText(sender), channel === "chat" ? (canBeep(sender) ? "beep" : "whisper") : channel); return; }
     if (STAFF_CMDS.includes(cmd) && !isStaff(sender)){ huh("?"+cmd+" is just for farm staff, sugar."); return; }
     if (onCooldown(sender, cmd, channel)){ waitYourTurn(sender, raw, channel); return; }   // waits its turn (14-parser.js)
 

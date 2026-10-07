@@ -661,7 +661,8 @@ UPKEEP
   // every command they can use: the same groups the Companion's Guides tab shows (shared/guides.js),
   // plus the commands of whatever add-ons are runnin', for their rank
   function myCommands(mn){
-    const line = (g) => "\n"+g.name+"\n  "+g.cmds.join(" · ");
+    // seen live: someone read "safe" in this list and said it to find out what it does, which calls everybody running
+    const line = (g) => "\n"+g.name+"\n  "+g.cmds.join(" · ")+(g.name === "Safety" ? "\n  (safe stops everything and fetches staff, so only say it when you need it. ?help safety explains)" : "");
     let o = "📋 EVERYTHING YOU CAN ASK ME, SUGAR\n"+PUBLIC_GROUPS.map(line).join("");
     if (isStaff(mn)) o += "\n\n🧑‍🌾 STAFF"+STAFF_GROUPS.map(line).join("");
     if (isProprietor(mn)) o += "\n\n👑 PROPRIETOR"+OWNER_GROUPS.map(line).join("");

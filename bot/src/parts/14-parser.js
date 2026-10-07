@@ -93,6 +93,8 @@
   function parseCommand(raw, isWhisper, isBeep, noNatural){
     let text = String(raw).trim();
     if (!text) return null;
+    // "/bot cert" typed into a beep (the game's /bot only works in the room): read it as "bot cert"
+    if (/^\/(bot|farm|office)\b/i.test(text)) text = text.slice(1);
     const lower = text.toLowerCase();
 
     for (const wp of CFG.BOT_WORDS){

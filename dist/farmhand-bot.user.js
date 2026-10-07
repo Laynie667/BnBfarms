@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.15.6
+// @version      0.15.7
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -1824,7 +1824,7 @@
   ];
 
   // bot/src/version.js
-  var VERSION = "0.15.6";
+  var VERSION = "0.15.7";
 
   // bot-parts:farmhand-bot-parts
   (function() {
@@ -4117,10 +4117,10 @@
           else say(text, false, mn);
           return;
         }
-        whisper(mn, text);
-        if (!canBeep(mn)) {
-          say(plainName(mn) + ", I whispered that one to you, hon! Add me (" + CFG.BOT_MEMBER + ") to your friend list and say ?friend, and I can reach you anywhere.", false, mn);
-        }
+        state.friendTipAt = state.friendTipAt || /* @__PURE__ */ new Map();
+        const tip = !canBeep(mn) && Date.now() - (state.friendTipAt.get(mn) || 0) > 30 * 6e4;
+        if (tip) state.friendTipAt.set(mn, Date.now());
+        whisper(mn, text + (tip ? "\n\n(I whispered that to you, hon. Add me (" + CFG.BOT_MEMBER + ") to your friend list and say ?friend, and I can reach you anywhere.)" : ""));
         return;
       }
       whisper(mn, text);
@@ -6941,6 +6941,18 @@
       audit(sender, "CONTRACT_RELEASE", t + " " + x.title);
       return "";
     }
+    function myContractsText(mn) {
+      contractsLedger();
+      const mine = L.contracts.filter((x) => x.mn === mn && ["prepared", "offered", "signed", "releasing"].includes(x.status));
+      const how = {
+        prepared: "ready for staff to offer you",
+        offered: "waitin' on you: read it on your BC+ Contracts page, and sign only if you want it",
+        signed: "signed",
+        releasing: "bein' released"
+      };
+      if (!mine.length) return "\u{1F4DC} You haven't got a farm contract yet, sugar. A herdmaster or the proprietors offer one in person, and it turns up on your BC+ Contracts page for you to read and sign. Nothin' in it applies till you do. Just ask one of 'em if you'd like one.";
+      return "\u{1F4DC} YOUR FARM CONTRACTS\n" + mine.map((x) => '  \u2022 "' + x.title + '" \xB7 ' + how[x.status] + (x.status === "signed" && x.until ? " \xB7 " + Math.max(0, Math.round((x.until - Date.now()) / 36e5)) + " h left" : "")).join("\n") + "\n\nStaff can let you out of one any time; just ask.";
+    }
     function contractLine(x) {
       const left = x.until ? Math.max(0, Math.round((x.until - Date.now()) / 36e5)) + " h left" : x.status === "signed" ? "permanent" : "";
       return plainName(x.mn) + ' \xB7 "' + x.title + '" \xB7 ' + x.status + (left ? " \xB7 " + left : "");
@@ -9452,7 +9464,7 @@ UPKEEP
       return "Hmm, I don't have a guide called '" + t0 + "', hon. Try one of these: start, safety, keys, herds, tiers, barn, breeding, pregnancy, heat, body, cocks, shots, life, fair or me" + (ADDONS.size ? ", or an add-on: " + [...ADDONS.keys()].join(", ") : "") + ". For example: ?help breeding";
     }
     function myCommands(mn) {
-      const line = (g) => "\n" + g.name + "\n  " + g.cmds.join(" \xB7 ");
+      const line = (g) => "\n" + g.name + "\n  " + g.cmds.join(" \xB7 ") + (g.name === "Safety" ? "\n  (safe stops everything and fetches staff, so only say it when you need it. ?help safety explains)" : "");
       let o = "\u{1F4CB} EVERYTHING YOU CAN ASK ME, SUGAR\n" + PUBLIC_GROUPS.map(line).join("");
       if (isStaff(mn)) o += "\n\n\u{1F9D1}\u200D\u{1F33E} STAFF" + STAFF_GROUPS.map(line).join("");
       if (isProprietor(mn)) o += "\n\n\u{1F451} PROPRIETOR" + OWNER_GROUPS.map(line).join("");
@@ -10003,6 +10015,7 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
     function parseCommand(raw, isWhisper, isBeep, noNatural) {
       let text = String(raw).trim();
       if (!text) return null;
+      if (/^\/(bot|farm|office)\b/i.test(text)) text = text.slice(1);
       const lower = text.toLowerCase();
       for (const wp of CFG.BOT_WORDS) {
         if (lower === wp) return { cmd: "help", args: [], rest: "" };
@@ -10403,6 +10416,10 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
           huh("I don't know ?" + cmd + ", hon." + (near ? " Did you mean ?" + near + "?" : "") + " ?help lists what I can do.");
           return;
         }
+      }
+      if ((cmd === "contract" || cmd === "contracts") && !isStaff(sender)) {
+        reply(sender, myContractsText(sender), channel === "chat" ? canBeep(sender) ? "beep" : "whisper" : channel);
+        return;
       }
       if (STAFF_CMDS.includes(cmd) && !isStaff(sender)) {
         huh("?" + cmd + " is just for farm staff, sugar.");

@@ -159,6 +159,18 @@
     x.status = "releasing"; saveLedger(); audit(sender, "CONTRACT_RELEASE", t+" "+x.title);
     return "";
   }
+  // ?contract from stock or a guest: their own farm contracts (seen live: livestock asked and were told it's staff-only)
+  function myContractsText(mn){
+    contractsLedger();
+    const mine = L.contracts.filter(x => x.mn === mn && ["prepared","offered","signed","releasing"].includes(x.status));
+    const how = { prepared: "ready for staff to offer you", offered: "waitin' on you: read it on your BC+ Contracts page, and sign only if you want it",
+                  signed: "signed", releasing: "bein' released" };
+    if (!mine.length) return "📜 You haven't got a farm contract yet, sugar. A herdmaster or the proprietors offer one in person, and it turns up on your BC+ Contracts page "+
+      "for you to read and sign. Nothin' in it applies till you do. Just ask one of 'em if you'd like one.";
+    return "📜 YOUR FARM CONTRACTS\n"+mine.map(x => "  • \""+x.title+"\" · "+how[x.status]+
+      (x.status === "signed" && x.until ? " · "+Math.max(0, Math.round((x.until - Date.now())/3600000))+" h left" : "")).join("\n")+
+      "\n\nStaff can let you out of one any time; just ask.";
+  }
   function contractLine(x){
     const left = x.until ? Math.max(0, Math.round((x.until - Date.now())/3600000))+" h left" : (x.status === "signed" ? "permanent" : "");
     return plainName(x.mn)+" · \""+x.title+"\" · "+x.status+(left ? " · "+left : "");

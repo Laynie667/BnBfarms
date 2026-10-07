@@ -562,10 +562,12 @@
       if (CFG.CHAT_REPLY_BEEP && canBeep(mn)) { beep(mn, text); return; }
       // an answer belongs to whoever asked: on a map, just to them (not to whoever it happens to mention)
       if (String(text).length <= CFG.CHAT_REPLY_SAY_MAX){ if (mapRoom()) privateTo(mn, text, "chat"); else say(text, false, mn); return; }
-      whisper(mn, text);
-      if (!canBeep(mn)) {
-        say(plainName(mn) + ", I whispered that one to you, hon! Add me ("+CFG.BOT_MEMBER+") to your friend list and say ?friend, and I can reach you anywhere.", false, mn);
-      }
+      // the friend tip rides along in the whisper, once in a while: said out loud it named them in front of the
+      // whole room, every command they typed (seen live: three times in two minutes for one newcomer)
+      state.friendTipAt = state.friendTipAt || new Map();
+      const tip = !canBeep(mn) && Date.now() - (state.friendTipAt.get(mn) || 0) > 30*60000;
+      if (tip) state.friendTipAt.set(mn, Date.now());
+      whisper(mn, text + (tip ? "\n\n(I whispered that to you, hon. Add me ("+CFG.BOT_MEMBER+") to your friend list and say ?friend, and I can reach you anywhere.)" : ""));
       return;
     }
     whisper(mn, text);

@@ -5,11 +5,12 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 | Script | File in `dist/` | Where it runs | Current |
 |---|---|---|---|
-| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.15.9** |
-| Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.5.1** |
+| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.16.0** |
+| Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.5.2** |
 | Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **1.0.3** |
-| Barn life, Breeding, Dairy, Map tools, Shows, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.2** |
-| Farmhand Companion | `farmhand-companion.user.js` | each player | **0.10.11** |
+| Barn life, Breeding, Dairy, Map tools, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.2** |
+| Shows | `farmhand-shows.user.js` | the bot's PC | **1.0.3** |
+| Farmhand Companion | `farmhand-companion.user.js` | each player | **0.11.0** |
 | Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.3** |
 
 ## Sending a watch report
@@ -20,6 +21,15 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 ## Latest changes (newest first)
 
+- **Bot 0.16.0, Companion 0.11.0, Glory stalls 1.5.2, Shows 1.0.3: ribbons, the store, potions, dares, the corral, and a wheel that does things.**
+  - **Ribbons** are the farm's scrip and keep day to day. Earned for the milk quota (3), a full stall session (1), a chore (2), a glory shift (3, punishment 1), a dare (2, reckless 4), placin' in a show (5/3/2), best milk or top sire of the week (10), and from staff (`?ribbon give|fine <who> <n> [why]`: farmhands up to 5, herdmasters 15). A missed quota costs 2. Up to 40 a day from farm things. The **Sunday till** names the week's top earner (+5) and biggest spender. `?ribbons`, `?ribbons top`.
+  - **The store** (`?store`, `?buy`, and the Companion's new 🎀 Store tab): wheel spins, lucky spins, a luxury day, skip a chore, quota grace, a greetin' of your own (staff approve it: `?store approve|reject <who>`), a ribbon tag on ?who, a dedication (praise, or a tease for those who like it), a bounty on a chore, shots, and every potion. Potions and dedications can be gifts; a gift asks them first and is only paid for on a yes. Proprietors: `?store price|off|on <item>`.
+  - **16 potions** that wear off. Rewards: Clover Cream, Golden Hour, Blue Ribbon Musk, Honey Tongue. Punishments: Bitterroot (ruined orgasms), Heavy Udder Draught (fill 3x, stalls refuse), Moo Juice (the Companion turns some of your words into your animal's noise), Bell Tonic, Needy Nectar (beg to end it). Just because: Hiccup Fizz, Featherlight, Wrong Barn (another species for an hour), Big Britches, Shrinking Violet, Echo Elixir, Heat Mist. Anyone else's potion needs `?potions on` (a Toggles switch); hard limits rule some out; the safeword pours them all out.
+  - **Dares** (`?dares on`): 20 dares, 8 of them reckless. `?dared` when done, `?dare skip` to chicken out. Staff: `?dare <who> [reckless] [your own]`.
+  - **The corral**: `?corral <who> [minutes] [milking|spot]`, at pen spots (`?spot set pen`, pen-2…) or a milkin' stall. Wander off and the farm girl walks you back. (`?pen` stays the map-tools zone pen.)
+  - **The wheel does things now.** 33 farm slices (`?wheel farm on|off`): the stocks, the corral, strapped in the milkin' stall, glory stall punishment shifts, the spinner's lead, denial, potions, dares, ribbons and fines, a luxury hour, quota grace, early release. Staff action slices: `?wheel add punish Off to the pen, %name% => pen 30`. A slice that can't happen to them (limits, switches, missing spots) is skipped.
+  - From the Oct 7 watch: somebody whose application is waitin' is told so, not "Say ?apply first!"; a one-letter typo in `?help` (glorty, bodyu) opens the right guide.
+  - The Shows add-on's placings list is now `?prizes` (`?ribbons` is the scrip).
 - **Bot 0.15.9**: livestock were getting whispers meant for someone else. A single word of a name counted as naming that person, so "BnB Cow Mira comes apart..." also went to BnB CuntBitch and BnB Dog Nikto (the shared "BnB"), and any line with "the" in it went to Eve the Kitt. Shared farm words (BnB, the, cow, dog, pony, kitty, miss, pet...) no longer count as a name on their own; "Mira", "Nikto" and "Eve" still do.
 - **Bot 0.15.8, Companion 0.10.11, Glory stalls 1.5.1** (Laynie and Sally, Oct 6): **LSCG splatters actually land now.** The bot doesn't run LSCG, so it never knew who had splatters on and never sent one; it now reads LSCG's own room messages (sent when someone joins or changes a setting) and the Companion reports its player's switch. Loads that go **inside** leave a splatter where they went in (pussy, ass, mouth), from breeding and from the glory stalls, as well as pull-outs. A stud who really cums (the game's orgasm) while inside somebody fills them; before, only typing a cum word did, and a real orgasm was "wasted". New studs start with full balls instead of empty (Sally's first load was "a little dribble, 2 mL"). LSCG still has the last word: with "lovers only" on, add the bot (260239) to your LSCG splatter whitelist.
 - **Bot 0.15.7** (from the Oct 6 watch reports): livestock and guests who say ?contract now see their own farm contracts (offered, signed) and how to get one; they were being told it's staff-only, and a second try got no answer at all. "/bot cert" typed into a beep works like "bot cert". The "I whispered that one to you, add me as a friend" tip is no longer said out loud after every command a newcomer types: it's added to their whisper, once every 30 minutes. The command list now says that `safe` stops everything and fetches staff (someone said it just to find out what it does).

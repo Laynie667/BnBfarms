@@ -360,7 +360,15 @@
 
     GREET_ENABLED: true,
     LSCG_SPLATTERS: true,
-    ORGASM_FILL_MIN: 3,       // a stud who cums within 3 minutes of their last thrust in somebody fills them
+    ORGASM_FILL_MIN: 3,
+    // ribbons, the farm's scrip (10l-ribbons.js), potions and dares (10m-potions.js), the wheel's action slices (10n-wheel.js)
+    RIBBONS_ON: true,
+    RIBBON_DAY_CAP: 40,          // ribbons a day from farm things (staff grants don't count)
+    RIBBON_TOP_BONUS: 5,         // the Sunday till: the week's top earner gets this many more
+    RIBBON_GRANT_MAX: { farmhand: 5, herdmaster: 15 },   // per ?ribbon give or fine (proprietors: any)
+    RIBBONS_FOR: { quota: 3, stall: 1, chore: 2, gloryShift: 3, gloryPunish: 1, weekBest: 10, showWin: [5, 3, 2] },
+    STORE_DAY_LIMIT: { luxury: 1, spin: 5, lucky: 3, grace: 1, greeting: 1, tag: 2 },
+    DARE_MIN: 30, DARE_RIBBONS: 2, DARE_RIBBONS_RECKLESS: 4,       // a stud who cums within 3 minutes of their last thrust in somebody fills them
     CONTRACT_NICKNAME: "BnB {Species} {name}",   // the nickname the farm's contracts give: {name} {Species} {species} {pet}          // finishes over somebody draw LSCG's splatters on them (if their LSCG has splatters on)
     SHOW_BADGE: true,
     DEBUG: true,

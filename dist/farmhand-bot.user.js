@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.15.9
+// @version      0.16.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -1805,7 +1805,8 @@
     { name: "Body", cmds: ["size", "measure", "penis", "futa", "gender <word>"] },
     { name: "Clothes", cmds: ["outfit", "outfits", "uniform", "outfit back"] },
     { name: "Mind", cmds: ["hypno", "teaseme"] },
-    { name: "Fun", cmds: ["fair", "enter"] }
+    { name: "Fun", cmds: ["fair", "enter"] },
+    { name: "Ribbons and the store", cmds: ["ribbons", "ribbons top", "store", "buy <item>", "gift <who> <potion>", "potions", "potions on", "dares on", "dare", "dared", "dare skip"] }
   ];
   var STAFF_GROUPS = [
     { name: "Books", cmds: ["queue", "app <n>", "approve <who> livestock", "deny <who>", "appclear", "roster", "stock", "find <who>", "record <who>", "note <who>", "signed", "addfriend <who>", "unregister <who>", "unregister <who> <role>"] },
@@ -1817,14 +1818,15 @@
     { name: "Map", cmds: ["spot", "spot set <name>", "spot place <name> <x> <y>", "zone", "zone who", "zone a <name>", "zone b <name>", "zone box <name> <ax> <ay> <bx> <by>", "zone pair <name> <group>", "tourstop", "setrescue", "where", "stucklog"] },
     { name: "Voice", cmds: ["voice", "voice on herd", "voice add herd <line>", "voice every herd 15"] },
     { name: "Work and play", cmds: ["clockin", "clockout", "hours", "done", "chores", "chore add <job> @<place>", "wheel", "spin", "begphrase", "score"] },
+    { name: "Ribbons, potions, dares", cmds: ["ribbon give <who> <n>", "ribbon fine <who> <n>", "ribbons <who>", "potion give <who> <potion>", "potion end <who>", "dare <who>", "dare <who> reckless", "corral <who> <minutes>", "uncorral <who>", "wheel farm", "store approve <who>"] },
     { name: "Keys and calls", cmds: ["keys <who>", "keysync", "keydump", "grant <who> <tier>", "revoke <who>", "forced", "summon <who>", "summon all", "pasture", "onduty", "cover"] }
   ];
   var OWNER_GROUPS = [
-    { name: "Proprietors", cmds: ["staffadd <who> <role>", "staffremove <who>", "goldkey <who>", "notice <text>", "feeding on", "curfew on", "fair open", "addons off <name>", "addons on <name>", "backup", "health"] }
+    { name: "Proprietors", cmds: ["staffadd <who> <role>", "staffremove <who>", "goldkey <who>", "notice <text>", "feeding on", "curfew on", "fair open", "addons off <name>", "addons on <name>", "backup", "health", "edit <who>", "store price <item> <n>", "store off <item>", "store on <item>"] }
   ];
 
   // bot/src/version.js
-  var VERSION = "0.15.9";
+  var VERSION = "0.16.0";
 
   // bot-parts:farmhand-bot-parts
   (function() {
@@ -2515,6 +2517,19 @@
       GREET_ENABLED: true,
       LSCG_SPLATTERS: true,
       ORGASM_FILL_MIN: 3,
+      // ribbons, the farm's scrip (10l-ribbons.js), potions and dares (10m-potions.js), the wheel's action slices (10n-wheel.js)
+      RIBBONS_ON: true,
+      RIBBON_DAY_CAP: 40,
+      // ribbons a day from farm things (staff grants don't count)
+      RIBBON_TOP_BONUS: 5,
+      // the Sunday till: the week's top earner gets this many more
+      RIBBON_GRANT_MAX: { farmhand: 5, herdmaster: 15 },
+      // per ?ribbon give or fine (proprietors: any)
+      RIBBONS_FOR: { quota: 3, stall: 1, chore: 2, gloryShift: 3, gloryPunish: 1, weekBest: 10, showWin: [5, 3, 2] },
+      STORE_DAY_LIMIT: { luxury: 1, spin: 5, lucky: 3, grace: 1, greeting: 1, tag: 2 },
+      DARE_MIN: 30,
+      DARE_RIBBONS: 2,
+      DARE_RIBBONS_RECKLESS: 4,
       // a stud who cums within 3 minutes of their last thrust in somebody fills them
       CONTRACT_NICKNAME: "BnB {Species} {name}",
       // the nickname the farm's contracts give: {name} {Species} {species} {pet}          // finishes over somebody draw LSCG's splatters on them (if their LSCG has splatters on)
@@ -3264,7 +3279,7 @@
     };
     W.FarmhandExport = exportLedger;
     W.FarmhandLedger = () => L;
-    if (W.__FARMHAND_TEST__) Object.assign(W, { __st: () => state, __cfg: CFG, __pt: prodTick, __qt: quotaTick, __lt: leashTick, __ms: milkingStallTick, __vt: voiceTick, __sync: syncCompanions, __gt: gearTick, __ht: homeTick, __addons: (h, ...a) => addonsEmit(h, ...a), __stateFor: (mn) => stateFor(mn), __leadTick: () => leadTick(), __ambient: () => ambientTick(), __about: (t) => aboutWhom(t), __announce: (t) => announce(t), __reply: (mn, t, ch) => reply(mn, t, ch), __office: () => officeCheck(), __namesHere: (t) => namesHere(t), __speciesCheck: (t) => QUESTIONS.find((q) => q.key === "species").check(t), __attach: () => attachListeners(), __tryLogin: () => tryLogin(), __beepText: (m) => beepText(m), __nameOnce: (t, mn) => nameOnce(t, mn), __buildContract: (n, mn, d) => buildContract(contractTemplate(n), mn, d) });
+    if (W.__FARMHAND_TEST__) Object.assign(W, { __st: () => state, __cfg: CFG, __pt: prodTick, __qt: quotaTick, __lt: leashTick, __ms: milkingStallTick, __vt: voiceTick, __sync: syncCompanions, __gt: gearTick, __ht: homeTick, __addons: (h, ...a) => addonsEmit(h, ...a), __stateFor: (mn) => stateFor(mn), __leadTick: () => leadTick(), __ambient: () => ambientTick(), __about: (t) => aboutWhom(t), __announce: (t) => announce(t), __reply: (mn, t, ch) => reply(mn, t, ch), __office: () => officeCheck(), __namesHere: (t) => namesHere(t), __speciesCheck: (t) => QUESTIONS.find((q) => q.key === "species").check(t), __attach: () => attachListeners(), __tryLogin: () => tryLogin(), __beepText: (m) => beepText(m), __nameOnce: (t, mn) => nameOnce(t, mn), __buildContract: (n, mn, d) => buildContract(contractTemplate(n), mn, d), __potionTick: () => potionTick(), __penTick: () => penTick(), __ribbonTick: () => ribbonTick(), __dareTick: () => dareTick(), __potionOn: (mn, id) => potionOn(mn, id), __milkRate: (mn) => milkRate(mn) });
     W.FarmhandSyncKeys = () => syncAllPresent(true);
     W.FarmhandFriends = () => W.Player.FriendList;
     W.FarmhandAddFriend = (mn) => addFriend(mn, false);
@@ -4227,7 +4242,8 @@
       const r0 = rec(mn);
       const known = L.archive[mn] || r0 && r0.roles && r0.roles.length;
       const pool = known ? RETURN_GREETINGS : GREETINGS;
-      const line = pool[Math.floor(Math.random() * pool.length)];
+      const own = customGreeting(mn);
+      const line = own || pool[Math.floor(Math.random() * pool.length)];
       later(() => say(fill(line, mn), false, mn), 1500);
       const r = rec(mn);
       if (r) {
@@ -4292,7 +4308,9 @@
       tally: "tally",
       teaseOptIn: "teaseme",
       forced: "forced",
-      hypno: "hypno"
+      hypno: "hypno",
+      potionsOn: "potions",
+      daresOn: "dares"
     };
     const DOC_CMDS = ["record", "stats", "vet", "quota", "keys", "size", "measure", "pedigree"];
     function shownMl(n) {
@@ -4335,6 +4353,13 @@
         const g = gearOf(mn);
         if (g.milk || g.machine || g.funnel) s.gear = { milk: g.milk || null, machine: g.machine || null, funnel: !!g.funnel };
         s.today = { tally: tallyToday(mn), naughty: r.naughtyMarks || 0, praised: r.praised || 0, degraded: r.degraded || 0 };
+        s.ribbons = r.ribbons || 0;
+        s.quotaGrace = r.quotaGrace || 0;
+        s.ribbonLog = (L.ribbonLog || []).filter((e) => e.mn === mn).slice(-6).reverse().map((e) => ({ n: e.n, why: e.why }));
+        s.store = storeItems().filter((it) => !it.off).map((it) => ({ id: it.potion || it.id, name: it.name, price: it.price, desc: it.desc, gift: !!it.gift, kind: it.kind || "" }));
+        s.fx = activePotions(mn).map((f) => ({ id: f.id, name: (potionDef(f.id) || {}).name || f.id, until: Math.ceil(f.until / 6e4) * 6e4 }));
+        if (r.dare) s.dare = { text: r.dare.text, until: r.dare.until, reckless: !!r.dare.reckless };
+        if (r.penned) s.penned = { until: r.penned.until, at: r.penned.name };
         s.at = now;
         if (isStaff(mn)) Object.assign(s, staffStateFor(mn));
         const mods = addonStateFor(mn);
@@ -4834,6 +4859,7 @@
       if (p.preg) r *= CFG.PROD.PREG_MILK_X;
       if (p.freshUntil > now) r *= CFG.PROD.FRESH_MILK_X;
       if (boosted(p, "milk")) r *= 2;
+      if (potionOn(mn, "heavy")) r *= 3;
       if (wornTags(mn).has("lactation")) r *= 1.5;
       if (tierOf(mn) === "prize") r *= 1.25;
       if (boosted(p, "hungry")) r *= CFG.HUNGRY_X;
@@ -4844,6 +4870,7 @@
       const p = prodOf(mn);
       let r = CFG.PROD.SEMEN_PER_H * testesX(mn);
       if (boosted(p, "semen")) r *= 2;
+      if (potionOn(mn, "heavy")) r *= 3;
       if (wornTags(mn).has("virility")) r *= 1.5;
       if (boosted(p, "hungry")) r *= CFG.HUNGRY_X;
       return r * addonRateX(mn, "semen");
@@ -4886,6 +4913,7 @@
               r.tier = "prize";
               audit(CFG.BOT_MEMBER, "TIER", best[0] + " \u2192 prize (best milk " + Y.week + ")");
               beep(best[0], "\u{1F3C6} Best milk on the farm this week, grade " + gradeLetter(best[1]) + "! You're prize stock now, sweetie. \u{1F95B}");
+              earnRibbons(best[0], CFG.RIBBONS_FOR.weekBest, "the best milk of the week", CFG.BOT_MEMBER, true);
               if (inRoom()) announce("\u{1F3C6} Best milk of the week goes to " + plainName(best[0]) + ", grade " + gradeLetter(best[1]) + "! Prize stock, y'all. \u{1F95B}");
             }
           }
@@ -4893,7 +4921,10 @@
         const sires = Object.entries(Y.s || {}).sort((a, b) => b[1] - a[1]).slice(0, CFG.TOP_SIRES);
         if (sires.length && inRoom())
           announce("\u{1F402} This week's top sires, y'all: " + sires.map(([m, n], i) => i + 1 + ". " + plainName(parseInt(m, 10)) + " (" + n + " caught)").join(", ") + ". Somebody's been busy! \u{1F37C}");
-        for (const [m] of sires.slice(0, 1)) beep(parseInt(m, 10), "\u{1F402} You're the top sire on the farm this week, sugar! Proud of you.");
+        for (const [m] of sires.slice(0, 1)) {
+          beep(parseInt(m, 10), "\u{1F402} You're the top sire on the farm this week, sugar! Proud of you.");
+          earnRibbons(parseInt(m, 10), CFG.RIBBONS_FOR.weekBest, "bein' top sire of the week", CFG.BOT_MEMBER, true);
+        }
         Y.w = {};
         Y.g = {};
         Y.s = {};
@@ -5307,6 +5338,13 @@
           }
           continue;
         }
+        if (!p.stall && (doM || doS) && potionOn(mn, "heavy")) {
+          if (!p.stallHeavyTold || now - p.stallHeavyTold > 5 * 6e4) {
+            p.stallHeavyTold = now;
+            privateTo(mn, "\u{1F95B} The cups sniff at " + plainName(mn) + "'s swollen, achin' " + (makesMilk(mn) ? "breasts" : "cock") + " and pull away. Not while that draught's in you, sugar. Just stand there and fill.", "emote");
+          }
+          continue;
+        }
         if (!p.stall && (doM || doS) && p.stallRest > now) {
           if (p.stallRestTold !== p.stallRest) {
             p.stallRestTold = p.stallRest;
@@ -5388,6 +5426,7 @@
         if (done) {
           p.stall = null;
           p.stallPaused = null;
+          if (st.got.m + st.got.s > 0) later(() => earnRibbons(mn, CFG.RIBBONS_FOR.stall, "a full session in the milkin' stall"), 3e3);
           const R = CFG.PROD.STALL_REST_MIN;
           p.stallRest = now + (R[0] + Math.random() * (R[1] - R[0])) * 6e4;
           if (st.got.m + st.got.s > 0) {
@@ -6045,6 +6084,7 @@
         const got = milkedOn(mn, prev);
         if (got >= q) {
           r.quotaStreak = (r.quotaStreak || 0) + 1;
+          earnRibbons(mn, CFG.RIBBONS_FOR.quota, "makin' your milk quota", 0, true);
           const tier = tierOf(mn), up = { new: "trained", trained: "prize" }[tier];
           if (r.quotaStreak >= CFG.QUOTA_STREAK_UP && up) {
             r.quotaStreak = 0;
@@ -6053,7 +6093,11 @@
             tell(mn, "\u{1F95B} " + CFG.QUOTA_STREAK_UP + " days in a row on quota! You're " + tierName(up) + " now, sweetie. Good cow.");
             if (onMap(mn)) emote("\u{1F380} " + plainName(mn) + " has filled the pail every day for " + CFG.QUOTA_STREAK_UP + " days, so the farm girl ties a " + tierName(up) + " ribbon on their collar. Such a good, productive cow.");
           } else tell(mn, "\u{1F95B} Quota met yesterday (" + ml(got) + " of " + ml(q) + "). That's " + r.quotaStreak + " day" + (r.quotaStreak === 1 ? "" : "s") + " in a row, sugar!");
+        } else if (r.quotaGrace > 0) {
+          r.quotaGrace--;
+          tell(mn, "\u{1F95B} You only gave " + ml(got) + " of your " + ml(q) + " quota yesterday, sugar, but you had quota grace in your pocket. Forgiven, this once." + (r.quotaGrace ? " (" + r.quotaGrace + " left)" : ""));
         } else {
+          fineRibbons(mn, 2, "a missed milk quota", CFG.BOT_MEMBER);
           r.quotaStreak = 0;
           r.naughtyMarks = (r.naughtyMarks || 0) + 1;
           tell(mn, "\u{1F95B} You only gave " + ml(got) + " of your " + ml(q) + " quota yesterday, sugar. That's a naughty mark (" + r.naughtyMarks + " now). Get yourself milked!");
@@ -6149,6 +6193,11 @@
     }
     function onRoleplay(sender, text, type) {
       if (!text || /^[?!.\-\/]/.test(text.trim())) return;
+      try {
+        potionHeard(sender, text, type);
+      } catch (e) {
+        warn("echo:", e);
+      }
       const now = Date.now();
       if (type === "Emote") {
         try {
@@ -7391,6 +7440,8 @@
         name: plainName,
         nameOnce: (text, mn) => nameOnce(text, mn),
         paint: (mn, area, by) => paintOn(mn, area, by),
+        ribbons: (mn, n, why) => earnRibbons(mn, n, why),
+        fineRibbons: (mn, n, why) => fineRibbons(mn, n, why, CFG.BOT_MEMBER),
         splat: (mn, hole, by) => lscgSplatAt(mn, HOLE_SPLAT[hole] || ["ItemVulva"], by ? plainName(by) : null),
         char: charFor,
         find: resolveTarget,
@@ -7876,6 +7927,11 @@
           n + " sags with a frustrated whine. So close, and nothin' to show for it."
         ]), mn);
       } else if (/^Orgasm\d/.test(content)) {
+        if (potionClimax(mn) === "ruined") {
+          p.climax.ruined++;
+          saveLedger();
+          return;
+        }
         p.climax.came++;
         face(mn, "afterglow", 40);
         const bits = [];
@@ -8790,6 +8846,1312 @@
     for (const part of ["milk", "cock"]) for (const [phase, lines] of Object.entries(STALL_MORE[part])) STALL_STORY[part][phase].push(...lines);
     for (const k of ["both", "bothFinish", "atmos", "praise", "degrade"]) STALL_STORY[k].push(...STALL_MORE[k]);
     for (const [k, lines] of Object.entries(STALL_MORE_TRAITS)) if (STALL_TRAITS[k]) STALL_TRAITS[k].lines.push(...lines);
+    function ribbonsOf(mn) {
+      const r = rec(mn);
+      return r ? r.ribbons || 0 : 0;
+    }
+    function ribbonWeek(r) {
+      const k = weekKey();
+      if (!r.rw || r.rw.key !== k) r.rw = { key: k, earned: 0, spent: 0 };
+      return r.rw;
+    }
+    function ribbonLog(mn, n, why, by) {
+      L.ribbonLog = L.ribbonLog || [];
+      L.ribbonLog.push({ at: Date.now(), mn, n, why: String(why || "").slice(0, 80), by: by || 0 });
+      if (L.ribbonLog.length > 600) L.ribbonLog = L.ribbonLog.slice(-600);
+    }
+    function earnRibbons(mn, n, why, by, quiet) {
+      const r = rec(mn);
+      if (!CFG.RIBBONS_ON || !r || !r.roles || !r.roles.length || !(n > 0)) return 0;
+      n = Math.round(n);
+      if (!by) {
+        const d = dayKey();
+        if (!r.rday || r.rday.d !== d) r.rday = { d, n: 0 };
+        n = Math.min(n, Math.max(0, CFG.RIBBON_DAY_CAP - r.rday.n));
+        if (!n) return 0;
+        r.rday.n += n;
+      }
+      r.ribbons = (r.ribbons || 0) + n;
+      ribbonWeek(r).earned += n;
+      ribbonLog(mn, n, why, by);
+      saveLedger();
+      if (!quiet) tell(mn, "\u{1F380} +" + n + " ribbon" + (n === 1 ? "" : "s") + " for " + why + ". That's " + r.ribbons + " in your purse, sugar.");
+      return n;
+    }
+    function spendRibbons(mn, n, why) {
+      const r = rec(mn);
+      if (!r || (r.ribbons || 0) < n) return false;
+      r.ribbons -= n;
+      ribbonWeek(r).spent += n;
+      ribbonLog(mn, -n, why);
+      saveLedger();
+      return true;
+    }
+    function fineRibbons(mn, n, why, by) {
+      const r = rec(mn);
+      if (!r) return 0;
+      const take = Math.min(r.ribbons || 0, Math.round(n));
+      r.ribbons = (r.ribbons || 0) - take;
+      ribbonLog(mn, -take, "fine: " + why, by);
+      saveLedger();
+      return take;
+    }
+    function ribbonTick() {
+      const now = Date.now();
+      for (const [k, r] of Object.entries(L.people)) {
+        const mn = parseInt(k, 10);
+        if (r.luxuryTemp && r.luxuryUntil < now) {
+          r.roles = (r.roles || []).filter((x) => x !== ROLE.LUXURY);
+          r.luxuryTemp = false;
+          r.luxuryUntil = 0;
+          saveLedger();
+          try {
+            syncKeys(mn, true);
+          } catch (e) {
+          }
+          tell(mn, "\u{1F6C1} Your luxury day's over, sugar. Back to the straw with the rest of 'em. It was nice while it lasted, wasn't it?");
+        }
+        if (r.tag && r.tag.until < now) {
+          r.tag = null;
+          saveLedger();
+        }
+        if (r.greet && r.greet.until < now) {
+          r.greet = null;
+          saveLedger();
+        }
+      }
+      const wk = weekKey();
+      if (!L.ribbonWeekKey) {
+        L.ribbonWeekKey = wk;
+        saveLedger();
+        return;
+      }
+      if (L.ribbonWeekKey === wk) return;
+      const prev = L.ribbonWeekKey;
+      L.ribbonWeekKey = wk;
+      saveLedger();
+      const rows = Object.entries(L.people).filter(([, r]) => r.rw && r.rw.key === prev).map(([k, r]) => [parseInt(k, 10), r.rw]);
+      const top = rows.filter(([, w]) => w.earned > 0).sort((a, b) => b[1].earned - a[1].earned)[0];
+      const big = rows.filter(([, w]) => w.spent > 0).sort((a, b) => b[1].spent - a[1].spent)[0];
+      if (top) earnRibbons(top[0], CFG.RIBBON_TOP_BONUS, "bein' the top earner of the week", CFG.BOT_MEMBER);
+      if ((top || big) && inRoom())
+        announce("\u{1F380} THE SUNDAY TILL! " + (top ? "Top earner this week: " + plainName(top[0]) + " with " + top[1].earned + " ribbons, and a bonus on top. Good animal." : "") + (big ? " Biggest spender: " + plainName(big[0]) + ", " + big[1].spent + " ribbons gone. Somebody's been treatin' themselves." : ""));
+    }
+    function farmAsk(mn, text, cb) {
+      state.farmAsks = state.farmAsks || /* @__PURE__ */ new Map();
+      state.farmAsks.set(mn, { cb, at: Date.now() });
+      askCard(mn, "farm", text);
+    }
+    function farmYesNo(mn, yes) {
+      const a = state.farmAsks && state.farmAsks.get(mn);
+      if (!a) return false;
+      state.farmAsks.delete(mn);
+      if (Date.now() - a.at > 15 * 6e4) {
+        tell(mn, "That question timed out, sugar, so nothin' happened.");
+        return true;
+      }
+      try {
+        a.cb(!!yes);
+      } catch (e) {
+        warn("farm ask:", e);
+      }
+      return true;
+    }
+    function customGreeting(mn) {
+      const r = rec(mn), g = r && r.greet;
+      return g && g.ok && g.until > Date.now() ? fill(g.text, mn) : null;
+    }
+    function vanityTag(mn) {
+      const r = rec(mn), t = r && r.tag;
+      return t && t.until > Date.now() ? " \u{1F380}" + t.text : "";
+    }
+    const STORE_BASE = [
+      { id: "spin", name: "A spin of the wheel", price: 3, desc: "Spin the farm wheel for yourself. Sweet or rotten, you take what it lands on." },
+      { id: "lucky", name: "A lucky spin", price: 8, desc: "Mostly sweet slices. Mostly." },
+      { id: "luxury", name: "A luxury day", price: 25, desc: "24 hours as a luxury guest: the soft straw, the good feed, and everybody calls you darlin'." },
+      { id: "skipchore", name: "Skip a chore", price: 4, desc: "Your chore comes off the board. Nobody needs to know." },
+      { id: "grace", name: "Quota grace", price: 10, desc: "Forgives one missed milk quota day before it becomes a naughty mark (hold up to 2)." },
+      { id: "greeting", name: "A greetin' of your own", price: 8, desc: "For a week, the farm girl greets you with a line you write (staff read it first). ?buy greeting <your line>" },
+      { id: "tag", name: "A ribbon tag", price: 5, desc: "A little tag by your name on ?who for a week. ?buy tag <up to 24 letters>, like ?buy tag Good Girl" },
+      { id: "dedicate", name: "A dedication", price: 2, desc: "The farm girl sings somebody's praises (or teases 'em, if they like that) from you. ?buy dedicate <who> praise|tease" },
+      { id: "bounty", name: "A bounty", price: 0, desc: "Pin ribbons to a job; the hand who does it collects. ?buy bounty <ribbons> <the job>" },
+      { id: "shot-milk", name: "A lactation shot", price: 6, desc: "Milk doubles for a day." },
+      { id: "shot-semen", name: "A virility shot", price: 6, desc: "Semen doubles for a day." },
+      { id: "shot-fert", name: "A fertility shot", price: 6, desc: "Catchin' doubles for a day." },
+      { id: "shot-contra", name: "A contraceptive shot", price: 4, desc: "No catchin' for two days." }
+    ];
+    function storeItems() {
+      const S = L.store || {}, price = S.price || {}, off = S.off || {};
+      const potions = POTIONS.map((p) => ({ id: "potion-" + p.id, name: p.name, price: p.price, desc: p.desc, potion: p.id, gift: true, kind: p.kind }));
+      return STORE_BASE.concat(potions).map((it) => Object.assign({}, it, { price: price[it.id] !== void 0 ? price[it.id] : it.price, off: !!off[it.id] }));
+    }
+    function storeItem(word) {
+      const w = String(word || "").toLowerCase().replace(/^potion[-:\s]?/, "potion-").replace(/[^a-z0-9-]/g, "");
+      const items = storeItems();
+      return items.find((it) => it.id === w) || items.find((it) => it.potion && ("potion-" + it.potion === w || it.potion === w.replace(/^potion-/, ""))) || items.find((it) => it.name.toLowerCase().replace(/[^a-z0-9]/g, "").includes(w.replace(/-/g, "")) && w.length >= 4) || null;
+    }
+    function storeText(mn) {
+      const items = storeItems().filter((it) => !it.off);
+      const row = (it) => "  " + it.price + "\u{1F380} \xB7 " + (it.potion ? it.potion : it.id) + " \xB7 " + it.name;
+      return "\u{1F6CD}\uFE0F THE FARM STORE \xB7 you've got " + ribbonsOf(mn) + " ribbons\n\nTREATS & FAVORS\n" + items.filter((it) => !it.potion && !it.id.startsWith("shot")).map(row).join("\n") + "\n\nSHOTS\n" + items.filter((it) => it.id.startsWith("shot")).map(row).join("\n") + "\n\nPOTIONS (they wear off \xB7 ?potions on to let others gift you one)\n" + items.filter((it) => it.potion).map(row).join("\n") + "\n\n?buy <item> \xB7 ?buy <potion> for <who> (they say yes first) \xB7 ?potions shows what each one does";
+    }
+    function buy(sender, args, R) {
+      const r = rec(sender);
+      if (!r || !r.roles || !r.roles.length) {
+        R("The store's for folks on the books, sugar. ?apply first!");
+        return;
+      }
+      if (!args.length) {
+        R(storeText(sender));
+        return;
+      }
+      const it = storeItem(args[0]);
+      if (!it || it.off) {
+        R("We don't stock that, hon. ?store shows the shelf.");
+        return;
+      }
+      let rest = args.slice(1);
+      let forWho = null;
+      const fi = rest.findIndex((w) => /^(for|to)$/i.test(w));
+      if (fi >= 0 && rest[fi + 1]) {
+        forWho = resolveTarget(rest[fi + 1]);
+        rest = rest.slice(0, fi).concat(rest.slice(fi + 2));
+      }
+      if (forWho === sender) forWho = null;
+      const text = rest.join(" ").trim();
+      const price = it.price;
+      const short = () => R("That's " + price + " ribbons, sugar, and you've only got " + ribbonsOf(sender) + ". Earn a few more: make your quota, finish a stall session, be good.");
+      if (it.id !== "bounty" && ribbonsOf(sender) < price) {
+        short();
+        return;
+      }
+      const today = dayKey();
+      r.buys = r.buys && r.buys.d === today ? r.buys : { d: today, n: {} };
+      const limit = (CFG.STORE_DAY_LIMIT || {})[it.id];
+      if (limit && (r.buys.n[it.id] || 0) >= limit) {
+        R("Just " + limit + " of those a day, sugar. Come back tomorrow.");
+        return;
+      }
+      const done = (what) => {
+        r.buys.n[it.id] = (r.buys.n[it.id] || 0) + 1;
+        audit(sender, "BUY", it.id + (forWho ? " for " + forWho : "") + " " + price);
+        saveLedger();
+        if (what) R(what);
+      };
+      if (it.potion) {
+        if (forWho) {
+          if (!rec(forWho)) {
+            R("I don't know who that is, sugar.");
+            return;
+          }
+          const why2 = potionRefusal(forWho, it.potion, sender);
+          if (why2) {
+            R(why2);
+            return;
+          }
+          R("\u{1F381} I've asked " + plainName(forWho) + " if they'll take your " + it.name + ". You only pay if they say yes.");
+          farmAsk(forWho, "\u{1F381} " + plainName(sender) + " wants to give you a " + it.name + " (" + potionDef(it.potion).desc + "). Drink it? Say yes or no.", (yes) => {
+            if (!yes) {
+              tell(sender, "\u{1F381} " + plainName(forWho) + " turned down your " + it.name + ", sugar. Your ribbons are still yours.");
+              return;
+            }
+            if (!spendRibbons(sender, price, it.name + " for " + plainName(forWho))) {
+              tell(forWho, "Aw, they couldn't pay for it after all, sugar.");
+              tell(sender, "You didn't have the ribbons anymore, hon.");
+              return;
+            }
+            givePotion(forWho, it.potion, sender, "a gift from " + plainName(sender));
+            tell(sender, "\u{1F381} " + plainName(forWho) + " drank your " + it.name + ". Enjoy the show.");
+            r.buys.n[it.id] = (r.buys.n[it.id] || 0) + 1;
+            saveLedger();
+          });
+          return;
+        }
+        const why = potionRefusal(sender, it.potion, sender);
+        if (why) {
+          R(why);
+          return;
+        }
+        spendRibbons(sender, price, it.name);
+        givePotion(sender, it.potion, sender, "bought it yourself");
+        done("\u{1F9EA} Down the hatch! " + price + " ribbons for a " + it.name + ". (" + ribbonsOf(sender) + " left)");
+        return;
+      }
+      if (forWho && it.id !== "dedicate") {
+        R("That one's just for you, sugar. Potions and dedications can be gifts.");
+        return;
+      }
+      switch (it.id) {
+        case "spin":
+        case "lucky": {
+          const res = spinWheel(sender, sender, it.id === "lucky" ? "lucky" : "", CFG.BOT_MEMBER);
+          if (!res) {
+            R("Nothin' on the wheel fits you right now, sugar, so I won't charge you.");
+            return;
+          }
+          spendRibbons(sender, price, it.name);
+          done("\u{1F3A1} " + price + " ribbons in the slot. (" + ribbonsOf(sender) + " left)");
+          return;
+        }
+        case "luxury": {
+          if (hasRole(sender, ROLE.LUXURY)) {
+            R("You're already livin' the luxury life, sugar.");
+            return;
+          }
+          spendRibbons(sender, price, it.name);
+          r.roles.push(ROLE.LUXURY);
+          r.luxuryTemp = true;
+          r.luxuryUntil = Date.now() + 24 * 36e5;
+          try {
+            syncKeys(sender, true);
+          } catch (e) {
+          }
+          if (onMap(sender)) emote("\u{1F6C1} The farm girl fluffs a pillow of clean straw and sets a little bell by " + plainName(sender) + ". A whole day of luxury, paid in ribbons. Ring if you need anything, darlin'.", sender);
+          done("\u{1F6C1} Your luxury day starts now, sugar: 24 hours. (" + ribbonsOf(sender) + " ribbons left)");
+          return;
+        }
+        case "skipchore": {
+          if (!r.chore) {
+            R("You haven't got a chore right now, sugar, so keep your ribbons.");
+            return;
+          }
+          spendRibbons(sender, price, it.name);
+          const was = r.chore.text;
+          r.chore = null;
+          done('\u{1F9F9} "' + String(was).replace(/\s*@[a-z0-9_-]+\s*$/i, "") + '" is off your list. Our little secret.');
+          return;
+        }
+        case "grace": {
+          if ((r.quotaGrace || 0) >= 2) {
+            R("You're already holdin' two, sugar. That's plenty of forgiveness.");
+            return;
+          }
+          spendRibbons(sender, price, it.name);
+          r.quotaGrace = (r.quotaGrace || 0) + 1;
+          done("\u{1F4CB} Quota grace in your pocket (" + r.quotaGrace + " now). The next day you come up short, it's forgiven.");
+          return;
+        }
+        case "greeting": {
+          if (text.length < 6 || text.length > 160) {
+            R("Write the line too, sugar (6 to 160 letters). %name% becomes your name. For example: ?buy greeting Look who's back, it's %name%, the prettiest cow in the county!");
+            return;
+          }
+          spendRibbons(sender, price, it.name);
+          r.greet = { text: text.replace(/[()]/g, ""), until: Date.now() + 7 * 864e5, ok: false };
+          notifyStaff("\u{1F380} " + plainName(sender) + ` bought a greetin' of their own: "` + r.greet.text + '". ?store approve ' + sender + " or ?store reject " + sender + " (refunds it).", true);
+          done("\u{1F380} Bought! Staff give it a read, then for a week I'll greet you with it.");
+          return;
+        }
+        case "tag": {
+          const t = text.replace(/[()\[\]<>]/g, "").trim();
+          if (t.length < 2 || t.length > 24) {
+            R("What should it say, sugar? 2 to 24 letters, like ?buy tag Good Girl");
+            return;
+          }
+          spendRibbons(sender, price, it.name);
+          r.tag = { text: t, until: Date.now() + 7 * 864e5 };
+          done('\u{1F380} Your tag reads "' + t + '" for a week. Look for it on ?who.');
+          return;
+        }
+        case "dedicate": {
+          const t = forWho || resolveTarget(rest[0]);
+          const how = /tease|degrade|mean/i.test(text) ? "tease" : "praise";
+          if (!t || !rec(t) || t === sender) {
+            R("Who's it for, sugar? ?buy dedicate <who> praise or ?buy dedicate <who> tease");
+            return;
+          }
+          if (!onMap(t)) {
+            R(plainName(t) + " isn't here to hear it, hon.");
+            return;
+          }
+          if (how === "tease" && !(rec(t).degradeMe || rec(t).teaseOptIn)) {
+            R(plainName(t) + " hasn't said they like bein' teased, sugar. Try praise.");
+            return;
+          }
+          spendRibbons(sender, price, it.name + " for " + plainName(t));
+          const pool = how === "tease" ? DEDICATE_TEASE : DEDICATE_PRAISE;
+          emote("\u{1F380} " + pool[Math.floor(Math.random() * pool.length)].replace(/%t/g, plainName(t)).replace(/%b/g, plainName(sender)), t);
+          done("\u{1F380} Dedicated. (" + ribbonsOf(sender) + " ribbons left)");
+          return;
+        }
+        case "bounty": {
+          const n = parseInt(rest[0], 10), job = rest.slice(1).join(" ").trim();
+          if (!(n >= 1 && n <= 50) || job.length < 4) {
+            R("How many ribbons, and what's the job? ?buy bounty <1-50> <the job>, like ?buy bounty 5 Brush down the ponies @stable");
+            return;
+          }
+          if (ribbonsOf(sender) < n) {
+            R("You've only got " + ribbonsOf(sender) + " ribbons, sugar.");
+            return;
+          }
+          spendRibbons(sender, n, "bounty: " + job);
+          L.chores.push({ text: job, by: sender, bounty: n, key: Date.now().toString(36) });
+          saveLedger();
+          done("\u{1F4CC} Bounty posted: " + n + ' ribbons to whoever does "' + job.replace(/\s*@[a-z0-9_-]+\s*$/i, "") + '".');
+          return;
+        }
+        default: {
+          if (it.id.startsWith("shot-")) {
+            const p = prodOf(sender), now = Date.now(), H = 36e5;
+            spendRibbons(sender, price, it.name);
+            if (it.id === "shot-milk") p.boosts.milk = now + 24 * H;
+            if (it.id === "shot-semen") p.boosts.semen = now + 24 * H;
+            if (it.id === "shot-fert") p.boosts.fert = now + 24 * H;
+            if (it.id === "shot-contra") p.boosts.contra = now + 48 * H;
+            if (onMap(sender)) emote("\u{1F489} The farm girl pinches up a bit of " + plainName(sender) + `'s flank and slides the needle in, quick and practiced. "There. You'll feel that by supper."`, sender);
+            done("\u{1F489} " + it.name + " in. " + it.desc + " (" + ribbonsOf(sender) + " ribbons left)");
+            return;
+          }
+          R("We don't stock that, hon. ?store shows the shelf.");
+        }
+      }
+    }
+    const DEDICATE_PRAISE = [
+      `The farm girl clears her throat for the whole barn: "This one's from %b, for %t. Prettiest thing in the straw, and the best behaved. Y'all take notice."`,
+      `"Special delivery from %b!" The farm girl tucks a ribbon behind %t's ear. "Says you're the sweetest animal on the property. I don't disagree."`,
+      `The farm girl leans on the rail by %t and reads off a little card: "From %b: you're doin' so good, and everybody can see it." She pats %t's cheek. "Ain't that nice."`,
+      `"Listen up! %b paid good ribbons to say %t is a credit to this farm." A few whistles go up from the hands. %t is blushin' to the ears.`
+    ];
+    const DEDICATE_TEASE = [
+      `The farm girl reads a little card out loud, grinnin': "From %b, for %t: 'You look so good drippin' in the straw, try not to moo too loud tonight.'" Somebody snickers.`,
+      `"Dedication for %t, courtesy of %b!" The farm girl tips %t's chin up. "Says you're the neediest thing in the barn. Look at that face. They ain't wrong."`,
+      `The farm girl taps %t's nose. "%b wanted everybody to know you've been eyein' the breedin' pen all day. Go on, deny it. Nobody believes you."`,
+      `"From %b, with love:" the farm girl reads, "'%t is all udder and no brains.'" She gives %t a fond squeeze. "Harsh. Accurate, but harsh."`
+    ];
+    function ribbonCommand(cmd, sender, args, R) {
+      const sub = String(args[0] || "").toLowerCase();
+      if (cmd === "buy") {
+        buy(sender, args, R);
+        return;
+      }
+      if (cmd === "gift") {
+        const t2 = args[0], item = args[1];
+        if (!t2 || !item) {
+          R("Gift what to who, sugar? ?gift <who> <potion>, like ?gift Bessie hiccup");
+          return;
+        }
+        buy(sender, [item, "for", t2].concat(args.slice(2)), R);
+        return;
+      }
+      if (cmd === "store") {
+        if (["price", "off", "on"].includes(sub)) {
+          if (!isProprietor(sender)) {
+            R("The proprietors stock the shelf, sugar.");
+            return;
+          }
+          const it = storeItem(args[1]);
+          if (!it) {
+            R("Which item, sugar? The words from ?store, like ?store price luxury 30");
+            return;
+          }
+          L.store = L.store || {};
+          L.store.price = L.store.price || {};
+          L.store.off = L.store.off || {};
+          if (sub === "price") {
+            const n = parseInt(args[2], 10);
+            if (!(n >= 0 && n <= 999)) {
+              R("A price from 0 to 999, sugar.");
+              return;
+            }
+            L.store.price[it.id] = n;
+          } else L.store.off[it.id] = sub === "off";
+          saveLedger();
+          audit(sender, "STORE", sub + " " + it.id + " " + (args[2] || ""));
+          R("\u{1F6CD}\uFE0F " + it.name + ": " + (sub === "price" ? args[2] + " ribbons now." : sub === "off" ? "off the shelf." : "back on the shelf."));
+          return;
+        }
+        if (sub === "approve" || sub === "reject") {
+          if (!isStaff(sender)) {
+            R("Staff read those, sugar.");
+            return;
+          }
+          const t2 = resolveTarget(args[1]), r2 = t2 && rec(t2);
+          if (!r2 || !r2.greet) {
+            R("Nobody by that name has a greetin' waitin', hon.");
+            return;
+          }
+          if (sub === "approve") {
+            r2.greet.ok = true;
+            saveLedger();
+            tell(t2, "\u{1F380} Your greetin' was approved, sugar! Next time you walk in, you'll hear it.");
+            R("\u{1F380} Approved.");
+          } else {
+            r2.greet = null;
+            earnRibbons(t2, (storeItem("greeting") || {}).price || 8, "a refund on your greetin'", sender, true);
+            saveLedger();
+            tell(t2, "\u{1F380} Staff passed on your greetin', sugar, so your ribbons are back. Try another line?");
+            R("\u{1F380} Rejected and refunded.");
+          }
+          return;
+        }
+        R(storeText(sender));
+        return;
+      }
+      if (cmd === "ribbon" && (sub === "give" || sub === "fine") || cmd === "ribbons" && (sub === "give" || sub === "fine")) {
+        if (!isStaff(sender)) {
+          R("Only staff hand out ribbons or take 'em, sugar.");
+          return;
+        }
+        const t2 = resolveTarget(args[1]), n = parseInt(args[2], 10), why = args.slice(3).join(" ").trim() || (sub === "give" ? "bein' good" : "misbehavin'");
+        if (!t2 || !rec(t2) || !(n >= 1)) {
+          R("Here's how, sugar: ?ribbon give <who> <n> [why] or ?ribbon fine <who> <n> [why]. For example: ?ribbon give Bessie 3 stood so nice for the milkin'");
+          return;
+        }
+        const cap = isProprietor(sender) ? 999 : isHerdmaster(sender) ? CFG.RIBBON_GRANT_MAX.herdmaster : CFG.RIBBON_GRANT_MAX.farmhand;
+        if (n > cap) {
+          R("You can " + sub + " up to " + cap + " at a time, sugar.");
+          return;
+        }
+        if (sub === "give") {
+          earnRibbons(t2, n, why + " (from " + plainName(sender) + ")", sender);
+          audit(sender, "RIBBON_GIVE", t2 + " " + n + " " + why);
+          R("\u{1F380} " + plainName(t2) + " gets " + n + ". They've got " + ribbonsOf(t2) + " now.");
+        } else {
+          const took = fineRibbons(t2, n, why, sender);
+          audit(sender, "RIBBON_FINE", t2 + " " + took + " " + why);
+          tell(t2, "\u{1F380} " + plainName(sender) + " took " + took + " ribbon" + (took === 1 ? "" : "s") + " off you for " + why + ", sugar. " + ribbonsOf(t2) + " left.");
+          R("\u{1F380} Took " + took + " from " + plainName(t2) + ". " + ribbonsOf(t2) + " left.");
+        }
+        return;
+      }
+      if (sub === "top" || sub === "board") {
+        const wk = weekKey();
+        const rows = Object.entries(L.people).filter(([, r2]) => r2.rw && r2.rw.key === wk && r2.rw.earned > 0).sort((a, b) => b[1].rw.earned - a[1].rw.earned).slice(0, 8);
+        R("\u{1F380} RIBBONS THIS WEEK\n" + (rows.length ? rows.map(([k, r2], i) => "  " + (i + 1) + ". " + plainName(parseInt(k, 10)) + " \xB7 " + r2.rw.earned + " earned").join("\n") : "  nobody's earned any yet") + "\nThe Sunday till pays the top earner a bonus.");
+        return;
+      }
+      const t = sub && sub !== "me" ? resolveTarget(args[0]) : sender;
+      if (t !== sender && !isStaff(sender)) {
+        R("Just your own purse, sugar. ?ribbons");
+        return;
+      }
+      const r = t && rec(t);
+      if (!r) {
+        R("I don't know who that is, sugar.");
+        return;
+      }
+      const mine = (L.ribbonLog || []).filter((e) => e.mn === t).slice(-6).reverse();
+      const d = dayKey(), today = r.rday && r.rday.d === d ? r.rday.n : 0;
+      R("\u{1F380} " + (t === sender ? "YOUR RIBBONS" : plainName(t).toUpperCase() + "'S RIBBONS") + ": " + (r.ribbons || 0) + "\nEarned today: " + today + " of " + CFG.RIBBON_DAY_CAP + (r.quotaGrace ? " \xB7 quota grace held: " + r.quotaGrace : "") + (mine.length ? "\n\nLately\n" + mine.map((e) => "  " + (e.n > 0 ? "+" : "") + e.n + " \xB7 " + e.why).join("\n") : "") + "\n\nEARN 'EM: make your milk quota \xB7 finish a stall session \xB7 do a chore \xB7 work a glory shift \xB7 best milk or top sire of the week \xB7 staff hand 'em out for good behavior\nSPEND 'EM: ?store");
+    }
+    const POTIONS = [
+      {
+        id: "clover",
+        name: "Clover Cream",
+        kind: "reward",
+        mins: 60,
+        price: 6,
+        desc: "Milk (or seed) comes in twice as fast for an hour, and every let-down feels like a gift.",
+        limit: /\bmilk|lactat/i,
+        drink: "It tastes like sweet clover and warm cream, and a slow heat spreads through your chest.",
+        seen: "%n drinks a little bottle of Clover Cream and sighs, already lookin' heavier and softer."
+      },
+      {
+        id: "golden",
+        name: "Golden Hour",
+        kind: "reward",
+        mins: 60,
+        price: 7,
+        desc: "For an hour, every time you cum the farm girl dotes on you, and it earns a ribbon (up to 3).",
+        limit: /\borgasm/i,
+        drink: "Honey-gold and fizzy. Everything goes warm and loose and glowy.",
+        seen: "%n tips back a bottle of Golden Hour, and a dreamy little smile spreads across their face."
+      },
+      {
+        id: "musk",
+        name: "Blue Ribbon Musk",
+        kind: "reward",
+        mins: 45,
+        price: 5,
+        desc: "For 45 minutes everybody nearby keeps noticin' you, and the farm girl makes sure you know it.",
+        limit: null,
+        drink: "You dab it on your neck and wrists. It smells like hay and heat and somethin' that makes heads turn.",
+        seen: "%n dabs on a little Blue Ribbon Musk. A couple of heads turn before the cork's even back in."
+      },
+      {
+        id: "honey",
+        name: "Honey Tongue",
+        kind: "reward",
+        mins: 45,
+        price: 5,
+        desc: "For 45 minutes the farm girl whispers sweet, filthy praise in your ear.",
+        limit: /\bpraise/i,
+        drink: "Thick as honey and twice as sweet. Your ears go pink before it's even down.",
+        seen: "%n licks a drop of Honey Tongue off their lips, and starts glowin' like they've been told somethin' nice."
+      },
+      {
+        id: "bitterroot",
+        name: "Bitterroot",
+        kind: "punish",
+        mins: 30,
+        price: 5,
+        desc: "For 30 minutes, every orgasm slips away ruined, and nobody gets filled by you.",
+        limit: /\b(denial|ruin|orgasm)/i,
+        drink: "Bitter as a scolding. It settles low and tight and mean, right where you ache.",
+        seen: "%n chokes down a bottle of Bitterroot and makes a face. Somebody's in for a frustratin' half hour."
+      },
+      {
+        id: "heavy",
+        name: "Heavy Udder Draught",
+        kind: "punish",
+        mins: 20,
+        price: 5,
+        desc: "For 20 minutes you fill three times as fast, and the stalls won't take you. Ache for it.",
+        limit: /\bmilk|lactat/i,
+        drink: "Thick and creamy and it goes straight to your chest. You can feel it fillin' already.",
+        seen: "%n gulps down a Heavy Udder Draught. You can practically watch 'em swell."
+      },
+      {
+        id: "moo",
+        name: "Moo Juice",
+        kind: "punish",
+        mins: 20,
+        price: 4,
+        needsPanel: true,
+        desc: "For 20 minutes your words keep comin' out as animal noises (needs the Companion).",
+        limit: /\b(speech|humiliat)/i,
+        drink: "It tastes like grass. You open your mouth to complain and a moo falls out.",
+        seen: "%n drinks a bottle of Moo Juice. They start to say somethin' and it comes out a very confused moo."
+      },
+      {
+        id: "bell",
+        name: "Bell Tonic",
+        kind: "punish",
+        mins: 30,
+        price: 4,
+        desc: "For 30 minutes a cowbell clangs every time you move. Everybody knows where you are.",
+        limit: /\bhumiliat/i,
+        drink: "Tastes like brass and bad decisions. Somewhere, a bell starts ringin'.",
+        seen: "%n drinks a Bell Tonic, and a loud brassy CLANG follows the very first step they take."
+      },
+      {
+        id: "needy",
+        name: "Needy Nectar",
+        kind: "punish",
+        mins: 30,
+        price: 4,
+        desc: "For 30 minutes you ache and squirm and can't stop thinkin' about it. ?beg nicely and it might let up early.",
+        limit: /\b(arous|denial)/i,
+        drink: "Sweet at first, then it blooms into a slow, maddenin' throb that won't settle.",
+        seen: "%n drinks a Needy Nectar and starts squirmin' within the minute, thighs pressed tight."
+      },
+      {
+        id: "hiccup",
+        name: "Hiccup Fizz",
+        kind: "silly",
+        mins: 15,
+        price: 3,
+        desc: "Fifteen minutes of hiccups. At the worst possible moments.",
+        limit: null,
+        drink: "Fizzy and bright and *hic*. Oh no.",
+        seen: "%n drinks a Hiccup Fizz and immediately lets out a very loud *hic*."
+      },
+      {
+        id: "feather",
+        name: "Featherlight",
+        kind: "silly",
+        mins: 15,
+        price: 3,
+        desc: "Fifteen minutes of bein' unbearably ticklish. Everything makes you giggle.",
+        limit: /\btickl/i,
+        drink: "Light as a feather, and suddenly your whole skin feels like one.",
+        seen: "%n drinks a Featherlight and giggles when the breeze touches 'em."
+      },
+      {
+        id: "wrongbarn",
+        name: "Wrong Barn",
+        kind: "silly",
+        mins: 60,
+        price: 5,
+        desc: "For an hour you're a different animal. Noises, stall story and all.",
+        limit: /\bspecies/i,
+        drink: "It tastes like somebody else's feed. Your whole body goes a bit\u2026 different.",
+        seen: "%n drinks a Wrong Barn and blinks. They don't seem quite like themselves."
+      },
+      {
+        id: "bigbritches",
+        name: "Big Britches",
+        kind: "silly",
+        mins: 60,
+        price: 4,
+        desc: "Somethin' of yours grows two sizes for an hour, then snaps back.",
+        limit: /\b(size|growth|grow)/i,
+        drink: "It goes down warm and then a whole lot of you gets\u2026 more.",
+        seen: "%n drinks a Big Britches, and somethin' on 'em swells right out of its britches."
+      },
+      {
+        id: "shrink",
+        name: "Shrinking Violet",
+        kind: "silly",
+        mins: 60,
+        price: 4,
+        desc: "Somethin' of yours shrinks two sizes for an hour, then comes back.",
+        limit: /\b(size|shrink)/i,
+        drink: "Cool and minty, and a whole lot of you suddenly feels very small.",
+        seen: "%n drinks a Shrinking Violet and goes a little smaller somewhere important."
+      },
+      {
+        id: "echo",
+        name: "Echo Elixir",
+        kind: "silly",
+        mins: 20,
+        price: 3,
+        desc: "Twice in 20 minutes, the farm girl repeats somethin' you said back to the room. Sweetly.",
+        limit: /\bhumiliat/i,
+        drink: "It tastes like it's been said before. Twice.",
+        seen: "%n drinks an Echo Elixir. The farm girl's ears perk up."
+      },
+      {
+        id: "heatmist",
+        name: "Heat Mist",
+        kind: "silly",
+        mins: 15,
+        price: 4,
+        desc: "Fifteen minutes in heat, right now, wherever you're standin'.",
+        limit: /\bheat/i,
+        drink: "A sweet mist, one breath of it, and you go hot and flushed all over.",
+        seen: "%n breathes in a puff of Heat Mist and flushes pink from the ears down."
+      }
+    ];
+    const potionDef = (id) => POTIONS.find((p) => p.id === String(id || "").toLowerCase()) || null;
+    function potionOn(mn, id) {
+      const r = rec(mn), f = r && r.fx && r.fx[id];
+      return !!(f && f.until > Date.now());
+    }
+    function activePotions(mn) {
+      const r = rec(mn), now = Date.now();
+      return r && r.fx ? Object.entries(r.fx).filter(([, f]) => f.until > now).map(([id, f]) => Object.assign({ id }, f)) : [];
+    }
+    function potionRefusal(mn, id, by) {
+      const P = potionDef(id), r = rec(mn);
+      if (!P) return "There's no potion called that, sugar. ?potions lists 'em.";
+      if (!r || !r.roles || !r.roles.length) return plainName(mn) + " isn't on the books, sugar.";
+      if (by !== mn && !r.potionsOn) return plainName(mn) + " hasn't said ?potions on, so nobody else can give 'em one.";
+      const lim = String(r.limits || "");
+      if (/\bpotion/i.test(lim) || P.limit && P.limit.test(lim)) return plainName(mn) + "'s limits rule out a " + P.name + ", sugar.";
+      if (P.needsPanel && !hasCompanion(mn)) return "A " + P.name + " only works with the Companion, and " + (by === mn ? "you don't" : plainName(mn) + " doesn't") + " have it runnin'.";
+      if ((P.id === "clover" || P.id === "heavy") && !makesMilk(mn) && !makesSemen(mn)) return plainName(mn) + " isn't makin' milk or seed, so it'd do nothin'.";
+      if ((P.id === "bigbritches" || P.id === "shrink") && !potionPart(mn)) return plainName(mn) + " hasn't got anything that size changes on, sugar.";
+      if (P.id === "wrongbarn" && !r.species) return plainName(mn) + " isn't an animal yet, so there's no barn to get wrong.";
+      return null;
+    }
+    function potionPart(mn) {
+      const have = (typeof bodyParts === "function" ? bodyParts(mn) : []).filter((k) => ["udder", "penis", "testes", "butt"].includes(k) && CFG.SIZES[k]);
+      return have.length ? have[Math.floor(Math.random() * have.length)] : null;
+    }
+    function givePotion(mn, id, by, how) {
+      const P = potionDef(id), r = rec(mn);
+      if (!P || !r) return false;
+      r.fx = r.fx || {};
+      const now = Date.now(), was = r.fx[id] && r.fx[id].until > now;
+      const f = was ? r.fx[id] : { at: now, by: by || 0, n: 0 };
+      f.until = now + P.mins * 6e4;
+      r.fx[id] = f;
+      if (!was) potionStart(mn, P, f);
+      saveLedger();
+      audit(by || CFG.BOT_MEMBER, "POTION", mn + " " + id + (how ? " (" + how + ")" : ""));
+      tell(mn, "\u{1F9EA} " + P.name + (how ? " (" + how + ")" : "") + ": " + P.drink + " " + P.desc + " Your safeword pours it out.");
+      if (onMap(mn)) emote("\u{1F9EA} " + P.seen.replace(/%n/g, plainName(mn)), mn);
+      syncCompanions(true);
+      return true;
+    }
+    function potionStart(mn, P, f) {
+      const p = prodOf(mn), r = rec(mn), now = Date.now();
+      if (P.id === "clover") {
+        if (makesMilk(mn)) p.boosts.milk = Math.max(p.boosts.milk || 0, now + P.mins * 6e4);
+        if (makesSemen(mn)) p.boosts.semen = Math.max(p.boosts.semen || 0, now + P.mins * 6e4);
+      }
+      if (P.id === "bitterroot") p.deniedUntil = Math.max(p.deniedUntil || 0, now + P.mins * 6e4);
+      if (P.id === "heatmist") startHeat(mn, f.by || CFG.BOT_MEMBER, P.mins / 60);
+      if (P.id === "wrongbarn") {
+        const kinds = Object.keys(CFG.SPECIES).filter((k) => k !== "default" && k !== speciesKey(mn));
+        const to = kinds[Math.floor(Math.random() * kinds.length)];
+        f.was = r.species;
+        f.to = SHOWN_SPECIES[to] || to;
+        r.species = f.to;
+      }
+      if (P.id === "bigbritches" || P.id === "shrink") {
+        const part = potionPart(mn);
+        if (part) {
+          f.part = part;
+          f.was = sizeOf(mn, part);
+          setSize(mn, part, f.was + (P.id === "shrink" ? -2 : 2), false);
+        }
+      }
+    }
+    function endPotion(mn, id, quiet) {
+      const r = rec(mn), f = r && r.fx && r.fx[id], P = potionDef(id);
+      if (!f) return;
+      delete r.fx[id];
+      const p = prodOf(mn);
+      if (id === "bitterroot" && p) p.deniedUntil = Math.min(p.deniedUntil || 0, Date.now());
+      if (id === "wrongbarn" && r.species === f.to) r.species = f.was || r.species;
+      if ((id === "bigbritches" || id === "shrink") && f.part && f.was) setSize(mn, f.part, f.was, false);
+      if (id === "heatmist" && p && p.heat && p.heat.by === f.by) p.heat.until = Math.min(p.heat.until, Date.now());
+      saveLedger();
+      syncCompanions(true);
+      if (!quiet && P) tell(mn, "\u{1F9EA} Your " + P.name + " has worn off, sugar.");
+    }
+    function clearPotions(mn) {
+      const r = rec(mn);
+      if (!r || !r.fx) return;
+      for (const id of Object.keys(r.fx)) endPotion(mn, id, true);
+    }
+    const FX_LINES = {
+      musk: [
+        "Heads keep turnin' toward %n. Somethin' about the way they smell today has the whole barn restless.",
+        "A farmhand walks past %n, stops, and walks past again, slower this time.",
+        "%n catches somebody starin'. They don't even pretend they weren't.",
+        "The studs in the far pen have gone quiet and still, noses up, every one of 'em pointed at %n.",
+        `The farm girl leans close to %n and breathes in. "Lord, sugar. You're gonna cause a stampede."`
+      ],
+      honey: [
+        `"Look at you, standin' so pretty for me. Best little animal on the property."`,
+        `"Every hand on this farm wants a turn with you today, sugar. Can't say I blame 'em."`,
+        `"You know what you are? You're a good, good thing, and you look so sweet bein' kept."`,
+        '"I could watch you all day. Them hips, that face, the way you just take it. Perfect."',
+        `"Such a soft, obedient creature. The farm's lucky to have you, and so am I."`,
+        `"Keep bein' this good and I'll make sure everybody hears about it."`
+      ],
+      needy: [
+        "The ache doesn't let up. Every shift of your hips makes it worse, and better, and worse.",
+        "You catch yourself rubbin' your thighs together and can't make yourself stop.",
+        "Every brush of fabric, every breeze through the barn, goes straight between your legs.",
+        "You'd beg. You'd beg anybody. The thought won't leave you alone.",
+        "It throbs, slow and patient and merciless, like it's got all day."
+      ],
+      hiccup: [
+        "%n lets out a loud *hic*, right in the middle of everything.",
+        "*HIC.* %n claps a hand over their mouth. Too late.",
+        "%n tries so hard to hold it in that the *hic* comes out as a squeak.",
+        "Three little *hics* in a row out of %n. The whole pen is grinnin'."
+      ],
+      feather: [
+        "A stray bit of straw brushes %n's side and they dissolve into helpless giggles.",
+        "%n squeaks and twists away from absolutely nothin'. The air tickled 'em.",
+        "Somebody breathes near %n's neck and they nearly fall over laughin'."
+      ],
+      bell: [
+        "CLANG. CLANG. Everybody knows exactly where %n is goin'.",
+        "%n tries to sneak, and the bell says CLANG anyway.",
+        "A brassy CLANG rings out across the yard as %n moves. Subtle as a dinner bell."
+      ]
+    };
+    function fxLine(id, mn) {
+      const a = FX_LINES[id];
+      return a[Math.floor(Math.random() * a.length)].replace(/%n/g, plainName(mn));
+    }
+    function potionTick() {
+      const now = Date.now();
+      for (const [k, r] of Object.entries(L.people)) {
+        if (!r.fx) continue;
+        const mn = parseInt(k, 10);
+        for (const [id, f] of Object.entries(r.fx)) {
+          if (f.until <= now) {
+            endPotion(mn, id, !charFor(mn));
+            continue;
+          }
+          if (!onMap(mn)) continue;
+          const every2 = (a, b) => {
+            if (!f.next) f.next = now + (a + Math.random() * (b - a)) * 6e4;
+            if (now < f.next) return false;
+            f.next = now + (a + Math.random() * (b - a)) * 6e4;
+            return true;
+          };
+          if (id === "musk" && every2(5, 9)) emote("\u{1F490} " + fxLine("musk", mn), mn);
+          if (id === "honey" && every2(5, 9)) privateTo(mn, "\u{1F36F} The farm girl leans in close to " + plainName(mn) + "'s ear: " + fxLine("honey", mn), "emote");
+          if (id === "needy" && every2(4, 7)) privateTo(mn, "\u{1F497} " + fxLine("needy", mn), "emote");
+          if (id === "hiccup" && every2(1, 3)) emote(fxLine("hiccup", mn), mn);
+          if (id === "feather" && every2(2, 4)) emote(fxLine("feather", mn), mn);
+          if (id === "bell") {
+            const C = charFor(mn), pos = C && C.MapData && C.MapData.Pos;
+            if (pos) {
+              const moved = f.pos && (f.pos.X !== pos.X || f.pos.Y !== pos.Y);
+              f.pos = { X: pos.X, Y: pos.Y };
+              if (moved && now - (f.rang || 0) > 45e3) {
+                f.rang = now;
+                emote("\u{1F514} " + fxLine("bell", mn), mn);
+              }
+            }
+          }
+        }
+      }
+    }
+    function potionClimax(mn) {
+      if (potionOn(mn, "bitterroot")) {
+        const r = rec(mn), p = prodOf(mn);
+        if (makesSemen(mn) && p.semen >= 2) p.semen -= Math.min(p.semen, p.semen * 0.2);
+        face(mn, "edged", 25);
+        emote(pickFresh("bitter", [
+          plainName(mn) + " gets right to the edge and the Bitterroot yanks it away. Ruined, leakin', and not one bit satisfied.",
+          plainName(mn) + " shudders and it just\u2026 fizzles. Bitterroot. They whine like it's the meanest thing that ever happened to 'em.",
+          "It slips right through " + plainName(mn) + "'s fingers, ruined. The Bitterroot ain't done with 'em yet."
+        ]), mn);
+        return "ruined";
+      }
+      if (potionOn(mn, "golden")) {
+        const f = rec(mn).fx.golden;
+        if ((f.n || 0) < 3) {
+          f.n = (f.n || 0) + 1;
+          later(() => earnRibbons(mn, 1, "a Golden Hour orgasm", CFG.BOT_MEMBER), 1500);
+        }
+        later(() => privateTo(mn, "\u2728 The farm girl strokes " + plainName(mn) + `'s hair while they come down. "There it is. That's my good thing. Look how pretty you are when you let go."`, "emote"), 2500);
+      }
+      return null;
+    }
+    function potionHeard(mn, text, type) {
+      if (type !== "Chat" || !potionOn(mn, "echo")) return;
+      const f = rec(mn).fx.echo, t = String(text).trim(), now = Date.now();
+      if ((f.n || 0) >= 2 || now - (f.echoAt || 0) < 18e4 || t.length < 4 || t.length > 140 || /^[?!.\-\/(]/.test(t)) return;
+      if (Math.random() < 0.5) return;
+      f.n = (f.n || 0) + 1;
+      f.echoAt = now;
+      saveLedger();
+      later(() => emote(`\u{1F5E3}\uFE0F The farm girl puts a hand to her heart. "Did y'all hear that? ` + plainName(mn) + " just said, and I quote: '" + t.replace(/[()]/g, "") + `'. Ain't that just the sweetest thing."`, mn), 2500);
+    }
+    function potionBegged(mn) {
+      if (!potionOn(mn, "needy")) return false;
+      endPotion(mn, "needy", true);
+      privateTo(mn, '\u{1F497} The farm girl strokes your cheek. "Since you asked so sweet." The ache finally, finally starts to ease.', "emote");
+      return true;
+    }
+    function potionsText(mn) {
+      const r = rec(mn), act = activePotions(mn);
+      const row = (P) => "  " + P.id + " \xB7 " + P.name + " (" + P.mins + " min) \xB7 " + P.desc;
+      return "\u{1F9EA} POTIONS\n" + (act.length ? "\nIN YOU RIGHT NOW\n" + act.map((a) => "  " + potionDef(a.id).name + " \xB7 " + Math.ceil((a.until - Date.now()) / 6e4) + " min left").join("\n") + "\n" : "") + "\nREWARDS\n" + POTIONS.filter((p) => p.kind === "reward").map(row).join("\n") + "\n\nPUNISHMENTS\n" + POTIONS.filter((p) => p.kind === "punish").map(row).join("\n") + "\n\nJUST BECAUSE\n" + POTIONS.filter((p) => p.kind === "silly").map(row).join("\n") + "\n\nGifts from others: " + (r && r.potionsOn ? "ON" : "off") + " (?potions on|off). Buy one: ?buy <potion>. Your safeword pours every one out.";
+    }
+    const DARES = [
+      { t: "Moo out loud every time somebody says your name, for the next ten minutes." },
+      { t: "Crawl to the feed trough on all fours and eat a mouthful like a good animal." },
+      { t: "Find a farmhand and ask them, politely, to check how full you are. With their hands." },
+      { t: "Kneel by the gate and greet the next person who walks in with your best animal noise." },
+      { t: "Tell the room, out loud, what you'd let the farm do to you if nobody was watchin'." },
+      { t: "Present yourself at the milkin' stall and stay there till you've given somethin'." },
+      { t: "Ask somebody to clip a lead on you and walk you one full lap of the yard." },
+      { t: "Describe, in an emote, exactly how you'd look locked in the stocks right now." },
+      { t: "Thank a member of staff for keepin' you, sincerely, in front of everyone." },
+      { t: "Let the next person who asks give you one swat. Say thank you after." },
+      { t: "Strike your prettiest pose by the barn door and hold it for two whole minutes." },
+      { t: "Beg the farm girl for a treat, and mean it. (?beg, with the proper words)" },
+      { t: "Go tell somebody you've never talked to that they smell nice. Sniff first.", reckless: true },
+      { t: "Ask a stud, out loud, if they'd like to breed you today. (Takin' no for an answer is part of the dare.)", reckless: true },
+      { t: "Walk into the middle of the yard, stretch real slow, and let everybody look.", reckless: true },
+      { t: "Ask a hand to milk you by hand, right where you're standin'.", reckless: true },
+      { t: "Climb into the stocks yourself and ask somebody to latch you in.", reckless: true },
+      { t: "Pick somebody and tell 'em one dirty thing you've thought about 'em today.", reckless: true },
+      { t: "Go stand in a glory stall for five minutes. See what happens.", reckless: true },
+      { t: "Announce to the whole room that you're a needy little thing and could use some attention.", reckless: true }
+    ];
+    function giveDare(mn, by, reckless, text) {
+      const r = rec(mn);
+      if (!r) return false;
+      const pool = DARES.filter((d2) => !!d2.reckless === !!reckless);
+      const lim = String(r.limits || "").toLowerCase();
+      const ok = pool.filter((d2) => !d2.t.toLowerCase().split(/[^a-z]+/).some((w) => w.length >= 5 && lim.includes(w)));
+      const d = text ? { t: text, reckless: !!reckless } : ok[Math.floor(Math.random() * ok.length)];
+      if (!d) return false;
+      r.dare = { text: d.t, reckless: !!d.reckless, until: Date.now() + CFG.DARE_MIN * 6e4, by: by || CFG.BOT_MEMBER };
+      saveLedger();
+      audit(by || CFG.BOT_MEMBER, "DARE", mn + " " + d.t.slice(0, 50));
+      syncCompanions(true);
+      tell(mn, "\u{1F3B2} " + (d.reckless ? "A RECKLESS DARE" : "A DARE") + ", sugar: " + d.t + "\nYou've got " + CFG.DARE_MIN + " minutes. ?dared when it's done (on your honor), ?dare skip if you chicken out.");
+      if (onMap(mn)) emote("\u{1F3B2} The farm girl slips " + plainName(mn) + " a folded card with a wicked little grin. " + (d.reckless ? "That one's a reckless dare. Y'all might want to watch." : "A dare."), mn);
+      return true;
+    }
+    function dareTick() {
+      const now = Date.now();
+      for (const [k, r] of Object.entries(L.people)) {
+        if (!r.dare || r.dare.until > now) continue;
+        const mn = parseInt(k, 10);
+        r.dare = null;
+        saveLedger();
+        const took = fineRibbons(mn, 1, "a dare left undone", CFG.BOT_MEMBER);
+        tell(mn, "\u{1F3B2} Time's up on your dare, sugar, and you didn't say ?dared." + (took ? " That's a ribbon off you." : "") + " Chicken. \u{1F414}");
+      }
+    }
+    function dareCommand(cmd, sender, args, R) {
+      const r = rec(sender), sub = String(args[0] || "").toLowerCase();
+      if (cmd === "dares") {
+        if (!r || !r.roles || !r.roles.length) {
+          R("Dares are for folks on the books, sugar.");
+          return;
+        }
+        if (/^(on|off)$/.test(sub)) {
+          r.daresOn = sub === "on";
+          saveLedger();
+          syncCompanions(true);
+          R(r.daresOn ? "\u{1F3B2} Dares ON. Staff and the wheel can hand you one now. ?dares off any time." : "\u{1F3B2} Dares off. Nobody can hand you one.");
+          return;
+        }
+        R("\u{1F3B2} Dares are " + (r.daresOn ? "ON" : "off") + " for you, sugar. ?dares on|off." + (r.dare ? "\nYour dare: " + r.dare.text : ""));
+        return;
+      }
+      if (cmd === "dared") {
+        if (!r || !r.dare) {
+          R("You haven't got a dare right now, sugar.");
+          return;
+        }
+        const d = r.dare;
+        r.dare = null;
+        saveLedger();
+        syncCompanions(true);
+        earnRibbons(sender, d.reckless ? CFG.DARE_RIBBONS_RECKLESS : CFG.DARE_RIBBONS, d.reckless ? "doin' a reckless dare" : "doin' your dare", CFG.BOT_MEMBER);
+        if (onMap(sender)) emote("\u{1F3B2} " + plainName(sender) + " did their dare" + (d.reckless ? ", the reckless one, too" : "") + `. The farm girl ties a ribbon on 'em. "Brave little thing."`, sender);
+        R("\u{1F3B2} Done and dusted. Good animal.");
+        return;
+      }
+      if (sub === "skip" || sub === "chicken") {
+        if (!r || !r.dare) {
+          R("No dare to skip, sugar.");
+          return;
+        }
+        r.dare = null;
+        saveLedger();
+        syncCompanions(true);
+        const took = fineRibbons(sender, 1, "chickenin' out of a dare", CFG.BOT_MEMBER);
+        R("\u{1F414} Bawk bawk. Dare's gone" + (took ? ", and so's a ribbon" : "") + ".");
+        return;
+      }
+      if (!sub) {
+        R(r && r.dare ? "\u{1F3B2} Your dare: " + r.dare.text + "\n" + Math.max(0, Math.ceil((r.dare.until - Date.now()) / 6e4)) + " minutes left. ?dared when it's done \xB7 ?dare skip" : "\u{1F3B2} No dare right now, sugar. ?dares on lets staff and the wheel give you one.");
+        return;
+      }
+      if (!isStaff(sender)) {
+        R("Only staff hand out dares, sugar. The wheel does too.");
+        return;
+      }
+      const t = resolveTarget(args[0]), tr = t && rec(t);
+      if (!tr) {
+        R("Dare who, sugar? ?dare <who> [reckless] [your own dare]");
+        return;
+      }
+      if (!tr.daresOn) {
+        R(plainName(t) + " hasn't said ?dares on, sugar.");
+        return;
+      }
+      const reckless = /^reckless$/i.test(args[1] || "");
+      const own = args.slice(reckless ? 2 : 1).join(" ").trim();
+      giveDare(t, sender, reckless, own || null);
+      R("\u{1F3B2} Dared " + plainName(t) + ".");
+    }
+    function penSpots() {
+      return Object.entries(L.spots || {}).filter(([n]) => n === "pen" || /^pens?-/.test(n) || n === "pens");
+    }
+    function milkSpots() {
+      return Object.entries(L.spots || {}).filter(([n]) => n.startsWith("milking"));
+    }
+    function penIn(mn, mins, by, where) {
+      const r = rec(mn);
+      if (!r) return null;
+      let spots = where === "milking" ? milkSpots() : penSpots();
+      if (where && where !== "milking") spots = Object.entries(L.spots || {}).filter(([n]) => n === where);
+      if (!spots.length) return null;
+      const taken = (s2) => (W.ChatRoomCharacter || []).some((c) => c.MemberNumber !== mn && c.MapData && c.MapData.Pos && c.MapData.Pos.X === s2.X && c.MapData.Pos.Y === s2.Y);
+      const pick = spots.find(([, s2]) => !taken(s2)) || spots[0];
+      const [name, s] = pick;
+      r.penned = { until: Date.now() + mins * 6e4, X: s.X, Y: s.Y, name, by: by || CFG.BOT_MEMBER };
+      saveLedger();
+      audit(by || CFG.BOT_MEMBER, "PEN", mn + " " + name + " " + mins + "m");
+      if (onMap(mn)) teleport(mn, { X: s.X, Y: s.Y }, true);
+      tell(mn, (where === "milking" ? "\u{1F95B} Strapped into the milkin' stall" : "\u{1F6A7} Penned up at " + name) + " for " + mins + " minutes, sugar. Wander off and I'll fetch you right back. Your safeword opens the gate.");
+      return name;
+    }
+    function unpen(mn, quiet) {
+      const r = rec(mn);
+      if (!r || !r.penned) return false;
+      r.penned = null;
+      saveLedger();
+      if (!quiet) tell(mn, "\u{1F6A7} The gate swings open, sugar. You're free to go.");
+      return true;
+    }
+    function penTick() {
+      const now = Date.now();
+      for (const [k, r] of Object.entries(L.people)) {
+        if (!r.penned) continue;
+        const mn = parseInt(k, 10);
+        if (r.penned.until <= now) {
+          unpen(mn, !charFor(mn));
+          continue;
+        }
+        const C = charFor(mn), pos = C && C.MapData && C.MapData.Pos;
+        if (!pos || pos.X < 0) continue;
+        if (Math.max(Math.abs(pos.X - r.penned.X), Math.abs(pos.Y - r.penned.Y)) <= 2) continue;
+        if (now - (r.penned.pullAt || 0) < 3e4) continue;
+        r.penned.pullAt = now;
+        saveLedger();
+        teleport(mn, { X: r.penned.X, Y: r.penned.Y }, true);
+        emote("\u{1F6A7} " + pickFresh("penback", [
+          "The farm girl catches " + plainName(mn) + ` by the collar and walks 'em right back to the pen. "Nice try, sugar."`,
+          plainName(mn) + " makes it three steps before a farmhand steers 'em back through the gate.",
+          `"And where do you think you're goin'?" The farm girl tuts and herds ` + plainName(mn) + " back where they belong."
+        ]), mn);
+      }
+    }
+    function penCommand(cmd, sender, args, R) {
+      if (cmd === "unpen") {
+        const t2 = resolveTarget(args[0]);
+        if (!t2 || !unpen(t2)) {
+          R("They ain't penned, hon. ?unpen <who>");
+          return;
+        }
+        audit(sender, "UNPEN", String(t2));
+        R("\u{1F6A7} Let " + plainName(t2) + " out of the pen.");
+        return;
+      }
+      const t = resolveTarget(args[0]);
+      if (!t || !rec(t)) {
+        R("Here's how, sugar: ?pen <who> [minutes, 5-240] [milking or a spot name]. Pen spots: ?spot set pen (and pen-2, pen-3\u2026). For example: ?pen Bessie 30 \xB7 ?pen Bessie 20 milking");
+        return;
+      }
+      const mins = Math.max(5, Math.min(240, parseInt(args[1], 10) || 30));
+      const where = args[2] ? String(args[2]).toLowerCase() : null;
+      const name = penIn(t, mins, sender, where);
+      if (!name) {
+        R(where === "milking" ? "No milkin' stalls are set up, sugar (?spot set milking1)." : "There's no pen spot yet, sugar. Stand in the pen and say ?spot set pen.");
+        return;
+      }
+      R("\u{1F6A7} " + plainName(t) + " is penned at " + name + " for " + mins + " minutes.");
+    }
+    function potionCommand(cmd, sender, args, R) {
+      const r = rec(sender), sub = String(args[0] || "").toLowerCase();
+      if (/^(on|off)$/.test(sub)) {
+        if (!r || !r.roles || !r.roles.length) {
+          R("Potions are for folks on the books, sugar.");
+          return;
+        }
+        r.potionsOn = sub === "on";
+        saveLedger();
+        syncCompanions(true);
+        R(r.potionsOn ? "\u{1F9EA} Potions ON: staff, the wheel, and gifts (you'll be asked) can give you one now. Your limits still rule some out. ?potions off any time." : "\u{1F9EA} Potions off. Only ones you buy yourself.");
+        return;
+      }
+      if (sub === "give") {
+        if (!isStaff(sender)) {
+          R("Only staff hand out potions, sugar. Gift one with ?buy <potion> for <who>.");
+          return;
+        }
+        const t = resolveTarget(args[1]), P = potionDef(args[2]);
+        if (!t || !P) {
+          R("?potion give <who> <potion>, like ?potion give Bessie hiccup. ?potions lists 'em.");
+          return;
+        }
+        const why = potionRefusal(t, P.id, sender);
+        if (why) {
+          R(why);
+          return;
+        }
+        givePotion(t, P.id, sender, "from " + plainName(sender));
+        R("\u{1F9EA} " + plainName(t) + " drank a " + P.name + ".");
+        return;
+      }
+      if (sub === "end" || sub === "clear") {
+        const t = args[1] ? resolveTarget(args[1]) : sender;
+        if (t !== sender && !isStaff(sender)) {
+          R("Only staff pour out somebody else's, sugar.");
+          return;
+        }
+        if (!t || !activePotions(t).length) {
+          R("Nothin' to pour out, sugar.");
+          return;
+        }
+        if (t === sender && !isStaff(sender)) {
+          R("No backin' out of a potion, sugar. It wears off when it wears off (your safeword pours 'em out if you need it).");
+          return;
+        }
+        clearPotions(t);
+        R("\u{1F9EA} Poured out " + plainName(t) + "'s potions.");
+        tell(t, "\u{1F9EA} Staff poured out your potions, sugar.");
+        return;
+      }
+      R(potionsText(sender));
+    }
+    const FARM_SLICES = [
+      // rewards
+      { kind: "reward", text: "\u{1F380} Three ribbons for %name%. Spend 'em wisely, sugar.", act: "ribbons 3" },
+      { kind: "reward", text: "\u{1F380} Five whole ribbons! Somebody's the farm's favorite today.", act: "ribbons 5" },
+      { kind: "reward", text: "\u{1F9EA} A bottle of Clover Cream for %name%. Let it all down, sugar.", act: "potion clover" },
+      { kind: "reward", text: "\u{1F9EA} Golden Hour for %name%. Go on and enjoy yourself.", act: "potion golden" },
+      { kind: "reward", text: "\u{1F9EA} A dab of Blue Ribbon Musk. Every head on the farm's gonna turn.", act: "potion musk" },
+      { kind: "reward", text: "\u{1F9EA} Honey Tongue! The farm girl's gonna sweet-talk %name% for a while.", act: "potion honey" },
+      { kind: "reward", text: "\u{1F6C1} A luxury hour for %name%: soft straw and the good feed.", act: "luxury 1" },
+      { kind: "reward", text: "\u{1F4CB} Quota grace! One bad milk day forgiven, in advance.", act: "grace" },
+      { kind: "reward", text: "\u{1F513} Time off for good behavior: out of the stocks and the pen early.", act: "release" },
+      // punishments
+      { kind: "punish", text: "\u26D3\uFE0F Into the stocks with %name% for 20 minutes. Bottom up, sugar.", act: "stocks 20" },
+      { kind: "punish", text: "\u26D3\uFE0F The stocks, 45 minutes. Somebody's gonna be sore and on display.", act: "stocks 45" },
+      { kind: "punish", text: "\u{1F6A7} Penned up for half an hour. Think about what you did.", act: "pen 30" },
+      { kind: "punish", text: "\u{1F6A7} An hour in the pen, %name%. The gate's latched.", act: "pen 60" },
+      { kind: "punish", text: "\u{1F95B} Strapped into the milkin' stall for 30 minutes. Every last drop.", act: "milkstall 30" },
+      { kind: "punish", text: "\u{1F573}\uFE0F A 30 minute punishment shift in the glory stalls. Strangers only.", act: "glory 30" },
+      { kind: "punish", text: "\u{1F573}\uFE0F A full hour on punishment shift in the glory stalls. Good luck, sugar.", act: "glory 60" },
+      { kind: "punish", text: "\u{1F9AE} On the spinner's lead for 20 minutes. Heel.", act: "leash 20" },
+      { kind: "punish", text: "\u{1F6AB} Two hours of denial. Every drop stays in.", act: "denial 2" },
+      { kind: "punish", text: "\u{1F9EA} Bitterroot! Thirty minutes of ruined, leakin' frustration.", act: "potion bitterroot" },
+      { kind: "punish", text: "\u{1F9EA} A Heavy Udder Draught, and the stalls are closed to you. Ache.", act: "potion heavy" },
+      { kind: "punish", text: "\u{1F9EA} Moo Juice. Say somethin' clever, %name%. Go on.", act: "potion moo" },
+      { kind: "punish", text: "\u{1F9EA} Bell Tonic: CLANG CLANG, everybody knows where you are.", act: "potion bell" },
+      { kind: "punish", text: "\u{1F9EA} Needy Nectar. Squirm for us, sugar.", act: "potion needy" },
+      { kind: "punish", text: "\u{1F3B2} A reckless dare. Everybody watch.", act: "dare reckless" },
+      { kind: "punish", text: "\u{1F380} Two ribbons fined. Naughty.", act: "fine 2" },
+      // just because
+      { kind: "silly", text: "\u{1F9EA} Hiccup Fizz! *hic*", act: "potion hiccup" },
+      { kind: "silly", text: "\u{1F9EA} Featherlight. Everything tickles now.", act: "potion feather" },
+      { kind: "silly", text: "\u{1F9EA} Wrong Barn! %name% is a whole different animal for an hour.", act: "potion wrongbarn" },
+      { kind: "silly", text: "\u{1F9EA} Big Britches! Somethin's about to get a whole lot bigger.", act: "potion bigbritches" },
+      { kind: "silly", text: "\u{1F9EA} Shrinking Violet. Somethin's about to get real small.", act: "potion shrink" },
+      { kind: "silly", text: "\u{1F9EA} Echo Elixir. Careful what you say, sugar.", act: "potion echo" },
+      { kind: "silly", text: "\u{1F9EA} Heat Mist! Fifteen minutes of flushed and bothered.", act: "potion heatmist" },
+      { kind: "silly", text: "\u{1F3B2} A dare for %name%. Nothin' too wild. Probably.", act: "dare" }
+    ];
+    const parseAct = (a) => {
+      const w = String(a || "").trim().toLowerCase().split(/\s+/);
+      return { name: w[0] || "", arg: w[1] || "", arg2: w[2] || "" };
+    };
+    function actPossible(act, t, by) {
+      const { name, arg } = parseAct(act), r = rec(t);
+      if (!name) return true;
+      if (!r) return false;
+      switch (name) {
+        case "potion":
+          return !potionRefusal(t, arg, CFG.BOT_MEMBER);
+        // off the wheel, even a self-spin: only with ?potions on
+        case "dare":
+          return !!r.daresOn && !r.dare;
+        case "stocks":
+          return onMap(t) && !stockedNow(t);
+        case "pen":
+          return onMap(t) && penSpots().length > 0 && !r.penned;
+        case "milkstall":
+          return onMap(t) && milkSpots().length > 0 && !r.penned && (makesMilk(t) || makesSemen(t));
+        case "glory": {
+          const d = addonData("glory-stalls");
+          return ADDONS.has("glory-stalls") && onMap(t) && !!(d.optIn && d.optIn[t]) && !(d.shifts && d.shifts[t]);
+        }
+        case "leash":
+          return !!by && by !== t && by !== CFG.BOT_MEMBER && onMap(t) && onMap(by) && !stockedNow(t);
+        case "denial":
+          return makesSemen(t) && !limitBlocks(t, "breed");
+        case "luxury":
+          return !hasRole(t, ROLE.LUXURY);
+        case "grace":
+          return makesMilk(t) && (r.quotaGrace || 0) < 2;
+        case "release":
+          return stockedNow(t) || !!r.penned;
+        case "heat":
+          return !/\bheat/i.test(String(r.limits || ""));
+        default:
+          return true;
+      }
+    }
+    function runAct(act, t, by) {
+      const { name, arg, arg2 } = parseAct(act), n = parseFloat(arg);
+      const spinner = by && by !== CFG.BOT_MEMBER ? by : CFG.BOT_MEMBER;
+      switch (name) {
+        case "":
+          return "";
+        case "potion":
+          return givePotion(t, arg, spinner, "off the wheel") ? "" : null;
+        case "dare":
+          return giveDare(t, spinner, arg === "reckless") ? "" : null;
+        case "stocks":
+          putInStocks(t, Math.max(5, Math.min(CFG.STOCKS_MAX_MIN, n || 20)), spinner);
+          return "";
+        case "pen":
+          return penIn(t, Math.max(5, Math.min(240, n || 30)), spinner, arg2 || null) ? "" : null;
+        case "milkstall":
+          return penIn(t, Math.max(5, Math.min(120, n || 30)), spinner, "milking") ? "" : null;
+        case "glory": {
+          const d = addonData("glory-stalls"), mins = Math.max(10, Math.min(240, n || 30));
+          d.shifts = d.shifts || {};
+          d.shifts[t] = { until: Date.now() + mins * 6e4, by: spinner, punish: true };
+          const free = Object.entries(L.spots || {}).filter(([k]) => /^glory-\d+$/.test(k)).find(([, s]) => !(W.ChatRoomCharacter || []).some((c) => c.MemberNumber !== t && c.MapData && c.MapData.Pos && c.MapData.Pos.X === s.X && c.MapData.Pos.Y === s.Y));
+          if (free) teleport(t, { X: free[1].X, Y: free[1].Y }, true);
+          saveLedger();
+          tell(t, "\u{1F573}\uFE0F The wheel sentenced you to " + mins + " minutes in the glory stalls" + (free ? ", " + free[0].replace("glory-", "stall ") : ". Find a free stall") + ". Strangers come more often on a punishment shift. Your safeword still works.");
+          return "";
+        }
+        case "leash": {
+          state.leashes.set(t, by);
+          const mins = Math.max(5, Math.min(120, n || 20));
+          whisper(t, "\u{1F9AE} You're on " + plainName(by) + "'s lead for " + mins + " minutes, sweetie. Wherever they go, you go. Safeword ends it.");
+          later(() => {
+            if (state.leashes.get(t) === by) {
+              state.leashes.delete(t);
+              whisper(t, "\u{1F9AE} Your time on the lead is up, sugar.");
+            }
+          }, mins * 6e4);
+          return "";
+        }
+        case "denial": {
+          const p = prodOf(t);
+          p.deniedUntil = Math.max(p.deniedUntil || 0, Date.now() + Math.max(0.25, Math.min(24, n || 2)) * 36e5);
+          saveLedger();
+          return "";
+        }
+        case "ribbons":
+          return earnRibbons(t, Math.max(1, Math.min(50, n || 3)), "a lucky spin", CFG.BOT_MEMBER, true) ? "" : null;
+        case "fine": {
+          fineRibbons(t, Math.max(1, Math.min(50, n || 2)), "the wheel", spinner);
+          return "";
+        }
+        case "luxury": {
+          const r = rec(t);
+          if (hasRole(t, ROLE.LUXURY)) return null;
+          r.roles.push(ROLE.LUXURY);
+          r.luxuryTemp = true;
+          r.luxuryUntil = Date.now() + Math.max(0.5, Math.min(24, n || 1)) * 36e5;
+          saveLedger();
+          try {
+            syncKeys(t, true);
+          } catch (e) {
+          }
+          return "";
+        }
+        case "grace": {
+          const r = rec(t);
+          r.quotaGrace = Math.min(2, (r.quotaGrace || 0) + 1);
+          saveLedger();
+          return "";
+        }
+        case "release": {
+          const r = rec(t);
+          if (r.stocked) r.stocked = null;
+          unpen(t, true);
+          saveLedger();
+          return "";
+        }
+        case "heat":
+          startHeat(t, spinner, Math.max(0.25, Math.min(24, n || 1)));
+          return "";
+        default:
+          return null;
+      }
+    }
+    function spinWheel(by, t, kind, actingAs) {
+      const custom = (L.wheel || []).map((e) => Object.assign({ custom: true }, e));
+      const farm = L.wheelFarm === false ? [] : FARM_SLICES;
+      let all = custom.concat(farm).filter((e) => wheelAllowed(e, t) && actPossible(e.act, t, by));
+      if (kind === "lucky") all = Math.random() < 0.8 ? all.filter((e) => e.kind === "reward") : all;
+      else if (["reward", "punish", "silly"].includes(kind)) all = all.filter((e) => e.kind === kind);
+      for (let tries = 0; tries < 5 && all.length; tries++) {
+        const e = all[Math.floor(Math.random() * all.length)];
+        const res = runAct(e.act, t, by);
+        if (res === null) {
+          all = all.filter((x) => x !== e);
+          continue;
+        }
+        const icon = e.kind === "reward" ? "\u{1F36C} " : e.kind === "silly" ? "\u{1F3AD} " : "\u{1F53B} ";
+        audit(by, "SPIN", t + " " + String(e.text).slice(0, 50) + (e.act ? " => " + e.act : ""));
+        say("\u{1F3A1} Round and round she goes! " + (by === t ? plainName(t) + " spins the wheel" : plainName(by === CFG.BOT_MEMBER ? t : by) + " spins the wheel for " + plainName(t)) + "\u2026 " + icon + fill(e.text, t), false, t);
+        syncCompanions(true);
+        return e;
+      }
+      return null;
+    }
+    function wheelAddAct(text) {
+      const m = String(text).split(/\s*=>\s*/);
+      return { text: m[0].trim(), act: m[1] ? m[1].trim().toLowerCase() : "" };
+    }
     function clockedIn(mn) {
       const r = rec(mn);
       return !!(r && r.shift && r.shift.in);
@@ -8822,7 +10184,7 @@
         }
         if (!r.chore && L.chores.length && (!r.nextChore || now >= r.nextChore)) {
           const c = L.chores[Math.floor(Math.random() * L.chores.length)];
-          r.chore = { text: c.text, at: now };
+          r.chore = { text: c.text, at: now, bounty: c.bounty || 0, key: c.key, by: c.by };
           r.nextChore = now + CFG.CHORE_EVERY_MIN * 6e4;
           saveLedger();
           const at = (String(c.text).match(/@([a-z0-9_-]+)\s*$/i) || [])[1];
@@ -9230,6 +10592,38 @@ BEGGIN'
     Get 'em wrong and I'll tell you what they are.
   \u2022 Ask properly for a quarter off your stocks time.
   \u2022 Once every 10 minutes, sugar.`,
+      ribbons: `\u{1F380} RIBBONS, THE STORE & POTIONS \u{1F380}
+
+RIBBONS are the farm's scrip. They keep day to day.
+  Earn: make your milk quota (3) \xB7 a full stall session (1) \xB7
+    a chore (2) \xB7 a glory shift (3) \xB7 a dare (2, reckless 4) \xB7
+    placin' in a show \xB7 best milk or top sire of the week (10) \xB7
+    staff hand 'em out for good behavior
+  Lose: a missed quota (2) \xB7 a dare left undone (1) \xB7 staff fines
+  Up to 40 a day from farm things. The Sunday till pays the
+    week's top earner a bonus.
+  ?ribbons \xB7 your purse \xB7 ?ribbons top \xB7 this week's board
+
+THE STORE \xB7 ?store
+  Spins, a lucky spin, a luxury day, skip a chore, quota grace,
+  a greetin' of your own, a ribbon tag on ?who, a dedication,
+  a bounty on a job, shots, and every potion.
+  ?buy <item> \xB7 ?buy <potion> for <who> \xB7 ?gift <who> <potion>
+  (a gift always asks them first, and you only pay on a yes)
+
+POTIONS wear off. ?potions lists them all.
+  Rewards: Clover Cream \xB7 Golden Hour \xB7 Blue Ribbon Musk \xB7
+    Honey Tongue
+  Punishments: Bitterroot \xB7 Heavy Udder Draught \xB7 Moo Juice \xB7
+    Bell Tonic \xB7 Needy Nectar (?beg nicely to end it early)
+  Just because: Hiccup Fizz \xB7 Featherlight \xB7 Wrong Barn \xB7
+    Big Britches \xB7 Shrinking Violet \xB7 Echo Elixir \xB7 Heat Mist
+  ?potions on lets staff, the wheel and gifts give you one.
+  Your limits rule some out. Your safeword pours them all out.
+
+DARES \xB7 ?dares on
+  A dare to do in 30 minutes. ?dared when it's done (on your
+  honor) \xB7 ?dare skip to chicken out (a ribbon).`,
       fair: `\u{1F3AA} THE COUNTY FAIR \u{1F3AA}
 
 COMMANDS
@@ -9382,10 +10776,24 @@ HOURS
       play: `\u{1F3A1} PLAY (staff)
 
 THE PRIZE WHEEL
-  ?wheel \xB7 list the slices
-  ?wheel add reward <text> \xB7 ?wheel add punish <text>
-  ?wheel remove <n>
-  ?spin <who> [reward|punish] \xB7 skips anything against their limits
+  ?wheel \xB7 list the slices (yours and the farm's)
+  ?wheel add reward|punish|silly <text> [=> action]
+     the action makes it happen: stocks 20 \xB7 pen 30 \xB7 milkstall 30 \xB7
+     glory 30 \xB7 leash 20 \xB7 denial 2 \xB7 potion hiccup \xB7 dare reckless \xB7
+     ribbons 3 \xB7 fine 2 \xB7 luxury 1 \xB7 grace \xB7 heat \xB7 release
+     e.g. ?wheel add punish Off to the pen, %name% => pen 30
+  ?wheel remove <n> \xB7 ?wheel farm on|off (the farm's own slices)
+  ?spin <who> [reward|punish|silly|lucky] \xB7 skips anything against
+     their limits or their switches (?potions, ?dares, ?glory)
+
+RIBBONS, POTIONS, DARES, THE CORRAL
+  ?ribbon give <who> <n> [why] \xB7 ?ribbon fine <who> <n> [why]
+     farmhands up to 5, herdmasters 15, proprietors any
+  ?potion give <who> <potion> \xB7 ?potion end <who>
+  ?dare <who> [reckless] [your own dare]
+  ?corral <who> [minutes] [milking|spot] \xB7 ?uncorral <who>
+     corral spots: ?spot set pen (pen-2, pen-3\u2026)
+  ?store approve|reject <who> \xB7 a bought greetin'
 
 BEGGIN'
   ?begphrase \xB7 shows the words \xB7 ?begphrase <words> \xB7 sets them
@@ -9452,6 +10860,13 @@ UPKEEP
   ?backup \xB7 ?health`
     };
     const GUIDE_ALIAS = {
+      ribbon: "ribbons",
+      store: "ribbons",
+      shop: "ribbons",
+      potion: "ribbons",
+      potions: "ribbons",
+      dares: "ribbons",
+      dare: "ribbons",
       new: "start",
       rules: "start",
       key: "keys",
@@ -9505,7 +10920,25 @@ UPKEEP
       if (GUIDES[t]) return GUIDES[t];
       const a = ADDONS.get(t) || [...ADDONS.values()].find((x) => x.label.toLowerCase() === t || x.commands[t]);
       if (a) return addonsText(a.name);
-      return "Hmm, I don't have a guide called '" + t0 + "', hon. Try one of these: start, safety, keys, herds, tiers, barn, breeding, pregnancy, heat, body, cocks, shots, life, fair or me" + (ADDONS.size ? ", or an add-on: " + [...ADDONS.keys()].join(", ") : "") + ". For example: ?help breeding";
+      if (t.length >= 4 && !helpFor.guessing) {
+        const names = Object.keys(GUIDES).concat(Object.keys(GUIDE_ALIAS), [...ADDONS.keys()], ...[...ADDONS.values()].map((x) => Object.keys(x.commands || {})));
+        const dist = (a2, b) => {
+          const d = Array.from({ length: a2.length + 1 }, (_, i) => [i]);
+          for (let j = 1; j <= b.length; j++) d[0][j] = j;
+          for (let i = 1; i <= a2.length; i++) for (let j = 1; j <= b.length; j++) d[i][j] = Math.min(d[i - 1][j] + 1, d[i][j - 1] + 1, d[i - 1][j - 1] + (a2[i - 1] === b[j - 1] ? 0 : 1));
+          return d[a2.length][b.length];
+        };
+        const best = names.filter((n) => n.length >= 3 && dist(t, n) === 1)[0];
+        if (best) {
+          helpFor.guessing = true;
+          try {
+            return helpFor(sender, best);
+          } finally {
+            helpFor.guessing = false;
+          }
+        }
+      }
+      return "Hmm, I don't have a guide called '" + t0 + "', hon. Try one of these: start, safety, keys, herds, tiers, barn, breeding, pregnancy, heat, body, cocks, shots, life, ribbons, fair or me" + (ADDONS.size ? ", or an add-on: " + [...ADDONS.keys()].join(", ") : "") + ". For example: ?help breeding";
     }
     function myCommands(mn) {
       const line = (g) => "\n" + g.name + "\n  " + g.cmds.join(" \xB7 ") + (g.name === "Safety" ? "\n  (safe stops everything and fetches staff, so only say it when you need it. ?help safety explains)" : "");
@@ -10153,7 +11586,17 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
       "fair",
       "enter",
       "addons",
-      "addon"
+      "addon",
+      "ribbons",
+      "ribbon",
+      "store",
+      "buy",
+      "gift",
+      "potions",
+      "potion",
+      "dares",
+      "dare",
+      "dared"
     ];
     const STAFF_CMDS = [
       "queue",
@@ -10234,7 +11677,9 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
       "zones",
       "voice",
       "machine",
-      "edit"
+      "edit",
+      "corral",
+      "uncorral"
     ];
     const SAFETY_CMDS = ["safe", "safeword", "red", "stuck"];
     const PRIVATE_REPLY = [
@@ -10350,7 +11795,7 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
         }
         o += "\n   " + (line || "The proprietors are out grazin' in the pasture. Might be a while, hon!");
       }
-      const extra = (m) => titleTag(m) + (paintedText(m) ? " \u{1F4A6}" : "") + ((rec(m) || {}).tally && tallyToday(m) ? " \u270F\uFE0F" + tallyToday(m) : "");
+      const extra = (m) => titleTag(m) + vanityTag(m) + (paintedText(m) ? " \u{1F4A6}" : "") + ((rec(m) || {}).tally && tallyToday(m) ? " \u270F\uFE0F" + tallyToday(m) : "");
       o += "\n\n\u{1F404} Stock: " + (stockHere.length ? stockHere.map((m) => plainName(m) + brandTag(m) + extra(m)).join(", ") : "none about right now");
       if (guestsHere.length) o += "\n\u{1F3E1} Guests: " + guestsHere.map(plainName).join(", ");
       if (otherHere.length) o += "\n\u{1F464} Visitors: " + otherHere.map(plainName).join(", ");
@@ -10481,7 +11926,13 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
       }
       const replyCh = channel === "chat" && (PRIVATE_REPLY.includes(cmd) || addonCmd && addonCmd.def.private) ? canBeep(sender) ? "beep" : "whisper" : channel;
       const docAbout = channel === "companion" && DOC_CMDS.includes(cmd) && args[0] && isStaff(sender) ? resolveTarget(args[0]) : null;
-      const R = docAbout && docAbout !== sender ? (txt) => toCompanion(sender, txt, "doc", false, { kind: cmd, who: plainName(docAbout), about: docAbout }) : (txt) => reply(sender, txt, replyCh);
+      const waiting = (txt) => {
+        if (!/\?apply/.test(String(txt)) || !/books|apply first|\?apply first|Say \?apply/i.test(String(txt))) return txt;
+        const r0 = rec(sender);
+        if (r0 && r0.roles && r0.roles.length || !L.applications.some((a) => a.mn === sender)) return txt;
+        return "\u{1F4CB} Your application's in, sugar, and waitin' on the proprietors. Once you're approved that'll work for you. Till then, look around: ?help start, ?tour, ?rules.";
+      };
+      const R = docAbout && docAbout !== sender ? (txt) => toCompanion(sender, txt, "doc", false, { kind: cmd, who: plainName(docAbout), about: docAbout }) : (txt) => reply(sender, waiting(txt), replyCh);
       if (addonCmd) {
         runAddonCommand(addonCmd, sender, args, rest, channel, R);
         return;
@@ -11929,6 +13380,12 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
             rec(sender).stocked = null;
             saveLedger();
           }
+          clearPotions(sender);
+          unpen(sender, true);
+          if (rec(sender) && rec(sender).dare) {
+            rec(sender).dare = null;
+            saveLedger();
+          }
           if (CFG.SUMMON_ON_SAFEWORD) {
             const n = summonHelp("\u{1F534} Safeword called by " + plainName(sender) + ".", sender, true, "safe");
             if (n) log("Summoned " + n + " on-call staff to a safeword.");
@@ -12394,6 +13851,27 @@ Welcome to B&B Farm, hon. \u{1F33E}`
           R("Got it, I've noted that on their file.");
           break;
         }
+        /* ── RIBBONS, THE STORE, POTIONS, DARES, THE CORRAL (10l, 10m) ── */
+        case "ribbons":
+        case "ribbon":
+        case "store":
+        case "buy":
+        case "gift":
+          ribbonCommand(cmd, sender, args, R);
+          break;
+        case "potions":
+        case "potion":
+          potionCommand(cmd, sender, args, R);
+          break;
+        case "dares":
+        case "dare":
+        case "dared":
+          dareCommand(cmd, sender, args, R);
+          break;
+        case "corral":
+        case "uncorral":
+          penCommand(cmd === "corral" ? "pen" : "unpen", sender, args, R);
+          break;
         case "edit": {
           if (!isProprietor(sender)) {
             R("Sorry, sugar, that one's just for the proprietors.");
@@ -13642,9 +15120,17 @@ Welcome to B&B Farm, hon. \u{1F33E}`
           r.choreWeek.n++;
           r.choreTotal = (r.choreTotal || 0) + 1;
           audit(sender, "CHORE", r.chore.text.slice(0, 50));
+          const bounty = r.chore.bounty || 0, bkey = r.chore.key, btext = r.chore.text, bby = r.chore.by;
           r.chore = null;
           saveLedger();
           staffPoints(sender, 1, "chore");
+          earnRibbons(sender, CFG.RIBBONS_FOR.chore, "a chore done");
+          if (bounty) {
+            L.chores = L.chores.filter((c) => c.key !== bkey);
+            saveLedger();
+            earnRibbons(sender, bounty, 'the bounty on "' + String(btext).replace(/\s*@[a-z0-9_-]+\s*$/i, "") + '"', bby || CFG.BOT_MEMBER);
+            if (bby && bby !== sender) tell(bby, "\u{1F4CC} " + plainName(sender) + " did your bounty job and collected the " + bounty + " ribbons.");
+          }
           R("\u2705 Thank you, sweetie! That's " + r.choreWeek.n + " this week.");
           break;
         }
@@ -13679,16 +15165,37 @@ Welcome to B&B Farm, hon. \u{1F33E}`
         /* ── PLAY ── */
         case "wheel": {
           const sub = String(args[0] || "list").toLowerCase();
+          if (sub === "farm") {
+            const v = String(args[1] || "").toLowerCase();
+            if (v === "on" || v === "off") {
+              if (!isHerdmaster(sender)) {
+                R("Herdmasters and up switch the farm's slices, sugar.");
+                break;
+              }
+              L.wheelFarm = v === "on";
+              saveLedger();
+            }
+            R("\u{1F3A1} The farm's own slices (" + FARM_SLICES.length + ": stocks, the pen, glory shifts, potions, dares, ribbons\u2026) are " + (L.wheelFarm === false ? "OFF" : "ON") + ". ?wheel farm on|off");
+            break;
+          }
           if (sub === "add") {
             const kind = String(args[1] || "").toLowerCase();
-            const text = args.slice(2).join(" ").trim();
-            if (!["reward", "punish"].includes(kind) || !text) {
-              R("Say whether it's a reward or a punish slice, sugar, then the words. ?wheel add reward <text> or ?wheel add punish <text> adds a slice (%name% becomes their name), ?wheel lists them, ?wheel remove <number> takes one off. For example: ?wheel add reward Extra hay tonight");
+            const { text, act } = wheelAddAct(args.slice(2).join(" ").trim());
+            if (!["reward", "punish", "silly"].includes(kind) || !text) {
+              R("Say whether it's a reward, punish or silly slice, sugar, then the words. ?wheel add reward <text> (%name% becomes their name). Add => and an action to make it happen: ?wheel add punish Off to the pen, %name% => pen 30. Actions: stocks <min> \xB7 pen <min> \xB7 milkstall <min> \xB7 glory <min> \xB7 leash <min> \xB7 denial <hours> \xB7 potion <name> \xB7 dare [reckless] \xB7 ribbons <n> \xB7 fine <n> \xB7 luxury <hours> \xB7 grace \xB7 heat");
               break;
             }
-            L.wheel.push({ kind, text, by: sender });
+            if (act && runAct.length && !["stocks", "pen", "milkstall", "glory", "leash", "denial", "potion", "dare", "ribbons", "fine", "luxury", "grace", "heat", "release"].includes(act.split(/\s+/)[0])) {
+              R("I don't know that action, sugar. Actions: stocks \xB7 pen \xB7 milkstall \xB7 glory \xB7 leash \xB7 denial \xB7 potion \xB7 dare \xB7 ribbons \xB7 fine \xB7 luxury \xB7 grace \xB7 heat \xB7 release");
+              break;
+            }
+            if (act && act.startsWith("potion") && !potionDef(act.split(/\s+/)[1])) {
+              R("There's no potion called that, sugar. ?potions lists 'em.");
+              break;
+            }
+            L.wheel.push({ kind, text, act, by: sender });
             saveLedger();
-            R("Added to the wheel! " + L.wheel.length + " slices now.");
+            R("Added to the wheel! " + L.wheel.length + " slices of your own now" + (act ? ", and that one does somethin' (" + act + ")" : "") + ".");
           } else if (sub === "remove") {
             const i = parseInt(args[1], 10) - 1;
             if (!(i >= 0 && i < L.wheel.length)) {
@@ -13698,7 +15205,8 @@ Welcome to B&B Farm, hon. \u{1F33E}`
             R("Took it off: " + L.wheel.splice(i, 1)[0].text);
             saveLedger();
           } else {
-            R(L.wheel.length ? "\u{1F3A1} THE WHEEL\n\n" + L.wheel.map((e, i) => i + 1 + ". " + (e.kind === "reward" ? "\u{1F36C}" : "\u{1F53B}") + " " + e.text).join("\n") : "Wheel's empty, sugar. ?wheel add reward <text> or ?wheel add punish <text> adds a slice (%name% becomes their name), ?wheel lists them, ?wheel remove <number> takes one off. For example: ?wheel add reward Extra hay tonight");
+            const icon = (e) => e.kind === "reward" ? "\u{1F36C}" : e.kind === "silly" ? "\u{1F3AD}" : "\u{1F53B}";
+            R("\u{1F3A1} THE WHEEL\n\nYOURS\n" + (L.wheel.length ? L.wheel.map((e, i) => i + 1 + ". " + icon(e) + " " + e.text + (e.act ? "  \u21D2 " + e.act : "")).join("\n") : "  none yet") + "\n\nTHE FARM'S (" + (L.wheelFarm === false ? "off" : "on") + ", ?wheel farm on|off)\n" + FARM_SLICES.map((e) => "  " + icon(e) + " " + e.text.replace(/%name%/g, "\u2026")).join("\n") + "\n\n?spin <who> [reward|punish|silly] \xB7 ?wheel add <kind> <text> [=> action] \xB7 ?wheel remove <number>. A slice that can't happen to them (limits, switches) is skipped.");
           }
           break;
         }
@@ -13709,14 +15217,12 @@ Welcome to B&B Farm, hon. \u{1F33E}`
             break;
           }
           const kind = String(args[1] || "").toLowerCase();
-          const pool = L.wheel.filter((e2) => (!["reward", "punish"].includes(kind) || e2.kind === kind) && wheelAllowed(e2, t));
-          if (!pool.length) {
-            R("Shoot, there's nothin' on the wheel that fits " + plainName(t) + "'s limits, hon. Try leavin' out reward or punish, or add some slices with ?wheel add.");
+          const e = spinWheel(sender, t, ["reward", "punish", "silly", "lucky"].includes(kind) ? kind : "");
+          if (!e) {
+            R("Shoot, there's nothin' on the wheel that can happen to " + plainName(t) + " right now (their limits, their switches, who's here), hon. Try another kind, or add slices with ?wheel add.");
             break;
           }
-          const e = pool[Math.floor(Math.random() * pool.length)];
-          audit(sender, "SPIN", t + " " + e.text.slice(0, 50));
-          say("\u{1F3A1} Round and round she goes! " + plainName(sender) + " spins the wheel for " + plainName(t) + "\u2026 " + (e.kind === "reward" ? "\u{1F36C} " : "\u{1F53B} ") + fill(e.text, t), false, t);
+          if (channel !== "chat") R("\u{1F3A1} Spun: " + fill(e.text, t) + (e.act ? " (" + e.act + ")" : ""));
           break;
         }
         case "beg":
@@ -13738,6 +15244,10 @@ Welcome to B&B Farm, hon. \u{1F33E}`
           }
           state.cooldowns.set("beg:" + sender, Date.now());
           audit(sender, "BEG", "");
+          if (potionBegged(sender)) {
+            R("\u{1F497} Such pretty beggin'. The Needy Nectar lets you go, sugar.");
+            break;
+          }
           if (stockedNow(sender)) {
             const left = r.stocked.until - Date.now();
             r.stocked.until -= Math.round(left * 0.25);
@@ -13903,6 +15413,7 @@ Welcome to B&B Farm, hon. \u{1F33E}`
       if (!pc) {
         const low0 = String(raw).trim().toLowerCase().replace(/^[?!.\-\/]/, "").replace(/^bot\s+/, "");
         if ((low0 === "yes" || low0 === "no") && (state.breedAsks.has(sender) || state.jarAsks.has(sender))) return answerPending(sender, low0 === "yes");
+        if ((low0 === "yes" || low0 === "no") && state.farmAsks && state.farmAsks.has(sender)) return farmYesNo(sender, low0 === "yes");
         if ((low0 === "yes" || low0 === "no") && addonAsks.has(sender)) return addonYesNo(sender, low0 === "yes");
         return false;
       }
@@ -14216,6 +15727,10 @@ Welcome to B&B Farm, hon. \u{1F33E}`
         gearTick();
         homeTick();
         lifeTick();
+        ribbonTick();
+        potionTick();
+        dareTick();
+        penTick();
         workTick();
         if (Date.now() - (state.wlTick || 0) > 5 * 6e4) {
           state.wlTick = Date.now();

@@ -664,7 +664,8 @@
     const r0 = rec(mn);
     const known = L.archive[mn] || (r0 && r0.roles && r0.roles.length);
     const pool = known ? RETURN_GREETINGS : GREETINGS;
-    const line = pool[Math.floor(Math.random()*pool.length)];
+    const own = customGreeting(mn);   // one they bought in the store (and staff approved)
+    const line = own || pool[Math.floor(Math.random()*pool.length)];
     later(()=>say(fill(line,mn), false, mn), 1500);   // addressed to them: never guessed from the names on the map
     const r = rec(mn); if (r){ r.name = plainName(mn); saveLedger(); }
   }

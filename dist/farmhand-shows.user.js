@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm add-on: Shows
 // @namespace    bnbfarm
-// @version      1.0.2
+// @version      1.0.3
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-shows.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-shows.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -179,6 +179,7 @@
     ranked.forEach(([mn], place) => {
       (d.ribbons[mn] = d.ribbons[mn] || []).push({ event: sh.event, place, at: Date.now() });
       delete d.ribbonSaid[mn];
+      if (api.ribbons) api.ribbons(Number(mn), [5, 3, 2][place] || 1, "placin' in the show");
     });
     api.announce("\u{1F380} " + EVENTS[sh.event].toUpperCase() + " RESULTS: " + ranked.map(([mn, v], i) => PLACES[i] + " " + api.name(mn) + " (" + shown(sh, mn, v) + ")").join(" \xB7 "));
     api.emote("\u{1F380} The judge pins a " + RIBBON[0] + " ribbon on " + api.name(ranked[0][0]) + ". Best in show!", ranked[0][0]);
@@ -292,14 +293,15 @@
     name: "shows",
     label: "Shows",
     version: "1.0.0",
-    guide: "Staff: ?show open udder | breeding | race | obedience, ?show score <who> <1-10>, ?show cue <who> <cue>, ?show go (race), ?show close. Stock: ?show enter. Ribbons stay on your record (?ribbons); your latest one gets shown off. Placards: ?sign by a placard spot; staff ?sign set <name> <text>.",
+    guide: "Staff: ?show open udder | breeding | race | obedience, ?show score <who> <1-10>, ?show cue <who> <cue>, ?show go (race), ?show close. Stock: ?show enter. Ribbons stay on your record (?prizes); your latest one gets shown off. Placards: ?sign by a placard spot; staff ?sign set <name> <text>.",
     setup(a) {
       api = a;
       D();
     },
     commands: {
       show: { usage: "show open|enter|score|cue|go|close", private: true, run: cmdShow },
-      ribbons: { usage: "ribbons", private: true, run: (c) => {
+      // (?ribbons is the farm's scrip now: show placings are ?prizes)
+      prizes: { usage: "prizes", aliases: ["rosettes"], private: true, run: (c) => {
         const t = c.args[0] ? c.api.find(c.args[0]) : c.sender, r = t && D().ribbons[t] || [];
         c.reply(r.length ? "\u{1F380} RIBBONS \u2014 " + c.api.name(t) + "\n" + r.map((x) => PLACES[x.place] + " \xB7 " + EVENTS[x.event] + " \xB7 " + new Date(x.at).toLocaleDateString()).join("\n") : t ? c.api.name(t) + " has no ribbons yet." : "Who's that, hon?");
       } },

@@ -345,6 +345,7 @@
     if (p.preg) r *= CFG.PROD.PREG_MILK_X;
     if (p.freshUntil > now) r *= CFG.PROD.FRESH_MILK_X;
     if (boosted(p,"milk")) r *= 2;
+    if (potionOn(mn, "heavy")) r *= 3;   // Heavy Udder Draught
     if (wornTags(mn).has("lactation")) r *= 1.5;
     if (tierOf(mn) === "prize") r *= 1.25;
     if (boosted(p,"hungry")) r *= CFG.HUNGRY_X;
@@ -355,6 +356,7 @@
     const p = prodOf(mn);
     let r = CFG.PROD.SEMEN_PER_H * testesX(mn);
     if (boosted(p,"semen")) r *= 2;
+    if (potionOn(mn, "heavy")) r *= 3;
     if (wornTags(mn).has("virility")) r *= 1.5;
     if (boosted(p,"hungry")) r *= CFG.HUNGRY_X;
     return r * addonRateX(mn, "semen");
@@ -392,6 +394,7 @@
             r.tier = "prize";
             audit(CFG.BOT_MEMBER,"TIER",best[0]+" → prize (best milk "+Y.week+")");
             beep(best[0], "🏆 Best milk on the farm this week, grade "+gradeLetter(best[1])+"! You're prize stock now, sweetie. 🥛");
+            earnRibbons(best[0], CFG.RIBBONS_FOR.weekBest, "the best milk of the week", CFG.BOT_MEMBER, true);
             if (inRoom()) announce("🏆 Best milk of the week goes to "+plainName(best[0])+", grade "+gradeLetter(best[1])+"! Prize stock, y'all. 🥛");
           }
         }
@@ -399,7 +402,7 @@
       const sires = Object.entries(Y.s||{}).sort((a,b)=>b[1]-a[1]).slice(0, CFG.TOP_SIRES);
       if (sires.length && inRoom())
         announce("🐂 This week's top sires, y'all: "+sires.map(([m,n],i)=>(i+1)+". "+plainName(parseInt(m,10))+" ("+n+" caught)").join(", ")+". Somebody's been busy! 🍼");
-      for (const [m] of sires.slice(0,1)) beep(parseInt(m,10), "🐂 You're the top sire on the farm this week, sugar! Proud of you.");
+      for (const [m] of sires.slice(0,1)){ beep(parseInt(m,10), "🐂 You're the top sire on the farm this week, sugar! Proud of you."); earnRibbons(parseInt(m,10), CFG.RIBBONS_FOR.weekBest, "bein' top sire of the week", CFG.BOT_MEMBER, true); }
       Y.w = {}; Y.g = {}; Y.s = {}; Y.week = weekKey();
     }
     saveLedger();
@@ -800,6 +803,12 @@
         continue;
       }
       // a stall that just finished with them rests a while; they're told once
+      // Heavy Udder Draught: the stall won't take them, and they ache for it
+      if (!p.stall && (doM || doS) && potionOn(mn, "heavy")){
+        if (!p.stallHeavyTold || now - p.stallHeavyTold > 5*60000){ p.stallHeavyTold = now;
+          privateTo(mn, "🥛 The cups sniff at "+plainName(mn)+"'s swollen, achin' "+(makesMilk(mn) ? "breasts" : "cock")+" and pull away. Not while that draught's in you, sugar. Just stand there and fill.", "emote"); }
+        continue;
+      }
       if (!p.stall && (doM || doS) && p.stallRest > now){
         if (p.stallRestTold !== p.stallRest){
           p.stallRestTold = p.stallRest;
@@ -868,6 +877,7 @@
       }
       if (done){
         p.stall = null; p.stallPaused = null;
+        if (st.got.m + st.got.s > 0) later(() => earnRibbons(mn, CFG.RIBBONS_FOR.stall, "a full session in the milkin' stall"), 3000);
         const R = CFG.PROD.STALL_REST_MIN; p.stallRest = now + (R[0] + Math.random()*(R[1]-R[0]))*60000;
         if (st.got.m + st.got.s > 0){
           privateTo(mn, (st.kind === "cock" ? "🐂 " : "🥛 ")+stallBeat(mn, st, true), "emote");
@@ -1377,13 +1387,19 @@
       const got = milkedOn(mn, prev);
       if (got >= q){
         r.quotaStreak = (r.quotaStreak||0) + 1;
+        earnRibbons(mn, CFG.RIBBONS_FOR.quota, "makin' your milk quota", 0, true);
         const tier = tierOf(mn), up = { new:"trained", trained:"prize" }[tier];
         if (r.quotaStreak >= CFG.QUOTA_STREAK_UP && up){
           r.quotaStreak = 0; r.tier = up; audit(CFG.BOT_MEMBER, "TIER", mn+" → "+up+" (milk quota)");
           tell(mn, "🥛 "+CFG.QUOTA_STREAK_UP+" days in a row on quota! You're "+tierName(up)+" now, sweetie. Good cow.");
           if (onMap(mn)) emote("🎀 "+plainName(mn)+" has filled the pail every day for "+CFG.QUOTA_STREAK_UP+" days, so the farm girl ties a "+tierName(up)+" ribbon on their collar. Such a good, productive cow.");
         } else tell(mn, "🥛 Quota met yesterday ("+ml(got)+" of "+ml(q)+"). That's "+r.quotaStreak+" day"+(r.quotaStreak===1?"":"s")+" in a row, sugar!");
+      } else if (r.quotaGrace > 0){
+        // quota grace from the store: forgiven, once
+        r.quotaGrace--;
+        tell(mn, "🥛 You only gave "+ml(got)+" of your "+ml(q)+" quota yesterday, sugar, but you had quota grace in your pocket. Forgiven, this once."+(r.quotaGrace ? " ("+r.quotaGrace+" left)" : ""));
       } else {
+        fineRibbons(mn, 2, "a missed milk quota", CFG.BOT_MEMBER);
         r.quotaStreak = 0; r.naughtyMarks = (r.naughtyMarks||0) + 1;
         tell(mn, "🥛 You only gave "+ml(got)+" of your "+ml(q)+" quota yesterday, sugar. That's a naughty mark ("+r.naughtyMarks+" now). Get yourself milked!");
         if (onMap(mn)) emote("📋 The farm girl taps her clipboard at "+plainName(mn)+": only "+ml(got)+" in the pail yesterday. A naughty mark goes on the board, and those udders get a disappointed little squeeze.");

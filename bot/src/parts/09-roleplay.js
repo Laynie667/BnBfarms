@@ -42,6 +42,7 @@
   }
   function onRoleplay(sender, text, type){
     if (!text || /^[?!.\-\/]/.test(text.trim())) return;          // commands aren't roleplay
+    try { potionHeard(sender, text, type); } catch(e){ warn("echo:", e); }   // Echo Elixir
     const now = Date.now();
     if (type === "Emote") { try { bellyTouchFromRP(sender, text); } catch(e){ warn("belly rp:", e); } }
     // breedin'

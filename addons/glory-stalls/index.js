@@ -167,6 +167,7 @@ function tick() {
     if (sh.until > now) continue;
     delete d.shifts[mn];
     api.notice(Number(mn), "🕳️ Your " + (sh.punish ? "punishment " : "") + "shift in the glory stalls is over, sugar. You can step out.");
+    if (api.ribbons) api.ribbons(Number(mn), sh.punish ? 1 : 3, sh.punish ? "servin' out your punishment shift" : "workin' a shift in the glory stalls");
     api.save();
   }
   for (const id of stallIds()) {

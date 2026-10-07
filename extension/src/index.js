@@ -42,6 +42,19 @@ try {
 window.__farmhandCompanion = VERSION;
 
 const st = { panel: null, welcomed: false, lastHello: 0, parts: new Map() };
+// Moo Juice: about half the words turn into the noise your animal makes
+const NOISES = { cow: ["moo", "mooo", "mrrrm"], bull: ["moo", "hrrmph"], pony: ["neigh", "nicker", "whinny"], horse: ["neigh", "whinny", "nicker"],
+  pup: ["arf", "woof", "awoo"], dog: ["woof", "arf", "ruff"], kitty: ["mew", "nya", "mrrp"], cat: ["meow", "mrrp", "purr"], bunny: ["squeak", "eep"],
+  rabbit: ["squeak", "eep"], pig: ["oink", "snrk"], goat: ["baa", "maa"], sheep: ["baa", "baaa"], fox: ["yip", "ack"], wolf: ["awoo", "grr"],
+  deer: ["bleat", "mweh"], goblin: ["heh", "nngh"] };
+function mooify(text, species) {
+  const say = NOISES[String(species || "").toLowerCase()] || NOISES.cow;
+  return String(text).replace(/[A-Za-z']{3,}/g, (w) => {
+    if (Math.random() < 0.5) return w;
+    const n = say[Math.floor(Math.random() * say.length)];
+    return w[0] === w[0].toUpperCase() ? n[0].toUpperCase() + n.slice(1) : n;
+  });
+}
 
 const botHere = () =>
   window.CurrentScreen === "ChatRoom" &&
@@ -276,6 +289,20 @@ function start() {
     if (m) { try { onFarmMsg(m); } catch (e) { console.warn("[Farmhand Companion]", e); } return; }
     return next(args);
   });
+
+  // Moo Juice, a farm potion: while it's in you (and only then), some of what you say out loud comes out as
+  // your animal's noise. Commands, whispers, emotes and out-of-character lines are never touched.
+  try {
+    mod.hookFunction("ServerSend", 5, (args, next) => {
+      try {
+        const d = args[1], s = st.panel && st.panel.s;
+        if (args[0] === "ChatRoomChat" && d && d.Type === "Chat" && typeof d.Content === "string" && s && Array.isArray(s.fx) &&
+            s.fx.some((f) => f.id === "moo" && f.until > Date.now()) && !/^\s*[(\[?!./\-*]/.test(d.Content))
+          args = [args[0], Object.assign({}, d, { Content: mooify(d.Content, s.species) })];
+      } catch (e) { console.warn("[Farmhand Companion] moo:", e); }
+      return next(args);
+    });
+  } catch (e) { console.warn("[Farmhand Companion] moo juice unavailable:", e); }
 
   // map pickin' (Zones tab): a click on the map picks a tile instead of walkin'
   // (an older game without the map view mustn't stop the rest of the Companion from startin')

@@ -123,7 +123,7 @@
       notifyStaff: (t, routine) => notifyStaff(t, routine),
       ask: (mn, text, cb) => { addonAsks.set(mn, { addon:a.name, cb, at:Date.now() }); askCard(mn, a.name, text); },
       // people
-      name: plainName, nameOnce: (text, mn) => nameOnce(text, mn), paint: (mn, area, by) => paintOn(mn, area, by), splat: (mn, hole, by) => lscgSplatAt(mn, HOLE_SPLAT[hole] || ["ItemVulva"], by ? plainName(by) : null), char: charFor, find: resolveTarget, here: () => (W.ChatRoomCharacter||[]).map(c => c.MemberNumber).filter(m => m !== CFG.BOT_MEMBER),
+      name: plainName, nameOnce: (text, mn) => nameOnce(text, mn), paint: (mn, area, by) => paintOn(mn, area, by), ribbons: (mn, n, why) => earnRibbons(mn, n, why), fineRibbons: (mn, n, why) => fineRibbons(mn, n, why, CFG.BOT_MEMBER), splat: (mn, hole, by) => lscgSplatAt(mn, HOLE_SPLAT[hole] || ["ItemVulva"], by ? plainName(by) : null), char: charFor, find: resolveTarget, here: () => (W.ChatRoomCharacter||[]).map(c => c.MemberNumber).filter(m => m !== CFG.BOT_MEMBER),
       onMap, rec: (mn) => rec(mn), isStaff, isHerdmaster, isProprietor, hasRole, ROLE, onDuty, herdLeaderOf, herdMembers,
       species: speciesKey, gender: genderOf, hasCompanion, limitBlocks, rank: rankOf,
       // bodies

@@ -131,7 +131,8 @@
                        "staff","stuck","friend","notice","teaseme",
                        "stats","board","pedigree","breedable","fertile","naturalheat","breed","cum","milkable","futa","size","sizes","measure","penis","cock","rights","accept",
                        "freeuse","jarok","gender","outfit","outfits","uniform","hypno","tally","eggs","yes","no","wash","quota","praise","degrade",
-                       "weather","feeding","curfew","beg","please","fair","enter","addons","addon"];
+                       "weather","feeding","curfew","beg","please","fair","enter","addons","addon",
+                       "ribbons","ribbon","store","buy","gift","potions","potion","dares","dare","dared"];
   const STAFF_CMDS  = ["queue","app","approve","deny","register","unregister","grant","revoke",
                        "claim","release","myherd","herdname","herdcall","herdsummon","turnout","letup","goldkey",
                        "pasture","onduty","cover","staffadd","staffremove",
@@ -142,7 +143,7 @@
                        "milk","collect","heat","heatline","shotlog",
                        "stocks","unstock","walk","tourstop","clockin","clockout","hours","done","chore","chores",
                        "wheel","spin","begphrase","score","drain","denial","ruin","jars","inseminate","nomilk","inspect","edge",
-                       "contract","contracts","zone","zones","voice","machine","edit"];
+                       "contract","contracts","zone","zones","voice","machine","edit","corral","uncorral"];
 
   const SAFETY_CMDS = ["safe","safeword","red","stuck"];
   const PRIVATE_REPLY = ["record","keys","find","app","queue","roster","stock","health",
@@ -222,7 +223,7 @@
       }
       o += "\n   "+(line||"The proprietors are out grazin' in the pasture. Might be a while, hon!");
     }
-    const extra = m => titleTag(m)+(paintedText(m) ? " 💦" : "")+((rec(m)||{}).tally && tallyToday(m) ? " ✏️"+tallyToday(m) : "");
+    const extra = m => titleTag(m)+vanityTag(m)+(paintedText(m) ? " 💦" : "")+((rec(m)||{}).tally && tallyToday(m) ? " ✏️"+tallyToday(m) : "");
     o += "\n\n🐄 Stock: "+(stockHere.length?stockHere.map(m=>plainName(m)+brandTag(m)+extra(m)).join(", "):"none about right now");
     if (guestsHere.length) o += "\n🏡 Guests: "+guestsHere.map(plainName).join(", ");
     if (otherHere.length)  o += "\n👤 Visitors: "+otherHere.map(plainName).join(", ");

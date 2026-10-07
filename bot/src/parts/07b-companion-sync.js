@@ -8,7 +8,7 @@
   // ledger field → the command that flips it
   const SWITCH_CMDS = { breedable:"breedable", fertile:"fertile", jarok:"jarok", freeuse:"freeuse", futa:"futa",
                         milkable:"milkable", naturalHeat:"naturalheat", praiseMe:"praise", degradeMe:"degrade",
-                        tally:"tally", teaseOptIn:"teaseme", forced:"forced", hypno:"hypno" };
+                        tally:"tally", teaseOptIn:"teaseme", forced:"forced", hypno:"hypno", potionsOn:"potions", daresOn:"dares" };
   // staff lookups about somebody else go to the Companion's Office tab
   const DOC_CMDS = ["record","stats","vet","quota","keys","size","measure","pedigree"];
 
@@ -46,6 +46,13 @@
       const g = gearOf(mn);   // the milkin' gear they're in right now
       if (g.milk || g.machine || g.funnel) s.gear = { milk: g.milk || null, machine: g.machine || null, funnel: !!g.funnel };
       s.today = { tally: tallyToday(mn), naughty: r.naughtyMarks || 0, praised: r.praised || 0, degraded: r.degraded || 0 };
+      // ribbons, the store, potions, a dare (the 🎀 Store tab)
+      s.ribbons = r.ribbons || 0; s.quotaGrace = r.quotaGrace || 0;
+      s.ribbonLog = (L.ribbonLog || []).filter(e => e.mn === mn).slice(-6).reverse().map(e => ({ n: e.n, why: e.why }));
+      s.store = storeItems().filter(it => !it.off).map(it => ({ id: it.potion || it.id, name: it.name, price: it.price, desc: it.desc, gift: !!it.gift, kind: it.kind || "" }));
+      s.fx = activePotions(mn).map(f => ({ id: f.id, name: (potionDef(f.id) || {}).name || f.id, until: Math.ceil(f.until/60000)*60000 }));
+      if (r.dare) s.dare = { text: r.dare.text, until: r.dare.until, reckless: !!r.dare.reckless };
+      if (r.penned) s.penned = { until: r.penned.until, at: r.penned.name };
       s.at = now;
       if (isStaff(mn)) Object.assign(s, staffStateFor(mn));
       const mods = addonStateFor(mn); if (mods) s.mods = mods;

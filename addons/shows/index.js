@@ -15,7 +15,7 @@
                   heel  → be right next to the judge when time's up
                   stay  → don't move for the whole 30 seconds
                 Score: cues passed out of cues given, ×10.
-   Ribbons: 1st, 2nd and 3rd go on the record forever (?ribbons). Only the most recent one gets the ribbon
+   Ribbons: 1st, 2nd and 3rd go on the record forever (?prizes). Only the most recent one gets the ribbon
    emote: once a day when they come to the farm, and on their placard.
 
    Placards: a spot called placard-<name>. Staff write it with ?sign set <name> <text>. Anybody standing
@@ -116,7 +116,8 @@ function closeShow(by) {
   const ranked = scores(sh).filter((x) => x[1] > 0).sort((a, b) => b[1] - a[1]).slice(0, 3);
   d.show = null;
   if (!ranked.length) { api.announce("🎀 The " + EVENTS[sh.event] + " is over, y'all. Nobody placed this time."); api.save(); return "Closed. Nobody placed."; }
-  ranked.forEach(([mn], place) => { (d.ribbons[mn] = d.ribbons[mn] || []).push({ event: sh.event, place, at: Date.now() }); delete d.ribbonSaid[mn]; });
+  ranked.forEach(([mn], place) => { (d.ribbons[mn] = d.ribbons[mn] || []).push({ event: sh.event, place, at: Date.now() }); delete d.ribbonSaid[mn];
+    if (api.ribbons) api.ribbons(Number(mn), [5, 3, 2][place] || 1, "placin' in the show"); });
   api.announce("🎀 " + EVENTS[sh.event].toUpperCase() + " RESULTS: " + ranked.map(([mn, v], i) => PLACES[i] + " " + api.name(mn) + " (" + shown(sh, mn, v) + ")").join(" · "));
   api.emote("🎀 The judge pins a " + RIBBON[0] + " ribbon on " + api.name(ranked[0][0]) + ". Best in show!", ranked[0][0]);
   api.save();
@@ -225,11 +226,12 @@ connect({
   label: "Shows",
   version: "1.0.0",
   guide: "Staff: ?show open udder | breeding | race | obedience, ?show score <who> <1-10>, ?show cue <who> <cue>, ?show go (race), ?show close. Stock: ?show enter. " +
-    "Ribbons stay on your record (?ribbons); your latest one gets shown off. Placards: ?sign by a placard spot; staff ?sign set <name> <text>.",
+    "Ribbons stay on your record (?prizes); your latest one gets shown off. Placards: ?sign by a placard spot; staff ?sign set <name> <text>.",
   setup(a) { api = a; D(); },
   commands: {
     show: { usage: "show open|enter|score|cue|go|close", private: true, run: cmdShow },
-    ribbons: { usage: "ribbons", private: true, run: (c) => {
+    // (?ribbons is the farm's scrip now: show placings are ?prizes)
+    prizes: { usage: "prizes", aliases: ["rosettes"], private: true, run: (c) => {
       const t = c.args[0] ? c.api.find(c.args[0]) : c.sender, r = (t && D().ribbons[t]) || [];
       c.reply(r.length ? "🎀 RIBBONS — " + c.api.name(t) + "\n" + r.map((x) => PLACES[x.place] + " · " + EVENTS[x.event] + " · " + new Date(x.at).toLocaleDateString()).join("\n") : (t ? c.api.name(t) + " has no ribbons yet." : "Who's that, hon?"));
     } },

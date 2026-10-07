@@ -99,9 +99,17 @@
       ? (canBeep(sender) ? "beep" : "whisper") : channel;
     // staff lookin' up somebody else from the Companion: the answer goes in their Office, not the feed
     const docAbout = (channel === "companion" && DOC_CMDS.includes(cmd) && args[0] && isStaff(sender)) ? resolveTarget(args[0]) : null;
+    // seen live: somebody who'd just finished applyin' was told "Say ?apply first!" a minute later. With an
+    // application in the queue, every "not on the books" answer says it's waitin' on the proprietors instead.
+    const waiting = (txt) => {
+      if (!/\?apply/.test(String(txt)) || !/books|apply first|\?apply first|Say \?apply/i.test(String(txt))) return txt;
+      const r0 = rec(sender);
+      if ((r0 && r0.roles && r0.roles.length) || !L.applications.some(a => a.mn === sender)) return txt;
+      return "📋 Your application's in, sugar, and waitin' on the proprietors. Once you're approved that'll work for you. Till then, look around: ?help start, ?tour, ?rules.";
+    };
     const R = (docAbout && docAbout !== sender)
       ? (txt) => toCompanion(sender, txt, "doc", false, { kind: cmd, who: plainName(docAbout), about: docAbout })
-      : (txt) => reply(sender, txt, replyCh);
+      : (txt) => reply(sender, waiting(txt), replyCh);
 
     if (addonCmd){ runAddonCommand(addonCmd, sender, args, rest, channel, R); return; }
 
@@ -1097,6 +1105,8 @@
         dropLeashes(sender); state.tours.delete(sender);
         { const r0 = rec(sender); if (r0 && r0.prod){ r0.prod.pin = null; r0.prod.unpinUntil = Date.now() + CFG.PROD.SAFEWORD_UNPIN_MIN*60000; saveLedger(); } }
         if (rec(sender) && rec(sender).stocked){ rec(sender).stocked = null; saveLedger(); }
+        clearPotions(sender); unpen(sender, true);
+        if (rec(sender) && rec(sender).dare){ rec(sender).dare = null; saveLedger(); }
         if (CFG.SUMMON_ON_SAFEWORD){
           const n = summonHelp("🔴 Safeword called by "+plainName(sender)+".", sender, true, "safe");
           if (n) log("Summoned "+n+" on-call staff to a safeword.");
@@ -1465,6 +1475,12 @@ Welcome to B&B Farm, hon. 🌾`);
         R("Got it, I've noted that on their file.");
         break;
       }
+
+      /* ── RIBBONS, THE STORE, POTIONS, DARES, THE CORRAL (10l, 10m) ── */
+      case "ribbons": case "ribbon": case "store": case "buy": case "gift": ribbonCommand(cmd, sender, args, R); break;
+      case "potions": case "potion": potionCommand(cmd, sender, args, R); break;
+      case "dares": case "dare": case "dared": dareCommand(cmd, sender, args, R); break;
+      case "corral": case "uncorral": penCommand(cmd === "corral" ? "pen" : "unpen", sender, args, R); break;
 
       case "edit": {
         // proprietors fix somebody's record: ?edit <who> shows what can change · ?edit <who> <field> <new value>
@@ -2298,8 +2314,16 @@ Welcome to B&B Farm, hon. 🌾`);
         const wk = weekKey();
         r.choreWeek = (r.choreWeek && r.choreWeek.key === wk) ? r.choreWeek : { key:wk, n:0 };
         r.choreWeek.n++; r.choreTotal = (r.choreTotal||0) + 1;
-        audit(sender,"CHORE",r.chore.text.slice(0,50)); r.chore = null; saveLedger();
+        audit(sender,"CHORE",r.chore.text.slice(0,50));
+        const bounty = r.chore.bounty || 0, bkey = r.chore.key, btext = r.chore.text, bby = r.chore.by;
+        r.chore = null; saveLedger();
         staffPoints(sender, 1, "chore");
+        earnRibbons(sender, CFG.RIBBONS_FOR.chore, "a chore done");
+        if (bounty){
+          L.chores = L.chores.filter(c => c.key !== bkey); saveLedger();
+          earnRibbons(sender, bounty, "the bounty on \""+String(btext).replace(/\s*@[a-z0-9_-]+\s*$/i, "")+"\"", bby || CFG.BOT_MEMBER);
+          if (bby && bby !== sender) tell(bby, "📌 "+plainName(sender)+" did your bounty job and collected the "+bounty+" ribbons.");
+        }
         R("✅ Thank you, sweetie! That's "+r.choreWeek.n+" this week.");
         break;
       }
@@ -2328,18 +2352,29 @@ Welcome to B&B Farm, hon. 🌾`);
       /* ── PLAY ── */
       case "wheel": {
         const sub = String(args[0]||"list").toLowerCase();
+        if (sub === "farm"){
+          const v = String(args[1]||"").toLowerCase();
+          if (v === "on" || v === "off"){ if (!isHerdmaster(sender)){ R("Herdmasters and up switch the farm's slices, sugar."); break; } L.wheelFarm = v === "on"; saveLedger(); }
+          R("🎡 The farm's own slices ("+FARM_SLICES.length+": stocks, the pen, glory shifts, potions, dares, ribbons…) are "+(L.wheelFarm === false ? "OFF" : "ON")+". ?wheel farm on|off");
+          break;
+        }
         if (sub === "add"){
           const kind = String(args[1]||"").toLowerCase();
-          const text = args.slice(2).join(" ").trim();
-          if (!["reward","punish"].includes(kind) || !text){ R("Say whether it's a reward or a punish slice, sugar, then the words. "+"?wheel add reward <text> or ?wheel add punish <text> adds a slice (%name% becomes their name), ?wheel lists them, ?wheel remove <number> takes one off. For example: ?wheel add reward Extra hay tonight"); break; }
-          L.wheel.push({ kind, text, by:sender }); saveLedger(); R("Added to the wheel! "+L.wheel.length+" slices now.");
+          const { text, act } = wheelAddAct(args.slice(2).join(" ").trim());
+          if (!["reward","punish","silly"].includes(kind) || !text){ R("Say whether it's a reward, punish or silly slice, sugar, then the words. "+"?wheel add reward <text> (%name% becomes their name). Add => and an action to make it happen: ?wheel add punish Off to the pen, %name% => pen 30. "+
+            "Actions: stocks <min> · pen <min> · milkstall <min> · glory <min> · leash <min> · denial <hours> · potion <name> · dare [reckless] · ribbons <n> · fine <n> · luxury <hours> · grace · heat"); break; }
+          if (act && runAct.length && !["stocks","pen","milkstall","glory","leash","denial","potion","dare","ribbons","fine","luxury","grace","heat","release"].includes(act.split(/\s+/)[0])){ R("I don't know that action, sugar. Actions: stocks · pen · milkstall · glory · leash · denial · potion · dare · ribbons · fine · luxury · grace · heat · release"); break; }
+          if (act && act.startsWith("potion") && !potionDef(act.split(/\s+/)[1])){ R("There's no potion called that, sugar. ?potions lists 'em."); break; }
+          L.wheel.push({ kind, text, act, by:sender }); saveLedger(); R("Added to the wheel! "+L.wheel.length+" slices of your own now"+(act ? ", and that one does somethin' ("+act+")" : "")+".");
         } else if (sub === "remove"){
           const i = parseInt(args[1],10)-1;
           if (!(i>=0 && i<L.wheel.length)){ R("Which number, hon? Say ?wheel remove and a number from the ?wheel list, like ?wheel remove 2."); break; }
           R("Took it off: "+L.wheel.splice(i,1)[0].text); saveLedger();
         } else {
-          R(L.wheel.length ? "🎡 THE WHEEL\n\n"+L.wheel.map((e,i)=>(i+1)+". "+(e.kind==="reward"?"🍬":"🔻")+" "+e.text).join("\n")
-                           : "Wheel's empty, sugar. "+"?wheel add reward <text> or ?wheel add punish <text> adds a slice (%name% becomes their name), ?wheel lists them, ?wheel remove <number> takes one off. For example: ?wheel add reward Extra hay tonight");
+          const icon = e => e.kind==="reward"?"🍬":e.kind==="silly"?"🎭":"🔻";
+          R("🎡 THE WHEEL\n\nYOURS\n"+(L.wheel.length ? L.wheel.map((e,i)=>(i+1)+". "+icon(e)+" "+e.text+(e.act ? "  ⇒ "+e.act : "")).join("\n") : "  none yet")+
+            "\n\nTHE FARM'S ("+(L.wheelFarm === false ? "off" : "on")+", ?wheel farm on|off)\n"+FARM_SLICES.map(e => "  "+icon(e)+" "+e.text.replace(/%name%/g, "…")).join("\n")+
+            "\n\n?spin <who> [reward|punish|silly] · ?wheel add <kind> <text> [=> action] · ?wheel remove <number>. A slice that can't happen to them (limits, switches) is skipped.");
         }
         break;
       }
@@ -2348,11 +2383,9 @@ Welcome to B&B Farm, hon. 🌾`);
         if (!t || !rec(t)){ R("Spin for who, sugar? Say ?spin, their name or member number, then reward or punish if you want just that kind (leave it out for any slice). "+
                            "Anything that clashes with their hard limits gets left out. For example: ?spin Bessie  or  ?spin 123456 punish"); break; }
         const kind = String(args[1]||"").toLowerCase();
-        const pool = L.wheel.filter(e => (!["reward","punish"].includes(kind) || e.kind === kind) && wheelAllowed(e, t));
-        if (!pool.length){ R("Shoot, there's nothin' on the wheel that fits "+plainName(t)+"'s limits, hon. Try leavin' out reward or punish, or add some slices with ?wheel add."); break; }
-        const e = pool[Math.floor(Math.random()*pool.length)];
-        audit(sender,"SPIN",t+" "+e.text.slice(0,50));
-        say("🎡 Round and round she goes! "+plainName(sender)+" spins the wheel for "+plainName(t)+"… "+(e.kind==="reward"?"🍬 ":"🔻 ")+fill(e.text, t), false, t);
+        const e = spinWheel(sender, t, ["reward","punish","silly","lucky"].includes(kind) ? kind : "");
+        if (!e){ R("Shoot, there's nothin' on the wheel that can happen to "+plainName(t)+" right now (their limits, their switches, who's here), hon. Try another kind, or add slices with ?wheel add."); break; }
+        if (channel !== "chat") R("🎡 Spun: "+fill(e.text, t)+(e.act ? " ("+e.act+")" : ""));
         break;
       }
       case "beg": case "please": {
@@ -2364,6 +2397,7 @@ Welcome to B&B Farm, hon. 🌾`);
         if (Date.now()-last < CFG.BEG_COOLDOWN_MIN*60000){ R("You just begged, hon! Don't wear it out. Try again in a little while."); break; }
         state.cooldowns.set("beg:"+sender, Date.now());
         audit(sender,"BEG","");
+        if (potionBegged(sender)){ R("💗 Such pretty beggin'. The Needy Nectar lets you go, sugar."); break; }
         if (stockedNow(sender)){
           const left = r.stocked.until - Date.now();
           r.stocked.until -= Math.round(left*0.25); saveLedger();
@@ -2471,6 +2505,7 @@ Welcome to B&B Farm, hon. 🌾`);
     if (!pc){
       const low0 = String(raw).trim().toLowerCase().replace(/^[?!.\-\/]/,"").replace(/^bot\s+/,"");
       if ((low0 === "yes" || low0 === "no") && (state.breedAsks.has(sender) || state.jarAsks.has(sender))) return answerPending(sender, low0 === "yes");
+      if ((low0 === "yes" || low0 === "no") && state.farmAsks && state.farmAsks.has(sender)) return farmYesNo(sender, low0 === "yes");
       if ((low0 === "yes" || low0 === "no") && addonAsks.has(sender)) return addonYesNo(sender, low0 === "yes");
       return false;
     }

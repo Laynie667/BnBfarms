@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm add-on: Glory stalls
 // @namespace    bnbfarm
-// @version      1.5.1
+// @version      1.5.2
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-glory-stalls.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-glory-stalls.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -1249,6 +1249,7 @@
       if (sh.until > now) continue;
       delete d.shifts[mn];
       api.notice(Number(mn), "\u{1F573}\uFE0F Your " + (sh.punish ? "punishment " : "") + "shift in the glory stalls is over, sugar. You can step out.");
+      if (api.ribbons) api.ribbons(Number(mn), sh.punish ? 1 : 3, sh.punish ? "servin' out your punishment shift" : "workin' a shift in the glory stalls");
       api.save();
     }
     for (const id of stallIds()) {

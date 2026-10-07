@@ -403,6 +403,39 @@ BEGGIN'
   • Ask properly for a quarter off your stocks time.
   • Once every 10 minutes, sugar.`,
 
+    ribbons: `🎀 RIBBONS, THE STORE & POTIONS 🎀
+
+RIBBONS are the farm's scrip. They keep day to day.
+  Earn: make your milk quota (3) · a full stall session (1) ·
+    a chore (2) · a glory shift (3) · a dare (2, reckless 4) ·
+    placin' in a show · best milk or top sire of the week (10) ·
+    staff hand 'em out for good behavior
+  Lose: a missed quota (2) · a dare left undone (1) · staff fines
+  Up to 40 a day from farm things. The Sunday till pays the
+    week's top earner a bonus.
+  ?ribbons · your purse · ?ribbons top · this week's board
+
+THE STORE · ?store
+  Spins, a lucky spin, a luxury day, skip a chore, quota grace,
+  a greetin' of your own, a ribbon tag on ?who, a dedication,
+  a bounty on a job, shots, and every potion.
+  ?buy <item> · ?buy <potion> for <who> · ?gift <who> <potion>
+  (a gift always asks them first, and you only pay on a yes)
+
+POTIONS wear off. ?potions lists them all.
+  Rewards: Clover Cream · Golden Hour · Blue Ribbon Musk ·
+    Honey Tongue
+  Punishments: Bitterroot · Heavy Udder Draught · Moo Juice ·
+    Bell Tonic · Needy Nectar (?beg nicely to end it early)
+  Just because: Hiccup Fizz · Featherlight · Wrong Barn ·
+    Big Britches · Shrinking Violet · Echo Elixir · Heat Mist
+  ?potions on lets staff, the wheel and gifts give you one.
+  Your limits rule some out. Your safeword pours them all out.
+
+DARES · ?dares on
+  A dare to do in 30 minutes. ?dared when it's done (on your
+  honor) · ?dare skip to chicken out (a ribbon).`,
+
     fair: `🎪 THE COUNTY FAIR 🎪
 
 COMMANDS
@@ -562,10 +595,24 @@ HOURS
     play: `🎡 PLAY (staff)
 
 THE PRIZE WHEEL
-  ?wheel · list the slices
-  ?wheel add reward <text> · ?wheel add punish <text>
-  ?wheel remove <n>
-  ?spin <who> [reward|punish] · skips anything against their limits
+  ?wheel · list the slices (yours and the farm's)
+  ?wheel add reward|punish|silly <text> [=> action]
+     the action makes it happen: stocks 20 · pen 30 · milkstall 30 ·
+     glory 30 · leash 20 · denial 2 · potion hiccup · dare reckless ·
+     ribbons 3 · fine 2 · luxury 1 · grace · heat · release
+     e.g. ?wheel add punish Off to the pen, %name% => pen 30
+  ?wheel remove <n> · ?wheel farm on|off (the farm's own slices)
+  ?spin <who> [reward|punish|silly|lucky] · skips anything against
+     their limits or their switches (?potions, ?dares, ?glory)
+
+RIBBONS, POTIONS, DARES, THE CORRAL
+  ?ribbon give <who> <n> [why] · ?ribbon fine <who> <n> [why]
+     farmhands up to 5, herdmasters 15, proprietors any
+  ?potion give <who> <potion> · ?potion end <who>
+  ?dare <who> [reckless] [your own dare]
+  ?corral <who> [minutes] [milking|spot] · ?uncorral <who>
+     corral spots: ?spot set pen (pen-2, pen-3…)
+  ?store approve|reject <who> · a bought greetin'
 
 BEGGIN'
   ?begphrase · shows the words · ?begphrase <words> · sets them
@@ -635,7 +682,7 @@ YOU
 UPKEEP
   ?backup · ?health`
   };
-  const GUIDE_ALIAS = { new:"start", rules:"start", key:"keys", doors:"keys", herd2:"herds", tier:"tiers", stocks:"tiers",
+  const GUIDE_ALIAS = { ribbon:"ribbons", store:"ribbons", shop:"ribbons", potion:"ribbons", potions:"ribbons", dares:"ribbons", dare:"ribbons", new:"start", rules:"start", key:"keys", doors:"keys", herd2:"herds", tier:"tiers", stocks:"tiers",
                         milk:"barn", milking:"barn", stats:"barn", nursing:"barn", breed:"breeding", scene:"breeding",
                         pregnant:"pregnancy", preg:"pregnancy", rights:"pregnancy", species:"pregnancy", litters:"pregnancy",
                         inflation:"cocks", cumflation:"cocks", knot:"cocks", knots:"cocks", penis:"cocks", cock:"cocks",
@@ -655,7 +702,16 @@ UPKEEP
     // an add-on, by its name, its label, or one of its commands (?help glory, ?help stalls)
     const a = ADDONS.get(t) || [...ADDONS.values()].find(x => x.label.toLowerCase() === t || x.commands[t]);
     if (a) return addonsText(a.name);
-    return "Hmm, I don't have a guide called '"+t0+"', hon. Try one of these: start, safety, keys, herds, tiers, barn, breeding, pregnancy, heat, body, cocks, shots, life, fair or me"+
+    // a typo (?help glorty, ?help bodyu, both seen live): one letter off a guide or an add-on, just open it
+    if (t.length >= 4 && !helpFor.guessing){
+      const names = Object.keys(GUIDES).concat(Object.keys(GUIDE_ALIAS), [...ADDONS.keys()], ...[...ADDONS.values()].map(x => Object.keys(x.commands || {})));
+      const dist = (a, b) => { const d = Array.from({ length: a.length + 1 }, (_, i) => [i]); for (let j = 1; j <= b.length; j++) d[0][j] = j;
+        for (let i = 1; i <= a.length; i++) for (let j = 1; j <= b.length; j++) d[i][j] = Math.min(d[i-1][j]+1, d[i][j-1]+1, d[i-1][j-1]+(a[i-1] === b[j-1] ? 0 : 1));
+        return d[a.length][b.length]; };
+      const best = names.filter(n => n.length >= 3 && dist(t, n) === 1)[0];
+      if (best){ helpFor.guessing = true; try { return helpFor(sender, best); } finally { helpFor.guessing = false; } }
+    }
+    return "Hmm, I don't have a guide called '"+t0+"', hon. Try one of these: start, safety, keys, herds, tiers, barn, breeding, pregnancy, heat, body, cocks, shots, life, ribbons, fair or me"+
            (ADDONS.size ? ", or an add-on: "+[...ADDONS.keys()].join(", ") : "")+". For example: ?help breeding";
   }
   // every command they can use: the same groups the Companion's Guides tab shows (shared/guides.js),

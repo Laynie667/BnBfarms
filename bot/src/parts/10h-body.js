@@ -98,6 +98,7 @@
                                n+"'s release fizzles out into a sad, twitching dribble. Ruined.",
                                n+" sags with a frustrated whine. So close, and nothin' to show for it."]), mn);
     } else if (/^Orgasm\d/.test(content)){
+      if (potionClimax(mn) === "ruined"){ p.climax.ruined++; saveLedger(); return; }   // Bitterroot
       p.climax.came++;
       face(mn, "afterglow", 40);
       const bits = [];

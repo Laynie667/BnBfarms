@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.10.11
+// @version      0.11.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -230,7 +230,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.10.11";
+  var VERSION = "0.11.0";
 
   // extension/src/config.js
   var BOT_MEMBER = 260239;
@@ -373,7 +373,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
     { name: "Body", cmds: ["size", "measure", "penis", "futa", "gender <word>"] },
     { name: "Clothes", cmds: ["outfit", "outfits", "uniform", "outfit back"] },
     { name: "Mind", cmds: ["hypno", "teaseme"] },
-    { name: "Fun", cmds: ["fair", "enter"] }
+    { name: "Fun", cmds: ["fair", "enter"] },
+    { name: "Ribbons and the store", cmds: ["ribbons", "ribbons top", "store", "buy <item>", "gift <who> <potion>", "potions", "potions on", "dares on", "dare", "dared", "dare skip"] }
   ];
   var STAFF_GROUPS = [
     { name: "Books", cmds: ["queue", "app <n>", "approve <who> livestock", "deny <who>", "appclear", "roster", "stock", "find <who>", "record <who>", "note <who>", "signed", "addfriend <who>", "unregister <who>", "unregister <who> <role>"] },
@@ -385,10 +386,11 @@ One of mods you are using is using an old version of SDK. It will work for now b
     { name: "Map", cmds: ["spot", "spot set <name>", "spot place <name> <x> <y>", "zone", "zone who", "zone a <name>", "zone b <name>", "zone box <name> <ax> <ay> <bx> <by>", "zone pair <name> <group>", "tourstop", "setrescue", "where", "stucklog"] },
     { name: "Voice", cmds: ["voice", "voice on herd", "voice add herd <line>", "voice every herd 15"] },
     { name: "Work and play", cmds: ["clockin", "clockout", "hours", "done", "chores", "chore add <job> @<place>", "wheel", "spin", "begphrase", "score"] },
+    { name: "Ribbons, potions, dares", cmds: ["ribbon give <who> <n>", "ribbon fine <who> <n>", "ribbons <who>", "potion give <who> <potion>", "potion end <who>", "dare <who>", "dare <who> reckless", "corral <who> <minutes>", "uncorral <who>", "wheel farm", "store approve <who>"] },
     { name: "Keys and calls", cmds: ["keys <who>", "keysync", "keydump", "grant <who> <tier>", "revoke <who>", "forced", "summon <who>", "summon all", "pasture", "onduty", "cover"] }
   ];
   var OWNER_GROUPS = [
-    { name: "Proprietors", cmds: ["staffadd <who> <role>", "staffremove <who>", "goldkey <who>", "notice <text>", "feeding on", "curfew on", "fair open", "addons off <name>", "addons on <name>", "backup", "health"] }
+    { name: "Proprietors", cmds: ["staffadd <who> <role>", "staffremove <who>", "goldkey <who>", "notice <text>", "feeding on", "curfew on", "fair open", "addons off <name>", "addons on <name>", "backup", "health", "edit <who>", "store price <item> <n>", "store off <item>", "store on <item>"] }
   ];
   var needsInput = (cmd) => /</.test(cmd);
   var cmdStem = (cmd) => cmd.replace(/\s*<.*$/, "").trim();
@@ -448,6 +450,72 @@ One of mods you are using is using an old version of SDK. It will work for now b
     ["Security wing", "Gold", "Permanent displays down the back hall."],
     ["The cabin", "Booking", "Laynie and Alexia's home, unless somebody books it."]
   ];
+
+  // extension/src/views/store.js
+  var minsLeft = (t) => Math.max(0, Math.ceil((t - Date.now()) / 6e4));
+  var KIND = { reward: "\u{1F36C}", punish: "\u{1F53B}", silly: "\u{1F3AD}" };
+  function storeTab(ctx2) {
+    const s = ctx2.s, items = s.store || [], fx = s.fx || [], log = s.ribbonLog || [];
+    const purse = card(
+      title("\u{1F380} Your ribbons"),
+      h("div", { style: { fontSize: "28px", fontWeight: "700", margin: "4px 0" } }, String(s.ribbons || 0)),
+      s.quotaGrace ? chip("quota grace \xD7 " + s.quotaGrace, "good") : null,
+      log.length ? h("div", { style: { marginTop: "6px" } }, log.map((e) => h("div", { class: "fhc-kv" }, h("span", null, e.why), h("b", null, (e.n > 0 ? "+" : "") + e.n)))) : null,
+      muted("Earn 'em: your milk quota, a full stall session, chores, glory shifts, dares, shows, best of the week, and staff who think you've been good."),
+      h("div", { style: { marginTop: "6px" } }, btn("This week's board", () => ctx2.send("ribbons top")))
+    );
+    const now = fx.length ? card(
+      title("\u{1F9EA} In you right now"),
+      fx.map((f) => h("div", { class: "fhc-kv" }, h("span", null, f.name), h("b", null, minsLeft(f.until) + " min"))),
+      muted("Your safeword pours every one of them out.")
+    ) : null;
+    const dare = s.dare ? card(
+      title(s.dare.reckless ? "\u{1F3B2} A reckless dare" : "\u{1F3B2} Your dare"),
+      h("p", null, s.dare.text),
+      muted(minsLeft(s.dare.until) + " minutes left."),
+      h("div", null, btn("I did it", () => ctx2.send("dared"), true), btn("Chicken out (1 ribbon)", () => ctx2.send("dare skip")))
+    ) : null;
+    const pen = s.penned ? card(title("\u{1F6A7} Corralled"), muted("At " + s.penned.at + " for " + minsLeft(s.penned.until) + " more minutes. Wander off and you'll be walked back.")) : null;
+    const who = () => String(ctx2.ui.giftWho || "").trim();
+    const row = (it) => h(
+      "div",
+      { class: "fhc-box", style: { padding: "8px", marginTop: "6px" } },
+      h(
+        "div",
+        { class: "fhc-kv", style: { borderBottom: "none", padding: "0" } },
+        h("b", null, (KIND[it.kind] ? KIND[it.kind] + " " : "") + it.name),
+        chip(it.price + " \u{1F380}", (s.ribbons || 0) >= it.price ? "good" : "")
+      ),
+      muted(it.desc),
+      it.id === "bounty" || it.id === "greeting" || it.id === "tag" || it.id === "dedicate" ? btn("Write it\u2026", () => ctx2.fillBox("buy " + it.id + " ")) : h(
+        "div",
+        null,
+        btn("Buy", () => ctx2.send("buy " + it.id), true),
+        it.gift ? btn("Gift it", () => who() ? ctx2.send("buy " + it.id + " for " + who()) : ctx2.hint("Type who it's for in the box above the potions first.")) : null
+      )
+    );
+    const shelf = (label, list) => list.length ? card(title(label), list.map(row)) : null;
+    const potions = items.filter((it) => it.kind), shots = items.filter((it) => /^shot-/.test(it.id)), treats = items.filter((it) => !it.kind && !/^shot-/.test(it.id));
+    return [
+      purse,
+      now,
+      dare,
+      pen,
+      shelf("\u{1F6CD}\uFE0F Treats and favors", treats),
+      shelf("\u{1F489} Shots", shots),
+      potions.length ? card(
+        title("\u{1F9EA} Potions"),
+        muted("Gifts always ask them first, and you only pay if they say yes. They need Potions switched on in their Toggles."),
+        h(
+          "label",
+          { class: "fhc-label" },
+          "Gift to (name or member number)",
+          h("input", { class: "fhc-in", value: ctx2.ui.giftWho || "", oninput: (e) => ctx2.setUi({ giftWho: e.target.value }, true) })
+        ),
+        potions.map(row)
+      ) : null
+    ];
+  }
 
   // extension/src/views/livestock.js
   var pct = (a, b) => b ? 100 * a / b : 0;
@@ -572,7 +640,9 @@ One of mods you are using is using an old version of SDK. It will work for now b
     ["degrade", "Degrade", "Let staff's degradin' count"],
     ["tally", "Tally marks", "Show your tally on ?who and the board"],
     ["teaseme", "Tease me", "Let staff tease lines name you"],
-    ["hypno", "Hypno", "Let your herd leader's voice lines reach you, privately"]
+    ["hypno", "Hypno", "Let your herd leader's voice lines reach you, privately"],
+    ["potions", "Potions", "Staff and the wheel can give you potions, and others can gift you one (you're asked first). Your limits still rule some out"],
+    ["dares", "Dares", "Staff and the wheel can hand you a dare to do in half an hour"]
   ];
   var NEEDS = { freeuse: ["breedable", "Turn Breedable on first"] };
   function farmSwitches(ctx2, list) {
@@ -650,6 +720,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     { id: "safety", label: "\u{1F198} Safety", render: safetyTab },
     { id: "milk", label: "Milking", render: milking },
     { id: "breed", label: "Breeding", render: breeding },
+    { id: "store", label: "\u{1F380} Store", render: storeTab },
     { id: "inbox", label: "Inbox", render: inbox },
     { id: "guides", label: "Guides", render: (ctx2) => guidesTab(ctx2, false) },
     { id: "toggles", label: "Toggles", render: toggles }
@@ -3997,6 +4068,33 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
   window.__farmhandCompanion = VERSION;
   var st = { panel: null, welcomed: false, lastHello: 0, parts: /* @__PURE__ */ new Map() };
+  var NOISES = {
+    cow: ["moo", "mooo", "mrrrm"],
+    bull: ["moo", "hrrmph"],
+    pony: ["neigh", "nicker", "whinny"],
+    horse: ["neigh", "whinny", "nicker"],
+    pup: ["arf", "woof", "awoo"],
+    dog: ["woof", "arf", "ruff"],
+    kitty: ["mew", "nya", "mrrp"],
+    cat: ["meow", "mrrp", "purr"],
+    bunny: ["squeak", "eep"],
+    rabbit: ["squeak", "eep"],
+    pig: ["oink", "snrk"],
+    goat: ["baa", "maa"],
+    sheep: ["baa", "baaa"],
+    fox: ["yip", "ack"],
+    wolf: ["awoo", "grr"],
+    deer: ["bleat", "mweh"],
+    goblin: ["heh", "nngh"]
+  };
+  function mooify(text, species) {
+    const say = NOISES[String(species || "").toLowerCase()] || NOISES.cow;
+    return String(text).replace(/[A-Za-z']{3,}/g, (w) => {
+      if (Math.random() < 0.5) return w;
+      const n = say[Math.floor(Math.random() * say.length)];
+      return w[0] === w[0].toUpperCase() ? n[0].toUpperCase() + n.slice(1) : n;
+    });
+  }
   var botHere = () => window.CurrentScreen === "ChatRoom" && Array.isArray(window.ChatRoomCharacter) && window.ChatRoomCharacter.some((c) => c.MemberNumber === BOT_MEMBER);
   var onBotAccount = () => !!(window.Player && window.Player.MemberNumber === BOT_MEMBER);
   var direct = () => onBotAccount() && window.Farmhand && typeof window.Farmhand.own === "function";
@@ -4276,6 +4374,20 @@ One of mods you are using is using an old version of SDK. It will work for now b
       }
       return next(args);
     });
+    try {
+      mod.hookFunction("ServerSend", 5, (args, next) => {
+        try {
+          const d = args[1], s = st.panel && st.panel.s;
+          if (args[0] === "ChatRoomChat" && d && d.Type === "Chat" && typeof d.Content === "string" && s && Array.isArray(s.fx) && s.fx.some((f) => f.id === "moo" && f.until > Date.now()) && !/^\s*[(\[?!./\-*]/.test(d.Content))
+            args = [args[0], Object.assign({}, d, { Content: mooify(d.Content, s.species) })];
+        } catch (e) {
+          console.warn("[Farmhand Companion] moo:", e);
+        }
+        return next(args);
+      });
+    } catch (e) {
+      console.warn("[Farmhand Companion] moo juice unavailable:", e);
+    }
     try {
       mod.hookFunction("ChatRoomMapViewClick", 10, (args, next) => {
         let took = false;

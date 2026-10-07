@@ -6,6 +6,7 @@
 // Also the "Livestock" view staff and proprietors switch to for their own personal info.
 import { h, card, title, muted, btn, chip, bar, toggle, ml } from "../dom.js";
 import { guidesTab, safetyTab } from "./common.js";
+import { storeTab } from "./store.js";
 
 const pct = (a, b) => (b ? (100 * a) / b : 0);
 const hoursLeft = (t) => Math.max(0, Math.ceil((t - Date.now()) / 3600000));
@@ -94,6 +95,8 @@ export const SWITCH_INFO = [
   ["degrade", "Degrade", "Let staff's degradin' count"], ["tally", "Tally marks", "Show your tally on ?who and the board"],
   ["teaseme", "Tease me", "Let staff tease lines name you"],
   ["hypno", "Hypno", "Let your herd leader's voice lines reach you, privately"],
+  ["potions", "Potions", "Staff and the wheel can give you potions, and others can gift you one (you're asked first). Your limits still rule some out"],
+  ["dares", "Dares", "Staff and the wheel can hand you a dare to do in half an hour"],
 ];
 // some switches only work once another is on; say so instead of lettin' a click do nothin'
 const NEEDS = { freeuse: ["breedable", "Turn Breedable on first"] };
@@ -148,6 +151,7 @@ export const LIVESTOCK_TABS = [
   { id: "safety", label: "🆘 Safety", render: safetyTab },
   { id: "milk", label: "Milking", render: milking },
   { id: "breed", label: "Breeding", render: breeding },
+  { id: "store", label: "🎀 Store", render: storeTab },
   { id: "inbox", label: "Inbox", render: inbox },
   { id: "guides", label: "Guides", render: (ctx) => guidesTab(ctx, false) },
   { id: "toggles", label: "Toggles", render: toggles },

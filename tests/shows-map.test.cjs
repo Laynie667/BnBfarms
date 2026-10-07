@@ -58,8 +58,8 @@ const beepsTo=(k,mn)=>sent.slice(k).filter(([e,d])=>e==='AccountBeep'&&d.MemberN
   handlers.AccountBeep({MemberNumber:221397,Message:'show go'}); await drain(1500);
   chars[2].MapData.Pos={X:15,Y:15}; await wait(1600); chars[2].MapData.Pos={X:20,Y:15}; await wait(1600);
   ok(S().ribbons['500'].length===2, 'finishing every checkpoint wins the race (and closes it when everyone is done)');
-  k=sent.length; handlers.AccountBeep({MemberNumber:500,Message:'ribbons'}); await drain(5500);
-  ok(/Pony Cart Race/.test(beepsTo(k,500).join(' ')), '?ribbons lists them');
+  k=sent.length; handlers.AccountBeep({MemberNumber:500,Message:'prizes'}); await drain(5500);
+  ok(/Pony Cart Race/.test(beepsTo(k,500).join(' ')), '?prizes lists them (show placings; ?ribbons is the scrip now)');
   // pens
   chars[2].MapData.Pos={X:3,Y:3};
   k=sent.length; handlers.AccountBeep({MemberNumber:221397,Message:'pen Moo pens'}); await drain(5500);

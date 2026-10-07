@@ -41,6 +41,7 @@
     state.sight = state.sight || new Map();
     const ok = a => Array.isArray(a) ? a.map(Number).filter(Number.isFinite).slice(0, 60) : [];
     state.sight.set(mn, { see: ok(m.see), hear: ok(m.hear), at: Date.now() });
+    if (typeof m.splat === "boolean") noteSplats(mn, m.splat);   // their own LSCG splatter switch
   }
 
   /* LEADIN' INSTEAD OF TELEPORTIN'. Their Companion walks them there (pathfindin', at their own speed).
@@ -107,8 +108,16 @@
         if (!g.milk) p.milk -= out;
         if (out >= 1) bits.push(g.milk ? "milk gushes down the pump's lines with every spasm (+"+ml(out)+" in the tank)" : "milk spurts from both teats as they shake");
       }
+      // came inside somebody? Seen live: a guest came three times in Laynie and only the time she typed a cum word
+      // counted. A breeding scene the game's own actions set up (penetrate, ride) that's still goin' gets the load.
+      let filled = false;
+      const sc = state.scenes.get(mn);
+      if (sc && makesSemen(mn) && now - (sc.lastSeen || sc.at) < CFG.ORGASM_FILL_MIN*60000 && now - (sc.lastCum || 0) >= sceneCooldown(mn)*1000){
+        const t = sc.with.find(x => charFor(x));
+        if (t){ sc.lastCum = now; filled = true; later(() => cumInto(mn, t, holesFrom(sc.hole) || ["vulva"], msg => whisper(mn, msg), true), 1500); }
+      }
       // a stud spends some of what they're carryin' (edges make it more)
-      if (makesSemen(mn) && !holeBlocked(mn, "penis") && p.semen >= 2){
+      if (!filled && makesSemen(mn) && !holeBlocked(mn, "penis") && p.semen >= 2){
         const spent = Math.min(p.semen, p.semen * CFG.PROD.LOAD_SHARE * 0.5 * (1 + CFG.EDGE_X * Math.min(p.edges||0, CFG.EDGE_MAX)));
         p.semen -= spent; p.edges = 0; p.pentUp = false;
         bits.push("their cock pulses out "+ml(spent)+" of wasted seed");

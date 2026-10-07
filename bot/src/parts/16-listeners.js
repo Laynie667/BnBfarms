@@ -56,6 +56,7 @@
           if (fm){ onCompanion(fm); return; }
           const bm = BCPLUS.readBCP(data);
           if (bm){ onBCPMessage(bm); return; }
+          if (data.Content === "LSCGMsg"){ noteLSCG(data); return; }
           if (typeof data.Content === "string" && data.Content.startsWith("ChatRoomBot ")){
             const text = data.Content.slice("ChatRoomBot ".length).trim().replace(/^\(+/,"").replace(/\)+$/,"");
             if (!text) return;

@@ -27,7 +27,7 @@
   function prodOf(mn){
     const r = rec(mn);
     if (!r) return null;
-    if (!r.prod) r.prod = { milk:0, semen:0, held:{vulva:0,butt:0,mouth:0}, capBonus:0,
+    if (!r.prod) r.prod = { milk:0, semen:CFG.PROD.SEMEN_CAP, held:{vulva:0,butt:0,mouth:0}, capBonus:0,
                             heat:null, boosts:{}, preg:null, freshUntil:0,
                             offspring:{male:0,female:0,futa:0,litters:0},
                             totals:{milked:0,collected:0,received:0,given:0,sired:0},
@@ -935,6 +935,7 @@
     // a knot plugs 'em up tight: not a drop spills, however full they get
     const kept = knot ? load - gagged : Math.min(load - gagged, room), spilt = load - gagged - kept;
     tp.held[hole] = (tp.held[hole]||0) + kept; tp.totals.received += kept;
+    if (!funnel && kept + spilt >= 1) lscgSplatAt(t, HOLE_SPLAT[hole] || ["ItemVulva"], plainName(stud));
     if (hole === "mouth") tp.milk = Math.min(milkCap(t), tp.milk + kept * CFG.PROD.SWALLOW_TO_MILK);
     if (hole === "mouth" && kept >= CFG.HUNGRY_ML){ tp.boosts = tp.boosts || {}; tp.boosts.hungry = Date.now() + 3600000; }
     const sc0 = state.scenes.get(stud);
@@ -1185,13 +1186,39 @@
      LSCG's own line reads "<who> sprays all over <them>'s face": who is the stud, or "A stranger". */
   const SPLAT_SPOTS = { face:["ItemHead","ItemMouth"], hair:["ItemHead"], tits:["ItemBreast"], chest:["ItemBreast"], belly:["ItemPelvis"],
                         back:["ItemButt"], ass:["ItemButt"], thighs:["ItemVulva"], crotch:["ItemVulva"], feet:["ItemPelvis"], body:["ItemPelvis"] };
+  const HOLE_SPLAT = { vulva:["ItemVulva"], butt:["ItemButt"], mouth:["ItemMouth"] };
+  // Seen live: no splatter ever landed. The bot doesn't run LSCG, so nobody's LSCG settings were ever put on its
+  // copy of them (that's LSCG's job, on games that have it). LSCG says them to the room in a hidden "LSCGMsg"
+  // when someone comes in or changes something, and the Companion reports its player's own: both are kept here.
+  function noteSplats(mn, on){
+    state.lscgSeen = state.lscgSeen || new Map();
+    state.lscgSeen.set(mn, { on: !!on, at: Date.now() });
+    const r = rec(mn);
+    if (r && !!r.lscgSplat !== !!on){ r.lscgSplat = !!on; saveLedger(); }
+  }
+  function noteLSCG(data){
+    try {
+      const d = Array.isArray(data.Dictionary) ? data.Dictionary[0] : null, m = d && d.message, s = m && m.settings;
+      if (!s || typeof s !== "object" || !s.SplatterModule || typeof s.SplatterModule !== "object") return;
+      const S = s.SplatterModule;
+      noteSplats(data.Sender, s.enabled !== false && S.enabled && S.taker !== false);
+    } catch(e){}
+  }
   function lscgSplatsOn(mn){
-    const C = charFor(mn), S = C && C.LSCG && C.LSCG.SplatterModule;
-    return !!(S && S.enabled && S.taker !== false && (!C.LSCG.GlobalModule || C.LSCG.GlobalModule.enabled !== false));
+    const C = charFor(mn);
+    if (!C) return false;
+    const S = C.LSCG && C.LSCG.SplatterModule;   // a bot account that does run LSCG has it right here
+    if (S) return !!(S.enabled && S.taker !== false && (!C.LSCG.GlobalModule || C.LSCG.GlobalModule.enabled !== false));
+    const k = state.lscgSeen && state.lscgSeen.get(mn);
+    if (k) return k.on;
+    const r = rec(mn); return !!(r && r.lscgSplat);
   }
   function lscgSplat(mn, area, who){
+    return lscgSplatAt(mn, SPLAT_SPOTS[PAINT_AREAS[String(area||"").toLowerCase()] || "body"] || ["ItemPelvis"], who);
+  }
+  function lscgSplatAt(mn, groups, who){
     if (!CFG.LSCG_SPLATTERS || !lscgSplatsOn(mn)) return false;
-    for (const group of SPLAT_SPOTS[PAINT_AREAS[String(area||"").toLowerCase()] || "body"] || ["ItemPelvis"]){
+    for (const group of groups){
       send("ChatRoomChat", { Content: "ChatOther-"+group+"-LSCG_Splat", Type: "Activity", Target: mn,
         Dictionary: [ { Tag: "SourceCharacter", Text: who || "A stranger" }, { TargetCharacter: mn },
                       { Tag: "FocusAssetGroup", FocusGroupName: group }, { ActivityName: "LSCG_Splat" } ] });

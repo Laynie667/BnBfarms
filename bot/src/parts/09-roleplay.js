@@ -154,7 +154,7 @@
     const where = hole === "mouth" ? "throat" : hole;
     emote("🐂 "+plainName(stud)+" is in "+plainName(bred)+"'s "+where+" now. The farm girl marks it in the stud book.");
     state.tipped = state.tipped || new Set();
-    if (!state.tipped.has(stud)){ state.tipped.add(stud); whisper(stud, "🐂 Tip, sugar: say cum (or orgasm) in your chat or emotes and I'll fill them up. ?breed stop ends the scene."); }
+    if (!state.tipped.has(stud)){ state.tipped.add(stud); whisper(stud, "🐂 Tip, sugar: when you cum in there, for real or in your chat or emotes (say cum), I'll fill them up. ?breed stop ends the scene."); }
   }
 
 

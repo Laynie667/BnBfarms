@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.10.10
+// @version      0.10.11
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -230,7 +230,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.10.10";
+  var VERSION = "0.10.11";
 
   // extension/src/config.js
   var BOT_MEMBER = 260239;
@@ -3680,11 +3680,13 @@ One of mods you are using is using an old version of SDK. It will work for now b
       if (W.CurrentScreen !== "ChatRoom" || !mapOn() || typeof W.ChatRoomMapViewCharacterIsVisible !== "function") return;
       const see = others().filter((c) => W.ChatRoomMapViewCharacterIsVisible(c)).map((c) => c.MemberNumber).sort();
       const hear = others().filter((c) => typeof W.ChatRoomMapViewCharacterIsHearable === "function" && W.ChatRoomMapViewCharacterIsHearable(c)).map((c) => c.MemberNumber).sort();
-      const key = see.join(",") + "|" + hear.join(",");
+      const LS = W.Player && W.Player.LSCG, S = LS && LS.SplatterModule;
+      const splat = S ? !!(S.enabled && S.taker !== false && (!LS.GlobalModule || LS.GlobalModule.enabled !== false)) : void 0;
+      const key = see.join(",") + "|" + hear.join(",") + "|" + splat;
       if (key === lastSight && Date.now() - (sightTick.at || 0) < 12e4) return;
       lastSight = key;
       sightTick.at = Date.now();
-      ctx.toBot("sight", { see, hear });
+      ctx.toBot("sight", splat === void 0 ? { see, hear } : { see, hear, splat });
     } catch (e) {
       console.warn("[Farmhand Companion] sight:", e);
     }

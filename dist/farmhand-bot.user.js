@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.15.7
+// @version      0.15.8
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -1824,7 +1824,7 @@
   ];
 
   // bot/src/version.js
-  var VERSION = "0.15.7";
+  var VERSION = "0.15.8";
 
   // bot-parts:farmhand-bot-parts
   (function() {
@@ -2514,6 +2514,8 @@
       RESCUE_POINT: { X: 20, Y: 30 },
       GREET_ENABLED: true,
       LSCG_SPLATTERS: true,
+      ORGASM_FILL_MIN: 3,
+      // a stud who cums within 3 minutes of their last thrust in somebody fills them
       CONTRACT_NICKNAME: "BnB {Species} {name}",
       // the nickname the farm's contracts give: {name} {Species} {species} {pet}          // finishes over somebody draw LSCG's splatters on them (if their LSCG has splatters on)
       SHOW_BADGE: true,
@@ -4448,7 +4450,7 @@
       if (!r) return null;
       if (!r.prod) r.prod = {
         milk: 0,
-        semen: 0,
+        semen: CFG.PROD.SEMEN_CAP,
         held: { vulva: 0, butt: 0, mouth: 0 },
         capBonus: 0,
         heat: null,
@@ -5489,6 +5491,7 @@
       const kept = knot ? load - gagged : Math.min(load - gagged, room), spilt = load - gagged - kept;
       tp.held[hole] = (tp.held[hole] || 0) + kept;
       tp.totals.received += kept;
+      if (!funnel && kept + spilt >= 1) lscgSplatAt(t, HOLE_SPLAT[hole] || ["ItemVulva"], plainName(stud));
       if (hole === "mouth") tp.milk = Math.min(milkCap(t), tp.milk + kept * CFG.PROD.SWALLOW_TO_MILK);
       if (hole === "mouth" && kept >= CFG.HUNGRY_ML) {
         tp.boosts = tp.boosts || {};
@@ -5815,13 +5818,41 @@
       feet: ["ItemPelvis"],
       body: ["ItemPelvis"]
     };
+    const HOLE_SPLAT = { vulva: ["ItemVulva"], butt: ["ItemButt"], mouth: ["ItemMouth"] };
+    function noteSplats(mn, on) {
+      state.lscgSeen = state.lscgSeen || /* @__PURE__ */ new Map();
+      state.lscgSeen.set(mn, { on: !!on, at: Date.now() });
+      const r = rec(mn);
+      if (r && !!r.lscgSplat !== !!on) {
+        r.lscgSplat = !!on;
+        saveLedger();
+      }
+    }
+    function noteLSCG(data) {
+      try {
+        const d = Array.isArray(data.Dictionary) ? data.Dictionary[0] : null, m = d && d.message, s = m && m.settings;
+        if (!s || typeof s !== "object" || !s.SplatterModule || typeof s.SplatterModule !== "object") return;
+        const S = s.SplatterModule;
+        noteSplats(data.Sender, s.enabled !== false && S.enabled && S.taker !== false);
+      } catch (e) {
+      }
+    }
     function lscgSplatsOn(mn) {
-      const C = charFor(mn), S = C && C.LSCG && C.LSCG.SplatterModule;
-      return !!(S && S.enabled && S.taker !== false && (!C.LSCG.GlobalModule || C.LSCG.GlobalModule.enabled !== false));
+      const C = charFor(mn);
+      if (!C) return false;
+      const S = C.LSCG && C.LSCG.SplatterModule;
+      if (S) return !!(S.enabled && S.taker !== false && (!C.LSCG.GlobalModule || C.LSCG.GlobalModule.enabled !== false));
+      const k = state.lscgSeen && state.lscgSeen.get(mn);
+      if (k) return k.on;
+      const r = rec(mn);
+      return !!(r && r.lscgSplat);
     }
     function lscgSplat(mn, area, who) {
+      return lscgSplatAt(mn, SPLAT_SPOTS[PAINT_AREAS[String(area || "").toLowerCase()] || "body"] || ["ItemPelvis"], who);
+    }
+    function lscgSplatAt(mn, groups, who) {
       if (!CFG.LSCG_SPLATTERS || !lscgSplatsOn(mn)) return false;
-      for (const group of SPLAT_SPOTS[PAINT_AREAS[String(area || "").toLowerCase()] || "body"] || ["ItemPelvis"]) {
+      for (const group of groups) {
         send("ChatRoomChat", {
           Content: "ChatOther-" + group + "-LSCG_Splat",
           Type: "Activity",
@@ -6259,7 +6290,7 @@
       state.tipped = state.tipped || /* @__PURE__ */ new Set();
       if (!state.tipped.has(stud)) {
         state.tipped.add(stud);
-        whisper(stud, "\u{1F402} Tip, sugar: say cum (or orgasm) in your chat or emotes and I'll fill them up. ?breed stop ends the scene.");
+        whisper(stud, "\u{1F402} Tip, sugar: when you cum in there, for real or in your chat or emotes (say cum), I'll fill them up. ?breed stop ends the scene.");
       }
     }
     const SHOT_LINES = {
@@ -7359,6 +7390,7 @@
         name: plainName,
         nameOnce: (text, mn) => nameOnce(text, mn),
         paint: (mn, area, by) => paintOn(mn, area, by),
+        splat: (mn, hole, by) => lscgSplatAt(mn, HOLE_SPLAT[hole] || ["ItemVulva"], by ? plainName(by) : null),
         char: charFor,
         find: resolveTarget,
         here: () => (W.ChatRoomCharacter || []).map((c) => c.MemberNumber).filter((m) => m !== CFG.BOT_MEMBER),
@@ -7767,6 +7799,7 @@
       state.sight = state.sight || /* @__PURE__ */ new Map();
       const ok = (a) => Array.isArray(a) ? a.map(Number).filter(Number.isFinite).slice(0, 60) : [];
       state.sight.set(mn, { see: ok(m.see), hear: ok(m.hear), at: Date.now() });
+      if (typeof m.splat === "boolean") noteSplats(mn, m.splat);
     }
     function canLead(mn) {
       return cueable(mn, "lead") && onMap(mn);
@@ -7851,7 +7884,17 @@
           if (!g.milk) p.milk -= out;
           if (out >= 1) bits.push(g.milk ? "milk gushes down the pump's lines with every spasm (+" + ml(out) + " in the tank)" : "milk spurts from both teats as they shake");
         }
-        if (makesSemen(mn) && !holeBlocked(mn, "penis") && p.semen >= 2) {
+        let filled = false;
+        const sc = state.scenes.get(mn);
+        if (sc && makesSemen(mn) && now - (sc.lastSeen || sc.at) < CFG.ORGASM_FILL_MIN * 6e4 && now - (sc.lastCum || 0) >= sceneCooldown(mn) * 1e3) {
+          const t = sc.with.find((x) => charFor(x));
+          if (t) {
+            sc.lastCum = now;
+            filled = true;
+            later(() => cumInto(mn, t, holesFrom(sc.hole) || ["vulva"], (msg) => whisper(mn, msg), true), 1500);
+          }
+        }
+        if (!filled && makesSemen(mn) && !holeBlocked(mn, "penis") && p.semen >= 2) {
           const spent = Math.min(p.semen, p.semen * CFG.PROD.LOAD_SHARE * 0.5 * (1 + CFG.EDGE_X * Math.min(p.edges || 0, CFG.EDGE_MAX)));
           p.semen -= spent;
           p.edges = 0;
@@ -13948,6 +13991,10 @@ Welcome to B&B Farm, hon. \u{1F33E}`
             const bm = readBCP(data);
             if (bm) {
               onBCPMessage(bm);
+              return;
+            }
+            if (data.Content === "LSCGMsg") {
+              noteLSCG(data);
               return;
             }
             if (typeof data.Content === "string" && data.Content.startsWith("ChatRoomBot ")) {

@@ -5,11 +5,11 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 | Script | File in `dist/` | Where it runs | Current |
 |---|---|---|---|
-| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.15.7** |
-| Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.5.0** |
+| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.15.8** |
+| Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.5.1** |
 | Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **1.0.3** |
 | Barn life, Breeding, Dairy, Map tools, Shows, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.2** |
-| Farmhand Companion | `farmhand-companion.user.js` | each player | **0.10.10** |
+| Farmhand Companion | `farmhand-companion.user.js` | each player | **0.10.11** |
 | Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.3** |
 
 ## Sending a watch report
@@ -20,6 +20,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 ## Latest changes (newest first)
 
+- **Bot 0.15.8, Companion 0.10.11, Glory stalls 1.5.1** (Laynie and Sally, Oct 6): **LSCG splatters actually land now.** The bot doesn't run LSCG, so it never knew who had splatters on and never sent one; it now reads LSCG's own room messages (sent when someone joins or changes a setting) and the Companion reports its player's switch. Loads that go **inside** leave a splatter where they went in (pussy, ass, mouth), from breeding and from the glory stalls, as well as pull-outs. A stud who really cums (the game's orgasm) while inside somebody fills them; before, only typing a cum word did, and a real orgasm was "wasted". New studs start with full balls instead of empty (Sally's first load was "a little dribble, 2 mL"). LSCG still has the last word: with "lovers only" on, add the bot (260239) to your LSCG splatter whitelist.
 - **Bot 0.15.7** (from the Oct 6 watch reports): livestock and guests who say ?contract now see their own farm contracts (offered, signed) and how to get one; they were being told it's staff-only, and a second try got no answer at all. "/bot cert" typed into a beep works like "bot cert". The "I whispered that one to you, add me as a friend" tip is no longer said out loud after every command a newcomer types: it's added to their whisper, once every 30 minutes. The command list now says that `safe` stops everything and fetches staff (someone said it just to find out what it does).
 - **Bot 0.15.6, Companion 0.10.10**: proprietors can fix anybody's record. `?edit <who>` shows what's on file; `?edit <who> <field> <new value>` changes it: name, species, gender, stay, depth, limits, triggers, aftercare, notes, or any application answer as `app.<question>` (likes, curious, soft, else...). `clear` as the value empties one. A name set this way is what the farm calls them from then on (greetings no longer overwrite it); `?edit <who> name clear` goes back to their game nickname. Every edit goes in the audit log. In the Companion: Dashboard → **Records**.
 - **Bot 0.15.5**: contracts are made for whoever they're offered to. The farm's fun/deep/nhl contracts give the nickname "BnB {Species} {name}" (BnB Cow Vicky; BnB Pet Rya for someone with no animal), and any saved contract can use {name} {Species} {species} {pet} in any text setting, the title or the terms.

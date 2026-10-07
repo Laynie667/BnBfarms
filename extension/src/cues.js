@@ -29,11 +29,14 @@ function sightTick() {
     if (W.CurrentScreen !== "ChatRoom" || !mapOn() || typeof W.ChatRoomMapViewCharacterIsVisible !== "function") return;
     const see = others().filter((c) => W.ChatRoomMapViewCharacterIsVisible(c)).map((c) => c.MemberNumber).sort();
     const hear = others().filter((c) => typeof W.ChatRoomMapViewCharacterIsHearable === "function" && W.ChatRoomMapViewCharacterIsHearable(c)).map((c) => c.MemberNumber).sort();
-    const key = see.join(",") + "|" + hear.join(",");
+    // my own LSCG splatter switch: the bot has no LSCG, so it can't see it any other way
+    const LS = W.Player && W.Player.LSCG, S = LS && LS.SplatterModule;
+    const splat = S ? !!(S.enabled && S.taker !== false && (!LS.GlobalModule || LS.GlobalModule.enabled !== false)) : undefined;
+    const key = see.join(",") + "|" + hear.join(",") + "|" + splat;
     // send when it changes (checked every 4 s), and every 2 minutes anyway so the bot knows it's still fresh
     if (key === lastSight && Date.now() - (sightTick.at || 0) < 120000) return;
     lastSight = key; sightTick.at = Date.now();
-    ctx.toBot("sight", { see, hear });
+    ctx.toBot("sight", splat === undefined ? { see, hear } : { see, hear, splat });
   } catch (e) { console.warn("[Farmhand Companion] sight:", e); }
 }
 

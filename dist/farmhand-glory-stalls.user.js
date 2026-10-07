@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm add-on: Glory stalls
 // @namespace    bnbfarm
-// @version      1.5.0
+// @version      1.5.1
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-glory-stalls.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-glory-stalls.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -1200,6 +1200,7 @@
     const holes = visitor && visitor.type === "double" ? ["vulva", "butt"] : [hole];
     if (p && inside) {
       for (const h of holes) p.held[h] = (p.held[h] || 0) + ml / holes.length;
+      if (api.splat) for (const h of holes) api.splat(mn, h);
       p.totals.received = (p.totals.received || 0) + ml;
       p.last = p.last || Date.now();
     }

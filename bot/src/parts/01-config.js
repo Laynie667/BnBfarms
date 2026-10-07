@@ -360,6 +360,7 @@
 
     GREET_ENABLED: true,
     LSCG_SPLATTERS: true,
+    ORGASM_FILL_MIN: 3,       // a stud who cums within 3 minutes of their last thrust in somebody fills them
     CONTRACT_NICKNAME: "BnB {Species} {name}",   // the nickname the farm's contracts give: {name} {Species} {species} {pet}          // finishes over somebody draw LSCG's splatters on them (if their LSCG has splatters on)
     SHOW_BADGE: true,
     DEBUG: true,

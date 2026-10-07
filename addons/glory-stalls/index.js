@@ -120,6 +120,7 @@ function finish(id, mn, hole, ml, inside, visitor) {
   const holes = visitor && visitor.type === "double" ? ["vulva", "butt"] : [hole];
   if (p && inside) {
     for (const h of holes) p.held[h] = (p.held[h] || 0) + ml / holes.length;
+    if (api.splat) for (const h of holes) api.splat(mn, h);   // it leaks: an LSCG splatter where it went in (players with LSCG splatters on)
     p.totals.received = (p.totals.received || 0) + ml;
     p.last = p.last || Date.now();
   }

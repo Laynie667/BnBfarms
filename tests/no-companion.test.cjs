@@ -66,7 +66,8 @@ const SKIP=/^(backup|safe|safeword|red|stuck|report|unregister|staffremove|appcl
     else if (ch==='beep') handlers.AccountBeep({MemberNumber:221397,Message:c});
     else handlers.ChatRoomMessage({Sender:221397,Type:'Hidden',Content:'ChatRoomBot '+c});
     await drain(120);
-    if (!seen(k0,221397)) silent.push(ch+':'+c);
+    // (a plain "yes" or "no" whispered with nothin' waitin' is taken as talk to whoever's at the bot's keyboard: silent on purpose)
+    if (!seen(k0,221397) && !(ch==='whisper' && /^(yes|no)$/.test(c))) silent.push(ch+':'+c);
     if (viaCompanion(k0,221397)) leaked.push(c);
   }
   out('every command answered without the Companion ('+all.length+' tried) ->', !silent.length, silent.join(' | '));

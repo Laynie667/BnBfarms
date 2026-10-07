@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.17.0
+// @version      0.17.1
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -1798,6 +1798,7 @@
   // shared/guides.js
   var PUBLIC_GROUPS = [
     { name: "Safety", cmds: ["safe", "stuck", "staff", "report"] },
+    { name: "Suggestion box", cmds: ["feedback <what you think>", "suggest <an idea>", "bug <what went wrong>", "feedback mine"] },
     { name: "Gettin' started", cmds: ["help", "help me", "rules", "consent", "tour", "apply", "friend", "species", "luxury", "doors", "addons"] },
     { name: "You and the farm", cmds: ["record", "keys", "who", "herd", "notice", "weather", "feeding", "curfew", "beg"] },
     { name: "Milk", cmds: ["stats", "board", "milkable", "quota"] },
@@ -1822,11 +1823,11 @@
     { name: "Keys and calls", cmds: ["keys <who>", "keysync", "keydump", "grant <who> <tier>", "revoke <who>", "forced", "summon <who>", "summon all", "pasture", "onduty", "cover"] }
   ];
   var OWNER_GROUPS = [
-    { name: "Proprietors", cmds: ["staffadd <who> <role>", "staffremove <who>", "goldkey <who>", "notice <text>", "feeding on", "curfew on", "fair open", "addons off <name>", "addons on <name>", "backup", "health", "edit <who>", "store price <item> <n>", "store off <item>", "store on <item>"] }
+    { name: "Proprietors", cmds: ["staffadd <who> <role>", "staffremove <who>", "goldkey <who>", "notice <text>", "feeding on", "curfew on", "fair open", "addons off <name>", "addons on <name>", "backup", "health", "edit <who>", "feedback list", "feedback list ideas", "feedback done <n>", "feedback export", "store price <item> <n>", "store off <item>", "store on <item>"] }
   ];
 
   // bot/src/version.js
-  var VERSION = "0.17.0";
+  var VERSION = "0.17.1";
 
   // bot-parts:farmhand-bot-parts
   (function() {
@@ -2527,6 +2528,9 @@
       // per ?ribbon give or fine (proprietors: any)
       RIBBONS_FOR: { quota: 3, stall: 1, chore: 2, gloryShift: 3, gloryPunish: 1, weekBest: 10, showWin: [5, 3, 2] },
       STORE_DAY_LIMIT: { luxury: 1, spin: 5, lucky: 3, grace: 1, greeting: 1, tag: 2 },
+      FEEDBACK_PER_DAY: 10,
+      FEEDBACK_MAX: 800,
+      // the suggestion box: how many a person can send a day, and how long each can be
       AWAY_H: 3,
       LINGER_MIN: 5,
       // "while you were gone" after 3 hours away · nudge lingerers after 5 minutes
@@ -4395,6 +4399,7 @@
           s.outfits = {};
           for (const [k, o] of Object.entries(L.outfits)) s.outfits[k] = { items: o.items, locks: o.locks, at: o.at };
           s.outfitRules = Object.assign({}, L.outfitRules);
+          s.feedback = fbLedger().slice(-60).reverse().map((f) => ({ id: f.id, t: f.t, name: f.name, mn: f.mn, kind: f.kind, text: f.text, status: f.status, note: f.note || "" }));
         }
       } catch (e) {
         dbg("stateFor:", e);
@@ -10668,6 +10673,97 @@
       if (!rec(mn) || !(rec(mn).roles || []).length) return [];
       return benchedHere().filter((m) => m !== mn).map((m) => ({ mn: m, name: plainName(m), uses: rec(m).benched.uses, holes: benchOpenHoles(m) }));
     }
+    const FB_KINDS = { feedback: "\u{1F4AC}", idea: "\u{1F4A1}", bug: "\u{1F41B}" };
+    const FB_STATUS = { open: "open", done: "done \u2705", later: "later \u23F3", no: "not this time" };
+    function fbLedger() {
+      L.feedback = L.feedback || [];
+      L.fbSeq = L.fbSeq || 0;
+      return L.feedback;
+    }
+    function fbLine(f, full) {
+      const d = new Date(f.t), when = d.getMonth() + 1 + "/" + d.getDate();
+      const text = full ? f.text : f.text.length > 90 ? f.text.slice(0, 88) + "\u2026" : f.text;
+      return "#" + f.id + " " + FB_KINDS[f.kind] + " " + when + " " + f.name + (f.status !== "open" ? " \xB7 " + FB_STATUS[f.status] : "") + ": " + text + (full && f.note ? "\n   \u21B3 " + f.note : "");
+    }
+    function fbSubmit(cmd, sender, rest, R) {
+      const list = fbLedger(), kind = cmd === "bug" ? "bug" : cmd === "suggest" || cmd === "idea" ? "idea" : "feedback";
+      const text = String(rest || "").trim();
+      if (!text) {
+        R(kind === "bug" ? "\u{1F41B} What went wrong, sugar? Say ?bug and then what happened, like ?bug the stall never let me go." : kind === "idea" ? "\u{1F4A1} What's your idea, sugar? Say ?suggest and then the idea, like ?suggest a hayride on Sundays." : "\u{1F4AC} What would you like to tell the proprietors? Say ?feedback and then your thoughts. (?suggest for an idea, ?bug for somethin' broken, ?feedback mine for what you've sent.)");
+        return;
+      }
+      if (text.length < 4) {
+        R("That's a little short to go on, sugar. Tell me a bit more.");
+        return;
+      }
+      const today = list.filter((f2) => f2.mn === sender && Date.now() - f2.t < 864e5).length;
+      if (today >= CFG.FEEDBACK_PER_DAY && !isStaff(sender)) {
+        R("You've sent " + today + " today already, sugar. Thank you! The proprietors will get to 'em. Try again tomorrow.");
+        return;
+      }
+      const f = { id: ++L.fbSeq, t: Date.now(), mn: sender, name: plainName(sender), kind, text: text.slice(0, CFG.FEEDBACK_MAX), status: "open", where: channelNote(sender) };
+      list.push(f);
+      if (list.length > 1e3) L.feedback = list.slice(-1e3);
+      saveLedger();
+      audit(sender, "FEEDBACK", "#" + f.id + " " + kind);
+      R(FB_KINDS[kind] + " Thank you, " + plainName(sender) + "! That's #" + f.id + " in the suggestion box. The proprietors read every one, and I'll tell you when somethin' comes of it. (?feedback mine to see yours)");
+      for (const p of CFG.PROPRIETORS) tell(p, FB_KINDS[kind] + " New in the suggestion box, #" + f.id + " from " + f.name + ": " + f.text.slice(0, 300) + (f.text.length > 300 ? "\u2026" : "") + " (?feedback list)");
+    }
+    function channelNote(mn) {
+      const w = typeof whereName === "function" && onMap(mn) ? whereName(mn) : "";
+      return w || (onMap(mn) ? "on the farm" : "away");
+    }
+    function feedbackCommand(cmd, sender, args, rest, R) {
+      if (cmd !== "feedback") return fbSubmit(cmd, sender, rest, R);
+      const sub = String(args[0] || "").toLowerCase(), list = fbLedger();
+      if (sub === "mine") {
+        const mine = list.filter((f2) => f2.mn === sender).slice(-15);
+        R(mine.length ? "\u{1F4EC} WHAT YOU'VE SENT\n" + mine.map((f2) => fbLine(f2, true)).join("\n") : "\u{1F4EC} You haven't sent anything yet, sugar. ?feedback, ?suggest or ?bug and then what you've got to say.");
+        return;
+      }
+      const tools = ["list", "done", "later", "no", "del", "delete", "export", "open"].includes(sub) || /^#?\d+$/.test(sub);
+      if (!tools || !isProprietor(sender)) return fbSubmit(cmd, sender, rest, R);
+      if (sub === "list") {
+        const which = String(args[1] || "open").toLowerCase();
+        const kind = { ideas: "idea", idea: "idea", bugs: "bug", bug: "bug", feedback: "feedback" }[which];
+        const rows = list.filter((f2) => kind ? f2.kind === kind && f2.status === "open" : which === "all" ? true : f2.status === "open");
+        R(rows.length ? "\u{1F4EC} SUGGESTION BOX \xB7 " + (which === "all" ? "everything" : kind ? which + ", open" : "open") + " (" + rows.length + ")\n" + rows.slice(-30).map((f2) => fbLine(f2)).join("\n") + "\n?feedback <n> reads one \xB7 ?feedback done|later|no <n> [note] \xB7 ?feedback del <n>" : "\u{1F4EC} Nothin' " + (which === "all" ? "" : "open ") + "in the suggestion box, sugar.");
+        return;
+      }
+      if (sub === "export") {
+        R(list.length ? "\u{1F4EC} EVERYTHING IN THE SUGGESTION BOX (" + list.length + ")\n" + list.map((f2) => fbLine(f2, true) + " [" + f2.mn + (f2.where ? ", " + f2.where : "") + "]").join("\n") : "\u{1F4EC} The suggestion box is empty.");
+        return;
+      }
+      const idArg = /^#?\d+$/.test(sub) ? sub : args[1];
+      const id = parseInt(String(idArg || "").replace("#", ""), 10), f = list.find((x) => x.id === id);
+      if (!f) {
+        R("There's no #" + (idArg || "?") + " in the suggestion box, sugar. ?feedback list shows the numbers.");
+        return;
+      }
+      if (/^#?\d+$/.test(sub)) {
+        R("\u{1F4EC} " + fbLine(f, true) + "\nFrom " + f.name + " (" + f.mn + "), " + new Date(f.t).toLocaleString() + (f.where ? ", " + f.where : ""));
+        return;
+      }
+      if (sub === "del" || sub === "delete") {
+        L.feedback = list.filter((x) => x !== f);
+        saveLedger();
+        audit(sender, "FEEDBACK_DEL", "#" + id);
+        R("\u{1F5D1}\uFE0F #" + id + " is out of the box.");
+        return;
+      }
+      const note = args.slice(2).join(" ").trim().slice(0, 300);
+      f.status = sub === "open" ? "open" : sub;
+      f.note = note || f.note || "";
+      f.by = sender;
+      f.at = Date.now();
+      saveLedger();
+      audit(sender, "FEEDBACK_" + sub.toUpperCase(), "#" + id);
+      if (sub === "done" || sub === "no" || sub === "later") {
+        const msg = sub === "done" ? "\u2705 Your " + (f.kind === "bug" ? "bug report" : f.kind === "idea" ? "idea" : "feedback") + " #" + id + " has been taken care of, " + f.name + ". Thank you for sendin' it!" : sub === "later" ? "\u23F3 Your " + (f.kind === "idea" ? "idea" : "note") + " #" + id + " is on the list for later, " + f.name + ". The proprietors liked it." : "\u{1F4EC} About your #" + id + ", " + f.name + ": the proprietors read it, and it's not somethin' they'll do right now.";
+        tell(f.mn, msg + (note ? " They said: " + note : ""));
+      }
+      R("\u{1F4EC} #" + id + " is " + FB_STATUS[f.status] + (f.status !== "open" ? ", and " + f.name + " has been told" : "") + ".");
+    }
     function clockedIn(mn) {
       const r = rec(mn);
       return !!(r && r.shift && r.shift.in);
@@ -10741,6 +10837,10 @@ Well hey there, %name%! I'm the gal behind the desk. \u{1F495}
 \u{1F534} IF YOU NEED HELP
   ?safe stops everything \xB7 ?stuck if you're wedged
   ?staff asks for a hand \xB7 ?report <what> tells staff quietly
+
+\u{1F4A1} THE SUGGESTION BOX
+  ?suggest <an idea> \xB7 ?bug <what went wrong> \xB7 ?feedback <anything>
+  ?feedback mine \xB7 what you've sent, and what came of it
 
 \u{1F4DA} GUIDES \xB7 say ?help and a topic, like ?help breeding
   Gettin' started
@@ -12128,7 +12228,11 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
       "dare",
       "dared",
       "bench",
-      "use"
+      "use",
+      "feedback",
+      "suggest",
+      "idea",
+      "bug"
     ];
     const STAFF_CMDS = [
       "queue",
@@ -12216,6 +12320,10 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
     ];
     const SAFETY_CMDS = ["safe", "safeword", "red", "stuck"];
     const PRIVATE_REPLY = [
+      "feedback",
+      "suggest",
+      "idea",
+      "bug",
       "record",
       "keys",
       "find",
@@ -12405,8 +12513,9 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
       const huh = (msg) => {
         if (channel === "chat") return;
         state.huhAt = state.huhAt || /* @__PURE__ */ new Map();
-        if (Date.now() - (state.huhAt.get(sender) || 0) < 6e4) return;
-        state.huhAt.set(sender, Date.now());
+        const last = state.huhAt.get(sender);
+        if (last && last.msg === msg && Date.now() - last.at < 6e4) return;
+        state.huhAt.set(sender, { msg, at: Date.now() });
         reply(sender, msg, channel);
       };
       const p = parseCommand(raw, isWhisper, isBeep);
@@ -12415,6 +12524,20 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
         return;
       }
       let { cmd, args, rest } = p;
+      {
+        const norm = (x) => String(x).toLowerCase().replace(/[’']/g, "").replace(/in\b/g, "ing").replace(/\s+/g, " ").trim();
+        const whole = norm(cmd + " " + rest), one = norm(cmd);
+        const SECTION = { "getting started": "start", "milk & breeding": "barn", "milk and breeding": "barn", "bodies": "body", "farm life": "life", "everything": "me", "farm extras": "addons" };
+        if (SECTION[whole]) {
+          args = SECTION[whole] === "addons" ? [] : [SECTION[whole]];
+          rest = args.join(" ");
+          cmd = SECTION[whole] === "addons" ? "addons" : "help";
+        } else if (one !== cmd && !args.length && guideTopic(one)) {
+          args = [one];
+          rest = one;
+          cmd = "help";
+        }
+      }
       if (cmd === "me" && !args.length) cmd = "record";
       let addonCmd = ADDON_CMDS.get(cmd) || null;
       if (addonCmd && !addonVisible(addonCmd.addon, sender)) addonCmd = null;
@@ -12432,9 +12555,9 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
           const near = nearestCommand(cmd, sender);
           if (channel === "chat") {
             if (near) {
-              state.huhAt = state.huhAt || /* @__PURE__ */ new Map();
-              if (Date.now() - (state.huhAt.get(sender) || 0) > 6e4) {
-                state.huhAt.set(sender, Date.now());
+              state.huhChatAt = state.huhChatAt || /* @__PURE__ */ new Map();
+              if (Date.now() - (state.huhChatAt.get(sender) || 0) > 6e4) {
+                state.huhChatAt.set(sender, Date.now());
                 reply(sender, "Did you mean ?" + near + ", sugar?", canBeep(sender) ? "beep" : "whisper");
               }
             }
@@ -14424,6 +14547,13 @@ Welcome to B&B Farm, hon. \u{1F33E}`
         case "use":
           benchCommand(cmd, sender, args, R);
           break;
+        case "feedback":
+        case "suggest":
+        case "idea":
+        case "bug":
+          feedbackCommand(cmd, sender, args, rest, R);
+          break;
+        // the suggestion box (10q)
         case "edit": {
           if (!isProprietor(sender)) {
             R("Sorry, sugar, that one's just for the proprietors.");

@@ -62,13 +62,21 @@
     const huh = (msg) => {
       if (channel === "chat") return;
       state.huhAt = state.huhAt || new Map();
-      if (Date.now() - (state.huhAt.get(sender)||0) < 60000) return;
-      state.huhAt.set(sender, Date.now());
+      const last = state.huhAt.get(sender);
+      if (last && last.msg === msg && Date.now() - last.at < 60000) return;   // the same answer twice in a minute: once is enough
+      state.huhAt.set(sender, { msg, at: Date.now() });
       reply(sender, msg, channel);
     };
     const p = parseCommand(raw, isWhisper, isBeep);
     if (!p){ huh("I didn't catch a command in that, sugar. Try ?help, or just say what you'd like, like stats or keys."); return; }
     let { cmd, args, rest } = p;
+    // the guide headings in ?help, said as they're written ("?Milk & breedin'", "?gettin' started"), and
+    // dropped g's ("?breedin'"), open the right guide (live, Oct 7: one went to ?milk, the other got silence)
+    { const norm = (x) => String(x).toLowerCase().replace(/[’']/g, "").replace(/in\b/g, "ing").replace(/\s+/g, " ").trim();
+      const whole = norm(cmd+" "+rest), one = norm(cmd);
+      const SECTION = { "getting started":"start", "milk & breeding":"barn", "milk and breeding":"barn", "bodies":"body", "farm life":"life", "everything":"me", "farm extras":"addons" };
+      if (SECTION[whole]){ args = SECTION[whole] === "addons" ? [] : [SECTION[whole]]; rest = args.join(" "); cmd = SECTION[whole] === "addons" ? "addons" : "help"; }
+      else if (one !== cmd && !args.length && guideTopic(one)){ args = [one]; rest = one; cmd = "help"; } }
     if (cmd === "me" && !args.length) cmd = "record";   // live, Oct 7: "?me" got "I don't know ?me"
     let addonCmd = ADDON_CMDS.get(cmd) || null;   // a command from an add-on script (10f-addons.js)
     if (addonCmd && !addonVisible(addonCmd.addon, sender)) addonCmd = null;   // somebody else's private add-on: as if it isn't there
@@ -80,7 +88,7 @@
         if (channel === "companion" && words >= 3){ huh("That looked like chat, hon, not a farm command, so it wasn't sent anywhere. This box talks to me (try ?help); chat goes in the game's own chat box."); return; }
         const near = nearestCommand(cmd, sender);
         // in the room only a near miss gets an answer (privately); talkin' to me direct always does
-        if (channel === "chat"){ if (near){ state.huhAt = state.huhAt || new Map(); if (Date.now() - (state.huhAt.get(sender)||0) > 60000){ state.huhAt.set(sender, Date.now()); reply(sender, "Did you mean ?"+near+", sugar?", canBeep(sender) ? "beep" : "whisper"); } } return; }
+        if (channel === "chat"){ if (near){ state.huhChatAt = state.huhChatAt || new Map(); if (Date.now() - (state.huhChatAt.get(sender)||0) > 60000){ state.huhChatAt.set(sender, Date.now()); reply(sender, "Did you mean ?"+near+", sugar?", canBeep(sender) ? "beep" : "whisper"); } } return; }
         huh("I don't know ?"+cmd+", hon."+(near ? " Did you mean ?"+near+"?" : "")+" ?help lists what I can do."); return;
       }
     }
@@ -1488,6 +1496,7 @@ Welcome to B&B Farm, hon. 🌾`);
       case "dares": case "dare": case "dared": dareCommand(cmd, sender, args, R); break;
       case "corral": case "uncorral": penCommand(cmd === "corral" ? "pen" : "unpen", sender, args, R); break;
       case "bench": case "unbench": case "use": benchCommand(cmd, sender, args, R); break;
+      case "feedback": case "suggest": case "idea": case "bug": feedbackCommand(cmd, sender, args, rest, R); break;   // the suggestion box (10q)
 
       case "edit": {
         // proprietors fix somebody's record: ?edit <who> shows what can change · ?edit <who> <field> <new value>

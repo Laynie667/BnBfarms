@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.11.1
+// @version      0.11.2
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -230,7 +230,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.11.1";
+  var VERSION = "0.11.2";
 
   // extension/src/config.js
   var BOT_MEMBER = 260239;
@@ -366,6 +366,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var BOOKS = [["Rules", "rules"], ["Consent", "consent"], ["Tour", "tour"], ["Doors", "doors"], ["Species", "species"], ["Help", "help"]];
   var PUBLIC_GROUPS = [
     { name: "Safety", cmds: ["safe", "stuck", "staff", "report"] },
+    { name: "Suggestion box", cmds: ["feedback <what you think>", "suggest <an idea>", "bug <what went wrong>", "feedback mine"] },
     { name: "Gettin' started", cmds: ["help", "help me", "rules", "consent", "tour", "apply", "friend", "species", "luxury", "doors", "addons"] },
     { name: "You and the farm", cmds: ["record", "keys", "who", "herd", "notice", "weather", "feeding", "curfew", "beg"] },
     { name: "Milk", cmds: ["stats", "board", "milkable", "quota"] },
@@ -390,7 +391,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     { name: "Keys and calls", cmds: ["keys <who>", "keysync", "keydump", "grant <who> <tier>", "revoke <who>", "forced", "summon <who>", "summon all", "pasture", "onduty", "cover"] }
   ];
   var OWNER_GROUPS = [
-    { name: "Proprietors", cmds: ["staffadd <who> <role>", "staffremove <who>", "goldkey <who>", "notice <text>", "feeding on", "curfew on", "fair open", "addons off <name>", "addons on <name>", "backup", "health", "edit <who>", "store price <item> <n>", "store off <item>", "store on <item>"] }
+    { name: "Proprietors", cmds: ["staffadd <who> <role>", "staffremove <who>", "goldkey <who>", "notice <text>", "feeding on", "curfew on", "fair open", "addons off <name>", "addons on <name>", "backup", "health", "edit <who>", "feedback list", "feedback list ideas", "feedback done <n>", "feedback export", "store price <item> <n>", "store off <item>", "store on <item>"] }
   ];
   var needsInput = (cmd) => /</.test(cmd);
   var cmdStem = (cmd) => cmd.replace(/\s*<.*$/, "").trim();
@@ -3111,11 +3112,49 @@ One of mods you are using is using an old version of SDK. It will work for now b
       latest(ctx2)
     ];
   }
+  var FB_ICON = { feedback: "\u{1F4AC}", idea: "\u{1F4A1}", bug: "\u{1F41B}" };
+  var FB_STATUS = { open: ["open", "acc"], done: ["done", "good"], later: ["later", ""], no: ["not now", "alert"] };
+  function suggestions(ctx2) {
+    const all = ctx2.s.feedback || [], f = ctx2.ui.fbFilter || "open";
+    const shown = all.filter((x) => f === "all" ? true : f === "open" ? x.status === "open" : x.kind === f && x.status === "open");
+    const pill = (id, label) => h("button", { type: "button", class: "fhc-pill" + (f === id ? " on" : ""), onclick: () => ctx2.setUi({ fbFilter: id }) }, label);
+    return [
+      h("div", null, pill("open", "Open"), pill("idea", "\u{1F4A1} Ideas"), pill("bug", "\u{1F41B} Bugs"), pill("feedback", "\u{1F4AC} Feedback"), pill("all", "Everything")),
+      shown.length ? shown.map((x) => {
+        const key = "fbnote_" + x.id, act = (what) => {
+          const note = (ctx2.ui[key] || "").trim();
+          ctx2.send("feedback " + what + " " + x.id + (note ? " " + note : ""));
+          ctx2.setUi({ [key]: "" });
+        };
+        return card(
+          h(
+            "div",
+            { class: "fhc-kv" },
+            h("b", null, FB_ICON[x.kind] + " #" + x.id + " \xB7 " + x.name),
+            h("span", null, chip(FB_STATUS[x.status][0], FB_STATUS[x.status][1]), " ", h("span", { class: "fhc-muted" }, new Date(x.t).toLocaleDateString()))
+          ),
+          h("div", { class: "fhc-card", style: { whiteSpace: "pre-wrap" } }, x.text),
+          x.note && muted("Your note: " + x.note),
+          h("input", { class: "fhc-in", placeholder: "a note back to " + x.name + " (optional)", value: ctx2.ui[key] || "", oninput: (e) => ctx2.setUi({ [key]: e.target.value }, true) }),
+          h(
+            "div",
+            { style: { marginTop: "6px" } },
+            btn("Done", () => act("done"), true),
+            btn("Later", () => act("later")),
+            btn("Not now", () => act("no")),
+            btn("Delete", () => ctx2.send("feedback del " + x.id))
+          )
+        );
+      }) : muted(f === "all" ? "The suggestion box is empty." : "Nothin' open here. Players send them with ?suggest, ?bug and ?feedback."),
+      h("div", { style: { marginTop: "6px" } }, btn("Export everything (for Claude)", () => ctx2.send("feedback export")))
+    ];
+  }
   var DASHBOARD_TABS = [
     { id: "contracts", label: "BC+ contracts", render: contracts2 },
     { id: "outfits", label: "Outfits", render: outfits },
     { id: "addons", label: "Other addons", render: addons },
-    { id: "records", label: "Records", render: records }
+    { id: "records", label: "Records", render: records },
+    { id: "suggestions", label: "\u{1F4A1} Suggestions", render: suggestions, badge: (ctx2) => (ctx2.s.feedback || []).filter((x) => x.status === "open").length }
   ];
 
   // extension/src/views/extras.js

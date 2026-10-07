@@ -5,13 +5,13 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 | Script | File in `dist/` | Where it runs | Current |
 |---|---|---|---|
-| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.17.0** |
+| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.17.1** |
 | Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.5.3** |
 | Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.1.0** |
 | Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **1.0.3** |
 | Barn life, Dairy, Map tools, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.2** |
 | Shows | `farmhand-shows.user.js` | the bot's PC | **1.0.3** |
-| Farmhand Companion | `farmhand-companion.user.js` | each player | **0.11.1** |
+| Farmhand Companion | `farmhand-companion.user.js` | each player | **0.11.2** |
 | Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.3** |
 
 ## Sending a watch report
@@ -21,6 +21,9 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 - Running the watcher on more than one game at once (the bot, yours, a tester's) lets Claude line them up into one timeline.
 
 ## Latest changes (newest first)
+
+- **Bot 0.17.1, Companion 0.11.2: the suggestion box.** Anybody on the farm, guests too, can send the proprietors somethin': `?suggest <an idea>` (or `?idea`), `?bug <what went wrong>`, `?feedback <anything>`. Each gets a number and is kept in the ledger, and the proprietors get a quiet note. `?feedback mine` shows what you've sent and what came of it. Up to 10 a day each. Proprietors: `?feedback list` (open ones; `list ideas`, `list bugs`, `list all`), `?feedback <n>` reads one, `?feedback done <n> [a note back]`, `?feedback later <n>`, `?feedback no <n> [why]` (the sender is told each time, with the note), `?feedback del <n>`, and `?feedback export` for everything at once (paste it to Claude). It's in `?help` and the Guides tab (Suggestion box). Proprietors also get a **💡 Suggestions** tab on the Dashboard (the open count shows on the tab): Open, Ideas, Bugs, Feedback or Everything, each with Done, Later, Not now and Delete buttons and a box for a note back, plus Export everything.
+- **Bot 0.17.1** (from the Oct 7 watch, 5:38 to 9:38 am): the guide headings in `?help` work when said the way they're written: `?Milk & breedin'` opens the barn guide (it was answered "?milk is just for farm staff"), `?gettin' started`, `?bodies`, `?farm life`, `?everything` too, and a dropped g (`?breedin'`) finds its guide. A second, different "I don't know that one" in the same minute was swallowed, so `?breedin'` and `?everything` got silence; now only the very same answer twice in a minute is held back.
 
 - **Bot 0.17.0, Breeding 1.1.0, Glory stalls 1.5.3, Companion 0.11.1: the use bench, breedin' season, the right-now strip, and more.**
   - **The use bench** (`?bench on` to opt in, or the switch in the Companion's farm settings). Staff `?bench <who> [minutes, 5-120]`, the wheel (two new punishment slices, and `bench <min>` as a staff action slice), or yourself (`?bench me 30`) put you on a bench spot (`?spot set bench`, bench-2, bench-3…). Anybody standin' by says `?use [mouth|pussy|ass]`: the room sees it, a stud's load goes in (or over them if they aren't ?breedable), a pussy load can take, and it's chalked up: their count, the tally marks, `?bench top` for the week, and a Use bench line on the `?board`. One person's turns are a minute apart. Wander off and the farm girl straps you back down. Limits rule it out like the glory stalls, a gag, chastity or plug closes that hole, and **the safeword takes you off at once** (first thing it does), as does `?bench off`. Time served earns a ribbon. `?unbench <who>` for staff; the wheel's early release covers it too.

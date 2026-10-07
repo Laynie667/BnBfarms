@@ -368,6 +368,7 @@
     RIBBON_GRANT_MAX: { farmhand: 5, herdmaster: 15 },   // per ?ribbon give or fine (proprietors: any)
     RIBBONS_FOR: { quota: 3, stall: 1, chore: 2, gloryShift: 3, gloryPunish: 1, weekBest: 10, showWin: [5, 3, 2] },
     STORE_DAY_LIMIT: { luxury: 1, spin: 5, lucky: 3, grace: 1, greeting: 1, tag: 2 },
+    FEEDBACK_PER_DAY: 10, FEEDBACK_MAX: 800,   // the suggestion box: how many a person can send a day, and how long each can be
     AWAY_H: 3, LINGER_MIN: 5,        // "while you were gone" after 3 hours away · nudge lingerers after 5 minutes
     BENCH_MAX_MIN: 120, BENCH_REUSE_SEC: 60,   // the use bench: longest sentence; one person's turns at least a minute apart
     DARE_MIN: 30, DARE_RIBBONS: 2, DARE_RIBBONS_RECKLESS: 4,       // a stud who cums within 3 minutes of their last thrust in somebody fills them

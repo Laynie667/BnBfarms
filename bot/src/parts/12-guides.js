@@ -20,6 +20,10 @@ Well hey there, %name%! I'm the gal behind the desk. 💕
   ?safe stops everything · ?stuck if you're wedged
   ?staff asks for a hand · ?report <what> tells staff quietly
 
+💡 THE SUGGESTION BOX
+  ?suggest <an idea> · ?bug <what went wrong> · ?feedback <anything>
+  ?feedback mine · what you've sent, and what came of it
+
 📚 GUIDES · say ?help and a topic, like ?help breeding
   Gettin' started
     start · safety · keys · herds · tiers

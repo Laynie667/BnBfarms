@@ -274,5 +274,20 @@ const STATE = { name: "Laynie", onBooks: true, roles: ["PROPRIETOR", "LIVESTOCK"
   out("13 the glory switch is in Toggles ->", !!gsw);
   const n13 = cmds().length; if (gsw) gsw.querySelector("button").click(); await wait(100);
   out("13 flipping it sends ?glory on ->", cmds().slice(n13).includes("glory on"));
+
+  // 14. the Dashboard's Suggestions tab: the box, with Done / Later / Not now / Delete and a note back
+  bot({ type: "state", state: Object.assign({}, STATE, { feedback: [
+    { id: 2, t: Date.now(), name: "Moo", mn: 500, kind: "idea", text: "A hayride on Sundays", status: "open", note: "" },
+    { id: 1, t: Date.now(), name: "Rex", mn: 600, kind: "bug", text: "The stall never let me go", status: "done", note: "Fixed!" }] }) });
+  click("Dashboard");
+  out("14 the Suggestions tab shows how many are open ->", [...D.querySelectorAll("#fhc-panel .fhc-pill")].some((b) => /Suggestions · 1/.test(b.textContent)));
+  click("💡 Suggestions");
+  out("14 open ones are listed ->", /A hayride on Sundays/.test(text()), !/The stall never let me go/.test(text()));
+  const note14 = [...D.querySelectorAll("#fhc-panel input")].find((i) => /a note back to Moo/.test(i.placeholder));
+  if (note14) { note14.value = "Booked!"; note14.dispatchEvent(new w.Event("input")); }
+  const n14 = cmds().length; click("Done"); await wait(100);
+  out("14 Done sends the note back ->", cmds().slice(n14).includes("feedback done 2 Booked!"));
+  click("Everything");
+  out("14 Everything shows the done ones too ->", /The stall never let me go/.test(text()), /Fixed!/.test(text()));
   process.exit(0);
 })();

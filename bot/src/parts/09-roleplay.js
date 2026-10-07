@@ -8,11 +8,18 @@
      Nursin': an emote about suckin', drinkin' or nursin' from nipples, breasts or
      milk drains the milker a little at a time. Both only touch folks who opted in. */
   // who from the list is mentioned: full name, nickname, or just their first name
+  // One word of somebody's name is enough to mean them ("Mira" for "BnB Cow Mira"), but not the words lots of
+  // farm names share. Seen live: "BnB Cow Mira comes apart" went to BnB CuntBitch and BnB Dog Nikto too, and
+  // every line with "the" in it went to Eve the Kitt, as whispers that looked meant for them.
+  const NAME_FILLER = new Set(("the and of for with bnb b&b farm farms miss mister mistress master lady lord sir madam " +
+    "little big good bad pet doll thing princess queen king girl boy babe baby " +
+    "cow cows bull heifer pony horse mare stallion dog pup puppy doggy pig piglet sow cat kitty kitten kitt bunny rabbit " +
+    "goat sheep ewe fox vixen wolf deer doe goblin hucow slave toy").split(" "));
   function namedIn(text, list){
     const low = " "+text.toLowerCase().replace(/[^a-z0-9'\s]/g," ")+" ";
     const has = w => w.length > 1 && (low.includes(" "+w+" ") || low.includes(" "+w+"'s "));
     return list.find(mn => low.includes(" "+mn+" ") ||
-      namesOf(mn).some(n => has(n) || n.split(/\s+/).some(w => w.length > 2 && has(w))));
+      namesOf(mn).some(n => has(n) || n.split(/\s+/).some(w => w.length > 2 && !NAME_FILLER.has(w) && has(w))));
   }
   // the hole the stud's own words name ("cums deep in her ass"); both, for a double cock
   function holeFromRP(text, stud, t){

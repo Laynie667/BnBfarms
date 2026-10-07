@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.15.8
+// @version      0.15.9
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -1824,7 +1824,7 @@
   ];
 
   // bot/src/version.js
-  var VERSION = "0.15.8";
+  var VERSION = "0.15.9";
 
   // bot-parts:farmhand-bot-parts
   (function() {
@@ -6124,10 +6124,11 @@
       }
       return doCum(stud, t, holes[0], R, auto, o2);
     }
+    const NAME_FILLER = new Set("the and of for with bnb b&b farm farms miss mister mistress master lady lord sir madam little big good bad pet doll thing princess queen king girl boy babe baby cow cows bull heifer pony horse mare stallion dog pup puppy doggy pig piglet sow cat kitty kitten kitt bunny rabbit goat sheep ewe fox vixen wolf deer doe goblin hucow slave toy".split(" "));
     function namedIn(text, list) {
       const low = " " + text.toLowerCase().replace(/[^a-z0-9'\s]/g, " ") + " ";
       const has = (w) => w.length > 1 && (low.includes(" " + w + " ") || low.includes(" " + w + "'s "));
-      return list.find((mn) => low.includes(" " + mn + " ") || namesOf(mn).some((n) => has(n) || n.split(/\s+/).some((w) => w.length > 2 && has(w))));
+      return list.find((mn) => low.includes(" " + mn + " ") || namesOf(mn).some((n) => has(n) || n.split(/\s+/).some((w) => w.length > 2 && !NAME_FILLER.has(w) && has(w))));
     }
     function holeFromRP(text, stud, t) {
       const low = String(text).toLowerCase(), found = [];

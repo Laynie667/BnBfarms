@@ -5,7 +5,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 | Script | File in `dist/` | Where it runs | Current |
 |---|---|---|---|
-| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.17.2** |
+| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.17.3** |
 | Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.5.4** |
 | Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.1.0** |
 | Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **1.0.3** |
@@ -21,6 +21,8 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 - Running the watcher on more than one game at once (the bot, yours, a tester's) lets Claude line them up into one timeline.
 
 ## Latest changes (newest first)
+
+- **Bot 0.17.3** (from the Oct 7 night watch, 8:47 to 10:47 pm): somebody not on the books who says `register`, `?register`, `Register stock` or `stock` is pointed at `?apply` every time (Niuky got "just for farm staff", then silence). An emote star in front of a command works (`*?rules` was answered "I don't know ?*?rules"). An animal noise on the end is ignored: `!help nya` (was "no guide called 'nya'"), `?breedable on, nya~`, `?stats moo`; free-text commands like `?feedback` and `?jot` keep every word.
 
 - **Bot 0.17.2, Companion 0.11.3, Glory stalls 1.5.4: tails in the scenes, and ?meh / ?more.** The farm reads tails off what people wear: a tail on a strap or a tail plug (pony, cow, puppy, kitty, fox, wolf, bunny, mouse, pig…). The use bench, breedin' and ?cum lines, the glory stall stories and the milkin' stall now and then use it ("Rex lifts Moo's pony tail out of the way and holds it up like a handle", "the tail plug in their ass bobs with every thrust", "their cow tail swishes lazily while the cups pull"). A tail plug keeps the ass closed, as before. **?meh** (the last farm line you got was off) and **?more** (you loved it) send that line to the suggestion box word for word, with an optional why: `?meh too samey`. Proprietors: `?feedback list lines`, and a Lines filter on the Dashboard's Suggestions tab. The farm's map is written up in `docs/FARM-MAP.md`.
 

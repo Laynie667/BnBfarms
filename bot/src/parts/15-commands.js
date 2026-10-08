@@ -77,6 +77,15 @@
       const SECTION = { "getting started":"start", "milk & breeding":"barn", "milk and breeding":"barn", "bodies":"body", "farm life":"life", "everything":"me", "farm extras":"addons" };
       if (SECTION[whole]){ args = SECTION[whole] === "addons" ? [] : [SECTION[whole]]; rest = args.join(" "); cmd = SECTION[whole] === "addons" ? "addons" : "help"; }
       else if (one !== cmd && !args.length && guideTopic(one)){ args = [one]; rest = one; cmd = "help"; } }
+    // an animal noise tacked on the end ("?help nya", "?breedable on, nya~", "?stats moo") isn't part of the command
+    // (live, Oct 7: "!help nya" was answered "I don't have a guide called 'nya'")
+    // (not for commands that take free text, where the last word is somebody's words)
+    if (!["feedback","suggest","idea","bug","meh","more","jot","report","notice","dare","contract","voice","heatline","tease","begphrase","beg","chore","edit","wheel","store","say","note"].includes(cmd))
+    { const NOISE =/^(nya+n?|nyaa+|mew+|meow+|mrr+p?|purr+|woof+|arf+|bark+|ruff+|awoo+|moo+|oink+|neigh+|whinny|snrt|brrhh|baa+|squeak+|yip+|hiss+)[~!.,]*$/i;
+      // (a word that is somebody's name, like a cow called Moo, stays)
+      while (args.length && NOISE.test(args[args.length - 1]) && !(() => { try { const m = resolveTarget(args[args.length - 1].replace(/[~!.,]+$/, "")); state.ambiguous = null; return m; } catch(e){ return null; } })()) args.pop();
+      if (args.length) args[args.length - 1] = args[args.length - 1].replace(/[,~]+$/, "");
+      args = args.filter(a => a !== ""); rest = args.join(" "); }
     if (cmd === "me" && !args.length) cmd = "record";   // live, Oct 7: "?me" got "I don't know ?me"
     let addonCmd = ADDON_CMDS.get(cmd) || null;   // a command from an add-on script (10f-addons.js)
     if (addonCmd && !addonVisible(addonCmd.addon, sender)) addonCmd = null;   // somebody else's private add-on: as if it isn't there
@@ -93,7 +102,13 @@
       }
     }
     if ((cmd === "contract" || cmd === "contracts") && !isStaff(sender)){ reply(sender, myContractsText(sender), channel === "chat" ? (canBeep(sender) ? "beep" : "whisper") : channel); return; }
-    if (STAFF_CMDS.includes(cmd) && !isStaff(sender)){ huh("?"+cmd+" is just for farm staff, sugar."); return; }
+    // somebody not on the books tryin' to sign themselves up (live, Oct 7: "Register stock", "?register", "stock"
+    // got "just for farm staff" and then silence): point them at ?apply
+    const joining = ["register","stock","approve","grant","claim"].includes(cmd) && !(rec(sender) && (rec(sender).roles || []).length);
+    if (STAFF_CMDS.includes(cmd) && !isStaff(sender)){
+      if (joining){ reply(sender, "Want to join the farm, sugar? Say ?apply and I'll walk you through it, one question at a time. Staff look it over and sign you on as stock, a guest, or a farmhand.", channel); return; }
+      huh("?"+cmd+" is just for farm staff, sugar."); return;
+    }
     if (onCooldown(sender, cmd, channel)){ waitYourTurn(sender, raw, channel); return; }   // waits its turn (14-parser.js)
 
     dbg("CMD:", cmd, "from", sender, "via", channel);

@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.17.2
+// @version      0.17.3
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -1827,7 +1827,7 @@
   ];
 
   // bot/src/version.js
-  var VERSION = "0.17.2";
+  var VERSION = "0.17.3";
 
   // bot-parts:farmhand-bot-parts
   (function() {
@@ -12234,6 +12234,7 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
           return { cmd: parts[0].toLowerCase().replace(/[,.!?]+$/, ""), args: parts.slice(1), rest: parts.slice(1).join(" ") };
         }
       }
+      if (/^\*+\s*[?!.\-]/.test(text)) text = text.replace(/^\*+\s*/, "");
       if (CFG.PREFIXES.includes(text[0])) {
         text = text.slice(1).trim();
         if (!text) return null;
@@ -12644,6 +12645,21 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
           cmd = "help";
         }
       }
+      if (!["feedback", "suggest", "idea", "bug", "meh", "more", "jot", "report", "notice", "dare", "contract", "voice", "heatline", "tease", "begphrase", "beg", "chore", "edit", "wheel", "store", "say", "note"].includes(cmd)) {
+        const NOISE = /^(nya+n?|nyaa+|mew+|meow+|mrr+p?|purr+|woof+|arf+|bark+|ruff+|awoo+|moo+|oink+|neigh+|whinny|snrt|brrhh|baa+|squeak+|yip+|hiss+)[~!.,]*$/i;
+        while (args.length && NOISE.test(args[args.length - 1]) && !(() => {
+          try {
+            const m = resolveTarget(args[args.length - 1].replace(/[~!.,]+$/, ""));
+            state.ambiguous = null;
+            return m;
+          } catch (e) {
+            return null;
+          }
+        })()) args.pop();
+        if (args.length) args[args.length - 1] = args[args.length - 1].replace(/[,~]+$/, "");
+        args = args.filter((a) => a !== "");
+        rest = args.join(" ");
+      }
       if (cmd === "me" && !args.length) cmd = "record";
       let addonCmd = ADDON_CMDS.get(cmd) || null;
       if (addonCmd && !addonVisible(addonCmd.addon, sender)) addonCmd = null;
@@ -12677,7 +12693,12 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
         reply(sender, myContractsText(sender), channel === "chat" ? canBeep(sender) ? "beep" : "whisper" : channel);
         return;
       }
+      const joining = ["register", "stock", "approve", "grant", "claim"].includes(cmd) && !(rec(sender) && (rec(sender).roles || []).length);
       if (STAFF_CMDS.includes(cmd) && !isStaff(sender)) {
+        if (joining) {
+          reply(sender, "Want to join the farm, sugar? Say ?apply and I'll walk you through it, one question at a time. Staff look it over and sign you on as stock, a guest, or a farmhand.", channel);
+          return;
+        }
         huh("?" + cmd + " is just for farm staff, sugar.");
         return;
       }

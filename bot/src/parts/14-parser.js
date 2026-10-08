@@ -106,6 +106,8 @@
       }
     }
 
+    // "*?rules": the emote star typed in front of a command (live, Oct 7: answered "I don't know ?*?rules")
+    if (/^\*+\s*[?!.\-]/.test(text)) text = text.replace(/^\*+\s*/, "");
     if (CFG.PREFIXES.includes(text[0])){
       text = text.slice(1).trim();
       if (!text) return null;

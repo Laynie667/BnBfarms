@@ -270,6 +270,7 @@
   // also: people who get every line wherever they're standin' (a scene's two people: whoever's doin' it,
   // even from across the map, and whoever it's done to)
   function emote(t, who, also){
+    { const s0 = who || aboutWhom(t); if (s0) noteLine(s0, t); for (const m of (also || [])) if (m) noteLine(m, t); }   // for ?meh / ?more (10q-feedback.js)
     if (state.cmdWatch) state.cmdWatch.emotes.push(String(t));
     const subject = who || aboutWhom(t);
     if (subject && waitPlaced(subject, () => emote(t, subject, also), () => privateTo(subject, t, "emote"))) return;
@@ -354,6 +355,7 @@
   }
   // one line, privately, drawn in their chat (Companion) or whispered out-of-character
   function privateTo(mn, text, kind){
+    noteLine(mn, text);   // for ?meh / ?more (10q-feedback.js)
     const line = (kind === "emote" ? "*" : "")+String(text);
     if (hasCompanion(mn)) enqueue(makeMsg("roomline", { text: line, kind }, mn));
     else for (const part of splitMessage(line, 900)) enqueue({ Content: "("+part.replace(/\(/g, "[").replace(/\)/g, "]"), Type:"Whisper", Target: mn });

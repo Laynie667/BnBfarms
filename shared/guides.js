@@ -5,7 +5,7 @@ export const BOOKS = [["Rules", "rules"], ["Consent", "consent"], ["Tour", "tour
 
 export const PUBLIC_GROUPS = [
   { name: "Safety", cmds: ["safe", "stuck", "staff", "report"] },
-  { name: "Suggestion box", cmds: ["feedback <what you think>", "suggest <an idea>", "bug <what went wrong>", "feedback mine"] },
+  { name: "Suggestion box", cmds: ["feedback <what you think>", "suggest <an idea>", "bug <what went wrong>", "feedback mine", "meh", "more"] },
   { name: "Gettin' started", cmds: ["help", "help me", "rules", "consent", "tour", "apply", "friend", "species", "luxury", "doors", "addons"] },
   { name: "You and the farm", cmds: ["record", "keys", "who", "herd", "notice", "weather", "feeding", "curfew", "beg"] },
   { name: "Milk", cmds: ["stats", "board", "milkable", "quota"] },
@@ -32,7 +32,7 @@ export const STAFF_GROUPS = [
 ];
 
 export const OWNER_GROUPS = [
-  { name: "Proprietors", cmds: ["staffadd <who> <role>", "staffremove <who>", "goldkey <who>", "notice <text>", "feeding on", "curfew on", "fair open", "addons off <name>", "addons on <name>", "backup", "health", "edit <who>", "feedback list", "feedback list ideas", "feedback done <n>", "feedback export", "store price <item> <n>", "store off <item>", "store on <item>"] },
+  { name: "Proprietors", cmds: ["staffadd <who> <role>", "staffremove <who>", "goldkey <who>", "notice <text>", "feeding on", "curfew on", "fair open", "addons off <name>", "addons on <name>", "backup", "health", "edit <who>", "feedback list", "feedback list ideas", "feedback list lines", "feedback done <n>", "feedback export", "store price <item> <n>", "store off <item>", "store on <item>"] },
 ];
 
 // "breed <who>" needs filling in; "stats" can be sent as it is

@@ -2,18 +2,44 @@
      THE SUGGESTION BOX: anybody on the farm (guests too) can send the proprietors feedback, a bug, or an idea.
        ?feedback <what you think> · ?suggest <an idea> (or ?idea) · ?bug <what went wrong>
        ?feedback mine · what you've sent and what's become of it
+       ?meh [why] · the last farm line you got was off · ?more [why] · you loved it (sent word for word)
      Each one is kept in the ledger with a number, and the proprietors get a quiet note.
      Proprietors: ?feedback list [open|all|ideas|bugs|feedback] · ?feedback <n> · ?feedback done <n> [a note back]
        ?feedback later <n> · ?feedback no <n> [why] · ?feedback del <n> · ?feedback export (everything, for Claude)
      When one's marked done (or no), whoever sent it is told, with the note.
   */
-  const FB_KINDS = { feedback: "💬", idea: "💡", bug: "🐛" };
+  const FB_KINDS = { feedback: "💬", idea: "💡", bug: "🐛", meh: "👎", more: "❤️" };
+
+  // ── ?meh and ?more: a farm line, flagged by whoever got it ──
+  // every scene line, room line and private line somebody gets is remembered (their last five), so they can
+  // say ?meh (that one was off: stale, clunky, wrong for them) or ?more (loved it), with an optional why
+  function noteLine(mn, text){
+    if (!mn || mn === CFG.BOT_MEMBER) return;
+    const t = String(text || "").replace(/^\*/, "").trim();
+    if (t.length < 25) return;
+    state.lastLines = state.lastLines || new Map();
+    const a = state.lastLines.get(mn) || [];
+    if (a[a.length - 1] === t) return;
+    a.push(t); if (a.length > 5) a.shift();
+    state.lastLines.set(mn, a);
+  }
+  function lineVote(cmd, sender, rest, R){
+    const a = (state.lastLines && state.lastLines.get(sender)) || [];
+    if (!a.length){ R("I haven't sent you a farm line lately, sugar. Say ?"+cmd+" right after one you "+(cmd === "more" ? "loved" : "didn't like")+"."); return; }
+    const line = a[a.length - 1], why = String(rest || "").trim();
+    const list = fbLedger();
+    const f = { id: ++L.fbSeq, t: Date.now(), mn: sender, name: plainName(sender), kind: cmd, text: line.slice(0, CFG.FEEDBACK_MAX), why: why.slice(0, 300), status: "open", where: channelNote(sender) };
+    list.push(f); if (list.length > 1000) L.feedback = list.slice(-1000);
+    saveLedger(); audit(sender, "LINE_"+cmd.toUpperCase(), "#"+f.id);
+    R(cmd === "more" ? "❤️ Noted, sugar: more like that one. The proprietors get it word for word."
+                     : "👎 Noted, sugar: that one's off. The proprietors get it word for word"+(why ? ", with your why" : "")+", and it'll get fixed.");
+  }
   const FB_STATUS = { open: "open", done: "done ✅", later: "later ⏳", no: "not this time" };
   function fbLedger(){ L.feedback = L.feedback || []; L.fbSeq = L.fbSeq || 0; return L.feedback; }
   function fbLine(f, full){
     const d = new Date(f.t), when = (d.getMonth()+1)+"/"+d.getDate();
     const text = full ? f.text : (f.text.length > 90 ? f.text.slice(0, 88)+"…" : f.text);
-    return "#"+f.id+" "+FB_KINDS[f.kind]+" "+when+" "+f.name+(f.status !== "open" ? " · "+FB_STATUS[f.status] : "")+": "+text+(full && f.note ? "\n   ↳ "+f.note : "");
+    return "#"+f.id+" "+FB_KINDS[f.kind]+" "+when+" "+f.name+(f.status !== "open" ? " · "+FB_STATUS[f.status] : "")+": "+text+(f.why ? " (why: "+f.why+")" : "")+(full && f.note ? "\n   ↳ "+f.note : "");
   }
   // the person sendin' it: ?feedback, ?suggest, ?idea, ?bug
   function fbSubmit(cmd, sender, rest, R){
@@ -38,6 +64,7 @@
   function channelNote(mn){ const w = (typeof whereName === "function" && onMap(mn)) ? whereName(mn) : ""; return w || (onMap(mn) ? "on the farm" : "away"); }
   // ?feedback … (the submitter's own, or the proprietors' tools)
   function feedbackCommand(cmd, sender, args, rest, R){
+    if (cmd === "meh" || cmd === "more") return lineVote(cmd, sender, rest, R);
     if (cmd !== "feedback") return fbSubmit(cmd, sender, rest, R);
     const sub = String(args[0] || "").toLowerCase(), list = fbLedger();
     if (sub === "mine"){
@@ -49,8 +76,8 @@
     if (!tools || !isProprietor(sender)) return fbSubmit(cmd, sender, rest, R);   // anything else is feedback itself
     if (sub === "list"){
       const which = String(args[1] || "open").toLowerCase();
-      const kind = { ideas: "idea", idea: "idea", bugs: "bug", bug: "bug", feedback: "feedback" }[which];
-      const rows = list.filter(f => (kind ? f.kind === kind && f.status === "open" : which === "all" ? true : f.status === "open"));
+      const kind = { ideas: "idea", idea: "idea", bugs: "bug", bug: "bug", feedback: "feedback", meh: "meh", more: "more" }[which];
+      const rows = list.filter(f => (which === "lines" ? (f.kind === "meh" || f.kind === "more") && f.status === "open" : kind ? f.kind === kind && f.status === "open" : which === "all" ? true : f.status === "open"));
       R(rows.length ? "📬 SUGGESTION BOX · "+(which === "all" ? "everything" : kind ? which+", open" : "open")+" ("+rows.length+")\n"+rows.slice(-30).map(f => fbLine(f)).join("\n")+
                       "\n?feedback <n> reads one · ?feedback done|later|no <n> [note] · ?feedback del <n>"
                     : "📬 Nothin' "+(which === "all" ? "" : "open ")+"in the suggestion box, sugar.");

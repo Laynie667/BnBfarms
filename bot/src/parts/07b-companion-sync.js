@@ -64,7 +64,7 @@
         s.outfits = {}; for (const [k, o] of Object.entries(L.outfits)) s.outfits[k] = { items: o.items, locks: o.locks, at: o.at };
         s.outfitRules = Object.assign({}, L.outfitRules);
         // the suggestion box, newest first (the Dashboard's Suggestions tab; 10q-feedback.js)
-        s.feedback = fbLedger().slice(-60).reverse().map(f => ({ id: f.id, t: f.t, name: f.name, mn: f.mn, kind: f.kind, text: f.text, status: f.status, note: f.note || "" }));
+        s.feedback = fbLedger().slice(-60).reverse().map(f => ({ id: f.id, t: f.t, name: f.name, mn: f.mn, kind: f.kind, text: f.text, why: f.why || "", status: f.status, note: f.note || "" }));
       }
     } catch(e){ dbg("stateFor:", e); }
     return s;

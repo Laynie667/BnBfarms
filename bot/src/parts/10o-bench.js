@@ -223,6 +223,7 @@
     const b = rt.benched; b.uses++;
     const W0 = benchWeek(); W0.n[t] = (W0.n[t] || 0) + 1; W0.by[sender] = (W0.by[sender] || 0) + 1;
     saveLedger(); audit(sender, "BENCH_USE", t+" "+hole+(load ? " "+Math.round(load)+"mL" : ""));
+    { const tb = Math.random() < 0.7 ? tailBit(t, hole, sender) : ""; if (tb) line += " "+tb.replace(/%/g, ""); }   // their tail, if they wear one
     emote("🪵 "+benchFill(line, vars), t, [sender]);
     face(t, inside ? "bred" : "afterglow", 40); sound(t, "wet");
     if (b.uses % 3 === 0) later(() => { if (benchedNow(t)) emote("🪵 "+benchFill(benchLine("tally", BENCH_LINES.tally), { t: plainName(t), n: b.uses }), t); }, 4000);

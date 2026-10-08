@@ -864,7 +864,8 @@
       // their own story, privately (like the glory stalls), about every 25 seconds (10i-stall-story.js)
       if (!done && now >= (st.nextBeat||0)){
         st.nextBeat = now + (15 + Math.random()*10)*1000;   // with 20-second ticks: a line every 20 to 40 seconds, about 27 on average
-        privateTo(mn, (st.kind === "cock" ? "🐂 " : "🥛 ")+stallBeat(mn, st), "emote");
+        const tb = (st.tailN = (st.tailN||0) + 1) % 5 === 0 ? tailBit(mn, null, null, "milk") : "";   // now and then, their tail (10r-looks.js)
+        privateTo(mn, (st.kind === "cock" ? "🐂 " : "🥛 ")+(tb || stallBeat(mn, st)), "emote");
       }
       // for the room: an open line at most every STALL_LINE_MIN minutes, STALL_OPEN_MAX a session
       if (!done && now >= (st.nextOpen||0) && (st.opens||0) < CFG.PROD.STALL_OPEN_MAX){
@@ -1013,6 +1014,7 @@
       tp.eggs = { n:clutch, by:stud, since:Date.now(), layAt: Date.now() + (dl + Math.random()*(dh-dl))*86400000 };
     }
     saveLedger(); audit(stud,"CUM",stud+"→"+t+" "+hole+" "+Math.round(load));
+    if (!opt.second && Math.random() < 0.6){ const tb = tailBit(t, hole, stud); if (tb) o += " "+tb; }   // their tail, if they wear one (10r-looks.js)
     emote(o, t);   // about the one bred (the stud is named too, so both get it)
     if (clutch) emote("🥚 Deep inside "+plainName(t)+", something takes hold: "+plainName(stud)+"'s draconic seed has left a clutch of "+clutch+" eggs growin' in there. They'll be layin' in a few days.");
     if (sc0) sc0.lastCum = Date.now();

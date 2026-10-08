@@ -1496,7 +1496,7 @@ Welcome to B&B Farm, hon. 🌾`);
       case "dares": case "dare": case "dared": dareCommand(cmd, sender, args, R); break;
       case "corral": case "uncorral": penCommand(cmd === "corral" ? "pen" : "unpen", sender, args, R); break;
       case "bench": case "unbench": case "use": benchCommand(cmd, sender, args, R); break;
-      case "feedback": case "suggest": case "idea": case "bug": feedbackCommand(cmd, sender, args, rest, R); break;   // the suggestion box (10q)
+      case "feedback": case "suggest": case "idea": case "bug": case "meh": case "more": feedbackCommand(cmd, sender, args, rest, R); break;   // the suggestion box (10q)
 
       case "edit": {
         // proprietors fix somebody's record: ?edit <who> shows what can change · ?edit <who> <field> <new value>

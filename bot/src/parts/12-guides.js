@@ -23,6 +23,7 @@ Well hey there, %name%! I'm the gal behind the desk. 💕
 💡 THE SUGGESTION BOX
   ?suggest <an idea> · ?bug <what went wrong> · ?feedback <anything>
   ?feedback mine · what you've sent, and what came of it
+  ?meh · the last farm line you got was off · ?more · loved it
 
 📚 GUIDES · say ?help and a topic, like ?help breeding
   Gettin' started

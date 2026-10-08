@@ -55,6 +55,7 @@
   // a line only this person sees, shown like a room emote or chat line wherever they are on the map:
   // the Companion puts it in their chat; without it, it's an out-of-character whisper (the map lets those through)
   function privateLine(mn, text, kind, urgent){
+    noteLine(mn, text);   // for ?meh / ?more (10q-feedback.js)
     const line = (kind === "emote" ? "*" : "") + String(text);
     if (hasCompanion(mn)) { enqueue(makeMsg("roomline", { text: line, kind: kind === "emote" ? "emote" : "chat" }, mn), urgent); return; }
     const ooc = mapRoom();
@@ -128,6 +129,8 @@
       // a load that landed somewhere outside the bot (a glory stall): tells every add-on, like the bot's own fills do
       bred: (mn, stud, hole, mlIn, took) => addonsEmit("bred", stud, mn, hole, mlIn, took || null),
       // put somebody on the use bench (only if they said ?bench on; same rules as staff and the wheel)
+      // their tail (10r-looks.js): tailOf(mn) → { kind, plug, name } or null · tailBit(mn, hole, byName) → a sentence or ""
+      tailOf: (mn) => tailOf(mn), tailBit: (mn, hole, by, mood) => tailBit(mn, hole, by, mood),
       bench: (mn, mins, why) => benchIn(mn, Math.max(5, Math.min(CFG.BENCH_MAX_MIN, Number(mins) || 30)), CFG.BOT_MEMBER, why || a.name),
       fineRibbons: (mn, n, why) => fineRibbons(mn, n, why, CFG.BOT_MEMBER), splat: (mn, hole, by) => lscgSplatAt(mn, HOLE_SPLAT[hole] || ["ItemVulva"], by ? plainName(by) : null), char: charFor, find: resolveTarget, here: () => (W.ChatRoomCharacter||[]).map(c => c.MemberNumber).filter(m => m !== CFG.BOT_MEMBER),
       onMap, rec: (mn) => rec(mn), isStaff, isHerdmaster, isProprietor, hasRole, ROLE, onDuty, herdLeaderOf, herdMembers,

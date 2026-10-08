@@ -132,7 +132,7 @@
                        "stats","board","pedigree","breedable","fertile","naturalheat","breed","cum","milkable","futa","size","sizes","measure","penis","cock","rights","accept",
                        "freeuse","jarok","gender","outfit","outfits","uniform","hypno","tally","eggs","yes","no","wash","quota","praise","degrade",
                        "weather","feeding","curfew","beg","please","fair","enter","addons","addon",
-                       "ribbons","ribbon","store","buy","gift","potions","potion","dares","dare","dared","bench","use","feedback","suggest","idea","bug"];
+                       "ribbons","ribbon","store","buy","gift","potions","potion","dares","dare","dared","bench","use","feedback","suggest","idea","bug","meh","more"];
   const STAFF_CMDS  = ["queue","app","approve","deny","register","unregister","grant","revoke",
                        "claim","release","myherd","herdname","herdcall","herdsummon","turnout","letup","goldkey",
                        "pasture","onduty","cover","staffadd","staffremove",
@@ -146,7 +146,7 @@
                        "contract","contracts","zone","zones","voice","machine","edit","corral","uncorral","unbench"];
 
   const SAFETY_CMDS = ["safe","safeword","red","stuck"];
-  const PRIVATE_REPLY = ["feedback","suggest","idea","bug","record","keys","find","app","queue","roster","stock","health",
+  const PRIVATE_REPLY = ["feedback","suggest","idea","bug","meh","more","record","keys","find","app","queue","roster","stock","health",
                          "myherd","herd","stucklog","keydump","summon","where","cover",
                          "vet","spot","spots","tease","teaseme","stats","pedigree",
                          "hours","chores","wheel","tourstop","quota","contract","contracts"];

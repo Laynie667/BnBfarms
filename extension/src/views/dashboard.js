@@ -172,20 +172,21 @@ function records(ctx) {
 
 // the suggestion box: what players sent with ?suggest, ?bug and ?feedback. Each one can be marked done, later
 // or no (the sender is told, with the note if there is one), or deleted.
-const FB_ICON = { feedback: "💬", idea: "💡", bug: "🐛" };
+const FB_ICON = { feedback: "💬", idea: "💡", bug: "🐛", meh: "👎", more: "❤️" };
 const FB_STATUS = { open: ["open", "acc"], done: ["done", "good"], later: ["later", ""], no: ["not now", "alert"] };
 function suggestions(ctx) {
   const all = ctx.s.feedback || [], f = ctx.ui.fbFilter || "open";
-  const shown = all.filter((x) => f === "all" ? true : f === "open" ? x.status === "open" : x.kind === f && x.status === "open");
+  const shown = all.filter((x) => f === "all" ? true : f === "open" ? x.status === "open" : f === "lines" ? (x.kind === "meh" || x.kind === "more") && x.status === "open" : x.kind === f && x.status === "open");
   const pill = (id, label) => h("button", { type: "button", class: "fhc-pill" + (f === id ? " on" : ""), onclick: () => ctx.setUi({ fbFilter: id }) }, label);
   return [
-    h("div", null, pill("open", "Open"), pill("idea", "💡 Ideas"), pill("bug", "🐛 Bugs"), pill("feedback", "💬 Feedback"), pill("all", "Everything")),
+    h("div", null, pill("open", "Open"), pill("idea", "💡 Ideas"), pill("bug", "🐛 Bugs"), pill("feedback", "💬 Feedback"), pill("lines", "👎❤️ Lines"), pill("all", "Everything")),
     shown.length ? shown.map((x) => {
       const key = "fbnote_" + x.id, act = (what) => { const note = (ctx.ui[key] || "").trim(); ctx.send("feedback " + what + " " + x.id + (note ? " " + note : "")); ctx.setUi({ [key]: "" }); };
       return card(
         h("div", { class: "fhc-kv" }, h("b", null, FB_ICON[x.kind] + " #" + x.id + " · " + x.name),
           h("span", null, chip(FB_STATUS[x.status][0], FB_STATUS[x.status][1]), " ", h("span", { class: "fhc-muted" }, new Date(x.t).toLocaleDateString()))),
-        h("div", { class: "fhc-card", style: { whiteSpace: "pre-wrap" } }, x.text),
+        h("div", { class: "fhc-card", style: { whiteSpace: "pre-wrap" } }, (x.kind === "meh" || x.kind === "more" ? "Line: " : "") + x.text),
+        x.why && muted("Why: " + x.why),
         x.note && muted("Your note: " + x.note),
         h("input", { class: "fhc-in", placeholder: "a note back to " + x.name + " (optional)", value: ctx.ui[key] || "", oninput: (e) => ctx.setUi({ [key]: e.target.value }, true) }),
         h("div", { style: { marginTop: "6px" } },

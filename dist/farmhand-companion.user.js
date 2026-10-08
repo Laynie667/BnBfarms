@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.11.2
+// @version      0.11.3
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -230,7 +230,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.11.2";
+  var VERSION = "0.11.3";
 
   // extension/src/config.js
   var BOT_MEMBER = 260239;
@@ -366,7 +366,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var BOOKS = [["Rules", "rules"], ["Consent", "consent"], ["Tour", "tour"], ["Doors", "doors"], ["Species", "species"], ["Help", "help"]];
   var PUBLIC_GROUPS = [
     { name: "Safety", cmds: ["safe", "stuck", "staff", "report"] },
-    { name: "Suggestion box", cmds: ["feedback <what you think>", "suggest <an idea>", "bug <what went wrong>", "feedback mine"] },
+    { name: "Suggestion box", cmds: ["feedback <what you think>", "suggest <an idea>", "bug <what went wrong>", "feedback mine", "meh", "more"] },
     { name: "Gettin' started", cmds: ["help", "help me", "rules", "consent", "tour", "apply", "friend", "species", "luxury", "doors", "addons"] },
     { name: "You and the farm", cmds: ["record", "keys", "who", "herd", "notice", "weather", "feeding", "curfew", "beg"] },
     { name: "Milk", cmds: ["stats", "board", "milkable", "quota"] },
@@ -391,7 +391,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     { name: "Keys and calls", cmds: ["keys <who>", "keysync", "keydump", "grant <who> <tier>", "revoke <who>", "forced", "summon <who>", "summon all", "pasture", "onduty", "cover"] }
   ];
   var OWNER_GROUPS = [
-    { name: "Proprietors", cmds: ["staffadd <who> <role>", "staffremove <who>", "goldkey <who>", "notice <text>", "feeding on", "curfew on", "fair open", "addons off <name>", "addons on <name>", "backup", "health", "edit <who>", "feedback list", "feedback list ideas", "feedback done <n>", "feedback export", "store price <item> <n>", "store off <item>", "store on <item>"] }
+    { name: "Proprietors", cmds: ["staffadd <who> <role>", "staffremove <who>", "goldkey <who>", "notice <text>", "feeding on", "curfew on", "fair open", "addons off <name>", "addons on <name>", "backup", "health", "edit <who>", "feedback list", "feedback list ideas", "feedback list lines", "feedback done <n>", "feedback export", "store price <item> <n>", "store off <item>", "store on <item>"] }
   ];
   var needsInput = (cmd) => /</.test(cmd);
   var cmdStem = (cmd) => cmd.replace(/\s*<.*$/, "").trim();
@@ -3112,14 +3112,14 @@ One of mods you are using is using an old version of SDK. It will work for now b
       latest(ctx2)
     ];
   }
-  var FB_ICON = { feedback: "\u{1F4AC}", idea: "\u{1F4A1}", bug: "\u{1F41B}" };
+  var FB_ICON = { feedback: "\u{1F4AC}", idea: "\u{1F4A1}", bug: "\u{1F41B}", meh: "\u{1F44E}", more: "\u2764\uFE0F" };
   var FB_STATUS = { open: ["open", "acc"], done: ["done", "good"], later: ["later", ""], no: ["not now", "alert"] };
   function suggestions(ctx2) {
     const all = ctx2.s.feedback || [], f = ctx2.ui.fbFilter || "open";
-    const shown = all.filter((x) => f === "all" ? true : f === "open" ? x.status === "open" : x.kind === f && x.status === "open");
+    const shown = all.filter((x) => f === "all" ? true : f === "open" ? x.status === "open" : f === "lines" ? (x.kind === "meh" || x.kind === "more") && x.status === "open" : x.kind === f && x.status === "open");
     const pill = (id, label) => h("button", { type: "button", class: "fhc-pill" + (f === id ? " on" : ""), onclick: () => ctx2.setUi({ fbFilter: id }) }, label);
     return [
-      h("div", null, pill("open", "Open"), pill("idea", "\u{1F4A1} Ideas"), pill("bug", "\u{1F41B} Bugs"), pill("feedback", "\u{1F4AC} Feedback"), pill("all", "Everything")),
+      h("div", null, pill("open", "Open"), pill("idea", "\u{1F4A1} Ideas"), pill("bug", "\u{1F41B} Bugs"), pill("feedback", "\u{1F4AC} Feedback"), pill("lines", "\u{1F44E}\u2764\uFE0F Lines"), pill("all", "Everything")),
       shown.length ? shown.map((x) => {
         const key = "fbnote_" + x.id, act = (what) => {
           const note = (ctx2.ui[key] || "").trim();
@@ -3133,7 +3133,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
             h("b", null, FB_ICON[x.kind] + " #" + x.id + " \xB7 " + x.name),
             h("span", null, chip(FB_STATUS[x.status][0], FB_STATUS[x.status][1]), " ", h("span", { class: "fhc-muted" }, new Date(x.t).toLocaleDateString()))
           ),
-          h("div", { class: "fhc-card", style: { whiteSpace: "pre-wrap" } }, x.text),
+          h("div", { class: "fhc-card", style: { whiteSpace: "pre-wrap" } }, (x.kind === "meh" || x.kind === "more" ? "Line: " : "") + x.text),
+          x.why && muted("Why: " + x.why),
           x.note && muted("Your note: " + x.note),
           h("input", { class: "fhc-in", placeholder: "a note back to " + x.name + " (optional)", value: ctx2.ui[key] || "", oninput: (e) => ctx2.setUi({ [key]: e.target.value }, true) }),
           h(

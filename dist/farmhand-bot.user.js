@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.17.1
+// @version      0.17.2
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -1798,7 +1798,7 @@
   // shared/guides.js
   var PUBLIC_GROUPS = [
     { name: "Safety", cmds: ["safe", "stuck", "staff", "report"] },
-    { name: "Suggestion box", cmds: ["feedback <what you think>", "suggest <an idea>", "bug <what went wrong>", "feedback mine"] },
+    { name: "Suggestion box", cmds: ["feedback <what you think>", "suggest <an idea>", "bug <what went wrong>", "feedback mine", "meh", "more"] },
     { name: "Gettin' started", cmds: ["help", "help me", "rules", "consent", "tour", "apply", "friend", "species", "luxury", "doors", "addons"] },
     { name: "You and the farm", cmds: ["record", "keys", "who", "herd", "notice", "weather", "feeding", "curfew", "beg"] },
     { name: "Milk", cmds: ["stats", "board", "milkable", "quota"] },
@@ -1823,11 +1823,11 @@
     { name: "Keys and calls", cmds: ["keys <who>", "keysync", "keydump", "grant <who> <tier>", "revoke <who>", "forced", "summon <who>", "summon all", "pasture", "onduty", "cover"] }
   ];
   var OWNER_GROUPS = [
-    { name: "Proprietors", cmds: ["staffadd <who> <role>", "staffremove <who>", "goldkey <who>", "notice <text>", "feeding on", "curfew on", "fair open", "addons off <name>", "addons on <name>", "backup", "health", "edit <who>", "feedback list", "feedback list ideas", "feedback done <n>", "feedback export", "store price <item> <n>", "store off <item>", "store on <item>"] }
+    { name: "Proprietors", cmds: ["staffadd <who> <role>", "staffremove <who>", "goldkey <who>", "notice <text>", "feeding on", "curfew on", "fair open", "addons off <name>", "addons on <name>", "backup", "health", "edit <who>", "feedback list", "feedback list ideas", "feedback list lines", "feedback done <n>", "feedback export", "store price <item> <n>", "store off <item>", "store on <item>"] }
   ];
 
   // bot/src/version.js
-  var VERSION = "0.17.1";
+  var VERSION = "0.17.2";
 
   // bot-parts:farmhand-bot-parts
   (function() {
@@ -3795,6 +3795,11 @@
       enqueue({ Content: t, Type: "Chat" }, urgent);
     }
     function emote(t, who, also) {
+      {
+        const s0 = who || aboutWhom(t);
+        if (s0) noteLine(s0, t);
+        for (const m of also || []) if (m) noteLine(m, t);
+      }
       if (state.cmdWatch) state.cmdWatch.emotes.push(String(t));
       const subject = who || aboutWhom(t);
       if (subject && waitPlaced(subject, () => emote(t, subject, also), () => privateTo(subject, t, "emote"))) return;
@@ -3888,6 +3893,7 @@
       for (const m of who) privateTo(m, r.text, "emote");
     }
     function privateTo(mn, text, kind) {
+      noteLine(mn, text);
       const line = (kind === "emote" ? "*" : "") + String(text);
       if (hasCompanion(mn)) enqueue(makeMsg("roomline", { text: line, kind }, mn));
       else for (const part of splitMessage(line, 900)) enqueue({ Content: "(" + part.replace(/\(/g, "[").replace(/\)/g, "]"), Type: "Whisper", Target: mn });
@@ -4399,7 +4405,7 @@
           s.outfits = {};
           for (const [k, o] of Object.entries(L.outfits)) s.outfits[k] = { items: o.items, locks: o.locks, at: o.at };
           s.outfitRules = Object.assign({}, L.outfitRules);
-          s.feedback = fbLedger().slice(-60).reverse().map((f) => ({ id: f.id, t: f.t, name: f.name, mn: f.mn, kind: f.kind, text: f.text, status: f.status, note: f.note || "" }));
+          s.feedback = fbLedger().slice(-60).reverse().map((f) => ({ id: f.id, t: f.t, name: f.name, mn: f.mn, kind: f.kind, text: f.text, why: f.why || "", status: f.status, note: f.note || "" }));
         }
       } catch (e) {
         dbg("stateFor:", e);
@@ -5434,7 +5440,8 @@
         const done = doneM && doneS || now - (st.since || now) > ((st.mins || 30) + 15) * 6e4;
         if (!done && now >= (st.nextBeat || 0)) {
           st.nextBeat = now + (15 + Math.random() * 10) * 1e3;
-          privateTo(mn, (st.kind === "cock" ? "\u{1F402} " : "\u{1F95B} ") + stallBeat(mn, st), "emote");
+          const tb = (st.tailN = (st.tailN || 0) + 1) % 5 === 0 ? tailBit(mn, null, null, "milk") : "";
+          privateTo(mn, (st.kind === "cock" ? "\u{1F402} " : "\u{1F95B} ") + (tb || stallBeat(mn, st)), "emote");
         }
         if (!done && now >= (st.nextOpen || 0) && (st.opens || 0) < CFG.PROD.STALL_OPEN_MAX) {
           st.nextOpen = now + CFG.PROD.STALL_LINE_MIN * 6e4;
@@ -5634,6 +5641,10 @@
       }
       saveLedger();
       audit(stud, "CUM", stud + "\u2192" + t + " " + hole + " " + Math.round(load));
+      if (!opt.second && Math.random() < 0.6) {
+        const tb = tailBit(t, hole, stud);
+        if (tb) o += " " + tb;
+      }
       emote(o, t);
       if (clutch) emote("\u{1F95A} Deep inside " + plainName(t) + ", something takes hold: " + plainName(stud) + "'s draconic seed has left a clutch of " + clutch + " eggs growin' in there. They'll be layin' in a few days.");
       if (sc0) sc0.lastCum = Date.now();
@@ -7390,6 +7401,7 @@
       return zonesOf(mn).some((z) => z.name === name || z.group === name);
     }
     function privateLine(mn, text, kind, urgent) {
+      noteLine(mn, text);
       const line = (kind === "emote" ? "*" : "") + String(text);
       if (hasCompanion(mn)) {
         enqueue(makeMsg("roomline", { text: line, kind: kind === "emote" ? "emote" : "chat" }, mn), urgent);
@@ -7482,6 +7494,9 @@
         // a load that landed somewhere outside the bot (a glory stall): tells every add-on, like the bot's own fills do
         bred: (mn, stud, hole, mlIn, took) => addonsEmit("bred", stud, mn, hole, mlIn, took || null),
         // put somebody on the use bench (only if they said ?bench on; same rules as staff and the wheel)
+        // their tail (10r-looks.js): tailOf(mn) → { kind, plug, name } or null · tailBit(mn, hole, byName) → a sentence or ""
+        tailOf: (mn) => tailOf(mn),
+        tailBit: (mn, hole, by, mood) => tailBit(mn, hole, by, mood),
         bench: (mn, mins, why) => benchIn(mn, Math.max(5, Math.min(CFG.BENCH_MAX_MIN, Number(mins) || 30)), CFG.BOT_MEMBER, why || a.name),
         fineRibbons: (mn, n, why) => fineRibbons(mn, n, why, CFG.BOT_MEMBER),
         splat: (mn, hole, by) => lscgSplatAt(mn, HOLE_SPLAT[hole] || ["ItemVulva"], by ? plainName(by) : null),
@@ -10494,6 +10509,10 @@
       W0.by[sender] = (W0.by[sender] || 0) + 1;
       saveLedger();
       audit(sender, "BENCH_USE", t + " " + hole + (load ? " " + Math.round(load) + "mL" : ""));
+      {
+        const tb = Math.random() < 0.7 ? tailBit(t, hole, sender) : "";
+        if (tb) line += " " + tb.replace(/%/g, "");
+      }
       emote("\u{1FAB5} " + benchFill(line, vars), t, [sender]);
       face(t, inside ? "bred" : "afterglow", 40);
       sound(t, "wet");
@@ -10673,7 +10692,33 @@
       if (!rec(mn) || !(rec(mn).roles || []).length) return [];
       return benchedHere().filter((m) => m !== mn).map((m) => ({ mn: m, name: plainName(m), uses: rec(m).benched.uses, holes: benchOpenHoles(m) }));
     }
-    const FB_KINDS = { feedback: "\u{1F4AC}", idea: "\u{1F4A1}", bug: "\u{1F41B}" };
+    const FB_KINDS = { feedback: "\u{1F4AC}", idea: "\u{1F4A1}", bug: "\u{1F41B}", meh: "\u{1F44E}", more: "\u2764\uFE0F" };
+    function noteLine(mn, text) {
+      if (!mn || mn === CFG.BOT_MEMBER) return;
+      const t = String(text || "").replace(/^\*/, "").trim();
+      if (t.length < 25) return;
+      state.lastLines = state.lastLines || /* @__PURE__ */ new Map();
+      const a = state.lastLines.get(mn) || [];
+      if (a[a.length - 1] === t) return;
+      a.push(t);
+      if (a.length > 5) a.shift();
+      state.lastLines.set(mn, a);
+    }
+    function lineVote(cmd, sender, rest, R) {
+      const a = state.lastLines && state.lastLines.get(sender) || [];
+      if (!a.length) {
+        R("I haven't sent you a farm line lately, sugar. Say ?" + cmd + " right after one you " + (cmd === "more" ? "loved" : "didn't like") + ".");
+        return;
+      }
+      const line = a[a.length - 1], why = String(rest || "").trim();
+      const list = fbLedger();
+      const f = { id: ++L.fbSeq, t: Date.now(), mn: sender, name: plainName(sender), kind: cmd, text: line.slice(0, CFG.FEEDBACK_MAX), why: why.slice(0, 300), status: "open", where: channelNote(sender) };
+      list.push(f);
+      if (list.length > 1e3) L.feedback = list.slice(-1e3);
+      saveLedger();
+      audit(sender, "LINE_" + cmd.toUpperCase(), "#" + f.id);
+      R(cmd === "more" ? "\u2764\uFE0F Noted, sugar: more like that one. The proprietors get it word for word." : "\u{1F44E} Noted, sugar: that one's off. The proprietors get it word for word" + (why ? ", with your why" : "") + ", and it'll get fixed.");
+    }
     const FB_STATUS = { open: "open", done: "done \u2705", later: "later \u23F3", no: "not this time" };
     function fbLedger() {
       L.feedback = L.feedback || [];
@@ -10683,7 +10728,7 @@
     function fbLine(f, full) {
       const d = new Date(f.t), when = d.getMonth() + 1 + "/" + d.getDate();
       const text = full ? f.text : f.text.length > 90 ? f.text.slice(0, 88) + "\u2026" : f.text;
-      return "#" + f.id + " " + FB_KINDS[f.kind] + " " + when + " " + f.name + (f.status !== "open" ? " \xB7 " + FB_STATUS[f.status] : "") + ": " + text + (full && f.note ? "\n   \u21B3 " + f.note : "");
+      return "#" + f.id + " " + FB_KINDS[f.kind] + " " + when + " " + f.name + (f.status !== "open" ? " \xB7 " + FB_STATUS[f.status] : "") + ": " + text + (f.why ? " (why: " + f.why + ")" : "") + (full && f.note ? "\n   \u21B3 " + f.note : "");
     }
     function fbSubmit(cmd, sender, rest, R) {
       const list = fbLedger(), kind = cmd === "bug" ? "bug" : cmd === "suggest" || cmd === "idea" ? "idea" : "feedback";
@@ -10714,6 +10759,7 @@
       return w || (onMap(mn) ? "on the farm" : "away");
     }
     function feedbackCommand(cmd, sender, args, rest, R) {
+      if (cmd === "meh" || cmd === "more") return lineVote(cmd, sender, rest, R);
       if (cmd !== "feedback") return fbSubmit(cmd, sender, rest, R);
       const sub = String(args[0] || "").toLowerCase(), list = fbLedger();
       if (sub === "mine") {
@@ -10725,8 +10771,8 @@
       if (!tools || !isProprietor(sender)) return fbSubmit(cmd, sender, rest, R);
       if (sub === "list") {
         const which = String(args[1] || "open").toLowerCase();
-        const kind = { ideas: "idea", idea: "idea", bugs: "bug", bug: "bug", feedback: "feedback" }[which];
-        const rows = list.filter((f2) => kind ? f2.kind === kind && f2.status === "open" : which === "all" ? true : f2.status === "open");
+        const kind = { ideas: "idea", idea: "idea", bugs: "bug", bug: "bug", feedback: "feedback", meh: "meh", more: "more" }[which];
+        const rows = list.filter((f2) => which === "lines" ? (f2.kind === "meh" || f2.kind === "more") && f2.status === "open" : kind ? f2.kind === kind && f2.status === "open" : which === "all" ? true : f2.status === "open");
         R(rows.length ? "\u{1F4EC} SUGGESTION BOX \xB7 " + (which === "all" ? "everything" : kind ? which + ", open" : "open") + " (" + rows.length + ")\n" + rows.slice(-30).map((f2) => fbLine(f2)).join("\n") + "\n?feedback <n> reads one \xB7 ?feedback done|later|no <n> [note] \xB7 ?feedback del <n>" : "\u{1F4EC} Nothin' " + (which === "all" ? "" : "open ") + "in the suggestion box, sugar.");
         return;
       }
@@ -10763,6 +10809,61 @@
         tell(f.mn, msg + (note ? " They said: " + note : ""));
       }
       R("\u{1F4EC} #" + id + " is " + FB_STATUS[f.status] + (f.status !== "open" ? ", and " + f.name + " has been told" : "") + ".");
+    }
+    const TAIL_KINDS = [
+      [/pony|horse|mare|stallion|equine/i, "pony"],
+      [/cow|bull|calf|heifer/i, "cow"],
+      [/pig|piggy|sow|boar/i, "curly pig"],
+      [/fox|vulpine/i, "fox"],
+      [/wolf/i, "wolf"],
+      [/puppy|dog|pup|canine/i, "puppy"],
+      [/kitten|kitty|cat|feline|neko/i, "kitty"],
+      [/bunny|rabbit|bun/i, "bunny"],
+      [/mouse|rat\b/i, "mouse"],
+      [/raccoon/i, "raccoon"],
+      [/dragon|lizard|draconic/i, "dragon"],
+      [/demon|devil|succubus/i, "devil"]
+    ];
+    function tailOf(mn) {
+      const C = charFor(mn);
+      if (!C || !Array.isArray(C.Appearance)) return null;
+      const items = C.Appearance.filter((x) => x && x.Asset && x.Asset.Group);
+      const plug = items.find((x) => x.Asset.Group.Name === "ItemButt" && /tail/i.test(x.Asset.Name));
+      const strap = items.find((x) => x.Asset.Group.Name === "TailStraps");
+      const it = plug || strap;
+      if (!it) return null;
+      const text = [it.Asset.Name, it.Craft && it.Craft.Name, it.Craft && it.Craft.Description].filter(Boolean).join(" ");
+      const kind = (TAIL_KINDS.find(([re]) => re.test(text)) || [])[1] || "";
+      return { kind, plug: !!plug, name: it.Craft && it.Craft.Name || it.Asset.Name };
+    }
+    const TAIL_BITS = {
+      // %n = them, %u = whoever's at them, %t = "pony tail", "cow tail"…
+      lift: [
+        "%u lifts %n's %t out of the way and holds it up like a handle.",
+        "%u wraps %n's %t around one fist and pulls it tight.",
+        "%n's %t gets shoved aside, then grabbed and yanked to arch their back.",
+        "%u pins %n's %t flat against their spine to keep them still."
+      ],
+      swish: [
+        "%n's %t swishes hard with every thrust.",
+        "%n's %t lashes back and forth, givin' away exactly how much they like it.",
+        "%n's %t curls up tight and quivers.",
+        "%n's %t flicks wildly as they're taken."
+      ],
+      plug: [
+        "The tail plug in %n's ass shifts with every thrust, the %t bobbin' along behind.",
+        "%u gives %n's %t a tug, and the plug pulls at their ass till they whimper.",
+        "%n's ass clenches around the tail plug, the %t twitchin' with it.",
+        "%u twists %n's %t, workin' the plug inside them while they're used."
+      ],
+      milk: ["%n's %t swishes lazily while the cups pull.", "Every long draw makes %n's %t twitch.", "%n's %t flicks at nothin', the way a contented dairy animal's does."]
+    };
+    function tailBit(mn, hole, by, mood) {
+      const t = tailOf(mn);
+      if (!t) return "";
+      const pool = mood === "milk" ? TAIL_BITS.milk : t.plug ? TAIL_BITS.plug.concat(TAIL_BITS.swish) : hole === "mouth" ? TAIL_BITS.swish : TAIL_BITS.lift.concat(TAIL_BITS.swish);
+      const line = pickFresh("tail:" + mn, pool);
+      return line.replace(/%n/g, plainName(mn)).replace(/%u/g, by ? typeof by === "string" ? by : plainName(by) : "somebody").replace(/%t/g, (t.kind ? t.kind + " " : "") + "tail");
     }
     function clockedIn(mn) {
       const r = rec(mn);
@@ -10841,6 +10942,7 @@ Well hey there, %name%! I'm the gal behind the desk. \u{1F495}
 \u{1F4A1} THE SUGGESTION BOX
   ?suggest <an idea> \xB7 ?bug <what went wrong> \xB7 ?feedback <anything>
   ?feedback mine \xB7 what you've sent, and what came of it
+  ?meh \xB7 the last farm line you got was off \xB7 ?more \xB7 loved it
 
 \u{1F4DA} GUIDES \xB7 say ?help and a topic, like ?help breeding
   Gettin' started
@@ -12232,7 +12334,9 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
       "feedback",
       "suggest",
       "idea",
-      "bug"
+      "bug",
+      "meh",
+      "more"
     ];
     const STAFF_CMDS = [
       "queue",
@@ -12324,6 +12428,8 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
       "suggest",
       "idea",
       "bug",
+      "meh",
+      "more",
       "record",
       "keys",
       "find",
@@ -14551,6 +14657,8 @@ Welcome to B&B Farm, hon. \u{1F33E}`
         case "suggest":
         case "idea":
         case "bug":
+        case "meh":
+        case "more":
           feedbackCommand(cmd, sender, args, rest, R);
           break;
         // the suggestion box (10q)

@@ -108,6 +108,9 @@
 
     // "*?rules": the emote star typed in front of a command (live, Oct 7: answered "I don't know ?*?rules")
     if (/^\*+\s*[?!.\-]/.test(text)) text = text.replace(/^\*+\s*/, "");
+    // "(?contract show Nikto)", "(help claiming)": the game's out-of-character brackets around the whole thing
+    // (live, Oct 8: answered "I don't know ?[?contract")
+    { const m = text.match(/^\(\s*(.*?)\s*\)?$/); if (m && m[1]) text = m[1]; }
     if (CFG.PREFIXES.includes(text[0])){
       text = text.slice(1).trim();
       if (!text) return null;

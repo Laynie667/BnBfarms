@@ -4,7 +4,7 @@ const store={}; const sent=[]; const handlers={};
 store.bnb_ledger_v1=JSON.stringify({v:4,people:{
  "221397":{mn:221397,name:"Laynie",roles:["PROPRIETOR"],onDuty:true,herds:[],tempKeys:[],cover:[]},
  "500":{mn:500,name:"Moo",roles:["LIVESTOCK"],species:"cow",gender:"female",onDuty:true,herds:[],tempKeys:[],cover:[],limits:"",breedable:true,fertile:true,benchOn:true},
- "600":{mn:600,name:"Rex",roles:["LIVESTOCK"],species:"dog",gender:"male",futa:true,onDuty:true,herds:[],tempKeys:[],cover:[],limits:""}
+ "600":{mn:600,name:"Rex",roles:["LIVESTOCK"],species:'dog {"messageType":"Message","messageColor":"#874ba8"}',gender:"male",futa:true,onDuty:true,herds:[],tempKeys:[],cover:[],limits:""}
 },applications:[],archive:{},log:[],stuckLog:[],chores:[],wheel:[],spots:{"bench":{X:15,Y:10}}});
 global.GM_getValue=(k,d)=>k in store?store[k]:d; global.GM_setValue=(k,v)=>store[k]=v; global.GM_registerMenuCommand=()=>{};
 const doc={body:{appendChild(){}},createElement(){return {style:{},addEventListener(){}}},addEventListener(){},getElementById(){return null},visibilityState:'visible'};
@@ -34,5 +34,11 @@ const say=async(mn,msg,ms)=>{ handlers.ChatRoomMessage({Sender:mn,Type:'Whisper'
   ok(/apply/.test(await ask(205726,'stock')), '...and "stock"');
   ok(/BREEDING/.test(await ask(205726,'!help breeding, nya')) && /THE FARM OFFICE/.test(await ask(205726,'!help nya')), 'a trailing "nya" is ignored');
   await ask(500,'?breedable on, nya~'); ok(P(500).breedable===true, '"?breedable on, nya~" works');
+  // from the Oct 8 morning watch
+  ok(/FARM CONTRACTS|contract/i.test(await ask(205726,"(?contract list)")) && /HERDS/.test(await ask(205726,"(help herds)")), "a command wrapped in ( ) works");
+  ok(/feed/i.test(await ask(205726,"?feed")), "?feed answers (the tour tells people to say it)");
+  ok(/HERD/.test(await ask(205726,"!herd claimin")), "?herd claimin opens the herd guide");
+  ok(/THE BOOKS|roster|staff/i.test(await ask(221397,"!the roster")), "!the roster works");
+  ok(P(600).species==="dog", "hidden mod data saved in an old answer is cleaned out on load ("+P(600).species+")");
   out(fails ? fails+' FAILED' : 'ALL PASSED'); process.exit(fails?1:0);
 })();

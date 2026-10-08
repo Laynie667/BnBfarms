@@ -30,6 +30,15 @@
     if (L.notice === undefined) L.notice = null;
     if (!L.life) L.life = { feedingOn:true, curfewOn:true };
     for (const r of Object.values(L.people||{})) if (r && r.species === "kitt") r.species = "kitty";   // the short key, written out
+    // hidden mod data that got saved inside answers before beeps were cleaned (live, Oct 8: ?roster showed
+    // "cow {"messagetype":"message",...}" for two people): taken out of every saved word, wherever it is
+    { const JUNK = /[\s​-‏-]*\{[^{}]*"(messageType|messageColor|bceMessageType)"[^{}]*\}/gi;
+      const clean = (o, depth) => { if (!o || typeof o !== "object" || depth > 4) return;
+        for (const k of Object.keys(o)){ const v = o[k];
+          if (typeof v === "string" && JUNK.test(v)){ JUNK.lastIndex = 0; o[k] = v.replace(JUNK, "").trim(); }
+          else if (v && typeof v === "object") clean(v, depth + 1); JUNK.lastIndex = 0; } };
+      for (const r of Object.values(L.people||{})) clean(r, 0);
+      for (const a of (L.applications||[])) clean(a, 0); }
     if (!Array.isArray(L.chores)) L.chores = CFG.CHORES.map(text => ({ text, by:0 }));
     if (!Array.isArray(L.wheel)) L.wheel = [];
     // old-style zones (before the A/B corner zones) are cleared; the new ones are kept

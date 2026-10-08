@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.17.3
+// @version      0.17.4
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -1827,7 +1827,7 @@
   ];
 
   // bot/src/version.js
-  var VERSION = "0.17.3";
+  var VERSION = "0.17.4";
 
   // bot-parts:farmhand-bot-parts
   (function() {
@@ -2645,6 +2645,22 @@
       if (L.notice === void 0) L.notice = null;
       if (!L.life) L.life = { feedingOn: true, curfewOn: true };
       for (const r of Object.values(L.people || {})) if (r && r.species === "kitt") r.species = "kitty";
+      {
+        const JUNK = /[\s​-‏-]*\{[^{}]*"(messageType|messageColor|bceMessageType)"[^{}]*\}/gi;
+        const clean = (o, depth) => {
+          if (!o || typeof o !== "object" || depth > 4) return;
+          for (const k of Object.keys(o)) {
+            const v = o[k];
+            if (typeof v === "string" && JUNK.test(v)) {
+              JUNK.lastIndex = 0;
+              o[k] = v.replace(JUNK, "").trim();
+            } else if (v && typeof v === "object") clean(v, depth + 1);
+            JUNK.lastIndex = 0;
+          }
+        };
+        for (const r of Object.values(L.people || {})) clean(r, 0);
+        for (const a of L.applications || []) clean(a, 0);
+      }
       if (!Array.isArray(L.chores)) L.chores = CFG.CHORES.map((text) => ({ text, by: 0 }));
       if (!Array.isArray(L.wheel)) L.wheel = [];
       if (L.zones && (typeof L.zones !== "object" || Object.values(L.zones).some((z) => !z || typeof z !== "object" || !("group" in z)))) delete L.zones;
@@ -12235,6 +12251,10 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
         }
       }
       if (/^\*+\s*[?!.\-]/.test(text)) text = text.replace(/^\*+\s*/, "");
+      {
+        const m = text.match(/^\(\s*(.*?)\s*\)?$/);
+        if (m && m[1]) text = m[1];
+      }
       if (CFG.PREFIXES.includes(text[0])) {
         text = text.slice(1).trim();
         if (!text) return null;
@@ -12661,6 +12681,11 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
         rest = args.join(" ");
       }
       if (cmd === "me" && !args.length) cmd = "record";
+      if (cmd === "feed" || cmd === "food") cmd = "feeding";
+      if (cmd === "the" && args.length) {
+        cmd = String(args.shift()).toLowerCase();
+        rest = args.join(" ");
+      }
       let addonCmd = ADDON_CMDS.get(cmd) || null;
       if (addonCmd && !addonVisible(addonCmd.addon, sender)) addonCmd = null;
       if (!PUBLIC_CMDS.includes(cmd) && !STAFF_CMDS.includes(cmd) && !addonCmd) {
@@ -13876,6 +13901,10 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
         }
         case "herd": {
           const named = args[0] ? resolveTarget(args[0]) : null;
+          if (!named && args[0] && /^(claim\w*|help|how|guide|rules|join|keep\w*|leader\w*|release\w*)'?$/i.test(args[0])) {
+            R(helpFor(sender, isStaff(sender) ? "herd" : "herds"));
+            break;
+          }
           const t = named || sender;
           const spq = (named ? args.slice(1) : args).join(" ").toLowerCase().trim();
           const mine = herdMembers(t).filter((r) => !spq || (r.species || "").toLowerCase().includes(spq));

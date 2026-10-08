@@ -86,7 +86,9 @@
       while (args.length && NOISE.test(args[args.length - 1]) && !(() => { try { const m = resolveTarget(args[args.length - 1].replace(/[~!.,]+$/, "")); state.ambiguous = null; return m; } catch(e){ return null; } })()) args.pop();
       if (args.length) args[args.length - 1] = args[args.length - 1].replace(/[,~]+$/, "");
       args = args.filter(a => a !== ""); rest = args.join(" "); }
-    if (cmd === "me" && !args.length) cmd = "record";   // live, Oct 7: "?me" got "I don't know ?me"
+    if (cmd === "me" && !args.length) cmd = "record";
+    if (cmd === "feed" || cmd === "food") cmd = "feeding";   // live, Oct 8: the tour says "?feed i think?", and ?feed got silence
+    if (cmd === "the" && args.length){ cmd = String(args.shift()).toLowerCase(); rest = args.join(" "); }   // "!the roster"   // live, Oct 7: "?me" got "I don't know ?me"
     let addonCmd = ADDON_CMDS.get(cmd) || null;   // a command from an add-on script (10f-addons.js)
     if (addonCmd && !addonVisible(addonCmd.addon, sender)) addonCmd = null;   // somebody else's private add-on: as if it isn't there
     if (!PUBLIC_CMDS.includes(cmd) && !STAFF_CMDS.includes(cmd) && !addonCmd){
@@ -897,6 +899,9 @@
       case "herd": {
         // ?herd · ?herd <who> · ?herd <who> <species> · ?herd <species> (your own)
         const named = args[0] ? resolveTarget(args[0]) : null;
+        // "?herd claimin'", "?herd help", "?herd how": a question about herds, not a herd. The guide answers it
+        // (live, Oct 8: "!herd claimin" was answered "ጋልሃ has no claimin")
+        if (!named && args[0] && /^(claim\w*|help|how|guide|rules|join|keep\w*|leader\w*|release\w*)'?$/i.test(args[0])){ R(helpFor(sender, isStaff(sender) ? "herd" : "herds")); break; }
         const t = named || sender;
         const spq = (named ? args.slice(1) : args).join(" ").toLowerCase().trim();
         const mine = herdMembers(t).filter(r => !spq || (r.species||"").toLowerCase().includes(spq));

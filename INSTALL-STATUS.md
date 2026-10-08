@@ -5,7 +5,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 | Script | File in `dist/` | Where it runs | Current |
 |---|---|---|---|
-| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.17.3** |
+| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.17.4** |
 | Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.5.4** |
 | Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.1.0** |
 | Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **1.0.3** |
@@ -21,6 +21,8 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 - Running the watcher on more than one game at once (the bot, yours, a tester's) lets Claude line them up into one timeline.
 
 ## Latest changes (newest first)
+
+- **Bot 0.17.4** (from the Oct 8 morning watch, 10:39 to 11:39): `?feed` answers (the tour tells people to say it, and two people got silence). A command wrapped in the game's ( ) works: `(?contract show Nikto)` was "I don't know ?[?contract". `?herd claimin`, `?herd help` open the herd guide (it said "has no claimin"). `!the roster` works. Hidden mod data saved inside two people's old answers (Himari's and Hound's species showed `{"messagetype":"message"...}` on `?roster`) is cleaned out of every saved record on start.
 
 - **Bot 0.17.3** (from the Oct 7 night watch, 8:47 to 10:47 pm): somebody not on the books who says `register`, `?register`, `Register stock` or `stock` is pointed at `?apply` every time (Niuky got "just for farm staff", then silence). An emote star in front of a command works (`*?rules` was answered "I don't know ?*?rules"). An animal noise on the end is ignored: `!help nya` (was "no guide called 'nya'"), `?breedable on, nya~`, `?stats moo`; free-text commands like `?feedback` and `?jot` keep every word.
 

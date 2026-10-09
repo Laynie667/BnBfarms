@@ -77,7 +77,7 @@ function companion(mn) {
   const d = D(), cards = [], pen = d.pens[mn];
   cards.push({ title: "Pens", text: pen ? "You're penned in " + pen.zone + "." : undefined,
     toggles: [{ label: "Fence me in", desc: "If staff pen you, wandering out tugs you back (and earns a naughty mark).", on: !!d.fence[mn], cmd: "fence " + (d.fence[mn] ? "off" : "on") }] });
-  if (api.isStaff(mn)) cards.push({ title: "Heat map", text: heatText(), input: { placeholder: "Bessie barn", label: "Pen (who, zone)", cmd: "pen" } });
+  if (api.isStaff(mn)) cards.push({ staff: true, title: "Heat map", text: heatText(), input: { placeholder: "Bessie barn", label: "Pen (who, zone)", cmd: "pen" } });
   return { cards };
 }
 

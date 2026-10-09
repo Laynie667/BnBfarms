@@ -41,7 +41,7 @@ const beepsTo=(k,mn)=>sent.slice(k).filter(([e,d])=>e==='AccountBeep'&&d.MemberN
   p.preg={since:now-5*86400000*0.5, due:now+5*86400000*0.5, sires:[600], count:2, warned:false};
   k=sent.length; W.__addons('tick'); await drain();
   ok(d().preg['500'].stage==='showing', "half way along is the showin' stage");
-  ok(sent.slice(k).some(([e,x])=>x&&/round out/.test(String(x.Content))), 'a stage line goes out');
+  ok(sent.slice(k).some(([e,x])=>x&&/round out|showin|curve|belly/.test(String(x.Content))), 'a stage line goes out');
   const st=W.__stateFor(500).mods.breeding.cards[0];
   ok(st.title==="Expectin'" && st.lines.some(l=>l[0]==='Belly size' && l[1]==='3 of 5'), 'the Companion shows belly size 3 of 5');
   // heavy: kicks for people nearby

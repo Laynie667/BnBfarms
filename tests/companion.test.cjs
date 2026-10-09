@@ -318,6 +318,12 @@ const STATE = { name: "Laynie", onBooks: true, roles: ["PROPRIETOR", "LIVESTOCK"
   bot({ type: "mark", dress: true }); await wait(50);
   out("15 dressed again ->", (loaded || []).some((b) => b.Group === "Cloth" && b.Name === "Shirt"));
   bot({ type: "mark", wash: true }); await wait(50);
+  // 16. staff cards from add-ons only on the Staff panel's Farm extras
+  bot({ type: "state", state: Object.assign({}, STATE, { mods: { x: { label: "Test add-on", cards: [{ title: "Staff thing", staff: true, text: "staff only bits" }, { title: "Mine", text: "for everybody" }] } } }) });
+  click("Livestock"); click("Farm extras");
+  out("16 the Livestock panel shows add-on cards but not staff ones ->", /for everybody/.test(text()), !/staff only bits/.test(text()));
+  click("Staff"); click("Farm extras");
+  out("16 the Staff panel shows the staff ones ->", /staff only bits/.test(text()));
   out("15 ?wash takes the splatters and writing off ->", !(loaded || []).some((b) => b.Name === "Splatters" || b.Name === "BodyWritings"), (loaded || []).some((b) => b.Group === "HairFront"));
   process.exit(0);
 })();

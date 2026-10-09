@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm add-on: Map tools
 // @namespace    bnbfarm
-// @version      1.0.2
+// @version      1.0.3
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-map-tools.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-map-tools.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -119,7 +119,7 @@
       text: pen ? "You're penned in " + pen.zone + "." : void 0,
       toggles: [{ label: "Fence me in", desc: "If staff pen you, wandering out tugs you back (and earns a naughty mark).", on: !!d.fence[mn], cmd: "fence " + (d.fence[mn] ? "off" : "on") }]
     });
-    if (api.isStaff(mn)) cards.push({ title: "Heat map", text: heatText(), input: { placeholder: "Bessie barn", label: "Pen (who, zone)", cmd: "pen" } });
+    if (api.isStaff(mn)) cards.push({ staff: true, title: "Heat map", text: heatText(), input: { placeholder: "Bessie barn", label: "Pen (who, zone)", cmd: "pen" } });
     return { cards };
   }
   connect({

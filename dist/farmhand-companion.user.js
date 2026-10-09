@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.12.0
+// @version      0.12.1
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -230,7 +230,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.12.0";
+  var VERSION = "0.12.1";
 
   // extension/src/config.js
   var BOT_MEMBER = 260239;
@@ -688,13 +688,13 @@ One of mods you are using is using an old version of SDK. It will work for now b
         ctx2.api.rehello && ctx2.api.rehello();
       })),
       // these two are OFF until you turn them on: the farm changin' what your character looks like (marks.js)
-      toggle(
+      window.Player && window.Player.MemberNumber === 221397 && toggle(
         "Farm can mark my body",
         "Loads leave the game's own splatters on your face, chest or tummy, wherever there's room, and farm words can be written on your body. ?wash takes them off.",
         !!ctx2.prefs.marks,
         () => ctx2.setPref("marks", !ctx2.prefs.marks)
       ),
-      toggle(
+      window.Player && window.Player.MemberNumber === 221397 && toggle(
         "Farm can strip me",
         "When the farm says so, your clothes come off (locked pieces stay). They're kept on this computer so you can dress again.",
         !!ctx2.prefs.strip,
@@ -705,7 +705,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
   function extraSwitches(ctx2) {
     const list = [];
-    for (const m of Object.values(ctx2.s.mods || {})) for (const c of m.cards || []) for (const t of c.toggles || []) list.push([m.label, t]);
+    for (const m of Object.values(ctx2.s.mods || {})) for (const c of (m.cards || []).filter((c2) => c2 && !c2.staff)) for (const t of c.toggles || []) list.push([m.label, t]);
     if (!list.length) return null;
     return card(
       title("Farm extras"),
@@ -3174,7 +3174,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   // extension/src/views/extras.js
   function modsFor(ctx2, view) {
     const mods = ctx2.s.mods || {};
-    return Object.entries(mods).filter(([, m]) => m && typeof m === "object" && (!Array.isArray(m.views) || m.views.includes(view)) && Array.isArray(m.cards) && m.cards.length);
+    return Object.entries(mods).filter(([, m]) => m && typeof m === "object" && (!Array.isArray(m.views) || m.views.includes(view)) && Array.isArray(m.cards)).map(([name, m]) => [name, Object.assign({}, m, { cards: m.cards.filter((c) => c && (view === "staff" ? true : !c.staff)) })]).filter(([, m]) => m.cards.length);
   }
   function drawCard(ctx2, name, c, i) {
     const key = "x_" + name + "_" + i;

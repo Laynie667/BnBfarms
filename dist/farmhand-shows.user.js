@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm add-on: Shows
 // @namespace    bnbfarm
-// @version      1.0.3
+// @version      1.0.4
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-shows.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-shows.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -283,6 +283,7 @@
       buttons: sh && !sh.entrants[mn] ? [{ label: "Enter the show", cmd: "show enter", accent: true }] : [{ label: "Show status", cmd: "show" }]
     });
     if (api.isStaff(mn)) cards.push({
+      staff: true,
       title: "Run a show",
       buttons: sh ? [{ label: "Close and award", cmd: "show close", accent: true }].concat(sh.event === "race" && !sh.start ? [{ label: "Start the race", cmd: "show go" }] : []) : Object.keys(EVENTS).map((e) => ({ label: EVENTS[e], cmd: "show open " + e })),
       input: sh ? sh.event === "obedience" ? { placeholder: "Bessie sit", label: "Cue", cmd: "show cue" } : sh.event === "race" ? void 0 : { placeholder: "Bessie 8", label: "Score", cmd: "show score" } : void 0

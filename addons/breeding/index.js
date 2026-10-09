@@ -20,6 +20,7 @@
      night the most-bred dam is crowned (10 ribbons) along with the busiest stud (5 ribbons).
 */
 import { connect, pick, between, fill } from "../_lib/connect.js";
+import { MORE } from "./more-lines.js";
 
 let api = null;
 function D() {
@@ -92,7 +93,7 @@ function tick() {
     if (st.key !== x.stage && STAGE_LINES[st.key]) {
       x.stage = st.key;
       api.notice(mn, fill(STAGE_LINES[st.key].you, { name: api.name(mn) }));
-      if (api.onMap(mn)) api.emote("🤰 " + fill(STAGE_LINES[st.key].room, { name: api.name(mn) }), mn);
+      if (api.onMap(mn)) api.emote("🤰 " + fill(pick([STAGE_LINES[st.key].room].concat((MORE.STAGE_ROOM || {})[st.key] || [])), { name: api.name(mn) }), mn);
       api.save();
     }
     if ((st.key === "showing" || st.key === "heavy") && now >= (x.craveAt || 0)) {
@@ -199,6 +200,9 @@ const BRED_MARKS = {
   10: ["Ten! The barn door's runnin' out of room for %name%'s chalk marks. That's a real breeder.",
     "Ten loads this season. The farm girl just shakes her head and hangs a whole bunch of ribbons on %name%'s gate."],
 };
+// more lines for the pools above (more-lines.js)
+CRAVINGS.push(...MORE.CRAVINGS); KICKS.push(...MORE.KICKS); MIDWIFE.push(...MORE.MIDWIFE); RUTTY.push(...MORE.RUTTY);
+for (const k of Object.keys(MORE.BRED_MARKS)) BRED_MARKS[k].push(...MORE.BRED_MARKS[k]);
 function onBred(stud, dam, hole, mlIn, took) {
   if (hole !== "vulva" || !isBreedWeek() || !D().optIn[dam] || !(mlIn > 0)) return;
   const w = season();
@@ -333,7 +337,7 @@ function companion(mn) {
     chips: isBreedWeek() ? [{ text: "on now", kind: "alert" }] : undefined, buttons: [{ label: "My pedigree", cmd: "pedigree" }, { label: "Stud book", cmd: "season book" }] });
   const mine = d.bookings.filter((b) => b.stud === mn || b.dam === mn);
   if (mine.length) cards.push({ title: "My bookings", lines: mine.map((b) => ["#" + b.id, api.name(b.stud) + " × " + api.name(b.dam)]) });
-  if (api.isStaff(mn)) cards.push({ title: "Stud bookings", text: bookingsText(), input: { placeholder: "Rex Bessie", label: "Book (stud, who)", cmd: "book" } });
+  if (api.isStaff(mn)) cards.push({ staff: true, title: "Stud bookings", text: bookingsText(), input: { placeholder: "Rex Bessie", label: "Book (stud, who)", cmd: "book" } });
   return { cards };
 }
 

@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm add-on: Breeding
 // @namespace    bnbfarm
-// @version      1.1.0
+// @version      1.1.1
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-breeding.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-breeding.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -52,6 +52,58 @@
   var pick = (list) => list[Math.floor(Math.random() * list.length)];
   var between = (lo, hi) => lo + Math.floor(Math.random() * (hi - lo + 1));
   var fill = (text, vars) => String(text).replace(/%(\w+)%/g, (m, k) => vars[k] !== void 0 ? vars[k] : m);
+
+  // addons/breeding/more-lines.js
+  var MORE = {
+    CRAVINGS: [
+      "You'd kill for a mouthful of somebody's cum right now, %name%. Warm, salty, straight from the source.",
+      "Your belly's growlin' and your pussy's achin' and you honestly can't tell which hunger's louder, %name%.",
+      "You want your swollen breasts sucked, %name%. Hard. You want the pressure gone and a mouth on you.",
+      "Pickles and cream. Together. Don't ask, %name%. Just go find some.",
+      "You're cravin' to be bred again, %name%, even though you're already full of a litter. Greedy thing.",
+      "Somethin' about the smell of hay has you droolin', %name%. Pregnant brain is a hell of a thing.",
+      "You keep thinkin' about bein' milked, %name%. Long and slow, till you're soft and empty."
+    ],
+    KICKS: [
+      "%name%'s round belly ripples, then bulges hard on one side as somethin' inside stretches out.",
+      "%name% gasps and grabs a rail. That one landed somewhere low and sensitive, and their thighs press together.",
+      "Two little kicks at once on %name%'s tight belly, like the litter's arguin' in there.",
+      "%name%'s belly button pops out a little further as the litter shoves for room.",
+      "A kick hard enough to make %name% leak a spurt of milk from both nipples. They flush bright pink.",
+      "%name% rubs slow circles on their belly and murmurs somethin' soft. The kickin' only gets wilder."
+    ],
+    MIDWIFE: [
+      `%by% kneels between %name%'s spread thighs, slick to the wrists, coaxin' and coaxin'. "That's it. Push for me, mama."`,
+      "%by% strokes %name%'s swollen breasts to bring the milk down and get things movin', murmurin' low and steady.",
+      "%by% holds %name%'s hand and lets them squeeze as hard as they need, never lookin' away."
+    ],
+    RUTTY: [
+      "%name% catches the scent of heat and their cock stiffens so fast it aches. They take a step toward it without meanin' to.",
+      "Somewhere close by, somebody's in heat. %name% can smell it, taste it, and their balls draw up tight.",
+      "%name% groans low in their chest. Every breath tastes like a fertile pussy and they're leakin' precum already.",
+      "%name%'s cock throbs against their belly. They'd mount the first thing that smelled like that.",
+      "%name%'s nostrils flare and their hips give a helpless little thrust at the air. Rut's got 'em."
+    ],
+    STAGE_ROOM: {
+      showing: [
+        "%name%'s belly has a soft, proud curve to it now. Bred, and anybody can see it.",
+        "There's no hidin' it anymore: %name% is showin', belly rounded where the litter's takin' root."
+      ],
+      heavy: [
+        "%name% waddles now, belly huge and tight and heavy, breasts swollen and leakin' for the litter to come.",
+        "%name%'s belly's so big it sways when they walk, skin shiny-taut, and milk beads at both nipples."
+      ],
+      nesting: [
+        "%name% keeps draggin' straw into a corner and lowerin' themselves into it, pantin', belly tight and low.",
+        "%name% can't settle. They pace, nest, pace again, belly hangin' low, every few minutes a groan."
+      ]
+    },
+    BRED_MARKS: {
+      3: ["Three breedin's in and %name%'s still bein' passed around the stand. The farm girl marks it on the board."],
+      5: ["Five. %name%'s pussy hasn't been empty all season, and it shows."],
+      10: ["Ten breedin's. %name% is the farm's busiest broodmare this season, and the barn knows it."]
+    }
+  };
 
   // addons/breeding/index.js
   var api = null;
@@ -137,7 +189,7 @@
       if (st.key !== x.stage && STAGE_LINES[st.key]) {
         x.stage = st.key;
         api.notice(mn, fill(STAGE_LINES[st.key].you, { name: api.name(mn) }));
-        if (api.onMap(mn)) api.emote("\u{1F930} " + fill(STAGE_LINES[st.key].room, { name: api.name(mn) }), mn);
+        if (api.onMap(mn)) api.emote("\u{1F930} " + fill(pick([STAGE_LINES[st.key].room].concat((MORE.STAGE_ROOM || {})[st.key] || [])), { name: api.name(mn) }), mn);
         api.save();
       }
       if ((st.key === "showing" || st.key === "heavy") && now >= (x.craveAt || 0)) {
@@ -253,6 +305,11 @@
       "Ten loads this season. The farm girl just shakes her head and hangs a whole bunch of ribbons on %name%'s gate."
     ]
   };
+  CRAVINGS.push(...MORE.CRAVINGS);
+  KICKS.push(...MORE.KICKS);
+  MIDWIFE.push(...MORE.MIDWIFE);
+  RUTTY.push(...MORE.RUTTY);
+  for (const k of Object.keys(MORE.BRED_MARKS)) BRED_MARKS[k].push(...MORE.BRED_MARKS[k]);
   function onBred(stud, dam, hole, mlIn, took) {
     if (hole !== "vulva" || !isBreedWeek() || !D().optIn[dam] || !(mlIn > 0)) return;
     const w = season();
@@ -396,7 +453,7 @@
     });
     const mine = d.bookings.filter((b) => b.stud === mn || b.dam === mn);
     if (mine.length) cards.push({ title: "My bookings", lines: mine.map((b) => ["#" + b.id, api.name(b.stud) + " \xD7 " + api.name(b.dam)]) });
-    if (api.isStaff(mn)) cards.push({ title: "Stud bookings", text: bookingsText(), input: { placeholder: "Rex Bessie", label: "Book (stud, who)", cmd: "book" } });
+    if (api.isStaff(mn)) cards.push({ staff: true, title: "Stud bookings", text: bookingsText(), input: { placeholder: "Rex Bessie", label: "Book (stud, who)", cmd: "book" } });
     return { cards };
   }
   connect({

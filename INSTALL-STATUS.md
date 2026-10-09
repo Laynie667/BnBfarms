@@ -6,12 +6,13 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 | Script | File in `dist/` | Where it runs | Current |
 |---|---|---|---|
 | Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.18.0** |
-| Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.5.5** |
-| Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.1.0** |
-| Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **1.0.3** |
-| Barn life, Dairy, Map tools, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.2** |
-| Shows | `farmhand-shows.user.js` | the bot's PC | **1.0.3** |
-| Farmhand Companion | `farmhand-companion.user.js` | each player | **0.12.0** |
+| Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.5.6** |
+| Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.1.1** |
+| Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **1.0.4** |
+| Barn life, Map tools, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.3** |
+| Dairy | `farmhand-dairy.user.js` | the bot's PC | **1.0.2** |
+| Shows | `farmhand-shows.user.js` | the bot's PC | **1.0.4** |
+| Farmhand Companion | `farmhand-companion.user.js` | each player | **0.12.1** |
 | Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.3** |
 
 ## Sending a watch report
@@ -21,6 +22,8 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 - Running the watcher on more than one game at once (the bot, yours, a tester's) lets Claude line them up into one timeline.
 
 ## Latest changes (newest first)
+
+- **Companion 0.12.1, Breeding 1.1.1, and every add-on with staff cards: the Livestock panel shows no staff things.** Add-on cards for staff (stud bookings, run a hypno session, the heat map and pens, run a show, write-ups, the stall board and punishments, the troughs and grooming) only show on the **Staff** panel's Farm extras now, never on the Livestock one, and their switches stay out of the Livestock Toggles. The two body switches (mark my body, strip me) only show in Laynie's Companion. Breeding has more cravings, kicks, midwife, rut and showin' lines.
 
 - **Bot 0.18.0, Companion 0.12.0, Glory stalls 1.5.5: marks on your body, potions that live, more bench lines, and the pin trap.**
   - **The pin trap** (Laynie, Oct 8): too full to move pinned her at the stocks, far from any stall, and a Heavy Udder Draught makes the stalls refuse you, so nothin' could ever empty her. Now a Heavy Udder Draught never pins (it aches), and no pin lasts more than 20 minutes: the farm girl kneels with a pail and milks you down where you stand, and you can move for an hour. The pin message says so, and that the safeword frees you.

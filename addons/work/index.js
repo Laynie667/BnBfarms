@@ -160,7 +160,7 @@ function companion(mn) {
   cards.push({ title: "Inspections", toggles: [{ label: "Take part in inspections", desc: "Warnings before one starts, and a share of the score.", on: !!d.optIn[mn], cmd: "insp " + (d.optIn[mn] ? "off" : "on") }],
     text: d.insp ? inspText() : undefined,
     buttons: (api.isHerdmaster(mn) || api.isProprietor(mn)) ? (d.insp ? [{ label: "Finish inspection", cmd: "insp end", accent: true }] : [{ label: "Start inspection (10 min)", cmd: "insp start" }]) : undefined });
-  if (api.isHerdmaster(mn) || api.isProprietor(mn)) cards.push({ title: "Write somebody up", input: { placeholder: "Bessie late for milking again", label: "Write up", cmd: "wu" },
+  if (api.isHerdmaster(mn) || api.isProprietor(mn)) cards.push({ staff: true, title: "Write somebody up", input: { placeholder: "Bessie late for milking again", label: "Write up", cmd: "wu" },
     note: "Only you and they can read it. Everybody else sees a count." });
   return { cards };
 }

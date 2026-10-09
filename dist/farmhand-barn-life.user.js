@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm add-on: Barn life
 // @namespace    bnbfarm
-// @version      1.0.2
+// @version      1.0.3
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-barn-life.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-barn-life.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -269,6 +269,7 @@
     if (api.isStaff(mn)) {
       const tr = Object.keys(api.spots()).filter((n) => n.startsWith("trough"));
       if (tr.length) cards.push({
+        staff: true,
         title: "Troughs",
         lines: tr.map((t) => [t, (d.troughs[t] === void 0 ? TROUGH_HELPINGS : d.troughs[t]) + " / " + TROUGH_HELPINGS]),
         input: { placeholder: "Bessie", label: "Groom (stand next to them)", cmd: "groom" },

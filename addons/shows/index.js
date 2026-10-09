@@ -215,7 +215,7 @@ function companion(mn) {
     text: sh ? "The " + EVENTS[sh.event] + " is on" + (sh.entrants[mn] ? ", and you're entered." : ".") : undefined,
     lines: rib.slice(-5).reverse().map((x) => [PLACES[x.place], EVENTS[x.event] + " · " + new Date(x.at).toLocaleDateString()]),
     buttons: sh && !sh.entrants[mn] ? [{ label: "Enter the show", cmd: "show enter", accent: true }] : [{ label: "Show status", cmd: "show" }] });
-  if (api.isStaff(mn)) cards.push({ title: "Run a show", buttons: sh ? [{ label: "Close and award", cmd: "show close", accent: true }].concat(sh.event === "race" && !sh.start ? [{ label: "Start the race", cmd: "show go" }] : [])
+  if (api.isStaff(mn)) cards.push({ staff: true, title: "Run a show", buttons: sh ? [{ label: "Close and award", cmd: "show close", accent: true }].concat(sh.event === "race" && !sh.start ? [{ label: "Start the race", cmd: "show go" }] : [])
       : Object.keys(EVENTS).map((e) => ({ label: EVENTS[e], cmd: "show open " + e })),
     input: sh ? (sh.event === "obedience" ? { placeholder: "Bessie sit", label: "Cue", cmd: "show cue" } : sh.event === "race" ? undefined : { placeholder: "Bessie 8", label: "Score", cmd: "show score" }) : undefined });
   return cards.length ? { cards } : null;

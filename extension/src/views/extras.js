@@ -6,10 +6,12 @@
 import { h, card, title, muted, btn, chip, bar, toggle } from "../dom.js";
 
 // add-ons that have somethin' for this panel (an add-on can say which panels with views: [...])
+// staff: true cards (bookings, punishments, write-ups, show controls…) only on the Staff panel, never the Livestock one
 function modsFor(ctx, view) {
   const mods = ctx.s.mods || {};
-  return Object.entries(mods).filter(([, m]) => m && typeof m === "object" &&
-    (!Array.isArray(m.views) || m.views.includes(view)) && Array.isArray(m.cards) && m.cards.length);
+  return Object.entries(mods).filter(([, m]) => m && typeof m === "object" && (!Array.isArray(m.views) || m.views.includes(view)) && Array.isArray(m.cards))
+    .map(([name, m]) => [name, Object.assign({}, m, { cards: m.cards.filter((c) => c && (view === "staff" ? true : !c.staff)) })])
+    .filter(([, m]) => m.cards.length);
 }
 
 function drawCard(ctx, name, c, i) {

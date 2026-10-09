@@ -341,7 +341,7 @@ function companion(mn) {
     buttons: [{ label: "The board", cmd: "stalls" }],
   });
   if (api.isStaff(mn) && stallIds().length) {
-    cards.push({ title: "Stall board", text: board(true), input: { placeholder: "Bessie 30", label: "Punish (who, minutes)", cmd: "stall punish" },
+    cards.push({ staff: true, title: "Stall board", text: board(true), input: { placeholder: "Bessie 30", label: "Punish (who, minutes)", cmd: "stall punish" },
       buttons: [{ label: "Refresh", cmd: "stalls" }] });
   }
   return { cards };

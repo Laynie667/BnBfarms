@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm add-on: Work
 // @namespace    bnbfarm
-// @version      1.0.2
+// @version      1.0.3
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-work.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-work.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -206,6 +206,7 @@
       buttons: api.isHerdmaster(mn) || api.isProprietor(mn) ? d.insp ? [{ label: "Finish inspection", cmd: "insp end", accent: true }] : [{ label: "Start inspection (10 min)", cmd: "insp start" }] : void 0
     });
     if (api.isHerdmaster(mn) || api.isProprietor(mn)) cards.push({
+      staff: true,
       title: "Write somebody up",
       input: { placeholder: "Bessie late for milking again", label: "Write up", cmd: "wu" },
       note: "Only you and they can read it. Everybody else sees a count."

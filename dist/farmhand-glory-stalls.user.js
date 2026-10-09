@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm add-on: Glory stalls
 // @namespace    bnbfarm
-// @version      1.5.5
+// @version      1.5.6
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-glory-stalls.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-glory-stalls.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -1425,6 +1425,7 @@
     });
     if (api.isStaff(mn) && stallIds().length) {
       cards.push({
+        staff: true,
         title: "Stall board",
         text: board(true),
         input: { placeholder: "Bessie 30", label: "Punish (who, minutes)", cmd: "stall punish" },

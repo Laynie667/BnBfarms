@@ -212,7 +212,7 @@ function companion(mn) {
   }
   if (api.isStaff(mn)) {
     const tr = Object.keys(api.spots()).filter((n) => n.startsWith("trough"));
-    if (tr.length) cards.push({ title: "Troughs", lines: tr.map((t) => [t, (d.troughs[t] === undefined ? TROUGH_HELPINGS : d.troughs[t]) + " / " + TROUGH_HELPINGS]),
+    if (tr.length) cards.push({ staff: true, title: "Troughs", lines: tr.map((t) => [t, (d.troughs[t] === undefined ? TROUGH_HELPINGS : d.troughs[t]) + " / " + TROUGH_HELPINGS]),
       input: { placeholder: "Bessie", label: "Groom (stand next to them)", cmd: "groom" }, note: "Refill a trough with ?refill <trough> standin' next to it." });
   }
   return { cards };

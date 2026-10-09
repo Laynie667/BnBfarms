@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.11.3
+// @version      0.12.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -230,7 +230,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.11.3";
+  var VERSION = "0.12.0";
 
   // extension/src/config.js
   var BOT_MEMBER = 260239;
@@ -687,6 +687,19 @@ One of mods you are using is using an old version of SDK. It will work for now b
         ctx2.setPref(k, !ctx2.prefs[k]);
         ctx2.api.rehello && ctx2.api.rehello();
       })),
+      // these two are OFF until you turn them on: the farm changin' what your character looks like (marks.js)
+      toggle(
+        "Farm can mark my body",
+        "Loads leave the game's own splatters on your face, chest or tummy, wherever there's room, and farm words can be written on your body. ?wash takes them off.",
+        !!ctx2.prefs.marks,
+        () => ctx2.setPref("marks", !ctx2.prefs.marks)
+      ),
+      toggle(
+        "Farm can strip me",
+        "When the farm says so, your clothes come off (locked pieces stay). They're kept on this computer so you can dress again.",
+        !!ctx2.prefs.strip,
+        () => ctx2.setPref("strip", !ctx2.prefs.strip)
+      ),
       btn("Put the button and panel back (size and full screen too)", () => ctx2.resetPlaces && ctx2.resetPlaces())
     );
   }
@@ -3700,8 +3713,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
     if (Array.isArray(c.Effect)) c.Effect = c.Effect.filter((e) => e !== "Lock");
     return c;
   }
-  function commit(bundle) {
-    window.ServerAppearanceLoadFromBundle(P(), P().AssetFamily, bundle, P().MemberNumber);
+  function commit(bundle2) {
+    window.ServerAppearanceLoadFromBundle(P(), P().AssetFamily, bundle2, P().MemberNumber);
     if (typeof window.CharacterRefresh === "function") window.CharacterRefresh(P());
     window.ChatRoomCharacterUpdate(P());
   }
@@ -3789,6 +3802,135 @@ One of mods you are using is using an old version of SDK. It will work for now b
       return false;
     }
   };
+
+  // extension/src/marks.js
+  var KEY = "fhc-marks";
+  var STRIP_KEY = "fhc-strip-backup";
+  var SPLAT_GROUPS = ["Mask", "FaceMarkings", "BodyMarkings"];
+  var WRITE_GROUPS = ["BodyMarkings", "ClothAccessory"];
+  var AREAS2 = { forehead: ["a", "b", "c"], face: ["d", "e", "f"], chest: ["g", "h", "i", "j"], tummy: ["k", "l", "m", "n"] };
+  var P2 = () => window.Player;
+  var load = () => {
+    try {
+      return JSON.parse(window.localStorage.getItem(KEY)) || {};
+    } catch (e) {
+      return {};
+    }
+  };
+  var save = (v) => {
+    try {
+      window.localStorage.setItem(KEY, JSON.stringify(v));
+    } catch (e) {
+    }
+  };
+  var groupOf2 = (name) => typeof window.AssetGroupGet === "function" ? window.AssetGroupGet(P2().AssetFamily, name) : null;
+  var bundle = () => window.ServerAppearanceBundle(P2().Appearance);
+  var lockedGroups2 = () => new Set(P2().Appearance.filter((it) => it.Property && it.Property.LockedBy).map((it) => it.Asset.Group.Name));
+  function commit2(next) {
+    window.ServerAppearanceLoadFromBundle(P2(), P2().AssetFamily, next, P2().MemberNumber);
+    if (typeof window.CharacterRefresh === "function") window.CharacterRefresh(P2());
+    window.ChatRoomCharacterUpdate(P2());
+  }
+  var cleanText = (t) => String(t || "").replace(/[^A-Za-z0-9 !?.,'&#*+-]/g, "").slice(0, 20);
+  function markBody(m, prefs) {
+    if (!P2() || !Array.isArray(P2().Appearance) || typeof window.ServerAppearanceBundle !== "function") return { ok: false, why: "not in a room" };
+    const did = [];
+    if (m.wash) return washMarks();
+    if (!prefs.marks) return { ok: false, why: "off" };
+    let next = bundle(), mem = load();
+    const has = (g) => next.find((b) => b.Group === g);
+    if (Array.isArray(m.splat) && m.splat.length) {
+      let it = next.find((b) => b.Name === "Splatters" && SPLAT_GROUPS.includes(b.Group));
+      if (!it) {
+        const g = SPLAT_GROUPS.find((x) => !has(x) && groupOf2(x));
+        if (g) {
+          it = { Group: g, Name: "Splatters", Property: { TypeRecord: {} } };
+          next.push(it);
+          mem.splatGroup = g;
+        }
+      }
+      if (it) {
+        it.Property = Object.assign({}, it.Property || {});
+        const tr = it.Property.TypeRecord = Object.assign({}, it.Property.TypeRecord || {});
+        for (const area of m.splat) {
+          const want = (AREAS2[area] || []).filter((k2) => !tr[k2]);
+          const any = Object.values(AREAS2).flat().filter((k2) => !tr[k2]);
+          const k = (want.length ? want : any)[Math.floor(Math.random() * (want.length ? want : any).length)];
+          if (k) {
+            tr[k] = 1;
+            did.push(area);
+          }
+        }
+      }
+    }
+    if (m.write && cleanText(m.write.line)) {
+      let it = next.find((b) => b.Name === "BodyWritings" && WRITE_GROUPS.includes(b.Group));
+      if (!it) {
+        const g = WRITE_GROUPS.find((x) => !has(x) && groupOf2(x));
+        if (g) {
+          it = { Group: g, Name: "BodyWritings", Property: { Text: "", Text2: "", Text3: "", TypeRecord: { p: 4, s: 0, t: 1 } } };
+          next.push(it);
+          mem.writeGroup = g;
+        }
+      }
+      if (it) {
+        const pr = it.Property = Object.assign({ Text: "", Text2: "", Text3: "" }, it.Property || {});
+        pr.Text3 = pr.Text2 || "";
+        pr.Text2 = pr.Text || "";
+        pr.Text = cleanText(m.write.line).toUpperCase();
+        pr.TypeRecord = Object.assign({ p: 4, s: 0, t: 1 }, pr.TypeRecord || {}, m.write.pos !== void 0 ? { p: m.write.pos } : {}, m.write.style !== void 0 ? { s: m.write.style } : {}, { t: 1 });
+        did.push("writing");
+      }
+    }
+    if (!did.length) return { ok: false, why: "no room" };
+    save(mem);
+    commit2(next);
+    return { ok: true, did };
+  }
+  function washMarks() {
+    const mem = load(), stuck = lockedGroups2();
+    const next = bundle().filter((b) => stuck.has(b.Group) || !(b.Name === "Splatters" && SPLAT_GROUPS.includes(b.Group) || b.Name === "BodyWritings" && b.Group === mem.writeGroup));
+    save({});
+    commit2(next);
+    return { ok: true, did: ["wash"] };
+  }
+  function stripMe(prefs) {
+    if (!prefs.strip) return { ok: false, why: "off" };
+    const cur = bundle(), stuck = lockedGroups2();
+    if (!window.localStorage.getItem(STRIP_KEY)) {
+      try {
+        window.localStorage.setItem(STRIP_KEY, JSON.stringify({ at: Date.now(), bundle: cur }));
+      } catch (e) {
+      }
+    }
+    const mem = load();
+    const next = cur.filter((b) => {
+      const g = groupOf2(b.Group);
+      return !(g && g.Clothing) || stuck.has(b.Group) || b.Name === "BodyWritings" || b.Name === "Splatters";
+    });
+    if (next.length === cur.length) return { ok: false, why: "nothin' to take off" };
+    commit2(next);
+    return { ok: true, did: ["strip"] };
+  }
+  function dressMe() {
+    let bk = null;
+    try {
+      bk = JSON.parse(window.localStorage.getItem(STRIP_KEY));
+    } catch (e) {
+    }
+    if (!bk || !Array.isArray(bk.bundle)) return { ok: false, why: "no clothes kept" };
+    const next = bundle(), have = new Set(next.map((b) => b.Group));
+    for (const b of bk.bundle) {
+      const g = groupOf2(b.Group);
+      if (g && g.Clothing && !have.has(b.Group)) next.push(b);
+    }
+    commit2(next);
+    try {
+      window.localStorage.removeItem(STRIP_KEY);
+    } catch (e) {
+    }
+    return { ok: true, did: ["dress"] };
+  }
 
   // extension/src/cues.js
   var W = window;
@@ -4173,7 +4315,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var inCharacter = (s) => String(s).replace(/\(/g, "[").replace(/\)/g, "]");
   function relay(m) {
     const text = inCharacter(forChat(m.text || "")).slice(0, 900);
-    const P2 = window.Player || {}, names = [P2.Nickname, P2.Name].filter(Boolean).map((n) => String(n).toLowerCase());
+    const P3 = window.Player || {}, names = [P3.Nickname, P3.Name].filter(Boolean).map((n) => String(n).toLowerCase());
     const now = Date.now();
     st.relayed = (st.relayed || []).filter((t) => now - t < 6e4);
     const blocked = typeof window.ChatRoomOwnerPresenceRule === "function" && (() => {
@@ -4282,6 +4424,20 @@ One of mods you are using is using an old version of SDK. It will work for now b
         });
         toChat("\u{1F457} The farm's offerin' you your " + String(m.label || "outfit") + ". Yes or Not now in your \u{1F33E} panel.", "#c9a35b");
         break;
+      case "mark": {
+        let r = { ok: false };
+        try {
+          const prefs = st.panel.prefs;
+          if (m.wash) r = washMarks();
+          else if (m.strip) r = stripMe(prefs);
+          else if (m.dress) r = dressMe();
+          else r = markBody(m, prefs);
+        } catch (e) {
+          r = { ok: false, why: e.message };
+        }
+        toBot("markDone", { ok: !!r.ok, did: r.did || [], why: r.why || "" });
+        break;
+      }
       case "relay":
         relay(m);
         break;

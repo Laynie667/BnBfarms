@@ -126,6 +126,11 @@ export function panelPrefs(ctx) {
      ["noFeelings", "Private feelings", "Now and then, a line only you see about what you're feelin' (your gear, your arousal, how full you are)"],
      ["noMarkers", "Map markers (staff)", "Small badges over stock on your map: M needs milkin', H in heat, B expectin', X teats capped"]].map(([k, label, desc]) =>
       toggle(label, desc, !ctx.prefs[k], () => { ctx.setPref(k, !ctx.prefs[k]); ctx.api.rehello && ctx.api.rehello(); })),
+    // these two are OFF until you turn them on: the farm changin' what your character looks like (marks.js)
+    toggle("Farm can mark my body", "Loads leave the game's own splatters on your face, chest or tummy, wherever there's room, and farm words can be written on your body. ?wash takes them off.",
+      !!ctx.prefs.marks, () => ctx.setPref("marks", !ctx.prefs.marks)),
+    toggle("Farm can strip me", "When the farm says so, your clothes come off (locked pieces stay). They're kept on this computer so you can dress again.",
+      !!ctx.prefs.strip, () => ctx.setPref("strip", !ctx.prefs.strip)),
     btn("Put the button and panel back (size and full screen too)", () => ctx.resetPlaces && ctx.resetPlaces()));
 }
 // every switch the farm's add-ons offer (glory stalls, barn life, breeding week, fences…), in one place

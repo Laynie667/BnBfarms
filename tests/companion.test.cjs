@@ -289,5 +289,35 @@ const STATE = { name: "Laynie", onBooks: true, roles: ["PROPRIETOR", "LIVESTOCK"
   out("14 Done sends the note back ->", cmds().slice(n14).includes("feedback done 2 Booked!"));
   click("Everything");
   out("14 Everything shows the done ones too ->", /The stall never let me go/.test(text()), /Fixed!/.test(text()));
+
+  // 15. the farm marking your body (marks.js): only with the Toggles switches on
+  Object.assign(G, { Mask: { Name: "Mask", Clothing: true, Category: "Appearance" }, FaceMarkings: { Name: "FaceMarkings", Clothing: false, Category: "Appearance" },
+    BodyMarkings: { Name: "BodyMarkings", Clothing: false, Category: "Appearance" }, ClothAccessory: { Name: "ClothAccessory", Clothing: true, Category: "Appearance" } });
+  w.Player.Appearance = [item("Cloth", "Shirt"), item("HairFront", "Hair1"), item("ItemArms", "HempRope", { LockedBy: "MetalPadlock", Effect: ["Lock"] })];
+  loaded = null;
+  bot({ type: "mark", splat: ["face"] }); await wait(50);
+  out("15 nothin' happens with the switch off ->", loaded === null);
+  bot({ type: "state", state: STATE }); click("Livestock"); click("Toggles");
+  const sw15 = (label) => [...D.querySelectorAll("#fhc-panel .fhc-tog")].find((t) => t.textContent.includes(label));
+  sw15("Farm can mark my body").querySelector("button").click(); await wait(50);
+  bot({ type: "mark", splat: ["face"] }); await wait(50);
+  const sp = (loaded || []).find((b) => b.Name === "Splatters");
+  out("15 a splatter lands on the face, in the first free spot ->", !!sp, sp && sp.Group === "Mask", sp && ["d", "e", "f"].some((k) => sp.Property.TypeRecord[k] === 1));
+  bot({ type: "mark", splat: ["tummy"] }); await wait(50);
+  const sp2 = (loaded || []).find((b) => b.Name === "Splatters");
+  out("15 the next one adds to it ->", sp2 && Object.values(sp2.Property.TypeRecord).filter((v) => v === 1).length === 2);
+  bot({ type: "mark", write: { line: "Breeder", pos: 7 } }); await wait(50);
+  bot({ type: "mark", write: { line: "free use" } }); await wait(50);
+  const bw = (loaded || []).find((b) => b.Name === "BodyWritings");
+  out("15 words are written on the body, newest on top ->", bw && bw.Property.Text === "FREE USE" && bw.Property.Text2 === "BREEDER" && bw.Property.TypeRecord.p === 7);
+  bot({ type: "mark", strip: true }); await wait(50);
+  out("15 no strippin' with that switch off ->", (loaded || []).some((b) => b.Group === "Cloth"));
+  sw15("Farm can strip me").querySelector("button").click(); await wait(50);
+  bot({ type: "mark", strip: true }); await wait(50);
+  out("15 stripped: clothes off, the locked rope stays ->", !(loaded || []).some((b) => b.Group === "Cloth"), (loaded || []).some((b) => b.Group === "ItemArms"));
+  bot({ type: "mark", dress: true }); await wait(50);
+  out("15 dressed again ->", (loaded || []).some((b) => b.Group === "Cloth" && b.Name === "Shirt"));
+  bot({ type: "mark", wash: true }); await wait(50);
+  out("15 ?wash takes the splatters and writing off ->", !(loaded || []).some((b) => b.Name === "Splatters" || b.Name === "BodyWritings"), (loaded || []).some((b) => b.Group === "HairFront"));
   process.exit(0);
 })();

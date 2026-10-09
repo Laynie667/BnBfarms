@@ -53,7 +53,11 @@
       const lone = String(raw).trim().toLowerCase();
       const pass = (p0 && ["help","rules","species","tour","consent","luxury","doors",
                            "safe","safeword","red","stuck","staff"].includes(p0.cmd))
-                || ["safe","safeword","red","stuck"].includes(lone);
+                || ["safe","safeword","red","stuck"].includes(lone)
+                // a switch flipped mid-interview ("potions on", often a Companion toggle) is a command, not an answer
+                // (live, Oct 8: Nikto's application saved "potions on" as their name)
+                || (/^[a-z]+ (on|off)$/.test(lone) && PUBLIC_CMDS.includes(lone.split(" ")[0]))
+                || (channel === "companion" && /^[a-z]+ (on|off)$/.test(lone));
       if (!pass && handleApplicationAnswer(sender, raw, channel)) return;
     }
 
@@ -1998,6 +2002,7 @@ Welcome to B&B Farm, hon. 🌾`);
         const p = t && rec(t) ? prodOf(t) : null;
         if (!p || !paintedText(t)){ R((t === sender ? "You're" : plainName(t)+" is")+" clean as a whistle, sugar."); break; }
         if (t === sender){ const no = addonVeto("wash", t); if (no){ R(no); break; } }   // an add-on can keep somebody messy (their own switch)
+        bodyMark(t, { wash: true });   // the splatters and writing their Companion put on (10s-marks.js)
         const was = paintedText(t); p.painted = null; saveLedger();
         if (onMap(t)) emote("🚿 "+plainName(t)+" gets hosed down at the trough, washin' the "+was+" clean. Shame, it was a good look.", t);
         else R("All washed up, sugar.");

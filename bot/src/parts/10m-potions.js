@@ -123,7 +123,7 @@
     if ((id === "bigbritches" || id === "shrink") && f.part && f.was) setSize(mn, f.part, f.was, false);
     if (id === "heatmist" && p && p.heat && p.heat.by === f.by) p.heat.until = Math.min(p.heat.until, Date.now());
     saveLedger(); syncCompanions(true);
-    if (!quiet && P) tell(mn, "🧪 Your "+P.name+" has worn off, sugar.");
+    if (!quiet && P) tell(mn, potionOffLine(mn, id, f) || "🧪 Your "+P.name+" has worn off, sugar.");
   }
   // the safeword: every bottle poured out at once
   function clearPotions(mn){ const r = rec(mn); if (!r || !r.fx) return; for (const id of Object.keys(r.fx)) endPotion(mn, id, true); }
@@ -169,7 +169,7 @@
       "A brassy CLANG rings out across the yard as %n moves. Subtle as a dinner bell."
     ]
   };
-  function fxLine(id, mn){ const a = FX_LINES[id]; return a[Math.floor(Math.random()*a.length)].replace(/%n/g, plainName(mn)); }
+  function fxLine(id, mn){ const a = FX_LINES[id]; const r = rec(mn); return fxFill(pickFresh("fx:"+id+":"+mn, a), mn, r && r.fx && r.fx[id]); }
   function potionTick(){
     const now = Date.now();
     for (const [k, r] of Object.entries(L.people)){
@@ -184,6 +184,14 @@
         if (id === "needy" && every(4, 7)) privateTo(mn, "💗 "+fxLine("needy", mn), "emote");
         if (id === "hiccup" && every(1, 3)) emote(fxLine("hiccup", mn), mn);
         if (id === "feather" && every(2, 4)) emote(fxLine("feather", mn), mn);
+        if (id === "clover" && every(4, 7)) emote("🥛 "+fxLine("clover", mn), mn);
+        if (id === "golden" && every(5, 8)) privateTo(mn, "✨ "+fxLine("golden", mn), "emote");
+        if (id === "heavy" && every(3, 6)) emote("🥛 "+fxLine("heavy", mn), mn);
+        if (id === "bitterroot" && every(5, 8)) privateTo(mn, "🌿 "+fxLine("bitterroot", mn), "emote");
+        if (id === "wrongbarn" && every(6, 10)) emote(fxLine("wrongbarn", mn), mn);
+        if ((id === "bigbritches" || id === "shrink") && every(8, 14)) emote(fxLine(id, mn), mn);
+        if (id === "heatmist" && every(4, 6)) emote("🔥 "+fxLine("heatmist", mn), mn);
+        if (id === "moo" && every(6, 10)) emote(fxLine("moo", mn), mn);
         if (id === "bell"){
           const C = charFor(mn), pos = C && C.MapData && C.MapData.Pos;
           if (pos){

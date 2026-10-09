@@ -200,7 +200,7 @@
     const inside = load >= 1 && (hole === "mouth" || !!rt.breedable);
     const vars = { t: plainName(t), u: plainName(sender), ml: ml(load) };
     let line;
-    if (!load) line = benchLine("dry", BENCH_LINES.dry).replace(/%h/g, BENCH_HOLES[hole]);
+    if (!load) line = hole === "mouth" ? benchLine("drymouth", BENCH_LINES.drymouth || BENCH_LINES.dry) : benchLine("dry", BENCH_LINES.dry).replace(/%h/g, BENCH_HOLES[hole]);
     else if (!inside) line = benchLine("over", BENCH_LINES.over).replace(/%h/g, BENCH_HOLES[hole]);
     else line = benchLine(hole, BENCH_LINES[hole]);
     if (pent && load) line += " Pent up as %u was, it just kept comin'.";
@@ -223,7 +223,8 @@
     const b = rt.benched; b.uses++;
     const W0 = benchWeek(); W0.n[t] = (W0.n[t] || 0) + 1; W0.by[sender] = (W0.by[sender] || 0) + 1;
     saveLedger(); audit(sender, "BENCH_USE", t+" "+hole+(load ? " "+Math.round(load)+"mL" : ""));
-    { const tb = Math.random() < 0.7 ? tailBit(t, hole, sender) : ""; if (tb) line += " "+tb.replace(/%/g, ""); }   // their tail, if they wear one
+    { const tb = Math.random() < 0.7 ? tailBit(t, hole, sender) : ""; if (tb) line += " "+tb.replace(/%/g, ""); }
+    { const pb = Math.random() < 0.7 ? potionBit(t) : ""; if (pb) line += " "+pb.replace(/%/g, ""); }   // their tail, if they wear one
     emote("🪵 "+benchFill(line, vars), t, [sender]);
     face(t, inside ? "bred" : "afterglow", 40); sound(t, "wet");
     if (b.uses % 3 === 0) later(() => { if (benchedNow(t)) emote("🪵 "+benchFill(benchLine("tally", BENCH_LINES.tally), { t: plainName(t), n: b.uses }), t); }, 4000);

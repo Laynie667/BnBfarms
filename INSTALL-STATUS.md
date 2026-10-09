@@ -5,13 +5,13 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 | Script | File in `dist/` | Where it runs | Current |
 |---|---|---|---|
-| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.17.4** |
-| Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.5.4** |
+| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.18.0** |
+| Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.5.5** |
 | Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.1.0** |
 | Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **1.0.3** |
 | Barn life, Dairy, Map tools, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.2** |
 | Shows | `farmhand-shows.user.js` | the bot's PC | **1.0.3** |
-| Farmhand Companion | `farmhand-companion.user.js` | each player | **0.11.3** |
+| Farmhand Companion | `farmhand-companion.user.js` | each player | **0.12.0** |
 | Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.3** |
 
 ## Sending a watch report
@@ -21,6 +21,13 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 - Running the watcher on more than one game at once (the bot, yours, a tester's) lets Claude line them up into one timeline.
 
 ## Latest changes (newest first)
+
+- **Bot 0.18.0, Companion 0.12.0, Glory stalls 1.5.5: marks on your body, potions that live, more bench lines, and the pin trap.**
+  - **The pin trap** (Laynie, Oct 8): too full to move pinned her at the stocks, far from any stall, and a Heavy Udder Draught makes the stalls refuse you, so nothin' could ever empty her. Now a Heavy Udder Draught never pins (it aches), and no pin lasts more than 20 minutes: the farm girl kneels with a pail and milks you down where you stand, and you can move for an hour. The pin message says so, and that the safeword frees you.
+  - **Marks on your body**, done by your own Companion and only if you switch them on in Toggles (both off to start): **Farm can mark my body**: every load leaves the game's own splatters (forehead, face, chest, tummy), wherever there's room, no LSCG needed; add-ons can write words on your body (the game's body writing, three lines). ?wash takes them off. **Farm can strip me**: add-ons can take your clothes off (locked pieces stay); they're kept so you can dress again.
+  - **Potions** now live while they last: Clover Cream leaks and drips, the Heavy Udder Draught aches and sprays, Bitterroot frustrates, Golden Hour glows, Wrong Barn makes animal noises, the size potions show off, Heat Mist flushes, Moo Juice moos, every few minutes. Each wears off with its own line. And they show up in other scenes: breedin', ?cum, the use bench and the glory stalls mention the musk, the Clover milk, the heat, the Bitterroot ruin, the cowbell.
+  - **The use bench** has about twice the lines, rougher, and a mouth on the bench without a cock to give gets its own.
+  - From the watches: a switch flipped in the middle of an application (Nikto's "potions on", from a Companion toggle) is a command, not saved as an answer.
 
 - **Bot 0.17.4** (from the Oct 8 morning watch, 10:39 to 11:39): `?feed` answers (the tour tells people to say it, and two people got silence). A command wrapped in the game's ( ) works: `(?contract show Nikto)` was "I don't know ?[?contract". `?herd claimin`, `?herd help` open the herd guide (it said "has no claimin"). `!the roster` works. Hidden mod data saved inside two people's old answers (Himari's and Hound's species showed `{"messagetype":"message"...}` on `?roster`) is cleaned out of every saved record on start.
 

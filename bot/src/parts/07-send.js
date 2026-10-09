@@ -476,6 +476,7 @@
     const mn = m.from;
     if (!mn) return;
     if (m.type === "relayNo"){ relayRefused(m.id); return; }
+    if (m.type === "markDone"){ dbg("mark", mn, m.ok, (m.did || []).join(","), m.why || ""); return; }
     if (m.type === "sight"){ onSight(mn, m); return; }
     if (m.type === "leadOk" || m.type === "leadNo"){ leadAnswer(mn, m); return; }
     if (m.type === "hello"){

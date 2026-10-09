@@ -110,6 +110,7 @@
       BASE_CAPACITY: 200, WORN_CAPACITY: 100,
       INJECT_CAPACITY: 250, REDUCE_CAPACITY: 500, MAX_CAPACITY: 50000,   // shots stretch (or shrink) capacity for good
       IMMOBILE_ML: 5000,                           // this much swelling pins you where you are
+      PIN_MAX_MIN: 20,                             // ...for this long at most; then the farm girl milks you down where you stand
       PIN_FROM_MILK: true,                         // milk past its normal cap counts toward it
       PIN_FROM_INFLATION: true,                    // held semen counts too: a stud can cumflate you till you can't move
                                                    // (a stud's own semen never pins)

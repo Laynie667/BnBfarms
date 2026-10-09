@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.17.4
+// @version      0.18.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -1827,7 +1827,7 @@
   ];
 
   // bot/src/version.js
-  var VERSION = "0.17.4";
+  var VERSION = "0.18.0";
 
   // bot-parts:farmhand-bot-parts
   (function() {
@@ -1952,6 +1952,8 @@
         // shots stretch (or shrink) capacity for good
         IMMOBILE_ML: 5e3,
         // this much swelling pins you where you are
+        PIN_MAX_MIN: 20,
+        // ...for this long at most; then the farm girl milks you down where you stand
         PIN_FROM_MILK: true,
         // milk past its normal cap counts toward it
         PIN_FROM_INFLATION: true,
@@ -4044,6 +4046,10 @@
         relayRefused(m.id);
         return;
       }
+      if (m.type === "markDone") {
+        dbg("mark", mn, m.ok, (m.did || []).join(","), m.why || "");
+        return;
+      }
       if (m.type === "sight") {
         onSight(mn, m);
         return;
@@ -5313,15 +5319,26 @@
         const swell = (CFG.PROD.PIN_FROM_INFLATION ? heldTotal(p) : 0) + (CFG.PROD.PIN_FROM_MILK ? Math.max(0, p.milk - milkCapNatural(mn)) : 0);
         const bySize = sizePinned(mn);
         const cumflated = CFG.PROD.PIN_FROM_INFLATION && heldTotal(p) >= CFG.CUMFLATE_PIN_X * capacity(mn);
-        const pinned = (swell >= CFG.PROD.IMMOBILE_ML || !!bySize || cumflated) && !(p.unpinUntil > now);
+        const heavy = potionOn(mn, "heavy");
+        const pinned = ((heavy ? 0 : swell) >= CFG.PROD.IMMOBILE_ML || !!bySize || cumflated && !heavy) && !(p.unpinUntil > now);
         const Cp = charFor(mn), pos = Cp && Cp.MapData && Cp.MapData.Pos;
+        if (pinned && p.pin && p.pin.since && now - p.pin.since > CFG.PROD.PIN_MAX_MIN * 6e4) {
+          const over = Math.max(0, p.milk - milkCapNatural(mn));
+          const got = over >= 1 ? drainMilk(mn, over) : 0;
+          p.pin = null;
+          p.unpinUntil = now + 60 * 6e4;
+          saveLedger();
+          if (onMap(mn)) emote("\u{1FAA3} The farm girl finally takes pity on " + plainName(mn) + ", kneels with a pail right where they're stuck" + (got ? " and strips " + ml(got) + " out of those swollen teats by hand" : " and rubs the ache out of 'em") + '. "There. Go on, waddle."', mn);
+          whisper(mn, "\u{1FAA3} You can move again, " + plainName(mn) + ". You've got an hour before it can pin you again.");
+          continue;
+        }
         if (pinned && pos) {
           if (!p.pin) {
-            p.pin = { X: pos.X, Y: pos.Y };
+            p.pin = { X: pos.X, Y: pos.Y, since: now };
             if (cumflated && !bySize) {
-            } else whisper(mn, bySize ? "\u{1F388} Oh my, your " + (bySize === "udder" ? "udder is" : "balls are") + " just too big to move with, " + plainName(mn) + "! You'll stay put right here till somebody gives you " + (bySize === "udder" ? "an udder" : "a ball") + " reducer shot." : "\u{1F388} Oh my, you're too full to move, " + plainName(mn) + "! You'll stay put right here till you're milked down or somebody gives you a reducin' shot.");
+            } else whisper(mn, bySize ? "\u{1F388} Oh my, your " + (bySize === "udder" ? "udder is" : "balls are") + " just too big to move with, " + plainName(mn) + "! You'll stay put right here till somebody gives you " + (bySize === "udder" ? "an udder" : "a ball") + " reducer shot." : "\u{1F388} Oh my, you're too full to move, " + plainName(mn) + "! You'll stay put right here till you're milked down or somebody gives you a reducin' shot. Twenty minutes at most, sugar, and your safeword frees you any time.");
           } else if (pos.X !== p.pin.X || pos.Y !== p.pin.Y) {
-            if (p.tieUntil > now) p.pin = { X: pos.X, Y: pos.Y };
+            if (p.tieUntil > now) p.pin = { X: pos.X, Y: pos.Y, since: p.pin.since };
             else teleport(mn, p.pin, false, true);
           }
         } else if (p.pin && !pinned) {
@@ -5661,6 +5678,10 @@
         const tb = tailBit(t, hole, stud);
         if (tb) o += " " + tb;
       }
+      if (!opt.second && Math.random() < 0.7) {
+        const pb = potionBit(t);
+        if (pb) o += " " + pb;
+      }
       emote(o, t);
       if (clutch) emote("\u{1F95A} Deep inside " + plainName(t) + ", something takes hold: " + plainName(stud) + "'s draconic seed has left a clutch of " + clutch + " eggs growin' in there. They'll be layin' in a few days.");
       if (sc0) sc0.lastCum = Date.now();
@@ -5951,6 +5972,10 @@
       return lscgSplatAt(mn, SPLAT_SPOTS[PAINT_AREAS[String(area || "").toLowerCase()] || "body"] || ["ItemPelvis"], who);
     }
     function lscgSplatAt(mn, groups, who) {
+      try {
+        splatBody(mn, { ItemVulva: "vulva", ItemButt: "butt", ItemMouth: "mouth" }[groups[0]] || "body");
+      } catch (e) {
+      }
       if (!CFG.LSCG_SPLATTERS || !lscgSplatsOn(mn)) return false;
       for (const group of groups) {
         send("ChatRoomChat", {
@@ -5974,6 +5999,10 @@
       const was = tp.painted && tp.painted.until > now ? tp.painted.areas : [];
       tp.painted = { areas: Array.from(new Set(was.concat(a))), until: now + CFG.PAINT_H * 36e5, by: by || 0 };
       lscgSplat(t, a, by ? plainName(by) : null);
+      try {
+        splatBody(t, String(area || "body").toLowerCase());
+      } catch (e) {
+      }
       saveLedger();
     }
     function paintedText(mn) {
@@ -7513,6 +7542,10 @@
         // their tail (10r-looks.js): tailOf(mn) → { kind, plug, name } or null · tailBit(mn, hole, byName) → a sentence or ""
         tailOf: (mn) => tailOf(mn),
         tailBit: (mn, hole, by, mood) => tailBit(mn, hole, by, mood),
+        // their look, through their own Companion if they allow it: { splat:["face"] } · { write:{ line, pos, style } } · { strip:true } · { dress:true } · { wash:true }
+        mark: (mn, payload) => bodyMark(mn, payload),
+        potionBit: (mn) => potionBit(mn),
+        potions: (mn) => activePotions(mn).map((f) => f.id),
         bench: (mn, mins, why) => benchIn(mn, Math.max(5, Math.min(CFG.BENCH_MAX_MIN, Number(mins) || 30)), CFG.BOT_MEMBER, why || a.name),
         fineRibbons: (mn, n, why) => fineRibbons(mn, n, why, CFG.BOT_MEMBER),
         splat: (mn, hole, by) => lscgSplatAt(mn, HOLE_SPLAT[hole] || ["ItemVulva"], by ? plainName(by) : null),
@@ -9675,7 +9708,7 @@
       if (id === "heatmist" && p && p.heat && p.heat.by === f.by) p.heat.until = Math.min(p.heat.until, Date.now());
       saveLedger();
       syncCompanions(true);
-      if (!quiet && P) tell(mn, "\u{1F9EA} Your " + P.name + " has worn off, sugar.");
+      if (!quiet && P) tell(mn, potionOffLine(mn, id, f) || "\u{1F9EA} Your " + P.name + " has worn off, sugar.");
     }
     function clearPotions(mn) {
       const r = rec(mn);
@@ -9724,7 +9757,8 @@
     };
     function fxLine(id, mn) {
       const a = FX_LINES[id];
-      return a[Math.floor(Math.random() * a.length)].replace(/%n/g, plainName(mn));
+      const r = rec(mn);
+      return fxFill(pickFresh("fx:" + id + ":" + mn, a), mn, r && r.fx && r.fx[id]);
     }
     function potionTick() {
       const now = Date.now();
@@ -9748,6 +9782,14 @@
           if (id === "needy" && every2(4, 7)) privateTo(mn, "\u{1F497} " + fxLine("needy", mn), "emote");
           if (id === "hiccup" && every2(1, 3)) emote(fxLine("hiccup", mn), mn);
           if (id === "feather" && every2(2, 4)) emote(fxLine("feather", mn), mn);
+          if (id === "clover" && every2(4, 7)) emote("\u{1F95B} " + fxLine("clover", mn), mn);
+          if (id === "golden" && every2(5, 8)) privateTo(mn, "\u2728 " + fxLine("golden", mn), "emote");
+          if (id === "heavy" && every2(3, 6)) emote("\u{1F95B} " + fxLine("heavy", mn), mn);
+          if (id === "bitterroot" && every2(5, 8)) privateTo(mn, "\u{1F33F} " + fxLine("bitterroot", mn), "emote");
+          if (id === "wrongbarn" && every2(6, 10)) emote(fxLine("wrongbarn", mn), mn);
+          if ((id === "bigbritches" || id === "shrink") && every2(8, 14)) emote(fxLine(id, mn), mn);
+          if (id === "heatmist" && every2(4, 6)) emote("\u{1F525} " + fxLine("heatmist", mn), mn);
+          if (id === "moo" && every2(6, 10)) emote(fxLine("moo", mn), mn);
           if (id === "bell") {
             const C = charFor(mn), pos = C && C.MapData && C.MapData.Pos;
             if (pos) {
@@ -10049,6 +10091,111 @@
         return;
       }
       R(potionsText(sender));
+    }
+    const FX_MORE = {
+      clover: [
+        "%n's breasts have gone heavy and tight, warm milk beadin' at both nipples without anybody touchin' 'em.",
+        "Every few steps %n has to stop and press a hand to their chest. The Clover Cream's fillin' 'em faster than they can stand.",
+        "A dark wet spot blooms on the front of %n where they've leaked straight through.",
+        "%n's nipples are swollen and stiff, achin' for a mouth or a cup, drippin' a thin white line down their belly.",
+        "%n sways, dreamy and heavy, every let-down a warm little rush that makes their knees soft.",
+        "You can hear it: a faint wet patter in the straw under %n where the Clover's makin' 'em overflow."
+      ],
+      golden: [
+        "%n's skin has a glow to it, flushed and loose, like they're waitin' for the next one.",
+        "%n keeps smilin' at nothin', hips givin' little rolls, chasin' that warm Golden feelin'.",
+        "%n's breath catches every time someone brushes past, golden and eager and easy to set off.",
+        "There's a honey-slow heat pooled low in %n, and every touch stirs it."
+      ],
+      heavy: [
+        "%n's udder is swollen tight as a drum, shiny and hot, and the stalls just turn 'em away.",
+        "%n whimpers and cups their breasts. They're so full it hurts to breathe, and nobody's allowed to empty 'em.",
+        "Milk drips steady from both of %n's teats, pattin' into the dirt, and the ache just keeps buildin'.",
+        "%n tries to walk and has to stop, bent over, breasts too heavy and too full to carry.",
+        "The Heavy Udder Draught has %n leakin' in two thin streams, achin' for hands that won't come.",
+        "%n's nipples are cracked-open taps. Every heartbeat pushes out more, and still they swell."
+      ],
+      bitterroot: [
+        "%n's thighs are slick and tremblin', and the Bitterroot won't let 'em anywhere near the edge.",
+        "Every time %n gets close the heat just drains away, mean and sudden. They whine through their teeth.",
+        "%n squirms, desperate, achin', and absolutely nothin' they do is gonna be enough.",
+        "The Bitterroot's got %n wound tight and leakin', ruined before they even start."
+      ],
+      needy: [
+        "%n can't keep their hips still. They're grindin' against nothin', pantin' through their nose.",
+        "%n's pussy is soaked and swollen and so needy they'd climb anybody who stood still long enough.",
+        "%n keeps lookin' at every hand on the farm like it might be the one that finally helps.",
+        "A thin string of wet slides down the inside of %n's thigh. They don't even notice anymore."
+      ],
+      wrongbarn: [
+        "%n lets out a %a's noise mid-sentence and goes red to the ears.",
+        "%n paws at the dirt like a %a, catches themselves, and doesn't quite manage to stop.",
+        "Somethin' about %n has gone all %a today: the way they stand, the way they sniff the air.",
+        "%n tries to say somethin' and a %a's call comes out instead. The pen snickers."
+      ],
+      bigbritches: [
+        "%n's %p strains, two sizes too big and impossible not to stare at.",
+        "%n keeps adjustin', but there's no hidin' a %p that swollen.",
+        "Heads turn at %n's %p, heavy and new and very much on show."
+      ],
+      shrink: [
+        "%n keeps glancin' down at their %p, so much smaller than it ought to be.",
+        "%n's %p has gone dainty and tight, and everyone can tell.",
+        "A farmhand chuckles at %n's shrunk %p, and %n flushes from the ears down."
+      ],
+      heatmist: [
+        "%n's skin is pink and hot, and they can't stop squeezin' their thighs together.",
+        "The heat's got %n swayin' their hips without meanin' to, presentin' to anyone in reach.",
+        "%n smells like heat, sweet and thick, and the studs nearby have noticed."
+      ],
+      moo: [
+        "%n opens their mouth to argue and a long, low moo rolls out instead.",
+        "Every word %n tries comes out as somethin' a cow would say. They've stopped tryin'."
+      ]
+    };
+    Object.assign(FX_LINES, Object.fromEntries(Object.entries(FX_MORE).map(([k, v]) => [k, (FX_LINES[k] || []).concat(v)])));
+    const FX_OFF = {
+      clover: ["The Clover Cream fades. Your breasts are still heavy, but the rush is gone. You'll miss it.", "The sweet clover warmth drains out of your chest. Back to fillin' at the usual pace, sugar."],
+      golden: ["The golden glow cools off. The next one's just yours again, not the farm's.", "The Golden Hour's over. That last one was worth every drop, wasn't it?"],
+      musk: ["The Blue Ribbon Musk fades. Heads stop turnin' quite so hard.", "Your skin smells like you again. The barn's a little less restless."],
+      honey: ["The farm girl's sweet voice drifts out of your ear. Honey Tongue's done, darlin'."],
+      bitterroot: ["The Bitterroot loosens its grip, slow and grudgin'. You can cum again, if you can still remember how.", "That mean, bitter knot finally unties. Go on. Somebody finish what it wouldn't let you."],
+      heavy: ["The Heavy Udder Draught wears off, but you're still achin' and full. The stalls'll take you now. Run.", "The draught's done. Your udder isn't. Go get milked, cow, before you burst."],
+      moo: ["Your words come back. The first one you say is still a little bit of a moo."],
+      bell: ["The cowbell clangs one last time and falls quiet. Sneak all you like now."],
+      needy: ["The ache finally fades to a dull, sticky throb. You're soaked, and you know it."],
+      hiccup: ["One last *hic*, and the Hiccup Fizz is spent."],
+      feather: ["Your skin stops tinglin'. The next breeze is just a breeze."],
+      wrongbarn: ["You blink, and you're yourself again. Mostly. You still want to %a a little."],
+      bigbritches: ["Your %p eases back to its own size. You'll miss the weight."],
+      shrink: ["Your %p comes back to its proper size. What a relief."],
+      echo: ["The Echo Elixir's spent. The farm girl stops listenin' quite so close."],
+      heatmist: ["The heat mist burns off, leavin' you damp and dazed."]
+    };
+    function fxFill(t, mn, f) {
+      f = f || {};
+      return String(t).replace(/%n/g, plainName(mn)).replace(/%p/g, f.part ? String((CFG.SIZES[f.part] || {}).label || f.part).toLowerCase() : "body").replace(/%a/g, f.to ? String(f.to).toLowerCase() : "animal");
+    }
+    function potionOffLine(mn, id, f) {
+      const pool = FX_OFF[id];
+      if (!pool) return null;
+      return "\u{1F9EA} " + fxFill(pickFresh("fxoff:" + id, pool), mn, f);
+    }
+    const FX_BITS = {
+      musk: ["The Blue Ribbon Musk on %n's skin has the stud halfway to mindless.", "Whoever's at %n can't stop breathin' in the musk on their neck."],
+      clover: ["Milk sprays from %n's Clover-swollen teats with every thrust.", "%n's heavy breasts leak a warm stream down their belly the whole time."],
+      heavy: ["%n's overfull udder swings and leaks, achin' with every slam.", "Every thrust squeezes milk out of %n's swollen, untouchable teats."],
+      heatmist: ["%n is so wet from the heat mist it's pourin' down their thighs.", "%n's heat-flushed pussy grips like it's been waitin' all day."],
+      needy: ["%n is so needy they're pushin' back for more before it's even started.", "%n sobs with relief at bein' filled at last."],
+      bitterroot: ["%n gets close, so close, and the Bitterroot snatches it away again. Ruined, and still bein' used.", "%n whines; the Bitterroot won't let 'em cum no matter how good it feels."],
+      golden: ["%n goes off like a firework, golden and shakin', the second they're touched.", "%n cums almost at once, glowin' and loose."],
+      bell: ["The cowbell on %n clangs with every single thrust. The whole farm can hear the rhythm."]
+    };
+    function potionBit(mn) {
+      const on = activePotions(mn).map((f) => f.id).filter((id2) => FX_BITS[id2]);
+      if (!on.length) return "";
+      const id = on[Math.floor(Math.random() * on.length)];
+      return fxFill(pickFresh("fxbit:" + id, FX_BITS[id]), mn, (rec(mn).fx || {})[id]);
     }
     const FARM_SLICES = [
       // rewards
@@ -10491,7 +10638,7 @@
       const inside = load >= 1 && (hole === "mouth" || !!rt.breedable);
       const vars = { t: plainName(t), u: plainName(sender), ml: ml(load) };
       let line;
-      if (!load) line = benchLine("dry", BENCH_LINES.dry).replace(/%h/g, BENCH_HOLES[hole]);
+      if (!load) line = hole === "mouth" ? benchLine("drymouth", BENCH_LINES.drymouth || BENCH_LINES.dry) : benchLine("dry", BENCH_LINES.dry).replace(/%h/g, BENCH_HOLES[hole]);
       else if (!inside) line = benchLine("over", BENCH_LINES.over).replace(/%h/g, BENCH_HOLES[hole]);
       else line = benchLine(hole, BENCH_LINES[hole]);
       if (pent && load) line += " Pent up as %u was, it just kept comin'.";
@@ -10528,6 +10675,10 @@
       {
         const tb = Math.random() < 0.7 ? tailBit(t, hole, sender) : "";
         if (tb) line += " " + tb.replace(/%/g, "");
+      }
+      {
+        const pb = Math.random() < 0.7 ? potionBit(t) : "";
+        if (pb) line += " " + pb.replace(/%/g, "");
       }
       emote("\u{1FAB5} " + benchFill(line, vars), t, [sender]);
       face(t, inside ? "bred" : "afterglow", 40);
@@ -10622,6 +10773,85 @@
       benchIn(t, mins, sender, t === sender ? "volunteered" : "staff");
       R(t === sender ? "\u{1FAB5} Strappin' you in for " + mins + " minutes, sugar." : "\u{1FAB5} " + plainName(t) + " is on the use bench for " + mins + " minutes.");
     }
+    const BENCH_MORE = {
+      on: [
+        '%t is marched to the bench by the collar, bent over it, and buckled down tight. The farm girl kicks their feet apart. "Open for business, sugar."',
+        "The bench is still warm and sticky from the last one when %t is strapped over it, cheeks spread, a fresh chalk board hung at their hip.",
+        "%t gets laid over the use bench like a saddle on a fence rail, wrists cuffed under it, ass high and helpless and free to anyone.",
+        '"Bottoms up," the farm girl says, and straps %t down over the bench, then gives that offered rump a slap that echoes across the yard.',
+        "%t is bent over the bench, ankles strapped wide, and the farm girl hangs a little sign from their collar: USE ME."
+      ],
+      mouth: [
+        "%u grabs %t by the hair and drags their face to the end of the bench, then feeds them every inch until their nose is buried and they're gaggin' around it. %u holds them there and unloads %ml straight down their throat.",
+        "%t's jaw is pried open with two fingers and %u slides home, fuckin' their throat in slow, sloppy strokes till spit hangs from %t's chin in ropes, then floods it with %ml.",
+        `%u uses %t's mouth like a fleshlight, holdin' their head in both hands, and pulls out at the end to paint %ml across their tongue. "Swallow." %t swallows.`,
+        "%u slaps %t's cheek with it first, twice, then pushes in and fucks their face hard enough to rattle the bench, finishin' %ml deep and holdin' still till %t's eyes water.",
+        "%t is made to lick it clean first, root to tip, before %u shoves it in and uses their throat, emptyin' %ml into them with a groan.",
+        "%u pinches %t's nose shut and fucks their throat while they can't breathe, lets 'em gasp, does it again, and comes %ml down their throat on the third."
+      ],
+      vulva: [
+        "%u lines up behind %t, rubs the head through their soaked lips, then slams in to the hilt in one stroke. They fuck %t like breedin' stock, hard and fast, and finish %ml deep against their cervix.",
+        "%t's pussy is used like it's farm property, which it is. %u ruts into them till the straps creak and then holds deep, pumpin' %ml into the fertile heat of them.",
+        '%u spreads %t open with both thumbs to look first, then sinks in slow. "Tight for a bench slut." They fuck %t raw and come %ml inside, then pat their ass like a good mare.',
+        "The first thrust knocks the breath out of %t. %u doesn't slow down after that, poundin' that sloppy pussy till they both shake, and leaves %ml of seed packed in deep.",
+        "%u grabs %t's hips and fucks them like they're tryin' to breed a litter into them right there on the bench: deep, grindin', relentless, and %ml of it settles where it belongs.",
+        "%t's pussy squelches with the last one's load as %u pushes in, and %u fucks the mess deeper, adding %ml of their own to it.",
+        "%u wraps a fist in %t's hair, arches them back off the bench, and breeds them like that, pussy clenchin' and leakin' around every thrust, until %ml of hot seed floods in."
+      ],
+      butt: [
+        "%u spits on %t's asshole, works a thumb in to loosen it, then shoves their cock in after it and takes that ass hard, finishin' %ml deep in their guts.",
+        "%t's ass is stretched open around %u's cock, every slow stroke draggin' a whine out of them, until %u buries it and fills them with %ml.",
+        "%u fucks %t's ass with their full weight, pinnin' them to the bench, and empties %ml so deep they'll be leakin' it for an hour.",
+        "%u pulls %t's cheeks wide, watches their hole gape and wink, then sinks in and uses it till %ml of cum is packed inside.",
+        "%u takes %t's ass in long, brutal strokes, %t's own wetness drippin' down unused below it, and comes %ml deep with a satisfied grunt."
+      ],
+      over: [
+        "%u fucks %t's %h right up to the edge, then pulls out and jerks %ml across their back and ass in thick white ropes.",
+        "%u pulls out of %t's %h at the last second and shoots %ml over their spread cheeks, rubbin' it into their skin like a brand.",
+        "%u finishes on %t instead of in them, %ml splattered from their shoulder blades to the crack of their ass. Marked, not bred.",
+        "%u uses %t's %h, then steps around and comes %ml all over their face where they're strapped. %t blinks through it."
+      ],
+      dry: [
+        "%u spanks %t's ass red, a dozen hard swats while %t jerks in the straps, then shoves three fingers in their %h and fucks them with them till they're shakin'.",
+        "%u kneels behind the bench and eats %t's %h like a starvin' man, tongue deep, till %t is sobbin' into the wood.",
+        "%u works a fist slow and patient into %t's %h, knuckle by knuckle, and leaves it there while they cry and drip.",
+        "%u brings a riding crop down across %t's thighs, then their ass, then right between, and laughs at how wet it makes 'em.",
+        "%u fingers %t's %h rough and fast, three fingers, then four, and pulls out dripping to smear it across %t's lips.",
+        "%u slides a fat plug into %t's %h, twists it, pulls it, works it in and out like a cock, and leaves it seated deep when they go."
+      ],
+      tally: [
+        "Another tally mark gets chalked on the board at the bench: %n. Somebody's drawn a little cock beside it.",
+        "%n marks now. The farm girl has to start a second row on the board.",
+        "The chalk squeaks: %n. %t whimpers at the sound of it.",
+        "%n uses. The board under the bench is more chalk than wood now."
+      ],
+      ambient: [
+        "You can feel the last one's load slidin' out of you, slow and warm, down the inside of your thigh and onto the bench.",
+        "Somebody walks past and doesn't stop. That's somehow worse.",
+        "Your nipples drag against the rough wood every time you shift. They're raw now, and so hard.",
+        "The flies have found the bench. You can't swat 'em. You just twitch.",
+        "A drop of somebody's cum finally falls from your chin. You hear it hit the board.",
+        "Your knees ache, your hole aches, and you're still wet. You hate how wet you are.",
+        "Someone off by the barn says your name and laughs. You don't know what they said. You can guess.",
+        "You're so open now you can feel the breeze inside you. Every hole's been stretched and left."
+      ],
+      back: [
+        "%t wriggles half off the bench and gets hauled right back by the hips, slapped twice, and buckled in a notch tighter.",
+        'The farm girl drags %t back over the bench by the ankle. "You go when the board says you go, sugar."'
+      ],
+      off: [
+        "The straps come off. %t slides off the bench in a sticky heap, %n marks on the board and every one of 'em leakin' out of them.",
+        "%t is unbuckled and can barely stand: %n uses, legs shakin', the bench slick with what poured out of them."
+      ]
+    };
+    for (const [k, v] of Object.entries(BENCH_MORE)) if (BENCH_LINES[k]) BENCH_LINES[k].push(...v);
+    BENCH_LINES.drymouth = [
+      "%u pushes two fingers into %t's mouth and makes them suck, deep, till they gag, then wipes them clean on %t's cheek.",
+      `%u grabs %t's chin, spits in their open mouth, and closes it for them. "Swallow."`,
+      "%u straddles the end of the bench and grinds their wet cunt against %t's face till they're dripping off %t's chin.",
+      "%u feeds %t a dildo, slow and deep, fuckin' their throat with it while %t drools down the wood.",
+      "%u kisses %t, filthy and deep, and bites their lip on the way out."
+    ];
     function awayText(mn, since) {
       const r = rec(mn), out = [];
       const book = (L.studbook || []).filter((e) => e.t >= since);
@@ -10880,6 +11110,26 @@
       const pool = mood === "milk" ? TAIL_BITS.milk : t.plug ? TAIL_BITS.plug.concat(TAIL_BITS.swish) : hole === "mouth" ? TAIL_BITS.swish : TAIL_BITS.lift.concat(TAIL_BITS.swish);
       const line = pickFresh("tail:" + mn, pool);
       return line.replace(/%n/g, plainName(mn)).replace(/%u/g, by ? typeof by === "string" ? by : plainName(by) : "somebody").replace(/%t/g, (t.kind ? t.kind + " " : "") + "tail");
+    }
+    const SPLAT_AREAS = {
+      mouth: ["face", "forehead", "face"],
+      vulva: ["tummy", "tummy", "chest"],
+      butt: ["tummy", "chest"],
+      face: ["face", "forehead"],
+      chest: ["chest"],
+      tits: ["chest"],
+      back: ["tummy", "chest"],
+      ass: ["tummy"],
+      body: ["chest", "tummy", "face"]
+    };
+    function bodyMark(mn, payload) {
+      if (!mn || mn === CFG.BOT_MEMBER || !hasCompanion(mn)) return false;
+      enqueue(makeMsg("mark", payload, mn));
+      return true;
+    }
+    function splatBody(mn, where) {
+      const pool = SPLAT_AREAS[where] || SPLAT_AREAS.body;
+      return bodyMark(mn, { splat: [pool[Math.floor(Math.random() * pool.length)]] });
     }
     function clockedIn(mn) {
       const r = rec(mn);
@@ -12634,7 +12884,7 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
           "red",
           "stuck",
           "staff"
-        ].includes(p0.cmd) || ["safe", "safeword", "red", "stuck"].includes(lone);
+        ].includes(p0.cmd) || ["safe", "safeword", "red", "stuck"].includes(lone) || /^[a-z]+ (on|off)$/.test(lone) && PUBLIC_CMDS.includes(lone.split(" ")[0]) || channel === "companion" && /^[a-z]+ (on|off)$/.test(lone);
         if (!pass && handleApplicationAnswer(sender, raw, channel)) return;
       }
       const huh = (msg) => {
@@ -15455,6 +15705,7 @@ Welcome to B&B Farm, hon. \u{1F33E}`
               break;
             }
           }
+          bodyMark(t, { wash: true });
           const was = paintedText(t);
           p2.painted = null;
           saveLedger();

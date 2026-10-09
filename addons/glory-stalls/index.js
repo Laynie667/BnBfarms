@@ -106,6 +106,7 @@ function step(id) {
   if (!beat) { running.delete(id); scheduleNext(id, mn); return; }
   api.privateEmote(mn, named(beat.t, mn));
   // their tail, if they wear one: a line about it partway into the scene (the stranger lifts it, or it swishes)
+  if (run.i === 3 && api.potionBit) { const pb = api.potionBit(mn); if (pb) api.later(() => api.privateEmote(mn, pb), 7000); }   // a potion they're on
   if (run.i === 2 && api.tailBit) { const tb = api.tailBit(mn, run.hole, "the stranger"); if (tb) api.later(() => api.privateEmote(mn, tb), 9000); }
   if (beat.finish) {
     finish(id, mn, beat.hole || run.hole, beat.ml, beat.inside, beat.visitor || run.visitor);

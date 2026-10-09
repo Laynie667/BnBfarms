@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm add-on: Glory stalls
 // @namespace    bnbfarm
-// @version      1.5.4
+// @version      1.5.5
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-glory-stalls.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-glory-stalls.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -1187,6 +1187,10 @@
       return;
     }
     api.privateEmote(mn, named(beat.t, mn));
+    if (run.i === 3 && api.potionBit) {
+      const pb = api.potionBit(mn);
+      if (pb) api.later(() => api.privateEmote(mn, pb), 7e3);
+    }
     if (run.i === 2 && api.tailBit) {
       const tb = api.tailBit(mn, run.hole, "the stranger");
       if (tb) api.later(() => api.privateEmote(mn, tb), 9e3);

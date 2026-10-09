@@ -715,16 +715,29 @@
                     (CFG.PROD.PIN_FROM_MILK ? Math.max(0, p.milk - milkCapNatural(mn)) : 0);
       const bySize = sizePinned(mn);
       const cumflated = CFG.PROD.PIN_FROM_INFLATION && heldTotal(p) >= CFG.CUMFLATE_PIN_X * capacity(mn);
-      const pinned = (swell >= CFG.PROD.IMMOBILE_ML || !!bySize || cumflated) && !(p.unpinUntil > now);
+      // a Heavy Udder Draught makes you ache, never stuck: with the stalls refusin' you, its milk pinned you
+      // somewhere you could never get milked (live, Oct 8: Laynie held at the stocks with 27 L in her)
+      const heavy = potionOn(mn, "heavy");
+      const pinned = ((heavy ? 0 : swell) >= CFG.PROD.IMMOBILE_ML || !!bySize || (cumflated && !heavy)) && !(p.unpinUntil > now);
       const Cp = charFor(mn), pos = Cp && Cp.MapData && Cp.MapData.Pos;
+      // and no pin lasts past PIN_MAX_MIN: the farm girl comes, milks 'em down where they stand (or lets the
+      // swellin' ease), and they're free to move for an hour
+      if (pinned && p.pin && p.pin.since && now - p.pin.since > CFG.PROD.PIN_MAX_MIN*60000){
+        const over = Math.max(0, p.milk - milkCapNatural(mn));
+        const got = over >= 1 ? drainMilk(mn, over) : 0;
+        p.pin = null; p.unpinUntil = now + 60*60000; saveLedger();
+        if (onMap(mn)) emote("🪣 The farm girl finally takes pity on "+plainName(mn)+", kneels with a pail right where they're stuck"+(got ? " and strips "+ml(got)+" out of those swollen teats by hand" : " and rubs the ache out of 'em")+". \"There. Go on, waddle.\"", mn);
+        whisper(mn, "🪣 You can move again, "+plainName(mn)+". You've got an hour before it can pin you again.");
+        continue;
+      }
       if (pinned && pos){
-        if (!p.pin){ p.pin = { X:pos.X, Y:pos.Y };
+        if (!p.pin){ p.pin = { X:pos.X, Y:pos.Y, since: now };
           if (cumflated && !bySize){ /* doCum already announced it */ }
           else whisper(mn, bySize
             ? "🎈 Oh my, your "+(bySize === "udder" ? "udder is" : "balls are")+" just too big to move with, "+plainName(mn)+"! You'll stay put right here till somebody gives you "+(bySize === "udder" ? "an udder" : "a ball")+" reducer shot."
-            : "🎈 Oh my, you're too full to move, "+plainName(mn)+"! You'll stay put right here till you're milked down or somebody gives you a reducin' shot."); }
+            : "🎈 Oh my, you're too full to move, "+plainName(mn)+"! You'll stay put right here till you're milked down or somebody gives you a reducin' shot. Twenty minutes at most, sugar, and your safeword frees you any time."); }
         else if (pos.X !== p.pin.X || pos.Y !== p.pin.Y){
-          if (p.tieUntil > now) p.pin = { X:pos.X, Y:pos.Y };   // tied: the knot drags 'em along, the pin moves with 'em
+          if (p.tieUntil > now) p.pin = { X:pos.X, Y:pos.Y, since: p.pin.since };   // tied: the knot drags 'em along, the pin moves with 'em
           else teleport(mn, p.pin, false, true);   // pinned: held in place
         }
       } else if (p.pin && !pinned){
@@ -1014,7 +1027,8 @@
       tp.eggs = { n:clutch, by:stud, since:Date.now(), layAt: Date.now() + (dl + Math.random()*(dh-dl))*86400000 };
     }
     saveLedger(); audit(stud,"CUM",stud+"→"+t+" "+hole+" "+Math.round(load));
-    if (!opt.second && Math.random() < 0.6){ const tb = tailBit(t, hole, stud); if (tb) o += " "+tb; }   // their tail, if they wear one (10r-looks.js)
+    if (!opt.second && Math.random() < 0.6){ const tb = tailBit(t, hole, stud); if (tb) o += " "+tb; }
+    if (!opt.second && Math.random() < 0.7){ const pb = potionBit(t); if (pb) o += " "+pb; }   // a potion they're on (10m2)   // their tail, if they wear one (10r-looks.js)
     emote(o, t);   // about the one bred (the stud is named too, so both get it)
     if (clutch) emote("🥚 Deep inside "+plainName(t)+", something takes hold: "+plainName(stud)+"'s draconic seed has left a clutch of "+clutch+" eggs growin' in there. They'll be layin' in a few days.");
     if (sc0) sc0.lastCum = Date.now();
@@ -1237,6 +1251,8 @@
     return lscgSplatAt(mn, SPLAT_SPOTS[PAINT_AREAS[String(area||"").toLowerCase()] || "body"] || ["ItemPelvis"], who);
   }
   function lscgSplatAt(mn, groups, who){
+    // the game's own splatters too, through their Companion (10s-marks.js), for anybody who said yes to it
+    try { splatBody(mn, { ItemVulva: "vulva", ItemButt: "butt", ItemMouth: "mouth" }[groups[0]] || "body"); } catch(e){}
     if (!CFG.LSCG_SPLATTERS || !lscgSplatsOn(mn)) return false;
     for (const group of groups){
       send("ChatRoomChat", { Content: "ChatOther-"+group+"-LSCG_Splat", Type: "Activity", Target: mn,
@@ -1252,6 +1268,7 @@
     const was = tp.painted && tp.painted.until > now ? tp.painted.areas : [];
     tp.painted = { areas: Array.from(new Set(was.concat(a))), until: now + CFG.PAINT_H*3600000, by: by || 0 };
     lscgSplat(t, a, by ? plainName(by) : null);
+    try { splatBody(t, String(area || "body").toLowerCase()); } catch(e){}
     saveLedger();
   }
   function paintedText(mn){

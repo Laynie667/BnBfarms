@@ -13,6 +13,7 @@ import { VERSION } from "./version.js";
 import { BOT_MEMBER, HELLO_EVERY_MS } from "./config.js";
 import { Panel } from "./panel.js";
 import { captureOutfit, wearOutfit, changeBack, hasBackup } from "./outfits.js";
+import { markBody, washMarks, stripMe, dressMe } from "./marks.js";
 import { initCues, cueOff, lead, face, sound, trance, drawMarkers } from "./cues.js";
 
 // the SDK ships as an old-style module; this digs the real thing out either way
@@ -188,6 +189,19 @@ function onFarmMsg(m) {
         keys: Array.isArray(m.keys) ? m.keys.filter(Number.isInteger) : [], why: String(m.why || "") });
       toChat("👗 The farm's offerin' you your " + String(m.label || "outfit") + ". Yes or Not now in your 🌾 panel.", "#c9a35b");
       break;
+    case "mark": {
+      // the farm marks your body (splatters, writing), strips you, dresses you or washes you, if your Toggles allow it (marks.js)
+      let r = { ok: false };
+      try {
+        const prefs = st.panel.prefs;
+        if (m.wash) r = washMarks();
+        else if (m.strip) r = stripMe(prefs);
+        else if (m.dress) r = dressMe();
+        else r = markBody(m, prefs);
+      } catch (e) { r = { ok: false, why: e.message }; }
+      toBot("markDone", { ok: !!r.ok, did: r.did || [], why: r.why || "" });
+      break;
+    }
     case "relay": relay(m); break;
     case "lead": lead(m); break;       // walk me there (cues.js)
     case "face": face(m); break;

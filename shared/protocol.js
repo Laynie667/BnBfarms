@@ -20,6 +20,8 @@
 //   bot  -> ext        outfitBack { why }                     change back into your own clothes (v2)
 //   ext  -> bot        outfitSave { slot, data, items, locks } a proprietor saves what they're wearin' (v2)
 //   ext  -> bot        outfitAnswer { answer, slot, locks }   worn / declined / back (v2)
+//   bot  -> ext        mark     { splat | write | strip | dress | wash }   their own body, if their Toggles allow (v2)
+//   ext  -> bot        markDone { ok, did, why }
 //   ext  -> bot        bye      {}                            extension turned off
 //
 // Older Companions ignore the v2 types, and older bots never send them, so either side can update first.

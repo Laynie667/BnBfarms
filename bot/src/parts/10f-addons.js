@@ -131,6 +131,9 @@
       // put somebody on the use bench (only if they said ?bench on; same rules as staff and the wheel)
       // their tail (10r-looks.js): tailOf(mn) → { kind, plug, name } or null · tailBit(mn, hole, byName) → a sentence or ""
       tailOf: (mn) => tailOf(mn), tailBit: (mn, hole, by, mood) => tailBit(mn, hole, by, mood),
+      // their look, through their own Companion if they allow it: { splat:["face"] } · { write:{ line, pos, style } } · { strip:true } · { dress:true } · { wash:true }
+      mark: (mn, payload) => bodyMark(mn, payload),
+      potionBit: (mn) => potionBit(mn), potions: (mn) => activePotions(mn).map(f => f.id),
       bench: (mn, mins, why) => benchIn(mn, Math.max(5, Math.min(CFG.BENCH_MAX_MIN, Number(mins) || 30)), CFG.BOT_MEMBER, why || a.name),
       fineRibbons: (mn, n, why) => fineRibbons(mn, n, why, CFG.BOT_MEMBER), splat: (mn, hole, by) => lscgSplatAt(mn, HOLE_SPLAT[hole] || ["ItemVulva"], by ? plainName(by) : null), char: charFor, find: resolveTarget, here: () => (W.ChatRoomCharacter||[]).map(c => c.MemberNumber).filter(m => m !== CFG.BOT_MEMBER),
       onMap, rec: (mn) => rec(mn), isStaff, isHerdmaster, isProprietor, hasRole, ROLE, onDuty, herdLeaderOf, herdMembers,

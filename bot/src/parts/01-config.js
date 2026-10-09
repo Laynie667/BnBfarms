@@ -242,6 +242,9 @@
     LABOUR_MIN: 45,               // labour lasts this long before the litter comes
     LABOUR_WAIT_H: 12,            // due but away from the farm this long: the litter comes without the show
     EGG_CHANCE: 0.2, EGG_TIED_CHANCE: 0.4, EGG_COUNT: [2,6], EGG_DAYS: [2,3],
+    EGG_BOOST_X: 3,        // an "eggs" item or shot: any stud's load can leave a clutch, three times as likely
+    HYPER_LITTER_X: [2,4], // a "hyper" item or shot: a litter comes in two to four times as big (up to HYPER_MAX)
+    HYPER_MAX: 24, HYPER_FERT_X: 1.5,
     MILK_ACHE_MIN: 20,            // milk-denied and full: an achin' emote about this often
     /* ── v0.9.23 ── */
     RP_ROUGH: /\b(pound\w*|rail\w*|rough\w*|slam\w*|hammer\w*|brutal\w*|ravag\w*|wreck\w*|savage\w*|plow\w*|plough\w*|ruin\w*|hard)\b/i,
@@ -301,7 +304,9 @@
     TAG_WORDS: {
       lactation:["lactation","lactating"], virility:["virility"], fertility:["fertility"],
       heat:["heat inducer","heat-inducer"], suppressant:["suppressant"],
-      contraceptive:["contraceptive"], capacity:["capacity","stretching"], reducing:["reducing","shrinking"]
+      contraceptive:["contraceptive"], capacity:["capacity","stretching"], reducing:["reducing","shrinking"],
+      // worn or injected: a clutch of eggs from any stud (and far likelier), and huge litters
+      eggs:["egg laying","egg-laying","oviposit","ovipositor","clutch"], hyper:["hyper pregnancy","hyperpregnancy","hyper fertil","hyperfertil","broodmother","brood"]
     },
     LEAK_LINES: [
       "Oh my — milk's just drippin' from %name%, too full to hold another drop.",
@@ -370,6 +375,7 @@
     RIBBONS_FOR: { quota: 3, stall: 1, chore: 2, gloryShift: 3, gloryPunish: 1, weekBest: 10, showWin: [5, 3, 2] },
     STORE_DAY_LIMIT: { luxury: 1, spin: 5, lucky: 3, grace: 1, greeting: 1, tag: 2 },
     FEEDBACK_PER_DAY: 10, FEEDBACK_MAX: 800,   // the suggestion box: how many a person can send a day, and how long each can be
+    CONTRACT_GRACE_H: 48,            // a new approval (stock, guests) has this long to sign a farm contract, or comes off the books
     AWAY_H: 3, LINGER_MIN: 5,        // "while you were gone" after 3 hours away · nudge lingerers after 5 minutes
     BENCH_MAX_MIN: 120, BENCH_REUSE_SEC: 60,   // the use bench: longest sentence; one person's turns at least a minute apart
     DARE_MIN: 30, DARE_RIBBONS: 2, DARE_RIBBONS_RECKLESS: 4,       // a stud who cums within 3 minutes of their last thrust in somebody fills them

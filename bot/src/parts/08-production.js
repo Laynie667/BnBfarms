@@ -483,6 +483,7 @@
     if (inHeat(p)) chance *= 3;
     if (boosted(p,"fert")) chance *= 2;
     if (wornTags(mother).has("fertility")) chance *= 1.5;
+    if (wornTags(mother).has("hyper") || boosted(p, "hyper")) chance *= CFG.HYPER_FERT_X;
     if (bonus) chance *= bonus;
     if (isRut()) chance *= 2;
     // edged and achin' for it (?edge <who> pussy): likelier to take, and the edges are used up by this fill
@@ -496,6 +497,10 @@
     if (p.preg){ p.preg.sires.push(stud); return "extra"; }
     const [lo,hi] = speciesInfo(mother).litter;
     let count = lo + Math.floor(Math.random()*(hi-lo+1));
+    // hyper pregnancy: a worn "hyper" item, a hyper shot, or a Broodmare Tonic
+    if (wornTags(mother).has("hyper") || boosted(p, "hyper")){
+      const [a, b] = CFG.HYPER_LITTER_X; count = Math.min(CFG.HYPER_MAX, Math.max(count + 2, Math.round(count * (a + Math.random()*(b - a)))));
+    }
     if (lo === 1 && hi === 1 && Math.random() < CFG.PROD.TWIN_CHANCE) count = 2;
     p.preg = { since:now, due: now + CFG.PROD.PREG_DAYS*86400000, sires:[stud], count, warned:false };
     return "new";
@@ -1020,8 +1025,10 @@
     }
     // a draconic stud can leave a clutch of eggs in somebody who said ?eggs on
     let clutch = 0;
-    if (!opt.second && hole !== "mouth" && makesSemen(stud) && penisType(stud) === "draconic" && rt.eggs && !tp.eggs && !limitBlocks(t, "eggs") &&
-        Math.random() < (knot ? CFG.EGG_TIED_CHANCE : CFG.EGG_CHANCE)){
+    // an "eggs" item or shot (or a Broodmare Tonic): any stud can leave a clutch, and far likelier
+    const eggBoost = wornTags(t).has("eggs") || boosted(tp, "eggs");
+    if (!opt.second && hole !== "mouth" && makesSemen(stud) && (penisType(stud) === "draconic" || eggBoost) && rt.eggs && !tp.eggs && !limitBlocks(t, "eggs") &&
+        Math.random() < Math.min(0.95, (knot ? CFG.EGG_TIED_CHANCE : CFG.EGG_CHANCE) * (eggBoost ? CFG.EGG_BOOST_X : 1))){
       const [lo,hi] = CFG.EGG_COUNT, [dl,dh] = CFG.EGG_DAYS;
       clutch = lo + Math.floor(Math.random()*(hi-lo+1));
       tp.eggs = { n:clutch, by:stud, since:Date.now(), layAt: Date.now() + (dl + Math.random()*(dh-dl))*86400000 };

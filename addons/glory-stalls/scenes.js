@@ -366,13 +366,35 @@ const BUILD = [
 ];
 const AMOUNT = (ml) => ml < 15 ? "a hot little spurt" : ml < 30 ? "a warm, creamy load" : ml < 60 ? "a thick, heavy load that just keeps pulsing" : ml < 100 ? "a huge, pumping flood" : "an absurd, never-ending flood";
 const HOLE_PLACE = { mouth: "%n's throat", vulva: "%n's pussy", butt: "%n's ass" };
-const OUTSIDE = { mouth: ["%n's face", "%n's lips and chin", "%n's tongue and cheeks", "%n's hair and face"],
-                  vulva: ["%n's ass and thighs", "%n's back", "the lips of %n's pussy", "%n's ass cheeks"],
-                  butt: ["%n's back", "%n's ass cheeks", "the small of %n's back", "%n's thighs"] };
+const OUTSIDE = { mouth: ["%n's face", "%n's lips and chin", "%n's tongue and cheeks", "%n's hair and face", "%n's eyes and nose", "%n's forehead and down into their eyelashes",
+                           "%n's open mouth and all down their chin", "%n's face and tits", "%n's upturned face, then their heaving tits", "%n's cheeks, nose and parted lips"],
+                  vulva: ["%n's ass and thighs", "%n's back", "the lips of %n's pussy", "%n's ass cheeks", "%n's spread pussy and clit", "%n's belly and mound",
+                          "%n's back, all the way up to their hair", "the backs of %n's thighs and the soles of their feet"],
+                  butt: ["%n's back", "%n's ass cheeks", "the small of %n's back", "%n's thighs", "%n's gaping hole and around it", "%n's spine, from tailbone to neck"] };
+// how it lands on them, outside
+const PAINT = [
+  "At the last second it pulls out and paints %where: %amt, hot ropes landing one after another while %n gasps.",
+  "It yanks free and jerks itself hard, and %amt splatters across %where, rope after rope, until %n is dripping with it.",
+  "\"Look at me,\" the voice says, and %n does, and it comes all over %where: %amt, thick enough to string between their lashes.",
+  "It slaps wet against %n's skin and lets go: %amt of it, glazing %where and running down in warm, heavy streams.",
+  "It pulls out with a groan and empties over %where, %amt, pulse after pulse, marking %n like property.",
+  "\"Hold still.\" %amt hits %where in thick white stripes, and the stranger rubs the head through it, smearing it in.",
+  "It comes in a hot, sudden gush all over %where: %amt, so much it drips off %n in long pearly strings.",
+];
+const PAINT_AFTER = [
+  "Cum slides slowly down %n's face, catches on their lip, and drips onto their tits.",
+  "%n can't open one eye; it's glued shut with somebody's load. They don't dare wipe it.",
+  "It's in %n's hair, on their lashes, running off their chin in a sticky string to the straw.",
+  "A stranger's taste is on %n's lips now, salty and warm, and it isn't going anywhere.",
+  "The load cools on %n's skin into a tacky glaze that pulls every time they move.",
+  "A drop runs from %n's chin all the way down between their breasts and keeps going.",
+  "%n's face is a mess of it, nose to chin, and somebody outside the stall laughs at the sight.",
+  "It's still warm where it pooled in the hollow of %n's throat.",
+];
 function finishLine(v, hole, ml, inside, funnel) {
   const amt = AMOUNT(ml) + ", easily " + Math.round(ml) + " mL of it";
   if (hole === "mouth" && funnel) return "The stranger cums straight into the funnel: " + amt + ", pouring down the tube and into %n's throat whether %n swallows or not.";
-  if (!inside) return "At the last second it pulls out and paints " + pickFrom(OUTSIDE[hole]) + ": " + amt + ", hot ropes landing one after another while %n gasps.";
+  if (!inside) return pickFrom(PAINT).replace("%where", pickFrom(OUTSIDE[hole])).replace("%amt", amt);
   const place = HOLE_PLACE[hole];
   switch (v.type) {
     case "canine": return "The knot shoves in and locks, and the stranger cums deep into " + place + ": " + amt + ", pumped in pulse after pulse while they're tied together.";
@@ -392,7 +414,7 @@ const AFTER = {
   inside: { mouth: ["It pours down %n's throat faster than %n can swallow, and some escapes down their chin.", "The taste lingers, thick and salty, coating %n's tongue.", "It coats %n's lips and tongue, thick and salty, and the taste stays."],
             vulva: ["When it slides out, warm cum runs down %n's thighs in slow, sticky trails.", "%n's pussy twitches and leaks, the load sitting heavy and warm inside them.", "It's pumped so deep into %n that it takes a while to start dripping out."],
             butt:  ["It pulls out with a wet pop and %n's ass gapes for a moment before it starts to leak.", "%n can feel it settle deep in their belly, warm and heavy.", "A slow, warm trickle starts down the back of %n's thigh."] },
-  outside: ["%n is left sticky and dripping, cum cooling on their skin.", "It drips slowly off %n onto the straw. Nobody's coming to wipe it off.", "%n can feel it running down, warm and then cool, marking them."],
+  outside: ["%n is left sticky and dripping, cum cooling on their skin.", "It drips slowly off %n onto the straw. Nobody's coming to wipe it off.", "%n can feel it running down, warm and then cool, marking them."].concat(PAINT_AFTER),
 };
 const FUNNEL_AFTER = ["It all drains down the funnel into %n, gurgling empty at last.", "The last of it trickles down the tube, and %n swallows, flushed and dazed."];
 const LEAVE = [
@@ -604,7 +626,7 @@ function oneVisitor(beats, { hole, visitor, funnel, degrade, praise, rounds, fir
   add(pick(REACT[h].late));
   add(talk());
   add(pick(BUILD));
-  const inside = persona.alwaysInside || v.type === "canine" || v.type === "double" || chance(0.75);
+  const inside = persona.alwaysInside || v.type === "canine" || v.type === "double" || chance(0.6);
   const [lo, hi] = SIZES[v.size].ml;
   const ml = Math.round(between(lo, hi) * (LOAD_X[v.type] || 1));
   add(finishLine(v, h, ml, inside, false), { finish: true, inside, ml, hole: h, visitor: v });
@@ -792,7 +814,7 @@ function together(beats, { hole, visitor, holes, degrade, praise, pick, rough })
   // 5. the finishes, in an order that makes sense: sometimes two together, otherwise one after another
   const load = (v) => { const [lo, hi] = SIZES[v.size].ml; return Math.round(between(lo, hi) * (LOAD_X[v.type] || 1)); };
   const finishOne = (i) => {
-    const v = vis[i], h = order[i], inside = v.type === "canine" || chance(0.8), ml = load(v);
+    const v = vis[i], h = order[i], inside = v.type === "canine" || chance(0.65), ml = load(v);
     add(finishLine(v, h, ml, inside, false), { finish: true, inside, ml, hole: h, visitor: v });
     return inside;
   };

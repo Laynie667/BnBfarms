@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.12.1
+// @version      0.12.2
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -230,7 +230,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.12.1";
+  var VERSION = "0.12.2";
 
   // extension/src/config.js
   var BOT_MEMBER = 260239;
@@ -3808,7 +3808,12 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var STRIP_KEY = "fhc-strip-backup";
   var SPLAT_GROUPS = ["Mask", "FaceMarkings", "BodyMarkings"];
   var WRITE_GROUPS = ["BodyMarkings", "ClothAccessory"];
+  var TREATISE = { group: "BodyMarkings2_Luzi", name: "\u8EAB\u4F53\u8BBA\u6587" };
+  var T_AREAS = { collar: [0, 1, 2], chest: [3, 4, 5], ribs: [6, 7, 8], waist: [9, 10, 11], hips: [12, 13, 14] };
+  var TALLY_PLACE = 11;
   var AREAS2 = { forehead: ["a", "b", "c"], face: ["d", "e", "f"], chest: ["g", "h", "i", "j"], tummy: ["k", "l", "m", "n"] };
+  var SPILL = { forehead: "face", face: "chest", chest: "tummy", tummy: "chest" };
+  var SPILL_CHANCE = 0.35;
   var P2 = () => window.Player;
   var load = () => {
     try {
@@ -3860,6 +3865,52 @@ One of mods you are using is using an old version of SDK. It will work for now b
             tr[k] = 1;
             did.push(area);
           }
+          if (k && SPILL[area] && Math.random() < SPILL_CHANCE) {
+            const down = AREAS2[SPILL[area]].filter((x) => !tr[x]);
+            if (down.length) {
+              tr[down[Math.floor(Math.random() * down.length)]] = 1;
+              did.push(SPILL[area]);
+            }
+          }
+        }
+      }
+    }
+    if (m.write && cleanText(m.write.line) || m.tally) {
+      if (groupOf2(TREATISE.group)) {
+        let it = next.find((b) => b.Group === TREATISE.group && b.Name === TREATISE.name);
+        if (!it && !has(TREATISE.group)) {
+          it = { Group: TREATISE.group, Name: TREATISE.name, Property: { TypeRecord: {} } };
+          next.push(it);
+          mem.treatise = true;
+        }
+        if (it) {
+          const pr = it.Property = Object.assign({}, it.Property || {}), tr = pr.TypeRecord = Object.assign({}, pr.TypeRecord || {});
+          const put = (place, line, text) => {
+            pr["Text" + (place * 3 + line)] = cleanText(text).toUpperCase();
+            tr[String.fromCharCode(97 + place)] = 1;
+          };
+          if (m.tally) {
+            put(TALLY_PLACE, 1, String(m.tally));
+            did.push("tally");
+          }
+          if (m.write && cleanText(m.write.line)) {
+            const pref2 = T_AREAS[m.write.area] || (m.write.pos !== void 0 ? [Math.min(14, Number(m.write.pos))] : [13, 10, 4, 1, 7]);
+            const all = [...pref2, ...Array.from({ length: 15 }, (_, i) => i).filter((i) => !pref2.includes(i) && i !== TALLY_PLACE)];
+            let spot = null;
+            for (const pl of all) {
+              for (const ln of [1, 2, 3]) if (!pr["Text" + (pl * 3 + ln)]) {
+                spot = [pl, ln];
+                break;
+              }
+              if (spot) break;
+            }
+            if (!spot) spot = [pref2[0], 1 + Math.floor(Math.random() * 3)];
+            put(spot[0], spot[1], m.write.line);
+            did.push("writing");
+          }
+          save(mem);
+          commit2(next);
+          return { ok: true, did };
         }
       }
     }
@@ -3889,7 +3940,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
   function washMarks() {
     const mem = load(), stuck = lockedGroups2();
-    const next = bundle().filter((b) => stuck.has(b.Group) || !(b.Name === "Splatters" && SPLAT_GROUPS.includes(b.Group) || b.Name === "BodyWritings" && b.Group === mem.writeGroup));
+    const next = bundle().filter((b) => stuck.has(b.Group) || !(b.Name === "Splatters" && SPLAT_GROUPS.includes(b.Group) || b.Name === "BodyWritings" && b.Group === mem.writeGroup || mem.treatise && b.Group === TREATISE.group));
     save({});
     commit2(next);
     return { ok: true, did: ["wash"] };
@@ -3906,7 +3957,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     const mem = load();
     const next = cur.filter((b) => {
       const g = groupOf2(b.Group);
-      return !(g && g.Clothing) || stuck.has(b.Group) || b.Name === "BodyWritings" || b.Name === "Splatters";
+      return !(g && g.Clothing) || stuck.has(b.Group) || b.Name === "BodyWritings" || b.Name === "Splatters" || b.Group === TREATISE.group;
     });
     if (next.length === cur.length) return { ok: false, why: "nothin' to take off" };
     commit2(next);

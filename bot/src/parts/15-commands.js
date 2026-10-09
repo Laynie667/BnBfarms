@@ -1284,6 +1284,8 @@
           keepApplication(t, L.applications[idx]);   // the whole thing stays on their record (it used to be thrown away)
           L.applications.splice(idx,1);
         }
+        // from now on, stock and guests have CFG.CONTRACT_GRACE_H hours to sign a farm contract (10t-contract-watch.js)
+        if (!isStaff(t) && !r.contractSigned && !hasSignedContract(t)) r.contractBy = Date.now() + CFG.CONTRACT_GRACE_H*3600000;
         saveLedger(); audit(sender,"APPROVE",t+" "+roles.join("+"));
         syncKeys(t, true);
         if (CFG.FRIEND_ON_REGISTER) addFriend(t, true);
@@ -1297,7 +1299,8 @@
           saveLedger();
           ready = "\n\n📜 They asked for "+dp.label+", "+d.label+". It's ready when you are: ?contract show "+dp.key+" "+t+" to look it over, then ?contract offer "+dp.key+" "+t+" "+d.key+" to send it.";
         }
-        R("✅ "+plainName(t)+" — "+roleString(t)+"\n🔑 "+keyString(t)+(r.species ? "\n🐾 "+r.species : "")+(r.gender ? " · "+r.gender : "")+ready);
+        R("✅ "+plainName(t)+" — "+roleString(t)+"\n🔑 "+keyString(t)+(r.species ? "\n🐾 "+r.species : "")+(r.gender ? " · "+r.gender : "")+ready+
+          (r.contractBy ? "\n⏳ They have "+CFG.CONTRACT_GRACE_H+" hours to sign a farm contract, or they come off the books." : ""));
         outfitsLedger();
         if (L.outfitRules.onApprove && roles.includes(ROLE.LIVESTOCK) && outfitSlotFor(t)) later(() => offerOutfit(t, outfitSlotFor(t), "Welcome to the farm"), 4000);
         beep(t,
@@ -1309,6 +1312,7 @@ Keys:     `+keyString(t)+`
 Your keys are live right now, so go on and try the doors! ?doors shows what opens what, and ?record shows your file.
 
 🔔 I've put myself on your friend list. Beep me from anywhere on the property, even hogtied in the far corner. Beep 'safe' and everything stops.
+`+(r.contractBy ? "\n\n📜 One more thing: you've got "+CFG.CONTRACT_GRACE_H+" hours to sign a farm contract. Staff will offer you one on your BC+ Contracts page. Without one, you come back off the books." : "")+`
 
 Welcome to B&B Farm, hon. 🌾`);
         break;

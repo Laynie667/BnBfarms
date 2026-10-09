@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.18.0
+// @version      0.19.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -1827,7 +1827,7 @@
   ];
 
   // bot/src/version.js
-  var VERSION = "0.18.0";
+  var VERSION = "0.19.0";
 
   // bot-parts:farmhand-bot-parts
   (function() {
@@ -2353,6 +2353,12 @@
       EGG_TIED_CHANCE: 0.4,
       EGG_COUNT: [2, 6],
       EGG_DAYS: [2, 3],
+      EGG_BOOST_X: 3,
+      // an "eggs" item or shot: any stud's load can leave a clutch, three times as likely
+      HYPER_LITTER_X: [2, 4],
+      // a "hyper" item or shot: a litter comes in two to four times as big (up to HYPER_MAX)
+      HYPER_MAX: 24,
+      HYPER_FERT_X: 1.5,
       MILK_ACHE_MIN: 20,
       // milk-denied and full: an achin' emote about this often
       /* ── v0.9.23 ── */
@@ -2451,7 +2457,10 @@
         suppressant: ["suppressant"],
         contraceptive: ["contraceptive"],
         capacity: ["capacity", "stretching"],
-        reducing: ["reducing", "shrinking"]
+        reducing: ["reducing", "shrinking"],
+        // worn or injected: a clutch of eggs from any stud (and far likelier), and huge litters
+        eggs: ["egg laying", "egg-laying", "oviposit", "ovipositor", "clutch"],
+        hyper: ["hyper pregnancy", "hyperpregnancy", "hyper fertil", "hyperfertil", "broodmother", "brood"]
       },
       LEAK_LINES: [
         "Oh my \u2014 milk's just drippin' from %name%, too full to hold another drop.",
@@ -2533,6 +2542,8 @@
       FEEDBACK_PER_DAY: 10,
       FEEDBACK_MAX: 800,
       // the suggestion box: how many a person can send a day, and how long each can be
+      CONTRACT_GRACE_H: 48,
+      // a new approval (stock, guests) has this long to sign a farm contract, or comes off the books
       AWAY_H: 3,
       LINGER_MIN: 5,
       // "while you were gone" after 3 hours away · nudge lingerers after 5 minutes
@@ -3311,7 +3322,10 @@
     };
     W.FarmhandExport = exportLedger;
     W.FarmhandLedger = () => L;
-    if (W.__FARMHAND_TEST__) Object.assign(W, { __st: () => state, __cfg: CFG, __pt: prodTick, __qt: quotaTick, __lt: leashTick, __ms: milkingStallTick, __vt: voiceTick, __sync: syncCompanions, __gt: gearTick, __ht: homeTick, __addons: (h, ...a) => addonsEmit(h, ...a), __stateFor: (mn) => stateFor(mn), __leadTick: () => leadTick(), __ambient: () => ambientTick(), __about: (t) => aboutWhom(t), __announce: (t) => announce(t), __reply: (mn, t, ch) => reply(mn, t, ch), __office: () => officeCheck(), __namesHere: (t) => namesHere(t), __speciesCheck: (t) => QUESTIONS.find((q) => q.key === "species").check(t), __attach: () => attachListeners(), __tryLogin: () => tryLogin(), __beepText: (m) => beepText(m), __nameOnce: (t, mn) => nameOnce(t, mn), __buildContract: (n, mn, d) => buildContract(contractTemplate(n), mn, d), __potionTick: () => potionTick(), __penTick: () => penTick(), __benchTick: () => benchTick(), __lingerTick: () => lingerTick(), __ribbonTick: () => ribbonTick(), __dareTick: () => dareTick(), __potionOn: (mn, id) => potionOn(mn, id), __milkRate: (mn) => milkRate(mn) });
+    if (W.__FARMHAND_TEST__) Object.assign(W, { __st: () => state, __cfg: CFG, __pt: prodTick, __qt: quotaTick, __lt: leashTick, __ms: milkingStallTick, __vt: voiceTick, __sync: syncCompanions, __gt: gearTick, __ht: homeTick, __addons: (h, ...a) => addonsEmit(h, ...a), __stateFor: (mn) => stateFor(mn), __leadTick: () => leadTick(), __ambient: () => ambientTick(), __about: (t) => aboutWhom(t), __announce: (t) => announce(t), __reply: (mn, t, ch) => reply(mn, t, ch), __office: () => officeCheck(), __namesHere: (t) => namesHere(t), __speciesCheck: (t) => QUESTIONS.find((q) => q.key === "species").check(t), __attach: () => attachListeners(), __tryLogin: () => tryLogin(), __beepText: (m) => beepText(m), __nameOnce: (t, mn) => nameOnce(t, mn), __buildContract: (n, mn, d) => buildContract(contractTemplate(n), mn, d), __potionTick: () => potionTick(), __penTick: () => penTick(), __benchTick: () => benchTick(), __roll: (m, s, a, b) => rollConception(m, s, a, b), __contractTick: () => {
+      state.cwAt = 0;
+      contractWatchTick();
+    }, __lingerTick: () => lingerTick(), __ribbonTick: () => ribbonTick(), __dareTick: () => dareTick(), __potionOn: (mn, id) => potionOn(mn, id), __milkRate: (mn) => milkRate(mn) });
     W.FarmhandSyncKeys = () => syncAllPresent(true);
     W.FarmhandFriends = () => W.Player.FriendList;
     W.FarmhandAddFriend = (mn) => addFriend(mn, false);
@@ -5072,6 +5086,7 @@
       if (inHeat(p)) chance *= 3;
       if (boosted(p, "fert")) chance *= 2;
       if (wornTags(mother).has("fertility")) chance *= 1.5;
+      if (wornTags(mother).has("hyper") || boosted(p, "hyper")) chance *= CFG.HYPER_FERT_X;
       if (bonus) chance *= bonus;
       if (isRut()) chance *= 2;
       if (p.vEdges && now - (p.vEdgeAt || 0) < CFG.VEDGE_HOURS * 36e5) chance *= 1 + CFG.VEDGE_X * p.vEdges;
@@ -5086,6 +5101,10 @@
       }
       const [lo, hi] = speciesInfo(mother).litter;
       let count = lo + Math.floor(Math.random() * (hi - lo + 1));
+      if (wornTags(mother).has("hyper") || boosted(p, "hyper")) {
+        const [a, b] = CFG.HYPER_LITTER_X;
+        count = Math.min(CFG.HYPER_MAX, Math.max(count + 2, Math.round(count * (a + Math.random() * (b - a)))));
+      }
       if (lo === 1 && hi === 1 && Math.random() < CFG.PROD.TWIN_CHANCE) count = 2;
       p.preg = { since: now, due: now + CFG.PROD.PREG_DAYS * 864e5, sires: [stud], count, warned: false };
       return "new";
@@ -5667,7 +5686,8 @@
         }
       }
       let clutch = 0;
-      if (!opt.second && hole !== "mouth" && makesSemen(stud) && penisType(stud) === "draconic" && rt.eggs && !tp.eggs && !limitBlocks(t, "eggs") && Math.random() < (knot ? CFG.EGG_TIED_CHANCE : CFG.EGG_CHANCE)) {
+      const eggBoost = wornTags(t).has("eggs") || boosted(tp, "eggs");
+      if (!opt.second && hole !== "mouth" && makesSemen(stud) && (penisType(stud) === "draconic" || eggBoost) && rt.eggs && !tp.eggs && !limitBlocks(t, "eggs") && Math.random() < Math.min(0.95, (knot ? CFG.EGG_TIED_CHANCE : CFG.EGG_CHANCE) * (eggBoost ? CFG.EGG_BOOST_X : 1))) {
         const [lo, hi] = CFG.EGG_COUNT, [dl, dh] = CFG.EGG_DAYS;
         clutch = lo + Math.floor(Math.random() * (hi - lo + 1));
         tp.eggs = { n: clutch, by: stud, since: Date.now(), layAt: Date.now() + (dl + Math.random() * (dh - dl)) * 864e5 };
@@ -6567,6 +6587,16 @@
         done.push("fertility doubled for a day");
         fx0.push("fertility");
       }
+      if (tags.has("eggs")) {
+        p.boosts.eggs = now + 24 * H;
+        done.push("any stud can leave a clutch of eggs for a day");
+        fx0.push("eggs");
+      }
+      if (tags.has("hyper")) {
+        p.boosts.hyper = now + 24 * H;
+        done.push("hyper pregnancy for a day: huge litters");
+        fx0.push("hyper");
+      }
       if (tags.has("contraceptive")) {
         p.boosts.contra = now + 48 * H;
         done.push("no catching for two days");
@@ -7045,6 +7075,7 @@
           saveLedger();
           audit(mn, "CONTRACT_SIGNED", x.title);
         }
+        contractSignedNow(mn);
         notifyStaff("\u{1F4DC} " + plainName(mn) + ' signed the farm contract "' + m[1] + '".', true);
         const tpl = x && contractTemplate(x.tpl), dress = tpl ? tpl.outfit === void 0 ? "auto" : tpl.outfit : "";
         const slot = dress === "auto" ? outfitSlotFor(mn) : dress;
@@ -7067,6 +7098,7 @@
           x.endedAt = Date.now();
           saveLedger();
         }
+        contractEndedNow(mn);
         return true;
       }
       return false;
@@ -7087,7 +7119,10 @@
           status: "signed",
           at: bc.signedAt
         }), L.contracts[L.contracts.length - 1]);
-        if (x.status === "offered") x.status = "signed";
+        if (x.status === "offered") {
+          x.status = "signed";
+          contractSignedNow(mn);
+        }
         x.bcpId = bc.id;
         x.signedAt = bc.signedAt;
         x.until = bc.until;
@@ -7097,6 +7132,8 @@
         x.endedAt = Date.now();
       }
       saveLedger();
+      if (held.length) contractSignedNow(mn);
+      else contractEndedNow(mn);
     }
     function releaseContract(sender, t, title) {
       const x = trackedContract(t, title || null, ["signed", "releasing"]);
@@ -9498,6 +9535,17 @@
         seen: "%n licks a drop of Honey Tongue off their lips, and starts glowin' like they've been told somethin' nice."
       },
       {
+        id: "brood",
+        name: "Broodmare Tonic",
+        kind: "reward",
+        mins: 180,
+        price: 9,
+        desc: "For three hours any stud's load can leave a clutch of eggs (three times as likely), and anything that takes comes in as a huge litter.",
+        limit: /\b(preg|breed|egg|litter)/i,
+        drink: "Thick and sweet as molasses. It settles low in your belly, and your womb goes hot and greedy.",
+        seen: "%n drinks a Broodmare Tonic and presses a hand low on their belly, already lookin' ripe."
+      },
+      {
         id: "bitterroot",
         name: "Bitterroot",
         kind: "punish",
@@ -9680,6 +9728,10 @@
         if (makesSemen(mn)) p.boosts.semen = Math.max(p.boosts.semen || 0, now + P.mins * 6e4);
       }
       if (P.id === "bitterroot") p.deniedUntil = Math.max(p.deniedUntil || 0, now + P.mins * 6e4);
+      if (P.id === "brood") {
+        p.boosts.eggs = Math.max(p.boosts.eggs || 0, now + P.mins * 6e4);
+        p.boosts.hyper = Math.max(p.boosts.hyper || 0, now + P.mins * 6e4);
+      }
       if (P.id === "heatmist") startHeat(mn, f.by || CFG.BOT_MEMBER, P.mins / 60);
       if (P.id === "wrongbarn") {
         const kinds = Object.keys(CFG.SPECIES).filter((k) => k !== "default" && k !== speciesKey(mn));
@@ -9706,6 +9758,10 @@
       if (id === "wrongbarn" && r.species === f.to) r.species = f.was || r.species;
       if ((id === "bigbritches" || id === "shrink") && f.part && f.was) setSize(mn, f.part, f.was, false);
       if (id === "heatmist" && p && p.heat && p.heat.by === f.by) p.heat.until = Math.min(p.heat.until, Date.now());
+      if (id === "brood" && p && p.boosts) {
+        p.boosts.eggs = Math.min(p.boosts.eggs || 0, Date.now());
+        p.boosts.hyper = Math.min(p.boosts.hyper || 0, Date.now());
+      }
       saveLedger();
       syncCompanions(true);
       if (!quiet && P) tell(mn, potionOffLine(mn, id, f) || "\u{1F9EA} Your " + P.name + " has worn off, sugar.");
@@ -9790,6 +9846,7 @@
           if ((id === "bigbritches" || id === "shrink") && every2(8, 14)) emote(fxLine(id, mn), mn);
           if (id === "heatmist" && every2(4, 6)) emote("\u{1F525} " + fxLine("heatmist", mn), mn);
           if (id === "moo" && every2(6, 10)) emote(fxLine("moo", mn), mn);
+          if (id === "brood" && every2(8, 14)) privateTo(mn, "\u{1F95A} " + fxLine("brood", mn), "emote");
           if (id === "bell") {
             const C = charFor(mn), pos = C && C.MapData && C.MapData.Pos;
             if (pos) {
@@ -10143,6 +10200,12 @@
         "%n's %p has gone dainty and tight, and everyone can tell.",
         "A farmhand chuckles at %n's shrunk %p, and %n flushes from the ears down."
       ],
+      brood: [
+        "%n's belly feels heavy and hungry, like it's waitin' to be filled with a whole litter. Their hand keeps driftin' to it.",
+        "%n's womb aches, a deep, greedy throb. The Broodmare Tonic wants 'em bred, and bred big.",
+        "%n keeps eyein' every stud on the farm like they're measurin' how many they could carry.",
+        "A slick, swollen heat sits low in %n's belly. Ripe. Ready for a clutch. Ready for a dozen."
+      ],
       heatmist: [
         "%n's skin is pink and hot, and they can't stop squeezin' their thighs together.",
         "The heat's got %n swayin' their hips without meanin' to, presentin' to anyone in reach.",
@@ -10170,7 +10233,8 @@
       bigbritches: ["Your %p eases back to its own size. You'll miss the weight."],
       shrink: ["Your %p comes back to its proper size. What a relief."],
       echo: ["The Echo Elixir's spent. The farm girl stops listenin' quite so close."],
-      heatmist: ["The heat mist burns off, leavin' you damp and dazed."]
+      heatmist: ["The heat mist burns off, leavin' you damp and dazed."],
+      brood: ["The Broodmare Tonic fades. Whatever got put in you while it lasted, though, stays put."]
     };
     function fxFill(t, mn, f) {
       f = f || {};
@@ -10189,7 +10253,8 @@
       needy: ["%n is so needy they're pushin' back for more before it's even started.", "%n sobs with relief at bein' filled at last."],
       bitterroot: ["%n gets close, so close, and the Bitterroot snatches it away again. Ruined, and still bein' used.", "%n whines; the Bitterroot won't let 'em cum no matter how good it feels."],
       golden: ["%n goes off like a firework, golden and shakin', the second they're touched.", "%n cums almost at once, glowin' and loose."],
-      bell: ["The cowbell on %n clangs with every single thrust. The whole farm can hear the rhythm."]
+      bell: ["The cowbell on %n clangs with every single thrust. The whole farm can hear the rhythm."],
+      brood: ["%n's Broodmare-ripe womb just drinks it down, hungry for a whole litter.", "%n's belly gives a deep, greedy clench around the load. That Tonic wants it to take, and take big."]
     };
     function potionBit(mn) {
       const on = activePotions(mn).map((f) => f.id).filter((id2) => FX_BITS[id2]);
@@ -11131,6 +11196,90 @@
       const pool = SPLAT_AREAS[where] || SPLAT_AREAS.body;
       return bodyMark(mn, { splat: [pool[Math.floor(Math.random() * pool.length)]] });
     }
+    function hasSignedContract(mn) {
+      contractsLedger();
+      return L.contracts.some((x) => x.mn === mn && x.status === "signed" && (!x.until || x.until > Date.now()));
+    }
+    function contractSignedNow(mn) {
+      const r = rec(mn);
+      if (!r) return;
+      r.contractSigned = true;
+      r.contractAuto = true;
+      if (r.contractBy) {
+        delete r.contractBy;
+        delete r.contractWarned;
+      }
+      saveLedger();
+      audit(CFG.BOT_MEMBER, "CONTRACT", mn + " signed (auto)");
+    }
+    function contractEndedNow(mn) {
+      const r = rec(mn);
+      if (!r || hasSignedContract(mn)) return;
+      if (r.contractSigned) {
+        r.contractSigned = false;
+        saveLedger();
+        audit(CFG.BOT_MEMBER, "CONTRACT", mn + " unsigned (contract ended)");
+      }
+    }
+    function contractWatchTick() {
+      const now = Date.now();
+      if (now - (state.cwAt || 0) < 6e4) return;
+      state.cwAt = now;
+      contractsLedger();
+      for (const x of L.contracts) {
+        if (x.status === "signed" && x.until && x.until <= now) {
+          x.status = "ended";
+          x.endedAt = now;
+          saveLedger();
+          contractEndedNow(x.mn);
+        }
+      }
+      for (const [k, r] of Object.entries(L.people)) {
+        if (!r.contractBy) continue;
+        const mn = parseInt(k, 10);
+        if (hasSignedContract(mn) || r.contractSigned) {
+          delete r.contractBy;
+          delete r.contractWarned;
+          saveLedger();
+          continue;
+        }
+        const left = r.contractBy - now;
+        r.contractWarned = r.contractWarned || {};
+        for (const h of [24, 4]) {
+          if (left <= h * 36e5 && left > 0 && !r.contractWarned[h]) {
+            r.contractWarned[h] = now;
+            saveLedger();
+            tell(mn, "\u{1F4DC} " + plainName(mn) + ", you've got about " + h + " hours left to sign a farm contract. Without one, I'll have to take you off the books. Ask staff, or ?contract to see what's waitin' for you.");
+            notifyStaff("\u{1F4DC} " + plainName(mn) + " (" + mn + ") has about " + h + " hours left to sign a farm contract, or they come off the books.", true);
+          }
+        }
+        if (left <= 0) unbookUnsigned(mn);
+      }
+    }
+    function unbookUnsigned(mn) {
+      const r = rec(mn);
+      if (!r) return;
+      if (CFG.PROPRIETORS.includes(mn) || isStaff(mn)) {
+        delete r.contractBy;
+        saveLedger();
+        return;
+      }
+      for (const k in L.people) {
+        const p = L.people[k];
+        if ((p.herds || []).some((h) => h.leader === mn)) p.herds = p.herds.filter((h) => h.leader !== mn);
+      }
+      L.archive[mn] = JSON.parse(JSON.stringify(r));
+      delete L.people[mn];
+      saveLedger();
+      audit(CFG.BOT_MEMBER, "UNREGISTER", mn + " (no contract within " + CFG.CONTRACT_GRACE_H + "h)");
+      try {
+        pushKeys(mn, [], true);
+      } catch (e) {
+      }
+      whitelistSync(true);
+      beep(mn, "\u{1F4DC} No farm contract was signed in your first " + CFG.CONTRACT_GRACE_H + " hours, " + plainName(mn) + ", so I've taken you off the books and the room's whitelist. Your paperwork's kept safe in the drawer. Apply again any time you're ready to sign, sweetie.");
+      notifyStaff("\u{1F4DC} " + plainName(mn) + " (" + mn + ") never signed a contract, so they're off the books and the whitelist now. Their paperwork's archived.", true);
+    }
     function clockedIn(mn) {
       const r = rec(mn);
       return !!(r && r.shift && r.shift.in);
@@ -11472,6 +11621,9 @@ INJECTORS \xB7 use Inject on someone
     virility \xB7 semen doubles for a day
     fertility \xB7 catchin' doubles for a day
     contraceptive \xB7 no catchin' for two days
+    egg laying (or clutch) \xB7 any stud can leave a clutch of eggs, 3x as likely
+    hyper pregnancy (or brood) \xB7 huge litters, 2 to 4 times as many
+    (worn, those two work for as long as you wear the item)
     heat inducer \xB7 heat now  \xB7  suppressant \xB7 heat ends
   Capacity
     stretching / capacity \xB7 +250 mL for good (up to 50 L)
@@ -11597,7 +11749,7 @@ THE STORE \xB7 ?store
 
 POTIONS wear off. ?potions lists them all.
   Rewards: Clover Cream \xB7 Golden Hour \xB7 Blue Ribbon Musk \xB7
-    Honey Tongue
+    Honey Tongue \xB7 Broodmare Tonic (eggs from anybody, huge litters)
   Punishments: Bitterroot \xB7 Heavy Udder Draught \xB7 Moo Juice \xB7
     Bell Tonic \xB7 Needy Nectar (?beg nicely to end it early)
   Just because: Hiccup Fizz \xB7 Featherlight \xB7 Wrong Barn \xB7
@@ -14627,6 +14779,7 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
             keepApplication(t, L.applications[idx]);
             L.applications.splice(idx, 1);
           }
+          if (!isStaff(t) && !r.contractSigned && !hasSignedContract(t)) r.contractBy = Date.now() + CFG.CONTRACT_GRACE_H * 36e5;
           saveLedger();
           audit(sender, "APPROVE", t + " " + roles.join("+"));
           syncKeys(t, true);
@@ -14651,7 +14804,7 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
             saveLedger();
             ready = "\n\n\u{1F4DC} They asked for " + dp.label + ", " + d.label + ". It's ready when you are: ?contract show " + dp.key + " " + t + " to look it over, then ?contract offer " + dp.key + " " + t + " " + d.key + " to send it.";
           }
-          R("\u2705 " + plainName(t) + " \u2014 " + roleString(t) + "\n\u{1F511} " + keyString(t) + (r.species ? "\n\u{1F43E} " + r.species : "") + (r.gender ? " \xB7 " + r.gender : "") + ready);
+          R("\u2705 " + plainName(t) + " \u2014 " + roleString(t) + "\n\u{1F511} " + keyString(t) + (r.species ? "\n\u{1F43E} " + r.species : "") + (r.gender ? " \xB7 " + r.gender : "") + ready + (r.contractBy ? "\n\u23F3 They have " + CFG.CONTRACT_GRACE_H + " hours to sign a farm contract, or they come off the books." : ""));
           outfitsLedger();
           if (L.outfitRules.onApprove && roles.includes(ROLE.LIVESTOCK) && outfitSlotFor(t)) later(() => offerOutfit(t, outfitSlotFor(t), "Welcome to the farm"), 4e3);
           beep(
@@ -14664,6 +14817,7 @@ Keys:     ` + keyString(t) + `
 Your keys are live right now, so go on and try the doors! ?doors shows what opens what, and ?record shows your file.
 
 \u{1F514} I've put myself on your friend list. Beep me from anywhere on the property, even hogtied in the far corner. Beep 'safe' and everything stops.
+` + (r.contractBy ? "\n\n\u{1F4DC} One more thing: you've got " + CFG.CONTRACT_GRACE_H + " hours to sign a farm contract. Staff will offer you one on your BC+ Contracts page. Without one, you come back off the books." : "") + `
 
 Welcome to B&B Farm, hon. \u{1F33E}`
           );
@@ -16855,6 +17009,7 @@ Welcome to B&B Farm, hon. \u{1F33E}`
         penTick();
         benchTick();
         lingerTick();
+        contractWatchTick();
         workTick();
         if (Date.now() - (state.wlTick || 0) > 5 * 6e4) {
           state.wlTick = Date.now();

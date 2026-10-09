@@ -48,6 +48,7 @@ const bcpTo=(mn,n)=>sent.slice(n).filter(s=>s[0]==='ChatRoomChat'&&s[1].Content=
   handlers.ChatRoomMessage({Sender:500,Type:'Hidden',Content:'BCP',Dictionary:{message:'ContractList',contracts:[{id:'cabc123',title:p.title,durationMin:10080,policy:'author',rules:p.rules,signedAt:Date.now(),until:Date.now()+604800000,prior:{}}]}});
   await wait(300);
   out('3 knows BC+ id ->', (L().contracts||[]).some(x=>x.mn===500&&x.bcpId==='cabc123'));
+  out('3 ?signed follows it: marked signed ->', L().people[500].contractSigned===true);
   // 4. release
   n=sent.length; await B(700,'contract release 500');
   const rel=bcpTo(500,n).find(d=>d.message==='ContractCommand')||{};
@@ -55,6 +56,28 @@ const bcpTo=(mn,n)=>sent.slice(n).filter(s=>s[0]==='ChatRoomChat'&&s[1].Content=
   handlers.ChatRoomMessage({Sender:500,Type:'Activity',Content:'BCPAction',Dictionary:[{Tag:'x',Text:'Bessie is no longer bound by the contract "'+p.title+'".'}]});
   await wait(300);
   out('4 marked ended ->', (L().contracts||[]).some(x=>x.mn===500&&x.status==='ended'));
+  out('4 ...and unsigned, it was their last ->', L().people[500].contractSigned===false);
+  // 4b. a new approval has 48 hours to sign one, or comes off the books (and off the whitelist)
+  L().applications.push({ mn: 900, name: 'Newbie', at: Date.now(), answers: [] });
+  chars.push({MemberNumber:900,Name:'Newbie',MapData:{Pos:{X:2,Y:2},PrivateState:{}}});
+  await B(221397,'approve 900 livestock');
+  out('4b a new approval gets a 48 hour clock ->', L().people[900] && L().people[900].contractBy > Date.now()+47*3600000);
+  out('4b an old one is left alone ->', !L().people[500].contractBy);
+  L().people[900].contractBy = Date.now() + 3*3600000; W.__contractTick(); await wait(1500);
+  out('4b warned with hours left ->', L().people[900].contractWarned && L().people[900].contractWarned[4]);
+  L().people[900].contractBy = Date.now() - 1000; W.__contractTick(); await wait(1500);
+  out('4b no contract in time: off the books, paperwork archived ->', !L().people[900], !!L().archive[900]);
+  // a signed one stops the clock
+  L().applications.push({ mn: 901, name: 'Signer', at: Date.now(), answers: [] });
+  chars.push({MemberNumber:901,Name:'Signer',MapData:{Pos:{X:3,Y:3},PrivateState:{}}});
+  await B(221397,'approve 901 livestock');
+  L().contracts.push({ key:'k901', mn:901, title:'B&B Farm · Fun', status:'offered', durationMin:60, at:Date.now() });
+  handlers.ChatRoomMessage({Sender:901,Type:'Activity',Content:'BCPAction',Target:260239,Dictionary:[{Tag:'x',Text:'BC+: Signer has signed your contract "B&B Farm · Fun".'}]});
+  await wait(1500);
+  out('4b signin\' stops the clock and marks them signed ->', !L().people[901].contractBy, L().people[901].contractSigned===true);
+  // it runs out: unsigned again
+  const c901 = L().contracts.find(x=>x.mn===901); c901.until = Date.now()-1; W.__contractTick(); await wait(300);
+  out('4b when it runs out, unsigned ->', c901.status==='ended', L().people[901].contractSigned===false);
   // 5. custom contract by proprietor, with checking
   await B(221397,'contract new prizecow from fun');
   await B(221397,'contract add prizecow other.listenToMyVoice sentences="Good cows stand still.|Moo for me." frequency=15');

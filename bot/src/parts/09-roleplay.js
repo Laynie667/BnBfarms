@@ -256,6 +256,8 @@
     if (tags.has("lactation"))   { p.boosts.milk  = now + 24*H; done.push("milk doubled for a day"); fx0.push("lactation"); }
     if (tags.has("virility"))    { p.boosts.semen = now + 24*H; done.push("semen doubled for a day"); fx0.push("virility"); }
     if (tags.has("fertility"))   { p.boosts.fert  = now + 24*H; done.push("fertility doubled for a day"); fx0.push("fertility"); }
+    if (tags.has("eggs"))        { p.boosts.eggs  = now + 24*H; done.push("any stud can leave a clutch of eggs for a day"); fx0.push("eggs"); }
+    if (tags.has("hyper"))       { p.boosts.hyper = now + 24*H; done.push("hyper pregnancy for a day: huge litters"); fx0.push("hyper"); }
     if (tags.has("contraceptive")){ p.boosts.contra = now + 48*H; done.push("no catching for two days"); fx0.push("contraceptive"); }
     if (tags.has("capacity")) fx0.push("capacity");
     if (tags.has("reducing")) fx0.push("reducing");

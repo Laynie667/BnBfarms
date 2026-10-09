@@ -43,6 +43,14 @@ const all=n=>sent.slice(n).filter(([e,d])=>d&&typeof d.Content==="string").map((
   // potions in their scenes
   n=sent.length; const f=P(500).fx.heavy; f.next=1; W.__potionTick(); await wait(1500);
   ok(/udder|teats|breasts/.test(all(n)), 'the draught has its own lines while it lasts');
+  // the Broodmare Tonic: eggs from anybody and huge litters while it lasts; the safeword pours it out
+  await say(221397,'?potion give 500 brood');
+  ok(P(500).fx && P(500).fx.brood && p().boosts.eggs>Date.now() && p().boosts.hyper>Date.now(), 'a Broodmare Tonic: eggs from anybody and hyper litters for three hours');
+  p().preg=null; P(500).breedable=true; P(500).fertile=true; p().held.vulva=2000;
+  for (let i=0;i<200 && !p().preg;i++) W.__roll(500, 600, 500, 5);
+  ok(p().preg && p().preg.count>=3, 'a cow (one calf, normally) on the Tonic carries a litter of '+(p().preg&&p().preg.count));
+  await say(500,'?safe',3000);
+  ok(!P(500).fx.brood && !(p().boosts.hyper>Date.now()), 'the safeword pours it out, boosts and all');
   // a switch flipped mid-application is a command, not an answer
   chars.push(at(255688,22,22)); chars[chars.length-1].Name='Nikto';
   await say(255688,'?apply'); n=sent.length; await say(255688,'potions on');

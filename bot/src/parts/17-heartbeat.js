@@ -56,7 +56,7 @@
       gearTick();
       homeTick();
       lifeTick();
-      ribbonTick(); potionTick(); dareTick(); penTick(); benchTick(); lingerTick();   // ribbons, potions, dares, the corral (10l, 10m), the use bench (10o)
+      ribbonTick(); potionTick(); dareTick(); penTick(); benchTick(); lingerTick(); contractWatchTick();   // ribbons, potions, dares, the corral (10l, 10m), the use bench (10o)
       workTick();
       if (Date.now() - (state.wlTick||0) > 5*60000){ state.wlTick = Date.now(); whitelistSync(true); }   // the room whitelist follows the books
       leadTick();                  // people being led who never arrived get teleported after all

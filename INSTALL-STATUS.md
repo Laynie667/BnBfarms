@@ -5,14 +5,14 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 | Script | File in `dist/` | Where it runs | Current |
 |---|---|---|---|
-| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.18.0** |
-| Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.5.6** |
+| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.19.0** |
+| Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.5.7** |
 | Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.1.1** |
 | Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **1.0.4** |
 | Barn life, Map tools, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.3** |
 | Dairy | `farmhand-dairy.user.js` | the bot's PC | **1.0.2** |
 | Shows | `farmhand-shows.user.js` | the bot's PC | **1.0.4** |
-| Farmhand Companion | `farmhand-companion.user.js` | each player | **0.12.1** |
+| Farmhand Companion | `farmhand-companion.user.js` | each player | **0.12.2** |
 | Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.3** |
 
 ## Sending a watch report
@@ -22,6 +22,14 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 - Running the watcher on more than one game at once (the bot, yours, a tester's) lets Claude line them up into one timeline.
 
 ## Latest changes (newest first)
+
+- **Bot 0.19.0, Companion 0.12.2, Glory stalls 1.5.7: contracts keep ?signed honest, 48 hours to sign, eggs and big litters, cum all over.**
+  - **?signed follows the contracts.** When somebody signs a farm contract the bot offered, they're marked signed; when their last one ends (runs out, is released, or BC+ stops listin' it), unsigned. ?signed still works by hand.
+  - **48 hours to sign.** Everybody approved from now on (stock and guests, not staff) has 48 hours to sign a farm contract. They're told when they're approved (and staff are shown it), reminded at 24 and 4 hours left (staff too), and if none is signed they come off the books and the room whitelist, paperwork archived. People approved before this aren't touched. (CFG.CONTRACT_GRACE_H)
+  - **Eggs and hyper pregnancy.** New tag words for crafted items and shots: **egg laying** (or clutch, ovipositor): any stud's load can leave a clutch of eggs, three times as likely; **hyper pregnancy** (or brood, hyperfertile): litters come in two to four times as big (up to 24), and catch half again as easily. Worn, they work as long as you wear it; a shot lasts a day. And a new store potion, the **Broodmare Tonic** (9 ribbons): both, for three hours, with its own lines.
+  - **Glory stalls: cum on the face and body.** Strangers pull out to paint you far more often (four in ten, not one in four), with seven ways it lands and many more places (eyes, lashes, open mouth, face and tits, belly, spread pussy, the whole spine), and eight more lines for after.
+  - **Splatters run.** A third of the time a load spills on: the mouth runs down onto the chest, the chest onto the belly (with Farm can mark my body on).
+  - **Echo's Body Treatise.** If somebody has Echo's Clothing Mod, farm writing uses its Body Treatise (15 places, collarbone to hips, three lines each) instead of the game's three-line body writing.
 
 - **Companion 0.12.1, Breeding 1.1.1, and every add-on with staff cards: the Livestock panel shows no staff things.** Add-on cards for staff (stud bookings, run a hypno session, the heat map and pens, run a show, write-ups, the stall board and punishments, the troughs and grooming) only show on the **Staff** panel's Farm extras now, never on the Livestock one, and their switches stay out of the Livestock Toggles. The two body switches (mark my body, strip me) only show in Laynie's Companion. Breeding has more cravings, kicks, midwife, rut and showin' lines.
 

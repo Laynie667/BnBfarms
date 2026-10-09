@@ -300,6 +300,9 @@ INJECTORS · use Inject on someone
     virility · semen doubles for a day
     fertility · catchin' doubles for a day
     contraceptive · no catchin' for two days
+    egg laying (or clutch) · any stud can leave a clutch of eggs, 3x as likely
+    hyper pregnancy (or brood) · huge litters, 2 to 4 times as many
+    (worn, those two work for as long as you wear the item)
     heat inducer · heat now  ·  suppressant · heat ends
   Capacity
     stretching / capacity · +250 mL for good (up to 50 L)
@@ -429,7 +432,7 @@ THE STORE · ?store
 
 POTIONS wear off. ?potions lists them all.
   Rewards: Clover Cream · Golden Hour · Blue Ribbon Musk ·
-    Honey Tongue
+    Honey Tongue · Broodmare Tonic (eggs from anybody, huge litters)
   Punishments: Bitterroot · Heavy Udder Draught · Moo Juice ·
     Bell Tonic · Needy Nectar (?beg nicely to end it early)
   Just because: Hiccup Fizz · Featherlight · Wrong Barn ·

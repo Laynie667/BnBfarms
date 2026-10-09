@@ -115,6 +115,7 @@
     if ((m = text.match(/has signed your contract "(.+)"\./))){
       const x = trackedContract(mn, m[1], ["offered"]);
       if (x){ x.status = "signed"; x.signedAt = Date.now(); x.until = x.durationMin ? Date.now() + x.durationMin*60000 : null; saveLedger(); audit(mn, "CONTRACT_SIGNED", x.title); }
+      contractSignedNow(mn);   // ?signed follows it (10t-contract-watch.js)
       notifyStaff("📜 "+plainName(mn)+" signed the farm contract \""+m[1]+"\".", true);
       // the outfit that goes with it: "auto" picks theirs by species and gender
       const tpl = x && contractTemplate(x.tpl), dress = tpl ? (tpl.outfit === undefined ? "auto" : tpl.outfit) : "";
@@ -131,6 +132,7 @@
     if ((m = text.match(/is no longer bound by the contract "(.+)"\./))){
       const x = trackedContract(mn, m[1], ["signed", "releasing"]);
       if (x){ x.status = "ended"; x.endedAt = Date.now(); saveLedger(); }
+      contractEndedNow(mn);
       return true;
     }
     return false;
@@ -144,11 +146,12 @@
       const x = trackedContract(mn, bc.title, ["offered", "signed", "releasing"]) ||
                 (L.contracts.push({ key: Date.now().toString(36), mn, title: bc.title, depth: "unknown", durationMin: bc.durationMin, policy: bc.policy,
                                     rules: Object.keys(bc.rules || {}), status: "signed", at: bc.signedAt }), L.contracts[L.contracts.length-1]);
-      if (x.status === "offered") x.status = "signed";
+      if (x.status === "offered"){ x.status = "signed"; contractSignedNow(mn); }
       x.bcpId = bc.id; x.signedAt = bc.signedAt; x.until = bc.until;
     }
     for (const x of L.contracts) if (x.mn === mn && (x.status === "signed" || x.status === "releasing") && x.bcpId && !held.some(bc => bc.id === x.bcpId)){ x.status = "ended"; x.endedAt = Date.now(); }
     saveLedger();
+    if (held.length) contractSignedNow(mn); else contractEndedNow(mn);
   }
   function releaseContract(sender, t, title){
     const x = trackedContract(t, title || null, ["signed", "releasing"]);

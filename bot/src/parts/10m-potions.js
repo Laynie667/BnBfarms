@@ -23,6 +23,9 @@
     { id: "honey", name: "Honey Tongue", kind: "reward", mins: 45, price: 5, desc: "For 45 minutes the farm girl whispers sweet, filthy praise in your ear.",
       limit: /\bpraise/i, drink: "Thick as honey and twice as sweet. Your ears go pink before it's even down.",
       seen: "%n licks a drop of Honey Tongue off their lips, and starts glowin' like they've been told somethin' nice." },
+    { id: "brood", name: "Broodmare Tonic", kind: "reward", mins: 180, price: 9, desc: "For three hours any stud's load can leave a clutch of eggs (three times as likely), and anything that takes comes in as a huge litter.",
+      limit: /\b(preg|breed|egg|litter)/i, drink: "Thick and sweet as molasses. It settles low in your belly, and your womb goes hot and greedy.",
+      seen: "%n drinks a Broodmare Tonic and presses a hand low on their belly, already lookin' ripe." },
     { id: "bitterroot", name: "Bitterroot", kind: "punish", mins: 30, price: 5, desc: "For 30 minutes, every orgasm slips away ruined, and nobody gets filled by you.",
       limit: /\b(denial|ruin|orgasm)/i, drink: "Bitter as a scolding. It settles low and tight and mean, right where you ache.",
       seen: "%n chokes down a bottle of Bitterroot and makes a face. Somebody's in for a frustratin' half hour." },
@@ -102,6 +105,7 @@
     const p = prodOf(mn), r = rec(mn), now = Date.now();
     if (P.id === "clover"){ if (makesMilk(mn)) p.boosts.milk = Math.max(p.boosts.milk || 0, now + P.mins*60000); if (makesSemen(mn)) p.boosts.semen = Math.max(p.boosts.semen || 0, now + P.mins*60000); }
     if (P.id === "bitterroot") p.deniedUntil = Math.max(p.deniedUntil || 0, now + P.mins*60000);
+    if (P.id === "brood"){ p.boosts.eggs = Math.max(p.boosts.eggs || 0, now + P.mins*60000); p.boosts.hyper = Math.max(p.boosts.hyper || 0, now + P.mins*60000); }
     if (P.id === "heatmist") startHeat(mn, f.by || CFG.BOT_MEMBER, P.mins/60);
     if (P.id === "wrongbarn"){
       const kinds = Object.keys(CFG.SPECIES).filter(k => k !== "default" && k !== speciesKey(mn));
@@ -122,6 +126,7 @@
     if (id === "wrongbarn" && r.species === f.to) r.species = f.was || r.species;
     if ((id === "bigbritches" || id === "shrink") && f.part && f.was) setSize(mn, f.part, f.was, false);
     if (id === "heatmist" && p && p.heat && p.heat.by === f.by) p.heat.until = Math.min(p.heat.until, Date.now());
+    if (id === "brood" && p && p.boosts){ p.boosts.eggs = Math.min(p.boosts.eggs || 0, Date.now()); p.boosts.hyper = Math.min(p.boosts.hyper || 0, Date.now()); }
     saveLedger(); syncCompanions(true);
     if (!quiet && P) tell(mn, potionOffLine(mn, id, f) || "🧪 Your "+P.name+" has worn off, sugar.");
   }
@@ -192,6 +197,7 @@
         if ((id === "bigbritches" || id === "shrink") && every(8, 14)) emote(fxLine(id, mn), mn);
         if (id === "heatmist" && every(4, 6)) emote("🔥 "+fxLine("heatmist", mn), mn);
         if (id === "moo" && every(6, 10)) emote(fxLine("moo", mn), mn);
+        if (id === "brood" && every(8, 14)) privateTo(mn, "🥚 "+fxLine("brood", mn), "emote");
         if (id === "bell"){
           const C = charFor(mn), pos = C && C.MapData && C.MapData.Pos;
           if (pos){

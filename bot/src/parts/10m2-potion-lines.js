@@ -55,6 +55,12 @@
       "%n's %p has gone dainty and tight, and everyone can tell.",
       "A farmhand chuckles at %n's shrunk %p, and %n flushes from the ears down.",
     ],
+    brood: [
+      "%n's belly feels heavy and hungry, like it's waitin' to be filled with a whole litter. Their hand keeps driftin' to it.",
+      "%n's womb aches, a deep, greedy throb. The Broodmare Tonic wants 'em bred, and bred big.",
+      "%n keeps eyein' every stud on the farm like they're measurin' how many they could carry.",
+      "A slick, swollen heat sits low in %n's belly. Ripe. Ready for a clutch. Ready for a dozen.",
+    ],
     heatmist: [
       "%n's skin is pink and hot, and they can't stop squeezin' their thighs together.",
       "The heat's got %n swayin' their hips without meanin' to, presentin' to anyone in reach.",
@@ -84,6 +90,7 @@
     shrink: ["Your %p comes back to its proper size. What a relief."],
     echo: ["The Echo Elixir's spent. The farm girl stops listenin' quite so close."],
     heatmist: ["The heat mist burns off, leavin' you damp and dazed."],
+    brood: ["The Broodmare Tonic fades. Whatever got put in you while it lasted, though, stays put."],
   };
   function fxFill(t, mn, f){
     f = f || {};
@@ -105,6 +112,7 @@
     bitterroot: ["%n gets close, so close, and the Bitterroot snatches it away again. Ruined, and still bein' used.", "%n whines; the Bitterroot won't let 'em cum no matter how good it feels."],
     golden: ["%n goes off like a firework, golden and shakin', the second they're touched.", "%n cums almost at once, glowin' and loose."],
     bell: ["The cowbell on %n clangs with every single thrust. The whole farm can hear the rhythm."],
+    brood: ["%n's Broodmare-ripe womb just drinks it down, hungry for a whole litter.", "%n's belly gives a deep, greedy clench around the load. That Tonic wants it to take, and take big."],
   };
   function potionBit(mn){
     const on = activePotions(mn).map(f => f.id).filter(id => FX_BITS[id]);

@@ -88,7 +88,7 @@ const C=mn=>chars.find(c=>c.MemberNumber===mn);
   ok(/wolf/i.test(all(n)) && P(400).prod.held.vulva > 100 && W.__stateFor(400).today.tally >= 3, 'the wolf den: three loads, three on the tally');
   cfg.TRAP_COOLDOWN_MIN=0; P(400).prod.held={vulva:0,butt:0,mouth:0}; P(400).prod.preg=null;
   n=sent.length; await say(221397,'?trap spring Hand drake'); await wait(1800);
-  ok(P(400).prod.eggs && P(400).prod.eggs.by === -16 && /drake/.test(all(n)), 'the drake leaves a clutch, in the book under his name');
+  ok(P(400).prod.eggs && P(400).prod.eggs.by === -16 && /drake|dragon|nest/.test(all(n)), 'the drake leaves a clutch, in the book under his name');
   P(400).breedable=false; P(400).prod.held={vulva:0,butt:0,mouth:0};
   n=sent.length; await say(221397,'?trap spring Hand stallion'); await wait(1800);
   ok(/stallion|rope after heavy rope|hoses/.test(all(n)) && !P(400).prod.held.vulva, 'not ?breedable: the load goes over them, never inside');

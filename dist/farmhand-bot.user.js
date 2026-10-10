@@ -12687,7 +12687,7 @@
       wolves: {
         beats: [
           [
-            "%n ducks under a low beam into the dark, and the dark growls. Three pairs of yellow eyes open in the straw.",
+            "%n ducks under a low beam into the dark, and the dark growls. Yellow eyes open in the straw, and the wolf-men who own them stand up on two long legs, one after another.",
             "The door swings shut behind %n. Somethin' big and shaggy unfolds itself off the hay bales, then two more: wolf-men, tall and lean, noses twitchin'."
           ],
           [
@@ -12702,7 +12702,7 @@
         in: [
           [
             "He finds %n's %h and drives his %c cock in to the root, ruttin' fast and hard, and then the knot swells and pops inside and %n is tied to him, squirmin', while he pumps them full.",
-            "He hilts in %n's %h in one shove and humps like a dog on a bitch till his knot locks behind the ring of them. %n yelps. He just growls and floods them."
+            "He hilts in %n's %h in one shove and ruts hard and fast till his knot locks behind the ring of them. %n yelps. He just growls and floods them."
           ],
           [
             "The second one doesn't wait for the first knot to go all the way down. He pulls %n off it, wet and gapin', and ties them himself. Then the third takes his turn.",
@@ -12719,7 +12719,7 @@
       stallion: {
         beats: [
           [
-            "%n walks past the end stall and a hand the size of a shovel comes over the half door and takes them by the hip.",
+            "%n walks past the end stall and a hand the size of a shovel comes over the half door and takes them by the hip. It belongs to the stallion stud: a horse-headed man, seven feet of black hide and muscle.",
             "The stall door bangs open as %n goes by. The stallion stud who lives in it is seven feet of black hide and muscle, and he's been waitin' on a mare."
           ],
           [
@@ -12815,11 +12815,11 @@
       boar: {
         beats: [
           [
-            "%n slips on the edge of the wallow and goes in on hands and knees. Somethin' enormous heaves itself up out of the mud beside them.",
-            "The sty rail gives under %n and they land face down in the muck. A grunt answers, low and close, and the mud next to them stands up."
+            "%n slips on the edge of the wallow and goes in on hands and knees. Somebody enormous heaves himself up out of the mud beside them and stands, on two legs, scratchin' his belly.",
+            "The sty rail gives under %n and they land face down in the muck. A chuckle answers, low and close, and the boar-man who was soakin' in it stands up."
           ],
           [
-            "It's the boar. Tusks, bristles, a belly like a barrel, mud to the eyes, and he looks at %n the way he'd look at a sow that had wandered into his pen. Which is what they did.",
+            `It's the boar: a tusked, bristled brute of a man with a belly like a barrel, mud to the eyes. "Well now," he rumbles. "Somebody's wandered into my pen."`,
             "He's a boar-man, big as an outhouse and twice as ripe, and he grunts with slow delight at what's just fallen into his wallow."
           ],
           [
@@ -12833,7 +12833,7 @@
             "Somethin' slick and spiralled worms into %n's %h and keeps windin' in, pokin' and feelin' its way, and then it finds what it's lookin' for and catches fast."
           ],
           [
-            "Then he just lies on them and cums. For minutes. %n is pinned in the mud under a quarter ton of hog while he grunts and pumps and pumps and pumps.",
+            'Then he just lies on them and cums. For minutes. %n is pinned in the mud under a quarter ton of hog while he grunts, "Hold still, sow," and pumps and pumps and pumps.',
             "Boars don't thrust. They lock and fill. %n squirms in the muck with their belly swellin' under them and he doesn't move an inch, just grunts every time another gush goes in."
           ]
         ],
@@ -12847,8 +12847,8 @@
       toms: {
         beats: [
           [
-            "Up in the hayloft somethin' purrs. %n looks up the ladder, and a tail flicks over the edge.",
-            "A bale tips off the loft and lands behind %n, blockin' the door. Two shapes drop down after it and land without a sound."
+            "Up in the hayloft somebody purrs. %n looks up the ladder, and a tomcat-man looks back down, chin on his folded arms, tail flickin' over the edge.",
+            "A bale tips off the loft and lands behind %n, blockin' the door. Two tomcat-men drop down after it and land on their feet without a sound."
           ],
           [
             "Barn toms: a grey one with a torn ear and a big orange one, lean and scarred, movin' like water. They wind round %n, one each side, rubbin' their cheeks along %n's ribs.",
@@ -12944,7 +12944,7 @@
         beats: [
           [
             "%n crawls into the big kennel after a dropped ribbon, and the door swings to behind them. The latch drops. It's on the outside.",
-            "The kennel door clicks shut on %n's heels. In the back, on a heap of old blankets, somethin' the size of a pony lifts its head."
+            "The kennel door clicks shut on %n's heels. In the back, on a heap of old blankets, the yard's mastiff-man opens one eye and sits up, scratchin' his chest."
           ],
           [
             "A mastiff. Brindle, jowly, shoulders like a bull, and when he stands up on two legs his ears brush the roof. He pads over and shoves his nose under %n's tail without so much as a hello.",
@@ -12961,7 +12961,7 @@
             "He ruts into %n's %h hard enough to rattle the kennel, and at the bottom of every stroke his knot kisses against them, bigger each time, till with a shove and a howl from %n it's inside."
           ],
           [
-            "Tied. He turns ass to ass with %n like dogs do and just stands there, pantin', pulsin', while the knot holds them stretched wide. When it finally shrinks enough to slip, he licks them clean and does it again.",
+            "Tied. He settles his weight on %n's back and just stays there, pantin', pulsin', while the knot holds them stretched wide. When it finally shrinks enough to slip, he licks them clean and does it again.",
             "The knot swells till %n can't tell where they end and he starts. He waits it out, lets it slide free with a wet pop, gives them a minute, and then puts it back in. That's the lesson."
           ]
         ],
@@ -13008,7 +13008,7 @@
         beats: [
           [
             "%n bends down to tie a bootlace by the goat post. That was the mistake.",
-            "Somethin' hard butts %n square in the backside and they go down on their knees in the yard."
+            "Somebody butts %n square in the backside, horns first, and they go down on their knees in the yard."
           ],
           [
             "The billy goat stands over them: wiry, yellow-eyed, a beard to his chest and horns curlin' back from his brow, and a smell on him you could lean on. He grins with all his teeth.",
@@ -13072,8 +13072,8 @@
     (function() {
       const W1 = ANTHRO_LINES.wolves, R1 = ANTHRO_LINES.warren, B1 = ANTHRO_LINES.boar;
       W1.beats[0].push(
-        "%n smells them before they see them: wet fur and musk. Then the straw all round the den starts to move. Not three of them tonight. Five.",
-        "A howl goes up from inside the old feed shed as %n passes, and another answers from behind them. The pack's been trackin' them since the gate."
+        "%n smells them before they see them: wet fur and musk. Then the wolf-men come out of the straw all round the den, tall and grinnin'. Not three of them tonight. Five.",
+        "A howl goes up from inside the old feed shed as %n passes, and a laugh answers from behind them. The wolf-men of the pack have been trackin' them since the gate."
       );
       W1.beats[1].push(
         "They bring %n down easy as a fawn, one on each arm, one at the scruff, and stretch them out belly down across a hay bale with their tail end in the air.",
@@ -13117,23 +13117,23 @@
         "%ml, in more little loads than %n could count, and every one of those bucks breeds true. The does kiss their cheeks and tell them to come back when it's time to nest."
       );
       B1.beats[0].push(
-        "The sign on the sty says BEWARE OF THE BOAR. %n was lookin' at the sign, not at where they were puttin' their feet.",
+        "The sign on the sty says BEWARE OF THE BOAR, in his own handwritin'. %n was lookin' at the sign, not at where they were puttin' their feet.",
         "A squeal of hinges, a shove from behind, and %n is through the sty gate and on their face in the wallow. The gate latches itself. It's a trap built for exactly this."
       );
       B1.beats[1].push(
-        "He's not alone today. A second boar, younger, leaner, lifts his snout from the trough and comes over to see what the old man's caught.",
-        "The boar roots at %n with his snout, under their arms, between their legs, shovin' them about in the mud like a truffle he's dug up, till they're slathered from end to end."
+        `He's not alone today. A second boar-man, younger, leaner, puts down his mug and comes over to see what the old man's caught. "Share?" "After."`,
+        "The boar-man turns %n over in the mud with his big hands, noses under their arms and between their legs, and rolls them about like a truffle he's dug up, till they're slathered from end to end."
       );
       B1.beats[2].push("He hooks a tusk under %n's hips and hoists them up onto their knees, ass high, face in the mud. Hogs don't court.");
       B1.in.splice(1, 0, [
-        "The younger one won't wait. He comes round to the front, plants his trotters either side of %n's head, and feeds his own long twisted cock into their mouth. Mud, musk, and hog at both ends.",
+        "The younger one won't wait. He comes round to the front, kneels in the mud at %n's head, takes a fistful of their hair, and feeds his own long twisted cock into their mouth. Mud, musk, and hog at both ends.",
         "It's a slow, deep, grindin' kind of breedin'. He shifts his weight and %n sinks another inch into the wallow, mud oozin' up between their fingers and over their teats, his belly hot and heavy on their back.",
         "%n can feel the tip of him turnin' inside them, screwin' tighter and tighter into place. Every time they squirm he grunts and leans on them harder."
       ]);
       B1.in.push([
         "Ten minutes. Fifteen. He's still cummin'. %n's belly has swelled till it's draggin' in the mud, and he just snorts and goes on pumpin' like he's fillin' a trough.",
         "When the old boar's finally done he doesn't get off. He waits, locked in, till he's sure it's set. Then the young one takes his place and starts the whole thing over.",
-        "The other pigs wander by to watch. One of the sows snuffles %n's face, almost kind. She knows how long this takes."
+        `The sty hands lean on the rail to watch. One of the sow-women wipes the mud off %n's face with her apron, almost kind. "He takes his time, love. Breathe."`
       ]);
       B1.end.push(
         "Two boars, the better part of half an hour, and %ml of hog seed corked up in %n's %h behind a plug as thick as candle wax. They have to be helped over the rail. They look like they've been dipped.",

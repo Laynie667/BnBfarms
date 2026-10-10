@@ -13,7 +13,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 | Dairy | `farmhand-dairy.user.js` | the bot's PC | **1.0.2** |
 | Shows | `farmhand-shows.user.js` | the bot's PC | **1.0.4** |
 | Farmhand Companion | `farmhand-companion.user.js` | each player | **0.12.2** |
-| Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.3** |
+| Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.4** |
 
 ## Sending a watch report
 
@@ -22,6 +22,8 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 - Running the watcher on more than one game at once (the bot, yours, a tester's) lets Claude line them up into one timeline.
 
 ## Latest changes (newest first)
+
+- **Watcher 1.0.4** (from the Oct 9 watch): a recording saved after the page was closed and reopened was named `farm-watch-player-…` because nobody was logged in yet; it now keeps the member number it started with.
 
 - **A server kit (`vps/`)**: runs the bot on a DigitalOcean droplet with no screen (the same scripts from `dist/`, the ledger kept in a file with daily backups, a watchdog, and updates pulled from GitHub by themselves). Step by step in `vps/README.md`. Nothing in the bot or the Companion changed.
 

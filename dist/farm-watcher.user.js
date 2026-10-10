@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farm Watcher (diagnostics)
 // @namespace    bnbfarm
-// @version      1.0.3
+// @version      1.0.4
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farm-watcher.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farm-watcher.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -27,7 +27,7 @@
 (() => {
   // watcher/index.js
   var W = typeof unsafeWindow !== "undefined" && unsafeWindow ? unsafeWindow : window;
-  var VERSION = true ? "1.0.3" : "dev";
+  var VERSION = true ? "1.0.4" : "dev";
   var KEY = "farm_watch_v1";
   var MAX_LINES = 8e4;
   var MAX_CHARS = 9e6;
@@ -410,7 +410,7 @@
   }
   function start(min) {
     min = Math.max(1, Math.min(240, Math.round(Number(min) || 60)));
-    S = { on: true, started: Date.now(), until: Date.now() + min * 6e4, lines: [], chars: 0 };
+    S = { on: true, started: Date.now(), until: Date.now() + min * 6e4, lines: [], chars: 0, who: me() || 0 };
     looks.clear();
     const room = W.ChatRoomData;
     line("WATCH", "Farm Watcher v" + VERSION + " recording for " + min + " minutes");
@@ -443,7 +443,7 @@
     try {
       const a = W.document.createElement("a");
       a.href = URL.createObjectURL(new Blob([fileText()], { type: "text/plain" }));
-      a.download = "farm-watch-" + (me() || "player") + "-" + new Date(S.started || Date.now()).toISOString().slice(0, 16).replace(/[:T]/g, "-") + ".txt";
+      a.download = "farm-watch-" + (S.who || me() || "player") + "-" + new Date(S.started || Date.now()).toISOString().slice(0, 16).replace(/[:T]/g, "-") + ".txt";
       W.document.body.appendChild(a);
       a.click();
       setTimeout(() => {

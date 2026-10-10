@@ -259,7 +259,7 @@ function detect() {
 }
 function start(min) {
   min = Math.max(1, Math.min(240, Math.round(Number(min) || 60)));
-  S = { on: true, started: Date.now(), until: Date.now() + min * 60000, lines: [], chars: 0 };
+  S = { on: true, started: Date.now(), until: Date.now() + min * 60000, lines: [], chars: 0, who: me() || 0 };   // who: so a file saved after the page reopens (before login) still carries the right number
   looks.clear();
   const room = W.ChatRoomData;
   line("WATCH", "Farm Watcher v" + VERSION + " recording for " + min + " minutes");
@@ -287,7 +287,7 @@ function download() {
   try {
     const a = W.document.createElement("a");
     a.href = URL.createObjectURL(new Blob([fileText()], { type: "text/plain" }));
-    a.download = "farm-watch-" + (me() || "player") + "-" + new Date(S.started || Date.now()).toISOString().slice(0, 16).replace(/[:T]/g, "-") + ".txt";
+    a.download = "farm-watch-" + (S.who || me() || "player") + "-" + new Date(S.started || Date.now()).toISOString().slice(0, 16).replace(/[:T]/g, "-") + ".txt";
     W.document.body.appendChild(a); a.click();
     setTimeout(() => { try { a.remove(); URL.revokeObjectURL(a.href); } catch (e) {} }, 3000);
   } catch (e) { say("👁 Couldn't save the file: " + e); }

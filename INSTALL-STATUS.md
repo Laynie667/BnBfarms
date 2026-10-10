@@ -5,7 +5,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 | Script | File in `dist/` | Where it runs | Current |
 |---|---|---|---|
-| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.21.0** |
+| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.21.1** |
 | Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.5.8** |
 | Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.1.3** |
 | Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **1.0.4** |
@@ -24,7 +24,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 ## Latest changes (newest first)
 
-- **Bot 0.21.0, Companion 0.13.0: test subjects, traps, the thing in the water, stackin' shots, and toys that act on their own.**
+- **Bot 0.21.1, Companion 0.13.0: test subjects, traps, the thing in the water, stackin' shots, and toys that act on their own.**
   - **Test subjects**: a new role the proprietors hand out by hand: `?subject add <who>`, `?subject remove <who>`, `?subject` for the list. It rides alongside whatever else they are. The subject can leave any time with `?subject quit`.
   - **Trap spots** spring for subjects and nobody else. Stand on the tile and say `?spot set trap-<kind>` (`trap-milker-2` for a second one; a plain `trap` spot is pot luck). Kinds: injector, milker, breeder, gas, snare, mud, spray, wire, clamp, pump, eggs, lantern, tentacle. `?traps` lists them. `?trap load <spot> lactation x3` fills an injector trap; `?trap spring <who> [kind]` sets one off by hand. A subject can `?traps off`, or `?traps skip <kind>`. Hard limits rule traps out, and the safeword stops one mid-scene and keeps them all quiet for an hour.
   - **Traps with somebody waitin' in them** (two-legged anthro studs and dams, each in the stud book under its own name): `trap-wolves`, `trap-stallion`, `trap-bull`, `trap-warren`, `trap-boar`, `trap-toms`, `trap-drake`, `trap-naga`, `trap-kennel`, `trap-hive`, `trap-goat`, `trap-sow`. Not `?breedable`: the loads go over them, never inside.

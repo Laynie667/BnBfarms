@@ -1,0 +1,18 @@
+[Unit]
+Description=B&B Farm - Farmhand bot (headless)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=farmhand
+WorkingDirectory=/home/farmhand/BnBfarms/vps
+ExecStart=/usr/bin/node run.mjs
+Restart=always
+RestartSec=15
+# the browser is the hungry part: keep it from taking the whole server down
+MemoryMax=1700M
+Environment=NODE_ENV=production
+
+[Install]
+WantedBy=multi-user.target

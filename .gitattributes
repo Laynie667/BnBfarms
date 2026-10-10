@@ -1,3 +1,5 @@
 * text=auto eol=lf
 *.png binary
 *.pdf binary
+# shell scripts run on the Linux server: always LF
+*.sh text eol=lf

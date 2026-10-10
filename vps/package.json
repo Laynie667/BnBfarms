@@ -1,0 +1,13 @@
+{
+  "name": "bnb-farm-vps",
+  "private": true,
+  "description": "Runs the Farmhand bot on a server (headless Chromium), with the ledger kept in a file",
+  "type": "module",
+  "scripts": {
+    "start": "node run.mjs",
+    "selftest": "node selftest.mjs"
+  },
+  "dependencies": {
+    "playwright": "^1.48.0"
+  }
+}

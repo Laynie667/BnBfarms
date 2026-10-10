@@ -7,3 +7,8 @@ ledger-backup*.json
 # private add-ons (addons/private-*): only on the bot's PC, never on GitHub
 addons/private-*/
 dist/farmhand-private-*.user.js
+
+# the server runner: its login, its ledger and its browser stay on the server
+vps/.env
+vps/data/
+vps/node_modules/

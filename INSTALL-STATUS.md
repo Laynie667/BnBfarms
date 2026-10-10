@@ -23,6 +23,8 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 ## Latest changes (newest first)
 
+- **A server kit (`vps/`)**: runs the bot on a DigitalOcean droplet with no screen (the same scripts from `dist/`, the ledger kept in a file with daily backups, a watchdog, and updates pulled from GitHub by themselves). Step by step in `vps/README.md`. Nothing in the bot or the Companion changed.
+
 - **Bot 0.19.0, Companion 0.12.2, Glory stalls 1.5.7: contracts keep ?signed honest, 48 hours to sign, eggs and big litters, cum all over.**
   - **?signed follows the contracts.** When somebody signs a farm contract the bot offered, they're marked signed; when their last one ends (runs out, is released, or BC+ stops listin' it), unsigned. ?signed still works by hand.
   - **48 hours to sign.** Everybody approved from now on (stock and guests, not staff) has 48 hours to sign a farm contract. They're told when they're approved (and staff are shown it), reminded at 24 and 4 hours left (staff too), and if none is signed they come off the books and the room whitelist, paperwork archived. People approved before this aren't touched. (CFG.CONTRACT_GRACE_H)

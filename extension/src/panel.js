@@ -55,7 +55,7 @@ export class Panel {
     // what changes is redrawn in here; the command box below is built once and never touched again, so a message
     // arrivin' never steals focus, pops a phone's keyboard back up, or zooms the screen
     this.top = h("div", { class: "fhc-top" });
-    this.form = h("form", { class: "fhc-form", onsubmit: (e) => { e.preventDefault(); const i = this.form.querySelector("#fhc-input"); if (i.value.trim()) this.ask(i.value.trim()); i.value = ""; } },
+    this.form = h("form", { class: "fhc-form", onsubmit: (e) => { e.preventDefault(); const i = this.form.querySelector("#fhc-input"); if (i.value.trim()) this.ask(i.value.trim(), true); i.value = ""; } },
       h("label", { class: "fhc-grow", style: { display: "flex" } }, h("span", { class: "fhc-sr" }, "Ask the farm girl"),
         h("input", { id: "fhc-input", class: "fhc-in", placeholder: "Ask the farm girl… (stats, size, help me)", autocomplete: "off" })),
       h("button", { type: "submit", class: "fhc-b fhc-b-acc", style: { margin: "0" } }, "Send"));
@@ -133,7 +133,9 @@ export class Panel {
   addAsk(a) { this.asks = this.asks.filter((x) => Date.now() - x.at < 10 * 60000).concat([Object.assign({ at: Date.now() }, a)]); this.ping(true); this.render(); }
   setChoose(c) { this.choose = c; this.ping(true); this.render(); }
   setOutfit(o) { this.outfit = o; this.ping(true); this.render(); }
-  ask(cmd) { this.add(cmd, "mine"); this.onCommand(cmd); }
+  // typed: they wrote it (or picked one of the bot's offered answers), so it may be an answer to a question the bot
+  // asked; anything else is a button or a switch, and the bot is told so
+  ask(cmd, typed) { this.add(cmd, "mine"); this.onCommand(cmd, !!typed); }
 
   toggle(open = !this.el.classList.contains("open")) {
     if (open) this.placePanel();
@@ -231,11 +233,11 @@ export class Panel {
         btn("Yes, dress me", () => { this.outfit = null; this.api.wear && this.api.wear(o); this.render(); }, true),
         btn("Not now", () => { this.outfit = null; this.api.decline && this.api.decline(o); this.render(); }))));
     if (this.choose) out.push(h("div", { class: "fhc-box ask" }, h("div", { style: { whiteSpace: "pre-wrap" } }, this.choose.text),
-      h("div", { style: { marginTop: "8px" } }, (this.choose.choices || []).map((c) => btn(c, () => { this.choose = null; this.ask(c); }, true)))));
+      h("div", { style: { marginTop: "8px" } }, (this.choose.choices || []).map((c) => btn(c, () => { this.choose = null; this.ask(c, true); }, true)))));
     for (const a of this.asks) out.push(h("div", { class: "fhc-box ask" }, h("div", null, a.text),
       h("div", { style: { marginTop: "8px" } },
-        btn("Yes", () => { this.asks = this.asks.filter((x) => x !== a); this.ask("yes"); }, true),
-        btn("No", () => { this.asks = this.asks.filter((x) => x !== a); this.ask("no"); }))));
+        btn("Yes", () => { this.asks = this.asks.filter((x) => x !== a); this.ask("yes", true); }, true),
+        btn("No", () => { this.asks = this.asks.filter((x) => x !== a); this.ask("no", true); }))));
     return out;
   }
   // drag the corner grip: the panel grows or shrinks from its top-left corner, and remembers the size

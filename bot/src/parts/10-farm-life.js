@@ -131,6 +131,8 @@
       if (i >= stops.length){ state.tours.delete(mn); whisper(mn, "And that's the farm, "+plainName(mn)+"! Hope you loved it. Say ?apply if you wanna stay with us, sweetie."); return; }
       teleport(mn, stops[i], false);
       whisper(mn, "📍 "+(i+1)+"/"+stops.length+" — "+fill(stops[i].text, mn));
+      // …and what goes on there, if it's one of the farm's workin' spots (10p-lookout.js)
+      { const show = tourShow(stops[i]); if (show) later(() => { if (state.tours.has(mn) || i + 1 >= stops.length) whisper(mn, show); }, 7000); }
       state.tours.set(mn, i+1);
       later(step, CFG.TOUR_STOP_S*1000);
     };

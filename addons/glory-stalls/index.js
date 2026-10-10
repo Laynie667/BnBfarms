@@ -144,13 +144,15 @@ function finish(id, mn, hole, ml, inside, visitor) {
   if (leader) api.staffPoints(leader, 1, "glory");
   const r = api.rec(mn);
   let took = null;
-  if (inside && holes.includes("vulva") && r && r.breedable && r.fertile && !api.limitBlocks(mn, "breed")) {
-    if (p) p.lastFill = { at: Date.now(), stud: api.ANON_STUD, ml: ml / holes.length };   // cummin' soon after can still make it take
-    took = api.rollConception(mn, api.ANON_STUD, ml / holes.length);
+  // where it can take: the pussy, or the ass for somebody with an mpreg item on (a newer bot says which)
+  const womb = holes.find((h) => (api.canCatchIn ? api.canCatchIn(mn, h) : h === "vulva"));
+  if (inside && womb && r && r.breedable && r.fertile && !api.limitBlocks(mn, "breed")) {
+    if (p) p.lastFill = { at: Date.now(), stud: api.ANON_STUD, ml: ml / holes.length, hole: womb };   // cummin' soon after can still make it take
+    took = api.rollConception(mn, api.ANON_STUD, ml / holes.length, undefined, womb);
     if (took === "new") api.later(() => api.notice(mn, "🍼 A warm, heavy feelin' settles low in your belly… somethin' from the stalls took, sugar. (?stats shows it)"), 20000);
   }
   // breeding season counts stall loads too (a stranger's, so no stud gets the credit)
-  if (inside && api.bred) for (const h of holes) api.bred(mn, api.ANON_STUD, h, ml / holes.length, h === "vulva" ? took : null);
+  if (inside && api.bred) for (const h of holes) api.bred(mn, api.ANON_STUD, h, ml / holes.length, h === (womb || "vulva") ? took : null);
   api.save();
 }
 

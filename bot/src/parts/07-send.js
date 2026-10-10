@@ -496,7 +496,10 @@
       if (c) c.at = Date.now(); else state.companions.set(mn, { at:Date.now(), ver:"?" });
       state.heard++; state.lastHealthy = Date.now();
       log("HEARD [companion] "+mn+": "+text.slice(0,70));
-      if (!handleYesNo(mn, text)) handleCommand(mn, text, "companion");
+      // btn: a button or switch in the panel, not somethin' they typed (a newer Companion says which), so it's
+      // never an answer to an application question
+      state.panelBtn = m.btn === true ? mn : 0;
+      try { if (!handleYesNo(mn, text)) handleCommand(mn, text, "companion"); } finally { state.panelBtn = 0; }
       later(()=>syncCompanions(), 1500);   // their switches or numbers may have just changed
     }
   }

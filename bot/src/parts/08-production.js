@@ -305,15 +305,18 @@
     const eff = x => [].concat((x.Property && x.Property.Effect) || [], x.Asset.Effect || []);
     const blk = x => [].concat((x.Property && x.Property.Block) || [], x.Asset.Block || []);
     const FRONT = ["ItemVulva","ItemPelvis","ItemVulvaPiercings","ItemPenis"];
+    // a hollow (fuckable) plug or dildo is a tunnel, not a stopper: a cock goes right through it. Told by the
+    // item's own name, or by the words in a crafted one's name or description
+    const hollow = x => /hollow|tunnel|fuck\s?-?able|fuck[\s-]?through|open[\s-]?(plug|ended)|speculum|gape\s?plug/i.test((x.Asset.Name||"")+" "+(x.Asset.Description||"")+" "+craftText(x));
     let it = null;
     if (hole === "vulva"){
       it = items.find(x => FRONT.includes(grp(x)) && eff(x).includes("Chaste")) ||
            items.find(x => grp(x) !== "ItemVulva" && blk(x).includes("ItemVulva")) ||
-           items.find(x => grp(x) === "ItemVulva" && (eff(x).includes("FillVulva") || /dildo|plug/i.test(x.Asset.Name)));
+           items.find(x => grp(x) === "ItemVulva" && (eff(x).includes("FillVulva") || /dildo|plug/i.test(x.Asset.Name)) && !hollow(x));
     } else if (hole === "butt"){
       it = items.find(x => eff(x).includes("ButtChaste")) ||
            items.find(x => grp(x) !== "ItemButt" && blk(x).includes("ItemButt")) ||
-           items.find(x => grp(x) === "ItemButt");
+           items.find(x => grp(x) === "ItemButt" && !hollow(x));
     } else if (hole === "mouth"){
       const MOUTH = ["ItemMouth","ItemMouth2","ItemMouth3"];
       // a fitted funnel gag is an open target, not a block
@@ -469,9 +472,14 @@
   function heatLines(){ return (L.heatLines && L.heatLines.length) ? L.heatLines.map(x=>x.text) : CFG.HEAT_LINES; }
 
   // pregnancy
-  function rollConception(mother, stud, amount, bonus){
+  // can a load in this hole take? the pussy always (if they have one); the ass with an "mpreg" item on or an mpreg shot in
+  function mpregOn(mn){ const p = prodOf(mn), r = rec(mn); return !!(r && r.mpreg) || wornTags(mn).has("mpreg") || boosted(p, "mpreg"); }   // their ?mpreg switch, an item, or a shot
+  function canCatchIn(mn, hole){ return hole === "vulva" ? hasVulva(mn) : hole === "butt" ? mpregOn(mn) : false; }
+  function rollConception(mother, stud, amount, bonus, hole){
     const p = prodOf(mother), r = rec(mother);
+    hole = hole === "butt" ? "butt" : "vulva";
     if (!r.fertile || boosted(p,"contra")) return null;
+    if (hole === "butt" && !mpregOn(mother)) return null;
     const now = Date.now();
     if (p.preg){
       // a second father can join only in the first day, and never the same stud twice
@@ -479,7 +487,7 @@
       if (p.preg.sires.includes(stud)) return null;
     }
     let chance = CFG.PROD.CONCEIVE_BASE * speciesInfo(mother).fert *
-                 (0.5 + Math.min(1, (p.held.vulva||0) / capacity(mother)));
+                 (0.5 + Math.min(1, (p.held[hole]||0) / capacity(mother)));
     if (inHeat(p)) chance *= 3;
     if (boosted(p,"fert")) chance *= 2;
     if (wornTags(mother).has("fertility")) chance *= 1.5;
@@ -497,12 +505,13 @@
     if (p.preg){ p.preg.sires.push(stud); return "extra"; }
     const [lo,hi] = speciesInfo(mother).litter;
     let count = lo + Math.floor(Math.random()*(hi-lo+1));
+    if (lo === 1 && hi === 1 && Math.random() < CFG.PROD.TWIN_CHANCE) count = 2;   // twins first, so a hyper litter is never cut back down to two
     // hyper pregnancy: a worn "hyper" item, a hyper shot, or a Broodmare Tonic
     if (wornTags(mother).has("hyper") || boosted(p, "hyper")){
       const [a, b] = CFG.HYPER_LITTER_X; count = Math.min(CFG.HYPER_MAX, Math.max(count + 2, Math.round(count * (a + Math.random()*(b - a)))));
     }
-    if (lo === 1 && hi === 1 && Math.random() < CFG.PROD.TWIN_CHANCE) count = 2;
     p.preg = { since:now, due: now + CFG.PROD.PREG_DAYS*86400000, sires:[stud], count, warned:false };
+    if (hole === "butt") p.preg.via = "butt";   // carried in the ass (mpreg)
     return "new";
   }
   function giveBirth(mn){
@@ -999,11 +1008,11 @@
       } else if (opt.gentle && needK > gape) o += " Taken slow and sweet, so not one bit of stretchin'.";
     }
     let caught = null;
-    if (hole === "vulva"){
+    if (canCatchIn(t, hole)){
       const bonus = (pent ? CFG.PENTUP_FERT_X : 1) * (knot ? CFG.KNOT_FERT_X : 1) *
                     (T.heat && !inHeat(tp) ? 3 : 1) * (onBreedingStand(t) ? CFG.BREEDING_STAND_X : 1);
-      tp.lastFill = { at: Date.now(), stud, ml: kept };
-      caught = rollConception(t, stud, kept, bonus);
+      tp.lastFill = { at: Date.now(), stud, ml: kept, hole };
+      caught = rollConception(t, stud, kept, bonus, hole);
       sp.totals.covers = (sp.totals.covers||0) + 1;
       if (caught){ sp.totals.conceived = (sp.totals.conceived||0) + 1;
                    rollBoard(); const Y = L.yield; Y.s = Y.s || {}; Y.s[stud] = (Y.s[stud]||0) + 1; }
@@ -1152,9 +1161,9 @@
     L.jars = L.jars.filter(j => j !== jar);
     // counted now; told as a scene (10g-scenes.js), with the news at the end if it took
     let caught = null;
-    if (hole === "vulva"){
-      tp.lastFill = { at: Date.now(), stud: jar.stud, ml: kept };
-      caught = rollConception(t, jar.stud, kept, onBreedingStand(t) ? CFG.BREEDING_STAND_X : 1);
+    if (canCatchIn(t, hole)){
+      tp.lastFill = { at: Date.now(), stud: jar.stud, ml: kept, hole };
+      caught = rollConception(t, jar.stud, kept, onBreedingStand(t) ? CFG.BREEDING_STAND_X : 1, hole);
       if (caught){ const sp = prodOf(jar.stud); sp.totals.conceived = (sp.totals.conceived||0) + 1;
                    rollBoard(); const Y = L.yield; Y.s = Y.s || {}; Y.s[jar.stud] = (Y.s[jar.stud]||0) + 1; }
     }

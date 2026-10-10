@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm add-on: Glory stalls
 // @namespace    bnbfarm
-// @version      1.5.7
+// @version      1.5.8
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-glory-stalls.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-glory-stalls.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -1272,12 +1272,13 @@
     if (leader) api.staffPoints(leader, 1, "glory");
     const r = api.rec(mn);
     let took = null;
-    if (inside && holes.includes("vulva") && r && r.breedable && r.fertile && !api.limitBlocks(mn, "breed")) {
-      if (p) p.lastFill = { at: Date.now(), stud: api.ANON_STUD, ml: ml / holes.length };
-      took = api.rollConception(mn, api.ANON_STUD, ml / holes.length);
+    const womb = holes.find((h) => api.canCatchIn ? api.canCatchIn(mn, h) : h === "vulva");
+    if (inside && womb && r && r.breedable && r.fertile && !api.limitBlocks(mn, "breed")) {
+      if (p) p.lastFill = { at: Date.now(), stud: api.ANON_STUD, ml: ml / holes.length, hole: womb };
+      took = api.rollConception(mn, api.ANON_STUD, ml / holes.length, void 0, womb);
       if (took === "new") api.later(() => api.notice(mn, "\u{1F37C} A warm, heavy feelin' settles low in your belly\u2026 somethin' from the stalls took, sugar. (?stats shows it)"), 2e4);
     }
-    if (inside && api.bred) for (const h of holes) api.bred(mn, api.ANON_STUD, h, ml / holes.length, h === "vulva" ? took : null);
+    if (inside && api.bred) for (const h of holes) api.bred(mn, api.ANON_STUD, h, ml / holes.length, h === (womb || "vulva") ? took : null);
     api.save();
   }
   try {

@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.19.0
+// @version      0.20.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -1800,9 +1800,10 @@
     { name: "Safety", cmds: ["safe", "stuck", "staff", "report"] },
     { name: "Suggestion box", cmds: ["feedback <what you think>", "suggest <an idea>", "bug <what went wrong>", "feedback mine", "meh", "more"] },
     { name: "Gettin' started", cmds: ["help", "help me", "rules", "consent", "tour", "apply", "friend", "species", "luxury", "doors", "addons"] },
-    { name: "You and the farm", cmds: ["record", "keys", "who", "herd", "notice", "weather", "feeding", "curfew", "beg"] },
+    { name: "You and the farm", cmds: ["today", "record", "keys", "who", "herd", "notice", "weather", "feeding", "curfew", "beg"] },
     { name: "Milk", cmds: ["stats", "board", "milkable", "quota"] },
-    { name: "Breedin'", cmds: ["breedable", "fertile", "freeuse", "jarok", "yes", "no", "naturalheat", "breed <who>", "cum <who>", "wash", "tally", "eggs", "praise", "degrade", "rights", "accept", "pedigree"] },
+    { name: "Stock with stock", cmds: ["milk <who>", "edge <who>", "groom <who>"] },
+    { name: "Breedin'", cmds: ["breedable", "fertile", "mpreg", "freeuse", "jarok", "yes", "no", "naturalheat", "breed <who>", "cum <who>", "wash", "tally", "eggs", "praise", "degrade", "rights", "accept", "pedigree"] },
     { name: "Body", cmds: ["size", "measure", "penis", "futa", "gender <word>"] },
     { name: "Clothes", cmds: ["outfit", "outfits", "uniform", "outfit back"] },
     { name: "Mind", cmds: ["hypno", "teaseme"] },
@@ -1827,7 +1828,7 @@
   ];
 
   // bot/src/version.js
-  var VERSION = "0.19.0";
+  var VERSION = "0.20.0";
 
   // bot-parts:farmhand-bot-parts
   (function() {
@@ -2459,6 +2460,8 @@
         capacity: ["capacity", "stretching"],
         reducing: ["reducing", "shrinking"],
         // worn or injected: a clutch of eggs from any stud (and far likelier), and huge litters
+        // worn or injected: a load in the ass can take (anal pregnancy); with a "hyper" tag too, a hyper one
+        mpreg: ["mpreg", "male pregnan", "anal pregnan", "anal womb", "ass womb", "boywomb", "boy womb", "breedable ass", "anal breed"],
         eggs: ["egg laying", "egg-laying", "oviposit", "ovipositor", "clutch"],
         hyper: ["hyper pregnancy", "hyperpregnancy", "hyper fertil", "hyperfertil", "broodmother", "brood"]
       },
@@ -4100,7 +4103,12 @@
         state.heard++;
         state.lastHealthy = Date.now();
         log("HEARD [companion] " + mn + ": " + text.slice(0, 70));
-        if (!handleYesNo(mn, text)) handleCommand(mn, text, "companion");
+        state.panelBtn = m.btn === true ? mn : 0;
+        try {
+          if (!handleYesNo(mn, text)) handleCommand(mn, text, "companion");
+        } finally {
+          state.panelBtn = 0;
+        }
         later(() => syncCompanions(), 1500);
       }
     }
@@ -4377,7 +4385,8 @@
       hypno: "hypno",
       potionsOn: "potions",
       daresOn: "dares",
-      benchOn: "bench"
+      benchOn: "bench",
+      mpreg: "mpreg"
     };
     const DOC_CMDS = ["record", "stats", "vet", "quota", "keys", "size", "measure", "pedigree"];
     function shownMl(n) {
@@ -4888,11 +4897,12 @@
       const eff = (x) => [].concat(x.Property && x.Property.Effect || [], x.Asset.Effect || []);
       const blk = (x) => [].concat(x.Property && x.Property.Block || [], x.Asset.Block || []);
       const FRONT = ["ItemVulva", "ItemPelvis", "ItemVulvaPiercings", "ItemPenis"];
+      const hollow = (x) => /hollow|tunnel|fuck\s?-?able|fuck[\s-]?through|open[\s-]?(plug|ended)|speculum|gape\s?plug/i.test((x.Asset.Name || "") + " " + (x.Asset.Description || "") + " " + craftText(x));
       let it = null;
       if (hole === "vulva") {
-        it = items.find((x) => FRONT.includes(grp(x)) && eff(x).includes("Chaste")) || items.find((x) => grp(x) !== "ItemVulva" && blk(x).includes("ItemVulva")) || items.find((x) => grp(x) === "ItemVulva" && (eff(x).includes("FillVulva") || /dildo|plug/i.test(x.Asset.Name)));
+        it = items.find((x) => FRONT.includes(grp(x)) && eff(x).includes("Chaste")) || items.find((x) => grp(x) !== "ItemVulva" && blk(x).includes("ItemVulva")) || items.find((x) => grp(x) === "ItemVulva" && (eff(x).includes("FillVulva") || /dildo|plug/i.test(x.Asset.Name)) && !hollow(x));
       } else if (hole === "butt") {
-        it = items.find((x) => eff(x).includes("ButtChaste")) || items.find((x) => grp(x) !== "ItemButt" && blk(x).includes("ItemButt")) || items.find((x) => grp(x) === "ItemButt");
+        it = items.find((x) => eff(x).includes("ButtChaste")) || items.find((x) => grp(x) !== "ItemButt" && blk(x).includes("ItemButt")) || items.find((x) => grp(x) === "ItemButt" && !hollow(x));
       } else if (hole === "mouth") {
         const MOUTH = ["ItemMouth", "ItemMouth2", "ItemMouth3"];
         const funnel = (x) => x.Asset.Name === "FunnelGag" && x.Property && (x.Property.Type === "Funnel" || x.Property.TypeRecord && x.Property.TypeRecord.typed === 1);
@@ -5074,15 +5084,24 @@
     function heatLines() {
       return L.heatLines && L.heatLines.length ? L.heatLines.map((x) => x.text) : CFG.HEAT_LINES;
     }
-    function rollConception(mother, stud, amount, bonus) {
+    function mpregOn(mn) {
+      const p = prodOf(mn), r = rec(mn);
+      return !!(r && r.mpreg) || wornTags(mn).has("mpreg") || boosted(p, "mpreg");
+    }
+    function canCatchIn(mn, hole) {
+      return hole === "vulva" ? hasVulva(mn) : hole === "butt" ? mpregOn(mn) : false;
+    }
+    function rollConception(mother, stud, amount, bonus, hole) {
       const p = prodOf(mother), r = rec(mother);
+      hole = hole === "butt" ? "butt" : "vulva";
       if (!r.fertile || boosted(p, "contra")) return null;
+      if (hole === "butt" && !mpregOn(mother)) return null;
       const now = Date.now();
       if (p.preg) {
         if (now - p.preg.since > CFG.PROD.EXTRA_SIRE_WINDOW_H * 36e5) return null;
         if (p.preg.sires.includes(stud)) return null;
       }
-      let chance = CFG.PROD.CONCEIVE_BASE * speciesInfo(mother).fert * (0.5 + Math.min(1, (p.held.vulva || 0) / capacity(mother)));
+      let chance = CFG.PROD.CONCEIVE_BASE * speciesInfo(mother).fert * (0.5 + Math.min(1, (p.held[hole] || 0) / capacity(mother)));
       if (inHeat(p)) chance *= 3;
       if (boosted(p, "fert")) chance *= 2;
       if (wornTags(mother).has("fertility")) chance *= 1.5;
@@ -5101,12 +5120,13 @@
       }
       const [lo, hi] = speciesInfo(mother).litter;
       let count = lo + Math.floor(Math.random() * (hi - lo + 1));
+      if (lo === 1 && hi === 1 && Math.random() < CFG.PROD.TWIN_CHANCE) count = 2;
       if (wornTags(mother).has("hyper") || boosted(p, "hyper")) {
         const [a, b] = CFG.HYPER_LITTER_X;
         count = Math.min(CFG.HYPER_MAX, Math.max(count + 2, Math.round(count * (a + Math.random() * (b - a)))));
       }
-      if (lo === 1 && hi === 1 && Math.random() < CFG.PROD.TWIN_CHANCE) count = 2;
       p.preg = { since: now, due: now + CFG.PROD.PREG_DAYS * 864e5, sires: [stud], count, warned: false };
+      if (hole === "butt") p.preg.via = "butt";
       return "new";
     }
     function giveBirth(mn) {
@@ -5656,10 +5676,10 @@
         } else if (opt.gentle && needK > gape) o += " Taken slow and sweet, so not one bit of stretchin'.";
       }
       let caught = null;
-      if (hole === "vulva") {
+      if (canCatchIn(t, hole)) {
         const bonus = (pent ? CFG.PENTUP_FERT_X : 1) * (knot ? CFG.KNOT_FERT_X : 1) * (T.heat && !inHeat(tp) ? 3 : 1) * (onBreedingStand(t) ? CFG.BREEDING_STAND_X : 1);
-        tp.lastFill = { at: Date.now(), stud, ml: kept };
-        caught = rollConception(t, stud, kept, bonus);
+        tp.lastFill = { at: Date.now(), stud, ml: kept, hole };
+        caught = rollConception(t, stud, kept, bonus, hole);
         sp.totals.covers = (sp.totals.covers || 0) + 1;
         if (caught) {
           sp.totals.conceived = (sp.totals.conceived || 0) + 1;
@@ -5828,9 +5848,9 @@
       tp.lastStud = jar.stud;
       L.jars = L.jars.filter((j) => j !== jar);
       let caught = null;
-      if (hole === "vulva") {
-        tp.lastFill = { at: Date.now(), stud: jar.stud, ml: kept };
-        caught = rollConception(t, jar.stud, kept, onBreedingStand(t) ? CFG.BREEDING_STAND_X : 1);
+      if (canCatchIn(t, hole)) {
+        tp.lastFill = { at: Date.now(), stud: jar.stud, ml: kept, hole };
+        caught = rollConception(t, jar.stud, kept, onBreedingStand(t) ? CFG.BREEDING_STAND_X : 1, hole);
         if (caught) {
           const sp = prodOf(jar.stud);
           sp.totals.conceived = (sp.totals.conceived || 0) + 1;
@@ -6592,6 +6612,11 @@
         done.push("any stud can leave a clutch of eggs for a day");
         fx0.push("eggs");
       }
+      if (tags.has("mpreg")) {
+        p.boosts.mpreg = now + 7 * 24 * H;
+        done.push("a load in the ass can take for a week (mpreg)");
+        fx0.push("mpreg");
+      }
       if (tags.has("hyper")) {
         p.boosts.hyper = now + 24 * H;
         done.push("hyper pregnancy for a day: huge litters");
@@ -6930,6 +6955,12 @@
         }
         teleport(mn, stops[i], false);
         whisper(mn, "\u{1F4CD} " + (i + 1) + "/" + stops.length + " \u2014 " + fill(stops[i].text, mn));
+        {
+          const show = tourShow(stops[i]);
+          if (show) later(() => {
+            if (state.tours.has(mn) || i + 1 >= stops.length) whisper(mn, show);
+          }, 7e3);
+        }
         state.tours.set(mn, i + 1);
         later(step, CFG.TOUR_STOP_S * 1e3);
       };
@@ -7640,6 +7671,8 @@
         inHeat,
         startHeat,
         rollConception,
+        canCatchIn,
+        mpregOn,
         gearOf,
         funnelOn,
         // the map
@@ -7773,6 +7806,13 @@
       }
       const a = ADDONS.get(ask.addon);
       if (a) addonCall(a, "ask", ask.cb, yes);
+      else if (!ask.addon && typeof ask.cb === "function") {
+        try {
+          ask.cb(yes);
+        } catch (e) {
+          warn("ask:", e);
+        }
+      }
       return true;
     }
     function addonVeto(kind, mn) {
@@ -8117,7 +8157,7 @@
         const f = p.lastFill;
         if (f && now - f.at < 15 * 6e4 && !f.rerolled && !p.preg && hasVulva(mn)) {
           f.rerolled = true;
-          if (rollConception(mn, f.stud, f.ml, 0.5)) later(() => emote("\u{1F37C} Right as " + n + " peaks, somethin' deep inside catches. " + plainName(f.stud) + "'s seed took after all.", mn), 4e3);
+          if (rollConception(mn, f.stud, f.ml, 0.5, f.hole)) later(() => emote("\u{1F37C} Right as " + n + " peaks, somethin' deep inside catches. " + plainName(f.stud) + "'s seed took after all.", mn), 4e3);
         }
       }
       saveLedger();
@@ -10715,10 +10755,10 @@
         tp.lastStud = sender;
         lscgSplatAt(t, HOLE_SPLAT[hole] || ["ItemVulva"], plainName(sender));
         if (hole === "mouth") tp.milk = Math.min(milkCap(t), tp.milk + kept * CFG.PROD.SWALLOW_TO_MILK);
-        if (hole === "vulva") {
+        if (canCatchIn(t, hole)) {
           sp.totals.covers = (sp.totals.covers || 0) + 1;
           tp.lastFill = { at: Date.now(), stud: sender, ml: kept };
-          if (rt.fertile && !limitBlocks(t, "breed")) caught = rollConception(t, sender, kept, pent ? CFG.PENTUP_FERT_X : 1);
+          if (rt.fertile && !limitBlocks(t, "breed")) caught = rollConception(t, sender, kept, pent ? CFG.PENTUP_FERT_X : 1, hole);
           if (caught) {
             sp.totals.conceived = (sp.totals.conceived || 0) + 1;
             rollBoard();
@@ -10982,6 +11022,74 @@
         ]));
       }
       for (const mn of [...state.arrivedAt.keys()]) if (!charFor(mn)) state.arrivedAt.delete(mn);
+    }
+    function todayText(mn) {
+      const now = Date.now(), here = (W.ChatRoomCharacter || []).map((c) => c.MemberNumber).filter((m) => m !== CFG.BOT_MEMBER && rec(m) && (rec(m).roles || []).length);
+      const names = (list) => list.slice(0, 8).map(plainName).join(", ") + (list.length > 8 ? " and " + (list.length - 8) + " more" : "");
+      const out = ["\u{1F4C5} TODAY ON THE FARM \xB7 " + here.length + " on the books here right now"];
+      if (isRut()) out.push("\u{1F525} It's rut day: every fill is twice as likely to take.");
+      const d = /* @__PURE__ */ new Date(), day = d.getDate();
+      const season = L.mods && L.mods.breeding && L.mods.breeding.week;
+      if (ADDONS.has("breeding")) {
+        if (day >= 15 && day <= 21) {
+          const top2 = season && season.bred ? Object.entries(season.bred).filter(([m]) => Number(m) > 0).sort((a, b) => b[1] - a[1])[0] : null;
+          out.push("\u{1F4D6} Breedin' season, night " + (day - 14) + " of 7" + (top2 ? ": " + plainName(Number(top2[0])) + " leads the stud book, bred " + top2[1] + " time" + (top2[1] === 1 ? "" : "s") : ": the stud book's still empty") + ". ?season book");
+        } else if (day < 15) out.push("\u{1F4D6} Breedin' season starts in " + (15 - day) + " day" + (15 - day === 1 ? "" : "s") + " (?season on to be in it).");
+      }
+      const bell = L.mods && L.mods["barn-life"] && L.mods["barn-life"].herd && L.mods["barn-life"].herd.bell;
+      if (ADDONS.has("barn-life") && !(bell && bell.off)) out.push("\u{1F514} Evenin' turn-out at " + (bell && bell.hour !== void 0 ? bell.hour : 19) + ":00, out in the pasture. A ribbon for comin'.");
+      if (L.life && L.life.feedingOn) out.push("\u{1F33E} Feedin' time at " + CFG.FEED_HOURS.map((h) => h + ":00").join(" and ") + ".");
+      const heat = here.filter((m) => {
+        const p = prodOf(m);
+        return inHeat(p) && !p.heat.quiet;
+      });
+      if (heat.length) out.push("\u{1F525} In heat: " + names(heat) + ".");
+      const bench = here.filter(benchedNow);
+      if (bench.length) out.push("\u{1FAB5} On the use bench: " + bench.map((m) => plainName(m) + " (" + rec(m).benched.uses + ")").join(", ") + ". Stand by and ?use.");
+      const full = here.filter((m) => {
+        const p = prodOf(m);
+        return makesMilk(m) && p.milk >= milkCap(m) * 0.9 && !milkDenied(m);
+      });
+      if (full.length) out.push("\u{1F95B} Full and achin' to be milked: " + names(full) + ".");
+      const due = here.filter((m) => {
+        const p = prodOf(m);
+        return p.preg && p.preg.due - now < 864e5;
+      });
+      if (due.length) out.push("\u{1F37C} Due any time: " + names(due) + ".");
+      rollBoard();
+      const top = Object.entries(L.yield && L.yield.d || {}).sort((a, b) => b[1] - a[1])[0];
+      if (top) out.push("\u{1F3C6} Top of today's milk board: " + plainName(parseInt(top[0], 10)) + ", " + ml(top[1]) + ". ?board");
+      const F = L.life && L.life.fair;
+      if (F && F.open) out.push("\u{1F3AA} The fair's open. ?fair");
+      const r = rec(mn);
+      if (r && r.dare) out.push("\u{1F3B2} You've got a dare waitin': ?dare");
+      if (L.notice && L.notice.text) out.push("\u{1F4CC} " + L.notice.text);
+      if (out.length === 1) out.push("A quiet one so far, sugar. ?help me shows everything there is to do.");
+      return out.join("\n");
+    }
+    const TOUR_SHOW = [
+      [/^milking/, [
+        "\u{1F95B} What happens here: the cups latch on, the strap cinches across a cow's back, and she sways there moanin' while the stall drains her down to a quarter.",
+        "\u{1F95B} What happens here: stock stand in the stall and get milked dry by the machine, a private story playin' out for them beat by beat."
+      ]],
+      [/^bench/, [
+        "\u{1FAB5} What happens here: somebody who said ?bench on gets strapped over it, bottom up, and anybody walkin' by can ?use them. Every use is chalked on the board.",
+        "\u{1FAB5} What happens here: the use bench. Time on it is a sentence from staff or the wheel, and it's exactly what it sounds like."
+      ]],
+      [/^glory-\d+$/, ["\u{1F573}\uFE0F What happens here: the glory stalls. Stand inside and strangers come to the hole, every 10 to 30 minutes, in whatever hole's open. Nobody ever learns who."]],
+      [/^breedingstand$/, ["\u{1F402} What happens here: the breedin' stand. Anybody bred on it is half again likelier to catch. Studs know the way."]],
+      [/^trough/, ["\u{1F33E} What happens here: the trough. Stock eat on their knees, no hands, and the feedin' bell rings twice a day."]],
+      [/^(pen|pens)(-|$)/, ["\u{1F6A7} What happens here: the corral. Naughty stock get penned for a while, and walked right back if they wander."]],
+      [/^stocks?$/, ["\u26D3\uFE0F What happens here: the stocks. Head and hands locked, everything else on show, for as long as staff say."]],
+      [/^(pasture|turnout)/, ["\u{1F514} What happens here: evenin' turn-out. The bell rings, the herd comes out together, and everybody who shows gets a ribbon."]]
+    ];
+    function tourShow(stop) {
+      for (const [name, s] of Object.entries(L.spots || {})) {
+        if (Math.max(Math.abs(s.X - stop.X), Math.abs(s.Y - stop.Y)) > 2) continue;
+        const hit = TOUR_SHOW.find(([re]) => re.test(name));
+        if (hit) return hit[1][Math.floor(Math.random() * hit[1].length)];
+      }
+      return null;
     }
     function rightNow(mn) {
       const r = rec(mn), p = prodOf(mn), now = Date.now(), out = [];
@@ -11623,6 +11731,12 @@ INJECTORS \xB7 use Inject on someone
     contraceptive \xB7 no catchin' for two days
     egg laying (or clutch) \xB7 any stud can leave a clutch of eggs, 3x as likely
     hyper pregnancy (or brood) \xB7 huge litters, 2 to 4 times as many
+    mpreg (or anal pregnancy) \xB7 a load in the ass can take, a week
+      (or just say ?mpreg on: your own switch, no item needed)
+      a shot, or for as long as you wear it. With hyper too: a
+      hyper one. A second stud the same day adds a second sire.
+    A plug or dildo with hollow, tunnel or fuckable in its name or
+      description lets a cock through: it does not close the hole.
     (worn, those two work for as long as you wear the item)
     heat inducer \xB7 heat now  \xB7  suppressant \xB7 heat ends
   Capacity
@@ -12706,6 +12820,7 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
       "pedigree",
       "breedable",
       "fertile",
+      "mpreg",
       "naturalheat",
       "breed",
       "cum",
@@ -12759,7 +12874,8 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
       "idea",
       "bug",
       "meh",
-      "more"
+      "more",
+      "today"
     ];
     const STAFF_CMDS = [
       "queue",
@@ -12846,7 +12962,16 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
       "unbench"
     ];
     const SAFETY_CMDS = ["safe", "safeword", "red", "stuck"];
+    const STOCK_PLAY = ["milk", "edge"];
+    function stockPlayOk(by, t) {
+      const r = rec(t);
+      if (r && r.freeuse) return true;
+      state.playOk = state.playOk || /* @__PURE__ */ new Map();
+      const u = state.playOk.get(t + ":" + by);
+      return !!(u && u > Date.now());
+    }
     const PRIVATE_REPLY = [
+      "today",
       "feedback",
       "suggest",
       "idea",
@@ -13037,7 +13162,12 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
           "stuck",
           "staff"
         ].includes(p0.cmd) || ["safe", "safeword", "red", "stuck"].includes(lone) || /^[a-z]+ (on|off)$/.test(lone) && PUBLIC_CMDS.includes(lone.split(" ")[0]) || channel === "companion" && /^[a-z]+ (on|off)$/.test(lone);
-        if (!pass && handleApplicationAnswer(sender, raw, channel)) return;
+        const button = channel === "companion" && state.panelBtn === sender;
+        if (button && !(p0 && pass) && !["safe", "safeword", "red", "stuck", "staff", "help", "rules", "consent", "tour", "species", "luxury", "doors", "apply"].includes(lone.split(" ")[0])) {
+          reply(sender, "You're in the middle of your application, sugar, so I've left that button alone: it wasn't taken as your answer. Type your answer to the last question in the box below (or say ?apply to see it again). The switches work once you're on the books.", channel);
+          return;
+        }
+        if (!pass && !button && handleApplicationAnswer(sender, raw, channel)) return;
       }
       const huh = (msg) => {
         if (channel === "chat") return;
@@ -13090,6 +13220,7 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
       }
       let addonCmd = ADDON_CMDS.get(cmd) || null;
       if (addonCmd && !addonVisible(addonCmd.addon, sender)) addonCmd = null;
+      if (addonCmd && !args.length && isStaff(sender) && guideTopic(cmd)) addonCmd = null;
       if (!PUBLIC_CMDS.includes(cmd) && !STAFF_CMDS.includes(cmd) && !addonCmd) {
         if (guideTopic(cmd)) {
           args = [cmd];
@@ -13121,7 +13252,37 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
         return;
       }
       const joining = ["register", "stock", "approve", "grant", "claim"].includes(cmd) && !(rec(sender) && (rec(sender).roles || []).length);
-      if (STAFF_CMDS.includes(cmd) && !isStaff(sender)) {
+      if (STOCK_PLAY.includes(cmd) && !isStaff(sender) && rec(sender) && (rec(sender).roles || []).length) {
+        const t = resolveTarget(args[0]);
+        if (!t || !rec(t) || !(rec(t).roles || []).length) {
+          huh("Who, sugar? ?" + cmd + " <who>, somebody on the farm's books, standin' right by you.");
+          return;
+        }
+        if (t === sender) {
+          huh(cmd === "milk" ? "Milkin' yourself? Stand in a milkin' stall, sugar, or ask somebody to do it for you." : "No edgin' yourself for the farm's count, sugar. Ask somebody.");
+          return;
+        }
+        const a = posOf(sender), b = posOf(t);
+        if (!a || !b || Math.max(Math.abs(a.X - b.X), Math.abs(a.Y - b.Y)) > 1) {
+          huh("Get right up next to " + plainName(t) + " first, sugar.");
+          return;
+        }
+        if (!stockPlayOk(sender, t)) {
+          const what = cmd === "milk" ? "milk you by hand" : "edge you";
+          addonAsks.set(t, { addon: null, at: Date.now(), cb: (yes) => {
+            if (!yes) {
+              tell(sender, plainName(t) + " said no, sugar. Leave 'em be.");
+              return;
+            }
+            state.playOk.set(t + ":" + sender, Date.now() + CFG.BREED_OK_H * 36e5);
+            tell(sender, plainName(t) + " said yes. Go on, sugar.");
+            handleCommand(sender, raw, channel, true);
+          } });
+          askCard(t, "play", (cmd === "milk" ? "\u{1F95B} " : "\u{1F608} ") + plainName(sender) + " wants to " + what + ", sugar. Say yes or no (?yes or ?no works too).");
+          reply(sender, "I've asked " + plainName(t) + " first, sugar. Once they say yes, it'll happen.", channel);
+          return;
+        }
+      } else if (STAFF_CMDS.includes(cmd) && !isStaff(sender)) {
         if (joining) {
           reply(sender, "Want to join the farm, sugar? Say ?apply and I'll walk you through it, one question at a time. Staff look it over and sign you on as stock, a guest, or a farmhand.", channel);
           return;
@@ -14571,6 +14732,10 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
         case "who":
           R(whoText());
           break;
+        case "today":
+          R(todayText(sender));
+          break;
+        // what's on, in one look (10p-lookout.js)
         case "health": {
           if (!isProprietor(sender)) {
             R("Sorry, sugar, that one's just for the proprietors.");
@@ -15981,7 +16146,8 @@ Welcome to B&B Farm, hon. \u{1F33E}`
         }
         case "breedable":
         case "fertile":
-        case "naturalheat": {
+        case "naturalheat":
+        case "mpreg": {
           const r = rec(sender);
           if (!r || !r.roles.length) {
             R("That's just for folks on the books, sugar. Say ?apply first!");
@@ -16006,7 +16172,7 @@ Welcome to B&B Farm, hon. \u{1F33E}`
           if (field === "naturalHeat" && on) prodOf(sender).nextHeatAt = Date.now() + CFG.PROD.NATURAL_HEAT_EVERY_D * 864e5;
           saveLedger();
           audit(sender, field.toUpperCase(), on ? "on" : "off");
-          R({ breedable: "Breedable", fertile: "Fertile (can catch)", naturalHeat: "Natural heat every " + CFG.PROD.NATURAL_HEAT_EVERY_D + " days" }[field] + ": " + (on ? "ON" : "off") + ". Say ?" + cmd + " on or ?" + cmd + " off any time to set it, hon.");
+          R({ breedable: "Breedable", fertile: "Fertile (can catch)", mpreg: "Mpreg (a load in your ass can take, no item needed; you still need ?breedable and ?fertile)", naturalHeat: "Natural heat every " + CFG.PROD.NATURAL_HEAT_EVERY_D + " days" }[field] + ": " + (on ? "ON" : "off") + ". Say ?" + cmd + " on or ?" + cmd + " off any time to set it, hon.");
           break;
         }
         case "breed": {

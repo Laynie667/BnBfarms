@@ -97,12 +97,12 @@ function relay(m) {
   window.ServerSend("ChatRoomChat", { Type: "Emote", Content: "*" + text });
 }
 
-function sendCommand(text) {
+function sendCommand(text, typed) {
   text = String(text || "").trim();
   if (!text) return;
   if (botHere()) {
     if (!st.welcomed) hello();
-    toBot("cmd", { text });
+    toBot("cmd", typed ? { text } : { text, btn: true });   // btn: a button or switch, never an answer to a question
     // if nothin' comes back, say so: a quiet failure is the hardest kind to find
     const sentAt = Date.now();
     st.lastSent = sentAt;
@@ -334,7 +334,7 @@ function start() {
     window.CommandCombine([{
       Tag: "farm",
       Description: "<command>: ask the B&B Farm girl, e.g. /farm stats",
-      Action: (args) => { sendCommand(args); st.panel.toggle(true); },
+      Action: (args) => { sendCommand(args, true); st.panel.toggle(true); },
     }]);
   }
 

@@ -48,7 +48,7 @@ const beepsTo=(k,mn)=>sent.slice(k).filter(([e,d])=>e==='AccountBeep'&&d.MemberN
   p.preg.since=now-5*86400000*0.8; p.preg.due=now+5*86400000*0.2; d().preg['500'].kickAt=1;
   k=sent.length; W.__addons('tick'); await drain();
   ok(d().preg['500'].stage==='heavy', 'later on is heavy');
-  ok(sent.slice(k).some(([e,x])=>x&&/kick|foot|rolls|ribs/.test(String(x.Content))&&/Moo/.test(String(x.Content))), 'a kick emote goes out');
+  ok(sent.slice(k).some(([e,x])=>x&&/kick|foot|rolls|ribs|belly|litter|landed/.test(String(x.Content))&&/Moo/.test(String(x.Content))), 'a kick emote goes out');
   // bookings: staff only
   k=sent.length; handlers.AccountBeep({MemberNumber:500,Message:'book Hana Moo'}); await drain(1500);
   ok(!d().bookings.length, 'stock cannot add bookings');

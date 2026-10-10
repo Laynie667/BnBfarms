@@ -58,7 +58,14 @@
                 // (live, Oct 8: Nikto's application saved "potions on" as their name)
                 || (/^[a-z]+ (on|off)$/.test(lone) && PUBLIC_CMDS.includes(lone.split(" ")[0]))
                 || (channel === "companion" && /^[a-z]+ (on|off)$/.test(lone));
-      if (!pass && handleApplicationAnswer(sender, raw, channel)) return;
+      // a panel button or switch pressed mid-application (reported: it was saved as the answer). Safety and the
+      // guides still work; anything else waits till they're on the books, and the question stays open.
+      const button = channel === "companion" && state.panelBtn === sender;
+      if (button && !(p0 && pass) && !["safe","safeword","red","stuck","staff","help","rules","consent","tour","species","luxury","doors","apply"].includes(lone.split(" ")[0])){
+        reply(sender, "You're in the middle of your application, sugar, so I've left that button alone: it wasn't taken as your answer. Type your answer to the last question in the box below (or say ?apply to see it again). The switches work once you're on the books.", channel);
+        return;
+      }
+      if (!pass && !button && handleApplicationAnswer(sender, raw, channel)) return;
     }
 
     // Never go quiet on somebody talkin' to me in private: a silent bot is harder to fix than a chatty one.
@@ -95,6 +102,8 @@
     if (cmd === "the" && args.length){ cmd = String(args.shift()).toLowerCase(); rest = args.join(" "); }   // "!the roster"   // live, Oct 7: "?me" got "I don't know ?me"
     let addonCmd = ADDON_CMDS.get(cmd) || null;   // a command from an add-on script (10f-addons.js)
     if (addonCmd && !addonVisible(addonCmd.addon, sender)) addonCmd = null;   // somebody else's private add-on: as if it isn't there
+    // a bare word that's both a staff guide and an add-on's command (?play): staff get the guide, as before
+    if (addonCmd && !args.length && isStaff(sender) && guideTopic(cmd)) addonCmd = null;
     if (!PUBLIC_CMDS.includes(cmd) && !STAFF_CMDS.includes(cmd) && !addonCmd){
       // a guide's name on its own opens that guide (?play, ?herd2, ?barnstaff)
       if (guideTopic(cmd)){ args = [cmd]; rest = cmd; cmd = "help"; }
@@ -111,6 +120,26 @@
     // somebody not on the books tryin' to sign themselves up (live, Oct 7: "Register stock", "?register", "stock"
     // got "just for farm staff" and then silence): point them at ?apply
     const joining = ["register","stock","approve","grant","claim"].includes(cmd) && !(rec(sender) && (rec(sender).roles || []).length);
+    // STOCK ON STOCK: ?milk and ?edge are open to anybody on the books, on somebody else on the books who's said
+    // yes to them (asked once, good for a couple of hours; never asked with ?freeuse on). Staff aren't asked about.
+    if (STOCK_PLAY.includes(cmd) && !isStaff(sender) && rec(sender) && (rec(sender).roles || []).length){
+      const t = resolveTarget(args[0]);
+      if (!t || !rec(t) || !(rec(t).roles || []).length){ huh("Who, sugar? ?"+cmd+" <who>, somebody on the farm's books, standin' right by you."); return; }
+      if (t === sender){ huh(cmd === "milk" ? "Milkin' yourself? Stand in a milkin' stall, sugar, or ask somebody to do it for you." : "No edgin' yourself for the farm's count, sugar. Ask somebody."); return; }
+      const a = posOf(sender), b = posOf(t);
+      if (!a || !b || Math.max(Math.abs(a.X - b.X), Math.abs(a.Y - b.Y)) > 1){ huh("Get right up next to "+plainName(t)+" first, sugar."); return; }
+      if (!stockPlayOk(sender, t)){
+        const what = cmd === "milk" ? "milk you by hand" : "edge you";
+        addonAsks.set(t, { addon: null, at: Date.now(), cb: (yes) => {
+          if (!yes){ tell(sender, plainName(t)+" said no, sugar. Leave 'em be."); return; }
+          state.playOk.set(t+":"+sender, Date.now() + CFG.BREED_OK_H*3600000);
+          tell(sender, plainName(t)+" said yes. Go on, sugar.");
+          handleCommand(sender, raw, channel, true);
+        } });
+        askCard(t, "play", (cmd === "milk" ? "🥛 " : "😈 ")+plainName(sender)+" wants to "+what+", sugar. Say yes or no (?yes or ?no works too).");
+        reply(sender, "I've asked "+plainName(t)+" first, sugar. Once they say yes, it'll happen.", channel); return;
+      }
+    } else
     if (STAFF_CMDS.includes(cmd) && !isStaff(sender)){
       if (joining){ reply(sender, "Want to join the farm, sugar? Say ?apply and I'll walk you through it, one question at a time. Staff look it over and sign you on as stock, a guest, or a farmhand.", channel); return; }
       huh("?"+cmd+" is just for farm staff, sugar."); return;
@@ -1124,6 +1153,7 @@
       }
 
       case "who": R(whoText()); break;
+      case "today": R(todayText(sender)); break;   // what's on, in one look (10p-lookout.js)
 
       case "health": {
         if (!isProprietor(sender)){ R("Sorry, sugar, that one's just for the proprietors."); break; }
@@ -2075,7 +2105,7 @@ Welcome to B&B Farm, hon. 🌾`);
         break;
       }
 
-      case "breedable": case "fertile": case "naturalheat": {
+      case "breedable": case "fertile": case "naturalheat": case "mpreg": {
         const r = rec(sender);
         if (!r || !r.roles.length){ R("That's just for folks on the books, sugar. Say ?apply first!"); break; }
         const field = cmd === "naturalheat" ? "naturalHeat" : cmd;
@@ -2087,7 +2117,7 @@ Welcome to B&B Farm, hon. 🌾`);
         r[field] = on;
         if (field === "naturalHeat" && on) prodOf(sender).nextHeatAt = Date.now() + CFG.PROD.NATURAL_HEAT_EVERY_D*86400000;
         saveLedger(); audit(sender, field.toUpperCase(), on?"on":"off");
-        R({ breedable:"Breedable", fertile:"Fertile (can catch)", naturalHeat:"Natural heat every "+CFG.PROD.NATURAL_HEAT_EVERY_D+" days" }[field]+": "+(on?"ON":"off")+". Say ?"+cmd+" on or ?"+cmd+" off any time to set it, hon.");
+        R({ breedable:"Breedable", fertile:"Fertile (can catch)", mpreg:"Mpreg (a load in your ass can take, no item needed; you still need ?breedable and ?fertile)", naturalHeat:"Natural heat every "+CFG.PROD.NATURAL_HEAT_EVERY_D+" days" }[field]+": "+(on?"ON":"off")+". Say ?"+cmd+" on or ?"+cmd+" off any time to set it, hon.");
         break;
       }
 

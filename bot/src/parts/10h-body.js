@@ -128,7 +128,7 @@
       const f = p.lastFill;
       if (f && now - f.at < 15*60000 && !f.rerolled && !p.preg && hasVulva(mn)){
         f.rerolled = true;
-        if (rollConception(mn, f.stud, f.ml, 0.5)) later(() => emote("🍼 Right as "+n+" peaks, somethin' deep inside catches. "+plainName(f.stud)+"'s seed took after all.", mn), 4000);
+        if (rollConception(mn, f.stud, f.ml, 0.5, f.hole)) later(() => emote("🍼 Right as "+n+" peaks, somethin' deep inside catches. "+plainName(f.stud)+"'s seed took after all.", mn), 4000);
       }
     }
     saveLedger();

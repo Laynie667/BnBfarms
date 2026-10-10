@@ -89,6 +89,7 @@ export function inbox(ctx) {
 // the farm switches you hold, flipped with the same commands you'd type
 export const SWITCH_INFO = [
   ["breedable", "Breedable", "You can be bred and filled"], ["fertile", "Fertile", "You can catch"],
+  ["mpreg", "Mpreg", "A load in your ass can take too, no item needed (with Breedable and Fertile on)"],
   ["jarok", "Jar insemination", "On: staff still ask every time · Off: never"], ["freeuse", "Free use", "Any stud may have you without askin'"],
   ["futa", "Futa", "Cock and vulva both, milk and semen both"], ["milkable", "Milkable", "Make milk"],
   ["naturalheat", "Natural heat", "Come into heat on your own every 7 days"], ["praise", "Praise", "Let staff's praise count"],

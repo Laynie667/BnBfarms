@@ -5,14 +5,15 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 | Script | File in `dist/` | Where it runs | Current |
 |---|---|---|---|
-| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.19.0** |
-| Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.5.7** |
-| Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.1.1** |
+| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.20.0** |
+| Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.5.8** |
+| Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.1.3** |
 | Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **1.0.4** |
-| Barn life, Map tools, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.3** |
+| Barn life | `farmhand-barn-life.user.js` | the bot's PC | **1.0.5** |
+| Map tools, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.3** |
 | Dairy | `farmhand-dairy.user.js` | the bot's PC | **1.0.2** |
 | Shows | `farmhand-shows.user.js` | the bot's PC | **1.0.4** |
-| Farmhand Companion | `farmhand-companion.user.js` | each player | **0.12.2** |
+| Farmhand Companion | `farmhand-companion.user.js` | each player | **0.12.3** |
 | Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.4** |
 
 ## Sending a watch report
@@ -22,6 +23,19 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 - Running the watcher on more than one game at once (the bot, yours, a tester's) lets Claude line them up into one timeline.
 
 ## Latest changes (newest first)
+
+- **Bot 0.20.0, Companion 0.12.3, Barn life 1.0.5, Breeding 1.1.3, Glory stalls 1.5.8: hollow plugs, mpreg, stock with stock, and things for the herd to do.**
+  - **`?today`**: what's on, in one look: who's on the books here, rut day, breedin' season and who leads the stud book, turn-out and feedin' times, who's in heat, on the bench, full and achin', due any time, the top of the milk board, your dare, the notice.
+  - **The tour shows what a place is for.** At a tour stop next to a milkin' stall, the bench, a glory stall, the breedin' stand, a trough, the pen, the stocks or the pasture, the visitor also gets a line about what happens there.
+  - **Play** (Barn life): `?play <who>` picks a game, or name it: `romp` (a tumble in the straw), `rps` (rock, paper, scissors: each says `?rps rock|paper|scissors` privately, or taps a button in the Companion; the loser pays a little forfeit) or `race` (first of the two to a spot the farm girl names). The other animal gets a yes/no first, good for a couple of hours. The first win of the day earns a ribbon.
+  - **Evenin' turn-out** (Barn life): at 7 pm on the bot's clock the bell calls everybody on the books out to the pasture (`?spot set pasture`). Ten minutes later whoever came shares a scene and gets a ribbon; nobody's moved or marked down for stayin' in. Proprietors: `?bell`, `?bell now`, `?bell hour <0-23>`, `?bell off|on`.
+  - **Call a stud** (Breeding): studs say `?studcall on`; anybody in heat says `?callstud` and every signed-up stud on the farm is told who and where, once every 20 minutes.
+  - **Mates for the day** (Breeding): `?mate <who>` asks them; mates last till midnight. Breedin' your mate is likelier to take (a second roll), and the first time pays you both a ribbon. `?mate`, `?mate off`.
+  - **Hollow plugs don't block.** A plug or dildo with hollow, tunnel or fuckable in its name (or in a crafted one's name or description) is a tunnel, not a stopper: ?breed, ?cum, the bench and the glory stalls go right through it. Chastity still closes a hole.
+  - **Mpreg.** A worn item with `mpreg` (or `anal pregnancy`, `male pregnancy`, `anal womb`, `breedable ass`) in its crafted name or description lets a load in the ass take, for as long as it's worn; an injector with the same word does it for a week. Or with no item at all: `?mpreg on` is a switch of your own (in the Companion's farm settings too). They still need ?breedable and ?fertile. Add `hyper pregnancy` to the same item (or wear both) for an anal hyper pregnancy, 2 to 4 times the litter. A second, different stud within a day adds a second sire, same as any pregnancy. It counts on the bench, in the glory stalls and in breedin' season too.
+  - Fixed on the way: a hyper litter for a one-at-a-time species was sometimes cut back down to twins.
+  - **Reported: a Companion switch or button pressed in the middle of an application was saved as the answer.** The Companion now tells the bot when somethin's a button; a button mid-application is left alone (they're told so, and the question stays open). What they type in the box, and the answer buttons the bot offers, still count. Safety, Rules, Consent, the tour and Help still work mid-application.
+  - **Stock with stock.** Anybody on the books can `?milk <who>` (by hand), `?edge <who>` and `?groom <who>` somebody else on the books, standin' right beside them. The one bein' milked or edged gets a yes/no first (good for a couple of hours; never asked with ?freeuse on). Groomin' between animals has its own lines. Staff use them as before.
 
 - **Watcher 1.0.4** (from the Oct 9 watch): a recording saved after the page was closed and reopened was named `farm-watch-player-…` because nobody was logged in yet; it now keeps the member number it started with.
 

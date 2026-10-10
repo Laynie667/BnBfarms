@@ -13,10 +13,12 @@
    • Grooming: staff ?groom <who> standing next to them (a staff point).
    • Reminders come at a quarter and at a tenth, at most once every 30 minutes, privately.
    • Well fed, watered and groomed stock milk a little better (×1.1); hungry or thirsty stock less (×0.75).
+   • Play and evenin' turn-out, for the herd to do with no staff around: see herd.js.
    • Milk-drunk: drinking somebody's milk (?nurse / nursing) makes you content, then sleepy, then
      milk-drunk. It wears off one step every 7 minutes. Richer milk (grade A) counts extra.
 */
 import { connect, pick, between, fill } from "../_lib/connect.js";
+import { herdSetup, herdTick, herdCommands, herdCards, HERD_GUIDE } from "./herd.js";   // play, and evenin' turn-out
 
 const FULL = 100;
 const PER_H = { food: 100 / 8, water: 100 / 6, groom: 100 / 24 };   // how fast each need drops, per hour in the room
@@ -173,16 +175,26 @@ function cmdRefill(c) {
   d.troughs[t] = TROUGH_HELPINGS; A.staffPoints(sender, 1, "refill"); A.save();
   A.emote("🌾 " + A.name(sender) + " hauls a sack over and fills " + t + " to the brim with fresh feed.", sender);
 }
+// one animal groomin' another
+const GROOM_STOCK = [
+  "%by% nuzzles in close and grooms %name% from ears to rump, slow and thorough, till their coat lies smooth.",
+  "%by% licks and nibbles along %name%'s neck and shoulders, groomin' them the way stock do. %name% leans into it.",
+  "%by% works over %name% with tongue and teeth and nose, pickin' out the straw, and doesn't skip the good spots.",
+  "%name% holds still and sighs while %by% grooms them, flank to flank, both of them warm and drowsy by the end.",
+  "%by% combs through %name%'s hair with their fingers, then nuzzles behind an ear. %name%'s tail gives them away.",
+];
 function cmdGroom(c) {
   const { sender, args, api: A } = c;
   const t = A.find(args[0]);
+  if (!A.rec(sender) || !(A.rec(sender).roles || []).length) return c.reply("Groomin's for folks on the farm's books, sugar. ?apply gets you started.");
   if (!t || !A.rec(t)) return c.reply("Who are we groomin', sugar? ?groom <who>, standin' next to them.");
+  if (t === sender) return c.reply("You can't reach your own back, sugar. Ask somebody to groom you.");
   if (!on(t)) return c.reply(A.name(t) + " doesn't have barn life on, so there's nothin' to track. Brush 'em anyway, they'll like it!");
   const me = A.pos(sender), them = A.pos(t);
   if (!me || !them || Math.max(Math.abs(me.X - them.X), Math.abs(me.Y - them.Y)) > 1) return c.reply("Get right up next to " + A.name(t) + " to groom 'em, hon.");
   const n = needsOf(t);
-  n.groom = FULL; n.warned.groom = 100; A.staffPoints(sender, 1, "groom"); A.save();
-  A.emote("🪮 " + fill(pick(GROOM), { name: A.name(t), by: A.name(sender) }), t);
+  n.groom = FULL; n.warned.groom = 100; if (A.isStaff(sender)) A.staffPoints(sender, 1, "groom"); A.save();
+  A.emote("🪮 " + fill(pick(A.isStaff(sender) ? GROOM : GROOM_STOCK), { name: A.name(t), by: A.name(sender) }), t);
 }
 
 // ── production: fed and groomed stock milk better ──────────
@@ -197,7 +209,7 @@ function rate(mn) {
 // ── the Companion's cards ──────────────────────────────────
 function companion(mn) {
   if (!api.rec(mn)) return null;
-  const d = D(), cards = [];
+  const d = D(), cards = herdCards(mn);
   const tg = { label: "Barn life (food, water, grooming)", desc: "Only while you're here. Reminders come privately, at most every 30 minutes.", on: !!d.optIn[mn], cmd: "needs " + (d.optIn[mn] ? "off" : "on") };
   if (!on(mn)) cards.push({ title: "Barn life", toggles: [tg], note: d.farmOff ? "Switched off farm-wide right now." : undefined });
   else {
@@ -224,16 +236,17 @@ connect({
   version: "1.0.0",
   guide: "?needs on to get hungry, thirsty and scruffy while you're on the farm (?needs off stops it). Eat at a trough spot with ?eat, drink at a water spot with ?drink " +
     "(BC+ and MPA bowl activities count there too). Staff: ?groom <who> next to them, ?refill <trough> next to it. Drinking milk makes you content, then sleepy, then milk-drunk. " +
-    "Proprietors: ?needs farm on|off.",
-  setup(a) { api = a; D(); },
+    "Proprietors: ?needs farm on|off." + HERD_GUIDE,
+  setup(a) { api = a; D(); herdSetup(a, D, needsOf, on); },
   commands: {
+    ...herdCommands,
     needs: { usage: "needs on|off", private: true, run: cmdNeeds },
     eat: { usage: "eat", run: (c) => eat(c.sender, c.reply) },
     drink: { usage: "drink", run: (c) => drink(c.sender, c.reply) },
     refill: { usage: "refill <trough>", rank: "staff", run: cmdRefill },
-    groom: { usage: "groom <who>", rank: "staff", run: cmdGroom },
+    groom: { usage: "groom <who>", run: cmdGroom },   // stock can groom each other too
   },
-  on: { tick, activity: onActivity, nurse: milkDrunk },
+  on: { tick: () => { tick(); herdTick(); }, activity: onActivity, nurse: milkDrunk },
   rates: { milk: rate },
   companion,
 });

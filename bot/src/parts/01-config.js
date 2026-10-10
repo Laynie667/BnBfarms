@@ -306,6 +306,8 @@
       heat:["heat inducer","heat-inducer"], suppressant:["suppressant"],
       contraceptive:["contraceptive"], capacity:["capacity","stretching"], reducing:["reducing","shrinking"],
       // worn or injected: a clutch of eggs from any stud (and far likelier), and huge litters
+      // worn or injected: a load in the ass can take (anal pregnancy); with a "hyper" tag too, a hyper one
+      mpreg:["mpreg","male pregnan","anal pregnan","anal womb","ass womb","boywomb","boy womb","breedable ass","anal breed"],
       eggs:["egg laying","egg-laying","oviposit","ovipositor","clutch"], hyper:["hyper pregnancy","hyperpregnancy","hyper fertil","hyperfertil","broodmother","brood"]
     },
     LEAK_LINES: [

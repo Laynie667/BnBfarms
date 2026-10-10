@@ -302,6 +302,12 @@ INJECTORS · use Inject on someone
     contraceptive · no catchin' for two days
     egg laying (or clutch) · any stud can leave a clutch of eggs, 3x as likely
     hyper pregnancy (or brood) · huge litters, 2 to 4 times as many
+    mpreg (or anal pregnancy) · a load in the ass can take, a week
+      (or just say ?mpreg on: your own switch, no item needed)
+      a shot, or for as long as you wear it. With hyper too: a
+      hyper one. A second stud the same day adds a second sire.
+    A plug or dildo with hollow, tunnel or fuckable in its name or
+      description lets a cock through: it does not close the hole.
     (worn, those two work for as long as you wear the item)
     heat inducer · heat now  ·  suppressant · heat ends
   Capacity

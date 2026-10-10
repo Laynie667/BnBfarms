@@ -134,10 +134,10 @@
   const PUBLIC_CMDS = ["help","commands","info","guide","rules","consent","tour","species","luxury","doors",
                        "ping","apply","record","keys","who","herd","safe","safeword","red","report",
                        "staff","stuck","friend","notice","teaseme",
-                       "stats","board","pedigree","breedable","fertile","naturalheat","breed","cum","milkable","futa","size","sizes","measure","penis","cock","rights","accept",
+                       "stats","board","pedigree","breedable","fertile","mpreg","naturalheat","breed","cum","milkable","futa","size","sizes","measure","penis","cock","rights","accept",
                        "freeuse","jarok","gender","outfit","outfits","uniform","hypno","tally","eggs","yes","no","wash","quota","praise","degrade",
                        "weather","feeding","curfew","beg","please","fair","enter","addons","addon",
-                       "ribbons","ribbon","store","buy","gift","potions","potion","dares","dare","dared","bench","use","feedback","suggest","idea","bug","meh","more"];
+                       "ribbons","ribbon","store","buy","gift","potions","potion","dares","dare","dared","bench","use","feedback","suggest","idea","bug","meh","more","today"];
   const STAFF_CMDS  = ["queue","app","approve","deny","register","unregister","grant","revoke",
                        "claim","release","myherd","herdname","herdcall","herdsummon","turnout","letup","goldkey",
                        "pasture","onduty","cover","staffadd","staffremove",
@@ -151,7 +151,14 @@
                        "contract","contracts","zone","zones","voice","machine","edit","corral","uncorral","unbench"];
 
   const SAFETY_CMDS = ["safe","safeword","red","stuck"];
-  const PRIVATE_REPLY = ["feedback","suggest","idea","bug","meh","more","record","keys","find","app","queue","roster","stock","health",
+  // staff commands that stock can also use on other stock, with a yes from them first (15-commands.js)
+  const STOCK_PLAY = ["milk","edge"];
+  function stockPlayOk(by, t){
+    const r = rec(t); if (r && r.freeuse) return true;
+    state.playOk = state.playOk || new Map();
+    const u = state.playOk.get(t+":"+by); return !!(u && u > Date.now());
+  }
+  const PRIVATE_REPLY = ["today","feedback","suggest","idea","bug","meh","more","record","keys","find","app","queue","roster","stock","health",
                          "myherd","herd","stucklog","keydump","summon","where","cover",
                          "vet","spot","spots","tease","teaseme","stats","pedigree",
                          "hours","chores","wheel","tourstop","quota","contract","contracts"];

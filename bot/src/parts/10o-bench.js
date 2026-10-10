@@ -211,10 +211,10 @@
       tp.lastStud = sender;
       lscgSplatAt(t, HOLE_SPLAT[hole] || ["ItemVulva"], plainName(sender));
       if (hole === "mouth") tp.milk = Math.min(milkCap(t), tp.milk + kept * CFG.PROD.SWALLOW_TO_MILK);
-      if (hole === "vulva"){
+      if (canCatchIn(t, hole)){
         sp.totals.covers = (sp.totals.covers || 0) + 1;
         tp.lastFill = { at: Date.now(), stud: sender, ml: kept };
-        if (rt.fertile && !limitBlocks(t, "breed")) caught = rollConception(t, sender, kept, pent ? CFG.PENTUP_FERT_X : 1);
+        if (rt.fertile && !limitBlocks(t, "breed")) caught = rollConception(t, sender, kept, pent ? CFG.PENTUP_FERT_X : 1, hole);
         if (caught){ sp.totals.conceived = (sp.totals.conceived || 0) + 1; rollBoard(); const Y = L.yield; Y.s = Y.s || {}; Y.s[sender] = (Y.s[sender] || 0) + 1; }
       }
       addonsEmit("bred", sender, t, hole, load, caught);   // the whole load counts for the stud book, even into somebody already full

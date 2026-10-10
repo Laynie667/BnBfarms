@@ -257,6 +257,7 @@
     if (tags.has("virility"))    { p.boosts.semen = now + 24*H; done.push("semen doubled for a day"); fx0.push("virility"); }
     if (tags.has("fertility"))   { p.boosts.fert  = now + 24*H; done.push("fertility doubled for a day"); fx0.push("fertility"); }
     if (tags.has("eggs"))        { p.boosts.eggs  = now + 24*H; done.push("any stud can leave a clutch of eggs for a day"); fx0.push("eggs"); }
+    if (tags.has("mpreg"))       { p.boosts.mpreg = now + 7*24*H; done.push("a load in the ass can take for a week (mpreg)"); fx0.push("mpreg"); }
     if (tags.has("hyper"))       { p.boosts.hyper = now + 24*H; done.push("hyper pregnancy for a day: huge litters"); fx0.push("hyper"); }
     if (tags.has("contraceptive")){ p.boosts.contra = now + 48*H; done.push("no catching for two days"); fx0.push("contraceptive"); }
     if (tags.has("capacity")) fx0.push("capacity");

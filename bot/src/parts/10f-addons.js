@@ -146,7 +146,7 @@
       peek: (other) => JSON.parse(JSON.stringify((L.mods && L.mods[other]) || {})),
       yieldWeek: (mn) => { rollBoard(); return (L.yield && L.yield.w && L.yield.w[mn]) || 0; },   // milk (and seed) given this week
       studbook: () => JSON.parse(JSON.stringify(L.studbook || [])),
-      clockedIn, isMandated, hoursThisWeek: (mn) => { const r = rec(mn); return r && r.shift && r.shift.week && r.shift.week.key === weekKey() ? r.shift.week.ms / 3600000 : 0; }, inHeat, startHeat, rollConception, gearOf, funnelOn,
+      clockedIn, isMandated, hoursThisWeek: (mn) => { const r = rec(mn); return r && r.shift && r.shift.week && r.shift.week.key === weekKey() ? r.shift.week.ms / 3600000 : 0; }, inHeat, startHeat, rollConception, canCatchIn, mpregOn, gearOf, funnelOn,
       // the map
       pos: posOf, spot: (n) => (L.spots && L.spots[n]) || null, spots: () => Object.assign({}, L.spots||{}),
       onSpot, whoOnSpot, zonesOf, inZone: inZoneNamed, zones: () => { zonesLedger(); return L.zones; }, teleport, spotBeside,
@@ -222,6 +222,7 @@
     if (Date.now() - ask.at > 15*60000){ tell(sender, "That question timed out, sugar, so nothin' happened."); return true; }
     const a = ADDONS.get(ask.addon);
     if (a) addonCall(a, "ask", ask.cb, yes);
+    else if (!ask.addon && typeof ask.cb === "function"){ try { ask.cb(yes); } catch(e){ warn("ask:", e); } }   // one the bot asked itself
     return true;
   }
 

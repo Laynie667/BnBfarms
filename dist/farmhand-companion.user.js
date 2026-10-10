@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.12.2
+// @version      0.12.3
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -230,7 +230,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.12.2";
+  var VERSION = "0.12.3";
 
   // extension/src/config.js
   var BOT_MEMBER = 260239;
@@ -368,9 +368,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
     { name: "Safety", cmds: ["safe", "stuck", "staff", "report"] },
     { name: "Suggestion box", cmds: ["feedback <what you think>", "suggest <an idea>", "bug <what went wrong>", "feedback mine", "meh", "more"] },
     { name: "Gettin' started", cmds: ["help", "help me", "rules", "consent", "tour", "apply", "friend", "species", "luxury", "doors", "addons"] },
-    { name: "You and the farm", cmds: ["record", "keys", "who", "herd", "notice", "weather", "feeding", "curfew", "beg"] },
+    { name: "You and the farm", cmds: ["today", "record", "keys", "who", "herd", "notice", "weather", "feeding", "curfew", "beg"] },
     { name: "Milk", cmds: ["stats", "board", "milkable", "quota"] },
-    { name: "Breedin'", cmds: ["breedable", "fertile", "freeuse", "jarok", "yes", "no", "naturalheat", "breed <who>", "cum <who>", "wash", "tally", "eggs", "praise", "degrade", "rights", "accept", "pedigree"] },
+    { name: "Stock with stock", cmds: ["milk <who>", "edge <who>", "groom <who>"] },
+    { name: "Breedin'", cmds: ["breedable", "fertile", "mpreg", "freeuse", "jarok", "yes", "no", "naturalheat", "breed <who>", "cum <who>", "wash", "tally", "eggs", "praise", "degrade", "rights", "accept", "pedigree"] },
     { name: "Body", cmds: ["size", "measure", "penis", "futa", "gender <word>"] },
     { name: "Clothes", cmds: ["outfit", "outfits", "uniform", "outfit back"] },
     { name: "Mind", cmds: ["hypno", "teaseme"] },
@@ -632,6 +633,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var SWITCH_INFO = [
     ["breedable", "Breedable", "You can be bred and filled"],
     ["fertile", "Fertile", "You can catch"],
+    ["mpreg", "Mpreg", "A load in your ass can take too, no item needed (with Breedable and Fertile on)"],
     ["jarok", "Jar insemination", "On: staff still ask every time \xB7 Off: never"],
     ["freeuse", "Free use", "Any stud may have you without askin'"],
     ["futa", "Futa", "Cock and vulva both, milk and semen both"],
@@ -3276,7 +3278,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
         { class: "fhc-form", onsubmit: (e) => {
           e.preventDefault();
           const i = this.form.querySelector("#fhc-input");
-          if (i.value.trim()) this.ask(i.value.trim());
+          if (i.value.trim()) this.ask(i.value.trim(), true);
           i.value = "";
         } },
         h(
@@ -3403,9 +3405,11 @@ One of mods you are using is using an old version of SDK. It will work for now b
       this.ping(true);
       this.render();
     }
-    ask(cmd) {
+    // typed: they wrote it (or picked one of the bot's offered answers), so it may be an answer to a question the bot
+    // asked; anything else is a button or a switch, and the bot is told so
+    ask(cmd, typed) {
       this.add(cmd, "mine");
-      this.onCommand(cmd);
+      this.onCommand(cmd, !!typed);
     }
     toggle(open = !this.el.classList.contains("open")) {
       if (open) this.placePanel();
@@ -3607,7 +3611,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
         h("div", { style: { whiteSpace: "pre-wrap" } }, this.choose.text),
         h("div", { style: { marginTop: "8px" } }, (this.choose.choices || []).map((c) => btn(c, () => {
           this.choose = null;
-          this.ask(c);
+          this.ask(c, true);
         }, true)))
       ));
       for (const a of this.asks) out.push(h(
@@ -3619,11 +3623,11 @@ One of mods you are using is using an old version of SDK. It will work for now b
           { style: { marginTop: "8px" } },
           btn("Yes", () => {
             this.asks = this.asks.filter((x) => x !== a);
-            this.ask("yes");
+            this.ask("yes", true);
           }, true),
           btn("No", () => {
             this.asks = this.asks.filter((x) => x !== a);
-            this.ask("no");
+            this.ask("no", true);
           })
         )
       ));
@@ -4384,12 +4388,12 @@ One of mods you are using is using an old version of SDK. It will work for now b
     st.relayed.push(now);
     window.ServerSend("ChatRoomChat", { Type: "Emote", Content: "*" + text });
   }
-  function sendCommand(text) {
+  function sendCommand(text, typed) {
     text = String(text || "").trim();
     if (!text) return;
     if (botHere()) {
       if (!st.welcomed) hello();
-      toBot("cmd", { text });
+      toBot("cmd", typed ? { text } : { text, btn: true });
       const sentAt = Date.now();
       st.lastSent = sentAt;
       setTimeout(() => {
@@ -4679,7 +4683,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
         Tag: "farm",
         Description: "<command>: ask the B&B Farm girl, e.g. /farm stats",
         Action: (args) => {
-          sendCommand(args);
+          sendCommand(args, true);
           st.panel.toggle(true);
         }
       }]);

@@ -21,6 +21,7 @@
 */
 import { connect, pick, between, fill } from "../_lib/connect.js";
 import { MORE } from "./more-lines.js";
+import { pairsSetup, pairsBred, pairsCommands, pairsCards, PAIRS_GUIDE } from "./pairs.js";   // call a stud, mates for the day
 
 let api = null;
 function D() {
@@ -204,7 +205,9 @@ const BRED_MARKS = {
 CRAVINGS.push(...MORE.CRAVINGS); KICKS.push(...MORE.KICKS); MIDWIFE.push(...MORE.MIDWIFE); RUTTY.push(...MORE.RUTTY);
 for (const k of Object.keys(MORE.BRED_MARKS)) BRED_MARKS[k].push(...MORE.BRED_MARKS[k]);
 function onBred(stud, dam, hole, mlIn, took) {
-  if (hole !== "vulva" || !isBreedWeek() || !D().optIn[dam] || !(mlIn > 0)) return;
+  // a pussy load, or an ass load in somebody carryin' that way (an mpreg item)
+  const counts = hole === "vulva" || (hole === "butt" && api.mpregOn && api.mpregOn(dam));
+  if (!counts || !isBreedWeek() || !D().optIn[dam] || !(mlIn > 0)) return;
   const w = season();
   w.bred[dam] = (w.bred[dam] || 0) + 1;
   if (took) w.took[dam] = (w.took[dam] || 0) + 1;
@@ -338,6 +341,7 @@ function companion(mn) {
   const mine = d.bookings.filter((b) => b.stud === mn || b.dam === mn);
   if (mine.length) cards.push({ title: "My bookings", lines: mine.map((b) => ["#" + b.id, api.name(b.stud) + " × " + api.name(b.dam)]) });
   if (api.isStaff(mn)) cards.push({ staff: true, title: "Stud bookings", text: bookingsText(), input: { placeholder: "Rex Bessie", label: "Book (stud, who)", cmd: "book" } });
+  if (r.roles && r.roles.length) cards.push(...pairsCards(mn));
   return { cards };
 }
 
@@ -346,9 +350,10 @@ connect({
   label: "Breeding",
   version: "1.1.0",
   guide: "Pregnancy now has stages (early, showin', heavy, nestin') with a belly size 1–5, cravings, and kicks nearby people can see. " +
-    "Breedin' season is the 15th–21st of each month: ?season on to come into heat for it (studs fill faster and get pent up sooner). Every breedin' goes in the stud book, read out each night from 9 pm; the most-bred is crowned on the last night (10 ribbons, 5 for the busiest stud). ?season book shows it. Staff: ?book <stud> <who>, ?book, ?book done <#>, and ?midwife <who> during labour.",
-  setup(a) { api = a; D(); },
+    "Breedin' season is the 15th–21st of each month: ?season on to come into heat for it (studs fill faster and get pent up sooner). Every breedin' goes in the stud book, read out each night from 9 pm; the most-bred is crowned on the last night (10 ribbons, 5 for the busiest stud). ?season book shows it. Staff: ?book <stud> <who>, ?book, ?book done <#>, and ?midwife <who> during labour." + PAIRS_GUIDE,
+  setup(a) { api = a; D(); pairsSetup(a, D); },
   commands: {
+    ...pairsCommands,
     // ?book lists them (anyone) · staff: ?book <stud> <who> adds one, ?book done|remove <#>
     book: { usage: "book [<stud> <who>]", aliases: ["bookings"], private: true, run: (c) => {
       if (!c.args.length) return c.reply(bookingsText());
@@ -366,7 +371,7 @@ connect({
     season: { usage: "season on|off|book", aliases: ["breedweek", "studbook"], private: true, run: cmdBreedweek },
     midwife: { usage: "midwife <who>", rank: "staff", run: cmdMidwife },
   },
-  on: { tick: () => { watchLabour(); tick(); }, birth: onBirth, bred: onBred },
+  on: { tick: () => { watchLabour(); tick(); }, birth: onBirth, bred: (...x) => { onBred(...x); pairsBred(...x); } },
   // signed-up studs fill half again faster during breedin' season
   rates: { semen: (mn) => (isBreedWeek() && D().optIn[mn] ? 1.5 : 1) },
   companion,

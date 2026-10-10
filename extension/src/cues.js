@@ -10,6 +10,9 @@
    • feelings: now and then, a private line about what you're actually feelin' (a plug, a cage, full
                udders, a sloshin' belly, heat), from your own gear and arousal. Only you see these.
    • markers:  staff see little badges over the stock on their own map (needs milkin', in heat, expectin').
+   • slow:     you walk slower the more you're carryin' (a pumped belly, a late litter, a clutch of eggs).
+   • stir:     OFF until you switch it on: traps, toys and scenes nudge your arousal meter, and while the farm has
+               you denied you're held at the edge.
    Each one has a switch in Toggles → "This panel".
 */
 const W = window;
@@ -18,7 +21,7 @@ let ctx = null;   // { toBot, panel, local }
 export function initCues(c) { ctx = c; setInterval(sightTick, 4000); setInterval(feelTick, 60000); }
 const pref = (k) => !ctx.panel.prefs[k];   // every cue is on unless switched off
 export const cueOff = () => ({ face: !pref("noFace") || undefined, sound: !pref("noSound") || undefined, trance: !pref("noTrance") || undefined,
-  lead: !pref("noLead") || undefined });
+  lead: !pref("noLead") || undefined, slow: !pref("noSlow") || undefined, stir: (ctx.panel.prefs.stir ? undefined : true) });
 const mapOn = () => typeof W.ChatRoomMapViewIsActive === "function" && W.ChatRoomMapViewIsActive() && W.Player && W.Player.MapData && W.Player.MapData.Pos;
 const others = () => (W.ChatRoomCharacter || []).filter((c) => c && c.MemberNumber !== (W.Player && W.Player.MemberNumber));
 
@@ -239,4 +242,49 @@ export function drawMarkers() {
       tags.forEach(([t, col], i) => W.DrawText(t, sx + tile * 0.2 + i * tile * 0.22, sy + tile * 0.15, col, "black"));
     }
   } catch (e) { /* never break the game's drawing */ }
+}
+
+// ── your body, the farm's way (index.js hooks these in) ────
+// slow: the more you're carryin' (a pumped belly, a late litter, a clutch of eggs), the slower you walk. The farm girl
+//       works out how much (state.slow); this just stretches the game's own step time. On unless you switch it off.
+// arouse: a trap, a toy or a scene nudges your arousal meter. OFF until you turn "Farm can stir me up" on.
+// denied: while the farm has you denied, the same switch holds you at the edge instead of lettin' you cum.
+const stirOn = () => !!ctx.panel.prefs.stir;
+const deniedNow = () => { const s = ctx.panel.s; return !!(s && s.deniedUntil && s.deniedUntil > Date.now()); };
+export function slowFactor() {
+  const s = ctx && ctx.panel && ctx.panel.s;
+  if (!s || !pref("noSlow") || !(s.slow > 1)) return 1;
+  return Math.max(1, Math.min(3, Number(s.slow) || 1));
+}
+export function arouse(m) {
+  try {
+    if (!stirOn() || !W.Player || !W.Player.ArousalSettings || typeof W.ActivitySetArousal !== "function") return;
+    if (W.Player.ArousalSettings.Active === "Inactive" || W.Player.ArousalSettings.Active === "NoMeter") return;
+    const cur = Number(W.Player.ArousalSettings.Progress) || 0, cap = Math.max(0, Math.min(deniedNow() ? 94 : 100, Number(m.cap) || 100));
+    const next = Math.max(0, Math.min(cap, cur + (Number(m.add) || 0)));
+    if (next > cur || m.add < 0) W.ActivitySetArousal(W.Player, next);
+  } catch (e) { console.warn("[Farmhand Companion] arouse:", e); }
+}
+export function initBody(mod) {
+  // the step time the game works out, stretched. Never turns a blocked tile into an open one or the other way round.
+  try {
+    mod.hookFunction("ChatRoomMapViewCanEnterTile", 0, (args, next) => {
+      const t = next(args);
+      try { const f = slowFactor(); return t > 0 && f > 1 && !(typeof W.ChatRoomMapViewHasSuperPowers === "function" && W.ChatRoomMapViewHasSuperPowers()) ? t * f : t; } catch (e) { return t; }
+    });
+  } catch (e) { console.warn("[Farmhand Companion] slowed walkin' unavailable:", e); }
+  // denied by the farm: held at the edge instead of goin' over (only with "Farm can stir me up" on)
+  try {
+    mod.hookFunction("ActivityOrgasmPrepare", 0, (args, next) => {
+      try {
+        const C = args[0];
+        if (C && typeof C.IsPlayer === "function" && C.IsPlayer() && stirOn() && deniedNow()) {
+          C.ArousalSettings.Progress = 94;
+          if (Date.now() - (initBody.told || 0) > 60000) { initBody.told = Date.now(); ctx.local("Right at the edge, and the farm won't let you over it. Not yet, sugar.", "#c9a35b", true); }
+          return;
+        }
+      } catch (e) { /* the game's own way, then */ }
+      return next(args);
+    });
+  } catch (e) { console.warn("[Farmhand Companion] denial unavailable:", e); }
 }

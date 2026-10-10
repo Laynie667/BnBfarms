@@ -13,10 +13,11 @@
   const ROLE = {
     PROPRIETOR:"PROPRIETOR", HERDMASTER:"HERDMASTER",
     MANDATED:"MANDATED", FARMHAND:"FARMHAND",
-    LIVESTOCK:"LIVESTOCK", GUEST:"GUEST", LUXURY:"LUXURY", GLORYHOLE:"GLORYHOLE"
+    LIVESTOCK:"LIVESTOCK", GUEST:"GUEST", LUXURY:"LUXURY", GLORYHOLE:"GLORYHOLE",
+    SUBJECT:"SUBJECT"     // a volunteer the proprietors signed up for the traps (10u-traps.js); it rides alongside their other roles
   };
   const ROLE_ORDER = ["PROPRIETOR","HERDMASTER","MANDATED","FARMHAND",
-                      "LIVESTOCK","LUXURY","GUEST","GLORYHOLE"];
+                      "LIVESTOCK","LUXURY","GUEST","GLORYHOLE","SUBJECT"];
   const ALL_TIERS = ["bronze","silver","gold"];
 
   const state = {

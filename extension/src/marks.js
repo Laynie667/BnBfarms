@@ -47,10 +47,15 @@ export function markBody(m, prefs) {
   const has = (g) => next.find((b) => b.Group === g);
   // ── splatters, wherever there's room ──
   if (Array.isArray(m.splat) && m.splat.length) {
-    let it = next.find((b) => b.Name === "Splatters" && SPLAT_GROUPS.includes(b.Group));
+    // a colour (piss yellow, mud brown) gets a Splatters item of its own, so the white ones stay white
+    const col = typeof m.color === "string" && /^#[0-9a-fA-F]{6}$/.test(m.color) ? m.color.toUpperCase() : null;
+    const colOf = (b) => (typeof b.Color === "string" && /^#/.test(b.Color) ? b.Color.toUpperCase() : null);
+    const mine = next.filter((b) => b.Name === "Splatters" && SPLAT_GROUPS.includes(b.Group));
+    let it = mine.find((b) => colOf(b) === col);
     if (!it) {
       const g = SPLAT_GROUPS.find((x) => !has(x) && groupOf(x));
-      if (g) { it = { Group: g, Name: "Splatters", Property: { TypeRecord: {} } }; next.push(it); mem.splatGroup = g; }
+      if (g) { it = { Group: g, Name: "Splatters", Property: { TypeRecord: {} } }; if (col) it.Color = col; next.push(it); mem.splatGroup = g; }
+      else it = mine[0];   // no room for another: it lands on the ones already there
     }
     if (it) {
       it.Property = Object.assign({}, it.Property || {});
@@ -108,6 +113,24 @@ export function markBody(m, prefs) {
   if (!did.length) return { ok: false, why: "no room" };
   save(mem); commit(next);
   return { ok: true, did };
+}
+
+// the parasite lips: a real Lip Gag on you while the farm's books say one's latched on (you said ?parasite on).
+// Put back if it's taken off early; gone the moment the farm says it's dropped off (or you safeword).
+const PARASITE_NAME = "Parasite Lips";
+export function parasiteGag(on) {
+  if (!P() || !Array.isArray(P().Appearance) || typeof window.ServerAppearanceBundle !== "function") return false;
+  const cur = bundle(), have = cur.find((b) => b.Craft && b.Craft.Name === PARASITE_NAME);
+  if (!!have === !!on) return false;
+  if (!on) { commit(cur.filter((b) => b !== have)); return true; }
+  const g = ["ItemMouth", "ItemMouth2", "ItemMouth3"].find((x) => !cur.find((b) => b.Group === x) && groupOf(x));
+  if (!g) return false;   // their mouth's full already: it's on the books just the same
+  const color = ["#E0607F", "#7A2B47", "#7A2B47"];
+  cur.push({ Group: g, Name: "LipGag", Color: color, Difficulty: 20, Property: {},
+    Craft: { Item: "LipGag", Name: PARASITE_NAME, Description: "A pair of fat, living lips sealed over the mouth, with a tentacle down the throat. It feeds its host serum and drinks every load they swallow. B&B Farm.",
+      Property: "Normal", Color: color.join(","), Lock: "", Private: true, MemberNumber: P().MemberNumber, MemberName: P().Name, ItemProperty: {}, Type: null, TypeRecord: null } });
+  commit(cur);
+  return true;
 }
 
 // off with what the farm put on (the splatters and the writing), nothin' else

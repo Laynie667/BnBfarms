@@ -53,7 +53,7 @@
   const ROLE_PRETTY = {
     PROPRIETOR:"Proprietor", HERDMASTER:"Herdmaster", MANDATED:"Mandated Farmhand",
     FARMHAND:"Farmhand", LIVESTOCK:"Livestock", GUEST:"Guest",
-    LUXURY:"Luxury Guest", GLORYHOLE:"Installed"
+    LUXURY:"Luxury Guest", GLORYHOLE:"Installed", SUBJECT:"Test Subject"
   };
 
   function roleString(mn){

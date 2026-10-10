@@ -127,7 +127,7 @@
       // people
       name: plainName, nameOnce: (text, mn) => nameOnce(text, mn), paint: (mn, area, by) => paintOn(mn, area, by), ribbons: (mn, n, why, award) => earnRibbons(mn, n, why, award ? CFG.BOT_MEMBER : undefined),   // award: a prize, past the daily cap
       // a load that landed somewhere outside the bot (a glory stall): tells every add-on, like the bot's own fills do
-      bred: (mn, stud, hole, mlIn, took) => addonsEmit("bred", stud, mn, hole, mlIn, took || null),
+      bred: (mn, stud, hole, mlIn, took) => { parasiteLoad(stud, mn, hole, mlIn); addonsEmit("bred", stud, mn, hole, mlIn, took || null); },
       // put somebody on the use bench (only if they said ?bench on; same rules as staff and the wheel)
       // their tail (10r-looks.js): tailOf(mn) → { kind, plug, name } or null · tailBit(mn, hole, byName) → a sentence or ""
       tailOf: (mn) => tailOf(mn), tailBit: (mn, hole, by, mood) => tailBit(mn, hole, by, mood),

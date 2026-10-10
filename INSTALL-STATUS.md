@@ -5,7 +5,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 | Script | File in `dist/` | Where it runs | Current |
 |---|---|---|---|
-| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.20.0** |
+| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.21.0** |
 | Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.5.8** |
 | Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.1.3** |
 | Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **1.0.4** |
@@ -13,7 +13,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 | Map tools, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.3** |
 | Dairy | `farmhand-dairy.user.js` | the bot's PC | **1.0.2** |
 | Shows | `farmhand-shows.user.js` | the bot's PC | **1.0.4** |
-| Farmhand Companion | `farmhand-companion.user.js` | each player | **0.12.3** |
+| Farmhand Companion | `farmhand-companion.user.js` | each player | **0.13.0** |
 | Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.4** |
 
 ## Sending a watch report
@@ -23,6 +23,17 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 - Running the watcher on more than one game at once (the bot, yours, a tester's) lets Claude line them up into one timeline.
 
 ## Latest changes (newest first)
+
+- **Bot 0.21.0, Companion 0.13.0: test subjects, traps, the thing in the water, stackin' shots, and toys that act on their own.**
+  - **Test subjects**: a new role the proprietors hand out by hand: `?subject add <who>`, `?subject remove <who>`, `?subject` for the list. It rides alongside whatever else they are. The subject can leave any time with `?subject quit`.
+  - **Trap spots** spring for subjects and nobody else. Stand on the tile and say `?spot set trap-<kind>` (`trap-milker-2` for a second one; a plain `trap` spot is pot luck). Kinds: injector, milker, breeder, gas, snare, mud, spray, wire, clamp, pump, eggs, lantern, tentacle. `?traps` lists them. `?trap load <spot> lactation x3` fills an injector trap; `?trap spring <who> [kind]` sets one off by hand. A subject can `?traps off`, or `?traps skip <kind>`. Hard limits rule traps out, and the safeword stops one mid-scene and keeps them all quiet for an hour.
+  - **Traps with somebody waitin' in them** (two-legged anthro studs and dams, each in the stud book under its own name): `trap-wolves`, `trap-stallion`, `trap-bull`, `trap-warren`, `trap-boar`, `trap-toms`, `trap-drake`, `trap-naga`, `trap-kennel`, `trap-hive`, `trap-goat`, `trap-sow`. Not `?breedable`: the loads go over them, never inside.
+  - **The parasite lips** (`?parasite on`, off by default): a 3% chance on each load swallowed at the glory stalls that a pair of livin' lips seals over the mouth for 12 hours. Every half hour it doses them (grows tits, cock, balls and ass in turn, fertility, hyper pregnancy, capacity); every load swallowed while it's on is turned into another dose instead of reachin' the belly. It leaves a cum cravin' (while on and 12 hours after), and passes by a mouth kiss to anybody else who said `?parasite on`. With the Companion it's a real Lip Gag crafted "Parasite Lips". `?parasite` shows time left; staff `?purge <who>`; proprietors `?parasite give <who>`; the safeword takes it off.
+  - **The thing in the water**: a 4% chance each time a subject wades into a water spot (`?spot set pond`, pool, creek, water, well, bath…), and again every 5 minutes they stay. Six scenes, and it always leaves a clutch of eggs; one time in four (or with a hyper item, shot or tonic) a huge one.
+  - **Shots and potions stack.** A second dose while the first is workin' raises the level (up to 5); `x2` to `x5` on a crafted needle gives that many doses at once. A second bottle of the same potion is stronger and longer (up to 3).
+  - **Toys that act on their own** (crafted words on worn items): `auto-injector` doses the wearer every half hour with the other words on the item; `ovipositor` on a gag, belt, plug or dildo lays a clutch now and then (`?eggs on` or a subject); `auto-feed` on a funnel gag pours a bellyful down every ten minutes; a cock type, `knotted` or a size word on a dildo, machine or belt makes it that cock in the farm's lines, and big ones stretch.
+  - **`?watersports on|off`** (off by default): the spray trap and a feeder crafted with "piss" only use it when it's on. Piss leaves yellow splatters.
+  - **Companion**: carryin' a lot (a pumped belly, a late litter, eggs) slows your walkin' on the map (Toggles → "Carryin' slows me down", on by default). New opt-in switch "Farm can stir me up": traps and toys nudge the arousal meter, and while the farm has you denied you're held at the edge. Test subjects can now switch on "Farm can mark my body" and "Farm can strip me". **Not yet tried in the live game**: the walkin' and arousal hooks were written against the game's code but only the bot side is covered by tests.
 
 - **Bot 0.20.0, Companion 0.12.3, Barn life 1.0.5, Breeding 1.1.3, Glory stalls 1.5.8: hollow plugs, mpreg, stock with stock, and things for the herd to do.**
   - **`?today`**: what's on, in one look: who's on the books here, rut day, breedin' season and who leads the stud book, turn-out and feedin' times, who's in heat, on the bench, full and achin', due any time, the top of the milk board, your dare, the notice.

@@ -129,6 +129,8 @@
     if (p.stall && p.stall.until) out.push({ icon: "🥛", text: "In the milkin' stall", until: p.stall.until });
     if (inHeat(p)) out.push({ icon: "🔥", text: "In heat", until: p.heat.until });
     if (p.deniedUntil > now) out.push({ icon: "🚫", text: "Denied", until: p.deniedUntil });
+    if (parasiteOn(mn)) out.push({ icon: "👄", text: "Parasite", until: rec(mn).parasite.until });
+    if (p.eggs) out.push({ icon: "🥚", text: p.eggs.n+" eggs", until: p.eggs.layAt });
     if (p.milkDeniedUntil > now) out.push({ icon: "🚫", text: "Teats capped", until: p.milkDeniedUntil });
     if (p.pentUp) out.push({ icon: "😤", text: "Pent up" });
     if (r.dare && r.dare.until > now) out.push({ icon: "🎲", text: "Dare", until: r.dare.until });

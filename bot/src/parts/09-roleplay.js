@@ -133,6 +133,7 @@
      When someone rides a stud's penis with their pussy or ass (LSCG), same thing the other way.
      When someone sucks or nibbles a milker's nipples, I drain a little milk, like a nursing emote. */
   function onBodyActivity(act, focus, src, tgt){
+    parasiteKiss(act, focus, src, tgt);   // a kiss on the mouth can pass the parasite on (10v-parasite.js)
     if (!src || !tgt || src === tgt) return;
     let stud = null, bred = null, hole = null;
     if (/^penetrate(slow|fast)$/i.test(act) && ["ItemVulva","ItemButt","ItemMouth"].includes(focus)){
@@ -249,23 +250,31 @@
                   tags: Array.from(tags).concat(sizeTags.map(([k,d]) => k+(d>0?" up":" down"))) }).slice(-15);
     dbg("INJECT", data.Sender, "→", target, "item:", text || "(no crafted item)", "tags:", Array.from(tags).join(",") || "none");
     if (!tags.size && !sizeTags.length && !ptags.type && !ptags.knot){ saveLedger(); return; }   // a plain injector: LSCG's business, not ours
+    applyShot(target, data.Sender, text);
+  }
+  const stackWord = lv => lv <= 1 ? "doubled" : lv === 2 ? "tripled" : "runnin' "+(lv + 1)+" times over";
+  // one dose of whatever a crafted item's words say. by: who gave it (the bot, for a trap or a toy that doses on its own)
+  // how: nothin' for a needle in the hand, or { open: the line that opens the emote, from: "the auto-injector's dose", heatH }
+  function applyShot(target, by, text, how){
+    const tags = tagsIn(text), sizeTags = sizeTagsIn(text), ptags = penisTagsIn(text), x = shotTimes(text);
+    if (!tags.size && !sizeTags.length && !ptags.type && !ptags.knot) return false;
     const r = rec(target);
-    if (!r){ saveLedger(); tell(data.Sender, "💉 That shot didn't take with me, hon: "+plainName(target)+" isn't on the farm books yet."); return; }
+    if (!r){ saveLedger(); if (by !== CFG.BOT_MEMBER) tell(by, "💉 That shot didn't take with me, hon: "+plainName(target)+" isn't on the farm books yet."); return false; }
     const p = prodOf(target), now = Date.now(), H = 3600000, done = [];
     const fx0 = [];
-    if (tags.has("lactation"))   { p.boosts.milk  = now + 24*H; done.push("milk doubled for a day"); fx0.push("lactation"); }
-    if (tags.has("virility"))    { p.boosts.semen = now + 24*H; done.push("semen doubled for a day"); fx0.push("virility"); }
-    if (tags.has("fertility"))   { p.boosts.fert  = now + 24*H; done.push("fertility doubled for a day"); fx0.push("fertility"); }
-    if (tags.has("eggs"))        { p.boosts.eggs  = now + 24*H; done.push("any stud can leave a clutch of eggs for a day"); fx0.push("eggs"); }
-    if (tags.has("mpreg"))       { p.boosts.mpreg = now + 7*24*H; done.push("a load in the ass can take for a week (mpreg)"); fx0.push("mpreg"); }
-    if (tags.has("hyper"))       { p.boosts.hyper = now + 24*H; done.push("hyper pregnancy for a day: huge litters"); fx0.push("hyper"); }
-    if (tags.has("contraceptive")){ p.boosts.contra = now + 48*H; done.push("no catching for two days"); fx0.push("contraceptive"); }
+    if (tags.has("lactation"))   { { const lv = addBoost(p, "milk", 24*H, x); done.push("milk "+stackWord(lv)+" for a day"); }; fx0.push("lactation"); }
+    if (tags.has("virility"))    { { const lv = addBoost(p, "semen", 24*H, x); done.push("semen "+stackWord(lv)+" for a day"); }; fx0.push("virility"); }
+    if (tags.has("fertility"))   { { const lv = addBoost(p, "fert", 24*H, x); done.push("fertility "+stackWord(lv)+" for a day"); }; fx0.push("fertility"); }
+    if (tags.has("eggs"))        { { const lv = addBoost(p, "eggs", 24*H, x); done.push("any stud can leave a clutch of eggs for a day"+(lv > 1 ? " (clutches "+lv+" times as big)" : "")); }; fx0.push("eggs"); }
+    if (tags.has("mpreg"))       { p.boosts.mpreg = Math.max(p.boosts.mpreg || 0, now) + 7*24*H*x; done.push("a load in the ass can take for "+(x > 1 ? x+" weeks" : "a week")+" (mpreg)"); fx0.push("mpreg"); }
+    if (tags.has("hyper"))       { { const lv = addBoost(p, "hyper", 24*H, x); done.push("hyper pregnancy for a day: huge litters"+(lv > 1 ? ", level "+lv : "")); }; fx0.push("hyper"); }
+    if (tags.has("contraceptive")){ p.boosts.contra = Math.max(p.boosts.contra || 0, now) + 48*H*x; done.push("no catching for "+(2*x)+" days"); fx0.push("contraceptive"); }
     if (tags.has("capacity")) fx0.push("capacity");
     if (tags.has("reducing")) fx0.push("reducing");
-    if (tags.has("capacity"))    { const b = p.capBonus; p.capBonus = Math.min(CFG.PROD.MAX_CAPACITY - CFG.PROD.BASE_CAPACITY, b + CFG.PROD.INJECT_CAPACITY);
+    if (tags.has("capacity"))    { const b = p.capBonus; p.capBonus = Math.min(CFG.PROD.MAX_CAPACITY - CFG.PROD.BASE_CAPACITY, b + CFG.PROD.INJECT_CAPACITY*x);
                                    done.push("capacity now "+ml(capacity(target))); }
     if (tags.has("reducing")){
-      p.capBonus = Math.max(0, p.capBonus - CFG.PROD.REDUCE_CAPACITY);
+      p.capBonus = Math.max(0, p.capBonus - CFG.PROD.REDUCE_CAPACITY*x);
       const over = heldTotal(p) - capacity(target);
       if (over > 0) for (const h of HOLES){ const cut = Math.min(p.held[h], over * p.held[h]/heldTotal(p)); p.held[h] -= cut; }
       done.push("capacity down to "+ml(capacity(target)));
@@ -279,7 +288,7 @@
       if (part === "knot" && !knotted(target)){ done.push("no knot to grow yet (that takes a knotting shot first)"); continue; }
       if (!hasPart(target, part)){ done.push("no "+(part === "testes" ? "balls" : part)+" for the "+(d>0?"growth":"shrinkin'")+" to work on"); continue; }
       const S = CFG.SIZES[part], before = sizeOf(target, part);
-      setSize(target, part, before + d*(S.step||1), true);
+      setSize(target, part, before + d*(S.step||1)*x, true);
       const word = S.label.toLowerCase();
       done.push(sizeOf(target, part) === before ? word+" can't go any "+(d>0?"bigger":"smaller")
                                                 : word+" "+(d>0?"up":"down")+" to "+sizeName(target, part));
@@ -288,18 +297,19 @@
     if (tags.has("suppressant") && inHeat(p)){ p.heat = null; done.push("heat broken"); fx0.push("suppressant"); }
     if (tags.has("heat")){
       if (limitBlocks(target,"heat")) done.push("no heat, though, 'cause their limits rule it out");
-      else { startHeat(target, data.Sender); done.push("heat"); }
+      else { startHeat(target, by, how && how.heatH); done.push("heat"); }
     }
-    saveLedger(); audit(data.Sender,"INJECT",target+" "+Array.from(tags).concat(sizeTags.map(([k,d]) => k+(d>0?"+":"-"))).join(" "));
+    saveLedger(); audit(by,"INJECT",target+" "+Array.from(tags).concat(sizeTags.map(([k,d]) => k+(d>0?"+":"-"))).join(" "));
     const lines = fx0.map(k => shotLine(k, target)).concat(fx).filter(Boolean);
     if (lines.length && onMap(target)){
-      emote("💉 "+(target === data.Sender ? plainName(target)+" sinks the needle into their own skin and pushes the plunger home."
-                                         : plainName(data.Sender)+" slides the needle into "+plainName(target)+" and pushes the plunger home.")+" "+lines.join(" "));
+      emote("💉 "+(how && how.open ? how.open : target === by ? plainName(target)+" sinks the needle into their own skin and pushes the plunger home."
+                                         : plainName(by)+" slides the needle into "+plainName(target)+" and pushes the plunger home.")+" "+lines.join(" ")+(x > 1 ? " A "+(x === 2 ? "double" : x === 3 ? "triple" : x+"-times")+" dose." : ""), target);
       if (done.length > lines.length) tell(target, "💉 Your shot: "+done.join(", ")+".");
     } else {
-      tell(target, "💉 "+plainName(data.Sender)+"'s shot is kickin' in, hon: "+done.join(", ")+".");
-      if (target !== data.Sender) tell(data.Sender, "💉 Your shot took on "+plainName(target)+": "+done.join(", ")+".");
+      tell(target, "💉 "+(how && how.from ? how.from : plainName(by)+"'s shot")+" is kickin' in, hon: "+done.join(", ")+".");
+      if (target !== by && by !== CFG.BOT_MEMBER) tell(by, "💉 Your shot took on "+plainName(target)+": "+done.join(", ")+".");
     }
+    return true;
   }
 
   // the parts that apply to this person

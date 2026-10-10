@@ -98,6 +98,8 @@ export const SWITCH_INFO = [
   ["hypno", "Hypno", "Let your herd leader's voice lines reach you, privately"],
   ["potions", "Potions", "Staff and the wheel can give you potions, and others can gift you one (you're asked first). Your limits still rule some out"],
   ["dares", "Dares", "Staff and the wheel can hand you a dare to do in half an hour"],
+  ["watersports", "Watersports", "Piss play can find you: the spray trap, a feeder crafted for it, and the scenes that have it. Off until you say so"],
+  ["parasite", "Parasite", "Swallow at the glory stalls and, rarely, a pair of livin' lips seals over your mouth for 12 hours: it feeds you fertility, growth, hyper pregnancy and capacity serum and turns every load you swallow into more"],
   ["bench", "Use bench", "Staff and the wheel can sentence you to time strapped over the use bench, where anybody can use you. Your safeword ends it at once"],
 ];
 // some switches only work once another is on; say so instead of lettin' a click do nothin'
@@ -110,6 +112,8 @@ export function farmSwitches(ctx, list) {
     return toggle(label, desc, !!sw[cmd], () => ctx.send(cmd + " " + (sw[cmd] ? "off" : "on")));
   });
 }
+// markin' and strippin': Laynie, and the farm's test subjects (the traps use both)
+const marksFor = (ctx) => !!(window.Player && (window.Player.MemberNumber === 221397 || ((ctx.s && ctx.s.roles) || []).includes("SUBJECT")));
 export function panelPrefs(ctx) {
   return card(title("This panel"), muted("Only on your computer."),
     [["chatToo", "Farm messages in chat too", "Tease lines, heat, summons and other farm messages also show in your chat log"],
@@ -125,12 +129,16 @@ export function panelPrefs(ctx) {
      ["noSound", "Farm sounds", "The pump, the stall door, the feedin' bell. Only you hear them, at your game volume"],
      ["noTrance", "Trance haze", "A soft haze at the edges of your screen during conditioning sessions"],
      ["noFeelings", "Private feelings", "Now and then, a line only you see about what you're feelin' (your gear, your arousal, how full you are)"],
+     ["noSlow", "Carryin' slows me down", "The fuller you are (a pumped belly, a late litter, a clutch of eggs), the slower you walk on the map"],
      ["noMarkers", "Map markers (staff)", "Small badges over stock on your map: M needs milkin', H in heat, B expectin', X teats capped"]].map(([k, label, desc]) =>
       toggle(label, desc, !ctx.prefs[k], () => { ctx.setPref(k, !ctx.prefs[k]); ctx.api.rehello && ctx.api.rehello(); })),
+    // OFF until you turn it on: the farm touchin' your arousal meter (cues.js)
+    toggle("Farm can stir me up", "Traps, toys and scenes nudge your arousal meter up, and while the farm has you denied you're held at the edge instead of cummin'. Your safeword still stops everything.",
+      !!ctx.prefs.stir, () => { ctx.setPref("stir", !ctx.prefs.stir); ctx.api.rehello && ctx.api.rehello(); }),
     // these two are OFF until you turn them on: the farm changin' what your character looks like (marks.js)
-    (window.Player && window.Player.MemberNumber === 221397) && toggle("Farm can mark my body", "Loads leave the game's own splatters on your face, chest or tummy, wherever there's room, and farm words can be written on your body. ?wash takes them off.",
+    marksFor(ctx) && toggle("Farm can mark my body", "Loads leave the game's own splatters on your face, chest or tummy, wherever there's room, and farm words can be written on your body. ?wash takes them off.",
       !!ctx.prefs.marks, () => ctx.setPref("marks", !ctx.prefs.marks)),
-    (window.Player && window.Player.MemberNumber === 221397) && toggle("Farm can strip me", "When the farm says so, your clothes come off (locked pieces stay). They're kept on this computer so you can dress again.",
+    marksFor(ctx) && toggle("Farm can strip me", "When the farm says so, your clothes come off (locked pieces stay). They're kept on this computer so you can dress again.",
       !!ctx.prefs.strip, () => ctx.setPref("strip", !ctx.prefs.strip)),
     btn("Put the button and panel back (size and full screen too)", () => ctx.resetPlaces && ctx.resetPlaces()));
 }

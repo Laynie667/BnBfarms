@@ -1,0 +1,140 @@
+// Test subjects and the traps only they spring (Oct 10): the role, trap spots, the thing in the water, shots and
+// potions that stack, toys that dose / lay / feed on their own, ?watersports, and the walkin' penalty.
+const fs=require('fs'), path=require('path');
+const store={}; const sent=[]; const handlers={};
+store.bnb_ledger_v1=JSON.stringify({v:4,people:{
+ "221397":{mn:221397,name:"Laynie",roles:["PROPRIETOR"],onDuty:true,herds:[],tempKeys:[],cover:[]},
+ "400":{mn:400,name:"Hand",roles:["FARMHAND"],onDuty:true,herds:[],tempKeys:[],cover:[]},
+ "500":{mn:500,name:"Moo",roles:["LIVESTOCK"],species:"cow",gender:"female",onDuty:true,herds:[],tempKeys:[],cover:[],limits:"",breedable:true,fertile:true,potionsOn:true},
+ "600":{mn:600,name:"Rex",roles:["LIVESTOCK"],species:"dog",gender:"male",futa:true,onDuty:true,herds:[],tempKeys:[],cover:[],limits:"eggs"}
+},applications:[],archive:{},log:[],stuckLog:[],chores:[],wheel:[],spots:{"trap-injector":{X:20,Y:20},"trap-gas":{X:22,Y:20},"trap-eggs":{X:24,Y:20},"pond":{X:30,Y:30}}});
+global.GM_getValue=(k,d)=>k in store?store[k]:d; global.GM_setValue=(k,v)=>store[k]=v; global.GM_registerMenuCommand=()=>{};
+const doc={body:{appendChild(){}},createElement(){return {style:{},addEventListener(){}}},addEventListener(){},getElementById(){return null},visibilityState:'visible'};
+const at=(m,X,Y)=>({MemberNumber:m,Name:'N'+m,Appearance:[],MapData:{Pos:{X,Y},PrivateState:{}}});
+const chars=[at(260239,1,1),at(221397,10,10),at(400,11,10),at(500,15,10),at(600,14,10)];
+const evts={};
+const W={document:doc,addEventListener(e,f){(evts[e]=evts[e]||[]).push(f)},dispatchEvent(ev){(evts[ev.type]||[]).forEach(f=>f(ev))},
+  CustomEvent:class{constructor(t,o){this.type=t;this.detail=o&&o.detail}},
+  location:{reload(){}},alert(){},prompt(){},
+  ServerSend:(ev,d)=>{ sent.push([ev,d]); }, ServerSocket:{connected:true,on:(e,f)=>handlers[e]=f},
+  Player:{MemberNumber:260239,FriendList:[]},
+  ChatRoomData:{Name:'B&B Farm',Admin:[260239],MapData:{Type:'Always'}}, ChatRoomCharacter:chars,
+  ChatRoomPlayerIsAdmin:()=>true, Commands:[]};
+global.unsafeWindow=W; global.window=W; global.Blob=class{}; global.URL={createObjectURL(){}};
+const warns=[]; global.console={...console,log:()=>{},warn:(...a)=>warns.push(a.join(' '))};
+W.__FARMHAND_TEST__=true; eval(fs.readFileSync(path.join(__dirname,'../dist/farmhand-bot.user.js'),'utf8'));
+const L=()=>W.FarmhandLedger(), P=mn=>L().people[mn];
+const wait=ms=>new Promise(r=>setTimeout(r,ms));
+const out=(...a)=>process.stdout.write(a.join(' ')+'\n');
+let fails=0; const ok=(c,msg)=>{ out(msg+' -> '+(c?'true':'false')); if(!c) fails++; };
+const to=(mn,n)=>sent.slice(n).filter(([e,d])=>d&&((d.Type==='Whisper'&&d.Target===mn)||(e==='AccountBeep'&&d.MemberNumber===mn))).map(([e,d])=>String(d.Content||d.Message)).join(' | ');
+const say=async(mn,msg,ms)=>{ handlers.ChatRoomMessage({Sender:mn,Type:'Whisper',Content:msg,Target:260239}); await wait(ms||2200); };
+const all=n=>sent.slice(n).filter(([e,d])=>d&&(typeof d.Content==='string'||e==='AccountBeep')).map(([e,d])=>String(d.Content||d.Message)).join(' | ');
+const moveTo=(mn,X,Y)=>{ chars.find(c=>c.MemberNumber===mn).MapData.Pos={X,Y}; };
+const C=mn=>chars.find(c=>c.MemberNumber===mn);
+(async()=>{ await wait(3500); const cfg=W.__cfg; cfg.USER_COOLDOWN_S=0; cfg.TRAP_BEAT_S=0.15; cfg.TRAP_COOLDOWN_MIN=0;
+  ['Laynie','Hand','Moo','Rex'].forEach((nm,i)=>chars[i+1].Name=nm);
+  const roles=mn=>P(mn).roles, prod=mn=>P(mn).prod;
+  await say(500,'?stats'); await say(600,'?stats');
+  // ── the role ──
+  let n=sent.length; await say(400,'?subject add Moo'); ok(/just for the proprietors/.test(to(400,n)) && !roles(500).includes('SUBJECT'), 'only a proprietor signs a subject up');
+  n=sent.length; await say(221397,'?subject add Moo');
+  ok(roles(500).includes('SUBJECT') && roles(500).includes('LIVESTOCK'), 'subject rides alongside their other roles');
+  ok(/TEST SUBJECT/.test(to(500,n)) && /subject quit/.test(to(500,n)) && /SAFEWORD/i.test(to(500,n)), 'the subject is told what it means and how to get out');
+  n=sent.length; await say(221397,'?subject',4000); ok(/Moo .500. /.test(to(221397,n)), '?subject lists them for a proprietor');
+  n=sent.length; await say(221397,'?traps'); ok(/trap-injector/.test(to(221397,n)) && /pond/.test(to(221397,n)) && /tentacle/.test(to(221397,n)), '?traps shows staff the kinds, the spots and the water');
+  n=sent.length; await say(500,'?traps'); ok(!/trap-injector/.test(to(500,n)) && /not tellin' you where/.test(to(500,n)), '...a subject hears what is out there, not where');
+  // ── a trap spot: nobody but a subject ──
+  moveTo(600,20,20); n=sent.length; W.__trapTick(); await wait(1200);
+  ok(!/sprung a trap/.test(all(n)), 'a trap does nothin\' for stock who are not subjects');
+  moveTo(600,14,10);
+  await say(221397,'?trap load trap-injector lactation x3');
+  moveTo(500,20,20); n=sent.length; W.__trapTick(); await wait(1500);
+  ok(/sprung a trap/.test(to(500,n)), 'a subject steppin\' on it springs it');
+  ok(prod(500).boosts.milk > Date.now() && prod(500).boostX.milk === 3, 'the loaded injector lands its dose: lactation x3 is level 3');
+  ok(/triple dose/.test(all(n)), '...and the room sees the story and the dose');
+  ok(!P(500).penned, 'the trap lets go when it is done');
+  const r1=W.__milkRate(500); W.__shot(500,221397,'lactation'); ok(prod(500).boostX.milk === 4 && W.__milkRate(500) > r1, 'another shot on top stacks (level 4, milk comes faster)');
+  W.__shot(500,221397,'lactation x5'); ok(prod(500).boostX.milk === 5, '...up to five and no further');
+  n=sent.length; W.__trapTick(); await wait(600); ok(!/sprung a trap/.test(to(500,n)), 'standin\' on it does not spring it twice');
+  moveTo(500,15,10); W.__trapTick(); moveTo(500,20,20); n=sent.length; W.__trapTick(); await wait(600);
+  ok(!/sprung a trap/.test(to(500,n)), '...and it takes a while to reset');
+  // ── skip, pause, limits ──
+  await say(500,'?traps skip gas'); moveTo(500,22,20); n=sent.length; W.__trapTick(); await wait(800);
+  ok(!/sprung a trap/.test(to(500,n)) && !(prod(500).heat && prod(500).heat.until > Date.now()), 'a kind they ruled out never springs');
+  await say(500,'?traps allow gas'); moveTo(500,15,10); W.__trapTick(); moveTo(500,22,20); n=sent.length; W.__trapTick(); await wait(1500);
+  ok(prod(500).heat && prod(500).heat.until > Date.now(), 'the gas trap leaves them in heat');
+  await say(221397,'?subject add Rex'); moveTo(600,24,20); n=sent.length; W.__trapTick(); await wait(1000);
+  ok(!prod(600).eggs, 'hard limits rule a trap out (eggs)');
+  moveTo(600,14,10);
+  // ── the thing in the water ──
+  cfg.TENTACLE_CHANCE=0; moveTo(500,30,30); n=sent.length; W.__trapTick(); await wait(500); ok(!prod(500).eggs, 'most times the water is just water');
+  cfg.TENTACLE_CHANCE=1; moveTo(500,15,10); W.__trapTick(); moveTo(500,30,31); n=sent.length; W.__trapTick(); await wait(600);
+  ok(P(500).penned && P(500).penned.trap, 'when it comes, it holds them there');
+  await wait(1800);
+  const e=prod(500).eggs; ok(e && e.n >= 4 && e.by === -2, 'it always leaves eggs ('+(e&&e.n)+')');
+  ok(/thing in the water|tentacle|eggs/.test(all(n)) && /eggs in your/.test(to(500,n)), 'the scenes play out and they are told the count');
+  ok(W.__slow(500) > 1 && W.__stateFor(500).slow > 1, 'carryin\' a clutch slows them down ('+W.__slow(500)+'x)');
+  ok(W.__slow(221397) === 1, '...nobody else');
+  // ── the safeword ──
+  await say(221397,'?subject add Laynie'); cfg.TRAP_BEAT_S=5;
+  n=sent.length; await say(221397,'?trap spring Laynie clamp'); ok(/Sprung on Laynie/.test(to(221397,n)), 'a proprietor can spring one by hand');
+  await say(221397,'?safeword',2500); cfg.TRAP_BEAT_S=0.15; await wait(600);
+  ok(!(P(221397).prod && P(221397).prod.deniedUntil > Date.now()), 'the safeword stops a trap before it lands');
+  n=sent.length; await say(221397,'?trap spring Laynie mud'); ok(/safeword not long ago/.test(to(221397,n)), '...and every trap stays quiet for an hour after');
+  // ── the ones with somebody waitin' in them ──
+  await say(221397,'?subject add Hand'); P(400).breedable=true; P(400).fertile=true; await say(400,'?stats');
+  n=sent.length; await say(221397,'?trap spring Hand wolves'); await wait(1800);
+  ok(/wolf/i.test(all(n)) && P(400).prod.held.vulva > 100 && W.__stateFor(400).today.tally >= 3, 'the wolf den: three loads, three on the tally');
+  cfg.TRAP_COOLDOWN_MIN=0; P(400).prod.held={vulva:0,butt:0,mouth:0}; P(400).prod.preg=null;
+  n=sent.length; await say(221397,'?trap spring Hand drake'); await wait(1800);
+  ok(P(400).prod.eggs && P(400).prod.eggs.by === -16 && /drake/.test(all(n)), 'the drake leaves a clutch, in the book under his name');
+  P(400).breedable=false; P(400).prod.held={vulva:0,butt:0,mouth:0};
+  n=sent.length; await say(221397,'?trap spring Hand stallion'); await wait(1800);
+  ok(/stallion|rope after heavy rope|hoses/.test(all(n)) && !P(400).prod.held.vulva, 'not ?breedable: the load goes over them, never inside');
+  // ── quit ──
+  await say(500,'?subject quit'); ok(!roles(500).includes('SUBJECT') && roles(500).includes('LIVESTOCK'), '?subject quit takes them off the list, nothin\' else');
+  // ── potions stack ──
+  await say(221397,'?potion give Moo clover'); await say(221397,'?potion give Moo clover',2600);
+  ok(P(500).fx.clover && P(500).fx.clover.x === 2 && P(500).fx.clover.until > Date.now()+100*60000, 'a second bottle stacks: stronger and longer');
+  // ── toys that act on their own ──
+  cfg.AUTOINJECT_MIN=0; cfg.OVI_MIN=0; cfg.AUTOFEED_MIN=0; cfg.TOYCOCK_MIN=0;
+  const item=(g,name,craft,d)=>({Asset:{Name:name,Group:{Name:g}},Craft:{Name:craft,Description:d||''}});
+  C(600).Appearance=[item('ItemPelvis','Belt','Doser Belt','auto-injector virility x2')];
+  W.__trapTick(); await wait(50); n=sent.length; W.__trapTick(); await wait(900);
+  ok(P(600).prod.boostX && P(600).prod.boostX.semen === 2, 'an auto-injector belt doses its wearer with what it says');
+  P(500).eggs=true; prod(500).held={vulva:0,butt:0,mouth:0}; const e0=(prod(500).eggs||{n:0}).n;
+  C(500).Appearance=[item('ItemButt','Plug','Layer Plug','ovipositor'), item('ItemMouth','FunnelGag','Feeder','auto-feed')];
+  W.__trapTick(); await wait(50); n=sent.length; W.__trapTick(); await wait(900);
+  ok(prod(500).eggs && prod(500).eggs.n > e0, 'an ovipositor plug lays in them (with ?eggs on)');
+  ok(prod(500).held.mouth >= 100, 'an auto-feed gag pours a bellyful down them');
+  C(600).Appearance=[item('ItemMouth','Gag','Layer Gag','ovipositor')]; W.__trapTick(); await wait(50); W.__trapTick(); await wait(300);
+  ok(!prod(600).eggs, '...never past a hard limit');
+  // ── the parasite lips ──
+  cfg.PARASITE_LATCH_S=0.1; cfg.PARASITE_CHANCE=1;
+  W.__load(-1,500,'mouth',60); await wait(500); ok(!P(500).parasite, 'no parasite for anybody who has not said ?parasite on');
+  await say(500,'?parasite on'); n=sent.length; W.__load(600,500,'mouth',60); await wait(500); ok(!P(500).parasite, '...and only out of the glory holes');
+  W.__load(-1,500,'vulva',60); await wait(500); ok(!P(500).parasite, '...and only from a load swallowed');
+  n=sent.length; W.__load(-1,500,'mouth',60); await wait(900);
+  ok(P(500).parasite && P(500).parasite.until > Date.now()+11*3600000 && /livin' lips/.test(to(500,n)), 'it latches for 12 hours and they are told what it is');
+  const f0=prod(500).boostX.fert||0, sz=()=>JSON.stringify(prod(500).size||{}), s0=sz(); P(500).parasite.next=0; n=sent.length; W.__parasiteTick(); await wait(700);
+  ok(P(500).parasite.n === 1 && sz() !== s0, 'every half hour it feeds them a dose (growth first: '+sz()+')');
+  prod(500).held.mouth=250; const u0=P(500).prod.size && P(500).prod.size.udder; n=sent.length; W.__load(600,500,'mouth',250); await wait(700);
+  ok(prod(500).held.mouth === 0 && P(500).parasite.fed === 1 && P(500).parasite.n === 2 && prod(500).boostX.fert >= Math.min(5, f0+1), 'a swallowed load never reaches the belly: it is turned into a dose (a big one, x3)');
+  ok(W.__stateFor(500).parasite && W.__stateFor(500).parasite.until > Date.now(), 'the Companion is told, so it can put the real lips on');
+  // it spreads by a kiss, but only to somebody who asked
+  W.__cfg.PARASITE_KISS_CHANCE=1; W.__kiss('Kiss','ItemMouth',500,600); await wait(3600); ok(!P(600).parasite, 'a kiss cannot give it to somebody who never said ?parasite on');
+  await say(600,'?parasite on'); W.__kiss('Kiss','ItemMouth',600,500); await wait(3600); ok(!!P(600).parasite, '...and does to somebody who did, whichever of them leaned in');
+  // the cravin'
+  P(500).parasite.ate=Date.now()-3*3600000; P(500).parasite.told=0; n=sent.length; W.__parasiteTick(); await wait(700);
+  ok(/shakin'|clenches|narrowed|droolin'/.test(all(n)), 'too long without a load and the cravin\' bites (only they see it)');
+  n=sent.length; await say(500,'?parasite'); ok(/more hours/.test(to(500,n)), '?parasite says how long is left');
+  n=sent.length; await say(400,'?purge Moo'); ok(!P(500).parasite && /Purged/.test(to(400,n)), 'staff can ?purge it');
+  W.__load(-1,500,'mouth',60); await wait(500); ok(!P(500).parasite, 'it cannot come back the same day');
+  ok(P(500).crave && P(500).crave.until > Date.now(), '...and it leaves the cravin\' behind for a while');
+  // ── watersports ──
+  n=sent.length; await say(500,'?watersports'); ok(/is off for you/.test(to(500,n)), 'watersports is off till they say so');
+  await say(500,'?watersports on'); ok(P(500).watersports === true && W.__stateFor(500).switches.watersports === true, '?watersports on, and the Companion knows');
+  const errs=warns.filter(w=>/trap|toy|command failed/i.test(w)); ok(!errs.length, 'no errors '+errs.join(' | '));
+  out(fails ? fails+' FAILED' : 'ALL PASSED'); process.exit(fails?1:0);
+})();

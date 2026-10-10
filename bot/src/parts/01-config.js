@@ -242,6 +242,25 @@
     LABOUR_MIN: 45,               // labour lasts this long before the litter comes
     LABOUR_WAIT_H: 12,            // due but away from the farm this long: the litter comes without the show
     EGG_CHANCE: 0.2, EGG_TIED_CHANCE: 0.4, EGG_COUNT: [2,6], EGG_DAYS: [2,3],
+    // traps, the thing in the water, and toys that act on their own (10u-traps.js)
+    TRAP_BEAT_S: 9,              // seconds between the beats of a trap's story
+    TRAP_COOLDOWN_MIN: 3,        // a breather for the subject between any two traps
+    TRAP_RESET_MIN: 15,          // how long one trap spot takes to reset for the same subject
+    TRAP_DENY_MIN: 30,           // the clamp
+    TRAP_OVERFULL: 1.3,          // traps can fill a belly this far past capacity (1.5 would pin them)
+    TENTACLE_CHANCE: 0.04,       // each time a subject wades into a water spot (and every TENTACLE_LINGER_MIN they stay)
+    TENTACLE_LINGER_MIN: 5, TENTACLE_HYPER_CHANCE: 0.25,
+    AUTOINJECT_MIN: 30, OVI_MIN: 45, AUTOFEED_MIN: 10, AUTOFEED_ML: 150, TOYCOCK_MIN: 12, TOYCOCK_STRETCH_EVERY: 10,
+    SLOW_MAX: 2.6,               // the most a full belly, a litter and a clutch can slow somebody's walkin'
+    PISS_COLOR: "#D9C13A",
+    // the parasite lips (10v-parasite.js)
+    PARASITE_CHANCE: 0.03,       // each load swallowed at the glory stalls, for somebody who said ?parasite on
+    PARASITE_HOURS: 12, PARASITE_DOSE_MIN: 30, PARASITE_LATCH_S: 12,
+    PARASITE_KISS_CHANCE: 0.5,   // a mouth kiss with somebody carryin' it, for somebody who said ?parasite on
+    CRAVE_HOURS: 12, CRAVE_AFTER_MIN: 45, CRAVE_LINE_MIN: 15,   // the cum cravin': how long it lingers after, how long without a load before it bites, how often it nags
+    PARASITE_BIG_ML: [80, 200],  // a swallowed load this big counts double / triple when it's turned to serum
+    STACK_MAX: 5,          // shots stack: a second dose (or an "x3" tag on the needle) raises the level, up to this
+    POTION_STACK_MAX: 3,   // ...and so do potions: another bottle while one's workin' makes it stronger and longer
     EGG_BOOST_X: 3,        // an "eggs" item or shot: any stud's load can leave a clutch, three times as likely
     HYPER_LITTER_X: [2,4], // a "hyper" item or shot: a litter comes in two to four times as big (up to HYPER_MAX)
     HYPER_MAX: 24, HYPER_FERT_X: 1.5,

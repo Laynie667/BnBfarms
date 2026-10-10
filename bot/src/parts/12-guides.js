@@ -310,6 +310,24 @@ INJECTORS · use Inject on someone
       description lets a cock through: it does not close the hole.
     (worn, those two work for as long as you wear the item)
     heat inducer · heat now  ·  suppressant · heat ends
+  Stackin'
+    Doses stack. A second lactation shot while the first is still
+      workin' makes it triple, a third four times, up to five deep.
+    Put x2 to x5 on the needle for that many doses in one go:
+      "lactation x3", "udder growth x2", "hyper pregnancy x2".
+    Potions stack too: another bottle of the same is stronger
+      (where it can be) and runs longer, up to three deep.
+
+TOYS THAT ACT ON THEIR OWN · crafted words on what you wear
+    auto-injector · the item doses you every half hour with the
+      other words on it: "auto-injector lactation x2"
+    ovipositor · on a gag, belt, plug or dildo: it lays a clutch in
+      you now and then (needs ?eggs on, or bein' a test subject)
+    auto-feed · on a funnel gag: a bellyful poured down you every
+      ten minutes. Add "piss" and say ?watersports on for that.
+    a cock type (canine, equine, feline, draconic), knotted, or a
+      size word (huge, hyper, monster) on a dildo, machine or belt:
+      the farm treats it as that cock, and big ones stretch you.
   Capacity
     stretching / capacity · +250 mL for good (up to 50 L)
     reducing / shrinking · −500 mL, spills the extra
@@ -457,7 +475,32 @@ THE USE BENCH · ?bench on
   ?use [mouth|pussy|ass] · stand by them first
   ?bench top · the week's tally (it's on the ?board too)
   Your limits, your gear and ?breedable still count.
-  Your safeword (or ?bench off) ends it at once.`,
+  Your safeword (or ?bench off) ends it at once.
+
+TEST SUBJECTS & TRAPS
+  A proprietor can sign a volunteer up as a test subject. The
+  farm's hidden traps spring for subjects and nobody else, and
+  somethin' lives in the water.
+  ?traps · what's out there · ?traps off|on · pause them
+  ?traps skip <kind> · rule one out · ?traps allow <kind>
+  ?subject quit · off the list for good
+  Your limits still rule, and your safeword stops a trap cold
+  and keeps them all quiet for an hour.
+
+THE PARASITE · ?parasite on
+  Swallow a load at the glory stalls and, once in a long while,
+  somethin' comes through the hole with it and seals over your
+  mouth for 12 hours. It feeds you serum every half hour
+  (fertility, growth, hyper pregnancy, capacity; the growth is
+  for keeps) and turns every load you swallow into more.
+  ?parasite · how long is left. Your safeword takes it off.
+
+WATERSPORTS · ?watersports on
+  Piss play. Off until you say so.
+
+CARRYIN' SLOWS YOU DOWN
+  A pumped belly, a late litter or a clutch of eggs makes you
+  walk slower on the map (with the Companion; it has a switch).`,
 
     fair: `🎪 THE COUNTY FAIR 🎪
 
@@ -639,6 +682,17 @@ RIBBONS, POTIONS, DARES, THE CORRAL
   ?bench <who> [minutes, 5-120] · ?unbench <who>
      only for people who said ?bench on · bench spots:
      ?spot set bench (bench-2, bench-3…)
+  ?subject add|remove <who> · proprietors: test subjects
+  ?traps · the kinds, the spots, the water
+     trap spots: ?spot set trap-<kind> (trap-milker-2…), or a
+     plain ?spot set trap for pot luck. ?traps lists every kind,
+     the ones with a wolf pack or a stallion waitin' in them too.
+     Water the thing lives in:
+     ?spot set pond (pool, creek, water, well, bath…)
+  ?trap load <spot> <shot words> · fill an injector trap
+  ?trap spring <who> [kind] · proprietors: set one off by hand
+  ?purge <who> · take a parasite off them
+  ?parasite give <who> · proprietors (they need ?parasite on)
   ?store approve|reject <who> · a bought greetin'
 
 BEGGIN'

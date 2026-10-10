@@ -13,8 +13,8 @@ import { VERSION } from "./version.js";
 import { BOT_MEMBER, HELLO_EVERY_MS } from "./config.js";
 import { Panel } from "./panel.js";
 import { captureOutfit, wearOutfit, changeBack, hasBackup } from "./outfits.js";
-import { markBody, washMarks, stripMe, dressMe } from "./marks.js";
-import { initCues, cueOff, lead, face, sound, trance, drawMarkers } from "./cues.js";
+import { markBody, washMarks, stripMe, dressMe, parasiteGag } from "./marks.js";
+import { initCues, cueOff, lead, face, sound, trance, drawMarkers, arouse, initBody } from "./cues.js";
 
 // the SDK ships as an old-style module; this digs the real thing out either way
 const bcModSdk = sdkModule.default || sdkModule;
@@ -139,6 +139,15 @@ function toChat(text, color, italic) {
   return true;
 }
 
+// the parasite lips: on your character while the farm's books say so, off the moment they don't (marks.js)
+function parasiteSync() {
+  try {
+    const s = st.panel && st.panel.s;
+    if (!st.gotState || !s || window.CurrentScreen !== "ChatRoom") return;
+    const on = !!(s.parasite && s.parasite.until > Date.now());
+    if (parasiteGag(on) && on) toChat("The lips settle back over your mouth, warm and tight. It isn't done with you.", "#c9a35b", true);
+  } catch (e) { console.warn("[Farmhand Companion] parasite:", e); }
+}
 function onFarmMsg(m) {
   if (m.from !== BOT_MEMBER) return;     // only the farm bot gets to talk to the panel
   if (m.type !== "ping" && m.type !== "state") st.lastHeard = Date.now();
@@ -159,7 +168,7 @@ function onFarmMsg(m) {
       }
       break;
     case "state":
-      if (m.state && typeof m.state === "object") { st.gotState = true; st.panel.setState(m.state); }
+      if (m.state && typeof m.state === "object") { st.gotState = true; st.panel.setState(m.state); parasiteSync(); }
       break;
     case "reply":
     case "notice": {
@@ -205,6 +214,7 @@ function onFarmMsg(m) {
     case "relay": relay(m); break;
     case "lead": lead(m); break;       // walk me there (cues.js)
     case "face": face(m); break;
+    case "arouse": arouse(m); break;   // a trap or a toy stirs you up, if you let the farm do that (cues.js)
     case "sound": sound(m); break;
     case "trance": trance(m); break;
     case "voice": {
@@ -287,6 +297,8 @@ function start() {
   st.panel = new Panel(sendCommand, api);
   st.panel.setStatus("waitin' for the farm girl");
   initCues({ toBot, panel: st.panel, local: toChat });
+  setInterval(parasiteSync, 60000);
+  initBody(mod);   // slowed walkin' when you're carryin' a lot, and bein' held at the edge while denied (cues.js)
   // the bot hands this page's own-account messages straight here (see toBot above)
   window.__farmhandOwnPanel = (data) => { if (!onBotAccount()) return; const m = readMsg(data); if (m) { try { onFarmMsg(m); } catch (e) { console.warn("[Farmhand Companion]", e); } } };
   // on the bot's account with a bot too old for the direct link: say so instead of sittin' on the guest panel

@@ -762,7 +762,7 @@
           PROPRIETOR:"🥇 PROPRIETORS", HERDMASTER:"🥈 HERDMASTERS",
           MANDATED:"🔗 MANDATED FARMHANDS", FARMHAND:"🥈 FARMHANDS",
           LIVESTOCK:"🐄 LIVESTOCK", LUXURY:"🏡 LUXURY GUESTS",
-          GUEST:"👤 GUESTS", GLORYHOLE:"🕳️ INSTALLED"
+          GUEST:"👤 GUESTS", GLORYHOLE:"🕳️ INSTALLED", SUBJECT:"🧪 TEST SUBJECTS"
         };
         const line = (r) => {
           const here = charFor(r.mn) ? " ●" : "";
@@ -1164,6 +1164,8 @@
       /* ── SAFETY ── */
       case "safe": case "safeword": case "red": {
         try { unbench(sender, "safe"); } catch(e){ warn("safeword bench:", e); }   // off the use bench before anything else
+        try { trapStop(sender); } catch(e){ warn("safeword trap:", e); }           // a trap lets go mid-scene, and they all stay quiet for an hour
+        try { parasiteOff(sender, "safe"); } catch(e){ warn("safeword parasite:", e); }
         say("🔴 PAUSE CALLED. Everything stops, right now, everybody.", true, sender);   // I go stand by them, so everyone near them hears it
         beep(sender, "I've got you, "+plainName(sender)+". Everything's stopped and I'm fetchin' somebody for you right now. You don't owe anybody an explanation. 🔴", true);
         notifyStaff("🔴 SAFEWORD from "+plainName(sender)+" ("+sender+"). Please go to them now.", false);
@@ -1554,6 +1556,8 @@ Welcome to B&B Farm, hon. 🌾`);
       case "dares": case "dare": case "dared": dareCommand(cmd, sender, args, R); break;
       case "corral": case "uncorral": penCommand(cmd === "corral" ? "pen" : "unpen", sender, args, R); break;
       case "bench": case "unbench": case "use": benchCommand(cmd, sender, args, R); break;
+      case "subject": case "subjects": case "traps": case "trap": case "watersports": trapCommand(cmd, sender, args, R); break;   // 10u-traps.js
+      case "parasite": case "purge": parasiteCommand(cmd, sender, args, R); break;   // 10v-parasite.js
       case "feedback": case "suggest": case "idea": case "bug": case "meh": case "more": feedbackCommand(cmd, sender, args, rest, R); break;   // the suggestion box (10q)
 
       case "edit": {

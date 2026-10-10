@@ -332,6 +332,18 @@
   function heldTotal(p){ return HOLES.reduce((a,h)=>a+(p.held[h]||0),0); }
   function inHeat(p){ return !!(p && p.heat && p.heat.until > Date.now()); }
   function boosted(p, k){ return !!(p && p.boosts && p.boosts[k] > Date.now()); }
+  // boosts stack: level 1 is one dose, and every dose on top (or an "x3" on the needle) raises it, up to CFG.STACK_MAX
+  function boostLevel(p, k){ return boosted(p, k) ? Math.max(1, Math.min(CFG.STACK_MAX, (p.boostX && p.boostX[k]) || 1)) : 0; }
+  function addBoost(p, k, ms, x){
+    const now = Date.now(), was = boostLevel(p, k);
+    x = Math.max(1, Math.min(CFG.STACK_MAX, Math.round(Number(x) || 1)));
+    p.boosts = p.boosts || {}; p.boostX = p.boostX || {};
+    p.boostX[k] = Math.min(CFG.STACK_MAX, was + x);
+    p.boosts[k] = Math.max(p.boosts[k] || 0, now + ms);
+    return p.boostX[k];
+  }
+  // "x3", "x 3" or "×3" on a crafted needle, toy or trap: that many doses at once
+  function shotTimes(text){ const m = String(text || "").toLowerCase().match(/(?:^|[^a-z0-9])[x×]\s?([1-9])(?![a-z0-9])/); return m ? Math.min(CFG.STACK_MAX, parseInt(m[1], 10)) : 1; }
   function milkCapNatural(mn){ return CFG.PROD.MILK_CAP * speciesInfo(mn).milk * udderX(mn); }
   function milkCap(mn){ const p = prodOf(mn); return milkCapNatural(mn) + (p ? p.capBonus : 0); }
   // stock make milk unless they switch it off; anyone else can switch it on
@@ -347,8 +359,8 @@
     let r = CFG.PROD.MILK_PER_H * speciesInfo(mn).milk * udderX(mn);
     if (p.preg) r *= CFG.PROD.PREG_MILK_X;
     if (p.freshUntil > now) r *= CFG.PROD.FRESH_MILK_X;
-    if (boosted(p,"milk")) r *= 2;
-    if (potionOn(mn, "heavy")) r *= 3;   // Heavy Udder Draught
+    r *= 1 + boostLevel(p,"milk");       // a lactation shot doubles it; every dose stacked on top adds as much again
+    r *= 1 + 2*potionX(mn, "heavy");     // Heavy Udder Draught (and it stacks)
     if (wornTags(mn).has("lactation")) r *= 1.5;
     if (tierOf(mn) === "prize") r *= 1.25;
     if (boosted(p,"hungry")) r *= CFG.HUNGRY_X;
@@ -358,8 +370,8 @@
   function semenRate(mn){
     const p = prodOf(mn);
     let r = CFG.PROD.SEMEN_PER_H * testesX(mn);
-    if (boosted(p,"semen")) r *= 2;
-    if (potionOn(mn, "heavy")) r *= 3;
+    r *= 1 + boostLevel(p,"semen");
+    r *= 1 + 2*potionX(mn, "heavy");
     if (wornTags(mn).has("virility")) r *= 1.5;
     if (boosted(p,"hungry")) r *= CFG.HUNGRY_X;
     return r * addonRateX(mn, "semen");
@@ -489,7 +501,7 @@
     let chance = CFG.PROD.CONCEIVE_BASE * speciesInfo(mother).fert *
                  (0.5 + Math.min(1, (p.held[hole]||0) / capacity(mother)));
     if (inHeat(p)) chance *= 3;
-    if (boosted(p,"fert")) chance *= 2;
+    chance *= 1 + boostLevel(p,"fert");
     if (wornTags(mother).has("fertility")) chance *= 1.5;
     if (wornTags(mother).has("hyper") || boosted(p, "hyper")) chance *= CFG.HYPER_FERT_X;
     if (bonus) chance *= bonus;
@@ -508,7 +520,8 @@
     if (lo === 1 && hi === 1 && Math.random() < CFG.PROD.TWIN_CHANCE) count = 2;   // twins first, so a hyper litter is never cut back down to two
     // hyper pregnancy: a worn "hyper" item, a hyper shot, or a Broodmare Tonic
     if (wornTags(mother).has("hyper") || boosted(p, "hyper")){
-      const [a, b] = CFG.HYPER_LITTER_X; count = Math.min(CFG.HYPER_MAX, Math.max(count + 2, Math.round(count * (a + Math.random()*(b - a)))));
+      const [a, b] = CFG.HYPER_LITTER_X, hx = 1 + 0.5*Math.max(0, boostLevel(p, "hyper") - 1);   // stacked hyper shots: bigger yet
+      count = Math.min(CFG.HYPER_MAX, Math.max(count + 2, Math.round(count * (a + Math.random()*(b - a)) * hx)));
     }
     p.preg = { since:now, due: now + CFG.PROD.PREG_DAYS*86400000, sires:[stud], count, warned:false };
     if (hole === "butt") p.preg.via = "butt";   // carried in the ass (mpreg)
@@ -1017,7 +1030,7 @@
       if (caught){ sp.totals.conceived = (sp.totals.conceived||0) + 1;
                    rollBoard(); const Y = L.yield; Y.s = Y.s || {}; Y.s[stud] = (Y.s[stud]||0) + 1; }
     }
-    if (load - gagged > 0) addonsEmit("bred", stud, t, hole, load - gagged, caught);   // breedin' season keeps its stud book from these
+    if (load - gagged > 0){ parasiteLoad(stud, t, hole, kept); addonsEmit("bred", stud, t, hole, load - gagged, caught); }   // breedin' season keeps its stud book from these
     okBreed(stud, t);
     face(t, "bred", 40); sound(t, "wet");
     if (!opt.second){
@@ -1039,7 +1052,7 @@
     if (!opt.second && hole !== "mouth" && makesSemen(stud) && (penisType(stud) === "draconic" || eggBoost) && rt.eggs && !tp.eggs && !limitBlocks(t, "eggs") &&
         Math.random() < Math.min(0.95, (knot ? CFG.EGG_TIED_CHANCE : CFG.EGG_CHANCE) * (eggBoost ? CFG.EGG_BOOST_X : 1))){
       const [lo,hi] = CFG.EGG_COUNT, [dl,dh] = CFG.EGG_DAYS;
-      clutch = lo + Math.floor(Math.random()*(hi-lo+1));
+      clutch = (lo + Math.floor(Math.random()*(hi-lo+1))) * Math.max(1, boostLevel(tp, "eggs"));   // stacked egg shots: a bigger clutch
       tp.eggs = { n:clutch, by:stud, since:Date.now(), layAt: Date.now() + (dl + Math.random()*(dh-dl))*86400000 };
     }
     saveLedger(); audit(stud,"CUM",stud+"→"+t+" "+hole+" "+Math.round(load));

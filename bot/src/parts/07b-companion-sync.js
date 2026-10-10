@@ -8,7 +8,7 @@
   // ledger field → the command that flips it
   const SWITCH_CMDS = { breedable:"breedable", fertile:"fertile", jarok:"jarok", freeuse:"freeuse", futa:"futa",
                         milkable:"milkable", naturalHeat:"naturalheat", praiseMe:"praise", degradeMe:"degrade",
-                        tally:"tally", teaseOptIn:"teaseme", forced:"forced", hypno:"hypno", potionsOn:"potions", daresOn:"dares", benchOn:"bench", mpreg:"mpreg" };
+                        tally:"tally", teaseOptIn:"teaseme", forced:"forced", hypno:"hypno", potionsOn:"potions", daresOn:"dares", benchOn:"bench", mpreg:"mpreg", watersports:"watersports", parasiteOn:"parasite" };
   // staff lookups about somebody else go to the Companion's Office tab
   const DOC_CMDS = ["record","stats","vet","quota","keys","size","measure","pedigree"];
 
@@ -54,6 +54,10 @@
       if (r.dare) s.dare = { text: r.dare.text, until: r.dare.until, reckless: !!r.dare.reckless };
       if (r.penned) s.penned = { until: r.penned.until, at: r.penned.name };
       s.now = rightNow(mn);                 // the "right now" strip (10p-lookout.js)
+      { const sl = slowOf(mn); if (sl >= 1.2) s.slow = sl; }                                   // how much slower they walk for what they're carryin' (10u-traps.js)
+      if (p.deniedUntil > now) s.deniedUntil = Math.ceil(p.deniedUntil / 60000) * 60000;     // held at the edge, if their Companion's set to
+      if (p.eggs) s.eggs = { n: p.eggs.n, layAt: p.eggs.layAt };
+      if (parasiteOn(mn)) s.parasite = { until: r.parasite.until };
       const bh = benchHereFor(mn); if (bh.length) s.benchHere = bh;   // tap-to-use bench buttons
       s.at = now;
       if (isStaff(mn)) Object.assign(s, staffStateFor(mn));

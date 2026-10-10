@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.12.3
+// @version      0.13.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -230,7 +230,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.12.3";
+  var VERSION = "0.13.0";
 
   // extension/src/config.js
   var BOT_MEMBER = 260239;
@@ -646,6 +646,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
     ["hypno", "Hypno", "Let your herd leader's voice lines reach you, privately"],
     ["potions", "Potions", "Staff and the wheel can give you potions, and others can gift you one (you're asked first). Your limits still rule some out"],
     ["dares", "Dares", "Staff and the wheel can hand you a dare to do in half an hour"],
+    ["watersports", "Watersports", "Piss play can find you: the spray trap, a feeder crafted for it, and the scenes that have it. Off until you say so"],
+    ["parasite", "Parasite", "Swallow at the glory stalls and, rarely, a pair of livin' lips seals over your mouth for 12 hours: it feeds you fertility, growth, hyper pregnancy and capacity serum and turns every load you swallow into more"],
     ["bench", "Use bench", "Staff and the wheel can sentence you to time strapped over the use bench, where anybody can use you. Your safeword ends it at once"]
   ];
   var NEEDS = { freeuse: ["breedable", "Turn Breedable on first"] };
@@ -657,6 +659,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       return toggle(label, desc, !!sw[cmd], () => ctx2.send(cmd + " " + (sw[cmd] ? "off" : "on")));
     });
   }
+  var marksFor = (ctx2) => !!(window.Player && (window.Player.MemberNumber === 221397 || (ctx2.s && ctx2.s.roles || []).includes("SUBJECT")));
   function panelPrefs(ctx2) {
     return card(
       title("This panel"),
@@ -684,19 +687,30 @@ One of mods you are using is using an old version of SDK. It will work for now b
         ["noSound", "Farm sounds", "The pump, the stall door, the feedin' bell. Only you hear them, at your game volume"],
         ["noTrance", "Trance haze", "A soft haze at the edges of your screen during conditioning sessions"],
         ["noFeelings", "Private feelings", "Now and then, a line only you see about what you're feelin' (your gear, your arousal, how full you are)"],
+        ["noSlow", "Carryin' slows me down", "The fuller you are (a pumped belly, a late litter, a clutch of eggs), the slower you walk on the map"],
         ["noMarkers", "Map markers (staff)", "Small badges over stock on your map: M needs milkin', H in heat, B expectin', X teats capped"]
       ].map(([k, label, desc]) => toggle(label, desc, !ctx2.prefs[k], () => {
         ctx2.setPref(k, !ctx2.prefs[k]);
         ctx2.api.rehello && ctx2.api.rehello();
       })),
+      // OFF until you turn it on: the farm touchin' your arousal meter (cues.js)
+      toggle(
+        "Farm can stir me up",
+        "Traps, toys and scenes nudge your arousal meter up, and while the farm has you denied you're held at the edge instead of cummin'. Your safeword still stops everything.",
+        !!ctx2.prefs.stir,
+        () => {
+          ctx2.setPref("stir", !ctx2.prefs.stir);
+          ctx2.api.rehello && ctx2.api.rehello();
+        }
+      ),
       // these two are OFF until you turn them on: the farm changin' what your character looks like (marks.js)
-      window.Player && window.Player.MemberNumber === 221397 && toggle(
+      marksFor(ctx2) && toggle(
         "Farm can mark my body",
         "Loads leave the game's own splatters on your face, chest or tummy, wherever there's room, and farm words can be written on your body. ?wash takes them off.",
         !!ctx2.prefs.marks,
         () => ctx2.setPref("marks", !ctx2.prefs.marks)
       ),
-      window.Player && window.Player.MemberNumber === 221397 && toggle(
+      marksFor(ctx2) && toggle(
         "Farm can strip me",
         "When the farm says so, your clothes come off (locked pieces stay). They're kept on this computer so you can dress again.",
         !!ctx2.prefs.strip,
@@ -3849,14 +3863,18 @@ One of mods you are using is using an old version of SDK. It will work for now b
     let next = bundle(), mem = load();
     const has = (g) => next.find((b) => b.Group === g);
     if (Array.isArray(m.splat) && m.splat.length) {
-      let it = next.find((b) => b.Name === "Splatters" && SPLAT_GROUPS.includes(b.Group));
+      const col = typeof m.color === "string" && /^#[0-9a-fA-F]{6}$/.test(m.color) ? m.color.toUpperCase() : null;
+      const colOf = (b) => typeof b.Color === "string" && /^#/.test(b.Color) ? b.Color.toUpperCase() : null;
+      const mine = next.filter((b) => b.Name === "Splatters" && SPLAT_GROUPS.includes(b.Group));
+      let it = mine.find((b) => colOf(b) === col);
       if (!it) {
         const g = SPLAT_GROUPS.find((x) => !has(x) && groupOf2(x));
         if (g) {
           it = { Group: g, Name: "Splatters", Property: { TypeRecord: {} } };
+          if (col) it.Color = col;
           next.push(it);
           mem.splatGroup = g;
-        }
+        } else it = mine[0];
       }
       if (it) {
         it.Property = Object.assign({}, it.Property || {});
@@ -3942,6 +3960,42 @@ One of mods you are using is using an old version of SDK. It will work for now b
     commit2(next);
     return { ok: true, did };
   }
+  var PARASITE_NAME = "Parasite Lips";
+  function parasiteGag(on) {
+    if (!P2() || !Array.isArray(P2().Appearance) || typeof window.ServerAppearanceBundle !== "function") return false;
+    const cur = bundle(), have = cur.find((b) => b.Craft && b.Craft.Name === PARASITE_NAME);
+    if (!!have === !!on) return false;
+    if (!on) {
+      commit2(cur.filter((b) => b !== have));
+      return true;
+    }
+    const g = ["ItemMouth", "ItemMouth2", "ItemMouth3"].find((x) => !cur.find((b) => b.Group === x) && groupOf2(x));
+    if (!g) return false;
+    const color = ["#E0607F", "#7A2B47", "#7A2B47"];
+    cur.push({
+      Group: g,
+      Name: "LipGag",
+      Color: color,
+      Difficulty: 20,
+      Property: {},
+      Craft: {
+        Item: "LipGag",
+        Name: PARASITE_NAME,
+        Description: "A pair of fat, living lips sealed over the mouth, with a tentacle down the throat. It feeds its host serum and drinks every load they swallow. B&B Farm.",
+        Property: "Normal",
+        Color: color.join(","),
+        Lock: "",
+        Private: true,
+        MemberNumber: P2().MemberNumber,
+        MemberName: P2().Name,
+        ItemProperty: {},
+        Type: null,
+        TypeRecord: null
+      }
+    });
+    commit2(cur);
+    return true;
+  }
   function washMarks() {
     const mem = load(), stuck = lockedGroups2();
     const next = bundle().filter((b) => stuck.has(b.Group) || !(b.Name === "Splatters" && SPLAT_GROUPS.includes(b.Group) || b.Name === "BodyWritings" && b.Group === mem.writeGroup || mem.treatise && b.Group === TREATISE.group));
@@ -4000,7 +4054,9 @@ One of mods you are using is using an old version of SDK. It will work for now b
     face: !pref("noFace") || void 0,
     sound: !pref("noSound") || void 0,
     trance: !pref("noTrance") || void 0,
-    lead: !pref("noLead") || void 0
+    lead: !pref("noLead") || void 0,
+    slow: !pref("noSlow") || void 0,
+    stir: ctx.panel.prefs.stir ? void 0 : true
   });
   var mapOn = () => typeof W.ChatRoomMapViewIsActive === "function" && W.ChatRoomMapViewIsActive() && W.Player && W.Player.MapData && W.Player.MapData.Pos;
   var others = () => (W.ChatRoomCharacter || []).filter((c) => c && c.MemberNumber !== (W.Player && W.Player.MemberNumber));
@@ -4298,6 +4354,61 @@ One of mods you are using is using an old version of SDK. It will work for now b
     } catch (e) {
     }
   }
+  var stirOn = () => !!ctx.panel.prefs.stir;
+  var deniedNow = () => {
+    const s = ctx.panel.s;
+    return !!(s && s.deniedUntil && s.deniedUntil > Date.now());
+  };
+  function slowFactor() {
+    const s = ctx && ctx.panel && ctx.panel.s;
+    if (!s || !pref("noSlow") || !(s.slow > 1)) return 1;
+    return Math.max(1, Math.min(3, Number(s.slow) || 1));
+  }
+  function arouse(m) {
+    try {
+      if (!stirOn() || !W.Player || !W.Player.ArousalSettings || typeof W.ActivitySetArousal !== "function") return;
+      if (W.Player.ArousalSettings.Active === "Inactive" || W.Player.ArousalSettings.Active === "NoMeter") return;
+      const cur = Number(W.Player.ArousalSettings.Progress) || 0, cap = Math.max(0, Math.min(deniedNow() ? 94 : 100, Number(m.cap) || 100));
+      const next = Math.max(0, Math.min(cap, cur + (Number(m.add) || 0)));
+      if (next > cur || m.add < 0) W.ActivitySetArousal(W.Player, next);
+    } catch (e) {
+      console.warn("[Farmhand Companion] arouse:", e);
+    }
+  }
+  function initBody(mod2) {
+    try {
+      mod2.hookFunction("ChatRoomMapViewCanEnterTile", 0, (args, next) => {
+        const t = next(args);
+        try {
+          const f = slowFactor();
+          return t > 0 && f > 1 && !(typeof W.ChatRoomMapViewHasSuperPowers === "function" && W.ChatRoomMapViewHasSuperPowers()) ? t * f : t;
+        } catch (e) {
+          return t;
+        }
+      });
+    } catch (e) {
+      console.warn("[Farmhand Companion] slowed walkin' unavailable:", e);
+    }
+    try {
+      mod2.hookFunction("ActivityOrgasmPrepare", 0, (args, next) => {
+        try {
+          const C = args[0];
+          if (C && typeof C.IsPlayer === "function" && C.IsPlayer() && stirOn() && deniedNow()) {
+            C.ArousalSettings.Progress = 94;
+            if (Date.now() - (initBody.told || 0) > 6e4) {
+              initBody.told = Date.now();
+              ctx.local("Right at the edge, and the farm won't let you over it. Not yet, sugar.", "#c9a35b", true);
+            }
+            return;
+          }
+        } catch (e) {
+        }
+        return next(args);
+      });
+    } catch (e) {
+      console.warn("[Farmhand Companion] denial unavailable:", e);
+    }
+  }
 
   // extension/src/index.js
   var bcModSdk = import_bondage_club_mod_sdk.default.default || import_bondage_club_mod_sdk.default;
@@ -4422,6 +4533,16 @@ One of mods you are using is using an old version of SDK. It will work for now b
     window.ChatRoomSendLocal(p.outerHTML);
     return true;
   }
+  function parasiteSync() {
+    try {
+      const s = st.panel && st.panel.s;
+      if (!st.gotState || !s || window.CurrentScreen !== "ChatRoom") return;
+      const on = !!(s.parasite && s.parasite.until > Date.now());
+      if (parasiteGag(on) && on) toChat("The lips settle back over your mouth, warm and tight. It isn't done with you.", "#c9a35b", true);
+    } catch (e) {
+      console.warn("[Farmhand Companion] parasite:", e);
+    }
+  }
   function onFarmMsg(m) {
     if (m.from !== BOT_MEMBER) return;
     if (m.type !== "ping" && m.type !== "state") st.lastHeard = Date.now();
@@ -4446,6 +4567,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
         if (m.state && typeof m.state === "object") {
           st.gotState = true;
           st.panel.setState(m.state);
+          parasiteSync();
         }
         break;
       case "reply":
@@ -4503,6 +4625,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
       case "face":
         face(m);
         break;
+      case "arouse":
+        arouse(m);
+        break;
+      // a trap or a toy stirs you up, if you let the farm do that (cues.js)
       case "sound":
         sound(m);
         break;
@@ -4612,6 +4738,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
     st.panel = new Panel(sendCommand, api);
     st.panel.setStatus("waitin' for the farm girl");
     initCues({ toBot, panel: st.panel, local: toChat });
+    setInterval(parasiteSync, 6e4);
+    initBody(mod);
     window.__farmhandOwnPanel = (data) => {
       if (!onBotAccount()) return;
       const m = readMsg(data);

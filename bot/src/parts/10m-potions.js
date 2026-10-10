@@ -65,6 +65,8 @@
   ];
   const potionDef = (id) => POTIONS.find(p => p.id === String(id || "").toLowerCase()) || null;
   function potionOn(mn, id){ const r = rec(mn), f = r && r.fx && r.fx[id]; return !!(f && f.until > Date.now()); }
+  // how many bottles deep they are (0 = none): another bottle while one's workin' stacks, up to CFG.POTION_STACK_MAX
+  function potionX(mn, id){ const r = rec(mn), f = r && r.fx && r.fx[id]; return f && f.until > Date.now() ? Math.max(1, f.x || 1) : 0; }
   function activePotions(mn){ const r = rec(mn), now = Date.now(); return r && r.fx ? Object.entries(r.fx).filter(([, f]) => f.until > now).map(([id, f]) => Object.assign({ id }, f)) : []; }
 
   // why this person can't have this potion right now (null = they can)
@@ -92,20 +94,32 @@
     r.fx = r.fx || {};
     const now = Date.now(), was = r.fx[id] && r.fx[id].until > now;
     const f = was ? r.fx[id] : { at: now, by: by || 0, n: 0 };
-    f.until = now + P.mins*60000;
+    // a second bottle on top of the first: stronger (where it can be) and longer, not just topped up
+    const stacked = was && (f.x || 1) < CFG.POTION_STACK_MAX;
+    if (was){ f.x = Math.min(CFG.POTION_STACK_MAX, (f.x || 1) + 1); f.until = Math.min(now + P.mins*60000*CFG.POTION_STACK_MAX, f.until + P.mins*60000); }
+    else f.until = now + P.mins*60000;
     r.fx[id] = f;
-    if (!was) potionStart(mn, P, f);
+    if (!was) potionStart(mn, P, f); else potionStack(mn, P, f);
     saveLedger(); audit(by || CFG.BOT_MEMBER, "POTION", mn+" "+id+(how ? " ("+how+")" : ""));
-    tell(mn, "🧪 "+P.name+(how ? " ("+how+")" : "")+": "+P.drink+" "+P.desc+" Your safeword pours it out.");
+    tell(mn, "🧪 "+P.name+(how ? " ("+how+")" : "")+": "+P.drink+" "+P.desc+(was ? (stacked ? " That's bottle number "+f.x+" on top of the last: it hits harder and runs longer." : " You're as deep in that one as it goes, so it just runs longer.") : "")+" Your safeword pours it out.");
     if (onMap(mn)) emote("🧪 "+P.seen.replace(/%n/g, plainName(mn)), mn);
     syncCompanions(true);
     return true;
   }
+  // another bottle of the same while it's still workin'
+  function potionStack(mn, P, f){
+    const p = prodOf(mn), left = f.until - Date.now();
+    if (P.id === "clover"){ if (makesMilk(mn)) addBoost(p, "milk", left, 1); if (makesSemen(mn)) addBoost(p, "semen", left, 1); }
+    if (P.id === "bitterroot") p.deniedUntil = Math.max(p.deniedUntil || 0, f.until);
+    if (P.id === "brood"){ addBoost(p, "eggs", left, 1); addBoost(p, "hyper", left, 1); }
+    if (P.id === "heatmist" && p.heat) p.heat.until = Math.max(p.heat.until, f.until);
+    if ((P.id === "bigbritches" || P.id === "shrink") && f.part) setSize(mn, f.part, sizeOf(mn, f.part) + (P.id === "shrink" ? -2 : 2), false);
+  }
   function potionStart(mn, P, f){
     const p = prodOf(mn), r = rec(mn), now = Date.now();
-    if (P.id === "clover"){ if (makesMilk(mn)) p.boosts.milk = Math.max(p.boosts.milk || 0, now + P.mins*60000); if (makesSemen(mn)) p.boosts.semen = Math.max(p.boosts.semen || 0, now + P.mins*60000); }
+    if (P.id === "clover"){ if (makesMilk(mn)) addBoost(p, "milk", P.mins*60000, 1); if (makesSemen(mn)) addBoost(p, "semen", P.mins*60000, 1); }
     if (P.id === "bitterroot") p.deniedUntil = Math.max(p.deniedUntil || 0, now + P.mins*60000);
-    if (P.id === "brood"){ p.boosts.eggs = Math.max(p.boosts.eggs || 0, now + P.mins*60000); p.boosts.hyper = Math.max(p.boosts.hyper || 0, now + P.mins*60000); }
+    if (P.id === "brood"){ addBoost(p, "eggs", P.mins*60000, 1); addBoost(p, "hyper", P.mins*60000, 1); }
     if (P.id === "heatmist") startHeat(mn, f.by || CFG.BOT_MEMBER, P.mins/60);
     if (P.id === "wrongbarn"){
       const kinds = Object.keys(CFG.SPECIES).filter(k => k !== "default" && k !== speciesKey(mn));

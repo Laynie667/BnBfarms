@@ -249,9 +249,9 @@
         if (it.id.startsWith("shot-")){
           const p = prodOf(sender), now = Date.now(), H = 3600000;
           spendRibbons(sender, price, it.name);
-          if (it.id === "shot-milk") p.boosts.milk = now + 24*H;
-          if (it.id === "shot-semen") p.boosts.semen = now + 24*H;
-          if (it.id === "shot-fert") p.boosts.fert = now + 24*H;
+          if (it.id === "shot-milk") addBoost(p, "milk", 24*H, 1);
+          if (it.id === "shot-semen") addBoost(p, "semen", 24*H, 1);
+          if (it.id === "shot-fert") addBoost(p, "fert", 24*H, 1);
           if (it.id === "shot-contra") p.boosts.contra = now + 48*H;
           if (onMap(sender)) emote("💉 The farm girl pinches up a bit of "+plainName(sender)+"'s flank and slides the needle in, quick and practiced. \"There. You'll feel that by supper.\"", sender);
           done("💉 "+it.name+" in. "+it.desc+" ("+ribbonsOf(sender)+" ribbons left)");

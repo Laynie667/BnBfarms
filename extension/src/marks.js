@@ -115,37 +115,71 @@ export function markBody(m, prefs) {
   return { ok: true, did };
 }
 
-// the parasite lips: a real Lip Gag on you while the farm's books say one's latched on (you said ?parasite on).
-// Put back if it's taken off early; gone the moment the farm says it's dropped off (or you safeword).
-const PARASITE_NAME = "Parasite Lips";
-const PARASITE_BELT = "Parasite Belt";
-const hasAsset = (g, n) => { try { return typeof window.AssetGet !== "function" || !!window.AssetGet(P().AssetFamily, g, n); } catch (e) { return false; } };
-export function parasiteGag(on, form) {
-  if (!P() || !Array.isArray(P().Appearance) || typeof window.ServerAppearanceBundle !== "function") return false;
-  const cur = bundle(), want = on ? (form === "belt" ? PARASITE_BELT : PARASITE_NAME) : null;
-  const mine = cur.filter((b) => b.Craft && (b.Craft.Name === PARASITE_NAME || b.Craft.Name === PARASITE_BELT));
-  if (mine.length === (want ? 1 : 0) && (!want || mine[0].Craft.Name === want)) return false;
-  const rest = cur.filter((b) => !mine.includes(b));
-  if (!on) { commit(rest); return true; }
-  if (form === "belt") {
-    // the same thing, grown: a livin' belt on the hips
-    if (rest.find((b) => b.Group === "ItemPelvis") || !groupOf("ItemPelvis") || !hasAsset("ItemPelvis", "PolishedChastityBelt")) { if (mine.length) commit(rest); return false; }
-    const bc = "#E0607F";
-    rest.push({ Group: "ItemPelvis", Name: "PolishedChastityBelt", Color: bc, Difficulty: 20, Property: {},
-      Craft: { Item: "PolishedChastityBelt", Name: PARASITE_BELT, Description: "A belt of living flesh closed round the hips, with a root up inside. It feeds its host serum and drinks every load they take. B&B Farm.",
-        Property: "Normal", Color: bc, Lock: "", Private: true, MemberNumber: P().MemberNumber, MemberName: P().Name, ItemProperty: {}, Type: null, TypeRecord: null } });
-    commit(rest);
-    return true;
+// FARM GEAR: real items the farm keeps on you (a trap's plug, growth cups, the clamp, a chain, the feed funnel, rope,
+// the parasite's lips or belt). The farm girl sends the list of what should be on you right now, and this makes your
+// character match it: a listed piece goes on, a piece that's no longer listed comes off, and one pulled off early
+// goes back. Trap gear needs "Farm can put real gear on me" (Toggles); the parasite's own switch is its say-so.
+// Each piece is crafted with FARM_TAG in its description, which is how we know which items are ours to remove.
+const FARM_TAG = "[B&B Farm gear]";
+const OLD_NAMES = ["Parasite Lips", "Parasite Belt"];   // from before the tag
+// slot → where it can go and which game item it is: the first that this game has; the pattern is a fallback
+const GEAR_SLOTS = {
+  plug:     { groups: ["ItemButt"], names: ["InflVibeButtPlug", "BlackButtPlug", "ButtPlug", "ButtPump"], re: /ButtPlug|Plug/, color: "#2B2B2B" },
+  dildo:    { groups: ["ItemVulva"], names: ["InflatableVibeDildo", "VibratingDildo", "ClitoralStimulator"], re: /Dildo/, color: "#2B2B2B" },
+  belt:     { groups: ["ItemPelvis"], names: ["PolishedChastityBelt", "LeatherChastityBelt", "SleekLeatherChastityBelt", "MetalChastityBelt"], re: /ChastityBelt/ },
+  cups:     { groups: ["ItemNipples"], names: ["LactationPump", "NippleSuctionCups"], re: /Pump|Suction/ },
+  leash:    { groups: ["ItemNeckRestraints"], names: ["CollarChainLong", "CollarLeash", "CollarChainShort"], re: /Chain|Leash/, needs: "ItemNeck" },
+  funnel:   { groups: ["ItemMouth", "ItemMouth2", "ItemMouth3"], names: ["FunnelGag"], re: /Funnel/ },
+  ropeArms: { groups: ["ItemArms"], names: ["HempRope"], re: /Rope/ },
+  ropeFeet: { groups: ["ItemFeet"], names: ["HempRope"], re: /Rope/ },
+  lips:     { groups: ["ItemMouth", "ItemMouth2", "ItemMouth3"], names: ["LipGag"], re: /LipGag/, color: ["#E0607F", "#7A2B47", "#7A2B47"] },
+};
+function gearAsset(group, slot) {
+  const fam = P().AssetFamily, get = (n) => { try { return typeof window.AssetGet === "function" ? window.AssetGet(fam, group, n) : null; } catch (e) { return null; } };
+  for (const n of slot.names) if (get(n)) return n;
+  const all = Array.isArray(window.Asset) ? window.Asset : [];
+  const hit = all.find((a) => a && a.Group && a.Group.Name === group && slot.re.test(a.Name) && !a.OwnerOnly && !a.LoverOnly && !a.FamilyOnly);
+  return hit ? hit.Name : (typeof window.AssetGet !== "function" ? slot.names[0] : null);
+}
+const isFarmGear = (b) => !!(b.Craft && (String(b.Craft.Description || "").includes(FARM_TAG) || OLD_NAMES.includes(b.Craft.Name)));
+// what we put where, kept on this computer too: if the game ever hands an item back without its crafted name,
+// we still know it's ours and can take it off again
+const GEAR_KEY = "fhc-gear";
+const gearMem = () => { try { return JSON.parse(window.localStorage.getItem(GEAR_KEY)) || {}; } catch (e) { return {}; } };
+const gearMemSave = (m) => { try { window.localStorage.setItem(GEAR_KEY, JSON.stringify(m)); } catch (e) { /* fine */ } };
+const gearNameOf = (b, mem) => (isFarmGear(b) ? b.Craft.Name : (Object.keys(mem).find((n) => mem[n].group === b.Group && mem[n].item === b.Name && !(b.Craft && b.Craft.Name)) || null));
+// list: [{ slot, name, desc, color, always }] · allow: trap gear is switched on. Returns what it did.
+export function syncFarmGear(list, allow) {
+  if (!P() || !Array.isArray(P().Appearance) || typeof window.ServerAppearanceBundle !== "function") return { on: [], off: [] };
+  const want = (Array.isArray(list) ? list : []).filter((g) => g && GEAR_SLOTS[g.slot] && (g.always || allow) && (!g.until || g.until > Date.now()));
+  const cur = bundle(), stuck = lockedGroups(), did = { on: [], off: [] }, mem = gearMem();
+  let next = cur.slice();
+  // off: ours, and not on the list any more
+  for (const b of cur) {
+    const n = gearNameOf(b, mem);
+    if (!n || want.some((g) => g.name === n) || stuck.has(b.Group)) continue;
+    next = next.filter((x) => x !== b); did.off.push(n); delete mem[n];
   }
-  if (mine.length) { commit(rest); return true; }   // (it was the belt: off first, the lips go on at the next look)
-  const g = ["ItemMouth", "ItemMouth2", "ItemMouth3"].find((x) => !cur.find((b) => b.Group === x) && groupOf(x));
-  if (!g) return false;   // their mouth's full already: it's on the books just the same
-  const color = ["#E0607F", "#7A2B47", "#7A2B47"];
-  cur.push({ Group: g, Name: "LipGag", Color: color, Difficulty: 20, Property: {},
-    Craft: { Item: "LipGag", Name: PARASITE_NAME, Description: "A pair of fat, living lips sealed over the mouth, with a tentacle down the throat. It feeds its host serum and drinks every load they swallow. B&B Farm.",
-      Property: "Normal", Color: color.join(","), Lock: "", Private: true, MemberNumber: P().MemberNumber, MemberName: P().Name, ItemProperty: {}, Type: null, TypeRecord: null } });
-  commit(cur);
-  return true;
+  for (const n of Object.keys(mem)) if (!want.some((g) => g.name === n) && !next.some((b) => gearNameOf(b, mem) === n)) delete mem[n];   // gone some other way
+  // on: listed, and not on you
+  for (const g of want) {
+    if (next.some((b) => gearNameOf(b, mem) === g.name)) continue;
+    const slot = GEAR_SLOTS[g.slot];
+    if (slot.needs && !next.some((b) => b.Group === slot.needs)) continue;            // a chain needs a collar to clip to
+    const group = slot.groups.find((x) => !next.some((b) => b.Group === x) && groupOf(x));
+    if (!group) continue;                                                              // that spot's taken: it's on the farm's books just the same
+    const item = gearAsset(group, slot);
+    if (!item) continue;
+    const color = g.color && !slot.color ? g.color : (slot.color || g.color || "Default");
+    const it = { Group: group, Name: item, Difficulty: 20, Property: {},
+      Craft: { Item: item, Name: String(g.name).slice(0, 30), Description: (String(g.desc || "").slice(0, 150) + " " + FARM_TAG).trim(),
+        Property: "Normal", Color: Array.isArray(color) ? color.join(",") : color, Lock: "", Private: true, MemberNumber: P().MemberNumber, MemberName: P().Name, ItemProperty: {}, Type: null, TypeRecord: null } };
+    if (color !== "Default") it.Color = color;
+    next.push(it); did.on.push(g.name); mem[g.name] = { group, item };
+  }
+  gearMemSave(mem);
+  if (did.on.length || did.off.length) commit(next);
+  return did;
 }
 
 // off with what the farm put on (the splatters and the writing), nothin' else

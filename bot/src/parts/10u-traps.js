@@ -88,6 +88,7 @@
     state.trapRuns = state.trapRuns || new Map();
     const run = { kind, i: 0, timer: null, beats: (beats = beats.slice()) };   // (a copy: ?struggle can add to it)
     const before = { pissed: (rec(mn) || {}).pissed || 0 };
+    const gearPlan = trapGearStart(mn, kind);   // real gear, for those who let the farm put it on them (10y-farm-gear.js)
     state.trapRuns.set(mn, run);
     const step = () => {
       if (state.trapRuns.get(mn) !== run) return;
@@ -98,7 +99,8 @@
         return;
       }
       state.trapRuns.delete(mn);
-      if (charFor(mn)){ try { done(); trapDone(mn, kind, before); } catch(e){ warn("trap "+kind+":", e); } }   // (what they're left wearin': 10x-trap-extras.js)
+      if (charFor(mn)){ try { done(); trapDone(mn, kind, before); } catch(e){ warn("trap "+kind+":", e); } }
+      try { trapGearDone(mn, charFor(mn) ? gearPlan : null); } catch(e){ warn("trap gear:", e); }   // (what they're left wearin': 10x-trap-extras.js)
       trapFree(mn); saveLedger(); syncCompanions(true);
     };
     step();
@@ -108,6 +110,7 @@
     const run = state.trapRuns && state.trapRuns.get(mn);
     if (run){ clearTimeout(run.timer); state.trapRuns.delete(mn); }
     trapWaitEnd(mn, "quiet");   // the tickle rack, the mirror box (10u4-more-traps.js)
+    gearOff(mn, null, "hold"); if (quietMin == null) gearOff(mn, null, "trap");   // what it had on them comes off (all of it, on a safeword)
     { const r0 = rec(mn); if (r0 && r0.benched && r0.benched.trap) unbench(mn, "safe"); }   // the pillory
     trapFree(mn);
     const r = rec(mn); if (r && isSubject(mn)){ r.trapQuiet = Date.now() + (quietMin == null ? 60 : quietMin)*60000; saveLedger(); }
@@ -334,7 +337,7 @@
         if (Math.random() < CFG.TENTACLE_CHANCE*nightX().water && !springTrap(mn, "tentacle", here)){ r.trapAt = now; saveLedger(); }   // (three times as hungry after dark)
       }
     }
-    toyTick(); moreTrapTick(); trapExtrasTick();
+    toyTick(); moreTrapTick(); trapExtrasTick(); farmGearTick(Date.now());
   }
 
   // ── toys that do things on their own ───────────────────────

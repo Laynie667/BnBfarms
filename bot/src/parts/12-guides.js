@@ -501,6 +501,13 @@ THE PARASITE · ?parasite on
 WATERSPORTS · ?watersports on
   Piss play. Off until you say so.
 
+REAL GEAR
+  With "Farm can put real gear on me" on in the Companion's
+  Toggles, a trap's plug, cups, clamp, chain, rope or funnel
+  is put on your character for real, and taken off when its
+  time's up. Pull it off early and it goes back. Your safeword
+  takes all of it off. The parasite needs no second switch.
+
 CARRYIN' SLOWS YOU DOWN
   A pumped belly, a late litter or a clutch of eggs makes you
   walk slower on the map (with the Companion; it has a switch).`,

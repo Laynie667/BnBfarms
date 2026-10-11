@@ -13,7 +13,7 @@ import { VERSION } from "./version.js";
 import { BOT_MEMBER, HELLO_EVERY_MS } from "./config.js";
 import { Panel } from "./panel.js";
 import { captureOutfit, wearOutfit, changeBack, hasBackup } from "./outfits.js";
-import { markBody, washMarks, stripMe, dressMe, parasiteGag } from "./marks.js";
+import { markBody, washMarks, stripMe, dressMe, syncFarmGear } from "./marks.js";
 import { initCues, cueOff, lead, face, sound, trance, drawMarkers, arouse, initBody } from "./cues.js";
 
 // the SDK ships as an old-style module; this digs the real thing out either way
@@ -139,14 +139,20 @@ function toChat(text, color, italic) {
   return true;
 }
 
-// the parasite lips: on your character while the farm's books say so, off the moment they don't (marks.js)
+// real farm gear (a trap's plug, cups, the clamp, the parasite…): on your character while the farm's list says so,
+// off the moment it doesn't (marks.js). Checked on every state update and once a minute.
 function parasiteSync() {
   try {
     const s = st.panel && st.panel.s;
     if (!st.gotState || !s || window.CurrentScreen !== "ChatRoom") return;
-    const on = !!(s.parasite && s.parasite.until > Date.now());
-    if (parasiteGag(on, on ? s.parasite.form : null) && on) toChat(s.parasite.form === "belt" ? "The belt draws snug round your hips again, and its roots settle. It isn't done with you." : "The lips settle back over your mouth, warm and tight. It isn't done with you.", "#c9a35b", true);
-  } catch (e) { console.warn("[Farmhand Companion] parasite:", e); }
+    let list = Array.isArray(s.farmGear) ? s.farmGear : [];
+    // an older farm girl only says "parasite": that's still a piece of gear
+    if (!Array.isArray(s.farmGear) && s.parasite && s.parasite.until > Date.now())
+      list = [{ slot: s.parasite.form === "belt" ? "belt" : "lips", name: s.parasite.form === "belt" ? "Parasite Belt" : "Parasite Lips", always: true, color: "#E0607F", until: s.parasite.until, desc: "It feeds its host serum and drinks every load." }];
+    const did = syncFarmGear(list, !!st.panel.prefs.gear);
+    for (const n of did.on) toChat("The farm puts somethin' on you: " + n + ".", "#c9a35b", true);
+    for (const n of did.off) toChat(n + " comes off.", "#c9a35b", true);
+  } catch (e) { console.warn("[Farmhand Companion] farm gear:", e); }
 }
 function onFarmMsg(m) {
   if (m.from !== BOT_MEMBER) return;     // only the farm bot gets to talk to the panel

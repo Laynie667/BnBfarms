@@ -5,7 +5,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 | Script | File in `dist/` | Where it runs | Current |
 |---|---|---|---|
-| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.22.0** |
+| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.23.0** |
 | Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.5.8** |
 | Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.1.3** |
 | Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **1.0.4** |
@@ -13,7 +13,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 | Map tools, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.3** |
 | Dairy | `farmhand-dairy.user.js` | the bot's PC | **1.0.2** |
 | Shows | `farmhand-shows.user.js` | the bot's PC | **1.0.4** |
-| Farmhand Companion | `farmhand-companion.user.js` | each player | **0.13.1** |
+| Farmhand Companion | `farmhand-companion.user.js` | each player | **0.14.0** |
 | Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.4** |
 
 ## Sending a watch report
@@ -23,6 +23,13 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 - Running the watcher on more than one game at once (the bot, yours, a tester's) lets Claude line them up into one timeline.
 
 ## Latest changes (newest first)
+
+- **Bot 0.23.0, Companion 0.14.0: real gear from the traps, and a Traps tab.**
+  - **Real items, on and off.** A trap that plugs, cups, clamps, chains, ropes or funnels somebody now puts the real game item on their character and takes it off when its time is up: the pump's bung (10 min), the egg post's plug and the water's slime seal (15), the boar's plug (20), a vine stem (10), the Denial Clamp belt (30, as long as the denial), Growth Cups (30), the Winch Chain (while penned; needs a collar on), and while the trap holds them: the Feed Chute funnel, Snare Rope, milker cups, breedin' frame cuffs. The safeword takes all of it off at once.
+  - **How it works**: the bot keeps a list per person and their own Companion makes their character match it, on every update and once a minute. A piece pulled off early goes back; a piece off the list comes off; nothin' that isn't the farm's is ever touched; a spot they already have somethin' in is left alone; a piece somebody locked stays till it's unlocked.
+  - **The switch**: Toggles → This panel → **"Farm can put real gear on me"**, off until they turn it on. The **parasite** (lips, and the belt from the fourth time) goes through the same path and needs no second switch: `?parasite on` is its say-so.
+  - **🧪 Traps tab** in the Companion's Livestock view: a subject's trap card (moved here from Breeding), what the farm has on you right now with minutes left, and for proprietors a card with every subject, the trap and water spots, the hunt, the nest, and buttons.
+  - Covered by a new test (`farm-gear`) that runs the Companion's wear-and-remove code against a stand-in wardrobe. **Still to be seen in the live game**: that the game shows each item the way it should.
 
 - **Bot 0.22.0, Companion 0.13.1: sixteen more traps, more lines for every trap pool, and what grew up round the traps.**
   - New trap spots (`?spot set trap-<kind>`): `pillory` (locked for 10 minutes; anybody standin' by can `?use` them, same as the bench), `brand` (writes a word on them), `winch` (walks them to the pen and leaves them), `glue` (stuck, then slow feet for 20 minutes), `cups` (growth cups: a size bigger and milk runnin' double), `chute` (a bellyful of mash), `vines` (heat, and seed pods laid like eggs), `slime` (strips, fills, slow and green), `tickle` (lets go on `?beg`, or after 6 minutes for a ribbon), `mirror` (a line to say out loud five times, or 6 minutes), `paddle` (twenty, counted), `wall` (stuck in a fence with strangers at both ends), `mister` (a random potion), `weights` (studs: drained, balls a size heavier), `trough` (`?watersports on` only), `pricetag` (a price written on them and the sale called to the farm).

@@ -59,6 +59,8 @@
       if (p.eggs) s.eggs = { n: p.eggs.n, layAt: p.eggs.layAt };
       if (parasiteOn(mn)) s.parasite = { until: r.parasite.until, form: r.parasite.form || "lips" };
       { const tc = trapCardFor(mn); if (tc) s.trapCard = tc; }   // the trap card (10x-trap-extras.js)
+      { const fg = farmGearFor(mn); if (fg.length) s.farmGear = fg; }   // real gear their Companion keeps on them (10y-farm-gear.js)
+      if (isProprietor(mn)) s.trapAdmin = trapAdminFor();
       const bh = benchHereFor(mn); if (bh.length) s.benchHere = bh;   // tap-to-use bench buttons
       s.at = now;
       if (isStaff(mn)) Object.assign(s, staffStateFor(mn));

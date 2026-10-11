@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.13.1
+// @version      0.14.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -230,7 +230,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.13.1";
+  var VERSION = "0.14.0";
 
   // extension/src/config.js
   var BOT_MEMBER = 260239;
@@ -615,15 +615,47 @@ One of mods you are using is using an old version of SDK. It will work for now b
         s.preg && muted("\u{1F37C} Carryin' for " + s.preg.sires.join(" & ")),
         s.eggs && muted("\u{1F95A} Carryin' " + s.eggs.n + " eggs \xB7 ?lay at the nest, or they come when they're due")
       ),
-      // the trap card: every kind that's had you, and how much is still out there (test subjects)
-      s.trapCard && card(
-        h("div", { class: "fhc-kv" }, title("Trap card"), chip(s.trapCard.total + " sprung", "acc")),
-        s.trapCard.kinds.length ? h("div", null, s.trapCard.kinds.map((k) => chip(k.kind + " \xD7" + k.n))) : muted("Nothin's caught you yet. Give it time."),
-        muted(s.trapCard.left + " kind" + (s.trapCard.left === 1 ? "" : "s") + " still to find" + (s.trapCard.eggs ? " \xB7 " + s.trapCard.eggs + " eggs laid" : "") + (s.trapCard.paused ? " \xB7 traps paused" : "")),
-        s.trapCard.hunt && muted("\u{1F514} The hunt is on: get to " + s.trapCard.hunt.goal),
-        h("div", null, btn("Struggle", () => ctx2.send("struggle")), btn(s.trapCard.paused ? "Traps on" : "Pause traps", () => ctx2.send("traps " + (s.trapCard.paused ? "on" : "off"))), btn("What's out there", () => ctx2.send("traps")))
-      ),
+      s.trapCard && muted("\u{1F9EA} Your trap card is on the Traps tab."),
       h("div", null, btn("My tally", () => ctx2.send("tally")), btn("Eggs", () => ctx2.send("eggs")), btn("Wash up", () => ctx2.send("wash")), btn("Pedigree", () => ctx2.send("pedigree")))
+    ];
+  }
+  function traps(ctx2) {
+    const s = ctx2.s, tc = s.trapCard, ad = s.trapAdmin, gear = s.farmGear || [];
+    return [
+      tc ? card(
+        h("div", { class: "fhc-kv" }, title("Trap card"), chip(tc.total + " sprung", "acc")),
+        tc.kinds.length ? h("div", null, tc.kinds.map((k) => chip(k.kind + " \xD7" + k.n))) : muted("Nothin's caught you yet. Give it time."),
+        muted(tc.left + " kind" + (tc.left === 1 ? "" : "s") + " still to find" + (tc.eggs ? " \xB7 " + tc.eggs + " eggs laid" : "") + (tc.paused ? " \xB7 traps paused" : "")),
+        tc.hunt && muted("\u{1F514} The hunt is on: get to " + tc.hunt.goal),
+        h(
+          "div",
+          null,
+          btn("Struggle", () => ctx2.send("struggle")),
+          btn(tc.paused ? "Traps on" : "Pause traps", () => ctx2.send("traps " + (tc.paused ? "on" : "off"))),
+          btn("What's out there", () => ctx2.send("traps")),
+          btn("Lay (at the nest)", () => ctx2.send("lay"))
+        )
+      ) : card(title("Traps"), muted("The farm's traps spring for test subjects and nobody else. A proprietor signs a volunteer up; you're not one right now, so you can walk right over them.")),
+      card(
+        title("On you right now"),
+        gear.length ? gear.map((g) => h("div", { class: "fhc-kv" }, h("span", null, g.name), h("span", { class: "fhc-muted" }, Math.max(0, Math.ceil((g.until - Date.now()) / 6e4)) + " min"))) : muted("No farm gear on you."),
+        !ctx2.prefs.gear && muted('Trap gear only goes on for real with "Farm can put real gear on me" switched on (Toggles \u2192 This panel).')
+      ),
+      ad && card(
+        h("div", { class: "fhc-kv" }, title("Proprietor: subjects & traps"), chip(ad.subjects.length + " subject" + (ad.subjects.length === 1 ? "" : "s"), "acc")),
+        ad.subjects.length ? ad.subjects.map((x) => h("div", { class: "fhc-kv" }, h("span", null, (x.here ? "\u25CF " : "") + x.name), h("span", { class: "fhc-muted" }, x.n + " sprung" + (x.paused ? " \xB7 paused" : "")))) : muted("Nobody's signed up yet: ?subject add <who>."),
+        muted("Trap spots: " + (ad.spots.length ? ad.spots.join(", ") : "none yet (?spot set trap-<kind>)")),
+        muted("Water: " + (ad.water.length ? ad.water.join(", ") : "none yet (?spot set pond)") + (ad.nest ? " \xB7 " + ad.nest + " eggs in the nest" : "") + (ad.pack ? " \xB7 pack at " + ad.pack : "")),
+        ad.hunt && muted("\u{1F514} Hunt on: finish at " + ad.hunt.goal + ", " + ad.hunt.done + " home"),
+        h(
+          "div",
+          null,
+          btn("Kinds & spots", () => ctx2.send("traps")),
+          btn("Subjects", () => ctx2.send("subject")),
+          btn(ad.hunt ? "Stop the hunt" : "Start a hunt", () => ctx2.send(ad.hunt ? "hunt stop" : "hunt start")),
+          btn("Gather eggs", () => ctx2.send("gather"))
+        )
+      )
     ];
   }
   function inbox(ctx2) {
@@ -712,6 +744,16 @@ One of mods you are using is using an old version of SDK. It will work for now b
           ctx2.api.rehello && ctx2.api.rehello();
         }
       ),
+      // OFF until you turn it on: real items from the traps (marks.js)
+      toggle(
+        "Farm can put real gear on me",
+        "A trap that plugs, cups, clamps, chains, ropes or funnels you puts the real item on your character, and takes it off again when its time's up. Pull one off early and it goes back. Your safeword takes it all off. (The parasite doesn't need this: ?parasite on is its switch.)",
+        !!ctx2.prefs.gear,
+        () => {
+          ctx2.setPref("gear", !ctx2.prefs.gear);
+          ctx2.api.rehello && ctx2.api.rehello();
+        }
+      ),
       // these two are OFF until you turn them on: the farm changin' what your character looks like (marks.js)
       marksFor(ctx2) && toggle(
         "Farm can mark my body",
@@ -760,6 +802,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     { id: "safety", label: "\u{1F198} Safety", render: safetyTab },
     { id: "milk", label: "Milking", render: milking },
     { id: "breed", label: "Breeding", render: breeding },
+    { id: "traps", label: "\u{1F9EA} Traps", render: traps },
     { id: "store", label: "\u{1F380} Store", render: storeTab },
     { id: "inbox", label: "Inbox", render: inbox },
     { id: "guides", label: "Guides", render: (ctx2) => guidesTab(ctx2, false) },
@@ -3969,43 +4012,81 @@ One of mods you are using is using an old version of SDK. It will work for now b
     commit2(next);
     return { ok: true, did };
   }
-  var PARASITE_NAME = "Parasite Lips";
-  var PARASITE_BELT = "Parasite Belt";
-  var hasAsset = (g, n) => {
+  var FARM_TAG = "[B&B Farm gear]";
+  var OLD_NAMES = ["Parasite Lips", "Parasite Belt"];
+  var GEAR_SLOTS = {
+    plug: { groups: ["ItemButt"], names: ["InflVibeButtPlug", "BlackButtPlug", "ButtPlug", "ButtPump"], re: /ButtPlug|Plug/, color: "#2B2B2B" },
+    dildo: { groups: ["ItemVulva"], names: ["InflatableVibeDildo", "VibratingDildo", "ClitoralStimulator"], re: /Dildo/, color: "#2B2B2B" },
+    belt: { groups: ["ItemPelvis"], names: ["PolishedChastityBelt", "LeatherChastityBelt", "SleekLeatherChastityBelt", "MetalChastityBelt"], re: /ChastityBelt/ },
+    cups: { groups: ["ItemNipples"], names: ["LactationPump", "NippleSuctionCups"], re: /Pump|Suction/ },
+    leash: { groups: ["ItemNeckRestraints"], names: ["CollarChainLong", "CollarLeash", "CollarChainShort"], re: /Chain|Leash/, needs: "ItemNeck" },
+    funnel: { groups: ["ItemMouth", "ItemMouth2", "ItemMouth3"], names: ["FunnelGag"], re: /Funnel/ },
+    ropeArms: { groups: ["ItemArms"], names: ["HempRope"], re: /Rope/ },
+    ropeFeet: { groups: ["ItemFeet"], names: ["HempRope"], re: /Rope/ },
+    lips: { groups: ["ItemMouth", "ItemMouth2", "ItemMouth3"], names: ["LipGag"], re: /LipGag/, color: ["#E0607F", "#7A2B47", "#7A2B47"] }
+  };
+  function gearAsset(group, slot) {
+    const fam = P2().AssetFamily, get = (n) => {
+      try {
+        return typeof window.AssetGet === "function" ? window.AssetGet(fam, group, n) : null;
+      } catch (e) {
+        return null;
+      }
+    };
+    for (const n of slot.names) if (get(n)) return n;
+    const all = Array.isArray(window.Asset) ? window.Asset : [];
+    const hit = all.find((a) => a && a.Group && a.Group.Name === group && slot.re.test(a.Name) && !a.OwnerOnly && !a.LoverOnly && !a.FamilyOnly);
+    return hit ? hit.Name : typeof window.AssetGet !== "function" ? slot.names[0] : null;
+  }
+  var isFarmGear = (b) => !!(b.Craft && (String(b.Craft.Description || "").includes(FARM_TAG) || OLD_NAMES.includes(b.Craft.Name)));
+  var GEAR_KEY = "fhc-gear";
+  var gearMem = () => {
     try {
-      return typeof window.AssetGet !== "function" || !!window.AssetGet(P2().AssetFamily, g, n);
+      return JSON.parse(window.localStorage.getItem(GEAR_KEY)) || {};
     } catch (e) {
-      return false;
+      return {};
     }
   };
-  function parasiteGag(on, form) {
-    if (!P2() || !Array.isArray(P2().Appearance) || typeof window.ServerAppearanceBundle !== "function") return false;
-    const cur = bundle(), want = on ? form === "belt" ? PARASITE_BELT : PARASITE_NAME : null;
-    const mine = cur.filter((b) => b.Craft && (b.Craft.Name === PARASITE_NAME || b.Craft.Name === PARASITE_BELT));
-    if (mine.length === (want ? 1 : 0) && (!want || mine[0].Craft.Name === want)) return false;
-    const rest = cur.filter((b) => !mine.includes(b));
-    if (!on) {
-      commit2(rest);
-      return true;
+  var gearMemSave = (m) => {
+    try {
+      window.localStorage.setItem(GEAR_KEY, JSON.stringify(m));
+    } catch (e) {
     }
-    if (form === "belt") {
-      if (rest.find((b) => b.Group === "ItemPelvis") || !groupOf2("ItemPelvis") || !hasAsset("ItemPelvis", "PolishedChastityBelt")) {
-        if (mine.length) commit2(rest);
-        return false;
-      }
-      const bc = "#E0607F";
-      rest.push({
-        Group: "ItemPelvis",
-        Name: "PolishedChastityBelt",
-        Color: bc,
+  };
+  var gearNameOf = (b, mem) => isFarmGear(b) ? b.Craft.Name : Object.keys(mem).find((n) => mem[n].group === b.Group && mem[n].item === b.Name && !(b.Craft && b.Craft.Name)) || null;
+  function syncFarmGear(list, allow) {
+    if (!P2() || !Array.isArray(P2().Appearance) || typeof window.ServerAppearanceBundle !== "function") return { on: [], off: [] };
+    const want = (Array.isArray(list) ? list : []).filter((g) => g && GEAR_SLOTS[g.slot] && (g.always || allow) && (!g.until || g.until > Date.now()));
+    const cur = bundle(), stuck = lockedGroups2(), did = { on: [], off: [] }, mem = gearMem();
+    let next = cur.slice();
+    for (const b of cur) {
+      const n = gearNameOf(b, mem);
+      if (!n || want.some((g) => g.name === n) || stuck.has(b.Group)) continue;
+      next = next.filter((x) => x !== b);
+      did.off.push(n);
+      delete mem[n];
+    }
+    for (const n of Object.keys(mem)) if (!want.some((g) => g.name === n) && !next.some((b) => gearNameOf(b, mem) === n)) delete mem[n];
+    for (const g of want) {
+      if (next.some((b) => gearNameOf(b, mem) === g.name)) continue;
+      const slot = GEAR_SLOTS[g.slot];
+      if (slot.needs && !next.some((b) => b.Group === slot.needs)) continue;
+      const group = slot.groups.find((x) => !next.some((b) => b.Group === x) && groupOf2(x));
+      if (!group) continue;
+      const item = gearAsset(group, slot);
+      if (!item) continue;
+      const color = g.color && !slot.color ? g.color : slot.color || g.color || "Default";
+      const it = {
+        Group: group,
+        Name: item,
         Difficulty: 20,
         Property: {},
         Craft: {
-          Item: "PolishedChastityBelt",
-          Name: PARASITE_BELT,
-          Description: "A belt of living flesh closed round the hips, with a root up inside. It feeds its host serum and drinks every load they take. B&B Farm.",
+          Item: item,
+          Name: String(g.name).slice(0, 30),
+          Description: (String(g.desc || "").slice(0, 150) + " " + FARM_TAG).trim(),
           Property: "Normal",
-          Color: bc,
+          Color: Array.isArray(color) ? color.join(",") : color,
           Lock: "",
           Private: true,
           MemberNumber: P2().MemberNumber,
@@ -4014,40 +4095,15 @@ One of mods you are using is using an old version of SDK. It will work for now b
           Type: null,
           TypeRecord: null
         }
-      });
-      commit2(rest);
-      return true;
+      };
+      if (color !== "Default") it.Color = color;
+      next.push(it);
+      did.on.push(g.name);
+      mem[g.name] = { group, item };
     }
-    if (mine.length) {
-      commit2(rest);
-      return true;
-    }
-    const g = ["ItemMouth", "ItemMouth2", "ItemMouth3"].find((x) => !cur.find((b) => b.Group === x) && groupOf2(x));
-    if (!g) return false;
-    const color = ["#E0607F", "#7A2B47", "#7A2B47"];
-    cur.push({
-      Group: g,
-      Name: "LipGag",
-      Color: color,
-      Difficulty: 20,
-      Property: {},
-      Craft: {
-        Item: "LipGag",
-        Name: PARASITE_NAME,
-        Description: "A pair of fat, living lips sealed over the mouth, with a tentacle down the throat. It feeds its host serum and drinks every load they swallow. B&B Farm.",
-        Property: "Normal",
-        Color: color.join(","),
-        Lock: "",
-        Private: true,
-        MemberNumber: P2().MemberNumber,
-        MemberName: P2().Name,
-        ItemProperty: {},
-        Type: null,
-        TypeRecord: null
-      }
-    });
-    commit2(cur);
-    return true;
+    gearMemSave(mem);
+    if (did.on.length || did.off.length) commit2(next);
+    return did;
   }
   function washMarks() {
     const mem = load(), stuck = lockedGroups2();
@@ -4109,7 +4165,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
     trance: !pref("noTrance") || void 0,
     lead: !pref("noLead") || void 0,
     slow: !pref("noSlow") || void 0,
-    stir: ctx.panel.prefs.stir ? void 0 : true
+    stir: ctx.panel.prefs.stir ? void 0 : true,
+    gear: ctx.panel.prefs.gear ? void 0 : true
   });
   var mapOn = () => typeof W.ChatRoomMapViewIsActive === "function" && W.ChatRoomMapViewIsActive() && W.Player && W.Player.MapData && W.Player.MapData.Pos;
   var others = () => (W.ChatRoomCharacter || []).filter((c) => c && c.MemberNumber !== (W.Player && W.Player.MemberNumber));
@@ -4590,10 +4647,14 @@ One of mods you are using is using an old version of SDK. It will work for now b
     try {
       const s = st.panel && st.panel.s;
       if (!st.gotState || !s || window.CurrentScreen !== "ChatRoom") return;
-      const on = !!(s.parasite && s.parasite.until > Date.now());
-      if (parasiteGag(on, on ? s.parasite.form : null) && on) toChat(s.parasite.form === "belt" ? "The belt draws snug round your hips again, and its roots settle. It isn't done with you." : "The lips settle back over your mouth, warm and tight. It isn't done with you.", "#c9a35b", true);
+      let list = Array.isArray(s.farmGear) ? s.farmGear : [];
+      if (!Array.isArray(s.farmGear) && s.parasite && s.parasite.until > Date.now())
+        list = [{ slot: s.parasite.form === "belt" ? "belt" : "lips", name: s.parasite.form === "belt" ? "Parasite Belt" : "Parasite Lips", always: true, color: "#E0607F", until: s.parasite.until, desc: "It feeds its host serum and drinks every load." }];
+      const did = syncFarmGear(list, !!st.panel.prefs.gear);
+      for (const n of did.on) toChat("The farm puts somethin' on you: " + n + ".", "#c9a35b", true);
+      for (const n of did.off) toChat(n + " comes off.", "#c9a35b", true);
     } catch (e) {
-      console.warn("[Farmhand Companion] parasite:", e);
+      console.warn("[Farmhand Companion] farm gear:", e);
     }
   }
   function onFarmMsg(m) {

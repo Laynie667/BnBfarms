@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.22.0
+// @version      0.23.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -1828,7 +1828,7 @@
   ];
 
   // bot/src/version.js
-  var VERSION = "0.22.0";
+  var VERSION = "0.23.0";
 
   // bot-parts:farmhand-bot-parts
   (function() {
@@ -3388,7 +3388,7 @@
     };
     W.FarmhandExport = exportLedger;
     W.FarmhandLedger = () => L;
-    if (W.__FARMHAND_TEST__) Object.assign(W, { __st: () => state, __cfg: CFG, __pt: prodTick, __qt: quotaTick, __lt: leashTick, __ms: milkingStallTick, __vt: voiceTick, __sync: syncCompanions, __gt: gearTick, __ht: homeTick, __addons: (h, ...a) => addonsEmit(h, ...a), __stateFor: (mn) => stateFor(mn), __leadTick: () => leadTick(), __ambient: () => ambientTick(), __about: (t) => aboutWhom(t), __announce: (t) => announce(t), __reply: (mn, t, ch) => reply(mn, t, ch), __office: () => officeCheck(), __namesHere: (t) => namesHere(t), __speciesCheck: (t) => QUESTIONS.find((q) => q.key === "species").check(t), __attach: () => attachListeners(), __tryLogin: () => tryLogin(), __beepText: (m) => beepText(m), __nameOnce: (t, mn) => nameOnce(t, mn), __buildContract: (n, mn, d) => buildContract(contractTemplate(n), mn, d), __potionTick: () => potionTick(), __penTick: () => penTick(), __trapTick: () => trapTick(), __heard: (mn, t) => trapHeard(mn, t), __parasiteTick: () => parasiteTick(), __kiss: (a, f, s, t) => parasiteKiss(a, f, s, t), __load: (s, m, h, x) => parasiteLoad(s, m, h, x), __shot: (t, by, text, how) => applyShot(t, by, text, how), __slow: (mn) => slowOf(mn), __milkRate: (mn) => milkRate(mn), __benchTick: () => benchTick(), __roll: (m, s, a, b) => rollConception(m, s, a, b), __contractTick: () => {
+    if (W.__FARMHAND_TEST__) Object.assign(W, { __st: () => state, __cfg: CFG, __pt: prodTick, __qt: quotaTick, __lt: leashTick, __ms: milkingStallTick, __vt: voiceTick, __sync: syncCompanions, __gt: gearTick, __ht: homeTick, __addons: (h, ...a) => addonsEmit(h, ...a), __stateFor: (mn) => stateFor(mn), __leadTick: () => leadTick(), __ambient: () => ambientTick(), __about: (t) => aboutWhom(t), __announce: (t) => announce(t), __reply: (mn, t, ch) => reply(mn, t, ch), __office: () => officeCheck(), __namesHere: (t) => namesHere(t), __speciesCheck: (t) => QUESTIONS.find((q) => q.key === "species").check(t), __attach: () => attachListeners(), __tryLogin: () => tryLogin(), __beepText: (m) => beepText(m), __nameOnce: (t, mn) => nameOnce(t, mn), __buildContract: (n, mn, d) => buildContract(contractTemplate(n), mn, d), __potionTick: () => potionTick(), __penTick: () => penTick(), __trapTick: () => trapTick(), __gearOn: (m, s, l, d, x) => gearOn(m, s, l, d, x), __heard: (mn, t) => trapHeard(mn, t), __parasiteTick: () => parasiteTick(), __kiss: (a, f, s, t) => parasiteKiss(a, f, s, t), __load: (s, m, h, x) => parasiteLoad(s, m, h, x), __shot: (t, by, text, how) => applyShot(t, by, text, how), __slow: (mn) => slowOf(mn), __milkRate: (mn) => milkRate(mn), __benchTick: () => benchTick(), __roll: (m, s, a, b) => rollConception(m, s, a, b), __contractTick: () => {
       state.cwAt = 0;
       contractWatchTick();
     }, __lingerTick: () => lingerTick(), __ribbonTick: () => ribbonTick(), __dareTick: () => dareTick(), __potionOn: (mn, id) => potionOn(mn, id), __milkRate: (mn) => milkRate(mn) });
@@ -4517,6 +4517,11 @@
           const tc = trapCardFor(mn);
           if (tc) s.trapCard = tc;
         }
+        {
+          const fg = farmGearFor(mn);
+          if (fg.length) s.farmGear = fg;
+        }
+        if (isProprietor(mn)) s.trapAdmin = trapAdminFor();
         const bh = benchHereFor(mn);
         if (bh.length) s.benchHere = bh;
         s.at = now;
@@ -11626,6 +11631,7 @@
       state.trapRuns = state.trapRuns || /* @__PURE__ */ new Map();
       const run = { kind, i: 0, timer: null, beats: beats = beats.slice() };
       const before = { pissed: (rec(mn) || {}).pissed || 0 };
+      const gearPlan = trapGearStart(mn, kind);
       state.trapRuns.set(mn, run);
       const step = () => {
         if (state.trapRuns.get(mn) !== run) return;
@@ -11644,6 +11650,11 @@
             warn("trap " + kind + ":", e);
           }
         }
+        try {
+          trapGearDone(mn, charFor(mn) ? gearPlan : null);
+        } catch (e) {
+          warn("trap gear:", e);
+        }
         trapFree(mn);
         saveLedger();
         syncCompanions(true);
@@ -11657,6 +11668,8 @@
         state.trapRuns.delete(mn);
       }
       trapWaitEnd(mn, "quiet");
+      gearOff(mn, null, "hold");
+      if (quietMin == null) gearOff(mn, null, "trap");
       {
         const r0 = rec(mn);
         if (r0 && r0.benched && r0.benched.trap) unbench(mn, "safe");
@@ -11929,6 +11942,7 @@
       toyTick();
       moreTrapTick();
       trapExtrasTick();
+      farmGearTick(Date.now());
     }
     const AUTO_INJECT = ["auto-injector", "autoinjector", "auto inject", "self-inject", "auto-dose", "auto doser"];
     const OVI_WORDS = ["ovipositor"];
@@ -15229,6 +15243,105 @@
         "%x eggs, counted into the basket by %n. They'll fetch a fair price at market."
       ]
     };
+    const stopperFor = (mn, first) => {
+      const h = openHole(mn, first);
+      return h === "vulva" ? "dildo" : h === "butt" ? "plug" : null;
+    };
+    const TRAP_GEAR = {
+      pump: [{ when: "after", slot: (mn) => stopperFor(mn, "butt"), label: "Pump Bung", desc: "A fat rubber bung left in by the pump trap, to keep it all in.", mins: 10 }],
+      eggs: [{ when: "after", slot: (mn) => stopperFor(mn, "vulva"), label: "Egg Post Plug", desc: "The egg post's parting gift: a plug to hold the clutch in while it settles.", mins: 15 }],
+      tentacle: [{ when: "after", slot: (mn) => stopperFor(mn, "vulva"), label: "Slime Seal", desc: "A thick knot of something from the water, set hard, sealing the eggs inside.", mins: 15 }],
+      boar: [{ when: "after", slot: (mn) => stopperFor(mn, "vulva"), label: "Boar's Plug", desc: "The waxy plug a boar leaves behind so not a drop gets out.", mins: 20 }],
+      vines: [{ when: "after", slot: (mn) => stopperFor(mn, "vulva"), label: "Seed Pod Stem", desc: "A cut length of vine, still rooted in them, keeping the pods where it planted them.", mins: 10 }],
+      clamp: [{ when: "after", slot: "belt", label: "Denial Clamp", desc: "The trap's clamp, locked on over everything worth touching. It lets go when the denial's up.", mins: () => CFG.TRAP_DENY_MIN }],
+      cups: [{ when: "after", slot: "cups", label: "Growth Cups", desc: "Two wide glass cups pulling at the teats. They stay on till they've finished the job.", mins: 30 }],
+      milker: [{ when: "hold", slot: "cups", label: "Trap Milker", desc: "The milker trap's cups, latched on and pulling." }],
+      winch: [{ when: "after", slot: "leash", label: "Winch Chain", desc: "The chain that walked them to the pen.", mins: () => CFG.TRAP_WINCH_MIN }],
+      chute: [{ when: "hold", slot: "funnel", label: "Feed Chute", desc: "The feed trap's funnel, strapped in." }],
+      snare: [{ when: "hold", slot: "ropeArms", label: "Snare Rope", desc: "The snare's rope, cinched tight." }, { when: "hold", slot: "ropeFeet", label: "Snare Rope", desc: "The snare's rope, cinched tight." }],
+      breeder: [{ when: "hold", slot: "ropeArms", label: "Breedin' Frame Cuffs", desc: "The breeding frame's cuffs." }],
+      kennel: [{ when: "hold", slot: "leash", label: "Kennel Lead", desc: "Clipped to the ring at the back of the kennel." }]
+    };
+    function gearOn(mn, slot, label, desc, mins, src) {
+      const r = rec(mn);
+      if (!r || !slot) return false;
+      r.gear = r.gear || {};
+      r.gear[slot] = { label: String(label).slice(0, 28), desc: String(desc || "").slice(0, 180), until: Date.now() + Math.max(0.5, mins || 5) * 6e4, src: src || "trap" };
+      saveLedger();
+      syncCompanions(true);
+      return true;
+    }
+    function gearOff(mn, slot, src) {
+      const r = rec(mn);
+      if (!r || !r.gear) return false;
+      let did = false;
+      for (const k of Object.keys(r.gear)) if ((!slot || k === slot) && (!src || r.gear[k].src === src)) {
+        delete r.gear[k];
+        did = true;
+      }
+      if (did) {
+        saveLedger();
+        syncCompanions(true);
+      }
+      return did;
+    }
+    function trapGearStart(mn, kind) {
+      const g = TRAP_GEAR[kind];
+      if (!g) return null;
+      const r = rec(mn), holdMin = r.penned && r.penned.trap ? Math.max(1, (r.penned.until - Date.now()) / 6e4) : 3;
+      const plan = g.map((x) => Object.assign({}, x, { slot: typeof x.slot === "function" ? x.slot(mn) : x.slot }));
+      for (const x of plan) if (x.when === "hold" && x.slot) gearOn(mn, x.slot, x.label, x.desc, holdMin + 0.5, "hold");
+      return plan;
+    }
+    function trapGearDone(mn, plan) {
+      gearOff(mn, null, "hold");
+      for (const x of plan || []) if (x.when === "after" && x.slot) gearOn(mn, x.slot, x.label, x.desc, typeof x.mins === "function" ? x.mins() : x.mins, "trap");
+    }
+    function farmGearTick(now) {
+      for (const [k, r] of Object.entries(L.people)) {
+        if (!r.gear) continue;
+        let did = false;
+        for (const s of Object.keys(r.gear)) if (r.gear[s].until <= now) {
+          delete r.gear[s];
+          did = true;
+        }
+        if (did) {
+          saveLedger();
+          state.gearDirty = true;
+        }
+      }
+      if (state.gearDirty) {
+        state.gearDirty = false;
+        syncCompanions(true);
+      }
+    }
+    function farmGearFor(mn) {
+      const r = rec(mn), now = Date.now(), out = [];
+      for (const [slot, g] of Object.entries(r && r.gear || {})) if (g.until > now) out.push({ slot, name: g.label, desc: g.desc, until: Math.ceil(g.until / 6e4) * 6e4 });
+      if (parasiteOn(mn)) {
+        const belt = r.parasite.form === "belt";
+        out.push({
+          slot: belt ? "belt" : "lips",
+          name: belt ? "Parasite Belt" : "Parasite Lips",
+          always: true,
+          color: "#E0607F",
+          until: r.parasite.until,
+          desc: belt ? "A belt of living flesh closed round the hips, with a root up inside. It feeds its host serum and drinks every load they take." : "A pair of fat, living lips sealed over the mouth, with a tentacle down the throat. It feeds its host serum and drinks every load they swallow."
+        });
+      }
+      return out;
+    }
+    function trapAdminFor() {
+      const subs = Object.values(L.people).filter((x) => x.roles && x.roles.includes(ROLE.SUBJECT));
+      return {
+        subjects: subs.map((x) => ({ mn: x.mn, name: plainName(x.mn), here: !!charFor(x.mn), n: x.trapN || 0, paused: !!x.trapsOff })),
+        spots: trapSpots().map(([n]) => n),
+        water: waterSpots().map(([n]) => n),
+        nest: L.nest && L.nest.eggs || 0,
+        hunt: huntOn() ? { until: L.hunt.until, goal: L.hunt.goal, done: L.hunt.done.length } : null,
+        pack: packOn() ? L.pack ? L.pack.spot : "out" : null
+      };
+    }
     function clockedIn(mn) {
       const r = rec(mn);
       return !!(r && r.shift && r.shift.in);
@@ -15766,6 +15879,13 @@ THE PARASITE \xB7 ?parasite on
 
 WATERSPORTS \xB7 ?watersports on
   Piss play. Off until you say so.
+
+REAL GEAR
+  With "Farm can put real gear on me" on in the Companion's
+  Toggles, a trap's plug, cups, clamp, chain, rope or funnel
+  is put on your character for real, and taken off when its
+  time's up. Pull it off early and it goes back. Your safeword
+  takes all of it off. The parasite needs no second switch.
 
 CARRYIN' SLOWS YOU DOWN
   A pumped belly, a late litter or a clutch of eggs makes you

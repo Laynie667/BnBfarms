@@ -71,16 +71,35 @@ function breeding(ctx) {
       s.heatUntil && muted("🔥 In heat · " + hoursLeft(s.heatUntil) + " h left"),
       s.preg && muted("🍼 Carryin' for " + s.preg.sires.join(" & ")),
       s.eggs && muted("🥚 Carryin' " + s.eggs.n + " eggs · ?lay at the nest, or they come when they're due")),
-    // the trap card: every kind that's had you, and how much is still out there (test subjects)
-    s.trapCard && card(h("div", { class: "fhc-kv" }, title("Trap card"), chip(s.trapCard.total + " sprung", "acc")),
-      s.trapCard.kinds.length ? h("div", null, s.trapCard.kinds.map((k) => chip(k.kind + " ×" + k.n))) : muted("Nothin's caught you yet. Give it time."),
-      muted(s.trapCard.left + " kind" + (s.trapCard.left === 1 ? "" : "s") + " still to find" + (s.trapCard.eggs ? " · " + s.trapCard.eggs + " eggs laid" : "") + (s.trapCard.paused ? " · traps paused" : "")),
-      s.trapCard.hunt && muted("🔔 The hunt is on: get to " + s.trapCard.hunt.goal),
-      h("div", null, btn("Struggle", () => ctx.send("struggle")), btn(s.trapCard.paused ? "Traps on" : "Pause traps", () => ctx.send("traps " + (s.trapCard.paused ? "on" : "off"))), btn("What's out there", () => ctx.send("traps")))),
+    s.trapCard && muted("🧪 Your trap card is on the Traps tab."),
     h("div", null, btn("My tally", () => ctx.send("tally")), btn("Eggs", () => ctx.send("eggs")), btn("Wash up", () => ctx.send("wash")), btn("Pedigree", () => ctx.send("pedigree"))),
   ];
 }
 
+// 🧪 Traps: a test subject's trap card, what the farm has on them right now, and the proprietors' own card
+function traps(ctx) {
+  const s = ctx.s, tc = s.trapCard, ad = s.trapAdmin, gear = s.farmGear || [];
+  return [
+    tc ? card(h("div", { class: "fhc-kv" }, title("Trap card"), chip(tc.total + " sprung", "acc")),
+      tc.kinds.length ? h("div", null, tc.kinds.map((k) => chip(k.kind + " ×" + k.n))) : muted("Nothin's caught you yet. Give it time."),
+      muted(tc.left + " kind" + (tc.left === 1 ? "" : "s") + " still to find" + (tc.eggs ? " · " + tc.eggs + " eggs laid" : "") + (tc.paused ? " · traps paused" : "")),
+      tc.hunt && muted("🔔 The hunt is on: get to " + tc.hunt.goal),
+      h("div", null, btn("Struggle", () => ctx.send("struggle")), btn(tc.paused ? "Traps on" : "Pause traps", () => ctx.send("traps " + (tc.paused ? "on" : "off"))),
+        btn("What's out there", () => ctx.send("traps")), btn("Lay (at the nest)", () => ctx.send("lay"))))
+       : card(title("Traps"), muted("The farm's traps spring for test subjects and nobody else. A proprietor signs a volunteer up; you're not one right now, so you can walk right over them.")),
+    card(title("On you right now"), gear.length ? gear.map((g) => h("div", { class: "fhc-kv" }, h("span", null, g.name), h("span", { class: "fhc-muted" }, Math.max(0, Math.ceil((g.until - Date.now()) / 60000)) + " min")))
+      : muted("No farm gear on you."),
+      !ctx.prefs.gear && muted("Trap gear only goes on for real with \"Farm can put real gear on me\" switched on (Toggles → This panel).")),
+    ad && card(h("div", { class: "fhc-kv" }, title("Proprietor: subjects & traps"), chip(ad.subjects.length + " subject" + (ad.subjects.length === 1 ? "" : "s"), "acc")),
+      ad.subjects.length ? ad.subjects.map((x) => h("div", { class: "fhc-kv" }, h("span", null, (x.here ? "● " : "") + x.name), h("span", { class: "fhc-muted" }, x.n + " sprung" + (x.paused ? " · paused" : ""))))
+        : muted("Nobody's signed up yet: ?subject add <who>."),
+      muted("Trap spots: " + (ad.spots.length ? ad.spots.join(", ") : "none yet (?spot set trap-<kind>)")),
+      muted("Water: " + (ad.water.length ? ad.water.join(", ") : "none yet (?spot set pond)") + (ad.nest ? " · " + ad.nest + " eggs in the nest" : "") + (ad.pack ? " · pack at " + ad.pack : "")),
+      ad.hunt && muted("🔔 Hunt on: finish at " + ad.hunt.goal + ", " + ad.hunt.done + " home"),
+      h("div", null, btn("Kinds & spots", () => ctx.send("traps")), btn("Subjects", () => ctx.send("subject")), btn(ad.hunt ? "Stop the hunt" : "Start a hunt", () => ctx.send(ad.hunt ? "hunt stop" : "hunt start")),
+        btn("Gather eggs", () => ctx.send("gather")))),
+  ];
+}
 export function inbox(ctx) {
   const f = ctx.ui.filter || "all";
   const items = ctx.feed.filter((x) => f === "all" || x.kind === f);
@@ -142,6 +161,9 @@ export function panelPrefs(ctx) {
     // OFF until you turn it on: the farm touchin' your arousal meter (cues.js)
     toggle("Farm can stir me up", "Traps, toys and scenes nudge your arousal meter up, and while the farm has you denied you're held at the edge instead of cummin'. Your safeword still stops everything.",
       !!ctx.prefs.stir, () => { ctx.setPref("stir", !ctx.prefs.stir); ctx.api.rehello && ctx.api.rehello(); }),
+    // OFF until you turn it on: real items from the traps (marks.js)
+    toggle("Farm can put real gear on me", "A trap that plugs, cups, clamps, chains, ropes or funnels you puts the real item on your character, and takes it off again when its time's up. Pull one off early and it goes back. Your safeword takes it all off. (The parasite doesn't need this: ?parasite on is its switch.)",
+      !!ctx.prefs.gear, () => { ctx.setPref("gear", !ctx.prefs.gear); ctx.api.rehello && ctx.api.rehello(); }),
     // these two are OFF until you turn them on: the farm changin' what your character looks like (marks.js)
     marksFor(ctx) && toggle("Farm can mark my body", "Loads leave the game's own splatters on your face, chest or tummy, wherever there's room, and farm words can be written on your body. ?wash takes them off.",
       !!ctx.prefs.marks, () => ctx.setPref("marks", !ctx.prefs.marks)),
@@ -173,6 +195,7 @@ export const LIVESTOCK_TABS = [
   { id: "safety", label: "🆘 Safety", render: safetyTab },
   { id: "milk", label: "Milking", render: milking },
   { id: "breed", label: "Breeding", render: breeding },
+  { id: "traps", label: "🧪 Traps", render: traps },
   { id: "store", label: "🎀 Store", render: storeTab },
   { id: "inbox", label: "Inbox", render: inbox },
   { id: "guides", label: "Guides", render: (ctx) => guidesTab(ctx, false) },

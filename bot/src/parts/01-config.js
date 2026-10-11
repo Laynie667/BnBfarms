@@ -247,6 +247,10 @@
     TRAP_COOLDOWN_MIN: 3,        // a breather for the subject between any two traps
     TRAP_RESET_MIN: 15,          // how long one trap spot takes to reset for the same subject
     TRAP_DENY_MIN: 30,           // the clamp
+    STRUGGLE_CHANCE: 0.35, FREE_CHANCE: 0.5,   // ?struggle and ?free
+    HUNT_MIN: 20, HUNT_RIBBONS: 3, PACK_MOVE_MIN: 60, CRATE_RESET_MIN: 30, SMELL_MIN: 10,
+    NEST_MIN_H: 1, EGGS_PER_RIBBON: 4,
+    TRAP_PILLORY_MIN: 10, TRAP_WINCH_MIN: 5, TRAP_STICKY_MIN: 20, TRAP_WAIT_MIN: 6,   // the pillory · the pen after the winch · slow feet after glue or slime · how long the tickle rack and mirror box hold out
     TRAP_OVERFULL: 1.3,          // traps can fill a belly this far past capacity (1.5 would pin them)
     TENTACLE_CHANCE: 0.04,       // each time a subject wades into a water spot (and every TENTACLE_LINGER_MIN they stay)
     TENTACLE_LINGER_MIN: 5, TENTACLE_HYPER_CHANCE: 0.25,
@@ -258,6 +262,7 @@
     PARASITE_HOURS: 12, PARASITE_DOSE_MIN: 30, PARASITE_LATCH_S: 12,
     PARASITE_KISS_CHANCE: 0.5,   // a mouth kiss with somebody carryin' it, for somebody who said ?parasite on
     CRAVE_HOURS: 12, CRAVE_AFTER_MIN: 45, CRAVE_LINE_MIN: 15,   // the cum cravin': how long it lingers after, how long without a load before it bites, how often it nags
+    PARASITE_BELT_AFTER: 3,      // from the fourth time on the same host it comes back as a belt
     PARASITE_BIG_ML: [80, 200],  // a swallowed load this big counts double / triple when it's turned to serum
     STACK_MAX: 5,          // shots stack: a second dose (or an "x3" tag on the needle) raises the level, up to this
     POTION_STACK_MAX: 3,   // ...and so do potions: another bottle while one's workin' makes it stronger and longer

@@ -148,7 +148,7 @@
       if (!r.benched) continue;
       const mn = parseInt(k, 10), b = r.benched;
       // they turned it off or their limits changed: let them up
-      if (!r.benchOn || limitBlocks(mn, "breed")){ unbench(mn, "off"); continue; }
+      if ((!r.benchOn && !b.trap) || limitBlocks(mn, "breed")){ unbench(mn, "off"); continue; }   // (a trap's pillory holds a test subject without ?bench on)
       if (b.until <= now){ unbench(mn, "time"); continue; }
       const C = charFor(mn), pos = C && C.MapData && C.MapData.Pos;
       if (!pos || pos.X < 0) continue;

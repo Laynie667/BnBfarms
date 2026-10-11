@@ -689,6 +689,7 @@
         if (here || now - p.eggs.layAt > CFG.LABOUR_WAIT_H*3600000){
           const e = p.eggs; p.eggs = null;
           p.offspring.eggs = (p.offspring.eggs||0) + e.n;
+          eggsLaid(mn, e.n, false);   // the week's best layer (10x-trap-extras.js)
           if (!L.studbook) L.studbook = [];
           L.studbook.push({ t:now, dam:mn, sires:[e.by], kids:{ male:0, female:0, futa:0 }, eggs:e.n });
           saveLedger(); audit(CFG.BOT_MEMBER, "EGGS", mn+" "+e.n);

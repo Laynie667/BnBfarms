@@ -1558,6 +1558,7 @@ Welcome to B&B Farm, hon. 🌾`);
       case "bench": case "unbench": case "use": benchCommand(cmd, sender, args, R); break;
       case "subject": case "subjects": case "traps": case "trap": case "watersports": trapCommand(cmd, sender, args, R); break;   // 10u-traps.js
       case "parasite": case "purge": parasiteCommand(cmd, sender, args, R); break;   // 10v-parasite.js
+      case "struggle": case "free": case "goad": case "hunt": case "lay": case "gather": case "pack": extrasCommand(cmd, sender, args, R); break;   // 10x-trap-extras.js
       case "feedback": case "suggest": case "idea": case "bug": case "meh": case "more": feedbackCommand(cmd, sender, args, rest, R); break;   // the suggestion box (10q)
 
       case "edit": {
@@ -2038,10 +2039,15 @@ Welcome to B&B Farm, hon. 🌾`);
       case "wash": {
         const t = args[0] && isStaff(sender) ? resolveTarget(args[0]) : sender;
         const p = t && rec(t) ? prodOf(t) : null;
+        if (p && !paintedText(t) && aftermathOf(t).length){   // nothin' painted on, but a trap left them filthy
+          bodyMark(t, { wash: true }); aftermathWash(t); saveLedger(); syncCompanions(true);
+          if (onMap(t)) emote("🚿 "+plainName(t)+" gets scrubbed down at the trough till the water runs clear.", t); else R("All washed up, sugar.");
+          break;
+        }
         if (!p || !paintedText(t)){ R((t === sender ? "You're" : plainName(t)+" is")+" clean as a whistle, sugar."); break; }
         if (t === sender){ const no = addonVeto("wash", t); if (no){ R(no); break; } }   // an add-on can keep somebody messy (their own switch)
         bodyMark(t, { wash: true });   // the splatters and writing their Companion put on (10s-marks.js)
-        const was = paintedText(t); p.painted = null; saveLedger();
+        const was = paintedText(t); p.painted = null; aftermathWash(t); saveLedger();
         if (onMap(t)) emote("🚿 "+plainName(t)+" gets hosed down at the trough, washin' the "+was+" clean. Shame, it was a good look.", t);
         else R("All washed up, sugar.");
         break;
@@ -2228,7 +2234,7 @@ Welcome to B&B Farm, hon. 🌾`);
                        .map(([m,n],i)=>"  "+(i+1)+". "+plainName(parseInt(m,10))+" — "+n+" caught").join("\n") || "  (nobody yet)";
         const dump = Object.entries(L.yield.u||{}).sort((a,b)=>b[1]-a[1])[0];
         R("🥛 YIELD BOARD\n\nToday\n"+top(L.yield.d)+"\n\nThis week (top goes prize)\n"+top(L.yield.w)+"\n\n🐂 Top sires this week\n"+sires+
-          (dump ? "\n\n🪣 Farm cumdump of the day: "+plainName(parseInt(dump[0],10))+" ("+dump[1]+" times)" : "")+benchBoardLine());
+          (dump ? "\n\n🪣 Farm cumdump of the day: "+plainName(parseInt(dump[0],10))+" ("+dump[1]+" times)" : "")+subjBoardLine()+benchBoardLine());
         break;
       }
 
@@ -2482,6 +2488,7 @@ Welcome to B&B Farm, hon. 🌾`);
         if (Date.now()-last < CFG.BEG_COOLDOWN_MIN*60000){ R("You just begged, hon! Don't wear it out. Try again in a little while."); break; }
         state.cooldowns.set("beg:"+sender, Date.now());
         audit(sender,"BEG","");
+        if (trapBegged(sender)){ R("🪶 There. That wasn't so hard, was it, sugar?"); break; }
         if (potionBegged(sender)){ R("💗 Such pretty beggin'. The Needy Nectar lets you go, sugar."); break; }
         if (stockedNow(sender)){
           const left = r.stocked.until - Date.now();

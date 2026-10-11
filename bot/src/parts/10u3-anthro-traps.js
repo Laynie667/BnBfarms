@@ -305,8 +305,8 @@
         ["\"Oh, look at you. Skin and bone.\" A pair of big soft arms come round %n from behind and lift them clean off the ground.",
          "%n is scooped up like a runt piglet and carried into the farrowin' shed before they can say a word."],
         ["She's the old sow, the matron of the sty: big as a wardrobe, pink and warm, apron straps cuttin' into rolls of soft flesh, and a double row of fat teats down her front. She sits, and %n is in her lap.",
-         "The sow-woman settles into her rockin' chair with a sigh and arranges %n across her knees like a baby. Everything about her is soft and huge and smells of milk."],
-        ["\"Hush now. Mama's got you.\" She unhooks her apron bib and pushes a teat the size of a thumb between %n's lips. It's already drippin'.",
+         "The sow-woman settles into her rockin' chair with a sigh and arranges %n across her knees like a lapful of washin'. Everything about her is soft and huge and smells of milk."],
+        ["\"Hush now. I've got you.\" She unhooks her apron bib and pushes a teat the size of a thumb between %n's lips. It's already drippin'.",
          "A broad hand cradles the back of %n's head and guides their mouth onto a fat warm nipple. \"Drink up, piglet. All of it.\""],
       ],
       in: [
@@ -316,9 +316,9 @@
          "\"There we go. Full at both ends.\" She rocks, and every rock pushes her deeper into %n's %h, and %n just suckles and lets her."],
       ],
       over: [["%n nurses till their belly's tight and their eyes won't stay open, while she rocks and pats their bottom and rubs herself slow against their thigh under her apron."]],
-      end: ["She grunts, soft and happy, and pumps %ml into %n's %h without ever takin' the teat out of their mouth. Then she burps them, wipes their chin with her apron, and sets them down, milk-drunk and bred.",
+      end: ["She grunts, soft and happy, and pumps %ml into %n's %h without ever takin' the teat out of their mouth. Then she sits them up, wipes their chin with her apron, and sets them down, milk-drunk and bred.",
             "The chair creaks, the sow sighs, and %n's %h fills with %ml of her seed. She lets them nurse a minute more, kisses the top of their head, and sends them off with a pat. \"Come back when you're hungry.\""],
-      endOver: ["She finishes into her own apron with a happy little grunt, burps %n over her shoulder and sets them on their feet, milk-drunk and wobblin'. \"Come back when you're hungry.\""],
+      endOver: ["She finishes into her own apron with a happy little grunt, wipes %n's chin and sets them on their feet, milk-drunk and wobblin'. \"Come back when you're hungry.\""],
     },
   };
 

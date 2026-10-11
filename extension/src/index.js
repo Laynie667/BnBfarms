@@ -145,7 +145,7 @@ function parasiteSync() {
     const s = st.panel && st.panel.s;
     if (!st.gotState || !s || window.CurrentScreen !== "ChatRoom") return;
     const on = !!(s.parasite && s.parasite.until > Date.now());
-    if (parasiteGag(on) && on) toChat("The lips settle back over your mouth, warm and tight. It isn't done with you.", "#c9a35b", true);
+    if (parasiteGag(on, on ? s.parasite.form : null) && on) toChat(s.parasite.form === "belt" ? "The belt draws snug round your hips again, and its roots settle. It isn't done with you." : "The lips settle back over your mouth, warm and tight. It isn't done with you.", "#c9a35b", true);
   } catch (e) { console.warn("[Farmhand Companion] parasite:", e); }
 }
 function onFarmMsg(m) {

@@ -69,7 +69,14 @@ function breeding(ctx) {
   return [
     card(title("Breedin'"), rows.map(([k, v]) => h("div", { class: "fhc-kv" }, h("span", null, k), h("span", { class: "fhc-muted" }, v === true ? "on" : v === false ? "off" : v))),
       s.heatUntil && muted("🔥 In heat · " + hoursLeft(s.heatUntil) + " h left"),
-      s.preg && muted("🍼 Carryin' for " + s.preg.sires.join(" & "))),
+      s.preg && muted("🍼 Carryin' for " + s.preg.sires.join(" & ")),
+      s.eggs && muted("🥚 Carryin' " + s.eggs.n + " eggs · ?lay at the nest, or they come when they're due")),
+    // the trap card: every kind that's had you, and how much is still out there (test subjects)
+    s.trapCard && card(h("div", { class: "fhc-kv" }, title("Trap card"), chip(s.trapCard.total + " sprung", "acc")),
+      s.trapCard.kinds.length ? h("div", null, s.trapCard.kinds.map((k) => chip(k.kind + " ×" + k.n))) : muted("Nothin's caught you yet. Give it time."),
+      muted(s.trapCard.left + " kind" + (s.trapCard.left === 1 ? "" : "s") + " still to find" + (s.trapCard.eggs ? " · " + s.trapCard.eggs + " eggs laid" : "") + (s.trapCard.paused ? " · traps paused" : "")),
+      s.trapCard.hunt && muted("🔔 The hunt is on: get to " + s.trapCard.hunt.goal),
+      h("div", null, btn("Struggle", () => ctx.send("struggle")), btn(s.trapCard.paused ? "Traps on" : "Pause traps", () => ctx.send("traps " + (s.trapCard.paused ? "on" : "off"))), btn("What's out there", () => ctx.send("traps")))),
     h("div", null, btn("My tally", () => ctx.send("tally")), btn("Eggs", () => ctx.send("eggs")), btn("Wash up", () => ctx.send("wash")), btn("Pedigree", () => ctx.send("pedigree"))),
   ];
 }

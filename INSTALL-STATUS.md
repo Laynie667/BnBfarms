@@ -5,7 +5,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 | Script | File in `dist/` | Where it runs | Current |
 |---|---|---|---|
-| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.21.1** |
+| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.22.0** |
 | Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.5.8** |
 | Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.1.3** |
 | Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **1.0.4** |
@@ -13,7 +13,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 | Map tools, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.3** |
 | Dairy | `farmhand-dairy.user.js` | the bot's PC | **1.0.2** |
 | Shows | `farmhand-shows.user.js` | the bot's PC | **1.0.4** |
-| Farmhand Companion | `farmhand-companion.user.js` | each player | **0.13.0** |
+| Farmhand Companion | `farmhand-companion.user.js` | each player | **0.13.1** |
 | Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.4** |
 
 ## Sending a watch report
@@ -23,6 +23,22 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 - Running the watcher on more than one game at once (the bot, yours, a tester's) lets Claude line them up into one timeline.
 
 ## Latest changes (newest first)
+
+- **Bot 0.22.0, Companion 0.13.1: sixteen more traps, more lines for every trap pool, and what grew up round the traps.**
+  - New trap spots (`?spot set trap-<kind>`): `pillory` (locked for 10 minutes; anybody standin' by can `?use` them, same as the bench), `brand` (writes a word on them), `winch` (walks them to the pen and leaves them), `glue` (stuck, then slow feet for 20 minutes), `cups` (growth cups: a size bigger and milk runnin' double), `chute` (a bellyful of mash), `vines` (heat, and seed pods laid like eggs), `slime` (strips, fills, slow and green), `tickle` (lets go on `?beg`, or after 6 minutes for a ribbon), `mirror` (a line to say out loud five times, or 6 minutes), `paddle` (twenty, counted), `wall` (stuck in a fence with strangers at both ends), `mister` (a random potion), `weights` (studs: drained, balls a size heavier), `trough` (`?watersports on` only), `pricetag` (a price written on them and the sale called to the farm).
+  - Every pool the traps, the thing in the water, the self-actin' toys and the parasite draw from has new lines.
+  - **`?struggle`**: one try at slippin' whatever has you (35%). A win is out early and a ribbon; a loss tightens it and keeps you longer.
+  - **`?free <who>`** / **`?goad <who>`**: stand by a caught subject and try to get them out (half the time; a subject who fails may get caught too), or help the trap along.
+  - **The hunt**: `?hunt start [minutes]` (proprietors) rings a bell, resets every trap and names a finish (`?spot set hunt-goal`, or a pasture, barn or trough spot). Subjects who reach it get 3 ribbons, 4 for the first. `?hunt`, `?hunt stop`.
+  - **The roamin' pack**: with a `trap-wolves` den on the farm, the pack moves to a different spot every hour, and subjects only hear roughly where. `?pack on|off`.
+  - **Bait**: `?trap bait <spot> <ribbons>`. The next subject that trap catches is paid, and subjects passin' close get a hint.
+  - **Aftermath**: muddy, slimed, pissed on, branded, reekin' of boar or wolf. It shows on their right-now strip till they `?wash`, and stock standin' close get a line about it.
+  - **The nest**: `?spot set nest`. Carryin' a clutch at least an hour old, stand on it and `?lay`. Staff `?gather`: the layers get a ribbon per 4 eggs.
+  - **The crate**: `?spot set crate`. Only a subject can open it: ribbons, a potion, or a trap.
+  - **After dark** (curfew hours) traps reset twice as fast and the water is three times as hungry.
+  - **Subject of the week** on the `?board`: most traps sprung, best layer, most loads from the anthro traps.
+  - **The parasite grows up**: from its fourth time on the same host it comes back as a belt (Companion: a real "Parasite Belt"), and drinks the loads they take in pussy or ass.
+  - **Companion**: a Trap card for test subjects (every kind that's had them, how many are still to find, Struggle and Pause buttons), and an eggs line.
 
 - **Bot 0.21.1, Companion 0.13.0: test subjects, traps, the thing in the water, stackin' shots, and toys that act on their own.**
   - **Test subjects**: a new role the proprietors hand out by hand: `?subject add <who>`, `?subject remove <who>`, `?subject` for the list. It rides alongside whatever else they are. The subject can leave any time with `?subject quit`.

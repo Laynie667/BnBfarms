@@ -484,6 +484,9 @@ TEST SUBJECTS & TRAPS
   ?traps · what's out there · ?traps off|on · pause them
   ?traps skip <kind> · rule one out · ?traps allow <kind>
   ?subject quit · off the list for good
+  ?struggle · one try at slippin' a trap that has you
+  ?free <who> · get a caught subject out · ?goad <who> · or don't
+  ?lay · on the nest, if you're carryin' eggs · ?hunt · ?pack
   Your limits still rule, and your safeword stops a trap cold
   and keeps them all quiet for an hour.
 
@@ -685,12 +688,19 @@ RIBBONS, POTIONS, DARES, THE CORRAL
   ?subject add|remove <who> · proprietors: test subjects
   ?traps · the kinds, the spots, the water
      trap spots: ?spot set trap-<kind> (trap-milker-2…), or a
-     plain ?spot set trap for pot luck. ?traps lists every kind,
+     plain ?spot set trap for pot luck. A pillory, a tickle rack
+     that wants a ?beg, a mirror box, a hole in the fence…
+     ?traps lists every kind,
      the ones with a wolf pack or a stallion waitin' in them too.
      Water the thing lives in:
      ?spot set pond (pool, creek, water, well, bath…)
   ?trap load <spot> <shot words> · fill an injector trap
   ?trap spring <who> [kind] · proprietors: set one off by hand
+  ?trap bait <spot> <ribbons> · pay the next one it catches
+  ?hunt start [minutes] · ?hunt stop · proprietors
+  ?pack on|off · the roamin' wolf pack (needs a trap-wolves den)
+  ?gather · collect what's in the nest (?spot set nest)
+  ?spot set crate · a box only subjects can open
   ?purge <who> · take a parasite off them
   ?parasite give <who> · proprietors (they need ?parasite on)
   ?store approve|reject <who> · a bought greetin'

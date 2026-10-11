@@ -118,11 +118,26 @@ export function markBody(m, prefs) {
 // the parasite lips: a real Lip Gag on you while the farm's books say one's latched on (you said ?parasite on).
 // Put back if it's taken off early; gone the moment the farm says it's dropped off (or you safeword).
 const PARASITE_NAME = "Parasite Lips";
-export function parasiteGag(on) {
+const PARASITE_BELT = "Parasite Belt";
+const hasAsset = (g, n) => { try { return typeof window.AssetGet !== "function" || !!window.AssetGet(P().AssetFamily, g, n); } catch (e) { return false; } };
+export function parasiteGag(on, form) {
   if (!P() || !Array.isArray(P().Appearance) || typeof window.ServerAppearanceBundle !== "function") return false;
-  const cur = bundle(), have = cur.find((b) => b.Craft && b.Craft.Name === PARASITE_NAME);
-  if (!!have === !!on) return false;
-  if (!on) { commit(cur.filter((b) => b !== have)); return true; }
+  const cur = bundle(), want = on ? (form === "belt" ? PARASITE_BELT : PARASITE_NAME) : null;
+  const mine = cur.filter((b) => b.Craft && (b.Craft.Name === PARASITE_NAME || b.Craft.Name === PARASITE_BELT));
+  if (mine.length === (want ? 1 : 0) && (!want || mine[0].Craft.Name === want)) return false;
+  const rest = cur.filter((b) => !mine.includes(b));
+  if (!on) { commit(rest); return true; }
+  if (form === "belt") {
+    // the same thing, grown: a livin' belt on the hips
+    if (rest.find((b) => b.Group === "ItemPelvis") || !groupOf("ItemPelvis") || !hasAsset("ItemPelvis", "PolishedChastityBelt")) { if (mine.length) commit(rest); return false; }
+    const bc = "#E0607F";
+    rest.push({ Group: "ItemPelvis", Name: "PolishedChastityBelt", Color: bc, Difficulty: 20, Property: {},
+      Craft: { Item: "PolishedChastityBelt", Name: PARASITE_BELT, Description: "A belt of living flesh closed round the hips, with a root up inside. It feeds its host serum and drinks every load they take. B&B Farm.",
+        Property: "Normal", Color: bc, Lock: "", Private: true, MemberNumber: P().MemberNumber, MemberName: P().Name, ItemProperty: {}, Type: null, TypeRecord: null } });
+    commit(rest);
+    return true;
+  }
+  if (mine.length) { commit(rest); return true; }   // (it was the belt: off first, the lips go on at the next look)
   const g = ["ItemMouth", "ItemMouth2", "ItemMouth3"].find((x) => !cur.find((b) => b.Group === x) && groupOf(x));
   if (!g) return false;   // their mouth's full already: it's on the books just the same
   const color = ["#E0607F", "#7A2B47", "#7A2B47"];

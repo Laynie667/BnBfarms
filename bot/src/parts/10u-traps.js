@@ -22,7 +22,7 @@
   const BOTMN = () => CFG.BOT_MEMBER;
   const TENTACLE_SIRE = -2, TOY_SIRE = -3, FRAME_SIRE = -4, POST_SIRE = -5;
   function thingName(mn){
-    return mn === -2 ? "the thing in the water" : mn === -3 ? "the toy buried in them" : mn === -4 ? "the breedin' frame" : mn === -5 ? "the egg post" : mn <= -10 ? anthroSireName(mn) : null;
+    return mn === -2 ? "the thing in the water" : mn === -3 ? "the toy buried in them" : mn === -4 ? "the breedin' frame" : mn === -5 ? "the egg post" : mn === -6 ? "the vine patch" : mn <= -10 ? anthroSireName(mn) : null;
   }
   function isSubject(mn){ return hasRole(mn, ROLE.SUBJECT); }
   const TRAP_KINDS = {
@@ -63,6 +63,8 @@
     if (kind === "gas" && limitBlocks(mn, "heat")) return "their limits rule it out";
     if (kind === "milker" && !makesMilk(mn) && !makesSemen(mn)) return "nothin' to milk";
     if (ANTHRO[kind] && limitBlocks(mn, "breed")) return "their limits rule it out";
+    if (TRAP_NEEDS[kind]){ const w = TRAP_NEEDS[kind](mn); if (w) return w; }
+    if (r.trapWait) return "a trap already has them";
     if (ANTHRO[kind] && /\b(anthro|furr|beast)/i.test(lim)) return "their limits rule it out";
     if (benchedNow(mn) || stockedNow(mn) || r.penned || (prodOf(mn) && prodOf(mn).stall)) return "they're held somewhere already";
     if (state.trapRuns && state.trapRuns.has(mn)) return "a trap already has them";
@@ -78,13 +80,14 @@
     r.penned = { until: Date.now() + mins*60000, X: pos.X, Y: pos.Y, name: label, by: BOTMN(), trap: true };
     saveLedger();
   }
-  function trapFree(mn){ const r = rec(mn); if (r && r.penned && r.penned.trap){ r.penned = null; saveLedger(); } }
+  function trapFree(mn){ const r = rec(mn); if (r && r.penned && r.penned.trap && !r.penned.wait){ r.penned = null; saveLedger(); } }   // (the rack and the box keep hold: 10u4)
 
   const tFill = (t, mn, v) => String(t).replace(/%n/g, plainName(mn)).replace(/%ml/g, (v && v.ml) || "").replace(/%c/g, (v && v.c) || "").replace(/%h/g, (v && v.h) || "").replace(/%x/g, (v && v.x) || "");
   // a trap's story, a beat at a time, then what it leaves behind
   function trapRun(mn, kind, beats, done, v){
     state.trapRuns = state.trapRuns || new Map();
-    const run = { kind, i: 0, timer: null };
+    const run = { kind, i: 0, timer: null, beats: (beats = beats.slice()) };   // (a copy: ?struggle can add to it)
+    const before = { pissed: (rec(mn) || {}).pissed || 0 };
     state.trapRuns.set(mn, run);
     const step = () => {
       if (state.trapRuns.get(mn) !== run) return;
@@ -95,7 +98,7 @@
         return;
       }
       state.trapRuns.delete(mn);
-      if (charFor(mn)){ try { done(); } catch(e){ warn("trap "+kind+":", e); } }
+      if (charFor(mn)){ try { done(); trapDone(mn, kind, before); } catch(e){ warn("trap "+kind+":", e); } }   // (what they're left wearin': 10x-trap-extras.js)
       trapFree(mn); saveLedger(); syncCompanions(true);
     };
     step();
@@ -104,6 +107,8 @@
   function trapStop(mn, quietMin){
     const run = state.trapRuns && state.trapRuns.get(mn);
     if (run){ clearTimeout(run.timer); state.trapRuns.delete(mn); }
+    trapWaitEnd(mn, "quiet");   // the tickle rack, the mirror box (10u4-more-traps.js)
+    { const r0 = rec(mn); if (r0 && r0.benched && r0.benched.trap) unbench(mn, "safe"); }   // the pillory
     trapFree(mn);
     const r = rec(mn); if (r && isSubject(mn)){ r.trapQuiet = Date.now() + (quietMin == null ? 60 : quietMin)*60000; saveLedger(); }
     return !!run;
@@ -146,6 +151,7 @@
     const r = rec(mn), p = prodOf(mn), T = TRAP_LINES[kind], v = {};
     r.trapLog = (r.trapLog || []).concat({ t: Date.now(), kind, spot: spot || "" }).slice(-20);
     r.trapN = (r.trapN || 0) + 1;
+    trapSprung(mn, kind, spot);   // tallies, the trap card, bait (10x-trap-extras.js)
     audit(BOTMN(), "TRAP", mn+" "+kind+(spot ? " at "+spot : "")+(force ? " (by hand)" : ""));
     tell(mn, TRAP_KINDS[kind].icon+" You've sprung a trap, sugar: "+TRAP_KINDS[kind].what+". Your safeword stops it cold.");
     face(mn, kind === "lantern" ? "trance" : "edged", 60);
@@ -272,6 +278,7 @@
       }
       case "tentacle": tentacleScene(mn, spot); break;
       default: if (ANTHRO[kind]) anthroScene(mn, kind, spot);   // somebody's waitin' in this one (10u3-anthro-traps.js)
+               else if (MORE_TRAPS[kind]) MORE_TRAPS[kind](mn, spot);   // 10u4-more-traps.js
     }
     saveLedger(); syncCompanions(true);
     return null;
@@ -312,11 +319,11 @@
       if (!here){ state.trapAt.delete(mn); continue; }
       const fresh = !was || was.spot !== here;
       if (fresh) state.trapAt.set(mn, { spot: here, at: now });
-      if (now - (r.trapAt || 0) < CFG.TRAP_COOLDOWN_MIN*60000) continue;                 // one trap at a time, with a breather between
+      if (!huntOn() && now - (r.trapAt || 0) < CFG.TRAP_COOLDOWN_MIN*60000) continue;    // one trap at a time, with a breather between (not durin' a hunt)
       if (on){
         if (!fresh) continue;                                                             // step off and back on to spring it again
         r.spotTrapAt = r.spotTrapAt || {};
-        if (now - (r.spotTrapAt[here] || 0) < CFG.TRAP_RESET_MIN*60000) continue;           // each trap takes a while to reset
+        if (now - (r.spotTrapAt[here] || 0) < CFG.TRAP_RESET_MIN*60000*nightX().reset) continue;   // each trap takes a while to reset (half as long after dark)
         const kind = trapKindOf(here);
         if (!springTrap(mn, kind, here)){ r.trapAt = now; r.spotTrapAt[here] = now; saveLedger(); }
       } else {
@@ -324,10 +331,10 @@
         const st = state.trapAt.get(mn);
         if (!fresh && now - (st.rolled || 0) < CFG.TENTACLE_LINGER_MIN*60000) continue;
         st.rolled = now;
-        if (Math.random() < CFG.TENTACLE_CHANCE && !springTrap(mn, "tentacle", here)){ r.trapAt = now; saveLedger(); }
+        if (Math.random() < CFG.TENTACLE_CHANCE*nightX().water && !springTrap(mn, "tentacle", here)){ r.trapAt = now; saveLedger(); }   // (three times as hungry after dark)
       }
     }
-    toyTick();
+    toyTick(); moreTrapTick(); trapExtrasTick();
   }
 
   // ── toys that do things on their own ───────────────────────
@@ -412,6 +419,7 @@
     if (p.eggs) s += Math.min(1, 0.06 * p.eggs.n);                                          // a clutch
     if (makesMilk(mn) && p.milk >= milkCap(mn)*0.95) s += 0.2;                              // udders fit to burst
     const r = rec(mn); if (r && r.penned && !r.penned.trap) s += 0.3;                       // hobbled in the pen
+    if (r && r.gluedUntil > now) s += 0.6;                                                  // glue or slime still on their feet
     return Math.round(Math.min(CFG.SLOW_MAX, s) * 10) / 10;
   }
 
@@ -479,6 +487,15 @@
         r.trapSkip = (r.trapSkip || []).filter(x => x !== k); if (a0 === "skip") r.trapSkip.push(k); saveLedger();
         R(a0 === "skip" ? "🧪 The "+k+" trap won't spring for you any more. ?traps allow "+k+" brings it back." : "🧪 The "+k+" trap is back on for you."); return true;
       }
+      if (a0 === "bait"){
+        if (!isProprietor(sender)){ R("Baitin' traps is just for the proprietors, sugar."); return true; }
+        const spot = String(args[1] || "").toLowerCase(), n = parseInt(args[2], 10);
+        if (!L.spots || !L.spots[spot] || !trapKindOf(spot)){ R("Which trap, sugar? ?trap bait <spot> <ribbons>, like ?trap bait trap-wolves 3. ?trap bait <spot> 0 takes it back."); return true; }
+        L.trapBait = L.trapBait || {};
+        if (!(n > 0)){ delete L.trapBait[spot]; saveLedger(); R("🎀 Bait taken off "+spot+"."); return true; }
+        L.trapBait[spot] = Math.min(10, n); saveLedger(); audit(sender, "TRAPBAIT", spot+" "+L.trapBait[spot]);
+        R("🎀 "+spot+" is baited with "+L.trapBait[spot]+" ribbon"+(L.trapBait[spot] === 1 ? "" : "s")+". The next subject it catches gets paid for it."); return true;
+      }
       if (a0 === "load"){
         if (!isProprietor(sender)){ R("Loadin' traps is just for the proprietors, sugar."); return true; }
         const spot = String(args[1] || "").toLowerCase(), words = args.slice(2).join(" ").trim();
@@ -505,10 +522,11 @@
           "\n\nSet one: stand on the spot and say ?spot set trap-<kind> (trap-milker-2 for a second one; plain ?spot set trap springs pot luck)."+
           "\nOut there now: "+(spots.length ? spots.map(([n]) => n+(L.trapLoads && L.trapLoads[n] ? " ["+L.trapLoads[n]+"]" : "")).join(", ") : "none yet")+
           "\nWater the thing lives in: "+(water.length ? water.map(([n]) => n).join(", ") : "none yet (?spot set pond, pool, creek, water, well, bath…)")+
-          "\n?trap load <spot> <words> · ?trap spring <who> <kind> · ?subject for the list");
+          "\n?trap load <spot> <words> · ?trap bait <spot> <ribbons> · ?trap spring <who> <kind> · ?subject for the list"+
+          "\n?hunt start [minutes] · ?pack on|off · nest spots (?spot set nest) and ?gather · crate spots (?spot set crate)");
       else if (isSubject(sender))
         R("🧪 WHAT'S OUT THERE FOR YOU\n"+trapsList()+"\n\nThere are "+spots.length+" trap"+(spots.length === 1 ? "" : "s")+" hidden on the farm"+(water.length ? ", and somethin' lives in the water" : "")+". I'm not tellin' you where."+
-          "\n?traps off pauses them · ?traps skip <kind> rules one out"+((r.trapSkip || []).length ? " (you skip: "+r.trapSkip.join(", ")+")" : "")+" · your safeword stops one cold.");
+          "\n?struggle when one has you (one try) · ?traps off pauses them · ?traps skip <kind> rules one out"+((r.trapSkip || []).length ? " (you skip: "+r.trapSkip.join(", ")+")" : "")+" · your safeword stops one cold.");
       else R("🧪 The farm's traps only spring for test subjects, sugar, and you're not one. You can walk right over 'em.");
       return true;
     }

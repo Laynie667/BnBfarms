@@ -57,7 +57,8 @@
       { const sl = slowOf(mn); if (sl >= 1.2) s.slow = sl; }                                   // how much slower they walk for what they're carryin' (10u-traps.js)
       if (p.deniedUntil > now) s.deniedUntil = Math.ceil(p.deniedUntil / 60000) * 60000;     // held at the edge, if their Companion's set to
       if (p.eggs) s.eggs = { n: p.eggs.n, layAt: p.eggs.layAt };
-      if (parasiteOn(mn)) s.parasite = { until: r.parasite.until };
+      if (parasiteOn(mn)) s.parasite = { until: r.parasite.until, form: r.parasite.form || "lips" };
+      { const tc = trapCardFor(mn); if (tc) s.trapCard = tc; }   // the trap card (10x-trap-extras.js)
       const bh = benchHereFor(mn); if (bh.length) s.benchHere = bh;   // tap-to-use bench buttons
       s.at = now;
       if (isStaff(mn)) Object.assign(s, staffStateFor(mn));

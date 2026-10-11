@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.13.0
+// @version      0.13.1
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -230,7 +230,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.13.0";
+  var VERSION = "0.13.1";
 
   // extension/src/config.js
   var BOT_MEMBER = 260239;
@@ -612,7 +612,16 @@ One of mods you are using is using an old version of SDK. It will work for now b
         title("Breedin'"),
         rows.map(([k, v]) => h("div", { class: "fhc-kv" }, h("span", null, k), h("span", { class: "fhc-muted" }, v === true ? "on" : v === false ? "off" : v))),
         s.heatUntil && muted("\u{1F525} In heat \xB7 " + hoursLeft(s.heatUntil) + " h left"),
-        s.preg && muted("\u{1F37C} Carryin' for " + s.preg.sires.join(" & "))
+        s.preg && muted("\u{1F37C} Carryin' for " + s.preg.sires.join(" & ")),
+        s.eggs && muted("\u{1F95A} Carryin' " + s.eggs.n + " eggs \xB7 ?lay at the nest, or they come when they're due")
+      ),
+      // the trap card: every kind that's had you, and how much is still out there (test subjects)
+      s.trapCard && card(
+        h("div", { class: "fhc-kv" }, title("Trap card"), chip(s.trapCard.total + " sprung", "acc")),
+        s.trapCard.kinds.length ? h("div", null, s.trapCard.kinds.map((k) => chip(k.kind + " \xD7" + k.n))) : muted("Nothin's caught you yet. Give it time."),
+        muted(s.trapCard.left + " kind" + (s.trapCard.left === 1 ? "" : "s") + " still to find" + (s.trapCard.eggs ? " \xB7 " + s.trapCard.eggs + " eggs laid" : "") + (s.trapCard.paused ? " \xB7 traps paused" : "")),
+        s.trapCard.hunt && muted("\u{1F514} The hunt is on: get to " + s.trapCard.hunt.goal),
+        h("div", null, btn("Struggle", () => ctx2.send("struggle")), btn(s.trapCard.paused ? "Traps on" : "Pause traps", () => ctx2.send("traps " + (s.trapCard.paused ? "on" : "off"))), btn("What's out there", () => ctx2.send("traps")))
       ),
       h("div", null, btn("My tally", () => ctx2.send("tally")), btn("Eggs", () => ctx2.send("eggs")), btn("Wash up", () => ctx2.send("wash")), btn("Pedigree", () => ctx2.send("pedigree")))
     ];
@@ -3961,12 +3970,56 @@ One of mods you are using is using an old version of SDK. It will work for now b
     return { ok: true, did };
   }
   var PARASITE_NAME = "Parasite Lips";
-  function parasiteGag(on) {
+  var PARASITE_BELT = "Parasite Belt";
+  var hasAsset = (g, n) => {
+    try {
+      return typeof window.AssetGet !== "function" || !!window.AssetGet(P2().AssetFamily, g, n);
+    } catch (e) {
+      return false;
+    }
+  };
+  function parasiteGag(on, form) {
     if (!P2() || !Array.isArray(P2().Appearance) || typeof window.ServerAppearanceBundle !== "function") return false;
-    const cur = bundle(), have = cur.find((b) => b.Craft && b.Craft.Name === PARASITE_NAME);
-    if (!!have === !!on) return false;
+    const cur = bundle(), want = on ? form === "belt" ? PARASITE_BELT : PARASITE_NAME : null;
+    const mine = cur.filter((b) => b.Craft && (b.Craft.Name === PARASITE_NAME || b.Craft.Name === PARASITE_BELT));
+    if (mine.length === (want ? 1 : 0) && (!want || mine[0].Craft.Name === want)) return false;
+    const rest = cur.filter((b) => !mine.includes(b));
     if (!on) {
-      commit2(cur.filter((b) => b !== have));
+      commit2(rest);
+      return true;
+    }
+    if (form === "belt") {
+      if (rest.find((b) => b.Group === "ItemPelvis") || !groupOf2("ItemPelvis") || !hasAsset("ItemPelvis", "PolishedChastityBelt")) {
+        if (mine.length) commit2(rest);
+        return false;
+      }
+      const bc = "#E0607F";
+      rest.push({
+        Group: "ItemPelvis",
+        Name: "PolishedChastityBelt",
+        Color: bc,
+        Difficulty: 20,
+        Property: {},
+        Craft: {
+          Item: "PolishedChastityBelt",
+          Name: PARASITE_BELT,
+          Description: "A belt of living flesh closed round the hips, with a root up inside. It feeds its host serum and drinks every load they take. B&B Farm.",
+          Property: "Normal",
+          Color: bc,
+          Lock: "",
+          Private: true,
+          MemberNumber: P2().MemberNumber,
+          MemberName: P2().Name,
+          ItemProperty: {},
+          Type: null,
+          TypeRecord: null
+        }
+      });
+      commit2(rest);
+      return true;
+    }
+    if (mine.length) {
+      commit2(rest);
       return true;
     }
     const g = ["ItemMouth", "ItemMouth2", "ItemMouth3"].find((x) => !cur.find((b) => b.Group === x) && groupOf2(x));
@@ -4538,7 +4591,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       const s = st.panel && st.panel.s;
       if (!st.gotState || !s || window.CurrentScreen !== "ChatRoom") return;
       const on = !!(s.parasite && s.parasite.until > Date.now());
-      if (parasiteGag(on) && on) toChat("The lips settle back over your mouth, warm and tight. It isn't done with you.", "#c9a35b", true);
+      if (parasiteGag(on, on ? s.parasite.form : null) && on) toChat(s.parasite.form === "belt" ? "The belt draws snug round your hips again, and its roots settle. It isn't done with you." : "The lips settle back over your mouth, warm and tight. It isn't done with you.", "#c9a35b", true);
     } catch (e) {
       console.warn("[Farmhand Companion] parasite:", e);
     }

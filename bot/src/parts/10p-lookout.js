@@ -131,6 +131,8 @@
     if (p.deniedUntil > now) out.push({ icon: "🚫", text: "Denied", until: p.deniedUntil });
     if (parasiteOn(mn)) out.push({ icon: "👄", text: "Parasite", until: rec(mn).parasite.until });
     if (p.eggs) out.push({ icon: "🥚", text: p.eggs.n+" eggs", until: p.eggs.layAt });
+    for (const a of aftermathOf(mn)) out.push(a);   // muddy, slimed, pissed on, branded… till they wash (10x-trap-extras.js)
+    if (huntOn() && isSubject(mn)) out.push({ icon: "🔔", text: "The hunt: get to "+L.hunt.goal, until: L.hunt.until });
     if (p.milkDeniedUntil > now) out.push({ icon: "🚫", text: "Teats capped", until: p.milkDeniedUntil });
     if (p.pentUp) out.push({ icon: "😤", text: "Pent up" });
     if (r.dare && r.dare.until > now) out.push({ icon: "🎲", text: "Dare", until: r.dare.until });

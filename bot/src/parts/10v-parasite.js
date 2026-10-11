@@ -37,8 +37,17 @@
   function parasiteLatch(mn, how){
     const r = rec(mn), now = Date.now();
     r.crave = null;
-    r.parasite = { since: now, until: now + CFG.PARASITE_HOURS*3600000, next: now + CFG.PARASITE_DOSE_MIN*60000, n: 0, fed: 0 };
     r.parasiteN = (r.parasiteN || 0) + 1;
+    // after three times on the same host it knows them: it comes back as a belt, and feeds from the other end
+    const belt = r.parasiteN > CFG.PARASITE_BELT_AFTER;
+    r.parasite = { since: now, until: now + CFG.PARASITE_HOURS*3600000, next: now + CFG.PARASITE_DOSE_MIN*60000, n: 0, fed: 0, form: belt ? "belt" : "lips" };
+    if (belt){
+      saveLedger(); audit(CFG.BOT_MEMBER, "PARASITE", mn+" latched as a belt"+(how ? " ("+how+")" : ""));
+      emote("👄 "+paraLine("latchBelt", mn), mn);
+      tell(mn, "👄 It knows you now, sugar. This time it didn't stop at your mouth: it slid down your body and closed round your hips, a livin' belt with a root up inside you. "+CFG.PARASITE_HOURS+" hours. It feeds you the same serum every half hour, and now it's every load you take in your pussy or your ass that it drinks and turns into more. Your safeword takes it off right now.");
+      face(mn, "edged", 60); arouse(mn, 25); syncCompanions(true);
+      return;
+    }
     saveLedger(); audit(CFG.BOT_MEMBER, "PARASITE", mn+" latched"+(how ? " ("+how+")" : ""));
     emote("👄 "+paraLine("latch", mn), mn);
     tell(mn, "👄 Somethin' came through the hole with that last cock, sugar, and it's sealed itself over your mouth: a pair of fat, livin' lips with a tentacle down your throat. It'll feed you serum every half hour for the next "+CFG.PARASITE_HOURS+" hours (it grows your tits, cock, balls and ass, stretches how much you hold, and makes you catch easy and carry big), and every load you swallow, it turns into more. It gets hungry, and so will you. Kiss somebody who said ?parasite on and it'll bud onto them. "+
@@ -48,12 +57,12 @@
   }
   function parasiteOff(mn, how){
     const r = rec(mn); if (!r || !r.parasite) return false;
-    const was = r.parasite.until > Date.now(), fed = r.parasite.fed || 0, n = r.parasite.n || 0;
+    const was = r.parasite.until > Date.now(), fed = r.parasite.fed || 0, n = r.parasite.n || 0, wasBelt = r.parasite.form === "belt";
     r.parasite = null; r.parasiteNext = Date.now() + (how === "safe" ? 7 : 1)*86400000;
     r.crave = how === "safe" ? null : { until: Date.now() + CFG.CRAVE_HOURS*3600000, ate: Date.now(), told: Date.now() };   // the cravin' it leaves behind
     saveLedger(); audit(CFG.BOT_MEMBER, "PARASITE", mn+" off ("+(how || "done")+")");
     if (how === "safe" || !was && how !== "done") return true;
-    if (charFor(mn)) emote("👄 "+paraLine(how === "purge" ? "purge" : "off", mn), mn);
+    if (charFor(mn)) emote("👄 "+paraLine(wasBelt ? "offBelt" : how === "purge" ? "purge" : "off", mn), mn);
     tell(mn, "👄 The parasite's off you, sugar. It gave you "+n+" dose"+(n === 1 ? "" : "s")+" and drank "+fed+" load"+(fed === 1 ? "" : "s")+" through you while it was on.");
     syncCompanions(true);
     return true;
@@ -61,8 +70,18 @@
   // a load went into somebody (every breedin', the bench, the glory stalls): the parasite's business if it was the mouth
   function parasiteLoad(stud, mn, hole, mlIn){
     try {
-      if (hole !== "mouth" || !(mlIn > 0)) return;
+      if (!(mlIn > 0)) return;
       const r = rec(mn), p = prodOf(mn); if (!r || !p) return;
+      // as a belt it drinks from the other end
+      if (hole !== "mouth"){
+        if (!parasiteOn(mn) || r.parasite.form !== "belt" || (hole !== "vulva" && hole !== "butt")) return;
+        p.held[hole] = Math.max(0, (p.held[hole] || 0) - mlIn);
+        r.parasite.fed = (r.parasite.fed || 0) + 1; r.parasite.ate = Date.now();
+        const xb = mlIn >= CFG.PARASITE_BIG_ML[1] ? 3 : mlIn >= CFG.PARASITE_BIG_ML[0] ? 2 : 1;
+        parasiteDose(mn, xb, paraLine("convertBelt", mn, { ml: ml(mlIn), h: hole === "butt" ? "ass" : "pussy" }));
+        return;
+      }
+      if (parasiteOn(mn) && r.parasite.form === "belt") return;   // the belt leaves their mouth alone
       // a load swallowed settles the cravin' for a while
       if (craving(mn)){
         const c = parasiteOn(mn) ? r.parasite : r.crave;
@@ -119,7 +138,7 @@
       if (r.parasite.until <= now){ parasiteOff(mn, "done"); continue; }
       if (!charFor(mn) || now < r.parasite.next) continue;
       r.parasite.next = now + CFG.PARASITE_DOSE_MIN*60000;
-      parasiteDose(mn, 1, paraLine("dose", mn));
+      parasiteDose(mn, 1, paraLine(r.parasite.form === "belt" ? "doseBelt" : "dose", mn));
     }
   }
   function parasiteCommand(cmd, sender, args, R){
@@ -155,6 +174,21 @@
   }
 
   const PARASITE_LINES = {
+    latchBelt: [
+      "It comes through the hole the same as before, but it doesn't stop at %n's lips. It pours down their chin, their chest, their belly, and closes round their hips in a wide glossy band. A thick root pushes up inside them and takes hold.",
+      "The parasite knows %n by now. It slides off the stranger's cock, down %n's body like spilled honey, and knits itself into a belt of livin' flesh, snug between their legs, with a tendril seated deep in each hole.",
+      "This time it wants more of %n than their mouth. It flows down between their thighs, seals itself front to back, and sinks two slow fat roots up into them. %n's knees buckle as it settles in."],
+    doseBelt: [
+      "The belt round %n's hips tightens and throbs. Up inside them, its root pulses and pumps somethin' hot straight into their core.",
+      "%n stops, legs pressed together. The thing wrapped round their hips is feedin' them again, from the inside, one deep squirt at a time.",
+      "A ripple runs round the livin' belt on %n, and the roots it has in them swell and spill. Another dose, where they can't spit it out."],
+    convertBelt: [
+      "The load never gets to settle in %n's %h. The root seated there drinks all %ml of it, and the belt flushes dark and pays them back with a deep hot spurt of serum.",
+      "%ml goes into %n's %h and straight into the parasite. It shivers round their hips, greedy, and pumps its own brew up into them in exchange.",
+      "The belt sucks %n's %h dry almost before the cock's out: %ml, gone. What it gives back makes their belly glow."],
+    offBelt: [
+      "The belt round %n's hips goes soft. Its roots slide out of them, long and slow, and the whole thing slips down their legs to the floor in a wet heap.",
+      "%n feels it let go, front and back, and draw itself out. The livin' belt drops off their hips and oozes away under the straw."],
     crave: [
       "Your mouth waters round the thing in it. It's been a while since you swallowed, and your whole throat feels empty.",
       "You catch yourself lookin' at every crotch that walks by. You want a cock in your mouth. You want what comes out of it.",

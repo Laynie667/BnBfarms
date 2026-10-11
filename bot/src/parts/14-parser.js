@@ -137,7 +137,7 @@
                        "stats","board","pedigree","breedable","fertile","mpreg","naturalheat","breed","cum","milkable","futa","size","sizes","measure","penis","cock","rights","accept",
                        "freeuse","jarok","gender","outfit","outfits","uniform","hypno","tally","eggs","yes","no","wash","quota","praise","degrade",
                        "weather","feeding","curfew","beg","please","fair","enter","addons","addon",
-                       "ribbons","ribbon","store","buy","gift","potions","potion","dares","dare","dared","bench","use","feedback","suggest","idea","bug","meh","more","today","subject","subjects","traps","trap","watersports","parasite"];
+                       "ribbons","ribbon","store","buy","gift","potions","potion","dares","dare","dared","bench","use","feedback","suggest","idea","bug","meh","more","today","subject","subjects","traps","trap","watersports","parasite","struggle","free","goad","hunt","lay","gather","pack"];
   const STAFF_CMDS  = ["queue","app","approve","deny","register","unregister","grant","revoke",
                        "claim","release","myherd","herdname","herdcall","herdsummon","turnout","letup","goldkey",
                        "pasture","onduty","cover","staffadd","staffremove",

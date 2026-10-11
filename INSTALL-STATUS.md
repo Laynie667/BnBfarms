@@ -5,7 +5,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 | Script | File in `dist/` | Where it runs | Current |
 |---|---|---|---|
-| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.24.0** |
+| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.24.1** |
 | Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.5.8** |
 | Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.1.3** |
 | Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **1.0.4** |
@@ -23,6 +23,8 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 - Running the watcher on more than one game at once (the bot, yours, a tester's) lets Claude line them up into one timeline.
 
 ## Latest changes (newest first)
+
+- **Bot 0.24.1** (from the Oct 10 evening watch report): `?unregister <who> subject` works (it said it did not know that role), and `?watersport` and `?parasites` are taken as `?watersports` and `?parasite`. The private add-on (1.16.0, not on GitHub) got its own fixes the same night.
 
 - **Bot 0.24.0, Companion 0.14.1: the Danger Draught, an eager switch, slower and fuller trap scenes, and gas, spray and needle traps in kinds and strengths.**
   - **Slower, closer scenes.** A trap's story now takes 18 seconds a beat (it was 9), a trap never lets go before its story's told, and every trap has an extra explicit middle beat. The thing in the water has a seventh scene.

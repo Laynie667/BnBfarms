@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.24.0
+// @version      0.24.1
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -1828,7 +1828,7 @@
   ];
 
   // bot/src/version.js
-  var VERSION = "0.24.0";
+  var VERSION = "0.24.1";
 
   // bot-parts:farmhand-bot-parts
   (function() {
@@ -17805,7 +17805,9 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
       "hunt",
       "lay",
       "gather",
-      "pack"
+      "pack",
+      "watersport",
+      "parasites"
     ];
     const STAFF_CMDS = [
       "queue",
@@ -17966,6 +17968,11 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
             break;
           case "gloryhole":
             out.push(ROLE.GLORYHOLE);
+            break;
+          case "subject":
+          case "testsubject":
+          case "subjects":
+            out.push(ROLE.SUBJECT);
             break;
         }
       }
@@ -19976,7 +19983,7 @@ Welcome to B&B Farm, hon. \u{1F33E}`
           if (words.length) {
             const roles = parseRoles(words);
             if (!roles.length) {
-              R("I don't know that role, hon. Roles: livestock, guest, luxury, gloryhole, farmhand, mandated, herdmaster.");
+              R("I don't know that role, hon. Roles: livestock, guest, luxury, gloryhole, farmhand, mandated, herdmaster, subject.");
               break;
             }
             const staffRoles = [ROLE.FARMHAND, ROLE.MANDATED, ROLE.HERDMASTER];
@@ -20219,12 +20226,14 @@ Welcome to B&B Farm, hon. \u{1F33E}`
         case "traps":
         case "trap":
         case "watersports":
-          trapCommand(cmd, sender, args, R);
+        case "watersport":
+          trapCommand(cmd === "watersport" ? "watersports" : cmd, sender, args, R);
           break;
         // 10u-traps.js
         case "parasite":
+        case "parasites":
         case "purge":
-          parasiteCommand(cmd, sender, args, R);
+          parasiteCommand(cmd === "parasites" ? "parasite" : cmd, sender, args, R);
           break;
         // 10v-parasite.js
         case "struggle":

@@ -1376,7 +1376,7 @@ Welcome to B&B Farm, hon. 🌾`);
         let full = !words.length;
         if (words.length){
           const roles = parseRoles(words);
-          if (!roles.length){ R("I don't know that role, hon. Roles: livestock, guest, luxury, gloryhole, farmhand, mandated, herdmaster."); break; }
+          if (!roles.length){ R("I don't know that role, hon. Roles: livestock, guest, luxury, gloryhole, farmhand, mandated, herdmaster, subject."); break; }
           const staffRoles = [ROLE.FARMHAND, ROLE.MANDATED, ROLE.HERDMASTER];
           if (roles.some(x => staffRoles.includes(x)) && !isProprietor(sender)){ R("Only the proprietors take away staff roles, sugar."); break; }
           const had = roles.filter(x => r.roles.includes(x));
@@ -1556,8 +1556,8 @@ Welcome to B&B Farm, hon. 🌾`);
       case "dares": case "dare": case "dared": dareCommand(cmd, sender, args, R); break;
       case "corral": case "uncorral": penCommand(cmd === "corral" ? "pen" : "unpen", sender, args, R); break;
       case "bench": case "unbench": case "use": benchCommand(cmd, sender, args, R); break;
-      case "subject": case "subjects": case "traps": case "trap": case "watersports": trapCommand(cmd, sender, args, R); break;   // 10u-traps.js
-      case "parasite": case "purge": parasiteCommand(cmd, sender, args, R); break;   // 10v-parasite.js
+      case "subject": case "subjects": case "traps": case "trap": case "watersports": case "watersport": trapCommand(cmd === "watersport" ? "watersports" : cmd, sender, args, R); break;   // 10u-traps.js
+      case "parasite": case "parasites": case "purge": parasiteCommand(cmd === "parasites" ? "parasite" : cmd, sender, args, R); break;   // 10v-parasite.js
       case "struggle": case "free": case "goad": case "hunt": case "lay": case "gather": case "pack": extrasCommand(cmd, sender, args, R); break;   // 10x-trap-extras.js
       case "feedback": case "suggest": case "idea": case "bug": case "meh": case "more": feedbackCommand(cmd, sender, args, rest, R); break;   // the suggestion box (10q)
 

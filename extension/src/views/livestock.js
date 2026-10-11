@@ -80,6 +80,7 @@ function breeding(ctx) {
 function traps(ctx) {
   const s = ctx.s, tc = s.trapCard, ad = s.trapAdmin, gear = s.farmGear || [];
   return [
+    s.stateErr && card(title("Somethin' broke on the farm girl's end"), muted("Part of your panel didn't arrive. Tell the proprietors this line: " + s.stateErr)),
     tc ? card(h("div", { class: "fhc-kv" }, title("Trap card"), chip(tc.total + " sprung", "acc")),
       tc.kinds.length ? h("div", null, tc.kinds.map((k) => chip(k.kind + " ×" + k.n))) : muted("Nothin's caught you yet. Give it time."),
       muted(tc.left + " kind" + (tc.left === 1 ? "" : "s") + " still to find" + (tc.eggs ? " · " + tc.eggs + " eggs laid" : "") + (tc.paused ? " · traps paused" : "") + (tc.eager ? " · eager (no waits)" : "") + (tc.danger ? " · Danger Draught in you" : "")),

@@ -15,6 +15,12 @@
   // amounts as the panel shows them (0.1 L steps from a litre up, 50 mL below): milk fillin' a few mL every
   // tick doesn't send a new panel each time, only when the number they see would change
   function shownMl(n){ n = Number(n) || 0; return n >= 1000 ? Math.round(n/100)*100 : Math.round(n/50)*50; }
+  // a part of somebody's panel that broke: in the log once every ten minutes, not every sync
+  function stateWarn(mn, name, e){
+    state.stateWarned = state.stateWarned || new Map();
+    const k = mn+":"+name; if (Date.now() - (state.stateWarned.get(k) || 0) < 600000) return;
+    state.stateWarned.set(k, Date.now()); warn("panel state ("+name+") for "+mn+":", e);
+  }
   function stateFor(mn){
     // proprietors named in CFG.PROPRIETORS are staff even if their record lists no roles (or they have no record yet)
     const staff = isStaff(mn);
@@ -53,14 +59,16 @@
       s.fx = activePotions(mn).map(f => ({ id: f.id, name: (potionDef(f.id) || {}).name || f.id, until: Math.ceil(f.until/60000)*60000 }));
       if (r.dare) s.dare = { text: r.dare.text, until: r.dare.until, reckless: !!r.dare.reckless };
       if (r.penned) s.penned = { until: r.penned.until, at: r.penned.name };
-      s.now = rightNow(mn);                 // the "right now" strip (10p-lookout.js)
-      { const sl = slowOf(mn); if (sl >= 1.2) s.slow = sl; }                                   // how much slower they walk for what they're carryin' (10u-traps.js)
+      // each of these stands alone: if one breaks for somebody, the rest of their panel still arrives, and the panel says which (Oct 11)
+      const part = (name, fn) => { try { fn(); } catch(e){ s.stateErr = (s.stateErr ? s.stateErr+" · " : "")+name+": "+String(e && e.message || e).slice(0, 80); stateWarn(mn, name, e); } };
+      part("right now", () => { s.now = rightNow(mn); });                 // the "right now" strip (10p-lookout.js)
+      part("slow", () => { const sl = slowOf(mn); if (sl >= 1.2) s.slow = sl; });   // how much slower they walk for what they're carryin' (10u-traps.js)
       if (p.deniedUntil > now) s.deniedUntil = Math.ceil(p.deniedUntil / 60000) * 60000;     // held at the edge, if their Companion's set to
       if (p.eggs) s.eggs = { n: p.eggs.n, layAt: p.eggs.layAt };
-      if (parasiteOn(mn)) s.parasite = { until: r.parasite.until, form: r.parasite.form || "lips" };
-      { const tc = trapCardFor(mn); if (tc) s.trapCard = tc; }   // the trap card (10x-trap-extras.js)
-      { const fg = farmGearFor(mn); if (fg.length) s.farmGear = fg; }   // real gear their Companion keeps on them (10y-farm-gear.js)
-      if (isProprietor(mn)) s.trapAdmin = trapAdminFor();
+      part("parasite", () => { if (parasiteOn(mn)) s.parasite = { until: r.parasite.until, form: r.parasite.form || "lips" }; });
+      part("trap card", () => { const tc = trapCardFor(mn); if (tc) s.trapCard = tc; });   // the trap card (10x-trap-extras.js)
+      part("farm gear", () => { const fg = farmGearFor(mn); if (fg.length) s.farmGear = fg; });   // real gear their Companion keeps on them (10y-farm-gear.js)
+      part("trap admin", () => { if (isProprietor(mn)) s.trapAdmin = trapAdminFor(); });
       const bh = benchHereFor(mn); if (bh.length) s.benchHere = bh;   // tap-to-use bench buttons
       s.at = now;
       if (isStaff(mn)) Object.assign(s, staffStateFor(mn));
@@ -73,7 +81,7 @@
         // the suggestion box, newest first (the Dashboard's Suggestions tab; 10q-feedback.js)
         s.feedback = fbLedger().slice(-60).reverse().map(f => ({ id: f.id, t: f.t, name: f.name, mn: f.mn, kind: f.kind, text: f.text, why: f.why || "", status: f.status, note: f.note || "" }));
       }
-    } catch(e){ dbg("stateFor:", e); }
+    } catch(e){ s.stateErr = (s.stateErr ? s.stateErr+" · " : "")+"panel: "+String(e && e.message || e).slice(0, 80); stateWarn(mn, "panel", e); }
     return s;
   }
 

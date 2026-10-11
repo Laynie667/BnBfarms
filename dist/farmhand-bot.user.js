@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.24.1
+// @version      0.24.2
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -1828,7 +1828,7 @@
   ];
 
   // bot/src/version.js
-  var VERSION = "0.24.1";
+  var VERSION = "0.24.2";
 
   // bot-parts:farmhand-bot-parts
   (function() {
@@ -4464,6 +4464,13 @@
       n = Number(n) || 0;
       return n >= 1e3 ? Math.round(n / 100) * 100 : Math.round(n / 50) * 50;
     }
+    function stateWarn(mn, name, e) {
+      state.stateWarned = state.stateWarned || /* @__PURE__ */ new Map();
+      const k = mn + ":" + name;
+      if (Date.now() - (state.stateWarned.get(k) || 0) < 6e5) return;
+      state.stateWarned.set(k, Date.now());
+      warn("panel state (" + name + ") for " + mn + ":", e);
+    }
     function stateFor(mn) {
       const staff = isStaff(mn);
       const r = rec(mn, staff);
@@ -4507,23 +4514,37 @@
         s.fx = activePotions(mn).map((f) => ({ id: f.id, name: (potionDef(f.id) || {}).name || f.id, until: Math.ceil(f.until / 6e4) * 6e4 }));
         if (r.dare) s.dare = { text: r.dare.text, until: r.dare.until, reckless: !!r.dare.reckless };
         if (r.penned) s.penned = { until: r.penned.until, at: r.penned.name };
-        s.now = rightNow(mn);
-        {
+        const part = (name, fn) => {
+          try {
+            fn();
+          } catch (e) {
+            s.stateErr = (s.stateErr ? s.stateErr + " \xB7 " : "") + name + ": " + String(e && e.message || e).slice(0, 80);
+            stateWarn(mn, name, e);
+          }
+        };
+        part("right now", () => {
+          s.now = rightNow(mn);
+        });
+        part("slow", () => {
           const sl = slowOf(mn);
           if (sl >= 1.2) s.slow = sl;
-        }
+        });
         if (p.deniedUntil > now) s.deniedUntil = Math.ceil(p.deniedUntil / 6e4) * 6e4;
         if (p.eggs) s.eggs = { n: p.eggs.n, layAt: p.eggs.layAt };
-        if (parasiteOn(mn)) s.parasite = { until: r.parasite.until, form: r.parasite.form || "lips" };
-        {
+        part("parasite", () => {
+          if (parasiteOn(mn)) s.parasite = { until: r.parasite.until, form: r.parasite.form || "lips" };
+        });
+        part("trap card", () => {
           const tc = trapCardFor(mn);
           if (tc) s.trapCard = tc;
-        }
-        {
+        });
+        part("farm gear", () => {
           const fg = farmGearFor(mn);
           if (fg.length) s.farmGear = fg;
-        }
-        if (isProprietor(mn)) s.trapAdmin = trapAdminFor();
+        });
+        part("trap admin", () => {
+          if (isProprietor(mn)) s.trapAdmin = trapAdminFor();
+        });
         const bh = benchHereFor(mn);
         if (bh.length) s.benchHere = bh;
         s.at = now;
@@ -4540,7 +4561,8 @@
           s.feedback = fbLedger().slice(-60).reverse().map((f) => ({ id: f.id, t: f.t, name: f.name, mn: f.mn, kind: f.kind, text: f.text, why: f.why || "", status: f.status, note: f.note || "" }));
         }
       } catch (e) {
-        dbg("stateFor:", e);
+        s.stateErr = (s.stateErr ? s.stateErr + " \xB7 " : "") + "panel: " + String(e && e.message || e).slice(0, 80);
+        stateWarn(mn, "panel", e);
       }
       return s;
     }

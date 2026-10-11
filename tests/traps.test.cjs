@@ -62,7 +62,7 @@ const C=mn=>chars.find(c=>c.MemberNumber===mn);
   // ── skip, pause, limits ──
   await say(500,'?traps skip gas'); moveTo(500,22,20); n=sent.length; W.__trapTick(); await wait(800);
   ok(!/sprung a trap/.test(to(500,n)) && !(prod(500).heat && prod(500).heat.until > Date.now()), 'a kind they ruled out never springs');
-  await say(500,'?traps allow gas'); moveTo(500,15,10); W.__trapTick(); moveTo(500,22,20); n=sent.length; W.__trapTick(); await wait(1500);
+  await say(500,'?traps allow gas'); await say(221397,'?trap load trap-gas heat strong'); moveTo(500,15,10); W.__trapTick(); moveTo(500,22,20); n=sent.length; W.__trapTick(); await wait(1500);
   ok(prod(500).heat && prod(500).heat.until > Date.now(), 'the gas trap leaves them in heat');
   await say(221397,'?subject add Rex'); moveTo(600,24,20); n=sent.length; W.__trapTick(); await wait(1000);
   ok(!prod(600).eggs, 'hard limits rule a trap out (eggs)');
@@ -71,7 +71,7 @@ const C=mn=>chars.find(c=>c.MemberNumber===mn);
   cfg.TENTACLE_CHANCE=0; moveTo(500,30,30); n=sent.length; W.__trapTick(); await wait(500); ok(!prod(500).eggs, 'most times the water is just water');
   cfg.TENTACLE_CHANCE=1; moveTo(500,15,10); W.__trapTick(); moveTo(500,30,31); n=sent.length; W.__trapTick(); await wait(600);
   ok(P(500).penned && P(500).penned.trap, 'when it comes, it holds them there');
-  await wait(1800);
+  await wait(3500);
   const e=prod(500).eggs; ok(e && e.n >= 4 && e.by === -2, 'it always leaves eggs ('+(e&&e.n)+')');
   ok(/thing in the water|tentacle|eggs/.test(all(n)) && /eggs in your/.test(to(500,n)), 'the scenes play out and they are told the count');
   ok(W.__slow(500) > 1 && W.__stateFor(500).slow > 1, 'carryin\' a clutch slows them down ('+W.__slow(500)+'x)');
@@ -146,6 +146,20 @@ const C=mn=>chars.find(c=>c.MemberNumber===mn);
   prod(500).held.vulva=100; const pf=P(500).parasite.n; W.__load(600,500,'vulva',100); await wait(600);
   ok(prod(500).held.vulva === 0 && P(500).parasite.n === pf+1, '...and drinks from the other end');
   P(500).parasite=null; P(500).parasiteOn=false; P(500).parasiteN=0; P(500).parasiteNext=0; P(500).crave=null; P(400).breedable=false;
+  // ── kinds and strengths, the Danger Draught, eager ──
+  n=sent.length; await say(221397,'?trap load trap-gas nonsense'); ok(/takes a kind and a strength/.test(to(221397,n)), 'a gas trap is loaded with a kind and a strength');
+  P(400).trapAt=0; P(400).penned=null; L().trapLoads['trap-x']='musk brutal';
+  await spring('gas'); ok(P(400).trapSev && ['mild','strong','brutal'].includes(P(400).trapSev), 'a gas trap picks a kind and a strength ('+P(400).trapSev+')');
+  P(400).dirt=null; await spring('spray'); ok(!!P(400).trapSev, 'so does a spray trap');
+  await say(400,'?traps eager on'); ok(P(400).trapEager === true && W.__stateFor(400).trapCard.eager, '?traps eager on: their own switch to skip the waits');
+  P(400).trapAt=Date.now(); P(400).spotTrapAt={'trap-gas':Date.now()}; P(400).penned=null; cfg.TRAP_COOLDOWN_MIN=3; moveTo(400,15,10); W.__trapTick(); moveTo(400,22,20); n=sent.length; W.__trapTick(); await wait(1500);
+  ok(/sprung a trap/.test(to(400,n)), '...eager: the same trap springs again with no breather and no reset');
+  cfg.TRAP_COOLDOWN_MIN=0; await say(400,'?traps eager off'); P(400).penned=null; P(400).potionsOn=true;
+  await say(221397,'?potion give Hand danger',2600); P(400).trapAt=0; P(400).penned=null; await say(221397,'?trap spring Hand glue',1500);
+  ok(P(400).fx && P(400).fx.danger && P(400).gluedUntil > Date.now()+38*60000, 'a Danger Draught doubles a trap timer (sticky feet for 40 minutes, not 20)');
+  await wait(1200); await say(221397,'?potion give Hand danger',2600); P(400).trapAt=0; P(400).penned=null; await say(221397,'?trap spring Hand glue',1500);
+  ok(P(400).fx.danger.x === 2 && P(400).gluedUntil > Date.now()+58*60000, '...a second bottle triples it');
+  await wait(1200); delete P(400).fx.danger; P(400).gluedUntil=0; P(400).penned=null;
   // ── quit ──
   await say(500,'?subject quit'); ok(!roles(500).includes('SUBJECT') && roles(500).includes('LIVESTOCK'), '?subject quit takes them off the list, nothin\' else');
   // ── potions stack ──

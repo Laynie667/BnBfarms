@@ -512,6 +512,7 @@
     // breedin' rights: only the rights-holder's loads can take
     if (r.rights && r.rights.until > now && r.rights.stud !== stud && !(r.rights.allow||[]).includes(stud)) return null;
     if (p.preg) chance *= CFG.PROD.EXTRA_SIRE_X;
+    chance *= dangerX(mother).chance;   // a Danger Draught (10z-trap-variants.js)
     chance = Math.min(0.95, chance);
     if (Math.random() >= chance) return null;
     if (p.preg){ p.preg.sires.push(stud); return "extra"; }

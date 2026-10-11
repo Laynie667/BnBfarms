@@ -190,9 +190,9 @@
       const r = rec(mn); if (r.trapsOff || (r.trapQuiet || 0) > now) continue;
       const c = crates.find(n => onSpot(mn, n, 0)); if (!c || now - (L.crateAt[c] || 0) < CFG.CRATE_RESET_MIN*60000) continue;
       L.crateAt[c] = now; saveLedger();
-      const roll = Math.random();
-      if (roll < 0.4){ const n = 1 + Math.floor(Math.random()*2); emote("📦 "+xLine("crateGood", mn), mn); earnRibbons(mn, n, "what was in the crate"); }
-      else if (roll < 0.65){
+      const roll = Math.random() / dangerX(mn).chance;   // a Danger Draught: likelier to bite
+      if (roll < 0.27){ const n = 1 + Math.floor(Math.random()*2); emote("📦 "+xLine("crateGood", mn), mn); earnRibbons(mn, n, "what was in the crate"); }
+      else if (roll < 0.43){
         const can = POTIONS.filter(P => !potionRefusal(mn, P.id, mn)), P = can[Math.floor(Math.random()*can.length)];
         emote("📦 "+xLine("cratePotion", mn), mn); if (P) later(() => givePotion(mn, P.id, CFG.BOT_MEMBER, "from the crate"), 2500);
       } else {
@@ -256,7 +256,7 @@
     const r = rec(mn); if (!isSubject(mn)) return null;
     const k = r.trapKinds || {}, all = Object.keys(TRAP_KINDS);
     return { total: r.trapN || 0, kinds: all.filter(x => k[x]).map(x => ({ kind: x, icon: TRAP_KINDS[x].icon, n: k[x] })), left: all.filter(x => !k[x]).length,
-             eggs: (prodOf(mn).offspring || {}).eggs || 0, paused: !!r.trapsOff, hunt: huntOn() ? { until: L.hunt.until, goal: L.hunt.goal } : null };
+             eggs: (prodOf(mn).offspring || {}).eggs || 0, paused: !!r.trapsOff, eager: !!r.trapEager, danger: dangerX(mn).on, hunt: huntOn() ? { until: L.hunt.until, goal: L.hunt.goal } : null };
   }
   function subjBoardLine(){
     const w = subjWeek(), top = (o, unit) => { const e = Object.entries(o).sort((a, b) => b[1] - a[1])[0]; return e ? plainName(parseInt(e[0], 10))+" ("+e[1]+" "+unit+")" : null; };

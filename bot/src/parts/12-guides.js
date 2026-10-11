@@ -485,6 +485,7 @@ TEST SUBJECTS & TRAPS
   ?traps skip <kind> · rule one out · ?traps allow <kind>
   ?subject quit · off the list for good
   ?struggle · one try at slippin' a trap that has you
+  ?traps eager on · no breather between traps, no resets
   ?free <who> · get a caught subject out · ?goad <who> · or don't
   ?lay · on the nest, if you're carryin' eggs · ?hunt · ?pack
   Your limits still rule, and your safeword stops a trap cold
@@ -702,6 +703,8 @@ RIBBONS, POTIONS, DARES, THE CORRAL
      Water the thing lives in:
      ?spot set pond (pool, creek, water, well, bath…)
   ?trap load <spot> <shot words> · fill an injector trap
+  ?trap load <spot> <kind> [mild|strong|brutal] · gas, spray
+     and needle traps: ?trap load trap-gas musk brutal
   ?trap spring <who> [kind] · proprietors: set one off by hand
   ?trap bait <spot> <ribbons> · pay the next one it catches
   ?hunt start [minutes] · ?hunt stop · proprietors

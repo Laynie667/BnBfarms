@@ -243,7 +243,8 @@
     LABOUR_WAIT_H: 12,            // due but away from the farm this long: the litter comes without the show
     EGG_CHANCE: 0.2, EGG_TIED_CHANCE: 0.4, EGG_COUNT: [2,6], EGG_DAYS: [2,3],
     // traps, the thing in the water, and toys that act on their own (10u-traps.js)
-    TRAP_BEAT_S: 9,              // seconds between the beats of a trap's story
+    TRAP_BEAT_S: 18,             // seconds between the beats of a trap's story (slow enough to read and to answer)
+    DANGER_CHANCE_X: 1.5,        // a Danger Draught: everything on a chance is this much likelier for them (timers double, triple with a second bottle)
     TRAP_COOLDOWN_MIN: 3,        // a breather for the subject between any two traps
     TRAP_RESET_MIN: 15,          // how long one trap spot takes to reset for the same subject
     TRAP_DENY_MIN: 30,           // the clamp

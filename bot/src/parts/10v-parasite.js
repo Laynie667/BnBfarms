@@ -97,7 +97,7 @@
         return;
       }
       if (stud !== ANON_STUD || !r.parasiteOn || (r.parasiteNext || 0) > Date.now()) return;      // only out of the glory holes, only if they asked
-      if (/\bparasit/i.test(r.limits || "") || Math.random() >= CFG.PARASITE_CHANCE) return;
+      if (/\bparasit/i.test(r.limits || "") || Math.random() >= CFG.PARASITE_CHANCE*dangerX(mn).chance) return;
       setTimeout(() => { try { if (charFor(mn) && !parasiteOn(mn)) parasiteLatch(mn, "glory"); } catch(e){ warn("parasite:", e); } }, CFG.PARASITE_LATCH_S*1000);
     } catch(e){ warn("parasite load:", e); }
   }
@@ -121,7 +121,7 @@
       if (!from || parasiteOn(to)) return;
       const r = rec(to);
       if (!r || !r.parasiteOn || (r.parasiteNext || 0) > Date.now() || /\bparasit/i.test(r.limits || "")) return;
-      if (Math.random() >= CFG.PARASITE_KISS_CHANCE) return;
+      if (Math.random() >= CFG.PARASITE_KISS_CHANCE*dangerX(to).chance) return;
       emote("👄 "+tFill(pickFresh("para:bud", PARASITE_LINES.bud), from, { c: plainName(to) }), to);
       setTimeout(() => { try { if (charFor(to) && !parasiteOn(to)) parasiteLatch(to, "kissed by "+from); } catch(e){ warn("parasite kiss:", e); } }, 3000);
     } catch(e){ warn("parasite kiss:", e); }

@@ -5,7 +5,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 | Script | File in `dist/` | Where it runs | Current |
 |---|---|---|---|
-| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.23.0** |
+| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.24.0** |
 | Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.5.8** |
 | Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.1.3** |
 | Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **1.0.4** |
@@ -13,7 +13,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 | Map tools, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.3** |
 | Dairy | `farmhand-dairy.user.js` | the bot's PC | **1.0.2** |
 | Shows | `farmhand-shows.user.js` | the bot's PC | **1.0.4** |
-| Farmhand Companion | `farmhand-companion.user.js` | each player | **0.14.0** |
+| Farmhand Companion | `farmhand-companion.user.js` | each player | **0.14.1** |
 | Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.4** |
 
 ## Sending a watch report
@@ -23,6 +23,13 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 - Running the watcher on more than one game at once (the bot, yours, a tester's) lets Claude line them up into one timeline.
 
 ## Latest changes (newest first)
+
+- **Bot 0.24.0, Companion 0.14.1: the Danger Draught, an eager switch, slower and fuller trap scenes, and gas, spray and needle traps in kinds and strengths.**
+  - **Slower, closer scenes.** A trap's story now takes 18 seconds a beat (it was 9), a trap never lets go before its story's told, and every trap has an extra explicit middle beat. The thing in the water has a seventh scene.
+  - **Gas, spray and needle traps come in kinds and three strengths** (mild, strong, brutal; pot luck leans mild). Gas: heat, milk, musk, needy, giggle, haze, rut, ripen, moo. Spray: seed, piss (`?watersports on` only), milk, slime, oil, ink, hose (cold water: washes them clean). Needle: milk, seed, breed, heat, eggs, hyper, udder, ass, balls, cock, stretch, mpreg, cocktail (two at once), delivered four ways (arm, chair, dart, collar). A stronger one holds longer, doses deeper (x2, x3) and makes more of a mess. Each kind and strength has its own lines.
+  - **Fix what a spot does**: `?trap load trap-gas musk brutal`, `?trap load trap-spray-2 slime`, `?trap load trap-injector cocktail strong`. An injector still takes plain needle words ("lactation x3").
+  - **`?traps eager on|off`**: a subject's own switch to skip the breather between traps and each spot's reset. Step off and back on and it springs again. Also a button on the Traps tab.
+  - **Danger Draught** (store, 8 ribbons, 2 hours): catchin', the thing in the water, the parasite and a crate that bites are half again as likely; traps reset half again as fast and lean strong or brutal; every trap timer (holds, gear, denial, sticky feet, the pillory) runs double. A second bottle: triple.
 
 - **Bot 0.23.0, Companion 0.14.0: real gear from the traps, and a Traps tab.**
   - **Real items, on and off.** A trap that plugs, cups, clamps, chains, ropes or funnels somebody now puts the real game item on their character and takes it off when its time is up: the pump's bung (10 min), the egg post's plug and the water's slime seal (15), the boar's plug (20), a vine stem (10), the Denial Clamp belt (30, as long as the denial), Growth Cups (30), the Winch Chain (while penned; needs a collar on), and while the trap holds them: the Feed Chute funnel, Snare Rope, milker cups, breedin' frame cuffs. The safeword takes all of it off at once.

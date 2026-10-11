@@ -77,7 +77,7 @@
   function trapHold(mn, mins, label){
     const r = rec(mn), pos = posOf(mn);
     if (!r || !pos) return;
-    r.penned = { until: Date.now() + mins*60000, X: pos.X, Y: pos.Y, name: label, by: BOTMN(), trap: true };
+    r.penned = { until: Date.now() + tmin(mn, mins)*60000, X: pos.X, Y: pos.Y, name: label, by: BOTMN(), trap: true };   // (a Danger Draught: twice as long)
     saveLedger();
   }
   function trapFree(mn){ const r = rec(mn); if (r && r.penned && r.penned.trap && !r.penned.wait){ r.penned = null; saveLedger(); } }   // (the rack and the box keep hold: 10u4)
@@ -88,6 +88,8 @@
     state.trapRuns = state.trapRuns || new Map();
     const run = { kind, i: 0, timer: null, beats: (beats = beats.slice()) };   // (a copy: ?struggle can add to it)
     const before = { pissed: (rec(mn) || {}).pissed || 0 };
+    // it never lets go before its story's told
+    { const r0 = rec(mn); if (r0 && r0.penned && r0.penned.trap) r0.penned.until = Math.max(r0.penned.until, Date.now() + (beats.length + 1)*CFG.TRAP_BEAT_S*1000); }
     const gearPlan = trapGearStart(mn, kind);   // real gear, for those who let the farm put it on them (10y-farm-gear.js)
     state.trapRuns.set(mn, run);
     const step = () => {
@@ -158,6 +160,8 @@
     audit(BOTMN(), "TRAP", mn+" "+kind+(spot ? " at "+spot : "")+(force ? " (by hand)" : ""));
     tell(mn, TRAP_KINDS[kind].icon+" You've sprung a trap, sugar: "+TRAP_KINDS[kind].what+". Your safeword stops it cold.");
     face(mn, kind === "lantern" ? "trance" : "edged", 60);
+    // gas, spray and the needle come in kinds and strengths (10z-trap-variants.js)
+    if (variantTrap(mn, kind, spot)){ saveLedger(); syncCompanions(true); return null; }
     switch (kind){
       case "injector": {
         const loaded = L.trapLoads && spot && L.trapLoads[spot];
@@ -237,9 +241,9 @@
       }
       case "clamp": {
         trapRun(mn, kind, T.beats, () => {
-          p.deniedUntil = Math.max(p.deniedUntil || 0, Date.now() + CFG.TRAP_DENY_MIN*60000);
+          p.deniedUntil = Math.max(p.deniedUntil || 0, Date.now() + tmin(mn, CFG.TRAP_DENY_MIN)*60000);
           arouse(mn, 60, 94); face(mn, "edged", 120);
-          tell(mn, "🚫 Clamped: no cummin' for "+CFG.TRAP_DENY_MIN+" minutes, sugar, and it'll hold you right at the edge the whole time.");
+          tell(mn, "🚫 Clamped: no cummin' for "+tmin(mn, CFG.TRAP_DENY_MIN)+" minutes, sugar, and it'll hold you right at the edge the whole time.");
         });
         break;
       }
@@ -292,7 +296,7 @@
     const r = rec(mn), p = prodOf(mn), T = TRAP_LINES.tentacle, v = {};
     const lower = openHole(mn, "vulva"), back = !holeBlocked(mn, "butt") && lower !== "butt" ? "butt" : null, mouth = !holeBlocked(mn, "mouth");
     v.h = lower && lower !== "mouth" ? TRAP_HOLE[lower] : "belly";
-    const beats = [T.grab, T.strip, lower && lower !== "mouth" ? T.take : T.takeShut, back ? T.second : T.wrap, mouth ? T.mouth : T.muzzle, T.swell];
+    const beats = [T.grab, T.strip, lower && lower !== "mouth" ? T.take : T.takeShut, back ? T.second : T.wrap, mouth ? T.mouth : T.muzzle].concat(T.churn ? [T.churn] : [], [T.swell]);   // (churn: 10w2-trap-lines-deeper.js)
     trapHold(mn, 6, "the water");
     trapRun(mn, "tentacle", beats, () => {
       const [lo, hi] = CFG.EGG_COUNT, hyper = hyperEggs(mn, CFG.TENTACLE_HYPER_CHANCE);
@@ -322,11 +326,11 @@
       if (!here){ state.trapAt.delete(mn); continue; }
       const fresh = !was || was.spot !== here;
       if (fresh) state.trapAt.set(mn, { spot: here, at: now });
-      if (!huntOn() && now - (r.trapAt || 0) < CFG.TRAP_COOLDOWN_MIN*60000) continue;    // one trap at a time, with a breather between (not durin' a hunt)
+      if (!huntOn() && !r.trapEager && now - (r.trapAt || 0) < CFG.TRAP_COOLDOWN_MIN*60000) continue;    // one trap at a time, with a breather between (not durin' a hunt)
       if (on){
         if (!fresh) continue;                                                             // step off and back on to spring it again
         r.spotTrapAt = r.spotTrapAt || {};
-        if (now - (r.spotTrapAt[here] || 0) < CFG.TRAP_RESET_MIN*60000*nightX().reset) continue;   // each trap takes a while to reset (half as long after dark)
+        if (!r.trapEager && now - (r.spotTrapAt[here] || 0) < CFG.TRAP_RESET_MIN*60000*nightX().reset/dangerX(mn).chance) continue;   // each trap takes a while to reset (half as long after dark)
         const kind = trapKindOf(here);
         if (!springTrap(mn, kind, here)){ r.trapAt = now; r.spotTrapAt[here] = now; saveLedger(); }
       } else {
@@ -334,7 +338,7 @@
         const st = state.trapAt.get(mn);
         if (!fresh && now - (st.rolled || 0) < CFG.TENTACLE_LINGER_MIN*60000) continue;
         st.rolled = now;
-        if (Math.random() < CFG.TENTACLE_CHANCE*nightX().water && !springTrap(mn, "tentacle", here)){ r.trapAt = now; saveLedger(); }   // (three times as hungry after dark)
+        if (Math.random() < CFG.TENTACLE_CHANCE*nightX().water*dangerX(mn).chance && !springTrap(mn, "tentacle", here)){ r.trapAt = now; saveLedger(); }   // (three times as hungry after dark)
       }
     }
     toyTick(); moreTrapTick(); trapExtrasTick(); farmGearTick(Date.now());
@@ -483,6 +487,13 @@
         r.trapsOff = a0 === "off"; if (r.trapsOff) trapStop(sender, 0); r.trapQuiet = 0; saveLedger();
         R(r.trapsOff ? "🧪 Traps paused. Not one will spring for you till you say ?traps on." : "🧪 Traps are live again, sugar. Watch your step."); return true;
       }
+      if (a0 === "eager"){
+        if (!isSubject(sender)){ R("Only a test subject has traps to hurry up, sugar."); return true; }
+        const v = String(args[1] || "").toLowerCase();
+        if (v !== "on" && v !== "off"){ R("🧪 Eager is "+(r.trapEager ? "ON" : "off")+" for you, sugar: ?traps eager on skips the breather between traps and the wait for a trap to reset. Step off a trap and back on, and it has you again."); return true; }
+        r.trapEager = v === "on"; saveLedger(); syncCompanions(true);
+        R(r.trapEager ? "🧪 Eager: ON. No breather between traps, no waitin' for one to reset. Step off and back on and it springs again. ?traps eager off when you've had enough." : "🧪 Eager: off. The traps go back to takin' their time with you."); return true;
+      }
       if (a0 === "skip" || a0 === "allow"){
         if (!isSubject(sender)){ R("Only a test subject has traps to rule out, sugar."); return true; }
         const k = String(args[1] || "").toLowerCase();
@@ -505,6 +516,11 @@
         if (!L.spots || !L.spots[spot] || !trapKindOf(spot)){ R("Which trap, sugar? ?trap load <spot> <words>, like ?trap load trap-injector lactation x3. ?trap load <spot> empty goes back to pot luck."); return true; }
         L.trapLoads = L.trapLoads || {};
         if (!words || /^(empty|none|clear|random)$/i.test(words)){ delete L.trapLoads[spot]; saveLedger(); R("💉 "+spot+" is back to pot luck."); return true; }
+        // gas, spray and needle traps take a kind and a strength: "musk brutal", "slime", "cocktail strong"
+        { const vk = trapKindOf(spot), pl = VARIANTS[vk] ? parseTrapLoad(vk, words) : null;
+          if (pl){ L.trapLoads[spot] = words.slice(0, 80).toLowerCase(); saveLedger(); audit(sender, "TRAPLOAD", spot+" "+words);
+                   R("🧪 "+spot+" is set: "+(pl.variant || "any kind")+", "+(pl.sev ? SEVERITY[pl.sev].name : "any strength")+"."); return true; }
+          if (vk === "gas" || vk === "spray"){ R("That trap takes a kind and a strength, sugar. Kinds: "+Object.keys(VARIANTS[vk]).join(", ")+". Strengths: mild, strong, brutal. Like ?trap load "+spot+" "+Object.keys(VARIANTS[vk])[2]+" strong."); return true; } }
         const tg = Array.from(tagsIn(words)).concat(sizeTagsIn(words).map(([k, d]) => k+(d > 0 ? " up" : " down")));
         if (!tg.length && !penisTagsIn(words).type && !penisTagsIn(words).knot){ R("I can't find a shot word in that, sugar. It takes the same words a crafted needle does: lactation, virility, fertility, heat inducer, egg laying, hyper pregnancy, mpreg, udder growth… and x2 to x5 on the end for a stronger dose."); return true; }
         L.trapLoads[spot] = words.slice(0, 80).toLowerCase(); saveLedger(); audit(sender, "TRAPLOAD", spot+" "+words);
@@ -529,7 +545,7 @@
           "\n?hunt start [minutes] · ?pack on|off · nest spots (?spot set nest) and ?gather · crate spots (?spot set crate)");
       else if (isSubject(sender))
         R("🧪 WHAT'S OUT THERE FOR YOU\n"+trapsList()+"\n\nThere are "+spots.length+" trap"+(spots.length === 1 ? "" : "s")+" hidden on the farm"+(water.length ? ", and somethin' lives in the water" : "")+". I'm not tellin' you where."+
-          "\n?struggle when one has you (one try) · ?traps off pauses them · ?traps skip <kind> rules one out"+((r.trapSkip || []).length ? " (you skip: "+r.trapSkip.join(", ")+")" : "")+" · your safeword stops one cold.");
+          "\n?struggle when one has you (one try) · ?traps eager on skips the waits · ?traps off pauses them · ?traps skip <kind> rules one out"+((r.trapSkip || []).length ? " (you skip: "+r.trapSkip.join(", ")+")" : "")+" · your safeword stops one cold.");
       else R("🧪 The farm's traps only spring for test subjects, sugar, and you're not one. You can walk right over 'em.");
       return true;
     }

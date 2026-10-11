@@ -54,7 +54,7 @@
       const pos = posOf(mn), r = rec(mn);
       trapRun(mn, "pillory", MORE_LINES.pillory.beats, () => {
         if (!pos) return;
-        r.benched = { until: Date.now() + CFG.TRAP_PILLORY_MIN*60000, X: pos.X, Y: pos.Y, name: "the pillory", by: BOTMN(), uses: 0, since: Date.now(), ambAt: Date.now() + 3*60000, trap: true };
+        r.benched = { until: Date.now() + tmin(mn, CFG.TRAP_PILLORY_MIN)*60000, X: pos.X, Y: pos.Y, name: "the pillory", by: BOTMN(), uses: 0, since: Date.now(), ambAt: Date.now() + 3*60000, trap: true };
         tell(mn, "🪵 Locked in the pillory for "+CFG.TRAP_PILLORY_MIN+" minutes, sugar. Anybody who walks up can ?use you, mouth, pussy or ass. Your safeword opens it.");
       });
     },
@@ -71,13 +71,13 @@
     winch(mn){
       trapRun(mn, "winch", MORE_LINES.winch.beats, () => {
         trapFree(mn);
-        const where = penIn(mn, CFG.TRAP_WINCH_MIN, BOTMN());
+        const where = penIn(mn, tmin(mn, CFG.TRAP_WINCH_MIN), BOTMN());
         emote("⛓️ "+moreLine("winch", where ? "end" : "endNone", mn), mn);
       });
     },
     glue(mn){
       trapHold(mn, 5, "the glue");
-      trapRun(mn, "glue", MORE_LINES.glue.beats, () => { rec(mn).gluedUntil = Date.now() + CFG.TRAP_STICKY_MIN*60000; arouse(mn, 10); });
+      trapRun(mn, "glue", MORE_LINES.glue.beats, () => { rec(mn).gluedUntil = Date.now() + tmin(mn, CFG.TRAP_STICKY_MIN)*60000; arouse(mn, 10); });
     },
     cups(mn){
       trapHold(mn, 3, "the growth cups");

@@ -51,7 +51,7 @@
   }
   function trapGearDone(mn, plan){
     gearOff(mn, null, "hold");
-    for (const x of (plan || [])) if (x.when === "after" && x.slot) gearOn(mn, x.slot, x.label, x.desc, typeof x.mins === "function" ? x.mins() : x.mins, "trap");
+    for (const x of (plan || [])) if (x.when === "after" && x.slot) gearOn(mn, x.slot, x.label, x.desc, tmin(mn, typeof x.mins === "function" ? x.mins() : x.mins), "trap");
   }
   function farmGearTick(now){
     for (const [k, r] of Object.entries(L.people)){

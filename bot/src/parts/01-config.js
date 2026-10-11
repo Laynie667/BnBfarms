@@ -261,7 +261,7 @@
     // the parasite lips (10v-parasite.js)
     PARASITE_CHANCE: 0.03,       // each load swallowed at the glory stalls, for somebody who said ?parasite on
     PARASITE_HOURS: 12, PARASITE_DOSE_MIN: 30, PARASITE_LATCH_S: 12,
-    PARASITE_DANGER: [0.25, 0.5],  // ...with one Danger Draught in them, and with two
+    PARASITE_PER_DANGER: 0.25,   // ...plus this for every Danger Draught in them (it stacks four deep: certain)
     PARASITE_KISS_CHANCE: 0.5,   // a mouth kiss with somebody carryin' it, for somebody who said ?parasite on
     CRAVE_HOURS: 12, CRAVE_AFTER_MIN: 45, CRAVE_LINE_MIN: 15,   // the cum cravin': how long it lingers after, how long without a load before it bites, how often it nags
     PARASITE_BELT_AFTER: 3,      // from the fourth time on the same host it comes back as a belt

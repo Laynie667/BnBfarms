@@ -203,8 +203,8 @@ const C=mn=>chars.find(c=>c.MemberNumber===mn);
   // a Danger Draught and the parasite: 3%, then one in four, then a coin toss
   { const rolls=(k)=>{ let hit=0; const R0=Math.random; let i=0; Math.random=()=>((i++)%100)/100; for(let j=0;j<100;j++){ P(500).parasite=null; P(500).parasiteNext=0; P(500).crave=null; const before=sent.length; } Math.random=R0; return 0; };
     P(500).parasiteOn=true; cfg.PARASITE_CHANCE=0.03; P(500).fx=P(500).fx||{}; delete P(500).fx.danger; const ch=()=>W.__parasiteChance(500);
-    const c0=ch(); P(500).fx.danger={at:Date.now(),until:Date.now()+3600000,n:0,x:1}; const c1=ch(); P(500).fx.danger.x=2; const c2=ch(); delete P(500).fx.danger; P(500).parasiteOn=false;
-    ok(c0===0.03 && c1===0.25 && c2===0.5, 'the parasite: 3%, 25% with a Danger Draught, 50% with two ('+[c0,c1,c2].join(', ')+')'); }
+    const c0=ch(); P(500).fx.danger={at:Date.now(),until:Date.now()+3600000,n:0,x:1}; const c1=ch(); P(500).fx.danger.x=2; const c2=ch(); P(500).fx.danger.x=4; const c4=ch(); delete P(500).fx.danger; P(500).parasiteOn=false;
+    ok(c0===0.03 && c1===0.25 && c2===0.5 && c4===1, 'the parasite: 3%, then a quarter more for every Danger Draught, certain at four ('+[c0,c1,c2,c4].join(', ')+')'); }
   // ── watersports ──
   n=sent.length; await say(500,'?watersports'); ok(/is off for you/.test(to(500,n)), 'watersports is off till they say so');
   await say(500,'?watersports on'); ok(P(500).watersports === true && W.__stateFor(500).switches.watersports === true, '?watersports on, and the Companion knows');

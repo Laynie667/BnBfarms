@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.24.4
+// @version      0.24.5
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -1828,7 +1828,7 @@
   ];
 
   // bot/src/version.js
-  var VERSION = "0.24.4";
+  var VERSION = "0.24.5";
 
   // bot-parts:farmhand-bot-parts
   (function() {
@@ -2401,8 +2401,8 @@
       PARASITE_HOURS: 12,
       PARASITE_DOSE_MIN: 30,
       PARASITE_LATCH_S: 12,
-      PARASITE_DANGER: [0.25, 0.5],
-      // ...with one Danger Draught in them, and with two
+      PARASITE_PER_DANGER: 0.25,
+      // ...plus this for every Danger Draught in them (it stacks four deep: certain)
       PARASITE_KISS_CHANCE: 0.5,
       // a mouth kiss with somebody carryin' it, for somebody who said ?parasite on
       CRAVE_HOURS: 12,
@@ -9814,7 +9814,8 @@
         kind: "punish",
         mins: 120,
         price: 8,
-        desc: "For two hours your luck runs bad: you catch half again as easy, the water and every chancy thing on the farm are half again as likely to get you, the parasite jumps to one chance in four, and whatever a trap does to you lasts twice as long. A second bottle on top: three times as long, and the parasite is a coin toss.",
+        stack: 4,
+        desc: "For two hours your luck runs bad: you catch half again as easy, the water and every chancy thing on the farm are half again as likely to get you, and whatever a trap does to you lasts twice as long (three times with a second bottle). Every bottle adds a quarter to the parasite's chance at the glory stalls: four bottles deep, it is certain.",
         limit: /\b(danger|risk)/i,
         drink: "It's black, it smokes a little, and it tastes like a dare. Somethin' in your belly goes cold and reckless.",
         seen: "%n knocks back a Danger Draught and shivers. They've just made themselves the unluckiest animal on the farm."
@@ -9933,10 +9934,11 @@
       r.fx = r.fx || {};
       const now = Date.now(), was = r.fx[id] && r.fx[id].until > now;
       const f = was ? r.fx[id] : { at: now, by: by || 0, n: 0 };
-      const stacked = was && (f.x || 1) < CFG.POTION_STACK_MAX;
+      const maxX = P.stack || CFG.POTION_STACK_MAX;
+      const stacked = was && (f.x || 1) < maxX;
       if (was) {
-        f.x = Math.min(CFG.POTION_STACK_MAX, (f.x || 1) + 1);
-        f.until = Math.min(now + P.mins * 6e4 * CFG.POTION_STACK_MAX, f.until + P.mins * 6e4);
+        f.x = Math.min(maxX, (f.x || 1) + 1);
+        f.until = Math.min(now + P.mins * 6e4 * maxX, f.until + P.mins * 6e4);
       } else f.until = now + P.mins * 6e4;
       r.fx[id] = f;
       if (!was) potionStart(mn, P, f);
@@ -13925,7 +13927,7 @@
     const PARASITE_GROWS = ["udder", "penis", "testes", "butt"];
     function parasiteChance(mn) {
       const n = potionX(mn, "danger");
-      return n >= 2 ? CFG.PARASITE_DANGER[1] : n === 1 ? CFG.PARASITE_DANGER[0] : CFG.PARASITE_CHANCE;
+      return n ? Math.min(1, n * CFG.PARASITE_PER_DANGER) : CFG.PARASITE_CHANCE;
     }
     function parasiteOn(mn) {
       const r = rec(mn);

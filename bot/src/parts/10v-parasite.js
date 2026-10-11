@@ -16,8 +16,8 @@
   */
   const PARASITE_SERUMS = ["growth", "fertility", "growth", "hyper pregnancy", "growth", "capacity"];
   const PARASITE_GROWS = ["udder", "penis", "testes", "butt"];     // tits, cock, balls, ass, round and round
-  // 3% on a swallowed glory-stall load; a Danger Draught makes it 25%, and a second bottle on top 50%
-  function parasiteChance(mn){ const n = potionX(mn, "danger"); return n >= 2 ? CFG.PARASITE_DANGER[1] : n === 1 ? CFG.PARASITE_DANGER[0] : CFG.PARASITE_CHANCE; }
+  // 3% on a swallowed glory-stall load. Every Danger Draught in them adds a quarter: 25%, 50%, 75%, and certain at four
+  function parasiteChance(mn){ const n = potionX(mn, "danger"); return n ? Math.min(1, n * CFG.PARASITE_PER_DANGER) : CFG.PARASITE_CHANCE; }
   function parasiteOn(mn){ const r = rec(mn); return !!(r && r.parasite && r.parasite.until > Date.now()); }
   function parasiteSerum(mn, i){
     let s = PARASITE_SERUMS[i % PARASITE_SERUMS.length];

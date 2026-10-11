@@ -41,7 +41,7 @@
     { id: "needy", name: "Needy Nectar", kind: "punish", mins: 30, price: 4, desc: "For 30 minutes you ache and squirm and can't stop thinkin' about it. ?beg nicely and it might let up early.",
       limit: /\b(arous|denial)/i, drink: "Sweet at first, then it blooms into a slow, maddenin' throb that won't settle.",
       seen: "%n drinks a Needy Nectar and starts squirmin' within the minute, thighs pressed tight." },
-    { id: "danger", name: "Danger Draught", kind: "punish", mins: 120, price: 8, desc: "For two hours your luck runs bad: you catch half again as easy, the water and every chancy thing on the farm are half again as likely to get you, the parasite jumps to one chance in four, and whatever a trap does to you lasts twice as long. A second bottle on top: three times as long, and the parasite is a coin toss.",
+    { id: "danger", name: "Danger Draught", kind: "punish", mins: 120, price: 8, stack: 4, desc: "For two hours your luck runs bad: you catch half again as easy, the water and every chancy thing on the farm are half again as likely to get you, and whatever a trap does to you lasts twice as long (three times with a second bottle). Every bottle adds a quarter to the parasite's chance at the glory stalls: four bottles deep, it is certain.",
       limit: /\b(danger|risk)/i, drink: "It's black, it smokes a little, and it tastes like a dare. Somethin' in your belly goes cold and reckless.",
       seen: "%n knocks back a Danger Draught and shivers. They've just made themselves the unluckiest animal on the farm." },
     { id: "hiccup", name: "Hiccup Fizz", kind: "silly", mins: 15, price: 3, desc: "Fifteen minutes of hiccups. At the worst possible moments.",
@@ -98,8 +98,9 @@
     const now = Date.now(), was = r.fx[id] && r.fx[id].until > now;
     const f = was ? r.fx[id] : { at: now, by: by || 0, n: 0 };
     // a second bottle on top of the first: stronger (where it can be) and longer, not just topped up
-    const stacked = was && (f.x || 1) < CFG.POTION_STACK_MAX;
-    if (was){ f.x = Math.min(CFG.POTION_STACK_MAX, (f.x || 1) + 1); f.until = Math.min(now + P.mins*60000*CFG.POTION_STACK_MAX, f.until + P.mins*60000); }
+    const maxX = P.stack || CFG.POTION_STACK_MAX;   // (the Danger Draught goes four deep)
+    const stacked = was && (f.x || 1) < maxX;
+    if (was){ f.x = Math.min(maxX, (f.x || 1) + 1); f.until = Math.min(now + P.mins*60000*maxX, f.until + P.mins*60000); }
     else f.until = now + P.mins*60000;
     r.fx[id] = f;
     if (!was) potionStart(mn, P, f); else potionStack(mn, P, f);

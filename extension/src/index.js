@@ -322,6 +322,21 @@ function start() {
     return next(args);
   });
 
+  // The parasite talks through its host: now and then (one line in five) somethin' it wants slips out with what you
+  // said out loud. Only while its lips are on you; never commands, whispers, emotes or out-of-character lines.
+  try {
+    mod.hookFunction("ServerSend", 4, (args, next) => {
+      try {
+        const d = args[1], s = st.panel && st.panel.s;
+        if (args[0] === "ChatRoomChat" && d && d.Type === "Chat" && typeof d.Content === "string" && s && Array.isArray(s.farmGear) &&
+            s.farmGear.some((g) => g.slot === "lips" && g.name === "Parasite Lips" && g.until > Date.now()) && !/^\s*[(\[?!./\-*]/.test(d.Content) && Math.random() < 0.2) {
+          const wants = ["...feed me.", "...more.", "...breed me.", "...need cum.", "...fill me.", "...so hungry.", "...use my mouth."];
+          args = [args[0], Object.assign({}, d, { Content: d.Content.replace(/\s+$/, "") + " " + wants[Math.floor(Math.random() * wants.length)] })];
+        }
+      } catch (e) { /* say it plain, then */ }
+      return next(args);
+    });
+  } catch (e) { console.warn("[Farmhand Companion] parasite speech unavailable:", e); }
   // Moo Juice, a farm potion: while it's in you (and only then), some of what you say out loud comes out as
   // your animal's noise. Commands, whispers, emotes and out-of-character lines are never touched.
   try {

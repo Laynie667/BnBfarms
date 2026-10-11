@@ -1051,17 +1051,19 @@
     let clutch = 0;
     // an "eggs" item or shot (or a Broodmare Tonic): any stud can leave a clutch, and far likelier
     const eggBoost = wornTags(t).has("eggs") || boosted(tp, "eggs");
-    if (!opt.second && hole !== "mouth" && makesSemen(stud) && (penisType(stud) === "draconic" || eggBoost) && rt.eggs && !tp.eggs && !limitBlocks(t, "eggs") &&
+    if (!opt.second && hole !== "mouth" && makesSemen(stud) && (penisType(stud) === "draconic" || eggBoost) && rt.eggs && !limitBlocks(t, "eggs") &&
         Math.random() < Math.min(0.95, (knot ? CFG.EGG_TIED_CHANCE : CFG.EGG_CHANCE) * (eggBoost ? CFG.EGG_BOOST_X : 1))){
       const [lo,hi] = CFG.EGG_COUNT, [dl,dh] = CFG.EGG_DAYS;
-      clutch = (lo + Math.floor(Math.random()*(hi-lo+1))) * Math.max(1, boostLevel(tp, "eggs"));   // stacked egg shots: a bigger clutch
-      tp.eggs = { n:clutch, by:stud, since:Date.now(), layAt: Date.now() + (dl + Math.random()*(dh-dl))*86400000 };
+      clutch = Math.round((lo + Math.floor(Math.random()*(hi-lo+1))) * Math.max(1, boostLevel(tp, "eggs")) * eggX(t));   // stacked egg shots, fertility, heat, Tentacle Musk: a bigger clutch
+      clutch = Math.min(CFG.EGG_MAX - (tp.eggs ? tp.eggs.n : 0), clutch);
+      if (tp.eggs) tp.eggs.n += clutch;   // clutches stack on what they're already carryin'
+      else tp.eggs = { n:clutch, by:stud, since:Date.now(), layAt: Date.now() + (dl + Math.random()*(dh-dl))*86400000 };
     }
     saveLedger(); audit(stud,"CUM",stud+"→"+t+" "+hole+" "+Math.round(load));
     if (!opt.second && Math.random() < 0.6){ const tb = tailBit(t, hole, stud); if (tb) o += " "+tb; }
     if (!opt.second && Math.random() < 0.7){ const pb = potionBit(t); if (pb) o += " "+pb; }   // a potion they're on (10m2)   // their tail, if they wear one (10r-looks.js)
     emote(o, t);   // about the one bred (the stud is named too, so both get it)
-    if (clutch) emote("🥚 Deep inside "+plainName(t)+", something takes hold: "+plainName(stud)+"'s draconic seed has left a clutch of "+clutch+" eggs growin' in there. They'll be layin' in a few days.");
+    if (clutch > 0) emote("🥚 Deep inside "+plainName(t)+", something takes hold: "+plainName(stud)+"'s draconic seed has left a clutch of "+clutch+" eggs growin' in there. They'll be layin' in a few days.");
     if (sc0) sc0.lastCum = Date.now();
     // the knot ties 'em: leashed together till it goes down
     if (knot && !opt.second){

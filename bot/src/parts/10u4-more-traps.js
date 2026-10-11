@@ -45,7 +45,9 @@
     trough:   mn => rec(mn).watersports ? null : "they haven't said ?watersports on",
     wall:     mn => limitBlocks(mn, "breed") ? "their limits rule it out" : null,
   };
-  const BRAND_WORDS = ["TRAPPED", "FREE USE", "BREED ME", "FARM PROPERTY", "TEST SUBJECT", "USE ME", "CUM HERE", "GOOD ANIMAL", "MILK ME", "KNOT ME", "SOW", "BROODMARE", "HOLES FOR HIRE", "CAUGHT AGAIN"];
+  const BRAND_WORDS = ["CUMDUMP", "BREEDING STOCK", "THREE HOLES", "FUCK ME", "KNOT SLUT", "FARM WHORE", "FILL ME UP", "EGG SACK", "COCK SLEEVE", "FREE CUNT", "USE ALL HOLES", "BRED DAILY", "MILK AND BREED",
+    "ANYBODY'S", "WET AND READY", "PUBLIC USE", "STUD'S TOY", "BREED THIS ASS", "SWALLOWS", "RUT ME",
+    "TRAPPED", "FREE USE", "BREED ME", "FARM PROPERTY", "TEST SUBJECT", "USE ME", "CUM HERE", "GOOD ANIMAL", "MILK ME", "KNOT ME", "SOW", "BROODMARE", "HOLES FOR HIRE", "CAUGHT AGAIN"];
   const MIRROR_LINES = ["i am stock and stock gets used", "my holes belong to the farm", "good animals do not think", "i was made to be bred", "i walked into it because i wanted it", "i am a test subject and i love my traps"];
   const moreLine = (kind, key, mn, v) => tFill(pickFresh("trap:"+kind+":"+key, MORE_LINES[kind][key]), mn, v);
 

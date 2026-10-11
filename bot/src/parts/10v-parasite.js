@@ -17,16 +17,21 @@
   const PARASITE_SERUMS = ["growth", "fertility", "growth", "hyper pregnancy", "growth", "capacity"];
   const PARASITE_GROWS = ["udder", "penis", "testes", "butt"];     // tits, cock, balls, ass, round and round
   // 3% on a swallowed glory-stall load. Every Danger Draught in them adds a quarter: 25%, 50%, 75%, and certain at four
-  function parasiteChance(mn){ const n = potionX(mn, "danger"); return n ? Math.min(1, n * CFG.PARASITE_PER_DANGER) : CFG.PARASITE_CHANCE; }
+  // Tentacle Musk counts the same as a Danger Draught here, bottle for bottle (it's the same kind of thing that's smellin' them)
+  function parasiteChance(mn){ const n = potionX(mn, "danger") + potionX(mn, "tentaclemusk"); return n ? Math.min(1, n * CFG.PARASITE_PER_DANGER) : CFG.PARASITE_CHANCE; }
   function parasiteOn(mn){ const r = rec(mn); return !!(r && r.parasite && r.parasite.until > Date.now()); }
   function parasiteSerum(mn, i){
-    let s = PARASITE_SERUMS[i % PARASITE_SERUMS.length];
+    const list = strainOf(rec(mn).parasite).serums;   // each strain has its own brew (10v2-parasite-more.js)
+    let s = list[i % list.length];
     if (s === "growth"){
       const parts = PARASITE_GROWS.filter(k => bodyParts(mn).includes(k) && CFG.SIZES[k]), g = rec(mn).parasite;
       const part = parts.length ? parts[(g.grew = (g.grew || 0) + 1) % parts.length] : null;
       s = part === "udder" ? "udder growth" : part === "testes" ? "balls growth" : part === "penis" ? "cock growth" : part === "butt" ? "ass growth" : "fertility";
     }
     if (/fertil|hyper/.test(s) && limitBlocks(mn, "breed")) s = "capacity";
+    if (/lactation|udder/.test(s) && !makesMilk(mn)) s = "ass growth";
+    if (/egg/.test(s) && limitBlocks(mn, "eggs")) s = "capacity";
+    if (/heat/.test(s) && limitBlocks(mn, "heat")) s = "capacity";
     return s;
   }
   const paraLine = (key, mn, v) => tFill(pickFresh("para:"+key, PARASITE_LINES[key]), mn, v);
@@ -43,6 +48,7 @@
     // after three times on the same host it knows them: it comes back as a belt, and feeds from the other end
     const belt = r.parasiteN > CFG.PARASITE_BELT_AFTER;
     r.parasite = { since: now, until: now + CFG.PARASITE_HOURS*3600000, next: now + CFG.PARASITE_DOSE_MIN*60000, n: 0, fed: 0, form: belt ? "belt" : "lips" };
+    parasiteBorn(mn);   // its strain, its first urge (10v2-parasite-more.js)
     if (belt){
       saveLedger(); audit(CFG.BOT_MEMBER, "PARASITE", mn+" latched as a belt"+(how ? " ("+how+")" : ""));
       emote("👄 "+paraLine("latchBelt", mn), mn);
@@ -58,9 +64,11 @@
     syncCompanions(true);
   }
   function parasiteOff(mn, how){
-    const r = rec(mn); if (!r || !r.parasite) return false;
-    const was = r.parasite.until > Date.now(), fed = r.parasite.fed || 0, n = r.parasite.n || 0, wasBelt = r.parasite.form === "belt";
-    r.parasite = null; r.parasiteNext = Date.now() + (how === "safe" ? 7 : 1)*86400000;
+    const r = rec(mn);
+    if (r && how === "safe" && r.parasiteSeed){ r.parasiteSeed = 0; saveLedger(); }   // the safeword clears a seed it left, too
+    if (!r || !r.parasite) return false;
+    const was = r.parasite.until > Date.now(), fed = r.parasite.fed || 0, n = r.parasite.n || 0, wasBelt = r.parasite.form === "belt", g0 = r.parasite;
+    r.parasite = null; parasiteGone(mn, g0, how || "done"); r.parasiteNext = Date.now() + (how === "safe" ? 7 : 1)*86400000;
     r.crave = how === "safe" ? null : { until: Date.now() + CFG.CRAVE_HOURS*3600000, ate: Date.now(), told: Date.now() };   // the cravin' it leaves behind
     saveLedger(); audit(CFG.BOT_MEMBER, "PARASITE", mn+" off ("+(how || "done")+")");
     if (how === "safe" || !was && how !== "done") return true;
@@ -76,14 +84,14 @@
       const r = rec(mn), p = prodOf(mn); if (!r || !p) return;
       // as a belt it drinks from the other end
       if (hole !== "mouth"){
-        if (!parasiteOn(mn) || r.parasite.form !== "belt" || (hole !== "vulva" && hole !== "butt")) return;
+        if (!parasiteOn(mn) || !parasiteParts(r.parasite).root || (hole !== "vulva" && hole !== "butt")) return;   // (once it has a root down there)
         p.held[hole] = Math.max(0, (p.held[hole] || 0) - mlIn);
         r.parasite.fed = (r.parasite.fed || 0) + 1; r.parasite.ate = Date.now();
         const xb = mlIn >= CFG.PARASITE_BIG_ML[1] ? 3 : mlIn >= CFG.PARASITE_BIG_ML[0] ? 2 : 1;
         parasiteDose(mn, xb, paraLine("convertBelt", mn, { ml: ml(mlIn), h: hole === "butt" ? "ass" : "pussy" }));
         return;
       }
-      if (parasiteOn(mn) && r.parasite.form === "belt") return;   // the belt leaves their mouth alone
+      if (parasiteOn(mn) && !parasiteParts(r.parasite).lips) return;   // no lips on it (yet): their mouth is their own
       // a load swallowed settles the cravin' for a while
       if (craving(mn)){
         const c = parasiteOn(mn) ? r.parasite : r.crave;
@@ -95,6 +103,7 @@
         p.held.mouth = Math.max(0, (p.held.mouth || 0) - mlIn);
         r.parasite.fed = (r.parasite.fed || 0) + 1;
         const x = mlIn >= CFG.PARASITE_BIG_ML[1] ? 3 : mlIn >= CFG.PARASITE_BIG_ML[0] ? 2 : 1;
+        parasiteUrgeDone(mn, "swallow");
         parasiteDose(mn, x, paraLine("convert", mn, { ml: ml(mlIn) }));
         return;
       }
@@ -120,6 +129,7 @@
     try {
       if (!/kiss/i.test(act) || !/^ItemMouth/.test(String(focus || "")) || !src || !tgt || src === tgt) return;
       const from = parasiteOn(src) ? src : parasiteOn(tgt) ? tgt : null, to = from === src ? tgt : src;
+      if (from) parasiteUrgeDone(from, "kiss");   // it wanted a kiss
       if (!from || parasiteOn(to)) return;
       const r = rec(to);
       if (!r || !r.parasiteOn || (r.parasiteNext || 0) > Date.now() || /\bparasit/i.test(r.limits || "")) return;
@@ -130,6 +140,7 @@
   }
   function parasiteTick(){
     const now = Date.now();
+    try { parasiteWorldTick(now); } catch(e){ warn("parasite world:", e); }   // a seed growin' back, a hatchling at the nest
     for (const [k, r] of Object.entries(L.people)){
       if (r.crave && r.crave.until <= now){ r.crave = null; saveLedger(); if (charFor(parseInt(k, 10))) tell(parseInt(k, 10), "👄 The cravin' the parasite left in you has finally let go, sugar."); }
       if (r.parasite || r.crave) craveTick(parseInt(k, 10), r, now);
@@ -138,9 +149,12 @@
       if (!r.parasite) continue;
       const mn = parseInt(k, 10);
       if (r.parasite.until <= now){ parasiteOff(mn, "done"); continue; }
-      if (!charFor(mn) || now < r.parasite.next) continue;
-      r.parasite.next = now + CFG.PARASITE_DOSE_MIN*60000;
-      parasiteDose(mn, 1, paraLine(r.parasite.form === "belt" ? "doseBelt" : "dose", mn));
+      if (!charFor(mn)) continue;
+      try { parasiteMoreTick(mn, r, now); } catch(e){ warn("parasite more:", e); }   // bloomin', layin', wantin' (10v2)
+      if (!r.parasite || now < r.parasite.next) continue;
+      r.parasite.next = now + strainOf(r.parasite).every*60000/(potionOn(mn, "tentaclemusk") ? 2 : 1);   // Tentacle Musk: it feeds twice as often
+      parasiteDose(mn, 1, paraLine(parasiteParts(r.parasite).lips ? "dose" : "doseBelt", mn));
+      try { parasiteAfterDose(mn); } catch(e){ warn("parasite drink:", e); }
     }
   }
   function parasiteCommand(cmd, sender, args, R){
@@ -161,7 +175,7 @@
       parasiteLatch(t, "given"); R("👄 It's on "+plainName(t)+" for "+CFG.PARASITE_HOURS+" hours."); return true;
     }
     if (!a0){
-      if (parasiteOn(sender)){ const m = Math.ceil((r.parasite.until - Date.now())/60000); R("👄 It's on you, sugar, for "+(m >= 90 ? Math.round(m/60)+" more hours" : m+" more minutes")+". Doses so far: "+(r.parasite.n || 0)+". Loads it's drunk through you: "+(r.parasite.fed || 0)+". Your safeword takes it off."); }
+      if (parasiteOn(sender)){ const m = Math.ceil((r.parasite.until - Date.now())/60000); R("👄 It's on you, sugar (a "+strainOf(r.parasite).name+"), for "+(m >= 90 ? Math.round(m/60)+" more hours" : m+" more minutes")+". Doses so far: "+(r.parasite.n || 0)+". Loads it's drunk through you: "+(r.parasite.fed || 0)+". Your safeword takes it off."); }
       else R(switchStatus("parasite", !!r.parasiteOn)+(r.parasiteOn ? " Swallow at the glory stalls and, once in a long while, somethin' comes through with the cock." : ""));
       return true;
     }

@@ -6,30 +6,57 @@
      moment it isn't (time up, the trap's done, the safeword), and a piece pulled off early is put back.
      Trap gear only goes on somebody who switched "Farm can put real gear on me" on in their Companion's Toggles.
      The parasite needs no second switch: ?parasite on is the say-so.
-     Slots (the Companion picks the game item): plug · dildo · belt · cups · leash · funnel · ropeArms · ropeFeet · lips
+     Slots (the Companion picks the game item): plug · dildo · belt · cups · leash · funnel · arms · legs · ropeFeet · lips
+     A piece can name the game items it would rather be ("Tentacles", "Slime") and a colour.
   */
   // what each trap puts on. when: "hold" = while the trap has them · "after" = when it's done with them, for mins
   // slot may be a function of the member (which hole it used)
   const stopperFor = (mn, first) => { const h = openHole(mn, first); return h === "vulva" ? "dildo" : h === "butt" ? "plug" : null; };
+  // items: game items to try first for this piece (the Companion falls back to the slot's usual one) · color: its colour
+  const SLIME = "#5FAE3A", FLESH = "#C9577A";
   const TRAP_GEAR = {
-    pump:     [{ when: "after", slot: mn => stopperFor(mn, "butt"), label: "Pump Bung", desc: "A fat rubber bung left in by the pump trap, to keep it all in.", mins: 10 }],
-    eggs:     [{ when: "after", slot: mn => stopperFor(mn, "vulva"), label: "Egg Post Plug", desc: "The egg post's parting gift: a plug to hold the clutch in while it settles.", mins: 15 }],
-    tentacle: [{ when: "after", slot: mn => stopperFor(mn, "vulva"), label: "Slime Seal", desc: "A thick knot of something from the water, set hard, sealing the eggs inside.", mins: 15 }],
-    boar:     [{ when: "after", slot: mn => stopperFor(mn, "vulva"), label: "Boar's Plug", desc: "The waxy plug a boar leaves behind so not a drop gets out.", mins: 20 }],
-    vines:    [{ when: "after", slot: mn => stopperFor(mn, "vulva"), label: "Seed Pod Stem", desc: "A cut length of vine, still rooted in them, keeping the pods where it planted them.", mins: 10 }],
-    clamp:    [{ when: "after", slot: "belt", label: "Denial Clamp", desc: "The trap's clamp, locked on over everything worth touching. It lets go when the denial's up.", mins: () => CFG.TRAP_DENY_MIN }],
-    cups:     [{ when: "after", slot: "cups", label: "Growth Cups", desc: "Two wide glass cups pulling at the teats. They stay on till they've finished the job.", mins: 30 }],
-    milker:   [{ when: "hold", slot: "cups", label: "Trap Milker", desc: "The milker trap's cups, latched on and pulling." }],
-    winch:    [{ when: "after", slot: "leash", label: "Winch Chain", desc: "The chain that walked them to the pen.", mins: () => CFG.TRAP_WINCH_MIN }],
-    chute:    [{ when: "hold", slot: "funnel", label: "Feed Chute", desc: "The feed trap's funnel, strapped in." }],
-    snare:    [{ when: "hold", slot: "ropeArms", label: "Snare Rope", desc: "The snare's rope, cinched tight." }, { when: "hold", slot: "ropeFeet", label: "Snare Rope", desc: "The snare's rope, cinched tight." }],
-    breeder:  [{ when: "hold", slot: "ropeArms", label: "Breedin' Frame Cuffs", desc: "The breeding frame's cuffs." }],
-    kennel:   [{ when: "hold", slot: "leash", label: "Kennel Lead", desc: "Clipped to the ring at the back of the kennel." }],
+    pump:     [{ when: "after", slot: mn => stopperFor(mn, "butt"), label: "Pump Bung", mins: 10,
+                 desc: "A fat black rubber bung, swollen tight inside, corking a belly pumped round and sloshing. It doesn't come out until every drop has soaked in." }],
+    eggs:     [{ when: "after", slot: mn => stopperFor(mn, "vulva"), label: "Egg Post Plug", mins: 15,
+                 desc: "The egg post's parting gift: a thick ridged plug seated deep behind a fresh clutch, holding every egg in a stretched, slick hole while they settle." }],
+    tentacle: [{ when: "hold", slot: "arms", label: "The Water's Grip", items: ["Tentacles"], color: FLESH,
+                 desc: "Thick, wet, suckered arms wound tight round wrists and elbows, holding them spread while the rest of it breeds them. They squeeze in time." },
+               { when: "hold", slot: "legs", label: "The Water's Coils", items: ["Tentacles"], color: FLESH,
+                 desc: "Slick coils round both thighs, hauling them wide and keeping them there. There is no closing these legs until it has finished laying." },
+               { when: "after", slot: mn => stopperFor(mn, "vulva"), label: "Slime Seal", mins: 15, items: ["Tentacles", "Slime"], color: FLESH,
+                 desc: "The thing left the tip of itself behind: a fat knot of living flesh buried to the root, pulsing, sealing a womb packed full of its eggs." }],
+    boar:     [{ when: "after", slot: mn => stopperFor(mn, "vulva"), label: "Boar's Plug", mins: 20,
+                 desc: "What a boar leaves so nothing leaks: a hard waxy plug as thick as a wrist, set deep, with a bellyful of hog seed sloshing behind it." }],
+    vines:    [{ when: "after", slot: mn => stopperFor(mn, "vulva"), label: "Seed Pod Stem", mins: 10, items: ["Tentacles"], color: "#3E8A3A",
+                 desc: "A cut length of thick green vine, still rooted inside and dripping sap, holding its seed pods where it planted them." }],
+    slime:    [{ when: "after", slot: "arms", label: "Slime Sleeves", mins: () => CFG.TRAP_STICKY_MIN, items: ["Slime"], color: SLIME,
+                 desc: "Thick green slime still clinging from fingers to shoulders, warm and tacky, stringing between arm and ribs with every move." },
+               { when: "after", slot: "legs", label: "Slime Stockings", mins: () => CFG.TRAP_STICKY_MIN, items: ["Slime"], color: SLIME,
+                 desc: "Slime coating both legs to the hip, oozing down the thighs and sucking at the floor. Whatever it crawled into is still in there too." }],
+    clamp:    [{ when: "after", slot: "belt", label: "Denial Clamp", mins: () => CFG.TRAP_DENY_MIN,
+                 desc: "Cold steel locked over everything worth touching. Inside, something soft licks and hums and stops, over and over. No cumming until it lets go." }],
+    cups:     [{ when: "after", slot: "cups", label: "Growth Cups", mins: 30,
+                 desc: "Two wide glass bells sucking hard at swollen teats, drawing them long and dark and fat. They stay on until these tits are a size bigger." }],
+    milker:   [{ when: "hold", slot: "cups", label: "Trap Milker", desc: "Steel milking cups latched on with a greedy pull, nipples stretched down the glass, pumping this animal dry whether there's anything left or not." }],
+    winch:    [{ when: "after", slot: "leash", label: "Winch Chain", mins: () => CFG.TRAP_WINCH_MIN,
+                 desc: "The chain that walked them across the yard on their toes, in front of everybody, like a heifer going to market. It's still clipped on." }],
+    chute:    [{ when: "hold", slot: "funnel", label: "Feed Chute", desc: "A wide rubber funnel strapped between the teeth, throat held open, with a hopper of warm sweet mash pouring down until this belly is tight as a drum." }],
+    snare:    [{ when: "hold", slot: "arms", label: "Snare Rope", desc: "Rough rope cinched round both wrists and hauled up overhead, stringing them out helpless while the little machine teases." },
+               { when: "hold", slot: "ropeFeet", label: "Snare Hobble", desc: "Rope round both ankles, pulling them wide apart. Everything between them is on show and out of their own reach." }],
+    breeder:  [{ when: "hold", slot: "arms", label: "Breedin' Frame Cuffs", desc: "Padded steel cuffs locking both wrists to the breeding frame: bent over, hips up, held still for the machine like a mare for the stud." }],
+    kennel:   [{ when: "hold", slot: "leash", label: "Kennel Lead", desc: "A short lead clipped to the ring at the back of the kennel. Long enough to get on all fours. Not long enough to reach the door." }],
+    wolves:   [{ when: "after", slot: mn => stopperFor(mn, "vulva"), label: "Pack's Knot", mins: 10, color: "#B3323A",
+                 desc: "The last wolf's knot, still swollen fat inside and throbbing, tying them to a bellyful of the whole pack's seed until it finally goes down." }],
+    stallion: [{ when: "after", slot: mn => stopperFor(mn, "vulva"), label: "Stud's Stopper", mins: 10,
+                 desc: "A stable hand's rubber stopper, shoved in after the stallion pulled out, to keep a mare's worth of horse cum from pouring down their legs." }],
+    pillory:  [{ when: "after", slot: "ropeFeet", label: "Pillory Spreader", mins: () => CFG.TRAP_PILLORY_MIN,
+                 desc: "A bar ratcheted between the ankles so the legs can't close while they're bent in the pillory. Whoever walks up gets whichever hole they like." }],
   };
-  function gearOn(mn, slot, label, desc, mins, src){
+  function gearOn(mn, slot, label, desc, mins, src, x){
     const r = rec(mn); if (!r || !slot) return false;
     r.gear = r.gear || {};
     r.gear[slot] = { label: String(label).slice(0, 28), desc: String(desc || "").slice(0, 180), until: Date.now() + Math.max(0.5, mins || 5)*60000, src: src || "trap" };
+    if (x && x.items) r.gear[slot].items = x.items.slice(0, 4); if (x && x.color) r.gear[slot].color = x.color;
     saveLedger(); syncCompanions(true);
     return true;
   }
@@ -46,12 +73,12 @@
     const r = rec(mn), holdMin = r.penned && r.penned.trap ? Math.max(1, (r.penned.until - Date.now())/60000) : 3;
     // which slot each piece uses is settled now, before anything's on them
     const plan = g.map(x => Object.assign({}, x, { slot: typeof x.slot === "function" ? x.slot(mn) : x.slot }));
-    for (const x of plan) if (x.when === "hold" && x.slot) gearOn(mn, x.slot, x.label, x.desc, holdMin + 0.5, "hold");
+    for (const x of plan) if (x.when === "hold" && x.slot) gearOn(mn, x.slot, x.label, x.desc, holdMin + 0.5, "hold", x);
     return plan;
   }
   function trapGearDone(mn, plan){
     gearOff(mn, null, "hold");
-    for (const x of (plan || [])) if (x.when === "after" && x.slot) gearOn(mn, x.slot, x.label, x.desc, tmin(mn, typeof x.mins === "function" ? x.mins() : x.mins), "trap");
+    for (const x of (plan || [])) if (x.when === "after" && x.slot) gearOn(mn, x.slot, x.label, x.desc, tmin(mn, typeof x.mins === "function" ? x.mins() : x.mins), "trap", x);
   }
   function farmGearTick(now){
     for (const [k, r] of Object.entries(L.people)){
@@ -65,13 +92,8 @@
   // what their Companion should have on them right now
   function farmGearFor(mn){
     const r = rec(mn), now = Date.now(), out = [];
-    for (const [slot, g] of Object.entries((r && r.gear) || {})) if (g.until > now) out.push({ slot, name: g.label, desc: g.desc, until: Math.ceil(g.until/60000)*60000 });
-    if (parasiteOn(mn)){
-      const belt = r.parasite.form === "belt";
-      out.push({ slot: belt ? "belt" : "lips", name: belt ? "Parasite Belt" : "Parasite Lips", always: true, color: "#E0607F", until: r.parasite.until,
-        desc: belt ? "A belt of living flesh closed round the hips, with a root up inside. It feeds its host serum and drinks every load they take."
-                   : "A pair of fat, living lips sealed over the mouth, with a tentacle down the throat. It feeds its host serum and drinks every load they swallow." });
-    }
+    for (const [slot, g] of Object.entries((r && r.gear) || {})) if (g.until > now) out.push(Object.assign({ slot, name: g.label, desc: g.desc, until: Math.ceil(g.until/60000)*60000 }, g.items ? { items: g.items } : {}, g.color ? { color: g.color } : {}));
+    if (parasiteOn(mn)) for (const g of parasiteGear(mn)) out.push(g);   // lips, suckers, root: whatever has bloomed (10v2-parasite-more.js)
     return out;
   }
   // the proprietors' own card: who's signed up, what's set, what's runnin'

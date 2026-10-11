@@ -251,10 +251,14 @@
     STRUGGLE_CHANCE: 0.35, FREE_CHANCE: 0.5,   // ?struggle and ?free
     HUNT_MIN: 20, HUNT_RIBBONS: 3, PACK_MOVE_MIN: 60, CRATE_RESET_MIN: 30, SMELL_MIN: 10,
     NEST_MIN_H: 1, EGGS_PER_RIBBON: 4,
+    TRAP_WRITE_CHANCE: 0.6,      // how often a trap writes on them what had them (for those who let the farm mark them)
     TRAP_PILLORY_MIN: 10, TRAP_WINCH_MIN: 5, TRAP_STICKY_MIN: 20, TRAP_WAIT_MIN: 6,   // the pillory · the pen after the winch · slow feet after glue or slime · how long the tickle rack and mirror box hold out
     TRAP_OVERFULL: 1.3,          // traps can fill a belly this far past capacity (1.5 would pin them)
     TENTACLE_CHANCE: 0.04,       // each time a subject wades into a water spot (and every TENTACLE_LINGER_MIN they stay)
     TENTACLE_LINGER_MIN: 5, TENTACLE_HYPER_CHANCE: 0.25,
+    MUSK_WATER_X: 20,            // Tentacle Musk: the thing in the water is this many times likelier to come
+    EGG_MAX: 150,                // the most eggs one body can carry (clutches stack)
+    GATHER_MAX_RIBBONS: 15,      // the most one layer is paid at one gatherin'
     AUTOINJECT_MIN: 30, OVI_MIN: 45, AUTOFEED_MIN: 10, AUTOFEED_ML: 150, TOYCOCK_MIN: 12, TOYCOCK_STRETCH_EVERY: 10,
     SLOW_MAX: 2.6,               // the most a full belly, a litter and a clutch can slow somebody's walkin'
     PISS_COLOR: "#D9C13A",
@@ -264,6 +268,9 @@
     PARASITE_PER_DANGER: 0.25,   // ...plus this for every Danger Draught in them (it stacks four deep: certain)
     PARASITE_KISS_CHANCE: 0.5,   // a mouth kiss with somebody carryin' it, for somebody who said ?parasite on
     CRAVE_HOURS: 12, CRAVE_AFTER_MIN: 45, CRAVE_LINE_MIN: 15,   // the cum cravin': how long it lingers after, how long without a load before it bites, how often it nags
+    PARASITE_BLOOM_H: [4, 8],    // hours in: suckers on the teats, then a root below (the belt form blooms upward)
+    PARASITE_SEED_CHANCE: 0.15,  // when it drops off by itself: the chance it grows back from inside within a day
+    PARASITE_URGE_PUNISH_MIN: 60,
     PARASITE_BELT_AFTER: 3,      // from the fourth time on the same host it comes back as a belt
     PARASITE_BIG_ML: [80, 200],  // a swallowed load this big counts double / triple when it's turned to serum
     STACK_MAX: 5,          // shots stack: a second dose (or an "x3" tag on the needle) raises the level, up to this

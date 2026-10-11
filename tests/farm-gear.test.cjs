@@ -11,7 +11,7 @@ const wait=ms=>new Promise(r=>setTimeout(r,ms));
   await esbuild.build({ entryPoints:[path.join(__dirname,'../extension/src/marks.js')], bundle:true, format:'cjs', outfile:tmp, logLevel:'silent' });
   const ASSETS={ ItemButt:['BlackButtPlug','AnalBeads'], ItemVulva:['VibratingDildo'], ItemPelvis:['PolishedChastityBelt'], ItemNipples:['LactationPump'],
                  ItemNeckRestraints:['CollarChainLong'], ItemNeck:['LeatherCollar'], ItemMouth:['FunnelGag','LipGag','BallGag'], ItemMouth2:['FunnelGag','LipGag'], ItemMouth3:['LipGag'],
-                 ItemArms:['HempRope'], ItemFeet:['HempRope'], Cloth:['Shirt'] };
+                 ItemArms:['HempRope','Tentacles'], ItemLegs:['HempRope'], ItemFeet:['HempRope'], Cloth:['Shirt'] };
   const mk=(Group,Name,extra)=>Object.assign({ Asset:{ Name, Group:{ Name:Group } }, Property:{} }, extra||{});
   const P={ MemberNumber:500, Name:'Moo', AssetFamily:'Female3DCG', Appearance:[mk('Cloth','Shirt'), mk('ItemMouth','BallGag',{ Craft:{ Name:'Her own gag', Description:'mine' } })] };
   let commits=0;
@@ -52,6 +52,11 @@ const wait=ms=>new Promise(r=>setTimeout(r,ms));
   d=syncFarmGear([], true); ok(!has('ItemVulva') && d.off.join()==='Slime Seal', 'a farm piece is known by its name even with its tag gone: it comes off');
   P.Appearance.push(mk('ItemVulva','VibratingDildo',{ Craft:{ Name:'Slime Seal', Description:'somebody else made this', MemberNumber:999 } }));
   d=syncFarmGear([], true); ok(has('ItemVulva'), '...but somebody else\x27s item that only shares the name is left alone'); P.Appearance=P.Appearance.filter(it=>it.Asset.Group.Name!=='ItemVulva');
+  // a piece can ask for a better-fittin' item and a colour; the usual one is used where this game has not got it
+  d=syncFarmGear([{ slot:'arms', name:"The Water's Grip", desc:'x', items:['Tentacles'], color:'#C9577A', until:far },{ slot:'legs', name:"The Water's Coils", desc:'x', items:['Tentacles'], until:far }], true);
+  { const a=P.Appearance.find(it=>it.Asset.Group.Name==='ItemArms'), l=P.Appearance.find(it=>it.Asset.Group.Name==='ItemLegs');
+    ok(a && a.Asset.Name==='Tentacles' && a.Color==='#C9577A' && l && l.Asset.Name==='HempRope', 'a piece wears the item it asked for where the game has it (tentacles on the arms), the usual one where it has not (legs)'); }
+  d=syncFarmGear([], true); ok(!has('ItemArms') && !has('ItemLegs'), '...and both come off again');
   // a spot that's taken, a chain with no collar, a locked farm piece
   P.Appearance.push(mk('ItemButt','AnalBeads',{ Craft:{ Name:'Her beads', Description:'' } }));
   d=syncFarmGear([plug,{ slot:'leash', name:'Winch Chain', desc:'x', until:far }], true);
@@ -94,7 +99,7 @@ const wait=ms=>new Promise(r=>setTimeout(r,ms));
   ok(/belt:Denial Clamp/.test(gearOf(500)), 'the clamp trap leaves a real belt on the list ('+gearOf(500)+')');
   R(500).gear.belt.until=Date.now()-1; W.__trapTick(); ok(!/belt/.test(gearOf(500)), '...and it comes off the list when its time is up');
   R(500).trapAt=0; cfg.TRAP_BEAT_S=5; await say(221397,'?trap spring Moo snare'); await wait(300);
-  ok(/ropeArms:Snare Rope/.test(gearOf(500)) && /ropeFeet/.test(gearOf(500)), 'the snare ropes them for as long as it holds them');
+  ok(/arms:Snare Rope/.test(gearOf(500)) && /ropeFeet:Snare Hobble/.test(gearOf(500)), 'the snare ropes them for as long as it holds them');
   await say(500,'?safeword',2500); ok(!gearOf(500), 'the safeword takes every piece of trap gear off the list');
   cfg.TRAP_BEAT_S=0.15; R(500).trapQuiet=0; R(500).trapAt=0; R(500).penned=null;
   await say(221397,'?trap spring Moo pump'); await wait(1800);
@@ -102,6 +107,10 @@ const wait=ms=>new Promise(r=>setTimeout(r,ms));
   R(500).parasiteOn=true; R(500).parasite={since:Date.now(),until:Date.now()+3600000,next:Date.now()+999999,n:0,fed:0,form:'lips'};
   ok(/lips:Parasite Lips/.test(gearOf(500)) && (W.__stateFor(500).farmGear.find(g=>g.slot==='lips')||{}).always===true, 'the parasite is on the same list, marked as needin\' no second switch');
   await say(221397,'?purge Moo'); ok(!/lips/.test(gearOf(500)), '?purge takes it off the list');
+  R(500).trapAt=0; R(500).penned=null; R(500).gear=null; cfg.TRAP_BEAT_S=5; await say(221397,'?trap spring Moo tentacle'); await wait(300);
+  { const fg=W.__stateFor(500).farmGear||[]; ok(fg.some(g=>g.slot==='arms' && g.items && g.items[0]==='Tentacles' && g.desc.length>100) && fg.some(g=>g.slot==='legs'), 'the thing in the water holds them in real tentacles, with a proper description'); }
+  await say(500,'?safeword',2500); cfg.TRAP_BEAT_S=0.15; R(500).trapQuiet=0;
+  await say(500,'?eager on'); ok(R(500).trapEager===true && W.__stateFor(500).switches.eager===true, '?eager on: the no-cooldown switch, and it shows in Toggles');
   ok(W.__stateFor(221397).trapAdmin && W.__stateFor(221397).trapAdmin.subjects.some(x=>x.mn===500) && W.__stateFor(500).trapCard, 'a proprietor gets the subjects card, a subject gets the trap card');
   const errs=warns.filter(w=>/trap|gear|command failed/i.test(w)); ok(!errs.length, 'no errors '+errs.join(' | '));
   out(fails ? fails+' FAILED' : 'ALL PASSED'); process.exit(fails?1:0);

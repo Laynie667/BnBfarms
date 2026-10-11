@@ -76,6 +76,7 @@
        OrgasmResist0-9              they held it back: an edge
        OrgasmFailTimeout/Surrender  ruined: counts as an edge too, with a sad dribble  */
   function onClimax(mn, content){
+    try { parasiteClimax(mn); } catch(e){ warn("parasite climax:", e); }   // a Tyrant eats it (10v2-parasite-more.js)
     const r = rec(mn), p = r && prodOf(mn);
     if (!p || limitBlocks(mn)) return;
     const now = Date.now(), d = dayKey(), n = plainName(mn);

@@ -59,7 +59,7 @@ const beepsTo=(k,mn)=>sent.slice(k).filter(([e,d])=>e==='AccountBeep'&&d.MemberN
   ok(lines.some(c=>/\d+ mL/.test(c)), 'the finish says where and how much');
   ok(!sent.slice(k).some(([e,d])=>d&&d.Type==='Emote'), 'nothing went to the public room');
   ok(total()>=1, 'the finish counted on Moo ('+total()+')');   // a scene can hold more than one finish (seconds, a second stranger)
-  const p=L().people[500].prod; ok(p && ((p.held.mouth+p.held.vulva+p.held.butt)>0 || lines.some(c=>/pulls out and paints/.test(c))), 'the cum is tracked in what Moo is holding (unless it was pulled out over her)');
+  const p=L().people[500].prod; ok(p && ((p.held.mouth+p.held.vulva+p.held.butt)>0 || lines.some(c=>/pulls out and paints/.test(c)) || ((d().people['500']||{}).splatters||0)>0), 'the cum is tracked in what Moo is holding (unless it was pulled out over her)');
   ok(L().staffScore && L().staffScore['221397'] && L().staffScore['221397'].pts>=1, "Moo's herd leader got a staff point");
   ok(lines.some(c=>/Moo/.test(c)) && !lines.some(c=>/Hana|Laynie/.test(c)), 'the scene names Moo and never the stranger');
 

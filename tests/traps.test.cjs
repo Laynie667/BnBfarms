@@ -185,14 +185,23 @@ const C=mn=>chars.find(c=>c.MemberNumber===mn);
   W.__load(-1,500,'vulva',60); await wait(500); ok(!P(500).parasite, '...and only from a load swallowed');
   n=sent.length; W.__load(-1,500,'mouth',60); await wait(900);
   ok(P(500).parasite && P(500).parasite.until > Date.now()+11*3600000 && /livin' lips/.test(to(500,n)), 'it latches for 12 hours and they are told what it is');
+  P(500).parasite.strain='grower'; P(500).parasite.urgeAt=Date.now()+9e9;
   const f0=prod(500).boostX.fert||0, sz=()=>JSON.stringify(prod(500).size||{}), s0=sz(); P(500).parasite.next=0; n=sent.length; W.__parasiteTick(); await wait(700);
   ok(P(500).parasite.n === 1 && sz() !== s0, 'every half hour it feeds them a dose (growth first: '+sz()+')');
   prod(500).held.mouth=250; const u0=P(500).prod.size && P(500).prod.size.udder; n=sent.length; W.__load(600,500,'mouth',250); await wait(700);
-  ok(prod(500).held.mouth === 0 && P(500).parasite.fed === 1 && P(500).parasite.n === 2 && prod(500).boostX.fert >= Math.min(5, f0+1), 'a swallowed load never reaches the belly: it is turned into a dose (a big one, x3)');
+  ok(prod(500).held.mouth === 0 && P(500).parasite.fed === 1 && P(500).parasite.n === 2, 'a swallowed load never reaches the belly: it is turned into a dose');
   ok(W.__stateFor(500).parasite && W.__stateFor(500).parasite.until > Date.now(), 'the Companion is told, so it can put the real lips on');
   // it spreads by a kiss, but only to somebody who asked
   W.__cfg.PARASITE_KISS_CHANCE=1; W.__kiss('Kiss','ItemMouth',500,600); await wait(3600); ok(!P(600).parasite, 'a kiss cannot give it to somebody who never said ?parasite on');
   await say(600,'?parasite on'); W.__kiss('Kiss','ItemMouth',600,500); await wait(3600); ok(!!P(600).parasite, '...and does to somebody who did, whichever of them leaned in');
+  // strains, bloomin', kin, the Tyrant, milk
+  ok(['breeder','grower','glutton','tyrant'].includes(P(600).parasite.strain), 'it latches as one of four strains ('+P(600).parasite.strain+')');
+  { const g=P(500).parasite, since=g.since; ok(W.__parts(500).lips && !W.__parts(500).suckers && !W.__parts(500).root, 'at first it is only lips');
+    g.since=Date.now()-5*3600000; W.__parasiteTick(); await wait(400); ok(W.__parts(500).suckers && (W.__stateFor(500).farmGear||[]).some(x=>x.slot==='cups' && /Suckers/.test(x.name)), 'from hour four: suckers on the teats, as real gear');
+    g.since=Date.now()-9*3600000; W.__parasiteTick(); await wait(400); ok(W.__parts(500).root && (W.__stateFor(500).farmGear||[]).some(x=>x.slot==='belt'), 'from hour eight: a root below');
+    prod(500).held.vulva=90; const n0=g.n; W.__load(600,500,'vulva',90); await wait(500); ok(prod(500).held.vulva===0 && g.n===n0+1, '...and with the root in, it drinks loads taken below too');
+    g.strain='tyrant'; const n1=g.n; W.__climax(500); await wait(500); ok(g.n===n1+1 && g.eaten===1, 'a Tyrant eats an orgasm and pays in serum');
+    g.strain='grower'; g.since=since; }
   // the cravin'
   P(500).parasite.ate=Date.now()-3*3600000; P(500).parasite.told=0; n=sent.length; W.__parasiteTick(); await wait(700);
   ok(/shakin'|clenches|narrowed|droolin'|floor|jaw/.test(all(n)), 'too long without a load and the cravin\' bites (only they see it)');

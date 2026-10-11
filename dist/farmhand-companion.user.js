@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.14.4
+// @version      0.15.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -230,7 +230,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.14.4";
+  var VERSION = "0.15.0";
 
   // extension/src/config.js
   var BOT_MEMBER = 260239;
@@ -695,6 +695,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     ["dares", "Dares", "Staff and the wheel can hand you a dare to do in half an hour"],
     ["watersports", "Watersports", "Piss play can find you: the spray trap, a feeder crafted for it, and the scenes that have it. Off until you say so"],
     ["parasite", "Parasite", "Swallow at the glory stalls and, rarely, a pair of livin' lips seals over your mouth for 12 hours: it feeds you fertility, growth, hyper pregnancy and capacity serum and turns every load you swallow into more"],
+    ["eager", "Traps: no cooldown", "Test subjects: no breather between traps and no wait for a trap to reset. Step off and back on and it springs again"],
     ["bench", "Use bench", "Staff and the wheel can sentence you to time strapped over the use bench, where anybody can use you. Your safeword ends it at once"]
   ];
   var NEEDS = { freeuse: ["breedable", "Turn Breedable on first"] };
@@ -706,7 +707,6 @@ One of mods you are using is using an old version of SDK. It will work for now b
       return toggle(label, desc, !!sw[cmd], () => ctx2.send(cmd + " " + (sw[cmd] ? "off" : "on")));
     });
   }
-  var marksFor = (ctx2) => !!(window.Player && (window.Player.MemberNumber === 221397 || (ctx2.s && ctx2.s.roles || []).includes("SUBJECT")));
   function panelPrefs(ctx2) {
     return card(
       title("This panel"),
@@ -760,14 +760,14 @@ One of mods you are using is using an old version of SDK. It will work for now b
           ctx2.api.rehello && ctx2.api.rehello();
         }
       ),
-      // these two are OFF until you turn them on: the farm changin' what your character looks like (marks.js)
-      marksFor(ctx2) && toggle(
+      // these two are OFF until you turn them on, and anybody can: the farm changin' what your character looks like (marks.js)
+      toggle(
         "Farm can mark my body",
         "Loads leave the game's own splatters on your face, chest or tummy, wherever there's room, and farm words can be written on your body. ?wash takes them off.",
         !!ctx2.prefs.marks,
         () => ctx2.setPref("marks", !ctx2.prefs.marks)
       ),
-      marksFor(ctx2) && toggle(
+      toggle(
         "Farm can strip me",
         "When the farm says so, your clothes come off (locked pieces stay). They're kept on this computer so you can dress again.",
         !!ctx2.prefs.strip,
@@ -4035,7 +4035,17 @@ One of mods you are using is using an old version of SDK. It will work for now b
     "Feed Chute",
     "Snare Rope",
     "Breedin' Frame Cuffs",
-    "Kennel Lead"
+    "Kennel Lead",
+    "The Water's Grip",
+    "The Water's Coils",
+    "Slime Sleeves",
+    "Slime Stockings",
+    "Snare Hobble",
+    "Pack's Knot",
+    "Stud's Stopper",
+    "Pillory Spreader",
+    "Parasite Suckers",
+    "Parasite Root"
   ];
   var GEAR_SLOTS = {
     plug: { groups: ["ItemButt"], names: ["InflVibeButtPlug", "BlackButtPlug", "ButtPlug", "ButtPump"], re: /ButtPlug|Plug/, color: "#2B2B2B" },
@@ -4045,10 +4055,12 @@ One of mods you are using is using an old version of SDK. It will work for now b
     leash: { groups: ["ItemNeckRestraints"], names: ["CollarChainLong", "CollarLeash", "CollarChainShort"], re: /Chain|Leash/, needs: "ItemNeck" },
     funnel: { groups: ["ItemMouth", "ItemMouth2", "ItemMouth3"], names: ["FunnelGag"], re: /Funnel/ },
     ropeArms: { groups: ["ItemArms"], names: ["HempRope"], re: /Rope/ },
+    arms: { groups: ["ItemArms"], names: ["HempRope", "LeatherCuffs"], re: /Rope|Cuffs/ },
+    legs: { groups: ["ItemLegs"], names: ["HempRope", "LeatherLegCuffs"], re: /Rope|Cuffs/ },
     ropeFeet: { groups: ["ItemFeet"], names: ["HempRope"], re: /Rope/ },
     lips: { groups: ["ItemMouth", "ItemMouth2", "ItemMouth3"], names: ["LipGag"], re: /LipGag/, color: ["#E0607F", "#7A2B47", "#7A2B47"] }
   };
-  function gearAsset(group, slot) {
+  function gearAsset(group, slot, prefer) {
     const fam = P2().AssetFamily, get = (n) => {
       try {
         return typeof window.AssetGet === "function" ? window.AssetGet(fam, group, n) : null;
@@ -4056,14 +4068,30 @@ One of mods you are using is using an old version of SDK. It will work for now b
         return null;
       }
     };
+    for (const n of Array.isArray(prefer) ? prefer.map(String) : []) if (/^[A-Za-z0-9_]{2,40}$/.test(n) && get(n)) return n;
     for (const n of slot.names) if (get(n)) return n;
     const all = Array.isArray(window.Asset) ? window.Asset : [];
     const hit = all.find((a) => a && a.Group && a.Group.Name === group && slot.re.test(a.Name) && !a.OwnerOnly && !a.LoverOnly && !a.FamilyOnly);
     return hit ? hit.Name : typeof window.AssetGet !== "function" ? slot.names[0] : null;
   }
+  var NAMES_KEY = "fhc-gear-names";
+  var knownNames = () => {
+    try {
+      return FARM_NAMES.concat(JSON.parse(window.localStorage.getItem(NAMES_KEY)) || []);
+    } catch (e) {
+      return FARM_NAMES;
+    }
+  };
+  var learnName = (n) => {
+    try {
+      const have = JSON.parse(window.localStorage.getItem(NAMES_KEY)) || [];
+      if (!FARM_NAMES.includes(n) && !have.includes(n)) window.localStorage.setItem(NAMES_KEY, JSON.stringify(have.concat(n).slice(-80)));
+    } catch (e) {
+    }
+  };
   var isFarmGear = (b) => {
     const c = b.Craft, d = c ? String(c.Description || "") : "";
-    return !!(c && (d.includes(FARM_TAG) || d.includes(OLD_TAG) || FARM_NAMES.includes(c.Name) && (!c.MemberNumber || c.MemberNumber === P2().MemberNumber)));
+    return !!(c && (d.includes(FARM_TAG) || d.includes(OLD_TAG) || knownNames().includes(c.Name) && (!c.MemberNumber || c.MemberNumber === P2().MemberNumber)));
   };
   var GEAR_KEY = "fhc-gear";
   var gearMem = () => {
@@ -4099,9 +4127,9 @@ One of mods you are using is using an old version of SDK. It will work for now b
       if (slot.needs && !next.some((b) => b.Group === slot.needs)) continue;
       const group = slot.groups.find((x) => !next.some((b) => b.Group === x) && groupOf2(x));
       if (!group) continue;
-      const item = gearAsset(group, slot);
+      const item = gearAsset(group, slot, g.items);
       if (!item) continue;
-      const color = g.color && !slot.color ? g.color : slot.color || g.color || "Default";
+      const color = (typeof g.color === "string" && /^#[0-9a-fA-F]{6}$/.test(g.color) ? g.color : null) || slot.color || "Default";
       const it = {
         Group: group,
         Name: item,
@@ -4110,7 +4138,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
         Craft: {
           Item: item,
           Name: String(g.name).slice(0, 30),
-          Description: (FARM_TAG + " " + String(g.desc || "").slice(0, 150)).trim(),
+          Description: (FARM_TAG + " " + String(g.desc || "").slice(0, 180)).trim(),
           Property: "Normal",
           Color: Array.isArray(color) ? color.join(",") : color,
           Lock: "",
@@ -4126,6 +4154,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       next.push(it);
       did.on.push(g.name);
       mem[g.name] = { group, item };
+      learnName(String(g.name).slice(0, 30));
     }
     gearMemSave(mem);
     if (did.on.length || did.off.length) commit2(next);
@@ -4915,6 +4944,21 @@ One of mods you are using is using an old version of SDK. It will work for now b
       }
       return next(args);
     });
+    try {
+      mod.hookFunction("ServerSend", 4, (args, next) => {
+        try {
+          const d = args[1], s = st.panel && st.panel.s;
+          if (args[0] === "ChatRoomChat" && d && d.Type === "Chat" && typeof d.Content === "string" && s && Array.isArray(s.farmGear) && s.farmGear.some((g) => g.slot === "lips" && g.name === "Parasite Lips" && g.until > Date.now()) && !/^\s*[(\[?!./\-*]/.test(d.Content) && Math.random() < 0.2) {
+            const wants = ["...feed me.", "...more.", "...breed me.", "...need cum.", "...fill me.", "...so hungry.", "...use my mouth."];
+            args = [args[0], Object.assign({}, d, { Content: d.Content.replace(/\s+$/, "") + " " + wants[Math.floor(Math.random() * wants.length)] })];
+          }
+        } catch (e) {
+        }
+        return next(args);
+      });
+    } catch (e) {
+      console.warn("[Farmhand Companion] parasite speech unavailable:", e);
+    }
     try {
       mod.hookFunction("ServerSend", 5, (args, next) => {
         try {

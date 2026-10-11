@@ -22,7 +22,7 @@
   const BOTMN = () => CFG.BOT_MEMBER;
   const TENTACLE_SIRE = -2, TOY_SIRE = -3, FRAME_SIRE = -4, POST_SIRE = -5;
   function thingName(mn){
-    return mn === -2 ? "the thing in the water" : mn === -3 ? "the toy buried in them" : mn === -4 ? "the breedin' frame" : mn === -5 ? "the egg post" : mn === -6 ? "the vine patch" : mn <= -10 ? anthroSireName(mn) : null;
+    return mn === -2 ? "the thing in the water" : mn === -3 ? "the toy buried in them" : mn === -4 ? "the breedin' frame" : mn === -5 ? "the egg post" : mn === -6 ? "the vine patch" : mn === -7 ? "the parasite" : mn <= -10 ? anthroSireName(mn) : null;
   }
   function isSubject(mn){ return hasRole(mn, ROLE.SUBJECT); }
   const TRAP_KINDS = {
@@ -134,10 +134,21 @@
     return kept;
   }
   // a clutch laid in them by somethin' that isn't a stud. Adds to one they're already carryin'.
+  // how much bigger a clutch comes in for this body: fertility (a shot or gas, by level; a worn fertility item), bein' in heat,
+  // and most of all Tentacle Musk
+  function eggX(mn){
+    const p = prodOf(mn); let x = 1;
+    x *= 1 + 0.5*boostLevel(p, "fert");
+    if (wornTags(mn).has("fertility")) x *= 1.5;
+    if (inHeat(p)) x *= 1.25;
+    x *= 1 + 2*potionX(mn, "tentaclemusk");
+    return x;
+  }
+  // clutches STACK: every encounter adds to what they're already carryin', up to CFG.EGG_MAX
   function layClutch(mn, n, by){
     const p = prodOf(mn), [dl, dh] = CFG.EGG_DAYS;
-    n = Math.max(1, Math.min(CFG.HYPER_MAX*2, Math.round(n)));
-    if (p.eggs) p.eggs.n = Math.min(CFG.HYPER_MAX*2, p.eggs.n + n);
+    n = Math.max(1, Math.min(CFG.EGG_MAX, Math.round(n * eggX(mn))));
+    if (p.eggs) p.eggs.n = Math.min(CFG.EGG_MAX, p.eggs.n + n);
     else p.eggs = { n, by, since: Date.now(), layAt: Date.now() + (dl + Math.random()*(dh - dl))*86400000 };
     saveLedger(); audit(BOTMN(), "CLUTCH", mn+" "+n+" by "+by);
     return p.eggs.n;
@@ -296,11 +307,12 @@
     const r = rec(mn), p = prodOf(mn), T = TRAP_LINES.tentacle, v = {};
     const lower = openHole(mn, "vulva"), back = !holeBlocked(mn, "butt") && lower !== "butt" ? "butt" : null, mouth = !holeBlocked(mn, "mouth");
     v.h = lower && lower !== "mouth" ? TRAP_HOLE[lower] : "belly";
-    const beats = [T.grab, T.strip, lower && lower !== "mouth" ? T.take : T.takeShut, back ? T.second : T.wrap, mouth ? T.mouth : T.muzzle].concat(T.churn ? [T.churn] : [], [T.swell]);   // (churn: 10w2-trap-lines-deeper.js)
+    const kin = parasiteOn(mn);   // it knows its own: a gentler comin', and double the clutch
+    const beats = (kin ? [PARASITE_MORE.kin] : []).concat([T.grab, T.strip, lower && lower !== "mouth" ? T.take : T.takeShut, back ? T.second : T.wrap, mouth ? T.mouth : T.muzzle], T.churn ? [T.churn] : [], [T.swell]);   // (churn: 10w2-trap-lines-deeper.js)
     trapHold(mn, 6, "the water");
     trapRun(mn, "tentacle", beats, () => {
       const [lo, hi] = CFG.EGG_COUNT, hyper = hyperEggs(mn, CFG.TENTACLE_HYPER_CHANCE);
-      const n = layClutch(mn, (lo + 2 + Math.floor(Math.random()*(hi - lo + 1))) * (hyper ? 3 + Math.floor(Math.random()*2) : 1), TENTACLE_SIRE);
+      const n = layClutch(mn, (lo + 2 + Math.floor(Math.random()*(hi - lo + 1))) * (hyper ? 3 + Math.floor(Math.random()*2) : 1) * (kin ? 2 : 1), TENTACLE_SIRE);
       v.x = String(n);
       if (lower && lower !== "mouth") trapFill(mn, lower, 250 + Math.random()*250, CFG.TRAP_OVERFULL);
       if (back) trapFill(mn, "butt", 150 + Math.random()*200, CFG.TRAP_OVERFULL);
@@ -336,9 +348,9 @@
       } else {
         // water: a slim chance when they wade in, and again every few minutes they linger
         const st = state.trapAt.get(mn);
-        if (!fresh && now - (st.rolled || 0) < CFG.TENTACLE_LINGER_MIN*60000) continue;
+        if (!fresh && now - (st.rolled || 0) < CFG.TENTACLE_LINGER_MIN*60000/(potionOn(mn, "tentaclemusk") ? 5 : 1)) continue;   // (with Tentacle Musk on, it looks again every minute)
         st.rolled = now;
-        if (Math.random() < CFG.TENTACLE_CHANCE*nightX().water*dangerX(mn).chance && !springTrap(mn, "tentacle", here)){ r.trapAt = now; saveLedger(); }   // (three times as hungry after dark)
+        if ((parasiteKin(mn, now) || Math.random() < Math.min(1, CFG.TENTACLE_CHANCE*nightX().water*dangerX(mn).chance*(potionOn(mn, "tentaclemusk") ? CFG.MUSK_WATER_X : 1))) && !springTrap(mn, "tentacle", here)){ r.trapAt = now; saveLedger(); }   // (three times as hungry after dark)
       }
     }
     toyTick(); moreTrapTick(); trapExtrasTick(); farmGearTick(Date.now());

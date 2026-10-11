@@ -42,7 +42,22 @@
     if (kind === "boar" || kind === "goat" || kind === "kennel" || kind === "wolves") d.reek = { boar: "boar", goat: "billy goat", kennel: "kennel", wolves: "wolf" }[kind];
     if (kind === "brand" && r.branded) d.brand = r.branded;
     if (ANTHRO[kind] && ANTHRO[kind].sire <= -10) bump1(subjWeek().fur, mn, ANTHRO[kind].loads);
+    // ...and what it writes on them, so everybody can read what had them
+    const words = TRAP_WRITES[kind];
+    if (words && Math.random() < CFG.TRAP_WRITE_CHANCE){
+      const w = words[Math.floor(Math.random()*words.length)];
+      later(() => { if (bodyMark(mn, { write: { line: w, area: ["hips", "waist", "chest", "ribs"][Math.floor(Math.random()*4)] } })){ const r2 = rec(mn); r2.dirt = r2.dirt || {}; r2.dirt.brand = w; saveLedger(); } }, 4000);
+    }
   }
+  const TRAP_WRITES = {
+    wolves: ["PACK BITCH", "KNOTTED X5", "WOLF BRED", "PACK'S HOLE"], stallion: ["MARE", "HORSE FUCKED", "STUD'S MARE", "TOOK IT ALL"], bull: ["HEIFER", "BULL BRED", "MILKED AND BRED"],
+    warren: ["BUNNY HOLE", "BRED X10", "RABBIT'S FUCKTOY"], boar: ["SOW", "HOG BRED", "BOAR'S SOW", "PLUGGED SOW"], toms: ["QUEEN IN HEAT", "TOM'S TOY", "BARBED AND BRED"],
+    drake: ["DRAGON'S BROODER", "EGG LAYER", "HOARD"], naga: ["BOTH HOLES", "SNAKE STUFFED"], kennel: ["KENNEL BITCH", "KNOT TRAINED", "GOOD BITCH"],
+    hive: ["HIVE BROODER", "EGG CELL"], goat: ["BILLY'S MOUTH", "THROAT FUCKED"], sow: ["MATRON'S PET", "NURSED AND BRED"],
+    tentacle: ["EGG SACK", "TENTACLE BRED", "BROODER", "FULL OF EGGS"], breeder: ["MACHINE BRED", "BREEDING STOCK"], eggs: ["EGG SACK", "LAYS ON COMMAND"],
+    pump: ["PUMPED FULL", "FILL TO HERE"], milker: ["MILKED DRY", "DAIRY STOCK"], wall: ["HOLE IN A FENCE", "USED BY STRANGERS", "BOTH ENDS"], pillory: ["HELP YOURSELF", "PUBLIC HOLES"],
+    clamp: ["DENIED", "NO CUMMING"], paddle: ["SPANKED X20", "BAD ANIMAL"], spray: ["CUM RAG", "SPRAYED"], trough: ["PISS TROUGH", "FARM URINAL"], vines: ["SEED BED", "PLANTED"],
+  };
   function aftermathOf(mn){
     const d = (rec(mn) || {}).dirt || {}, out = [];
     if (d.mud) out.push({ icon: "🐖", text: "Caked in mud" });
@@ -222,6 +237,7 @@
       if (!L.studbook) L.studbook = [];
       L.studbook.push({ t: Date.now(), dam: sender, sires: [e.by], kids: { male: 0, female: 0, futa: 0 }, eggs: e.n });
       eggsLaid(sender, e.n, true);
+      if (e.para) L.nestBrood = (L.nestBrood || 0) + 1;   // one of the parasite's own: it'll hatch here
       saveLedger(); audit(sender, "EGGS", sender+" "+e.n+" at the nest");
       emote("🥚 "+xLine(e.n >= 12 ? "layBig" : "lay", sender, { x: String(e.n), c: plainName(e.by) }), sender);
       face(sender, "afterglow", 120); syncCompanions(true);
@@ -233,7 +249,7 @@
     if (!n){ R("The nest's empty, sugar."); return; }
     if (!nestSpots().some(s => onSpot(sender, s, 2))){ R("Come over to the nest to gather, sugar."); return; }
     const by = L.nest.by; L.nest = { eggs: 0, by: {} }; saveLedger(); audit(sender, "GATHER", String(n));
-    for (const [m, k] of Object.entries(by)) earnRibbons(parseInt(m, 10), Math.max(1, Math.round(k / CFG.EGGS_PER_RIBBON)), "eggs sold at market");
+    for (const [m, k] of Object.entries(by)) earnRibbons(parseInt(m, 10), Math.min(CFG.GATHER_MAX_RIBBONS, Math.max(1, Math.round(k / CFG.EGGS_PER_RIBBON))), "eggs sold at market");
     earnRibbons(sender, 1, "gatherin' the eggs");
     emote("🧺 "+xLine("gather", sender, { x: String(n) }), sender);
     R("🧺 "+n+" eggs gathered and off to market. The layers have been paid: "+Object.entries(by).map(([m, k]) => plainName(parseInt(m, 10))+" ("+k+")").join(", ")+".");

@@ -112,6 +112,15 @@
     { id: "shot-semen", name: "A virility shot",      price: 6,  desc: "Semen doubles for a day." },
     { id: "shot-fert",  name: "A fertility shot",     price: 6,  desc: "Catchin' doubles for a day." },
     { id: "shot-contra",name: "A contraceptive shot", price: 4,  desc: "No catchin' for two days." },
+    { id: "shot-hyper", name: "A hyper pregnancy shot", price: 9, words: "hyper pregnancy", limit: "breed", desc: "For a day, anything that takes comes in as a huge litter. Stacks." },
+    { id: "shot-eggs",  name: "An egg layin' shot",   price: 7,  words: "egg laying", limit: "eggs", desc: "For a day, any stud's load can leave a clutch, and far likelier. Stacks: bigger clutches." },
+    { id: "shot-mpreg", name: "An mpreg shot",        price: 8,  words: "mpreg", limit: "breed", desc: "For a week, a load in the ass can take." },
+    { id: "shot-heat",  name: "A heat shot",          price: 5,  words: "heat inducer", limit: "heat", desc: "In heat, right now." },
+    { id: "shot-stretch", name: "A stretchin' shot",  price: 6,  words: "capacity", desc: "You hold more, for good." },
+    { id: "shot-udder", name: "An udder growth shot", price: 7,  words: "udder growth", part: "udder", desc: "Tits a size bigger, for good." },
+    { id: "shot-ass",   name: "An ass growth shot",   price: 7,  words: "ass growth", part: "butt", desc: "Ass a size bigger, for good." },
+    { id: "shot-balls", name: "A ball growth shot",   price: 7,  words: "balls growth", part: "testes", desc: "Balls a size heavier, for good." },
+    { id: "shot-cock",  name: "A cock growth shot",   price: 7,  words: "cock growth", part: "penis", desc: "Cock a size bigger, for good." },
   ];
   function storeItems(){
     const S = L.store || {}, price = S.price || {}, off = S.off || {};
@@ -246,6 +255,15 @@
         return;
       }
       default: {
+        if (it.id.startsWith("shot-") && it.words){   // the newer shots: the same words a crafted needle carries
+          if (it.limit && limitBlocks(sender, it.limit)){ R("Your hard limits rule that one out, sugar, so I'll keep it on the shelf."); return; }
+          if (it.part && !hasPart(sender, it.part)){ R("💉 That shot's got nothin' to work on in you, sugar, so I'll keep it on the shelf."); return; }
+          spendRibbons(sender, price, it.name);
+          const ok = applyShot(sender, CFG.BOT_MEMBER, it.words, { open: "The farm girl pinches up a bit of "+plainName(sender)+"'s flank and slides the needle in, quick and practiced. \"There. You'll feel that by supper.\"", from: "the farm girl's shot" });
+          if (!ok){ earnRibbons(sender, price, "a shot that had nothin' to work on", 0, true); R("💉 That shot's got nothin' to work on in you, sugar. Your ribbons are back in your purse."); return; }
+          done("💉 "+it.name+" in. "+it.desc+" ("+ribbonsOf(sender)+" ribbons left)");
+          return;
+        }
         if (it.id.startsWith("shot-")){
           const p = prodOf(sender), now = Date.now(), H = 3600000;
           spendRibbons(sender, price, it.name);

@@ -497,6 +497,9 @@ THE PARASITE · ?parasite on
   mouth for 12 hours. It feeds you serum every half hour
   (fertility, growth, hyper pregnancy, capacity; the growth is
   for keeps) and turns every load you swallow into more.
+  It comes in four strains, blooms over its twelve hours (lips,
+  then teats, then below), gets urges, lays its own eggs at the
+  end, and passes by a kiss or by nursin'.
   ?parasite · how long is left. Your safeword takes it off.
 
 WATERSPORTS · ?watersports on

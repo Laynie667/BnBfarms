@@ -131,6 +131,7 @@ export const SWITCH_INFO = [
   ["dares", "Dares", "Staff and the wheel can hand you a dare to do in half an hour"],
   ["watersports", "Watersports", "Piss play can find you: the spray trap, a feeder crafted for it, and the scenes that have it. Off until you say so"],
   ["parasite", "Parasite", "Swallow at the glory stalls and, rarely, a pair of livin' lips seals over your mouth for 12 hours: it feeds you fertility, growth, hyper pregnancy and capacity serum and turns every load you swallow into more"],
+  ["eager", "Traps: no cooldown", "Test subjects: no breather between traps and no wait for a trap to reset. Step off and back on and it springs again"],
   ["bench", "Use bench", "Staff and the wheel can sentence you to time strapped over the use bench, where anybody can use you. Your safeword ends it at once"],
 ];
 // some switches only work once another is on; say so instead of lettin' a click do nothin'
@@ -143,8 +144,6 @@ export function farmSwitches(ctx, list) {
     return toggle(label, desc, !!sw[cmd], () => ctx.send(cmd + " " + (sw[cmd] ? "off" : "on")));
   });
 }
-// markin' and strippin': Laynie, and the farm's test subjects (the traps use both)
-const marksFor = (ctx) => !!(window.Player && (window.Player.MemberNumber === 221397 || ((ctx.s && ctx.s.roles) || []).includes("SUBJECT")));
 export function panelPrefs(ctx) {
   return card(title("This panel"), muted("Only on your computer."),
     [["chatToo", "Farm messages in chat too", "Tease lines, heat, summons and other farm messages also show in your chat log"],
@@ -169,10 +168,10 @@ export function panelPrefs(ctx) {
     // OFF until you turn it on: real items from the traps (marks.js)
     toggle("Farm can put real gear on me", "A trap that plugs, cups, clamps, chains, ropes or funnels you puts the real item on your character, and takes it off again when its time's up. Pull one off early and it goes back. Your safeword takes it all off. (The parasite doesn't need this: ?parasite on is its switch.)",
       !!ctx.prefs.gear, () => { ctx.setPref("gear", !ctx.prefs.gear); ctx.api.rehello && ctx.api.rehello(); }),
-    // these two are OFF until you turn them on: the farm changin' what your character looks like (marks.js)
-    marksFor(ctx) && toggle("Farm can mark my body", "Loads leave the game's own splatters on your face, chest or tummy, wherever there's room, and farm words can be written on your body. ?wash takes them off.",
+    // these two are OFF until you turn them on, and anybody can: the farm changin' what your character looks like (marks.js)
+    toggle("Farm can mark my body", "Loads leave the game's own splatters on your face, chest or tummy, wherever there's room, and farm words can be written on your body. ?wash takes them off.",
       !!ctx.prefs.marks, () => ctx.setPref("marks", !ctx.prefs.marks)),
-    marksFor(ctx) && toggle("Farm can strip me", "When the farm says so, your clothes come off (locked pieces stay). They're kept on this computer so you can dress again.",
+    toggle("Farm can strip me", "When the farm says so, your clothes come off (locked pieces stay). They're kept on this computer so you can dress again.",
       !!ctx.prefs.strip, () => ctx.setPref("strip", !ctx.prefs.strip)),
     btn("Put the button and panel back (size and full screen too)", () => ctx.resetPlaces && ctx.resetPlaces()));
 }

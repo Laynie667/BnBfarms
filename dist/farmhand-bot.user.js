@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.24.5
+// @version      0.25.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -1828,7 +1828,7 @@
   ];
 
   // bot/src/version.js
-  var VERSION = "0.24.5";
+  var VERSION = "0.25.0";
 
   // bot-parts:farmhand-bot-parts
   (function() {
@@ -2375,6 +2375,8 @@
       SMELL_MIN: 10,
       NEST_MIN_H: 1,
       EGGS_PER_RIBBON: 4,
+      TRAP_WRITE_CHANCE: 0.6,
+      // how often a trap writes on them what had them (for those who let the farm mark them)
       TRAP_PILLORY_MIN: 10,
       TRAP_WINCH_MIN: 5,
       TRAP_STICKY_MIN: 20,
@@ -2386,6 +2388,12 @@
       // each time a subject wades into a water spot (and every TENTACLE_LINGER_MIN they stay)
       TENTACLE_LINGER_MIN: 5,
       TENTACLE_HYPER_CHANCE: 0.25,
+      MUSK_WATER_X: 20,
+      // Tentacle Musk: the thing in the water is this many times likelier to come
+      EGG_MAX: 150,
+      // the most eggs one body can carry (clutches stack)
+      GATHER_MAX_RIBBONS: 15,
+      // the most one layer is paid at one gatherin'
       AUTOINJECT_MIN: 30,
       OVI_MIN: 45,
       AUTOFEED_MIN: 10,
@@ -2409,6 +2417,11 @@
       CRAVE_AFTER_MIN: 45,
       CRAVE_LINE_MIN: 15,
       // the cum cravin': how long it lingers after, how long without a load before it bites, how often it nags
+      PARASITE_BLOOM_H: [4, 8],
+      // hours in: suckers on the teats, then a root below (the belt form blooms upward)
+      PARASITE_SEED_CHANCE: 0.15,
+      // when it drops off by itself: the chance it grows back from inside within a day
+      PARASITE_URGE_PUNISH_MIN: 60,
       PARASITE_BELT_AFTER: 3,
       // from the fourth time on the same host it comes back as a belt
       PARASITE_BIG_ML: [80, 200],
@@ -3392,7 +3405,7 @@
     };
     W.FarmhandExport = exportLedger;
     W.FarmhandLedger = () => L;
-    if (W.__FARMHAND_TEST__) Object.assign(W, { __st: () => state, __cfg: CFG, __pt: prodTick, __qt: quotaTick, __lt: leashTick, __ms: milkingStallTick, __vt: voiceTick, __sync: syncCompanions, __gt: gearTick, __ht: homeTick, __addons: (h, ...a) => addonsEmit(h, ...a), __stateFor: (mn) => stateFor(mn), __leadTick: () => leadTick(), __ambient: () => ambientTick(), __about: (t) => aboutWhom(t), __announce: (t) => announce(t), __reply: (mn, t, ch) => reply(mn, t, ch), __office: () => officeCheck(), __namesHere: (t) => namesHere(t), __speciesCheck: (t) => QUESTIONS.find((q) => q.key === "species").check(t), __attach: () => attachListeners(), __tryLogin: () => tryLogin(), __beepText: (m) => beepText(m), __nameOnce: (t, mn) => nameOnce(t, mn), __buildContract: (n, mn, d) => buildContract(contractTemplate(n), mn, d), __potionTick: () => potionTick(), __penTick: () => penTick(), __trapTick: () => trapTick(), __gearOn: (m, s, l, d, x) => gearOn(m, s, l, d, x), __heard: (mn, t) => trapHeard(mn, t), __parasiteTick: () => parasiteTick(), __parasiteChance: (m) => parasiteChance(m), __kiss: (a, f, s, t) => parasiteKiss(a, f, s, t), __load: (s, m, h, x) => parasiteLoad(s, m, h, x), __shot: (t, by, text, how) => applyShot(t, by, text, how), __slow: (mn) => slowOf(mn), __milkRate: (mn) => milkRate(mn), __benchTick: () => benchTick(), __roll: (m, s, a, b) => rollConception(m, s, a, b), __contractTick: () => {
+    if (W.__FARMHAND_TEST__) Object.assign(W, { __st: () => state, __cfg: CFG, __pt: prodTick, __qt: quotaTick, __lt: leashTick, __ms: milkingStallTick, __vt: voiceTick, __sync: syncCompanions, __gt: gearTick, __ht: homeTick, __addons: (h, ...a) => addonsEmit(h, ...a), __stateFor: (mn) => stateFor(mn), __leadTick: () => leadTick(), __ambient: () => ambientTick(), __about: (t) => aboutWhom(t), __announce: (t) => announce(t), __reply: (mn, t, ch) => reply(mn, t, ch), __office: () => officeCheck(), __namesHere: (t) => namesHere(t), __speciesCheck: (t) => QUESTIONS.find((q) => q.key === "species").check(t), __attach: () => attachListeners(), __tryLogin: () => tryLogin(), __beepText: (m) => beepText(m), __nameOnce: (t, mn) => nameOnce(t, mn), __buildContract: (n, mn, d) => buildContract(contractTemplate(n), mn, d), __potionTick: () => potionTick(), __penTick: () => penTick(), __trapTick: () => trapTick(), __gearOn: (m, s, l, d, x) => gearOn(m, s, l, d, x), __heard: (mn, t) => trapHeard(mn, t), __parasiteTick: () => parasiteTick(), __parts: (m) => parasiteParts(rec(m).parasite), __climax: (m) => parasiteClimax(m), __nurse: (a, b) => parasiteNurse(a, b), __parasiteChance: (m) => parasiteChance(m), __kiss: (a, f, s, t) => parasiteKiss(a, f, s, t), __load: (s, m, h, x) => parasiteLoad(s, m, h, x), __shot: (t, by, text, how) => applyShot(t, by, text, how), __slow: (mn) => slowOf(mn), __milkRate: (mn) => milkRate(mn), __benchTick: () => benchTick(), __roll: (m, s, a, b) => rollConception(m, s, a, b), __contractTick: () => {
       state.cwAt = 0;
       contractWatchTick();
     }, __lingerTick: () => lingerTick(), __ribbonTick: () => ribbonTick(), __dareTick: () => dareTick(), __potionOn: (mn, id) => potionOn(mn, id), __milkRate: (mn) => milkRate(mn) });
@@ -4459,7 +4472,8 @@
       benchOn: "bench",
       mpreg: "mpreg",
       watersports: "watersports",
-      parasiteOn: "parasite"
+      parasiteOn: "parasite",
+      trapEager: "eager"
     };
     const DOC_CMDS = ["record", "stats", "vet", "quota", "keys", "size", "measure", "pedigree"];
     function shownMl(n) {
@@ -5839,10 +5853,12 @@
       }
       let clutch = 0;
       const eggBoost = wornTags(t).has("eggs") || boosted(tp, "eggs");
-      if (!opt.second && hole !== "mouth" && makesSemen(stud) && (penisType(stud) === "draconic" || eggBoost) && rt.eggs && !tp.eggs && !limitBlocks(t, "eggs") && Math.random() < Math.min(0.95, (knot ? CFG.EGG_TIED_CHANCE : CFG.EGG_CHANCE) * (eggBoost ? CFG.EGG_BOOST_X : 1))) {
+      if (!opt.second && hole !== "mouth" && makesSemen(stud) && (penisType(stud) === "draconic" || eggBoost) && rt.eggs && !limitBlocks(t, "eggs") && Math.random() < Math.min(0.95, (knot ? CFG.EGG_TIED_CHANCE : CFG.EGG_CHANCE) * (eggBoost ? CFG.EGG_BOOST_X : 1))) {
         const [lo, hi] = CFG.EGG_COUNT, [dl, dh] = CFG.EGG_DAYS;
-        clutch = (lo + Math.floor(Math.random() * (hi - lo + 1))) * Math.max(1, boostLevel(tp, "eggs"));
-        tp.eggs = { n: clutch, by: stud, since: Date.now(), layAt: Date.now() + (dl + Math.random() * (dh - dl)) * 864e5 };
+        clutch = Math.round((lo + Math.floor(Math.random() * (hi - lo + 1))) * Math.max(1, boostLevel(tp, "eggs")) * eggX(t));
+        clutch = Math.min(CFG.EGG_MAX - (tp.eggs ? tp.eggs.n : 0), clutch);
+        if (tp.eggs) tp.eggs.n += clutch;
+        else tp.eggs = { n: clutch, by: stud, since: Date.now(), layAt: Date.now() + (dl + Math.random() * (dh - dl)) * 864e5 };
       }
       saveLedger();
       audit(stud, "CUM", stud + "\u2192" + t + " " + hole + " " + Math.round(load));
@@ -5855,7 +5871,7 @@
         if (pb) o += " " + pb;
       }
       emote(o, t);
-      if (clutch) emote("\u{1F95A} Deep inside " + plainName(t) + ", something takes hold: " + plainName(stud) + "'s draconic seed has left a clutch of " + clutch + " eggs growin' in there. They'll be layin' in a few days.");
+      if (clutch > 0) emote("\u{1F95A} Deep inside " + plainName(t) + ", something takes hold: " + plainName(stud) + "'s draconic seed has left a clutch of " + clutch + " eggs growin' in there. They'll be layin' in a few days.");
       if (sc0) sc0.lastCum = Date.now();
       if (knot && !opt.second) {
         const frac = (sizeOf(stud, "knot") - 1) / (CFG.SIZES.knot.max - 1), span = CFG.TIE_MAX_M - CFG.TIE_MIN_M;
@@ -6527,6 +6543,7 @@
       }
     }
     function nurse(milker, drinker) {
+      parasiteNurse(milker, drinker);
       if (missing(milker, drinker)) return false;
       const p = prodOf(milker), now = Date.now();
       if (now - (p.lastNursed || 0) < CFG.NURSE_COOLDOWN_S * 1e3 || p.milk < 1) return false;
@@ -8247,6 +8264,11 @@
       }
     }
     function onClimax(mn, content) {
+      try {
+        parasiteClimax(mn);
+      } catch (e) {
+        warn("parasite climax:", e);
+      }
       const r = rec(mn), p = r && prodOf(mn);
       if (!p || limitBlocks(mn)) return;
       const now = Date.now(), d = dayKey(), n = plainName(mn);
@@ -9340,7 +9362,16 @@
       { id: "shot-milk", name: "A lactation shot", price: 6, desc: "Milk doubles for a day." },
       { id: "shot-semen", name: "A virility shot", price: 6, desc: "Semen doubles for a day." },
       { id: "shot-fert", name: "A fertility shot", price: 6, desc: "Catchin' doubles for a day." },
-      { id: "shot-contra", name: "A contraceptive shot", price: 4, desc: "No catchin' for two days." }
+      { id: "shot-contra", name: "A contraceptive shot", price: 4, desc: "No catchin' for two days." },
+      { id: "shot-hyper", name: "A hyper pregnancy shot", price: 9, words: "hyper pregnancy", limit: "breed", desc: "For a day, anything that takes comes in as a huge litter. Stacks." },
+      { id: "shot-eggs", name: "An egg layin' shot", price: 7, words: "egg laying", limit: "eggs", desc: "For a day, any stud's load can leave a clutch, and far likelier. Stacks: bigger clutches." },
+      { id: "shot-mpreg", name: "An mpreg shot", price: 8, words: "mpreg", limit: "breed", desc: "For a week, a load in the ass can take." },
+      { id: "shot-heat", name: "A heat shot", price: 5, words: "heat inducer", limit: "heat", desc: "In heat, right now." },
+      { id: "shot-stretch", name: "A stretchin' shot", price: 6, words: "capacity", desc: "You hold more, for good." },
+      { id: "shot-udder", name: "An udder growth shot", price: 7, words: "udder growth", part: "udder", desc: "Tits a size bigger, for good." },
+      { id: "shot-ass", name: "An ass growth shot", price: 7, words: "ass growth", part: "butt", desc: "Ass a size bigger, for good." },
+      { id: "shot-balls", name: "A ball growth shot", price: 7, words: "balls growth", part: "testes", desc: "Balls a size heavier, for good." },
+      { id: "shot-cock", name: "A cock growth shot", price: 7, words: "cock growth", part: "penis", desc: "Cock a size bigger, for good." }
     ];
     function storeItems() {
       const S = L.store || {}, price = S.price || {}, off = S.off || {};
@@ -9553,6 +9584,25 @@
           return;
         }
         default: {
+          if (it.id.startsWith("shot-") && it.words) {
+            if (it.limit && limitBlocks(sender, it.limit)) {
+              R("Your hard limits rule that one out, sugar, so I'll keep it on the shelf.");
+              return;
+            }
+            if (it.part && !hasPart(sender, it.part)) {
+              R("\u{1F489} That shot's got nothin' to work on in you, sugar, so I'll keep it on the shelf.");
+              return;
+            }
+            spendRibbons(sender, price, it.name);
+            const ok = applyShot(sender, CFG.BOT_MEMBER, it.words, { open: "The farm girl pinches up a bit of " + plainName(sender) + `'s flank and slides the needle in, quick and practiced. "There. You'll feel that by supper."`, from: "the farm girl's shot" });
+            if (!ok) {
+              earnRibbons(sender, price, "a shot that had nothin' to work on", 0, true);
+              R("\u{1F489} That shot's got nothin' to work on in you, sugar. Your ribbons are back in your purse.");
+              return;
+            }
+            done("\u{1F489} " + it.name + " in. " + it.desc + " (" + ribbonsOf(sender) + " ribbons left)");
+            return;
+          }
           if (it.id.startsWith("shot-")) {
             const p = prodOf(sender), now = Date.now(), H = 36e5;
             spendRibbons(sender, price, it.name);
@@ -9819,6 +9869,18 @@
         limit: /\b(danger|risk)/i,
         drink: "It's black, it smokes a little, and it tastes like a dare. Somethin' in your belly goes cold and reckless.",
         seen: "%n knocks back a Danger Draught and shivers. They've just made themselves the unluckiest animal on the farm."
+      },
+      {
+        id: "tentaclemusk",
+        name: "Tentacle Musk",
+        kind: "punish",
+        mins: 120,
+        price: 10,
+        stack: 3,
+        desc: "A perfume. For two hours the thing in the water can smell you from the bottom of the pond: it's twenty times as likely to come for you, it looks for you every minute you stand near water, and every clutch anything lays in you comes in three times the size (five with a second dab, seven with a third). The parasite likes it too. Test subjects only for the water.",
+        limit: /\b(tentacle|eggs?|ovipos|clutch|monster)/i,
+        drink: "You dab it on your throat, your wrists, the insides of your thighs. It smells of salt and deep water and somethin' sweet rottin'. Somewhere, somethin' wakes up.",
+        seen: "%n dabs on a perfume that smells like low tide and sex. The surface of every trough and puddle nearby shivers, just once."
       },
       {
         id: "hiccup",
@@ -11598,7 +11660,7 @@
     const BOTMN = () => CFG.BOT_MEMBER;
     const TENTACLE_SIRE = -2, TOY_SIRE = -3, FRAME_SIRE = -4, POST_SIRE = -5;
     function thingName(mn) {
-      return mn === -2 ? "the thing in the water" : mn === -3 ? "the toy buried in them" : mn === -4 ? "the breedin' frame" : mn === -5 ? "the egg post" : mn === -6 ? "the vine patch" : mn <= -10 ? anthroSireName(mn) : null;
+      return mn === -2 ? "the thing in the water" : mn === -3 ? "the toy buried in them" : mn === -4 ? "the breedin' frame" : mn === -5 ? "the egg post" : mn === -6 ? "the vine patch" : mn === -7 ? "the parasite" : mn <= -10 ? anthroSireName(mn) : null;
     }
     function isSubject(mn) {
       return hasRole(mn, ROLE.SUBJECT);
@@ -11746,10 +11808,19 @@
       }
       return kept;
     }
+    function eggX(mn) {
+      const p = prodOf(mn);
+      let x = 1;
+      x *= 1 + 0.5 * boostLevel(p, "fert");
+      if (wornTags(mn).has("fertility")) x *= 1.5;
+      if (inHeat(p)) x *= 1.25;
+      x *= 1 + 2 * potionX(mn, "tentaclemusk");
+      return x;
+    }
     function layClutch(mn, n, by) {
       const p = prodOf(mn), [dl, dh] = CFG.EGG_DAYS;
-      n = Math.max(1, Math.min(CFG.HYPER_MAX * 2, Math.round(n)));
-      if (p.eggs) p.eggs.n = Math.min(CFG.HYPER_MAX * 2, p.eggs.n + n);
+      n = Math.max(1, Math.min(CFG.EGG_MAX, Math.round(n * eggX(mn))));
+      if (p.eggs) p.eggs.n = Math.min(CFG.EGG_MAX, p.eggs.n + n);
       else p.eggs = { n, by, since: Date.now(), layAt: Date.now() + (dl + Math.random() * (dh - dl)) * 864e5 };
       saveLedger();
       audit(BOTMN(), "CLUTCH", mn + " " + n + " by " + by);
@@ -11938,11 +12009,12 @@
       const r = rec(mn), p = prodOf(mn), T = TRAP_LINES.tentacle, v = {};
       const lower = openHole(mn, "vulva"), back = !holeBlocked(mn, "butt") && lower !== "butt" ? "butt" : null, mouth = !holeBlocked(mn, "mouth");
       v.h = lower && lower !== "mouth" ? TRAP_HOLE[lower] : "belly";
-      const beats = [T.grab, T.strip, lower && lower !== "mouth" ? T.take : T.takeShut, back ? T.second : T.wrap, mouth ? T.mouth : T.muzzle].concat(T.churn ? [T.churn] : [], [T.swell]);
+      const kin = parasiteOn(mn);
+      const beats = (kin ? [PARASITE_MORE.kin] : []).concat([T.grab, T.strip, lower && lower !== "mouth" ? T.take : T.takeShut, back ? T.second : T.wrap, mouth ? T.mouth : T.muzzle], T.churn ? [T.churn] : [], [T.swell]);
       trapHold(mn, 6, "the water");
       trapRun(mn, "tentacle", beats, () => {
         const [lo, hi] = CFG.EGG_COUNT, hyper = hyperEggs(mn, CFG.TENTACLE_HYPER_CHANCE);
-        const n = layClutch(mn, (lo + 2 + Math.floor(Math.random() * (hi - lo + 1))) * (hyper ? 3 + Math.floor(Math.random() * 2) : 1), TENTACLE_SIRE);
+        const n = layClutch(mn, (lo + 2 + Math.floor(Math.random() * (hi - lo + 1))) * (hyper ? 3 + Math.floor(Math.random() * 2) : 1) * (kin ? 2 : 1), TENTACLE_SIRE);
         v.x = String(n);
         if (lower && lower !== "mouth") trapFill(mn, lower, 250 + Math.random() * 250, CFG.TRAP_OVERFULL);
         if (back) trapFill(mn, "butt", 150 + Math.random() * 200, CFG.TRAP_OVERFULL);
@@ -11984,9 +12056,9 @@
           }
         } else {
           const st = state.trapAt.get(mn);
-          if (!fresh && now - (st.rolled || 0) < CFG.TENTACLE_LINGER_MIN * 6e4) continue;
+          if (!fresh && now - (st.rolled || 0) < CFG.TENTACLE_LINGER_MIN * 6e4 / (potionOn(mn, "tentaclemusk") ? 5 : 1)) continue;
           st.rolled = now;
-          if (Math.random() < CFG.TENTACLE_CHANCE * nightX().water * dangerX(mn).chance && !springTrap(mn, "tentacle", here)) {
+          if ((parasiteKin(mn, now) || Math.random() < Math.min(1, CFG.TENTACLE_CHANCE * nightX().water * dangerX(mn).chance * (potionOn(mn, "tentaclemusk") ? CFG.MUSK_WATER_X : 1))) && !springTrap(mn, "tentacle", here)) {
             r.trapAt = now;
             saveLedger();
           }
@@ -13333,7 +13405,42 @@
       trough: (mn) => rec(mn).watersports ? null : "they haven't said ?watersports on",
       wall: (mn) => limitBlocks(mn, "breed") ? "their limits rule it out" : null
     };
-    const BRAND_WORDS = ["TRAPPED", "FREE USE", "BREED ME", "FARM PROPERTY", "TEST SUBJECT", "USE ME", "CUM HERE", "GOOD ANIMAL", "MILK ME", "KNOT ME", "SOW", "BROODMARE", "HOLES FOR HIRE", "CAUGHT AGAIN"];
+    const BRAND_WORDS = [
+      "CUMDUMP",
+      "BREEDING STOCK",
+      "THREE HOLES",
+      "FUCK ME",
+      "KNOT SLUT",
+      "FARM WHORE",
+      "FILL ME UP",
+      "EGG SACK",
+      "COCK SLEEVE",
+      "FREE CUNT",
+      "USE ALL HOLES",
+      "BRED DAILY",
+      "MILK AND BREED",
+      "ANYBODY'S",
+      "WET AND READY",
+      "PUBLIC USE",
+      "STUD'S TOY",
+      "BREED THIS ASS",
+      "SWALLOWS",
+      "RUT ME",
+      "TRAPPED",
+      "FREE USE",
+      "BREED ME",
+      "FARM PROPERTY",
+      "TEST SUBJECT",
+      "USE ME",
+      "CUM HERE",
+      "GOOD ANIMAL",
+      "MILK ME",
+      "KNOT ME",
+      "SOW",
+      "BROODMARE",
+      "HOLES FOR HIRE",
+      "CAUGHT AGAIN"
+    ];
     const MIRROR_LINES = ["i am stock and stock gets used", "my holes belong to the farm", "good animals do not think", "i was made to be bred", "i walked into it because i wanted it", "i am a test subject and i love my traps"];
     const moreLine = (kind, key, mn, v) => tFill(pickFresh("trap:" + kind + ":" + key, MORE_LINES[kind][key]), mn, v);
     const MORE_TRAPS = {
@@ -13926,7 +14033,7 @@
     const PARASITE_SERUMS = ["growth", "fertility", "growth", "hyper pregnancy", "growth", "capacity"];
     const PARASITE_GROWS = ["udder", "penis", "testes", "butt"];
     function parasiteChance(mn) {
-      const n = potionX(mn, "danger");
+      const n = potionX(mn, "danger") + potionX(mn, "tentaclemusk");
       return n ? Math.min(1, n * CFG.PARASITE_PER_DANGER) : CFG.PARASITE_CHANCE;
     }
     function parasiteOn(mn) {
@@ -13934,13 +14041,17 @@
       return !!(r && r.parasite && r.parasite.until > Date.now());
     }
     function parasiteSerum(mn, i) {
-      let s = PARASITE_SERUMS[i % PARASITE_SERUMS.length];
+      const list = strainOf(rec(mn).parasite).serums;
+      let s = list[i % list.length];
       if (s === "growth") {
         const parts = PARASITE_GROWS.filter((k) => bodyParts(mn).includes(k) && CFG.SIZES[k]), g = rec(mn).parasite;
         const part = parts.length ? parts[(g.grew = (g.grew || 0) + 1) % parts.length] : null;
         s = part === "udder" ? "udder growth" : part === "testes" ? "balls growth" : part === "penis" ? "cock growth" : part === "butt" ? "ass growth" : "fertility";
       }
       if (/fertil|hyper/.test(s) && limitBlocks(mn, "breed")) s = "capacity";
+      if (/lactation|udder/.test(s) && !makesMilk(mn)) s = "ass growth";
+      if (/egg/.test(s) && limitBlocks(mn, "eggs")) s = "capacity";
+      if (/heat/.test(s) && limitBlocks(mn, "heat")) s = "capacity";
       return s;
     }
     const paraLine = (key, mn, v) => tFill(pickFresh("para:" + key, PARASITE_LINES[key]), mn, v);
@@ -13957,6 +14068,7 @@
       r.parasiteN = (r.parasiteN || 0) + 1;
       const belt = r.parasiteN > CFG.PARASITE_BELT_AFTER;
       r.parasite = { since: now, until: now + CFG.PARASITE_HOURS * 36e5, next: now + CFG.PARASITE_DOSE_MIN * 6e4, n: 0, fed: 0, form: belt ? "belt" : "lips" };
+      parasiteBorn(mn);
       if (belt) {
         saveLedger();
         audit(CFG.BOT_MEMBER, "PARASITE", mn + " latched as a belt" + (how ? " (" + how + ")" : ""));
@@ -13977,9 +14089,14 @@
     }
     function parasiteOff(mn, how) {
       const r = rec(mn);
+      if (r && how === "safe" && r.parasiteSeed) {
+        r.parasiteSeed = 0;
+        saveLedger();
+      }
       if (!r || !r.parasite) return false;
-      const was = r.parasite.until > Date.now(), fed = r.parasite.fed || 0, n = r.parasite.n || 0, wasBelt = r.parasite.form === "belt";
+      const was = r.parasite.until > Date.now(), fed = r.parasite.fed || 0, n = r.parasite.n || 0, wasBelt = r.parasite.form === "belt", g0 = r.parasite;
       r.parasite = null;
+      parasiteGone(mn, g0, how || "done");
       r.parasiteNext = Date.now() + (how === "safe" ? 7 : 1) * 864e5;
       r.crave = how === "safe" ? null : { until: Date.now() + CFG.CRAVE_HOURS * 36e5, ate: Date.now(), told: Date.now() };
       saveLedger();
@@ -13996,7 +14113,7 @@
         const r = rec(mn), p = prodOf(mn);
         if (!r || !p) return;
         if (hole !== "mouth") {
-          if (!parasiteOn(mn) || r.parasite.form !== "belt" || hole !== "vulva" && hole !== "butt") return;
+          if (!parasiteOn(mn) || !parasiteParts(r.parasite).root || hole !== "vulva" && hole !== "butt") return;
           p.held[hole] = Math.max(0, (p.held[hole] || 0) - mlIn);
           r.parasite.fed = (r.parasite.fed || 0) + 1;
           r.parasite.ate = Date.now();
@@ -14004,7 +14121,7 @@
           parasiteDose(mn, xb, paraLine("convertBelt", mn, { ml: ml(mlIn), h: hole === "butt" ? "ass" : "pussy" }));
           return;
         }
-        if (parasiteOn(mn) && r.parasite.form === "belt") return;
+        if (parasiteOn(mn) && !parasiteParts(r.parasite).lips) return;
         if (craving(mn)) {
           const c = parasiteOn(mn) ? r.parasite : r.crave;
           if (Date.now() - (c.ate || 0) > CFG.CRAVE_AFTER_MIN * 6e4) setTimeout(() => privateLine(mn, tFill(pickFresh("para:sated", PARASITE_LINES.sated), mn), "emote"), 4e3);
@@ -14014,6 +14131,7 @@
           p.held.mouth = Math.max(0, (p.held.mouth || 0) - mlIn);
           r.parasite.fed = (r.parasite.fed || 0) + 1;
           const x = mlIn >= CFG.PARASITE_BIG_ML[1] ? 3 : mlIn >= CFG.PARASITE_BIG_ML[0] ? 2 : 1;
+          parasiteUrgeDone(mn, "swallow");
           parasiteDose(mn, x, paraLine("convert", mn, { ml: ml(mlIn) }));
           return;
         }
@@ -14049,6 +14167,7 @@
       try {
         if (!/kiss/i.test(act) || !/^ItemMouth/.test(String(focus || "")) || !src || !tgt || src === tgt) return;
         const from = parasiteOn(src) ? src : parasiteOn(tgt) ? tgt : null, to = from === src ? tgt : src;
+        if (from) parasiteUrgeDone(from, "kiss");
         if (!from || parasiteOn(to)) return;
         const r = rec(to);
         if (!r || !r.parasiteOn || (r.parasiteNext || 0) > Date.now() || /\bparasit/i.test(r.limits || "")) return;
@@ -14067,6 +14186,11 @@
     }
     function parasiteTick() {
       const now = Date.now();
+      try {
+        parasiteWorldTick(now);
+      } catch (e) {
+        warn("parasite world:", e);
+      }
       for (const [k, r] of Object.entries(L.people)) {
         if (r.crave && r.crave.until <= now) {
           r.crave = null;
@@ -14082,9 +14206,20 @@
           parasiteOff(mn, "done");
           continue;
         }
-        if (!charFor(mn) || now < r.parasite.next) continue;
-        r.parasite.next = now + CFG.PARASITE_DOSE_MIN * 6e4;
-        parasiteDose(mn, 1, paraLine(r.parasite.form === "belt" ? "doseBelt" : "dose", mn));
+        if (!charFor(mn)) continue;
+        try {
+          parasiteMoreTick(mn, r, now);
+        } catch (e) {
+          warn("parasite more:", e);
+        }
+        if (!r.parasite || now < r.parasite.next) continue;
+        r.parasite.next = now + strainOf(r.parasite).every * 6e4 / (potionOn(mn, "tentaclemusk") ? 2 : 1);
+        parasiteDose(mn, 1, paraLine(parasiteParts(r.parasite).lips ? "dose" : "doseBelt", mn));
+        try {
+          parasiteAfterDose(mn);
+        } catch (e) {
+          warn("parasite drink:", e);
+        }
       }
     }
     function parasiteCommand(cmd, sender, args, R) {
@@ -14132,7 +14267,7 @@
       if (!a0) {
         if (parasiteOn(sender)) {
           const m = Math.ceil((r.parasite.until - Date.now()) / 6e4);
-          R("\u{1F444} It's on you, sugar, for " + (m >= 90 ? Math.round(m / 60) + " more hours" : m + " more minutes") + ". Doses so far: " + (r.parasite.n || 0) + ". Loads it's drunk through you: " + (r.parasite.fed || 0) + ". Your safeword takes it off.");
+          R("\u{1F444} It's on you, sugar (a " + strainOf(r.parasite).name + "), for " + (m >= 90 ? Math.round(m / 60) + " more hours" : m + " more minutes") + ". Doses so far: " + (r.parasite.n || 0) + ". Loads it's drunk through you: " + (r.parasite.fed || 0) + ". Your safeword takes it off.");
         } else R(switchStatus("parasite", !!r.parasiteOn) + (r.parasiteOn ? " Swallow at the glory stalls and, once in a long while, somethin' comes through with the cock." : ""));
         return true;
       }
@@ -14222,6 +14357,260 @@
       purge: [
         "A farmhand gets two fingers under the edge of the lips on %n's mouth, breaks the seal, and draws the whole thing out, tentacle and all. It goes in a jar. %n coughs and gulps air.",
         "The parasite is peeled off %n's face and its long root pulled hand over hand up out of their throat. It squirms. %n gags, spits, and has their own mouth back."
+      ]
+    };
+    const PARASITE_SIRE = -7;
+    const STRAINS = {
+      breeder: {
+        name: "Breeder",
+        serums: ["fertility", "hyper pregnancy", "growth", "egg laying", "fertility", "capacity"],
+        every: 30,
+        can: (mn) => !limitBlocks(mn, "breed"),
+        tell: "It's a BREEDER: it wants you ripe. Fertility, hyper pregnancy, clutches of eggs, over and over, till anything that so much as looks at you leaves you carryin'."
+      },
+      grower: {
+        name: "Grower",
+        serums: ["growth", "growth", "capacity", "growth", "growth", "fertility"],
+        every: 20,
+        can: () => true,
+        tell: "It's a GROWER: it feeds you every twenty minutes, and nearly all of it goes to makin' more of you. Tits, cock, balls, ass, round and round, and all of it for keeps."
+      },
+      glutton: {
+        name: "Glutton",
+        serums: ["lactation", "udder growth", "lactation", "capacity", "growth", "lactation"],
+        every: 30,
+        can: (mn) => makesMilk(mn) && !limitBlocks(mn, "milk"),
+        tell: "It's a GLUTTON: it's as hungry for your milk as for cum. It'll drink you down at every feed, and dose you so you make twice as much for it next time."
+      },
+      tyrant: {
+        name: "Tyrant",
+        serums: ["growth", "fertility", "heat inducer", "growth", "hyper pregnancy", "capacity"],
+        every: 30,
+        can: (mn) => !/\b(denial|orgasm|edg|ruin)/i.test(rec(mn).limits || ""),
+        tell: "It's a TYRANT: you don't cum while it's on you. Every time you get there, it eats it, ruins it, and pays you in serum instead. Twelve hours of that."
+      }
+    };
+    const strainOf = (g) => STRAINS[g && g.strain] || STRAINS.grower;
+    function pickStrain(mn) {
+      const can = Object.keys(STRAINS).filter((k) => STRAINS[k].can(mn));
+      return can[Math.floor(Math.random() * can.length)] || "grower";
+    }
+    function parasiteParts(g) {
+      const h = (Date.now() - g.since) / 36e5, stage = h >= CFG.PARASITE_BLOOM_H[1] ? 3 : h >= CFG.PARASITE_BLOOM_H[0] ? 2 : 1;
+      return g.form === "belt" ? { stage, root: true, suckers: stage >= 2, lips: stage >= 3 } : { stage, lips: true, suckers: stage >= 2, root: stage >= 3 };
+    }
+    const pmLine = (key, mn, v) => tFill(pickFresh("para2:" + key, PARASITE_MORE[key]), mn, v);
+    function parasiteGear(mn) {
+      const r = rec(mn), g = r.parasite, P = parasiteParts(g), S = strainOf(g), out = [], base = { always: true, color: "#E0607F", until: g.until };
+      if (P.lips) out.push(Object.assign({ slot: "lips", name: "Parasite Lips", desc: S.name + " strain. Fat, wet, living lips sealed over the mouth, with a tentacle seated down the throat. It feeds its host serum and swallows every load they suck out." }, base));
+      if (P.suckers) out.push(Object.assign({ slot: "cups", name: "Parasite Suckers", desc: S.name + " strain. Two soft pink mouths latched over the teats, sucking in slow greedy pulls. They drink every drop of milk and give something hotter back." }, base));
+      if (P.root) out.push(Object.assign({ slot: "belt", name: g.form === "belt" ? "Parasite Belt" : "Parasite Root", desc: S.name + " strain. A band of hot living flesh sealed round the hips, with a thick root pulsing in each hole. It drinks every load they take and pumps its own brew back in." }, base));
+      return out;
+    }
+    function parasiteBorn(mn) {
+      const r = rec(mn), g = r.parasite, p = prodOf(mn);
+      g.strain = pickStrain(mn);
+      g.stageTold = 1;
+      g.urgeAt = Date.now() + (40 + Math.random() * 40) * 6e4;
+      g.next = Date.now() + strainOf(g).every * 6e4;
+      if (g.strain === "tyrant") p.deniedUntil = Math.max(p.deniedUntil || 0, g.until);
+      r.parasiteSeed = 0;
+      saveLedger();
+      later(() => {
+        if (parasiteOn(mn)) tell(mn, "\u{1F444} " + strainOf(g).tell);
+      }, 9e3);
+    }
+    function parasiteGone(mn, g, how) {
+      const r = rec(mn), p = prodOf(mn);
+      if (g && g.strain === "tyrant" && p) p.deniedUntil = Math.min(p.deniedUntil || 0, Date.now());
+      if (how === "done" && r.parasiteOn && Math.random() < CFG.PARASITE_SEED_CHANCE) r.parasiteSeed = Date.now() + (2 + Math.random() * 18) * 36e5;
+    }
+    function parasiteMoreTick(mn, r, now) {
+      const g = r.parasite, P = parasiteParts(g), p = prodOf(mn);
+      if (P.stage > (g.stageTold || 1)) {
+        g.stageTold = P.stage;
+        saveLedger();
+        const grew = g.form === "belt" ? P.stage === 2 ? "suckers" : "lipsLate" : P.stage === 2 ? "suckers" : "root";
+        emote("\u{1F444} " + pmLine("bloom_" + grew, mn), mn);
+        arouse(mn, 20);
+        syncCompanions(true);
+      }
+      if (!g.laid && g.until - now < 36e5 && !limitBlocks(mn, "eggs")) {
+        g.laid = true;
+        const [lo, hi] = CFG.EGG_COUNT, n0 = lo + Math.floor(Math.random() * (hi - lo + 1));
+        layClutch(mn, n0, PARASITE_SIRE);
+        p.eggs.para = true;
+        emote("\u{1F95A} " + pmLine("lay", mn), mn);
+        tell(mn, "\u{1F95A} The parasite's laid its own clutch in you before it goes, sugar. Lay them at the nest and one'll hatch there, lookin' for somebody new.");
+        saveLedger();
+        syncCompanions(true);
+      }
+      if (g.urge && now > g.urge.until) {
+        g.urge = null;
+        g.urgeAt = now + (60 + Math.random() * 60) * 6e4;
+        p.deniedUntil = Math.max(p.deniedUntil || 0, now + CFG.PARASITE_URGE_PUNISH_MIN * 6e4);
+        privateLine(mn, pmLine("urgeFail", mn), "emote");
+        arouse(mn, 40, 94);
+        saveLedger();
+        syncCompanions(true);
+      } else if (g.urge && g.urge.kind === "glory" && Object.keys(L.spots || {}).some((n) => /^glory-\d+$/.test(n) && onSpot(mn, n, 0))) parasiteUrgeDone(mn, "glory");
+      else if (!g.urge && now >= (g.urgeAt || 0) && !heldByTrap(mn) && !r.benched && !r.penned && !(p && p.stall)) {
+        const kinds = ["kiss", "swallow"].concat(Object.keys(L.spots || {}).some((n) => /^glory-\d+$/.test(n)) ? ["glory"] : []).filter((k) => !(k !== "glory" && !P.lips && k === "swallow"));
+        const kind = kinds[Math.floor(Math.random() * kinds.length)];
+        g.urge = { kind, until: now + (kind === "swallow" ? 15 : 10) * 6e4 };
+        saveLedger();
+        privateLine(mn, pmLine("urge_" + kind, mn), "emote");
+        tell(mn, "\u{1F444} It wants somethin', sugar: " + { kiss: "kiss somebody on the mouth", swallow: "swallow a load", glory: "get yourself into a glory stall" }[kind] + ", inside " + (kind === "swallow" ? 15 : 10) + " minutes. Do it and it'll be sweet to you. Don't, and it'll hold you at the edge for an hour.");
+      }
+    }
+    function parasiteUrgeDone(mn, kind) {
+      const r = rec(mn), g = r && r.parasite;
+      if (!g || !g.urge || g.urge.kind !== kind || !parasiteOn(mn)) return false;
+      g.urge = null;
+      g.urgeAt = Date.now() + (60 + Math.random() * 60) * 6e4;
+      saveLedger();
+      later(() => {
+        if (parasiteOn(mn)) {
+          parasiteDose(mn, 1, pmLine("urgeDone", mn));
+          arouse(mn, 25);
+        }
+      }, 5e3);
+      return true;
+    }
+    function parasiteAfterDose(mn) {
+      const r = rec(mn), g = r.parasite, p = prodOf(mn);
+      if (!(parasiteParts(g).suckers || g.strain === "glutton") || !makesMilk(mn) || p.milk < 20) return;
+      const got = drainMilk(mn, p.milk * (g.strain === "glutton" ? 0.8 : 0.4));
+      if (got < 5) return;
+      g.drunk = (g.drunk || 0) + got;
+      emote("\u{1F444} " + pmLine("drink", mn, { ml: ml(got) }), mn);
+      if (g.strain === "glutton") addBoost(p, "milk", 6 * 36e5, 1);
+      saveLedger();
+    }
+    function parasiteClimax(mn) {
+      const r = rec(mn), g = r && r.parasite;
+      if (!g || !parasiteOn(mn) || g.strain !== "tyrant") return;
+      const now = Date.now();
+      if (now - (g.ateAt || 0) < 6e4) return;
+      g.ateAt = now;
+      g.eaten = (g.eaten || 0) + 1;
+      parasiteDose(mn, 1, pmLine("tyrant", mn));
+    }
+    function parasiteNurse(host, drinker) {
+      try {
+        if (!parasiteOn(host) || parasiteOn(drinker) || host === drinker) return;
+        const r = rec(drinker);
+        if (!r || !r.parasiteOn || (r.parasiteNext || 0) > Date.now() || /\bparasit/i.test(r.limits || "")) return;
+        if (Math.random() >= CFG.PARASITE_KISS_CHANCE * dangerX(drinker).chance) return;
+        emote("\u{1F444} " + tFill(pickFresh("para2:nurse", PARASITE_MORE.nurse), host, { c: plainName(drinker) }), drinker);
+        later(() => {
+          if (charFor(drinker) && !parasiteOn(drinker)) parasiteLatch(drinker, "nursed from " + host);
+        }, 3e3);
+      } catch (e) {
+        warn("parasite nurse:", e);
+      }
+    }
+    function parasiteWorldTick(now) {
+      for (const [k, r] of Object.entries(L.people)) {
+        if (!r.parasiteSeed || now < r.parasiteSeed) continue;
+        const mn = parseInt(k, 10);
+        if (!charFor(mn)) continue;
+        r.parasiteSeed = 0;
+        if (!r.parasiteOn || parasiteOn(mn) || /\bparasit/i.test(r.limits || "")) {
+          saveLedger();
+          continue;
+        }
+        emote("\u{1F444} " + pmLine("regrow", mn), mn);
+        parasiteLatch(mn, "grew back");
+      }
+      if (L.nestBrood > 0) {
+        for (const C of W.ChatRoomCharacter || []) {
+          const mn = C.MemberNumber, r = rec(mn);
+          if (mn === CFG.BOT_MEMBER || !r || !r.parasiteOn || parasiteOn(mn) || (r.parasiteNext || 0) > now || /\bparasit/i.test(r.limits || "")) continue;
+          if (!nestSpots().some((n) => onSpot(mn, n, 0))) continue;
+          L.nestBrood--;
+          saveLedger();
+          emote("\u{1F95A} " + pmLine("hatch", mn), mn);
+          later(() => {
+            if (charFor(mn) && !parasiteOn(mn)) parasiteLatch(mn, "hatched at the nest");
+          }, 3e3);
+          break;
+        }
+      }
+    }
+    function parasiteKin(mn, now) {
+      const r = rec(mn);
+      if (!parasiteOn(mn) || now - (r.kinAt || 0) < 30 * 6e4) return false;
+      r.kinAt = now;
+      return true;
+    }
+    const PARASITE_MORE = {
+      bloom_suckers: [
+        "The parasite on %n ripples and spreads. Two soft pink buds push out of it, crawl down over their chest, and close over both nipples like little wet mouths. They start to suck.",
+        "%n gasps. The thing on them has grown: a pair of fleshy cups have latched onto their teats and are pullin' in a slow, greedy rhythm, drinkin' whatever comes.",
+        "It's bloomin'. Thin pink tendrils trail across %n's skin to their tits and swell at the tips into suckers that seal on tight and begin to nurse."
+      ],
+      bloom_root: [
+        "The parasite isn't done growin'. A thick strand of it slides down %n's belly, wraps their hips in a hot wet band, and pushes a fat root up into each hole below. %n's knees buckle.",
+        "It's found the rest of %n. A sash of livin' flesh knots itself round their hips, and two slow thick tendrils work their way up inside, front and back, and settle there, pulsin'.",
+        "%n feels it creep lower, and lower, and then it's between their legs, sealin' over them, rootin' up into their cunt and their ass both. Lips, teats and holes: it has all of them now."
+      ],
+      bloom_lipsLate: [
+        "The belt on %n sends a pink runner up their body, over their chest and throat. It reaches their mouth, flattens, and seals over their lips, and a tendril slides down their throat. It has all of them now.",
+        "The last of it blooms: a wet pink mouth closes over %n's own, plump and shinin', and somethin' long and soft feeds itself past their tongue. Lips, teats and holes, every one taken."
+      ],
+      lay: [
+        "The parasite goes still, and then every root of it swells at once. %n feels eggs bein' pushed into them, small and slick and many, wherever it's buried: its own clutch, left in the host before it goes.",
+        "Somethin' is comin' down the tendril in %n. They feel the first egg pass, then a string of them, pumped in slow and packed down deep. It's makin' sure there'll be more of it.",
+        "It lays in %n without any fuss at all, a soft steady pulse and a growin' weight low in their belly. By the time they understand what it's doin', it's done."
+      ],
+      hatch: [
+        "One of the eggs in the nest splits with a wet little crack as %n steps in. Somethin' pink and quick uncoils from it and goes straight up their leg.",
+        "The nest was not empty. A shell rocks, opens, and a small glistenin' thing pours itself out, tastes the air, and leaps at %n's face."
+      ],
+      regrow: [
+        "%n coughs, and somethin' moves in their throat that isn't a cough. The parasite left a piece of itself behind, and it's been growin'. Pink flesh wells up over their tongue and seals across their lips from the inside.",
+        "It never really left %n. Somewhere deep in them a seed of it has been swellin' all day, and now it climbs: up, out, and over, bloomin' back into the same fat wet lips as before."
+      ],
+      urge_kiss: [
+        "The thing on you throbs, and a want that isn't yours rises up through it: a mouth. Somebody's mouth on yours. It wants to taste another one.",
+        "It tugs at your lips from the inside. It wants to be kissed, deep and wet, by somebody who doesn't know what they're kissin'."
+      ],
+      urge_swallow: [
+        "It's hungry. The root in your throat flexes, and your mouth floods. It wants a cock, and what comes out of one, and it wants it soon.",
+        "A hollow ache opens under your tongue and spreads. The parasite wants feedin': a hot load, straight from the source."
+      ],
+      urge_glory: [
+        "A picture comes into your head and stays there: the glory stalls, the holes in the boards, all those cocks. It knows where the food is, and it wants you kneelin' there.",
+        "It pulls at you like a leash. The stalls. Go to the stalls and get on your knees. It'll make it worth your while."
+      ],
+      urgeDone: [
+        "The parasite shivers with pleasure at gettin' its way, squeezes %n everywhere it touches, and pumps them a long, sweet, generous dose.",
+        "It got what it wanted, and it's grateful. A warm rush of serum floods into %n, thick and slow, like bein' kissed from the inside.",
+        "Good host. The thing on %n purrs against their skin and pays them: a deep, hot, lingerin' dose."
+      ],
+      urgeFail: [
+        "You didn't do it. The parasite goes cold and tight on you, and then it starts to stroke, exactly where it'll hurt most, and stops. It's goin' to keep you right there for an hour.",
+        "It gave you a simple thing to do. Now it winds you up, slow and cruel, to the very edge, and holds you. No. Not for an hour. That's what disobeyin' costs."
+      ],
+      drink: [
+        "The suckers on %n's teats clamp down and pull, hard and long. %ml of milk goes straight into the parasite, and it flushes a deep, satisfied rose.",
+        "%n moans as the thing nurses them: deep greedy draws at both nipples, %ml drunk down in a minute. It leaves them tinglin' and already fillin' again.",
+        "The parasite drinks. %n can feel the milk leavin' them in thick pulses, %ml of it, and the soft wet mouths on their tits squeezin' for more."
+      ],
+      tyrant: [
+        "%n starts to cum, and the parasite takes it. Every root and sucker clamps tight at the very top, and the orgasm just drains out of them, ruined, swallowed. What it gives back is a dose.",
+        "Right at the peak the thing on %n squeezes, and the pleasure is gone, sucked out of them like marrow from a bone. %n sobs. The parasite hums, fed, and pumps them full of serum instead.",
+        "It lets %n climb all the way up, and then it eats what's at the top. They're left twitchin' and empty with a hot dose spreadin' in their belly where the cummin' should have been."
+      ],
+      nurse: [
+        "%c draws on %n's teat, and somethin' that isn't milk comes with it: a little slick knot of pink that slips over their tongue before they can spit.",
+        "The milk %c is swallowin' from %n has a thread of the parasite in it. It goes down easy. It doesn't stay down."
+      ],
+      kin: [
+        "The thing in the water rises slow this time, almost careful. One thin arm reaches out and touches the parasite on %n, and both of them shiver. It knows its own.",
+        "It comes up out of the water for %n without any hurry at all, and the parasite on them strains toward it like a pup toward its mother. This isn't an attack. It's a visit.",
+        "The water opens for %n. A tentacle strokes the livin' flesh sealed on them, tip to tip, tastin', and then the rest of it comes to do what kin does: add to the brood."
       ]
     };
     (function() {
@@ -15017,7 +15406,45 @@
       if (kind === "boar" || kind === "goat" || kind === "kennel" || kind === "wolves") d.reek = { boar: "boar", goat: "billy goat", kennel: "kennel", wolves: "wolf" }[kind];
       if (kind === "brand" && r.branded) d.brand = r.branded;
       if (ANTHRO[kind] && ANTHRO[kind].sire <= -10) bump1(subjWeek().fur, mn, ANTHRO[kind].loads);
+      const words = TRAP_WRITES[kind];
+      if (words && Math.random() < CFG.TRAP_WRITE_CHANCE) {
+        const w = words[Math.floor(Math.random() * words.length)];
+        later(() => {
+          if (bodyMark(mn, { write: { line: w, area: ["hips", "waist", "chest", "ribs"][Math.floor(Math.random() * 4)] } })) {
+            const r2 = rec(mn);
+            r2.dirt = r2.dirt || {};
+            r2.dirt.brand = w;
+            saveLedger();
+          }
+        }, 4e3);
+      }
     }
+    const TRAP_WRITES = {
+      wolves: ["PACK BITCH", "KNOTTED X5", "WOLF BRED", "PACK'S HOLE"],
+      stallion: ["MARE", "HORSE FUCKED", "STUD'S MARE", "TOOK IT ALL"],
+      bull: ["HEIFER", "BULL BRED", "MILKED AND BRED"],
+      warren: ["BUNNY HOLE", "BRED X10", "RABBIT'S FUCKTOY"],
+      boar: ["SOW", "HOG BRED", "BOAR'S SOW", "PLUGGED SOW"],
+      toms: ["QUEEN IN HEAT", "TOM'S TOY", "BARBED AND BRED"],
+      drake: ["DRAGON'S BROODER", "EGG LAYER", "HOARD"],
+      naga: ["BOTH HOLES", "SNAKE STUFFED"],
+      kennel: ["KENNEL BITCH", "KNOT TRAINED", "GOOD BITCH"],
+      hive: ["HIVE BROODER", "EGG CELL"],
+      goat: ["BILLY'S MOUTH", "THROAT FUCKED"],
+      sow: ["MATRON'S PET", "NURSED AND BRED"],
+      tentacle: ["EGG SACK", "TENTACLE BRED", "BROODER", "FULL OF EGGS"],
+      breeder: ["MACHINE BRED", "BREEDING STOCK"],
+      eggs: ["EGG SACK", "LAYS ON COMMAND"],
+      pump: ["PUMPED FULL", "FILL TO HERE"],
+      milker: ["MILKED DRY", "DAIRY STOCK"],
+      wall: ["HOLE IN A FENCE", "USED BY STRANGERS", "BOTH ENDS"],
+      pillory: ["HELP YOURSELF", "PUBLIC HOLES"],
+      clamp: ["DENIED", "NO CUMMING"],
+      paddle: ["SPANKED X20", "BAD ANIMAL"],
+      spray: ["CUM RAG", "SPRAYED"],
+      trough: ["PISS TROUGH", "FARM URINAL"],
+      vines: ["SEED BED", "PLANTED"]
+    };
     function aftermathOf(mn) {
       const d = (rec(mn) || {}).dirt || {}, out = [];
       if (d.mud) out.push({ icon: "\u{1F416}", text: "Caked in mud" });
@@ -15289,6 +15716,7 @@
         if (!L.studbook) L.studbook = [];
         L.studbook.push({ t: Date.now(), dam: sender, sires: [e.by], kids: { male: 0, female: 0, futa: 0 }, eggs: e.n });
         eggsLaid(sender, e.n, true);
+        if (e.para) L.nestBrood = (L.nestBrood || 0) + 1;
         saveLedger();
         audit(sender, "EGGS", sender + " " + e.n + " at the nest");
         emote("\u{1F95A} " + xLine(e.n >= 12 ? "layBig" : "lay", sender, { x: String(e.n), c: plainName(e.by) }), sender);
@@ -15314,7 +15742,7 @@
       L.nest = { eggs: 0, by: {} };
       saveLedger();
       audit(sender, "GATHER", String(n));
-      for (const [m, k] of Object.entries(by)) earnRibbons(parseInt(m, 10), Math.max(1, Math.round(k / CFG.EGGS_PER_RIBBON)), "eggs sold at market");
+      for (const [m, k] of Object.entries(by)) earnRibbons(parseInt(m, 10), Math.min(CFG.GATHER_MAX_RIBBONS, Math.max(1, Math.round(k / CFG.EGGS_PER_RIBBON))), "eggs sold at market");
       earnRibbons(sender, 1, "gatherin' the eggs");
       emote("\u{1F9FA} " + xLine("gather", sender, { x: String(n) }), sender);
       R("\u{1F9FA} " + n + " eggs gathered and off to market. The layers have been paid: " + Object.entries(by).map(([m, k]) => plainName(parseInt(m, 10)) + " (" + k + ")").join(", ") + ".");
@@ -15466,26 +15894,144 @@
       const h = openHole(mn, first);
       return h === "vulva" ? "dildo" : h === "butt" ? "plug" : null;
     };
+    const SLIME = "#5FAE3A", FLESH = "#C9577A";
     const TRAP_GEAR = {
-      pump: [{ when: "after", slot: (mn) => stopperFor(mn, "butt"), label: "Pump Bung", desc: "A fat rubber bung left in by the pump trap, to keep it all in.", mins: 10 }],
-      eggs: [{ when: "after", slot: (mn) => stopperFor(mn, "vulva"), label: "Egg Post Plug", desc: "The egg post's parting gift: a plug to hold the clutch in while it settles.", mins: 15 }],
-      tentacle: [{ when: "after", slot: (mn) => stopperFor(mn, "vulva"), label: "Slime Seal", desc: "A thick knot of something from the water, set hard, sealing the eggs inside.", mins: 15 }],
-      boar: [{ when: "after", slot: (mn) => stopperFor(mn, "vulva"), label: "Boar's Plug", desc: "The waxy plug a boar leaves behind so not a drop gets out.", mins: 20 }],
-      vines: [{ when: "after", slot: (mn) => stopperFor(mn, "vulva"), label: "Seed Pod Stem", desc: "A cut length of vine, still rooted in them, keeping the pods where it planted them.", mins: 10 }],
-      clamp: [{ when: "after", slot: "belt", label: "Denial Clamp", desc: "The trap's clamp, locked on over everything worth touching. It lets go when the denial's up.", mins: () => CFG.TRAP_DENY_MIN }],
-      cups: [{ when: "after", slot: "cups", label: "Growth Cups", desc: "Two wide glass cups pulling at the teats. They stay on till they've finished the job.", mins: 30 }],
-      milker: [{ when: "hold", slot: "cups", label: "Trap Milker", desc: "The milker trap's cups, latched on and pulling." }],
-      winch: [{ when: "after", slot: "leash", label: "Winch Chain", desc: "The chain that walked them to the pen.", mins: () => CFG.TRAP_WINCH_MIN }],
-      chute: [{ when: "hold", slot: "funnel", label: "Feed Chute", desc: "The feed trap's funnel, strapped in." }],
-      snare: [{ when: "hold", slot: "ropeArms", label: "Snare Rope", desc: "The snare's rope, cinched tight." }, { when: "hold", slot: "ropeFeet", label: "Snare Rope", desc: "The snare's rope, cinched tight." }],
-      breeder: [{ when: "hold", slot: "ropeArms", label: "Breedin' Frame Cuffs", desc: "The breeding frame's cuffs." }],
-      kennel: [{ when: "hold", slot: "leash", label: "Kennel Lead", desc: "Clipped to the ring at the back of the kennel." }]
+      pump: [{
+        when: "after",
+        slot: (mn) => stopperFor(mn, "butt"),
+        label: "Pump Bung",
+        mins: 10,
+        desc: "A fat black rubber bung, swollen tight inside, corking a belly pumped round and sloshing. It doesn't come out until every drop has soaked in."
+      }],
+      eggs: [{
+        when: "after",
+        slot: (mn) => stopperFor(mn, "vulva"),
+        label: "Egg Post Plug",
+        mins: 15,
+        desc: "The egg post's parting gift: a thick ridged plug seated deep behind a fresh clutch, holding every egg in a stretched, slick hole while they settle."
+      }],
+      tentacle: [
+        {
+          when: "hold",
+          slot: "arms",
+          label: "The Water's Grip",
+          items: ["Tentacles"],
+          color: FLESH,
+          desc: "Thick, wet, suckered arms wound tight round wrists and elbows, holding them spread while the rest of it breeds them. They squeeze in time."
+        },
+        {
+          when: "hold",
+          slot: "legs",
+          label: "The Water's Coils",
+          items: ["Tentacles"],
+          color: FLESH,
+          desc: "Slick coils round both thighs, hauling them wide and keeping them there. There is no closing these legs until it has finished laying."
+        },
+        {
+          when: "after",
+          slot: (mn) => stopperFor(mn, "vulva"),
+          label: "Slime Seal",
+          mins: 15,
+          items: ["Tentacles", "Slime"],
+          color: FLESH,
+          desc: "The thing left the tip of itself behind: a fat knot of living flesh buried to the root, pulsing, sealing a womb packed full of its eggs."
+        }
+      ],
+      boar: [{
+        when: "after",
+        slot: (mn) => stopperFor(mn, "vulva"),
+        label: "Boar's Plug",
+        mins: 20,
+        desc: "What a boar leaves so nothing leaks: a hard waxy plug as thick as a wrist, set deep, with a bellyful of hog seed sloshing behind it."
+      }],
+      vines: [{
+        when: "after",
+        slot: (mn) => stopperFor(mn, "vulva"),
+        label: "Seed Pod Stem",
+        mins: 10,
+        items: ["Tentacles"],
+        color: "#3E8A3A",
+        desc: "A cut length of thick green vine, still rooted inside and dripping sap, holding its seed pods where it planted them."
+      }],
+      slime: [
+        {
+          when: "after",
+          slot: "arms",
+          label: "Slime Sleeves",
+          mins: () => CFG.TRAP_STICKY_MIN,
+          items: ["Slime"],
+          color: SLIME,
+          desc: "Thick green slime still clinging from fingers to shoulders, warm and tacky, stringing between arm and ribs with every move."
+        },
+        {
+          when: "after",
+          slot: "legs",
+          label: "Slime Stockings",
+          mins: () => CFG.TRAP_STICKY_MIN,
+          items: ["Slime"],
+          color: SLIME,
+          desc: "Slime coating both legs to the hip, oozing down the thighs and sucking at the floor. Whatever it crawled into is still in there too."
+        }
+      ],
+      clamp: [{
+        when: "after",
+        slot: "belt",
+        label: "Denial Clamp",
+        mins: () => CFG.TRAP_DENY_MIN,
+        desc: "Cold steel locked over everything worth touching. Inside, something soft licks and hums and stops, over and over. No cumming until it lets go."
+      }],
+      cups: [{
+        when: "after",
+        slot: "cups",
+        label: "Growth Cups",
+        mins: 30,
+        desc: "Two wide glass bells sucking hard at swollen teats, drawing them long and dark and fat. They stay on until these tits are a size bigger."
+      }],
+      milker: [{ when: "hold", slot: "cups", label: "Trap Milker", desc: "Steel milking cups latched on with a greedy pull, nipples stretched down the glass, pumping this animal dry whether there's anything left or not." }],
+      winch: [{
+        when: "after",
+        slot: "leash",
+        label: "Winch Chain",
+        mins: () => CFG.TRAP_WINCH_MIN,
+        desc: "The chain that walked them across the yard on their toes, in front of everybody, like a heifer going to market. It's still clipped on."
+      }],
+      chute: [{ when: "hold", slot: "funnel", label: "Feed Chute", desc: "A wide rubber funnel strapped between the teeth, throat held open, with a hopper of warm sweet mash pouring down until this belly is tight as a drum." }],
+      snare: [
+        { when: "hold", slot: "arms", label: "Snare Rope", desc: "Rough rope cinched round both wrists and hauled up overhead, stringing them out helpless while the little machine teases." },
+        { when: "hold", slot: "ropeFeet", label: "Snare Hobble", desc: "Rope round both ankles, pulling them wide apart. Everything between them is on show and out of their own reach." }
+      ],
+      breeder: [{ when: "hold", slot: "arms", label: "Breedin' Frame Cuffs", desc: "Padded steel cuffs locking both wrists to the breeding frame: bent over, hips up, held still for the machine like a mare for the stud." }],
+      kennel: [{ when: "hold", slot: "leash", label: "Kennel Lead", desc: "A short lead clipped to the ring at the back of the kennel. Long enough to get on all fours. Not long enough to reach the door." }],
+      wolves: [{
+        when: "after",
+        slot: (mn) => stopperFor(mn, "vulva"),
+        label: "Pack's Knot",
+        mins: 10,
+        color: "#B3323A",
+        desc: "The last wolf's knot, still swollen fat inside and throbbing, tying them to a bellyful of the whole pack's seed until it finally goes down."
+      }],
+      stallion: [{
+        when: "after",
+        slot: (mn) => stopperFor(mn, "vulva"),
+        label: "Stud's Stopper",
+        mins: 10,
+        desc: "A stable hand's rubber stopper, shoved in after the stallion pulled out, to keep a mare's worth of horse cum from pouring down their legs."
+      }],
+      pillory: [{
+        when: "after",
+        slot: "ropeFeet",
+        label: "Pillory Spreader",
+        mins: () => CFG.TRAP_PILLORY_MIN,
+        desc: "A bar ratcheted between the ankles so the legs can't close while they're bent in the pillory. Whoever walks up gets whichever hole they like."
+      }]
     };
-    function gearOn(mn, slot, label, desc, mins, src) {
+    function gearOn(mn, slot, label, desc, mins, src, x) {
       const r = rec(mn);
       if (!r || !slot) return false;
       r.gear = r.gear || {};
       r.gear[slot] = { label: String(label).slice(0, 28), desc: String(desc || "").slice(0, 180), until: Date.now() + Math.max(0.5, mins || 5) * 6e4, src: src || "trap" };
+      if (x && x.items) r.gear[slot].items = x.items.slice(0, 4);
+      if (x && x.color) r.gear[slot].color = x.color;
       saveLedger();
       syncCompanions(true);
       return true;
@@ -15509,12 +16055,12 @@
       if (!g) return null;
       const r = rec(mn), holdMin = r.penned && r.penned.trap ? Math.max(1, (r.penned.until - Date.now()) / 6e4) : 3;
       const plan = g.map((x) => Object.assign({}, x, { slot: typeof x.slot === "function" ? x.slot(mn) : x.slot }));
-      for (const x of plan) if (x.when === "hold" && x.slot) gearOn(mn, x.slot, x.label, x.desc, holdMin + 0.5, "hold");
+      for (const x of plan) if (x.when === "hold" && x.slot) gearOn(mn, x.slot, x.label, x.desc, holdMin + 0.5, "hold", x);
       return plan;
     }
     function trapGearDone(mn, plan) {
       gearOff(mn, null, "hold");
-      for (const x of plan || []) if (x.when === "after" && x.slot) gearOn(mn, x.slot, x.label, x.desc, tmin(mn, typeof x.mins === "function" ? x.mins() : x.mins), "trap");
+      for (const x of plan || []) if (x.when === "after" && x.slot) gearOn(mn, x.slot, x.label, x.desc, tmin(mn, typeof x.mins === "function" ? x.mins() : x.mins), "trap", x);
     }
     function farmGearTick(now) {
       for (const [k, r] of Object.entries(L.people)) {
@@ -15536,18 +16082,8 @@
     }
     function farmGearFor(mn) {
       const r = rec(mn), now = Date.now(), out = [];
-      for (const [slot, g] of Object.entries(r && r.gear || {})) if (g.until > now) out.push({ slot, name: g.label, desc: g.desc, until: Math.ceil(g.until / 6e4) * 6e4 });
-      if (parasiteOn(mn)) {
-        const belt = r.parasite.form === "belt";
-        out.push({
-          slot: belt ? "belt" : "lips",
-          name: belt ? "Parasite Belt" : "Parasite Lips",
-          always: true,
-          color: "#E0607F",
-          until: r.parasite.until,
-          desc: belt ? "A belt of living flesh closed round the hips, with a root up inside. It feeds its host serum and drinks every load they take." : "A pair of fat, living lips sealed over the mouth, with a tentacle down the throat. It feeds its host serum and drinks every load they swallow."
-        });
-      }
+      for (const [slot, g] of Object.entries(r && r.gear || {})) if (g.until > now) out.push(Object.assign({ slot, name: g.label, desc: g.desc, until: Math.ceil(g.until / 6e4) * 6e4 }, g.items ? { items: g.items } : {}, g.color ? { color: g.color } : {}));
+      if (parasiteOn(mn)) for (const g of parasiteGear(mn)) out.push(g);
       return out;
     }
     function trapAdminFor() {
@@ -16799,6 +17335,9 @@ THE PARASITE \xB7 ?parasite on
   mouth for 12 hours. It feeds you serum every half hour
   (fertility, growth, hyper pregnancy, capacity; the growth is
   for keeps) and turns every load you swallow into more.
+  It comes in four strains, blooms over its twelve hours (lips,
+  then teats, then below), gets urges, lays its own eggs at the
+  end, and passes by a kiss or by nursin'.
   ?parasite \xB7 how long is left. Your safeword takes it off.
 
 WATERSPORTS \xB7 ?watersports on
@@ -17841,7 +18380,8 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
       "gather",
       "pack",
       "watersport",
-      "parasites"
+      "parasites",
+      "eager"
     ];
     const STAFF_CMDS = [
       "queue",
@@ -20270,6 +20810,10 @@ Welcome to B&B Farm, hon. \u{1F33E}`
           parasiteCommand(cmd === "parasites" ? "parasite" : cmd, sender, args, R);
           break;
         // 10v-parasite.js
+        case "eager":
+          trapCommand("traps", sender, ["eager"].concat(args), R);
+          break;
+        // the no-cooldown switch, as its own command (and a Toggles switch)
         case "struggle":
         case "free":
         case "goad":

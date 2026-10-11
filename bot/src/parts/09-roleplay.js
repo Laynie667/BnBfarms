@@ -92,6 +92,7 @@
   }
   // someone drinks from the milker: a little at a time over a few seconds
   function nurse(milker, drinker){
+    parasiteNurse(milker, drinker);   // it passes in milk (10v2-parasite-more.js)
     if (missing(milker, drinker)) return false;
     const p = prodOf(milker), now = Date.now();
     if (now - (p.lastNursed||0) < CFG.NURSE_COOLDOWN_S*1000 || p.milk < 1) return false;

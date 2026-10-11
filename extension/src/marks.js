@@ -125,7 +125,8 @@ const OLD_TAG = "[B&B Farm gear]";
 // every name the farm gives a piece. An item YOU crafted onto yourself under one of these names is the farm's, whatever became
 // of its description (live, Oct 11: a Slime Seal lost its tag and never came off)
 const FARM_NAMES = ["Parasite Lips", "Parasite Belt", "Pump Bung", "Egg Post Plug", "Slime Seal", "Boar's Plug", "Seed Pod Stem", "Denial Clamp", "Growth Cups",
-  "Trap Milker", "Winch Chain", "Feed Chute", "Snare Rope", "Breedin' Frame Cuffs", "Kennel Lead"];
+  "Trap Milker", "Winch Chain", "Feed Chute", "Snare Rope", "Breedin' Frame Cuffs", "Kennel Lead", "The Water's Grip", "The Water's Coils", "Slime Sleeves", "Slime Stockings",
+  "Snare Hobble", "Pack's Knot", "Stud's Stopper", "Pillory Spreader", "Parasite Suckers", "Parasite Root"];
 // slot → where it can go and which game item it is: the first that this game has; the pattern is a fallback
 const GEAR_SLOTS = {
   plug:     { groups: ["ItemButt"], names: ["InflVibeButtPlug", "BlackButtPlug", "ButtPlug", "ButtPump"], re: /ButtPlug|Plug/, color: "#2B2B2B" },
@@ -135,17 +136,23 @@ const GEAR_SLOTS = {
   leash:    { groups: ["ItemNeckRestraints"], names: ["CollarChainLong", "CollarLeash", "CollarChainShort"], re: /Chain|Leash/, needs: "ItemNeck" },
   funnel:   { groups: ["ItemMouth", "ItemMouth2", "ItemMouth3"], names: ["FunnelGag"], re: /Funnel/ },
   ropeArms: { groups: ["ItemArms"], names: ["HempRope"], re: /Rope/ },
+  arms:     { groups: ["ItemArms"], names: ["HempRope", "LeatherCuffs"], re: /Rope|Cuffs/ },
+  legs:     { groups: ["ItemLegs"], names: ["HempRope", "LeatherLegCuffs"], re: /Rope|Cuffs/ },
   ropeFeet: { groups: ["ItemFeet"], names: ["HempRope"], re: /Rope/ },
   lips:     { groups: ["ItemMouth", "ItemMouth2", "ItemMouth3"], names: ["LipGag"], re: /LipGag/, color: ["#E0607F", "#7A2B47", "#7A2B47"] },
 };
-function gearAsset(group, slot) {
+function gearAsset(group, slot, prefer) {
   const fam = P().AssetFamily, get = (n) => { try { return typeof window.AssetGet === "function" ? window.AssetGet(fam, group, n) : null; } catch (e) { return null; } };
+  for (const n of (Array.isArray(prefer) ? prefer.map(String) : [])) if (/^[A-Za-z0-9_]{2,40}$/.test(n) && get(n)) return n;   // the piece's own choice, if this game has it there
   for (const n of slot.names) if (get(n)) return n;
   const all = Array.isArray(window.Asset) ? window.Asset : [];
   const hit = all.find((a) => a && a.Group && a.Group.Name === group && slot.re.test(a.Name) && !a.OwnerOnly && !a.LoverOnly && !a.FamilyOnly);
   return hit ? hit.Name : (typeof window.AssetGet !== "function" ? slot.names[0] : null);
 }
-const isFarmGear = (b) => { const c = b.Craft, d = c ? String(c.Description || "") : ""; return !!(c && (d.includes(FARM_TAG) || d.includes(OLD_TAG) || (FARM_NAMES.includes(c.Name) && (!c.MemberNumber || c.MemberNumber === P().MemberNumber)))); };
+const NAMES_KEY = "fhc-gear-names";
+const knownNames = () => { try { return FARM_NAMES.concat(JSON.parse(window.localStorage.getItem(NAMES_KEY)) || []); } catch (e) { return FARM_NAMES; } };
+const learnName = (n) => { try { const have = JSON.parse(window.localStorage.getItem(NAMES_KEY)) || []; if (!FARM_NAMES.includes(n) && !have.includes(n)) window.localStorage.setItem(NAMES_KEY, JSON.stringify(have.concat(n).slice(-80))); } catch (e) { /* fine */ } };
+const isFarmGear = (b) => { const c = b.Craft, d = c ? String(c.Description || "") : ""; return !!(c && (d.includes(FARM_TAG) || d.includes(OLD_TAG) || (knownNames().includes(c.Name) && (!c.MemberNumber || c.MemberNumber === P().MemberNumber)))); };
 // what we put where, kept on this computer too: if the game ever hands an item back without its crafted name,
 // we still know it's ours and can take it off again
 const GEAR_KEY = "fhc-gear";
@@ -172,14 +179,14 @@ export function syncFarmGear(list, allow) {
     if (slot.needs && !next.some((b) => b.Group === slot.needs)) continue;            // a chain needs a collar to clip to
     const group = slot.groups.find((x) => !next.some((b) => b.Group === x) && groupOf(x));
     if (!group) continue;                                                              // that spot's taken: it's on the farm's books just the same
-    const item = gearAsset(group, slot);
+    const item = gearAsset(group, slot, g.items);
     if (!item) continue;
-    const color = g.color && !slot.color ? g.color : (slot.color || g.color || "Default");
+    const color = (typeof g.color === "string" && /^#[0-9a-fA-F]{6}$/.test(g.color) ? g.color : null) || slot.color || "Default";
     const it = { Group: group, Name: item, Difficulty: 20, Property: {},
-      Craft: { Item: item, Name: String(g.name).slice(0, 30), Description: (FARM_TAG + " " + String(g.desc || "").slice(0, 150)).trim(),
+      Craft: { Item: item, Name: String(g.name).slice(0, 30), Description: (FARM_TAG + " " + String(g.desc || "").slice(0, 180)).trim(),
         Property: "Normal", Color: Array.isArray(color) ? color.join(",") : color, Lock: "", Private: true, MemberNumber: P().MemberNumber, MemberName: P().Name, ItemProperty: {}, Type: null, TypeRecord: null } };
     if (color !== "Default") it.Color = color;
-    next.push(it); did.on.push(g.name); mem[g.name] = { group, item };
+    next.push(it); did.on.push(g.name); mem[g.name] = { group, item }; learnName(String(g.name).slice(0, 30));
   }
   gearMemSave(mem);
   if (did.on.length || did.off.length) commit(next);

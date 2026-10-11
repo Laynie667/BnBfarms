@@ -34,7 +34,7 @@ const wait=ms=>new Promise(r=>setTimeout(r,ms));
   d=syncFarmGear([plug,cups,lips], true);
   ok(has('ItemButt','BlackButtPlug') && has('ItemNipples','LactationPump') && d.on.length===2, 'switched on: the plug and the cups go on as real items');
   const pl=P.Appearance.find(it=>it.Asset.Group.Name==='ItemButt');
-  ok(pl.Craft.Name==='Pump Bung' && /\[B&B Farm gear\]/.test(pl.Craft.Description), '...crafted with the farm\'s name and tag');
+  ok(pl.Craft.Name==='Pump Bung' && /^BnB Farm gear\./.test(pl.Craft.Description), '...crafted with the farm\'s name and tag');
   const c0=commits; d=syncFarmGear([plug,cups,lips], true); ok(!d.on.length && !d.off.length && commits===c0, 'nothin\' to do the second time: no needless wardrobe change');
   P.Appearance=P.Appearance.filter(it=>it.Asset.Group.Name!=='ItemButt'); d=syncFarmGear([plug,cups,lips], true);
   ok(has('ItemButt','BlackButtPlug') && d.on.join()==='Pump Bung', 'pulled out early: it goes back in');
@@ -47,6 +47,11 @@ const wait=ms=>new Promise(r=>setTimeout(r,ms));
   syncFarmGear([plug], true); delete P.Appearance.find(it=>it.Asset.Group.Name==='ItemButt').Craft;
   d=syncFarmGear([plug], true); ok(!d.on.length && P.Appearance.filter(it=>it.Asset.Group.Name==='ItemButt').length===1, 'an item that lost its crafted name is still known as ours (no second one)');
   d=syncFarmGear([], true); ok(!has('ItemButt') && d.off.join()==='Pump Bung', '...and still comes off');
+  // live, Oct 11: a Slime Seal whose description lost its tag (and whose note on this computer was gone) never came off
+  P.Appearance.push(mk('ItemVulva','VibratingDildo',{ Craft:{ Name:'Slime Seal', Description:'mangled by the game', MemberNumber:500 } })); for (const k of Object.keys(ls)) delete ls[k];
+  d=syncFarmGear([], true); ok(!has('ItemVulva') && d.off.join()==='Slime Seal', 'a farm piece is known by its name even with its tag gone: it comes off');
+  P.Appearance.push(mk('ItemVulva','VibratingDildo',{ Craft:{ Name:'Slime Seal', Description:'somebody else made this', MemberNumber:999 } }));
+  d=syncFarmGear([], true); ok(has('ItemVulva'), '...but somebody else\x27s item that only shares the name is left alone'); P.Appearance=P.Appearance.filter(it=>it.Asset.Group.Name!=='ItemVulva');
   // a spot that's taken, a chain with no collar, a locked farm piece
   P.Appearance.push(mk('ItemButt','AnalBeads',{ Craft:{ Name:'Her beads', Description:'' } }));
   d=syncFarmGear([plug,{ slot:'leash', name:'Winch Chain', desc:'x', until:far }], true);

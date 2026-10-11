@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.14.3
+// @version      0.14.4
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -230,7 +230,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.14.3";
+  var VERSION = "0.14.4";
 
   // extension/src/config.js
   var BOT_MEMBER = 260239;
@@ -4018,8 +4018,25 @@ One of mods you are using is using an old version of SDK. It will work for now b
     commit2(next);
     return { ok: true, did };
   }
-  var FARM_TAG = "[B&B Farm gear]";
-  var OLD_NAMES = ["Parasite Lips", "Parasite Belt"];
+  var FARM_TAG = "BnB Farm gear.";
+  var OLD_TAG = "[B&B Farm gear]";
+  var FARM_NAMES = [
+    "Parasite Lips",
+    "Parasite Belt",
+    "Pump Bung",
+    "Egg Post Plug",
+    "Slime Seal",
+    "Boar's Plug",
+    "Seed Pod Stem",
+    "Denial Clamp",
+    "Growth Cups",
+    "Trap Milker",
+    "Winch Chain",
+    "Feed Chute",
+    "Snare Rope",
+    "Breedin' Frame Cuffs",
+    "Kennel Lead"
+  ];
   var GEAR_SLOTS = {
     plug: { groups: ["ItemButt"], names: ["InflVibeButtPlug", "BlackButtPlug", "ButtPlug", "ButtPump"], re: /ButtPlug|Plug/, color: "#2B2B2B" },
     dildo: { groups: ["ItemVulva"], names: ["InflatableVibeDildo", "VibratingDildo", "ClitoralStimulator"], re: /Dildo/, color: "#2B2B2B" },
@@ -4044,7 +4061,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
     const hit = all.find((a) => a && a.Group && a.Group.Name === group && slot.re.test(a.Name) && !a.OwnerOnly && !a.LoverOnly && !a.FamilyOnly);
     return hit ? hit.Name : typeof window.AssetGet !== "function" ? slot.names[0] : null;
   }
-  var isFarmGear = (b) => !!(b.Craft && (String(b.Craft.Description || "").includes(FARM_TAG) || OLD_NAMES.includes(b.Craft.Name)));
+  var isFarmGear = (b) => {
+    const c = b.Craft, d = c ? String(c.Description || "") : "";
+    return !!(c && (d.includes(FARM_TAG) || d.includes(OLD_TAG) || FARM_NAMES.includes(c.Name) && (!c.MemberNumber || c.MemberNumber === P2().MemberNumber)));
+  };
   var GEAR_KEY = "fhc-gear";
   var gearMem = () => {
     try {
@@ -4059,7 +4079,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     } catch (e) {
     }
   };
-  var gearNameOf = (b, mem) => isFarmGear(b) ? b.Craft.Name : Object.keys(mem).find((n) => mem[n].group === b.Group && mem[n].item === b.Name && !(b.Craft && b.Craft.Name)) || null;
+  var gearNameOf = (b, mem) => isFarmGear(b) ? b.Craft.Name : Object.keys(mem).find((n) => mem[n].group === b.Group && mem[n].item === b.Name && (!(b.Craft && b.Craft.Name) || b.Craft.Name === n)) || null;
   function syncFarmGear(list, allow) {
     if (!P2() || !Array.isArray(P2().Appearance) || typeof window.ServerAppearanceBundle !== "function") return { on: [], off: [] };
     const want = (Array.isArray(list) ? list : []).filter((g) => g && GEAR_SLOTS[g.slot] && (g.always || allow) && (!g.until || g.until > Date.now()));
@@ -4090,7 +4110,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
         Craft: {
           Item: item,
           Name: String(g.name).slice(0, 30),
-          Description: (String(g.desc || "").slice(0, 150) + " " + FARM_TAG).trim(),
+          Description: (FARM_TAG + " " + String(g.desc || "").slice(0, 150)).trim(),
           Property: "Normal",
           Color: Array.isArray(color) ? color.join(",") : color,
           Lock: "",

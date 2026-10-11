@@ -120,8 +120,12 @@ export function markBody(m, prefs) {
 // character match it: a listed piece goes on, a piece that's no longer listed comes off, and one pulled off early
 // goes back. Trap gear needs "Farm can put real gear on me" (Toggles); the parasite's own switch is its say-so.
 // Each piece is crafted with FARM_TAG in its description, which is how we know which items are ours to remove.
-const FARM_TAG = "[B&B Farm gear]";
-const OLD_NAMES = ["Parasite Lips", "Parasite Belt"];   // from before the tag
+const FARM_TAG = "BnB Farm gear.";   // plain letters, and at the FRONT of the description, so the game can neither strip it nor cut it off
+const OLD_TAG = "[B&B Farm gear]";
+// every name the farm gives a piece. An item YOU crafted onto yourself under one of these names is the farm's, whatever became
+// of its description (live, Oct 11: a Slime Seal lost its tag and never came off)
+const FARM_NAMES = ["Parasite Lips", "Parasite Belt", "Pump Bung", "Egg Post Plug", "Slime Seal", "Boar's Plug", "Seed Pod Stem", "Denial Clamp", "Growth Cups",
+  "Trap Milker", "Winch Chain", "Feed Chute", "Snare Rope", "Breedin' Frame Cuffs", "Kennel Lead"];
 // slot → where it can go and which game item it is: the first that this game has; the pattern is a fallback
 const GEAR_SLOTS = {
   plug:     { groups: ["ItemButt"], names: ["InflVibeButtPlug", "BlackButtPlug", "ButtPlug", "ButtPump"], re: /ButtPlug|Plug/, color: "#2B2B2B" },
@@ -141,13 +145,13 @@ function gearAsset(group, slot) {
   const hit = all.find((a) => a && a.Group && a.Group.Name === group && slot.re.test(a.Name) && !a.OwnerOnly && !a.LoverOnly && !a.FamilyOnly);
   return hit ? hit.Name : (typeof window.AssetGet !== "function" ? slot.names[0] : null);
 }
-const isFarmGear = (b) => !!(b.Craft && (String(b.Craft.Description || "").includes(FARM_TAG) || OLD_NAMES.includes(b.Craft.Name)));
+const isFarmGear = (b) => { const c = b.Craft, d = c ? String(c.Description || "") : ""; return !!(c && (d.includes(FARM_TAG) || d.includes(OLD_TAG) || (FARM_NAMES.includes(c.Name) && (!c.MemberNumber || c.MemberNumber === P().MemberNumber)))); };
 // what we put where, kept on this computer too: if the game ever hands an item back without its crafted name,
 // we still know it's ours and can take it off again
 const GEAR_KEY = "fhc-gear";
 const gearMem = () => { try { return JSON.parse(window.localStorage.getItem(GEAR_KEY)) || {}; } catch (e) { return {}; } };
 const gearMemSave = (m) => { try { window.localStorage.setItem(GEAR_KEY, JSON.stringify(m)); } catch (e) { /* fine */ } };
-const gearNameOf = (b, mem) => (isFarmGear(b) ? b.Craft.Name : (Object.keys(mem).find((n) => mem[n].group === b.Group && mem[n].item === b.Name && !(b.Craft && b.Craft.Name)) || null));
+const gearNameOf = (b, mem) => (isFarmGear(b) ? b.Craft.Name : (Object.keys(mem).find((n) => mem[n].group === b.Group && mem[n].item === b.Name && (!(b.Craft && b.Craft.Name) || b.Craft.Name === n)) || null));
 // list: [{ slot, name, desc, color, always }] · allow: trap gear is switched on. Returns what it did.
 export function syncFarmGear(list, allow) {
   if (!P() || !Array.isArray(P().Appearance) || typeof window.ServerAppearanceBundle !== "function") return { on: [], off: [] };
@@ -172,7 +176,7 @@ export function syncFarmGear(list, allow) {
     if (!item) continue;
     const color = g.color && !slot.color ? g.color : (slot.color || g.color || "Default");
     const it = { Group: group, Name: item, Difficulty: 20, Property: {},
-      Craft: { Item: item, Name: String(g.name).slice(0, 30), Description: (String(g.desc || "").slice(0, 150) + " " + FARM_TAG).trim(),
+      Craft: { Item: item, Name: String(g.name).slice(0, 30), Description: (FARM_TAG + " " + String(g.desc || "").slice(0, 150)).trim(),
         Property: "Normal", Color: Array.isArray(color) ? color.join(",") : color, Lock: "", Private: true, MemberNumber: P().MemberNumber, MemberName: P().Name, ItemProperty: {}, Type: null, TypeRecord: null } };
     if (color !== "Default") it.Color = color;
     next.push(it); did.on.push(g.name); mem[g.name] = { group, item };

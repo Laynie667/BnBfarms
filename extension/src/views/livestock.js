@@ -86,6 +86,10 @@ function traps(ctx) {
       tc.hunt && muted("🔔 The hunt is on: get to " + tc.hunt.goal),
       h("div", null, btn("Struggle", () => ctx.send("struggle")), btn(tc.paused ? "Traps on" : "Pause traps", () => ctx.send("traps " + (tc.paused ? "on" : "off"))),
         btn(tc.eager ? "Eager: on" : "Eager: off", () => ctx.send("traps eager " + (tc.eager ? "off" : "on"))), btn("What's out there", () => ctx.send("traps")), btn("Lay (at the nest)", () => ctx.send("lay"))))
+       : (s.roles || []).includes("SUBJECT")
+         // a subject, but the farm girl sent no card: her bot is older than this panel
+         ? card(title("Trap card"), muted("You're a test subject, and the traps are live for you. Your card isn't showin' because the farm girl's bot (v" + ((ctx.welcome && ctx.welcome.ver) || "?") + ") is older than this panel: it needs 0.22 or newer on her computer to send it."),
+             h("div", null, btn("Struggle", () => ctx.send("struggle")), btn("What's out there", () => ctx.send("traps"))))
        : card(title("Traps"), muted("The farm's traps spring for test subjects and nobody else. A proprietor signs a volunteer up; you're not one right now, so you can walk right over them.")),
     card(title("On you right now"), gear.length ? gear.map((g) => h("div", { class: "fhc-kv" }, h("span", null, g.name), h("span", { class: "fhc-muted" }, Math.max(0, Math.ceil((g.until - Date.now()) / 60000)) + " min")))
       : muted("No farm gear on you."),

@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.14.1
+// @version      0.14.2
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -230,7 +230,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.14.1";
+  var VERSION = "0.14.2";
 
   // extension/src/config.js
   var BOT_MEMBER = 260239;
@@ -636,6 +636,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
           btn("What's out there", () => ctx2.send("traps")),
           btn("Lay (at the nest)", () => ctx2.send("lay"))
         )
+      ) : (s.roles || []).includes("SUBJECT") ? card(
+        title("Trap card"),
+        muted("You're a test subject, and the traps are live for you. Your card isn't showin' because the farm girl's bot (v" + (ctx2.welcome && ctx2.welcome.ver || "?") + ") is older than this panel: it needs 0.22 or newer on her computer to send it."),
+        h("div", null, btn("Struggle", () => ctx2.send("struggle")), btn("What's out there", () => ctx2.send("traps")))
       ) : card(title("Traps"), muted("The farm's traps spring for test subjects and nobody else. A proprietor signs a volunteer up; you're not one right now, so you can walk right over them.")),
       card(
         title("On you right now"),

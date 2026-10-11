@@ -1287,7 +1287,10 @@
     if (!CFG.LSCG_SPLATTERS || !lscgSplatsOn(mn)) return false;
     for (const group of groups){
       send("ChatRoomChat", { Content: "ChatOther-"+group+"-LSCG_Splat", Type: "Activity", Target: mn,
-        Dictionary: [ { Tag: "SourceCharacter", Text: who || "A stranger" }, { TargetCharacter: mn },
+        // (Oct 11) the action now names a real character as its source: me. A source with only a name and no member
+        // number left other mods lookin' up a character that isn't there, and crashed some players (ModSDK error).
+        // The name line comes first, so the sentence still reads "A stranger sprays…".
+        Dictionary: [ { Tag: "SourceCharacter", Text: who || "A stranger" }, { SourceCharacter: CFG.BOT_MEMBER }, { TargetCharacter: mn },
                       { Tag: "FocusAssetGroup", FocusGroupName: group }, { ActivityName: "LSCG_Splat" } ] });
     }
     return true;

@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.24.2
+// @version      0.24.3
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -1828,7 +1828,7 @@
   ];
 
   // bot/src/version.js
-  var VERSION = "0.24.2";
+  var VERSION = "0.24.3";
 
   // bot-parts:farmhand-bot-parts
   (function() {
@@ -2401,6 +2401,8 @@
       PARASITE_HOURS: 12,
       PARASITE_DOSE_MIN: 30,
       PARASITE_LATCH_S: 12,
+      PARASITE_DANGER: [0.25, 0.5],
+      // ...with one Danger Draught in them, and with two
       PARASITE_KISS_CHANCE: 0.5,
       // a mouth kiss with somebody carryin' it, for somebody who said ?parasite on
       CRAVE_HOURS: 12,
@@ -3390,7 +3392,7 @@
     };
     W.FarmhandExport = exportLedger;
     W.FarmhandLedger = () => L;
-    if (W.__FARMHAND_TEST__) Object.assign(W, { __st: () => state, __cfg: CFG, __pt: prodTick, __qt: quotaTick, __lt: leashTick, __ms: milkingStallTick, __vt: voiceTick, __sync: syncCompanions, __gt: gearTick, __ht: homeTick, __addons: (h, ...a) => addonsEmit(h, ...a), __stateFor: (mn) => stateFor(mn), __leadTick: () => leadTick(), __ambient: () => ambientTick(), __about: (t) => aboutWhom(t), __announce: (t) => announce(t), __reply: (mn, t, ch) => reply(mn, t, ch), __office: () => officeCheck(), __namesHere: (t) => namesHere(t), __speciesCheck: (t) => QUESTIONS.find((q) => q.key === "species").check(t), __attach: () => attachListeners(), __tryLogin: () => tryLogin(), __beepText: (m) => beepText(m), __nameOnce: (t, mn) => nameOnce(t, mn), __buildContract: (n, mn, d) => buildContract(contractTemplate(n), mn, d), __potionTick: () => potionTick(), __penTick: () => penTick(), __trapTick: () => trapTick(), __gearOn: (m, s, l, d, x) => gearOn(m, s, l, d, x), __heard: (mn, t) => trapHeard(mn, t), __parasiteTick: () => parasiteTick(), __kiss: (a, f, s, t) => parasiteKiss(a, f, s, t), __load: (s, m, h, x) => parasiteLoad(s, m, h, x), __shot: (t, by, text, how) => applyShot(t, by, text, how), __slow: (mn) => slowOf(mn), __milkRate: (mn) => milkRate(mn), __benchTick: () => benchTick(), __roll: (m, s, a, b) => rollConception(m, s, a, b), __contractTick: () => {
+    if (W.__FARMHAND_TEST__) Object.assign(W, { __st: () => state, __cfg: CFG, __pt: prodTick, __qt: quotaTick, __lt: leashTick, __ms: milkingStallTick, __vt: voiceTick, __sync: syncCompanions, __gt: gearTick, __ht: homeTick, __addons: (h, ...a) => addonsEmit(h, ...a), __stateFor: (mn) => stateFor(mn), __leadTick: () => leadTick(), __ambient: () => ambientTick(), __about: (t) => aboutWhom(t), __announce: (t) => announce(t), __reply: (mn, t, ch) => reply(mn, t, ch), __office: () => officeCheck(), __namesHere: (t) => namesHere(t), __speciesCheck: (t) => QUESTIONS.find((q) => q.key === "species").check(t), __attach: () => attachListeners(), __tryLogin: () => tryLogin(), __beepText: (m) => beepText(m), __nameOnce: (t, mn) => nameOnce(t, mn), __buildContract: (n, mn, d) => buildContract(contractTemplate(n), mn, d), __potionTick: () => potionTick(), __penTick: () => penTick(), __trapTick: () => trapTick(), __gearOn: (m, s, l, d, x) => gearOn(m, s, l, d, x), __heard: (mn, t) => trapHeard(mn, t), __parasiteTick: () => parasiteTick(), __parasiteChance: (m) => parasiteChance(m), __kiss: (a, f, s, t) => parasiteKiss(a, f, s, t), __load: (s, m, h, x) => parasiteLoad(s, m, h, x), __shot: (t, by, text, how) => applyShot(t, by, text, how), __slow: (mn) => slowOf(mn), __milkRate: (mn) => milkRate(mn), __benchTick: () => benchTick(), __roll: (m, s, a, b) => rollConception(m, s, a, b), __contractTick: () => {
       state.cwAt = 0;
       contractWatchTick();
     }, __lingerTick: () => lingerTick(), __ribbonTick: () => ribbonTick(), __dareTick: () => dareTick(), __potionOn: (mn, id) => potionOn(mn, id), __milkRate: (mn) => milkRate(mn) });
@@ -9808,7 +9810,7 @@
         kind: "punish",
         mins: 120,
         price: 8,
-        desc: "For two hours your luck runs bad: you catch half again as easy, the water, the parasite and every chancy thing on the farm are half again as likely to get you, and whatever a trap does to you lasts twice as long. A second bottle on top makes it three times.",
+        desc: "For two hours your luck runs bad: you catch half again as easy, the water and every chancy thing on the farm are half again as likely to get you, the parasite jumps to one chance in four, and whatever a trap does to you lasts twice as long. A second bottle on top: three times as long, and the parasite is a coin toss.",
         limit: /\b(danger|risk)/i,
         drink: "It's black, it smokes a little, and it tastes like a dare. Somethin' in your belly goes cold and reckless.",
         seen: "%n knocks back a Danger Draught and shivers. They've just made themselves the unluckiest animal on the farm."
@@ -13917,6 +13919,10 @@
     ANTHRO_LINES.wall = MORE_LINES.wall;
     const PARASITE_SERUMS = ["growth", "fertility", "growth", "hyper pregnancy", "growth", "capacity"];
     const PARASITE_GROWS = ["udder", "penis", "testes", "butt"];
+    function parasiteChance(mn) {
+      const n = potionX(mn, "danger");
+      return n >= 2 ? CFG.PARASITE_DANGER[1] : n === 1 ? CFG.PARASITE_DANGER[0] : CFG.PARASITE_CHANCE;
+    }
     function parasiteOn(mn) {
       const r = rec(mn);
       return !!(r && r.parasite && r.parasite.until > Date.now());
@@ -14006,7 +14012,7 @@
           return;
         }
         if (stud !== ANON_STUD || !r.parasiteOn || (r.parasiteNext || 0) > Date.now()) return;
-        if (/\bparasit/i.test(r.limits || "") || Math.random() >= CFG.PARASITE_CHANCE * dangerX(mn).chance) return;
+        if (/\bparasit/i.test(r.limits || "") || Math.random() >= parasiteChance(mn)) return;
         setTimeout(() => {
           try {
             if (charFor(mn) && !parasiteOn(mn)) parasiteLatch(mn, "glory");

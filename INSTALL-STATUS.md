@@ -5,7 +5,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 | Script | File in `dist/` | Where it runs | Current |
 |---|---|---|---|
-| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.24.2** |
+| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.24.3** |
 | Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.5.8** |
 | Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.1.3** |
 | Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **1.0.4** |

@@ -41,7 +41,7 @@
     { id: "needy", name: "Needy Nectar", kind: "punish", mins: 30, price: 4, desc: "For 30 minutes you ache and squirm and can't stop thinkin' about it. ?beg nicely and it might let up early.",
       limit: /\b(arous|denial)/i, drink: "Sweet at first, then it blooms into a slow, maddenin' throb that won't settle.",
       seen: "%n drinks a Needy Nectar and starts squirmin' within the minute, thighs pressed tight." },
-    { id: "danger", name: "Danger Draught", kind: "punish", mins: 120, price: 8, desc: "For two hours your luck runs bad: you catch half again as easy, the water, the parasite and every chancy thing on the farm are half again as likely to get you, and whatever a trap does to you lasts twice as long. A second bottle on top makes it three times.",
+    { id: "danger", name: "Danger Draught", kind: "punish", mins: 120, price: 8, desc: "For two hours your luck runs bad: you catch half again as easy, the water and every chancy thing on the farm are half again as likely to get you, the parasite jumps to one chance in four, and whatever a trap does to you lasts twice as long. A second bottle on top: three times as long, and the parasite is a coin toss.",
       limit: /\b(danger|risk)/i, drink: "It's black, it smokes a little, and it tastes like a dare. Somethin' in your belly goes cold and reckless.",
       seen: "%n knocks back a Danger Draught and shivers. They've just made themselves the unluckiest animal on the farm." },
     { id: "hiccup", name: "Hiccup Fizz", kind: "silly", mins: 15, price: 3, desc: "Fifteen minutes of hiccups. At the worst possible moments.",

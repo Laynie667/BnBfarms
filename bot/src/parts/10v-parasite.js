@@ -16,6 +16,8 @@
   */
   const PARASITE_SERUMS = ["growth", "fertility", "growth", "hyper pregnancy", "growth", "capacity"];
   const PARASITE_GROWS = ["udder", "penis", "testes", "butt"];     // tits, cock, balls, ass, round and round
+  // 3% on a swallowed glory-stall load; a Danger Draught makes it 25%, and a second bottle on top 50%
+  function parasiteChance(mn){ const n = potionX(mn, "danger"); return n >= 2 ? CFG.PARASITE_DANGER[1] : n === 1 ? CFG.PARASITE_DANGER[0] : CFG.PARASITE_CHANCE; }
   function parasiteOn(mn){ const r = rec(mn); return !!(r && r.parasite && r.parasite.until > Date.now()); }
   function parasiteSerum(mn, i){
     let s = PARASITE_SERUMS[i % PARASITE_SERUMS.length];
@@ -97,7 +99,7 @@
         return;
       }
       if (stud !== ANON_STUD || !r.parasiteOn || (r.parasiteNext || 0) > Date.now()) return;      // only out of the glory holes, only if they asked
-      if (/\bparasit/i.test(r.limits || "") || Math.random() >= CFG.PARASITE_CHANCE*dangerX(mn).chance) return;
+      if (/\bparasit/i.test(r.limits || "") || Math.random() >= parasiteChance(mn)) return;
       setTimeout(() => { try { if (charFor(mn) && !parasiteOn(mn)) parasiteLatch(mn, "glory"); } catch(e){ warn("parasite:", e); } }, CFG.PARASITE_LATCH_S*1000);
     } catch(e){ warn("parasite load:", e); }
   }

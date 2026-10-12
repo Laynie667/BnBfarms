@@ -5,7 +5,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 | Script | File in `dist/` | Where it runs | Current |
 |---|---|---|---|
-| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.29.1** |
+| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.29.2** |
 | Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.6.0** |
 | Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.1.3** |
 | Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **1.0.4** |
@@ -23,6 +23,8 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 - Running the watcher on more than one game at once (the bot, yours, a tester's) lets Claude line them up into one timeline.
 
 ## Latest changes (newest first)
+
+- **Bot 0.29.2: the intensity dial, trap by trap.** All 25 named traps (the 13 farm traps and the 12 anthro ones) now have three tender and three filthy closing lines of their own, 150 in all. With `?intensity tender` or `filthy`, half of a trap's beats from the second on get one, two times in three from that trap's own list.
 
 - **Bot 0.29.1: a second round of lines** for brooding, the whistle, home-built traps, trained holes, barn dreams, the stall dial, overdue udders, bringing into milk, bed rest and being kept: about 75 new lines so those scenes stop repeating.
 

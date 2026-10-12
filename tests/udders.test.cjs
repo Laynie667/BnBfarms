@@ -45,7 +45,10 @@ const rnd=Math.random;
   // ── intensity ──
   n=sent.length; await say(500,'?intensity filthy'); ok(P(500).intensity==='filthy' && /FILTHY/.test(to(500,n)), '?intensity sets how the farm talks about them');
   ok(W.__stateFor(500).intensity==='filthy', '...and the Companion knows');
+  Math.random=()=>0; ok(/hog gettin' wormed|drippin' before the plunger|Dosed like livestock/.test(W.__intTail(500,'injector')), 'filthy has lines of its own for each trap');
+  ok(W.__intTail(600,'injector')==='', '...and somebody on rough gets nothin\' added'); Math.random=rnd;
   await say(500,'?intensity tender'); ok(W.__intSev(500,3)===2 && W.__intSev(500,1)===1, 'tender leans the traps a step milder');
+  Math.random=()=>0; ok(/padded rest|rubs the spot|goes in warm/.test(W.__intTail(500,'injector')), 'tender has its own too'); Math.random=rnd;
   await say(500,'?intensity rough'); ok(W.__intSev(500,3)===3, 'rough leaves them as written');
   // ── the dial, and milked till you cum ──
   n=sent.length; await say(800,'?stalldial Moo hard'); ok(/Only staff/.test(to(800,n)), 'only staff set somebody else\'s dial');

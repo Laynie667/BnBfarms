@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.29.1
+// @version      0.29.2
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -1828,7 +1828,7 @@
   ];
 
   // bot/src/version.js
-  var VERSION = "0.29.1";
+  var VERSION = "0.29.2";
 
   // bot-parts:farmhand-bot-parts
   (function() {
@@ -3460,7 +3460,7 @@
     if (W.__FARMHAND_TEST__) Object.assign(W, { __st: () => state, __cfg: CFG, __pt: prodTick, __qt: quotaTick, __lt: leashTick, __ms: milkingStallTick, __vt: voiceTick, __sync: syncCompanions, __gt: gearTick, __ht: homeTick, __addons: (h, ...a) => addonsEmit(h, ...a), __stateFor: (mn) => stateFor(mn), __leadTick: () => leadTick(), __ambient: () => ambientTick(), __about: (t) => aboutWhom(t), __announce: (t) => announce(t), __reply: (mn, t, ch) => reply(mn, t, ch), __office: () => officeCheck(), __namesHere: (t) => namesHere(t), __speciesCheck: (t) => QUESTIONS.find((q) => q.key === "species").check(t), __attach: () => attachListeners(), __tryLogin: () => tryLogin(), __beepText: (m) => beepText(m), __nameOnce: (t, mn) => nameOnce(t, mn), __buildContract: (n, mn, d) => buildContract(contractTemplate(n), mn, d), __potionTick: () => potionTick(), __penTick: () => penTick(), __trapTick: () => trapTick(), __corrupt: (m, n) => corrupt(m, n), __under: (m) => underOf(m), __goUnder: (m, n) => goUnder(m, n), __lend: () => state.lend, __keepTick: () => keepersTick(), __conceive: (m, s, a, b, h) => rollConception(m, s, a, b, h), __birth: (m) => giveBirth(m), __milkCapOf: (m) => milkCap(m), __udderTick: () => {
       state.udderAt = 0;
       uddersTick();
-    }, __wordsFor: (m, t) => wordsFor(m, t), __overdue: (m) => overdueStage(m), __milkCum: (m) => stallClimax(m), __intSev: (m, s) => intensitySev(m, s), __holes: (m) => holesFor(m), __album: (m) => albumFor(m, 60), __holeTook: (m, h, a) => holeTook(m, h, a), __dreamTheme: (m) => dreamTheme(m), __eggsWorth: (t, n) => eggsWorth(t, n), __rank: (m) => rankX(m), __broodBook: (m) => broodBook(m), __belly: (m) => bellyStage(m), __happening: (m) => happeningFor(m), __gearOn: (m, s, l, d, x) => gearOn(m, s, l, d, x), __heard: (mn, t) => trapHeard(mn, t), __parasiteTick: () => parasiteTick(), __parts: (m) => parasiteParts(rec(m).parasite), __climax: (m) => parasiteClimax(m), __nurse: (a, b) => parasiteNurse(a, b), __parasiteChance: (m) => parasiteChance(m), __kiss: (a, f, s, t) => parasiteKiss(a, f, s, t), __load: (s, m, h, x) => parasiteLoad(s, m, h, x), __shot: (t, by, text, how) => applyShot(t, by, text, how), __slow: (mn) => slowOf(mn), __milkRate: (mn) => milkRate(mn), __benchTick: () => benchTick(), __roll: (m, s, a, b) => rollConception(m, s, a, b), __contractTick: () => {
+    }, __wordsFor: (m, t) => wordsFor(m, t), __overdue: (m) => overdueStage(m), __milkCum: (m) => stallClimax(m), __intSev: (m, s) => intensitySev(m, s), __intTail: (m, k) => intensityTail(m, 5, 6, k), __holes: (m) => holesFor(m), __album: (m) => albumFor(m, 60), __holeTook: (m, h, a) => holeTook(m, h, a), __dreamTheme: (m) => dreamTheme(m), __eggsWorth: (t, n) => eggsWorth(t, n), __rank: (m) => rankX(m), __broodBook: (m) => broodBook(m), __belly: (m) => bellyStage(m), __happening: (m) => happeningFor(m), __gearOn: (m, s, l, d, x) => gearOn(m, s, l, d, x), __heard: (mn, t) => trapHeard(mn, t), __parasiteTick: () => parasiteTick(), __parts: (m) => parasiteParts(rec(m).parasite), __climax: (m) => parasiteClimax(m), __nurse: (a, b) => parasiteNurse(a, b), __parasiteChance: (m) => parasiteChance(m), __kiss: (a, f, s, t) => parasiteKiss(a, f, s, t), __load: (s, m, h, x) => parasiteLoad(s, m, h, x), __shot: (t, by, text, how) => applyShot(t, by, text, how), __slow: (mn) => slowOf(mn), __milkRate: (mn) => milkRate(mn), __benchTick: () => benchTick(), __roll: (m, s, a, b) => rollConception(m, s, a, b), __contractTick: () => {
       state.cwAt = 0;
       contractWatchTick();
     }, __lingerTick: () => lingerTick(), __ribbonTick: () => ribbonTick(), __dareTick: () => dareTick(), __potionOn: (mn, id) => potionOn(mn, id), __milkRate: (mn) => milkRate(mn) });
@@ -11920,7 +11920,7 @@
         if (state.trapRuns.get(mn) !== run) return;
         if (run.i < beats.length && charFor(mn)) {
           const b = beats[run.i++];
-          emote(TRAP_KINDS[kind].icon + " " + tFill(pickFresh("trap:" + kind + ":" + run.i, Array.isArray(b) ? b : [b]), mn, v) + intensityTail(mn, run.i, beats.length), mn);
+          emote(TRAP_KINDS[kind].icon + " " + tFill(pickFresh("trap:" + kind + ":" + run.i, Array.isArray(b) ? b : [b]), mn, v) + intensityTail(mn, run.i, beats.length, kind), mn);
           toysBeat(mn, run.i, beats.length);
           run.timer = setTimeout(step, CFG.TRAP_BEAT_S * 1e3);
           return;
@@ -18907,10 +18907,10 @@
       const r = rec(mn);
       return r && (r.intensity === "tender" || r.intensity === "filthy") ? r.intensity : "rough";
     }
-    function intensityTail(mn, i, n) {
+    function intensityTail(mn, i, n, kind) {
       const k = intensityOf(mn);
       if (k === "rough" || i < 2 || Math.random() >= 0.5) return "";
-      return " " + tFill(pickFresh("udd:int:" + k, UDDER_LINES["int_" + k]), mn);
+      return " " + (intensityTrapLine(mn, kind) || tFill(pickFresh("udd:int:" + k, UDDER_LINES["int_" + k]), mn));
     }
     function intensitySev(mn, sev) {
       const k = intensityOf(mn);
@@ -19383,6 +19383,113 @@
     };
     for (const [k, list] of Object.entries(MORE_KEEP)) if (KEEP_LINES[k]) KEEP_LINES[k].push(...list);
     for (const [k, list] of Object.entries(MORE_UDDER)) if (UDDER_LINES[k]) UDDER_LINES[k].push(...list);
+    const INTENSITY_BY_TRAP = {
+      injector: {
+        tender: ["The arm steadies %n with a padded rest first, the way you'd gentle a filly for the vet.", "It rubs the spot after, a slow little circle, till the sting's gone.", "The dose goes in warm and slow, and somethin' holds %n's hip so they needn't hold still on their own."],
+        filthy: ["It jabs %n in the ass like a hog gettin' wormed and doesn't wait for the yelp.", "%n is drippin' before the plunger's half down, and the arm wipes its needle on their thigh.", "Dosed like livestock, bent over a post, cunt on show to the whole yard while it empties."]
+      },
+      milker: {
+        tender: ["The cups warm themselves before they touch %n, and the first pulls are soft as a calf nuzzlin'.", "It milks %n slow, lettin' each let-down finish before it asks for the next.", "Somethin' strokes down %n's back in time with the pump, and they sigh into it."],
+        filthy: ["%n's tits are hauled out long and purple in the glass, squirtin', and they're humpin' the rail like a bitch in heat.", "It milks %n like it hates them, and their cunt's runnin' down both legs for it.", "Teats slappin' in the cups, drool on the floor, eyes gone: that's not a person bein' milked, that's a cow."]
+      },
+      breeder: {
+        tender: ["It eases in an inch at a time and waits, every time, till %n pushes back for more.", "The frame cradles %n's belly while it works, and the strokes are long and deep and unhurried.", "It holds still after, buried, lettin' %n feel every warm pulse of it."],
+        filthy: ["It splits %n open and fucks them stupid, balls-deep on every stroke, cum frothin' out round the shaft.", "%n's cunt is makin' the wettest, rudest noise in the county and the machine only goes harder.", "Bred like a sow on a rack: face down, ass up, pumped full and left gapin' with it runnin' out."]
+      },
+      gas: {
+        tender: ["It smells like warm hay and somethin' sweeter, and %n breathes it in deep without bein' told.", "The heat comes on gentle, a slow bloom low in the belly.", "%n just sways, flushed and smilin', as it settles into them."],
+        filthy: ["Two breaths and %n's cunt is drippin' down their thigh and they're lookin' round for anything to rub it on.", "%n is in heat like a barn cat now, ass up, yowlin' for it.", "The mist has them pawin' at themselves in front of everybody, too far gone to care who's watchin'."]
+      },
+      snare: {
+        tender: ["The rope's soft, and it takes %n's weight so nothin' pinches.", "The little machine is patient with them, light as a fingertip.", "It keeps %n right on the sweet edge and croons while it does."],
+        filthy: ["Strung up with their holes hangin' open, %n drips on the dirt like a carcass on a hook.", "The toy slaps at %n's swollen clit till they're sobbin' and humpin' at nothin'.", "Anybody walkin' past could stick anything in %n right now and they'd thank them for it."]
+      },
+      mud: {
+        tender: ["The wallow's warm as a bath, and it closes over %n soft.", "Somethin' about bein' filthy and nobody mindin' makes %n go quiet and easy.", "It's only mud. It feels like bein' let off the hook."],
+        filthy: ["%n comes up caked in sty muck and slop from tits to ass-crack and it's in every fold of them.", "Face down in the wallow with their ass in the air, %n looks exactly like what they are.", "The stink's goin' to be on %n for days, and so will the grin."]
+      },
+      spray: {
+        tender: ["It comes down warm as rain, and %n tips their face up into it.", "It runs down %n's breasts in slow ropes, and they shiver and let it.", "Marked, gentle, all over, like bein' claimed by somethin' fond of them."],
+        filthy: ["%n is plastered: cum in their hair, strung across their face, drippin' off their tits and their tongue.", "They're hosed down like a cumrag that's already been used twice, and they open their mouth for more.", "It's in %n's eyes and up their nose and they're lickin' it off their own lip."]
+      },
+      wire: {
+        tender: ["It takes %n's clothes off them piece by piece, careful with the buttons.", "Bare, and the air's warm, and nobody's laughin'.", "It folds what it took. %n stands there naked and somehow not afraid."],
+        filthy: ["Stripped to the skin with their tits bouncin' and their wet cunt on show for the whole yard.", "%n tries to cover up and can't decide which bit, and everybody sees all of it.", "Naked as stock at auction, and from the state of their thighs they like it."]
+      },
+      clamp: {
+        tender: ["It closes over %n snug and warm, and what's inside is soft as a tongue.", "It denies them so sweetly it's almost a kindness.", "It hushes %n right at the edge, and holds them there, and holds them."],
+        filthy: ["%n's cunt is locked in a box that licks it and stops, and they're fuckin' the air like an animal.", "They'd suck off the whole bunkhouse for one orgasm right now and it wouldn't get them one.", "Drippin' through the vents of it, beggin' steel for mercy, edged till they drool."]
+      },
+      pump: {
+        tender: ["The nozzle's warmed and slick, and it goes in easy.", "It fills %n slow enough to feel their belly round out a breath at a time.", "Somethin' rubs that tight belly while it swells, and %n moans soft."],
+        filthy: ["%n's asshole is stretched round a hose and their gut's blowin' up like a tick.", "Pumped till their belly's draggin' and it's foamin' out round the nozzle.", "They slosh. They waddle. They leak out the back with every step and moan about it."]
+      },
+      eggs: {
+        tender: ["Each egg is fed into %n slow, with a pause after, lettin' them close round it.", "The post is warm, and it strokes them inside between eggs.", "%n's hand goes to their belly and stays there, feelin' it fill."],
+        filthy: ["%n's cunt is stuffed with eggs like a Christmas goose and it's still shovin' more up there.", "They cum on the fourth egg and the seventh and lose count after, squirtin' round the post.", "Packed so full the last one's showin', and %n's pushin' down to keep it in."]
+      },
+      lantern: {
+        tender: ["The light's the colour of honey, and it wants nothin' from %n but lookin'.", "Every swing takes a worry with it.", "%n's shoulders come down. Their mouth goes soft. Good."],
+        filthy: ["%n's jaw hangs open and a string of drool goes all the way to their tit.", "Empty-headed and wet, hips rollin' at nothin': just a hole with a body round it.", "Whatever was in %n's head has leaked out between their legs."]
+      },
+      tentacle: {
+        tender: ["It holds %n up out of the water like somethin' precious, and its arms are warm.", "It opens them slow and waits for their body to say yes before it goes deeper.", "It strokes %n's hair with a tip while it lays, one egg at a time."],
+        filthy: ["Every hole %n has is stuffed with a fat wet arm and all three are pumpin'.", "It fucks them like it's stirrin' a pot, slime and cum foamin' out of both ends.", "%n is gurglin' round a tentacle with their belly bulgin' and their eyes rolled white, cummin' on it."]
+      },
+      wolves: {
+        tender: ["The first wolf-man noses under %n's jaw before he mounts, and he's careful with his teeth.", "They take turns keepin' %n warm between them.", "The knot goes in slow, and he licks their neck till it's seated."],
+        filthy: ["%n is the pack's bitch tonight: knotted, dragged, flipped and knotted again.", "There's wolf cum runnin' out of them in sheets and the next one just shoves it back in.", "Tied ass to ass with a wolf-man, tongue out, pantin', gettin' their face fucked by another while they wait."]
+      },
+      stallion: {
+        tender: ["He gives %n time. A hand the size of a shovel on their back, and no hurry.", "He only goes as deep as they can take, and holds there, breathin'.", "When he finishes he stays close and lets %n lean on him."],
+        filthy: ["A forearm's worth of horse cock punches %n's belly out from inside and they scream and cum.", "He unloads like a fire hose and it blows back out of %n's cunt round him and down both legs.", "Gaped wide enough to see into, slack and winkin', pourin' horse cum on the straw."]
+      },
+      bull: {
+        tender: ["The bull-man's hands are slow on %n's udders, milkin' in time with his hips.", "He's heavy and warm on their back and he rumbles, low, like he's pleased.", "He lets %n finish before he does."],
+        filthy: ["Milked and fucked at once, squirtin' from both ends, moo-in' on every thrust.", "He ruts %n like a heifer in a head gate, balls slappin', and they can't do a thing but take it.", "Bull cum down their thighs, milk down their belly, snot on their lip: a proper used cow."]
+      },
+      warren: {
+        tender: ["The bucks are quick but they're sweet about it, nuzzlin' and soft-furred.", "Each one snuggles in a moment after, before the next.", "%n's laughin', breathless, by the fourth."],
+        filthy: ["Ten bucks, ten loads, no break: %n's cunt is a foamin' mess and there's a queue.", "They're fucked so fast they can't finish one orgasm before the next buck's in them.", "Bred like a hutch doe till it's bubblin' out of them on every stroke."]
+      },
+      boar: {
+        tender: ["The mud's warm and the boar-man is slow and heavy and oddly gentle with them.", "The tie is long, and he just lies on %n and breathes.", "He grunts soft in their ear the whole time."],
+        filthy: ["Pinned in the muck under a quarter ton of boar-man with his corkscrew jammed in their womb.", "He pumps for a quarter hour and %n's belly comes up round as a sow's.", "Plugged with hog wax, stinkin' of sty, grunted over like a prize gilt."]
+      },
+      toms: {
+        tender: ["The toms purr against %n the whole time, and it goes right through them.", "They groom %n's shoulders after with rough warm tongues.", "The barbs only prickle, just enough to make %n gasp."],
+        filthy: ["The barbs rake %n raw comin' out and they yowl and shove back for it.", "Bitten by the scruff, bred from behind, and the second tom's already kneadin' their tits.", "Left in heat with their ass in the air, cryin' like a queen for any tom that'll have them."]
+      },
+      drake: {
+        tender: ["The drake-man curls round %n on his nest, warm as a hearth.", "He's careful with his claws and slow with his ridges.", "He nuzzles their belly after, where his clutch is."],
+        filthy: ["Every ridge of that dragon cock pops in and out of %n and they squeal on each one.", "He breeds them, then he lays in them, and their belly's lumpy with it.", "Egg-stuffed, cum-glazed, sprawled on a dragon's nest with their cunt hangin' open."]
+      },
+      naga: {
+        tender: ["The coils hold %n everywhere at once, smooth and cool and close.", "He takes both of them slow, watchin' their face.", "Wrapped up tight, rocked, %n goes loose as a sleeper."],
+        filthy: ["Two cocks, two holes, and %n is squeezed so tight in the coils the cum has nowhere to go but out.", "Double-stuffed and wrung like a rag, drool runnin', tongue lollin'.", "He fucks %n's ass and cunt on the same stroke and their eyes cross."]
+      },
+      kennel: {
+        tender: ["The mastiff licks %n's face first, and waits to be let.", "He's a patient teacher, and he whines encouragin' when %n gets it right.", "Tied, he just rests his weight on them and pants."],
+        filthy: ["On all fours in a cage with a dog-man's knot tearin' their asshole wide: %n is learnin' what they're for.", "He trains them till they present on their own, cheeks spread, whinin'.", "Knotted in the ass, leakin' down their balls or their slit, waggin' for more."]
+      },
+      hive: {
+        tender: ["The honey's warm and thick, and the queen feeds %n by hand.", "She hums while she lays, and it thrums all through them.", "It's sweet and slow and %n is half asleep by the end."],
+        filthy: ["%n is honey-drunk, sticky to the elbows, and the queen's ovipositor is up their ass to the hilt.", "Their gut's packed with grubs' eggs and they're lickin' honey off her fingers like a whore.", "Stuffed at both ends and glazed like a bun."]
+      },
+      goat: {
+        tender: ["The billy's hand is light on the back of %n's head, guidin', never shovin'.", "He lets them set the pace and bleats soft when it's good.", "He strokes %n's cheek after and tells them they did well."],
+        filthy: ["He grabs %n by the hair and fucks their throat till their nose is in his fur and their eyes run.", "Goat cum down the gullet, out the nose, strung from chin to tits.", "%n gags, gulps, and opens up again like a good trough."]
+      },
+      sow: {
+        tender: ["The matron gathers %n into her lap and there's nowhere softer on the farm.", "She takes her time with them, hummin', one big hand rubbin' their back.", "When she breeds them it's slow and deep and she holds them the whole while."],
+        filthy: ["The old sow hauls %n onto her cock by the hips and uses them like a rag doll.", "%n's face is squashed between a pair of huge tits while she pumps them full.", "She finishes, wipes herself on %n's ass, and shoves them off her lap drippin'."]
+      }
+    };
+    function intensityTrapLine(mn, kind) {
+      const k = intensityOf(mn), T = INTENSITY_BY_TRAP[kind];
+      if (!T || !T[k] || Math.random() >= 0.67) return "";
+      return tFill(pickFresh("udd:int:" + k + ":" + kind, T[k]), mn);
+    }
     const SEVERITY = [null, { name: "mild", x: 1, t: 1 }, { name: "strong", x: 2, t: 1.5 }, { name: "brutal", x: 3, t: 2.5 }];
     function dangerX(mn) {
       const n = potionX(mn, "danger");

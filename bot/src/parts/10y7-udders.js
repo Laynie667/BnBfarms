@@ -18,7 +18,7 @@
      The kink of the whole place
      • YOUR WORDS: ?callme <names> and ?nevercall <names>. Lines about you use the first and never the second.
      • INTENSITY: ?intensity tender|rough|filthy. Tender softens what the traps add and leans them mild; filthy does
-       the opposite.
+       the opposite. Each trap has its own tender and filthy lines (10y9b-intensity-lines.js).
      • KEPT: a herd leader can ?keep <who> for a week (they're asked): a tag written on them, a name for the week,
        milkin' hours, and who may breed them. ?kept shows it; ?kept off ends it.
   */
@@ -273,10 +273,10 @@
 
   // ── intensity ──────────────────────────────────────────────
   function intensityOf(mn){ const r = rec(mn); return r && (r.intensity === "tender" || r.intensity === "filthy") ? r.intensity : "rough"; }
-  function intensityTail(mn, i, n){
+  function intensityTail(mn, i, n, kind){
     const k = intensityOf(mn);
     if (k === "rough" || i < 2 || Math.random() >= 0.5) return "";
-    return " "+tFill(pickFresh("udd:int:"+k, UDDER_LINES["int_"+k]), mn);
+    return " "+(intensityTrapLine(mn, kind) || tFill(pickFresh("udd:int:"+k, UDDER_LINES["int_"+k]), mn));   // the trap's own, two times in three (10y9b-intensity-lines.js)
   }
   // tender leans the traps mild, filthy leans them brutal (10z-trap-variants.js asks)
   function intensitySev(mn, sev){ const k = intensityOf(mn); return k === "tender" ? Math.max(1, sev - 1) : k === "filthy" ? Math.min(3, sev + (Math.random() < 0.5 ? 1 : 0)) : sev; }

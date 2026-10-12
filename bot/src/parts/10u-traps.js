@@ -98,7 +98,7 @@
       if (state.trapRuns.get(mn) !== run) return;
       if (run.i < beats.length && charFor(mn)){
         const b = beats[run.i++];
-        emote(TRAP_KINDS[kind].icon+" "+tFill(pickFresh("trap:"+kind+":"+run.i, Array.isArray(b) ? b : [b]), mn, v)+intensityTail(mn, run.i, beats.length), mn);
+        emote(TRAP_KINDS[kind].icon+" "+tFill(pickFresh("trap:"+kind+":"+run.i, Array.isArray(b) ? b : [b]), mn, v)+intensityTail(mn, run.i, beats.length, kind), mn);
         toysBeat(mn, run.i, beats.length);   // any buzzin' toy they're wearin' follows the scene (10y6-keepers.js)
         run.timer = setTimeout(step, CFG.TRAP_BEAT_S*1000);
         return;

@@ -552,7 +552,8 @@
     if (kids.futa)   parts.push(kids.futa+" futa");
     const msg = "🍼 Oh, y'all! "+plainName(mn)+" just delivered "+g.count+" ("+parts.join(", ")+"), sired by "+
                 g.sires.map(plainName).join(" & ")+". Milk's comin' in strong now!";
-    if (onMap(mn)) emote("🍼 With one last long push, "+plainName(mn)+" delivers "+g.count+" ("+parts.join(", ")+"), sired by "+g.sires.map(plainName).join(" & ")+
+    if (onMap(mn) && CFG.LAY_SCENE) farrowScene(mn, g.count, parts.join(", "), sires);   // the birth, in beats (10y2-brood.js)
+    else if (onMap(mn)) emote("🍼 With one last long push, "+plainName(mn)+" delivers "+g.count+" ("+parts.join(", ")+"), sired by "+g.sires.map(plainName).join(" & ")+
                          ". The farm girl tucks 'em in the straw, and "+plainName(mn)+"'s milk comes in strong, breasts swellin' heavy.");
     else beep(mn, msg);
     for (const h of herdsOf(mn)) beep(h.leader, msg);

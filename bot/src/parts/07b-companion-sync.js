@@ -69,6 +69,7 @@
       part("trap card", () => { const tc = trapCardFor(mn); if (tc) s.trapCard = tc; });   // the trap card (10x-trap-extras.js)
       part("farm gear", () => { const fg = farmGearFor(mn); if (fg.length) s.farmGear = fg; });   // real gear their Companion keeps on them (10y-farm-gear.js)
       part("trap admin", () => { if (isProprietor(mn)) s.trapAdmin = trapAdminFor(); });
+      part("happening", () => { const hp = happeningFor(mn); if (hp.length) s.happening = hp; if (quietNow(mn)) s.quietUntil = Math.ceil(r.quietUntil / 60000) * 60000; });   // what has them right now (10y2-brood.js)
       const bh = benchHereFor(mn); if (bh.length) s.benchHere = bh;   // tap-to-use bench buttons
       s.at = now;
       if (isStaff(mn)) Object.assign(s, staffStateFor(mn));

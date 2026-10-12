@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.25.0
+// @version      0.26.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -1828,7 +1828,7 @@
   ];
 
   // bot/src/version.js
-  var VERSION = "0.25.0";
+  var VERSION = "0.26.0";
 
   // bot-parts:farmhand-bot-parts
   (function() {
@@ -2388,6 +2388,12 @@
       // each time a subject wades into a water spot (and every TENTACLE_LINGER_MIN they stay)
       TENTACLE_LINGER_MIN: 5,
       TENTACLE_HYPER_CHANCE: 0.25,
+      LAY_SCENE: true,
+      // layin' and birthin' play out in beats (false: the old single line)
+      BELLY_SEEN_MIN: 20,
+      SCENT_WAIT_MIN: 2,
+      SCENT_CHANCE: 0.15,
+      // how often a belly gets noticed; how soon and how surely a scent brings somethin'
       MUSK_WATER_X: 20,
       // Tentacle Musk: the thing in the water is this many times likelier to come
       EGG_MAX: 150,
@@ -3405,7 +3411,7 @@
     };
     W.FarmhandExport = exportLedger;
     W.FarmhandLedger = () => L;
-    if (W.__FARMHAND_TEST__) Object.assign(W, { __st: () => state, __cfg: CFG, __pt: prodTick, __qt: quotaTick, __lt: leashTick, __ms: milkingStallTick, __vt: voiceTick, __sync: syncCompanions, __gt: gearTick, __ht: homeTick, __addons: (h, ...a) => addonsEmit(h, ...a), __stateFor: (mn) => stateFor(mn), __leadTick: () => leadTick(), __ambient: () => ambientTick(), __about: (t) => aboutWhom(t), __announce: (t) => announce(t), __reply: (mn, t, ch) => reply(mn, t, ch), __office: () => officeCheck(), __namesHere: (t) => namesHere(t), __speciesCheck: (t) => QUESTIONS.find((q) => q.key === "species").check(t), __attach: () => attachListeners(), __tryLogin: () => tryLogin(), __beepText: (m) => beepText(m), __nameOnce: (t, mn) => nameOnce(t, mn), __buildContract: (n, mn, d) => buildContract(contractTemplate(n), mn, d), __potionTick: () => potionTick(), __penTick: () => penTick(), __trapTick: () => trapTick(), __gearOn: (m, s, l, d, x) => gearOn(m, s, l, d, x), __heard: (mn, t) => trapHeard(mn, t), __parasiteTick: () => parasiteTick(), __parts: (m) => parasiteParts(rec(m).parasite), __climax: (m) => parasiteClimax(m), __nurse: (a, b) => parasiteNurse(a, b), __parasiteChance: (m) => parasiteChance(m), __kiss: (a, f, s, t) => parasiteKiss(a, f, s, t), __load: (s, m, h, x) => parasiteLoad(s, m, h, x), __shot: (t, by, text, how) => applyShot(t, by, text, how), __slow: (mn) => slowOf(mn), __milkRate: (mn) => milkRate(mn), __benchTick: () => benchTick(), __roll: (m, s, a, b) => rollConception(m, s, a, b), __contractTick: () => {
+    if (W.__FARMHAND_TEST__) Object.assign(W, { __st: () => state, __cfg: CFG, __pt: prodTick, __qt: quotaTick, __lt: leashTick, __ms: milkingStallTick, __vt: voiceTick, __sync: syncCompanions, __gt: gearTick, __ht: homeTick, __addons: (h, ...a) => addonsEmit(h, ...a), __stateFor: (mn) => stateFor(mn), __leadTick: () => leadTick(), __ambient: () => ambientTick(), __about: (t) => aboutWhom(t), __announce: (t) => announce(t), __reply: (mn, t, ch) => reply(mn, t, ch), __office: () => officeCheck(), __namesHere: (t) => namesHere(t), __speciesCheck: (t) => QUESTIONS.find((q) => q.key === "species").check(t), __attach: () => attachListeners(), __tryLogin: () => tryLogin(), __beepText: (m) => beepText(m), __nameOnce: (t, mn) => nameOnce(t, mn), __buildContract: (n, mn, d) => buildContract(contractTemplate(n), mn, d), __potionTick: () => potionTick(), __penTick: () => penTick(), __trapTick: () => trapTick(), __belly: (m) => bellyStage(m), __happening: (m) => happeningFor(m), __gearOn: (m, s, l, d, x) => gearOn(m, s, l, d, x), __heard: (mn, t) => trapHeard(mn, t), __parasiteTick: () => parasiteTick(), __parts: (m) => parasiteParts(rec(m).parasite), __climax: (m) => parasiteClimax(m), __nurse: (a, b) => parasiteNurse(a, b), __parasiteChance: (m) => parasiteChance(m), __kiss: (a, f, s, t) => parasiteKiss(a, f, s, t), __load: (s, m, h, x) => parasiteLoad(s, m, h, x), __shot: (t, by, text, how) => applyShot(t, by, text, how), __slow: (mn) => slowOf(mn), __milkRate: (mn) => milkRate(mn), __benchTick: () => benchTick(), __roll: (m, s, a, b) => rollConception(m, s, a, b), __contractTick: () => {
       state.cwAt = 0;
       contractWatchTick();
     }, __lingerTick: () => lingerTick(), __ribbonTick: () => ribbonTick(), __dareTick: () => dareTick(), __potionOn: (mn, id) => potionOn(mn, id), __milkRate: (mn) => milkRate(mn) });
@@ -4438,7 +4444,7 @@
       for (const C of W.ChatRoomCharacter || []) {
         const mn = C.MemberNumber;
         const r = rec(mn);
-        if (!r || !r.teaseOptIn) {
+        if (!r || !r.teaseOptIn || quietNow(mn)) {
           state.teaseNext.delete(mn);
           continue;
         }
@@ -4560,6 +4566,11 @@
         });
         part("trap admin", () => {
           if (isProprietor(mn)) s.trapAdmin = trapAdminFor();
+        });
+        part("happening", () => {
+          const hp = happeningFor(mn);
+          if (hp.length) s.happening = hp;
+          if (quietNow(mn)) s.quietUntil = Math.ceil(r.quietUntil / 6e4) * 6e4;
         });
         const bh = benchHereFor(mn);
         if (bh.length) s.benchHere = bh;
@@ -5303,7 +5314,8 @@
       if (kids.female) parts.push(kids.female + " female");
       if (kids.futa) parts.push(kids.futa + " futa");
       const msg = "\u{1F37C} Oh, y'all! " + plainName(mn) + " just delivered " + g.count + " (" + parts.join(", ") + "), sired by " + g.sires.map(plainName).join(" & ") + ". Milk's comin' in strong now!";
-      if (onMap(mn)) emote("\u{1F37C} With one last long push, " + plainName(mn) + " delivers " + g.count + " (" + parts.join(", ") + "), sired by " + g.sires.map(plainName).join(" & ") + ". The farm girl tucks 'em in the straw, and " + plainName(mn) + "'s milk comes in strong, breasts swellin' heavy.");
+      if (onMap(mn) && CFG.LAY_SCENE) farrowScene(mn, g.count, parts.join(", "), sires);
+      else if (onMap(mn)) emote("\u{1F37C} With one last long push, " + plainName(mn) + " delivers " + g.count + " (" + parts.join(", ") + "), sired by " + g.sires.map(plainName).join(" & ") + ". The farm girl tucks 'em in the straw, and " + plainName(mn) + "'s milk comes in strong, breasts swellin' heavy.");
       else beep(mn, msg);
       for (const h of herdsOf(mn)) beep(h.leader, msg);
     }
@@ -9883,6 +9895,39 @@
         seen: "%n dabs on a perfume that smells like low tide and sex. The surface of every trough and puddle nearby shivers, just once."
       },
       {
+        id: "wolfscent",
+        name: "Wolf Scent",
+        kind: "punish",
+        mins: 60,
+        price: 6,
+        desc: "A scent. For an hour you smell like a bitch in season to anything with a muzzle, and the pack will come and find you wherever you're standin'. Test subjects only.",
+        limit: /\b(gang|knot|anthro|furr)/i,
+        drink: "You dab it behind your ears and between your legs. Musky, sharp, a little like wet fur. Somewhere far off, somethin' lifts its nose.",
+        seen: "%n dabs on somethin' sharp and musky. Out past the fence, a howl goes up."
+      },
+      {
+        id: "mareheat",
+        name: "Mare's Heat",
+        kind: "punish",
+        mins: 60,
+        price: 6,
+        desc: "A scent. For an hour you smell like a mare ready for the stud, and the stallion will leave his stall and come for you. Test subjects only.",
+        limit: /\b(size|inflat|anthro|furr)/i,
+        drink: "It's thick and sweet and a little rank, and you stroke it up the insides of your thighs. In the stud barn, a hoof strikes a door.",
+        seen: "%n smears on a scent that makes every stallion on the place stamp and snort."
+      },
+      {
+        id: "sowslop",
+        name: "Sow's Slop",
+        kind: "punish",
+        mins: 60,
+        price: 6,
+        desc: "A scent. For an hour you smell like slop and sow, and the boar will break out of the sty to get at you. Test subjects only.",
+        limit: /\b(mud|filth|humiliat|knot|anthro|furr)/i,
+        drink: "It stinks. You rub it on anyway, belly and backside, and from the sty comes a long, hungry grunt.",
+        seen: "%n rubs on somethin' that reeks of the sty. The boar's rails creak."
+      },
+      {
         id: "hiccup",
         name: "Hiccup Fizz",
         kind: "silly",
@@ -11368,6 +11413,11 @@
       if (parasiteOn(mn)) out.push({ icon: "\u{1F444}", text: "Parasite", until: rec(mn).parasite.until });
       if (p.eggs) out.push({ icon: "\u{1F95A}", text: p.eggs.n + " eggs", until: p.eggs.layAt });
       for (const a of aftermathOf(mn)) out.push(a);
+      {
+        const bs = bellyStage(mn);
+        if (bs) out.push({ icon: "\u{1F930}", text: "Belly: " + BELLY[bs] });
+      }
+      if (quietNow(mn)) out.push({ icon: "\u{1F92B}", text: "Quiet", until: r.quietUntil });
       if (huntOn() && isSubject(mn)) out.push({ icon: "\u{1F514}", text: "The hunt: get to " + L.hunt.goal, until: L.hunt.until });
       if (p.milkDeniedUntil > now) out.push({ icon: "\u{1F6AB}", text: "Teats capped", until: p.milkDeniedUntil });
       if (p.pentUp) out.push({ icon: "\u{1F624}", text: "Pent up" });
@@ -11690,7 +11740,7 @@
       return Object.entries(L.spots || {}).filter(([n]) => trapKindOf(n));
     }
     function waterSpots() {
-      return Object.entries(L.spots || {}).filter(([n]) => WATER_SPOT.test(n) && !trapKindOf(n));
+      return Object.entries(L.spots || {}).filter(([n]) => (WATER_SPOT.test(n) || /^trough/.test(n)) && !trapKindOf(n));
     }
     function trapWhyNot(mn, kind) {
       const r = rec(mn), K = TRAP_KINDS[kind];
@@ -11699,6 +11749,7 @@
       if (r.trapsOff) return "they've paused the traps";
       if ((r.trapSkip || []).includes(kind)) return "they've ruled that one out";
       if ((r.trapQuiet || 0) > Date.now()) return "they called their safeword not long ago";
+      if (quietNow(mn)) return "they've asked for quiet";
       const lim = String(r.limits || "");
       if (/\btraps?\b/i.test(lim) || K.limit && K.limit.test(lim)) return "their limits rule it out";
       if (kind === "eggs" && limitBlocks(mn, "eggs")) return "their limits rule it out";
@@ -11778,6 +11829,7 @@
         state.trapRuns.delete(mn);
       }
       trapWaitEnd(mn, "quiet");
+      sceneStop(mn);
       gearOff(mn, null, "hold");
       if (quietMin == null) gearOff(mn, null, "trap");
       {
@@ -12005,16 +12057,16 @@
       syncCompanions(true);
       return null;
     }
-    function tentacleScene(mn, spot) {
+    function tentacleScene(mn, spot, deep) {
       const r = rec(mn), p = prodOf(mn), T = TRAP_LINES.tentacle, v = {};
       const lower = openHole(mn, "vulva"), back = !holeBlocked(mn, "butt") && lower !== "butt" ? "butt" : null, mouth = !holeBlocked(mn, "mouth");
       v.h = lower && lower !== "mouth" ? TRAP_HOLE[lower] : "belly";
       const kin = parasiteOn(mn);
-      const beats = (kin ? [PARASITE_MORE.kin] : []).concat([T.grab, T.strip, lower && lower !== "mouth" ? T.take : T.takeShut, back ? T.second : T.wrap, mouth ? T.mouth : T.muzzle], T.churn ? [T.churn] : [], [T.swell]);
-      trapHold(mn, 6, "the water");
+      const beats = (kin ? [PARASITE_MORE.kin] : []).concat(deep ? [BROOD_LINES.wellGrab, BROOD_LINES.wellDeep] : [T.grab], [T.strip, lower && lower !== "mouth" ? T.take : T.takeShut, back ? T.second : T.wrap, mouth ? T.mouth : T.muzzle], T.churn ? [T.churn] : [], [T.swell]);
+      trapHold(mn, deep ? 10 : 6, deep ? "the well" : "the water");
       trapRun(mn, "tentacle", beats, () => {
         const [lo, hi] = CFG.EGG_COUNT, hyper = hyperEggs(mn, CFG.TENTACLE_HYPER_CHANCE);
-        const n = layClutch(mn, (lo + 2 + Math.floor(Math.random() * (hi - lo + 1))) * (hyper ? 3 + Math.floor(Math.random() * 2) : 1) * (kin ? 2 : 1), TENTACLE_SIRE);
+        const n = layClutch(mn, (lo + 2 + Math.floor(Math.random() * (hi - lo + 1))) * (hyper ? 3 + Math.floor(Math.random() * 2) : 1) * (kin ? 2 : 1) * (deep ? 1.5 : 1), TENTACLE_SIRE);
         v.x = String(n);
         if (lower && lower !== "mouth") trapFill(mn, lower, 250 + Math.random() * 250, CFG.TRAP_OVERFULL);
         if (back) trapFill(mn, "butt", 150 + Math.random() * 200, CFG.TRAP_OVERFULL);
@@ -12058,7 +12110,8 @@
           const st = state.trapAt.get(mn);
           if (!fresh && now - (st.rolled || 0) < CFG.TENTACLE_LINGER_MIN * 6e4 / (potionOn(mn, "tentaclemusk") ? 5 : 1)) continue;
           st.rolled = now;
-          if ((parasiteKin(mn, now) || Math.random() < Math.min(1, CFG.TENTACLE_CHANCE * nightX().water * dangerX(mn).chance * (potionOn(mn, "tentaclemusk") ? CFG.MUSK_WATER_X : 1))) && !springTrap(mn, "tentacle", here)) {
+          const wk = waterKindOf(here);
+          if ((wk === "tentacle" && parasiteKin(mn, now) || Math.random() < Math.min(1, CFG.TENTACLE_CHANCE * nightX().water * dangerX(mn).chance * (potionOn(mn, "tentaclemusk") ? CFG.MUSK_WATER_X : 1))) && !springTrap(mn, wk, here)) {
             r.trapAt = now;
             saveLedger();
           }
@@ -12068,6 +12121,7 @@
       moreTrapTick();
       trapExtrasTick();
       farmGearTick(Date.now());
+      broodTick();
     }
     const AUTO_INJECT = ["auto-injector", "autoinjector", "auto inject", "self-inject", "auto-dose", "auto doser"];
     const OVI_WORDS = ["ovipositor"];
@@ -12090,7 +12144,7 @@
       for (const C of W.ChatRoomCharacter || []) {
         const mn = C.MemberNumber, r = rec(mn);
         if (mn === BOTMN() || !r || !r.roles || !r.roles.length || !Array.isArray(C.Appearance)) continue;
-        if ((r.trapQuiet || 0) > now && isSubject(mn)) continue;
+        if ((r.trapQuiet || 0) > now && isSubject(mn) || quietNow(mn)) continue;
         const p = prodOf(mn);
         p.toyAt = p.toyAt || {};
         for (const it of C.Appearance) {
@@ -14154,7 +14208,7 @@
     }
     function craveTick(mn, r, now) {
       const c = parasiteOn(mn) ? r.parasite : r.crave;
-      if (!c || !charFor(mn)) return;
+      if (!c || !charFor(mn) || quietNow(mn)) return;
       if (!c.ate) c.ate = c.since || now;
       if (now - c.ate < CFG.CRAVE_AFTER_MIN * 6e4 || now - (c.told || 0) < CFG.CRAVE_LINE_MIN * 6e4) return;
       c.told = now;
@@ -14454,7 +14508,7 @@
         saveLedger();
         syncCompanions(true);
       } else if (g.urge && g.urge.kind === "glory" && Object.keys(L.spots || {}).some((n) => /^glory-\d+$/.test(n) && onSpot(mn, n, 0))) parasiteUrgeDone(mn, "glory");
-      else if (!g.urge && now >= (g.urgeAt || 0) && !heldByTrap(mn) && !r.benched && !r.penned && !(p && p.stall)) {
+      else if (!g.urge && now >= (g.urgeAt || 0) && !quietNow(mn) && !heldByTrap(mn) && !r.benched && !r.penned && !(p && p.stall)) {
         const kinds = ["kiss", "swallow"].concat(Object.keys(L.spots || {}).some((n) => /^glory-\d+$/.test(n)) ? ["glory"] : []).filter((k) => !(k !== "glory" && !P.lips && k === "swallow"));
         const kind = kinds[Math.floor(Math.random() * kinds.length)];
         g.urge = { kind, until: now + (kind === "swallow" ? 15 : 10) * 6e4 };
@@ -15710,6 +15764,15 @@
           R("They've not been in you an hour yet, sugar. Let 'em settle.");
           return;
         }
+        if (state.sceneRuns && state.sceneRuns.has(sender)) {
+          R("They're already comin', sugar. Keep pushin'.");
+          return;
+        }
+        if (CFG.LAY_SCENE) {
+          layScene(sender, nest);
+          R("\u{1F95A} Here they come, sugar. Bear down.");
+          return;
+        }
         const e = p.eggs;
         p.eggs = null;
         p.offspring.eggs = (p.offspring.eggs || 0) + e.n;
@@ -16097,6 +16160,385 @@
         pack: packOn() ? L.pack ? L.pack.spot : "out" : null
       };
     }
+    const bLine = (key, mn, v) => tFill(pickFresh("brood:" + key, BROOD_LINES[key]), mn, v);
+    function quietNow(mn) {
+      const r = rec(mn);
+      return !!(r && r.quietUntil > Date.now());
+    }
+    function sceneRun(mn, icon, beats, done, v) {
+      state.sceneRuns = state.sceneRuns || /* @__PURE__ */ new Map();
+      const run = { i: 0, timer: null, n: beats.length };
+      state.sceneRuns.set(mn, run);
+      const step = () => {
+        if (state.sceneRuns.get(mn) !== run) return;
+        if (run.i < beats.length && charFor(mn)) {
+          const b = beats[run.i++];
+          emote(icon + " " + tFill(pickFresh("scene:" + icon + ":" + run.i, Array.isArray(b) ? b : [b]), mn, v), mn);
+          run.timer = setTimeout(step, CFG.TRAP_BEAT_S * 1e3);
+          return;
+        }
+        state.sceneRuns.delete(mn);
+        try {
+          done(!!charFor(mn));
+        } catch (e) {
+          warn("scene:", e);
+        }
+        saveLedger();
+        syncCompanions(true);
+      };
+      step();
+    }
+    function sceneStop(mn) {
+      const run = state.sceneRuns && state.sceneRuns.get(mn);
+      if (!run) return false;
+      clearTimeout(run.timer);
+      state.sceneRuns.delete(mn);
+      const r = rec(mn);
+      if (r && r.penned && r.penned.brood) {
+        r.penned = null;
+        saveLedger();
+      }
+      return true;
+    }
+    function layScene(mn, nest) {
+      const r = rec(mn), p = prodOf(mn), e = p.eggs, n = e.n, pos = posOf(mn);
+      const helper = r.tender && r.tender.until > Date.now() && charFor(r.tender.by) && (() => {
+        const a = posOf(mn), b = posOf(r.tender.by);
+        return a && b && Math.max(Math.abs(a.X - b.X), Math.abs(a.Y - b.Y)) <= 2;
+      })() ? r.tender.by : 0;
+      const v = { x: String(n), c: helper ? plainName(helper) : "" };
+      const mids = n < 10 ? 0 : n < 25 ? 1 : n < 50 ? 2 : n < 90 ? 4 : 5;
+      const beats = [BROOD_LINES.layStart].concat(helper ? [BROOD_LINES.layHelp] : [], [BROOD_LINES.layFirst]);
+      for (let i = 0; i < mids; i++) beats.push(i === mids - 1 && n >= 50 ? BROOD_LINES.layHuge : helper && i === 1 ? BROOD_LINES.layHelpMid : BROOD_LINES.layMid);
+      if (pos) r.penned = { until: Date.now() + (beats.length + 2) * CFG.TRAP_BEAT_S * 1e3, X: pos.X, Y: pos.Y, name: "the nest", by: CFG.BOT_MEMBER, trap: true, brood: true };
+      saveLedger();
+      sceneRun(mn, "\u{1F95A}", beats, (here) => {
+        if (r.penned && r.penned.brood) r.penned = null;
+        if (!p.eggs) return;
+        p.eggs = null;
+        p.offspring.eggs = (p.offspring.eggs || 0) + n;
+        if (!L.studbook) L.studbook = [];
+        L.studbook.push({ t: Date.now(), dam: mn, sires: [e.by], kids: { male: 0, female: 0, futa: 0 }, eggs: n });
+        eggsLaid(mn, n, true);
+        if (e.para) L.nestBrood = (L.nestBrood || 0) + 1;
+        audit(mn, "EGGS", mn + " " + n + " at the nest" + (helper ? " tended by " + helper : ""));
+        if (here) emote("\u{1F95A} " + bLine(n >= 50 ? "layEndHuge" : n >= 12 ? "layEndBig" : "layEnd", mn, v), mn);
+        tell(mn, "\u{1F95A} " + n + " eggs in the nest, sugar. Staff'll gather them, and there's ribbons in it for you when they do.");
+        if (helper) {
+          r.tender = null;
+          later(() => earnRibbons(helper, 1, "tendin' a layin'"), 2500);
+        }
+        face(mn, "afterglow", 120);
+        arouse(mn, 30);
+      }, v);
+    }
+    function farrowScene(mn, count, parts, sires) {
+      const v = { x: String(count), c: sires.map(plainName).join(" & ") };
+      const mids = count <= 2 ? 0 : count <= 5 ? 1 : count <= 10 ? 2 : 3;
+      const beats = [BROOD_LINES.farrowStart, BROOD_LINES.farrowCrown];
+      for (let i = 0; i < mids; i++) beats.push(i === mids - 1 && count > 10 ? BROOD_LINES.farrowHuge : BROOD_LINES.farrowMid);
+      sceneRun(mn, "\u{1F37C}", beats, (here) => {
+        if (here) emote("\u{1F37C} " + bLine("farrowEnd", mn, Object.assign({ ml: parts }, v)), mn);
+        face(mn, "afterglow", 180);
+      }, v);
+    }
+    const BELLY = ["", "showin'", "heavy", "huge", "so big they can't see their feet"];
+    function bellyStage(mn) {
+      const p = prodOf(mn);
+      if (!p) return 0;
+      let w = 0;
+      const now = Date.now();
+      if (p.eggs) w += p.eggs.n / 10;
+      if (p.preg) {
+        const frac = Math.max(0, Math.min(1, (now - p.preg.since) / Math.max(1, p.preg.due - p.preg.since)));
+        w += frac * (1 + (p.preg.count || 1) * 0.5);
+      }
+      const full = heldTotal(p) / capacity(mn);
+      if (full > 0.8) w += (full - 0.8) * 3;
+      return w >= 8 ? 4 : w >= 4 ? 3 : w >= 2 ? 2 : w >= 0.8 ? 1 : 0;
+    }
+    function bellyTick(now) {
+      for (const C of W.ChatRoomCharacter || []) {
+        const mn = C.MemberNumber, r = rec(mn);
+        if (mn === CFG.BOT_MEMBER || !r || !r.roles || !r.roles.length) continue;
+        const p = prodOf(mn), st = bellyStage(mn);
+        if (st > (p.bellyTold || 0) && !quietNow(mn)) {
+          emote("\u{1F930} " + bLine("belly" + st, mn), mn);
+        }
+        if (st !== (p.bellyTold || 0)) {
+          p.bellyTold = st;
+          saveLedger();
+          state.gearDirty = true;
+        }
+        if (st >= 2 && now - (p.bellySeenAt || 0) > CFG.BELLY_SEEN_MIN * 6e4) {
+          p.bellySeenAt = now;
+          const near = (W.ChatRoomCharacter || []).map((c) => c.MemberNumber).filter((m) => m !== mn && m !== CFG.BOT_MEMBER && rec(m) && !quietNow(m) && (() => {
+            const a = posOf(mn), b = posOf(m);
+            return a && b && Math.max(Math.abs(a.X - b.X), Math.abs(a.Y - b.Y)) <= 2;
+          })());
+          if (near.length && Math.random() < 0.6) privateLine(near[Math.floor(Math.random() * near.length)], bLine("bellySeen", mn, { c: BELLY[st] }), "emote");
+        }
+      }
+    }
+    const SCENTS = { wolfscent: "wolves", mareheat: "stallion", sowslop: "boar" };
+    function scentTick(now) {
+      for (const C of W.ChatRoomCharacter || []) {
+        const mn = C.MemberNumber;
+        if (!isSubject(mn) || quietNow(mn)) continue;
+        const r = rec(mn);
+        for (const [id, kind] of Object.entries(SCENTS)) {
+          const f = r.fx && r.fx[id];
+          if (!f || f.until <= now || f.came) continue;
+          if (now - f.at < CFG.SCENT_WAIT_MIN * 6e4 || heldByTrap(mn) || state.sceneRuns && state.sceneRuns.has(mn) || Math.random() >= CFG.SCENT_CHANCE) continue;
+          f.came = true;
+          saveLedger();
+          emote(TRAP_KINDS[kind].icon + " " + bLine("scent_" + kind, mn), mn);
+          later(() => {
+            const why = springTrap(mn, kind, "", true);
+            if (!why) {
+              rec(mn).trapAt = Date.now();
+              saveLedger();
+            } else f.came = false;
+          }, 5e3);
+          break;
+        }
+      }
+    }
+    const WATER_KINDS = [[/^trough/, "leeches"], [/^well/, "well"], [/^(bath|shower)/, "slime"]];
+    function waterKindOf(name) {
+      const hit = WATER_KINDS.find(([re]) => re.test(name));
+      return hit ? hit[1] : "tentacle";
+    }
+    Object.assign(TRAP_KINDS, {
+      leeches: { icon: "\u{1FAB1}", what: "fat leeches out of the trough, latched on your teats and anywhere else that's soft", limit: /\b(leech|blood|bug|insect|worm)/i },
+      well: { icon: "\u{1F573}\uFE0F", what: "the thing in the well. It pulls you down and keeps you a long while, and it always leaves eggs", limit: /\b(tentacle|eggs?|ovipos|clutch|monster)/i }
+    });
+    MORE_TRAPS.leeches = function(mn) {
+      const p = prodOf(mn);
+      trapHold(mn, 4, "the trough");
+      trapRun(mn, "leeches", BROOD_LINES.leeches, () => {
+        const got = makesMilk(mn) ? drainMilk(mn, p.milk * 0.6) : 0;
+        if (hasPart(mn, "udder") && CFG.SIZES.udder) setSize(mn, "udder", sizeOf(mn, "udder") + 1, false);
+        emote("\u{1FAB1} " + bLine("leechesEnd", mn, { ml: got >= 5 ? ml(got) : "what they wanted" }), mn);
+        arouse(mn, 30);
+      });
+    };
+    MORE_TRAPS.well = function(mn, spot) {
+      tentacleScene(mn, spot, true);
+    };
+    TRAP_GEAR.leeches = [{
+      when: "after",
+      slot: "cups",
+      label: "Trough Leeches",
+      mins: 20,
+      color: "#3B2A2A",
+      desc: "Two fat black leeches latched on swollen teats, pulsing as they feed. They drop off when they're full, and not a minute sooner."
+    }];
+    function broodCommand(cmd, sender, args, R) {
+      const r = rec(sender);
+      if (cmd === "quiet") {
+        if (!r || !r.roles || !r.roles.length) {
+          R("That's for folks on the books, sugar.");
+          return;
+        }
+        const a0 = String(args[0] || "").toLowerCase();
+        if (a0 === "off" || a0 === "end" || a0 === "stop") {
+          r.quietUntil = 0;
+          saveLedger();
+          syncCompanions(true);
+          R("\u{1F92B} Quiet's over, sugar. The farm can find you again.");
+          return;
+        }
+        const mins = Math.max(10, Math.min(480, parseInt(a0, 10) || 60));
+        r.quietUntil = Date.now() + mins * 6e4;
+        saveLedger();
+        audit(sender, "QUIET", mins + "m");
+        syncCompanions(true);
+        R("\u{1F92B} " + mins + " minutes of quiet, sugar. Nothin' new will start on you: no traps, no urges, no scents, no teasin'. Your switches stay as they are, and anything that already has you carries on (your safeword stops that). ?quiet off ends it early.");
+        return;
+      }
+      const t = resolveTarget(args[0]);
+      if (!t || t === sender || !rec(t)) {
+        R("Tend who, sugar? Stand by somebody who's about to lay and say ?tend <who>.");
+        return;
+      }
+      const a = posOf(sender), b = posOf(t);
+      if (!a || !b || Math.max(Math.abs(a.X - b.X), Math.abs(a.Y - b.Y)) > 2) {
+        R("Get right up beside " + plainName(t) + " first, sugar.");
+        return;
+      }
+      if (!prodOf(t).eggs) {
+        R(plainName(t) + " isn't carryin' a clutch, sugar.");
+        return;
+      }
+      rec(t).tender = { by: sender, until: Date.now() + 15 * 6e4 };
+      saveLedger();
+      R("\u{1F9FA} You're tendin' " + plainName(t) + ". Stay close: when they lay, you'll be the one with your hands on them.");
+      tell(t, "\u{1F9FA} " + plainName(sender) + " is goin' to tend you while you lay, sugar. ?lay when you're on the nest.");
+    }
+    function happeningFor(mn) {
+      const r = rec(mn), p = prodOf(mn), now = Date.now(), out = [], mins = (t) => Math.max(1, Math.ceil((t - now) / 6e4));
+      if (!r || !p) return out;
+      const run = state.trapRuns && state.trapRuns.get(mn);
+      if (run) out.push(TRAP_KINDS[run.kind].icon + " A trap has you (" + run.kind + "): part " + Math.min(run.i, run.beats.length) + " of " + run.beats.length + ". Your safeword stops it.");
+      const sc = state.sceneRuns && state.sceneRuns.get(mn);
+      if (sc) out.push("\u{1F95A} It's comin': part " + Math.min(sc.i, sc.n) + " of " + sc.n + ".");
+      if (r.trapWait) out.push(TRAP_KINDS[r.trapWait.kind].icon + " " + (r.trapWait.kind === "tickle" ? "The tickle rack has you till you ?beg" : "The mirror box wants its line " + (5 - (r.trapWait.n || 0)) + " more times") + ", or " + mins(r.trapWait.until) + " min.");
+      if (r.benched && r.benched.until > now) out.push("\u{1FAB5} " + (r.benched.trap ? "Locked in the pillory" : "On the use bench") + ": " + mins(r.benched.until) + " min left, used " + r.benched.uses + " time" + (r.benched.uses === 1 ? "" : "s") + ".");
+      if (r.penned && r.penned.until > now && !run && !sc) out.push("\u{1F6A7} Held at " + r.penned.name + ": " + mins(r.penned.until) + " min left.");
+      if (parasiteOn(mn)) {
+        const g = r.parasite, P = parasiteParts(g);
+        out.push("\u{1F444} Parasite (" + strainOf(g).name + "): " + [P.lips && "lips", P.suckers && "teats", P.root && "below"].filter(Boolean).join(", ") + ". Feeds in " + mins(g.next) + " min. Drops off in " + (g.until - now > 54e5 ? Math.round((g.until - now) / 36e5) + " h" : mins(g.until) + " min") + ".");
+        if (g.urge) out.push("\u{1F444} It wants you to " + { kiss: "kiss somebody on the mouth", swallow: "swallow a load", glory: "get into a glory stall" }[g.urge.kind] + ": " + mins(g.urge.until) + " min.");
+      }
+      if (p.deniedUntil > now) out.push("\u{1F6AB} No cummin' for " + mins(p.deniedUntil) + " min.");
+      if (p.eggs) out.push("\u{1F95A} Carryin' " + p.eggs.n + " eggs" + (bellyStage(mn) ? " (belly: " + BELLY[bellyStage(mn)] + ")" : "") + ". ?lay at the nest" + (now - p.eggs.since < CFG.NEST_MIN_H * 36e5 ? " in " + mins(p.eggs.since + CFG.NEST_MIN_H * 36e5) + " min" : " any time") + ".");
+      for (const [slot, g] of Object.entries(r.gear || {})) if (g.until > now) out.push("\u26D3\uFE0F " + g.label + ": " + mins(g.until) + " min.");
+      if (r.gluedUntil > now) out.push("\u{1F36F} Sticky feet: " + mins(r.gluedUntil) + " min.");
+      for (const id of Object.keys(SCENTS)) if (r.fx && r.fx[id] && r.fx[id].until > now && !r.fx[id].came && isSubject(mn)) out.push("\u{1F32B}\uFE0F " + potionDef(id).name + " is on you. Somethin's goin' to smell it.");
+      if (quietNow(mn)) out.push("\u{1F92B} Quiet: nothin' new starts on you for " + mins(r.quietUntil) + " min.");
+      return out.slice(0, 8);
+    }
+    function broodTick() {
+      const now = Date.now();
+      try {
+        bellyTick(now);
+        scentTick(now);
+      } catch (e) {
+        warn("brood tick:", e);
+      }
+    }
+    const BROOD_LINES = {
+      layStart: [
+        "%n lowers themselves into the nest, knees wide, hands braced on the rail. Their belly hangs heavy and tight between their thighs, and somethin' inside it shifts.",
+        "%n climbs into the straw and squats, pantin' already. The clutch has dropped. They can feel the first one sittin' low, right at the door.",
+        "%n settles on the nest on all fours, back arched, tail end up. A slow hard squeeze rolls down their belly, and they groan with it."
+      ],
+      layHelp: [
+        '%c kneels behind %n and lays a warm hand on the small of their back, the other cupped underneath, ready. "Breathe. Push when it comes."',
+        `%c settles in the straw at %n's side, rubbin' slow circles on their swollen belly, feelin' the eggs shift under the skin. "I've got you. Let them come."`,
+        `%c parts %n's thighs a little wider and holds them there, thumb strokin'. "Good. Open right up. I want to see every one."`
+      ],
+      layFirst: [
+        "The first egg crowns: slick, pale, wider than it has any right to be. %n's lips stretch thin round it, they bear down with a long low moan, and it slides free and drops into the straw.",
+        "%n strains. Somethin' round and firm presses out from inside, spreadin' them open till it burns, and then the fat middle of it passes and it's out, warm and glistenin', with a rope of slime behind it.",
+        "A push, a grunt, a wet stretchin' sound. The first one comes out of %n slow and then all at once, and they shudder from heels to scalp."
+      ],
+      layMid: [
+        "Another. And another behind it. %n has found the rhythm now: squeeze, stretch, drop. Every egg rubs every tender place on its way out, and their thighs are runnin' wet.",
+        "They come faster. %n is moanin' on every one, hips rollin', hole gapin' and closin' and gapin' again. The pile in the straw is growin'.",
+        "%n's whole belly ripples. Three in a row, pop, pop, pop, each one drawin' a higher sound out of them. Their arms are shakin'.",
+        "An egg sticks, right at the widest part, and %n is held open round it, tremblin', whinin'. Then it gives, and the two behind it tumble out after."
+      ],
+      layHelpMid: [
+        "%c catches each one as it comes and sets it in the straw, countin' out loud, and between eggs works two fingers into %n to coax the next one down.",
+        `"That's it. Another." %c presses down on %n's belly with the flat of a hand, and an egg squeezes out into their waitin' palm, hot and slick.`,
+        "%c leans in and licks the slime from %n's stretched hole between pushes. %n wails, clenches, and lays the next one right against their tongue."
+      ],
+      layHuge: [
+        "It doesn't end. %n has lost count and lost words. They're just a body layin', egg after egg after egg, cummin' somewhere in the middle of it without even noticin', drool hangin' from their lip.",
+        "%n's belly is goin' down like a slow tide and there's still more in there. They're past moanin': it's a steady animal lowin' now, and the nest is heapin' over.",
+        "Dozens. %n's hole can't close between them any more, it just hangs open and gives them up one after another, and every one makes their whole body jerk."
+      ],
+      layEnd: [
+        "The last one slips out of %n with a little wet pop. %x eggs, warm in the straw. They sag against the rail, emptied and glowin'.",
+        "%x, all told. %n lies down beside their clutch, pantin', one hand on a belly gone soft and flat again.",
+        "Done. %x eggs in the nest, and %n drippin' and shakin' above them, lookin' prouder than they'd admit."
+      ],
+      layEndBig: [
+        "%n pushes out the last of them and collapses in the straw beside the heap: %x eggs, steamin' faintly, and a hole that's goin' to gape for an hour.",
+        "%x. It took a long time and a lot of noise. %n curls round the clutch they just laid, wrung out and tremblin', belly loose and empty.",
+        "The nest is full: %x eggs. %n can't get up yet. They just lie there with their thighs apart, leakin' slime, feelin' how hollow they are."
+      ],
+      layEndHuge: [
+        "%x eggs. The nest can't hold them; they've spilled over the rail and into the aisle. %n is flat on their back in the middle of it all, legs splayed, hole hangin' open, twitchin' through the last of it with their eyes rolled up.",
+        "It's over. %x. A whole barrow-load, laid by one body. %n can't speak and can't stand. They lie in the wreck of the nest, empty for the first time in days, and already missin' the weight.",
+        "%n's belly, that was restin' on their thighs this mornin', is flat. %x eggs lie heaped round them. They're cryin' a little, and smilin', and they don't know which one they mean."
+      ],
+      farrowStart: [
+        "%n drops to their knees in the farrowin' straw and bears down with everything they have. Their belly's gone hard as a drum and low as it'll go. It's time.",
+        "A long deep push rolls through %n and doesn't stop. They grab the rail, spread their knees, and holler. The litter's comin', and it's comin' now."
+      ],
+      farrowCrown: [
+        "The first one crowns, stretchin' %n wider than any stud ever did. They pant, push, pant, and with a rush of fluid it slides out into the farm girl's waitin' hands.",
+        "%n strains till the cords stand out in their neck, and the first of the litter comes, slick and squallin'. The farm girl wipes it down and lays it in the straw by their teats."
+      ],
+      farrowMid: [
+        "No rest. The next one's right behind, and %n is pushin' again before they've caught their breath. Their milk's lettin' down already, runnin' in streams with every heave.",
+        "Another, and another. %n is on all fours now, rockin', lowin' like stock, and every push leaves one more squirmin' in the straw.",
+        "The farm girl reaches in to help turn one, and %n shrieks, and it comes, and so does the one behind it."
+      ],
+      farrowHuge: [
+        "It's a litter fit for a sow. %n has been at it so long they've gone quiet and glassy, just pushin' when their body says push, while the straw fills up round them.",
+        "They keep comin'. %n's belly is shrinkin' by the handful, and there's still a row of little shapes movin' under the skin, waitin' their turn."
+      ],
+      farrowEnd: [
+        "With one last long push, %n delivers the last of %x (%ml), sired by %c. The farm girl tucks them in the straw against %n's swollen teats, and the milk comes in hard.",
+        "%x in the straw (%ml), every one of them %c's. %n lies on their side, spent and leakin' milk, while the litter roots and latches on."
+      ],
+      belly1: ["%n's belly has started to round out. It's showin' now.", "There's a soft new curve low on %n. Somethin' in there is growin'."],
+      belly2: [
+        "%n's belly has gone heavy. It hangs, and sways when they walk, and they've started carryin' a hand under it.",
+        "%n is properly swollen now: a taut, heavy gut that leads the way into every room."
+      ],
+      belly3: [
+        "%n is huge. Their belly sits on their thighs when they kneel, skin stretched shiny, navel popped. Whatever's in there, there's a lot of it.",
+        "%n's belly has swelled past all decency: a great tight dome they have to lean back to balance. You can see things shift under the skin."
+      ],
+      belly4: [
+        "%n can't see their own feet. Their belly is enormous, low and draggin', and they waddle with their knees apart and their back bowed, groanin' at every step.",
+        "%n is so full they can hardly walk. That belly reaches halfway to their knees, drum-tight and movin', and they need a rail to get up from the straw."
+      ],
+      bellySeen: [
+        "%n's belly is %c. You can't stop lookin' at it.",
+        "Standin' this close, you can see %n's swollen belly move. Somethin' in there just rolled over.",
+        "%n is %c with it. You could set a mug on that belly.",
+        "You catch yourself wantin' to lay a hand on %n's belly, just to feel what's in there."
+      ],
+      scent_wolves: [
+        "A howl goes up from the far side of the yard. Then another, closer. They've caught %n's scent.",
+        "Somethin' is trottin' this way through the long grass, more than one of them, noses down. %n smells like a bitch in season to anything with a muzzle."
+      ],
+      scent_stallion: [
+        "A stall door bangs open somewhere. Hoofbeats, heavy and unhurried, comin' straight for %n. The stud's smelled a mare.",
+        "The stallion lifts his head three barns away, curls his lip, and starts walkin'. He knows exactly where %n is."
+      ],
+      scent_boar: [
+        "There's a squeal and a splinterin' of rails from the sty. The boar's out, and he's followin' his nose to %n.",
+        "The boar comes snufflin' round the corner, bristles up, slobber swingin'. %n smells like slop and sow, and he means to have both."
+      ],
+      leeches: [
+        [
+          "%n leans over the trough for a drink. The water isn't empty. Somethin' black and soft and long as a hand loops up out of it and slaps wetly onto their chest.",
+          "The trough water stirs as %n bends to it. A dozen fat dark shapes rise to the surface, and the nearest ones jump."
+        ],
+        [
+          "Leeches. Big ones. Two find %n's nipples before they can straighten up and latch on with soft round mouths, and start to suck, slow and strong.",
+          "They fasten on %n's teats like calves, cool and slick, and begin to feed. Each pull goes right through to the root of them."
+        ],
+        [
+          "More of them inch up %n's thighs, lookin' for somewhere soft. One settles over their clit and seals on. %n's legs fold.",
+          "A third leech works its way between %n's legs and finds what it wants. It doesn't bite. It suckles, and it does not let go."
+        ],
+        [
+          "%n kneels by the trough with a leech on each tit and one between their legs, all three pulsin' in time, drinkin' them and swellin' fat. They can't pull them off. They've stopped tryin'.",
+          "They feed on %n till they're round as plums, and %n is left pantin', rockin' against the one below, milked by somethin' with no eyes."
+        ]
+      ],
+      leechesEnd: [
+        "The one between %n's legs drops off, full. The two on their teats stay. They've had %ml and they want the rest, and %n's tits are swellin' round them.",
+        "%n gets their breath back with two fat leeches still hangin' from their nipples, heavy and warm. %ml gone into them already."
+      ],
+      wellGrab: [
+        "%n leans over the well to look. Far down, the water looks back. A rope of somethin' wet comes up the shaft faster than a bucket ever did and takes them round the chest.",
+        "The well cover's off. %n hears somethin' breathe down there, and then they're over the lip and goin' down, wrapped tight, into the dark.",
+        "Somethin' cold loops %n's ankle from the well mouth and pulls. The stones go by. The circle of sky gets small."
+      ],
+      wellDeep: [
+        "It's black down here and close, and the thing fills the whole shaft. %n hangs in it, held on every side, turned slowly, with its arms goin' over every inch of them in the dark.",
+        "%n can't see it. They can only feel it: coils everywhere, the walls themselves movin', and no way to tell up from down. It has all the time in the world down here."
+      ]
+    };
     const SEVERITY = [null, { name: "mild", x: 1, t: 1 }, { name: "strong", x: 2, t: 1.5 }, { name: "brutal", x: 3, t: 2.5 }];
     function dangerX(mn) {
       const n = potionX(mn, "danger");
@@ -17322,6 +17764,8 @@ TEST SUBJECTS & TRAPS
   ?traps \xB7 what's out there \xB7 ?traps off|on \xB7 pause them
   ?traps skip <kind> \xB7 rule one out \xB7 ?traps allow <kind>
   ?subject quit \xB7 off the list for good
+  ?quiet [minutes] \xB7 an hour where nothin' new starts on you
+  ?tend <who> \xB7 help somebody lay (a ribbon in it)
   ?struggle \xB7 one try at slippin' a trap that has you
   ?traps eager on \xB7 no breather between traps, no resets
   ?free <who> \xB7 get a caught subject out \xB7 ?goad <who> \xB7 or don't
@@ -18381,7 +18825,9 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
       "pack",
       "watersport",
       "parasites",
-      "eager"
+      "eager",
+      "quiet",
+      "tend"
     ];
     const STAFF_CMDS = [
       "queue",
@@ -20810,6 +21256,11 @@ Welcome to B&B Farm, hon. \u{1F33E}`
           parasiteCommand(cmd === "parasites" ? "parasite" : cmd, sender, args, R);
           break;
         // 10v-parasite.js
+        case "quiet":
+        case "tend":
+          broodCommand(cmd, sender, args, R);
+          break;
+        // 10y2-brood.js
         case "eager":
           trapCommand("traps", sender, ["eager"].concat(args), R);
           break;

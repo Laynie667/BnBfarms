@@ -11,6 +11,15 @@ import { storeTab } from "./store.js";
 const pct = (a, b) => (b ? (100 * a) / b : 0);
 const hoursLeft = (t) => Math.max(0, Math.ceil((t - Date.now()) / 3600000));
 
+// what has you right now, in plain lines, and the quiet button
+export function happeningCard(ctx) {
+  const s = ctx.s, hp = s.happening || [], quiet = s.quietUntil && s.quietUntil > Date.now();
+  if (!hp.length && !s.onBooks) return null;
+  return card(h("div", { class: "fhc-kv" }, title("What's happenin' to you"), quiet ? chip("quiet", "acc") : null),
+    hp.length ? hp.map((t) => h("div", { style: { margin: "3px 0" } }, t)) : muted("Nothin' has hold of you right now."),
+    h("div", null, quiet ? btn("End the quiet", () => ctx.send("quiet off")) : btn("An hour's quiet", () => ctx.send("quiet 60")),
+      muted(quiet ? "Nothin' new starts on you till it's over." : "Quiet: no new traps, urges, scents or teasin' for an hour. It doesn't stop what already has you; the safe word does.")));
+}
 function me(ctx) {
   const s = ctx.s;
   const chips = [s.tier && chip(s.tier, "acc"), s.species && chip(s.species), s.gender && chip(s.gender),
@@ -23,6 +32,7 @@ function me(ctx) {
   ];
   return [
     card(h("div", { class: "fhc-title" }, s.name), h("div", { style: { marginTop: "6px" } }, chips)),
+    happeningCard(ctx),
     bars.some(Boolean) && card(title("Today"), bars,
       s.heatUntil && muted("In heat for " + hoursLeft(s.heatUntil) + " more hours"),
       s.preg && muted("Carryin' for " + s.preg.sires.join(" & ") + " · due in " + Math.max(0, Math.ceil((s.preg.due - Date.now()) / 86400000)) + " day(s)")),
@@ -80,6 +90,7 @@ function breeding(ctx) {
 function traps(ctx) {
   const s = ctx.s, tc = s.trapCard, ad = s.trapAdmin, gear = s.farmGear || [];
   return [
+    happeningCard(ctx),
     s.stateErr && card(title("Somethin' broke on the farm girl's end"), muted("Part of your panel didn't arrive. Tell the proprietors this line: " + s.stateErr)),
     tc ? card(h("div", { class: "fhc-kv" }, title("Trap card"), chip(tc.total + " sprung", "acc")),
       tc.kinds.length ? h("div", null, tc.kinds.map((k) => chip(k.kind + " ×" + k.n))) : muted("Nothin's caught you yet. Give it time."),

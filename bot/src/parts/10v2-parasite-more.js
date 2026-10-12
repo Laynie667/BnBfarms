@@ -83,7 +83,7 @@
       p.deniedUntil = Math.max(p.deniedUntil || 0, now + CFG.PARASITE_URGE_PUNISH_MIN*60000);
       privateLine(mn, pmLine("urgeFail", mn), "emote"); arouse(mn, 40, 94); saveLedger(); syncCompanions(true);
     } else if (g.urge && g.urge.kind === "glory" && Object.keys(L.spots || {}).some(n => /^glory-\d+$/.test(n) && onSpot(mn, n, 0))) parasiteUrgeDone(mn, "glory");
-    else if (!g.urge && now >= (g.urgeAt || 0) && !heldByTrap(mn) && !r.benched && !r.penned && !(p && p.stall)){
+    else if (!g.urge && now >= (g.urgeAt || 0) && !quietNow(mn) && !heldByTrap(mn) && !r.benched && !r.penned && !(p && p.stall)){
       const kinds = ["kiss", "swallow"].concat(Object.keys(L.spots || {}).some(n => /^glory-\d+$/.test(n)) ? ["glory"] : []).filter(k => !(k !== "glory" && !P.lips && k === "swallow"));
       const kind = kinds[Math.floor(Math.random()*kinds.length)];
       g.urge = { kind, until: now + (kind === "swallow" ? 15 : 10)*60000 }; saveLedger();

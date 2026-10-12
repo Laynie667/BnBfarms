@@ -116,7 +116,7 @@
   function craving(mn){ const r = rec(mn); return !!(r && (parasiteOn(mn) || (r.crave && r.crave.until > Date.now()))); }
   function craveTick(mn, r, now){
     const c = parasiteOn(mn) ? r.parasite : r.crave;
-    if (!c || !charFor(mn)) return;
+    if (!c || !charFor(mn) || quietNow(mn)) return;
     if (!c.ate) c.ate = c.since || now;
     if (now - c.ate < CFG.CRAVE_AFTER_MIN*60000 || now - (c.told || 0) < CFG.CRAVE_LINE_MIN*60000) return;
     c.told = now; saveLedger();

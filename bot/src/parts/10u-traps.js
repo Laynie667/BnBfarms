@@ -47,7 +47,7 @@
     return m[1] && TRAP_KINDS[m[1]] ? m[1] : "random";
   }
   function trapSpots(){ return Object.entries(L.spots || {}).filter(([n]) => trapKindOf(n)); }
-  function waterSpots(){ return Object.entries(L.spots || {}).filter(([n]) => WATER_SPOT.test(n) && !trapKindOf(n)); }
+  function waterSpots(){ return Object.entries(L.spots || {}).filter(([n]) => (WATER_SPOT.test(n) || /^trough/.test(n)) && !trapKindOf(n)); }   // (a trough has leeches: 10y2-brood.js)
   // can this trap spring on them right now? null = yes
   function trapWhyNot(mn, kind){
     const r = rec(mn), K = TRAP_KINDS[kind];
@@ -56,6 +56,7 @@
     if (r.trapsOff) return "they've paused the traps";
     if ((r.trapSkip || []).includes(kind)) return "they've ruled that one out";
     if ((r.trapQuiet || 0) > Date.now()) return "they called their safeword not long ago";
+    if (quietNow(mn)) return "they've asked for quiet";
     const lim = String(r.limits || "");
     if (/\btraps?\b/i.test(lim) || (K.limit && K.limit.test(lim))) return "their limits rule it out";
     if (kind === "eggs" && limitBlocks(mn, "eggs")) return "their limits rule it out";
@@ -112,6 +113,7 @@
     const run = state.trapRuns && state.trapRuns.get(mn);
     if (run){ clearTimeout(run.timer); state.trapRuns.delete(mn); }
     trapWaitEnd(mn, "quiet");   // the tickle rack, the mirror box (10u4-more-traps.js)
+    sceneStop(mn);              // a layin' or a birth scene (10y2-brood.js)
     gearOff(mn, null, "hold"); if (quietMin == null) gearOff(mn, null, "trap");   // what it had on them comes off (all of it, on a safeword)
     { const r0 = rec(mn); if (r0 && r0.benched && r0.benched.trap) unbench(mn, "safe"); }   // the pillory
     trapFree(mn);
@@ -303,16 +305,16 @@
   }
 
   // the thing in the water: five scenes, and it always leaves eggs
-  function tentacleScene(mn, spot){
+  function tentacleScene(mn, spot, deep){   // deep: the thing in the well (it keeps them longer, and lays more)
     const r = rec(mn), p = prodOf(mn), T = TRAP_LINES.tentacle, v = {};
     const lower = openHole(mn, "vulva"), back = !holeBlocked(mn, "butt") && lower !== "butt" ? "butt" : null, mouth = !holeBlocked(mn, "mouth");
     v.h = lower && lower !== "mouth" ? TRAP_HOLE[lower] : "belly";
     const kin = parasiteOn(mn);   // it knows its own: a gentler comin', and double the clutch
-    const beats = (kin ? [PARASITE_MORE.kin] : []).concat([T.grab, T.strip, lower && lower !== "mouth" ? T.take : T.takeShut, back ? T.second : T.wrap, mouth ? T.mouth : T.muzzle], T.churn ? [T.churn] : [], [T.swell]);   // (churn: 10w2-trap-lines-deeper.js)
-    trapHold(mn, 6, "the water");
+    const beats = (kin ? [PARASITE_MORE.kin] : []).concat(deep ? [BROOD_LINES.wellGrab, BROOD_LINES.wellDeep] : [T.grab], [T.strip, lower && lower !== "mouth" ? T.take : T.takeShut, back ? T.second : T.wrap, mouth ? T.mouth : T.muzzle], T.churn ? [T.churn] : [], [T.swell]);   // (churn: 10w2-trap-lines-deeper.js)
+    trapHold(mn, deep ? 10 : 6, deep ? "the well" : "the water");
     trapRun(mn, "tentacle", beats, () => {
       const [lo, hi] = CFG.EGG_COUNT, hyper = hyperEggs(mn, CFG.TENTACLE_HYPER_CHANCE);
-      const n = layClutch(mn, (lo + 2 + Math.floor(Math.random()*(hi - lo + 1))) * (hyper ? 3 + Math.floor(Math.random()*2) : 1) * (kin ? 2 : 1), TENTACLE_SIRE);
+      const n = layClutch(mn, (lo + 2 + Math.floor(Math.random()*(hi - lo + 1))) * (hyper ? 3 + Math.floor(Math.random()*2) : 1) * (kin ? 2 : 1) * (deep ? 1.5 : 1), TENTACLE_SIRE);
       v.x = String(n);
       if (lower && lower !== "mouth") trapFill(mn, lower, 250 + Math.random()*250, CFG.TRAP_OVERFULL);
       if (back) trapFill(mn, "butt", 150 + Math.random()*200, CFG.TRAP_OVERFULL);
@@ -350,10 +352,11 @@
         const st = state.trapAt.get(mn);
         if (!fresh && now - (st.rolled || 0) < CFG.TENTACLE_LINGER_MIN*60000/(potionOn(mn, "tentaclemusk") ? 5 : 1)) continue;   // (with Tentacle Musk on, it looks again every minute)
         st.rolled = now;
-        if ((parasiteKin(mn, now) || Math.random() < Math.min(1, CFG.TENTACLE_CHANCE*nightX().water*dangerX(mn).chance*(potionOn(mn, "tentaclemusk") ? CFG.MUSK_WATER_X : 1))) && !springTrap(mn, "tentacle", here)){ r.trapAt = now; saveLedger(); }   // (three times as hungry after dark)
+        const wk = waterKindOf(here);   // tentacles, leeches, the well, or slime (10y2-brood.js)
+        if (((wk === "tentacle" && parasiteKin(mn, now)) || Math.random() < Math.min(1, CFG.TENTACLE_CHANCE*nightX().water*dangerX(mn).chance*(potionOn(mn, "tentaclemusk") ? CFG.MUSK_WATER_X : 1))) && !springTrap(mn, wk, here)){ r.trapAt = now; saveLedger(); }   // (three times as hungry after dark)
       }
     }
-    toyTick(); moreTrapTick(); trapExtrasTick(); farmGearTick(Date.now());
+    toyTick(); moreTrapTick(); trapExtrasTick(); farmGearTick(Date.now()); broodTick();
   }
 
   // ── toys that do things on their own ───────────────────────
@@ -377,7 +380,7 @@
     for (const C of (W.ChatRoomCharacter || [])){
       const mn = C.MemberNumber, r = rec(mn);
       if (mn === BOTMN() || !r || !r.roles || !r.roles.length || !Array.isArray(C.Appearance)) continue;
-      if ((r.trapQuiet || 0) > now && isSubject(mn)) continue;
+      if (((r.trapQuiet || 0) > now && isSubject(mn)) || quietNow(mn)) continue;
       const p = prodOf(mn); p.toyAt = p.toyAt || {};
       for (const it of C.Appearance){
         if (!it || !it.Craft || !it.Asset || !it.Asset.Group) continue;

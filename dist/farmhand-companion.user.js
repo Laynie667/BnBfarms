@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.15.0
+// @version      0.15.1
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -230,7 +230,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.15.0";
+  var VERSION = "0.15.1";
 
   // extension/src/config.js
   var BOT_MEMBER = 260239;
@@ -522,6 +522,20 @@ One of mods you are using is using an old version of SDK. It will work for now b
   // extension/src/views/livestock.js
   var pct = (a, b) => b ? 100 * a / b : 0;
   var hoursLeft = (t) => Math.max(0, Math.ceil((t - Date.now()) / 36e5));
+  function happeningCard(ctx2) {
+    const s = ctx2.s, hp = s.happening || [], quiet = s.quietUntil && s.quietUntil > Date.now();
+    if (!hp.length && !s.onBooks) return null;
+    return card(
+      h("div", { class: "fhc-kv" }, title("What's happenin' to you"), quiet ? chip("quiet", "acc") : null),
+      hp.length ? hp.map((t) => h("div", { style: { margin: "3px 0" } }, t)) : muted("Nothin' has hold of you right now."),
+      h(
+        "div",
+        null,
+        quiet ? btn("End the quiet", () => ctx2.send("quiet off")) : btn("An hour's quiet", () => ctx2.send("quiet 60")),
+        muted(quiet ? "Nothin' new starts on you till it's over." : "Quiet: no new traps, urges, scents or teasin' for an hour. It doesn't stop what already has you; the safe word does.")
+      )
+    );
+  }
   function me(ctx2) {
     const s = ctx2.s;
     const chips = [
@@ -540,6 +554,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     ];
     return [
       card(h("div", { class: "fhc-title" }, s.name), h("div", { style: { marginTop: "6px" } }, chips)),
+      happeningCard(ctx2),
       bars.some(Boolean) && card(
         title("Today"),
         bars,
@@ -622,6 +637,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   function traps(ctx2) {
     const s = ctx2.s, tc = s.trapCard, ad = s.trapAdmin, gear = s.farmGear || [];
     return [
+      happeningCard(ctx2),
       s.stateErr && card(title("Somethin' broke on the farm girl's end"), muted("Part of your panel didn't arrive. Tell the proprietors this line: " + s.stateErr)),
       tc ? card(
         h("div", { class: "fhc-kv" }, title("Trap card"), chip(tc.total + " sprung", "acc")),

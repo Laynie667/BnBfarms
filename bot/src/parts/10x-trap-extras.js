@@ -232,6 +232,8 @@
       const nest = nestSpots().find(n => onSpot(sender, n, 1));
       if (!nest){ R(nestSpots().length ? "Get yourself onto the nest first, sugar. They'll come on their own when they're due, wherever you are." : "There's no nest set up yet, sugar. They'll come on their own when they're due."); return; }
       if (Date.now() - p.eggs.since < CFG.NEST_MIN_H*3600000){ R("They've not been in you an hour yet, sugar. Let 'em settle."); return; }
+      if (state.sceneRuns && state.sceneRuns.has(sender)){ R("They're already comin', sugar. Keep pushin'."); return; }
+      if (CFG.LAY_SCENE){ layScene(sender, nest); R("🥚 Here they come, sugar. Bear down."); return; }   // the long way (10y2-brood.js)
       const e = p.eggs; p.eggs = null;
       p.offspring.eggs = (p.offspring.eggs || 0) + e.n;
       if (!L.studbook) L.studbook = [];

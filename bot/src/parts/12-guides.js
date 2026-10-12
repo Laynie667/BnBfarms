@@ -484,6 +484,8 @@ TEST SUBJECTS & TRAPS
   ?traps · what's out there · ?traps off|on · pause them
   ?traps skip <kind> · rule one out · ?traps allow <kind>
   ?subject quit · off the list for good
+  ?quiet [minutes] · an hour where nothin' new starts on you
+  ?tend <who> · help somebody lay (a ribbon in it)
   ?struggle · one try at slippin' a trap that has you
   ?traps eager on · no breather between traps, no resets
   ?free <who> · get a caught subject out · ?goad <who> · or don't

@@ -5,7 +5,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 | Script | File in `dist/` | Where it runs | Current |
 |---|---|---|---|
-| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.25.0** |
+| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.26.0** |
 | Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.5.8** |
 | Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.1.3** |
 | Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **1.0.4** |
@@ -13,7 +13,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 | Map tools, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.3** |
 | Dairy | `farmhand-dairy.user.js` | the bot's PC | **1.0.2** |
 | Shows | `farmhand-shows.user.js` | the bot's PC | **1.0.4** |
-| Farmhand Companion | `farmhand-companion.user.js` | each player | **0.15.0** |
+| Farmhand Companion | `farmhand-companion.user.js` | each player | **0.15.1** |
 | Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.4** |
 
 ## Sending a watch report
@@ -23,6 +23,14 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 - Running the watcher on more than one game at once (the bot, yours, a tester's) lets Claude line them up into one timeline.
 
 ## Latest changes (newest first)
+
+- **Bot 0.26.0, Companion 0.15.1: laying and birth as scenes, a belly that shows, scents, different water, a quiet hour.**
+  - **Laying is a scene**, as long as the clutch is big (two beats for a handful, eight for a hundred). They are held on the nest until the last egg; the eggs only count at the end, and the safeword stops it with the rest still in. `?tend <who>` writes a helper into it and pays them a ribbon. A litter born on the farm plays out in beats too.
+  - **Belly stages**: eggs, a litter and a pumped gut add up to showin, heavy, huge, or cannot-see-their-feet. A chip on the strip, a room line when it grows, and a private line for somebody standing close.
+  - **Scents** (store, 6 ribbons, an hour): Wolf Scent, Mare's Heat, Sow's Slop. On a test subject, the pack, the stallion or the boar comes and finds them wherever they stand.
+  - **Different water**: pond, pool, creek keep the tentacles; a `trough` spot has leeches (they stay on the teats as real gear for 20 minutes); a `well` spot pulls them down, holds them longer and lays half again as many; a `bath` or `shower` spot has slime.
+  - **`?quiet [minutes|off]`** (default an hour, up to 8): nothing optional starts on them: no traps, urges, scents, teasing or toy lines. Switches stay as they are; whatever already has them carries on.
+  - **Companion**: a card at the top of Me and Traps, "What's happenin' to you": the beat a trap is on, minutes left on holds and gear, the parasite's next feed and what it wants, eggs carried, with an hour's-quiet button.
 
 - **Bot 0.25.0, Companion 0.15.0: better gear, traps that write on you, and switches for everybody.**
   - **Traps: no cooldown** is now a farm switch in Toggles (and `?eager on|off`). It was only a button on the trap card.

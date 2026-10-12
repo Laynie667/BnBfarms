@@ -723,7 +723,7 @@
     for (const C of (W.ChatRoomCharacter||[])){
       const mn = C.MemberNumber;
       const r = rec(mn);
-      if (!r || !r.teaseOptIn) { state.teaseNext.delete(mn); continue; }
+      if (!r || !r.teaseOptIn || quietNow(mn)) { state.teaseNext.delete(mn); continue; }   // (?quiet: 10y2-brood.js)
       const next = state.teaseNext.get(mn);
       if (!next){ state.teaseNext.set(mn, now + gap()); continue; }   // first one comes a while after they arrive
       if (now < next) continue;

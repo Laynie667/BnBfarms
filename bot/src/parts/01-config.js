@@ -256,6 +256,8 @@
     TRAP_OVERFULL: 1.3,          // traps can fill a belly this far past capacity (1.5 would pin them)
     TENTACLE_CHANCE: 0.04,       // each time a subject wades into a water spot (and every TENTACLE_LINGER_MIN they stay)
     TENTACLE_LINGER_MIN: 5, TENTACLE_HYPER_CHANCE: 0.25,
+    LAY_SCENE: true,             // layin' and birthin' play out in beats (false: the old single line)
+    BELLY_SEEN_MIN: 20, SCENT_WAIT_MIN: 2, SCENT_CHANCE: 0.15,   // how often a belly gets noticed; how soon and how surely a scent brings somethin'
     MUSK_WATER_X: 20,            // Tentacle Musk: the thing in the water is this many times likelier to come
     EGG_MAX: 150,                // the most eggs one body can carry (clutches stack)
     GATHER_MAX_RIBBONS: 15,      // the most one layer is paid at one gatherin'

@@ -256,6 +256,10 @@
     TRAP_OVERFULL: 1.3,          // traps can fill a belly this far past capacity (1.5 would pin them)
     TENTACLE_CHANCE: 0.04,       // each time a subject wades into a water spot (and every TENTACLE_LINGER_MIN they stay)
     TENTACLE_LINGER_MIN: 5, TENTACLE_HYPER_CHANCE: 0.25,
+    SIT_MIN: 20, SIT_LINE_MIN: 4, WHISTLE_COOLDOWN_MIN: 90, ALBUM_MAX: 60, HOLE_MORE_X: 0.15, HOLE_CAP_BONUS: 40, DREAM_EVERY_MIN: 25,
+    LEADER_SHARE: 0.25, LEADER_REINS_MIN: 15, VAT_ML_PER_RIBBON: 500, VAT_DAY_MAX: 3,   // 10y6-keepers.js
+    MILKCUM_AROUSAL: 70, MILKCUM_CHANCE: 0.06, MILKCUM_GAP_S: 180, MILKCUM_LETDOWN: 0.12, DIAL_SORE_MIN: 30, DIAL_SENSITIVE_MIN: 60, OVERDUE_H: [1, 3, 6],
+    BRINGIN_TENDS: 6, DOUBLE_CARRY: true, BREDBACK_MIN: 60, BREDBACK_X: 4, BED_TEND_MIN: 10, KEPT_DAYS: 7,   // 10y7-udders.js
     UNDER_STEP_MIN: 30, RAID_EVERY_MIN: 30, RAID_CHANCE: 0.1, GAUNTLET_POT: 5, GAUNTLET_MAX_MIN: 30, CLEANSE_COST: 5, LEND_BID_S: 180,   // 10y4-corruption.js
     SUIT_HOURS: 6, SUIT_WALK_MIN: 20, CURSE_BOX_PRICE: 4,   // 10y5-cursed.js
     CHAIN_CHANCE: 0.25, CHAIN_MAX: 3,   // one trap handin' a subject to the next: how often, and how many in a row
@@ -303,7 +307,9 @@
       { key:"throat", name:"Throat Goat",      why:"a bottomless throat" },
       { key:"stud",   name:"Stud of the Farm", why:"50 covers" },
       { key:"sire",   name:"Prolific Sire",    why:"sired 10 litters" },
-      { key:"eggs",   name:"Egg Layer",        why:"10 eggs laid" }
+      { key:"eggs",   name:"Egg Layer",        why:"10 eggs laid" },
+      { key:"triple", name:"Triple-Carried",   why:"womb, ass and a clutch, all at once" },
+      { key:"bredback", name:"Bred Back",      why:"caught again within the hour of bein' emptied" }
     ],
     FAST_SCENE_TYPES: ["canine","draconic"], FAST_SCENE_S: 30,   // these can fill every 30 seconds in a scene
     STAMINA_FILLS: 3, STAMINA_X: 0.6,   // past 3 fills in an hour, each load is 60% of the one before (pent up / virility skip it)

@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.15.3
+// @version      0.15.4
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -230,7 +230,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.15.3";
+  var VERSION = "0.15.4";
 
   // extension/src/config.js
   var BOT_MEMBER = 260239;
@@ -466,6 +466,11 @@ One of mods you are using is using an old version of SDK. It will work for now b
       muted("Earn 'em: your milk quota, a full stall session, chores, glory shifts, dares, shows, best of the week, and staff who think you've been good."),
       h("div", { style: { marginTop: "6px" } }, btn("This week's board", () => ctx2.send("ribbons top")))
     );
+    const vat = s.vat ? card(
+      title("\u{1F95B} Your vat"),
+      h("div", { style: { fontSize: "20px", fontWeight: "700", margin: "4px 0" } }, s.vat >= 1e3 ? (s.vat / 1e3).toFixed(1) + " L" : s.vat + " ml"),
+      muted("Everything milked and collected from you. It buys potions and shots at " + (s.vatPer || 500) + ' ml for each ribbon of the price: "Pay with milk" on the shelf.')
+    ) : null;
     const now = fx.length ? card(
       title("\u{1F9EA} In you right now"),
       fx.map((f) => h("div", { class: "fhc-kv" }, h("span", null, f.name), h("b", null, minsLeft(f.until) + " min"))),
@@ -493,6 +498,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
         "div",
         null,
         btn("Buy", () => ctx2.send("buy " + it.id), true),
+        s.vat && (it.kind || /^shot-/.test(it.id)) ? btn("Pay with milk", () => ctx2.send("buy " + it.id + " with milk")) : null,
         it.gift ? btn("Gift it", () => who() ? ctx2.send("buy " + it.id + " for " + who()) : ctx2.hint("Type who it's for in the box above the potions first.")) : null
       )
     );
@@ -500,6 +506,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     const potions = items.filter((it) => it.kind), shots = items.filter((it) => /^shot-/.test(it.id)), treats = items.filter((it) => !it.kind && !/^shot-/.test(it.id));
     return [
       purse,
+      vat,
       now,
       dare,
       pen,
@@ -571,6 +578,20 @@ One of mods you are using is using an old version of SDK. It will work for now b
         { class: "fhc-grid" },
         [["Used today", s.today.tally], ["Naughty marks", s.today.naughty], ["Praised", s.today.praised]].map(([k, v]) => h("div", null, muted(k), h("div", { style: { fontWeight: 600 } }, v)))
       )),
+      s.kept && card(
+        h("div", { class: "fhc-kv" }, title("\u{1F3F7}\uFE0F Kept by " + s.kept.by), chip(Math.max(1, Math.ceil((s.kept.until - Date.now()) / 864e5)) + " day(s)", "acc")),
+        s.kept.tag ? muted("Your tag: " + s.kept.tag) : null,
+        s.kept.name ? muted("This week you're called: " + s.kept.name) : null,
+        (s.kept.milk || []).length ? muted("Milked at " + s.kept.milk.map((x) => x + ":00").join(" and ")) : null,
+        h("div", null, btn("What that means", () => ctx2.send("kept")), btn("End it", () => ctx2.send("kept off")))
+      ),
+      s.intensity && card(
+        title("How the farm talks to you"),
+        h("div", null, [["tender", "Tender"], ["rough", "Rough"], ["filthy", "Filthy"]].map(([id, label]) => h("button", { type: "button", class: "fhc-pill" + (s.intensity === id ? " on" : ""), onclick: () => ctx2.send("intensity " + id) }, label))),
+        muted(s.intensity === "tender" ? "Softer words, and the traps lean mild." : s.intensity === "filthy" ? "Dirtier words, and the traps lean brutal." : "As written."),
+        muted("It calls you: " + (((s.words || {}).call || []).join(", ") || "whatever comes to mind") + " \xB7 never: " + (((s.words || {}).never || []).join(", ") || "nothin' ruled out")),
+        h("div", null, btn("Names I love\u2026", () => ctx2.fillBox("callme ")), btn("Never call me\u2026", () => ctx2.fillBox("nevercall ")))
+      ),
       h("div", { class: "fhc-quick" }, ["stats", "measure", "record", "pedigree", "keys"].map((c) => btn(c[0].toUpperCase() + c.slice(1), () => ctx2.send(c))))
     ];
   }
@@ -610,6 +631,12 @@ One of mods you are using is using an old version of SDK. It will work for now b
         title("Milkin' stall"),
         chip(Math.max(0, Math.round((s.stallUntil - Date.now()) / 6e4)) + " min left", "acc")
       ), muted("It drains you down to a quarter of what you hold, then lets go.")),
+      s.dial && card(
+        h("div", { class: "fhc-kv" }, title("The stall dial"), s.milkCums ? chip("milked till you came \xD7 " + s.milkCums, "acc") : null),
+        h("div", null, [["gentle", "Gentle"], ["steady", "Steady"], ["hard", "Hard"], ["punishing", "Punishin'"]].map(([id, label]) => h("button", { type: "button", class: "fhc-pill" + (s.dial === id ? " on" : ""), onclick: () => ctx2.send("stalldial " + id) }, label))),
+        muted({ gentle: "Slow and sweet. It leaves you a third.", steady: "It drains you to a quarter.", hard: "Fast and deep, down to an eighth, and sore teats after.", punishing: "Past empty. You'll be sensitive for an hour after." }[s.dial] || ""),
+        muted("Run hot enough in the stall and the cups will tip you over.")
+      ),
       h("div", null, btn("Quota", () => ctx2.send("quota")), btn("Milk board", () => ctx2.send("board")))
     ];
   }
@@ -665,6 +692,17 @@ One of mods you are using is using an old version of SDK. It will work for now b
         gear.length ? gear.map((g) => h("div", { class: "fhc-kv" }, h("span", null, g.name), h("span", { class: "fhc-muted" }, Math.max(0, Math.ceil((g.until - Date.now()) / 6e4)) + " min"))) : muted("No farm gear on you."),
         !ctx2.prefs.gear && muted('Trap gear only goes on for real with "Farm can put real gear on me" switched on (Toggles \u2192 This panel).')
       ),
+      s.sitting && card(title("\u{1FABA} Sittin' the nest"), muted(s.sitting.n + " eggs under you. They hatch in about " + Math.max(1, Math.ceil((s.sitting.until - Date.now()) / 6e4)) + " min."), h("div", null, btn("Get up", () => ctx2.send("sit up")))),
+      s.holes && s.holes.length ? card(
+        title("What you've taken"),
+        s.holes.map((x) => h("div", { class: "fhc-kv" }, h("span", null, "Your " + x.hole + " \xB7 " + x.rank), h("span", { class: "fhc-muted" }, x.loads + " loads" + (x.knots ? " \xB7 " + x.knots + " knots" : "") + (x.next ? " \xB7 next at " + x.next : "")))),
+        muted("Every step a hole is trained, you hold more for good and the traps pour more into it.")
+      ) : null,
+      s.album && s.album.length ? card(
+        title("\u{1F4D4} Keepsakes"),
+        s.album.map((e) => h("div", { style: { marginTop: "6px" } }, h("div", { class: "fhc-kv" }, h("b", null, e.i + " " + e.h), h("span", { class: "fhc-muted" }, new Date(e.t).toLocaleDateString())), muted(e.x))),
+        muted("Only you can open this album.")
+      ) : null,
       ad && card(
         h("div", { class: "fhc-kv" }, title("Proprietor: subjects & traps"), chip(ad.subjects.length + " subject" + (ad.subjects.length === 1 ? "" : "s"), "acc")),
         ad.subjects.length ? ad.subjects.map((x) => h("div", { class: "fhc-kv" }, h("span", null, (x.here ? "\u25CF " : "") + x.name), h("span", { class: "fhc-muted" }, x.n + " sprung" + (x.paused ? " \xB7 paused" : "")))) : muted("Nobody's signed up yet: ?subject add <who>."),
@@ -761,7 +799,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       // OFF until you turn it on: the farm touchin' your arousal meter (cues.js)
       toggle(
         "Farm can stir me up",
-        "Traps, toys and scenes nudge your arousal meter up, and while the farm has you denied you're held at the edge instead of cummin'. Your safeword still stops everything.",
+        "Traps, toys and scenes nudge your arousal meter up, and while the farm has you denied you're held at the edge instead of cummin'. A buzzin' toy you're wearin' follows a trap too: low while it teases, high when it breeds you, still while you're denied, then back how you had it. Your safeword still stops everything.",
         !!ctx2.prefs.stir,
         () => {
           ctx2.setPref("stir", !ctx2.prefs.stir);
@@ -4558,6 +4596,63 @@ One of mods you are using is using an old version of SDK. It will work for now b
       console.warn("[Farmhand Companion] arouse:", e);
     }
   }
+  var VIBE_MODE = ["Low", "Medium", "High", "Maximum"];
+  var vibeWas = null;
+  var vibeTimer = null;
+  var vibeToys = () => (W.Player && Array.isArray(W.Player.Appearance) ? W.Player.Appearance : []).filter((it) => it && it.Asset && it.Asset.Group && it.Property && typeof it.Property.Intensity === "number" && !(it.Property.LockedBy && typeof W.DialogCanUnlock === "function" && !W.DialogCanUnlock(W.Player, it)));
+  function vibePush(toys) {
+    if (typeof W.CharacterRefresh === "function") W.CharacterRefresh(W.Player, false);
+    if (typeof W.ChatRoomCharacterItemUpdate === "function") toys.forEach((it) => W.ChatRoomCharacterItemUpdate(W.Player, it.Asset.Group.Name));
+    else if (typeof W.ChatRoomCharacterUpdate === "function") W.ChatRoomCharacterUpdate(W.Player);
+  }
+  function vibeSet(it, level, mode) {
+    it.Property.Intensity = level;
+    it.Property.Mode = mode || (level < 0 ? "Off" : VIBE_MODE[level]);
+    const eff = new Set(Array.isArray(it.Property.Effect) ? it.Property.Effect : []);
+    if (level < 0) eff.delete("Vibrating");
+    else eff.add("Vibrating");
+    it.Property.Effect = Array.from(eff);
+  }
+  function vibeRestore() {
+    clearTimeout(vibeTimer);
+    vibeTimer = null;
+    const was = vibeWas;
+    vibeWas = null;
+    if (!was) return;
+    try {
+      const toys = vibeToys().filter((it) => was[it.Asset.Group.Name + "/" + it.Asset.Name]);
+      toys.forEach((it) => {
+        const w = was[it.Asset.Group.Name + "/" + it.Asset.Name];
+        vibeSet(it, w.level, w.mode);
+      });
+      if (toys.length) vibePush(toys);
+    } catch (e) {
+      console.warn("[Farmhand Companion] toys back:", e);
+    }
+  }
+  function vibe(m) {
+    try {
+      if (m.level == null) return vibeRestore();
+      if (!stirOn()) return;
+      const toys = vibeToys();
+      if (!toys.length) return;
+      if (!vibeWas) {
+        vibeWas = {};
+        toys.forEach((it) => {
+          vibeWas[it.Asset.Group.Name + "/" + it.Asset.Name] = { level: it.Property.Intensity, mode: it.Property.Mode };
+        });
+      }
+      const level = Math.max(-1, Math.min(3, Math.round(Number(m.level)) || 0));
+      const change = toys.filter((it) => it.Property.Intensity !== level);
+      change.forEach((it) => vibeSet(it, level));
+      if (change.length) vibePush(change);
+      clearTimeout(vibeTimer);
+      const hold = Number(m.until) - Date.now();
+      vibeTimer = setTimeout(vibeRestore, hold > 0 ? Math.min(hold, 36e5) : 12e4);
+    } catch (e) {
+      console.warn("[Farmhand Companion] toys:", e);
+    }
+  }
   function initBody(mod2) {
     try {
       mod2.hookFunction("ChatRoomMapViewCanEnterTile", 0, (args, next) => {
@@ -4822,6 +4917,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
       case "face":
         face(m);
         break;
+      case "vibe":
+        vibe(m);
+        break;
+      // a scene turns the dial on a buzzin' toy you're wearin' (cues.js)
       case "arouse":
         arouse(m);
         break;

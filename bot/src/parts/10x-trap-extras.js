@@ -221,9 +221,11 @@
   function nestSpots(){ return Object.keys(L.spots || {}).filter(n => n === "nest" || /^nest-[a-z0-9]+$/.test(n)); }
   function eggsLaid(mn, n, atNest, types){
     bump1(subjWeek().eggs, mn, n);
+    openedUp(mn);   // wide open for an hour (10y7-udders.js)
+    try { albumAdd(mn, "🥚", "A clutch laid", n+" eggs pushed out"+(atNest ? " into the nest" : ", right where you stood")+"."+(eggTypesText(types) ? " "+eggTypesText(types)+"." : "")); } catch(e){}   // a keepsake (10y6-keepers.js)
     if (!atNest) return;
     L.nest = L.nest || { eggs: 0, by: {} };
-    L.nest.eggs += n; bump1(L.nest.by, mn, n);
+    L.nest.eggs += n; bump1(L.nest.by, mn, n);   // (kept for the gatherin')
     // what kinds, per layer (they sell for different prices: 10y4-corruption.js)
     L.nest.types = L.nest.types || {}; const mine = L.nest.types[mn] = L.nest.types[mn] || {};
     const tt = types && Object.keys(types).length ? types : { stud: n };
@@ -255,7 +257,7 @@
     if (!n){ R("The nest's empty, sugar."); return; }
     if (!nestSpots().some(s => onSpot(sender, s, 2))){ R("Come over to the nest to gather, sugar."); return; }
     const by = L.nest.by, types = L.nest.types || {}; L.nest = { eggs: 0, by: {} }; saveLedger(); audit(sender, "GATHER", String(n));
-    for (const [m, k] of Object.entries(by)) earnRibbons(parseInt(m, 10), Math.min(CFG.GATHER_MAX_RIBBONS, eggsWorth(types[m], k)), "eggs sold at market"+(eggTypesText(types[m]) ? " ("+eggTypesText(types[m])+")" : ""));
+    for (const [m, k] of Object.entries(by)) leaderShare(parseInt(m, 10), earnRibbons(parseInt(m, 10), Math.min(CFG.GATHER_MAX_RIBBONS, eggsWorth(types[m], k)), "eggs sold at market"+(eggTypesText(types[m]) ? " ("+eggTypesText(types[m])+")" : "")));   // a herd leader takes a share (10y6-keepers.js)
     earnRibbons(sender, 1, "gatherin' the eggs");
     emote("🧺 "+xLine("gather", sender, { x: String(n) }), sender);
     R("🧺 "+n+" eggs gathered and off to market. The layers have been paid: "+Object.entries(by).map(([m, k]) => plainName(parseInt(m, 10))+" ("+k+")").join(", ")+".");
@@ -282,8 +284,8 @@
   }
   function subjBoardLine(){
     const w = subjWeek(), top = (o, unit) => { const e = Object.entries(o).sort((a, b) => b[1] - a[1])[0]; return e ? plainName(parseInt(e[0], 10))+" ("+e[1]+" "+unit+")" : null; };
-    const t = top(w.traps, "traps"), e = top(w.eggs, "eggs"), f = top(w.fur, "loads");
-    return t || e || f ? "\n\n🧪 Test subject of the week: "+(t || "nobody yet")+(e ? "\n🥚 Best layer: "+e : "")+(f ? "\n🐺 Most bred by things with fur: "+f : "") : "";
+    const t = top(w.traps, "traps"), e = top(w.eggs, "eggs"), f = top(w.fur, "loads"), hb = top(w.hatched || {}, "hatched");
+    return t || e || f || hb ? "\n\n🧪 Test subject of the week: "+(t || "nobody yet")+(e ? "\n🥚 Best layer: "+e : "")+(f ? "\n🐺 Most bred by things with fur: "+f : "")+(hb ? "\n🐣 Broodiest: "+hb : "") : "";
   }
 
   function extrasCommand(cmd, sender, args, R){

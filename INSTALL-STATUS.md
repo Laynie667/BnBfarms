@@ -1,11 +1,11 @@
 # What to install (current versions)
 
-Updated 2026-10-07. Every file is in the `dist/` folder (it syncs through OneDrive, so the phone app has it too).
+Updated 2026-10-11. Every file is in the `dist/` folder (it syncs through OneDrive, so the phone app has it too).
 In Tampermonkey's dashboard, compare each script's version with this list. Anything already at these versions is up to date.
 
 | Script | File in `dist/` | Where it runs | Current |
 |---|---|---|---|
-| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.28.0** |
+| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.29.0** |
 | Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.6.0** |
 | Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.1.3** |
 | Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **1.0.4** |
@@ -13,7 +13,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 | Map tools, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.3** |
 | Dairy | `farmhand-dairy.user.js` | the bot's PC | **1.0.2** |
 | Shows | `farmhand-shows.user.js` | the bot's PC | **1.0.4** |
-| Farmhand Companion | `farmhand-companion.user.js` | each player | **0.15.3** |
+| Farmhand Companion | `farmhand-companion.user.js` | each player | **0.15.4** |
 | Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.4** |
 
 ## Sending a watch report
@@ -23,6 +23,28 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 - Running the watcher on more than one game at once (the bot, yours, a tester's) lets Claude line them up into one timeline.
 
 ## Latest changes (newest first)
+
+- **Bot 0.29.0, Companion 0.15.4: toys that follow, home-built traps, brooding, the whistle, keepsakes, trained holes, barn dreams, leaders' reins, the vat; and milking, pregnancy and "your words".**
+  - **Toys follow the scene** (Companion, needs "Farm can stir me up"): any vibrating toy really worn goes low while a trap teases, high as it finishes, off while denied, then back how it was. Locked toys the wearer can't change are left alone. NOT YET SEEN LIVE.
+  - **Build your own trap** (proprietors): `?trap make <name> <dose|hold|fill|breed|strip|write> [mild|strong|brutal] [words] | line | line…` with `%n` for their name. Spot name `trap-<name>`. `?trap made`, `?trap unmake <name>`.
+  - **Brooding**: on the nest, `?sit` (staff: `?sit <who>`) takes the eggs under them for 20 minutes, fed by hand, till they hatch. The sitter is paid, the layers get half of market, and "Broodiest" joins the weekly board. `?sit up` or the safeword puts the eggs back.
+  - **The keeper's whistle** (staff): `?whistle <which> <who>` calls any of the twelve to a subject where they stand. 90 minutes between calls (proprietors exempt).
+  - **Keepsakes**: `?album` and a card on the Traps tab. Every trap, clutch, litter, hatching, parasite's twelve hours and a few firsts leave an entry only that player sees.
+  - **Trained holes**: `?holes`. Each hole counts loads, the biggest, the most in a day, and knots. At 10, 25, 50 and 100 loads: 40 ml more capacity for good, and traps pour 15% more into that hole per step.
+  - **Barn dreams**: on the `barn` spot through curfew, a private dream every 25 minutes shaped by the day's traps; at morning they wake needy (arousal, maybe heat), sore, or carrying.
+  - **Herd leaders**: `?send <who> <trap>`, `?dose <who> <shot words>`, `?herdtraps`, baiting traps, and a quarter of what their animals earn at the nest. 15 minutes between uses.
+  - **The vat**: everything milked or collected is counted per player (`?vat`, and the Store tab). `?buy <potion or shot> with milk` pays 500 ml per ribbon of the price, 3 a day; the week's top producer pays a quarter less.
+  - **Milked till you cum**: in the stall, at 70+ arousal the cups may tip them over (and a real orgasm in the stall counts): a room line, 12% of capacity extra let down, a count on the record.
+  - **The stall dial**: `?stalldial gentle|steady|hard|punishing` (staff can set it for others; the animal can always put it back). Gentle leaves a third; hard an eighth, faster, sore after; punishing takes everything and leaves them sensitive for an hour.
+  - **Overdue**: full for 1, 3 and 6 hours shows as leaking, engorged, bursting, with lines for them and the room.
+  - **Brought into milk**: staff `?bringin <who>` (they are asked first); six tendings, two a day at most, then they are a milker. `?bringin stop`.
+  - **A second litter**: once the first is a day old, a load in the other hole can start a second pregnancy on its own clock. With a clutch too: the Triple-Carried title.
+  - **Bred back**: for an hour after a birth or a laying, conception is four times as likely; caught inside the hour earns the Bred Back title.
+  - **Whose they were**: with more than one sire, the split of the litter is counted out at the birth.
+  - **Too big to walk**: only once the map has `?spot set farrowing`. At the last belly stage they are bedded down there; `?tend <who>` feeds or milks them and pays a ribbon. `?bedrest off` opts out.
+  - **Your words**: `?callme <names>` and `?nevercall <names>`. Lines to or about that player swap the farm girl's pet names for theirs half the time, and never use a ruled-out word.
+  - **Intensity**: `?intensity tender|rough|filthy`. First pass: it adds a tender or filthy closing sentence to trap beats and leans gas, spray and needle traps milder or harsher. The main pools are not yet written three ways.
+  - **Kept**: a herd leader `?keep <who>` (they are asked); then `tag`, `name`, `milk <hours>`, `breed <who>`. The tag is written on the body (with "Farm can mark my body"), not yet on a collar item. `?kept off` ends it.
 
 - **Bot 0.28.0, Companion 0.15.3: corruption, egg kinds, the night raid, going under, the gauntlet, lent for the night, the mystery box, the living suit.**
   - **Corruption** (test subjects, 0 to 100, never falls by itself): +2 a trap, +3 more if it laid in them, +5 the parasite. Permanent changes at 20 (heats half again as long), 40 (a size up), 60 (a cum craving that stays), 80 (a word that slips out when they talk), 100 (Ruined: gas, spray and needle lean brutal). `?corruption`; staff `?cleanse <who>` for 5 ribbons takes 20 off.

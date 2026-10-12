@@ -19,7 +19,7 @@
   function pickSeverity(mn, fixed){
     if (fixed) return fixed;
     const w = ruined(mn) ? [0.1, 0.3, 0.6] : dangerX(mn).on ? [0.2, 0.4, 0.4] : [0.55, 0.3, 0.15], roll = Math.random();   // (Ruined: 10y4-corruption.js)
-    return roll < w[0] ? 1 : roll < w[0] + w[1] ? 2 : 3;
+    return intensitySev(mn, roll < w[0] ? 1 : roll < w[0] + w[1] ? 2 : 3);   // tender leans mild, filthy leans brutal (10y7-udders.js)
   }
   // "musk brutal", "slime", "strong": what a proprietor loaded a spot with
   function parseTrapLoad(kind, words){

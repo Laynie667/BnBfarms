@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.28.0
+// @version      0.29.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -1828,7 +1828,7 @@
   ];
 
   // bot/src/version.js
-  var VERSION = "0.28.0";
+  var VERSION = "0.29.0";
 
   // bot-parts:farmhand-bot-parts
   (function() {
@@ -2388,6 +2388,32 @@
       // each time a subject wades into a water spot (and every TENTACLE_LINGER_MIN they stay)
       TENTACLE_LINGER_MIN: 5,
       TENTACLE_HYPER_CHANCE: 0.25,
+      SIT_MIN: 20,
+      SIT_LINE_MIN: 4,
+      WHISTLE_COOLDOWN_MIN: 90,
+      ALBUM_MAX: 60,
+      HOLE_MORE_X: 0.15,
+      HOLE_CAP_BONUS: 40,
+      DREAM_EVERY_MIN: 25,
+      LEADER_SHARE: 0.25,
+      LEADER_REINS_MIN: 15,
+      VAT_ML_PER_RIBBON: 500,
+      VAT_DAY_MAX: 3,
+      // 10y6-keepers.js
+      MILKCUM_AROUSAL: 70,
+      MILKCUM_CHANCE: 0.06,
+      MILKCUM_GAP_S: 180,
+      MILKCUM_LETDOWN: 0.12,
+      DIAL_SORE_MIN: 30,
+      DIAL_SENSITIVE_MIN: 60,
+      OVERDUE_H: [1, 3, 6],
+      BRINGIN_TENDS: 6,
+      DOUBLE_CARRY: true,
+      BREDBACK_MIN: 60,
+      BREDBACK_X: 4,
+      BED_TEND_MIN: 10,
+      KEPT_DAYS: 7,
+      // 10y7-udders.js
       UNDER_STEP_MIN: 30,
       RAID_EVERY_MIN: 30,
       RAID_CHANCE: 0.1,
@@ -2486,7 +2512,9 @@
         { key: "throat", name: "Throat Goat", why: "a bottomless throat" },
         { key: "stud", name: "Stud of the Farm", why: "50 covers" },
         { key: "sire", name: "Prolific Sire", why: "sired 10 litters" },
-        { key: "eggs", name: "Egg Layer", why: "10 eggs laid" }
+        { key: "eggs", name: "Egg Layer", why: "10 eggs laid" },
+        { key: "triple", name: "Triple-Carried", why: "womb, ass and a clutch, all at once" },
+        { key: "bredback", name: "Bred Back", why: "caught again within the hour of bein' emptied" }
       ],
       FAST_SCENE_TYPES: ["canine", "draconic"],
       FAST_SCENE_S: 30,
@@ -3429,7 +3457,10 @@
     };
     W.FarmhandExport = exportLedger;
     W.FarmhandLedger = () => L;
-    if (W.__FARMHAND_TEST__) Object.assign(W, { __st: () => state, __cfg: CFG, __pt: prodTick, __qt: quotaTick, __lt: leashTick, __ms: milkingStallTick, __vt: voiceTick, __sync: syncCompanions, __gt: gearTick, __ht: homeTick, __addons: (h, ...a) => addonsEmit(h, ...a), __stateFor: (mn) => stateFor(mn), __leadTick: () => leadTick(), __ambient: () => ambientTick(), __about: (t) => aboutWhom(t), __announce: (t) => announce(t), __reply: (mn, t, ch) => reply(mn, t, ch), __office: () => officeCheck(), __namesHere: (t) => namesHere(t), __speciesCheck: (t) => QUESTIONS.find((q) => q.key === "species").check(t), __attach: () => attachListeners(), __tryLogin: () => tryLogin(), __beepText: (m) => beepText(m), __nameOnce: (t, mn) => nameOnce(t, mn), __buildContract: (n, mn, d) => buildContract(contractTemplate(n), mn, d), __potionTick: () => potionTick(), __penTick: () => penTick(), __trapTick: () => trapTick(), __corrupt: (m, n) => corrupt(m, n), __under: (m) => underOf(m), __goUnder: (m, n) => goUnder(m, n), __lend: () => state.lend, __eggsWorth: (t, n) => eggsWorth(t, n), __rank: (m) => rankX(m), __broodBook: (m) => broodBook(m), __belly: (m) => bellyStage(m), __happening: (m) => happeningFor(m), __gearOn: (m, s, l, d, x) => gearOn(m, s, l, d, x), __heard: (mn, t) => trapHeard(mn, t), __parasiteTick: () => parasiteTick(), __parts: (m) => parasiteParts(rec(m).parasite), __climax: (m) => parasiteClimax(m), __nurse: (a, b) => parasiteNurse(a, b), __parasiteChance: (m) => parasiteChance(m), __kiss: (a, f, s, t) => parasiteKiss(a, f, s, t), __load: (s, m, h, x) => parasiteLoad(s, m, h, x), __shot: (t, by, text, how) => applyShot(t, by, text, how), __slow: (mn) => slowOf(mn), __milkRate: (mn) => milkRate(mn), __benchTick: () => benchTick(), __roll: (m, s, a, b) => rollConception(m, s, a, b), __contractTick: () => {
+    if (W.__FARMHAND_TEST__) Object.assign(W, { __st: () => state, __cfg: CFG, __pt: prodTick, __qt: quotaTick, __lt: leashTick, __ms: milkingStallTick, __vt: voiceTick, __sync: syncCompanions, __gt: gearTick, __ht: homeTick, __addons: (h, ...a) => addonsEmit(h, ...a), __stateFor: (mn) => stateFor(mn), __leadTick: () => leadTick(), __ambient: () => ambientTick(), __about: (t) => aboutWhom(t), __announce: (t) => announce(t), __reply: (mn, t, ch) => reply(mn, t, ch), __office: () => officeCheck(), __namesHere: (t) => namesHere(t), __speciesCheck: (t) => QUESTIONS.find((q) => q.key === "species").check(t), __attach: () => attachListeners(), __tryLogin: () => tryLogin(), __beepText: (m) => beepText(m), __nameOnce: (t, mn) => nameOnce(t, mn), __buildContract: (n, mn, d) => buildContract(contractTemplate(n), mn, d), __potionTick: () => potionTick(), __penTick: () => penTick(), __trapTick: () => trapTick(), __corrupt: (m, n) => corrupt(m, n), __under: (m) => underOf(m), __goUnder: (m, n) => goUnder(m, n), __lend: () => state.lend, __keepTick: () => keepersTick(), __conceive: (m, s, a, b, h) => rollConception(m, s, a, b, h), __birth: (m) => giveBirth(m), __milkCapOf: (m) => milkCap(m), __udderTick: () => {
+      state.udderAt = 0;
+      uddersTick();
+    }, __wordsFor: (m, t) => wordsFor(m, t), __overdue: (m) => overdueStage(m), __milkCum: (m) => stallClimax(m), __intSev: (m, s) => intensitySev(m, s), __holes: (m) => holesFor(m), __album: (m) => albumFor(m, 60), __holeTook: (m, h, a) => holeTook(m, h, a), __dreamTheme: (m) => dreamTheme(m), __eggsWorth: (t, n) => eggsWorth(t, n), __rank: (m) => rankX(m), __broodBook: (m) => broodBook(m), __belly: (m) => bellyStage(m), __happening: (m) => happeningFor(m), __gearOn: (m, s, l, d, x) => gearOn(m, s, l, d, x), __heard: (mn, t) => trapHeard(mn, t), __parasiteTick: () => parasiteTick(), __parts: (m) => parasiteParts(rec(m).parasite), __climax: (m) => parasiteClimax(m), __nurse: (a, b) => parasiteNurse(a, b), __parasiteChance: (m) => parasiteChance(m), __kiss: (a, f, s, t) => parasiteKiss(a, f, s, t), __load: (s, m, h, x) => parasiteLoad(s, m, h, x), __shot: (t, by, text, how) => applyShot(t, by, text, how), __slow: (mn) => slowOf(mn), __milkRate: (mn) => milkRate(mn), __benchTick: () => benchTick(), __roll: (m, s, a, b) => rollConception(m, s, a, b), __contractTick: () => {
       state.cwAt = 0;
       contractWatchTick();
     }, __lingerTick: () => lingerTick(), __ribbonTick: () => ribbonTick(), __dareTick: () => dareTick(), __potionOn: (mn, id) => potionOn(mn, id), __milkRate: (mn) => milkRate(mn) });
@@ -3934,6 +3965,7 @@
       enqueue({ Content: t, Type: "Chat" }, urgent);
     }
     function emote(t, who, also) {
+      if (who) t = wordsFor(who, t);
       {
         const s0 = who || aboutWhom(t);
         if (s0) noteLine(s0, t);
@@ -4033,7 +4065,7 @@
     }
     function privateTo(mn, text, kind) {
       noteLine(mn, text);
-      const line = (kind === "emote" ? "*" : "") + String(text);
+      const line = (kind === "emote" ? "*" : "") + String(wordsFor(mn, text));
       if (hasCompanion(mn)) enqueue(makeMsg("roomline", { text: line, kind }, mn));
       else for (const part of splitMessage(line, 900)) enqueue({ Content: "(" + part.replace(/\(/g, "[").replace(/\)/g, "]"), Type: "Whisper", Target: mn });
     }
@@ -4374,11 +4406,11 @@
       const room = (W.ChatRoomCharacter || []).map((c) => c.MemberNumber).filter((m) => m !== CFG.BOT_MEMBER);
       const books = Object.keys(L.people).map((k) => parseInt(k, 10));
       const all = [...new Set(room.concat(books))];
-      const onBooks = (m) => {
+      const onBooks2 = (m) => {
         const r = rec(m);
         return !!(r && r.roles && r.roles.length);
       };
-      const score = (m) => (onBooks(m) ? 2 : 0) + (charFor(m) ? 1 : 0);
+      const score = (m) => (onBooks2(m) ? 2 : 0) + (charFor(m) ? 1 : 0);
       const choose = (list) => {
         if (list.length <= 1) return list[0] || null;
         const best = Math.max(...list.map(score)), top = list.filter((m) => score(m) === best);
@@ -4590,6 +4622,8 @@
           if (u >= 2) s.under = u;
           if (r.corrWord) s.corrWord = r.corrWord;
         });
+        part("keepsakes", () => keepersStateFor(mn, s));
+        part("udders", () => uddersStateFor(mn, s));
         part("happening", () => {
           const hp = happeningFor(mn);
           if (hp.length) s.happening = hp;
@@ -4809,6 +4843,7 @@
       return out;
     }
     function tell(mn, text) {
+      text = wordsFor(mn, text);
       if (canBeep(mn)) beep(mn, text);
       else if (charFor(mn)) whisper(mn, text);
       else beep(mn, text);
@@ -5192,6 +5227,7 @@
       rollBoard();
       L.yield.d[mn] = (L.yield.d[mn] || 0) + amount;
       L.yield.w[mn] = (L.yield.w[mn] || 0) + amount;
+      vatAdd(mn, amount);
     }
     function drainMilk(mn, amount, nursing) {
       const p = prodOf(mn);
@@ -5270,6 +5306,10 @@
       const p = prodOf(mother), r = rec(mother);
       hole = hole === "butt" ? "butt" : "vulva";
       if (!r.fertile || boosted(p, "contra")) return null;
+      {
+        const sc = secondCarry(mother, stud, amount, bonus, hole);
+        if (sc !== void 0) return sc;
+      }
       if (hole === "butt" && !mpregOn(mother)) return null;
       const now = Date.now();
       if (p.preg) {
@@ -5288,6 +5328,7 @@
       if (r.rights && r.rights.until > now && r.rights.stud !== stud && !(r.rights.allow || []).includes(stud)) return null;
       if (p.preg) chance *= CFG.PROD.EXTRA_SIRE_X;
       chance *= dangerX(mother).chance;
+      chance *= openX(mother);
       chance = Math.min(0.95, chance);
       if (Math.random() >= chance) return null;
       if (p.preg) {
@@ -5302,6 +5343,11 @@
         count = Math.min(CFG.HYPER_MAX, Math.max(count + 2, Math.round(count * (a + Math.random() * (b - a)) * hx)));
       }
       p.preg = { since: now, due: now + CFG.PROD.PREG_DAYS * 864e5, sires: [stud], count, warned: false };
+      try {
+        bredBack(mother);
+      } catch (e) {
+        warn("bred back:", e);
+      }
       if (hole === "butt") p.preg.via = "butt";
       return "new";
     }
@@ -5329,6 +5375,7 @@
       const sires = g.sires.slice();
       p.preg = null;
       p.freshUntil = Date.now() + CFG.PROD.FRESH_DAYS * 864e5;
+      openedUp(mn);
       saveLedger();
       audit(CFG.BOT_MEMBER, "BIRTH", mn + " " + JSON.stringify(kids));
       later(() => addonsEmit("birth", mn, kids, sires), 1500);
@@ -5337,9 +5384,19 @@
       if (kids.female) parts.push(kids.female + " female");
       if (kids.futa) parts.push(kids.futa + " futa");
       const msg = "\u{1F37C} Oh, y'all! " + plainName(mn) + " just delivered " + g.count + " (" + parts.join(", ") + "), sired by " + g.sires.map(plainName).join(" & ") + ". Milk's comin' in strong now!";
+      try {
+        albumAdd(mn, "\u{1F37C}", "A litter delivered", g.count + " (" + parts.join(", ") + "), sired by " + g.sires.map(plainName).join(" & ") + ".");
+      } catch (e) {
+      }
       if (onMap(mn) && CFG.LAY_SCENE) farrowScene(mn, g.count, parts.join(", "), sires);
       else if (onMap(mn)) emote("\u{1F37C} With one last long push, " + plainName(mn) + " delivers " + g.count + " (" + parts.join(", ") + "), sired by " + g.sires.map(plainName).join(" & ") + ". The farm girl tucks 'em in the straw, and " + plainName(mn) + "'s milk comes in strong, breasts swellin' heavy.");
       else beep(mn, msg);
+      try {
+        const split = revealSplit(mn, sires, g.count);
+        if (split) L.studbook[L.studbook.length - 1].split = split;
+      } catch (e) {
+        warn("split:", e);
+      }
       for (const h of herdsOf(mn)) beep(h.leader, msg);
     }
     function sessionScore(mn, gapH) {
@@ -5594,6 +5651,7 @@
           if (p0) {
             p0.stallSeen = 0;
             p0.stallWhyTold = false;
+            p0.stallKeptTold = false;
             if (p0.stall && now - (p0.stall.seenAt || now) > CFG.PROD.STALL_AWAY_GRACE_S * 1e3) {
               p0.stallPaused = { until: now + 6e5, st: p0.stall };
               p0.stall = null;
@@ -5602,7 +5660,7 @@
           continue;
         }
         const p = prodOf(mn);
-        const keepM = milkCap(mn) * CFG.PROD.STALL_LEAVE_SHARE, keepS = semenCap(mn) * CFG.PROD.STALL_LEAVE_SHARE;
+        const keepM = milkCap(mn) * stallShare(mn), keepS = semenCap(mn) * stallShare(mn);
         const doM = makesMilk(mn) && !milkDenied(mn) && !gearOf(mn).milk && p.milk > keepM;
         const doS = makesSemen(mn) && p.semen > keepS;
         if (!p.stall && !doM && !doS) {
@@ -5630,6 +5688,16 @@
           }
           continue;
         }
+        if (!p.stall && (doM || doS)) {
+          const kb = keptMilkBlock(mn);
+          if (kb) {
+            if (!p.stallKeptTold) {
+              p.stallKeptTold = true;
+              tell(mn, "\u{1F95B} The cups sniff at you and let go, sugar. " + plainName(kb.by) + " has you milked at " + kb.milk.map((h) => h + ":00").join(" and ") + ", and not before.");
+            }
+            continue;
+          }
+        }
         if (!p.stall && (doM || doS) && p.stallRest > now) {
           if (p.stallRestTold !== p.stallRest) {
             p.stallRestTold = p.stallRest;
@@ -5651,7 +5719,7 @@
           const [lo, hi] = CFG.PROD.STALL_SESSION_RANGE;
           const fracM = doM ? (p.milk - keepM) / Math.max(1, milkCap(mn) - keepM) : 0;
           const fracS = doS ? (p.semen - keepS) / Math.max(1, semenCap(mn) - keepS) : 0;
-          const mins = Math.round(lo + (hi - lo) * Math.min(1, Math.max(fracM, fracS)));
+          const mins = Math.max(2, Math.round((lo + (hi - lo) * Math.min(1, Math.max(fracM, fracS))) / dialRate(mn)));
           const total = { m: doM ? p.milk - keepM : 0, s: doS ? p.semen - keepS : 0 };
           p.stall = {
             since: now,
@@ -5685,13 +5753,18 @@
         st.oweS = Math.max(0, st.oweS - gotS);
         st.got.m += gotM;
         st.got.s += gotS;
+        try {
+          stallCumTick(mn, st, now);
+        } catch (e) {
+          warn("milk cum:", e);
+        }
         const doneM = !makesMilk(mn) || milkDenied(mn) || gearOf(mn).milk || p.milk <= keepM + 1;
         const doneS = !makesSemen(mn) || p.semen <= keepS + 1;
         const done = doneM && doneS || now - (st.since || now) > ((st.mins || 30) + 15) * 6e4;
         if (!done && now >= (st.nextBeat || 0)) {
           st.nextBeat = now + (15 + Math.random() * 10) * 1e3;
           const tb = (st.tailN = (st.tailN || 0) + 1) % 5 === 0 ? tailBit(mn, null, null, "milk") : "";
-          privateTo(mn, (st.kind === "cock" ? "\u{1F402} " : "\u{1F95B} ") + (tb || stallBeat(mn, st)), "emote");
+          privateTo(mn, (st.kind === "cock" ? "\u{1F402} " : "\u{1F95B} ") + (tb || dialBeat(mn, st) || stallBeat(mn, st)), "emote");
         }
         if (!done && now >= (st.nextOpen || 0) && (st.opens || 0) < CFG.PROD.STALL_OPEN_MAX) {
           st.nextOpen = now + CFG.PROD.STALL_LINE_MIN * 6e4;
@@ -5716,6 +5789,11 @@
         if (done) {
           p.stall = null;
           p.stallPaused = null;
+          try {
+            stallDialDone(mn, st);
+          } catch (e) {
+            warn("dial:", e);
+          }
           if (st.got.m + st.got.s > 0) later(() => earnRibbons(mn, CFG.RIBBONS_FOR.stall, "a full session in the milkin' stall"), 3e3);
           const R = CFG.PROD.STALL_REST_MIN;
           p.stallRest = now + (R[0] + Math.random() * (R[1] - R[0])) * 6e4;
@@ -6353,6 +6431,10 @@
           return (t.sired || 0) >= 10;
         case "eggs":
           return (o.eggs || 0) >= 10;
+        case "triple":
+          return (r.triple || 0) >= 1;
+        case "bredback":
+          return (r.bredBack || 0) >= 1;
       }
       return false;
     }
@@ -7569,16 +7651,16 @@
         if (lv > 0) g.milk = { kind: "pump", name: "lactation pump", level: lv, ml: CFG.GEAR.PUMP_ML[lv] };
       }
       const arousal = Math.max(0, Math.min(100, C.ArousalSettings && C.ArousalSettings.Progress || 0));
-      const intensityOf = (it) => it && it.Property && typeof it.Property.Intensity === "number" ? it.Property.Intensity : -1;
+      const intensityOf2 = (it) => it && it.Property && typeof it.Property.Intensity === "number" ? it.Property.Intensity : -1;
       const echo = (name, it) => {
-        const i = intensityOf(it);
+        const i = intensityOf2(it);
         const mix = Math.min(1, 0.6 * i / 3 + 0.4 * arousal / 100);
         return { kind: "echo", name, level: i + 1, ml: Math.round(CFG.GEAR.ECHO_ML_MIN + (CFG.GEAR.ECHO_ML_MAX - CFG.GEAR.ECHO_ML_MIN) * mix) };
       };
       const ep = wornItem(mn, "ItemTorso", "\u4FBF\u643A\u4E73\u6CF5");
-      if (!g.milk && ep && typeRec(ep).s === 0 && intensityOf(ep) >= 0) g.milk = echo("portable breast pump", ep);
+      if (!g.milk && ep && typeRec(ep).s === 0 && intensityOf2(ep) >= 0) g.milk = echo("portable breast pump", ep);
       const ev = wornItem(mn, "ItemDevices", "\u5976\u8D29");
-      if (!g.milk && ev && typeRec(ev).m === 1 && intensityOf(ev) >= 0) g.milk = echo("milk vendor", ev);
+      if (!g.milk && ev && typeRec(ev).m === 1 && intensityOf2(ev) >= 0) g.milk = echo("milk vendor", ev);
       for (const [n, label] of [["FuckMachine", "fuck machine"], ["Sybian", "Sybian"]]) {
         const m = wornItem(mn, "ItemDevices", n), i = m && m.Property && typeof m.Property.Intensity === "number" ? m.Property.Intensity : -1;
         if (m) g.machine = { name: label, intensity: i };
@@ -7732,7 +7814,7 @@
     }
     function privateLine(mn, text, kind, urgent) {
       noteLine(mn, text);
-      const line = (kind === "emote" ? "*" : "") + String(text);
+      const line = (kind === "emote" ? "*" : "") + String(wordsFor(mn, text));
       if (hasCompanion(mn)) {
         enqueue(makeMsg("roomline", { text: line, kind: kind === "emote" ? "emote" : "chat" }, mn), urgent);
         return;
@@ -8353,6 +8435,11 @@
           return;
         }
         p.climax.came++;
+        try {
+          stallClimax(mn);
+        } catch (e) {
+          warn("stall climax:", e);
+        }
         face(mn, "afterglow", 40);
         const bits = [];
         if (makesMilk(mn) && !milkDenied(mn) && p.milk > 1) {
@@ -9435,6 +9522,7 @@
         R(storeText(sender));
         return;
       }
+      if (vatBuy(sender, args, R)) return;
       const it = storeItem(args[0]);
       if (!it || it.off) {
         R("We don't stock that, hon. ?store shows the shelf.");
@@ -11022,11 +11110,11 @@
         const m = resolveTarget(a);
         if (m && benchedNow(m)) t = m;
       }
-      const near = (m) => {
+      const near2 = (m) => {
         const p = posOf(sender), q = posOf(m);
         return p && q && Math.max(Math.abs(p.X - q.X), Math.abs(p.Y - q.Y)) <= 2;
       };
-      if (!t) t = benchedHere().find(near) || null;
+      if (!t) t = benchedHere().find(near2) || null;
       if (!t) {
         R(benchedHere().length ? "Get right up to the bench first, sugar (within a couple of steps). ?bench shows who's on it." : "Nobody's on the use bench right now, sugar.");
         return;
@@ -11039,7 +11127,7 @@
         R("You need to be on the farm's books to use the bench, sugar. ?apply gets you started.");
         return;
       }
-      if (!onMap(sender) || !near(t)) {
+      if (!onMap(sender) || !near2(t)) {
         R("Get right up to " + plainName(t) + " on the bench first, sugar.");
         return;
       }
@@ -11832,7 +11920,8 @@
         if (state.trapRuns.get(mn) !== run) return;
         if (run.i < beats.length && charFor(mn)) {
           const b = beats[run.i++];
-          emote(TRAP_KINDS[kind].icon + " " + tFill(pickFresh("trap:" + kind + ":" + run.i, Array.isArray(b) ? b : [b]), mn, v), mn);
+          emote(TRAP_KINDS[kind].icon + " " + tFill(pickFresh("trap:" + kind + ":" + run.i, Array.isArray(b) ? b : [b]), mn, v) + intensityTail(mn, run.i, beats.length), mn);
+          toysBeat(mn, run.i, beats.length);
           run.timer = setTimeout(step, CFG.TRAP_BEAT_S * 1e3);
           return;
         }
@@ -11851,6 +11940,12 @@
           warn("trap gear:", e);
         }
         try {
+          if (charFor(mn)) keepersAfter(mn, kind, before);
+          toysAfter(mn);
+        } catch (e) {
+          warn("keepsake:", e);
+        }
+        try {
           if (charFor(mn)) trapAfter(mn, kind, before);
         } catch (e) {
           warn("trap after:", e);
@@ -11866,7 +11961,10 @@
       if (run) {
         clearTimeout(run.timer);
         state.trapRuns.delete(mn);
+        toysFollow(mn, null);
       }
+      sitStop(mn, "safe");
+      if (quietMin == null) uddersSafe(mn);
       trapWaitEnd(mn, "quiet");
       sceneStop(mn);
       gearOff(mn, null, "hold");
@@ -11898,9 +11996,15 @@
     }
     const TRAP_HOLE = { vulva: "pussy", butt: "ass", mouth: "throat" };
     function trapFill(mn, hole, amount, over) {
+      amount *= holeX(mn, hole);
       const p = prodOf(mn), room = Math.max(0, capacity(mn) * (over || 1) - heldTotal(p)), kept = Math.min(amount, room);
       p.held[hole] = (p.held[hole] || 0) + kept;
       p.totals.received += kept;
+      try {
+        holeTook(mn, hole, kept);
+      } catch (e) {
+        warn("holes:", e);
+      }
       if (hole === "mouth" && kept >= CFG.HUNGRY_ML) {
         p.boosts = p.boosts || {};
         p.boosts.hungry = Date.now() + 36e5;
@@ -11923,6 +12027,11 @@
       if (p.eggs) p.eggs.n = Math.min(CFG.EGG_MAX, p.eggs.n + n);
       else p.eggs = { n, by, since: Date.now(), layAt: Date.now() + (dl + Math.random() * (dh - dl)) * 864e5 };
       eggTypesNote(p, n, by);
+      try {
+        bredBack(mn);
+      } catch (e) {
+        warn("bred back:", e);
+      }
       saveLedger();
       audit(BOTMN(), "CLUTCH", mn + " " + n + " by " + by);
       return p.eggs.n;
@@ -12174,6 +12283,8 @@
       broodTick();
       corruptionTick();
       cursedTick();
+      keepersTick();
+      uddersTick();
     }
     const AUTO_INJECT = ["auto-injector", "autoinjector", "auto inject", "self-inject", "auto-dose", "auto doser"];
     const OVI_WORDS = ["ovipositor"];
@@ -12271,6 +12382,7 @@
         const frac = Math.max(0, Math.min(1, (now - p.preg.since) / Math.max(1, p.preg.due - p.preg.since)));
         s += frac * Math.min(1.2, 0.3 + 0.1 * (p.preg.count || 1));
       }
+      if (p.preg2) s += 0.4;
       if (p.eggs) s += Math.min(1, 0.06 * p.eggs.n);
       if (makesMilk(mn) && p.milk >= milkCap(mn) * 0.95) s += 0.2;
       const r = rec(mn);
@@ -12414,9 +12526,10 @@
           R(a0 === "skip" ? "\u{1F9EA} The " + k + " trap won't spring for you any more. ?traps allow " + k + " brings it back." : "\u{1F9EA} The " + k + " trap is back on for you.");
           return true;
         }
+        if (a0 === "make" || a0 === "unmake" || a0 === "made") return customTrapCommand(a0, sender, args, R);
         if (a0 === "bait") {
-          if (!isProprietor(sender)) {
-            R("Baitin' traps is just for the proprietors, sugar.");
+          if (!isProprietor(sender) && !herdMembers(sender).some((x) => isSubject(x.mn))) {
+            R("Baitin' traps is for the proprietors, sugar, and for herd leaders with a subject in their herd.");
             return true;
           }
           const spot = String(args[1] || "").toLowerCase(), n = parseInt(args[2], 10);
@@ -12480,6 +12593,7 @@
           return true;
         }
         if (a0 === "spring") {
+          customLoad();
           if (!isProprietor(sender)) {
             R("Springin' traps by hand is just for the proprietors, sugar.");
             return true;
@@ -12504,7 +12618,7 @@
         }
         const spots = trapSpots(), water = waterSpots();
         if (isStaff(sender))
-          R("\u{1F9EA} TRAPS (they spring for test subjects and nobody else)\n" + trapsList() + "\n\nSet one: stand on the spot and say ?spot set trap-<kind> (trap-milker-2 for a second one; plain ?spot set trap springs pot luck).\nOut there now: " + (spots.length ? spots.map(([n]) => n + (L.trapLoads && L.trapLoads[n] ? " [" + L.trapLoads[n] + "]" : "")).join(", ") : "none yet") + "\nWater the thing lives in: " + (water.length ? water.map(([n]) => n).join(", ") : "none yet (?spot set pond, pool, creek, water, well, bath\u2026)") + "\n?trap load <spot> <words> \xB7 ?trap bait <spot> <ribbons> \xB7 ?trap spring <who> <kind> \xB7 ?subject for the list\n?hunt start [minutes] \xB7 ?pack on|off \xB7 nest spots (?spot set nest) and ?gather \xB7 crate spots (?spot set crate)");
+          R("\u{1F9EA} TRAPS (they spring for test subjects and nobody else)\n" + trapsList() + "\n\nSet one: stand on the spot and say ?spot set trap-<kind> (trap-milker-2 for a second one; plain ?spot set trap springs pot luck).\nOut there now: " + (spots.length ? spots.map(([n]) => n + (L.trapLoads && L.trapLoads[n] ? " [" + L.trapLoads[n] + "]" : "")).join(", ") : "none yet") + "\nWater the thing lives in: " + (water.length ? water.map(([n]) => n).join(", ") : "none yet (?spot set pond, pool, creek, water, well, bath\u2026)") + "\n?trap load <spot> <words> \xB7 ?trap bait <spot> <ribbons> \xB7 ?trap spring <who> <kind> \xB7 ?subject for the list\n?trap make <name> <what it does>\u2026 builds one of your own (?trap made) \xB7 ?whistle <which> <who> calls one of the farm's own to them\n?hunt start [minutes] \xB7 ?pack on|off \xB7 nest spots (?spot set nest) and ?gather \xB7 crate spots (?spot set crate)");
         else if (isSubject(sender))
           R("\u{1F9EA} WHAT'S OUT THERE FOR YOU\n" + trapsList() + "\n\nThere are " + spots.length + " trap" + (spots.length === 1 ? "" : "s") + " hidden on the farm" + (water.length ? ", and somethin' lives in the water" : "") + ". I'm not tellin' you where.\n?struggle when one has you (one try) \xB7 ?traps eager on skips the waits \xB7 ?traps off pauses them \xB7 ?traps skip <kind> rules one out" + ((r.trapSkip || []).length ? " (you skip: " + r.trapSkip.join(", ") + ")" : "") + " \xB7 your safeword stops one cold.");
         else R("\u{1F9EA} The farm's traps only spring for test subjects, sugar, and you're not one. You can walk right over 'em.");
@@ -14212,6 +14326,7 @@
       const was = r.parasite.until > Date.now(), fed = r.parasite.fed || 0, n = r.parasite.n || 0, wasBelt = r.parasite.form === "belt", g0 = r.parasite;
       r.parasite = null;
       parasiteGone(mn, g0, how || "done");
+      if (how !== "safe") albumAdd(mn, "\u{1FAB1}", "The parasite's twelve hours", "It fed " + fed + " times off what you swallowed" + (n ? " and laid in you " + n + " times" : "") + ", then let go.");
       r.parasiteNext = Date.now() + (how === "safe" ? 7 : 1) * 864e5;
       if (r.crave && r.crave.forGood) {
         if (how === "safe") r.crave.told = Date.now() + 864e5;
@@ -15585,13 +15700,13 @@
       for (const C of W.ChatRoomCharacter || []) {
         const mn = C.MemberNumber, d = (rec(mn) || {}).dirt;
         if (!d || !(d.mud || d.slime || d.piss || d.reek)) continue;
-        const near = (W.ChatRoomCharacter || []).map((c) => c.MemberNumber).filter((m) => m !== mn && m !== CFG.BOT_MEMBER && rec(m) && (() => {
+        const near2 = (W.ChatRoomCharacter || []).map((c) => c.MemberNumber).filter((m) => m !== mn && m !== CFG.BOT_MEMBER && rec(m) && (() => {
           const a = posOf(mn), b = posOf(m);
           return a && b && Math.max(Math.abs(a.X - b.X), Math.abs(a.Y - b.Y)) <= 2;
         })());
-        if (!near.length || Math.random() < 0.5) continue;
+        if (!near2.length || Math.random() < 0.5) continue;
         const what = d.reek ? d.reek : d.piss ? "piss" : d.slime ? "slime" : "the hog wallow";
-        privateLine(near[Math.floor(Math.random() * near.length)], tFill(pickFresh("trapx:smell", EXTRA_LINES.smell), mn, { c: what }), "emote");
+        privateLine(near2[Math.floor(Math.random() * near2.length)], tFill(pickFresh("trapx:smell", EXTRA_LINES.smell), mn, { c: what }), "emote");
       }
     }
     function struggle(mn, R) {
@@ -15806,6 +15921,11 @@
     }
     function eggsLaid(mn, n, atNest, types) {
       bump1(subjWeek().eggs, mn, n);
+      openedUp(mn);
+      try {
+        albumAdd(mn, "\u{1F95A}", "A clutch laid", n + " eggs pushed out" + (atNest ? " into the nest" : ", right where you stood") + "." + (eggTypesText(types) ? " " + eggTypesText(types) + "." : ""));
+      } catch (e) {
+      }
       if (!atNest) return;
       L.nest = L.nest || { eggs: 0, by: {} };
       L.nest.eggs += n;
@@ -15872,7 +15992,7 @@
       L.nest = { eggs: 0, by: {} };
       saveLedger();
       audit(sender, "GATHER", String(n));
-      for (const [m, k] of Object.entries(by)) earnRibbons(parseInt(m, 10), Math.min(CFG.GATHER_MAX_RIBBONS, eggsWorth(types[m], k)), "eggs sold at market" + (eggTypesText(types[m]) ? " (" + eggTypesText(types[m]) + ")" : ""));
+      for (const [m, k] of Object.entries(by)) leaderShare(parseInt(m, 10), earnRibbons(parseInt(m, 10), Math.min(CFG.GATHER_MAX_RIBBONS, eggsWorth(types[m], k)), "eggs sold at market" + (eggTypesText(types[m]) ? " (" + eggTypesText(types[m]) + ")" : "")));
       earnRibbons(sender, 1, "gatherin' the eggs");
       emote("\u{1F9FA} " + xLine("gather", sender, { x: String(n) }), sender);
       R("\u{1F9FA} " + n + " eggs gathered and off to market. The layers have been paid: " + Object.entries(by).map(([m, k]) => plainName(parseInt(m, 10)) + " (" + k + ")").join(", ") + ".");
@@ -15926,8 +16046,8 @@
         const e2 = Object.entries(o).sort((a, b) => b[1] - a[1])[0];
         return e2 ? plainName(parseInt(e2[0], 10)) + " (" + e2[1] + " " + unit + ")" : null;
       };
-      const t = top(w.traps, "traps"), e = top(w.eggs, "eggs"), f = top(w.fur, "loads");
-      return t || e || f ? "\n\n\u{1F9EA} Test subject of the week: " + (t || "nobody yet") + (e ? "\n\u{1F95A} Best layer: " + e : "") + (f ? "\n\u{1F43A} Most bred by things with fur: " + f : "") : "";
+      const t = top(w.traps, "traps"), e = top(w.eggs, "eggs"), f = top(w.fur, "loads"), hb = top(w.hatched || {}, "hatched");
+      return t || e || f || hb ? "\n\n\u{1F9EA} Test subject of the week: " + (t || "nobody yet") + (e ? "\n\u{1F95A} Best layer: " + e : "") + (f ? "\n\u{1F43A} Most bred by things with fur: " + f : "") + (hb ? "\n\u{1F423} Broodiest: " + hb : "") : "";
     }
     function extrasCommand(cmd, sender, args, R) {
       if (cmd === "struggle") return struggle(sender, R);
@@ -16321,6 +16441,7 @@
       let w = 0;
       const now = Date.now();
       if (p.eggs) w += p.eggs.n / 10;
+      if (p.preg2) w += 1;
       if (p.preg) {
         const frac = Math.max(0, Math.min(1, (now - p.preg.since) / Math.max(1, p.preg.due - p.preg.since)));
         w += frac * (1 + (p.preg.count || 1) * 0.5);
@@ -16344,11 +16465,11 @@
         }
         if (st >= 2 && now - (p.bellySeenAt || 0) > CFG.BELLY_SEEN_MIN * 6e4) {
           p.bellySeenAt = now;
-          const near = (W.ChatRoomCharacter || []).map((c) => c.MemberNumber).filter((m) => m !== mn && m !== CFG.BOT_MEMBER && rec(m) && !quietNow(m) && (() => {
+          const near2 = (W.ChatRoomCharacter || []).map((c) => c.MemberNumber).filter((m) => m !== mn && m !== CFG.BOT_MEMBER && rec(m) && !quietNow(m) && (() => {
             const a = posOf(mn), b = posOf(m);
             return a && b && Math.max(Math.abs(a.X - b.X), Math.abs(a.Y - b.Y)) <= 2;
           })());
-          if (near.length && Math.random() < 0.6) privateLine(near[Math.floor(Math.random() * near.length)], bLine("bellySeen", mn, { c: BELLY[st] }), "emote");
+          if (near2.length && Math.random() < 0.6) privateLine(near2[Math.floor(Math.random() * near2.length)], bLine("bellySeen", mn, { c: BELLY[st] }), "emote");
         }
       }
     }
@@ -16453,6 +16574,11 @@
       if (!r || !p) return out;
       const run = state.trapRuns && state.trapRuns.get(mn);
       if (run) out.push(TRAP_KINDS[run.kind].icon + " A trap has you (" + run.kind + "): part " + Math.min(run.i, run.beats.length) + " of " + run.beats.length + ". Your safeword stops it.");
+      {
+        const sit = sitHappening(mn);
+        if (sit) out.push(sit);
+      }
+      uddersHappening(mn, out);
       const sc = state.sceneRuns && state.sceneRuns.get(mn);
       if (sc) out.push("\u{1F95A} It's comin': part " + Math.min(sc.i, sc.n) + " of " + sc.n + ".");
       if (r.trapWait) out.push(TRAP_KINDS[r.trapWait.kind].icon + " " + (r.trapWait.kind === "tickle" ? "The tickle rack has you till you ?beg" : "The mirror box wants its line " + (5 - (r.trapWait.n || 0)) + " more times") + ", or " + mins(r.trapWait.until) + " min.");
@@ -16702,15 +16828,15 @@
     function offerBets(mn, kind) {
       const what = EGG_TRAPS[kind] ? "eggs" : kind === "tickle" || kind === "mirror" ? "wait" : null;
       if (!what) return;
-      const near = (W.ChatRoomCharacter || []).map((c) => c.MemberNumber).filter((m) => m !== mn && m !== CFG.BOT_MEMBER && rec(m) && (rec(m).roles || []).length && !quietNow(m) && (() => {
+      const near2 = (W.ChatRoomCharacter || []).map((c) => c.MemberNumber).filter((m) => m !== mn && m !== CFG.BOT_MEMBER && rec(m) && (rec(m).roles || []).length && !quietNow(m) && (() => {
         const a = posOf(mn), b = posOf(m);
         return a && b && Math.max(Math.abs(a.X - b.X), Math.abs(a.Y - b.Y)) <= 4;
       })());
-      if (!near.length) return;
+      if (!near2.length) return;
       state.bets = state.bets || /* @__PURE__ */ new Map();
       const line = what === "eggs" ? Math.round(EGG_TRAPS[kind] * eggX(mn) * rankX(mn).eggs) : 0;
       state.bets.set(mn, { what, line, kind, at: Date.now(), stakes: [] });
-      for (const m of near) tell(m, what === "eggs" ? "\u{1F3B2} " + plainName(mn) + "'s been caught, and it's goin' to lay in them. Fancy a flutter? ?bet <ribbons> high if you think it leaves more than " + line + " eggs, ?bet <ribbons> low if not. Up to " + CFG.BET_MAX + " ribbons, double back if you're right." : "\u{1F3B2} " + plainName(mn) + "'s been caught. Will they give it what it wants? ?bet <ribbons> breaks or ?bet <ribbons> holds. Up to " + CFG.BET_MAX + " ribbons, double back if you're right.");
+      for (const m of near2) tell(m, what === "eggs" ? "\u{1F3B2} " + plainName(mn) + "'s been caught, and it's goin' to lay in them. Fancy a flutter? ?bet <ribbons> high if you think it leaves more than " + line + " eggs, ?bet <ribbons> low if not. Up to " + CFG.BET_MAX + " ribbons, double back if you're right." : "\u{1F3B2} " + plainName(mn) + "'s been caught. Will they give it what it wants? ?bet <ribbons> breaks or ?bet <ribbons> holds. Up to " + CFG.BET_MAX + " ribbons, double back if you're right.");
     }
     function settleBets(mn, bet, result, how) {
       if (!bet.stakes.length) return;
@@ -17523,6 +17649,1607 @@
       ],
       suitPeeled: ["It takes two farmhands and a bucket of somethin' cold to get the suit to let go of %n. It comes away a strip at a time, clingin', and the roots inside come out last and slowest."]
     };
+    const kLine = (key, mn, v) => tFill(pickFresh("keep:" + key, KEEP_LINES[key]), mn, v);
+    function toysFollow(mn, level, until) {
+      if (hasCompanion(mn)) enqueue(makeMsg("vibe", { level, until: until || 0 }, mn));
+    }
+    function toysBeat(mn, i, n) {
+      const f = n ? i / n : 1;
+      toysFollow(mn, f < 0.35 ? 0 : f < 0.65 ? 1 : f < 0.9 ? 2 : 3);
+    }
+    function toysAfter(mn) {
+      const p = prodOf(mn), now = Date.now();
+      if (p && p.deniedUntil > now) toysFollow(mn, -1, p.deniedUntil);
+      else toysFollow(mn, null);
+    }
+    const CUSTOM_DOES = {
+      dose: { what: "a dose of somethin'", limit: null, hold: [2, 2, 3] },
+      hold: { what: "it catches you and keeps you", limit: /\b(snare|rope|immobil)/i, hold: [3, 6, 10] },
+      fill: { what: "it pumps you full", limit: /\b(inflat|enema|pump|belly)/i, hold: [3, 4, 5] },
+      breed: { what: "it breeds you", limit: /\b(breed|pregnan|impregnat|cum|creampie|seed)/i, hold: [3, 4, 6] },
+      strip: { what: "it has every stitch off you", limit: /\b(strip|nud|naked|expos)/i, hold: [1, 1, 2] },
+      write: { what: "it writes on you", limit: /\b(writ|mark|humiliat)/i, hold: [2, 2, 3] }
+    };
+    const SEV_N = { mild: 1, strong: 2, brutal: 3 };
+    function customRegister(k, c) {
+      const D = CUSTOM_DOES[c.does];
+      if (!D) return;
+      TRAP_KINDS[k] = { icon: "\u{1F6E0}\uFE0F", what: (c.what || D.what) + " (" + c.sev + ", built by " + plainName(c.by) + ")", limit: D.limit, custom: true };
+      MORE_TRAPS[k] = (mn, spot) => customTrap(mn, k, spot);
+      if (c.does === "breed") TRAP_NEEDS[k] = (mn) => limitBlocks(mn, "breed") ? "their limits rule it out" : null;
+    }
+    function customLoad() {
+      if (state.customLoaded) return;
+      state.customLoaded = true;
+      for (const [k, c] of Object.entries(L.customTraps || {})) {
+        try {
+          customRegister(k, c);
+        } catch (e) {
+          warn("custom trap " + k + ":", e);
+        }
+      }
+    }
+    function customTrap(mn, k, spot) {
+      const c = L.customTraps[k], D = CUSTOM_DOES[c.does], r = rec(mn), p = prodOf(mn), sev = SEV_N[c.sev] || 1, v = {};
+      const beats = c.lines && c.lines.length ? c.lines.map((x) => [x]) : KEEP_LINES["custom_" + c.does];
+      trapHold(mn, D.hold[sev - 1], "the " + k + " trap");
+      trapRun(mn, k, beats, () => {
+        switch (c.does) {
+          case "dose": {
+            const pool = INJECTOR_LOADS.filter((t) => (!/lactation|udder/.test(t) || makesMilk(mn)) && (!/virility/.test(t) || makesSemen(mn)) && (!/heat/.test(t) || !limitBlocks(mn, "heat")) && (!/egg/.test(t) || !limitBlocks(mn, "eggs")) && (!/fertil|hyper/.test(t) || !limitBlocks(mn, "breed")) && !/ x\d/.test(t));
+            let text = c.words || pool[Math.floor(Math.random() * pool.length)] || "ass growth";
+            if (shotTimes(text) <= 1 && sev > 1) text += " x" + sev;
+            if (!applyShot(mn, BOTMN(), text, { open: kLine("customDose", mn), from: "the " + k + " trap's dose", heatH: 1 })) emote("\u{1F6E0}\uFE0F " + kLine("customDud", mn), mn);
+            break;
+          }
+          case "hold": {
+            const mins = [3, 6, 10][sev - 1];
+            arouse(mn, 20 * sev, 94);
+            later(() => {
+              if (charFor(mn) && !rec(mn).penned) {
+                trapHold(mn, mins, "the " + k + " trap");
+                tell(mn, "\u{1F6E0}\uFE0F It's not lettin' go yet, sugar: " + tmin(mn, mins) + " more minutes right where you are. Your safeword opens it.");
+              }
+            }, 300);
+            break;
+          }
+          case "fill": {
+            const hole = openHole(mn, "butt");
+            if (!hole) {
+              emote("\u{1F6E0}\uFE0F " + kLine("customShut", mn), mn);
+              break;
+            }
+            v.ml = ml(trapFill(mn, hole, [200, 400, 700][sev - 1], CFG.TRAP_OVERFULL));
+            v.h = TRAP_HOLE[hole];
+            emote("\u{1F6E0}\uFE0F " + kLine("customFill", mn, v), mn);
+            splatBody(mn, hole);
+            break;
+          }
+          case "breed": {
+            const hole = r.breedable ? openHole(mn, "vulva") : null, load = [150, 300, 500][sev - 1];
+            if (!hole) {
+              splatBody(mn, "back");
+              emote("\u{1F6E0}\uFE0F " + kLine("customOver", mn, { ml: ml(load) }), mn);
+              break;
+            }
+            v.ml = ml(trapFill(mn, hole, load, CFG.TRAP_OVERFULL));
+            v.h = TRAP_HOLE[hole];
+            tally(mn);
+            let took = null;
+            if (hole !== "mouth" && r.fertile && canCatchIn(mn, hole)) took = rollConception(mn, FRAME_SIRE, load, 1 + 0.3 * sev, hole);
+            emote("\u{1F6E0}\uFE0F " + kLine("customBreed", mn, v) + (took === "new" ? " " + tFill(pickFresh("trap:anthro:took", ANTHRO_TOOK), mn, v) : ""), mn);
+            splatBody(mn, hole);
+            break;
+          }
+          case "strip":
+            if (!bodyMark(mn, { strip: true })) tell(mn, '\u{1F6E0}\uFE0F With the Companion and "Farm can strip me" on, that would have had every stitch off you, sugar.');
+            break;
+          case "write": {
+            const words = String(c.words || "FARM PROPERTY").split("/").map((x) => x.trim()).filter(Boolean).slice(0, sev);
+            let did = false;
+            words.forEach((w, i) => {
+              did = bodyMark(mn, { write: { line: w.toUpperCase().slice(0, 20), pos: (Math.floor(Math.random() * 3) + i * 3) % 9, style: 0 } }) || did;
+            });
+            if (!did) tell(mn, `\u{1F6E0}\uFE0F With the Companion and "Farm can mark my body" on, you'd be wearin' "` + words.join('" and "') + '" right now, sugar.');
+            break;
+          }
+        }
+        arouse(mn, 10 * sev);
+        face(mn, "edged", 60);
+      }, v);
+    }
+    function customTrapCommand(a0, sender, args, R) {
+      customLoad();
+      if (!isProprietor(sender)) {
+        R("Buildin' traps is just for the proprietors, sugar.");
+        return true;
+      }
+      L.customTraps = L.customTraps || {};
+      if (a0 === "made") {
+        const all = Object.entries(L.customTraps);
+        R(all.length ? "\u{1F6E0}\uFE0F HOME-BUILT TRAPS\n" + all.map(([k2, c2]) => "\u2022 " + k2 + ": " + c2.does + ", " + c2.sev + (c2.words ? " [" + c2.words + "]" : "") + " \xB7 " + (c2.lines.length || "stock") + " line" + (c2.lines.length === 1 ? "" : "s") + " \xB7 spot name trap-" + k2).join("\n") + "\n?trap unmake <name> takes one apart." : "\u{1F6E0}\uFE0F Nothin' home-built yet, sugar.\n?trap make <name> <dose|hold|fill|breed|strip|write> [mild|strong|brutal] [words] | first line | second line\u2026\nUse %n for their name. Then stand where you want it and ?spot set trap-<name>.");
+        return true;
+      }
+      const k = String(args[1] || "").toLowerCase();
+      if (a0 === "unmake") {
+        if (!L.customTraps[k]) {
+          R("There's no home-built trap by that name, sugar. ?trap made lists them.");
+          return true;
+        }
+        delete L.customTraps[k];
+        delete TRAP_KINDS[k];
+        delete MORE_TRAPS[k];
+        delete TRAP_NEEDS[k];
+        saveLedger();
+        audit(sender, "TRAPMAKE", "unmake " + k);
+        R("\u{1F6E0}\uFE0F The " + k + " trap is taken apart. Any spot named trap-" + k + " springs pot luck now.");
+        return true;
+      }
+      const does = String(args[2] || "").toLowerCase();
+      if (!/^[a-z]{3,14}$/.test(k) || !CUSTOM_DOES[does]) {
+        R("\u{1F6E0}\uFE0F ?trap make <name> <dose|hold|fill|breed|strip|write> [mild|strong|brutal] [words] | first line | second line\u2026\nThe name is one word, letters only. The words are a shot's words for a dose (lactation, heat inducer\u2026) or what to write, with / between lines. Use %n for their name in your lines.");
+        return true;
+      }
+      if (TRAP_KINDS[k] && !L.customTraps[k]) {
+        R("There's already a trap called " + k + ", sugar. Pick another name.");
+        return true;
+      }
+      const parts = args.slice(3).join(" ").split("|").map((x) => x.trim());
+      let head = parts.shift() || "", sev = "strong";
+      const sm = head.match(/^(mild|strong|brutal)\b\s*/i);
+      if (sm) {
+        sev = sm[1].toLowerCase();
+        head = head.slice(sm[0].length);
+      }
+      const words = head.trim().slice(0, 80);
+      if (does === "dose" && words && !tagsIn(words).size && !sizeTagsIn(words).length) {
+        R(`I can't find a shot word in "` + words + '", sugar. Try lactation, fertility, heat inducer, egg laying, hyper pregnancy, udder growth\u2026');
+        return true;
+      }
+      const lines = parts.filter(Boolean).slice(0, 8).map((x) => x.slice(0, 240));
+      const c = L.customTraps[k] = { does, sev, words: does === "write" ? words : words.toLowerCase(), lines, by: sender, t: Date.now() };
+      customRegister(k, c);
+      saveLedger();
+      audit(sender, "TRAPMAKE", k + " " + does + " " + sev);
+      R("\u{1F6E0}\uFE0F Built: the " + k + " trap. It " + CUSTOM_DOES[does].what.replace(/^it /, "") + ", " + sev + (words ? " [" + words + "]" : "") + ", with " + (lines.length ? lines.length + " line" + (lines.length === 1 ? "" : "s") + " of your own" : "the stock lines") + ".\nStand where you want it and say ?spot set trap-" + k + ". ?trap spring <who> " + k + " tries it out.");
+      return true;
+    }
+    function sitStart(mn, by, R) {
+      const r = rec(mn), now = Date.now(), n = L.nest && L.nest.eggs || 0, pos = posOf(mn);
+      if (!r || !r.roles || !r.roles.length) {
+        R("That's for folks on the books, sugar.");
+        return;
+      }
+      if (r.sitting) {
+        R("\u{1FABA} " + (by === mn ? "You're" : plainName(mn) + " is") + " already sittin' a clutch.");
+        return;
+      }
+      const nest = nestSpots().find((s) => onSpot(mn, s, 1));
+      if (!nest || !pos) {
+        R(by === mn ? "Climb onto the nest first, sugar." : plainName(mn) + " needs to be on the nest first, sugar.");
+        return;
+      }
+      if (!n) {
+        R("The nest's empty, sugar. Nothin' to keep warm.");
+        return;
+      }
+      if (limitBlocks(mn, "eggs") || quietNow(mn)) {
+        R(by === mn ? "Not with your limits and your quiet hour as they are, sugar." : "Their limits or their quiet hour rule it out, sugar.");
+        return;
+      }
+      if (r.penned || benchedNow(mn) || stockedNow(mn) || state.trapRuns && state.trapRuns.has(mn) || state.sceneRuns && state.sceneRuns.has(mn)) {
+        R("Somethin' else has " + (by === mn ? "you" : "them") + " right now, sugar.");
+        return;
+      }
+      r.sitting = { since: now, until: now + CFG.SIT_MIN * 6e4, n, by: L.nest.by || {}, types: L.nest.types || {}, next: now + CFG.SIT_LINE_MIN * 6e4, nest, setBy: by };
+      L.nest = { eggs: 0, by: {} };
+      r.penned = { until: r.sitting.until + 12e4, X: pos.X, Y: pos.Y, name: "the nest", by: BOTMN(), sit: true };
+      saveLedger();
+      audit(by, "SIT", mn + " on " + n);
+      emote("\u{1FABA} " + kLine("sitStart", mn, { x: String(n) }), mn);
+      tell(mn, "\u{1FABA} You're sittin' " + n + " eggs, sugar, and you're kept on the nest till they hatch: about " + CFG.SIT_MIN + " minutes. You'll be fed where you sit. Your safeword gets you up, and the eggs go back in the straw.");
+      if (by !== mn) R("\u{1FABA} " + plainName(mn) + " is set on the nest over " + n + " eggs.");
+      syncCompanions(true);
+    }
+    function sitStop(mn, why) {
+      const r = rec(mn);
+      if (!r || !r.sitting) return false;
+      const s = r.sitting;
+      r.sitting = null;
+      if (r.penned && r.penned.sit) r.penned = null;
+      L.nest = L.nest || { eggs: 0, by: {} };
+      L.nest.eggs += s.n;
+      L.nest.types = L.nest.types || {};
+      for (const [m, k] of Object.entries(s.by)) L.nest.by[m] = (L.nest.by[m] || 0) + k;
+      for (const [m, t] of Object.entries(s.types)) {
+        const mine = L.nest.types[m] = L.nest.types[m] || {};
+        for (const [kk, q] of Object.entries(t)) mine[kk] = (mine[kk] || 0) + q;
+      }
+      saveLedger();
+      if (why !== "gone" && charFor(mn)) emote("\u{1FABA} " + kLine("sitStop", mn), mn);
+      return true;
+    }
+    function sitHatch(mn) {
+      const r = rec(mn), s = r.sitting;
+      r.sitting = null;
+      if (r.penned && r.penned.sit) r.penned = null;
+      r.brooded = (r.brooded || 0) + s.n;
+      const w = subjWeek();
+      w.hatched = w.hatched || {};
+      bump1(w.hatched, mn, s.n);
+      L.hatched = (L.hatched || 0) + s.n;
+      for (const [m, k] of Object.entries(s.by)) {
+        const layer = parseInt(m, 10), got = earnRibbons(layer, Math.max(1, Math.round(Math.min(CFG.GATHER_MAX_RIBBONS, eggsWorth(s.types[m], k)) / 2)), "your eggs hatched under " + plainName(mn));
+        leaderShare(layer, got);
+      }
+      leaderShare(mn, earnRibbons(mn, Math.min(CFG.GATHER_MAX_RIBBONS, Math.max(1, Math.ceil(s.n / 4))), "hatchin' a brood of " + s.n));
+      saveLedger();
+      audit(BOTMN(), "HATCH", mn + " " + s.n);
+      emote("\u{1F423} " + kLine(s.n >= 12 ? "hatchBig" : "hatch", mn, { x: String(s.n) }), mn);
+      tell(mn, "\u{1F423} " + s.n + " hatched under you, sugar. That's " + r.brooded + " you've brooded all told, and the board knows whose they are.");
+      albumAdd(mn, "\u{1F423}", "A brood hatched", s.n + " hatched under you after " + Math.round((Date.now() - s.since) / 6e4) + " minutes on the nest." + (eggTypesText(mergeTypes(s.types)) ? " " + eggTypesText(mergeTypes(s.types)) + "." : ""));
+      face(mn, "afterglow", 120);
+      syncCompanions(true);
+    }
+    function mergeTypes(byLayer) {
+      const out = {};
+      for (const t of Object.values(byLayer || {})) for (const [k, q] of Object.entries(t)) out[k] = (out[k] || 0) + q;
+      return out;
+    }
+    function sitTick(now) {
+      for (const [k, r] of Object.entries(L.people)) {
+        if (!r.sitting) continue;
+        const mn = parseInt(k, 10);
+        if (!charFor(mn)) {
+          sitStop(mn, "gone");
+          continue;
+        }
+        if (now >= r.sitting.until) {
+          sitHatch(mn);
+          continue;
+        }
+        if (now >= r.sitting.next) {
+          r.sitting.next = now + CFG.SIT_LINE_MIN * 6e4;
+          r.sitting.fed = (r.sitting.fed || 0) + 1;
+          emote("\u{1FABA} " + kLine(r.sitting.fed % 2 ? "sitFed" : "sitWarm", mn), mn);
+          if (r.sitting.fed % 2) {
+            const p = prodOf(mn);
+            p.boosts = p.boosts || {};
+            p.boosts.hungry = 0;
+            arouse(mn, 8);
+          }
+          saveLedger();
+        }
+      }
+    }
+    function sitHappening(mn) {
+      const r = rec(mn);
+      return r && r.sitting ? "\u{1FABA} You're sittin' " + r.sitting.n + " eggs: they hatch in about " + Math.max(1, Math.ceil((r.sitting.until - Date.now()) / 6e4)) + " min. Your safeword gets you up." : null;
+    }
+    function leads(leader, mn) {
+      return !!membership(mn, leader);
+    }
+    function whistleCommand(sender, args, R) {
+      const which = String(args[0] || "").toLowerCase(), t = resolveTarget(args[1]), r = rec(sender), now = Date.now();
+      if (!isStaff(sender)) {
+        R("The whistle hangs on the staff hook, sugar.");
+        return;
+      }
+      if (!ANTHRO[which] || !t) {
+        R("\u{1F4EF} ?whistle <which> <who>. Who comes when called: " + Object.keys(ANTHRO).join(", ") + ".");
+        return;
+      }
+      if (!charFor(t)) {
+        R(plainName(t) + " isn't here, sugar.");
+        return;
+      }
+      const wait = (r.whistleAt || 0) + CFG.WHISTLE_COOLDOWN_MIN * 6e4 - now;
+      if (wait > 0 && !isProprietor(sender)) {
+        R("\u{1F4EF} They've only just been called out, sugar. Give it " + Math.ceil(wait / 6e4) + " more minutes.");
+        return;
+      }
+      const why = trapWhyNot(t, which);
+      if (why) {
+        R("\u{1F4EF} Nobody comes for " + plainName(t) + ": " + why + ".");
+        return;
+      }
+      r.whistleAt = now;
+      saveLedger();
+      audit(sender, "WHISTLE", which + " " + t);
+      emote("\u{1F4EF} " + kLine("whistle", t, { c: ANTHRO[which].name, x: plainName(sender) }), t);
+      later(() => {
+        if (charFor(t) && !springTrap(t, which, "", true)) {
+          rec(t).trapAt = Date.now();
+          saveLedger();
+        }
+      }, 5e3);
+      R("\u{1F4EF} Called. " + ANTHRO[which].name.replace(/^t/, "T") + " will be on " + plainName(t) + " in a moment.");
+    }
+    function albumAdd(mn, icon, title, text) {
+      const r = rec(mn);
+      if (!r) return;
+      r.album = (r.album || []).concat({ t: Date.now(), i: icon, h: String(title).slice(0, 40), x: String(text).slice(0, 220) }).slice(-CFG.ALBUM_MAX);
+      saveLedger();
+    }
+    function albumFor(mn, n) {
+      const r = rec(mn);
+      return (r && r.album || []).slice(-(n || 10)).reverse();
+    }
+    const ALBUM_TITLES = { tentacle: "Taken by the water", well: "Taken down the well", eggs: "The egg post", breeder: "The breedin' frame", milker: "Drained by the trap", pump: "Pumped round", clamp: "Clamped and denied", lantern: "The lantern" };
+    function keepersAfter(mn, kind, before) {
+      const r = rec(mn), p = prodOf(mn), laid = (p.eggs ? p.eggs.n : 0) - (before.eggs || 0), A = ANTHRO[kind];
+      if (A && A.type === "canine" && r.holes) {
+        const hole = r.holes[A.hole] || r.holes.vulva || r.holes.butt;
+        if (hole) hole.knots = (hole.knots || 0) + A.loads;
+      }
+      const bits = [];
+      if (laid > 0) bits.push(laid + " eggs left in you");
+      if (heldTotal(p) > 0) bits.push(ml(heldTotal(p)) + " sloshin' in you after");
+      if (p.preg && p.preg.since > Date.now() - 6e4) bits.push("and it took");
+      if (p.deniedUntil > Date.now()) bits.push("left denied");
+      albumAdd(
+        mn,
+        TRAP_KINDS[kind] ? TRAP_KINDS[kind].icon : "\u{1F9EA}",
+        A ? A.name.replace(/^the /, "The ") : ALBUM_TITLES[kind] || "The " + kind + " trap",
+        "Trap number " + (r.trapN || 0) + " for you." + (bits.length ? " " + bits.join(", ").replace(/^./, (c) => c.toUpperCase()) + "." : "")
+      );
+    }
+    const HOLE_MARKS = [10, 25, 50, 100], HOLE_RANK = ["green", "broken in", "well trained", "bottomless", "ruined for anything smaller"];
+    function holeLevel(mn, hole) {
+      const h = ((rec(mn) || {}).holes || {})[hole];
+      return h ? HOLE_MARKS.filter((m) => h.loads >= m).length : 0;
+    }
+    function holeX(mn, hole) {
+      return 1 + CFG.HOLE_MORE_X * holeLevel(mn, hole);
+    }
+    function holeTook(mn, hole, amount) {
+      const r = rec(mn);
+      if (!r || !(amount > 0) || !TRAP_HOLE[hole]) return;
+      r.holes = r.holes || {};
+      const h = r.holes[hole] = r.holes[hole] || { loads: 0, big: 0, knots: 0, d: "", n: 0, best: 0 }, was = holeLevel(mn, hole), today = dayKey();
+      h.loads++;
+      h.big = Math.max(h.big, Math.round(amount));
+      if (h.d !== today) {
+        h.d = today;
+        h.n = 0;
+      }
+      h.n++;
+      h.best = Math.max(h.best, h.n);
+      const now = holeLevel(mn, hole);
+      if (now > was) {
+        const p = prodOf(mn);
+        p.capBonus = (p.capBonus || 0) + CFG.HOLE_CAP_BONUS;
+        later(() => {
+          privateLine(mn, kLine("hole" + Math.min(4, now), mn, { h: TRAP_HOLE[hole] }), "emote");
+          tell(mn, "\u{1F573}\uFE0F Your " + TRAP_HOLE[hole] + " has taken " + h.loads + " loads now, sugar: " + HOLE_RANK[now] + ". You hold " + CFG.HOLE_CAP_BONUS + " ml more for good, and the traps will pour more into it from here on.");
+        }, 9e3);
+        albumAdd(mn, "\u{1F573}\uFE0F", "Your " + TRAP_HOLE[hole] + ": " + HOLE_RANK[now], h.loads + " loads taken, the biggest " + ml(h.big) + ", " + h.best + " in one day at the most.");
+      }
+    }
+    function holesFor(mn) {
+      const r = rec(mn), out = [];
+      for (const hole of ["vulva", "butt", "mouth"]) {
+        const h = (r && r.holes || {})[hole];
+        if (h) out.push({ hole: TRAP_HOLE[hole], loads: h.loads, big: h.big, best: h.best, knots: h.knots || 0, rank: HOLE_RANK[holeLevel(mn, hole)], next: HOLE_MARKS[holeLevel(mn, hole)] || 0 });
+      }
+      return out;
+    }
+    function dreamTheme(mn) {
+      const r = rec(mn), p = prodOf(mn), since = Date.now() - 18 * 36e5;
+      const last = (r.trapLog || []).filter((e) => e.t > since).map((e) => e.kind).reverse();
+      for (const k of last) {
+        if (k === "tentacle" || k === "well" || k === "eggs" || k === "drake" || k === "hive") return "eggs";
+        if (ANTHRO[k] || k === "breeder") return "bred";
+        if (k === "milker") return "milk";
+        if (k === "clamp") return "denied";
+      }
+      if (p && p.deniedUntil > Date.now()) return "denied";
+      if (p && (p.preg || p.eggs)) return "carry";
+      return "plain";
+    }
+    function dreamTick(now) {
+      if (!inCurfew()) {
+        for (const [k, r] of Object.entries(L.people)) {
+          if (!r.dream || !r.dream.n) {
+            if (r.dream) r.dream = null;
+            continue;
+          }
+          const mn = parseInt(k, 10), p = prodOf(mn), theme = r.dream.theme;
+          r.dream = null;
+          if (!charFor(mn)) continue;
+          const how = p && (p.preg || p.eggs) ? "carry" : theme === "denied" || theme === "bred" || theme === "eggs" ? "needy" : "sore";
+          if (how === "needy") {
+            arouse(mn, 40, 94);
+            if (!limitBlocks(mn, "heat") && Math.random() < 0.5) startHeat(mn, BOTMN(), 1);
+          }
+          tell(mn, "\u2600\uFE0F " + kLine("wake_" + how, mn));
+        }
+        saveLedger();
+        return;
+      }
+      if (now - (state.dreamAt || 0) < 6e4) return;
+      state.dreamAt = now;
+      const barn = Object.keys(L.spots || {}).filter((n) => /^barn/.test(n));
+      for (const C of W.ChatRoomCharacter || []) {
+        const mn = C.MemberNumber, r = rec(mn);
+        if (mn === BOTMN() || !r || !(isSubject(mn) || hasRole(mn, ROLE.LIVESTOCK)) || quietNow(mn) || !barn.some((b) => onSpot(mn, b, 4))) continue;
+        if (state.trapRuns && state.trapRuns.has(mn) || state.sceneRuns && state.sceneRuns.has(mn)) continue;
+        if (!r.dream) r.dream = { n: 0, at: now };
+        if (now - r.dream.at < CFG.DREAM_EVERY_MIN * 6e4) continue;
+        r.dream.at = now;
+        r.dream.n++;
+        r.dream.theme = dreamTheme(mn);
+        privateLine(mn, "\u{1F4A4} " + kLine("dream_" + r.dream.theme, mn), "emote");
+        arouse(mn, 6, 80);
+        saveLedger();
+      }
+    }
+    function leaderShare(mn, earned) {
+      const lead2 = herdLeaderOf(mn);
+      if (!lead2 || lead2 === mn || !(earned >= 2)) return 0;
+      return earnRibbons(lead2, Math.max(1, Math.round(earned * CFG.LEADER_SHARE)), plainName(mn) + "'s eggs (your herd's share)", BOTMN());
+    }
+    function leaderCommand(cmd, sender, args, R) {
+      const r = rec(sender), now = Date.now();
+      if (cmd === "herdtraps") {
+        const mine = herdMembers(sender).filter((x) => isSubject(x.mn));
+        if (!mine.length) {
+          R("None of your herd are test subjects, sugar.");
+          return;
+        }
+        R("\u{1F9EA} YOUR HERD'S TRAP CARDS\n" + mine.map((x) => {
+          const p = prodOf(x.mn);
+          return "\u2022 " + plainName(x.mn) + (charFor(x.mn) ? " \u25CF" : "") + ": " + SUBJECT_RANKS[rankOfSubject(x.mn)].name + ", " + (x.trapN || 0) + " sprung, corruption " + corruptionOf(x.mn) + (p && p.eggs ? ", carryin' " + p.eggs.n + " eggs" : "") + (p && p.preg ? ", bred" : "") + (x.trapsOff ? ", paused" : "");
+        }).join("\n") + "\n?send <who> <trap> \xB7 ?dose <who> <shot words> \xB7 ?trap bait <spot> <ribbons>");
+        return;
+      }
+      const t = resolveTarget(args[0]);
+      if (!t || !rec(t)) {
+        R(cmd === "send" ? "?send <who> <trap>, sugar: one of your own herd, to a trap of your choosin'." : "?dose <who> <shot words>, sugar: one of your own herd, like ?dose Daisy lactation x2.");
+        return;
+      }
+      if (!isProprietor(sender) && !leads(sender, t)) {
+        R(plainName(t) + " isn't in your herd, sugar. The reins only reach your own.");
+        return;
+      }
+      if (!charFor(t)) {
+        R(plainName(t) + " isn't here, sugar.");
+        return;
+      }
+      const wait = (r.reinsAt || 0) + CFG.LEADER_REINS_MIN * 6e4 - now;
+      if (wait > 0 && !isProprietor(sender)) {
+        R("Easy on the reins, sugar. " + Math.ceil(wait / 6e4) + " more minutes.");
+        return;
+      }
+      if (cmd === "send") {
+        customLoad();
+        const k = String(args[1] || "random").toLowerCase();
+        if (k !== "random" && !TRAP_KINDS[k]) {
+          R("Which trap, sugar? " + Object.keys(TRAP_KINDS).join(", ") + ".");
+          return;
+        }
+        const why = springTrap(t, k, "", true);
+        if (why) {
+          R("\u{1F9EA} That won't spring on " + plainName(t) + ": " + why + ".");
+          return;
+        }
+        rec(t).trapAt = now;
+        r.reinsAt = now;
+        saveLedger();
+        audit(sender, "SEND", t + " " + k);
+        tell(t, "\u{1F9EA} That one was " + plainName(sender) + "'s doin', sugar. Your herd leader sent you.");
+        R("\u{1F9EA} Sent. " + plainName(t) + " is in it now.");
+        return;
+      }
+      const words = args.slice(1).join(" ").trim();
+      if (!words) {
+        R("?dose <who> <shot words>, sugar, like ?dose Daisy fertility x2.");
+        return;
+      }
+      if (quietNow(t)) {
+        R(plainName(t) + " has asked for a quiet hour, sugar.");
+        return;
+      }
+      if (!applyShot(t, sender, words, { open: kLine("leaderDose", t, { x: plainName(sender) }), from: plainName(sender) + "'s needle" })) {
+        R("That didn't take, sugar: no shot word I know in it, or their limits rule it out.");
+        return;
+      }
+      r.reinsAt = now;
+      saveLedger();
+      audit(sender, "DOSE", t + " " + words);
+      R("\u{1F489} Done. " + plainName(t) + " has it in them.");
+    }
+    function vatAdd(mn, amount) {
+      const r = rec(mn);
+      if (r && amount > 0) r.vat = (r.vat || 0) + amount;
+    }
+    function vatTop(mn) {
+      const w = L.yield && L.yield.w || {}, e = Object.entries(w).sort((a, b) => b[1] - a[1])[0];
+      return !!e && parseInt(e[0], 10) === mn && e[1] > 0;
+    }
+    function vatCost(mn, price) {
+      return Math.round(price * CFG.VAT_ML_PER_RIBBON * (vatTop(mn) ? 0.75 : 1));
+    }
+    function vatBuy(sender, args, R) {
+      const i = args.findIndex((w) => /^with$/i.test(w));
+      if (i < 1 || !/^(milk|seed|cum|vat|fluids?|tank)$/i.test(args[i + 1] || "")) return false;
+      const r = rec(sender), it = storeItem(args[0]), today = dayKey();
+      if (!r || !r.roles || !r.roles.length) {
+        R("The store's for folks on the books, sugar.");
+        return true;
+      }
+      if (!it || it.off) {
+        R("We don't stock that, hon. ?store shows the shelf.");
+        return true;
+      }
+      if (!it.potion && !/^shot-/.test(it.id)) {
+        R("The vat only buys potions and shots, sugar. Everything else is ribbons.");
+        return true;
+      }
+      if (args.slice(1, i).some((w) => /^(for|to)$/i.test(w))) {
+        R("What comes out of you only buys for you, sugar. Gifts are ribbons.");
+        return true;
+      }
+      const cost = vatCost(sender, it.price);
+      if ((r.vat || 0) < cost) {
+        R("\u{1F95B} A " + it.name + " is " + ml(cost) + " from your vat, sugar, and you've " + ml(r.vat || 0) + " in it. Get yourself milked.");
+        return true;
+      }
+      if (!r.vatDay || r.vatDay.d !== today) r.vatDay = { d: today, n: 0 };
+      if (r.vatDay.n >= CFG.VAT_DAY_MAX) {
+        R("\u{1F95B} The vat's bought you " + CFG.VAT_DAY_MAX + " today already, sugar. Tomorrow.");
+        return true;
+      }
+      const before = r.ribbons || 0, spent0 = ribbonWeek(r).spent, logN = (L.ribbonLog || []).length, said = [];
+      r.ribbons = before + it.price;
+      try {
+        buy(sender, args.slice(0, i), (t) => said.push(t));
+      } catch (e) {
+        warn("vat buy:", e);
+      }
+      const went = (r.ribbons || 0) === before;
+      r.ribbons = before;
+      ribbonWeek(r).spent = spent0;
+      if (!went) {
+        saveLedger();
+        R(said.join("\n") || "That didn't go through, sugar.");
+        return true;
+      }
+      if (L.ribbonLog && L.ribbonLog.length > logN) L.ribbonLog.length = logN;
+      r.vat -= cost;
+      r.vatDay.n++;
+      saveLedger();
+      audit(sender, "VATBUY", it.id + " " + Math.round(cost));
+      R("\u{1F95B} Paid in what came out of you: " + ml(cost) + " from your vat for a " + it.name + (vatTop(sender) ? " (top producer's price)" : "") + ". " + ml(r.vat) + " left in it.");
+      return true;
+    }
+    function keepersCommand(cmd, sender, args, R) {
+      customLoad();
+      const r = rec(sender);
+      if (cmd === "whistle") return whistleCommand(sender, args, R);
+      if (cmd === "send" || cmd === "dose" || cmd === "herdtraps") return leaderCommand(cmd, sender, args, R);
+      if (cmd === "sit" || cmd === "broody") {
+        const a0 = String(args[0] || "").toLowerCase();
+        if (a0 === "up" || a0 === "off" || a0 === "stop") {
+          R(sitStop(sender, "up") ? "\u{1FABA} Up you get, sugar. The eggs are back in the straw." : "You're not sittin' a clutch, sugar.");
+          syncCompanions(true);
+          return;
+        }
+        if (a0 && a0 !== "me") {
+          if (!isStaff(sender)) {
+            R("Settin' somebody else on the nest is a job for staff, sugar. ?sit on your own puts you there.");
+            return;
+          }
+          const t = resolveTarget(args[0]);
+          if (!t || !charFor(t)) {
+            R("Who, sugar? ?sit <who>, and they need to be on the nest.");
+            return;
+          }
+          return sitStart(t, sender, R);
+        }
+        return sitStart(sender, sender, R);
+      }
+      if (cmd === "album") {
+        const a = albumFor(sender, 8);
+        R(a.length ? "\u{1F4D4} YOUR KEEPSAKES (newest first)\n" + a.map((e) => e.i + " " + e.h + " \xB7 " + new Date(e.t).toLocaleDateString() + "\n   " + e.x).join("\n") : "\u{1F4D4} Your album's empty yet, sugar. Give the farm time.");
+        return;
+      }
+      if (cmd === "holes") {
+        const hs = holesFor(sender);
+        R(hs.length ? "\u{1F573}\uFE0F WHAT YOU'VE TAKEN\n" + hs.map((h) => "\u2022 Your " + h.hole + ": " + h.rank + ". " + h.loads + " loads, the biggest " + ml(h.big) + ", " + h.best + " in one day at the most" + (h.knots ? ", " + h.knots + " knots" : "") + (h.next ? ". Next step at " + h.next : "") + ".").join("\n") : "\u{1F573}\uFE0F Nothin' on the books yet, sugar. The traps keep count of what each hole takes.");
+        return;
+      }
+      if (cmd === "vat") {
+        if (!r || !r.roles || !r.roles.length) {
+          R("That's for folks on the books, sugar.");
+          return;
+        }
+        R("\u{1F95B} Your vat: " + ml(r.vat || 0) + " of what's been milked and collected from you. It buys potions and shots: ?buy <which> with milk, at " + ml(vatCost(sender, 1)) + " a ribbon of the price" + (vatTop(sender) ? " (top producer's price this week)" : "") + ", up to " + CFG.VAT_DAY_MAX + " a day.");
+        return;
+      }
+    }
+    function keepersTick() {
+      const now = Date.now();
+      customLoad();
+      try {
+        sitTick(now);
+        dreamTick(now);
+      } catch (e) {
+        warn("keepers tick:", e);
+      }
+    }
+    function keepersStateFor(mn, s) {
+      const a = albumFor(mn, 12);
+      if (a.length) s.album = a;
+      const hs = holesFor(mn);
+      if (hs.length) s.holes = hs;
+      const r = rec(mn);
+      if (r && r.vat >= 1) {
+        s.vat = Math.round(r.vat);
+        s.vatPer = vatCost(mn, 1);
+      }
+      if (r && r.sitting) s.sitting = { n: r.sitting.n, until: r.sitting.until };
+    }
+    const KEEP_LINES = {
+      // home-built traps with no lines of their own
+      custom_dose: [
+        [
+          "Somethin' clicks under %n's foot. A steel arm swings up out of the straw, quick as a snake, with a fat glass syringe on the end of it.",
+          "A plate gives under %n. Two padded bars close on their hips and a needle on a long arm comes round to look at them."
+        ],
+        [
+          "It takes its time choosin' a spot. It settles on the soft of %n's ass, presses, and sinks in slow to the hilt.",
+          "The needle noses along %n's thigh, up over a cheek, and slides in deep where the meat is thickest."
+        ],
+        [
+          "The plunger goes down a finger at a time. %n can feel it spreadin' warm under the skin, and there's nothin' to do but take all of it.",
+          "It empties itself into %n steady and unhurried, and whatever was in that glass is in them now, workin'."
+        ]
+      ],
+      custom_hold: [
+        [
+          "A loop snaps shut round %n's ankle and another takes a wrist. Before they've drawn breath they're strung out tight between two posts.",
+          "Bars come up out of the floor either side of %n and fold shut round wrists and waist. They're held bent, ass out, goin' nowhere."
+        ],
+        [
+          "It tests them: a pull here, a little more spread there, till %n is open and shakin' and can't close a thing.",
+          "Somethin' soft and buzzin' is laid right against %n's sex and left there, not near enough to finish on."
+        ],
+        [
+          "It keeps them like that. Every time %n's hips start to chase it, it backs off a hair and waits for them to whine.",
+          "%n hangs in it, drippin', rockin' on nothin', while the whole yard gets a good long look."
+        ]
+      ],
+      custom_fill: [
+        [
+          "The floor drops an inch under %n and a padded yoke closes over the small of their back. Behind them a greased nozzle swings up on a hose.",
+          "%n is tipped forward over a rail and strapped there. A thick rubber nozzle noses in between their cheeks, huntin'."
+        ],
+        [
+          "It finds what it wants and pushes in, swellin' once it's seated so there's no squeezin' it out.",
+          "It slides in deep and locks with a fat little bulb. The hose behind it jumps as the pump starts up."
+        ],
+        [
+          "Warm and heavy, it pours into %n. Their belly rounds, then tightens, then pushes out past their hips while they moan through their teeth.",
+          "The pump thuds and %n fills: a slosh, a stretch, a belly goin' round and shiny as a drum."
+        ]
+      ],
+      custom_breed: [
+        [
+          "A frame folds up out of the straw and takes %n at the hips and the neck, bendin' them over with their ass in the air.",
+          "Steel closes on %n's wrists and knees and spreads them on all fours. Behind them, somethin' long and slick slides out of its housing."
+        ],
+        [
+          "The machine's cock lines itself up, fat and ridged and drippin' warm, and leans its whole weight on them.",
+          "It rubs up and down %n's slit twice, gettin' itself wet on them, then pushes in to the root in one long shove."
+        ],
+        [
+          "It ruts them hard and steady, no rhythm a body could keep up with, slappin' wet against them while they grunt on every stroke.",
+          "It hammers %n like a stud coverin' a mare, deep every time, and it does not tire, and it does not care how loud they get."
+        ]
+      ],
+      custom_strip: [
+        [
+          "Hooks on thin wires flick out of the dark and catch in %n's clothes: collar, hem, waistband, all at once.",
+          "A dozen little steel fingers come up round %n's feet and take hold of every seam they can reach."
+        ],
+        [
+          "One hard pull. Cloth goes one way and %n goes the other, bare to the skin and blinkin' in the open.",
+          "They tug, and everythin' %n had on is hauled off and away into the rafters, leavin' them naked for the whole farm."
+        ]
+      ],
+      custom_write: [
+        [
+          "Padded clamps take %n by the arms and hold them still. A little arm with a fat brush on it unfolds and dips itself in black ink.",
+          "%n is caught and turned to the light. Somethin' with a marker for a finger comes down to look them over for a good clean patch of skin."
+        ],
+        [
+          "It writes slow and neat, the wet tip draggin' over bare skin while %n squirms and tries to read it upside down.",
+          "It prints its letters big, pressin' firm, takin' care over every one. It wants folks to be able to read it from the gate."
+        ]
+      ],
+      customDose: ["The trap's needle slides out of %n and the arm folds away, empty."],
+      customDud: ["The arm clicks, hisses, and folds away. Whatever it was loaded with, %n's body just shrugged it off."],
+      customShut: ["It hunts all over %n for a way in and finds every hole plugged or locked. It sprays its load across their ass and thighs in a sulk and lets go."],
+      customFill: [
+        "The pump cuts off with %ml packed in %n's %h. The nozzle pops free and they sag there, belly hangin' round and tight, leakin' down both thighs.",
+        "%ml, and the hose finally lets go of %n's %h. They can feel every drop shift when they breathe."
+      ],
+      customOver: ["It never gets inside them. It ruts between %n's thighs till it's done and paints their back and ass with %ml of thick warm seed instead."],
+      customBreed: [
+        "It buries itself and holds, pumpin' %ml into %n's %h in long hot throbs till it's runnin' back out round the shaft. Then it slides free and leaves them gapin' and bred.",
+        "With a last deep shove it empties in %n's %h: %ml of it, thick as cream. They hang in the frame drippin' while it folds itself away."
+      ],
+      // broodin'
+      sitStart: [
+        "%n is settled down onto the nest, knees wide, bare belly and thighs laid right over %x warm eggs. A soft strap goes across their hips so they'll stay put.",
+        `The farm girl walks %n onto the nest and presses them down over the clutch: %x eggs, snug up under their belly and between their legs. "There. Keep 'em warm for me, broody girl."`,
+        "%n lowers themself onto %x eggs, shiftin' till every one is tucked against bare skin. A rope goes round their waist and off to the rail. They're broody now."
+      ],
+      sitFed: [
+        "A hand comes round with a bowl of warm mash and feeds %n off two fingers, mouthful by mouthful, since they're not to get up for anything.",
+        "Somebody tips a bottle of warm milk to %n's lips and holds it there till it's gone, wipin' their chin with a thumb after. Then a pat on the flank, like you'd give a good hen.",
+        `The farm girl feeds %n by hand where they sit, slow, and has a feel underneath while she's at it. "Still warm. Good. Don't you move."`
+      ],
+      sitWarm: [
+        "%n shifts on the nest and the eggs roll against them, warm and smooth, right up in the split of them. They've been rockin' on that a while now, whether they meant to or not.",
+        "The eggs under %n have gone hot as fresh bread. Every little squirm rubs one somewhere sweet, and broody stock isn't allowed to do a thing about it.",
+        "One of the eggs under %n twitches. They gasp and clamp their thighs round the clutch, flushed to the chest."
+      ],
+      sitStop: ["%n climbs up off the nest on shaky legs, thighs slick, and the clutch is left in the straw for somebody else to mind."],
+      hatch: [
+        "The shells start to tick and split under %n. The strap comes off and they're lifted clear, wobbly and flushed, to watch %x of them hatch and wriggle off into the straw.",
+        "%n feels the first shell crack and yelps. The farm girl helps them up off the clutch, and one by one %x eggs open in the warm hollow their body left.",
+        "It happens all at once: %x eggs tickin', splittin', openin'. %n is stood up beside the nest on shaky legs, thighs still slick from the sittin', told what a good broody thing they've been."
+      ],
+      hatchBig: [
+        "The whole nest starts to heave. %n is hauled up off it just in time, and %x eggs hatch in a rush where they were sat, the straw comin' alive.",
+        "%x. Every one of them hatches. %n stands there bow-legged and dazed from the long hot sit, lookin' down at a nest that's boilin' over, and it's all theirs on the board."
+      ],
+      // the whistle
+      whistle: [
+        "%x puts two fingers to their lips and whistles, long and low. Somewhere past the barn, %c lifts a head. It knows that call, and it knows it means %n.",
+        "A whistle from %x carries clear across the yard. %n has just time to turn round before they hear %c comin' for them.",
+        "%x whistles once and points at %n. From out of the dark comes the sound of %c, already on the way."
+      ],
+      // trained holes
+      hole1: ["Your %h doesn't fight it the way it used to. It's learnin' what it's for."],
+      hole2: ["Your %h opens for things now before you've decided to let it. It's been trained, and you can feel it."],
+      hole3: ["There's a soft, loose, hungry feel to your %h these days. It takes what it's given and wants the next one bigger."],
+      hole4: ["Your %h is ruined for anything gentle, and both of you know it. It only feels right packed full."],
+      // dreams
+      dream_plain: [
+        "You dream of the stall door closin' behind you, and of bein' glad it did.",
+        "In the dream somebody's hands go all over you, checkin' you like stock, and you stand still for it and push into every one.",
+        "You dream you're led across the yard naked on a rope, and everybody you pass tells you what a good animal you are.",
+        "The straw is warm. You dream of bein' kept, fed, used and put away, and you wake half-way to rubbin' yourself on it."
+      ],
+      dream_bred: [
+        "You dream of weight on your back and breath on your neck, and of bein' held still while you're filled. Your hips are rockin' in your sleep.",
+        "It has you again in the dream, deeper than it did today, and this time it doesn't pull out. You wake with your thighs wet.",
+        "You dream of a knot swellin' in you till you can't get off it, and of not wantin' to. Somethin' aches, low down, where it was.",
+        "In the dream they line up for you. You count them goin' in and lose count, and you're smilin' into the straw."
+      ],
+      dream_eggs: [
+        "You dream your belly's full of somethin' round and warm that moves when you breathe. Your hand is on it when you wake.",
+        "In the dream it's got you under the water again, feedin' them into you one by one, and you're openin' your legs to help.",
+        "You dream of layin'. Each one stretches you slow and sweet on the way out, and you never want the clutch to end.",
+        "Somethin' slick coils round your thigh in your sleep. When you start awake there's nothin' there. You're a little sorry."
+      ],
+      dream_milk: [
+        "You dream of the cups on you, pullin' and pullin', and of bein' drained till you're cross-eyed and droolin' on the rail.",
+        "In the dream your tits are so full they hurt, and nobody comes. You wake with your own hands on them.",
+        "You dream you're in the parlour in a long row of stock, all of you moanin' in time with the pump."
+      ],
+      dream_denied: [
+        "You dream of cummin'. Over and over you're right there, and every time you wake a breath before it, hips in the air.",
+        "In the dream somebody tells you no, very kindly, and keeps touchin' you. You wake with a whine in your throat.",
+        "You dream you're allowed. You're not. Your whole body is hummin' and the straw under you is damp."
+      ],
+      dream_carry: [
+        "You dream of your own belly, round and tight and heavier every time you look. Somethin' inside turns over, and you spread your knees for it without wakin'.",
+        "In the dream you're too big to walk, and you're kept in deep straw and hand-fed and bred again anyway.",
+        "You dream of what's in you. You dream of it bein' born, and of the farm puttin' the next one in before you've caught your breath."
+      ],
+      wake_needy: [
+        "Mornin', sugar. You wake up wet, achin' and rubbin' against the straw, with every dream from last night still on your skin. You're goin' to need seein' to today.",
+        "The barn's gettin' light. You come awake with your hand already between your legs and nothin' like enough to finish on."
+      ],
+      wake_sore: [
+        "Mornin', sugar. You wake stiff and sore in all the places the farm got to yesterday, and the dreams didn't let any of it rest.",
+        "First light. Everything that was used on you yesterday is tender this mornin', and you can still feel the shape of it."
+      ],
+      wake_carry: [
+        "Mornin', sugar. You wake curled round your belly with both hands on it. It's heavier than it was at lights out, and it moved in the night.",
+        "The barn's gettin' light. What you're carryin' kept you dreamin' till dawn, and it's sat low and full in you now."
+      ],
+      leaderDose: ["%x takes %n by the collar, turns them round and slides a needle into the fat of their ass like they're dosin' their own heifer. Which they are."]
+    };
+    const uLine = (key, mn, v) => tFill(pickFresh("udd:" + key, UDDER_LINES[key]), mn, v);
+    const onBooks = (mn) => {
+      const r = rec(mn);
+      return !!(r && r.roles && r.roles.length);
+    };
+    const near = (a, b, d) => {
+      const A = posOf(a), B = posOf(b);
+      return !!(A && B && Math.max(Math.abs(A.X - B.X), Math.abs(A.Y - B.Y)) <= (d || 2));
+    };
+    function arousalOf(mn) {
+      const C = charFor(mn);
+      return Math.max(0, Math.min(100, C && C.ArousalSettings && C.ArousalSettings.Progress || 0));
+    }
+    function stallCumTick(mn, st, now) {
+      const p = prodOf(mn);
+      if (now - (st.cumAt || 0) < CFG.MILKCUM_GAP_S * 1e3 || quietNow(mn) || p.deniedUntil > now) return;
+      const a = arousalOf(mn);
+      if (a < CFG.MILKCUM_AROUSAL) return;
+      if (Math.random() < CFG.MILKCUM_CHANCE * (1 + (a - CFG.MILKCUM_AROUSAL) / 30)) milkCum(mn, st, false);
+    }
+    function milkCum(mn, st, real) {
+      const p = prodOf(mn), r = rec(mn), cock = st.kind === "cock";
+      st.cumAt = Date.now();
+      st.cums = (st.cums || 0) + 1;
+      st.got = st.got || { m: 0, s: 0 };
+      r.milkCums = (r.milkCums || 0) + 1;
+      let extra = 0;
+      if (!cock && makesMilk(mn)) {
+        extra = drainMilk(mn, Math.min(p.milk, milkCap(mn) * CFG.MILKCUM_LETDOWN));
+        st.got.m += extra;
+      } else if (makesSemen(mn)) {
+        extra = drainSemen(mn, Math.min(p.semen, semenCap(mn) * CFG.MILKCUM_LETDOWN));
+        st.got.s += extra;
+      }
+      emote((cock ? "\u{1F402} " : "\u{1F95B} ") + uLine(cock ? "cumCock" : "cumMilk", mn, { ml: ml(extra) }), mn);
+      if (!real) arouse(mn, 100, 100);
+      face(mn, "afterglow", 60);
+      if (r.milkCums === 1 || r.milkCums % 10 === 0) albumAdd(mn, "\u{1F95B}", "Milked till you came", "Time number " + r.milkCums + ". The cups got " + ml(extra) + " more out of you for it.");
+      saveLedger();
+    }
+    function stallClimax(mn) {
+      const p = prodOf(mn);
+      if (p && p.stall && Date.now() - (p.stall.cumAt || 0) > 2e4) milkCum(mn, p.stall, true);
+    }
+    const DIALS = { gentle: { share: 0.35, rate: 0.7 }, steady: { share: null, rate: 1 }, hard: { share: 0.12, rate: 1.4 }, punishing: { share: 0, rate: 1.8 } };
+    function dialOf(mn) {
+      const r = rec(mn);
+      return r && DIALS[r.stallDial] ? r.stallDial : "steady";
+    }
+    function stallShare(mn) {
+      const d = DIALS[dialOf(mn)];
+      return d.share == null ? CFG.PROD.STALL_LEAVE_SHARE : d.share;
+    }
+    function dialRate(mn) {
+      return DIALS[dialOf(mn)].rate;
+    }
+    function dialBeat(mn, st) {
+      const d = dialOf(mn);
+      if (d === "steady") return "";
+      st.dialN = (st.dialN || 0) + 1;
+      return st.dialN % 3 === 2 ? uLine("dial_" + d, mn) : "";
+    }
+    function stallDialDone(mn, st) {
+      const d = dialOf(mn), p = prodOf(mn), now = Date.now();
+      if (d === "hard") {
+        p.soreUntil = now + CFG.DIAL_SORE_MIN * 6e4;
+        later(() => tell(mn, "\u{1F95B} Milked hard, sugar: your teats are stretched long and sore, and they'll stay tender for " + CFG.DIAL_SORE_MIN + " minutes."), 5e3);
+      }
+      if (d === "punishing") {
+        p.soreUntil = now + CFG.DIAL_SENSITIVE_MIN * 6e4;
+        p.sensitiveUntil = now + CFG.DIAL_SENSITIVE_MIN * 6e4;
+        p.sensNag = now;
+        later(() => {
+          if (charFor(mn)) emote("\u{1F95B} " + uLine("punished", mn), mn);
+          tell(mn, "\u{1F95B} Milked past empty, sugar. For the next hour every brush of air on you is goin' to feel like a tongue.");
+        }, 5e3);
+      }
+    }
+    function dialCommand(sender, args, R) {
+      let t = sender, word = String(args[0] || "").toLowerCase();
+      if (args.length >= 2) {
+        t = resolveTarget(args[0]);
+        word = String(args[1] || "").toLowerCase();
+      }
+      if (!t || !rec(t)) {
+        R("?stalldial <gentle|steady|hard|punishing> for yourself, sugar, or ?stalldial <who> <settin'> if you're staff.");
+        return;
+      }
+      if (!DIALS[word]) {
+        R("\u{1F95B} " + (t === sender ? "Your" : plainName(t) + "'s") + " stall dial is on " + dialOf(t).toUpperCase() + ". Settin's: gentle (leaves you a third), steady (a quarter), hard (drains you low and fast, and sore after), punishing (past empty, and sensitive for an hour).");
+        return;
+      }
+      if (t !== sender && !isStaff(sender)) {
+        R("Only staff set somebody else's dial, sugar.");
+        return;
+      }
+      if (t !== sender && (word === "hard" || word === "punishing") && /\b(pain|overmilk|punish)/i.test(rec(t).limits || "")) {
+        R("Their limits rule that settin' out, sugar.");
+        return;
+      }
+      rec(t).stallDial = word;
+      saveLedger();
+      audit(sender, "STALLDIAL", t + " " + word);
+      syncCompanions(true);
+      R("\u{1F95B} " + (t === sender ? "Your" : plainName(t) + "'s") + " stall dial: " + word.toUpperCase() + ".");
+      if (t !== sender) tell(t, "\u{1F95B} " + plainName(sender) + " has turned your stall dial to " + word.toUpperCase() + ", sugar. ?stalldial steady puts it back whenever you like.");
+    }
+    function overdueStage(mn) {
+      const p = prodOf(mn);
+      if (!p || !p.fullSince) return 0;
+      const h = (Date.now() - p.fullSince) / 36e5, H = CFG.OVERDUE_H;
+      return h >= H[2] ? 4 : h >= H[1] ? 3 : h >= H[0] ? 2 : 1;
+    }
+    function overdueTick(mn, now) {
+      const p = prodOf(mn);
+      if (!makesMilk(mn)) {
+        if (p.fullSince) {
+          p.fullSince = 0;
+          p.fullTold = 0;
+        }
+        return;
+      }
+      const cap = milkCap(mn);
+      if (p.milk >= cap * 0.95) {
+        if (!p.fullSince) {
+          p.fullSince = now;
+          p.fullTold = 0;
+        }
+      } else if (p.milk < cap * 0.8) {
+        if (p.fullSince) {
+          p.fullSince = 0;
+          p.fullTold = 0;
+          saveLedger();
+        }
+        return;
+      }
+      const st = overdueStage(mn);
+      if (!st) return;
+      if (st > (p.fullTold || 0)) {
+        p.fullTold = st;
+        saveLedger();
+        if (st < 2 || quietNow(mn) || !charFor(mn)) return;
+        privateLine(mn, uLine("over" + st, mn), "emote");
+        if (st >= 2) {
+          emote("\u{1F95B} " + uLine("overRoom" + st, mn), mn);
+          bodyMark(mn, { splat: ["chest"], color: "#FFFFFF" });
+        }
+      }
+      if (st >= 4 && now - (p.fullNag || 0) > 10 * 6e4 && !quietNow(mn) && charFor(mn)) {
+        p.fullNag = now;
+        privateLine(mn, uLine("over4nag", mn), "emote");
+        arouse(mn, 8, 90);
+      }
+    }
+    const OVERDUE_WORD = ["", "tight", "leakin'", "engorged", "burstin'"];
+    function bringInCommand(sender, args, R) {
+      const a0 = String(args[0] || "").toLowerCase(), me = rec(sender);
+      if (a0 === "stop" || a0 === "off") {
+        if (!me || !me.bringIn) {
+          R("Nobody's bringin' you into milk, sugar.");
+          return;
+        }
+        me.bringIn = null;
+        saveLedger();
+        R("\u{1F95B} That's stopped, sugar. Your tits are your own again.");
+        return;
+      }
+      if (!isStaff(sender)) {
+        R(me && me.bringIn ? "\u{1F95B} You're bein' brought into milk: " + me.bringIn.n + " of " + CFG.BRINGIN_TENDS + " tendin's done. ?bringin stop ends it." : "Bringin' somebody into milk is a job for staff, sugar.");
+        return;
+      }
+      const t = resolveTarget(args[0]), r = t && rec(t);
+      if (!r || t === sender || !onBooks(t)) {
+        R("?bringin <who>, sugar: somebody on the books who isn't a milker yet.");
+        return;
+      }
+      if (!r.bringIn) {
+        if (makesMilk(t)) {
+          R(plainName(t) + " is in milk already, sugar.");
+          return;
+        }
+        if (limitBlocks(t, "milk")) {
+          R("Their limits rule milkin' out, sugar.");
+          return;
+        }
+        if (!charFor(t)) {
+          R(plainName(t) + " isn't here, sugar.");
+          return;
+        }
+        R("\u{1F95B} I've asked " + plainName(t) + " if they'll be brought into milk.");
+        farmAsk(t, "\u{1F95B} " + plainName(sender) + " wants to bring you into milk, sugar: cups and hands on your tits mornin' and night for a few days, till they start to drip, and then you're a milker like the rest of the stock. Say yes or no. (?bringin stop ends it any time.)", (yes) => {
+          if (!yes) {
+            tell(sender, "\u{1F95B} " + plainName(t) + " said no to bein' brought into milk, sugar.");
+            return;
+          }
+          r.bringIn = { by: sender, since: Date.now(), n: 0, d: "", dn: 0 };
+          saveLedger();
+          audit(sender, "BRINGIN", String(t));
+          tell(sender, "\u{1F95B} " + plainName(t) + " said yes. Get beside them and ?bringin " + plainName(t) + " to tend them: twice a day at most, " + CFG.BRINGIN_TENDS + " tendin's to bring the milk.");
+          if (charFor(t)) emote("\u{1F95B} " + uLine("bringStart", t, { x: plainName(sender) }), t);
+        });
+        return;
+      }
+      if (!near(sender, t)) {
+        R("Get right up beside " + plainName(t) + " first, sugar.");
+        return;
+      }
+      const b = r.bringIn, today = dayKey();
+      if (b.d !== today) {
+        b.d = today;
+        b.dn = 0;
+      }
+      if (b.dn >= 2) {
+        R("\u{1F95B} " + plainName(t) + " has been tended twice today, sugar. Let it work overnight.");
+        return;
+      }
+      b.dn++;
+      b.n++;
+      saveLedger();
+      if (b.n < CFG.BRINGIN_TENDS) {
+        emote("\u{1F95B} " + uLine(b.n >= CFG.BRINGIN_TENDS - 2 ? "bringLate" : "bringTend", t, { x: plainName(sender) }), t);
+        arouse(t, 12);
+        R("\u{1F95B} Tended: " + b.n + " of " + CFG.BRINGIN_TENDS + ".");
+        return;
+      }
+      r.bringIn = null;
+      r.milkable = true;
+      const p = prodOf(t);
+      p.milk = Math.max(p.milk || 0, 30);
+      r.broughtIn = Date.now();
+      saveLedger();
+      audit(sender, "BRINGIN", t + " in milk");
+      emote("\u{1F95B} " + uLine("bringDone", t, { x: plainName(sender) }), t);
+      tell(t, "\u{1F95B} You're in milk, sugar. It'll build from here, and the stall will take you like any other milker.");
+      albumAdd(t, "\u{1F95B}", "Brought into milk", plainName(sender) + " worked your tits for " + Math.max(1, Math.round((Date.now() - b.since) / 864e5)) + " days till the first drops came.");
+      earnRibbons(t, 3, "comin' into milk");
+      earnRibbons(sender, 2, "bringin' " + plainName(t) + " into milk");
+      R("\u{1F95B} There it is. " + plainName(t) + " is a milker now.");
+      syncCompanions(true);
+    }
+    function secondCarry(mother, stud, amount, bonus, hole) {
+      const p = prodOf(mother);
+      if (!CFG.DOUBLE_CARRY || !p || !p.preg || p.preg2 || state.secondRoll) return void 0;
+      if (hole === (p.preg.via === "butt" ? "butt" : "vulva")) return void 0;
+      if (Date.now() - p.preg.since <= CFG.PROD.EXTRA_SIRE_WINDOW_H * 36e5) return void 0;
+      const first = p.preg;
+      p.preg = null;
+      state.secondRoll = true;
+      let res = null;
+      try {
+        res = rollConception(mother, stud, amount, bonus, hole);
+      } finally {
+        state.secondRoll = false;
+      }
+      if (res === "new") {
+        p.preg2 = p.preg;
+        p.preg = first;
+        later(() => {
+          if (charFor(mother)) emote("\u{1F930} " + uLine("second", mother, { h: hole === "butt" ? "ass" : "womb" }), mother);
+          tell(mother, "\u{1F930} That took, sugar, and you were already carryin'. There's a second litter in your " + (hole === "butt" ? "ass" : "womb") + " now, on its own clock.");
+        }, 6e3);
+        return null;
+      }
+      p.preg = first;
+      return null;
+    }
+    function openX(mn) {
+      const p = prodOf(mn);
+      return p && p.openUntil > Date.now() ? CFG.BREDBACK_X : 1;
+    }
+    function openedUp(mn) {
+      const p = prodOf(mn);
+      if (p) {
+        p.openUntil = Date.now() + CFG.BREDBACK_MIN * 6e4;
+      }
+    }
+    function bredBack(mn) {
+      const p = prodOf(mn), r = rec(mn);
+      if (!p || !r || !(p.openUntil > Date.now())) return;
+      p.openUntil = 0;
+      r.bredBack = (r.bredBack || 0) + 1;
+      saveLedger();
+      later(() => {
+        if (charFor(mn)) emote("\u{1F930} " + uLine("bredBack", mn), mn);
+        tell(mn, "\u{1F930} BRED BACK, sugar: emptied and filled again inside the hour. That's " + r.bredBack + " time" + (r.bredBack === 1 ? "" : "s") + " on your record.");
+        checkTitles(mn);
+      }, 8e3);
+      albumAdd(mn, "\u{1F930}", "Bred back", "Caught again within the hour of bein' emptied. Time number " + r.bredBack + ".");
+    }
+    function sireSplit(sires, count) {
+      const out = {};
+      for (const s of sires) out[s] = 0;
+      for (let i = 0; i < count; i++) out[sires[Math.floor(Math.random() * sires.length)]]++;
+      return out;
+    }
+    function splitText(split) {
+      return Object.entries(split).sort((a, b) => b[1] - a[1]).map(([s, n]) => n ? n + " " + plainName(parseInt(s, 10)) + "'s" : "none of them " + plainName(parseInt(s, 10)) + "'s").join(", ");
+    }
+    function revealSplit(mn, sires, count) {
+      if (sires.length < 2) return null;
+      const split = sireSplit(sires, count), text = splitText(split);
+      later(
+        () => {
+          if (onMap(mn)) emote("\u{1F37C} " + uLine("split", mn, { c: text }), mn);
+          else tell(mn, "\u{1F37C} The count, sugar: " + text + ".");
+          for (const s of sires) if (s > 0) tell(s, "\u{1F37C} " + plainName(mn) + "'s litter is counted: " + text + ".");
+        },
+        onMap(mn) && CFG.LAY_SCENE ? (6 * CFG.TRAP_BEAT_S + 4) * 1e3 : 5e3
+      );
+      albumAdd(mn, "\u{1F37C}", "Whose they were", text + ".");
+      return split;
+    }
+    function carryTick(mn, now) {
+      const p = prodOf(mn), r = rec(mn);
+      if (p.preg2 && !p.preg) {
+        p.preg = p.preg2;
+        p.preg2 = null;
+        saveLedger();
+      }
+      const all3 = !!(p.preg && p.preg2 && p.eggs);
+      if (all3 && !r.tripleNow) {
+        r.tripleNow = true;
+        r.triple = (r.triple || 0) + 1;
+        saveLedger();
+        if (charFor(mn)) emote("\u{1F930} " + uLine("triple", mn), mn);
+        tell(mn, "\u{1F930} TRIPLE-CARRIED, sugar: a litter in your womb, another in your ass and a clutch of eggs on top. The board says so.");
+        albumAdd(mn, "\u{1F930}", "Triple-carried", "A litter in the womb, a second in the ass, and " + p.eggs.n + " eggs besides, all at once.");
+        checkTitles(mn);
+      } else if (!all3 && r.tripleNow) {
+        r.tripleNow = false;
+        saveLedger();
+      }
+    }
+    function bedTick(mn, now) {
+      const r = rec(mn), p = prodOf(mn);
+      const big = !!(p.preg || p.preg2 || p.eggs) && bellyStage(mn) >= 4;
+      if (r.bedded) {
+        if (!big || r.noBed) {
+          bedStop(mn);
+          if (charFor(mn)) emote("\u{1F6CF}\uFE0F " + uLine("bedUp", mn), mn);
+        }
+        return;
+      }
+      if (!big || r.noBed || !charFor(mn) || quietNow(mn) || (r.bedQuiet || 0) > now || r.penned || benchedNow(mn) || stockedNow(mn) || p.stall || r.sitting || p.labour || state.trapRuns && state.trapRuns.has(mn) || state.sceneRuns && state.sceneRuns.has(mn) || /\b(immobil|bed ?rest)/i.test(r.limits || "")) return;
+      const spot = Object.keys(L.spots || {}).find((n) => /^farrow/.test(n)), pos = spot && L.spots[spot];
+      if (!pos) return;
+      r.bedded = { since: now, spot: spot || "" };
+      r.penned = { until: now + 12 * 36e5, X: pos.X, Y: pos.Y, name: "the farrowin' stall", by: BOTMN(), bed: true };
+      saveLedger();
+      if (spot && !onSpot(mn, spot, 2)) teleport(mn, { X: pos.X, Y: pos.Y }, true);
+      emote("\u{1F6CF}\uFE0F " + uLine("bedDown", mn), mn);
+      tell(mn, "\u{1F6CF}\uFE0F You're too big to walk, sugar, so you're bedded down till it's over. Anybody can come ?tend you: you'll be fed and milked where you lie. ?bedrest off gets you up and keeps you up; your safeword does too.");
+    }
+    function bedStop(mn) {
+      const r = rec(mn);
+      if (!r || !r.bedded) return false;
+      r.bedded = null;
+      if (r.penned && r.penned.bed) r.penned = null;
+      saveLedger();
+      return true;
+    }
+    function bedTend(sender, args, R) {
+      const t = resolveTarget(args[0]), r = t && rec(t);
+      if (!r || !r.bedded || t === sender) return false;
+      if (!near(sender, t)) {
+        R("Get right up beside " + plainName(t) + " first, sugar.");
+        return true;
+      }
+      state.bedTends = state.bedTends || /* @__PURE__ */ new Map();
+      const key = sender + ":" + t, now = Date.now();
+      if (now - (state.bedTends.get(key) || 0) < CFG.BED_TEND_MIN * 6e4) {
+        R(plainName(t) + " has just been seen to, sugar. Give it a few minutes.");
+        return true;
+      }
+      state.bedTends.set(key, now);
+      const p = prodOf(t);
+      if (makesMilk(t) && !milkDenied(t) && p.milk > milkCap(t) * 0.3) {
+        const got = drainMilk(t, p.milk * 0.4);
+        emote("\u{1F6CF}\uFE0F " + uLine("bedMilk", t, { x: plainName(sender), ml: ml(got) }), t);
+      } else {
+        p.boosts = p.boosts || {};
+        p.boosts.hungry = now + 36e5;
+        emote("\u{1F6CF}\uFE0F " + uLine("bedFeed", t, { x: plainName(sender) }), t);
+      }
+      arouse(t, 10);
+      earnRibbons(sender, 1, "tendin' " + plainName(t) + " in the farrowin' stall");
+      R("\u{1F6CF}\uFE0F Tended.");
+      return true;
+    }
+    const ADDRESS = ["sugar", "hon", "sweetie", "darlin'", "sweetheart"];
+    const cleanWords = (text) => String(text || "").split(/[,/]+/).map((w) => w.replace(/[^A-Za-z' -]/g, "").trim().slice(0, 20)).filter((w) => w.length >= 2).slice(0, 8);
+    const reEsc = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    function likedWords(mn) {
+      const r = rec(mn) || {};
+      return (r.kept && r.kept.name ? [r.kept.name] : []).concat(r.callMe || []);
+    }
+    function wordsFor(mn, text) {
+      try {
+        const r = L && L.people && L.people[mn];
+        if (!r || !r.callMe && !r.neverCall && !(r.kept && r.kept.name)) return text;
+        const liked = likedWords(mn), never = (r.neverCall || []).map((w) => w.toLowerCase());
+        const pick = () => liked[Math.floor(Math.random() * liked.length)];
+        const safe = ADDRESS.find((w) => !never.includes(w)) || "you";
+        let t = String(text);
+        for (const w of never) t = t.replace(new RegExp("\\b" + reEsc(w) + "(?:s|es)?(?![A-Za-z])", "gi"), () => liked.length ? pick() : safe);
+        if (liked.length) t = t.replace(/\b(sugar|sweetie|hon|darlin'|sweetheart)(?![A-Za-z])/g, (m) => Math.random() < 0.5 ? pick() : m);
+        return t;
+      } catch (e) {
+        return text;
+      }
+    }
+    function wordsCommand(cmd, sender, args, R) {
+      const r = rec(sender);
+      if (!onBooks(sender)) {
+        R("That's for folks on the books, sugar.");
+        return;
+      }
+      const key = cmd === "callme" ? "callMe" : "neverCall", text = args.join(" ").trim();
+      if (!text) {
+        R("\u{1F4AC} The farm calls you: " + ((r.callMe || []).join(", ") || "whatever comes to mind") + ".\nIt never calls you: " + ((r.neverCall || []).join(", ") || "nothin' ruled out") + ".\n?callme <names, with commas> \xB7 ?nevercall <names> \xB7 ?callme clear \xB7 ?nevercall clear");
+        return;
+      }
+      if (/^(clear|none|off)$/i.test(text)) {
+        r[key] = null;
+        saveLedger();
+        R(cmd === "callme" ? "\u{1F4AC} Cleared. I'll call you whatever comes to mind, sugar." : "\u{1F4AC} Cleared. Nothin's ruled out.");
+        return;
+      }
+      const words = cleanWords(text);
+      if (!words.length) {
+        R("Give me names with commas between them, sugar, like ?" + cmd + " good girl, heifer, pet.");
+        return;
+      }
+      r[key] = words;
+      saveLedger();
+      audit(sender, cmd.toUpperCase(), words.join(","));
+      R(cmd === "callme" ? "\u{1F4AC} Got it. From here on the farm calls you: " + words.join(", ") + "." : "\u{1F4AC} Got it. You'll never be called: " + words.join(", ") + ". Any line about you that had one of those gets another word put in.");
+    }
+    function intensityOf(mn) {
+      const r = rec(mn);
+      return r && (r.intensity === "tender" || r.intensity === "filthy") ? r.intensity : "rough";
+    }
+    function intensityTail(mn, i, n) {
+      const k = intensityOf(mn);
+      if (k === "rough" || i < 2 || Math.random() >= 0.5) return "";
+      return " " + tFill(pickFresh("udd:int:" + k, UDDER_LINES["int_" + k]), mn);
+    }
+    function intensitySev(mn, sev) {
+      const k = intensityOf(mn);
+      return k === "tender" ? Math.max(1, sev - 1) : k === "filthy" ? Math.min(3, sev + (Math.random() < 0.5 ? 1 : 0)) : sev;
+    }
+    function intensityCommand(sender, args, R) {
+      const r = rec(sender), w = String(args[0] || "").toLowerCase();
+      if (!onBooks(sender)) {
+        R("That's for folks on the books, sugar.");
+        return;
+      }
+      if (!/^(tender|rough|filthy)$/.test(w)) {
+        R("\u{1F525} Your intensity is " + intensityOf(sender).toUpperCase() + ". ?intensity tender (softer words, traps lean mild) \xB7 rough (as written) \xB7 filthy (dirtier words, traps lean brutal).");
+        return;
+      }
+      r.intensity = w;
+      saveLedger();
+      syncCompanions(true);
+      R("\u{1F525} Intensity: " + w.toUpperCase() + ". " + (w === "tender" ? "The farm will be sweet about ruinin' you." : w === "filthy" ? "No more manners, then." : "As written."));
+    }
+    function keptOf(mn) {
+      const r = rec(mn);
+      return r && r.kept && r.kept.until > Date.now() ? r.kept : null;
+    }
+    function keptEnd(mn, why) {
+      const r = rec(mn);
+      if (!r || !r.kept) return false;
+      const k = r.kept;
+      r.kept = null;
+      if (r.rights && r.rights.kept) r.rights = null;
+      saveLedger();
+      syncCompanions(true);
+      if (why !== "quiet") tell(k.by, "\u{1F3F7}\uFE0F " + plainName(mn) + " isn't kept by you any more, sugar" + (why === "time" ? ": the week's up." : "."));
+      return true;
+    }
+    function keptMilkBlock(mn) {
+      const k = keptOf(mn);
+      if (!k || !k.milk || !k.milk.length) return null;
+      const h = hourNow();
+      return k.milk.some((x) => h === x || h === (x + 1) % 24) ? null : k;
+    }
+    function keptCommand(cmd, sender, args, R) {
+      if (cmd === "kept") {
+        const k2 = keptOf(sender), a0 = String(args[0] || "").toLowerCase();
+        if (a0 === "off" || a0 === "end") {
+          R(keptEnd(sender, "off") ? "\u{1F3F7}\uFE0F You're nobody's kept thing now, sugar." : "Nobody's keepin' you, sugar.");
+          return;
+        }
+        R(k2 ? "\u{1F3F7}\uFE0F You're KEPT by " + plainName(k2.by) + " for " + Math.max(1, Math.ceil((k2.until - Date.now()) / 864e5)) + " more day(s)." + (k2.tag ? "\nYour tag: " + k2.tag : "") + (k2.name ? "\nThis week you're called: " + k2.name : "") + (k2.milk && k2.milk.length ? "\nMilked at: " + k2.milk.map((h) => h + ":00").join(" and ") : "") + (rec(sender).rights && rec(sender).rights.kept ? "\nBred by: " + plainName(rec(sender).rights.stud) + " only" : "") + "\n?kept off ends it." : "Nobody's keepin' you, sugar.");
+        return;
+      }
+      const t = resolveTarget(args[0]), r = t && rec(t), sub = String(args[1] || "").toLowerCase(), rest = args.slice(2).join(" ").trim();
+      if (!r || t === sender) {
+        R("\u{1F3F7}\uFE0F ?keep <who> asks one of your herd to be kept for a week. Then: ?keep <who> tag <words> \xB7 name <a name> \xB7 milk <hour> <hour> (or any) \xB7 breed <who> (or anyone) \xB7 off");
+        return;
+      }
+      if (!isProprietor(sender) && !membership(t, sender)) {
+        R(plainName(t) + " isn't in your herd, sugar. You can only keep your own.");
+        return;
+      }
+      const k = keptOf(t);
+      if (!k) {
+        if (sub) {
+          R(plainName(t) + " isn't kept yet, sugar. ?keep " + plainName(t) + " asks them.");
+          return;
+        }
+        if (!charFor(t)) {
+          R(plainName(t) + " isn't here to ask, sugar.");
+          return;
+        }
+        R("\u{1F3F7}\uFE0F I've asked " + plainName(t) + ".");
+        farmAsk(t, "\u{1F3F7}\uFE0F " + plainName(sender) + " wants to KEEP you for a week, sugar: a tag written on you, a name of their choosin', and their say over when you're milked and who breeds you. Say yes or no. (?kept off ends it any time, and your limits still rule.)", (yes) => {
+          if (!yes) {
+            tell(sender, "\u{1F3F7}\uFE0F " + plainName(t) + " said no to bein' kept, sugar.");
+            return;
+          }
+          r.kept = { by: sender, since: Date.now(), until: Date.now() + CFG.KEPT_DAYS * 864e5, tag: "", name: "", milk: [] };
+          saveLedger();
+          audit(sender, "KEEP", String(t));
+          syncCompanions(true);
+          tell(sender, "\u{1F3F7}\uFE0F " + plainName(t) + " is yours to keep for " + CFG.KEPT_DAYS + " days. ?keep " + plainName(t) + " tag <words> \xB7 name <a name> \xB7 milk <hour> <hour> \xB7 breed <who>");
+          if (charFor(t)) emote("\u{1F3F7}\uFE0F " + uLine("kept", t, { x: plainName(sender) }), t);
+        });
+        return;
+      }
+      if (k.by !== sender && !isProprietor(sender)) {
+        R(plainName(t) + " is kept by " + plainName(k.by) + ", sugar.");
+        return;
+      }
+      if (sub === "off" || sub === "release") {
+        keptEnd(t, "quiet");
+        tell(t, "\u{1F3F7}\uFE0F " + plainName(sender) + " has let you go, sugar. You're not kept any more.");
+        R("\u{1F3F7}\uFE0F Let go.");
+        return;
+      }
+      if (sub === "tag") {
+        k.tag = rest.replace(/[^A-Za-z0-9 !?.,'&#*+-]/g, "").slice(0, 20).toUpperCase();
+        saveLedger();
+        syncCompanions(true);
+        if (k.tag && !bodyMark(t, { write: { line: k.tag, pos: 4, style: 0 } })) tell(t, `\u{1F3F7}\uFE0F With the Companion and "Farm can mark my body" on, you'd be wearin' "` + k.tag + '" on your skin right now, sugar.');
+        tell(t, "\u{1F3F7}\uFE0F " + plainName(sender) + " has tagged you: " + (k.tag || "nothin'") + ".");
+        R("\u{1F3F7}\uFE0F Tagged: " + (k.tag || "cleared") + ".");
+        return;
+      }
+      if (sub === "name") {
+        k.name = cleanWords(rest)[0] || "";
+        saveLedger();
+        syncCompanions(true);
+        tell(t, k.name ? "\u{1F3F7}\uFE0F This week " + plainName(sender) + ' has you called "' + k.name + '", and the farm will use it.' : "\u{1F3F7}\uFE0F " + plainName(sender) + " took your week's name back.");
+        R("\u{1F3F7}\uFE0F Called: " + (k.name || "cleared") + ".");
+        return;
+      }
+      if (sub === "milk") {
+        const hours = args.slice(2).map((x) => parseInt(x, 10)).filter((x) => x >= 0 && x <= 23).slice(0, 3);
+        k.milk = hours;
+        saveLedger();
+        tell(t, hours.length ? "\u{1F3F7}\uFE0F " + plainName(sender) + " will have you milked at " + hours.map((h) => h + ":00").join(" and ") + ", sugar, and the stall won't take you outside those hours." : "\u{1F3F7}\uFE0F " + plainName(sender) + " has taken your milkin' hours off. The stall takes you any time.");
+        R("\u{1F3F7}\uFE0F Milkin' hours: " + (hours.length ? hours.map((h) => h + ":00").join(", ") + " (an hour's grace after each)" : "any time") + ".");
+        return;
+      }
+      if (sub === "breed") {
+        if (/^(anyone|any|all|off)$/i.test(rest)) {
+          if (r.rights && r.rights.kept) r.rights = null;
+          saveLedger();
+          tell(t, "\u{1F3F7}\uFE0F " + plainName(sender) + " says anybody may breed you, sugar.");
+          R("\u{1F3F7}\uFE0F Open to anyone.");
+          return;
+        }
+        const s = resolveTarget(args[2]);
+        if (!s || !rec(s)) {
+          R("Who, sugar? ?keep " + plainName(t) + " breed <who>, or anyone.");
+          return;
+        }
+        if (r.rights && r.rights.until > Date.now() && !r.rights.kept) {
+          R(plainName(t) + " has breedin' rights of their own choosin' out already, sugar. Those stand.");
+          return;
+        }
+        r.rights = { stud: s, until: k.until, since: Date.now(), allow: [], kept: true };
+        saveLedger();
+        tell(t, "\u{1F3F7}\uFE0F " + plainName(sender) + " says only " + plainName(s) + "'s loads take in you this week, sugar.");
+        R("\u{1F3F7}\uFE0F Only " + plainName(s) + " breeds " + plainName(t) + " this week.");
+        return;
+      }
+      R("\u{1F3F7}\uFE0F " + plainName(t) + " is kept by you for " + Math.max(1, Math.ceil((k.until - Date.now()) / 864e5)) + " more day(s). Tag: " + (k.tag || "none") + " \xB7 name: " + (k.name || "none") + " \xB7 milked: " + (k.milk.length ? k.milk.map((h) => h + ":00").join(", ") : "any time") + "\n?keep <who> tag|name|milk|breed|off");
+    }
+    function uddersCommand(cmd, sender, args, R) {
+      if (cmd === "stalldial") return dialCommand(sender, args, R);
+      if (cmd === "bringin") return bringInCommand(sender, args, R);
+      if (cmd === "callme" || cmd === "nevercall") return wordsCommand(cmd, sender, args, R);
+      if (cmd === "intensity") return intensityCommand(sender, args, R);
+      if (cmd === "keep" || cmd === "kept") return keptCommand(cmd, sender, args, R);
+      if (cmd === "bedrest") {
+        const r = rec(sender), a0 = String(args[0] || "").toLowerCase();
+        if (!onBooks(sender)) {
+          R("That's for folks on the books, sugar.");
+          return;
+        }
+        if (a0 !== "on" && a0 !== "off") {
+          R("\u{1F6CF}\uFE0F Bed rest is " + (r.noBed ? "OFF" : "on") + " for you: when you're too big to walk, the farm beds you down till it's over. ?bedrest off keeps you on your feet.");
+          return;
+        }
+        r.noBed = a0 === "off";
+        if (r.noBed) bedStop(sender);
+        saveLedger();
+        syncCompanions(true);
+        R(r.noBed ? "\u{1F6CF}\uFE0F Bed rest: off. However big you get, you'll waddle." : "\u{1F6CF}\uFE0F Bed rest: on. Get big enough and you'll be bedded down.");
+        return;
+      }
+    }
+    function uddersSafe(mn) {
+      const r = rec(mn);
+      if (r && r.bedded) {
+        bedStop(mn);
+        r.bedQuiet = Date.now() + 36e5;
+        saveLedger();
+      }
+    }
+    function uddersTick() {
+      const now = Date.now();
+      if (now - (state.udderAt || 0) < 3e4) return;
+      state.udderAt = now;
+      for (const [k, r] of Object.entries(L.people)) {
+        const mn = parseInt(k, 10), p = r.prod;
+        if (!p) continue;
+        try {
+          if (p.preg || p.preg2 || r.tripleNow) carryTick(mn, now);
+          if (r.kept && r.kept.until <= now) keptEnd(mn, "time");
+          if (!charFor(mn)) continue;
+          overdueTick(mn, now);
+          bedTick(mn, now);
+          if (p.sensitiveUntil > now && now - (p.sensNag || 0) > 10 * 6e4 && !quietNow(mn)) {
+            p.sensNag = now;
+            privateLine(mn, uLine("sensitive", mn), "emote");
+            arouse(mn, 10, 95);
+          }
+        } catch (e) {
+          warn("udders tick " + mn + ":", e);
+        }
+      }
+    }
+    function uddersHappening(mn, out) {
+      const r = rec(mn), p = prodOf(mn), now = Date.now(), st = overdueStage(mn);
+      if (st >= 2) out.push("\u{1F95B} Overdue: your udders are " + OVERDUE_WORD[st] + ". Get to a stall.");
+      if (r.bedded) out.push("\u{1F6CF}\uFE0F Too big to walk: bedded down till it's over. ?bedrest off gets you up.");
+      if (p.preg && p.preg2) out.push("\u{1F930} Carryin' two litters" + (p.eggs ? " and a clutch: triple-carried." : ": one in the womb, one in the ass."));
+      if (p.openUntil > now) out.push("\u{1F930} Wide open: for " + Math.max(1, Math.ceil((p.openUntil - now) / 6e4)) + " more min you'll catch at almost anything.");
+      if (p.sensitiveUntil > now) out.push("\u{1F95B} Milked past empty: sensitive for " + Math.max(1, Math.ceil((p.sensitiveUntil - now) / 6e4)) + " more min.");
+      if (r.bringIn) out.push("\u{1F95B} Bein' brought into milk: " + r.bringIn.n + " of " + CFG.BRINGIN_TENDS + " tendin's.");
+    }
+    function uddersStateFor(mn, s) {
+      const r = rec(mn), k = keptOf(mn);
+      s.dial = dialOf(mn);
+      s.intensity = intensityOf(mn);
+      if (r.callMe || r.neverCall) s.words = { call: r.callMe || [], never: r.neverCall || [] };
+      if (k) s.kept = { by: plainName(k.by), until: k.until, tag: k.tag, name: k.name, milk: k.milk };
+      if (r.milkCums) s.milkCums = r.milkCums;
+      if (r.noBed) s.noBed = true;
+    }
+    const UDDER_LINES = {
+      cumMilk: [
+        "The cups drag one long pull too many out of %n and they go rigid in the stall, cummin' on nothin' but bein' milked. Their tits let down in a rush: %ml more, hissin' into the lines.",
+        "%n's knees buckle. They cum hard in the straps with both teats stretched down the glass, and the milk comes with it, %ml in great hot spurts.",
+        "It tips %n over. A wail, hips jerkin' at the air, and every squeeze of their cunt sends another jet down the hoses: %ml the stall hadn't counted on.",
+        "%n cums like stock: loud, helpless, and still bein' milked through it. The pump doesn't miss a beat. It just takes the extra %ml and keeps goin'.",
+        "There it is. %n shudders from the teats down, eyes rolled back, lettin' down %ml all at once while their thighs run wet. The cups only suck harder."
+      ],
+      cumCock: [
+        "The sleeve wrings %n past bearin' and they cum in it, buckin' against the rail, pumpin' %ml into the jar in thick ropes while it keeps strokin'.",
+        "%n's balls draw up tight in the cup and they unload with a groan: %ml, milked out of them pulse by pulse, and the machine doesn't let up after.",
+        "It gets %n there and holds them there, cock jumpin' in the sleeve, emptyin' %ml down the line while their legs shake."
+      ],
+      dial_gentle: [
+        "The cups are bein' sweet with you. Slow, shallow pulls, like a warm mouth takin' its time.",
+        "It milks you soft, a lazy tug and a long rest, and you find yourself leanin' into it for more.",
+        "Gentle as hands. Every pull ends in a little squeeze that makes your eyes close."
+      ],
+      dial_hard: [
+        "The pump's turned up. Each pull drags your teats a full inch down the glass and lets them snap back, over and over.",
+        "It's not askin'. Hard, fast, deep pulls that make you grunt, and the bucket's fillin' twice as quick.",
+        "Your teats are stretched long and dark in the cups and the pump only wants them longer."
+      ],
+      dial_punishing: [
+        "There's hardly anything left and it doesn't care. The cups haul on you dry and raw, and you can feel it right down between your legs.",
+        "It's milkin' you past empty. Every pull finds one more drop somewhere deep and tears it out of you.",
+        "You're wrung out, shakin', beggin' the rail, and the dial's still all the way over."
+      ],
+      punished: ["%n is let out of the stall on legs that won't hold, teats swollen dark and twice their length, flinchin' when the air so much as moves over them."],
+      sensitive: [
+        "Your wrung-out teats catch on nothin' at all and a jolt goes straight to your sex.",
+        "Every step sways them, and every sway is almost too much. You're wet from walkin'.",
+        "A draught from the barn door finds your nipples and you have to stop and hold on to somethin'."
+      ],
+      over1: ["Your udders have gone tight and warm. Full to the skin, and nobody's milked you."],
+      over2: ["A bead of milk wells at each teat and runs. You're leakin', and you can't stop it."],
+      over3: ["They're hard as melons now and hot to the touch, the skin shiny with it. Every heartbeat throbs in them."],
+      over4: ["You can't think. There's only how full you are, the ache, the drip, and the need to have somethin' latch on and take it."],
+      over4nag: [
+        "Milk is runnin' down your belly in two steady lines. You'd let anybody milk you right now. Anybody.",
+        "Your udders are so tight they shake when you breathe. You catch yourself squeezin' them and it only makes it worse.",
+        "You're dribblin' with every step and lowin' under your breath. Get to a stall."
+      ],
+      overRoom2: [
+        "Two wet patches are spreadin' down %n's front. Somebody's overdue for milkin' and startin' to leak.",
+        "%n's teats are drippin' steady, a bead at a time, and they keep pressin' an arm across to hide it."
+      ],
+      overRoom3: [
+        "%n's udders have swollen up round and hard, veins standin' out, milk runnin' in threads. They wince when anything touches them.",
+        "Anybody can see %n hasn't been milked: tits engorged and shinin', nipples stood out thick and weepin'."
+      ],
+      overRoom4: [
+        "%n is burstin'. Milk's sprayin' in thin jets every time they move, soakin' them to the knees, and they're moanin' like an animal left too long in the field.",
+        "%n can barely stand for how full they are, cradlin' two huge, hot, streamin' udders and beggin' anybody who looks their way."
+      ],
+      bringStart: [`%x cups %n's dry tits in both hands, weighs them, and rolls the nipples slow between finger and thumb. "We'll have these runnin' inside the week."`],
+      bringTend: [
+        "%x sits %n down and works their tits by hand: warm oil, long firm strokes from the ribs to the nipple, then the little hand pump, suckin' at nothin' till %n is squirmin'.",
+        "%x fits two small cups to %n's nipples and lets the pump tug at them dry for a good while, thumbs rubbin' circles underneath. Nothin' comes. Not yet.",
+        `"Hold still." %x milks at %n's empty teats like they're already a cow, pinchin' and drawin' down, over and over, till they're puffy and red and %n is breathin' hard.`
+      ],
+      bringLate: [
+        "%n's tits have filled out under %x's hands, heavier than last week, the nipples fat and dark from all the pullin'. Somethin' is close.",
+        `%x squeezes and a single clear bead stands on %n's nipple. "There you are. Nearly." The cups go back on.`
+      ],
+      bringDone: ["%x strips %n's teat between two fingers and a thin white jet hits the straw. Then the other side. %n stares down at their own drippin' tits while the barn whoops: first milk, and plenty more behind it."],
+      second: [
+        "Somethin' catches in %n's %h, low and certain, never mind the litter they're already carryin'. That's two bellies' worth in one animal now.",
+        "%n was bred already. It didn't matter. Their %h has taken too, and they'll be carryin' front and back."
+      ],
+      triple: [
+        "%n is carryin' three ways at once: a litter in the womb, another up the ass, and a clutch of eggs packed in besides. Their belly's a great tight drum and it's only goin' to get worse.",
+        "Womb full, ass full, and eggs on top. %n has been bred in every way this farm knows, all at the same time, and can hardly get their arms round the result."
+      ],
+      bredBack: [
+        "%n isn't an hour emptied and somethin' has already taken in them again. Bred back, still slack and drippin' from the last lot.",
+        "Not even time to close up. %n is caught again inside the hour, and the farm girl chalks BRED BACK on their flank."
+      ],
+      split: [
+        `The farm girl counts the litter off against the book. "Well now. %c." She grins up at %n. "Busy thing, weren't you."`,
+        "Nobody knew whose they'd be till now. The count for %n's litter: %c."
+      ],
+      bedDown: [
+        "%n gets three steps and can't manage a fourth, belly near on the ground. Two hands walk them to deep straw and ease them down on their side. They're not gettin' up again till it's over.",
+        "That belly has finally got too big for %n's legs. They're bedded down in the farrowin' stall, propped on bolsters, huge and helpless, for anybody to come and tend."
+      ],
+      bedUp: ["%n is helped up out of the straw, lighter and unsteady, and set back on their own feet."],
+      bedMilk: [
+        "%x kneels in the straw by %n and milks them where they lie, one heavy teat and then the other, %ml into a pail, while %n can only pant and let it happen.",
+        "%x props %n's top leg, settles in against that enormous belly and strips their udders by hand: %ml, warm in the bucket."
+      ],
+      bedFeed: [
+        "%x sits by %n's head and feeds them warm mash off their fingers, then rubs slow circles over the great tight belly till it settles.",
+        "%x tips a bottle to %n's lips, holds it till it's drained, and has a good long feel of that belly while they're there."
+      ],
+      kept: [`%x clips a tag to %n's collar and turns their face up by the chin. "Mine, for the week." %n is kept.`],
+      int_tender: [
+        "It's almost kind about it.",
+        "Somethin' strokes %n's hair while it happens.",
+        "It goes slow enough for them to feel every inch.",
+        `"Good. That's it. Good," somebody murmurs.`,
+        "It waits for %n to catch a breath before it goes on.",
+        "%n is held close the whole time.",
+        "It's careful with them, the way you are with stock you mean to keep.",
+        "A thumb wipes %n's cheek dry.",
+        "It lets them rock back against it at their own pace.",
+        "Nothin' about it hurts. That's the worst part: how easy it is to give in."
+      ],
+      int_filthy: [
+        "%n is droolin', leakin' and stinkin' of it, and nobody's goin' to clean them up.",
+        "It uses them like a hole in a wall.",
+        '"Look at the state of that cunt," somebody says, not unkindly.',
+        "%n's own slick is runnin' down to their knees.",
+        "It slaps wet with every stroke and the sound carries clear across the yard.",
+        "They're a mess of spit and cum and they're pushin' back for more.",
+        "Nothin' on this farm is too dirty to do to %n, and they've just proved it again.",
+        "It grunts, and %n grunts with it, just another animal gettin' rutted in the muck.",
+        "%n's holes are left gapin' and foamin', and they're still humpin' the air.",
+        "It wipes itself off on %n's face when it's done with that end."
+      ]
+    };
     const SEVERITY = [null, { name: "mild", x: 1, t: 1 }, { name: "strong", x: 2, t: 1.5 }, { name: "brutal", x: 3, t: 2.5 }];
     function dangerX(mn) {
       const n = potionX(mn, "danger");
@@ -17532,7 +19259,7 @@
     function pickSeverity(mn, fixed) {
       if (fixed) return fixed;
       const w = ruined(mn) ? [0.1, 0.3, 0.6] : dangerX(mn).on ? [0.2, 0.4, 0.4] : [0.55, 0.3, 0.15], roll = Math.random();
-      return roll < w[0] ? 1 : roll < w[0] + w[1] ? 2 : 3;
+      return intensitySev(mn, roll < w[0] ? 1 : roll < w[0] + w[1] ? 2 : 3);
     }
     function parseTrapLoad(kind, words) {
       const w = String(words || "").toLowerCase().split(/\s+/).filter(Boolean), out = { variant: null, sev: 0 };
@@ -18758,6 +20485,14 @@ TEST SUBJECTS & TRAPS
   ?gauntlet \xB7 the timed trap run and its board
   ?lend me \xB7 put yourself up: the top ?bid picks three traps
   ?mysterybox \xB7 4 ribbons: somethin' lovely that locks itself on
+  ?album \xB7 your keepsakes \xB7 ?holes \xB7 what each hole has taken
+  ?sit \xB7 brood the nest's eggs till they hatch \xB7 ?sit up
+  ?vat \xB7 what's been milked from you \xB7 ?buy <potion> with milk
+  ?stalldial gentle|steady|hard|punishing \xB7 how the stall milks you
+  ?callme <names> \xB7 ?nevercall <names> \xB7 your words, in every line
+  ?intensity tender|rough|filthy \xB7 how the farm talks about you
+  ?kept \xB7 who's keepin' you this week \xB7 ?kept off
+  ?bedrest on|off \xB7 bedded down when you're too big to walk
   ?struggle \xB7 one try at slippin' a trap that has you
   ?traps eager on \xB7 no breather between traps, no resets
   ?free <who> \xB7 get a caught subject out \xB7 ?goad <who> \xB7 or don't
@@ -18981,6 +20716,14 @@ RIBBONS, POTIONS, DARES, THE CORRAL
   ?gather \xB7 collect what's in the nest (?spot set nest)
   ?spot set crate \xB7 a box only subjects can open
   ?cleanse <who> \xB7 5 of your ribbons: 20 off their corruption
+  ?whistle <which> <who> \xB7 call one of the farm's own to a subject
+  ?trap make <name> <does> [strength] [words] | lines\u2026 \xB7 proprietors
+  ?trap made \xB7 ?trap unmake <name>
+  ?send <who> <trap> \xB7 ?dose <who> <words> \xB7 ?herdtraps \xB7 leaders
+  ?keep <who> [tag|name|milk|breed|off] \xB7 keep one of your herd
+  ?bringin <who> \xB7 tend a dry animal into milk (6 tendin's)
+  ?sit <who> \xB7 set them on the nest \xB7 ?stalldial <who> <settin'>
+  ?tend <who> \xB7 feed and milk somebody bedded down (a ribbon)
   ?mysterybox lift <who> \xB7 ?suit off <who>
   ?gauntlet pot <n> \xB7 proprietors (ends: gauntlet-start, -end)
   ?purge <who> \xB7 take a parasite off them
@@ -19832,7 +21575,24 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
       "bid",
       "route",
       "mysterybox",
-      "suit"
+      "suit",
+      "whistle",
+      "send",
+      "dose",
+      "herdtraps",
+      "sit",
+      "broody",
+      "album",
+      "holes",
+      "vat",
+      "stalldial",
+      "bringin",
+      "bedrest",
+      "callme",
+      "nevercall",
+      "intensity",
+      "keep",
+      "kept"
     ];
     const STAFF_CMDS = [
       "queue",
@@ -20195,18 +21955,18 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
             huh("That looked like chat, hon, not a farm command, so it wasn't sent anywhere. This box talks to me (try ?help); chat goes in the game's own chat box.");
             return;
           }
-          const near = nearestCommand(cmd, sender);
+          const near2 = nearestCommand(cmd, sender);
           if (channel === "chat") {
-            if (near) {
+            if (near2) {
               state.huhChatAt = state.huhChatAt || /* @__PURE__ */ new Map();
               if (Date.now() - (state.huhChatAt.get(sender) || 0) > 6e4) {
                 state.huhChatAt.set(sender, Date.now());
-                reply(sender, "Did you mean ?" + near + ", sugar?", canBeep(sender) ? "beep" : "whisper");
+                reply(sender, "Did you mean ?" + near2 + ", sugar?", canBeep(sender) ? "beep" : "whisper");
               }
             }
             return;
           }
-          huh("I don't know ?" + cmd + ", hon." + (near ? " Did you mean ?" + near + "?" : "") + " ?help lists what I can do.");
+          huh("I don't know ?" + cmd + ", hon." + (near2 ? " Did you mean ?" + near2 + "?" : "") + " ?help lists what I can do.");
           return;
         }
       }
@@ -22263,7 +24023,7 @@ Welcome to B&B Farm, hon. \u{1F33E}`
         // 10v-parasite.js
         case "quiet":
         case "tend":
-          broodCommand(cmd, sender, args, R);
+          if (cmd !== "tend" || !bedTend(sender, args, R)) broodCommand(cmd, sender, args, R);
           break;
         // 10y2-brood.js
         case "brood":
@@ -22285,6 +24045,29 @@ Welcome to B&B Farm, hon. \u{1F33E}`
           cursedCommand(cmd, sender, args, R);
           break;
         // 10y5-cursed.js
+        case "whistle":
+        case "send":
+        case "dose":
+        case "herdtraps":
+        case "sit":
+        case "broody":
+        case "album":
+        case "holes":
+        case "vat":
+          keepersCommand(cmd, sender, args, R);
+          break;
+        // 10y6-keepers.js
+        case "stalldial":
+        case "bringin":
+        case "bedrest":
+        case "callme":
+        case "nevercall":
+        case "intensity":
+        case "keep":
+        case "kept":
+          uddersCommand(cmd, sender, args, R);
+          break;
+        // 10y7-udders.js
         case "eager":
           trapCommand("traps", sender, ["eager"].concat(args), R);
           break;

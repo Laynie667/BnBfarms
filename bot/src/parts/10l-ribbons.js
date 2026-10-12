@@ -149,6 +149,7 @@
     const r = rec(sender);
     if (!r || !r.roles || !r.roles.length){ R("The store's for folks on the books, sugar. ?apply first!"); return; }
     if (!args.length){ R(storeText(sender)); return; }
+    if (vatBuy(sender, args, R)) return;   // "?buy <potion> with milk": paid from their vat (10y6-keepers.js)
     const it = storeItem(args[0]);
     if (!it || it.off){ R("We don't stock that, hon. ?store shows the shelf."); return; }
     let rest = args.slice(1);

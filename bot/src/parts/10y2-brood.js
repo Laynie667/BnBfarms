@@ -89,6 +89,7 @@
     const p = prodOf(mn); if (!p) return 0;
     let w = 0; const now = Date.now();
     if (p.eggs) w += p.eggs.n / 10;
+    if (p.preg2) w += 1;   // a second litter (10y7-udders.js)
     if (p.preg){ const frac = Math.max(0, Math.min(1, (now - p.preg.since) / Math.max(1, p.preg.due - p.preg.since))); w += frac * (1 + (p.preg.count || 1) * 0.5); }
     const full = heldTotal(p) / capacity(mn); if (full > 0.8) w += (full - 0.8) * 3;
     return w >= 8 ? 4 : w >= 4 ? 3 : w >= 2 ? 2 : w >= 0.8 ? 1 : 0;
@@ -175,6 +176,8 @@
     if (!r || !p) return out;
     const run = state.trapRuns && state.trapRuns.get(mn);
     if (run) out.push(TRAP_KINDS[run.kind].icon+" A trap has you ("+run.kind+"): part "+Math.min(run.i, run.beats.length)+" of "+run.beats.length+". Your safeword stops it.");
+    { const sit = sitHappening(mn); if (sit) out.push(sit); }
+    uddersHappening(mn, out);   // overdue, bedded down, wide open, twice bred (10y7-udders.js)   // broodin' on the nest (10y6-keepers.js)
     const sc = state.sceneRuns && state.sceneRuns.get(mn);
     if (sc) out.push("🥚 It's comin': part "+Math.min(sc.i, sc.n)+" of "+sc.n+".");
     if (r.trapWait) out.push(TRAP_KINDS[r.trapWait.kind].icon+" "+(r.trapWait.kind === "tickle" ? "The tickle rack has you till you ?beg" : "The mirror box wants its line "+(5 - (r.trapWait.n || 0))+" more times")+", or "+mins(r.trapWait.until)+" min.");

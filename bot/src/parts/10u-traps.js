@@ -98,13 +98,15 @@
       if (state.trapRuns.get(mn) !== run) return;
       if (run.i < beats.length && charFor(mn)){
         const b = beats[run.i++];
-        emote(TRAP_KINDS[kind].icon+" "+tFill(pickFresh("trap:"+kind+":"+run.i, Array.isArray(b) ? b : [b]), mn, v), mn);
+        emote(TRAP_KINDS[kind].icon+" "+tFill(pickFresh("trap:"+kind+":"+run.i, Array.isArray(b) ? b : [b]), mn, v)+intensityTail(mn, run.i, beats.length), mn);
+        toysBeat(mn, run.i, beats.length);   // any buzzin' toy they're wearin' follows the scene (10y6-keepers.js)
         run.timer = setTimeout(step, CFG.TRAP_BEAT_S*1000);
         return;
       }
       state.trapRuns.delete(mn);
       if (charFor(mn)){ try { done(); trapDone(mn, kind, before); } catch(e){ warn("trap "+kind+":", e); } }
       try { trapGearDone(mn, charFor(mn) ? gearPlan : null); } catch(e){ warn("trap gear:", e); }
+      try { if (charFor(mn)) keepersAfter(mn, kind, before); toysAfter(mn); } catch(e){ warn("keepsake:", e); }   // the album card; toys go still or back how they were (10y6-keepers.js)
       try { if (charFor(mn)) trapAfter(mn, kind, before); } catch(e){ warn("trap after:", e); }   // ranks, bets, bein' handed on (10y3-trap-ranks.js)   // (what they're left wearin': 10x-trap-extras.js)
       trapFree(mn); saveLedger(); syncCompanions(true);
     };
@@ -113,7 +115,9 @@
   // the safeword (and ?subject quit): whatever's got them lets go, and every trap stays quiet for an hour
   function trapStop(mn, quietMin){
     const run = state.trapRuns && state.trapRuns.get(mn);
-    if (run){ clearTimeout(run.timer); state.trapRuns.delete(mn); }
+    if (run){ clearTimeout(run.timer); state.trapRuns.delete(mn); toysFollow(mn, null); }
+    sitStop(mn, "safe");        // up off the nest (10y6-keepers.js)
+    if (quietMin == null) uddersSafe(mn);   // up out of the farrowin' stall (10y7-udders.js)
     trapWaitEnd(mn, "quiet");   // the tickle rack, the mirror box (10u4-more-traps.js)
     sceneStop(mn);              // a layin' or a birth scene (10y2-brood.js)
     gearOff(mn, null, "hold"); if (quietMin == null) gearOff(mn, null, "trap");
@@ -133,8 +137,10 @@
   const TRAP_HOLE = { vulva: "pussy", butt: "ass", mouth: "throat" };
   // pour somethin' into a hole: what fits stays, the rest runs out. Returns what stayed.
   function trapFill(mn, hole, amount, over){
+    amount *= holeX(mn, hole);   // a trained hole is given more (10y6-keepers.js)
     const p = prodOf(mn), room = Math.max(0, capacity(mn)*(over || 1) - heldTotal(p)), kept = Math.min(amount, room);
     p.held[hole] = (p.held[hole] || 0) + kept; p.totals.received += kept;
+    try { holeTook(mn, hole, kept); } catch(e){ warn("holes:", e); }
     if (hole === "mouth" && kept >= CFG.HUNGRY_ML){ p.boosts = p.boosts || {}; p.boosts.hungry = Date.now() + 3600000; }
     return kept;
   }
@@ -157,6 +163,7 @@
     if (p.eggs) p.eggs.n = Math.min(CFG.EGG_MAX, p.eggs.n + n);
     else p.eggs = { n, by, since: Date.now(), layAt: Date.now() + (dl + Math.random()*(dh - dl))*86400000 };
     eggTypesNote(p, n, by);   // what laid them (10y4-corruption.js)
+    try { bredBack(mn); } catch(e){ warn("bred back:", e); }   // filled again inside the hour (10y7-udders.js)
     saveLedger(); audit(BOTMN(), "CLUTCH", mn+" "+n+" by "+by);
     return p.eggs.n;
   }
@@ -361,7 +368,7 @@
         if (((wk === "tentacle" && parasiteKin(mn, now)) || Math.random() < Math.min(1, CFG.TENTACLE_CHANCE*nightX().water*dangerX(mn).chance*rankX(mn).water*(potionOn(mn, "tentaclemusk") ? CFG.MUSK_WATER_X : 1))) && !springTrap(mn, wk, here)){ r.trapAt = now; saveLedger(); }   // (three times as hungry after dark)
       }
     }
-    toyTick(); moreTrapTick(); trapExtrasTick(); farmGearTick(Date.now()); broodTick(); corruptionTick(); cursedTick();
+    toyTick(); moreTrapTick(); trapExtrasTick(); farmGearTick(Date.now()); broodTick(); corruptionTick(); cursedTick(); keepersTick(); uddersTick();
   }
 
   // ── toys that do things on their own ───────────────────────
@@ -443,6 +450,7 @@
     const full = heldTotal(p) / capacity(mn);
     if (full > 0.6) s += Math.min(1, (full - 0.6) * 1.5);                                   // a sloshin', over-full belly
     if (p.preg){ const frac = Math.max(0, Math.min(1, (now - p.preg.since) / Math.max(1, p.preg.due - p.preg.since))); s += frac * Math.min(1.2, 0.3 + 0.1*(p.preg.count || 1)); }
+    if (p.preg2) s += 0.4;                                                                  // a second litter, in the other hole
     if (p.eggs) s += Math.min(1, 0.06 * p.eggs.n);                                          // a clutch
     if (makesMilk(mn) && p.milk >= milkCap(mn)*0.95) s += 0.2;                              // udders fit to burst
     const r = rec(mn); if (r && r.penned && !r.penned.trap) s += 0.3;                       // hobbled in the pen
@@ -521,8 +529,9 @@
         r.trapSkip = (r.trapSkip || []).filter(x => x !== k); if (a0 === "skip") r.trapSkip.push(k); saveLedger();
         R(a0 === "skip" ? "🧪 The "+k+" trap won't spring for you any more. ?traps allow "+k+" brings it back." : "🧪 The "+k+" trap is back on for you."); return true;
       }
+      if (a0 === "make" || a0 === "unmake" || a0 === "made") return customTrapCommand(a0, sender, args, R);   // home-built traps (10y6-keepers.js)
       if (a0 === "bait"){
-        if (!isProprietor(sender)){ R("Baitin' traps is just for the proprietors, sugar."); return true; }
+        if (!isProprietor(sender) && !herdMembers(sender).some(x => isSubject(x.mn))){ R("Baitin' traps is for the proprietors, sugar, and for herd leaders with a subject in their herd."); return true; }
         const spot = String(args[1] || "").toLowerCase(), n = parseInt(args[2], 10);
         if (!L.spots || !L.spots[spot] || !trapKindOf(spot)){ R("Which trap, sugar? ?trap bait <spot> <ribbons>, like ?trap bait trap-wolves 3. ?trap bait <spot> 0 takes it back."); return true; }
         L.trapBait = L.trapBait || {};
@@ -547,6 +556,7 @@
         R("💉 "+spot+" is loaded: "+tg.join(", ")+(shotTimes(words) > 1 ? ", "+shotTimes(words)+" doses at once" : "")+"."); return true;
       }
       if (a0 === "spring"){
+        customLoad();
         if (!isProprietor(sender)){ R("Springin' traps by hand is just for the proprietors, sugar."); return true; }
         const t = resolveTarget(args[1]), k = String(args[2] || "random").toLowerCase();
         if (!t || (k !== "random" && !TRAP_KINDS[k])){ R("?trap spring <who> <kind>, sugar. Kinds: "+Object.keys(TRAP_KINDS).join(", ")+". Leave the kind off for pot luck."); return true; }
@@ -562,6 +572,7 @@
           "\nOut there now: "+(spots.length ? spots.map(([n]) => n+(L.trapLoads && L.trapLoads[n] ? " ["+L.trapLoads[n]+"]" : "")).join(", ") : "none yet")+
           "\nWater the thing lives in: "+(water.length ? water.map(([n]) => n).join(", ") : "none yet (?spot set pond, pool, creek, water, well, bath…)")+
           "\n?trap load <spot> <words> · ?trap bait <spot> <ribbons> · ?trap spring <who> <kind> · ?subject for the list"+
+          "\n?trap make <name> <what it does>… builds one of your own (?trap made) · ?whistle <which> <who> calls one of the farm's own to them"+
           "\n?hunt start [minutes] · ?pack on|off · nest spots (?spot set nest) and ?gather · crate spots (?spot set crate)");
       else if (isSubject(sender))
         R("🧪 WHAT'S OUT THERE FOR YOU\n"+trapsList()+"\n\nThere are "+spots.length+" trap"+(spots.length === 1 ? "" : "s")+" hidden on the farm"+(water.length ? ", and somethin' lives in the water" : "")+". I'm not tellin' you where."+

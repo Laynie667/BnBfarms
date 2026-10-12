@@ -493,6 +493,14 @@ TEST SUBJECTS & TRAPS
   ?gauntlet · the timed trap run and its board
   ?lend me · put yourself up: the top ?bid picks three traps
   ?mysterybox · 4 ribbons: somethin' lovely that locks itself on
+  ?album · your keepsakes · ?holes · what each hole has taken
+  ?sit · brood the nest's eggs till they hatch · ?sit up
+  ?vat · what's been milked from you · ?buy <potion> with milk
+  ?stalldial gentle|steady|hard|punishing · how the stall milks you
+  ?callme <names> · ?nevercall <names> · your words, in every line
+  ?intensity tender|rough|filthy · how the farm talks about you
+  ?kept · who's keepin' you this week · ?kept off
+  ?bedrest on|off · bedded down when you're too big to walk
   ?struggle · one try at slippin' a trap that has you
   ?traps eager on · no breather between traps, no resets
   ?free <who> · get a caught subject out · ?goad <who> · or don't
@@ -724,6 +732,14 @@ RIBBONS, POTIONS, DARES, THE CORRAL
   ?gather · collect what's in the nest (?spot set nest)
   ?spot set crate · a box only subjects can open
   ?cleanse <who> · 5 of your ribbons: 20 off their corruption
+  ?whistle <which> <who> · call one of the farm's own to a subject
+  ?trap make <name> <does> [strength] [words] | lines… · proprietors
+  ?trap made · ?trap unmake <name>
+  ?send <who> <trap> · ?dose <who> <words> · ?herdtraps · leaders
+  ?keep <who> [tag|name|milk|breed|off] · keep one of your herd
+  ?bringin <who> · tend a dry animal into milk (6 tendin's)
+  ?sit <who> · set them on the nest · ?stalldial <who> <settin'>
+  ?tend <who> · feed and milk somebody bedded down (a ribbon)
   ?mysterybox lift <who> · ?suit off <who>
   ?gauntlet pot <n> · proprietors (ends: gauntlet-start, -end)
   ?purge <who> · take a parasite off them

@@ -100,7 +100,7 @@
   }
   // a message that reaches them anywhere on the map: beep if we're friends, whisper otherwise
   // a private word: a beep if it can reach them, otherwise a whisper (or held for later, see beep())
-  function tell(mn, text){ if (canBeep(mn)) beep(mn, text); else if (charFor(mn)) whisper(mn, text); else beep(mn, text); }
+  function tell(mn, text){ text = wordsFor(mn, text);   /* their own names for themselves (10y7-udders.js) */ if (canBeep(mn)) beep(mn, text); else if (charFor(mn)) whisper(mn, text); else beep(mn, text); }
   const wornCache = new Map();
   function wornTags(mn){
     const hit = wornCache.get(mn), now = Date.now();
@@ -426,6 +426,7 @@
     rollBoard();
     L.yield.d[mn] = (L.yield.d[mn]||0) + amount;
     L.yield.w[mn] = (L.yield.w[mn]||0) + amount;
+    vatAdd(mn, amount);   // their own vat: it buys potions and shots (10y6-keepers.js)
   }
 
   function drainMilk(mn, amount, nursing){
@@ -491,6 +492,7 @@
     const p = prodOf(mother), r = rec(mother);
     hole = hole === "butt" ? "butt" : "vulva";
     if (!r.fertile || boosted(p,"contra")) return null;
+    { const sc = secondCarry(mother, stud, amount, bonus, hole); if (sc !== undefined) return sc; }   // a second litter in the other hole (10y7-udders.js)
     if (hole === "butt" && !mpregOn(mother)) return null;
     const now = Date.now();
     if (p.preg){
@@ -512,7 +514,8 @@
     // breedin' rights: only the rights-holder's loads can take
     if (r.rights && r.rights.until > now && r.rights.stud !== stud && !(r.rights.allow||[]).includes(stud)) return null;
     if (p.preg) chance *= CFG.PROD.EXTRA_SIRE_X;
-    chance *= dangerX(mother).chance;   // a Danger Draught (10z-trap-variants.js)
+    chance *= dangerX(mother).chance;
+    chance *= openX(mother);            // wide open for an hour after a birth or a layin' (10y7-udders.js)   // a Danger Draught (10z-trap-variants.js)
     chance = Math.min(0.95, chance);
     if (Math.random() >= chance) return null;
     if (p.preg){ p.preg.sires.push(stud); return "extra"; }
@@ -525,6 +528,7 @@
       count = Math.min(CFG.HYPER_MAX, Math.max(count + 2, Math.round(count * (a + Math.random()*(b - a)) * hx)));
     }
     p.preg = { since:now, due: now + CFG.PROD.PREG_DAYS*86400000, sires:[stud], count, warned:false };
+    try { bredBack(mother); } catch(e){ warn("bred back:", e); }
     if (hole === "butt") p.preg.via = "butt";   // carried in the ass (mpreg)
     return "new";
   }
@@ -543,7 +547,7 @@
     L.studbook.push({ t:Date.now(), dam:mn, sires:g.sires.slice(), kids });
     if (L.studbook.length > 1000) L.studbook = L.studbook.slice(-1000);
     const sires = g.sires.slice();
-    p.preg = null; p.freshUntil = Date.now() + CFG.PROD.FRESH_DAYS*86400000;
+    p.preg = null; p.freshUntil = Date.now() + CFG.PROD.FRESH_DAYS*86400000; openedUp(mn);
     saveLedger(); audit(CFG.BOT_MEMBER,"BIRTH",mn+" "+JSON.stringify(kids));
     later(() => addonsEmit("birth", mn, kids, sires), 1500);   // midwives, pregnancy add-on
     const parts = [];
@@ -552,10 +556,12 @@
     if (kids.futa)   parts.push(kids.futa+" futa");
     const msg = "🍼 Oh, y'all! "+plainName(mn)+" just delivered "+g.count+" ("+parts.join(", ")+"), sired by "+
                 g.sires.map(plainName).join(" & ")+". Milk's comin' in strong now!";
+    try { albumAdd(mn, "🍼", "A litter delivered", g.count+" ("+parts.join(", ")+"), sired by "+g.sires.map(plainName).join(" & ")+"."); } catch(e){}   // a keepsake (10y6-keepers.js)
     if (onMap(mn) && CFG.LAY_SCENE) farrowScene(mn, g.count, parts.join(", "), sires);   // the birth, in beats (10y2-brood.js)
     else if (onMap(mn)) emote("🍼 With one last long push, "+plainName(mn)+" delivers "+g.count+" ("+parts.join(", ")+"), sired by "+g.sires.map(plainName).join(" & ")+
                          ". The farm girl tucks 'em in the straw, and "+plainName(mn)+"'s milk comes in strong, breasts swellin' heavy.");
     else beep(mn, msg);
+    try { const split = revealSplit(mn, sires, g.count); if (split) L.studbook[L.studbook.length - 1].split = split; } catch(e){ warn("split:", e); }   // whose they were (10y7-udders.js)
     for (const h of herdsOf(mn)) beep(h.leader, msg);
   }
 
@@ -808,7 +814,7 @@
         // walked past, or stepped off: a session in progress just pauses for a minute before it ends
         const p0 = rec(mn) && prodOf(mn);
         if (p0){
-          p0.stallSeen = 0; p0.stallWhyTold = false;   // next visit they're told again
+          p0.stallSeen = 0; p0.stallWhyTold = false; p0.stallKeptTold = false;   // next visit they're told again
           if (p0.stall && now - (p0.stall.seenAt||now) > CFG.PROD.STALL_AWAY_GRACE_S*1000){
             // gone a while: the session's put on hold for 10 minutes, and comin' back picks it up quietly
             // (seen live: steppin' off for two minutes started a whole new session with a new announcement)
@@ -820,7 +826,7 @@
       }
       const p = prodOf(mn);
       // the stall drains down to a quarter of what they can hold, then stops (CFG.PROD.STALL_LEAVE_SHARE)
-      const keepM = milkCap(mn) * CFG.PROD.STALL_LEAVE_SHARE, keepS = semenCap(mn) * CFG.PROD.STALL_LEAVE_SHARE;
+      const keepM = milkCap(mn) * stallShare(mn), keepS = semenCap(mn) * stallShare(mn);   // (the dial: 10y7-udders.js)
       const doM = makesMilk(mn) && !milkDenied(mn) && !gearOf(mn).milk && p.milk > keepM;   // a pump they're wearin' does its own milkin' (gearTick)
       const doS = makesSemen(mn) && p.semen > keepS;
       // standin' in the stall and it won't milk them: say why, once per visit (it used to say nothin' at all,
@@ -852,6 +858,8 @@
           privateTo(mn, "🥛 The cups sniff at "+plainName(mn)+"'s swollen, achin' "+(makesMilk(mn) ? "breasts" : "cock")+" and pull away. Not while that draught's in you, sugar. Just stand there and fill.", "emote"); }
         continue;
       }
+      // kept stock is milked when their keeper says (10y7-udders.js)
+      if (!p.stall && (doM || doS)){ const kb = keptMilkBlock(mn); if (kb){ if (!p.stallKeptTold){ p.stallKeptTold = true; tell(mn, "🥛 The cups sniff at you and let go, sugar. "+plainName(kb.by)+" has you milked at "+kb.milk.map(h => h+":00").join(" and ")+", and not before."); } continue; } }
       if (!p.stall && (doM || doS) && p.stallRest > now){
         if (p.stallRestTold !== p.stallRest){
           p.stallRestTold = p.stallRest;
@@ -873,7 +881,7 @@
         const [lo, hi] = CFG.PROD.STALL_SESSION_RANGE;
         const fracM = doM ? (p.milk - keepM) / Math.max(1, milkCap(mn) - keepM) : 0;
         const fracS = doS ? (p.semen - keepS) / Math.max(1, semenCap(mn) - keepS) : 0;
-        const mins = Math.round(lo + (hi - lo) * Math.min(1, Math.max(fracM, fracS)));
+        const mins = Math.max(2, Math.round((lo + (hi - lo) * Math.min(1, Math.max(fracM, fracS))) / dialRate(mn)));
         const total = { m: doM ? p.milk - keepM : 0, s: doS ? p.semen - keepS : 0 };
         p.stall = { since: now, seenAt: now, mins, total, got: { m:0, s:0 },
                     rateM: total.m / mins, rateS: total.s / mins,
@@ -900,6 +908,7 @@
       const gotS = doS && st.oweS >= 1 ? drainSemen(mn, Math.min(st.oweS, p.semen - keepS)) : 0;
       st.oweM = Math.max(0, st.oweM - gotM); st.oweS = Math.max(0, st.oweS - gotS);
       st.got.m += gotM; st.got.s += gotS;
+      try { stallCumTick(mn, st, now); } catch(e){ warn("milk cum:", e); }   // milked till they cum (10y7-udders.js)
       const doneM = !makesMilk(mn) || milkDenied(mn) || gearOf(mn).milk || p.milk <= keepM + 1;
       const doneS = !makesSemen(mn) || p.semen <= keepS + 1;
       // never more than a quarter hour past what the session was meant to take
@@ -908,7 +917,7 @@
       if (!done && now >= (st.nextBeat||0)){
         st.nextBeat = now + (15 + Math.random()*10)*1000;   // with 20-second ticks: a line every 20 to 40 seconds, about 27 on average
         const tb = (st.tailN = (st.tailN||0) + 1) % 5 === 0 ? tailBit(mn, null, null, "milk") : "";   // now and then, their tail (10r-looks.js)
-        privateTo(mn, (st.kind === "cock" ? "🐂 " : "🥛 ")+(tb || stallBeat(mn, st)), "emote");
+        privateTo(mn, (st.kind === "cock" ? "🐂 " : "🥛 ")+(tb || dialBeat(mn, st) || stallBeat(mn, st)), "emote");
       }
       // for the room: an open line at most every STALL_LINE_MIN minutes, STALL_OPEN_MAX a session
       if (!done && now >= (st.nextOpen||0) && (st.opens||0) < CFG.PROD.STALL_OPEN_MAX){
@@ -928,6 +937,7 @@
       }
       if (done){
         p.stall = null; p.stallPaused = null;
+        try { stallDialDone(mn, st); } catch(e){ warn("dial:", e); }
         if (st.got.m + st.got.s > 0) later(() => earnRibbons(mn, CFG.RIBBONS_FOR.stall, "a full session in the milkin' stall"), 3000);
         const R = CFG.PROD.STALL_REST_MIN; p.stallRest = now + (R[0] + Math.random()*(R[1]-R[0]))*60000;
         if (st.got.m + st.got.s > 0){
@@ -1414,6 +1424,8 @@
       case "stud":    return (t.covers||0) >= 50;
       case "sire":    return (t.sired||0) >= 10;
       case "eggs":    return (o.eggs||0) >= 10;
+      case "triple":  return (r.triple||0) >= 1;
+      case "bredback":return (r.bredBack||0) >= 1;
     }
     return false;
   }

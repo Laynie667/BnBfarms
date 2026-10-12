@@ -1558,10 +1558,12 @@ Welcome to B&B Farm, hon. 🌾`);
       case "bench": case "unbench": case "use": benchCommand(cmd, sender, args, R); break;
       case "subject": case "subjects": case "traps": case "trap": case "watersports": case "watersport": trapCommand(cmd === "watersport" ? "watersports" : cmd, sender, args, R); break;   // 10u-traps.js
       case "parasite": case "parasites": case "purge": parasiteCommand(cmd === "parasites" ? "parasite" : cmd, sender, args, R); break;   // 10v-parasite.js
-      case "quiet": case "tend": broodCommand(cmd, sender, args, R); break;   // 10y2-brood.js
+      case "quiet": case "tend": if (cmd !== "tend" || !bedTend(sender, args, R)) broodCommand(cmd, sender, args, R); break;   // 10y2-brood.js
       case "brood": case "bet": ranksCommand(cmd, sender, args, R); break;   // 10y3-trap-ranks.js
       case "cleanse": case "corruption": case "gauntlet": case "lend": case "bid": case "route": corruptionCommand(cmd, sender, args, R); break;   // 10y4-corruption.js
       case "mysterybox": case "suit": cursedCommand(cmd, sender, args, R); break;   // 10y5-cursed.js
+      case "whistle": case "send": case "dose": case "herdtraps": case "sit": case "broody": case "album": case "holes": case "vat": keepersCommand(cmd, sender, args, R); break;   // 10y6-keepers.js
+      case "stalldial": case "bringin": case "bedrest": case "callme": case "nevercall": case "intensity": case "keep": case "kept": uddersCommand(cmd, sender, args, R); break;   // 10y7-udders.js
       case "eager": trapCommand("traps", sender, ["eager"].concat(args), R); break;   // the no-cooldown switch, as its own command (and a Toggles switch)
       case "struggle": case "free": case "goad": case "hunt": case "lay": case "gather": case "pack": extrasCommand(cmd, sender, args, R); break;   // 10x-trap-extras.js
       case "feedback": case "suggest": case "idea": case "bug": case "meh": case "more": feedbackCommand(cmd, sender, args, rest, R); break;   // the suggestion box (10q)

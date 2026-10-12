@@ -14,7 +14,7 @@ import { BOT_MEMBER, HELLO_EVERY_MS } from "./config.js";
 import { Panel } from "./panel.js";
 import { captureOutfit, wearOutfit, changeBack, hasBackup } from "./outfits.js";
 import { markBody, washMarks, stripMe, dressMe, syncFarmGear } from "./marks.js";
-import { initCues, cueOff, lead, face, sound, trance, drawMarkers, arouse, initBody } from "./cues.js";
+import { initCues, cueOff, lead, face, sound, trance, drawMarkers, arouse, vibe, initBody } from "./cues.js";
 
 // the SDK ships as an old-style module; this digs the real thing out either way
 const bcModSdk = sdkModule.default || sdkModule;
@@ -232,6 +232,7 @@ function onFarmMsg(m) {
     case "relay": relay(m); break;
     case "lead": lead(m); break;       // walk me there (cues.js)
     case "face": face(m); break;
+    case "vibe": vibe(m); break;       // a scene turns the dial on a buzzin' toy you're wearin' (cues.js)
     case "arouse": arouse(m); break;   // a trap or a toy stirs you up, if you let the farm do that (cues.js)
     case "sound": sound(m); break;
     case "trance": trance(m); break;

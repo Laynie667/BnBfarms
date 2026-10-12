@@ -265,6 +265,50 @@ export function arouse(m) {
     if (next > cur || m.add < 0) W.ActivitySetArousal(W.Player, next);
   } catch (e) { console.warn("[Farmhand Companion] arouse:", e); }
 }
+// vibe: while a trap has you, any buzzin' toy you're really wearin' follows the scene: low while it teases, high when it
+// breeds you, dead still while you're denied. The same "Farm can stir me up" switch. Your toys go back how you had
+// them when it's done (or two minutes after the farm girl last said anything, whatever happens to her).
+const VIBE_MODE = ["Low", "Medium", "High", "Maximum"];
+let vibeWas = null, vibeTimer = null;
+const vibeToys = () => (W.Player && Array.isArray(W.Player.Appearance) ? W.Player.Appearance : []).filter((it) => it && it.Asset && it.Asset.Group && it.Property && typeof it.Property.Intensity === "number" &&
+  !(it.Property.LockedBy && typeof W.DialogCanUnlock === "function" && !W.DialogCanUnlock(W.Player, it)));
+function vibePush(toys) {
+  if (typeof W.CharacterRefresh === "function") W.CharacterRefresh(W.Player, false);
+  if (typeof W.ChatRoomCharacterItemUpdate === "function") toys.forEach((it) => W.ChatRoomCharacterItemUpdate(W.Player, it.Asset.Group.Name));
+  else if (typeof W.ChatRoomCharacterUpdate === "function") W.ChatRoomCharacterUpdate(W.Player);
+}
+function vibeSet(it, level, mode) {
+  it.Property.Intensity = level; it.Property.Mode = mode || (level < 0 ? "Off" : VIBE_MODE[level]);
+  const eff = new Set(Array.isArray(it.Property.Effect) ? it.Property.Effect : []);
+  if (level < 0) eff.delete("Vibrating"); else eff.add("Vibrating");
+  it.Property.Effect = Array.from(eff);
+}
+function vibeRestore() {
+  clearTimeout(vibeTimer); vibeTimer = null;
+  const was = vibeWas; vibeWas = null;
+  if (!was) return;
+  try {
+    const toys = vibeToys().filter((it) => was[it.Asset.Group.Name + "/" + it.Asset.Name]);
+    toys.forEach((it) => { const w = was[it.Asset.Group.Name + "/" + it.Asset.Name]; vibeSet(it, w.level, w.mode); });
+    if (toys.length) vibePush(toys);
+  } catch (e) { console.warn("[Farmhand Companion] toys back:", e); }
+}
+export function vibe(m) {
+  try {
+    if (m.level == null) return vibeRestore();
+    if (!stirOn()) return;
+    const toys = vibeToys();
+    if (!toys.length) return;
+    if (!vibeWas) { vibeWas = {}; toys.forEach((it) => { vibeWas[it.Asset.Group.Name + "/" + it.Asset.Name] = { level: it.Property.Intensity, mode: it.Property.Mode }; }); }
+    const level = Math.max(-1, Math.min(3, Math.round(Number(m.level)) || 0));
+    const change = toys.filter((it) => it.Property.Intensity !== level);
+    change.forEach((it) => vibeSet(it, level));
+    if (change.length) vibePush(change);
+    clearTimeout(vibeTimer);
+    const hold = Number(m.until) - Date.now();
+    vibeTimer = setTimeout(vibeRestore, hold > 0 ? Math.min(hold, 3600000) : 120000);
+  } catch (e) { console.warn("[Farmhand Companion] toys:", e); }
+}
 export function initBody(mod) {
   // the step time the game works out, stretched. Never turns a blocked tile into an open one or the other way round.
   try {

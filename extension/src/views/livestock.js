@@ -40,6 +40,16 @@ function me(ctx) {
       s.body.map((b) => h("div", null, muted(b.label), h("div", { style: { fontWeight: 600 } }, b.size))))),
     s.today && card(title("Marks"), h("div", { class: "fhc-grid" },
       [["Used today", s.today.tally], ["Naughty marks", s.today.naughty], ["Praised", s.today.praised]].map(([k, v]) => h("div", null, muted(k), h("div", { style: { fontWeight: 600 } }, v))))),
+    s.kept && card(h("div", { class: "fhc-kv" }, title("🏷️ Kept by " + s.kept.by), chip(Math.max(1, Math.ceil((s.kept.until - Date.now()) / 86400000)) + " day(s)", "acc")),
+      s.kept.tag ? muted("Your tag: " + s.kept.tag) : null, s.kept.name ? muted("This week you're called: " + s.kept.name) : null,
+      (s.kept.milk || []).length ? muted("Milked at " + s.kept.milk.map((x) => x + ":00").join(" and ")) : null,
+      h("div", null, btn("What that means", () => ctx.send("kept")), btn("End it", () => ctx.send("kept off")))),
+    s.intensity && card(title("How the farm talks to you"),
+      h("div", null, [["tender", "Tender"], ["rough", "Rough"], ["filthy", "Filthy"]].map(([id, label]) =>
+        h("button", { type: "button", class: "fhc-pill" + (s.intensity === id ? " on" : ""), onclick: () => ctx.send("intensity " + id) }, label))),
+      muted(s.intensity === "tender" ? "Softer words, and the traps lean mild." : s.intensity === "filthy" ? "Dirtier words, and the traps lean brutal." : "As written."),
+      muted("It calls you: " + (((s.words || {}).call || []).join(", ") || "whatever comes to mind") + " · never: " + (((s.words || {}).never || []).join(", ") || "nothin' ruled out")),
+      h("div", null, btn("Names I love…", () => ctx.fillBox("callme ")), btn("Never call me…", () => ctx.fillBox("nevercall ")))),
     h("div", { class: "fhc-quick" }, ["stats", "measure", "record", "pedigree", "keys"].map((c) => btn(c[0].toUpperCase() + c.slice(1), () => ctx.send(c)))),
   ];
 }
@@ -68,6 +78,11 @@ function milking(ctx) {
     gearCard(s),
     s.stallUntil && card(h("div", { class: "fhc-kv" }, title("Milkin' stall"),
       chip(Math.max(0, Math.round((s.stallUntil - Date.now()) / 60000)) + " min left", "acc")), muted("It drains you down to a quarter of what you hold, then lets go.")),
+    s.dial && card(h("div", { class: "fhc-kv" }, title("The stall dial"), s.milkCums ? chip("milked till you came × " + s.milkCums, "acc") : null),
+      h("div", null, [["gentle", "Gentle"], ["steady", "Steady"], ["hard", "Hard"], ["punishing", "Punishin'"]].map(([id, label]) =>
+        h("button", { type: "button", class: "fhc-pill" + (s.dial === id ? " on" : ""), onclick: () => ctx.send("stalldial " + id) }, label))),
+      muted({ gentle: "Slow and sweet. It leaves you a third.", steady: "It drains you to a quarter.", hard: "Fast and deep, down to an eighth, and sore teats after.", punishing: "Past empty. You'll be sensitive for an hour after." }[s.dial] || ""),
+      muted("Run hot enough in the stall and the cups will tip you over.")),
     h("div", null, btn("Quota", () => ctx.send("quota")), btn("Milk board", () => ctx.send("board"))),
   ];
 }
@@ -107,6 +122,13 @@ function traps(ctx) {
     card(title("On you right now"), gear.length ? gear.map((g) => h("div", { class: "fhc-kv" }, h("span", null, g.name), h("span", { class: "fhc-muted" }, Math.max(0, Math.ceil((g.until - Date.now()) / 60000)) + " min")))
       : muted("No farm gear on you."),
       !ctx.prefs.gear && muted("Trap gear only goes on for real with \"Farm can put real gear on me\" switched on (Toggles → This panel).")),
+    s.sitting && card(title("🪺 Sittin' the nest"), muted(s.sitting.n + " eggs under you. They hatch in about " + Math.max(1, Math.ceil((s.sitting.until - Date.now()) / 60000)) + " min."), h("div", null, btn("Get up", () => ctx.send("sit up")))),
+    (s.holes && s.holes.length) ? card(title("What you've taken"),
+      s.holes.map((x) => h("div", { class: "fhc-kv" }, h("span", null, "Your " + x.hole + " · " + x.rank), h("span", { class: "fhc-muted" }, x.loads + " loads" + (x.knots ? " · " + x.knots + " knots" : "") + (x.next ? " · next at " + x.next : "")))),
+      muted("Every step a hole is trained, you hold more for good and the traps pour more into it.")) : null,
+    (s.album && s.album.length) ? card(title("📔 Keepsakes"),
+      s.album.map((e) => h("div", { style: { marginTop: "6px" } }, h("div", { class: "fhc-kv" }, h("b", null, e.i + " " + e.h), h("span", { class: "fhc-muted" }, new Date(e.t).toLocaleDateString())), muted(e.x))),
+      muted("Only you can open this album.")) : null,
     ad && card(h("div", { class: "fhc-kv" }, title("Proprietor: subjects & traps"), chip(ad.subjects.length + " subject" + (ad.subjects.length === 1 ? "" : "s"), "acc")),
       ad.subjects.length ? ad.subjects.map((x) => h("div", { class: "fhc-kv" }, h("span", null, (x.here ? "● " : "") + x.name), h("span", { class: "fhc-muted" }, x.n + " sprung" + (x.paused ? " · paused" : ""))))
         : muted("Nobody's signed up yet: ?subject add <who>."),
@@ -175,7 +197,7 @@ export function panelPrefs(ctx) {
      ["noMarkers", "Map markers (staff)", "Small badges over stock on your map: M needs milkin', H in heat, B expectin', X teats capped"]].map(([k, label, desc]) =>
       toggle(label, desc, !ctx.prefs[k], () => { ctx.setPref(k, !ctx.prefs[k]); ctx.api.rehello && ctx.api.rehello(); })),
     // OFF until you turn it on: the farm touchin' your arousal meter (cues.js)
-    toggle("Farm can stir me up", "Traps, toys and scenes nudge your arousal meter up, and while the farm has you denied you're held at the edge instead of cummin'. Your safeword still stops everything.",
+    toggle("Farm can stir me up", "Traps, toys and scenes nudge your arousal meter up, and while the farm has you denied you're held at the edge instead of cummin'. A buzzin' toy you're wearin' follows a trap too: low while it teases, high when it breeds you, still while you're denied, then back how you had it. Your safeword still stops everything.",
       !!ctx.prefs.stir, () => { ctx.setPref("stir", !ctx.prefs.stir); ctx.api.rehello && ctx.api.rehello(); }),
     // OFF until you turn it on: real items from the traps (marks.js)
     toggle("Farm can put real gear on me", "A trap that plugs, cups, clamps, chains, ropes or funnels you puts the real item on your character, and takes it off again when its time's up. Pull one off early and it goes back. Your safeword takes it all off. (The parasite doesn't need this: ?parasite on is its switch.)",

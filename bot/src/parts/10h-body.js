@@ -101,6 +101,7 @@
     } else if (/^Orgasm\d/.test(content)){
       if (potionClimax(mn) === "ruined"){ p.climax.ruined++; saveLedger(); return; }   // Bitterroot
       p.climax.came++;
+      try { stallClimax(mn); } catch(e){ warn("stall climax:", e); }   // cummin' in the milkin' stall (10y7-udders.js)
       face(mn, "afterglow", 40);
       const bits = [];
       // milk lets down when they cum

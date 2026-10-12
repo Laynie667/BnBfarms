@@ -69,7 +69,9 @@
     if (r && how === "safe" && r.parasiteSeed){ r.parasiteSeed = 0; saveLedger(); }   // the safeword clears a seed it left, too
     if (!r || !r.parasite) return false;
     const was = r.parasite.until > Date.now(), fed = r.parasite.fed || 0, n = r.parasite.n || 0, wasBelt = r.parasite.form === "belt", g0 = r.parasite;
-    r.parasite = null; parasiteGone(mn, g0, how || "done"); r.parasiteNext = Date.now() + (how === "safe" ? 7 : 1)*86400000;
+    r.parasite = null; parasiteGone(mn, g0, how || "done");
+    if (how !== "safe") albumAdd(mn, "🪱", "The parasite's twelve hours", "It fed "+fed+" times off what you swallowed"+(n ? " and laid in you "+n+" times" : "")+", then let go.");
+    r.parasiteNext = Date.now() + (how === "safe" ? 7 : 1)*86400000;
     if (r.crave && r.crave.forGood){ if (how === "safe") r.crave.told = Date.now() + 86400000; }   // permanent, but a safeword quiets it for a day
     else r.crave = how === "safe" ? null : { until: Date.now() + CFG.CRAVE_HOURS*3600000, ate: Date.now(), told: Date.now() };   // the cravin' it leaves behind
     saveLedger(); audit(CFG.BOT_MEMBER, "PARASITE", mn+" off ("+(how || "done")+")");

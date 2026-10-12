@@ -56,7 +56,7 @@
   // the Companion puts it in their chat; without it, it's an out-of-character whisper (the map lets those through)
   function privateLine(mn, text, kind, urgent){
     noteLine(mn, text);   // for ?meh / ?more (10q-feedback.js)
-    const line = (kind === "emote" ? "*" : "") + String(text);
+    const line = (kind === "emote" ? "*" : "") + String(wordsFor(mn, text));
     if (hasCompanion(mn)) { enqueue(makeMsg("roomline", { text: line, kind: kind === "emote" ? "emote" : "chat" }, mn), urgent); return; }
     const ooc = mapRoom();
     for (const c of splitMessage(line, 900)) enqueue({ Content: ooc ? "("+c.replace(/\(/g, "[").replace(/\)/g, "]") : c, Type:"Whisper", Target: mn }, urgent);

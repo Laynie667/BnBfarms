@@ -15,6 +15,8 @@ export function storeTab(ctx) {
     log.length ? h("div", { style: { marginTop: "6px" } }, log.map((e) => h("div", { class: "fhc-kv" }, h("span", null, e.why), h("b", null, (e.n > 0 ? "+" : "") + e.n)))) : null,
     muted("Earn 'em: your milk quota, a full stall session, chores, glory shifts, dares, shows, best of the week, and staff who think you've been good."),
     h("div", { style: { marginTop: "6px" } }, btn("This week's board", () => ctx.send("ribbons top"))));
+  const vat = s.vat ? card(title("🥛 Your vat"), h("div", { style: { fontSize: "20px", fontWeight: "700", margin: "4px 0" } }, (s.vat >= 1000 ? (s.vat / 1000).toFixed(1) + " L" : s.vat + " ml")),
+    muted("Everything milked and collected from you. It buys potions and shots at " + (s.vatPer || 500) + " ml for each ribbon of the price: \"Pay with milk\" on the shelf.")) : null;
   const now = fx.length ? card(title("🧪 In you right now"),
     fx.map((f) => h("div", { class: "fhc-kv" }, h("span", null, f.name), h("b", null, minsLeft(f.until) + " min"))),
     muted("Your safeword pours every one of them out.")) : null;
@@ -32,10 +34,11 @@ export function storeTab(ctx) {
       ? btn("Write it…", () => ctx.fillBox("buy " + it.id + " "))
       : h("div", null,
           btn("Buy", () => ctx.send("buy " + it.id), true),
+          s.vat && (it.kind || /^shot-/.test(it.id)) ? btn("Pay with milk", () => ctx.send("buy " + it.id + " with milk")) : null,
           it.gift ? btn("Gift it", () => (who() ? ctx.send("buy " + it.id + " for " + who()) : ctx.hint("Type who it's for in the box above the potions first."))) : null));
   const shelf = (label, list) => list.length ? card(title(label), list.map(row)) : null;
   const potions = items.filter((it) => it.kind), shots = items.filter((it) => /^shot-/.test(it.id)), treats = items.filter((it) => !it.kind && !/^shot-/.test(it.id));
-  return [purse, now, dare, pen,
+  return [purse, vat, now, dare, pen,
     shelf("🛍️ Treats and favors", treats),
     shelf("💉 Shots", shots),
     potions.length ? card(title("🧪 Potions"),

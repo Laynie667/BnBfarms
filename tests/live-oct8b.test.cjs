@@ -42,7 +42,7 @@ const all=n=>sent.slice(n).filter(([e,d])=>d&&typeof d.Content==="string").map((
   ok(!p().pin, 'a Heavy Udder Draught makes you ache, never stuck');
   // potions in their scenes
   n=sent.length; const f=P(500).fx.heavy; f.next=1; W.__potionTick(); await wait(4000);   // (the line can queue behind others)
-  ok(/udder|teats|breasts/i.test(all(n)), 'the draught has its own lines while it lasts');
+  ok(/udder|teats|breasts|nipples|leakin'/i.test(all(n)), 'the draught has its own lines while it lasts');
   // the Broodmare Tonic: eggs from anybody and huge litters while it lasts; the safeword pours it out
   await say(221397,'?potion give 500 brood');
   ok(P(500).fx && P(500).fx.brood && p().boosts.eggs>Date.now() && p().boosts.hyper>Date.now(), 'a Broodmare Tonic: eggs from anybody and hyper litters for three hours');

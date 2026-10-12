@@ -5,7 +5,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 | Script | File in `dist/` | Where it runs | Current |
 |---|---|---|---|
-| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.29.0** |
+| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.29.1** |
 | Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.6.0** |
 | Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.1.3** |
 | Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **1.0.4** |
@@ -23,6 +23,8 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 - Running the watcher on more than one game at once (the bot, yours, a tester's) lets Claude line them up into one timeline.
 
 ## Latest changes (newest first)
+
+- **Bot 0.29.1: a second round of lines** for brooding, the whistle, home-built traps, trained holes, barn dreams, the stall dial, overdue udders, bringing into milk, bed rest and being kept: about 75 new lines so those scenes stop repeating.
 
 - **Companion 0.15.5: what your gear is doing to you, the long way.** "On you right now" (Traps tab) shows a full paragraph for each of the 35 pieces the traps, the parasite, the mystery box and the living suit can put on somebody, written to the wearer. The game's own item description stays short because the game caps it.
 

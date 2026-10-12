@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.15.7
+// @version      0.15.8
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -230,7 +230,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.15.7";
+  var VERSION = "0.15.8";
 
   // extension/src/config.js
   var BOT_MEMBER = 260239;
@@ -531,6 +531,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     "Pump Bung": "A fat black rubber bung, pushed in while the hose was still runnin' and swollen up behind your ring so it can't be squeezed out. Your belly's packed round and tight behind it and every step sets the lot sloshin'. You can feel it press on everything. It stays in till you've soaked up what you were given, so walk careful, and don't let anybody poke that belly unless you want to moan in front of them.",
     "Egg Post Plug": "The post didn't just lay in you, it corked you after. A thick ridged plug is seated right up against the clutch, each ridge holdin' you open a little wider than the last, so the eggs sit deep and warm and can't slip. When you clench, you clench on it. When the eggs shift, it shifts with them. It comes out when they've settled, and you'll gape for a while after.",
     "The Water's Grip": "Wet, heavy arms as thick as your wrist, wound round you from hand to elbow, every sucker kissin' your skin and holdin' on. They pull when you pull. They squeeze in time with whatever the rest of it is doin' between your legs, so you feel each thrust twice. You're not gettin' your hands back till it's finished.",
+    "The Water's Embrace": "It has you round the middle as well: thick wet arms wound over your belly and ribs and up between your tits, squeezing slow, holding you up out of the water like something it caught. You can feel it breathe against you. Every squeeze pushes what it's put in you a little deeper.",
     "The Water's Coils": "Slick coils round both thighs, hauled wide and kept wide. They're warm, they're strong, and they flex like somethin' breathin'. Try to close your legs and they open you further and hold you there, drippin', spread for it like a mare in the stocks. It wants room to work, and it's made some.",
     "Slime Seal": "It left the tip of itself in you. A fat knot of livin' flesh is buried to the root, pulsin' slow, plugged tight against a womb it packed with eggs, and it's still leakin' somethin' warm that keeps you wet and soft and wantin'. You can feel it twitch when you walk. It lets go when the clutch has taken hold, and not one second before.",
     "Boar's Plug": "What a boar leaves so his work isn't wasted: a hard waxy plug thick as your wrist, set deep while he was still tied in you. Behind it there's more hog seed than you'd think a belly could hold, hot and heavy, and you can hear it when you move. You smell of him. Everybody who gets close knows exactly what happened to you and how long it took.",
@@ -4141,7 +4142,18 @@ One of mods you are using is using an old version of SDK. It will work for now b
     "Stud's Stopper",
     "Pillory Spreader",
     "Parasite Suckers",
-    "Parasite Root"
+    "Parasite Root",
+    "The Water's Embrace",
+    "Growin' Plug",
+    "Hungry Belt",
+    "Milkmaid's Cups",
+    "Glutton's Funnel",
+    "The Hobble",
+    "Living Suit (legs)",
+    "Living Suit (hips)",
+    "Living Suit (chest)",
+    "Living Suit (arms)",
+    "Living Suit (mouth)"
   ];
   var GEAR_SLOTS = {
     plug: { groups: ["ItemButt"], names: ["InflVibeButtPlug", "BlackButtPlug", "ButtPlug", "ButtPump"], re: /ButtPlug|Plug/, color: "#2B2B2B" },
@@ -4154,7 +4166,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
     arms: { groups: ["ItemArms"], names: ["HempRope", "LeatherCuffs"], re: /Rope|Cuffs/ },
     legs: { groups: ["ItemLegs"], names: ["HempRope", "LeatherLegCuffs"], re: /Rope|Cuffs/ },
     ropeFeet: { groups: ["ItemFeet"], names: ["HempRope"], re: /Rope/ },
-    lips: { groups: ["ItemMouth", "ItemMouth2", "ItemMouth3"], names: ["LipGag"], re: /LipGag/, color: ["#E0607F", "#7A2B47", "#7A2B47"] }
+    // (a piece can ask for a spreader bar here instead)
+    lips: { groups: ["ItemMouth", "ItemMouth2", "ItemMouth3"], names: ["LipGag"], re: /LipGag/, color: ["#E0607F", "#7A2B47", "#7A2B47"] },
+    torso: { groups: ["ItemTorso", "ItemTorso2"], names: ["TentacleSuit", "HempRopeHarness"], re: /Harness/ },
+    tag: { groups: ["ItemNeckAccessories"], names: ["CollarNameTagLivestock", "CollarNameTag"], re: /NameTag/, needs: "ItemNeck" }
   };
   function gearAsset(group, slot, prefer) {
     const fam = P2().AssetFamily, get = (n) => {

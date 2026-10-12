@@ -63,9 +63,9 @@
     { where: "a patch on your thigh" },
     { where: "both thighs, to the hip", slot: "legs", name: "Living Suit (legs)", items: ["Slime"], desc: "Glossy black living latex, grown up both legs to the hip, warm as skin and tighter. It ripples when they walk, and it is still spreading." },
     { where: "your hips and everything between", slot: "belt", name: "Living Suit (hips)", desc: "The suit has closed over hips and groin in a seamless black skin, with a soft thick root of itself pushed up inside. It squeezes when they get close, and holds them there." },
-    { where: "your chest", slot: "cups", name: "Living Suit (chest)", desc: "Living latex moulded over both breasts, kneading in slow waves, with a wet little mouth of itself sealed over each nipple." },
+    { where: "your chest", slot: "cups", name: "Living Suit (chest)", items: ["NippleSuctionCups"], desc: "Living latex moulded over both breasts, kneading in slow waves, with a wet little mouth of itself sealed over each nipple." },
     { where: "your arms, to the fingertips", slot: "arms", name: "Living Suit (arms)", items: ["Slime"], desc: "The suit has run down both arms and webbed the fingers together. Their hands are its hands now, and it does not let them touch themselves." },
-    { where: "all of you, mouth and all", slot: "lips", name: "Living Suit (mouth)", desc: "The last of it: a smooth black sheath over the face from the nose down, and a tongue of itself in the mouth. Every inch of them is inside it now." },
+    { where: "all of you, mouth and all", slot: "lips", name: "Living Suit (mouth)", items: ["LatexSheathGag", "LatexMuzzleMask"], desc: "The last of it: a smooth black sheath over the face from the nose down, and a tongue of itself in the mouth. Every inch of them is inside it now." },
   ];
   const SUIT_COLOR = "#1A1A1F";
   function suitStage(s){ return Math.max(0, Math.min(SUIT_STAGES.length - 1, Math.floor((Date.now() - s.since) / (CFG.SUIT_HOURS*3600000 / SUIT_STAGES.length)))); }

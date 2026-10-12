@@ -5,7 +5,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 | Script | File in `dist/` | Where it runs | Current |
 |---|---|---|---|
-| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.29.3** |
+| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.29.4** |
 | Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.6.0** |
 | Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.1.3** |
 | Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **1.0.4** |
@@ -13,7 +13,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 | Map tools, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.3** |
 | Dairy | `farmhand-dairy.user.js` | the bot's PC | **1.0.2** |
 | Shows | `farmhand-shows.user.js` | the bot's PC | **1.0.4** |
-| Farmhand Companion | `farmhand-companion.user.js` | each player | **0.15.7** |
+| Farmhand Companion | `farmhand-companion.user.js` | each player | **0.15.8** |
 | Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.4** |
 
 ## Sending a watch report
@@ -23,6 +23,8 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 - Running the watcher on more than one game at once (the bot, yours, a tester's) lets Claude line them up into one timeline.
 
 ## Latest changes (newest first)
+
+- **Bot 0.29.4, Companion 0.15.8: farm gear fitted to the right game items.** Item names now come from the game's own list instead of guesses. The pump bung is a butt pump, the egg post leaves the XXL egg plug, the boar leaves a fuck plug, the stud's stopper is a hollow plug, the Slime Seal and the vine stem are a tentacle (in the ass) or a flesh-coloured dildo (the game has no tentacle item for the pussy), the pillory spreader is a real metal spreader bar, the breeding frame uses steel cuffs, the kennel uses a collar leash, the denial clamp is steel chastity panties, and the living suit's mouth is the latex sheath gag. The water also wraps the body now (the tentacle suit). **A keeper's tag is a real livestock name tag on the collar** (needs a collar and "Farm can put real gear on me"), with the tag's words as its name. The game has no belly item, so the belly stays in words. NOT YET SEEN LIVE.
 
 - **Bot 0.29.3, Companion 0.15.7: a sound for every trap.** Each trap now plays one of the game's own sounds when it springs (a hiss for gas, rope for the snare, a pneumatic latch for the milker and the cups, inflation for the pump, chain for the winch and the kennel, stretching latex for the living suit, and so on for all 44 kinds), and some play a second when they let go. The milking stall latches with a pneumatic clunk and releases with its twin. Home-built traps get a sound by what they do. Heard by the one caught and anybody near with farm sounds on. Sound names were checked against the game's Audio folder. NOT YET HEARD LIVE: tell me any that sound wrong.
 

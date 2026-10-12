@@ -126,7 +126,8 @@ const OLD_TAG = "[B&B Farm gear]";
 // of its description (live, Oct 11: a Slime Seal lost its tag and never came off)
 const FARM_NAMES = ["Parasite Lips", "Parasite Belt", "Pump Bung", "Egg Post Plug", "Slime Seal", "Boar's Plug", "Seed Pod Stem", "Denial Clamp", "Growth Cups",
   "Trap Milker", "Winch Chain", "Feed Chute", "Snare Rope", "Breedin' Frame Cuffs", "Kennel Lead", "The Water's Grip", "The Water's Coils", "Slime Sleeves", "Slime Stockings",
-  "Snare Hobble", "Pack's Knot", "Stud's Stopper", "Pillory Spreader", "Parasite Suckers", "Parasite Root"];
+  "Snare Hobble", "Pack's Knot", "Stud's Stopper", "Pillory Spreader", "Parasite Suckers", "Parasite Root", "The Water's Embrace",
+  "Growin' Plug", "Hungry Belt", "Milkmaid's Cups", "Glutton's Funnel", "The Hobble", "Living Suit (legs)", "Living Suit (hips)", "Living Suit (chest)", "Living Suit (arms)", "Living Suit (mouth)"];
 // slot → where it can go and which game item it is: the first that this game has; the pattern is a fallback
 const GEAR_SLOTS = {
   plug:     { groups: ["ItemButt"], names: ["InflVibeButtPlug", "BlackButtPlug", "ButtPlug", "ButtPump"], re: /ButtPlug|Plug/, color: "#2B2B2B" },
@@ -138,8 +139,10 @@ const GEAR_SLOTS = {
   ropeArms: { groups: ["ItemArms"], names: ["HempRope"], re: /Rope/ },
   arms:     { groups: ["ItemArms"], names: ["HempRope", "LeatherCuffs"], re: /Rope|Cuffs/ },
   legs:     { groups: ["ItemLegs"], names: ["HempRope", "LeatherLegCuffs"], re: /Rope|Cuffs/ },
-  ropeFeet: { groups: ["ItemFeet"], names: ["HempRope"], re: /Rope/ },
+  ropeFeet: { groups: ["ItemFeet"], names: ["HempRope"], re: /Rope/ },   // (a piece can ask for a spreader bar here instead)
   lips:     { groups: ["ItemMouth", "ItemMouth2", "ItemMouth3"], names: ["LipGag"], re: /LipGag/, color: ["#E0607F", "#7A2B47", "#7A2B47"] },
+  torso:    { groups: ["ItemTorso", "ItemTorso2"], names: ["TentacleSuit", "HempRopeHarness"], re: /Harness/ },
+  tag:      { groups: ["ItemNeckAccessories"], names: ["CollarNameTagLivestock", "CollarNameTag"], re: /NameTag/, needs: "ItemNeck" },
 };
 function gearAsset(group, slot, prefer) {
   const fam = P().AssetFamily, get = (n) => { try { return typeof window.AssetGet === "function" ? window.AssetGet(fam, group, n) : null; } catch (e) { return null; } };

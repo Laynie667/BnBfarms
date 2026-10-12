@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.29.3
+// @version      0.29.4
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -1828,7 +1828,7 @@
   ];
 
   // bot/src/version.js
-  var VERSION = "0.29.3";
+  var VERSION = "0.29.4";
 
   // bot-parts:farmhand-bot-parts
   (function() {
@@ -16163,6 +16163,7 @@
         when: "after",
         slot: (mn) => stopperFor(mn, "butt"),
         label: "Pump Bung",
+        items: ["ButtPump", "HollowButtPlug", "InflatableVibeDildo"],
         mins: 10,
         desc: "A fat black rubber bung, swollen tight inside, corking a belly pumped round and sloshing. It doesn't come out until every drop has soaked in."
       }],
@@ -16170,6 +16171,7 @@
         when: "after",
         slot: (mn) => stopperFor(mn, "vulva"),
         label: "Egg Post Plug",
+        items: ["EggVibePlugXXL", "PenisDildo"],
         mins: 15,
         desc: "The egg post's parting gift: a thick ridged plug seated deep behind a fresh clutch, holding every egg in a stretched, slick hole while they settle."
       }],
@@ -16184,6 +16186,14 @@
         },
         {
           when: "hold",
+          slot: "torso",
+          label: "The Water's Embrace",
+          items: ["TentacleSuit"],
+          color: FLESH,
+          desc: "It has them round the middle too: thick wet arms wound over belly and ribs and between the breasts, squeezing slow, holding them up out of the water like a catch."
+        },
+        {
+          when: "hold",
           slot: "legs",
           label: "The Water's Coils",
           items: ["Tentacles"],
@@ -16195,7 +16205,7 @@
           slot: (mn) => stopperFor(mn, "vulva"),
           label: "Slime Seal",
           mins: 15,
-          items: ["Tentacles", "Slime"],
+          items: ["Tentacles", "DoubleEndDildo", "PenisDildo"],
           color: FLESH,
           desc: "The thing left the tip of itself behind: a fat knot of living flesh buried to the root, pulsing, sealing a womb packed full of its eggs."
         }
@@ -16204,6 +16214,7 @@
         when: "after",
         slot: (mn) => stopperFor(mn, "vulva"),
         label: "Boar's Plug",
+        items: ["FuckPlug", "PenisPlug", "PenisDildo"],
         mins: 20,
         desc: "What a boar leaves so nothing leaks: a hard waxy plug as thick as a wrist, set deep, with a bellyful of hog seed sloshing behind it."
       }],
@@ -16212,7 +16223,7 @@
         slot: (mn) => stopperFor(mn, "vulva"),
         label: "Seed Pod Stem",
         mins: 10,
-        items: ["Tentacles"],
+        items: ["Tentacles", "PenisDildo"],
         color: "#3E8A3A",
         desc: "A cut length of thick green vine, still rooted inside and dripping sap, holding its seed pods where it planted them."
       }],
@@ -16240,6 +16251,7 @@
         when: "after",
         slot: "belt",
         label: "Denial Clamp",
+        items: ["SteelChastityPanties", "HeavyDutyBelt", "MetalChastityBelt"],
         mins: () => CFG.TRAP_DENY_MIN,
         desc: "Cold steel locked over everything worth touching. Inside, something soft licks and hums and stops, over and over. No cumming until it lets go."
       }],
@@ -16247,28 +16259,31 @@
         when: "after",
         slot: "cups",
         label: "Growth Cups",
+        items: ["NippleSuctionCups"],
         mins: 30,
         desc: "Two wide glass bells sucking hard at swollen teats, drawing them long and dark and fat. They stay on until these tits are a size bigger."
       }],
-      milker: [{ when: "hold", slot: "cups", label: "Trap Milker", desc: "Steel milking cups latched on with a greedy pull, nipples stretched down the glass, pumping this animal dry whether there's anything left or not." }],
+      milker: [{ when: "hold", slot: "cups", label: "Trap Milker", items: ["LactationPump"], desc: "Steel milking cups latched on with a greedy pull, nipples stretched down the glass, pumping this animal dry whether there's anything left or not." }],
       winch: [{
         when: "after",
         slot: "leash",
         label: "Winch Chain",
+        items: ["CollarChainShort", "CollarChainMedium"],
         mins: () => CFG.TRAP_WINCH_MIN,
         desc: "The chain that walked them across the yard on their toes, in front of everybody, like a heifer going to market. It's still clipped on."
       }],
-      chute: [{ when: "hold", slot: "funnel", label: "Feed Chute", desc: "A wide rubber funnel strapped between the teeth, throat held open, with a hopper of warm sweet mash pouring down until this belly is tight as a drum." }],
+      chute: [{ when: "hold", slot: "funnel", label: "Feed Chute", items: ["FunnelGag"], desc: "A wide rubber funnel strapped between the teeth, throat held open, with a hopper of warm sweet mash pouring down until this belly is tight as a drum." }],
       snare: [
         { when: "hold", slot: "arms", label: "Snare Rope", desc: "Rough rope cinched round both wrists and hauled up overhead, stringing them out helpless while the little machine teases." },
         { when: "hold", slot: "ropeFeet", label: "Snare Hobble", desc: "Rope round both ankles, pulling them wide apart. Everything between them is on show and out of their own reach." }
       ],
-      breeder: [{ when: "hold", slot: "arms", label: "Breedin' Frame Cuffs", desc: "Padded steel cuffs locking both wrists to the breeding frame: bent over, hips up, held still for the machine like a mare for the stud." }],
-      kennel: [{ when: "hold", slot: "leash", label: "Kennel Lead", desc: "A short lead clipped to the ring at the back of the kennel. Long enough to get on all fours. Not long enough to reach the door." }],
+      breeder: [{ when: "hold", slot: "arms", label: "Breedin' Frame Cuffs", items: ["SteelCuffs", "WristShackles", "LeatherCuffs"], desc: "Padded steel cuffs locking both wrists to the breeding frame: bent over, hips up, held still for the machine like a mare for the stud." }],
+      kennel: [{ when: "hold", slot: "leash", label: "Kennel Lead", items: ["CollarLeash", "ChainLeash"], desc: "A short lead clipped to the ring at the back of the kennel. Long enough to get on all fours. Not long enough to reach the door." }],
       wolves: [{
         when: "after",
         slot: (mn) => stopperFor(mn, "vulva"),
         label: "Pack's Knot",
+        items: ["PenisDildo", "PenisPlug"],
         mins: 10,
         color: "#B3323A",
         desc: "The last wolf's knot, still swollen fat inside and throbbing, tying them to a bellyful of the whole pack's seed until it finally goes down."
@@ -16277,6 +16292,7 @@
         when: "after",
         slot: (mn) => stopperFor(mn, "vulva"),
         label: "Stud's Stopper",
+        items: ["HollowButtPlug", "PenisDildo"],
         mins: 10,
         desc: "A stable hand's rubber stopper, shoved in after the stallion pulled out, to keep a mare's worth of horse cum from pouring down their legs."
       }],
@@ -16284,6 +16300,7 @@
         when: "after",
         slot: "ropeFeet",
         label: "Pillory Spreader",
+        items: ["SpreaderMetal", "HeavySpreaderMetal"],
         mins: () => CFG.TRAP_PILLORY_MIN,
         desc: "A bar ratcheted between the ankles so the legs can't close while they're bent in the pillory. Whoever walks up gets whichever hole they like."
       }]
@@ -17398,9 +17415,9 @@
       { where: "a patch on your thigh" },
       { where: "both thighs, to the hip", slot: "legs", name: "Living Suit (legs)", items: ["Slime"], desc: "Glossy black living latex, grown up both legs to the hip, warm as skin and tighter. It ripples when they walk, and it is still spreading." },
       { where: "your hips and everything between", slot: "belt", name: "Living Suit (hips)", desc: "The suit has closed over hips and groin in a seamless black skin, with a soft thick root of itself pushed up inside. It squeezes when they get close, and holds them there." },
-      { where: "your chest", slot: "cups", name: "Living Suit (chest)", desc: "Living latex moulded over both breasts, kneading in slow waves, with a wet little mouth of itself sealed over each nipple." },
+      { where: "your chest", slot: "cups", name: "Living Suit (chest)", items: ["NippleSuctionCups"], desc: "Living latex moulded over both breasts, kneading in slow waves, with a wet little mouth of itself sealed over each nipple." },
       { where: "your arms, to the fingertips", slot: "arms", name: "Living Suit (arms)", items: ["Slime"], desc: "The suit has run down both arms and webbed the fingers together. Their hands are its hands now, and it does not let them touch themselves." },
-      { where: "all of you, mouth and all", slot: "lips", name: "Living Suit (mouth)", desc: "The last of it: a smooth black sheath over the face from the nose down, and a tongue of itself in the mouth. Every inch of them is inside it now." }
+      { where: "all of you, mouth and all", slot: "lips", name: "Living Suit (mouth)", items: ["LatexSheathGag", "LatexMuzzleMask"], desc: "The last of it: a smooth black sheath over the face from the nose down, and a tongue of itself in the mouth. Every inch of them is inside it now." }
     ];
     const SUIT_COLOR = "#1A1A1F";
     function suitStage(s) {
@@ -18953,6 +18970,7 @@
       const k = r.kept;
       r.kept = null;
       if (r.rights && r.rights.kept) r.rights = null;
+      gearOff(mn, "tag", "kept");
       saveLedger();
       syncCompanions(true);
       if (why !== "quiet") tell(k.by, "\u{1F3F7}\uFE0F " + plainName(mn) + " isn't kept by you any more, sugar" + (why === "time" ? ": the week's up." : "."));
@@ -19025,6 +19043,8 @@
         k.tag = rest.replace(/[^A-Za-z0-9 !?.,'&#*+-]/g, "").slice(0, 20).toUpperCase();
         saveLedger();
         syncCompanions(true);
+        gearOff(t, "tag", "kept");
+        if (k.tag) gearOn(t, "tag", k.tag, "A livestock tag clipped to the collar ring, stamped with what their keeper calls them. It swings and rings when they move, and it says whose they are.", Math.max(5, (k.until - Date.now()) / 6e4), "kept", { items: ["CollarNameTagLivestock", "CollarNameTag"] });
         if (k.tag && !bodyMark(t, { write: { line: k.tag, pos: 4, style: 0 } })) tell(t, `\u{1F3F7}\uFE0F With the Companion and "Farm can mark my body" on, you'd be wearin' "` + k.tag + '" on your skin right now, sugar.');
         tell(t, "\u{1F3F7}\uFE0F " + plainName(sender) + " has tagged you: " + (k.tag || "nothin'") + ".");
         R("\u{1F3F7}\uFE0F Tagged: " + (k.tag || "cleared") + ".");

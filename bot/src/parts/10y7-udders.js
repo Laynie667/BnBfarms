@@ -292,7 +292,7 @@
   function keptOf(mn){ const r = rec(mn); return r && r.kept && r.kept.until > Date.now() ? r.kept : null; }
   function keptEnd(mn, why){
     const r = rec(mn); if (!r || !r.kept) return false;
-    const k = r.kept; r.kept = null; if (r.rights && r.rights.kept) r.rights = null; saveLedger(); syncCompanions(true);
+    const k = r.kept; r.kept = null; if (r.rights && r.rights.kept) r.rights = null; gearOff(mn, "tag", "kept"); saveLedger(); syncCompanions(true);
     if (why !== "quiet") tell(k.by, "🏷️ "+plainName(mn)+" isn't kept by you any more, sugar"+(why === "time" ? ": the week's up." : "."));
     return true;
   }
@@ -328,6 +328,8 @@
     if (sub === "off" || sub === "release"){ keptEnd(t, "quiet"); tell(t, "🏷️ "+plainName(sender)+" has let you go, sugar. You're not kept any more."); R("🏷️ Let go."); return; }
     if (sub === "tag"){
       k.tag = rest.replace(/[^A-Za-z0-9 !?.,'&#*+-]/g, "").slice(0, 20).toUpperCase(); saveLedger(); syncCompanions(true);
+      gearOff(t, "tag", "kept");
+      if (k.tag) gearOn(t, "tag", k.tag, "A livestock tag clipped to the collar ring, stamped with what their keeper calls them. It swings and rings when they move, and it says whose they are.", Math.max(5, (k.until - Date.now())/60000), "kept", { items: ["CollarNameTagLivestock", "CollarNameTag"] });   // the real tag, on their collar (needs "Farm can put real gear on me")
       if (k.tag && !bodyMark(t, { write: { line: k.tag, pos: 4, style: 0 } })) tell(t, "🏷️ With the Companion and \"Farm can mark my body\" on, you'd be wearin' \""+k.tag+"\" on your skin right now, sugar.");
       tell(t, "🏷️ "+plainName(sender)+" has tagged you: "+(k.tag || "nothin'")+"."); R("🏷️ Tagged: "+(k.tag || "cleared")+"."); return;
     }

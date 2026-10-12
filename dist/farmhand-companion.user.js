@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.15.1
+// @version      0.15.2
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -230,7 +230,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.15.1";
+  var VERSION = "0.15.2";
 
   // extension/src/config.js
   var BOT_MEMBER = 260239;
@@ -640,7 +640,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       happeningCard(ctx2),
       s.stateErr && card(title("Somethin' broke on the farm girl's end"), muted("Part of your panel didn't arrive. Tell the proprietors this line: " + s.stateErr)),
       tc ? card(
-        h("div", { class: "fhc-kv" }, title("Trap card"), chip(tc.total + " sprung", "acc")),
+        h("div", { class: "fhc-kv" }, title("Trap card" + (tc.rank ? " \xB7 " + tc.rank : "")), chip(tc.total + " sprung" + (tc.nextRank ? " \xB7 next rank at " + tc.nextRank : ""), "acc")),
         tc.kinds.length ? h("div", null, tc.kinds.map((k) => chip(k.kind + " \xD7" + k.n))) : muted("Nothin's caught you yet. Give it time."),
         muted(tc.left + " kind" + (tc.left === 1 ? "" : "s") + " still to find" + (tc.eggs ? " \xB7 " + tc.eggs + " eggs laid" : "") + (tc.paused ? " \xB7 traps paused" : "") + (tc.eager ? " \xB7 eager (no waits)" : "") + (tc.danger ? " \xB7 Danger Draught in you" : "")),
         tc.hunt && muted("\u{1F514} The hunt is on: get to " + tc.hunt.goal),
@@ -651,7 +651,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
           btn(tc.paused ? "Traps on" : "Pause traps", () => ctx2.send("traps " + (tc.paused ? "on" : "off"))),
           btn(tc.eager ? "Eager: on" : "Eager: off", () => ctx2.send("traps eager " + (tc.eager ? "off" : "on"))),
           btn("What's out there", () => ctx2.send("traps")),
-          btn("Lay (at the nest)", () => ctx2.send("lay"))
+          btn("Lay (at the nest)", () => ctx2.send("lay")),
+          btn("My brood book", () => ctx2.send("brood"))
         )
       ) : (s.roles || []).includes("SUBJECT") ? card(
         title("Trap card"),

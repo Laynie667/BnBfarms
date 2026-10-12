@@ -274,7 +274,7 @@
     const r = rec(mn); if (!isSubject(mn)) return null;
     const k = r.trapKinds || {}, all = Object.keys(TRAP_KINDS);
     return { total: r.trapN || 0, kinds: all.filter(x => k[x]).map(x => ({ kind: x, icon: TRAP_KINDS[x].icon, n: k[x] })), left: all.filter(x => !k[x]).length,
-             eggs: (prodOf(mn).offspring || {}).eggs || 0, paused: !!r.trapsOff, eager: !!r.trapEager, danger: dangerX(mn).on, hunt: huntOn() ? { until: L.hunt.until, goal: L.hunt.goal } : null };
+             eggs: (prodOf(mn).offspring || {}).eggs || 0, paused: !!r.trapsOff, eager: !!r.trapEager, danger: dangerX(mn).on, rank: SUBJECT_RANKS[rankOfSubject(mn)].name, nextRank: (SUBJECT_RANKS[rankOfSubject(mn) + 1] || {}).at || 0, hunt: huntOn() ? { until: L.hunt.until, goal: L.hunt.goal } : null };
   }
   function subjBoardLine(){
     const w = subjWeek(), top = (o, unit) => { const e = Object.entries(o).sort((a, b) => b[1] - a[1])[0]; return e ? plainName(parseInt(e[0], 10))+" ("+e[1]+" "+unit+")" : null; };

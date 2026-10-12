@@ -1559,6 +1559,7 @@ Welcome to B&B Farm, hon. 🌾`);
       case "subject": case "subjects": case "traps": case "trap": case "watersports": case "watersport": trapCommand(cmd === "watersport" ? "watersports" : cmd, sender, args, R); break;   // 10u-traps.js
       case "parasite": case "parasites": case "purge": parasiteCommand(cmd === "parasites" ? "parasite" : cmd, sender, args, R); break;   // 10v-parasite.js
       case "quiet": case "tend": broodCommand(cmd, sender, args, R); break;   // 10y2-brood.js
+      case "brood": case "bet": ranksCommand(cmd, sender, args, R); break;   // 10y3-trap-ranks.js
       case "eager": trapCommand("traps", sender, ["eager"].concat(args), R); break;   // the no-cooldown switch, as its own command (and a Toggles switch)
       case "struggle": case "free": case "goad": case "hunt": case "lay": case "gather": case "pack": extrasCommand(cmd, sender, args, R); break;   // 10x-trap-extras.js
       case "feedback": case "suggest": case "idea": case "bug": case "meh": case "more": feedbackCommand(cmd, sender, args, rest, R); break;   // the suggestion box (10q)

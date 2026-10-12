@@ -189,6 +189,7 @@
     const r = rec(mn), w = r && r.trapWait; if (!w) return false;
     r.trapWait = null; if (r.penned && r.penned.trap) r.penned = null;
     saveLedger();
+    try { betsWaitEnd(mn, how); } catch(e){ warn("bets:", e); }
     if (how === "quiet") return true;
     if (w.kind === "mirror") trance(mn, 0);
     if (charFor(mn)) emote(TRAP_KINDS[w.kind].icon+" "+moreLine(w.kind, how === "gave" ? "gave" : "held", mn), mn);

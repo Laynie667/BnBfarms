@@ -5,15 +5,15 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 | Script | File in `dist/` | Where it runs | Current |
 |---|---|---|---|
-| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.26.0** |
-| Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.5.8** |
+| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.27.0** |
+| Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.6.0** |
 | Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.1.3** |
 | Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **1.0.4** |
 | Barn life | `farmhand-barn-life.user.js` | the bot's PC | **1.0.5** |
 | Map tools, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.3** |
 | Dairy | `farmhand-dairy.user.js` | the bot's PC | **1.0.2** |
 | Shows | `farmhand-shows.user.js` | the bot's PC | **1.0.4** |
-| Farmhand Companion | `farmhand-companion.user.js` | each player | **0.15.1** |
+| Farmhand Companion | `farmhand-companion.user.js` | each player | **0.15.2** |
 | Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.4** |
 
 ## Sending a watch report
@@ -23,6 +23,14 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 - Running the watcher on more than one game at once (the bot, yours, a tester's) lets Claude line them up into one timeline.
 
 ## Latest changes (newest first)
+
+- **Bot 0.27.0, Companion 0.15.2, Glory stalls 1.6.0: ranks, traps that hand you on, the brood book, bets, a stall of your own.**
+  - **Subject ranks** by traps sprung: Bait, Trap Fodder (10), Brood Sow (25), Broodmother (60). Each rank: water 25% hungrier, resets 20% faster, clutches 10% bigger, and likelier to be handed on. Shown on the trap card.
+  - **Traps hand them on**: a quarter of the time (more with rank or a Danger Draught) a finished trap passes the subject straight to another, up to three in a row. Never during `?quiet` or after a safeword.
+  - **`?brood`** (their own) / `?brood <who>` (proprietors): what has bred them and how often, eggs laid, litters, the biggest clutch, whose they carried. A button on the Traps tab.
+  - **Watchers bet**: when a trap that lays (or the tickle rack or mirror box) takes somebody, people within four steps are offered `?bet <ribbons> high|low` (or `breaks|holds`). Up to 5 ribbons, double back for calling it right.
+  - **A stall of your own** (Glory stalls 1.6.0): `?stall claim` while standing in one puts their name and the day's tally on the door, on the `?stalls` board for everybody. The fullest claimed door earns a ribbon the next day. `?stall unclaim`.
+  - The private add-on (1.17.0, not on GitHub): Dolly can send her to a trap spot or bait one for her (`?mine traps on`).
 
 - **Bot 0.26.0, Companion 0.15.1: laying and birth as scenes, a belly that shows, scents, different water, a quiet hour.**
   - **Laying is a scene**, as long as the clutch is big (two beats for a handful, eight for a hundred). They are held on the nest until the last egg; the eggs only count at the end, and the safeword stops it with the rest still in. `?tend <who>` writes a helper into it and pays them a ribbon. A litter born on the farm plays out in beats too.

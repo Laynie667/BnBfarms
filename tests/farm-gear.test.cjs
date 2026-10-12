@@ -92,7 +92,7 @@ const wait=ms=>new Promise(r=>setTimeout(r,ms));
   W.__FARMHAND_TEST__=true; eval(fs.readFileSync(path.join(__dirname,'../dist/farmhand-bot.user.js'),'utf8'));
   const L=()=>W.FarmhandLedger(), R=mn=>L().people[mn];
   const say=async(mn,msg,ms)=>{ handlers.ChatRoomMessage({Sender:mn,Type:'Whisper',Content:msg,Target:260239}); await wait(ms||2200); };
-  await wait(3500); const cfg=W.__cfg; cfg.USER_COOLDOWN_S=0; cfg.TRAP_BEAT_S=0.15; cfg.TRAP_COOLDOWN_MIN=0;
+  await wait(3500); const cfg=W.__cfg; cfg.USER_COOLDOWN_S=0; cfg.TRAP_BEAT_S=0.15; cfg.TRAP_COOLDOWN_MIN=0; cfg.CHAIN_CHANCE=0;
   chars[1].Name='Laynie'; chars[2].Name='Moo'; await say(500,'?stats');
   const gearOf=mn=>(W.__stateFor(mn).farmGear||[]).map(g=>g.slot+':'+g.name).join(' ');
   await say(221397,'?trap spring Moo clamp'); await wait(1500);

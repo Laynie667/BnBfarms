@@ -92,12 +92,12 @@ function traps(ctx) {
   return [
     happeningCard(ctx),
     s.stateErr && card(title("Somethin' broke on the farm girl's end"), muted("Part of your panel didn't arrive. Tell the proprietors this line: " + s.stateErr)),
-    tc ? card(h("div", { class: "fhc-kv" }, title("Trap card"), chip(tc.total + " sprung", "acc")),
+    tc ? card(h("div", { class: "fhc-kv" }, title("Trap card" + (tc.rank ? " · " + tc.rank : "")), chip(tc.total + " sprung" + (tc.nextRank ? " · next rank at " + tc.nextRank : ""), "acc")),
       tc.kinds.length ? h("div", null, tc.kinds.map((k) => chip(k.kind + " ×" + k.n))) : muted("Nothin's caught you yet. Give it time."),
       muted(tc.left + " kind" + (tc.left === 1 ? "" : "s") + " still to find" + (tc.eggs ? " · " + tc.eggs + " eggs laid" : "") + (tc.paused ? " · traps paused" : "") + (tc.eager ? " · eager (no waits)" : "") + (tc.danger ? " · Danger Draught in you" : "")),
       tc.hunt && muted("🔔 The hunt is on: get to " + tc.hunt.goal),
       h("div", null, btn("Struggle", () => ctx.send("struggle")), btn(tc.paused ? "Traps on" : "Pause traps", () => ctx.send("traps " + (tc.paused ? "on" : "off"))),
-        btn(tc.eager ? "Eager: on" : "Eager: off", () => ctx.send("traps eager " + (tc.eager ? "off" : "on"))), btn("What's out there", () => ctx.send("traps")), btn("Lay (at the nest)", () => ctx.send("lay"))))
+        btn(tc.eager ? "Eager: on" : "Eager: off", () => ctx.send("traps eager " + (tc.eager ? "off" : "on"))), btn("What's out there", () => ctx.send("traps")), btn("Lay (at the nest)", () => ctx.send("lay")), btn("My brood book", () => ctx.send("brood"))))
        : (s.roles || []).includes("SUBJECT")
          // a subject, but the farm girl sent no card: her bot is older than this panel
          ? card(title("Trap card"), muted("You're a test subject, and the traps are live for you. Your card isn't showin' because the farm girl's bot (v" + ((ctx.welcome && ctx.welcome.ver) || "?") + ") is older than this panel: it needs 0.22 or newer on her computer to send it."),

@@ -140,6 +140,7 @@ function finish(id, mn, hole, ml, inside, visitor) {
   me.biggest = Math.max(me.biggest || 0, ml);
   if (visitor) { me.kinds = me.kinds || {}; me.kinds[visitor.type] = (me.kinds[visitor.type] || 0) + 1; }
   bump(d.stalls[id] = d.stalls[id] || {}, 1);
+  { const cl = Object.values(d.claims || {}).find((c) => c.mn === mn && c.day === today()); if (cl) cl.n = (cl.n || 0) + 1; }   // their own stall's tally
   const leader = api.herdLeaderOf(mn);
   if (leader) api.staffPoints(leader, 1, "glory");
   const r = api.rec(mn);
@@ -170,6 +171,7 @@ function scheduleNext(id, mn) {
 const toldWhy = {};   // member -> when they were last told why a stall does nothing for them
 function tick() {
   const d = D(), now = Date.now();
+  try { claimsTick(); } catch (e) { /* tomorrow, then */ }
   // shifts endin'
   for (const [mn, sh] of Object.entries(d.shifts)) {
     if (sh.until > now) continue;
@@ -233,13 +235,32 @@ function cmdGlory(c) {
     (d.shifts[sender] ? "\nOn " + (d.shifts[sender].punish ? "a punishment " : "") + "shift for " + Math.ceil((d.shifts[sender].until - Date.now()) / 60000) + " more minutes." : ""));
 }
 
+// A STALL OF YOUR OWN: stock standin' in a stall can claim it for the day (?stall claim). Their name goes on the door
+// and their day's tally with it, where everybody can read it. At the end of the day the claimed stall with the
+// fullest tally earns its owner a ribbon. ?stall unclaim takes the name down.
+function claimOf(id) { const c = (D().claims || {})[id]; return c && c.day === today() ? c : null; }
+function tallyOf(mn) { const me = D().people[mn]; return me && me.day === today() ? me.today : 0; }
+function claimsTick() {
+  const d = D(); d.claims = d.claims || {};
+  const old = Object.entries(d.claims).filter(([, c]) => c.day !== today());
+  if (!old.length) return;
+  // yesterday's doors: the fullest tally takes the ribbon (people[mn].yesterday is kept by bump below)
+  let best = null;
+  for (const [id, c] of old) { const n = c.n || 0; if (n > 0 && (!best || n > best.n)) best = { id, mn: c.mn, n }; delete d.claims[id]; }
+  if (best) {
+    api.notice(best.mn, "\u{1F573}\uFE0F Your stall had the fullest tally on the farm yesterday, sugar: " + best.n + ". That's a ribbon.");
+    if (api.ribbons) api.ribbons(best.mn, 1, "the fullest glory stall of the day");
+  }
+  api.save();
+}
 function board(staff) {
   const d = D(), ids = stallIds();
   if (!ids.length) return "🕳️ No glory stalls are set up yet. Herdmasters: ?spot set glory-1 inside the booth and ?spot set glory-1-visitor outside the hole.";
   return "🕳️ GLORY STALLS\n" + ids.map((id) => {
     const s = d.stalls[id] || {}, mn = occupantOf(id), n = s.day === today() ? s.today : 0;
     const sh = mn && d.shifts[mn];
-    return "Stall " + id + ": " + (mn ? (staff ? api.name(mn) : "occupied") + (running.has(id) ? " · busy right now" : "") : "empty") +
+    const cl = claimOf(id);
+    return "Stall " + id + (cl ? " (" + api.name(cl.mn) + "'s stall, " + tallyOf(cl.mn) + " today)" : "") + ": " + (mn ? (staff || (cl && cl.mn === mn) ? api.name(mn) : "occupied") + (running.has(id) ? " · busy right now" : "") : "empty") +
       " · " + n + " today" + (staff && sh ? " · " + (sh.punish ? "punishment " : "") + "shift, " + Math.ceil((sh.until - Date.now()) / 60000) + " min left" : "");
   }).join("\n");
 }
@@ -247,6 +268,23 @@ function board(staff) {
 function cmdStall(c) {
   const { sender, args, api: A } = c, d = D(), sub = String(args[0] || "").toLowerCase(), staff = A.isStaff(sender);
   if (!sub || sub === "board") return c.reply(board(staff));
+  if (sub === "claim" || sub === "unclaim") {
+    d.claims = d.claims || {};
+    const mine = Object.entries(d.claims).find(([, x]) => x.mn === sender && x.day === today());
+    if (sub === "unclaim") {
+      if (!mine) return c.reply("You've no stall of your own today, sugar.");
+      delete d.claims[mine[0]]; A.save();
+      return c.reply("\u{1F573}\uFE0F Your name's off the door of stall " + mine[0] + ".");
+    }
+    const id = stallOf(sender);
+    if (!id) return c.reply("Stand in the stall you want first, sugar, then ?stall claim.");
+    if (whyNot(sender)) return c.reply("You can't claim a stall just now: " + whyNot(sender) + ".");
+    if (mine) return c.reply(mine[0] === id ? "Stall " + id + " is already yours today, sugar." : "You've got stall " + mine[0] + " today, sugar. ?stall unclaim first if you want this one.");
+    if (claimOf(id)) return c.reply("Stall " + id + " has " + A.name(claimOf(id).mn) + "'s name on the door today.");
+    d.claims[id] = { mn: sender, day: today(), n: 0 }; A.save();
+    A.privateEmote(sender, "The farm girl chalks " + A.name(sender) + "'s name on the door of stall " + id + ", with a zero under it. \"Let's see you fill that in, sugar.\"");
+    return c.reply("\u{1F573}\uFE0F Stall " + id + " is yours for today. Your name's on the door and every finish gets chalked under it, on the ?stalls board for all to see. The fullest door tonight earns a ribbon. ?stall unclaim takes it down.");
+  }
 
   if (sub === "use") {
     const id = visitorStallOf(sender);
@@ -359,7 +397,7 @@ connect({
   setup(a) { api = a; D(); },
   commands: {
     glory: { usage: "glory on|off", private: true, run: cmdGlory },
-    stall: { usage: "stall use|shift|punish|release", private: true, run: cmdStall },
+    stall: { usage: "stall use|claim|unclaim|shift|punish|release", private: true, run: cmdStall },
     stalls: { usage: "stalls", private: true, run: (c) => c.reply(board(c.api.isStaff(c.sender))) },
   },
   on: { tick, safe: onSafe },

@@ -486,6 +486,9 @@ TEST SUBJECTS & TRAPS
   ?subject quit · off the list for good
   ?quiet [minutes] · an hour where nothin' new starts on you
   ?tend <who> · help somebody lay (a ribbon in it)
+  ?brood · your brood book: what's bred you, what you carried
+  ?bet <ribbons> high|low · a flutter when a trap takes somebody
+     near you (breaks|holds for the rack and the mirror)
   ?struggle · one try at slippin' a trap that has you
   ?traps eager on · no breather between traps, no resets
   ?free <who> · get a caught subject out · ?goad <who> · or don't

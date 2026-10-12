@@ -88,7 +88,8 @@
   function trapRun(mn, kind, beats, done, v){
     state.trapRuns = state.trapRuns || new Map();
     const run = { kind, i: 0, timer: null, beats: (beats = beats.slice()) };   // (a copy: ?struggle can add to it)
-    const before = { pissed: (rec(mn) || {}).pissed || 0 };
+    const before = { pissed: (rec(mn) || {}).pissed || 0, eggs: ((prodOf(mn) || {}).eggs || {}).n || 0 };
+    try { offerBets(mn, kind); } catch(e){ warn("bets:", e); }   // watchers get a flutter (10y3-trap-ranks.js)
     // it never lets go before its story's told
     { const r0 = rec(mn); if (r0 && r0.penned && r0.penned.trap) r0.penned.until = Math.max(r0.penned.until, Date.now() + (beats.length + 1)*CFG.TRAP_BEAT_S*1000); }
     const gearPlan = trapGearStart(mn, kind);   // real gear, for those who let the farm put it on them (10y-farm-gear.js)
@@ -103,7 +104,8 @@
       }
       state.trapRuns.delete(mn);
       if (charFor(mn)){ try { done(); trapDone(mn, kind, before); } catch(e){ warn("trap "+kind+":", e); } }
-      try { trapGearDone(mn, charFor(mn) ? gearPlan : null); } catch(e){ warn("trap gear:", e); }   // (what they're left wearin': 10x-trap-extras.js)
+      try { trapGearDone(mn, charFor(mn) ? gearPlan : null); } catch(e){ warn("trap gear:", e); }
+      try { if (charFor(mn)) trapAfter(mn, kind, before); } catch(e){ warn("trap after:", e); }   // ranks, bets, bein' handed on (10y3-trap-ranks.js)   // (what they're left wearin': 10x-trap-extras.js)
       trapFree(mn); saveLedger(); syncCompanions(true);
     };
     step();
@@ -144,6 +146,7 @@
     if (wornTags(mn).has("fertility")) x *= 1.5;
     if (inHeat(p)) x *= 1.25;
     x *= 1 + 2*potionX(mn, "tentaclemusk");
+    x *= rankX(mn).eggs;   // a higher-ranked subject carries more (10y3-trap-ranks.js)
     return x;
   }
   // clutches STACK: every encounter adds to what they're already carryin', up to CFG.EGG_MAX
@@ -344,7 +347,7 @@
       if (on){
         if (!fresh) continue;                                                             // step off and back on to spring it again
         r.spotTrapAt = r.spotTrapAt || {};
-        if (!r.trapEager && now - (r.spotTrapAt[here] || 0) < CFG.TRAP_RESET_MIN*60000*nightX().reset/dangerX(mn).chance) continue;   // each trap takes a while to reset (half as long after dark)
+        if (!r.trapEager && now - (r.spotTrapAt[here] || 0) < CFG.TRAP_RESET_MIN*60000*nightX().reset/dangerX(mn).chance/rankX(mn).reset) continue;   // each trap takes a while to reset (half as long after dark)
         const kind = trapKindOf(here);
         if (!springTrap(mn, kind, here)){ r.trapAt = now; r.spotTrapAt[here] = now; saveLedger(); }
       } else {
@@ -353,7 +356,7 @@
         if (!fresh && now - (st.rolled || 0) < CFG.TENTACLE_LINGER_MIN*60000/(potionOn(mn, "tentaclemusk") ? 5 : 1)) continue;   // (with Tentacle Musk on, it looks again every minute)
         st.rolled = now;
         const wk = waterKindOf(here);   // tentacles, leeches, the well, or slime (10y2-brood.js)
-        if (((wk === "tentacle" && parasiteKin(mn, now)) || Math.random() < Math.min(1, CFG.TENTACLE_CHANCE*nightX().water*dangerX(mn).chance*(potionOn(mn, "tentaclemusk") ? CFG.MUSK_WATER_X : 1))) && !springTrap(mn, wk, here)){ r.trapAt = now; saveLedger(); }   // (three times as hungry after dark)
+        if (((wk === "tentacle" && parasiteKin(mn, now)) || Math.random() < Math.min(1, CFG.TENTACLE_CHANCE*nightX().water*dangerX(mn).chance*rankX(mn).water*(potionOn(mn, "tentaclemusk") ? CFG.MUSK_WATER_X : 1))) && !springTrap(mn, wk, here)){ r.trapAt = now; saveLedger(); }   // (three times as hungry after dark)
       }
     }
     toyTick(); moreTrapTick(); trapExtrasTick(); farmGearTick(Date.now()); broodTick();

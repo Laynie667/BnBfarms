@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.26.0
+// @version      0.27.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -1828,7 +1828,7 @@
   ];
 
   // bot/src/version.js
-  var VERSION = "0.26.0";
+  var VERSION = "0.27.0";
 
   // bot-parts:farmhand-bot-parts
   (function() {
@@ -2388,6 +2388,12 @@
       // each time a subject wades into a water spot (and every TENTACLE_LINGER_MIN they stay)
       TENTACLE_LINGER_MIN: 5,
       TENTACLE_HYPER_CHANCE: 0.25,
+      CHAIN_CHANCE: 0.25,
+      CHAIN_MAX: 3,
+      // one trap handin' a subject to the next: how often, and how many in a row
+      BET_MAX: 5,
+      BET_OPEN_S: 120,
+      // watchers' bets: the most ribbons, and how long the book stays open
       LAY_SCENE: true,
       // layin' and birthin' play out in beats (false: the old single line)
       BELLY_SEEN_MIN: 20,
@@ -3411,7 +3417,7 @@
     };
     W.FarmhandExport = exportLedger;
     W.FarmhandLedger = () => L;
-    if (W.__FARMHAND_TEST__) Object.assign(W, { __st: () => state, __cfg: CFG, __pt: prodTick, __qt: quotaTick, __lt: leashTick, __ms: milkingStallTick, __vt: voiceTick, __sync: syncCompanions, __gt: gearTick, __ht: homeTick, __addons: (h, ...a) => addonsEmit(h, ...a), __stateFor: (mn) => stateFor(mn), __leadTick: () => leadTick(), __ambient: () => ambientTick(), __about: (t) => aboutWhom(t), __announce: (t) => announce(t), __reply: (mn, t, ch) => reply(mn, t, ch), __office: () => officeCheck(), __namesHere: (t) => namesHere(t), __speciesCheck: (t) => QUESTIONS.find((q) => q.key === "species").check(t), __attach: () => attachListeners(), __tryLogin: () => tryLogin(), __beepText: (m) => beepText(m), __nameOnce: (t, mn) => nameOnce(t, mn), __buildContract: (n, mn, d) => buildContract(contractTemplate(n), mn, d), __potionTick: () => potionTick(), __penTick: () => penTick(), __trapTick: () => trapTick(), __belly: (m) => bellyStage(m), __happening: (m) => happeningFor(m), __gearOn: (m, s, l, d, x) => gearOn(m, s, l, d, x), __heard: (mn, t) => trapHeard(mn, t), __parasiteTick: () => parasiteTick(), __parts: (m) => parasiteParts(rec(m).parasite), __climax: (m) => parasiteClimax(m), __nurse: (a, b) => parasiteNurse(a, b), __parasiteChance: (m) => parasiteChance(m), __kiss: (a, f, s, t) => parasiteKiss(a, f, s, t), __load: (s, m, h, x) => parasiteLoad(s, m, h, x), __shot: (t, by, text, how) => applyShot(t, by, text, how), __slow: (mn) => slowOf(mn), __milkRate: (mn) => milkRate(mn), __benchTick: () => benchTick(), __roll: (m, s, a, b) => rollConception(m, s, a, b), __contractTick: () => {
+    if (W.__FARMHAND_TEST__) Object.assign(W, { __st: () => state, __cfg: CFG, __pt: prodTick, __qt: quotaTick, __lt: leashTick, __ms: milkingStallTick, __vt: voiceTick, __sync: syncCompanions, __gt: gearTick, __ht: homeTick, __addons: (h, ...a) => addonsEmit(h, ...a), __stateFor: (mn) => stateFor(mn), __leadTick: () => leadTick(), __ambient: () => ambientTick(), __about: (t) => aboutWhom(t), __announce: (t) => announce(t), __reply: (mn, t, ch) => reply(mn, t, ch), __office: () => officeCheck(), __namesHere: (t) => namesHere(t), __speciesCheck: (t) => QUESTIONS.find((q) => q.key === "species").check(t), __attach: () => attachListeners(), __tryLogin: () => tryLogin(), __beepText: (m) => beepText(m), __nameOnce: (t, mn) => nameOnce(t, mn), __buildContract: (n, mn, d) => buildContract(contractTemplate(n), mn, d), __potionTick: () => potionTick(), __penTick: () => penTick(), __trapTick: () => trapTick(), __rank: (m) => rankX(m), __broodBook: (m) => broodBook(m), __belly: (m) => bellyStage(m), __happening: (m) => happeningFor(m), __gearOn: (m, s, l, d, x) => gearOn(m, s, l, d, x), __heard: (mn, t) => trapHeard(mn, t), __parasiteTick: () => parasiteTick(), __parts: (m) => parasiteParts(rec(m).parasite), __climax: (m) => parasiteClimax(m), __nurse: (a, b) => parasiteNurse(a, b), __parasiteChance: (m) => parasiteChance(m), __kiss: (a, f, s, t) => parasiteKiss(a, f, s, t), __load: (s, m, h, x) => parasiteLoad(s, m, h, x), __shot: (t, by, text, how) => applyShot(t, by, text, how), __slow: (mn) => slowOf(mn), __milkRate: (mn) => milkRate(mn), __benchTick: () => benchTick(), __roll: (m, s, a, b) => rollConception(m, s, a, b), __contractTick: () => {
       state.cwAt = 0;
       contractWatchTick();
     }, __lingerTick: () => lingerTick(), __ribbonTick: () => ribbonTick(), __dareTick: () => dareTick(), __potionOn: (mn, id) => potionOn(mn, id), __milkRate: (mn) => milkRate(mn) });
@@ -11787,7 +11793,12 @@
     function trapRun(mn, kind, beats, done, v) {
       state.trapRuns = state.trapRuns || /* @__PURE__ */ new Map();
       const run = { kind, i: 0, timer: null, beats: beats = beats.slice() };
-      const before = { pissed: (rec(mn) || {}).pissed || 0 };
+      const before = { pissed: (rec(mn) || {}).pissed || 0, eggs: ((prodOf(mn) || {}).eggs || {}).n || 0 };
+      try {
+        offerBets(mn, kind);
+      } catch (e) {
+        warn("bets:", e);
+      }
       {
         const r0 = rec(mn);
         if (r0 && r0.penned && r0.penned.trap) r0.penned.until = Math.max(r0.penned.until, Date.now() + (beats.length + 1) * CFG.TRAP_BEAT_S * 1e3);
@@ -11815,6 +11826,11 @@
           trapGearDone(mn, charFor(mn) ? gearPlan : null);
         } catch (e) {
           warn("trap gear:", e);
+        }
+        try {
+          if (charFor(mn)) trapAfter(mn, kind, before);
+        } catch (e) {
+          warn("trap after:", e);
         }
         trapFree(mn);
         saveLedger();
@@ -11867,6 +11883,7 @@
       if (wornTags(mn).has("fertility")) x *= 1.5;
       if (inHeat(p)) x *= 1.25;
       x *= 1 + 2 * potionX(mn, "tentaclemusk");
+      x *= rankX(mn).eggs;
       return x;
     }
     function layClutch(mn, n, by) {
@@ -12099,7 +12116,7 @@
         if (on) {
           if (!fresh) continue;
           r.spotTrapAt = r.spotTrapAt || {};
-          if (!r.trapEager && now - (r.spotTrapAt[here] || 0) < CFG.TRAP_RESET_MIN * 6e4 * nightX().reset / dangerX(mn).chance) continue;
+          if (!r.trapEager && now - (r.spotTrapAt[here] || 0) < CFG.TRAP_RESET_MIN * 6e4 * nightX().reset / dangerX(mn).chance / rankX(mn).reset) continue;
           const kind = trapKindOf(here);
           if (!springTrap(mn, kind, here)) {
             r.trapAt = now;
@@ -12111,7 +12128,7 @@
           if (!fresh && now - (st.rolled || 0) < CFG.TENTACLE_LINGER_MIN * 6e4 / (potionOn(mn, "tentaclemusk") ? 5 : 1)) continue;
           st.rolled = now;
           const wk = waterKindOf(here);
-          if ((wk === "tentacle" && parasiteKin(mn, now) || Math.random() < Math.min(1, CFG.TENTACLE_CHANCE * nightX().water * dangerX(mn).chance * (potionOn(mn, "tentaclemusk") ? CFG.MUSK_WATER_X : 1))) && !springTrap(mn, wk, here)) {
+          if ((wk === "tentacle" && parasiteKin(mn, now) || Math.random() < Math.min(1, CFG.TENTACLE_CHANCE * nightX().water * dangerX(mn).chance * rankX(mn).water * (potionOn(mn, "tentaclemusk") ? CFG.MUSK_WATER_X : 1))) && !springTrap(mn, wk, here)) {
             r.trapAt = now;
             saveLedger();
           }
@@ -13651,6 +13668,11 @@
       r.trapWait = null;
       if (r.penned && r.penned.trap) r.penned = null;
       saveLedger();
+      try {
+        betsWaitEnd(mn, how);
+      } catch (e) {
+        warn("bets:", e);
+      }
       if (how === "quiet") return true;
       if (w.kind === "mirror") trance(mn, 0);
       if (charFor(mn)) emote(TRAP_KINDS[w.kind].icon + " " + moreLine(w.kind, how === "gave" ? "gave" : "held", mn), mn);
@@ -15847,6 +15869,8 @@
         paused: !!r.trapsOff,
         eager: !!r.trapEager,
         danger: dangerX(mn).on,
+        rank: SUBJECT_RANKS[rankOfSubject(mn)].name,
+        nextRank: (SUBJECT_RANKS[rankOfSubject(mn) + 1] || {}).at || 0,
         hunt: huntOn() ? { until: L.hunt.until, goal: L.hunt.goal } : null
       };
     }
@@ -16538,6 +16562,204 @@
         "It's black down here and close, and the thing fills the whole shaft. %n hangs in it, held on every side, turned slowly, with its arms goin' over every inch of them in the dark.",
         "%n can't see it. They can only feel it: coils everywhere, the walls themselves movin', and no way to tell up from down. It has all the time in the world down here."
       ]
+    };
+    const SUBJECT_RANKS = [{ at: 0, name: "Bait" }, { at: 10, name: "Trap Fodder" }, { at: 25, name: "Brood Sow" }, { at: 60, name: "Broodmother" }];
+    function rankOfSubject(mn) {
+      const n = (rec(mn) || {}).trapN || 0;
+      let i = 0;
+      for (let k = 0; k < SUBJECT_RANKS.length; k++) if (n >= SUBJECT_RANKS[k].at) i = k;
+      return i;
+    }
+    function rankX(mn) {
+      const k = isSubject(mn) ? rankOfSubject(mn) : 0;
+      return { water: 1 + 0.25 * k, reset: 1 + 0.2 * k, eggs: 1 + 0.1 * k, chain: 1 + 0.3 * k, rank: k };
+    }
+    const rkLine = (key, mn, v) => tFill(pickFresh("rank:" + key, RANK_LINES[key]), mn, v);
+    const CHAIN_NEXT = {
+      winch: ["breeder", "pillory", "milker"],
+      breeder: ["mud", "eggs", "pump"],
+      snare: ["tickle", "paddle", "wolves"],
+      gas: ["wolves", "stallion", "toms"],
+      wire: ["pillory", "wall", "pricetag"],
+      mud: ["boar", "spray"],
+      glue: ["paddle", "tickle", "brand"],
+      pump: ["eggs", "mud"],
+      lantern: ["mirror", "kennel"],
+      spray: ["mud", "brand"],
+      milker: ["cups", "bull"],
+      injector: ["breeder", "milker", "gas"],
+      pillory: ["brand", "pricetag"],
+      paddle: ["pillory"],
+      cups: ["milker", "bull"],
+      chute: ["pump", "sow"],
+      slime: ["vines", "eggs"],
+      weights: ["breeder"]
+    };
+    function trapAfter(mn, kind, before) {
+      const r = rec(mn), p = prodOf(mn), now = Date.now();
+      const k = rankOfSubject(mn);
+      if (k > (r.trapRank || 0)) {
+        r.trapRank = k;
+        saveLedger();
+        later(() => {
+          if (charFor(mn)) emote("\u{1F9EA} " + rkLine("rank" + k, mn), mn);
+          tell(mn, "\u{1F9EA} " + (r.trapN || 0) + " traps, sugar. You're a " + SUBJECT_RANKS[k].name.toUpperCase() + " now. The farm treats that rank a little rougher: hungrier water, traps that reset sooner, bigger clutches, and more chance of bein' handed from one trap to the next.");
+        }, 7e3);
+      }
+      const bet = state.bets && state.bets.get(mn);
+      if (bet) {
+        state.bets.delete(mn);
+        const laid = (p.eggs ? p.eggs.n : 0) - (before.eggs || 0);
+        const result = bet.what === "eggs" ? laid > bet.line ? "high" : "low" : null;
+        if (result) settleBets(mn, bet, result, laid + " eggs");
+        else if (bet.what === "wait") state.betsWait = (state.betsWait || /* @__PURE__ */ new Map()).set(mn, bet);
+      }
+      r.chainN = now - (r.chainAt || 0) < 10 * 6e4 ? r.chainN || 0 : 0;
+      if (r.chainN >= CFG.CHAIN_MAX - 1 || kind === "tentacle" || kind === "well" || r.trapWait || r.benched && r.benched.trap || quietNow(mn)) return;
+      if (Math.random() >= Math.min(0.9, CFG.CHAIN_CHANCE * rankX(mn).chain * dangerX(mn).chance)) return;
+      const want = (CHAIN_NEXT[kind] || []).filter((x) => !trapWhyNotFree(mn, x));
+      const any = Object.keys(TRAP_KINDS).filter((x) => x !== kind && x !== "tentacle" && x !== "well" && !trapWhyNotFree(mn, x));
+      const next = want.length ? want[Math.floor(Math.random() * want.length)] : any[Math.floor(Math.random() * any.length)];
+      if (!next) return;
+      r.chainN++;
+      r.chainAt = now;
+      saveLedger();
+      later(() => {
+        if (!charFor(mn) || quietNow(mn) || (r.trapQuiet || 0) > Date.now() || heldByTrap(mn)) return;
+        const rr = rec(mn);
+        if (rr.penned && !rr.penned.trap) return;
+        emote("\u26D3\uFE0F " + rkLine("handOn", mn, { c: TRAP_KINDS[next].what.split(/[,:.]/)[0] }), mn);
+        later(() => {
+          const why = springTrap(mn, next, "", true);
+          if (!why) {
+            rec(mn).trapAt = Date.now();
+            saveLedger();
+          }
+        }, 3500);
+      }, 8e3);
+    }
+    function trapWhyNotFree(mn, kind) {
+      const r = rec(mn), pen = r.penned;
+      if (pen && pen.trap) r.penned = null;
+      const why = trapWhyNot(mn, kind);
+      if (pen && pen.trap) r.penned = pen;
+      return why;
+    }
+    const EGG_TRAPS = { tentacle: 9, well: 12, eggs: 5, drake: 5, hive: 5, vines: 5 };
+    function offerBets(mn, kind) {
+      const what = EGG_TRAPS[kind] ? "eggs" : kind === "tickle" || kind === "mirror" ? "wait" : null;
+      if (!what) return;
+      const near = (W.ChatRoomCharacter || []).map((c) => c.MemberNumber).filter((m) => m !== mn && m !== CFG.BOT_MEMBER && rec(m) && (rec(m).roles || []).length && !quietNow(m) && (() => {
+        const a = posOf(mn), b = posOf(m);
+        return a && b && Math.max(Math.abs(a.X - b.X), Math.abs(a.Y - b.Y)) <= 4;
+      })());
+      if (!near.length) return;
+      state.bets = state.bets || /* @__PURE__ */ new Map();
+      const line = what === "eggs" ? Math.round(EGG_TRAPS[kind] * eggX(mn) * rankX(mn).eggs) : 0;
+      state.bets.set(mn, { what, line, kind, at: Date.now(), stakes: [] });
+      for (const m of near) tell(m, what === "eggs" ? "\u{1F3B2} " + plainName(mn) + "'s been caught, and it's goin' to lay in them. Fancy a flutter? ?bet <ribbons> high if you think it leaves more than " + line + " eggs, ?bet <ribbons> low if not. Up to " + CFG.BET_MAX + " ribbons, double back if you're right." : "\u{1F3B2} " + plainName(mn) + "'s been caught. Will they give it what it wants? ?bet <ribbons> breaks or ?bet <ribbons> holds. Up to " + CFG.BET_MAX + " ribbons, double back if you're right.");
+    }
+    function settleBets(mn, bet, result, how) {
+      if (!bet.stakes.length) return;
+      const won = bet.stakes.filter((s) => s.side === result), lost = bet.stakes.filter((s) => s.side !== result);
+      for (const s of won) earnRibbons(s.by, s.n * 2, "callin' it right on " + plainName(mn));
+      for (const s of lost) tell(s.by, "\u{1F3B2} " + how + ". You called it wrong on " + plainName(mn) + ", sugar. That's " + s.n + " ribbon" + (s.n === 1 ? "" : "s") + " gone.");
+      if (charFor(mn)) emote("\u{1F3B2} " + rkLine("betDone", mn, { x: how, c: won.length ? won.map((s) => plainName(s.by)).join(" and ") : "nobody" }), mn);
+    }
+    function betsWaitEnd(mn, how) {
+      const bet = state.betsWait && state.betsWait.get(mn) || state.bets && state.bets.get(mn);
+      if (!bet || bet.what !== "wait") return;
+      if (state.betsWait) state.betsWait.delete(mn);
+      if (state.bets) state.bets.delete(mn);
+      if (how === "quiet") {
+        for (const s of bet.stakes) earnRibbons(s.by, s.n, "a bet called off", 0, true);
+        return;
+      }
+      settleBets(mn, bet, how === "gave" ? "breaks" : "holds", how === "gave" ? "They broke" : "They held out");
+    }
+    function betCommand(sender, args, R) {
+      const n = parseInt(args[0], 10), side = String(args[1] || "").toLowerCase();
+      const open = Array.from((state.bets || /* @__PURE__ */ new Map()).entries()).concat(Array.from((state.betsWait || /* @__PURE__ */ new Map()).entries())).filter(([mn2, b]) => mn2 !== sender && Date.now() - b.at < CFG.BET_OPEN_S * 1e3 && (() => {
+        const a = posOf(sender), c = posOf(mn2);
+        return a && c && Math.max(Math.abs(a.X - c.X), Math.abs(a.Y - c.Y)) <= 6;
+      })());
+      if (!open.length) {
+        R("There's nothin' to bet on right now, sugar. When a trap takes somebody near you, I'll tell you.");
+        return;
+      }
+      const [mn, bet] = open[open.length - 1], sides = bet.what === "eggs" ? ["high", "low"] : ["breaks", "holds"];
+      if (!(n >= 1) || !sides.includes(side)) {
+        R("?bet <ribbons> " + sides.join("|") + ", sugar. Up to " + CFG.BET_MAX + " ribbons on " + plainName(mn) + (bet.what === "eggs" ? " (the line is " + bet.line + " eggs)" : "") + ".");
+        return;
+      }
+      if (bet.stakes.some((s) => s.by === sender)) {
+        R("You've a bet down on that one already, sugar.");
+        return;
+      }
+      const stake = Math.min(CFG.BET_MAX, n);
+      if (ribbonsOf(sender) < stake) {
+        R("You've not got " + stake + " ribbons to put down, sugar.");
+        return;
+      }
+      spendRibbons(sender, stake, "a bet on " + plainName(mn));
+      bet.stakes.push({ by: sender, n: stake, side });
+      R("\u{1F3B2} " + stake + " ribbon" + (stake === 1 ? "" : "s") + " on " + side + ". Let's see what " + plainName(mn) + " does.");
+    }
+    function broodBook(mn) {
+      const r = rec(mn), p = prodOf(mn);
+      if (!r || !p) return "They're not on the books, sugar.";
+      const book = (L.studbook || []).filter((e) => e.dam === mn), by = {};
+      let eggs = 0, kids = 0, litters = 0, biggest = 0;
+      for (const e of book) {
+        const who = (e.sires || []).map(plainName).join(" & ") || "somebody";
+        const b = by[who] = by[who] || { clutches: 0, eggs: 0, litters: 0, kids: 0 };
+        if (e.eggs) {
+          b.clutches++;
+          b.eggs += e.eggs;
+          eggs += e.eggs;
+          biggest = Math.max(biggest, e.eggs);
+        } else {
+          const k = e.kids ? e.kids.male + e.kids.female + e.kids.futa : 0;
+          b.litters++;
+          b.kids += k;
+          kids += k;
+          litters++;
+        }
+      }
+      const had = Object.entries(r.trapKinds || {}).filter(([k]) => ANTHRO[k] || k === "tentacle" || k === "well" || k === "breeder" || k === "eggs" || k === "vines" || k === "leeches").sort((a, b) => b[1] - a[1]);
+      const lines = ["\u{1F4D6} " + plainName(mn).toUpperCase() + "'S BROOD BOOK" + (isSubject(mn) ? " \xB7 " + SUBJECT_RANKS[rankOfSubject(mn)].name + " (" + (r.trapN || 0) + " traps)" : "")];
+      lines.push("Eggs laid: " + eggs + (biggest ? " (biggest clutch " + biggest + ")" : "") + " \xB7 Litters: " + litters + " (" + kids + " young)" + (p.eggs ? " \xB7 carryin' " + p.eggs.n + " eggs now" : "") + (p.preg ? " \xB7 carryin' a litter of " + p.preg.count + " now" : ""));
+      if (had.length) lines.push("What's had them: " + had.map(([k, n]) => (ANTHRO[k] ? ANTHRO[k].name : k === "tentacle" ? "the thing in the water" : k === "well" ? "the thing in the well" : k === "breeder" ? "the breedin' frame" : k === "eggs" ? "the egg post" : k === "vines" ? "the vine patch" : "the trough leeches") + " \xD7" + n).join(" \xB7 "));
+      if (r.parasiteN) lines.push("The parasite: " + r.parasiteN + " time" + (r.parasiteN === 1 ? "" : "s") + (parasiteOn(mn) ? " (on them now)" : ""));
+      const rows = Object.entries(by).sort((a, b) => b[1].eggs + b[1].kids - (a[1].eggs + a[1].kids)).slice(0, 12);
+      if (rows.length) lines.push("Whose they carried:\n" + rows.map(([who, b]) => "\u2022 " + who + ": " + [b.clutches && b.clutches + " clutch" + (b.clutches === 1 ? "" : "es") + " (" + b.eggs + " eggs)", b.litters && b.litters + " litter" + (b.litters === 1 ? "" : "s") + " (" + b.kids + " young)"].filter(Boolean).join(", ")).join("\n"));
+      if (lines.length === 2 && !eggs && !litters) lines.push("Nothin' written in it yet. Give it time.");
+      return lines.join("\n");
+    }
+    function ranksCommand(cmd, sender, args, R) {
+      if (cmd === "bet") return betCommand(sender, args, R);
+      const t = args[0] ? resolveTarget(args[0]) : sender;
+      if (!t || !rec(t)) {
+        R("Whose brood book, sugar? ?brood, or ?brood <who> for the proprietors.");
+        return;
+      }
+      if (t !== sender && !isProprietor(sender)) {
+        R("A brood book is between an animal and the proprietors, sugar. ?brood shows your own.");
+        return;
+      }
+      R(broodBook(t));
+    }
+    const RANK_LINES = {
+      rank1: ["%n has sprung enough of the farm's traps to earn a name for it: TRAP FODDER. The farm girl chalks it by their stall.", "Ten traps. %n isn't bait any more. They're TRAP FODDER, and the traps seem to know it."],
+      rank2: ["Twenty-five traps, and most of them left somethin' behind. %n is a BROOD SOW now, and the water's started to take an interest.", "%n has been caught, filled and laid in often enough to be wrote down as a BROOD SOW. Everything on this farm that breeds can smell it on them."],
+      rank3: ["Sixty. %n is a BROODMOTHER: the thing every trap on this farm was built to make. They'll never again cross the yard without somethin' reachin' for them.", "%n has earned the last name the farm gives its subjects: BROODMOTHER. The traps reset faster for them, the water rises to meet them, and their belly is never goin' to be empty for long."],
+      handOn: [
+        "It isn't finished with %n. The floor tilts, somethin' catches them as they stumble, and they're passed along: %c.",
+        "%n gets two steps before the next one has them. One trap hands them straight to another: %c.",
+        "No rest. As the last one lets go, a second one's already closin': %c.",
+        "The traps on this farm talk to each other. %n is tipped, slid and delivered: %c."
+      ],
+      betDone: ["%x. The ones who called it right about %n: %c.", "It's settled: %x. Winnin's to %c.", "%x, for all the yard to see. %c had the right of it."]
     };
     const SEVERITY = [null, { name: "mild", x: 1, t: 1 }, { name: "strong", x: 2, t: 1.5 }, { name: "brutal", x: 3, t: 2.5 }];
     function dangerX(mn) {
@@ -17766,6 +17988,9 @@ TEST SUBJECTS & TRAPS
   ?subject quit \xB7 off the list for good
   ?quiet [minutes] \xB7 an hour where nothin' new starts on you
   ?tend <who> \xB7 help somebody lay (a ribbon in it)
+  ?brood \xB7 your brood book: what's bred you, what you carried
+  ?bet <ribbons> high|low \xB7 a flutter when a trap takes somebody
+     near you (breaks|holds for the rack and the mirror)
   ?struggle \xB7 one try at slippin' a trap that has you
   ?traps eager on \xB7 no breather between traps, no resets
   ?free <who> \xB7 get a caught subject out \xB7 ?goad <who> \xB7 or don't
@@ -18827,7 +19052,9 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
       "parasites",
       "eager",
       "quiet",
-      "tend"
+      "tend",
+      "brood",
+      "bet"
     ];
     const STAFF_CMDS = [
       "queue",
@@ -21261,6 +21488,11 @@ Welcome to B&B Farm, hon. \u{1F33E}`
           broodCommand(cmd, sender, args, R);
           break;
         // 10y2-brood.js
+        case "brood":
+        case "bet":
+          ranksCommand(cmd, sender, args, R);
+          break;
+        // 10y3-trap-ranks.js
         case "eager":
           trapCommand("traps", sender, ["eager"].concat(args), R);
           break;

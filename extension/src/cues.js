@@ -116,9 +116,15 @@ export function face(m) {
 }
 
 // ── sounds only you hear (the game's own sound files, at your game volume) ──
-const SOUNDS = { pump: "SciFiPump", machine: "Sybian", bell: "BellMedium", cowbell: "BellSmall", stall: "SciFiPump", gate: "CageOpen",   // (the stall latchin' on used to be a cage door slammin': jarring, said Laynie, Oct 12)
+// Every name here is one of the game's own files in BondageClub/Audio (checked against the game's folder, Oct 12).
+// A name this panel doesn't know is simply not played, so the farm girl can ask for new ones safely.
+const SOUNDS = { pump: "SciFiPump", machine: "Sybian", bell: "BellMedium", cowbell: "BellSmall", stall: "HydraulicLock", gate: "CageOpen",
+  latch: "HydraulicLock", unlatch: "HydraulicUnlock", clip: "MetalClip", hiss: "Deflation", rope: "RopeShort1", ropelong: "RopeLong1", rip: "ClothSlip",
+  clamp: "MetalShut", inflate: "Inflation", chainlong: "ChainLong", softgate: "SofterCageClose", latex: "BalloonStretch", rubber: "BalloonRubbing",
+  wood: "WoodenCuffs", straw: "SoftFurniture", biglock: "LockLarge", unlock: "UnlockSmall", buzz: "VibrationTone4ShortLoop", zap: "Shocks",
+  creak: "LeatherCreak", paddle: "BrushSpank1", crop: "SmackCrop1", scifi: "SciFiEffect", beeps: "SciFiBeeps1", squeak: "SqueakToy", cuffs: "CuffsMetal",   // (the stall latchin' on used to be a cage door slammin': jarring, said Laynie, Oct 12)
   bowl: "PlaceBowl", wet: "Slime", chain: "ChainShort", lock: "LockSmall", vibe: "VibratorShort", spank: "SpankSkin1" };
-const QUIET = { stall: 0.35, pump: 0.4, machine: 0.4 };   // the ones that run under a scene sit lower
+const QUIET = { stall: 0.35, latch: 0.35, unlatch: 0.35, pump: 0.4, machine: 0.4, inflate: 0.4, hiss: 0.4, buzz: 0.3, zap: 0.35, clamp: 0.45, softgate: 0.4 };   // the ones that run under a scene sit lower
 export function sound(m) {
   const f = SOUNDS[m.name]; if (!f || !pref("noSound") || typeof W.AudioPlayInstantSound !== "function") return;
   const vol = (W.Player && W.Player.AudioSettings && W.Player.AudioSettings.Volume) || 0;

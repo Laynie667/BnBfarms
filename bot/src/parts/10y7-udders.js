@@ -214,7 +214,7 @@
     r.penned = { until: now + 12*3600000, X: pos.X, Y: pos.Y, name: "the farrowin' stall", by: BOTMN(), bed: true };
     saveLedger();
     if (spot && !onSpot(mn, spot, 2)) teleport(mn, { X: pos.X, Y: pos.Y }, true);
-    emote("🛏️ "+uLine("bedDown", mn), mn);
+    emote("🛏️ "+uLine("bedDown", mn), mn); sound(mn, "straw");
     tell(mn, "🛏️ You're too big to walk, sugar, so you're bedded down till it's over. Anybody can come ?tend you: you'll be fed and milked where you lie. ?bedrest off gets you up and keeps you up; your safeword does too.");
   }
   function bedStop(mn){
@@ -320,7 +320,7 @@
         if (!yes){ tell(sender, "🏷️ "+plainName(t)+" said no to bein' kept, sugar."); return; }
         r.kept = { by: sender, since: Date.now(), until: Date.now() + CFG.KEPT_DAYS*86400000, tag: "", name: "", milk: [] }; saveLedger(); audit(sender, "KEEP", String(t)); syncCompanions(true);
         tell(sender, "🏷️ "+plainName(t)+" is yours to keep for "+CFG.KEPT_DAYS+" days. ?keep "+plainName(t)+" tag <words> · name <a name> · milk <hour> <hour> · breed <who>");
-        if (charFor(t)) emote("🏷️ "+uLine("kept", t, { x: plainName(sender) }), t);
+        if (charFor(t)){ emote("🏷️ "+uLine("kept", t, { x: plainName(sender) }), t); sound(t, "clip"); }
       });
       return;
     }

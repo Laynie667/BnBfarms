@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.15.6
+// @version      0.15.7
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -230,7 +230,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.15.6";
+  var VERSION = "0.15.7";
 
   // extension/src/config.js
   var BOT_MEMBER = 260239;
@@ -4456,8 +4456,34 @@ One of mods you are using is using an old version of SDK. It will work for now b
     machine: "Sybian",
     bell: "BellMedium",
     cowbell: "BellSmall",
-    stall: "SciFiPump",
+    stall: "HydraulicLock",
     gate: "CageOpen",
+    latch: "HydraulicLock",
+    unlatch: "HydraulicUnlock",
+    clip: "MetalClip",
+    hiss: "Deflation",
+    rope: "RopeShort1",
+    ropelong: "RopeLong1",
+    rip: "ClothSlip",
+    clamp: "MetalShut",
+    inflate: "Inflation",
+    chainlong: "ChainLong",
+    softgate: "SofterCageClose",
+    latex: "BalloonStretch",
+    rubber: "BalloonRubbing",
+    wood: "WoodenCuffs",
+    straw: "SoftFurniture",
+    biglock: "LockLarge",
+    unlock: "UnlockSmall",
+    buzz: "VibrationTone4ShortLoop",
+    zap: "Shocks",
+    creak: "LeatherCreak",
+    paddle: "BrushSpank1",
+    crop: "SmackCrop1",
+    scifi: "SciFiEffect",
+    beeps: "SciFiBeeps1",
+    squeak: "SqueakToy",
+    cuffs: "CuffsMetal",
     // (the stall latchin' on used to be a cage door slammin': jarring, said Laynie, Oct 12)
     bowl: "PlaceBowl",
     wet: "Slime",
@@ -4466,7 +4492,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     vibe: "VibratorShort",
     spank: "SpankSkin1"
   };
-  var QUIET = { stall: 0.35, pump: 0.4, machine: 0.4 };
+  var QUIET = { stall: 0.35, latch: 0.35, unlatch: 0.35, pump: 0.4, machine: 0.4, inflate: 0.4, hiss: 0.4, buzz: 0.3, zap: 0.35, clamp: 0.45, softgate: 0.4 };
   function sound(m) {
     const f = SOUNDS[m.name];
     if (!f || !pref("noSound") || typeof W.AudioPlayInstantSound !== "function") return;

@@ -145,7 +145,7 @@
     L.nest = { eggs: 0, by: {} };
     r.penned = { until: r.sitting.until + 120000, X: pos.X, Y: pos.Y, name: "the nest", by: BOTMN(), sit: true };
     saveLedger(); audit(by, "SIT", mn+" on "+n);
-    emote("🪺 "+kLine("sitStart", mn, { x: String(n) }), mn);
+    emote("🪺 "+kLine("sitStart", mn, { x: String(n) }), mn); sound(mn, "straw");
     tell(mn, "🪺 You're sittin' "+n+" eggs, sugar, and you're kept on the nest till they hatch: about "+CFG.SIT_MIN+" minutes. You'll be fed where you sit. Your safeword gets you up, and the eggs go back in the straw.");
     if (by !== mn) R("🪺 "+plainName(mn)+" is set on the nest over "+n+" eggs.");
     syncCompanions(true);
@@ -334,7 +334,7 @@
     if (!words){ R("?dose <who> <shot words>, sugar, like ?dose Daisy fertility x2."); return; }
     if (quietNow(t)){ R(plainName(t)+" has asked for a quiet hour, sugar."); return; }
     if (!applyShot(t, sender, words, { open: kLine("leaderDose", t, { x: plainName(sender) }), from: plainName(sender)+"'s needle" })){ R("That didn't take, sugar: no shot word I know in it, or their limits rule it out."); return; }
-    r.reinsAt = now; saveLedger(); audit(sender, "DOSE", t+" "+words);
+    r.reinsAt = now; saveLedger(); audit(sender, "DOSE", t+" "+words); sound(t, "clip");
     R("💉 Done. "+plainName(t)+" has it in them.");
   }
 

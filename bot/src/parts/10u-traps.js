@@ -106,7 +106,8 @@
       state.trapRuns.delete(mn);
       if (charFor(mn)){ try { done(); trapDone(mn, kind, before); } catch(e){ warn("trap "+kind+":", e); } }
       try { trapGearDone(mn, charFor(mn) ? gearPlan : null); } catch(e){ warn("trap gear:", e); }
-      try { if (charFor(mn)) keepersAfter(mn, kind, before); toysAfter(mn); } catch(e){ warn("keepsake:", e); }   // the album card; toys go still or back how they were (10y6-keepers.js)
+      try { if (charFor(mn)) keepersAfter(mn, kind, before); toysAfter(mn); } catch(e){ warn("keepsake:", e); }
+      try { if (charFor(mn) && TRAP_SOUND_END[kind]) sound(mn, TRAP_SOUND_END[kind]); } catch(e){}   // ...and when it lets go   // the album card; toys go still or back how they were (10y6-keepers.js)
       try { if (charFor(mn)) trapAfter(mn, kind, before); } catch(e){ warn("trap after:", e); }   // ranks, bets, bein' handed on (10y3-trap-ranks.js)   // (what they're left wearin': 10x-trap-extras.js)
       trapFree(mn); saveLedger(); syncCompanions(true);
     };
@@ -185,6 +186,7 @@
     audit(BOTMN(), "TRAP", mn+" "+kind+(spot ? " at "+spot : "")+(force ? " (by hand)" : ""));
     tell(mn, TRAP_KINDS[kind].icon+" You've sprung a trap, sugar: "+TRAP_KINDS[kind].what+". Your safeword stops it cold.");
     face(mn, kind === "lantern" ? "trance" : "edged", 60);
+    { const snd = TRAP_SOUND[kind] || (L.customTraps && L.customTraps[kind] && CUSTOM_SOUND[L.customTraps[kind].does]); if (snd) sound(mn, snd); }   // what it sounds like when it gets you (10y9c-sounds.js)
     // gas, spray and the needle come in kinds and strengths (10z-trap-variants.js)
     if (variantTrap(mn, kind, spot)){ saveLedger(); syncCompanions(true); return null; }
     switch (kind){

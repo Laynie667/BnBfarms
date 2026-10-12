@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.29.2
+// @version      0.29.3
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -1828,7 +1828,7 @@
   ];
 
   // bot/src/version.js
-  var VERSION = "0.29.2";
+  var VERSION = "0.29.3";
 
   // bot-parts:farmhand-bot-parts
   (function() {
@@ -5794,6 +5794,7 @@
           } catch (e) {
             warn("dial:", e);
           }
+          sound(mn, "unlatch");
           if (st.got.m + st.got.s > 0) later(() => earnRibbons(mn, CFG.RIBBONS_FOR.stall, "a full session in the milkin' stall"), 3e3);
           const R = CFG.PROD.STALL_REST_MIN;
           p.stallRest = now + (R[0] + Math.random() * (R[1] - R[0])) * 6e4;
@@ -11946,6 +11947,10 @@
           warn("keepsake:", e);
         }
         try {
+          if (charFor(mn) && TRAP_SOUND_END[kind]) sound(mn, TRAP_SOUND_END[kind]);
+        } catch (e) {
+        }
+        try {
           if (charFor(mn)) trapAfter(mn, kind, before);
         } catch (e) {
           warn("trap after:", e);
@@ -12055,6 +12060,10 @@
       audit(BOTMN(), "TRAP", mn + " " + kind + (spot ? " at " + spot : "") + (force ? " (by hand)" : ""));
       tell(mn, TRAP_KINDS[kind].icon + " You've sprung a trap, sugar: " + TRAP_KINDS[kind].what + ". Your safeword stops it cold.");
       face(mn, kind === "lantern" ? "trance" : "edged", 60);
+      {
+        const snd = TRAP_SOUND[kind] || L.customTraps && L.customTraps[kind] && CUSTOM_SOUND[L.customTraps[kind].does];
+        if (snd) sound(mn, snd);
+      }
       if (variantTrap(mn, kind, spot)) {
         saveLedger();
         syncCompanions(true);
@@ -17847,6 +17856,7 @@
       saveLedger();
       audit(by, "SIT", mn + " on " + n);
       emote("\u{1FABA} " + kLine("sitStart", mn, { x: String(n) }), mn);
+      sound(mn, "straw");
       tell(mn, "\u{1FABA} You're sittin' " + n + " eggs, sugar, and you're kept on the nest till they hatch: about " + CFG.SIT_MIN + " minutes. You'll be fed where you sit. Your safeword gets you up, and the eggs go back in the straw.");
       if (by !== mn) R("\u{1FABA} " + plainName(mn) + " is set on the nest over " + n + " eggs.");
       syncCompanions(true);
@@ -18157,6 +18167,7 @@
       r.reinsAt = now;
       saveLedger();
       audit(sender, "DOSE", t + " " + words);
+      sound(t, "clip");
       R("\u{1F489} Done. " + plainName(t) + " has it in them.");
     }
     function vatAdd(mn, amount) {
@@ -18816,6 +18827,7 @@
       saveLedger();
       if (spot && !onSpot(mn, spot, 2)) teleport(mn, { X: pos.X, Y: pos.Y }, true);
       emote("\u{1F6CF}\uFE0F " + uLine("bedDown", mn), mn);
+      sound(mn, "straw");
       tell(mn, "\u{1F6CF}\uFE0F You're too big to walk, sugar, so you're bedded down till it's over. Anybody can come ?tend you: you'll be fed and milked where you lie. ?bedrest off gets you up and keeps you up; your safeword does too.");
     }
     function bedStop(mn) {
@@ -18992,7 +19004,10 @@
           audit(sender, "KEEP", String(t));
           syncCompanions(true);
           tell(sender, "\u{1F3F7}\uFE0F " + plainName(t) + " is yours to keep for " + CFG.KEPT_DAYS + " days. ?keep " + plainName(t) + " tag <words> \xB7 name <a name> \xB7 milk <hour> <hour> \xB7 breed <who>");
-          if (charFor(t)) emote("\u{1F3F7}\uFE0F " + uLine("kept", t, { x: plainName(sender) }), t);
+          if (charFor(t)) {
+            emote("\u{1F3F7}\uFE0F " + uLine("kept", t, { x: plainName(sender) }), t);
+            sound(t, "clip");
+          }
         });
         return;
       }
@@ -19490,6 +19505,54 @@
       if (!T || !T[k] || Math.random() >= 0.67) return "";
       return tFill(pickFresh("udd:int:" + k + ":" + kind, T[k]), mn);
     }
+    const TRAP_SOUND = {
+      injector: "clip",
+      milker: "latch",
+      breeder: "machine",
+      gas: "hiss",
+      snare: "rope",
+      mud: "wet",
+      spray: "wet",
+      wire: "rip",
+      clamp: "clamp",
+      pump: "inflate",
+      eggs: "wet",
+      lantern: "cowbell",
+      tentacle: "wet",
+      well: "wet",
+      leeches: "wet",
+      wolves: "chain",
+      stallion: "softgate",
+      bull: "softgate",
+      warren: "straw",
+      boar: "wet",
+      toms: "straw",
+      drake: "straw",
+      naga: "ropelong",
+      kennel: "softgate",
+      hive: "wet",
+      goat: "rope",
+      sow: "straw",
+      pillory: "wood",
+      brand: "clip",
+      winch: "chainlong",
+      glue: "wet",
+      cups: "latch",
+      chute: "bowl",
+      vines: "ropelong",
+      slime: "wet",
+      tickle: "cuffs",
+      mirror: "softgate",
+      paddle: "paddle",
+      wall: "wood",
+      mister: "hiss",
+      weights: "latch",
+      trough: "wet",
+      pricetag: "bell",
+      suit: "latex"
+    };
+    const TRAP_SOUND_END = { milker: "unlatch", clamp: "lock", pump: "hiss", winch: "chain", kennel: "gate", cups: "unlatch", weights: "unlatch", breeder: "unlatch", paddle: "paddle", wolves: "chain" };
+    const CUSTOM_SOUND = { dose: "clip", hold: "cuffs", fill: "inflate", breed: "machine", strip: "rip", write: "clip" };
     const SEVERITY = [null, { name: "mild", x: 1, t: 1 }, { name: "strong", x: 2, t: 1.5 }, { name: "brutal", x: 3, t: 2.5 }];
     function dangerX(mn) {
       const n = potionX(mn, "danger");

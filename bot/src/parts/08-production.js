@@ -938,6 +938,7 @@
       if (done){
         p.stall = null; p.stallPaused = null;
         try { stallDialDone(mn, st); } catch(e){ warn("dial:", e); }
+        sound(mn, "unlatch");   // the cups let go
         if (st.got.m + st.got.s > 0) later(() => earnRibbons(mn, CFG.RIBBONS_FOR.stall, "a full session in the milkin' stall"), 3000);
         const R = CFG.PROD.STALL_REST_MIN; p.stallRest = now + (R[0] + Math.random()*(R[1]-R[0]))*60000;
         if (st.got.m + st.got.s > 0){

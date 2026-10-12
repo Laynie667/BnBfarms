@@ -489,6 +489,10 @@ TEST SUBJECTS & TRAPS
   ?brood · your brood book: what's bred you, what you carried
   ?bet <ribbons> high|low · a flutter when a trap takes somebody
      near you (breaks|holds for the rack and the mirror)
+  ?corruption · how much of the farm is in you, for good
+  ?gauntlet · the timed trap run and its board
+  ?lend me · put yourself up: the top ?bid picks three traps
+  ?mysterybox · 4 ribbons: somethin' lovely that locks itself on
   ?struggle · one try at slippin' a trap that has you
   ?traps eager on · no breather between traps, no resets
   ?free <who> · get a caught subject out · ?goad <who> · or don't
@@ -719,6 +723,9 @@ RIBBONS, POTIONS, DARES, THE CORRAL
   ?pack on|off · the roamin' wolf pack (needs a trap-wolves den)
   ?gather · collect what's in the nest (?spot set nest)
   ?spot set crate · a box only subjects can open
+  ?cleanse <who> · 5 of your ribbons: 20 off their corruption
+  ?mysterybox lift <who> · ?suit off <who>
+  ?gauntlet pot <n> · proprietors (ends: gauntlet-start, -end)
   ?purge <who> · take a parasite off them
   ?parasite give <who> · proprietors (they need ?parasite on)
   ?store approve|reject <who> · a bought greetin'

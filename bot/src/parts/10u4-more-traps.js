@@ -191,7 +191,7 @@
     saveLedger();
     try { betsWaitEnd(mn, how); } catch(e){ warn("bets:", e); }
     if (how === "quiet") return true;
-    if (w.kind === "mirror") trance(mn, 0);
+    if (w.kind === "mirror"){ trance(mn, 0); if (how === "gave") goUnder(mn, 2); }
     if (charFor(mn)) emote(TRAP_KINDS[w.kind].icon+" "+moreLine(w.kind, how === "gave" ? "gave" : "held", mn), mn);
     if (how === "held") later(() => earnRibbons(mn, 1, "holdin' out against the "+(w.kind === "tickle" ? "tickle rack" : "mirror box")), 2000);
     syncCompanions(true);

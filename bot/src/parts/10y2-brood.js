@@ -62,7 +62,7 @@
       p.offspring.eggs = (p.offspring.eggs || 0) + n;
       if (!L.studbook) L.studbook = [];
       L.studbook.push({ t: Date.now(), dam: mn, sires: [e.by], kids: { male: 0, female: 0, futa: 0 }, eggs: n });
-      eggsLaid(mn, n, true);
+      eggsLaid(mn, n, true, e.types);
       if (e.para) L.nestBrood = (L.nestBrood || 0) + 1;   // one of the parasite's own: it'll hatch here
       audit(mn, "EGGS", mn+" "+n+" at the nest"+(helper ? " tended by "+helper : ""));
       if (here) emote("🥚 "+bLine(n >= 50 ? "layEndHuge" : n >= 12 ? "layEndBig" : "layEnd", mn, v), mn);
@@ -190,6 +190,10 @@
     for (const [slot, g] of Object.entries(r.gear || {})) if (g.until > now) out.push("⛓️ "+g.label+": "+mins(g.until)+" min.");
     if (r.gluedUntil > now) out.push("🍯 Sticky feet: "+mins(r.gluedUntil)+" min.");
     for (const id of Object.keys(SCENTS)) if (r.fx && r.fx[id] && r.fx[id].until > now && !r.fx[id].came && isSubject(mn)) out.push("🌫️ "+potionDef(id).name+" is on you. Somethin's goin' to smell it.");
+    if (isSubject(mn) && corruptionOf(mn)) out.push("🖤 Corruption "+corruptionOf(mn)+" of 100."+(underOf(mn) ? " Gone under: depth "+underOf(mn)+"." : ""));
+    if (r.run) out.push("🏁 On the gauntlet: "+Math.floor((now - r.run.at)/60000)+" min in, "+((r.trapN || 0) - r.run.traps)+" traps sprung.");
+    if (r.curse && r.curse.until > now) out.push("🎁 "+r.curse.name+": "+mins(r.curse.until)+" min. "+r.curse.what);
+    if (r.suit && r.suit.until > now) out.push("🖤 The livin' suit: "+SUIT_STAGES[suitStage(r.suit)].where+". It lets go in "+(r.suit.until - now > 5400000 ? Math.round((r.suit.until - now)/3600000)+" h" : mins(r.suit.until)+" min")+".");
     if (quietNow(mn)) out.push("🤫 Quiet: nothin' new starts on you for "+mins(r.quietUntil)+" min.");
     return out.slice(0, 8);
   }

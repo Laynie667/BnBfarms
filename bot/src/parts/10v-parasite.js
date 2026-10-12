@@ -43,7 +43,8 @@
   }
   function parasiteLatch(mn, how){
     const r = rec(mn), now = Date.now();
-    r.crave = null;
+    if (!(r.crave && r.crave.forGood)) r.crave = null;   // (a cravin' the farm made permanent stays: 10y4-corruption.js)
+    corrupt(mn, 5, "parasite");
     r.parasiteN = (r.parasiteN || 0) + 1;
     // after three times on the same host it knows them: it comes back as a belt, and feeds from the other end
     const belt = r.parasiteN > CFG.PARASITE_BELT_AFTER;
@@ -69,7 +70,8 @@
     if (!r || !r.parasite) return false;
     const was = r.parasite.until > Date.now(), fed = r.parasite.fed || 0, n = r.parasite.n || 0, wasBelt = r.parasite.form === "belt", g0 = r.parasite;
     r.parasite = null; parasiteGone(mn, g0, how || "done"); r.parasiteNext = Date.now() + (how === "safe" ? 7 : 1)*86400000;
-    r.crave = how === "safe" ? null : { until: Date.now() + CFG.CRAVE_HOURS*3600000, ate: Date.now(), told: Date.now() };   // the cravin' it leaves behind
+    if (r.crave && r.crave.forGood){ if (how === "safe") r.crave.told = Date.now() + 86400000; }   // permanent, but a safeword quiets it for a day
+    else r.crave = how === "safe" ? null : { until: Date.now() + CFG.CRAVE_HOURS*3600000, ate: Date.now(), told: Date.now() };   // the cravin' it leaves behind
     saveLedger(); audit(CFG.BOT_MEMBER, "PARASITE", mn+" off ("+(how || "done")+")");
     if (how === "safe" || !was && how !== "done") return true;
     if (charFor(mn)) emote("👄 "+paraLine(wasBelt ? "offBelt" : how === "purge" ? "purge" : "off", mn), mn);

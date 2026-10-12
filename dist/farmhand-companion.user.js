@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.15.2
+// @version      0.15.3
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -230,7 +230,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.15.2";
+  var VERSION = "0.15.3";
 
   // extension/src/config.js
   var BOT_MEMBER = 260239;
@@ -643,6 +643,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
         h("div", { class: "fhc-kv" }, title("Trap card" + (tc.rank ? " \xB7 " + tc.rank : "")), chip(tc.total + " sprung" + (tc.nextRank ? " \xB7 next rank at " + tc.nextRank : ""), "acc")),
         tc.kinds.length ? h("div", null, tc.kinds.map((k) => chip(k.kind + " \xD7" + k.n))) : muted("Nothin's caught you yet. Give it time."),
         muted(tc.left + " kind" + (tc.left === 1 ? "" : "s") + " still to find" + (tc.eggs ? " \xB7 " + tc.eggs + " eggs laid" : "") + (tc.paused ? " \xB7 traps paused" : "") + (tc.eager ? " \xB7 eager (no waits)" : "") + (tc.danger ? " \xB7 Danger Draught in you" : "")),
+        tc.corr || tc.under ? bar("Corruption", tc.corr + " of 100" + (tc.under ? " \xB7 gone under, depth " + tc.under : ""), tc.corr, "alert") : null,
         tc.hunt && muted("\u{1F514} The hunt is on: get to " + tc.hunt.goal),
         h(
           "div",
@@ -4647,6 +4648,16 @@ One of mods you are using is using an old version of SDK. It will work for now b
       return w[0] === w[0].toUpperCase() ? n[0].toUpperCase() + n.slice(1) : n;
     });
   }
+  function dumbDown(text, depth) {
+    const max = depth >= 4 ? 4 : depth === 3 ? 6 : 8, fillers = ["mm", "uh", "...", "nn"];
+    let out = String(text).replace(/[A-Za-z']+/g, (w) => {
+      if (w.length <= max) return w;
+      if (depth >= 4) return Math.random() < 0.5 ? fillers[Math.floor(Math.random() * fillers.length)] : w.slice(0, 3) + "...";
+      return Math.random() < (depth === 3 ? 0.7 : 0.4) ? w.slice(0, Math.max(3, max - 2)) + "..." : w;
+    });
+    if (depth >= 3) out = out.toLowerCase();
+    return out;
+  }
   var botHere = () => window.CurrentScreen === "ChatRoom" && Array.isArray(window.ChatRoomCharacter) && window.ChatRoomCharacter.some((c) => c.MemberNumber === BOT_MEMBER);
   var onBotAccount = () => !!(window.Player && window.Player.MemberNumber === BOT_MEMBER);
   var direct = () => onBotAccount() && window.Farmhand && typeof window.Farmhand.own === "function";
@@ -4961,6 +4972,23 @@ One of mods you are using is using an old version of SDK. It will work for now b
       }
       return next(args);
     });
+    try {
+      mod.hookFunction("ServerSend", 3, (args, next) => {
+        try {
+          const d = args[1], s = st.panel && st.panel.s;
+          if (args[0] === "ChatRoomChat" && d && d.Type === "Chat" && typeof d.Content === "string" && s && !/^\s*[(\[?!./\-*]/.test(d.Content)) {
+            let text = d.Content;
+            if (s.under >= 2) text = dumbDown(text, s.under);
+            if (s.corrWord && Math.random() < 0.17) text = text.replace(/\s+$/, "") + " ..." + String(s.corrWord).slice(0, 20) + ".";
+            if (text !== d.Content) args = [args[0], Object.assign({}, d, { Content: text })];
+          }
+        } catch (e) {
+        }
+        return next(args);
+      });
+    } catch (e) {
+      console.warn("[Farmhand Companion] gone-under speech unavailable:", e);
+    }
     try {
       mod.hookFunction("ServerSend", 4, (args, next) => {
         try {

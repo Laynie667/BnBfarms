@@ -18,7 +18,7 @@
   const tmin = (mn, mins) => mins * dangerX(mn).time;
   function pickSeverity(mn, fixed){
     if (fixed) return fixed;
-    const w = dangerX(mn).on ? [0.2, 0.4, 0.4] : [0.55, 0.3, 0.15], roll = Math.random();
+    const w = ruined(mn) ? [0.1, 0.3, 0.6] : dangerX(mn).on ? [0.2, 0.4, 0.4] : [0.55, 0.3, 0.15], roll = Math.random();   // (Ruined: 10y4-corruption.js)
     return roll < w[0] ? 1 : roll < w[0] + w[1] ? 2 : 3;
   }
   // "musk brutal", "slime", "strong": what a proprietor loaded a spot with
@@ -36,12 +36,12 @@
                          ass: "ass growth", balls: "balls growth", cock: "cock growth", stretch: "capacity", mpreg: "mpreg" };
   const VARIANTS = {
     gas: {
-      heat:   { can: mn => !limitBlocks(mn, "heat"), go(mn, S){ startHeat(mn, BOTMN(), tmin(mn, S.t)); arouse(mn, 25 + 10*S.x); } },
+      heat:   { can: mn => !limitBlocks(mn, "heat"), go(mn, S){ startHeat(mn, BOTMN(), tmin(mn, S.t)*corrHeatX(mn)); arouse(mn, 25 + 10*S.x); } },
       milk:   { can: mn => makesMilk(mn) && !limitBlocks(mn, "milk"), go(mn, S){ const p = prodOf(mn); addBoost(p, "milk", tmin(mn, 3)*3600000, S.x); p.milk = Math.min(milkCap(mn), p.milk + milkCap(mn)*0.3*S.x); arouse(mn, 10*S.x); } },
       musk:   { can: mn => !potionRefusal(mn, "musk", mn), go(mn, S){ for (let i = 0; i < S.x; i++) givePotion(mn, "musk", BOTMN(), "gas"); } },
       needy:  { can: mn => !potionRefusal(mn, "needy", mn), go(mn, S){ for (let i = 0; i < S.x; i++) givePotion(mn, "needy", BOTMN(), "gas"); arouse(mn, 20*S.x, 92); } },
       giggle: { can: mn => !potionRefusal(mn, "feather", mn), go(mn, S){ givePotion(mn, "feather", BOTMN(), "gas"); if (S.x >= 2 && !potionRefusal(mn, "hiccup", mn)) givePotion(mn, "hiccup", BOTMN(), "gas"); if (S.x >= 3) givePotion(mn, "feather", BOTMN(), "gas"); } },
-      haze:   { can: mn => !/\b(hypno|trance|mind)/i.test(rec(mn).limits || ""), go(mn, S){ trance(mn, S.x); later(() => trance(mn, 0), tmin(mn, S.t)*120000); arouse(mn, 15*S.x); tell(mn, "🏮 "+tFill(pickFresh("trap:lantern:thought", TRAP_LINES.lantern.thought), mn)); } },
+      haze:   { can: mn => !/\b(hypno|trance|mind)/i.test(rec(mn).limits || ""), go(mn, S){ trance(mn, S.x); goUnder(mn, S.x); later(() => trance(mn, 0), tmin(mn, S.t)*120000); arouse(mn, 15*S.x); tell(mn, "🏮 "+tFill(pickFresh("trap:lantern:thought", TRAP_LINES.lantern.thought), mn)); } },
       rut:    { can: mn => makesSemen(mn), go(mn, S){ const p = prodOf(mn); p.pentUp = true; addBoost(p, "semen", tmin(mn, 3)*3600000, S.x); p.semen = Math.min(semenCap(mn), p.semen + semenCap(mn)*0.3*S.x); arouse(mn, 20*S.x); } },
       ripen:  { can: mn => hasVulva(mn) && !limitBlocks(mn, "breed"), go(mn, S){ const p = prodOf(mn); addBoost(p, "fert", tmin(mn, 6)*3600000, S.x); if (S.x >= 3) addBoost(p, "hyper", tmin(mn, 6)*3600000, 1); arouse(mn, 10*S.x); } },
       moo:    { can: mn => !potionRefusal(mn, "moo", mn), go(mn, S){ for (let i = 0; i < Math.min(2, S.x); i++) givePotion(mn, "moo", BOTMN(), "gas"); } },

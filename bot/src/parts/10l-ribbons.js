@@ -108,6 +108,7 @@
     { id: "tag",       name: "A ribbon tag",          price: 5,  desc: "A little tag by your name on ?who for a week. ?buy tag <up to 24 letters>, like ?buy tag Good Girl" },
     { id: "dedicate",  name: "A dedication",          price: 2,  desc: "The farm girl sings somebody's praises (or teases 'em, if they like that) from you. ?buy dedicate <who> praise|tease" },
     { id: "bounty",    name: "A bounty",              price: 0,  desc: "Pin ribbons to a job; the hand who does it collects. ?buy bounty <ribbons> <the job>" },
+    { id: "mysterybox", name: "A mystery box",       price: 4,  desc: "Somethin' lovely is inside. It puts itself on, and it does somethin' to you till it comes off. ?mysterybox opens one." },
     { id: "shot-milk",  name: "A lactation shot",     price: 6,  desc: "Milk doubles for a day." },
     { id: "shot-semen", name: "A virility shot",      price: 6,  desc: "Semen doubles for a day." },
     { id: "shot-fert",  name: "A fertility shot",     price: 6,  desc: "Catchin' doubles for a day." },
@@ -255,6 +256,7 @@
         return;
       }
       default: {
+        if (it.id === "mysterybox"){ cursedCommand("mysterybox", sender, [], R); return; }   // (it takes the ribbons itself: 10y5-cursed.js)
         if (it.id.startsWith("shot-") && it.words){   // the newer shots: the same words a crafted needle carries
           if (it.limit && limitBlocks(sender, it.limit)){ R("Your hard limits rule that one out, sugar, so I'll keep it on the shelf."); return; }
           if (it.part && !hasPart(sender, it.part)){ R("💉 That shot's got nothin' to work on in you, sugar, so I'll keep it on the shelf."); return; }

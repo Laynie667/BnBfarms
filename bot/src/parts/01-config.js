@@ -256,13 +256,15 @@
     TRAP_OVERFULL: 1.3,          // traps can fill a belly this far past capacity (1.5 would pin them)
     TENTACLE_CHANCE: 0.04,       // each time a subject wades into a water spot (and every TENTACLE_LINGER_MIN they stay)
     TENTACLE_LINGER_MIN: 5, TENTACLE_HYPER_CHANCE: 0.25,
+    UNDER_STEP_MIN: 30, RAID_EVERY_MIN: 30, RAID_CHANCE: 0.1, GAUNTLET_POT: 5, GAUNTLET_MAX_MIN: 30, CLEANSE_COST: 5, LEND_BID_S: 180,   // 10y4-corruption.js
+    SUIT_HOURS: 6, SUIT_WALK_MIN: 20, CURSE_BOX_PRICE: 4,   // 10y5-cursed.js
     CHAIN_CHANCE: 0.25, CHAIN_MAX: 3,   // one trap handin' a subject to the next: how often, and how many in a row
     BET_MAX: 5, BET_OPEN_S: 120,        // watchers' bets: the most ribbons, and how long the book stays open
     LAY_SCENE: true,             // layin' and birthin' play out in beats (false: the old single line)
     BELLY_SEEN_MIN: 20, SCENT_WAIT_MIN: 2, SCENT_CHANCE: 0.15,   // how often a belly gets noticed; how soon and how surely a scent brings somethin'
     MUSK_WATER_X: 20,            // Tentacle Musk: the thing in the water is this many times likelier to come
     EGG_MAX: 150,                // the most eggs one body can carry (clutches stack)
-    GATHER_MAX_RIBBONS: 15,      // the most one layer is paid at one gatherin'
+    GATHER_MAX_RIBBONS: 20,      // the most one layer is paid at one gatherin'
     AUTOINJECT_MIN: 30, OVI_MIN: 45, AUTOFEED_MIN: 10, AUTOFEED_ML: 150, TOYCOCK_MIN: 12, TOYCOCK_STRETCH_EVERY: 10,
     SLOW_MAX: 2.6,               // the most a full belly, a litter and a clutch can slow somebody's walkin'
     PISS_COLOR: "#D9C13A",

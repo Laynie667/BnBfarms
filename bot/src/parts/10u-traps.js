@@ -116,7 +116,8 @@
     if (run){ clearTimeout(run.timer); state.trapRuns.delete(mn); }
     trapWaitEnd(mn, "quiet");   // the tickle rack, the mirror box (10u4-more-traps.js)
     sceneStop(mn);              // a layin' or a birth scene (10y2-brood.js)
-    gearOff(mn, null, "hold"); if (quietMin == null) gearOff(mn, null, "trap");   // what it had on them comes off (all of it, on a safeword)
+    gearOff(mn, null, "hold"); if (quietMin == null) gearOff(mn, null, "trap");
+    if (quietMin == null){ const r1 = rec(mn); if (r1){ r1.run = null; } if (state.lend && state.lend.mn === mn) state.lend = null; cursedOff(mn, "safe"); }   // a safeword ends a gauntlet run, a loan, a curse and the suit   // what it had on them comes off (all of it, on a safeword)
     { const r0 = rec(mn); if (r0 && r0.benched && r0.benched.trap) unbench(mn, "safe"); }   // the pillory
     trapFree(mn);
     const r = rec(mn); if (r && isSubject(mn)){ r.trapQuiet = Date.now() + (quietMin == null ? 60 : quietMin)*60000; saveLedger(); }
@@ -155,6 +156,7 @@
     n = Math.max(1, Math.min(CFG.EGG_MAX, Math.round(n * eggX(mn))));
     if (p.eggs) p.eggs.n = Math.min(CFG.EGG_MAX, p.eggs.n + n);
     else p.eggs = { n, by, since: Date.now(), layAt: Date.now() + (dl + Math.random()*(dh - dl))*86400000 };
+    eggTypesNote(p, n, by);   // what laid them (10y4-corruption.js)
     saveLedger(); audit(BOTMN(), "CLUTCH", mn+" "+n+" by "+by);
     return p.eggs.n;
   }
@@ -294,7 +296,7 @@
         trance(mn, 2);
         trapHold(mn, 3, "the lantern");
         trapRun(mn, kind, T.beats, () => {
-          trance(mn, 0); arouse(mn, 30);
+          trance(mn, 0); arouse(mn, 30); goUnder(mn, 2);
           tell(mn, "🏮 "+tFill(pickFresh("trap:lantern:thought", T.thought), mn));
         });
         break;
@@ -343,11 +345,11 @@
       if (!here){ state.trapAt.delete(mn); continue; }
       const fresh = !was || was.spot !== here;
       if (fresh) state.trapAt.set(mn, { spot: here, at: now });
-      if (!huntOn() && !r.trapEager && now - (r.trapAt || 0) < CFG.TRAP_COOLDOWN_MIN*60000) continue;    // one trap at a time, with a breather between (not durin' a hunt)
+      if (!huntOn() && !r.trapEager && !onGauntlet(mn) && now - (r.trapAt || 0) < CFG.TRAP_COOLDOWN_MIN*60000) continue;    // one trap at a time, with a breather between (not durin' a hunt)
       if (on){
         if (!fresh) continue;                                                             // step off and back on to spring it again
         r.spotTrapAt = r.spotTrapAt || {};
-        if (!r.trapEager && now - (r.spotTrapAt[here] || 0) < CFG.TRAP_RESET_MIN*60000*nightX().reset/dangerX(mn).chance/rankX(mn).reset) continue;   // each trap takes a while to reset (half as long after dark)
+        if (!r.trapEager && !onGauntlet(mn) && now - (r.spotTrapAt[here] || 0) < CFG.TRAP_RESET_MIN*60000*nightX().reset/dangerX(mn).chance/rankX(mn).reset) continue;   // each trap takes a while to reset (half as long after dark)
         const kind = trapKindOf(here);
         if (!springTrap(mn, kind, here)){ r.trapAt = now; r.spotTrapAt[here] = now; saveLedger(); }
       } else {
@@ -359,7 +361,7 @@
         if (((wk === "tentacle" && parasiteKin(mn, now)) || Math.random() < Math.min(1, CFG.TENTACLE_CHANCE*nightX().water*dangerX(mn).chance*rankX(mn).water*(potionOn(mn, "tentaclemusk") ? CFG.MUSK_WATER_X : 1))) && !springTrap(mn, wk, here)){ r.trapAt = now; saveLedger(); }   // (three times as hungry after dark)
       }
     }
-    toyTick(); moreTrapTick(); trapExtrasTick(); farmGearTick(Date.now()); broodTick();
+    toyTick(); moreTrapTick(); trapExtrasTick(); farmGearTick(Date.now()); broodTick(); corruptionTick(); cursedTick();
   }
 
   // ── toys that do things on their own ───────────────────────

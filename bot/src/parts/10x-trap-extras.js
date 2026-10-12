@@ -219,11 +219,15 @@
 
   // ── the nest ──
   function nestSpots(){ return Object.keys(L.spots || {}).filter(n => n === "nest" || /^nest-[a-z0-9]+$/.test(n)); }
-  function eggsLaid(mn, n, atNest){
+  function eggsLaid(mn, n, atNest, types){
     bump1(subjWeek().eggs, mn, n);
     if (!atNest) return;
     L.nest = L.nest || { eggs: 0, by: {} };
     L.nest.eggs += n; bump1(L.nest.by, mn, n);
+    // what kinds, per layer (they sell for different prices: 10y4-corruption.js)
+    L.nest.types = L.nest.types || {}; const mine = L.nest.types[mn] = L.nest.types[mn] || {};
+    const tt = types && Object.keys(types).length ? types : { stud: n };
+    for (const [t, k] of Object.entries(tt)) mine[t] = (mine[t] || 0) + k;
   }
   function nestCommand(cmd, sender, args, R){
     if (cmd === "lay"){
@@ -238,7 +242,7 @@
       p.offspring.eggs = (p.offspring.eggs || 0) + e.n;
       if (!L.studbook) L.studbook = [];
       L.studbook.push({ t: Date.now(), dam: sender, sires: [e.by], kids: { male: 0, female: 0, futa: 0 }, eggs: e.n });
-      eggsLaid(sender, e.n, true);
+      eggsLaid(sender, e.n, true, e.types);
       if (e.para) L.nestBrood = (L.nestBrood || 0) + 1;   // one of the parasite's own: it'll hatch here
       saveLedger(); audit(sender, "EGGS", sender+" "+e.n+" at the nest");
       emote("🥚 "+xLine(e.n >= 12 ? "layBig" : "lay", sender, { x: String(e.n), c: plainName(e.by) }), sender);
@@ -250,8 +254,8 @@
     const n = L.nest && L.nest.eggs;
     if (!n){ R("The nest's empty, sugar."); return; }
     if (!nestSpots().some(s => onSpot(sender, s, 2))){ R("Come over to the nest to gather, sugar."); return; }
-    const by = L.nest.by; L.nest = { eggs: 0, by: {} }; saveLedger(); audit(sender, "GATHER", String(n));
-    for (const [m, k] of Object.entries(by)) earnRibbons(parseInt(m, 10), Math.min(CFG.GATHER_MAX_RIBBONS, Math.max(1, Math.round(k / CFG.EGGS_PER_RIBBON))), "eggs sold at market");
+    const by = L.nest.by, types = L.nest.types || {}; L.nest = { eggs: 0, by: {} }; saveLedger(); audit(sender, "GATHER", String(n));
+    for (const [m, k] of Object.entries(by)) earnRibbons(parseInt(m, 10), Math.min(CFG.GATHER_MAX_RIBBONS, eggsWorth(types[m], k)), "eggs sold at market"+(eggTypesText(types[m]) ? " ("+eggTypesText(types[m])+")" : ""));
     earnRibbons(sender, 1, "gatherin' the eggs");
     emote("🧺 "+xLine("gather", sender, { x: String(n) }), sender);
     R("🧺 "+n+" eggs gathered and off to market. The layers have been paid: "+Object.entries(by).map(([m, k]) => plainName(parseInt(m, 10))+" ("+k+")").join(", ")+".");
@@ -274,7 +278,7 @@
     const r = rec(mn); if (!isSubject(mn)) return null;
     const k = r.trapKinds || {}, all = Object.keys(TRAP_KINDS);
     return { total: r.trapN || 0, kinds: all.filter(x => k[x]).map(x => ({ kind: x, icon: TRAP_KINDS[x].icon, n: k[x] })), left: all.filter(x => !k[x]).length,
-             eggs: (prodOf(mn).offspring || {}).eggs || 0, paused: !!r.trapsOff, eager: !!r.trapEager, danger: dangerX(mn).on, rank: SUBJECT_RANKS[rankOfSubject(mn)].name, nextRank: (SUBJECT_RANKS[rankOfSubject(mn) + 1] || {}).at || 0, hunt: huntOn() ? { until: L.hunt.until, goal: L.hunt.goal } : null };
+             eggs: (prodOf(mn).offspring || {}).eggs || 0, paused: !!r.trapsOff, eager: !!r.trapEager, danger: dangerX(mn).on, corr: corruptionOf(mn), under: underOf(mn), rank: SUBJECT_RANKS[rankOfSubject(mn)].name, nextRank: (SUBJECT_RANKS[rankOfSubject(mn) + 1] || {}).at || 0, hunt: huntOn() ? { until: L.hunt.until, goal: L.hunt.goal } : null };
   }
   function subjBoardLine(){
     const w = subjWeek(), top = (o, unit) => { const e = Object.entries(o).sort((a, b) => b[1] - a[1])[0]; return e ? plainName(parseInt(e[0], 10))+" ("+e[1]+" "+unit+")" : null; };

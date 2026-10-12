@@ -1059,6 +1059,7 @@
       clutch = Math.min(CFG.EGG_MAX - (tp.eggs ? tp.eggs.n : 0), clutch);
       if (tp.eggs) tp.eggs.n += clutch;   // clutches stack on what they're already carryin'
       else tp.eggs = { n:clutch, by:stud, since:Date.now(), layAt: Date.now() + (dl + Math.random()*(dh-dl))*86400000 };
+      eggTypesNote(tp, clutch, penisType(stud) === "draconic" ? -16 : stud);   // a draconic stud's are drake eggs
     }
     saveLedger(); audit(stud,"CUM",stud+"→"+t+" "+hole+" "+Math.round(load));
     if (!opt.second && Math.random() < 0.6){ const tb = tailBit(t, hole, stud); if (tb) o += " "+tb; }

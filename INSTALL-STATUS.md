@@ -5,7 +5,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 | Script | File in `dist/` | Where it runs | Current |
 |---|---|---|---|
-| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.27.0** |
+| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.28.0** |
 | Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.6.0** |
 | Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.1.3** |
 | Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **1.0.4** |
@@ -13,7 +13,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 | Map tools, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.3** |
 | Dairy | `farmhand-dairy.user.js` | the bot's PC | **1.0.2** |
 | Shows | `farmhand-shows.user.js` | the bot's PC | **1.0.4** |
-| Farmhand Companion | `farmhand-companion.user.js` | each player | **0.15.2** |
+| Farmhand Companion | `farmhand-companion.user.js` | each player | **0.15.3** |
 | Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.4** |
 
 ## Sending a watch report
@@ -23,6 +23,17 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 - Running the watcher on more than one game at once (the bot, yours, a tester's) lets Claude line them up into one timeline.
 
 ## Latest changes (newest first)
+
+- **Bot 0.28.0, Companion 0.15.3: corruption, egg kinds, the night raid, going under, the gauntlet, lent for the night, the mystery box, the living suit.**
+  - **Corruption** (test subjects, 0 to 100, never falls by itself): +2 a trap, +3 more if it laid in them, +5 the parasite. Permanent changes at 20 (heats half again as long), 40 (a size up), 60 (a cum craving that stays), 80 (a word that slips out when they talk), 100 (Ruined: gas, spray and needle lean brutal). `?corruption`; staff `?cleanse <who>` for 5 ribbons takes 20 off.
+  - **Egg kinds**: a clutch remembers what laid it (water, drake, hive, parasite, post, vine, toy, stud). Each kind has its own price at `?gather`, three kinds or more sell for a quarter more, and a layer can earn up to 20 ribbons a gathering.
+  - **The night raid**: in curfew hours, every half hour there is a 1 in 10 chance the wolf pack comes into the `barn` spot for the subjects there.
+  - **Going under**: haze gas, the lantern and the mirror box stack a depth (0 to 5) that fades a step each half hour. From depth 2 the Companion simplifies what they say out loud.
+  - **The gauntlet**: `?spot set gauntlet-start` and `gauntlet-end`. A subject stepping on the start is timed to the end with no breather between traps. Pot of 5 ribbons (`?gauntlet pot <n>`), 2 more for the fastest run; `?gauntlet` shows fastest and most ruined.
+  - **Lent for the night**: a subject says `?lend me`; three minutes of `?bid <ribbons>`; the winner names up to three traps with `?route <kind> <kind> <kind>` and the subject is put through them. The subject keeps half the bid.
+  - **The mystery box** (`?mysterybox` or the store, 4 ribbons, anybody): a cursed piece puts itself on as real gear for 40 to 60 minutes: Growin' Plug, Hungry Belt, Milkmaid's Cups, Glutton's Funnel or the Hobble. Staff `?mysterybox lift <who>`.
+  - **The living suit** (`?spot set trap-suit`): a patch that spreads over a subject across 6 hours (legs, hips, chest, arms, mouth), each stage real gear. It feeds on arousal, stops them cumming once it has their hips, and walks them where it likes. Staff `?suit off <who>`.
+  - The safeword ends every one of these at once.
 
 - **Bot 0.27.0, Companion 0.15.2, Glory stalls 1.6.0: ranks, traps that hand you on, the brood book, bets, a stall of your own.**
   - **Subject ranks** by traps sprung: Bait, Trap Fodder (10), Brood Sow (25), Broodmother (60). Each rank: water 25% hungrier, resets 20% faster, clutches 10% bigger, and likelier to be handed on. Shown on the trap card.

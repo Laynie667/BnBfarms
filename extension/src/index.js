@@ -57,6 +57,18 @@ function mooify(text, species) {
   });
 }
 
+// simpler words for somebody who's gone under: depth 2 trims the longest words, 3 trims more and drops the capitals,
+// 4 and 5 leave short words and little sighs
+function dumbDown(text, depth) {
+  const max = depth >= 4 ? 4 : depth === 3 ? 6 : 8, fillers = ["mm", "uh", "...", "nn"];
+  let out = String(text).replace(/[A-Za-z']+/g, (w) => {
+    if (w.length <= max) return w;
+    if (depth >= 4) return Math.random() < 0.5 ? fillers[Math.floor(Math.random() * fillers.length)] : w.slice(0, 3) + "...";
+    return Math.random() < (depth === 3 ? 0.7 : 0.4) ? w.slice(0, Math.max(3, max - 2)) + "..." : w;
+  });
+  if (depth >= 3) out = out.toLowerCase();
+  return out;
+}
 const botHere = () =>
   window.CurrentScreen === "ChatRoom" &&
   Array.isArray(window.ChatRoomCharacter) &&
@@ -322,6 +334,23 @@ function start() {
     return next(args);
   });
 
+  // GONE UNDER (the haze, the lantern, the mirror box): from depth 2 your words come out simpler on screen: long words
+  // shorten or trail off, the deeper the more. And once the farm has put a word in your mouth (corruption 80), it
+  // slips out on the end of one line in six. Only what you say out loud; never commands, whispers or emotes.
+  try {
+    mod.hookFunction("ServerSend", 3, (args, next) => {
+      try {
+        const d = args[1], s = st.panel && st.panel.s;
+        if (args[0] === "ChatRoomChat" && d && d.Type === "Chat" && typeof d.Content === "string" && s && !/^\s*[(\[?!./\-*]/.test(d.Content)) {
+          let text = d.Content;
+          if (s.under >= 2) text = dumbDown(text, s.under);
+          if (s.corrWord && Math.random() < 0.17) text = text.replace(/\s+$/, "") + " ..." + String(s.corrWord).slice(0, 20) + ".";
+          if (text !== d.Content) args = [args[0], Object.assign({}, d, { Content: text })];
+        }
+      } catch (e) { /* say it plain, then */ }
+      return next(args);
+    });
+  } catch (e) { console.warn("[Farmhand Companion] gone-under speech unavailable:", e); }
   // The parasite talks through its host: now and then (one line in five) somethin' it wants slips out with what you
   // said out loud. Only while its lips are on you; never commands, whispers, emotes or out-of-character lines.
   try {

@@ -23,6 +23,7 @@
   // called when a trap has finished with them (10u-traps.js trapRun)
   function trapAfter(mn, kind, before){
     const r = rec(mn), p = prodOf(mn), now = Date.now();
+    corrupt(mn, 2 + (((p.eggs ? p.eggs.n : 0) > (before.eggs || 0)) ? 3 : 0) + (r.chainN ? 1 : 0), kind);   // every trap leaves a little more of the farm in them (10y4-corruption.js)
     // rank up?
     const k = rankOfSubject(mn);
     if (k > (r.trapRank || 0)){

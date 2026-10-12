@@ -7,6 +7,7 @@
 import { h, card, title, muted, btn, chip, bar, toggle, ml } from "../dom.js";
 import { guidesTab, safetyTab } from "./common.js";
 import { storeTab } from "./store.js";
+import { gearLore } from "../gearlore.js";
 
 const pct = (a, b) => (b ? (100 * a) / b : 0);
 const hoursLeft = (t) => Math.max(0, Math.ceil((t - Date.now()) / 3600000));
@@ -119,7 +120,7 @@ function traps(ctx) {
          ? card(title("Trap card"), muted("You're a test subject, and the traps are live for you. Your card isn't showin' because the farm girl's bot (v" + ((ctx.welcome && ctx.welcome.ver) || "?") + ") is older than this panel: it needs 0.22 or newer on her computer to send it."),
              h("div", null, btn("Struggle", () => ctx.send("struggle")), btn("What's out there", () => ctx.send("traps"))))
        : card(title("Traps"), muted("The farm's traps spring for test subjects and nobody else. A proprietor signs a volunteer up; you're not one right now, so you can walk right over them.")),
-    card(title("On you right now"), gear.length ? gear.map((g) => h("div", { class: "fhc-kv" }, h("span", null, g.name), h("span", { class: "fhc-muted" }, Math.max(0, Math.ceil((g.until - Date.now()) / 60000)) + " min")))
+    card(title("On you right now"), gear.length ? gear.map((g) => h("div", { style: { marginTop: "6px" } }, h("div", { class: "fhc-kv" }, h("b", null, g.name), h("span", { class: "fhc-muted" }, Math.max(0, Math.ceil((g.until - Date.now()) / 60000)) + " min")), muted(gearLore(g.name) || g.desc || "")))
       : muted("No farm gear on you."),
       !ctx.prefs.gear && muted("Trap gear only goes on for real with \"Farm can put real gear on me\" switched on (Toggles → This panel).")),
     s.sitting && card(title("🪺 Sittin' the nest"), muted(s.sitting.n + " eggs under you. They hatch in about " + Math.max(1, Math.ceil((s.sitting.until - Date.now()) / 60000)) + " min."), h("div", null, btn("Get up", () => ctx.send("sit up")))),

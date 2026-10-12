@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.15.4
+// @version      0.15.5
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -230,7 +230,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.15.4";
+  var VERSION = "0.15.5";
 
   // extension/src/config.js
   var BOT_MEMBER = 260239;
@@ -526,6 +526,46 @@ One of mods you are using is using an old version of SDK. It will work for now b
     ];
   }
 
+  // extension/src/gearlore.js
+  var GEAR_LORE = {
+    "Pump Bung": "A fat black rubber bung, pushed in while the hose was still runnin' and swollen up behind your ring so it can't be squeezed out. Your belly's packed round and tight behind it and every step sets the lot sloshin'. You can feel it press on everything. It stays in till you've soaked up what you were given, so walk careful, and don't let anybody poke that belly unless you want to moan in front of them.",
+    "Egg Post Plug": "The post didn't just lay in you, it corked you after. A thick ridged plug is seated right up against the clutch, each ridge holdin' you open a little wider than the last, so the eggs sit deep and warm and can't slip. When you clench, you clench on it. When the eggs shift, it shifts with them. It comes out when they've settled, and you'll gape for a while after.",
+    "The Water's Grip": "Wet, heavy arms as thick as your wrist, wound round you from hand to elbow, every sucker kissin' your skin and holdin' on. They pull when you pull. They squeeze in time with whatever the rest of it is doin' between your legs, so you feel each thrust twice. You're not gettin' your hands back till it's finished.",
+    "The Water's Coils": "Slick coils round both thighs, hauled wide and kept wide. They're warm, they're strong, and they flex like somethin' breathin'. Try to close your legs and they open you further and hold you there, drippin', spread for it like a mare in the stocks. It wants room to work, and it's made some.",
+    "Slime Seal": "It left the tip of itself in you. A fat knot of livin' flesh is buried to the root, pulsin' slow, plugged tight against a womb it packed with eggs, and it's still leakin' somethin' warm that keeps you wet and soft and wantin'. You can feel it twitch when you walk. It lets go when the clutch has taken hold, and not one second before.",
+    "Boar's Plug": "What a boar leaves so his work isn't wasted: a hard waxy plug thick as your wrist, set deep while he was still tied in you. Behind it there's more hog seed than you'd think a belly could hold, hot and heavy, and you can hear it when you move. You smell of him. Everybody who gets close knows exactly what happened to you and how long it took.",
+    "Seed Pod Stem": "A length of green vine as thick as two fingers, cut off and left rooted in you, still weepin' sap. It's holdin' its seed pods right where it planted them, and every so often it tightens, like it's checkin' they're still there. The sap tingles. It's makin' you slick enough to take the next thing that finds you.",
+    "Slime Sleeves": "Thick green slime from your fingertips to your shoulders, warm as a mouth and twice as clingy. It strings between your arm and your ribs when you lift it, and it sucks at anything you touch. Your hands are no use for anything fiddly, least of all gettin' yourself off, which is the idea.",
+    "Slime Stockings": "Slime to the hip on both legs, oozin' down your thighs and pullin' at the floor with every step. It's inside you as well, a slow warm crawl that never quite stops movin'. Walkin' rubs it everywhere at once. Standin' still, you can feel it explorin'.",
+    "Denial Clamp": "Cold steel locked over everything worth touchin', and it's not empty in there. Somethin' soft and wet laps at you, slow, then hums, then stops dead the instant your hips start to chase it. Over and over, right up to the edge and no further. You can rub the outside of it all you like. You're not cummin' till it opens.",
+    "Growth Cups": "Two wide glass bells, pumped down hard, with your teats drawn up long and dark inside them where anybody can watch. The suction never lets up. You can feel them swellin', hot and tight, a deep ache that goes straight down between your legs. They come off when your tits are a size bigger, and they'll be tender as fresh bruises when they do.",
+    "Trap Milker": "Steel cups latched on with a pull that means it, nipples stretched right down the glass, bein' milked in hard steady strokes whether you've anything left to give or not. You can hear it hit the bottle. You can't shake them off, and the more you squirm the better they seat.",
+    "Winch Chain": "The chain that walked you across the yard on your tiptoes with everybody watchin', like a heifer bein' taken to the bull. It's still clipped to your collar and still warm from the winch. Whoever picks up the other end can take you anywhere they like.",
+    "Feed Chute": "A wide rubber funnel strapped between your teeth, your throat held open, and warm sweet mash slidin' down whether you swallow or not. Your belly's goin' round and tight under it. You can't close your mouth, you can't say no, and you're droolin' round the rim like stock at the trough.",
+    "Snare Rope": "Rough rope cinched round both wrists and hauled up over your head, stretchin' you out long and helpless. Your tits are lifted, your ribs are showin', and there's not a thing you can cover. The little machine it brought with it knows it.",
+    "Snare Hobble": "Rope round each ankle, pullin' your feet wide apart and keepin' them there. Everything between your legs is open to the air and to anybody passin', and you can't reach it yourself. You can feel yourself drippin' onto the dirt.",
+    "Breedin' Frame Cuffs": "Padded steel on both wrists, locked to the frame: bent over, hips up, back arched, held still the way a mare's held for the stud. You can rock an inch. That's all it gives you, and it's just enough to push back onto what's comin'.",
+    "Kennel Lead": "A short lead clipped to the ring at the back of the kennel. Long enough for all fours, long enough to get your ass up. Not long enough to reach the door. You'll be let out when he's finished trainin' you.",
+    "Pack's Knot": "The last wolf's knot, swollen fat as a fist behind your ring and throbbin', lockin' in a bellyful of the whole pack's seed. You're tied. Pull and it only hurts sweet; hold still and you can feel it pulse, pumpin' the last of him into you. It goes down when it goes down.",
+    "Stud's Stopper": "A stable hand's rubber stopper, shoved up you the moment the stallion dragged himself out, so a mare's worth of horse cum stays where he put it. You're so full of him your belly's pushed out, and every step you can feel it roll. Pull that stopper and you'd flood the yard.",
+    "Pillory Spreader": "A steel bar ratcheted between your ankles so your legs can't close. Bent in the pillory with your ass in the air, that leaves both holes on show and on offer. Whoever walks up gets their pick, and you get to guess who it was.",
+    "Parasite Lips": "Fat, wet, livin' lips sealed over your own, and a tentacle down your throat that you stopped gaggin' on a while ago. It feeds you its brew in slow warm pulses, and it swallows every load you suck out of anybody before you taste a drop. Your mouth is a hole it uses to eat. You'd let it, too. That's the serum talkin', and it's very persuasive.",
+    "Parasite Suckers": "Two soft pink mouths latched over your teats, suckin' in long greedy pulls. They drink every drop of milk you make and push somethin' hotter back in, and your tits are swellin' with it. Try to pull one off and it only latches deeper and sucks harder.",
+    "Parasite Belt": "A band of hot livin' flesh sealed round your hips, with a thick root of itself throbbin' in each hole. It drinks every load you're given, it pumps its own brew back up into you, and it never stops movin'. It's decided what your body's for, and it's makin' the changes itself.",
+    "Parasite Root": "The thing has rooted in you: a thick, pulsin' length of itself seated deep and feedin'. It swells when you're filled and it squeezes when it's hungry, and right now you can't tell which of you is the one that wants bred.",
+    "Growin' Plug": "It seemed a sensible size goin' in. It isn't any more. Every ten minutes it swells a little fatter inside you, slow and patient, stretchin' your ring a hair past what you thought you could take, and it will not come out till it's done growin'. Walk and it rocks. Sit and it goes deeper.",
+    "Hungry Belt": "A pretty filigree belt that locked itself the second it touched your skin. It hums against everything it covers, never quite enough, and every time you get close it drinks the orgasm right out of you before it can start. You're soaked under it and it's lovin' that.",
+    "Milkmaid's Cups": "Two silver cups that latched on by themselves and began to pull. Your udders are fillin' twice as fast to keep up with them, hot and heavy and achin', and the cups only want more. You can feel the milk let down every time they squeeze.",
+    "Glutton's Funnel": "A gilded funnel that strapped itself between your teeth. Every ten minutes it pours another warm, thick helpin' straight down your throat whether there's room or not, and your belly rounds a little further. There's no closin' your mouth and no turnin' your head.",
+    "The Hobble": "Two dainty cuffs joined by a hand's length of chain. They looked like anklets in the box. Now every step is a tiny swayin' shuffle with your thighs rubbin' together, and you won't be outrunnin' anything on this farm.",
+    "Living Suit (legs)": "Glossy black livin' latex, grown up both your legs to the hip, warm as skin and a good deal tighter. It ripples when you walk and strokes the backs of your knees when you stand still. It's still spreadin'. You can feel the edge of it creepin' higher.",
+    "Living Suit (hips)": "It's closed over your hips and everything between in one seamless black skin, with a soft thick root of itself pushed up inside you. It squeezes when you get close and holds you right there, pantin', and it will not let you over. It's feedin' on how bad you want it.",
+    "Living Suit (chest)": "Livin' latex moulded over both your tits, kneadin' them in slow waves, with a wet little mouth of itself sealed on each nipple. It suckles when you breathe in. It's learnin' what makes you whine.",
+    "Living Suit (arms)": "It's run down both your arms and webbed your fingers together. Your hands are its hands now. It'll let you hold a rail. It won't let you touch yourself, and it moves them where it pleases.",
+    "Living Suit (mouth)": "The last of it: a smooth black sheath over your face from the nose down, and a tongue of itself in your mouth, fillin' it. Every inch of you is inside it now. It walks you where it likes, and you go."
+  };
+  var gearLore = (name) => GEAR_LORE[name] || "";
+
   // extension/src/views/livestock.js
   var pct = (a, b) => b ? 100 * a / b : 0;
   var hoursLeft = (t) => Math.max(0, Math.ceil((t - Date.now()) / 36e5));
@@ -689,7 +729,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       ) : card(title("Traps"), muted("The farm's traps spring for test subjects and nobody else. A proprietor signs a volunteer up; you're not one right now, so you can walk right over them.")),
       card(
         title("On you right now"),
-        gear.length ? gear.map((g) => h("div", { class: "fhc-kv" }, h("span", null, g.name), h("span", { class: "fhc-muted" }, Math.max(0, Math.ceil((g.until - Date.now()) / 6e4)) + " min"))) : muted("No farm gear on you."),
+        gear.length ? gear.map((g) => h("div", { style: { marginTop: "6px" } }, h("div", { class: "fhc-kv" }, h("b", null, g.name), h("span", { class: "fhc-muted" }, Math.max(0, Math.ceil((g.until - Date.now()) / 6e4)) + " min")), muted(gearLore(g.name) || g.desc || ""))) : muted("No farm gear on you."),
         !ctx2.prefs.gear && muted('Trap gear only goes on for real with "Farm can put real gear on me" switched on (Toggles \u2192 This panel).')
       ),
       s.sitting && card(title("\u{1FABA} Sittin' the nest"), muted(s.sitting.n + " eggs under you. They hatch in about " + Math.max(1, Math.ceil((s.sitting.until - Date.now()) / 6e4)) + " min."), h("div", null, btn("Get up", () => ctx2.send("sit up")))),

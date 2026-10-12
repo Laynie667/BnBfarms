@@ -13,7 +13,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 | Map tools, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.3** |
 | Dairy | `farmhand-dairy.user.js` | the bot's PC | **1.0.2** |
 | Shows | `farmhand-shows.user.js` | the bot's PC | **1.0.4** |
-| Farmhand Companion | `farmhand-companion.user.js` | each player | **0.15.4** |
+| Farmhand Companion | `farmhand-companion.user.js` | each player | **0.15.5** |
 | Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.4** |
 
 ## Sending a watch report
@@ -23,6 +23,8 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 - Running the watcher on more than one game at once (the bot, yours, a tester's) lets Claude line them up into one timeline.
 
 ## Latest changes (newest first)
+
+- **Companion 0.15.5: what your gear is doing to you, the long way.** "On you right now" (Traps tab) shows a full paragraph for each of the 35 pieces the traps, the parasite, the mystery box and the living suit can put on somebody, written to the wearer. The game's own item description stays short because the game caps it.
 
 - **Bot 0.29.0, Companion 0.15.4: toys that follow, home-built traps, brooding, the whistle, keepsakes, trained holes, barn dreams, leaders' reins, the vat; and milking, pregnancy and "your words".**
   - **Toys follow the scene** (Companion, needs "Farm can stir me up"): any vibrating toy really worn goes low while a trap teases, high as it finishes, off while denied, then back how it was. Locked toys the wearer can't change are left alone. NOT YET SEEN LIVE.

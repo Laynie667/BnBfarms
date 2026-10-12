@@ -116,12 +116,13 @@ export function face(m) {
 }
 
 // ── sounds only you hear (the game's own sound files, at your game volume) ──
-const SOUNDS = { pump: "SciFiPump", machine: "Sybian", bell: "BellMedium", cowbell: "BellSmall", stall: "CageClose", gate: "CageOpen",
+const SOUNDS = { pump: "SciFiPump", machine: "Sybian", bell: "BellMedium", cowbell: "BellSmall", stall: "SciFiPump", gate: "CageOpen",   // (the stall latchin' on used to be a cage door slammin': jarring, said Laynie, Oct 12)
   bowl: "PlaceBowl", wet: "Slime", chain: "ChainShort", lock: "LockSmall", vibe: "VibratorShort", spank: "SpankSkin1" };
+const QUIET = { stall: 0.35, pump: 0.4, machine: 0.4 };   // the ones that run under a scene sit lower
 export function sound(m) {
   const f = SOUNDS[m.name]; if (!f || !pref("noSound") || typeof W.AudioPlayInstantSound !== "function") return;
   const vol = (W.Player && W.Player.AudioSettings && W.Player.AudioSettings.Volume) || 0;
-  try { W.AudioPlayInstantSound("Audio/" + f + ".mp3", vol * 0.6); } catch (e) { /* no sound: fine */ }
+  try { W.AudioPlayInstantSound("Audio/" + f + ".mp3", vol * (QUIET[m.name] || 0.6)); } catch (e) { /* no sound: fine */ }
 }
 
 // ── the trance haze ────────────────────────────────────────

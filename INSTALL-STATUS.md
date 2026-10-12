@@ -13,7 +13,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 | Map tools, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.3** |
 | Dairy | `farmhand-dairy.user.js` | the bot's PC | **1.0.2** |
 | Shows | `farmhand-shows.user.js` | the bot's PC | **1.0.4** |
-| Farmhand Companion | `farmhand-companion.user.js` | each player | **0.15.5** |
+| Farmhand Companion | `farmhand-companion.user.js` | each player | **0.15.6** |
 | Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.4** |
 
 ## Sending a watch report
@@ -23,6 +23,8 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 - Running the watcher on more than one game at once (the bot, yours, a tester's) lets Claude line them up into one timeline.
 
 ## Latest changes (newest first)
+
+- **Companion 0.15.6: the milking stall no longer slams a cage door.** When the cups latch on it plays the pump, quietly. The pump and machine sounds sit lower too. A proper pass over every sound cue waits on the game's Audio folder being back in `reference`.
 
 - **Bot 0.29.2: the intensity dial, trap by trap.** All 25 named traps (the 13 farm traps and the 12 anthro ones) now have three tender and three filthy closing lines of their own, 150 in all. With `?intensity tender` or `filthy`, half of a trap's beats from the second on get one, two times in three from that trap's own list.
 

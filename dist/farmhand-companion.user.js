@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.15.5
+// @version      0.15.6
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -230,7 +230,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.15.5";
+  var VERSION = "0.15.6";
 
   // extension/src/config.js
   var BOT_MEMBER = 260239;
@@ -4456,8 +4456,9 @@ One of mods you are using is using an old version of SDK. It will work for now b
     machine: "Sybian",
     bell: "BellMedium",
     cowbell: "BellSmall",
-    stall: "CageClose",
+    stall: "SciFiPump",
     gate: "CageOpen",
+    // (the stall latchin' on used to be a cage door slammin': jarring, said Laynie, Oct 12)
     bowl: "PlaceBowl",
     wet: "Slime",
     chain: "ChainShort",
@@ -4465,12 +4466,13 @@ One of mods you are using is using an old version of SDK. It will work for now b
     vibe: "VibratorShort",
     spank: "SpankSkin1"
   };
+  var QUIET = { stall: 0.35, pump: 0.4, machine: 0.4 };
   function sound(m) {
     const f = SOUNDS[m.name];
     if (!f || !pref("noSound") || typeof W.AudioPlayInstantSound !== "function") return;
     const vol = W.Player && W.Player.AudioSettings && W.Player.AudioSettings.Volume || 0;
     try {
-      W.AudioPlayInstantSound("Audio/" + f + ".mp3", vol * 0.6);
+      W.AudioPlayInstantSound("Audio/" + f + ".mp3", vol * (QUIET[m.name] || 0.6));
     } catch (e) {
     }
   }

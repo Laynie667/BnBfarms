@@ -143,12 +143,23 @@
   // a piece is grown, evenly, by whatever takes the game's breast to hers: kx across (about the breastbone), and mapY down
   // the picture (rows above the chest don't move; the game's nipple line lands on the middle of her breast, the game's
   // underside on hers). ro, ri, rv: her breast as a plain oval, for telling what is on it from what is beside it.
-  function fitOf(S) {
+  // On all fours the game shows her chest from the front, smaller and higher in the picture, and her breasts rest on the
+  // ground: whatever hangs past it is cut off flat. So there the game's breast (top to underside) is laid onto what
+  // SHOWS of hers (from where it leaves her chest down to the ground), not onto the whole hanging shape. My first try
+  // used the whole shape, and a bra landed with only its straps on her and its cups under the floor.
+  const GAME_ALLFOURS = { dx: 33, cy: 288, ro: 22, rv: 25, y1: 236, y2: 262, y3: 318 }, GROUND = 398;
+  function fitOf(S, pose) {
+    if (pose === "AllFours") { const G2 = GAME_ALLFOURS, ro = S.r * (1 + S.sag * 0.3), rv = S.r * (1 + S.sag), kx = (S.bx + ro) / (G2.dx + G2.ro);
+      const bottom = Math.min(GROUND, ROOT_Y + S.by + rv), top = Math.max(G2.y1 + 4, Math.min(bottom - 40, ROOT_Y + S.by - S.r * S.top * 0.8)), ky = (bottom - top) / (G2.cy + G2.rv - G2.y2);
+      return { G: G2, gi: G2.dx - G2.ro, go: G2.dx + G2.ro, ti: Math.max(0, S.bx - S.r), to: S.bx + ro, kx, ro, ri: Math.min(S.r, S.bx), rv, mapY: (y) => (y <= G2.y1 ? y : y >= G2.y2 ? top + (y - G2.y2) * ky : G2.y1 + (top - G2.y1) * (y - G2.y1) / (G2.y2 - G2.y1)) }; }
     if (S.held) return { kx: S.sc, ro: S.ro, ri: S.ri, rv: S.rv, mapY: (y) => heldY(y, S.sc) };
     const ro = S.r * (1 + S.sag * 0.3), rv = S.r * (1 + S.sag), kx = (S.bx + ro) / (GAME.dx + GAME.ro), ky = rv / GAME.rv;
     const cy = ROOT_Y + S.by, top = Math.max(GAME.y1 + 4, cy - (GAME.cy - GAME.y2) * ky);
     const mapY = (y) => (y <= GAME.y1 ? y : y >= GAME.y2 ? top + (y - GAME.y2) * ky : GAME.y1 + (top - GAME.y1) * (y - GAME.y1) / (GAME.y2 - GAME.y1));
-    return { kx, ro, ri: Math.min(S.r, S.bx), rv, mapY };
+    // gi, go: the game's breast, its inner and outer edge out from the breastbone (standing, the game's two touch: gi is 0).
+    // ti, to: hers. Hers sit apart at the smaller sizes, so what the game has ON the breastbone (the bridge of a bra, the
+    // middle of a top) is spread across her gap, and what's on the breast is laid from her inner edge to her outer one.
+    return { gi: 0, go: GAME.dx + GAME.ro, ti: Math.max(0, S.bx - S.r), to: S.bx + ro, kx, ro, ri: Math.min(S.r, S.bx), rv, mapY };
   }
   window.FarmBreasts = { fitOf, NATIVE, CUPS, DRAWN_FROM, ROOT_Y, GAME, shape, held, heldY, point, nipples, canvas };
 })();

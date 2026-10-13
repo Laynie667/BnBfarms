@@ -678,7 +678,7 @@
                 bc = BREAST.flat;
               }
               real.drawImage(bc, rx - bc.ax, ry - bc.ay, {}); if (typeof real.drawImageBlink === "function") real.drawImageBlink(bc, rx - bc.ax, ry - bc.ay, {});
-              ctx.breast = { fit: FarmBreasts.fitOf(S3), held: isHeld, upperSrc: upper[2], ux: upper[0], pose: bpose, ground: bpose === "AllFours" ? ground : Infinity, S: S3, rx, ry, uy: upper[1], mask: bc.mask, mx: rx - bc.ax, my: ry - bc.ay, nips: bc.nips.map((p, i) => [rx + p[0] + (i ? 1 : -1) * br.nipX, ry + p[1] + br.nipY]), k: FarmBreasts.shape(br.cup, br).k, kN: (1 + 0.45 * FarmBreasts.shape(br.cup, br).k) * br.nip, sig: key + "|" + Math.round(rx) + "," + Math.round(ry) + "|" + [br.nip, br.nipX, br.nipY].join(","), mid: upper[0] + 250 };
+              ctx.breast = { fit: FarmBreasts.fitOf(S3, FarmBelly.bellyPose(upper[2])), held: isHeld, upperSrc: upper[2], ux: upper[0], pose: bpose, ground: bpose === "AllFours" ? ground : Infinity, S: S3, rx, ry, uy: upper[1], mask: bc.mask, mx: rx - bc.ax, my: ry - bc.ay, nips: bc.nips.map((p, i) => [rx + p[0] + (i ? 1 : -1) * br.nipX, ry + p[1] + br.nipY]), k: FarmBreasts.shape(br.cup, br).k, kN: (1 + 0.45 * FarmBreasts.shape(br.cup, br).k) * br.nip, sig: key + "|" + Math.round(rx) + "," + Math.round(ry) + "|" + [br.nip, br.nipX, br.nipY].join(","), mid: upper[0] + 250 };
               // (a pose where the game paints the nipples into the body itself, all fours, gives us none to move: ours then)
               if (!held.length) {
                 const B = ctx.breast, sk = bellySkin(upper[2], upper[3], bpose), rad = 7 * B.kN, nc = document.createElement("canvas"); nc.width = nc.height = Math.ceil(rad * 2 + 4);
@@ -756,7 +756,7 @@
           //     the way the breasts themselves do.
           //   · It's only shown where there's something for it to lie on: the breasts, or the body. Nothing hangs in the air.
           const dressDraw = (name, src, x, y, o) => {
-            const B = ctx.breast, im = B && B.pose !== "AllFours" && mouldImg(src); if (!im) return false;
+            const B = ctx.breast, im = B && mouldImg(src); if (!im) return false;   // (every pose, all fours too: nothing is drawn below the ground there)
             // A piece that lies ON the breasts is grown with them (and every layer of it: a buckle or a bow goes along). A
             // piece that only props them from under (an underbust corset) holds them but has nothing ON them, so nothing of
             // it is grown: grown, its top trim was landing on the breast (Laynie, Oct 13: "the latex corset shows stuff on
@@ -766,7 +766,7 @@
             const key = "dress|" + src + "|" + Math.round(x) + "," + Math.round(y) + "|" + B.sig + "|" + (ctx.belly && !fit.behind && BELLY.auto !== false ? ctx.sig : "") + "|" + MOULD.ver;
             let c = BREAST.out.get(key);
             if (!c) {
-              const MX = 260, MY = 480, w = im.naturalWidth, h = im.naturalHeight, S2 = Object.assign({}, B.S, { sc: B.fit.kx, ro: B.fit.ro, ri: B.fit.ri, rv: B.fit.rv }), G = FarmBreasts.GAME, sc = S2.sc;
+              const MX = 260, MY = 480, w = im.naturalWidth, h = im.naturalHeight, S2 = Object.assign({}, B.S, { sc: B.fit.kx, ro: B.fit.ro, ri: B.fit.ri, rv: B.fit.rv }), G = B.fit.G || FarmBreasts.GAME, sc = S2.sc;
               c = document.createElement("canvas"); c.width = w + MX * 2; c.height = h + MY * 2; c.MX = MX; c.MY = MY;
               const g = c.getContext("2d", { willReadFrequently: true }), midX = MX + B.mid - x, uyc = MY + B.uy - y;
               const pk = (pieceOf(src) || {}).key || src, CW = c.width, CH = c.height;
@@ -814,7 +814,11 @@
                 // MOULDED: the stretch of the piece across her body on each row is grown out to a line that runs from
                 // the side of the breast down to the body again, by the piece's hem or a little below the bust,
                 // whichever comes first. Same rows, same cloth, same print: only wider, the way the mould always did it.
-                const tentOn = !!BREAST.solid[pk], tEnd = tentOn ? Math.min(pb > 0 ? pb : flapEnd, bcy + S2.rv * 2.4) : 0;
+                // across: the gap between her breasts is filled from the game's gap, each breast from the game's breast
+                const FT = B.fit, srcOff = (off, sg) => { if (FT.to == null || sc <= 1.001) return off / sg; const e = Math.max(0, Math.min(1, (sg - 1) / (sc - 1))), a = Math.abs(off);
+                  const m = a <= FT.ti ? (FT.ti > 0.5 ? a * FT.gi / FT.ti : FT.gi) : FT.gi + (a - FT.ti) * (FT.go - FT.gi) / Math.max(1, FT.to - FT.ti); return (off < 0 ? -1 : 1) * ((1 - e) * a + e * m); };
+                const groundRow = B.ground < 1e8 ? MY + B.ground - y - 1 : 1e9;
+                const tentOn = !!BREAST.solid[pk] && B.pose !== "AllFours", tEnd = tentOn ? Math.min(pb > 0 ? pb : flapEnd, bcy + S2.rv * 2.4) : 0;
                 const bodyHalfAt = (qy) => { const pj = Math.round(qy - uyc); return prof && pj >= 0 && pj < prof.h && prof.L[pj] >= 0 ? Math.max(midX - (ux + prof.L[pj]), ux + prof.R[pj] - midX) : 80; };
                 const tentTop = S2.bx + S2.ro * 0.96, tentBot = tentOn ? bodyHalfAt(tEnd) + 1 : 0;
                 const tentHalf = (qy) => { const t = Math.max(0, Math.min(1, (qy - bcy) / Math.max(1, tEnd - bcy))); return tentTop + (tentBot - tentTop) * Math.pow(t, 1.25); };
@@ -835,6 +839,7 @@
                     // both white sleeves: Laynie, Oct 13, "those outfits look broken again"). And under the breasts it spans
                     // from one to the other: cloth pulled over two breasts is taut across the gap, it doesn't follow each
                     // one in underneath like paint on two balloons.
+                    if (qy > groundRow) continue;
                     const inRows = qy <= yEnd, under = tentOn && qy > bcy;
                     const onB = inRows && onBreast(qx, qy), onBody = inRows && !under && (!drape || qy <= bcy) && (prof ? (tl >= 0 && qx >= ux + tl && qx <= ux + tr) : Math.abs(qx - midX) <= 80);
                     const bridge = inRows && !onB && qy > bcy && Math.abs(qx - midX) < S2.bx && qy <= bcy + S2.rv * (0.94 + 0.06 * Math.pow(Math.abs(qx - midX) / S2.bx, 2));   /* nearly straight across between their two lowest points: her shape hangs lower in the middle than the round one did, and skin was showing in the gap */
@@ -842,7 +847,7 @@
                     const th = under && qy <= tEnd ? tentHalf(qy) : 0, bh2 = th ? bodyHalfAt(qy) : 0, onTent = th > bh2 + 1 && !onB && !bridge && Math.abs(qx - midX) <= th;
                     if (!(onB || onBody || bridge || onSlope || onTent)) continue;
                     const o4 = (j * bw + i) * 4; if (!onSlope) hi.data[o4 + 3] = 255;
-                    const fx = onTent ? midX + (qx - midX) * bh2 / th : midX + (qx - midX) / sg, fy = onTent ? qy : yn, ix = Math.floor(fx), iy = Math.floor(fy); if (ix < 0 || iy < 0 || ix >= CW - 1 || iy >= CH - 1) continue;
+                    const fx = onTent ? midX + (qx - midX) * bh2 / th : midX + srcOff(qx - midX, sg), fy = onTent ? qy : yn, ix = Math.floor(fx), iy = Math.floor(fy); if (ix < 0 || iy < 0 || ix >= CW - 1 || iy >= CH - 1) continue;
                     const ax = fx - ix, ay = fy - iy, p00 = (iy * CW + ix) * 4, p10 = p00 + 4, p01 = p00 + CW * 4, p11 = p01 + 4;
                     const a00 = sp[p00 + 3] * (1 - ax) * (1 - ay), a10 = sp[p10 + 3] * ax * (1 - ay), a01 = sp[p01 + 3] * (1 - ax) * ay, a11 = sp[p11 + 3] * ax * ay, at = a00 + a10 + a01 + a11;
                     if (at < 1) continue;

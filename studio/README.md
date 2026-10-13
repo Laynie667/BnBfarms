@@ -96,6 +96,15 @@ the game's pictures into the drawing.
   not set to "behind".
 - The list of moulded pieces is saved in `fits/items.json` when you press *Save this fit*.
 
+## Step 29: the breast fits the clothes
+
+- With anything worn over the chest, the drawn breasts take the game's own breast shape a size up, and the piece
+  is the game's own picture grown by the same amount. Nothing about the piece is redrawn. This replaces steps 18
+  to 28 below, which bent the piece to a free-hanging breast and never looked like the originals.
+- Bare, they hang free in the teardrop shape.
+- *Clothes a size up* in the Breasts section switches it off; a picked piece can be left as the game draws it or
+  tucked behind.
+
 ## Step 22: straps keep their layout
 
 - Every piece keeps the game's own layout on drawn breasts. If its picture measures as straps, they are pared back to

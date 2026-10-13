@@ -26,10 +26,31 @@
     const by = r * top;                              // the slope starts at the chest, so the longer it is the lower they hang
     return { cup, i, k, r, sag, top, bx, by };
   }
+  // ── HELD ──
+  // Hanging free, a breast is the teardrop above. In a bra, a harness, a top, it isn't: it sits IN the thing, the shape
+  // the thing gives it (Laynie, Oct 13, after I'd spent a day bending clothes round the hanging shape: "maybe you're
+  // focusing too much about the clothing shape and how it sits on the breast, instead of how the breast should fit in
+  // them?"). The game's clothes are all cut to the game's own breast. So when she's wearing something over the chest,
+  // ours takes the game's shape, a size up: the same round breast, bigger by however much the cup calls for, hung from
+  // the same place on the chest. Then the piece is the game's own picture, grown by the very same amount, and the two
+  // fit the way the game drew them, because they're the same drawing.
+  // GAME: the game's biggest chest, measured off its upper-body picture. dx: each breast's middle, out from the centre
+  // line · cy: how far down · ro: how far it reaches out to the side · rv: up and down · y1 to y2: the stretch of chest
+  // above the breast over which the growing comes on (a strap coming down from the shoulder flares out over it) ·
+  // y3: where the chest piece ends, under the breasts.
+  const GAME = { dx: 42, cy: 330, ro: 34, rv: 42, y1: 252, y2: 289, y3: 398 };
+  const heldScale = (S) => S.r / 41;
+  // how far down the picture a row of the game's chest lands once it's grown (rows above y1 don't move)
+  function heldY(y, sc) { if (y <= GAME.y1) return y; const top = GAME.y1 + (GAME.y2 - GAME.y1) * (1 + sc) / 2; if (y >= GAME.y2) return top + (y - GAME.y2) * sc; const t = (y - GAME.y1) / (GAME.y2 - GAME.y1); return GAME.y1 + (GAME.y2 - GAME.y1) * (t + (sc - 1) * (t * t * t - t * t * t * t / 2)); }
+  function held(S) {
+    const sc = heldScale(S);
+    return Object.assign({}, S, { held: true, sc, bx: GAME.dx * sc, by: heldY(GAME.cy, sc) - ROOT_Y, ro: GAME.ro * sc, ri: GAME.dx * sc, rv: GAME.rv * sc, r: GAME.rv * sc, sag: 0, top: 1 });
+  }
   // a point on one breast's outline. s: -1 the one on the left of the picture, 1 the right. t runs round, 0 at its outer
   // side for the right one, a quarter turn at the bottom.
   function point(S, s, t) {
     const sn = Math.sin(t), cs = Math.cos(t);
+    if (S.held) return [s * S.bx + (s * cs > 0 ? S.ro : S.ri) * cs, S.by + S.rv * sn];   // the game's own round breast: it reaches less far out to the side than in to the cleavage
     if (sn >= 0) return [s * S.bx + S.r * cs * (1 + S.sag * 0.30 * sn * sn) + s * S.r * 0.06 * S.k * sn * sn, S.by + S.r * sn * (1 + S.sag)];     // the full, hanging half: round, its lowest point a little to the outside
     const up = -sn;
     // the upper half is round too (Laynie's size charts, Oct 13: full round orbs, no slope running up to a point). It
@@ -40,7 +61,7 @@
     for (let j = 0; j <= steps; j++) { const p = point(S, s, from + (to - from) * j / steps); if (j) g.lineTo(ox + p[0], oy + p[1]); else g.moveTo(ox + p[0], oy + p[1]); }
   }
   // where the nipple sits on each: below the middle, out to the side, more so the heavier they are
-  function nipples(S) { const x = S.bx + S.r * (0.02 + 0.2 * S.k), y = S.by + S.r * (-0.15 + 0.42 * S.k); return [[-x, y], [x, y]]; }
+  function nipples(S) { if (S.held) { const hx = S.bx + 4 * S.sc, hy = S.by - 0.43 * S.rv; return [[-hx, hy], [hx, hy]]; } const x = S.bx + S.r * (0.02 + 0.2 * S.k), y = S.by + S.r * (-0.15 + 0.42 * S.k); return [[-x, y], [x, y]]; }
 
   // the picture. cv.ax, cv.ay: where the chest's root point (the middle of the chest, ROOT_Y down the upper-body picture) is in it.
   function canvas(S, skin) {
@@ -93,6 +114,7 @@
     // the line where they press together
     let y0 = Infinity, y1 = -Infinity;
     for (let t = 0; t < Math.PI * 2; t += 0.02) { const p = point(S, 1, t); if (p[0] <= 0) { y0 = Math.min(y0, p[1]); y1 = Math.max(y1, p[1]); } }
+    if (S.held) { y0 = S.by - S.rv * 0.2; y1 = S.by + S.rv * 0.72; }   // (held together they meet along a line, as the game's do)
     if (y1 > y0) { const a = Math.max(y0, S.by - S.r * 0.45), lg = g.createLinearGradient(0, oy + a, 0, oy + y1);
       lg.addColorStop(0, "rgba(0,0,0,0)"); lg.addColorStop(0.35, rgb(skin, 0.28)); lg.addColorStop(1, rgb(skin, 0.28));
       g.strokeStyle = lg; g.lineWidth = 1.6; g.beginPath(); g.moveTo(ox, oy + a); g.lineTo(ox, oy + y1); g.stroke(); }
@@ -114,5 +136,5 @@
     out.mask = mask;
     return out;
   }
-  window.FarmBreasts = { NATIVE, CUPS, DRAWN_FROM, ROOT_Y, shape, point, nipples, canvas };
+  window.FarmBreasts = { NATIVE, CUPS, DRAWN_FROM, ROOT_Y, GAME, shape, held, heldY, point, nipples, canvas };
 })();

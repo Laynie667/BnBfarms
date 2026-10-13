@@ -20,8 +20,8 @@
     const a = adj || {}, i = Math.max(0, cup - DRAWN_FROM), n = CUPS.length - 1 - DRAWN_FROM;   // i: 0 (DD) .. n (R)
     const k = i / n, hang = a.hang == null ? 1 : a.hang, full = a.full == null ? 1 : a.full, apart = a.apart == null ? 1 : a.apart;
     const r = (44 + 2.6 * i) * full;                    // DD is a little more than the game's biggest; R is past the size of her head
-    const sag = (0.08 + 0.18 * k) * hang;            // how much lower than a ball the underside goes, and how far the fullness drops
-    const top = 1.1 + 0.3 * k * hang;               // how long the upper slope is, in radii
+    const sag = (0.06 + 0.10 * k) * hang;            // (eased off, Laynie Oct 13: "maybe a bit less real gravity")            // how much lower than a ball the underside goes, and how far the fullness drops
+    const top = 1.08 + 0.17 * k * hang;             // how long the upper slope is, in radii
     const bx = (r * (0.90 + 0.06 * k) + 3) * apart;  // each one's middle, out from the breastbone: heavier ones swing wider
     const by = r * top;                              // the slope starts at the chest, so the longer it is the lower they hang
     return { cup, i, k, r, sag, top, bx, by };
@@ -30,9 +30,9 @@
   // side for the right one, a quarter turn at the bottom.
   function point(S, s, t) {
     const sn = Math.sin(t), cs = Math.cos(t);
-    if (sn >= 0) return [s * S.bx + S.r * cs * (1 + S.sag * 0.12 * sn) + s * S.r * 0.10 * S.k * sn, S.by + S.r * sn * (1 + S.sag)];     // the full, hanging half: round, its lowest point a little to the outside
+    if (sn >= 0) return [s * S.bx + S.r * cs * (1 + S.sag * 0.12 * sn * sn) + s * S.r * 0.08 * S.k * sn * sn, S.by + S.r * sn * (1 + S.sag)];     // the full, hanging half: round, its lowest point a little to the outside
     const up = -sn;
-    const u = Math.pow(up, 1.5), tx = s * Math.min(S.bx, 46);   // tx: where it's hung from, up on the chest
+    const u = up * up, tx = s * Math.max(40, S.bx * 0.55);   // tx: where it's hung from, up on the chest
     return [(s * S.bx + S.r * cs) * (1 - u) + tx * u, S.by - S.r * S.top * up];   // the long slope up to there: it's a teardrop, not a ball
   }
   function path(g, S, s, from, to, ox, oy) {
@@ -40,7 +40,7 @@
     for (let j = 0; j <= steps; j++) { const p = point(S, s, from + (to - from) * j / steps); if (j) g.lineTo(ox + p[0], oy + p[1]); else g.moveTo(ox + p[0], oy + p[1]); }
   }
   // where the nipple sits on each: below the middle, out to the side, more so the heavier they are
-  function nipples(S) { const x = S.bx + S.r * (0.02 + 0.2 * S.k), y = S.by + S.r * (-0.15 + 0.6 * S.k); return [[-x, y], [x, y]]; }
+  function nipples(S) { const x = S.bx + S.r * (0.02 + 0.2 * S.k), y = S.by + S.r * (-0.15 + 0.42 * S.k); return [[-x, y], [x, y]]; }
 
   // the picture. cv.ax, cv.ay: where the chest's root point (the middle of the chest, ROOT_Y down the upper-body picture) is in it.
   function canvas(S, skin) {

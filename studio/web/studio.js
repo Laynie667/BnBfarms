@@ -404,6 +404,51 @@
       return out;
     };
   }
+  // ── parts the game draws itself ──
+  // The words on a pet sign, body writing, a name tag, a number on a collar: those aren't pictures. The item's own
+  // code writes them onto a little canvas and hands that to the game, and the game's move/stretch/turn settings are
+  // only read for pictures. So those parts sat still while the rest of the piece moved (Laynie, Oct 12: "text from body
+  // writing, the pet sign, etc arent being sized up or down, or even moved"). Here the studio steps in where the game
+  // calls an item's own drawing code and gives it a brush that reads the same settings the pictures get.
+  function hookDrawn() {
+    const game = CommonCallFunctionByNameWarn;
+    const num = (v) => (typeof v === "number" && !Number.isNaN(v) ? v : undefined);
+    const fitFor = (item, layer) => {
+      const p = (item && item.Property) || {}, of = (k) => num(p[k]), lay = (k) => num((p["Layer" + k] || {})[layer || ""]);
+      const add = (k) => (of(k) || 0) + (lay(k) || 0), mul = (k) => Math.max(0.01, Math.min(3, (of(k) == null ? 1 : of(k)) * (lay(k) == null ? 1 : lay(k))));
+      return { TranslationX: add("TranslationX"), TranslationY: add("TranslationY"), ScaleX: mul("ScaleX"), ScaleY: mul("ScaleY"), Rotation: Math.max(-180, Math.min(180, add("Rotation"))) };
+    };
+    // How big the piece's own pictures are, by item name. A picture is stretched from its top left corner and turned
+    // about its middle, so the words have to be laid on a sheet the same size as the piece's picture and that sheet
+    // stretched and turned, or they'd slide off the sign as it shrinks.
+    const frames = new Map(), drawGL = GLDrawImage;
+    GLDrawImage = function (source, gl, ...rest) {
+      const out = drawGL.call(this, source, gl, ...rest);
+      try { if (typeof source === "string") { const file = source.slice(source.lastIndexOf("/") + 1), nm = file.split("_")[0].replace(/.png$/, ""); if (!frames.has(nm)) { const tex = GLDrawLoadImage(gl, source); if (tex && tex.width) frames.set(nm, { w: tex.width, h: tex.height }); } } } catch (e) { /* only a measurement */ }
+      return out;
+    };
+    CommonCallFunctionByNameWarn = function (name, data, ...rest) {
+      try {
+        const gl = typeof GLDrawCanvas !== "undefined" && GLDrawCanvas && GLDrawCanvas.GL;
+        if (gl && typeof name === "string" && name.endsWith("AfterDraw") && data && data.C === S.C && data.CA && typeof data.drawCanvas === "function") {
+          const t = fitFor(data.CA, data.L);
+          if (t.TranslationX || t.TranslationY || t.Rotation || t.ScaleX !== 1 || t.ScaleY !== 1) {
+            // (drawn the way the game draws a moved picture: placed at the moved spot, with the settings passed along too)
+            const fr = frames.get(data.A && data.A.Name);
+            const brush = (offset) => (img, x, y, alphaMasks, maskLayers) => {
+              const o = Object.assign({ AlphaMasks: alphaMasks, TextureAlphaMask: maskLayers }, t);
+              if (!fr) return drawGL(img, gl, x + t.TranslationX, y + t.TranslationY, o, offset);   // no picture to go by: about its own corner
+              const sheet = document.createElement("canvas"); sheet.width = fr.w; sheet.height = fr.h;
+              sheet.getContext("2d").drawImage(img, Math.round(x - data.X), Math.round(y - data.Y));
+              return drawGL(sheet, gl, data.X + t.TranslationX, data.Y + t.TranslationY, o, offset);
+            };
+            data = Object.assign({}, data, { drawCanvas: brush(0), drawCanvasBlink: brush(500) });
+          }
+        }
+      } catch (e) { console.warn("[studio] drawn parts:", e); }
+      return game.call(this, name, data, ...rest);
+    };
+  }
   const bellyDraw = () => { try { CharacterLoadCanvas(S.C); } catch (e) { console.warn("[studio] belly redraw:", e); } };
   function bellyPanel() {
     const box = $("div", { id: "fh-belly" });
@@ -489,6 +534,7 @@
     document.body.classList.add("fh-studio-on");   // (studio.css hides the sign-in form, however late the game adds it)
     CurrentScreen = "FarmStudio";
     CurrentScreenFunctions = { Run: run, Draw: none, Click: none, MouseDown: none, MouseUp: none, MouseMove: none, MouseWheel: none, Load: async () => {}, Unload: none, Resize: none, KeyDown: () => false, KeyUp: () => false, Exit: none, Paste: none };
+    try { hookDrawn(); } catch (e) { console.warn("[studio] drawn parts:", e); }
     if (window.FarmBelly) hookBelly(); else console.warn("[studio] the belly drawing didn't load: no belly section");
     S.C = CharacterLoadSimple("FarmStudio");
     CharacterAppearanceSetDefault(S.C);

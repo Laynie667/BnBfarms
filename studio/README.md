@@ -96,6 +96,13 @@ the game's pictures into the drawing.
   not set to "behind".
 - The list of moulded pieces is saved in `fits/items.json` when you press *Save this fit*.
 
+## Step 8: words and signs
+
+- The words on a sign, body writing, face writing and tags now move, stretch and turn with the piece's sliders.
+  The game itself only does that for pictures, so this is the studio's own doing: in the live game the words would
+  still sit where the game puts them.
+- Body writing only shows once it is switched to show text in *Configure it*, and it is drawn under the hands.
+
 ## What it is for next
 
 1. The Companion's belly reading the saved fits, so a shape tuned here is the shape worn in the game.

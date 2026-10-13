@@ -7,7 +7,7 @@
    Step 2: pick any item from any slot and try it on · colour it · see what's worn and take pieces off.
    Step 3: the belly, drawn with the Companion's own belly code · sliders for shape and place · its own fit for each
            pose · saved to studio/fits/belly.json.
-   The codes are the ones WCE and BCX export: the outfit's list of items as JSON, packed with LZString to base64
+   The codes are the ones WCE and BCX export, and the game's own wardrobe copy: the list of items as JSON, packed with LZString to base64
    (a plain JSON list is taken too).
 
    How it sits in the game: once the game's own start-up has loaded the item list and reached its sign-in screen,
@@ -27,14 +27,23 @@
     if (!json) throw new Error("That isn't an outfit code I can read. It should be the text WCE or BCX gives you when you export a look.");
     const list = JSON.parse(json);
     if (!Array.isArray(list)) throw new Error("That code unpacked, but it isn't a list of items.");
-    return list.filter((b) => b && typeof b.Group === "string" && typeof b.Name === "string");
+    // Two shapes of list turn up. WCE and BCX write whole items: { Group, Name, Color, Property, Craft… }. The game's own
+    // wardrobe (its copy and paste of a look) writes a short form: { G: group, A: item, C: colour }. Both are taken.
+    const items = list.map((b) => (b && typeof b.G === "string" && typeof b.A === "string" ? Object.assign({ Group: b.G, Name: b.A, Color: b.C }, b.P ? { Property: b.P } : {}) : b))
+      .filter((b) => b && typeof b.Group === "string" && typeof b.Name === "string");
+    if (!items.length) throw new Error("That code unpacked into a list of " + list.length + " things, but none of them is an item I recognise.");
+    return items;
   }
   const encode = (C) => LZString.compressToBase64(JSON.stringify(ServerAppearanceBundle(C.Appearance)));
 
   // put a list of items on the character. keepBody: the code only replaces what it names; everything else stays.
   function wear(list) {
     const C = S.C, named = new Set(list.map((b) => b.Group));
-    const keep = ServerAppearanceBundle(C.Appearance).filter((b) => !named.has(b.Group));
+    // A code that names the body itself is a WHOLE look (the game's wardrobe copy is): clothes it doesn't mention come
+    // off, as they would in the game. Restraints and toys are left alone either way. A code without the body only
+    // replaces the slots it names.
+    const whole = named.has("BodyUpper"), isItem = (g) => { const G = AssetGroupGet(C.AssetFamily, g); return !!G && G.Category === "Item"; };
+    const keep = ServerAppearanceBundle(C.Appearance).filter((b) => !named.has(b.Group) && (!whole || isItem(b.Group)));
     ServerAppearanceLoadFromBundle(C, C.AssetFamily, keep.concat(list), undefined);
     redraw();
     return list.length;
@@ -214,7 +223,7 @@
       $("p", { className: "note", textContent: "Offline, on this computer only. The game's own drawing, signed in to nothing." }),
       $("h2", { textContent: "Outfit code" }), box,
       $("div", { className: "row" },
-        $("button", { type: "button", className: "go", textContent: "Put it on", onclick: () => { try { const n = wear(decode(box.value)); say(n + " pieces put on. Anything the code didn't name was left as it was."); } catch (e) { say(String(e && e.message || e), true); } } }),
+        $("button", { type: "button", className: "go", textContent: "Put it on", onclick: () => { try { const n = wear(decode(box.value)); say(n + " pieces put on."); } catch (e) { say(String(e && e.message || e), true); } } }),
         $("button", { type: "button", textContent: "Copy this look as a code", onclick: async () => { const code = encode(S.C); box.value = code; try { await navigator.clipboard.writeText(code); say("Copied. Paste it into the game with WCE's /importlooks or BCX's import."); } catch (e) { say("It's in the box above: select it and copy."); } } }),
         $("button", { type: "button", textContent: "Strip to bare", onclick: () => { CharacterNaked(S.C, false); redraw(); say("Bare."); } }),
         $("button", { type: "button", textContent: "Start over", onclick: () => { CharacterAppearanceSetDefault(S.C); redraw(); say("Back to the game's plain starting look."); } })),

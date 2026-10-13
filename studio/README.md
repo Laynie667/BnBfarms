@@ -30,7 +30,7 @@ the game's pictures into the drawing.
 ## What it does so far (step 1)
 
 - Shows a character, drawn by the game's own code.
-- **Outfit codes.** Paste the code WCE (`/exportlooks`) or BCX gives you and press *Put it on*. Only the slots the
+- **Outfit codes.** Paste the code WCE (`/exportlooks`) or BCX gives you, or the one the game's own wardrobe copies, and press *Put it on*. Only the slots the
   code names are replaced. *Copy this look as a code* gives one back, to paste into the game.
 - **Body.** The six chest sizes, the four hip sizes, the three named skins.
 - **Poses.** Arms, legs, all fours and hogtied.

@@ -7,6 +7,8 @@
    Step 2: pick any item from any slot and try it on · colour it · see what's worn and take pieces off.
    Step 4: click a worn piece to fit it: move, stretch, turn (the whole piece or one layer), change its option ·
            a fit is kept per item, body and pose in studio/fits/items.json and put back when that item is worn again.
+   Step 6: "Configure it" opens the game's own settings menu for an item · adjustments are kept through a change of
+           pose or body.
    Step 5: forward and back in the drawing order (the piece or one layer) · a colour for each colour layer.
    Step 3: the belly, drawn with the Companion's own belly code · sliders for shape and place · its own fit for each
            pose · saved to studio/fits/belly.json.
@@ -56,6 +58,7 @@
   // ── body ──
   const bodyItem = (group) => S.C.Appearance.find((a) => a.Asset.Group.Name === group);
   function setBody(group, name) {
+    stashFits();
     const b = ServerAppearanceBundle(S.C.Appearance), it = b.find((x) => x.Group === group);
     if (it) it.Name = name;
     ServerAppearanceLoadFromBundle(S.C, S.C.AssetFamily, b, undefined); applyAllSaved(); redraw();
@@ -68,6 +71,7 @@
   // ── pose ──
   const POSES = [["Arms", ["BaseUpper", "Yoked", "OverTheHead", "BackBoxTie", "BackElbowTouch", "BackCuffs"]], ["Legs", ["BaseLower", "Kneel", "KneelingSpread", "LegsClosed", "Spread"]], ["Whole body", ["AllFours", "Hogtied"]]];
   function setPose(name) {
+    stashFits();
     try { PoseSetActive(S.C, name, true, false); } catch (e) { say("The game wouldn't take that pose: " + (e && e.message || e), true); }
     applyAllSaved(); redraw(); if (BELLY.fill) BELLY.fill();
   }
@@ -128,7 +132,10 @@
   // its properties, and each LAYER of an item can carry its own on top (LayerTranslationX and so on, by layer name).
   // These are the "item configurations": numbers, not pictures. A fit is kept for an item on a body in a pose
   // (studio/fits/items.json), and put back whenever that item is worn on that body in that pose again.
-  const FIT = { picked: null, layer: "", saved: {} };
+  // saved: what's in the file · work: what you've set this sitting and not saved yet, by the same key. Changing the
+  // pose or the body never throws an adjustment away (Laynie, Oct 12): what you'd set is kept for the pose you set
+  // it in, and carried over to the new pose unless that pose already has a fit of its own.
+  const FIT = { picked: null, layer: "", saved: {}, work: {} };
   const FIT_SLIDERS = [["TranslationX", "Left / right", -250, 250, 1, 0], ["TranslationY", "Up / down", -250, 250, 1, 0], ["ScaleX", "Wider / narrower", 0.3, 2.5, 0.01, 1], ["ScaleY", "Taller / shorter", 0.3, 2.5, 0.01, 1], ["Rotation", "Turn", -180, 180, 1, 0]];
   const fitKey = (it) => it.Asset.Group.Name + "/" + it.Asset.Name + "|" + ((bodyItem("BodyUpper") || { Asset: {} }).Asset.Name || "") + "+" + ((bodyItem("BodyLower") || { Asset: {} }).Asset.Name || "") + "|" + poseKey();
   const fitGet = (it, k, def) => { const p = it.Property || {}; if (FIT.layer) { const rec = p["Layer" + k]; return rec && typeof rec[FIT.layer] === "number" ? rec[FIT.layer] : def; } return typeof p[k] === "number" ? p[k] : def; };
@@ -137,6 +144,34 @@
     if (FIT.layer) { const rec = p["Layer" + k] = Object.assign({}, p["Layer" + k]); if (v === def) delete rec[FIT.layer]; else rec[FIT.layer] = v; if (!Object.keys(rec).length) delete p["Layer" + k]; }
     else if (v === def) delete p[k]; else p[k] = v;
   }
+  // ── the game's own settings for an item ──
+  // Many items have a settings menu of their own in the game (a pump's speed, a gag's type, a belt's shields, a tag's
+  // words, an item made of several parts). The studio doesn't copy those menus: it opens the game's real one, on our
+  // character, drawn by the game. While it's open our panel steps aside; "Done" (or the game's own exit) brings it back.
+  const CONFIG = { on: false, timer: null };
+  function configure(group) {
+    const it = worn(group); if (!it) return;
+    if (!it.Asset.Extended && !it.Asset.Archetype) { say("That piece has no settings menu in the game. Its fit, order and colours are below."); return; }
+    try {
+      stashFits();
+      S.C.FocusGroup = it.Asset.Group;
+      CharacterSetCurrent(S.C, { mode: "items" });
+      DialogExtendItem(it);
+      if (!DialogFocusItem) throw new Error("the game wouldn't open it (it may think the item is blocked)");
+      CONFIG.on = true; document.body.classList.add("fh-config");
+      clearInterval(CONFIG.timer); CONFIG.timer = setInterval(() => { if (CONFIG.on && (!CurrentCharacter || !DialogFocusItem)) configureDone(); }, 250);
+    } catch (e) { configureDone(); say("The game's menu for that piece wouldn't open: " + (e && e.message || e), true); }
+  }
+  function configureDone() {
+    clearInterval(CONFIG.timer); CONFIG.timer = null;
+    try { if (DialogFocusItem) DialogLeaveFocusItem(false); } catch (e) { console.warn("[studio] closing the item menu:", e); }
+    try { if (CurrentCharacter) DialogLeave(); } catch (e) { console.warn("[studio] leaving the dialog:", e); }
+    CurrentCharacter = null; DialogFocusItem = null; if (S.C) S.C.FocusGroup = null;
+    const was = CONFIG.on; CONFIG.on = false; document.body.classList.remove("fh-config");
+    if (CurrentScreen !== "FarmStudio") { CurrentScreen = "FarmStudio"; }
+    redraw(); if (was) say("Settings kept. They travel in the outfit code when you copy the look.");
+  }
+
   // ── forward and back ──
   // Every layer has a place in the drawing order (a number: bigger is drawn later, so it's in front). The game lets
   // an item override that: Property.OverridePriority, one number for the whole piece or a number for each layer by name.
@@ -171,8 +206,12 @@
 
   const fitOf = (it) => { const p = it.Property || {}, out = {}; for (const [k] of FIT_SLIDERS) { if (typeof p[k] === "number") out[k] = p[k]; if (p["Layer" + k] && Object.keys(p["Layer" + k]).length) out["Layer" + k] = Object.assign({}, p["Layer" + k]); } if (p.OverridePriority != null) out.OverridePriority = typeof p.OverridePriority === "object" ? Object.assign({}, p.OverridePriority) : p.OverridePriority; return out; };
   function fitClear(it) { const p = it.Property || {}; for (const [k] of FIT_SLIDERS) { delete p[k]; delete p["Layer" + k]; } delete p.OverridePriority; }
-  function applySaved(it) { const f = FIT.saved[fitKey(it)]; fitClear(it); if (f) Object.assign(it.Property = it.Property || {}, JSON.parse(JSON.stringify(f))); return !!f; }
-  function applyAllSaved() { for (const it of S.C.Appearance) if (it.Asset.Group.Category === "Item" || it.Asset.Group.AllowNone) applySaved(it); }
+  const fittable = (it) => it.Asset.Group.Category === "Item" || it.Asset.Group.AllowNone;
+  // this pose and body's own fit for a piece, if it has one (unsaved work first, then the file). Otherwise it's left as it is.
+  function applySaved(it) { const k = fitKey(it), f = FIT.work[k] || FIT.saved[k]; if (!f) return false; fitClear(it); Object.assign(it.Property = it.Property || {}, JSON.parse(JSON.stringify(f))); return true; }
+  function applyAllSaved() { for (const it of S.C.Appearance) if (fittable(it)) applySaved(it); }
+  // before the pose or the body changes: remember what each piece is set to, for the pose and body it's set in
+  function stashFits() { try { for (const it of S.C.Appearance) if (fittable(it)) { const f = fitOf(it), k = fitKey(it); if (Object.keys(f).length) FIT.work[k] = f; else delete FIT.work[k]; } } catch (e) { console.warn("[studio] keeping fits:", e); } }
   const fitDraw = () => { try { CharacterLoadCanvas(S.C); } catch (e) { console.warn("[studio] fit redraw:", e); } };
   const fitRefresh = () => { try { CharacterRefresh(S.C, false, false); } catch (e) { console.warn("[studio] fit refresh:", e); } };   // (when the drawing order changed)
   function select(group) { FIT.picked = FIT.picked === group ? null : group; FIT.layer = ""; fillWorn(); }
@@ -188,6 +227,7 @@
     const has = !!FIT.saved[fitKey(it)];
     box.replaceChildren(...[
       $("p", { className: "note", textContent: "Fitting: " + itemName(it.Asset) + "  (" + it.Asset.Group.Name + " / " + it.Asset.Name + ")  on a " + fitKey(it).split("|")[1].replace("+", " chest, ") + " hips body, " + POSE_KEYS[poseKey()].toLowerCase() + "." }),
+      (it.Asset.Extended || it.Asset.Archetype) ? $("div", { className: "row" }, $("button", { type: "button", className: "go", textContent: "Configure it (the game's own menu)", title: "Opens the real settings menu the game has for this item", onclick: () => configure(it.Asset.Group.Name) }), $("span", { className: "note", textContent: "Everything the game lets you set on it." })) : "",
       options.length > 1 ? $("div", { className: "row" }, $("label", { textContent: "Option:" }), options.map((o) => $("button", { type: "button", className: typeNow() === o ? "on" : "", textContent: o.replace(/([a-z])([A-Z0-9])/g, "$1 $2"), onclick: () => { try { TypedItemSetOptionByName(S.C, it, o, false, null, false); } catch (e) { say("The game wouldn't set that option: " + (e && e.message || e), true); } redraw(); } }))) : "",
       layers.length > 1 ? $("div", { className: "row" }, $("label", { textContent: "Move:" }),
         $("button", { type: "button", className: FIT.layer ? "" : "on", textContent: "The whole piece", onclick: () => { FIT.layer = ""; fillFit(); } }),
@@ -214,11 +254,12 @@
   async function saveFit(it) {
     const key = fitKey(it), f = fitOf(it);
     if (Object.keys(f).length) FIT.saved[key] = f; else delete FIT.saved[key];
+    delete FIT.work[key];
     try { const r = await fetch("/__studio/fits/items.json", { method: "POST", body: JSON.stringify({ v: 1, saved: new Date().toISOString(), note: "key: slot/item|chest+hips|pose", fits: FIT.saved }, null, 1) }); if (!r.ok) throw new Error(await r.text());
       say("Saved the fit for " + itemName(it.Asset) + " on this body in this pose. " + Object.keys(FIT.saved).length + " fits kept in studio\\fits\\items.json."); fillFit(); }
     catch (e) { say("It didn't save: " + (e && e.message || e), true); }
   }
-  async function loadItemFits() { try { const d = await (await fetch("/__studio/fits/items.json", { cache: "no-store" })).json(); if (d && d.fits) { FIT.saved = d.fits; applyAllSaved(); fitDraw(); fillFit(); } } catch (e) { /* none yet */ } }
+  async function loadItemFits() { try { const d = await (await fetch("/__studio/fits/items.json", { cache: "no-store" })).json(); if (d && d.fits) { FIT.saved = d.fits; applyAllSaved(); fitRefresh(); fillFit(); } } catch (e) { /* none yet */ } }
 
   // ── the belly ──
   // A fit for each pose: where it sits and what shape it is. "std" is standing, kneeling and every arms pose (the torso
@@ -351,6 +392,7 @@
       $("h2", { textContent: "Skin" }), $("div", { className: "row" }, ["White", "Asian", "Black"].map((t) => toggle(t, () => { const u = bodyItem("BodyUpper"); const c = u && (Array.isArray(u.Color) ? u.Color[0] : u.Color); return c === t; }, () => setSkin(t)))),
       POSES.map(([label, list]) => [$("h2", { textContent: "Pose: " + label.toLowerCase() }), $("div", { className: "row" }, list.map((p) => toggle(p.replace(/([a-z])([A-Z])/g, "$1 $2").replace(/^Base (Upper|Lower)$/, "Relaxed"), () => poseOn(p), () => setPose(p))))]));
     document.body.append(root);
+    document.body.append($("button", { id: "fh-done", type: "button", textContent: "Done: back to the studio", onclick: () => configureDone() }));
     document.getElementById("fh-slot").value = "ItemNipples";
     fillItems(); fillWorn();
     syncButtons();
@@ -373,7 +415,7 @@
     CharacterAppearanceSetDefault(S.C);
     CharacterRefresh(S.C, false, false);
     panel(); S.ready = true; loadFits(false); loadItemFits();
-    window.FarmStudio = { S, wear, decode, encode, setBody, setSkin, setPose, redraw, putOn, tint, slots, BELLY, bellyDraw, saveFits, loadFits, FIT, select, saveFit, fitSet, fitDraw, orderSet, orderNow, colourSet, colourLayers };   // for poking at from the console
+    window.FarmStudio = { S, wear, decode, encode, setBody, setSkin, setPose, redraw, putOn, tint, slots, BELLY, bellyDraw, saveFits, loadFits, FIT, select, saveFit, fitSet, fitDraw, orderSet, orderNow, colourSet, colourLayers, configure, configureDone, stashFits };   // for poking at from the console
     say("Ready. Paste an outfit code, or change the body and pose below.");
   }
   let tries = 0;

@@ -76,6 +76,16 @@ the game's pictures into the drawing.
 - **Colours.** Each colour layer of the picked piece has its own swatch, and a button to go back to the game's
   colour for that layer. Colours belong to the look, so they travel in the outfit code, not in the fit.
 
+## Step 6: the game's own settings, and fits that stay
+
+- **Configure it (the game's own menu).** For any item that has settings in the game (a pump's speed, a gag's type,
+  a belt's shields, an item built from parts), this opens the real menu, drawn by the game, on the studio's character.
+  The studio's panel steps aside while it is open. *Done: back to the studio*, bottom left, or the game's own exit,
+  brings it back. What you set travels in the outfit code. The game's own Layering button is in that menu too.
+- **Fits stay through a change of pose or body.** What you set is remembered for the pose and body you set it in,
+  and carried over to the new one unless that one already has a fit of its own. *Save this fit* still writes the
+  file; unsaved work lasts until the page is closed.
+
 ## What it is for next
 
 1. The Companion's belly reading the saved fits, so a shape tuned here is the shape worn in the game.

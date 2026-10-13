@@ -96,6 +96,13 @@ the game's pictures into the drawing.
   not set to "behind".
 - The list of moulded pieces is saved in `fits/items.json` when you press *Save this fit*.
 
+## Step 22: straps keep their layout
+
+- Every piece keeps the game's own layout on drawn breasts. If its picture measures as straps, they are pared back to
+  a strap's width after the stretch. No list: it is worked out from the picture.
+- Picked piece, *On drawn breasts*: the usual (straps kept thin), plain stretch, simple drawn straps (the step 20
+  recipes, where one exists), leave as the game draws it, tuck behind.
+
 ## Step 20: strap pieces redrawn
 
 - Pieces with a recipe in `STRAPS` (in `web/studio.js`) are redrawn on drawn breasts as straps on the breast's outline:

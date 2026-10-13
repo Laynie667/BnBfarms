@@ -196,6 +196,31 @@ export function syncFarmGear(list, allow) {
   return did;
 }
 
+// ── a body that shows its size ──
+// The game's own body sizes, smallest to biggest. Everything you wear is drawn for each of them, so it all still fits.
+const SHAPES = { BodyUpper: ["FlatSmall", "FlatMedium", "Small", "Normal", "Large", "XLarge"], BodyLower: ["Small", "Normal", "Large", "XLarge"] };
+const SHAPE_KEY = "fhc-shape";   // { BodyUpper: { own, set }, BodyLower: { own, set } }: your own shape, and what the farm last made it
+// shape: { up, low } = steps above (or below) your own shape; null or switched off = your own shape back. Returns what changed.
+export function syncShape(shape, allow) {
+  if (!P() || !Array.isArray(P().Appearance) || typeof window.ServerAppearanceBundle !== "function") return [];
+  let mem; try { mem = JSON.parse(window.localStorage.getItem(SHAPE_KEY)) || {}; } catch (e) { mem = {}; }
+  const next = bundle().map((b) => Object.assign({}, b)), did = [];
+  for (const [group, steps] of [["BodyUpper", shape && allow ? Number(shape.up) || 0 : 0], ["BodyLower", shape && allow ? Number(shape.low) || 0 : 0]]) {
+    const order = SHAPES[group], b = next.find((x) => x.Group === group); if (!b) continue;
+    const m = mem[group];
+    // changed it yourself since? then that's your own shape now
+    const own = m && m.set === b.Name && order.includes(m.own) ? m.own : b.Name;
+    const at = order.indexOf(own); if (at < 0) continue;
+    const want = order[Math.max(0, Math.min(order.length - 1, at + Math.round(steps)))];
+    if (typeof window.AssetGet === "function" && !window.AssetGet(P().AssetFamily, group, want)) continue;
+    if (want !== b.Name) { b.Name = want; did.push(group + " " + want); }
+    if (want === own) delete mem[group]; else mem[group] = { own, set: want };
+  }
+  try { window.localStorage.setItem(SHAPE_KEY, JSON.stringify(mem)); } catch (e) { /* fine */ }
+  if (did.length) commit(next);
+  return did;
+}
+
 // off with what the farm put on (the splatters and the writing), nothin' else
 export function washMarks() {
   const mem = load(), stuck = lockedGroups();

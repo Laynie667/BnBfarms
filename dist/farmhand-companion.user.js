@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.15.9
+// @version      0.16.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -230,7 +230,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.15.9";
+  var VERSION = "0.16.0";
 
   // extension/src/config.js
   var BOT_MEMBER = 260239;
@@ -859,6 +859,16 @@ One of mods you are using is using an old version of SDK. It will work for now b
         !!ctx2.prefs.gear,
         () => {
           ctx2.setPref("gear", !ctx2.prefs.gear);
+          ctx2.api.rehello && ctx2.api.rehello();
+        }
+      ),
+      // OFF until you turn it on: your character's own chest and hips growin' with the farm's sizes (marks.js)
+      toggle(
+        "Farm can change my body shape",
+        "Your chest grows a size on your character for every two udder sizes the farm gives you (up to the game's biggest), and your hips widen with a growin' ass or a heavy belly. Everything you're wearin' is redrawn to fit. Your own shape is remembered and comes back when the growth goes, when you switch this off, and for an hour after your safeword.",
+        !!ctx2.prefs.shape,
+        () => {
+          ctx2.setPref("shape", !ctx2.prefs.shape);
           ctx2.api.rehello && ctx2.api.rehello();
         }
       ),
@@ -4281,6 +4291,40 @@ One of mods you are using is using an old version of SDK. It will work for now b
     if (did.on.length || did.off.length) commit2(next);
     return did;
   }
+  var SHAPES = { BodyUpper: ["FlatSmall", "FlatMedium", "Small", "Normal", "Large", "XLarge"], BodyLower: ["Small", "Normal", "Large", "XLarge"] };
+  var SHAPE_KEY = "fhc-shape";
+  function syncShape(shape, allow) {
+    if (!P2() || !Array.isArray(P2().Appearance) || typeof window.ServerAppearanceBundle !== "function") return [];
+    let mem;
+    try {
+      mem = JSON.parse(window.localStorage.getItem(SHAPE_KEY)) || {};
+    } catch (e) {
+      mem = {};
+    }
+    const next = bundle().map((b) => Object.assign({}, b)), did = [];
+    for (const [group, steps] of [["BodyUpper", shape && allow ? Number(shape.up) || 0 : 0], ["BodyLower", shape && allow ? Number(shape.low) || 0 : 0]]) {
+      const order = SHAPES[group], b = next.find((x) => x.Group === group);
+      if (!b) continue;
+      const m = mem[group];
+      const own = m && m.set === b.Name && order.includes(m.own) ? m.own : b.Name;
+      const at = order.indexOf(own);
+      if (at < 0) continue;
+      const want = order[Math.max(0, Math.min(order.length - 1, at + Math.round(steps)))];
+      if (typeof window.AssetGet === "function" && !window.AssetGet(P2().AssetFamily, group, want)) continue;
+      if (want !== b.Name) {
+        b.Name = want;
+        did.push(group + " " + want);
+      }
+      if (want === own) delete mem[group];
+      else mem[group] = { own, set: want };
+    }
+    try {
+      window.localStorage.setItem(SHAPE_KEY, JSON.stringify(mem));
+    } catch (e) {
+    }
+    if (did.length) commit2(next);
+    return did;
+  }
   function washMarks() {
     const mem = load(), stuck = lockedGroups2();
     const next = bundle().filter((b) => stuck.has(b.Group) || !(b.Name === "Splatters" && SPLAT_GROUPS.includes(b.Group) || b.Name === "BodyWritings" && b.Group === mem.writeGroup || mem.treatise && b.Group === TREATISE.group));
@@ -4922,6 +4966,11 @@ One of mods you are using is using an old version of SDK. It will work for now b
       if (!Array.isArray(s.farmGear) && s.parasite && s.parasite.until > Date.now())
         list = [{ slot: s.parasite.form === "belt" ? "belt" : "lips", name: s.parasite.form === "belt" ? "Parasite Belt" : "Parasite Lips", always: true, color: "#E0607F", until: s.parasite.until, desc: "It feeds its host serum and drinks every load." }];
       const did = syncFarmGear(list, !!st.panel.prefs.gear);
+      try {
+        syncShape(st.panel.s && st.panel.s.shape, !!st.panel.prefs.shape);
+      } catch (e2) {
+        console.warn("[Farmhand Companion] body shape:", e2);
+      }
       for (const n of did.on) toChat("The farm puts somethin' on you: " + n + ".", "#c9a35b", true);
       for (const n of did.off) toChat(n + " comes off.", "#c9a35b", true);
     } catch (e) {

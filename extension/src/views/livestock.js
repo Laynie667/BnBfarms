@@ -203,6 +203,9 @@ export function panelPrefs(ctx) {
     // OFF until you turn it on: real items from the traps (marks.js)
     toggle("Farm can put real gear on me", "A trap that plugs, cups, clamps, chains, ropes or funnels you puts the real item on your character, and takes it off again when its time's up. Pull one off early and it goes back. Your safeword takes it all off. (The parasite doesn't need this: ?parasite on is its switch.)",
       !!ctx.prefs.gear, () => { ctx.setPref("gear", !ctx.prefs.gear); ctx.api.rehello && ctx.api.rehello(); }),
+    // OFF until you turn it on: your character's own chest and hips growin' with the farm's sizes (marks.js)
+    toggle("Farm can change my body shape", "Your chest grows a size on your character for every two udder sizes the farm gives you (up to the game's biggest), and your hips widen with a growin' ass or a heavy belly. Everything you're wearin' is redrawn to fit. Your own shape is remembered and comes back when the growth goes, when you switch this off, and for an hour after your safeword.",
+      !!ctx.prefs.shape, () => { ctx.setPref("shape", !ctx.prefs.shape); ctx.api.rehello && ctx.api.rehello(); }),
     // these two are OFF until you turn them on, and anybody can: the farm changin' what your character looks like (marks.js)
     toggle("Farm can mark my body", "Loads leave the game's own splatters on your face, chest or tummy, wherever there's room, and farm words can be written on your body. ?wash takes them off.",
       !!ctx.prefs.marks, () => ctx.setPref("marks", !ctx.prefs.marks)),

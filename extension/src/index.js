@@ -13,7 +13,7 @@ import { VERSION } from "./version.js";
 import { BOT_MEMBER, HELLO_EVERY_MS } from "./config.js";
 import { Panel } from "./panel.js";
 import { captureOutfit, wearOutfit, changeBack, hasBackup } from "./outfits.js";
-import { markBody, washMarks, stripMe, dressMe, syncFarmGear } from "./marks.js";
+import { markBody, washMarks, stripMe, dressMe, syncFarmGear, syncShape } from "./marks.js";
 import { initCues, cueOff, lead, face, sound, trance, drawMarkers, arouse, vibe, initBody } from "./cues.js";
 
 // the SDK ships as an old-style module; this digs the real thing out either way
@@ -162,6 +162,7 @@ function parasiteSync() {
     if (!Array.isArray(s.farmGear) && s.parasite && s.parasite.until > Date.now())
       list = [{ slot: s.parasite.form === "belt" ? "belt" : "lips", name: s.parasite.form === "belt" ? "Parasite Belt" : "Parasite Lips", always: true, color: "#E0607F", until: s.parasite.until, desc: "It feeds its host serum and drinks every load." }];
     const did = syncFarmGear(list, !!st.panel.prefs.gear);
+    try { syncShape(st.panel.s && st.panel.s.shape, !!st.panel.prefs.shape); } catch (e2) { console.warn("[Farmhand Companion] body shape:", e2); }   // chest and hips that show the farm's sizes (marks.js)
     for (const n of did.on) toChat("The farm puts somethin' on you: " + n + ".", "#c9a35b", true);
     for (const n of did.off) toChat(n + " comes off.", "#c9a35b", true);
   } catch (e) { console.warn("[Farmhand Companion] farm gear:", e); }

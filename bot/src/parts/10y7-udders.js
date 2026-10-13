@@ -368,7 +368,7 @@
       R(r.noBed ? "🛏️ Bed rest: off. However big you get, you'll waddle." : "🛏️ Bed rest: on. Get big enough and you'll be bedded down."); return;
     }
   }
-  function uddersSafe(mn){ const r = rec(mn); if (r && r.bedded){ bedStop(mn); r.bedQuiet = Date.now() + 3600000; saveLedger(); } }
+  function uddersSafe(mn){ const r = rec(mn); if (!r) return; r.shapeQuiet = Date.now() + 3600000;   /* their own shape back for an hour */ if (r.bedded){ bedStop(mn); r.bedQuiet = Date.now() + 3600000; } saveLedger(); }
   function uddersTick(){
     const now = Date.now();
     if (now - (state.udderAt || 0) < 30000) return; state.udderAt = now;
@@ -392,7 +392,20 @@
     if (p.sensitiveUntil > now) out.push("🥛 Milked past empty: sensitive for "+Math.max(1, Math.ceil((p.sensitiveUntil - now)/60000))+" more min.");
     if (r.bringIn) out.push("🥛 Bein' brought into milk: "+r.bringIn.n+" of "+CFG.BRINGIN_TENDS+" tendin's.");
   }
+  // BODIES THAT SHOW THEIR SIZE (Oct 12). The game's own body comes in sizes: six chests (Flat Small, Flat Medium, Small,
+  // Normal, Large, XLarge) and four lower bodies (Small to XLarge), and every item worn is drawn for each of them, so
+  // restraints follow by themselves. The farm only says how many steps up or down from their own shape they should be;
+  // their Companion remembers their own shape and puts it back (Toggles: "Farm can change my body shape", off till they
+  // turn it on). Past XLarge the game can't draw it: the farm's bigger sizes stay in words.
+  function shapeFor(mn){
+    const p = prodOf(mn); if (!p) return null;
+    const U = CFG.SIZES.udder, Bt = CFG.SIZES.butt, belly = bellyStage(mn);
+    const up = Math.max(-2, Math.min(5, Math.trunc((udderLevel(mn) - U.start) / CFG.SHAPE_UDDER_PER_STEP)));
+    const low = Math.max(0, Math.min(3, Math.floor((sizeOf(mn, "butt") - Bt.start) / CFG.SHAPE_BUTT_PER_STEP) + (belly >= 4 ? 2 : belly >= 2 ? 1 : 0)));
+    return { up, low };
+  }
   function uddersStateFor(mn, s){
+    { const sh = (rec(mn).shapeQuiet || 0) > Date.now() ? null : shapeFor(mn); if (sh && (sh.up || sh.low)) s.shape = sh; }
     const r = rec(mn), k = keptOf(mn);
     s.dial = dialOf(mn); s.intensity = intensityOf(mn);
     if (r.callMe || r.neverCall) s.words = { call: r.callMe || [], never: r.neverCall || [] };

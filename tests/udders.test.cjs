@@ -50,6 +50,13 @@ const rnd=Math.random;
   await say(500,'?intensity tender'); ok(W.__intSev(500,3)===2 && W.__intSev(500,1)===1, 'tender leans the traps a step milder');
   Math.random=()=>0; ok(/padded rest|rubs the spot|goes in warm/.test(W.__intTail(500,'injector')), 'tender has its own too'); Math.random=rnd;
   await say(500,'?intensity rough'); ok(W.__intSev(500,3)===3, 'rough leaves them as written');
+  // ── a body that shows its size ──
+  ok(!W.__stateFor(500).shape, "at the farm's startin' size nothin' is asked of their body");
+  prod(500).size=Object.assign(prod(500).size||{},{udder:7,butt:5});
+  ok(W.__shape(500).up===2 && W.__shape(500).low===1 && W.__stateFor(500).shape.up===2, "four udder sizes up is two chest sizes on their character; a bigger ass widens the hips");
+  prod(500).size.udder=20; ok(W.__shape(500).up===5, "it stops where the game stops");
+  P(500).shapeQuiet=Date.now()+60000; ok(!W.__stateFor(500).shape, "after a safeword their own shape comes back for a while");
+  P(500).shapeQuiet=0; prod(500).size.udder=3; prod(500).size.butt=1;
   // ── the dial, and milked till you cum ──
   n=sent.length; await say(800,'?stalldial Moo hard'); ok(/Only staff/.test(to(800,n)), 'only staff set somebody else\'s dial');
   n=sent.length; await say(600,'?stalldial Moo punishing'); ok(P(500).stallDial==='punishing' && /turned your stall dial to PUNISHING/.test(to(500,n)), 'staff turn the dial, and the animal is told');

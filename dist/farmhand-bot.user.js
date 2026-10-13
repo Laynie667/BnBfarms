@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.30.0
+// @version      0.30.1
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -1828,7 +1828,7 @@
   ];
 
   // bot/src/version.js
-  var VERSION = "0.30.0";
+  var VERSION = "0.30.1";
 
   // bot-parts:farmhand-bot-parts
   (function() {
@@ -2410,6 +2410,8 @@
       BODY_TAIL_CHANCE: 0.33,
       STRAIN_GEAR: true,
       TYRANT_EDGE_MIN: 15,
+      SHAPE_UDDER_PER_STEP: 2,
+      SHAPE_BUTT_PER_STEP: 4,
       // 10y9d-body-fit.js, 10v3-parasite-strains.js
       BRINGIN_TENDS: 6,
       DOUBLE_CARRY: true,
@@ -3461,7 +3463,7 @@
     };
     W.FarmhandExport = exportLedger;
     W.FarmhandLedger = () => L;
-    if (W.__FARMHAND_TEST__) Object.assign(W, { __st: () => state, __cfg: CFG, __pt: prodTick, __qt: quotaTick, __lt: leashTick, __ms: milkingStallTick, __vt: voiceTick, __sync: syncCompanions, __gt: gearTick, __ht: homeTick, __addons: (h, ...a) => addonsEmit(h, ...a), __stateFor: (mn) => stateFor(mn), __leadTick: () => leadTick(), __ambient: () => ambientTick(), __about: (t) => aboutWhom(t), __announce: (t) => announce(t), __reply: (mn, t, ch) => reply(mn, t, ch), __office: () => officeCheck(), __namesHere: (t) => namesHere(t), __speciesCheck: (t) => QUESTIONS.find((q) => q.key === "species").check(t), __attach: () => attachListeners(), __tryLogin: () => tryLogin(), __beepText: (m) => beepText(m), __nameOnce: (t, mn) => nameOnce(t, mn), __buildContract: (n, mn, d) => buildContract(contractTemplate(n), mn, d), __potionTick: () => potionTick(), __penTick: () => penTick(), __trapTick: () => trapTick(), __corrupt: (m, n) => corrupt(m, n), __under: (m) => underOf(m), __goUnder: (m, n) => goUnder(m, n), __lend: () => state.lend, __keepTick: () => keepersTick(), __body: (m) => bodyOf(m), __pickFor: (m, k, l) => pickFor(m, k, l), __bodyWords: (m, t) => bodyWords(m, t), __strainGear: (m) => strainGear(m), __strainSerums: (m) => strainSerums(m), __strainParts: (s, n) => strainParts(s, n), __tFill: (t, m, v) => tFill(t, m, v), __conceive: (m, s, a, b, h) => rollConception(m, s, a, b, h), __birth: (m) => giveBirth(m), __milkCapOf: (m) => milkCap(m), __udderTick: () => {
+    if (W.__FARMHAND_TEST__) Object.assign(W, { __st: () => state, __cfg: CFG, __pt: prodTick, __qt: quotaTick, __lt: leashTick, __ms: milkingStallTick, __vt: voiceTick, __sync: syncCompanions, __gt: gearTick, __ht: homeTick, __addons: (h, ...a) => addonsEmit(h, ...a), __stateFor: (mn) => stateFor(mn), __leadTick: () => leadTick(), __ambient: () => ambientTick(), __about: (t) => aboutWhom(t), __announce: (t) => announce(t), __reply: (mn, t, ch) => reply(mn, t, ch), __office: () => officeCheck(), __namesHere: (t) => namesHere(t), __speciesCheck: (t) => QUESTIONS.find((q) => q.key === "species").check(t), __attach: () => attachListeners(), __tryLogin: () => tryLogin(), __beepText: (m) => beepText(m), __nameOnce: (t, mn) => nameOnce(t, mn), __buildContract: (n, mn, d) => buildContract(contractTemplate(n), mn, d), __potionTick: () => potionTick(), __penTick: () => penTick(), __trapTick: () => trapTick(), __corrupt: (m, n) => corrupt(m, n), __under: (m) => underOf(m), __goUnder: (m, n) => goUnder(m, n), __lend: () => state.lend, __keepTick: () => keepersTick(), __body: (m) => bodyOf(m), __shape: (m) => shapeFor(m), __pickFor: (m, k, l) => pickFor(m, k, l), __bodyWords: (m, t) => bodyWords(m, t), __strainGear: (m) => strainGear(m), __strainSerums: (m) => strainSerums(m), __strainParts: (s, n) => strainParts(s, n), __tFill: (t, m, v) => tFill(t, m, v), __conceive: (m, s, a, b, h) => rollConception(m, s, a, b, h), __birth: (m) => giveBirth(m), __milkCapOf: (m) => milkCap(m), __udderTick: () => {
       state.udderAt = 0;
       uddersTick();
     }, __wordsFor: (m, t) => wordsFor(m, t), __overdue: (m) => overdueStage(m), __milkCum: (m) => stallClimax(m), __intSev: (m, s) => intensitySev(m, s), __intTail: (m, k) => intensityTail(m, 5, 6, k), __holes: (m) => holesFor(m), __album: (m) => albumFor(m, 60), __holeTook: (m, h, a) => holeTook(m, h, a), __dreamTheme: (m) => dreamTheme(m), __eggsWorth: (t, n) => eggsWorth(t, n), __rank: (m) => rankX(m), __broodBook: (m) => broodBook(m), __belly: (m) => bellyStage(m), __happening: (m) => happeningFor(m), __gearOn: (m, s, l, d, x) => gearOn(m, s, l, d, x), __heard: (mn, t) => trapHeard(mn, t), __parasiteTick: () => parasiteTick(), __parts: (m) => parasiteParts(rec(m).parasite), __climax: (m) => parasiteClimax(m), __nurse: (a, b) => parasiteNurse(a, b), __parasiteChance: (m) => parasiteChance(m), __kiss: (a, f, s, t) => parasiteKiss(a, f, s, t), __load: (s, m, h, x) => parasiteLoad(s, m, h, x), __shot: (t, by, text, how) => applyShot(t, by, text, how), __slow: (mn) => slowOf(mn), __milkRate: (mn) => milkRate(mn), __benchTick: () => benchTick(), __roll: (m, s, a, b) => rollConception(m, s, a, b), __contractTick: () => {
@@ -19286,11 +19288,13 @@
     }
     function uddersSafe(mn) {
       const r = rec(mn);
-      if (r && r.bedded) {
+      if (!r) return;
+      r.shapeQuiet = Date.now() + 36e5;
+      if (r.bedded) {
         bedStop(mn);
         r.bedQuiet = Date.now() + 36e5;
-        saveLedger();
       }
+      saveLedger();
     }
     function uddersTick() {
       const now = Date.now();
@@ -19324,7 +19328,19 @@
       if (p.sensitiveUntil > now) out.push("\u{1F95B} Milked past empty: sensitive for " + Math.max(1, Math.ceil((p.sensitiveUntil - now) / 6e4)) + " more min.");
       if (r.bringIn) out.push("\u{1F95B} Bein' brought into milk: " + r.bringIn.n + " of " + CFG.BRINGIN_TENDS + " tendin's.");
     }
+    function shapeFor(mn) {
+      const p = prodOf(mn);
+      if (!p) return null;
+      const U = CFG.SIZES.udder, Bt = CFG.SIZES.butt, belly = bellyStage(mn);
+      const up = Math.max(-2, Math.min(5, Math.trunc((udderLevel(mn) - U.start) / CFG.SHAPE_UDDER_PER_STEP)));
+      const low = Math.max(0, Math.min(3, Math.floor((sizeOf(mn, "butt") - Bt.start) / CFG.SHAPE_BUTT_PER_STEP) + (belly >= 4 ? 2 : belly >= 2 ? 1 : 0)));
+      return { up, low };
+    }
     function uddersStateFor(mn, s) {
+      {
+        const sh = (rec(mn).shapeQuiet || 0) > Date.now() ? null : shapeFor(mn);
+        if (sh && (sh.up || sh.low)) s.shape = sh;
+      }
       const r = rec(mn), k = keptOf(mn);
       s.dial = dialOf(mn);
       s.intensity = intensityOf(mn);

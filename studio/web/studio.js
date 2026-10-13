@@ -240,7 +240,7 @@
         $("label", { textContent: "On drawn breasts:" }),
         (() => { const k = mouldKey(it), now = BREAST.wear[k] || "";
           return $("select", { title: "What this piece does when the breasts are a drawn size (DD and up)", onchange: (e) => { const v = e.target.value; if (v) BREAST.wear[k] = v; else delete BREAST.wear[k]; BREAST.out.clear(); bellyDraw(); fillFit(); } },
-            [["", "Stretch over them (the usual)"], ["plain", "Leave it as the game draws it"], ["behind", "Tuck it behind them"]].map(([v, t]) => $("option", { value: v, textContent: t, selected: v === now }))); })(),
+            [["", STRAPS[it.Asset.Name] ? "Redrawn as straps (the usual for this one)" : "Stretch over them (the usual)"]].concat(STRAPS[it.Asset.Name] ? [["stretch", "Stretch it instead"]] : [], [["plain", "Leave it as the game draws it"], ["behind", "Tuck it behind them"]]).map(([v, t]) => $("option", { value: v, textContent: t, selected: v === now }))); })(),
         $("span", { className: "note", textContent: "Kept with Save the breasts." })),
       options.length > 1 ? $("div", { className: "row" }, $("label", { textContent: "Option:" }), options.map((o) => $("button", { type: "button", className: typeNow() === o ? "on" : "", textContent: o.replace(/([a-z])([A-Z0-9])/g, "$1 $2"), onclick: () => { try { TypedItemSetOptionByName(S.C, it, o, false, null, false); } catch (e) { say("The game wouldn't set that option: " + (e && e.message || e), true); } redraw(); } }))) : "",
       layers.length > 1 ? $("div", { className: "row" }, $("label", { textContent: "Move:" }),
@@ -415,6 +415,18 @@
   // chest wear, whatever slot it's in (a straitjacket is in the arms slot, a cape in the neck's). Hair is left alone:
   // it falls over them, it isn't worn on them.
   const chestSlot = (g) => !!g && !/^Hair/.test(g) && !NIP_GROUPS.has(g) && !HAND_GROUPS.has(g) && !/^(Body|Arms|Head|Eyes|Eyebrows|Mouth|Blush|Fluids|Pussy|Emoticon|Height)/.test(g);
+  // Straps don't stretch: a thin strap blown up to the size of the breast stops being a strap (the open harnesses and
+  // frame bras came out as blobs). So those pieces are REDRAWN on drawn breasts, out of a few kinds of strap laid on
+  // the breast's own outline, at a strap's width whatever the size:
+  //   ring: round the base of each breast · under: along the underside · over: across the top of them
+  //   across: a band over the nipples · centre: down between them · cross: an X between them
+  // The number is the strap's width. The piece's own colour is used (or the tint you gave it). What's off the breasts
+  // (shoulder straps, the back, the waist) is still the game's picture; the ring meets it at the breast's edge.
+  const STRAPS = {
+    FrameBra1: { ring: 6, centre: 4 }, FrameBra2: { ring: 3.5, cross: 2.5 }, BondageBra1: { across: 0.42, under: 6 }, HarnessBra2: { ring: 6, under: 8 },
+    StarHarnessBra: { ring: 4, cross: 3.5, over: 3.5 }, StuddedHarness: { ring: 8, under: 8 }, LeatherBreastBinder: { over: 10, under: 10, centre: 6 },
+    LeatherHarness: { ring: 6, centre: 5, under: 6 }, LeatherStrapHarness: { ring: 6, centre: 5, under: 6 }, HarnessBra1: { ring: 5, under: 6 },
+  };
   const GAME_BREAST = { dx: 42, y: 330, r: 41 };   // the game's biggest chest, in its upper-body picture: each breast's middle is this far out from the centre line, this far down, and about this big
   const upperName = () => { const it = bodyItem("BodyUpper"); return it && it.Asset ? it.Asset.Name : ""; };
   // the drawn breasts to show right now, or null (a cup the game draws itself, another chest picked since, or a pose they aren't drawn in)
@@ -516,7 +528,7 @@
           // (a piece's pictures are in its slot's folder or the folder of the slot it borrows its art from, named for the piece)
           const mouldList = S.C.Appearance.filter((it) => MOULD.items.has(mouldKey(it))).map((it) => ({ folders: [it.Asset.Group.Name, it.Asset.DynamicGroupName], name: it.Asset.Name, key: mouldKey(it), mode: MOULD.mode.get(mouldKey(it)) || "wide" }));
           const wornList = S.C.Appearance.map((it) => ({ folders: [it.Asset.Group.Name, it.Asset.DynamicGroupName], name: it.Asset.Name, key: mouldKey(it) })).sort((a, b) => b.name.length - a.name.length);
-          const wearOf = (src) => { const g = groupOf(src), file = src.slice(src.lastIndexOf("/") + 1), q = wornList.find((w) => w.folders.includes(g) && file.startsWith(w.name)); return (q && BREAST.wear[q.key]) || ""; };
+          const pieceOf = (src) => { const g = groupOf(src), file = src.slice(src.lastIndexOf("/") + 1); return wornList.find((w) => w.folders.includes(g) && file.startsWith(w.name)) || null; };
           const isMoulded = (src) => { if (!mouldList.length) return null; const g = groupOf(src), file = src.slice(src.lastIndexOf("/") + 1); return mouldList.find((q) => q.folders.includes(g) && file.startsWith(q.name)) || null; };
           const gate = FarmBelly.skinGate(C);   // true once a picture comes after all the skin, genitals included
           const prio = (src) => { const g = AssetGroupGet(C.AssetFamily, groupOf(src)); return g && typeof g.DrawingPriority === "number" ? g.DrawingPriority : 99; };
@@ -587,6 +599,48 @@
             }
             real[name](c, x - c.MX, y - c.MY, o); return true;
           };
+          // the piece's own colour, out of its picture (for one worn in the game's own colours, with no tint to go by)
+          const ownColour = (src, im) => {
+            const key = "col|" + src; let v = BREAST.cover.get(key); if (v) return v;
+            const c = document.createElement("canvas"); c.width = im.naturalWidth; c.height = im.naturalHeight; const g = c.getContext("2d", { willReadFrequently: true }); g.drawImage(im, 0, 0);
+            const d = g.getImageData(0, 0, c.width, c.height).data, px = [];
+            for (let i = 0; i < d.length; i += 16) if (d[i + 3] > 200) px.push([d[i], d[i + 1], d[i + 2]]);
+            px.sort((a, b) => (a[0] + a[1] + a[2]) - (b[0] + b[1] + b[2]));
+            v = px.length ? px[Math.floor(px.length * 0.6)] : [40, 40, 44]; BREAST.cover.set(key, v); return v;
+          };
+          const strapBase = {};   // the first picture of each piece carries the straps; its other layers just step out of the way
+          const strapDraw = (name, src, x, y, o, piece) => {
+            const B = ctx.breast, im = B && mouldImg(src); if (!im) return false;
+            if (!strapBase[piece.key]) strapBase[piece.key] = src;
+            const base = strapBase[piece.key] === src, R = STRAPS[piece.name], tinted = !!(o && o.HexColor);
+            const key = "strap|" + src + "|" + Math.round(x) + "," + Math.round(y) + "|" + B.sig + "|" + (tinted ? 1 : 0);
+            let c = BREAST.out.get(key);
+            if (!c) {
+              const MX = 220, MY = 420, w = im.naturalWidth, h = im.naturalHeight, S2 = B.S;
+              c = document.createElement("canvas"); c.width = w + MX * 2; c.height = h + MY * 2; c.MX = MX; c.MY = MY;
+              const g = c.getContext("2d"), ox = MX + B.rx - x, oy = MY + B.ry - y;
+              const P = (sd, t) => { const p = FarmBreasts.point(S2, sd, t); return [ox + p[0], oy + p[1]]; };
+              const arc = (sd, from, to) => { g.beginPath(); for (let j = 0; j <= 60; j++) { const p = P(sd, from + (to - from) * j / 60); if (j) g.lineTo(p[0], p[1]); else g.moveTo(p[0], p[1]); } };
+              g.drawImage(im, MX, MY);
+              g.globalCompositeOperation = "destination-out"; for (const sd of [-1, 1]) { arc(sd, 0, Math.PI * 2); g.closePath(); g.fill(); } g.globalCompositeOperation = "source-over";
+              if (base) {
+                const col = tinted ? [205, 205, 205] : ownColour(src, im), k = (m) => "rgb(" + col.map((v) => Math.max(0, Math.min(255, Math.round(v * m)))).join(",") + ")";
+                const grow = 1 + 0.5 * S2.k;
+                // a strap: a dark edge, the leather, and a thin shine along it
+                const strap = (wd, path) => { g.lineCap = "round"; g.lineJoin = "round"; g.strokeStyle = k(0.35); g.lineWidth = wd + 2.2; path(); g.stroke(); g.strokeStyle = k(1); g.lineWidth = wd; path(); g.stroke(); g.strokeStyle = tinted ? "rgba(255,255,255,0.55)" : "rgba(255,255,255,0.22)"; g.lineWidth = Math.max(1, wd * 0.22); g.save(); g.translate(-wd * 0.18, -wd * 0.18); path(); g.stroke(); g.restore(); };
+                const side = (sd, draw) => { g.save(); g.beginPath(); if (sd < 0) g.rect(0, 0, ox, c.height); else g.rect(ox, 0, c.width - ox, c.height); g.clip(); draw(); g.restore(); };
+                const nipY = oy + S2.by + S2.r * (-0.15 + 0.42 * S2.k), topY = oy + S2.by - S2.r * S2.top, botY = oy + S2.by + S2.r * (1 + S2.sag);
+                if (R.across) { const wd = S2.r * R.across; for (const sd of [-1, 1]) side(sd, () => strap(wd, () => { g.beginPath(); g.moveTo(ox + sd * (S2.bx + S2.r * 1.02), nipY - S2.r * 0.1); g.quadraticCurveTo(ox + sd * S2.bx, nipY + S2.r * 0.22, ox, nipY - S2.r * 0.05); })); }
+                if (R.over) { const wd = R.over * grow, yy = oy + S2.by - S2.r * 0.62; for (const sd of [-1, 1]) side(sd, () => strap(wd, () => { g.beginPath(); g.moveTo(ox + sd * (S2.bx + S2.r * 0.86), yy); g.quadraticCurveTo(ox + sd * S2.bx, yy + S2.r * 0.16, ox, yy - S2.r * 0.02); })); }
+                if (R.under) { const wd = R.under * grow; for (const sd of [-1, 1]) side(sd, () => strap(wd, () => (sd > 0 ? arc(sd, -0.02 * Math.PI, Math.PI * 1.04) : arc(sd, Math.PI * 1.02, -0.04 * Math.PI)))); }
+                if (R.ring) { const wd = R.ring * grow; for (const sd of [-1, 1]) side(sd, () => strap(wd, () => { arc(sd, 0, Math.PI * 2); g.closePath(); })); }
+                if (R.cross) { const wd = R.cross * grow; for (const sd of [-1, 1]) strap(wd, () => { const a = P(sd, -Math.PI / 2), b = P(-sd, Math.PI * (sd > 0 ? 0.72 : 0.28)); g.beginPath(); g.moveTo(a[0], a[1]); g.lineTo(b[0], b[1]); }); }
+                if (R.centre) { const wd = R.centre * grow; strap(wd, () => { g.beginPath(); g.moveTo(ox, topY + S2.r * 0.25); g.lineTo(ox, botY - S2.r * 0.1); }); }
+              }
+              if (BREAST.out.size > 60) BREAST.out.clear(); BREAST.out.set(key, c);
+            }
+            real[name](c, x - c.MX, y - c.MY, o); return true;
+          };
           const held = [];
           const nipDraw = (name, src, x, y, o) => {
             const B = ctx.breast, im = B && mouldImg(src); if (!im) return false;
@@ -616,8 +670,10 @@
             if (br && typeof src === "string") { const gname = groupOf(src);
               if (!done && gname === "Nipples") { held.push([name, src, x, y, o]); return; }
               if (done && NIP_GROUPS.has(gname)) { try { if (nipDraw(name, src, x, y, o)) return; } catch (e) { console.warn("[studio] nipples:", e); } }
-              if (done && chestSlot(gname) && !isMoulded(src)) { const how = wearOf(src);
-                try { if (how === "behind") { if (handDraw(name, src, x, y, o)) return; } else if (how !== "plain" && BREAST.dress) { if (dressDraw(name, src, x, y, o)) return; } } catch (e) { console.warn("[studio] chest wear:", e); } }
+              if (done && chestSlot(gname) && !isMoulded(src)) { const piece = pieceOf(src), how = (piece && BREAST.wear[piece.key]) || "";
+                try { if (how === "behind") { if (handDraw(name, src, x, y, o)) return; }
+                  else if (how === "" && piece && STRAPS[piece.name] && BREAST.dress) { if (strapDraw(name, src, x, y, o, piece)) return; }
+                  else if (how !== "plain" && BREAST.dress) { if (dressDraw(name, src, x, y, o)) return; } } catch (e) { console.warn("[studio] chest wear:", e); } }
               if (done && HAND_GROUPS.has(gname)) { try { if (handDraw(name, src, x, y, o)) return; } catch (e) { console.warn("[studio] hands:", e); } } }
             let drawn = false;
             try { if (ctx.belly && !fit.behind && typeof src === "string") { const q = isMoulded(src), m = q && mouldCanvas(src, x, y, ctx, q.key, q.mode); if (m) { real[name](m, x - MOULD.M, y, o); drawn = true; } } } catch (e) { console.warn("[studio] mould:", e); }

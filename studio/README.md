@@ -96,6 +96,12 @@ the game's pictures into the drawing.
   not set to "behind".
 - The list of moulded pieces is saved in `fits/items.json` when you press *Save this fit*.
 
+## Step 20: strap pieces redrawn
+
+- Pieces with a recipe in `STRAPS` (in `web/studio.js`) are redrawn on drawn breasts as straps on the breast's outline:
+  ring, under, over, across, centre, cross, each with a width. Adding a piece is one line there.
+- The picked piece's *On drawn breasts* row can switch it back to a stretch.
+
 ## Step 19: every slot, a choice, and the sheet
 
 - Every slot follows the drawn breasts now, not a fixed list. Hair is left alone.

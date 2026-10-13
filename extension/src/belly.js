@@ -72,7 +72,10 @@ function skinAt(C, bx, by) {
   if (typeof col === "string" && /^#[0-9a-fA-F]{6}$/.test(col)) return [parseInt(col.slice(1, 3), 16), parseInt(col.slice(3, 5), 16), parseInt(col.slice(5, 7), 16)];
   return FALLBACK[col] || FALLBACK.White;
 }
-export function initBelly(mod) {
+let hooked = false, sdk = null;
+export function initBelly(mod) { sdk = mod; }   // nothin' is hooked until the test is switched on
+function hookBelly(mod) {
+  if (hooked || !mod) return; hooked = true;
   try {
     mod.hookFunction("CommonDrawAppearanceBuild", 1, (args, next) => {
       try {
@@ -102,6 +105,7 @@ export function initBelly(mod) {
 // 0 off · 1, 2, 3. Redraws your own character.
 export function bellyTrial(n, say) {
   trial = Math.max(0, Math.min(3, Math.round(Number(n)) || 0));
+  if (trial) hookBelly(sdk);
   try { if (W.Player && typeof W.CharacterLoadCanvas === "function") W.CharacterLoadCanvas(W.Player); } catch (e) { console.warn("[Farmhand Companion] belly redraw:", e); }
   if (say) say(trial ? "Belly test: " + ["", "small", "medium", "large"][trial] + ". Look at your character with nothing over your middle. Only you can see it. Tell Claude how it looks: the shape, the colour match, where it sits." : "Belly test off.");
 }

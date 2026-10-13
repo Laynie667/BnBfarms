@@ -227,7 +227,8 @@ export function syncShape(shape, allow) {
 // everybody sees them with no add-on at all. What we don't know yet is whether the game keeps them on the BODY
 // (the Layering screen refuses to, but the drawing code doesn't check). This sets 15% on your chest and on whatever
 // you're wearing on your nipples, breasts or torso, waits, and says what stuck. scaleTrial(false) puts it all back.
-const TRIAL_GROUPS = ["BodyUpper", "ItemNipples", "ItemBreast", "ItemTorso", "Bra"];
+const TRIAL_GROUPS = ["ItemNipples", "ItemBreast", "ItemTorso"];   // worn items only: never the body, never clothes (Oct 12: something broke for Laynie right after these trials went out)
+const TRIAL_CLEAN = ["BodyUpper", "BodyLower", "Bra", "ItemNipples", "ItemBreast", "ItemTorso"];
 export function scaleTrial(on, say) {
   try {
     if (!P() || !Array.isArray(P().Appearance)) return say("I can't see your character right now.");
@@ -236,6 +237,10 @@ export function scaleTrial(on, say) {
       const p = Object.assign({}, it.Property || {});
       if (on) { p.ScaleX = 1.15; p.ScaleY = 1.15; p.TranslationY = -12; } else { delete p.ScaleX; delete p.ScaleY; delete p.TranslationY; }
       it.Property = p;
+    }
+    if (!on) for (const it of P().Appearance) {   // undo also clears anything an earlier trial left on the body or a bra
+      if (!it || !it.Asset || !it.Asset.Group || !TRIAL_CLEAN.includes(it.Asset.Group.Name) || !it.Property) continue;
+      if (it.Property.ScaleX === 1.15) delete it.Property.ScaleX; if (it.Property.ScaleY === 1.15) delete it.Property.ScaleY; if (it.Property.TranslationY === -12) delete it.Property.TranslationY;
     }
     if (typeof window.CharacterRefresh === "function") window.CharacterRefresh(P());
     if (typeof window.ChatRoomCharacterUpdate === "function" && window.CurrentScreen === "ChatRoom") window.ChatRoomCharacterUpdate(P());

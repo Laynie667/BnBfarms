@@ -13,7 +13,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 | Map tools, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.3** |
 | Dairy | `farmhand-dairy.user.js` | the bot's PC | **1.0.2** |
 | Shows | `farmhand-shows.user.js` | the bot's PC | **1.0.4** |
-| Farmhand Companion | `farmhand-companion.user.js` | each player | **0.16.2** |
+| Farmhand Companion | `farmhand-companion.user.js` | each player | **0.16.3** |
 | Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.4** |
 
 ## Sending a watch report
@@ -23,6 +23,8 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 - Running the watcher on more than one game at once (the bot, yours, a tester's) lets Claude line them up into one timeline.
 
 ## Latest changes (newest first)
+
+- **Companion 0.16.3: the two experiments made safe.** Reported right after 0.16.2: looking at a character, dressing and adding restraints stopped working properly. Cause not yet confirmed. The belly test no longer hooks the game's drawing at all until one of its buttons is pressed, and the scale trial no longer touches the body or a bra, only worn items. "Undo the scale trial" now also clears anything an earlier trial left on the body.
 
 - **Companion 0.16.2: the belly test** (Toggles, at the bottom: Belly small, medium, large, off). Draws a round belly on the player's own character, in their own skin colour read off the screen, over the skin and under clothes and gear. Only that player sees it, nothing is sent and nothing on the character changes. It is a trial of whether drawn body art looks good enough to build the outfit studio on. NOT YET SEEN LIVE: position, colour match and outline all need a look.
 

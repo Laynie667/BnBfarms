@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.16.2
+// @version      0.16.3
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -230,7 +230,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.16.2";
+  var VERSION = "0.16.3";
 
   // extension/src/config.js
   var BOT_MEMBER = 260239;
@@ -906,7 +906,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
     if (did.length) commit(next);
     return did;
   }
-  var TRIAL_GROUPS = ["BodyUpper", "ItemNipples", "ItemBreast", "ItemTorso", "Bra"];
+  var TRIAL_GROUPS = ["ItemNipples", "ItemBreast", "ItemTorso"];
+  var TRIAL_CLEAN = ["BodyUpper", "BodyLower", "Bra", "ItemNipples", "ItemBreast", "ItemTorso"];
   function scaleTrial(on, say) {
     try {
       if (!P() || !Array.isArray(P().Appearance)) return say("I can't see your character right now.");
@@ -923,6 +924,12 @@ One of mods you are using is using an old version of SDK. It will work for now b
           delete p.TranslationY;
         }
         it.Property = p;
+      }
+      if (!on) for (const it of P().Appearance) {
+        if (!it || !it.Asset || !it.Asset.Group || !TRIAL_CLEAN.includes(it.Asset.Group.Name) || !it.Property) continue;
+        if (it.Property.ScaleX === 1.15) delete it.Property.ScaleX;
+        if (it.Property.ScaleY === 1.15) delete it.Property.ScaleY;
+        if (it.Property.TranslationY === -12) delete it.Property.TranslationY;
       }
       if (typeof window.CharacterRefresh === "function") window.CharacterRefresh(P());
       if (typeof window.ChatRoomCharacterUpdate === "function" && window.CurrentScreen === "ChatRoom") window.ChatRoomCharacterUpdate(P());
@@ -1077,7 +1084,14 @@ One of mods you are using is using an old version of SDK. It will work for now b
     if (typeof col === "string" && /^#[0-9a-fA-F]{6}$/.test(col)) return [parseInt(col.slice(1, 3), 16), parseInt(col.slice(3, 5), 16), parseInt(col.slice(5, 7), 16)];
     return FALLBACK[col] || FALLBACK.White;
   }
+  var hooked = false;
+  var sdk = null;
   function initBelly(mod2) {
+    sdk = mod2;
+  }
+  function hookBelly(mod2) {
+    if (hooked || !mod2) return;
+    hooked = true;
     try {
       mod2.hookFunction("CommonDrawAppearanceBuild", 1, (args, next) => {
         try {
@@ -1116,6 +1130,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
   function bellyTrial(n, say) {
     trial = Math.max(0, Math.min(3, Math.round(Number(n)) || 0));
+    if (trial) hookBelly(sdk);
     try {
       if (W.Player && typeof W.CharacterLoadCanvas === "function") W.CharacterLoadCanvas(W.Player);
     } catch (e) {

@@ -105,6 +105,11 @@ function bellyPlace(size, upperX, upperY, cv, pose) {
   return [upperX + 250 - cv.width / 2, upperY + 392 + S.ry * 0.62 - (S.lift || 0) - cv.height / 2];
 }
 // which pose the upper body is drawn in, from its picture's folder ("" for the ordinary ones)
+// On all fours the game shows the body from the FRONT: head, then chest, with everything else behind. A belly pressed to
+// the ground is behind the chest and the breasts there, so all that showed of it was stray lines under the breasts
+// (Laynie, Oct 12: "that looks very strange... it looks off on all 3 sizes"). It can't be drawn honestly from that
+// angle with a shape made for the front, so on all fours it isn't drawn. The pressed drawing is kept for a studio to use.
+const ALL_FOURS_BELLY = false;
 const GROUND_Y = 386;   // in the all-fours body picture, how far down the hands and elbows touch the ground
 function bellyPose(src) { const m = /\/BodyUpper\/(AllFours|Hogtied)\//.exec(String(src)); return m ? m[1] : ""; }
 // where in the body's picture to look for skin, by pose
@@ -197,7 +202,8 @@ function hookBelly(mod) {
           // On all fours and hogtied the belly is BEHIND the chest, so it has to go down before the upper body does.
           const before = (src, x, y, o) => {
             if (done || typeof src !== "string") return;
-            if (src.includes("/BodyUpper/")) { const pose = bellyPose(src); if (pose === "AllFours" || pose === "Hogtied") { upper = [x, y, src, o && o.HexColor, pose]; lower = true; paint(); return; } }
+            if (src.includes("/BodyUpper/")) { const pose = bellyPose(src); if (pose === "AllFours" && !ALL_FOURS_BELLY) { done = true; return; }   // (not drawn: see ALL_FOURS_BELLY)
+            if (pose === "AllFours" || pose === "Hogtied") { upper = [x, y, src, o && o.HexColor, pose]; lower = true; paint(); return; } }
             if (lower && prio(src) > SKIN_TOP) paint();
           };
           const after = (src, x, y, o) => { if (typeof src !== "string") return; if (src.includes("/BodyUpper/")) upper = [x, y, src, o && o.HexColor, bellyPose(src)]; if (src.includes("/BodyLower/")) lower = true; };

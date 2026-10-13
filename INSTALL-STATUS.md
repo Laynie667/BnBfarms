@@ -13,7 +13,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 | Map tools, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.3** |
 | Dairy | `farmhand-dairy.user.js` | the bot's PC | **1.0.2** |
 | Shows | `farmhand-shows.user.js` | the bot's PC | **1.0.4** |
-| Farmhand Companion | `farmhand-companion.user.js` | each player | **0.17.0** |
+| Farmhand Companion | `farmhand-companion.user.js` | each player | **0.17.1** |
 | Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.4** |
 
 ## Sending a watch report
@@ -23,6 +23,8 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 - Running the watcher on more than one game at once (the bot, yours, a tester's) lets Claude line them up into one timeline.
 
 ## Latest changes (newest first)
+
+- **Companion 0.17.1: no belly drawn on all fours.** Seen live on 0.17.0: the pressed belly showed only as stray lines under the breasts, on all three sizes. On all fours the game shows the body from the front with the chest in the way, so a belly on the ground is hidden behind it and cannot be drawn well with a front-view shape. It is no longer drawn in that pose. Standing, kneeling, the arms poses and hogtied are unchanged.
 
 - **Companion 0.17.0: on all fours the belly rests on the ground; hogtied it hangs.** Laynie on 0.16.9: on all fours it hung below the elbows, when it would be pressed against the ground; hanging only makes sense suspended. On all fours the belly is now pressed: a fifth wider, 40% shallower, flat underneath, with its underside on the line the hands are on, so it never reaches below them. Hogtied (hung up) it is drawn again, hanging free under the chest. In both it goes down before the upper body, behind the chest. Preview checked; NOT YET SEEN LIVE.
 

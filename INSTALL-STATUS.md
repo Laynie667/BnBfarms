@@ -13,7 +13,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 | Map tools, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.3** |
 | Dairy | `farmhand-dairy.user.js` | the bot's PC | **1.0.2** |
 | Shows | `farmhand-shows.user.js` | the bot's PC | **1.0.4** |
-| Farmhand Companion | `farmhand-companion.user.js` | each player | **0.16.1** |
+| Farmhand Companion | `farmhand-companion.user.js` | each player | **0.16.2** |
 | Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.4** |
 
 ## Sending a watch report
@@ -23,6 +23,8 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 - Running the watcher on more than one game at once (the bot, yours, a tester's) lets Claude line them up into one timeline.
 
 ## Latest changes (newest first)
+
+- **Companion 0.16.2: the belly test** (Toggles, at the bottom: Belly small, medium, large, off). Draws a round belly on the player's own character, in their own skin colour read off the screen, over the skin and under clothes and gear. Only that player sees it, nothing is sent and nothing on the character changes. It is a trial of whether drawn body art looks good enough to build the outfit studio on. NOT YET SEEN LIVE: position, colour match and outline all need a look.
 
 - **Companion 0.16.1: a scale trial button** (Toggles, at the bottom). The game has built-in per-item scale and move settings (0.01x to 3x, up to 500 pixels) that everybody sees without any add-on. The button sets 15% on the chest and on anything worn on the nipples, breasts or torso, then reports which the game kept. It answers whether the body itself can be scaled past XLarge, which decides how the outfit studio would be built. "Undo the scale trial" puts everything back.
 

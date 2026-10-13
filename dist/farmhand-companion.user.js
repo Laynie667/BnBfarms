@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.16.1
+// @version      0.16.2
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -230,7 +230,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.16.1";
+  var VERSION = "0.16.2";
 
   // extension/src/config.js
   var BOT_MEMBER = 260239;
@@ -981,6 +981,149 @@ One of mods you are using is using an old version of SDK. It will work for now b
     return { ok: true, did: ["dress"] };
   }
 
+  // extension/src/belly.js
+  var W = window;
+  var trial = 0;
+  var SIZES = [null, { rx: 54, ry: 50 }, { rx: 76, ry: 72 }, { rx: 100, ry: 96 }];
+  var FALLBACK = { White: [236, 204, 196], Asian: [232, 200, 164], Black: [120, 86, 70] };
+  var clamp = (v) => Math.max(0, Math.min(255, Math.round(v)));
+  var rgb = (c, k) => "rgb(" + clamp(c[0] * k) + "," + clamp(c[1] * k) + "," + clamp(c[2] * k) + ")";
+  function bellyCanvas(size, skin) {
+    const S = SIZES[size], pad = 6, w = S.rx * 2 + pad * 2, hgt = S.ry * 2 + pad * 2, cx = w / 2, cy = hgt / 2;
+    const cv = document.createElement("canvas");
+    cv.width = w;
+    cv.height = hgt;
+    const g = cv.getContext("2d");
+    const grad = g.createRadialGradient(cx - S.rx * 0.3, cy - S.ry * 0.35, S.rx * 0.1, cx, cy, S.rx * 1.15);
+    grad.addColorStop(0, rgb(skin, 1.04));
+    grad.addColorStop(0.6, rgb(skin, 1));
+    grad.addColorStop(1, rgb([skin[0], skin[1] * 0.9, skin[2] * 0.9], 0.93));
+    g.fillStyle = grad;
+    g.beginPath();
+    g.ellipse(cx, cy, S.rx, S.ry, 0, 0, Math.PI * 2);
+    g.fill();
+    g.globalCompositeOperation = "destination-out";
+    {
+      const fr = Math.min(S.rx * 0.95, 60);
+      g.save();
+      g.translate(cx, cy - S.ry * 0.95);
+      g.scale(1, S.ry * 0.85 / fr);
+      const fade = g.createRadialGradient(0, 0, fr * 0.25, 0, 0, fr);
+      fade.addColorStop(0, "rgba(0,0,0,1)");
+      fade.addColorStop(1, "rgba(0,0,0,0)");
+      g.fillStyle = fade;
+      g.beginPath();
+      g.arc(0, 0, fr, 0, Math.PI * 2);
+      g.fill();
+      g.restore();
+    }
+    g.globalCompositeOperation = "source-over";
+    g.strokeStyle = rgb(skin, 0.28);
+    g.lineWidth = 1.6;
+    g.lineCap = "round";
+    g.beginPath();
+    {
+      const up = [0, 0.1, 0.2, 0.33][size] * Math.PI;
+      g.ellipse(cx, cy, S.rx, S.ry, 0, -up, Math.PI + up);
+    }
+    g.stroke();
+    const blush = g.createRadialGradient(cx, cy + S.ry * 0.55, 2, cx, cy + S.ry * 0.55, S.rx * 0.8);
+    blush.addColorStop(0, "rgba(214,120,120,0.16)");
+    blush.addColorStop(1, "rgba(214,120,120,0)");
+    g.fillStyle = blush;
+    g.beginPath();
+    g.ellipse(cx, cy, S.rx - 2, S.ry - 2, 0, 0, Math.PI * 2);
+    g.fill();
+    {
+      g.save();
+      g.translate(cx - S.rx * 0.38, cy - S.ry * 0.12);
+      g.rotate(-0.35);
+      const sh = g.createRadialGradient(0, 0, 0, 0, 0, S.rx * 0.34);
+      sh.addColorStop(0, "rgba(255,255,255,0.85)");
+      sh.addColorStop(0.5, "rgba(255,255,255,0.35)");
+      sh.addColorStop(1, "rgba(255,255,255,0)");
+      g.fillStyle = sh;
+      g.scale(0.42, 1);
+      g.beginPath();
+      g.arc(0, 0, S.rx * 0.34, 0, Math.PI * 2);
+      g.fill();
+      g.restore();
+    }
+    g.strokeStyle = rgb(skin, 0.45);
+    g.lineWidth = 1.4;
+    g.beginPath();
+    if (size >= 3) g.ellipse(cx, cy + S.ry * 0.18, 4, 3, 0, 0, Math.PI * 2);
+    else {
+      g.moveTo(cx, cy + S.ry * 0.12);
+      g.quadraticCurveTo(cx + 2.5, cy + S.ry * 0.2, cx, cy + S.ry * 0.3);
+    }
+    g.stroke();
+    return cv;
+  }
+  function skinAt(C, bx, by) {
+    try {
+      const gl = W.GLDrawCanvas && W.GLDrawCanvas.GL;
+      if (gl && typeof gl.readPixels === "function") {
+        for (const [dx, dy] of [[222, 416], [278, 416], [214, 402]]) {
+          const px = new Uint8Array(4);
+          gl.readPixels(Math.round(bx + dx), Math.round(gl.canvas.height - (by + dy) - 1), 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, px);
+          if (px[3] > 200 && px[0] + px[1] + px[2] > 90 && Math.min(px[0], px[1], px[2]) < 242) return [px[0], px[1], px[2]];
+        }
+      }
+    } catch (e) {
+    }
+    const it = (C.DrawAppearance || C.Appearance || []).find((a) => a && a.Asset && a.Asset.Group && a.Asset.Group.Name === "BodyUpper");
+    const col = it && (Array.isArray(it.Color) ? it.Color[0] : it.Color);
+    if (typeof col === "string" && /^#[0-9a-fA-F]{6}$/.test(col)) return [parseInt(col.slice(1, 3), 16), parseInt(col.slice(3, 5), 16), parseInt(col.slice(5, 7), 16)];
+    return FALLBACK[col] || FALLBACK.White;
+  }
+  function initBelly(mod2) {
+    try {
+      mod2.hookFunction("CommonDrawAppearanceBuild", 1, (args, next) => {
+        try {
+          const C = args[0], cb = args[1];
+          if (trial && C && W.Player && C.MemberNumber === W.Player.MemberNumber && cb && typeof cb.drawImage === "function") {
+            let upper = null, done = false;
+            const after = (src, x, y) => {
+              if (done || typeof src !== "string") return;
+              if (src.includes("/BodyUpper/")) upper = [x, y];
+              if (src.includes("/BodyLower/") && upper) {
+                done = true;
+                const S = SIZES[trial], cv = bellyCanvas(trial, skinAt(C, upper[0], upper[1]));
+                const dx = upper[0] + 250 - cv.width / 2, dy = upper[1] + 432 + S.ry * 0.22 - cv.height / 2;
+                cb.drawImage(cv, dx, dy, {});
+                if (typeof cb.drawImageBlink === "function") cb.drawImageBlink(cv, dx, dy, {});
+              }
+            };
+            const wrap = (name) => typeof cb[name] === "function" ? (src, x, y, o) => {
+              cb[name](src, x, y, o);
+              try {
+                if (!/Blink$/.test(name)) after(src, x, y);
+              } catch (e) {
+                console.warn("[Farmhand Companion] belly:", e);
+              }
+            } : cb[name];
+            args[1] = Object.assign({}, cb, { drawImage: wrap("drawImage"), drawImageColorize: wrap("drawImageColorize") });
+          }
+        } catch (e) {
+          console.warn("[Farmhand Companion] belly hook:", e);
+        }
+        return next(args);
+      });
+    } catch (e) {
+      console.warn("[Farmhand Companion] belly test unavailable:", e);
+    }
+  }
+  function bellyTrial(n, say) {
+    trial = Math.max(0, Math.min(3, Math.round(Number(n)) || 0));
+    try {
+      if (W.Player && typeof W.CharacterLoadCanvas === "function") W.CharacterLoadCanvas(W.Player);
+    } catch (e) {
+      console.warn("[Farmhand Companion] belly redraw:", e);
+    }
+    if (say) say(trial ? "Belly test: " + ["", "small", "medium", "large"][trial] + ". Look at your character with nothing over your middle. Only you can see it. Tell Claude how it looks: the shape, the colour match, where it sits." : "Belly test off.");
+  }
+
   // extension/src/views/livestock.js
   var pct = (a, b) => b ? 100 * a / b : 0;
   var hoursLeft = (t) => Math.max(0, Math.ceil((t - Date.now()) / 36e5));
@@ -1301,6 +1444,16 @@ One of mods you are using is using an old version of SDK. It will work for now b
         muted("Experiment: can the game draw your chest and what's on it bigger than its biggest size? Try it in a chat room, look, and undo."),
         btn("Scale trial: chest 15% bigger", () => scaleTrial(true, (t) => ctx2.hint(t))),
         btn("Undo the scale trial", () => scaleTrial(false, (t) => ctx2.hint(t)))
+      ),
+      // the drawn-belly test (belly.js): only you see it, on your own character
+      h(
+        "div",
+        { style: { marginTop: "10px" } },
+        muted("Experiment: a drawn belly on your own character, in your skin colour, under your clothes. Only you see it. Take off whatever covers your middle first."),
+        btn("Belly: small", () => bellyTrial(1, (t) => ctx2.hint(t))),
+        btn("Belly: medium", () => bellyTrial(2, (t) => ctx2.hint(t))),
+        btn("Belly: large", () => bellyTrial(3, (t) => ctx2.hint(t))),
+        btn("Belly: off", () => bellyTrial(0, (t) => ctx2.hint(t)))
       ),
       btn("Put the button and panel back (size and full screen too)", () => ctx2.resetPlaces && ctx2.resetPlaces())
     );
@@ -4409,7 +4562,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   };
 
   // extension/src/cues.js
-  var W = window;
+  var W2 = window;
   var ctx = null;
   function initCues(c) {
     ctx = c;
@@ -4426,15 +4579,15 @@ One of mods you are using is using an old version of SDK. It will work for now b
     stir: ctx.panel.prefs.stir ? void 0 : true,
     gear: ctx.panel.prefs.gear ? void 0 : true
   });
-  var mapOn = () => typeof W.ChatRoomMapViewIsActive === "function" && W.ChatRoomMapViewIsActive() && W.Player && W.Player.MapData && W.Player.MapData.Pos;
-  var others = () => (W.ChatRoomCharacter || []).filter((c) => c && c.MemberNumber !== (W.Player && W.Player.MemberNumber));
+  var mapOn = () => typeof W2.ChatRoomMapViewIsActive === "function" && W2.ChatRoomMapViewIsActive() && W2.Player && W2.Player.MapData && W2.Player.MapData.Pos;
+  var others = () => (W2.ChatRoomCharacter || []).filter((c) => c && c.MemberNumber !== (W2.Player && W2.Player.MemberNumber));
   var lastSight = "";
   function sightTick() {
     try {
-      if (W.CurrentScreen !== "ChatRoom" || !mapOn() || typeof W.ChatRoomMapViewCharacterIsVisible !== "function") return;
-      const see = others().filter((c) => W.ChatRoomMapViewCharacterIsVisible(c)).map((c) => c.MemberNumber).sort();
-      const hear = others().filter((c) => typeof W.ChatRoomMapViewCharacterIsHearable === "function" && W.ChatRoomMapViewCharacterIsHearable(c)).map((c) => c.MemberNumber).sort();
-      const LS = W.Player && W.Player.LSCG, S = LS && LS.SplatterModule;
+      if (W2.CurrentScreen !== "ChatRoom" || !mapOn() || typeof W2.ChatRoomMapViewCharacterIsVisible !== "function") return;
+      const see = others().filter((c) => W2.ChatRoomMapViewCharacterIsVisible(c)).map((c) => c.MemberNumber).sort();
+      const hear = others().filter((c) => typeof W2.ChatRoomMapViewCharacterIsHearable === "function" && W2.ChatRoomMapViewCharacterIsHearable(c)).map((c) => c.MemberNumber).sort();
+      const LS = W2.Player && W2.Player.LSCG, S = LS && LS.SplatterModule;
       const splat = S ? !!(S.enabled && S.taker !== false && (!LS.GlobalModule || LS.GlobalModule.enabled !== false)) : void 0;
       const key = see.join(",") + "|" + hear.join(",") + "|" + splat;
       if (key === lastSight && Date.now() - (sightTick.at || 0) < 12e4) return;
@@ -4449,13 +4602,13 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var DIRS = [["North", 0, -1], ["South", 0, 1], ["West", -1, 0], ["East", 1, 0]];
   function canStep(x, y) {
     try {
-      return W.ChatRoomMapViewCanEnterTile(x, y) > 0;
+      return W2.ChatRoomMapViewCanEnterTile(x, y) > 0;
     } catch (e) {
       return false;
     }
   }
   function findPath(from, to) {
-    const wide = W.ChatRoomMapViewWidth || 40, high = W.ChatRoomMapViewHeight || 40, key = (x, y) => x + "," + y;
+    const wide = W2.ChatRoomMapViewWidth || 40, high = W2.ChatRoomMapViewHeight || 40, key = (x, y) => x + "," + y;
     const goal = (x, y) => Math.max(Math.abs(x - to.X), Math.abs(y - to.Y)) <= (canStep(to.X, to.Y) ? 0 : 1);
     const prev = /* @__PURE__ */ new Map([[key(from.X, from.Y), null]]), q2 = [[from.X, from.Y]];
     while (q2.length) {
@@ -4485,8 +4638,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
       walk = null;
       ctx.toBot("leadNo", { id: m.id });
     };
-    if (!pref("noLead") || !mapOn() || typeof W.ChatRoomMapViewMove !== "function") return no();
-    const from = W.Player.MapData.Pos, to = { X: m.X, Y: m.Y };
+    if (!pref("noLead") || !mapOn() || typeof W2.ChatRoomMapViewMove !== "function") return no();
+    const from = W2.Player.MapData.Pos, to = { X: m.X, Y: m.Y };
     const path = findPath(from, to);
     if (!path) return no();
     if (!path.length) {
@@ -4499,7 +4652,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
   function stepWalk() {
     if (!walk) return;
-    const w = walk, p = W.Player && W.Player.MapData && W.Player.MapData.Pos;
+    const w = walk, p = W2.Player && W2.Player.MapData && W2.Player.MapData.Pos;
     if (!p) {
       walk = null;
       return;
@@ -4528,9 +4681,9 @@ One of mods you are using is using an old version of SDK. It will work for now b
       }
       Object.assign(w, { path, i: 0, stuck: Date.now(), retried: true });
     }
-    if (W.ChatRoomMapViewMovement == null) {
+    if (W2.ChatRoomMapViewMovement == null) {
       try {
-        W.ChatRoomMapViewMove(w.path[w.i]);
+        W2.ChatRoomMapViewMove(w.path[w.i]);
       } catch (e) {
       }
     }
@@ -4548,12 +4701,12 @@ One of mods you are using is using an old version of SDK. It will work for now b
   };
   function face(m) {
     const f = FACES[m.mood];
-    if (!f || !pref("noFace") || typeof W.CharacterSetFacialExpression !== "function" || !W.Player) return;
+    if (!f || !pref("noFace") || typeof W2.CharacterSetFacialExpression !== "function" || !W2.Player) return;
     const secs = m.mood === "clear" ? null : Math.max(5, Math.min(1800, Number(m.secs) || 30));
     for (const [g, e] of Object.entries(f)) {
       try {
-        W.CharacterSetFacialExpression(W.Player, g, e, secs);
-        if (g === "Eyes") W.CharacterSetFacialExpression(W.Player, "Eyes2", e, secs);
+        W2.CharacterSetFacialExpression(W2.Player, g, e, secs);
+        if (g === "Eyes") W2.CharacterSetFacialExpression(W2.Player, "Eyes2", e, secs);
       } catch (e2) {
       }
     }
@@ -4602,35 +4755,35 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var QUIET = { stall: 0.35, latch: 0.35, unlatch: 0.35, pump: 0.4, machine: 0.4, inflate: 0.4, hiss: 0.4, buzz: 0.3, zap: 0.35, clamp: 0.45, softgate: 0.4 };
   function sound(m) {
     const f = SOUNDS[m.name];
-    if (!f || !pref("noSound") || typeof W.AudioPlayInstantSound !== "function") return;
-    const vol = W.Player && W.Player.AudioSettings && W.Player.AudioSettings.Volume || 0;
+    if (!f || !pref("noSound") || typeof W2.AudioPlayInstantSound !== "function") return;
+    const vol = W2.Player && W2.Player.AudioSettings && W2.Player.AudioSettings.Volume || 0;
     try {
-      W.AudioPlayInstantSound("Audio/" + f + ".mp3", vol * (QUIET[m.name] || 0.6));
+      W2.AudioPlayInstantSound("Audio/" + f + ".mp3", vol * (QUIET[m.name] || 0.6));
     } catch (e) {
     }
   }
   function trance(m) {
-    let el = W.document.getElementById("fhc-trance");
+    let el = W2.document.getElementById("fhc-trance");
     const lvl = pref("noTrance") ? Math.max(0, Math.min(3, Number(m.level) || 0)) : 0;
     if (!lvl) {
       if (el) el.remove();
       return;
     }
     if (!el) {
-      el = W.document.createElement("div");
+      el = W2.document.createElement("div");
       el.id = "fhc-trance";
       el.style.cssText = "position:fixed;inset:0;pointer-events:none;z-index:9998;transition:opacity 4s;opacity:0;animation:fhcTrance 6s ease-in-out infinite";
-      if (!W.document.getElementById("fhc-trance-css")) {
-        const s = W.document.createElement("style");
+      if (!W2.document.getElementById("fhc-trance-css")) {
+        const s = W2.document.createElement("style");
         s.id = "fhc-trance-css";
         s.textContent = "@keyframes fhcTrance{0%,100%{filter:brightness(1)}50%{filter:brightness(0.85)}}";
-        W.document.head.appendChild(s);
+        W2.document.head.appendChild(s);
       }
-      W.document.body.appendChild(el);
+      W2.document.body.appendChild(el);
     }
     const edge = [0, 0.25, 0.45, 0.65][lvl], inner = [0, 55, 42, 30][lvl];
     el.style.background = "radial-gradient(ellipse at center, transparent " + inner + "%, rgba(70,20,90," + edge + ") 100%)";
-    (W.requestAnimationFrame || ((f) => setTimeout(f, 16)))(() => {
+    (W2.requestAnimationFrame || ((f) => setTimeout(f, 16)))(() => {
       el.style.opacity = "1";
     });
   }
@@ -4702,13 +4855,13 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var recentFeel = [];
   function feelTick() {
     try {
-      if (!pref("noFeelings") || W.CurrentScreen !== "ChatRoom" || !W.Player || !ctx.panel.s || !ctx.panel.s.onBooks) return;
+      if (!pref("noFeelings") || W2.CurrentScreen !== "ChatRoom" || !W2.Player || !ctx.panel.s || !ctx.panel.s.onBooks) return;
       if (Date.now() < (feelTick.next || 0)) return;
       feelTick.next = Date.now() + (7 + Math.random() * 6) * 6e4;
-      const s = ctx.panel.s, items = (W.Player.Appearance || []).filter((x) => x && x.Asset && x.Asset.Group);
+      const s = ctx.panel.s, items = (W2.Player.Appearance || []).filter((x) => x && x.Asset && x.Asset.Group);
       const grp = (g) => items.find((x) => x.Asset.Group.Name === g);
       const eff = (x) => [].concat(x.Property && x.Property.Effect || [], x.Asset.Effect || []);
-      const arousal = W.Player.ArousalSettings && W.Player.ArousalSettings.Progress || 0;
+      const arousal = W2.Player.ArousalSettings && W2.Player.ArousalSettings.Progress || 0;
       const kinds = [];
       if (grp("ItemButt")) kinds.push("plug");
       if (items.some((x) => eff(x).includes("Chaste")) && arousal > 40) kinds.push("chaste");
@@ -4732,11 +4885,11 @@ One of mods you are using is using an old version of SDK. It will work for now b
   function drawMarkers() {
     try {
       const s = ctx.panel.s;
-      if (!s || !s.staff || !Array.isArray(s.herd) || !pref("noMarkers") || !mapOn() || typeof W.DrawText !== "function") return;
-      const R = W.ChatRoomMapViewPerceptionRange || 6, tile = 1e3 / (R * 2 + 1), me3 = W.Player.MapData.Pos;
+      if (!s || !s.staff || !Array.isArray(s.herd) || !pref("noMarkers") || !mapOn() || typeof W2.DrawText !== "function") return;
+      const R = W2.ChatRoomMapViewPerceptionRange || 6, tile = 1e3 / (R * 2 + 1), me3 = W2.Player.MapData.Pos;
       for (const x of s.herd) {
-        const C = (W.ChatRoomCharacter || []).find((c) => c.MemberNumber === x.mn);
-        if (!C || !C.MapData || !C.MapData.Pos || !W.ChatRoomMapViewCharacterIsVisible(C)) continue;
+        const C = (W2.ChatRoomCharacter || []).find((c) => c.MemberNumber === x.mn);
+        if (!C || !C.MapData || !C.MapData.Pos || !W2.ChatRoomMapViewCharacterIsVisible(C)) continue;
         const tags = [];
         if (x.milk !== null && x.milk >= 75) tags.push(["M", "#7fa8c9"]);
         if (x.heat) tags.push(["H", "#d9534f"]);
@@ -4745,7 +4898,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
         if (!tags.length) continue;
         const sx = (C.MapData.Pos.X - me3.X + R) * tile, sy = (C.MapData.Pos.Y - me3.Y) * tile + R * tile;
         if (sx < 0 || sy < 0 || sx > 1e3 || sy > 1e3) continue;
-        tags.forEach(([t, col], i) => W.DrawText(t, sx + tile * 0.2 + i * tile * 0.22, sy + tile * 0.15, col, "black"));
+        tags.forEach(([t, col], i) => W2.DrawText(t, sx + tile * 0.2 + i * tile * 0.22, sy + tile * 0.15, col, "black"));
       }
     } catch (e) {
     }
@@ -4762,11 +4915,11 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
   function arouse(m) {
     try {
-      if (!stirOn() || !W.Player || !W.Player.ArousalSettings || typeof W.ActivitySetArousal !== "function") return;
-      if (W.Player.ArousalSettings.Active === "Inactive" || W.Player.ArousalSettings.Active === "NoMeter") return;
-      const cur = Number(W.Player.ArousalSettings.Progress) || 0, cap = Math.max(0, Math.min(deniedNow() ? 94 : 100, Number(m.cap) || 100));
+      if (!stirOn() || !W2.Player || !W2.Player.ArousalSettings || typeof W2.ActivitySetArousal !== "function") return;
+      if (W2.Player.ArousalSettings.Active === "Inactive" || W2.Player.ArousalSettings.Active === "NoMeter") return;
+      const cur = Number(W2.Player.ArousalSettings.Progress) || 0, cap = Math.max(0, Math.min(deniedNow() ? 94 : 100, Number(m.cap) || 100));
       const next = Math.max(0, Math.min(cap, cur + (Number(m.add) || 0)));
-      if (next > cur || m.add < 0) W.ActivitySetArousal(W.Player, next);
+      if (next > cur || m.add < 0) W2.ActivitySetArousal(W2.Player, next);
     } catch (e) {
       console.warn("[Farmhand Companion] arouse:", e);
     }
@@ -4774,11 +4927,11 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var VIBE_MODE = ["Low", "Medium", "High", "Maximum"];
   var vibeWas = null;
   var vibeTimer = null;
-  var vibeToys = () => (W.Player && Array.isArray(W.Player.Appearance) ? W.Player.Appearance : []).filter((it) => it && it.Asset && it.Asset.Group && it.Property && typeof it.Property.Intensity === "number" && !(it.Property.LockedBy && typeof W.DialogCanUnlock === "function" && !W.DialogCanUnlock(W.Player, it)));
+  var vibeToys = () => (W2.Player && Array.isArray(W2.Player.Appearance) ? W2.Player.Appearance : []).filter((it) => it && it.Asset && it.Asset.Group && it.Property && typeof it.Property.Intensity === "number" && !(it.Property.LockedBy && typeof W2.DialogCanUnlock === "function" && !W2.DialogCanUnlock(W2.Player, it)));
   function vibePush(toys) {
-    if (typeof W.CharacterRefresh === "function") W.CharacterRefresh(W.Player, false);
-    if (typeof W.ChatRoomCharacterItemUpdate === "function") toys.forEach((it) => W.ChatRoomCharacterItemUpdate(W.Player, it.Asset.Group.Name));
-    else if (typeof W.ChatRoomCharacterUpdate === "function") W.ChatRoomCharacterUpdate(W.Player);
+    if (typeof W2.CharacterRefresh === "function") W2.CharacterRefresh(W2.Player, false);
+    if (typeof W2.ChatRoomCharacterItemUpdate === "function") toys.forEach((it) => W2.ChatRoomCharacterItemUpdate(W2.Player, it.Asset.Group.Name));
+    else if (typeof W2.ChatRoomCharacterUpdate === "function") W2.ChatRoomCharacterUpdate(W2.Player);
   }
   function vibeSet(it, level, mode) {
     it.Property.Intensity = level;
@@ -4834,7 +4987,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
         const t = next(args);
         try {
           const f = slowFactor();
-          return t > 0 && f > 1 && !(typeof W.ChatRoomMapViewHasSuperPowers === "function" && W.ChatRoomMapViewHasSuperPowers()) ? t * f : t;
+          return t > 0 && f > 1 && !(typeof W2.ChatRoomMapViewHasSuperPowers === "function" && W2.ChatRoomMapViewHasSuperPowers()) ? t * f : t;
         } catch (e) {
           return t;
         }
@@ -5215,6 +5368,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     st.panel.setStatus("waitin' for the farm girl");
     initCues({ toBot, panel: st.panel, local: toChat });
     setInterval(parasiteSync, 6e4);
+    initBelly(mod);
     initBody(mod);
     window.__farmhandOwnPanel = (data) => {
       if (!onBotAccount()) return;

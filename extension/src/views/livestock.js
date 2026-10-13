@@ -9,6 +9,7 @@ import { guidesTab, safetyTab } from "./common.js";
 import { storeTab } from "./store.js";
 import { gearLore } from "../gearlore.js";
 import { scaleTrial } from "../marks.js";
+import { bellyTrial } from "../belly.js";
 
 const pct = (a, b) => (b ? (100 * a) / b : 0);
 const hoursLeft = (t) => Math.max(0, Math.ceil((t - Date.now()) / 3600000));
@@ -215,6 +216,9 @@ export function panelPrefs(ctx) {
     // a one-off experiment for the outfit studio idea (marks.js: scaleTrial)
     h("div", { style: { marginTop: "10px" } }, muted("Experiment: can the game draw your chest and what's on it bigger than its biggest size? Try it in a chat room, look, and undo."),
       btn("Scale trial: chest 15% bigger", () => scaleTrial(true, (t) => ctx.hint(t))), btn("Undo the scale trial", () => scaleTrial(false, (t) => ctx.hint(t)))),
+    // the drawn-belly test (belly.js): only you see it, on your own character
+    h("div", { style: { marginTop: "10px" } }, muted("Experiment: a drawn belly on your own character, in your skin colour, under your clothes. Only you see it. Take off whatever covers your middle first."),
+      btn("Belly: small", () => bellyTrial(1, (t) => ctx.hint(t))), btn("Belly: medium", () => bellyTrial(2, (t) => ctx.hint(t))), btn("Belly: large", () => bellyTrial(3, (t) => ctx.hint(t))), btn("Belly: off", () => bellyTrial(0, (t) => ctx.hint(t)))),
     btn("Put the button and panel back (size and full screen too)", () => ctx.resetPlaces && ctx.resetPlaces()));
 }
 // every switch the farm's add-ons offer (glory stalls, barn life, breeding week, fences…), in one place

@@ -96,6 +96,14 @@ the game's pictures into the drawing.
   not set to "behind".
 - The list of moulded pieces is saved in `fits/items.json` when you press *Save this fit*.
 
+## Steps 42 to 46: where it stands
+
+- **One breast shape, the approved one, dressed or bare.** Nothing may change it for clothes; clothes are grown to fit
+  it (`fitOf` in `web/breasts-drawing.js`). Steps 29 to 32 below describe a round "held" shape that was withdrawn.
+- **Her breasts hang in front of her hands**, and of what is on her hands and wrists.
+- **Between the legs:** the game's pussies, or a cock: the game's picture, or ours drawn (`web/cock-drawing.js`) at any
+  length, girth and ball size, soft or hard, in the farm's six kinds, with or without a knot.
+
 ## Step 32: filled, not sat on
 
 - A long piece (a top, a dress) is grown over the breasts only; below them it is as the game drew it. No shelf.

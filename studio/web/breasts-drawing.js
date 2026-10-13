@@ -132,7 +132,8 @@
     const mask = document.createElement("canvas"); mask.width = out.width; mask.height = out.height;
     const mg = mask.getContext("2d"); mg.fillStyle = "#000";
     for (const s of [-1, 1]) { mg.beginPath(); path(mg, S, s, 0, Math.PI * 2, ox, oy); mg.closePath(); mg.fill(); }
-    mg.clearRect(0, 0, mask.width, oy + S.by - S.r * 0.3);   // (only the hanging part: up on the chest they cover nothing)
+    // (the whole outline. It used to be cut off level, a third of the way up, and that level line is what sliced straight
+    // through her hands: the "scuffed" hands. The outline itself is the only edge a hand should ever be hidden by.)
     out.mask = mask;
     return out;
   }

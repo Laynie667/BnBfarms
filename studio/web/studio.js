@@ -561,14 +561,14 @@
   // one once she's worked up past 30). The farm keeps a length for a cock, in inches (6 to start, up to 30), so here it
   // can be drawn at that length: the game's picture, grown evenly from where it joins her. The game won't grow a
   // picture past three times, which is 18 inches; longer than that is drawn at 18.
-  const GEN = { inches: 6, box: {} };
+  const GEN = { inches: 6, box: {}, drawn: true, kind: "human", knot: false, girth: 1, balls: 3, cv: null, cvKey: "" };   // drawn: ours (cock-drawing.js) in place of the game's picture
   const genItem = () => S.C.Appearance.find((a) => a.Asset.Group.Name === "Pussy");
   const genHard = () => { const it = genItem(); return !!(it && it.Property && it.Property.Expression === "Hard"); };
   function genFit() {
     const it = genItem(); if (!it) return;
     const p = it.Property = it.Property || {};
     for (const k of ["ScaleX", "ScaleY", "TranslationX", "TranslationY"]) delete p[k];
-    if (it.Asset.Name === "Penis") { const k = Math.max(0.5, Math.min(3, GEN.inches / 6));
+    if (it.Asset.Name === "Penis" && !(GEN.drawn && window.FarmCock)) { const k = Math.max(0.5, Math.min(3, GEN.inches / 6));
       if (Math.abs(k - 1) > 0.01) {
         // grown from where it joins her, so it's moved back by however
         // far that point would have gone: soft, it hangs from the top middle of what's drawn; hard, it stands up from low
@@ -588,7 +588,13 @@
       box.replaceChildren(...[
         $("div", { className: "row" }, ["Pussy1", "Pussy2", "Pussy3", "Penis"].filter((n) => Asset.some((a) => a.Group.Name === "Pussy" && a.Name === n)).map((n) => $("button", { type: "button", className: it && it.Asset.Name === n ? "on" : "", textContent: n === "Penis" ? "Cock" : "Pussy " + n.slice(-1), onclick: () => { genSet(n); fill(); } }))),
         cock ? $("div", { className: "row" }, $("button", { type: "button", className: genHard() ? "" : "on", textContent: "Soft", onclick: () => { genHardSet(false); fill(); } }), $("button", { type: "button", className: genHard() ? "on" : "", textContent: "Hard", onclick: () => { genHardSet(true); fill(); } }), $("span", { className: "note", textContent: "In the game it goes hard by itself past 30 arousal." })) : "",
-        cock ? $("div", { className: "fh-slide" }, $("label", { textContent: "Length, as the farm counts it" }), $("input", { type: "range", min: 3, max: 30, step: 1, value: GEN.inches, oninput: (e) => { GEN.inches = Number(e.target.value); val.textContent = GEN.inches + " in" + (GEN.inches > 18 ? " (drawn at 18)" : ""); genFit(); } }), val) : ""].flat(Infinity)); };
+        cock ? $("div", { className: "fh-slide" }, $("label", { textContent: "Length, as the farm counts it" }), $("input", { type: "range", min: 3, max: 36, step: 1, value: GEN.inches, oninput: (e) => { GEN.inches = Number(e.target.value); val.textContent = GEN.inches + " in" + (!GEN.drawn && GEN.inches > 18 ? " (the game's picture stops at 18)" : ""); genFit(); bellyDraw(); } }), val) : "",
+        cock && window.FarmCock ? $("div", { className: "row" },
+          $("button", { type: "button", className: GEN.drawn ? "on" : "", textContent: GEN.drawn ? "Ours, drawn" : "The game's picture", title: "Ours can be any length, any kind, with balls of any size. The game's is one picture.", onclick: () => { GEN.drawn = !GEN.drawn; genFit(); bellyDraw(); fill(); } }),
+          GEN.drawn ? $("select", { title: "What kind", onchange: (e) => { GEN.kind = e.target.value; bellyDraw(); } }, Object.keys(FarmCock.KINDS).map((k) => $("option", { value: k, textContent: FarmCock.KINDS[k].label, selected: k === GEN.kind }))) : "",
+          GEN.drawn ? $("button", { type: "button", className: GEN.knot ? "on" : "", textContent: GEN.knot ? "Knotted" : "No knot", title: "A canine one always has a knot. It shows when it's hard.", onclick: () => { GEN.knot = !GEN.knot; bellyDraw(); fill(); } }) : "") : "",
+        cock && GEN.drawn && window.FarmCock ? [["girth", "Girth", 0.6, 2, 0.05, ""], ["balls", "Balls, as the farm counts them (1 to 20)", 1, 20, 1, ""]].map(([k, label, min, max, step]) => { const v2 = $("span", { className: "fh-val", textContent: String(GEN[k]) });
+          return $("div", { className: "fh-slide" }, $("label", { textContent: label }), $("input", { type: "range", min, max, step, value: GEN[k], oninput: (e) => { GEN[k] = Number(e.target.value); v2.textContent = String(GEN[k]); bellyDraw(); } }), v2); }) : ""].flat(Infinity)); };
     GEN.fill = fill; fill(); return box;
   }
   function breastPanel() {
@@ -626,7 +632,7 @@
       let finish = null, seenNow = null, handFNow = null;
       try {
         const fit = C === S.C ? fitNow() : null, br = C === S.C ? breastNow() : null, real = cb;   // real: the game's own callbacks (the wrapped set below must never call itself)
-        if (fit && (fit.on || br) && cb && typeof cb.drawImage === "function") {
+        if (fit && cb && typeof cb.drawImage === "function") {
           let upper = null, lower = false, done = false;
           const ctx = { bodies: [], belly: null, sig: "", seen: {} }; if (br) { seenNow = ctx.seen; handFNow = { get v() { return ctx.handF; } }; }
           const slot = new RegExp("(?:^|/)Assets/[^/]+/(?:Override/[^/]+/)?([^/]+)/");
@@ -964,7 +970,8 @@
             real[name](c, x - c.MX, y - c.MY, o); return true;
           };
           const before = (src, x, y, o) => { if (done || typeof src !== "string") return; if (src.includes("/BodyUpper/") && fit.on && fit.behind) { upper = [x, y, src, o && o.HexColor]; paint(); return; } if (gate ? gate(src) : (lower && prio(src) > 12)) paint(); };
-          const after = (src, x, y, o) => { if (typeof src !== "string") return; if (src.includes("/BodyUpper/")) { upper = [x, y, src, o && o.HexColor]; ctx.bodies.push({ src, x, y }); } if (src.includes("/BodyLower/")) { lower = true; ctx.bodies.push({ src, x, y }); } };
+          let upperSkin = null;
+          const after = (src, x, y, o) => { if (typeof src !== "string") return; if (src.includes("/BodyUpper/")) { try { upperSkin = bellySkin(src, o && o.HexColor, FarmBelly.bellyPose(src)); } catch (e) { /* the usual colour */ } upper = [x, y, src, o && o.HexColor]; ctx.bodies.push({ src, x, y }); } if (src.includes("/BodyLower/")) { lower = true; ctx.bodies.push({ src, x, y }); } };
           const wrap = (name) => (typeof real[name] === "function" ? (src, x, y, o) => {
             const blink = /Blink$/.test(name);
             if (!blink) { try { before(src, x, y, o); } catch (e) { console.warn("[studio] belly:", e); } }
@@ -996,8 +1003,19 @@
               // draws them all together, in front, and that is always right. So that's the default.)
               if (done && BREAST.tuck && (HAND_GROUPS.has(gname) || ARM_GROUPS.has(gname) || /Hand|Glove|Nail|Ring|Bracelet|Sleeve/i.test(gname)) && ctx.breast && ctx.breast.pose !== "AllFours") {
                 try { if (/^Hands/.test(gname)) { const fr = handHidden(src, x, y); if (fr != null) ctx.handF = Math.max(ctx.handF || 0, fr); } } catch (e) { console.warn("[studio] hands:", e); }
-                if (BREAST.tuck && BREAST.handsBehind) return;   // behind: not drawn at all
+                // Her breasts hang IN FRONT of her hands (Laynie, Oct 13: "the hands don't layer properly with the breast"): the
+                // hands were being drawn over the underside of them, or else vanishing whole. So each hand picture, and
+                // what's worn on it, is drawn with exactly the breasts' outline taken out of it: what the breast hangs in
+                // front of is hidden, the rest shows, and the edge between is the breast's own drawn edge.
+                try { if (handDraw(name, src, x, y, o)) return; } catch (e) { console.warn("[studio] hands:", e); }
               } }
+            // a drawn cock, in place of the game's picture of one (soft or hard, whichever the game was about to draw)
+            if (GEN.drawn && window.FarmCock && typeof src === "string" && groupOf(src) === "Pussy" && /Penis/.test(src)) {
+              try { const hard = /\/Hard\//.test(src), skin = upperSkin || FarmBelly.FALLBACK.White;
+                const key = [GEN.kind, GEN.knot, GEN.inches, GEN.girth, GEN.balls, hard, skin.join(",")].join("|");
+                if (GEN.cvKey !== key) { GEN.cv = FarmCock.canvas({ kind: GEN.kind, knot: GEN.knot, inches: GEN.inches, girth: GEN.girth, balls: GEN.balls, hard, skin }); GEN.cvKey = key; }
+                real[blink ? "drawImageBlink" : "drawImage"](GEN.cv, x + 49.5 - GEN.cv.ax, y + 110 - GEN.cv.ay, {}); return; } catch (e) { console.warn("[studio] cock:", e); }
+            }
             let drawn = false;
             try { if (ctx.belly && !fit.behind && typeof src === "string") { const q = isMoulded(src), m = q ? mouldCanvas(src, x, y, ctx, q.key, q.mode) : bellyAuto(src, x, y, ctx, fit.behind, (pieceOf(src) || {}).key); if (m) { real[name](m, x - MOULD.M, y, o); drawn = true; } } } catch (e) { console.warn("[studio] mould:", e); }
             if (!drawn) real[name](src, x, y, o);

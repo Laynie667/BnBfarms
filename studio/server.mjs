@@ -42,7 +42,7 @@ createServer(async (req, res) => {
     if (path === "/" || path === "/index.html") {
       // the game's own page, with the studio added at the end
       let html = await readFile(join(GAME, "index.html"), "utf8");
-      html = html.replace("</body>", `<link rel="stylesheet" href="/__studio/studio.css">\n<script src="/__studio/belly-drawing.js"></script>\n<script src="/__studio/breasts-drawing.js"></script>\n<script src="/__studio/studio.js"></script>\n</body>`).replace("<title>Bondage Club</title>", "<title>B&B outfit studio</title>");
+      html = html.replace("</body>", `<link rel="stylesheet" href="/__studio/studio.css">\n<script src="/__studio/belly-drawing.js"></script>\n<script src="/__studio/breasts-drawing.js"></script>\n<script src="/__studio/cock-drawing.js"></script>\n<script src="/__studio/studio.js"></script>\n</body>`).replace("<title>Bondage Club</title>", "<title>B&B outfit studio</title>");
       res.writeHead(200, { "Content-Type": TYPES[".html"], "Cache-Control": "no-cache" }).end(html);
       return;
     }

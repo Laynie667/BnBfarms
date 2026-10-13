@@ -13,7 +13,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 | Map tools, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.3** |
 | Dairy | `farmhand-dairy.user.js` | the bot's PC | **1.0.2** |
 | Shows | `farmhand-shows.user.js` | the bot's PC | **1.0.4** |
-| Farmhand Companion | `farmhand-companion.user.js` | each player | **0.17.2** |
+| Farmhand Companion | `farmhand-companion.user.js` | each player | **0.17.3** |
 | Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.4** |
 
 ## Sending a watch report
@@ -23,6 +23,10 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 - Running the watcher on more than one game at once (the bot, yours, a tester's) lets Claude line them up into one timeline.
 
 ## Latest changes (newest first)
+
+- **Outfit studio, step 4: fit what is worn; Companion 0.17.3: the belly covers the genitals.**
+  - Laynie in the studio: "the genitals show over the belly". The belly was placed by each slot's usual spot in the drawing order, but a pussy or cock can have layers drawn later than that. It now walks the game's own ordered layer list and goes on right after the last layer of chest, hips or genitals. Same fix in the Companion (0.17.3), which falls back to the old rule if the game has no such list.
+  - Studio: clicking a worn piece no longer takes it off. It picks it for fitting: sliders for left and right, up and down, wider, taller and turn, for the whole piece or any one layer; buttons for the item's options; "Save this fit" keeps it per item, body size and pose in `studio/fits/items.json` and puts it back when that item is worn there again. The ✕ takes a piece off. The sliders set the game's own item properties, which the newer game copy in `reference/` draws; whether the live game (R132) draws them is not yet checked.
 
 - **Outfit studio: the game's own wardrobe codes now load.** Laynie's first real code did nothing. It was the game's own look copy, which writes each piece in a short form (`G` group, `A` item, `C` colour), not the full form WCE and BCX write, and the studio only knew the full form. Both are read now. A code that names the body is treated as a whole look, so clothes it does not mention come off as they would in the game; restraints and toys are left on. Checked with her code: 23 pieces, the whole look drawn.
 

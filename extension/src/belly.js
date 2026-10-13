@@ -117,6 +117,29 @@ const GROUND_Y = 386;   // in the all-fours body picture, how far down the hands
 function bellyPose(src) { const m = /\/BodyUpper\/(AllFours|Hogtied)\//.exec(String(src)); return m ? m[1] : ""; }
 // where in the body's picture to look for skin, by pose
 function skinPatch(pose) { return pose === "AllFours" ? [226, 236] : pose === "Hogtied" ? [226, 236] : [226, 388]; }
+// WHEN it goes on. The game draws a character as an ordered list of layers (C.AppearanceLayers). The belly belongs
+// right after the last layer of bare skin: the chest, the hips and legs, and what's between the legs. Going by a
+// slot's usual place in the order wasn't enough (Laynie, Oct 12: "the genitals show over the belly"): a pussy or a
+// cock can have layers that are drawn later than their slot's usual place. So this walks the game's own list.
+// skinGate(C) gives back a function to call once for every picture drawn, in order, with that picture's address;
+// it answers true when that picture comes after all the skin. null if this game has no such list.
+const SKIN_UNDER = { BodyUpper: 1, BodyLower: 1, Pussy: 1 };
+function skinGate(C) {
+  const layers = C && C.AppearanceLayers;
+  if (!Array.isArray(layers) || !layers.length) return null;
+  const groupOf = (l) => (l && l.Asset && l.Asset.Group && l.Asset.Group.Name) || "";
+  let last = -1, at = 0;
+  for (let i = 0; i < layers.length; i++) if (SKIN_UNDER[groupOf(layers[i])]) last = i;
+  if (last < 0) return null;
+  const slot = new RegExp("/Assets/[^/]+/([^/]+)/");
+  return (src) => {
+    const m = slot.exec(String(src)); if (!m) return false;
+    let i = at; while (i < layers.length && groupOf(layers[i]) !== m[1]) i++;
+    if (i >= layers.length) return false;      // not one of the listed layers (somethin' another add-on drew): no opinion
+    at = i + 1;
+    return i > last;
+  };
+}
 // <<< belly drawing
 // The game keeps every picture it draws in a list it looks things up in BY NAME, and it expects every name to be text.
 // Handing it the drawing itself (Oct 12, Companion 0.16.2) put a non-text name in that list, and from then on every
@@ -194,6 +217,7 @@ function hookBelly(mod) {
           // so the pussy or cock was painted over the bottom of it. Now it waits for all the skin: it goes in just before the
           // first thing that isn't skin, or at the very end on a bare body.
           let upper = null, lower = false, done = false;
+          const gate = skinGate(C);   // the game's own layer list, when it has one (belly drawing block)
           const prio = (src) => { const m = new RegExp("/Assets/[^/]+/([^/]+)/").exec(src); if (!m) return 99; try { const g = W.AssetGroupGet && W.AssetGroupGet(C.AssetFamily, m[1]); return g && typeof g.DrawingPriority === "number" ? g.DrawingPriority : 99; } catch (e) { return 99; } };
           const paint = () => {
             if (done || !upper || !lower) return; done = true;
@@ -207,7 +231,7 @@ function hookBelly(mod) {
             if (done || typeof src !== "string") return;
             if (src.includes("/BodyUpper/")) { const pose = bellyPose(src); if (pose === "AllFours" && !ALL_FOURS_BELLY) { done = true; return; }   // (not drawn: see ALL_FOURS_BELLY)
             if (pose === "AllFours" || pose === "Hogtied") { upper = [x, y, src, o && o.HexColor, pose]; lower = true; paint(); return; } }
-            if (lower && prio(src) > SKIN_TOP) paint();
+            if (gate ? gate(src) : (lower && prio(src) > SKIN_TOP)) paint();
           };
           const after = (src, x, y, o) => { if (typeof src !== "string") return; if (src.includes("/BodyUpper/")) upper = [x, y, src, o && o.HexColor, bellyPose(src)]; if (src.includes("/BodyLower/")) lower = true; };
           const wrap = (name) => (typeof cb[name] === "function" ? (src, x, y, o) => { try { before(src, x, y, o); } catch (e) { console.warn("[Farmhand Companion] belly:", e); } cb[name](src, x, y, o); try { after(src, x, y, o); } catch (e) { console.warn("[Farmhand Companion] belly:", e); } } : cb[name]);

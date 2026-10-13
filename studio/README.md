@@ -56,6 +56,18 @@ the game's pictures into the drawing.
 - **Save all the fits** writes `studio/fits/belly.json`. They load again next time.
 - It is drawn by the Companion's own belly code (`extension/src/belly.js`), so what you see is what the game will show.
 
+## Step 4: fit what is worn
+
+- Click a piece under **Wearing now** to pick it (the ✕ beside it takes it off). Clicking an item that is already on in
+  the item list picks it too.
+- **Sliders:** left and right, up and down, wider, taller, turn. They set the game's own item properties
+  (`TranslationX/Y`, `ScaleX/Y`, `Rotation`), so the piece's art, colours and options are untouched.
+- **The whole piece or one layer.** A belt's keyhole or lock can be moved separately from the belt.
+- **Options.** For items that have variants (open back, closed back), buttons to switch.
+- **Save this fit** keeps it for that piece, on that body (chest and hip size), in that pose, in
+  `studio/fits/items.json`. It is put back whenever that piece is worn on that body in that pose again.
+- The belly now goes on above all the skin, genitals included.
+
 ## What it is for next
 
 1. The Companion's belly reading the saved fits, so a shape tuned here is the shape worn in the game.

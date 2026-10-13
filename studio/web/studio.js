@@ -5,6 +5,8 @@
 
    Step 1: a character on screen · paste an outfit code and see it worn · body size, skin, pose · copy the code back out.
    Step 2: pick any item from any slot and try it on · colour it · see what's worn and take pieces off.
+   Step 4: click a worn piece to fit it: move, stretch, turn (the whole piece or one layer), change its option ·
+           a fit is kept per item, body and pose in studio/fits/items.json and put back when that item is worn again.
    Step 3: the belly, drawn with the Companion's own belly code · sliders for shape and place · its own fit for each
            pose · saved to studio/fits/belly.json.
    The codes are the ones WCE and BCX export, and the game's own wardrobe copy: the list of items as JSON, packed with LZString to base64
@@ -55,7 +57,7 @@
   function setBody(group, name) {
     const b = ServerAppearanceBundle(S.C.Appearance), it = b.find((x) => x.Group === group);
     if (it) it.Name = name;
-    ServerAppearanceLoadFromBundle(S.C, S.C.AssetFamily, b, undefined); redraw();
+    ServerAppearanceLoadFromBundle(S.C, S.C.AssetFamily, b, undefined); applyAllSaved(); redraw();
   }
   function setSkin(tone) {
     const b = ServerAppearanceBundle(S.C.Appearance);
@@ -66,7 +68,7 @@
   const POSES = [["Arms", ["BaseUpper", "Yoked", "OverTheHead", "BackBoxTie", "BackElbowTouch", "BackCuffs"]], ["Legs", ["BaseLower", "Kneel", "KneelingSpread", "LegsClosed", "Spread"]], ["Whole body", ["AllFours", "Hogtied"]]];
   function setPose(name) {
     try { PoseSetActive(S.C, name, true, false); } catch (e) { say("The game wouldn't take that pose: " + (e && e.message || e), true); }
-    redraw(); if (BELLY.fill) BELLY.fill();
+    applyAllSaved(); redraw(); if (BELLY.fill) BELLY.fill();
   }
   const poseOn = (name) => { const p = S.C.ActivePose || S.C.Pose || []; return Array.isArray(p) ? p.includes(name) : Object.values(S.C.ActivePoseMapping || {}).includes(name); };
 
@@ -84,11 +86,12 @@
   const worn = (group) => S.C.Appearance.find((a) => a.Asset.Group.Name === group);
   function putOn(group, name) {
     const was = worn(group);
-    if (was && was.Asset.Name === name) { InventoryRemove(S.C, group, false); say("Off: " + name + "."); }
+    if (was && was.Asset.Name === name) { select(group); say("That's on already. It's picked for fitting: the sliders are under \"Wearing now\". The ✕ there takes it off."); return; }
     else {
       InventoryWear(S.C, name, group, null, null, null, null, false);
       const now = worn(group);
       say(now && now.Asset.Name === name ? "On: " + itemName(now.Asset) + "  (the game calls it " + group + " / " + name + ")" : "The game wouldn't put that on.", !(now && now.Asset.Name === name));
+      if (now && now.Asset.Name === name) { FIT.picked = group; applySaved(now); }
     }
     redraw();
   }
@@ -111,9 +114,65 @@
     const box = document.getElementById("fh-worn"); if (!box) return;
     const body = new Set(["BodyUpper", "BodyLower", "Head", "ArmsLeft", "ArmsRight", "Height", "BodyStyle", "Pronouns"]);
     const list = S.C.Appearance.filter((a) => !body.has(a.Asset.Group.Name) && (a.Asset.Group.Category === "Item" || a.Asset.Group.AllowNone));   // only what can come off: not eyes, mouth or hands
-    box.replaceChildren(...list.map((a) => $("button", { type: "button", textContent: slotName(a.Asset.Group) + ": " + itemName(a.Asset) + "  ✕", title: "Take it off", onclick: () => { InventoryRemove(S.C, a.Asset.Group.Name, false); redraw(); } })),
+    if (FIT.picked && !list.some((a) => a.Asset.Group.Name === FIT.picked)) FIT.picked = null;
+    box.replaceChildren(...list.map((a) => { const g = a.Asset.Group.Name; return $("span", { className: "fh-piece" + (FIT.picked === g ? " on" : "") },
+        $("button", { type: "button", className: FIT.picked === g ? "on" : "", textContent: slotName(a.Asset.Group) + ": " + itemName(a.Asset), title: "Pick it, to fit it with the sliders below", onclick: () => select(g) }),
+        $("button", { type: "button", className: "fh-x", textContent: "✕", title: "Take it off", onclick: () => { InventoryRemove(S.C, g, false); redraw(); } })); }),
       list.length ? "" : $("p", { className: "note", textContent: "Bare." }));
+    fillFit();
   }
+
+  // ── fitting what's worn ──
+  // The game can draw any worn item moved, stretched or turned: each item carries TranslationX/Y, ScaleX/Y and Rotation in
+  // its properties, and each LAYER of an item can carry its own on top (LayerTranslationX and so on, by layer name).
+  // These are the "item configurations": numbers, not pictures. A fit is kept for an item on a body in a pose
+  // (studio/fits/items.json), and put back whenever that item is worn on that body in that pose again.
+  const FIT = { picked: null, layer: "", saved: {} };
+  const FIT_SLIDERS = [["TranslationX", "Left / right", -250, 250, 1, 0], ["TranslationY", "Up / down", -250, 250, 1, 0], ["ScaleX", "Wider / narrower", 0.3, 2.5, 0.01, 1], ["ScaleY", "Taller / shorter", 0.3, 2.5, 0.01, 1], ["Rotation", "Turn", -180, 180, 1, 0]];
+  const fitKey = (it) => it.Asset.Group.Name + "/" + it.Asset.Name + "|" + ((bodyItem("BodyUpper") || { Asset: {} }).Asset.Name || "") + "+" + ((bodyItem("BodyLower") || { Asset: {} }).Asset.Name || "") + "|" + poseKey();
+  const fitGet = (it, k, def) => { const p = it.Property || {}; if (FIT.layer) { const rec = p["Layer" + k]; return rec && typeof rec[FIT.layer] === "number" ? rec[FIT.layer] : def; } return typeof p[k] === "number" ? p[k] : def; };
+  function fitSet(it, k, v, def) {
+    const p = it.Property = it.Property || {};
+    if (FIT.layer) { const rec = p["Layer" + k] = Object.assign({}, p["Layer" + k]); if (v === def) delete rec[FIT.layer]; else rec[FIT.layer] = v; if (!Object.keys(rec).length) delete p["Layer" + k]; }
+    else if (v === def) delete p[k]; else p[k] = v;
+  }
+  const fitOf = (it) => { const p = it.Property || {}, out = {}; for (const [k] of FIT_SLIDERS) { if (typeof p[k] === "number") out[k] = p[k]; if (p["Layer" + k] && Object.keys(p["Layer" + k]).length) out["Layer" + k] = Object.assign({}, p["Layer" + k]); } return out; };
+  function fitClear(it) { const p = it.Property || {}; for (const [k] of FIT_SLIDERS) { delete p[k]; delete p["Layer" + k]; } }
+  function applySaved(it) { const f = FIT.saved[fitKey(it)]; fitClear(it); if (f) Object.assign(it.Property = it.Property || {}, JSON.parse(JSON.stringify(f))); return !!f; }
+  function applyAllSaved() { for (const it of S.C.Appearance) if (it.Asset.Group.Category === "Item" || it.Asset.Group.AllowNone) applySaved(it); }
+  const fitDraw = () => { try { CharacterLoadCanvas(S.C); } catch (e) { console.warn("[studio] fit redraw:", e); } };
+  function select(group) { FIT.picked = FIT.picked === group ? null : group; FIT.layer = ""; fillWorn(); }
+  function fillFit() {
+    const box = document.getElementById("fh-fit"); if (!box) return;
+    const it = FIT.picked && worn(FIT.picked);
+    if (!it) { box.replaceChildren($("p", { className: "note", textContent: "Click a piece above to fit it: move it, stretch it, turn it, or change its option. The ✕ takes it off." })); return; }
+    const layers = (it.Asset.Layer || []).map((l) => l.Name).filter((n) => typeof n === "string" && n);
+    let options = []; try { options = (TypedItemGetOptions(it.Asset.Group.Name, it.Asset.Name) || []).map((o) => o.Name); } catch (e) { options = []; }
+    const typeNow = () => { const r = (it.Property || {}).TypeRecord; const i = r && typeof r.typed === "number" ? r.typed : 0; return options[i]; };
+    const rows = FIT_SLIDERS.map(([k, label, min, max, step, def]) => { const v = fitGet(it, k, def), val = $("span", { className: "fh-val", textContent: String(v) });
+      return $("div", { className: "fh-slide" }, $("label", { textContent: label }), $("input", { type: "range", min, max, step, value: v, oninput: (e) => { const n = Number(e.target.value); fitSet(it, k, n, def); val.textContent = String(n); fitDraw(); } }), val); });
+    const has = !!FIT.saved[fitKey(it)];
+    box.replaceChildren(...[
+      $("p", { className: "note", textContent: "Fitting: " + itemName(it.Asset) + "  (" + it.Asset.Group.Name + " / " + it.Asset.Name + ")  on a " + fitKey(it).split("|")[1].replace("+", " chest, ") + " hips body, " + POSE_KEYS[poseKey()].toLowerCase() + "." }),
+      options.length > 1 ? $("div", { className: "row" }, $("label", { textContent: "Option:" }), options.map((o) => $("button", { type: "button", className: typeNow() === o ? "on" : "", textContent: o.replace(/([a-z])([A-Z0-9])/g, "$1 $2"), onclick: () => { try { TypedItemSetOptionByName(S.C, it, o, false, null, false); } catch (e) { say("The game wouldn't set that option: " + (e && e.message || e), true); } redraw(); } }))) : "",
+      layers.length > 1 ? $("div", { className: "row" }, $("label", { textContent: "Move:" }),
+        $("button", { type: "button", className: FIT.layer ? "" : "on", textContent: "The whole piece", onclick: () => { FIT.layer = ""; fillFit(); } }),
+        layers.map((n) => $("button", { type: "button", className: FIT.layer === n ? "on" : "", textContent: n.replace(/([a-z])([A-Z0-9])/g, "$1 $2"), title: "Just this layer of it", onclick: () => { FIT.layer = n; fillFit(); } }))) : "",
+      rows,
+      $("div", { className: "row" },
+        $("button", { type: "button", className: "go", textContent: "Save this fit", title: "For this piece on this body in this pose", onclick: () => saveFit(it) }),
+        $("button", { type: "button", textContent: "Back to how the game draws it", onclick: () => { fitClear(it); fitDraw(); fillFit(); say("Fit cleared on screen. \"Save this fit\" would save it cleared."); } }),
+        has ? $("button", { type: "button", textContent: "Put the saved fit back", onclick: () => { applySaved(it); fitDraw(); fillFit(); } }) : "",
+        $("span", { className: "note", textContent: has ? "A fit is saved for this." : "No fit saved for this yet." }))].flat(Infinity).filter((x) => x !== ""));
+  }
+  async function saveFit(it) {
+    const key = fitKey(it), f = fitOf(it);
+    if (Object.keys(f).length) FIT.saved[key] = f; else delete FIT.saved[key];
+    try { const r = await fetch("/__studio/fits/items.json", { method: "POST", body: JSON.stringify({ v: 1, saved: new Date().toISOString(), note: "key: slot/item|chest+hips|pose", fits: FIT.saved }, null, 1) }); if (!r.ok) throw new Error(await r.text());
+      say("Saved the fit for " + itemName(it.Asset) + " on this body in this pose. " + Object.keys(FIT.saved).length + " fits kept in studio\\fits\\items.json."); fillFit(); }
+    catch (e) { say("It didn't save: " + (e && e.message || e), true); }
+  }
+  async function loadItemFits() { try { const d = await (await fetch("/__studio/fits/items.json", { cache: "no-store" })).json(); if (d && d.fits) { FIT.saved = d.fits; applyAllSaved(); fitDraw(); fillFit(); } } catch (e) { /* none yet */ } }
 
   // ── the belly ──
   // A fit for each pose: where it sits and what shape it is. "std" is standing, kneeling and every arms pose (the torso
@@ -157,6 +216,7 @@
         const fit = C === S.C ? fitNow() : null, real = cb;   // real: the game's own callbacks (the wrapped set below must never call itself)
         if (fit && fit.on && cb && typeof cb.drawImage === "function") {
           let upper = null, lower = false, done = false;
+          const gate = FarmBelly.skinGate(C);   // true once a picture comes after all the skin, genitals included
           const prio = (src) => { const m = new RegExp("/Assets/[^/]+/([^/]+)/").exec(src); const g = m && AssetGroupGet(C.AssetFamily, m[1]); return g && typeof g.DrawingPriority === "number" ? g.DrawingPriority : 99; };
           const paint = () => {
             if (done || !upper) return; done = true;
@@ -166,7 +226,7 @@
             const dx = upper[0] + 250 - cv.width / 2 + fit.x, dy = upper[1] + 392 + fit.ry * 0.62 - cv.height / 2 + fit.y;
             real.drawImage(cv, dx, dy, {}); if (typeof real.drawImageBlink === "function") real.drawImageBlink(cv, dx, dy, {});
           };
-          const before = (src, x, y, o) => { if (done || typeof src !== "string") return; if (src.includes("/BodyUpper/") && fit.behind) { upper = [x, y, src, o && o.HexColor]; paint(); return; } if (lower && prio(src) > 12) paint(); };
+          const before = (src, x, y, o) => { if (done || typeof src !== "string") return; if (src.includes("/BodyUpper/") && fit.behind) { upper = [x, y, src, o && o.HexColor]; paint(); return; } if (gate ? gate(src) : (lower && prio(src) > 12)) paint(); };
           const after = (src, x, y, o) => { if (typeof src !== "string") return; if (src.includes("/BodyUpper/")) upper = [x, y, src, o && o.HexColor]; if (src.includes("/BodyLower/")) lower = true; };
           const wrap = (name) => (typeof real[name] === "function" ? (src, x, y, o) => { try { before(src, x, y, o); } catch (e) { console.warn("[studio] belly:", e); } real[name](src, x, y, o); try { after(src, x, y, o); } catch (e) { console.warn("[studio] belly:", e); } } : real[name]);
           cb = Object.assign({}, real, { drawImage: wrap("drawImage"), drawImageColorize: wrap("drawImageColorize") });
@@ -238,6 +298,7 @@
         $("input", { id: "fh-colour", type: "color", value: "#c9577a", onchange: (e) => tint(document.getElementById("fh-slot").value, e.target.value) }),
         $("button", { type: "button", textContent: "Game's own colours", onclick: () => tint(document.getElementById("fh-slot").value, "Default") })),
       $("h2", { textContent: "Wearing now" }), $("div", { className: "row", id: "fh-worn" }),
+      $("div", { id: "fh-fit" }),
       $("h2", { textContent: "Belly" }), bellyPanel(),
       $("h2", { textContent: "Chest" }), $("div", { className: "row" }, sizes("BodyUpper", ["FlatSmall", "FlatMedium", "Small", "Normal", "Large", "XLarge"])),
       $("h2", { textContent: "Hips and legs" }), $("div", { className: "row" }, sizes("BodyLower", ["Small", "Normal", "Large", "XLarge"])),
@@ -265,8 +326,8 @@
     S.C = CharacterLoadSimple("FarmStudio");
     CharacterAppearanceSetDefault(S.C);
     CharacterRefresh(S.C, false, false);
-    panel(); S.ready = true; loadFits(false);
-    window.FarmStudio = { S, wear, decode, encode, setBody, setSkin, setPose, redraw, putOn, tint, slots, BELLY, bellyDraw, saveFits, loadFits };   // for poking at from the console
+    panel(); S.ready = true; loadFits(false); loadItemFits();
+    window.FarmStudio = { S, wear, decode, encode, setBody, setSkin, setPose, redraw, putOn, tint, slots, BELLY, bellyDraw, saveFits, loadFits, FIT, select, saveFit, fitSet, fitDraw };   // for poking at from the console
     say("Ready. Paste an outfit code, or change the body and pose below.");
   }
   let tries = 0;

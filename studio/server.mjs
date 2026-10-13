@@ -49,7 +49,7 @@ createServer(async (req, res) => {
     if (path === "/__studio/belly-drawing.js") {
       const src = await readFile(BELLY_SRC, "utf8"), a = src.indexOf("// >>> belly drawing"), b = src.indexOf("// <<< belly drawing");
       if (a < 0 || b < 0) { res.writeHead(500).end("the belly drawing block isn't marked in extension/src/belly.js"); return; }
-      res.writeHead(200, { "Content-Type": TYPES[".js"], "Cache-Control": "no-cache" }).end("(() => {\n" + src.slice(a, b) + "\nwindow.FarmBelly = { SIZES, bellyCanvas, bellyPlace, bellyPose, skinPatch, FALLBACK };\n})();\n");   // wrapped, so its names can't clash with the game's
+      res.writeHead(200, { "Content-Type": TYPES[".js"], "Cache-Control": "no-cache" }).end("(() => {\n" + src.slice(a, b) + "\nwindow.FarmBelly = { SIZES, bellyCanvas, bellyPlace, bellyPose, skinPatch, skinGate, FALLBACK };\n})();\n");   // wrapped, so its names can't clash with the game's
       return;
     }
     if (path.startsWith("/__studio/fits/")) {

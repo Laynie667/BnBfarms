@@ -665,7 +665,10 @@
                   const sg = grown(yn), pj = Math.round(qy - uyc), tl = prof && pj >= 0 && pj < prof.h ? prof.L[pj] : -1, tr = tl >= 0 ? prof.R[pj] : -1;
                   for (let i = 0; i < bw; i++) {
                     const qx = x0 + i;
-                    if (!(onBreast(qx, qy) || (prof ? (tl >= 0 && qx >= ux + tl && qx <= ux + tr) : Math.abs(qx - midX) <= 80))) continue;
+                    // (and above the middle of the breasts, anywhere between their outer edges: a strap from the shoulder to the top of a
+                    // big breast runs out past the side of the chest on its way. Cut off at the body's edge it was left in
+                    // pieces: Laynie's marks on the R-cups, Oct 13.)
+                    if (!(onBreast(qx, qy) || (prof ? (tl >= 0 && qx >= ux + tl && qx <= ux + tr) : Math.abs(qx - midX) <= 80) || (qy <= bcy && Math.abs(qx - midX) <= S2.bx + S2.ro))) continue;
                     const o4 = (j * bw + i) * 4; hi.data[o4 + 3] = 255;
                     const fx = midX + (qx - midX) / sg, fy = yn, ix = Math.floor(fx), iy = Math.floor(fy); if (ix < 0 || iy < 0 || ix >= CW - 1 || iy >= CH - 1) continue;
                     const ax = fx - ix, ay = fy - iy, p00 = (iy * CW + ix) * 4, p10 = p00 + 4, p01 = p00 + CW * 4, p11 = p01 + 4;

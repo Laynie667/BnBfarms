@@ -456,7 +456,7 @@
   // Flat to R. The first six cups are the game's own chest sizes: picking one just changes the body. From DD up they're
   // drawn (breasts-drawing.js), over the game's biggest chest, standing and kneeling only for now. The game's nipples,
   // and whatever is worn on them, are lifted off where the game puts them and set down on the drawn ones.
-  const BREAST = { on: {}, free: false, holds: {}, holdSig: "", wear: {}, dress: true, cover: new Map(), cup: null, full: 1, hang: 1, apart: 1, x: 0, y: 0, nip: 1, nipY: 0, nipX: 0, cv: null, cvKey: "", halves: new Map(), out: new Map() };
+  const BREAST = { tuck: false, on: {}, free: false, holds: {}, holdSig: "", wear: {}, dress: true, cover: new Map(), cup: null, full: 1, hang: 1, apart: 1, x: 0, y: 0, nip: 1, nipY: 0, nipX: 0, cv: null, cvKey: "", halves: new Map(), out: new Map() };
   const BREAST_SLIDERS = [["full", "Fullness", 0.7, 1.4, 0.01], ["hang", "Weight (how low and heavy they hang)", 0, 2, 0.01], ["apart", "Apart / together", 0.6, 1.5, 0.01], ["x", "Left / right", -60, 60, 1], ["y", "Up / down", -80, 80, 1],
     ["nip", "Nipple size (and what's worn on them)", 0.4, 4, 0.05], ["nipY", "Nipples up / down", -80, 80, 1], ["nipX", "Nipples in / out", -60, 60, 1]];
   const NIP_GROUPS = new Set(["Nipples", "ItemNipples", "ItemNipplesPiercings"]);
@@ -572,6 +572,7 @@
         $("div", { className: "row" },
           $("button", { type: "button", className: "go", textContent: "Save the breasts", onclick: saveBreasts }),
           $("button", { type: "button", textContent: "Put the saved ones back", onclick: () => loadBreasts(true) }),
+          $("button", { type: "button", className: BREAST.tuck ? "on" : "", textContent: BREAST.tuck ? "Hands: tucked behind when they're big" : "Hands: in front, as the game draws them", title: "Tucking hides her hands, and what's on her hands and wrists, once the breasts would cover most of them", onclick: () => { BREAST.tuck = !BREAST.tuck; fill(); bellyDraw(); } }),
           $("button", { type: "button", className: BREAST.free ? "on" : "", textContent: BREAST.free ? "Bare: they hang free" : "Bare: same shape as dressed", title: "With nothing over the chest: the same round shape as when she's dressed, or hanging free in a teardrop", onclick: () => { BREAST.free = !BREAST.free; fill(); bellyDraw(); } }),
           $("button", { type: "button", className: BREAST.dress ? "on" : "", textContent: BREAST.dress ? "Clothes a size up: on" : "Clothes a size up: off", title: "What's worn over the chest is drawn a size up, and the breasts take its shape", onclick: () => { BREAST.dress = !BREAST.dress; fill(); bellyDraw(); } }),
           $("button", { type: "button", textContent: "Sliders back to plain", onclick: () => { Object.assign(BREAST, { full: 1, hang: 1, apart: 1, x: 0, y: 0, nip: 1, nipY: 0, nipX: 0 }); fill(); bellyDraw(); } }))].flat(Infinity));
@@ -753,6 +754,13 @@
               const x0 = Math.max(0, Math.floor(midX - 110 * sc)), bw = Math.min(CW - x0, Math.ceil(220 * sc)), y0 = Math.max(0, Math.floor(y1)), bh = yEnd - y0 + 1;
               if (bw > 0 && bh > 0) {
                 const out = g.createImageData(bw, bh), od = out.data, hi = g.createImageData(bw, bh);
+                // Above the breasts the grown piece may run out past the side of the chest, to reach the top of a breast that's
+                // wider than she is. How far out is a SLOPE, from the edge of the body at the top of the grown part down to
+                // the breast's own side: not the full width all the way up, which gave every top a pair of square corners
+                // standing off her shoulders (Laynie, Oct 13: "why the sharp angles on the shoulders?").
+                const pj1 = Math.round(y1 - uyc), bodyHalf = prof && pj1 >= 0 && pj1 < prof.h && prof.L[pj1] >= 0 ? Math.max(midX - (ux + prof.L[pj1]), ux + prof.R[pj1] - midX) : 80;
+                const slopeEnd = bcy - S2.rv * 0.65, sideHalf = S2.bx + S2.ro * 0.76;   // (where the breast's own outline has come out to nearly its full width)
+                const slopeHalf = (qy) => { const t = Math.max(0, Math.min(1, (qy - y1) / Math.max(1, slopeEnd - y1))); return bodyHalf + (sideHalf - bodyHalf) * t * t * (3 - 2 * t); };
                 let yn = y1;
                 for (let j = 0; j < bh; j++) {
                   const qy = y0 + j;
@@ -764,7 +772,7 @@
                     // (and above the middle of the breasts, anywhere between their outer edges: a strap from the shoulder to the top of a
                     // big breast runs out past the side of the chest on its way. Cut off at the body's edge it was left in
                     // pieces: Laynie's marks on the R-cups, Oct 13.)
-                    if (!(onBreast(qx, qy) || ((!drape || qy <= bcy) && (prof ? (tl >= 0 && qx >= ux + tl && qx <= ux + tr) : Math.abs(qx - midX) <= 80)) || (qy <= bcy && Math.abs(qx - midX) <= S2.bx + S2.ro))) continue;
+                    if (!(onBreast(qx, qy) || ((!drape || qy <= bcy) && (prof ? (tl >= 0 && qx >= ux + tl && qx <= ux + tr) : Math.abs(qx - midX) <= 80)) || (qy <= slopeEnd && Math.abs(qx - midX) <= slopeHalf(qy)))) continue;
                     const o4 = (j * bw + i) * 4; hi.data[o4 + 3] = 255;
                     const fx = midX + (qx - midX) / sg, fy = yn, ix = Math.floor(fx), iy = Math.floor(fy); if (ix < 0 || iy < 0 || ix >= CW - 1 || iy >= CH - 1) continue;
                     const ax = fx - ix, ay = fy - iy, p00 = (iy * CW + ix) * 4, p10 = p00 + 4, p01 = p00 + CW * 4, p11 = p01 + 4;
@@ -884,9 +892,13 @@
               // they are the default hands".) Which it is goes by how much of the hands the breasts would cover: under
               // most of them, the hands are in front, resting under the breasts; over most of them, they're behind.
               // Cuffs and arm gear go with the hands, whichever way that is.
-              if (done && (HAND_GROUPS.has(gname) || ARM_GROUPS.has(gname)) && ctx.breast && ctx.breast.pose !== "AllFours") {
+              // (And only if asked. A hand in the game is more than the two hand pictures: nails, rings, gloves, the cuffs of a
+              // sleeve, a fishnet arm are each their own piece in their own slot, and hiding "the hands" left all of those
+              // hanging there without them: Laynie's own outfit, Oct 13, "what is up with the hands?". Left alone, the game
+              // draws them all together, in front, and that is always right. So that's the default.)
+              if (done && BREAST.tuck && (HAND_GROUPS.has(gname) || ARM_GROUPS.has(gname) || /Hand|Glove|Nail|Ring|Bracelet|Sleeve/i.test(gname)) && ctx.breast && ctx.breast.pose !== "AllFours") {
                 try { if (/^Hands/.test(gname)) { const fr = handHidden(src, x, y); if (fr != null) ctx.handF = Math.max(ctx.handF || 0, fr); } } catch (e) { console.warn("[studio] hands:", e); }
-                if (BREAST.handsBehind) return;   // behind: not drawn at all
+                if (BREAST.tuck && BREAST.handsBehind) return;   // behind: not drawn at all
               } }
             let drawn = false;
             try { if (ctx.belly && !fit.behind && typeof src === "string") { const q = isMoulded(src), m = q ? mouldCanvas(src, x, y, ctx, q.key, q.mode) : bellyAuto(src, x, y, ctx, fit.behind, (pieceOf(src) || {}).key); if (m) { real[name](m, x - MOULD.M, y, o); drawn = true; } } } catch (e) { console.warn("[studio] mould:", e); }

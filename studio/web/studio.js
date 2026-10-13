@@ -641,7 +641,11 @@
               const g = c.getContext("2d", { willReadFrequently: true }), ox = MX + B.rx - x, oy = MY + B.ry - y, midX = MX + B.mid - x;
               g.drawImage(im, MX, MY);
               const CW = c.width, CH = c.height, sp = g.getImageData(0, 0, CW, CH).data;
-              const Rn = GB.r * 1.12, An = GB.r * 0.86, ny = MY + B.uy + GB.y - y, cy = oy + S2.by;                     // the game's breast (with the straps round it), and the middle of ours
+              const half = plain ? 0 : strapHalf(src, im, x, y, B), want = 1.1 + 0.5 * S2.k, paring = half > 0 && half <= 8;
+              // (a cup or a top is cut a little inside the game's breast; on ours that sliver of bare skin round it grew
+              // with everything else. Laynie on the plain bra: "needs to come to edge of breast". So a solid piece is read
+              // from a little further in, and covers ours to the edge. Straps are read to the full edge, where they sit.)
+              const Rn = GB.r * (paring ? 1.12 : 1.02), An = GB.r * (paring ? 0.86 : 0.76), ny = MY + B.uy + GB.y - y, cy = oy + S2.by;                     // the game's breast (with the straps round it), and the middle of ours
               const yT = Math.round(ny - Rn), yB = Math.round(cy + S2.r * (1 + S2.sag)) + 1;         // top (the same line in both) and our underside
               // (Laynie's second marks, Oct 13: every strap and cup edge sat INSIDE our outline, short of it. I'd taken the game's
               // breast for a circle as wide as it is tall. It isn't: from its middle it reaches much less far out to the side
@@ -651,7 +655,6 @@
               const edgeT = new Float32Array(CH);
               for (let j = 0; j <= 3000; j++) { const p = FarmBreasts.point(S2, 1, Math.PI * 2 * j / 3000), row = Math.round(oy + p[1]); if (row >= 0 && row < CH && p[0] > edgeT[row]) edgeT[row] = p[0]; }
               for (let row = 1; row < CH - 1; row++) if (!edgeT[row] && edgeT[row - 1] && row < yB) edgeT[row] = edgeT[row - 1];
-              const half = plain ? 0 : strapHalf(src, im, x, y, B), want = 1 + 0.35 * S2.k, paring = half > 0 && half <= 8;
               const maxX = Math.ceil(Math.max(...edgeT)) + 2, x0 = Math.max(0, Math.floor(midX - maxX)), bw = Math.min(CW - x0, maxX * 2), y0 = Math.max(0, yT), bh = Math.min(CH - y0, yB - yT);
               if (bw > 0 && bh > 0) {
                 const out = g.createImageData(bw, bh), od = out.data, wgt = new Float32Array(bw * bh).fill(-1), grew = new Float32Array(bw * bh);
@@ -665,7 +668,7 @@
                   for (let i = 0; i < bw; i++) {
                     const qx = x0 + i, off = qx - midX; if (Math.abs(off) > Xt) continue;
                     const fx = (1 - ease) * (midX + off * kx) + ease * qx, fy = (1 - ease) * yn + ease * qy;
-                    wgt[j * bw + i] = ease; grew[j * bw + i] = 1 / Math.sqrt(Math.max(0.01, kx * ky));
+                    wgt[j * bw + i] = ease; grew[j * bw + i] = (1 / Math.sqrt(Math.max(0.01, kx * ky)) + Math.max(1 / Math.max(0.05, kx), 1 / Math.max(0.05, ky))) / 2;   // how much things grew here: between the average and the most
                     const ix = Math.floor(fx), iy = Math.floor(fy); if (ix < 0 || iy < 0 || ix >= CW - 1 || iy >= CH - 1) continue;
                     const ax = fx - ix, ay = fy - iy, p00 = (iy * CW + ix) * 4, p10 = p00 + 4, p01 = p00 + CW * 4, p11 = p01 + 4, o4 = (j * bw + i) * 4;
                     const a00 = sp[p00 + 3] * (1 - ax) * (1 - ay), a10 = sp[p10 + 3] * ax * (1 - ay), a01 = sp[p01 + 3] * (1 - ax) * ay, a11 = sp[p11 + 3] * ax * ay, at = a00 + a10 + a01 + a11;
@@ -678,7 +681,20 @@
                 if (paring) {
                   const al = new Uint8Array(bw * bh); for (let i = 0; i < al.length; i++) al[i] = od[i * 4 + 3];
                   const d = distMap(al, bw, bh);
-                  for (let i = 0; i < al.length; i++) { if (wgt[i] < 0 || !al[i]) continue; const e = Math.max(0, Math.min(half * grew[i] - 1.4, half * (grew[i] - want))) * (1 - wgt[i]); if (e <= 0.3) continue; const v = d[i] - e; if (v <= 0) od[i * 4 + 3] = 0; else if (v < 1) od[i * 4 + 3] = Math.round(od[i * 4 + 3] * v); }
+                  // How thick is the strap RIGHT HERE, after it was laid on? (Laynie's third marks, Oct 13: the frame's outer
+                  // strap had gone fat, a bar had gone missing on the biggest size. A strap laid on sideways-stretched
+                  // skin gets fatter if it runs up and down and not if it runs across, so paring them all by one amount
+                  // left some fat and wore others away.) thick: half the strap's width at each spot, spread out from its
+                  // middle line a few pixels. Then every strap is pared to the SAME width, whichever way it runs, and
+                  // anything too thick to be a strap (a cup, a panel) isn't touched.
+                  let thick = Float32Array.from(d), nxt = new Float32Array(d.length);
+                  for (let it = 0; it < 10; it++) { for (let yy = 1; yy < bh - 1; yy++) for (let xx = 1; xx < bw - 1; xx++) { const i = yy * bw + xx; if (!al[i]) { nxt[i] = 0; continue; } nxt[i] = Math.max(thick[i], thick[i - 1], thick[i + 1], thick[i - bw], thick[i + bw]); } const sw = thick; thick = nxt; nxt = sw; }
+                  const body = ownColour(src, im);
+                  // (what's left after paring is the strap's middle line, and on a studded or shiny strap that's all studs and
+                  // shine: it came out pale and hollow. So the pared strap is mostly given the piece's own body colour back.)
+                  for (let i = 0; i < al.length; i++) { if (wgt[i] < 0 || !al[i] || thick[i] > 15) continue; // each strap is pared back to the width it had in the game (and a little over, for the bigger breast): a wide strap stays a wide one, a thin one thin
+                    const e = (thick[i] - Math.max(1.8, thick[i] * want / Math.max(1, grew[i]))) * (1 - wgt[i]); if (e <= 0.3) continue; const v = d[i] - e; if (v <= 0) { od[i * 4 + 3] = 0; continue; } if (v < 1) od[i * 4 + 3] = Math.round(od[i * 4 + 3] * v);
+                    const m = 0.6 * Math.min(1, e / 1.5); od[i * 4] = od[i * 4] * (1 - m) + body[0] * m; od[i * 4 + 1] = od[i * 4 + 1] * (1 - m) + body[1] * m; od[i * 4 + 2] = od[i * 4 + 2] * (1 - m) + body[2] * m; }
                   rimDark = o && o.HexColor ? [70, 70, 70] : ownColour(src, im).map((v) => v * 0.3);
                 }
                 const T = document.createElement("canvas"); T.width = bw; T.height = bh; T.getContext("2d").putImageData(out, 0, 0);

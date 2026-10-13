@@ -13,7 +13,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 | Map tools, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.3** |
 | Dairy | `farmhand-dairy.user.js` | the bot's PC | **1.0.2** |
 | Shows | `farmhand-shows.user.js` | the bot's PC | **1.0.4** |
-| Farmhand Companion | `farmhand-companion.user.js` | each player | **0.16.0** |
+| Farmhand Companion | `farmhand-companion.user.js` | each player | **0.16.1** |
 | Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.4** |
 
 ## Sending a watch report
@@ -23,6 +23,8 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 - Running the watcher on more than one game at once (the bot, yours, a tester's) lets Claude line them up into one timeline.
 
 ## Latest changes (newest first)
+
+- **Companion 0.16.1: a scale trial button** (Toggles, at the bottom). The game has built-in per-item scale and move settings (0.01x to 3x, up to 500 pixels) that everybody sees without any add-on. The button sets 15% on the chest and on anything worn on the nipples, breasts or torso, then reports which the game kept. It answers whether the body itself can be scaled past XLarge, which decides how the outfit studio would be built. "Undo the scale trial" puts everything back.
 
 - **Bot 0.30.1, Companion 0.16.0: bodies that show their size.** New switch in Toggles, off by default: "Farm can change my body shape". With it on, the character's chest moves one of the game's own sizes (Flat Small, Flat Medium, Small, Normal, Large, XLarge) for every two udder sizes above or below the farm's starting size, and the lower body widens one size per four ass sizes, plus one at a heavy belly and two at the biggest. The game draws every worn item for each body size, so restraints fit by themselves. The player's own shape is remembered on their computer and restored when the growth goes or the switch is turned off; if they change their body in the wardrobe, that becomes their own shape. Past XLarge the farm's sizes stay in words. There is no belly item in the game or the add-ons, so the belly itself is still words. NOT YET SEEN LIVE.
 

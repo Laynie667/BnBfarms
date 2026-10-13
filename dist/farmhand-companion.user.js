@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.16.0
+// @version      0.16.1
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -230,7 +230,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.16.0";
+  var VERSION = "0.16.1";
 
   // extension/src/config.js
   var BOT_MEMBER = 260239;
@@ -572,6 +572,415 @@ One of mods you are using is using an old version of SDK. It will work for now b
   };
   var gearLore = (name) => GEAR_LORE[name] || "";
 
+  // extension/src/marks.js
+  var KEY = "fhc-marks";
+  var STRIP_KEY = "fhc-strip-backup";
+  var SPLAT_GROUPS = ["Mask", "FaceMarkings", "BodyMarkings"];
+  var WRITE_GROUPS = ["BodyMarkings", "ClothAccessory"];
+  var TREATISE = { group: "BodyMarkings2_Luzi", name: "\u8EAB\u4F53\u8BBA\u6587" };
+  var T_AREAS = { collar: [0, 1, 2], chest: [3, 4, 5], ribs: [6, 7, 8], waist: [9, 10, 11], hips: [12, 13, 14] };
+  var TALLY_PLACE = 11;
+  var AREAS2 = { forehead: ["a", "b", "c"], face: ["d", "e", "f"], chest: ["g", "h", "i", "j"], tummy: ["k", "l", "m", "n"] };
+  var SPILL = { forehead: "face", face: "chest", chest: "tummy", tummy: "chest" };
+  var SPILL_CHANCE = 0.35;
+  var P = () => window.Player;
+  var load = () => {
+    try {
+      return JSON.parse(window.localStorage.getItem(KEY)) || {};
+    } catch (e) {
+      return {};
+    }
+  };
+  var save = (v) => {
+    try {
+      window.localStorage.setItem(KEY, JSON.stringify(v));
+    } catch (e) {
+    }
+  };
+  var groupOf = (name) => typeof window.AssetGroupGet === "function" ? window.AssetGroupGet(P().AssetFamily, name) : null;
+  var bundle = () => window.ServerAppearanceBundle(P().Appearance);
+  var lockedGroups = () => new Set(P().Appearance.filter((it) => it.Property && it.Property.LockedBy).map((it) => it.Asset.Group.Name));
+  function commit(next) {
+    window.ServerAppearanceLoadFromBundle(P(), P().AssetFamily, next, P().MemberNumber);
+    if (typeof window.CharacterRefresh === "function") window.CharacterRefresh(P());
+    window.ChatRoomCharacterUpdate(P());
+  }
+  var cleanText = (t) => String(t || "").replace(/[^A-Za-z0-9 !?.,'&#*+-]/g, "").slice(0, 20);
+  function markBody(m, prefs) {
+    if (!P() || !Array.isArray(P().Appearance) || typeof window.ServerAppearanceBundle !== "function") return { ok: false, why: "not in a room" };
+    const did = [];
+    if (m.wash) return washMarks();
+    if (!prefs.marks) return { ok: false, why: "off" };
+    let next = bundle(), mem = load();
+    const has = (g) => next.find((b) => b.Group === g);
+    if (Array.isArray(m.splat) && m.splat.length) {
+      const col = typeof m.color === "string" && /^#[0-9a-fA-F]{6}$/.test(m.color) ? m.color.toUpperCase() : null;
+      const colOf = (b) => typeof b.Color === "string" && /^#/.test(b.Color) ? b.Color.toUpperCase() : null;
+      const mine = next.filter((b) => b.Name === "Splatters" && SPLAT_GROUPS.includes(b.Group));
+      let it = mine.find((b) => colOf(b) === col);
+      if (!it) {
+        const g = SPLAT_GROUPS.find((x) => !has(x) && groupOf(x));
+        if (g) {
+          it = { Group: g, Name: "Splatters", Property: { TypeRecord: {} } };
+          if (col) it.Color = col;
+          next.push(it);
+          mem.splatGroup = g;
+        } else it = mine[0];
+      }
+      if (it) {
+        it.Property = Object.assign({}, it.Property || {});
+        const tr = it.Property.TypeRecord = Object.assign({}, it.Property.TypeRecord || {});
+        for (const area of m.splat) {
+          const want = (AREAS2[area] || []).filter((k2) => !tr[k2]);
+          const any = Object.values(AREAS2).flat().filter((k2) => !tr[k2]);
+          const k = (want.length ? want : any)[Math.floor(Math.random() * (want.length ? want : any).length)];
+          if (k) {
+            tr[k] = 1;
+            did.push(area);
+          }
+          if (k && SPILL[area] && Math.random() < SPILL_CHANCE) {
+            const down = AREAS2[SPILL[area]].filter((x) => !tr[x]);
+            if (down.length) {
+              tr[down[Math.floor(Math.random() * down.length)]] = 1;
+              did.push(SPILL[area]);
+            }
+          }
+        }
+      }
+    }
+    if (m.write && cleanText(m.write.line) || m.tally) {
+      if (groupOf(TREATISE.group)) {
+        let it = next.find((b) => b.Group === TREATISE.group && b.Name === TREATISE.name);
+        if (!it && !has(TREATISE.group)) {
+          it = { Group: TREATISE.group, Name: TREATISE.name, Property: { TypeRecord: {} } };
+          next.push(it);
+          mem.treatise = true;
+        }
+        if (it) {
+          const pr = it.Property = Object.assign({}, it.Property || {}), tr = pr.TypeRecord = Object.assign({}, pr.TypeRecord || {});
+          const put = (place, line, text) => {
+            pr["Text" + (place * 3 + line)] = cleanText(text).toUpperCase();
+            tr[String.fromCharCode(97 + place)] = 1;
+          };
+          if (m.tally) {
+            put(TALLY_PLACE, 1, String(m.tally));
+            did.push("tally");
+          }
+          if (m.write && cleanText(m.write.line)) {
+            const pref2 = T_AREAS[m.write.area] || (m.write.pos !== void 0 ? [Math.min(14, Number(m.write.pos))] : [13, 10, 4, 1, 7]);
+            const all = [...pref2, ...Array.from({ length: 15 }, (_, i) => i).filter((i) => !pref2.includes(i) && i !== TALLY_PLACE)];
+            let spot = null;
+            for (const pl of all) {
+              for (const ln of [1, 2, 3]) if (!pr["Text" + (pl * 3 + ln)]) {
+                spot = [pl, ln];
+                break;
+              }
+              if (spot) break;
+            }
+            if (!spot) spot = [pref2[0], 1 + Math.floor(Math.random() * 3)];
+            put(spot[0], spot[1], m.write.line);
+            did.push("writing");
+          }
+          save(mem);
+          commit(next);
+          return { ok: true, did };
+        }
+      }
+    }
+    if (m.write && cleanText(m.write.line)) {
+      let it = next.find((b) => b.Name === "BodyWritings" && WRITE_GROUPS.includes(b.Group));
+      if (!it) {
+        const g = WRITE_GROUPS.find((x) => !has(x) && groupOf(x));
+        if (g) {
+          it = { Group: g, Name: "BodyWritings", Property: { Text: "", Text2: "", Text3: "", TypeRecord: { p: 4, s: 0, t: 1 } } };
+          next.push(it);
+          mem.writeGroup = g;
+        }
+      }
+      if (it) {
+        const pr = it.Property = Object.assign({ Text: "", Text2: "", Text3: "" }, it.Property || {});
+        pr.Text3 = pr.Text2 || "";
+        pr.Text2 = pr.Text || "";
+        pr.Text = cleanText(m.write.line).toUpperCase();
+        pr.TypeRecord = Object.assign({ p: 4, s: 0, t: 1 }, pr.TypeRecord || {}, m.write.pos !== void 0 ? { p: m.write.pos } : {}, m.write.style !== void 0 ? { s: m.write.style } : {}, { t: 1 });
+        did.push("writing");
+      }
+    }
+    if (!did.length) return { ok: false, why: "no room" };
+    save(mem);
+    commit(next);
+    return { ok: true, did };
+  }
+  var FARM_TAG = "BnB Farm gear.";
+  var OLD_TAG = "[B&B Farm gear]";
+  var FARM_NAMES = [
+    "Parasite Lips",
+    "Parasite Belt",
+    "Pump Bung",
+    "Egg Post Plug",
+    "Slime Seal",
+    "Boar's Plug",
+    "Seed Pod Stem",
+    "Denial Clamp",
+    "Growth Cups",
+    "Trap Milker",
+    "Winch Chain",
+    "Feed Chute",
+    "Snare Rope",
+    "Breedin' Frame Cuffs",
+    "Kennel Lead",
+    "The Water's Grip",
+    "The Water's Coils",
+    "Slime Sleeves",
+    "Slime Stockings",
+    "Snare Hobble",
+    "Pack's Knot",
+    "Stud's Stopper",
+    "Pillory Spreader",
+    "Parasite Suckers",
+    "Parasite Root",
+    "The Water's Embrace",
+    "Brood Sac",
+    "Grower's Sheath",
+    "Glutton's Sleeve",
+    "Tyrant's Cage",
+    "Tyrant's Web",
+    "Growin' Plug",
+    "Hungry Belt",
+    "Milkmaid's Cups",
+    "Glutton's Funnel",
+    "The Hobble",
+    "Living Suit (legs)",
+    "Living Suit (hips)",
+    "Living Suit (chest)",
+    "Living Suit (arms)",
+    "Living Suit (mouth)"
+  ];
+  var GEAR_SLOTS = {
+    plug: { groups: ["ItemButt"], names: ["InflVibeButtPlug", "BlackButtPlug", "ButtPlug", "ButtPump"], re: /ButtPlug|Plug/, color: "#2B2B2B" },
+    dildo: { groups: ["ItemVulva"], names: ["InflatableVibeDildo", "VibratingDildo", "ClitoralStimulator"], re: /Dildo/, color: "#2B2B2B" },
+    belt: { groups: ["ItemPelvis"], names: ["PolishedChastityBelt", "LeatherChastityBelt", "SleekLeatherChastityBelt", "MetalChastityBelt"], re: /ChastityBelt/ },
+    cups: { groups: ["ItemNipples"], names: ["LactationPump", "NippleSuctionCups"], re: /Pump|Suction/ },
+    leash: { groups: ["ItemNeckRestraints"], names: ["CollarChainLong", "CollarLeash", "CollarChainShort"], re: /Chain|Leash/, needs: "ItemNeck" },
+    funnel: { groups: ["ItemMouth", "ItemMouth2", "ItemMouth3"], names: ["FunnelGag"], re: /Funnel/ },
+    ropeArms: { groups: ["ItemArms"], names: ["HempRope"], re: /Rope/ },
+    arms: { groups: ["ItemArms"], names: ["HempRope", "LeatherCuffs"], re: /Rope|Cuffs/ },
+    legs: { groups: ["ItemLegs"], names: ["HempRope", "LeatherLegCuffs"], re: /Rope|Cuffs/ },
+    ropeFeet: { groups: ["ItemFeet"], names: ["HempRope"], re: /Rope/ },
+    // (a piece can ask for a spreader bar here instead)
+    lips: { groups: ["ItemMouth", "ItemMouth2", "ItemMouth3"], names: ["LipGag"], re: /LipGag/, color: ["#E0607F", "#7A2B47", "#7A2B47"] },
+    torso: { groups: ["ItemTorso", "ItemTorso2"], names: ["TentacleSuit", "HempRopeHarness"], re: /Harness/ },
+    tag: { groups: ["ItemNeckAccessories"], names: ["CollarNameTagLivestock", "CollarNameTag"], re: /NameTag/, needs: "ItemNeck" }
+  };
+  function gearAsset(group, slot, prefer) {
+    const fam = P().AssetFamily, get = (n) => {
+      try {
+        return typeof window.AssetGet === "function" ? window.AssetGet(fam, group, n) : null;
+      } catch (e) {
+        return null;
+      }
+    };
+    for (const n of Array.isArray(prefer) ? prefer.map(String) : []) if (/^[A-Za-z0-9_]{2,40}$/.test(n) && get(n)) return n;
+    for (const n of slot.names) if (get(n)) return n;
+    const all = Array.isArray(window.Asset) ? window.Asset : [];
+    const hit = all.find((a) => a && a.Group && a.Group.Name === group && slot.re.test(a.Name) && !a.OwnerOnly && !a.LoverOnly && !a.FamilyOnly);
+    return hit ? hit.Name : typeof window.AssetGet !== "function" ? slot.names[0] : null;
+  }
+  var NAMES_KEY = "fhc-gear-names";
+  var knownNames = () => {
+    try {
+      return FARM_NAMES.concat(JSON.parse(window.localStorage.getItem(NAMES_KEY)) || []);
+    } catch (e) {
+      return FARM_NAMES;
+    }
+  };
+  var learnName = (n) => {
+    try {
+      const have = JSON.parse(window.localStorage.getItem(NAMES_KEY)) || [];
+      if (!FARM_NAMES.includes(n) && !have.includes(n)) window.localStorage.setItem(NAMES_KEY, JSON.stringify(have.concat(n).slice(-80)));
+    } catch (e) {
+    }
+  };
+  var isFarmGear = (b) => {
+    const c = b.Craft, d = c ? String(c.Description || "") : "";
+    return !!(c && (d.includes(FARM_TAG) || d.includes(OLD_TAG) || knownNames().includes(c.Name) && (!c.MemberNumber || c.MemberNumber === P().MemberNumber)));
+  };
+  var GEAR_KEY = "fhc-gear";
+  var gearMem = () => {
+    try {
+      return JSON.parse(window.localStorage.getItem(GEAR_KEY)) || {};
+    } catch (e) {
+      return {};
+    }
+  };
+  var gearMemSave = (m) => {
+    try {
+      window.localStorage.setItem(GEAR_KEY, JSON.stringify(m));
+    } catch (e) {
+    }
+  };
+  var gearNameOf = (b, mem) => isFarmGear(b) ? b.Craft.Name : Object.keys(mem).find((n) => mem[n].group === b.Group && mem[n].item === b.Name && (!(b.Craft && b.Craft.Name) || b.Craft.Name === n)) || null;
+  function syncFarmGear(list, allow) {
+    if (!P() || !Array.isArray(P().Appearance) || typeof window.ServerAppearanceBundle !== "function") return { on: [], off: [] };
+    const want = (Array.isArray(list) ? list : []).filter((g) => g && GEAR_SLOTS[g.slot] && (g.always || allow) && (!g.until || g.until > Date.now()));
+    const cur = bundle(), stuck = lockedGroups(), did = { on: [], off: [] }, mem = gearMem();
+    let next = cur.slice();
+    for (const b of cur) {
+      const n = gearNameOf(b, mem);
+      if (!n || want.some((g) => g.name === n) || stuck.has(b.Group)) continue;
+      next = next.filter((x) => x !== b);
+      did.off.push(n);
+      delete mem[n];
+    }
+    for (const n of Object.keys(mem)) if (!want.some((g) => g.name === n) && !next.some((b) => gearNameOf(b, mem) === n)) delete mem[n];
+    for (const g of want) {
+      if (next.some((b) => gearNameOf(b, mem) === g.name)) continue;
+      const slot = GEAR_SLOTS[g.slot];
+      if (slot.needs && !next.some((b) => b.Group === slot.needs)) continue;
+      const group = slot.groups.find((x) => !next.some((b) => b.Group === x) && groupOf(x));
+      if (!group) continue;
+      const item = gearAsset(group, slot, g.items);
+      if (!item) continue;
+      const color = (typeof g.color === "string" && /^#[0-9a-fA-F]{6}$/.test(g.color) ? g.color : null) || slot.color || "Default";
+      const it = {
+        Group: group,
+        Name: item,
+        Difficulty: 20,
+        Property: {},
+        Craft: {
+          Item: item,
+          Name: String(g.name).slice(0, 30),
+          Description: (FARM_TAG + " " + String(g.desc || "").slice(0, 180)).trim(),
+          Property: "Normal",
+          Color: Array.isArray(color) ? color.join(",") : color,
+          Lock: "",
+          Private: true,
+          MemberNumber: P().MemberNumber,
+          MemberName: P().Name,
+          ItemProperty: {},
+          Type: null,
+          TypeRecord: null
+        }
+      };
+      if (color !== "Default") it.Color = color;
+      next.push(it);
+      did.on.push(g.name);
+      mem[g.name] = { group, item };
+      learnName(String(g.name).slice(0, 30));
+    }
+    gearMemSave(mem);
+    if (did.on.length || did.off.length) commit(next);
+    return did;
+  }
+  var SHAPES = { BodyUpper: ["FlatSmall", "FlatMedium", "Small", "Normal", "Large", "XLarge"], BodyLower: ["Small", "Normal", "Large", "XLarge"] };
+  var SHAPE_KEY = "fhc-shape";
+  function syncShape(shape, allow) {
+    if (!P() || !Array.isArray(P().Appearance) || typeof window.ServerAppearanceBundle !== "function") return [];
+    let mem;
+    try {
+      mem = JSON.parse(window.localStorage.getItem(SHAPE_KEY)) || {};
+    } catch (e) {
+      mem = {};
+    }
+    const next = bundle().map((b) => Object.assign({}, b)), did = [];
+    for (const [group, steps] of [["BodyUpper", shape && allow ? Number(shape.up) || 0 : 0], ["BodyLower", shape && allow ? Number(shape.low) || 0 : 0]]) {
+      const order = SHAPES[group], b = next.find((x) => x.Group === group);
+      if (!b) continue;
+      const m = mem[group];
+      const own = m && m.set === b.Name && order.includes(m.own) ? m.own : b.Name;
+      const at = order.indexOf(own);
+      if (at < 0) continue;
+      const want = order[Math.max(0, Math.min(order.length - 1, at + Math.round(steps)))];
+      if (typeof window.AssetGet === "function" && !window.AssetGet(P().AssetFamily, group, want)) continue;
+      if (want !== b.Name) {
+        b.Name = want;
+        did.push(group + " " + want);
+      }
+      if (want === own) delete mem[group];
+      else mem[group] = { own, set: want };
+    }
+    try {
+      window.localStorage.setItem(SHAPE_KEY, JSON.stringify(mem));
+    } catch (e) {
+    }
+    if (did.length) commit(next);
+    return did;
+  }
+  var TRIAL_GROUPS = ["BodyUpper", "ItemNipples", "ItemBreast", "ItemTorso", "Bra"];
+  function scaleTrial(on, say) {
+    try {
+      if (!P() || !Array.isArray(P().Appearance)) return say("I can't see your character right now.");
+      const items = P().Appearance.filter((it) => it && it.Asset && it.Asset.Group && TRIAL_GROUPS.includes(it.Asset.Group.Name));
+      for (const it of items) {
+        const p = Object.assign({}, it.Property || {});
+        if (on) {
+          p.ScaleX = 1.15;
+          p.ScaleY = 1.15;
+          p.TranslationY = -12;
+        } else {
+          delete p.ScaleX;
+          delete p.ScaleY;
+          delete p.TranslationY;
+        }
+        it.Property = p;
+      }
+      if (typeof window.CharacterRefresh === "function") window.CharacterRefresh(P());
+      if (typeof window.ChatRoomCharacterUpdate === "function" && window.CurrentScreen === "ChatRoom") window.ChatRoomCharacterUpdate(P());
+      if (!on) return say("Scale trial undone: everything is back to its own size.");
+      setTimeout(() => {
+        const now = P().Appearance.filter((it) => it && it.Asset && it.Asset.Group && TRIAL_GROUPS.includes(it.Asset.Group.Name));
+        const kept = now.filter((it) => it.Property && it.Property.ScaleX === 1.15).map((it) => it.Asset.Group.Name), lost = now.filter((it) => !(it.Property && it.Property.ScaleX === 1.15)).map((it) => it.Asset.Group.Name);
+        say("Scale trial, 15% bigger. The game KEPT it on: " + (kept.join(", ") || "nothing") + ". It DROPPED it on: " + (lost.join(", ") || "nothing") + '. Look at your character: is the chest bigger? Ask somebody else in the room if they see it too, then tell Claude all three answers. "Undo the scale trial" puts it back.');
+      }, 3e3);
+    } catch (e) {
+      say("The scale trial hit an error: " + (e && e.message || e));
+    }
+  }
+  function washMarks() {
+    const mem = load(), stuck = lockedGroups();
+    const next = bundle().filter((b) => stuck.has(b.Group) || !(b.Name === "Splatters" && SPLAT_GROUPS.includes(b.Group) || b.Name === "BodyWritings" && b.Group === mem.writeGroup || mem.treatise && b.Group === TREATISE.group));
+    save({});
+    commit(next);
+    return { ok: true, did: ["wash"] };
+  }
+  function stripMe(prefs) {
+    if (!prefs.strip) return { ok: false, why: "off" };
+    const cur = bundle(), stuck = lockedGroups();
+    if (!window.localStorage.getItem(STRIP_KEY)) {
+      try {
+        window.localStorage.setItem(STRIP_KEY, JSON.stringify({ at: Date.now(), bundle: cur }));
+      } catch (e) {
+      }
+    }
+    const mem = load();
+    const next = cur.filter((b) => {
+      const g = groupOf(b.Group);
+      return !(g && g.Clothing) || stuck.has(b.Group) || b.Name === "BodyWritings" || b.Name === "Splatters" || b.Group === TREATISE.group;
+    });
+    if (next.length === cur.length) return { ok: false, why: "nothin' to take off" };
+    commit(next);
+    return { ok: true, did: ["strip"] };
+  }
+  function dressMe() {
+    let bk = null;
+    try {
+      bk = JSON.parse(window.localStorage.getItem(STRIP_KEY));
+    } catch (e) {
+    }
+    if (!bk || !Array.isArray(bk.bundle)) return { ok: false, why: "no clothes kept" };
+    const next = bundle(), have = new Set(next.map((b) => b.Group));
+    for (const b of bk.bundle) {
+      const g = groupOf(b.Group);
+      if (g && g.Clothing && !have.has(b.Group)) next.push(b);
+    }
+    commit(next);
+    try {
+      window.localStorage.removeItem(STRIP_KEY);
+    } catch (e) {
+    }
+    return { ok: true, did: ["dress"] };
+  }
+
   // extension/src/views/livestock.js
   var pct = (a, b) => b ? 100 * a / b : 0;
   var hoursLeft = (t) => Math.max(0, Math.ceil((t - Date.now()) / 36e5));
@@ -884,6 +1293,14 @@ One of mods you are using is using an old version of SDK. It will work for now b
         "When the farm says so, your clothes come off (locked pieces stay). They're kept on this computer so you can dress again.",
         !!ctx2.prefs.strip,
         () => ctx2.setPref("strip", !ctx2.prefs.strip)
+      ),
+      // a one-off experiment for the outfit studio idea (marks.js: scaleTrial)
+      h(
+        "div",
+        { style: { marginTop: "10px" } },
+        muted("Experiment: can the game draw your chest and what's on it bigger than its biggest size? Try it in a chat room, look, and undo."),
+        btn("Scale trial: chest 15% bigger", () => scaleTrial(true, (t) => ctx2.hint(t))),
+        btn("Undo the scale trial", () => scaleTrial(false, (t) => ctx2.hint(t)))
       ),
       btn("Put the button and panel back (size and full screen too)", () => ctx2.resetPlaces && ctx2.resetPlaces())
     );
@@ -3890,26 +4307,26 @@ One of mods you are using is using an old version of SDK. It will work for now b
     "MemberNumberListKeys",
     "RemoveOnUnlock"
   ];
-  var P = () => window.Player;
-  var groupOf = (name) => typeof window.AssetGroupGet === "function" ? window.AssetGroupGet(P().AssetFamily, name) : null;
+  var P2 = () => window.Player;
+  var groupOf2 = (name) => typeof window.AssetGroupGet === "function" ? window.AssetGroupGet(P2().AssetFamily, name) : null;
   var isClothes = (g) => !!(g && g.Clothing);
   var isItem = (g) => !!(g && g.Category === "Item");
-  var lockedGroups = () => new Set(P().Appearance.filter((it) => it.Property && it.Property.LockedBy).map((it) => it.Asset.Group.Name));
+  var lockedGroups2 = () => new Set(P2().Appearance.filter((it) => it.Property && it.Property.LockedBy).map((it) => it.Asset.Group.Name));
   function unlocked(prop) {
     const c = Object.assign({}, prop || {});
     for (const k of LOCK_FIELDS) delete c[k];
     if (Array.isArray(c.Effect)) c.Effect = c.Effect.filter((e) => e !== "Lock");
     return c;
   }
-  function commit(bundle2) {
-    window.ServerAppearanceLoadFromBundle(P(), P().AssetFamily, bundle2, P().MemberNumber);
-    if (typeof window.CharacterRefresh === "function") window.CharacterRefresh(P());
-    window.ChatRoomCharacterUpdate(P());
+  function commit2(bundle2) {
+    window.ServerAppearanceLoadFromBundle(P2(), P2().AssetFamily, bundle2, P2().MemberNumber);
+    if (typeof window.CharacterRefresh === "function") window.CharacterRefresh(P2());
+    window.ChatRoomCharacterUpdate(P2());
   }
   function captureOutfit() {
     const items = [];
     let locks = 0;
-    for (const it of P().Appearance) {
+    for (const it of P2().Appearance) {
       const g = it.Asset && it.Asset.Group;
       if (!g || !(isClothes(g) || isItem(g))) continue;
       const b = window.ServerBundledItemFromAppearanceItem(it);
@@ -3922,18 +4339,18 @@ One of mods you are using is using an old version of SDK. It will work for now b
   function wearOutfit(data, keys) {
     const outfit = JSON.parse(window.LZString.decompressFromBase64(String(data)) || "null");
     if (!outfit || !Array.isArray(outfit.items)) return { ok: false, why: "that outfit didn't come through right" };
-    const cur = window.ServerAppearanceBundle(P().Appearance), stuck = lockedGroups();
+    const cur = window.ServerAppearanceBundle(P2().Appearance), stuck = lockedGroups2();
     const mine = new Set(outfit.items.map((i) => i.Group));
     const next = cur.filter((b) => {
       if (stuck.has(b.Group)) return true;
-      const g = groupOf(b.Group);
+      const g = groupOf2(b.Group);
       if (isClothes(g)) return false;
       return !mine.has(b.Group);
     });
     let worn = 0, locks = 0, skipped = 0;
     const added = [];
     for (const it of outfit.items) {
-      const g = groupOf(it.Group);
+      const g = groupOf2(it.Group);
       if (!g || !(isClothes(g) || isItem(g))) continue;
       if (stuck.has(it.Group)) {
         skipped++;
@@ -3942,7 +4359,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       const b = { Group: it.Group, Name: it.Name, Color: it.Color, Difficulty: it.Difficulty, Craft: it.Craft, Property: unlocked(it.Property) };
       if (it.locked && keys && keys.length) {
         b.Property.Effect = (b.Property.Effect || []).concat(["Lock"]);
-        Object.assign(b.Property, { LockedBy: "HighSecurityPadlock", LockMemberNumber: P().MemberNumber, MemberNumberListKeys: keys.join(",") });
+        Object.assign(b.Property, { LockedBy: "HighSecurityPadlock", LockMemberNumber: P2().MemberNumber, MemberNumberListKeys: keys.join(",") });
         locks++;
       }
       next.push(b);
@@ -3953,7 +4370,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       window.localStorage.setItem(BACKUP_KEY, JSON.stringify({ at: Date.now(), bundle: cur, added }));
     } catch (e) {
     }
-    commit(next);
+    commit2(next);
     return { ok: true, worn, locks, skipped };
   }
   function changeBack() {
@@ -3963,20 +4380,20 @@ One of mods you are using is using an old version of SDK. It will work for now b
     } catch (e) {
     }
     if (!bk || !Array.isArray(bk.bundle)) return { ok: false, why: "I don't have your own clothes saved on this computer" };
-    const stuck = lockedGroups();
-    const next = window.ServerAppearanceBundle(P().Appearance).filter((b) => {
+    const stuck = lockedGroups2();
+    const next = window.ServerAppearanceBundle(P2().Appearance).filter((b) => {
       if (stuck.has(b.Group)) return true;
-      const g = groupOf(b.Group);
+      const g = groupOf2(b.Group);
       if (isClothes(g)) return false;
       return !(bk.added || []).includes(b.Group);
     });
     const have = new Set(next.map((b) => b.Group));
     for (const b of bk.bundle) {
-      const g = groupOf(b.Group);
+      const g = groupOf2(b.Group);
       if (have.has(b.Group) || stuck.has(b.Group)) continue;
       if (isClothes(g) || isItem(g) && (bk.added || []).includes(b.Group)) next.push(b);
     }
-    commit(next);
+    commit2(next);
     try {
       window.localStorage.removeItem(BACKUP_KEY);
     } catch (e) {
@@ -3990,385 +4407,6 @@ One of mods you are using is using an old version of SDK. It will work for now b
       return false;
     }
   };
-
-  // extension/src/marks.js
-  var KEY = "fhc-marks";
-  var STRIP_KEY = "fhc-strip-backup";
-  var SPLAT_GROUPS = ["Mask", "FaceMarkings", "BodyMarkings"];
-  var WRITE_GROUPS = ["BodyMarkings", "ClothAccessory"];
-  var TREATISE = { group: "BodyMarkings2_Luzi", name: "\u8EAB\u4F53\u8BBA\u6587" };
-  var T_AREAS = { collar: [0, 1, 2], chest: [3, 4, 5], ribs: [6, 7, 8], waist: [9, 10, 11], hips: [12, 13, 14] };
-  var TALLY_PLACE = 11;
-  var AREAS2 = { forehead: ["a", "b", "c"], face: ["d", "e", "f"], chest: ["g", "h", "i", "j"], tummy: ["k", "l", "m", "n"] };
-  var SPILL = { forehead: "face", face: "chest", chest: "tummy", tummy: "chest" };
-  var SPILL_CHANCE = 0.35;
-  var P2 = () => window.Player;
-  var load = () => {
-    try {
-      return JSON.parse(window.localStorage.getItem(KEY)) || {};
-    } catch (e) {
-      return {};
-    }
-  };
-  var save = (v) => {
-    try {
-      window.localStorage.setItem(KEY, JSON.stringify(v));
-    } catch (e) {
-    }
-  };
-  var groupOf2 = (name) => typeof window.AssetGroupGet === "function" ? window.AssetGroupGet(P2().AssetFamily, name) : null;
-  var bundle = () => window.ServerAppearanceBundle(P2().Appearance);
-  var lockedGroups2 = () => new Set(P2().Appearance.filter((it) => it.Property && it.Property.LockedBy).map((it) => it.Asset.Group.Name));
-  function commit2(next) {
-    window.ServerAppearanceLoadFromBundle(P2(), P2().AssetFamily, next, P2().MemberNumber);
-    if (typeof window.CharacterRefresh === "function") window.CharacterRefresh(P2());
-    window.ChatRoomCharacterUpdate(P2());
-  }
-  var cleanText = (t) => String(t || "").replace(/[^A-Za-z0-9 !?.,'&#*+-]/g, "").slice(0, 20);
-  function markBody(m, prefs) {
-    if (!P2() || !Array.isArray(P2().Appearance) || typeof window.ServerAppearanceBundle !== "function") return { ok: false, why: "not in a room" };
-    const did = [];
-    if (m.wash) return washMarks();
-    if (!prefs.marks) return { ok: false, why: "off" };
-    let next = bundle(), mem = load();
-    const has = (g) => next.find((b) => b.Group === g);
-    if (Array.isArray(m.splat) && m.splat.length) {
-      const col = typeof m.color === "string" && /^#[0-9a-fA-F]{6}$/.test(m.color) ? m.color.toUpperCase() : null;
-      const colOf = (b) => typeof b.Color === "string" && /^#/.test(b.Color) ? b.Color.toUpperCase() : null;
-      const mine = next.filter((b) => b.Name === "Splatters" && SPLAT_GROUPS.includes(b.Group));
-      let it = mine.find((b) => colOf(b) === col);
-      if (!it) {
-        const g = SPLAT_GROUPS.find((x) => !has(x) && groupOf2(x));
-        if (g) {
-          it = { Group: g, Name: "Splatters", Property: { TypeRecord: {} } };
-          if (col) it.Color = col;
-          next.push(it);
-          mem.splatGroup = g;
-        } else it = mine[0];
-      }
-      if (it) {
-        it.Property = Object.assign({}, it.Property || {});
-        const tr = it.Property.TypeRecord = Object.assign({}, it.Property.TypeRecord || {});
-        for (const area of m.splat) {
-          const want = (AREAS2[area] || []).filter((k2) => !tr[k2]);
-          const any = Object.values(AREAS2).flat().filter((k2) => !tr[k2]);
-          const k = (want.length ? want : any)[Math.floor(Math.random() * (want.length ? want : any).length)];
-          if (k) {
-            tr[k] = 1;
-            did.push(area);
-          }
-          if (k && SPILL[area] && Math.random() < SPILL_CHANCE) {
-            const down = AREAS2[SPILL[area]].filter((x) => !tr[x]);
-            if (down.length) {
-              tr[down[Math.floor(Math.random() * down.length)]] = 1;
-              did.push(SPILL[area]);
-            }
-          }
-        }
-      }
-    }
-    if (m.write && cleanText(m.write.line) || m.tally) {
-      if (groupOf2(TREATISE.group)) {
-        let it = next.find((b) => b.Group === TREATISE.group && b.Name === TREATISE.name);
-        if (!it && !has(TREATISE.group)) {
-          it = { Group: TREATISE.group, Name: TREATISE.name, Property: { TypeRecord: {} } };
-          next.push(it);
-          mem.treatise = true;
-        }
-        if (it) {
-          const pr = it.Property = Object.assign({}, it.Property || {}), tr = pr.TypeRecord = Object.assign({}, pr.TypeRecord || {});
-          const put = (place, line, text) => {
-            pr["Text" + (place * 3 + line)] = cleanText(text).toUpperCase();
-            tr[String.fromCharCode(97 + place)] = 1;
-          };
-          if (m.tally) {
-            put(TALLY_PLACE, 1, String(m.tally));
-            did.push("tally");
-          }
-          if (m.write && cleanText(m.write.line)) {
-            const pref2 = T_AREAS[m.write.area] || (m.write.pos !== void 0 ? [Math.min(14, Number(m.write.pos))] : [13, 10, 4, 1, 7]);
-            const all = [...pref2, ...Array.from({ length: 15 }, (_, i) => i).filter((i) => !pref2.includes(i) && i !== TALLY_PLACE)];
-            let spot = null;
-            for (const pl of all) {
-              for (const ln of [1, 2, 3]) if (!pr["Text" + (pl * 3 + ln)]) {
-                spot = [pl, ln];
-                break;
-              }
-              if (spot) break;
-            }
-            if (!spot) spot = [pref2[0], 1 + Math.floor(Math.random() * 3)];
-            put(spot[0], spot[1], m.write.line);
-            did.push("writing");
-          }
-          save(mem);
-          commit2(next);
-          return { ok: true, did };
-        }
-      }
-    }
-    if (m.write && cleanText(m.write.line)) {
-      let it = next.find((b) => b.Name === "BodyWritings" && WRITE_GROUPS.includes(b.Group));
-      if (!it) {
-        const g = WRITE_GROUPS.find((x) => !has(x) && groupOf2(x));
-        if (g) {
-          it = { Group: g, Name: "BodyWritings", Property: { Text: "", Text2: "", Text3: "", TypeRecord: { p: 4, s: 0, t: 1 } } };
-          next.push(it);
-          mem.writeGroup = g;
-        }
-      }
-      if (it) {
-        const pr = it.Property = Object.assign({ Text: "", Text2: "", Text3: "" }, it.Property || {});
-        pr.Text3 = pr.Text2 || "";
-        pr.Text2 = pr.Text || "";
-        pr.Text = cleanText(m.write.line).toUpperCase();
-        pr.TypeRecord = Object.assign({ p: 4, s: 0, t: 1 }, pr.TypeRecord || {}, m.write.pos !== void 0 ? { p: m.write.pos } : {}, m.write.style !== void 0 ? { s: m.write.style } : {}, { t: 1 });
-        did.push("writing");
-      }
-    }
-    if (!did.length) return { ok: false, why: "no room" };
-    save(mem);
-    commit2(next);
-    return { ok: true, did };
-  }
-  var FARM_TAG = "BnB Farm gear.";
-  var OLD_TAG = "[B&B Farm gear]";
-  var FARM_NAMES = [
-    "Parasite Lips",
-    "Parasite Belt",
-    "Pump Bung",
-    "Egg Post Plug",
-    "Slime Seal",
-    "Boar's Plug",
-    "Seed Pod Stem",
-    "Denial Clamp",
-    "Growth Cups",
-    "Trap Milker",
-    "Winch Chain",
-    "Feed Chute",
-    "Snare Rope",
-    "Breedin' Frame Cuffs",
-    "Kennel Lead",
-    "The Water's Grip",
-    "The Water's Coils",
-    "Slime Sleeves",
-    "Slime Stockings",
-    "Snare Hobble",
-    "Pack's Knot",
-    "Stud's Stopper",
-    "Pillory Spreader",
-    "Parasite Suckers",
-    "Parasite Root",
-    "The Water's Embrace",
-    "Brood Sac",
-    "Grower's Sheath",
-    "Glutton's Sleeve",
-    "Tyrant's Cage",
-    "Tyrant's Web",
-    "Growin' Plug",
-    "Hungry Belt",
-    "Milkmaid's Cups",
-    "Glutton's Funnel",
-    "The Hobble",
-    "Living Suit (legs)",
-    "Living Suit (hips)",
-    "Living Suit (chest)",
-    "Living Suit (arms)",
-    "Living Suit (mouth)"
-  ];
-  var GEAR_SLOTS = {
-    plug: { groups: ["ItemButt"], names: ["InflVibeButtPlug", "BlackButtPlug", "ButtPlug", "ButtPump"], re: /ButtPlug|Plug/, color: "#2B2B2B" },
-    dildo: { groups: ["ItemVulva"], names: ["InflatableVibeDildo", "VibratingDildo", "ClitoralStimulator"], re: /Dildo/, color: "#2B2B2B" },
-    belt: { groups: ["ItemPelvis"], names: ["PolishedChastityBelt", "LeatherChastityBelt", "SleekLeatherChastityBelt", "MetalChastityBelt"], re: /ChastityBelt/ },
-    cups: { groups: ["ItemNipples"], names: ["LactationPump", "NippleSuctionCups"], re: /Pump|Suction/ },
-    leash: { groups: ["ItemNeckRestraints"], names: ["CollarChainLong", "CollarLeash", "CollarChainShort"], re: /Chain|Leash/, needs: "ItemNeck" },
-    funnel: { groups: ["ItemMouth", "ItemMouth2", "ItemMouth3"], names: ["FunnelGag"], re: /Funnel/ },
-    ropeArms: { groups: ["ItemArms"], names: ["HempRope"], re: /Rope/ },
-    arms: { groups: ["ItemArms"], names: ["HempRope", "LeatherCuffs"], re: /Rope|Cuffs/ },
-    legs: { groups: ["ItemLegs"], names: ["HempRope", "LeatherLegCuffs"], re: /Rope|Cuffs/ },
-    ropeFeet: { groups: ["ItemFeet"], names: ["HempRope"], re: /Rope/ },
-    // (a piece can ask for a spreader bar here instead)
-    lips: { groups: ["ItemMouth", "ItemMouth2", "ItemMouth3"], names: ["LipGag"], re: /LipGag/, color: ["#E0607F", "#7A2B47", "#7A2B47"] },
-    torso: { groups: ["ItemTorso", "ItemTorso2"], names: ["TentacleSuit", "HempRopeHarness"], re: /Harness/ },
-    tag: { groups: ["ItemNeckAccessories"], names: ["CollarNameTagLivestock", "CollarNameTag"], re: /NameTag/, needs: "ItemNeck" }
-  };
-  function gearAsset(group, slot, prefer) {
-    const fam = P2().AssetFamily, get = (n) => {
-      try {
-        return typeof window.AssetGet === "function" ? window.AssetGet(fam, group, n) : null;
-      } catch (e) {
-        return null;
-      }
-    };
-    for (const n of Array.isArray(prefer) ? prefer.map(String) : []) if (/^[A-Za-z0-9_]{2,40}$/.test(n) && get(n)) return n;
-    for (const n of slot.names) if (get(n)) return n;
-    const all = Array.isArray(window.Asset) ? window.Asset : [];
-    const hit = all.find((a) => a && a.Group && a.Group.Name === group && slot.re.test(a.Name) && !a.OwnerOnly && !a.LoverOnly && !a.FamilyOnly);
-    return hit ? hit.Name : typeof window.AssetGet !== "function" ? slot.names[0] : null;
-  }
-  var NAMES_KEY = "fhc-gear-names";
-  var knownNames = () => {
-    try {
-      return FARM_NAMES.concat(JSON.parse(window.localStorage.getItem(NAMES_KEY)) || []);
-    } catch (e) {
-      return FARM_NAMES;
-    }
-  };
-  var learnName = (n) => {
-    try {
-      const have = JSON.parse(window.localStorage.getItem(NAMES_KEY)) || [];
-      if (!FARM_NAMES.includes(n) && !have.includes(n)) window.localStorage.setItem(NAMES_KEY, JSON.stringify(have.concat(n).slice(-80)));
-    } catch (e) {
-    }
-  };
-  var isFarmGear = (b) => {
-    const c = b.Craft, d = c ? String(c.Description || "") : "";
-    return !!(c && (d.includes(FARM_TAG) || d.includes(OLD_TAG) || knownNames().includes(c.Name) && (!c.MemberNumber || c.MemberNumber === P2().MemberNumber)));
-  };
-  var GEAR_KEY = "fhc-gear";
-  var gearMem = () => {
-    try {
-      return JSON.parse(window.localStorage.getItem(GEAR_KEY)) || {};
-    } catch (e) {
-      return {};
-    }
-  };
-  var gearMemSave = (m) => {
-    try {
-      window.localStorage.setItem(GEAR_KEY, JSON.stringify(m));
-    } catch (e) {
-    }
-  };
-  var gearNameOf = (b, mem) => isFarmGear(b) ? b.Craft.Name : Object.keys(mem).find((n) => mem[n].group === b.Group && mem[n].item === b.Name && (!(b.Craft && b.Craft.Name) || b.Craft.Name === n)) || null;
-  function syncFarmGear(list, allow) {
-    if (!P2() || !Array.isArray(P2().Appearance) || typeof window.ServerAppearanceBundle !== "function") return { on: [], off: [] };
-    const want = (Array.isArray(list) ? list : []).filter((g) => g && GEAR_SLOTS[g.slot] && (g.always || allow) && (!g.until || g.until > Date.now()));
-    const cur = bundle(), stuck = lockedGroups2(), did = { on: [], off: [] }, mem = gearMem();
-    let next = cur.slice();
-    for (const b of cur) {
-      const n = gearNameOf(b, mem);
-      if (!n || want.some((g) => g.name === n) || stuck.has(b.Group)) continue;
-      next = next.filter((x) => x !== b);
-      did.off.push(n);
-      delete mem[n];
-    }
-    for (const n of Object.keys(mem)) if (!want.some((g) => g.name === n) && !next.some((b) => gearNameOf(b, mem) === n)) delete mem[n];
-    for (const g of want) {
-      if (next.some((b) => gearNameOf(b, mem) === g.name)) continue;
-      const slot = GEAR_SLOTS[g.slot];
-      if (slot.needs && !next.some((b) => b.Group === slot.needs)) continue;
-      const group = slot.groups.find((x) => !next.some((b) => b.Group === x) && groupOf2(x));
-      if (!group) continue;
-      const item = gearAsset(group, slot, g.items);
-      if (!item) continue;
-      const color = (typeof g.color === "string" && /^#[0-9a-fA-F]{6}$/.test(g.color) ? g.color : null) || slot.color || "Default";
-      const it = {
-        Group: group,
-        Name: item,
-        Difficulty: 20,
-        Property: {},
-        Craft: {
-          Item: item,
-          Name: String(g.name).slice(0, 30),
-          Description: (FARM_TAG + " " + String(g.desc || "").slice(0, 180)).trim(),
-          Property: "Normal",
-          Color: Array.isArray(color) ? color.join(",") : color,
-          Lock: "",
-          Private: true,
-          MemberNumber: P2().MemberNumber,
-          MemberName: P2().Name,
-          ItemProperty: {},
-          Type: null,
-          TypeRecord: null
-        }
-      };
-      if (color !== "Default") it.Color = color;
-      next.push(it);
-      did.on.push(g.name);
-      mem[g.name] = { group, item };
-      learnName(String(g.name).slice(0, 30));
-    }
-    gearMemSave(mem);
-    if (did.on.length || did.off.length) commit2(next);
-    return did;
-  }
-  var SHAPES = { BodyUpper: ["FlatSmall", "FlatMedium", "Small", "Normal", "Large", "XLarge"], BodyLower: ["Small", "Normal", "Large", "XLarge"] };
-  var SHAPE_KEY = "fhc-shape";
-  function syncShape(shape, allow) {
-    if (!P2() || !Array.isArray(P2().Appearance) || typeof window.ServerAppearanceBundle !== "function") return [];
-    let mem;
-    try {
-      mem = JSON.parse(window.localStorage.getItem(SHAPE_KEY)) || {};
-    } catch (e) {
-      mem = {};
-    }
-    const next = bundle().map((b) => Object.assign({}, b)), did = [];
-    for (const [group, steps] of [["BodyUpper", shape && allow ? Number(shape.up) || 0 : 0], ["BodyLower", shape && allow ? Number(shape.low) || 0 : 0]]) {
-      const order = SHAPES[group], b = next.find((x) => x.Group === group);
-      if (!b) continue;
-      const m = mem[group];
-      const own = m && m.set === b.Name && order.includes(m.own) ? m.own : b.Name;
-      const at = order.indexOf(own);
-      if (at < 0) continue;
-      const want = order[Math.max(0, Math.min(order.length - 1, at + Math.round(steps)))];
-      if (typeof window.AssetGet === "function" && !window.AssetGet(P2().AssetFamily, group, want)) continue;
-      if (want !== b.Name) {
-        b.Name = want;
-        did.push(group + " " + want);
-      }
-      if (want === own) delete mem[group];
-      else mem[group] = { own, set: want };
-    }
-    try {
-      window.localStorage.setItem(SHAPE_KEY, JSON.stringify(mem));
-    } catch (e) {
-    }
-    if (did.length) commit2(next);
-    return did;
-  }
-  function washMarks() {
-    const mem = load(), stuck = lockedGroups2();
-    const next = bundle().filter((b) => stuck.has(b.Group) || !(b.Name === "Splatters" && SPLAT_GROUPS.includes(b.Group) || b.Name === "BodyWritings" && b.Group === mem.writeGroup || mem.treatise && b.Group === TREATISE.group));
-    save({});
-    commit2(next);
-    return { ok: true, did: ["wash"] };
-  }
-  function stripMe(prefs) {
-    if (!prefs.strip) return { ok: false, why: "off" };
-    const cur = bundle(), stuck = lockedGroups2();
-    if (!window.localStorage.getItem(STRIP_KEY)) {
-      try {
-        window.localStorage.setItem(STRIP_KEY, JSON.stringify({ at: Date.now(), bundle: cur }));
-      } catch (e) {
-      }
-    }
-    const mem = load();
-    const next = cur.filter((b) => {
-      const g = groupOf2(b.Group);
-      return !(g && g.Clothing) || stuck.has(b.Group) || b.Name === "BodyWritings" || b.Name === "Splatters" || b.Group === TREATISE.group;
-    });
-    if (next.length === cur.length) return { ok: false, why: "nothin' to take off" };
-    commit2(next);
-    return { ok: true, did: ["strip"] };
-  }
-  function dressMe() {
-    let bk = null;
-    try {
-      bk = JSON.parse(window.localStorage.getItem(STRIP_KEY));
-    } catch (e) {
-    }
-    if (!bk || !Array.isArray(bk.bundle)) return { ok: false, why: "no clothes kept" };
-    const next = bundle(), have = new Set(next.map((b) => b.Group));
-    for (const b of bk.bundle) {
-      const g = groupOf2(b.Group);
-      if (g && g.Clothing && !have.has(b.Group)) next.push(b);
-    }
-    commit2(next);
-    try {
-      window.localStorage.removeItem(STRIP_KEY);
-    } catch (e) {
-    }
-    return { ok: true, did: ["dress"] };
-  }
 
   // extension/src/cues.js
   var W = window;

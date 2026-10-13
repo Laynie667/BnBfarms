@@ -8,6 +8,7 @@ import { h, card, title, muted, btn, chip, bar, toggle, ml } from "../dom.js";
 import { guidesTab, safetyTab } from "./common.js";
 import { storeTab } from "./store.js";
 import { gearLore } from "../gearlore.js";
+import { scaleTrial } from "../marks.js";
 
 const pct = (a, b) => (b ? (100 * a) / b : 0);
 const hoursLeft = (t) => Math.max(0, Math.ceil((t - Date.now()) / 3600000));
@@ -211,6 +212,9 @@ export function panelPrefs(ctx) {
       !!ctx.prefs.marks, () => ctx.setPref("marks", !ctx.prefs.marks)),
     toggle("Farm can strip me", "When the farm says so, your clothes come off (locked pieces stay). They're kept on this computer so you can dress again.",
       !!ctx.prefs.strip, () => ctx.setPref("strip", !ctx.prefs.strip)),
+    // a one-off experiment for the outfit studio idea (marks.js: scaleTrial)
+    h("div", { style: { marginTop: "10px" } }, muted("Experiment: can the game draw your chest and what's on it bigger than its biggest size? Try it in a chat room, look, and undo."),
+      btn("Scale trial: chest 15% bigger", () => scaleTrial(true, (t) => ctx.hint(t))), btn("Undo the scale trial", () => scaleTrial(false, (t) => ctx.hint(t)))),
     btn("Put the button and panel back (size and full screen too)", () => ctx.resetPlaces && ctx.resetPlaces()));
 }
 // every switch the farm's add-ons offer (glory stalls, barn life, breeding week, fences…), in one place

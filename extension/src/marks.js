@@ -221,6 +221,33 @@ export function syncShape(shape, allow) {
   return did;
 }
 
+// ── the scale trial (Oct 12) ──
+// The game itself can draw any worn item bigger, smaller or moved: every item has ScaleX, ScaleY, TranslationX and
+// TranslationY in its properties (the wardrobe's Layering screen sets them), and those travel with the item, so
+// everybody sees them with no add-on at all. What we don't know yet is whether the game keeps them on the BODY
+// (the Layering screen refuses to, but the drawing code doesn't check). This sets 15% on your chest and on whatever
+// you're wearing on your nipples, breasts or torso, waits, and says what stuck. scaleTrial(false) puts it all back.
+const TRIAL_GROUPS = ["BodyUpper", "ItemNipples", "ItemBreast", "ItemTorso", "Bra"];
+export function scaleTrial(on, say) {
+  try {
+    if (!P() || !Array.isArray(P().Appearance)) return say("I can't see your character right now.");
+    const items = P().Appearance.filter((it) => it && it.Asset && it.Asset.Group && TRIAL_GROUPS.includes(it.Asset.Group.Name));
+    for (const it of items) {
+      const p = Object.assign({}, it.Property || {});
+      if (on) { p.ScaleX = 1.15; p.ScaleY = 1.15; p.TranslationY = -12; } else { delete p.ScaleX; delete p.ScaleY; delete p.TranslationY; }
+      it.Property = p;
+    }
+    if (typeof window.CharacterRefresh === "function") window.CharacterRefresh(P());
+    if (typeof window.ChatRoomCharacterUpdate === "function" && window.CurrentScreen === "ChatRoom") window.ChatRoomCharacterUpdate(P());
+    if (!on) return say("Scale trial undone: everything is back to its own size.");
+    setTimeout(() => {
+      const now = P().Appearance.filter((it) => it && it.Asset && it.Asset.Group && TRIAL_GROUPS.includes(it.Asset.Group.Name));
+      const kept = now.filter((it) => it.Property && it.Property.ScaleX === 1.15).map((it) => it.Asset.Group.Name), lost = now.filter((it) => !(it.Property && it.Property.ScaleX === 1.15)).map((it) => it.Asset.Group.Name);
+      say("Scale trial, 15% bigger. The game KEPT it on: " + (kept.join(", ") || "nothing") + ". It DROPPED it on: " + (lost.join(", ") || "nothing") + ". Look at your character: is the chest bigger? Ask somebody else in the room if they see it too, then tell Claude all three answers. \"Undo the scale trial\" puts it back.");
+    }, 3000);
+  } catch (e) { say("The scale trial hit an error: " + (e && e.message || e)); }
+}
+
 // off with what the farm put on (the splatters and the writing), nothin' else
 export function washMarks() {
   const mem = load(), stuck = lockedGroups();

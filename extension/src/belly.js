@@ -7,14 +7,14 @@
    character: nothing is sent to anybody and nothing about your character is changed. "Off" takes it away.
 
    How: the game builds a character by drawing its layers one after another (CommonDrawAppearanceBuild). We step in
-   right after the lower body is drawn, read the skin colour off what was just painted, and paint the belly there.
+   once all the skin is drawn, work out the skin colour from the body's own picture, and paint the belly there.
 */
 const W = window;
 const SKIN_TOP = 12;                 // the game's drawing order: everything up to here is skin (the body, nipples, pussy or cock)
 let trial = 0;                       // 0 off · 1 small · 2 medium · 3 large
 // >>> belly drawing (kept self-contained: tools/belly-preview.mjs lifts this block out to draw a preview)
 // rx: half its width at the widest · ry: half its height · sag: how far the weight has dropped (0 = a ball, 0.3 = heavy and low)
-const SIZES = [null, { rx: 50, ry: 54, sag: 0.16 }, { rx: 70, ry: 80, sag: 0.22 }, { rx: 92, ry: 112, sag: 0.28 }];
+const SIZES = [null, { rx: 50, ry: 54, sag: 0.16 }, { rx: 70, ry: 80, sag: 0.22, lift: 5 }, { rx: 92, ry: 112, sag: 0.28, lift: 20 }];   // lift: how far it's raised (Laynie: "the large belly can sit a little higher")
 const FALLBACK = { White: [236, 204, 196], Asian: [232, 200, 164], Black: [120, 86, 70] };
 const clamp = (v) => Math.max(0, Math.min(255, Math.round(v)));
 const rgb = (c, k) => "rgb(" + clamp(c[0] * k) + "," + clamp(c[1] * k) + "," + clamp(c[2] * k) + ")";
@@ -82,7 +82,7 @@ function bellyCanvas(size, skin) {
   return cv;
 }
 // where its top-left corner goes, given where the upper-body picture was drawn: hung from just under the ribs
-function bellyPlace(size, upperX, upperY, cv) { const S = SIZES[size]; return [upperX + 250 - cv.width / 2, upperY + 392 + S.ry * 0.62 - cv.height / 2]; }
+function bellyPlace(size, upperX, upperY, cv) { const S = SIZES[size]; return [upperX + 250 - cv.width / 2, upperY + 392 + S.ry * 0.62 - (S.lift || 0) - cv.height / 2]; }
 // <<< belly drawing
 // The game keeps every picture it draws in a list it looks things up in BY NAME, and it expects every name to be text.
 // Handing it the drawing itself (Oct 12, Companion 0.16.2) put a non-text name in that list, and from then on every
@@ -102,34 +102,47 @@ export function scrubCache() {
   return n;
 }
 // what colour did the game just paint their skin? read it off the canvas, a little under the chest
-// Readin' a pixel back off the screen makes the graphics card stop and wait, and the map redraws characters a lot
-// (Laynie, Oct 12: "the map just loads a lot slower"). So the colour is read once for each body and skin, and kept.
-const skinSeen = new Map();
-function skinFor(C, bx, by) {
-  const it = (C.DrawAppearance || C.Appearance || []).find((x) => x && x.Asset && x.Asset.Group && x.Asset.Group.Name === "BodyUpper");
-  const key = it ? it.Asset.Name + "|" + JSON.stringify(it.Color || "") : "?";
-  let c = skinSeen.get(key);
-  if (!c) { c = skinAt(C, bx, by); if (skinSeen.size > 12) skinSeen.clear(); skinSeen.set(key, c); }
-  return c;
+// THE SKIN COLOUR. Twice it was read back off the screen, and twice it came out too tan on Laynie (Oct 12): the
+// read was landing somewhere it shouldn't, and then the stand-in colour was used. So it's worked out the way the
+// game itself gets it: from the body's own picture file, plus the game's tint when the skin is a custom colour.
+//   · a named skin (White, Asian, Black): the body picture is already that colour, so take it from the picture
+//   · a custom colour: the game paints the pale picture and multiplies it by the colour (each pixel's brightness,
+//     its red + green + blue over 383, times the colour), so do the same sum
+// The picture has to be loaded once to look at it. Until it has, a near guess is used, then the belly is redrawn.
+const skinSeen = new Map();   // key → [r, g, b], or "loading"
+const hexRGB = (h) => [parseInt(h.slice(1, 3), 16), parseInt(h.slice(3, 5), 16), parseInt(h.slice(5, 7), 16)];
+function skinGuess(src, hex) {
+  if (hex) return hexRGB(hex).map((v) => clamp(v * 1.62));
+  return /_Black\./.test(src) ? FALLBACK.Black : /_Asian\./.test(src) ? FALLBACK.Asian : FALLBACK.White;
 }
-function skinAt(C, bx, by) {
-  try {
-    const gl = W.GLDrawCanvas && W.GLDrawCanvas.GL;
-    if (gl && typeof gl.readPixels === "function") {
-      // One block out of the middle of the torso. A single point near the waist's edge landed on the body's own
-      // shading (seen live: the belly came out a shade too tan), so take a patch and use its typical bright skin:
-      // not the white shine down the centre line, and not the darker edges.
-      const bw = 48, bh = 40, px = new Uint8Array(bw * bh * 4);
-      gl.readPixels(Math.round(bx + 226), Math.round(gl.canvas.height - (by + 388) - bh), bw, bh, gl.RGBA, gl.UNSIGNED_BYTE, px);
-      const good = [];
-      for (let i = 0; i < px.length; i += 4) if (px[i + 3] > 200 && px[i] + px[i + 1] + px[i + 2] > 90 && Math.min(px[i], px[i + 1], px[i + 2]) < 238) good.push([px[i], px[i + 1], px[i + 2]]);
-      if (good.length >= 40) { good.sort((m, n) => (m[0] + m[1] + m[2]) - (n[0] + n[1] + n[2])); return good[Math.floor(good.length * 0.7)]; }
-    }
-  } catch (e) { /* fall back to the named colour */ }
-  const it = (C.DrawAppearance || C.Appearance || []).find((a) => a && a.Asset && a.Asset.Group && a.Asset.Group.Name === "BodyUpper");
-  const col = it && (Array.isArray(it.Color) ? it.Color[0] : it.Color);
-  if (typeof col === "string" && /^#[0-9a-fA-F]{6}$/.test(col)) return [parseInt(col.slice(1, 3), 16), parseInt(col.slice(3, 5), 16), parseInt(col.slice(5, 7), 16)];
-  return FALLBACK[col] || FALLBACK.White;
+function skinFor(src, hex) {
+  hex = typeof hex === "string" && /^#[0-9a-fA-F]{6}$/.test(hex) ? hex : "";
+  const key = src + "|" + hex, v = skinSeen.get(key);
+  if (Array.isArray(v)) return v;
+  if (!v) { if (skinSeen.size > 16) skinSeen.clear(); skinSeen.set(key, "loading"); skinLoad(key, src, hex); }
+  return skinGuess(src, hex);
+}
+function skinLoad(key, src, hex) {
+  const img = new Image();
+  img.onload = () => {
+    let c = skinGuess(src, hex);
+    try {
+      // a patch from the middle of the torso, under the chest: its typical bright skin (not the white shine, not the edges)
+      const bw = 48, bh = 40, cv = document.createElement("canvas"); cv.width = bw; cv.height = bh;
+      const g = cv.getContext("2d"); g.drawImage(img, -226, -388);
+      const d = g.getImageData(0, 0, bw, bh).data, good = [];
+      for (let i = 0; i < d.length; i += 4) if (d[i + 3] > 200 && d[i] + d[i + 1] + d[i + 2] > 90 && Math.min(d[i], d[i + 1], d[i + 2]) < 238) good.push([d[i], d[i + 1], d[i + 2]]);
+      if (good.length >= 40) {
+        good.sort((m, n) => (m[0] + m[1] + m[2]) - (n[0] + n[1] + n[2]));
+        const p = good[Math.floor(good.length * 0.7)];
+        c = hex ? hexRGB(hex).map((v) => clamp(v * (p[0] + p[1] + p[2]) / 383)) : p;
+      }
+    } catch (e) { /* a picture we may not look inside: keep the guess */ }
+    skinSeen.set(key, c);
+    try { if (trial && W.Player && typeof W.CharacterLoadCanvas === "function") W.CharacterLoadCanvas(W.Player); } catch (e) { /* next redraw will do */ }
+  };
+  img.onerror = () => skinSeen.set(key, skinGuess(src, hex));
+  img.src = src;
 }
 let hooked = false, sdk = null;
 export function initBelly(mod) { sdk = mod; setTimeout(scrubCache, 4000); }   // nothin' is hooked until the test is switched on
@@ -150,14 +163,14 @@ function hookBelly(mod) {
           const prio = (src) => { const m = new RegExp("/Assets/[^/]+/([^/]+)/").exec(src); if (!m) return 99; try { const g = W.AssetGroupGet && W.AssetGroupGet(C.AssetFamily, m[1]); return g && typeof g.DrawingPriority === "number" ? g.DrawingPriority : 99; } catch (e) { return 99; } };
           const paint = () => {
             if (done || !upper || !lower) return; done = true;
-            const S = SIZES[trial], cv = bellyPicture(trial, skinFor(C, upper[0], upper[1]));   // { url, width, height }: a picture the game can cache by name
+            const S = SIZES[trial], cv = bellyPicture(trial, skinFor(upper[2], upper[3]));   // { url, width, height }: a picture the game can cache by name
             const [dx, dy] = bellyPlace(trial, upper[0], upper[1], cv);
             cb.drawImage(cv.url, dx, dy, {});
             if (typeof cb.drawImageBlink === "function") cb.drawImageBlink(cv.url, dx, dy, {});
           };
           const before = (src) => { if (!done && lower && typeof src === "string" && prio(src) > SKIN_TOP) paint(); };
-          const after = (src, x, y) => { if (typeof src !== "string") return; if (src.includes("/BodyUpper/")) upper = [x, y]; if (src.includes("/BodyLower/")) lower = true; };
-          const wrap = (name) => (typeof cb[name] === "function" ? (src, x, y, o) => { try { before(src); } catch (e) { console.warn("[Farmhand Companion] belly:", e); } cb[name](src, x, y, o); try { after(src, x, y); } catch (e) { console.warn("[Farmhand Companion] belly:", e); } } : cb[name]);
+          const after = (src, x, y, o) => { if (typeof src !== "string") return; if (src.includes("/BodyUpper/")) upper = [x, y, src, o && o.HexColor]; if (src.includes("/BodyLower/")) lower = true; };
+          const wrap = (name) => (typeof cb[name] === "function" ? (src, x, y, o) => { try { before(src); } catch (e) { console.warn("[Farmhand Companion] belly:", e); } cb[name](src, x, y, o); try { after(src, x, y, o); } catch (e) { console.warn("[Farmhand Companion] belly:", e); } } : cb[name]);
           args[1] = Object.assign({}, cb, { drawImage: wrap("drawImage"), drawImageColorize: wrap("drawImageColorize") });
           finish = paint;   // (a bare body: nothin' comes after the skin, so it goes in at the very end)
         }

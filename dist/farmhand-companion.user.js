@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.16.7
+// @version      0.16.8
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -230,7 +230,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.16.7";
+  var VERSION = "0.16.8";
 
   // extension/src/config.js
   var BOT_MEMBER = 260239;
@@ -992,7 +992,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var W = window;
   var SKIN_TOP = 12;
   var trial = 0;
-  var SIZES = [null, { rx: 50, ry: 54, sag: 0.16 }, { rx: 70, ry: 80, sag: 0.22 }, { rx: 92, ry: 112, sag: 0.28 }];
+  var SIZES = [null, { rx: 50, ry: 54, sag: 0.16 }, { rx: 70, ry: 80, sag: 0.22, lift: 5 }, { rx: 92, ry: 112, sag: 0.28, lift: 20 }];
   var FALLBACK = { White: [236, 204, 196], Asian: [232, 200, 164], Black: [120, 86, 70] };
   var clamp = (v) => Math.max(0, Math.min(255, Math.round(v)));
   var rgb = (c, k) => "rgb(" + clamp(c[0] * k) + "," + clamp(c[1] * k) + "," + clamp(c[2] * k) + ")";
@@ -1106,7 +1106,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
   function bellyPlace(size, upperX, upperY, cv) {
     const S = SIZES[size];
-    return [upperX + 250 - cv.width / 2, upperY + 392 + S.ry * 0.62 - cv.height / 2];
+    return [upperX + 250 - cv.width / 2, upperY + 392 + S.ry * 0.62 - (S.lift || 0) - cv.height / 2];
   }
   var pictures = /* @__PURE__ */ new Map();
   function bellyPicture(size, skin) {
@@ -1141,36 +1141,49 @@ One of mods you are using is using an old version of SDK. It will work for now b
     return n;
   }
   var skinSeen = /* @__PURE__ */ new Map();
-  function skinFor(C, bx, by) {
-    const it = (C.DrawAppearance || C.Appearance || []).find((x) => x && x.Asset && x.Asset.Group && x.Asset.Group.Name === "BodyUpper");
-    const key = it ? it.Asset.Name + "|" + JSON.stringify(it.Color || "") : "?";
-    let c = skinSeen.get(key);
-    if (!c) {
-      c = skinAt(C, bx, by);
-      if (skinSeen.size > 12) skinSeen.clear();
-      skinSeen.set(key, c);
-    }
-    return c;
+  var hexRGB = (h2) => [parseInt(h2.slice(1, 3), 16), parseInt(h2.slice(3, 5), 16), parseInt(h2.slice(5, 7), 16)];
+  function skinGuess(src, hex) {
+    if (hex) return hexRGB(hex).map((v) => clamp(v * 1.62));
+    return /_Black\./.test(src) ? FALLBACK.Black : /_Asian\./.test(src) ? FALLBACK.Asian : FALLBACK.White;
   }
-  function skinAt(C, bx, by) {
-    try {
-      const gl = W.GLDrawCanvas && W.GLDrawCanvas.GL;
-      if (gl && typeof gl.readPixels === "function") {
-        const bw = 48, bh = 40, px = new Uint8Array(bw * bh * 4);
-        gl.readPixels(Math.round(bx + 226), Math.round(gl.canvas.height - (by + 388) - bh), bw, bh, gl.RGBA, gl.UNSIGNED_BYTE, px);
-        const good = [];
-        for (let i = 0; i < px.length; i += 4) if (px[i + 3] > 200 && px[i] + px[i + 1] + px[i + 2] > 90 && Math.min(px[i], px[i + 1], px[i + 2]) < 238) good.push([px[i], px[i + 1], px[i + 2]]);
+  function skinFor(src, hex) {
+    hex = typeof hex === "string" && /^#[0-9a-fA-F]{6}$/.test(hex) ? hex : "";
+    const key = src + "|" + hex, v = skinSeen.get(key);
+    if (Array.isArray(v)) return v;
+    if (!v) {
+      if (skinSeen.size > 16) skinSeen.clear();
+      skinSeen.set(key, "loading");
+      skinLoad(key, src, hex);
+    }
+    return skinGuess(src, hex);
+  }
+  function skinLoad(key, src, hex) {
+    const img = new Image();
+    img.onload = () => {
+      let c = skinGuess(src, hex);
+      try {
+        const bw = 48, bh = 40, cv = document.createElement("canvas");
+        cv.width = bw;
+        cv.height = bh;
+        const g = cv.getContext("2d");
+        g.drawImage(img, -226, -388);
+        const d = g.getImageData(0, 0, bw, bh).data, good = [];
+        for (let i = 0; i < d.length; i += 4) if (d[i + 3] > 200 && d[i] + d[i + 1] + d[i + 2] > 90 && Math.min(d[i], d[i + 1], d[i + 2]) < 238) good.push([d[i], d[i + 1], d[i + 2]]);
         if (good.length >= 40) {
           good.sort((m, n) => m[0] + m[1] + m[2] - (n[0] + n[1] + n[2]));
-          return good[Math.floor(good.length * 0.7)];
+          const p = good[Math.floor(good.length * 0.7)];
+          c = hex ? hexRGB(hex).map((v) => clamp(v * (p[0] + p[1] + p[2]) / 383)) : p;
         }
+      } catch (e) {
       }
-    } catch (e) {
-    }
-    const it = (C.DrawAppearance || C.Appearance || []).find((a) => a && a.Asset && a.Asset.Group && a.Asset.Group.Name === "BodyUpper");
-    const col = it && (Array.isArray(it.Color) ? it.Color[0] : it.Color);
-    if (typeof col === "string" && /^#[0-9a-fA-F]{6}$/.test(col)) return [parseInt(col.slice(1, 3), 16), parseInt(col.slice(3, 5), 16), parseInt(col.slice(5, 7), 16)];
-    return FALLBACK[col] || FALLBACK.White;
+      skinSeen.set(key, c);
+      try {
+        if (trial && W.Player && typeof W.CharacterLoadCanvas === "function") W.CharacterLoadCanvas(W.Player);
+      } catch (e) {
+      }
+    };
+    img.onerror = () => skinSeen.set(key, skinGuess(src, hex));
+    img.src = src;
   }
   var hooked = false;
   var sdk = null;
@@ -1201,7 +1214,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
             const paint = () => {
               if (done || !upper || !lower) return;
               done = true;
-              const S = SIZES[trial], cv = bellyPicture(trial, skinFor(C, upper[0], upper[1]));
+              const S = SIZES[trial], cv = bellyPicture(trial, skinFor(upper[2], upper[3]));
               const [dx, dy] = bellyPlace(trial, upper[0], upper[1], cv);
               cb.drawImage(cv.url, dx, dy, {});
               if (typeof cb.drawImageBlink === "function") cb.drawImageBlink(cv.url, dx, dy, {});
@@ -1209,9 +1222,9 @@ One of mods you are using is using an old version of SDK. It will work for now b
             const before = (src) => {
               if (!done && lower && typeof src === "string" && prio(src) > SKIN_TOP) paint();
             };
-            const after = (src, x, y) => {
+            const after = (src, x, y, o) => {
               if (typeof src !== "string") return;
-              if (src.includes("/BodyUpper/")) upper = [x, y];
+              if (src.includes("/BodyUpper/")) upper = [x, y, src, o && o.HexColor];
               if (src.includes("/BodyLower/")) lower = true;
             };
             const wrap = (name) => typeof cb[name] === "function" ? (src, x, y, o) => {
@@ -1222,7 +1235,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
               }
               cb[name](src, x, y, o);
               try {
-                after(src, x, y);
+                after(src, x, y, o);
               } catch (e) {
                 console.warn("[Farmhand Companion] belly:", e);
               }

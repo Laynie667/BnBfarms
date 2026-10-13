@@ -805,6 +805,27 @@
                     od[o4] = (sp[p00] * a00 + sp[p10] * a10 + sp[p01] * a01 + sp[p11] * a11) / at; od[o4 + 1] = (sp[p00 + 1] * a00 + sp[p10 + 1] * a10 + sp[p01 + 1] * a01 + sp[p11 + 1] * a11) / at; od[o4 + 2] = (sp[p00 + 2] * a00 + sp[p10 + 2] * a10 + sp[p01 + 2] * a01 + sp[p11 + 2] * a11) / at; od[o4 + 3] = at;
                   }
                 }
+                // FROM THE SHOULDER TO THE BUST. Laynie's marks on the student outfit (Oct 13): a green line each side, straight
+                // from the shoulder strap down to the widest point of the breast. The cloth had been following the round
+                // top of each breast in, leaving a notch between the strap and the bust. Cloth held at the shoulder and
+                // pushed out by the breast is taut between the two: a straight line. So on a piece that's cloth over the
+                // breasts, each row from the shoulder down to the middle of the bust is let out, at its outer part only, until
+                // its edge is on that line. (The middle of the row, the front of the bust, isn't touched.)
+                if (tentOn) {
+                  const midR = midX - x0, halfOf = (j) => { const o = j * bw * 4; let l = -1, r = -1; for (let i = 0; i < bw; i++) if (od[o + i * 4 + 3] > 40) { if (l < 0) l = i; r = i; } return l < 0 ? 0 : Math.max(midR - l, r - midR); };
+                  const jEnd = Math.min(bh - 1, Math.round(bcy - y0)); let j0 = -1, top = 0;
+                  for (let j = 0; j < jEnd; j++) { const hf = halfOf(j); if (hf > 12) { j0 = j; top = hf; break; } }
+                  if (j0 >= 0 && jEnd - j0 > 8) {
+                    const side = S2.bx + S2.ro, row = new Uint8ClampedArray(bw * 4);
+                    for (let j = j0 + 1; j <= jEnd; j++) {
+                      const hf = halfOf(j), want = top + (side - top) * (j - j0) / (jEnd - j0); if (hf < 8 || want <= hf + 1) continue;
+                      const o = j * bw * 4, inner = hf * 0.55; row.set(od.subarray(o, o + bw * 4));
+                      for (let i = 0; i < bw; i++) { const d = Math.abs(i - midR); if (d <= inner || d > want) continue;
+                        const sd = inner + (d - inner) * (hf - inner) / (want - inner), si = Math.round(midR + (i < midR ? -sd : sd)); if (si < 0 || si >= bw) continue;
+                        od[o + i * 4] = row[si * 4]; od[o + i * 4 + 1] = row[si * 4 + 1]; od[o + i * 4 + 2] = row[si * 4 + 2]; od[o + i * 4 + 3] = row[si * 4 + 3]; }
+                    }
+                  }
+                }
                 const T = document.createElement("canvas"); T.width = bw; T.height = bh; T.getContext("2d").putImageData(out, 0, 0);
                 const hole = document.createElement("canvas"); hole.width = bw; hole.height = bh; hole.getContext("2d").putImageData(hi, 0, 0);
                 g.globalCompositeOperation = "destination-out"; g.drawImage(hole, x0, y0); g.globalCompositeOperation = "source-over";

@@ -55,6 +55,23 @@ function bellyCanvas(size, skin) {
   g.stroke();
   return cv;
 }
+// The game keeps every picture it draws in a list it looks things up in BY NAME, and it expects every name to be text.
+// Handing it the drawing itself (Oct 12, Companion 0.16.2) put a non-text name in that list, and from then on every
+// character refresh crashed in the game's own clean-up (AnimationPurge: "key.startsWith is not a function"): no dressing,
+// no restraints, no looking at anybody, till the page was reloaded. So the belly is handed over as a picture address
+// (text), one per size and skin colour, and scrubCache() takes out anything that isn't text.
+const pictures = new Map();
+function bellyPicture(size, skin) {
+  const key = size + ":" + skin.map((v) => Math.round(v / 4) * 4).join(",");
+  let p = pictures.get(key);
+  if (!p) { const cv = bellyCanvas(size, skin); p = { url: cv.toDataURL("image/png"), width: cv.width, height: cv.height }; if (pictures.size > 24) pictures.clear(); pictures.set(key, p); }
+  return p;
+}
+export function scrubCache() {
+  let n = 0;
+  try { for (const name of ["DrawImageCache", "GLDrawImageCache"]) { const m = W[name]; if (m && typeof m.forEach === "function" && typeof m.delete === "function") { const bad = []; m.forEach((v, k) => { if (typeof k !== "string") bad.push(k); }); for (const k of bad) { m.delete(k); n++; } } } } catch (e) { /* not a plain list in this version: leave it */ }
+  return n;
+}
 // what colour did the game just paint their skin? read it off the canvas, a little under the chest
 function skinAt(C, bx, by) {
   try {
@@ -73,7 +90,7 @@ function skinAt(C, bx, by) {
   return FALLBACK[col] || FALLBACK.White;
 }
 let hooked = false, sdk = null;
-export function initBelly(mod) { sdk = mod; }   // nothin' is hooked until the test is switched on
+export function initBelly(mod) { sdk = mod; setTimeout(scrubCache, 4000); }   // nothin' is hooked until the test is switched on
 function hookBelly(mod) {
   if (hooked || !mod) return; hooked = true;
   try {
@@ -87,11 +104,11 @@ function hookBelly(mod) {
             if (src.includes("/BodyUpper/")) upper = [x, y];
             if (src.includes("/BodyLower/") && upper) {
               done = true;
-              const S = SIZES[trial], cv = bellyCanvas(trial, skinAt(C, upper[0], upper[1]));
+              const S = SIZES[trial], cv = bellyPicture(trial, skinAt(C, upper[0], upper[1]));   // { url, width, height }: a picture the game can cache by name
               // centred on the navel of the upper-body picture, sittin' lower as it gets bigger
               const dx = upper[0] + 250 - cv.width / 2, dy = upper[1] + 432 + S.ry * 0.22 - cv.height / 2;
-              cb.drawImage(cv, dx, dy, {});
-              if (typeof cb.drawImageBlink === "function") cb.drawImageBlink(cv, dx, dy, {});
+              cb.drawImage(cv.url, dx, dy, {});
+              if (typeof cb.drawImageBlink === "function") cb.drawImageBlink(cv.url, dx, dy, {});
             }
           };
           const wrap = (name) => (typeof cb[name] === "function" ? (src, x, y, o) => { cb[name](src, x, y, o); try { if (!/Blink$/.test(name)) after(src, x, y); } catch (e) { console.warn("[Farmhand Companion] belly:", e); } } : cb[name]);
@@ -105,7 +122,9 @@ function hookBelly(mod) {
 // 0 off · 1, 2, 3. Redraws your own character.
 export function bellyTrial(n, say) {
   trial = Math.max(0, Math.min(3, Math.round(Number(n)) || 0));
+  scrubCache();
   if (trial) hookBelly(sdk);
-  try { if (W.Player && typeof W.CharacterLoadCanvas === "function") W.CharacterLoadCanvas(W.Player); } catch (e) { console.warn("[Farmhand Companion] belly redraw:", e); }
+  const redraw = () => { try { if (W.Player && typeof W.CharacterLoadCanvas === "function") W.CharacterLoadCanvas(W.Player); } catch (e) { console.warn("[Farmhand Companion] belly redraw:", e); } };
+  redraw(); setTimeout(redraw, 500); setTimeout(redraw, 1800);   // (the game loads a new picture a moment after it's first asked for)
   if (say) say(trial ? "Belly test: " + ["", "small", "medium", "large"][trial] + ". Look at your character with nothing over your middle. Only you can see it. Tell Claude how it looks: the shape, the colour match, where it sits." : "Belly test off.");
 }

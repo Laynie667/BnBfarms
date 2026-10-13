@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.16.3
+// @version      0.16.4
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -230,7 +230,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.16.3";
+  var VERSION = "0.16.4";
 
   // extension/src/config.js
   var BOT_MEMBER = 260239;
@@ -1067,6 +1067,38 @@ One of mods you are using is using an old version of SDK. It will work for now b
     g.stroke();
     return cv;
   }
+  var pictures = /* @__PURE__ */ new Map();
+  function bellyPicture(size, skin) {
+    const key = size + ":" + skin.map((v) => Math.round(v / 4) * 4).join(",");
+    let p = pictures.get(key);
+    if (!p) {
+      const cv = bellyCanvas(size, skin);
+      p = { url: cv.toDataURL("image/png"), width: cv.width, height: cv.height };
+      if (pictures.size > 24) pictures.clear();
+      pictures.set(key, p);
+    }
+    return p;
+  }
+  function scrubCache() {
+    let n = 0;
+    try {
+      for (const name of ["DrawImageCache", "GLDrawImageCache"]) {
+        const m = W[name];
+        if (m && typeof m.forEach === "function" && typeof m.delete === "function") {
+          const bad = [];
+          m.forEach((v, k) => {
+            if (typeof k !== "string") bad.push(k);
+          });
+          for (const k of bad) {
+            m.delete(k);
+            n++;
+          }
+        }
+      }
+    } catch (e) {
+    }
+    return n;
+  }
   function skinAt(C, bx, by) {
     try {
       const gl = W.GLDrawCanvas && W.GLDrawCanvas.GL;
@@ -1088,6 +1120,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var sdk = null;
   function initBelly(mod2) {
     sdk = mod2;
+    setTimeout(scrubCache, 4e3);
   }
   function hookBelly(mod2) {
     if (hooked || !mod2) return;
@@ -1103,10 +1136,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
               if (src.includes("/BodyUpper/")) upper = [x, y];
               if (src.includes("/BodyLower/") && upper) {
                 done = true;
-                const S = SIZES[trial], cv = bellyCanvas(trial, skinAt(C, upper[0], upper[1]));
+                const S = SIZES[trial], cv = bellyPicture(trial, skinAt(C, upper[0], upper[1]));
                 const dx = upper[0] + 250 - cv.width / 2, dy = upper[1] + 432 + S.ry * 0.22 - cv.height / 2;
-                cb.drawImage(cv, dx, dy, {});
-                if (typeof cb.drawImageBlink === "function") cb.drawImageBlink(cv, dx, dy, {});
+                cb.drawImage(cv.url, dx, dy, {});
+                if (typeof cb.drawImageBlink === "function") cb.drawImageBlink(cv.url, dx, dy, {});
               }
             };
             const wrap = (name) => typeof cb[name] === "function" ? (src, x, y, o) => {
@@ -1130,12 +1163,18 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
   function bellyTrial(n, say) {
     trial = Math.max(0, Math.min(3, Math.round(Number(n)) || 0));
+    scrubCache();
     if (trial) hookBelly(sdk);
-    try {
-      if (W.Player && typeof W.CharacterLoadCanvas === "function") W.CharacterLoadCanvas(W.Player);
-    } catch (e) {
-      console.warn("[Farmhand Companion] belly redraw:", e);
-    }
+    const redraw = () => {
+      try {
+        if (W.Player && typeof W.CharacterLoadCanvas === "function") W.CharacterLoadCanvas(W.Player);
+      } catch (e) {
+        console.warn("[Farmhand Companion] belly redraw:", e);
+      }
+    };
+    redraw();
+    setTimeout(redraw, 500);
+    setTimeout(redraw, 1800);
     if (say) say(trial ? "Belly test: " + ["", "small", "medium", "large"][trial] + ". Look at your character with nothing over your middle. Only you can see it. Tell Claude how it looks: the shape, the colour match, where it sits." : "Belly test off.");
   }
 

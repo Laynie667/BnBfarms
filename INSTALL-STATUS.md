@@ -13,7 +13,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 | Map tools, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.3** |
 | Dairy | `farmhand-dairy.user.js` | the bot's PC | **1.0.2** |
 | Shows | `farmhand-shows.user.js` | the bot's PC | **1.0.4** |
-| Farmhand Companion | `farmhand-companion.user.js` | each player | **0.16.3** |
+| Farmhand Companion | `farmhand-companion.user.js` | each player | **0.16.4** |
 | Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.4** |
 
 ## Sending a watch report
@@ -23,6 +23,8 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 - Running the watcher on more than one game at once (the bot, yours, a tester's) lets Claude line them up into one timeline.
 
 ## Latest changes (newest first)
+
+- **Companion 0.16.4: the belly test crash, found and fixed.** Cause (from the watch file of Oct 12, 21:18): pressing a belly size handed the game a drawing instead of a picture address. The live game (R132) files every picture under a text name, so a non-text name went into its picture list and every later character refresh crashed in the game's own clean-up (`AnimationPurge: key.startsWith is not a function`). That broke dressing, restraints and looking at characters until the page was reloaded. The belly is now handed over as a picture address, and the Companion removes any non-text entry from the list when it starts and whenever a belly button is pressed. Reloading the page also clears it. Also learned: the game copy in `reference` is newer than the live game, so its code cannot be trusted to match what players run.
 
 - **Companion 0.16.3: the two experiments made safe.** Reported right after 0.16.2: looking at a character, dressing and adding restraints stopped working properly. Cause not yet confirmed. The belly test no longer hooks the game's drawing at all until one of its buttons is pressed, and the scale trial no longer touches the body or a bra, only worn items. "Undo the scale trial" now also clears anything an earlier trial left on the body.
 

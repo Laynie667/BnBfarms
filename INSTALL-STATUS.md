@@ -24,6 +24,8 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 ## Latest changes (newest first)
 
+- **Outfit studio, step 2: try anything on.** Pick any of the game's 76 slots, then any item in it (with a find box), to put it on or take it off; tint what is on with a colour picker or put the game's own colours back; a "Wearing now" list with a ✕ on each piece. Checked here by dressing a character in the water trap's own gear (tentacles on arms, legs and ass, the tentacle suit, a lactation pump) in the farm's flesh colour, so the studio now shows what farm gear will look like before anybody wears it live.
+
 - **New: the B&B outfit studio (`studio/`), step 1.** An offline dressing room for our own use: double-click `studioStart the studio.bat`. It loads the game's own item list and drawing code from the copy in `reference/`, signs in to nothing, and draws a character exactly as the game would. So far: paste a WCE or BCX outfit code to wear it, copy a look back out as a code, six chest sizes, four hip sizes, three skins, every pose, strip and reset. Checked working here (2,634 items loaded, a look round-trips through its code, body, pose and items draw). See `studio/README.md`. Next: pick any item to try on, then the belly sliders.
 
 - **Companion 0.17.1: no belly drawn on all fours.** Seen live on 0.17.0: the pressed belly showed only as stray lines under the breasts, on all three sizes. On all fours the game shows the body from the front with the chest in the way, so a belly on the ground is hidden behind it and cannot be drawn well with a front-view shape. It is no longer drawn in that pose. Standing, kneeling, the arms poses and hogtied are unchanged.

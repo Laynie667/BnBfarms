@@ -3,8 +3,8 @@
    The game's code is only used to DRAW: it builds a character exactly the way the game does, so every outfit,
    restraint, pose and colour here looks the way it would in the game.
 
-   Step 1 (this file so far): a character on screen · paste an outfit code and see it worn · body size, skin, pose ·
-   copy the code back out.
+   Step 1: a character on screen · paste an outfit code and see it worn · body size, skin, pose · copy the code back out.
+   Step 2: pick any item from any slot and try it on · colour it · see what's worn and take pieces off.
    The codes are the ones WCE and BCX export: the outfit's list of items as JSON, packed with LZString to base64
    (a plain JSON list is taken too).
 
@@ -37,7 +37,7 @@
     redraw();
     return list.length;
   }
-  function redraw() { try { CharacterRefresh(S.C, false, false); } catch (e) { console.warn("[studio] refresh:", e); } syncButtons(); }
+  function redraw() { try { CharacterRefresh(S.C, false, false); } catch (e) { console.warn("[studio] refresh:", e); } syncButtons(); try { fillItems(); fillWorn(); } catch (e) { /* panel not built yet */ } }
 
   // ── body ──
   const bodyItem = (group) => S.C.Appearance.find((a) => a.Asset.Group.Name === group);
@@ -59,6 +59,51 @@
   }
   const poseOn = (name) => { const p = S.C.ActivePose || S.C.Pose || []; return Array.isArray(p) ? p.includes(name) : Object.values(S.C.ActivePoseMapping || {}).includes(name); };
 
+  // ── try something on ──
+  // every slot the game has that something can be put in: restraints and toys first, then clothes and looks
+  function slots() {
+    const body = new Set(["BodyUpper", "BodyLower", "Head", "ArmsLeft", "ArmsRight", "Height", "BodyStyle", "Pronouns", "ItemScript"]);
+    const all = AssetGroup.filter((g) => g.Family === S.C.AssetFamily && !body.has(g.Name) && Asset.some((a) => a.Group === g));
+    const items = all.filter((g) => g.Category === "Item"), looks = all.filter((g) => g.Category !== "Item");
+    const byName = (a, b) => slotName(a).localeCompare(slotName(b));
+    return [["Restraints and toys", items.sort(byName)], ["Clothes and looks", looks.sort(byName)]];
+  }
+  const slotName = (g) => String(g.Description || g.Name).replace(/([a-z])([A-Z])/g, "$1 $2");
+  const itemName = (a) => String(a.Description || a.Name).replace(/([a-z])([A-Z0-9])/g, "$1 $2");
+  const worn = (group) => S.C.Appearance.find((a) => a.Asset.Group.Name === group);
+  function putOn(group, name) {
+    const was = worn(group);
+    if (was && was.Asset.Name === name) { InventoryRemove(S.C, group, false); say("Off: " + name + "."); }
+    else {
+      InventoryWear(S.C, name, group, null, null, null, null, false);
+      const now = worn(group);
+      say(now && now.Asset.Name === name ? "On: " + itemName(now.Asset) + "  (the game calls it " + group + " / " + name + ")" : "The game wouldn't put that on.", !(now && now.Asset.Name === name));
+    }
+    redraw();
+  }
+  function tint(group, colour) {
+    const it = worn(group); if (!it) { say("Nothing's on in that slot to colour.", true); return; }
+    it.Color = colour === "Default" ? "Default" : (Array.isArray(it.Color) || (it.Asset.Layer || []).filter((l) => l.AllowColorize !== false).length > 1 ? (it.Asset.Layer || []).filter((l) => l.AllowColorize !== false).map(() => colour) : colour);
+    redraw(); say(colour === "Default" ? "Back to the game's own colours." : "Every colour layer of " + itemName(it.Asset) + " set to " + colour + ".");
+  }
+  function fillItems() {
+    const box = document.getElementById("fh-items"), sel = document.getElementById("fh-slot"), find = document.getElementById("fh-find");
+    if (!box || !sel) return;
+    const g = AssetGroup.find((x) => x.Name === sel.value && x.Family === S.C.AssetFamily), q = String(find.value || "").toLowerCase().replace(/\s+/g, "");
+    const list = Asset.filter((a) => a.Group === g && (!q || (a.Name + " " + (a.Description || "")).toLowerCase().replace(/\s+/g, "").includes(q)));
+    const on = worn(sel.value);
+    box.replaceChildren(...list.slice(0, 300).map((a) => $("button", { type: "button", className: on && on.Asset.Name === a.Name ? "on" : "", textContent: itemName(a), title: a.Group.Name + " / " + a.Name, onclick: () => putOn(a.Group.Name, a.Name) })),
+      list.length ? "" : $("p", { className: "note", textContent: "Nothing in this slot matches." }));
+    document.getElementById("fh-count").textContent = list.length + " in this slot" + (list.length > 300 ? " (showing the first 300: type to narrow it)" : "");
+  }
+  function fillWorn() {
+    const box = document.getElementById("fh-worn"); if (!box) return;
+    const body = new Set(["BodyUpper", "BodyLower", "Head", "ArmsLeft", "ArmsRight", "Height", "BodyStyle", "Pronouns"]);
+    const list = S.C.Appearance.filter((a) => !body.has(a.Asset.Group.Name) && (a.Asset.Group.Category === "Item" || a.Asset.Group.AllowNone));   // only what can come off: not eyes, mouth or hands
+    box.replaceChildren(...list.map((a) => $("button", { type: "button", textContent: slotName(a.Asset.Group) + ": " + itemName(a.Asset) + "  ✕", title: "Take it off", onclick: () => { InventoryRemove(S.C, a.Asset.Group.Name, false); redraw(); } })),
+      list.length ? "" : $("p", { className: "note", textContent: "Bare." }));
+  }
+
   // ── the panel ──
   const buttons = [];   // [el, isOn()]
   const toggle = (label, isOn, act) => { const el = $("button", { type: "button", textContent: label, onclick: () => { try { act(); } catch (e) { say(String(e && e.message || e), true); } } }); buttons.push([el, isOn]); return el; };
@@ -76,11 +121,23 @@
         $("button", { type: "button", textContent: "Strip to bare", onclick: () => { CharacterNaked(S.C, false); redraw(); say("Bare."); } }),
         $("button", { type: "button", textContent: "Start over", onclick: () => { CharacterAppearanceSetDefault(S.C); redraw(); say("Back to the game's plain starting look."); } })),
       $("div", { id: "fh-say" }),
+      $("h2", { textContent: "Try something on" }),
+      $("div", { className: "row" },
+        $("select", { id: "fh-slot", onchange: () => fillItems() }, slots().map(([label, groups]) => $("optgroup", { label }, groups.map((g) => $("option", { value: g.Name, textContent: slotName(g) + "  (" + g.Name + ")" }))))),
+        $("input", { id: "fh-find", type: "search", placeholder: "find…", oninput: () => fillItems() })),
+      $("p", { className: "note", id: "fh-count" }),
+      $("div", { className: "row", id: "fh-items" }),
+      $("div", { className: "row" }, $("label", { textContent: "Colour what's on in this slot:" }),
+        $("input", { id: "fh-colour", type: "color", value: "#c9577a", onchange: (e) => tint(document.getElementById("fh-slot").value, e.target.value) }),
+        $("button", { type: "button", textContent: "Game's own colours", onclick: () => tint(document.getElementById("fh-slot").value, "Default") })),
+      $("h2", { textContent: "Wearing now" }), $("div", { className: "row", id: "fh-worn" }),
       $("h2", { textContent: "Chest" }), $("div", { className: "row" }, sizes("BodyUpper", ["FlatSmall", "FlatMedium", "Small", "Normal", "Large", "XLarge"])),
       $("h2", { textContent: "Hips and legs" }), $("div", { className: "row" }, sizes("BodyLower", ["Small", "Normal", "Large", "XLarge"])),
       $("h2", { textContent: "Skin" }), $("div", { className: "row" }, ["White", "Asian", "Black"].map((t) => toggle(t, () => { const u = bodyItem("BodyUpper"); const c = u && (Array.isArray(u.Color) ? u.Color[0] : u.Color); return c === t; }, () => setSkin(t)))),
       POSES.map(([label, list]) => [$("h2", { textContent: "Pose: " + label.toLowerCase() }), $("div", { className: "row" }, list.map((p) => toggle(p.replace(/([a-z])([A-Z])/g, "$1 $2").replace(/^Base (Upper|Lower)$/, "Relaxed"), () => poseOn(p), () => setPose(p))))]));
     document.body.append(root);
+    document.getElementById("fh-slot").value = "ItemNipples";
+    fillItems(); fillWorn();
     syncButtons();
   }
 
@@ -93,13 +150,14 @@
     try { CurrentScreenFunctions.Unload && CurrentScreenFunctions.Unload(); } catch (e) { console.warn("[studio] leaving the sign-in screen:", e); }
     for (const el of document.querySelectorAll("body > *")) if (el.id !== "MainCanvas" && el.id !== "fh-studio" && el.tagName !== "SCRIPT" && el.tagName !== "LINK") el.style.display = "none";   // the sign-in form
     const none = () => {};
+    document.body.classList.add("fh-studio-on");   // (studio.css hides the sign-in form, however late the game adds it)
     CurrentScreen = "FarmStudio";
     CurrentScreenFunctions = { Run: run, Draw: none, Click: none, MouseDown: none, MouseUp: none, MouseMove: none, MouseWheel: none, Load: async () => {}, Unload: none, Resize: none, KeyDown: () => false, KeyUp: () => false, Exit: none, Paste: none };
     S.C = CharacterLoadSimple("FarmStudio");
     CharacterAppearanceSetDefault(S.C);
     CharacterRefresh(S.C, false, false);
     panel(); S.ready = true;
-    window.FarmStudio = { S, wear, decode, encode, setBody, setSkin, setPose, redraw };   // for poking at from the console
+    window.FarmStudio = { S, wear, decode, encode, setBody, setSkin, setPose, redraw, putOn, tint, slots };   // for poking at from the console
     say("Ready. Paste an outfit code, or change the body and pose below.");
   }
   let tries = 0;

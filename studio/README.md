@@ -36,11 +36,19 @@ the game's pictures into the drawing.
 - **Poses.** Arms, legs, all fours and hogtied.
 - *Strip to bare* and *Start over*.
 
+## Step 2: try anything on
+
+- **Pick a slot, pick an item.** Every slot the game has (28 for restraints and toys, 48 for clothes and looks), with a
+  box to narrow the list. Click an item to put it on, click it again to take it off. Hover for the game's own name
+  for it, which is what the farm's gear lists use.
+- **Colour it.** A colour picker tints every colour layer of what is on in that slot; one button puts the game's own
+  colours back.
+- **Wearing now** lists what is on, each with a ✕ to take it off.
+
 ## What it is for next
 
-1. Try on any item from any slot, by picking it.
-2. The belly, and other drawn body parts, with sliders for size, position, width and hang, in every pose.
-3. Saving those fits to a file the body extension reads.
+1. The belly, and other drawn body parts, with sliders for size, position, width and hang, in every pose.
+2. Saving those fits to a file the body extension reads.
 
 ## Good to know
 

@@ -13,3 +13,10 @@
 #fh-studio label { color: #c5c9d2; margin-right: 6px; }
 #fh-studio #fh-say { min-height: 20px; margin-top: 8px; color: #e0b866; font-size: 13px; white-space: pre-wrap; }
 #fh-studio .bad { color: #e88a7a; }
+#fh-studio input[type=search] { background: #12141a; color: #e8e4da; border: 1px solid #3a3f49; border-radius: 6px; padding: 6px 8px; font: inherit; width: 150px; }
+#fh-studio select { max-width: 100%; }
+#fh-studio #fh-items { max-height: 230px; overflow-y: auto; border: 1px solid #2f343d; border-radius: 6px; padding: 4px; }
+#fh-studio #fh-items button, #fh-studio #fh-worn button { font-size: 12.5px; padding: 4px 8px; }
+#fh-studio input[type=color] { width: 40px; height: 30px; padding: 0; border: 1px solid #454b57; border-radius: 6px; background: none; vertical-align: middle; margin-right: 6px; }
+/* nothing of the game's own pages shows: only its canvas and our panel */
+body.fh-studio-on > :not(#MainCanvas):not(#fh-studio) { display: none !important; }

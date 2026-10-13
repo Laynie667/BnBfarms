@@ -96,6 +96,12 @@ the game's pictures into the drawing.
   not set to "behind".
 - The list of moulded pieces is saved in `fits/items.json` when you press *Save this fit*.
 
+## Step 32: filled, not sat on
+
+- A long piece (a top, a dress) is grown over the breasts only; below them it is as the game drew it. No shelf.
+- What lies under the breasts and props them (an underbust corset) holds them too.
+- One breast shape, dressed or bare, by default. *Bare: they hang free* brings the hanging teardrop back.
+
 ## Step 31: the same for the belly, and for every slot
 
 - A piece holds the breasts in the game's shape if it actually lies over them, whatever slot it is in.

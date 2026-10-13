@@ -368,6 +368,16 @@
     { const m = new RegExp("(?:^|/)Assets/[^/]+/([^/]+)/").exec(src); if (!m || !chestSlot(m[1])) return false; }
     const pk = pieceKey || src; if (bellyCover(src, x, y, ctx) >= 0.15) MOULD.lies.add(pk); if (!MOULD.lies.has(pk)) return false;   // (if any layer of a piece lies on the belly, all of its layers grow together)
     return mouldCanvas(src, x, y, ctx, "auto|" + (pieceKey || src), "auto"); }
+  // How far a whole piece reaches, over all its layers: its left and right edge on every row of the screen, and its last
+  // row. Each layer's picture adds to it as it's drawn; when it grows, the picture is drawn again.
+  function pieceSpan(pk, src, x, y) {
+    const span = MOULD.span.get("p|" + pk) || { L: new Float32Array(2600).fill(1e9), R: new Float32Array(2600).fill(-1e9), v: 0, bottom: -1 };
+    MOULD.span.set("p|" + pk, span);
+    const p0 = edgesOf(src); let grew = false;
+    if (p0) for (let j = 0; j < p0.h; j++) { const yy = Math.round(y) + j; if (p0.L[j] < 0 || yy < 0 || yy >= 2600) continue; if (x + p0.L[j] < span.L[yy]) { span.L[yy] = x + p0.L[j]; grew = true; } if (x + p0.R[j] > span.R[yy]) { span.R[yy] = x + p0.R[j]; grew = true; } if (yy > span.bottom) { span.bottom = yy; grew = true; } }
+    if (grew) { span.v++; MOULD.ver++; clearTimeout(MOULD.t); MOULD.t = setTimeout(bellyDraw, 60); }
+    return span;
+  }
   // the belly's first and last row on the screen
   function bellyRows(ctx) { const b = ctx.belly, bp = b.prof || (b.prof = edges(b.cv, b.cv.width, b.cv.height)); let t = -1, e = -1; for (let j = 0; j < bp.h; j++) if (bp.L[j] >= 0) { if (t < 0) t = j; e = j; } return t < 0 ? null : { top: Math.round(b.dy) + t, bottom: Math.round(b.dy) + e }; }
   function mouldCanvas(src, x, y, ctx, piece, mode) {
@@ -446,7 +456,7 @@
   // Flat to R. The first six cups are the game's own chest sizes: picking one just changes the body. From DD up they're
   // drawn (breasts-drawing.js), over the game's biggest chest, standing and kneeling only for now. The game's nipples,
   // and whatever is worn on them, are lifted off where the game puts them and set down on the drawn ones.
-  const BREAST = { holds: {}, holdSig: "", wear: {}, dress: true, cover: new Map(), cup: null, full: 1, hang: 1, apart: 1, x: 0, y: 0, nip: 1, nipY: 0, nipX: 0, cv: null, cvKey: "", halves: new Map(), out: new Map() };
+  const BREAST = { free: false, holds: {}, holdSig: "", wear: {}, dress: true, cover: new Map(), cup: null, full: 1, hang: 1, apart: 1, x: 0, y: 0, nip: 1, nipY: 0, nipX: 0, cv: null, cvKey: "", halves: new Map(), out: new Map() };
   const BREAST_SLIDERS = [["full", "Fullness", 0.7, 1.4, 0.01], ["hang", "Weight (how low and heavy they hang)", 0, 2, 0.01], ["apart", "Apart / together", 0.6, 1.5, 0.01], ["x", "Left / right", -60, 60, 1], ["y", "Up / down", -80, 80, 1],
     ["nip", "Nipple size (and what's worn on them)", 0.4, 4, 0.05], ["nipY", "Nipples up / down", -80, 80, 1], ["nipX", "Nipples in / out", -60, 60, 1]];
   const NIP_GROUPS = new Set(["Nipples", "ItemNipples", "ItemNipplesPiercings"]);
@@ -458,7 +468,10 @@
   // Not by slot (a pair of wrist cuffs is in the arms slot and holds nothing; a straitjacket is in it too and does): by
   // whether the piece actually lies over the breasts. That's seen as it's drawn, so it's known from the drawing before:
   // BREAST.holds is the pieces that covered the breasts last time, and when that changes the picture is drawn again.
-  const heldNow = () => BREAST.hold !== false && S.C.Appearance.some((it) => BREAST.holds[mouldKey(it)] && !["plain", "behind"].includes(BREAST.wear[mouldKey(it)] || ""));
+  // And bare? Laynie crossed both bare pictures on the Oct 13 sheet, the only ones where they hung in the other shape. So
+  // by default it's one shape always: the game's own breast a size up, dressed or not. BREAST.free brings the hanging
+  // teardrop back for when nothing over the chest is holding them.
+  const heldNow = () => BREAST.hold !== false && (!BREAST.free || S.C.Appearance.some((it) => BREAST.holds[mouldKey(it)] && !["plain", "behind"].includes(BREAST.wear[mouldKey(it)] || "")));
   // What's worn over the chest. Every one of these is cut for the game's biggest chest, so on drawn breasts it would
   // sit in the middle like a patch. Instead the part of the piece that covered each of the game's breasts is taken and
   // GROWN onto the drawn one: same piece, same colours and shading, stretched from the game's breast to ours and kept
@@ -558,6 +571,7 @@
         $("div", { className: "row" },
           $("button", { type: "button", className: "go", textContent: "Save the breasts", onclick: saveBreasts }),
           $("button", { type: "button", textContent: "Put the saved ones back", onclick: () => loadBreasts(true) }),
+          $("button", { type: "button", className: BREAST.free ? "on" : "", textContent: BREAST.free ? "Bare: they hang free" : "Bare: same shape as dressed", title: "With nothing over the chest: the same round shape as when she's dressed, or hanging free in a teardrop", onclick: () => { BREAST.free = !BREAST.free; fill(); bellyDraw(); } }),
           $("button", { type: "button", className: BREAST.dress ? "on" : "", textContent: BREAST.dress ? "Clothes a size up: on" : "Clothes a size up: off", title: "What's worn over the chest is drawn a size up, and the breasts take its shape", onclick: () => { BREAST.dress = !BREAST.dress; fill(); bellyDraw(); } }),
           $("button", { type: "button", textContent: "Sliders back to plain", onclick: () => { Object.assign(BREAST, { full: 1, hang: 1, apart: 1, x: 0, y: 0, nip: 1, nipY: 0, nipX: 0 }); fill(); bellyDraw(); } }))].flat(Infinity));
     };
@@ -644,7 +658,7 @@
             const key = src + "|" + Math.round(x) + "," + Math.round(y); let v = BREAST.cover.get(key); if (v != null) return v;
             const w = im.naturalWidth, h = im.naturalHeight, c = document.createElement("canvas"); c.width = w; c.height = h;
             const g = c.getContext("2d", { willReadFrequently: true }); g.drawImage(im, 0, 0);
-            const GB = gameBreast(B), d = g.getImageData(0, 0, w, h).data, R = GB.r; let hit = 0, all = 0;
+            const GB = gameBreast(B), d = g.getImageData(0, 0, w, h).data, R = Math.round(GB.r * 1.3); let hit = 0, all = 0;   // (a third wider than the breast: an underbust corset or a shelf bra lies under it, not on it, and it's holding it all the same)
             for (const sd of [-1, 1]) { const cx = Math.round(B.mid + sd * GB.dx - x), cy = Math.round(B.uy + GB.y - y);
               for (let j = -R; j <= R; j += 2) for (let i = -R; i <= R; i += 2) { if (i * i + j * j > R * R) continue; all++; const px = cx + i, py = cy + j; if (px >= 0 && py >= 0 && px < w && py < h && d[(py * w + px) * 4 + 3] > 60) hit++; } }
             v = all ? hit / all : 0; BREAST.cover.set(key, v); return v;
@@ -686,21 +700,36 @@
           //   · It's only shown where there's something for it to lie on: the breasts, or the body. Nothing hangs in the air.
           const dressDraw = (name, src, x, y, o) => {
             const B = ctx.breast, im = B && B.held && mouldImg(src); if (!im) return false;
-            if (chestCover(src, im, x, y, B) < 0.05) return false;
-            const key = "dress|" + src + "|" + Math.round(x) + "," + Math.round(y) + "|" + B.sig + "|" + (ctx.belly && !fit.behind && BELLY.auto !== false ? ctx.sig + "|" + MOULD.ver : "");
+            if (chestCover(src, im, x, y, B) < 0.05 && !BREAST.holds[(pieceOf(src) || {}).key]) return false;   // (a buckle or a bow on a piece that covers the chest grows with it)
+            const key = "dress|" + src + "|" + Math.round(x) + "," + Math.round(y) + "|" + B.sig + "|" + (ctx.belly && !fit.behind && BELLY.auto !== false ? ctx.sig : "") + "|" + MOULD.ver;
             let c = BREAST.out.get(key);
             if (!c) {
               const MX = 260, MY = 480, w = im.naturalWidth, h = im.naturalHeight, S2 = B.S, G = FarmBreasts.GAME, sc = S2.sc;
               c = document.createElement("canvas"); c.width = w + MX * 2; c.height = h + MY * 2; c.MX = MX; c.MY = MY;
               const g = c.getContext("2d", { willReadFrequently: true }), midX = MX + B.mid - x, uyc = MY + B.uy - y;
-              g.drawImage(im, MX, MY);
-              const CW = c.width, CH = c.height, sp = g.getImageData(0, 0, CW, CH).data;   // (the chest is read from the game's own picture…)
-              const overBelly = bellyAuto(src, x, y, ctx, fit.behind, (pieceOf(src) || {}).key);                       // (…and laid on the piece as it is once it's been grown to the belly, if she has one)
-              if (overBelly) { g.clearRect(0, 0, CW, CH); g.drawImage(overBelly, MX - MOULD.M, MY); }
-              const y1 = uyc + G.y1, y2 = uyc + G.y2, y3 = uyc + G.y3;
-              // how much things have grown on a row of the game's picture: nothing above y1, fully by y2
-              const grown = (yn) => { const t = Math.max(0, Math.min(1, (yn - y1) / (y2 - y1))); return 1 + (sc - 1) * t * t * (3 - 2 * t); };
-              const yEnd = Math.min(CH - 2, Math.floor(uyc + FarmBreasts.heldY(G.y3, sc)));
+              const pk = (pieceOf(src) || {}).key || src, CW = c.width, CH = c.height;
+              const overBelly = bellyAuto(src, x, y, ctx, fit.behind, pk);   // (the piece as it is once it's been grown to the belly, if she has one: the chest is laid on that)
+              if (overBelly) g.drawImage(overBelly, MX - MOULD.M, MY); else g.drawImage(im, MX, MY);
+              const sp = g.getImageData(0, 0, CW, CH).data;
+              const y1 = uyc + G.y1, y2 = uyc + G.y2, y3 = uyc + G.y3, flapEnd = uyc + FarmBreasts.heldY(G.y3, sc);
+              // FILLED, not laid on top (Laynie, Oct 13, of a school uniform whose top had come out as a wide block ending in
+              // a straight line across her middle: "think about how the tits and/or belly fill the clothing, instead of how
+              // the clothing sits on top"). A bra ends under the breasts and that's that. But a top, a dress, a jacket goes
+              // on down, and the grown part mustn't end in a shelf. So for a long piece the grown part is shown ONLY ON THE
+              // BREASTS below their middle: its lower edge is the round underside of each breast, the cloth pulled full
+              // over them, and under that the rest of the piece is just as the game drew it, on the body where it
+              // always was. (I tried re-laying the rest of the piece too, letting the width out down to the hem. It
+              // dragged sleeves and cuffs about with it, because a sleeve crossing the body can't be told from the body
+              // of the dress. The rest of the piece is right as it is.) Whether a piece is long is seen from where it
+              // ends, over all its layers: a short one, a bra, keeps its band under the breasts.
+              const span = pieceSpan(pk, src, x, y), pb = span.bottom > 0 ? MY + span.bottom - y : 0;
+              const drape = pb > flapEnd + 24;   // a long piece: it goes on well below the breasts
+              const sm = (t) => { t = Math.max(0, Math.min(1, t)); return t * t * (3 - 2 * t); };
+              // how much things have grown on a row of the game's picture: nothing above y1, fully by y2, and (draping) easing off again below y3
+              const grown = (yn) => 1 + (sc - 1) * sm((yn - y1) / (y2 - y1));
+              // where a row of the game's picture lands
+              const lands = (yn) => uyc + FarmBreasts.heldY(yn - uyc, sc);
+              const ynMax = y3, yEnd = Math.min(CH - 2, Math.floor(flapEnd));
               // the body's own outline, row by row, and where our two breasts are
               const prof = edgesOf(B.upperSrc), ux = MX + B.ux - x, bcy = MY + B.ry - y + S2.by, bcx = [midX + (B.rx - B.mid) - S2.bx, midX + (B.rx - B.mid) + S2.bx];
               const onBreast = (qx, qy) => { for (let k = 0; k < 2; k++) { const dx = qx - bcx[k], rxk = (k ? dx > 0 : dx < 0) ? S2.ro : S2.ri, dy = (qy - bcy) / (S2.rv + 2); if ((dx / (rxk + 2)) * (dx / (rxk + 2)) + dy * dy <= 1) return true; } return false; };
@@ -711,14 +740,14 @@
                 for (let j = 0; j < bh; j++) {
                   const qy = y0 + j;
                   // which row of the game's picture this is: step down it until its grown position reaches us
-                  while (yn < y3 && uyc + FarmBreasts.heldY(yn + 0.25 - uyc, sc) < qy) yn += 0.25;
+                  while (yn < ynMax && lands(yn + 0.25) < qy) yn += 0.25;
                   const sg = grown(yn), pj = Math.round(qy - uyc), tl = prof && pj >= 0 && pj < prof.h ? prof.L[pj] : -1, tr = tl >= 0 ? prof.R[pj] : -1;
                   for (let i = 0; i < bw; i++) {
                     const qx = x0 + i;
                     // (and above the middle of the breasts, anywhere between their outer edges: a strap from the shoulder to the top of a
                     // big breast runs out past the side of the chest on its way. Cut off at the body's edge it was left in
                     // pieces: Laynie's marks on the R-cups, Oct 13.)
-                    if (!(onBreast(qx, qy) || (prof ? (tl >= 0 && qx >= ux + tl && qx <= ux + tr) : Math.abs(qx - midX) <= 80) || (qy <= bcy && Math.abs(qx - midX) <= S2.bx + S2.ro))) continue;
+                    if (!(onBreast(qx, qy) || ((!drape || qy <= bcy) && (prof ? (tl >= 0 && qx >= ux + tl && qx <= ux + tr) : Math.abs(qx - midX) <= 80)) || (qy <= bcy && Math.abs(qx - midX) <= S2.bx + S2.ro))) continue;
                     const o4 = (j * bw + i) * 4; hi.data[o4 + 3] = 255;
                     const fx = midX + (qx - midX) / sg, fy = yn, ix = Math.floor(fx), iy = Math.floor(fy); if (ix < 0 || iy < 0 || ix >= CW - 1 || iy >= CH - 1) continue;
                     const ax = fx - ix, ay = fy - iy, p00 = (iy * CW + ix) * 4, p10 = p00 + 4, p01 = p00 + CW * 4, p11 = p01 + 4;

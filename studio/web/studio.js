@@ -643,7 +643,8 @@
               g.drawImage(im, MX, MY);
               // the game's picture, to read from (in the big canvas's own coordinates, so the empty margin reads as empty)
               const srcData = g.getImageData(0, 0, c.width, c.height), sp = srcData.data, CW = c.width, CH = c.height;
-              const sx = S2.r * 1.04 / (GB.r * 1.08), sy = S2.r * (1 + S2.sag * 0.6) / (GB.r * 1.08);
+              // (more than the game's breast is taken, a quarter again: the straps that ring it and run under it sit just outside it, and they belong on ours)
+              const sx = S2.r * 1.04 / (GB.r * 1.26), sy = S2.r * (1 + S2.sag) / (GB.r * 1.26);
               const half = plain ? 0 : strapHalf(src, im, x, y, B), sAvg = (sx + sy) / 2, want = 1 + 0.35 * S2.k;
               const pare = half > 0 && half <= 8 ? Math.max(0, Math.min(half * sAvg - 1.4, half * (sAvg - want))) : 0;
               const N = 720;

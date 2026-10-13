@@ -365,7 +365,7 @@
   // the piece grown to the belly, if it covers it and nothing else has been chosen for it: the canvas, false (nothing to grow) or null (not ready)
   function bellyAuto(src, x, y, ctx, behind, pieceKey) { if (!ctx.belly || behind || BELLY.auto === false || typeof src !== "string") return null;
     // worn things only: not her hands, her skin or her hair
-    { const m = new RegExp("(?:^|/)Assets/[^/]+/([^/]+)/").exec(src); if (!m || !chestSlot(m[1])) return false; }
+    { const m = new RegExp("(?:^|/)Assets/[^/]+/(?:Override/[^/]+/)?([^/]+)/").exec(src); if (!m || !chestSlot(m[1])) return false; }
     const pk = pieceKey || src; if (bellyCover(src, x, y, ctx) >= 0.15) MOULD.lies.add(pk); if (!MOULD.lies.has(pk)) return false;   // (if any layer of a piece lies on the belly, all of its layers grow together)
     return mouldCanvas(src, x, y, ctx, "auto|" + (pieceKey || src), "auto"); }
   // How far a whole piece reaches, over all its layers: its left and right edge on every row of the screen, and its last
@@ -592,7 +592,7 @@
         if (fit && (fit.on || br) && cb && typeof cb.drawImage === "function") {
           let upper = null, lower = false, done = false;
           const ctx = { bodies: [], belly: null, sig: "", seen: {} }; if (br) { seenNow = ctx.seen; handFNow = { get v() { return ctx.handF; } }; }
-          const slot = new RegExp("(?:^|/)Assets/[^/]+/([^/]+)/");
+          const slot = new RegExp("(?:^|/)Assets/[^/]+/(?:Override/[^/]+/)?([^/]+)/");
           const groupOf = (src) => { const m = slot.exec(src); return m ? m[1] : ""; };
           // (a piece's pictures are in its slot's folder or the folder of the slot it borrows its art from, named for the piece)
           const mouldList = S.C.Appearance.filter((it) => MOULD.items.has(mouldKey(it))).map((it) => ({ folders: [it.Asset.Group.Name, it.Asset.DynamicGroupName], name: it.Asset.Name, key: mouldKey(it), mode: MOULD.mode.get(mouldKey(it)) || "wide" }));
@@ -811,17 +811,19 @@
                 // pushed out by the breast is taut between the two: a straight line. So on a piece that's cloth over the
                 // breasts, each row from the shoulder down to the middle of the bust is let out, at its outer part only, until
                 // its edge is on that line. (The middle of the row, the front of the bust, isn't touched.)
+                // (Each side is worked on its own. An off-the-shoulder top has cloth to the shoulder on one side and a bare
+                // shoulder on the other, and taking one width for both pulled cloth up over the bare one.)
                 if (tentOn) {
-                  const midR = midX - x0, halfOf = (j) => { const o = j * bw * 4; let l = -1, r = -1; for (let i = 0; i < bw; i++) if (od[o + i * 4 + 3] > 40) { if (l < 0) l = i; r = i; } return l < 0 ? 0 : Math.max(midR - l, r - midR); };
-                  const jEnd = Math.min(bh - 1, Math.round(bcy - y0)); let j0 = -1, top = 0;
-                  for (let j = 0; j < jEnd; j++) { const hf = halfOf(j); if (hf > 12) { j0 = j; top = hf; break; } }
-                  if (j0 >= 0 && jEnd - j0 > 8) {
-                    const side = S2.bx + S2.ro, row = new Uint8ClampedArray(bw * 4);
+                  const midR = midX - x0, jEnd = Math.min(bh - 1, Math.round(bcy - y0)), side = S2.bx + S2.ro, row = new Uint8ClampedArray(bw * 4);
+                  for (const sg2 of [-1, 1]) {
+                    const halfOf = (j) => { const o = j * bw * 4; let far = 0; for (let d = 1; d < bw; d++) { const i = Math.round(midR + sg2 * d); if (i < 0 || i >= bw) break; if (od[o + i * 4 + 3] > 40) far = d; } return far; };
+                    let j0 = -1, top = 0; for (let j = 0; j < jEnd; j++) { const hf = halfOf(j); if (hf > 12) { j0 = j; top = hf; break; } }
+                    if (j0 < 0 || jEnd - j0 <= 8) continue;
                     for (let j = j0 + 1; j <= jEnd; j++) {
                       const hf = halfOf(j), want = top + (side - top) * (j - j0) / (jEnd - j0); if (hf < 8 || want <= hf + 1) continue;
-                      const o = j * bw * 4, inner = hf * 0.55; row.set(od.subarray(o, o + bw * 4));
-                      for (let i = 0; i < bw; i++) { const d = Math.abs(i - midR); if (d <= inner || d > want) continue;
-                        const sd = inner + (d - inner) * (hf - inner) / (want - inner), si = Math.round(midR + (i < midR ? -sd : sd)); if (si < 0 || si >= bw) continue;
+                      const o = j * bw * 4, inner = 0; row.set(od.subarray(o, o + bw * 4));   /* the whole half-row is let out evenly: letting out only its outer part smeared the dark shading at a top's edge into a wide dark wing */
+                      for (let d = 1; d <= want; d++) { const i = Math.round(midR + sg2 * d); if (i < 0 || i >= bw) break;
+                        const si = Math.round(midR + sg2 * (inner + (d - inner) * (hf - inner) / (want - inner))); if (si < 0 || si >= bw) continue;
                         od[o + i * 4] = row[si * 4]; od[o + i * 4 + 1] = row[si * 4 + 1]; od[o + i * 4 + 2] = row[si * 4 + 2]; od[o + i * 4 + 3] = row[si * 4 + 3]; }
                     }
                   }
@@ -838,14 +840,20 @@
                 const ell = (k, grow, dy) => { g.beginPath(); g.ellipse(bcx[k] + (k ? 1 : -1) * (S2.ro - S2.ri) / 2, bcy + (dy || 0), (S2.ro + S2.ri) / 2 + grow, S2.rv + grow, 0, 0, Math.PI * 2); };
                 // the shadow they throw on the piece below them
                 g.drawImage(T, x0, y0);
-                atop(() => { g.filter = "blur(5px)"; g.fillStyle = "rgba(0,0,0,0.26)"; for (let k = 0; k < 2; k++) { ell(k, -2, 7 + S2.rv * 0.06); g.fill(); } });
+                // (This shadow was landing on the breasts themselves as well as under them, darkening the whole front of every top by a
+                // quarter: discs of a different colour on the pink T-shirt, the maid's white, the bra. Laynie, Oct 13: "weird
+                // coloring issues". It's kept off them now: it falls only below their undersides. And the darkening
+                // underneath each one is half what it was, and starts lower.)
+                atop(() => { g.beginPath(); g.rect(0, 0, CW, CH); for (let k = 0; k < 2; k++) g.ellipse(bcx[k] + (k ? 1 : -1) * (S2.ro - S2.ri) / 2, bcy, (S2.ro + S2.ri) / 2 + 1, S2.rv + 1, 0, 0, Math.PI * 2); g.clip("evenodd");
+                  g.beginPath(); g.rect(0, bcy + S2.rv * 0.55, CW, CH); g.clip();
+                  g.filter = "blur(4px)"; g.fillStyle = "rgba(0,0,0,0.20)"; for (let k = 0; k < 2; k++) { ell(k, -6, 6 + S2.rv * 0.05); g.fill(); } });
                 atop(() => { for (let k = 0; k < 2; k++) { g.save(); ell(k, 1, 0); g.clip();
-                    const under = g.createLinearGradient(0, bcy + S2.rv * 0.05, 0, bcy + S2.rv); under.addColorStop(0, "rgba(0,0,0,0)"); under.addColorStop(1, "rgba(0,0,0,0.34)");
+                    const under = g.createLinearGradient(0, bcy + S2.rv * 0.5, 0, bcy + S2.rv); under.addColorStop(0, "rgba(0,0,0,0)"); under.addColorStop(1, "rgba(0,0,0,0.16)");
                     g.fillStyle = under; g.fillRect(0, bcy, CW, S2.rv + 4);
                     const hx = bcx[k] - S2.ro * 0.18, hy = bcy - S2.rv * 0.38, light = g.createRadialGradient(hx, hy, 0, hx, hy, S2.rv * 0.6); light.addColorStop(0, "rgba(255,255,255,0.04)"); light.addColorStop(1, "rgba(255,255,255,0)");
                     g.fillStyle = light; g.fillRect(0, 0, CW, CH); g.restore(); }
                   // down between them
-                  const cl = g.createLinearGradient(midX - S2.ri * 0.3, 0, midX + S2.ri * 0.3, 0); cl.addColorStop(0, "rgba(0,0,0,0)"); cl.addColorStop(0.5, "rgba(0,0,0,0.30)"); cl.addColorStop(1, "rgba(0,0,0,0)");
+                  const cl = g.createLinearGradient(midX - S2.ri * 0.3, 0, midX + S2.ri * 0.3, 0); cl.addColorStop(0, "rgba(0,0,0,0)"); cl.addColorStop(0.5, "rgba(0,0,0,0.14)"); cl.addColorStop(1, "rgba(0,0,0,0)");
                   g.save(); g.beginPath(); for (let k = 0; k < 2; k++) g.ellipse(bcx[k] + (k ? 1 : -1) * (S2.ro - S2.ri) / 2, bcy, (S2.ro + S2.ri) / 2, S2.rv, 0, 0, Math.PI * 2); g.clip(); g.fillStyle = cl; g.fillRect(midX - S2.ri * 0.3, bcy - S2.rv * 0.35, S2.ri * 0.6, S2.rv * 1.3); g.restore();
                   // the line of the underside
                   g.strokeStyle = "rgba(0,0,0,0.42)"; g.lineWidth = 1.5; g.lineCap = "round";
@@ -926,7 +934,15 @@
             if (br && typeof src === "string") { const gname = groupOf(src);
               if (!done && gname === "Nipples") { held.push([name, src, x, y, o]); return; }
               if (done && NIP_GROUPS.has(gname)) { try { if (nipDraw(name, src, x, y, o)) return; } catch (e) { console.warn("[studio] nipples:", e); } }
-              if (done && chestSlot(gname) && !isMoulded(src)) { const piece = pieceOf(src), how = (piece && BREAST.wear[piece.key]) || "";
+              // A decal (lettering, a logo, a mark) is its own piece, sitting on the chest. Grown with the chest it's the game's
+              // picture blown up, and lettering goes soft and fat (Laynie, Oct 13: "the hornywood decal isn't part of the
+              // shirt"). So a decal is never grown: it's the game's own picture at its own size, moved down to where that
+              // part of her chest now is.
+              if (done && /Decal/i.test(gname) && ctx.breast && ctx.breast.held) {
+                try { const p0 = edgesOf(src); if (p0) { let t0 = -1, t1 = -1; for (let j = 0; j < p0.h; j++) if (p0.L[j] >= 0) { if (t0 < 0) t0 = j; t1 = j; }
+                    if (t0 >= 0) { const cyL = y + (t0 + t1) / 2 - ctx.breast.uy; real[name](src, x, y + (FarmBreasts.heldY(cyL, ctx.breast.S.sc) - cyL), o); return; } } } catch (e) { console.warn("[studio] decal:", e); }
+              }
+              if (done && chestSlot(gname) && !/Decal/i.test(gname) && !isMoulded(src)) { const piece = pieceOf(src), how = (piece && BREAST.wear[piece.key]) || "";
                 try { const im0 = piece && ctx.breast && mouldImg(src); if (im0 && chestCover(src, im0, x, y, ctx.breast, true) >= 0.05) ctx.seen[piece.key] = true; if (im0 && chestCover(src, im0, x, y, ctx.breast, false) >= 0.05) ctx.seen["on:" + piece.key] = true; if (im0 && chestCover(src, im0, x, y, ctx.breast, false) >= 0.6) ctx.seen["solid:" + piece.key] = true; } catch (e) { /* only a measurement */ }
                 try { if (how === "behind") { if (handDraw(name, src, x, y, o)) return; }
                   else if (how !== "plain" && BREAST.dress) { if (dressDraw(name, src, x, y, o)) return; } } catch (e) { console.warn("[studio] chest wear:", e); } }

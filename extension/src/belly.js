@@ -133,7 +133,10 @@ function skinGate(C) {
   if (last < 0) return null;
   // (the game's picture addresses are relative, "Assets/Female3DCG/Pussy/…", with no slash in front: a pattern that
   // wanted one never matched, the gate never opened, and the belly went on last, over everything. Oct 12.)
-  const slot = new RegExp("(?:^|/)Assets/[^/]+/([^/]+)/");
+  // (and a body STYLE's pictures live a folder deeper, "Assets/Female3DCG/Override/EchoV2/Pussy/…": read as they stood, every
+  // one of them was in a slot called "Override", so on a character with a body style nothing was recognised. Found on
+  // Laynie's own outfit, Oct 13.)
+  const slot = new RegExp("(?:^|/)Assets/[^/]+/(?:Override/[^/]+/)?([^/]+)/");
   return (src) => {
     const m = slot.exec(String(src)); if (!m) return false;
     // (an item's pictures can live in ANOTHER slot's folder: a corset locked on as a restraint draws from "Corset", not
@@ -222,7 +225,7 @@ function hookBelly(mod) {
           // first thing that isn't skin, or at the very end on a bare body.
           let upper = null, lower = false, done = false;
           const gate = skinGate(C);   // the game's own layer list, when it has one (belly drawing block)
-          const prio = (src) => { const m = new RegExp("(?:^|/)Assets/[^/]+/([^/]+)/").exec(src); if (!m) return 99; try { const g = W.AssetGroupGet && W.AssetGroupGet(C.AssetFamily, m[1]); return g && typeof g.DrawingPriority === "number" ? g.DrawingPriority : 99; } catch (e) { return 99; } };
+          const prio = (src) => { const m = new RegExp("(?:^|/)Assets/[^/]+/(?:Override/[^/]+/)?([^/]+)/").exec(src); if (!m) return 99; try { const g = W.AssetGroupGet && W.AssetGroupGet(C.AssetFamily, m[1]); return g && typeof g.DrawingPriority === "number" ? g.DrawingPriority : 99; } catch (e) { return 99; } };
           const paint = () => {
             if (done || !upper || !lower) return; done = true;
             const S = SIZES[trial], cv = bellyPicture(trial, skinFor(upper[2], upper[3]), upper[4] === "AllFours");   // { url, width, height }: a picture the game can cache by name

@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.17.5
+// @version      0.17.6
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -230,7 +230,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.17.5";
+  var VERSION = "0.17.6";
 
   // extension/src/config.js
   var BOT_MEMBER = 260239;
@@ -1149,7 +1149,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     let last = -1, at = 0;
     for (let i = 0; i < layers.length; i++) if (SKIN_UNDER[groupOf3(layers[i])]) last = i;
     if (last < 0) return null;
-    const slot = new RegExp("(?:^|/)Assets/[^/]+/([^/]+)/");
+    const slot = new RegExp("(?:^|/)Assets/[^/]+/(?:Override/[^/]+/)?([^/]+)/");
     return (src) => {
       const m = slot.exec(String(src));
       if (!m) return false;
@@ -1255,7 +1255,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
             let upper = null, lower = false, done = false;
             const gate = skinGate(C);
             const prio = (src) => {
-              const m = new RegExp("(?:^|/)Assets/[^/]+/([^/]+)/").exec(src);
+              const m = new RegExp("(?:^|/)Assets/[^/]+/(?:Override/[^/]+/)?([^/]+)/").exec(src);
               if (!m) return 99;
               try {
                 const g = W.AssetGroupGet && W.AssetGroupGet(C.AssetFamily, m[1]);

@@ -772,8 +772,17 @@
                     // (and above the middle of the breasts, anywhere between their outer edges: a strap from the shoulder to the top of a
                     // big breast runs out past the side of the chest on its way. Cut off at the body's edge it was left in
                     // pieces: Laynie's marks on the R-cups, Oct 13.)
-                    if (!(onBreast(qx, qy) || ((!drape || qy <= bcy) && (prof ? (tl >= 0 && qx >= ux + tl && qx <= ux + tr) : Math.abs(qx - midX) <= 80)) || (qy <= slopeEnd && Math.abs(qx - midX) <= slopeHalf(qy)))) continue;
-                    const o4 = (j * bw + i) * 4; hi.data[o4 + 3] = 255;
+                    // Where the grown piece shows, and where it REPLACES the game's. On the breasts and on the body it replaces
+                    // it. On the slope out past the shoulder it's only laid OVER it: there the game's picture is her sleeve,
+                    // and wiping it took the sleeves off every top (set beside the game's own, the student outfit had lost
+                    // both white sleeves: Laynie, Oct 13, "those outfits look broken again"). And under the breasts it spans
+                    // from one to the other: cloth pulled over two breasts is taut across the gap, it doesn't follow each
+                    // one in underneath like paint on two balloons.
+                    const onB = onBreast(qx, qy), onBody = (!drape || qy <= bcy) && (prof ? (tl >= 0 && qx >= ux + tl && qx <= ux + tr) : Math.abs(qx - midX) <= 80);
+                    const bridge = !onB && qy > bcy && Math.abs(qx - midX) < S2.bx && qy <= bcy + S2.rv * (0.78 + 0.22 * Math.pow(Math.abs(qx - midX) / S2.bx, 2));
+                    const onSlope = !onB && !onBody && qy <= slopeEnd && Math.abs(qx - midX) <= slopeHalf(qy);
+                    if (!(onB || onBody || bridge || onSlope)) continue;
+                    const o4 = (j * bw + i) * 4; if (!onSlope) hi.data[o4 + 3] = 255;
                     const fx = midX + (qx - midX) / sg, fy = yn, ix = Math.floor(fx), iy = Math.floor(fy); if (ix < 0 || iy < 0 || ix >= CW - 1 || iy >= CH - 1) continue;
                     const ax = fx - ix, ay = fy - iy, p00 = (iy * CW + ix) * 4, p10 = p00 + 4, p01 = p00 + CW * 4, p11 = p01 + 4;
                     const a00 = sp[p00 + 3] * (1 - ax) * (1 - ay), a10 = sp[p10 + 3] * ax * (1 - ay), a01 = sp[p01 + 3] * (1 - ax) * ay, a11 = sp[p11 + 3] * ax * ay, at = a00 + a10 + a01 + a11;
@@ -797,7 +806,7 @@
                 atop(() => { for (let k = 0; k < 2; k++) { g.save(); ell(k, 1, 0); g.clip();
                     const under = g.createLinearGradient(0, bcy + S2.rv * 0.05, 0, bcy + S2.rv); under.addColorStop(0, "rgba(0,0,0,0)"); under.addColorStop(1, "rgba(0,0,0,0.34)");
                     g.fillStyle = under; g.fillRect(0, bcy, CW, S2.rv + 4);
-                    const hx = bcx[k] - S2.ro * 0.18, hy = bcy - S2.rv * 0.38, light = g.createRadialGradient(hx, hy, 0, hx, hy, S2.rv * 0.6); light.addColorStop(0, "rgba(255,255,255,0.16)"); light.addColorStop(1, "rgba(255,255,255,0)");
+                    const hx = bcx[k] - S2.ro * 0.18, hy = bcy - S2.rv * 0.38, light = g.createRadialGradient(hx, hy, 0, hx, hy, S2.rv * 0.6); light.addColorStop(0, "rgba(255,255,255,0.04)"); light.addColorStop(1, "rgba(255,255,255,0)");
                     g.fillStyle = light; g.fillRect(0, 0, CW, CH); g.restore(); }
                   // down between them
                   const cl = g.createLinearGradient(midX - S2.ri * 0.3, 0, midX + S2.ri * 0.3, 0); cl.addColorStop(0, "rgba(0,0,0,0)"); cl.addColorStop(0.5, "rgba(0,0,0,0.30)"); cl.addColorStop(1, "rgba(0,0,0,0)");

@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.16.6
+// @version      0.16.7
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -230,7 +230,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.16.6";
+  var VERSION = "0.16.7";
 
   // extension/src/config.js
   var BOT_MEMBER = 260239;
@@ -992,31 +992,74 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var W = window;
   var SKIN_TOP = 12;
   var trial = 0;
-  var SIZES = [null, { rx: 54, ry: 50 }, { rx: 76, ry: 72 }, { rx: 100, ry: 96 }];
+  var SIZES = [null, { rx: 50, ry: 54, sag: 0.16 }, { rx: 70, ry: 80, sag: 0.22 }, { rx: 92, ry: 112, sag: 0.28 }];
   var FALLBACK = { White: [236, 204, 196], Asian: [232, 200, 164], Black: [120, 86, 70] };
   var clamp = (v) => Math.max(0, Math.min(255, Math.round(v)));
   var rgb = (c, k) => "rgb(" + clamp(c[0] * k) + "," + clamp(c[1] * k) + "," + clamp(c[2] * k) + ")";
+  function bellyPoint(S, cx, cy, t) {
+    const sn = Math.sin(t), cs = Math.cos(t);
+    const wide = 1 + S.sag * sn - S.sag * 0.55 * (sn < 0 ? sn * sn : 0);
+    const drop = sn > 0 ? 1 + S.sag * 0.35 * sn : 1 - S.sag * 0.25 * -sn;
+    return [cx + S.rx * cs * wide / (1 + S.sag), cy + S.ry * sn * drop / (1 + S.sag * 0.35)];
+  }
+  function bellyPath(g, S, cx, cy, from, to) {
+    const steps = 72;
+    for (let i = 0; i <= steps; i++) {
+      const p = bellyPoint(S, cx, cy, from + (to - from) * i / steps);
+      if (i) g.lineTo(p[0], p[1]);
+      else g.moveTo(p[0], p[1]);
+    }
+  }
   function bellyCanvas(size, skin) {
-    const S = SIZES[size], pad = 6, w = S.rx * 2 + pad * 2, hgt = S.ry * 2 + pad * 2, cx = w / 2, cy = hgt / 2;
+    const S = SIZES[size], pad = 6, w = S.rx * 2 + pad * 2, hgt = S.ry * 2 + pad * 2, cx = w / 2, cy = hgt / 2, low = cy + S.ry * 0.28;
     const cv = document.createElement("canvas");
     cv.width = w;
     cv.height = hgt;
     const g = cv.getContext("2d");
-    const grad = g.createRadialGradient(cx - S.rx * 0.3, cy - S.ry * 0.35, S.rx * 0.1, cx, cy, S.rx * 1.15);
-    grad.addColorStop(0, rgb(skin, 1.04));
-    grad.addColorStop(0.6, rgb(skin, 1));
-    grad.addColorStop(1, rgb([skin[0], skin[1] * 0.9, skin[2] * 0.9], 0.93));
+    const whole = () => {
+      g.beginPath();
+      bellyPath(g, S, cx, cy, 0, Math.PI * 2);
+      g.closePath();
+    };
+    const grad = g.createRadialGradient(cx - S.rx * 0.22, low - S.ry * 0.42, S.rx * 0.1, cx, low, S.ry * 1.05);
+    grad.addColorStop(0, rgb(skin, 1.03));
+    grad.addColorStop(0.55, rgb(skin, 1));
+    grad.addColorStop(1, rgb([skin[0], skin[1] * 0.93, skin[2] * 0.92], 0.94));
     g.fillStyle = grad;
-    g.beginPath();
-    g.ellipse(cx, cy, S.rx, S.ry, 0, 0, Math.PI * 2);
+    whole();
     g.fill();
+    g.save();
+    whole();
+    g.clip();
+    const under = g.createLinearGradient(0, low + S.ry * 0.25, 0, cy + S.ry + pad);
+    under.addColorStop(0, "rgba(150,70,60,0)");
+    under.addColorStop(1, "rgba(150,70,60,0.22)");
+    g.fillStyle = under;
+    g.fillRect(0, 0, w, hgt);
+    const blush = g.createRadialGradient(cx, low + S.ry * 0.2, 2, cx, low + S.ry * 0.2, S.rx * 0.85);
+    blush.addColorStop(0, "rgba(214,120,120,0.14)");
+    blush.addColorStop(1, "rgba(214,120,120,0)");
+    g.fillStyle = blush;
+    g.fillRect(0, 0, w, hgt);
+    g.translate(cx - S.rx * 0.36, low - S.ry * 0.3);
+    g.rotate(-0.22);
+    const sh = g.createRadialGradient(0, 0, 0, 0, 0, S.ry * 0.36);
+    sh.addColorStop(0, "rgba(255,255,255,0.8)");
+    sh.addColorStop(0.5, "rgba(255,255,255,0.3)");
+    sh.addColorStop(1, "rgba(255,255,255,0)");
+    g.fillStyle = sh;
+    g.scale(0.34, 1);
+    g.beginPath();
+    g.arc(0, 0, S.ry * 0.36, 0, Math.PI * 2);
+    g.fill();
+    g.restore();
     g.globalCompositeOperation = "destination-out";
     {
-      const fr = Math.min(S.rx * 0.95, 60);
+      const fr = Math.min(S.rx * 0.9, 56);
       g.save();
-      g.translate(cx, cy - S.ry * 0.95);
-      g.scale(1, S.ry * 0.85 / fr);
-      const fade = g.createRadialGradient(0, 0, fr * 0.25, 0, 0, fr);
+      g.translate(cx, cy - S.ry * 0.98);
+      g.scale(1, S.ry * 0.7 / fr);
+      const fade = g.createRadialGradient(0, 0, fr * 0.3, 0, 0, fr);
       fade.addColorStop(0, "rgba(0,0,0,1)");
       fade.addColorStop(1, "rgba(0,0,0,0)");
       g.fillStyle = fade;
@@ -1026,47 +1069,44 @@ One of mods you are using is using an old version of SDK. It will work for now b
       g.restore();
     }
     g.globalCompositeOperation = "source-over";
+    const up = [0, -0.14, 0.02, 0.3][size] * Math.PI;
     g.strokeStyle = rgb(skin, 0.28);
-    g.lineWidth = 1.6;
     g.lineCap = "round";
+    g.lineJoin = "round";
+    g.lineWidth = 1.5;
     g.beginPath();
-    {
-      const up = [0, 0.1, 0.2, 0.33][size] * Math.PI;
-      g.ellipse(cx, cy, S.rx, S.ry, 0, -up, Math.PI + up);
-    }
+    bellyPath(g, S, cx, cy, -up, Math.PI + up);
     g.stroke();
-    const blush = g.createRadialGradient(cx, cy + S.ry * 0.55, 2, cx, cy + S.ry * 0.55, S.rx * 0.8);
-    blush.addColorStop(0, "rgba(214,120,120,0.16)");
-    blush.addColorStop(1, "rgba(214,120,120,0)");
-    g.fillStyle = blush;
+    g.lineWidth = 2.1;
     g.beginPath();
-    g.ellipse(cx, cy, S.rx - 2, S.ry - 2, 0, 0, Math.PI * 2);
-    g.fill();
-    {
-      g.save();
-      g.translate(cx - S.rx * 0.38, cy - S.ry * 0.12);
-      g.rotate(-0.35);
-      const sh = g.createRadialGradient(0, 0, 0, 0, 0, S.rx * 0.34);
-      sh.addColorStop(0, "rgba(255,255,255,0.85)");
-      sh.addColorStop(0.5, "rgba(255,255,255,0.35)");
-      sh.addColorStop(1, "rgba(255,255,255,0)");
-      g.fillStyle = sh;
-      g.scale(0.42, 1);
-      g.beginPath();
-      g.arc(0, 0, S.rx * 0.34, 0, Math.PI * 2);
-      g.fill();
-      g.restore();
-    }
+    bellyPath(g, S, cx, cy, Math.PI * 0.2, Math.PI * 0.8);
+    g.stroke();
     g.strokeStyle = rgb(skin, 0.45);
     g.lineWidth = 1.4;
     g.beginPath();
-    if (size >= 3) g.ellipse(cx, cy + S.ry * 0.18, 4, 3, 0, 0, Math.PI * 2);
-    else {
-      g.moveTo(cx, cy + S.ry * 0.12);
-      g.quadraticCurveTo(cx + 2.5, cy + S.ry * 0.2, cx, cy + S.ry * 0.3);
+    const ny = low + S.ry * 0.12;
+    if (size >= 3) {
+      g.ellipse(cx, ny, 4.5, 3.2, 0, 0, Math.PI * 2);
+    } else {
+      g.moveTo(cx - 0.5, ny - S.ry * 0.07);
+      g.quadraticCurveTo(cx + 3, ny, cx - 0.5, ny + S.ry * 0.07);
     }
     g.stroke();
+    if (size >= 2) {
+      g.strokeStyle = rgb(skin, 0.72);
+      g.lineWidth = 1;
+      g.globalAlpha = 0.45;
+      g.beginPath();
+      g.moveTo(cx, ny + 6);
+      g.lineTo(cx, cy + S.ry * 0.86);
+      g.stroke();
+      g.globalAlpha = 1;
+    }
     return cv;
+  }
+  function bellyPlace(size, upperX, upperY, cv) {
+    const S = SIZES[size];
+    return [upperX + 250 - cv.width / 2, upperY + 392 + S.ry * 0.62 - cv.height / 2];
   }
   var pictures = /* @__PURE__ */ new Map();
   function bellyPicture(size, skin) {
@@ -1116,10 +1156,13 @@ One of mods you are using is using an old version of SDK. It will work for now b
     try {
       const gl = W.GLDrawCanvas && W.GLDrawCanvas.GL;
       if (gl && typeof gl.readPixels === "function") {
-        for (const [dx, dy] of [[222, 416], [278, 416], [214, 402]]) {
-          const px = new Uint8Array(4);
-          gl.readPixels(Math.round(bx + dx), Math.round(gl.canvas.height - (by + dy) - 1), 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, px);
-          if (px[3] > 200 && px[0] + px[1] + px[2] > 90 && Math.min(px[0], px[1], px[2]) < 242) return [px[0], px[1], px[2]];
+        const bw = 48, bh = 40, px = new Uint8Array(bw * bh * 4);
+        gl.readPixels(Math.round(bx + 226), Math.round(gl.canvas.height - (by + 388) - bh), bw, bh, gl.RGBA, gl.UNSIGNED_BYTE, px);
+        const good = [];
+        for (let i = 0; i < px.length; i += 4) if (px[i + 3] > 200 && px[i] + px[i + 1] + px[i + 2] > 90 && Math.min(px[i], px[i + 1], px[i + 2]) < 238) good.push([px[i], px[i + 1], px[i + 2]]);
+        if (good.length >= 40) {
+          good.sort((m, n) => m[0] + m[1] + m[2] - (n[0] + n[1] + n[2]));
+          return good[Math.floor(good.length * 0.7)];
         }
       }
     } catch (e) {
@@ -1159,7 +1202,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
               if (done || !upper || !lower) return;
               done = true;
               const S = SIZES[trial], cv = bellyPicture(trial, skinFor(C, upper[0], upper[1]));
-              const dx = upper[0] + 250 - cv.width / 2, dy = upper[1] + 432 + S.ry * 0.22 - cv.height / 2;
+              const [dx, dy] = bellyPlace(trial, upper[0], upper[1], cv);
               cb.drawImage(cv.url, dx, dy, {});
               if (typeof cb.drawImageBlink === "function") cb.drawImageBlink(cv.url, dx, dy, {});
             };

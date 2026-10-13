@@ -13,7 +13,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 | Map tools, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.3** |
 | Dairy | `farmhand-dairy.user.js` | the bot's PC | **1.0.2** |
 | Shows | `farmhand-shows.user.js` | the bot's PC | **1.0.4** |
-| Farmhand Companion | `farmhand-companion.user.js` | each player | **0.16.6** |
+| Farmhand Companion | `farmhand-companion.user.js` | each player | **0.16.7** |
 | Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.4** |
 
 ## Sending a watch report
@@ -23,6 +23,8 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 - Running the watcher on more than one game at once (the bot, yours, a tester's) lets Claude line them up into one timeline.
 
 ## Latest changes (newest first)
+
+- **Companion 0.16.7: the belly test hangs.** Laynie on 0.16.4: "too much of a ball, not enough gravity", and the picture showed it a shade too tan. The belly is now a pear: narrow where it leaves the ribs, widest well below the middle, with a full underside that hangs lower as it gets bigger, a shadow underneath, the navel pulled low, and a faint line below it on the bigger two. A small belly is only inked underneath. The skin colour is now read from a patch in the middle of the torso (the typical bright skin in it), not from one point near the waist's edge, which had been landing on the body's own shading. `node tools/belly-preview.mjs` draws it over the game's body pictures without logging in.
 
 - **Companion 0.16.6: the belly test sits above all the skin.** Seen live: the layers between the legs and the belly clipped now and then. The belly was drawn right after the legs, so what the game draws next on the skin (nipples, then the pussy or cock) was painted over the bottom of it. It now waits until every skin layer is down and goes in just before the first piece of clothing or gear.
 

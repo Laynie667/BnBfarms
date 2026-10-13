@@ -456,13 +456,14 @@
   // Flat to R. The first six cups are the game's own chest sizes: picking one just changes the body. From DD up they're
   // drawn (breasts-drawing.js), over the game's biggest chest, standing and kneeling only for now. The game's nipples,
   // and whatever is worn on them, are lifted off where the game puts them and set down on the drawn ones.
-  const BREAST = { free: false, holds: {}, holdSig: "", wear: {}, dress: true, cover: new Map(), cup: null, full: 1, hang: 1, apart: 1, x: 0, y: 0, nip: 1, nipY: 0, nipX: 0, cv: null, cvKey: "", halves: new Map(), out: new Map() };
+  const BREAST = { on: {}, free: false, holds: {}, holdSig: "", wear: {}, dress: true, cover: new Map(), cup: null, full: 1, hang: 1, apart: 1, x: 0, y: 0, nip: 1, nipY: 0, nipX: 0, cv: null, cvKey: "", halves: new Map(), out: new Map() };
   const BREAST_SLIDERS = [["full", "Fullness", 0.7, 1.4, 0.01], ["hang", "Weight (how low and heavy they hang)", 0, 2, 0.01], ["apart", "Apart / together", 0.6, 1.5, 0.01], ["x", "Left / right", -60, 60, 1], ["y", "Up / down", -80, 80, 1],
     ["nip", "Nipple size (and what's worn on them)", 0.4, 4, 0.05], ["nipY", "Nipples up / down", -80, 80, 1], ["nipX", "Nipples in / out", -60, 60, 1]];
   const NIP_GROUPS = new Set(["Nipples", "ItemNipples", "ItemNipplesPiercings"]);
   // what the breasts hang in front of once they reach it (Laynie, Oct 13: "at larger sizes should probably cover the
   // hands"): the hands and what's worn on them. Their pictures are drawn with the breasts' outline cut out.
   const HAND_GROUPS = new Set(["HandsLeft", "HandsRight", "ItemHands", "Gloves"]);
+  const ARM_GROUPS = new Set(["ItemArms", "Bracelet"]);
   // What holds a breast: anything worn round or over the chest. With one of these on, the drawn breasts take the game's
   // own shape a size up (see HELD in breasts-drawing.js) and the piece is drawn a size up to match.
   // Not by slot (a pair of wrist cuffs is in the arms slot and holds nothing; a straitjacket is in it too and does): by
@@ -654,11 +655,13 @@
             real[name](c, x, y, o); return true;
           };
           // how much of the game's two breasts this picture covers (0 to 1): a belt or a collar isn't chest wear
-          const chestCover = (src, im, x, y, B) => {
-            const key = src + "|" + Math.round(x) + "," + Math.round(y); let v = BREAST.cover.get(key); if (v != null) return v;
+          // wide: measured a third wider than the breast (is it round or under them: does it hold them?). Not wide: measured
+          // just inside the breast (is it ON them: is there anything of it to grow?).
+          const chestCover = (src, im, x, y, B, wide) => {
+            const key = (wide ? "w|" : "n|") + src + "|" + Math.round(x) + "," + Math.round(y); let v = BREAST.cover.get(key); if (v != null) return v;
             const w = im.naturalWidth, h = im.naturalHeight, c = document.createElement("canvas"); c.width = w; c.height = h;
             const g = c.getContext("2d", { willReadFrequently: true }); g.drawImage(im, 0, 0);
-            const GB = gameBreast(B), d = g.getImageData(0, 0, w, h).data, R = Math.round(GB.r * 1.3); let hit = 0, all = 0;   // (a third wider than the breast: an underbust corset or a shelf bra lies under it, not on it, and it's holding it all the same)
+            const GB = gameBreast(B), d = g.getImageData(0, 0, w, h).data, R = Math.round(GB.r * (wide ? 1.3 : 0.82)); let hit = 0, all = 0;
             for (const sd of [-1, 1]) { const cx = Math.round(B.mid + sd * GB.dx - x), cy = Math.round(B.uy + GB.y - y);
               for (let j = -R; j <= R; j += 2) for (let i = -R; i <= R; i += 2) { if (i * i + j * j > R * R) continue; all++; const px = cx + i, py = cy + j; if (px >= 0 && py >= 0 && px < w && py < h && d[(py * w + px) * 4 + 3] > 60) hit++; } }
             v = all ? hit / all : 0; BREAST.cover.set(key, v); return v;
@@ -700,7 +703,12 @@
           //   · It's only shown where there's something for it to lie on: the breasts, or the body. Nothing hangs in the air.
           const dressDraw = (name, src, x, y, o) => {
             const B = ctx.breast, im = B && B.held && mouldImg(src); if (!im) return false;
-            if (chestCover(src, im, x, y, B) < 0.05 && !BREAST.holds[(pieceOf(src) || {}).key]) return false;   // (a buckle or a bow on a piece that covers the chest grows with it)
+            // A piece that lies ON the breasts is grown with them (and every layer of it: a buckle or a bow goes along). A
+            // piece that only props them from under (an underbust corset) holds them but has nothing ON them, so nothing of
+            // it is grown: grown, its top trim was landing on the breast (Laynie, Oct 13: "the latex corset shows stuff on
+            // the breast"). It's drawn as the game draws it, and the breasts sit in front of its top edge.
+            const pk0 = (pieceOf(src) || {}).key;
+            if (chestCover(src, im, x, y, B, false) < 0.05 && !BREAST.on[pk0]) return BREAST.holds[pk0] ? handDraw(name, src, x, y, o) : false;
             const key = "dress|" + src + "|" + Math.round(x) + "," + Math.round(y) + "|" + B.sig + "|" + (ctx.belly && !fit.behind && BELLY.auto !== false ? ctx.sig : "") + "|" + MOULD.ver;
             let c = BREAST.out.get(key);
             if (!c) {
@@ -759,7 +767,27 @@
                 const T = document.createElement("canvas"); T.width = bw; T.height = bh; T.getContext("2d").putImageData(out, 0, 0);
                 const hole = document.createElement("canvas"); hole.width = bw; hole.height = bh; hole.getContext("2d").putImageData(hi, 0, 0);
                 g.globalCompositeOperation = "destination-out"; g.drawImage(hole, x0, y0); g.globalCompositeOperation = "source-over";
+                // FORM. Cloth laid over them flat reads as a slab: a black top came out as one black block (Laynie, Oct 13:
+                // "completely unflattering"). What makes a clothed breast read as a breast is light: the shadow it throws on
+                // the cloth under it, the darkness underneath where it turns away, the shadow down between the two, a
+                // little light on top, and the line of its underside. All of that is put on the cloth here, and only on
+                // the cloth (never on bare skin): each of these is laid over what's already drawn and nowhere else.
+                const atop = (draw) => { g.save(); g.globalCompositeOperation = "source-atop"; draw(); g.restore(); };
+                const ell = (k, grow, dy) => { g.beginPath(); g.ellipse(bcx[k] + (k ? 1 : -1) * (S2.ro - S2.ri) / 2, bcy + (dy || 0), (S2.ro + S2.ri) / 2 + grow, S2.rv + grow, 0, 0, Math.PI * 2); };
+                // the shadow they throw on the piece below them
+                atop(() => { g.filter = "blur(5px)"; g.fillStyle = "rgba(0,0,0,0.30)"; for (let k = 0; k < 2; k++) { ell(k, -2, 7 + S2.rv * 0.06); g.fill(); } });
                 g.drawImage(T, x0, y0);
+                atop(() => { for (let k = 0; k < 2; k++) { g.save(); ell(k, 1, 0); g.clip();
+                    const under = g.createLinearGradient(0, bcy + S2.rv * 0.05, 0, bcy + S2.rv); under.addColorStop(0, "rgba(0,0,0,0)"); under.addColorStop(1, "rgba(0,0,0,0.34)");
+                    g.fillStyle = under; g.fillRect(0, bcy, CW, S2.rv + 4);
+                    const hx = bcx[k] - S2.ro * 0.18, hy = bcy - S2.rv * 0.38, light = g.createRadialGradient(hx, hy, 0, hx, hy, S2.rv * 0.6); light.addColorStop(0, "rgba(255,255,255,0.16)"); light.addColorStop(1, "rgba(255,255,255,0)");
+                    g.fillStyle = light; g.fillRect(0, 0, CW, CH); g.restore(); }
+                  // down between them
+                  const cl = g.createLinearGradient(midX - S2.ri * 0.3, 0, midX + S2.ri * 0.3, 0); cl.addColorStop(0, "rgba(0,0,0,0)"); cl.addColorStop(0.5, "rgba(0,0,0,0.30)"); cl.addColorStop(1, "rgba(0,0,0,0)");
+                  g.save(); g.beginPath(); for (let k = 0; k < 2; k++) g.ellipse(bcx[k] + (k ? 1 : -1) * (S2.ro - S2.ri) / 2, bcy, (S2.ro + S2.ri) / 2, S2.rv, 0, 0, Math.PI * 2); g.clip(); g.fillStyle = cl; g.fillRect(midX - S2.ri * 0.3, bcy - S2.rv * 0.35, S2.ri * 0.6, S2.rv * 1.3); g.restore();
+                  // the line of the underside
+                  g.strokeStyle = "rgba(0,0,0,0.42)"; g.lineWidth = 1.5; g.lineCap = "round";
+                  for (let k = 0; k < 2; k++) { g.beginPath(); g.ellipse(bcx[k] + (k ? 1 : -1) * (S2.ro - S2.ri) / 2, bcy, (S2.ro + S2.ri) / 2, S2.rv, 0, Math.PI * 0.08, Math.PI * 0.92); g.stroke(); } });
               }
               if (BREAST.out.size > 60) BREAST.out.clear(); BREAST.out.set(key, c);
             }
@@ -837,10 +865,10 @@
               if (!done && gname === "Nipples") { held.push([name, src, x, y, o]); return; }
               if (done && NIP_GROUPS.has(gname)) { try { if (nipDraw(name, src, x, y, o)) return; } catch (e) { console.warn("[studio] nipples:", e); } }
               if (done && chestSlot(gname) && !isMoulded(src)) { const piece = pieceOf(src), how = (piece && BREAST.wear[piece.key]) || "";
-                try { const im0 = piece && ctx.breast && mouldImg(src); if (im0 && chestCover(src, im0, x, y, ctx.breast) >= 0.05) ctx.seen[piece.key] = true; } catch (e) { /* only a measurement */ }
+                try { const im0 = piece && ctx.breast && mouldImg(src); if (im0 && chestCover(src, im0, x, y, ctx.breast, true) >= 0.05) ctx.seen[piece.key] = true; if (im0 && chestCover(src, im0, x, y, ctx.breast, false) >= 0.05) ctx.seen["on:" + piece.key] = true; } catch (e) { /* only a measurement */ }
                 try { if (how === "behind") { if (handDraw(name, src, x, y, o)) return; }
                   else if (how !== "plain" && BREAST.dress) { if (dressDraw(name, src, x, y, o)) return; } } catch (e) { console.warn("[studio] chest wear:", e); } }
-              if (done && HAND_GROUPS.has(gname) && ctx.breast && ctx.breast.pose !== "AllFours") { try { if (handDraw(name, src, x, y, o)) return; } catch (e) { console.warn("[studio] hands:", e); } } }
+              if (done && (HAND_GROUPS.has(gname) || ARM_GROUPS.has(gname)) && ctx.breast && ctx.breast.pose !== "AllFours") { /* cuffs and the like go where the hands go: behind them (Laynie, Oct 13: "the handcuffs are showing layered above the breast") */ try { if (handDraw(name, src, x, y, o)) return; } catch (e) { console.warn("[studio] hands:", e); } } }
             let drawn = false;
             try { if (ctx.belly && !fit.behind && typeof src === "string") { const q = isMoulded(src), m = q ? mouldCanvas(src, x, y, ctx, q.key, q.mode) : bellyAuto(src, x, y, ctx, fit.behind, (pieceOf(src) || {}).key); if (m) { real[name](m, x - MOULD.M, y, o); drawn = true; } } } catch (e) { console.warn("[studio] mould:", e); }
             if (!drawn) real[name](src, x, y, o);
@@ -852,7 +880,7 @@
       } catch (e) { console.warn("[studio] belly hook:", e); }
       const out = game(C, cb);
       if (finish) { try { finish(); } catch (e) { console.warn("[studio] belly:", e); } }
-      if (finish && seenNow) { const sig = Object.keys(seenNow).sort().join("|"); if (sig !== BREAST.holdSig) { BREAST.holds = seenNow; BREAST.holdSig = sig; clearTimeout(BREAST.holdT); BREAST.holdT = setTimeout(bellyDraw, 40); } }
+      if (finish && seenNow) { const sig = Object.keys(seenNow).sort().join("|"); if (sig !== BREAST.holdSig) { BREAST.holds = seenNow; BREAST.on = {}; for (const k of Object.keys(seenNow)) if (k.startsWith("on:")) BREAST.on[k.slice(3)] = true; BREAST.holdSig = sig; clearTimeout(BREAST.holdT); BREAST.holdT = setTimeout(bellyDraw, 40); } }
       return out;
     };
   }

@@ -21,7 +21,7 @@
     const k = i / n, hang = a.hang == null ? 1 : a.hang, full = a.full == null ? 1 : a.full, apart = a.apart == null ? 1 : a.apart;
     const r = (44 + 2.6 * i) * full;                    // DD is a little more than the game's biggest; R is past the size of her head
     const sag = (0.06 + 0.10 * k) * hang;            // (eased off, Laynie Oct 13: "maybe a bit less real gravity")            // how much lower than a ball the underside goes, and how far the fullness drops
-    const top = 1.08 + 0.17 * k * hang;             // how long the upper slope is, in radii
+    const top = 1.0 + 0.10 * k * hang;              // how long the upper slope is, in radii
     const bx = (r * (0.90 + 0.06 * k) + 3) * apart;  // each one's middle, out from the breastbone: heavier ones swing wider
     const by = r * top;                              // the slope starts at the chest, so the longer it is the lower they hang
     return { cup, i, k, r, sag, top, bx, by };
@@ -32,8 +32,8 @@
     const sn = Math.sin(t), cs = Math.cos(t);
     if (sn >= 0) return [s * S.bx + S.r * cs * (1 + S.sag * 0.12 * sn * sn) + s * S.r * 0.08 * S.k * sn * sn, S.by + S.r * sn * (1 + S.sag)];     // the full, hanging half: round, its lowest point a little to the outside
     const up = -sn;
-    const u = up * up, tx = s * Math.max(40, S.bx * 0.55);   // tx: where it's hung from, up on the chest
-    return [(s * S.bx + S.r * cs) * (1 - u) + tx * u, S.by - S.r * S.top * up];   // the long slope up to there: it's a teardrop, not a ball
+    // the upper half is round too (Laynie's size charts, Oct 13: full round orbs, no slope running up to a point). It
+    return [s * S.bx + S.r * cs * (1 - 0.10 * up * up), S.by - S.r * S.top * up];   // only draws in a little toward the top, and melts into the chest there
   }
   function path(g, S, s, from, to, ox, oy) {
     const steps = 80;
@@ -77,16 +77,16 @@
     // melt the tops into the chest: nothing shows where they leave it, and they firm up on the way down
     g.globalCompositeOperation = "destination-out";
     // (only over the chest itself: out past the ribs the upper slope is solid, in front of the arm)
-    { const topY = oy + S.by - S.r * S.top, fx = Math.min(S.bx + S.r * 0.35, 100), fy = S.r * S.top * 0.8;
+    { const topY = oy + S.by - S.r * S.top, fx = Math.min(S.bx * 1.15, 72), fy = S.r * S.top * 0.95;
       g.save(); g.translate(ox, topY); g.scale(1, fy / fx);
-      const fade = g.createRadialGradient(0, 0, fx * 0.35, 0, 0, fx);
+      const fade = g.createRadialGradient(0, 0, fx * 0.45, 0, 0, fx);
       fade.addColorStop(0, "rgba(0,0,0,1)"); fade.addColorStop(1, "rgba(0,0,0,0)");
       g.fillStyle = fade; g.beginPath(); g.arc(0, 0, fx, 0, Math.PI * 2); g.fill(); g.restore(); }
     g.globalCompositeOperation = "source-over";
     // the ink: down the outer side, heavy round the underside, up into the cleavage
     g.strokeStyle = rgb(skin, 0.28); g.lineCap = "round"; g.lineJoin = "round";
     for (const s of [-1, 1]) side(s, () => {
-      const hi = (0.08 + 0.14 * S.k) * Math.PI, outer = s > 0 ? [-hi, Math.PI * 1.02] : [Math.PI + hi, -0.02 * Math.PI];   // the heavier, the further up the outer side the line runs
+      const hi = (0.22 + 0.16 * S.k) * Math.PI, outer = s > 0 ? [-hi, Math.PI * 1.02] : [Math.PI + hi, -0.02 * Math.PI];   // the heavier, the further up the outer side the line runs
       g.lineWidth = 1.5; g.beginPath(); path(g, S, s, outer[0], outer[1], ox, oy); g.stroke();
       g.lineWidth = 2.2; g.beginPath(); path(g, S, s, Math.PI * 0.15, Math.PI * 0.85, ox, oy); g.stroke();
     });
@@ -102,6 +102,8 @@
     const patch = og.createRadialGradient(0, 0, 62, 0, 0, 80);
     patch.addColorStop(0, rgb(skin, 1)); patch.addColorStop(1, "rgba(" + clamp(skin[0]) + "," + clamp(skin[1]) + "," + clamp(skin[2]) + ",0)");
     og.fillStyle = patch; og.beginPath(); og.arc(0, 0, 80, 0, Math.PI * 2); og.fill(); og.restore();
+    // (and over the little hooked line the game starts its own breasts with, at each armpit: ours start their own way)
+    og.fillStyle = rgb(skin, 1); for (const s of [-1, 1]) { og.beginPath(); og.ellipse(ox + s * 70, oy + 6, 6, 13, 0, 0, Math.PI * 2); og.fill(); }
     og.drawImage(cv, 0, 0);
     out.ax = cv.ax; out.ay = cv.ay; out.nips = cv.nips;
     // their plain outline, filled: for cutting away what they hang in front of (the hands)

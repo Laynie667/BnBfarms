@@ -116,7 +116,7 @@ function hookBelly(mod) {
           // so the pussy or cock was painted over the bottom of it. Now it waits for all the skin: it goes in just before the
           // first thing that isn't skin, or at the very end on a bare body.
           let upper = null, lower = false, done = false;
-          const prio = (src) => { const m = //Assets/[^/]+/([^/]+)//.exec(src); if (!m) return 99; try { const g = W.AssetGroupGet && W.AssetGroupGet(C.AssetFamily, m[1]); return g && typeof g.DrawingPriority === "number" ? g.DrawingPriority : 99; } catch (e) { return 99; } };
+          const prio = (src) => { const m = new RegExp("/Assets/[^/]+/([^/]+)/").exec(src); if (!m) return 99; try { const g = W.AssetGroupGet && W.AssetGroupGet(C.AssetFamily, m[1]); return g && typeof g.DrawingPriority === "number" ? g.DrawingPriority : 99; } catch (e) { return 99; } };
           const paint = () => {
             if (done || !upper || !lower) return; done = true;
             const S = SIZES[trial], cv = bellyPicture(trial, skinFor(C, upper[0], upper[1]));   // { url, width, height }: a picture the game can cache by name

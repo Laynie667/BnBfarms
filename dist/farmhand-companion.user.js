@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.16.5
+// @version      0.16.6
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -230,7 +230,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.16.5";
+  var VERSION = "0.16.6";
 
   // extension/src/config.js
   var BOT_MEMBER = 260239;
@@ -990,6 +990,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
 
   // extension/src/belly.js
   var W = window;
+  var SKIN_TOP = 12;
   var trial = 0;
   var SIZES = [null, { rx: 54, ry: 50 }, { rx: 76, ry: 72 }, { rx: 100, ry: 96 }];
   var FALLBACK = { White: [236, 204, 196], Asian: [232, 200, 164], Black: [120, 86, 70] };
@@ -1139,35 +1140,65 @@ One of mods you are using is using an old version of SDK. It will work for now b
     hooked = true;
     try {
       mod2.hookFunction("CommonDrawAppearanceBuild", 1, (args, next) => {
+        let finish = null;
         try {
           const C = args[0], cb = args[1];
           if (trial && C && W.Player && C.MemberNumber === W.Player.MemberNumber && cb && typeof cb.drawImage === "function") {
-            let upper = null, done = false;
-            const after = (src, x, y) => {
-              if (done || typeof src !== "string") return;
-              if (src.includes("/BodyUpper/")) upper = [x, y];
-              if (src.includes("/BodyLower/") && upper) {
-                done = true;
-                const S = SIZES[trial], cv = bellyPicture(trial, skinFor(C, upper[0], upper[1]));
-                const dx = upper[0] + 250 - cv.width / 2, dy = upper[1] + 432 + S.ry * 0.22 - cv.height / 2;
-                cb.drawImage(cv.url, dx, dy, {});
-                if (typeof cb.drawImageBlink === "function") cb.drawImageBlink(cv.url, dx, dy, {});
+            let upper = null, lower = false, done = false;
+            const prio = (src) => {
+              const m = new RegExp("/Assets/[^/]+/([^/]+)/").exec(src);
+              if (!m) return 99;
+              try {
+                const g = W.AssetGroupGet && W.AssetGroupGet(C.AssetFamily, m[1]);
+                return g && typeof g.DrawingPriority === "number" ? g.DrawingPriority : 99;
+              } catch (e) {
+                return 99;
               }
             };
+            const paint = () => {
+              if (done || !upper || !lower) return;
+              done = true;
+              const S = SIZES[trial], cv = bellyPicture(trial, skinFor(C, upper[0], upper[1]));
+              const dx = upper[0] + 250 - cv.width / 2, dy = upper[1] + 432 + S.ry * 0.22 - cv.height / 2;
+              cb.drawImage(cv.url, dx, dy, {});
+              if (typeof cb.drawImageBlink === "function") cb.drawImageBlink(cv.url, dx, dy, {});
+            };
+            const before = (src) => {
+              if (!done && lower && typeof src === "string" && prio(src) > SKIN_TOP) paint();
+            };
+            const after = (src, x, y) => {
+              if (typeof src !== "string") return;
+              if (src.includes("/BodyUpper/")) upper = [x, y];
+              if (src.includes("/BodyLower/")) lower = true;
+            };
             const wrap = (name) => typeof cb[name] === "function" ? (src, x, y, o) => {
+              try {
+                before(src);
+              } catch (e) {
+                console.warn("[Farmhand Companion] belly:", e);
+              }
               cb[name](src, x, y, o);
               try {
-                if (!/Blink$/.test(name)) after(src, x, y);
+                after(src, x, y);
               } catch (e) {
                 console.warn("[Farmhand Companion] belly:", e);
               }
             } : cb[name];
             args[1] = Object.assign({}, cb, { drawImage: wrap("drawImage"), drawImageColorize: wrap("drawImageColorize") });
+            finish = paint;
           }
         } catch (e) {
           console.warn("[Farmhand Companion] belly hook:", e);
         }
-        return next(args);
+        const out = next(args);
+        if (finish) {
+          try {
+            finish();
+          } catch (e) {
+            console.warn("[Farmhand Companion] belly:", e);
+          }
+        }
+        return out;
       });
     } catch (e) {
       console.warn("[Farmhand Companion] belly test unavailable:", e);

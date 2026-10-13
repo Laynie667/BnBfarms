@@ -96,6 +96,16 @@ the game's pictures into the drawing.
   not set to "behind".
 - The list of moulded pieces is saved in `fits/items.json` when you press *Save this fit*.
 
+## Step 10: breasts, flat to R
+
+- **Cup.** Flat, AA, A, B, C and D are the game's own six chest sizes: picking one changes the body, nothing more.
+  From DD to R they are drawn over the game's biggest chest (`web/breasts-drawing.js`).
+- **Weight.** The bigger, the longer the slope down from the chest, the lower the fullness sits, the wider they
+  swing and the lower and further out the nipples ride. The *Weight* slider turns that up or down for any size.
+- **Nipples and nipple gear** are moved from where the game draws them onto the drawn breasts, and grow a little.
+- Standing and kneeling only for now. Bras and chest gear are not fitted to them yet.
+- *Save the breasts* writes `fits/breasts.json`.
+
 ## Step 9: over or under
 
 - *Mould to the body* is a choice of three. **Wide**: sideways only, as before. **Over**: wide, and lengthened so

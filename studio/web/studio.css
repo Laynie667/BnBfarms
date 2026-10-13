@@ -1,0 +1,15 @@
+/* The studio's panel, laid over the right-hand side of the game's own canvas. */
+#fh-studio { position: fixed; top: 0; right: 0; bottom: 0; width: min(46vw, 620px); z-index: 9000; background: #1d2026; color: #e8e4da;
+  font: 14px/1.4 system-ui, "Segoe UI", sans-serif; overflow-y: auto; padding: 14px 16px 30px; box-sizing: border-box; border-left: 1px solid #3a3f49; }
+#fh-studio h1 { font-size: 18px; margin: 0 0 2px; color: #e0b866; }
+#fh-studio h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: #9aa3b2; margin: 18px 0 6px; }
+#fh-studio p.note { color: #9aa3b2; margin: 2px 0 8px; font-size: 13px; }
+#fh-studio textarea { width: 100%; height: 76px; box-sizing: border-box; background: #12141a; color: #e8e4da; border: 1px solid #3a3f49; border-radius: 6px; padding: 8px; font: 12px/1.3 ui-monospace, Consolas, monospace; resize: vertical; }
+#fh-studio button, #fh-studio select { background: #2b303a; color: #e8e4da; border: 1px solid #454b57; border-radius: 6px; padding: 6px 10px; margin: 3px 4px 3px 0; font: inherit; cursor: pointer; }
+#fh-studio button:hover { background: #363c48; }
+#fh-studio button.on { background: #e0b866; color: #1d2026; border-color: #e0b866; }
+#fh-studio button.go { background: #4f7d4a; border-color: #4f7d4a; }
+#fh-studio .row { display: flex; flex-wrap: wrap; align-items: center; gap: 2px; }
+#fh-studio label { color: #c5c9d2; margin-right: 6px; }
+#fh-studio #fh-say { min-height: 20px; margin-top: 8px; color: #e0b866; font-size: 13px; white-space: pre-wrap; }
+#fh-studio .bad { color: #e88a7a; }

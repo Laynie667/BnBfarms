@@ -24,6 +24,8 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 ## Latest changes (newest first)
 
+- **New: the B&B outfit studio (`studio/`), step 1.** An offline dressing room for our own use: double-click `studioStart the studio.bat`. It loads the game's own item list and drawing code from the copy in `reference/`, signs in to nothing, and draws a character exactly as the game would. So far: paste a WCE or BCX outfit code to wear it, copy a look back out as a code, six chest sizes, four hip sizes, three skins, every pose, strip and reset. Checked working here (2,634 items loaded, a look round-trips through its code, body, pose and items draw). See `studio/README.md`. Next: pick any item to try on, then the belly sliders.
+
 - **Companion 0.17.1: no belly drawn on all fours.** Seen live on 0.17.0: the pressed belly showed only as stray lines under the breasts, on all three sizes. On all fours the game shows the body from the front with the chest in the way, so a belly on the ground is hidden behind it and cannot be drawn well with a front-view shape. It is no longer drawn in that pose. Standing, kneeling, the arms poses and hogtied are unchanged.
 
 - **Companion 0.17.0: on all fours the belly rests on the ground; hogtied it hangs.** Laynie on 0.16.9: on all fours it hung below the elbows, when it would be pressed against the ground; hanging only makes sense suspended. On all fours the belly is now pressed: a fifth wider, 40% shallower, flat underneath, with its underside on the line the hands are on, so it never reaches below them. Hogtied (hung up) it is drawn again, hanging free under the chest. In both it goes down before the upper body, behind the chest. Preview checked; NOT YET SEEN LIVE.

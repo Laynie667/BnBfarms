@@ -556,6 +556,41 @@
     if (!stop) { wear(before); redraw(); head.textContent = list.length + " pieces in " + group + " at " + FarmBreasts.CUPS[cupNow()] + ". Click one to put it on and pick it."; }
     AUDIT.on = false;
   }
+  // ── between the legs ──
+  // The game's own art: three pussies and a cock, and the cock has a soft picture and a hard one (the game shows the hard
+  // one once she's worked up past 30). The farm keeps a length for a cock, in inches (6 to start, up to 30), so here it
+  // can be drawn at that length: the game's picture, grown evenly from where it joins her. The game won't grow a
+  // picture past three times, which is 18 inches; longer than that is drawn at 18.
+  const GEN = { inches: 6, box: {} };
+  const genItem = () => S.C.Appearance.find((a) => a.Asset.Group.Name === "Pussy");
+  const genHard = () => { const it = genItem(); return !!(it && it.Property && it.Property.Expression === "Hard"); };
+  function genFit() {
+    const it = genItem(); if (!it) return;
+    const p = it.Property = it.Property || {};
+    for (const k of ["ScaleX", "ScaleY", "TranslationX", "TranslationY"]) delete p[k];
+    if (it.Asset.Name === "Penis") { const k = Math.max(0.5, Math.min(3, GEN.inches / 6));
+      if (Math.abs(k - 1) > 0.01) {
+        // grown from where it joins her, so it's moved back by however
+        // far that point would have gone: soft, it hangs from the top middle of what's drawn; hard, it stands up from low
+        // in the picture, just above the balls.
+        const hard = p.Expression === "Hard", src = "Assets/Female3DCG/Pussy/" + (hard ? "Hard/" : "") + "Penis_White.png", box = GEN.box[src];
+        if (!box) { const im = new Image(); im.onload = () => { const e = edges(im, im.naturalWidth, im.naturalHeight); let t = -1, b = -1, l = 1e9, r = -1; for (let j = 0; j < e.h; j++) if (e.L[j] >= 0) { if (t < 0) t = j; b = j; l = Math.min(l, e.L[j]); r = Math.max(r, e.R[j]); } GEN.box[src] = { cx: (l + r) / 2, t, b, w: im.naturalWidth, h: im.naturalHeight }; genFit(); }; im.src = src; }
+        else { const ax = box.cx, ay = hard ? box.t + (box.b - box.t) * 0.72 : box.t; // (measured, not assumed: the game grows a picture about its MIDDLE, and a move asked for is applied twice over)
+          p.ScaleX = k; p.ScaleY = k; p.TranslationX = -Math.round((ax - box.w / 2) * (k - 1) / 2); p.TranslationY = -Math.round((ay - box.h / 2) * (k - 1) / 2); }
+      } }
+    redraw();
+  }
+  function genSet(name) { setBody("Pussy", name); genFit(); }
+  function genHardSet(on) { const it = genItem(); if (!it) return; const p = it.Property = it.Property || {}; if (on) p.Expression = "Hard"; else delete p.Expression; genFit(); }
+  function genPanel() {
+    const box = $("div", { id: "fh-gen" });
+    const fill = () => { const it = genItem(), cock = !!(it && it.Asset.Name === "Penis"), val = $("span", { className: "fh-val", textContent: GEN.inches + " in" });
+      box.replaceChildren(...[
+        $("div", { className: "row" }, ["Pussy1", "Pussy2", "Pussy3", "Penis"].filter((n) => Asset.some((a) => a.Group.Name === "Pussy" && a.Name === n)).map((n) => $("button", { type: "button", className: it && it.Asset.Name === n ? "on" : "", textContent: n === "Penis" ? "Cock" : "Pussy " + n.slice(-1), onclick: () => { genSet(n); fill(); } }))),
+        cock ? $("div", { className: "row" }, $("button", { type: "button", className: genHard() ? "" : "on", textContent: "Soft", onclick: () => { genHardSet(false); fill(); } }), $("button", { type: "button", className: genHard() ? "on" : "", textContent: "Hard", onclick: () => { genHardSet(true); fill(); } }), $("span", { className: "note", textContent: "In the game it goes hard by itself past 30 arousal." })) : "",
+        cock ? $("div", { className: "fh-slide" }, $("label", { textContent: "Length, as the farm counts it" }), $("input", { type: "range", min: 3, max: 30, step: 1, value: GEN.inches, oninput: (e) => { GEN.inches = Number(e.target.value); val.textContent = GEN.inches + " in" + (GEN.inches > 18 ? " (drawn at 18)" : ""); genFit(); } }), val) : ""].flat(Infinity)); };
+    GEN.fill = fill; fill(); return box;
+  }
   function breastPanel() {
     const box = $("div", { id: "fh-breasts" });
     if (!window.FarmBreasts) { box.append($("p", { className: "note", textContent: "The breast drawing didn't load. Restart the studio (close its window and run the .bat again)." })); return box; }
@@ -1088,6 +1123,7 @@
       $("div", { id: "fh-fit" }),
       $("h2", { textContent: "Breasts" }), breastPanel(),
       $("h2", { textContent: "Belly" }), bellyPanel(),
+      $("h2", { textContent: "Between the legs" }), genPanel(),
       $("h2", { textContent: "Chest" }), $("div", { className: "row" }, sizes("BodyUpper", ["FlatSmall", "FlatMedium", "Small", "Normal", "Large", "XLarge"])),
       $("h2", { textContent: "Hips and legs" }), $("div", { className: "row" }, sizes("BodyLower", ["Small", "Normal", "Large", "XLarge"])),
       $("h2", { textContent: "Skin" }), $("div", { className: "row" }, ["White", "Asian", "Black"].map((t) => toggle(t, () => { const u = bodyItem("BodyUpper"); const c = u && (Array.isArray(u.Color) ? u.Color[0] : u.Color); return c === t; }, () => setSkin(t)))),
@@ -1117,7 +1153,7 @@
     CharacterAppearanceSetDefault(S.C);
     CharacterRefresh(S.C, false, false);
     panel(); S.ready = true; loadFits(false); loadItemFits(); loadBreasts(false);
-    window.FarmStudio = { S, wear, decode, encode, setBody, setSkin, setPose, redraw, putOn, tint, slots, BELLY, bellyDraw, saveFits, loadFits, FIT, select, saveFit, fitSet, fitDraw, orderSet, orderNow, colourSet, colourLayers, configure, configureDone, stashFits, MOULD, BREAST, chestAudit, setCup, cupNow, saveBreasts, loadBreasts };   // for poking at from the console
+    window.FarmStudio = { S, wear, decode, encode, setBody, setSkin, setPose, redraw, putOn, tint, slots, BELLY, bellyDraw, saveFits, loadFits, FIT, select, saveFit, fitSet, fitDraw, orderSet, orderNow, colourSet, colourLayers, configure, configureDone, stashFits, MOULD, BREAST, GEN, genSet, genHardSet, genFit, chestAudit, setCup, cupNow, saveBreasts, loadBreasts };   // for poking at from the console
     say("Ready. Paste an outfit code, or change the body and pose below.");
   }
   let tries = 0;

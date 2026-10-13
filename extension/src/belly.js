@@ -73,6 +73,16 @@ export function scrubCache() {
   return n;
 }
 // what colour did the game just paint their skin? read it off the canvas, a little under the chest
+// Readin' a pixel back off the screen makes the graphics card stop and wait, and the map redraws characters a lot
+// (Laynie, Oct 12: "the map just loads a lot slower"). So the colour is read once for each body and skin, and kept.
+const skinSeen = new Map();
+function skinFor(C, bx, by) {
+  const it = (C.DrawAppearance || C.Appearance || []).find((x) => x && x.Asset && x.Asset.Group && x.Asset.Group.Name === "BodyUpper");
+  const key = it ? it.Asset.Name + "|" + JSON.stringify(it.Color || "") : "?";
+  let c = skinSeen.get(key);
+  if (!c) { c = skinAt(C, bx, by); if (skinSeen.size > 12) skinSeen.clear(); skinSeen.set(key, c); }
+  return c;
+}
 function skinAt(C, bx, by) {
   try {
     const gl = W.GLDrawCanvas && W.GLDrawCanvas.GL;
@@ -104,7 +114,7 @@ function hookBelly(mod) {
             if (src.includes("/BodyUpper/")) upper = [x, y];
             if (src.includes("/BodyLower/") && upper) {
               done = true;
-              const S = SIZES[trial], cv = bellyPicture(trial, skinAt(C, upper[0], upper[1]));   // { url, width, height }: a picture the game can cache by name
+              const S = SIZES[trial], cv = bellyPicture(trial, skinFor(C, upper[0], upper[1]));   // { url, width, height }: a picture the game can cache by name
               // centred on the navel of the upper-body picture, sittin' lower as it gets bigger
               const dx = upper[0] + 250 - cv.width / 2, dy = upper[1] + 432 + S.ry * 0.22 - cv.height / 2;
               cb.drawImage(cv.url, dx, dy, {});

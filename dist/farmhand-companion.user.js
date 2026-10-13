@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.16.4
+// @version      0.16.5
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -230,7 +230,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.16.4";
+  var VERSION = "0.16.5";
 
   // extension/src/config.js
   var BOT_MEMBER = 260239;
@@ -1099,6 +1099,18 @@ One of mods you are using is using an old version of SDK. It will work for now b
     }
     return n;
   }
+  var skinSeen = /* @__PURE__ */ new Map();
+  function skinFor(C, bx, by) {
+    const it = (C.DrawAppearance || C.Appearance || []).find((x) => x && x.Asset && x.Asset.Group && x.Asset.Group.Name === "BodyUpper");
+    const key = it ? it.Asset.Name + "|" + JSON.stringify(it.Color || "") : "?";
+    let c = skinSeen.get(key);
+    if (!c) {
+      c = skinAt(C, bx, by);
+      if (skinSeen.size > 12) skinSeen.clear();
+      skinSeen.set(key, c);
+    }
+    return c;
+  }
   function skinAt(C, bx, by) {
     try {
       const gl = W.GLDrawCanvas && W.GLDrawCanvas.GL;
@@ -1136,7 +1148,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
               if (src.includes("/BodyUpper/")) upper = [x, y];
               if (src.includes("/BodyLower/") && upper) {
                 done = true;
-                const S = SIZES[trial], cv = bellyPicture(trial, skinAt(C, upper[0], upper[1]));
+                const S = SIZES[trial], cv = bellyPicture(trial, skinFor(C, upper[0], upper[1]));
                 const dx = upper[0] + 250 - cv.width / 2, dy = upper[1] + 432 + S.ry * 0.22 - cv.height / 2;
                 cb.drawImage(cv.url, dx, dy, {});
                 if (typeof cb.drawImageBlink === "function") cb.drawImageBlink(cv.url, dx, dy, {});

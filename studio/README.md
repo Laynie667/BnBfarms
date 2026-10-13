@@ -86,6 +86,16 @@ the game's pictures into the drawing.
   and carried over to the new one unless that one already has a fit of its own. *Save this fit* still writes the
   file; unsaved work lasts until the page is closed.
 
+## Step 7: mould to the body
+
+- **Mould to the body.** A button on the picked piece. Sliders move or stretch a whole piece evenly, and a belly is
+  not even. A moulded piece is redrawn one row at a time: the part across the body is widened to the body's outline
+  on that row (belly included), and what hangs outside the body on either side moves out with the edge. Rows the
+  belly does not reach are left alone. The sliders still work on top of it.
+- It widens sideways only. A short corset stays short, and no bulge is painted on. Needs the belly switched on and
+  not set to "behind".
+- The list of moulded pieces is saved in `fits/items.json` when you press *Save this fit*.
+
 ## What it is for next
 
 1. The Companion's belly reading the saved fits, so a shape tuned here is the shape worn in the game.

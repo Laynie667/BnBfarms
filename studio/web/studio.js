@@ -7,6 +7,7 @@
    Step 2: pick any item from any slot and try it on · colour it · see what's worn and take pieces off.
    Step 4: click a worn piece to fit it: move, stretch, turn (the whole piece or one layer), change its option ·
            a fit is kept per item, body and pose in studio/fits/items.json and put back when that item is worn again.
+   Step 7: "Mould to the body": a marked piece is redrawn row by row to follow the body's outline, belly and all.
    Step 6: "Configure it" opens the game's own settings menu for an item · adjustments are kept through a change of
            pose or body.
    Step 5: forward and back in the drawing order (the piece or one layer) · a colour for each colour layer.
@@ -228,6 +229,9 @@
     box.replaceChildren(...[
       $("p", { className: "note", textContent: "Fitting: " + itemName(it.Asset) + "  (" + it.Asset.Group.Name + " / " + it.Asset.Name + ")  on a " + fitKey(it).split("|")[1].replace("+", " chest, ") + " hips body, " + POSE_KEYS[poseKey()].toLowerCase() + "." }),
       (it.Asset.Extended || it.Asset.Archetype) ? $("div", { className: "row" }, $("button", { type: "button", className: "go", textContent: "Configure it (the game's own menu)", title: "Opens the real settings menu the game has for this item", onclick: () => configure(it.Asset.Group.Name) }), $("span", { className: "note", textContent: "Everything the game lets you set on it." })) : "",
+      $("div", { className: "row" },
+        $("button", { type: "button", className: MOULD.items.has(mouldKey(it)) ? "on" : "", textContent: MOULD.items.has(mouldKey(it)) ? "Moulded to the body: on" : "Mould to the body", title: "Redraws this piece to follow the outline of the body, belly and all", onclick: () => { const k = mouldKey(it); if (MOULD.items.has(k)) MOULD.items.delete(k); else MOULD.items.add(k); MOULD.out.clear(); bellyDraw(); fillFit(); if (MOULD.items.has(k) && !fitNow().on) say("It's marked. The moulding shows once the belly is showing: there's nothing to mould to yet."); } }),
+        $("span", { className: "note", textContent: MOULD.items.has(mouldKey(it)) ? "It follows the body's outline. The sliders still work on top." : "Follows the outline where the sliders can't: wide where the belly is, untouched where it isn't." })),
       options.length > 1 ? $("div", { className: "row" }, $("label", { textContent: "Option:" }), options.map((o) => $("button", { type: "button", className: typeNow() === o ? "on" : "", textContent: o.replace(/([a-z])([A-Z0-9])/g, "$1 $2"), onclick: () => { try { TypedItemSetOptionByName(S.C, it, o, false, null, false); } catch (e) { say("The game wouldn't set that option: " + (e && e.message || e), true); } redraw(); } }))) : "",
       layers.length > 1 ? $("div", { className: "row" }, $("label", { textContent: "Move:" }),
         $("button", { type: "button", className: FIT.layer ? "" : "on", textContent: "The whole piece", onclick: () => { FIT.layer = ""; fillFit(); } }),
@@ -255,11 +259,12 @@
     const key = fitKey(it), f = fitOf(it);
     if (Object.keys(f).length) FIT.saved[key] = f; else delete FIT.saved[key];
     delete FIT.work[key];
-    try { const r = await fetch("/__studio/fits/items.json", { method: "POST", body: JSON.stringify({ v: 1, saved: new Date().toISOString(), note: "key: slot/item|chest+hips|pose", fits: FIT.saved }, null, 1) }); if (!r.ok) throw new Error(await r.text());
+    try { const r = await fetch("/__studio/fits/items.json", { method: "POST", body: JSON.stringify({ v: 1, saved: new Date().toISOString(), note: "key: slot/item|chest+hips|pose · mould: slot/item pieces redrawn to the body's outline", fits: FIT.saved, mould: Array.from(MOULD.items) }, null, 1) }); if (!r.ok) throw new Error(await r.text());
       say("Saved the fit for " + itemName(it.Asset) + " on this body in this pose. " + Object.keys(FIT.saved).length + " fits kept in studio\\fits\\items.json."); fillFit(); }
     catch (e) { say("It didn't save: " + (e && e.message || e), true); }
   }
-  async function loadItemFits() { try { const d = await (await fetch("/__studio/fits/items.json", { cache: "no-store" })).json(); if (d && d.fits) { FIT.saved = d.fits; applyAllSaved(); fitRefresh(); fillFit(); } } catch (e) { /* none yet */ } }
+  async function loadItemFits() { try { const d = await (await fetch("/__studio/fits/items.json", { cache: "no-store" })).json(); if (d && Array.isArray(d.mould)) for (const k of d.mould) MOULD.items.add(k);
+      if (d && d.fits) { FIT.saved = d.fits; applyAllSaved(); fitRefresh(); fillFit(); } } catch (e) { /* none yet */ } }
 
   // ── the belly ──
   // A fit for each pose: where it sits and what shape it is. "std" is standing, kneeling and every arms pose (the torso
@@ -295,6 +300,65 @@
     return guess;
   }
   // step into the game's drawing of our character and lay the belly in: after all the skin, or before the upper body
+  // ── moulded to the body ──
+  // A slider can only move or stretch a whole piece evenly, and a belly isn't even: narrow at the ribs, wide lower
+  // down. A MOULDED piece is redrawn to follow the outline instead. For every row of pixels we know where the body's
+  // edges were (the game's body pictures) and where they are now (those, plus the belly). Each row of the piece is
+  // then redrawn in three parts: the stretch across the body is widened to the new edges, and what hangs outside the
+  // body on either side is moved out with the edge, so it stays attached. Rows the belly doesn't reach are untouched.
+  // It follows the outline as seen from the front. It doesn't paint a bulge onto the piece.
+  const MOULD = { items: new Set(), img: new Map(), prof: new Map(), out: new Map(), M: 150 };
+  const mouldKey = (it) => it.Asset.Group.Name + "/" + it.Asset.Name;
+  function mouldImg(src) {
+    let e = MOULD.img.get(src);
+    if (!e) { e = { img: new Image(), ok: false }; e.img.onload = () => { e.ok = true; clearTimeout(MOULD.t); MOULD.t = setTimeout(bellyDraw, 60); }; e.img.onerror = () => { e.bad = true; }; e.img.src = src; MOULD.img.set(src, e); }
+    return e.ok ? e.img : null;
+  }
+  // the left and right edge of what's drawn on each row of a picture (-1 where the row is empty)
+  function edges(source, w, h) {
+    const c = document.createElement("canvas"); c.width = w; c.height = h;
+    const g = c.getContext("2d", { willReadFrequently: true }); g.drawImage(source, 0, 0);
+    const d = g.getImageData(0, 0, w, h).data, L = new Int16Array(h).fill(-1), R = new Int16Array(h).fill(-1);
+    for (let y = 0; y < h; y++) { let l = -1, r = -1; const o = y * w * 4; for (let x = 0; x < w; x++) if (d[o + x * 4 + 3] > 60) { if (l < 0) l = x; r = x; } L[y] = l; R[y] = r; }
+    return { L, R, w, h };
+  }
+  function edgesOf(src) { let p = MOULD.prof.get(src); if (p) return p; const im = mouldImg(src); if (!im) return null; p = edges(im, im.naturalWidth, im.naturalHeight); MOULD.prof.set(src, p); return p; }
+  // ctx: { bodies: [{ src, x, y }], belly: { cv, dx, dy } }. Gives the body's edges on a row of the screen, before and after.
+  function outline(ctx) {
+    const parts = []; for (const b of ctx.bodies) { const p = edgesOf(b.src); if (!p) return null; parts.push({ p, x: b.x, y: b.y }); }
+    const bp = ctx.belly.prof || (ctx.belly.prof = edges(ctx.belly.cv, ctx.belly.cv.width, ctx.belly.cv.height));
+    const row = (yy, withBelly) => {
+      let l = Infinity, r = -Infinity;
+      for (const q of parts) { const j = yy - Math.round(q.y); if (j >= 0 && j < q.p.h && q.p.L[j] >= 0) { l = Math.min(l, q.x + q.p.L[j]); r = Math.max(r, q.x + q.p.R[j]); } }
+      if (l === Infinity) return null;
+      if (withBelly) { const j = yy - Math.round(ctx.belly.dy); if (j >= 0 && j < bp.h && bp.L[j] >= 0) { l = Math.min(l, ctx.belly.dx + bp.L[j]); r = Math.max(r, ctx.belly.dx + bp.R[j]); } }
+      return { l, r };
+    };
+    return { old: (yy) => row(yy, false), neu: (yy) => row(yy, true) };
+  }
+  function mouldCanvas(src, x, y, ctx) {
+    const im = mouldImg(src); if (!im) return null;
+    const key = src + "|" + Math.round(x) + "," + Math.round(y) + "|" + ctx.sig;
+    if (MOULD.out.has(key)) return MOULD.out.get(key);
+    const ol = ctx.outline || (ctx.outline = outline(ctx)); if (!ol) return null;   // a body picture is still loading: try again next redraw
+    const M = MOULD.M, w = im.naturalWidth, h = im.naturalHeight, c = document.createElement("canvas"); c.width = w + M * 2; c.height = h;
+    const g = c.getContext("2d"); let changed = false;
+    for (let j = 0; j < h; j++) {
+      const yy = Math.round(y) + j, o = ol.old(yy), n = ol.neu(yy);
+      if (!o || !n || (n.l >= o.l && n.r <= o.r)) { g.drawImage(im, 0, j, w, 1, M, j, w, 1); continue; }
+      changed = true;
+      const l0 = Math.max(0, Math.min(w - 1, Math.round(o.l - x))), r0 = Math.max(l0, Math.min(w - 1, Math.round(o.r - x))), l1 = Math.round(n.l - x), r1 = Math.round(n.r - x);
+      if (l0 > 0) g.drawImage(im, 0, j, l0, 1, M + (l1 - l0), j, l0, 1);                                   // left of the body: out with the edge
+      g.drawImage(im, l0, j, r0 - l0 + 1, 1, M + l1, j, r1 - l1 + 1, 1);                                   // across the body: stretched to fit
+      if (r0 + 1 < w) g.drawImage(im, r0 + 1, j, w - r0 - 1, 1, M + r1 + 1, j, w - r0 - 1, 1);             // right of the body
+    }
+    const res = changed ? c : false;   // false: nothing on this piece overlaps the belly, draw it as the game does
+    if (MOULD.out.size > 80) MOULD.out.clear(); MOULD.out.set(key, res);
+    return res;
+  }
+
+  // step into the game's drawing of our character: lay the belly in (after all the skin, or before the upper body), and
+  // redraw any moulded piece to the new outline
   function hookBelly() {
     const game = CommonDrawAppearanceBuild;
     CommonDrawAppearanceBuild = function (C, cb) {
@@ -303,8 +367,14 @@
         const fit = C === S.C ? fitNow() : null, real = cb;   // real: the game's own callbacks (the wrapped set below must never call itself)
         if (fit && fit.on && cb && typeof cb.drawImage === "function") {
           let upper = null, lower = false, done = false;
+          const ctx = { bodies: [], belly: null, sig: "" };
+          const slot = new RegExp("(?:^|/)Assets/[^/]+/([^/]+)/");
+          const groupOf = (src) => { const m = slot.exec(src); return m ? m[1] : ""; };
+          // (a piece's pictures are in its slot's folder or the folder of the slot it borrows its art from, named for the piece)
+          const mouldList = S.C.Appearance.filter((it) => MOULD.items.has(mouldKey(it))).map((it) => ({ folders: [it.Asset.Group.Name, it.Asset.DynamicGroupName], name: it.Asset.Name }));
+          const isMoulded = (src) => { if (!mouldList.length) return false; const g = groupOf(src), file = src.slice(src.lastIndexOf("/") + 1); return mouldList.some((q) => q.folders.includes(g) && file.startsWith(q.name)); };
           const gate = FarmBelly.skinGate(C);   // true once a picture comes after all the skin, genitals included
-          const prio = (src) => { const m = new RegExp("(?:^|/)Assets/[^/]+/([^/]+)/").exec(src); const g = m && AssetGroupGet(C.AssetFamily, m[1]); return g && typeof g.DrawingPriority === "number" ? g.DrawingPriority : 99; };
+          const prio = (src) => { const g = AssetGroupGet(C.AssetFamily, groupOf(src)); return g && typeof g.DrawingPriority === "number" ? g.DrawingPriority : 99; };
           const paint = () => {
             if (done || !upper) return; done = true;
             const shape = { rx: fit.rx, ry: fit.ry, sag: fit.sag, cut: fit.cut };
@@ -312,11 +382,20 @@
             // hung from just under the ribs, then moved by the sliders; pressed flat, its ground line is what the sliders place
             const dx = upper[0] + 250 - cv.width / 2 + fit.x, dy = upper[1] + 392 + fit.ry * 0.62 - cv.height / 2 + fit.y;
             real.drawImage(cv, dx, dy, {}); if (typeof real.drawImageBlink === "function") real.drawImageBlink(cv, dx, dy, {});
+            ctx.belly = { cv, dx, dy };
+            ctx.sig = [fit.rx, fit.ry, fit.sag, fit.cut, fit.flat ? 1 : 0, Math.round(dx), Math.round(dy)].join(",") + "|" + ctx.bodies.map((b) => b.src + "@" + Math.round(b.x) + "," + Math.round(b.y)).join(";");
           };
           const before = (src, x, y, o) => { if (done || typeof src !== "string") return; if (src.includes("/BodyUpper/") && fit.behind) { upper = [x, y, src, o && o.HexColor]; paint(); return; } if (gate ? gate(src) : (lower && prio(src) > 12)) paint(); };
-          const after = (src, x, y, o) => { if (typeof src !== "string") return; if (src.includes("/BodyUpper/")) upper = [x, y, src, o && o.HexColor]; if (src.includes("/BodyLower/")) lower = true; };
-          const wrap = (name) => (typeof real[name] === "function" ? (src, x, y, o) => { try { before(src, x, y, o); } catch (e) { console.warn("[studio] belly:", e); } real[name](src, x, y, o); try { after(src, x, y, o); } catch (e) { console.warn("[studio] belly:", e); } } : real[name]);
-          cb = Object.assign({}, real, { drawImage: wrap("drawImage"), drawImageColorize: wrap("drawImageColorize") });
+          const after = (src, x, y, o) => { if (typeof src !== "string") return; if (src.includes("/BodyUpper/")) { upper = [x, y, src, o && o.HexColor]; ctx.bodies.push({ src, x, y }); } if (src.includes("/BodyLower/")) { lower = true; ctx.bodies.push({ src, x, y }); } };
+          const wrap = (name) => (typeof real[name] === "function" ? (src, x, y, o) => {
+            const blink = /Blink$/.test(name);
+            if (!blink) { try { before(src, x, y, o); } catch (e) { console.warn("[studio] belly:", e); } }
+            let drawn = false;
+            try { if (ctx.belly && !fit.behind && typeof src === "string" && isMoulded(src)) { const m = mouldCanvas(src, x, y, ctx); if (m) { real[name](m, x - MOULD.M, y, o); drawn = true; } } } catch (e) { console.warn("[studio] mould:", e); }
+            if (!drawn) real[name](src, x, y, o);
+            if (!blink) { try { after(src, x, y, o); } catch (e) { console.warn("[studio] belly:", e); } }
+          } : real[name]);
+          cb = Object.assign({}, real, { drawImage: wrap("drawImage"), drawImageColorize: wrap("drawImageColorize"), drawImageBlink: wrap("drawImageBlink"), drawImageColorizeBlink: wrap("drawImageColorizeBlink") });
           finish = paint;
         }
       } catch (e) { console.warn("[studio] belly hook:", e); }
@@ -415,7 +494,7 @@
     CharacterAppearanceSetDefault(S.C);
     CharacterRefresh(S.C, false, false);
     panel(); S.ready = true; loadFits(false); loadItemFits();
-    window.FarmStudio = { S, wear, decode, encode, setBody, setSkin, setPose, redraw, putOn, tint, slots, BELLY, bellyDraw, saveFits, loadFits, FIT, select, saveFit, fitSet, fitDraw, orderSet, orderNow, colourSet, colourLayers, configure, configureDone, stashFits };   // for poking at from the console
+    window.FarmStudio = { S, wear, decode, encode, setBody, setSkin, setPose, redraw, putOn, tint, slots, BELLY, bellyDraw, saveFits, loadFits, FIT, select, saveFit, fitSet, fitDraw, orderSet, orderNow, colourSet, colourLayers, configure, configureDone, stashFits, MOULD };   // for poking at from the console
     say("Ready. Paste an outfit code, or change the body and pose below.");
   }
   let tries = 0;

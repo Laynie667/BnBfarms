@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.17.4
+// @version      0.17.5
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -230,7 +230,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.17.4";
+  var VERSION = "0.17.5";
 
   // extension/src/config.js
   var BOT_MEMBER = 260239;
@@ -1154,7 +1154,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       const m = slot.exec(String(src));
       if (!m) return false;
       let i = at;
-      while (i < layers.length && groupOf3(layers[i]) !== m[1]) i++;
+      while (i < layers.length && groupOf3(layers[i]) !== m[1] && (layers[i].Asset && layers[i].Asset.DynamicGroupName) !== m[1]) i++;
       if (i >= layers.length) return false;
       at = i + 1;
       return i > last;

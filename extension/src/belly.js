@@ -136,7 +136,9 @@ function skinGate(C) {
   const slot = new RegExp("(?:^|/)Assets/[^/]+/([^/]+)/");
   return (src) => {
     const m = slot.exec(String(src)); if (!m) return false;
-    let i = at; while (i < layers.length && groupOf(layers[i]) !== m[1]) i++;
+    // (an item's pictures can live in ANOTHER slot's folder: a corset locked on as a restraint draws from "Corset", not
+    // "ItemTorso". Matched by slot name only, such a piece was never recognised and the belly went on over it. Oct 12.)
+    let i = at; while (i < layers.length && groupOf(layers[i]) !== m[1] && (layers[i].Asset && layers[i].Asset.DynamicGroupName) !== m[1]) i++;
     if (i >= layers.length) return false;      // not one of the listed layers (somethin' another add-on drew): no opinion
     at = i + 1;
     return i > last;

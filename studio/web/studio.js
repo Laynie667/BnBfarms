@@ -619,18 +619,17 @@
                 if (v0 >= d[k - 1] && v0 >= d[k + 1] && v0 >= d[k - w] && v0 >= d[k + w] && v0 >= d[k - w - 1] && v0 >= d[k - w + 1] && v0 >= d[k + w - 1] && v0 >= d[k + w + 1]) ridge.push(v0); } }
             ridge.sort((m, n) => m - n); v = ridge.length >= 24 ? ridge[Math.floor(ridge.length * 0.2)] : 0; BREAST.cover.set(key, v); return v;
           };
-          // Chest wear on drawn breasts. The piece's own picture is BULGED, the way a lens bulges what's under it: in the
-          // middle of each breast it is the part that covered the game's breast, grown to ours; toward our outline it
-          // eases back, and AT the outline it is exactly the game's picture again. So nothing jumps at the edge: a
-          // strap that runs off the breast to the shoulder is one unbroken strap (Laynie, Oct 13, of the version that
-          // cut the breast out and pasted a grown copy in: "those still don't look right at all, or aligned").
-          // Each pixel inside our outline looks up where it came from in the game's picture.
-          const breastRim = (S2, sd) => {   // how far the outline is from the breast's middle, by direction (720 steps round)
-            const N = 720, rim = new Float32Array(N);
-            for (let j = 0; j < 4000; j++) { const p = FarmBreasts.point(S2, sd, Math.PI * 2 * j / 4000), dx = p[0] - sd * S2.bx, dy = p[1] - S2.by, k = ((Math.round(Math.atan2(dy, dx) / (Math.PI * 2) * N) % N) + N) % N, d = Math.hypot(dx, dy); if (d > rim[k]) rim[k] = d; }
-            for (let k = 0; k < N; k++) if (!rim[k]) { let m = 1; while (m < N && !rim[(k + m) % N]) m++; rim[k] = rim[(k + m) % N]; }
-            return rim;
-          };
+          // Chest wear on drawn breasts. The piece is the game's own picture, re-laid over the bigger breasts so that every
+          // part of it keeps its PLACE on the breast (Laynie's marks, Oct 13: straps that ring the game's breast have to
+          // ring ours, out at its edge; they'd been running across its face, and the middle was a smear):
+          //   · the breastbone stays the breastbone: what sits between the breasts stays between them
+          //   · the breast's outer edge is the outer edge: a strap round the outside of the game's is round the outside of ours
+          //   · the top is the top: level with the top of the game's breast the piece is exactly the game's picture, so a
+          //     strap from the shoulder runs on to the breast unbroken
+          //   · the underside is the underside, and the nipple line the nipple line
+          // It's done a row at a time. Each row of ours, from the breastbone out to our outer edge, is filled from the
+          // matching row of the game's, from the breastbone out to ITS outer edge. Below and outside the breast the
+          // piece is hidden by the breast, as it would be.
           const dressDraw = (name, src, x, y, o, plain) => {
             const B = ctx.breast, im = B && mouldImg(src); if (!im) return false;
             if (chestCover(src, im, x, y, B) < (B.pose === "AllFours" ? 0.05 : 0.08)) return false;
@@ -639,44 +638,47 @@
             if (!c) {
               const MX = 220, MY = 420, w = im.naturalWidth, h = im.naturalHeight, S2 = B.S, GB = gameBreast(B);
               c = document.createElement("canvas"); c.width = w + MX * 2; c.height = h + MY * 2; c.MX = MX; c.MY = MY;
-              const g = c.getContext("2d"), ox = MX + B.rx - x, oy = MY + B.ry - y, midX = MX + B.mid - x;
+              const g = c.getContext("2d", { willReadFrequently: true }), ox = MX + B.rx - x, oy = MY + B.ry - y, midX = MX + B.mid - x;
               g.drawImage(im, MX, MY);
-              // the game's picture, to read from (in the big canvas's own coordinates, so the empty margin reads as empty)
-              const srcData = g.getImageData(0, 0, c.width, c.height), sp = srcData.data, CW = c.width, CH = c.height;
-              // (more than the game's breast is taken, a quarter again: the straps that ring it and run under it sit just outside it, and they belong on ours)
-              const sx = S2.r * 1.04 / (GB.r * 1.26), sy = S2.r * (1 + S2.sag) / (GB.r * 1.26);
-              const half = plain ? 0 : strapHalf(src, im, x, y, B), sAvg = (sx + sy) / 2, want = 1 + 0.35 * S2.k;
-              const pare = half > 0 && half <= 8 ? Math.max(0, Math.min(half * sAvg - 1.4, half * (sAvg - want))) : 0;
-              const N = 720;
-              for (const sd of [-1, 1]) {
-                const rim = breastRim(S2, sd), cx = ox + sd * S2.bx, cy = oy + S2.by, yTop = cy - S2.r * S2.top, yFull = cy - S2.r * 0.25, nx = midX + sd * GB.dx, ny = MY + B.uy + GB.y - y;
-                const x0 = Math.max(0, Math.floor(cx - S2.r * 1.5)), y0 = Math.max(0, Math.floor(cy - S2.r * S2.top - 4)), bw = Math.min(CW - x0, Math.ceil(S2.r * 3)), bh = Math.min(CH - y0, Math.ceil(S2.r * (S2.top + 1 + S2.sag) + 10));
-                if (bw <= 0 || bh <= 0) continue;
-                const out = g.createImageData(bw, bh), od = out.data, wgt = new Float32Array(bw * bh).fill(-1);
-                for (let j = 0; j < bh; j++) for (let i = 0; i < bw; i++) {
-                  const qx = x0 + i, qy = y0 + j; if (sd < 0 ? qx >= midX : qx < midX) continue;   // each keeps to its own side of the breastbone
-                  const dx = qx - cx, dy = qy - cy, dist = Math.hypot(dx, dy), k = ((Math.round(Math.atan2(dy, dx) / (Math.PI * 2) * N) % N) + N) % N, rho = dist / rim[k];
-                  if (rho >= 1) continue;
-                  // 1 up where the breast leaves the chest (as the game drew it: the chest hasn't changed), easing to 0 a third of the way down (grown). Round the sides and underneath there is no easing: that's the breast's own edge, and what was on the body behind it is hidden by it.
-                  const t = Math.max(0, Math.min(1, (qy - yTop) / (yFull - yTop))), wv = 1 - t * t * (3 - 2 * t);
-                  const fx = (1 - wv) * (nx + dx / sx) + wv * qx, fy = (1 - wv) * (ny + dy / sy) + wv * qy;
-                  const ix = Math.floor(fx), iy = Math.floor(fy); if (ix < 0 || iy < 0 || ix >= CW - 1 || iy >= CH - 1) continue;
-                  const ax = fx - ix, ay = fy - iy, p00 = (iy * CW + ix) * 4, p10 = p00 + 4, p01 = p00 + CW * 4, p11 = p01 + 4, o4 = (j * bw + i) * 4;
-                  const a00 = sp[p00 + 3] * (1 - ax) * (1 - ay), a10 = sp[p10 + 3] * ax * (1 - ay), a01 = sp[p01 + 3] * (1 - ax) * ay, a11 = sp[p11 + 3] * ax * ay, at = a00 + a10 + a01 + a11;
-                  wgt[j * bw + i] = wv;
-                  if (at < 1) continue;
-                  od[o4] = (sp[p00] * a00 + sp[p10] * a10 + sp[p01] * a01 + sp[p11] * a11) / at; od[o4 + 1] = (sp[p00 + 1] * a00 + sp[p10 + 1] * a10 + sp[p01 + 1] * a01 + sp[p11 + 1] * a11) / at; od[o4 + 2] = (sp[p00 + 2] * a00 + sp[p10 + 2] * a10 + sp[p01 + 2] * a01 + sp[p11 + 2] * a11) / at; od[o4 + 3] = at;
+              const CW = c.width, CH = c.height, sp = g.getImageData(0, 0, CW, CH).data;
+              const Rn = GB.r * 1.2, ny = MY + B.uy + GB.y - y, cy = oy + S2.by;                     // the game's breast (with the straps round it), and the middle of ours
+              const yT = Math.round(ny - Rn), yB = Math.round(cy + S2.r * (1 + S2.sag)) + 1;         // top (the same line in both) and our underside
+              const edgeN = (yn) => GB.dx + Math.sqrt(Math.max(0, Rn * Rn - (yn - ny) * (yn - ny)));   // the game's outer edge on a row, out from the breastbone
+              // our outer edge on each row
+              const edgeT = new Float32Array(CH);
+              for (let j = 0; j <= 3000; j++) { const p = FarmBreasts.point(S2, 1, Math.PI * 2 * j / 3000), row = Math.round(oy + p[1]); if (row >= 0 && row < CH && p[0] > edgeT[row]) edgeT[row] = p[0]; }
+              for (let row = 1; row < CH - 1; row++) if (!edgeT[row] && edgeT[row - 1] && row < yB) edgeT[row] = edgeT[row - 1];
+              const half = plain ? 0 : strapHalf(src, im, x, y, B), want = 1 + 0.35 * S2.k, paring = half > 0 && half <= 8;
+              const maxX = Math.ceil(Math.max(...edgeT)) + 2, x0 = Math.max(0, Math.floor(midX - maxX)), bw = Math.min(CW - x0, maxX * 2), y0 = Math.max(0, yT), bh = Math.min(CH - y0, yB - yT);
+              if (bw > 0 && bh > 0) {
+                const out = g.createImageData(bw, bh), od = out.data, wgt = new Float32Array(bw * bh).fill(-1), grew = new Float32Array(bw * bh);
+                const easeRows = Math.max(6, (cy - yT) * 0.45);
+                for (let j = 0; j < bh; j++) {
+                  const qy = y0 + j, Xt = Math.max(edgeT[qy] || 0, 1);
+                  // which row of the game's: top to nipple line maps to top to nipple line, and the same below
+                  const yn = qy <= cy ? yT + (qy - yT) * (ny - yT) / Math.max(1, cy - yT) : ny + (qy - cy) * Rn / Math.max(1, yB - cy);
+                  const Xn = edgeN(yn), t = Math.min(1, (qy - yT) / easeRows), ease = 1 - t * t * (3 - 2 * t);   // 1 at the top (the game's own picture), 0 once we're on the breast
+                  const kx = Xn / Xt, ky = qy <= cy ? (ny - yT) / Math.max(1, cy - yT) : Rn / Math.max(1, yB - cy);
+                  for (let i = 0; i < bw; i++) {
+                    const qx = x0 + i, off = qx - midX; if (Math.abs(off) > Xt) continue;
+                    const fx = (1 - ease) * (midX + off * kx) + ease * qx, fy = (1 - ease) * yn + ease * qy;
+                    wgt[j * bw + i] = ease; grew[j * bw + i] = 1 / Math.sqrt(Math.max(0.01, kx * ky));
+                    const ix = Math.floor(fx), iy = Math.floor(fy); if (ix < 0 || iy < 0 || ix >= CW - 1 || iy >= CH - 1) continue;
+                    const ax = fx - ix, ay = fy - iy, p00 = (iy * CW + ix) * 4, p10 = p00 + 4, p01 = p00 + CW * 4, p11 = p01 + 4, o4 = (j * bw + i) * 4;
+                    const a00 = sp[p00 + 3] * (1 - ax) * (1 - ay), a10 = sp[p10 + 3] * ax * (1 - ay), a01 = sp[p01 + 3] * (1 - ax) * ay, a11 = sp[p11 + 3] * ax * ay, at = a00 + a10 + a01 + a11;
+                    if (at < 1) continue;
+                    od[o4] = (sp[p00] * a00 + sp[p10] * a10 + sp[p01] * a01 + sp[p11] * a11) / at; od[o4 + 1] = (sp[p00 + 1] * a00 + sp[p10 + 1] * a10 + sp[p01 + 1] * a01 + sp[p11 + 1] * a11) / at; od[o4 + 2] = (sp[p00 + 2] * a00 + sp[p10 + 2] * a10 + sp[p01 + 2] * a01 + sp[p11 + 2] * a11) / at; od[o4 + 3] = at;
+                  }
                 }
-                // a strap grown with the breast isn't a strap any more: pare it back from both edges, most where it grew most
+                // a strap grown with the breast isn't a strap any more: pare it back from both edges, by as much as it grew there
                 let rimDark = null;
-                if (pare > 0.5) {
+                if (paring) {
                   const al = new Uint8Array(bw * bh); for (let i = 0; i < al.length; i++) al[i] = od[i * 4 + 3];
                   const d = distMap(al, bw, bh);
-                  for (let i = 0; i < al.length; i++) { if (wgt[i] < 0 || !al[i]) continue; const e = pare * (1 - wgt[i]); if (e <= 0.3) continue; const v = d[i] - e; if (v <= 0) od[i * 4 + 3] = 0; else if (v < 1) od[i * 4 + 3] = Math.round(od[i * 4 + 3] * v); }
+                  for (let i = 0; i < al.length; i++) { if (wgt[i] < 0 || !al[i]) continue; const e = Math.max(0, Math.min(half * grew[i] - 1.4, half * (grew[i] - want))) * (1 - wgt[i]); if (e <= 0.3) continue; const v = d[i] - e; if (v <= 0) od[i * 4 + 3] = 0; else if (v < 1) od[i * 4 + 3] = Math.round(od[i * 4 + 3] * v); }
                   rimDark = o && o.HexColor ? [70, 70, 70] : ownColour(src, im).map((v) => v * 0.3);
                 }
                 const T = document.createElement("canvas"); T.width = bw; T.height = bh; T.getContext("2d").putImageData(out, 0, 0);
-                // our pixels replace the game's inside the outline (wgt >= 0 marks them)
                 const hole = document.createElement("canvas"); hole.width = bw; hole.height = bh; const hd = hole.getContext("2d"), hi = hd.createImageData(bw, bh);
                 for (let i = 0; i < wgt.length; i++) if (wgt[i] >= 0) hi.data[i * 4 + 3] = 255;
                 hd.putImageData(hi, 0, 0);
@@ -684,7 +686,7 @@
                 if (rimDark) { const rc = document.createElement("canvas"); rc.width = bw; rc.height = bh; const rg = rc.getContext("2d");
                   for (const [ddx, ddy] of [[-1, 0], [1, 0], [0, -1], [0, 1]]) rg.drawImage(T, ddx, ddy);
                   rg.globalCompositeOperation = "source-in"; rg.fillStyle = "rgb(" + rimDark.map((v) => Math.round(v)).join(",") + ")"; rg.fillRect(0, 0, bw, bh);
-                  rg.globalCompositeOperation = "destination-in"; rg.drawImage(hole, 0, 0);   // (the dark edge stays inside our outline too)
+                  rg.globalCompositeOperation = "destination-in"; rg.drawImage(hole, 0, 0);
                   g.drawImage(rc, x0, y0); }
                 g.drawImage(T, x0, y0);
               }

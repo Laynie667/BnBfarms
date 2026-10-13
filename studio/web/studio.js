@@ -394,13 +394,19 @@
   // Flat to R. The first six cups are the game's own chest sizes: picking one just changes the body. From DD up they're
   // drawn (breasts-drawing.js), over the game's biggest chest, standing and kneeling only for now. The game's nipples,
   // and whatever is worn on them, are lifted off where the game puts them and set down on the drawn ones.
-  const BREAST = { cup: null, full: 1, hang: 1, apart: 1, x: 0, y: 0, nip: 1, nipY: 0, nipX: 0, cv: null, cvKey: "", halves: new Map(), out: new Map() };
+  const BREAST = { dress: true, cover: new Map(), cup: null, full: 1, hang: 1, apart: 1, x: 0, y: 0, nip: 1, nipY: 0, nipX: 0, cv: null, cvKey: "", halves: new Map(), out: new Map() };
   const BREAST_SLIDERS = [["full", "Fullness", 0.7, 1.4, 0.01], ["hang", "Weight (how low and heavy they hang)", 0, 2, 0.01], ["apart", "Apart / together", 0.6, 1.5, 0.01], ["x", "Left / right", -60, 60, 1], ["y", "Up / down", -80, 80, 1],
     ["nip", "Nipple size (and what's worn on them)", 0.4, 4, 0.05], ["nipY", "Nipples up / down", -80, 80, 1], ["nipX", "Nipples in / out", -60, 60, 1]];
   const NIP_GROUPS = new Set(["Nipples", "ItemNipples", "ItemNipplesPiercings"]);
   // what the breasts hang in front of once they reach it (Laynie, Oct 13: "at larger sizes should probably cover the
   // hands"): the hands and what's worn on them. Their pictures are drawn with the breasts' outline cut out.
   const HAND_GROUPS = new Set(["HandsLeft", "HandsRight", "ItemHands", "Gloves"]);
+  // What's worn over the chest. Every one of these is cut for the game's biggest chest, so on drawn breasts it would
+  // sit in the middle like a patch. Instead the part of the piece that covered each of the game's breasts is taken and
+  // GROWN onto the drawn one: same piece, same colours and shading, stretched from the game's breast to ours and kept
+  // inside our outline. A bra cup stays a cup, a top stays a top. What's off the breasts isn't touched.
+  const CHEST_GROUPS = new Set(["Cloth", "ClothOuter", "ClothAccessory", "Suit", "Bra", "Corset", "ItemBreast", "ItemTorso", "ItemTorso2"]);
+  const GAME_BREAST = { dx: 42, y: 330, r: 41 };   // the game's biggest chest, in its upper-body picture: each breast's middle is this far out from the centre line, this far down, and about this big
   const upperName = () => { const it = bodyItem("BodyUpper"); return it && it.Asset ? it.Asset.Name : ""; };
   // the drawn breasts to show right now, or null (a cup the game draws itself, another chest picked since, or a pose they aren't drawn in)
   function breastNow() { if (!window.FarmBreasts || BREAST.cup == null || BREAST.cup < FarmBreasts.DRAWN_FROM) return null; if (upperName() !== "XLarge" || poseKey() !== "std") return null; return BREAST; }
@@ -447,6 +453,7 @@
         $("div", { className: "row" },
           $("button", { type: "button", className: "go", textContent: "Save the breasts", onclick: saveBreasts }),
           $("button", { type: "button", textContent: "Put the saved ones back", onclick: () => loadBreasts(true) }),
+          $("button", { type: "button", className: BREAST.dress ? "on" : "", textContent: BREAST.dress ? "Clothes follow them: on" : "Clothes follow them: off", title: "Tops, bras and chest gear are stretched over the drawn breasts", onclick: () => { BREAST.dress = !BREAST.dress; fill(); bellyDraw(); } }),
           $("button", { type: "button", textContent: "Sliders back to plain", onclick: () => { Object.assign(BREAST, { full: 1, hang: 1, apart: 1, x: 0, y: 0, nip: 1, nipY: 0, nipX: 0 }); fill(); bellyDraw(); } }))].flat(Infinity));
     };
     BREAST.fill = fill; fill();
@@ -488,7 +495,7 @@
               if (BREAST.cvKey !== key) { BREAST.cv = FarmBreasts.canvas(FarmBreasts.shape(br.cup, br), bellySkin(upper[2], upper[3], "")); BREAST.cvKey = key; }
               const bc = BREAST.cv, rx = upper[0] + 250 + br.x, ry = upper[1] + FarmBreasts.ROOT_Y + br.y;
               real.drawImage(bc, rx - bc.ax, ry - bc.ay, {}); if (typeof real.drawImageBlink === "function") real.drawImageBlink(bc, rx - bc.ax, ry - bc.ay, {});
-              ctx.breast = { mask: bc.mask, mx: rx - bc.ax, my: ry - bc.ay, nips: bc.nips.map((p, i) => [rx + p[0] + (i ? 1 : -1) * br.nipX, ry + p[1] + br.nipY]), k: FarmBreasts.shape(br.cup, br).k, kN: (1 + 0.45 * FarmBreasts.shape(br.cup, br).k) * br.nip, sig: key + "|" + Math.round(rx) + "," + Math.round(ry) + "|" + [br.nip, br.nipX, br.nipY].join(","), mid: upper[0] + 250 };
+              ctx.breast = { S: FarmBreasts.shape(br.cup, br), rx, ry, uy: upper[1], mask: bc.mask, mx: rx - bc.ax, my: ry - bc.ay, nips: bc.nips.map((p, i) => [rx + p[0] + (i ? 1 : -1) * br.nipX, ry + p[1] + br.nipY]), k: FarmBreasts.shape(br.cup, br).k, kN: (1 + 0.45 * FarmBreasts.shape(br.cup, br).k) * br.nip, sig: key + "|" + Math.round(rx) + "," + Math.round(ry) + "|" + [br.nip, br.nipX, br.nipY].join(","), mid: upper[0] + 250 };
               for (const h of held.splice(0)) { try { if (!nipDraw(...h)) real[h[0]](h[1], h[2], h[3], h[4]); } catch (e) { console.warn("[studio] nipples:", e); } }
             }
           };
@@ -500,6 +507,43 @@
             let c = BREAST.out.get(key);
             if (!c) { c = document.createElement("canvas"); c.width = im.naturalWidth; c.height = im.naturalHeight; const g = c.getContext("2d"); g.drawImage(im, 0, 0); g.globalCompositeOperation = "destination-out"; g.drawImage(B.mask, B.mx - x, B.my - y); if (BREAST.out.size > 60) BREAST.out.clear(); BREAST.out.set(key, c); }
             real[name](c, x, y, o); return true;
+          };
+          // how much of the game's two breasts this picture covers (0 to 1): a belt or a collar isn't chest wear
+          const chestCover = (src, im, x, y, B) => {
+            const key = src + "|" + Math.round(x) + "," + Math.round(y); let v = BREAST.cover.get(key); if (v != null) return v;
+            const w = im.naturalWidth, h = im.naturalHeight, c = document.createElement("canvas"); c.width = w; c.height = h;
+            const g = c.getContext("2d", { willReadFrequently: true }); g.drawImage(im, 0, 0);
+            const d = g.getImageData(0, 0, w, h).data, R = GAME_BREAST.r; let hit = 0, all = 0;
+            for (const sd of [-1, 1]) { const cx = Math.round(B.mid + sd * GAME_BREAST.dx - x), cy = Math.round(B.uy + GAME_BREAST.y - y);
+              for (let j = -R; j <= R; j += 2) for (let i = -R; i <= R; i += 2) { if (i * i + j * j > R * R) continue; all++; const px = cx + i, py = cy + j; if (px >= 0 && py >= 0 && px < w && py < h && d[(py * w + px) * 4 + 3] > 60) hit++; } }
+            v = all ? hit / all : 0; BREAST.cover.set(key, v); return v;
+          };
+          const dressDraw = (name, src, x, y, o) => {
+            const B = ctx.breast, im = B && mouldImg(src); if (!im) return false;
+            if (chestCover(src, im, x, y, B) < 0.12) return false;
+            const key = "dress|" + src + "|" + Math.round(x) + "," + Math.round(y) + "|" + B.sig;
+            let c = BREAST.out.get(key);
+            if (!c) {
+              const MX = 220, MY = 420, w = im.naturalWidth, h = im.naturalHeight, S2 = B.S;
+              c = document.createElement("canvas"); c.width = w + MX * 2; c.height = h + MY * 2; c.MX = MX; c.MY = MY;
+              const g = c.getContext("2d"), ox = MX + B.rx - x, oy = MY + B.ry - y, midX = MX + B.mid - x;
+              g.drawImage(im, MX, MY);
+              const outline = (sd) => { g.beginPath(); for (let j = 0; j <= 80; j++) { const p = FarmBreasts.point(S2, sd, Math.PI * 2 * j / 80); if (j) g.lineTo(ox + p[0], oy + p[1]); else g.moveTo(ox + p[0], oy + p[1]); } g.closePath(); };
+              // take the piece off where our breasts are…
+              g.globalCompositeOperation = "destination-out"; for (const sd of [-1, 1]) { outline(sd); g.fill(); } g.globalCompositeOperation = "source-over";
+              // …and put back what covered each of the game's breasts, grown to ours
+              const sx = S2.r * 1.06 / GAME_BREAST.r, sy = S2.r * (1 + S2.sag) / GAME_BREAST.r;
+              for (const sd of [-1, 1]) {
+                g.save();
+                g.beginPath(); if (sd < 0) g.rect(0, 0, midX, c.height); else g.rect(midX, 0, c.width - midX, c.height); g.clip();   // each to its own side of the breastbone
+                outline(sd); g.clip();
+                g.translate(ox + sd * S2.bx, oy + S2.by); g.scale(sx, sy); g.translate(-(midX + sd * GAME_BREAST.dx), -(MY + B.uy + GAME_BREAST.y - y));
+                g.drawImage(im, MX, MY);
+                g.restore();
+              }
+              if (BREAST.out.size > 60) BREAST.out.clear(); BREAST.out.set(key, c);
+            }
+            real[name](c, x - c.MX, y - c.MY, o); return true;
           };
           const held = [];
           const nipDraw = (name, src, x, y, o) => {
@@ -530,6 +574,7 @@
             if (br && typeof src === "string") { const gname = groupOf(src);
               if (!done && gname === "Nipples") { held.push([name, src, x, y, o]); return; }
               if (done && NIP_GROUPS.has(gname)) { try { if (nipDraw(name, src, x, y, o)) return; } catch (e) { console.warn("[studio] nipples:", e); } }
+              if (done && BREAST.dress && CHEST_GROUPS.has(gname) && !isMoulded(src)) { try { if (dressDraw(name, src, x, y, o)) return; } catch (e) { console.warn("[studio] chest wear:", e); } }
               if (done && HAND_GROUPS.has(gname)) { try { if (handDraw(name, src, x, y, o)) return; } catch (e) { console.warn("[studio] hands:", e); } } }
             let drawn = false;
             try { if (ctx.belly && !fit.behind && typeof src === "string") { const q = isMoulded(src), m = q && mouldCanvas(src, x, y, ctx, q.key, q.mode); if (m) { real[name](m, x - MOULD.M, y, o); drawn = true; } } } catch (e) { console.warn("[studio] mould:", e); }

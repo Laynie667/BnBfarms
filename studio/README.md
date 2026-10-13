@@ -96,6 +96,13 @@ the game's pictures into the drawing.
   not set to "behind".
 - The list of moulded pieces is saved in `fits/items.json` when you press *Save this fit*.
 
+## Step 18: clothes on the drawn breasts
+
+- Tops, bras, suits, corsets, breast gear and torso harnesses are stretched from the game's breast onto the drawn one,
+  inside its outline. *Clothes follow them* in the Breasts section switches it off.
+- It is a stretch of the piece's own picture: patterns and straps grow with the breast.
+- Nipple size and position have sliders of their own (step 17).
+
 ## Step 10: breasts, flat to R
 
 - **Cup.** Flat, AA, A, B, C and D are the game's own six chest sizes: picking one changes the body, nothing more.

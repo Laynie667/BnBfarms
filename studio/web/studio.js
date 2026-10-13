@@ -830,7 +830,7 @@
                     // one in underneath like paint on two balloons.
                     const inRows = qy <= yEnd, under = tentOn && qy > bcy;
                     const onB = inRows && onBreast(qx, qy), onBody = inRows && !under && (!drape || qy <= bcy) && (prof ? (tl >= 0 && qx >= ux + tl && qx <= ux + tr) : Math.abs(qx - midX) <= 80);
-                    const bridge = inRows && !onB && qy > bcy && Math.abs(qx - midX) < S2.bx && qy <= bcy + S2.rv * (0.78 + 0.22 * Math.pow(Math.abs(qx - midX) / S2.bx, 2));
+                    const bridge = inRows && !onB && qy > bcy && Math.abs(qx - midX) < S2.bx && qy <= bcy + S2.rv * (0.94 + 0.06 * Math.pow(Math.abs(qx - midX) / S2.bx, 2));   /* nearly straight across between their two lowest points: her shape hangs lower in the middle than the round one did, and skin was showing in the gap */
                     const onSlope = inRows && !onB && !onBody && qy <= slopeEnd && Math.abs(qx - midX) <= slopeHalf(qy);
                     const th = under && qy <= tEnd ? tentHalf(qy) : 0, bh2 = th ? bodyHalfAt(qy) : 0, onTent = th > bh2 + 1 && !onB && !bridge && Math.abs(qx - midX) <= th;
                     if (!(onB || onBody || bridge || onSlope || onTent)) continue;

@@ -619,48 +619,73 @@
                 if (v0 >= d[k - 1] && v0 >= d[k + 1] && v0 >= d[k - w] && v0 >= d[k + w] && v0 >= d[k - w - 1] && v0 >= d[k - w + 1] && v0 >= d[k + w - 1] && v0 >= d[k + w + 1]) ridge.push(v0); } }
             ridge.sort((m, n) => m - n); v = ridge.length >= 24 ? ridge[Math.floor(ridge.length * 0.2)] : 0; BREAST.cover.set(key, v); return v;
           };
+          // Chest wear on drawn breasts. The piece's own picture is BULGED, the way a lens bulges what's under it: in the
+          // middle of each breast it is the part that covered the game's breast, grown to ours; toward our outline it
+          // eases back, and AT the outline it is exactly the game's picture again. So nothing jumps at the edge: a
+          // strap that runs off the breast to the shoulder is one unbroken strap (Laynie, Oct 13, of the version that
+          // cut the breast out and pasted a grown copy in: "those still don't look right at all, or aligned").
+          // Each pixel inside our outline looks up where it came from in the game's picture.
+          const breastRim = (S2, sd) => {   // how far the outline is from the breast's middle, by direction (720 steps round)
+            const N = 720, rim = new Float32Array(N);
+            for (let j = 0; j < 4000; j++) { const p = FarmBreasts.point(S2, sd, Math.PI * 2 * j / 4000), dx = p[0] - sd * S2.bx, dy = p[1] - S2.by, k = ((Math.round(Math.atan2(dy, dx) / (Math.PI * 2) * N) % N) + N) % N, d = Math.hypot(dx, dy); if (d > rim[k]) rim[k] = d; }
+            for (let k = 0; k < N; k++) if (!rim[k]) { let m = 1; while (m < N && !rim[(k + m) % N]) m++; rim[k] = rim[(k + m) % N]; }
+            return rim;
+          };
           const dressDraw = (name, src, x, y, o, plain) => {
             const B = ctx.breast, im = B && mouldImg(src); if (!im) return false;
             if (chestCover(src, im, x, y, B) < (B.pose === "AllFours" ? 0.05 : 0.08)) return false;
             const key = "dress|" + src + "|" + Math.round(x) + "," + Math.round(y) + "|" + B.sig + "|" + (plain ? "p" : "") + (o && o.HexColor ? "t" : "");
             let c = BREAST.out.get(key);
             if (!c) {
-              const MX = 220, MY = 420, w = im.naturalWidth, h = im.naturalHeight, S2 = B.S;
+              const MX = 220, MY = 420, w = im.naturalWidth, h = im.naturalHeight, S2 = B.S, GB = gameBreast(B);
               c = document.createElement("canvas"); c.width = w + MX * 2; c.height = h + MY * 2; c.MX = MX; c.MY = MY;
               const g = c.getContext("2d"), ox = MX + B.rx - x, oy = MY + B.ry - y, midX = MX + B.mid - x;
               g.drawImage(im, MX, MY);
-              const outline = (sd) => { g.beginPath(); for (let j = 0; j <= 80; j++) { const p = FarmBreasts.point(S2, sd, Math.PI * 2 * j / 80); if (j) g.lineTo(ox + p[0], oy + p[1]); else g.moveTo(ox + p[0], oy + p[1]); } g.closePath(); };
-              // take the piece off where our breasts are…
-              g.globalCompositeOperation = "destination-out"; for (const sd of [-1, 1]) { outline(sd); g.fill(); } g.globalCompositeOperation = "source-over";
-              // …and put back what covered each of the game's breasts, grown to ours
-              // (a little more than the game's breast is taken, so a band that ran just UNDER it lands on our underside and isn't lost)
-              const GB = gameBreast(B), sx = S2.r * 1.06 / (GB.r * 1.13), sy = S2.r * (1 + S2.sag) / (GB.r * 1.13);
-              // A strap grown with the breast isn't a strap any more (Laynie, Oct 13, on my first redraws: "needs… to be
-              // consistent with the original look and strap layout"). So the layout is the game's own, grown as above,
-              // and then the straps are pared back from both edges to a strap's width, and their dark edge put back.
+              // the game's picture, to read from (in the big canvas's own coordinates, so the empty margin reads as empty)
+              const srcData = g.getImageData(0, 0, c.width, c.height), sp = srcData.data, CW = c.width, CH = c.height;
+              const sx = S2.r * 1.04 / (GB.r * 1.08), sy = S2.r * (1 + S2.sag * 0.6) / (GB.r * 1.08);
               const half = plain ? 0 : strapHalf(src, im, x, y, B), sAvg = (sx + sy) / 2, want = 1 + 0.35 * S2.k;
               const pare = half > 0 && half <= 8 ? Math.max(0, Math.min(half * sAvg - 1.4, half * (sAvg - want))) : 0;
+              const N = 720;
               for (const sd of [-1, 1]) {
-                const T = document.createElement("canvas"); T.width = c.width; T.height = c.height; const tg = T.getContext("2d", { willReadFrequently: pare > 0.5 });
-                tg.save(); tg.translate(ox + sd * S2.bx, oy + S2.by); tg.scale(sx, sy); tg.translate(-(midX + sd * GB.dx), -(MY + B.uy + GB.y - y)); tg.drawImage(im, MX, MY); tg.restore();
-                let rim = null;
-                if (pare > 0.5) {
-                  const bx0 = Math.max(0, Math.floor(ox + sd * S2.bx - S2.r * 1.5)), by0 = Math.max(0, Math.floor(oy + S2.by - S2.r * S2.top - 6)), bw = Math.min(T.width - bx0, Math.ceil(S2.r * 3)), bh = Math.min(T.height - by0, Math.ceil(S2.r * (S2.top + 1 + S2.sag) + 12));
-                  const id = tg.getImageData(bx0, by0, bw, bh), al = new Uint8Array(bw * bh); for (let i = 0; i < al.length; i++) al[i] = id.data[i * 4 + 3];
-                  const d = distMap(al, bw, bh);
-                  for (let i = 0; i < al.length; i++) { const v = d[i] - pare; if (v <= 0) id.data[i * 4 + 3] = 0; else if (v < 1) id.data[i * 4 + 3] = Math.round(id.data[i * 4 + 3] * v); }
-                  tg.clearRect(0, 0, T.width, T.height); tg.putImageData(id, bx0, by0);
-                  rim = document.createElement("canvas"); rim.width = T.width; rim.height = T.height; const rg = rim.getContext("2d");
-                  for (const [dx, dy] of [[-1, 0], [1, 0], [0, -1], [0, 1], [-1, -1], [1, 1], [-1, 1], [1, -1]]) rg.drawImage(T, dx, dy);
-                  rg.globalCompositeOperation = "source-in"; const oc = o && o.HexColor ? [70, 70, 70] : ownColour(src, im).map((v) => v * 0.3);
-                  rg.fillStyle = "rgb(" + oc.map((v) => Math.round(v)).join(",") + ")"; rg.fillRect(0, 0, rim.width, rim.height);
+                const rim = breastRim(S2, sd), cx = ox + sd * S2.bx, cy = oy + S2.by, yTop = cy - S2.r * S2.top, yFull = cy - S2.r * 0.25, nx = midX + sd * GB.dx, ny = MY + B.uy + GB.y - y;
+                const x0 = Math.max(0, Math.floor(cx - S2.r * 1.5)), y0 = Math.max(0, Math.floor(cy - S2.r * S2.top - 4)), bw = Math.min(CW - x0, Math.ceil(S2.r * 3)), bh = Math.min(CH - y0, Math.ceil(S2.r * (S2.top + 1 + S2.sag) + 10));
+                if (bw <= 0 || bh <= 0) continue;
+                const out = g.createImageData(bw, bh), od = out.data, wgt = new Float32Array(bw * bh).fill(-1);
+                for (let j = 0; j < bh; j++) for (let i = 0; i < bw; i++) {
+                  const qx = x0 + i, qy = y0 + j; if (sd < 0 ? qx >= midX : qx < midX) continue;   // each keeps to its own side of the breastbone
+                  const dx = qx - cx, dy = qy - cy, dist = Math.hypot(dx, dy), k = ((Math.round(Math.atan2(dy, dx) / (Math.PI * 2) * N) % N) + N) % N, rho = dist / rim[k];
+                  if (rho >= 1) continue;
+                  // 1 up where the breast leaves the chest (as the game drew it: the chest hasn't changed), easing to 0 a third of the way down (grown). Round the sides and underneath there is no easing: that's the breast's own edge, and what was on the body behind it is hidden by it.
+                  const t = Math.max(0, Math.min(1, (qy - yTop) / (yFull - yTop))), wv = 1 - t * t * (3 - 2 * t);
+                  const fx = (1 - wv) * (nx + dx / sx) + wv * qx, fy = (1 - wv) * (ny + dy / sy) + wv * qy;
+                  const ix = Math.floor(fx), iy = Math.floor(fy); if (ix < 0 || iy < 0 || ix >= CW - 1 || iy >= CH - 1) continue;
+                  const ax = fx - ix, ay = fy - iy, p00 = (iy * CW + ix) * 4, p10 = p00 + 4, p01 = p00 + CW * 4, p11 = p01 + 4, o4 = (j * bw + i) * 4;
+                  const a00 = sp[p00 + 3] * (1 - ax) * (1 - ay), a10 = sp[p10 + 3] * ax * (1 - ay), a01 = sp[p01 + 3] * (1 - ax) * ay, a11 = sp[p11 + 3] * ax * ay, at = a00 + a10 + a01 + a11;
+                  wgt[j * bw + i] = wv;
+                  if (at < 1) continue;
+                  od[o4] = (sp[p00] * a00 + sp[p10] * a10 + sp[p01] * a01 + sp[p11] * a11) / at; od[o4 + 1] = (sp[p00 + 1] * a00 + sp[p10 + 1] * a10 + sp[p01 + 1] * a01 + sp[p11 + 1] * a11) / at; od[o4 + 2] = (sp[p00 + 2] * a00 + sp[p10 + 2] * a10 + sp[p01 + 2] * a01 + sp[p11 + 2] * a11) / at; od[o4 + 3] = at;
                 }
-                g.save();
-                g.beginPath(); if (sd < 0) g.rect(0, 0, midX, c.height); else g.rect(midX, 0, c.width - midX, c.height); g.clip();   // each to its own side of the breastbone
-                outline(sd); g.clip();
-                if (rim) g.drawImage(rim, 0, 0);
-                g.drawImage(T, 0, 0);
-                g.restore();
+                // a strap grown with the breast isn't a strap any more: pare it back from both edges, most where it grew most
+                let rimDark = null;
+                if (pare > 0.5) {
+                  const al = new Uint8Array(bw * bh); for (let i = 0; i < al.length; i++) al[i] = od[i * 4 + 3];
+                  const d = distMap(al, bw, bh);
+                  for (let i = 0; i < al.length; i++) { if (wgt[i] < 0 || !al[i]) continue; const e = pare * (1 - wgt[i]); if (e <= 0.3) continue; const v = d[i] - e; if (v <= 0) od[i * 4 + 3] = 0; else if (v < 1) od[i * 4 + 3] = Math.round(od[i * 4 + 3] * v); }
+                  rimDark = o && o.HexColor ? [70, 70, 70] : ownColour(src, im).map((v) => v * 0.3);
+                }
+                const T = document.createElement("canvas"); T.width = bw; T.height = bh; T.getContext("2d").putImageData(out, 0, 0);
+                // our pixels replace the game's inside the outline (wgt >= 0 marks them)
+                const hole = document.createElement("canvas"); hole.width = bw; hole.height = bh; const hd = hole.getContext("2d"), hi = hd.createImageData(bw, bh);
+                for (let i = 0; i < wgt.length; i++) if (wgt[i] >= 0) hi.data[i * 4 + 3] = 255;
+                hd.putImageData(hi, 0, 0);
+                g.globalCompositeOperation = "destination-out"; g.drawImage(hole, x0, y0); g.globalCompositeOperation = "source-over";
+                if (rimDark) { const rc = document.createElement("canvas"); rc.width = bw; rc.height = bh; const rg = rc.getContext("2d");
+                  for (const [ddx, ddy] of [[-1, 0], [1, 0], [0, -1], [0, 1]]) rg.drawImage(T, ddx, ddy);
+                  rg.globalCompositeOperation = "source-in"; rg.fillStyle = "rgb(" + rimDark.map((v) => Math.round(v)).join(",") + ")"; rg.fillRect(0, 0, bw, bh);
+                  rg.globalCompositeOperation = "destination-in"; rg.drawImage(hole, 0, 0);   // (the dark edge stays inside our outline too)
+                  g.drawImage(rc, x0, y0); }
+                g.drawImage(T, x0, y0);
               }
               if (BREAST.out.size > 60) BREAST.out.clear(); BREAST.out.set(key, c);
             }

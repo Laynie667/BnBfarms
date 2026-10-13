@@ -645,7 +645,7 @@
           const gate = FarmBelly.skinGate(C);   // true once a picture comes after all the skin, genitals included
           const prio = (src) => { const g = AssetGroupGet(C.AssetFamily, groupOf(src)); return g && typeof g.DrawingPriority === "number" ? g.DrawingPriority : 99; };
           const paint = () => {
-            if (done || !upper) return; done = true;
+            if (done || !upper) return; done = true;   /* (runs once, after the last of the skin: belly, then a standing cock, then breasts) */
             if (fit.on) {
             const shape = { rx: fit.rx, ry: fit.ry, sag: fit.sag, cut: fit.cut };
             const cv = FarmBelly.bellyCanvas(shape, bellySkin(upper[2], upper[3], FarmBelly.bellyPose(upper[2])), !!fit.flat);
@@ -655,6 +655,7 @@
             ctx.belly = { cv, dx, dy };
             ctx.sig = [fit.rx, fit.ry, fit.sag, fit.cut, fit.flat ? 1 : 0, Math.round(dx), Math.round(dy)].join(",") + "|" + ctx.bodies.map((b) => b.src + "@" + Math.round(b.x) + "," + Math.round(b.y)).join(";");
             }
+            if (ctx.cock) { const k = ctx.cock; ctx.cock = null; real.drawImage(k[0], k[1], k[2], {}); if (typeof real.drawImageBlink === "function") real.drawImageBlink(k[0], k[1], k[2], {}); }
             if (br) {
               // over the belly: they hang in front of it
               const isHeld = FarmBelly.bellyPose(upper[2]) !== "AllFours" && heldNow(), freeS = FarmBreasts.shape(br.cup, br), S3 = isHeld ? FarmBreasts.held(freeS) : freeS;
@@ -1014,6 +1015,7 @@
               try { const hard = /\/Hard\//.test(src), skin = upperSkin || FarmBelly.FALLBACK.White;
                 const key = [GEN.kind, GEN.knot, GEN.inches, GEN.girth, GEN.balls, hard, skin.join(",")].join("|");
                 if (GEN.cvKey !== key) { GEN.cv = FarmCock.canvas({ kind: GEN.kind, knot: GEN.knot, inches: GEN.inches, girth: GEN.girth, balls: GEN.balls, hard, skin }); GEN.cvKey = key; }
+                if (hard) { if (!blink) ctx.cock = [GEN.cv, x + 49.5 - GEN.cv.ax, y + 110 - GEN.cv.ay]; return; }   // standing: held back, and drawn once the belly is on, in front of it
                 real[blink ? "drawImageBlink" : "drawImage"](GEN.cv, x + 49.5 - GEN.cv.ax, y + 110 - GEN.cv.ay, {}); return; } catch (e) { console.warn("[studio] cock:", e); }
             }
             let drawn = false;

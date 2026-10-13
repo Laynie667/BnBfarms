@@ -18,6 +18,11 @@
    shading, only a breath of it at the edges; a soft coral head; stubbier and thicker than I had them; and the root
    melts into the body with no line across it. So: the outline colour, the fill, the shading and the proportions are
    all taken from that picture now, and the animal kinds are the same style in softened colours.
+   FIFTH PASS, VOLUME (Oct 13). Laynie: "looks better, still very cartoonish", and a third set of references: painted,
+   mostly front-on. What makes those read as flesh and mine as stickers is roundness. So: each one is shaded as a round
+   thing (dark toward both edges, one bright wet streak down the lit side that tapers at both ends, a shadow under the
+   rim of the head and under the cock where it lies on the sack), the sack is two round weights with a deep cleft, a
+   hard one leans to one side as it stands, and it stands IN FRONT of the belly (the studio draws it after the belly).
    Seen from the front. Soft, it hangs; hard, it stands. No game code in here: it only draws. window.FarmCock. */
 (() => {
   const PX_PER_INCH = 9;   // the game's own soft cock is about 54 pixels long, and the farm calls the starting one 6 inches
@@ -52,7 +57,7 @@
     const W = Math.max(7, (8 + full * 0.072) * (o.girth || 1) * (K.slim || 1) * (hard ? 1.06 : 1));                  // half-width: thicker as it gets longer, but not in step
     const br = ballR(o.balls || 3), knotted = !!(o.knot || K.knot), gap = K.two ? W * 1.25 : 0;
     const col = K.col || [skin[0], skin[1] * 0.93, skin[2] * 0.92], sh = K.sheath === "skin" || !K.sheath ? [skin[0] * 0.98, skin[1] * 0.93, skin[2] * 0.91] : K.sheath;
-    const bend = (hard ? 0.05 : 0.09) * L;   // how far it bows to the side
+    const bend = (hard ? 0.11 : 0.09) * L;   // how far it bows to the side
     const widest = W * (1.7 + (knotted ? 0.9 : 0)) + gap + bend, drop = br * (1.15 + Math.min(0.6, br / 90));
     const half = Math.max(widest, br * 2.1) + 10, up = (hard ? L + W : W * 1.2) + 10, down = Math.max(hard ? W * 1.5 : L + W, drop + br * 1.5) + 12;
     const cv = document.createElement("canvas"); cv.width = Math.ceil(half * 2); cv.height = Math.ceil(up + down);
@@ -68,14 +73,14 @@
         g.bezierCurveTo(ox + r * 0.35, cy + r * 1.28, ox + r * 1.5, cy + r * 1.18, ox + r * 1.72, cy + r * 0.35);      // under the right lobe (it rides a little higher)
         g.bezierCurveTo(ox + r * 2.0, cy - r * 0.55, ox + r * 1.1, top + drop * 0.35, ox + W * 0.9, top); g.closePath(); };
       const grad = g.createRadialGradient(ox - r * 0.5, cy - r * 0.2, r * 0.2, ox, cy + r * 0.1, r * 2.3);
-      grad.addColorStop(0, rgb(skin, 1)); grad.addColorStop(0.7, rgb(skin, 1)); grad.addColorStop(1, rgb([skin[0], skin[1] * 0.96, skin[2] * 0.95], 0.97));
+      grad.addColorStop(0, rgb(skin, 1.02)); grad.addColorStop(0.55, rgb(skin, 0.99)); grad.addColorStop(1, rgb([skin[0], skin[1] * 0.86, skin[2] * 0.84], 0.86));
       g.fillStyle = grad; path(); g.fill();
       g.save(); path(); g.clip();
-      const cleft = g.createLinearGradient(ox - r * 0.5, 0, ox + r * 0.5, 0); cleft.addColorStop(0, "rgba(120,60,55,0)"); cleft.addColorStop(0.5, "rgba(170,90,85,0.10)"); cleft.addColorStop(1, "rgba(120,60,55,0)");
+      const cleft = g.createLinearGradient(ox - r * 0.5, 0, ox + r * 0.5, 0); cleft.addColorStop(0, "rgba(120,60,55,0)"); cleft.addColorStop(0.5, "rgba(140,70,66,0.30)"); cleft.addColorStop(1, "rgba(120,60,55,0)");
       g.fillStyle = cleft; g.fillRect(ox - r * 0.5, cy - r * 0.6, r, r * 2.2);
-      const und = g.createLinearGradient(0, cy + r * 0.3, 0, cy + r * 1.4); und.addColorStop(0, "rgba(120,60,55,0)"); und.addColorStop(1, "rgba(170,90,85,0.10)");
+      const und = g.createLinearGradient(0, cy + r * 0.3, 0, cy + r * 1.4); und.addColorStop(0, "rgba(120,60,55,0)"); und.addColorStop(1, "rgba(140,70,66,0.26)");
       g.fillStyle = und; g.fillRect(0, cy, cv.width, r * 2); g.restore();
-      g.fillStyle = "rgba(255,255,255,0.45)"; for (const sd of [-1, 1]) { g.beginPath(); g.ellipse(ox + sd * r * 0.95 - r * 0.28, cy + r * 0.05 + (sd < 0 ? r * 0.12 : 0), r * 0.11, r * 0.3, 0.35, 0, Math.PI * 2); g.fill(); }
+      g.fillStyle = "rgba(255,255,255,0.6)"; for (const sd of [-1, 1]) { g.beginPath(); g.ellipse(ox + sd * r * 0.95 - r * 0.28, cy + r * 0.05 + (sd < 0 ? r * 0.12 : 0), r * 0.11, r * 0.3, 0.35, 0, Math.PI * 2); g.fill(); }
       g.strokeStyle = line(skin); g.lineWidth = 1.2; path(); g.stroke();
       g.strokeStyle = line(skin); g.globalAlpha = 0.6; g.lineWidth = 1; g.beginPath(); g.moveTo(ox, cy + r * 0.2); g.quadraticCurveTo(ox + r * 0.08, cy + r * 0.3, ox, cy + r * 0.93); g.stroke(); g.globalAlpha = 1;   // the seam
     };
@@ -95,7 +100,7 @@
       const along = g.createLinearGradient(0, oy, 0, oy + dir * L); const hA = K.headAt || 0.7;
       along.addColorStop(0, rgb(col, 1)); along.addColorStop(Math.max(0.05, hA - 0.04), rgb(mix(col, K.tipCol, 0.15), 1)); along.addColorStop(Math.min(0.99, hA + 0.03), rgb(K.tipCol, 1)); along.addColorStop(1, rgb(K.tipCol, 1.04));
       g.fillStyle = along; g.fillRect(0, 0, cv.width, cv.height);
-      const across = g.createLinearGradient(ox + dx - W * 1.6, 0, ox + dx + W * 1.6, 0); across.addColorStop(0, "rgba(160,80,70,0.10)"); across.addColorStop(0.3, "rgba(255,255,255,0.06)"); across.addColorStop(0.7, "rgba(0,0,0,0)"); across.addColorStop(1, "rgba(160,80,70,0.12)");
+      const across = g.createLinearGradient(ox + dx - W * 1.6, 0, ox + dx + W * 1.6, 0); across.addColorStop(0.12, "rgba(110,50,48,0.34)"); across.addColorStop(0.36, "rgba(255,255,255,0.10)"); across.addColorStop(0.6, "rgba(0,0,0,0)"); across.addColorStop(0.9, "rgba(110,50,48,0.42)");
       g.fillStyle = across; g.fillRect(0, 0, cv.width, cv.height);
       if (K.ring) { const c = cen(K.ring); g.strokeStyle = line(col); g.lineWidth = 1.2; g.beginPath(); g.moveTo(c[0] - W * 1.4, c[1]); g.quadraticCurveTo(c[0], c[1] + dir * W * 0.5, c[0] + W * 1.4, c[1]); g.stroke();
         g.fillStyle = "rgba(222,150,152,0.45)"; for (const [a, b2, r] of [[-0.4, 0.7, 0.3], [0.35, 0.78, 0.22], [0.0, 0.9, 0.3], [-0.3, 0.6, 0.16]]) { const c3 = cen(b2); g.beginPath(); g.ellipse(c3[0] + a * W, c3[1], r * W, r * W * 1.5, 0, 0, Math.PI * 2); g.fill(); } }   // the medial ring, and pink mottling toward the end
@@ -109,7 +114,11 @@
         vein([[0.16, -0.25], [0.26, -0.5], [0.38, -0.3], [0.5, -0.55], [0.62, -0.25], [0.74, -0.4]]); vein([[0.38, -0.3], [0.46, 0.1], [0.56, 0.3]]); vein([[0.2, 0.45], [0.32, 0.6], [0.44, 0.4]]);
         g.globalAlpha = 1; }
       if (false) { g.beginPath(); const a = cen(0.2), b2 = cen(0.45), c4 = cen(0.68); g.moveTo(a[0] - W * 0.3, a[1]); g.bezierCurveTo(b2[0] - W * 0.8, b2[1], b2[0] + W * 0.4, b2[1], c4[0] - W * 0.1, c4[1]); g.stroke(); }   // a vein
-      { g.strokeStyle = "rgba(255,255,255,0.5)"; g.lineWidth = Math.max(1.4, W * 0.16); g.beginPath(); for (let t = 0.2; t <= 0.62; t += 0.03) { const c = cen(t), w = wd(t); if (t === 0.2) g.moveTo(c[0] - w * 0.55, c[1]); else g.lineTo(c[0] - w * 0.55, c[1]); } g.stroke(); }
+      { g.fillStyle = "rgba(255,255,255,0.72)"; g.beginPath(); const A0 = 0.16, A1 = (K.headAt || 0.8) - 0.08, pts = [];
+        for (let t = A0; t <= A1; t += 0.02) { const c = cen(t), w = wd(t), u = (t - A0) / (A1 - A0), th = w * 0.13 * Math.sin(u * Math.PI); pts.push([c[0] - w * 0.5, c[1], th]); }
+        pts.forEach((p, i) => (i ? g.lineTo(p[0] - p[2], p[1]) : g.moveTo(p[0] - p[2], p[1]))); for (let i = pts.length - 1; i >= 0; i--) g.lineTo(pts[i][0] + pts[i][2], pts[i][1]); g.closePath(); g.fill();
+        if (K.headAt) { const c = cen(K.headAt + (1 - K.headAt) * 0.45), w = wd(K.headAt + 0.05); g.beginPath(); g.ellipse(c[0] - w * 0.42, c[1], w * 0.14, w * 0.3, 0.3, 0, Math.PI * 2); g.fill();          // and a glint on the head
+          const r0 = cen(K.headAt - 0.03), sh2 = g.createLinearGradient(0, r0[1], 0, r0[1] - dir * W * 0.9); sh2.addColorStop(0, "rgba(110,50,48,0.30)"); sh2.addColorStop(1, "rgba(110,50,48,0)"); g.fillStyle = sh2; g.fillRect(0, Math.min(r0[1], r0[1] - dir * W * 0.9), cv.width, W * 0.9); } }   // the shadow the rim throws back down the shaft
       g.restore();
       if (K.barbs) { g.fillStyle = line(col); for (let t = 0.45; t < 0.92; t += 0.1) for (const sd of [0, 1]) { const i = Math.round(t * N), p = (sd ? R0 : L0)[i], c = cen(t), ux2 = (p[0] - c[0]) / (wd(t) || 1), uy2 = (p[1] - c[1]) / (wd(t) || 1), s2 = Math.max(1.6, W * 0.22); g.beginPath(); g.moveTo(p[0], p[1] - dir * s2 * 0.6); g.lineTo(p[0] + ux2 * s2 * 1.3, p[1] + uy2 * s2 * 1.3 - dir * s2 * 1.4); g.lineTo(p[0], p[1] + dir * s2 * 0.5); g.closePath(); g.fill(); } }
       g.strokeStyle = line(mix(col, K.tipCol, 0.5)); g.lineWidth = 1.2; outline(); g.stroke();

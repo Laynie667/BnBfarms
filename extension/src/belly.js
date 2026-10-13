@@ -82,7 +82,17 @@ function bellyCanvas(size, skin) {
   return cv;
 }
 // where its top-left corner goes, given where the upper-body picture was drawn: hung from just under the ribs
-function bellyPlace(size, upperX, upperY, cv) { const S = SIZES[size]; return [upperX + 250 - cv.width / 2, upperY + 392 + S.ry * 0.62 - (S.lift || 0) - cv.height / 2]; }
+// pose: "" standing, kneeling and every arms pose (the torso is in the same place in all of them) · "AllFours": seen from
+// the front, the belly hangs down under the chest
+function bellyPlace(size, upperX, upperY, cv, pose) {
+  const S = SIZES[size];
+  if (pose === "AllFours") return [upperX + 250 - cv.width / 2, upperY + 318 + S.ry * 0.34 - cv.height / 2];
+  return [upperX + 250 - cv.width / 2, upperY + 392 + S.ry * 0.62 - (S.lift || 0) - cv.height / 2];
+}
+// which pose the upper body is drawn in, from its picture's folder ("" for the ordinary ones)
+function bellyPose(src) { const m = /\/BodyUpper\/(AllFours|Hogtied)\//.exec(String(src)); return m ? m[1] : ""; }
+// where in the body's picture to look for skin, by pose
+function skinPatch(pose) { return pose === "AllFours" ? [226, 236] : [226, 388]; }
 // <<< belly drawing
 // The game keeps every picture it draws in a list it looks things up in BY NAME, and it expects every name to be text.
 // Handing it the drawing itself (Oct 12, Companion 0.16.2) put a non-text name in that list, and from then on every
@@ -129,7 +139,7 @@ function skinLoad(key, src, hex) {
     try {
       // a patch from the middle of the torso, under the chest: its typical bright skin (not the white shine, not the edges)
       const bw = 48, bh = 40, cv = document.createElement("canvas"); cv.width = bw; cv.height = bh;
-      const g = cv.getContext("2d"); g.drawImage(img, -226, -388);
+      const g = cv.getContext("2d"), at = skinPatch(bellyPose(src)); g.drawImage(img, -at[0], -at[1]);
       const d = g.getImageData(0, 0, bw, bh).data, good = [];
       for (let i = 0; i < d.length; i += 4) if (d[i + 3] > 200 && d[i] + d[i + 1] + d[i + 2] > 90 && Math.min(d[i], d[i + 1], d[i + 2]) < 238) good.push([d[i], d[i + 1], d[i + 2]]);
       if (good.length >= 40) {
@@ -164,13 +174,18 @@ function hookBelly(mod) {
           const paint = () => {
             if (done || !upper || !lower) return; done = true;
             const S = SIZES[trial], cv = bellyPicture(trial, skinFor(upper[2], upper[3]));   // { url, width, height }: a picture the game can cache by name
-            const [dx, dy] = bellyPlace(trial, upper[0], upper[1], cv);
+            const [dx, dy] = bellyPlace(trial, upper[0], upper[1], cv, upper[4]);
             cb.drawImage(cv.url, dx, dy, {});
             if (typeof cb.drawImageBlink === "function") cb.drawImageBlink(cv.url, dx, dy, {});
           };
-          const before = (src) => { if (!done && lower && typeof src === "string" && prio(src) > SKIN_TOP) paint(); };
-          const after = (src, x, y, o) => { if (typeof src !== "string") return; if (src.includes("/BodyUpper/")) upper = [x, y, src, o && o.HexColor]; if (src.includes("/BodyLower/")) lower = true; };
-          const wrap = (name) => (typeof cb[name] === "function" ? (src, x, y, o) => { try { before(src); } catch (e) { console.warn("[Farmhand Companion] belly:", e); } cb[name](src, x, y, o); try { after(src, x, y, o); } catch (e) { console.warn("[Farmhand Companion] belly:", e); } } : cb[name]);
+          // On all fours the belly hangs BEHIND the chest, so it has to go down before the upper body does. Hogtied, it's out of sight.
+          const before = (src, x, y, o) => {
+            if (done || typeof src !== "string") return;
+            if (src.includes("/BodyUpper/")) { const pose = bellyPose(src); if (pose === "Hogtied") { done = true; return; } if (pose === "AllFours") { upper = [x, y, src, o && o.HexColor, pose]; lower = true; paint(); return; } }
+            if (lower && prio(src) > SKIN_TOP) paint();
+          };
+          const after = (src, x, y, o) => { if (typeof src !== "string") return; if (src.includes("/BodyUpper/")) upper = [x, y, src, o && o.HexColor, bellyPose(src)]; if (src.includes("/BodyLower/")) lower = true; };
+          const wrap = (name) => (typeof cb[name] === "function" ? (src, x, y, o) => { try { before(src, x, y, o); } catch (e) { console.warn("[Farmhand Companion] belly:", e); } cb[name](src, x, y, o); try { after(src, x, y, o); } catch (e) { console.warn("[Farmhand Companion] belly:", e); } } : cb[name]);
           args[1] = Object.assign({}, cb, { drawImage: wrap("drawImage"), drawImageColorize: wrap("drawImageColorize") });
           finish = paint;   // (a bare body: nothin' comes after the skin, so it goes in at the very end)
         }

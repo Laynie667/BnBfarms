@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.16.8
+// @version      0.16.9
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -230,7 +230,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.16.8";
+  var VERSION = "0.16.9";
 
   // extension/src/config.js
   var BOT_MEMBER = 260239;
@@ -1104,9 +1104,17 @@ One of mods you are using is using an old version of SDK. It will work for now b
     }
     return cv;
   }
-  function bellyPlace(size, upperX, upperY, cv) {
+  function bellyPlace(size, upperX, upperY, cv, pose) {
     const S = SIZES[size];
+    if (pose === "AllFours") return [upperX + 250 - cv.width / 2, upperY + 318 + S.ry * 0.34 - cv.height / 2];
     return [upperX + 250 - cv.width / 2, upperY + 392 + S.ry * 0.62 - (S.lift || 0) - cv.height / 2];
+  }
+  function bellyPose(src) {
+    const m = /\/BodyUpper\/(AllFours|Hogtied)\//.exec(String(src));
+    return m ? m[1] : "";
+  }
+  function skinPatch(pose) {
+    return pose === "AllFours" ? [226, 236] : [226, 388];
   }
   var pictures = /* @__PURE__ */ new Map();
   function bellyPicture(size, skin) {
@@ -1165,8 +1173,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
         const bw = 48, bh = 40, cv = document.createElement("canvas");
         cv.width = bw;
         cv.height = bh;
-        const g = cv.getContext("2d");
-        g.drawImage(img, -226, -388);
+        const g = cv.getContext("2d"), at = skinPatch(bellyPose(src));
+        g.drawImage(img, -at[0], -at[1]);
         const d = g.getImageData(0, 0, bw, bh).data, good = [];
         for (let i = 0; i < d.length; i += 4) if (d[i + 3] > 200 && d[i] + d[i + 1] + d[i + 2] > 90 && Math.min(d[i], d[i + 1], d[i + 2]) < 238) good.push([d[i], d[i + 1], d[i + 2]]);
         if (good.length >= 40) {
@@ -1215,21 +1223,35 @@ One of mods you are using is using an old version of SDK. It will work for now b
               if (done || !upper || !lower) return;
               done = true;
               const S = SIZES[trial], cv = bellyPicture(trial, skinFor(upper[2], upper[3]));
-              const [dx, dy] = bellyPlace(trial, upper[0], upper[1], cv);
+              const [dx, dy] = bellyPlace(trial, upper[0], upper[1], cv, upper[4]);
               cb.drawImage(cv.url, dx, dy, {});
               if (typeof cb.drawImageBlink === "function") cb.drawImageBlink(cv.url, dx, dy, {});
             };
-            const before = (src) => {
-              if (!done && lower && typeof src === "string" && prio(src) > SKIN_TOP) paint();
+            const before = (src, x, y, o) => {
+              if (done || typeof src !== "string") return;
+              if (src.includes("/BodyUpper/")) {
+                const pose = bellyPose(src);
+                if (pose === "Hogtied") {
+                  done = true;
+                  return;
+                }
+                if (pose === "AllFours") {
+                  upper = [x, y, src, o && o.HexColor, pose];
+                  lower = true;
+                  paint();
+                  return;
+                }
+              }
+              if (lower && prio(src) > SKIN_TOP) paint();
             };
             const after = (src, x, y, o) => {
               if (typeof src !== "string") return;
-              if (src.includes("/BodyUpper/")) upper = [x, y, src, o && o.HexColor];
+              if (src.includes("/BodyUpper/")) upper = [x, y, src, o && o.HexColor, bellyPose(src)];
               if (src.includes("/BodyLower/")) lower = true;
             };
             const wrap = (name) => typeof cb[name] === "function" ? (src, x, y, o) => {
               try {
-                before(src);
+                before(src, x, y, o);
               } catch (e) {
                 console.warn("[Farmhand Companion] belly:", e);
               }

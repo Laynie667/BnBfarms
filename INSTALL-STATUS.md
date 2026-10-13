@@ -13,7 +13,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 | Map tools, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.3** |
 | Dairy | `farmhand-dairy.user.js` | the bot's PC | **1.0.2** |
 | Shows | `farmhand-shows.user.js` | the bot's PC | **1.0.4** |
-| Farmhand Companion | `farmhand-companion.user.js` | each player | **0.16.8** |
+| Farmhand Companion | `farmhand-companion.user.js` | each player | **0.16.9** |
 | Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.4** |
 
 ## Sending a watch report
@@ -23,6 +23,8 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 - Running the watcher on more than one game at once (the bot, yours, a tester's) lets Claude line them up into one timeline.
 
 ## Latest changes (newest first)
+
+- **Companion 0.16.9: the belly test follows poses.** Laynie on 0.16.8: "that looks perfect" (standing). Kneeling and every arms pose already worked, because the belly hangs off the upper body and the torso is in the same place in all of them. On all fours the game draws the body from the front with the chest low, so the belly now goes down before the upper body and hangs under the chest, behind it. Hogtied, it is out of sight and not drawn. NOT YET SEEN LIVE in those two poses.
 
 - **Companion 0.16.8: the large belly sits higher, and the skin colour is worked out, not read off the screen.** Laynie on 0.16.7: "pretty good, the large belly can sit a little higher"; her picture still showed the belly a shade more tan than her skin. The large belly is raised 20 pixels and the medium 5. The colour no longer comes from reading the screen (that read was missing, so a stand-in colour was being used): it is taken from the body's own picture file, and for a custom skin colour the game's own tint sum is applied to it (brightness over 383, times the colour). The first time a body is seen the picture is loaded once, a near guess is used for a moment, then the belly redraws in the true colour.
 

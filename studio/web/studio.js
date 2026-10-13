@@ -397,6 +397,9 @@
   const BREAST = { cup: null, full: 1, hang: 1, apart: 1, x: 0, y: 0, cv: null, cvKey: "", halves: new Map(), out: new Map() };
   const BREAST_SLIDERS = [["full", "Fullness", 0.7, 1.4, 0.01], ["hang", "Weight (how low and heavy they hang)", 0, 2, 0.01], ["apart", "Apart / together", 0.6, 1.5, 0.01], ["x", "Left / right", -60, 60, 1], ["y", "Up / down", -80, 80, 1]];
   const NIP_GROUPS = new Set(["Nipples", "ItemNipples", "ItemNipplesPiercings"]);
+  // what the breasts hang in front of once they reach it (Laynie, Oct 13: "at larger sizes should probably cover the
+  // hands"): the hands and what's worn on them. Their pictures are drawn with the breasts' outline cut out.
+  const HAND_GROUPS = new Set(["HandsLeft", "HandsRight", "ItemHands", "Gloves"]);
   const upperName = () => { const it = bodyItem("BodyUpper"); return it && it.Asset ? it.Asset.Name : ""; };
   // the drawn breasts to show right now, or null (a cup the game draws itself, another chest picked since, or a pose they aren't drawn in)
   function breastNow() { if (!window.FarmBreasts || BREAST.cup == null || BREAST.cup < FarmBreasts.DRAWN_FROM) return null; if (upperName() !== "XLarge" || poseKey() !== "std") return null; return BREAST; }
@@ -484,12 +487,19 @@
               if (BREAST.cvKey !== key) { BREAST.cv = FarmBreasts.canvas(FarmBreasts.shape(br.cup, br), bellySkin(upper[2], upper[3], "")); BREAST.cvKey = key; }
               const bc = BREAST.cv, rx = upper[0] + 250 + br.x, ry = upper[1] + FarmBreasts.ROOT_Y + br.y;
               real.drawImage(bc, rx - bc.ax, ry - bc.ay, {}); if (typeof real.drawImageBlink === "function") real.drawImageBlink(bc, rx - bc.ax, ry - bc.ay, {});
-              ctx.breast = { nips: bc.nips.map((p) => [rx + p[0], ry + p[1]]), k: FarmBreasts.shape(br.cup, br).k, sig: key + "|" + Math.round(rx) + "," + Math.round(ry), mid: upper[0] + 250 };
+              ctx.breast = { mask: bc.mask, mx: rx - bc.ax, my: ry - bc.ay, nips: bc.nips.map((p) => [rx + p[0], ry + p[1]]), k: FarmBreasts.shape(br.cup, br).k, sig: key + "|" + Math.round(rx) + "," + Math.round(ry), mid: upper[0] + 250 };
               for (const h of held.splice(0)) { try { if (!nipDraw(...h)) real[h[0]](h[1], h[2], h[3], h[4]); } catch (e) { console.warn("[studio] nipples:", e); } }
             }
           };
           // the game's nipples, and what's worn on them, set down on the drawn breasts: each side of the picture is
           // moved to its own nipple, and grown a little with the size. false: not ready, draw it as the game does.
+          const handDraw = (name, src, x, y, o) => {
+            const B = ctx.breast, im = B && mouldImg(src); if (!im) return false;
+            const key = "hand|" + src + "|" + Math.round(x) + "," + Math.round(y) + "|" + B.sig;
+            let c = BREAST.out.get(key);
+            if (!c) { c = document.createElement("canvas"); c.width = im.naturalWidth; c.height = im.naturalHeight; const g = c.getContext("2d"); g.drawImage(im, 0, 0); g.globalCompositeOperation = "destination-out"; g.drawImage(B.mask, B.mx - x, B.my - y); if (BREAST.out.size > 60) BREAST.out.clear(); BREAST.out.set(key, c); }
+            real[name](c, x, y, o); return true;
+          };
           const held = [];
           const nipDraw = (name, src, x, y, o) => {
             const B = ctx.breast, im = B && mouldImg(src); if (!im) return false;
@@ -518,7 +528,8 @@
             if (!blink) { try { before(src, x, y, o); } catch (e) { console.warn("[studio] belly:", e); } }
             if (br && typeof src === "string") { const gname = groupOf(src);
               if (!done && gname === "Nipples") { held.push([name, src, x, y, o]); return; }
-              if (done && NIP_GROUPS.has(gname)) { try { if (nipDraw(name, src, x, y, o)) return; } catch (e) { console.warn("[studio] nipples:", e); } } }
+              if (done && NIP_GROUPS.has(gname)) { try { if (nipDraw(name, src, x, y, o)) return; } catch (e) { console.warn("[studio] nipples:", e); } }
+              if (done && HAND_GROUPS.has(gname)) { try { if (handDraw(name, src, x, y, o)) return; } catch (e) { console.warn("[studio] hands:", e); } } }
             let drawn = false;
             try { if (ctx.belly && !fit.behind && typeof src === "string") { const q = isMoulded(src), m = q && mouldCanvas(src, x, y, ctx, q.key, q.mode); if (m) { real[name](m, x - MOULD.M, y, o); drawn = true; } } } catch (e) { console.warn("[studio] mould:", e); }
             if (!drawn) real[name](src, x, y, o);

@@ -22,7 +22,7 @@
     const r = (44 + 2.6 * i) * full;                    // DD is a little more than the game's biggest; R is past the size of her head
     const sag = (0.08 + 0.18 * k) * hang;            // how much lower than a ball the underside goes, and how far the fullness drops
     const top = 1.1 + 0.3 * k * hang;               // how long the upper slope is, in radii
-    const bx = (r * (0.80 + 0.07 * k) + 5) * apart;  // each one's middle, out from the breastbone: heavier ones swing wider
+    const bx = (r * (0.90 + 0.06 * k) + 3) * apart;  // each one's middle, out from the breastbone: heavier ones swing wider
     const by = r * top;                              // the slope starts at the chest, so the longer it is the lower they hang
     return { cup, i, k, r, sag, top, bx, by };
   }
@@ -30,9 +30,9 @@
   // side for the right one, a quarter turn at the bottom.
   function point(S, s, t) {
     const sn = Math.sin(t), cs = Math.cos(t);
-    if (sn >= 0) return [s * S.bx + S.r * cs * (1 + S.sag * 0.35 * sn), S.by + S.r * sn * (1 + S.sag)];     // the full, hanging half
+    if (sn >= 0) return [s * S.bx + S.r * cs * (1 + S.sag * 0.12 * sn) + s * S.r * 0.10 * S.k * sn, S.by + S.r * sn * (1 + S.sag)];     // the full, hanging half: round, its lowest point a little to the outside
     const up = -sn;
-    const u = Math.pow(up, 1.6), tx = s * Math.min(S.bx, 46);   // tx: where it's hung from, up on the chest
+    const u = Math.pow(up, 1.5), tx = s * Math.min(S.bx, 46);   // tx: where it's hung from, up on the chest
     return [(s * S.bx + S.r * cs) * (1 - u) + tx * u, S.by - S.r * S.top * up];   // the long slope up to there: it's a teardrop, not a ball
   }
   function path(g, S, s, from, to, ox, oy) {
@@ -104,6 +104,12 @@
     og.fillStyle = patch; og.beginPath(); og.arc(0, 0, 80, 0, Math.PI * 2); og.fill(); og.restore();
     og.drawImage(cv, 0, 0);
     out.ax = cv.ax; out.ay = cv.ay; out.nips = cv.nips;
+    // their plain outline, filled: for cutting away what they hang in front of (the hands)
+    const mask = document.createElement("canvas"); mask.width = out.width; mask.height = out.height;
+    const mg = mask.getContext("2d"); mg.fillStyle = "#000";
+    for (const s of [-1, 1]) { mg.beginPath(); path(mg, S, s, 0, Math.PI * 2, ox, oy); mg.closePath(); mg.fill(); }
+    mg.clearRect(0, 0, mask.width, oy + S.by - S.r * 0.3);   // (only the hanging part: up on the chest they cover nothing)
+    out.mask = mask;
     return out;
   }
   window.FarmBreasts = { NATIVE, CUPS, DRAWN_FROM, ROOT_Y, shape, point, nipples, canvas };

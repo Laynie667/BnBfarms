@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.16.9
+// @version      0.17.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -230,7 +230,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.16.9";
+  var VERSION = "0.17.0";
 
   // extension/src/config.js
   var BOT_MEMBER = 260239;
@@ -1010,8 +1010,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
       else g.moveTo(p[0], p[1]);
     }
   }
-  function bellyCanvas(size, skin) {
-    const S = SIZES[size], pad = 6, w = S.rx * 2 + pad * 2, hgt = S.ry * 2 + pad * 2, cx = w / 2, cy = hgt / 2, low = cy + S.ry * 0.28;
+  function bellyCanvas(size, skin, pressed) {
+    const S0 = SIZES[size], S = pressed ? { rx: S0.rx * 1.2, ry: S0.ry * 0.6, sag: S0.sag + 0.12 } : S0, pad = 6, w = S.rx * 2 + pad * 2, hgt = S.ry * 2 + pad * 2, cx = w / 2, cy = hgt / 2, low = cy + S.ry * 0.28;
     const cv = document.createElement("canvas");
     cv.width = w;
     cv.height = hgt;
@@ -1102,27 +1102,49 @@ One of mods you are using is using an old version of SDK. It will work for now b
       g.stroke();
       g.globalAlpha = 1;
     }
+    if (pressed) {
+      const cut = Math.round(cy + S.ry * 0.74);
+      g.clearRect(0, cut, w, hgt - cut);
+      let x0 = cx, x1 = cx;
+      for (let t = 0; t <= Math.PI; t += 0.01) {
+        const p = bellyPoint(S, cx, cy, t);
+        if (p[1] >= cut) {
+          x0 = Math.min(x0, p[0]);
+          x1 = Math.max(x1, p[0]);
+        }
+      }
+      g.strokeStyle = rgb(skin, 0.28);
+      g.lineWidth = 2;
+      g.lineCap = "round";
+      g.beginPath();
+      g.moveTo(x0, cut - 1);
+      g.lineTo(x1, cut - 1);
+      g.stroke();
+      cv.cut = cut;
+    }
     return cv;
   }
   function bellyPlace(size, upperX, upperY, cv, pose) {
     const S = SIZES[size];
-    if (pose === "AllFours") return [upperX + 250 - cv.width / 2, upperY + 318 + S.ry * 0.34 - cv.height / 2];
+    if (pose === "AllFours") return [upperX + 250 - cv.width / 2, upperY + GROUND_Y - (cv.cut || cv.height)];
+    if (pose === "Hogtied") return [upperX + 250 - cv.width / 2, upperY + 300 + S.ry * 0.34 - cv.height / 2];
     return [upperX + 250 - cv.width / 2, upperY + 392 + S.ry * 0.62 - (S.lift || 0) - cv.height / 2];
   }
+  var GROUND_Y = 386;
   function bellyPose(src) {
     const m = /\/BodyUpper\/(AllFours|Hogtied)\//.exec(String(src));
     return m ? m[1] : "";
   }
   function skinPatch(pose) {
-    return pose === "AllFours" ? [226, 236] : [226, 388];
+    return pose === "AllFours" ? [226, 236] : pose === "Hogtied" ? [226, 236] : [226, 388];
   }
   var pictures = /* @__PURE__ */ new Map();
-  function bellyPicture(size, skin) {
-    const key = size + ":" + skin.map((v) => Math.round(v / 4) * 4).join(",");
+  function bellyPicture(size, skin, pressed) {
+    const key = size + (pressed ? "p" : "") + ":" + skin.map((v) => Math.round(v / 4) * 4).join(",");
     let p = pictures.get(key);
     if (!p) {
-      const cv = bellyCanvas(size, skin);
-      p = { url: cv.toDataURL("image/png"), width: cv.width, height: cv.height };
+      const cv = bellyCanvas(size, skin, pressed);
+      p = { url: cv.toDataURL("image/png"), width: cv.width, height: cv.height, cut: cv.cut };
       if (pictures.size > 24) pictures.clear();
       pictures.set(key, p);
     }
@@ -1222,7 +1244,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
             const paint = () => {
               if (done || !upper || !lower) return;
               done = true;
-              const S = SIZES[trial], cv = bellyPicture(trial, skinFor(upper[2], upper[3]));
+              const S = SIZES[trial], cv = bellyPicture(trial, skinFor(upper[2], upper[3]), upper[4] === "AllFours");
               const [dx, dy] = bellyPlace(trial, upper[0], upper[1], cv, upper[4]);
               cb.drawImage(cv.url, dx, dy, {});
               if (typeof cb.drawImageBlink === "function") cb.drawImageBlink(cv.url, dx, dy, {});
@@ -1231,11 +1253,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
               if (done || typeof src !== "string") return;
               if (src.includes("/BodyUpper/")) {
                 const pose = bellyPose(src);
-                if (pose === "Hogtied") {
-                  done = true;
-                  return;
-                }
-                if (pose === "AllFours") {
+                if (pose === "AllFours" || pose === "Hogtied") {
                   upper = [x, y, src, o && o.HexColor, pose];
                   lower = true;
                   paint();

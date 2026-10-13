@@ -32,8 +32,10 @@ function bellyPath(g, S, cx, cy, from, to) {
   for (let i = 0; i <= steps; i++) { const p = bellyPoint(S, cx, cy, from + (to - from) * i / steps); if (i) g.lineTo(p[0], p[1]); else g.moveTo(p[0], p[1]); }
 }
 // the picture: lit from the upper left, heavier and warmer underneath, inked round the sides and bottom, with a navel
-function bellyCanvas(size, skin) {
-  const S = SIZES[size], pad = 6, w = S.rx * 2 + pad * 2, hgt = S.ry * 2 + pad * 2, cx = w / 2, cy = hgt / 2, low = cy + S.ry * 0.28;
+// pressed: it's lyin' on the ground (on all fours). The weight spreads sideways and the underside goes flat where it
+// touches: wider, shallower, cut off straight at the ground. cv.cut is how far down the picture the ground line is.
+function bellyCanvas(size, skin, pressed) {
+  const S0 = SIZES[size], S = pressed ? { rx: S0.rx * 1.2, ry: S0.ry * 0.6, sag: S0.sag + 0.12 } : S0, pad = 6, w = S.rx * 2 + pad * 2, hgt = S.ry * 2 + pad * 2, cx = w / 2, cy = hgt / 2, low = cy + S.ry * 0.28;
   const cv = document.createElement("canvas"); cv.width = w; cv.height = hgt;
   const g = cv.getContext("2d");
   const whole = () => { g.beginPath(); bellyPath(g, S, cx, cy, 0, Math.PI * 2); g.closePath(); };
@@ -79,6 +81,15 @@ function bellyCanvas(size, skin) {
   g.stroke();
   // on the biggest, the faint line that runs down from the navel
   if (size >= 2) { g.strokeStyle = rgb(skin, 0.72); g.lineWidth = 1; g.globalAlpha = 0.45; g.beginPath(); g.moveTo(cx, ny + 6); g.lineTo(cx, cy + S.ry * 0.86); g.stroke(); g.globalAlpha = 1; }
+  if (pressed) {
+    // flat where it meets the ground, with the line of contact inked
+    const cut = Math.round(cy + S.ry * 0.74);
+    g.clearRect(0, cut, w, hgt - cut);
+    let x0 = cx, x1 = cx;
+    for (let t = 0; t <= Math.PI; t += 0.01) { const p = bellyPoint(S, cx, cy, t); if (p[1] >= cut) { x0 = Math.min(x0, p[0]); x1 = Math.max(x1, p[0]); } }
+    g.strokeStyle = rgb(skin, 0.28); g.lineWidth = 2; g.lineCap = "round"; g.beginPath(); g.moveTo(x0, cut - 1); g.lineTo(x1, cut - 1); g.stroke();
+    cv.cut = cut;
+  }
   return cv;
 }
 // where its top-left corner goes, given where the upper-body picture was drawn: hung from just under the ribs
@@ -86,13 +97,18 @@ function bellyCanvas(size, skin) {
 // the front, the belly hangs down under the chest
 function bellyPlace(size, upperX, upperY, cv, pose) {
   const S = SIZES[size];
-  if (pose === "AllFours") return [upperX + 250 - cv.width / 2, upperY + 318 + S.ry * 0.34 - cv.height / 2];
+  // On all fours it rests on the ground (Laynie, Oct 12: "wouldn't the belly be compressed against the ground... it
+  // probably shouldn't extend below the elbows unless suspended"): its flat underside sits on the line the hands are on.
+  if (pose === "AllFours") return [upperX + 250 - cv.width / 2, upperY + GROUND_Y - (cv.cut || cv.height)];
+  // Hogtied is hung up: it hangs free under the chest
+  if (pose === "Hogtied") return [upperX + 250 - cv.width / 2, upperY + 300 + S.ry * 0.34 - cv.height / 2];
   return [upperX + 250 - cv.width / 2, upperY + 392 + S.ry * 0.62 - (S.lift || 0) - cv.height / 2];
 }
 // which pose the upper body is drawn in, from its picture's folder ("" for the ordinary ones)
+const GROUND_Y = 386;   // in the all-fours body picture, how far down the hands and elbows touch the ground
 function bellyPose(src) { const m = /\/BodyUpper\/(AllFours|Hogtied)\//.exec(String(src)); return m ? m[1] : ""; }
 // where in the body's picture to look for skin, by pose
-function skinPatch(pose) { return pose === "AllFours" ? [226, 236] : [226, 388]; }
+function skinPatch(pose) { return pose === "AllFours" ? [226, 236] : pose === "Hogtied" ? [226, 236] : [226, 388]; }
 // <<< belly drawing
 // The game keeps every picture it draws in a list it looks things up in BY NAME, and it expects every name to be text.
 // Handing it the drawing itself (Oct 12, Companion 0.16.2) put a non-text name in that list, and from then on every
@@ -100,10 +116,10 @@ function skinPatch(pose) { return pose === "AllFours" ? [226, 236] : [226, 388];
 // no restraints, no looking at anybody, till the page was reloaded. So the belly is handed over as a picture address
 // (text), one per size and skin colour, and scrubCache() takes out anything that isn't text.
 const pictures = new Map();
-function bellyPicture(size, skin) {
-  const key = size + ":" + skin.map((v) => Math.round(v / 4) * 4).join(",");
+function bellyPicture(size, skin, pressed) {
+  const key = size + (pressed ? "p" : "") + ":" + skin.map((v) => Math.round(v / 4) * 4).join(",");
   let p = pictures.get(key);
-  if (!p) { const cv = bellyCanvas(size, skin); p = { url: cv.toDataURL("image/png"), width: cv.width, height: cv.height }; if (pictures.size > 24) pictures.clear(); pictures.set(key, p); }
+  if (!p) { const cv = bellyCanvas(size, skin, pressed); p = { url: cv.toDataURL("image/png"), width: cv.width, height: cv.height, cut: cv.cut }; if (pictures.size > 24) pictures.clear(); pictures.set(key, p); }
   return p;
 }
 export function scrubCache() {
@@ -173,15 +189,15 @@ function hookBelly(mod) {
           const prio = (src) => { const m = new RegExp("/Assets/[^/]+/([^/]+)/").exec(src); if (!m) return 99; try { const g = W.AssetGroupGet && W.AssetGroupGet(C.AssetFamily, m[1]); return g && typeof g.DrawingPriority === "number" ? g.DrawingPriority : 99; } catch (e) { return 99; } };
           const paint = () => {
             if (done || !upper || !lower) return; done = true;
-            const S = SIZES[trial], cv = bellyPicture(trial, skinFor(upper[2], upper[3]));   // { url, width, height }: a picture the game can cache by name
+            const S = SIZES[trial], cv = bellyPicture(trial, skinFor(upper[2], upper[3]), upper[4] === "AllFours");   // { url, width, height }: a picture the game can cache by name
             const [dx, dy] = bellyPlace(trial, upper[0], upper[1], cv, upper[4]);
             cb.drawImage(cv.url, dx, dy, {});
             if (typeof cb.drawImageBlink === "function") cb.drawImageBlink(cv.url, dx, dy, {});
           };
-          // On all fours the belly hangs BEHIND the chest, so it has to go down before the upper body does. Hogtied, it's out of sight.
+          // On all fours and hogtied the belly is BEHIND the chest, so it has to go down before the upper body does.
           const before = (src, x, y, o) => {
             if (done || typeof src !== "string") return;
-            if (src.includes("/BodyUpper/")) { const pose = bellyPose(src); if (pose === "Hogtied") { done = true; return; } if (pose === "AllFours") { upper = [x, y, src, o && o.HexColor, pose]; lower = true; paint(); return; } }
+            if (src.includes("/BodyUpper/")) { const pose = bellyPose(src); if (pose === "AllFours" || pose === "Hogtied") { upper = [x, y, src, o && o.HexColor, pose]; lower = true; paint(); return; } }
             if (lower && prio(src) > SKIN_TOP) paint();
           };
           const after = (src, x, y, o) => { if (typeof src !== "string") return; if (src.includes("/BodyUpper/")) upper = [x, y, src, o && o.HexColor, bellyPose(src)]; if (src.includes("/BodyLower/")) lower = true; };

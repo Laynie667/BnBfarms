@@ -13,7 +13,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 | Map tools, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.3** |
 | Dairy | `farmhand-dairy.user.js` | the bot's PC | **1.0.2** |
 | Shows | `farmhand-shows.user.js` | the bot's PC | **1.0.4** |
-| Farmhand Companion | `farmhand-companion.user.js` | each player | **0.16.9** |
+| Farmhand Companion | `farmhand-companion.user.js` | each player | **0.17.0** |
 | Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.4** |
 
 ## Sending a watch report
@@ -23,6 +23,8 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 - Running the watcher on more than one game at once (the bot, yours, a tester's) lets Claude line them up into one timeline.
 
 ## Latest changes (newest first)
+
+- **Companion 0.17.0: on all fours the belly rests on the ground; hogtied it hangs.** Laynie on 0.16.9: on all fours it hung below the elbows, when it would be pressed against the ground; hanging only makes sense suspended. On all fours the belly is now pressed: a fifth wider, 40% shallower, flat underneath, with its underside on the line the hands are on, so it never reaches below them. Hogtied (hung up) it is drawn again, hanging free under the chest. In both it goes down before the upper body, behind the chest. Preview checked; NOT YET SEEN LIVE.
 
 - **Companion 0.16.9: the belly test follows poses.** Laynie on 0.16.8: "that looks perfect" (standing). Kneeling and every arms pose already worked, because the belly hangs off the upper body and the torso is in the same place in all of them. On all fours the game draws the body from the front with the chest low, so the belly now goes down before the upper body and hangs under the chest, behind it. Hogtied, it is out of sight and not drawn. NOT YET SEEN LIVE in those two poses.
 

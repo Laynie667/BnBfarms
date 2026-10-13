@@ -96,6 +96,13 @@ the game's pictures into the drawing.
   not set to "behind".
 - The list of moulded pieces is saved in `fits/items.json` when you press *Save this fit*.
 
+## Step 19: every slot, a choice, and the sheet
+
+- Every slot follows the drawn breasts now, not a fixed list. Hair is left alone.
+- Picked piece, *On drawn breasts*: stretch over them, leave it as the game draws it, or tuck it behind them.
+- Breasts section, *See a whole slot at this size*: every piece in the slot as a sheet of small pictures, to find the
+  ones that need a redraw. A big slot takes a minute or two. Click a picture to put the piece on.
+
 ## Step 18: clothes on the drawn breasts
 
 - Tops, bras, suits, corsets, breast gear and torso harnesses are stretched from the game's breast onto the drawn one,

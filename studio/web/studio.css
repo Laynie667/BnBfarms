@@ -35,3 +35,10 @@ body.fh-config > #fh-done { display: block !important; }
 #fh-studio .fh-colour { display: inline-flex; align-items: center; gap: 4px; margin: 3px 10px 3px 0; color: #c5c9d2; font-size: 13px; }
 #fh-studio .fh-colour button.fh-x { margin: 0; padding: 3px 7px; font-size: 12px; color: #c5c9d2; }
 #fh-studio .fh-colour input[type=color] { margin: 0; }
+#fh-audit { position: fixed; inset: 0; z-index: 9800; background: #14161b; overflow: auto; padding: 0 14px 20px; }
+#fh-audit .fh-audit-head { position: sticky; top: 0; background: #14161b; padding: 10px 0; display: flex; gap: 12px; align-items: center; color: #e8e4da; z-index: 1; }
+#fh-audit .fh-audit-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 8px; }
+#fh-audit figure { margin: 0; background: #23262d; border: 1px solid #333842; border-radius: 6px; padding: 4px; cursor: pointer; }
+#fh-audit figure:hover { border-color: #d9a441; }
+#fh-audit figure canvas { position: static !important; width: 100% !important; height: auto !important; display: block; transform: none !important; }
+#fh-audit figcaption { font-size: 12px; color: #c5c9d2; text-align: center; padding: 3px 0 1px; }

@@ -236,6 +236,12 @@
             [["", "No: as the game draws it"], ["wide", "Wide: out to the body's outline"], ["over", "Over: wide, and down over the belly"], ["under", "Under: it sits beneath, the belly hangs over it"]].map(([v, t]) => $("option", { value: v, textContent: t, selected: v === now })));
           return sel; })(),
         $("span", { className: "note", textContent: ({ "": "Follows the body where the sliders can't.", wide: "As wide as the body on every row. Never longer.", over: "Wide, and lengthened so it runs down to the underside of the belly.", under: "Left where it is on the body. The belly covers what it hangs in front of." })[MOULD.items.has(mouldKey(it)) ? (MOULD.mode.get(mouldKey(it)) || "wide") : ""] })),
+      $("div", { className: "row" },
+        $("label", { textContent: "On drawn breasts:" }),
+        (() => { const k = mouldKey(it), now = BREAST.wear[k] || "";
+          return $("select", { title: "What this piece does when the breasts are a drawn size (DD and up)", onchange: (e) => { const v = e.target.value; if (v) BREAST.wear[k] = v; else delete BREAST.wear[k]; BREAST.out.clear(); bellyDraw(); fillFit(); } },
+            [["", "Stretch over them (the usual)"], ["plain", "Leave it as the game draws it"], ["behind", "Tuck it behind them"]].map(([v, t]) => $("option", { value: v, textContent: t, selected: v === now }))); })(),
+        $("span", { className: "note", textContent: "Kept with Save the breasts." })),
       options.length > 1 ? $("div", { className: "row" }, $("label", { textContent: "Option:" }), options.map((o) => $("button", { type: "button", className: typeNow() === o ? "on" : "", textContent: o.replace(/([a-z])([A-Z0-9])/g, "$1 $2"), onclick: () => { try { TypedItemSetOptionByName(S.C, it, o, false, null, false); } catch (e) { say("The game wouldn't set that option: " + (e && e.message || e), true); } redraw(); } }))) : "",
       layers.length > 1 ? $("div", { className: "row" }, $("label", { textContent: "Move:" }),
         $("button", { type: "button", className: FIT.layer ? "" : "on", textContent: "The whole piece", onclick: () => { FIT.layer = ""; fillFit(); } }),
@@ -394,7 +400,7 @@
   // Flat to R. The first six cups are the game's own chest sizes: picking one just changes the body. From DD up they're
   // drawn (breasts-drawing.js), over the game's biggest chest, standing and kneeling only for now. The game's nipples,
   // and whatever is worn on them, are lifted off where the game puts them and set down on the drawn ones.
-  const BREAST = { dress: true, cover: new Map(), cup: null, full: 1, hang: 1, apart: 1, x: 0, y: 0, nip: 1, nipY: 0, nipX: 0, cv: null, cvKey: "", halves: new Map(), out: new Map() };
+  const BREAST = { wear: {}, dress: true, cover: new Map(), cup: null, full: 1, hang: 1, apart: 1, x: 0, y: 0, nip: 1, nipY: 0, nipX: 0, cv: null, cvKey: "", halves: new Map(), out: new Map() };
   const BREAST_SLIDERS = [["full", "Fullness", 0.7, 1.4, 0.01], ["hang", "Weight (how low and heavy they hang)", 0, 2, 0.01], ["apart", "Apart / together", 0.6, 1.5, 0.01], ["x", "Left / right", -60, 60, 1], ["y", "Up / down", -80, 80, 1],
     ["nip", "Nipple size (and what's worn on them)", 0.4, 4, 0.05], ["nipY", "Nipples up / down", -80, 80, 1], ["nipX", "Nipples in / out", -60, 60, 1]];
   const NIP_GROUPS = new Set(["Nipples", "ItemNipples", "ItemNipplesPiercings"]);
@@ -405,7 +411,10 @@
   // sit in the middle like a patch. Instead the part of the piece that covered each of the game's breasts is taken and
   // GROWN onto the drawn one: same piece, same colours and shading, stretched from the game's breast to ours and kept
   // inside our outline. A bra cup stays a cup, a top stays a top. What's off the breasts isn't touched.
-  const CHEST_GROUPS = new Set(["Cloth", "ClothOuter", "ClothAccessory", "Suit", "Bra", "Corset", "ItemBreast", "ItemTorso", "ItemTorso2"]);
+  // Which slots: all of them. Anything drawn after the breasts that covers enough of where the game's breasts were is
+  // chest wear, whatever slot it's in (a straitjacket is in the arms slot, a cape in the neck's). Hair is left alone:
+  // it falls over them, it isn't worn on them.
+  const chestSlot = (g) => !!g && !/^Hair/.test(g) && !NIP_GROUPS.has(g) && !HAND_GROUPS.has(g) && !/^(Body|Arms|Head|Eyes|Eyebrows|Mouth|Blush|Fluids|Pussy|Emoticon|Height)/.test(g);
   const GAME_BREAST = { dx: 42, y: 330, r: 41 };   // the game's biggest chest, in its upper-body picture: each breast's middle is this far out from the centre line, this far down, and about this big
   const upperName = () => { const it = bodyItem("BodyUpper"); return it && it.Asset ? it.Asset.Name : ""; };
   // the drawn breasts to show right now, or null (a cup the game draws itself, another chest picked since, or a pose they aren't drawn in)
@@ -429,13 +438,41 @@
     v = acc.map((a) => (a[2] ? [a[0] / a[2], a[1] / a[2]] : null)); BREAST.halves.set(key, v); return v;
   }
   async function saveBreasts() {
-    try { const r = await fetch("/__studio/fits/breasts.json", { method: "POST", body: JSON.stringify({ v: 1, saved: new Date().toISOString(), cup: BREAST.cup, full: BREAST.full, hang: BREAST.hang, apart: BREAST.apart, x: BREAST.x, y: BREAST.y, nip: BREAST.nip, nipY: BREAST.nipY, nipX: BREAST.nipX }, null, 1) }); if (!r.ok) throw new Error(await r.text()); say("Saved to studio\\fits\\breasts.json."); }
+    try { const r = await fetch("/__studio/fits/breasts.json", { method: "POST", body: JSON.stringify({ v: 1, saved: new Date().toISOString(), cup: BREAST.cup, full: BREAST.full, hang: BREAST.hang, apart: BREAST.apart, x: BREAST.x, y: BREAST.y, nip: BREAST.nip, nipY: BREAST.nipY, nipX: BREAST.nipX, wear: BREAST.wear }, null, 1) }); if (!r.ok) throw new Error(await r.text()); say("Saved to studio\\fits\\breasts.json."); }
     catch (e) { say("It didn't save: " + (e && e.message || e), true); }
   }
   async function loadBreasts(tell) {
     try { const d = await (await fetch("/__studio/fits/breasts.json", { cache: "no-store" })).json();
-      if (d) { for (const [k] of BREAST_SLIDERS) if (typeof d[k] === "number") BREAST[k] = d[k]; if (tell && typeof d.cup === "number") setCup(d.cup); if (BREAST.fill) BREAST.fill(); bellyDraw(); if (tell) say("The saved breasts are back."); }
+      if (d) { for (const [k] of BREAST_SLIDERS) if (typeof d[k] === "number") BREAST[k] = d[k]; if (d.wear && typeof d.wear === "object") BREAST.wear = d.wear; if (tell && typeof d.cup === "number") setCup(d.cup); if (BREAST.fill) BREAST.fill(); bellyDraw(); if (tell) say("The saved breasts are back."); }
       else if (tell) say("Nothing has been saved yet."); } catch (e) { if (tell) say("I couldn't read the saved breasts: " + (e && e.message || e), true); }
+  }
+  // Every piece in a slot, tried on at the size showing, as a sheet of small pictures: the quick way to find the ones
+  // the stretch makes a mess of. Click a picture to put that piece on and pick it.
+  const AUDIT = { on: false };
+  const waitMs = (ms) => new Promise((r) => setTimeout(r, ms));
+  async function chestAudit(group) {
+    if (AUDIT.on) return; AUDIT.on = true;
+    const before = ServerAppearanceBundle(S.C.Appearance), list = Asset.filter((a) => a.Group.Name === group && a.Visible !== false);
+    const grid = $("div", { className: "fh-audit-grid" }), head = $("span", { textContent: "Trying on " + list.length + " pieces…" });
+    let stop = false;
+    const close = () => { stop = true; over.remove(); };
+    const over = $("div", { id: "fh-audit" }, $("div", { className: "fh-audit-head" }, head, $("button", { type: "button", textContent: "Close", onclick: close })), grid);
+    document.getElementById("fh-studio").append(over);
+    let n = 0;
+    for (const a of list) {
+      if (stop) break;
+      try {
+        wear(before); putOn(group, a.Name);
+        await waitMs(450); bellyDraw(); await waitMs(150); bellyDraw();
+        const cv = $("canvas", { width: 200, height: 210, title: a.Name });
+        cv.getContext("2d").drawImage(S.C.Canvas, 60, 900, 380, 400, 0, 0, 200, 210);
+        grid.append($("figure", { onclick: () => { close(); wear(before); putOn(group, a.Name); FIT.picked = group; redraw(); } }, cv, $("figcaption", { textContent: itemName(a) })));
+      } catch (e) { console.warn("[studio] sheet:", a.Name, e); }
+      head.textContent = "Tried " + (++n) + " of " + list.length + " in " + group + ". Click one to put it on.";
+    }
+    if (!before.some((b) => b.Group === group)) { try { InventoryRemove(S.C, group); } catch (e) { /* nothing on */ } }
+    if (!stop) { wear(before); redraw(); head.textContent = list.length + " pieces in " + group + " at " + FarmBreasts.CUPS[cupNow()] + ". Click one to put it on and pick it."; }
+    AUDIT.on = false;
   }
   function breastPanel() {
     const box = $("div", { id: "fh-breasts" });
@@ -450,6 +487,9 @@
         $("p", { className: "note", textContent: drawn ? "Drawn. The game's nipples, and what's worn on them, move onto them. Bras and chest gear are still cut for the game's chest." : "Flat to D is the game's own chest, so everything made for it fits. From DD up they're drawn." }),
         BREAST_SLIDERS.map(([k, label, min, max, step]) => { const val = $("span", { className: "fh-val", textContent: String(BREAST[k]) });
           return $("div", { className: "fh-slide" }, $("label", { textContent: label }), $("input", { type: "range", min, max, step, value: BREAST[k], disabled: !drawn, oninput: (e) => { BREAST[k] = Number(e.target.value); val.textContent = String(BREAST[k]); bellyDraw(); } }), val); }),
+        $("div", { className: "row" }, $("label", { textContent: "See a whole slot at this size:" }),
+          (() => { const sel = $("select", {}, ["Cloth", "ClothOuter", "ClothAccessory", "Bra", "Suit", "Corset", "Necklace", "ItemBreast", "ItemTorso", "ItemTorso2", "ItemArms", "ItemNipples", "ItemNipplesPiercings", "ItemNeckAccessories", "ItemNeckRestraints"].filter((gn) => Asset.some((a) => a.Group.Name === gn)).map((gn) => $("option", { value: gn, textContent: gn.replace(/([a-z])([A-Z0-9])/g, "$1 $2") })));
+            return [sel, $("button", { type: "button", textContent: "Show the sheet", title: "Tries on every piece in the slot and shows them side by side", onclick: () => chestAudit(sel.value) })]; })()),
         $("div", { className: "row" },
           $("button", { type: "button", className: "go", textContent: "Save the breasts", onclick: saveBreasts }),
           $("button", { type: "button", textContent: "Put the saved ones back", onclick: () => loadBreasts(true) }),
@@ -475,6 +515,8 @@
           const groupOf = (src) => { const m = slot.exec(src); return m ? m[1] : ""; };
           // (a piece's pictures are in its slot's folder or the folder of the slot it borrows its art from, named for the piece)
           const mouldList = S.C.Appearance.filter((it) => MOULD.items.has(mouldKey(it))).map((it) => ({ folders: [it.Asset.Group.Name, it.Asset.DynamicGroupName], name: it.Asset.Name, key: mouldKey(it), mode: MOULD.mode.get(mouldKey(it)) || "wide" }));
+          const wornList = S.C.Appearance.map((it) => ({ folders: [it.Asset.Group.Name, it.Asset.DynamicGroupName], name: it.Asset.Name, key: mouldKey(it) })).sort((a, b) => b.name.length - a.name.length);
+          const wearOf = (src) => { const g = groupOf(src), file = src.slice(src.lastIndexOf("/") + 1), q = wornList.find((w) => w.folders.includes(g) && file.startsWith(w.name)); return (q && BREAST.wear[q.key]) || ""; };
           const isMoulded = (src) => { if (!mouldList.length) return null; const g = groupOf(src), file = src.slice(src.lastIndexOf("/") + 1); return mouldList.find((q) => q.folders.includes(g) && file.startsWith(q.name)) || null; };
           const gate = FarmBelly.skinGate(C);   // true once a picture comes after all the skin, genitals included
           const prio = (src) => { const g = AssetGroupGet(C.AssetFamily, groupOf(src)); return g && typeof g.DrawingPriority === "number" ? g.DrawingPriority : 99; };
@@ -574,7 +616,8 @@
             if (br && typeof src === "string") { const gname = groupOf(src);
               if (!done && gname === "Nipples") { held.push([name, src, x, y, o]); return; }
               if (done && NIP_GROUPS.has(gname)) { try { if (nipDraw(name, src, x, y, o)) return; } catch (e) { console.warn("[studio] nipples:", e); } }
-              if (done && BREAST.dress && CHEST_GROUPS.has(gname) && !isMoulded(src)) { try { if (dressDraw(name, src, x, y, o)) return; } catch (e) { console.warn("[studio] chest wear:", e); } }
+              if (done && chestSlot(gname) && !isMoulded(src)) { const how = wearOf(src);
+                try { if (how === "behind") { if (handDraw(name, src, x, y, o)) return; } else if (how !== "plain" && BREAST.dress) { if (dressDraw(name, src, x, y, o)) return; } } catch (e) { console.warn("[studio] chest wear:", e); } }
               if (done && HAND_GROUPS.has(gname)) { try { if (handDraw(name, src, x, y, o)) return; } catch (e) { console.warn("[studio] hands:", e); } } }
             let drawn = false;
             try { if (ctx.belly && !fit.behind && typeof src === "string") { const q = isMoulded(src), m = q && mouldCanvas(src, x, y, ctx, q.key, q.mode); if (m) { real[name](m, x - MOULD.M, y, o); drawn = true; } } } catch (e) { console.warn("[studio] mould:", e); }
@@ -727,7 +770,7 @@
     CharacterAppearanceSetDefault(S.C);
     CharacterRefresh(S.C, false, false);
     panel(); S.ready = true; loadFits(false); loadItemFits(); loadBreasts(false);
-    window.FarmStudio = { S, wear, decode, encode, setBody, setSkin, setPose, redraw, putOn, tint, slots, BELLY, bellyDraw, saveFits, loadFits, FIT, select, saveFit, fitSet, fitDraw, orderSet, orderNow, colourSet, colourLayers, configure, configureDone, stashFits, MOULD, BREAST, setCup, cupNow, saveBreasts, loadBreasts };   // for poking at from the console
+    window.FarmStudio = { S, wear, decode, encode, setBody, setSkin, setPose, redraw, putOn, tint, slots, BELLY, bellyDraw, saveFits, loadFits, FIT, select, saveFit, fitSet, fitDraw, orderSet, orderNow, colourSet, colourLayers, configure, configureDone, stashFits, MOULD, BREAST, chestAudit, setCup, cupNow, saveBreasts, loadBreasts };   // for poking at from the console
     say("Ready. Paste an outfit code, or change the body and pose below.");
   }
   let tries = 0;

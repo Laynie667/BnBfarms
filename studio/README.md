@@ -68,6 +68,14 @@ the game's pictures into the drawing.
   `studio/fits/items.json`. It is put back whenever that piece is worn on that body in that pose again.
 - The belly now goes on above all the skin, genitals included.
 
+## Step 5: forward and back, and colours
+
+- **In front of / behind other things.** *Back* and *Forward* move the picked piece, or the one layer you picked, a
+  step earlier or later in the drawing order. The number is its place (bigger is in front); one button puts the
+  game's own back. This sets the game's `OverridePriority`, and it is kept as part of a saved fit.
+- **Colours.** Each colour layer of the picked piece has its own swatch, and a button to go back to the game's
+  colour for that layer. Colours belong to the look, so they travel in the outfit code, not in the fit.
+
 ## What it is for next
 
 1. The Companion's belly reading the saved fits, so a shape tuned here is the shape worn in the game.

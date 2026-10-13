@@ -7,6 +7,7 @@
    Step 2: pick any item from any slot and try it on · colour it · see what's worn and take pieces off.
    Step 4: click a worn piece to fit it: move, stretch, turn (the whole piece or one layer), change its option ·
            a fit is kept per item, body and pose in studio/fits/items.json and put back when that item is worn again.
+   Step 5: forward and back in the drawing order (the piece or one layer) · a colour for each colour layer.
    Step 3: the belly, drawn with the Companion's own belly code · sliders for shape and place · its own fit for each
            pose · saved to studio/fits/belly.json.
    The codes are the ones WCE and BCX export, and the game's own wardrobe copy: the list of items as JSON, packed with LZString to base64
@@ -136,11 +137,44 @@
     if (FIT.layer) { const rec = p["Layer" + k] = Object.assign({}, p["Layer" + k]); if (v === def) delete rec[FIT.layer]; else rec[FIT.layer] = v; if (!Object.keys(rec).length) delete p["Layer" + k]; }
     else if (v === def) delete p[k]; else p[k] = v;
   }
-  const fitOf = (it) => { const p = it.Property || {}, out = {}; for (const [k] of FIT_SLIDERS) { if (typeof p[k] === "number") out[k] = p[k]; if (p["Layer" + k] && Object.keys(p["Layer" + k]).length) out["Layer" + k] = Object.assign({}, p["Layer" + k]); } return out; };
-  function fitClear(it) { const p = it.Property || {}; for (const [k] of FIT_SLIDERS) { delete p[k]; delete p["Layer" + k]; } }
+  // ── forward and back ──
+  // Every layer has a place in the drawing order (a number: bigger is drawn later, so it's in front). The game lets
+  // an item override that: Property.OverridePriority, one number for the whole piece or a number for each layer by name.
+  const layerOf = (it, name) => (it.Asset.Layer || []).find((l) => l.Name === name);
+  function orderOwn(it) { const l = FIT.layer && layerOf(it, FIT.layer); return l && typeof l.Priority === "number" ? l.Priority : (typeof it.Asset.DrawingPriority === "number" ? it.Asset.DrawingPriority : (it.Asset.Group.DrawingPriority || 0)); }
+  function orderNow(it) {
+    const o = (it.Property || {}).OverridePriority;
+    if (typeof o === "number") return o;
+    if (o && typeof o === "object" && FIT.layer && typeof o[FIT.layer] === "number") return o[FIT.layer];
+    return orderOwn(it);
+  }
+  function orderSet(it, n) {
+    const p = it.Property = it.Property || {};
+    if (n == null) { if (FIT.layer && p.OverridePriority && typeof p.OverridePriority === "object") { delete p.OverridePriority[FIT.layer]; if (!Object.keys(p.OverridePriority).length) delete p.OverridePriority; } else delete p.OverridePriority; }
+    else if (FIT.layer) { const rec = typeof p.OverridePriority === "object" && p.OverridePriority ? Object.assign({}, p.OverridePriority) : {}; rec[FIT.layer] = n; p.OverridePriority = rec; }
+    else p.OverridePriority = n;
+    redraw();   // the order is worked out when the character is refreshed, not just redrawn
+  }
+  // ── colours, layer by layer ──
+  function colourLayers(it) {
+    const out = [], seen = new Set(); let i = 0;
+    for (const l of it.Asset.Layer || []) {
+      if (l.AllowColorize === false || l.HideColoring) continue;
+      const idx = typeof l.ColorIndex === "number" ? l.ColorIndex : i; i++;
+      if (seen.has(idx)) continue; seen.add(idx);
+      out.push({ idx, name: l.ColorGroup || l.Name || "Colour " + (idx + 1) });
+    }
+    return out;
+  }
+  function colourList(it, n) { const c = Array.isArray(it.Color) ? it.Color.slice() : new Array(n).fill(typeof it.Color === "string" ? it.Color : "Default"); while (c.length < n) c.push("Default"); return c; }
+  function colourSet(it, idx, hex) { const L = colourLayers(it), n = Math.max(1, ...L.map((x) => x.idx + 1)), c = colourList(it, n); c[idx] = hex; it.Color = c; redraw(); }
+
+  const fitOf = (it) => { const p = it.Property || {}, out = {}; for (const [k] of FIT_SLIDERS) { if (typeof p[k] === "number") out[k] = p[k]; if (p["Layer" + k] && Object.keys(p["Layer" + k]).length) out["Layer" + k] = Object.assign({}, p["Layer" + k]); } if (p.OverridePriority != null) out.OverridePriority = typeof p.OverridePriority === "object" ? Object.assign({}, p.OverridePriority) : p.OverridePriority; return out; };
+  function fitClear(it) { const p = it.Property || {}; for (const [k] of FIT_SLIDERS) { delete p[k]; delete p["Layer" + k]; } delete p.OverridePriority; }
   function applySaved(it) { const f = FIT.saved[fitKey(it)]; fitClear(it); if (f) Object.assign(it.Property = it.Property || {}, JSON.parse(JSON.stringify(f))); return !!f; }
   function applyAllSaved() { for (const it of S.C.Appearance) if (it.Asset.Group.Category === "Item" || it.Asset.Group.AllowNone) applySaved(it); }
   const fitDraw = () => { try { CharacterLoadCanvas(S.C); } catch (e) { console.warn("[studio] fit redraw:", e); } };
+  const fitRefresh = () => { try { CharacterRefresh(S.C, false, false); } catch (e) { console.warn("[studio] fit refresh:", e); } };   // (when the drawing order changed)
   function select(group) { FIT.picked = FIT.picked === group ? null : group; FIT.layer = ""; fillWorn(); }
   function fillFit() {
     const box = document.getElementById("fh-fit"); if (!box) return;
@@ -159,6 +193,18 @@
         $("button", { type: "button", className: FIT.layer ? "" : "on", textContent: "The whole piece", onclick: () => { FIT.layer = ""; fillFit(); } }),
         layers.map((n) => $("button", { type: "button", className: FIT.layer === n ? "on" : "", textContent: n.replace(/([a-z])([A-Z0-9])/g, "$1 $2"), title: "Just this layer of it", onclick: () => { FIT.layer = n; fillFit(); } }))) : "",
       rows,
+      (() => { const own = orderOwn(it), now = orderNow(it);
+        return $("div", { className: "row" }, $("label", { textContent: "In front of / behind other things:" }),
+          $("button", { type: "button", textContent: "◀ Back", title: "Drawn earlier, so more things cover it", onclick: () => { orderSet(it, orderNow(it) - 1); } }),
+          $("span", { className: "fh-val", style: "min-width:34px;text-align:center", textContent: String(now) }),
+          $("button", { type: "button", textContent: "Forward ▶", title: "Drawn later, so it covers more things", onclick: () => { orderSet(it, orderNow(it) + 1); } }),
+          $("button", { type: "button", textContent: "The game's own (" + own + ")", onclick: () => { orderSet(it, null); } }),
+          $("span", { className: "note", textContent: (FIT.layer ? "this layer" : "the whole piece") + (now !== own ? ", moved " + (now > own ? "forward " : "back ") + Math.abs(now - own) : "") })); })(),
+      (() => { const L = colourLayers(it); if (!L.length) return ""; const cols = colourList(it, Math.max(1, ...L.map((x) => x.idx + 1)));
+        return $("div", { className: "row" }, $("label", { textContent: "Colours:" }), L.map((x) => { const c = cols[x.idx], hex = typeof c === "string" && /^#[0-9a-fA-F]{6}$/.test(c) ? c : "#888888";
+          return $("span", { className: "fh-colour" }, $("span", { textContent: String(x.name).replace(/([a-z])([A-Z0-9])/g, "$1 $2") }),
+            $("input", { type: "color", value: hex, title: "Its own colour: " + c, onchange: (e) => colourSet(it, x.idx, e.target.value) }),
+            $("button", { type: "button", className: "fh-x", textContent: c === "Default" ? "game's" : "↺", title: "Back to the game's own colour for this layer", onclick: () => colourSet(it, x.idx, "Default") })); })); })(),
       $("div", { className: "row" },
         $("button", { type: "button", className: "go", textContent: "Save this fit", title: "For this piece on this body in this pose", onclick: () => saveFit(it) }),
         $("button", { type: "button", textContent: "Back to how the game draws it", onclick: () => { fitClear(it); fitDraw(); fillFit(); say("Fit cleared on screen. \"Save this fit\" would save it cleared."); } }),
@@ -327,7 +373,7 @@
     CharacterAppearanceSetDefault(S.C);
     CharacterRefresh(S.C, false, false);
     panel(); S.ready = true; loadFits(false); loadItemFits();
-    window.FarmStudio = { S, wear, decode, encode, setBody, setSkin, setPose, redraw, putOn, tint, slots, BELLY, bellyDraw, saveFits, loadFits, FIT, select, saveFit, fitSet, fitDraw };   // for poking at from the console
+    window.FarmStudio = { S, wear, decode, encode, setBody, setSkin, setPose, redraw, putOn, tint, slots, BELLY, bellyDraw, saveFits, loadFits, FIT, select, saveFit, fitSet, fitDraw, orderSet, orderNow, colourSet, colourLayers };   // for poking at from the console
     say("Ready. Paste an outfit code, or change the body and pose below.");
   }
   let tries = 0;

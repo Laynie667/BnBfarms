@@ -24,6 +24,8 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 ## Latest changes (newest first)
 
+- **Outfit studio, step 5: forward and back, and a colour per layer.** In the fit box for a picked piece: Back and Forward buttons move the whole piece, or one chosen layer, earlier or later in the drawing order (the game's `OverridePriority`), with its place shown and a button for the game's own; it is saved as part of the fit. And a colour swatch for each colour layer of the piece, each with its own reset. Checked here on a chastity belt (belt and keyhole coloured separately, the lock brought forward on its own).
+
 - **Outfit studio, step 4: fit what is worn; Companion 0.17.3: the belly covers the genitals.**
   - Laynie in the studio: "the genitals show over the belly". The belly was placed by each slot's usual spot in the drawing order, but a pussy or cock can have layers drawn later than that. It now walks the game's own ordered layer list and goes on right after the last layer of chest, hips or genitals. Same fix in the Companion (0.17.3), which falls back to the old rule if the game has no such list.
   - Studio: clicking a worn piece no longer takes it off. It picks it for fitting: sliders for left and right, up and down, wider, taller and turn, for the whole piece or any one layer; buttons for the item's options; "Save this fit" keeps it per item, body size and pose in `studio/fits/items.json` and puts it back when that item is worn there again. The ✕ takes a piece off. The sliders set the game's own item properties, which the newer game copy in `reference/` draws; whether the live game (R132) draws them is not yet checked.

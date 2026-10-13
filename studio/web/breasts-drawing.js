@@ -20,9 +20,9 @@
     const a = adj || {}, i = Math.max(0, cup - DRAWN_FROM), n = CUPS.length - 1 - DRAWN_FROM;   // i: 0 (DD) .. n (R)
     const k = i / n, hang = a.hang == null ? 1 : a.hang, full = a.full == null ? 1 : a.full, apart = a.apart == null ? 1 : a.apart;
     const r = (44 + 2.6 * i) * full;                    // DD is a little more than the game's biggest; R is past the size of her head
-    const sag = (0.06 + 0.10 * k) * hang;            // (eased off, Laynie Oct 13: "maybe a bit less real gravity")            // how much lower than a ball the underside goes, and how far the fullness drops
+    const sag = (0.06 + 0.22 * k) * hang;            // (eased off, Laynie Oct 13: "maybe a bit less real gravity")            // how much lower than a ball the underside goes, and how far the fullness drops
     const top = 1.0 + 0.10 * k * hang;              // how long the upper slope is, in radii
-    const bx = (r * (0.90 + 0.06 * k) + 3) * apart;  // each one's middle, out from the breastbone: heavier ones swing wider
+    const bx = (r * (0.86 + 0.02 * k) + 2) * apart;  // each one's middle, out from the breastbone: heavier ones swing wider
     const by = r * top;                              // the slope starts at the chest, so the longer it is the lower they hang
     return { cup, i, k, r, sag, top, bx, by };
   }
@@ -30,7 +30,7 @@
   // side for the right one, a quarter turn at the bottom.
   function point(S, s, t) {
     const sn = Math.sin(t), cs = Math.cos(t);
-    if (sn >= 0) return [s * S.bx + S.r * cs * (1 + S.sag * 0.12 * sn * sn) + s * S.r * 0.08 * S.k * sn * sn, S.by + S.r * sn * (1 + S.sag)];     // the full, hanging half: round, its lowest point a little to the outside
+    if (sn >= 0) return [s * S.bx + S.r * cs * (1 + S.sag * 0.30 * sn * sn) + s * S.r * 0.06 * S.k * sn * sn, S.by + S.r * sn * (1 + S.sag)];     // the full, hanging half: round, its lowest point a little to the outside
     const up = -sn;
     // the upper half is round too (Laynie's size charts, Oct 13: full round orbs, no slope running up to a point). It
     return [s * S.bx + S.r * cs * (1 - 0.10 * up * up), S.by - S.r * S.top * up];   // only draws in a little toward the top, and melts into the chest there

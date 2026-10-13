@@ -456,7 +456,7 @@
   // Flat to R. The first six cups are the game's own chest sizes: picking one just changes the body. From DD up they're
   // drawn (breasts-drawing.js), over the game's biggest chest, standing and kneeling only for now. The game's nipples,
   // and whatever is worn on them, are lifted off where the game puts them and set down on the drawn ones.
-  const BREAST = { solid: {}, tuck: false, on: {}, free: true, holds: {}, holdSig: "", wear: {}, dress: true, cover: new Map(), cup: null, full: 1, hang: 1, apart: 1, x: 0, y: 0, nip: 1, nipY: 0, nipX: 0, cv: null, cvKey: "", halves: new Map(), out: new Map() };
+  const BREAST = { solid: {}, tuck: true, on: {}, free: true, holds: {}, holdSig: "", wear: {}, dress: true, cover: new Map(), cup: null, full: 1, hang: 1, apart: 1, x: 0, y: 0, nip: 1, nipY: 0, nipX: 0, cv: null, cvKey: "", halves: new Map(), out: new Map() };
   const BREAST_SLIDERS = [["full", "Fullness", 0.7, 1.4, 0.01], ["hang", "Weight (how low and heavy they hang)", 0, 2, 0.01], ["apart", "Apart / together", 0.6, 1.5, 0.01], ["x", "Left / right", -60, 60, 1], ["y", "Up / down", -80, 80, 1],
     ["nip", "Nipple size (and what's worn on them)", 0.4, 4, 0.05], ["nipY", "Nipples up / down", -80, 80, 1], ["nipX", "Nipples in / out", -60, 60, 1]];
   const NIP_GROUPS = new Set(["Nipples", "ItemNipples", "ItemNipplesPiercings"]);
@@ -472,7 +472,10 @@
   // And bare? Laynie crossed both bare pictures on the Oct 13 sheet, the only ones where they hung in the other shape. So
   // by default it's one shape always: the game's own breast a size up, dressed or not. BREAST.free brings the hanging
   // teardrop back for when nothing over the chest is holding them.
-  const heldNow = () => BREAST.hold !== false && (!BREAST.free || S.C.Appearance.some((it) => BREAST.holds[mouldKey(it)] && !["plain", "behind"].includes(BREAST.wear[mouldKey(it)] || "")));
+  // (Withdrawn, Oct 13. Both of those swapped Laynie's approved shape for another without her asking: "you altered the
+  // tits from the way we agreed on?… my approved shape always." There is one shape, hers, dressed or bare, and nothing
+  // here may change it. Clothes are grown to fit it: see fitOf in breasts-drawing.js.)
+  const heldNow = () => false;
   // What's worn over the chest. Every one of these is cut for the game's biggest chest, so on drawn breasts it would
   // sit in the middle like a patch. Instead the part of the piece that covered each of the game's breasts is taken and
   // GROWN onto the drawn one: same piece, same colours and shading, stretched from the game's breast to ours and kept
@@ -573,7 +576,6 @@
           $("button", { type: "button", className: "go", textContent: "Save the breasts", onclick: saveBreasts }),
           $("button", { type: "button", textContent: "Put the saved ones back", onclick: () => loadBreasts(true) }),
           $("button", { type: "button", className: BREAST.tuck ? "on" : "", textContent: BREAST.tuck ? "Hands: tucked behind when they're big" : "Hands: in front, as the game draws them", title: "Tucking hides her hands, and what's on her hands and wrists, once the breasts would cover most of them", onclick: () => { BREAST.tuck = !BREAST.tuck; fill(); bellyDraw(); } }),
-          $("button", { type: "button", className: BREAST.free ? "on" : "", textContent: BREAST.free ? "Bare: they hang free" : "Bare: same shape as dressed", title: "With nothing over the chest: the same round shape as when she's dressed, or hanging free in a teardrop", onclick: () => { BREAST.free = !BREAST.free; fill(); bellyDraw(); } }),
           $("button", { type: "button", className: BREAST.dress ? "on" : "", textContent: BREAST.dress ? "Clothes a size up: on" : "Clothes a size up: off", title: "What's worn over the chest is drawn a size up, and the breasts take its shape", onclick: () => { BREAST.dress = !BREAST.dress; fill(); bellyDraw(); } }),
           $("button", { type: "button", textContent: "Sliders back to plain", onclick: () => { Object.assign(BREAST, { full: 1, hang: 1, apart: 1, x: 0, y: 0, nip: 1, nipY: 0, nipX: 0 }); fill(); bellyDraw(); } }))].flat(Infinity));
     };
@@ -634,7 +636,7 @@
                 bc = BREAST.flat;
               }
               real.drawImage(bc, rx - bc.ax, ry - bc.ay, {}); if (typeof real.drawImageBlink === "function") real.drawImageBlink(bc, rx - bc.ax, ry - bc.ay, {});
-              ctx.breast = { held: isHeld, upperSrc: upper[2], ux: upper[0], pose: bpose, ground: bpose === "AllFours" ? ground : Infinity, S: S3, rx, ry, uy: upper[1], mask: bc.mask, mx: rx - bc.ax, my: ry - bc.ay, nips: bc.nips.map((p, i) => [rx + p[0] + (i ? 1 : -1) * br.nipX, ry + p[1] + br.nipY]), k: FarmBreasts.shape(br.cup, br).k, kN: (1 + 0.45 * FarmBreasts.shape(br.cup, br).k) * br.nip, sig: key + "|" + Math.round(rx) + "," + Math.round(ry) + "|" + [br.nip, br.nipX, br.nipY].join(","), mid: upper[0] + 250 };
+              ctx.breast = { fit: FarmBreasts.fitOf(S3), held: isHeld, upperSrc: upper[2], ux: upper[0], pose: bpose, ground: bpose === "AllFours" ? ground : Infinity, S: S3, rx, ry, uy: upper[1], mask: bc.mask, mx: rx - bc.ax, my: ry - bc.ay, nips: bc.nips.map((p, i) => [rx + p[0] + (i ? 1 : -1) * br.nipX, ry + p[1] + br.nipY]), k: FarmBreasts.shape(br.cup, br).k, kN: (1 + 0.45 * FarmBreasts.shape(br.cup, br).k) * br.nip, sig: key + "|" + Math.round(rx) + "," + Math.round(ry) + "|" + [br.nip, br.nipX, br.nipY].join(","), mid: upper[0] + 250 };
               // (a pose where the game paints the nipples into the body itself, all fours, gives us none to move: ours then)
               if (!held.length) {
                 const B = ctx.breast, sk = bellySkin(upper[2], upper[3], bpose), rad = 7 * B.kN, nc = document.createElement("canvas"); nc.width = nc.height = Math.ceil(rad * 2 + 4);
@@ -712,7 +714,7 @@
           //     the way the breasts themselves do.
           //   · It's only shown where there's something for it to lie on: the breasts, or the body. Nothing hangs in the air.
           const dressDraw = (name, src, x, y, o) => {
-            const B = ctx.breast, im = B && B.held && mouldImg(src); if (!im) return false;
+            const B = ctx.breast, im = B && B.pose !== "AllFours" && mouldImg(src); if (!im) return false;
             // A piece that lies ON the breasts is grown with them (and every layer of it: a buckle or a bow goes along). A
             // piece that only props them from under (an underbust corset) holds them but has nothing ON them, so nothing of
             // it is grown: grown, its top trim was landing on the breast (Laynie, Oct 13: "the latex corset shows stuff on
@@ -722,14 +724,14 @@
             const key = "dress|" + src + "|" + Math.round(x) + "," + Math.round(y) + "|" + B.sig + "|" + (ctx.belly && !fit.behind && BELLY.auto !== false ? ctx.sig : "") + "|" + MOULD.ver;
             let c = BREAST.out.get(key);
             if (!c) {
-              const MX = 260, MY = 480, w = im.naturalWidth, h = im.naturalHeight, S2 = B.S, G = FarmBreasts.GAME, sc = S2.sc;
+              const MX = 260, MY = 480, w = im.naturalWidth, h = im.naturalHeight, S2 = Object.assign({}, B.S, { sc: B.fit.kx, ro: B.fit.ro, ri: B.fit.ri, rv: B.fit.rv }), G = FarmBreasts.GAME, sc = S2.sc;
               c = document.createElement("canvas"); c.width = w + MX * 2; c.height = h + MY * 2; c.MX = MX; c.MY = MY;
               const g = c.getContext("2d", { willReadFrequently: true }), midX = MX + B.mid - x, uyc = MY + B.uy - y;
               const pk = (pieceOf(src) || {}).key || src, CW = c.width, CH = c.height;
               const overBelly = bellyAuto(src, x, y, ctx, fit.behind, pk);   // (the piece as it is once it's been grown to the belly, if she has one: the chest is laid on that)
               if (overBelly) g.drawImage(overBelly, MX - MOULD.M, MY); else g.drawImage(im, MX, MY);
               const sp = g.getImageData(0, 0, CW, CH).data;
-              const y1 = uyc + G.y1, y2 = uyc + G.y2, y3 = uyc + G.y3, flapEnd = uyc + FarmBreasts.heldY(G.y3, sc);
+              const y1 = uyc + G.y1, y2 = uyc + G.y2, y3 = uyc + G.y3, flapEnd = uyc + B.fit.mapY(G.y3);
               // FILLED, not laid on top (Laynie, Oct 13, of a school uniform whose top had come out as a wide block ending in
               // a straight line across her middle: "think about how the tits and/or belly fill the clothing, instead of how
               // the clothing sits on top"). A bra ends under the breasts and that's that. But a top, a dress, a jacket goes
@@ -746,7 +748,7 @@
               // how much things have grown on a row of the game's picture: nothing above y1, fully by y2, and (draping) easing off again below y3
               const grown = (yn) => 1 + (sc - 1) * sm((yn - y1) / (y2 - y1));
               // where a row of the game's picture lands
-              const lands = (yn) => uyc + FarmBreasts.heldY(yn - uyc, sc);
+              const lands = (yn) => uyc + B.fit.mapY(yn - uyc);
               const ynMax = y3, yEnd = Math.min(CH - 2, Math.floor(flapEnd));
               // the body's own outline, row by row, and where our two breasts are
               const prof = edgesOf(B.upperSrc), ux = MX + B.ux - x, bcy = MY + B.ry - y + S2.by, bcx = [midX + (B.rx - B.mid) - S2.bx, midX + (B.rx - B.mid) + S2.bx];
@@ -938,9 +940,9 @@
               // picture blown up, and lettering goes soft and fat (Laynie, Oct 13: "the hornywood decal isn't part of the
               // shirt"). So a decal is never grown: it's the game's own picture at its own size, moved down to where that
               // part of her chest now is.
-              if (done && /Decal/i.test(gname) && ctx.breast && ctx.breast.held) {
+              if (done && /Decal/i.test(gname) && ctx.breast && ctx.breast.pose !== "AllFours") {
                 try { const p0 = edgesOf(src); if (p0) { let t0 = -1, t1 = -1; for (let j = 0; j < p0.h; j++) if (p0.L[j] >= 0) { if (t0 < 0) t0 = j; t1 = j; }
-                    if (t0 >= 0) { const cyL = y + (t0 + t1) / 2 - ctx.breast.uy; real[name](src, x, y + (FarmBreasts.heldY(cyL, ctx.breast.S.sc) - cyL), o); return; } } } catch (e) { console.warn("[studio] decal:", e); }
+                    if (t0 >= 0) { const cyL = y + (t0 + t1) / 2 - ctx.breast.uy; real[name](src, x, y + (ctx.breast.fit.mapY(cyL) - cyL), o); return; } } } catch (e) { console.warn("[studio] decal:", e); }
               }
               if (done && chestSlot(gname) && !/Decal/i.test(gname) && !isMoulded(src)) { const piece = pieceOf(src), how = (piece && BREAST.wear[piece.key]) || "";
                 try { const im0 = piece && ctx.breast && mouldImg(src); if (im0 && chestCover(src, im0, x, y, ctx.breast, true) >= 0.05) ctx.seen[piece.key] = true; if (im0 && chestCover(src, im0, x, y, ctx.breast, false) >= 0.05) ctx.seen["on:" + piece.key] = true; if (im0 && chestCover(src, im0, x, y, ctx.breast, false) >= 0.6) ctx.seen["solid:" + piece.key] = true; } catch (e) { /* only a measurement */ }
@@ -972,7 +974,7 @@
       } catch (e) { console.warn("[studio] belly hook:", e); }
       const out = game(C, cb);
       if (finish) { try { finish(); } catch (e) { console.warn("[studio] belly:", e); } }
-      if (finish && seenNow && handFNow && handFNow.v != null) { const behind = handFNow.v >= 0.6; if (behind !== !!BREAST.handsBehind) { BREAST.handsBehind = behind; clearTimeout(BREAST.holdT); BREAST.holdT = setTimeout(bellyDraw, 40); } }
+      if (finish && seenNow && handFNow && handFNow.v != null) { const behind = handFNow.v >= 0.45;   /* (Laynie, Oct 13: "hands should be hidden once breasts exceed a certain size". Hidden means all of them, with what's on them: never part.) */ if (behind !== !!BREAST.handsBehind) { BREAST.handsBehind = behind; clearTimeout(BREAST.holdT); BREAST.holdT = setTimeout(bellyDraw, 40); } }
       if (finish && seenNow) { const sig = Object.keys(seenNow).sort().join("|"); if (sig !== BREAST.holdSig) { BREAST.holds = seenNow; BREAST.on = {}; for (const k of Object.keys(seenNow)) if (k.startsWith("on:")) BREAST.on[k.slice(3)] = true; BREAST.solid = {}; for (const k of Object.keys(seenNow)) if (k.startsWith("solid:")) BREAST.solid[k.slice(6)] = true; BREAST.holdSig = sig; clearTimeout(BREAST.holdT); BREAST.holdT = setTimeout(bellyDraw, 40); } }
       return out;
     };

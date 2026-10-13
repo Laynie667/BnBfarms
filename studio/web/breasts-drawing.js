@@ -136,5 +136,18 @@
     out.mask = mask;
     return out;
   }
-  window.FarmBreasts = { NATIVE, CUPS, DRAWN_FROM, ROOT_Y, GAME, shape, held, heldY, point, nipples, canvas };
+  // ── how the game's chest pictures are grown to fit a breast shape ──
+  // THE SHAPE IS NOT CHANGED FOR CLOTHES (Laynie, Oct 13: "my approved shape always… please don't change the bare shape
+  // again"). The breasts are the approved shape, dressed or bare. What changes is the clothes: the game's own picture of
+  // a piece is grown, evenly, by whatever takes the game's breast to hers: kx across (about the breastbone), and mapY down
+  // the picture (rows above the chest don't move; the game's nipple line lands on the middle of her breast, the game's
+  // underside on hers). ro, ri, rv: her breast as a plain oval, for telling what is on it from what is beside it.
+  function fitOf(S) {
+    if (S.held) return { kx: S.sc, ro: S.ro, ri: S.ri, rv: S.rv, mapY: (y) => heldY(y, S.sc) };
+    const ro = S.r * (1 + S.sag * 0.3), rv = S.r * (1 + S.sag), kx = (S.bx + ro) / (GAME.dx + GAME.ro), ky = rv / GAME.rv;
+    const cy = ROOT_Y + S.by, top = Math.max(GAME.y1 + 4, cy - (GAME.cy - GAME.y2) * ky);
+    const mapY = (y) => (y <= GAME.y1 ? y : y >= GAME.y2 ? top + (y - GAME.y2) * ky : GAME.y1 + (top - GAME.y1) * (y - GAME.y1) / (GAME.y2 - GAME.y1));
+    return { kx, ro, ri: Math.min(S.r, S.bx), rv, mapY };
+  }
+  window.FarmBreasts = { fitOf, NATIVE, CUPS, DRAWN_FROM, ROOT_Y, GAME, shape, held, heldY, point, nipples, canvas };
 })();

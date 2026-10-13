@@ -394,8 +394,9 @@
   // Flat to R. The first six cups are the game's own chest sizes: picking one just changes the body. From DD up they're
   // drawn (breasts-drawing.js), over the game's biggest chest, standing and kneeling only for now. The game's nipples,
   // and whatever is worn on them, are lifted off where the game puts them and set down on the drawn ones.
-  const BREAST = { cup: null, full: 1, hang: 1, apart: 1, x: 0, y: 0, cv: null, cvKey: "", halves: new Map(), out: new Map() };
-  const BREAST_SLIDERS = [["full", "Fullness", 0.7, 1.4, 0.01], ["hang", "Weight (how low and heavy they hang)", 0, 2, 0.01], ["apart", "Apart / together", 0.6, 1.5, 0.01], ["x", "Left / right", -60, 60, 1], ["y", "Up / down", -80, 80, 1]];
+  const BREAST = { cup: null, full: 1, hang: 1, apart: 1, x: 0, y: 0, nip: 1, nipY: 0, nipX: 0, cv: null, cvKey: "", halves: new Map(), out: new Map() };
+  const BREAST_SLIDERS = [["full", "Fullness", 0.7, 1.4, 0.01], ["hang", "Weight (how low and heavy they hang)", 0, 2, 0.01], ["apart", "Apart / together", 0.6, 1.5, 0.01], ["x", "Left / right", -60, 60, 1], ["y", "Up / down", -80, 80, 1],
+    ["nip", "Nipple size (and what's worn on them)", 0.4, 4, 0.05], ["nipY", "Nipples up / down", -80, 80, 1], ["nipX", "Nipples in / out", -60, 60, 1]];
   const NIP_GROUPS = new Set(["Nipples", "ItemNipples", "ItemNipplesPiercings"]);
   // what the breasts hang in front of once they reach it (Laynie, Oct 13: "at larger sizes should probably cover the
   // hands"): the hands and what's worn on them. Their pictures are drawn with the breasts' outline cut out.
@@ -422,7 +423,7 @@
     v = acc.map((a) => (a[2] ? [a[0] / a[2], a[1] / a[2]] : null)); BREAST.halves.set(key, v); return v;
   }
   async function saveBreasts() {
-    try { const r = await fetch("/__studio/fits/breasts.json", { method: "POST", body: JSON.stringify({ v: 1, saved: new Date().toISOString(), cup: BREAST.cup, full: BREAST.full, hang: BREAST.hang, apart: BREAST.apart, x: BREAST.x, y: BREAST.y }, null, 1) }); if (!r.ok) throw new Error(await r.text()); say("Saved to studio\\fits\\breasts.json."); }
+    try { const r = await fetch("/__studio/fits/breasts.json", { method: "POST", body: JSON.stringify({ v: 1, saved: new Date().toISOString(), cup: BREAST.cup, full: BREAST.full, hang: BREAST.hang, apart: BREAST.apart, x: BREAST.x, y: BREAST.y, nip: BREAST.nip, nipY: BREAST.nipY, nipX: BREAST.nipX }, null, 1) }); if (!r.ok) throw new Error(await r.text()); say("Saved to studio\\fits\\breasts.json."); }
     catch (e) { say("It didn't save: " + (e && e.message || e), true); }
   }
   async function loadBreasts(tell) {
@@ -446,7 +447,7 @@
         $("div", { className: "row" },
           $("button", { type: "button", className: "go", textContent: "Save the breasts", onclick: saveBreasts }),
           $("button", { type: "button", textContent: "Put the saved ones back", onclick: () => loadBreasts(true) }),
-          $("button", { type: "button", textContent: "Sliders back to plain", onclick: () => { Object.assign(BREAST, { full: 1, hang: 1, apart: 1, x: 0, y: 0 }); fill(); bellyDraw(); } }))].flat(Infinity));
+          $("button", { type: "button", textContent: "Sliders back to plain", onclick: () => { Object.assign(BREAST, { full: 1, hang: 1, apart: 1, x: 0, y: 0, nip: 1, nipY: 0, nipX: 0 }); fill(); bellyDraw(); } }))].flat(Infinity));
     };
     BREAST.fill = fill; fill();
     return box;
@@ -487,7 +488,7 @@
               if (BREAST.cvKey !== key) { BREAST.cv = FarmBreasts.canvas(FarmBreasts.shape(br.cup, br), bellySkin(upper[2], upper[3], "")); BREAST.cvKey = key; }
               const bc = BREAST.cv, rx = upper[0] + 250 + br.x, ry = upper[1] + FarmBreasts.ROOT_Y + br.y;
               real.drawImage(bc, rx - bc.ax, ry - bc.ay, {}); if (typeof real.drawImageBlink === "function") real.drawImageBlink(bc, rx - bc.ax, ry - bc.ay, {});
-              ctx.breast = { mask: bc.mask, mx: rx - bc.ax, my: ry - bc.ay, nips: bc.nips.map((p) => [rx + p[0], ry + p[1]]), k: FarmBreasts.shape(br.cup, br).k, sig: key + "|" + Math.round(rx) + "," + Math.round(ry), mid: upper[0] + 250 };
+              ctx.breast = { mask: bc.mask, mx: rx - bc.ax, my: ry - bc.ay, nips: bc.nips.map((p, i) => [rx + p[0] + (i ? 1 : -1) * br.nipX, ry + p[1] + br.nipY]), k: FarmBreasts.shape(br.cup, br).k, kN: (1 + 0.45 * FarmBreasts.shape(br.cup, br).k) * br.nip, sig: key + "|" + Math.round(rx) + "," + Math.round(ry) + "|" + [br.nip, br.nipX, br.nipY].join(","), mid: upper[0] + 250 };
               for (const h of held.splice(0)) { try { if (!nipDraw(...h)) real[h[0]](h[1], h[2], h[3], h[4]); } catch (e) { console.warn("[studio] nipples:", e); } }
             }
           };
@@ -508,7 +509,7 @@
             const key = src + "|" + Math.round(x) + "," + Math.round(y) + "|" + B.sig + "|" + (ctx.native ? "n" : "o");
             let c = BREAST.out.get(key);
             if (!c) {
-              const MX = 200, MY = 360, w = im.naturalWidth, h = im.naturalHeight, kN = 1 + 0.45 * B.k;
+              const MX = 320, MY = 460, w = im.naturalWidth, h = im.naturalHeight, kN = B.kN;
               c = document.createElement("canvas"); c.width = w + MX * 2; c.height = h + MY * 2; c.MX = MX; c.MY = MY;
               const g = c.getContext("2d");
               [[0, split], [split, w - split]].forEach(([sx, sw], i) => {

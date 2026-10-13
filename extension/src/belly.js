@@ -131,7 +131,9 @@ function skinGate(C) {
   let last = -1, at = 0;
   for (let i = 0; i < layers.length; i++) if (SKIN_UNDER[groupOf(layers[i])]) last = i;
   if (last < 0) return null;
-  const slot = new RegExp("/Assets/[^/]+/([^/]+)/");
+  // (the game's picture addresses are relative, "Assets/Female3DCG/Pussy/…", with no slash in front: a pattern that
+  // wanted one never matched, the gate never opened, and the belly went on last, over everything. Oct 12.)
+  const slot = new RegExp("(?:^|/)Assets/[^/]+/([^/]+)/");
   return (src) => {
     const m = slot.exec(String(src)); if (!m) return false;
     let i = at; while (i < layers.length && groupOf(layers[i]) !== m[1]) i++;
@@ -218,7 +220,7 @@ function hookBelly(mod) {
           // first thing that isn't skin, or at the very end on a bare body.
           let upper = null, lower = false, done = false;
           const gate = skinGate(C);   // the game's own layer list, when it has one (belly drawing block)
-          const prio = (src) => { const m = new RegExp("/Assets/[^/]+/([^/]+)/").exec(src); if (!m) return 99; try { const g = W.AssetGroupGet && W.AssetGroupGet(C.AssetFamily, m[1]); return g && typeof g.DrawingPriority === "number" ? g.DrawingPriority : 99; } catch (e) { return 99; } };
+          const prio = (src) => { const m = new RegExp("(?:^|/)Assets/[^/]+/([^/]+)/").exec(src); if (!m) return 99; try { const g = W.AssetGroupGet && W.AssetGroupGet(C.AssetFamily, m[1]); return g && typeof g.DrawingPriority === "number" ? g.DrawingPriority : 99; } catch (e) { return 99; } };
           const paint = () => {
             if (done || !upper || !lower) return; done = true;
             const S = SIZES[trial], cv = bellyPicture(trial, skinFor(upper[2], upper[3]), upper[4] === "AllFours");   // { url, width, height }: a picture the game can cache by name

@@ -13,7 +13,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 | Map tools, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.3** |
 | Dairy | `farmhand-dairy.user.js` | the bot's PC | **1.0.2** |
 | Shows | `farmhand-shows.user.js` | the bot's PC | **1.0.4** |
-| Farmhand Companion | `farmhand-companion.user.js` | each player | **0.17.3** |
+| Farmhand Companion | `farmhand-companion.user.js` | each player | **0.17.4** |
 | Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.4** |
 
 ## Sending a watch report
@@ -23,6 +23,8 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 - Running the watcher on more than one game at once (the bot, yours, a tester's) lets Claude line them up into one timeline.
 
 ## Latest changes (newest first)
+
+- **Companion 0.17.4 and the studio: the belly was drawing in front of everything.** My fault, from the last change. The new rule for where the belly goes reads each picture's slot out of its address, and the pattern expected a slash in front of `Assets/`. The game's addresses are relative (`Assets/Female3DCG/Pussy/…`), so it never matched, the rule never fired, and the belly went on last, over clothes and gear. Pattern fixed in both. Checked in the studio by logging the real drawing order: chest, head, hips and legs, then the belly, then face, nipples, gear, clothes, hands and hair. **Anyone on Companion 0.17.3 who turns the belly test on sees it over everything: update.**
 
 - **Outfit studio, step 5: forward and back, and a colour per layer.** In the fit box for a picked piece: Back and Forward buttons move the whole piece, or one chosen layer, earlier or later in the drawing order (the game's `OverridePriority`), with its place shown and a button for the game's own; it is saved as part of the fit. And a colour swatch for each colour layer of the piece, each with its own reset. Checked here on a chastity belt (belt and keyhole coloured separately, the lock brought forward on its own).
 

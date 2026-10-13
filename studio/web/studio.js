@@ -263,7 +263,7 @@
         if (fit && fit.on && cb && typeof cb.drawImage === "function") {
           let upper = null, lower = false, done = false;
           const gate = FarmBelly.skinGate(C);   // true once a picture comes after all the skin, genitals included
-          const prio = (src) => { const m = new RegExp("/Assets/[^/]+/([^/]+)/").exec(src); const g = m && AssetGroupGet(C.AssetFamily, m[1]); return g && typeof g.DrawingPriority === "number" ? g.DrawingPriority : 99; };
+          const prio = (src) => { const m = new RegExp("(?:^|/)Assets/[^/]+/([^/]+)/").exec(src); const g = m && AssetGroupGet(C.AssetFamily, m[1]); return g && typeof g.DrawingPriority === "number" ? g.DrawingPriority : 99; };
           const paint = () => {
             if (done || !upper) return; done = true;
             const shape = { rx: fit.rx, ry: fit.ry, sag: fit.sag, cut: fit.cut };

@@ -13,7 +13,7 @@
        keeps them from cummin' once it has their hips, and every so often walks them somewhere of its own choosin'.
        It lets go after CFG.SUIT_HOURS. The safeword peels it off at once; staff: ?suit off <who>.
   */
-  const zLine = (key, mn, v) => tFill(pickFresh("curse:"+key, CURSE_LINES[key]), mn, v);
+  const zLine = (key, mn, v) => tFill(pickFor(mn, "curse:"+key, CURSE_LINES[key]), mn, v);
   const CURSES = {
     plug:   { slot: mn => stopperFor(mn, "butt"), name: "Growin' Plug", mins: 60, what: "It swells a size every ten minutes.", limit: /\b(size|stretch|plug|anal)/i,
               desc: "A sleek black plug that seemed a sensible size going in. It isn't any more. Every ten minutes it swells a little fatter, and it will not come out until it's done." },

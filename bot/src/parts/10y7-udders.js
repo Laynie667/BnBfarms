@@ -22,7 +22,7 @@
      • KEPT: a herd leader can ?keep <who> for a week (they're asked): a tag written on them, a name for the week,
        milkin' hours, and who may breed them. ?kept shows it; ?kept off ends it.
   */
-  const uLine = (key, mn, v) => tFill(pickFresh("udd:"+key, UDDER_LINES[key]), mn, v);
+  const uLine = (key, mn, v) => tFill(pickFor(mn, "udd:"+key, UDDER_LINES[key]), mn, v);
   const onBooks = mn => { const r = rec(mn); return !!(r && r.roles && r.roles.length); };
   const near = (a, b, d) => { const A = posOf(a), B = posOf(b); return !!(A && B && Math.max(Math.abs(A.X - B.X), Math.abs(A.Y - B.Y)) <= (d || 2)); };
 
@@ -276,7 +276,7 @@
   function intensityTail(mn, i, n, kind){
     const k = intensityOf(mn);
     if (k === "rough" || i < 2 || Math.random() >= 0.5) return "";
-    return " "+(intensityTrapLine(mn, kind) || tFill(pickFresh("udd:int:"+k, UDDER_LINES["int_"+k]), mn));   // the trap's own, two times in three (10y9b-intensity-lines.js)
+    return " "+(intensityTrapLine(mn, kind) || tFill(pickFor(mn, "udd:int:"+k, UDDER_LINES["int_"+k]), mn));   // the trap's own, two times in three (10y9b-intensity-lines.js)
   }
   // tender leans the traps mild, filthy leans them brutal (10z-trap-variants.js asks)
   function intensitySev(mn, sev){ const k = intensityOf(mn); return k === "tender" ? Math.max(1, sev - 1) : k === "filthy" ? Math.min(3, sev + (Math.random() < 0.5 ? 1 : 0)) : sev; }

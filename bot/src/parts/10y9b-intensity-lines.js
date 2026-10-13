@@ -59,5 +59,5 @@
   function intensityTrapLine(mn, kind){
     const k = intensityOf(mn), T = INTENSITY_BY_TRAP[kind];
     if (!T || !T[k] || Math.random() >= 0.67) return "";
-    return tFill(pickFresh("udd:int:"+k+":"+kind, T[k]), mn);
+    return tFill(pickFor(mn, "udd:int:"+k+":"+kind, T[k]), mn);
   }

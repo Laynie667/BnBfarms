@@ -83,7 +83,7 @@
   }
   function trapFree(mn){ const r = rec(mn); if (r && r.penned && r.penned.trap && !r.penned.wait){ r.penned = null; saveLedger(); } }   // (the rack and the box keep hold: 10u4)
 
-  const tFill = (t, mn, v) => String(t).replace(/%n/g, plainName(mn)).replace(/%ml/g, (v && v.ml) || "").replace(/%c/g, (v && v.c) || "").replace(/%h/g, (v && v.h) || "").replace(/%x/g, (v && v.x) || "");
+  const tFill = (t, mn, v) => bodyWords(mn, t).replace(/%n/g, plainName(mn)).replace(/%ml/g, (v && v.ml) || "").replace(/%c/g, (v && v.c) || "").replace(/%h/g, (v && v.h) || "").replace(/%x/g, (v && v.x) || "");
   // a trap's story, a beat at a time, then what it leaves behind
   function trapRun(mn, kind, beats, done, v){
     state.trapRuns = state.trapRuns || new Map();
@@ -98,7 +98,7 @@
       if (state.trapRuns.get(mn) !== run) return;
       if (run.i < beats.length && charFor(mn)){
         const b = beats[run.i++];
-        emote(TRAP_KINDS[kind].icon+" "+tFill(pickFresh("trap:"+kind+":"+run.i, Array.isArray(b) ? b : [b]), mn, v)+intensityTail(mn, run.i, beats.length, kind), mn);
+        emote(TRAP_KINDS[kind].icon+" "+tFill(pickFor(mn, "trap:"+kind+":"+run.i, Array.isArray(b) ? b : [b]), mn, v)+(intensityTail(mn, run.i, beats.length, kind) || bodyTail(mn, kind, run.i)), mn);
         toysBeat(mn, run.i, beats.length);   // any buzzin' toy they're wearin' follows the scene (10y6-keepers.js)
         run.timer = setTimeout(step, CFG.TRAP_BEAT_S*1000);
         return;
@@ -197,7 +197,7 @@
         const text = loaded || pool[Math.floor(Math.random()*pool.length)] || "ass growth";
         trapHold(mn, 2, "the injector post");
         trapRun(mn, kind, T.beats, () => {
-          const ok = applyShot(mn, BOTMN(), text, { open: tFill(pickFresh("trap:inj:open", T.open), mn), from: "the trap's dose", heatH: 1 });
+          const ok = applyShot(mn, BOTMN(), text, { open: tFill(pickFor(mn, "trap:inj:open", T.open), mn), from: "the trap's dose", heatH: 1 });
           if (!ok) emote("💉 "+tFill(T.dud, mn), mn);
           arouse(mn, 15);
         });
@@ -208,7 +208,7 @@
         const m0 = makesMilk(mn) ? p.milk : 0, s0 = makesSemen(mn) ? p.semen : 0;
         trapRun(mn, kind, (m0 >= s0 ? T.milk : T.seed).concat(T.both), () => {
           const gotM = m0 > 0 ? drainMilk(mn, p.milk) : 0, gotS = s0 > 0 ? drainSemen(mn, p.semen) : 0;
-          emote("🥛 "+tFill(pickFresh("trap:milker:end", T.end), mn, { ml: ml(gotM + gotS) }), mn);
+          emote("🥛 "+tFill(pickFor(mn, "trap:milker:end", T.end), mn, { ml: ml(gotM + gotS) }), mn);
           face(mn, "milked", 60); arouse(mn, 25);
         });
         break;
@@ -226,10 +226,10 @@
             tally(mn);
             let took = null;
             if (hole !== "mouth" && r.fertile && canCatchIn(mn, hole)) took = rollConception(mn, FRAME_SIRE, kept, CFG.PENIS_TYPES[type].knot ? 1.5 : 1.2, hole);
-            emote("🐎 "+tFill(pickFresh("trap:breeder:end", T.end), mn, v)+(took === "new" ? " "+tFill(T.took, mn, v) : ""), mn);
+            emote("🐎 "+tFill(pickFor(mn, "trap:breeder:end", T.end), mn, v)+(took === "new" ? " "+tFill(T.took, mn, v) : ""), mn);
             splatBody(mn, hole); face(mn, "bred", 90);
           } else {
-            emote("🐎 "+tFill(pickFresh("trap:breeder:endover", T.endOver), mn, v), mn);
+            emote("🐎 "+tFill(pickFor(mn, "trap:breeder:endover", T.endOver), mn, v), mn);
             splatBody(mn, "back"); splatBody(mn, "ass");
           }
           arouse(mn, 30);
@@ -242,7 +242,7 @@
       }
       case "snare": {
         trapHold(mn, 5, "the snare");
-        trapRun(mn, kind, T.beats, () => { arouse(mn, 35, 92); emote("🪢 "+tFill(pickFresh("trap:snare:end", T.end), mn), mn); });
+        trapRun(mn, kind, T.beats, () => { arouse(mn, 35, 92); emote("🪢 "+tFill(pickFor(mn, "trap:snare:end", T.end), mn), mn); });
         break;
       }
       case "mud": {
@@ -282,7 +282,7 @@
         trapRun(mn, kind, T.beats, () => {
           const kept = trapFill(mn, hole, capacity(mn)*1.4, CFG.TRAP_OVERFULL);
           v.ml = ml(kept);
-          emote("🎈 "+tFill(pickFresh("trap:pump:end", T.end), mn, v), mn);
+          emote("🎈 "+tFill(pickFor(mn, "trap:pump:end", T.end), mn, v), mn);
           arouse(mn, 20);
         }, v);
         break;
@@ -296,7 +296,7 @@
           const [lo, hi] = CFG.EGG_COUNT, hyper = hyperEggs(mn, 0.1);
           const n = layClutch(mn, (lo + Math.floor(Math.random()*(hi - lo + 1))) * (hyper ? 3 : 1), POST_SIRE);
           v.x = String(n);
-          emote("🥚 "+tFill(pickFresh("trap:eggs:end", hyper ? T.endHyper : T.end), mn, v), mn);
+          emote("🥚 "+tFill(pickFor(mn, "trap:eggs:end", hyper ? T.endHyper : T.end), mn, v), mn);
           arouse(mn, 25);
         }, v);
         break;
@@ -306,7 +306,7 @@
         trapHold(mn, 3, "the lantern");
         trapRun(mn, kind, T.beats, () => {
           trance(mn, 0); arouse(mn, 30); goUnder(mn, 2);
-          tell(mn, "🏮 "+tFill(pickFresh("trap:lantern:thought", T.thought), mn));
+          tell(mn, "🏮 "+tFill(pickFor(mn, "trap:lantern:thought", T.thought), mn));
         });
         break;
       }
@@ -334,7 +334,7 @@
       if (back) trapFill(mn, "butt", 150 + Math.random()*200, CFG.TRAP_OVERFULL);
       if (mouth) trapFill(mn, "mouth", 120, CFG.TRAP_OVERFULL);
       tally(mn);
-      emote("🥚 "+tFill(pickFresh("trap:tentacle:end", hyper ? T.endHyper : T.end), mn, v), mn);
+      emote("🥚 "+tFill(pickFor(mn, "trap:tentacle:end", hyper ? T.endHyper : T.end), mn, v), mn);
       tell(mn, "🥚 "+(hyper ? "It packed you till you couldn't hold another one: " : "It left ")+n+" eggs in your "+v.h+", sugar. You'll be layin' in a few days, and you'll be slow on your feet till then.");
       bodyMark(mn, { splat: ["tummy", "chest", "face"] }); face(mn, "afterglow", 180); arouse(mn, 50);
       r.tentacled = (r.tentacled || 0) + 1;
@@ -403,7 +403,7 @@
         const due = (k, mins) => { const t = p.toyAt[k+key]; if (!t){ p.toyAt[k+key] = now + mins*60000*(0.3 + Math.random()*0.4); return false; } if (now < t) return false; p.toyAt[k+key] = now + mins*60000*(0.8 + Math.random()*0.4); return true; };
         // an auto-injector: whatever else the item says, every half hour
         if (hasWord(text, AUTO_INJECT) && due("inj", CFG.AUTOINJECT_MIN)){
-          const ok = applyShot(mn, BOTMN(), text, { open: tFill(pickFresh("toy:inj", TOY_LINES.inject), mn, { c: itemName(it) }), from: "your "+itemName(it)+"'s dose", heatH: 1 });
+          const ok = applyShot(mn, BOTMN(), text, { open: tFill(pickFor(mn, "toy:inj", TOY_LINES.inject), mn, { c: itemName(it) }), from: "your "+itemName(it)+"'s dose", heatH: 1 });
           if (ok) audit(BOTMN(), "AUTOINJECT", mn+" "+itemName(it));
         }
         // an ovipositor on a gag, a belt, a plug or a dildo
@@ -411,7 +411,7 @@
           const [lo, hi] = CFG.EGG_COUNT, hyper = tagsIn(text).has("hyper") || hyperEggs(mn, 0);
           const n0 = (lo + Math.floor(Math.random()*(hi - lo + 1))) * shotTimes(text) * (hyper ? 3 : 1);
           const n = layClutch(mn, n0, TOY_SIRE), hole = TOY_GROUPS[g];
-          emote("🥚 "+tFill(pickFresh("toy:ovi:"+hole, TOY_LINES.ovi[hole]), mn, { c: itemName(it), x: String(n0) }), mn);
+          emote("🥚 "+tFill(pickFor(mn, "toy:ovi:"+hole, TOY_LINES.ovi[hole]), mn, { c: itemName(it), x: String(n0) }), mn);
           tell(mn, "🥚 Your "+itemName(it)+" just laid "+n0+" eggs in you, sugar. You're carryin' "+n+" now.");
           arouse(mn, 20);
         }
@@ -421,7 +421,7 @@
           const kept = trapFill(mn, "mouth", CFG.AUTOFEED_ML * shotTimes(text), CFG.TRAP_OVERFULL);
           if (kept >= 1){
             if (!piss) p.milk = Math.min(milkCap(mn), p.milk + kept * CFG.PROD.SWALLOW_TO_MILK);
-            emote("🍼 "+tFill(pickFresh("toy:feed:"+(piss ? "p" : "f"), piss ? TOY_LINES.feedPiss : TOY_LINES.feed), mn, { c: itemName(it), ml: ml(kept) }), mn);
+            emote("🍼 "+tFill(pickFor(mn, "toy:feed:"+(piss ? "p" : "f"), piss ? TOY_LINES.feedPiss : TOY_LINES.feed), mn, { c: itemName(it), ml: ml(kept) }), mn);
             if (typeof addonsEmit === "function") addonsEmit("fed", mn, kept, piss ? "piss" : "feed");
           } else if (now - (p.toyAt.fullTold || 0) > 30*60000){ p.toyAt.fullTold = now; tell(mn, "🍼 Your "+itemName(it)+" gurgles, but there's not room for another drop in you, sugar."); }
         }
@@ -430,7 +430,7 @@
           const tc = toyCock(text, it.Asset.Name);
           if (tc && due("cock", CFG.TOYCOCK_MIN)){
             const where = g === "ItemButt" ? "ass" : g === "ItemDevices" ? (hasVulva(mn) ? "pussy" : "ass") : hasVulva(mn) ? "pussy" : "ass";
-            emote("🍆 "+tFill(pickFresh("toy:cock:"+(tc.knot ? "k" : tc.big ? "b" : "p"), tc.knot ? TOY_LINES.cockKnot : tc.big ? TOY_LINES.cockBig : TOY_LINES.cock), mn,
+            emote("🍆 "+tFill(pickFor(mn, "toy:cock:"+(tc.knot ? "k" : tc.big ? "b" : "p"), tc.knot ? TOY_LINES.cockKnot : tc.big ? TOY_LINES.cockBig : TOY_LINES.cock), mn,
               { c: (tc.big ? "huge " : "")+CFG.PENIS_TYPES[tc.type].label, h: where }), mn);
             arouse(mn, tc.big ? 15 : 10);
             // a big one or a knot stretches them, a little at a time (the same trainin' a stretcher plug does)

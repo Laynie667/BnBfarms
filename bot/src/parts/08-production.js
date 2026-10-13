@@ -123,8 +123,10 @@
     return CFG.PROD.BASE_CAPACITY + (p ? p.capBonus : 0) + (wornTags(mn).has("capacity") ? CFG.PROD.WORN_CAPACITY : 0);
   }
   // futa make milk and semen, and can breed and be bred
-  function makesSemen(mn){ const r = rec(mn), p = prodOf(mn); return !!(r && (r.futa || (p && p.hasPenis))); }
-  function hasVulva(mn){ const r = rec(mn), p = prodOf(mn); return !!(r && (r.futa || !(p && p.hasPenis))); }
+  // their ?gender says first: a male or a femboy has a cock and no pussy whatever the game's wardrobe shows (Oct 12:
+  // a male with nothin' drawn between his legs was bein' told about his pussy)
+  function makesSemen(mn){ const r = rec(mn), p = prodOf(mn); return !!(r && (r.futa || (p && p.hasPenis) || r.gender === "male" || r.gender === "femboy")); }
+  function hasVulva(mn){ const r = rec(mn), p = prodOf(mn); return !!(r && (r.futa || (r.gender !== "male" && r.gender !== "femboy" && !(p && p.hasPenis)))); }
 
   // body sizes
   function sizeOf(mn, part){

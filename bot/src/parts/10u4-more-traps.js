@@ -49,7 +49,7 @@
     "ANYBODY'S", "WET AND READY", "PUBLIC USE", "STUD'S TOY", "BREED THIS ASS", "SWALLOWS", "RUT ME",
     "TRAPPED", "FREE USE", "BREED ME", "FARM PROPERTY", "TEST SUBJECT", "USE ME", "CUM HERE", "GOOD ANIMAL", "MILK ME", "KNOT ME", "SOW", "BROODMARE", "HOLES FOR HIRE", "CAUGHT AGAIN"];
   const MIRROR_LINES = ["i am stock and stock gets used", "my holes belong to the farm", "good animals do not think", "i was made to be bred", "i walked into it because i wanted it", "i am a test subject and i love my traps"];
-  const moreLine = (kind, key, mn, v) => tFill(pickFresh("trap:"+kind+":"+key, MORE_LINES[kind][key]), mn, v);
+  const moreLine = (kind, key, mn, v) => tFill(pickFor(mn, "trap:"+kind+":"+key, MORE_LINES[kind][key]), mn, v);
 
   const MORE_TRAPS = {
     pillory(mn){
@@ -217,7 +217,7 @@
     if (!w || w.kind !== "mirror" || squash(text).indexOf(squash(w.line)) < 0) return;
     w.n = (w.n || 0) + 1; saveLedger();
     if (w.n >= 5){ trapWaitEnd(mn, "gave"); return; }
-    privateLine(mn, tFill(pickFresh("trap:mirror:count", MORE_LINES.mirror.count), mn, { x: String(5 - w.n) }), "emote");
+    privateLine(mn, tFill(pickFor(mn, "trap:mirror:count", MORE_LINES.mirror.count), mn, { x: String(5 - w.n) }), "emote");
     arouse(mn, 8);
   }
 

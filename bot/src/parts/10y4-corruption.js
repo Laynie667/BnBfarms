@@ -17,7 +17,7 @@
        three traps (?route <kind> <kind> <kind>) and the subject is put through them in order. The subject keeps
        half the bid.
   */
-  const cLine = (key, mn, v) => tFill(pickFresh("corr:"+key, CORR_LINES[key]), mn, v);
+  const cLine = (key, mn, v) => tFill(pickFor(mn, "corr:"+key, CORR_LINES[key]), mn, v);
   const CORR_MARKS = [20, 40, 60, 80, 100];
   function corruptionOf(mn){ return Math.max(0, Math.min(100, Math.round((rec(mn) || {}).corr || 0))); }
   function corrupt(mn, n, why){

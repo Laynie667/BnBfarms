@@ -22,7 +22,7 @@
                tell: "It's a BREEDER: it wants you ripe. Fertility, hyper pregnancy, clutches of eggs, over and over, till anything that so much as looks at you leaves you carryin'." },
     grower:  { name: "Grower", serums: ["growth", "growth", "capacity", "growth", "growth", "fertility"], every: 20, can: () => true,
                tell: "It's a GROWER: it feeds you every twenty minutes, and nearly all of it goes to makin' more of you. Tits, cock, balls, ass, round and round, and all of it for keeps." },
-    glutton: { name: "Glutton", serums: ["lactation", "udder growth", "lactation", "capacity", "growth", "lactation"], every: 30, can: mn => makesMilk(mn) && !limitBlocks(mn, "milk"),
+    glutton: { name: "Glutton", serums: ["lactation", "udder growth", "lactation", "capacity", "growth", "lactation"], every: 30, can: mn => (makesMilk(mn) && !limitBlocks(mn, "milk")) || makesSemen(mn),
                tell: "It's a GLUTTON: it's as hungry for your milk as for cum. It'll drink you down at every feed, and dose you so you make twice as much for it next time." },
     tyrant:  { name: "Tyrant", serums: ["growth", "fertility", "heat inducer", "growth", "hyper pregnancy", "capacity"], every: 30, can: mn => !/\b(denial|orgasm|edg|ruin)/i.test(rec(mn).limits || ""),
                tell: "It's a TYRANT: you don't cum while it's on you. Every time you get there, it eats it, ruins it, and pays you in serum instead. Twelve hours of that." },
@@ -32,11 +32,12 @@
   // which parts of it have grown in: the lips form blooms downward, the belt form upward
   function parasiteParts(g){
     const h = (Date.now() - g.since) / 3600000, stage = h >= CFG.PARASITE_BLOOM_H[1] ? 3 : h >= CFG.PARASITE_BLOOM_H[0] ? 2 : 1;
-    return g.form === "belt" ? { stage, root: true, suckers: stage >= 2, lips: stage >= 3 } : { stage, lips: true, suckers: stage >= 2, root: stage >= 3 };
+    return g.form === "belt" ? { stage, root: true, suckers: stage >= 2, lips: stage >= 3 } : strainParts(strainKey(g), stage);   // each strain blooms its own way (10v3-parasite-strains.js)
   }
-  const pmLine = (key, mn, v) => tFill(pickFresh("para2:"+key, PARASITE_MORE[key]), mn, v);
+  const pmLine = (key, mn, v) => tFill(pickFor(mn, "para2:"+key, PARASITE_MORE[key]), mn, v);
   // what their Companion should have on them for it
   function parasiteGear(mn){
+    if (CFG.STRAIN_GEAR) return strainGear(mn);   // each strain's own pieces, colour and words, for the body it's on (10v3-parasite-strains.js)
     const r = rec(mn), g = r.parasite, P = parasiteParts(g), S = strainOf(g), out = [], base = { always: true, color: "#E0607F", until: g.until };
     if (P.lips) out.push(Object.assign({ slot: "lips", name: "Parasite Lips", desc: S.name+" strain. Fat, wet, living lips sealed over the mouth, with a tentacle seated down the throat. It feeds its host serum and swallows every load they suck out." }, base));
     if (P.suckers) out.push(Object.assign({ slot: "cups", name: "Parasite Suckers", desc: S.name+" strain. Two soft pink mouths latched over the teats, sucking in slow greedy pulls. They drink every drop of milk and give something hotter back." }, base));
@@ -48,10 +49,10 @@
     const r = rec(mn), g = r.parasite, p = prodOf(mn);
     g.strain = pickStrain(mn); g.stageTold = 1; g.urgeAt = Date.now() + (40 + Math.random()*40)*60000;
     g.next = Date.now() + strainOf(g).every*60000;
-    if (g.strain === "tyrant") p.deniedUntil = Math.max(p.deniedUntil || 0, g.until);
+    strainBorn(mn);   // what it does to this body from the first minute (10v3-parasite-strains.js)
     r.parasiteSeed = 0;
     saveLedger();
-    later(() => { if (parasiteOn(mn)) tell(mn, "👄 "+strainOf(g).tell); }, 9000);
+    later(() => { if (parasiteOn(mn)) tell(mn, "👄 "+strainTell(mn)); }, 9000);
   }
   // called when it comes off, however it comes off
   function parasiteGone(mn, g, how){
@@ -65,9 +66,11 @@
     // it blooms
     if (P.stage > (g.stageTold || 1)){
       g.stageTold = P.stage; saveLedger();
-      const grew = g.form === "belt" ? (P.stage === 2 ? "suckers" : "lipsLate") : (P.stage === 2 ? "suckers" : "root");
+      const grew = g.form === "belt" ? (P.stage === 2 ? "suckers" : "lipsLate") : bloomWhat(g, P.stage);
       emote("👄 "+pmLine("bloom_"+grew, mn), mn); arouse(mn, 20); syncCompanions(true);
+      { const st = P.stage; later(() => { if (parasiteOn(mn)) tell(mn, "👄 "+strainBloomTell(mn, st)); }, 7000); }
     }
+    strainTick(mn, r, now);   // the Breeder's first clutch, the Tyrant's edges (10v3-parasite-strains.js)
     // it lays, in its last hour
     if (!g.laid && g.until - now < 3600000 && !limitBlocks(mn, "eggs")){
       g.laid = true;
@@ -101,6 +104,7 @@
   // after each regular feed: the suckers (or a Glutton, from the start) drink their milk
   function parasiteAfterDose(mn){
     const r = rec(mn), g = r.parasite, p = prodOf(mn);
+    strainAfterDose(mn);   // the Glutton's sleeve (10v3-parasite-strains.js)
     if (!(parasiteParts(g).suckers || g.strain === "glutton") || !makesMilk(mn) || p.milk < 20) return;
     const got = drainMilk(mn, p.milk * (g.strain === "glutton" ? 0.8 : 0.4));
     if (got < 5) return;
@@ -124,7 +128,7 @@
       const r = rec(drinker);
       if (!r || !r.parasiteOn || (r.parasiteNext || 0) > Date.now() || /\bparasit/i.test(r.limits || "")) return;
       if (Math.random() >= CFG.PARASITE_KISS_CHANCE*dangerX(drinker).chance) return;
-      emote("👄 "+tFill(pickFresh("para2:nurse", PARASITE_MORE.nurse), host, { c: plainName(drinker) }), drinker);
+      emote("👄 "+tFill(pickFor(host, "para2:nurse", PARASITE_MORE.nurse), host, { c: plainName(drinker) }), drinker);
       later(() => { if (charFor(drinker) && !parasiteOn(drinker)) parasiteLatch(drinker, "nursed from "+host); }, 3000);
     } catch(e){ warn("parasite nurse:", e); }
   }

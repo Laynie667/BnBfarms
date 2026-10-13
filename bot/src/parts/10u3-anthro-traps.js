@@ -59,7 +59,7 @@
         const [lo, hi] = CFG.EGG_COUNT, hyper = hyperEggs(mn, 0.1);
         v.x = String(layClutch(mn, (lo + Math.floor(Math.random()*(hi - lo + 1))) * (hyper ? 3 : 1), A.sire));
       }
-      emote(icon+" "+tFill(pickFresh("trap:"+kind+":end", hole ? T.end : T.endOver), mn, v)+(took === "new" ? " "+tFill(pickFresh("trap:anthro:took", ANTHRO_TOOK), mn, v) : ""), mn);
+      emote(icon+" "+tFill(pickFor(mn, "trap:"+kind+":end", hole ? T.end : T.endOver), mn, v)+(took === "new" ? " "+tFill(pickFor(mn, "trap:anthro:took", ANTHRO_TOOK), mn, v) : ""), mn);
       if (hole) splatBody(mn, hole); else { splatBody(mn, "back"); splatBody(mn, "face"); }
       // what each one leaves behind besides
       if (kind === "bull" && makesMilk(mn)) drainMilk(mn, p.milk);

@@ -1,11 +1,11 @@
 # What to install (current versions)
 
-Updated 2026-10-11. Every file is in the `dist/` folder (it syncs through OneDrive, so the phone app has it too).
+Updated 2026-10-12. Every file is in the `dist/` folder (it syncs through OneDrive, so the phone app has it too).
 In Tampermonkey's dashboard, compare each script's version with this list. Anything already at these versions is up to date.
 
 | Script | File in `dist/` | Where it runs | Current |
 |---|---|---|---|
-| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.29.4** |
+| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.30.0** |
 | Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.6.0** |
 | Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.1.3** |
 | Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **1.0.4** |
@@ -13,7 +13,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 | Map tools, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.3** |
 | Dairy | `farmhand-dairy.user.js` | the bot's PC | **1.0.2** |
 | Shows | `farmhand-shows.user.js` | the bot's PC | **1.0.4** |
-| Farmhand Companion | `farmhand-companion.user.js` | each player | **0.15.8** |
+| Farmhand Companion | `farmhand-companion.user.js` | each player | **0.15.9** |
 | Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.4** |
 
 ## Sending a watch report
@@ -23,6 +23,17 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 - Running the watcher on more than one game at once (the bot, yours, a tester's) lets Claude line them up into one timeline.
 
 ## Latest changes (newest first)
+
+- **Bot 0.30.0, Companion 0.15.9: lines that fit the body, and parasite strains told apart.**
+  - **Gender comes first.** A player set to `?gender male` or `femboy` now counts as having a cock and no pussy whatever the wardrobe shows. Before, a male with nothing drawn between his legs was treated as having a pussy, which is where the wrong lines came from. This also means a load can only take in a male through the ass, with mpreg.
+  - **Every trap line is picked for the body.** All 40 places that pick a trap, parasite, brood, curse, keeper or milking line now leave out lines about a pussy, womb or clit for somebody without one, and lines about tits, udders or teats for a flat chest. If nothing in a pool fits, the words are swapped (pussy to ass, tits to chest, and for a male, girl to boy, heifer to steer, mare to colt). A femboy keeps the soft words.
+  - **Lines about what they do have.** About a third of trap beats add a sentence about the host's own parts: cock and balls, pussy, both for a futa, and a femboy's own set. 150 new lines: each of 25 traps has its own for cock and for pussy, plus shared ones.
+  - **Parasite strains now differ in bloom order, colour, gear, brew and one special trick each**, and by host body:
+    - **Breeder (rose):** roots at hour 4, suckers and a Brood Sac at hour 8, and lays twice. A host with no womb is given mpreg for the day and carries its eggs in the ass.
+    - **Grower (violet):** suckers at hour 4, root and (on a cock) a Grower's Sheath at hour 8. It grows cock and balls on a male, tits and ass on a female, everything on a futa, and hips, ass and tits on a femboy.
+    - **Glutton (gold):** suckers from the first minute; a Glutton's Sleeve on a cock at hour 4 that drains 80% of their seed at every feed and doubles production; root at hour 8. It can now take a host who makes seed but no milk.
+    - **Tyrant (blood red):** a clasp from the first minute (a Tyrant's Cage on a cock, a sealed belt on a pussy), suckers at hour 4, a Tyrant's Web at hour 8 and an edge every 15 minutes from then.
+  - The Companion knows the five new pieces and has a long description for each.
 
 - **Bot 0.29.4, Companion 0.15.8: farm gear fitted to the right game items.** Item names now come from the game's own list instead of guesses. The pump bung is a butt pump, the egg post leaves the XXL egg plug, the boar leaves a fuck plug, the stud's stopper is a hollow plug, the Slime Seal and the vine stem are a tentacle (in the ass) or a flesh-coloured dildo (the game has no tentacle item for the pussy), the pillory spreader is a real metal spreader bar, the breeding frame uses steel cuffs, the kennel uses a collar leash, the denial clamp is steel chastity panties, and the living suit's mouth is the latex sheath gag. The water also wraps the body now (the tentacle suit). **A keeper's tag is a real livestock name tag on the collar** (needs a collar and "Farm can put real gear on me"), with the tag's words as its name. The game has no belly item, so the belly stays in words. NOT YET SEEN LIVE.
 

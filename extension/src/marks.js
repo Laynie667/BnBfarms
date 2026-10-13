@@ -126,7 +126,7 @@ const OLD_TAG = "[B&B Farm gear]";
 // of its description (live, Oct 11: a Slime Seal lost its tag and never came off)
 const FARM_NAMES = ["Parasite Lips", "Parasite Belt", "Pump Bung", "Egg Post Plug", "Slime Seal", "Boar's Plug", "Seed Pod Stem", "Denial Clamp", "Growth Cups",
   "Trap Milker", "Winch Chain", "Feed Chute", "Snare Rope", "Breedin' Frame Cuffs", "Kennel Lead", "The Water's Grip", "The Water's Coils", "Slime Sleeves", "Slime Stockings",
-  "Snare Hobble", "Pack's Knot", "Stud's Stopper", "Pillory Spreader", "Parasite Suckers", "Parasite Root", "The Water's Embrace",
+  "Snare Hobble", "Pack's Knot", "Stud's Stopper", "Pillory Spreader", "Parasite Suckers", "Parasite Root", "The Water's Embrace", "Brood Sac", "Grower's Sheath", "Glutton's Sleeve", "Tyrant's Cage", "Tyrant's Web",
   "Growin' Plug", "Hungry Belt", "Milkmaid's Cups", "Glutton's Funnel", "The Hobble", "Living Suit (legs)", "Living Suit (hips)", "Living Suit (chest)", "Living Suit (arms)", "Living Suit (mouth)"];
 // slot → where it can go and which game item it is: the first that this game has; the pattern is a fallback
 const GEAR_SLOTS = {

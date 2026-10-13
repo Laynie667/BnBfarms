@@ -21,7 +21,7 @@
   function parasiteChance(mn){ const n = potionX(mn, "danger") + potionX(mn, "tentaclemusk"); return n ? Math.min(1, n * CFG.PARASITE_PER_DANGER) : CFG.PARASITE_CHANCE; }
   function parasiteOn(mn){ const r = rec(mn); return !!(r && r.parasite && r.parasite.until > Date.now()); }
   function parasiteSerum(mn, i){
-    const list = strainOf(rec(mn).parasite).serums;   // each strain has its own brew (10v2-parasite-more.js)
+    const list = strainSerums(mn);   // each strain has its own brew (10v2-parasite-more.js)
     let s = list[i % list.length];
     if (s === "growth"){
       const parts = PARASITE_GROWS.filter(k => bodyParts(mn).includes(k) && CFG.SIZES[k]), g = rec(mn).parasite;
@@ -34,7 +34,7 @@
     if (/heat/.test(s) && limitBlocks(mn, "heat")) s = "capacity";
     return s;
   }
-  const paraLine = (key, mn, v) => tFill(pickFresh("para:"+key, PARASITE_LINES[key]), mn, v);
+  const paraLine = (key, mn, v) => tFill(pickFor(mn, "para:"+key, PARASITE_LINES[key]), mn, v);
   function parasiteDose(mn, x, open){
     const r = rec(mn), g = r.parasite;
     const serum = parasiteSerum(mn, g.n || 0); g.n = (g.n || 0) + 1;
@@ -99,7 +99,7 @@
       // a load swallowed settles the cravin' for a while
       if (craving(mn)){
         const c = parasiteOn(mn) ? r.parasite : r.crave;
-        if (Date.now() - (c.ate || 0) > CFG.CRAVE_AFTER_MIN*60000) setTimeout(() => privateLine(mn, tFill(pickFresh("para:sated", PARASITE_LINES.sated), mn), "emote"), 4000);
+        if (Date.now() - (c.ate || 0) > CFG.CRAVE_AFTER_MIN*60000) setTimeout(() => privateLine(mn, tFill(pickFor(mn, "para:sated", PARASITE_LINES.sated), mn), "emote"), 4000);
         c.ate = Date.now();
       }
       if (parasiteOn(mn)){
@@ -125,7 +125,7 @@
     if (now - c.ate < CFG.CRAVE_AFTER_MIN*60000 || now - (c.told || 0) < CFG.CRAVE_LINE_MIN*60000) return;
     c.told = now; saveLedger();
     const hours = (now - c.ate) / 3600000;
-    privateLine(mn, tFill(pickFresh("para:crave", hours > 2 ? PARASITE_LINES.craveBad : PARASITE_LINES.crave), mn), "emote");
+    privateLine(mn, tFill(pickFor(mn, "para:crave", hours > 2 ? PARASITE_LINES.craveBad : PARASITE_LINES.crave), mn), "emote");
     arouse(mn, hours > 2 ? 20 : 10, 90);
   }
   // a kiss on the mouth with somebody carryin' it: it buds, and the bud takes to whoever else said ?parasite on
@@ -138,7 +138,7 @@
       const r = rec(to);
       if (!r || !r.parasiteOn || (r.parasiteNext || 0) > Date.now() || /\bparasit/i.test(r.limits || "")) return;
       if (Math.random() >= CFG.PARASITE_KISS_CHANCE*dangerX(to).chance) return;
-      emote("👄 "+tFill(pickFresh("para:bud", PARASITE_LINES.bud), from, { c: plainName(to) }), to);
+      emote("👄 "+tFill(pickFor(from, "para:bud", PARASITE_LINES.bud), from, { c: plainName(to) }), to);
       setTimeout(() => { try { if (charFor(to) && !parasiteOn(to)) parasiteLatch(to, "kissed by "+from); } catch(e){ warn("parasite kiss:", e); } }, 3000);
     } catch(e){ warn("parasite kiss:", e); }
   }

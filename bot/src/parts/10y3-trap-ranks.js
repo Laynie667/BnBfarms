@@ -14,7 +14,7 @@
   function rankOfSubject(mn){ const n = (rec(mn) || {}).trapN || 0; let i = 0; for (let k = 0; k < SUBJECT_RANKS.length; k++) if (n >= SUBJECT_RANKS[k].at) i = k; return i; }
   // how much worse it is for them, by what
   function rankX(mn){ const k = isSubject(mn) ? rankOfSubject(mn) : 0; return { water: 1 + 0.25*k, reset: 1 + 0.2*k, eggs: 1 + 0.1*k, chain: 1 + 0.3*k, rank: k }; }
-  const rkLine = (key, mn, v) => tFill(pickFresh("rank:"+key, RANK_LINES[key]), mn, v);
+  const rkLine = (key, mn, v) => tFill(pickFor(mn, "rank:"+key, RANK_LINES[key]), mn, v);
 
   // which trap likes to pass them to which (a kind, or one of a few); anything else is pot luck
   const CHAIN_NEXT = { winch: ["breeder", "pillory", "milker"], breeder: ["mud", "eggs", "pump"], snare: ["tickle", "paddle", "wolves"], gas: ["wolves", "stallion", "toms"], wire: ["pillory", "wall", "pricetag"],

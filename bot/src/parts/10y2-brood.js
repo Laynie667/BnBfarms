@@ -15,7 +15,7 @@
        untouched; whatever already has them carries on (that's what the safeword is for).
      • WHAT'S HAPPENIN' TO ME: a few plain lines for the Companion about whatever has them right now.
   */
-  const bLine = (key, mn, v) => tFill(pickFresh("brood:"+key, BROOD_LINES[key]), mn, v);
+  const bLine = (key, mn, v) => tFill(pickFor(mn, "brood:"+key, BROOD_LINES[key]), mn, v);
   function quietNow(mn){ const r = rec(mn); return !!(r && r.quietUntil > Date.now()); }
 
   // a little story about one person, a beat at a time (the same pace as the traps); the safeword stops it
@@ -27,7 +27,7 @@
       if (state.sceneRuns.get(mn) !== run) return;
       if (run.i < beats.length && charFor(mn)){
         const b = beats[run.i++];
-        emote(icon+" "+tFill(pickFresh("scene:"+icon+":"+run.i, Array.isArray(b) ? b : [b]), mn, v), mn);
+        emote(icon+" "+tFill(pickFor(mn, "scene:"+icon+":"+run.i, Array.isArray(b) ? b : [b]), mn, v), mn);
         run.timer = setTimeout(step, CFG.TRAP_BEAT_S*1000);
         return;
       }

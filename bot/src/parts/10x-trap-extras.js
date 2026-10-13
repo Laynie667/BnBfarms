@@ -17,7 +17,7 @@
      • AFTER DARK        through curfew the traps reset twice as fast and the water's three times as hungry.
      • SUBJECT OF THE WEEK on the ?board: most traps sprung, most eggs laid, most loads from things with fur.
   */
-  const xLine = (key, mn, v) => tFill(pickFresh("trapx:"+key, EXTRA_LINES[key]), mn, v);
+  const xLine = (key, mn, v) => tFill(pickFor(mn, "trapx:"+key, EXTRA_LINES[key]), mn, v);
   function subjWeek(){ const k = weekKey(); if (!L.subjWeek || L.subjWeek.week !== k) L.subjWeek = { week: k, traps: {}, eggs: {}, fur: {} }; return L.subjWeek; }
   const bump1 = (o, mn, n) => { o[mn] = (o[mn] || 0) + (n || 1); };
   const nightX = () => (inCurfew() ? { reset: 0.5, water: 3 } : { reset: 1, water: 1 });
@@ -78,7 +78,7 @@
       const near = (W.ChatRoomCharacter || []).map(c => c.MemberNumber).filter(m => m !== mn && m !== CFG.BOT_MEMBER && rec(m) && (() => { const a = posOf(mn), b = posOf(m); return a && b && Math.max(Math.abs(a.X - b.X), Math.abs(a.Y - b.Y)) <= 2; })());
       if (!near.length || Math.random() < 0.5) continue;
       const what = d.reek ? d.reek : d.piss ? "piss" : d.slime ? "slime" : "the hog wallow";
-      privateLine(near[Math.floor(Math.random()*near.length)], tFill(pickFresh("trapx:smell", EXTRA_LINES.smell), mn, { c: what }), "emote");
+      privateLine(near[Math.floor(Math.random()*near.length)], tFill(pickFor(mn, "trapx:smell", EXTRA_LINES.smell), mn, { c: what }), "emote");
     }
   }
 
@@ -273,7 +273,7 @@
     for (const C of (W.ChatRoomCharacter || [])){
       const mn = C.MemberNumber; if (!isSubject(mn)) continue;
       const r = rec(mn); if (now - (r.baitTold || 0) < 10*60000) continue;
-      if (Object.keys(L.trapBait).some(s => onSpot(mn, s, 3) && !onSpot(mn, s, 0))){ r.baitTold = now; privateLine(mn, tFill(pickFresh("trapx:bait", EXTRA_LINES.bait), mn), "emote"); }
+      if (Object.keys(L.trapBait).some(s => onSpot(mn, s, 3) && !onSpot(mn, s, 0))){ r.baitTold = now; privateLine(mn, tFill(pickFor(mn, "trapx:bait", EXTRA_LINES.bait), mn), "emote"); }
     }
   }
   function trapCardFor(mn){

@@ -18,7 +18,7 @@
      • FLUIDS AS COIN: everything milked or collected from you goes in your vat (?vat). ?buy <potion or shot> with milk
        pays from it. The week's top producer pays a quarter less.
   */
-  const kLine = (key, mn, v) => tFill(pickFresh("keep:"+key, KEEP_LINES[key]), mn, v);
+  const kLine = (key, mn, v) => tFill(pickFor(mn, "keep:"+key, KEEP_LINES[key]), mn, v);
 
   // ── toys that follow the scene ─────────────────────────────
   // level: -1 still · 0 low · 1 medium · 2 high · 3 flat out · null = put them back how they were
@@ -85,7 +85,7 @@
           v.ml = ml(trapFill(mn, hole, load, CFG.TRAP_OVERFULL)); v.h = TRAP_HOLE[hole]; tally(mn);
           let took = null;
           if (hole !== "mouth" && r.fertile && canCatchIn(mn, hole)) took = rollConception(mn, FRAME_SIRE, load, 1 + 0.3*sev, hole);
-          emote("🛠️ "+kLine("customBreed", mn, v)+(took === "new" ? " "+tFill(pickFresh("trap:anthro:took", ANTHRO_TOOK), mn, v) : ""), mn); splatBody(mn, hole);
+          emote("🛠️ "+kLine("customBreed", mn, v)+(took === "new" ? " "+tFill(pickFor(mn, "trap:anthro:took", ANTHRO_TOOK), mn, v) : ""), mn); splatBody(mn, hole);
           break;
         }
         case "strip": if (!bodyMark(mn, { strip: true })) tell(mn, "🛠️ With the Companion and \"Farm can strip me\" on, that would have had every stitch off you, sugar."); break;

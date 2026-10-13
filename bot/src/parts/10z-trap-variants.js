@@ -30,7 +30,7 @@
     }
     return out.variant || out.sev ? out : null;
   }
-  const vLine = (pool, key, mn, v) => tFill(pickFresh("trapv:"+key, pool), mn, v);
+  const vLine = (pool, key, mn, v) => tFill(pickFor(mn, "trapv:"+key, pool), mn, v);
 
   const NEEDLE_WORDS = { milk: "lactation", seed: "virility", breed: "fertility", heat: "heat inducer", eggs: "egg laying", hyper: "hyper pregnancy", udder: "udder growth",
                          ass: "ass growth", balls: "balls growth", cock: "cock growth", stretch: "capacity", mpreg: "mpreg" };
@@ -41,7 +41,7 @@
       musk:   { can: mn => !potionRefusal(mn, "musk", mn), go(mn, S){ for (let i = 0; i < S.x; i++) givePotion(mn, "musk", BOTMN(), "gas"); } },
       needy:  { can: mn => !potionRefusal(mn, "needy", mn), go(mn, S){ for (let i = 0; i < S.x; i++) givePotion(mn, "needy", BOTMN(), "gas"); arouse(mn, 20*S.x, 92); } },
       giggle: { can: mn => !potionRefusal(mn, "feather", mn), go(mn, S){ givePotion(mn, "feather", BOTMN(), "gas"); if (S.x >= 2 && !potionRefusal(mn, "hiccup", mn)) givePotion(mn, "hiccup", BOTMN(), "gas"); if (S.x >= 3) givePotion(mn, "feather", BOTMN(), "gas"); } },
-      haze:   { can: mn => !/\b(hypno|trance|mind)/i.test(rec(mn).limits || ""), go(mn, S){ trance(mn, S.x); goUnder(mn, S.x); later(() => trance(mn, 0), tmin(mn, S.t)*120000); arouse(mn, 15*S.x); tell(mn, "🏮 "+tFill(pickFresh("trap:lantern:thought", TRAP_LINES.lantern.thought), mn)); } },
+      haze:   { can: mn => !/\b(hypno|trance|mind)/i.test(rec(mn).limits || ""), go(mn, S){ trance(mn, S.x); goUnder(mn, S.x); later(() => trance(mn, 0), tmin(mn, S.t)*120000); arouse(mn, 15*S.x); tell(mn, "🏮 "+tFill(pickFor(mn, "trap:lantern:thought", TRAP_LINES.lantern.thought), mn)); } },
       rut:    { can: mn => makesSemen(mn), go(mn, S){ const p = prodOf(mn); p.pentUp = true; addBoost(p, "semen", tmin(mn, 3)*3600000, S.x); p.semen = Math.min(semenCap(mn), p.semen + semenCap(mn)*0.3*S.x); arouse(mn, 20*S.x); } },
       ripen:  { can: mn => hasVulva(mn) && !limitBlocks(mn, "breed"), go(mn, S){ const p = prodOf(mn); addBoost(p, "fert", tmin(mn, 6)*3600000, S.x); if (S.x >= 3) addBoost(p, "hyper", tmin(mn, 6)*3600000, 1); arouse(mn, 10*S.x); } },
       moo:    { can: mn => !potionRefusal(mn, "moo", mn), go(mn, S){ for (let i = 0; i < Math.min(2, S.x); i++) givePotion(mn, "moo", BOTMN(), "gas"); } },

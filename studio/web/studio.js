@@ -619,17 +619,64 @@
                 if (v0 >= d[k - 1] && v0 >= d[k + 1] && v0 >= d[k - w] && v0 >= d[k + w] && v0 >= d[k - w - 1] && v0 >= d[k - w + 1] && v0 >= d[k + w - 1] && v0 >= d[k + w + 1]) ridge.push(v0); } }
             ridge.sort((m, n) => m - n); v = ridge.length >= 24 ? ridge[Math.floor(ridge.length * 0.2)] : 0; BREAST.cover.set(key, v); return v;
           };
-          // Chest wear on drawn breasts. The piece is the game's own picture, re-laid over the bigger breasts so that every
-          // part of it keeps its PLACE on the breast (Laynie's marks, Oct 13: straps that ring the game's breast have to
-          // ring ours, out at its edge; they'd been running across its face, and the middle was a smear):
-          //   · the breastbone stays the breastbone: what sits between the breasts stays between them
-          //   · the breast's outer edge is the outer edge: a strap round the outside of the game's is round the outside of ours
-          //   · the top is the top: level with the top of the game's breast the piece is exactly the game's picture, so a
-          //     strap from the shoulder runs on to the breast unbroken
-          //   · the underside is the underside, and the nipple line the nipple line
-          // It's done a row at a time. Each row of ours, from the breastbone out to our outer edge, is filled from the
-          // matching row of the game's, from the breastbone out to ITS outer edge. Below and outside the breast the
-          // piece is hidden by the breast, as it would be.
+          // ── Chest wear on drawn breasts ──
+          // The piece is the game's own, re-laid over the bigger breasts so every part of it keeps its PLACE on the breast.
+          // Four lines of the game's breast are matched to the same four of ours (all from Laynie's marked-up sheets, Oct 13):
+          //   · the breastbone: what sits between the breasts stays between them
+          //   · the inner edge, the side of the cleavage: a strap down the inside of the game's breast runs down the inside of ours
+          //   · the outer edge: a strap round the outside of the game's is round the outside of ours, and a cup reaches it
+          //   · top and underside: level with the top of the game's breast the piece is exactly the game's picture, so a
+          //     shoulder strap runs on unbroken; the nipple line is the nipple line, the underside the underside
+          // The two KINDS of thing in a piece are treated differently, because one way doesn't do both cleanly:
+          //   · SOLID parts (cups, panels, wide bands) are laid on as pixels: stretched cloth still looks like cloth.
+          //   · STRAPS are not stretched at all. A stretched strap is fat one way and thin the other, and paring it back
+          //     left it ragged (Laynie: "these look so messy… please take your time to do clean work"). Instead the
+          //     middle line of every strap is found in the game's picture, carried across point by point, and the strap
+          //     is DRAWN along it, at the width it has in the game (a little more on a bigger breast), with a clean dark
+          //     edge. So the layout is the game's, and the line is ours. Studs and stitching along a strap aren't kept.
+          const chestMap = (B, S2, GB, c, ox, oy, midX, ny, solidOnly) => {
+            const CH = c.height, Rn = GB.r * (solidOnly ? 1.02 : 1.12), An = GB.r * (solidOnly ? 0.76 : 0.86), cy = oy + S2.by;
+            const yT = Math.round(ny - Rn), yB = Math.round(cy + S2.r * (1 + S2.sag)) + 1;
+            const edgeN = (yn) => GB.dx + An * Math.sqrt(Math.max(0, 1 - ((yn - ny) / Rn) * ((yn - ny) / Rn)));
+            const innerN = (yn) => (yn >= ny ? 0 : GB.dx * (1 - Math.sqrt(Math.max(0, 1 - ((ny - yn) / Rn) * ((ny - yn) / Rn)))));
+            const edgeT = new Float32Array(CH), innerT = new Float32Array(CH).fill(1e9);
+            for (let j = 0; j <= 4000; j++) { const p = FarmBreasts.point(S2, 1, Math.PI * 2 * j / 4000), row = Math.round(oy + p[1]); if (row < 0 || row >= CH) continue; if (p[0] > edgeT[row]) edgeT[row] = p[0]; if (p[0] < innerT[row]) innerT[row] = p[0]; }
+            for (let row = 0; row < CH; row++) innerT[row] = innerT[row] > 1e8 ? -1 : Math.max(0, innerT[row]);
+            for (let row = 1; row < CH - 1; row++) { if (!edgeT[row] && edgeT[row - 1] && row < yB) edgeT[row] = edgeT[row - 1]; if (innerT[row] < 0 && innerT[row - 1] >= 0 && row < yB) innerT[row] = innerT[row - 1]; }
+            const easeRows = Math.max(6, (cy - yT) * 0.45);
+            // everything about one row of ours: which row of the game's it is, and the three edges of each
+            const rowOf = (qy) => {
+              const yn = qy <= cy ? yT + (qy - yT) * (ny - yT) / Math.max(1, cy - yT) : ny + (qy - cy) * Rn / Math.max(1, yB - cy);
+              const Xt = Math.max(edgeT[Math.round(qy)] || 0, 1), Xn = edgeN(yn), In = Math.min(innerN(yn), Xn - 1), It = Math.min(Math.max(innerT[Math.round(qy)] < 0 ? In : innerT[Math.round(qy)], In * 0.45), Xt - 1);
+              const t = Math.max(0, Math.min(1, (qy - yT) / easeRows)), ease = 1 - t * t * (3 - 2 * t);   // 1 at the top (the game's own picture), 0 once on the breast
+              return { yn, Xt, Xn, In, It, ease, ky: qy <= cy ? (ny - yT) / Math.max(1, cy - yT) : Rn / Math.max(1, yB - cy), kGap: It > 0.5 ? In / It : 1, kBr: (Xn - In) / Math.max(1, Xt - It) };
+            };
+            // ours -> the game's (for laying pixels on): null outside the breast
+            const back = (qx, qy, R) => { const off = qx - midX, ao = Math.abs(off); if (ao > R.Xt) return null; const so = ao <= R.It ? ao * R.kGap : R.In + (ao - R.It) * R.kBr; return [(1 - R.ease) * (midX + (off < 0 ? -so : so)) + R.ease * qx, (1 - R.ease) * R.yn + R.ease * qy]; };
+            // the game's -> ours (for carrying a strap's middle line across): null if that spot is hidden behind our breast
+            const fwd = (sx, sy) => {
+              if (sy < yT || sy > ny + Rn) return null;
+              let qy = sy <= ny ? yT + (sy - yT) * (cy - yT) / Math.max(1, ny - yT) : cy + (sy - ny) * (yB - cy) / Rn, R = rowOf(qy);
+              for (let it = 0; it < 5; it++) { qy += (sy - ((1 - R.ease) * R.yn + R.ease * qy)) / Math.max(0.15, (1 - R.ease) * R.ky + R.ease); R = rowOf(qy); }   // (the easing at the top bends the rows a little: settle on the right one)
+              const off = sx - midX, ao0 = Math.abs(off); if (ao0 > R.Xn + 7) return null;   // (a strap lying just outside the game's breast still belongs on the edge of ours: it isn't dropped, or the line comes out in dashes)
+              const ao = Math.min(ao0, R.Xn);
+              const to = ao <= R.In ? (R.kGap ? ao / R.kGap : ao) : R.It + (ao - R.In) / Math.max(0.05, R.kBr), tx = midX + (off < 0 ? -to : to);
+              return [(1 - R.ease) * tx + R.ease * sx, qy, R.ease, R.Xt];
+            };
+            return { yT, yB, Rn, edgeT, rowOf, back, fwd };
+          };
+          // thin a shape down to its middle line (Zhang and Suen's way). m: 1 where the shape is. Gives back the same grid, 1 on the line.
+          const middleLine = (m, w, h) => {
+            const sk = Uint8Array.from(m); let changed = true, guard = 0;
+            const N = (i) => [sk[i - w], sk[i - w + 1], sk[i + 1], sk[i + w + 1], sk[i + w], sk[i + w - 1], sk[i - 1], sk[i - w - 1]];
+            while (changed && guard++ < 60) { changed = false;
+              for (let pass = 0; pass < 2; pass++) { const kill = [];
+                for (let yy = 1; yy < h - 1; yy++) for (let xx = 1; xx < w - 1; xx++) { const i = yy * w + xx; if (!sk[i]) continue; const p = N(i); let cnt = 0, tr = 0; for (let q = 0; q < 8; q++) { cnt += p[q]; if (!p[q] && p[(q + 1) % 8]) tr++; }
+                  if (cnt < 2 || cnt > 6 || tr !== 1) continue;
+                  if (pass === 0 ? (p[0] * p[2] * p[4] === 0 && p[2] * p[4] * p[6] === 0) : (p[0] * p[2] * p[6] === 0 && p[0] * p[4] * p[6] === 0)) kill.push(i); }
+                for (const i of kill) sk[i] = 0; if (kill.length) changed = true; } }
+            return sk;
+          };
           const dressDraw = (name, src, x, y, o, plain) => {
             const B = ctx.breast, im = B && mouldImg(src); if (!im) return false;
             if (chestCover(src, im, x, y, B) < (B.pose === "AllFours" ? 0.05 : 0.08)) return false;
@@ -638,76 +685,69 @@
             if (!c) {
               const MX = 220, MY = 420, w = im.naturalWidth, h = im.naturalHeight, S2 = B.S, GB = gameBreast(B);
               c = document.createElement("canvas"); c.width = w + MX * 2; c.height = h + MY * 2; c.MX = MX; c.MY = MY;
-              const g = c.getContext("2d", { willReadFrequently: true }), ox = MX + B.rx - x, oy = MY + B.ry - y, midX = MX + B.mid - x;
+              const g = c.getContext("2d", { willReadFrequently: true }), ox = MX + B.rx - x, oy = MY + B.ry - y, midX = MX + B.mid - x, ny = MY + B.uy + GB.y - y;
               g.drawImage(im, MX, MY);
               const CW = c.width, CH = c.height, sp = g.getImageData(0, 0, CW, CH).data;
-              const half = plain ? 0 : strapHalf(src, im, x, y, B), want = 1.1 + 0.5 * S2.k, paring = half > 0 && half <= 8;
-              // (a cup or a top is cut a little inside the game's breast; on ours that sliver of bare skin round it grew
-              // with everything else. Laynie on the plain bra: "needs to come to edge of breast". So a solid piece is read
-              // from a little further in, and covers ours to the edge. Straps are read to the full edge, where they sit.)
-              const Rn = GB.r * (paring ? 1.12 : 1.02), An = GB.r * (paring ? 0.86 : 0.76), ny = MY + B.uy + GB.y - y, cy = oy + S2.by;                     // the game's breast (with the straps round it), and the middle of ours
-              const yT = Math.round(ny - Rn), yB = Math.round(cy + S2.r * (1 + S2.sag)) + 1;         // top (the same line in both) and our underside
-              // (Laynie's second marks, Oct 13: every strap and cup edge sat INSIDE our outline, short of it. I'd taken the game's
-              // breast for a circle as wide as it is tall. It isn't: from its middle it reaches much less far out to the side
-              // than it does down. An: how far out to the side, Rn: how far up and down. Measured off the game's picture.)
-              const edgeN = (yn) => GB.dx + An * Math.sqrt(Math.max(0, 1 - ((yn - ny) / Rn) * ((yn - ny) / Rn)));   // the game's outer edge on a row, out from the breastbone
-              // our outer edge on each row
-              const edgeT = new Float32Array(CH);
-              for (let j = 0; j <= 3000; j++) { const p = FarmBreasts.point(S2, 1, Math.PI * 2 * j / 3000), row = Math.round(oy + p[1]); if (row >= 0 && row < CH && p[0] > edgeT[row]) edgeT[row] = p[0]; }
-              for (let row = 1; row < CH - 1; row++) if (!edgeT[row] && edgeT[row - 1] && row < yB) edgeT[row] = edgeT[row - 1];
-              const maxX = Math.ceil(Math.max(...edgeT)) + 2, x0 = Math.max(0, Math.floor(midX - maxX)), bw = Math.min(CW - x0, maxX * 2), y0 = Math.max(0, yT), bh = Math.min(CH - y0, yB - yT);
+              // which parts of the game's picture, over its breasts, are straps and which are solid
+              const half = plain ? 0 : strapHalf(src, im, x, y, B), strappy = half > 0 && half <= 8, STRAP_MAX = 6.5;   // a strap: no more than about 13 pixels across in the game
+              const M0 = chestMap(B, S2, GB, c, ox, oy, midX, ny, !strappy);
+              const rx0 = Math.max(1, Math.round(midX - GB.dx - GB.r * 1.6)), ry0 = Math.max(1, M0.yT - 2), rw = Math.min(CW - rx0 - 1, Math.round((GB.dx + GB.r * 1.6) * 2)), rh = Math.min(CH - ry0 - 1, Math.round(ny + M0.Rn) + 4 - ry0);
+              let strapMask = null, dist = null;
+              if (strappy && rw > 4 && rh > 4) {
+                const al = new Uint8Array(rw * rh); for (let j = 0; j < rh; j++) for (let i = 0; i < rw; i++) al[j * rw + i] = sp[((ry0 + j) * CW + rx0 + i) * 4 + 3];
+                dist = distMap(al, rw, rh);
+                let thick = Float32Array.from(dist), nxt = new Float32Array(dist.length);
+                for (let it = 0; it < 12; it++) { for (let yy = 1; yy < rh - 1; yy++) for (let xx = 1; xx < rw - 1; xx++) { const i = yy * rw + xx; if (!dist[i]) { nxt[i] = 0; continue; } nxt[i] = Math.max(thick[i], thick[i - 1], thick[i + 1], thick[i - rw], thick[i + rw]); } const sw = thick; thick = nxt; nxt = sw; }
+                strapMask = new Uint8Array(rw * rh); let any = 0;
+                for (let i = 0; i < strapMask.length; i++) if (dist[i] > 0 && thick[i] <= STRAP_MAX) { strapMask[i] = 1; any++; }
+                if (!any) strapMask = null;
+                // the straps come out of the picture the pixels are laid on from (their faint edge pixels with them)
+                if (strapMask) for (let j = 1; j < rh - 1; j++) for (let i = 1; i < rw - 1; i++) { const k = j * rw + i; if (strapMask[k] || (al[k] && !dist[k] && (strapMask[k - 1] || strapMask[k + 1] || strapMask[k - rw] || strapMask[k + rw]))) sp[((ry0 + j) * CW + rx0 + i) * 4 + 3] = 0; }
+              }
+              // 1. the solid parts, laid on a row at a time
+              const maxX = Math.ceil(Math.max(...M0.edgeT)) + 2, x0 = Math.max(0, Math.floor(midX - maxX)), bw = Math.min(CW - x0, maxX * 2), y0 = Math.max(0, M0.yT), bh = Math.min(CH - y0, M0.yB - M0.yT);
               if (bw > 0 && bh > 0) {
-                const out = g.createImageData(bw, bh), od = out.data, wgt = new Float32Array(bw * bh).fill(-1), grew = new Float32Array(bw * bh);
-                const easeRows = Math.max(6, (cy - yT) * 0.45);
-                for (let j = 0; j < bh; j++) {
-                  const qy = y0 + j, Xt = Math.max(edgeT[qy] || 0, 1);
-                  // which row of the game's: top to nipple line maps to top to nipple line, and the same below
-                  const yn = qy <= cy ? yT + (qy - yT) * (ny - yT) / Math.max(1, cy - yT) : ny + (qy - cy) * Rn / Math.max(1, yB - cy);
-                  const Xn = edgeN(yn), t = Math.min(1, (qy - yT) / easeRows), ease = 1 - t * t * (3 - 2 * t);   // 1 at the top (the game's own picture), 0 once we're on the breast
-                  const kx = Xn / Xt, ky = qy <= cy ? (ny - yT) / Math.max(1, cy - yT) : Rn / Math.max(1, yB - cy);
-                  for (let i = 0; i < bw; i++) {
-                    const qx = x0 + i, off = qx - midX; if (Math.abs(off) > Xt) continue;
-                    const fx = (1 - ease) * (midX + off * kx) + ease * qx, fy = (1 - ease) * yn + ease * qy;
-                    wgt[j * bw + i] = ease; grew[j * bw + i] = (1 / Math.sqrt(Math.max(0.01, kx * ky)) + Math.max(1 / Math.max(0.05, kx), 1 / Math.max(0.05, ky))) / 2;   // how much things grew here: between the average and the most
-                    const ix = Math.floor(fx), iy = Math.floor(fy); if (ix < 0 || iy < 0 || ix >= CW - 1 || iy >= CH - 1) continue;
+                const out = g.createImageData(bw, bh), od = out.data, hi = g.createImageData(bw, bh);
+                for (let j = 0; j < bh; j++) { const qy = y0 + j, R = M0.rowOf(qy);
+                  for (let i = 0; i < bw; i++) { const f = M0.back(x0 + i, qy, R); if (!f) continue; hi.data[(j * bw + i) * 4 + 3] = 255;
+                    const fx = f[0], fy = f[1], ix = Math.floor(fx), iy = Math.floor(fy); if (ix < 0 || iy < 0 || ix >= CW - 1 || iy >= CH - 1) continue;
                     const ax = fx - ix, ay = fy - iy, p00 = (iy * CW + ix) * 4, p10 = p00 + 4, p01 = p00 + CW * 4, p11 = p01 + 4, o4 = (j * bw + i) * 4;
                     const a00 = sp[p00 + 3] * (1 - ax) * (1 - ay), a10 = sp[p10 + 3] * ax * (1 - ay), a01 = sp[p01 + 3] * (1 - ax) * ay, a11 = sp[p11 + 3] * ax * ay, at = a00 + a10 + a01 + a11;
                     if (at < 1) continue;
-                    od[o4] = (sp[p00] * a00 + sp[p10] * a10 + sp[p01] * a01 + sp[p11] * a11) / at; od[o4 + 1] = (sp[p00 + 1] * a00 + sp[p10 + 1] * a10 + sp[p01 + 1] * a01 + sp[p11 + 1] * a11) / at; od[o4 + 2] = (sp[p00 + 2] * a00 + sp[p10 + 2] * a10 + sp[p01 + 2] * a01 + sp[p11 + 2] * a11) / at; od[o4 + 3] = at;
+                    od[o4] = (sp[p00] * a00 + sp[p10] * a10 + sp[p01] * a01 + sp[p11] * a11) / at; od[o4 + 1] = (sp[p00 + 1] * a00 + sp[p10 + 1] * a10 + sp[p01 + 1] * a01 + sp[p11 + 1] * a11) / at; od[o4 + 2] = (sp[p00 + 2] * a00 + sp[p10 + 2] * a10 + sp[p01 + 2] * a01 + sp[p11 + 2] * a11) / at; od[o4 + 3] = at; } }
+                const T = document.createElement("canvas"); T.width = bw; T.height = bh; T.getContext("2d").putImageData(out, 0, 0);
+                const hole = document.createElement("canvas"); hole.width = bw; hole.height = bh; hole.getContext("2d").putImageData(hi, 0, 0);
+                g.globalCompositeOperation = "destination-out"; g.drawImage(hole, x0, y0); g.globalCompositeOperation = "source-over";
+                g.drawImage(T, x0, y0);
+                // 2. the straps, drawn along their middle lines
+                if (strapMask) {
+                  const sk = middleLine(strapMask, rw, rh), pts = new Map(), want = 1.08 + 0.45 * S2.k;
+                  const at = (i, j) => { const k = j * rw + i; if (!sk[k]) return null; let p = pts.get(k); if (p === undefined) { const t = M0.fwd(rx0 + i, ry0 + j); if (t) { const d0 = Math.max(0.7, Math.min(STRAP_MAX, dist[k]) - 0.75) /* less the soft pixel each side of a drawn line, which isn't part of its width */, hw = d0 * (1 + (want - 1) * (1 - t[2]) * Math.min(1, Math.max(0, (d0 - 1.5) / 2)));   // a fine line stays fine; a proper strap gets a little wider on a bigger breast
+                      const lim = Math.max(0, t[3] - hw - 1), off = t[0] - midX;   // and all of it stays on the breast, right up to the edge but not over it
+                      p = { x: (t[2] > 0.5 ? t[0] : midX + Math.max(-lim, Math.min(lim, off))) - x0, y: t[1] - y0, hw }; } else p = null; pts.set(k, p); } return p; };
+                  // A middle line found pixel by pixel is a staircase, and carried across it's a wobble. Each point is eased
+                  // toward its neighbours along the line a few times over, which leaves the line where it was but smooth.
+                  for (let j = 1; j < rh - 1; j++) for (let i = 1; i < rw - 1; i++) at(i, j);
+                  for (let round = 0; round < 4; round++) { const moved = [];
+                    for (const [k, p] of pts) { if (!p) continue; let sx2 = 0, sy2 = 0, sh = 0, n = 0;
+                      for (const dk of [-rw - 1, -rw, -rw + 1, -1, 1, rw - 1, rw, rw + 1]) { const q = pts.get(k + dk); if (q && Math.hypot(q.x - p.x, q.y - p.y) < 14) { sx2 += q.x; sy2 += q.y; sh += q.hw; n++; } }
+                      if (n >= 2) moved.push([p, (p.x + sx2 / n) / 2, (p.y + sy2 / n) / 2, (p.hw + sh / n) / 2]); }
+                    for (const [p, nx2, ny2, nh] of moved) { p.x = nx2; p.y = ny2; p.hw = nh; } }
+                  const segs = [];
+                  for (let j = 1; j < rh - 1; j++) for (let i = 1; i < rw - 1; i++) { const p = at(i, j); if (!p) continue; let joined = false;
+                    for (const [di, dj] of [[1, 0], [0, 1], [1, 1], [-1, 1]]) { const q = at(i + di, j + dj); if (!q) continue; if (Math.hypot(q.x - p.x, q.y - p.y) > 14) continue; segs.push([p, q]); joined = true; }
+                    if (!joined && !sk[j * rw + i - 1] && !sk[(j - 1) * rw + i] && !sk[(j - 1) * rw + i - 1] && !sk[(j - 1) * rw + i + 1]) segs.push([p, p]); }
+                  if (segs.length) {
+                    const V = document.createElement("canvas"); V.width = bw; V.height = bh; const vg = V.getContext("2d");
+                    const tinted = !!(o && o.HexColor), col = ownColour(src, im), tone = (m) => "rgb(" + col.map((v) => Math.max(0, Math.min(255, Math.round(v * m)))).join(",") + ")";
+                    vg.lineCap = "round"; vg.lineJoin = "round";
+                    const pass = (grow, style) => { vg.strokeStyle = style; for (const [p, q] of segs) { vg.lineWidth = (p.hw + q.hw) + grow; vg.beginPath(); vg.moveTo(p.x, p.y); vg.lineTo(q.x + (p === q ? 0.01 : 0), q.y); vg.stroke(); } };
+                    pass(0.9, tone(tinted ? 0.34 : 0.32));   // the dark edge
+                    pass(0, tone(1));                         // the strap
+                    vg.globalCompositeOperation = "destination-in"; vg.drawImage(hole, 0, 0);   // (kept to our breast: nothing pokes past its edge)
+                    g.drawImage(V, x0, y0);
                   }
                 }
-                // a strap grown with the breast isn't a strap any more: pare it back from both edges, by as much as it grew there
-                let rimDark = null;
-                if (paring) {
-                  const al = new Uint8Array(bw * bh); for (let i = 0; i < al.length; i++) al[i] = od[i * 4 + 3];
-                  const d = distMap(al, bw, bh);
-                  // How thick is the strap RIGHT HERE, after it was laid on? (Laynie's third marks, Oct 13: the frame's outer
-                  // strap had gone fat, a bar had gone missing on the biggest size. A strap laid on sideways-stretched
-                  // skin gets fatter if it runs up and down and not if it runs across, so paring them all by one amount
-                  // left some fat and wore others away.) thick: half the strap's width at each spot, spread out from its
-                  // middle line a few pixels. Then every strap is pared to the SAME width, whichever way it runs, and
-                  // anything too thick to be a strap (a cup, a panel) isn't touched.
-                  let thick = Float32Array.from(d), nxt = new Float32Array(d.length);
-                  for (let it = 0; it < 10; it++) { for (let yy = 1; yy < bh - 1; yy++) for (let xx = 1; xx < bw - 1; xx++) { const i = yy * bw + xx; if (!al[i]) { nxt[i] = 0; continue; } nxt[i] = Math.max(thick[i], thick[i - 1], thick[i + 1], thick[i - bw], thick[i + bw]); } const sw = thick; thick = nxt; nxt = sw; }
-                  const body = ownColour(src, im);
-                  // (what's left after paring is the strap's middle line, and on a studded or shiny strap that's all studs and
-                  // shine: it came out pale and hollow. So the pared strap is mostly given the piece's own body colour back.)
-                  for (let i = 0; i < al.length; i++) { if (wgt[i] < 0 || !al[i] || thick[i] > 15) continue; // each strap is pared back to the width it had in the game (and a little over, for the bigger breast): a wide strap stays a wide one, a thin one thin
-                    const e = (thick[i] - Math.max(1.8, thick[i] * want / Math.max(1, grew[i]))) * (1 - wgt[i]); if (e <= 0.3) continue; const v = d[i] - e; if (v <= 0) { od[i * 4 + 3] = 0; continue; } if (v < 1) od[i * 4 + 3] = Math.round(od[i * 4 + 3] * v);
-                    const m = 0.6 * Math.min(1, e / 1.5); od[i * 4] = od[i * 4] * (1 - m) + body[0] * m; od[i * 4 + 1] = od[i * 4 + 1] * (1 - m) + body[1] * m; od[i * 4 + 2] = od[i * 4 + 2] * (1 - m) + body[2] * m; }
-                  rimDark = o && o.HexColor ? [70, 70, 70] : ownColour(src, im).map((v) => v * 0.3);
-                }
-                const T = document.createElement("canvas"); T.width = bw; T.height = bh; T.getContext("2d").putImageData(out, 0, 0);
-                const hole = document.createElement("canvas"); hole.width = bw; hole.height = bh; const hd = hole.getContext("2d"), hi = hd.createImageData(bw, bh);
-                for (let i = 0; i < wgt.length; i++) if (wgt[i] >= 0) hi.data[i * 4 + 3] = 255;
-                hd.putImageData(hi, 0, 0);
-                g.globalCompositeOperation = "destination-out"; g.drawImage(hole, x0, y0); g.globalCompositeOperation = "source-over";
-                if (rimDark) { const rc = document.createElement("canvas"); rc.width = bw; rc.height = bh; const rg = rc.getContext("2d");
-                  for (const [ddx, ddy] of [[-1, 0], [1, 0], [0, -1], [0, 1]]) rg.drawImage(T, ddx, ddy);
-                  rg.globalCompositeOperation = "source-in"; rg.fillStyle = "rgb(" + rimDark.map((v) => Math.round(v)).join(",") + ")"; rg.fillRect(0, 0, bw, bh);
-                  rg.globalCompositeOperation = "destination-in"; rg.drawImage(hole, 0, 0);
-                  g.drawImage(rc, x0, y0); }
-                g.drawImage(T, x0, y0);
               }
               if (BREAST.out.size > 60) BREAST.out.clear(); BREAST.out.set(key, c);
             }

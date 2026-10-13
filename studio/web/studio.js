@@ -456,7 +456,7 @@
   // Flat to R. The first six cups are the game's own chest sizes: picking one just changes the body. From DD up they're
   // drawn (breasts-drawing.js), over the game's biggest chest, standing and kneeling only for now. The game's nipples,
   // and whatever is worn on them, are lifted off where the game puts them and set down on the drawn ones.
-  const BREAST = { tuck: false, on: {}, free: false, holds: {}, holdSig: "", wear: {}, dress: true, cover: new Map(), cup: null, full: 1, hang: 1, apart: 1, x: 0, y: 0, nip: 1, nipY: 0, nipX: 0, cv: null, cvKey: "", halves: new Map(), out: new Map() };
+  const BREAST = { solid: {}, tuck: false, on: {}, free: false, holds: {}, holdSig: "", wear: {}, dress: true, cover: new Map(), cup: null, full: 1, hang: 1, apart: 1, x: 0, y: 0, nip: 1, nipY: 0, nipX: 0, cv: null, cvKey: "", halves: new Map(), out: new Map() };
   const BREAST_SLIDERS = [["full", "Fullness", 0.7, 1.4, 0.01], ["hang", "Weight (how low and heavy they hang)", 0, 2, 0.01], ["apart", "Apart / together", 0.6, 1.5, 0.01], ["x", "Left / right", -60, 60, 1], ["y", "Up / down", -80, 80, 1],
     ["nip", "Nipple size (and what's worn on them)", 0.4, 4, 0.05], ["nipY", "Nipples up / down", -80, 80, 1], ["nipX", "Nipples in / out", -60, 60, 1]];
   const NIP_GROUPS = new Set(["Nipples", "ItemNipples", "ItemNipplesPiercings"]);
@@ -751,7 +751,7 @@
               // the body's own outline, row by row, and where our two breasts are
               const prof = edgesOf(B.upperSrc), ux = MX + B.ux - x, bcy = MY + B.ry - y + S2.by, bcx = [midX + (B.rx - B.mid) - S2.bx, midX + (B.rx - B.mid) + S2.bx];
               const onBreast = (qx, qy) => { for (let k = 0; k < 2; k++) { const dx = qx - bcx[k], rxk = (k ? dx > 0 : dx < 0) ? S2.ro : S2.ri, dy = (qy - bcy) / (S2.rv + 2); if ((dx / (rxk + 2)) * (dx / (rxk + 2)) + dy * dy <= 1) return true; } return false; };
-              const x0 = Math.max(0, Math.floor(midX - 110 * sc)), bw = Math.min(CW - x0, Math.ceil(220 * sc)), y0 = Math.max(0, Math.floor(y1)), bh = yEnd - y0 + 1;
+              const x0 = Math.max(0, Math.floor(midX - 110 * sc)), bw = Math.min(CW - x0, Math.ceil(220 * sc)), y0 = Math.max(0, Math.floor(y1)), bh = Math.min(CH - 2, Math.max(yEnd, Math.floor(BREAST.solid[pk] ? Math.min(pb > 0 ? pb : flapEnd, MY + B.ry - y + S2.by + S2.rv * 2.4) : 0))) - y0 + 1;
               if (bw > 0 && bh > 0) {
                 const out = g.createImageData(bw, bh), od = out.data, hi = g.createImageData(bw, bh);
                 // Above the breasts the grown piece may run out past the side of the chest, to reach the top of a breast that's
@@ -761,6 +761,19 @@
                 const pj1 = Math.round(y1 - uyc), bodyHalf = prof && pj1 >= 0 && pj1 < prof.h && prof.L[pj1] >= 0 ? Math.max(midX - (ux + prof.L[pj1]), ux + prof.R[pj1] - midX) : 80;
                 const slopeEnd = bcy - S2.rv * 0.65, sideHalf = S2.bx + S2.ro * 0.76;   // (where the breast's own outline has come out to nearly its full width)
                 const slopeHalf = (qy) => { const t = Math.max(0, Math.min(1, (qy - y1) / Math.max(1, slopeEnd - y1))); return bodyHalf + (sideHalf - bodyHalf) * t * t * (3 - 2 * t); };
+                // THE MOULD, WITH THE SIZE-UP (Laynie, Oct 13: "why doesn't it use our 'mould to shape' fix in combination
+                // with the original conscious redraw?"). They'd been two separate things: the size-up for the chest, the
+                // mould for the belly. So a top was grown over the bust and then stopped, and under the bust the same top
+                // went straight back to the width of her ribs: a big bust on a narrow tube. Cloth doesn't do that. It
+                // hangs from the widest point of the bust and comes in gradually. So for a piece that's cloth right over
+                // the breasts (a top, a dress: not straps, not a bra), the rows from the middle of the bust down are
+                // MOULDED: the stretch of the piece across her body on each row is grown out to a line that runs from
+                // the side of the breast down to the body again, by the piece's hem or a little below the bust,
+                // whichever comes first. Same rows, same cloth, same print: only wider, the way the mould always did it.
+                const tentOn = !!BREAST.solid[pk], tEnd = tentOn ? Math.min(pb > 0 ? pb : flapEnd, bcy + S2.rv * 2.4) : 0;
+                const bodyHalfAt = (qy) => { const pj = Math.round(qy - uyc); return prof && pj >= 0 && pj < prof.h && prof.L[pj] >= 0 ? Math.max(midX - (ux + prof.L[pj]), ux + prof.R[pj] - midX) : 80; };
+                const tentTop = S2.bx + S2.ro * 0.96, tentBot = tentOn ? bodyHalfAt(tEnd) + 1 : 0;
+                const tentHalf = (qy) => { const t = Math.max(0, Math.min(1, (qy - bcy) / Math.max(1, tEnd - bcy))); return tentTop + (tentBot - tentTop) * Math.pow(t, 1.25); };
                 let yn = y1;
                 for (let j = 0; j < bh; j++) {
                   const qy = y0 + j;
@@ -778,12 +791,14 @@
                     // both white sleeves: Laynie, Oct 13, "those outfits look broken again"). And under the breasts it spans
                     // from one to the other: cloth pulled over two breasts is taut across the gap, it doesn't follow each
                     // one in underneath like paint on two balloons.
-                    const onB = onBreast(qx, qy), onBody = (!drape || qy <= bcy) && (prof ? (tl >= 0 && qx >= ux + tl && qx <= ux + tr) : Math.abs(qx - midX) <= 80);
-                    const bridge = !onB && qy > bcy && Math.abs(qx - midX) < S2.bx && qy <= bcy + S2.rv * (0.78 + 0.22 * Math.pow(Math.abs(qx - midX) / S2.bx, 2));
-                    const onSlope = !onB && !onBody && qy <= slopeEnd && Math.abs(qx - midX) <= slopeHalf(qy);
-                    if (!(onB || onBody || bridge || onSlope)) continue;
+                    const inRows = qy <= yEnd, under = tentOn && qy > bcy;
+                    const onB = inRows && onBreast(qx, qy), onBody = inRows && !under && (!drape || qy <= bcy) && (prof ? (tl >= 0 && qx >= ux + tl && qx <= ux + tr) : Math.abs(qx - midX) <= 80);
+                    const bridge = inRows && !onB && qy > bcy && Math.abs(qx - midX) < S2.bx && qy <= bcy + S2.rv * (0.78 + 0.22 * Math.pow(Math.abs(qx - midX) / S2.bx, 2));
+                    const onSlope = inRows && !onB && !onBody && qy <= slopeEnd && Math.abs(qx - midX) <= slopeHalf(qy);
+                    const th = under && qy <= tEnd ? tentHalf(qy) : 0, bh2 = th ? bodyHalfAt(qy) : 0, onTent = th > bh2 + 1 && !onB && !bridge && Math.abs(qx - midX) <= th;
+                    if (!(onB || onBody || bridge || onSlope || onTent)) continue;
                     const o4 = (j * bw + i) * 4; if (!onSlope) hi.data[o4 + 3] = 255;
-                    const fx = midX + (qx - midX) / sg, fy = yn, ix = Math.floor(fx), iy = Math.floor(fy); if (ix < 0 || iy < 0 || ix >= CW - 1 || iy >= CH - 1) continue;
+                    const fx = onTent ? midX + (qx - midX) * bh2 / th : midX + (qx - midX) / sg, fy = onTent ? qy : yn, ix = Math.floor(fx), iy = Math.floor(fy); if (ix < 0 || iy < 0 || ix >= CW - 1 || iy >= CH - 1) continue;
                     const ax = fx - ix, ay = fy - iy, p00 = (iy * CW + ix) * 4, p10 = p00 + 4, p01 = p00 + CW * 4, p11 = p01 + 4;
                     const a00 = sp[p00 + 3] * (1 - ax) * (1 - ay), a10 = sp[p10 + 3] * ax * (1 - ay), a01 = sp[p01 + 3] * (1 - ax) * ay, a11 = sp[p11 + 3] * ax * ay, at = a00 + a10 + a01 + a11;
                     if (at < 1) continue;
@@ -801,8 +816,8 @@
                 const atop = (draw) => { g.save(); g.globalCompositeOperation = "source-atop"; draw(); g.restore(); };
                 const ell = (k, grow, dy) => { g.beginPath(); g.ellipse(bcx[k] + (k ? 1 : -1) * (S2.ro - S2.ri) / 2, bcy + (dy || 0), (S2.ro + S2.ri) / 2 + grow, S2.rv + grow, 0, 0, Math.PI * 2); };
                 // the shadow they throw on the piece below them
-                atop(() => { g.filter = "blur(5px)"; g.fillStyle = "rgba(0,0,0,0.30)"; for (let k = 0; k < 2; k++) { ell(k, -2, 7 + S2.rv * 0.06); g.fill(); } });
                 g.drawImage(T, x0, y0);
+                atop(() => { g.filter = "blur(5px)"; g.fillStyle = "rgba(0,0,0,0.26)"; for (let k = 0; k < 2; k++) { ell(k, -2, 7 + S2.rv * 0.06); g.fill(); } });
                 atop(() => { for (let k = 0; k < 2; k++) { g.save(); ell(k, 1, 0); g.clip();
                     const under = g.createLinearGradient(0, bcy + S2.rv * 0.05, 0, bcy + S2.rv); under.addColorStop(0, "rgba(0,0,0,0)"); under.addColorStop(1, "rgba(0,0,0,0.34)");
                     g.fillStyle = under; g.fillRect(0, bcy, CW, S2.rv + 4);
@@ -891,7 +906,7 @@
               if (!done && gname === "Nipples") { held.push([name, src, x, y, o]); return; }
               if (done && NIP_GROUPS.has(gname)) { try { if (nipDraw(name, src, x, y, o)) return; } catch (e) { console.warn("[studio] nipples:", e); } }
               if (done && chestSlot(gname) && !isMoulded(src)) { const piece = pieceOf(src), how = (piece && BREAST.wear[piece.key]) || "";
-                try { const im0 = piece && ctx.breast && mouldImg(src); if (im0 && chestCover(src, im0, x, y, ctx.breast, true) >= 0.05) ctx.seen[piece.key] = true; if (im0 && chestCover(src, im0, x, y, ctx.breast, false) >= 0.05) ctx.seen["on:" + piece.key] = true; } catch (e) { /* only a measurement */ }
+                try { const im0 = piece && ctx.breast && mouldImg(src); if (im0 && chestCover(src, im0, x, y, ctx.breast, true) >= 0.05) ctx.seen[piece.key] = true; if (im0 && chestCover(src, im0, x, y, ctx.breast, false) >= 0.05) ctx.seen["on:" + piece.key] = true; if (im0 && chestCover(src, im0, x, y, ctx.breast, false) >= 0.6) ctx.seen["solid:" + piece.key] = true; } catch (e) { /* only a measurement */ }
                 try { if (how === "behind") { if (handDraw(name, src, x, y, o)) return; }
                   else if (how !== "plain" && BREAST.dress) { if (dressDraw(name, src, x, y, o)) return; } } catch (e) { console.warn("[studio] chest wear:", e); } }
               // Hands, and what's worn on the wrists and arms. They're the game's own pictures and they stay WHOLE: either in
@@ -921,7 +936,7 @@
       const out = game(C, cb);
       if (finish) { try { finish(); } catch (e) { console.warn("[studio] belly:", e); } }
       if (finish && seenNow && handFNow && handFNow.v != null) { const behind = handFNow.v >= 0.6; if (behind !== !!BREAST.handsBehind) { BREAST.handsBehind = behind; clearTimeout(BREAST.holdT); BREAST.holdT = setTimeout(bellyDraw, 40); } }
-      if (finish && seenNow) { const sig = Object.keys(seenNow).sort().join("|"); if (sig !== BREAST.holdSig) { BREAST.holds = seenNow; BREAST.on = {}; for (const k of Object.keys(seenNow)) if (k.startsWith("on:")) BREAST.on[k.slice(3)] = true; BREAST.holdSig = sig; clearTimeout(BREAST.holdT); BREAST.holdT = setTimeout(bellyDraw, 40); } }
+      if (finish && seenNow) { const sig = Object.keys(seenNow).sort().join("|"); if (sig !== BREAST.holdSig) { BREAST.holds = seenNow; BREAST.on = {}; for (const k of Object.keys(seenNow)) if (k.startsWith("on:")) BREAST.on[k.slice(3)] = true; BREAST.solid = {}; for (const k of Object.keys(seenNow)) if (k.startsWith("solid:")) BREAST.solid[k.slice(6)] = true; BREAST.holdSig = sig; clearTimeout(BREAST.holdT); BREAST.holdT = setTimeout(bellyDraw, 40); } }
       return out;
     };
   }

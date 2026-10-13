@@ -123,7 +123,7 @@ the game's pictures into the drawing.
 - **Weight.** The bigger, the longer the slope down from the chest, the lower the fullness sits, the wider they
   swing and the lower and further out the nipples ride. The *Weight* slider turns that up or down for any size.
 - **Nipples and nipple gear** are moved from where the game draws them onto the drawn breasts, and grow a little.
-- Standing and kneeling only for now. Bras and chest gear are not fitted to them yet.
+- Every pose (step 21). On all fours they hang down and rest flat on the ground; hogtied is as standing.
 - *Save the breasts* writes `fits/breasts.json`.
 
 ## Step 9: over or under

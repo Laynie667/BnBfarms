@@ -427,14 +427,15 @@
     StarHarnessBra: { ring: 4, cross: 3.5, over: 3.5 }, StuddedHarness: { ring: 8, under: 8 }, LeatherBreastBinder: { over: 10, under: 10, centre: 6 },
     LeatherHarness: { ring: 6, centre: 5, under: 6 }, LeatherStrapHarness: { ring: 6, centre: 5, under: 6 }, HarnessBra1: { ring: 5, under: 6 },
   };
+  const GAME_BREAST_ALLFOURS = { dx: 33, y: 288, r: 24 };
+  const gameBreast = (B) => (B.pose === "AllFours" ? GAME_BREAST_ALLFOURS : GAME_BREAST);
   const GAME_BREAST = { dx: 42, y: 330, r: 41 };   // the game's biggest chest, in its upper-body picture: each breast's middle is this far out from the centre line, this far down, and about this big
   const upperName = () => { const it = bodyItem("BodyUpper"); return it && it.Asset ? it.Asset.Name : ""; };
   // the drawn breasts to show right now, or null (a cup the game draws itself, another chest picked since, or a pose they aren't drawn in)
-  function breastNow() { if (!window.FarmBreasts || BREAST.cup == null || BREAST.cup < FarmBreasts.DRAWN_FROM) return null; if (upperName() !== "XLarge" || poseKey() !== "std") return null; return BREAST; }
+  function breastNow() { if (!window.FarmBreasts || BREAST.cup == null || BREAST.cup < FarmBreasts.DRAWN_FROM) return null; if (upperName() !== "XLarge") return null; return BREAST; }   // every pose (Laynie, Oct 13: "need to make sure it also works for all positions too")
   function setCup(i) {
     BREAST.cup = i;
     setBody("BodyUpper", i < FarmBreasts.DRAWN_FROM ? FarmBreasts.NATIVE[i] : "XLarge");
-    if (i >= FarmBreasts.DRAWN_FROM && poseKey() !== "std") say("From DD up they're drawn, and so far only standing and kneeling. In this pose you'll see the game's biggest chest.");
     bellyDraw();
   }
   // which cup is showing: the one picked, or whichever of the game's six the body is
@@ -545,11 +546,34 @@
             }
             if (br) {
               // over the belly: they hang in front of it
-              const key = [br.cup, br.full, br.hang, br.apart].join(",") + "|" + bellySkin(upper[2], upper[3], "").join(",");
-              if (BREAST.cvKey !== key) { BREAST.cv = FarmBreasts.canvas(FarmBreasts.shape(br.cup, br), bellySkin(upper[2], upper[3], "")); BREAST.cvKey = key; }
-              const bc = BREAST.cv, rx = upper[0] + 250 + br.x, ry = upper[1] + FarmBreasts.ROOT_Y + br.y;
+              const key = [br.cup, br.full, br.hang, br.apart].join(",") + "|" + bellySkin(upper[2], upper[3], FarmBelly.bellyPose(upper[2])).join(",");
+              if (BREAST.cvKey !== key) { BREAST.cv = FarmBreasts.canvas(FarmBreasts.shape(br.cup, br), bellySkin(upper[2], upper[3], FarmBelly.bellyPose(upper[2]))); BREAST.cvKey = key; }
+              // Hogtied, the chest is where it is standing. On all fours the game shows her from the front, chest under the
+              // head and between the arms: they hang straight down from it, and whatever reaches the ground rests on it,
+              // flat underneath. The hands are in front of them there, not behind.
+              const bpose = FarmBelly.bellyPose(upper[2]), rx = upper[0] + 250 + br.x, ry = upper[1] + FarmBreasts.ROOT_Y + br.y, ground = upper[1] + 398;
+              let bc = BREAST.cv;
+              if (bpose === "AllFours" && ry - bc.ay + bc.height > ground) {
+                if (BREAST.flatKey !== key + "|" + Math.round(ry)) {
+                  const fc = document.createElement("canvas"); fc.width = bc.width; fc.height = bc.height; const fg = fc.getContext("2d"), cut = Math.round(ground - (ry - bc.ay));
+                  fg.drawImage(bc, 0, 0); fg.clearRect(0, cut, fc.width, fc.height - cut);
+                  // the line where they meet the ground
+                  const row = fg.getImageData(0, Math.max(0, cut - 2), fc.width, 1).data; let x0 = -1, x1 = -1; for (let i = 0; i < fc.width; i++) if (row[i * 4 + 3] > 120) { if (x0 < 0) x0 = i; x1 = i; }
+                  if (x0 >= 0) { fg.strokeStyle = "rgba(70,40,36,0.75)"; fg.lineWidth = 2; fg.lineCap = "round"; fg.beginPath(); fg.moveTo(x0 + 2, cut - 1); fg.lineTo(x1 - 2, cut - 1); fg.stroke(); }
+                  fc.ax = bc.ax; fc.ay = bc.ay; fc.nips = bc.nips; fc.mask = bc.mask; BREAST.flat = fc; BREAST.flatKey = key + "|" + Math.round(ry);
+                }
+                bc = BREAST.flat;
+              }
               real.drawImage(bc, rx - bc.ax, ry - bc.ay, {}); if (typeof real.drawImageBlink === "function") real.drawImageBlink(bc, rx - bc.ax, ry - bc.ay, {});
-              ctx.breast = { S: FarmBreasts.shape(br.cup, br), rx, ry, uy: upper[1], mask: bc.mask, mx: rx - bc.ax, my: ry - bc.ay, nips: bc.nips.map((p, i) => [rx + p[0] + (i ? 1 : -1) * br.nipX, ry + p[1] + br.nipY]), k: FarmBreasts.shape(br.cup, br).k, kN: (1 + 0.45 * FarmBreasts.shape(br.cup, br).k) * br.nip, sig: key + "|" + Math.round(rx) + "," + Math.round(ry) + "|" + [br.nip, br.nipX, br.nipY].join(","), mid: upper[0] + 250 };
+              ctx.breast = { pose: bpose, ground: bpose === "AllFours" ? ground : Infinity, S: FarmBreasts.shape(br.cup, br), rx, ry, uy: upper[1], mask: bc.mask, mx: rx - bc.ax, my: ry - bc.ay, nips: bc.nips.map((p, i) => [rx + p[0] + (i ? 1 : -1) * br.nipX, ry + p[1] + br.nipY]), k: FarmBreasts.shape(br.cup, br).k, kN: (1 + 0.45 * FarmBreasts.shape(br.cup, br).k) * br.nip, sig: key + "|" + Math.round(rx) + "," + Math.round(ry) + "|" + [br.nip, br.nipX, br.nipY].join(","), mid: upper[0] + 250 };
+              // (a pose where the game paints the nipples into the body itself, all fours, gives us none to move: ours then)
+              if (!held.length) {
+                const B = ctx.breast, sk = bellySkin(upper[2], upper[3], bpose), rad = 7 * B.kN, nc = document.createElement("canvas"); nc.width = nc.height = Math.ceil(rad * 2 + 4);
+                const ng = nc.getContext("2d"), gr = ng.createRadialGradient(nc.width / 2, nc.height / 2, 0, nc.width / 2, nc.height / 2, rad), tone = (m, a) => "rgba(" + Math.round(Math.min(255, sk[0] * m)) + "," + Math.round(sk[1] * 0.62 * m) + "," + Math.round(sk[2] * 0.62 * m) + "," + a + ")";
+                gr.addColorStop(0, tone(0.92, 1)); gr.addColorStop(0.3, tone(1, 0.95)); gr.addColorStop(0.75, tone(1.02, 0.8)); gr.addColorStop(1, tone(1.02, 0));
+                ng.fillStyle = gr; ng.beginPath(); ng.arc(nc.width / 2, nc.height / 2, rad, 0, Math.PI * 2); ng.fill();
+                for (const p of B.nips) if (p[1] + rad < B.ground) { real.drawImage(nc, p[0] - nc.width / 2, p[1] - nc.height / 2, {}); if (typeof real.drawImageBlink === "function") real.drawImageBlink(nc, p[0] - nc.width / 2, p[1] - nc.height / 2, {}); }
+              }
               for (const h of held.splice(0)) { try { if (!nipDraw(...h)) real[h[0]](h[1], h[2], h[3], h[4]); } catch (e) { console.warn("[studio] nipples:", e); } }
             }
           };
@@ -567,8 +591,8 @@
             const key = src + "|" + Math.round(x) + "," + Math.round(y); let v = BREAST.cover.get(key); if (v != null) return v;
             const w = im.naturalWidth, h = im.naturalHeight, c = document.createElement("canvas"); c.width = w; c.height = h;
             const g = c.getContext("2d", { willReadFrequently: true }); g.drawImage(im, 0, 0);
-            const d = g.getImageData(0, 0, w, h).data, R = GAME_BREAST.r; let hit = 0, all = 0;
-            for (const sd of [-1, 1]) { const cx = Math.round(B.mid + sd * GAME_BREAST.dx - x), cy = Math.round(B.uy + GAME_BREAST.y - y);
+            const GB = gameBreast(B), d = g.getImageData(0, 0, w, h).data, R = GB.r; let hit = 0, all = 0;
+            for (const sd of [-1, 1]) { const cx = Math.round(B.mid + sd * GB.dx - x), cy = Math.round(B.uy + GB.y - y);
               for (let j = -R; j <= R; j += 2) for (let i = -R; i <= R; i += 2) { if (i * i + j * j > R * R) continue; all++; const px = cx + i, py = cy + j; if (px >= 0 && py >= 0 && px < w && py < h && d[(py * w + px) * 4 + 3] > 60) hit++; } }
             v = all ? hit / all : 0; BREAST.cover.set(key, v); return v;
           };
@@ -586,12 +610,12 @@
               // take the piece off where our breasts are…
               g.globalCompositeOperation = "destination-out"; for (const sd of [-1, 1]) { outline(sd); g.fill(); } g.globalCompositeOperation = "source-over";
               // …and put back what covered each of the game's breasts, grown to ours
-              const sx = S2.r * 1.06 / GAME_BREAST.r, sy = S2.r * (1 + S2.sag) / GAME_BREAST.r;
+              const GB = gameBreast(B), sx = S2.r * 1.06 / GB.r, sy = S2.r * (1 + S2.sag) / GB.r;
               for (const sd of [-1, 1]) {
                 g.save();
                 g.beginPath(); if (sd < 0) g.rect(0, 0, midX, c.height); else g.rect(midX, 0, c.width - midX, c.height); g.clip();   // each to its own side of the breastbone
                 outline(sd); g.clip();
-                g.translate(ox + sd * S2.bx, oy + S2.by); g.scale(sx, sy); g.translate(-(midX + sd * GAME_BREAST.dx), -(MY + B.uy + GAME_BREAST.y - y));
+                g.translate(ox + sd * S2.bx, oy + S2.by); g.scale(sx, sy); g.translate(-(midX + sd * GB.dx), -(MY + B.uy + GB.y - y));
                 g.drawImage(im, MX, MY);
                 g.restore();
               }
@@ -674,7 +698,7 @@
                 try { if (how === "behind") { if (handDraw(name, src, x, y, o)) return; }
                   else if (how === "" && piece && STRAPS[piece.name] && BREAST.dress) { if (strapDraw(name, src, x, y, o, piece)) return; }
                   else if (how !== "plain" && BREAST.dress) { if (dressDraw(name, src, x, y, o)) return; } } catch (e) { console.warn("[studio] chest wear:", e); } }
-              if (done && HAND_GROUPS.has(gname)) { try { if (handDraw(name, src, x, y, o)) return; } catch (e) { console.warn("[studio] hands:", e); } } }
+              if (done && HAND_GROUPS.has(gname) && ctx.breast && ctx.breast.pose !== "AllFours") { try { if (handDraw(name, src, x, y, o)) return; } catch (e) { console.warn("[studio] hands:", e); } } }
             let drawn = false;
             try { if (ctx.belly && !fit.behind && typeof src === "string") { const q = isMoulded(src), m = q && mouldCanvas(src, x, y, ctx, q.key, q.mode); if (m) { real[name](m, x - MOULD.M, y, o); drawn = true; } } } catch (e) { console.warn("[studio] mould:", e); }
             if (!drawn) real[name](src, x, y, o);

@@ -641,9 +641,12 @@
               const g = c.getContext("2d", { willReadFrequently: true }), ox = MX + B.rx - x, oy = MY + B.ry - y, midX = MX + B.mid - x;
               g.drawImage(im, MX, MY);
               const CW = c.width, CH = c.height, sp = g.getImageData(0, 0, CW, CH).data;
-              const Rn = GB.r * 1.2, ny = MY + B.uy + GB.y - y, cy = oy + S2.by;                     // the game's breast (with the straps round it), and the middle of ours
+              const Rn = GB.r * 1.12, An = GB.r * 0.86, ny = MY + B.uy + GB.y - y, cy = oy + S2.by;                     // the game's breast (with the straps round it), and the middle of ours
               const yT = Math.round(ny - Rn), yB = Math.round(cy + S2.r * (1 + S2.sag)) + 1;         // top (the same line in both) and our underside
-              const edgeN = (yn) => GB.dx + Math.sqrt(Math.max(0, Rn * Rn - (yn - ny) * (yn - ny)));   // the game's outer edge on a row, out from the breastbone
+              // (Laynie's second marks, Oct 13: every strap and cup edge sat INSIDE our outline, short of it. I'd taken the game's
+              // breast for a circle as wide as it is tall. It isn't: from its middle it reaches much less far out to the side
+              // than it does down. An: how far out to the side, Rn: how far up and down. Measured off the game's picture.)
+              const edgeN = (yn) => GB.dx + An * Math.sqrt(Math.max(0, 1 - ((yn - ny) / Rn) * ((yn - ny) / Rn)));   // the game's outer edge on a row, out from the breastbone
               // our outer edge on each row
               const edgeT = new Float32Array(CH);
               for (let j = 0; j <= 3000; j++) { const p = FarmBreasts.point(S2, 1, Math.PI * 2 * j / 3000), row = Math.round(oy + p[1]); if (row >= 0 && row < CH && p[0] > edgeT[row]) edgeT[row] = p[0]; }

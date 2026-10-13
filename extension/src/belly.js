@@ -10,6 +10,7 @@
    right after the lower body is drawn, read the skin colour off what was just painted, and paint the belly there.
 */
 const W = window;
+const SKIN_TOP = 12;                 // the game's drawing order: everything up to here is skin (the body, nipples, pussy or cock)
 let trial = 0;                       // 0 off · 1 small · 2 medium · 3 large
 const SIZES = [null, { rx: 54, ry: 50 }, { rx: 76, ry: 72 }, { rx: 100, ry: 96 }];
 const FALLBACK = { White: [236, 204, 196], Asian: [232, 200, 164], Black: [120, 86, 70] };
@@ -105,27 +106,35 @@ function hookBelly(mod) {
   if (hooked || !mod) return; hooked = true;
   try {
     mod.hookFunction("CommonDrawAppearanceBuild", 1, (args, next) => {
+      let finish = null;
       try {
         const C = args[0], cb = args[1];
         if (trial && C && W.Player && C.MemberNumber === W.Player.MemberNumber && cb && typeof cb.drawImage === "function") {
-          let upper = null, done = false;
-          const after = (src, x, y) => {
-            if (done || typeof src !== "string") return;
-            if (src.includes("/BodyUpper/")) upper = [x, y];
-            if (src.includes("/BodyLower/") && upper) {
-              done = true;
-              const S = SIZES[trial], cv = bellyPicture(trial, skinFor(C, upper[0], upper[1]));   // { url, width, height }: a picture the game can cache by name
-              // centred on the navel of the upper-body picture, sittin' lower as it gets bigger
-              const dx = upper[0] + 250 - cv.width / 2, dy = upper[1] + 432 + S.ry * 0.22 - cv.height / 2;
-              cb.drawImage(cv.url, dx, dy, {});
-              if (typeof cb.drawImageBlink === "function") cb.drawImageBlink(cv.url, dx, dy, {});
-            }
+          // WHERE in the stack it goes (Oct 12, seen live: "the layers between the legs and belly clip now and then").
+          // The game draws skin first, in this order: chest and arms (7), marks on the skin (8), hips and legs (9), nipples (11),
+          // what's between the legs (12). Clothes and gear come after (13 and up). The belly used to go in right after the legs,
+          // so the pussy or cock was painted over the bottom of it. Now it waits for all the skin: it goes in just before the
+          // first thing that isn't skin, or at the very end on a bare body.
+          let upper = null, lower = false, done = false;
+          const prio = (src) => { const m = //Assets/[^/]+/([^/]+)//.exec(src); if (!m) return 99; try { const g = W.AssetGroupGet && W.AssetGroupGet(C.AssetFamily, m[1]); return g && typeof g.DrawingPriority === "number" ? g.DrawingPriority : 99; } catch (e) { return 99; } };
+          const paint = () => {
+            if (done || !upper || !lower) return; done = true;
+            const S = SIZES[trial], cv = bellyPicture(trial, skinFor(C, upper[0], upper[1]));   // { url, width, height }: a picture the game can cache by name
+            // centred on the navel of the upper-body picture, sittin' lower as it gets bigger
+            const dx = upper[0] + 250 - cv.width / 2, dy = upper[1] + 432 + S.ry * 0.22 - cv.height / 2;
+            cb.drawImage(cv.url, dx, dy, {});
+            if (typeof cb.drawImageBlink === "function") cb.drawImageBlink(cv.url, dx, dy, {});
           };
-          const wrap = (name) => (typeof cb[name] === "function" ? (src, x, y, o) => { cb[name](src, x, y, o); try { if (!/Blink$/.test(name)) after(src, x, y); } catch (e) { console.warn("[Farmhand Companion] belly:", e); } } : cb[name]);
+          const before = (src) => { if (!done && lower && typeof src === "string" && prio(src) > SKIN_TOP) paint(); };
+          const after = (src, x, y) => { if (typeof src !== "string") return; if (src.includes("/BodyUpper/")) upper = [x, y]; if (src.includes("/BodyLower/")) lower = true; };
+          const wrap = (name) => (typeof cb[name] === "function" ? (src, x, y, o) => { try { before(src); } catch (e) { console.warn("[Farmhand Companion] belly:", e); } cb[name](src, x, y, o); try { after(src, x, y); } catch (e) { console.warn("[Farmhand Companion] belly:", e); } } : cb[name]);
           args[1] = Object.assign({}, cb, { drawImage: wrap("drawImage"), drawImageColorize: wrap("drawImageColorize") });
+          finish = paint;   // (a bare body: nothin' comes after the skin, so it goes in at the very end)
         }
       } catch (e) { console.warn("[Farmhand Companion] belly hook:", e); }
-      return next(args);
+      const out = next(args);   // the game's own drawing, called once, whatever happened above
+      if (finish) { try { finish(); } catch (e) { console.warn("[Farmhand Companion] belly:", e); } }
+      return out;
     });
   } catch (e) { console.warn("[Farmhand Companion] belly test unavailable:", e); }
 }

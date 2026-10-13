@@ -13,7 +13,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 | Map tools, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.3** |
 | Dairy | `farmhand-dairy.user.js` | the bot's PC | **1.0.2** |
 | Shows | `farmhand-shows.user.js` | the bot's PC | **1.0.4** |
-| Farmhand Companion | `farmhand-companion.user.js` | each player | **0.16.5** |
+| Farmhand Companion | `farmhand-companion.user.js` | each player | **0.16.6** |
 | Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.4** |
 
 ## Sending a watch report
@@ -23,6 +23,8 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 - Running the watcher on more than one game at once (the bot, yours, a tester's) lets Claude line them up into one timeline.
 
 ## Latest changes (newest first)
+
+- **Companion 0.16.6: the belly test sits above all the skin.** Seen live: the layers between the legs and the belly clipped now and then. The belly was drawn right after the legs, so what the game draws next on the skin (nipples, then the pussy or cock) was painted over the bottom of it. It now waits until every skin layer is down and goes in just before the first piece of clothing or gear.
 
 - **Companion 0.16.5: the belly test no longer slows the map.** Seen live on 0.16.4: the belly draws, layers under clothes and changes size, but the map loaded much slower. The test was reading the skin colour back off the screen every time the character was redrawn, which stalls the graphics card. It now reads it once per body and skin colour and keeps it. Still open: the shape needs work, and it only fits the standing pose.
 

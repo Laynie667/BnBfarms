@@ -1,0 +1,39 @@
+{
+ "v": 1,
+ "saved": "2026-10-13T03:42:43.859Z",
+ "fits": {
+  "std": {
+   "on": true,
+   "rx": 92,
+   "ry": 112,
+   "sag": 0.28,
+   "x": 0,
+   "y": -20,
+   "behind": false,
+   "flat": false,
+   "cut": 0.74
+  },
+  "AllFours": {
+   "on": false,
+   "rx": 70,
+   "ry": 80,
+   "sag": 0.22,
+   "x": 0,
+   "y": -60,
+   "behind": true,
+   "flat": false,
+   "cut": 0.74
+  },
+  "Hogtied": {
+   "on": false,
+   "rx": 70,
+   "ry": 80,
+   "sag": 0.22,
+   "x": 0,
+   "y": -75,
+   "behind": true,
+   "flat": false,
+   "cut": 0.74
+  }
+ }
+}

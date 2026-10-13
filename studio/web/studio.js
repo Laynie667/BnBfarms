@@ -5,6 +5,8 @@
 
    Step 1: a character on screen · paste an outfit code and see it worn · body size, skin, pose · copy the code back out.
    Step 2: pick any item from any slot and try it on · colour it · see what's worn and take pieces off.
+   Step 3: the belly, drawn with the Companion's own belly code · sliders for shape and place · its own fit for each
+           pose · saved to studio/fits/belly.json.
    The codes are the ones WCE and BCX export: the outfit's list of items as JSON, packed with LZString to base64
    (a plain JSON list is taken too).
 
@@ -55,7 +57,7 @@
   const POSES = [["Arms", ["BaseUpper", "Yoked", "OverTheHead", "BackBoxTie", "BackElbowTouch", "BackCuffs"]], ["Legs", ["BaseLower", "Kneel", "KneelingSpread", "LegsClosed", "Spread"]], ["Whole body", ["AllFours", "Hogtied"]]];
   function setPose(name) {
     try { PoseSetActive(S.C, name, true, false); } catch (e) { say("The game wouldn't take that pose: " + (e && e.message || e), true); }
-    redraw();
+    redraw(); if (BELLY.fill) BELLY.fill();
   }
   const poseOn = (name) => { const p = S.C.ActivePose || S.C.Pose || []; return Array.isArray(p) ? p.includes(name) : Object.values(S.C.ActivePoseMapping || {}).includes(name); };
 
@@ -104,6 +106,102 @@
       list.length ? "" : $("p", { className: "note", textContent: "Bare." }));
   }
 
+  // ── the belly ──
+  // A fit for each pose: where it sits and what shape it is. "std" is standing, kneeling and every arms pose (the torso
+  // is in the same place in all of them). Saved to studio/fits/belly.json by the Save button.
+  const POSE_KEYS = { std: "Standing, kneeling, arms poses", AllFours: "All fours", Hogtied: "Hogtied" };
+  const FIT0 = () => ({ on: false, rx: 70, ry: 80, sag: 0.22, x: 0, y: 0, behind: false, flat: false, cut: 0.74 });
+  const BELLY = { fits: { std: FIT0(), AllFours: Object.assign(FIT0(), { behind: true, y: -60 }), Hogtied: Object.assign(FIT0(), { behind: true, y: -75 }) }, skin: new Map() };
+  const SLIDERS = [["rx", "Width", 20, 170, 1], ["ry", "Height", 20, 190, 1], ["sag", "Hang (how low the weight sits)", 0, 0.5, 0.01], ["x", "Left / right", -120, 120, 1], ["y", "Up / down", -200, 200, 1], ["cut", "Ground line (when pressed flat)", 0.2, 1, 0.01]];
+  const poseKey = () => { const m = S.C && S.C.PoseMapping || {}; const all = Object.values(m).concat(S.C && S.C.Pose || []); return all.includes("AllFours") ? "AllFours" : all.includes("Hogtied") ? "Hogtied" : "std"; };
+  const fitNow = () => BELLY.fits[poseKey()];
+  // the body's own colour, out of its picture (and the game's tint for a custom colour), as the Companion works it out
+  function bellySkin(src, hex, pose) {
+    const key = src + "|" + (hex || ""), v = BELLY.skin.get(key);
+    if (Array.isArray(v)) return v;
+    const guess = /_Black\./.test(src) ? FarmBelly.FALLBACK.Black : /_Asian\./.test(src) ? FarmBelly.FALLBACK.Asian : FarmBelly.FALLBACK.White;
+    if (!v) {
+      BELLY.skin.set(key, "loading");
+      const img = new Image();
+      img.onload = () => {
+        let c = guess;
+        try {
+          const at = FarmBelly.skinPatch(pose), cv = document.createElement("canvas"); cv.width = 48; cv.height = 40;
+          const g = cv.getContext("2d"); g.drawImage(img, -at[0], -at[1]);
+          const d = g.getImageData(0, 0, 48, 40).data, good = [];
+          for (let i = 0; i < d.length; i += 4) if (d[i + 3] > 200 && d[i] + d[i + 1] + d[i + 2] > 90 && Math.min(d[i], d[i + 1], d[i + 2]) < 238) good.push([d[i], d[i + 1], d[i + 2]]);
+          if (good.length >= 40) { good.sort((m, n) => (m[0] + m[1] + m[2]) - (n[0] + n[1] + n[2])); const p = good[Math.floor(good.length * 0.7)]; c = hex ? [1, 3, 5].map((i) => Math.min(255, parseInt(hex.slice(i, i + 2), 16) * (p[0] + p[1] + p[2]) / 383)) : p; }
+        } catch (e) { /* keep the guess */ }
+        BELLY.skin.set(key, c); try { CharacterLoadCanvas(S.C); } catch (e) { /* next redraw */ }
+      };
+      img.onerror = () => BELLY.skin.set(key, guess);
+      img.src = src;
+    }
+    return guess;
+  }
+  // step into the game's drawing of our character and lay the belly in: after all the skin, or before the upper body
+  function hookBelly() {
+    const game = CommonDrawAppearanceBuild;
+    CommonDrawAppearanceBuild = function (C, cb) {
+      let finish = null;
+      try {
+        const fit = C === S.C ? fitNow() : null, real = cb;   // real: the game's own callbacks (the wrapped set below must never call itself)
+        if (fit && fit.on && cb && typeof cb.drawImage === "function") {
+          let upper = null, lower = false, done = false;
+          const prio = (src) => { const m = new RegExp("/Assets/[^/]+/([^/]+)/").exec(src); const g = m && AssetGroupGet(C.AssetFamily, m[1]); return g && typeof g.DrawingPriority === "number" ? g.DrawingPriority : 99; };
+          const paint = () => {
+            if (done || !upper) return; done = true;
+            const shape = { rx: fit.rx, ry: fit.ry, sag: fit.sag, cut: fit.cut };
+            const cv = FarmBelly.bellyCanvas(shape, bellySkin(upper[2], upper[3], FarmBelly.bellyPose(upper[2])), !!fit.flat);
+            // hung from just under the ribs, then moved by the sliders; pressed flat, its ground line is what the sliders place
+            const dx = upper[0] + 250 - cv.width / 2 + fit.x, dy = upper[1] + 392 + fit.ry * 0.62 - cv.height / 2 + fit.y;
+            real.drawImage(cv, dx, dy, {}); if (typeof real.drawImageBlink === "function") real.drawImageBlink(cv, dx, dy, {});
+          };
+          const before = (src, x, y, o) => { if (done || typeof src !== "string") return; if (src.includes("/BodyUpper/") && fit.behind) { upper = [x, y, src, o && o.HexColor]; paint(); return; } if (lower && prio(src) > 12) paint(); };
+          const after = (src, x, y, o) => { if (typeof src !== "string") return; if (src.includes("/BodyUpper/")) upper = [x, y, src, o && o.HexColor]; if (src.includes("/BodyLower/")) lower = true; };
+          const wrap = (name) => (typeof real[name] === "function" ? (src, x, y, o) => { try { before(src, x, y, o); } catch (e) { console.warn("[studio] belly:", e); } real[name](src, x, y, o); try { after(src, x, y, o); } catch (e) { console.warn("[studio] belly:", e); } } : real[name]);
+          cb = Object.assign({}, real, { drawImage: wrap("drawImage"), drawImageColorize: wrap("drawImageColorize") });
+          finish = paint;
+        }
+      } catch (e) { console.warn("[studio] belly hook:", e); }
+      const out = game(C, cb);
+      if (finish) { try { finish(); } catch (e) { console.warn("[studio] belly:", e); } }
+      return out;
+    };
+  }
+  const bellyDraw = () => { try { CharacterLoadCanvas(S.C); } catch (e) { console.warn("[studio] belly redraw:", e); } };
+  function bellyPanel() {
+    const box = $("div", { id: "fh-belly" });
+    const fill = () => {
+      const fit = fitNow(), key = poseKey();
+      box.replaceChildren(...[
+        $("p", { className: "note", textContent: "This fit is for: " + POSE_KEYS[key] + ". Change the pose above and the sliders switch to that pose's own fit." }),
+        $("div", { className: "row" },
+          $("button", { type: "button", className: fit.on ? "on" : "", textContent: fit.on ? "Belly: showing" : "Belly: hidden", onclick: () => { fit.on = !fit.on; fill(); bellyDraw(); } }),
+          [["Small", 50, 54, 0.16], ["Medium", 70, 80, 0.22], ["Large", 92, 112, 0.28]].map(([n, rx, ry, sag]) => $("button", { type: "button", textContent: n, title: "Start from the " + n.toLowerCase() + " shape", onclick: () => { Object.assign(fit, { on: true, rx, ry, sag }); fill(); bellyDraw(); } })),
+          $("button", { type: "button", className: fit.behind ? "on" : "", textContent: fit.behind ? "Behind the chest" : "In front, over the skin", title: "Whether it is drawn before the upper body (behind it) or after all the skin", onclick: () => { fit.behind = !fit.behind; fill(); bellyDraw(); } }),
+          $("button", { type: "button", className: fit.flat ? "on" : "", textContent: fit.flat ? "Pressed flat underneath" : "Hanging free", title: "Flat underneath, for a belly resting on the ground", onclick: () => { fit.flat = !fit.flat; fill(); bellyDraw(); } })),
+        SLIDERS.map(([k, label, min, max, step]) => { const val = $("span", { className: "fh-val", textContent: String(fit[k]) });
+          return $("div", { className: "fh-slide" }, $("label", { textContent: label }), $("input", { type: "range", min, max, step, value: fit[k], oninput: (e) => { fit[k] = Number(e.target.value); val.textContent = String(fit[k]); bellyDraw(); } }), val); }),
+        $("div", { className: "row" },
+          $("button", { type: "button", className: "go", textContent: "Save all the fits", onclick: saveFits }),
+          $("button", { type: "button", textContent: "Put the saved ones back", onclick: () => loadFits(true) }))].flat(Infinity));
+    };
+    BELLY.fill = fill; fill();
+    return box;
+  }
+  async function saveFits() {
+    try { const r = await fetch("/__studio/fits/belly.json", { method: "POST", body: JSON.stringify({ v: 1, saved: new Date().toISOString(), fits: BELLY.fits }, null, 1) }); if (!r.ok) throw new Error(await r.text()); say("Saved to studio\\fits\\belly.json: a fit each for standing, all fours and hogtied."); }
+    catch (e) { say("It didn't save: " + (e && e.message || e), true); }
+  }
+  async function loadFits(tell) {
+    try {
+      const d = await (await fetch("/__studio/fits/belly.json", { cache: "no-store" })).json();
+      if (d && d.fits) { for (const k of Object.keys(BELLY.fits)) if (d.fits[k]) Object.assign(BELLY.fits[k], d.fits[k]); if (BELLY.fill) BELLY.fill(); bellyDraw(); if (tell) say("The saved fits are back."); }
+      else if (tell) say("Nothing has been saved yet.");
+    } catch (e) { if (tell) say("I couldn't read the saved fits: " + (e && e.message || e), true); }
+  }
+
   // ── the panel ──
   const buttons = [];   // [el, isOn()]
   const toggle = (label, isOn, act) => { const el = $("button", { type: "button", textContent: label, onclick: () => { try { act(); } catch (e) { say(String(e && e.message || e), true); } } }); buttons.push([el, isOn]); return el; };
@@ -131,6 +229,7 @@
         $("input", { id: "fh-colour", type: "color", value: "#c9577a", onchange: (e) => tint(document.getElementById("fh-slot").value, e.target.value) }),
         $("button", { type: "button", textContent: "Game's own colours", onclick: () => tint(document.getElementById("fh-slot").value, "Default") })),
       $("h2", { textContent: "Wearing now" }), $("div", { className: "row", id: "fh-worn" }),
+      $("h2", { textContent: "Belly" }), bellyPanel(),
       $("h2", { textContent: "Chest" }), $("div", { className: "row" }, sizes("BodyUpper", ["FlatSmall", "FlatMedium", "Small", "Normal", "Large", "XLarge"])),
       $("h2", { textContent: "Hips and legs" }), $("div", { className: "row" }, sizes("BodyLower", ["Small", "Normal", "Large", "XLarge"])),
       $("h2", { textContent: "Skin" }), $("div", { className: "row" }, ["White", "Asian", "Black"].map((t) => toggle(t, () => { const u = bodyItem("BodyUpper"); const c = u && (Array.isArray(u.Color) ? u.Color[0] : u.Color); return c === t; }, () => setSkin(t)))),
@@ -153,11 +252,12 @@
     document.body.classList.add("fh-studio-on");   // (studio.css hides the sign-in form, however late the game adds it)
     CurrentScreen = "FarmStudio";
     CurrentScreenFunctions = { Run: run, Draw: none, Click: none, MouseDown: none, MouseUp: none, MouseMove: none, MouseWheel: none, Load: async () => {}, Unload: none, Resize: none, KeyDown: () => false, KeyUp: () => false, Exit: none, Paste: none };
+    if (window.FarmBelly) hookBelly(); else console.warn("[studio] the belly drawing didn't load: no belly section");
     S.C = CharacterLoadSimple("FarmStudio");
     CharacterAppearanceSetDefault(S.C);
     CharacterRefresh(S.C, false, false);
-    panel(); S.ready = true;
-    window.FarmStudio = { S, wear, decode, encode, setBody, setSkin, setPose, redraw, putOn, tint, slots };   // for poking at from the console
+    panel(); S.ready = true; loadFits(false);
+    window.FarmStudio = { S, wear, decode, encode, setBody, setSkin, setPose, redraw, putOn, tint, slots, BELLY, bellyDraw, saveFits, loadFits };   // for poking at from the console
     say("Ready. Paste an outfit code, or change the body and pose below.");
   }
   let tries = 0;

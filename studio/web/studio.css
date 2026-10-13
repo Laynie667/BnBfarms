@@ -20,3 +20,6 @@
 #fh-studio input[type=color] { width: 40px; height: 30px; padding: 0; border: 1px solid #454b57; border-radius: 6px; background: none; vertical-align: middle; margin-right: 6px; }
 /* nothing of the game's own pages shows: only its canvas and our panel */
 body.fh-studio-on > :not(#MainCanvas):not(#fh-studio) { display: none !important; }
+#fh-studio .fh-slide { display: grid; grid-template-columns: 210px 1fr 52px; align-items: center; gap: 8px; margin: 3px 0; }
+#fh-studio .fh-slide input[type=range] { width: 100%; accent-color: #e0b866; }
+#fh-studio .fh-val { color: #e0b866; font: 12px ui-monospace, Consolas, monospace; text-align: right; }

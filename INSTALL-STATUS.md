@@ -13,7 +13,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 | Map tools, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.3** |
 | Dairy | `farmhand-dairy.user.js` | the bot's PC | **1.0.2** |
 | Shows | `farmhand-shows.user.js` | the bot's PC | **1.0.4** |
-| Farmhand Companion | `farmhand-companion.user.js` | each player | **0.17.1** |
+| Farmhand Companion | `farmhand-companion.user.js` | each player | **0.17.2** |
 | Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.4** |
 
 ## Sending a watch report
@@ -23,6 +23,8 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 - Running the watcher on more than one game at once (the bot, yours, a tester's) lets Claude line them up into one timeline.
 
 ## Latest changes (newest first)
+
+- **Outfit studio, step 3: the belly with sliders. Companion 0.17.2 (no change in the game).** The studio has a Belly section: show or hide, start from small, medium or large, then sliders for width, height, hang, left and right, up and down; in front of the skin or behind the chest; hanging or pressed flat with a ground-line slider. Each pose keeps its own fit (standing and kneeling share one; all fours; hogtied) and the sliders switch when the pose changes. "Save all the fits" writes `studio/fits/belly.json`, loaded again on start. The studio draws it with the Companion's own belly code, served straight from `extension/src/belly.js`, which now also accepts a hand-set shape; that is the only Companion change. Checked here: standing and all fours draw, save and reload work. Restart the studio (close its small window, run the .bat again) to get it.
 
 - **Outfit studio, step 2: try anything on.** Pick any of the game's 76 slots, then any item in it (with a find box), to put it on or take it off; tint what is on with a colour picker or put the game's own colours back; a "Wearing now" list with a ✕ on each piece. Checked here by dressing a character in the water trap's own gear (tentacles on arms, legs and ass, the tentacle suit, a lactation pump) in the farm's flesh colour, so the studio now shows what farm gear will look like before anybody wears it live.
 

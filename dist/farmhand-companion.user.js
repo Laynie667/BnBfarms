@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.17.1
+// @version      0.17.2
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -230,7 +230,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.17.1";
+  var VERSION = "0.17.2";
 
   // extension/src/config.js
   var BOT_MEMBER = 260239;
@@ -1011,7 +1011,9 @@ One of mods you are using is using an old version of SDK. It will work for now b
     }
   }
   function bellyCanvas(size, skin, pressed) {
-    const S0 = SIZES[size], S = pressed ? { rx: S0.rx * 1.2, ry: S0.ry * 0.6, sag: S0.sag + 0.12 } : S0, pad = 6, w = S.rx * 2 + pad * 2, hgt = S.ry * 2 + pad * 2, cx = w / 2, cy = hgt / 2, low = cy + S.ry * 0.28;
+    const byHand = typeof size === "object" && !!size, S0 = byHand ? size : SIZES[size];
+    if (byHand) size = S0.rx >= 84 ? 3 : S0.rx >= 60 ? 2 : 1;
+    const S = pressed && !byHand ? { rx: S0.rx * 1.2, ry: S0.ry * 0.6, sag: S0.sag + 0.12 } : S0, pad = 6, w = S.rx * 2 + pad * 2, hgt = S.ry * 2 + pad * 2, cx = w / 2, cy = hgt / 2, low = cy + S.ry * 0.28;
     const cv = document.createElement("canvas");
     cv.width = w;
     cv.height = hgt;
@@ -1103,7 +1105,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       g.globalAlpha = 1;
     }
     if (pressed) {
-      const cut = Math.round(cy + S.ry * 0.74);
+      const cut = Math.round(cy + S.ry * (byHand && S0.cut > 0 ? S0.cut : 0.74));
       g.clearRect(0, cut, w, hgt - cut);
       let x0 = cx, x1 = cx;
       for (let t = 0; t <= Math.PI; t += 0.01) {

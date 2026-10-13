@@ -35,7 +35,10 @@ function bellyPath(g, S, cx, cy, from, to) {
 // pressed: it's lyin' on the ground (on all fours). The weight spreads sideways and the underside goes flat where it
 // touches: wider, shallower, cut off straight at the ground. cv.cut is how far down the picture the ground line is.
 function bellyCanvas(size, skin, pressed) {
-  const S0 = SIZES[size], S = pressed ? { rx: S0.rx * 1.2, ry: S0.ry * 0.6, sag: S0.sag + 0.12 } : S0, pad = 6, w = S.rx * 2 + pad * 2, hgt = S.ry * 2 + pad * 2, cx = w / 2, cy = hgt / 2, low = cy + S.ry * 0.28;
+  // size: 1, 2 or 3, or a shape set by hand in the studio: { rx, ry, sag, cut } (then it's drawn exactly as given)
+  const byHand = typeof size === "object" && !!size, S0 = byHand ? size : SIZES[size];
+  if (byHand) size = S0.rx >= 84 ? 3 : S0.rx >= 60 ? 2 : 1;   // which trimmings it gets: the navel, the line under it, how far up the ink runs
+  const S = pressed && !byHand ? { rx: S0.rx * 1.2, ry: S0.ry * 0.6, sag: S0.sag + 0.12 } : S0, pad = 6, w = S.rx * 2 + pad * 2, hgt = S.ry * 2 + pad * 2, cx = w / 2, cy = hgt / 2, low = cy + S.ry * 0.28;
   const cv = document.createElement("canvas"); cv.width = w; cv.height = hgt;
   const g = cv.getContext("2d");
   const whole = () => { g.beginPath(); bellyPath(g, S, cx, cy, 0, Math.PI * 2); g.closePath(); };
@@ -83,7 +86,7 @@ function bellyCanvas(size, skin, pressed) {
   if (size >= 2) { g.strokeStyle = rgb(skin, 0.72); g.lineWidth = 1; g.globalAlpha = 0.45; g.beginPath(); g.moveTo(cx, ny + 6); g.lineTo(cx, cy + S.ry * 0.86); g.stroke(); g.globalAlpha = 1; }
   if (pressed) {
     // flat where it meets the ground, with the line of contact inked
-    const cut = Math.round(cy + S.ry * 0.74);
+    const cut = Math.round(cy + S.ry * (byHand && S0.cut > 0 ? S0.cut : 0.74));
     g.clearRect(0, cut, w, hgt - cut);
     let x0 = cx, x1 = cx;
     for (let t = 0; t <= Math.PI; t += 0.01) { const p = bellyPoint(S, cx, cy, t); if (p[1] >= cut) { x0 = Math.min(x0, p[0]); x1 = Math.max(x1, p[0]); } }

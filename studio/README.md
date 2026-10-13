@@ -45,10 +45,21 @@ the game's pictures into the drawing.
   colours back.
 - **Wearing now** lists what is on, each with a ✕ to take it off.
 
+## Step 3: the belly, with sliders
+
+- **Belly** section: show or hide it, start from the small, medium or large shape, then drag: width, height, hang,
+  left and right, up and down.
+- **In front or behind.** Over the skin (standing), or behind the chest (all fours, hogtied).
+- **Hanging or pressed flat**, with a slider for where the ground line cuts it.
+- **A fit for each pose.** Standing, kneeling and the arms poses share one; all fours has its own; hogtied has its own.
+  Change the pose and the sliders switch to that pose's fit.
+- **Save all the fits** writes `studio/fits/belly.json`. They load again next time.
+- It is drawn by the Companion's own belly code (`extension/src/belly.js`), so what you see is what the game will show.
+
 ## What it is for next
 
-1. The belly, and other drawn body parts, with sliders for size, position, width and hang, in every pose.
-2. Saving those fits to a file the body extension reads.
+1. The Companion's belly reading the saved fits, so a shape tuned here is the shape worn in the game.
+2. Other drawn body parts, and fits for worn items on them.
 
 ## Good to know
 

@@ -456,7 +456,7 @@
   // Flat to R. The first six cups are the game's own chest sizes: picking one just changes the body. From DD up they're
   // drawn (breasts-drawing.js), over the game's biggest chest, standing and kneeling only for now. The game's nipples,
   // and whatever is worn on them, are lifted off where the game puts them and set down on the drawn ones.
-  const BREAST = { solid: {}, tuck: false, on: {}, free: false, holds: {}, holdSig: "", wear: {}, dress: true, cover: new Map(), cup: null, full: 1, hang: 1, apart: 1, x: 0, y: 0, nip: 1, nipY: 0, nipX: 0, cv: null, cvKey: "", halves: new Map(), out: new Map() };
+  const BREAST = { solid: {}, tuck: false, on: {}, free: true, holds: {}, holdSig: "", wear: {}, dress: true, cover: new Map(), cup: null, full: 1, hang: 1, apart: 1, x: 0, y: 0, nip: 1, nipY: 0, nipX: 0, cv: null, cvKey: "", halves: new Map(), out: new Map() };
   const BREAST_SLIDERS = [["full", "Fullness", 0.7, 1.4, 0.01], ["hang", "Weight (how low and heavy they hang)", 0, 2, 0.01], ["apart", "Apart / together", 0.6, 1.5, 0.01], ["x", "Left / right", -60, 60, 1], ["y", "Up / down", -80, 80, 1],
     ["nip", "Nipple size (and what's worn on them)", 0.4, 4, 0.05], ["nipY", "Nipples up / down", -80, 80, 1], ["nipX", "Nipples in / out", -60, 60, 1]];
   const NIP_GROUPS = new Set(["Nipples", "ItemNipples", "ItemNipplesPiercings"]);

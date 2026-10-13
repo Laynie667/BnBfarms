@@ -585,12 +585,12 @@
   function hookBelly() {
     const game = CommonDrawAppearanceBuild;
     CommonDrawAppearanceBuild = function (C, cb) {
-      let finish = null, seenNow = null;
+      let finish = null, seenNow = null, handFNow = null;
       try {
         const fit = C === S.C ? fitNow() : null, br = C === S.C ? breastNow() : null, real = cb;   // real: the game's own callbacks (the wrapped set below must never call itself)
         if (fit && (fit.on || br) && cb && typeof cb.drawImage === "function") {
           let upper = null, lower = false, done = false;
-          const ctx = { bodies: [], belly: null, sig: "", seen: {} }; if (br) seenNow = ctx.seen;
+          const ctx = { bodies: [], belly: null, sig: "", seen: {} }; if (br) { seenNow = ctx.seen; handFNow = { get v() { return ctx.handF; } }; }
           const slot = new RegExp("(?:^|/)Assets/[^/]+/([^/]+)/");
           const groupOf = (src) => { const m = slot.exec(src); return m ? m[1] : ""; };
           // (a piece's pictures are in its slot's folder or the folder of the slot it borrows its art from, named for the piece)
@@ -647,6 +647,15 @@
           };
           // the game's nipples, and what's worn on them, set down on the drawn breasts: each side of the picture is
           // moved to its own nipple, and grown a little with the size. false: not ready, draw it as the game does.
+          // how much of a hand picture the breasts would cover (0 to 1); null while it's loading
+          const handHidden = (src, x, y) => {
+            const B = ctx.breast, im = B && mouldImg(src); if (!im) return null;
+            const key = "hh|" + src + "|" + Math.round(x) + "," + Math.round(y) + "|" + B.sig; let v = BREAST.cover.get(key); if (v != null) return v;
+            const w = im.naturalWidth, h = im.naturalHeight, c = document.createElement("canvas"); c.width = w; c.height = h; const g = c.getContext("2d", { willReadFrequently: true });
+            const count = () => { const d = g.getImageData(0, 0, w, h).data; let n = 0; for (let i = 3; i < d.length; i += 16) if (d[i] > 100) n++; return n; };
+            g.drawImage(im, 0, 0); const all = count(); g.globalCompositeOperation = "destination-in"; g.drawImage(B.mask, B.mx - x, B.my - y); const under = count();
+            v = all ? under / all : 0; BREAST.cover.set(key, v); return v;
+          };
           const handDraw = (name, src, x, y, o) => {
             const B = ctx.breast, im = B && mouldImg(src); if (!im) return false;
             const key = "hand|" + src + "|" + Math.round(x) + "," + Math.round(y) + "|" + B.sig;
@@ -868,7 +877,17 @@
                 try { const im0 = piece && ctx.breast && mouldImg(src); if (im0 && chestCover(src, im0, x, y, ctx.breast, true) >= 0.05) ctx.seen[piece.key] = true; if (im0 && chestCover(src, im0, x, y, ctx.breast, false) >= 0.05) ctx.seen["on:" + piece.key] = true; } catch (e) { /* only a measurement */ }
                 try { if (how === "behind") { if (handDraw(name, src, x, y, o)) return; }
                   else if (how !== "plain" && BREAST.dress) { if (dressDraw(name, src, x, y, o)) return; } } catch (e) { console.warn("[studio] chest wear:", e); } }
-              if (done && (HAND_GROUPS.has(gname) || ARM_GROUPS.has(gname)) && ctx.breast && ctx.breast.pose !== "AllFours") { /* cuffs and the like go where the hands go: behind them (Laynie, Oct 13: "the handcuffs are showing layered above the breast") */ try { if (handDraw(name, src, x, y, o)) return; } catch (e) { console.warn("[studio] hands:", e); } } }
+              // Hands, and what's worn on the wrists and arms. They're the game's own pictures and they stay WHOLE: either in
+              // front of the breasts, as the game has them, or hidden behind them. Never cut through. (I had the breasts'
+              // outline cut out of them, and at the sizes where it crossed the knuckles it left torn hands with the
+              // wrists and shirt cuffs gone. Laynie, Oct 13: "the hands also look scuffed and messy… they shouldn't, if
+              // they are the default hands".) Which it is goes by how much of the hands the breasts would cover: under
+              // most of them, the hands are in front, resting under the breasts; over most of them, they're behind.
+              // Cuffs and arm gear go with the hands, whichever way that is.
+              if (done && (HAND_GROUPS.has(gname) || ARM_GROUPS.has(gname)) && ctx.breast && ctx.breast.pose !== "AllFours") {
+                try { if (/^Hands/.test(gname)) { const fr = handHidden(src, x, y); if (fr != null) ctx.handF = Math.max(ctx.handF || 0, fr); } } catch (e) { console.warn("[studio] hands:", e); }
+                if (BREAST.handsBehind) return;   // behind: not drawn at all
+              } }
             let drawn = false;
             try { if (ctx.belly && !fit.behind && typeof src === "string") { const q = isMoulded(src), m = q ? mouldCanvas(src, x, y, ctx, q.key, q.mode) : bellyAuto(src, x, y, ctx, fit.behind, (pieceOf(src) || {}).key); if (m) { real[name](m, x - MOULD.M, y, o); drawn = true; } } } catch (e) { console.warn("[studio] mould:", e); }
             if (!drawn) real[name](src, x, y, o);
@@ -880,6 +899,7 @@
       } catch (e) { console.warn("[studio] belly hook:", e); }
       const out = game(C, cb);
       if (finish) { try { finish(); } catch (e) { console.warn("[studio] belly:", e); } }
+      if (finish && seenNow && handFNow && handFNow.v != null) { const behind = handFNow.v >= 0.6; if (behind !== !!BREAST.handsBehind) { BREAST.handsBehind = behind; clearTimeout(BREAST.holdT); BREAST.holdT = setTimeout(bellyDraw, 40); } }
       if (finish && seenNow) { const sig = Object.keys(seenNow).sort().join("|"); if (sig !== BREAST.holdSig) { BREAST.holds = seenNow; BREAST.on = {}; for (const k of Object.keys(seenNow)) if (k.startsWith("on:")) BREAST.on[k.slice(3)] = true; BREAST.holdSig = sig; clearTimeout(BREAST.holdT); BREAST.holdT = setTimeout(bellyDraw, 40); } }
       return out;
     };

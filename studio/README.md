@@ -96,6 +96,13 @@ the game's pictures into the drawing.
   not set to "behind".
 - The list of moulded pieces is saved in `fits/items.json` when you press *Save this fit*.
 
+## Step 31: the same for the belly, and for every slot
+
+- A piece holds the breasts in the game's shape if it actually lies over them, whatever slot it is in.
+- Anything worn across the middle of the belly is grown sideways to cover it, with nothing to press. *Clothes cover
+  it* in the Belly section switches that off; *Mould to the body* on a picked piece sets that one piece its own way.
+- It widens. It does not lengthen: a short top stays short unless the piece is set to *over*.
+
 ## Step 29: the breast fits the clothes
 
 - With anything worn over the chest, the drawn breasts take the game's own breast shape a size up, and the piece

@@ -233,7 +233,7 @@
         $("label", { textContent: "Mould to the body:" }),
         (() => { const k = mouldKey(it), now = MOULD.items.has(k) ? (MOULD.mode.get(k) || "wide") : "";
           const sel = $("select", { title: "Redraws this piece to follow the body, belly and all", onchange: (e) => { const v = e.target.value; if (v) { MOULD.items.add(k); MOULD.mode.set(k, v); } else { MOULD.items.delete(k); MOULD.mode.delete(k); } MOULD.out.clear(); bellyDraw(); fillFit(); if (v && !fitNow().on) say("It's marked. The moulding shows once the belly is showing: there's nothing to mould to yet."); } },
-            [["", "No: as the game draws it"], ["wide", "Wide: out to the body's outline"], ["over", "Over: wide, and down over the belly"], ["under", "Under: it sits beneath, the belly hangs over it"]].map(([v, t]) => $("option", { value: v, textContent: t, selected: v === now })));
+            [["", "The usual: grown to cover the belly, if it lies on it"], ["wide", "Wide: out to the body's outline, sleeves and all"], ["over", "Over: wide, and down over the belly"], ["under", "Under: it sits beneath, the belly hangs over it"]].map(([v, t]) => $("option", { value: v, textContent: t, selected: v === now })));
           return sel; })(),
         $("span", { className: "note", textContent: ({ "": "Follows the body where the sliders can't.", wide: "As wide as the body on every row. Never longer.", over: "Wide, and lengthened so it runs down to the underside of the belly.", under: "Left where it is on the body. The belly covers what it hangs in front of." })[MOULD.items.has(mouldKey(it)) ? (MOULD.mode.get(mouldKey(it)) || "wide") : ""] })),
       $("div", { className: "row" },
@@ -323,7 +323,7 @@
   //          from where the belly starts down to the piece's own end is stretched so it ends at the belly's underside.
   //          Every layer of a piece is stretched by the same amount (ext: the piece's top and bottom, over all its layers).
   //   under: the piece stays on the body where it was and the belly hangs in front: the belly's shape is cut out of it.
-  const MOULD = { items: new Set(), mode: new Map(), ext: new Map(), img: new Map(), prof: new Map(), out: new Map(), M: 150 };
+  const MOULD = { ver: 0, lies: new Set(), span: new Map(), cover: new Map(), items: new Set(), mode: new Map(), ext: new Map(), img: new Map(), prof: new Map(), out: new Map(), M: 150 };
   const mouldKey = (it) => it.Asset.Group.Name + "/" + it.Asset.Name;
   function mouldImg(src) {
     let e = MOULD.img.get(src);
@@ -352,6 +352,22 @@
     };
     return { old: (yy) => row(yy, false), neu: (yy) => row(yy, true) };
   }
+  // how much of the middle of the belly a picture covers (0 to 1): a collar or a shoe doesn't, a dress does
+  function bellyCover(src, x, y, ctx) {
+    const im = mouldImg(src); if (!im) return 0;
+    const b = ctx.belly, key = "bc|" + src + "|" + Math.round(x) + "," + Math.round(y) + "|" + Math.round(b.dx) + "," + Math.round(b.dy) + "," + b.cv.width + "," + b.cv.height; let v = MOULD.cover.get(key); if (v != null) return v;
+    const w = im.naturalWidth, h = im.naturalHeight, c = document.createElement("canvas"); c.width = w; c.height = h;
+    const g = c.getContext("2d", { willReadFrequently: true }); g.drawImage(im, 0, 0);
+    const d = g.getImageData(0, 0, w, h).data, cx = b.dx + b.cv.width / 2 - x, cy = b.dy + b.cv.height / 2 - y, rx = b.cv.width * 0.3, ry = b.cv.height * 0.3; let hit = 0, all = 0;
+    for (let j = -ry; j <= ry; j += 3) for (let i = -rx; i <= rx; i += 3) { if ((i / rx) * (i / rx) + (j / ry) * (j / ry) > 1) continue; all++; const px = Math.round(cx + i), py = Math.round(cy + j); if (px >= 0 && py >= 0 && px < w && py < h && d[(py * w + px) * 4 + 3] > 60) hit++; }
+    v = all ? hit / all : 0; if (MOULD.cover.size > 400) MOULD.cover.clear(); MOULD.cover.set(key, v); return v;
+  }
+  // the piece grown to the belly, if it covers it and nothing else has been chosen for it: the canvas, false (nothing to grow) or null (not ready)
+  function bellyAuto(src, x, y, ctx, behind, pieceKey) { if (!ctx.belly || behind || BELLY.auto === false || typeof src !== "string") return null;
+    // worn things only: not her hands, her skin or her hair
+    { const m = new RegExp("(?:^|/)Assets/[^/]+/([^/]+)/").exec(src); if (!m || !chestSlot(m[1])) return false; }
+    const pk = pieceKey || src; if (bellyCover(src, x, y, ctx) >= 0.15) MOULD.lies.add(pk); if (!MOULD.lies.has(pk)) return false;   // (if any layer of a piece lies on the belly, all of its layers grow together)
+    return mouldCanvas(src, x, y, ctx, "auto|" + (pieceKey || src), "auto"); }
   // the belly's first and last row on the screen
   function bellyRows(ctx) { const b = ctx.belly, bp = b.prof || (b.prof = edges(b.cv, b.cv.width, b.cv.height)); let t = -1, e = -1; for (let j = 0; j < bp.h; j++) if (bp.L[j] >= 0) { if (t < 0) t = j; e = j; } return t < 0 ? null : { top: Math.round(b.dy) + t, bottom: Math.round(b.dy) + e }; }
   function mouldCanvas(src, x, y, ctx, piece, mode) {
@@ -384,6 +400,36 @@
     }
     const c = document.createElement("canvas"); c.width = w + M * 2; c.height = h;
     const g = c.getContext("2d");
+    if (mode === "auto") {
+      // The same lesson as the breasts (Laynie, Oct 13: "take what you learned and apply it across the board for all
+      // wearable items"): the piece stays the game's own picture, and it's made to fit by growing it evenly, not by
+      // cutting it about. Row by row: if the piece lies across the middle of the belly on that row, the whole width of
+      // the piece there is grown, about its own two edges, until it reaches the belly's two edges. A corset that was
+      // as wide as her waist is as wide as her belly. A skirt already wider than the belly isn't touched. The piece's
+      // width on a row is taken over ALL its layers (span), so a buckle in the middle grows with the strap it's on
+      // and isn't pulled out to the full width by itself; and edges are averaged over a few rows, so the grown part
+      // has a smooth side and not a stepped one.
+      const b = ctx.belly, bp = b.prof || (b.prof = edges(b.cv, b.cv.width, b.cv.height)), cxs = b.dx + b.cv.width / 2;
+      const span = MOULD.span.get(piece) || { L: new Float32Array(2600).fill(1e9), R: new Float32Array(2600).fill(-1e9), v: 0 };
+      MOULD.span.set(piece, span);
+      const p0 = edgesOf(src); let grew = false;
+      if (p0) for (let j = 0; j < p0.h; j++) { const yy = Math.round(y) + j; if (p0.L[j] < 0 || yy < 0 || yy >= 2600) continue; if (x + p0.L[j] < span.L[yy]) { span.L[yy] = x + p0.L[j]; grew = true; } if (x + p0.R[j] > span.R[yy]) { span.R[yy] = x + p0.R[j]; grew = true; } }
+      if (grew) { span.v++; MOULD.ver++; clearTimeout(MOULD.t); MOULD.t = setTimeout(bellyDraw, 60); }
+      const key2 = key + "|span" + span.v; if (MOULD.out.has(key2)) return MOULD.out.get(key2);
+      const rowOf = (yy) => { if (yy < 0 || yy >= 2600 || span.L[yy] > 1e8) return null; const j = yy - Math.round(b.dy); if (j < 0 || j >= bp.h || bp.L[j] < 0) return null; const gl = span.L[yy], gr = span.R[yy], bl = b.dx + bp.L[j], br2 = b.dx + bp.R[j]; if (gl > cxs || gr < cxs) return null; return { gl, gr, nl: Math.min(gl, bl), nr: Math.max(gr, br2) }; };
+      for (let j = 0; j < h; j++) {
+        const yy = Math.round(y) + j;
+        g.drawImage(im, 0, j, w, 1, M, j, w, 1);
+        let gl = 0, gr = 0, nl2 = 0, nr = 0, n2 = 0; for (let d = -4; d <= 4; d++) { const e = rowOf(yy + d); if (e) { gl += e.gl; gr += e.gr; nl2 += e.nl; nr += e.nr; n2++; } }
+        if (n2 < 5 || !rowOf(yy)) continue; gl /= n2; gr /= n2; nl2 /= n2; nr /= n2;
+        if (gr - gl < 6 || (nl2 >= gl - 0.5 && nr <= gr + 0.5)) continue;
+        const k = (nr - nl2) / (gr - gl), sa = Math.max(0, gl - x), sb = Math.min(w, gr - x + 1); if (sb - sa < 1) continue;
+        changed = true;
+        g.clearRect(M + nl2 - x - 1, j, nr - nl2 + 2, 1);
+        g.drawImage(im, sa, j, sb - sa, 1, M + (nl2 - x) + (sa - (gl - x)) * k, j, (sb - sa) * k, 1);
+      }
+      const res2 = changed ? c : false; if (MOULD.out.size > 80) MOULD.out.clear(); MOULD.out.set(key2, res2); return res2;
+    }
     for (let j = 0; j < h; j++) {
       const yy = Math.round(y) + j, o = ol.old(yy), n = ol.neu(yy);
       if (!o || !n || (n.l >= o.l && n.r <= o.r)) { g.drawImage(im, 0, j, w, 1, M, j, w, 1); continue; }
@@ -400,7 +446,7 @@
   // Flat to R. The first six cups are the game's own chest sizes: picking one just changes the body. From DD up they're
   // drawn (breasts-drawing.js), over the game's biggest chest, standing and kneeling only for now. The game's nipples,
   // and whatever is worn on them, are lifted off where the game puts them and set down on the drawn ones.
-  const BREAST = { wear: {}, dress: true, cover: new Map(), cup: null, full: 1, hang: 1, apart: 1, x: 0, y: 0, nip: 1, nipY: 0, nipX: 0, cv: null, cvKey: "", halves: new Map(), out: new Map() };
+  const BREAST = { holds: {}, holdSig: "", wear: {}, dress: true, cover: new Map(), cup: null, full: 1, hang: 1, apart: 1, x: 0, y: 0, nip: 1, nipY: 0, nipX: 0, cv: null, cvKey: "", halves: new Map(), out: new Map() };
   const BREAST_SLIDERS = [["full", "Fullness", 0.7, 1.4, 0.01], ["hang", "Weight (how low and heavy they hang)", 0, 2, 0.01], ["apart", "Apart / together", 0.6, 1.5, 0.01], ["x", "Left / right", -60, 60, 1], ["y", "Up / down", -80, 80, 1],
     ["nip", "Nipple size (and what's worn on them)", 0.4, 4, 0.05], ["nipY", "Nipples up / down", -80, 80, 1], ["nipX", "Nipples in / out", -60, 60, 1]];
   const NIP_GROUPS = new Set(["Nipples", "ItemNipples", "ItemNipplesPiercings"]);
@@ -409,8 +455,10 @@
   const HAND_GROUPS = new Set(["HandsLeft", "HandsRight", "ItemHands", "Gloves"]);
   // What holds a breast: anything worn round or over the chest. With one of these on, the drawn breasts take the game's
   // own shape a size up (see HELD in breasts-drawing.js) and the piece is drawn a size up to match.
-  const HOLD_GROUPS = new Set(["Bra", "Cloth", "ClothOuter", "Suit", "Corset", "ItemBreast", "ItemTorso", "ItemTorso2", "ItemArms"]);
-  const heldNow = () => BREAST.hold !== false && S.C.Appearance.some((it) => HOLD_GROUPS.has(it.Asset.Group.Name) && !["plain", "behind"].includes(BREAST.wear[mouldKey(it)] || ""));
+  // Not by slot (a pair of wrist cuffs is in the arms slot and holds nothing; a straitjacket is in it too and does): by
+  // whether the piece actually lies over the breasts. That's seen as it's drawn, so it's known from the drawing before:
+  // BREAST.holds is the pieces that covered the breasts last time, and when that changes the picture is drawn again.
+  const heldNow = () => BREAST.hold !== false && S.C.Appearance.some((it) => BREAST.holds[mouldKey(it)] && !["plain", "behind"].includes(BREAST.wear[mouldKey(it)] || ""));
   // What's worn over the chest. Every one of these is cut for the game's biggest chest, so on drawn breasts it would
   // sit in the middle like a patch. Instead the part of the piece that covered each of the game's breasts is taken and
   // GROWN onto the drawn one: same piece, same colours and shading, stretched from the game's breast to ours and kept
@@ -522,12 +570,12 @@
   function hookBelly() {
     const game = CommonDrawAppearanceBuild;
     CommonDrawAppearanceBuild = function (C, cb) {
-      let finish = null;
+      let finish = null, seenNow = null;
       try {
         const fit = C === S.C ? fitNow() : null, br = C === S.C ? breastNow() : null, real = cb;   // real: the game's own callbacks (the wrapped set below must never call itself)
         if (fit && (fit.on || br) && cb && typeof cb.drawImage === "function") {
           let upper = null, lower = false, done = false;
-          const ctx = { bodies: [], belly: null, sig: "" };
+          const ctx = { bodies: [], belly: null, sig: "", seen: {} }; if (br) seenNow = ctx.seen;
           const slot = new RegExp("(?:^|/)Assets/[^/]+/([^/]+)/");
           const groupOf = (src) => { const m = slot.exec(src); return m ? m[1] : ""; };
           // (a piece's pictures are in its slot's folder or the folder of the slot it borrows its art from, named for the piece)
@@ -639,14 +687,16 @@
           const dressDraw = (name, src, x, y, o) => {
             const B = ctx.breast, im = B && B.held && mouldImg(src); if (!im) return false;
             if (chestCover(src, im, x, y, B) < 0.05) return false;
-            const key = "dress|" + src + "|" + Math.round(x) + "," + Math.round(y) + "|" + B.sig;
+            const key = "dress|" + src + "|" + Math.round(x) + "," + Math.round(y) + "|" + B.sig + "|" + (ctx.belly && !fit.behind && BELLY.auto !== false ? ctx.sig + "|" + MOULD.ver : "");
             let c = BREAST.out.get(key);
             if (!c) {
               const MX = 260, MY = 480, w = im.naturalWidth, h = im.naturalHeight, S2 = B.S, G = FarmBreasts.GAME, sc = S2.sc;
               c = document.createElement("canvas"); c.width = w + MX * 2; c.height = h + MY * 2; c.MX = MX; c.MY = MY;
               const g = c.getContext("2d", { willReadFrequently: true }), midX = MX + B.mid - x, uyc = MY + B.uy - y;
               g.drawImage(im, MX, MY);
-              const CW = c.width, CH = c.height, sp = g.getImageData(0, 0, CW, CH).data;
+              const CW = c.width, CH = c.height, sp = g.getImageData(0, 0, CW, CH).data;   // (the chest is read from the game's own picture…)
+              const overBelly = bellyAuto(src, x, y, ctx, fit.behind, (pieceOf(src) || {}).key);                       // (…and laid on the piece as it is once it's been grown to the belly, if she has one)
+              if (overBelly) { g.clearRect(0, 0, CW, CH); g.drawImage(overBelly, MX - MOULD.M, MY); }
               const y1 = uyc + G.y1, y2 = uyc + G.y2, y3 = uyc + G.y3;
               // how much things have grown on a row of the game's picture: nothing above y1, fully by y2
               const grown = (yn) => { const t = Math.max(0, Math.min(1, (yn - y1) / (y2 - y1))); return 1 + (sc - 1) * t * t * (3 - 2 * t); };
@@ -758,11 +808,12 @@
               if (!done && gname === "Nipples") { held.push([name, src, x, y, o]); return; }
               if (done && NIP_GROUPS.has(gname)) { try { if (nipDraw(name, src, x, y, o)) return; } catch (e) { console.warn("[studio] nipples:", e); } }
               if (done && chestSlot(gname) && !isMoulded(src)) { const piece = pieceOf(src), how = (piece && BREAST.wear[piece.key]) || "";
+                try { const im0 = piece && ctx.breast && mouldImg(src); if (im0 && chestCover(src, im0, x, y, ctx.breast) >= 0.05) ctx.seen[piece.key] = true; } catch (e) { /* only a measurement */ }
                 try { if (how === "behind") { if (handDraw(name, src, x, y, o)) return; }
                   else if (how !== "plain" && BREAST.dress) { if (dressDraw(name, src, x, y, o)) return; } } catch (e) { console.warn("[studio] chest wear:", e); } }
               if (done && HAND_GROUPS.has(gname) && ctx.breast && ctx.breast.pose !== "AllFours") { try { if (handDraw(name, src, x, y, o)) return; } catch (e) { console.warn("[studio] hands:", e); } } }
             let drawn = false;
-            try { if (ctx.belly && !fit.behind && typeof src === "string") { const q = isMoulded(src), m = q && mouldCanvas(src, x, y, ctx, q.key, q.mode); if (m) { real[name](m, x - MOULD.M, y, o); drawn = true; } } } catch (e) { console.warn("[studio] mould:", e); }
+            try { if (ctx.belly && !fit.behind && typeof src === "string") { const q = isMoulded(src), m = q ? mouldCanvas(src, x, y, ctx, q.key, q.mode) : bellyAuto(src, x, y, ctx, fit.behind, (pieceOf(src) || {}).key); if (m) { real[name](m, x - MOULD.M, y, o); drawn = true; } } } catch (e) { console.warn("[studio] mould:", e); }
             if (!drawn) real[name](src, x, y, o);
             if (!blink) { try { after(src, x, y, o); } catch (e) { console.warn("[studio] belly:", e); } }
           } : real[name]);
@@ -772,6 +823,7 @@
       } catch (e) { console.warn("[studio] belly hook:", e); }
       const out = game(C, cb);
       if (finish) { try { finish(); } catch (e) { console.warn("[studio] belly:", e); } }
+      if (finish && seenNow) { const sig = Object.keys(seenNow).sort().join("|"); if (sig !== BREAST.holdSig) { BREAST.holds = seenNow; BREAST.holdSig = sig; clearTimeout(BREAST.holdT); BREAST.holdT = setTimeout(bellyDraw, 40); } }
       return out;
     };
   }
@@ -831,6 +883,7 @@
           $("button", { type: "button", className: fit.on ? "on" : "", textContent: fit.on ? "Belly: showing" : "Belly: hidden", onclick: () => { fit.on = !fit.on; fill(); bellyDraw(); } }),
           [["Small", 50, 54, 0.16], ["Medium", 70, 80, 0.22], ["Large", 92, 112, 0.28]].map(([n, rx, ry, sag]) => $("button", { type: "button", textContent: n, title: "Start from the " + n.toLowerCase() + " shape", onclick: () => { Object.assign(fit, { on: true, rx, ry, sag }); fill(); bellyDraw(); } })),
           $("button", { type: "button", className: fit.behind ? "on" : "", textContent: fit.behind ? "Behind the chest" : "In front, over the skin", title: "Whether it is drawn before the upper body (behind it) or after all the skin", onclick: () => { fit.behind = !fit.behind; fill(); bellyDraw(); } }),
+          $("button", { type: "button", className: BELLY.auto !== false ? "on" : "", textContent: BELLY.auto !== false ? "Clothes cover it: on" : "Clothes cover it: off", title: "Whatever is worn over the belly is grown sideways to cover it. A piece can be set its own way under Mould to the body.", onclick: () => { BELLY.auto = BELLY.auto === false; MOULD.out.clear(); BREAST.out.clear(); fill(); bellyDraw(); } }),
           $("button", { type: "button", className: fit.flat ? "on" : "", textContent: fit.flat ? "Pressed flat underneath" : "Hanging free", title: "Flat underneath, for a belly resting on the ground", onclick: () => { fit.flat = !fit.flat; fill(); bellyDraw(); } })),
         SLIDERS.map(([k, label, min, max, step]) => { const val = $("span", { className: "fh-val", textContent: String(fit[k]) });
           return $("div", { className: "fh-slide" }, $("label", { textContent: label }), $("input", { type: "range", min, max, step, value: fit[k], oninput: (e) => { fit[k] = Number(e.target.value); val.textContent = String(fit[k]); bellyDraw(); } }), val); }),

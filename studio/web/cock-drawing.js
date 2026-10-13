@@ -24,10 +24,10 @@
   // w: half-width along the length, t from 0 (root) to 1 (tip), in units of the usual half-width. hard: standing.
   const KINDS = {
     human:    { label: "Human", col: null, tipCol: [240, 140, 132], sheath: null, soft: 1,
-                w: (t) => { if (t < 0.78) return 1 - 0.05 * t; if (t < 0.83) return 0.96 - (t - 0.78) * 1.6;            // the shaft, then the pinch behind the head
-                  if (t < 0.86) return 0.88 + (t - 0.83) / 0.03 * 0.3; const h = (t - 0.86) / 0.14; return 1.18 * Math.sqrt(Math.max(0.0004, 1 - h * h * 0.96)); }, headAt: 0.86 },
+                w: (t) => { if (t < 0.66) return 1 - 0.04 * t; if (t < 0.71) return 0.97 - (t - 0.66) * 1.4; if (t < 0.735) return 0.9 + (t - 0.71) / 0.025 * 0.28;   // the shaft, the pinch, the rim
+                  const h = (t - 0.735) / 0.265; return 1.18 * Math.pow(Math.max(0.0005, 1 - Math.pow(h, 2.2)), 0.5); }, headAt: 0.735, cleft: true },   // (a taller head: about a quarter of the length, as the game's is)
     canine:   { label: "Canine", col: [226, 118, 120], tipCol: [232, 108, 112], sheath: "skin", soft: 0.3, knot: true,
-                w: (t) => 0.72 + 0.26 * Math.sin(Math.min(1, t / 0.75) * Math.PI) * 0.9 - (t > 0.72 ? Math.pow((t - 0.72) / 0.28, 1.6) * 0.78 : 0) },
+                w: (t) => 0.7 + 0.2 * Math.sin(Math.min(1, t / 0.8) * Math.PI) - (t > 0.8 ? Math.pow((t - 0.8) / 0.2, 1.3) * 0.62 : 0) + (t > 0.93 ? 0.1 * Math.sin((t - 0.93) / 0.07 * Math.PI) : 0) },
     equine:   { label: "Flared equine", col: [150, 116, 112], tipCol: [196, 150, 150], sheath: [118, 92, 90], soft: 0.6, ring: 0.5,
                 w: (t, hard) => 1 + 0.07 * Math.exp(-Math.pow((t - 0.5) / 0.03, 2)) - 0.1 * Math.exp(-Math.pow((t - 0.86) / 0.07, 2)) + (t > 0.9 ? (hard ? 0.55 : 0.16) * Math.pow((t - 0.9) / 0.1, 0.7) : 0), flat: true },
     feline:   { label: "Barbed feline", col: [238, 164, 166], tipCol: [240, 150, 154], sheath: "skin", soft: 0.25, barbs: true, slim: 0.78,
@@ -42,14 +42,14 @@
   const line = (c) => "rgb(" + clamp(c[0] * 0.74) + "," + clamp(c[1] * 0.62) + "," + clamp(c[2] * 0.6) + ")";   // the game's outline: the colour itself, deepened and warmed, never black
   const mix = (a, b, t) => [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t];
   // how big each ball is across, for a farm level of 1 to 20 (3 is where the farm starts them)
-  const ballR = (level) => 7 + 2.6 * Math.max(0, level - 1) + 0.16 * Math.pow(Math.max(0, level - 6), 2);
+  const ballR = (level) => 5 + 2.1 * Math.max(0, level - 1) + 0.18 * Math.pow(Math.max(0, level - 6), 2);   // (at the farm's starting 3 the sack is about as wide as the game draws it)
 
   // o: { kind, knot, inches, girth (1 = usual for the length), balls (1..20), hard, skin [r,g,b] }
   // Gives a canvas, with .ax .ay: the point in it where the cock joins her.
   function canvas(o) {
     const K = KINDS[o.kind] || KINDS.human, skin = o.skin || [236, 204, 196], hard = !!o.hard;
     const full = Math.max(16, (o.inches || 6) * PX_PER_INCH), L = full * (hard ? 1.06 : 0.9 * (0.55 + 0.45 * K.soft));   // soft, an animal's is partly drawn back
-    const W = Math.max(6, (7.5 + full * 0.05) * (o.girth || 1) * (K.slim || 1) * (hard ? 1.08 : 1));                  // half-width: thicker as it gets longer, but not in step
+    const W = Math.max(7, (8 + full * 0.072) * (o.girth || 1) * (K.slim || 1) * (hard ? 1.06 : 1));                  // half-width: thicker as it gets longer, but not in step
     const br = ballR(o.balls || 3), knotted = !!(o.knot || K.knot), gap = K.two ? W * 1.25 : 0;
     const col = K.col || [skin[0], skin[1] * 0.93, skin[2] * 0.92], sh = K.sheath === "skin" || !K.sheath ? [skin[0] * 0.98, skin[1] * 0.93, skin[2] * 0.91] : K.sheath;
     const bend = (hard ? 0.05 : 0.09) * L;   // how far it bows to the side
@@ -75,13 +75,14 @@
       g.fillStyle = cleft; g.fillRect(ox - r * 0.5, cy - r * 0.6, r, r * 2.2);
       const und = g.createLinearGradient(0, cy + r * 0.3, 0, cy + r * 1.4); und.addColorStop(0, "rgba(120,60,55,0)"); und.addColorStop(1, "rgba(170,90,85,0.10)");
       g.fillStyle = und; g.fillRect(0, cy, cv.width, r * 2); g.restore();
+      g.fillStyle = "rgba(255,255,255,0.45)"; for (const sd of [-1, 1]) { g.beginPath(); g.ellipse(ox + sd * r * 0.95 - r * 0.28, cy + r * 0.05 + (sd < 0 ? r * 0.12 : 0), r * 0.11, r * 0.3, 0.35, 0, Math.PI * 2); g.fill(); }
       g.strokeStyle = line(skin); g.lineWidth = 1.2; path(); g.stroke();
       g.strokeStyle = line(skin); g.globalAlpha = 0.6; g.lineWidth = 1; g.beginPath(); g.moveTo(ox, cy + r * 0.2); g.quadraticCurveTo(ox + r * 0.08, cy + r * 0.3, ox, cy + r * 0.93); g.stroke(); g.globalAlpha = 1;   // the seam
     };
 
     // ── one cock: a single outline from root to tip ──
     const shaft = (dx, lean) => {
-      const dir = hard ? -1 : 1, N = 56, kn = (t) => (knotted && hard ? 0.95 * Math.exp(-Math.pow((t - 0.22) / 0.07, 2)) : 0);
+      const dir = hard ? -1 : 1, N = 56, kn = (t) => (knotted && hard ? 0.85 * Math.pow(Math.max(0, 1 - Math.pow((t - 0.2) / 0.105, 2)), 0.5) : 0);
       const cen = (t) => [ox + dx + (lean + Math.sin(t * Math.PI * 0.85) * bend) * (dx < 0 ? -1 : 1) * (K.two ? 1 : 1) + lean * t * 6, oy + dir * (t * L) + (hard ? 0 : W * 0.15)];
       const wd = (t) => Math.max(0.02, K.w(t, hard) + kn(t)) * W;
       const L0 = [], R0 = [];
@@ -100,12 +101,20 @@
         g.fillStyle = "rgba(222,150,152,0.45)"; for (const [a, b2, r] of [[-0.4, 0.7, 0.3], [0.35, 0.78, 0.22], [0.0, 0.9, 0.3], [-0.3, 0.6, 0.16]]) { const c3 = cen(b2); g.beginPath(); g.ellipse(c3[0] + a * W, c3[1], r * W, r * W * 1.5, 0, 0, Math.PI * 2); g.fill(); } }   // the medial ring, and pink mottling toward the end
       if (K.ridges) { g.strokeStyle = line(col); g.lineWidth = 1.1; for (let t = 0.1; t < 0.9; t += 1 / 7) { const c = cen(t), w = wd(t); g.beginPath(); g.moveTo(c[0] - w, c[1] - dir * w * 0.2); g.quadraticCurveTo(c[0], c[1] + dir * w * 0.6, c[0] + w, c[1] - dir * w * 0.2); g.stroke(); } }
       if (K.headAt) { const c = cen(K.headAt), w = wd(K.headAt) * 1.25; g.strokeStyle = line(K.tipCol); g.lineWidth = 1.1; g.beginPath(); g.moveTo(c[0] - w, c[1] - dir * w * 0.1); g.quadraticCurveTo(c[0], c[1] - dir * w * 0.55, c[0] + w, c[1] - dir * w * 0.1); g.stroke();
-        const e = cen(0.985); g.beginPath(); g.moveTo(e[0], e[1] - dir * W * 0.25); g.lineTo(e[0], e[1] + dir * W * 0.12); g.stroke(); }   // the rim of the head, and the slit
-      if (hard && !K.ridges) { g.strokeStyle = rgb(col, 0.9); g.lineWidth = 0.9; g.beginPath(); const a = cen(0.2), b2 = cen(0.45), c4 = cen(0.68); g.moveTo(a[0] - W * 0.3, a[1]); g.bezierCurveTo(b2[0] - W * 0.8, b2[1], b2[0] + W * 0.4, b2[1], c4[0] - W * 0.1, c4[1]); g.stroke(); }   // a vein
+        const e = cen(0.985); g.beginPath(); g.moveTo(e[0], e[1] - dir * W * 0.25); g.lineTo(e[0], e[1] + dir * W * 0.12); g.stroke();
+        if (K.cleft) { const a = cen(K.headAt + 0.02), b2 = cen(0.97); g.globalAlpha = 0.5; g.beginPath(); g.moveTo(a[0], a[1]); g.quadraticCurveTo(a[0] + W * 0.12, (a[1] + b2[1]) / 2, b2[0], b2[1]); g.stroke(); g.globalAlpha = 1; } }   // the rim of the head, the slit, and the line down the middle of it
+      if (!K.ridges) { const top = K.headAt ? K.headAt - 0.06 : 0.7, P2 = (t, k) => { const c = cen(t), w = wd(t); return [c[0] + k * w, c[1]]; };
+        g.strokeStyle = line(col); g.globalAlpha = hard ? 0.55 : 0.3; g.lineWidth = 1;
+        const vein = (pts) => { g.beginPath(); pts.forEach(([t, k], i) => { const p = P2(Math.min(top, t), k); if (i) g.lineTo(p[0], p[1]); else g.moveTo(p[0], p[1]); }); g.stroke(); };
+        vein([[0.16, -0.25], [0.26, -0.5], [0.38, -0.3], [0.5, -0.55], [0.62, -0.25], [0.74, -0.4]]); vein([[0.38, -0.3], [0.46, 0.1], [0.56, 0.3]]); vein([[0.2, 0.45], [0.32, 0.6], [0.44, 0.4]]);
+        g.globalAlpha = 1; }
+      if (false) { g.beginPath(); const a = cen(0.2), b2 = cen(0.45), c4 = cen(0.68); g.moveTo(a[0] - W * 0.3, a[1]); g.bezierCurveTo(b2[0] - W * 0.8, b2[1], b2[0] + W * 0.4, b2[1], c4[0] - W * 0.1, c4[1]); g.stroke(); }   // a vein
+      { g.strokeStyle = "rgba(255,255,255,0.5)"; g.lineWidth = Math.max(1.4, W * 0.16); g.beginPath(); for (let t = 0.2; t <= 0.62; t += 0.03) { const c = cen(t), w = wd(t); if (t === 0.2) g.moveTo(c[0] - w * 0.55, c[1]); else g.lineTo(c[0] - w * 0.55, c[1]); } g.stroke(); }
       g.restore();
       if (K.barbs) { g.fillStyle = line(col); for (let t = 0.45; t < 0.92; t += 0.1) for (const sd of [0, 1]) { const i = Math.round(t * N), p = (sd ? R0 : L0)[i], c = cen(t), ux2 = (p[0] - c[0]) / (wd(t) || 1), uy2 = (p[1] - c[1]) / (wd(t) || 1), s2 = Math.max(1.6, W * 0.22); g.beginPath(); g.moveTo(p[0], p[1] - dir * s2 * 0.6); g.lineTo(p[0] + ux2 * s2 * 1.3, p[1] + uy2 * s2 * 1.3 - dir * s2 * 1.4); g.lineTo(p[0], p[1] + dir * s2 * 0.5); g.closePath(); g.fill(); } }
       g.strokeStyle = line(mix(col, K.tipCol, 0.5)); g.lineWidth = 1.2; outline(); g.stroke();
       // the sheath it comes out of: a soft sleeve round the root, a little wider than the shaft, with a rolled edge
+      if (!K.sheath && hard) return;   // (a human one, standing, has no sleeve at the root)
       const sl = hard ? Math.min(0.11, 10 / L + 0.03) : (K.sheath ? 0.62 : 0.14), M = Math.max(2, Math.round(sl * N)), sw = 1.16;
       const sp = () => { g.beginPath(); for (let i = 0; i <= M; i++) { const c = cen(i / N), p = L0[i]; g.lineTo(c[0] + (p[0] - c[0]) * sw, c[1] + (p[1] - c[1]) * sw); } const cE = cen(M / N); g.quadraticCurveTo(cE[0], cE[1] + dir * W * 0.5, cE[0] + (R0[M][0] - cE[0]) * sw, cE[1] + (R0[M][1] - cE[1]) * sw); for (let i = M; i >= 0; i--) { const c = cen(i / N), p = R0[i]; g.lineTo(c[0] + (p[0] - c[0]) * sw, c[1] + (p[1] - c[1]) * sw); } g.closePath(); };
       const sg = g.createLinearGradient(ox + dx - W * 1.6, 0, ox + dx + W * 1.6, 0); sg.addColorStop(0, rgb(sh, 0.97)); sg.addColorStop(0.36, rgb(sh, 1)); sg.addColorStop(1, rgb(sh, 0.96));

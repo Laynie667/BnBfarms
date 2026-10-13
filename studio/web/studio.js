@@ -230,8 +230,12 @@
       $("p", { className: "note", textContent: "Fitting: " + itemName(it.Asset) + "  (" + it.Asset.Group.Name + " / " + it.Asset.Name + ")  on a " + fitKey(it).split("|")[1].replace("+", " chest, ") + " hips body, " + POSE_KEYS[poseKey()].toLowerCase() + "." }),
       (it.Asset.Extended || it.Asset.Archetype) ? $("div", { className: "row" }, $("button", { type: "button", className: "go", textContent: "Configure it (the game's own menu)", title: "Opens the real settings menu the game has for this item", onclick: () => configure(it.Asset.Group.Name) }), $("span", { className: "note", textContent: "Everything the game lets you set on it." })) : "",
       $("div", { className: "row" },
-        $("button", { type: "button", className: MOULD.items.has(mouldKey(it)) ? "on" : "", textContent: MOULD.items.has(mouldKey(it)) ? "Moulded to the body: on" : "Mould to the body", title: "Redraws this piece to follow the outline of the body, belly and all", onclick: () => { const k = mouldKey(it); if (MOULD.items.has(k)) MOULD.items.delete(k); else MOULD.items.add(k); MOULD.out.clear(); bellyDraw(); fillFit(); if (MOULD.items.has(k) && !fitNow().on) say("It's marked. The moulding shows once the belly is showing: there's nothing to mould to yet."); } }),
-        $("span", { className: "note", textContent: MOULD.items.has(mouldKey(it)) ? "It follows the body's outline. The sliders still work on top." : "Follows the outline where the sliders can't: wide where the belly is, untouched where it isn't." })),
+        $("label", { textContent: "Mould to the body:" }),
+        (() => { const k = mouldKey(it), now = MOULD.items.has(k) ? (MOULD.mode.get(k) || "wide") : "";
+          const sel = $("select", { title: "Redraws this piece to follow the body, belly and all", onchange: (e) => { const v = e.target.value; if (v) { MOULD.items.add(k); MOULD.mode.set(k, v); } else { MOULD.items.delete(k); MOULD.mode.delete(k); } MOULD.out.clear(); bellyDraw(); fillFit(); if (v && !fitNow().on) say("It's marked. The moulding shows once the belly is showing: there's nothing to mould to yet."); } },
+            [["", "No: as the game draws it"], ["wide", "Wide: out to the body's outline"], ["over", "Over: wide, and down over the belly"], ["under", "Under: it sits beneath, the belly hangs over it"]].map(([v, t]) => $("option", { value: v, textContent: t, selected: v === now })));
+          return sel; })(),
+        $("span", { className: "note", textContent: ({ "": "Follows the body where the sliders can't.", wide: "As wide as the body on every row. Never longer.", over: "Wide, and lengthened so it runs down to the underside of the belly.", under: "Left where it is on the body. The belly covers what it hangs in front of." })[MOULD.items.has(mouldKey(it)) ? (MOULD.mode.get(mouldKey(it)) || "wide") : ""] })),
       options.length > 1 ? $("div", { className: "row" }, $("label", { textContent: "Option:" }), options.map((o) => $("button", { type: "button", className: typeNow() === o ? "on" : "", textContent: o.replace(/([a-z])([A-Z0-9])/g, "$1 $2"), onclick: () => { try { TypedItemSetOptionByName(S.C, it, o, false, null, false); } catch (e) { say("The game wouldn't set that option: " + (e && e.message || e), true); } redraw(); } }))) : "",
       layers.length > 1 ? $("div", { className: "row" }, $("label", { textContent: "Move:" }),
         $("button", { type: "button", className: FIT.layer ? "" : "on", textContent: "The whole piece", onclick: () => { FIT.layer = ""; fillFit(); } }),
@@ -259,11 +263,11 @@
     const key = fitKey(it), f = fitOf(it);
     if (Object.keys(f).length) FIT.saved[key] = f; else delete FIT.saved[key];
     delete FIT.work[key];
-    try { const r = await fetch("/__studio/fits/items.json", { method: "POST", body: JSON.stringify({ v: 1, saved: new Date().toISOString(), note: "key: slot/item|chest+hips|pose · mould: slot/item pieces redrawn to the body's outline", fits: FIT.saved, mould: Array.from(MOULD.items) }, null, 1) }); if (!r.ok) throw new Error(await r.text());
+    try { const r = await fetch("/__studio/fits/items.json", { method: "POST", body: JSON.stringify({ v: 1, saved: new Date().toISOString(), note: "key: slot/item|chest+hips|pose · mould: slot/item pieces redrawn to the body's outline", fits: FIT.saved, mould: Array.from(MOULD.items), mouldMode: Object.fromEntries(MOULD.mode) }, null, 1) }); if (!r.ok) throw new Error(await r.text());
       say("Saved the fit for " + itemName(it.Asset) + " on this body in this pose. " + Object.keys(FIT.saved).length + " fits kept in studio\\fits\\items.json."); fillFit(); }
     catch (e) { say("It didn't save: " + (e && e.message || e), true); }
   }
-  async function loadItemFits() { try { const d = await (await fetch("/__studio/fits/items.json", { cache: "no-store" })).json(); if (d && Array.isArray(d.mould)) for (const k of d.mould) MOULD.items.add(k);
+  async function loadItemFits() { try { const d = await (await fetch("/__studio/fits/items.json", { cache: "no-store" })).json(); if (d && Array.isArray(d.mould)) for (const k of d.mould) MOULD.items.add(k); if (d && d.mouldMode) for (const k of Object.keys(d.mouldMode)) if (MOULD.items.has(k)) MOULD.mode.set(k, d.mouldMode[k]);
       if (d && d.fits) { FIT.saved = d.fits; applyAllSaved(); fitRefresh(); fillFit(); } } catch (e) { /* none yet */ } }
 
   // ── the belly ──
@@ -307,7 +311,13 @@
   // then redrawn in three parts: the stretch across the body is widened to the new edges, and what hangs outside the
   // body on either side is moved out with the edge, so it stays attached. Rows the belly doesn't reach are untouched.
   // It follows the outline as seen from the front. It doesn't paint a bulge onto the piece.
-  const MOULD = { items: new Set(), img: new Map(), prof: new Map(), out: new Map(), M: 150 };
+  // Three ways (Laynie, Oct 13: "over, but I am sure some things might look better under"):
+  //   wide:  as above, sideways only.
+  //   over:  wide, and LONGER. What a belly does to a crotch chain is hang past the end of it. The part of the piece
+  //          from where the belly starts down to the piece's own end is stretched so it ends at the belly's underside.
+  //          Every layer of a piece is stretched by the same amount (ext: the piece's top and bottom, over all its layers).
+  //   under: the piece stays on the body where it was and the belly hangs in front: the belly's shape is cut out of it.
+  const MOULD = { items: new Set(), mode: new Map(), ext: new Map(), img: new Map(), prof: new Map(), out: new Map(), M: 150 };
   const mouldKey = (it) => it.Asset.Group.Name + "/" + it.Asset.Name;
   function mouldImg(src) {
     let e = MOULD.img.get(src);
@@ -336,13 +346,38 @@
     };
     return { old: (yy) => row(yy, false), neu: (yy) => row(yy, true) };
   }
-  function mouldCanvas(src, x, y, ctx) {
-    const im = mouldImg(src); if (!im) return null;
-    const key = src + "|" + Math.round(x) + "," + Math.round(y) + "|" + ctx.sig;
+  // the belly's first and last row on the screen
+  function bellyRows(ctx) { const b = ctx.belly, bp = b.prof || (b.prof = edges(b.cv, b.cv.width, b.cv.height)); let t = -1, e = -1; for (let j = 0; j < bp.h; j++) if (bp.L[j] >= 0) { if (t < 0) t = j; e = j; } return t < 0 ? null : { top: Math.round(b.dy) + t, bottom: Math.round(b.dy) + e }; }
+  function mouldCanvas(src, x, y, ctx, piece, mode) {
+    let im = mouldImg(src); if (!im) return null;
+    const M = MOULD.M, w = im.naturalWidth; let h = im.naturalHeight;
+    // the piece's own top and bottom on the screen, over every layer of it seen so far
+    const p = edgesOf(src); let ext = MOULD.ext.get(piece);
+    if (p) { let t = -1, e = -1; for (let j = 0; j < p.h; j++) if (p.L[j] >= 0) { if (t < 0) t = j; e = j; }
+      if (t >= 0) { const T = Math.round(y) + t, B = Math.round(y) + e; if (!ext || T < ext.top || B > ext.bottom) { ext = { top: ext ? Math.min(ext.top, T) : T, bottom: ext ? Math.max(ext.bottom, B) : B }; MOULD.ext.set(piece, ext); clearTimeout(MOULD.t); MOULD.t = setTimeout(bellyDraw, 60); } } }
+    const key = src + "|" + Math.round(x) + "," + Math.round(y) + "|" + mode + "|" + (ext ? ext.top + "-" + ext.bottom : "") + "|" + ctx.sig;
     if (MOULD.out.has(key)) return MOULD.out.get(key);
+    const keep = (res) => { if (MOULD.out.size > 80) MOULD.out.clear(); MOULD.out.set(key, res); return res; };
+    if (mode === "under") {
+      const c = document.createElement("canvas"); c.width = w + M * 2; c.height = h; const g = c.getContext("2d");
+      g.drawImage(im, M, 0); g.globalCompositeOperation = "destination-out"; g.drawImage(ctx.belly.cv, ctx.belly.dx - x + M, ctx.belly.dy - y);
+      return keep(c);
+    }
     const ol = ctx.outline || (ctx.outline = outline(ctx)); if (!ol) return null;   // a body picture is still loading: try again next redraw
-    const M = MOULD.M, w = im.naturalWidth, h = im.naturalHeight, c = document.createElement("canvas"); c.width = w + M * 2; c.height = h;
-    const g = c.getContext("2d"); let changed = false;
+    let changed = false;
+    if (mode === "over" && ext) {
+      const br = bellyRows(ctx), from = br ? Math.max(ext.top, br.top) : 0, to = br ? br.bottom - 2 : 0;   // (a little short of the very bottom: it goes under there)
+      if (br && ext.bottom > from + 4 && ext.bottom < to) {
+        const a = from - Math.round(y), b = ext.bottom - Math.round(y), b2 = to - Math.round(y), tall = document.createElement("canvas"); tall.width = w; tall.height = Math.max(h, b2 + 1 + (h - 1 - b));
+        const tg = tall.getContext("2d");
+        if (a > 0) tg.drawImage(im, 0, 0, w, a, 0, 0, w, a);                                     // above the belly: as it is
+        tg.drawImage(im, 0, a, w, b - a + 1, 0, a, w, b2 - a + 1);                               // down the belly: lengthened
+        if (b + 1 < h) tg.drawImage(im, 0, b + 1, w, h - b - 1, 0, b2 + 1, w, h - b - 1);        // (anything below: moved down)
+        im = tall; h = tall.height; changed = true;
+      }
+    }
+    const c = document.createElement("canvas"); c.width = w + M * 2; c.height = h;
+    const g = c.getContext("2d");
     for (let j = 0; j < h; j++) {
       const yy = Math.round(y) + j, o = ol.old(yy), n = ol.neu(yy);
       if (!o || !n || (n.l >= o.l && n.r <= o.r)) { g.drawImage(im, 0, j, w, 1, M, j, w, 1); continue; }
@@ -352,9 +387,7 @@
       g.drawImage(im, l0, j, r0 - l0 + 1, 1, M + l1, j, r1 - l1 + 1, 1);                                   // across the body: stretched to fit
       if (r0 + 1 < w) g.drawImage(im, r0 + 1, j, w - r0 - 1, 1, M + r1 + 1, j, w - r0 - 1, 1);             // right of the body
     }
-    const res = changed ? c : false;   // false: nothing on this piece overlaps the belly, draw it as the game does
-    if (MOULD.out.size > 80) MOULD.out.clear(); MOULD.out.set(key, res);
-    return res;
+    return keep(changed ? c : false);   // false: nothing on this piece overlaps the belly, draw it as the game does
   }
 
   // step into the game's drawing of our character: lay the belly in (after all the skin, or before the upper body), and
@@ -371,8 +404,8 @@
           const slot = new RegExp("(?:^|/)Assets/[^/]+/([^/]+)/");
           const groupOf = (src) => { const m = slot.exec(src); return m ? m[1] : ""; };
           // (a piece's pictures are in its slot's folder or the folder of the slot it borrows its art from, named for the piece)
-          const mouldList = S.C.Appearance.filter((it) => MOULD.items.has(mouldKey(it))).map((it) => ({ folders: [it.Asset.Group.Name, it.Asset.DynamicGroupName], name: it.Asset.Name }));
-          const isMoulded = (src) => { if (!mouldList.length) return false; const g = groupOf(src), file = src.slice(src.lastIndexOf("/") + 1); return mouldList.some((q) => q.folders.includes(g) && file.startsWith(q.name)); };
+          const mouldList = S.C.Appearance.filter((it) => MOULD.items.has(mouldKey(it))).map((it) => ({ folders: [it.Asset.Group.Name, it.Asset.DynamicGroupName], name: it.Asset.Name, key: mouldKey(it), mode: MOULD.mode.get(mouldKey(it)) || "wide" }));
+          const isMoulded = (src) => { if (!mouldList.length) return null; const g = groupOf(src), file = src.slice(src.lastIndexOf("/") + 1); return mouldList.find((q) => q.folders.includes(g) && file.startsWith(q.name)) || null; };
           const gate = FarmBelly.skinGate(C);   // true once a picture comes after all the skin, genitals included
           const prio = (src) => { const g = AssetGroupGet(C.AssetFamily, groupOf(src)); return g && typeof g.DrawingPriority === "number" ? g.DrawingPriority : 99; };
           const paint = () => {
@@ -391,7 +424,7 @@
             const blink = /Blink$/.test(name);
             if (!blink) { try { before(src, x, y, o); } catch (e) { console.warn("[studio] belly:", e); } }
             let drawn = false;
-            try { if (ctx.belly && !fit.behind && typeof src === "string" && isMoulded(src)) { const m = mouldCanvas(src, x, y, ctx); if (m) { real[name](m, x - MOULD.M, y, o); drawn = true; } } } catch (e) { console.warn("[studio] mould:", e); }
+            try { if (ctx.belly && !fit.behind && typeof src === "string") { const q = isMoulded(src), m = q && mouldCanvas(src, x, y, ctx, q.key, q.mode); if (m) { real[name](m, x - MOULD.M, y, o); drawn = true; } } } catch (e) { console.warn("[studio] mould:", e); }
             if (!drawn) real[name](src, x, y, o);
             if (!blink) { try { after(src, x, y, o); } catch (e) { console.warn("[studio] belly:", e); } }
           } : real[name]);

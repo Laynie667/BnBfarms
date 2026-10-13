@@ -96,6 +96,14 @@ the game's pictures into the drawing.
   not set to "behind".
 - The list of moulded pieces is saved in `fits/items.json` when you press *Save this fit*.
 
+## Step 9: over or under
+
+- *Mould to the body* is a choice of three. **Wide**: sideways only, as before. **Over**: wide, and lengthened so
+  the piece runs down to the underside of the belly (for a crotch chain the belly would otherwise hang past).
+  **Under**: the piece stays on the body and the belly hangs in front of it, hiding what it covers.
+- Over stretches what is there, so chain links get a little longer. If a piece already reaches the bottom of the
+  belly, over leaves its length alone.
+
 ## Step 8: words and signs
 
 - The words on a sign, body writing, face writing and tags now move, stretch and turn with the piece's sliders.

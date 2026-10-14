@@ -15,6 +15,7 @@ import { Panel } from "./panel.js";
 import { captureOutfit, wearOutfit, changeBack, hasBackup } from "./outfits.js";
 import { markBody, washMarks, stripMe, dressMe, syncFarmGear, syncShape } from "./marks.js";
 import { initBelly } from "./belly.js";
+import { initDrawnBody } from "./drawnbody.js";
 import { initCues, cueOff, lead, face, sound, trance, drawMarkers, arouse, vibe, initBody } from "./cues.js";
 
 // the SDK ships as an old-style module; this digs the real thing out either way
@@ -320,6 +321,7 @@ function start() {
   initCues({ toBot, panel: st.panel, local: toChat });
   setInterval(parasiteSync, 60000);
   initBelly(mod);  // the drawn-belly test (belly.js)
+  initDrawnBody(mod);  // the drawn body from the outfit studio, on your own character (drawnbody.js)
   initBody(mod);   // slowed walkin' when you're carryin' a lot, and bein' held at the edge while denied (cues.js)
   // the bot hands this page's own-account messages straight here (see toBot above)
   window.__farmhandOwnPanel = (data) => { if (!onBotAccount()) return; const m = readMsg(data); if (m) { try { onFarmMsg(m); } catch (e) { console.warn("[Farmhand Companion]", e); } } };

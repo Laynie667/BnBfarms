@@ -148,6 +148,8 @@ function skinGate(C) {
   };
 }
 // <<< belly drawing
+// the drawing block, for the drawn body (drawnbody.js), which draws the belly with the very same code
+export const bellyDrawing = { SIZES, bellyCanvas, bellyPlace, bellyPose, skinPatch, skinGate, FALLBACK };
 // The game keeps every picture it draws in a list it looks things up in BY NAME, and it expects every name to be text.
 // Handing it the drawing itself (Oct 12, Companion 0.16.2) put a non-text name in that list, and from then on every
 // character refresh crashed in the game's own clean-up (AnimationPurge: "key.startsWith is not a function"): no dressing,
@@ -217,7 +219,7 @@ function hookBelly(mod) {
       let finish = null;
       try {
         const C = args[0], cb = args[1];
-        if (trial && C && W.Player && C.MemberNumber === W.Player.MemberNumber && cb && typeof cb.drawImage === "function") {
+        if (trial && !W.__farmDrawnBody && C && W.Player && C.MemberNumber === W.Player.MemberNumber && cb && typeof cb.drawImage === "function") {
           // WHERE in the stack it goes (Oct 12, seen live: "the layers between the legs and belly clip now and then").
           // The game draws skin first, in this order: chest and arms (7), marks on the skin (8), hips and legs (9), nipples (11),
           // what's between the legs (12). Clothes and gear come after (13 and up). The belly used to go in right after the legs,

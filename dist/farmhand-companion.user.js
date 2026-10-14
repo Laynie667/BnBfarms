@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.17.6
+// @version      0.18.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -230,7 +230,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.17.6";
+  var VERSION = "0.18.0";
 
   // extension/src/config.js
   var BOT_MEMBER = 260239;
@@ -996,16 +996,16 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var FALLBACK = { White: [236, 204, 196], Asian: [232, 200, 164], Black: [120, 86, 70] };
   var clamp = (v) => Math.max(0, Math.min(255, Math.round(v)));
   var rgb = (c, k) => "rgb(" + clamp(c[0] * k) + "," + clamp(c[1] * k) + "," + clamp(c[2] * k) + ")";
-  function bellyPoint(S, cx, cy, t) {
+  function bellyPoint(S2, cx, cy, t) {
     const sn = Math.sin(t), cs = Math.cos(t);
-    const wide = 1 + S.sag * sn - S.sag * 0.55 * (sn < 0 ? sn * sn : 0);
-    const drop = sn > 0 ? 1 + S.sag * 0.35 * sn : 1 - S.sag * 0.25 * -sn;
-    return [cx + S.rx * cs * wide / (1 + S.sag), cy + S.ry * sn * drop / (1 + S.sag * 0.35)];
+    const wide = 1 + S2.sag * sn - S2.sag * 0.55 * (sn < 0 ? sn * sn : 0);
+    const drop = sn > 0 ? 1 + S2.sag * 0.35 * sn : 1 - S2.sag * 0.25 * -sn;
+    return [cx + S2.rx * cs * wide / (1 + S2.sag), cy + S2.ry * sn * drop / (1 + S2.sag * 0.35)];
   }
-  function bellyPath(g, S, cx, cy, from, to) {
+  function bellyPath(g, S2, cx, cy, from, to) {
     const steps = 72;
     for (let i = 0; i <= steps; i++) {
-      const p = bellyPoint(S, cx, cy, from + (to - from) * i / steps);
+      const p = bellyPoint(S2, cx, cy, from + (to - from) * i / steps);
       if (i) g.lineTo(p[0], p[1]);
       else g.moveTo(p[0], p[1]);
     }
@@ -1013,17 +1013,17 @@ One of mods you are using is using an old version of SDK. It will work for now b
   function bellyCanvas(size, skin, pressed) {
     const byHand = typeof size === "object" && !!size, S0 = byHand ? size : SIZES[size];
     if (byHand) size = S0.rx >= 84 ? 3 : S0.rx >= 60 ? 2 : 1;
-    const S = pressed && !byHand ? { rx: S0.rx * 1.2, ry: S0.ry * 0.6, sag: S0.sag + 0.12 } : S0, pad = 6, w = S.rx * 2 + pad * 2, hgt = S.ry * 2 + pad * 2, cx = w / 2, cy = hgt / 2, low = cy + S.ry * 0.28;
+    const S2 = pressed && !byHand ? { rx: S0.rx * 1.2, ry: S0.ry * 0.6, sag: S0.sag + 0.12 } : S0, pad = 6, w = S2.rx * 2 + pad * 2, hgt = S2.ry * 2 + pad * 2, cx = w / 2, cy = hgt / 2, low = cy + S2.ry * 0.28;
     const cv = document.createElement("canvas");
     cv.width = w;
     cv.height = hgt;
     const g = cv.getContext("2d");
     const whole = () => {
       g.beginPath();
-      bellyPath(g, S, cx, cy, 0, Math.PI * 2);
+      bellyPath(g, S2, cx, cy, 0, Math.PI * 2);
       g.closePath();
     };
-    const grad = g.createRadialGradient(cx - S.rx * 0.22, low - S.ry * 0.42, S.rx * 0.1, cx, low, S.ry * 1.05);
+    const grad = g.createRadialGradient(cx - S2.rx * 0.22, low - S2.ry * 0.42, S2.rx * 0.1, cx, low, S2.ry * 1.05);
     grad.addColorStop(0, rgb(skin, 1.03));
     grad.addColorStop(0.55, rgb(skin, 1));
     grad.addColorStop(1, rgb([skin[0], skin[1] * 0.93, skin[2] * 0.92], 0.94));
@@ -1033,34 +1033,34 @@ One of mods you are using is using an old version of SDK. It will work for now b
     g.save();
     whole();
     g.clip();
-    const under = g.createLinearGradient(0, low + S.ry * 0.25, 0, cy + S.ry + pad);
+    const under = g.createLinearGradient(0, low + S2.ry * 0.25, 0, cy + S2.ry + pad);
     under.addColorStop(0, "rgba(150,70,60,0)");
     under.addColorStop(1, "rgba(150,70,60,0.22)");
     g.fillStyle = under;
     g.fillRect(0, 0, w, hgt);
-    const blush = g.createRadialGradient(cx, low + S.ry * 0.2, 2, cx, low + S.ry * 0.2, S.rx * 0.85);
+    const blush = g.createRadialGradient(cx, low + S2.ry * 0.2, 2, cx, low + S2.ry * 0.2, S2.rx * 0.85);
     blush.addColorStop(0, "rgba(214,120,120,0.14)");
     blush.addColorStop(1, "rgba(214,120,120,0)");
     g.fillStyle = blush;
     g.fillRect(0, 0, w, hgt);
-    g.translate(cx - S.rx * 0.36, low - S.ry * 0.3);
+    g.translate(cx - S2.rx * 0.36, low - S2.ry * 0.3);
     g.rotate(-0.22);
-    const sh = g.createRadialGradient(0, 0, 0, 0, 0, S.ry * 0.36);
+    const sh = g.createRadialGradient(0, 0, 0, 0, 0, S2.ry * 0.36);
     sh.addColorStop(0, "rgba(255,255,255,0.8)");
     sh.addColorStop(0.5, "rgba(255,255,255,0.3)");
     sh.addColorStop(1, "rgba(255,255,255,0)");
     g.fillStyle = sh;
     g.scale(0.34, 1);
     g.beginPath();
-    g.arc(0, 0, S.ry * 0.36, 0, Math.PI * 2);
+    g.arc(0, 0, S2.ry * 0.36, 0, Math.PI * 2);
     g.fill();
     g.restore();
     g.globalCompositeOperation = "destination-out";
     {
-      const fr = Math.min(S.rx * 0.9, 56);
+      const fr = Math.min(S2.rx * 0.9, 56);
       g.save();
-      g.translate(cx, cy - S.ry * 0.98);
-      g.scale(1, S.ry * 0.7 / fr);
+      g.translate(cx, cy - S2.ry * 0.98);
+      g.scale(1, S2.ry * 0.7 / fr);
       const fade = g.createRadialGradient(0, 0, fr * 0.3, 0, 0, fr);
       fade.addColorStop(0, "rgba(0,0,0,1)");
       fade.addColorStop(1, "rgba(0,0,0,0)");
@@ -1077,21 +1077,21 @@ One of mods you are using is using an old version of SDK. It will work for now b
     g.lineJoin = "round";
     g.lineWidth = 1.5;
     g.beginPath();
-    bellyPath(g, S, cx, cy, -up, Math.PI + up);
+    bellyPath(g, S2, cx, cy, -up, Math.PI + up);
     g.stroke();
     g.lineWidth = 2.1;
     g.beginPath();
-    bellyPath(g, S, cx, cy, Math.PI * 0.2, Math.PI * 0.8);
+    bellyPath(g, S2, cx, cy, Math.PI * 0.2, Math.PI * 0.8);
     g.stroke();
     g.strokeStyle = rgb(skin, 0.45);
     g.lineWidth = 1.4;
     g.beginPath();
-    const ny = low + S.ry * 0.12;
+    const ny = low + S2.ry * 0.12;
     if (size >= 3) {
       g.ellipse(cx, ny, 4.5, 3.2, 0, 0, Math.PI * 2);
     } else {
-      g.moveTo(cx - 0.5, ny - S.ry * 0.07);
-      g.quadraticCurveTo(cx + 3, ny, cx - 0.5, ny + S.ry * 0.07);
+      g.moveTo(cx - 0.5, ny - S2.ry * 0.07);
+      g.quadraticCurveTo(cx + 3, ny, cx - 0.5, ny + S2.ry * 0.07);
     }
     g.stroke();
     if (size >= 2) {
@@ -1100,16 +1100,16 @@ One of mods you are using is using an old version of SDK. It will work for now b
       g.globalAlpha = 0.45;
       g.beginPath();
       g.moveTo(cx, ny + 6);
-      g.lineTo(cx, cy + S.ry * 0.86);
+      g.lineTo(cx, cy + S2.ry * 0.86);
       g.stroke();
       g.globalAlpha = 1;
     }
     if (pressed) {
-      const cut = Math.round(cy + S.ry * (byHand && S0.cut > 0 ? S0.cut : 0.74));
+      const cut = Math.round(cy + S2.ry * (byHand && S0.cut > 0 ? S0.cut : 0.74));
       g.clearRect(0, cut, w, hgt - cut);
       let x0 = cx, x1 = cx;
       for (let t = 0; t <= Math.PI; t += 0.01) {
-        const p = bellyPoint(S, cx, cy, t);
+        const p = bellyPoint(S2, cx, cy, t);
         if (p[1] >= cut) {
           x0 = Math.min(x0, p[0]);
           x1 = Math.max(x1, p[0]);
@@ -1127,10 +1127,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
     return cv;
   }
   function bellyPlace(size, upperX, upperY, cv, pose) {
-    const S = SIZES[size];
+    const S2 = SIZES[size];
     if (pose === "AllFours") return [upperX + 250 - cv.width / 2, upperY + GROUND_Y - (cv.cut || cv.height)];
-    if (pose === "Hogtied") return [upperX + 250 - cv.width / 2, upperY + 300 + S.ry * 0.34 - cv.height / 2];
-    return [upperX + 250 - cv.width / 2, upperY + 392 + S.ry * 0.62 - (S.lift || 0) - cv.height / 2];
+    if (pose === "Hogtied") return [upperX + 250 - cv.width / 2, upperY + 300 + S2.ry * 0.34 - cv.height / 2];
+    return [upperX + 250 - cv.width / 2, upperY + 392 + S2.ry * 0.62 - (S2.lift || 0) - cv.height / 2];
   }
   var ALL_FOURS_BELLY = false;
   var GROUND_Y = 386;
@@ -1160,6 +1160,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       return i > last;
     };
   }
+  var bellyDrawing = { SIZES, bellyCanvas, bellyPlace, bellyPose, skinPatch, skinGate, FALLBACK };
   var pictures = /* @__PURE__ */ new Map();
   function bellyPicture(size, skin, pressed) {
     const key = size + (pressed ? "p" : "") + ":" + skin.map((v) => Math.round(v / 4) * 4).join(",");
@@ -1251,7 +1252,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
         let finish = null;
         try {
           const C = args[0], cb = args[1];
-          if (trial && C && W.Player && C.MemberNumber === W.Player.MemberNumber && cb && typeof cb.drawImage === "function") {
+          if (trial && !W.__farmDrawnBody && C && W.Player && C.MemberNumber === W.Player.MemberNumber && cb && typeof cb.drawImage === "function") {
             let upper = null, lower = false, done = false;
             const gate = skinGate(C);
             const prio = (src) => {
@@ -1267,7 +1268,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
             const paint = () => {
               if (done || !upper || !lower) return;
               done = true;
-              const S = SIZES[trial], cv = bellyPicture(trial, skinFor(upper[2], upper[3]), upper[4] === "AllFours");
+              const S2 = SIZES[trial], cv = bellyPicture(trial, skinFor(upper[2], upper[3]), upper[4] === "AllFours");
               const [dx, dy] = bellyPlace(trial, upper[0], upper[1], cv, upper[4]);
               cb.drawImage(cv.url, dx, dy, {});
               if (typeof cb.drawImageBlink === "function") cb.drawImageBlink(cv.url, dx, dy, {});
@@ -1331,17 +1332,2327 @@ One of mods you are using is using an old version of SDK. It will work for now b
     trial = Math.max(0, Math.min(3, Math.round(Number(n)) || 0));
     scrubCache();
     if (trial) hookBelly(sdk);
-    const redraw = () => {
+    const redraw2 = () => {
       try {
         if (W.Player && typeof W.CharacterLoadCanvas === "function") W.CharacterLoadCanvas(W.Player);
       } catch (e) {
         console.warn("[Farmhand Companion] belly redraw:", e);
       }
     };
-    redraw();
-    setTimeout(redraw, 500);
-    setTimeout(redraw, 1800);
+    redraw2();
+    setTimeout(redraw2, 500);
+    setTimeout(redraw2, 1800);
     if (say) say(trial ? "Belly test: " + ["", "small", "medium", "large"][trial] + ". Look at your character with nothing over your middle. Only you can see it. Tell Claude how it looks: the shape, the colour match, where it sits." : "Belly test off.");
+  }
+
+  // studio/web/breasts-drawing.js
+  (() => {
+    const NATIVE = ["FlatSmall", "FlatMedium", "Small", "Normal", "Large", "XLarge"];
+    const CUPS = ["Flat", "AA", "A", "B", "C", "D", "DD", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R"];
+    const DRAWN_FROM = NATIVE.length;
+    const ROOT_Y = 284;
+    const clamp2 = (v) => Math.max(0, Math.min(255, Math.round(v)));
+    const rgb2 = (c, k) => "rgb(" + clamp2(c[0] * k) + "," + clamp2(c[1] * k) + "," + clamp2(c[2] * k) + ")";
+    function shape(cup, adj) {
+      const a = adj || {}, i = Math.max(0, cup - DRAWN_FROM), n = CUPS.length - 1 - DRAWN_FROM;
+      const k = i / n, hang = a.hang == null ? 1 : a.hang, full = a.full == null ? 1 : a.full, apart = a.apart == null ? 1 : a.apart;
+      const r = (44 + 2.6 * i) * full;
+      const sag = (0.06 + 0.22 * k) * hang;
+      const top = 1.34 + 0.16 * k * hang;
+      const bx = (r * (1.03 - 0.13 * k) + 5 * (1 - k)) * apart;
+      const by = r * top;
+      return { cup, i, k, r, sag, top, bx, by };
+    }
+    const GAME = { dx: 42, cy: 330, ro: 34, rv: 42, y1: 252, y2: 289, y3: 398 };
+    const heldScale = (S2) => S2.r / 41;
+    function heldY(y, sc) {
+      if (y <= GAME.y1) return y;
+      const top = GAME.y1 + (GAME.y2 - GAME.y1) * (1 + sc) / 2;
+      if (y >= GAME.y2) return top + (y - GAME.y2) * sc;
+      const t = (y - GAME.y1) / (GAME.y2 - GAME.y1);
+      return GAME.y1 + (GAME.y2 - GAME.y1) * (t + (sc - 1) * (t * t * t - t * t * t * t / 2));
+    }
+    function held(S2) {
+      const sc = heldScale(S2);
+      return Object.assign({}, S2, { held: true, sc, bx: GAME.dx * sc, by: heldY(GAME.cy, sc) - ROOT_Y, ro: GAME.ro * sc, ri: GAME.dx * sc, rv: GAME.rv * sc, r: GAME.rv * sc, sag: 0, top: 1 });
+    }
+    function point(S2, s, t) {
+      const sn = Math.sin(t), cs = Math.cos(t);
+      if (S2.held) return [s * S2.bx + (s * cs > 0 ? S2.ro : S2.ri) * cs, S2.by + S2.rv * sn];
+      if (sn >= 0) return [s * S2.bx + S2.r * cs * (1 + S2.sag * 0.3 * sn * sn) + s * S2.r * 0.06 * S2.k * sn * sn, S2.by + S2.r * sn * (1 + S2.sag)];
+      const up = -sn;
+      return [s * S2.bx + S2.r * cs * (1 - 0.5 * up * up) - s * S2.r * 0.2 * up * up, S2.by - S2.r * S2.top * up];
+    }
+    function path(g, S2, s, from, to, ox, oy) {
+      const steps = 80;
+      for (let j = 0; j <= steps; j++) {
+        const p = point(S2, s, from + (to - from) * j / steps);
+        if (j) g.lineTo(ox + p[0], oy + p[1]);
+        else g.moveTo(ox + p[0], oy + p[1]);
+      }
+    }
+    function nipples(S2) {
+      if (S2.held) {
+        const hx = S2.bx + 4 * S2.sc, hy = S2.by - 0.43 * S2.rv;
+        return [[-hx, hy], [hx, hy]];
+      }
+      const x = S2.bx + S2.r * (0.02 + 0.2 * S2.k), y = S2.by + S2.r * (-0.15 + 0.42 * S2.k);
+      return [[-x, y], [x, y]];
+    }
+    function canvas(S2, skin) {
+      const pad = 8, half = S2.bx + S2.r * (1 + S2.sag * 0.35) + pad, up = Math.max(0, S2.r * S2.top - S2.by) + pad, down = S2.by + S2.r * (1 + S2.sag) + pad + 10;
+      const out = document.createElement("canvas");
+      out.width = Math.ceil(Math.max(half, 110) * 2);
+      out.height = Math.ceil(up + Math.max(down, 110));
+      const cv = document.createElement("canvas");
+      cv.width = out.width;
+      cv.height = out.height;
+      const g = cv.getContext("2d"), ox = out.width / 2, oy = up;
+      cv.ax = ox;
+      cv.ay = oy;
+      cv.nips = nipples(S2);
+      const side = (s, draw) => {
+        g.save();
+        g.beginPath();
+        if (s < 0) g.rect(0, 0, ox, cv.height);
+        else g.rect(ox, 0, cv.width - ox, cv.height);
+        g.clip();
+        draw();
+        g.restore();
+      };
+      const whole = (s) => {
+        g.beginPath();
+        path(g, S2, s, 0, Math.PI * 2, ox, oy);
+        g.closePath();
+      };
+      for (const s of [-1, 1]) side(s, () => {
+        g.save();
+        g.translate(0, 5 + S2.r * 0.04);
+        g.filter = "blur(4px)";
+        g.fillStyle = "rgba(120,60,50,0.22)";
+        whole(s);
+        g.fill();
+        g.restore();
+      });
+      for (const s of [-1, 1]) side(s, () => {
+        const cx = ox + s * S2.bx, low = oy + S2.by + S2.r * 0.25;
+        const grad = g.createRadialGradient(cx - S2.r * 0.25, low - S2.r * 0.5, S2.r * 0.1, cx, low, S2.r * 1.25);
+        grad.addColorStop(0, rgb2(skin, 1.03));
+        grad.addColorStop(0.55, rgb2(skin, 1));
+        grad.addColorStop(1, rgb2([skin[0], skin[1] * 0.93, skin[2] * 0.92], 0.94));
+        g.fillStyle = grad;
+        whole(s);
+        g.fill();
+        g.save();
+        whole(s);
+        g.clip();
+        const under = g.createLinearGradient(0, low + S2.r * 0.2, 0, oy + S2.by + S2.r * (1 + S2.sag));
+        under.addColorStop(0, "rgba(150,70,60,0)");
+        under.addColorStop(1, "rgba(150,70,60,0.24)");
+        g.fillStyle = under;
+        g.fillRect(0, 0, cv.width, cv.height);
+        const cl = g.createLinearGradient(ox, 0, ox + s * S2.r * 0.3, 0);
+        cl.addColorStop(0, "rgba(150,70,60,0.20)");
+        cl.addColorStop(1, "rgba(150,70,60,0)");
+        g.fillStyle = cl;
+        g.fillRect(0, oy + S2.by - S2.r * 0.6, cv.width, cv.height);
+        g.translate(cx - S2.r * 0.38, low - S2.r * 0.42);
+        g.rotate(-0.25);
+        const sh = g.createRadialGradient(0, 0, 0, 0, 0, S2.r * 0.34);
+        sh.addColorStop(0, "rgba(255,255,255,0.8)");
+        sh.addColorStop(0.5, "rgba(255,255,255,0.3)");
+        sh.addColorStop(1, "rgba(255,255,255,0)");
+        g.fillStyle = sh;
+        g.scale(0.36, 1);
+        g.beginPath();
+        g.arc(0, 0, S2.r * 0.34, 0, Math.PI * 2);
+        g.fill();
+        g.restore();
+      });
+      g.globalCompositeOperation = "destination-out";
+      {
+        const topY = oy + S2.by - S2.r * S2.top, fx = Math.min(S2.bx * 1.15, 72), fy = S2.r * S2.top * 0.95;
+        g.save();
+        g.translate(ox, topY);
+        g.scale(1, fy / fx);
+        const fade = g.createRadialGradient(0, 0, fx * 0.45, 0, 0, fx);
+        fade.addColorStop(0, "rgba(0,0,0,1)");
+        fade.addColorStop(1, "rgba(0,0,0,0)");
+        g.fillStyle = fade;
+        g.beginPath();
+        g.arc(0, 0, fx, 0, Math.PI * 2);
+        g.fill();
+        g.restore();
+      }
+      g.globalCompositeOperation = "source-over";
+      g.strokeStyle = rgb2(skin, 0.28);
+      g.lineCap = "round";
+      g.lineJoin = "round";
+      for (const s of [-1, 1]) side(s, () => {
+        const hi = (0.22 + 0.16 * S2.k) * Math.PI, outer = s > 0 ? [-hi, Math.PI * 1.02] : [Math.PI + hi, -0.02 * Math.PI];
+        g.lineWidth = 1.5;
+        g.beginPath();
+        path(g, S2, s, outer[0], outer[1], ox, oy);
+        g.stroke();
+        g.lineWidth = 2.2;
+        g.beginPath();
+        path(g, S2, s, Math.PI * 0.15, Math.PI * 0.85, ox, oy);
+        g.stroke();
+      });
+      let y0 = Infinity, y1 = -Infinity;
+      for (let t = 0; t < Math.PI * 2; t += 0.02) {
+        const p = point(S2, 1, t);
+        if (p[0] <= 0) {
+          y0 = Math.min(y0, p[1]);
+          y1 = Math.max(y1, p[1]);
+        }
+      }
+      if (S2.held) {
+        y0 = S2.by - S2.rv * 0.2;
+        y1 = S2.by + S2.rv * 0.72;
+      }
+      if (y1 > y0) {
+        const a = Math.max(y0, S2.by - S2.r * 0.45), lg = g.createLinearGradient(0, oy + a, 0, oy + y1);
+        lg.addColorStop(0, "rgba(0,0,0,0)");
+        lg.addColorStop(0.35, rgb2(skin, 0.28));
+        lg.addColorStop(1, rgb2(skin, 0.28));
+        g.strokeStyle = lg;
+        g.lineWidth = 1.6;
+        g.beginPath();
+        g.moveTo(ox, oy + a);
+        g.lineTo(ox, oy + y1);
+        g.stroke();
+      }
+      const og = out.getContext("2d");
+      og.save();
+      og.translate(ox, oy + 46);
+      og.scale(1, 0.66);
+      const patch = og.createRadialGradient(0, 0, 62, 0, 0, 80);
+      patch.addColorStop(0, rgb2(skin, 1));
+      patch.addColorStop(1, "rgba(" + clamp2(skin[0]) + "," + clamp2(skin[1]) + "," + clamp2(skin[2]) + ",0)");
+      og.fillStyle = patch;
+      og.beginPath();
+      og.arc(0, 0, 80, 0, Math.PI * 2);
+      og.fill();
+      og.restore();
+      og.fillStyle = rgb2(skin, 1);
+      for (const s of [-1, 1]) {
+        og.beginPath();
+        og.ellipse(ox + s * 70, oy + 6, 6, 13, 0, 0, Math.PI * 2);
+        og.fill();
+      }
+      og.drawImage(cv, 0, 0);
+      out.ax = cv.ax;
+      out.ay = cv.ay;
+      out.nips = cv.nips;
+      const mask = document.createElement("canvas");
+      mask.width = out.width;
+      mask.height = out.height;
+      const mg = mask.getContext("2d");
+      mg.fillStyle = "#000";
+      for (const s of [-1, 1]) {
+        mg.beginPath();
+        path(mg, S2, s, 0, Math.PI * 2, ox, oy);
+        mg.closePath();
+        mg.fill();
+      }
+      out.mask = mask;
+      return out;
+    }
+    const GAME_ALLFOURS = { dx: 33, cy: 288, ro: 22, rv: 25, y1: 236, y2: 262, y3: 318 }, GROUND = 398;
+    function fitOf(S2, pose, nip) {
+      if (pose === "AllFours") {
+        const G2 = GAME_ALLFOURS, ro2 = S2.r * (1 + S2.sag * 0.3), rv2 = S2.r * (1 + S2.sag), kx2 = (S2.bx + ro2) / (G2.dx + G2.ro);
+        const bottom = Math.min(GROUND, ROOT_Y + S2.by + rv2), top2 = Math.max(G2.y1 + 4, Math.min(bottom - 40, ROOT_Y + S2.by - S2.r * S2.top * 0.8)), ky2 = (bottom - top2) / (G2.cy + G2.rv - G2.y2);
+        return { G: G2, gi: G2.dx - G2.ro, go: G2.dx + G2.ro, ti: Math.max(0, S2.bx - S2.r), to: S2.bx + ro2, kx: kx2, ro: ro2, ri: Math.min(S2.r, S2.bx), rv: rv2, mapY: (y) => y <= G2.y1 ? y : y >= G2.y2 ? top2 + (y - G2.y2) * ky2 : G2.y1 + (top2 - G2.y1) * (y - G2.y1) / (G2.y2 - G2.y1) };
+      }
+      if (S2.held) return { kx: S2.sc, ro: S2.ro, ri: S2.ri, rv: S2.rv, mapY: (y) => heldY(y, S2.sc) };
+      const ro = S2.r * (1 + S2.sag * 0.3), rv = S2.r * (1 + S2.sag), kx = (S2.bx + ro) / (GAME.dx + GAME.ro), ky = rv / GAME.rv;
+      const cy = ROOT_Y + S2.by, top = Math.max(GAME.y1 + 4, cy - (GAME.cy - GAME.y2) * ky);
+      const gnx = GAME.dx + 4, gny = GAME.cy - 0.43 * GAME.rv, pn = nipples(S2)[1], tnx = nip ? nip[0] : pn[0], tny = ROOT_Y + (nip ? nip[1] : pn[1]), bot = cy + rv, gbot = GAME.cy + GAME.rv;
+      const okY = tny > top + 6 && tny < bot - 6;
+      const mapY = (y) => y <= GAME.y1 ? y : y >= GAME.y2 ? top + (y - GAME.y2) * ky : GAME.y1 + (top - GAME.y1) * (y - GAME.y1) / (GAME.y2 - GAME.y1);
+      const mapYN = (y) => {
+        if (y <= GAME.y1) return y;
+        if (y < GAME.y2) return GAME.y1 + (top - GAME.y1) * (y - GAME.y1) / (GAME.y2 - GAME.y1);
+        if (!okY) return top + (y - GAME.y2) * ky;
+        if (y <= gny) return top + (y - GAME.y2) * (tny - top) / (gny - GAME.y2);
+        return tny + (y - gny) * (bot - tny) / (gbot - gny);
+      };
+      const ti = Math.max(0, S2.bx - S2.r), to = S2.bx + ro;
+      return { gi: 0, go: GAME.dx + GAME.ro, gn: gnx, tn: tnx > ti + 6 && tnx < to - 6 ? tnx : null, ti, to, kx, ro, ri: Math.min(S2.r, S2.bx), rv, mapY, mapYN };
+    }
+    window.FarmBreasts = { fitOf, NATIVE, CUPS, DRAWN_FROM, ROOT_Y, GAME, shape, held, heldY, point, nipples, canvas };
+  })();
+
+  // studio/web/body-engine.js
+  (() => {
+    window.FarmBodyEngine = function(host) {
+      "use strict";
+      const S2 = host.S;
+      const bodyItem = (g) => host.bodyItem(g);
+      const setBody = (g, n) => host.setBody(g, n);
+      const bellyDraw = () => {
+        try {
+          host.redraw();
+        } catch (e) {
+          console.warn("[body] redraw:", e);
+        }
+      };
+      const FIT0 = () => ({ on: false, rx: 70, ry: 80, sag: 0.22, x: 0, y: 0, behind: false, flat: false, cut: 0.74 });
+      const BELLY = { fits: { std: FIT0(), AllFours: Object.assign(FIT0(), { behind: true, y: -60 }), Hogtied: Object.assign(FIT0(), { behind: true, y: -75 }) }, skin: /* @__PURE__ */ new Map() };
+      const poseKey = () => {
+        const m = S2.C && S2.C.PoseMapping || {};
+        const all = Object.values(m).concat(S2.C && S2.C.Pose || []);
+        return all.includes("AllFours") ? "AllFours" : all.includes("Hogtied") ? "Hogtied" : "std";
+      };
+      const fitNow = () => BELLY.fits[poseKey()];
+      function bellySkin(src, hex, pose) {
+        const key = src + "|" + (hex || ""), v = BELLY.skin.get(key);
+        if (Array.isArray(v)) return v;
+        const guess = /_Black\./.test(src) ? FarmBelly.FALLBACK.Black : /_Asian\./.test(src) ? FarmBelly.FALLBACK.Asian : FarmBelly.FALLBACK.White;
+        if (!v) {
+          BELLY.skin.set(key, "loading");
+          const img = new Image();
+          img.onload = () => {
+            let c = guess;
+            try {
+              const at = FarmBelly.skinPatch(pose), cv = document.createElement("canvas");
+              cv.width = 48;
+              cv.height = 40;
+              const g = cv.getContext("2d");
+              g.drawImage(img, -at[0], -at[1]);
+              const d = g.getImageData(0, 0, 48, 40).data, good = [];
+              for (let i = 0; i < d.length; i += 4) if (d[i + 3] > 200 && d[i] + d[i + 1] + d[i + 2] > 90 && Math.min(d[i], d[i + 1], d[i + 2]) < 238) good.push([d[i], d[i + 1], d[i + 2]]);
+              if (good.length >= 40) {
+                good.sort((m, n) => m[0] + m[1] + m[2] - (n[0] + n[1] + n[2]));
+                const p = good[Math.floor(good.length * 0.7)];
+                c = hex ? [1, 3, 5].map((i) => Math.min(255, parseInt(hex.slice(i, i + 2), 16) * (p[0] + p[1] + p[2]) / 383)) : p;
+              }
+            } catch (e) {
+            }
+            BELLY.skin.set(key, c);
+            bellyDraw();
+          };
+          img.onerror = () => BELLY.skin.set(key, guess);
+          img.src = src;
+        }
+        return guess;
+      }
+      const MOULD = { ver: 0, lies: /* @__PURE__ */ new Set(), span: /* @__PURE__ */ new Map(), cover: /* @__PURE__ */ new Map(), items: /* @__PURE__ */ new Set(), mode: /* @__PURE__ */ new Map(), ext: /* @__PURE__ */ new Map(), img: /* @__PURE__ */ new Map(), prof: /* @__PURE__ */ new Map(), out: /* @__PURE__ */ new Map(), M: 150 };
+      const mouldKey = (it) => it.Asset.Group.Name + "/" + it.Asset.Name;
+      function mouldImg(src) {
+        let e = MOULD.img.get(src);
+        if (!e) {
+          e = { img: new Image(), ok: false };
+          e.img.onload = () => {
+            e.ok = true;
+            clearTimeout(MOULD.t);
+            MOULD.t = setTimeout(bellyDraw, 60);
+          };
+          e.img.onerror = () => {
+            e.bad = true;
+          };
+          e.img.src = src;
+          MOULD.img.set(src, e);
+        }
+        return e.ok ? e.img : null;
+      }
+      function edges(source, w, h2) {
+        const c = document.createElement("canvas");
+        c.width = w;
+        c.height = h2;
+        const g = c.getContext("2d", { willReadFrequently: true });
+        g.drawImage(source, 0, 0);
+        const d = g.getImageData(0, 0, w, h2).data, L = new Int16Array(h2).fill(-1), R = new Int16Array(h2).fill(-1);
+        for (let y = 0; y < h2; y++) {
+          let l = -1, r = -1;
+          const o = y * w * 4;
+          for (let x = 0; x < w; x++) if (d[o + x * 4 + 3] > 60) {
+            if (l < 0) l = x;
+            r = x;
+          }
+          L[y] = l;
+          R[y] = r;
+        }
+        return { L, R, w, h: h2 };
+      }
+      function edgesOf(src) {
+        let p = MOULD.prof.get(src);
+        if (p) return p;
+        const im = mouldImg(src);
+        if (!im) return null;
+        p = edges(im, im.naturalWidth, im.naturalHeight);
+        MOULD.prof.set(src, p);
+        return p;
+      }
+      function outline(ctx2) {
+        const parts = [];
+        for (const b of ctx2.bodies) {
+          const p = edgesOf(b.src);
+          if (!p) return null;
+          parts.push({ p, x: b.x, y: b.y });
+        }
+        const bp = ctx2.belly.prof || (ctx2.belly.prof = edges(ctx2.belly.cv, ctx2.belly.cv.width, ctx2.belly.cv.height));
+        const row = (yy, withBelly) => {
+          let l = Infinity, r = -Infinity;
+          for (const q2 of parts) {
+            const j = yy - Math.round(q2.y);
+            if (j >= 0 && j < q2.p.h && q2.p.L[j] >= 0) {
+              l = Math.min(l, q2.x + q2.p.L[j]);
+              r = Math.max(r, q2.x + q2.p.R[j]);
+            }
+          }
+          if (l === Infinity) return null;
+          if (withBelly) {
+            const j = yy - Math.round(ctx2.belly.dy);
+            if (j >= 0 && j < bp.h && bp.L[j] >= 0) {
+              l = Math.min(l, ctx2.belly.dx + bp.L[j]);
+              r = Math.max(r, ctx2.belly.dx + bp.R[j]);
+            }
+          }
+          return { l, r };
+        };
+        return { old: (yy) => row(yy, false), neu: (yy) => row(yy, true) };
+      }
+      function bellyCover(src, x, y, ctx2) {
+        const im = mouldImg(src);
+        if (!im) return 0;
+        const b = ctx2.belly, key = "bc|" + src + "|" + Math.round(x) + "," + Math.round(y) + "|" + Math.round(b.dx) + "," + Math.round(b.dy) + "," + b.cv.width + "," + b.cv.height;
+        let v = MOULD.cover.get(key);
+        if (v != null) return v;
+        const w = im.naturalWidth, h2 = im.naturalHeight, c = document.createElement("canvas");
+        c.width = w;
+        c.height = h2;
+        const g = c.getContext("2d", { willReadFrequently: true });
+        g.drawImage(im, 0, 0);
+        const d = g.getImageData(0, 0, w, h2).data, cx = b.dx + b.cv.width / 2 - x, cy = b.dy + b.cv.height / 2 - y, rx = b.cv.width * 0.3, ry = b.cv.height * 0.3;
+        let hit = 0, all = 0;
+        for (let j = -ry; j <= ry; j += 3) for (let i = -rx; i <= rx; i += 3) {
+          if (i / rx * (i / rx) + j / ry * (j / ry) > 1) continue;
+          all++;
+          const px = Math.round(cx + i), py = Math.round(cy + j);
+          if (px >= 0 && py >= 0 && px < w && py < h2 && d[(py * w + px) * 4 + 3] > 60) hit++;
+        }
+        v = all ? hit / all : 0;
+        if (MOULD.cover.size > 400) MOULD.cover.clear();
+        MOULD.cover.set(key, v);
+        return v;
+      }
+      function bellyAuto(src, x, y, ctx2, behind, pieceKey) {
+        if (!ctx2.belly || behind || BELLY.auto === false || typeof src !== "string") return null;
+        const m0 = new RegExp("(?:^|/)Assets/[^/]+/(?:Override/[^/]+/)?([^/]+)/").exec(src);
+        if (!m0) return false;
+        if (m0[1] !== "Panties" && !chestSlot(m0[1])) return false;
+        if (m0[1] === "Panties") return mouldCanvas(src, x, y, ctx2, "under|" + (pieceKey || src), "under");
+        const pk = pieceKey || src;
+        if (bellyCover(src, x, y, ctx2) >= 0.15) MOULD.lies.add(pk);
+        if (!MOULD.lies.has(pk)) return false;
+        return mouldCanvas(src, x, y, ctx2, "auto|" + (pieceKey || src), "auto");
+      }
+      function pieceSpan(pk, src, x, y) {
+        const span = MOULD.span.get("p|" + pk) || { L: new Float32Array(2600).fill(1e9), R: new Float32Array(2600).fill(-1e9), v: 0, bottom: -1 };
+        MOULD.span.set("p|" + pk, span);
+        const p0 = edgesOf(src);
+        let grew = false;
+        if (p0) for (let j = 0; j < p0.h; j++) {
+          const yy = Math.round(y) + j;
+          if (p0.L[j] < 0 || yy < 0 || yy >= 2600) continue;
+          if (x + p0.L[j] < span.L[yy]) {
+            span.L[yy] = x + p0.L[j];
+            grew = true;
+          }
+          if (x + p0.R[j] > span.R[yy]) {
+            span.R[yy] = x + p0.R[j];
+            grew = true;
+          }
+          if (yy > span.bottom) {
+            span.bottom = yy;
+            grew = true;
+          }
+        }
+        if (grew) {
+          span.v++;
+          MOULD.ver++;
+          clearTimeout(MOULD.t);
+          MOULD.t = setTimeout(bellyDraw, 60);
+        }
+        return span;
+      }
+      function bellyRows(ctx2) {
+        const b = ctx2.belly, bp = b.prof || (b.prof = edges(b.cv, b.cv.width, b.cv.height));
+        let t = -1, e = -1;
+        for (let j = 0; j < bp.h; j++) if (bp.L[j] >= 0) {
+          if (t < 0) t = j;
+          e = j;
+        }
+        return t < 0 ? null : { top: Math.round(b.dy) + t, bottom: Math.round(b.dy) + e };
+      }
+      function mouldCanvas(src, x, y, ctx2, piece, mode) {
+        let im = mouldImg(src);
+        if (!im) return null;
+        const M = MOULD.M, w = im.naturalWidth;
+        let h2 = im.naturalHeight;
+        const p = edgesOf(src);
+        let ext = MOULD.ext.get(piece);
+        if (p) {
+          let t = -1, e = -1;
+          for (let j = 0; j < p.h; j++) if (p.L[j] >= 0) {
+            if (t < 0) t = j;
+            e = j;
+          }
+          if (t >= 0) {
+            const T = Math.round(y) + t, B = Math.round(y) + e;
+            if (!ext || T < ext.top || B > ext.bottom) {
+              ext = { top: ext ? Math.min(ext.top, T) : T, bottom: ext ? Math.max(ext.bottom, B) : B };
+              MOULD.ext.set(piece, ext);
+              clearTimeout(MOULD.t);
+              MOULD.t = setTimeout(bellyDraw, 60);
+            }
+          }
+        }
+        const key = src + "|" + Math.round(x) + "," + Math.round(y) + "|" + mode + "|" + (ext ? ext.top + "-" + ext.bottom : "") + "|" + ctx2.sig;
+        if (MOULD.out.has(key)) return MOULD.out.get(key);
+        const keep = (res) => {
+          if (MOULD.out.size > 80) MOULD.out.clear();
+          MOULD.out.set(key, res);
+          return res;
+        };
+        if (mode === "under") {
+          const c2 = document.createElement("canvas");
+          c2.width = w + M * 2;
+          c2.height = h2;
+          const g2 = c2.getContext("2d");
+          g2.drawImage(im, M, 0);
+          g2.globalCompositeOperation = "destination-out";
+          g2.drawImage(ctx2.belly.cv, ctx2.belly.dx - x + M, ctx2.belly.dy - y);
+          return keep(c2);
+        }
+        const ol = ctx2.outline || (ctx2.outline = outline(ctx2));
+        if (!ol) return null;
+        let changed = false;
+        if (mode === "over" && ext) {
+          const br = bellyRows(ctx2), from = br ? Math.max(ext.top, br.top) : 0, to = br ? br.bottom - 2 : 0;
+          if (br && ext.bottom > from + 4 && ext.bottom < to) {
+            const a = from - Math.round(y), b = ext.bottom - Math.round(y), b2 = to - Math.round(y), tall = document.createElement("canvas");
+            tall.width = w;
+            tall.height = Math.max(h2, b2 + 1 + (h2 - 1 - b));
+            const tg = tall.getContext("2d");
+            if (a > 0) tg.drawImage(im, 0, 0, w, a, 0, 0, w, a);
+            tg.drawImage(im, 0, a, w, b - a + 1, 0, a, w, b2 - a + 1);
+            if (b + 1 < h2) tg.drawImage(im, 0, b + 1, w, h2 - b - 1, 0, b2 + 1, w, h2 - b - 1);
+            im = tall;
+            h2 = tall.height;
+            changed = true;
+          }
+        }
+        const c = document.createElement("canvas");
+        c.width = w + M * 2;
+        c.height = h2;
+        const g = c.getContext("2d");
+        let longSrc = false;
+        if (mode === "auto" && ext) {
+          const br = bellyRows(ctx2), mid = br ? (br.top + br.bottom) / 2 : 0, to = br ? br.bottom - 2 : 0, from = br ? Math.max(ext.top, br.top) : 0;
+          const ps = pieceSpan(piece, src, x, y), bp0 = ctx2.belly.prof || (ctx2.belly.prof = edges(ctx2.belly.cv, ctx2.belly.cv.width, ctx2.belly.cv.height));
+          let endW = 1e9, bW = 0;
+          for (let k = 3; k <= 8; k++) {
+            const yy = ext.bottom - k;
+            if (yy >= 0 && yy < 2600 && ps.L[yy] < 1e8) endW = Math.min(endW, ps.R[yy] - ps.L[yy]);
+          }
+          for (let j = 0; j < bp0.h; j++) if (bp0.L[j] >= 0) bW = Math.max(bW, bp0.R[j] - bp0.L[j]);
+          if (br && endW < bW * 0.45 && ext.bottom > mid && ext.bottom < to - 2 && ext.bottom > from + 4) {
+            const a = from - Math.round(y), b = ext.bottom - Math.round(y), b2 = to - Math.round(y);
+            if (b > a) {
+              const tall = document.createElement("canvas");
+              tall.width = w;
+              tall.height = Math.max(h2, b2 + 1 + Math.max(0, h2 - 1 - b));
+              const tg = tall.getContext("2d");
+              if (a > 0) tg.drawImage(im, 0, 0, w, Math.min(a, h2), 0, 0, w, Math.min(a, h2));
+              if (b >= a && a < h2) tg.drawImage(im, 0, Math.max(0, a), w, Math.min(h2, b + 1) - Math.max(0, a), 0, Math.max(0, a), w, b2 - Math.max(0, a) + 1);
+              if (b + 1 < h2) tg.drawImage(im, 0, b + 1, w, h2 - b - 1, 0, b2 + 1, w, h2 - b - 1);
+              im = tall;
+              h2 = tall.height;
+              longSrc = true;
+            }
+          }
+        }
+        if (mode === "auto") {
+          const b = ctx2.belly, bp = b.prof || (b.prof = edges(b.cv, b.cv.width, b.cv.height)), cxs = b.dx + b.cv.width / 2;
+          if (longSrc) {
+            c.height = h2;
+          }
+          const spanKey = piece + (longSrc ? "|long" + (ext ? ext.top + "-" + ext.bottom : "") : ""), span = MOULD.span.get(spanKey) || { L: new Float32Array(2600).fill(1e9), R: new Float32Array(2600).fill(-1e9), v: 0 };
+          MOULD.span.set(spanKey, span);
+          const p0 = longSrc ? edges(im, w, h2) : edgesOf(src);
+          let grew = false;
+          if (p0) for (let j = 0; j < p0.h; j++) {
+            const yy = Math.round(y) + j;
+            if (p0.L[j] < 0 || yy < 0 || yy >= 2600) continue;
+            if (x + p0.L[j] < span.L[yy]) {
+              span.L[yy] = x + p0.L[j];
+              grew = true;
+            }
+            if (x + p0.R[j] > span.R[yy]) {
+              span.R[yy] = x + p0.R[j];
+              grew = true;
+            }
+          }
+          if (grew) {
+            span.v++;
+            MOULD.ver++;
+            clearTimeout(MOULD.t);
+            MOULD.t = setTimeout(bellyDraw, 60);
+          }
+          const key2 = key + "|span" + span.v;
+          if (MOULD.out.has(key2)) return MOULD.out.get(key2);
+          const rowOf = (yy) => {
+            if (yy < 0 || yy >= 2600 || span.L[yy] > 1e8) return null;
+            const j = yy - Math.round(b.dy);
+            if (j < 0 || j >= bp.h || bp.L[j] < 0) return null;
+            const gl = span.L[yy], gr = span.R[yy], bl = b.dx + bp.L[j], br2 = b.dx + bp.R[j];
+            if (gl > cxs || gr < cxs) return null;
+            return { gl, gr, nl: Math.min(gl, bl), nr: Math.max(gr, br2), bw: br2 - bl };
+          };
+          const strappy = bellyCover(src, x, y, ctx2) < 0.35;
+          for (let j = 0; j < h2; j++) {
+            const yy = Math.round(y) + j;
+            g.drawImage(im, 0, j, w, 1, M, j, w, 1);
+            let gl = 0, gr = 0, nl2 = 0, nr = 0, bw = 0, n2 = 0;
+            for (let d = -4; d <= 4; d++) {
+              const e = rowOf(yy + d);
+              if (e) {
+                gl += e.gl;
+                gr += e.gr;
+                nl2 += e.nl;
+                nr += e.nr;
+                bw += e.bw;
+                n2++;
+              }
+            }
+            if (n2 < 5 || !rowOf(yy)) continue;
+            gl /= n2;
+            gr /= n2;
+            nl2 /= n2;
+            nr /= n2;
+            if (gr - gl < (strappy ? Math.max(6, bw / n2 * 0.45) : 6) || nl2 >= gl - 0.5 && nr <= gr + 0.5) continue;
+            const k = (nr - nl2) / (gr - gl), sa = Math.max(0, gl - x), sb = Math.min(w, gr - x + 1);
+            if (sb - sa < 1) continue;
+            changed = true;
+            g.clearRect(M + nl2 - x - 1, j, nr - nl2 + 2, 1);
+            g.drawImage(im, sa, j, sb - sa, 1, M + (nl2 - x) + (sa - (gl - x)) * k, j, (sb - sa) * k, 1);
+          }
+          const res2 = changed ? c : false;
+          if (MOULD.out.size > 80) MOULD.out.clear();
+          MOULD.out.set(key2, res2);
+          return res2;
+        }
+        for (let j = 0; j < h2; j++) {
+          const yy = Math.round(y) + j, o = ol.old(yy), n = ol.neu(yy);
+          if (!o || !n || n.l >= o.l && n.r <= o.r) {
+            g.drawImage(im, 0, j, w, 1, M, j, w, 1);
+            continue;
+          }
+          changed = true;
+          const l0 = Math.max(0, Math.min(w - 1, Math.round(o.l - x))), r0 = Math.max(l0, Math.min(w - 1, Math.round(o.r - x))), l1 = Math.round(n.l - x), r1 = Math.round(n.r - x);
+          if (l0 > 0) g.drawImage(im, 0, j, l0, 1, M + (l1 - l0), j, l0, 1);
+          g.drawImage(im, l0, j, r0 - l0 + 1, 1, M + l1, j, r1 - l1 + 1, 1);
+          if (r0 + 1 < w) g.drawImage(im, r0 + 1, j, w - r0 - 1, 1, M + r1 + 1, j, w - r0 - 1, 1);
+        }
+        return keep(changed ? c : false);
+      }
+      const BREAST = { band: {}, solid: {}, tuck: true, on: {}, free: true, holds: {}, holdSig: "", wear: {}, dress: true, cover: /* @__PURE__ */ new Map(), cup: null, full: 1, hang: 1, apart: 1, x: 0, y: 0, nip: 1, nipY: 0, nipX: 0, cv: null, cvKey: "", halves: /* @__PURE__ */ new Map(), out: /* @__PURE__ */ new Map() };
+      const BREAST_SLIDERS = [
+        ["full", "Fullness", 0.7, 1.4, 0.01],
+        ["hang", "Weight (how low and heavy they hang)", 0, 2, 0.01],
+        ["apart", "Apart / together", 0.6, 1.5, 0.01],
+        ["x", "Left / right", -60, 60, 1],
+        ["y", "Up / down", -80, 80, 1],
+        ["nip", "Nipple size (and what's worn on them)", 0.4, 4, 0.05],
+        ["nipY", "Nipples up / down", -80, 80, 1],
+        ["nipX", "Nipples in / out", -60, 60, 1]
+      ];
+      const NIP_GROUPS = /* @__PURE__ */ new Set(["Nipples", "ItemNipples", "ItemNipplesPiercings"]);
+      const HAND_GROUPS = /* @__PURE__ */ new Set(["HandsLeft", "HandsRight", "ItemHands", "Gloves"]);
+      const NIP_PIECES = new RegExp("Forbidden|Pastie|Nipple|Shield|Tape|Heart|Tassel|Piercing", "i");
+      const ARM_GROUPS = /* @__PURE__ */ new Set(["ItemArms", "Bracelet"]);
+      const heldNow = () => false;
+      const chestSlot = (g) => !!g && !/^Hair/.test(g) && !NIP_GROUPS.has(g) && !HAND_GROUPS.has(g) && !/^(Body|Arms|Head|Eyes|Eyebrows|Mouth|Blush|Fluids|Pussy|Emoticon|Height)/.test(g);
+      const STRAPS = {
+        FrameBra1: { ring: 6, centre: 4 },
+        FrameBra2: { ring: 3.5, cross: 2.5 },
+        BondageBra1: { across: 0.42, under: 6 },
+        HarnessBra2: { ring: 6, under: 8 },
+        StarHarnessBra: { ring: 4, cross: 3.5, over: 3.5 },
+        StuddedHarness: { ring: 8, under: 8 },
+        LeatherBreastBinder: { over: 10, under: 10, centre: 6 },
+        LeatherHarness: { ring: 6, centre: 5, under: 6 },
+        LeatherStrapHarness: { ring: 6, centre: 5, under: 6 },
+        HarnessBra1: { ring: 5, under: 6 }
+      };
+      const GAME_BREAST_ALLFOURS = { dx: 33, y: 288, r: 24 };
+      const gameBreast = (B) => B.pose === "AllFours" ? GAME_BREAST_ALLFOURS : GAME_BREAST;
+      const GAME_BREAST = { dx: 42, y: 330, r: 41 };
+      const upperName = () => {
+        const it = bodyItem("BodyUpper");
+        return it && it.Asset ? it.Asset.Name : "";
+      };
+      function breastNow() {
+        if (!window.FarmBreasts || BREAST.cup == null || BREAST.cup < FarmBreasts.DRAWN_FROM) return null;
+        if (upperName() !== "XLarge") return null;
+        return BREAST;
+      }
+      function setCup(i) {
+        BREAST.cup = i;
+        setBody("BodyUpper", i < FarmBreasts.DRAWN_FROM ? FarmBreasts.NATIVE[i] : "XLarge");
+        bellyDraw();
+      }
+      function cupNow() {
+        if (breastNow()) return BREAST.cup;
+        const n = FarmBreasts.NATIVE.indexOf(upperName());
+        return n < 0 ? 3 : n;
+      }
+      function nipHalves(src, split) {
+        const key = src + "|" + split;
+        let v = BREAST.halves.get(key);
+        if (v) return v;
+        const im = mouldImg(src);
+        if (!im) return null;
+        const w = im.naturalWidth, h2 = im.naturalHeight, c = document.createElement("canvas");
+        c.width = w;
+        c.height = h2;
+        const g = c.getContext("2d", { willReadFrequently: true });
+        g.drawImage(im, 0, 0);
+        const d = g.getImageData(0, 0, w, h2).data, acc = [[0, 0, 0], [0, 0, 0]];
+        for (let y = 0; y < h2; y++) for (let x = 0; x < w; x++) if (d[(y * w + x) * 4 + 3] > 60) {
+          const a = acc[x < split ? 0 : 1];
+          a[0] += x;
+          a[1] += y;
+          a[2]++;
+        }
+        v = acc.map((a) => a[2] ? [a[0] / a[2], a[1] / a[2]] : null);
+        BREAST.halves.set(key, v);
+        return v;
+      }
+      const GEN = { inches: 6, box: {}, drawn: true, kind: "human", knot: false, girth: 1, balls: 3, cv: null, cvKey: "" };
+      function draw(C, cb, game) {
+        {
+          let finish = null, seenNow = null, handFNow = null;
+          try {
+            const fit = C === S2.C ? fitNow() : null, br = C === S2.C ? breastNow() : null, real = cb;
+            const put = (name, img, x, y, o) => {
+              if (typeof img === "string" || !host.picture) return real[name](img, x, y, o);
+              const p = host.picture(img);
+              if (p) return real[name](p.src, x + p.dx, y + p.dy, o);
+            };
+            if (fit && cb && typeof cb.drawImage === "function") {
+              let upper = null, lower = false, done = false;
+              const ctx2 = { bodies: [], belly: null, sig: "", seen: {} };
+              if (br) {
+                seenNow = ctx2.seen;
+                handFNow = { get v() {
+                  return ctx2.handF;
+                } };
+              }
+              const slot = new RegExp("(?:^|/)Assets/[^/]+/(?:Override/[^/]+/)?([^/]+)/");
+              const groupOf3 = (src) => {
+                const m = slot.exec(src);
+                return m ? m[1] : "";
+              };
+              const mouldList = S2.C.Appearance.filter((it) => MOULD.items.has(mouldKey(it))).map((it) => ({ folders: [it.Asset.Group.Name, it.Asset.DynamicGroupName], name: it.Asset.Name, key: mouldKey(it), mode: MOULD.mode.get(mouldKey(it)) || "wide" }));
+              const wornList = S2.C.Appearance.map((it) => ({ folders: [it.Asset.Group.Name, it.Asset.DynamicGroupName], name: it.Asset.Name, key: mouldKey(it), flat: !!(it.Asset.Prerequisite || []).includes("HasFlatChest") && !InventoryIsItemInList(S2.C, "BodyUpper", ["FlatSmall", "FlatMedium"]) })).sort((a, b) => b.name.length - a.name.length);
+              const pieceOf = (src) => {
+                const g = groupOf3(src), file = src.slice(src.lastIndexOf("/") + 1);
+                return wornList.find((w) => w.folders.includes(g) && file.startsWith(w.name)) || null;
+              };
+              const isMoulded = (src) => {
+                if (!mouldList.length) return null;
+                const g = groupOf3(src), file = src.slice(src.lastIndexOf("/") + 1);
+                return mouldList.find((q2) => q2.folders.includes(g) && file.startsWith(q2.name)) || null;
+              };
+              const gate = FarmBelly.skinGate(C);
+              const prio = (src) => {
+                const g = AssetGroupGet(C.AssetFamily, groupOf3(src));
+                return g && typeof g.DrawingPriority === "number" ? g.DrawingPriority : 99;
+              };
+              const paint = () => {
+                if (done || !upper) return;
+                done = true;
+                if (fit.on) {
+                  const shape = { rx: fit.rx, ry: fit.ry, sag: fit.sag, cut: fit.cut };
+                  const cv = FarmBelly.bellyCanvas(shape, bellySkin(upper[2], upper[3], FarmBelly.bellyPose(upper[2])), !!fit.flat);
+                  const dx = upper[0] + 250 - cv.width / 2 + fit.x, dy = upper[1] + 392 + fit.ry * 0.62 - cv.height / 2 + fit.y;
+                  put("drawImage", cv, dx, dy, {});
+                  if (typeof real.drawImageBlink === "function") put("drawImageBlink", cv, dx, dy, {});
+                  ctx2.belly = { cv, dx, dy };
+                  ctx2.sig = [fit.rx, fit.ry, fit.sag, fit.cut, fit.flat ? 1 : 0, Math.round(dx), Math.round(dy)].join(",") + "|" + ctx2.bodies.map((b) => b.src + "@" + Math.round(b.x) + "," + Math.round(b.y)).join(";");
+                }
+                if (ctx2.cock) {
+                  const k = ctx2.cock;
+                  ctx2.cock = null;
+                  put("drawImage", k[0], k[1], k[2], {});
+                  if (typeof real.drawImageBlink === "function") put("drawImageBlink", k[0], k[1], k[2], {});
+                }
+                if (br) {
+                  const isHeld = FarmBelly.bellyPose(upper[2]) !== "AllFours" && heldNow(), freeS = FarmBreasts.shape(br.cup, br), S3 = isHeld ? FarmBreasts.held(freeS) : freeS;
+                  const key = [br.cup, br.full, br.hang, br.apart, isHeld ? "held" : "free"].join(",") + "|" + bellySkin(upper[2], upper[3], FarmBelly.bellyPose(upper[2])).join(",");
+                  if (BREAST.cvKey !== key) {
+                    BREAST.cv = FarmBreasts.canvas(S3, bellySkin(upper[2], upper[3], FarmBelly.bellyPose(upper[2])));
+                    BREAST.cvKey = key;
+                  }
+                  const bpose = FarmBelly.bellyPose(upper[2]), rx = upper[0] + 250 + br.x, ry = upper[1] + FarmBreasts.ROOT_Y + br.y, ground = upper[1] + 398;
+                  let bc = BREAST.cv;
+                  if (bpose === "AllFours" && ry - bc.ay + bc.height > ground) {
+                    if (BREAST.flatKey !== key + "|" + Math.round(ry)) {
+                      const fc = document.createElement("canvas");
+                      fc.width = bc.width;
+                      fc.height = bc.height;
+                      const fg = fc.getContext("2d"), cut = Math.round(ground - (ry - bc.ay));
+                      fg.drawImage(bc, 0, 0);
+                      fg.clearRect(0, cut, fc.width, fc.height - cut);
+                      const row = fg.getImageData(0, Math.max(0, cut - 3), fc.width, 1).data;
+                      let x0 = -1, x1 = -1;
+                      for (let i = 0; i < fc.width; i++) if (row[i * 4 + 3] > 120) {
+                        if (x0 < 0) x0 = i;
+                        x1 = i;
+                      }
+                      if (x0 >= 0) {
+                        const soft = 16, mid = (x0 + x1) / 2, half = (x1 - x0) / 2;
+                        fg.globalCompositeOperation = "destination-out";
+                        const fade = fg.createLinearGradient(0, cut - soft, 0, cut);
+                        fade.addColorStop(0, "rgba(0,0,0,0)");
+                        fade.addColorStop(1, "rgba(0,0,0,0.9)");
+                        fg.fillStyle = fade;
+                        fg.fillRect(0, cut - soft, fc.width, soft);
+                        for (const sd of [-1, 1]) {
+                          const cx = mid + sd * half, rg = fg.createRadialGradient(cx, cut, 0, cx, cut, soft * 1.8);
+                          rg.addColorStop(0, "rgba(0,0,0,1)");
+                          rg.addColorStop(1, "rgba(0,0,0,0)");
+                          fg.fillStyle = rg;
+                          fg.fillRect(cx - soft * 2, cut - soft * 2, soft * 4, soft * 2);
+                        }
+                        fg.globalCompositeOperation = "destination-over";
+                        const sh = fg.createRadialGradient(mid, cut - 3, 0, mid, cut - 3, half * 1.05);
+                        sh.addColorStop(0, "rgba(70,40,36,0.34)");
+                        sh.addColorStop(0.75, "rgba(70,40,36,0.2)");
+                        sh.addColorStop(1, "rgba(70,40,36,0)");
+                        fg.save();
+                        fg.translate(0, cut - 3);
+                        fg.scale(1, 0.09);
+                        fg.translate(0, -(cut - 3));
+                        fg.fillStyle = sh;
+                        fg.beginPath();
+                        fg.arc(mid, cut - 3, half * 1.05, 0, Math.PI * 2);
+                        fg.fill();
+                        fg.restore();
+                        fg.globalCompositeOperation = "source-over";
+                      }
+                      fc.ax = bc.ax;
+                      fc.ay = bc.ay;
+                      fc.nips = bc.nips;
+                      fc.mask = bc.mask;
+                      BREAST.flat = fc;
+                      BREAST.flatKey = key + "|" + Math.round(ry);
+                    }
+                    bc = BREAST.flat;
+                  }
+                  put("drawImage", bc, rx - bc.ax, ry - bc.ay, {});
+                  if (typeof real.drawImageBlink === "function") put("drawImageBlink", bc, rx - bc.ax, ry - bc.ay, {});
+                  ctx2.breast = { fit: FarmBreasts.fitOf(S3, FarmBelly.bellyPose(upper[2]), [bc.nips[1][0] + br.nipX, bc.nips[1][1] + br.nipY]), held: isHeld, upperSrc: upper[2], ux: upper[0], pose: bpose, ground: bpose === "AllFours" ? ground : Infinity, S: S3, rx, ry, uy: upper[1], mask: bc.mask, mx: rx - bc.ax, my: ry - bc.ay, nips: bc.nips.map((p, i) => [rx + p[0] + (i ? 1 : -1) * br.nipX, ry + p[1] + br.nipY]), k: FarmBreasts.shape(br.cup, br).k, kN: (1 + 0.45 * FarmBreasts.shape(br.cup, br).k) * br.nip, sig: key + "|" + Math.round(rx) + "," + Math.round(ry) + "|" + [br.nip, br.nipX, br.nipY].join(","), mid: upper[0] + 250 };
+                  if (!held.length) {
+                    const B = ctx2.breast, sk = bellySkin(upper[2], upper[3], bpose), rad = 7 * B.kN, nc = document.createElement("canvas");
+                    nc.width = nc.height = Math.ceil(rad * 2 + 4);
+                    const ng = nc.getContext("2d"), gr = ng.createRadialGradient(nc.width / 2, nc.height / 2, 0, nc.width / 2, nc.height / 2, rad), tone = (m, a) => "rgba(" + Math.round(Math.min(255, sk[0] * m)) + "," + Math.round(sk[1] * 0.62 * m) + "," + Math.round(sk[2] * 0.62 * m) + "," + a + ")";
+                    gr.addColorStop(0, tone(0.92, 1));
+                    gr.addColorStop(0.3, tone(1, 0.95));
+                    gr.addColorStop(0.75, tone(1.02, 0.8));
+                    gr.addColorStop(1, tone(1.02, 0));
+                    ng.fillStyle = gr;
+                    ng.beginPath();
+                    ng.arc(nc.width / 2, nc.height / 2, rad, 0, Math.PI * 2);
+                    ng.fill();
+                    for (const p of B.nips) if (p[1] + rad < B.ground) {
+                      put("drawImage", nc, p[0] - nc.width / 2, p[1] - nc.height / 2, {});
+                      if (typeof real.drawImageBlink === "function") put("drawImageBlink", nc, p[0] - nc.width / 2, p[1] - nc.height / 2, {});
+                    }
+                  }
+                  for (const h2 of held.splice(0)) {
+                    try {
+                      if (!nipDraw(...h2)) put(h2[0], h2[1], h2[2], h2[3], h2[4]);
+                    } catch (e) {
+                      console.warn("[studio] nipples:", e);
+                    }
+                  }
+                }
+              };
+              const handHidden = (src, x, y) => {
+                const B = ctx2.breast, im = B && mouldImg(src);
+                if (!im) return null;
+                const key = "hh|" + src + "|" + Math.round(x) + "," + Math.round(y) + "|" + B.sig;
+                let v = BREAST.cover.get(key);
+                if (v != null) return v;
+                const w = im.naturalWidth, h2 = im.naturalHeight, c = document.createElement("canvas");
+                c.width = w;
+                c.height = h2;
+                const g = c.getContext("2d", { willReadFrequently: true });
+                const count = () => {
+                  const d = g.getImageData(0, 0, w, h2).data;
+                  let n = 0;
+                  for (let i = 3; i < d.length; i += 16) if (d[i] > 100) n++;
+                  return n;
+                };
+                g.drawImage(im, 0, 0);
+                const all = count();
+                g.globalCompositeOperation = "destination-in";
+                g.drawImage(B.mask, B.mx - x, B.my - y);
+                const under = count();
+                v = all ? under / all : 0;
+                BREAST.cover.set(key, v);
+                return v;
+              };
+              const LOWER_GROUPS = /^(Panties|ClothLower|SuitLower|ItemPelvis|ItemVulva|ItemButt|ItemLegs|Garters|Socks)$/;
+              const handDraw = (name, src, x, y, o) => {
+                const B = ctx2.breast, im = B && mouldImg(src);
+                if (!im) return false;
+                let bv = null;
+                try {
+                  bv = ctx2.belly && !fit.behind && LOWER_GROUPS.test(groupOf3(src)) ? bellyAuto(src, x, y, ctx2, fit.behind, (pieceOf(src) || {}).key) : null;
+                } catch (e) {
+                  bv = null;
+                }
+                const base = bv || im, ox = bv ? MOULD.M : 0;
+                const key = "hand|" + src + "|" + Math.round(x) + "," + Math.round(y) + "|" + B.sig + (bv ? "|b" + ctx2.sig + "|" + MOULD.ver + "|" + base.width + "x" + base.height : "");
+                let c = BREAST.out.get(key);
+                if (!c) {
+                  c = document.createElement("canvas");
+                  c.width = base.naturalWidth || base.width;
+                  c.height = base.naturalHeight || base.height;
+                  const g = c.getContext("2d");
+                  g.drawImage(base, 0, 0);
+                  g.globalCompositeOperation = "destination-out";
+                  g.drawImage(B.mask, B.mx - (x - ox), B.my - y);
+                  if (BREAST.out.size > 60) BREAST.out.clear();
+                  BREAST.out.set(key, c);
+                }
+                put(name, c, x - ox, y, o);
+                return true;
+              };
+              const frameCover = (src, im, x, y, B) => {
+                const key = "fr|" + src + "|" + Math.round(x) + "," + Math.round(y);
+                let v = BREAST.cover.get(key);
+                if (v != null) return v;
+                const fm = frameMeasure(src, im, x, y, B);
+                v = fm ? fm.share : 0;
+                BREAST.cover.set(key, v);
+                return v;
+              };
+              const FRAME_N = 96;
+              const frameMeasure = (src, im, x, y, B) => {
+                const key = "fm|" + src + "|" + Math.round(x) + "," + Math.round(y) + "|" + B.pose;
+                let v = BREAST.out.get(key);
+                if (v !== void 0) return v;
+                const w = im.naturalWidth, h2 = im.naturalHeight, c = document.createElement("canvas");
+                c.width = w;
+                c.height = h2;
+                const g = c.getContext("2d", { willReadFrequently: true });
+                g.drawImage(im, 0, 0);
+                const d = g.getImageData(0, 0, w, h2).data;
+                const GB = gameBreast(B), R = GB.r, sides = [];
+                let hits = 0, all = 0, top = 0, tAll = 0;
+                const runs = [], cols = [];
+                for (const sd of [-1, 1]) {
+                  const cx = B.mid + sd * GB.dx - x, cy = B.uy + GB.y - y, hit = [];
+                  for (let a = 0; a < FRAME_N; a++) {
+                    const t = a / FRAME_N * Math.PI * 2, ux = Math.cos(t) * sd, uy = Math.sin(t);
+                    let r0 = -1, r1 = -1;
+                    for (let rr2 = R * 0.8; rr2 <= R * 1.32; rr2 += 0.5) {
+                      const px = Math.round(cx + ux * rr2), py = Math.round(cy + uy * rr2);
+                      const on = px >= 0 && py >= 0 && px < w && py < h2 && d[(py * w + px) * 4 + 3] > 60;
+                      if (on) {
+                        if (r0 < 0) r0 = rr2;
+                        r1 = rr2;
+                        const o = (py * w + px) * 4;
+                        cols.push(d[o], d[o + 1], d[o + 2]);
+                      } else if (r0 >= 0) break;
+                    }
+                    const ok = r0 >= 0 && r1 - r0 >= 1.5 && r1 - r0 <= R * 0.35;
+                    hit.push(ok ? [r0, r1] : null);
+                    all++;
+                    if (ok) {
+                      hits++;
+                      runs.push(r1 - r0);
+                    }
+                    if (uy < -0.3) {
+                      tAll++;
+                      if (ok) top++;
+                    }
+                  }
+                  for (let a = 0; a < FRAME_N; a++) if (!hit[a]) {
+                    let p = -1, q2 = -1;
+                    for (let k = 1; k <= 6; k++) {
+                      if (p < 0 && hit[(a - k + FRAME_N) % FRAME_N]) p = (a - k + FRAME_N) % FRAME_N;
+                      if (q2 < 0 && hit[(a + k) % FRAME_N]) q2 = (a + k) % FRAME_N;
+                    }
+                    if (p >= 0 && q2 >= 0) hit[a] = [(hit[p][0] + hit[q2][0]) / 2, (hit[p][1] + hit[q2][1]) / 2, true];
+                  }
+                  const att = [];
+                  let grp = [];
+                  for (let a = 0; a <= FRAME_N; a++) {
+                    const k = a % FRAME_N, hr = hit[k], t = k / FRAME_N * Math.PI * 2, ux = Math.cos(t) * sd, uy = Math.sin(t);
+                    let on = false;
+                    if (hr && uy < -0.3 && Math.cos(t) > -0.6 && a < FRAME_N) {
+                      on = true;
+                      for (let q2 = 2; q2 <= 7; q2++) {
+                        const px = Math.round(cx + ux * (hr[1] + q2)), py = Math.round(cy + uy * (hr[1] + q2));
+                        if (!(px >= 0 && py >= 0 && px < w && py < h2 && d[(py * w + px) * 4 + 3] > 60)) {
+                          on = false;
+                          break;
+                        }
+                      }
+                    }
+                    if (on) grp.push(k);
+                    else if (grp.length) {
+                      const m = grp[grp.length >> 1], hm = hit[m], tm = m / FRAME_N * Math.PI * 2;
+                      att.push({ a: m, x: cx + Math.cos(tm) * sd * (hm[1] + 1), y: cy + Math.sin(tm) * (hm[1] + 1) });
+                      grp = [];
+                    }
+                  }
+                  sides.push({ sd, cx, cy, hit, att });
+                }
+                if (sides.length === 2) {
+                  for (const [p, q2] of [[0, 1], [1, 0]]) if (!sides[p].att.length && sides[q2].att.length) sides[p].att = sides[q2].att.map((at) => ({ a: at.a, x: 2 * (B.mid - x) - at.x, y: at.y }));
+                }
+                if (!runs.length) {
+                  BREAST.out.set(key, null);
+                  return null;
+                }
+                runs.sort((p, q2) => p - q2);
+                let rr = 0, gg = 0, bb = 0;
+                const n = cols.length / 3;
+                for (let i = 0; i < cols.length; i += 3) {
+                  rr += cols[i];
+                  gg += cols[i + 1];
+                  bb += cols[i + 2];
+                }
+                let hiL = 0, hiC = [rr / n, gg / n, bb / n];
+                for (let i = 0; i < cols.length; i += 3) {
+                  const L = cols[i] + cols[i + 1] + cols[i + 2];
+                  if (L > hiL) {
+                    hiL = L;
+                    hiC = [cols[i], cols[i + 1], cols[i + 2]];
+                  }
+                }
+                v = { sides, width: runs[runs.length >> 1] + 1, col: [rr / n, gg / n, bb / n], hi: hiC, share: tAll ? top / tAll : 0, all: hits / all };
+                BREAST.out.set(key, v);
+                return v;
+              };
+              const herOutline = (B) => {
+                const key = "ho|" + B.sig;
+                let v = BREAST.out.get(key);
+                if (v) return v;
+                const m = B.mask, w = m.width, h2 = m.height, d = m.getContext("2d", { willReadFrequently: true }).getImageData(0, 0, w, h2).data, mid = B.mid - B.mx, cs = [];
+                for (const sd of [-1, 1]) {
+                  let x0 = 1e9, x1 = -1e9, y0 = 1e9, y1 = -1e9;
+                  for (let yy = 0; yy < h2; yy += 2) for (let xx = 0; xx < w; xx += 2) {
+                    if ((xx - mid) * sd < 0 || d[(yy * w + xx) * 4 + 3] <= 60) continue;
+                    x0 = Math.min(x0, xx);
+                    x1 = Math.max(x1, xx);
+                    y0 = Math.min(y0, yy);
+                    y1 = Math.max(y1, yy);
+                  }
+                  const rx = (x1 - x0) / 2, cx = (x0 + x1) / 2, cy = y1 - rx, edge = [];
+                  for (let a = 0; a < FRAME_N; a++) {
+                    const t = a / FRAME_N * Math.PI * 2, ux = Math.cos(t) * sd, uy = Math.sin(t);
+                    let re = 0;
+                    for (let rr = 2; rr < 400; rr += 1) {
+                      const px = Math.round(cx + ux * rr), py = Math.round(cy + uy * rr);
+                      if (px < 0 || py < 0 || px >= w || py >= h2 || d[(py * w + px) * 4 + 3] <= 60) {
+                        re = rr;
+                        break;
+                      }
+                    }
+                    edge.push(Math.min(re, rx));
+                  }
+                  const sm = edge.map((_, a) => {
+                    let t = 0;
+                    for (let k = -3; k <= 3; k++) t += edge[(a + k + FRAME_N) % FRAME_N];
+                    return t / 7;
+                  });
+                  edge.splice(0, FRAME_N, ...sm);
+                  cs.push({ sd, cx: cx + B.mx, cy: cy + B.my, edge });
+                }
+                v = cs;
+                if (BREAST.out.size > 60) BREAST.out.clear();
+                BREAST.out.set(key, v);
+                return v;
+              };
+              const frameDraw = (name, src, x, y, o) => {
+                const B = ctx2.breast, im = B && mouldImg(src);
+                if (!im || B.pose === "AllFours" || cupNow() <= 5) return false;
+                const fm = frameMeasure(src, im, x, y, B);
+                if (!fm) return false;
+                const key = "frame|" + src + "|" + Math.round(x) + "," + Math.round(y) + "|" + B.sig;
+                let c = BREAST.out.get(key);
+                if (!c) {
+                  const MX = 260, MY = 480, w = im.naturalWidth, h2 = im.naturalHeight;
+                  c = document.createElement("canvas");
+                  c.width = w + MX * 2;
+                  c.height = h2 + MY * 2;
+                  c.MX = MX;
+                  c.MY = MY;
+                  const g = c.getContext("2d");
+                  g.drawImage(im, MX, MY);
+                  g.globalCompositeOperation = "destination-out";
+                  g.lineCap = "round";
+                  for (const sv of fm.sides) for (let a = 0; a < FRAME_N; a++) {
+                    const hr = sv.hit[a], t = a / FRAME_N * Math.PI * 2;
+                    if (!hr || Math.sin(t) >= 0.3) continue;
+                    const ux = Math.cos(t) * sv.sd, uy = Math.sin(t);
+                    g.lineWidth = Math.max(3, (hr[0] + hr[1]) / 2 * Math.PI * 2 / FRAME_N * 1.6);
+                    g.beginPath();
+                    g.moveTo(MX + sv.cx + ux * (hr[0] - 1.5), MY + sv.cy + uy * (hr[0] - 1.5));
+                    g.lineTo(MX + sv.cx + ux * (hr[1] + 1.5), MY + sv.cy + uy * (hr[1] + 1.5));
+                    g.stroke();
+                  }
+                  g.drawImage(B.mask, MX + B.mx - x, MY + B.my - y);
+                  g.globalCompositeOperation = "source-over";
+                  const ho = herOutline(B), W4 = fm.width, rgb2 = (q2, k) => "rgb(" + q2.map((u) => Math.max(0, Math.min(255, Math.round(u * k)))).join(",") + ")";
+                  for (const hv of ho) {
+                    const sv = fm.sides.find((q2) => q2.sd === hv.sd);
+                    if (!sv) continue;
+                    const segs = [];
+                    let cur = null;
+                    for (let k = 0; k <= FRAME_N; k++) {
+                      const a = k % FRAME_N, ta = a / FRAME_N * Math.PI * 2, on = !!sv.hit[a] && hv.edge[a] > 0 && Math.sin(ta) < 0.3 && Math.cos(ta) > -0.6;
+                      if (on) {
+                        const t = a / FRAME_N * Math.PI * 2, ux = Math.cos(t) * hv.sd, uy = Math.sin(t), rr = hv.edge[a] - W4 * 0.45;
+                        (cur || (cur = [])).push([MX + hv.cx - x + ux * rr, MY + hv.cy - y + uy * rr]);
+                      } else if (cur) {
+                        segs.push(cur);
+                        cur = null;
+                      }
+                    }
+                    if (cur) segs.push(cur);
+                    if (segs.length > 1 && sv.hit[0] && sv.hit[FRAME_N - 1]) {
+                      const last = segs.pop();
+                      segs[0] = last.concat(segs[0]);
+                    }
+                    const path = (pts) => {
+                      g.beginPath();
+                      pts.forEach((p, i) => i ? g.lineTo(p[0], p[1]) : g.moveTo(p[0], p[1]));
+                    };
+                    g.lineCap = "round";
+                    g.lineJoin = "round";
+                    for (const at of sv.att || []) {
+                      const t = at.a / FRAME_N * Math.PI * 2, ux = Math.cos(t) * hv.sd, uy = Math.sin(t), rr = hv.edge[at.a] - W4 * 0.45;
+                      segs.push([[MX + at.x, MY + at.y], [MX + hv.cx - x + ux * rr, MY + hv.cy - y + uy * rr]]);
+                    }
+                    for (const pts of segs) {
+                      if (pts.length < 2) continue;
+                      path(pts);
+                      g.strokeStyle = rgb2(fm.col, 0.55);
+                      g.lineWidth = W4 + 1.5;
+                      g.stroke();
+                      path(pts);
+                      g.strokeStyle = rgb2(fm.col, 1);
+                      g.lineWidth = W4;
+                      g.stroke();
+                      path(pts.map((p, i) => {
+                        const q2 = pts[Math.min(pts.length - 1, i + 1)], pp = pts[Math.max(0, i - 1)], dx = q2[0] - pp[0], dy = q2[1] - pp[1], L = Math.hypot(dx, dy) || 1;
+                        return [p[0] - dy / L * W4 * 0.18, p[1] + dx / L * W4 * 0.18];
+                      }));
+                      g.globalAlpha = 0.55;
+                      g.strokeStyle = rgb2(fm.hi, 1);
+                      g.lineWidth = Math.max(1, W4 * 0.22);
+                      g.stroke();
+                      g.globalAlpha = 1;
+                    }
+                  }
+                  if (BREAST.out.size > 60) BREAST.out.clear();
+                  BREAST.out.set(key, c);
+                }
+                put(name, c, x - c.MX, y - c.MY, o);
+                return true;
+              };
+              const underBand = (src, im, x, y, B) => {
+                const key = "ub|" + src + "|" + Math.round(x) + "," + Math.round(y);
+                let v = BREAST.cover.get(key);
+                if (v != null) return v;
+                const w = im.naturalWidth, h2 = im.naturalHeight, c = document.createElement("canvas");
+                c.width = w;
+                c.height = h2;
+                const g = c.getContext("2d", { willReadFrequently: true });
+                g.drawImage(im, 0, 0);
+                const GB = gameBreast(B), d = g.getImageData(0, 0, w, h2).data;
+                let hit = 0, all = 0;
+                for (const sd of [-1, 1]) for (let i = -Math.round(GB.r * 0.8); i <= Math.round(GB.r * 0.8); i += 2) {
+                  all++;
+                  const px = Math.round(B.mid + sd * GB.dx - x) + i;
+                  let any = false;
+                  for (let j = Math.round(GB.r * 0.7); j <= Math.round(GB.r * 1.6); j++) {
+                    const py = Math.round(B.uy + GB.y - y) + j;
+                    if (px >= 0 && py >= 0 && px < w && py < h2 && d[(py * w + px) * 4 + 3] > 60) {
+                      any = true;
+                      break;
+                    }
+                  }
+                  if (any) hit++;
+                }
+                v = all ? hit / all : 0;
+                BREAST.cover.set(key, v);
+                return v;
+              };
+              const bandDraw = (name, src, x, y, o) => {
+                const B = ctx2.breast, im = mouldImg(src);
+                if (!B || !im) return false;
+                const key = "band|" + src + "|" + Math.round(x) + "," + Math.round(y) + "|" + B.sig;
+                let c = BREAST.out.get(key);
+                if (!c) {
+                  const GB = gameBreast(B), MX = 260, MY = 480, w = im.naturalWidth, h2 = im.naturalHeight, S22 = B.S;
+                  c = document.createElement("canvas");
+                  c.width = w + MX * 2;
+                  c.height = h2 + MY * 2;
+                  c.MX = MX;
+                  c.MY = MY;
+                  const g = c.getContext("2d");
+                  g.drawImage(im, MX, MY);
+                  g.globalCompositeOperation = "destination-out";
+                  g.drawImage(B.mask, MX + B.mx - x, MY + B.my - y);
+                  g.globalCompositeOperation = "source-over";
+                  const b0 = Math.round(B.uy + GB.y + GB.r * 0.62 - y), b1 = Math.round(B.uy + GB.y + GB.r * 1.65 - y), gUnder = B.uy + GB.y + GB.r, herUnder = B.ry + S22.by + (B.fit.rv || S22.r), dy = herUnder - gUnder, kx = 1, mid = B.mid - x;
+                  if (b1 > b0) {
+                    const strip = document.createElement("canvas");
+                    strip.width = w;
+                    strip.height = b1 - b0;
+                    strip.getContext("2d").drawImage(im, 0, b0, w, b1 - b0, 0, 0, w, b1 - b0);
+                    g.drawImage(strip, MX + mid - mid * kx, MY + b0 + dy, w * kx, b1 - b0);
+                  }
+                  if (BREAST.out.size > 60) BREAST.out.clear();
+                  BREAST.out.set(key, c);
+                }
+                put(name, c, x - c.MX, y - c.MY, o);
+                return true;
+              };
+              const chestCover = (src, im, x, y, B, wide) => {
+                const key = (wide ? "w|" : "n|") + src + "|" + Math.round(x) + "," + Math.round(y);
+                let v = BREAST.cover.get(key);
+                if (v != null) return v;
+                const w = im.naturalWidth, h2 = im.naturalHeight, c = document.createElement("canvas");
+                c.width = w;
+                c.height = h2;
+                const g = c.getContext("2d", { willReadFrequently: true });
+                g.drawImage(im, 0, 0);
+                const GB = gameBreast(B), d = g.getImageData(0, 0, w, h2).data, R = Math.round(GB.r * (wide ? 1.3 : 0.82));
+                let hit = 0, all = 0;
+                for (const sd of [-1, 1]) {
+                  const cx = Math.round(B.mid + sd * GB.dx - x), cy = Math.round(B.uy + GB.y - y);
+                  for (let j = -R; j <= R; j += 2) for (let i = -R; i <= R; i += 2) {
+                    if (i * i + j * j > R * R) continue;
+                    all++;
+                    const px = cx + i, py = cy + j;
+                    if (px >= 0 && py >= 0 && px < w && py < h2 && d[(py * w + px) * 4 + 3] > 60) hit++;
+                  }
+                }
+                v = all ? hit / all : 0;
+                BREAST.cover.set(key, v);
+                return v;
+              };
+              const distMap = (alpha, w, h2) => {
+                const d = new Float32Array(w * h2), BIG = 1e6, D = 1.4142;
+                for (let i = 0; i < d.length; i++) d[i] = alpha[i] > 60 ? BIG : 0;
+                for (let yy = 0; yy < h2; yy++) for (let xx = 0; xx < w; xx++) {
+                  const i = yy * w + xx;
+                  if (!d[i]) continue;
+                  let v = d[i];
+                  if (xx > 0) v = Math.min(v, d[i - 1] + 1);
+                  if (yy > 0) {
+                    v = Math.min(v, d[i - w] + 1);
+                    if (xx > 0) v = Math.min(v, d[i - w - 1] + D);
+                    if (xx < w - 1) v = Math.min(v, d[i - w + 1] + D);
+                  }
+                  d[i] = v;
+                }
+                for (let yy = h2 - 1; yy >= 0; yy--) for (let xx = w - 1; xx >= 0; xx--) {
+                  const i = yy * w + xx;
+                  if (!d[i]) continue;
+                  let v = d[i];
+                  if (xx < w - 1) v = Math.min(v, d[i + 1] + 1);
+                  if (yy < h2 - 1) {
+                    v = Math.min(v, d[i + w] + 1);
+                    if (xx < w - 1) v = Math.min(v, d[i + w + 1] + D);
+                    if (xx > 0) v = Math.min(v, d[i + w - 1] + D);
+                  }
+                  d[i] = v;
+                }
+                return d;
+              };
+              const strapHalf = (src, im, x, y, B) => {
+                const key = "thin|" + src + "|" + Math.round(x) + "," + Math.round(y) + "|" + B.pose;
+                let v = BREAST.cover.get(key);
+                if (v != null) return v;
+                const w = im.naturalWidth, h2 = im.naturalHeight, c = document.createElement("canvas");
+                c.width = w;
+                c.height = h2;
+                const g = c.getContext("2d", { willReadFrequently: true });
+                g.drawImage(im, 0, 0);
+                const px = g.getImageData(0, 0, w, h2).data, a = new Uint8Array(w * h2);
+                for (let i = 0; i < a.length; i++) a[i] = px[i * 4 + 3];
+                const d = distMap(a, w, h2), GB = gameBreast(B), R = GB.r + 4, ridge = [];
+                for (const sd of [-1, 1]) {
+                  const cx = Math.round(B.mid + sd * GB.dx - x), cy = Math.round(B.uy + GB.y - y);
+                  for (let j = -R; j <= R; j++) for (let i = -R; i <= R; i++) {
+                    if (i * i + j * j > R * R) continue;
+                    const xx = cx + i, yy = cy + j;
+                    if (xx < 1 || yy < 1 || xx >= w - 1 || yy >= h2 - 1) continue;
+                    const k = yy * w + xx, v0 = d[k];
+                    if (v0 < 1) continue;
+                    if (v0 >= d[k - 1] && v0 >= d[k + 1] && v0 >= d[k - w] && v0 >= d[k + w] && v0 >= d[k - w - 1] && v0 >= d[k - w + 1] && v0 >= d[k + w - 1] && v0 >= d[k + w + 1]) ridge.push(v0);
+                  }
+                }
+                ridge.sort((m, n) => m - n);
+                v = ridge.length >= 24 ? ridge[Math.floor(ridge.length * 0.2)] : 0;
+                BREAST.cover.set(key, v);
+                return v;
+              };
+              const dressDraw = (name, src, x, y, o) => {
+                const B = ctx2.breast, im = B && mouldImg(src);
+                if (!im) return false;
+                const pk0 = (pieceOf(src) || {}).key;
+                if (!BREAST.on[pk0] && chestCover(src, im, x, y, B, false) < 0.012 && frameCover(src, im, x, y, B) >= 0.55) {
+                  if (frameDraw(name, src, x, y, o)) return true;
+                }
+                if (chestCover(src, im, x, y, B, false) < 0.012 && !BREAST.on[pk0] && underBand(src, im, x, y, B) >= 0.35) BREAST.band[pk0] = true;
+                if (BREAST.band[pk0] && !BREAST.on[pk0]) return handDraw(name, src, x, y, o);
+                if (chestCover(src, im, x, y, B, false) < 0.012 && !BREAST.on[pk0]) {
+                  const e0 = edgesOf(src);
+                  if (e0) {
+                    let t0 = -1;
+                    for (let j = 0; j < e0.h; j++) if (e0.L[j] >= 0) {
+                      t0 = j;
+                      break;
+                    }
+                    if (t0 >= 0 && y + t0 > B.uy + gameBreast(B).y) return handDraw(name, src, x, y, o);
+                  }
+                }
+                if (chestCover(src, im, x, y, B, false) < 0.012 && !BREAST.on[pk0]) return BREAST.holds[pk0] ? handDraw(name, src, x, y, o) : false;
+                const pc0 = pieceOf(src), flatK = pc0 && pc0.flat ? 0.87 : 1, wm = pc0 && BREAST.wear[pc0.key] || "", pin = wm === "nipple" || wm === "" && !!pc0 && NIP_PIECES.test(pc0.name), mapYp = pin && B.fit.mapYN ? B.fit.mapYN : B.fit.mapY;
+                const key = "dress|" + (pin ? "pin|" : "") + src + "|" + Math.round(x) + "," + Math.round(y) + "|" + B.sig + "|" + (ctx2.belly && !fit.behind && BELLY.auto !== false ? ctx2.sig : "") + "|" + MOULD.ver;
+                let c = BREAST.out.get(key);
+                if (!c) {
+                  const MX = 260, MY = 480, w = im.naturalWidth, h2 = im.naturalHeight, S22 = Object.assign({}, B.S, { sc: B.fit.kx, ro: B.fit.ro, ri: B.fit.ri, rv: B.fit.rv }), G = B.fit.G || FarmBreasts.GAME, sc = S22.sc;
+                  c = document.createElement("canvas");
+                  c.width = w + MX * 2;
+                  c.height = h2 + MY * 2;
+                  c.MX = MX;
+                  c.MY = MY;
+                  const g = c.getContext("2d", { willReadFrequently: true }), midX = MX + B.mid - x, uyc = MY + B.uy - y;
+                  const pk = (pieceOf(src) || {}).key || src, CW = c.width, CH = c.height;
+                  const overBelly = bellyAuto(src, x, y, ctx2, fit.behind, pk);
+                  if (overBelly) g.drawImage(overBelly, MX - MOULD.M, MY);
+                  else g.drawImage(im, MX, MY);
+                  const sp = g.getImageData(0, 0, CW, CH).data;
+                  const spb = (() => {
+                    const cb2 = document.createElement("canvas");
+                    cb2.width = CW;
+                    cb2.height = CH;
+                    const gb = cb2.getContext("2d", { willReadFrequently: true });
+                    gb.filter = "blur(1.5px)";
+                    gb.drawImage(c, 0, 0);
+                    gb.filter = "none";
+                    return gb.getImageData(0, 0, CW, CH).data;
+                  })();
+                  const sharp = (t, w2) => {
+                    const u = Math.max(0, Math.min(1, (t - 0.5 + w2) / (2 * w2)));
+                    return u * u * (3 - 2 * u);
+                  };
+                  const sample = (fx, fy, mag, od, o4) => {
+                    const ix = Math.floor(fx), iy = Math.floor(fy), ax = fx - ix, ay = fy - iy, p00 = (iy * CW + ix) * 4, p10 = p00 + 4, p01 = p00 + CW * 4, p11 = p01 + 4;
+                    const a00 = sp[p00 + 3] * (1 - ax) * (1 - ay), a10 = sp[p10 + 3] * ax * (1 - ay), a01 = sp[p01 + 3] * (1 - ax) * ay, a11 = sp[p11 + 3] * ax * ay, at = a00 + a10 + a01 + a11;
+                    let r = 0, gg = 0, bl = 0;
+                    if (at >= 1) {
+                      r = (sp[p00] * a00 + sp[p10] * a10 + sp[p01] * a01 + sp[p11] * a11) / at;
+                      gg = (sp[p00 + 1] * a00 + sp[p10 + 1] * a10 + sp[p01 + 1] * a01 + sp[p11 + 1] * a11) / at;
+                      bl = (sp[p00 + 2] * a00 + sp[p10 + 2] * a10 + sp[p01 + 2] * a01 + sp[p11 + 2] * a11) / at;
+                    }
+                    let alpha = at;
+                    if (mag > 1.15) {
+                      const w2 = Math.max(0.06, Math.min(0.5, 0.3 / mag)), P3 = [p00, p10, p01, p11];
+                      const b00 = spb[p00 + 3] * (1 - ax) * (1 - ay), b10 = spb[p10 + 3] * ax * (1 - ay), b01 = spb[p01 + 3] * (1 - ax) * ay, b11 = spb[p11 + 3] * ax * ay, bt = b00 + b10 + b01 + b11;
+                      let amin = 255, amax = 0, aEnds = 0, aN = 0;
+                      for (let yy = iy - 1; yy <= iy + 2; yy++) for (let xx = ix - 1; xx <= ix + 2; xx++) {
+                        if (xx < 0 || yy < 0 || xx >= CW || yy >= CH) continue;
+                        const a = sp[(yy * CW + xx) * 4 + 3];
+                        aN++;
+                        if (a < 20 || a > 235) aEnds++;
+                        if (a < amin) amin = a;
+                        if (a > amax) amax = a;
+                      }
+                      if (amax - amin > 140 && aEnds >= aN * 0.75) alpha = amin + (amax - amin) * sharp((bt - amin) / (amax - amin), w2);
+                      let lo = -1, hi = -1, lmin = 1e9, lmax = -1, n = 0;
+                      const Q = [];
+                      for (let yy = iy - 1; yy <= iy + 2; yy++) for (let xx = ix - 1; xx <= ix + 2; xx++) {
+                        if (xx < 0 || yy < 0 || xx >= CW || yy >= CH) continue;
+                        const p = (yy * CW + xx) * 4;
+                        if (sp[p + 3] < 200) continue;
+                        Q.push(p);
+                        n++;
+                        const L = sp[p] * 0.3 + sp[p + 1] * 0.59 + sp[p + 2] * 0.11;
+                        if (L < lmin) {
+                          lmin = L;
+                          lo = p;
+                        }
+                        if (L > lmax) {
+                          lmax = L;
+                          hi = p;
+                        }
+                      }
+                      if (n >= 2 && bt >= 1) {
+                        const dr = sp[hi] - sp[lo], dg = sp[hi + 1] - sp[lo + 1], db = sp[hi + 2] - sp[lo + 2], dd = dr * dr + dg * dg + db * db;
+                        if (dd > 900) {
+                          let two = true, ends = 0;
+                          for (const p of Q) {
+                            const er = sp[p] - sp[lo], eg = sp[p + 1] - sp[lo + 1], eb = sp[p + 2] - sp[lo + 2], u = Math.max(0, Math.min(1, (er * dr + eg * dg + eb * db) / dd)), qr = er - u * dr, qg = eg - u * dg, qb = eb - u * db;
+                            if (qr * qr + qg * qg + qb * qb > dd * 0.03 + 60) {
+                              two = false;
+                              break;
+                            }
+                            if (u < 0.12 || u > 0.88) ends++;
+                          }
+                          if (ends < Q.length * 0.5) two = false;
+                          if (two) {
+                            const br2 = (spb[p00] * b00 + spb[p10] * b10 + spb[p01] * b01 + spb[p11] * b11) / bt, bg = (spb[p00 + 1] * b00 + spb[p10 + 1] * b10 + spb[p01 + 1] * b01 + spb[p11 + 1] * b11) / bt, bb = (spb[p00 + 2] * b00 + spb[p10 + 2] * b10 + spb[p01 + 2] * b01 + spb[p11 + 2] * b11) / bt;
+                            const ts = sharp(((br2 - sp[lo]) * dr + (bg - sp[lo + 1]) * dg + (bb - sp[lo + 2]) * db) / dd, w2), tr = ((r - sp[lo]) * dr + (gg - sp[lo + 1]) * dg + (bl - sp[lo + 2]) * db) / dd;
+                            const t = Math.abs(tr - ts) > 0.65 ? Math.max(0, Math.min(1, tr)) : ts;
+                            r = sp[lo] + dr * t;
+                            gg = sp[lo + 1] + dg * t;
+                            bl = sp[lo + 2] + db * t;
+                          }
+                        }
+                      }
+                    }
+                    od[o4] = r;
+                    od[o4 + 1] = gg;
+                    od[o4 + 2] = bl;
+                    od[o4 + 3] = alpha;
+                    return alpha;
+                  };
+                  const gUnderY = (G.cy || 330) + (G.rv || 42) + 4, y1 = uyc + G.y1, y2 = uyc + G.y2, y3 = uyc + Math.min(G.y3, gUnderY), flapEnd = uyc + mapYp(Math.min(G.y3, gUnderY));
+                  const span = pieceSpan(pk, src, x, y), pb = span.bottom > 0 ? MY + span.bottom - y : 0;
+                  const drape = pb > flapEnd + 24;
+                  const sm = (t) => {
+                    t = Math.max(0, Math.min(1, t));
+                    return t * t * (3 - 2 * t);
+                  };
+                  const grown = (yn) => 1 + (sc - 1) * sm((yn - y1) / (y2 - y1));
+                  const lands = (yn) => uyc + mapYp(yn - uyc);
+                  const ynMax = y3, yEnd = Math.min(CH - 2, Math.floor(flapEnd));
+                  const prof = edgesOf(B.upperSrc), ux = MX + B.ux - x, bcy = MY + B.ry - y + S22.by, bcx = [midX + (B.rx - B.mid) - S22.bx, midX + (B.rx - B.mid) + S22.bx];
+                  const onBreast = (qx, qy) => {
+                    for (let k = 0; k < 2; k++) {
+                      const dx = qx - bcx[k], rxk = (k ? dx > 0 : dx < 0) ? S22.ro : S22.ri, dy = (qy - bcy) / (S22.rv + 2);
+                      if (dx / (rxk + 2) * (dx / (rxk + 2)) + dy * dy <= 1) return true;
+                    }
+                    return false;
+                  };
+                  const x0 = Math.max(0, Math.floor(midX - 110 * sc)), bw = Math.min(CW - x0, Math.ceil(220 * sc)), y0 = Math.max(0, Math.floor(y1)), bh = Math.min(CH - 2, Math.max(yEnd, Math.floor(BREAST.solid[pk] ? Math.min(pb > 0 ? pb : flapEnd, MY + B.ry - y + S22.by + S22.rv * 2.4) : 0))) - y0 + 1;
+                  if (bw > 0 && bh > 0) {
+                    const out2 = g.createImageData(bw, bh), od = out2.data, hi = g.createImageData(bw, bh);
+                    const pj1 = Math.round(y1 - uyc), bodyHalf = prof && pj1 >= 0 && pj1 < prof.h && prof.L[pj1] >= 0 ? Math.max(midX - (ux + prof.L[pj1]), ux + prof.R[pj1] - midX) : 80;
+                    const slopeEnd = bcy - S22.rv * 0.65, sideHalf = S22.bx + S22.ro * 0.76;
+                    const slopeHalf = (qy) => {
+                      const t = Math.max(0, Math.min(1, (qy - y1) / Math.max(1, slopeEnd - y1)));
+                      return bodyHalf + (sideHalf - bodyHalf) * t * t * (3 - 2 * t);
+                    };
+                    const nipPull = (() => {
+                      if (true) return null;
+                      const G0 = FarmBreasts.GAME, gx = G0.dx + 4, gy = G0.cy - 0.43 * G0.rv;
+                      const land = B.fit.ti + (gx - B.fit.gi) * (B.fit.to - B.fit.ti) / Math.max(1, B.fit.go - B.fit.gi), landY = uyc + B.fit.mapY(gy), R = S22.r * 0.95;
+                      return B.nips.map((p, i) => {
+                        const tx = MX + p[0] - x, ty = MY + p[1] - y;
+                        return { tx, ty, dx: midX + (i ? 1 : -1) * land - tx, dy: landY - ty, R };
+                      });
+                    })();
+                    const kyAt = (yn2) => Math.max(0.2, B.fit.mapY(yn2 - uyc + 1) - B.fit.mapY(yn2 - uyc));
+                    const FT = B.fit, srcOff = (off, sg) => {
+                      if (FT.to == null || sc <= 1.001) return off / sg;
+                      const e = Math.max(0, Math.min(1, (sg - 1) / (sc - 1))), a = Math.abs(off);
+                      const m = a <= FT.ti ? FT.ti > 0.5 ? a * FT.gi / FT.ti : FT.gi : FT.tn == null || !pin ? FT.gi + (a - FT.ti) * (FT.go - FT.gi) / Math.max(1, FT.to - FT.ti) : a <= FT.tn ? FT.gi + (a - FT.ti) * (FT.gn - FT.gi) / Math.max(1, FT.tn - FT.ti) : FT.gn + (a - FT.tn) * (FT.go - FT.gn) / Math.max(1, FT.to - FT.tn);
+                      return (off < 0 ? -1 : 1) * ((1 - e) * a + e * m);
+                    };
+                    const groundRow = B.ground < 1e8 ? MY + B.ground - y - 1 : 1e9;
+                    const tentOn = false, tEnd = tentOn ? Math.min(pb > 0 ? pb : flapEnd, bcy + S22.rv * 2.4) : 0;
+                    const bodyHalfAt = (qy) => {
+                      const pj = Math.round(qy - uyc);
+                      return prof && pj >= 0 && pj < prof.h && prof.L[pj] >= 0 ? Math.max(midX - (ux + prof.L[pj]), ux + prof.R[pj] - midX) : 80;
+                    };
+                    const tentTop = S22.bx + S22.ro * 0.96, tentBot = tentOn ? bodyHalfAt(tEnd) + 1 : 0;
+                    const tentHalf = (qy) => {
+                      const t = Math.max(0, Math.min(1, (qy - bcy) / Math.max(1, tEnd - bcy)));
+                      return tentTop + (tentBot - tentTop) * Math.pow(t, 1.25);
+                    };
+                    const solidRows = /* @__PURE__ */ new Map(), rowSolid = (qy) => {
+                      let v = solidRows.get(qy);
+                      if (v != null) return v;
+                      const hb = bodyHalfAt(qy), yy = Math.round(qy);
+                      let n = 0, k = 0;
+                      for (let xx = Math.round(midX - hb * 0.9); xx <= Math.round(midX + hb * 0.9); xx += 2) {
+                        k++;
+                        if (xx >= 0 && xx < CW && yy >= 0 && yy < CH && sp[(yy * CW + xx) * 4 + 3] > 60) n++;
+                      }
+                      v = k > 0 && n / k >= 0.85;
+                      solidRows.set(qy, v);
+                      return v;
+                    };
+                    let yn = y1;
+                    for (let j = 0; j < bh; j++) {
+                      const qy = y0 + j;
+                      while (yn < ynMax && lands(yn + 0.25) < qy) yn += 0.25;
+                      const sg = grown(yn), pj = Math.round(qy - uyc), tl = prof && pj >= 0 && pj < prof.h ? prof.L[pj] : -1, tr = tl >= 0 ? prof.R[pj] : -1;
+                      for (let i = 0; i < bw; i++) {
+                        const qx = x0 + i;
+                        if (qy > groundRow) continue;
+                        const inRows = qy <= yEnd, under = tentOn && qy > bcy;
+                        const onB = inRows && onBreast(qx, qy), onBody = inRows && !under && (!drape || qy <= bcy) && (prof ? tl >= 0 && qx >= ux + tl && qx <= ux + tr : Math.abs(qx - midX) <= 80);
+                        const bridge = inRows && !onB && qy > bcy && Math.abs(qx - midX) < S22.bx && qy <= bcy + S22.rv * (0.94 + 0.06 * Math.pow(Math.abs(qx - midX) / S22.bx, 2));
+                        const onSlope = inRows && !onB && !onBody && qy <= slopeEnd && Math.abs(qx - midX) <= slopeHalf(qy);
+                        const th = under && qy <= tEnd && rowSolid(qy) ? tentHalf(qy) : 0, bh2 = th ? bodyHalfAt(qy) : 0, onTent = th > bh2 + 1 && !onB && !bridge && Math.abs(qx - midX) <= th;
+                        if (!(onB || onBody || bridge || onSlope || onTent)) continue;
+                        const o4 = (j * bw + i) * 4;
+                        if (!onSlope) hi.data[o4 + 3] = 255;
+                        let px2 = qx, pyS = 0;
+                        if (nipPull && !onTent) {
+                          const np = nipPull[qx < midX ? 0 : 1], dd = Math.hypot(qx - np.tx, qy - np.ty);
+                          if (dd < np.R) {
+                            const wv = Math.pow(1 - dd / np.R, 2) * (3 - 2 * (1 - dd / np.R));
+                            px2 = qx + np.dx * wv;
+                            pyS = np.dy * wv;
+                          }
+                        }
+                        const asIs = !onB && !onTent && !bridge && qy > bcy;
+                        const fx = asIs ? qx : onTent ? midX + (qx - midX) * bh2 / th : midX + srcOff(px2 - midX, sg) * flatK, fy = asIs ? qy : onTent ? qy : yn + pyS / kyAt(yn), ix = Math.floor(fx), iy = Math.floor(fy);
+                        if (ix < 0 || iy < 0 || ix >= CW - 1 || iy >= CH - 1) continue;
+                        const at = sample(fx, fy, asIs ? 1 : Math.max(sg, kyAt(yn)), od, o4);
+                        if (at < 1) {
+                          od[o4 + 3] = 0;
+                          continue;
+                        }
+                        if (groundRow < 1e8 && groundRow - qy < 16) od[o4 + 3] = at * Math.max(0.1, (groundRow - qy) / 16);
+                      }
+                    }
+                    if (tentOn) {
+                      const midR = midX - x0, jEnd = Math.min(bh - 1, Math.round(bcy - y0)), side = S22.bx + S22.ro, row = new Uint8ClampedArray(bw * 4);
+                      for (const sg2 of [-1, 1]) {
+                        const halfOf = (j) => {
+                          const o2 = j * bw * 4;
+                          let far = 0;
+                          for (let d = 1; d < bw; d++) {
+                            const i = Math.round(midR + sg2 * d);
+                            if (i < 0 || i >= bw) break;
+                            if (od[o2 + i * 4 + 3] > 40) far = d;
+                          }
+                          return far;
+                        };
+                        let j0 = -1, top = 0;
+                        for (let j = 0; j < jEnd; j++) {
+                          const hf = halfOf(j);
+                          if (hf > 12) {
+                            j0 = j;
+                            top = hf;
+                            break;
+                          }
+                        }
+                        if (j0 < 0 || jEnd - j0 <= 8) continue;
+                        for (let j = j0 + 1; j <= jEnd; j++) {
+                          const hf = halfOf(j), want = top + (side - top) * (j - j0) / (jEnd - j0);
+                          if (hf < 8 || want <= hf + 1) continue;
+                          const o2 = j * bw * 4, inner = 0;
+                          row.set(od.subarray(o2, o2 + bw * 4));
+                          for (let d = 1; d <= want; d++) {
+                            const i = Math.round(midR + sg2 * d);
+                            if (i < 0 || i >= bw) break;
+                            const si = Math.round(midR + sg2 * (inner + (d - inner) * (hf - inner) / (want - inner)));
+                            if (si < 0 || si >= bw) continue;
+                            od[o2 + i * 4] = row[si * 4];
+                            od[o2 + i * 4 + 1] = row[si * 4 + 1];
+                            od[o2 + i * 4 + 2] = row[si * 4 + 2];
+                            od[o2 + i * 4 + 3] = row[si * 4 + 3];
+                          }
+                        }
+                      }
+                    }
+                    const T = document.createElement("canvas");
+                    T.width = bw;
+                    T.height = bh;
+                    T.getContext("2d").putImageData(out2, 0, 0);
+                    const hole = document.createElement("canvas");
+                    hole.width = bw;
+                    hole.height = bh;
+                    hole.getContext("2d").putImageData(hi, 0, 0);
+                    g.globalCompositeOperation = "destination-out";
+                    g.drawImage(hole, x0, y0);
+                    g.globalCompositeOperation = "source-over";
+                    const atop = (draw2) => {
+                      g.save();
+                      g.globalCompositeOperation = "source-atop";
+                      draw2();
+                      g.restore();
+                    };
+                    const ell = (k, grow, dy) => {
+                      g.beginPath();
+                      g.ellipse(bcx[k] + (k ? 1 : -1) * (S22.ro - S22.ri) / 2, bcy + (dy || 0), (S22.ro + S22.ri) / 2 + grow, S22.rv + grow, 0, 0, Math.PI * 2);
+                    };
+                    g.drawImage(T, x0, y0);
+                    atop(() => {
+                      g.beginPath();
+                      g.rect(0, 0, CW, CH);
+                      for (let k = 0; k < 2; k++) g.ellipse(bcx[k] + (k ? 1 : -1) * (S22.ro - S22.ri) / 2, bcy, (S22.ro + S22.ri) / 2 + 1, S22.rv + 1, 0, 0, Math.PI * 2);
+                      g.clip("evenodd");
+                      g.beginPath();
+                      g.rect(0, bcy + S22.rv * 0.55, CW, CH);
+                      g.clip();
+                      g.filter = "blur(4px)";
+                      g.fillStyle = "rgba(0,0,0,0.20)";
+                      for (let k = 0; k < 2; k++) {
+                        ell(k, -6, 6 + S22.rv * 0.05);
+                        g.fill();
+                      }
+                    });
+                    atop(() => {
+                      for (let k = 0; k < 2; k++) {
+                        g.save();
+                        ell(k, 1, 0);
+                        g.clip();
+                        const under = g.createLinearGradient(0, bcy + S22.rv * 0.5, 0, bcy + S22.rv);
+                        under.addColorStop(0, "rgba(0,0,0,0)");
+                        under.addColorStop(1, "rgba(0,0,0,0.16)");
+                        g.fillStyle = under;
+                        g.fillRect(0, bcy, CW, S22.rv + 4);
+                        const hx = bcx[k] - S22.ro * 0.18, hy = bcy - S22.rv * 0.38, light = g.createRadialGradient(hx, hy, 0, hx, hy, S22.rv * 0.6);
+                        light.addColorStop(0, "rgba(255,255,255,0.04)");
+                        light.addColorStop(1, "rgba(255,255,255,0)");
+                        g.fillStyle = light;
+                        g.fillRect(0, 0, CW, CH);
+                        g.restore();
+                      }
+                      const cl = g.createLinearGradient(midX - S22.ri * 0.3, 0, midX + S22.ri * 0.3, 0);
+                      cl.addColorStop(0, "rgba(0,0,0,0)");
+                      cl.addColorStop(0.5, "rgba(0,0,0,0.14)");
+                      cl.addColorStop(1, "rgba(0,0,0,0)");
+                      g.save();
+                      g.beginPath();
+                      for (let k = 0; k < 2; k++) g.ellipse(bcx[k] + (k ? 1 : -1) * (S22.ro - S22.ri) / 2, bcy, (S22.ro + S22.ri) / 2, S22.rv, 0, 0, Math.PI * 2);
+                      g.clip();
+                      g.fillStyle = cl;
+                      g.fillRect(midX - S22.ri * 0.3, bcy - S22.rv * 0.35, S22.ri * 0.6, S22.rv * 1.3);
+                      g.restore();
+                      g.strokeStyle = "rgba(0,0,0,0.42)";
+                      g.lineWidth = 1.5;
+                      g.lineCap = "round";
+                      for (let k = 0; k < 2; k++) {
+                        g.beginPath();
+                        g.ellipse(bcx[k] + (k ? 1 : -1) * (S22.ro - S22.ri) / 2, bcy, (S22.ro + S22.ri) / 2, S22.rv, 0, Math.PI * 0.08, Math.PI * 0.92);
+                        g.stroke();
+                      }
+                    });
+                  }
+                  if (BREAST.out.size > 60) BREAST.out.clear();
+                  BREAST.out.set(key, c);
+                }
+                put(name, c, x - c.MX, y - c.MY, o);
+                return true;
+              };
+              const ownColour = (src, im) => {
+                const key = "col|" + src;
+                let v = BREAST.cover.get(key);
+                if (v) return v;
+                const c = document.createElement("canvas");
+                c.width = im.naturalWidth;
+                c.height = im.naturalHeight;
+                const g = c.getContext("2d", { willReadFrequently: true });
+                g.drawImage(im, 0, 0);
+                const d = g.getImageData(0, 0, c.width, c.height).data, px = [];
+                for (let i = 0; i < d.length; i += 16) if (d[i + 3] > 200) px.push([d[i], d[i + 1], d[i + 2]]);
+                px.sort((a, b) => a[0] + a[1] + a[2] - (b[0] + b[1] + b[2]));
+                v = px.length ? px[Math.floor(px.length * 0.6)] : [40, 40, 44];
+                BREAST.cover.set(key, v);
+                return v;
+              };
+              const strapBase = {};
+              const strapDraw = (name, src, x, y, o, piece) => {
+                const B = ctx2.breast, im = B && mouldImg(src);
+                if (!im) return false;
+                if (!strapBase[piece.key]) strapBase[piece.key] = src;
+                const base = strapBase[piece.key] === src, R = STRAPS[piece.name], tinted = !!(o && o.HexColor);
+                const key = "strap|" + src + "|" + Math.round(x) + "," + Math.round(y) + "|" + B.sig + "|" + (tinted ? 1 : 0);
+                let c = BREAST.out.get(key);
+                if (!c) {
+                  const MX = 220, MY = 420, w = im.naturalWidth, h2 = im.naturalHeight, S22 = B.S;
+                  c = document.createElement("canvas");
+                  c.width = w + MX * 2;
+                  c.height = h2 + MY * 2;
+                  c.MX = MX;
+                  c.MY = MY;
+                  const g = c.getContext("2d"), ox = MX + B.rx - x, oy = MY + B.ry - y;
+                  const P3 = (sd, t) => {
+                    const p = FarmBreasts.point(S22, sd, t);
+                    return [ox + p[0], oy + p[1]];
+                  };
+                  const arc = (sd, from, to) => {
+                    g.beginPath();
+                    for (let j = 0; j <= 60; j++) {
+                      const p = P3(sd, from + (to - from) * j / 60);
+                      if (j) g.lineTo(p[0], p[1]);
+                      else g.moveTo(p[0], p[1]);
+                    }
+                  };
+                  g.drawImage(im, MX, MY);
+                  g.globalCompositeOperation = "destination-out";
+                  for (const sd of [-1, 1]) {
+                    arc(sd, 0, Math.PI * 2);
+                    g.closePath();
+                    g.fill();
+                  }
+                  g.globalCompositeOperation = "source-over";
+                  if (base) {
+                    const col = tinted ? [205, 205, 205] : ownColour(src, im), k = (m) => "rgb(" + col.map((v) => Math.max(0, Math.min(255, Math.round(v * m)))).join(",") + ")";
+                    const grow = 1 + 0.5 * S22.k;
+                    const strap = (wd, path) => {
+                      g.lineCap = "round";
+                      g.lineJoin = "round";
+                      g.strokeStyle = k(0.35);
+                      g.lineWidth = wd + 2.2;
+                      path();
+                      g.stroke();
+                      g.strokeStyle = k(1);
+                      g.lineWidth = wd;
+                      path();
+                      g.stroke();
+                      g.strokeStyle = tinted ? "rgba(255,255,255,0.55)" : "rgba(255,255,255,0.22)";
+                      g.lineWidth = Math.max(1, wd * 0.22);
+                      g.save();
+                      g.translate(-wd * 0.18, -wd * 0.18);
+                      path();
+                      g.stroke();
+                      g.restore();
+                    };
+                    const side = (sd, draw2) => {
+                      g.save();
+                      g.beginPath();
+                      if (sd < 0) g.rect(0, 0, ox, c.height);
+                      else g.rect(ox, 0, c.width - ox, c.height);
+                      g.clip();
+                      draw2();
+                      g.restore();
+                    };
+                    const nipY = oy + S22.by + S22.r * (-0.15 + 0.42 * S22.k), topY = oy + S22.by - S22.r * S22.top, botY = oy + S22.by + S22.r * (1 + S22.sag);
+                    if (R.across) {
+                      const wd = S22.r * R.across;
+                      for (const sd of [-1, 1]) side(sd, () => strap(wd, () => {
+                        g.beginPath();
+                        g.moveTo(ox + sd * (S22.bx + S22.r * 1.02), nipY - S22.r * 0.1);
+                        g.quadraticCurveTo(ox + sd * S22.bx, nipY + S22.r * 0.22, ox, nipY - S22.r * 0.05);
+                      }));
+                    }
+                    if (R.over) {
+                      const wd = R.over * grow, yy = oy + S22.by - S22.r * 0.62;
+                      for (const sd of [-1, 1]) side(sd, () => strap(wd, () => {
+                        g.beginPath();
+                        g.moveTo(ox + sd * (S22.bx + S22.r * 0.86), yy);
+                        g.quadraticCurveTo(ox + sd * S22.bx, yy + S22.r * 0.16, ox, yy - S22.r * 0.02);
+                      }));
+                    }
+                    if (R.under) {
+                      const wd = R.under * grow;
+                      for (const sd of [-1, 1]) side(sd, () => strap(wd, () => sd > 0 ? arc(sd, -0.02 * Math.PI, Math.PI * 1.04) : arc(sd, Math.PI * 1.02, -0.04 * Math.PI)));
+                    }
+                    if (R.ring) {
+                      const wd = R.ring * grow;
+                      for (const sd of [-1, 1]) side(sd, () => strap(wd, () => {
+                        arc(sd, 0, Math.PI * 2);
+                        g.closePath();
+                      }));
+                    }
+                    if (R.cross) {
+                      const wd = R.cross * grow;
+                      for (const sd of [-1, 1]) strap(wd, () => {
+                        const a = P3(sd, -Math.PI / 2), b = P3(-sd, Math.PI * (sd > 0 ? 0.72 : 0.28));
+                        g.beginPath();
+                        g.moveTo(a[0], a[1]);
+                        g.lineTo(b[0], b[1]);
+                      });
+                    }
+                    if (R.centre) {
+                      const wd = R.centre * grow;
+                      strap(wd, () => {
+                        g.beginPath();
+                        g.moveTo(ox, topY + S22.r * 0.25);
+                        g.lineTo(ox, botY - S22.r * 0.1);
+                      });
+                    }
+                  }
+                  if (BREAST.out.size > 60) BREAST.out.clear();
+                  BREAST.out.set(key, c);
+                }
+                put(name, c, x - c.MX, y - c.MY, o);
+                return true;
+              };
+              const held = [];
+              const PUMP = { cups: [[188, 296, 40, 42], [272, 296, 40, 42]], cupMid: [[207, 316], [293, 316]], join: [250, 376], pumpTop: 700 };
+              const pumpDraw = (name, src, x, y, o) => {
+                const B = ctx2.breast, im = B && mouldImg(src);
+                if (!im || im.naturalHeight < 900) return false;
+                const key = "pump|" + src + "|" + Math.round(x) + "," + Math.round(y) + "|" + B.sig;
+                let c = BREAST.out.get(key);
+                if (!c) {
+                  const MX = 320, MY = 200, w = im.naturalWidth, h2 = im.naturalHeight;
+                  c = document.createElement("canvas");
+                  c.width = w + MX * 2;
+                  c.height = h2 + MY * 2;
+                  c.MX = MX;
+                  c.MY = MY;
+                  const g = c.getContext("2d"), N = B.nips.map((p) => [p[0] - x, p[1] - y]);
+                  const jx = (N[0][0] + N[1][0]) / 2, jy = Math.min(PUMP.pumpTop - 90, Math.max(N[0][1], N[1][1]) + 40 + 30 * B.k);
+                  g.drawImage(im, 0, PUMP.pumpTop, w, h2 - PUMP.pumpTop, MX, MY + PUMP.pumpTop, w, h2 - PUMP.pumpTop);
+                  for (let yy = Math.round(jy); yy < PUMP.pumpTop; yy++) {
+                    const t = (yy - jy) / (PUMP.pumpTop - jy), sy = PUMP.join[1] + t * (PUMP.pumpTop - PUMP.join[1]);
+                    g.drawImage(im, 0, sy, w, 1, MX + (jx - PUMP.join[0]) * (1 - t), MY + yy, w, 1);
+                  }
+                  g.lineCap = "round";
+                  g.lineJoin = "round";
+                  for (const [col, wd] of [["rgba(120,126,134,0.9)", 6.5], ["rgba(232,236,240,0.95)", 4.2]]) {
+                    g.strokeStyle = col;
+                    g.lineWidth = wd;
+                    for (let i = 0; i < 2; i++) {
+                      g.beginPath();
+                      g.moveTo(MX + N[i][0], MY + N[i][1] + 10);
+                      g.quadraticCurveTo(MX + N[i][0] + (jx - N[i][0]) * 0.25, MY + jy - 6, MX + jx, MY + jy + 4);
+                      g.stroke();
+                    }
+                  }
+                  PUMP.cups.forEach(([sx, sy, sw, sh], i) => g.drawImage(im, sx, sy, sw, sh, MX + N[i][0] - (PUMP.cupMid[i][0] - sx), MY + N[i][1] - (PUMP.cupMid[i][1] - sy), sw, sh));
+                  if (BREAST.out.size > 60) BREAST.out.clear();
+                  BREAST.out.set(key, c);
+                }
+                put(name, c, x - c.MX, y - c.MY, o);
+                return true;
+              };
+              const nipDraw = (name, src, x, y, o) => {
+                if (/LactationPump/.test(src)) {
+                  try {
+                    if (pumpDraw(name, src, x, y, o)) return true;
+                  } catch (e) {
+                    console.warn("[studio] pump:", e);
+                  }
+                }
+                const B = ctx2.breast, im = B && mouldImg(src);
+                if (!im) return false;
+                const split = Math.max(0, Math.min(im.naturalWidth, Math.round(B.mid - x))), own = nipHalves(src, split);
+                if (!own) return false;
+                if (!ctx2.native && groupOf3(src) === "Nipples") ctx2.native = own.map((p) => p && [x + p[0], y + p[1]]);
+                const key = src + "|" + Math.round(x) + "," + Math.round(y) + "|" + B.sig + "|" + (ctx2.native ? "n" : "o");
+                let c = BREAST.out.get(key);
+                if (!c) {
+                  const MX = 320, MY = 460, w = im.naturalWidth, h2 = im.naturalHeight, kN = B.kN;
+                  c = document.createElement("canvas");
+                  c.width = w + MX * 2;
+                  c.height = h2 + MY * 2;
+                  c.MX = MX;
+                  c.MY = MY;
+                  const g = c.getContext("2d");
+                  [[0, split], [split, w - split]].forEach(([sx, sw], i) => {
+                    if (sw <= 0) return;
+                    const N = ctx2.native && ctx2.native[i] || own[i] && [x + own[i][0], y + own[i][1]];
+                    if (!N) return;
+                    const T = B.nips[i];
+                    g.drawImage(im, sx, 0, sw, h2, MX + (T[0] - x) + (sx + x - N[0]) * kN, MY + (T[1] - y) + (y - N[1]) * kN, sw * kN, h2 * kN);
+                  });
+                  if (BREAST.out.size > 60) BREAST.out.clear();
+                  BREAST.out.set(key, c);
+                }
+                put(name, c, x - c.MX, y - c.MY, o);
+                return true;
+              };
+              const before = (src, x, y, o) => {
+                if (done || typeof src !== "string") return;
+                if (src.includes("/BodyUpper/") && fit.on && fit.behind) {
+                  upper = [x, y, src, o && o.HexColor];
+                  paint();
+                  return;
+                }
+                if (gate ? gate(src) : lower && prio(src) > 12) paint();
+              };
+              let upperSkin = null;
+              const after = (src, x, y, o) => {
+                if (typeof src !== "string") return;
+                if (src.includes("/BodyUpper/")) {
+                  try {
+                    upperSkin = bellySkin(src, o && o.HexColor, FarmBelly.bellyPose(src));
+                  } catch (e) {
+                  }
+                  upper = [x, y, src, o && o.HexColor];
+                  ctx2.bodies.push({ src, x, y });
+                }
+                if (src.includes("/BodyLower/")) {
+                  lower = true;
+                  ctx2.bodies.push({ src, x, y });
+                }
+              };
+              const wrap = (name) => typeof real[name] === "function" ? (src, x, y, o) => {
+                const blink = /Blink$/.test(name);
+                if (!blink) {
+                  try {
+                    before(src, x, y, o);
+                  } catch (e) {
+                    console.warn("[studio] belly:", e);
+                  }
+                }
+                if (br && typeof src === "string") {
+                  const gname = groupOf3(src);
+                  if (!done && gname === "Nipples") {
+                    held.push([name, src, x, y, o]);
+                    return;
+                  }
+                  if (done && NIP_GROUPS.has(gname)) {
+                    try {
+                      if (nipDraw(name, src, x, y, o)) return;
+                    } catch (e) {
+                      console.warn("[studio] nipples:", e);
+                    }
+                  }
+                  if (done && /Decal/i.test(gname) && ctx2.breast && ctx2.breast.pose !== "AllFours") {
+                    try {
+                      const p0 = edgesOf(src);
+                      if (p0) {
+                        let t0 = -1, t1 = -1;
+                        for (let j = 0; j < p0.h; j++) if (p0.L[j] >= 0) {
+                          if (t0 < 0) t0 = j;
+                          t1 = j;
+                        }
+                        if (t0 >= 0) {
+                          const cyL = y + (t0 + t1) / 2 - ctx2.breast.uy;
+                          put(name, src, x, y + (ctx2.breast.fit.mapY(cyL) - cyL), o);
+                          return;
+                        }
+                      }
+                    } catch (e) {
+                      console.warn("[studio] decal:", e);
+                    }
+                  }
+                  if (done && chestSlot(gname) && !/Decal/i.test(gname) && !isMoulded(src)) {
+                    const piece = pieceOf(src), how = piece && BREAST.wear[piece.key] || "";
+                    try {
+                      const im0 = piece && ctx2.breast && mouldImg(src);
+                      if (im0 && chestCover(src, im0, x, y, ctx2.breast, true) >= 0.05) ctx2.seen[piece.key] = true;
+                      if (im0 && chestCover(src, im0, x, y, ctx2.breast, false) >= 0.012) ctx2.seen["on:" + piece.key] = true;
+                      if (im0 && chestCover(src, im0, x, y, ctx2.breast, false) >= 0.6) ctx2.seen["solid:" + piece.key] = true;
+                    } catch (e) {
+                    }
+                    try {
+                      if (how === "behind") {
+                        if (handDraw(name, src, x, y, o)) return;
+                      } else if (how !== "plain" && BREAST.dress) {
+                        if (dressDraw(name, src, x, y, o)) return;
+                      }
+                    } catch (e) {
+                      console.warn("[studio] chest wear:", e);
+                    }
+                  }
+                  if (done && BREAST.tuck && (HAND_GROUPS.has(gname) || ARM_GROUPS.has(gname) && !/Rope|Harness|Binder|Jacket|Strait|Dress|Suit|Belt|Yoke|Pillory|Chain|Web|Tape|Bondage/i.test(src.slice(src.lastIndexOf("/") + 1)) || /Hand|Glove|Nail|Ring|Bracelet|Sleeve/i.test(gname)) && ctx2.breast && ctx2.breast.pose !== "AllFours") {
+                    try {
+                      if (/^Hands/.test(gname)) {
+                        const fr = handHidden(src, x, y);
+                        if (fr != null) ctx2.handF = Math.max(ctx2.handF || 0, fr);
+                      }
+                    } catch (e) {
+                      console.warn("[studio] hands:", e);
+                    }
+                    try {
+                      if (handDraw(name, src, x, y, o)) return;
+                    } catch (e) {
+                      console.warn("[studio] hands:", e);
+                    }
+                  }
+                }
+                if (GEN.drawn && window.FarmCock && typeof src === "string" && groupOf3(src) === "Pussy" && /Penis/.test(src)) {
+                  try {
+                    const hard = /\/Hard\//.test(src), skin = upperSkin || FarmBelly.FALLBACK.White;
+                    const key = [GEN.kind, GEN.knot, GEN.inches, GEN.girth, GEN.balls, hard, skin.join(",")].join("|");
+                    if (GEN.cvKey !== key) {
+                      GEN.cv = FarmCock.canvas({ kind: GEN.kind, knot: GEN.knot, inches: GEN.inches, girth: GEN.girth, balls: GEN.balls, hard, skin });
+                      GEN.cvKey = key;
+                    }
+                    if (hard) {
+                      if (!blink) ctx2.cock = [GEN.cv, x + 49.5 - GEN.cv.ax, y + 110 - GEN.cv.ay];
+                      return;
+                    }
+                    put(blink ? "drawImageBlink" : "drawImage", GEN.cv, x + 49.5 - GEN.cv.ax, y + 110 - GEN.cv.ay, {});
+                    return;
+                  } catch (e) {
+                    console.warn("[studio] cock:", e);
+                  }
+                }
+                let drawn = false;
+                try {
+                  if (ctx2.belly && !fit.behind && typeof src === "string") {
+                    const q2 = isMoulded(src), m = q2 ? mouldCanvas(src, x, y, ctx2, q2.key, q2.mode) : bellyAuto(src, x, y, ctx2, fit.behind, (pieceOf(src) || {}).key);
+                    if (m) {
+                      put(name, m, x - MOULD.M, y, o);
+                      drawn = true;
+                    }
+                  }
+                } catch (e) {
+                  console.warn("[studio] mould:", e);
+                }
+                if (!drawn) put(name, src, x, y, o);
+                if (!blink) {
+                  try {
+                    after(src, x, y, o);
+                  } catch (e) {
+                    console.warn("[studio] belly:", e);
+                  }
+                }
+              } : real[name];
+              cb = Object.assign({}, real, { drawImage: wrap("drawImage"), drawImageColorize: wrap("drawImageColorize"), drawImageBlink: wrap("drawImageBlink"), drawImageColorizeBlink: wrap("drawImageColorizeBlink") });
+              finish = paint;
+            }
+          } catch (e) {
+            console.warn("[studio] belly hook:", e);
+          }
+          const out = game(cb);
+          if (finish) {
+            try {
+              finish();
+            } catch (e) {
+              console.warn("[studio] belly:", e);
+            }
+          }
+          if (finish && seenNow && handFNow && handFNow.v != null) {
+            const behind = handFNow.v >= 0.45;
+            if (behind !== !!BREAST.handsBehind) {
+              BREAST.handsBehind = behind;
+              clearTimeout(BREAST.holdT);
+              BREAST.holdT = setTimeout(bellyDraw, 40);
+            }
+          }
+          if (finish && seenNow) {
+            const sig = Object.keys(seenNow).sort().join("|");
+            if (sig !== BREAST.holdSig) {
+              BREAST.holds = seenNow;
+              BREAST.on = {};
+              for (const k of Object.keys(seenNow)) if (k.startsWith("on:")) BREAST.on[k.slice(3)] = true;
+              BREAST.solid = {};
+              for (const k of Object.keys(seenNow)) if (k.startsWith("solid:")) BREAST.solid[k.slice(6)] = true;
+              BREAST.holdSig = sig;
+              clearTimeout(BREAST.holdT);
+              BREAST.holdT = setTimeout(bellyDraw, 40);
+            }
+          }
+          return out;
+        }
+      }
+      return {
+        BELLY,
+        FIT0,
+        poseKey,
+        fitNow,
+        bellySkin,
+        MOULD,
+        mouldKey,
+        mouldImg,
+        edges,
+        edgesOf,
+        outline,
+        bellyCover,
+        bellyAuto,
+        pieceSpan,
+        bellyRows,
+        mouldCanvas,
+        BREAST,
+        BREAST_SLIDERS,
+        NIP_GROUPS,
+        HAND_GROUPS,
+        NIP_PIECES,
+        ARM_GROUPS,
+        heldNow,
+        chestSlot,
+        STRAPS,
+        gameBreast,
+        upperName,
+        breastNow,
+        setCup,
+        cupNow,
+        nipHalves,
+        GEN,
+        draw
+      };
+    };
+  })();
+
+  // extension/src/drawnbody.js
+  var W2 = window;
+  var KEY2 = "farmhand-drawn-body";
+  var CODE_HEAD = "FARMBODY1:";
+  var DEFAULTS = () => ({ v: 1, on: false, cup: 12, breast: {}, wear: {}, belly: null, auto: true, mould: { items: [], mode: {} } });
+  var S = DEFAULTS();
+  var E = null;
+  var sdk2 = null;
+  var hooked2 = false;
+  function load2() {
+    try {
+      const d = JSON.parse(W2.localStorage.getItem(KEY2));
+      if (d && typeof d === "object") S = Object.assign(DEFAULTS(), d);
+    } catch (e) {
+    }
+  }
+  function save2() {
+    try {
+      W2.localStorage.setItem(KEY2, JSON.stringify(S));
+    } catch (e) {
+    }
+  }
+  var made = /* @__PURE__ */ new WeakMap();
+  var used = /* @__PURE__ */ new Map();
+  var fresh = false;
+  var gone = /* @__PURE__ */ new Set();
+  function picture(cv) {
+    let p = made.get(cv);
+    if (p) {
+      if (!p.src) return null;
+      if (gone.delete(p.src)) fresh = true;
+      used.set(p.src, Date.now());
+      return p;
+    }
+    const w = cv.width, h2 = cv.height;
+    if (!w || !h2) return null;
+    let x0 = w, y0 = h2, x1 = -1, y1 = -1;
+    try {
+      const d = cv.getContext("2d", { willReadFrequently: true }).getImageData(0, 0, w, h2).data;
+      for (let y = 0; y < h2; y++) {
+        const o = y * w * 4;
+        for (let x = 0; x < w; x++) if (d[o + x * 4 + 3]) {
+          if (x < x0) x0 = x;
+          if (x > x1) x1 = x;
+          if (y < y0) y0 = y;
+          if (y > y1) y1 = y;
+        }
+      }
+    } catch (e) {
+      x0 = 0;
+      y0 = 0;
+      x1 = w - 1;
+      y1 = h2 - 1;
+    }
+    if (x1 < 0) {
+      p = { src: null, dx: 0, dy: 0 };
+      made.set(cv, p);
+      return null;
+    }
+    const c = W2.document.createElement("canvas");
+    c.width = x1 - x0 + 1;
+    c.height = y1 - y0 + 1;
+    c.getContext("2d").drawImage(cv, -x0, -y0);
+    p = { src: c.toDataURL("image/png"), dx: x0, dy: y0 };
+    made.set(cv, p);
+    used.set(p.src, Date.now());
+    fresh = true;
+    return p;
+  }
+  function prune() {
+    const old = Date.now() - 3e4;
+    let n = 0;
+    for (const [src, t] of used) {
+      if (t > old) continue;
+      used.delete(src);
+      gone.add(src);
+      n++;
+      try {
+        const m = W2.GLDrawImageCache;
+        if (m && typeof m.delete === "function") m.delete(src);
+      } catch (e) {
+      }
+      try {
+        const m = W2.DrawImageCache;
+        if (m && typeof m.delete === "function") m.delete(src);
+      } catch (e) {
+      }
+      try {
+        const gl = W2.GLDrawCanvas && W2.GLDrawCanvas.GL, tc = gl && gl.textureCache;
+        const t2 = tc && tc.get(src);
+        if (t2) {
+          if (t2.texture) gl.deleteTexture(t2.texture);
+          tc.delete(src);
+        }
+      } catch (e) {
+      }
+    }
+    if (gone.size > 400) gone.clear();
+    return n;
+  }
+  var againT = null;
+  function redraw(soon) {
+    clearTimeout(againT);
+    againT = setTimeout(() => {
+      try {
+        if (W2.Player && typeof W2.CharacterLoadCanvas === "function") W2.CharacterLoadCanvas(W2.Player);
+      } catch (e) {
+        console.warn("[Farmhand Companion] drawn body redraw:", e);
+      }
+    }, soon || 60);
+  }
+  function engine() {
+    if (E) return E;
+    if (!W2.FarmBelly) W2.FarmBelly = bellyDrawing;
+    if (typeof W2.FarmBodyEngine !== "function" || !W2.FarmBreasts) return null;
+    E = W2.FarmBodyEngine({
+      S: { get C() {
+        return W2.Player;
+      } },
+      bodyItem: (g) => W2.Player && Array.isArray(W2.Player.Appearance) ? W2.Player.Appearance.find((a) => a && a.Asset && a.Asset.Group && a.Asset.Group.Name === g) : void 0,
+      setBody: () => {
+      },
+      // never: your body items are yours
+      redraw: () => redraw(60),
+      picture
+    });
+    apply();
+    return E;
+  }
+  function apply() {
+    if (!E) return;
+    const B = E.BREAST, b = S.breast || {};
+    B.cup = Math.max(0, Math.min(W2.FarmBreasts.CUPS.length - 1, Math.round(Number(S.cup) || 0)));
+    for (const k of ["full", "hang", "apart", "x", "y", "nip", "nipY", "nipX"]) if (typeof b[k] === "number" && isFinite(b[k])) B[k] = b[k];
+    B.wear = S.wear && typeof S.wear === "object" ? Object.assign({}, S.wear) : {};
+    B.out.clear();
+    B.cover.clear();
+    B.cvKey = "";
+    B.holdSig = "";
+    const fits = S.belly && typeof S.belly === "object" ? S.belly : null;
+    for (const k of Object.keys(E.BELLY.fits)) {
+      const f = E.BELLY.fits[k];
+      Object.assign(f, E.FIT0(), k === "std" ? {} : { behind: true, y: k === "AllFours" ? -60 : -75 });
+      if (fits && fits[k]) Object.assign(f, fits[k]);
+    }
+    E.BELLY.auto = S.auto !== false;
+    B.tuck = S.tuck !== false;
+    B.dress = S.dress !== false;
+    E.MOULD.items.clear();
+    E.MOULD.mode.clear();
+    E.MOULD.out.clear();
+    for (const it of S.mould && S.mould.items || []) E.MOULD.items.add(String(it));
+    for (const [k, m] of Object.entries(S.mould && S.mould.mode || {})) if (E.MOULD.items.has(k)) E.MOULD.mode.set(k, String(m));
+    E.GEN.drawn = false;
+  }
+  function hook() {
+    if (hooked2 || !sdk2) return;
+    hooked2 = true;
+    try {
+      sdk2.hookFunction("CommonDrawAppearanceBuild", 2, (args, next) => {
+        const C = args[0];
+        if (!S.on || !E || !C || C !== W2.Player) return next(args);
+        fresh = false;
+        let out;
+        try {
+          out = E.draw(C, args[1], (cb2) => {
+            args[1] = cb2;
+            return next(args);
+          });
+        } catch (e) {
+          console.warn("[Farmhand Companion] drawn body:", e);
+          return next(args);
+        }
+        if (fresh) {
+          redraw(250);
+          setTimeout(() => redraw(0), 1200);
+        }
+        return out;
+      });
+    } catch (e) {
+      console.warn("[Farmhand Companion] drawn body unavailable:", e);
+      hooked2 = false;
+    }
+  }
+  function initDrawnBody(mod2) {
+    sdk2 = mod2;
+    load2();
+    setInterval(prune, 2e4);
+    if (S.on) setTimeout(() => {
+      if (engine()) {
+        W2.__farmDrawnBody = true;
+        hook();
+        redraw(500);
+      }
+    }, 3e3);
+  }
+  function drawnBodyState() {
+    const up = W2.Player && Array.isArray(W2.Player.Appearance) ? W2.Player.Appearance.find((a) => a && a.Asset && a.Asset.Group && a.Asset.Group.Name === "BodyUpper") : null;
+    const cups = W2.FarmBreasts && W2.FarmBreasts.CUPS || [];
+    return { on: !!S.on, cup: S.cup, cupName: cups[S.cup] || "?", cups, chest: up && up.Asset ? up.Asset.Name : "", fromStudio: !!S.saved, belly: !!(S.belly && S.belly.std && S.belly.std.on) };
+  }
+  function drawnBodySet(on, say) {
+    S.on = !!on;
+    save2();
+    if (S.on) {
+      if (!engine()) {
+        S.on = false;
+        save2();
+        return say && say("The drawn body didn't load. Reload the page and try again.");
+      }
+      bellyTrial(0);
+      W2.__farmDrawnBody = true;
+      apply();
+      hook();
+    } else W2.__farmDrawnBody = false;
+    redraw(60);
+    setTimeout(() => redraw(0), 800);
+    if (say) {
+      const st2 = drawnBodyState();
+      if (!S.on) say("Drawn body off. You're the game's own picture again.");
+      else if (S.cup >= 6 && st2.chest !== "XLarge") say("Drawn body on, " + st2.cupName + " cup. Your chest needs to be the game's biggest size (wardrobe, body, upper body: the largest) for the drawn breasts to show; the belly and fitting work already.");
+      else say("Drawn body on: " + st2.cupName + " cup" + (st2.belly ? " with your belly" : "") + ". Only you see it.");
+    }
+  }
+  function drawnBodyCup(i, say) {
+    const n = W2.FarmBreasts ? W2.FarmBreasts.CUPS.length : 21;
+    S.cup = Math.max(6, Math.min(n - 1, Math.round(Number(i) || 0)));
+    save2();
+    apply();
+    redraw(60);
+    if (say) say("Cup: " + drawnBodyState().cupName + ".");
+  }
+  function drawnBodyPaste(text, say) {
+    try {
+      const t = String(text || "").trim();
+      if (!t.startsWith(CODE_HEAD)) throw new Error("that isn't a code from the studio (it starts with " + CODE_HEAD + ")");
+      const raw = W2.LZString && typeof W2.LZString.decompressFromBase64 === "function" ? W2.LZString.decompressFromBase64(t.slice(CODE_HEAD.length)) : null;
+      const d = raw && JSON.parse(raw);
+      if (!d || typeof d !== "object" || d.v !== 1) throw new Error("the code is damaged or from a newer studio");
+      const num = (v, lo, hi, def) => typeof v === "number" && isFinite(v) ? Math.max(lo, Math.min(hi, v)) : def;
+      S.cup = num(d.cup, 0, 20, S.cup);
+      S.breast = {};
+      for (const k of ["full", "hang", "apart", "x", "y", "nip", "nipY", "nipX"]) if (typeof d.breast?.[k] === "number" && isFinite(d.breast[k])) S.breast[k] = d.breast[k];
+      S.wear = {};
+      for (const [k, v] of Object.entries(d.wear || {})) if (/^[\w/ -]{1,80}$/.test(k) && ["behind", "plain", "nipple", ""].includes(v)) S.wear[k] = v;
+      S.belly = {};
+      for (const k of ["std", "AllFours", "Hogtied"]) {
+        const f = d.belly?.[k];
+        if (!f) continue;
+        S.belly[k] = { on: !!f.on, behind: !!f.behind, flat: !!f.flat, rx: num(f.rx, 20, 170, 70), ry: num(f.ry, 20, 190, 80), sag: num(f.sag, 0, 0.5, 0.22), x: num(f.x, -120, 120, 0), y: num(f.y, -200, 200, 0), cut: num(f.cut, 0.2, 1, 0.74) };
+      }
+      S.auto = d.auto !== false;
+      S.tuck = d.tuck !== false;
+      S.dress = d.dress !== false;
+      S.mould = { items: (Array.isArray(d.mould?.items) ? d.mould.items : []).filter((k) => typeof k === "string" && k.length < 80).slice(0, 200), mode: {} };
+      for (const [k, m] of Object.entries(d.mould?.mode || {})) if (S.mould.items.includes(k) && ["wide", "over", "under"].includes(m)) S.mould.mode[k] = m;
+      S.saved = typeof d.saved === "string" ? d.saved.slice(0, 40) : (/* @__PURE__ */ new Date()).toISOString();
+      save2();
+      apply();
+      redraw(60);
+      if (say) say("Settings from the studio put in: " + drawnBodyState().cupName + " cup" + (S.belly.std && S.belly.std.on ? ", your belly" : "") + ", " + Object.keys(S.wear).length + " piece choices. " + (S.on ? "" : "Switch the drawn body on to see it."));
+      return true;
+    } catch (e) {
+      if (say) say("I couldn't read that code: " + (e && e.message || e));
+      return false;
+    }
   }
 
   // extension/src/views/livestock.js
@@ -1657,6 +3968,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
         !!ctx2.prefs.strip,
         () => ctx2.setPref("strip", !ctx2.prefs.strip)
       ),
+      // the drawn body from the outfit studio (drawnbody.js): only you see it, on your own character
+      drawnBodyCard(ctx2),
       // a one-off experiment for the outfit studio idea (marks.js: scaleTrial)
       h(
         "div",
@@ -1676,6 +3989,42 @@ One of mods you are using is using an old version of SDK. It will work for now b
         btn("Belly: off", () => bellyTrial(0, (t) => ctx2.hint(t)))
       ),
       btn("Put the button and panel back (size and full screen too)", () => ctx2.resetPlaces && ctx2.resetPlaces())
+    );
+  }
+  function drawnBodyCard(ctx2) {
+    const st2 = drawnBodyState(), say = (t) => ctx2.hint(t);
+    const code = h("textarea", { class: "fhc-in", rows: 2, placeholder: "Paste the code from the studio's Copy for the Companion button" });
+    return h(
+      "div",
+      { style: { marginTop: "10px" } },
+      toggle(
+        "Drawn body (from the outfit studio)",
+        "Breasts from DD to R in your own skin, your belly, and what you wear fitted to them, drawn on your own character. Only you see it: everyone else sees the game's own picture of you. Off takes it away.",
+        st2.on,
+        () => {
+          drawnBodySet(!st2.on, say);
+          ctx2.setPref("drawnBody", !st2.on);
+        }
+      ),
+      h(
+        "div",
+        { class: "fhc-kv", style: { marginTop: "6px" } },
+        muted("Cup"),
+        h(
+          "select",
+          { class: "fhc-sel", onchange: (e) => {
+            drawnBodyCup(Number(e.target.value), say);
+            ctx2.setPref("drawnBodyCup", Number(e.target.value));
+          } },
+          st2.cups.map((c, i) => i < 6 ? null : h("option", { value: String(i), selected: i === st2.cup }, c))
+        )
+      ),
+      st2.on && st2.cup >= 6 && st2.chest && st2.chest !== "XLarge" ? muted("Your chest is set to " + st2.chest + " in the wardrobe. Set it to the biggest for the drawn breasts to show.") : null,
+      h("div", { style: { marginTop: "6px" } }, code),
+      btn("Put in the studio's settings", () => {
+        if (drawnBodyPaste(code.value, say)) ctx2.setPref("drawnBodyAt", Date.now());
+      }),
+      muted(st2.fromStudio ? "Using the settings from the studio." : "Using the plain settings. In the studio, Copy for the Companion gives you a code with your shape, belly and piece choices.")
     );
   }
   function extraSwitches(ctx2) {
@@ -4782,7 +7131,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   };
 
   // extension/src/cues.js
-  var W2 = window;
+  var W3 = window;
   var ctx = null;
   function initCues(c) {
     ctx = c;
@@ -4799,16 +7148,16 @@ One of mods you are using is using an old version of SDK. It will work for now b
     stir: ctx.panel.prefs.stir ? void 0 : true,
     gear: ctx.panel.prefs.gear ? void 0 : true
   });
-  var mapOn = () => typeof W2.ChatRoomMapViewIsActive === "function" && W2.ChatRoomMapViewIsActive() && W2.Player && W2.Player.MapData && W2.Player.MapData.Pos;
-  var others = () => (W2.ChatRoomCharacter || []).filter((c) => c && c.MemberNumber !== (W2.Player && W2.Player.MemberNumber));
+  var mapOn = () => typeof W3.ChatRoomMapViewIsActive === "function" && W3.ChatRoomMapViewIsActive() && W3.Player && W3.Player.MapData && W3.Player.MapData.Pos;
+  var others = () => (W3.ChatRoomCharacter || []).filter((c) => c && c.MemberNumber !== (W3.Player && W3.Player.MemberNumber));
   var lastSight = "";
   function sightTick() {
     try {
-      if (W2.CurrentScreen !== "ChatRoom" || !mapOn() || typeof W2.ChatRoomMapViewCharacterIsVisible !== "function") return;
-      const see = others().filter((c) => W2.ChatRoomMapViewCharacterIsVisible(c)).map((c) => c.MemberNumber).sort();
-      const hear = others().filter((c) => typeof W2.ChatRoomMapViewCharacterIsHearable === "function" && W2.ChatRoomMapViewCharacterIsHearable(c)).map((c) => c.MemberNumber).sort();
-      const LS = W2.Player && W2.Player.LSCG, S = LS && LS.SplatterModule;
-      const splat = S ? !!(S.enabled && S.taker !== false && (!LS.GlobalModule || LS.GlobalModule.enabled !== false)) : void 0;
+      if (W3.CurrentScreen !== "ChatRoom" || !mapOn() || typeof W3.ChatRoomMapViewCharacterIsVisible !== "function") return;
+      const see = others().filter((c) => W3.ChatRoomMapViewCharacterIsVisible(c)).map((c) => c.MemberNumber).sort();
+      const hear = others().filter((c) => typeof W3.ChatRoomMapViewCharacterIsHearable === "function" && W3.ChatRoomMapViewCharacterIsHearable(c)).map((c) => c.MemberNumber).sort();
+      const LS = W3.Player && W3.Player.LSCG, S2 = LS && LS.SplatterModule;
+      const splat = S2 ? !!(S2.enabled && S2.taker !== false && (!LS.GlobalModule || LS.GlobalModule.enabled !== false)) : void 0;
       const key = see.join(",") + "|" + hear.join(",") + "|" + splat;
       if (key === lastSight && Date.now() - (sightTick.at || 0) < 12e4) return;
       lastSight = key;
@@ -4822,13 +7171,13 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var DIRS = [["North", 0, -1], ["South", 0, 1], ["West", -1, 0], ["East", 1, 0]];
   function canStep(x, y) {
     try {
-      return W2.ChatRoomMapViewCanEnterTile(x, y) > 0;
+      return W3.ChatRoomMapViewCanEnterTile(x, y) > 0;
     } catch (e) {
       return false;
     }
   }
   function findPath(from, to) {
-    const wide = W2.ChatRoomMapViewWidth || 40, high = W2.ChatRoomMapViewHeight || 40, key = (x, y) => x + "," + y;
+    const wide = W3.ChatRoomMapViewWidth || 40, high = W3.ChatRoomMapViewHeight || 40, key = (x, y) => x + "," + y;
     const goal = (x, y) => Math.max(Math.abs(x - to.X), Math.abs(y - to.Y)) <= (canStep(to.X, to.Y) ? 0 : 1);
     const prev = /* @__PURE__ */ new Map([[key(from.X, from.Y), null]]), q2 = [[from.X, from.Y]];
     while (q2.length) {
@@ -4858,8 +7207,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
       walk = null;
       ctx.toBot("leadNo", { id: m.id });
     };
-    if (!pref("noLead") || !mapOn() || typeof W2.ChatRoomMapViewMove !== "function") return no();
-    const from = W2.Player.MapData.Pos, to = { X: m.X, Y: m.Y };
+    if (!pref("noLead") || !mapOn() || typeof W3.ChatRoomMapViewMove !== "function") return no();
+    const from = W3.Player.MapData.Pos, to = { X: m.X, Y: m.Y };
     const path = findPath(from, to);
     if (!path) return no();
     if (!path.length) {
@@ -4872,7 +7221,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
   function stepWalk() {
     if (!walk) return;
-    const w = walk, p = W2.Player && W2.Player.MapData && W2.Player.MapData.Pos;
+    const w = walk, p = W3.Player && W3.Player.MapData && W3.Player.MapData.Pos;
     if (!p) {
       walk = null;
       return;
@@ -4901,9 +7250,9 @@ One of mods you are using is using an old version of SDK. It will work for now b
       }
       Object.assign(w, { path, i: 0, stuck: Date.now(), retried: true });
     }
-    if (W2.ChatRoomMapViewMovement == null) {
+    if (W3.ChatRoomMapViewMovement == null) {
       try {
-        W2.ChatRoomMapViewMove(w.path[w.i]);
+        W3.ChatRoomMapViewMove(w.path[w.i]);
       } catch (e) {
       }
     }
@@ -4921,12 +7270,12 @@ One of mods you are using is using an old version of SDK. It will work for now b
   };
   function face(m) {
     const f = FACES[m.mood];
-    if (!f || !pref("noFace") || typeof W2.CharacterSetFacialExpression !== "function" || !W2.Player) return;
+    if (!f || !pref("noFace") || typeof W3.CharacterSetFacialExpression !== "function" || !W3.Player) return;
     const secs = m.mood === "clear" ? null : Math.max(5, Math.min(1800, Number(m.secs) || 30));
     for (const [g, e] of Object.entries(f)) {
       try {
-        W2.CharacterSetFacialExpression(W2.Player, g, e, secs);
-        if (g === "Eyes") W2.CharacterSetFacialExpression(W2.Player, "Eyes2", e, secs);
+        W3.CharacterSetFacialExpression(W3.Player, g, e, secs);
+        if (g === "Eyes") W3.CharacterSetFacialExpression(W3.Player, "Eyes2", e, secs);
       } catch (e2) {
       }
     }
@@ -4975,35 +7324,35 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var QUIET = { stall: 0.35, latch: 0.35, unlatch: 0.35, pump: 0.4, machine: 0.4, inflate: 0.4, hiss: 0.4, buzz: 0.3, zap: 0.35, clamp: 0.45, softgate: 0.4 };
   function sound(m) {
     const f = SOUNDS[m.name];
-    if (!f || !pref("noSound") || typeof W2.AudioPlayInstantSound !== "function") return;
-    const vol = W2.Player && W2.Player.AudioSettings && W2.Player.AudioSettings.Volume || 0;
+    if (!f || !pref("noSound") || typeof W3.AudioPlayInstantSound !== "function") return;
+    const vol = W3.Player && W3.Player.AudioSettings && W3.Player.AudioSettings.Volume || 0;
     try {
-      W2.AudioPlayInstantSound("Audio/" + f + ".mp3", vol * (QUIET[m.name] || 0.6));
+      W3.AudioPlayInstantSound("Audio/" + f + ".mp3", vol * (QUIET[m.name] || 0.6));
     } catch (e) {
     }
   }
   function trance(m) {
-    let el = W2.document.getElementById("fhc-trance");
+    let el = W3.document.getElementById("fhc-trance");
     const lvl = pref("noTrance") ? Math.max(0, Math.min(3, Number(m.level) || 0)) : 0;
     if (!lvl) {
       if (el) el.remove();
       return;
     }
     if (!el) {
-      el = W2.document.createElement("div");
+      el = W3.document.createElement("div");
       el.id = "fhc-trance";
       el.style.cssText = "position:fixed;inset:0;pointer-events:none;z-index:9998;transition:opacity 4s;opacity:0;animation:fhcTrance 6s ease-in-out infinite";
-      if (!W2.document.getElementById("fhc-trance-css")) {
-        const s = W2.document.createElement("style");
+      if (!W3.document.getElementById("fhc-trance-css")) {
+        const s = W3.document.createElement("style");
         s.id = "fhc-trance-css";
         s.textContent = "@keyframes fhcTrance{0%,100%{filter:brightness(1)}50%{filter:brightness(0.85)}}";
-        W2.document.head.appendChild(s);
+        W3.document.head.appendChild(s);
       }
-      W2.document.body.appendChild(el);
+      W3.document.body.appendChild(el);
     }
     const edge = [0, 0.25, 0.45, 0.65][lvl], inner = [0, 55, 42, 30][lvl];
     el.style.background = "radial-gradient(ellipse at center, transparent " + inner + "%, rgba(70,20,90," + edge + ") 100%)";
-    (W2.requestAnimationFrame || ((f) => setTimeout(f, 16)))(() => {
+    (W3.requestAnimationFrame || ((f) => setTimeout(f, 16)))(() => {
       el.style.opacity = "1";
     });
   }
@@ -5075,13 +7424,13 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var recentFeel = [];
   function feelTick() {
     try {
-      if (!pref("noFeelings") || W2.CurrentScreen !== "ChatRoom" || !W2.Player || !ctx.panel.s || !ctx.panel.s.onBooks) return;
+      if (!pref("noFeelings") || W3.CurrentScreen !== "ChatRoom" || !W3.Player || !ctx.panel.s || !ctx.panel.s.onBooks) return;
       if (Date.now() < (feelTick.next || 0)) return;
       feelTick.next = Date.now() + (7 + Math.random() * 6) * 6e4;
-      const s = ctx.panel.s, items = (W2.Player.Appearance || []).filter((x) => x && x.Asset && x.Asset.Group);
+      const s = ctx.panel.s, items = (W3.Player.Appearance || []).filter((x) => x && x.Asset && x.Asset.Group);
       const grp = (g) => items.find((x) => x.Asset.Group.Name === g);
       const eff = (x) => [].concat(x.Property && x.Property.Effect || [], x.Asset.Effect || []);
-      const arousal = W2.Player.ArousalSettings && W2.Player.ArousalSettings.Progress || 0;
+      const arousal = W3.Player.ArousalSettings && W3.Player.ArousalSettings.Progress || 0;
       const kinds = [];
       if (grp("ItemButt")) kinds.push("plug");
       if (items.some((x) => eff(x).includes("Chaste")) && arousal > 40) kinds.push("chaste");
@@ -5105,11 +7454,11 @@ One of mods you are using is using an old version of SDK. It will work for now b
   function drawMarkers() {
     try {
       const s = ctx.panel.s;
-      if (!s || !s.staff || !Array.isArray(s.herd) || !pref("noMarkers") || !mapOn() || typeof W2.DrawText !== "function") return;
-      const R = W2.ChatRoomMapViewPerceptionRange || 6, tile = 1e3 / (R * 2 + 1), me3 = W2.Player.MapData.Pos;
+      if (!s || !s.staff || !Array.isArray(s.herd) || !pref("noMarkers") || !mapOn() || typeof W3.DrawText !== "function") return;
+      const R = W3.ChatRoomMapViewPerceptionRange || 6, tile = 1e3 / (R * 2 + 1), me3 = W3.Player.MapData.Pos;
       for (const x of s.herd) {
-        const C = (W2.ChatRoomCharacter || []).find((c) => c.MemberNumber === x.mn);
-        if (!C || !C.MapData || !C.MapData.Pos || !W2.ChatRoomMapViewCharacterIsVisible(C)) continue;
+        const C = (W3.ChatRoomCharacter || []).find((c) => c.MemberNumber === x.mn);
+        if (!C || !C.MapData || !C.MapData.Pos || !W3.ChatRoomMapViewCharacterIsVisible(C)) continue;
         const tags = [];
         if (x.milk !== null && x.milk >= 75) tags.push(["M", "#7fa8c9"]);
         if (x.heat) tags.push(["H", "#d9534f"]);
@@ -5118,7 +7467,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
         if (!tags.length) continue;
         const sx = (C.MapData.Pos.X - me3.X + R) * tile, sy = (C.MapData.Pos.Y - me3.Y) * tile + R * tile;
         if (sx < 0 || sy < 0 || sx > 1e3 || sy > 1e3) continue;
-        tags.forEach(([t, col], i) => W2.DrawText(t, sx + tile * 0.2 + i * tile * 0.22, sy + tile * 0.15, col, "black"));
+        tags.forEach(([t, col], i) => W3.DrawText(t, sx + tile * 0.2 + i * tile * 0.22, sy + tile * 0.15, col, "black"));
       }
     } catch (e) {
     }
@@ -5135,11 +7484,11 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
   function arouse(m) {
     try {
-      if (!stirOn() || !W2.Player || !W2.Player.ArousalSettings || typeof W2.ActivitySetArousal !== "function") return;
-      if (W2.Player.ArousalSettings.Active === "Inactive" || W2.Player.ArousalSettings.Active === "NoMeter") return;
-      const cur = Number(W2.Player.ArousalSettings.Progress) || 0, cap = Math.max(0, Math.min(deniedNow() ? 94 : 100, Number(m.cap) || 100));
+      if (!stirOn() || !W3.Player || !W3.Player.ArousalSettings || typeof W3.ActivitySetArousal !== "function") return;
+      if (W3.Player.ArousalSettings.Active === "Inactive" || W3.Player.ArousalSettings.Active === "NoMeter") return;
+      const cur = Number(W3.Player.ArousalSettings.Progress) || 0, cap = Math.max(0, Math.min(deniedNow() ? 94 : 100, Number(m.cap) || 100));
       const next = Math.max(0, Math.min(cap, cur + (Number(m.add) || 0)));
-      if (next > cur || m.add < 0) W2.ActivitySetArousal(W2.Player, next);
+      if (next > cur || m.add < 0) W3.ActivitySetArousal(W3.Player, next);
     } catch (e) {
       console.warn("[Farmhand Companion] arouse:", e);
     }
@@ -5147,11 +7496,11 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var VIBE_MODE = ["Low", "Medium", "High", "Maximum"];
   var vibeWas = null;
   var vibeTimer = null;
-  var vibeToys = () => (W2.Player && Array.isArray(W2.Player.Appearance) ? W2.Player.Appearance : []).filter((it) => it && it.Asset && it.Asset.Group && it.Property && typeof it.Property.Intensity === "number" && !(it.Property.LockedBy && typeof W2.DialogCanUnlock === "function" && !W2.DialogCanUnlock(W2.Player, it)));
+  var vibeToys = () => (W3.Player && Array.isArray(W3.Player.Appearance) ? W3.Player.Appearance : []).filter((it) => it && it.Asset && it.Asset.Group && it.Property && typeof it.Property.Intensity === "number" && !(it.Property.LockedBy && typeof W3.DialogCanUnlock === "function" && !W3.DialogCanUnlock(W3.Player, it)));
   function vibePush(toys) {
-    if (typeof W2.CharacterRefresh === "function") W2.CharacterRefresh(W2.Player, false);
-    if (typeof W2.ChatRoomCharacterItemUpdate === "function") toys.forEach((it) => W2.ChatRoomCharacterItemUpdate(W2.Player, it.Asset.Group.Name));
-    else if (typeof W2.ChatRoomCharacterUpdate === "function") W2.ChatRoomCharacterUpdate(W2.Player);
+    if (typeof W3.CharacterRefresh === "function") W3.CharacterRefresh(W3.Player, false);
+    if (typeof W3.ChatRoomCharacterItemUpdate === "function") toys.forEach((it) => W3.ChatRoomCharacterItemUpdate(W3.Player, it.Asset.Group.Name));
+    else if (typeof W3.ChatRoomCharacterUpdate === "function") W3.ChatRoomCharacterUpdate(W3.Player);
   }
   function vibeSet(it, level, mode) {
     it.Property.Intensity = level;
@@ -5207,7 +7556,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
         const t = next(args);
         try {
           const f = slowFactor();
-          return t > 0 && f > 1 && !(typeof W2.ChatRoomMapViewHasSuperPowers === "function" && W2.ChatRoomMapViewHasSuperPowers()) ? t * f : t;
+          return t > 0 && f > 1 && !(typeof W3.ChatRoomMapViewHasSuperPowers === "function" && W3.ChatRoomMapViewHasSuperPowers()) ? t * f : t;
         } catch (e) {
           return t;
         }
@@ -5589,6 +7938,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     initCues({ toBot, panel: st.panel, local: toChat });
     setInterval(parasiteSync, 6e4);
     initBelly(mod);
+    initDrawnBody(mod);
     initBody(mod);
     window.__farmhandOwnPanel = (data) => {
       if (!onBotAccount()) return;

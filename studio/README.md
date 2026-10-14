@@ -96,6 +96,15 @@ the game's pictures into the drawing.
   not set to "behind".
 - The list of moulded pieces is saved in `fits/items.json` when you press *Save this fit*.
 
+## In the game (Companion 0.18.0)
+
+- The drawing lives in `web/body-engine.js`. The studio and the Companion both draw with it, so the studio shows what
+  the game will show.
+- *Copy for the Companion* (Breasts section): your cup, breast sliders, hands and clothes choices, piece choices,
+  belly for each pose and mould choices, as one code. Nothing of the outfit.
+- In the game: the Companion's Toggles, *Drawn body (from the outfit studio)*. Paste the code, press *Put in the
+  studio's settings*, switch it on. Only you see it. For the drawn breasts your chest must be the game's biggest size.
+
 ## The catalogue
 
 - *Make the catalogue* (Breasts section): every piece in the chosen slot, on her as she is now, twelve to a page,

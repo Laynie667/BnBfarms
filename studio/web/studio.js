@@ -854,7 +854,8 @@
               const overBelly = bellyAuto(src, x, y, ctx, fit.behind, pk);   // (the piece as it is once it's been grown to the belly, if she has one: the chest is laid on that)
               if (overBelly) g.drawImage(overBelly, MX - MOULD.M, MY); else g.drawImage(im, MX, MY);
               const sp = g.getImageData(0, 0, CW, CH).data;
-              const y1 = uyc + G.y1, y2 = uyc + G.y2, y3 = uyc + G.y3, flapEnd = uyc + mapYp(G.y3);
+              // (only down to the underside of the game's breast: below that the piece is on her body, and stays exactly where the game drew it. Review, Oct 14: the studded harness's waist panels were being grown out past her sides.)
+              const gUnderY = (G.cy || 330) + (G.rv || 42) + 4, y1 = uyc + G.y1, y2 = uyc + G.y2, y3 = uyc + Math.min(G.y3, gUnderY), flapEnd = uyc + mapYp(Math.min(G.y3, gUnderY));
               // FILLED, not laid on top (Laynie, Oct 13, of a school uniform whose top had come out as a wide block ending in
               // a straight line across her middle: "think about how the tits and/or belly fill the clothing, instead of how
               // the clothing sits on top"). A bra ends under the breasts and that's that. But a top, a dress, a jacket goes
@@ -939,7 +940,8 @@
                     if (!(onB || onBody || bridge || onSlope || onTent)) continue;
                     const o4 = (j * bw + i) * 4; if (!onSlope) hi.data[o4 + 3] = 255;
                     let px2 = qx, pyS = 0; if (nipPull && !onTent) { const np = nipPull[qx < midX ? 0 : 1], dd = Math.hypot(qx - np.tx, qy - np.ty); if (dd < np.R) { const wv = Math.pow(1 - dd / np.R, 2) * (3 - 2 * (1 - dd / np.R)) ; px2 = qx + np.dx * wv; pyS = np.dy * wv; } }
-                    const fx = onTent ? midX + (qx - midX) * bh2 / th : midX + srcOff(px2 - midX, sg), fy = onTent ? qy : yn + pyS / kyAt(yn), ix = Math.floor(fx), iy = Math.floor(fy); if (ix < 0 || iy < 0 || ix >= CW - 1 || iy >= CH - 1) continue;
+                    const asIs = !onB && !onTent && !bridge && qy > bcy;   /* (below her breasts and off them, the piece is exactly the game's picture: same place, same width. Review, Oct 14.) */
+                    const fx = asIs ? qx : onTent ? midX + (qx - midX) * bh2 / th : midX + srcOff(px2 - midX, sg), fy = asIs ? qy : onTent ? qy : yn + pyS / kyAt(yn), ix = Math.floor(fx), iy = Math.floor(fy); if (ix < 0 || iy < 0 || ix >= CW - 1 || iy >= CH - 1) continue;
                     const ax = fx - ix, ay = fy - iy, p00 = (iy * CW + ix) * 4, p10 = p00 + 4, p01 = p00 + CW * 4, p11 = p01 + 4;
                     const a00 = sp[p00 + 3] * (1 - ax) * (1 - ay), a10 = sp[p10 + 3] * ax * (1 - ay), a01 = sp[p01 + 3] * (1 - ax) * ay, a11 = sp[p11 + 3] * ax * ay, at = a00 + a10 + a01 + a11;
                     if (at < 1) continue;

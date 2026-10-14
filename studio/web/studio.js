@@ -939,6 +939,9 @@
                 const bodyHalfAt = (qy) => { const pj = Math.round(qy - uyc); return prof && pj >= 0 && pj < prof.h && prof.L[pj] >= 0 ? Math.max(midX - (ux + prof.L[pj]), ux + prof.R[pj] - midX) : 80; };
                 const tentTop = S2.bx + S2.ro * 0.96, tentBot = tentOn ? bodyHalfAt(tEnd) + 1 : 0;
                 const tentHalf = (qy) => { const t = Math.max(0, Math.min(1, (qy - bcy) / Math.max(1, tEnd - bcy))); return tentTop + (tentBot - tentTop) * Math.pow(t, 1.25); };
+                // (only where the piece is cloth right across her body on that row: a piece open at the sides under the bust, the
+                // Leather Vest Suit, had its side panels pulled out into wings by the drape. Laynie's marks, Oct 14.)
+                const solidRows = new Map(), rowSolid = (qy) => { let v = solidRows.get(qy); if (v != null) return v; const hb = bodyHalfAt(qy), yy = Math.round(qy); let n = 0, k = 0; for (let xx = Math.round(midX - hb * 0.9); xx <= Math.round(midX + hb * 0.9); xx += 2) { k++; if (xx >= 0 && xx < CW && yy >= 0 && yy < CH && sp[(yy * CW + xx) * 4 + 3] > 60) n++; } v = k > 0 && n / k >= 0.85; solidRows.set(qy, v); return v; };
                 let yn = y1;
                 for (let j = 0; j < bh; j++) {
                   const qy = y0 + j;
@@ -961,7 +964,7 @@
                     const onB = inRows && onBreast(qx, qy), onBody = inRows && !under && (!drape || qy <= bcy) && (prof ? (tl >= 0 && qx >= ux + tl && qx <= ux + tr) : Math.abs(qx - midX) <= 80);
                     const bridge = inRows && !onB && qy > bcy && Math.abs(qx - midX) < S2.bx && qy <= bcy + S2.rv * (0.94 + 0.06 * Math.pow(Math.abs(qx - midX) / S2.bx, 2));   /* nearly straight across between their two lowest points: her shape hangs lower in the middle than the round one did, and skin was showing in the gap */
                     const onSlope = inRows && !onB && !onBody && qy <= slopeEnd && Math.abs(qx - midX) <= slopeHalf(qy);
-                    const th = under && qy <= tEnd ? tentHalf(qy) : 0, bh2 = th ? bodyHalfAt(qy) : 0, onTent = th > bh2 + 1 && !onB && !bridge && Math.abs(qx - midX) <= th;
+                    const th = under && qy <= tEnd && rowSolid(qy) ? tentHalf(qy) : 0, bh2 = th ? bodyHalfAt(qy) : 0, onTent = th > bh2 + 1 && !onB && !bridge && Math.abs(qx - midX) <= th;
                     if (!(onB || onBody || bridge || onSlope || onTent)) continue;
                     const o4 = (j * bw + i) * 4; if (!onSlope) hi.data[o4 + 3] = 255;
                     let px2 = qx, pyS = 0; if (nipPull && !onTent) { const np = nipPull[qx < midX ? 0 : 1], dd = Math.hypot(qx - np.tx, qy - np.ty); if (dd < np.R) { const wv = Math.pow(1 - dd / np.R, 2) * (3 - 2 * (1 - dd / np.R)) ; px2 = qx + np.dx * wv; pyS = np.dy * wv; } }

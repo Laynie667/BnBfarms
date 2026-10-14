@@ -774,11 +774,13 @@
             g.drawImage(im, 0, 0); const all = count(); g.globalCompositeOperation = "destination-in"; g.drawImage(B.mask, B.mx - x, B.my - y); const under = count();
             v = all ? under / all : 0; BREAST.cover.set(key, v); return v;
           };
+          /* (what's worn below the waist and reaches up behind her big breasts, a skirt, jeans, a catsuit's legs, is drawn here, and was drawn without her belly: flat over it, the belly hidden. Checking the suits, Oct 14.) */
+          const LOWER_GROUPS = /^(Panties|ClothLower|SuitLower|ItemPelvis|ItemVulva|ItemButt|ItemLegs|Garters|Socks)$/;
           const handDraw = (name, src, x, y, o) => {
             const B = ctx.breast, im = B && mouldImg(src); if (!im) return false;
             // (panties, with a belly, are under it: drawn here behind the breasts as the game has them, they were right over the belly.
             // Laynie's marks, Oct 14. Only panties: given the belly's version here, bands under the breasts were stretched out sideways.)
-            let bv = null; try { bv = ctx.belly && !fit.behind && groupOf(src) === "Panties" ? bellyAuto(src, x, y, ctx, fit.behind, (pieceOf(src) || {}).key) : null; } catch (e) { bv = null; }
+            let bv = null; try { bv = ctx.belly && !fit.behind && LOWER_GROUPS.test(groupOf(src)) ? bellyAuto(src, x, y, ctx, fit.behind, (pieceOf(src) || {}).key) : null; } catch (e) { bv = null; }
             const base = bv || im, ox = bv ? MOULD.M : 0;
             const key = "hand|" + src + "|" + Math.round(x) + "," + Math.round(y) + "|" + B.sig + (bv ? "|b" + ctx.sig + "|" + MOULD.ver + "|" + base.width + "x" + base.height : "");
             let c = BREAST.out.get(key);

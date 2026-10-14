@@ -1015,7 +1015,33 @@
             real[name](c, x - c.MX, y - c.MY, o); return true;
           };
           const held = [];
+          // The lactation pump is one picture: two cups, a Y of tube, a long hose, and the pump with its bottle down by her
+          // leg. Moved and grown as a whole, like other nipple gear, the bottle went with one breast and grew, and the
+          // hoses crossed (Laynie, Oct 14: "the milker attachment looks odd too. I don't mind if we can make the hose
+          // stretch, if we can do it without affecting the lactation pump part"). So it's taken apart: the PUMP stays
+          // exactly where and what it is; each CUP goes on her nipple; the Y is drawn from each cup to where they meet,
+          // under and between her breasts; and the HOSE is the game's own hose, stretched to run from there to the pump.
+          const PUMP = { cups: [[188, 296, 40, 42], [272, 296, 40, 42]], cupMid: [[207, 316], [293, 316]], join: [250, 376], pumpTop: 700 };
+          const pumpDraw = (name, src, x, y, o) => {
+            const B = ctx.breast, im = B && mouldImg(src); if (!im || im.naturalHeight < 900) return false;
+            const key = "pump|" + src + "|" + Math.round(x) + "," + Math.round(y) + "|" + B.sig;
+            let c = BREAST.out.get(key);
+            if (!c) {
+              const MX = 320, MY = 200, w = im.naturalWidth, h = im.naturalHeight;
+              c = document.createElement("canvas"); c.width = w + MX * 2; c.height = h + MY * 2; c.MX = MX; c.MY = MY;
+              const g = c.getContext("2d"), N = B.nips.map((p) => [p[0] - x, p[1] - y]);   // her nipples, in the picture's own coordinates
+              const jx = (N[0][0] + N[1][0]) / 2, jy = Math.min(PUMP.pumpTop - 90, Math.max(N[0][1], N[1][1]) + 40 + 30 * B.k);
+              g.drawImage(im, 0, PUMP.pumpTop, w, h - PUMP.pumpTop, MX, MY + PUMP.pumpTop, w, h - PUMP.pumpTop);                       // the pump and bottle: untouched
+              for (let yy = Math.round(jy); yy < PUMP.pumpTop; yy++) { const t = (yy - jy) / (PUMP.pumpTop - jy), sy = PUMP.join[1] + t * (PUMP.pumpTop - PUMP.join[1]); g.drawImage(im, 0, sy, w, 1, MX + (jx - PUMP.join[0]) * (1 - t), MY + yy, w, 1); }   // the hose: stretched, its top end brought to the join
+              g.lineCap = "round"; g.lineJoin = "round";
+              for (const [col, wd] of [["rgba(120,126,134,0.9)", 6.5], ["rgba(232,236,240,0.95)", 4.2]]) { g.strokeStyle = col; g.lineWidth = wd; for (let i = 0; i < 2; i++) { g.beginPath(); g.moveTo(MX + N[i][0], MY + N[i][1] + 10); g.quadraticCurveTo(MX + N[i][0] + (jx - N[i][0]) * 0.25, MY + jy - 6, MX + jx, MY + jy + 4); g.stroke(); } }   // the Y: a tube from each cup down to the join
+              PUMP.cups.forEach(([sx, sy, sw, sh], i) => g.drawImage(im, sx, sy, sw, sh, MX + N[i][0] - (PUMP.cupMid[i][0] - sx), MY + N[i][1] - (PUMP.cupMid[i][1] - sy), sw, sh));   // the cups: on her nipples, their own size
+              if (BREAST.out.size > 60) BREAST.out.clear(); BREAST.out.set(key, c);
+            }
+            real[name](c, x - c.MX, y - c.MY, o); return true;
+          };
           const nipDraw = (name, src, x, y, o) => {
+            if (/LactationPump/.test(src)) { try { if (pumpDraw(name, src, x, y, o)) return true; } catch (e) { console.warn("[studio] pump:", e); } }
             const B = ctx.breast, im = B && mouldImg(src); if (!im) return false;
             const split = Math.max(0, Math.min(im.naturalWidth, Math.round(B.mid - x))), own = nipHalves(src, split); if (!own) return false;
             if (!ctx.native && groupOf(src) === "Nipples") ctx.native = own.map((p) => p && [x + p[0], y + p[1]]);   // where the game has the nipples

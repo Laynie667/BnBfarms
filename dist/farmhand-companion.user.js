@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.18.2
+// @version      0.18.3
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -230,7 +230,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.18.2";
+  var VERSION = "0.18.3";
 
   // extension/src/config.js
   var BOT_MEMBER = 260239;
@@ -2734,7 +2734,63 @@ One of mods you are using is using an old version of SDK. It will work for now b
                   const overBelly = bellyAuto(src, x, y, ctx2, fit.behind, pk);
                   if (overBelly) g.drawImage(overBelly, MX - MOULD.M, MY);
                   else g.drawImage(im, MX, MY);
+                  let sleeves = null, spA = null;
+                  if (pc0 && pc0.flat) {
+                    const fsrc = String(B.upperSrc).replace("/XLarge", "/FlatMedium").replace("XLarge_", "FlatMedium_").replace(/XLarge(?=[_.])/, "FlatMedium"), fp = edgesOf(fsrc);
+                    if (!fp) return false;
+                    const fux = MX + B.ux - x, r0 = Math.max(0, Math.round(uyc + G.y1 - 40)), r1 = Math.min(CH, Math.round(uyc + G.y3 + 30));
+                    sleeves = document.createElement("canvas");
+                    sleeves.width = CW;
+                    sleeves.height = CH;
+                    const id = g.getImageData(0, r0, CW, r1 - r0), d = id.data, sg0 = sleeves.getContext("2d"), sd = sg0.createImageData(CW, r1 - r0), e = sd.data;
+                    for (let j = 0; j < r1 - r0; j++) {
+                      const pj = r0 + j - uyc;
+                      if (pj < 0 || pj >= fp.h || fp.L[pj] < 0) continue;
+                      const L = Math.round(fux + fp.L[pj]), R = Math.round(fux + fp.R[pj]), o2 = j * CW * 4;
+                      for (let xx = 0; xx < CW; xx++) {
+                        if (xx >= L - 1 && xx <= R + 1) continue;
+                        const p = o2 + xx * 4;
+                        if (!d[p + 3]) continue;
+                        e[p] = d[p];
+                        e[p + 1] = d[p + 1];
+                        e[p + 2] = d[p + 2];
+                        e[p + 3] = d[p + 3];
+                        d[p + 3] = 0;
+                      }
+                    }
+                    g.putImageData(id, 0, r0);
+                    spA = g.getImageData(0, 0, CW, CH).data;
+                    for (let j = 0; j < r1 - r0; j++) {
+                      const pj = r0 + j - uyc;
+                      if (pj < 0 || pj >= fp.h || fp.L[pj] < 0) continue;
+                      const L = Math.round(fux + fp.L[pj]), R = Math.round(fux + fp.R[pj]), o2 = j * CW * 4;
+                      for (const [edge, step] of [[R, 1], [L, -1]]) {
+                        let src2 = -1;
+                        for (let k = 6; k < 12; k++) {
+                          const xx = edge - step * k, p = o2 + xx * 4;
+                          if (xx >= 0 && xx < CW && d[p + 3] > 200) {
+                            src2 = p;
+                            break;
+                          }
+                        }
+                        if (src2 < 0) continue;
+                        for (let k = 1; k <= 40; k++) {
+                          const xx = edge + step * k;
+                          if (xx < 0 || xx >= CW) break;
+                          const p = o2 + xx * 4;
+                          if (d[p + 3] > 200) break;
+                          d[p] = d[src2];
+                          d[p + 1] = d[src2 + 1];
+                          d[p + 2] = d[src2 + 2];
+                          d[p + 3] = d[src2 + 3];
+                        }
+                      }
+                    }
+                    g.putImageData(id, 0, r0);
+                    sg0.putImageData(sd, 0, r0);
+                  }
                   const sp = g.getImageData(0, 0, CW, CH).data;
+                  if (spA) g.putImageData(new ImageData(spA, CW, CH), 0, 0);
                   const spb = (() => {
                     const cb2 = document.createElement("canvas");
                     cb2.width = CW;
@@ -2916,7 +2972,20 @@ One of mods you are using is using an old version of SDK. It will work for now b
                         const asIs = !onB && !onTent && !bridge && qy > bcy;
                         const fx = asIs ? qx : onTent ? midX + (qx - midX) * bh2 / th : midX + srcOff(px2 - midX, sg) * flatK, fy = asIs ? qy : onTent ? qy : yn + pyS / kyAt(yn), ix = Math.floor(fx), iy = Math.floor(fy);
                         if (ix < 0 || iy < 0 || ix >= CW - 1 || iy >= CH - 1) continue;
-                        const mg = asIs ? 1 : Math.max(sg, kyAt(yn)), at = sample(fx, fy, mg, od, o4);
+                        const mg = asIs ? 1 : Math.max(sg, kyAt(yn));
+                        if (asIs && spA) {
+                          const p = (qy * CW + qx) * 4;
+                          if (spA[p + 3] < 1) {
+                            od[o4 + 3] = 0;
+                            continue;
+                          }
+                          od[o4] = spA[p];
+                          od[o4 + 1] = spA[p + 1];
+                          od[o4 + 2] = spA[p + 2];
+                          od[o4 + 3] = spA[p + 3];
+                          continue;
+                        }
+                        const at = sample(fx, fy, mg, od, o4);
                         if (at < 1) {
                           od[o4 + 3] = 0;
                           continue;
@@ -3111,6 +3180,32 @@ One of mods you are using is using an old version of SDK. It will work for now b
                       g.ellipse(bcx[k] + (k ? 1 : -1) * (S22.ro - S22.ri) / 2, bcy + (dy || 0), (S22.ro + S22.ri) / 2 + grow, S22.rv + grow, 0, 0, Math.PI * 2);
                     };
                     g.drawImage(T, x0, y0);
+                    if (pc0 && pc0.flat && chestCover(src, im, x, y, B, false) >= 0.5) {
+                      const bl = document.createElement("canvas");
+                      bl.width = CW;
+                      bl.height = CH;
+                      const bg2 = bl.getContext("2d");
+                      bg2.filter = "blur(6px)";
+                      bg2.drawImage(c, 0, 0);
+                      bg2.filter = "none";
+                      const mk = document.createElement("canvas");
+                      mk.width = CW;
+                      mk.height = CH;
+                      const mg2 = mk.getContext("2d");
+                      mg2.filter = "blur(5px)";
+                      mg2.fillStyle = "#000";
+                      for (let k = 0; k < 2; k++) {
+                        mg2.beginPath();
+                        mg2.ellipse(bcx[k] + (k ? 1 : -1) * (S22.ro - S22.ri) / 2, bcy, (S22.ro + S22.ri) / 2 - 8, S22.rv - 8, 0, 0, Math.PI * 2);
+                        mg2.fill();
+                      }
+                      bg2.globalCompositeOperation = "destination-in";
+                      bg2.drawImage(mk, 0, 0);
+                      g.save();
+                      g.globalCompositeOperation = "source-atop";
+                      g.drawImage(bl, 0, 0);
+                      g.restore();
+                    }
                     atop(() => {
                       g.beginPath();
                       g.rect(0, 0, CW, CH);
@@ -3163,6 +3258,12 @@ One of mods you are using is using an old version of SDK. It will work for now b
                         g.stroke();
                       }
                     });
+                  }
+                  if (sleeves) {
+                    g.save();
+                    g.globalCompositeOperation = "destination-over";
+                    g.drawImage(sleeves, 0, 0);
+                    g.restore();
                   }
                   if (ctx2.belly && !fit.behind) {
                     try {

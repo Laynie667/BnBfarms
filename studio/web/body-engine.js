@@ -642,7 +642,28 @@ window.FarmBodyEngine = function (host) {
               const pk = (pieceOf(src) || {}).key || src, CW = c.width, CH = c.height;
               const overBelly = bellyAuto(src, x, y, ctx, fit.behind, pk);   // (the piece as it is once it's been grown to the belly, if she has one: the chest is laid on that)
               if (overBelly) g.drawImage(overBelly, MX - MOULD.M, MY); else g.drawImage(im, MX, MY);
+              // A PIECE MADE FOR A FLAT CHEST (the Button Shirt, the male vests and catsuit). Its sleeves start where a flat chest
+              // ends, close in to the body, so growing the chest grew them too: long flaps down her sides ending in a straight
+              // cut, and its torso is narrower than a breast, so her sides showed past it (catalogue, Oct 14). So on the chest
+              // rows the sleeves are lifted off before it's grown, and put back after, where the game has them; and the cloth's
+              // own edge is carried a little further out, so it reaches round her.
+              let sleeves = null, spA = null;
+              if (pc0 && pc0.flat) {
+                const fsrc = String(B.upperSrc).replace("/XLarge", "/FlatMedium").replace("XLarge_", "FlatMedium_").replace(/XLarge(?=[_.])/, "FlatMedium"), fp = edgesOf(fsrc);
+                if (!fp) return false;   // (its body picture is loading: drawn the game's way this once, and again once it's in)
+                const fux = MX + B.ux - x, r0 = Math.max(0, Math.round(uyc + G.y1 - 40)), r1 = Math.min(CH, Math.round(uyc + G.y3 + 30));
+                sleeves = document.createElement("canvas"); sleeves.width = CW; sleeves.height = CH;
+                const id = g.getImageData(0, r0, CW, r1 - r0), d = id.data, sg0 = sleeves.getContext("2d"), sd = sg0.createImageData(CW, r1 - r0), e = sd.data;
+                for (let j = 0; j < r1 - r0; j++) { const pj = r0 + j - uyc; if (pj < 0 || pj >= fp.h || fp.L[pj] < 0) continue; const L = Math.round(fux + fp.L[pj]), R = Math.round(fux + fp.R[pj]), o = j * CW * 4;
+                  for (let xx = 0; xx < CW; xx++) { if (xx >= L - 1 && xx <= R + 1) continue; const p = o + xx * 4; if (!d[p + 3]) continue; e[p] = d[p]; e[p + 1] = d[p + 1]; e[p + 2] = d[p + 2]; e[p + 3] = d[p + 3]; d[p + 3] = 0; } }
+                g.putImageData(id, 0, r0); spA = g.getImageData(0, 0, CW, CH).data;   /* (the piece as the game has it, less its sleeves: where it's off her breasts and below them, it's this, unmoved) */
+                for (let j = 0; j < r1 - r0; j++) { const pj = r0 + j - uyc; if (pj < 0 || pj >= fp.h || fp.L[pj] < 0) continue; const L = Math.round(fux + fp.L[pj]), R = Math.round(fux + fp.R[pj]), o = j * CW * 4;
+                  for (const [edge, step] of [[R, 1], [L, -1]]) { let src2 = -1; for (let k = 6; k < 12; k++) { const xx = edge - step * k, p = o + xx * 4; if (xx >= 0 && xx < CW && d[p + 3] > 200) { src2 = p; break; } } if (src2 < 0) continue;   /* (the colour from a little inside the edge: the edge itself is the ink line, and carried out it made dark bars) */
+                    for (let k = 1; k <= 40; k++) { const xx = edge + step * k; if (xx < 0 || xx >= CW) break; const p = o + xx * 4; if (d[p + 3] > 200) break; d[p] = d[src2]; d[p + 1] = d[src2 + 1]; d[p + 2] = d[src2 + 2]; d[p + 3] = d[src2 + 3]; } } }
+                g.putImageData(id, 0, r0); sg0.putImageData(sd, 0, r0);
+              }
               const sp = g.getImageData(0, 0, CW, CH).data;
+              if (spA) g.putImageData(new ImageData(spA, CW, CH), 0, 0);   /* (the cloth carried out to her sides is only for reading the grown part from; what shows unmoved is the game's own) */
               // ENLARGED CLEAN. The game's cloth is drawn in flat shapes with hard edges (its light, its shade, a white
               // front, a trim). Grown two or three times over by plain blending, every hard edge came out as a blurry
               // staircase and the light on a shirt became a blocky white patch (Laynie, Oct 14: "the textures are ugly too,
@@ -783,7 +804,9 @@ window.FarmBodyEngine = function (host) {
                     let px2 = qx, pyS = 0; if (nipPull && !onTent) { const np = nipPull[qx < midX ? 0 : 1], dd = Math.hypot(qx - np.tx, qy - np.ty); if (dd < np.R) { const wv = Math.pow(1 - dd / np.R, 2) * (3 - 2 * (1 - dd / np.R)) ; px2 = qx + np.dx * wv; pyS = np.dy * wv; } }
                     const asIs = !onB && !onTent && !bridge && qy > bcy;   /* (below her breasts and off them, the piece is exactly the game's picture: same place, same width. Review, Oct 14.) */
                     const fx = asIs ? qx : onTent ? midX + (qx - midX) * bh2 / th : midX + srcOff(px2 - midX, sg) * flatK, fy = asIs ? qy : onTent ? qy : yn + pyS / kyAt(yn), ix = Math.floor(fx), iy = Math.floor(fy); if (ix < 0 || iy < 0 || ix >= CW - 1 || iy >= CH - 1) continue;
-                    const mg = asIs ? 1 : Math.max(sg, kyAt(yn)), at = sample(fx, fy, mg, od, o4); if (at < 1) { od[o4 + 3] = 0; continue; }
+                    const mg = asIs ? 1 : Math.max(sg, kyAt(yn));
+                    if (asIs && spA) { const p = (qy * CW + qx) * 4; if (spA[p + 3] < 1) { od[o4 + 3] = 0; continue; } od[o4] = spA[p]; od[o4 + 1] = spA[p + 1]; od[o4 + 2] = spA[p + 2]; od[o4 + 3] = spA[p + 3]; continue; }
+                    const at = sample(fx, fy, mg, od, o4); if (at < 1) { od[o4 + 3] = 0; continue; }
                     if (!asIs && !onSlope) { fxA[j * bw + i] = fx; fyA[j * bw + i] = fy; magA[j * bw + i] = mg; }
                     if (groundRow < 1e8 && groundRow - qy < 16) od[o4 + 3] = at * Math.max(0.1, (groundRow - qy) / 16);
                   }
@@ -888,6 +911,14 @@ window.FarmBodyEngine = function (host) {
                 const ell = (k, grow, dy) => { g.beginPath(); g.ellipse(bcx[k] + (k ? 1 : -1) * (S2.ro - S2.ri) / 2, bcy + (dy || 0), (S2.ro + S2.ri) / 2 + grow, S2.rv + grow, 0, 0, Math.PI * 2); };
                 // the shadow they throw on the piece below them
                 g.drawImage(T, x0, y0);
+                // (a flat-chested piece's own chest shading, a man's chest muscles, smoothed off her breasts: the form below gives them their shape)
+                if (pc0 && pc0.flat && chestCover(src, im, x, y, B, false) >= 0.5) {
+                  const bl = document.createElement("canvas"); bl.width = CW; bl.height = CH; const bg2 = bl.getContext("2d"); bg2.filter = "blur(6px)"; bg2.drawImage(c, 0, 0); bg2.filter = "none";
+                  const mk = document.createElement("canvas"); mk.width = CW; mk.height = CH; const mg2 = mk.getContext("2d"); mg2.filter = "blur(5px)"; mg2.fillStyle = "#000";
+                  for (let k = 0; k < 2; k++) { mg2.beginPath(); mg2.ellipse(bcx[k] + (k ? 1 : -1) * (S2.ro - S2.ri) / 2, bcy, (S2.ro + S2.ri) / 2 - 8, S2.rv - 8, 0, 0, Math.PI * 2); mg2.fill(); }
+                  bg2.globalCompositeOperation = "destination-in"; bg2.drawImage(mk, 0, 0);
+                  g.save(); g.globalCompositeOperation = "source-atop"; g.drawImage(bl, 0, 0); g.restore();
+                }
                 // (This shadow was landing on the breasts themselves as well as under them, darkening the whole front of every top by a
                 // quarter: discs of a different colour on the pink T-shirt, the maid's white, the bra. Laynie, Oct 13: "weird
                 // coloring issues". It's kept off them now: it falls only below their undersides. And the darkening
@@ -907,6 +938,7 @@ window.FarmBodyEngine = function (host) {
                   g.strokeStyle = "rgba(0,0,0,0.42)"; g.lineWidth = 1.5; g.lineCap = "round";
                   for (let k = 0; k < 2; k++) { g.beginPath(); g.ellipse(bcx[k] + (k ? 1 : -1) * (S2.ro - S2.ri) / 2, bcy, (S2.ro + S2.ri) / 2, S2.rv, 0, Math.PI * 0.08, Math.PI * 0.92); g.stroke(); } });
               }
+              if (sleeves) { g.save(); g.globalCompositeOperation = "destination-over"; g.drawImage(sleeves, 0, 0); g.restore(); }   /* (the sleeves, back where the game has them, behind her breasts: a catsuit's long sleeves laid on top ran down over them) */
               if (ctx.belly && !fit.behind) { try { const sh = bellyShade(c, x - c.MX, y - c.MY, ctx); if (sh) { sh.MX = c.MX; sh.MY = c.MY; c = sh; } } catch (e) { console.warn("[body] belly form:", e); } }
               if (BREAST.out.size > 60) BREAST.out.clear(); BREAST.out.set(key, c);
             }

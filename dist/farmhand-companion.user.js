@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.18.0
+// @version      0.18.1
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -230,7 +230,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.18.0";
+  var VERSION = "0.18.1";
 
   // extension/src/config.js
   var BOT_MEMBER = 260239;
@@ -2613,6 +2613,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
                 BREAST.cover.set(key, v);
                 return v;
               };
+              const TEX = { FuzzyDress: {}, FurCoat: {}, FurBolero: {}, DressFur: {}, FlowerDress: { bl: 9, cell: 34 } };
               const dressDraw = (name, src, x, y, o) => {
                 const B = ctx2.breast, im = B && mouldImg(src);
                 if (!im) return false;
@@ -2756,6 +2757,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
                   const x0 = Math.max(0, Math.floor(midX - 110 * sc)), bw = Math.min(CW - x0, Math.ceil(220 * sc)), y0 = Math.max(0, Math.floor(y1)), bh = Math.min(CH - 2, Math.max(yEnd, Math.floor(BREAST.solid[pk] ? Math.min(pb > 0 ? pb : flapEnd, MY + B.ry - y + S22.by + S22.rv * 2.4) : 0))) - y0 + 1;
                   if (bw > 0 && bh > 0) {
                     const out2 = g.createImageData(bw, bh), od = out2.data, hi = g.createImageData(bw, bh);
+                    const fxA = new Float32Array(bw * bh).fill(-1), fyA = new Float32Array(bw * bh), magA = new Float32Array(bw * bh);
                     const pj1 = Math.round(y1 - uyc), bodyHalf = prof && pj1 >= 0 && pj1 < prof.h && prof.L[pj1] >= 0 ? Math.max(midX - (ux + prof.L[pj1]), ux + prof.R[pj1] - midX) : 80;
                     const slopeEnd = bcy - S22.rv * 0.65, sideHalf = S22.bx + S22.ro * 0.76;
                     const slopeHalf = (qy) => {
@@ -2830,12 +2832,136 @@ One of mods you are using is using an old version of SDK. It will work for now b
                         const asIs = !onB && !onTent && !bridge && qy > bcy;
                         const fx = asIs ? qx : onTent ? midX + (qx - midX) * bh2 / th : midX + srcOff(px2 - midX, sg) * flatK, fy = asIs ? qy : onTent ? qy : yn + pyS / kyAt(yn), ix = Math.floor(fx), iy = Math.floor(fy);
                         if (ix < 0 || iy < 0 || ix >= CW - 1 || iy >= CH - 1) continue;
-                        const at = sample(fx, fy, asIs ? 1 : Math.max(sg, kyAt(yn)), od, o4);
+                        const mg = asIs ? 1 : Math.max(sg, kyAt(yn)), at = sample(fx, fy, mg, od, o4);
                         if (at < 1) {
                           od[o4 + 3] = 0;
                           continue;
                         }
+                        if (!asIs && !onSlope) {
+                          fxA[j * bw + i] = fx;
+                          fyA[j * bw + i] = fy;
+                          magA[j * bw + i] = mg;
+                        }
                         if (groundRow < 1e8 && groundRow - qy < 16) od[o4 + 3] = at * Math.max(0.1, (groundRow - qy) / 16);
+                      }
+                    }
+                    const texOf = (() => {
+                      const tx = TEX[(pieceOf(src) || {}).name];
+                      if (!tx) return null;
+                      const BL = tx.bl || 7, S3 = tx.cell || 30;
+                      const spL = (() => {
+                        const cb2 = document.createElement("canvas");
+                        cb2.width = CW;
+                        cb2.height = CH;
+                        const gb = cb2.getContext("2d", { willReadFrequently: true });
+                        gb.filter = "blur(" + BL + "px)";
+                        gb.drawImage(c, 0, 0);
+                        gb.filter = "none";
+                        return gb.getImageData(0, 0, CW, CH).data;
+                      })();
+                      const lum = (A, p) => A[p] * 0.3 + A[p + 1] * 0.59 + A[p + 2] * 0.11;
+                      const ch = [[], [], []];
+                      for (const sd of [-1, 1]) for (let yy = Math.round(uyc + G.cy - G.rv * 0.6); yy < Math.round(uyc + G.cy + G.rv * 0.6); yy += 2) for (let xx = Math.round(midX + sd * G.dx - G.ro * 0.6); xx < Math.round(midX + sd * G.dx + G.ro * 0.6); xx += 2) {
+                        if (xx < 0 || yy < 0 || xx >= CW || yy >= CH) continue;
+                        const p = (yy * CW + xx) * 4;
+                        if (sp[p + 3] < 250) continue;
+                        const t = spL[p] + spL[p + 1] + spL[p + 2] || 1;
+                        ch[0].push(spL[p] / t);
+                        ch[1].push(spL[p + 1] / t);
+                        ch[2].push(spL[p + 2] / t);
+                      }
+                      if (ch[0].length < 300) return null;
+                      const bn = ch.map((a) => {
+                        a.sort((p, q2) => p - q2);
+                        return a[a.length >> 1];
+                      });
+                      const rx0 = Math.max(1, Math.round(midX - G.dx - G.ro - 30)), rx1 = Math.min(CW - 2, Math.round(midX + G.dx + G.ro + 30)), ry0 = Math.max(1, Math.round(uyc + G.y1)), ry1 = Math.min(CH - 2, Math.round(uyc + G.y3 + 90));
+                      const RW = rx1 - rx0 + 1, RH = ry1 - ry0 + 1, clean = new Uint8Array(RW * RH);
+                      let nC = 0, sD = 0, bl = 0;
+                      for (let yy = ry0; yy <= ry1; yy++) for (let xx = rx0; xx <= rx1; xx++) {
+                        const p = (yy * CW + xx) * 4;
+                        if (sp[p + 3] < 250) continue;
+                        const t = spL[p] + spL[p + 1] + spL[p + 2] || 1;
+                        if (Math.abs(spL[p] / t - bn[0]) + Math.abs(spL[p + 1] / t - bn[1]) + Math.abs(spL[p + 2] / t - bn[2]) > 0.05) continue;
+                        const gr = Math.abs(lum(spL, p + 4) - lum(spL, p - 4)) + Math.abs(lum(spL, p + CW * 4) - lum(spL, p - CW * 4));
+                        if (gr > 9) continue;
+                        clean[(yy - ry0) * RW + (xx - rx0)] = 1;
+                        nC++;
+                        sD += Math.abs(lum(sp, p) - lum(spL, p));
+                        bl += lum(spL, p);
+                      }
+                      if (nC < 800) return null;
+                      const det = sD / nC;
+                      if (det < 2.5) return null;
+                      const I = new Float32Array((RW + 1) * (RH + 1));
+                      for (let yy = 0; yy < RH; yy++) {
+                        let row = 0;
+                        for (let xx = 0; xx < RW; xx++) {
+                          row += clean[yy * RW + xx];
+                          I[(yy + 1) * (RW + 1) + xx + 1] = I[yy * (RW + 1) + xx + 1] + row;
+                        }
+                      }
+                      const box = (x2, y4, r) => {
+                        const a = Math.max(0, x2 - r), b = Math.max(0, y4 - r), c2 = Math.min(RW, x2 + r + 1), d2 = Math.min(RH, y4 + r + 1);
+                        return (I[d2 * (RW + 1) + c2] - I[b * (RW + 1) + c2] - I[d2 * (RW + 1) + a] + I[b * (RW + 1) + a]) / ((2 * r + 1) * (2 * r + 1));
+                      };
+                      const srcs = [];
+                      for (let yy = S3; yy < RH - S3; yy += 3) for (let xx = S3; xx < RW - S3; xx += 3) if (clean[yy * RW + xx] && box(xx, yy, S3) > 0.8) srcs.push([xx + rx0, yy + ry0]);
+                      if (srcs.length < 4) return null;
+                      return { S: S3, spL, srcs, bn, base: bl / nC, det, cleanAt: (x2, y4) => {
+                        const xx = Math.round(x2) - rx0, yy = Math.round(y4) - ry0;
+                        return xx >= 0 && yy >= 0 && xx < RW && yy < RH && clean[yy * RW + xx] === 1;
+                      } };
+                    })();
+                    if (texOf) {
+                      const { S: S3, spL, srcs, bn, base, cleanAt } = texOf, lum = (A, p) => A[p] * 0.3 + A[p + 1] * 0.59 + A[p + 2] * 0.11;
+                      const bil = (A, fx, fy, k) => {
+                        const ix = Math.floor(fx), iy = Math.floor(fy);
+                        if (ix < 0 || iy < 0 || ix >= CW - 1 || iy >= CH - 1) return -1;
+                        const ax = fx - ix, ay = fy - iy, p = (iy * CW + ix) * 4 + k;
+                        return A[p] * (1 - ax) * (1 - ay) + A[p + 4] * ax * (1 - ay) + A[p + CW * 4] * (1 - ax) * ay + A[p + CW * 4 + 4] * ax * ay;
+                      };
+                      const pick = (ci, cj) => {
+                        let hsh = ci * 73856093 ^ cj * 19349663 ^ srcs.length;
+                        hsh = Math.imul(hsh ^ hsh >>> 13, 1540483477);
+                        hsh ^= hsh >>> 15;
+                        return srcs[Math.abs(hsh) % srcs.length];
+                      };
+                      const sm2 = (t) => t * t * (3 - 2 * t);
+                      for (let j = 0; j < bh; j++) for (let i = 0; i < bw; i++) {
+                        const pi = j * bw + i;
+                        if (fxA[pi] < 0) continue;
+                        const o4 = pi * 4;
+                        if (od[o4 + 3] < 200) continue;
+                        const mg = magA[pi], wm2 = Math.max(0, Math.min(1, (mg - 1.2) / 0.5));
+                        if (wm2 <= 0) continue;
+                        const fx = fxA[pi], fy = fyA[pi], Lr = bil(spL, fx, fy, 0), Lg = bil(spL, fx, fy, 1), Lb = bil(spL, fx, fy, 2);
+                        if (Lr < 0) continue;
+                        const ls = Lr + Lg + Lb || 1, dc = Math.abs(Lr / ls - bn[0]) + Math.abs(Lg / ls - bn[1]) + Math.abs(Lb / ls - bn[2]), lk = (Lr * 0.3 + Lg * 0.59 + Lb * 0.11) / (base || 1);
+                        const wc = Math.max(0, Math.min(1, (0.075 - dc) / 0.03)) * (lk > 0.35 && lk < 1.8 ? 1 : 0);
+                        if (wc <= 0) continue;
+                        const pg = Math.abs(bil(spL, fx + 1.5, fy, 0) - bil(spL, fx - 1.5, fy, 0)) + Math.abs(bil(spL, fx, fy + 1.5, 0) - bil(spL, fx, fy - 1.5, 0)) + Math.abs(bil(spL, fx + 1.5, fy, 1) - bil(spL, fx - 1.5, fy, 1)) + Math.abs(bil(spL, fx, fy + 1.5, 1) - bil(spL, fx, fy - 1.5, 1));
+                        const we = Math.max(0, Math.min(1, 1 - (pg - 14) / 24));
+                        const w2 = wm2 * wc * we;
+                        if (w2 <= 0.01) continue;
+                        const qx = i + x0, qy = j + y0, u = qx / S3 - 0.5, v = qy / S3 - 0.5, ci = Math.floor(u), cj = Math.floor(v), du = sm2(u - ci), dv = sm2(v - cj);
+                        let sr = 0, sg2 = 0, sb = 0, sw = 0, sw2 = 0;
+                        for (const [di, dj, bwt] of [[0, 0, (1 - du) * (1 - dv)], [1, 0, du * (1 - dv)], [0, 1, (1 - du) * dv], [1, 1, du * dv]]) {
+                          if (bwt <= 1e-3) continue;
+                          const P3 = pick(ci + di, cj + dj), cx = (ci + di + 0.5) * S3, cy = (cj + dj + 0.5) * S3, sx = P3[0] + (qx - cx), sy = P3[1] + (qy - cy);
+                          if (!cleanAt(sx, sy)) continue;
+                          const p = (Math.round(sy) * CW + Math.round(sx)) * 4;
+                          sr += bwt * (sp[p] - spL[p]);
+                          sg2 += bwt * (sp[p + 1] - spL[p + 1]);
+                          sb += bwt * (sp[p + 2] - spL[p + 2]);
+                          sw += bwt;
+                          sw2 += bwt * bwt;
+                        }
+                        if (sw < 0.2) continue;
+                        const nrm = 1 / Math.sqrt(sw2), ww = w2 * Math.min(1, (sw - 0.2) / 0.3), k = Math.min(1.6, lk);
+                        od[o4] = od[o4] * (1 - ww) + Math.max(0, Math.min(255, Lr + sr * nrm * k)) * ww;
+                        od[o4 + 1] = od[o4 + 1] * (1 - ww) + Math.max(0, Math.min(255, Lg + sg2 * nrm * k)) * ww;
+                        od[o4 + 2] = od[o4 + 2] * (1 - ww) + Math.max(0, Math.min(255, Lb + sb * nrm * k)) * ww;
                       }
                     }
                     if (tentOn) {

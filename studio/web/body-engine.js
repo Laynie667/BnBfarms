@@ -568,6 +568,12 @@ window.FarmBodyEngine = function (host) {
           //     breastbone. That block lies over whatever of the piece is on the body behind it (the body of a corset),
           //     the way the breasts themselves do.
           //   · It's only shown where there's something for it to lie on: the breasts, or the body. Nothing hangs in the air.
+          // Pieces whose cloth has a pattern or a grain all over it (flowers, fur, lace, knit, a print): these are laid on her
+          // with the pattern repeated at its own size instead of blown up with the breast (see PRINTS AND GRAIN, below). Only
+          // these: on a piece whose detail is its make (seams, boning, piping, stitching), repeating it scattered bits of seam
+          // about (the leather jacket, the steampunk corset). bl: how soft the copy is that the light and shade are read from
+          // (bigger for a bigger pattern); cell: how big each repeated patch is.
+          const TEX = { FuzzyDress: {}, FurCoat: {}, FurBolero: {}, DressFur: {}, FlowerDress: { bl: 9, cell: 34 } };   /* (tried and left as they were: the wool coat and sweater (their folds and ribbing scattered), the leather jacket and steampunk corset (seams), the fishnet bikini (bits of strap). Big motifs, cow spots and the flowers on a Chinese dress, can't be repeated from a piece that only has a few of them.) */
           const dressDraw = (name, src, x, y, o) => {
             const B = ctx.breast, im = B && mouldImg(src); if (!im) return false;   // (every pose, all fours too: nothing is drawn below the ground there)
             // A piece that lies ON the breasts is grown with them (and every layer of it: a buckle or a bow goes along). A
@@ -665,6 +671,7 @@ window.FarmBodyEngine = function (host) {
               const x0 = Math.max(0, Math.floor(midX - 110 * sc)), bw = Math.min(CW - x0, Math.ceil(220 * sc)), y0 = Math.max(0, Math.floor(y1)), bh = Math.min(CH - 2, Math.max(yEnd, Math.floor(BREAST.solid[pk] ? Math.min(pb > 0 ? pb : flapEnd, MY + B.ry - y + S2.by + S2.rv * 2.4) : 0))) - y0 + 1;
               if (bw > 0 && bh > 0) {
                 const out = g.createImageData(bw, bh), od = out.data, hi = g.createImageData(bw, bh);
+                const fxA = new Float32Array(bw * bh).fill(-1), fyA = new Float32Array(bw * bh), magA = new Float32Array(bw * bh);   /* where each grown pixel was read from, and how much it was enlarged there (for the print, below) */
                 // Above the breasts the grown piece may run out past the side of the chest, to reach the top of a breast that's
                 // wider than she is. How far out is a SLOPE, from the edge of the body at the top of the grown part down to
                 // the breast's own side: not the full width all the way up, which gave every top a pair of square corners
@@ -731,8 +738,74 @@ window.FarmBodyEngine = function (host) {
                     let px2 = qx, pyS = 0; if (nipPull && !onTent) { const np = nipPull[qx < midX ? 0 : 1], dd = Math.hypot(qx - np.tx, qy - np.ty); if (dd < np.R) { const wv = Math.pow(1 - dd / np.R, 2) * (3 - 2 * (1 - dd / np.R)) ; px2 = qx + np.dx * wv; pyS = np.dy * wv; } }
                     const asIs = !onB && !onTent && !bridge && qy > bcy;   /* (below her breasts and off them, the piece is exactly the game's picture: same place, same width. Review, Oct 14.) */
                     const fx = asIs ? qx : onTent ? midX + (qx - midX) * bh2 / th : midX + srcOff(px2 - midX, sg) * flatK, fy = asIs ? qy : onTent ? qy : yn + pyS / kyAt(yn), ix = Math.floor(fx), iy = Math.floor(fy); if (ix < 0 || iy < 0 || ix >= CW - 1 || iy >= CH - 1) continue;
-                    const at = sample(fx, fy, asIs ? 1 : Math.max(sg, kyAt(yn)), od, o4); if (at < 1) { od[o4 + 3] = 0; continue; }
+                    const mg = asIs ? 1 : Math.max(sg, kyAt(yn)), at = sample(fx, fy, mg, od, o4); if (at < 1) { od[o4 + 3] = 0; continue; }
+                    if (!asIs && !onSlope) { fxA[j * bw + i] = fx; fyA[j * bw + i] = fy; magA[j * bw + i] = mg; }
                     if (groundRow < 1e8 && groundRow - qy < 16) od[o4 + 3] = at * Math.max(0.1, (groundRow - qy) / 16);
+                  }
+                }
+                // PRINTS AND GRAIN AT THEIR OWN SIZE. Grown with the breast, a print or the grain of a cloth grows too: flowers
+                // two and a half times their size, fur and knit and leather grain gone coarse (Laynie, Oct 14: "the textures
+                // are ugly too, from how they are stretched"). Her pick: copy the pattern to fill in, rather than stretch it.
+                // So a clean patch of the piece is found, on the game's breast where the light is even (no trim, no fold,
+                // no shine), and its fine pattern is lifted off it. The grown piece keeps its broad colour and its light and
+                // shade (read from a softened copy, so its blown-up pattern isn't in it), and the patch's pattern is laid
+                // back over it, one pixel for one pixel, repeated (mirrored, so no seam shows), darker where the cloth is
+                // in shadow. Only where the cloth is the patch's own colour: a trim, a bow, a white front keep the piece's
+                // own picture. A piece with no pattern to speak of (most are flat colour) is left exactly as it was.
+                const texOf = (() => {
+                  const tx = TEX[(pieceOf(src) || {}).name]; if (!tx) return null;
+                  const BL = tx.bl || 7, S = tx.cell || 30;
+                  const spL = (() => { const cb = document.createElement("canvas"); cb.width = CW; cb.height = CH; const gb = cb.getContext("2d", { willReadFrequently: true }); gb.filter = "blur(" + BL + "px)"; gb.drawImage(c, 0, 0); gb.filter = "none"; return gb.getImageData(0, 0, CW, CH).data; })();
+                  const lum = (A, p) => A[p] * 0.3 + A[p + 1] * 0.59 + A[p + 2] * 0.11;
+                  // the cloth's own colour: the middle of what's on the game's breasts
+                  const ch = [[], [], []];
+                  for (const sd of [-1, 1]) for (let yy = Math.round(uyc + G.cy - G.rv * 0.6); yy < Math.round(uyc + G.cy + G.rv * 0.6); yy += 2) for (let xx = Math.round(midX + sd * G.dx - G.ro * 0.6); xx < Math.round(midX + sd * G.dx + G.ro * 0.6); xx += 2) {
+                    if (xx < 0 || yy < 0 || xx >= CW || yy >= CH) continue; const p = (yy * CW + xx) * 4; if (sp[p + 3] < 250) continue; const t = spL[p] + spL[p + 1] + spL[p + 2] || 1; ch[0].push(spL[p] / t); ch[1].push(spL[p + 1] / t); ch[2].push(spL[p + 2] / t); }
+                  if (ch[0].length < 300) return null;
+                  const bn = ch.map((a) => { a.sort((p, q) => p - q); return a[a.length >> 1]; });
+                  // the clean cloth: that colour, the light even, the piece solid there (from above the breasts to well below them)
+                  const rx0 = Math.max(1, Math.round(midX - G.dx - G.ro - 30)), rx1 = Math.min(CW - 2, Math.round(midX + G.dx + G.ro + 30)), ry0 = Math.max(1, Math.round(uyc + G.y1)), ry1 = Math.min(CH - 2, Math.round(uyc + G.y3 + 90));
+                  const RW = rx1 - rx0 + 1, RH = ry1 - ry0 + 1, clean = new Uint8Array(RW * RH); let nC = 0, sD = 0, bl = 0;
+                  for (let yy = ry0; yy <= ry1; yy++) for (let xx = rx0; xx <= rx1; xx++) {
+                    const p = (yy * CW + xx) * 4; if (sp[p + 3] < 250) continue; const t = spL[p] + spL[p + 1] + spL[p + 2] || 1;
+                    if (Math.abs(spL[p] / t - bn[0]) + Math.abs(spL[p + 1] / t - bn[1]) + Math.abs(spL[p + 2] / t - bn[2]) > 0.05) continue;
+                    const gr = Math.abs(lum(spL, p + 4) - lum(spL, p - 4)) + Math.abs(lum(spL, p + CW * 4) - lum(spL, p - CW * 4)); if (gr > 9) continue;
+                    clean[(yy - ry0) * RW + (xx - rx0)] = 1; nC++; sD += Math.abs(lum(sp, p) - lum(spL, p)); bl += lum(spL, p);
+                  }
+                  if (nC < 800) return null;
+                  const det = sD / nC;
+                  if (det < 2.5) return null;
+                  // where a patch can come from: a clean spot with mostly clean cloth round it
+                  const I = new Float32Array((RW + 1) * (RH + 1)); for (let yy = 0; yy < RH; yy++) { let row = 0; for (let xx = 0; xx < RW; xx++) { row += clean[yy * RW + xx]; I[(yy + 1) * (RW + 1) + xx + 1] = I[yy * (RW + 1) + xx + 1] + row; } }
+                  const box = (x, y, r) => { const a = Math.max(0, x - r), b = Math.max(0, y - r), c2 = Math.min(RW, x + r + 1), d2 = Math.min(RH, y + r + 1); return (I[d2 * (RW + 1) + c2] - I[b * (RW + 1) + c2] - I[d2 * (RW + 1) + a] + I[b * (RW + 1) + a]) / ((2 * r + 1) * (2 * r + 1)); };
+                  const srcs = []; for (let yy = S; yy < RH - S; yy += 3) for (let xx = S; xx < RW - S; xx += 3) if (clean[yy * RW + xx] && box(xx, yy, S) > 0.8) srcs.push([xx + rx0, yy + ry0]);
+                  if (srcs.length < 4) return null;
+                  return { S, spL, srcs, bn, base: bl / nC, det, cleanAt: (x, y) => { const xx = Math.round(x) - rx0, yy = Math.round(y) - ry0; return xx >= 0 && yy >= 0 && xx < RW && yy < RH && clean[yy * RW + xx] === 1; } };
+                })();
+                if (texOf) {
+                  const { S, spL, srcs, bn, base, cleanAt } = texOf, lum = (A, p) => A[p] * 0.3 + A[p + 1] * 0.59 + A[p + 2] * 0.11;
+                  const bil = (A, fx, fy, k) => { const ix = Math.floor(fx), iy = Math.floor(fy); if (ix < 0 || iy < 0 || ix >= CW - 1 || iy >= CH - 1) return -1; const ax = fx - ix, ay = fy - iy, p = (iy * CW + ix) * 4 + k;
+                    return A[p] * (1 - ax) * (1 - ay) + A[p + 4] * ax * (1 - ay) + A[p + CW * 4] * (1 - ax) * ay + A[p + CW * 4 + 4] * ax * ay; };
+                  // each cell of the grid on her takes its pattern from its own patch (chosen the same way every time it's drawn)
+                  const pick = (ci, cj) => { let hsh = (ci * 73856093) ^ (cj * 19349663) ^ srcs.length; hsh = Math.imul(hsh ^ (hsh >>> 13), 0x5bd1e995); hsh ^= hsh >>> 15; return srcs[Math.abs(hsh) % srcs.length]; };
+                  const sm = (t) => t * t * (3 - 2 * t);
+                  for (let j = 0; j < bh; j++) for (let i = 0; i < bw; i++) {
+                    const pi = j * bw + i; if (fxA[pi] < 0) continue; const o4 = pi * 4; if (od[o4 + 3] < 200) continue;
+                    const mg = magA[pi], wm = Math.max(0, Math.min(1, (mg - 1.2) / 0.5)); if (wm <= 0) continue;
+                    const fx = fxA[pi], fy = fyA[pi], Lr = bil(spL, fx, fy, 0), Lg = bil(spL, fx, fy, 1), Lb = bil(spL, fx, fy, 2); if (Lr < 0) continue;
+                    const ls = Lr + Lg + Lb || 1, dc = Math.abs(Lr / ls - bn[0]) + Math.abs(Lg / ls - bn[1]) + Math.abs(Lb / ls - bn[2]), lk = (Lr * 0.3 + Lg * 0.59 + Lb * 0.11) / (base || 1);
+                    const wc = Math.max(0, Math.min(1, (0.075 - dc) / 0.03)) * (lk > 0.35 && lk < 1.8 ? 1 : 0); if (wc <= 0) continue;
+                    const pg = Math.abs(bil(spL, fx + 1.5, fy, 0) - bil(spL, fx - 1.5, fy, 0)) + Math.abs(bil(spL, fx, fy + 1.5, 0) - bil(spL, fx, fy - 1.5, 0)) + Math.abs(bil(spL, fx + 1.5, fy, 1) - bil(spL, fx - 1.5, fy, 1)) + Math.abs(bil(spL, fx, fy + 1.5, 1) - bil(spL, fx, fy - 1.5, 1));
+                    const we = Math.max(0, Math.min(1, 1 - (pg - 14) / 24)); const w = wm * wc * we; if (w <= 0.01) continue;
+                    // the pattern here: from the four nearest cells' patches, blended
+                    const qx = i + x0, qy = j + y0, u = qx / S - 0.5, v = qy / S - 0.5, ci = Math.floor(u), cj = Math.floor(v), du = sm(u - ci), dv = sm(v - cj);
+                    let sr = 0, sg2 = 0, sb = 0, sw = 0, sw2 = 0;
+                    for (const [di, dj, bwt] of [[0, 0, (1 - du) * (1 - dv)], [1, 0, du * (1 - dv)], [0, 1, (1 - du) * dv], [1, 1, du * dv]]) {
+                      if (bwt <= 1e-3) continue; const P = pick(ci + di, cj + dj), cx = (ci + di + 0.5) * S, cy = (cj + dj + 0.5) * S, sx = P[0] + (qx - cx), sy = P[1] + (qy - cy);
+                      if (!cleanAt(sx, sy)) continue; const p = (Math.round(sy) * CW + Math.round(sx)) * 4;
+                      sr += bwt * (sp[p] - spL[p]); sg2 += bwt * (sp[p + 1] - spL[p + 1]); sb += bwt * (sp[p + 2] - spL[p + 2]); sw += bwt; sw2 += bwt * bwt; }
+                    if (sw < 0.2) continue; const nrm = 1 / Math.sqrt(sw2), ww = w * Math.min(1, (sw - 0.2) / 0.3), k = Math.min(1.6, lk);
+                    od[o4] = od[o4] * (1 - ww) + Math.max(0, Math.min(255, Lr + sr * nrm * k)) * ww; od[o4 + 1] = od[o4 + 1] * (1 - ww) + Math.max(0, Math.min(255, Lg + sg2 * nrm * k)) * ww; od[o4 + 2] = od[o4 + 2] * (1 - ww) + Math.max(0, Math.min(255, Lb + sb * nrm * k)) * ww;
                   }
                 }
                 // FROM THE SHOULDER TO THE BUST. Laynie's marks on the student outfit (Oct 13): a green line each side, straight

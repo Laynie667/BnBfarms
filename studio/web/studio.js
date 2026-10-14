@@ -456,7 +456,7 @@
   // Flat to R. The first six cups are the game's own chest sizes: picking one just changes the body. From DD up they're
   // drawn (breasts-drawing.js), over the game's biggest chest, standing and kneeling only for now. The game's nipples,
   // and whatever is worn on them, are lifted off where the game puts them and set down on the drawn ones.
-  const BREAST = { solid: {}, tuck: true, on: {}, free: true, holds: {}, holdSig: "", wear: {}, dress: true, cover: new Map(), cup: null, full: 1, hang: 1, apart: 1, x: 0, y: 0, nip: 1, nipY: 0, nipX: 0, cv: null, cvKey: "", halves: new Map(), out: new Map() };
+  const BREAST = { band: {}, solid: {}, tuck: true, on: {}, free: true, holds: {}, holdSig: "", wear: {}, dress: true, cover: new Map(), cup: null, full: 1, hang: 1, apart: 1, x: 0, y: 0, nip: 1, nipY: 0, nipX: 0, cv: null, cvKey: "", halves: new Map(), out: new Map() };
   const BREAST_SLIDERS = [["full", "Fullness", 0.7, 1.4, 0.01], ["hang", "Weight (how low and heavy they hang)", 0, 2, 0.01], ["apart", "Apart / together", 0.6, 1.5, 0.01], ["x", "Left / right", -60, 60, 1], ["y", "Up / down", -80, 80, 1],
     ["nip", "Nipple size (and what's worn on them)", 0.4, 4, 0.05], ["nipY", "Nipples up / down", -80, 80, 1], ["nipX", "Nipples in / out", -60, 60, 1]];
   const NIP_GROUPS = new Set(["Nipples", "ItemNipples", "ItemNipplesPiercings"]);
@@ -759,6 +759,34 @@
           // how much of the game's two breasts this picture covers (0 to 1): a belt or a collar isn't chest wear
           // wide: measured a third wider than the breast (is it round or under them: does it hold them?). Not wide: measured
           // just inside the breast (is it ON them: is there anything of it to grow?).
+          // Is there a band running along the underside of the game's breasts? (an underbust strap, the lower edge of a harness.)
+          // Such a piece has little ON the breast, but its band has to follow the breast down to HER underside, or it ends up
+          // across the middle of her breasts (Laynie's marks on the Futuristic and High Security harnesses, Oct 14).
+          const underBand = (src, im, x, y, B) => {
+            const key = "ub|" + src + "|" + Math.round(x) + "," + Math.round(y); let v = BREAST.cover.get(key); if (v != null) return v;
+            const w = im.naturalWidth, h = im.naturalHeight, c = document.createElement("canvas"); c.width = w; c.height = h;
+            const g = c.getContext("2d", { willReadFrequently: true }); g.drawImage(im, 0, 0);
+            const GB = gameBreast(B), d = g.getImageData(0, 0, w, h).data; let hit = 0, all = 0;
+            for (const sd of [-1, 1]) for (let i = -Math.round(GB.r * 0.8); i <= Math.round(GB.r * 0.8); i += 2) { all++; const px = Math.round(B.mid + sd * GB.dx - x) + i; let any = false;
+              for (let j = Math.round(GB.r * 0.7); j <= Math.round(GB.r * 1.6); j++) { const py = Math.round(B.uy + GB.y - y) + j; if (px >= 0 && py >= 0 && px < w && py < h && d[(py * w + px) * 4 + 3] > 60) { any = true; break; } } if (any) hit++; }
+            v = all ? hit / all : 0; BREAST.cover.set(key, v); return v;
+          };
+          // The piece as the game draws it, with her breasts in front of it; and its under-band, the strip along the underside
+          // of the game's breasts, lifted out and set along HER underside, widened to her.
+          const bandDraw = (name, src, x, y, o) => {
+            const B = ctx.breast, im = mouldImg(src); if (!B || !im) return false;
+            const key = "band|" + src + "|" + Math.round(x) + "," + Math.round(y) + "|" + B.sig; let c = BREAST.out.get(key);
+            if (!c) {
+              const GB = gameBreast(B), MX = 260, MY = 480, w = im.naturalWidth, h = im.naturalHeight, S2 = B.S;
+              c = document.createElement("canvas"); c.width = w + MX * 2; c.height = h + MY * 2; c.MX = MX; c.MY = MY; const g = c.getContext("2d");
+              g.drawImage(im, MX, MY); g.globalCompositeOperation = "destination-out"; g.drawImage(B.mask, MX + B.mx - x, MY + B.my - y); g.globalCompositeOperation = "source-over";   // behind her breasts
+              const b0 = Math.round(B.uy + GB.y + GB.r * 0.62 - y), b1 = Math.round(B.uy + GB.y + GB.r * 1.65 - y), gUnder = B.uy + GB.y + GB.r, herUnder = B.ry + S2.by + (B.fit.rv || S2.r), dy = herUnder - gUnder, kx = B.fit.kx || 1, mid = B.mid - x;
+              if (b1 > b0) { const strip = document.createElement("canvas"); strip.width = w; strip.height = b1 - b0; strip.getContext("2d").drawImage(im, 0, b0, w, b1 - b0, 0, 0, w, b1 - b0);
+                g.drawImage(strip, MX + mid - mid * kx, MY + b0 + dy, w * kx, b1 - b0); }
+              if (BREAST.out.size > 60) BREAST.out.clear(); BREAST.out.set(key, c);
+            }
+            real[name](c, x - c.MX, y - c.MY, o); return true;
+          };
           const chestCover = (src, im, x, y, B, wide) => {
             const key = (wide ? "w|" : "n|") + src + "|" + Math.round(x) + "," + Math.round(y); let v = BREAST.cover.get(key); if (v != null) return v;
             const w = im.naturalWidth, h = im.naturalHeight, c = document.createElement("canvas"); c.width = w; c.height = h;
@@ -810,6 +838,10 @@
             // it is grown: grown, its top trim was landing on the breast (Laynie, Oct 13: "the latex corset shows stuff on
             // the breast"). It's drawn as the game draws it, and the breasts sit in front of its top edge.
             const pk0 = (pieceOf(src) || {}).key;
+            if (chestCover(src, im, x, y, B, false) < 0.012 && !BREAST.on[pk0] && underBand(src, im, x, y, B) >= 0.35) BREAST.band[pk0] = true;
+            if (BREAST.band[pk0] && !BREAST.on[pk0]) return bandDraw(name, src, x, y, o);
+            // a piece that starts below the game's breasts (a waist strap, a belt) is under her bigger ones: they hang in front of it
+            if (chestCover(src, im, x, y, B, false) < 0.012 && !BREAST.on[pk0]) { const e0 = edgesOf(src); if (e0) { let t0 = -1; for (let j = 0; j < e0.h; j++) if (e0.L[j] >= 0) { t0 = j; break; } if (t0 >= 0 && y + t0 > B.uy + gameBreast(B).y) return handDraw(name, src, x, y, o); } }   /* (every layer of a banded piece goes the same way: its clasp in the middle too) */
             if (chestCover(src, im, x, y, B, false) < 0.012 && !BREAST.on[pk0])   /* (a rope or a thin strap across the breast covers very little of it, and is still ON it: the box-tie ropes were being taken for an underbust piece and hidden behind her breasts. Found in the catalogue, Oct 14.) */ return BREAST.holds[pk0] ? handDraw(name, src, x, y, o) : false;
             const pc0 = pieceOf(src), wm = (pc0 && BREAST.wear[pc0.key]) || "", pin = wm === "nipple" || (wm === "" && !!pc0 && NIP_PIECES.test(pc0.name)), mapYp = pin && B.fit.mapYN ? B.fit.mapYN : B.fit.mapY;
             const key = "dress|" + (pin ? "pin|" : "") + src + "|" + Math.round(x) + "," + Math.round(y) + "|" + B.sig + "|" + (ctx.belly && !fit.behind && BELLY.auto !== false ? ctx.sig : "") + "|" + MOULD.ver;

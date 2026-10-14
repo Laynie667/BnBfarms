@@ -420,7 +420,11 @@
     let longSrc = false;
     if (mode === "auto" && ext) {
       const br = bellyRows(ctx), mid = br ? (br.top + br.bottom) / 2 : 0, to = br ? br.bottom - 2 : 0, from = br ? Math.max(ext.top, br.top) : 0;
-      if (br && ext.bottom > mid && ext.bottom < to - 2 && ext.bottom > from + 4) {
+      /* (only a piece that narrows to her crotch at its end: a catsuit's top ends wide, at her hips, and lengthened it was drawn flat over the whole belly. Found checking the suits, Oct 14.) */
+      const ps = pieceSpan(piece, src, x, y), bp0 = ctx.belly.prof || (ctx.belly.prof = edges(ctx.belly.cv, ctx.belly.cv.width, ctx.belly.cv.height)); let endW = 1e9, bW = 0;
+      for (let k = 3; k <= 8; k++) { const yy = ext.bottom - k; if (yy >= 0 && yy < 2600 && ps.L[yy] < 1e8) endW = Math.min(endW, ps.R[yy] - ps.L[yy]); }
+      for (let j = 0; j < bp0.h; j++) if (bp0.L[j] >= 0) bW = Math.max(bW, bp0.R[j] - bp0.L[j]);
+      if (br && endW < bW * 0.45 && ext.bottom > mid && ext.bottom < to - 2 && ext.bottom > from + 4) {
         const a = from - Math.round(y), b = ext.bottom - Math.round(y), b2 = to - Math.round(y);
         if (b > a) { const tall = document.createElement("canvas"); tall.width = w; tall.height = Math.max(h, b2 + 1 + Math.max(0, h - 1 - b)); const tg = tall.getContext("2d");
           if (a > 0) tg.drawImage(im, 0, 0, w, Math.min(a, h), 0, 0, w, Math.min(a, h));

@@ -5,7 +5,7 @@
 // The staff panel: duty, the Office (lookups about other people land here), contracts, the barn, guides, switches.
 import { h, card, title, muted, btn, chip, toggle } from "../dom.js";
 import { guidesTab } from "./common.js";
-import { panelPrefs } from "./livestock.js";
+import { panelPrefs, drawnBodyCard } from "./livestock.js";
 import { DURATIONS } from "../../../shared/bcplus.js";
 import { summonReady } from "../addons.js";
 import { herd, tease, zones, voice, shift } from "./staffdata.js";
@@ -126,6 +126,7 @@ function summonCheck() {
 function toggles(ctx) {
   const s = ctx.s, sw = s.switches || {};
   return [
+    drawnBodyCard(ctx),
     card(title("Work"), muted("Most staff leave this off. Mandated farmhands are always on call."),
       s.mandated ? h("div", { class: "fhc-kv" }, h("span", null, "On call"), chip("always (mandated)", "alert"))
         : toggle("On call", "Let the office summon you from anywhere with BCX or BC+ summoning", !!sw.forced, () => ctx.send("forced")),

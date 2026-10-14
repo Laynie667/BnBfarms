@@ -36,9 +36,20 @@ async function send(res, file) {
     res.end(await readFile(file));
   } catch (e) { res.writeHead(404, { "Content-Type": "text/plain" }).end("not found"); }
 }
+// The game's own sites: the Companion there may READ what the studio has saved (its "Get my studio's settings" button).
+// Nothing else is shared, and only the studio's own page may save. (Any web page can send this computer a request;
+// without this, one could have written into the studio's saved fits.)
+const GAME_ORIGIN = new RegExp("^https://([a-z0-9-]+[.])*(bondageprojects[.]elementfx[.]com|bondage-europe[.]com|bondageprojects[.]com|bondage-asia[.]com|bondageeurope[.]com)$");
+const OWN_ORIGIN = new RegExp("^http://(localhost|127[.]0[.]0[.]1)(:[0-9]+)?$");
 createServer(async (req, res) => {
   try {
-    const path = new URL(req.url, "http://localhost").pathname;
+    const path = new URL(req.url, "http://localhost").pathname, origin = String(req.headers.origin || "");
+    if (req.method !== "GET" && req.method !== "HEAD" && req.method !== "OPTIONS" && origin && !OWN_ORIGIN.test(origin)) { res.writeHead(403).end("not from here"); return; }
+    if (path.startsWith("/__studio/fits/") && GAME_ORIGIN.test(origin)) {
+      res.setHeader("Access-Control-Allow-Origin", origin); res.setHeader("Vary", "Origin");
+      if (req.method === "OPTIONS") { res.writeHead(204, { "Access-Control-Allow-Methods": "GET", "Access-Control-Allow-Private-Network": "true", "Access-Control-Max-Age": "600" }).end(); return; }
+      if (req.method !== "GET") { res.writeHead(403).end("read only"); return; }
+    }
     if (path === "/" || path === "/index.html") {
       // the game's own page, with the studio added at the end
       let html = await readFile(join(GAME, "index.html"), "utf8");

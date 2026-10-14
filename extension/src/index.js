@@ -15,7 +15,7 @@ import { Panel } from "./panel.js";
 import { captureOutfit, wearOutfit, changeBack, hasBackup } from "./outfits.js";
 import { markBody, washMarks, stripMe, dressMe, syncFarmGear, syncShape } from "./marks.js";
 import { initBelly } from "./belly.js";
-import { initDrawnBody } from "./drawnbody.js";
+import { initDrawnBody, onBodyMsg } from "./drawnbody.js";
 import { initCues, cueOff, lead, face, sound, trance, drawMarkers, arouse, vibe, initBody } from "./cues.js";
 
 // the SDK ships as an old-style module; this digs the real thing out either way
@@ -170,6 +170,7 @@ function parasiteSync() {
   } catch (e) { console.warn("[Farmhand Companion] farm gear:", e); }
 }
 function onFarmMsg(m) {
+  if (m.type === "body" || m.type === "bodyAsk") { try { onBodyMsg(m); } catch (e) { console.warn("[Farmhand Companion] drawn body:", e); } return; }   // another Companion's drawn body (drawnbody.js)
   if (m.from !== BOT_MEMBER) return;     // only the farm bot gets to talk to the panel
   if (m.type !== "ping" && m.type !== "state") st.lastHeard = Date.now();
   switch (m.type) {

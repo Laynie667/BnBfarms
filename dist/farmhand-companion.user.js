@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.18.5
+// @version      0.19.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -230,7 +230,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.18.5";
+  var VERSION = "0.19.0";
 
   // extension/src/config.js
   var BOT_MEMBER = 260239;
@@ -616,8 +616,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
     if (Array.isArray(m.splat) && m.splat.length) {
       const col = typeof m.color === "string" && /^#[0-9a-fA-F]{6}$/.test(m.color) ? m.color.toUpperCase() : null;
       const colOf = (b) => typeof b.Color === "string" && /^#/.test(b.Color) ? b.Color.toUpperCase() : null;
-      const mine = next.filter((b) => b.Name === "Splatters" && SPLAT_GROUPS.includes(b.Group));
-      let it = mine.find((b) => colOf(b) === col);
+      const mine2 = next.filter((b) => b.Name === "Splatters" && SPLAT_GROUPS.includes(b.Group));
+      let it = mine2.find((b) => colOf(b) === col);
       if (!it) {
         const g = SPLAT_GROUPS.find((x) => !has(x) && groupOf(x));
         if (g) {
@@ -625,7 +625,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
           if (col) it.Color = col;
           next.push(it);
           mem.splatGroup = g;
-        } else it = mine[0];
+        } else it = mine2[0];
       }
       if (it) {
         it.Property = Object.assign({}, it.Property || {});
@@ -3077,7 +3077,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
                         return a[a.length >> 1];
                       });
                       const rx0 = Math.max(1, Math.round(midX - G.dx - G.ro - 30)), rx1 = Math.min(CW - 2, Math.round(midX + G.dx + G.ro + 30)), ry0 = Math.max(1, Math.round(uyc + G.y1)), ry1 = Math.min(CH - 2, Math.round(uyc + G.y3 + 90));
-                      const RW = rx1 - rx0 + 1, RH = ry1 - ry0 + 1, clean = new Uint8Array(RW * RH);
+                      const RW = rx1 - rx0 + 1, RH = ry1 - ry0 + 1, clean2 = new Uint8Array(RW * RH);
                       let nC = 0, sD = 0, bl = 0;
                       for (let yy = ry0; yy <= ry1; yy++) for (let xx = rx0; xx <= rx1; xx++) {
                         const p = (yy * CW + xx) * 4;
@@ -3086,7 +3086,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
                         if (Math.abs(spL[p] / t - bn[0]) + Math.abs(spL[p + 1] / t - bn[1]) + Math.abs(spL[p + 2] / t - bn[2]) > 0.05) continue;
                         const gr = Math.abs(lum(spL, p + 4) - lum(spL, p - 4)) + Math.abs(lum(spL, p + CW * 4) - lum(spL, p - CW * 4));
                         if (gr > 9) continue;
-                        clean[(yy - ry0) * RW + (xx - rx0)] = 1;
+                        clean2[(yy - ry0) * RW + (xx - rx0)] = 1;
                         nC++;
                         sD += Math.abs(lum(sp, p) - lum(spL, p));
                         bl += lum(spL, p);
@@ -3098,7 +3098,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
                       for (let yy = 0; yy < RH; yy++) {
                         let row = 0;
                         for (let xx = 0; xx < RW; xx++) {
-                          row += clean[yy * RW + xx];
+                          row += clean2[yy * RW + xx];
                           I[(yy + 1) * (RW + 1) + xx + 1] = I[yy * (RW + 1) + xx + 1] + row;
                         }
                       }
@@ -3107,11 +3107,11 @@ One of mods you are using is using an old version of SDK. It will work for now b
                         return (I[d2 * (RW + 1) + c2] - I[b * (RW + 1) + c2] - I[d2 * (RW + 1) + a] + I[b * (RW + 1) + a]) / ((2 * r + 1) * (2 * r + 1));
                       };
                       const srcs = [];
-                      for (let yy = S3; yy < RH - S3; yy += 3) for (let xx = S3; xx < RW - S3; xx += 3) if (clean[yy * RW + xx] && box(xx, yy, S3) > 0.8) srcs.push([xx + rx0, yy + ry0]);
+                      for (let yy = S3; yy < RH - S3; yy += 3) for (let xx = S3; xx < RW - S3; xx += 3) if (clean2[yy * RW + xx] && box(xx, yy, S3) > 0.8) srcs.push([xx + rx0, yy + ry0]);
                       if (srcs.length < 4) return null;
                       return { S: S3, spL, srcs, bn, base: bl / nC, det, cleanAt: (x2, y4) => {
                         const xx = Math.round(x2) - rx0, yy = Math.round(y4) - ry0;
-                        return xx >= 0 && yy >= 0 && xx < RW && yy < RH && clean[yy * RW + xx] === 1;
+                        return xx >= 0 && yy >= 0 && xx < RW && yy < RH && clean2[yy * RW + xx] === 1;
                       } };
                     })();
                     if (texOf) {
@@ -3765,18 +3765,27 @@ One of mods you are using is using an old version of SDK. It will work for now b
   // extension/src/drawnbody.js
   var W2 = window;
   var KEY2 = "farmhand-drawn-body";
+  var SEE_KEY = "farmhand-drawn-body-see";
   var CODE_HEAD = "FARMBODY1:";
-  var DEFAULTS = () => ({ v: 1, on: false, cup: 12, breast: {}, wear: {}, belly: null, auto: true, mould: { items: [], mode: {} } });
+  var STUDIO = "http://localhost:4780";
+  var DEFAULTS = () => ({ v: 1, on: false, cup: 12, breast: {}, wear: {}, belly: null, auto: true, tuck: true, dress: true, mould: { items: [], mode: {} } });
   var S = DEFAULTS();
-  var E = null;
   var sdk2 = null;
   var hooked2 = false;
+  var seeOthers = true;
+  var mine = { S: null, E: null };
+  var others = /* @__PURE__ */ new Map();
   function load2() {
     try {
       const d = JSON.parse(W2.localStorage.getItem(KEY2));
       if (d && typeof d === "object") S = Object.assign(DEFAULTS(), d);
     } catch (e) {
     }
+    try {
+      seeOthers = W2.localStorage.getItem(SEE_KEY) !== "0";
+    } catch (e) {
+    }
+    mine.S = S;
   }
   function save2() {
     try {
@@ -3860,62 +3869,144 @@ One of mods you are using is using an old version of SDK. It will work for now b
       }
     }
     if (gone.size > 400) gone.clear();
+    for (const [mn, o] of others) if (Date.now() - o.at > 36e5 && !charOf(mn)) others.delete(mn);
     return n;
   }
-  var againT = null;
-  function redraw(soon) {
-    clearTimeout(againT);
-    againT = setTimeout(() => {
+  var charOf = (mn) => W2.Player && W2.Player.MemberNumber === mn ? W2.Player : (W2.ChatRoomCharacter || []).find((c) => c && c.MemberNumber === mn) || null;
+  var itemOf = (C, g) => C && Array.isArray(C.Appearance) ? C.Appearance.find((a) => a && a.Asset && a.Asset.Group && a.Asset.Group.Name === g) : void 0;
+  var againT = /* @__PURE__ */ new Map();
+  function redrawMn(mn, soon) {
+    clearTimeout(againT.get(mn));
+    againT.set(mn, setTimeout(() => {
       try {
-        if (W2.Player && typeof W2.CharacterLoadCanvas === "function") W2.CharacterLoadCanvas(W2.Player);
+        const C = charOf(mn);
+        if (C && typeof W2.CharacterLoadCanvas === "function") W2.CharacterLoadCanvas(C);
       } catch (e) {
         console.warn("[Farmhand Companion] drawn body redraw:", e);
       }
-    }, soon || 60);
+    }, soon || 60));
   }
-  function engine() {
-    if (E) return E;
+  var redraw = (soon) => {
+    if (W2.Player) redrawMn(W2.Player.MemberNumber, soon);
+  };
+  function makeEngine(mn) {
     if (!W2.FarmBelly) W2.FarmBelly = bellyDrawing;
     if (typeof W2.FarmBodyEngine !== "function" || !W2.FarmBreasts) return null;
-    E = W2.FarmBodyEngine({
+    return W2.FarmBodyEngine({
       S: { get C() {
-        return W2.Player;
+        return charOf(mn);
       } },
-      bodyItem: (g) => W2.Player && Array.isArray(W2.Player.Appearance) ? W2.Player.Appearance.find((a) => a && a.Asset && a.Asset.Group && a.Asset.Group.Name === g) : void 0,
+      bodyItem: (g) => itemOf(charOf(mn), g),
       setBody: () => {
       },
-      // never: your body items are yours
-      redraw: () => redraw(60),
+      // never: their body items are theirs
+      redraw: () => redrawMn(mn, 60),
       picture
     });
-    apply();
-    return E;
   }
-  function apply() {
+  function engine() {
+    if (!mine.E && W2.Player) mine.E = makeEngine(W2.Player.MemberNumber);
+    if (mine.E) apply(mine.E, S);
+    return mine.E;
+  }
+  function apply(E, s) {
     if (!E) return;
-    const B = E.BREAST, b = S.breast || {};
-    B.cup = Math.max(0, Math.min(W2.FarmBreasts.CUPS.length - 1, Math.round(Number(S.cup) || 0)));
+    const B = E.BREAST, b = s.breast || {};
+    B.cup = Math.max(0, Math.min(W2.FarmBreasts.CUPS.length - 1, Math.round(Number(s.cup) || 0)));
     for (const k of ["full", "hang", "apart", "x", "y", "nip", "nipY", "nipX"]) if (typeof b[k] === "number" && isFinite(b[k])) B[k] = b[k];
-    B.wear = S.wear && typeof S.wear === "object" ? Object.assign({}, S.wear) : {};
+    B.wear = s.wear && typeof s.wear === "object" ? Object.assign({}, s.wear) : {};
     B.out.clear();
     B.cover.clear();
     B.cvKey = "";
     B.holdSig = "";
-    const fits = S.belly && typeof S.belly === "object" ? S.belly : null;
+    const fits = s.belly && typeof s.belly === "object" ? s.belly : null;
     for (const k of Object.keys(E.BELLY.fits)) {
       const f = E.BELLY.fits[k];
       Object.assign(f, E.FIT0(), k === "std" ? {} : { behind: true, y: k === "AllFours" ? -60 : -75 });
       if (fits && fits[k]) Object.assign(f, fits[k]);
     }
-    E.BELLY.auto = S.auto !== false;
-    B.tuck = S.tuck !== false;
-    B.dress = S.dress !== false;
+    E.BELLY.auto = s.auto !== false;
+    B.tuck = s.tuck !== false;
+    B.dress = s.dress !== false;
     E.MOULD.items.clear();
     E.MOULD.mode.clear();
     E.MOULD.out.clear();
-    for (const it of S.mould && S.mould.items || []) E.MOULD.items.add(String(it));
-    for (const [k, m] of Object.entries(S.mould && S.mould.mode || {})) if (E.MOULD.items.has(k)) E.MOULD.mode.set(k, String(m));
+    for (const it of s.mould && s.mould.items || []) E.MOULD.items.add(String(it));
+    for (const [k, m] of Object.entries(s.mould && s.mould.mode || {})) if (E.MOULD.items.has(k)) E.MOULD.mode.set(k, String(m));
     E.GEN.drawn = false;
+  }
+  function clean(d) {
+    if (!d || typeof d !== "object") return null;
+    const num = (v, lo, hi, def) => typeof v === "number" && isFinite(v) ? Math.max(lo, Math.min(hi, v)) : def;
+    const s = DEFAULTS();
+    s.cup = Math.round(num(d.cup, 0, 20, 12));
+    for (const k of ["full", "hang", "apart", "x", "y", "nip", "nipY", "nipX"]) {
+      const v = d.breast && d.breast[k];
+      if (typeof v === "number" && isFinite(v)) s.breast[k] = num(v, -100, 100, 0);
+    }
+    let n = 0;
+    for (const [k, v] of Object.entries(d.wear || {})) if (n < 80 && /^[\w/ -]{1,80}$/.test(k) && ["behind", "plain", "nipple", ""].includes(v)) {
+      s.wear[k] = v;
+      n++;
+    }
+    s.belly = {};
+    for (const k of ["std", "AllFours", "Hogtied"]) {
+      const f = d.belly && d.belly[k];
+      if (!f || typeof f !== "object") continue;
+      s.belly[k] = { on: !!f.on, behind: !!f.behind, flat: !!f.flat, rx: num(f.rx, 20, 170, 70), ry: num(f.ry, 20, 190, 80), sag: num(f.sag, 0, 0.5, 0.22), x: num(f.x, -120, 120, 0), y: num(f.y, -200, 200, 0), cut: num(f.cut, 0.2, 1, 0.74) };
+    }
+    s.auto = d.auto !== false;
+    s.tuck = d.tuck !== false;
+    s.dress = d.dress !== false;
+    s.mould = { items: (Array.isArray(d.mould && d.mould.items) ? d.mould.items : []).filter((k) => typeof k === "string" && /^[\w/ -]{1,80}$/.test(k)).slice(0, 60), mode: {} };
+    for (const [k, m] of Object.entries(d.mould && d.mould.mode || {})) if (s.mould.items.includes(k) && ["wide", "over", "under"].includes(m)) s.mould.mode[k] = m;
+    return s;
+  }
+  var shareOf = (s) => ({ cup: s.cup, breast: s.breast, wear: s.wear, belly: s.belly, auto: s.auto, tuck: s.tuck, dress: s.dress, mould: s.mould });
+  var send = (type, data) => {
+    try {
+      if (W2.ServerSend && W2.ServerPlayerIsInChatRoom && W2.ServerPlayerIsInChatRoom()) W2.ServerSend("ChatRoomChat", makeMsg(type, data));
+    } catch (e) {
+    }
+  };
+  var toldAt = 0;
+  var askedAt = 0;
+  function tell(force) {
+    if (!force && Date.now() - toldAt < 8e3) return;
+    toldAt = Date.now();
+    send("body", S.on ? { on: true, body: shareOf(S) } : { on: false });
+  }
+  function ask() {
+    if (Date.now() - askedAt < 8e3) return;
+    askedAt = Date.now();
+    send("bodyAsk", {});
+  }
+  function onBodyMsg(m) {
+    const mn = m.from;
+    if (!mn || W2.Player && mn === W2.Player.MemberNumber) return;
+    if (m.type === "bodyAsk") {
+      if (S.on) setTimeout(() => tell(), 300 + Math.random() * 1500);
+      return;
+    }
+    if (m.type !== "body") return;
+    if (!m.on) {
+      if (others.delete(mn)) redrawMn(mn, 60);
+      return;
+    }
+    const s = clean(m.body);
+    if (!s) return;
+    let o = others.get(mn);
+    if (!o) {
+      o = { S: s, E: makeEngine(mn), at: Date.now() };
+      others.set(mn, o);
+    } else {
+      o.S = s;
+      o.at = Date.now();
+    }
+    if (o.E) apply(o.E, s);
+    hook();
+    redrawMn(mn, 120);
+    setTimeout(() => redrawMn(mn, 0), 1500);
   }
   function hook() {
     if (hooked2 || !sdk2) return;
@@ -3923,7 +4014,18 @@ One of mods you are using is using an old version of SDK. It will work for now b
     try {
       sdk2.hookFunction("CommonDrawAppearanceBuild", 2, (args, next) => {
         const C = args[0];
-        if (!S.on || !E || !C || C !== W2.Player) return next(args);
+        if (!C) return next(args);
+        let E = null;
+        if (C === W2.Player) {
+          if (S.on) E = mine.E || engine();
+        } else if (seeOthers && typeof C.MemberNumber === "number") {
+          const o = others.get(C.MemberNumber);
+          if (o) {
+            o.at = Date.now();
+            E = o.E;
+          }
+        }
+        if (!E) return next(args);
         fresh = false;
         let out;
         try {
@@ -3936,10 +4038,19 @@ One of mods you are using is using an old version of SDK. It will work for now b
           return next(args);
         }
         if (fresh) {
-          redraw(250);
-          setTimeout(() => redraw(0), 1200);
+          const mn = C.MemberNumber;
+          redrawMn(mn, 250);
+          setTimeout(() => redrawMn(mn, 0), 1200);
         }
         return out;
+      });
+      sdk2.hookFunction("ChatRoomSync", 0, (args, next) => {
+        const r = next(args);
+        setTimeout(() => {
+          if (S.on) tell(true);
+          if (seeOthers) ask();
+        }, 2500);
+        return r;
       });
     } catch (e) {
       console.warn("[Farmhand Companion] drawn body unavailable:", e);
@@ -3950,18 +4061,19 @@ One of mods you are using is using an old version of SDK. It will work for now b
     sdk2 = mod2;
     load2();
     setInterval(prune, 2e4);
-    if (S.on) setTimeout(() => {
-      if (engine()) {
+    setTimeout(() => {
+      if (S.on && engine()) {
         W2.__farmDrawnBody = true;
-        hook();
         redraw(500);
       }
+      hook();
+      if (S.on) tell(true);
+      if (seeOthers) ask();
     }, 3e3);
   }
   function drawnBodyState() {
-    const up = W2.Player && Array.isArray(W2.Player.Appearance) ? W2.Player.Appearance.find((a) => a && a.Asset && a.Asset.Group && a.Asset.Group.Name === "BodyUpper") : null;
-    const cups = W2.FarmBreasts && W2.FarmBreasts.CUPS || [];
-    return { on: !!S.on, cup: S.cup, cupName: cups[S.cup] || "?", cups, chest: up && up.Asset ? up.Asset.Name : "", fromStudio: !!S.saved, belly: !!(S.belly && S.belly.std && S.belly.std.on) };
+    const up = itemOf(W2.Player, "BodyUpper"), cups = W2.FarmBreasts && W2.FarmBreasts.CUPS || [];
+    return { on: !!S.on, cup: S.cup, cupName: cups[S.cup] || "?", cups, chest: up && up.Asset ? up.Asset.Name : "", fromStudio: !!S.saved, belly: !!(S.belly && S.belly.std && S.belly.std.on), seeOthers, othersHere: Array.from(others.keys()).filter((mn) => charOf(mn)).length };
   }
   function drawnBodySet(on, say) {
     S.on = !!on;
@@ -3974,25 +4086,53 @@ One of mods you are using is using an old version of SDK. It will work for now b
       }
       bellyTrial(0);
       W2.__farmDrawnBody = true;
-      apply();
       hook();
     } else W2.__farmDrawnBody = false;
+    tell(true);
     redraw(60);
     setTimeout(() => redraw(0), 800);
     if (say) {
       const st2 = drawnBodyState();
-      if (!S.on) say("Drawn body off. You're the game's own picture again.");
+      if (!S.on) say("Drawn body off. You're the game's own picture again, for you and everybody else.");
       else if (S.cup >= 6 && st2.chest !== "XLarge") say("Drawn body on, " + st2.cupName + " cup. Your chest needs to be the game's biggest size (wardrobe, body, upper body: the largest) for the drawn breasts to show; the belly and fitting work already.");
-      else say("Drawn body on: " + st2.cupName + " cup" + (st2.belly ? " with your belly" : "") + ". Only you see it.");
+      else say("Drawn body on: " + st2.cupName + " cup" + (st2.belly ? " with your belly" : "") + ". Everyone here with the Companion sees it too.");
     }
+  }
+  function drawnBodySeeOthers(on, say) {
+    seeOthers = !!on;
+    try {
+      W2.localStorage.setItem(SEE_KEY, on ? "1" : "0");
+    } catch (e) {
+    }
+    for (const mn of others.keys()) redrawMn(mn, 60);
+    if (on) {
+      hook();
+      ask();
+    }
+    if (say) say(on ? "You'll see other people's drawn bodies." : "Other people are drawn the game's own way on your screen.");
   }
   function drawnBodyCup(i, say) {
     const n = W2.FarmBreasts ? W2.FarmBreasts.CUPS.length : 21;
     S.cup = Math.max(6, Math.min(n - 1, Math.round(Number(i) || 0)));
     save2();
-    apply();
+    if (mine.E) apply(mine.E, S);
     redraw(60);
+    tell(true);
     if (say) say("Cup: " + drawnBodyState().cupName + ".");
+  }
+  function take(d, say, from) {
+    const s = clean(d);
+    if (!s) throw new Error("the settings are damaged");
+    s.on = S.on;
+    s.saved = typeof d.saved === "string" ? d.saved.slice(0, 40) : (/* @__PURE__ */ new Date()).toISOString();
+    S = s;
+    mine.S = S;
+    save2();
+    if (mine.E) apply(mine.E, S);
+    redraw(60);
+    tell(true);
+    if (say) say("Settings " + from + " put in: " + drawnBodyState().cupName + " cup" + (S.belly.std && S.belly.std.on ? ", your belly" : "") + ", " + Object.keys(S.wear).length + " piece choices. " + (S.on ? "" : "Switch the drawn body on to see it."));
+    return true;
   }
   function drawnBodyPaste(text, say) {
     try {
@@ -4001,31 +4141,24 @@ One of mods you are using is using an old version of SDK. It will work for now b
       const raw = W2.LZString && typeof W2.LZString.decompressFromBase64 === "function" ? W2.LZString.decompressFromBase64(t.slice(CODE_HEAD.length)) : null;
       const d = raw && JSON.parse(raw);
       if (!d || typeof d !== "object" || d.v !== 1) throw new Error("the code is damaged or from a newer studio");
-      const num = (v, lo, hi, def) => typeof v === "number" && isFinite(v) ? Math.max(lo, Math.min(hi, v)) : def;
-      S.cup = num(d.cup, 0, 20, S.cup);
-      S.breast = {};
-      for (const k of ["full", "hang", "apart", "x", "y", "nip", "nipY", "nipX"]) if (typeof d.breast?.[k] === "number" && isFinite(d.breast[k])) S.breast[k] = d.breast[k];
-      S.wear = {};
-      for (const [k, v] of Object.entries(d.wear || {})) if (/^[\w/ -]{1,80}$/.test(k) && ["behind", "plain", "nipple", ""].includes(v)) S.wear[k] = v;
-      S.belly = {};
-      for (const k of ["std", "AllFours", "Hogtied"]) {
-        const f = d.belly?.[k];
-        if (!f) continue;
-        S.belly[k] = { on: !!f.on, behind: !!f.behind, flat: !!f.flat, rx: num(f.rx, 20, 170, 70), ry: num(f.ry, 20, 190, 80), sag: num(f.sag, 0, 0.5, 0.22), x: num(f.x, -120, 120, 0), y: num(f.y, -200, 200, 0), cut: num(f.cut, 0.2, 1, 0.74) };
-      }
-      S.auto = d.auto !== false;
-      S.tuck = d.tuck !== false;
-      S.dress = d.dress !== false;
-      S.mould = { items: (Array.isArray(d.mould?.items) ? d.mould.items : []).filter((k) => typeof k === "string" && k.length < 80).slice(0, 200), mode: {} };
-      for (const [k, m] of Object.entries(d.mould?.mode || {})) if (S.mould.items.includes(k) && ["wide", "over", "under"].includes(m)) S.mould.mode[k] = m;
-      S.saved = typeof d.saved === "string" ? d.saved.slice(0, 40) : (/* @__PURE__ */ new Date()).toISOString();
-      save2();
-      apply();
-      redraw(60);
-      if (say) say("Settings from the studio put in: " + drawnBodyState().cupName + " cup" + (S.belly.std && S.belly.std.on ? ", your belly" : "") + ", " + Object.keys(S.wear).length + " piece choices. " + (S.on ? "" : "Switch the drawn body on to see it."));
-      return true;
+      return take(d, say, "from the code");
     } catch (e) {
       if (say) say("I couldn't read that code: " + (e && e.message || e));
+      return false;
+    }
+  }
+  async function drawnBodyFromStudio(say) {
+    try {
+      const get = async (f) => {
+        const r = await fetch(STUDIO + "/__studio/fits/" + f, { cache: "no-store" });
+        if (!r.ok) throw new Error(f + ": " + r.status);
+        return r.json();
+      };
+      const [br, be, it] = await Promise.all([get("breasts.json"), get("belly.json").catch(() => null), get("items.json").catch(() => null)]);
+      if (!br) throw new Error("the studio hasn't saved any breasts yet (Save the breasts)");
+      return take({ cup: br.cup, breast: br, wear: br.wear, belly: be && be.fits, tuck: br.tuck, dress: br.dress, mould: it ? { items: it.mould || [], mode: it.mouldMode || {} } : null, saved: br.saved }, say, "from your studio");
+    } catch (e) {
+      if (say) say("I couldn't reach your studio (" + (e && e.message || e) + "). Is it running? Start the studio.bat, then try again. Or use its Copy for the Companion button and paste the code here.");
       return false;
     }
   }
@@ -4343,8 +4476,6 @@ One of mods you are using is using an old version of SDK. It will work for now b
         !!ctx2.prefs.strip,
         () => ctx2.setPref("strip", !ctx2.prefs.strip)
       ),
-      // the drawn body from the outfit studio (drawnbody.js): only you see it, on your own character
-      drawnBodyCard(ctx2),
       // a one-off experiment for the outfit studio idea (marks.js: scaleTrial)
       h(
         "div",
@@ -4368,13 +4499,12 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
   function drawnBodyCard(ctx2) {
     const st2 = drawnBodyState(), say = (t) => ctx2.hint(t);
-    const code = h("textarea", { class: "fhc-in", rows: 2, placeholder: "Paste the code from the studio's Copy for the Companion button" });
-    return h(
-      "div",
-      { style: { marginTop: "10px" } },
+    const code = h("textarea", { class: "fhc-in", rows: 2, placeholder: "\u2026or paste the code from the studio's Copy for the Companion button" });
+    return card(
+      title("Drawn body (outfit studio)"),
       toggle(
-        "Drawn body (from the outfit studio)",
-        "Breasts from DD to R in your own skin, your belly, and what you wear fitted to them, drawn on your own character. Only you see it: everyone else sees the game's own picture of you. Off takes it away.",
+        "Show my drawn body",
+        "Breasts from DD to R in your own skin, your belly, and what you wear fitted to them, on your character. Everyone here with the Companion sees it; people without it see the game's own picture of you. Off takes it away.",
         st2.on,
         () => {
           drawnBodySet(!st2.on, say);
@@ -4395,11 +4525,26 @@ One of mods you are using is using an old version of SDK. It will work for now b
         )
       ),
       st2.on && st2.cup >= 6 && st2.chest && st2.chest !== "XLarge" ? muted("Your chest is set to " + st2.chest + " in the wardrobe. Set it to the biggest for the drawn breasts to show.") : null,
+      h("div", { style: { marginTop: "6px" } }, btn("Get my studio's settings", () => {
+        drawnBodyFromStudio(say).then((ok) => {
+          if (ok) ctx2.setPref("drawnBodyAt", Date.now());
+        });
+      }, true)),
+      muted("Works while the studio is running on this computer: it takes what you last saved there (Save the breasts, Save all the fits)."),
       h("div", { style: { marginTop: "6px" } }, code),
-      btn("Put in the studio's settings", () => {
+      btn("Put in the pasted code", () => {
         if (drawnBodyPaste(code.value, say)) ctx2.setPref("drawnBodyAt", Date.now());
       }),
-      muted(st2.fromStudio ? "Using the settings from the studio." : "Using the plain settings. In the studio, Copy for the Companion gives you a code with your shape, belly and piece choices.")
+      muted(st2.fromStudio ? "Using your studio settings." : "Using the plain settings until you bring yours over from the studio."),
+      toggle(
+        "See other people's drawn bodies",
+        "Draw other Companion users the way their studio settings say" + (st2.othersHere ? " (" + st2.othersHere + " here now)" : "") + ". Off: everybody else is the game's own picture on your screen.",
+        st2.seeOthers,
+        () => {
+          drawnBodySeeOthers(!st2.seeOthers, say);
+          ctx2.setPref("drawnBodySee", !st2.seeOthers);
+        }
+      )
     );
   }
   function extraSwitches(ctx2) {
@@ -4414,6 +4559,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
   function toggles(ctx2) {
     return [
+      drawnBodyCard(ctx2),
       card(title("Farm settings"), muted("Saved by the farm girl. Your limits still win."), farmSwitches(ctx2, SWITCH_INFO)),
       extraSwitches(ctx2),
       card(
@@ -4467,7 +4613,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     ] },
     { id: "inbox", label: "Inbox", render: inbox },
     { id: "guides", label: "Guides", render: (ctx2) => guidesTab(ctx2, false) },
-    { id: "settings", label: "Settings", render: (ctx2) => [card(title("Farm settings"), muted("Once you're on the books, your milkin', breedin' and teasin' switches show up here."), btn("Apply to join", () => ctx2.send("apply"), true)), panelPrefs(ctx2)] }
+    { id: "settings", label: "Settings", render: (ctx2) => [card(title("Farm settings"), muted("Once you're on the books, your milkin', breedin' and teasin' switches show up here."), btn("Apply to join", () => ctx2.send("apply"), true)), drawnBodyCard(ctx2), panelPrefs(ctx2)] }
   ];
 
   // shared/bcplus-rules.json
@@ -6518,6 +6664,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   function toggles2(ctx2) {
     const s = ctx2.s, sw = s.switches || {};
     return [
+      drawnBodyCard(ctx2),
       card(
         title("Work"),
         muted("Most staff leave this off. Mandated farmhands are always on call."),
@@ -7437,12 +7584,12 @@ One of mods you are using is using an old version of SDK. It will work for now b
     const outfit = JSON.parse(window.LZString.decompressFromBase64(String(data)) || "null");
     if (!outfit || !Array.isArray(outfit.items)) return { ok: false, why: "that outfit didn't come through right" };
     const cur = window.ServerAppearanceBundle(P2().Appearance), stuck = lockedGroups2();
-    const mine = new Set(outfit.items.map((i) => i.Group));
+    const mine2 = new Set(outfit.items.map((i) => i.Group));
     const next = cur.filter((b) => {
       if (stuck.has(b.Group)) return true;
       const g = groupOf2(b.Group);
       if (isClothes(g)) return false;
-      return !mine.has(b.Group);
+      return !mine2.has(b.Group);
     });
     let worn = 0, locks = 0, skipped = 0;
     const added = [];
@@ -7524,13 +7671,13 @@ One of mods you are using is using an old version of SDK. It will work for now b
     gear: ctx.panel.prefs.gear ? void 0 : true
   });
   var mapOn = () => typeof W3.ChatRoomMapViewIsActive === "function" && W3.ChatRoomMapViewIsActive() && W3.Player && W3.Player.MapData && W3.Player.MapData.Pos;
-  var others = () => (W3.ChatRoomCharacter || []).filter((c) => c && c.MemberNumber !== (W3.Player && W3.Player.MemberNumber));
+  var others2 = () => (W3.ChatRoomCharacter || []).filter((c) => c && c.MemberNumber !== (W3.Player && W3.Player.MemberNumber));
   var lastSight = "";
   function sightTick() {
     try {
       if (W3.CurrentScreen !== "ChatRoom" || !mapOn() || typeof W3.ChatRoomMapViewCharacterIsVisible !== "function") return;
-      const see = others().filter((c) => W3.ChatRoomMapViewCharacterIsVisible(c)).map((c) => c.MemberNumber).sort();
-      const hear = others().filter((c) => typeof W3.ChatRoomMapViewCharacterIsHearable === "function" && W3.ChatRoomMapViewCharacterIsHearable(c)).map((c) => c.MemberNumber).sort();
+      const see = others2().filter((c) => W3.ChatRoomMapViewCharacterIsVisible(c)).map((c) => c.MemberNumber).sort();
+      const hear = others2().filter((c) => typeof W3.ChatRoomMapViewCharacterIsHearable === "function" && W3.ChatRoomMapViewCharacterIsHearable(c)).map((c) => c.MemberNumber).sort();
       const LS = W3.Player && W3.Player.LSCG, S2 = LS && LS.SplatterModule;
       const splat = S2 ? !!(S2.enabled && S2.taker !== false && (!LS.GlobalModule || LS.GlobalModule.enabled !== false)) : void 0;
       const key = see.join(",") + "|" + hear.join(",") + "|" + splat;
@@ -8113,6 +8260,14 @@ One of mods you are using is using an old version of SDK. It will work for now b
     }
   }
   function onFarmMsg(m) {
+    if (m.type === "body" || m.type === "bodyAsk") {
+      try {
+        onBodyMsg(m);
+      } catch (e) {
+        console.warn("[Farmhand Companion] drawn body:", e);
+      }
+      return;
+    }
     if (m.from !== BOT_MEMBER) return;
     if (m.type !== "ping" && m.type !== "state") st.lastHeard = Date.now();
     switch (m.type) {

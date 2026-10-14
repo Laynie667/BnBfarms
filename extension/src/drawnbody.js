@@ -3,11 +3,15 @@
    fitted to them: bras and tops grown over the breasts, straps round them, harnesses and belts left where the game puts
    them with the breasts hanging in front, what's on your nipples moved onto your nipples, panties under the belly.
 
-   Only you see it, and only on your own character: it changes how YOUR game draws you, nothing more. Nothing is sent to
-   anybody and nothing about your character is changed. Off until you switch it on (Toggles), and off takes it away.
+   Live for everyone with the Companion (Laynie, Oct 14: "that should be live for everyone. based on what i set from my
+   outfit studio"). Your Companion tells the room your settings (a small hidden message: the cup, the breast sliders, the
+   belly, the piece choices), and every other Companion in the room draws you with them, the way yours does. Theirs come
+   to you the same way. Players without the Companion see the game's own picture: nothing can change their screens.
+   Nothing about your character is changed for anybody. Off until you switch it on (Toggles), and off takes it away,
+   for you and for them.
 
    It is the studio's own drawing (studio/web/body-engine.js), so what the studio shows is what you get. The settings
-   (cup, the breast sliders, the belly, the per-piece choices) are made in the studio and copied over as a code.
+   are made in the studio and either fetched from it (while it's running on this computer) or copied over as a code.
 
    How it hands its drawings to the game: the live game only takes a picture by its name (an address), and a drawing
    handed over as itself broke every character refresh once (Companion 0.16.2, see belly.js). So every drawing of ours
@@ -17,14 +21,22 @@
 import "../../studio/web/breasts-drawing.js";   // window.FarmBreasts: the breasts themselves
 import "../../studio/web/body-engine.js";       // window.FarmBodyEngine: the studio's drawing
 import { bellyDrawing, bellyTrial } from "./belly.js";
+import { makeMsg } from "../../shared/protocol.js";
 
 const W = window;
-const KEY = "farmhand-drawn-body";
+const KEY = "farmhand-drawn-body", SEE_KEY = "farmhand-drawn-body-see";
 const CODE_HEAD = "FARMBODY1:";
-const DEFAULTS = () => ({ v: 1, on: false, cup: 12, breast: {}, wear: {}, belly: null, auto: true, mould: { items: [], mode: {} } });
-let S = DEFAULTS(), E = null, sdk = null, hooked = false;
+const STUDIO = "http://localhost:4780";
+const DEFAULTS = () => ({ v: 1, on: false, cup: 12, breast: {}, wear: {}, belly: null, auto: true, tuck: true, dress: true, mould: { items: [], mode: {} } });
+let S = DEFAULTS(), sdk = null, hooked = false, seeOthers = true;
+const mine = { S: null, E: null };                 // you
+const others = new Map();                          // member number → { S, E, at }: what other Companions told us
 
-function load() { try { const d = JSON.parse(W.localStorage.getItem(KEY)); if (d && typeof d === "object") S = Object.assign(DEFAULTS(), d); } catch (e) { /* fresh */ } }
+function load() {
+  try { const d = JSON.parse(W.localStorage.getItem(KEY)); if (d && typeof d === "object") S = Object.assign(DEFAULTS(), d); } catch (e) { /* fresh */ }
+  try { seeOthers = W.localStorage.getItem(SEE_KEY) !== "0"; } catch (e) { /* on */ }
+  mine.S = S;
+}
 function save() { try { W.localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { /* private window: fine */ } }
 
 // ── handing drawings to the game by name ──
@@ -56,94 +68,158 @@ function prune() {
     try { const gl = W.GLDrawCanvas && W.GLDrawCanvas.GL, tc = gl && gl.textureCache; const t2 = tc && tc.get(src); if (t2) { if (t2.texture) gl.deleteTexture(t2.texture); tc.delete(src); } } catch (e) { /* fine */ }
   }
   if (gone.size > 400) gone.clear();
+  // and anybody who's left the room and not been seen for an hour
+  for (const [mn, o] of others) if (Date.now() - o.at > 3600000 && !charOf(mn)) others.delete(mn);
   return n;
 }
 
-// ── drawing you again ──
-let againT = null;
-function redraw(soon) {
-  clearTimeout(againT);
-  againT = setTimeout(() => { try { if (W.Player && typeof W.CharacterLoadCanvas === "function") W.CharacterLoadCanvas(W.Player); } catch (e) { console.warn("[Farmhand Companion] drawn body redraw:", e); } }, soon || 60);
-}
+// ── whose character is whose ──
+const charOf = (mn) => (W.Player && W.Player.MemberNumber === mn ? W.Player : (W.ChatRoomCharacter || []).find((c) => c && c.MemberNumber === mn) || null);
+const itemOf = (C, g) => (C && Array.isArray(C.Appearance) ? C.Appearance.find((a) => a && a.Asset && a.Asset.Group && a.Asset.Group.Name === g) : undefined);
 
-// ── the engine, set up from the settings ──
-function engine() {
-  if (E) return E;
+// ── drawing somebody again ──
+const againT = new Map();
+function redrawMn(mn, soon) {
+  clearTimeout(againT.get(mn));
+  againT.set(mn, setTimeout(() => { try { const C = charOf(mn); if (C && typeof W.CharacterLoadCanvas === "function") W.CharacterLoadCanvas(C); } catch (e) { console.warn("[Farmhand Companion] drawn body redraw:", e); } }, soon || 60));
+}
+const redraw = (soon) => { if (W.Player) redrawMn(W.Player.MemberNumber, soon); };
+
+// ── an engine per body, set up from its settings ──
+function makeEngine(mn) {
   if (!W.FarmBelly) W.FarmBelly = bellyDrawing;
   if (typeof W.FarmBodyEngine !== "function" || !W.FarmBreasts) return null;
-  E = W.FarmBodyEngine({
-    S: { get C() { return W.Player; } },
-    bodyItem: (g) => (W.Player && Array.isArray(W.Player.Appearance) ? W.Player.Appearance.find((a) => a && a.Asset && a.Asset.Group && a.Asset.Group.Name === g) : undefined),
-    setBody: () => {},          // never: your body items are yours
-    redraw: () => redraw(60),
+  return W.FarmBodyEngine({
+    S: { get C() { return charOf(mn); } },
+    bodyItem: (g) => itemOf(charOf(mn), g),
+    setBody: () => {},          // never: their body items are theirs
+    redraw: () => redrawMn(mn, 60),
     picture,
   });
-  apply();
-  return E;
 }
-function apply() {
+function engine() { if (!mine.E && W.Player) mine.E = makeEngine(W.Player.MemberNumber); if (mine.E) apply(mine.E, S); return mine.E; }
+function apply(E, s) {
   if (!E) return;
-  const B = E.BREAST, b = S.breast || {};
-  B.cup = Math.max(0, Math.min(W.FarmBreasts.CUPS.length - 1, Math.round(Number(S.cup) || 0)));
+  const B = E.BREAST, b = s.breast || {};
+  B.cup = Math.max(0, Math.min(W.FarmBreasts.CUPS.length - 1, Math.round(Number(s.cup) || 0)));
   for (const k of ["full", "hang", "apart", "x", "y", "nip", "nipY", "nipX"]) if (typeof b[k] === "number" && isFinite(b[k])) B[k] = b[k];
-  B.wear = S.wear && typeof S.wear === "object" ? Object.assign({}, S.wear) : {};
+  B.wear = s.wear && typeof s.wear === "object" ? Object.assign({}, s.wear) : {};
   B.out.clear(); B.cover.clear(); B.cvKey = ""; B.holdSig = "";
-  const fits = S.belly && typeof S.belly === "object" ? S.belly : null;
+  const fits = s.belly && typeof s.belly === "object" ? s.belly : null;
   for (const k of Object.keys(E.BELLY.fits)) { const f = E.BELLY.fits[k]; Object.assign(f, E.FIT0(), k === "std" ? {} : { behind: true, y: k === "AllFours" ? -60 : -75 }); if (fits && fits[k]) Object.assign(f, fits[k]); }
-  E.BELLY.auto = S.auto !== false; B.tuck = S.tuck !== false; B.dress = S.dress !== false;
+  E.BELLY.auto = s.auto !== false; B.tuck = s.tuck !== false; B.dress = s.dress !== false;
   E.MOULD.items.clear(); E.MOULD.mode.clear(); E.MOULD.out.clear();
-  for (const it of (S.mould && S.mould.items) || []) E.MOULD.items.add(String(it));
-  for (const [k, m] of Object.entries((S.mould && S.mould.mode) || {})) if (E.MOULD.items.has(k)) E.MOULD.mode.set(k, String(m));
+  for (const it of (s.mould && s.mould.items) || []) E.MOULD.items.add(String(it));
+  for (const [k, m] of Object.entries((s.mould && s.mould.mode) || {})) if (E.MOULD.items.has(k)) E.MOULD.mode.set(k, String(m));
   E.GEN.drawn = false;          // the game's own cock: the drawn ones aren't ready
+}
+
+// settings from anywhere (the studio's code, the studio itself, another Companion): only what's expected, in range
+function clean(d) {
+  if (!d || typeof d !== "object") return null;
+  const num = (v, lo, hi, def) => (typeof v === "number" && isFinite(v) ? Math.max(lo, Math.min(hi, v)) : def);
+  const s = DEFAULTS();
+  s.cup = Math.round(num(d.cup, 0, 20, 12));
+  for (const k of ["full", "hang", "apart", "x", "y", "nip", "nipY", "nipX"]) { const v = d.breast && d.breast[k]; if (typeof v === "number" && isFinite(v)) s.breast[k] = num(v, -100, 100, 0); }
+  let n = 0; for (const [k, v] of Object.entries(d.wear || {})) if (n < 80 && /^[\w/ -]{1,80}$/.test(k) && ["behind", "plain", "nipple", ""].includes(v)) { s.wear[k] = v; n++; }
+  s.belly = {}; for (const k of ["std", "AllFours", "Hogtied"]) { const f = d.belly && d.belly[k]; if (!f || typeof f !== "object") continue; s.belly[k] = { on: !!f.on, behind: !!f.behind, flat: !!f.flat, rx: num(f.rx, 20, 170, 70), ry: num(f.ry, 20, 190, 80), sag: num(f.sag, 0, 0.5, 0.22), x: num(f.x, -120, 120, 0), y: num(f.y, -200, 200, 0), cut: num(f.cut, 0.2, 1, 0.74) }; }
+  s.auto = d.auto !== false; s.tuck = d.tuck !== false; s.dress = d.dress !== false;
+  s.mould = { items: (Array.isArray(d.mould && d.mould.items) ? d.mould.items : []).filter((k) => typeof k === "string" && /^[\w/ -]{1,80}$/.test(k)).slice(0, 60), mode: {} };
+  for (const [k, m] of Object.entries((d.mould && d.mould.mode) || {})) if (s.mould.items.includes(k) && ["wide", "over", "under"].includes(m)) s.mould.mode[k] = m;
+  return s;
+}
+// what's shared with the room: the settings, no more
+const shareOf = (s) => ({ cup: s.cup, breast: s.breast, wear: s.wear, belly: s.belly, auto: s.auto, tuck: s.tuck, dress: s.dress, mould: s.mould });
+
+// ── telling the room, and hearing from it ──
+const send = (type, data) => { try { if (W.ServerSend && W.ServerPlayerIsInChatRoom && W.ServerPlayerIsInChatRoom()) W.ServerSend("ChatRoomChat", makeMsg(type, data)); } catch (e) { /* not in a room */ } };
+let toldAt = 0, askedAt = 0;
+function tell(force) {
+  if (!force && Date.now() - toldAt < 8000) return; toldAt = Date.now();
+  send("body", S.on ? { on: true, body: shareOf(S) } : { on: false });
+}
+function ask() { if (Date.now() - askedAt < 8000) return; askedAt = Date.now(); send("bodyAsk", {}); }
+// a message from another Companion (index.js hands these over)
+export function onBodyMsg(m) {
+  const mn = m.from; if (!mn || (W.Player && mn === W.Player.MemberNumber)) return;
+  if (m.type === "bodyAsk") { if (S.on) setTimeout(() => tell(), 300 + Math.random() * 1500); return; }
+  if (m.type !== "body") return;
+  if (!m.on) { if (others.delete(mn)) redrawMn(mn, 60); return; }
+  const s = clean(m.body); if (!s) return;
+  let o = others.get(mn);
+  if (!o) { o = { S: s, E: makeEngine(mn), at: Date.now() }; others.set(mn, o); } else { o.S = s; o.at = Date.now(); }
+  if (o.E) apply(o.E, s);
+  hook(); redrawMn(mn, 120); setTimeout(() => redrawMn(mn, 0), 1500);
 }
 
 function hook() {
   if (hooked || !sdk) return; hooked = true;
   try {
     sdk.hookFunction("CommonDrawAppearanceBuild", 2, (args, next) => {
-      const C = args[0];
-      if (!S.on || !E || !C || C !== W.Player) return next(args);
+      const C = args[0]; if (!C) return next(args);
+      let E = null;
+      if (C === W.Player) { if (S.on) E = mine.E || engine(); }
+      else if (seeOthers && typeof C.MemberNumber === "number") { const o = others.get(C.MemberNumber); if (o) { o.at = Date.now(); E = o.E; } }
+      if (!E) return next(args);
       fresh = false;
       let out;
       try { out = E.draw(C, args[1], (cb2) => { args[1] = cb2; return next(args); }); }
       catch (e) { console.warn("[Farmhand Companion] drawn body:", e); return next(args); }
-      if (fresh) { redraw(250); setTimeout(() => redraw(0), 1200); }   // (a new picture takes a moment to load)
+      if (fresh) { const mn = C.MemberNumber; redrawMn(mn, 250); setTimeout(() => redrawMn(mn, 0), 1200); }   // (a new picture takes a moment to load)
       return out;
     });
+    // into a room: say what you look like, and ask what everybody else does
+    sdk.hookFunction("ChatRoomSync", 0, (args, next) => { const r = next(args); setTimeout(() => { if (S.on) tell(true); if (seeOthers) ask(); }, 2500); return r; });
   } catch (e) { console.warn("[Farmhand Companion] drawn body unavailable:", e); hooked = false; }
 }
 
 export function initDrawnBody(mod) {
   sdk = mod; load();
   setInterval(prune, 20000);
-  if (S.on) setTimeout(() => { if (engine()) { W.__farmDrawnBody = true; hook(); redraw(500); } }, 3000);   // (switched on last time: back on once the game is up)
+  setTimeout(() => {
+    if (S.on && engine()) { W.__farmDrawnBody = true; redraw(500); }   // (switched on last time: back on once the game is up)
+    hook(); if (S.on) tell(true); if (seeOthers) ask();
+  }, 3000);
 }
 
 // ── what the Toggles screen shows and does ──
 export function drawnBodyState() {
-  const up = W.Player && Array.isArray(W.Player.Appearance) ? W.Player.Appearance.find((a) => a && a.Asset && a.Asset.Group && a.Asset.Group.Name === "BodyUpper") : null;
-  const cups = (W.FarmBreasts && W.FarmBreasts.CUPS) || [];
-  return { on: !!S.on, cup: S.cup, cupName: cups[S.cup] || "?", cups, chest: up && up.Asset ? up.Asset.Name : "", fromStudio: !!S.saved, belly: !!(S.belly && S.belly.std && S.belly.std.on) };
+  const up = itemOf(W.Player, "BodyUpper"), cups = (W.FarmBreasts && W.FarmBreasts.CUPS) || [];
+  return { on: !!S.on, cup: S.cup, cupName: cups[S.cup] || "?", cups, chest: up && up.Asset ? up.Asset.Name : "", fromStudio: !!S.saved, belly: !!(S.belly && S.belly.std && S.belly.std.on), seeOthers, othersHere: Array.from(others.keys()).filter((mn) => charOf(mn)).length };
 }
 export function drawnBodySet(on, say) {
   S.on = !!on; save();
   if (S.on) {
     if (!engine()) { S.on = false; save(); return say && say("The drawn body didn't load. Reload the page and try again."); }
     bellyTrial(0);                // (the old belly test would be a second belly)
-    W.__farmDrawnBody = true; apply(); hook();
+    W.__farmDrawnBody = true; hook();
   } else W.__farmDrawnBody = false;
+  tell(true);
   redraw(60); setTimeout(() => redraw(0), 800);
   if (say) {
     const st = drawnBodyState();
-    if (!S.on) say("Drawn body off. You're the game's own picture again.");
+    if (!S.on) say("Drawn body off. You're the game's own picture again, for you and everybody else.");
     else if (S.cup >= 6 && st.chest !== "XLarge") say("Drawn body on, " + st.cupName + " cup. Your chest needs to be the game's biggest size (wardrobe, body, upper body: the largest) for the drawn breasts to show; the belly and fitting work already.");
-    else say("Drawn body on: " + st.cupName + " cup" + (st.belly ? " with your belly" : "") + ". Only you see it.");
+    else say("Drawn body on: " + st.cupName + " cup" + (st.belly ? " with your belly" : "") + ". Everyone here with the Companion sees it too.");
   }
+}
+export function drawnBodySeeOthers(on, say) {
+  seeOthers = !!on; try { W.localStorage.setItem(SEE_KEY, on ? "1" : "0"); } catch (e) { /* fine */ }
+  for (const mn of others.keys()) redrawMn(mn, 60);
+  if (on) { hook(); ask(); }
+  if (say) say(on ? "You'll see other people's drawn bodies." : "Other people are drawn the game's own way on your screen.");
 }
 export function drawnBodyCup(i, say) {
   const n = W.FarmBreasts ? W.FarmBreasts.CUPS.length : 21;
-  S.cup = Math.max(6, Math.min(n - 1, Math.round(Number(i) || 0))); save(); apply(); redraw(60);
+  S.cup = Math.max(6, Math.min(n - 1, Math.round(Number(i) || 0))); save(); if (mine.E) apply(mine.E, S); redraw(60); tell(true);
   if (say) say("Cup: " + drawnBodyState().cupName + ".");
+}
+function take(d, say, from) {
+  const s = clean(d); if (!s) throw new Error("the settings are damaged");
+  s.on = S.on; s.saved = typeof d.saved === "string" ? d.saved.slice(0, 40) : new Date().toISOString();
+  S = s; mine.S = S; save(); if (mine.E) apply(mine.E, S); redraw(60); tell(true);
+  if (say) say("Settings " + from + " put in: " + drawnBodyState().cupName + " cup" + (S.belly.std && S.belly.std.on ? ", your belly" : "") + ", " + Object.keys(S.wear).length + " piece choices. " + (S.on ? "" : "Switch the drawn body on to see it."));
+  return true;
 }
 // the code from the studio's "Copy for the Companion" button
 export function drawnBodyPaste(text, say) {
@@ -151,17 +227,15 @@ export function drawnBodyPaste(text, say) {
     const t = String(text || "").trim(); if (!t.startsWith(CODE_HEAD)) throw new Error("that isn't a code from the studio (it starts with " + CODE_HEAD + ")");
     const raw = W.LZString && typeof W.LZString.decompressFromBase64 === "function" ? W.LZString.decompressFromBase64(t.slice(CODE_HEAD.length)) : null;
     const d = raw && JSON.parse(raw); if (!d || typeof d !== "object" || d.v !== 1) throw new Error("the code is damaged or from a newer studio");
-    const num = (v, lo, hi, def) => (typeof v === "number" && isFinite(v) ? Math.max(lo, Math.min(hi, v)) : def);
-    S.cup = num(d.cup, 0, 20, S.cup);
-    S.breast = {}; for (const k of ["full", "hang", "apart", "x", "y", "nip", "nipY", "nipX"]) if (typeof d.breast?.[k] === "number" && isFinite(d.breast[k])) S.breast[k] = d.breast[k];
-    S.wear = {}; for (const [k, v] of Object.entries(d.wear || {})) if (/^[\w/ -]{1,80}$/.test(k) && ["behind", "plain", "nipple", ""].includes(v)) S.wear[k] = v;
-    S.belly = {}; for (const k of ["std", "AllFours", "Hogtied"]) { const f = d.belly?.[k]; if (!f) continue; S.belly[k] = { on: !!f.on, behind: !!f.behind, flat: !!f.flat, rx: num(f.rx, 20, 170, 70), ry: num(f.ry, 20, 190, 80), sag: num(f.sag, 0, 0.5, 0.22), x: num(f.x, -120, 120, 0), y: num(f.y, -200, 200, 0), cut: num(f.cut, 0.2, 1, 0.74) }; }
-    S.auto = d.auto !== false; S.tuck = d.tuck !== false; S.dress = d.dress !== false;
-    S.mould = { items: (Array.isArray(d.mould?.items) ? d.mould.items : []).filter((k) => typeof k === "string" && k.length < 80).slice(0, 200), mode: {} };
-    for (const [k, m] of Object.entries(d.mould?.mode || {})) if (S.mould.items.includes(k) && ["wide", "over", "under"].includes(m)) S.mould.mode[k] = m;
-    S.saved = typeof d.saved === "string" ? d.saved.slice(0, 40) : new Date().toISOString();
-    save(); apply(); redraw(60);
-    if (say) say("Settings from the studio put in: " + drawnBodyState().cupName + " cup" + (S.belly.std && S.belly.std.on ? ", your belly" : "") + ", " + Object.keys(S.wear).length + " piece choices. " + (S.on ? "" : "Switch the drawn body on to see it."));
-    return true;
+    return take(d, say, "from the code");
   } catch (e) { if (say) say("I couldn't read that code: " + (e && e.message || e)); return false; }
+}
+// straight from the studio, while it's running on this computer: what its Save buttons last saved
+export async function drawnBodyFromStudio(say) {
+  try {
+    const get = async (f) => { const r = await fetch(STUDIO + "/__studio/fits/" + f, { cache: "no-store" }); if (!r.ok) throw new Error(f + ": " + r.status); return r.json(); };
+    const [br, be, it] = await Promise.all([get("breasts.json"), get("belly.json").catch(() => null), get("items.json").catch(() => null)]);
+    if (!br) throw new Error("the studio hasn't saved any breasts yet (Save the breasts)");
+    return take({ cup: br.cup, breast: br, wear: br.wear, belly: be && be.fits, tuck: br.tuck, dress: br.dress, mould: it ? { items: it.mould || [], mode: it.mouldMode || {} } : null, saved: br.saved }, say, "from your studio");
+  } catch (e) { if (say) say("I couldn't reach your studio (" + (e && e.message || e) + "). Is it running? Start the studio.bat, then try again. Or use its Copy for the Companion button and paste the code here."); return false; }
 }

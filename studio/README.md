@@ -96,6 +96,13 @@ the game's pictures into the drawing.
   not set to "behind".
 - The list of moulded pieces is saved in `fits/items.json` when you press *Save this fit*.
 
+## The catalogue
+
+- *Make the catalogue* (Breasts section): every piece in the chosen slot, on her as she is now, twelve to a page,
+  saved as PNG files in `studio/catalogue/`. The file name says the slot, the size and the page.
+- Set the size, belly and pose first: the catalogue is of how things look on that body.
+- The folder is on this computer only. It is not in the repo.
+
 ## Steps 42 to 46: where it stands
 
 - **One breast shape, the approved one, dressed or bare.** Nothing may change it for clothes; clothes are grown to fit

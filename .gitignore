@@ -12,3 +12,6 @@ dist/farmhand-private-*.user.js
 vps/.env
 vps/data/
 vps/node_modules/
+
+# the outfit studio's catalogue pages: pictures made on this computer, never on GitHub
+studio/catalogue/

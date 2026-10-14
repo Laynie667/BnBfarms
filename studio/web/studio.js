@@ -597,6 +597,38 @@
           return $("div", { className: "fh-slide" }, $("label", { textContent: label }), $("input", { type: "range", min, max, step, value: GEN[k], oninput: (e) => { GEN[k] = Number(e.target.value); v2.textContent = String(GEN[k]); bellyDraw(); } }), v2); }) : ""].flat(Infinity)); };
     GEN.fill = fill; fill(); return box;
   }
+  // ── the catalogue ──
+  // Every piece in a slot, on the body and at the size showing now, as pages of pictures big enough to judge (twelve to a
+  // page), saved as PNG files in studio\catalogue. For going through the whole wardrobe slot by slot and marking what
+  // doesn't fit (Laynie, Oct 14: "keep going with all the clothing items, restraints until we have a full catalogue").
+  const CAT_SLOTS = ["Cloth", "ClothOuter", "ClothAccessory", "Bra", "Suit", "Corset", "Necklace", "ItemBreast", "ItemTorso", "ItemTorso2", "ItemArms", "ItemNipples", "ItemNipplesPiercings", "ItemNeckAccessories", "ItemNeckRestraints", "ClothLower", "Panties", "SuitLower", "ItemPelvis", "ItemVulva", "ItemButt", "ItemLegs"];
+  async function catalogue(group, opt) {
+    opt = opt || {};
+    const per = 12, cols = 4, TW = 320, TH = 360, crop = opt.crop || [40, 880, 420, 472];
+    const before = ServerAppearanceBundle(S.C.Appearance), had = before.some((b) => b.Group === group);
+    const all = Asset.filter((a) => a.Group.Name === group && a.Visible !== false), pages = Math.ceil(all.length / per), saved = [];
+    const tag = FarmBreasts.CUPS[cupNow()] + (fitNow().on ? "-belly" : "") + (poseKey() !== "std" ? "-" + poseKey().toLowerCase() : "");
+    for (let p = (opt.from || 0); p < Math.min(pages, opt.to == null ? pages : opt.to); p++) {
+      const cv = document.createElement("canvas"); cv.width = cols * TW; cv.height = Math.ceil(per / cols) * TH + 30; const g = cv.getContext("2d");
+      g.fillStyle = "#565a66"; g.fillRect(0, 0, cv.width, cv.height); g.fillStyle = "#fff"; g.font = "bold 18px system-ui, sans-serif";
+      g.fillText(group + "  ·  " + tag + "  ·  page " + (p + 1) + " of " + pages + "  ·  " + all.length + " pieces", 10, 21);
+      const part = all.slice(p * per, p * per + per);
+      for (let n = 0; n < part.length; n++) {
+        const a = part[n], X = (n % cols) * TW, Y = 30 + Math.floor(n / cols) * TH;
+        try { wear(before); if (!had) { try { InventoryRemove(S.C, group); } catch (e) { /* nothing on */ } } putOn(group, a.Name);
+          for (let k = 0; k < 4; k++) { await waitMs(k ? 220 : 520); bellyDraw(); } await waitMs(60);
+          g.drawImage(S.C.Canvas, crop[0], crop[1], crop[2], crop[3], X, Y, TW, TH); } catch (e) { console.warn("[studio] catalogue:", a.Name, e); g.fillStyle = "#a33"; g.fillRect(X, Y, TW, TH); }
+        g.fillStyle = "rgba(0,0,0,0.6)"; g.fillRect(X, Y, TW, 20); g.fillStyle = "#fff"; g.font = "13px system-ui, sans-serif"; g.fillText((p * per + n + 1) + ". " + itemName(a).slice(0, 34), X + 4, Y + 15);
+        if (opt.say !== false) say("Catalogue: " + group + ", " + (p * per + n + 1) + " of " + all.length + "…");
+      }
+      const name = (group + "-" + tag + "-" + String(p + 1).padStart(2, "0")).toLowerCase().replace(/[^a-z0-9-]/g, "");
+      try { const blob = await new Promise((r) => cv.toBlob(r, "image/png")); const res = await fetch("/__studio/catalogue/" + name + ".png", { method: "POST", body: blob }); if (!res.ok) throw new Error(await res.text()); saved.push(name + ".png"); }
+      catch (e) { say("A catalogue page didn't save: " + (e && e.message || e), true); }
+    }
+    wear(before); if (!had) { try { InventoryRemove(S.C, group); } catch (e) { /* nothing on */ } } redraw();
+    say("Catalogue of " + group + ": " + saved.length + " page(s) saved in studio\\catalogue.");
+    return saved;
+  }
   function breastPanel() {
     const box = $("div", { id: "fh-breasts" });
     if (!window.FarmBreasts) { box.append($("p", { className: "note", textContent: "The breast drawing didn't load. Restart the studio (close its window and run the .bat again)." })); return box; }
@@ -610,6 +642,9 @@
         $("p", { className: "note", textContent: drawn ? "Drawn. The game's nipples, and what's worn on them, move onto them. Bras and chest gear are still cut for the game's chest." : "Flat to D is the game's own chest, so everything made for it fits. From DD up they're drawn." }),
         BREAST_SLIDERS.map(([k, label, min, max, step]) => { const val = $("span", { className: "fh-val", textContent: String(BREAST[k]) });
           return $("div", { className: "fh-slide" }, $("label", { textContent: label }), $("input", { type: "range", min, max, step, value: BREAST[k], disabled: !drawn, oninput: (e) => { BREAST[k] = Number(e.target.value); val.textContent = String(BREAST[k]); bellyDraw(); } }), val); }),
+        $("div", { className: "row" }, $("label", { textContent: "Catalogue a slot (saved as pictures):" }),
+          (() => { const sel = $("select", {}, CAT_SLOTS.filter((gn) => Asset.some((a) => a.Group.Name === gn)).map((gn) => $("option", { value: gn, textContent: gn.replace(/([a-z])([A-Z0-9])/g, "$1 $2") })));
+            return [sel, $("button", { type: "button", textContent: "Make the catalogue", title: "Every piece in the slot, on her as she is now, twelve to a page, saved in studio\\catalogue", onclick: () => catalogue(sel.value) })]; })()),
         $("div", { className: "row" }, $("label", { textContent: "See a whole slot at this size:" }),
           (() => { const sel = $("select", {}, ["Cloth", "ClothOuter", "ClothAccessory", "Bra", "Suit", "Corset", "Necklace", "ItemBreast", "ItemTorso", "ItemTorso2", "ItemArms", "ItemNipples", "ItemNipplesPiercings", "ItemNeckAccessories", "ItemNeckRestraints"].filter((gn) => Asset.some((a) => a.Group.Name === gn)).map((gn) => $("option", { value: gn, textContent: gn.replace(/([a-z])([A-Z0-9])/g, "$1 $2") })));
             return [sel, $("button", { type: "button", textContent: "Show the sheet", title: "Tries on every piece in the slot and shows them side by side", onclick: () => chestAudit(sel.value) })]; })()),
@@ -669,10 +704,21 @@
               if (bpose === "AllFours" && ry - bc.ay + bc.height > ground) {
                 if (BREAST.flatKey !== key + "|" + Math.round(ry)) {
                   const fc = document.createElement("canvas"); fc.width = bc.width; fc.height = bc.height; const fg = fc.getContext("2d"), cut = Math.round(ground - (ry - bc.ay));
+                  // Where they meet the ground. It was a dead level cut with a hard line under it (Laynie, Oct 14: "the all fours
+                  // 'cut off' is a little harsh… a bit softer a transition at the edge of the breast"). Now the last of
+                  // each breast curves in to the ground instead of being sliced: the corners are rounded off, the bottom
+                  // few rows fade, and what marks the ground is a soft shadow, not a line.
                   fg.drawImage(bc, 0, 0); fg.clearRect(0, cut, fc.width, fc.height - cut);
-                  // the line where they meet the ground
-                  const row = fg.getImageData(0, Math.max(0, cut - 2), fc.width, 1).data; let x0 = -1, x1 = -1; for (let i = 0; i < fc.width; i++) if (row[i * 4 + 3] > 120) { if (x0 < 0) x0 = i; x1 = i; }
-                  if (x0 >= 0) { fg.strokeStyle = "rgba(70,40,36,0.75)"; fg.lineWidth = 2; fg.lineCap = "round"; fg.beginPath(); fg.moveTo(x0 + 2, cut - 1); fg.lineTo(x1 - 2, cut - 1); fg.stroke(); }
+                  const row = fg.getImageData(0, Math.max(0, cut - 3), fc.width, 1).data; let x0 = -1, x1 = -1; for (let i = 0; i < fc.width; i++) if (row[i * 4 + 3] > 120) { if (x0 < 0) x0 = i; x1 = i; }
+                  if (x0 >= 0) { const soft = 16, mid = (x0 + x1) / 2, half = (x1 - x0) / 2;
+                    fg.globalCompositeOperation = "destination-out";
+                    const fade = fg.createLinearGradient(0, cut - soft, 0, cut); fade.addColorStop(0, "rgba(0,0,0,0)"); fade.addColorStop(1, "rgba(0,0,0,0.9)");
+                    fg.fillStyle = fade; fg.fillRect(0, cut - soft, fc.width, soft);
+                    for (const sd of [-1, 1]) { const cx = mid + sd * half, rg = fg.createRadialGradient(cx, cut, 0, cx, cut, soft * 1.8); rg.addColorStop(0, "rgba(0,0,0,1)"); rg.addColorStop(1, "rgba(0,0,0,0)"); fg.fillStyle = rg; fg.fillRect(cx - soft * 2, cut - soft * 2, soft * 4, soft * 2); }   // the outer corners, rounded off
+                    fg.globalCompositeOperation = "destination-over";
+                    const sh = fg.createRadialGradient(mid, cut - 3, 0, mid, cut - 3, half * 1.05); sh.addColorStop(0, "rgba(70,40,36,0.34)"); sh.addColorStop(0.75, "rgba(70,40,36,0.2)"); sh.addColorStop(1, "rgba(70,40,36,0)");
+                    fg.save(); fg.translate(0, cut - 3); fg.scale(1, 0.09); fg.translate(0, -(cut - 3)); fg.fillStyle = sh; fg.beginPath(); fg.arc(mid, cut - 3, half * 1.05, 0, Math.PI * 2); fg.fill(); fg.restore();
+                    fg.globalCompositeOperation = "source-over"; }
                   fc.ax = bc.ax; fc.ay = bc.ay; fc.nips = bc.nips; fc.mask = bc.mask; BREAST.flat = fc; BREAST.flatKey = key + "|" + Math.round(ry);
                 }
                 bc = BREAST.flat;
@@ -818,7 +864,8 @@
                 const FT = B.fit, srcOff = (off, sg) => { if (FT.to == null || sc <= 1.001) return off / sg; const e = Math.max(0, Math.min(1, (sg - 1) / (sc - 1))), a = Math.abs(off);
                   const m = a <= FT.ti ? (FT.ti > 0.5 ? a * FT.gi / FT.ti : FT.gi) : FT.gi + (a - FT.ti) * (FT.go - FT.gi) / Math.max(1, FT.to - FT.ti); return (off < 0 ? -1 : 1) * ((1 - e) * a + e * m); };
                 const groundRow = B.ground < 1e8 ? MY + B.ground - y - 1 : 1e9;
-                const tentOn = !!BREAST.solid[pk] && B.pose !== "AllFours", tEnd = tentOn ? Math.min(pb > 0 ? pb : flapEnd, bcy + S2.rv * 2.4) : 0;
+                // (only a layer that is itself cloth over the breasts is let out below them. A suit's sleeves are a layer of their own with nothing on the chest, and letting THAT out wiped the arms it was on: every catsuit lost its sleeves. Found in the catalogue, Oct 14.)
+                const tentOn = !!BREAST.solid[pk] && B.pose !== "AllFours" && chestCover(src, im, x, y, B, false) >= 0.5, tEnd = tentOn ? Math.min(pb > 0 ? pb : flapEnd, bcy + S2.rv * 2.4) : 0;
                 const bodyHalfAt = (qy) => { const pj = Math.round(qy - uyc); return prof && pj >= 0 && pj < prof.h && prof.L[pj] >= 0 ? Math.max(midX - (ux + prof.L[pj]), ux + prof.R[pj] - midX) : 80; };
                 const tentTop = S2.bx + S2.ro * 0.96, tentBot = tentOn ? bodyHalfAt(tEnd) + 1 : 0;
                 const tentHalf = (qy) => { const t = Math.max(0, Math.min(1, (qy - bcy) / Math.max(1, tEnd - bcy))); return tentTop + (tentBot - tentTop) * Math.pow(t, 1.25); };
@@ -851,7 +898,7 @@
                     const ax = fx - ix, ay = fy - iy, p00 = (iy * CW + ix) * 4, p10 = p00 + 4, p01 = p00 + CW * 4, p11 = p01 + 4;
                     const a00 = sp[p00 + 3] * (1 - ax) * (1 - ay), a10 = sp[p10 + 3] * ax * (1 - ay), a01 = sp[p01 + 3] * (1 - ax) * ay, a11 = sp[p11 + 3] * ax * ay, at = a00 + a10 + a01 + a11;
                     if (at < 1) continue;
-                    od[o4] = (sp[p00] * a00 + sp[p10] * a10 + sp[p01] * a01 + sp[p11] * a11) / at; od[o4 + 1] = (sp[p00 + 1] * a00 + sp[p10 + 1] * a10 + sp[p01 + 1] * a01 + sp[p11 + 1] * a11) / at; od[o4 + 2] = (sp[p00 + 2] * a00 + sp[p10 + 2] * a10 + sp[p01 + 2] * a01 + sp[p11 + 2] * a11) / at; od[o4 + 3] = at;
+                    od[o4] = (sp[p00] * a00 + sp[p10] * a10 + sp[p01] * a01 + sp[p11] * a11) / at; od[o4 + 1] = (sp[p00 + 1] * a00 + sp[p10 + 1] * a10 + sp[p01 + 1] * a01 + sp[p11 + 1] * a11) / at; od[o4 + 2] = (sp[p00 + 2] * a00 + sp[p10 + 2] * a10 + sp[p01 + 2] * a01 + sp[p11 + 2] * a11) / at; od[o4 + 3] = groundRow < 1e8 && groundRow - qy < 16 ? at * Math.max(0.1, (groundRow - qy) / 16) : at;
                   }
                 }
                 // FROM THE SHOULDER TO THE BUST. Laynie's marks on the student outfit (Oct 13): a green line each side, straight
@@ -1178,7 +1225,7 @@
     CharacterAppearanceSetDefault(S.C);
     CharacterRefresh(S.C, false, false);
     panel(); S.ready = true; loadFits(false); loadItemFits(); loadBreasts(false);
-    window.FarmStudio = { S, wear, decode, encode, setBody, setSkin, setPose, redraw, putOn, tint, slots, BELLY, bellyDraw, saveFits, loadFits, FIT, select, saveFit, fitSet, fitDraw, orderSet, orderNow, colourSet, colourLayers, configure, configureDone, stashFits, MOULD, BREAST, GEN, genSet, genHardSet, genFit, chestAudit, setCup, cupNow, saveBreasts, loadBreasts };   // for poking at from the console
+    window.FarmStudio = { S, wear, decode, encode, setBody, setSkin, setPose, redraw, putOn, tint, slots, BELLY, bellyDraw, saveFits, loadFits, FIT, select, saveFit, fitSet, fitDraw, orderSet, orderNow, colourSet, colourLayers, configure, configureDone, stashFits, MOULD, BREAST, catalogue, CAT_SLOTS, GEN, genSet, genHardSet, genFit, chestAudit, setCup, cupNow, saveBreasts, loadBreasts };   // for poking at from the console
     say("Ready. Paste an outfit code, or change the body and pose below.");
   }
   let tries = 0;

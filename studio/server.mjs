@@ -52,6 +52,18 @@ createServer(async (req, res) => {
       res.writeHead(200, { "Content-Type": TYPES[".js"], "Cache-Control": "no-cache" }).end("(() => {\n" + src.slice(a, b) + "\nwindow.FarmBelly = { SIZES, bellyCanvas, bellyPlace, bellyPose, skinPatch, skinGate, FALLBACK };\n})();\n");   // wrapped, so its names can't clash with the game's
       return;
     }
+    if (path.startsWith("/__studio/catalogue/")) {
+      // a page of the catalogue, made in the browser: kept as a picture on this computer (never in the repo)
+      const name = path.slice("/__studio/catalogue/".length);
+      if (!/^[a-z0-9-]{1,80}\.png$/.test(name)) { res.writeHead(400).end("bad name"); return; }
+      const dir = join(HERE, "catalogue"), file = join(dir, name);
+      if (req.method === "POST") {
+        const chunks = []; let size = 0; for await (const chunk of req) { size += chunk.length; if (size > 30e6) { res.writeHead(413).end("too big"); return; } chunks.push(chunk); }
+        await mkdir(dir, { recursive: true }); await writeFile(file, Buffer.concat(chunks));
+        res.writeHead(200, { "Content-Type": "text/plain" }).end("saved"); return;
+      }
+      return send(res, file);
+    }
     if (path.startsWith("/__studio/fits/")) {
       const name = path.slice("/__studio/fits/".length);
       if (!/^[a-z0-9-]{1,40}\.json$/.test(name)) { res.writeHead(400).end("bad name"); return; }

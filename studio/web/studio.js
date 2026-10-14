@@ -1038,7 +1038,8 @@
                     : a <= FT.tn ? FT.gi + (a - FT.ti) * (FT.gn - FT.gi) / Math.max(1, FT.tn - FT.ti) : FT.gn + (a - FT.tn) * (FT.go - FT.gn) / Math.max(1, FT.to - FT.tn); return (off < 0 ? -1 : 1) * ((1 - e) * a + e * m); };
                 const groundRow = B.ground < 1e8 ? MY + B.ground - y - 1 : 1e9;
                 // (only a layer that is itself cloth over the breasts is let out below them. A suit's sleeves are a layer of their own with nothing on the chest, and letting THAT out wiped the arms it was on: every catsuit lost its sleeves. Found in the catalogue, Oct 14.)
-                const tentOn = !!BREAST.solid[pk] && B.pose !== "AllFours" && chestCover(src, im, x, y, B, false) >= 0.5, tEnd = tentOn ? Math.min(pb > 0 ? pb : flapEnd, bcy + S2.rv * 2.4) : 0;
+                /* (the drape is off. Hanging from her breasts it widened the dress below them, and at the bigger sizes the skirt flared out in a box: Laynie, Oct 14, "the bottom of dresses flare out when i increase the breast size". Below her breasts a dress is the game's own picture, the same width at every size.) */
+                const tentOn = false && !!BREAST.solid[pk] && B.pose !== "AllFours" && chestCover(src, im, x, y, B, false) >= 0.5, tEnd = tentOn ? Math.min(pb > 0 ? pb : flapEnd, bcy + S2.rv * 2.4) : 0;
                 const bodyHalfAt = (qy) => { const pj = Math.round(qy - uyc); return prof && pj >= 0 && pj < prof.h && prof.L[pj] >= 0 ? Math.max(midX - (ux + prof.L[pj]), ux + prof.R[pj] - midX) : 80; };
                 const tentTop = S2.bx + S2.ro * 0.96, tentBot = tentOn ? bodyHalfAt(tEnd) + 1 : 0;
                 const tentHalf = (qy) => { const t = Math.max(0, Math.min(1, (qy - bcy) / Math.max(1, tEnd - bcy))); return tentTop + (tentBot - tentTop) * Math.pow(t, 1.25); };

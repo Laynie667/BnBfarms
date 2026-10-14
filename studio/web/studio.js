@@ -365,7 +365,10 @@
   // the piece grown to the belly, if it covers it and nothing else has been chosen for it: the canvas, false (nothing to grow) or null (not ready)
   function bellyAuto(src, x, y, ctx, behind, pieceKey) { if (!ctx.belly || behind || BELLY.auto === false || typeof src !== "string") return null;
     // worn things only: not her hands, her skin or her hair
-    { const m = new RegExp("(?:^|/)Assets/[^/]+/(?:Override/[^/]+/)?([^/]+)/").exec(src); if (!m || !chestSlot(m[1])) return false; }
+    const m0 = new RegExp("(?:^|/)Assets/[^/]+/(?:Override/[^/]+/)?([^/]+)/").exec(src); if (!m0) return false; if (m0[1] !== "Panties" && !chestSlot(m0[1])) return false;
+    // Panties go UNDER: her belly hangs in front of them and hides them, only their sides at her hips showing (Laynie, Oct 14:
+    // "panties can be hidden by the large belly").
+    if (m0[1] === "Panties") return mouldCanvas(src, x, y, ctx, "under|" + (pieceKey || src), "under");
     const pk = pieceKey || src; if (bellyCover(src, x, y, ctx) >= 0.15) MOULD.lies.add(pk); if (!MOULD.lies.has(pk)) return false;   // (if any layer of a piece lies on the belly, all of its layers grow together)
     return mouldCanvas(src, x, y, ctx, "auto|" + (pieceKey || src), "auto"); }
   // How far a whole piece reaches, over all its layers: its left and right edge on every row of the screen, and its last
@@ -410,6 +413,22 @@
     }
     const c = document.createElement("canvas"); c.width = w + M * 2; c.height = h;
     const g = c.getContext("2d");
+    // In the usual (auto) way too, a piece that comes down past the middle of the belly to her crotch (a crotch strap, a chain,
+    // a swimsuit) is lengthened down the belly so it ends at its underside and tucks under. Her belly hangs lower than her
+    // crotch, and a strap that stopped where the game stops it ended in mid-air on the front of the belly (Laynie's marks,
+    // Oct 14). Every layer of the piece by the same amount, as "over" does.
+    let longSrc = false;
+    if (mode === "auto" && ext) {
+      const br = bellyRows(ctx), mid = br ? (br.top + br.bottom) / 2 : 0, to = br ? br.bottom - 2 : 0, from = br ? Math.max(ext.top, br.top) : 0;
+      if (br && ext.bottom > mid && ext.bottom < to - 2 && ext.bottom > from + 4) {
+        const a = from - Math.round(y), b = ext.bottom - Math.round(y), b2 = to - Math.round(y);
+        if (b > a) { const tall = document.createElement("canvas"); tall.width = w; tall.height = Math.max(h, b2 + 1 + Math.max(0, h - 1 - b)); const tg = tall.getContext("2d");
+          if (a > 0) tg.drawImage(im, 0, 0, w, Math.min(a, h), 0, 0, w, Math.min(a, h));
+          if (b >= a && a < h) tg.drawImage(im, 0, Math.max(0, a), w, Math.min(h, b + 1) - Math.max(0, a), 0, Math.max(0, a), w, b2 - Math.max(0, a) + 1);
+          if (b + 1 < h) tg.drawImage(im, 0, b + 1, w, h - b - 1, 0, b2 + 1, w, h - b - 1);
+          im = tall; h = tall.height; longSrc = true; }
+      }
+    }
     if (mode === "auto") {
       // The same lesson as the breasts (Laynie, Oct 13: "take what you learned and apply it across the board for all
       // wearable items"): the piece stays the game's own picture, and it's made to fit by growing it evenly, not by
@@ -420,9 +439,10 @@
       // and isn't pulled out to the full width by itself; and edges are averaged over a few rows, so the grown part
       // has a smooth side and not a stepped one.
       const b = ctx.belly, bp = b.prof || (b.prof = edges(b.cv, b.cv.width, b.cv.height)), cxs = b.dx + b.cv.width / 2;
-      const span = MOULD.span.get(piece) || { L: new Float32Array(2600).fill(1e9), R: new Float32Array(2600).fill(-1e9), v: 0 };
-      MOULD.span.set(piece, span);
-      const p0 = edgesOf(src); let grew = false;
+      if (longSrc) { c.height = h; }
+      const spanKey = piece + (longSrc ? "|long" + (ext ? ext.top + "-" + ext.bottom : "") : ""), span = MOULD.span.get(spanKey) || { L: new Float32Array(2600).fill(1e9), R: new Float32Array(2600).fill(-1e9), v: 0 };
+      MOULD.span.set(spanKey, span);
+      const p0 = longSrc ? edges(im, w, h) : edgesOf(src); let grew = false;
       if (p0) for (let j = 0; j < p0.h; j++) { const yy = Math.round(y) + j; if (p0.L[j] < 0 || yy < 0 || yy >= 2600) continue; if (x + p0.L[j] < span.L[yy]) { span.L[yy] = x + p0.L[j]; grew = true; } if (x + p0.R[j] > span.R[yy]) { span.R[yy] = x + p0.R[j]; grew = true; } }
       if (grew) { span.v++; MOULD.ver++; clearTimeout(MOULD.t); MOULD.t = setTimeout(bellyDraw, 60); }
       const key2 = key + "|span" + span.v; if (MOULD.out.has(key2)) return MOULD.out.get(key2);
@@ -752,10 +772,14 @@
           };
           const handDraw = (name, src, x, y, o) => {
             const B = ctx.breast, im = B && mouldImg(src); if (!im) return false;
-            const key = "hand|" + src + "|" + Math.round(x) + "," + Math.round(y) + "|" + B.sig;
+            // (panties, with a belly, are under it: drawn here behind the breasts as the game has them, they were right over the belly.
+            // Laynie's marks, Oct 14. Only panties: given the belly's version here, bands under the breasts were stretched out sideways.)
+            let bv = null; try { bv = ctx.belly && !fit.behind && groupOf(src) === "Panties" ? bellyAuto(src, x, y, ctx, fit.behind, (pieceOf(src) || {}).key) : null; } catch (e) { bv = null; }
+            const base = bv || im, ox = bv ? MOULD.M : 0;
+            const key = "hand|" + src + "|" + Math.round(x) + "," + Math.round(y) + "|" + B.sig + (bv ? "|b" + ctx.sig + "|" + MOULD.ver + "|" + base.width + "x" + base.height : "");
             let c = BREAST.out.get(key);
-            if (!c) { c = document.createElement("canvas"); c.width = im.naturalWidth; c.height = im.naturalHeight; const g = c.getContext("2d"); g.drawImage(im, 0, 0); g.globalCompositeOperation = "destination-out"; g.drawImage(B.mask, B.mx - x, B.my - y); if (BREAST.out.size > 60) BREAST.out.clear(); BREAST.out.set(key, c); }
-            real[name](c, x, y, o); return true;
+            if (!c) { c = document.createElement("canvas"); c.width = base.naturalWidth || base.width; c.height = base.naturalHeight || base.height; const g = c.getContext("2d"); g.drawImage(base, 0, 0); g.globalCompositeOperation = "destination-out"; g.drawImage(B.mask, B.mx - (x - ox), B.my - y); if (BREAST.out.size > 60) BREAST.out.clear(); BREAST.out.set(key, c); }
+            real[name](c, x - ox, y, o); return true;
           };
           // how much of the game's two breasts this picture covers (0 to 1): a belt or a collar isn't chest wear
           // wide: measured a third wider than the breast (is it round or under them: does it hold them?). Not wide: measured

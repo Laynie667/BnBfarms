@@ -426,13 +426,14 @@
       if (p0) for (let j = 0; j < p0.h; j++) { const yy = Math.round(y) + j; if (p0.L[j] < 0 || yy < 0 || yy >= 2600) continue; if (x + p0.L[j] < span.L[yy]) { span.L[yy] = x + p0.L[j]; grew = true; } if (x + p0.R[j] > span.R[yy]) { span.R[yy] = x + p0.R[j]; grew = true; } }
       if (grew) { span.v++; MOULD.ver++; clearTimeout(MOULD.t); MOULD.t = setTimeout(bellyDraw, 60); }
       const key2 = key + "|span" + span.v; if (MOULD.out.has(key2)) return MOULD.out.get(key2);
-      const rowOf = (yy) => { if (yy < 0 || yy >= 2600 || span.L[yy] > 1e8) return null; const j = yy - Math.round(b.dy); if (j < 0 || j >= bp.h || bp.L[j] < 0) return null; const gl = span.L[yy], gr = span.R[yy], bl = b.dx + bp.L[j], br2 = b.dx + bp.R[j]; if (gl > cxs || gr < cxs) return null; return { gl, gr, nl: Math.min(gl, bl), nr: Math.max(gr, br2) }; };
+      const rowOf = (yy) => { if (yy < 0 || yy >= 2600 || span.L[yy] > 1e8) return null; const j = yy - Math.round(b.dy); if (j < 0 || j >= bp.h || bp.L[j] < 0) return null; const gl = span.L[yy], gr = span.R[yy], bl = b.dx + bp.L[j], br2 = b.dx + bp.R[j]; if (gl > cxs || gr < cxs) return null; return { gl, gr, nl: Math.min(gl, bl), nr: Math.max(gr, br2), bw: br2 - bl }; };
+      const strappy = bellyCover(src, x, y, ctx) < 0.35;   /* cloth (a swimsuit) is grown over the belly row by row as before, its narrow crotch too */
       for (let j = 0; j < h; j++) {
         const yy = Math.round(y) + j;
         g.drawImage(im, 0, j, w, 1, M, j, w, 1);
-        let gl = 0, gr = 0, nl2 = 0, nr = 0, n2 = 0; for (let d = -4; d <= 4; d++) { const e = rowOf(yy + d); if (e) { gl += e.gl; gr += e.gr; nl2 += e.nl; nr += e.nr; n2++; } }
+        let gl = 0, gr = 0, nl2 = 0, nr = 0, bw = 0, n2 = 0; for (let d = -4; d <= 4; d++) { const e = rowOf(yy + d); if (e) { gl += e.gl; gr += e.gr; nl2 += e.nl; nr += e.nr; bw += e.bw; n2++; } }
         if (n2 < 5 || !rowOf(yy)) continue; gl /= n2; gr /= n2; nl2 /= n2; nr /= n2;
-        if (gr - gl < 6 || (nl2 >= gl - 0.5 && nr <= gr + 0.5)) continue;
+        if (gr - gl < (strappy ? Math.max(6, bw / n2 * 0.45) : 6) || (nl2 >= gl - 0.5 && nr <= gr + 0.5)) continue;   /* (on a piece that is straps over the belly, not cloth, a strap down the middle narrower than about half the belly lies over it as it is: grown to the belly's width, the Studded Harness's crotch strap became a black blob. Catalogue with the belly, Oct 14.) */
         const k = (nr - nl2) / (gr - gl), sa = Math.max(0, gl - x), sb = Math.min(w, gr - x + 1); if (sb - sa < 1) continue;
         changed = true;
         g.clearRect(M + nl2 - x - 1, j, nr - nl2 + 2, 1);

@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.18.3
+// @version      0.18.4
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -230,7 +230,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.18.3";
+  var VERSION = "0.18.4";
 
   // extension/src/config.js
   var BOT_MEMBER = 260239;
@@ -1651,6 +1651,20 @@ One of mods you are using is using an old version of SDK. It will work for now b
             MOULD.t = setTimeout(bellyDraw, 60);
           };
           e.img.onerror = () => {
+            if (!e.retried) {
+              e.retried = true;
+              let url = src;
+              try {
+                if (host.mapSrc) url = host.mapSrc(src) || src;
+              } catch (er) {
+                url = src;
+              }
+              if (url !== src) {
+                e.img.crossOrigin = "anonymous";
+                e.img.src = url;
+                return;
+              }
+            }
             e.bad = true;
           };
           e.img.src = src;
@@ -1824,7 +1838,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
         if (!fm) return null;
         const w = img.naturalWidth || img.width, h2 = img.naturalHeight || img.height;
         if (!w || !h2) return null;
-        const key = Math.round(sx) + "," + Math.round(sy) + "|" + ctx2.sig;
+        const key = Math.round(sx) + "," + Math.round(sy) + "|" + ctx2.sig + "|" + (ctx2.breast ? ctx2.breast.sig : "");
         let e = shadeSeen.get(img);
         if (e && e.key === key) return e.out;
         const ox = Math.round(b.dx - sx), oy = Math.round(b.dy - sy), x0 = Math.max(0, ox), y0 = Math.max(0, oy), x1 = Math.min(w, ox + fm.w), y1 = Math.min(h2, oy + fm.h);
@@ -1837,10 +1851,22 @@ One of mods you are using is using an old version of SDK. It will work for now b
           g.drawImage(img, 0, 0);
           const part = g.getImageData(x0, y0, x1 - x0, y1 - y0), d = part.data;
           let any = false;
+          let bm = null;
+          const Bb = ctx2.breast;
+          if (Bb && Bb.mask) {
+            const mc = document.createElement("canvas");
+            mc.width = x1 - x0;
+            mc.height = y1 - y0;
+            const mg = mc.getContext("2d", { willReadFrequently: true });
+            mg.filter = "blur(2px)";
+            mg.drawImage(Bb.mask, Bb.mx - sx - x0, Bb.my - sy - y0);
+            bm = mg.getImageData(0, 0, mc.width, mc.height).data;
+          }
           for (let yy = y0; yy < y1; yy++) for (let xx = x0; xx < x1; xx++) {
             const i = ((yy - y0) * (x1 - x0) + (xx - x0)) * 4;
             if (d[i + 3] < 8) continue;
-            const k = fm.F[(yy - oy) * fm.w + (xx - ox)];
+            let k = fm.F[(yy - oy) * fm.w + (xx - ox)];
+            if (bm) k = 1 + (k - 1) * (1 - bm[i + 3] / 255);
             if (Math.abs(k - 1) < 0.01) continue;
             any = true;
             d[i] = Math.min(255, d[i] * k);
@@ -3838,7 +3864,32 @@ One of mods you are using is using an old version of SDK. It will work for now b
       },
       // never: your body items are yours
       redraw: () => redraw(60),
-      picture
+      picture,
+      // a picture an add-on supplies (the Echo clothing mod's): the address the add-on gives the game for it. The add-on steps
+      // into the game's DrawGetImage and swaps the address there, and the first thing DrawGetImage does is look the address up
+      // in the game's picture list. So that lookup is watched for a moment (and answered with nothing, so nothing is loaded
+      // or kept), and the address it was asked for is the one.
+      mapSrc: (src) => {
+        if (typeof W2.DrawGetImage !== "function") return src;
+        const lists = [typeof DrawCacheImage !== "undefined" ? DrawCacheImage : W2.DrawCacheImage, W2.DrawImageCache].filter((c) => c && typeof c.get === "function");
+        if (!lists.length) return src;
+        let seen = null;
+        const kept = lists.map((c) => [c, Object.prototype.hasOwnProperty.call(c, "get"), c.get]);
+        try {
+          for (const [c] of kept) c.get = function(k) {
+            if (seen == null) seen = k;
+            return { isLoaded: () => false, data: void 0, complete: false };
+          };
+          W2.DrawGetImage(src);
+        } catch (e) {
+        } finally {
+          for (const [c, own, g] of kept) {
+            if (own) c.get = g;
+            else delete c.get;
+          }
+        }
+        return typeof seen === "string" && seen ? seen : src;
+      }
     });
     apply();
     return E;

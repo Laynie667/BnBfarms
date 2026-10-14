@@ -77,6 +77,21 @@ function engine() {
     setBody: () => {},          // never: your body items are yours
     redraw: () => redraw(60),
     picture,
+    // a picture an add-on supplies (the Echo clothing mod's): the address the add-on gives the game for it. The add-on steps
+    // into the game's DrawGetImage and swaps the address there, and the first thing DrawGetImage does is look the address up
+    // in the game's picture list. So that lookup is watched for a moment (and answered with nothing, so nothing is loaded
+    // or kept), and the address it was asked for is the one.
+    mapSrc: (src) => {
+      if (typeof W.DrawGetImage !== "function") return src;
+      /* (the game's live version keeps that list in a const, which isn't on window: named bare, it still answers) */
+      // eslint-disable-next-line no-undef
+      const lists = [typeof DrawCacheImage !== "undefined" ? DrawCacheImage : W.DrawCacheImage, W.DrawImageCache].filter((c) => c && typeof c.get === "function"); if (!lists.length) return src;
+      let seen = null; const kept = lists.map((c) => [c, Object.prototype.hasOwnProperty.call(c, "get"), c.get]);
+      try { for (const [c] of kept) c.get = function (k) { if (seen == null) seen = k; return { isLoaded: () => false, data: undefined, complete: false }; }; W.DrawGetImage(src); }
+      catch (e) { /* nothing */ }
+      finally { for (const [c, own, g] of kept) { if (own) c.get = g; else delete c.get; } }
+      return typeof seen === "string" && seen ? seen : src;
+    },
   });
   apply();
   return E;

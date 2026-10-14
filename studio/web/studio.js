@@ -839,7 +839,7 @@
             // the breast"). It's drawn as the game draws it, and the breasts sit in front of its top edge.
             const pk0 = (pieceOf(src) || {}).key;
             if (chestCover(src, im, x, y, B, false) < 0.012 && !BREAST.on[pk0] && underBand(src, im, x, y, B) >= 0.35) BREAST.band[pk0] = true;
-            if (BREAST.band[pk0] && !BREAST.on[pk0]) return bandDraw(name, src, x, y, o);
+            if (BREAST.band[pk0] && !BREAST.on[pk0]) return handDraw(name, src, x, y, o);   /* (a band on her body stays exactly where the game puts it, at any size; her breasts simply hang in front of it. Laynie, Oct 14: "that part shouldn't have moved between sizes". bandDraw, which lowered it, is no longer used.) */
             // a piece that starts below the game's breasts (a waist strap, a belt) is under her bigger ones: they hang in front of it
             if (chestCover(src, im, x, y, B, false) < 0.012 && !BREAST.on[pk0]) { const e0 = edgesOf(src); if (e0) { let t0 = -1; for (let j = 0; j < e0.h; j++) if (e0.L[j] >= 0) { t0 = j; break; } if (t0 >= 0 && y + t0 > B.uy + gameBreast(B).y) return handDraw(name, src, x, y, o); } }   /* (every layer of a banded piece goes the same way: its clasp in the middle too) */
             if (chestCover(src, im, x, y, B, false) < 0.012 && !BREAST.on[pk0])   /* (a rope or a thin strap across the breast covers very little of it, and is still ON it: the box-tie ropes were being taken for an underbust piece and hidden behind her breasts. Found in the catalogue, Oct 14.) */ return BREAST.holds[pk0] ? handDraw(name, src, x, y, o) : false;

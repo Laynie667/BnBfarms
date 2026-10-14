@@ -982,6 +982,53 @@
               const overBelly = bellyAuto(src, x, y, ctx, fit.behind, pk);   // (the piece as it is once it's been grown to the belly, if she has one: the chest is laid on that)
               if (overBelly) g.drawImage(overBelly, MX - MOULD.M, MY); else g.drawImage(im, MX, MY);
               const sp = g.getImageData(0, 0, CW, CH).data;
+              // ENLARGED CLEAN. The game's cloth is drawn in flat shapes with hard edges (its light, its shade, a white
+              // front, a trim). Grown two or three times over by plain blending, every hard edge came out as a blurry
+              // staircase and the light on a shirt became a blocky white patch (Laynie, Oct 14: "the textures are ugly too,
+              // from how they are stretched"). So where a pixel of the grown piece sits on an edge between two flat
+              // colours, the edge is found from a slightly softened copy of the picture (which runs smooth between the
+              // pixel steps) and drawn crisp along it: a clean curve, one pixel soft, the two colours on either side
+              // exactly the game's. Where there is no clean edge (three colours meeting, fine print) it blends as before.
+              const spb = (() => { const cb = document.createElement("canvas"); cb.width = CW; cb.height = CH; const gb = cb.getContext("2d", { willReadFrequently: true });
+                gb.filter = "blur(1.5px)"; gb.drawImage(c, 0, 0); gb.filter = "none"; return gb.getImageData(0, 0, CW, CH).data; })();
+              const sharp = (t, w) => { const u = Math.max(0, Math.min(1, (t - 0.5 + w) / (2 * w))); return u * u * (3 - 2 * u); };
+              // one pixel of the grown piece, read from the game's picture at (fx, fy), enlarged `mag` times there
+              const sample = (fx, fy, mag, od, o4) => {
+                const ix = Math.floor(fx), iy = Math.floor(fy), ax = fx - ix, ay = fy - iy, p00 = (iy * CW + ix) * 4, p10 = p00 + 4, p01 = p00 + CW * 4, p11 = p01 + 4;
+                const a00 = sp[p00 + 3] * (1 - ax) * (1 - ay), a10 = sp[p10 + 3] * ax * (1 - ay), a01 = sp[p01 + 3] * (1 - ax) * ay, a11 = sp[p11 + 3] * ax * ay, at = a00 + a10 + a01 + a11;
+                let r = 0, gg = 0, bl = 0; if (at >= 1) { r = (sp[p00] * a00 + sp[p10] * a10 + sp[p01] * a01 + sp[p11] * a11) / at; gg = (sp[p00 + 1] * a00 + sp[p10 + 1] * a10 + sp[p01 + 1] * a01 + sp[p11 + 1] * a11) / at; bl = (sp[p00 + 2] * a00 + sp[p10 + 2] * a10 + sp[p01 + 2] * a01 + sp[p11 + 2] * a11) / at; }
+                let alpha = at;
+                if (mag > 1.15) {
+                  const w = Math.max(0.06, Math.min(0.5, 0.3 / mag)), P = [p00, p10, p01, p11];
+                  // the softened picture here
+                  const b00 = spb[p00 + 3] * (1 - ax) * (1 - ay), b10 = spb[p10 + 3] * ax * (1 - ay), b01 = spb[p01 + 3] * (1 - ax) * ay, b11 = spb[p11 + 3] * ax * ay, bt = b00 + b10 + b01 + b11;
+                  // the outline of the piece itself (where it meets nothing)
+                  /* (only a hard edge: a soft, feathered one, a leather strap's, came out with a hairy fringe) */
+                  let amin = 255, amax = 0, aEnds = 0, aN = 0; for (let yy = iy - 1; yy <= iy + 2; yy++) for (let xx = ix - 1; xx <= ix + 2; xx++) { if (xx < 0 || yy < 0 || xx >= CW || yy >= CH) continue; const a = sp[(yy * CW + xx) * 4 + 3]; aN++; if (a < 20 || a > 235) aEnds++; if (a < amin) amin = a; if (a > amax) amax = a; }
+                  if (amax - amin > 140 && aEnds >= aN * 0.75) alpha = amin + (amax - amin) * sharp((bt - amin) / (amax - amin), w);
+                  // a colour edge: the opaque pixels round here (four by four) are two flat colours and the game's own blends
+                  // of the two along the edge between them. Not a third colour: where three meet it's left as it was.
+                  let lo = -1, hi = -1, lmin = 1e9, lmax = -1, n = 0; const Q = [];
+                  for (let yy = iy - 1; yy <= iy + 2; yy++) for (let xx = ix - 1; xx <= ix + 2; xx++) { if (xx < 0 || yy < 0 || xx >= CW || yy >= CH) continue; const p = (yy * CW + xx) * 4; if (sp[p + 3] < 200) continue; Q.push(p); n++; const L = sp[p] * 0.3 + sp[p + 1] * 0.59 + sp[p + 2] * 0.11; if (L < lmin) { lmin = L; lo = p; } if (L > lmax) { lmax = L; hi = p; } }
+                  if (n >= 2 && bt >= 1) {
+                    const dr = sp[hi] - sp[lo], dg = sp[hi + 1] - sp[lo + 1], db = sp[hi + 2] - sp[lo + 2], dd = dr * dr + dg * dg + db * db;
+                    if (dd > 900) {
+                      /* (and FLAT: most of them right at one colour or the other. Leather, satin, anything shaded smooth or grainy is
+                         all in-betweens, and read as an edge it came out ragged: the studded harness. It's left as it was.) */
+                      let two = true, ends = 0; for (const p of Q) { const er = sp[p] - sp[lo], eg = sp[p + 1] - sp[lo + 1], eb = sp[p + 2] - sp[lo + 2], u = Math.max(0, Math.min(1, (er * dr + eg * dg + eb * db) / dd)), qr = er - u * dr, qg = eg - u * dg, qb = eb - u * db; if (qr * qr + qg * qg + qb * qb > dd * 0.03 + 60) { two = false; break; } if (u < 0.12 || u > 0.88) ends++; }
+                      if (ends < Q.length * 0.5) two = false;
+                      if (two) {
+                        const br = (spb[p00] * b00 + spb[p10] * b10 + spb[p01] * b01 + spb[p11] * b11) / bt, bg = (spb[p00 + 1] * b00 + spb[p10 + 1] * b10 + spb[p01 + 1] * b01 + spb[p11 + 1] * b11) / bt, bb = (spb[p00 + 2] * b00 + spb[p10 + 2] * b10 + spb[p01 + 2] * b01 + spb[p11 + 2] * b11) / bt;
+                        const ts = sharp(((br - sp[lo]) * dr + (bg - sp[lo + 1]) * dg + (bb - sp[lo + 2]) * db) / dd, w), tr = ((r - sp[lo]) * dr + (gg - sp[lo + 1]) * dg + (bl - sp[lo + 2]) * db) / dd;
+                        /* (a speck or a hairline the softening would wash away, a button, a stitch, is kept as the game has it) */
+                        const t = Math.abs(tr - ts) > 0.65 ? Math.max(0, Math.min(1, tr)) : ts;
+                        r = sp[lo] + dr * t; gg = sp[lo + 1] + dg * t; bl = sp[lo + 2] + db * t;
+                      }
+                    }
+                  }
+                }
+                od[o4] = r; od[o4 + 1] = gg; od[o4 + 2] = bl; od[o4 + 3] = alpha; return alpha;
+              };
               // (only down to the underside of the game's breast: below that the piece is on her body, and stays exactly where the game drew it. Review, Oct 14: the studded harness's waist panels were being grown out past her sides.)
               const gUnderY = (G.cy || 330) + (G.rv || 42) + 4, y1 = uyc + G.y1, y2 = uyc + G.y2, y3 = uyc + Math.min(G.y3, gUnderY), flapEnd = uyc + mapYp(Math.min(G.y3, gUnderY));
               // FILLED, not laid on top (Laynie, Oct 13, of a school uniform whose top had come out as a wide block ending in
@@ -1074,10 +1121,8 @@
                     let px2 = qx, pyS = 0; if (nipPull && !onTent) { const np = nipPull[qx < midX ? 0 : 1], dd = Math.hypot(qx - np.tx, qy - np.ty); if (dd < np.R) { const wv = Math.pow(1 - dd / np.R, 2) * (3 - 2 * (1 - dd / np.R)) ; px2 = qx + np.dx * wv; pyS = np.dy * wv; } }
                     const asIs = !onB && !onTent && !bridge && qy > bcy;   /* (below her breasts and off them, the piece is exactly the game's picture: same place, same width. Review, Oct 14.) */
                     const fx = asIs ? qx : onTent ? midX + (qx - midX) * bh2 / th : midX + srcOff(px2 - midX, sg) * flatK, fy = asIs ? qy : onTent ? qy : yn + pyS / kyAt(yn), ix = Math.floor(fx), iy = Math.floor(fy); if (ix < 0 || iy < 0 || ix >= CW - 1 || iy >= CH - 1) continue;
-                    const ax = fx - ix, ay = fy - iy, p00 = (iy * CW + ix) * 4, p10 = p00 + 4, p01 = p00 + CW * 4, p11 = p01 + 4;
-                    const a00 = sp[p00 + 3] * (1 - ax) * (1 - ay), a10 = sp[p10 + 3] * ax * (1 - ay), a01 = sp[p01 + 3] * (1 - ax) * ay, a11 = sp[p11 + 3] * ax * ay, at = a00 + a10 + a01 + a11;
-                    if (at < 1) continue;
-                    od[o4] = (sp[p00] * a00 + sp[p10] * a10 + sp[p01] * a01 + sp[p11] * a11) / at; od[o4 + 1] = (sp[p00 + 1] * a00 + sp[p10 + 1] * a10 + sp[p01 + 1] * a01 + sp[p11 + 1] * a11) / at; od[o4 + 2] = (sp[p00 + 2] * a00 + sp[p10 + 2] * a10 + sp[p01 + 2] * a01 + sp[p11 + 2] * a11) / at; od[o4 + 3] = groundRow < 1e8 && groundRow - qy < 16 ? at * Math.max(0.1, (groundRow - qy) / 16) : at;
+                    const at = sample(fx, fy, asIs ? 1 : Math.max(sg, kyAt(yn)), od, o4); if (at < 1) { od[o4 + 3] = 0; continue; }
+                    if (groundRow < 1e8 && groundRow - qy < 16) od[o4 + 3] = at * Math.max(0.1, (groundRow - qy) / 16);
                   }
                 }
                 // FROM THE SHOULDER TO THE BUST. Laynie's marks on the student outfit (Oct 13): a green line each side, straight

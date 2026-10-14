@@ -148,18 +148,33 @@
   // SHOWS of hers (from where it leaves her chest down to the ground), not onto the whole hanging shape. My first try
   // used the whole shape, and a bra landed with only its straps on her and its cups under the floor.
   const GAME_ALLFOURS = { dx: 33, cy: 288, ro: 22, rv: 25, y1: 236, y2: 262, y3: 318 }, GROUND = 398;
-  function fitOf(S, pose) {
+  function fitOf(S, pose, nip) {
     if (pose === "AllFours") { const G2 = GAME_ALLFOURS, ro = S.r * (1 + S.sag * 0.3), rv = S.r * (1 + S.sag), kx = (S.bx + ro) / (G2.dx + G2.ro);
       const bottom = Math.min(GROUND, ROOT_Y + S.by + rv), top = Math.max(G2.y1 + 4, Math.min(bottom - 40, ROOT_Y + S.by - S.r * S.top * 0.8)), ky = (bottom - top) / (G2.cy + G2.rv - G2.y2);
       return { G: G2, gi: G2.dx - G2.ro, go: G2.dx + G2.ro, ti: Math.max(0, S.bx - S.r), to: S.bx + ro, kx, ro, ri: Math.min(S.r, S.bx), rv, mapY: (y) => (y <= G2.y1 ? y : y >= G2.y2 ? top + (y - G2.y2) * ky : G2.y1 + (top - G2.y1) * (y - G2.y1) / (G2.y2 - G2.y1)) }; }
     if (S.held) return { kx: S.sc, ro: S.ro, ri: S.ri, rv: S.rv, mapY: (y) => heldY(y, S.sc) };
     const ro = S.r * (1 + S.sag * 0.3), rv = S.r * (1 + S.sag), kx = (S.bx + ro) / (GAME.dx + GAME.ro), ky = rv / GAME.rv;
     const cy = ROOT_Y + S.by, top = Math.max(GAME.y1 + 4, cy - (GAME.cy - GAME.y2) * ky);
+    // THE NIPPLE IS A FIXED POINT TOO. Whatever the game puts over its nipple (a shield, the peak of a cup, a ring, a hole)
+    // has to land on HER nipple, which on her shape sits lower and further out (Laynie's mark on the Forbidden Chastity
+    // Bra, Oct 14: "they need to sit on the nipples"). So the game's nipple is laid on hers, and the picture is spread
+    // evenly either side of it: from the top of the breast down to the nipple, and from the nipple down to the underside;
+    // from the inner edge out to the nipple, and from the nipple out to the outer edge. (I first tried dragging the
+    // picture toward the nipple from all round. It put the shields in the right place and bent every strap near them.)
+    const gnx = GAME.dx + 4, gny = GAME.cy - 0.43 * GAME.rv, pn = nipples(S)[1], tnx = nip ? nip[0] : pn[0], tny = ROOT_Y + (nip ? nip[1] : pn[1]), bot = cy + rv, gbot = GAME.cy + GAME.rv;
+    const okY = tny > top + 6 && tny < bot - 6;
+    // (But only for pieces that HAVE something for the nipple. The game's nipple sits high on its breast and hers sits low,
+    // so pinning one to the other stretches the top of a piece and squeezes the bottom: right for a pair of shields,
+    // wrong for an ordinary cup, which came out pinched. So there are two fits: mapY, even, for most things; mapYN and
+    // tn, pinned at the nipple, for the pieces that need it. The studio picks by piece.)
     const mapY = (y) => (y <= GAME.y1 ? y : y >= GAME.y2 ? top + (y - GAME.y2) * ky : GAME.y1 + (top - GAME.y1) * (y - GAME.y1) / (GAME.y2 - GAME.y1));
+    const mapYN = (y) => { if (y <= GAME.y1) return y; if (y < GAME.y2) return GAME.y1 + (top - GAME.y1) * (y - GAME.y1) / (GAME.y2 - GAME.y1); if (!okY) return top + (y - GAME.y2) * ky;
+      if (y <= gny) return top + (y - GAME.y2) * (tny - top) / (gny - GAME.y2); return tny + (y - gny) * (bot - tny) / (gbot - gny); };
     // gi, go: the game's breast, its inner and outer edge out from the breastbone (standing, the game's two touch: gi is 0).
     // ti, to: hers. Hers sit apart at the smaller sizes, so what the game has ON the breastbone (the bridge of a bra, the
     // middle of a top) is spread across her gap, and what's on the breast is laid from her inner edge to her outer one.
-    return { gi: 0, go: GAME.dx + GAME.ro, ti: Math.max(0, S.bx - S.r), to: S.bx + ro, kx, ro, ri: Math.min(S.r, S.bx), rv, mapY };
+    const ti = Math.max(0, S.bx - S.r), to = S.bx + ro;
+    return { gi: 0, go: GAME.dx + GAME.ro, gn: gnx, tn: tnx > ti + 6 && tnx < to - 6 ? tnx : null, ti, to, kx, ro, ri: Math.min(S.r, S.bx), rv, mapY, mapYN };
   }
   window.FarmBreasts = { fitOf, NATIVE, CUPS, DRAWN_FROM, ROOT_Y, GAME, shape, held, heldY, point, nipples, canvas };
 })();

@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.18.1
+// @version      0.18.2
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -230,7 +230,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.18.1";
+  var VERSION = "0.18.2";
 
   // extension/src/config.js
   var BOT_MEMBER = 260239;
@@ -1779,6 +1779,82 @@ One of mods you are using is using an old version of SDK. It will work for now b
         }
         return span;
       }
+      function bellyForm(cv) {
+        if (cv.formF !== void 0) return cv.formF;
+        const w = cv.width, h2 = cv.height;
+        let d;
+        try {
+          d = cv.getContext("2d", { willReadFrequently: true }).getImageData(0, 0, w, h2).data;
+        } catch (e) {
+          return cv.formF = null;
+        }
+        const lum = (i) => d[i] * 0.3 + d[i + 1] * 0.59 + d[i + 2] * 0.11, ls = [];
+        for (let i = 0; i < d.length; i += 4 * 5) if (d[i + 3] > 250) ls.push(lum(i));
+        if (ls.length < 50) return cv.formF = null;
+        ls.sort((p, q2) => p - q2);
+        const med = ls[Math.floor(ls.length * 0.6)] || 1;
+        const c = document.createElement("canvas");
+        c.width = w;
+        c.height = h2;
+        const g = c.getContext("2d", { willReadFrequently: true }), im = g.createImageData(w, h2);
+        for (let i = 0; i < d.length; i += 4) {
+          const a = d[i + 3] / 255, fr = Math.max(0.62, Math.min(1.1, lum(i) / med)), v = 1 + (fr - 1) * a;
+          im.data[i] = im.data[i + 1] = im.data[i + 2] = Math.round(v * 200);
+          im.data[i + 3] = 255;
+        }
+        g.putImageData(im, 0, 0);
+        const c2 = document.createElement("canvas");
+        c2.width = w;
+        c2.height = h2;
+        const g2 = c2.getContext("2d", { willReadFrequently: true });
+        g2.fillStyle = "rgb(200,200,200)";
+        g2.fillRect(0, 0, w, h2);
+        g2.filter = "blur(1.2px)";
+        g2.drawImage(c, 0, 0);
+        g2.filter = "none";
+        const dd = g2.getImageData(0, 0, w, h2).data, F = new Float32Array(w * h2);
+        for (let i = 0, j = 0; j < F.length; i += 4, j++) F[j] = dd[i] / 200;
+        return cv.formF = { F, w, h: h2 };
+      }
+      const shadeSeen = /* @__PURE__ */ new WeakMap();
+      function bellyShade(img, sx, sy, ctx2) {
+        const b = ctx2.belly;
+        if (!b || !img) return null;
+        const fm = bellyForm(b.cv);
+        if (!fm) return null;
+        const w = img.naturalWidth || img.width, h2 = img.naturalHeight || img.height;
+        if (!w || !h2) return null;
+        const key = Math.round(sx) + "," + Math.round(sy) + "|" + ctx2.sig;
+        let e = shadeSeen.get(img);
+        if (e && e.key === key) return e.out;
+        const ox = Math.round(b.dx - sx), oy = Math.round(b.dy - sy), x0 = Math.max(0, ox), y0 = Math.max(0, oy), x1 = Math.min(w, ox + fm.w), y1 = Math.min(h2, oy + fm.h);
+        let out = null;
+        if (x1 > x0 && y1 > y0) {
+          const c = document.createElement("canvas");
+          c.width = w;
+          c.height = h2;
+          const g = c.getContext("2d", { willReadFrequently: true });
+          g.drawImage(img, 0, 0);
+          const part = g.getImageData(x0, y0, x1 - x0, y1 - y0), d = part.data;
+          let any = false;
+          for (let yy = y0; yy < y1; yy++) for (let xx = x0; xx < x1; xx++) {
+            const i = ((yy - y0) * (x1 - x0) + (xx - x0)) * 4;
+            if (d[i + 3] < 8) continue;
+            const k = fm.F[(yy - oy) * fm.w + (xx - ox)];
+            if (Math.abs(k - 1) < 0.01) continue;
+            any = true;
+            d[i] = Math.min(255, d[i] * k);
+            d[i + 1] = Math.min(255, d[i + 1] * k);
+            d[i + 2] = Math.min(255, d[i + 2] * k);
+          }
+          if (any) {
+            g.putImageData(part, x0, y0);
+            out = c;
+          }
+        }
+        shadeSeen.set(img, { key, out });
+        return out;
+      }
       function bellyRows(ctx2) {
         const b = ctx2.belly, bp = b.prof || (b.prof = edges(b.cv, b.cv.width, b.cv.height));
         let t = -1, e = -1;
@@ -2220,7 +2296,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
                   bv = null;
                 }
                 const base = bv || im, ox = bv ? MOULD.M : 0;
-                const key = "hand|" + src + "|" + Math.round(x) + "," + Math.round(y) + "|" + B.sig + (bv ? "|b" + ctx2.sig + "|" + MOULD.ver + "|" + base.width + "x" + base.height : "");
+                const key = "hand|" + src + "|" + Math.round(x) + "," + Math.round(y) + "|" + B.sig + (bv ? "|b" + ctx2.sig + "|" + MOULD.ver + "|" + base.width + "x" + base.height : "") + (ctx2.belly ? "|s" + ctx2.sig : "");
                 let c = BREAST.out.get(key);
                 if (!c) {
                   c = document.createElement("canvas");
@@ -2230,6 +2306,14 @@ One of mods you are using is using an old version of SDK. It will work for now b
                   g.drawImage(base, 0, 0);
                   g.globalCompositeOperation = "destination-out";
                   g.drawImage(B.mask, B.mx - (x - ox), B.my - y);
+                  if (ctx2.belly && !fit.behind && chestSlot(groupOf3(src)) && groupOf3(src) !== "Panties") {
+                    try {
+                      const sh = bellyShade(c, x - ox, y, ctx2);
+                      if (sh) c = sh;
+                    } catch (e) {
+                      console.warn("[body] belly form:", e);
+                    }
+                  }
                   if (BREAST.out.size > 60) BREAST.out.clear();
                   BREAST.out.set(key, c);
                 }
@@ -3080,6 +3164,18 @@ One of mods you are using is using an old version of SDK. It will work for now b
                       }
                     });
                   }
+                  if (ctx2.belly && !fit.behind) {
+                    try {
+                      const sh = bellyShade(c, x - c.MX, y - c.MY, ctx2);
+                      if (sh) {
+                        sh.MX = c.MX;
+                        sh.MY = c.MY;
+                        c = sh;
+                      }
+                    } catch (e) {
+                      console.warn("[body] belly form:", e);
+                    }
+                  }
                   if (BREAST.out.size > 60) BREAST.out.clear();
                   BREAST.out.set(key, c);
                 }
@@ -3420,7 +3516,11 @@ One of mods you are using is using an old version of SDK. It will work for now b
                 try {
                   if (ctx2.belly && !fit.behind && typeof src === "string") {
                     const q2 = isMoulded(src), m = q2 ? mouldCanvas(src, x, y, ctx2, q2.key, q2.mode) : bellyAuto(src, x, y, ctx2, fit.behind, (pieceOf(src) || {}).key);
-                    if (m) {
+                    const gname2 = groupOf3(src), formed = done && chestSlot(gname2) && gname2 !== "Panties" && (!q2 || q2.mode !== "under") ? m ? bellyShade(m, x - MOULD.M, y, ctx2) : bellyShade(mouldImg(src), x, y, ctx2) : null;
+                    if (formed) {
+                      put(name, formed, m ? x - MOULD.M : x, y, o);
+                      drawn = true;
+                    } else if (m) {
                       put(name, m, x - MOULD.M, y, o);
                       drawn = true;
                     }

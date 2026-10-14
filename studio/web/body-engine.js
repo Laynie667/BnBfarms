@@ -125,6 +125,48 @@ window.FarmBodyEngine = function (host) {
     if (grew) { span.v++; MOULD.ver++; clearTimeout(MOULD.t); MOULD.t = setTimeout(bellyDraw, 60); }
     return span;
   }
+  // THE BUMP UNDER CLOTHES. A piece that covers the belly and is as wide as it already (a long dress, a catsuit's legs,
+  // jeans) isn't grown, and lay over her flat, as if there were no belly under it (catalogue with the belly, Oct 14). Two
+  // tries at shading it on were taken back: her belly's own light laid on cloth made a pale window, and shading only the
+  // piece that covered the belly left a seam where it met the next layer. So: the belly's light and shade, as a FACTOR
+  // (darker toward its sides and underneath, a touch lighter where it's lit, never lighter than a tenth), multiplies every
+  // layer of everything worn over it, in the cloth's own colour. Every layer the same, so no seam.
+  function bellyForm(cv) {
+    if (cv.formF !== undefined) return cv.formF;
+    const w = cv.width, h = cv.height; let d;
+    try { d = cv.getContext("2d", { willReadFrequently: true }).getImageData(0, 0, w, h).data; } catch (e) { return (cv.formF = null); }
+    const lum = (i) => d[i] * 0.3 + d[i + 1] * 0.59 + d[i + 2] * 0.11, ls = [];
+    for (let i = 0; i < d.length; i += 4 * 5) if (d[i + 3] > 250) ls.push(lum(i));
+    if (ls.length < 50) return (cv.formF = null);
+    ls.sort((p, q) => p - q); const med = ls[Math.floor(ls.length * 0.6)] || 1;
+    // the factor as a picture, softened a little (the ink and the navel come through as a soft line, not a hard one)
+    const c = document.createElement("canvas"); c.width = w; c.height = h; const g = c.getContext("2d", { willReadFrequently: true }), im = g.createImageData(w, h);
+    for (let i = 0; i < d.length; i += 4) { const a = d[i + 3] / 255, fr = Math.max(0.62, Math.min(1.1, lum(i) / med)), v = 1 + (fr - 1) * a; im.data[i] = im.data[i + 1] = im.data[i + 2] = Math.round(v * 200); im.data[i + 3] = 255; }
+    g.putImageData(im, 0, 0);
+    const c2 = document.createElement("canvas"); c2.width = w; c2.height = h; const g2 = c2.getContext("2d", { willReadFrequently: true });
+    g2.fillStyle = "rgb(200,200,200)"; g2.fillRect(0, 0, w, h); g2.filter = "blur(1.2px)"; g2.drawImage(c, 0, 0); g2.filter = "none";
+    const dd = g2.getImageData(0, 0, w, h).data, F = new Float32Array(w * h);
+    for (let i = 0, j = 0; j < F.length; i += 4, j++) F[j] = dd[i] / 200;
+    return (cv.formF = { F, w, h });
+  }
+  // img (a picture or a canvas) drawn with its corner at (sx, sy): a copy with the belly's form on it, or null if it
+  // doesn't lie over the belly
+  const shadeSeen = new WeakMap();
+  function bellyShade(img, sx, sy, ctx) {
+    const b = ctx.belly; if (!b || !img) return null;
+    const fm = bellyForm(b.cv); if (!fm) return null;
+    const w = img.naturalWidth || img.width, h = img.naturalHeight || img.height; if (!w || !h) return null;
+    const key = Math.round(sx) + "," + Math.round(sy) + "|" + ctx.sig; let e = shadeSeen.get(img); if (e && e.key === key) return e.out;
+    const ox = Math.round(b.dx - sx), oy = Math.round(b.dy - sy), x0 = Math.max(0, ox), y0 = Math.max(0, oy), x1 = Math.min(w, ox + fm.w), y1 = Math.min(h, oy + fm.h);
+    let out = null;
+    if (x1 > x0 && y1 > y0) {
+      const c = document.createElement("canvas"); c.width = w; c.height = h; const g = c.getContext("2d", { willReadFrequently: true }); g.drawImage(img, 0, 0);
+      const part = g.getImageData(x0, y0, x1 - x0, y1 - y0), d = part.data; let any = false;
+      for (let yy = y0; yy < y1; yy++) for (let xx = x0; xx < x1; xx++) { const i = ((yy - y0) * (x1 - x0) + (xx - x0)) * 4; if (d[i + 3] < 8) continue; const k = fm.F[(yy - oy) * fm.w + (xx - ox)]; if (Math.abs(k - 1) < 0.01) continue; any = true; d[i] = Math.min(255, d[i] * k); d[i + 1] = Math.min(255, d[i + 1] * k); d[i + 2] = Math.min(255, d[i + 2] * k); }
+      if (any) { g.putImageData(part, x0, y0); out = c; }
+    }
+    shadeSeen.set(img, { key, out }); return out;
+  }
   // the belly's first and last row on the screen
   function bellyRows(ctx) { const b = ctx.belly, bp = b.prof || (b.prof = edges(b.cv, b.cv.width, b.cv.height)); let t = -1, e = -1; for (let j = 0; j < bp.h; j++) if (bp.L[j] >= 0) { if (t < 0) t = j; e = j; } return t < 0 ? null : { top: Math.round(b.dy) + t, bottom: Math.round(b.dy) + e }; }
   function mouldCanvas(src, x, y, ctx, piece, mode) {
@@ -392,9 +434,12 @@ window.FarmBodyEngine = function (host) {
             // Laynie's marks, Oct 14. Only panties: given the belly's version here, bands under the breasts were stretched out sideways.)
             let bv = null; try { bv = ctx.belly && !fit.behind && LOWER_GROUPS.test(groupOf(src)) ? bellyAuto(src, x, y, ctx, fit.behind, (pieceOf(src) || {}).key) : null; } catch (e) { bv = null; }
             const base = bv || im, ox = bv ? MOULD.M : 0;
-            const key = "hand|" + src + "|" + Math.round(x) + "," + Math.round(y) + "|" + B.sig + (bv ? "|b" + ctx.sig + "|" + MOULD.ver + "|" + base.width + "x" + base.height : "");
+            const key = "hand|" + src + "|" + Math.round(x) + "," + Math.round(y) + "|" + B.sig + (bv ? "|b" + ctx.sig + "|" + MOULD.ver + "|" + base.width + "x" + base.height : "") + (ctx.belly ? "|s" + ctx.sig : "");
             let c = BREAST.out.get(key);
-            if (!c) { c = document.createElement("canvas"); c.width = base.naturalWidth || base.width; c.height = base.naturalHeight || base.height; const g = c.getContext("2d"); g.drawImage(base, 0, 0); g.globalCompositeOperation = "destination-out"; g.drawImage(B.mask, B.mx - (x - ox), B.my - y); if (BREAST.out.size > 60) BREAST.out.clear(); BREAST.out.set(key, c); }
+            if (!c) { c = document.createElement("canvas"); c.width = base.naturalWidth || base.width; c.height = base.naturalHeight || base.height; const g = c.getContext("2d"); g.drawImage(base, 0, 0); g.globalCompositeOperation = "destination-out"; g.drawImage(B.mask, B.mx - (x - ox), B.my - y);
+              /* (and the belly's form on it, if it's worn over the belly: a skirt, jeans, a catsuit's legs, a belt) */
+              if (ctx.belly && !fit.behind && chestSlot(groupOf(src)) && groupOf(src) !== "Panties") { try { const sh = bellyShade(c, x - ox, y, ctx); if (sh) c = sh; } catch (e) { console.warn("[body] belly form:", e); } }
+              if (BREAST.out.size > 60) BREAST.out.clear(); BREAST.out.set(key, c); }
             put(name, c, x - ox, y, o); return true;
           };
           // ── straps round each breast ──
@@ -862,6 +907,7 @@ window.FarmBodyEngine = function (host) {
                   g.strokeStyle = "rgba(0,0,0,0.42)"; g.lineWidth = 1.5; g.lineCap = "round";
                   for (let k = 0; k < 2; k++) { g.beginPath(); g.ellipse(bcx[k] + (k ? 1 : -1) * (S2.ro - S2.ri) / 2, bcy, (S2.ro + S2.ri) / 2, S2.rv, 0, Math.PI * 0.08, Math.PI * 0.92); g.stroke(); } });
               }
+              if (ctx.belly && !fit.behind) { try { const sh = bellyShade(c, x - c.MX, y - c.MY, ctx); if (sh) { sh.MX = c.MX; sh.MY = c.MY; c = sh; } } catch (e) { console.warn("[body] belly form:", e); } }
               if (BREAST.out.size > 60) BREAST.out.clear(); BREAST.out.set(key, c);
             }
             put(name, c, x - c.MX, y - c.MY, o); return true;
@@ -1005,7 +1051,10 @@ window.FarmBodyEngine = function (host) {
                 put(blink ? "drawImageBlink" : "drawImage", GEN.cv, x + 49.5 - GEN.cv.ax, y + 110 - GEN.cv.ay, {}); return; } catch (e) { console.warn("[studio] cock:", e); }
             }
             let drawn = false;
-            try { if (ctx.belly && !fit.behind && typeof src === "string") { const q = isMoulded(src), m = q ? mouldCanvas(src, x, y, ctx, q.key, q.mode) : bellyAuto(src, x, y, ctx, fit.behind, (pieceOf(src) || {}).key); if (m) { put(name, m, x - MOULD.M, y, o); drawn = true; } } } catch (e) { console.warn("[studio] mould:", e); }
+            try { if (ctx.belly && !fit.behind && typeof src === "string") { const q = isMoulded(src), m = q ? mouldCanvas(src, x, y, ctx, q.key, q.mode) : bellyAuto(src, x, y, ctx, fit.behind, (pieceOf(src) || {}).key);
+                const gname2 = groupOf(src), formed = done && chestSlot(gname2) && gname2 !== "Panties" && (!q || q.mode !== "under") ? (m ? bellyShade(m, x - MOULD.M, y, ctx) : bellyShade(mouldImg(src), x, y, ctx)) : null;
+                if (formed) { put(name, formed, m ? x - MOULD.M : x, y, o); drawn = true; }
+                else if (m) { put(name, m, x - MOULD.M, y, o); drawn = true; } } } catch (e) { console.warn("[studio] mould:", e); }
             if (!drawn) put(name, src, x, y, o);
             if (!blink) { try { after(src, x, y, o); } catch (e) { console.warn("[studio] belly:", e); } }
           } : real[name]);

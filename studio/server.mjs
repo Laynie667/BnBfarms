@@ -79,6 +79,10 @@ createServer(async (req, res) => {
     }
     if (path.startsWith("/__studio/")) { const f = inside(WEB, path.slice("/__studio/".length)); if (f) return send(res, f); }
     const f = inside(GAME, path);
+    // A piece the game only draws for a flat chest (the Button Shirt, the vests: "male" clothes) has no pictures for a chest
+    // with breasts, and draws nothing there. Its flat-chest picture is sent instead, and fitted to her like anything else.
+    // (Laynie, Oct 14: "some clothes are gendered~ but no worries we can plan for them anyway".)
+    if (f && !existsSync(f) && /_(Small|Normal|Large|XLarge)(?=[_.])/.test(f)) { const flat = f.replace(/_(Small|Normal|Large|XLarge)(?=[_.])/, "_FlatMedium"); if (existsSync(flat)) return send(res, flat); }
     if (f) return send(res, f);
     res.writeHead(403).end("no");
   } catch (e) { res.writeHead(500, { "Content-Type": "text/plain" }).end(String(e && e.message || e)); }

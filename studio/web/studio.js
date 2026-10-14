@@ -810,7 +810,7 @@
             // it is grown: grown, its top trim was landing on the breast (Laynie, Oct 13: "the latex corset shows stuff on
             // the breast"). It's drawn as the game draws it, and the breasts sit in front of its top edge.
             const pk0 = (pieceOf(src) || {}).key;
-            if (chestCover(src, im, x, y, B, false) < 0.05 && !BREAST.on[pk0]) return BREAST.holds[pk0] ? handDraw(name, src, x, y, o) : false;
+            if (chestCover(src, im, x, y, B, false) < 0.012 && !BREAST.on[pk0])   /* (a rope or a thin strap across the breast covers very little of it, and is still ON it: the box-tie ropes were being taken for an underbust piece and hidden behind her breasts. Found in the catalogue, Oct 14.) */ return BREAST.holds[pk0] ? handDraw(name, src, x, y, o) : false;
             const pc0 = pieceOf(src), wm = (pc0 && BREAST.wear[pc0.key]) || "", pin = wm === "nipple" || (wm === "" && !!pc0 && NIP_PIECES.test(pc0.name)), mapYp = pin && B.fit.mapYN ? B.fit.mapYN : B.fit.mapY;
             const key = "dress|" + (pin ? "pin|" : "") + src + "|" + Math.round(x) + "," + Math.round(y) + "|" + B.sig + "|" + (ctx.belly && !fit.behind && BELLY.auto !== false ? ctx.sig : "") + "|" + MOULD.ver;
             let c = BREAST.out.get(key);
@@ -1079,7 +1079,7 @@
                     if (t0 >= 0) { const cyL = y + (t0 + t1) / 2 - ctx.breast.uy; real[name](src, x, y + (ctx.breast.fit.mapY(cyL) - cyL), o); return; } } } catch (e) { console.warn("[studio] decal:", e); }
               }
               if (done && chestSlot(gname) && !/Decal/i.test(gname) && !isMoulded(src)) { const piece = pieceOf(src), how = (piece && BREAST.wear[piece.key]) || "";
-                try { const im0 = piece && ctx.breast && mouldImg(src); if (im0 && chestCover(src, im0, x, y, ctx.breast, true) >= 0.05) ctx.seen[piece.key] = true; if (im0 && chestCover(src, im0, x, y, ctx.breast, false) >= 0.05) ctx.seen["on:" + piece.key] = true; if (im0 && chestCover(src, im0, x, y, ctx.breast, false) >= 0.6) ctx.seen["solid:" + piece.key] = true; } catch (e) { /* only a measurement */ }
+                try { const im0 = piece && ctx.breast && mouldImg(src); if (im0 && chestCover(src, im0, x, y, ctx.breast, true) >= 0.05) ctx.seen[piece.key] = true; if (im0 && chestCover(src, im0, x, y, ctx.breast, false) >= 0.012) ctx.seen["on:" + piece.key] = true; if (im0 && chestCover(src, im0, x, y, ctx.breast, false) >= 0.6) ctx.seen["solid:" + piece.key] = true; } catch (e) { /* only a measurement */ }
                 try { if (how === "behind") { if (handDraw(name, src, x, y, o)) return; }
                   else if (how !== "plain" && BREAST.dress) { if (dressDraw(name, src, x, y, o)) return; } }   /* ("nipple" goes through dressDraw too: it reads the choice itself) */ catch (e) { console.warn("[studio] chest wear:", e); } }
               // Hands, and what's worn on the wrists and arms. They're the game's own pictures and they stay WHOLE: either in
@@ -1093,7 +1093,8 @@
               // sleeve, a fishnet arm are each their own piece in their own slot, and hiding "the hands" left all of those
               // hanging there without them: Laynie's own outfit, Oct 13, "what is up with the hands?". Left alone, the game
               // draws them all together, in front, and that is always right. So that's the default.)
-              if (done && BREAST.tuck && (HAND_GROUPS.has(gname) || ARM_GROUPS.has(gname) || /Hand|Glove|Nail|Ring|Bracelet|Sleeve/i.test(gname)) && ctx.breast && ctx.breast.pose !== "AllFours") {
+              /* (only what is worn ON the hands and wrists: ropes, harnesses, binders and jackets in the arms slot are bondage on the body, and treated as hands they vanished. Found in the catalogue, Oct 14.) */
+              if (done && BREAST.tuck && (HAND_GROUPS.has(gname) || (ARM_GROUPS.has(gname) && !/Rope|Harness|Binder|Jacket|Strait|Dress|Suit|Belt|Yoke|Pillory|Chain|Web|Tape|Bondage/i.test(src.slice(src.lastIndexOf("/") + 1))) || /Hand|Glove|Nail|Ring|Bracelet|Sleeve/i.test(gname)) && ctx.breast && ctx.breast.pose !== "AllFours") {
                 try { if (/^Hands/.test(gname)) { const fr = handHidden(src, x, y); if (fr != null) ctx.handF = Math.max(ctx.handF || 0, fr); } } catch (e) { console.warn("[studio] hands:", e); }
                 // Her breasts hang IN FRONT of her hands (Laynie, Oct 13: "the hands don't layer properly with the breast"): the
                 // hands were being drawn over the underside of them, or else vanishing whole. So each hand picture, and

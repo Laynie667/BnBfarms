@@ -69,13 +69,29 @@ window.FarmBodyEngine = function (host) {
   //   under: the piece stays on the body where it was and the belly hangs in front: the belly's shape is cut out of it.
   const MOULD = { ver: 0, lies: new Set(), span: new Map(), cover: new Map(), items: new Set(), mode: new Map(), ext: new Map(), img: new Map(), prof: new Map(), out: new Map(), M: 150 };
   const mouldKey = (it) => it.Asset.Group.Name + "/" + it.Asset.Name;
+  // a picture an add-on supplies (the Echo clothing mod's): the address the add-on gives the game for it. The add-on steps
+  // into the game's DrawGetImage and swaps the address there, and the first thing DrawGetImage does is look the address up
+  // in the game's picture list. So that lookup is watched for a moment (and answered with nothing, so nothing is loaded
+  // or kept), and the address it was asked for is the one.
+  const W = window;
+  const mapSrc = host.mapSrc || ((src) => {
+    if (typeof W.DrawGetImage !== "function") return src;
+    /* (the game's live version keeps that list in a const, which isn't on window: named bare, it still answers) */
+    // eslint-disable-next-line no-undef
+    const lists = [typeof DrawCacheImage !== "undefined" ? DrawCacheImage : W.DrawCacheImage, W.DrawImageCache].filter((c) => c && typeof c.get === "function"); if (!lists.length) return src;
+    let seen = null; const kept = lists.map((c) => [c, Object.prototype.hasOwnProperty.call(c, "get"), c.get]);
+    try { for (const [c] of kept) c.get = function (k) { if (seen == null) seen = k; return { isLoaded: () => false, data: undefined, complete: false }; }; W.DrawGetImage(src); }
+    catch (e) { /* nothing */ }
+    finally { for (const [c, own, g] of kept) { if (own) c.get = g; else delete c.get; } }
+    return typeof seen === "string" && seen ? seen : src;
+  });
   function mouldImg(src) {
     let e = MOULD.img.get(src);
     // (a picture an add-on supplies, the Echo clothing mod's, isn't on the game's own server: the add-on hands the game its own
     // address for it. host.mapSrc, when there is one, gives that address, so the very picture the game draws is the one fitted.)
     if (!e) { e = { img: new Image(), ok: false }; e.img.onload = () => { e.ok = true; clearTimeout(MOULD.t); MOULD.t = setTimeout(bellyDraw, 60); };
       // (tried at the game's own address first: only a picture that isn't there is looked up again)
-      e.img.onerror = () => { if (!e.retried) { e.retried = true; let url = src; try { if (host.mapSrc) url = host.mapSrc(src) || src; } catch (er) { url = src; } if (url !== src) { e.img.crossOrigin = "anonymous"; e.img.src = url; return; } } e.bad = true; };
+      e.img.onerror = () => { if (!e.retried) { e.retried = true; let url = src; try { url = mapSrc(src) || src; } catch (er) { url = src; } if (url !== src) { e.img.crossOrigin = "anonymous"; e.img.src = url; return; } } e.bad = true; };
       e.img.src = src; MOULD.img.set(src, e); }
     return e.ok ? e.img : null;
   }

@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.18.4
+// @version      0.18.5
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -230,7 +230,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.18.4";
+  var VERSION = "0.18.5";
 
   // extension/src/config.js
   var BOT_MEMBER = 260239;
@@ -1641,6 +1641,28 @@ One of mods you are using is using an old version of SDK. It will work for now b
       }
       const MOULD = { ver: 0, lies: /* @__PURE__ */ new Set(), span: /* @__PURE__ */ new Map(), cover: /* @__PURE__ */ new Map(), items: /* @__PURE__ */ new Set(), mode: /* @__PURE__ */ new Map(), ext: /* @__PURE__ */ new Map(), img: /* @__PURE__ */ new Map(), prof: /* @__PURE__ */ new Map(), out: /* @__PURE__ */ new Map(), M: 150 };
       const mouldKey = (it) => it.Asset.Group.Name + "/" + it.Asset.Name;
+      const W4 = window;
+      const mapSrc = host.mapSrc || ((src) => {
+        if (typeof W4.DrawGetImage !== "function") return src;
+        const lists = [typeof DrawCacheImage !== "undefined" ? DrawCacheImage : W4.DrawCacheImage, W4.DrawImageCache].filter((c) => c && typeof c.get === "function");
+        if (!lists.length) return src;
+        let seen = null;
+        const kept = lists.map((c) => [c, Object.prototype.hasOwnProperty.call(c, "get"), c.get]);
+        try {
+          for (const [c] of kept) c.get = function(k) {
+            if (seen == null) seen = k;
+            return { isLoaded: () => false, data: void 0, complete: false };
+          };
+          W4.DrawGetImage(src);
+        } catch (e) {
+        } finally {
+          for (const [c, own, g] of kept) {
+            if (own) c.get = g;
+            else delete c.get;
+          }
+        }
+        return typeof seen === "string" && seen ? seen : src;
+      });
       function mouldImg(src) {
         let e = MOULD.img.get(src);
         if (!e) {
@@ -1655,7 +1677,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
               e.retried = true;
               let url = src;
               try {
-                if (host.mapSrc) url = host.mapSrc(src) || src;
+                url = mapSrc(src) || src;
               } catch (er) {
                 url = src;
               }
@@ -2525,7 +2547,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
                   }
                   g.drawImage(B.mask, MX + B.mx - x, MY + B.my - y);
                   g.globalCompositeOperation = "source-over";
-                  const ho = herOutline(B), W4 = fm.width, rgb2 = (q2, k) => "rgb(" + q2.map((u) => Math.max(0, Math.min(255, Math.round(u * k)))).join(",") + ")";
+                  const ho = herOutline(B), W5 = fm.width, rgb2 = (q2, k) => "rgb(" + q2.map((u) => Math.max(0, Math.min(255, Math.round(u * k)))).join(",") + ")";
                   for (const hv of ho) {
                     const sv = fm.sides.find((q2) => q2.sd === hv.sd);
                     if (!sv) continue;
@@ -2534,7 +2556,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
                     for (let k = 0; k <= FRAME_N; k++) {
                       const a = k % FRAME_N, ta = a / FRAME_N * Math.PI * 2, on = !!sv.hit[a] && hv.edge[a] > 0 && Math.sin(ta) < 0.3 && Math.cos(ta) > -0.6;
                       if (on) {
-                        const t = a / FRAME_N * Math.PI * 2, ux = Math.cos(t) * hv.sd, uy = Math.sin(t), rr = hv.edge[a] - W4 * 0.45;
+                        const t = a / FRAME_N * Math.PI * 2, ux = Math.cos(t) * hv.sd, uy = Math.sin(t), rr = hv.edge[a] - W5 * 0.45;
                         (cur || (cur = [])).push([MX + hv.cx - x + ux * rr, MY + hv.cy - y + uy * rr]);
                       } else if (cur) {
                         segs.push(cur);
@@ -2553,26 +2575,26 @@ One of mods you are using is using an old version of SDK. It will work for now b
                     g.lineCap = "round";
                     g.lineJoin = "round";
                     for (const at of sv.att || []) {
-                      const t = at.a / FRAME_N * Math.PI * 2, ux = Math.cos(t) * hv.sd, uy = Math.sin(t), rr = hv.edge[at.a] - W4 * 0.45;
+                      const t = at.a / FRAME_N * Math.PI * 2, ux = Math.cos(t) * hv.sd, uy = Math.sin(t), rr = hv.edge[at.a] - W5 * 0.45;
                       segs.push([[MX + at.x, MY + at.y], [MX + hv.cx - x + ux * rr, MY + hv.cy - y + uy * rr]]);
                     }
                     for (const pts of segs) {
                       if (pts.length < 2) continue;
                       path(pts);
                       g.strokeStyle = rgb2(fm.col, 0.55);
-                      g.lineWidth = W4 + 1.5;
+                      g.lineWidth = W5 + 1.5;
                       g.stroke();
                       path(pts);
                       g.strokeStyle = rgb2(fm.col, 1);
-                      g.lineWidth = W4;
+                      g.lineWidth = W5;
                       g.stroke();
                       path(pts.map((p, i) => {
                         const q2 = pts[Math.min(pts.length - 1, i + 1)], pp = pts[Math.max(0, i - 1)], dx = q2[0] - pp[0], dy = q2[1] - pp[1], L = Math.hypot(dx, dy) || 1;
-                        return [p[0] - dy / L * W4 * 0.18, p[1] + dx / L * W4 * 0.18];
+                        return [p[0] - dy / L * W5 * 0.18, p[1] + dx / L * W5 * 0.18];
                       }));
                       g.globalAlpha = 0.55;
                       g.strokeStyle = rgb2(fm.hi, 1);
-                      g.lineWidth = Math.max(1, W4 * 0.22);
+                      g.lineWidth = Math.max(1, W5 * 0.22);
                       g.stroke();
                       g.globalAlpha = 1;
                     }
@@ -3864,32 +3886,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       },
       // never: your body items are yours
       redraw: () => redraw(60),
-      picture,
-      // a picture an add-on supplies (the Echo clothing mod's): the address the add-on gives the game for it. The add-on steps
-      // into the game's DrawGetImage and swaps the address there, and the first thing DrawGetImage does is look the address up
-      // in the game's picture list. So that lookup is watched for a moment (and answered with nothing, so nothing is loaded
-      // or kept), and the address it was asked for is the one.
-      mapSrc: (src) => {
-        if (typeof W2.DrawGetImage !== "function") return src;
-        const lists = [typeof DrawCacheImage !== "undefined" ? DrawCacheImage : W2.DrawCacheImage, W2.DrawImageCache].filter((c) => c && typeof c.get === "function");
-        if (!lists.length) return src;
-        let seen = null;
-        const kept = lists.map((c) => [c, Object.prototype.hasOwnProperty.call(c, "get"), c.get]);
-        try {
-          for (const [c] of kept) c.get = function(k) {
-            if (seen == null) seen = k;
-            return { isLoaded: () => false, data: void 0, complete: false };
-          };
-          W2.DrawGetImage(src);
-        } catch (e) {
-        } finally {
-          for (const [c, own, g] of kept) {
-            if (own) c.get = g;
-            else delete c.get;
-          }
-        }
-        return typeof seen === "string" && seen ? seen : src;
-      }
+      picture
     });
     apply();
     return E;

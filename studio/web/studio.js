@@ -516,6 +516,18 @@
     } catch (e) { if (tell) say("I couldn't read the saved fits: " + (e && e.message || e), true); }
   }
 
+  // ── the Echo clothing mod ──
+  // Its items are added while the game runs, so to try them on here the studio loads the mod itself, from its own site (the
+  // address in its README, the same script installed in the game). It needs the internet; nothing else in the studio does.
+  // Only when the button is pressed. Its pictures come from its site too, and the drawing reads them like any other.
+  const ECHO_URL = "https://sugarchain-studio.github.io/echo-clothing-ext/bc-cloth.user.js";
+  function loadEcho() {
+    const btn = document.getElementById("fh-echo"); if (S.echo) return say("The Echo clothing mod is already loaded.");
+    S.echo = true; if (btn) btn.disabled = true; const before = Asset.length; say("Loading the Echo clothing mod…");
+    const el = document.createElement("script"); el.src = ECHO_URL + "?t=" + Date.now(); el.onerror = () => { S.echo = false; if (btn) btn.disabled = false; say("The Echo clothing mod didn't load (no internet, or its site is down).", true); };
+    el.onload = () => { let n = 0; const tick = () => { n++; const added = Asset.length - before; if (added > 0 && n > 6) { say("Echo clothing mod loaded: " + added + " items added. They're in each slot's list."); try { fillItems(); } catch (e) { /* not yet */ } return; } if (n > 60) { say(added > 0 ? "Echo clothing mod loaded: " + added + " items." : "The Echo script loaded but added no items yet. Give it a moment and look in the slot lists.", !added); return; } setTimeout(tick, 500); }; tick(); };
+    document.head.append(el);
+  }
   // ── the panel ──
   const buttons = [];   // [el, isOn()]
   const toggle = (label, isOn, act) => { const el = $("button", { type: "button", textContent: label, onclick: () => { try { act(); } catch (e) { say(String(e && e.message || e), true); } } }); buttons.push([el, isOn]); return el; };
@@ -532,6 +544,8 @@
         $("button", { type: "button", textContent: "Copy this look as a code", onclick: async () => { const code = encode(S.C); box.value = code; try { await navigator.clipboard.writeText(code); say("Copied. Paste it into the game with WCE's /importlooks or BCX's import."); } catch (e) { say("It's in the box above: select it and copy."); } } }),
         $("button", { type: "button", textContent: "Strip to bare", onclick: () => { CharacterNaked(S.C, false); redraw(); say("Bare."); } }),
         $("button", { type: "button", textContent: "Start over", onclick: () => { CharacterAppearanceSetDefault(S.C); redraw(); say("Back to the game's plain starting look."); } })),
+      $("div", { className: "row" },
+        $("button", { type: "button", id: "fh-echo", textContent: "Load the Echo clothing mod", title: "Adds the Echo clothing mod's items, from its own site (the same script you install in the game). Needs the internet; nothing else here does.", onclick: loadEcho })),
       $("div", { id: "fh-say" }),
       $("h2", { textContent: "Try something on" }),
       $("div", { className: "row" },

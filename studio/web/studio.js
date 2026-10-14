@@ -780,7 +780,7 @@
               const GB = gameBreast(B), MX = 260, MY = 480, w = im.naturalWidth, h = im.naturalHeight, S2 = B.S;
               c = document.createElement("canvas"); c.width = w + MX * 2; c.height = h + MY * 2; c.MX = MX; c.MY = MY; const g = c.getContext("2d");
               g.drawImage(im, MX, MY); g.globalCompositeOperation = "destination-out"; g.drawImage(B.mask, MX + B.mx - x, MY + B.my - y); g.globalCompositeOperation = "source-over";   // behind her breasts
-              const b0 = Math.round(B.uy + GB.y + GB.r * 0.62 - y), b1 = Math.round(B.uy + GB.y + GB.r * 1.65 - y), gUnder = B.uy + GB.y + GB.r, herUnder = B.ry + S2.by + (B.fit.rv || S2.r), dy = herUnder - gUnder, kx = B.fit.kx || 1, mid = B.mid - x;
+              const b0 = Math.round(B.uy + GB.y + GB.r * 0.62 - y), b1 = Math.round(B.uy + GB.y + GB.r * 1.65 - y), gUnder = B.uy + GB.y + GB.r, herUnder = B.ry + S2.by + (B.fit.rv || S2.r), dy = herUnder - gUnder, kx = 1, mid = B.mid - x;   /* not widened: her ribs under her breasts are as wide at any cup size (Laynie, Oct 14: "the width of the character without the breast would be the same width no matter the tit size") */
               if (b1 > b0) { const strip = document.createElement("canvas"); strip.width = w; strip.height = b1 - b0; strip.getContext("2d").drawImage(im, 0, b0, w, b1 - b0, 0, 0, w, b1 - b0);
                 g.drawImage(strip, MX + mid - mid * kx, MY + b0 + dy, w * kx, b1 - b0); }
               if (BREAST.out.size > 60) BREAST.out.clear(); BREAST.out.set(key, c);

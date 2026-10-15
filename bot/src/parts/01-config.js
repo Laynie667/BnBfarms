@@ -157,12 +157,12 @@
       testes: { label:"Balls",  start:3, natural:10, max:20,
                 names:["tiny","small","average","full","heavy","big","huge","swollen","massive","enormous",
                        "hyper","melon-sized","sloshing","colossal","basketball-sized","titanic","immobilizing","mountainous","room-filling","impossibly huge"] },
-      penis:  { label:"Penis",  start:6, natural:14, max:30, step:2, inches:true,   // inches; a shot adds or takes 2"
+      penis:  { label:"Cock",   start:6, natural:14, max:30, step:2, inches:true,   // inches; a shot adds or takes 2"
                 words:[[3,"tiny"],[5,"small"],[7,"average"],[9,"big"],[12,"huge"],[16,"massive"],[20,"enormous"],[25,"monstrous"],[31,"hyper"]] },
-      vulva:  { label:"Vulva",  start:1, natural:10, max:20, gape:true,
+      vulva:  { label:"Pussy",  start:1, natural:10, max:20, gape:true,
                 names:["tight","snug","slightly gaped","gaped","loose","well-used","gaping","wide open","cavernous","ruined",
                        "hyper-gaped","fist-wide","yawning","arm-deep","sloppy and slack","bottomless","hollowed out","endless","abyssal","impossibly gaped"] },
-      butt:   { label:"Butt",   start:1, natural:10, max:20, gape:true,
+      butt:   { label:"Ass",    start:1, natural:10, max:20, gape:true,
                 names:["tight","snug","slightly gaped","gaped","loose","well-used","gaping","wide open","cavernous","ruined",
                        "hyper-gaped","fist-wide","yawning","arm-deep","sloppy and slack","bottomless","hollowed out","endless","abyssal","impossibly gaped"] },
       knot:   { label:"Knot",   start:3, natural:10, max:20,    // only for knotted cocks

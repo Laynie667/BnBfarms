@@ -40,6 +40,19 @@ const check=(b,who,label,t0)=>{ const why=[], t=t0.replace(/you've no womb/g,'')
   if(b.g==='male'&&GIRL.test(t)) why.push('girl word: '+t.match(GIRL)[0]); if(CLINICAL.test(t)) why.push('clinical: '+t.match(CLINICAL)[0]); if(LEAK.test(t)) why.push('leak: '+t.match(LEAK)[0]);
   if(why.length) report.problems.push({who,label,why,text:t}); return why.length; };
 const STRAINS=['breeder','grower','glutton','tyrant'];
+const WANTS={ breeder:['bred','kiss','nest'], grower:['swallow','milked','glory'], glutton:['milked','swallow','glory'], tyrant:['kneel','beg','kiss'] };
+const urgeSeen={}, urgeDone={};
+// doing what it asked, the way a player would
+async function obey(mn, k){
+  const C=chars.find(c=>c.MemberNumber===mn), back=Object.assign({}, C.MapData.Pos);
+  if (k==='kiss') W.__kiss('kiss','ItemMouth',mn,221397);
+  else if (k==='swallow') W.__load(910===mn?500:910,mn,'mouth',120);
+  else if (k==='bred') W.__load(600===mn?500:600,mn,W.__body(mn).vulva?'vulva':'butt',120);
+  else if (k==='milked'){ const p=W.__prodOf(mn); p.milk=Math.max(p.milk||0,300); W.__drainMilk(mn,150); }
+  else if (k==='nest'||k==='glory'){ C.MapData.Pos={X:k==='nest'?60:80,Y:k==='nest'?60:10}; for (let i=0;i<2;i++){ W.__parasiteTick(); await wait(30); } C.MapData.Pos=back; }
+  else if (k==='kneel'){ C.ActivePose=['Kneel']; for (let i=0;i<4;i++){ W.__parasiteTick(); await wait(30); } C.ActivePose=[]; }
+  else if (k==='beg') handlers.ChatRoomMessage({Sender:mn,Type:'Chat',Content:'Please, please, I need it so bad'});
+}
 
 (async()=>{ await wait(3500); const cfg=W.__cfg; cfg.USER_COOLDOWN_S=0; cfg.SEND_INTERVAL_MS=2; cfg.PARASITE_KISS_CHANCE=1; cfg.PARASITE_SEED_CHANCE=0;
   chars[1].Name='Laynie'; BODIES.forEach(([mn,name],i)=>chars[i+2].Name=name);
@@ -60,9 +73,11 @@ const STRAINS=['breeder','grower','glutton','tyrant'];
         const now=Date.now(), G=g(); if(!G) break; last=G;
         G.since=now-h*3600000; G.until=G.since+12*3600000; G.next=0;
         p.milk=Math.max(p.milk||0,200); p.semen=Math.max(p.semen||0,120); P(mn).trapQuiet=0; P(mn).quietUntil=0;
-        if (h===2) G.urgeAt=0;                                       // it wants somethin'...
-        if (h===2.5 && G.urge){ if (G.urge.kind==='kiss') W.__kiss('kiss','ItemMouth',mn,221397); else if (G.urge.kind==='swallow') W.__load(910===mn?500:910,mn,'mouth',120); else G.urge.until=0; }   // ...and gets it, or doesn't
-        if (h===5) { G.urgeAt=0; } if (h===5.5 && G.urge) G.urge.until=0;   // ...and once it's let down
+        // it wants somethin' (each strain its own things: 10v2 STRAIN_URGES), six times over: done, done, ignored, done, done, ignored
+        if ([2, 3.5, 5, 6.5, 8, 9.5].includes(h)) { G.urge=null; G.urgeAt=0; }
+        if ([2.5, 4, 7, 8.5].includes(h) && G.urge){ const k=G.urge.kind; (urgeSeen[strain]=urgeSeen[strain]||{})[k]=(urgeSeen[strain][k]||0)+1; await obey(mn, k); await wait(60);
+          (urgeDone[strain]=urgeDone[strain]||{})[k]=(urgeDone[strain][k]||0)+(G.urge?0:1); }
+        if ([5.5, 10].includes(h) && G.urge){ (urgeSeen[strain]=urgeSeen[strain]||{})[G.urge.kind]=(urgeSeen[strain][G.urge.kind]||0)+1; G.urge.until=0; }   // ...and ignored
         if (h===3) { G.ate=now-50*60000; G.told=0; }                 // the cravin'
         if (h===7) W.__load(500===mn?600:500,mn,'mouth',150);        // a swallowed load turned to serum
         if (h===9 && strain==='tyrant') W.__climax(mn);               // a Tyrant eats what they reach for
@@ -72,7 +87,8 @@ const STRAINS=['breeder','grower','glutton','tyrant'];
         lines.push(...since(n));
       }
       n=sent.length; if (g()){ g().until=Date.now()-1; W.__parasiteTick(); await wait(60); await drain(); } lines.push(...since(n)); const G=last;   // (it may have dropped off by itself at hour twelve)
-      const mine=[...new Set(lines)].filter(t=>!/^\?|^🧪/.test(t)), size1=prod(mn).size||{};
+      const others=BODIES.filter(([m2,nm])=>nm!==name).map(([m2,nm])=>new RegExp('\\b'+nm+'\\b'));   // (a line about somebody else in the room is theirs)
+      const mine=[...new Set(lines)].filter(t=>!/^\?|^🧪/.test(t) && !others.some(re=>re.test(t))), size1=prod(mn).size||{};
       let probs=0; for (const t of mine) probs+=check(b,name,strain,t);
       const grew=Object.keys(size1).filter(k=>JSON.parse(size0)[k]!==size1[k]);
       report.runs[strain+':'+name]={got,lines:mine.length,stages,grew,eggs:(prod(mn).eggs||{}).n||0,drunk:G&&G.drunk||0,eaten:G&&G.eaten||0,denied:!!(prod(mn).deniedUntil),probs,heard:mine};
@@ -88,6 +104,12 @@ const STRAINS=['breeder','grower','glutton','tyrant'];
     }
   }
 
+  // ── what each strain wanted, and whether doin' it counted ──
+  for (const st of STRAINS){ const seen=Object.keys(urgeSeen[st]||{}), done=urgeDone[st]||{};
+    out(st.padEnd(8)+' wanted: '+seen.map(k=>k+' x'+urgeSeen[st][k]+(done[k]!=null?' (obeyed '+done[k]+')':'')).join(', '));
+    ok(seen.length>0 && seen.every(k=>WANTS[st].includes(k)), '  '+st+' only wants its own things');
+    ok(seen.length>=2, '  '+st+' wants more than one thing');
+    ok(Object.keys(done).every(k=>done[k]>0), '  '+st+': doing what it wanted counts, every kind ('+JSON.stringify(done)+')'); }
   // ── the ways it gets on somebody, and the belt it comes back as ──
   W.__forceStrain=null;
   const fresh=mn=>{ const r=P(mn); r.parasite=null; r.parasiteNext=0; r.parasiteN=0; r.parasiteSeed=0; };

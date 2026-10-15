@@ -5,7 +5,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 | Script | File in `dist/` | Where it runs | Current |
 |---|---|---|---|
-| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.30.3** |
+| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.30.4** |
 | Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.6.0** |
 | Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.1.3** |
 | Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **1.0.4** |
@@ -23,6 +23,8 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 - Running the watcher on more than one game at once (the bot, yours, a tester's) lets Claude line them up into one timeline.
 
 ## Latest changes (newest first)
+
+- **Bot 0.30.4: parasites want their own things; potions seen five ways.** Laynie: "lets do the parasites, the seen drinking lines". (1) **Each strain's urges:** the Breeder wants them bred (a load in pussy or ass), a kiss, or the nest; the Grower a load swallowed, a milkin', a glory stall; the Glutton a milkin', a load swallowed, a glory stall; the Tyrant wants them on their knees, beggin' out loud, or a kiss. Only what can be done: no swallowin' without its lips, no milkin' for somebody who makes nothin', no nest or stall the farm hasn't got. Doin' it counts the way you'd expect: a load in the right hole, bein' milked by a stall, a machine or a hand (not the parasite's own drinkin'), standin' in the nest, kneelin' (or on all fours) for a minute, sayin' please. New lines for every urge, and each strain thanks and punishes in its own voice. (2) **Potions:** four more ways the room sees each of the 22 bottles go down (88 lines), picked fresh and fitted to the body; the private "how it tastes" line is fitted too (the Broodmare Tonic told a male about his womb). (3) Sizes in ?stats and the panel say Cock, Pussy and Ass now (they said Penis, Vulva, Butt), and a shot that can't grow a flat chest any further says chest. Checked: tests/parasite-sweep.cjs (every strain's urges on six bodies, every kind obeyed and ignored) and a new tests/potion-lines.test.cjs. **Bot.**
 
 - **Bot 0.30.3, Companion 0.21.0: the drawn body grows with the farm.** Laynie: "the belly sizes in game need to automatically adjust based on how full or pregnant each player is", "same for tit sizes and growth". The bot tells each player's Companion their cup as the farm counts it (the udder is already measured in bra cups, AA to R, the same scale as the drawn body) and how big their belly is (0 to 4, the farm's own belly stage: pregnant, eggs, a full load). The drawn body follows both: the cup is the farm's, and the belly shows and grows as they fill up or get bred, and goes when they empty. The farm look's belly is the large one; smaller and bigger are drawn in proportion to it. In Toggles: *Cup* has *Follow the farm* (the default) or a fixed cup, and *Belly* has *Follow the farm* (the default), *Always*, *Never*, or *As my studio has it*. Everyone else sees the same, because each Companion shares what it draws. Checked: a new part of tests/farm-look.test.cjs (L cup with a middling belly, growing, emptying, no repeats when nothing changed). **Bot and Companion.**
 

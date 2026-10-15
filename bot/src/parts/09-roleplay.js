@@ -44,6 +44,7 @@
     if (!text || /^[?!.\-\/]/.test(text.trim())) return;          // commands aren't roleplay
     try { potionHeard(sender, text, type); } catch(e){ warn("echo:", e); }   // Echo Elixir
     try { trapHeard(sender, text); } catch(e){ warn("mirror box:", e); }      // the mirror box wants its line said (10u4)
+    try { parasiteHeard(sender, text); } catch(e){ warn("parasite beg:", e); }   // a Tyrant that wanted them beggin' (10v2)
     const now = Date.now();
     if (type === "Emote") { try { bellyTouchFromRP(sender, text); } catch(e){ warn("belly rp:", e); } }
     // breedin'
@@ -293,10 +294,10 @@
     const fx = [];
     for (const [part, d] of sizeTags){
       if (part === "knot" && !knotted(target)){ done.push("no knot to grow yet (that takes a knotting shot first)"); continue; }
-      if (!hasPart(target, part)){ done.push("no "+(part === "testes" ? "balls" : part)+" for the "+(d>0?"growth":"shrinkin'")+" to work on"); continue; }
+      if (!hasPart(target, part)){ done.push("no "+((CFG.SIZES[part] || {}).label || part).toLowerCase()+" for the "+(d>0?"growth":"shrinkin'")+" to work on"); continue; }
       const S = CFG.SIZES[part], before = sizeOf(target, part);
       setSize(target, part, before + d*(S.step||1)*x, true);
-      const word = S.label.toLowerCase();
+      const word = part === "udder" && !bodyOf(target).tits ? "chest" : S.label.toLowerCase();   // (a flat chest is a chest, whatever the farm calls it)
       done.push(sizeOf(target, part) === before ? word+" can't go any "+(d>0?"bigger":"smaller")
                                                 : word+" "+(d>0?"up":"down")+" to "+sizeName(target, part));
       if (sizeOf(target, part) !== before) fx.push(shotLine(part+(d>0?"+":"-"), target, part));

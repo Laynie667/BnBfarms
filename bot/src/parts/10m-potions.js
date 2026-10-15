@@ -78,6 +78,121 @@
       limit: /\bheat/i, drink: "A sweet mist, one breath of it, and you go hot and flushed all over.",
       seen: "%n breathes in a puff of Heat Mist and flushes pink from the ears down." },
   ];
+  // ── seen drinkin' it: more ways the room sees each bottle go down (Laynie, Oct 14: the same line every time). Picked
+  // fresh, for the body that drank it ({t} tits, {nt} flat, {v} pussy, {c} cock, as everywhere). The bottle's own
+  // first line (seen, above) is in the pool too.
+  const POTION_SEEN = {
+    clover: [
+      "{t}%n downs a little bottle of Clover Cream and their tits give a slow, heavy throb they can't help but cup.",
+      "%n sips a Clover Cream like it's dessert, licks the rim, and goes soft-eyed and warm all over.",
+      "A bottle of Clover Cream goes down %n's throat, and they settle back like a cow in good grass, sleepy and full and leakin' a little already.",
+      "%n tips up the Clover Cream, and the smell of sweet hay and cream drifts off 'em for a good minute after."],
+    golden: [
+      "%n drinks off a Golden Hour and giggles at nothin'. Their cheeks are already pink.",
+      "The Golden Hour fizzes on %n's tongue, and they go loose and glowy, like they've just been told they're the best little thing on the farm.",
+      "%n sips a Golden Hour slow, eyes half-shut, and you can see them start lookin' forward to the next time they cum.",
+      "A bottle of liquid sunshine goes down %n, and they stretch like a cat in a warm window."],
+    musk: [
+      "%n rubs a drop of Blue Ribbon Musk into their throat, and the nearest farmhand forgets what they were sayin'.",
+      "A whiff of hay and heat comes off %n with every step now. Folks keep lookin' up and not knowing why.",
+      "%n dabs Blue Ribbon Musk behind each ear, then, after a thought, a little lower. Heads turn.",
+      "The cork comes out, the scent rolls across the yard, and suddenly %n is the most interesting animal in the barn."],
+    honey: [
+      "%n tips a spoonful of Honey Tongue onto their tongue and goes dreamy, like somebody's whisperin' sweet nothin's right into their ear. Somebody is.",
+      "%n drinks the Honey Tongue and blushes clear down to the collarbone. The praise has already started.",
+      "A sticky-sweet Honey Tongue, licked off two fingers. %n squirms like they've just been called a very good pet.",
+      "%n swallows the Honey Tongue and leans into nothin', the way you lean into a warm voice."],
+    brood: [
+      "{v}%n drinks a Broodmare Tonic, and their pussy clenches on nothin' as it hits. They look ready for anybody.",
+      "%n knocks back a Broodmare Tonic. Their belly gives a low, warm flutter, and their hips start rollin' all on their own.",
+      "The Broodmare Tonic goes down thick as molasses, and %n spreads their stance without thinkin', like a mare waitin' at the fence.",
+      "%n finishes the Broodmare Tonic and rubs slow circles low on their belly. Any stud worth his salt can smell it from here."],
+    bitterroot: [
+      "%n gags on a Bitterroot and glares at the bottle. Everything that was building in 'em just went sour.",
+      "A swig of Bitterroot, and %n's face scrunches up. Whatever pleasure's comin' their way for the next half hour, it's comin' ruined.",
+      "%n swallows the Bitterroot like medicine. Then their thighs press together, and they whimper, because now it aches and it won't pay out.",
+      "The Bitterroot goes down mean. %n squirms, already frustrated, and they haven't even been touched yet."],
+    heavy: [
+      "{t}%n gulps the Heavy Udder Draught and their tits fill visibly, tight and hot, straining against whatever's holdin' them.",
+      "{t}The Heavy Udder Draught hits %n's chest like a wave. They're full to aching inside a minute, and the stalls won't have 'em.",
+      "{nt}%n drinks the Heavy Udder Draught, and their chest goes hot and puffy, nipples swelling, a bead of milk welling up on each.",
+      "%n downs the Heavy Udder Draught and grabs the nearest rail. Something in 'em is fillin' fast and it isn't going to stop."],
+    moo: [
+      "%n drinks the Moo Juice, opens their mouth to say thank you, and lows like a heifer at feeding time.",
+      "One bottle of Moo Juice later, %n tries to complain. What comes out is a long, mournful mooooo.",
+      "%n swallows the Moo Juice and claps a hand over their mouth. Too late: the moo's out, and everyone heard it.",
+      "The Moo Juice goes down, and %n's next three words are all the same word, and that word is moo."],
+    bell: [
+      "%n drinks the Bell Tonic. They shift their weight, and CLANG. They freeze. CLANG.",
+      "A Bell Tonic later, %n tries to sneak off. The cowbell that isn't there rings the whole way out of the yard.",
+      "%n downs the Bell Tonic and takes one careful step. The bell goes off like the dinner gong.",
+      "Every wiggle %n makes after that Bell Tonic rings out across the farm. Nobody's losin' track of 'em now."],
+    needy: [
+      "%n drinks the Needy Nectar, and within a minute they're rubbing their thighs together and biting their lip.",
+      "The Needy Nectar blooms in %n's belly, and they start squirmin' against whatever they're sitting on.",
+      "%n finishes the Needy Nectar and goes pink and fidgety. Their hands keep drifting down and getting caught halfway.",
+      "One sip of Needy Nectar and %n is leaning on things, pressing on things, aching for things. They might have to ask nicely."],
+    danger: [
+      "%n knocks back a Danger Draught and laughs, a little too loud. Somewhere out in the fields, something notices.",
+      "The Danger Draught smokes on the way down. %n shivers, and every trap on the farm gets a little hungrier.",
+      "%n drinks the Danger Draught like a dare. Their luck just went belly-up, and they look thrilled about it.",
+      "A black bottle, a cold shiver, and %n is the most catchable thing on the farm for the next two hours."],
+    tentaclemusk: [
+      "%n dabs Tentacle Musk on their wrists and the insides of their thighs. The pond goes very, very still.",
+      "%n uncorks the Tentacle Musk. It smells like the sea at night, and something in the deep water turns toward 'em.",
+      "A drop of Tentacle Musk behind each ear, and every trough on the farm ripples once, all at the same time.",
+      "%n smooths the Tentacle Musk down over their belly. The water's going to come lookin' for 'em now."],
+    wolfscent: [
+      "%n rubs Wolf Scent into the hollow of their throat. From the treeline, something answers with a low, interested growl.",
+      "%n dabs Wolf Scent between their legs, and the dogs in the yard all lift their heads at once.",
+      "One whiff of Wolf Scent on %n and the whole pack knows exactly where to find 'em, and what they're for.",
+      "%n smells like a bitch in season now. Somewhere past the fence, paws start moving."],
+    mareheat: [
+      "%n smears Mare's Heat up the insides of their thighs. In the stud barn, a stallion screams and kicks his door.",
+      "The Mare's Heat goes on thick and sweet. %n shifts their weight like a mare in the paddock, and the big horse starts pacin'.",
+      "%n strokes on the Mare's Heat and every stallion on the place suddenly has one thing on his mind.",
+      "A dab of Mare's Heat on %n's rump, and the stud barn sounds like it's about to come apart."],
+    sowslop: [
+      "%n slathers on Sow's Slop and wrinkles their nose. From the sty comes a squeal and the crash of a gate post.",
+      "%n rubs Sow's Slop into their belly and backside. The boar's already grunting their name, more or less.",
+      "Sow's Slop, smeared on thick. %n smells like a sow in season and the whole sty knows it.",
+      "%n reeks of the sty now. The boar's rails creak, then groan, then give a little."],
+    hiccup: [
+      "%n drinks a Hiccup Fizz. *Hic.* They try to look dignified. *Hic.*",
+      "The Hiccup Fizz goes down bubbly, and %n hiccups so hard their whole body jumps.",
+      "%n downs a Hiccup Fizz and hiccups through an apology. Then hiccups through the apology for the hiccup.",
+      "One Hiccup Fizz later, %n can't get through a sentence. Or a moan. *Hic.*"],
+    feather: [
+      "%n drinks a Featherlight and shrieks with laughter when their own sleeve brushes their arm.",
+      "The Featherlight goes down, and suddenly %n can't stand still: every breeze, every touch, sets them giggling.",
+      "%n swallows a Featherlight and dissolves into helpless giggles the second anybody breathes near their neck.",
+      "One Featherlight, and %n squirms at the brush of their own hair. Anyone with a feather is very much invited."],
+    wrongbarn: [
+      "%n drinks the Wrong Barn and sniffs the air like a different animal entirely. They look baffled.",
+      "One sip of Wrong Barn and %n's noises change. Their stance changes. Even the way they flick their ears.",
+      "%n swallows the Wrong Barn and wanders toward the wrong pen without thinking. Old habits, new animal.",
+      "The Wrong Barn takes hold, and %n is suddenly very confused about what they're meant to be eating."],
+    bigbritches: [
+      "%n drinks a Big Britches and something on 'em swells two sizes on the spot. They look down, wide-eyed.",
+      "The Big Britches hits, and %n has to adjust everything they're wearing. Quickly.",
+      "%n finishes a Big Britches and gasps as a whole lot more of 'em suddenly needs room.",
+      "One Big Britches later, %n is very much bigger somewhere, and very aware of it."],
+    shrink: [
+      "%n drinks a Shrinking Violet and a part of 'em goes small and shy and sensitive.",
+      "The Shrinking Violet takes hold, and %n looks down at somethin' that's suddenly a good deal smaller.",
+      "%n swallows a Shrinking Violet and blushes. Smaller, tighter, and somehow more sensitive than ever.",
+      "One cool sip of Shrinking Violet, and %n is a size or two less of somethin' important for an hour."],
+    echo: [
+      "%n drinks an Echo Elixir. Somewhere, the farm girl smiles and starts listening very closely.",
+      "The Echo Elixir goes down, and everything %n says for a while might come back around. Sweetly.",
+      "%n swallows an Echo Elixir and says somethin' silly. The farm girl tucks it away for later.",
+      "One Echo Elixir, and %n's words are on loan to the farm girl for the next twenty minutes."],
+    heatmist: [
+      "%n breathes in the Heat Mist and goes flushed and slick and squirmy all at once.",
+      "One puff of Heat Mist, and %n's scent changes. Every stud in the yard lifts his head.",
+      "%n inhales the Heat Mist, shivers, and starts rubbing against the nearest post like a mare in season.",
+      "The Heat Mist settles on %n like a warm hand, and they come into heat right there in front of everybody."],
+  };
   const potionDef = (id) => POTIONS.find(p => p.id === String(id || "").toLowerCase()) || null;
   function potionOn(mn, id){ const r = rec(mn), f = r && r.fx && r.fx[id]; return !!(f && f.until > Date.now()); }
   // how many bottles deep they are (0 = none): another bottle while one's workin' stacks, up to CFG.POTION_STACK_MAX
@@ -117,8 +232,8 @@
     r.fx[id] = f;
     if (!was) potionStart(mn, P, f); else potionStack(mn, P, f);
     saveLedger(); audit(by || CFG.BOT_MEMBER, "POTION", mn+" "+id+(how ? " ("+how+")" : ""));
-    tell(mn, "🧪 "+P.name+(how ? " ("+how+")" : "")+": "+P.drink+" "+P.desc+(was ? (stacked ? " That's bottle number "+f.x+" on top of the last: it hits harder and runs longer." : " You're as deep in that one as it goes, so it just runs longer.") : "")+" Your safeword pours it out.");
-    if (onMap(mn)) emote("🧪 "+P.seen.replace(/%n/g, plainName(mn)), mn);
+    tell(mn, "🧪 "+P.name+(how ? " ("+how+")" : "")+": "+bodyWords(mn, P.drink)+" "+P.desc+(was ? (stacked ? " That's bottle number "+f.x+" on top of the last: it hits harder and runs longer." : " You're as deep in that one as it goes, so it just runs longer.") : "")+" Your safeword pours it out.");
+    if (onMap(mn)) emote("🧪 "+tFill(pickFor(mn, "potion-seen:"+P.id, [P.seen].concat(POTION_SEEN[P.id] || [])), mn), mn);
     syncCompanions(true);
     return true;
   }

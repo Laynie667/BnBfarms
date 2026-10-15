@@ -458,6 +458,7 @@
       g[mn] = g[mn] || { sum:0, n:0 }; g[mn].sum += sc; g[mn].n++;
     }
     if (!nursing) p.lastMilkAt = now;
+    if (!nursing && take >= 20){ const g = rec(mn) && rec(mn).parasite; if (g && !g.drinking) parasiteUrgeDone(mn, "milked"); }   // a parasite that wanted them milked (not its own drinkin': 10v2)
     p.milk -= take; p.totals.milked += take; credit(mn, take);
     // squeezin' someone who's cumflated pushes some of that load back out too
     const over = heldTotal(p) - capacity(mn);
@@ -480,6 +481,7 @@
     if (!(take >= 1)) return 0;
     p.lastCollectAt = Date.now();
     p.semen -= take; p.totals.collected += take; credit(mn, take);
+    if (take >= 5){ const g = rec(mn) && rec(mn).parasite; if (g && !g.drinking) parasiteUrgeDone(mn, "milked"); }
     return take;
   }
 

@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.30.3
+// @version      0.30.4
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -1828,7 +1828,7 @@
   ];
 
   // bot/src/version.js
-  var VERSION = "0.30.3";
+  var VERSION = "0.30.4";
 
   // bot-parts:farmhand-bot-parts
   (function() {
@@ -2092,7 +2092,7 @@
           ]
         },
         penis: {
-          label: "Penis",
+          label: "Cock",
           start: 6,
           natural: 14,
           max: 30,
@@ -2102,7 +2102,7 @@
           words: [[3, "tiny"], [5, "small"], [7, "average"], [9, "big"], [12, "huge"], [16, "massive"], [20, "enormous"], [25, "monstrous"], [31, "hyper"]]
         },
         vulva: {
-          label: "Vulva",
+          label: "Pussy",
           start: 1,
           natural: 10,
           max: 20,
@@ -2131,7 +2131,7 @@
           ]
         },
         butt: {
-          label: "Butt",
+          label: "Ass",
           start: 1,
           natural: 10,
           max: 20,
@@ -3463,7 +3463,7 @@
     };
     W.FarmhandExport = exportLedger;
     W.FarmhandLedger = () => L;
-    if (W.__FARMHAND_TEST__) Object.assign(W, { __st: () => state, __cfg: CFG, __pt: prodTick, __qt: quotaTick, __lt: leashTick, __ms: milkingStallTick, __vt: voiceTick, __sync: syncCompanions, __gt: gearTick, __ht: homeTick, __addons: (h, ...a) => addonsEmit(h, ...a), __stateFor: (mn) => stateFor(mn), __leadTick: () => leadTick(), __ambient: () => ambientTick(), __about: (t) => aboutWhom(t), __announce: (t) => announce(t), __reply: (mn, t, ch) => reply(mn, t, ch), __office: () => officeCheck(), __namesHere: (t) => namesHere(t), __speciesCheck: (t) => QUESTIONS.find((q) => q.key === "species").check(t), __attach: () => attachListeners(), __tryLogin: () => tryLogin(), __beepText: (m) => beepText(m), __nameOnce: (t, mn) => nameOnce(t, mn), __buildContract: (n, mn, d) => buildContract(contractTemplate(n), mn, d), __potionTick: () => potionTick(), __penTick: () => penTick(), __trapTick: () => trapTick(), __corrupt: (m, n) => corrupt(m, n), __under: (m) => underOf(m), __goUnder: (m, n) => goUnder(m, n), __lend: () => state.lend, __keepTick: () => keepersTick(), __body: (m) => bodyOf(m), __drainMilk: (m, n) => drainMilk(m, n), __farmLookTick: () => farmLookTick(), __prodOf: (m) => prodOf(m), __shape: (m) => shapeFor(m), __pickFor: (m, k, l) => pickFor(m, k, l), __bodyWords: (m, t) => bodyWords(m, t), __strainGear: (m) => strainGear(m), __strainSerums: (m) => strainSerums(m), __strainParts: (s, n) => strainParts(s, n), __tFill: (t, m, v) => tFill(t, m, v), __conceive: (m, s, a, b, h) => rollConception(m, s, a, b, h), __birth: (m) => giveBirth(m), __milkCapOf: (m) => milkCap(m), __udderTick: () => {
+    if (W.__FARMHAND_TEST__) Object.assign(W, { __st: () => state, __cfg: CFG, __pt: prodTick, __qt: quotaTick, __lt: leashTick, __ms: milkingStallTick, __vt: voiceTick, __sync: syncCompanions, __gt: gearTick, __ht: homeTick, __addons: (h, ...a) => addonsEmit(h, ...a), __stateFor: (mn) => stateFor(mn), __leadTick: () => leadTick(), __ambient: () => ambientTick(), __about: (t) => aboutWhom(t), __announce: (t) => announce(t), __reply: (mn, t, ch) => reply(mn, t, ch), __office: () => officeCheck(), __namesHere: (t) => namesHere(t), __speciesCheck: (t) => QUESTIONS.find((q) => q.key === "species").check(t), __attach: () => attachListeners(), __tryLogin: () => tryLogin(), __beepText: (m) => beepText(m), __nameOnce: (t, mn) => nameOnce(t, mn), __buildContract: (n, mn, d) => buildContract(contractTemplate(n), mn, d), __potionTick: () => potionTick(), __penTick: () => penTick(), __trapTick: () => trapTick(), __corrupt: (m, n) => corrupt(m, n), __under: (m) => underOf(m), __goUnder: (m, n) => goUnder(m, n), __lend: () => state.lend, __keepTick: () => keepersTick(), __body: (m) => bodyOf(m), __drainMilk: (m, n) => drainMilk(m, n), __farmLookTick: () => farmLookTick(), __givePotion: (m, id, by) => givePotion(m, id, by), __prodOf: (m) => prodOf(m), __shape: (m) => shapeFor(m), __pickFor: (m, k, l) => pickFor(m, k, l), __bodyWords: (m, t) => bodyWords(m, t), __strainGear: (m) => strainGear(m), __strainSerums: (m) => strainSerums(m), __strainParts: (s, n) => strainParts(s, n), __tFill: (t, m, v) => tFill(t, m, v), __conceive: (m, s, a, b, h) => rollConception(m, s, a, b, h), __birth: (m) => giveBirth(m), __milkCapOf: (m) => milkCap(m), __udderTick: () => {
       state.udderAt = 0;
       uddersTick();
     }, __wordsFor: (m, t) => wordsFor(m, t), __overdue: (m) => overdueStage(m), __milkCum: (m) => stallClimax(m), __intSev: (m, s) => intensitySev(m, s), __intTail: (m, k) => intensityTail(m, 5, 6, k), __holes: (m) => holesFor(m), __album: (m) => albumFor(m, 60), __holeTook: (m, h, a) => holeTook(m, h, a), __dreamTheme: (m) => dreamTheme(m), __eggsWorth: (t, n) => eggsWorth(t, n), __rank: (m) => rankX(m), __broodBook: (m) => broodBook(m), __belly: (m) => bellyStage(m), __happening: (m) => happeningFor(m), __gearOn: (m, s, l, d, x) => gearOn(m, s, l, d, x), __heard: (mn, t) => trapHeard(mn, t), __parasiteTick: () => parasiteTick(), __parts: (m) => parasiteParts(rec(m).parasite), __climax: (m) => parasiteClimax(m), __nurse: (a, b) => parasiteNurse(a, b), __parasiteChance: (m) => parasiteChance(m), __kiss: (a, f, s, t) => parasiteKiss(a, f, s, t), __load: (s, m, h, x) => parasiteLoad(s, m, h, x), __shot: (t, by, text, how) => applyShot(t, by, text, how), __slow: (mn) => slowOf(mn), __milkRate: (mn) => milkRate(mn), __benchTick: () => benchTick(), __roll: (m, s, a, b) => rollConception(m, s, a, b), __contractTick: () => {
@@ -5271,6 +5271,10 @@
         g[mn].n++;
       }
       if (!nursing) p.lastMilkAt = now;
+      if (!nursing && take >= 20) {
+        const g = rec(mn) && rec(mn).parasite;
+        if (g && !g.drinking) parasiteUrgeDone(mn, "milked");
+      }
       p.milk -= take;
       p.totals.milked += take;
       credit(mn, take);
@@ -5296,6 +5300,10 @@
       p.semen -= take;
       p.totals.collected += take;
       credit(mn, take);
+      if (take >= 5) {
+        const g = rec(mn) && rec(mn).parasite;
+        if (g && !g.drinking) parasiteUrgeDone(mn, "milked");
+      }
       return take;
     }
     function startHeat(mn, by, hours) {
@@ -6625,6 +6633,11 @@
       } catch (e) {
         warn("mirror box:", e);
       }
+      try {
+        parasiteHeard(sender, text);
+      } catch (e) {
+        warn("parasite beg:", e);
+      }
       const now = Date.now();
       if (type === "Emote") {
         try {
@@ -7001,12 +7014,12 @@
           continue;
         }
         if (!hasPart(target, part)) {
-          done.push("no " + (part === "testes" ? "balls" : part) + " for the " + (d > 0 ? "growth" : "shrinkin'") + " to work on");
+          done.push("no " + ((CFG.SIZES[part] || {}).label || part).toLowerCase() + " for the " + (d > 0 ? "growth" : "shrinkin'") + " to work on");
           continue;
         }
         const S = CFG.SIZES[part], before = sizeOf(target, part);
         setSize(target, part, before + d * (S.step || 1) * x, true);
-        const word = S.label.toLowerCase();
+        const word = part === "udder" && !bodyOf(target).tits ? "chest" : S.label.toLowerCase();
         done.push(sizeOf(target, part) === before ? word + " can't go any " + (d > 0 ? "bigger" : "smaller") : word + " " + (d > 0 ? "up" : "down") + " to " + sizeName(target, part));
         if (sizeOf(target, part) !== before) fx.push(shotLine(part + (d > 0 ? "+" : "-"), target, part));
       }
@@ -10152,6 +10165,140 @@
         seen: "%n breathes in a puff of Heat Mist and flushes pink from the ears down."
       }
     ];
+    const POTION_SEEN = {
+      clover: [
+        "{t}%n downs a little bottle of Clover Cream and their tits give a slow, heavy throb they can't help but cup.",
+        "%n sips a Clover Cream like it's dessert, licks the rim, and goes soft-eyed and warm all over.",
+        "A bottle of Clover Cream goes down %n's throat, and they settle back like a cow in good grass, sleepy and full and leakin' a little already.",
+        "%n tips up the Clover Cream, and the smell of sweet hay and cream drifts off 'em for a good minute after."
+      ],
+      golden: [
+        "%n drinks off a Golden Hour and giggles at nothin'. Their cheeks are already pink.",
+        "The Golden Hour fizzes on %n's tongue, and they go loose and glowy, like they've just been told they're the best little thing on the farm.",
+        "%n sips a Golden Hour slow, eyes half-shut, and you can see them start lookin' forward to the next time they cum.",
+        "A bottle of liquid sunshine goes down %n, and they stretch like a cat in a warm window."
+      ],
+      musk: [
+        "%n rubs a drop of Blue Ribbon Musk into their throat, and the nearest farmhand forgets what they were sayin'.",
+        "A whiff of hay and heat comes off %n with every step now. Folks keep lookin' up and not knowing why.",
+        "%n dabs Blue Ribbon Musk behind each ear, then, after a thought, a little lower. Heads turn.",
+        "The cork comes out, the scent rolls across the yard, and suddenly %n is the most interesting animal in the barn."
+      ],
+      honey: [
+        "%n tips a spoonful of Honey Tongue onto their tongue and goes dreamy, like somebody's whisperin' sweet nothin's right into their ear. Somebody is.",
+        "%n drinks the Honey Tongue and blushes clear down to the collarbone. The praise has already started.",
+        "A sticky-sweet Honey Tongue, licked off two fingers. %n squirms like they've just been called a very good pet.",
+        "%n swallows the Honey Tongue and leans into nothin', the way you lean into a warm voice."
+      ],
+      brood: [
+        "{v}%n drinks a Broodmare Tonic, and their pussy clenches on nothin' as it hits. They look ready for anybody.",
+        "%n knocks back a Broodmare Tonic. Their belly gives a low, warm flutter, and their hips start rollin' all on their own.",
+        "The Broodmare Tonic goes down thick as molasses, and %n spreads their stance without thinkin', like a mare waitin' at the fence.",
+        "%n finishes the Broodmare Tonic and rubs slow circles low on their belly. Any stud worth his salt can smell it from here."
+      ],
+      bitterroot: [
+        "%n gags on a Bitterroot and glares at the bottle. Everything that was building in 'em just went sour.",
+        "A swig of Bitterroot, and %n's face scrunches up. Whatever pleasure's comin' their way for the next half hour, it's comin' ruined.",
+        "%n swallows the Bitterroot like medicine. Then their thighs press together, and they whimper, because now it aches and it won't pay out.",
+        "The Bitterroot goes down mean. %n squirms, already frustrated, and they haven't even been touched yet."
+      ],
+      heavy: [
+        "{t}%n gulps the Heavy Udder Draught and their tits fill visibly, tight and hot, straining against whatever's holdin' them.",
+        "{t}The Heavy Udder Draught hits %n's chest like a wave. They're full to aching inside a minute, and the stalls won't have 'em.",
+        "{nt}%n drinks the Heavy Udder Draught, and their chest goes hot and puffy, nipples swelling, a bead of milk welling up on each.",
+        "%n downs the Heavy Udder Draught and grabs the nearest rail. Something in 'em is fillin' fast and it isn't going to stop."
+      ],
+      moo: [
+        "%n drinks the Moo Juice, opens their mouth to say thank you, and lows like a heifer at feeding time.",
+        "One bottle of Moo Juice later, %n tries to complain. What comes out is a long, mournful mooooo.",
+        "%n swallows the Moo Juice and claps a hand over their mouth. Too late: the moo's out, and everyone heard it.",
+        "The Moo Juice goes down, and %n's next three words are all the same word, and that word is moo."
+      ],
+      bell: [
+        "%n drinks the Bell Tonic. They shift their weight, and CLANG. They freeze. CLANG.",
+        "A Bell Tonic later, %n tries to sneak off. The cowbell that isn't there rings the whole way out of the yard.",
+        "%n downs the Bell Tonic and takes one careful step. The bell goes off like the dinner gong.",
+        "Every wiggle %n makes after that Bell Tonic rings out across the farm. Nobody's losin' track of 'em now."
+      ],
+      needy: [
+        "%n drinks the Needy Nectar, and within a minute they're rubbing their thighs together and biting their lip.",
+        "The Needy Nectar blooms in %n's belly, and they start squirmin' against whatever they're sitting on.",
+        "%n finishes the Needy Nectar and goes pink and fidgety. Their hands keep drifting down and getting caught halfway.",
+        "One sip of Needy Nectar and %n is leaning on things, pressing on things, aching for things. They might have to ask nicely."
+      ],
+      danger: [
+        "%n knocks back a Danger Draught and laughs, a little too loud. Somewhere out in the fields, something notices.",
+        "The Danger Draught smokes on the way down. %n shivers, and every trap on the farm gets a little hungrier.",
+        "%n drinks the Danger Draught like a dare. Their luck just went belly-up, and they look thrilled about it.",
+        "A black bottle, a cold shiver, and %n is the most catchable thing on the farm for the next two hours."
+      ],
+      tentaclemusk: [
+        "%n dabs Tentacle Musk on their wrists and the insides of their thighs. The pond goes very, very still.",
+        "%n uncorks the Tentacle Musk. It smells like the sea at night, and something in the deep water turns toward 'em.",
+        "A drop of Tentacle Musk behind each ear, and every trough on the farm ripples once, all at the same time.",
+        "%n smooths the Tentacle Musk down over their belly. The water's going to come lookin' for 'em now."
+      ],
+      wolfscent: [
+        "%n rubs Wolf Scent into the hollow of their throat. From the treeline, something answers with a low, interested growl.",
+        "%n dabs Wolf Scent between their legs, and the dogs in the yard all lift their heads at once.",
+        "One whiff of Wolf Scent on %n and the whole pack knows exactly where to find 'em, and what they're for.",
+        "%n smells like a bitch in season now. Somewhere past the fence, paws start moving."
+      ],
+      mareheat: [
+        "%n smears Mare's Heat up the insides of their thighs. In the stud barn, a stallion screams and kicks his door.",
+        "The Mare's Heat goes on thick and sweet. %n shifts their weight like a mare in the paddock, and the big horse starts pacin'.",
+        "%n strokes on the Mare's Heat and every stallion on the place suddenly has one thing on his mind.",
+        "A dab of Mare's Heat on %n's rump, and the stud barn sounds like it's about to come apart."
+      ],
+      sowslop: [
+        "%n slathers on Sow's Slop and wrinkles their nose. From the sty comes a squeal and the crash of a gate post.",
+        "%n rubs Sow's Slop into their belly and backside. The boar's already grunting their name, more or less.",
+        "Sow's Slop, smeared on thick. %n smells like a sow in season and the whole sty knows it.",
+        "%n reeks of the sty now. The boar's rails creak, then groan, then give a little."
+      ],
+      hiccup: [
+        "%n drinks a Hiccup Fizz. *Hic.* They try to look dignified. *Hic.*",
+        "The Hiccup Fizz goes down bubbly, and %n hiccups so hard their whole body jumps.",
+        "%n downs a Hiccup Fizz and hiccups through an apology. Then hiccups through the apology for the hiccup.",
+        "One Hiccup Fizz later, %n can't get through a sentence. Or a moan. *Hic.*"
+      ],
+      feather: [
+        "%n drinks a Featherlight and shrieks with laughter when their own sleeve brushes their arm.",
+        "The Featherlight goes down, and suddenly %n can't stand still: every breeze, every touch, sets them giggling.",
+        "%n swallows a Featherlight and dissolves into helpless giggles the second anybody breathes near their neck.",
+        "One Featherlight, and %n squirms at the brush of their own hair. Anyone with a feather is very much invited."
+      ],
+      wrongbarn: [
+        "%n drinks the Wrong Barn and sniffs the air like a different animal entirely. They look baffled.",
+        "One sip of Wrong Barn and %n's noises change. Their stance changes. Even the way they flick their ears.",
+        "%n swallows the Wrong Barn and wanders toward the wrong pen without thinking. Old habits, new animal.",
+        "The Wrong Barn takes hold, and %n is suddenly very confused about what they're meant to be eating."
+      ],
+      bigbritches: [
+        "%n drinks a Big Britches and something on 'em swells two sizes on the spot. They look down, wide-eyed.",
+        "The Big Britches hits, and %n has to adjust everything they're wearing. Quickly.",
+        "%n finishes a Big Britches and gasps as a whole lot more of 'em suddenly needs room.",
+        "One Big Britches later, %n is very much bigger somewhere, and very aware of it."
+      ],
+      shrink: [
+        "%n drinks a Shrinking Violet and a part of 'em goes small and shy and sensitive.",
+        "The Shrinking Violet takes hold, and %n looks down at somethin' that's suddenly a good deal smaller.",
+        "%n swallows a Shrinking Violet and blushes. Smaller, tighter, and somehow more sensitive than ever.",
+        "One cool sip of Shrinking Violet, and %n is a size or two less of somethin' important for an hour."
+      ],
+      echo: [
+        "%n drinks an Echo Elixir. Somewhere, the farm girl smiles and starts listening very closely.",
+        "The Echo Elixir goes down, and everything %n says for a while might come back around. Sweetly.",
+        "%n swallows an Echo Elixir and says somethin' silly. The farm girl tucks it away for later.",
+        "One Echo Elixir, and %n's words are on loan to the farm girl for the next twenty minutes."
+      ],
+      heatmist: [
+        "%n breathes in the Heat Mist and goes flushed and slick and squirmy all at once.",
+        "One puff of Heat Mist, and %n's scent changes. Every stud in the yard lifts his head.",
+        "%n inhales the Heat Mist, shivers, and starts rubbing against the nearest post like a mare in season.",
+        "The Heat Mist settles on %n like a warm hand, and they come into heat right there in front of everybody."
+      ]
+    };
     const potionDef = (id) => POTIONS.find((p) => p.id === String(id || "").toLowerCase()) || null;
     function potionOn(mn, id) {
       const r = rec(mn), f = r && r.fx && r.fx[id];
@@ -10199,8 +10346,8 @@
       else potionStack(mn, P, f);
       saveLedger();
       audit(by || CFG.BOT_MEMBER, "POTION", mn + " " + id + (how ? " (" + how + ")" : ""));
-      tell(mn, "\u{1F9EA} " + P.name + (how ? " (" + how + ")" : "") + ": " + P.drink + " " + P.desc + (was ? stacked ? " That's bottle number " + f.x + " on top of the last: it hits harder and runs longer." : " You're as deep in that one as it goes, so it just runs longer." : "") + " Your safeword pours it out.");
-      if (onMap(mn)) emote("\u{1F9EA} " + P.seen.replace(/%n/g, plainName(mn)), mn);
+      tell(mn, "\u{1F9EA} " + P.name + (how ? " (" + how + ")" : "") + ": " + bodyWords(mn, P.drink) + " " + P.desc + (was ? stacked ? " That's bottle number " + f.x + " on top of the last: it hits harder and runs longer." : " You're as deep in that one as it goes, so it just runs longer." : "") + " Your safeword pours it out.");
+      if (onMap(mn)) emote("\u{1F9EA} " + tFill(pickFor(mn, "potion-seen:" + P.id, [P.seen].concat(POTION_SEEN[P.id] || [])), mn), mn);
       syncCompanions(true);
       return true;
     }
@@ -14392,6 +14539,7 @@
         const r = rec(mn), p = prodOf(mn);
         if (!r || !p) return;
         if (hole !== "mouth") {
+          if ((hole === "vulva" || hole === "butt") && parasiteOn(mn)) parasiteUrgeDone(mn, "bred");
           if (!parasiteOn(mn) || !parasiteParts(r.parasite).root || hole !== "vulva" && hole !== "butt") return;
           p.held[hole] = Math.max(0, (p.held[hole] || 0) - mlIn);
           r.parasite.fed = (r.parasite.fed || 0) + 1;
@@ -14763,19 +14911,58 @@
         g.urge = null;
         g.urgeAt = now + (60 + Math.random() * 60) * 6e4;
         p.deniedUntil = Math.max(p.deniedUntil || 0, now + CFG.PARASITE_URGE_PUNISH_MIN * 6e4);
-        privateLine(mn, pmLine("urgeFail", mn), "emote");
+        privateLine(mn, pmLine(PARASITE_MORE[strainKey(g) + "_urgeFail"] ? strainKey(g) + "_urgeFail" : "urgeFail", mn), "emote");
         arouse(mn, 40, 94);
         saveLedger();
         syncCompanions(true);
       } else if (g.urge && g.urge.kind === "glory" && Object.keys(L.spots || {}).some((n) => /^glory-\d+$/.test(n) && onSpot(mn, n, 0))) parasiteUrgeDone(mn, "glory");
-      else if (!g.urge && now >= (g.urgeAt || 0) && !quietNow(mn) && !heldByTrap(mn) && !r.benched && !r.penned && !(p && p.stall)) {
-        const kinds = ["kiss", "swallow"].concat(Object.keys(L.spots || {}).some((n) => /^glory-\d+$/.test(n)) ? ["glory"] : []).filter((k) => !(k !== "glory" && !P.lips && k === "swallow"));
-        const kind = kinds[Math.floor(Math.random() * kinds.length)];
-        g.urge = { kind, until: now + (kind === "swallow" ? 15 : 10) * 6e4 };
+      else if (g.urge && g.urge.kind === "nest" && nestSpots().some((n) => onSpot(mn, n, 0))) parasiteUrgeDone(mn, "nest");
+      else if (g.urge && g.urge.kind === "kneel" && kneelingNow(mn)) {
+        g.urge.knelt = (g.urge.knelt || 0) + 1;
+        if (g.urge.knelt >= 3) parasiteUrgeDone(mn, "kneel");
+        else saveLedger();
+      } else if (!g.urge && now >= (g.urgeAt || 0) && !quietNow(mn) && !heldByTrap(mn) && !r.benched && !r.penned && !(p && p.stall)) {
+        const kinds = urgeKinds(mn, g, P);
+        if (!kinds.length) {
+          g.urgeAt = now + 30 * 6e4;
+          return;
+        }
+        const kind = kinds[Math.floor(Math.random() * kinds.length)], mins = URGE_MINS[kind] || 10;
+        g.urge = { kind, until: now + mins * 6e4 };
         saveLedger();
-        privateLine(mn, pmLine("urge_" + kind, mn), "emote");
-        tell(mn, "\u{1F444} It wants somethin', sugar: " + { kiss: "kiss somebody on the mouth", swallow: "swallow a load", glory: "get yourself into a glory stall" }[kind] + ", inside " + (kind === "swallow" ? 15 : 10) + " minutes. Do it and it'll be sweet to you. Don't, and it'll hold you at the edge for an hour.");
+        privateLine(mn, pmLine(PARASITE_MORE[strainKey(g) + "_urge_" + kind] ? strainKey(g) + "_urge_" + kind : "urge_" + kind, mn), "emote");
+        tell(mn, "\u{1F444} It wants somethin', sugar: " + urgeAsk(mn, kind) + ", inside " + mins + " minutes. Do it and it'll be sweet to you. Don't, and it'll hold you at the edge for an hour.");
       }
+    }
+    const STRAIN_URGES = { breeder: ["bred", "kiss", "nest"], grower: ["swallow", "milked", "glory"], glutton: ["milked", "swallow", "glory"], tyrant: ["kneel", "beg", "kiss"] };
+    const URGE_MINS = { swallow: 15, bred: 15, milked: 15, nest: 10, glory: 10, kiss: 10, kneel: 10, beg: 10 };
+    function urgeKinds(mn, g, P) {
+      const glory = Object.keys(L.spots || {}).some((n) => /^glory-\d+$/.test(n));
+      return (STRAIN_URGES[strainKey(g)] || ["kiss", "swallow", "glory"]).filter((k) => k === "swallow" ? !!P.lips && !holeBlocked(mn, "mouth") : k === "glory" ? glory : k === "nest" ? nestSpots().length > 0 : k === "bred" ? !limitBlocks(mn, "breed") : k === "milked" ? makesMilk(mn) && !limitBlocks(mn, "milk") || makesSemen(mn) : true);
+    }
+    function urgeAsk(mn, kind) {
+      const v = hasVulva(mn);
+      return {
+        kiss: "kiss somebody on the mouth",
+        swallow: "swallow a load",
+        glory: "get yourself into a glory stall",
+        nest: "go and settle yourself in the nest",
+        bred: v ? "take a load in your pussy or your ass" : "take a load up your ass",
+        milked: makesMilk(mn) && !limitBlocks(mn, "milk") ? "get yourself milked" : "get your cock milked",
+        kneel: "get down on your knees and stay there",
+        beg: "beg for it, out loud, where folks can hear you"
+      }[kind] || "do as it says";
+    }
+    function kneelingNow(mn) {
+      const C = charFor(mn);
+      if (!C) return false;
+      const a = [].concat(C.ActivePose || [], C.Pose || []);
+      return a.some((p) => /^(Kneel|KneelingSpread|AllFours)$/.test(String(p)));
+    }
+    const BEG_WORDS = /\b(please|plea+se|beg|begging|beggin'?|pretty please|i need (it|you|this|to)|let me cum|need to cum|have mercy|mercy)\b/i;
+    function parasiteHeard(mn, text) {
+      const g = rec(mn) && rec(mn).parasite;
+      if (g && g.urge && g.urge.kind === "beg" && BEG_WORDS.test(String(text))) parasiteUrgeDone(mn, "beg");
     }
     function parasiteUrgeDone(mn, kind) {
       const r = rec(mn), g = r && r.parasite;
@@ -14783,9 +14970,10 @@
       g.urge = null;
       g.urgeAt = Date.now() + (60 + Math.random() * 60) * 6e4;
       saveLedger();
+      const k = strainKey(g) + "_urgeDone";
       later(() => {
         if (parasiteOn(mn)) {
-          parasiteDose(mn, 1, pmLine("urgeDone", mn));
+          parasiteDose(mn, 1, pmLine(PARASITE_MORE[k] ? k : "urgeDone", mn));
           arouse(mn, 25);
         }
       }, 5e3);
@@ -14793,6 +14981,14 @@
     }
     function parasiteAfterDose(mn) {
       const r = rec(mn), g = r.parasite, p = prodOf(mn);
+      g.drinking = true;
+      try {
+        afterDoseDrink(mn, r, g, p);
+      } finally {
+        g.drinking = false;
+      }
+    }
+    function afterDoseDrink(mn, r, g, p) {
       strainAfterDose(mn);
       if (!(parasiteParts(g).suckers || g.strain === "glutton") || !makesMilk(mn) || p.milk < 20) return;
       const got = drainMilk(mn, p.milk * (g.strain === "glutton" ? 0.8 : 0.4));
@@ -15085,6 +15281,100 @@
         "{c}The cage tightens, and the tongue inside it laps the tip of your cock slow, slower, till your balls draw up. Then nothin'. It's waitin' for you to come down so it can do it again.",
         "{v}The root in you rubs that one spot, in little circles, till your legs are tremblin'. Then it stops dead. You'd beg, but it's got your mouth.",
         "The web pulls you up on your toes and works you over all at once: nipples, hole, the back of your neck. Right at the top, it lets go of everything."
+      ]
+    });
+    Object.assign(PARASITE_MORE, {
+      urge_bred: [
+        "{v}It goes still inside you, then swells, and every part of you it touches starts to ache the same way: empty. It wants you bred. Your pussy's already wet for whoever it is.",
+        "{nv}The root seated in your ass twists, slow, and you feel the place it's made in there clench on nothin'. It wants a load put up you. It doesn't care whose.",
+        "There's a pull low in your belly, like a hook, and it's tugging you toward anybody with a cock. It wants you on your back, or your knees, and filled.",
+        "Your hips keep tilting by themselves. It's makin' your body ready, slick and open, and you can feel it waiting for a stranger to finish in you.",
+        "It hums low in your belly, right where it means to put a litter. It wants seed in you. It'll make it very hard to think about anything else till it gets some."
+      ],
+      urge_nest: [
+        "A picture swims up behind your eyes: warm straw, a hollow in it shaped just for you, the smell of eggs. It wants you in the nest.",
+        "Your belly feels heavy and your thighs keep pressing together. It wants to be somewhere soft and hidden. The nest. Now.",
+        "It's restless, turning over and over in you like a hen circling her box. Go to the nest, it's saying. Sit. Spread. Wait.",
+        "You keep looking toward the nest without meaning to. Whatever's in you has decided that's where you belong for a while."
+      ],
+      urge_milked: [
+        "{t}Your tits throb, tight and hot, and the suckers on them pull at nothin'. It wants you emptied properly, on a machine or under somebody's hands.",
+        "{t}You're so full it aches, and the thing on you won't drink the last of it. It wants you milked. It wants to watch.",
+        "{nt}{c}Your balls are drawn up heavy and sore, and something in you keeps squeezing them, testing. It wants your cock milked dry. Somebody else's hands, or a machine's.",
+        "There's a pressure building in you that it's doing on purpose. It wants you strapped up and drained, and it's making sure you'll beg for it.",
+        "It keeps nudging you toward the stalls. Get milked, it says, without a word. Get milked, and I'll be sweet to you."
+      ],
+      urge_kneel: [
+        "Your knees go soft. It's pressing on the backs of them, gentle and absolutely sure. Down. On your knees. Stay there.",
+        "It wants you lower. It wants everyone who walks past to look down at you. Kneel, and don't you dare get up till it says.",
+        "A cold squeeze, everywhere it holds you, and one clear wish under it: kneel. Right where you are. Show it you know your place.",
+        "You can feel it watching through your own skin, waiting to see how fast you'll drop. On your knees, pet. It'll know if you don't."
+      ],
+      urge_beg: [
+        "It wants to hear you. Out loud, where others can hear it too. Beg. Say please like you mean it.",
+        "It winds you up, slow, and then it stops and waits. It's not going to give you a thing until you beg for it, in front of everyone.",
+        "Your mouth opens before you've decided anything. It wants the words. Please. Please. It wants the whole room to hear how badly.",
+        "It hums a question into your bones and only one answer will do: begging. Pretty, desperate, and loud enough to carry."
+      ],
+      breeder_urge_kiss: [
+        "It wants a taste of somebody's mouth, so it can tell whether they'd breed you well. Kiss someone. Deep.",
+        "Your lips feel swollen and wet. It wants you kissing someone, slow and open, the kind of kiss that ends with your legs apart."
+      ],
+      tyrant_urge_kiss: [
+        "It wants your mouth on someone else's, and it wants you to ask nicely first. Kiss somebody. Mean it.",
+        "A kiss. It wants you to give one away, so you'll remember who decides what your mouth is for."
+      ],
+      grower_urge_swallow: [
+        "It's hungry, and everything it eats goes straight into making more of you. Swallow a load. Feed it. Feel yourself fill out after.",
+        "The tentacle in your throat flexes. It wants cum, and it wants it now, so it can pour it back into you as more of you, everywhere."
+      ],
+      glutton_urge_swallow: [
+        "It's starving. Any load, from anyone, straight down. It'll drink every drop before it touches your belly.",
+        "Your mouth floods. The Glutton wants feeding and it doesn't care who from: find a cock and swallow what comes out of it."
+      ],
+      glutton_urge_glory: [
+        "The glory stalls. All those cocks through the boards, one after another, and every load free for the taking. It wants you there, mouth open.",
+        "It's dreaming of the stalls through you. A hole in the wall and a queue on the other side of it. Go and feed it."
+      ],
+      breeder_urgeDone: [
+        "The Breeder on %n goes warm and heavy with satisfaction, and every root of it squeezes at once. A thick hot dose floods into them, the kind that makes things take.",
+        "%n shivers as the Breeder pulses its thanks, deep and slow. Whatever it pumps into them now is meant for one thing, and their belly knows it.",
+        "It got what it wanted. The Breeder nuzzles into %n from the inside and fills them with something sweet and potent that settles low and stays.",
+        "Good, fertile host. The thing on %n throbs once, twice, and leaves them flushed, aching and ripe."
+      ],
+      grower_urgeDone: [
+        "The Grower on %n swells with pleasure and pays them in kind: a fat warm dose that goes straight to their curves. They feel it start to work.",
+        "%n gasps as the Grower squeezes them everywhere it holds. Tight, then looser, then tight again, like it's measuring how much bigger it can make them.",
+        "It's pleased. The violet thing on %n ripples, and %n can feel themselves fill out a little under it, heavy and warm.",
+        "The Grower drinks its reward and gives one back: a long thick dose, and the stretched, full feeling that comes after."
+      ],
+      glutton_urgeDone: [
+        "The Glutton on %n sighs through their whole body, fed and greedy and grateful. It pours a rich dose back into them so there'll be more to take next time.",
+        "Gorged, the golden thing on %n goes slack and warm for a moment, then squeezes out a thick dose of thanks. %n can feel themselves start to fill again.",
+        "It's had its fill, for now. The Glutton kneads %n slow and pleased, and leaves them dripping and swollen with what it pumped back in.",
+        "The Glutton purrs against %n's skin. A deep gulp of serum floods into them, the kind that makes a body work twice as hard to feed it."
+      ],
+      tyrant_urgeDone: [
+        "The Tyrant on %n loosens, just slightly, the way a hand eases on a leash. Good. A slow sweet dose seeps into them, and for one breath it lets them feel almost close.",
+        "%n obeyed, and the Tyrant rewards obedience: a warm flood of serum and a long, lazy stroke that stops exactly where it always stops.",
+        "It's pleased with %n. It lets them feel that, a warm hum from everywhere it holds them, and pays them a dose. Nothing more. Good pets don't get to cum.",
+        "The dark thing on %n purrs. A thick dose, a squeeze that's almost tender, and the edge pulled back a fraction. Almost."
+      ],
+      breeder_urgeFail: [
+        "You didn't let anyone breed you. It takes that personally. It swells against every needy spot you've got and holds you there, aching, empty, for an hour.",
+        "It wanted you filled and you stayed empty. Now it makes sure you feel how empty, every second, right at the edge, for an hour."
+      ],
+      grower_urgeFail: [
+        "It didn't get fed, so neither do you. It works you up to the very edge and leaves you there for an hour, swollen and aching and unsatisfied.",
+        "Hungry, and sulking about it. It squeezes everything it has hold of, slow and cruel, and won't let you finish. An hour of that."
+      ],
+      glutton_urgeFail: [
+        "It's starving and it blames you. It sucks at you everywhere, hard, right up to the edge, and keeps you there for an hour while it goes hungry too.",
+        "No milkin', no load. The Glutton clamps down and drains every bit of pleasure out of you before it can turn into anything. An hour of it."
+      ],
+      tyrant_urgeFail: [
+        "You disobeyed. The Tyrant doesn't get angry; it gets thorough. For the next hour it takes you right to the edge and holds you there, over and over.",
+        "It told you what to do. You didn't. Now it's going to keep you trembling and close and denied for an hour, and you're going to thank it after."
       ]
     });
     (function() {

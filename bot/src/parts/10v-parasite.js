@@ -93,6 +93,7 @@
       const r = rec(mn), p = prodOf(mn); if (!r || !p) return;
       // as a belt it drinks from the other end
       if (hole !== "mouth"){
+        if ((hole === "vulva" || hole === "butt") && parasiteOn(mn)) parasiteUrgeDone(mn, "bred");   // a Breeder that wanted them bred (10v2)
         if (!parasiteOn(mn) || !parasiteParts(r.parasite).root || (hole !== "vulva" && hole !== "butt")) return;   // (once it has a root down there)
         p.held[hole] = Math.max(0, (p.held[hole] || 0) - mlIn);
         r.parasite.fed = (r.parasite.fed || 0) + 1; r.parasite.ate = Date.now();

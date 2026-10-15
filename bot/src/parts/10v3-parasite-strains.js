@@ -163,3 +163,83 @@
                  "{v}The root in you rubs that one spot, in little circles, till your legs are tremblin'. Then it stops dead. You'd beg, but it's got your mouth.",
                  "The web pulls you up on your toes and works you over all at once: nipples, hole, the back of your neck. Right at the top, it lets go of everything."],
   });
+
+  // ── what each strain wants (10v2-parasite-more.js: STRAIN_URGES), and how it takes bein' obeyed or ignored ──
+  // urge_* lines are only theirs to read (you); *_urgeDone the room sees (%n); *_urgeFail are theirs again.
+  Object.assign(PARASITE_MORE, {
+    urge_bred: [
+      "{v}It goes still inside you, then swells, and every part of you it touches starts to ache the same way: empty. It wants you bred. Your pussy's already wet for whoever it is.",
+      "{nv}The root seated in your ass twists, slow, and you feel the place it's made in there clench on nothin'. It wants a load put up you. It doesn't care whose.",
+      "There's a pull low in your belly, like a hook, and it's tugging you toward anybody with a cock. It wants you on your back, or your knees, and filled.",
+      "Your hips keep tilting by themselves. It's makin' your body ready, slick and open, and you can feel it waiting for a stranger to finish in you.",
+      "It hums low in your belly, right where it means to put a litter. It wants seed in you. It'll make it very hard to think about anything else till it gets some."],
+    urge_nest: [
+      "A picture swims up behind your eyes: warm straw, a hollow in it shaped just for you, the smell of eggs. It wants you in the nest.",
+      "Your belly feels heavy and your thighs keep pressing together. It wants to be somewhere soft and hidden. The nest. Now.",
+      "It's restless, turning over and over in you like a hen circling her box. Go to the nest, it's saying. Sit. Spread. Wait.",
+      "You keep looking toward the nest without meaning to. Whatever's in you has decided that's where you belong for a while."],
+    urge_milked: [
+      "{t}Your tits throb, tight and hot, and the suckers on them pull at nothin'. It wants you emptied properly, on a machine or under somebody's hands.",
+      "{t}You're so full it aches, and the thing on you won't drink the last of it. It wants you milked. It wants to watch.",
+      "{nt}{c}Your balls are drawn up heavy and sore, and something in you keeps squeezing them, testing. It wants your cock milked dry. Somebody else's hands, or a machine's.",
+      "There's a pressure building in you that it's doing on purpose. It wants you strapped up and drained, and it's making sure you'll beg for it.",
+      "It keeps nudging you toward the stalls. Get milked, it says, without a word. Get milked, and I'll be sweet to you."],
+    urge_kneel: [
+      "Your knees go soft. It's pressing on the backs of them, gentle and absolutely sure. Down. On your knees. Stay there.",
+      "It wants you lower. It wants everyone who walks past to look down at you. Kneel, and don't you dare get up till it says.",
+      "A cold squeeze, everywhere it holds you, and one clear wish under it: kneel. Right where you are. Show it you know your place.",
+      "You can feel it watching through your own skin, waiting to see how fast you'll drop. On your knees, pet. It'll know if you don't."],
+    urge_beg: [
+      "It wants to hear you. Out loud, where others can hear it too. Beg. Say please like you mean it.",
+      "It winds you up, slow, and then it stops and waits. It's not going to give you a thing until you beg for it, in front of everyone.",
+      "Your mouth opens before you've decided anything. It wants the words. Please. Please. It wants the whole room to hear how badly.",
+      "It hums a question into your bones and only one answer will do: begging. Pretty, desperate, and loud enough to carry."],
+    breeder_urge_kiss: [
+      "It wants a taste of somebody's mouth, so it can tell whether they'd breed you well. Kiss someone. Deep.",
+      "Your lips feel swollen and wet. It wants you kissing someone, slow and open, the kind of kiss that ends with your legs apart."],
+    tyrant_urge_kiss: [
+      "It wants your mouth on someone else's, and it wants you to ask nicely first. Kiss somebody. Mean it.",
+      "A kiss. It wants you to give one away, so you'll remember who decides what your mouth is for."],
+    grower_urge_swallow: [
+      "It's hungry, and everything it eats goes straight into making more of you. Swallow a load. Feed it. Feel yourself fill out after.",
+      "The tentacle in your throat flexes. It wants cum, and it wants it now, so it can pour it back into you as more of you, everywhere."],
+    glutton_urge_swallow: [
+      "It's starving. Any load, from anyone, straight down. It'll drink every drop before it touches your belly.",
+      "Your mouth floods. The Glutton wants feeding and it doesn't care who from: find a cock and swallow what comes out of it."],
+    glutton_urge_glory: [
+      "The glory stalls. All those cocks through the boards, one after another, and every load free for the taking. It wants you there, mouth open.",
+      "It's dreaming of the stalls through you. A hole in the wall and a queue on the other side of it. Go and feed it."],
+
+    breeder_urgeDone: [
+      "The Breeder on %n goes warm and heavy with satisfaction, and every root of it squeezes at once. A thick hot dose floods into them, the kind that makes things take.",
+      "%n shivers as the Breeder pulses its thanks, deep and slow. Whatever it pumps into them now is meant for one thing, and their belly knows it.",
+      "It got what it wanted. The Breeder nuzzles into %n from the inside and fills them with something sweet and potent that settles low and stays.",
+      "Good, fertile host. The thing on %n throbs once, twice, and leaves them flushed, aching and ripe."],
+    grower_urgeDone: [
+      "The Grower on %n swells with pleasure and pays them in kind: a fat warm dose that goes straight to their curves. They feel it start to work.",
+      "%n gasps as the Grower squeezes them everywhere it holds. Tight, then looser, then tight again, like it's measuring how much bigger it can make them.",
+      "It's pleased. The violet thing on %n ripples, and %n can feel themselves fill out a little under it, heavy and warm.",
+      "The Grower drinks its reward and gives one back: a long thick dose, and the stretched, full feeling that comes after."],
+    glutton_urgeDone: [
+      "The Glutton on %n sighs through their whole body, fed and greedy and grateful. It pours a rich dose back into them so there'll be more to take next time.",
+      "Gorged, the golden thing on %n goes slack and warm for a moment, then squeezes out a thick dose of thanks. %n can feel themselves start to fill again.",
+      "It's had its fill, for now. The Glutton kneads %n slow and pleased, and leaves them dripping and swollen with what it pumped back in.",
+      "The Glutton purrs against %n's skin. A deep gulp of serum floods into them, the kind that makes a body work twice as hard to feed it."],
+    tyrant_urgeDone: [
+      "The Tyrant on %n loosens, just slightly, the way a hand eases on a leash. Good. A slow sweet dose seeps into them, and for one breath it lets them feel almost close.",
+      "%n obeyed, and the Tyrant rewards obedience: a warm flood of serum and a long, lazy stroke that stops exactly where it always stops.",
+      "It's pleased with %n. It lets them feel that, a warm hum from everywhere it holds them, and pays them a dose. Nothing more. Good pets don't get to cum.",
+      "The dark thing on %n purrs. A thick dose, a squeeze that's almost tender, and the edge pulled back a fraction. Almost."],
+    breeder_urgeFail: [
+      "You didn't let anyone breed you. It takes that personally. It swells against every needy spot you've got and holds you there, aching, empty, for an hour.",
+      "It wanted you filled and you stayed empty. Now it makes sure you feel how empty, every second, right at the edge, for an hour."],
+    grower_urgeFail: [
+      "It didn't get fed, so neither do you. It works you up to the very edge and leaves you there for an hour, swollen and aching and unsatisfied.",
+      "Hungry, and sulking about it. It squeezes everything it has hold of, slow and cruel, and won't let you finish. An hour of that."],
+    glutton_urgeFail: [
+      "It's starving and it blames you. It sucks at you everywhere, hard, right up to the edge, and keeps you there for an hour while it goes hungry too.",
+      "No milkin', no load. The Glutton clamps down and drains every bit of pleasure out of you before it can turn into anything. An hour of it."],
+    tyrant_urgeFail: [
+      "You disobeyed. The Tyrant doesn't get angry; it gets thorough. For the next hour it takes you right to the edge and holds you there, over and over.",
+      "It told you what to do. You didn't. Now it's going to keep you trembling and close and denied for an hour, and you're going to thank it after."],
+  });

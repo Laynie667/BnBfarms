@@ -84,26 +84,65 @@
     if (g.urge && now > g.urge.until){
       g.urge = null; g.urgeAt = now + (60 + Math.random()*60)*60000;
       p.deniedUntil = Math.max(p.deniedUntil || 0, now + CFG.PARASITE_URGE_PUNISH_MIN*60000);
-      privateLine(mn, pmLine("urgeFail", mn), "emote"); arouse(mn, 40, 94); saveLedger(); syncCompanions(true);
+      privateLine(mn, pmLine(PARASITE_MORE[strainKey(g)+"_urgeFail"] ? strainKey(g)+"_urgeFail" : "urgeFail", mn), "emote"); arouse(mn, 40, 94); saveLedger(); syncCompanions(true);
     } else if (g.urge && g.urge.kind === "glory" && Object.keys(L.spots || {}).some(n => /^glory-\d+$/.test(n) && onSpot(mn, n, 0))) parasiteUrgeDone(mn, "glory");
+    else if (g.urge && g.urge.kind === "nest" && nestSpots().some(n => onSpot(mn, n, 0))) parasiteUrgeDone(mn, "nest");
+    else if (g.urge && g.urge.kind === "kneel" && kneelingNow(mn)){ g.urge.knelt = (g.urge.knelt || 0) + 1; if (g.urge.knelt >= 3) parasiteUrgeDone(mn, "kneel"); else saveLedger(); }   // (three heartbeats on their knees, a minute or so)
     else if (!g.urge && now >= (g.urgeAt || 0) && !quietNow(mn) && !heldByTrap(mn) && !r.benched && !r.penned && !(p && p.stall)){
-      const kinds = ["kiss", "swallow"].concat(Object.keys(L.spots || {}).some(n => /^glory-\d+$/.test(n)) ? ["glory"] : []).filter(k => !(k !== "glory" && !P.lips && k === "swallow"));
-      const kind = kinds[Math.floor(Math.random()*kinds.length)];
-      g.urge = { kind, until: now + (kind === "swallow" ? 15 : 10)*60000 }; saveLedger();
-      privateLine(mn, pmLine("urge_"+kind, mn), "emote");
-      tell(mn, "👄 It wants somethin', sugar: "+{ kiss: "kiss somebody on the mouth", swallow: "swallow a load", glory: "get yourself into a glory stall" }[kind]+", inside "+(kind === "swallow" ? 15 : 10)+" minutes. Do it and it'll be sweet to you. Don't, and it'll hold you at the edge for an hour.");
+      const kinds = urgeKinds(mn, g, P);
+      if (!kinds.length){ g.urgeAt = now + 30*60000; return; }
+      const kind = kinds[Math.floor(Math.random()*kinds.length)], mins = URGE_MINS[kind] || 10;
+      g.urge = { kind, until: now + mins*60000 }; saveLedger();
+      privateLine(mn, pmLine(PARASITE_MORE[strainKey(g)+"_urge_"+kind] ? strainKey(g)+"_urge_"+kind : "urge_"+kind, mn), "emote");
+      tell(mn, "👄 It wants somethin', sugar: "+urgeAsk(mn, kind)+", inside "+mins+" minutes. Do it and it'll be sweet to you. Don't, and it'll hold you at the edge for an hour.");
     }
   }
+  // WHAT EACH STRAIN WANTS (Laynie, Oct 14: "lets do the parasites"). They all used to want the same three things. Now:
+  //   Breeder  bred (a load in pussy or ass), a kiss, the nest
+  //   Grower   a load swallowed, a milkin', a glory stall
+  //   Glutton  a milkin', a load swallowed, a glory stall
+  //   Tyrant   on your knees, beggin' out loud, a kiss
+  // Each only if it can be done: no swallowin' without its lips on them, no milkin' for somebody who makes nothin',
+  // no nest or glory stall the farm hasn't got, no breedin' past a limit that rules it out.
+  const STRAIN_URGES = { breeder: ["bred", "kiss", "nest"], grower: ["swallow", "milked", "glory"], glutton: ["milked", "swallow", "glory"], tyrant: ["kneel", "beg", "kiss"] };
+  const URGE_MINS = { swallow: 15, bred: 15, milked: 15, nest: 10, glory: 10, kiss: 10, kneel: 10, beg: 10 };
+  function urgeKinds(mn, g, P){
+    const glory = Object.keys(L.spots || {}).some(n => /^glory-\d+$/.test(n));
+    return (STRAIN_URGES[strainKey(g)] || ["kiss", "swallow", "glory"]).filter(k =>
+      k === "swallow" ? !!P.lips && !holeBlocked(mn, "mouth") :
+      k === "glory"   ? glory :
+      k === "nest"    ? nestSpots().length > 0 :
+      k === "bred"    ? !limitBlocks(mn, "breed") :
+      k === "milked"  ? (makesMilk(mn) && !limitBlocks(mn, "milk")) || makesSemen(mn) :
+      true);
+  }
+  // what they're told to do, for the body they've got
+  function urgeAsk(mn, kind){
+    const v = hasVulva(mn);
+    return { kiss: "kiss somebody on the mouth", swallow: "swallow a load", glory: "get yourself into a glory stall", nest: "go and settle yourself in the nest",
+             bred: v ? "take a load in your pussy or your ass" : "take a load up your ass",
+             milked: makesMilk(mn) && !limitBlocks(mn, "milk") ? "get yourself milked" : "get your cock milked",
+             kneel: "get down on your knees and stay there", beg: "beg for it, out loud, where folks can hear you" }[kind] || "do as it says";
+  }
+  // on their knees (or all fours) in the game right now
+  function kneelingNow(mn){ const C = charFor(mn); if (!C) return false; const a = [].concat(C.ActivePose || [], C.Pose || []); return a.some(p => /^(Kneel|KneelingSpread|AllFours)$/.test(String(p))); }
+  // a line in the room from them: the Tyrant wanted beggin'
+  const BEG_WORDS = /\b(please|plea+se|beg|begging|beggin'?|pretty please|i need (it|you|this|to)|let me cum|need to cum|have mercy|mercy)\b/i;
+  function parasiteHeard(mn, text){ const g = rec(mn) && rec(mn).parasite; if (g && g.urge && g.urge.kind === "beg" && BEG_WORDS.test(String(text))) parasiteUrgeDone(mn, "beg"); }
   function parasiteUrgeDone(mn, kind){
     const r = rec(mn), g = r && r.parasite;
     if (!g || !g.urge || g.urge.kind !== kind || !parasiteOn(mn)) return false;
     g.urge = null; g.urgeAt = Date.now() + (60 + Math.random()*60)*60000; saveLedger();
-    later(() => { if (parasiteOn(mn)){ parasiteDose(mn, 1, pmLine("urgeDone", mn)); arouse(mn, 25); } }, 5000);
+    const k = strainKey(g)+"_urgeDone";
+    later(() => { if (parasiteOn(mn)){ parasiteDose(mn, 1, pmLine(PARASITE_MORE[k] ? k : "urgeDone", mn)); arouse(mn, 25); } }, 5000);
     return true;
   }
   // after each regular feed: the suckers (or a Glutton, from the start) drink their milk
   function parasiteAfterDose(mn){
     const r = rec(mn), g = r.parasite, p = prodOf(mn);
+    g.drinking = true; try { afterDoseDrink(mn, r, g, p); } finally { g.drinking = false; }   // (its own drinkin' isn't the milkin' it asked them to go and get)
+  }
+  function afterDoseDrink(mn, r, g, p){
     strainAfterDose(mn);   // the Glutton's sleeve (10v3-parasite-strains.js)
     if (!(parasiteParts(g).suckers || g.strain === "glutton") || !makesMilk(mn) || p.milk < 20) return;
     const got = drainMilk(mn, p.milk * (g.strain === "glutton" ? 0.8 : 0.4));

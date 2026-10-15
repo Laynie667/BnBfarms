@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.30.2
+// @version      0.30.3
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -1828,7 +1828,7 @@
   ];
 
   // bot/src/version.js
-  var VERSION = "0.30.2";
+  var VERSION = "0.30.3";
 
   // bot-parts:farmhand-bot-parts
   (function() {
@@ -4583,6 +4583,7 @@
         if (makesSemen(mn)) s.semen = { ml: Math.round(p.semen), cap: Math.round(semenCap(mn)) };
         s.holding = { ml: shownMl(heldTotal(p)), cap: Math.round(capacity(mn)) };
         s.body = bodyParts(mn).filter((k) => CFG.SIZES[k]).map((k) => ({ part: k, label: CFG.SIZES[k].label, size: sizeName(mn, k) }));
+        s.drawn = { cup: bodyParts(mn).includes("udder") ? udderLevel(mn) : 0, belly: bellyStage(mn) };
         if (inHeat(p)) s.heatUntil = p.heat.until;
         if (p.preg) s.preg = { due: p.preg.due, sires: p.preg.sires.map(plainName) };
         if (quotaOf(mn)) s.quota = { ml: Math.round(milkedOn(mn, dayKey())), goal: Math.round(quotaOf(mn)), streak: r.quotaStreak || 0 };

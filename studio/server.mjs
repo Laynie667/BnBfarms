@@ -1,16 +1,24 @@
-// The outfit studio's little server. It runs on this computer only and talks to nobody.
-//   node studio/server.mjs [path to the game's BondageClub folder] [port]
-// It serves the game's own files (pictures, item list, drawing code) from your copy of the game, and adds the
-// studio's panel on top. Nothing is signed in to: the game's code is only used to draw.
-// Then open http://localhost:4780/ in a browser.
+// The outfit studio's little server. It runs on this computer only and signs in to nothing.
+//   node studio/server.mjs live [port]             the live game's own files, fetched from its site as they're needed
+//   node studio/server.mjs live:R132 [port]        ...a version of your choosing
+//   node studio/server.mjs [path to a BondageClub folder] [port]   a copy of the game on this computer (the default:
+//                                                  the one in reference/, the developers' newest work)
+// It serves the game's own files (pictures, item list, drawing code) and adds the studio's panel on top. The game's
+// code is only used to draw. Then open http://localhost:4780/ in a browser.
+// LIVE (Laynie, Oct 14: sharing the studio with players): nothing to download first. Each game file is fetched from the
+// live game's own site the first time the studio asks for it and kept in studio/game-cache/<version>, so it's the very
+// version players are on (and the Echo mod, made for it, behaves as in the game). Needs the internet the first time.
 import { createServer } from "node:http";
-import { readFile, stat, writeFile, mkdir } from "node:fs/promises";
+import { readFile, stat, writeFile, mkdir, rename } from "node:fs/promises";
 import { existsSync } from "node:fs";
-import { extname, join, normalize, resolve, sep } from "node:path";
+import { dirname, extname, join, normalize, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const HERE = fileURLToPath(new URL(".", import.meta.url));
-const GAME = resolve(process.argv[2] || join(HERE, "../../reference/Bondage-College-new/Bondage-College-master/BondageClub"));
+const ARG = String(process.argv[2] || "");
+const GAME = resolve(ARG && !/^live/i.test(ARG) ? ARG : join(HERE, "../../reference/Bondage-College-new/Bondage-College-master/BondageClub"));
+const LIVE_SITE = "https://www.bondageprojects.elementfx.com/";
+let LIVE = null;   // { ver, base, dir, missing, busy } when the game comes from its site
 const PORT = Number(process.argv[3] || process.env.PORT || 4780);
 const WEB = join(HERE, "web");
 const FITS = join(HERE, "fits");                                  // what the sliders save: one small JSON file per body part
@@ -20,7 +28,18 @@ const TYPES = { ".html": "text/html; charset=utf-8", ".js": "text/javascript; ch
   ".png": "image/png", ".jpg": "image/jpeg", ".jpeg": "image/jpeg", ".gif": "image/gif", ".svg": "image/svg+xml", ".webp": "image/webp", ".mp3": "audio/mpeg", ".ogg": "audio/ogg", ".wav": "audio/wav",
   ".csv": "text/csv; charset=utf-8", ".txt": "text/plain; charset=utf-8", ".ttf": "font/ttf", ".woff": "font/woff", ".woff2": "font/woff2", ".ico": "image/x-icon" };
 
-if (!existsSync(join(GAME, "index.html"))) {
+if (/^live/i.test(ARG)) {
+  // which version: the one asked for, or the newest the site has (old versions stay up, so: count up till one isn't there)
+  let ver = (/^live:(R\d+)$/i.exec(ARG) || [])[1];
+  if (!ver) {
+    for (let n = 132; n < 160; n++) {
+      try { const r = await fetch(LIVE_SITE + "R" + n + "/BondageClub/index.html"); if (!r.ok) break; await r.arrayBuffer(); ver = "R" + n; } catch (e) { break; }
+    }
+  }
+  if (!ver) { console.error("I couldn't reach the game's site (" + LIVE_SITE + "). Is this computer online? Or use a copy of the game: node studio/server.mjs \"C:\\path\\to\\BondageClub\""); process.exit(1); }
+  ver = ver.toUpperCase();
+  LIVE = { ver, base: LIVE_SITE + ver + "/BondageClub/", dir: join(HERE, "game-cache", ver), missing: new Set(), busy: new Map() };
+} else if (!existsSync(join(GAME, "index.html"))) {
   console.error("I can't find the game at " + GAME + "\nGive me the folder that has index.html, Assets and Scripts in it:\n  node studio/server.mjs \"C:\\path\\to\\BondageClub\"");
   process.exit(1);
 }
@@ -28,6 +47,27 @@ if (!existsSync(join(GAME, "index.html"))) {
 function inside(root, urlPath) {
   const p = normalize(join(root, decodeURIComponent(urlPath)));
   return p === root || p.startsWith(root + sep) ? p : null;
+}
+// a game file, by its address in the game ("Scripts/Drawing.js"): the file on this computer, or null if the game has none.
+// Live, it's fetched from the site the first time and kept; one fetch at a time per file, and a miss is remembered.
+async function gameFile(rel) {
+  rel = String(rel).replace(/^\/+/, "");
+  const root = LIVE ? LIVE.dir : GAME, f = normalize(join(root, rel));
+  if (!(f === root || f.startsWith(root + sep))) return null;
+  if (existsSync(f)) return f;
+  if (!LIVE || LIVE.missing.has(rel)) return null;
+  let p = LIVE.busy.get(rel);
+  if (!p) {
+    p = (async () => {
+      const r = await fetch(LIVE.base + rel.split("/").map(encodeURIComponent).join("/"));
+      if (!r.ok) { if (r.status === 404) LIVE.missing.add(rel); return null; }
+      const buf = Buffer.from(await r.arrayBuffer());
+      await mkdir(dirname(f), { recursive: true }); const tmp = f + ".part" + process.pid; await writeFile(tmp, buf); await rename(tmp, f);
+      return f;
+    })().catch(() => null).finally(() => LIVE.busy.delete(rel));
+    LIVE.busy.set(rel, p);
+  }
+  return p;
 }
 async function send(res, file) {
   try {
@@ -53,7 +93,9 @@ createServer(async (req, res) => {
     }
     if (path === "/" || path === "/index.html") {
       // the game's own page, with the studio added at the end
-      let html = await readFile(join(GAME, "index.html"), "utf8");
+      const idx = await gameFile("index.html"); if (!idx) { res.writeHead(502).end("the game's page couldn't be fetched"); return; }
+      let html = await readFile(idx, "utf8");
+      if (LIVE) html = html.replace("</head>", "<script>window.__studioLive = " + JSON.stringify(LIVE.ver) + ";</script>\n</head>");   // (studio.js: the live game's own drawing is used as it is)
       html = html.replace("</body>", `<link rel="stylesheet" href="/__studio/studio.css">\n<script src="/__studio/belly-drawing.js"></script>\n<script src="/__studio/breasts-drawing.js"></script>\n<script src="/__studio/cock-drawing.js"></script>\n<script src="/__studio/body-engine.js"></script>\n<script src="/__studio/studio.js"></script>\n</body>`).replace("<title>Bondage Club</title>", "<title>B&B outfit studio</title>");
       res.writeHead(200, { "Content-Type": TYPES[".html"], "Cache-Control": "no-cache" }).end(html);
       return;
@@ -105,12 +147,14 @@ createServer(async (req, res) => {
       res.writeHead(200, { "Content-Type": "image/png", "Content-Length": buf.length, "Cache-Control": "max-age=86400" }).end(buf); return;
     }
     if (path.startsWith("/__studio/")) { const f = inside(WEB, path.slice("/__studio/".length)); if (f) return send(res, f); }
-    const f = inside(GAME, path);
+    let rel; try { rel = decodeURIComponent(path).replace(/^\/+/, ""); } catch (e) { res.writeHead(400).end("bad path"); return; }
+    if (rel.split("/").includes("..")) { res.writeHead(403).end("no"); return; }
+    let f = await gameFile(rel);
     // A piece the game only draws for a flat chest (the Button Shirt, the vests: "male" clothes) has no pictures for a chest
     // with breasts, and draws nothing there. Its flat-chest picture is sent instead, and fitted to her like anything else.
     // (Laynie, Oct 14: "some clothes are gendered~ but no worries we can plan for them anyway".)
-    if (f && !existsSync(f) && /_(Small|Normal|Large|XLarge)(?=[_.])/.test(f)) { const flat = f.replace(/_(Small|Normal|Large|XLarge)(?=[_.])/, "_FlatMedium"); if (existsSync(flat)) return send(res, flat); }
+    if (!f && /_(Small|Normal|Large|XLarge)(?=[_.])/.test(rel)) f = await gameFile(rel.replace(/_(Small|Normal|Large|XLarge)(?=[_.])/, "_FlatMedium"));
     if (f) return send(res, f);
-    res.writeHead(403).end("no");
+    res.writeHead(404, { "Content-Type": "text/plain" }).end("not found");
   } catch (e) { res.writeHead(500, { "Content-Type": "text/plain" }).end(String(e && e.message || e)); }
-}).listen(PORT, "127.0.0.1", () => console.log("B&B outfit studio: http://localhost:" + PORT + "/\nGame files from: " + GAME + "\nThis computer only. Ctrl+C stops it."));
+}).listen(PORT, "127.0.0.1", () => console.log("B&B outfit studio: http://localhost:" + PORT + "/\nGame files from: " + (LIVE ? "the live game, " + LIVE.ver + " (" + LIVE.base + "), kept in " + LIVE.dir : GAME) + "\nThis computer only. Ctrl+C stops it."));

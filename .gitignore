@@ -16,3 +16,6 @@ vps/node_modules/
 # the outfit studio's catalogue pages: pictures made on this computer, never on GitHub
 studio/catalogue/
 tests/out/
+
+# the outfit studio's copy of the live game's files (fetched from its site as they're needed)
+studio/game-cache/

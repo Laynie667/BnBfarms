@@ -2,27 +2,45 @@
 
 An offline dressing room for Bondage Club, for our own use. It runs on this computer only and signs in to nothing.
 
-It does not imitate the game. It loads the game's own item list and drawing code from the copy of the game in
-`reference/`, and has that draw a character. So an outfit, a restraint, a pose or a colour looks here the way it
-looks in the game.
+It does not imitate the game. It loads the game's own item list and drawing code, from the live game's own site or
+from a copy of the game, and has that draw a character. So an outfit, a restraint, a pose or a colour looks here the
+way it looks in the game.
 
 ## Start it
 
 Double-click **`Start the studio.bat`**. A small window opens (that is the studio running) and your browser opens
 `http://localhost:4780/`. Close the small window to stop it.
 
-Or, from the `farmhand` folder:
+It uses **the live game's own files**: each one is fetched from the game's site the first time the studio needs it
+and kept in `studio/game-cache/<version>` (a session uses about 15 MB, not the whole game). It's the version players
+are on, so the Echo clothing mod, made for that version, behaves as it does in the game. It finds the newest version
+on the site by itself. It needs the internet the first time a file is wanted.
+
+From the `farmhand` folder:
 
 ```bash
-node studio/server.mjs
+node studio/server.mjs live
 ```
 
-It needs Node (already installed for the farm) and the game copy at
-`reference/Bondage-College-new/Bondage-College-master/BondageClub`. To use a different copy:
+`node studio/server.mjs live:R132` picks a version. With nothing after `server.mjs` it uses the developers' newer copy
+in `reference/`, and any other copy works too:
 
 ```bash
 node studio/server.mjs "C:\path\to\BondageClub" 4780
 ```
+
+## Sharing it with a player
+
+Everything it needs is in the repo; nothing of the game has to be downloaded first.
+
+1. Install Node.js (the LTS version, from nodejs.org).
+2. Download the repo (on GitHub: *Code*, *Download ZIP*) and unzip it.
+3. Double-click `studio/Start the studio.bat`. On a Mac or Linux, run `node studio/server.mjs live` in the unzipped
+   folder and open `http://localhost:4780/`.
+
+What they save (the Save buttons) stays in their own `studio/fits`. In the game, their Companion's *Get my studio's
+settings* reads it while the studio is running, and those settings replace the farm's look for them. Without a
+studio, every Companion draws the farm's look, which the bot hands out.
 
 It has to be opened through that address, not by double-clicking a file: a browser will not let a plain file load
 the game's pictures into the drawing.
@@ -102,8 +120,12 @@ the game's pictures into the drawing.
   the game will show.
 - *Copy for the Companion* (Breasts section): your cup, breast sliders, hands and clothes choices, piece choices,
   belly for each pose and mould choices, as one code. Nothing of the outfit.
-- In the game: the Companion's Toggles, *Drawn body (from the outfit studio)*. Paste the code, press *Put in the
-  studio's settings*, switch it on. Only you see it. For the drawn breasts your chest must be the game's biggest size.
+- In the game: the Companion's Toggles, *Drawn body (outfit studio)*: *Get my studio's settings* (while the studio
+  runs on that computer) or paste the code, then switch it on. Everyone in the room with the Companion sees it. For
+  the drawn breasts your chest must be the game's biggest size.
+- **The farm's look (Companion 0.20.0).** The Companion on the bot's own account holds the farm's look: put the
+  studio's settings in there, and the bot hands them to every Companion, phones included. Each player picks their
+  own cup and *Show my belly* on top.
 
 ## The catalogue
 
@@ -202,7 +224,9 @@ the game's pictures into the drawing.
 ## Good to know
 
 - The game copy in `reference/` is the developers' newest work (R133 at the time of writing). The live game is a
-  version behind, so the studio can show an item or a feature that is not live yet.
+  version behind, so with that copy the studio can show an item or a feature that is not live yet. The Echo mod is
+  made for the live version: with the newer copy the studio draws the plain way once Echo is loaded (its fast drawing
+  scrambled the body there). With `live` it draws exactly as the game does.
 - The codes are the outfit's list of items as JSON, packed with LZString to base64. A plain JSON list is accepted too.
 - `window.FarmStudio` in the browser console has the pieces (`wear`, `decode`, `encode`, `setBody`, `setPose`).
 - Nothing here is sent anywhere. The game's code looks for a server on this same computer, finds none, and carries on.

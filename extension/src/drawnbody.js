@@ -43,16 +43,40 @@ function load() {
   try { const f = JSON.parse(W.localStorage.getItem(FARM_KEY)); if (f && typeof f.at === "number" && f.body) { const b = clean(f.body); if (b) farm = { at: f.at, body: b }; } } catch (e) { /* none yet */ }
   mine.S = S;
 }
-// what you're drawn with: your own studio's settings if you brought them, otherwise the farm's look with your own cup
-// and belly on top (and plain settings till the farm's look arrives)
+// What you're drawn with: your own studio's settings if you brought them, otherwise the farm's look (plain settings till
+// it arrives). On top, your cup and your belly FOLLOW THE FARM unless you pick your own (Laynie, Oct 14: "the belly
+// sizes in game need to automatically adjust based on how full or pregnant each player is", "same for tit sizes and
+// growth"): the bot says your cup as it counts it (1 AA ... 20 R, the same scale as here) and how big your belly is
+// (0 none ... 4 huge), and both change as the farm changes you.
+let farmMe = null;                                 // { cup, belly } for you, from the bot (state.drawn)
+const BELLY_STAGES = [null, { k: 50 / 92, kr: 54 / 112, sag: 0.16, lift: 0 }, { k: 70 / 92, kr: 80 / 112, sag: 0.22, lift: 5 }, { k: 1, kr: 1, sag: 0.28, lift: 20 }, { k: 1.2, kr: 1.2, sag: 0.32, lift: 30 }];
+const bellyMode = () => S.bellyMode || (S.bellyOn ? "on" : "farm");
+function bellyAt(base, stage) {
+  // the look's standing belly is the large one (stage 3); smaller and bigger are drawn in proportion to it, raised or
+  // dropped the way the belly drawing's own sizes are. Other poses only if the look has them switched on.
+  const out = {}, s = BELLY_STAGES[stage], ref = BELLY_STAGES[3];
+  for (const k of ["std", "AllFours", "Hogtied"]) {
+    const b = (base && base[k]) || (k === "std" ? { rx: 92, ry: 112, sag: 0.28, x: 0, y: -20, behind: false, flat: false, cut: 0.74 } : null); if (!b) continue;
+    if (!s) { out[k] = Object.assign({}, b, { on: false }); continue; }
+    out[k] = Object.assign({}, b, { on: k === "std" ? true : !!b.on, rx: Math.round((b.rx || 92) * s.k), ry: Math.round((b.ry || 112) * s.kr), sag: Math.max(0, Math.min(0.5, (b.sag || 0.28) * s.sag / ref.sag)), y: (b.y || 0) + (k === "std" ? ref.lift - s.lift : 0) });
+  }
+  return out;
+}
 function eff() {
-  if (S.saved || !farm) return S;
-  const f = farm.body, e = Object.assign({}, f, { on: S.on });
-  if (S.cupSet) e.cup = S.cup;
-  e.belly = {};
-  for (const k of ["std", "AllFours", "Hogtied"]) { const fk = f.belly && f.belly[k]; if (fk) e.belly[k] = Object.assign({}, fk, { on: !!S.bellyOn && !!fk.on }); }
-  if (S.bellyOn && !(e.belly.std && e.belly.std.on)) e.belly.std = Object.assign({}, e.belly.std || {}, { on: true });   // (the farm's look has no belly of its own: the usual one)
+  const base = S.saved || !farm ? S : farm.body, e = Object.assign({}, base, { on: S.on });
+  if (S.cupSet) e.cup = S.cup; else if (farmMe && farmMe.cup >= 1) e.cup = farmMe.cup;
+  const mode = bellyMode();
+  e.belly = mode === "studio" ? base.belly : bellyAt(base.belly, mode === "off" ? 0 : mode === "on" ? 3 : Math.max(0, Math.min(4, Math.round(Number(farmMe && farmMe.belly) || 0))));
   return e;
+}
+// the bot's word on your size (index.js hands over state.drawn)
+export function drawnBodyFarmState(d) {
+  if (!d || typeof d !== "object") return;
+  const cup = Math.max(0, Math.min(20, Math.round(Number(d.cup) || 0))), belly = Math.max(0, Math.min(4, Math.round(Number(d.belly) || 0)));
+  if (farmMe && farmMe.cup === cup && farmMe.belly === belly) return;
+  farmMe = { cup, belly };
+  if (!S.on) return;
+  if (mine.E) apply(mine.E, eff()); redraw(60); tell(true);
 }
 function save() { try { W.localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { /* private window: fine */ } }
 
@@ -72,7 +96,9 @@ function picture(cv) {
   if (x1 < 0) { p = { src: null, dx: 0, dy: 0 }; made.set(cv, p); return null; }   // nothing on it
   const c = W.document.createElement("canvas"); c.width = x1 - x0 + 1; c.height = y1 - y0 + 1;
   c.getContext("2d").drawImage(cv, -x0, -y0);
-  p = { src: c.toDataURL("image/png"), dx: x0, dy: y0 }; made.set(cv, p); used.set(p.src, Date.now()); fresh = true;
+  p = { src: c.toDataURL("image/png"), dx: x0, dy: y0 }; made.set(cv, p);
+  if (!used.has(p.src)) fresh = true;   // (a new drawing with the very same picture as before is no reason to draw again: that went round and round)
+  used.set(p.src, Date.now());
   return p;
 }
 // pictures not handed over for a while come out of the game's lists (and the drawing card's memory)
@@ -206,7 +232,8 @@ export function initDrawnBody(mod) {
 // ── what the Toggles screen shows and does ──
 export function drawnBodyState() {
   const up = itemOf(W.Player, "BodyUpper"), cups = (W.FarmBreasts && W.FarmBreasts.CUPS) || [], e = eff();
-  return { on: !!S.on, cup: e.cup, cupName: cups[e.cup] || "?", cups, chest: up && up.Asset ? up.Asset.Name : "", fromStudio: !!S.saved, fromFarm: !S.saved && !!farm, bellyOn: !!S.bellyOn,
+  return { on: !!S.on, cup: e.cup, cupName: cups[e.cup] || "?", cups, cupSet: !!S.cupSet, farmCup: farmMe && farmMe.cup >= 1 ? farmMe.cup : 0, farmBelly: farmMe ? farmMe.belly : 0, bellyMode: bellyMode(),
+           chest: up && up.Asset ? up.Asset.Name : "", fromStudio: !!S.saved, fromFarm: !S.saved && !!farm,
            belly: !!(e.belly && e.belly.std && e.belly.std.on), seeOthers, othersHere: Array.from(others.keys()).filter((mn) => charOf(mn)).length };
 }
 // ── the farm's look, from the bot (index.js hands these over) ──
@@ -220,10 +247,11 @@ export function onFarmLook(m) {
   if (mine.E) apply(mine.E, eff());
   if (S.on) { redraw(60); tell(true); }
 }
-// your belly on the drawn body, the farm's shape for it
-export function drawnBodyBelly(on, say) {
-  S.bellyOn = !!on; save(); if (mine.E) apply(mine.E, eff()); redraw(60); tell(true);
-  if (say) say(on ? (S.saved ? "Belly on. You're using your own studio settings, so it's the belly you set there (switch it on in the studio if it isn't)." : "Belly on.") : "Belly off.");
+// your belly: "farm" (as full or pregnant as the farm has you, the default), "on" (always, the large one), "off", or
+// "studio" (as your own studio has it)
+export function drawnBodyBelly(mode, say) {
+  S.bellyMode = ["farm", "on", "off", "studio"].includes(mode) ? mode : "farm"; delete S.bellyOn; save(); if (mine.E) apply(mine.E, eff()); redraw(60); tell(true);
+  if (say) say({ farm: "Your belly follows the farm: it shows, and grows, as you fill up or get bred.", on: "Belly always on.", off: "Belly off.", studio: "Your belly is the one your own studio has." }[S.bellyMode]);
 }
 // back to the farm's look, from settings of your own
 export function drawnBodyUseFarm(say) {
@@ -254,12 +282,13 @@ export function drawnBodySeeOthers(on, say) {
 }
 export function drawnBodyCup(i, say) {
   const n = W.FarmBreasts ? W.FarmBreasts.CUPS.length : 21;
+  if (i === "auto") { S.cupSet = false; save(); if (mine.E) apply(mine.E, eff()); redraw(60); tell(true); if (say) say("Your cup follows the farm: " + drawnBodyState().cupName + " now, and it changes as you grow."); return; }
   S.cup = Math.max(6, Math.min(n - 1, Math.round(Number(i) || 0))); S.cupSet = true; save(); if (mine.E) apply(mine.E, eff()); redraw(60); tell(true);
-  if (say) say("Cup: " + drawnBodyState().cupName + ".");
+  if (say) say("Cup: " + drawnBodyState().cupName + ", whatever the farm does. Pick Follow the farm to have it grow with you again.");
 }
 function take(d, say, from) {
   const s = clean(d); if (!s) throw new Error("the settings are damaged");
-  s.on = S.on; s.bellyOn = S.bellyOn; s.saved = typeof d.saved === "string" ? d.saved.slice(0, 40) : new Date().toISOString();
+  s.on = S.on; s.bellyMode = S.bellyMode; s.bellyOn = S.bellyOn; s.cupSet = S.cupSet; s.cup = S.cupSet ? S.cup : s.cup; s.saved = typeof d.saved === "string" ? d.saved.slice(0, 40) : new Date().toISOString();
   S = s; mine.S = S; save(); if (mine.E) apply(mine.E, eff()); redraw(60); tell(true);
   if (say) say("Settings " + from + " put in: " + drawnBodyState().cupName + " cup" + (S.belly.std && S.belly.std.on ? ", your belly" : "") + ", " + Object.keys(S.wear).length + " piece choices. " + (S.on ? "" : "Switch the drawn body on to see it."));
   return true;

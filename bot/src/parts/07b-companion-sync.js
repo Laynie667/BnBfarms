@@ -46,6 +46,10 @@
       if (makesSemen(mn)) s.semen = { ml: Math.round(p.semen), cap: Math.round(semenCap(mn)) };
       s.holding = { ml: shownMl(heldTotal(p)), cap: Math.round(capacity(mn)) };
       s.body = bodyParts(mn).filter(k => CFG.SIZES[k]).map(k => ({ part: k, label: CFG.SIZES[k].label, size: sizeName(mn, k) }));
+      // for the drawn body (extension/src/drawnbody.js): their cup as the farm counts it (1 AA ... 20 R, 0 none) and how
+      // big their belly is (0 to 4: pregnant, eggs, a full load). Laynie, Oct 14: "the belly sizes in game need to
+      // automatically adjust based on how full or pregnant each player is", "same for tit sizes and growth".
+      s.drawn = { cup: bodyParts(mn).includes("udder") ? udderLevel(mn) : 0, belly: bellyStage(mn) };
       if (inHeat(p)) s.heatUntil = p.heat.until;
       if (p.preg) s.preg = { due: p.preg.due, sires: p.preg.sires.map(plainName) };
       if (quotaOf(mn)) s.quota = { ml: Math.round(milkedOn(mn, dayKey())), goal: Math.round(quotaOf(mn)), streak: r.quotaStreak || 0 };

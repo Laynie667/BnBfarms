@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.20.0
+// @version      0.21.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -230,7 +230,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.20.0";
+  var VERSION = "0.21.0";
 
   // extension/src/config.js
   var BOT_MEMBER = 260239;
@@ -1590,17 +1590,23 @@ One of mods you are using is using an old version of SDK. It will work for now b
                   if (typeof real.drawImageBlink === "function") put("drawImageBlink", bc, rx - bc.ax, ry - bc.ay, {});
                   ctx2.breast = { fit: FarmBreasts.fitOf(S3, FarmBelly.bellyPose(upper[2]), [bc.nips[1][0] + br.nipX, bc.nips[1][1] + br.nipY]), held: isHeld, upperSrc: upper[2], ux: upper[0], pose: bpose, ground: bpose === "AllFours" ? ground : Infinity, S: S3, rx, ry, uy: upper[1], mask: bc.mask, mx: rx - bc.ax, my: ry - bc.ay, nips: bc.nips.map((p, i) => [rx + p[0] + (i ? 1 : -1) * br.nipX, ry + p[1] + br.nipY]), k: FarmBreasts.shape(br.cup, br).k, kN: (1 + 0.45 * FarmBreasts.shape(br.cup, br).k) * br.nip, sig: key + "|" + Math.round(rx) + "," + Math.round(ry) + "|" + [br.nip, br.nipX, br.nipY].join(","), mid: upper[0] + 250 };
                   if (!held.length) {
-                    const B = ctx2.breast, sk = bellySkin(upper[2], upper[3], bpose), rad = 7 * B.kN, nc = document.createElement("canvas");
-                    nc.width = nc.height = Math.ceil(rad * 2 + 4);
-                    const ng = nc.getContext("2d"), gr = ng.createRadialGradient(nc.width / 2, nc.height / 2, 0, nc.width / 2, nc.height / 2, rad), tone = (m, a) => "rgba(" + Math.round(Math.min(255, sk[0] * m)) + "," + Math.round(sk[1] * 0.62 * m) + "," + Math.round(sk[2] * 0.62 * m) + "," + a + ")";
-                    gr.addColorStop(0, tone(0.92, 1));
-                    gr.addColorStop(0.3, tone(1, 0.95));
-                    gr.addColorStop(0.75, tone(1.02, 0.8));
-                    gr.addColorStop(1, tone(1.02, 0));
-                    ng.fillStyle = gr;
-                    ng.beginPath();
-                    ng.arc(nc.width / 2, nc.height / 2, rad, 0, Math.PI * 2);
-                    ng.fill();
+                    const B = ctx2.breast, sk = bellySkin(upper[2], upper[3], bpose), rad = 7 * B.kN, ncKey = rad.toFixed(2) + "|" + sk.join(",");
+                    let nc = BREAST.nc;
+                    if (!nc || BREAST.ncKey !== ncKey) {
+                      nc = document.createElement("canvas");
+                      nc.width = nc.height = Math.ceil(rad * 2 + 4);
+                      const ng = nc.getContext("2d"), gr = ng.createRadialGradient(nc.width / 2, nc.height / 2, 0, nc.width / 2, nc.height / 2, rad), tone = (m, a) => "rgba(" + Math.round(Math.min(255, sk[0] * m)) + "," + Math.round(sk[1] * 0.62 * m) + "," + Math.round(sk[2] * 0.62 * m) + "," + a + ")";
+                      gr.addColorStop(0, tone(0.92, 1));
+                      gr.addColorStop(0.3, tone(1, 0.95));
+                      gr.addColorStop(0.75, tone(1.02, 0.8));
+                      gr.addColorStop(1, tone(1.02, 0));
+                      ng.fillStyle = gr;
+                      ng.beginPath();
+                      ng.arc(nc.width / 2, nc.height / 2, rad, 0, Math.PI * 2);
+                      ng.fill();
+                      BREAST.nc = nc;
+                      BREAST.ncKey = ncKey;
+                    }
                     for (const p of B.nips) if (p[1] + rad < B.ground) {
                       put("drawImage", nc, p[0] - nc.width / 2, p[1] - nc.height / 2, {});
                       if (typeof real.drawImageBlink === "function") put("drawImageBlink", nc, p[0] - nc.width / 2, p[1] - nc.height / 2, {});
@@ -3461,17 +3467,39 @@ One of mods you are using is using an old version of SDK. It will work for now b
     }
     mine.S = S;
   }
-  function eff() {
-    if (S.saved || !farm) return S;
-    const f = farm.body, e = Object.assign({}, f, { on: S.on });
-    if (S.cupSet) e.cup = S.cup;
-    e.belly = {};
+  var farmMe = null;
+  var BELLY_STAGES = [null, { k: 50 / 92, kr: 54 / 112, sag: 0.16, lift: 0 }, { k: 70 / 92, kr: 80 / 112, sag: 0.22, lift: 5 }, { k: 1, kr: 1, sag: 0.28, lift: 20 }, { k: 1.2, kr: 1.2, sag: 0.32, lift: 30 }];
+  var bellyMode = () => S.bellyMode || (S.bellyOn ? "on" : "farm");
+  function bellyAt(base, stage) {
+    const out = {}, s = BELLY_STAGES[stage], ref = BELLY_STAGES[3];
     for (const k of ["std", "AllFours", "Hogtied"]) {
-      const fk = f.belly && f.belly[k];
-      if (fk) e.belly[k] = Object.assign({}, fk, { on: !!S.bellyOn && !!fk.on });
+      const b = base && base[k] || (k === "std" ? { rx: 92, ry: 112, sag: 0.28, x: 0, y: -20, behind: false, flat: false, cut: 0.74 } : null);
+      if (!b) continue;
+      if (!s) {
+        out[k] = Object.assign({}, b, { on: false });
+        continue;
+      }
+      out[k] = Object.assign({}, b, { on: k === "std" ? true : !!b.on, rx: Math.round((b.rx || 92) * s.k), ry: Math.round((b.ry || 112) * s.kr), sag: Math.max(0, Math.min(0.5, (b.sag || 0.28) * s.sag / ref.sag)), y: (b.y || 0) + (k === "std" ? ref.lift - s.lift : 0) });
     }
-    if (S.bellyOn && !(e.belly.std && e.belly.std.on)) e.belly.std = Object.assign({}, e.belly.std || {}, { on: true });
+    return out;
+  }
+  function eff() {
+    const base = S.saved || !farm ? S : farm.body, e = Object.assign({}, base, { on: S.on });
+    if (S.cupSet) e.cup = S.cup;
+    else if (farmMe && farmMe.cup >= 1) e.cup = farmMe.cup;
+    const mode = bellyMode();
+    e.belly = mode === "studio" ? base.belly : bellyAt(base.belly, mode === "off" ? 0 : mode === "on" ? 3 : Math.max(0, Math.min(4, Math.round(Number(farmMe && farmMe.belly) || 0))));
     return e;
+  }
+  function drawnBodyFarmState(d) {
+    if (!d || typeof d !== "object") return;
+    const cup = Math.max(0, Math.min(20, Math.round(Number(d.cup) || 0))), belly = Math.max(0, Math.min(4, Math.round(Number(d.belly) || 0)));
+    if (farmMe && farmMe.cup === cup && farmMe.belly === belly) return;
+    farmMe = { cup, belly };
+    if (!S.on) return;
+    if (mine.E) apply(mine.E, eff());
+    redraw(60);
+    tell(true);
   }
   function save() {
     try {
@@ -3522,8 +3550,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
     c.getContext("2d").drawImage(cv, -x0, -y0);
     p = { src: c.toDataURL("image/png"), dx: x0, dy: y0 };
     made.set(cv, p);
+    if (!used.has(p.src)) fresh = true;
     used.set(p.src, Date.now());
-    fresh = true;
     return p;
   }
   function prune() {
@@ -3765,10 +3793,13 @@ One of mods you are using is using an old version of SDK. It will work for now b
       cup: e.cup,
       cupName: cups[e.cup] || "?",
       cups,
+      cupSet: !!S.cupSet,
+      farmCup: farmMe && farmMe.cup >= 1 ? farmMe.cup : 0,
+      farmBelly: farmMe ? farmMe.belly : 0,
+      bellyMode: bellyMode(),
       chest: up && up.Asset ? up.Asset.Name : "",
       fromStudio: !!S.saved,
       fromFarm: !S.saved && !!farm,
-      bellyOn: !!S.bellyOn,
       belly: !!(e.belly && e.belly.std && e.belly.std.on),
       seeOthers,
       othersHere: Array.from(others.keys()).filter((mn) => charOf(mn)).length
@@ -3794,13 +3825,14 @@ One of mods you are using is using an old version of SDK. It will work for now b
       tell(true);
     }
   }
-  function drawnBodyBelly(on, say) {
-    S.bellyOn = !!on;
+  function drawnBodyBelly(mode, say) {
+    S.bellyMode = ["farm", "on", "off", "studio"].includes(mode) ? mode : "farm";
+    delete S.bellyOn;
     save();
     if (mine.E) apply(mine.E, eff());
     redraw(60);
     tell(true);
-    if (say) say(on ? S.saved ? "Belly on. You're using your own studio settings, so it's the belly you set there (switch it on in the studio if it isn't)." : "Belly on." : "Belly off.");
+    if (say) say({ farm: "Your belly follows the farm: it shows, and grows, as you fill up or get bred.", on: "Belly always on.", off: "Belly off.", studio: "Your belly is the one your own studio has." }[S.bellyMode]);
   }
   function drawnBodyUseFarm(say) {
     delete S.saved;
@@ -3849,19 +3881,31 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
   function drawnBodyCup(i, say) {
     const n = W2.FarmBreasts ? W2.FarmBreasts.CUPS.length : 21;
+    if (i === "auto") {
+      S.cupSet = false;
+      save();
+      if (mine.E) apply(mine.E, eff());
+      redraw(60);
+      tell(true);
+      if (say) say("Your cup follows the farm: " + drawnBodyState().cupName + " now, and it changes as you grow.");
+      return;
+    }
     S.cup = Math.max(6, Math.min(n - 1, Math.round(Number(i) || 0)));
     S.cupSet = true;
     save();
     if (mine.E) apply(mine.E, eff());
     redraw(60);
     tell(true);
-    if (say) say("Cup: " + drawnBodyState().cupName + ".");
+    if (say) say("Cup: " + drawnBodyState().cupName + ", whatever the farm does. Pick Follow the farm to have it grow with you again.");
   }
   function take(d, say, from) {
     const s = clean(d);
     if (!s) throw new Error("the settings are damaged");
     s.on = S.on;
+    s.bellyMode = S.bellyMode;
     s.bellyOn = S.bellyOn;
+    s.cupSet = S.cupSet;
+    s.cup = S.cupSet ? S.cup : s.cup;
     s.saved = typeof d.saved === "string" ? d.saved.slice(0, 40) : (/* @__PURE__ */ new Date()).toISOString();
     S = s;
     mine.S = S;
@@ -4240,22 +4284,30 @@ One of mods you are using is using an old version of SDK. It will work for now b
         h(
           "select",
           { class: "fhc-sel", onchange: (e) => {
-            drawnBodyCup(Number(e.target.value), say);
-            ctx2.setPref("drawnBodyCup", Number(e.target.value));
+            const v = e.target.value;
+            drawnBodyCup(v === "auto" ? "auto" : Number(v), say);
+            ctx2.setPref("drawnBodyCup", v);
           } },
-          st2.cups.map((c, i) => i < 6 ? null : h("option", { value: String(i), selected: i === st2.cup }, c))
+          [h("option", { value: "auto", selected: !st2.cupSet }, "Follow the farm" + (st2.farmCup ? " (" + (st2.cups[st2.farmCup] || "?") + " now)" : ""))].concat(
+            st2.cups.map((c, i) => i < 6 ? null : h("option", { value: String(i), selected: st2.cupSet && i === st2.cup }, c))
+          )
         )
       ),
       st2.on && st2.cup >= 6 && st2.chest && st2.chest !== "XLarge" ? muted("Your chest is set to " + st2.chest + " in the wardrobe. Set it to the biggest for the drawn breasts to show.") : null,
-      toggle(
-        "Show my belly",
-        "A round belly on your drawn body, in the farm's shape for it, with what you wear fitted over it.",
-        st2.bellyOn,
-        () => {
-          drawnBodyBelly(!st2.bellyOn, say);
-          ctx2.setPref("drawnBodyBelly", !st2.bellyOn);
-        }
+      h(
+        "div",
+        { class: "fhc-kv", style: { marginTop: "6px" } },
+        muted("Belly"),
+        h(
+          "select",
+          { class: "fhc-sel", onchange: (e) => {
+            drawnBodyBelly(e.target.value, say);
+            ctx2.setPref("drawnBodyBelly", e.target.value);
+          } },
+          [["farm", "Follow the farm" + (st2.farmBelly ? " (showing now)" : " (flat now)")], ["on", "Always"], ["off", "Never"]].concat(st2.fromStudio ? [["studio", "As my studio has it"]] : []).map(([v, label]) => h("option", { value: v, selected: st2.bellyMode === v }, label))
+        )
       ),
+      muted("Following the farm, your cup is the size the farm has grown your udder to, and your belly shows and grows as you fill up, carry eggs or get bred."),
       muted(st2.fromStudio ? "Using your own studio settings." : st2.fromFarm ? "Using the farm's look, with your own cup and belly." : "The farm's look comes from the farm girl once you're in her room; plain settings till then."),
       st2.fromStudio ? btn("Use the farm's look instead", () => {
         drawnBodyUseFarm(say);
@@ -8448,6 +8500,11 @@ One of mods you are using is using an old version of SDK. It will work for now b
           st.gotState = true;
           st.panel.setState(m.state);
           parasiteSync();
+          try {
+            drawnBodyFarmState(m.state.drawn);
+          } catch (e) {
+            console.warn("[Farmhand Companion] drawn body size:", e);
+          }
         }
         break;
       case "reply":

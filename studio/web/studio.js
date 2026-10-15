@@ -70,11 +70,26 @@
     ServerAppearanceLoadFromBundle(S.C, S.C.AssetFamily, b, undefined); redraw();
   }
   // ── the drawing ── (studio/web/body-engine.js: the very same code the Companion draws with)
-  const E = window.FarmBodyEngine({ S, bodyItem: (g) => bodyItem(g), setBody: (g, n) => setBody(g, n), redraw: () => bellyDraw() });
+  // With the live game's own files, our drawings are handed to it by address, the way the Companion does in the game
+  // (extension/src/drawnbody.js): that version keeps its pictures by address, and one handed over as itself stopped
+  // every redraw ("key.startsWith is not a function"). Trimmed to what's on them; the old ones are let go after a while.
+  const made = new WeakMap(), used = new Map(); let fresh = false;
+  function picture(cv) {
+    let p = made.get(cv); if (p) { if (p.src) used.set(p.src, Date.now()); return p.src ? p : null; }
+    const w = cv.width, h = cv.height; if (!w || !h) return null;
+    let x0 = w, y0 = h, x1 = -1, y1 = -1;
+    try { const d = cv.getContext("2d", { willReadFrequently: true }).getImageData(0, 0, w, h).data; for (let y = 0; y < h; y++) { const o = y * w * 4; for (let x = 0; x < w; x++) if (d[o + x * 4 + 3]) { if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y; } } }
+    catch (e) { x0 = 0; y0 = 0; x1 = w - 1; y1 = h - 1; }
+    if (x1 < 0) { made.set(cv, { src: null }); return null; }
+    const c = document.createElement("canvas"); c.width = x1 - x0 + 1; c.height = y1 - y0 + 1; c.getContext("2d").drawImage(cv, -x0, -y0);
+    p = { src: c.toDataURL("image/png"), dx: x0, dy: y0 }; made.set(cv, p); if (!used.has(p.src)) fresh = true; used.set(p.src, Date.now()); return p;   // (the same picture again: no new drawing needed)
+  }
+  if (window.__studioLive) setInterval(() => { const old = Date.now() - 30000; for (const [src, t] of used) if (t < old) { used.delete(src); try { if (window.GLDrawImageCache) GLDrawImageCache.delete(src); if (window.DrawImageCache) DrawImageCache.delete(src); const gl = window.GLDrawCanvas && GLDrawCanvas.GL, tc = gl && gl.textureCache, t2 = tc && tc.get(src); if (t2) { if (t2.texture) gl.deleteTexture(t2.texture); tc.delete(src); } } catch (e) { /* fine */ } } }, 20000);
+  const E = window.FarmBodyEngine({ S, bodyItem: (g) => bodyItem(g), setBody: (g, n) => setBody(g, n), redraw: () => bellyDraw(), picture: window.__studioLive ? picture : undefined });
   const { BELLY, FIT0, poseKey, fitNow, bellySkin, MOULD, mouldKey, mouldImg, edges, edgesOf, outline, bellyCover, bellyAuto, pieceSpan, bellyRows, mouldCanvas,
     BREAST, BREAST_SLIDERS, NIP_GROUPS, HAND_GROUPS, NIP_PIECES, ARM_GROUPS, heldNow, chestSlot, STRAPS, gameBreast, upperName, breastNow, setCup, cupNow, nipHalves, GEN } = E;
   // step into the game's drawing of our character
-  function hookBelly() { const game = CommonDrawAppearanceBuild; CommonDrawAppearanceBuild = function (C, cb) { return E.draw(C, cb, (cb2) => game(C, cb2)); }; }
+  function hookBelly() { const game = CommonDrawAppearanceBuild; CommonDrawAppearanceBuild = function (C, cb) { fresh = false; const out = E.draw(C, cb, (cb2) => game(C, cb2)); if (fresh) setTimeout(() => bellyDraw(), 250); return out; }; }   // (a new picture takes a moment to load: drawn again then)
 
   // ── pose ──
   const POSES = [["Arms", ["BaseUpper", "Yoked", "OverTheHead", "BackBoxTie", "BackElbowTouch", "BackCuffs"]], ["Legs", ["BaseLower", "Kneel", "KneelingSpread", "LegsClosed", "Spread"]], ["Whole body", ["AllFours", "Hogtied"]]];
@@ -394,7 +409,7 @@
         const a = part[n], X = (n % cols) * TW, Y = 30 + Math.floor(n / cols) * TH;
         try { wear(before); if (!had) { try { InventoryRemove(S.C, group); } catch (e) { /* nothing on */ } } putOn(group, a.Name);
           for (let k = 0; k < 4; k++) { await waitMs(k ? 220 : (opt.wait || (opt.echo ? 1500 : 520))); bellyDraw(); }   /* (Echo's pictures come from the internet: a first look waits longer for them) */ await waitMs(60);
-          g.drawImage(S.C.Canvas, crop[0], crop[1], crop[2], crop[3], X, Y, TW, TH); } catch (e) { console.warn("[studio] catalogue:", a.Name, e); g.fillStyle = "#a33"; g.fillRect(X, Y, TW, TH); }
+          g.drawImage(S.C.Canvas, crop[0] + charX(), crop[1], crop[2], crop[3], X, Y, TW, TH); } catch (e) { console.warn("[studio] catalogue:", a.Name, e); g.fillStyle = "#a33"; g.fillRect(X, Y, TW, TH); }
         g.fillStyle = "rgba(0,0,0,0.6)"; g.fillRect(X, Y, TW, 20); g.fillStyle = "#fff"; g.font = "13px system-ui, sans-serif"; g.fillText((p * per + n + 1) + ". " + itemName(a).slice(0, 34), X + 4, Y + 15);
         if (opt.say !== false) say("Catalogue: " + group + ", " + (p * per + n + 1) + " of " + all.length + "…");
       }
@@ -537,7 +552,8 @@
     // (and it changes how the game's fast drawing works, in ways made for the live game: on this newer copy the body came out
     // in scrambled pieces. The game's plain drawing is untouched by it, so the studio draws that way once Echo is in.)
     // (it switches the fast drawing back on as it starts, so this is done again once it's in)
-    const plain = () => { if (typeof GLVersion !== "undefined" && GLVersion !== "No WebGL") { GLVersion = "No WebGL"; try { redraw(); } catch (e) { /* not ready */ } } };
+    // (not with the live game's own files: Echo is made for that version, and draws there as it does in the game)
+    const plain = () => { if (!window.__studioLive && typeof GLVersion !== "undefined" && GLVersion !== "No WebGL") { GLVersion = "No WebGL"; try { redraw(); } catch (e) { /* not ready */ } } };
     plain();
     const el = document.createElement("script"); el.src = ECHO_URL + "?t=" + Date.now(); el.onerror = () => { S.echo = false; if (btn) btn.disabled = false; say("The Echo clothing mod didn't load (no internet, or its site is down).", true); };
     el.onload = () => { let n = 0; const tick = () => { n++; const added = Asset.length - before; plain(); if (added > 0 && n > 6) { say("Echo clothing mod loaded: " + added + " items added. They're in each slot's list."); try { fillItems(); } catch (e) { /* not yet */ } return; } if (n > 60) { say(added > 0 ? "Echo clothing mod loaded: " + added + " items." : "The Echo script loaded but added no items yet. Give it a moment and look in the slot lists.", !added); return; } setTimeout(tick, 500); }; tick(); };
@@ -587,12 +603,14 @@
     syncButtons();
   }
 
+  // where she starts in her own canvas: Echo widens it, and with the live game's files it centres her in the width
+  const charX = () => (window.__studioLive && S.C && S.C.Canvas && S.C.Canvas.width > 500 ? (S.C.Canvas.width - 500) / 2 : 0);
   // ── our screen, in place of the game's sign-in screen ──
   function run() {
     DrawRect(0, 0, 2000, 1000, "#2a2e36");
     // (Echo widens every character's canvas, to 1000 from 500, and draws it half that much further left to make up: she
     // jumped to the left once it was loaded. Laynie, Oct 14. She's put back where she stands.)
-    if (S.C) DrawCharacter(S.C, 290 + (S.echo && S.C.Canvas && S.C.Canvas.width > 500 ? (S.C.Canvas.width - 500) / 2 : 0), 0, 1, false);
+    if (S.C) DrawCharacter(S.C, 290 + (S.echo && !window.__studioLive && S.C.Canvas && S.C.Canvas.width > 500 ? (S.C.Canvas.width - 500) / 2 : 0), 0, 1, false);   /* (with the live game's files Echo puts her right itself) */
   }
   function takeOver() {
     try { CurrentScreenFunctions.Unload && CurrentScreenFunctions.Unload(); } catch (e) { console.warn("[studio] leaving the sign-in screen:", e); }

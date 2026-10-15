@@ -46,6 +46,8 @@ const LOOK = { v: 1, on: true, cup: 15, saved: "2026-10-14T22:00:00Z", breast: {
     const bc = farmMsgs(n).find((m) => m.Dictionary.type === "bodyFarm");
     ok(L().drawnFarm.body.cup === 17 && L().drawnFarm.at > at0, "Laynie changes it on the bot: the farm's look changes");
     ok(bc && !bc.Target && bc.Dictionary.body.cup === 17, "...and every Companion in the room is told");
+    const sd = W.__stateFor(500).drawn;
+    ok(sd && sd.cup === 3 && sd.belly === 0, "a player's panel says their cup as the farm counts it and their belly (" + JSON.stringify(sd) + ")");
     const errs = warns.filter((w) => /farm look|TypeError|ReferenceError/i.test(w)); ok(!errs.length, "no errors in the bot " + errs.join(" | ").slice(0, 200));
   }
 
@@ -76,6 +78,20 @@ const LOOK = { v: 1, on: true, cup: 15, saved: "2026-10-14T22:00:00Z", breast: {
     ok(!mine(n, "bodyFarmAsk").length, "a welcome with the look it has: no asking again");
     w.ChatRoomMessage({ Sender: 777, Type: "Hidden", Content: "FarmhandMsg", Dictionary: { v: 2, type: "bodyFarm", at: 2222, body: { cup: 3 } } }); await wait(200);
     ok(JSON.parse(w.localStorage.getItem("farmhand-drawn-body-farm")).at === 1111, "a farm look from anybody but the farm girl is ignored");
+    // her size follows the farm (Laynie: "the belly sizes in game need to automatically adjust", "same for tit sizes and growth")
+    const STATE = (drawn) => ({ name: "Moo", onBooks: true, roles: ["LIVESTOCK"], tier: "", species: "cow", gender: "female", staff: false, herdmaster: false, proprietor: false, mandated: false, onDuty: true, onCall: false, keys: [], switches: {}, drawn });
+    n = sent.length; bot({ type: "state", state: STATE({ cup: 14, belly: 2 }) }); await wait(300);
+    let t2 = mine(n, "body").pop();
+    ok(t2 && t2.Dictionary.body.cup === 14, "the farm has grown her to an L: she's drawn an L");
+    ok(t2 && t2.Dictionary.body.belly.std && t2.Dictionary.body.belly.std.on && t2.Dictionary.body.belly.std.rx === Math.round(90 * 70 / 92), "...with a middling belly while she's that full: the farm look's belly, in proportion (" + JSON.stringify(t2 && t2.Dictionary.body.belly.std) + ")");
+    n = sent.length; bot({ type: "state", state: STATE({ cup: 16, belly: 4 }) }); await wait(300);
+    t2 = mine(n, "body").pop();
+    ok(t2 && t2.Dictionary.body.cup === 16 && t2.Dictionary.body.belly.std.rx > 100, "she grows, and so does her belly");
+    n = sent.length; bot({ type: "state", state: STATE({ cup: 16, belly: 0 }) }); await wait(300);
+    t2 = mine(n, "body").pop();
+    ok(t2 && !t2.Dictionary.body.belly.std.on, "emptied out: the belly goes");
+    n = sent.length; bot({ type: "state", state: STATE({ cup: 16, belly: 0 }) }); await wait(300);
+    ok(!mine(n, "body").length, "the same size again: nothing new said");
   }
   out(fails ? "\n❌ " + fails + " failed" : "\n✅ all good"); process.exit(fails ? 1 : 0);
 })();

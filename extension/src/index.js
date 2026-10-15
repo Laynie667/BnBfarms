@@ -15,7 +15,7 @@ import { Panel } from "./panel.js";
 import { captureOutfit, wearOutfit, changeBack, hasBackup } from "./outfits.js";
 import { markBody, washMarks, stripMe, dressMe, syncFarmGear, syncShape, scaleTrialCleanup } from "./marks.js";
 import { initBelly } from "./belly.js";
-import { initDrawnBody, onBodyMsg, onFarmLook, farmLookWanted } from "./drawnbody.js";
+import { initDrawnBody, onBodyMsg, onFarmLook, farmLookWanted, drawnBodyFarmState } from "./drawnbody.js";
 import { initCues, cueOff, lead, face, sound, trance, drawMarkers, arouse, vibe, initBody } from "./cues.js";
 
 // the SDK ships as an old-style module; this digs the real thing out either way
@@ -194,7 +194,7 @@ function onFarmMsg(m) {
       try { if (!onBotAccount()) onFarmLook(m); } catch (e) { console.warn("[Farmhand Companion] farm look:", e); }   // (on the bot's own account, its settings ARE the farm's look)
       break;
     case "state":
-      if (m.state && typeof m.state === "object") { st.gotState = true; st.panel.setState(m.state); parasiteSync(); }
+      if (m.state && typeof m.state === "object") { st.gotState = true; st.panel.setState(m.state); parasiteSync(); try { drawnBodyFarmState(m.state.drawn); } catch (e) { console.warn("[Farmhand Companion] drawn body size:", e); } }
       break;
     case "reply":
     case "notice": {

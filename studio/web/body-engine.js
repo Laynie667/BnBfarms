@@ -476,10 +476,12 @@ window.FarmBodyEngine = function (host) {
               ctx.breast = { fit: FarmBreasts.fitOf(S3, FarmBelly.bellyPose(upper[2]), [bc.nips[1][0] + br.nipX, bc.nips[1][1] + br.nipY]), held: isHeld, upperSrc: upper[2], ux: upper[0], pose: bpose, ground: bpose === "AllFours" ? ground : Infinity, S: S3, rx, ry, uy: upper[1], mask: bc.mask, mx: rx - bc.ax, my: ry - bc.ay, nips: bc.nips.map((p, i) => [rx + p[0] + (i ? 1 : -1) * br.nipX, ry + p[1] + br.nipY]), k: FarmBreasts.shape(br.cup, br).k, kN: (1 + 0.45 * FarmBreasts.shape(br.cup, br).k) * br.nip, sig: key + "|" + Math.round(rx) + "," + Math.round(ry) + "|" + [br.nip, br.nipX, br.nipY].join(","), mid: upper[0] + 250 };
               // (a pose where the game paints the nipples into the body itself, all fours, gives us none to move: ours then)
               if (!held.length) {
-                const B = ctx.breast, sk = bellySkin(upper[2], upper[3], bpose), rad = 7 * B.kN, nc = document.createElement("canvas"); nc.width = nc.height = Math.ceil(rad * 2 + 4);
+                const B = ctx.breast, sk = bellySkin(upper[2], upper[3], bpose), rad = 7 * B.kN, ncKey = rad.toFixed(2) + "|" + sk.join(",");
+                // (made once per size and skin: a new one every drawing kept the game drawing her over and over)
+                let nc = BREAST.nc; if (!nc || BREAST.ncKey !== ncKey) { nc = document.createElement("canvas"); nc.width = nc.height = Math.ceil(rad * 2 + 4);
                 const ng = nc.getContext("2d"), gr = ng.createRadialGradient(nc.width / 2, nc.height / 2, 0, nc.width / 2, nc.height / 2, rad), tone = (m, a) => "rgba(" + Math.round(Math.min(255, sk[0] * m)) + "," + Math.round(sk[1] * 0.62 * m) + "," + Math.round(sk[2] * 0.62 * m) + "," + a + ")";
                 gr.addColorStop(0, tone(0.92, 1)); gr.addColorStop(0.3, tone(1, 0.95)); gr.addColorStop(0.75, tone(1.02, 0.8)); gr.addColorStop(1, tone(1.02, 0));
-                ng.fillStyle = gr; ng.beginPath(); ng.arc(nc.width / 2, nc.height / 2, rad, 0, Math.PI * 2); ng.fill();
+                ng.fillStyle = gr; ng.beginPath(); ng.arc(nc.width / 2, nc.height / 2, rad, 0, Math.PI * 2); ng.fill(); BREAST.nc = nc; BREAST.ncKey = ncKey; }
                 for (const p of B.nips) if (p[1] + rad < B.ground) { put("drawImage", nc, p[0] - nc.width / 2, p[1] - nc.height / 2, {}); if (typeof real.drawImageBlink === "function") put("drawImageBlink", nc, p[0] - nc.width / 2, p[1] - nc.height / 2, {}); }
               }
               for (const h of held.splice(0)) { try { if (!nipDraw(...h)) put(h[0], h[1], h[2], h[3], h[4]); } catch (e) { console.warn("[studio] nipples:", e); } }

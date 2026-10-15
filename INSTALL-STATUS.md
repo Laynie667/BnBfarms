@@ -13,7 +13,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 | Map tools, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.4** |
 | Dairy | `farmhand-dairy.user.js` | the bot's PC | **1.1.0** |
 | Shows | `farmhand-shows.user.js` | the bot's PC | **1.1.0** |
-| Farmhand Companion | `farmhand-companion.user.js` | each player | **0.29.0** |
+| Farmhand Companion | `farmhand-companion.user.js` | each player | **0.29.1** |
 | Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.4** |
 
 ## Sending a watch report
@@ -23,6 +23,8 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 - Running the watcher on more than one game at once (the bot, yours, a tester's) lets Claude line them up into one timeline.
 
 ## Latest changes (newest first)
+
+- **Companion 0.29.1, studio: clothes and restraints fit the drawn body again.** Laynie: "for some reason, the draw order changed on the studio between breast, belly and clothes/restraints." Since Companion 0.26.2 the helper that keeps the fitted pieces was called put, the same name the drawing step uses for its brush, so inside the drawing the fitted pieces were drawn raw instead of kept: shirts and harnesses unfitted, under the breasts and cut off. Fixed (keepIn), and the kept pieces are only ever let go between drawings. Side by side in the studio with the version from before, the same. **Companion and studio.**
 
 - **Bot 0.35.0: messes in the traps, four mess traps, and messes off the shelf.** Laynie: "need to wire the new messes into traps. new traps for messes, and store messes to i can creampie other players and such." The breedin' traps (pump, saddle, wheel, scarecrow, crate, kissin' gate, collection bench) were leavin' whipped cream; they leave cum now, and milk splashes say milk. New traps, each with real gear: **trap-fountain** (the chocolate fountain, licked clean), **trap-bakery** (piped with frosting, sprinkled and sold by the slice, a price tag after), **trap-creamery** (whipped cream cannon, strawberry, somebody hungry), **trap-seedshower** (a ring of strangers, every one finishes on them). **The mess shelf** in ?store: creampie, facial, cream pie, cake smash, honey, maple, chocolate, strawberry, slime, mud, milk, piss (both on ?watersports), 1 or 2 ribbons: ?buy <one> for <who>, asked first unless they've said **?messes on**; limits count; a shelf creampie is only the look, no breedin'. **docs/EQUIPMENT.md**: every trap, its gear, how to get it, what rules it out and its mess, the mystery box, the livin' suit, the symbiotes and the shelf (tools/equipment-list.mjs rebuilds it). tests/mess-store.test.cjs. **Bot.**
 

@@ -239,7 +239,7 @@ window.FarmBodyEngine = function (host) {
       if (t >= 0) { const T = Math.round(y) + t, B = Math.round(y) + e; if (!ext || T < ext.top || B > ext.bottom) { ext = { top: ext ? Math.min(ext.top, T) : T, bottom: ext ? Math.max(ext.bottom, B) : B }; MOULD.ext.set(piece, ext); clearTimeout(MOULD.t); MOULD.t = setTimeout(bellyDraw, 60); } } }
     const key = src + "|" + Math.round(x) + "," + Math.round(y) + "|" + mode + "|" + (ext ? ext.top + "-" + ext.bottom : "") + "|" + ctx.sig;
     if (MOULD.out.has(key)) return MOULD.out.get(key);
-    const keep = (res) => { put(MOULD.out, key, res); return res; };
+    const keep = (res) => { keepIn(MOULD.out, key, res); return res; };
     if (mode === "under") {
       const c = document.createElement("canvas"); c.width = w + M * 2; c.height = h; const g = c.getContext("2d");
       g.drawImage(im, M, 0); g.globalCompositeOperation = "destination-out"; g.drawImage(ctx.belly.cv, ctx.belly.dx - x + M, ctx.belly.dy - y);
@@ -310,7 +310,7 @@ window.FarmBodyEngine = function (host) {
         g.clearRect(M + nl2 - x - 1, j, nr - nl2 + 2, 1);
         g.drawImage(im, sa, j, sb - sa, 1, M + (nl2 - x) + (sa - (gl - x)) * k, j, (sb - sa) * k, 1);
       }
-      const res2 = changed ? c : false; put(MOULD.out, key2, res2); return res2;
+      const res2 = changed ? c : false; keepIn(MOULD.out, key2, res2); return res2;
     }
     for (let j = 0; j < h; j++) {
       const yy = Math.round(y) + j, o = ol.old(yy), n = ol.neu(yy);
@@ -332,19 +332,22 @@ window.FarmBodyEngine = function (host) {
      were kept by count (60 and 80), but one fitted piece is a big picture (a dress piece is about 1000 by 2000, 8 MB),
      so one body could keep near 700 MB, and every Companion-drawn player in the room has a body of their own: three of
      them filled the page up and it crashed (Laynie, Oct 15: "it said it stopped working, and even the devtools got
-     disconnected"). Now they're kept by size: past the budget, the oldest go first. */
-  const BUDGET = (host && host.budget) || 96e6;
+     disconnected"). Now they're kept by size: past the budget, the oldest go first.
+     Only ever BETWEEN drawings (trim(), at the start of draw()), so nothing goes in the middle of one.
+     (Oct 15: the helper that keeps them was first called put, the very name draw() gives its brush, so inside draw() the
+     fitted pieces went to the brush instead of the store: shirts and harnesses drawn unfitted, under the breasts, cut off.
+     Laynie: "the draw order changed on the studio between breast, belly and clothes/restraints". It's keepIn now.) */
+  const BUDGET = (host && host.budget) || 256e6;
   const bytesOf = (v) => { if (!v || typeof v !== "object") return 0; if (v.width && v.height && typeof v.getContext === "function") return v.width * v.height * 4; let n = 0; for (const k in v) { const x = v[k]; if (x && typeof x === "object" && x.width && x.height && typeof x.getContext === "function") n += x.width * x.height * 4; } return n; };
-  function put(map, key, v) {
-    map.delete(key); map.set(key, v);
+  function keepIn(map, key, v) { map.delete(key); map.set(key, v); return v; }   // (not "put": draw() has its own put, the brush, and inside it that one wins)
+  function trim() {
     const maps = [BREAST.out, MOULD.out]; let total = 0;
     for (const m of maps) for (const x of m.values()) total += bytesOf(x);
     while (total > BUDGET) {
       let gone = false;
-      for (const m of maps) { const k = m.keys().next(); if (k.done || (m === map && k.value === key)) continue; total -= bytesOf(m.get(k.value)); m.delete(k.value); gone = true; if (total <= BUDGET) break; }
+      for (const m of maps) { const k = m.keys().next(); if (k.done) continue; total -= bytesOf(m.get(k.value)); m.delete(k.value); gone = true; if (total <= BUDGET) break; }
       if (!gone) break;
     }
-    return v;
   }
   function keptBytes() { let t = 0; for (const m of [BREAST.out, MOULD.out]) for (const x of m.values()) t += bytesOf(x); return t; }
   const BREAST = { band: {}, solid: {}, tuck: true, on: {}, free: true, holds: {}, holdSig: "", wear: {}, dress: true, cover: new Map(), cup: null, full: 1, hang: 1, apart: 1, x: 0, y: 0, nip: 1, nipY: 0, nipX: 0, cv: null, cvKey: "", halves: new Map(), out: new Map() };
@@ -422,6 +425,7 @@ window.FarmBodyEngine = function (host) {
   // redraw any moulded piece to the new outline
   // game(cb): the game's own drawing, with whatever set of brushes it's handed
   function draw(C, cb, game) {
+    trim();   // (the kept drawings, back under the budget: only here, between drawings)
     {
       let finish = null, seenNow = null, handFNow = null;
       try {
@@ -530,7 +534,7 @@ window.FarmBodyEngine = function (host) {
             if (!c) { c = document.createElement("canvas"); c.width = base.naturalWidth || base.width; c.height = base.naturalHeight || base.height; const g = c.getContext("2d"); g.drawImage(base, 0, 0); g.globalCompositeOperation = "destination-out"; g.drawImage(B.mask, B.mx - (x - ox), B.my - y);
               /* (and the belly's form on it, if it's worn over the belly: a skirt, jeans, a catsuit's legs, a belt) */
               if (ctx.belly && !fit.behind && chestSlot(groupOf(src)) && groupOf(src) !== "Panties") { try { const sh = bellyShade(c, x - ox, y, ctx); if (sh) c = sh; } catch (e) { console.warn("[body] belly form:", e); } }
-              put(BREAST.out, key, c); }
+              keepIn(BREAST.out, key, c); }
             put(name, c, x - ox, y, o); return true;
           };
           // ── straps round each breast ──
@@ -588,7 +592,7 @@ window.FarmBodyEngine = function (host) {
               /* (smoothed, so the strap runs clean) */
               const sm = edge.map((_, a) => { let t = 0; for (let k = -3; k <= 3; k++) t += edge[(a + k + FRAME_N) % FRAME_N]; return t / 7; }); edge.splice(0, FRAME_N, ...sm);
               cs.push({ sd, cx: cx + B.mx, cy: cy + B.my, edge }); }
-            v = cs; put(BREAST.out, key, v); return v;
+            v = cs; keepIn(BREAST.out, key, v); return v;
           };
           const frameDraw = (name, src, x, y, o) => {
             const B = ctx.breast, im = B && mouldImg(src); if (!im || B.pose === "AllFours" || cupNow() <= 5) return false;   /* (Flat to D is the game's own chest: its own picture) */
@@ -625,7 +629,7 @@ window.FarmBodyEngine = function (host) {
                   path(pts.map((p, i) => { const q = pts[Math.min(pts.length - 1, i + 1)], pp = pts[Math.max(0, i - 1)], dx = q[0] - pp[0], dy = q[1] - pp[1], L = Math.hypot(dx, dy) || 1; return [p[0] - dy / L * W * 0.18, p[1] + dx / L * W * 0.18]; }));
                   g.globalAlpha = 0.55; g.strokeStyle = rgb(fm.hi, 1); g.lineWidth = Math.max(1, W * 0.22); g.stroke(); g.globalAlpha = 1; }   /* a shine along it */
               }
-              put(BREAST.out, key, c);
+              keepIn(BREAST.out, key, c);
             }
             put(name, c, x - c.MX, y - c.MY, o); return true;
           };
@@ -656,7 +660,7 @@ window.FarmBodyEngine = function (host) {
               const b0 = Math.round(B.uy + GB.y + GB.r * 0.62 - y), b1 = Math.round(B.uy + GB.y + GB.r * 1.65 - y), gUnder = B.uy + GB.y + GB.r, herUnder = B.ry + S2.by + (B.fit.rv || S2.r), dy = herUnder - gUnder, kx = 1, mid = B.mid - x;   /* not widened: her ribs under her breasts are as wide at any cup size (Laynie, Oct 14: "the width of the character without the breast would be the same width no matter the tit size") */
               if (b1 > b0) { const strip = document.createElement("canvas"); strip.width = w; strip.height = b1 - b0; strip.getContext("2d").drawImage(im, 0, b0, w, b1 - b0, 0, 0, w, b1 - b0);
                 g.drawImage(strip, MX + mid - mid * kx, MY + b0 + dy, w * kx, b1 - b0); }
-              put(BREAST.out, key, c);
+              keepIn(BREAST.out, key, c);
             }
             put(name, c, x - c.MX, y - c.MY, o); return true;
           };
@@ -1031,7 +1035,7 @@ window.FarmBodyEngine = function (host) {
               }
               if (sleeves) { g.save(); g.globalCompositeOperation = "destination-over"; g.drawImage(sleeves, 0, 0); g.restore(); }   /* (the sleeves, back where the game has them, behind her breasts: a catsuit's long sleeves laid on top ran down over them) */
               if (ctx.belly && !fit.behind) { try { const sh = bellyShade(c, x - c.MX, y - c.MY, ctx); if (sh) { sh.MX = c.MX; sh.MY = c.MY; c = sh; } } catch (e) { console.warn("[body] belly form:", e); } }
-              put(BREAST.out, key, c);
+              keepIn(BREAST.out, key, c);
             }
             put(name, c, x - c.MX, y - c.MY, o); return true;
           };
@@ -1073,7 +1077,7 @@ window.FarmBodyEngine = function (host) {
                 if (R.cross) { const wd = R.cross * grow; for (const sd of [-1, 1]) strap(wd, () => { const a = P(sd, -Math.PI / 2), b = P(-sd, Math.PI * (sd > 0 ? 0.72 : 0.28)); g.beginPath(); g.moveTo(a[0], a[1]); g.lineTo(b[0], b[1]); }); }
                 if (R.centre) { const wd = R.centre * grow; strap(wd, () => { g.beginPath(); g.moveTo(ox, topY + S2.r * 0.25); g.lineTo(ox, botY - S2.r * 0.1); }); }
               }
-              put(BREAST.out, key, c);
+              keepIn(BREAST.out, key, c);
             }
             put(name, c, x - c.MX, y - c.MY, o); return true;
           };
@@ -1099,7 +1103,7 @@ window.FarmBodyEngine = function (host) {
               g.lineCap = "round"; g.lineJoin = "round";
               for (const [col, wd] of [["rgba(120,126,134,0.9)", 6.5], ["rgba(232,236,240,0.95)", 4.2]]) { g.strokeStyle = col; g.lineWidth = wd; for (let i = 0; i < 2; i++) { g.beginPath(); g.moveTo(MX + N[i][0], MY + N[i][1] + 10); g.quadraticCurveTo(MX + N[i][0] + (jx - N[i][0]) * 0.25, MY + jy - 6, MX + jx, MY + jy + 4); g.stroke(); } }   // the Y: a tube from each cup down to the join
               PUMP.cups.forEach(([sx, sy, sw, sh], i) => g.drawImage(im, sx, sy, sw, sh, MX + N[i][0] - (PUMP.cupMid[i][0] - sx), MY + N[i][1] - (PUMP.cupMid[i][1] - sy), sw, sh));   // the cups: on her nipples, their own size
-              put(BREAST.out, key, c);
+              keepIn(BREAST.out, key, c);
             }
             put(name, c, x - c.MX, y - c.MY, o); return true;
           };
@@ -1120,7 +1124,7 @@ window.FarmBodyEngine = function (host) {
                 const T = B.nips[i];
                 g.drawImage(im, sx, 0, sw, h, MX + (T[0] - x) + (sx + x - N[0]) * kN, MY + (T[1] - y) + (y - N[1]) * kN, sw * kN, h * kN);
               });
-              put(BREAST.out, key, c);
+              keepIn(BREAST.out, key, c);
             }
             put(name, c, x - c.MX, y - c.MY, o); return true;
           };

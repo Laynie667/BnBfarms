@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.29.0
+// @version      0.29.1
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -230,7 +230,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.29.0";
+  var VERSION = "0.29.1";
 
   // extension/src/config.js
   var BOT_MEMBER = 260239;
@@ -1398,7 +1398,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
         const key = src + "|" + Math.round(x) + "," + Math.round(y) + "|" + mode + "|" + (ext ? ext.top + "-" + ext.bottom : "") + "|" + ctx2.sig;
         if (MOULD.out.has(key)) return MOULD.out.get(key);
         const keep2 = (res) => {
-          put2(MOULD.out, key, res);
+          keepIn(MOULD.out, key, res);
           return res;
         };
         if (mode === "under") {
@@ -1525,7 +1525,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
             g.drawImage(im, sa, j, sb - sa, 1, M + (nl2 - x) + (sa - (gl - x)) * k, j, (sb - sa) * k, 1);
           }
           const res2 = changed ? c : false;
-          put2(MOULD.out, key2, res2);
+          keepIn(MOULD.out, key2, res2);
           return res2;
         }
         for (let j = 0; j < h2; j++) {
@@ -1542,7 +1542,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
         }
         return keep2(changed ? c : false);
       }
-      const BUDGET = host && host.budget || 96e6;
+      const BUDGET = host && host.budget || 256e6;
       const bytesOf = (v) => {
         if (!v || typeof v !== "object") return 0;
         if (v.width && v.height && typeof v.getContext === "function") return v.width * v.height * 4;
@@ -1553,9 +1553,12 @@ One of mods you are using is using an old version of SDK. It will work for now b
         }
         return n;
       };
-      function put2(map, key, v) {
+      function keepIn(map, key, v) {
         map.delete(key);
         map.set(key, v);
+        return v;
+      }
+      function trim() {
         const maps = [BREAST.out, MOULD.out];
         let total = 0;
         for (const m of maps) for (const x of m.values()) total += bytesOf(x);
@@ -1563,7 +1566,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
           let gone2 = false;
           for (const m of maps) {
             const k = m.keys().next();
-            if (k.done || m === map && k.value === key) continue;
+            if (k.done) continue;
             total -= bytesOf(m.get(k.value));
             m.delete(k.value);
             gone2 = true;
@@ -1571,7 +1574,6 @@ One of mods you are using is using an old version of SDK. It will work for now b
           }
           if (!gone2) break;
         }
-        return v;
       }
       function keptBytes() {
         let t = 0;
@@ -1654,11 +1656,12 @@ One of mods you are using is using an old version of SDK. It will work for now b
       }
       const GEN = { inches: 6, box: {}, drawn: true, kind: "human", knot: false, girth: 1, balls: 3, cv: null, cvKey: "" };
       function draw(C, cb, game) {
+        trim();
         {
           let finish = null, seenNow = null, handFNow = null;
           try {
             const fit = C === S3.C ? fitNow() : null, br = C === S3.C ? breastNow() : null, real = cb;
-            const put3 = (name, img2, x, y, o) => {
+            const put2 = (name, img2, x, y, o) => {
               if (img2 && typeof img2 !== "string" && img2.MX != null && o && o.TextureAlphaMask) o = Object.assign({}, o, { TextureAlphaMask: void 0 });
               if (typeof img2 === "string" || !host.picture) return real[name](img2, x, y, o);
               const p = host.picture(img2);
@@ -1702,16 +1705,16 @@ One of mods you are using is using an old version of SDK. It will work for now b
                   const cv0 = FarmBelly.bellyCanvas(shape, bellySkin(upper[2], upper[3], FarmBelly.bellyPose(upper[2])), !!fit.flat);
                   const dx = upper[0] + 250 - cv0.width / 2 + fit.x, dy = upper[1] + 392 + fit.ry * 0.62 - cv0.height / 2 + fit.y;
                   const cv = br || fit.behind ? cv0 : bellyUnder(cv0, dx, dy, upper[2], upper[0], upper[1]);
-                  put3("drawImage", cv, dx, dy, {});
-                  if (typeof real.drawImageBlink === "function") put3("drawImageBlink", cv, dx, dy, {});
+                  put2("drawImage", cv, dx, dy, {});
+                  if (typeof real.drawImageBlink === "function") put2("drawImageBlink", cv, dx, dy, {});
                   ctx2.belly = { cv, dx, dy };
                   ctx2.sig = [fit.rx, fit.ry, fit.sag, fit.cut, fit.flat ? 1 : 0, Math.round(dx), Math.round(dy)].join(",") + "|" + ctx2.bodies.map((b) => b.src + "@" + Math.round(b.x) + "," + Math.round(b.y)).join(";");
                 }
                 if (ctx2.cock) {
                   const k = ctx2.cock;
                   ctx2.cock = null;
-                  put3("drawImage", k[0], k[1], k[2], {});
-                  if (typeof real.drawImageBlink === "function") put3("drawImageBlink", k[0], k[1], k[2], {});
+                  put2("drawImage", k[0], k[1], k[2], {});
+                  if (typeof real.drawImageBlink === "function") put2("drawImageBlink", k[0], k[1], k[2], {});
                 }
                 if (br) {
                   const isHeld = FarmBelly.bellyPose(upper[2]) !== "AllFours" && heldNow(), freeS = FarmBreasts.shape(br.cup, br), S32 = isHeld ? FarmBreasts.held(freeS) : freeS;
@@ -1776,8 +1779,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
                     }
                     bc = BREAST.flat;
                   }
-                  put3("drawImage", bc, rx - bc.ax, ry - bc.ay, {});
-                  if (typeof real.drawImageBlink === "function") put3("drawImageBlink", bc, rx - bc.ax, ry - bc.ay, {});
+                  put2("drawImage", bc, rx - bc.ax, ry - bc.ay, {});
+                  if (typeof real.drawImageBlink === "function") put2("drawImageBlink", bc, rx - bc.ax, ry - bc.ay, {});
                   ctx2.breast = { fit: FarmBreasts.fitOf(S32, FarmBelly.bellyPose(upper[2]), [bc.nips[1][0] + br.nipX, bc.nips[1][1] + br.nipY]), held: isHeld, upperSrc: upper[2], ux: upper[0], pose: bpose, ground: bpose === "AllFours" ? ground : Infinity, S: S32, rx, ry, uy: upper[1], mask: bc.mask, mx: rx - bc.ax, my: ry - bc.ay, nips: bc.nips.map((p, i) => [rx + p[0] + (i ? 1 : -1) * br.nipX, ry + p[1] + br.nipY]), k: FarmBreasts.shape(br.cup, br).k, kN: (1 + 0.45 * FarmBreasts.shape(br.cup, br).k) * br.nip, sig: key + "|" + Math.round(rx) + "," + Math.round(ry) + "|" + [br.nip, br.nipX, br.nipY].join(","), mid: upper[0] + 250 };
                   if (!held.length) {
                     const B = ctx2.breast, sk = bellySkin(upper[2], upper[3], bpose), rad = 7 * B.kN, ncKey = rad.toFixed(2) + "|" + sk.join(",");
@@ -1798,13 +1801,13 @@ One of mods you are using is using an old version of SDK. It will work for now b
                       BREAST.ncKey = ncKey;
                     }
                     for (const p of B.nips) if (p[1] + rad < B.ground) {
-                      put3("drawImage", nc, p[0] - nc.width / 2, p[1] - nc.height / 2, {});
-                      if (typeof real.drawImageBlink === "function") put3("drawImageBlink", nc, p[0] - nc.width / 2, p[1] - nc.height / 2, {});
+                      put2("drawImage", nc, p[0] - nc.width / 2, p[1] - nc.height / 2, {});
+                      if (typeof real.drawImageBlink === "function") put2("drawImageBlink", nc, p[0] - nc.width / 2, p[1] - nc.height / 2, {});
                     }
                   }
                   for (const h2 of held.splice(0)) {
                     try {
-                      if (!nipDraw(...h2)) put3(h2[0], h2[1], h2[2], h2[3], h2[4]);
+                      if (!nipDraw(...h2)) put2(h2[0], h2[1], h2[2], h2[3], h2[4]);
                     } catch (e) {
                       console.warn("[studio] nipples:", e);
                     }
@@ -1865,9 +1868,9 @@ One of mods you are using is using an old version of SDK. It will work for now b
                       console.warn("[body] belly form:", e);
                     }
                   }
-                  put3(BREAST.out, key, c);
+                  keepIn(BREAST.out, key, c);
                 }
-                put3(name, c, x - ox, y, o);
+                put2(name, c, x - ox, y, o);
                 return true;
               };
               const frameCover = (src, im, x, y, B) => {
@@ -2015,7 +2018,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
                   cs.push({ sd, cx: cx + B.mx, cy: cy + B.my, edge });
                 }
                 v = cs;
-                put3(BREAST.out, key, v);
+                keepIn(BREAST.out, key, v);
                 return v;
               };
               const frameDraw = (name, src, x, y, o) => {
@@ -2100,9 +2103,9 @@ One of mods you are using is using an old version of SDK. It will work for now b
                       g.globalAlpha = 1;
                     }
                   }
-                  put3(BREAST.out, key, c);
+                  keepIn(BREAST.out, key, c);
                 }
-                put3(name, c, x - c.MX, y - c.MY, o);
+                put2(name, c, x - c.MX, y - c.MY, o);
                 return true;
               };
               const underBand = (src, im, x, y, B) => {
@@ -2158,9 +2161,9 @@ One of mods you are using is using an old version of SDK. It will work for now b
                     strip.getContext("2d").drawImage(im, 0, b0, w, b1 - b0, 0, 0, w, b1 - b0);
                     g.drawImage(strip, MX + mid - mid * kx, MY + b0 + dy, w * kx, b1 - b0);
                   }
-                  put3(BREAST.out, key, c);
+                  keepIn(BREAST.out, key, c);
                 }
-                put3(name, c, x - c.MX, y - c.MY, o);
+                put2(name, c, x - c.MX, y - c.MY, o);
                 return true;
               };
               const chestCover = (src, im, x, y, B, wide) => {
@@ -2824,9 +2827,9 @@ One of mods you are using is using an old version of SDK. It will work for now b
                       console.warn("[body] belly form:", e);
                     }
                   }
-                  put3(BREAST.out, key, c);
+                  keepIn(BREAST.out, key, c);
                 }
-                put3(name, c, x - c.MX, y - c.MY, o);
+                put2(name, c, x - c.MX, y - c.MY, o);
                 return true;
               };
               const ownColour = (src, im) => {
@@ -2958,9 +2961,9 @@ One of mods you are using is using an old version of SDK. It will work for now b
                       });
                     }
                   }
-                  put3(BREAST.out, key, c);
+                  keepIn(BREAST.out, key, c);
                 }
-                put3(name, c, x - c.MX, y - c.MY, o);
+                put2(name, c, x - c.MX, y - c.MY, o);
                 return true;
               };
               const held = [];
@@ -2997,9 +3000,9 @@ One of mods you are using is using an old version of SDK. It will work for now b
                     }
                   }
                   PUMP.cups.forEach(([sx, sy, sw, sh], i) => g.drawImage(im, sx, sy, sw, sh, MX + N[i][0] - (PUMP.cupMid[i][0] - sx), MY + N[i][1] - (PUMP.cupMid[i][1] - sy), sw, sh));
-                  put3(BREAST.out, key, c);
+                  keepIn(BREAST.out, key, c);
                 }
-                put3(name, c, x - c.MX, y - c.MY, o);
+                put2(name, c, x - c.MX, y - c.MY, o);
                 return true;
               };
               const nipDraw = (name, src, x, y, o) => {
@@ -3032,9 +3035,9 @@ One of mods you are using is using an old version of SDK. It will work for now b
                     const T = B.nips[i];
                     g.drawImage(im, sx, 0, sw, h2, MX + (T[0] - x) + (sx + x - N[0]) * kN, MY + (T[1] - y) + (y - N[1]) * kN, sw * kN, h2 * kN);
                   });
-                  put3(BREAST.out, key, c);
+                  keepIn(BREAST.out, key, c);
                 }
-                put3(name, c, x - c.MX, y - c.MY, o);
+                put2(name, c, x - c.MX, y - c.MY, o);
                 return true;
               };
               const before = (src, x, y, o) => {
@@ -3095,7 +3098,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
                         }
                         if (t0 >= 0) {
                           const cyL = y + (t0 + t1) / 2 - ctx2.breast.uy;
-                          put3(name, src, x, y + (ctx2.breast.fit.mapY(cyL) - cyL), o);
+                          put2(name, src, x, y + (ctx2.breast.fit.mapY(cyL) - cyL), o);
                           return;
                         }
                       }
@@ -3150,7 +3153,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
                       if (!blink) ctx2.cock = [GEN.cv, x + 49.5 - GEN.cv.ax, y + 110 - GEN.cv.ay];
                       return;
                     }
-                    put3(blink ? "drawImageBlink" : "drawImage", GEN.cv, x + 49.5 - GEN.cv.ax, y + 110 - GEN.cv.ay, {});
+                    put2(blink ? "drawImageBlink" : "drawImage", GEN.cv, x + 49.5 - GEN.cv.ax, y + 110 - GEN.cv.ay, {});
                     return;
                   } catch (e) {
                     console.warn("[studio] cock:", e);
@@ -3162,17 +3165,17 @@ One of mods you are using is using an old version of SDK. It will work for now b
                     const q2 = isMoulded(src), m = q2 ? mouldCanvas(src, x, y, ctx2, q2.key, q2.mode) : bellyAuto(src, x, y, ctx2, fit.behind, (pieceOf(src) || {}).key);
                     const gname2 = groupOf3(src), formed = done && chestSlot(gname2) && gname2 !== "Panties" && (!q2 || q2.mode !== "under") ? m ? bellyShade(m, x - MOULD.M, y, ctx2) : bellyShade(mouldImg(src), x, y, ctx2) : null;
                     if (formed) {
-                      put3(name, formed, m ? x - MOULD.M : x, y, o);
+                      put2(name, formed, m ? x - MOULD.M : x, y, o);
                       drawn = true;
                     } else if (m) {
-                      put3(name, m, x - MOULD.M, y, o);
+                      put2(name, m, x - MOULD.M, y, o);
                       drawn = true;
                     }
                   }
                 } catch (e) {
                   console.warn("[studio] mould:", e);
                 }
-                if (!drawn) put3(name, src, x, y, o);
+                if (!drawn) put2(name, src, x, y, o);
                 if (!blink) {
                   try {
                     after(src, x, y, o);
@@ -3801,8 +3804,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
       // never: their body items are theirs
       redraw: () => mn == null ? redraw(60) : redrawMn(mn, 60),
       picture,
-      budget: mn == null ? 128e6 : 48e6
-      // how much of its drawings it keeps (body-engine.js): yours more, everybody else's less
+      budget: mn == null ? 192e6 : 96e6
+      // how much of its drawings it keeps between drawings (body-engine.js): yours more, everybody else's less
     });
   }
   function engine() {

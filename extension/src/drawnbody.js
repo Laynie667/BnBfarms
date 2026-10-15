@@ -144,7 +144,7 @@ function makeEngine(mn) {
     setBody: () => {},          // never: their body items are theirs
     redraw: () => (mn == null ? redraw(60) : redrawMn(mn, 60)),
     picture,
-    budget: mn == null ? 128e6 : 48e6,   // how much of its drawings it keeps (body-engine.js): yours more, everybody else's less
+    budget: mn == null ? 192e6 : 96e6,   // how much of its drawings it keeps between drawings (body-engine.js): yours more, everybody else's less
   });
 }
 function engine() { if (!mine.E && W.Player) mine.E = makeEngine(null); if (mine.E) apply(mine.E, eff()); return mine.E; }

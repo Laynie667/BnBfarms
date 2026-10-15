@@ -223,14 +223,14 @@
   // a stamp, varied: turned, flipped (mirrored), narrowed or stretched, sized, each substance its own way
   function stamp(ctx, r, K, x, y, size) {
     const st = STAMPS[Math.floor(r() * STAMPS.length)], img = tinted(st, K), sc = (size / 60) * (0.75 + r() * 0.5);
-    const flip = r() < 0.5 ? -1 : 1, narrow = K.narrow ? K.narrow[0] + r() * (K.narrow[1] - K.narrow[0]) : 0.85 + r() * 0.3, long = K.long || 1;
+    const flip = r() < 0.5 ? -1 : 1, narrow = K.narrow ? K.narrow[0] + r() * (K.narrow[1] - K.narrow[0]) : 0.85 + r() * 0.3, long = (K.long || 1) * (K.runX || 1);
     ctx.save(); ctx.translate(x, y); ctx.rotate((r() - 0.5) * (K.turn || 0.6)); ctx.scale(sc * flip * narrow, sc * long);
     ctx.globalAlpha = K.stampAlpha || 1; ctx.drawImage(img, -img.width / 2, -img.height * 0.3);
     ctx.restore();
   }
 
   function paint(ctx, kind, opt) {
-    const K = KINDS[kind] || KINDS.cum, r = rng((opt && opt.seed) || 1), amount = Math.max(0.3, (opt && opt.amount) || 1), at = (opt && opt.at) || [[250, 330, 40]];
+    const K0 = KINDS[kind] || KINDS.cum, K = opt && opt.runX ? Object.assign({}, K0, { run: K0.run * opt.runX, runX: 0.85 + 0.15 * opt.runX }) : K0, r = rng((opt && opt.seed) || 1), amount = Math.max(0.3, (opt && opt.amount) || 1), at = (opt && opt.at) || [[250, 330, 40]];
     ctx.save(); ctx.lineJoin = "round";
     for (const [ax, ay, size] of at) {
       const spot = () => [ax + (r() - 0.5) * size * 1.5, ay + (r() - 0.5) * size * 0.9];

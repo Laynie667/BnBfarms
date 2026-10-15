@@ -1033,7 +1033,7 @@
     // a knot plugs 'em up tight: not a drop spills, however full they get
     const kept = knot ? load - gagged : Math.min(load - gagged, room), spilt = load - gagged - kept;
     tp.held[hole] = (tp.held[hole]||0) + kept; tp.totals.received += kept;
-    if (!funnel && kept + spilt >= 1) lscgSplatAt(t, HOLE_SPLAT[hole] || ["ItemVulva"], plainName(stud));
+    if (!funnel && kept + spilt >= 1) lscgSplatAt(t, HOLE_SPLAT[hole] || ["ItemVulva"], plainName(stud), kept + spilt);
     if (hole === "mouth") tp.milk = Math.min(milkCap(t), tp.milk + kept * CFG.PROD.SWALLOW_TO_MILK);
     if (hole === "mouth" && kept >= CFG.HUNGRY_ML){ tp.boosts = tp.boosts || {}; tp.boosts.hungry = Date.now() + 3600000; }
     const sc0 = state.scenes.get(stud);
@@ -1322,9 +1322,9 @@
   function lscgSplat(mn, area, who){
     return lscgSplatAt(mn, SPLAT_SPOTS[PAINT_AREAS[String(area||"").toLowerCase()] || "body"] || ["ItemPelvis"], who);
   }
-  function lscgSplatAt(mn, groups, who){
+  function lscgSplatAt(mn, groups, who, mlx){
     // the game's own splatters too, through their Companion (10s-marks.js), for anybody who said yes to it
-    try { splatBody(mn, { ItemVulva: "vulva", ItemButt: "butt", ItemMouth: "mouth" }[groups[0]] || "body"); } catch(e){}
+    try { splatBody(mn, { ItemVulva: "vulva", ItemButt: "butt", ItemMouth: "mouth" }[groups[0]] || "body", mlx); } catch(e){}
     if (!CFG.LSCG_SPLATTERS || !lscgSplatsOn(mn)) return false;
     for (const group of groups){
       send("ChatRoomChat", { Content: "ChatOther-"+group+"-LSCG_Splat", Type: "Activity", Target: mn,

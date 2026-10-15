@@ -27,7 +27,7 @@ const AREA_OF = { face: "face", forehead: "forehead", chest: "chest", tummy: "tu
 function load() { try { const v = JSON.parse(W.localStorage.getItem(KEY)); if (Array.isArray(v)) mine = v.filter(ok).slice(-MAX); } catch (e) { mine = []; } }
 function save() { try { W.localStorage.setItem(KEY, JSON.stringify(mine)); } catch (e) { /* fine */ } }
 const ok = (e) => e && typeof e.k === "string" && W.FarmMess && W.FarmMess.KINDS[e.k] && Array.isArray(e.a) && Number.isFinite(e.s);
-const clean = (list) => (Array.isArray(list) ? list.filter(ok).slice(-MAX).map((e) => ({ k: e.k, a: e.a.filter((x) => typeof x === "string" && W.FarmMess.AREAS[x]).slice(0, 6), s: e.s | 0, t: +e.t || 0 })) : []);
+const clean = (list) => (Array.isArray(list) ? list.filter(ok).slice(-MAX).map((e) => ({ k: e.k, a: e.a.filter((x) => typeof x === "string" && W.FarmMess.AREAS[x]).slice(0, 6), s: e.s | 0, t: +e.t || 0, m: Math.max(0.5, Math.min(3, Number(e.m) || 1)) })) : []);
 
 // ── the farm marked you: what landed, and where ──
 export function messFromMark(m) {
@@ -38,7 +38,8 @@ export function messFromMark(m) {
   // a wet mess runs: from the belly onto the thighs, now and then
   if (a.includes("tummy") && ["cum", "piss", "milk", "honey", "maple", "chocolate", "strawberry", "slime"].includes(kind) && Math.random() < 0.4) a.push(Math.random() < 0.5 ? "thighL" : "thighR");
   if (!a.length) a.push("chest");
-  mine.push({ k: kind, a, s: (Math.random() * 1e9) | 0, t: Date.now() });
+  const amt = Number(m.amount) > 0 ? Math.max(0.5, Math.min(3, Number(m.amount))) : 1;   // a bigger load, a bigger mess
+  mine.push({ k: kind, a, s: (Math.random() * 1e9) | 0, t: Date.now(), m: Math.round(amt * 10) / 10 });
   if (mine.length > MAX) mine = mine.slice(-MAX);
   save(); tell(true); redrawMe();
   return true;
@@ -79,13 +80,14 @@ const made = new Map();   // member → { key, src, dx, dy }
 function messPicture(C, list, body) {
   const over = W.CanvasUpperOverflow || 700, h = (C.Canvas && C.Canvas.height) || 1000 + over;
   const up = body.find((b) => /\/BodyUpper\//.test(b[0])), ox = up ? up[1] : 0, oy = up ? up[2] - over : 0;
-  const key = JSON.stringify(list) + "|" + body.map((b) => b[0] + "@" + b[1] + "," + b[2]).join(";");
+  const age = (e) => Math.min(5, Math.floor((Date.now() - (e.t || 0)) / 60000));
+  const key = JSON.stringify(list) + "|" + list.map(age).join("") + "|" + body.map((b) => b[0] + "@" + b[1] + "," + b[2]).join(";");
   const was = made.get(C.MemberNumber); if (was && was.key === key) return was;
   const mask = W.document.createElement("canvas"); mask.width = 500; mask.height = h; const mg = mask.getContext("2d");
   for (const [src, x, y] of body) { const i = img(src, C.MemberNumber); if (!i) return was || null; mg.drawImage(i, x, y); }
   const c = W.document.createElement("canvas"); c.width = 500; c.height = h; const g = c.getContext("2d");
   const at = (names) => names.map((n) => { const A = W.FarmMess.AREAS[n]; return [A[0] + ox, A[1] + over + oy, A[2]]; });
-  for (const e of list) W.FarmMess.paintOn(g, mask, e.k, { at: at(e.a), seed: e.s, amount: 1 });
+  for (const e of list) W.FarmMess.paintOn(g, mask, e.k, { at: at(e.a), seed: e.s, amount: e.m || 1, runX: 0.55 + 0.09 * age(e) });
   // trimmed to what's on it, handed over by address (the live game takes pictures by name: see drawnbody.js)
   const d = g.getImageData(0, 0, c.width, c.height).data; let x0 = c.width, y0 = c.height, x1 = -1, y1 = -1;
   for (let y = 0; y < c.height; y++) for (let x = 0; x < c.width; x++) if (d[(y * c.width + x) * 4 + 3]) { if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y; }
@@ -135,5 +137,11 @@ function hook() {
 }
 export function initMesses(mod) {
   sdk = mod; load();
+  // a fresh mess keeps running for its first five minutes: drawn again once a minute while it does
+  setInterval(() => {
+    const fresh = (l) => l.some((e) => Date.now() - (e.t || 0) < 6 * 60000);
+    if (fresh(mine)) redrawMe();
+    for (const [mn, o] of others) if (fresh(o.list)) redrawMn(mn);
+  }, 60000);
   setTimeout(() => { hook(); if (mine.length) { tell(true); redrawMe(); } ask(); }, 3500);
 }

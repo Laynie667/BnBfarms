@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.33.1
+// @version      0.33.2
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -1828,7 +1828,7 @@
   ];
 
   // bot/src/version.js
-  var VERSION = "0.33.1";
+  var VERSION = "0.33.2";
 
   // bot-parts:farmhand-bot-parts
   (function() {
@@ -5951,7 +5951,7 @@
       const kept = knot ? load - gagged : Math.min(load - gagged, room), spilt = load - gagged - kept;
       tp.held[hole] = (tp.held[hole] || 0) + kept;
       tp.totals.received += kept;
-      if (!funnel && kept + spilt >= 1) lscgSplatAt(t, HOLE_SPLAT[hole] || ["ItemVulva"], plainName(stud));
+      if (!funnel && kept + spilt >= 1) lscgSplatAt(t, HOLE_SPLAT[hole] || ["ItemVulva"], plainName(stud), kept + spilt);
       if (hole === "mouth") tp.milk = Math.min(milkCap(t), tp.milk + kept * CFG.PROD.SWALLOW_TO_MILK);
       if (hole === "mouth" && kept >= CFG.HUNGRY_ML) {
         tp.boosts = tp.boosts || {};
@@ -6326,9 +6326,9 @@
     function lscgSplat(mn, area, who) {
       return lscgSplatAt(mn, SPLAT_SPOTS[PAINT_AREAS[String(area || "").toLowerCase()] || "body"] || ["ItemPelvis"], who);
     }
-    function lscgSplatAt(mn, groups, who) {
+    function lscgSplatAt(mn, groups, who, mlx) {
       try {
-        splatBody(mn, { ItemVulva: "vulva", ItemButt: "butt", ItemMouth: "mouth" }[groups[0]] || "body");
+        splatBody(mn, { ItemVulva: "vulva", ItemButt: "butt", ItemMouth: "mouth" }[groups[0]] || "body", mlx);
       } catch (e) {
       }
       if (!CFG.LSCG_SPLATTERS || !lscgSplatsOn(mn)) return false;
@@ -11979,9 +11979,9 @@
       enqueue(makeMsg("mark", payload, mn));
       return true;
     }
-    function splatBody(mn, where) {
+    function splatBody(mn, where, mlx) {
       const pool = SPLAT_AREAS[where] || SPLAT_AREAS.body;
-      return bodyMark(mn, { splat: [pool[Math.floor(Math.random() * pool.length)]] });
+      return bodyMark(mn, Object.assign({ splat: [pool[Math.floor(Math.random() * pool.length)]] }, mlx > 0 ? { amount: Math.max(0.6, Math.min(3, mlx / 45)) } : {}));
     }
     function hasSignedContract(mn) {
       contractsLedger();

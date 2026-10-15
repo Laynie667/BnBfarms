@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.25.0
+// @version      0.26.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -230,7 +230,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.25.0";
+  var VERSION = "0.26.0";
 
   // extension/src/config.js
   var BOT_MEMBER = 260239;
@@ -8276,7 +8276,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     };
     function stamp(ctx2, r, K, x, y, size) {
       const st2 = STAMPS[Math.floor(r() * STAMPS.length)], img2 = tinted(st2, K), sc = size / 60 * (0.75 + r() * 0.5);
-      const flip = r() < 0.5 ? -1 : 1, narrow = K.narrow ? K.narrow[0] + r() * (K.narrow[1] - K.narrow[0]) : 0.85 + r() * 0.3, long = K.long || 1;
+      const flip = r() < 0.5 ? -1 : 1, narrow = K.narrow ? K.narrow[0] + r() * (K.narrow[1] - K.narrow[0]) : 0.85 + r() * 0.3, long = (K.long || 1) * (K.runX || 1);
       ctx2.save();
       ctx2.translate(x, y);
       ctx2.rotate((r() - 0.5) * (K.turn || 0.6));
@@ -8286,7 +8286,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       ctx2.restore();
     }
     function paint(ctx2, kind, opt) {
-      const K = KINDS[kind] || KINDS.cum, r = rng(opt && opt.seed || 1), amount = Math.max(0.3, opt && opt.amount || 1), at = opt && opt.at || [[250, 330, 40]];
+      const K0 = KINDS[kind] || KINDS.cum, K = opt && opt.runX ? Object.assign({}, K0, { run: K0.run * opt.runX, runX: 0.85 + 0.15 * opt.runX }) : K0, r = rng(opt && opt.seed || 1), amount = Math.max(0.3, opt && opt.amount || 1), at = opt && opt.at || [[250, 330, 40]];
       ctx2.save();
       ctx2.lineJoin = "round";
       for (const [ax, ay, size] of at) {
@@ -8469,7 +8469,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     }
   }
   var ok = (e) => e && typeof e.k === "string" && W3.FarmMess && W3.FarmMess.KINDS[e.k] && Array.isArray(e.a) && Number.isFinite(e.s);
-  var clean2 = (list) => Array.isArray(list) ? list.filter(ok).slice(-MAX).map((e) => ({ k: e.k, a: e.a.filter((x) => typeof x === "string" && W3.FarmMess.AREAS[x]).slice(0, 6), s: e.s | 0, t: +e.t || 0 })) : [];
+  var clean2 = (list) => Array.isArray(list) ? list.filter(ok).slice(-MAX).map((e) => ({ k: e.k, a: e.a.filter((x) => typeof x === "string" && W3.FarmMess.AREAS[x]).slice(0, 6), s: e.s | 0, t: +e.t || 0, m: Math.max(0.5, Math.min(3, Number(e.m) || 1)) })) : [];
   function messFromMark(m) {
     if (!m || !Array.isArray(m.splat) || !m.splat.length || !W3.FarmMess) return false;
     const kind = typeof m.mess === "string" && W3.FarmMess.KINDS[m.mess] ? m.mess : (typeof m.color === "string" ? BY_COLOR[m.color.toLowerCase()] : null) || "cum";
@@ -8480,7 +8480,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
     }
     if (a.includes("tummy") && ["cum", "piss", "milk", "honey", "maple", "chocolate", "strawberry", "slime"].includes(kind) && Math.random() < 0.4) a.push(Math.random() < 0.5 ? "thighL" : "thighR");
     if (!a.length) a.push("chest");
-    mine2.push({ k: kind, a, s: Math.random() * 1e9 | 0, t: Date.now() });
+    const amt = Number(m.amount) > 0 ? Math.max(0.5, Math.min(3, Number(m.amount))) : 1;
+    mine2.push({ k: kind, a, s: Math.random() * 1e9 | 0, t: Date.now(), m: Math.round(amt * 10) / 10 });
     if (mine2.length > MAX) mine2 = mine2.slice(-MAX);
     save3();
     tell2(true);
@@ -8567,7 +8568,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
   function messPicture(C, list, body) {
     const over = W3.CanvasUpperOverflow || 700, h2 = C.Canvas && C.Canvas.height || 1e3 + over;
     const up = body.find((b) => /\/BodyUpper\//.test(b[0])), ox = up ? up[1] : 0, oy = up ? up[2] - over : 0;
-    const key = JSON.stringify(list) + "|" + body.map((b) => b[0] + "@" + b[1] + "," + b[2]).join(";");
+    const age = (e) => Math.min(5, Math.floor((Date.now() - (e.t || 0)) / 6e4));
+    const key = JSON.stringify(list) + "|" + list.map(age).join("") + "|" + body.map((b) => b[0] + "@" + b[1] + "," + b[2]).join(";");
     const was = made2.get(C.MemberNumber);
     if (was && was.key === key) return was;
     const mask = W3.document.createElement("canvas");
@@ -8587,7 +8589,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       const A = W3.FarmMess.AREAS[n];
       return [A[0] + ox, A[1] + over + oy, A[2]];
     });
-    for (const e of list) W3.FarmMess.paintOn(g, mask, e.k, { at: at(e.a), seed: e.s, amount: 1 });
+    for (const e of list) W3.FarmMess.paintOn(g, mask, e.k, { at: at(e.a), seed: e.s, amount: e.m || 1, runX: 0.55 + 0.09 * age(e) });
     const d = g.getImageData(0, 0, c.width, c.height).data;
     let x0 = c.width, y0 = c.height, x1 = -1, y1 = -1;
     for (let y = 0; y < c.height; y++) for (let x = 0; x < c.width; x++) if (d[(y * c.width + x) * 4 + 3]) {
@@ -8674,6 +8676,11 @@ One of mods you are using is using an old version of SDK. It will work for now b
   function initMesses(mod2) {
     sdk3 = mod2;
     load3();
+    setInterval(() => {
+      const fresh2 = (l) => l.some((e) => Date.now() - (e.t || 0) < 6 * 6e4);
+      if (fresh2(mine2)) redrawMe();
+      for (const [mn, o] of others2) if (fresh2(o.list)) redrawMn2(mn);
+    }, 6e4);
     setTimeout(() => {
       hook2();
       if (mine2.length) {

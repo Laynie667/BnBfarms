@@ -15,7 +15,8 @@
     return true;
   }
   // a load landed (in a hole, or over them): a splatter where it'd show
-  function splatBody(mn, where){
+  function splatBody(mn, where, mlx){
     const pool = SPLAT_AREAS[where] || SPLAT_AREAS.body;
-    return bodyMark(mn, { splat: [pool[Math.floor(Math.random() * pool.length)]] });
+    // how much (Companion 0.26.0 draws a bigger mess for a bigger load: a little spurt is a splash, a flood covers them)
+    return bodyMark(mn, Object.assign({ splat: [pool[Math.floor(Math.random() * pool.length)]] }, mlx > 0 ? { amount: Math.max(0.6, Math.min(3, mlx / 45)) } : {}));
   }

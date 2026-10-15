@@ -8,7 +8,7 @@
   // ledger field → the command that flips it
   const SWITCH_CMDS = { breedable:"breedable", fertile:"fertile", jarok:"jarok", freeuse:"freeuse", futa:"futa",
                         milkable:"milkable", naturalHeat:"naturalheat", praiseMe:"praise", degradeMe:"degrade",
-                        tally:"tally", teaseOptIn:"teaseme", forced:"forced", hypno:"hypno", potionsOn:"potions", daresOn:"dares", benchOn:"bench", mpreg:"mpreg", watersports:"watersports", parasiteOn:"parasite", trapEager:"eager" };
+                        tally:"tally", teaseOptIn:"teaseme", forced:"forced", hypno:"hypno", potionsOn:"potions", daresOn:"dares", benchOn:"bench", mpreg:"mpreg", watersports:"watersports", parasiteOn:"parasite", symbioteOn:"symbiote", trapEager:"eager" };
   // staff lookups about somebody else go to the Companion's Office tab
   const DOC_CMDS = ["record","stats","vet","quota","keys","size","measure","pedigree"];
 
@@ -70,6 +70,7 @@
       if (p.deniedUntil > now) s.deniedUntil = Math.ceil(p.deniedUntil / 60000) * 60000;     // held at the edge, if their Companion's set to
       if (p.eggs) s.eggs = { n: p.eggs.n, layAt: p.eggs.layAt };
       part("parasite", () => { if (parasiteOn(mn)) s.parasite = { until: r.parasite.until, form: r.parasite.form || "lips" }; });
+      part("symbiote", () => { if (symOn(mn)){ const g = r.symbiote; s.symbiote = { kind: g.kind, name: SYMBIOTES[g.kind].name, stage: g.stage, of: SYMBIOTES[g.kind].stages, until: g.until, hungry: Date.now() - g.fedAt > CFG.SYM.HUNGRY_MIN*60000 }; } });
       part("trap card", () => { const tc = trapCardFor(mn); if (tc) s.trapCard = tc; });   // the trap card (10x-trap-extras.js)
       part("farm gear", () => { const fg = farmGearFor(mn); if (fg.length) s.farmGear = fg; });   // real gear their Companion keeps on them (10y-farm-gear.js)
       part("trap admin", () => { if (isProprietor(mn)) s.trapAdmin = trapAdminFor(); });

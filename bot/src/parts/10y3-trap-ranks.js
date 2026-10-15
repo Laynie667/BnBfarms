@@ -18,8 +18,10 @@
 
   // which trap likes to pass them to which (a kind, or one of a few); anything else is pot luck
   const CHAIN_NEXT = { winch: ["breeder", "pillory", "milker"], breeder: ["mud", "eggs", "pump"], snare: ["tickle", "paddle", "wolves"], gas: ["wolves", "stallion", "toms"], wire: ["pillory", "wall", "pricetag"],
-                       mud: ["boar", "spray"], glue: ["paddle", "tickle", "brand"], pump: ["eggs", "mud"], lantern: ["mirror", "kennel"], spray: ["mud", "brand"], milker: ["cups", "bull"], injector: ["breeder", "milker", "gas"],
-                       pillory: ["brand", "pricetag"], paddle: ["pillory"], cups: ["milker", "bull"], chute: ["pump", "sow"], slime: ["vines", "eggs"], weights: ["breeder"] };
+                       mud: ["boar", "spray", "dip"], glue: ["paddle", "tickle", "brand"], pump: ["eggs", "mud"], lantern: ["mirror", "kennel"], spray: ["mud", "brand"], milker: ["cups", "bull"], injector: ["breeder", "milker", "gas"],
+                       pillory: ["brand", "pricetag"], paddle: ["pillory"], cups: ["milker", "bull"], chute: ["pump", "sow"], slime: ["vines", "eggs"], weights: ["breeder"],
+                       saddle: ["paddle", "milker", "dip"], net: ["pillory", "tickle", "bell"], bell: ["winch", "scale"], scale: ["pricetag", "cups", "brand"], teaser: ["weights", "milker", "crate"], dip: ["mud", "spray", "net"],
+                       crate: ["milker", "carousel", "bale"], carousel: ["cups", "crate", "dip"], plow: ["paddle", "dip", "scarecrow"], bale: ["scarecrow", "pillory"], scarecrow: ["plow", "net", "washline"], washline: ["paddle", "dip"] };
   // called when a trap has finished with them (10u-traps.js trapRun)
   function trapAfter(mn, kind, before){
     const r = rec(mn), p = prodOf(mn), now = Date.now();

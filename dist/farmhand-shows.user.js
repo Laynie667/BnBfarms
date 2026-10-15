@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm add-on: Shows
 // @namespace    bnbfarm
-// @version      1.0.4
+// @version      1.1.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-shows.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-shows.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -23,7 +23,7 @@
 
 (() => {
   // addons/_lib/connect.js
-  var W = typeof unsafeWindow !== "undefined" && unsafeWindow ? unsafeWindow : window;
+  var W = typeof unsafeWindow !== "undefined" && unsafeWindow ? unsafeWindow : typeof window !== "undefined" ? window : globalThis;
   function connect(def) {
     let done = false;
     const go = () => {
@@ -49,6 +49,175 @@
       }, 1e4);
     }
   }
+  var pick = (list) => list[Math.floor(Math.random() * list.length)];
+  var fill = (text, vars) => String(text).replace(/%(\w+)%/g, (m, k) => vars[k] !== void 0 ? vars[k] : m);
+  var TAG_ANY = /\{(?:nv|nc|nt|fu|fb|ok|v|c|t|f|m)\}/g;
+  var TAG_LEAD = /^((?:\{(?:nv|nc|nt|fu|fb|v|c|t|f|m)\})+)/;
+  var VULVA_W = /\b(pussy|pussies|cunt|cunts|slit|womb|clit|cervix)\b/i;
+  var TITS_W = /\b(tits?|titties|breasts?|udders?|teats?|cleavage)\b/i;
+  var GIRL_W = /\b(girl|heifer|mare|broodmare)\b/i;
+  var untag = (t) => String(t == null ? "" : t).replace(TAG_ANY, "");
+  var bodyOf = (api2, mn) => {
+    try {
+      return api2 && api2.body && mn ? api2.body(mn) : null;
+    } catch (e) {
+      return null;
+    }
+  };
+  var gearOf = (api2, mn) => {
+    try {
+      return api2 && api2.gear && mn && api2.gear(mn) || {};
+    } catch (e) {
+      return {};
+    }
+  };
+  function fits(line, b) {
+    const s = String(line), m = s.match(TAG_LEAD);
+    if (!b) return !m;
+    if (m) {
+      for (const t of m[1].slice(1, -1).split("}{")) {
+        if (t === "v" && !b.vulva || t === "nv" && b.vulva || t === "c" && !b.cock || t === "nc" && b.cock || t === "t" && !b.tits || t === "nt" && b.tits || t === "f" && b.g !== "female" || t === "m" && b.g !== "male" || t === "fu" && b.g !== "futa" || t === "fb" && b.g !== "femboy") return false;
+      }
+      return true;
+    }
+    if (!b.vulva && VULVA_W.test(s)) return false;
+    if (!b.tits && TITS_W.test(s)) return false;
+    if (b.g === "male" && GIRL_W.test(s)) return false;
+    return true;
+  }
+  function fitting(list, b) {
+    const ok = list.filter((l) => fits(l, b));
+    if (ok.length) return ok;
+    const plain = list.filter((l) => !TAG_LEAD.test(l));
+    return plain.length ? plain : list;
+  }
+  var pickFit = (list, b) => untag(pick(fitting(list, b)));
+  function lineFor(api2, mn, list, key) {
+    if (!Array.isArray(list) || !list.length) return "";
+    const b = bodyOf(api2, mn);
+    let t;
+    try {
+      t = key && api2 && api2.pickFor && api2.tags >= 2 ? untag(api2.pickFor(mn, key, list)) : pickFit(list, b);
+    } catch (e) {
+      t = pickFit(list, b);
+    }
+    return api2 && api2.fit && api2.tags >= 2 ? api2.fit(mn, t) : t;
+  }
+  var ANIMALS = {
+    cow: { f: "cow", m: "bull", young: ["calf", "calves"], call: "moo", sound: ["a low moo", "a soft, needy moo", "a long, shaky moo"] },
+    bull: { f: "cow", m: "bull", young: ["calf", "calves"], call: "snort", sound: ["a deep snort", "a low bellow", "a rumbling snort"] },
+    pony: { f: "pony", m: "pony", young: ["foal", "foals"], call: "whinny", sound: ["a breathy whinny", "a soft nicker", "a shaky little whinny"] },
+    horse: { f: "mare", m: "stallion", young: ["foal", "foals"], call: "whinny", sound: ["a breathy whinny", "a low nicker", "a long, trembling whinny"] },
+    deer: { f: "doe", m: "buck", young: ["fawn", "fawns"], call: "bleat", sound: ["a thin, wavering bleat", "a soft bleat"] },
+    pig: { f: "sow", m: "boar", young: ["piglet", "piglets"], call: "oink", sound: ["a needy little oink", "a soft grunt", "a squealing gasp"] },
+    pup: { f: "pup", m: "pup", young: ["pup", "pups"], call: "woof", sound: ["a high, needy whine", "a soft whimper", "a breathless yip"] },
+    dog: { f: "bitch", m: "dog", young: ["pup", "pups"], call: "woof", sound: ["a needy whine", "a low whimper", "a shaky yip"] },
+    kitt: { f: "kitty", m: "kitty", young: ["kitten", "kittens"], call: "mew", sound: ["a needy mewl", "a soft, broken purr", "a breathy mew"] },
+    cat: { f: "cat", m: "tom", young: ["kitten", "kittens"], call: "mew", sound: ["a needy mewl", "a rumbling purr", "a breathy mew"] },
+    goblin: { f: "goblin", m: "goblin", young: ["goblin brat", "goblin brats"], call: "cackle", sound: ["a ragged little cackle that turns into a moan", "a breathless giggle"] },
+    bunny: { f: "bunny", m: "bunny", young: ["kit", "kits"], call: "squeak", sound: ["a breathy squeak", "a soft little squeak", "a thump of one foot"] },
+    rabbit: { f: "doe", m: "buck", young: ["kit", "kits"], call: "squeak", sound: ["a breathy squeak", "a soft little squeak", "a thump of one foot"] },
+    fox: { f: "vixen", m: "fox", young: ["kit", "kits"], call: "yip", sound: ["a high yip", "a breathy little whine", "a sharp, startled yip"] },
+    wolf: { f: "wolf", m: "wolf", young: ["pup", "pups"], call: "howl", sound: ["a low, wavering howl", "a needy whine", "a rumbling growl"] },
+    goat: { f: "nanny", m: "billy", young: ["kid", "kids"], call: "bleat", sound: ["a shaky bleat", "a soft bleat", "a loud, startled bleat"] },
+    sheep: { f: "ewe", m: "ram", young: ["lamb", "lambs"], call: "baa", sound: ["a soft baa", "a trembling baa"] },
+    default: { f: "animal", m: "animal", young: ["little one", "little ones"], call: "moan", sound: ["a soft moan", "a needy whimper", "a shaky gasp"] }
+  };
+  function animalOf(api2, mn) {
+    let k = "default";
+    try {
+      k = api2 && api2.species && api2.species(mn) || "default";
+    } catch (e) {
+    }
+    const w = ANIMALS[k] || ANIMALS.default, b = bodyOf(api2, mn), male = !!(b && (b.g === "male" || b.g === "femboy"));
+    return { key: ANIMALS[k] ? k : "default", a: male ? w.m : w.f, young: w.young, call: w.call, sound: pick(w.sound), sounds: w.sound, male };
+  }
+
+  // addons/shows/more-lines.js
+  var GAIT = {
+    cow: ["lumbers", "trundles", "barrels"],
+    bull: ["charges", "thunders", "barrels"],
+    pony: ["gallops", "thunders", "prances"],
+    horse: ["gallops", "thunders", "canters"],
+    deer: ["bounds", "springs", "darts"],
+    pig: ["trots", "scurries", "hurtles"],
+    pup: ["scrambles", "bounds", "tears"],
+    dog: ["bounds", "tears", "races"],
+    kitt: ["streaks", "darts", "pounces"],
+    cat: ["streaks", "darts", "slinks"],
+    goblin: ["scuttles", "scrambles", "cackles"],
+    bunny: ["hops", "bounds", "zigzags"],
+    rabbit: ["hops", "bounds", "zigzags"],
+    fox: ["darts", "streaks", "bounds"],
+    wolf: ["lopes", "races", "tears"],
+    goat: ["clatters", "bounds", "skitters"],
+    sheep: ["trots", "bundles", "bounces"],
+    default: ["runs", "dashes", "races"]
+  };
+  var ENTER = {
+    udder: [
+      "{t}\u{1F380} %name% steps into the ring for udder judgin', heavy and swingin', and gives the judges a good long look.",
+      "{t}\u{1F380} %name% walks into the ring slow and proud, udder full and tight for the judges.",
+      "{nt}\u{1F380} %name% steps into the ring for udder judgin', chest out and nipples stiff, ready to show what they give.",
+      "\u{1F380} %name% is led into the ring for udder judgin' and stands square, waitin' to be felt over."
+    ],
+    breeding: [
+      "\u{1F380} %name% steps into the ring for the breedin' stand, and the stud book comes out.",
+      "\u{1F380} %name% struts into the breedin' ring like they've got a season's worth to show for it.",
+      "{v}\u{1F380} %name% takes the breedin' stand, tail up and proud.",
+      "{c}\u{1F380} %name% takes the breedin' stand, every inch a stud and showin' it."
+    ],
+    race: [
+      "\u{1F380} %name% paws the ground at the start line, ready to go.",
+      "\u{1F380} %name% lines up for the cart race, stampin' and snortin' and rarin' to go.",
+      "\u{1F380} %name% shakes out their legs at the start and eyes the course."
+    ],
+    obedience: [
+      "\u{1F380} %name% trots into the ring for the obedience trial and sits pretty for the judges.",
+      "\u{1F380} %name% steps into the obedience ring, ears pricked, watchin' the judge's hands.",
+      "\u{1F380} %name% comes into the ring and waits for their first cue, all eyes and good manners."
+    ]
+  };
+  var CUE_OK = [
+    "\u{1F380} %name% does it perfectly on cue. The judge marks the card.",
+    "\u{1F380} %name% nails the cue, quick and neat, and the crowd claps.",
+    "\u{1F380} Right on cue! %name% gets a nod from the judge and a pat on the head.",
+    "\u{1F380} %name% does just what was asked, first time. Good %a%.",
+    "\u{1F380} Perfect. %name% gives a pleased little %call% and the judge marks it down."
+  ];
+  var CUE_MISS = [
+    "\u{1F380} %name% misses the cue. The judge shakes their head and marks it down.",
+    "\u{1F380} %name% gets distracted by somethin' in the straw and misses it entirely.",
+    "\u{1F380} Not quite. %name% gets halfway there and loses their nerve. The judge marks it down.",
+    "\u{1F380} %name% looks at the judge, looks at the crowd, and does the wrong thing with great confidence."
+  ];
+  var FINISH = [
+    "\u{1F3C1} %name% %gait% across the finish line in %time% seconds!",
+    "\u{1F3C1} Over the line! %name% %gait% home in %time% seconds, flanks heavin'.",
+    "\u{1F3C1} %name% %gait% through the last checkpoint and over the line: %time% seconds.",
+    "\u{1F3C1} Here comes %name%, flat out for the line, %time% seconds on the clock!"
+  ];
+  var BEST = [
+    "\u{1F380} The judge pins a blue ribbon on %name%. Best in show!",
+    "\u{1F380} Blue ribbon for %name%, and a round of applause from the rail. Best in show!",
+    "\u{1F380} The judge steps back, looks %name% over once more, and pins the blue on them. Best in show!"
+  ];
+  var BEST_COLLAR = [
+    "\u{1F380} The judge pins a blue ribbon to %name%'s collar. Best in show!",
+    "\u{1F380} A blue ribbon goes on %name%'s collar, and the judge gives it a proud little tug. Best in show!"
+  ];
+  var BEST_HARNESS = [
+    "\u{1F380} The judge buckles a blue rosette to %name%'s harness. Best in show!"
+  ];
+  var WEAR = [
+    "\u{1F380} %name% wears their %ribbon% proudly.",
+    "\u{1F380} %name% shows off their %ribbon% to anybody who'll look.",
+    "\u{1F380} %name%'s %ribbon% catches the light as they come in."
+  ];
+  var WEAR_COLLAR = [
+    "\u{1F380} %name% has their %ribbon% pinned to their collar, and it bobs when they walk.",
+    "\u{1F380} There's a %ribbon% on %name%'s collar today, and they keep checkin' it's still there."
+  ];
 
   // addons/shows/index.js
   var EVENTS = { udder: "Udder Judging", breeding: "Breeding Stand", race: "Pony Cart Race", obedience: "Obedience Trial" };
@@ -63,6 +232,10 @@
     d.placards = d.placards || {};
     d.ribbonSaid = d.ribbonSaid || {};
     return d;
+  }
+  function about(mn, pool, key, extra) {
+    const an = animalOf(api, mn), gait = GAIT[an.key] || GAIT.default;
+    return fill(lineFor(api, mn, pool, key), Object.assign({ name: api.name(mn), a: an.a, call: an.call, gait: pick(gait) }, extra || {}));
   }
   var avg = (o) => {
     const v = Object.values(o || {});
@@ -121,7 +294,7 @@
         e.cp++;
         if (e.cp >= cps.length) {
           e.done = Date.now();
-          api.emote("\u{1F3C1} " + api.name(mn) + " thunders across the finish line in " + ((e.done - sh.start) / 1e3).toFixed(1) + " seconds!", mn);
+          api.emote(about(mn, FINISH, "finish", { time: ((e.done - sh.start) / 1e3).toFixed(1) }), mn);
         } else api.privateEmote(mn, "Checkpoint " + e.cp + " of " + cps.length + "! On to " + cps[e.cp] + ".");
       }
     }
@@ -158,7 +331,7 @@
     e.cues++;
     if (ok) e.passed++;
     api.save();
-    api.emote(ok ? "\u{1F380} " + api.name(mn) + " does it perfectly on cue. The judge marks the card." : "\u{1F380} " + api.name(mn) + " misses the cue. The judge shakes their head and marks it down.", mn);
+    api.emote(about(mn, ok ? CUE_OK : CUE_MISS, ok ? "cueok" : "cuemiss"), mn);
   }
   function onRoleplay(mn, text) {
     const c = cues.get(mn);
@@ -182,7 +355,10 @@
       if (api.ribbons) api.ribbons(Number(mn), [5, 3, 2][place] || 1, "placin' in the show");
     });
     api.announce("\u{1F380} " + EVENTS[sh.event].toUpperCase() + " RESULTS: " + ranked.map(([mn, v], i) => PLACES[i] + " " + api.name(mn) + " (" + shown(sh, mn, v) + ")").join(" \xB7 "));
-    api.emote("\u{1F380} The judge pins a " + RIBBON[0] + " ribbon on " + api.name(ranked[0][0]) + ". Best in show!", ranked[0][0]);
+    {
+      const w = Number(ranked[0][0]), g = gearOf(api, w);
+      api.emote(about(w, g.collar ? BEST_COLLAR : g.harness ? BEST_HARNESS : BEST, "best"), w);
+    }
     api.save();
     return "Closed and ribbons handed out.";
   }
@@ -206,7 +382,7 @@
       if (sh.event === "race" && sh.start) return c.reply("The race has already started, sugar. Next time!");
       sh.entrants[sender] = sh.entrants[sender] || { scores: {}, cues: 0, passed: 0, cp: 0, done: 0 };
       A.save();
-      A.emote("\u{1F380} " + A.name(sender) + " steps into the ring for the " + EVENTS[sh.event] + ".", sender);
+      A.emote(about(sender, ENTER[sh.event] || ["\u{1F380} %name% steps into the ring for the " + EVENTS[sh.event] + "."], "enter:" + sh.event), sender);
       return;
     }
     if (w === "go") {
@@ -250,7 +426,7 @@
     if (d.ribbonSaid[mn] === today) return;
     d.ribbonSaid[mn] = today;
     api.save();
-    api.later(() => api.char(mn) && api.emote("\u{1F380} " + api.name(mn) + " wears their " + ribbonText(x) + " proudly.", mn), 12e3);
+    api.later(() => api.char(mn) && api.emote(about(mn, gearOf(api, mn).collar ? WEAR.concat(WEAR_COLLAR) : WEAR, "wear", { ribbon: ribbonText(x) }), mn), 12e3);
   }
   function placardText(name) {
     const t = D().placards[name] || "(nothing written yet)";

@@ -19,7 +19,7 @@
    Everything respects their limits and what's blocked (a gag, chastity, a plug); a funnel gag counts as a
    mouth.
 */
-import { connect, pick, between, fill } from "../_lib/connect.js";
+import { connect, pick, between, fill, bodyOf, gearOf, animalOf } from "../_lib/connect.js";
 import { buildScene, buildRealScene, pickVisitor, sizeFromInches, ATMOS, TYPES } from "./scenes.js";
 
 const HOLE_WORDS = { mouth: "mouth", vulva: "pussy", butt: "ass" };
@@ -87,7 +87,7 @@ function startScene(id, mn) {
   const sh = D().shifts[mn], C = api.char(mn);
   const tied = !!(C && (C.Appearance || []).some((x) => x && x.Asset && x.Asset.Group && ["ItemArms", "ItemHands"].includes(x.Asset.Group.Name)));
   const setup = sh && sh.punish && sh.until > Date.now() ? "punished" : tied ? "bound" : "voluntary";
-  const scene = buildScene({ hole, visitor, funnel, degrade: !!r.degradeMe, praise: !!r.praiseMe, holes, setup });
+  const scene = buildScene({ hole, visitor, funnel, degrade: !!r.degradeMe, praise: !!r.praiseMe, holes, setup, body: bodyOf(api, mn), gear: gearOf(api, mn), animal: animalOf(api, mn) });
   running.set(id, { mn, scene, hole, visitor, i: 0 });
   api.log("stall " + id + ": " + scene.kind + ", " + visitor.size + " " + visitor.type + " in the " + hole + " for " + mn);
   step(id);
@@ -306,8 +306,9 @@ function cmdStall(c) {
     if (visitor.type === "double" && !(hole !== "mouth" && openHoles(mn).includes("vulva") && openHoles(mn).includes("butt"))) visitor.type = "human";
     const inside = true, funnel = hole === "mouth" && A.funnelOn(mn);
     A.privateEmote(sender, "You step up to the hole and push through into the " + w + " waiting on the other side. You finish " + (load >= 1 ? "deep inside, about " + Math.round(load) + " mL" : "with a shudder") + ". Whoever's in there never sees your face.");
-    const lines = load >= 1 ? buildRealScene({ hole, visitor, funnel, ml: load, inside })
-      : buildRealScene({ hole, visitor, funnel, ml: 0, inside }).slice(0, 4).concat(["The stranger shudders and finishes against the wall, then pulls away."]);
+    const body = bodyOf(A, mn);
+    const lines = load >= 1 ? buildRealScene({ hole, visitor, funnel, ml: load, inside, body })
+      : buildRealScene({ hole, visitor, funnel, ml: 0, inside, body }).slice(0, 4).concat(["The stranger shudders and finishes against the wall, then pulls away."]);
     lines.forEach((l, i) => A.later(() => A.privateEmote(mn, named(l, mn)), i * 5000));
     A.later(() => finish(id, mn, hole, load, inside, visitor), (lines.length - 1) * 5000);
     scheduleNext(id, mn);

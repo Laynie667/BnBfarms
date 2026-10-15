@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.21.0
+// @version      0.22.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -230,7 +230,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.21.0";
+  var VERSION = "0.22.0";
 
   // extension/src/config.js
   var BOT_MEMBER = 260239;
@@ -4170,6 +4170,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     ["dares", "Dares", "Staff and the wheel can hand you a dare to do in half an hour"],
     ["watersports", "Watersports", "Piss play can find you: the spray trap, a feeder crafted for it, and the scenes that have it. Off until you say so"],
     ["parasite", "Parasite", "Swallow at the glory stalls and, rarely, a pair of livin' lips seals over your mouth for 12 hours: it feeds you fertility, growth, hyper pregnancy and capacity serum and turns every load you swallow into more"],
+    ["symbiote", "Symbiotes", "Livin' latex, milk moss or the nestling can bond to you. Each gives you somethin' for as long as it's fed: room to hold more, more milk, an easier catch. Your safeword sends it away"],
     ["eager", "Traps: no cooldown", "Test subjects: no breather between traps and no wait for a trap to reset. Step off and back on and it springs again"],
     ["bench", "Use bench", "Staff and the wheel can sentence you to time strapped over the use bench, where anybody can use you. Your safeword ends it at once"]
   ];

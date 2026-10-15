@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm add-on: Conditioning
 // @namespace    bnbfarm
-// @version      1.0.4
+// @version      1.1.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-conditioning.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-conditioning.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -23,7 +23,7 @@
 
 (() => {
   // addons/_lib/connect.js
-  var W = typeof unsafeWindow !== "undefined" && unsafeWindow ? unsafeWindow : window;
+  var W = typeof unsafeWindow !== "undefined" && unsafeWindow ? unsafeWindow : typeof window !== "undefined" ? window : globalThis;
   function connect(def) {
     let done = false;
     const go = () => {
@@ -49,8 +49,219 @@
       }, 1e4);
     }
   }
+  var pick = (list) => list[Math.floor(Math.random() * list.length)];
   var between = (lo, hi) => lo + Math.floor(Math.random() * (hi - lo + 1));
   var fill = (text, vars) => String(text).replace(/%(\w+)%/g, (m, k) => vars[k] !== void 0 ? vars[k] : m);
+  var TAG_ANY = /\{(?:nv|nc|nt|fu|fb|ok|v|c|t|f|m)\}/g;
+  var TAG_LEAD = /^((?:\{(?:nv|nc|nt|fu|fb|v|c|t|f|m)\})+)/;
+  var VULVA_W = /\b(pussy|pussies|cunt|cunts|slit|womb|clit|cervix)\b/i;
+  var TITS_W = /\b(tits?|titties|breasts?|udders?|teats?|cleavage)\b/i;
+  var GIRL_W = /\b(girl|heifer|mare|broodmare)\b/i;
+  var untag = (t) => String(t == null ? "" : t).replace(TAG_ANY, "");
+  var bodyOf = (api2, mn) => {
+    try {
+      return api2 && api2.body && mn ? api2.body(mn) : null;
+    } catch (e) {
+      return null;
+    }
+  };
+  var gearOf = (api2, mn) => {
+    try {
+      return api2 && api2.gear && mn && api2.gear(mn) || {};
+    } catch (e) {
+      return {};
+    }
+  };
+  function fits(line, b) {
+    const s = String(line), m = s.match(TAG_LEAD);
+    if (!b) return !m;
+    if (m) {
+      for (const t of m[1].slice(1, -1).split("}{")) {
+        if (t === "v" && !b.vulva || t === "nv" && b.vulva || t === "c" && !b.cock || t === "nc" && b.cock || t === "t" && !b.tits || t === "nt" && b.tits || t === "f" && b.g !== "female" || t === "m" && b.g !== "male" || t === "fu" && b.g !== "futa" || t === "fb" && b.g !== "femboy") return false;
+      }
+      return true;
+    }
+    if (!b.vulva && VULVA_W.test(s)) return false;
+    if (!b.tits && TITS_W.test(s)) return false;
+    if (b.g === "male" && GIRL_W.test(s)) return false;
+    return true;
+  }
+  function fitting(list, b) {
+    const ok = list.filter((l) => fits(l, b));
+    if (ok.length) return ok;
+    const plain = list.filter((l) => !TAG_LEAD.test(l));
+    return plain.length ? plain : list;
+  }
+
+  // addons/conditioning/more-lines.js
+  var SPECIES_MORE = {
+    bull: { a: "bull", s: "snort", p: "heavy balls", act: "breed and obey", pose: "on all fours, head low", names: ["good bull", "farm bull", "breeding bull", "dumb stud bull"] },
+    kitt: { a: "kitty", s: "mew", p: "twitching tail", act: "purr and present", pose: "curled low, hips up", names: ["sweet kitty", "farm cat", "needy kitty", "brainless pet"] },
+    rabbit: { a: "bunny", s: "squeak", p: "twitchy ears", act: "hop and breed", pose: "crouched low, nose twitching", names: ["sweet bunny", "farm bunny", "breeding doe", "dumb breeding doe"] },
+    fox: { a: "fox", s: "yip", p: "bushy tail", act: "present and please", pose: "low on your elbows, tail high", names: ["sweet fox", "farm vixen", "eager vixen", "dumb little vixen"] },
+    wolf: { a: "wolf", s: "howl", p: "thick ruff", act: "heel and obey", pose: "kneeling up, paws tucked", names: ["good wolf", "farm wolf", "obedient wolf", "dumb tame wolf"] },
+    deer: { a: "doe", s: "bleat", p: "soft flanks", act: "stand still and wait", pose: "on all fours, head low", names: ["sweet doe", "farm doe", "tame doe", "dumb little doe"] },
+    goblin: { a: "goblin", s: "giggle", p: "greedy hands", act: "fetch and serve", pose: "squatting low, hands on the floor", names: ["good goblin", "farm goblin", "useful goblin", "dumb goblin"] }
+  };
+  var MALE = {
+    cow: { a: "bull", names: ["good bull", "farm bull", "breeding bull", "dumb stud bull"] },
+    horse: { a: "stallion", names: ["good stallion", "farm stallion", "stud stallion", "dumb stud"] },
+    pig: { a: "boar", names: ["sweet piggy", "farm boar", "greedy boar", "filthy boar"] },
+    bunny: { a: "bunny", names: ["sweet bunny", "farm bunny", "breeding buck", "dumb breeding buck"] },
+    rabbit: { a: "bunny", names: ["sweet bunny", "farm bunny", "breeding buck", "dumb breeding buck"] },
+    goat: { a: "goat", names: ["sweet goat", "farm goat", "billy goat", "dumb billy"] },
+    sheep: { a: "ram", names: ["sweet lamb", "farm ram", "flock ram", "dumb ram"] },
+    fox: { a: "fox", names: ["sweet fox", "farm fox", "eager fox", "dumb little fox"] },
+    deer: { a: "buck", names: ["sweet buck", "farm buck", "tame buck", "dumb little buck"] },
+    dog: { names: ["good dog", "farm dog", "obedient mutt", "dumb mutt"] },
+    pup: { names: ["good pup", "farm pup", "obedient pup", "dumb mutt"] }
+  };
+  var UDDER_KINDS = ["cow", "goat"];
+  var SCRIPT_MORE = {
+    settle: [
+      "Listen, %name%. Just listen. The barn is warm, the straw is soft, and my voice is the only thing that matters.",
+      "Let your hands go loose. Let your jaw go loose. Let everything that's holding on just let go.",
+      "In through your nose, slow. Out through your mouth, slower. Again. Good.",
+      "Somewhere a cow lows and a gate creaks, and every sound just makes you sleepier.",
+      "Your body is getting heavy, %name%, heavy and warm, sinking into the straw.",
+      "You've worked hard. You've been good. Now you get to stop, and just hear me.",
+      "Feel the weight of your own head. Let it tip. Let it rest.",
+      "There's nothing you need to do right now, %name%. Nothing at all but listen."
+    ],
+    deeper: {
+      fun: [
+        "Sinking softly now, like a calf curling up in the hay.",
+        "Each breath out, a little further down. Nice and easy. Nothing to it.",
+        "It's so pleasant down here, %name%. Warm and simple and quiet.",
+        "Drifting, drifting, and every drift feels better than the last.",
+        "You're my good {a} now, and being my good {a} feels so easy."
+      ],
+      deep: [
+        "Down past the busy part of your mind, down where it's dark and warm and slow.",
+        "Every word I say pushes you a little deeper, and you don't want me to stop.",
+        "Your thoughts are coming slower now, one at a time, and then not at all.",
+        "Deeper. You can't feel where your body ends and the straw begins.",
+        "So deep. So good. A good {a} sinks when they're told."
+      ],
+      nhl: [
+        "Deeper than thought. Deeper than words. Down where only the {a} lives.",
+        "Your name is getting far away, %name%. Let it go. You won't need it down here.",
+        "Every breath out takes a little more of the person with it. Let it go.",
+        "There's no up from here unless I bring you, and I'm in no hurry.",
+        "Lower and lower, until you're nothing but warm and obedient and {a}."
+      ]
+    },
+    suggest: {
+      fun: [
+        "Every time you hear the milking bell, you'll feel a little flutter of good {a} pride.",
+        "When someone pats your head, you'll lean into it. You won't even notice you're doing it.",
+        "You'll find yourself standing the way a good {a} stands: {pose}. It just feels right.",
+        "Every time you {s}, you'll feel a little warm rush. Good {a}s make their noises.",
+        "When someone says {pet}, you'll smile. You won't be able to help it.",
+        "{t}Your tits will feel full and heavy and proud, like they're there to be admired.",
+        "{c}When you're praised, a little warm throb runs through your cock. Good {a}s like praise."
+      ],
+      deep: [
+        "Your mind stays soft and slow even after you wake. Thinking can wait. Obeying can't.",
+        "When your handler speaks, everything else gets quiet. That's how it should be.",
+        "The ache stays with you after you wake, low and warm, and you'll never quite get to finish it.",
+        "You'll {s} when you're happy. You'll {s} when you're needy. Words are for people.",
+        "{t}Your tits are the farm's, and they ache to be milked whenever someone looks at them.",
+        "{c}Your cock is the farm's. It stays hard and aching and it doesn't belong to you.",
+        "{v}Your pussy is the farm's. Wet and ready whenever the farm wants it.",
+        "Every time you kneel, you'll feel yourself sink a little. Kneeling is home."
+      ],
+      nhl: [
+        "There was never a person. There was only ever a {a} that thought it was one.",
+        "Hands are paws. Words are noises. Wanting is waiting. That's all you need.",
+        "When you're touched, you push into it like an animal. When you're left, you wait like one.",
+        "{t}Your udders are for milking. That's what they're for. That's what you're for.",
+        "{c}You're for breeding now. Your cock knows it even if the rest of you forgets.",
+        "{v}You're for breeding now. Your pussy knows it even if the rest of you forgets.",
+        "Your pen is home. Your handler is everything. The farm is the whole world."
+      ]
+    },
+    wake: {
+      fun: [
+        "Coming up now. Three, two, one, and you're back in the barn, %name%, smiling for no reason at all. Good {a}.",
+        "Up you come, slow and easy. Wiggle your fingers. Open your eyes. Welcome back, {pet}."
+      ],
+      deep: [
+        "I'll bring you up now, %name%, but not all the way. Part of you stays down there, listening. Three, two, one.",
+        "Up, slowly. Your name comes back first, then your hands. But the quiet stays, and so does my voice."
+      ],
+      nhl: [
+        "No counting up, {pet}. Just open your eyes. The {a} can look around now.",
+        "The session's over. The {a} isn't. Stay as you are."
+      ]
+    }
+  };
+  var GEAR_SUGGEST = {
+    collar: [
+      "Feel your collar, %name%. Every time it presses your throat, you remember whose {a} you are.",
+      "Your collar is warm against your neck. It's always there, and so am I."
+    ],
+    leash: [
+      "Feel the leash. A good {a} goes where the leash goes, and never minds.",
+      "Every tug of your leash is a tug on something deeper. You follow. You like following."
+    ],
+    bell: [
+      "Every time your bell rings, you sink a little. Ring, sink. Ring, sink.",
+      "Your bell tells the whole farm where its {a} is. You like being found."
+    ],
+    gag: [
+      "You don't need your mouth for words, {pet}. Let it rest round the gag. Your {s} is enough.",
+      "The gag keeps the words in. Good. Words were never yours anyway."
+    ],
+    blind: [
+      "You can't see, and you don't need to. My voice is the only thing to follow.",
+      "In the dark behind the blindfold, there's only my voice and the warm straw."
+    ],
+    hood: [
+      "Inside the hood, there's no face to be. There's only the {a}.",
+      "The hood holds you close and quiet. Nothing in here but my voice."
+    ],
+    paws: [
+      "Your hands are paws now. Paws don't grab. Paws don't hold. Paws wait.",
+      "Feel how useless your paws are. Isn't it a relief, not having to do anything with them?"
+    ],
+    arms: [
+      "Your arms are tied, so you don't have to decide anything with them. Let them rest.",
+      "Bound, you're free of choices. Just a {a}, held still, listening."
+    ],
+    cage: [
+      "{c}Your cage keeps you good. You don't need to touch. You don't even want to.",
+      "{c}Every throb against your cage is the farm reminding you who it belongs to."
+    ],
+    nipples: [
+      "That little bite at your nipples is the farm's hand on you. Feel it, and sink.",
+      "Your clamped nipples throb in time with my voice. Every throb, a little deeper."
+    ],
+    latex: [
+      "Your latex is your hide now. Smooth, shining, nothing human under it.",
+      "Feel how the rubber holds you. Tight. Close. Like it's keeping the {a} in."
+    ],
+    harness: [
+      "Your harness holds you like a farm holds its stock. Snug, and safe, and owned.",
+      "Feel every strap of your harness. Each one says: tack, not clothes."
+    ],
+    ears: [
+      "Feel your ears. They twitch at my voice, don't they. {a}s' ears always do.",
+      "Your ears are listening harder than you are. Let them."
+    ],
+    tail: [
+      "Feel your tail. It moves when you're happy, and you're happy now.",
+      "Your tail is part of you. It always was."
+    ],
+    hooves: [
+      "Your hooves keep you up on your toes, the way a good {a} should stand.",
+      "Feel the weight of your hooves. You weren't made for walking like a person."
+    ],
+    noseRing: [
+      "Your nose ring is where a handler leads a good {a}. You'll follow it anywhere.",
+      "Feel the ring in your nose. One tug, and you'll come."
+    ]
+  };
 
   // addons/conditioning/index.js
   var SPECIES = {
@@ -67,6 +278,7 @@
     sheep: { a: "lamb", s: "baa", p: "soft fleece", act: "follow the flock", pose: "on all fours, head low", names: ["sweet lamb", "farm lamb", "flock ewe", "dumb sheep"] },
     default: { a: "animal", s: "low animal sound", p: "body", act: "obey", pose: "kneeling, hands on your thighs", names: ["good animal", "farm animal", "livestock", "dumb livestock"] }
   };
+  Object.assign(SPECIES, SPECIES_MORE);
   var LEVELS = ["fun", "deep", "nhl"];
   var LEVEL_NAME = { fun: "Fun", deep: "Deep", nhl: "No human left" };
   var MILESTONES = [3, 7, 15, 30];
@@ -107,7 +319,7 @@
         "Only my voice matters now. Other voices are just noise in the barn.",
         "Feel the heat building low in your belly. Let it build. You don't get to finish. You just ache, and it feels like being good.",
         "When I tell you to, you'll {s}. Not words. Just a {s}. Go on. Let it out.",
-        "Your {p} belong to the farm. You feel that every time someone looks at you.",
+        "Every bit of you belongs to the farm, your {p} most of all. You feel that every time someone looks at you.",
         "You {act} because it's what you're for. It's not a choice, and that's a relief."
       ],
       nhl: [
@@ -127,6 +339,8 @@
       ]
     }
   };
+  SCRIPT.settle.push(...SCRIPT_MORE.settle);
+  for (const l of ["fun", "deep", "nhl"]) for (const part of ["deeper", "suggest", "wake"]) SCRIPT[part][l].push(...SCRIPT_MORE[part][l]);
   var api = null;
   var running = /* @__PURE__ */ new Map();
   function D() {
@@ -135,7 +349,13 @@
     return d;
   }
   var me = (mn) => D().people[mn] = D().people[mn] || { max: "fun", sessions: { fun: 0, deep: 0, nhl: 0 }, total: 0, tier: 0 };
-  var words = (mn) => SPECIES[api.species(mn)] || SPECIES[String((api.rec(mn) || {}).species || "").toLowerCase()] || SPECIES.default;
+  function words(mn) {
+    const key = SPECIES[api.species(mn)] ? api.species(mn) : SPECIES[String((api.rec(mn) || {}).species || "").toLowerCase()] ? String(api.rec(mn).species).toLowerCase() : "default";
+    const w = Object.assign({}, SPECIES[key]), b = bodyOf(api, mn);
+    if (b && (b.g === "male" || b.g === "femboy") && MALE[key]) Object.assign(w, MALE[key]);
+    if (UDDER_KINDS.includes(key) && b && !b.tits) w.p = b.cock ? "heavy balls" : "body";
+    return w;
+  }
   function petName(mn) {
     const w = words(mn), r = api.rec(mn) || {}, t = me(mn).tier;
     const i = Math.max(0, Math.min(3, r.degradeMe ? t + 1 : r.praiseMe ? t - 1 : t));
@@ -145,11 +365,27 @@
     const w = words(mn);
     return fill(line, { name: api.name(mn) }).replace(/\{a\}/g, w.a).replace(/\{s\}/g, w.s).replace(/\{p\}/g, w.p).replace(/\{act\}/g, w.act).replace(/\{pose\}/g, w.pose).replace(/\{pet\}/g, petName(mn)).replace(/(^|[.!?]\s+)([a-z])/g, (m, a, b) => a + b.toUpperCase());
   }
-  function scriptFor(level) {
-    return [].concat(SCRIPT.settle, SCRIPT.deeper[level], SCRIPT.suggest[level], SCRIPT.wake[level]);
+  var handful = (list, n, b) => {
+    const pool = fitting(list, b).slice();
+    for (let i = pool.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [pool[i], pool[j]] = [pool[j], pool[i]];
+    }
+    return pool.slice(0, n).map(untag);
+  };
+  function scriptFor(level, mn) {
+    const b = mn ? bodyOf(api, mn) : null, g = mn ? gearOf(api, mn) : {};
+    const settle = handful(SCRIPT.settle, 4, b), deeper = handful(SCRIPT.deeper[level], level === "fun" ? 3 : 4, b);
+    const worn = Object.keys(GEAR_SUGGEST).filter((k) => g[k]), gearLines = handful(worn.map((k) => pick(GEAR_SUGGEST[k])), Math.min(2, worn.length), b);
+    const suggest = handful(SCRIPT.suggest[level], (level === "fun" ? 4 : 5) - gearLines.length, b);
+    for (const l of gearLines) suggest.splice(1 + Math.floor(Math.random() * suggest.length), 0, l);
+    const wake = handful(SCRIPT.wake[level], 1, b);
+    const lines = [].concat(settle, deeper, suggest, wake);
+    lines.cut = [settle.length, deeper.length, suggest.length];
+    return lines;
   }
   function start(by, mn, level) {
-    running.set(mn, { by, level, lines: scriptFor(level), i: 0 });
+    running.set(mn, { by, level, lines: scriptFor(level, mn), i: 0 });
     step(mn);
   }
   function step(mn) {
@@ -164,7 +400,7 @@
       finish(mn, run);
       return;
     }
-    const s = SCRIPT.settle.length, d = SCRIPT.deeper[run.level].length, g = SCRIPT.suggest[run.level].length;
+    const [s, d, g] = run.lines.cut;
     const haze = run.i < s ? 1 : run.i < s + d ? run.level === "nhl" ? 3 : 2 : run.i < s + d + g ? { fun: 1, deep: 2, nhl: 3 }[run.level] : run.level === "nhl" ? 1 : 0;
     if (haze !== run.haze) {
       run.haze = haze;
@@ -219,7 +455,7 @@
     const want = LEVELS.includes(String(args[1] || "").toLowerCase()) ? String(args[1]).toLowerCase() : me(t).max;
     if (LEVELS.indexOf(want) > LEVELS.indexOf(me(t).max)) return c.reply(A.name(t) + " only allows " + LEVEL_NAME[me(t).max] + " sessions. That's their call.");
     start(sender, t, want);
-    c.reply("\u{1F300} " + LEVEL_NAME[want] + " session started for " + A.name(t) + " (about " + Math.round(scriptFor(want).length * 42 / 60) + " minutes). ?hyp stop " + A.name(t) + " ends it.");
+    c.reply("\u{1F300} " + LEVEL_NAME[want] + " session started for " + A.name(t) + " (about " + Math.round(((running.get(t) || {}).lines || []).length * 42 / 60) + " minutes). ?hyp stop " + A.name(t) + " ends it.");
   }
   function cmdLevel(c) {
     const { sender, args, api: A } = c, v = String(args[0] || "").toLowerCase();

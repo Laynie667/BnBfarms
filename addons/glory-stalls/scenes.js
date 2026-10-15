@@ -20,7 +20,14 @@
 
    Writing more: add a line to any pool. %n is the person in the stall; %from and %to are hole words in
    SWITCH lines. Every line should name %n or be about the stall around them. No round brackets.
+
+   Fitted to them (Oct 15): every line is picked for the body in the stall, so a flat chest never hears about its
+   tits and a male never about his pussy (a {tag} on the front says who a line is for; see _lib/connect.js). What
+   their own body does while they're used, what they're wearin' and their species get lines of their own
+   (scenes-more.js, which also holds the extra lines for every pool here).
 */
+import { fitting, fits, untag } from "../_lib/connect.js";
+import { OWN, GEAR, KIND, SOUND, MORE as M2 } from "./scenes-more.js";
 
 const pickFrom = (a) => a[Math.floor(Math.random() * a.length)];
 const between = (lo, hi) => lo + Math.random() * (hi - lo);
@@ -51,6 +58,8 @@ export function pickVisitor(holes) {
 // a real visitor's own cock, in the same words
 export function sizeFromInches(inches) { return inches >= 13 ? "hyper" : inches >= 9 ? "huge" : inches >= 6 ? "thick" : "modest"; }
 const SIZE_WORD = { modest: "neat little", thick: "thick, heavy", huge: "huge", hyper: "absurdly huge" };
+// a size dropped into a line, with "a" turned to "an" before "absurdly"
+const sized = (line, v) => String(line).replace("%size", SIZE_WORD[v.size]).replace(/\b([Aa]) (absurdly)\b/g, "$1n $2");
 const HOLE_WORD = { mouth: "mouth", vulva: "pussy", butt: "ass" };
 
 // ── strangers: one character for the whole scene ──────────
@@ -391,10 +400,10 @@ const PAINT_AFTER = [
   "%n's face is a mess of it, nose to chin, and somebody outside the stall laughs at the sight.",
   "It's still warm where it pooled in the hollow of %n's throat.",
 ];
-function finishLine(v, hole, ml, inside, funnel) {
+function finishLine(v, hole, ml, inside, funnel, pick = pickFrom) {
   const amt = AMOUNT(ml) + ", easily " + Math.round(ml) + " mL of it";
   if (hole === "mouth" && funnel) return "The stranger cums straight into the funnel: " + amt + ", pouring down the tube and into %n's throat whether %n swallows or not.";
-  if (!inside) return pickFrom(PAINT).replace("%where", pickFrom(OUTSIDE[hole])).replace("%amt", amt);
+  if (!inside) return pick(PAINT).replace("%where", pick(OUTSIDE[hole])).replace("%amt", amt);
   const place = HOLE_PLACE[hole];
   switch (v.type) {
     case "canine": return "The knot shoves in and locks, and the stranger cums deep into " + place + ": " + amt + ", pumped in pulse after pulse while they're tied together.";
@@ -402,7 +411,7 @@ function finishLine(v, hole, ml, inside, funnel) {
     case "feline": return "It cums in quick hard jerks deep in " + place + ": " + amt + ", and the barbs rake every inch of %n on the way out.";
     case "draconic": return "Every ridge swells and throbs at once as it empties into " + place + ": " + amt + ", hot as bathwater.";
     case "double": return "Both cocks unload at once, one into %n's pussy and one into %n's ass: " + amt + " between them, filling %n from both ends.";
-    default: return pickFrom(["It buries itself to the hilt and cums deep in " + place + ": " + amt + ", throbbing with every spurt while %n shudders around it.",
+    default: return pick(["It buries itself to the hilt and cums deep in " + place + ": " + amt + ", throbbing with every spurt while %n shudders around it.",
                               "With a strangled groan it empties into " + place + ": " + amt + ", pulse after pulse, until %n can feel the heat of it spreading."]);
   }
 }
@@ -410,6 +419,7 @@ const KNOT_TIE = ["The knot won't come free. %n is stuck to the wall, tied, the 
                   "Tied fast. Every little shift of the stranger tugs at %n from the inside, and there's nothing to do but wait for the knot to go down.",
                   "Minutes pass, %n and the stranger locked together through the wall. The knot throbs and pumps out a little more every so often.",
                   "Finally the knot softens and slips free with a wet pop, and a gush follows it out of %n."];
+const KNOT_HOLD = KNOT_TIE.slice(0, 3), KNOT_FREE = [KNOT_TIE[3]];
 const AFTER = {
   inside: { mouth: ["It pours down %n's throat faster than %n can swallow, and some escapes down their chin.", "The taste lingers, thick and salty, coating %n's tongue.", "It coats %n's lips and tongue, thick and salty, and the taste stays."],
             vulva: ["When it slides out, warm cum runs down %n's thighs in slow, sticky trails.", "%n's pussy twitches and leaks, the load sitting heavy and warm inside them.", "It's pumped so deep into %n that it takes a while to start dripping out."],
@@ -458,8 +468,8 @@ const NEXT_UP = [
 ];
 export const TAUNTS = [
   "\"Fuck, you're good at this.\"", "\"They keep you well used in here, don't they.\"", "\"Look at that. Made for a wall.\"",
-  "\"Whose cow is this? I'm coming back for more.\"", "\"Dripping already. Desperate little thing.\"", "\"Hold still. You're just somewhere warm to finish.\"",
-  "\"I'm telling everyone about this stall.\"", "\"Moo for me. Go on.\"", "\"Doesn't even need a face. Just this.\"", "\"You'll be leaking all day, and you'll love it.\"",
+  "\"Whose %a is this? I'm coming back for more.\"", "\"Dripping already. Desperate little thing.\"", "\"Hold still. You're just somewhere warm to finish.\"",
+  "\"I'm telling everyone about this stall.\"", "\"%call for me. Go on.\"", "\"Doesn't even need a face. Just this.\"", "\"You'll be leaking all day, and you'll love it.\"",
 ];
 export const PRAISES = ["\"God, you're good. Thank you.\"", "\"Best stall on the farm, honestly.\"", "\"That's it, that's perfect, you're perfect.\"", "\"So good. So, so good.\""];
 
@@ -555,35 +565,95 @@ for (const k of Object.keys(PERSONAS)) {
   if (add) PERSONAS[k].talk.push(...add);
 }
 
+// ── the Oct 15 batch (scenes-more.js), pushed in once every pool below is defined (called at the end of the file) ──
+const into = (pool, more) => { if (Array.isArray(pool) && Array.isArray(more)) pool.push(...more); };
+function addOct15() {
+into(ARRIVE, M2.ARRIVE); into(FUNNEL, M2.FUNNEL); into(SECOND_WIND, M2.SECOND_WIND); into(SWITCH, M2.SWITCH); into(BUILD, M2.BUILD);
+into(PAINT, M2.PAINT); into(PAINT_AFTER, M2.PAINT_AFTER); into(AFTER.outside, M2.PAINT_AFTER); into(AFTER.outside, M2.AFTER_OUT);
+into(KNOT_HOLD, M2.KNOT_HOLD); into(KNOT_FREE, M2.KNOT_FREE); into(FUNNEL_AFTER, M2.FUNNEL_AFTER); into(LEAVE, M2.LEAVE);
+into(ATMOS, M2.ATMOS); into(NEXT_UP, M2.NEXT_UP); into(TAUNTS, M2.TAUNTS); into(PRAISES, M2.PRAISES);
+into(JOIN2, M2.JOIN2); into(JOIN3, M2.JOIN3); into(FIRST_DONE, M2.FIRST_DONE); into(BOTH_AT_ONCE, M2.BOTH_AT_ONCE); into(ALL_DONE, M2.ALL_DONE);
+for (const k of Object.keys(M2.REVEAL)) into(REVEAL[k], M2.REVEAL[k]);
+for (const h of ["mouth", "vulva", "butt"]) {
+  into(TEASE[h], M2.TEASE[h]); into(STRETCH[h], M2.STRETCH[h]); into(AFTER.inside[h], M2.AFTER_IN[h]);
+  for (const ph of ["early", "mid", "late"]) { into(RHYTHM[h][ph], M2.RHYTHM[h][ph]); into(REACT[h][ph], M2.REACT[h][ph]); }
+}
+for (const t of Object.keys(M2.ENTRY)) for (const h of Object.keys(M2.ENTRY[t])) into((ENTRY[t] = ENTRY[t] || {})[h] = ENTRY[t][h] || [], M2.ENTRY[t][h]);
+for (const k of Object.keys(M2.PACE_LINE)) into(PACE_LINE[k], M2.PACE_LINE[k]);
+for (const k of Object.keys(M2.TYPE_RHYTHM)) into(TYPE_RHYTHM[k], M2.TYPE_RHYTHM[k]);
+for (const k of Object.keys(M2.TOGETHER)) into(TOGETHER[k], M2.TOGETHER[k]);
+for (const k of Object.keys(M2.PERSONAS)) if (PERSONAS[k]) { into(PERSONAS[k].arrive, M2.PERSONAS[k].arrive); into(PERSONAS[k].leave, M2.PERSONAS[k].leave); }
+for (const k of Object.keys(M2.ARRANGE)) {
+  const A = ARRANGE[k], B = M2.ARRANGE[k];
+  if (Array.isArray(A.open)) into(A.open, B.open); else for (const p of Object.keys(B.open)) into(A.open[p], B.open[p]);
+  into(A.remind, B.remind); into(A.close, B.close);
+}
+}
+
+// ── fitted to them: their own body, their gear, their kind ──
+// lines about what their own body does, for the hole in use and how far along it is
+const ownPool = (h, phase) => OWN.any[phase].concat((OWN[h] || {})[phase] || []);
+// gear lines for what they've got on (some only make sense with a particular hole in use, or not in use)
+function gearPools(gear, hole, body) {
+  const out = [];
+  for (const [k, v] of Object.entries(GEAR)) {
+    if (!gear || !gear[k]) continue;
+    if (Array.isArray(v)) { out.push(v); continue; }
+    if (v.mouthOnly && hole === "mouth") out.push(v.mouthOnly);
+    if (v.notMouth && hole !== "mouth") out.push(v.notMouth);
+    if (v.notButt && hole !== "butt") out.push(v.notButt);
+    if (v.notVulva && hole !== "vulva") out.push(v.notVulva);
+  }
+  // only pools with a line for this body (a cage line is for a cock)
+  return out.filter((p) => p.some((l) => fits(l, body)));
+}
+// their species: a line from their kind's pool, or the noise their kind makes
+function kindLine(animal, pick) {
+  if (!animal) return null;
+  const own = KIND[animal.key];
+  if (own && chance(0.6)) return pick(own);
+  const snd = pickFrom(animal.sounds || [animal.sound || "a soft moan"]);
+  return pick(SOUND).replace("%snd", snd);
+}
+// a taunt or praise with their kind in it ("Whose cow is this?", "Moo for me")
+const kindWords = (line, animal) => {
+  const a = (animal && animal.a) || "animal", call = (animal && animal.call) || "moan";
+  return String(line).replace(/%a\b/g, a).replace(/(^|["!?.]\s*)%call/g, (m, p) => p + call.charAt(0).toUpperCase() + call.slice(1)).replace(/%call/g, call);
+};
+
 // ── put a scene together, in order ─────────────────────────
 // a picker that never repeats a line inside one scene
 // (in a queue, every stranger shares it, so lines nobody's used yet come first)
-function freshPicker() {
+function freshPicker(body) {
   const used = new Set();
-  return (list) => { const pool = list.filter((x) => !used.has(x)); const v = pickFrom(pool.length ? pool : list); used.add(v); return v; };
+  return (list) => { const ok = fitting(list, body), pool = ok.filter((x) => !used.has(x)); const v = pickFrom(pool.length ? pool : ok); used.add(v); return untag(v); };
 }
 
 // one stranger, start to finish, as a little story
-function oneVisitor(beats, { hole, visitor, funnel, degrade, praise, rounds, first, holes, pick, rough }) {
+function oneVisitor(beats, { hole, visitor, funnel, degrade, praise, rounds, first, holes, pick, rough, gear, animal, body }) {
   const v = visitor, persona = PERSONAS[pickPersona(hole, rough)];
   const add = (t, extra) => { if (t) beats.push(Object.assign({ t }, extra || {})); };
   const talk = () => (chance(0.6) ? "A voice through the boards: " + pick(persona.talk) : null);
-  const voice = () => (degrade && chance(0.35) ? "A voice through the boards: " + pick(TAUNTS) : praise && chance(0.35) ? "A voice through the boards: " + pick(PRAISES) : null);
+  const voice = () => (degrade && chance(0.35) ? "A voice through the boards: " + kindWords(pick(TAUNTS), animal) : praise && chance(0.35) ? "A voice through the boards: " + kindWords(pick(PRAISES), animal) : null);
   const atmos = () => (chance(0.3) ? pick(ATMOS) : null);
+  const own = (h, phase, p) => (chance(p) ? pick(ownPool(h, phase)) : null);
+  let gearLeft = chance(0.85) ? 1 + (rounds > 0 && chance(0.5) ? 1 : 0) : 0, kindLeft = chance(0.6) ? 1 : 0;
+  const gearBit = (h) => { if (gearLeft <= 0) return null; const g = gearPools(gear, h, body); if (!g.length) return null; gearLeft--; return pick(pickFrom(g)); };
+  const kindBit = () => { if (kindLeft <= 0) return null; kindLeft--; return kindLine(animal, pick); };
   if (persona.short) rounds = 0;
 
   // 1. arrival, and who it is
   add(first ? (chance(0.6) ? pick(persona.arrive) : pick(ARRIVE)) : pick(NEXT_UP));
   if (!first && chance(0.5)) add(pick(persona.arrive));
   add(atmos());
-  add(pick(REVEAL[v.type]).replace("%size", SIZE_WORD[v.size]));
+  add(sized(pick(REVEAL[v.type]), v));
 
   // a funnel gag: the cock can't go in, so it's a scene of its own
   if (hole === "mouth" && funnel) {
     add(pick(FUNNEL)); add(pick(FUNNEL)); add(talk()); add(pick(FUNNEL)); add(voice() || atmos()); add(pick(FUNNEL));
     add(pick(BUILD));
     const [lo, hi] = SIZES[v.size].ml, ml = Math.round(between(lo, hi) * (LOAD_X[v.type] || 1));
-    add(finishLine(v, hole, ml, true, true), { finish: true, inside: true, ml, hole, visitor: v });
+    add(finishLine(v, hole, ml, true, true, pick), { finish: true, inside: true, ml, hole, visitor: v });
     add(pick(FUNNEL_AFTER));
     add(chance(0.6) ? pick(persona.leave) : pick(LEAVE));
     return;
@@ -598,12 +668,15 @@ function oneVisitor(beats, { hole, visitor, funnel, degrade, praise, rounds, fir
   // 3. early → middle
   let h = hole;
   add(pick(REACT[h].early));
+  add(own(h, "early", 0.45));
   add(pick(RHYTHM[h].early));
   add(pick(PACE_LINE[persona.pace]));
   add(pick(RHYTHM[h].mid));
   add(pick(TYPE_RHYTHM[v.type]));
   add(pick(REACT[h].mid));
+  add(own(h, "mid", 0.55) || gearBit(h));
   add(talk());
+  add(gearBit(h));
   if (!persona.short) { add(pick(RHYTHM[h].mid)); add(voice() || atmos()); }
 
   // 4. more rounds for the ones who take their time, sometimes moving to another hole
@@ -618,21 +691,24 @@ function oneVisitor(beats, { hole, visitor, funnel, degrade, praise, rounds, fir
     add(pick(RHYTHM[h].mid));
     add(pick(TYPE_RHYTHM[v.type]));
     add(pick(REACT[h].mid));
+    add(chance(0.5) ? own(h, "mid", 1) : kindBit());
     add(talk() || voice());
   }
 
   // 5. late, build-up, finish
   add(pick(RHYTHM[h].late));
   add(pick(REACT[h].late));
+  add(own(h, "late", 0.6) || kindBit());
   add(talk());
+  add(kindBit());
   add(pick(BUILD));
   const inside = persona.alwaysInside || v.type === "canine" || v.type === "double" || chance(0.6);
   const [lo, hi] = SIZES[v.size].ml;
   const ml = Math.round(between(lo, hi) * (LOAD_X[v.type] || 1));
-  add(finishLine(v, h, ml, inside, false), { finish: true, inside, ml, hole: h, visitor: v });
+  add(finishLine(v, h, ml, inside, false, pick), { finish: true, inside, ml, hole: h, visitor: v });
 
   // 6. after: the knot, the mess, the goodbye
-  if (inside && v.type === "canine") { add(pick(KNOT_TIE.slice(0, 3))); add(KNOT_TIE[3]); }
+  if (inside && v.type === "canine") { add(pick(KNOT_HOLD)); add(pick(KNOT_FREE)); }
   add(inside ? pick(AFTER.inside[h]) : pick(AFTER.outside));
   add(voice());
   add(chance(0.65) ? pick(persona.leave) : pick(LEAVE));
@@ -751,12 +827,12 @@ function atHole(h, line, bothBehind) {
 }
 // a cock showin' up at a particular hatch
 function revealAt(h, v, pick) {
-  const line = pick(REVEAL[v.type]).replace("%size", SIZE_WORD[v.size]);
+  const line = sized(pick(REVEAL[v.type]), v);
   return "At the hatch " + SIDE[h] + ", " + line.charAt(0).toLowerCase() + line.slice(1);
 }
 const say = (h, line) => (h === "mouth" ? "From the hatch in front of %n: " : "From behind %n: ") + line;
 
-function together(beats, { hole, visitor, holes, degrade, praise, pick, rough }) {
+function together(beats, { hole, visitor, holes, degrade, praise, pick, rough, gear, animal, body }) {
   const add = (t, extra) => { if (t) beats.push(Object.assign({ t }, extra || {})); };
   // who goes where: the first one keeps their hole; the next take others (mouth + one behind, or both behind)
   const back = holes.filter((h) => h !== "mouth"), order = [hole];
@@ -769,7 +845,13 @@ function together(beats, { hole, visitor, holes, degrade, praise, pick, rough })
   const vis = order.map((h, i) => i === 0 ? visitor : (() => { let v; do { v = pickVisitor(holes); } while (v.type === "double"); return v; })());
   const pers = order.map((h) => PERSONAS[pickPersona(h, rough)]);
   const talk = (i) => chance(0.5) ? say(order[i], pick(pers[i].talk)) : null;
-  const voice = () => (degrade && chance(0.3) ? "A voice through the boards: " + pick(TAUNTS) : praise && chance(0.3) ? "A voice through the boards: " + pick(PRAISES) : null);
+  const voice = () => (degrade && chance(0.3) ? "A voice through the boards: " + kindWords(pick(TAUNTS), animal) : praise && chance(0.3) ? "A voice through the boards: " + kindWords(pick(PRAISES), animal) : null);
+  let gearLeft = chance(0.85) ? 1 : 0, kindLeft = chance(0.6) ? 1 : 0;
+  const extra = (h) => {
+    if (gearLeft > 0 && chance(0.4)) { const g = gearPools(gear, h, body); if (g.length) { gearLeft--; return pick(pickFrom(g)); } }
+    if (kindLeft > 0 && chance(0.3)) { kindLeft--; return kindLine(animal, pick); }
+    return chance(0.35) ? pick(ownPool(h, "mid")) : null;
+  };
   const pool = () => {
     const both = order.slice(0, 2), lines = TOGETHER.any.slice();
     if (both.includes("mouth")) lines.push(...TOGETHER.spit, ...TOGETHER.spit); else lines.push(...TOGETHER.dp, ...TOGETHER.dp);
@@ -802,6 +884,7 @@ function together(beats, { hole, visitor, holes, degrade, praise, pick, rough })
     add(at(h, pick(RHYTHM[h].mid)));
     if (chance(0.6)) add(at(h, pick(TYPE_RHYTHM[vis[i].type])));
     add(pick(REACT[h].mid));
+    add(extra(h));
     add(chance(0.6) ? first() : talk(i));
     if (chance(0.3)) add(voice() || (chance(0.5) ? pick(ATMOS) : null));
   }
@@ -809,13 +892,14 @@ function together(beats, { hole, visitor, holes, degrade, praise, pick, rough })
   // 4. late: everyone speeds up
   for (let i = 0; i < order.length; i++) add(at(order[i], pick(RHYTHM[order[i]].late)));
   add(pick(REACT[order[0]].late));
+  if (chance(0.5)) add(pick(ownPool(order[0], "late")));
   add(pick(BUILD));
 
   // 5. the finishes, in an order that makes sense: sometimes two together, otherwise one after another
   const load = (v) => { const [lo, hi] = SIZES[v.size].ml; return Math.round(between(lo, hi) * (LOAD_X[v.type] || 1)); };
   const finishOne = (i) => {
     const v = vis[i], h = order[i], inside = v.type === "canine" || chance(0.65), ml = load(v);
-    add(finishLine(v, h, ml, inside, false), { finish: true, inside, ml, hole: h, visitor: v });
+    add(finishLine(v, h, ml, inside, false, pick), { finish: true, inside, ml, hole: h, visitor: v });
     return inside;
   };
   const insides = [];
@@ -838,9 +922,9 @@ function together(beats, { hole, visitor, holes, degrade, praise, pick, rough })
 
   // 6. after: a knot that ties, the mess at each hole, and they leave
   const knotted = order.findIndex((h, i) => vis[i].type === "canine" && insides[i]);
-  if (knotted >= 0) add(pick(KNOT_TIE.slice(0, 3)));
+  if (knotted >= 0) add(pick(KNOT_HOLD));
   for (let i = 0; i < order.length; i++) if (insides[i] && chance(0.7)) add(pick(AFTER.inside[order[i]]));
-  if (knotted >= 0) add(KNOT_TIE[3]);
+  if (knotted >= 0) add(pick(KNOT_FREE));
   add(voice());
   add(pick(ALL_DONE));
 }
@@ -940,8 +1024,8 @@ function arrange(beats, setup, firstHole, pick) {
 
 // a whole scene. Most are one stranger; some take extra rounds; now and then a queue takes turns.
 // And sometimes, when they have more than one hole open, two or three strangers use them at once (together).
-export function buildScene({ hole, visitor, funnel, degrade, praise, holes, length, setup }) {
-  const beats = [], open = holes && holes.length ? holes : [hole], pick = freshPicker();
+export function buildScene({ hole, visitor, funnel, degrade, praise, holes, length, setup, body, gear, animal }) {
+  const beats = [], open = holes && holes.length ? holes : [hole], pick = freshPicker(body);
   // together needs two holes a cock can get into (a funnel gag keeps the mouth out of it) and a single-cock first stranger
   const usable = open.filter((h) => h !== "mouth" || !funnel);
   const canTogether = usable.length >= 2 && visitor.type !== "double" && usable.includes(hole);
@@ -950,19 +1034,19 @@ export function buildScene({ hole, visitor, funnel, degrade, praise, holes, leng
   let kind = length || (r < 0.45 ? "single" : r < 0.7 ? "long" : r < 0.88 && canTogether ? "together" : r < 0.88 ? "long" : "marathon");
   if (kind === "together" && !canTogether) kind = "long";
   if (kind === "together") {
-    together(beats, { hole, visitor, holes: usable, degrade, praise, pick, rough: setup === "punished" });
+    together(beats, { hole, visitor, holes: usable, degrade, praise, pick, rough: setup === "punished", gear, animal, body });
     arrange(beats, setup, hole, pick);
     const fin = beats.filter((b) => b.finish);
     return { beats, kind, ml: fin.reduce((a, b) => a + b.ml, 0), inside: fin.some((b) => b.inside) };
   }
   const rounds = () => (kind === "single" ? 0 : 1 + Math.floor(Math.random() * 2));
-  oneVisitor(beats, { hole, visitor, funnel, degrade, praise, rounds: rounds(), first: true, holes: open, pick, rough: setup === "punished" });
+  oneVisitor(beats, { hole, visitor, funnel, degrade, praise, rounds: rounds(), first: true, holes: open, pick, rough: setup === "punished", gear, animal, body });
   if (kind === "marathon") {
     const more = 2 + Math.floor(Math.random() * 2);   // two or three more strangers
     for (let i = 0; i < more; i++) {
       const v = pickVisitor(open);
       const h = v.type === "double" ? "vulva" : pickFrom(open);
-      oneVisitor(beats, { hole: h, visitor: v, funnel: funnel && h === "mouth", degrade, praise, rounds: Math.random() < 0.4 ? 1 : 0, first: false, holes: open, pick, rough: setup === "punished" });
+      oneVisitor(beats, { hole: h, visitor: v, funnel: funnel && h === "mouth", degrade, praise, rounds: Math.random() < 0.4 ? 1 : 0, first: false, holes: open, pick, rough: setup === "punished", gear, animal, body });
     }
   }
   arrange(beats, setup, hole, pick);
@@ -971,14 +1055,16 @@ export function buildScene({ hole, visitor, funnel, degrade, praise, holes, leng
 }
 
 // a real visitor: a shorter scene from the same pools, with their own cock and their own load
-export function buildRealScene({ hole, visitor, funnel, ml, inside }) {
-  const pick = freshPicker();
-  if (hole === "mouth" && funnel) return [pick(REVEAL[visitor.type]).replace("%size", SIZE_WORD[visitor.size]), pick(FUNNEL), pick(FUNNEL), finishLine(visitor, hole, ml, true, true)];
+export function buildRealScene({ hole, visitor, funnel, ml, inside, body }) {
+  const pick = freshPicker(body);
+  if (hole === "mouth" && funnel) return [sized(pick(REVEAL[visitor.type]), visitor), pick(FUNNEL), pick(FUNNEL), finishLine(visitor, hole, ml, true, true, pick)];
   return [
-    pick(REVEAL[visitor.type]).replace("%size", SIZE_WORD[visitor.size]),
+    sized(pick(REVEAL[visitor.type]), visitor),
     pick((ENTRY[visitor.type] || ENTRY.human)[hole] || ENTRY.human[hole]),
     pick(RHYTHM[hole].mid),
     pick(TYPE_RHYTHM[visitor.type]),
-    finishLine(visitor, hole, ml, inside, funnel),
+    finishLine(visitor, hole, ml, inside, funnel, pick),
   ];
 }
+
+addOct15();

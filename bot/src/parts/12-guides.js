@@ -519,6 +519,20 @@ THE PARASITE · ?parasite on
   end, and passes by a kiss or by nursin'.
   ?parasite · how long is left. Your safeword takes it off.
 
+SYMBIOTES · ?symbiote on
+  A livin' thing that bonds to you and gives somethin' back for
+  as long as it's fed. Livin' latex spreads into a second skin:
+  room to hold more, and it eats the mess off you; it feeds on
+  every load and every climax. Milk moss grows on a milker's
+  chest: up to three quarters more milk, and it feeds on bein'
+  milked. The nestling curls low in your belly: you catch
+  easier and hold more, and it feeds on loads below.
+  Each grows over a few hours. Fed, it stays a day or more and
+  leaves you a thank-you; starved, it goes. One at a time.
+  ?symbiote take · at a symbiote-latex, -moss or -nestling spot
+  ?symbiote · how it's doin' · ?symbiote off · send it away
+  Your safeword takes it off at once.
+
 WATERSPORTS · ?watersports on
   Piss play. Off until you say so.
 
@@ -744,6 +758,7 @@ RIBBONS, POTIONS, DARES, THE CORRAL
   ?gauntlet pot <n> · proprietors (ends: gauntlet-start, -end)
   ?purge <who> · take a parasite off them
   ?parasite give <who> · proprietors (they need ?parasite on)
+  ?symbiote give <who> latex|moss|nestling · proprietors (they need ?symbiote on)
   ?store approve|reject <who> · a bought greetin'
 
 BEGGIN'

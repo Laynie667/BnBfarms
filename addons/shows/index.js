@@ -21,8 +21,12 @@
    Placards: a spot called placard-<name>. Staff write it with ?sign set <name> <text>. Anybody standing
    within 2 tiles reads it with ?sign. If somebody stands on display-<name>, the placard names them
    (with their animal and their latest ribbon), so it works as a display case.
+
+   The ring's lines fit the animal (more-lines.js): a pony gallops and a pig trots, a pup barks when it's pleased, udder
+   judgin' talks about an udder only to somebody with one, and a ribbon goes on a collar only if they're wearin' one.
 */
-import { connect, pick } from "../_lib/connect.js";
+import { connect, pick, fill, lineFor, gearOf, animalOf } from "../_lib/connect.js";
+import * as M from "./more-lines.js";
 
 const EVENTS = { udder: "Udder Judging", breeding: "Breeding Stand", race: "Pony Cart Race", obedience: "Obedience Trial" };
 const PLACES = ["🥇 1st", "🥈 2nd", "🥉 3rd"];
@@ -36,6 +40,11 @@ function D() {
   d.placards = d.placards || {};  // name → text
   d.ribbonSaid = d.ribbonSaid || {};
   return d;
+}
+// a line about one animal, fitted to them, with their kind's words in it
+function about(mn, pool, key, extra) {
+  const an = animalOf(api, mn), gait = M.GAIT[an.key] || M.GAIT.default;
+  return fill(lineFor(api, mn, pool, key), Object.assign({ name: api.name(mn), a: an.a, call: an.call, gait: pick(gait) }, extra || {}));
 }
 const avg = (o) => { const v = Object.values(o || {}); return v.length ? v.reduce((a, b) => a + b, 0) / v.length : 0; };
 const latestRibbon = (mn) => { const r = D().ribbons[mn]; return r && r.length ? r[r.length - 1] : null; };
@@ -76,7 +85,7 @@ function raceTick() {
     if (e.done || !api.char(mn)) continue;
     if (atCheckpoint(mn, cps[e.cp])) {
       e.cp++;
-      if (e.cp >= cps.length) { e.done = Date.now(); api.emote("🏁 " + api.name(mn) + " thunders across the finish line in " + ((e.done - sh.start) / 1000).toFixed(1) + " seconds!", mn); }
+      if (e.cp >= cps.length) { e.done = Date.now(); api.emote(about(mn, M.FINISH, "finish", { time: ((e.done - sh.start) / 1000).toFixed(1) }), mn); }
       else api.privateEmote(mn, "Checkpoint " + e.cp + " of " + cps.length + "! On to " + cps[e.cp] + ".");
     }
   }
@@ -102,7 +111,7 @@ function judgeCue(mn) {
   if (c.cue === "stay") { const a = api.pos(mn); ok = !!(a && c.from && a.X === c.from.X && a.Y === c.from.Y); }
   const e = sh.entrants[mn]; e.cues++; if (ok) e.passed++;
   api.save();
-  api.emote(ok ? "🎀 " + api.name(mn) + " does it perfectly on cue. The judge marks the card." : "🎀 " + api.name(mn) + " misses the cue. The judge shakes their head and marks it down.", mn);
+  api.emote(about(mn, ok ? M.CUE_OK : M.CUE_MISS, ok ? "cueok" : "cuemiss"), mn);
 }
 function onRoleplay(mn, text) {
   const c = cues.get(mn); if (!c || c.heard) return;
@@ -119,7 +128,7 @@ function closeShow(by) {
   ranked.forEach(([mn], place) => { (d.ribbons[mn] = d.ribbons[mn] || []).push({ event: sh.event, place, at: Date.now() }); delete d.ribbonSaid[mn];
     if (api.ribbons) api.ribbons(Number(mn), [5, 3, 2][place] || 1, "placin' in the show"); });
   api.announce("🎀 " + EVENTS[sh.event].toUpperCase() + " RESULTS: " + ranked.map(([mn, v], i) => PLACES[i] + " " + api.name(mn) + " (" + shown(sh, mn, v) + ")").join(" · "));
-  api.emote("🎀 The judge pins a " + RIBBON[0] + " ribbon on " + api.name(ranked[0][0]) + ". Best in show!", ranked[0][0]);
+  { const w = Number(ranked[0][0]), g = gearOf(api, w); api.emote(about(w, g.collar ? M.BEST_COLLAR : g.harness ? M.BEST_HARNESS : M.BEST, "best"), w); }
   api.save();
   return "Closed and ribbons handed out.";
 }
@@ -141,7 +150,7 @@ function cmdShow(c) {
     if (sh.event === "udder" && !A.makesMilk(sender)) return c.reply("Udder judging is for milkers, hon.");
     if (sh.event === "race" && sh.start) return c.reply("The race has already started, sugar. Next time!");
     sh.entrants[sender] = sh.entrants[sender] || { scores: {}, cues: 0, passed: 0, cp: 0, done: 0 }; A.save();
-    A.emote("🎀 " + A.name(sender) + " steps into the ring for the " + EVENTS[sh.event] + ".", sender);
+    A.emote(about(sender, M.ENTER[sh.event] || ["🎀 %name% steps into the ring for the " + EVENTS[sh.event] + "."], "enter:" + sh.event), sender);
     return;
   }
   if (w === "go") {
@@ -183,7 +192,7 @@ function onJoin(mn) {
   const x = latestRibbon(mn), d = D(); if (!x) return;
   const today = api.dayKey(); if (d.ribbonSaid[mn] === today) return;
   d.ribbonSaid[mn] = today; api.save();
-  api.later(() => api.char(mn) && api.emote("🎀 " + api.name(mn) + " wears their " + ribbonText(x) + " proudly.", mn), 12000);
+  api.later(() => api.char(mn) && api.emote(about(mn, gearOf(api, mn).collar ? M.WEAR.concat(M.WEAR_COLLAR) : M.WEAR, "wear", { ribbon: ribbonText(x) }), mn), 12000);
 }
 
 // ── placards ───────────────────────────────────────────────

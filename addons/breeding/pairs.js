@@ -7,7 +7,8 @@
      day is likelier to take (a second roll of the dice), and the first time earns each of you a ribbon.
      ?mate shows yours · ?mate off ends it. One mate a day each.
 */
-import { pick, fill } from "../_lib/connect.js";
+import { pick, fill, lineFor } from "../_lib/connect.js";
+import { MORE2 } from "./more-lines-2.js";
 
 let api = null, D = null;
 export function pairsSetup(a, data) { api = a; D = data; }
@@ -19,18 +20,21 @@ const whereIs = (mn) => { const z = api.zonesOf(mn)[0]; const q = api.pos(mn); r
 
 const CALL_STUD = [
   "🔥 %name% is in heat %where% and callin' for a stud. Tail up, achin' for it. Go on, sugar.",
-  "🔥 Somebody needs breedin': %name%, %where%, in heat and askin' for you studs by name. First one there gets her.",
+  "🔥 Somebody needs breedin': %name%, %where%, in heat and askin' for you studs by name. First one there gets 'em.",
   "🔥 %name%'s in season %where% and beggin' for a cock. You signed up for stud calls, so here's one.",
 ];
 const CALLED = [
   "🔥 You lift your tail and call. %n% stud%s% heard you. Stay put and present, sugar.",
   "🔥 The call's gone out to %n% stud%s% on the farm. Somebody'll be along to see to you.",
 ];
-const MATED = [
+const MATED_ = [
   "💞 %a% and %b% rub noses and it's settled: mates for the day. Anybody watchin' can guess what comes next.",
   "💞 %a% nuzzles up under %b%'s chin and gets nuzzled right back. Mates till midnight, those two.",
   "💞 %b% says yes. %a% and %b% are a pair today, flank to flank, and the farm girl chalks their names side by side on the barn door.",
 ];
+
+CALL_STUD.push(...MORE2.CALL_STUD); CALLED.push(...MORE2.CALLED);
+const MATED = MATED_.concat(MORE2.MATED);
 
 function cmdStudcall(c) {
   const { sender, args, api: A } = c, p = P(), w = String(args[0] || "").toLowerCase();
@@ -50,7 +54,7 @@ function cmdCallstud(c) {
   const studs = A.here().filter((m) => m !== sender && p.studs[m] && A.makesSemen(m) && A.onMap(m));
   if (!studs.length) return c.reply("No stud on the farm is takin' calls right now, sugar. (Studs sign up with ?studcall on.)");
   p.called[sender] = Date.now(); A.save();
-  const line = fill(pick(CALL_STUD), { name: A.name(sender), where: whereIs(sender) });
+  const line = fill(lineFor(A, sender, CALL_STUD, "call"), { name: A.name(sender), where: whereIs(sender) });
   for (const m of studs) A.notice(m, line);
   c.reply(fill(pick(CALLED), { n: studs.length, s: studs.length === 1 ? "" : "s" }));
 }

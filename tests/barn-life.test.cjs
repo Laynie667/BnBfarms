@@ -47,12 +47,12 @@ const beepsTo=(k,mn)=>sent.slice(k).filter(([e,d])=>e==='AccountBeep'&&d.MemberN
   chars.splice(2,1); const f0=n.food; n.t=Date.now()-5*3600000; W.__addons('tick'); ok(Math.abs(n.food-f0)<0.01, "needs don't drop while you're away");
   chars.splice(2,0,at(500,5,5)); chars[2].Name='Moo';
   n.food=20; n.water=20; n.said=0; n.warned={}; n.t=Date.now(); k=sent.length; W.__addons('tick'); await drain();
-  ok(beepsTo(k,500).concat(toWhom(k,500)).some(m=>/thirsty|dry/.test(m)), 'a private reminder when low');
+  ok(beepsTo(k,500).concat(toWhom(k,500)).some(m=>/thirst|dry|parched|water/.test(m)), 'a private reminder when low');
   W.__pt && W.__pt();
   ok(true, 'production tick runs with the rate hook');
   k=sent.length; handlers.AccountBeep({MemberNumber:500,Message:'eat'}); await drain(5500);
   ok(n.food>=69 && d().troughs['trough-1']===19, 'eating at the trough fills food and uses a helping');
-  ok(sent.slice(k).some(([e,x])=>x&&/trough/.test(String(x.Content))&&/Moo/.test(String(x.Content))), 'an eating emote goes out');
+  ok(sent.slice(k).some(([e,x])=>x&&/trough|feed|chew|eat|mouthful/.test(String(x.Content))&&/Moo/.test(String(x.Content))), 'an eating emote goes out');
   k=sent.length; handlers.AccountBeep({MemberNumber:500,Message:'drink'}); await drain(5500);
   ok(/water spot/.test(beepsTo(k,500).join(' ')), "can't drink away from a water spot");
   // a BC+ bowl drink on the water spot

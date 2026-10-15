@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm add-on: Breeding
 // @namespace    bnbfarm
-// @version      1.1.3
+// @version      1.2.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-breeding.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-breeding.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -23,7 +23,7 @@
 
 (() => {
   // addons/_lib/connect.js
-  var W = typeof unsafeWindow !== "undefined" && unsafeWindow ? unsafeWindow : window;
+  var W = typeof unsafeWindow !== "undefined" && unsafeWindow ? unsafeWindow : typeof window !== "undefined" ? window : globalThis;
   function connect(def) {
     let done = false;
     const go = () => {
@@ -52,46 +52,127 @@
   var pick = (list) => list[Math.floor(Math.random() * list.length)];
   var between = (lo, hi) => lo + Math.floor(Math.random() * (hi - lo + 1));
   var fill = (text, vars) => String(text).replace(/%(\w+)%/g, (m, k) => vars[k] !== void 0 ? vars[k] : m);
+  var TAG_ANY = /\{(?:nv|nc|nt|fu|fb|ok|v|c|t|f|m)\}/g;
+  var TAG_LEAD = /^((?:\{(?:nv|nc|nt|fu|fb|v|c|t|f|m)\})+)/;
+  var VULVA_W = /\b(pussy|pussies|cunt|cunts|slit|womb|clit|cervix)\b/i;
+  var TITS_W = /\b(tits?|titties|breasts?|udders?|teats?|cleavage)\b/i;
+  var GIRL_W = /\b(girl|heifer|mare|broodmare)\b/i;
+  var untag = (t) => String(t == null ? "" : t).replace(TAG_ANY, "");
+  var bodyOf = (api3, mn) => {
+    try {
+      return api3 && api3.body && mn ? api3.body(mn) : null;
+    } catch (e) {
+      return null;
+    }
+  };
+  var gearOf = (api3, mn) => {
+    try {
+      return api3 && api3.gear && mn && api3.gear(mn) || {};
+    } catch (e) {
+      return {};
+    }
+  };
+  function fits(line, b) {
+    const s = String(line), m = s.match(TAG_LEAD);
+    if (!b) return !m;
+    if (m) {
+      for (const t of m[1].slice(1, -1).split("}{")) {
+        if (t === "v" && !b.vulva || t === "nv" && b.vulva || t === "c" && !b.cock || t === "nc" && b.cock || t === "t" && !b.tits || t === "nt" && b.tits || t === "f" && b.g !== "female" || t === "m" && b.g !== "male" || t === "fu" && b.g !== "futa" || t === "fb" && b.g !== "femboy") return false;
+      }
+      return true;
+    }
+    if (!b.vulva && VULVA_W.test(s)) return false;
+    if (!b.tits && TITS_W.test(s)) return false;
+    if (b.g === "male" && GIRL_W.test(s)) return false;
+    return true;
+  }
+  function fitting(list, b) {
+    const ok = list.filter((l) => fits(l, b));
+    if (ok.length) return ok;
+    const plain = list.filter((l) => !TAG_LEAD.test(l));
+    return plain.length ? plain : list;
+  }
+  var pickFit = (list, b) => untag(pick(fitting(list, b)));
+  function lineFor(api3, mn, list, key) {
+    if (!Array.isArray(list) || !list.length) return "";
+    const b = bodyOf(api3, mn);
+    let t;
+    try {
+      t = key && api3 && api3.pickFor && api3.tags >= 2 ? untag(api3.pickFor(mn, key, list)) : pickFit(list, b);
+    } catch (e) {
+      t = pickFit(list, b);
+    }
+    return api3 && api3.fit && api3.tags >= 2 ? api3.fit(mn, t) : t;
+  }
+  var ANIMALS = {
+    cow: { f: "cow", m: "bull", young: ["calf", "calves"], call: "moo", sound: ["a low moo", "a soft, needy moo", "a long, shaky moo"] },
+    bull: { f: "cow", m: "bull", young: ["calf", "calves"], call: "snort", sound: ["a deep snort", "a low bellow", "a rumbling snort"] },
+    pony: { f: "pony", m: "pony", young: ["foal", "foals"], call: "whinny", sound: ["a breathy whinny", "a soft nicker", "a shaky little whinny"] },
+    horse: { f: "mare", m: "stallion", young: ["foal", "foals"], call: "whinny", sound: ["a breathy whinny", "a low nicker", "a long, trembling whinny"] },
+    deer: { f: "doe", m: "buck", young: ["fawn", "fawns"], call: "bleat", sound: ["a thin, wavering bleat", "a soft bleat"] },
+    pig: { f: "sow", m: "boar", young: ["piglet", "piglets"], call: "oink", sound: ["a needy little oink", "a soft grunt", "a squealing gasp"] },
+    pup: { f: "pup", m: "pup", young: ["pup", "pups"], call: "woof", sound: ["a high, needy whine", "a soft whimper", "a breathless yip"] },
+    dog: { f: "bitch", m: "dog", young: ["pup", "pups"], call: "woof", sound: ["a needy whine", "a low whimper", "a shaky yip"] },
+    kitt: { f: "kitty", m: "kitty", young: ["kitten", "kittens"], call: "mew", sound: ["a needy mewl", "a soft, broken purr", "a breathy mew"] },
+    cat: { f: "cat", m: "tom", young: ["kitten", "kittens"], call: "mew", sound: ["a needy mewl", "a rumbling purr", "a breathy mew"] },
+    goblin: { f: "goblin", m: "goblin", young: ["goblin brat", "goblin brats"], call: "cackle", sound: ["a ragged little cackle that turns into a moan", "a breathless giggle"] },
+    bunny: { f: "bunny", m: "bunny", young: ["kit", "kits"], call: "squeak", sound: ["a breathy squeak", "a soft little squeak", "a thump of one foot"] },
+    rabbit: { f: "doe", m: "buck", young: ["kit", "kits"], call: "squeak", sound: ["a breathy squeak", "a soft little squeak", "a thump of one foot"] },
+    fox: { f: "vixen", m: "fox", young: ["kit", "kits"], call: "yip", sound: ["a high yip", "a breathy little whine", "a sharp, startled yip"] },
+    wolf: { f: "wolf", m: "wolf", young: ["pup", "pups"], call: "howl", sound: ["a low, wavering howl", "a needy whine", "a rumbling growl"] },
+    goat: { f: "nanny", m: "billy", young: ["kid", "kids"], call: "bleat", sound: ["a shaky bleat", "a soft bleat", "a loud, startled bleat"] },
+    sheep: { f: "ewe", m: "ram", young: ["lamb", "lambs"], call: "baa", sound: ["a soft baa", "a trembling baa"] },
+    default: { f: "animal", m: "animal", young: ["little one", "little ones"], call: "moan", sound: ["a soft moan", "a needy whimper", "a shaky gasp"] }
+  };
+  function animalOf(api3, mn) {
+    let k = "default";
+    try {
+      k = api3 && api3.species && api3.species(mn) || "default";
+    } catch (e) {
+    }
+    const w = ANIMALS[k] || ANIMALS.default, b = bodyOf(api3, mn), male = !!(b && (b.g === "male" || b.g === "femboy"));
+    return { key: ANIMALS[k] ? k : "default", a: male ? w.m : w.f, young: w.young, call: w.call, sound: pick(w.sound), sounds: w.sound, male };
+  }
 
   // addons/breeding/more-lines.js
   var MORE = {
     CRAVINGS: [
       "You'd kill for a mouthful of somebody's cum right now, %name%. Warm, salty, straight from the source.",
-      "Your belly's growlin' and your pussy's achin' and you honestly can't tell which hunger's louder, %name%.",
-      "You want your swollen breasts sucked, %name%. Hard. You want the pressure gone and a mouth on you.",
+      "{v}Your belly's growlin' and your pussy's achin' and you honestly can't tell which hunger's louder, %name%.",
+      "{t}You want your swollen breasts sucked, %name%. Hard. You want the pressure gone and a mouth on you.",
       "Pickles and cream. Together. Don't ask, %name%. Just go find some.",
-      "You're cravin' to be bred again, %name%, even though you're already full of a litter. Greedy thing.",
+      "You're cravin' to be bred again, %name%, even though you're already full of %litter%. Greedy thing.",
       "Somethin' about the smell of hay has you droolin', %name%. Pregnant brain is a hell of a thing.",
       "You keep thinkin' about bein' milked, %name%. Long and slow, till you're soft and empty."
     ],
     KICKS: [
       "%name%'s round belly ripples, then bulges hard on one side as somethin' inside stretches out.",
       "%name% gasps and grabs a rail. That one landed somewhere low and sensitive, and their thighs press together.",
-      "Two little kicks at once on %name%'s tight belly, like the litter's arguin' in there.",
-      "%name%'s belly button pops out a little further as the litter shoves for room.",
+      "Two little kicks at once on %name%'s tight belly, like there's an argument goin' on in there.",
+      "%name%'s belly button pops out a little further as somethin' inside shoves for room.",
       "A kick hard enough to make %name% leak a spurt of milk from both nipples. They flush bright pink.",
       "%name% rubs slow circles on their belly and murmurs somethin' soft. The kickin' only gets wilder."
     ],
     MIDWIFE: [
-      `%by% kneels between %name%'s spread thighs, slick to the wrists, coaxin' and coaxin'. "That's it. Push for me, mama."`,
-      "%by% strokes %name%'s swollen breasts to bring the milk down and get things movin', murmurin' low and steady.",
+      `{v}%by% kneels between %name%'s spread thighs, slick to the wrists, coaxin' and coaxin'. "That's it. Push for me, mama."`,
+      "{t}%by% strokes %name%'s swollen breasts to bring the milk down and get things movin', murmurin' low and steady.",
       "%by% holds %name%'s hand and lets them squeeze as hard as they need, never lookin' away."
     ],
     RUTTY: [
       "%name% catches the scent of heat and their cock stiffens so fast it aches. They take a step toward it without meanin' to.",
       "Somewhere close by, somebody's in heat. %name% can smell it, taste it, and their balls draw up tight.",
-      "%name% groans low in their chest. Every breath tastes like a fertile pussy and they're leakin' precum already.",
+      "%name% groans low in their chest. Every breath tastes like somebody ripe and ready, and they're leakin' already.",
       "%name%'s cock throbs against their belly. They'd mount the first thing that smelled like that.",
       "%name%'s nostrils flare and their hips give a helpless little thrust at the air. Rut's got 'em."
     ],
     STAGE_ROOM: {
       showing: [
         "%name%'s belly has a soft, proud curve to it now. Bred, and anybody can see it.",
-        "There's no hidin' it anymore: %name% is showin', belly rounded where the litter's takin' root."
+        "There's no hidin' it anymore: %name% is showin', belly rounded where the seed took root."
       ],
       heavy: [
-        "%name% waddles now, belly huge and tight and heavy, breasts swollen and leakin' for the litter to come.",
-        "%name%'s belly's so big it sways when they walk, skin shiny-taut, and milk beads at both nipples."
+        "{t}%name% waddles now, belly huge and tight and heavy, breasts swollen and leakin' for %litter% to come.",
+        "%name%'s belly's so big it sways when they walk, skin shiny-taut, and they have to lean back to balance it."
       ],
       nesting: [
         "%name% keeps draggin' straw into a corner and lowerin' themselves into it, pantin', belly tight and low.",
@@ -100,9 +181,159 @@
     },
     BRED_MARKS: {
       3: ["Three breedin's in and %name%'s still bein' passed around the stand. The farm girl marks it on the board."],
-      5: ["Five. %name%'s pussy hasn't been empty all season, and it shows."],
-      10: ["Ten breedin's. %name% is the farm's busiest broodmare this season, and the barn knows it."]
+      5: ["{v}Five. %name%'s pussy hasn't been empty all season, and it shows."],
+      10: ["{f}Ten breedin's. %name% is the farm's busiest broodmare this season, and the barn knows it."]
     }
+  };
+
+  // addons/breeding/more-lines-2.js
+  var MORE2 = {
+    STAGE_YOU: {
+      showing: [
+        "\u{1F930} Your belly's rounder this mornin', %name%, and your clothes know it before you do.",
+        "\u{1F930} There's a little swell under your hand when you rub your belly now, %name%. Somethin' took.",
+        "\u{1F930} You're showin', %name%. Folks are goin' to start pattin' your belly without askin'.",
+        "\u{1F930} Your belly's gone soft and round and proud, %name%. Everybody can see what got put in you."
+      ],
+      heavy: [
+        "\u{1F930} You're heavy now, %name%. Gettin' up takes two tries, and your belly gets there first.",
+        "\u{1F930} You feel %litter% kick when you lie down and kick again when you stand up, %name%. You're big as a barrel.",
+        "\u{1F930} Your belly's tight as a drum, %name%, and you walk with your hands on your back to hold it up.",
+        "\u{1F930} You're carryin' heavy, %name%. Every step you feel %litter% shift and settle."
+      ],
+      nesting: [
+        "\u{1F930} You can't sit still, %name%. You want straw, and a corner, and somebody to stroke your back.",
+        "\u{1F930} Your belly's dropped low, %name%. It won't be long now, and every bit of you knows it.",
+        "\u{1F930} You keep fussin' with the straw, %name%, pushin' it into a nest without meanin' to.",
+        "\u{1F930} Everything aches and everything's ready, %name%. Find your nest, sugar."
+      ]
+    },
+    STAGE_ROOM: {
+      showing: [
+        "%name% has a round little belly now, and keeps restin' a hand on it when they think nobody's lookin'.",
+        "The curve of %name%'s belly has gone from maybe to certainly. They're carryin'.",
+        "{t}%name%'s belly has started to swell, and their tits have gone fuller with it.",
+        "%name% turns sideways in the light, and there it is: bred and showin'."
+      ],
+      heavy: [
+        "%name% lowers themselves onto a hay bale with a grunt, belly first, heavy as a harvest.",
+        "%name%'s belly is huge and high, and it rolls now and then as somethin' inside shifts.",
+        "{t}%name%'s tits are heavy and full to match their belly, and they leak a little when they stretch.",
+        "%name% waddles across the barn, one hand on their back and their belly leadin' the way."
+      ],
+      nesting: [
+        "%name% has made a nest of straw in the corner and keeps fluffin' it, pantin' between goes.",
+        "%name% circles and circles before lyin' down, belly low and tight, makin' little grunts.",
+        "%name% is restless as any %a% about to drop, pacin' and nestin' and pacin' again.",
+        "%name% can't settle. They lie down, get up, scratch at the straw, lie down. It's nearly time."
+      ]
+    },
+    CRAVINGS: [
+      "You want somethin' cold and somethin' sweet, %name%, and you want it right now.",
+      "You keep thinkin' about warm milk, a whole pail of it, %name%.",
+      "You'd let anybody rub your belly right now, %name%, and you'd purr for it.",
+      "{v}Your pussy's swollen and achin' and wantin' attention, %name%. Bein' bred does that.",
+      "{c}You're hard more often than not, %name%, and it isn't helpin' your temper.",
+      "{t}Your tits ache, %name%. You want somebody's mouth on them, drinkin' the ache away.",
+      "{t}Your nipples are so sore your top hurts, %name%. You'd rather go without.",
+      "You're hungry, %name%. Not peckish: hungry, like you could eat a whole trough.",
+      "Salt. You want salt, %name%. Lick it off somebody if you have to.",
+      "You want to be filled again, %name%, even though you're already full of %litter%. Greedy %a%.",
+      "You'd give a ribbon for a nap in warm straw with somebody's arms round you, %name%.",
+      "You're eatin' for %eatin%, %name%, and your belly won't let you forget it."
+    ],
+    KICKS: [
+      "Somethin' inside %name% kicks hard enough to make the hand on their belly jump.",
+      "%name% stops mid-step, both hands on their belly, while whatever's in there has a good long wriggle.",
+      "A little bump pushes out of %name%'s belly, round as a knee, and slides away again.",
+      "%name% laughs and winces at once. That one got them right under the ribs.",
+      "%name%'s belly rolls like a sack of kittens, and they sit down quick.",
+      "Anybody watchin' %name% sees their belly twitch and bulge, and %name% sighs and rubs it.",
+      "%name% gasps. That kick landed low, and their knees go a bit weak.",
+      "{t}A hard kick, and %name% leaks a little from both nipples. They flush and pretend nobody saw."
+    ],
+    MIDWIFE: [
+      "%by% kneels in the straw with %name%, a hand low on their belly, breathin' with them through the next wave.",
+      `%by% rubs slow circles into the small of %name%'s back and murmurs, "That's it. Nearly. Nearly."`,
+      "%by% wipes %name%'s face with a cool cloth and holds their hand through it.",
+      `{v}%by% checks between %name%'s thighs and grins. "Not long now, sweet thing. I can see the way it's goin'."`,
+      "{nv}%by% presses on %name%'s belly with both palms, gentle and firm, and talks them through it.",
+      "%by% props %name% up on a hay bale and stays right beside them, steady as a fence post."
+    ],
+    RUTTY: [
+      "%name%'s head comes up and their nostrils flare. Somebody near here is in heat, and %name% knows it in their balls.",
+      "%name% shifts on their feet, cock thickenin', breathin' in that heavy, sweet smell.",
+      "The heat-smell hits %name% and their whole body goes tight and restless.",
+      "%name% swallows hard. Somebody close by is ripe, and every bit of them wants to mount.",
+      "%name%'s cock throbs and leaks. They'd follow that smell anywhere.",
+      "%name% paces, snortin', unable to settle with that smell on the air."
+    ],
+    BRED_MARKS: {
+      3: [
+        "%name%'s third breedin' this season goes on the board in red chalk. The farm girl underlines it.",
+        "Three. %name% gets a ribbon on their gate and a wink from the farm girl."
+      ],
+      5: [
+        "Five times bred. %name%'s gate is lookin' festive, all ribbons.",
+        "The farm girl rings the barn bell once for %name%'s fifth breedin'. It's tradition now."
+      ],
+      10: [
+        "Ten breedin's this season. The farm girl climbs a ladder to add %name%'s chalk mark, there's no room left lower down.",
+        "Ten. Folks stop by %name%'s gate just to count the ribbons."
+      ]
+    },
+    CALL_STUD: [
+      "\u{1F525} %name% is in heat %where% and can't keep still. They're askin' for a stud, sugar, and you're on the list.",
+      "\u{1F525} Heat call: %name%, %where%, rump up and achin'. You signed up for this.",
+      "\u{1F525} %name% is ripe and callin' %where%. Go see to them before somebody else does.",
+      "\u{1F525} %name%'s in season %where%, and their call's gone out to every stud on the farm. Including you."
+    ],
+    CALLED: [
+      "\u{1F525} The call's out to %n% stud%s%. Find somewhere soft and wait, sugar.",
+      "\u{1F525} %n% stud%s% will be catchin' your scent about now. Stay where you are.",
+      "\u{1F525} Heard by %n% stud%s%. Get comfortable, sugar, and get presentin'."
+    ],
+    MATED: [
+      "\u{1F49E} %a% and %b% bump foreheads and that's that: mates for the day. The farm girl chalks a heart on the barn door.",
+      "\u{1F49E} %b% leans into %a%'s side and stays there. Mates till midnight.",
+      "\u{1F49E} %a% and %b% are a pair today. Anybody tryin' to cut in gets a look.",
+      "\u{1F49E} %a% nuzzles %b%'s neck, %b% nuzzles right back, and the whole barn knows they're mates today."
+    ],
+    CROWN: [
+      "\u{1F451} The farm girl pins a big blue rosette on %name%: most bred of the season. Their belly's earned it.",
+      "\u{1F451} %name% is crowned most bred of the season, and the farm girl hangs the blue rosette right where everybody can see it.",
+      "\u{1F451} A blue rosette for %name%, most bred of the season, and a round of applause from the barn."
+    ],
+    CROWN_COLLAR: [
+      "\u{1F451} The farm girl pins a big blue rosette on %name%'s collar: most bred of the season. Their belly's earned it.",
+      "\u{1F451} A blue rosette goes on %name%'s collar, most bred of the season, and the farm girl gives it a proud little tug."
+    ],
+    BIRTH_MIDWIFE: [
+      "\u{1F37C} %by% cleans the newborns and tucks them against %name%, every one of them healthy. Good work, midwife.",
+      "\u{1F37C} %by% wraps the little ones in clean straw and settles them with %name%. Every one's breathin' fine.",
+      "\u{1F37C} %by% sits back on their heels, grinnin', as %name% curls round the newborns. A good birth, and a good midwife.",
+      "\u{1F37C} %by% counts them twice, smiles, and helps %name% get comfortable with them. All healthy."
+    ],
+    BOOKED_STUD: [
+      "\u{1F402} You've been booked to breed %dam%, sugar. I'll tell you when you're both on the farm.",
+      "\u{1F402} There's a bookin' with your name on it: %dam%. I'll let you know when they're here.",
+      "\u{1F402} Staff booked you for %dam%. Save some for 'em, sugar. I'll tell you when it's time."
+    ],
+    BOOKED_DAM: [
+      "\u{1F404} You've been booked with %stud%, sugar. I'll tell you when you're both on the farm.",
+      "\u{1F404} %stud% is booked to breed you. I'll let you know when they're here, sugar.",
+      "\u{1F404} Staff have booked you with %stud%. I'll come find you when it's time."
+    ],
+    TIME_STUD: [
+      "\u{1F402} Your bookin' with %dam% is up, sugar. They're here. Head for the breedin' stand.",
+      "\u{1F402} %dam% is on the farm, and so are you. That bookin' won't keep itself, sugar.",
+      "\u{1F402} It's time: %dam% is here for your bookin'. The stand's waitin'."
+    ],
+    TIME_DAM: [
+      "\u{1F404} %stud% is here for your bookin', sugar. Head for the breedin' stand.",
+      "\u{1F404} %stud%'s on the farm. Time to go get bred, sugar.",
+      "\u{1F404} Your stud's arrived: %stud%. The stand's waitin' for you both."
+    ]
   };
 
   // addons/breeding/pairs.js
@@ -136,18 +367,21 @@
   };
   var CALL_STUD = [
     "\u{1F525} %name% is in heat %where% and callin' for a stud. Tail up, achin' for it. Go on, sugar.",
-    "\u{1F525} Somebody needs breedin': %name%, %where%, in heat and askin' for you studs by name. First one there gets her.",
+    "\u{1F525} Somebody needs breedin': %name%, %where%, in heat and askin' for you studs by name. First one there gets 'em.",
     "\u{1F525} %name%'s in season %where% and beggin' for a cock. You signed up for stud calls, so here's one."
   ];
   var CALLED = [
     "\u{1F525} You lift your tail and call. %n% stud%s% heard you. Stay put and present, sugar.",
     "\u{1F525} The call's gone out to %n% stud%s% on the farm. Somebody'll be along to see to you."
   ];
-  var MATED = [
+  var MATED_ = [
     "\u{1F49E} %a% and %b% rub noses and it's settled: mates for the day. Anybody watchin' can guess what comes next.",
     "\u{1F49E} %a% nuzzles up under %b%'s chin and gets nuzzled right back. Mates till midnight, those two.",
     "\u{1F49E} %b% says yes. %a% and %b% are a pair today, flank to flank, and the farm girl chalks their names side by side on the barn door."
   ];
+  CALL_STUD.push(...MORE2.CALL_STUD);
+  CALLED.push(...MORE2.CALLED);
+  var MATED = MATED_.concat(MORE2.MATED);
   function cmdStudcall(c) {
     const { sender, args, api: A } = c, p = P(), w = String(args[0] || "").toLowerCase();
     if (!onBooks(sender)) return c.reply("That's for folks on the farm's books, sugar.");
@@ -168,7 +402,7 @@
     if (!studs.length) return c.reply("No stud on the farm is takin' calls right now, sugar. (Studs sign up with ?studcall on.)");
     p.called[sender] = Date.now();
     A.save();
-    const line = fill(pick(CALL_STUD), { name: A.name(sender), where: whereIs(sender) });
+    const line = fill(lineFor(A, sender, CALL_STUD, "call"), { name: A.name(sender), where: whereIs(sender) });
     for (const m of studs) A.notice(m, line);
     c.reply(fill(pick(CALLED), { n: studs.length, s: studs.length === 1 ? "" : "s" }));
   }
@@ -254,7 +488,7 @@
   var STAGES = [
     { at: 0, key: "early", label: "early days" },
     { at: 0.33, key: "showing", label: "showin'" },
-    { at: 0.66, key: "heavy", label: "heavy with the litter" },
+    { at: 0.66, key: "heavy", label: "heavy with it" },
     { at: 0.9, key: "nesting", label: "nestin'" }
   ];
   var stageOf = (f) => STAGES.filter((s) => f >= s.at).slice(-1)[0];
@@ -262,11 +496,11 @@
   var STAGE_LINES = {
     showing: {
       you: "\u{1F930} Your belly's started to round out, %name%. Anybody lookin' can tell now.",
-      room: "%name%'s belly has started to round out, soft and unmistakable. The litter's showin'."
+      room: "%name%'s belly has started to round out, soft and unmistakable. They're showin'."
     },
     heavy: {
-      you: "\u{1F930} You're heavy with it now, %name%: belly full and tight, the litter movin' inside you.",
-      room: "%name% is heavy with the litter now, belly big and tight, and they move a little slower for it."
+      you: "\u{1F930} You're heavy with it now, %name%: belly full and tight, %litter% movin' inside you.",
+      room: "%name% is heavy with %litter% now, belly big and tight, and they move a little slower for it."
     },
     nesting: {
       you: "\u{1F930} You're nestin', %name%. Restless, achy, and wantin' a soft corner of straw. It won't be long.",
@@ -277,14 +511,14 @@
     "You're cravin' somethin' salty somethin' fierce, %name%.",
     "All you can think about is a big bowl of warm milk, %name%.",
     "You'd do just about anything for somethin' sweet right now, %name%.",
-    "You're achin' for a big, thick load, %name%. Funny what a litter does to you.",
+    "You're achin' for a big, thick load, %name%. Funny what bein' bred does to you.",
     "You want to be held and rubbed, %name%. Your belly especially.",
-    "You're starvin', %name%. Eatin' for a whole litter now."
+    "You're starvin', %name%. Eatin' for %eatin% now."
   ];
   var KICKS = [
-    "%name%'s belly jumps as the litter kicks hard enough to see from across the pen.",
+    "%name%'s belly jumps with a kick hard enough to see from across the pen.",
     "A little foot pushes out against %name%'s tight belly, then rolls away. They gasp and rub the spot.",
-    "%name%'s whole belly shifts and rolls as the litter turns over. They stop and breathe through it.",
+    "%name%'s whole belly shifts and rolls as somethin' inside turns over. They stop and breathe through it.",
     "Something kicks %name% right in the ribs. They wince and laugh and press a hand to it."
   ];
   var MIDWIFE = [
@@ -296,6 +530,12 @@
     "%name% catches the smell of heat on the air and goes stiff and restless, nostrils flaring.",
     "%name% can't stop lookin' toward the scent of heat nearby. Their breathing's gone heavy."
   ];
+  function words(mn, extra) {
+    const an = animalOf(api2, mn), p = api2.prod(mn), n = p && p.preg && p.preg.count || 1, young = an.young || ["little one", "little ones"];
+    const litter = "the " + (n > 1 ? young[1] : young[0]);
+    return Object.assign({ name: api2.name(mn), litter, Litter: litter.charAt(0).toUpperCase() + litter.slice(1), eatin: n > 1 ? "a whole litter" : "two", a: an.a, young: young[0] }, extra || {});
+  }
+  var lineAbout = (mn, pool, key, extra) => fill(lineFor(api2, mn, pool, key), words(mn, extra));
   var isBreedWeek = (d = /* @__PURE__ */ new Date()) => d.getDate() >= 15 && d.getDate() <= 21;
   var NIGHT_HOUR = 21;
   var PENT_H = 4;
@@ -320,16 +560,16 @@
       const st = stageOf(f);
       if (st.key !== x.stage && STAGE_LINES[st.key]) {
         x.stage = st.key;
-        api2.notice(mn, fill(STAGE_LINES[st.key].you, { name: api2.name(mn) }));
-        if (api2.onMap(mn)) api2.emote("\u{1F930} " + fill(pick([STAGE_LINES[st.key].room].concat((MORE.STAGE_ROOM || {})[st.key] || [])), { name: api2.name(mn) }), mn);
+        api2.notice(mn, lineAbout(mn, [STAGE_LINES[st.key].you].concat(MORE2.STAGE_YOU[st.key] || []), "you:" + st.key));
+        if (api2.onMap(mn)) api2.emote("\u{1F930} " + lineAbout(mn, [STAGE_LINES[st.key].room].concat((MORE.STAGE_ROOM || {})[st.key] || [], MORE2.STAGE_ROOM[st.key] || []), "room:" + st.key), mn);
         api2.save();
       }
       if ((st.key === "showing" || st.key === "heavy") && now >= (x.craveAt || 0)) {
-        if (x.craveAt) api2.notice(mn, "\u{1F930} " + fill(pick(CRAVINGS), { name: api2.name(mn) }));
+        if (x.craveAt) api2.notice(mn, "\u{1F930} " + lineAbout(mn, CRAVINGS, "crave"));
         x.craveAt = now + between(120, 240) * 6e4;
       }
       if ((st.key === "heavy" || st.key === "nesting") && api2.onMap(mn) && now >= (x.kickAt || 0)) {
-        if (x.kickAt) api2.emote("\u{1F930} " + fill(pick(KICKS), { name: api2.name(mn) }), mn);
+        if (x.kickAt) api2.emote("\u{1F930} " + lineAbout(mn, KICKS, "kick"), mn);
         x.kickAt = now + between(20, 40) * 6e4;
       }
     }
@@ -341,8 +581,9 @@
     for (const b of d.bookings) {
       if (b.told || !set.has(b.stud) || !set.has(b.dam) || !api2.onMap(b.stud) || !api2.onMap(b.dam)) continue;
       b.told = Date.now();
-      api2.notice(b.stud, "\u{1F402} Your booking with " + api2.name(b.dam) + " is up, sugar. They're here. Head for the breeding stand.");
-      api2.notice(b.dam, "\u{1F404} " + api2.name(b.stud) + " is here for your booking, sugar. Head for the breeding stand.");
+      const who = { dam: api2.name(b.dam), stud: api2.name(b.stud) };
+      api2.notice(b.stud, fill(pick(MORE2.TIME_STUD), who));
+      api2.notice(b.dam, fill(pick(MORE2.TIME_DAM), who));
       api2.save();
     }
   }
@@ -365,8 +606,9 @@
     d.bookings.push({ id: d.seq, stud, dam, by: sender, at: Date.now(), told: 0 });
     A.save();
     A.audit(sender, "BOOK", stud + "x" + dam);
-    A.notice(stud, "\u{1F402} You've been booked to breed " + A.name(dam) + ". I'll tell you when you're both on the farm.");
-    A.notice(dam, "\u{1F404} You've been booked with " + A.name(stud) + ". I'll tell you when you're both on the farm.");
+    const who = { dam: A.name(dam), stud: A.name(stud) };
+    A.notice(stud, fill(pick(MORE2.BOOKED_STUD), who));
+    A.notice(dam, fill(pick(MORE2.BOOKED_DAM), who));
     c.reply("\u{1F402} Booked: #" + d.seq + " " + A.name(stud) + " \xD7 " + A.name(dam) + ".");
   }
   var bookingsText = () => {
@@ -411,7 +653,7 @@
         return q && Math.max(Math.abs(q.X - sp.X), Math.abs(q.Y - sp.Y)) <= 3;
       })) continue;
       d.scent[stud] = Date.now();
-      api2.privateEmote(stud, fill(pick(RUTTY), { name: api2.name(stud) }));
+      api2.privateEmote(stud, lineAbout(stud, RUTTY, "rutty"));
     }
   }
   function season() {
@@ -437,11 +679,11 @@
       "Ten loads this season. The farm girl just shakes her head and hangs a whole bunch of ribbons on %name%'s gate."
     ]
   };
-  CRAVINGS.push(...MORE.CRAVINGS);
-  KICKS.push(...MORE.KICKS);
-  MIDWIFE.push(...MORE.MIDWIFE);
-  RUTTY.push(...MORE.RUTTY);
-  for (const k of Object.keys(MORE.BRED_MARKS)) BRED_MARKS[k].push(...MORE.BRED_MARKS[k]);
+  CRAVINGS.push(...MORE.CRAVINGS, ...MORE2.CRAVINGS);
+  KICKS.push(...MORE.KICKS, ...MORE2.KICKS);
+  MIDWIFE.push(...MORE.MIDWIFE, ...MORE2.MIDWIFE);
+  RUTTY.push(...MORE.RUTTY, ...MORE2.RUTTY);
+  for (const k of Object.keys(MORE.BRED_MARKS)) BRED_MARKS[k].push(...MORE.BRED_MARKS[k], ...MORE2.BRED_MARKS[k] || []);
   function onBred(stud, dam, hole, mlIn, took) {
     const counts = hole === "vulva" || hole === "butt" && api2.mpregOn && api2.mpregOn(dam);
     if (!counts || !isBreedWeek() || !D2().optIn[dam] || !(mlIn > 0)) return;
@@ -451,7 +693,7 @@
     if (stud > 0 && stud !== dam && D2().optIn[stud]) w.covers[stud] = (w.covers[stud] || 0) + 1;
     api2.save();
     const lines = BRED_MARKS[w.bred[dam]];
-    if (lines && api2.onMap(dam)) api2.later(() => api2.emote("\u{1F525} " + fill(pick(lines), { name: api2.name(dam) }), dam), 6e3);
+    if (lines && api2.onMap(dam)) api2.later(() => api2.emote("\u{1F525} " + lineAbout(dam, lines, "marks"), dam), 6e3);
   }
   function rankList(o, n, unit) {
     return Object.entries(o).filter(([m]) => Number(m) > 0).sort((a, b) => b[1] - a[1]).slice(0, n).map(([m, v], i) => "  " + (["\u{1F947}", "\u{1F948}", "\u{1F949}"][i] || i + 1 + ".") + " " + api2.name(Number(m)) + ", " + v + " " + unit(v)).join("\n");
@@ -512,7 +754,7 @@
     readOut(here, bookText(7) + "\n\n\u{1F451} That's the season, y'all! " + api2.name(champ.dam) + " is the farm's most-bred, " + champ.times + " times" + (champ.stud ? ", and " + api2.name(champ.stud) + " the busiest stud with " + champ.covers : "") + ". Ribbons for the winners! \u{1F402}");
     if (api2.ribbons) api2.ribbons(champ.dam, PRIZE.dam, "bein' the most-bred of breedin' season", true);
     if (champ.stud && api2.ribbons) api2.ribbons(champ.stud, PRIZE.stud, "bein' the busiest stud of breedin' season", true);
-    if (api2.onMap(champ.dam)) api2.later(() => api2.emote("\u{1F451} The farm girl pins a big blue rosette on " + api2.name(champ.dam) + "'s collar: most bred of the season. Their belly's earned it.", champ.dam), 4e3);
+    if (api2.onMap(champ.dam)) api2.later(() => api2.emote(lineAbout(champ.dam, gearOf(api2, champ.dam).collar ? MORE2.CROWN_COLLAR : MORE2.CROWN, "crown"), champ.dam), 4e3);
     api2.audit(api2.cfg.BOT_MEMBER, "SEASON", w.month + " " + champ.dam + "x" + champ.times + (champ.stud ? " stud " + champ.stud + "x" + champ.covers : ""));
   }
   function cmdMidwife(c) {
@@ -524,7 +766,7 @@
     if (!me || !them || Math.max(Math.abs(me.X - them.X), Math.abs(me.Y - them.Y)) > 1) return c.reply("Get right down next to " + A.name(t) + " to help, sugar.");
     p.labour.midwife = sender;
     A.save();
-    A.emote("\u{1F37C} " + fill(pick(MIDWIFE), { name: A.name(t), by: A.name(sender) }), t);
+    A.emote("\u{1F37C} " + lineAbout(t, MIDWIFE, "midwife", { by: A.name(sender) }), t);
   }
   function onBirth(mn) {
     const d = D2();
@@ -532,7 +774,7 @@
     const m = d.lastMidwife && d.lastMidwife[mn];
     if (m) {
       api2.staffPoints(m, 2, "midwife");
-      if (api2.onMap(mn)) api2.emote("\u{1F37C} " + api2.name(m) + " cleans the newborns and tucks them against " + api2.name(mn) + ", every one of them healthy. Good work, midwife.", mn);
+      if (api2.onMap(mn)) api2.emote(lineAbout(mn, MORE2.BIRTH_MIDWIFE, "born", { by: api2.name(m) }), mn);
       delete d.lastMidwife[mn];
     }
     api2.save();

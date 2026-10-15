@@ -12,7 +12,8 @@
      little scene and gets a ribbon. Nobody's moved, and nobody's marked down for stayin' in.
      Proprietors: ?bell (how it's set) · ?bell now · ?bell hour <0-23> · ?bell off|on
 */
-import { pick, between, fill } from "../_lib/connect.js";
+import { pick, between, fill, animalOf } from "../_lib/connect.js";
+import * as M from "./more-lines.js";
 
 let api = null, D = null, needsOf = null, isOn = null;
 export function herdSetup(a, data, needs, on) { api = a; D = data; needsOf = needs; isOn = on; }
@@ -30,7 +31,7 @@ const ROMP = [
     "%w% ends up on top, pantin' and pleased with themselves, with %l% squirmin' and laughin' underneath."],
   ["%a% nips at %b%'s flank and bolts. %b% is after them before the straw settles.",
     "Round the pen they go, %b% gainin', till the pair of them go down in a heap by the fence.",
-    "%w% sits right on %l%'s back and won't budge till they cry uncle. Or moo."],
+    "%w% sits right on %l%'s back and won't budge till they cry uncle. Or %lcall%."],
   ["%a% butts their head into %b%'s shoulder, playful, askin' for trouble.",
     "%b% shoves back and the two of them wrestle, shoulder to shoulder, gruntin' and gigglin'.",
     "%w% rolls %l% over and blows a raspberry on their belly. %l% shrieks."],
@@ -39,7 +40,7 @@ const ROMP = [
     "The hay snaps. %w% gets the bigger half and prances a victory lap round %l%."],
 ];
 const RPS_FORFEIT = [
-  "%l% has to moo for %w%, loud enough for the barn to hear.",
+  "%l% has to %lcall% for %w%, loud enough for the barn to hear.",
   "%w% gets to pin %l% and lick their face clean, ear to ear.",
   "%l% carries %w%'s pride around all day: loser grooms the winner. Get to it.",
   "%w% claims a forfeit: %l% kneels and nuzzles their hand like good stock.",
@@ -61,6 +62,9 @@ const TURNOUT_ALONE = [
   "🌾 %names% has the whole pasture to themselves this evenin', and makes the most of it: a long stretch, a roll in the grass, and a ribbon for showin' up.",
 ];
 
+ROMP.push(...M.ROMP); RPS_FORFEIT.push(...M.RPS_FORFEIT); TURNOUT_CALL.push(...M.TURNOUT_CALL); TURNOUT_SCENE.push(...M.TURNOUT_SCENE); TURNOUT_ALONE.push(...M.TURNOUT_ALONE);
+const callOf = (mn) => animalOf(api, mn).call;   // the noise the loser's kind makes ("moo", "whinny", "woof")
+
 // ── play ───────────────────────────────────────────────────
 function allowed(a, b) { const u = H().ok[b + ":" + a]; return !!(u && u > Date.now()); }
 function startGame(a, b, kind) {
@@ -81,7 +85,7 @@ function startGame(a, b, kind) {
   }
   // a romp: three beats, a winner picked by the straw
   const [w, l] = Math.random() < 0.5 ? [a, b] : [b, a], beats = pick(ROMP);
-  beats.forEach((t, i) => api.later(() => { if (api.onMap(a) && api.onMap(b)) api.emote("🐾 " + fill(t, { a: N(a), b: N(b), w: N(w), l: N(l) }), a); }, i * 9000));
+  beats.forEach((t, i) => api.later(() => { if (api.onMap(a) && api.onMap(b)) api.emote("🐾 " + fill(t, { a: N(a), b: N(b), w: N(w), l: N(l), lcall: callOf(l) }), a); }, i * 9000));
   api.later(() => won(w, l, "romp"), beats.length * 9000);
 }
 function won(w, l, kind) {
@@ -127,7 +131,7 @@ function settleRps(g) {
   }
   if (pa === pb) return api.emote("✊ " + N(g.a) + " and " + N(g.b) + " both throw " + pa + ". A draw! They eye each other. Best go again.", g.a);
   const [w, l, pw, pl] = BEATS[pa] === pb ? [g.a, g.b, pa, pb] : [g.b, g.a, pb, pa];
-  api.emote("✊ " + N(w) + " throws " + pw + ", " + N(l) + " throws " + pl + ". " + N(w) + " wins! " + fill(pick(RPS_FORFEIT), { w: N(w), l: N(l) }), w);
+  api.emote("✊ " + N(w) + " throws " + pw + ", " + N(l) + " throws " + pl + ". " + N(w) + " wins! " + fill(pick(RPS_FORFEIT), { w: N(w), l: N(l), lcall: callOf(l) }), w);
   won(w, l, "rps");
 }
 

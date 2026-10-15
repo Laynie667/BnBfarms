@@ -6,10 +6,14 @@
      words rarely come up twice: what's milking them and how hard, how full they are, and a touch of
      praise or degradation for people who switched those on. Plain farm talk, no medical words.
      Switch this add-on off (?addons off dairy) and the bot's own lines come back.
+     Every piece is picked for the body being milked (a flat chest hears about its nipples, not an udder; a cock gets
+     the stud's lines), and now and then a line mentions what they're wearin' or makes the noise their kind makes
+     (more-lines.js holds the extra pieces and those bits).
    • Certificate: every week each person who was milked gets a certificate with their grade and how much
      they gave. The new one replaces last week's. ?cert shows yours (or somebody's, for staff).
 */
-import { connect, pick } from "../_lib/connect.js";
+import { connect, pick, untag, fitting, bodyOf, gearOf, animalOf } from "../_lib/connect.js";
+import { MORE, GEAR_TAIL, SOUND_TAIL } from "./more-lines.js";
 
 let api = null;
 function D() {
@@ -61,12 +65,12 @@ const FULL = {
     ", their teats sore and their udder soft and spent"],
 };
 const PRAISE = [" Such a good animal, giving so much.", " Such a good milker.", " The farm's proud of you, sugar.", " Look at all that. Lovely."];
-const DEGRADE = [" Nothing but a dairy animal, and a leaky one at that.", " Moo for it, cow.", " That's all you're good for, and you know it.",
+const DEGRADE = [" Nothing but a dairy animal, and a leaky one at that.", " That's all you're good for, and you know it.",
   " Dripping like a broken tap. Pathetic little milker."];
 const STALL_MILK = [
   "The stall's cups latch onto %n%'s teats and pull in a slow, rolling rhythm, milk running down the lines into the bucket",
   "%n% shifts their weight in the stall as the machine milks them, warm milk drumming into the bucket",
-  "The stall's milker draws on %n% long and steady, and they let out a soft, contented moo",
+  "The stall's milker draws on %n% long and steady, and they let out %s%",
   "Milk streams from %n% into the stall's bucket while they rest their head on the rail",
 ];
 const STALL_SEMEN = [
@@ -82,19 +86,39 @@ const DONE_SEMEN = ["The stall wrings %n% down to the last quarter and lets go. 
 const DRY = ["The %g% pulls %n% completely dry. Every last drop is in the tank, and their teats are pink and tender.",
   "%n% is milked out: the %g% sucks at nothing but air, and they sag with relief."];
 
-const say = (s, i) => s.replace(/%n%/g, i.name).replace(/%g%/g, i.gear || "milker").replace(/%c%/g, i.cock || "").replace(/%ml%/g, i.ml || "");
-const fullness = (i) => pick(i.full > 0.7 ? FULL.high : i.full > 0.35 ? FULL.mid : FULL.low);
-const tail = (i) => (i.degrade && Math.random() < 0.5 ? pick(DEGRADE) : i.praise && Math.random() < 0.5 ? pick(PRAISE) : "");
+// the Oct 15 pieces (more-lines.js)
+for (let t = 0; t < 3; t++) { PUMP[t].push(...MORE.PUMP[t]); ECHO[t].push(...MORE.ECHO[t]); }
+for (const k of ["high", "mid", "low"]) FULL[k].push(...MORE.FULL[k]);
+PRAISE.push(...MORE.PRAISE); DEGRADE.push(...MORE.DEGRADE); STALL_MILK.push(...MORE.STALL_MILK); STALL_SEMEN.push(...MORE.STALL_SEMEN);
+DONE.push(...MORE.DONE); DONE_SEMEN.push(...MORE.DONE_SEMEN); DRY.push(...MORE.DRY);
+
+const cap = (w) => String(w || "").charAt(0).toUpperCase() + String(w || "").slice(1);
+// who's bein' milked: their body, what they've got on, and their kind (an older bot just gets the lines for anybody)
+const who = (i) => Object.assign({}, i, { body: bodyOf(api, i.mn), on: gearOf(api, i.mn), an: animalOf(api, i.mn) });
+// one piece, picked to fit their body, the tag taken off
+const part = (list, i) => untag(pick(fitting(list, i.body)));
+const say = (s, i) => s.replace(/%n%/g, i.name).replace(/%g%/g, i.gear || "milker").replace(/%c%/g, i.cock || "").replace(/%ml%/g, i.ml || "")
+  .replace(/%a%/g, i.an.a).replace(/%Call%/g, cap(i.an.call)).replace(/%call%/g, i.an.call).replace(/%S%/g, cap(i.an.sound)).replace(/%s%/g, i.an.sound);
+const fullness = (i) => part(i.full > 0.7 ? FULL.high : i.full > 0.35 ? FULL.mid : FULL.low, i);
+const tail = (i) => (i.degrade && Math.random() < 0.5 ? part(DEGRADE, i) : i.praise && Math.random() < 0.5 ? part(PRAISE, i) : "");
+// now and then: a bit about what they're wearin', or the noise their kind makes
+function extra(i) {
+  const r = Math.random();
+  if (r < 0.25) { const on = Object.keys(GEAR_TAIL).filter((k) => i.on[k] && GEAR_TAIL[k].length); if (on.length) return pick(GEAR_TAIL[pick(on)]); }
+  if (r > 0.8) return pick(SOUND_TAIL);
+  return "";
+}
 const tier = (level) => (level <= 1 ? 0 : level <= 2 ? 1 : 2);
+const build = (f) => (raw) => { const i = who(raw); return say(f(i), i); };
 
 const lines = {
-  pump: (i) => say(pick(PUMP[tier(i.level)]) + fullness(i) + ". +" + i.ml + "." + tail(i), i),
-  echo: (i) => say(pick(ECHO[tier(i.level)]) + fullness(i) + ". +" + i.ml + "." + tail(i), i),
-  stallMilk: (i) => say(pick(STALL_MILK) + fullness(i) + "." + tail(i), i),
-  stallSemen: (i) => say(pick(STALL_SEMEN) + "." + tail(i), i),
-  stallDone: (i) => say(pick(DONE), i),
-  stallDoneSemen: (i) => say(pick(DONE_SEMEN), i),
-  gearDry: (i) => say(pick(DRY), i),
+  pump: build((i) => part(PUMP[tier(i.level)], i) + fullness(i) + ". +" + i.ml + "." + extra(i) + tail(i)),
+  echo: build((i) => part(ECHO[tier(i.level)], i) + fullness(i) + ". +" + i.ml + "." + extra(i) + tail(i)),
+  stallMilk: build((i) => part(STALL_MILK, i) + fullness(i) + "." + extra(i) + tail(i)),
+  stallSemen: build((i) => part(STALL_SEMEN, i) + "." + extra(i) + tail(i)),
+  stallDone: build((i) => part(DONE, i)),
+  stallDoneSemen: build((i) => part(DONE_SEMEN, i)),
+  gearDry: build((i) => part(DRY, i)),
 };
 
 // ── the weekly certificate ─────────────────────────────────

@@ -37,7 +37,7 @@ const moveTo=(mn,X,Y)=>{ chars.find(c=>c.MemberNumber===mn).MapData.Pos={X,Y}; }
   prod(500).eggs={n:12,by:-2,since:Date.now()-2*3600000,layAt:Date.now()+86400000}; ok(W.__belly(500)===1, 'a dozen eggs: showin\'');
   prod(500).eggs.n=45; ok(W.__belly(500)===3, 'forty-five: huge');
   n=sent.length; W.__trapTick(); await wait(600);
-  ok(/huge|past all decency/.test(all(n)) && W.__stateFor(500).now.some(x=>/Belly: huge/.test(x.text)), 'the room hears when it grows, and it shows on their strip');
+  ok(/huge|past all decency|carryin' so much/.test(all(n)) && W.__stateFor(500).now.some(x=>/Belly: huge/.test(x.text)), 'the room hears when it grows, and it shows on their strip');
   // ── layin', tended ──
   moveTo(500,40,40); moveTo(600,41,40);
   n=sent.length; await say(600,'?tend Moo'); ok(/tendin' Moo/.test(to(600,n)) && P(500).tender, '?tend: somebody signs on to help');
@@ -63,7 +63,7 @@ const moveTo=(mn,X,Y)=>{ chars.find(c=>c.MemberNumber===mn).MapData.Pos={X,Y}; }
   // ── scents ──
   cfg.TENTACLE_CHANCE=0; cfg.SCENT_WAIT_MIN=0; cfg.SCENT_CHANCE=1; P(500).trapAt=0; P(500).penned=null; P(500).gear=null; moveTo(500,15,10); W.__trapTick();
   await say(221397,'?potion give Moo wolfscent',2600); n=sent.length; W.__trapTick(); await wait(7500);
-  ok(/howl|trottin'/.test(all(n)) && /wolf/i.test(to(500,n)), 'Wolf Scent: the pack comes and finds them, no spot needed');
+  ok(/howl|trottin'|trot|pack/.test(all(n)) && /wolf/i.test(to(500,n)), 'Wolf Scent: the pack comes and finds them, no spot needed');
   P(500).trapAt=0; P(500).penned=null; P(500).gear=null; prod(500).held={vulva:0,butt:0,mouth:0};
   // ── quiet ──
   n=sent.length; await say(500,'?quiet'); ok(P(500).quietUntil>Date.now()+55*60000 && /60 minutes of quiet/.test(to(500,n)), '?quiet: an hour by default');

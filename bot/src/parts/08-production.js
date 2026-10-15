@@ -120,7 +120,7 @@
   }
   function capacity(mn){
     const p = prodOf(mn);
-    return CFG.PROD.BASE_CAPACITY + (p ? p.capBonus : 0) + (wornTags(mn).has("capacity") ? CFG.PROD.WORN_CAPACITY : 0);
+    return CFG.PROD.BASE_CAPACITY + (p ? p.capBonus : 0) + (wornTags(mn).has("capacity") ? CFG.PROD.WORN_CAPACITY : 0) + symbioteCap(mn);   // (a symbiote makes room: 10v4-symbiotes.js)
   }
   // futa make milk and semen, and can breed and be bred
   // their ?gender says first: a male or a femboy has a cock and no pussy whatever the game's wardrobe shows (Oct 12:
@@ -367,6 +367,7 @@
     if (tierOf(mn) === "prize") r *= 1.25;
     if (boosted(p,"hungry")) r *= CFG.HUNGRY_X;
     if (p.nursed && p.nursed.week === weekKey()) r *= 1 + Math.min(CFG.NURSE_SUPPLY_MAX, CFG.NURSE_SUPPLY_STEP * p.nursed.n);
+    r *= symbioteX(mn, "milk");          // milk moss (10v4-symbiotes.js)
     return r * addonRateX(mn, "milk");   // add-ons (barn life: fed and groomed stock milk better)
   }
   function semenRate(mn){
@@ -448,7 +449,13 @@
     const take = Math.min(p.milk, amount);
     if (!(take >= 1)) return 0;
     const now = Date.now();
-    if (!nursing){ const d = dayKey(); if (!p.mday || p.mday.day !== d) p.mday = { day:d, ml:0 }; p.mday.ml += take; }
+    if (!nursing){
+      const d = dayKey(); if (!p.mday || p.mday.day !== d) p.mday = { day:d, ml:0 };
+      // milk pays by the litre, stingy: a ribbon every CFG.LITRE_RIBBON_ML, CFG.LITRE_RIBBON_DAY a day at most
+      const was = Math.floor(p.mday.ml / CFG.LITRE_RIBBON_ML); p.mday.ml += take;
+      const owe = Math.min(Math.floor(p.mday.ml / CFG.LITRE_RIBBON_ML) - was, CFG.LITRE_RIBBON_DAY - (p.mday.paid || 0));
+      if (owe > 0){ p.mday.paid = (p.mday.paid || 0) + owe; later(() => earnRibbons(mn, owe, "every "+(CFG.LITRE_RIBBON_ML/1000)+" litres you're milked"), 2500); }
+    }
     if (!nursing && (!p.lastMilkAt || now - p.lastMilkAt > CFG.GRADE.SESSION_GAP_MIN*60000)){
       const gapH = p.lastMilkAt ? (now - p.lastMilkAt)/3600000 : null;
       const sc = sessionScore(mn, gapH);
@@ -458,7 +465,7 @@
       g[mn] = g[mn] || { sum:0, n:0 }; g[mn].sum += sc; g[mn].n++;
     }
     if (!nursing) p.lastMilkAt = now;
-    if (!nursing && take >= 20){ const g = rec(mn) && rec(mn).parasite; if (g && !g.drinking) parasiteUrgeDone(mn, "milked"); }   // a parasite that wanted them milked (not its own drinkin': 10v2)
+    if (!nursing && take >= 20){ const g = rec(mn) && rec(mn).parasite; if (g && !g.drinking) parasiteUrgeDone(mn, "milked"); symbioteFed(mn, "milked"); }   // a parasite that wanted them milked (not its own drinkin': 10v2)
     p.milk -= take; p.totals.milked += take; credit(mn, take);
     // squeezin' someone who's cumflated pushes some of that load back out too
     const over = heldTotal(p) - capacity(mn);
@@ -521,6 +528,7 @@
     if (inHeat(p)) chance *= 3;
     chance *= 1 + boostLevel(p,"fert");
     if (wornTags(mother).has("fertility")) chance *= 1.5;
+    chance *= symbioteX(mother, "fert");   // the nestling (10v4-symbiotes.js)
     if (wornTags(mother).has("hyper") || boosted(p, "hyper")) chance *= CFG.HYPER_FERT_X;
     if (bonus) chance *= bonus;
     if (isRut()) chance *= 2;
@@ -574,11 +582,13 @@
                 g.sires.map(plainName).join(" & ")+". Milk's comin' in strong now!";
     try { albumAdd(mn, "🍼", "A litter delivered", g.count+" ("+parts.join(", ")+"), sired by "+g.sires.map(plainName).join(" & ")+"."); } catch(e){}   // a keepsake (10y6-keepers.js)
     if (onMap(mn) && CFG.LAY_SCENE) farrowScene(mn, g.count, parts.join(", "), sires);   // the birth, in beats (10y2-brood.js)
-    else if (onMap(mn)) emote("🍼 With one last long push, "+plainName(mn)+" delivers "+g.count+" ("+parts.join(", ")+"), sired by "+g.sires.map(plainName).join(" & ")+
-                         ". The farm girl tucks 'em in the straw, and "+plainName(mn)+"'s milk comes in strong, breasts swellin' heavy.");
+    else if (onMap(mn)) emote(bodyWords(mn, "🍼 With one last long push, "+plainName(mn)+" delivers "+g.count+" ("+parts.join(", ")+"), sired by "+g.sires.map(plainName).join(" & ")+
+                         ". The farm girl tucks 'em in the straw, and "+plainName(mn)+"'s milk comes in strong, breasts swellin' heavy."));   // (fitted: a male carryin' has a chest, not breasts)
     else beep(mn, msg);
     try { const split = revealSplit(mn, sires, g.count); if (split) L.studbook[L.studbook.length - 1].split = split; } catch(e){ warn("split:", e); }   // whose they were (10y7-udders.js)
     for (const h of herdsOf(mn)) beep(h.leader, msg);
+    // a birth pays, stingy: a ribbon per CFG.BIRTH_RIBBON_PER young (rounded up), CFG.BIRTH_RIBBON_MAX at most
+    later(() => earnRibbons(mn, Math.min(CFG.BIRTH_RIBBON_MAX, Math.ceil(g.count / CFG.BIRTH_RIBBON_PER)), "deliverin' "+g.count+" young"), 4000);
   }
 
   // Each milking session gets a score; the grade is the average of the last few.

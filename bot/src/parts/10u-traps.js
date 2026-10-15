@@ -108,7 +108,8 @@
       try { trapGearDone(mn, charFor(mn) ? gearPlan : null); } catch(e){ warn("trap gear:", e); }
       try { if (charFor(mn)) keepersAfter(mn, kind, before); toysAfter(mn); } catch(e){ warn("keepsake:", e); }
       try { if (charFor(mn) && TRAP_SOUND_END[kind]) sound(mn, TRAP_SOUND_END[kind]); } catch(e){}   // ...and when it lets go   // the album card; toys go still or back how they were (10y6-keepers.js)
-      try { if (charFor(mn)) trapAfter(mn, kind, before); } catch(e){ warn("trap after:", e); }   // ranks, bets, bein' handed on (10y3-trap-ranks.js)   // (what they're left wearin': 10x-trap-extras.js)
+      try { if (charFor(mn)) trapAfter(mn, kind, before); } catch(e){ warn("trap after:", e); }
+      try { if (charFor(mn)) symbioteAfterTrap(mn, kind); } catch(e){ warn("trap symbiote:", e); }   // somethin' waitin' in it (10v4-symbiotes.js)   // ranks, bets, bein' handed on (10y3-trap-ranks.js)   // (what they're left wearin': 10x-trap-extras.js)
       trapFree(mn); saveLedger(); syncCompanions(true);
     };
     step();
@@ -370,7 +371,7 @@
         if (((wk === "tentacle" && parasiteKin(mn, now)) || Math.random() < Math.min(1, CFG.TENTACLE_CHANCE*nightX().water*dangerX(mn).chance*rankX(mn).water*(potionOn(mn, "tentaclemusk") ? CFG.MUSK_WATER_X : 1))) && !springTrap(mn, wk, here)){ r.trapAt = now; saveLedger(); }   // (three times as hungry after dark)
       }
     }
-    toyTick(); moreTrapTick(); trapExtrasTick(); farmGearTick(Date.now()); broodTick(); corruptionTick(); cursedTick(); keepersTick(); uddersTick();
+    toyTick(); moreTrapTick(); newTrapTick(); trapExtrasTick(); farmGearTick(Date.now()); broodTick(); corruptionTick(); cursedTick(); keepersTick(); uddersTick();
   }
 
   // ── toys that do things on their own ───────────────────────

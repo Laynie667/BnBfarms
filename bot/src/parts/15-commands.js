@@ -1166,6 +1166,7 @@
         try { unbench(sender, "safe"); } catch(e){ warn("safeword bench:", e); }   // off the use bench before anything else
         try { trapStop(sender); } catch(e){ warn("safeword trap:", e); }           // a trap lets go mid-scene, and they all stay quiet for an hour
         try { parasiteOff(sender, "safe"); } catch(e){ warn("safeword parasite:", e); }
+        try { symOff(sender, "safe"); } catch(e){ warn("safeword symbiote:", e); }
         say("🔴 PAUSE CALLED. Everything stops, right now, everybody.", true, sender);   // I go stand by them, so everyone near them hears it
         beep(sender, "I've got you, "+plainName(sender)+". Everything's stopped and I'm fetchin' somebody for you right now. You don't owe anybody an explanation. 🔴", true);
         notifyStaff("🔴 SAFEWORD from "+plainName(sender)+" ("+sender+"). Please go to them now.", false);
@@ -1558,6 +1559,7 @@ Welcome to B&B Farm, hon. 🌾`);
       case "bench": case "unbench": case "use": benchCommand(cmd, sender, args, R); break;
       case "subject": case "subjects": case "traps": case "trap": case "watersports": case "watersport": trapCommand(cmd === "watersport" ? "watersports" : cmd, sender, args, R); break;   // 10u-traps.js
       case "parasite": case "parasites": case "purge": parasiteCommand(cmd === "parasites" ? "parasite" : cmd, sender, args, R); break;   // 10v-parasite.js
+      case "symbiote": case "symbiotes": symbioteCommand(sender, args, R); break;   // 10v4-symbiotes.js
       case "quiet": case "tend": if (cmd !== "tend" || !bedTend(sender, args, R)) broodCommand(cmd, sender, args, R); break;   // 10y2-brood.js
       case "brood": case "bet": ranksCommand(cmd, sender, args, R); break;   // 10y3-trap-ranks.js
       case "cleanse": case "corruption": case "gauntlet": case "lend": case "bid": case "route": corruptionCommand(cmd, sender, args, R); break;   // 10y4-corruption.js

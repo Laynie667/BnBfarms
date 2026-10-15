@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm add-on: Map tools
 // @namespace    bnbfarm
-// @version      1.0.3
+// @version      1.0.4
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-map-tools.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-map-tools.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -23,7 +23,7 @@
 
 (() => {
   // addons/_lib/connect.js
-  var W = typeof unsafeWindow !== "undefined" && unsafeWindow ? unsafeWindow : window;
+  var W = typeof unsafeWindow !== "undefined" && unsafeWindow ? unsafeWindow : typeof window !== "undefined" ? window : globalThis;
   function connect(def) {
     let done = false;
     const go = () => {

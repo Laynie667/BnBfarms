@@ -268,8 +268,10 @@
     LAY_SCENE: true,             // layin' and birthin' play out in beats (false: the old single line)
     BELLY_SEEN_MIN: 20, SCENT_WAIT_MIN: 2, SCENT_CHANCE: 0.15,   // how often a belly gets noticed; how soon and how surely a scent brings somethin'
     MUSK_WATER_X: 20,            // Tentacle Musk: the thing in the water is this many times likelier to come
-    EGG_MAX: 150,                // the most eggs one body can carry (clutches stack)
-    GATHER_MAX_RIBBONS: 20,      // the most one layer is paid at one gatherin'
+    EGG_MAX: 400,                // the most eggs one body can carry (clutches stack; Laynie, Oct 15: 400)
+    LITRE_RIBBON_ML: 2000, LITRE_RIBBON_DAY: 3,   // milk pays a ribbon every 2 litres, 3 a day at most (Laynie, Oct 15: stingy)
+    BIRTH_RIBBON_PER: 2, BIRTH_RIBBON_MAX: 5,     // a birth pays a ribbon per 2 young (rounded up), 5 at most
+    GATHER_MAX_RIBBONS: 12,      // the most one layer is paid at one gatherin' (Laynie, Oct 15: stingy, 12)
     AUTOINJECT_MIN: 30, OVI_MIN: 45, AUTOFEED_MIN: 10, AUTOFEED_ML: 150, TOYCOCK_MIN: 12, TOYCOCK_STRETCH_EVERY: 10,
     SLOW_MAX: 2.6,               // the most a full belly, a litter and a clutch can slow somebody's walkin'
     PISS_COLOR: "#D9C13A",

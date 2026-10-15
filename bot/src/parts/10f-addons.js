@@ -80,7 +80,7 @@
     for (const a of ADDONS.values()){
       if (a.enabled === false || !a.lines || typeof a.lines[kind] !== "function") continue;
       const v = addonCall(a, "lines."+kind, a.lines[kind], info);
-      if (typeof v === "string" && v.trim()) return v.slice(0, 900);
+      if (typeof v === "string" && v.trim()) return fitTo(info && info.mn, v.slice(0, 900));   // fitted to whoever it's about
     }
     return null;
   }
@@ -105,7 +105,15 @@
   // stays in the bot.
   // a line an add-on says about somebody, fitted to the body they've got (10y9d-body-fit.js): a word for a part they
   // lack is swapped for one they have, and a {tag} on the front never shows. Every add-on gets this, old ones too.
-  const fitTo = (mn, t) => (mn && typeof mn === "number" && mn > 0 ? bodyWords(mn, t) : String(t).replace(BODY_TAG, ""));
+  // A tag anywhere in the line (an add-on puttin' "🔥 " in front of a fitted line, or joinin' fitted pieces) means it was
+  // written or fitted for the body already: the tags come off and nothin' is swapped.
+  const ANY_TAG = /\{(?:nv|nc|nt|fu|fb|ok|v|c|t|f|m)\}/g;
+  const untag = (t) => String(t).replace(ANY_TAG, "");
+  const fitTo = (mn, t) => {
+    const s = String(t);
+    if (s.search(ANY_TAG) >= 0 || !(mn && typeof mn === "number" && mn > 0)) return untag(s);
+    return bodyWords(mn, s);
+  };
   function addonApi(a){
     return Object.freeze({
       version: VERSION, cfg: CFG,   // (api.name is the name lookup below, not the add-on's name)
@@ -113,25 +121,28 @@
       log: (...x) => log("["+a.name+"]", ...x),
       audit: (by, action, detail) => audit(by, a.name.toUpperCase()+"_"+action, detail),
       // talkin'
-      say: (t, urgent, who) => say(t, urgent, who),
-      announce: (t, urgent) => announce(t, urgent),   // for the whole farm, even when it names somebody
+      say: (t, urgent, who) => say(untag(t), urgent, who),
+      announce: (t, urgent) => announce(untag(t), urgent),   // for the whole farm, even when it names somebody
       emote: (t, who) => emote(fitTo(who, t), who),
       whisper: (mn, t) => whisper(mn, fitTo(mn, t)),
       privateEmote: (mn, t) => privateLine(mn, fitTo(mn, t), "emote"),
       privateSay: (mn, t) => privateLine(mn, fitTo(mn, t), "chat"),
       // a "listen to my voice" line: purple and private in the Companion, an out-of-character whisper otherwise
-      voice: (mn, t) => hasCompanion(mn) ? enqueue(makeMsg("voice", { text: String(t) }, mn)) : whisper(mn, "[Voice] "+t),
+      voice: (mn, t) => hasCompanion(mn) ? enqueue(makeMsg("voice", { text: fitTo(mn, t) }, mn)) : whisper(mn, "[Voice] "+fitTo(mn, t)),
       tell: (mn, t) => tell(mn, fitTo(mn, t)),
       // a private note: the Companion if they have it, otherwise a beep (friends) or a whisper
       notice: (mn, t) => hasCompanion(mn) ? toCompanion(mn, fitTo(mn, t), "notice") : tell(mn, fitTo(mn, t)),
       // bodies, for writin' lines that fit (Laynie, Oct 14: "checking that they make sense via gender, equipped anatomy,
       // equipped items, species"): body(mn) → { g, vulva, cock, tits } · pickFor(mn, key, pool) picks a fresh line that
       // fits, honourin' {v} {nv} {c} {nc} {t} {nt} {f} {m} {fu} {fb} tags · fit(mn, text) swaps any word that doesn't
-      body: (mn) => bodyOf(mn), pickFor: (mn, key, pool) => pickFor(mn, a.name+":"+key, pool), fit: (mn, t) => fitTo(mn, t),
+      // fit(mn, text) comes back marked {ok}, so it can go to anybody (a line about one person, told to another) without
+      // bein' fitted to the wrong body · gear(mn) → what they've got on (10y9h-gear-sense.js) · noise(mn) → a sound their species makes
+      body: (mn) => bodyOf(mn), pickFor: (mn, key, pool) => pickFor(mn, a.name+":"+key, pool), fit: (mn, t) => "{ok}"+fitTo(mn, t), tags: 2,
+      gear: (mn) => gearSense(mn), noise: (mn) => { const s = STALL_SOUNDS[speciesKey(mn)] || STALL_SOUNDS.default; return s[Math.floor(Math.random()*s.length)]; },
       wears: (mn) => { try { return wornTags(mn); } catch(e){ return ""; } },
-      reply: (mn, t, ch) => reply(mn, t, ch),
+      reply: (mn, t, ch) => reply(mn, untag(t), ch),
       notifyStaff: (t, routine) => notifyStaff(t, routine),
-      ask: (mn, text, cb) => { addonAsks.set(mn, { addon:a.name, cb, at:Date.now() }); askCard(mn, a.name, text); },
+      ask: (mn, text, cb) => { addonAsks.set(mn, { addon:a.name, cb, at:Date.now() }); askCard(mn, a.name, untag(text)); },
       // people
       name: plainName, nameOnce: (text, mn) => nameOnce(text, mn), paint: (mn, area, by) => paintOn(mn, area, by), ribbons: (mn, n, why, award) => earnRibbons(mn, n, why, award ? CFG.BOT_MEMBER : undefined),   // award: a prize, past the daily cap
       // a load that landed somewhere outside the bot (a glory stall): tells every add-on, like the bot's own fills do

@@ -12,7 +12,7 @@
      • bodyTail(mn, kind): now and then a trap beat gets one more sentence about the parts they DO have: cock and
        balls, pussy, both, or a femboy's. Each named trap has its own, and there are shared ones.
   */
-  const BODY_TAG = /^(?:\{(?:nv|nc|nt|fu|fb|v|c|t|f|m)\})+/;
+  const BODY_TAG = /^(?:\{(?:nv|nc|nt|fu|fb|ok|v|c|t|f|m)\})+/;   // {ok}: already fitted (an add-on did it), leave it be
   const VULVA_WORDS = /\b(pussy|pussies|cunt|cunts|slit|womb|clit|cervix)\b/i;
   const TITS_WORDS = /\b(tits?|titties|breasts?|udders?|teats?|cleavage)\b/i;
   const GIRL_WORDS = /\b(girl|heifer|mare|broodmare)\b/i;

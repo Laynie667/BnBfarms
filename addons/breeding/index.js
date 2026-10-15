@@ -19,8 +19,9 @@
      a glory stall stranger). Each night from 9 pm the stud book is read out to the farm, and on the last
      night the most-bred dam is crowned (10 ribbons) along with the busiest stud (5 ribbons).
 */
-import { connect, pick, between, fill } from "../_lib/connect.js";
+import { connect, pick, between, fill, lineFor, gearOf, animalOf } from "../_lib/connect.js";
 import { MORE } from "./more-lines.js";
+import { MORE2 } from "./more-lines-2.js";
 import { pairsSetup, pairsBred, pairsCommands, pairsCards, PAIRS_GUIDE } from "./pairs.js";   // call a stud, mates for the day
 
 let api = null;
@@ -39,7 +40,7 @@ function along(p) { return p && p.preg ? Math.min(1, Math.max(0, (Date.now() - p
 const STAGES = [
   { at: 0, key: "early", label: "early days" },
   { at: 0.33, key: "showing", label: "showin'" },
-  { at: 0.66, key: "heavy", label: "heavy with the litter" },
+  { at: 0.66, key: "heavy", label: "heavy with it" },
   { at: 0.9, key: "nesting", label: "nestin'" },
 ];
 const stageOf = (f) => STAGES.filter((s) => f >= s.at).slice(-1)[0];
@@ -47,21 +48,21 @@ const bellySize = (f) => Math.min(5, 1 + Math.floor(f * 5));   // 1–5, for the
 
 const STAGE_LINES = {
   showing: { you: "🤰 Your belly's started to round out, %name%. Anybody lookin' can tell now.",
-    room: "%name%'s belly has started to round out, soft and unmistakable. The litter's showin'." },
-  heavy: { you: "🤰 You're heavy with it now, %name%: belly full and tight, the litter movin' inside you.",
-    room: "%name% is heavy with the litter now, belly big and tight, and they move a little slower for it." },
+    room: "%name%'s belly has started to round out, soft and unmistakable. They're showin'." },
+  heavy: { you: "🤰 You're heavy with it now, %name%: belly full and tight, %litter% movin' inside you.",
+    room: "%name% is heavy with %litter% now, belly big and tight, and they move a little slower for it." },
   nesting: { you: "🤰 You're nestin', %name%. Restless, achy, and wantin' a soft corner of straw. It won't be long.",
     room: "%name% is restless and nestin', pawing straw into a pile and lowering themselves into it with a groan. It won't be long now." },
 };
 const CRAVINGS = [
   "You're cravin' somethin' salty somethin' fierce, %name%.", "All you can think about is a big bowl of warm milk, %name%.",
-  "You'd do just about anything for somethin' sweet right now, %name%.", "You're achin' for a big, thick load, %name%. Funny what a litter does to you.",
-  "You want to be held and rubbed, %name%. Your belly especially.", "You're starvin', %name%. Eatin' for a whole litter now.",
+  "You'd do just about anything for somethin' sweet right now, %name%.", "You're achin' for a big, thick load, %name%. Funny what bein' bred does to you.",
+  "You want to be held and rubbed, %name%. Your belly especially.", "You're starvin', %name%. Eatin' for %eatin% now.",
 ];
 const KICKS = [
-  "%name%'s belly jumps as the litter kicks hard enough to see from across the pen.",
+  "%name%'s belly jumps with a kick hard enough to see from across the pen.",
   "A little foot pushes out against %name%'s tight belly, then rolls away. They gasp and rub the spot.",
-  "%name%'s whole belly shifts and rolls as the litter turns over. They stop and breathe through it.",
+  "%name%'s whole belly shifts and rolls as somethin' inside turns over. They stop and breathe through it.",
   "Something kicks %name% right in the ribs. They wince and laugh and press a hand to it.",
 ];
 const MIDWIFE = [
@@ -73,6 +74,15 @@ const RUTTY = [
   "%name% catches the smell of heat on the air and goes stiff and restless, nostrils flaring.",
   "%name% can't stop lookin' toward the scent of heat nearby. Their breathing's gone heavy.",
 ];
+
+// words for a line about somebody expectin': their kind's young, and how many (Oct 15: a cow carries a calf, not a litter)
+function words(mn, extra) {
+  const an = animalOf(api, mn), p = api.prod(mn), n = (p && p.preg && p.preg.count) || 1, young = an.young || ["little one", "little ones"];
+  const litter = "the " + (n > 1 ? young[1] : young[0]);
+  return Object.assign({ name: api.name(mn), litter, Litter: litter.charAt(0).toUpperCase() + litter.slice(1), eatin: n > 1 ? "a whole litter" : "two", a: an.a, young: young[0] }, extra || {});
+}
+// a line about them from a pool, picked to fit their body (and fresh), with the words filled in
+const lineAbout = (mn, pool, key, extra) => fill(lineFor(api, mn, pool, key), words(mn, extra));
 
 const isBreedWeek = (d = new Date()) => d.getDate() >= 15 && d.getDate() <= 21;
 const NIGHT_HOUR = 21;                       // the stud book is read out from 9 pm (the bot's clock)
@@ -93,16 +103,16 @@ function tick() {
     const st = stageOf(f);
     if (st.key !== x.stage && STAGE_LINES[st.key]) {
       x.stage = st.key;
-      api.notice(mn, fill(STAGE_LINES[st.key].you, { name: api.name(mn) }));
-      if (api.onMap(mn)) api.emote("🤰 " + fill(pick([STAGE_LINES[st.key].room].concat((MORE.STAGE_ROOM || {})[st.key] || [])), { name: api.name(mn) }), mn);
+      api.notice(mn, lineAbout(mn, [STAGE_LINES[st.key].you].concat(MORE2.STAGE_YOU[st.key] || []), "you:" + st.key));
+      if (api.onMap(mn)) api.emote("🤰 " + lineAbout(mn, [STAGE_LINES[st.key].room].concat((MORE.STAGE_ROOM || {})[st.key] || [], MORE2.STAGE_ROOM[st.key] || []), "room:" + st.key), mn);
       api.save();
     }
     if ((st.key === "showing" || st.key === "heavy") && now >= (x.craveAt || 0)) {
-      if (x.craveAt) api.notice(mn, "🤰 " + fill(pick(CRAVINGS), { name: api.name(mn) }));
+      if (x.craveAt) api.notice(mn, "🤰 " + lineAbout(mn, CRAVINGS, "crave"));
       x.craveAt = now + between(120, 240) * 60000;
     }
     if ((st.key === "heavy" || st.key === "nesting") && api.onMap(mn) && now >= (x.kickAt || 0)) {
-      if (x.kickAt) api.emote("🤰 " + fill(pick(KICKS), { name: api.name(mn) }), mn);
+      if (x.kickAt) api.emote("🤰 " + lineAbout(mn, KICKS, "kick"), mn);
       x.kickAt = now + between(20, 40) * 60000;
     }
   }
@@ -116,8 +126,9 @@ function bookingsTick(here) {
   for (const b of d.bookings) {
     if (b.told || !set.has(b.stud) || !set.has(b.dam) || !api.onMap(b.stud) || !api.onMap(b.dam)) continue;
     b.told = Date.now();
-    api.notice(b.stud, "🐂 Your booking with " + api.name(b.dam) + " is up, sugar. They're here. Head for the breeding stand.");
-    api.notice(b.dam, "🐄 " + api.name(b.stud) + " is here for your booking, sugar. Head for the breeding stand.");
+    const who = { dam: api.name(b.dam), stud: api.name(b.stud) };
+    api.notice(b.stud, fill(pick(MORE2.TIME_STUD), who));
+    api.notice(b.dam, fill(pick(MORE2.TIME_DAM), who));
     api.save();
   }
 }
@@ -138,8 +149,9 @@ function cmdBook(c) {
   d.seq = (d.seq || 0) + 1;
   d.bookings.push({ id: d.seq, stud, dam, by: sender, at: Date.now(), told: 0 });
   A.save(); A.audit(sender, "BOOK", stud + "x" + dam);
-  A.notice(stud, "🐂 You've been booked to breed " + A.name(dam) + ". I'll tell you when you're both on the farm.");
-  A.notice(dam, "🐄 You've been booked with " + A.name(stud) + ". I'll tell you when you're both on the farm.");
+  const who = { dam: A.name(dam), stud: A.name(stud) };
+  A.notice(stud, fill(pick(MORE2.BOOKED_STUD), who));
+  A.notice(dam, fill(pick(MORE2.BOOKED_DAM), who));
   c.reply("🐂 Booked: #" + d.seq + " " + A.name(stud) + " × " + A.name(dam) + ".");
 }
 const bookingsText = () => {
@@ -180,7 +192,7 @@ function breedWeekTick(here) {
     const sp = api.pos(stud);
     if (!sp || !inHeat.some((m) => { const q = api.pos(m); return q && Math.max(Math.abs(q.X - sp.X), Math.abs(q.Y - sp.Y)) <= 3; })) continue;
     d.scent[stud] = Date.now();
-    api.privateEmote(stud, fill(pick(RUTTY), { name: api.name(stud) }));
+    api.privateEmote(stud, lineAbout(stud, RUTTY, "rutty"));
   }
 }
 
@@ -202,8 +214,8 @@ const BRED_MARKS = {
     "Ten loads this season. The farm girl just shakes her head and hangs a whole bunch of ribbons on %name%'s gate."],
 };
 // more lines for the pools above (more-lines.js)
-CRAVINGS.push(...MORE.CRAVINGS); KICKS.push(...MORE.KICKS); MIDWIFE.push(...MORE.MIDWIFE); RUTTY.push(...MORE.RUTTY);
-for (const k of Object.keys(MORE.BRED_MARKS)) BRED_MARKS[k].push(...MORE.BRED_MARKS[k]);
+CRAVINGS.push(...MORE.CRAVINGS, ...MORE2.CRAVINGS); KICKS.push(...MORE.KICKS, ...MORE2.KICKS); MIDWIFE.push(...MORE.MIDWIFE, ...MORE2.MIDWIFE); RUTTY.push(...MORE.RUTTY, ...MORE2.RUTTY);
+for (const k of Object.keys(MORE.BRED_MARKS)) BRED_MARKS[k].push(...MORE.BRED_MARKS[k], ...(MORE2.BRED_MARKS[k] || []));
 function onBred(stud, dam, hole, mlIn, took) {
   // a pussy load, or an ass load in somebody carryin' that way (an mpreg item)
   const counts = hole === "vulva" || (hole === "butt" && api.mpregOn && api.mpregOn(dam));
@@ -214,7 +226,7 @@ function onBred(stud, dam, hole, mlIn, took) {
   if (stud > 0 && stud !== dam && D().optIn[stud]) w.covers[stud] = (w.covers[stud] || 0) + 1;
   api.save();
   const lines = BRED_MARKS[w.bred[dam]];
-  if (lines && api.onMap(dam)) api.later(() => api.emote("🔥 " + fill(pick(lines), { name: api.name(dam) }), dam), 6000);
+  if (lines && api.onMap(dam)) api.later(() => api.emote("🔥 " + lineAbout(dam, lines, "marks"), dam), 6000);
 }
 function rankList(o, n, unit) {
   return Object.entries(o).filter(([m]) => Number(m) > 0).sort((a, b) => b[1] - a[1]).slice(0, n)
@@ -269,7 +281,7 @@ function crownTick(here, lastNight) {
     (champ.stud ? ", and " + api.name(champ.stud) + " the busiest stud with " + champ.covers : "") + ". Ribbons for the winners! 🐂");
   if (api.ribbons) api.ribbons(champ.dam, PRIZE.dam, "bein' the most-bred of breedin' season", true);
   if (champ.stud && api.ribbons) api.ribbons(champ.stud, PRIZE.stud, "bein' the busiest stud of breedin' season", true);
-  if (api.onMap(champ.dam)) api.later(() => api.emote("👑 The farm girl pins a big blue rosette on " + api.name(champ.dam) + "'s collar: most bred of the season. Their belly's earned it.", champ.dam), 4000);
+  if (api.onMap(champ.dam)) api.later(() => api.emote(lineAbout(champ.dam, gearOf(api, champ.dam).collar ? MORE2.CROWN_COLLAR : MORE2.CROWN, "crown"), champ.dam), 4000);   // (on their collar only if they wear one)
   api.audit(api.cfg.BOT_MEMBER, "SEASON", w.month + " " + champ.dam + "x" + champ.times + (champ.stud ? " stud " + champ.stud + "x" + champ.covers : ""));
 }
 
@@ -282,7 +294,7 @@ function cmdMidwife(c) {
   const me = A.pos(sender), them = A.pos(t);
   if (!me || !them || Math.max(Math.abs(me.X - them.X), Math.abs(me.Y - them.Y)) > 1) return c.reply("Get right down next to " + A.name(t) + " to help, sugar.");
   p.labour.midwife = sender; A.save();
-  A.emote("🍼 " + fill(pick(MIDWIFE), { name: A.name(t), by: A.name(sender) }), t);
+  A.emote("🍼 " + lineAbout(t, MIDWIFE, "midwife", { by: A.name(sender) }), t);
 }
 function onBirth(mn) {
   const d = D(); delete d.preg[mn];
@@ -290,7 +302,7 @@ function onBirth(mn) {
   const m = d.lastMidwife && d.lastMidwife[mn];
   if (m) {
     api.staffPoints(m, 2, "midwife");
-    if (api.onMap(mn)) api.emote("🍼 " + api.name(m) + " cleans the newborns and tucks them against " + api.name(mn) + ", every one of them healthy. Good work, midwife.", mn);
+    if (api.onMap(mn)) api.emote(lineAbout(mn, MORE2.BIRTH_MIDWIFE, "born", { by: api.name(m) }), mn);
     delete d.lastMidwife[mn];
   }
   api.save();

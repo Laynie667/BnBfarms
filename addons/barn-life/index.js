@@ -16,8 +16,12 @@
    • Play and evenin' turn-out, for the herd to do with no staff around: see herd.js.
    • Milk-drunk: drinking somebody's milk (?nurse / nursing) makes you content, then sleepy, then
      milk-drunk. It wears off one step every 7 minutes. Richer milk (grade A) counts extra.
+   • Lines fit who's eatin' or bein' groomed (more-lines.js): their kind (a cow chews, a pig roots, a cat picks), their
+     hands (tied or pawed: face first into the trough), a gag (no eatin' till it's out; a funnel gets water poured
+     down it), and what they wear gets groomed too (latex polished, a harness oiled).
 */
-import { connect, pick, between, fill } from "../_lib/connect.js";
+import { connect, pick, between, fill, lineFor, gearOf, animalOf } from "../_lib/connect.js";
+import * as M from "./more-lines.js";
 import { herdSetup, herdTick, herdCommands, herdCards, HERD_GUIDE } from "./herd.js";   // play, and evenin' turn-out
 
 const FULL = 100;
@@ -68,6 +72,32 @@ const DRUNK_LINES = {
       "%name% wobbles on their feet, drunk on milk, a dreamy smile on their face and a dribble on their chin."],
 };
 
+EAT.push(...M.EAT); DRINK.push(...M.DRINK); GROOM.push(...M.GROOM);
+for (const k of Object.keys(M.REMIND)) REMIND[k].push(...M.REMIND[k]);
+for (const k of Object.keys(M.DRUNK_LINES)) DRUNK_LINES[k].push(...M.DRUNK_LINES[k]);
+// which pool, for who they are and what they've got on
+const kindOf = (mn) => animalOf(api, mn);
+const bound = (g) => !!(g.arms || g.paws || g.hands);
+function eatPool(mn, g) {
+  const k = M.EAT_KIND[kindOf(mn).key];
+  if (bound(g) && Math.random() < 0.7) return M.EAT_BOUND;
+  return k && Math.random() < 0.6 ? k : EAT;
+}
+function drinkPool(mn, g) {
+  if (api.funnelOn && api.funnelOn(mn)) return M.DRINK_FUNNEL;
+  const k = M.DRINK_KIND[kindOf(mn).key];
+  if (bound(g) && Math.random() < 0.7) return M.DRINK_BOUND;
+  return k && Math.random() < 0.5 ? k : DRINK;
+}
+function groomPool(mn) {
+  const g = gearOf(api, mn), on = Object.keys(M.GROOM_GEAR).filter((k) => g[k]), k = M.GROOM_KIND[kindOf(mn).key], r = Math.random();
+  if (on.length && r < 0.35) return M.GROOM_GEAR[pick(on)];
+  return k && r < 0.75 ? k : GROOM;
+}
+const words = (mn, extra) => Object.assign({ name: api.name(mn), a: kindOf(mn).a, call: kindOf(mn).call }, extra || {});
+// a mouth that's gagged shut can't eat or drink (a funnel can be poured into, but there's no chewin' through one)
+const mouthShut = (mn) => !!(api.holeBlocked && api.holeBlocked(mn, "mouth")) || !!gearOf(api, mn).gag;
+
 // ── needs over time ────────────────────────────────────────
 function tick() {
   if (D().farmOff) return;
@@ -93,7 +123,7 @@ function remind(mn, n) {
     const lvl = n[need] <= 10 ? 10 : n[need] <= 25 ? 25 : 0;
     if (!lvl || (n.warned[need] || 100) <= lvl) continue;
     n.warned[need] = lvl; n.said = Date.now();
-    api.notice(mn, (need === "water" ? "💧 " : need === "food" ? "🌾 " : "🪮 ") + fill(pick(REMIND[need]), { name: api.name(mn) }));
+    api.notice(mn, (need === "water" ? "💧 " : need === "food" ? "🌾 " : "🪮 ") + fill(lineFor(api, mn, REMIND[need], "remind:" + need), words(mn)));
     return;
   }
 }
@@ -107,8 +137,9 @@ function eat(mn, reply, how) {
   if (left <= 0) { api.notifyStaff("🌾 " + t + " is empty and " + api.name(mn) + " is hungry. ?refill " + t + " standing next to it.", true); return reply("The trough's licked clean, hon. I've told staff it needs fillin'."); }
   const n = needsOf(mn);
   if (n.food >= 95) return reply("You're stuffed already, sugar.");
+  if (mouthShut(mn) || (api.funnelOn && api.funnelOn(mn))) return reply("You can't eat with your mouth stopped up like that, sugar. Get somebody to take it out first.");
   d.troughs[t] = left - 1; n.food = Math.min(FULL, n.food + 50); n.warned.food = 100;
-  api.emote("🌾 " + fill(pick(EAT), { name: api.name(mn) }), mn);
+  api.emote("🌾 " + fill(lineFor(api, mn, eatPool(mn, gearOf(api, mn)), "eat"), words(mn)), mn);
   api.save();
   if (how !== "bowl") reply("🌾 Food " + Math.round(n.food) + "% · the trough has " + d.troughs[t] + " helpings left.");
 }
@@ -117,8 +148,9 @@ function drink(mn, reply, how) {
   if (!near(mn, "water")) return reply("You need to be at a water spot to drink, sugar (a spot called water-…).");
   const n = needsOf(mn);
   if (n.water >= 95) return reply("You're not thirsty right now, hon.");
+  if (mouthShut(mn)) return reply("You can't drink with your mouth stopped up like that, sugar. Get somebody to take it out first.");
   n.water = Math.min(FULL, n.water + 60); n.warned.water = 100;
-  api.emote("💧 " + fill(pick(DRINK), { name: api.name(mn) }), mn);
+  api.emote("💧 " + fill(lineFor(api, mn, drinkPool(mn, gearOf(api, mn)), "drink"), words(mn)), mn);
   api.save();
   if (how !== "bowl") reply("💧 Water " + Math.round(n.water) + "%.");
 }
@@ -131,7 +163,7 @@ function milkDrunk(milker, drinker, ml, grade) {
   x.lvl = Math.min(3, x.lvl + (/^A/.test(grade || "") || ml >= 150 ? 2 : 1)); x.t = Date.now();
   api.face(drinker, "milkdrunk", x.lvl * 7 * 60);
   if (x.lvl !== before) {
-    const line = fill(pick(DRUNK_LINES[x.lvl]), { name: api.name(drinker) });
+    const line = fill(lineFor(api, drinker, DRUNK_LINES[x.lvl], "drunk:" + x.lvl), words(drinker));
     if (x.lvl === 3) api.emote("🥛 " + line, drinker); else api.privateEmote(drinker, line);
   }
   api.save();
@@ -183,6 +215,7 @@ const GROOM_STOCK = [
   "%name% holds still and sighs while %by% grooms them, flank to flank, both of them warm and drowsy by the end.",
   "%by% combs through %name%'s hair with their fingers, then nuzzles behind an ear. %name%'s tail gives them away.",
 ];
+GROOM_STOCK.push(...M.GROOM_STOCK);
 function cmdGroom(c) {
   const { sender, args, api: A } = c;
   const t = A.find(args[0]);
@@ -194,7 +227,7 @@ function cmdGroom(c) {
   if (!me || !them || Math.max(Math.abs(me.X - them.X), Math.abs(me.Y - them.Y)) > 1) return c.reply("Get right up next to " + A.name(t) + " to groom 'em, hon.");
   const n = needsOf(t);
   n.groom = FULL; n.warned.groom = 100; if (A.isStaff(sender)) A.staffPoints(sender, 1, "groom"); A.save();
-  A.emote("🪮 " + fill(pick(A.isStaff(sender) ? GROOM : GROOM_STOCK), { name: A.name(t), by: A.name(sender) }), t);
+  A.emote("🪮 " + fill(lineFor(A, t, A.isStaff(sender) ? groomPool(t) : GROOM_STOCK, "groom"), words(t, { by: A.name(sender) })), t);
 }
 
 // ── production: fed and groomed stock milk better ──────────

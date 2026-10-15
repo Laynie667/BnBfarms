@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm add-on: Barn life
 // @namespace    bnbfarm
-// @version      1.0.5
+// @version      1.1.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-barn-life.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-barn-life.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -23,7 +23,7 @@
 
 (() => {
   // addons/_lib/connect.js
-  var W = typeof unsafeWindow !== "undefined" && unsafeWindow ? unsafeWindow : window;
+  var W = typeof unsafeWindow !== "undefined" && unsafeWindow ? unsafeWindow : typeof window !== "undefined" ? window : globalThis;
   function connect(def) {
     let done = false;
     const go = () => {
@@ -51,6 +51,286 @@
   }
   var pick = (list) => list[Math.floor(Math.random() * list.length)];
   var fill = (text, vars) => String(text).replace(/%(\w+)%/g, (m, k) => vars[k] !== void 0 ? vars[k] : m);
+  var TAG_ANY = /\{(?:nv|nc|nt|fu|fb|ok|v|c|t|f|m)\}/g;
+  var TAG_LEAD = /^((?:\{(?:nv|nc|nt|fu|fb|v|c|t|f|m)\})+)/;
+  var VULVA_W = /\b(pussy|pussies|cunt|cunts|slit|womb|clit|cervix)\b/i;
+  var TITS_W = /\b(tits?|titties|breasts?|udders?|teats?|cleavage)\b/i;
+  var GIRL_W = /\b(girl|heifer|mare|broodmare)\b/i;
+  var untag = (t) => String(t == null ? "" : t).replace(TAG_ANY, "");
+  var bodyOf = (api3, mn) => {
+    try {
+      return api3 && api3.body && mn ? api3.body(mn) : null;
+    } catch (e) {
+      return null;
+    }
+  };
+  var gearOf = (api3, mn) => {
+    try {
+      return api3 && api3.gear && mn && api3.gear(mn) || {};
+    } catch (e) {
+      return {};
+    }
+  };
+  function fits(line, b) {
+    const s = String(line), m = s.match(TAG_LEAD);
+    if (!b) return !m;
+    if (m) {
+      for (const t of m[1].slice(1, -1).split("}{")) {
+        if (t === "v" && !b.vulva || t === "nv" && b.vulva || t === "c" && !b.cock || t === "nc" && b.cock || t === "t" && !b.tits || t === "nt" && b.tits || t === "f" && b.g !== "female" || t === "m" && b.g !== "male" || t === "fu" && b.g !== "futa" || t === "fb" && b.g !== "femboy") return false;
+      }
+      return true;
+    }
+    if (!b.vulva && VULVA_W.test(s)) return false;
+    if (!b.tits && TITS_W.test(s)) return false;
+    if (b.g === "male" && GIRL_W.test(s)) return false;
+    return true;
+  }
+  function fitting(list, b) {
+    const ok = list.filter((l) => fits(l, b));
+    if (ok.length) return ok;
+    const plain = list.filter((l) => !TAG_LEAD.test(l));
+    return plain.length ? plain : list;
+  }
+  var pickFit = (list, b) => untag(pick(fitting(list, b)));
+  function lineFor(api3, mn, list, key) {
+    if (!Array.isArray(list) || !list.length) return "";
+    const b = bodyOf(api3, mn);
+    let t;
+    try {
+      t = key && api3 && api3.pickFor && api3.tags >= 2 ? untag(api3.pickFor(mn, key, list)) : pickFit(list, b);
+    } catch (e) {
+      t = pickFit(list, b);
+    }
+    return api3 && api3.fit && api3.tags >= 2 ? api3.fit(mn, t) : t;
+  }
+  var ANIMALS = {
+    cow: { f: "cow", m: "bull", young: ["calf", "calves"], call: "moo", sound: ["a low moo", "a soft, needy moo", "a long, shaky moo"] },
+    bull: { f: "cow", m: "bull", young: ["calf", "calves"], call: "snort", sound: ["a deep snort", "a low bellow", "a rumbling snort"] },
+    pony: { f: "pony", m: "pony", young: ["foal", "foals"], call: "whinny", sound: ["a breathy whinny", "a soft nicker", "a shaky little whinny"] },
+    horse: { f: "mare", m: "stallion", young: ["foal", "foals"], call: "whinny", sound: ["a breathy whinny", "a low nicker", "a long, trembling whinny"] },
+    deer: { f: "doe", m: "buck", young: ["fawn", "fawns"], call: "bleat", sound: ["a thin, wavering bleat", "a soft bleat"] },
+    pig: { f: "sow", m: "boar", young: ["piglet", "piglets"], call: "oink", sound: ["a needy little oink", "a soft grunt", "a squealing gasp"] },
+    pup: { f: "pup", m: "pup", young: ["pup", "pups"], call: "woof", sound: ["a high, needy whine", "a soft whimper", "a breathless yip"] },
+    dog: { f: "bitch", m: "dog", young: ["pup", "pups"], call: "woof", sound: ["a needy whine", "a low whimper", "a shaky yip"] },
+    kitt: { f: "kitty", m: "kitty", young: ["kitten", "kittens"], call: "mew", sound: ["a needy mewl", "a soft, broken purr", "a breathy mew"] },
+    cat: { f: "cat", m: "tom", young: ["kitten", "kittens"], call: "mew", sound: ["a needy mewl", "a rumbling purr", "a breathy mew"] },
+    goblin: { f: "goblin", m: "goblin", young: ["goblin brat", "goblin brats"], call: "cackle", sound: ["a ragged little cackle that turns into a moan", "a breathless giggle"] },
+    bunny: { f: "bunny", m: "bunny", young: ["kit", "kits"], call: "squeak", sound: ["a breathy squeak", "a soft little squeak", "a thump of one foot"] },
+    rabbit: { f: "doe", m: "buck", young: ["kit", "kits"], call: "squeak", sound: ["a breathy squeak", "a soft little squeak", "a thump of one foot"] },
+    fox: { f: "vixen", m: "fox", young: ["kit", "kits"], call: "yip", sound: ["a high yip", "a breathy little whine", "a sharp, startled yip"] },
+    wolf: { f: "wolf", m: "wolf", young: ["pup", "pups"], call: "howl", sound: ["a low, wavering howl", "a needy whine", "a rumbling growl"] },
+    goat: { f: "nanny", m: "billy", young: ["kid", "kids"], call: "bleat", sound: ["a shaky bleat", "a soft bleat", "a loud, startled bleat"] },
+    sheep: { f: "ewe", m: "ram", young: ["lamb", "lambs"], call: "baa", sound: ["a soft baa", "a trembling baa"] },
+    default: { f: "animal", m: "animal", young: ["little one", "little ones"], call: "moan", sound: ["a soft moan", "a needy whimper", "a shaky gasp"] }
+  };
+  function animalOf(api3, mn) {
+    let k = "default";
+    try {
+      k = api3 && api3.species && api3.species(mn) || "default";
+    } catch (e) {
+    }
+    const w = ANIMALS[k] || ANIMALS.default, b = bodyOf(api3, mn), male = !!(b && (b.g === "male" || b.g === "femboy"));
+    return { key: ANIMALS[k] ? k : "default", a: male ? w.m : w.f, young: w.young, call: w.call, sound: pick(w.sound), sounds: w.sound, male };
+  }
+
+  // addons/barn-life/more-lines.js
+  var EAT = [
+    "%name% gets their nose right down in the trough and doesn't come up till half of it's gone.",
+    "%name% eats noisily, a happy little grunt between mouthfuls.",
+    "%name% roots through the feed for the sweet bits, scattering the rest all over the floor.",
+    "%name% stands at the trough chewin' slow and steady, like the good farm %a% they are.",
+    "%name% eats till their belly's round and tight, then has just one more mouthful."
+  ];
+  var EAT_KIND = {
+    cow: [
+      "%name% pulls a big mouthful of hay from the trough and chews it slow, jaw goin' round and round like a proper cow.",
+      "%name% grazes at the trough, lowin' softly between mouthfuls, tail flickin'.",
+      "%name% chews and chews and chews, dreamy-eyed, then goes back for more."
+    ],
+    horse: [
+      "%name% lips at the oats in the trough, snufflin' for the sweetest ones, and crunches them up.",
+      "%name% buries their nose in the hay net and tugs out a mouthful, chewin' with a contented snort.",
+      "%name% stamps once at the trough, impatient, then gets their face in the feed."
+    ],
+    pig: [
+      "%name% snuffles and snorts through the trough, nose first, slop all up their cheeks.",
+      "%name% roots through the feed like there's a truffle at the bottom, gruntin' happily.",
+      "%name% eats like a proper pig, loud and messy and delighted about it."
+    ],
+    dog: [
+      "%name% wolfs the feed down in about four seconds flat, then licks the trough clean.",
+      "%name% eats with their whole face, tail goin', and looks up hopeful for seconds.",
+      "%name% gulps their food so fast they have to stop for a little cough, then dives back in."
+    ],
+    cat: [
+      "%name% eats daintily from the very edge of the trough, one fussy mouthful at a time.",
+      "%name% sniffs every bit of the feed before decidin' it's acceptable, then eats it all.",
+      "%name% picks at the trough, pausin' to lick their lips, unhurried and particular."
+    ],
+    bunny: [
+      "%name% nibbles at the greens in the trough, nose twitchin', little bites, very fast.",
+      "%name% munches a whole leaf from one end to the other without stoppin'."
+    ],
+    goat: [
+      "%name% eats the feed, a corner of the trough sign and a bit of somebody's sleeve.",
+      "%name% headbutts the trough, gets what falls out, and chews it with great satisfaction."
+    ],
+    deer: [
+      "%name% eats in quick, nervous little bites, lookin' up between every one.",
+      "%name% nibbles at the feed delicately, ears flickin' at every sound in the barn."
+    ],
+    goblin: [
+      "%name% eats with both hands and no manners, grinnin' through a mouthful.",
+      "%name% stuffs their pockets with feed for later, then eats what's left."
+    ]
+  };
+  var EAT_BOUND = [
+    "With no hands to help, %name% has to push their whole face into the trough and eat like stock.",
+    "%name% kneels and eats straight from the trough, hands useless, feed sticking to their chin and cheeks.",
+    "Their hands are no good to them, so %name% noses the feed into a pile and gobbles it face-first."
+  ];
+  var DRINK = [
+    "%name% drinks long and greedy, throat bobbin', and comes up gasping and dripping.",
+    "%name% laps at the water, quick and noisy, till their chin and chest are soaked.",
+    "%name% sucks the water up in long pulls, eyes closed, sighing between gulps.",
+    "%name% dunks their whole face in, blows bubbles, and drinks."
+  ];
+  var DRINK_KIND = {
+    cow: ["%name% drinks in long, slow pulls, like a cow at the pond, water runnin' off their chin."],
+    horse: ["%name% plunges their muzzle in and drinks deep, ears flickin', then blows out a snort that splashes everywhere."],
+    pig: ["%name% slurps at the water trough, then flops in it a little to cool off."],
+    dog: ["%name% laps at the water so fast and sloppy that most of it ends up on the floor."],
+    cat: ["%name% laps delicately at the very edge of the water, then shakes a drop off their nose with disgust."],
+    bunny: ["%name% takes quick little sips, nose wigglin', and keeps an eye out the whole time."],
+    goat: ["%name% drinks, then tries to climb into the water trough. It's a goat thing."]
+  };
+  var DRINK_BOUND = [
+    "No hands, so %name% gets down and laps from the water trough like any animal would.",
+    "%name% kneels at the water and drinks face-first, water drippin' off their nose and chin."
+  ];
+  var DRINK_FUNNEL = [
+    "A farmhand tips a ladle of water into %name%'s funnel, and they swallow it down, eyes watering.",
+    "%name% stands by the water while someone pours it down their funnel for them, a gurgle at a time."
+  ];
+  var GROOM = [
+    "%by% brushes %name% from neck to tail, slow and thorough, until they're glossy and sighing.",
+    "%by% picks the straw out of %name%'s hair, one bit at a time, humming while they work.",
+    "%by% works a soft brush in circles down %name%'s back, and %name% leans so hard into it they nearly fall over.",
+    "%by% gives %name% a wipe down with a warm damp cloth, then a brush, then a pat. Show ready.",
+    "%by% combs %name%'s hair out smooth and checks them over, ears to hooves."
+  ];
+  var GROOM_KIND = {
+    cow: [
+      "%by% curries %name%'s flanks in big circles, raisin' the dust, then brushes them down smooth. %name% lows happily.",
+      "%by% brushes %name% down like a show cow, then fluffs the tuft of their tail."
+    ],
+    horse: [
+      "%by% brushes %name%'s mane out and braids it neat, then works through their tail till it shines.",
+      "%by% curries %name% down, picks out their hooves and finishes with a soft brush. %name% nickers."
+    ],
+    dog: [
+      "%by% brushes %name% all over, and %name% rolls onto their back for the belly. They get the belly.",
+      "%by% gives %name% a good brushin' and a scratch behind the ears, and %name%'s whole back end wiggles."
+    ],
+    cat: [
+      "%by% strokes a soft brush down %name%'s back, and %name% purrs and pushes up into every stroke.",
+      "%by% brushes %name% just the way they like it, and gets a slow blink for their trouble."
+    ],
+    pig: [
+      "%by% scrubs %name% down with a stiff brush and a bucket of warm water, and %name% grunts happily.",
+      "%by% scratches %name% behind the ears with the brush, and %name% leans in and groans."
+    ],
+    bunny: ["%by% brushes %name% out till they're fluffy as a dandelion, and their nose twitches in thanks."],
+    sheep: ["%by% fluffs up %name%'s wool, picks out the burrs, and gives them a pat on the rump."],
+    goat: ["%by% brushes %name% and gets nibbled for their trouble. %name% looks very pleased with themselves."]
+  };
+  var GROOM_GEAR = {
+    latex: ["%by% polishes %name%'s latex with a soft cloth until it shines like a wet apple.", "%by% wipes %name%'s rubber down and buffs it to a gleam, and %name% squeaks."],
+    collar: ["%by% unbuckles %name%'s collar, brushes underneath it, and buckles it back, snug."],
+    harness: ["%by% checks every strap of %name%'s harness, oils the leather and tightens it a hole."],
+    hooves: ["%by% picks out %name%'s hooves one at a time and gives them a polish."],
+    bell: ["%by% gives %name%'s bell a polish too, and it rings bright when they're done."],
+    tail: ["%by% brushes %name%'s tail out long and smooth."]
+  };
+  var GROOM_STOCK = [
+    "%by% grooms %name% the way herd animals do: nose to neck, slow, with little nibbles at the itchy places.",
+    "%by% leans into %name% and rubs their cheek along %name%'s shoulder, groomin' and claimin' all at once.",
+    "%by% licks a stubborn patch of %name%'s hair flat, then nuzzles it for good measure.",
+    "%name% and %by% take turns groomin' each other, and both end up drowsy and leanin' together."
+  ];
+  var REMIND = {
+    food: [
+      "Your belly's rumblin', %name%. Find a trough before you start chewin' the fence.",
+      "You're peckish, %name%. The feed won't eat itself.",
+      "Somethin' smells good at the trough, %name%, and your belly's noticed."
+    ],
+    water: [
+      "Your lips are dry, %name%. Get yourself to the water.",
+      "You're parched, %name%. A long drink would fix you right up.",
+      "You've been workin' up a thirst, %name%. The water's waitin'."
+    ],
+    groom: ["You're a tangle of straw and mud, %name%. Ask somebody for a brushin'.", "You're lookin' rumpled, %name%. A groom would perk you right up."]
+  };
+  var DRUNK_LINES = {
+    1: [
+      "Warm milk settles in %name%'s belly, and they sigh, soft and pleased.",
+      "%name% licks the last of the milk off their lips, warm all the way through.",
+      "%name% goes a little pink and a lot content, a hand on their full belly."
+    ],
+    2: [
+      "%name% sways where they stand, eyes half shut, belly warm and full of milk.",
+      "%name% yawns a big, jaw-crackin' yawn and leans on the nearest post.",
+      "%name% has gone soft and slow and smiley, like a calf after a good feed."
+    ],
+    3: [
+      "%name% is milk-drunk and proud of it: wobbly, giggly, and lookin' for somebody to lean on.",
+      "%name% hiccups, giggles, and sits down in the straw very suddenly, drunk on milk.",
+      "%name% is so full of warm milk they've gone boneless, smilin' at nothin' with a dribble on their chin."
+    ]
+  };
+  var ROMP = [
+    [
+      "%a% crouches low, eyes bright, and pounces on %b% with a happy noise.",
+      "The two of them roll across the straw, kickin' up a cloud of it, laughin' and squirmin'.",
+      "%w% comes out on top, straw in their hair, sittin' on %l% like a prize."
+    ],
+    [
+      "%a% sneaks up on %b% and nips their ear, then bolts.",
+      "%b% gives chase round the hay bales, and the pair of them go crashin' through a pile of straw.",
+      "%w% catches %l% by the ankle, and %l% goes down in a heap, laughin' too hard to get up."
+    ],
+    [
+      "%a% and %b% lock shoulders and push, digging in, neither willing to give an inch.",
+      "They shove back and forth across the pen, snortin' and grinnin', until somebody's feet slip.",
+      "%w% shoves %l% right into the hay pile and stands over them, very pleased."
+    ],
+    [
+      "%b% flops down in the straw and %a% flops right on top of them.",
+      "There's a lot of wigglin' and tickling and squealin', and straw goes everywhere.",
+      "%l% ends up pinned and tickled breathless, %w% grinnin' down at them."
+    ]
+  ];
+  var RPS_FORFEIT = [
+    "%l% has to %lcall% for %w%, loud enough for the whole barn to hear.",
+    "%l% carries %w%'s feed bucket for the rest of the day. Them's the rules.",
+    "%w% gets a piggyback from %l% to the water trough and back.",
+    "%l% has to let %w% pick the straw out of their hair, slow, in front of everybody.",
+    "%l% gives %w% a nuzzle and a groom, and has to say thank you after.",
+    "%w% gets %l%'s spot by the warm wall tonight."
+  ];
+  var TURNOUT_CALL = [
+    "\u{1F514} There goes the turn-out bell! Pasture, y'all: ten minutes, and a ribbon for every one of you who comes out.",
+    "\u{1F514} Ding-a-ling! Evenin' turn-out. The grass is sweet and the sky's goin' pink. Ten minutes to get out there."
+  ];
+  var TURNOUT_SCENE = [
+    "\u{1F33E} %names% spill out into the pasture together, kick up their heels in the evenin' air, and settle down to graze side by side.",
+    "\u{1F33E} The herd's out: %names%, noses in the grass, the last of the sun warm on their backs.",
+    "\u{1F33E} %names% wander out to the pasture, and somebody starts a game of chase that nobody finishes. Then they all lie down in a heap."
+  ];
+  var TURNOUT_ALONE = [
+    "\u{1F33E} %names% has the pasture all to themselves tonight: a good roll in the grass, a long look at the sunset, and a ribbon.",
+    "\u{1F33E} Just %names% out in the evenin' pasture, grazin' quiet under a pink sky. A ribbon for turnin' out."
+  ];
 
   // addons/barn-life/herd.js
   var api = null;
@@ -82,7 +362,7 @@
     const p = api.pos(a), q = api.pos(b);
     return !!(p && q && Math.max(Math.abs(p.X - q.X), Math.abs(p.Y - q.Y)) <= (reach || 2));
   };
-  var ROMP = [
+  var ROMP2 = [
     [
       "%a% drops their shoulders, rump in the air, and bounces at %b%. It's on.",
       "%a% and %b% go tumbling through the straw, a tangle of limbs and tails, each tryin' to pin the other.",
@@ -91,7 +371,7 @@
     [
       "%a% nips at %b%'s flank and bolts. %b% is after them before the straw settles.",
       "Round the pen they go, %b% gainin', till the pair of them go down in a heap by the fence.",
-      "%w% sits right on %l%'s back and won't budge till they cry uncle. Or moo."
+      "%w% sits right on %l%'s back and won't budge till they cry uncle. Or %lcall%."
     ],
     [
       "%a% butts their head into %b%'s shoulder, playful, askin' for trouble.",
@@ -104,8 +384,8 @@
       "The hay snaps. %w% gets the bigger half and prances a victory lap round %l%."
     ]
   ];
-  var RPS_FORFEIT = [
-    "%l% has to moo for %w%, loud enough for the barn to hear.",
+  var RPS_FORFEIT2 = [
+    "%l% has to %lcall% for %w%, loud enough for the barn to hear.",
     "%w% gets to pin %l% and lick their face clean, ear to ear.",
     "%l% carries %w%'s pride around all day: loser grooms the winner. Get to it.",
     "%w% claims a forfeit: %l% kneels and nuzzles their hand like good stock.",
@@ -113,19 +393,25 @@
     "%l% owes %w% a belly rub. A long one."
   ];
   var BEATS = { rock: "scissors", scissors: "paper", paper: "rock" };
-  var TURNOUT_CALL = [
+  var TURNOUT_CALL2 = [
     "\u{1F514} Evenin' turn-out! The bell's ringin', y'all. Come on out to the pasture: ten minutes, and there's a ribbon for everybody who shows.",
     "\u{1F514} That's the turn-out bell. Everybody out to the pasture for the evenin'. Ten minutes, and a ribbon if you make it.",
     "\u{1F514} Clang, clang! Turn-out time. Stretch your legs in the pasture, sweet things. Ten minutes."
   ];
-  var TURNOUT_SCENE = [
+  var TURNOUT_SCENE2 = [
     "\u{1F33E} The herd's out for the evenin': %names% graze shoulder to shoulder as the light goes gold, tails flickin', nobody in any hurry.",
     "\u{1F33E} Turn-out. %names% settle into the pasture together, nosin' the grass and each other, warm flanks touchin' as the sun goes down.",
     "\u{1F33E} %names% amble out under the evenin' sky and bunch up the way a herd does, chewin' slow, one of them already half asleep on another's shoulder."
   ];
-  var TURNOUT_ALONE = [
+  var TURNOUT_ALONE2 = [
     "\u{1F33E} %names% has the whole pasture to themselves this evenin', and makes the most of it: a long stretch, a roll in the grass, and a ribbon for showin' up."
   ];
+  ROMP2.push(...ROMP);
+  RPS_FORFEIT2.push(...RPS_FORFEIT);
+  TURNOUT_CALL2.push(...TURNOUT_CALL);
+  TURNOUT_SCENE2.push(...TURNOUT_SCENE);
+  TURNOUT_ALONE2.push(...TURNOUT_ALONE);
+  var callOf = (mn) => animalOf(api, mn).call;
   function allowed(a, b) {
     const u = H().ok[b + ":" + a];
     return !!(u && u > Date.now());
@@ -146,9 +432,9 @@
       for (const m of [a, b]) api.notice(m, "\u{1F3C1} Race! First to stand on " + spot + " wins. Run, sugar!");
       return;
     }
-    const [w, l] = Math.random() < 0.5 ? [a, b] : [b, a], beats = pick(ROMP);
+    const [w, l] = Math.random() < 0.5 ? [a, b] : [b, a], beats = pick(ROMP2);
     beats.forEach((t, i) => api.later(() => {
-      if (api.onMap(a) && api.onMap(b)) api.emote("\u{1F43E} " + fill(t, { a: N(a), b: N(b), w: N(w), l: N(l) }), a);
+      if (api.onMap(a) && api.onMap(b)) api.emote("\u{1F43E} " + fill(t, { a: N(a), b: N(b), w: N(w), l: N(l), lcall: callOf(l) }), a);
     }, i * 9e3));
     api.later(() => won(w, l, "romp"), beats.length * 9e3);
   }
@@ -206,7 +492,7 @@
     }
     if (pa === pb) return api.emote("\u270A " + N(g.a) + " and " + N(g.b) + " both throw " + pa + ". A draw! They eye each other. Best go again.", g.a);
     const [w, l, pw, pl] = BEATS[pa] === pb ? [g.a, g.b, pa, pb] : [g.b, g.a, pb, pa];
-    api.emote("\u270A " + N(w) + " throws " + pw + ", " + N(l) + " throws " + pl + ". " + N(w) + " wins! " + fill(pick(RPS_FORFEIT), { w: N(w), l: N(l) }), w);
+    api.emote("\u270A " + N(w) + " throws " + pw + ", " + N(l) + " throws " + pl + ". " + N(w) + " wins! " + fill(pick(RPS_FORFEIT2), { w: N(w), l: N(l), lcall: callOf(l) }), w);
     won(w, l, "rps");
   }
   var pastureSpot = () => Object.keys(api.spots()).find((s) => /^(pasture|turnout)/.test(s)) || null;
@@ -217,7 +503,7 @@
     h.bell.until = Date.now() + 10 * 6e4;
     h.bell.spot = spot;
     api.save();
-    const line = pick(TURNOUT_CALL);
+    const line = pick(TURNOUT_CALL2);
     for (const mn of api.here()) if (onBooks(mn)) api.notice(mn, line);
     return true;
   }
@@ -228,7 +514,7 @@
     const there = api.here().filter((mn) => onBooks(mn) && api.onSpot(mn, spot, 4));
     if (!there.length) return;
     const N = there.map(api.name), names = N.length === 1 ? N[0] : N.slice(0, -1).join(", ") + " and " + N[N.length - 1];
-    api.emote(fill(pick(there.length === 1 ? TURNOUT_ALONE : TURNOUT_SCENE), { names }).replace("%names%", names), there[0]);
+    api.emote(fill(pick(there.length === 1 ? TURNOUT_ALONE2 : TURNOUT_SCENE2), { names }).replace("%names%", names), there[0]);
     for (const mn of there) {
       if (api.ribbons) api.ribbons(mn, 1, "comin' out for evenin' turn-out");
       if (isOn(mn)) {
@@ -317,27 +603,27 @@
     return d.needs[mn] = d.needs[mn] || { food: FULL, water: FULL, groom: FULL, t: Date.now(), warned: {}, said: 0 };
   }
   var near = (mn, prefix) => Object.keys(api2.spots()).find((n) => n.startsWith(prefix) && api2.onSpot(mn, n, 1)) || null;
-  var EAT = [
+  var EAT2 = [
     "%name% buries their face in the trough and eats like they haven't seen food in days, chewing noisily.",
     "%name% noses through the feed at the trough, picking out the best bits before gobbling the rest.",
     "%name% kneels at the trough and eats without using their hands, crumbs all over their chin."
   ];
-  var DRINK = [
+  var DRINK2 = [
     "%name% laps at the water trough, slurping loudly until their chin is dripping.",
     "%name% dunks their face in the water and drinks long and deep, coming up gasping.",
     "%name% drinks greedily from the water trough, splashing half of it down their chest."
   ];
-  var GROOM = [
+  var GROOM2 = [
     "%by% brushes %name% down with long, firm strokes, working the tangles out until they're glossy and sighing.",
     "%by% curries %name% from neck to tail, then smooths them down with a soft brush. %name% leans into every stroke.",
     "%by% gives %name% a proper grooming: brushed, wiped down and checked over, ready for show."
   ];
-  var REMIND = {
+  var REMIND2 = {
     food: ["Your tummy rumbles, %name%. The trough's waitin'.", "You're gettin' mighty hungry, %name%. Go eat at the trough."],
     water: ["Your mouth's gone dry, %name%. Get to the water.", "You're thirsty, %name%. The water trough never runs dry."],
     groom: ["You're lookin' scruffy, %name%. Ask a farmhand for a brushin'."]
   };
-  var DRUNK_LINES = {
+  var DRUNK_LINES2 = {
     1: ["A warm, content feeling spreads through %name%'s belly. They lick their lips, wanting more."],
     2: [
       "%name%'s eyelids droop. Full of warm milk, they sway a little where they stand, sleepy and soft.",
@@ -348,6 +634,31 @@
       "%name% wobbles on their feet, drunk on milk, a dreamy smile on their face and a dribble on their chin."
     ]
   };
+  EAT2.push(...EAT);
+  DRINK2.push(...DRINK);
+  GROOM2.push(...GROOM);
+  for (const k of Object.keys(REMIND)) REMIND2[k].push(...REMIND[k]);
+  for (const k of Object.keys(DRUNK_LINES)) DRUNK_LINES2[k].push(...DRUNK_LINES[k]);
+  var kindOf = (mn) => animalOf(api2, mn);
+  var bound = (g) => !!(g.arms || g.paws || g.hands);
+  function eatPool(mn, g) {
+    const k = EAT_KIND[kindOf(mn).key];
+    if (bound(g) && Math.random() < 0.7) return EAT_BOUND;
+    return k && Math.random() < 0.6 ? k : EAT2;
+  }
+  function drinkPool(mn, g) {
+    if (api2.funnelOn && api2.funnelOn(mn)) return DRINK_FUNNEL;
+    const k = DRINK_KIND[kindOf(mn).key];
+    if (bound(g) && Math.random() < 0.7) return DRINK_BOUND;
+    return k && Math.random() < 0.5 ? k : DRINK2;
+  }
+  function groomPool(mn) {
+    const g = gearOf(api2, mn), on2 = Object.keys(GROOM_GEAR).filter((k2) => g[k2]), k = GROOM_KIND[kindOf(mn).key], r = Math.random();
+    if (on2.length && r < 0.35) return GROOM_GEAR[pick(on2)];
+    return k && r < 0.75 ? k : GROOM2;
+  }
+  var words = (mn, extra) => Object.assign({ name: api2.name(mn), a: kindOf(mn).a, call: kindOf(mn).call }, extra || {});
+  var mouthShut = (mn) => !!(api2.holeBlocked && api2.holeBlocked(mn, "mouth")) || !!gearOf(api2, mn).gag;
   function tick() {
     if (D2().farmOff) return;
     const now = Date.now(), here = new Set(api2.here());
@@ -380,7 +691,7 @@
       if (!lvl || (n.warned[need] || 100) <= lvl) continue;
       n.warned[need] = lvl;
       n.said = Date.now();
-      api2.notice(mn, (need === "water" ? "\u{1F4A7} " : need === "food" ? "\u{1F33E} " : "\u{1FAAE} ") + fill(pick(REMIND[need]), { name: api2.name(mn) }));
+      api2.notice(mn, (need === "water" ? "\u{1F4A7} " : need === "food" ? "\u{1F33E} " : "\u{1FAAE} ") + fill(lineFor(api2, mn, REMIND2[need], "remind:" + need), words(mn)));
       return;
     }
   }
@@ -395,10 +706,11 @@
     }
     const n = needsOf2(mn);
     if (n.food >= 95) return reply("You're stuffed already, sugar.");
+    if (mouthShut(mn) || api2.funnelOn && api2.funnelOn(mn)) return reply("You can't eat with your mouth stopped up like that, sugar. Get somebody to take it out first.");
     d.troughs[t] = left - 1;
     n.food = Math.min(FULL, n.food + 50);
     n.warned.food = 100;
-    api2.emote("\u{1F33E} " + fill(pick(EAT), { name: api2.name(mn) }), mn);
+    api2.emote("\u{1F33E} " + fill(lineFor(api2, mn, eatPool(mn, gearOf(api2, mn)), "eat"), words(mn)), mn);
     api2.save();
     if (how !== "bowl") reply("\u{1F33E} Food " + Math.round(n.food) + "% \xB7 the trough has " + d.troughs[t] + " helpings left.");
   }
@@ -407,9 +719,10 @@
     if (!near(mn, "water")) return reply("You need to be at a water spot to drink, sugar (a spot called water-\u2026).");
     const n = needsOf2(mn);
     if (n.water >= 95) return reply("You're not thirsty right now, hon.");
+    if (mouthShut(mn)) return reply("You can't drink with your mouth stopped up like that, sugar. Get somebody to take it out first.");
     n.water = Math.min(FULL, n.water + 60);
     n.warned.water = 100;
-    api2.emote("\u{1F4A7} " + fill(pick(DRINK), { name: api2.name(mn) }), mn);
+    api2.emote("\u{1F4A7} " + fill(lineFor(api2, mn, drinkPool(mn, gearOf(api2, mn)), "drink"), words(mn)), mn);
     api2.save();
     if (how !== "bowl") reply("\u{1F4A7} Water " + Math.round(n.water) + "%.");
   }
@@ -421,7 +734,7 @@
     x.t = Date.now();
     api2.face(drinker, "milkdrunk", x.lvl * 7 * 60);
     if (x.lvl !== before) {
-      const line = fill(pick(DRUNK_LINES[x.lvl]), { name: api2.name(drinker) });
+      const line = fill(lineFor(api2, drinker, DRUNK_LINES2[x.lvl], "drunk:" + x.lvl), words(drinker));
       if (x.lvl === 3) api2.emote("\u{1F95B} " + line, drinker);
       else api2.privateEmote(drinker, line);
     }
@@ -468,13 +781,14 @@
     A.save();
     A.emote("\u{1F33E} " + A.name(sender) + " hauls a sack over and fills " + t + " to the brim with fresh feed.", sender);
   }
-  var GROOM_STOCK = [
+  var GROOM_STOCK2 = [
     "%by% nuzzles in close and grooms %name% from ears to rump, slow and thorough, till their coat lies smooth.",
     "%by% licks and nibbles along %name%'s neck and shoulders, groomin' them the way stock do. %name% leans into it.",
     "%by% works over %name% with tongue and teeth and nose, pickin' out the straw, and doesn't skip the good spots.",
     "%name% holds still and sighs while %by% grooms them, flank to flank, both of them warm and drowsy by the end.",
     "%by% combs through %name%'s hair with their fingers, then nuzzles behind an ear. %name%'s tail gives them away."
   ];
+  GROOM_STOCK2.push(...GROOM_STOCK);
   function cmdGroom(c) {
     const { sender, args, api: A } = c;
     const t = A.find(args[0]);
@@ -489,7 +803,7 @@
     n.warned.groom = 100;
     if (A.isStaff(sender)) A.staffPoints(sender, 1, "groom");
     A.save();
-    A.emote("\u{1FAAE} " + fill(pick(A.isStaff(sender) ? GROOM : GROOM_STOCK), { name: A.name(t), by: A.name(sender) }), t);
+    A.emote("\u{1FAAE} " + fill(lineFor(A, t, A.isStaff(sender) ? groomPool(t) : GROOM_STOCK2, "groom"), words(t, { by: A.name(sender) })), t);
   }
   function rate(mn) {
     if (!on(mn)) return 1;

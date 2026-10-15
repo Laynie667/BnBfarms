@@ -15,8 +15,12 @@
      and the nickname the session uses gets more animal with each tier (more degrading for people with
      ?degrade on, sweeter for ?praise on).
    • ?wake ends a session at once, and so does ?safe (everything stops).
+   • Every session takes a fresh handful of lines from each part, in order (more-lines.js has the extra ones), so no
+     two read the same. The words fit them: a male cow is a bull, a stallion not a mare; udders only for somebody with
+     tits; and a line or two is about what they're wearin' (a collar, a bell, paws, a gag, latex…).
 */
-import { connect, pick, between, fill } from "../_lib/connect.js";
+import { connect, pick, between, fill, fitting, untag, bodyOf, gearOf } from "../_lib/connect.js";
+import { SPECIES_MORE, MALE, UDDER_KINDS, SCRIPT_MORE, GEAR_SUGGEST } from "./more-lines.js";
 
 // words for each species; anything unknown uses "default"
 const SPECIES = {
@@ -33,6 +37,7 @@ const SPECIES = {
   sheep:   { a: "lamb",  s: "baa",    p: "soft fleece",       act: "follow the flock",   pose: "on all fours, head low",          names: ["sweet lamb", "farm lamb", "flock ewe", "dumb sheep"] },
   default: { a: "animal", s: "low animal sound", p: "body",   act: "obey",               pose: "kneeling, hands on your thighs", names: ["good animal", "farm animal", "livestock", "dumb livestock"] },
 };
+Object.assign(SPECIES, SPECIES_MORE);
 const LEVELS = ["fun", "deep", "nhl"];
 const LEVEL_NAME = { fun: "Fun", deep: "Deep", nhl: "No human left" };
 const MILESTONES = [3, 7, 15, 30];
@@ -66,7 +71,7 @@ const SCRIPT = {
     deep: ["Only my voice matters now. Other voices are just noise in the barn.",
            "Feel the heat building low in your belly. Let it build. You don't get to finish. You just ache, and it feels like being good.",
            "When I tell you to, you'll {s}. Not words. Just a {s}. Go on. Let it out.",
-           "Your {p} belong to the farm. You feel that every time someone looks at you.",
+           "Every bit of you belongs to the farm, your {p} most of all. You feel that every time someone looks at you.",
            "You {act} because it's what you're for. It's not a choice, and that's a relief."],
     nhl: ["There's no human left in here. Just a {a}, {pose}, waiting for its handler.",
           "Clothes don't feel like clothes anymore. They feel like a coat, a harness, a hide. You were born in them.",
@@ -82,6 +87,10 @@ const SCRIPT = {
   },
 };
 
+// the Oct 15 lines
+SCRIPT.settle.push(...SCRIPT_MORE.settle);
+for (const l of ["fun", "deep", "nhl"]) for (const part of ["deeper", "suggest", "wake"]) SCRIPT[part][l].push(...SCRIPT_MORE[part][l]);
+
 let api = null;
 const running = new Map();   // member → { by, level, lines, i }
 function D() {
@@ -90,7 +99,14 @@ function D() {
   return d;
 }
 const me = (mn) => (D().people[mn] = D().people[mn] || { max: "fun", sessions: { fun: 0, deep: 0, nhl: 0 }, total: 0, tier: 0 });
-const words = (mn) => SPECIES[api.species(mn)] || SPECIES[String((api.rec(mn) || {}).species || "").toLowerCase()] || SPECIES.default;
+function words(mn) {
+  const key = SPECIES[api.species(mn)] ? api.species(mn) : SPECIES[String((api.rec(mn) || {}).species || "").toLowerCase()] ? String(api.rec(mn).species).toLowerCase() : "default";
+  const w = Object.assign({}, SPECIES[key]), b = bodyOf(api, mn);
+  if (b && (b.g === "male" || b.g === "femboy") && MALE[key]) Object.assign(w, MALE[key]);
+  // udders for somebody with tits; a cock gets its balls; anybody else just their body
+  if (UDDER_KINDS.includes(key) && b && !b.tits) w.p = b.cock ? "heavy balls" : "body";
+  return w;
+}
 function petName(mn) {
   const w = words(mn), r = api.rec(mn) || {}, t = me(mn).tier;
   // degrade: the name gets rougher a tier sooner; praise: it stays sweet a tier longer
@@ -104,12 +120,23 @@ function say(mn, line) {
     // a word dropped in at the start of a sentence gets its capital (live: "That's alright. cows don't need words.")
     .replace(/(^|[.!?]\s+)([a-z])/g, (m, a, b) => a + b.toUpperCase());
 }
-function scriptFor(level) {
-  return [].concat(SCRIPT.settle, SCRIPT.deeper[level], SCRIPT.suggest[level], SCRIPT.wake[level]);
+// a session: a fresh handful from each part, in order, fitted to their body, with a line or two about their gear
+const handful = (list, n, b) => { const pool = fitting(list, b).slice(); for (let i = pool.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [pool[i], pool[j]] = [pool[j], pool[i]]; } return pool.slice(0, n).map(untag); };
+function scriptFor(level, mn) {
+  const b = mn ? bodyOf(api, mn) : null, g = mn ? gearOf(api, mn) : {};
+  const settle = handful(SCRIPT.settle, 4, b), deeper = handful(SCRIPT.deeper[level], level === "fun" ? 3 : 4, b);
+  const worn = Object.keys(GEAR_SUGGEST).filter((k) => g[k]), gearLines = handful(worn.map((k) => pick(GEAR_SUGGEST[k])), Math.min(2, worn.length), b);
+  const suggest = handful(SCRIPT.suggest[level], (level === "fun" ? 4 : 5) - gearLines.length, b);
+  // the gear lines go in among the suggestions, not all at the end
+  for (const l of gearLines) suggest.splice(1 + Math.floor(Math.random() * suggest.length), 0, l);
+  const wake = handful(SCRIPT.wake[level], 1, b);
+  const lines = [].concat(settle, deeper, suggest, wake);
+  lines.cut = [settle.length, deeper.length, suggest.length];
+  return lines;
 }
 
 function start(by, mn, level) {
-  running.set(mn, { by, level, lines: scriptFor(level), i: 0 });
+  running.set(mn, { by, level, lines: scriptFor(level, mn), i: 0 });
   step(mn);
 }
 function step(mn) {
@@ -118,7 +145,7 @@ function step(mn) {
   const line = run.lines[run.i];
   if (!line) { finish(mn, run); return; }
   // the haze on their screen follows the session: settle 1, deeper 2 (3 for No human left), then lifts
-  const s = SCRIPT.settle.length, d = SCRIPT.deeper[run.level].length, g = SCRIPT.suggest[run.level].length;
+  const [s, d, g] = run.lines.cut;
   const haze = run.i < s ? 1 : run.i < s + d ? (run.level === "nhl" ? 3 : 2) : run.i < s + d + g ? { fun: 1, deep: 2, nhl: 3 }[run.level] : (run.level === "nhl" ? 1 : 0);
   if (haze !== run.haze) { run.haze = haze; api.trance(mn, haze); api.face(mn, haze ? "trance" : "clear", haze ? 600 : 1); }
   api.voice(mn, say(mn, line));
@@ -165,7 +192,7 @@ function cmdCondition(c) {
   const want = LEVELS.includes(String(args[1] || "").toLowerCase()) ? String(args[1]).toLowerCase() : me(t).max;
   if (LEVELS.indexOf(want) > LEVELS.indexOf(me(t).max)) return c.reply(A.name(t) + " only allows " + LEVEL_NAME[me(t).max] + " sessions. That's their call.");
   start(sender, t, want);
-  c.reply("🌀 " + LEVEL_NAME[want] + " session started for " + A.name(t) + " (about " + Math.round(scriptFor(want).length * 42 / 60) + " minutes). ?hyp stop " + A.name(t) + " ends it.");
+  c.reply("🌀 " + LEVEL_NAME[want] + " session started for " + A.name(t) + " (about " + Math.round(((running.get(t) || {}).lines || []).length * 42 / 60) + " minutes). ?hyp stop " + A.name(t) + " ends it.");
 }
 function cmdLevel(c) {
   const { sender, args, api: A } = c, v = String(args[0] || "").toLowerCase();

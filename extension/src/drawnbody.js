@@ -314,3 +314,10 @@ export async function drawnBodyFromStudio(say) {
     return take({ cup: br.cup, breast: br, wear: br.wear, belly: be && be.fits, tuck: br.tuck, dress: br.dress, mould: it ? { items: it.mould || [], mode: it.mouldMode || {} } : null, saved: br.saved }, say, "from your studio");
   } catch (e) { if (say) say("I couldn't reach your studio (" + (e && e.message || e) + "). Is it running? Start the studio.bat, then try again. Or use its Copy for the Companion button and paste the code here."); return false; }
 }
+
+// ── how much it's holding (memlog.js writes this down every half minute, for chasing the page running out of room) ──
+export function drawnBodyMemory() {
+  let kept = 0, engines = 0;
+  for (const E of [mine.E, ...Array.from(others.values()).map((o) => o.E)]) if (E) { engines++; try { kept += E.keptBytes ? E.keptBytes() : 0; } catch (e) { /* fine */ } }
+  return { engines, others: others.size, pictures: used.size, keptMB: Math.round(kept / 1e6) };
+}

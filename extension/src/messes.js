@@ -158,3 +158,6 @@ export function initMesses(mod) {
   }, 60000);
   setTimeout(() => { hook(); if (mine.length) { tell(true); redrawMe(); } ask(); }, 3500);
 }
+
+// ── how much it's holding (memlog.js) ──
+export function messMemory() { let pics = 0; for (const p of made.values()) if (p.src) pics++; return { pictures: pics, bytesKB: Math.round(Array.from(made.values()).reduce((n, p) => n + (p.src ? p.src.length : 0), 0) / 1000), imgs: imgs.size, others: others.size }; }

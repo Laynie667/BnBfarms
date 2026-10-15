@@ -13,7 +13,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 | Map tools, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.4** |
 | Dairy | `farmhand-dairy.user.js` | the bot's PC | **1.1.0** |
 | Shows | `farmhand-shows.user.js` | the bot's PC | **1.1.0** |
-| Farmhand Companion | `farmhand-companion.user.js` | each player | **0.26.2** |
+| Farmhand Companion | `farmhand-companion.user.js` | each player | **0.27.0** |
 | Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.4** |
 
 ## Sending a watch report
@@ -23,6 +23,8 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 - Running the watcher on more than one game at once (the bot, yours, a tester's) lets Claude line them up into one timeline.
 
 ## Latest changes (newest first)
+
+- **Companion 0.27.0: a memory log, /farmmem.** Laynie: "crashed again, out of memory", at about half the memory it showed before. A page that died can't say what filled it, so every half minute the Companion writes down how big things are (the page's memory, the game's pictures and how much is on the graphics card, the drawn bodies' and messes' keepings, how many are in the room), the last hour of it, in that browser only. After a crash: reload and type **/farmmem**; it shows the last twelve minutes and copies the whole hour to paste to Claude. **Companion.**
 
 - **Companion 0.26.2: the drawn body keeps less.** Laynie: "it said it stopped working, and even the devtools got disconnected", so the page itself ran out of room. The drawn body keeps every fitted piece it draws so the next drawing is quick, kept by count (60 and 80 pieces), and every Companion-drawn player in the room has a set of their own, kept for an hour after they leave. Now it keeps by size (128 MB for you, 48 MB for each other player, the oldest going first), and a player who's left the room for two minutes has theirs let go (drawn fresh if they come back). The studio keeps 96 MB.
 

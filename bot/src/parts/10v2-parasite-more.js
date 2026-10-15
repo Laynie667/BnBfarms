@@ -28,7 +28,7 @@
                tell: "It's a TYRANT: you don't cum while it's on you. Every time you get there, it eats it, ruins it, and pays you in serum instead. Twelve hours of that." },
   };
   const strainOf = g => STRAINS[g && g.strain] || STRAINS.grower;
-  function pickStrain(mn){ const can = Object.keys(STRAINS).filter(k => STRAINS[k].can(mn)); return can[Math.floor(Math.random()*can.length)] || "grower"; }
+  function pickStrain(mn){ const can = Object.keys(STRAINS).filter(k => STRAINS[k].can(mn)); if (W.__FARMHAND_TEST__ && can.includes(W.__forceStrain)) return W.__forceStrain; return can[Math.floor(Math.random()*can.length)] || "grower"; }
   // which parts of it have grown in: the lips form blooms downward, the belt form upward
   function parasiteParts(g){
     const h = (Date.now() - g.since) / 3600000, stage = h >= CFG.PARASITE_BLOOM_H[1] ? 3 : h >= CFG.PARASITE_BLOOM_H[0] ? 2 : 1;
@@ -169,8 +169,10 @@
       "It's bloomin'. Thin pink tendrils trail across %n's skin to their tits and swell at the tips into suckers that seal on tight and begin to nurse."],
     bloom_root: [
       "The parasite isn't done growin'. A thick strand of it slides down %n's belly, wraps their hips in a hot wet band, and pushes a fat root up into each hole below. %n's knees buckle.",
-      "It's found the rest of %n. A sash of livin' flesh knots itself round their hips, and two slow thick tendrils work their way up inside, front and back, and settle there, pulsin'.",
-      "%n feels it creep lower, and lower, and then it's between their legs, sealin' over them, rootin' up into their cunt and their ass both. Lips, teats and holes: it has all of them now."],
+      "{nv}It's found the rest of %n. A sash of livin' flesh knots itself round their hips, and one slow thick tendril works its way up their ass and settles there, pulsin'.",
+      "{v}It's found the rest of %n. A sash of livin' flesh knots itself round their hips, and two slow thick tendrils work their way up inside, front and back, and settle there, pulsin'.",
+      "{v}%n feels it creep lower, and lower, and then it's between their legs, sealin' over them, rootin' up into their cunt and their ass both. Lips, teats and holes: it has all of them now.",
+      "{nv}%n feels it creep lower, and lower, and then it's between their legs, sealin' over them, rootin' slow and deep up their ass. Mouth, nipples and hole: it has every one of them now."],
     bloom_lipsLate: [
       "The belt on %n sends a pink runner up their body, over their chest and throat. It reaches their mouth, flattens, and seals over their lips, and a tendril slides down their throat. It has all of them now.",
       "The last of it blooms: a wet pink mouth closes over %n's own, plump and shinin', and somethin' long and soft feeds itself past their tongue. Lips, teats and holes, every one taken."],

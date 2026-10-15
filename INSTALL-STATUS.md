@@ -1,11 +1,11 @@
 # What to install (current versions)
 
-Updated 2026-10-12. Every file is in the `dist/` folder (it syncs through OneDrive, so the phone app has it too).
+Updated 2026-10-14. Every file is in the `dist/` folder (it syncs through OneDrive, so the phone app has it too).
 In Tampermonkey's dashboard, compare each script's version with this list. Anything already at these versions is up to date.
 
 | Script | File in `dist/` | Where it runs | Current |
 |---|---|---|---|
-| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.30.1** |
+| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.30.2** |
 | Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.6.0** |
 | Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.1.3** |
 | Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **1.0.4** |
@@ -13,7 +13,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 | Map tools, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.3** |
 | Dairy | `farmhand-dairy.user.js` | the bot's PC | **1.0.2** |
 | Shows | `farmhand-shows.user.js` | the bot's PC | **1.0.4** |
-| Farmhand Companion | `farmhand-companion.user.js` | each player | **0.19.0** |
+| Farmhand Companion | `farmhand-companion.user.js` | each player | **0.19.1** |
 | Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.4** |
 
 ## Sending a watch report
@@ -23,6 +23,9 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 - Running the watcher on more than one game at once (the bot, yours, a tester's) lets Claude line them up into one timeline.
 
 ## Latest changes (newest first)
+
+- **Companion 0.19.1, studio: Echo clothes on the drawn body.** The Echo clothing mod now runs in the outfit studio (its *Load the Echo clothing mod* button). Three things stood in the way and are fixed: its pictures come through the studio's own server (the mod's picture site refused the newer game copy's way of asking); its changes to the game's fast drawing scrambled the body on the newer copy, so the studio draws the plain way once Echo is loaded; and most of Echo's newer dresses carry an arm mask that cut square holes through a top fitted to big breasts, with bare breast showing in each. That last one is in the drawing the Companion uses too, so it's fixed in the game as well. Checked: Echo's tops and dresses at a J cup with a belly, page by page, holes gone. **Companion and studio** (restart the studio).
+- **Bot 0.30.2: the voice sweep and the parasite sweep.** Two new checks, run by hand: *tests/voice-sweep.cjs* springs every trap on six kinds of body (cow girl, bull, femboy bunny, futa pony, pony mare, goblin) and reads back every line; *tests/parasite-sweep.cjs* lives every parasite strain through its twelve hours on the same six. Around 230 different lines per body from the traps. What they turned up, now fixed: milkin' somebody who was still full of seed said "udder" to a flat chest (now a seven-line pool fitted to the body); a parasite that got on by a kiss, by nursin', from a nest egg, from a seed, or from the farm girl's hand was always described as comin' through a glory hole (each way now has its own lines); the belt told a femboy about their pussy; the Breeder said it had laid at hour four when it lays at hour six; a male Grower promised tits it never grows (femboys still get theirs, milk or no milk); a root line went "front and back" on a body with one hole; "for the next 1 hours". Each strain's own trick checked on every body: Breeder lays twice, Grower grows the right parts, Glutton drinks milk and milks a cock, Tyrant eats orgasms and edges late on. **Bot.**
 
 - **Outfit studio, step 6: the game's own item settings; fits survive a pose change.**
   - **Configure it.** A picked piece that has settings in the game gets a "Configure it (the game's own menu)" button. It opens the game's real settings menu for that item on the studio's character, drawn and run by the game itself, so every option the game has is there (and its own Layering screen). The studio panel hides while it is open; "Done: back to the studio" returns. Checked here: a lactation pump set to High through the game's menu, kept on return.

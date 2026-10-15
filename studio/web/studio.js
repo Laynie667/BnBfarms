@@ -383,8 +383,8 @@
     opt = opt || {};
     const per = 12, cols = 4, TW = 320, TH = 360, crop = opt.crop || [40, 880, 420, 472];
     const before = ServerAppearanceBundle(S.C.Appearance), had = before.some((b) => b.Group === group);
-    const all = Asset.filter((a) => a.Group.Name === group && a.Visible !== false), pages = Math.ceil(all.length / per), saved = [];
-    const tag = FarmBreasts.CUPS[cupNow()] + (fitNow().on ? "-belly" : "") + (poseKey() !== "std" ? "-" + poseKey().toLowerCase() : "");
+    const all = Asset.filter((a) => a.Group.Name === group && a.Visible !== false && (!opt.echo || (S.echoFrom != null && Asset.indexOf(a) >= S.echoFrom))), pages = Math.ceil(all.length / per), saved = [];
+    const tag = (opt.echo ? "echo-" : "") + FarmBreasts.CUPS[cupNow()] + (fitNow().on ? "-belly" : "") + (poseKey() !== "std" ? "-" + poseKey().toLowerCase() : "");
     for (let p = (opt.from || 0); p < Math.min(pages, opt.to == null ? pages : opt.to); p++) {
       const cv = document.createElement("canvas"); cv.width = cols * TW; cv.height = Math.ceil(per / cols) * TH + 30; const g = cv.getContext("2d");
       g.fillStyle = "#565a66"; g.fillRect(0, 0, cv.width, cv.height); g.fillStyle = "#fff"; g.font = "bold 18px system-ui, sans-serif";
@@ -393,7 +393,7 @@
       for (let n = 0; n < part.length; n++) {
         const a = part[n], X = (n % cols) * TW, Y = 30 + Math.floor(n / cols) * TH;
         try { wear(before); if (!had) { try { InventoryRemove(S.C, group); } catch (e) { /* nothing on */ } } putOn(group, a.Name);
-          for (let k = 0; k < 4; k++) { await waitMs(k ? 220 : 520); bellyDraw(); } await waitMs(60);
+          for (let k = 0; k < 4; k++) { await waitMs(k ? 220 : (opt.wait || (opt.echo ? 1500 : 520))); bellyDraw(); }   /* (Echo's pictures come from the internet: a first look waits longer for them) */ await waitMs(60);
           g.drawImage(S.C.Canvas, crop[0], crop[1], crop[2], crop[3], X, Y, TW, TH); } catch (e) { console.warn("[studio] catalogue:", a.Name, e); g.fillStyle = "#a33"; g.fillRect(X, Y, TW, TH); }
         g.fillStyle = "rgba(0,0,0,0.6)"; g.fillRect(X, Y, TW, 20); g.fillStyle = "#fff"; g.font = "13px system-ui, sans-serif"; g.fillText((p * per + n + 1) + ". " + itemName(a).slice(0, 34), X + 4, Y + 15);
         if (opt.say !== false) say("Catalogue: " + group + ", " + (p * per + n + 1) + " of " + all.length + "…");
@@ -421,7 +421,7 @@
           return $("div", { className: "fh-slide" }, $("label", { textContent: label }), $("input", { type: "range", min, max, step, value: BREAST[k], disabled: !drawn, oninput: (e) => { BREAST[k] = Number(e.target.value); val.textContent = String(BREAST[k]); bellyDraw(); } }), val); }),
         $("div", { className: "row" }, $("label", { textContent: "Catalogue a slot (saved as pictures):" }),
           (() => { const sel = $("select", {}, CAT_SLOTS.filter((gn) => Asset.some((a) => a.Group.Name === gn)).map((gn) => $("option", { value: gn, textContent: gn.replace(/([a-z])([A-Z0-9])/g, "$1 $2") })));
-            return [sel, $("button", { type: "button", textContent: "Make the catalogue", title: "Every piece in the slot, on her as she is now, twelve to a page, saved in studio\\catalogue", onclick: () => catalogue(sel.value) })]; })()),
+            return [sel, $("button", { type: "button", textContent: "Make the catalogue", title: "Every piece in the slot, on her as she is now, twelve to a page, saved in studio\\catalogue", onclick: () => catalogue(sel.value) }), $("button", { type: "button", textContent: "Only its Echo items", title: "The same, for the Echo clothing mod's items in this slot (load the mod first)", onclick: () => (S.echoFrom != null ? catalogue(sel.value, { echo: true }) : say("Load the Echo clothing mod first (the button under the outfit code).", true)) })]; })()),
         $("div", { className: "row" }, $("label", { textContent: "See a whole slot at this size:" }),
           (() => { const sel = $("select", {}, ["Cloth", "ClothOuter", "ClothAccessory", "Bra", "Suit", "Corset", "Necklace", "ItemBreast", "ItemTorso", "ItemTorso2", "ItemArms", "ItemNipples", "ItemNipplesPiercings", "ItemNeckAccessories", "ItemNeckRestraints"].filter((gn) => Asset.some((a) => a.Group.Name === gn)).map((gn) => $("option", { value: gn, textContent: gn.replace(/([a-z])([A-Z0-9])/g, "$1 $2") })));
             return [sel, $("button", { type: "button", textContent: "Show the sheet", title: "Tries on every piece in the slot and shows them side by side", onclick: () => chestAudit(sel.value) })]; })()),
@@ -523,9 +523,24 @@
   const ECHO_URL = "https://sugarchain-studio.github.io/echo-clothing-ext/bc-cloth.user.js";
   function loadEcho() {
     const btn = document.getElementById("fh-echo"); if (S.echo) return say("The Echo clothing mod is already loaded.");
-    S.echo = true; if (btn) btn.disabled = true; const before = Asset.length; say("Loading the Echo clothing mod…");
+    S.echo = true; if (btn) btn.disabled = true; const before = Asset.length; S.echoFrom = before; say("Loading the Echo clothing mod…");
+    // (the mod is made for the live game, which is a version behind the copy the studio draws with, and it reaches for game
+    // functions the newer game has dropped or renamed: missing, it stops before adding a thing. Stand-ins, never called by
+    // this game, let it start. The list is the functions the mod steps into, from its own code.)
+    const ECHO_NEEDS = "ActivityCheckPrerequisites ActivityOrgasmStart ActivityOrgasmStop AppearancePreviewUseCharacter AssetBuildDescription AssetBuildExtended AssetGet AssetLoadAll AssetTextGet CharacterAppearanceGetCurrentValue CharacterAppearanceValidate CharacterAppearanceVisible CharacterCheckHooks CharacterLoadCanvas CharacterSetFacialExpression ChatRoomCanBeLeashedBy ChatRoomCharacterViewDraw ChatRoomDrawCharacterStatusIcons ChatRoomMessage ChatRoomPingLeashedPlayers ChatRoomPublishAction ChatRoomPublishCustomAction ChatRoomSync ChatRoomSyncMemberJoin ChatRoomUpdateDisplay CommonDrawCanvasPrepare CommonDrawComputeDrawingCoordinates CommonDrawResolveAssetPose CraftingSaveServer DialogInventoryAdd DialogInventoryBuild DialogMenuButtonBuild DrawAssetPreview DrawCharacter DrawCharacterSegment DrawRefreshCharacterForImage GLDrawAppearanceBuild GLDrawLoad GLDrawLoadImage GLDrawLoadTextureAlphaMask InterfaceTextGet InventoryAvailable InventoryGetRandom InventoryItemHasEffect InventorySetPermission InventoryWear ItemColorLoad LoginDoNextThankYou LoginPerformCraftingFixups LoginResponse PreferenceArousalAtLeast ServerAccountBeep ServerSend TranslationAssetProcess ValidationResolveAppearanceDiff ValidationResolveRemoveDiff ValidationResolveSwapDiff".split(" ");
+    const missing = ECHO_NEEDS.filter((n) => typeof window[n] !== "function");
+    if (missing.length) { const sh = document.createElement("script"); sh.textContent = missing.map((n) => "function " + n + "() {}").join("; "); document.head.append(sh); console.info("[studio] stand-ins for the Echo mod:", missing.join(", ")); }
+    // (its pictures come through the studio's own server: the game copy here asks the mod's site for them in a way the site
+    // refuses from a page, and every Echo piece, and the parts of the body it redraws, came out missing)
+    if (!window.__echoFetch) { const f0 = window.fetch.bind(window), CDN = "https://cdn.jsdelivr.net/gh/SugarChain-Studio/echo-clothing-ext@";
+      window.__echoFetch = true; window.fetch = (u, o) => { const url = typeof u === "string" ? u : u && u.url; if (url && url.startsWith(CDN)) { const rest = url.slice(CDN.length), at = rest.indexOf("/resources/"); if (at > 0) return f0("/__echo/" + rest.slice(0, at) + "/" + rest.slice(at + "/resources/".length), { cache: "default" }); } return f0(u, o); }; }
+    // (and it changes how the game's fast drawing works, in ways made for the live game: on this newer copy the body came out
+    // in scrambled pieces. The game's plain drawing is untouched by it, so the studio draws that way once Echo is in.)
+    // (it switches the fast drawing back on as it starts, so this is done again once it's in)
+    const plain = () => { if (typeof GLVersion !== "undefined" && GLVersion !== "No WebGL") { GLVersion = "No WebGL"; try { redraw(); } catch (e) { /* not ready */ } } };
+    plain();
     const el = document.createElement("script"); el.src = ECHO_URL + "?t=" + Date.now(); el.onerror = () => { S.echo = false; if (btn) btn.disabled = false; say("The Echo clothing mod didn't load (no internet, or its site is down).", true); };
-    el.onload = () => { let n = 0; const tick = () => { n++; const added = Asset.length - before; if (added > 0 && n > 6) { say("Echo clothing mod loaded: " + added + " items added. They're in each slot's list."); try { fillItems(); } catch (e) { /* not yet */ } return; } if (n > 60) { say(added > 0 ? "Echo clothing mod loaded: " + added + " items." : "The Echo script loaded but added no items yet. Give it a moment and look in the slot lists.", !added); return; } setTimeout(tick, 500); }; tick(); };
+    el.onload = () => { let n = 0; const tick = () => { n++; const added = Asset.length - before; plain(); if (added > 0 && n > 6) { say("Echo clothing mod loaded: " + added + " items added. They're in each slot's list."); try { fillItems(); } catch (e) { /* not yet */ } return; } if (n > 60) { say(added > 0 ? "Echo clothing mod loaded: " + added + " items." : "The Echo script loaded but added no items yet. Give it a moment and look in the slot lists.", !added); return; } setTimeout(tick, 500); }; tick(); };
     document.head.append(el);
   }
   // ── the panel ──

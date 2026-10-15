@@ -369,7 +369,11 @@ window.FarmBodyEngine = function (host) {
         const fit = C === S.C ? fitNow() : null, br = C === S.C ? breastNow() : null, real = cb;   // real: the game's own callbacks (the wrapped set below must never call itself)
         // put: hand the game something to draw. A drawing of ours goes through host.picture when there is one (the live game
         // only takes pictures by name: see the Companion's body.js); in the studio the drawing itself is handed over.
-        const put = (name, img, x, y, o) => { if (typeof img === "string" || !host.picture) return real[name](img, x, y, o); const p = host.picture(img); if (p) return real[name](p.src, x + p.dx, y + p.dy, o); };
+        // (A piece fitted to her breasts leaves its arm mask behind: a mask is cut where the game's arms sit in front of a
+        // breast the game's size, and on a fitted piece it cut square holes through the cloth with her bare breast showing
+        // in each. Echo's newer dresses all carry one. Found in the Echo catalogue, Oct 14. Her hands are drawn on their own.)
+        const put = (name, img, x, y, o) => { if (img && typeof img !== "string" && img.MX != null && o && o.TextureAlphaMask) o = Object.assign({}, o, { TextureAlphaMask: undefined });
+          if (typeof img === "string" || !host.picture) return real[name](img, x, y, o); const p = host.picture(img); if (p) return real[name](p.src, x + p.dx, y + p.dy, o); };
         if (fit && cb && typeof cb.drawImage === "function") {
           let upper = null, lower = false, done = false;
           const ctx = { bodies: [], belly: null, sig: "", seen: {} }; if (br) { seenNow = ctx.seen; handFNow = { get v() { return ctx.handF; } }; }

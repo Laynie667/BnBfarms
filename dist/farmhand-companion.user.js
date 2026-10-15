@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.19.0
+// @version      0.19.1
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -230,7 +230,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.19.0";
+  var VERSION = "0.19.1";
 
   // extension/src/config.js
   var BOT_MEMBER = 260239;
@@ -2164,6 +2164,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
           try {
             const fit = C === S2.C ? fitNow() : null, br = C === S2.C ? breastNow() : null, real = cb;
             const put = (name, img, x, y, o) => {
+              if (img && typeof img !== "string" && img.MX != null && o && o.TextureAlphaMask) o = Object.assign({}, o, { TextureAlphaMask: void 0 });
               if (typeof img === "string" || !host.picture) return real[name](img, x, y, o);
               const p = host.picture(img);
               if (p) return real[name](p.src, x + p.dx, y + p.dy, o);

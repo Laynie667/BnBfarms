@@ -171,9 +171,11 @@
 
   // what everybody sees when a shot kicks in (%t = them, %s = the new size)
   const SHOT_LINES = {
-    "udder+":  ["%t's breasts swell and strain, heavier with every heartbeat, till they settle at %s.",
-                "%t gasps as their chest fills out, nipples stiffening while those tits plump up to %s."],
-    "udder-":  ["%t's breasts tingle and draw in, perkier and lighter, down to %s.",
+    "udder+":  ["{t}%t's breasts swell and strain, heavier with every heartbeat, till they settle at %s.",
+                "{t}%t gasps as their chest fills out, nipples stiffening while those tits plump up to %s.",
+                "{nt}%t's chest goes hot and tight, the nipples puffin' up fat and sore while it fills out soft and heavy: %s now.",
+                "{nt}%t groans as their flat chest swells into a pair of soft little mounds, nipples standin' proud: %s."],
+    "udder-":  ["{t}%t's breasts tingle and draw in, perkier and lighter, down to %s.",
                 "A cool ache, and %t's chest shrinks back to %s."],
     "testes+": ["%t's balls throb and drop heavier, fat and churnin' (%s now). Somebody's gonna make bigger loads.",
                 "%t groans as their sack tightens, then swells, heavy and churnin': %s."],
@@ -193,9 +195,11 @@
     "butt-":   ["%t's ass clenches up nice and tight: %s again."],
     "throat+": ["%t's throat relaxes and the gag reflex just melts away: %s now. Open wide, sugar."],
     "throat-": ["%t's throat tightens back up, gaggy as ever: %s."],
-    lactation: ["%t's nipples tingle and bead with milk, breasts goin' heavy and achy to be milked."],
+    lactation: ["{t}%t's nipples tingle and bead with milk, breasts goin' heavy and achy to be milked.",
+                "%t's nipples prickle and swell, and a bead of milk wells up on each. They'll be wantin' the pump soon."],
     virility:  ["%t's balls churn and swell with fresh seed. Somebody's gonna be a fountain for a day."],
-    fertility: ["A warm, needy flush spreads through %t's belly. That womb is ripe and waitin'."],
+    fertility: ["{v}A warm, needy flush spreads through %t's belly. That womb is ripe and waitin'.",
+                "{nv}A warm, needy flush spreads low in %t's belly. Whatever the farm's done in there, it's ripe and waitin' now."],
     contraceptive: ["%t gets a cool little shiver. Nothin's takin' root in there for a couple of days."],
     capacity:  ["%t's belly goes warm and stretchy, ready to hold even more."],
     reducing:  ["%t's belly draws in tight, and anything extra comes spillin' out."],
@@ -214,7 +218,8 @@
     const L0 = SHOT_LINES[k]; if (!L0) return "";
     const sz = part ? (part === "udder" ? CFG.SIZES.udder.cups[udderLevel(t)-1]+" cup, "+CFG.SIZES.udder.names[udderLevel(t)-1]
                       : CFG.SIZES[part].inches ? sizeOf(t,part)+" inches" : sizeWord(part, sizeOf(t,part))+" "+sizeOf(t,part)+"/"+CFG.SIZES[part].max) : "";
-    return L0[Math.floor(Math.random()*L0.length)].replace(/%t/g, plainName(t)).replace(/%s/g, sz);
+    // (fitted to their body: a male cow given udder growth was told his "breasts swell". The voice sweep, Oct 14.)
+    return bodyWords(t, pickFor(t, "shot:"+k, L0)).replace(/%t/g, plainName(t)).replace(/%s/g, sz);
   }
 
   // An "Inject" activity on someone: read the injector's crafted keywords.

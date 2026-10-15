@@ -14,7 +14,8 @@ const GAME = resolve(process.argv[2] || join(HERE, "../../reference/Bondage-Coll
 const PORT = Number(process.argv[3] || process.env.PORT || 4780);
 const WEB = join(HERE, "web");
 const FITS = join(HERE, "fits");                                  // what the sliders save: one small JSON file per body part
-const BELLY_SRC = join(HERE, "../extension/src/belly.js");        // the Companion's own belly drawing: the studio draws with the very same code
+const BELLY_SRC = join(HERE, "../extension/src/belly.js");
+const ECHO_RES = (() => { const p = join(HERE, "../../reference/addons/echocloth-new/resources"); return existsSync(p) ? p : null; })();   // the Echo clothing mod's pictures, if a copy is here        // the Companion's own belly drawing: the studio draws with the very same code
 const TYPES = { ".html": "text/html; charset=utf-8", ".js": "text/javascript; charset=utf-8", ".mjs": "text/javascript; charset=utf-8", ".css": "text/css; charset=utf-8", ".json": "application/json",
   ".png": "image/png", ".jpg": "image/jpeg", ".jpeg": "image/jpeg", ".gif": "image/gif", ".svg": "image/svg+xml", ".webp": "image/webp", ".mp3": "audio/mpeg", ".ogg": "audio/ogg", ".wav": "audio/wav",
   ".csv": "text/csv; charset=utf-8", ".txt": "text/plain; charset=utf-8", ".ttf": "font/ttf", ".woff": "font/woff", ".woff2": "font/woff2", ".ico": "image/x-icon" };
@@ -87,6 +88,23 @@ createServer(async (req, res) => {
       }
       if (!existsSync(file)) { res.writeHead(200, { "Content-Type": TYPES[".json"] }).end("null"); return; }
       return send(res, file);
+    }
+    // The Echo clothing mod's pictures, for the studio: its own copy on this computer when it's there, otherwise fetched from
+    // its site here (the newer game copy the studio draws with asks the site in a way it refuses from a page).
+    if (path.startsWith("/__echo/")) {
+      const rel = decodeURIComponent(path.slice("/__echo/".length)).split("/").slice(1).join("/");   // (the first part is the version)
+      // Echo carries its own copies of the game's body pictures, drawn for the game it was made for. The studio's newer game
+      // draws the body differently and those copies come out in pieces, so any picture the game has itself is the game's.
+      const own = inside(GAME, rel);
+      if (own && existsSync(own)) return send(res, own);
+      const local = ECHO_RES && inside(ECHO_RES, rel);
+      if (local && existsSync(local)) return send(res, local);
+      const ver = path.slice("/__echo/".length).split("/")[0];
+      if (!/^[0-9a-f]{7,40}$/.test(ver) || !(rel.startsWith("Assets/") && rel.toLowerCase().endsWith(".png")) || rel.includes("..")) { res.writeHead(400).end("bad path"); return; }
+      const up = await fetch("https://cdn.jsdelivr.net/gh/SugarChain-Studio/echo-clothing-ext@" + ver + "/resources/" + rel.split("/").map(encodeURIComponent).join("/"));
+      if (!up.ok) { res.writeHead(up.status).end("not found"); return; }
+      const buf = Buffer.from(await up.arrayBuffer());
+      res.writeHead(200, { "Content-Type": "image/png", "Content-Length": buf.length, "Cache-Control": "max-age=86400" }).end(buf); return;
     }
     if (path.startsWith("/__studio/")) { const f = inside(WEB, path.slice("/__studio/".length)); if (f) return send(res, f); }
     const f = inside(GAME, path);

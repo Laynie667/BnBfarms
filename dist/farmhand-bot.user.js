@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.30.1
+// @version      0.30.2
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -1828,7 +1828,7 @@
   ];
 
   // bot/src/version.js
-  var VERSION = "0.30.1";
+  var VERSION = "0.30.2";
 
   // bot-parts:farmhand-bot-parts
   (function() {
@@ -3463,7 +3463,7 @@
     };
     W.FarmhandExport = exportLedger;
     W.FarmhandLedger = () => L;
-    if (W.__FARMHAND_TEST__) Object.assign(W, { __st: () => state, __cfg: CFG, __pt: prodTick, __qt: quotaTick, __lt: leashTick, __ms: milkingStallTick, __vt: voiceTick, __sync: syncCompanions, __gt: gearTick, __ht: homeTick, __addons: (h, ...a) => addonsEmit(h, ...a), __stateFor: (mn) => stateFor(mn), __leadTick: () => leadTick(), __ambient: () => ambientTick(), __about: (t) => aboutWhom(t), __announce: (t) => announce(t), __reply: (mn, t, ch) => reply(mn, t, ch), __office: () => officeCheck(), __namesHere: (t) => namesHere(t), __speciesCheck: (t) => QUESTIONS.find((q) => q.key === "species").check(t), __attach: () => attachListeners(), __tryLogin: () => tryLogin(), __beepText: (m) => beepText(m), __nameOnce: (t, mn) => nameOnce(t, mn), __buildContract: (n, mn, d) => buildContract(contractTemplate(n), mn, d), __potionTick: () => potionTick(), __penTick: () => penTick(), __trapTick: () => trapTick(), __corrupt: (m, n) => corrupt(m, n), __under: (m) => underOf(m), __goUnder: (m, n) => goUnder(m, n), __lend: () => state.lend, __keepTick: () => keepersTick(), __body: (m) => bodyOf(m), __shape: (m) => shapeFor(m), __pickFor: (m, k, l) => pickFor(m, k, l), __bodyWords: (m, t) => bodyWords(m, t), __strainGear: (m) => strainGear(m), __strainSerums: (m) => strainSerums(m), __strainParts: (s, n) => strainParts(s, n), __tFill: (t, m, v) => tFill(t, m, v), __conceive: (m, s, a, b, h) => rollConception(m, s, a, b, h), __birth: (m) => giveBirth(m), __milkCapOf: (m) => milkCap(m), __udderTick: () => {
+    if (W.__FARMHAND_TEST__) Object.assign(W, { __st: () => state, __cfg: CFG, __pt: prodTick, __qt: quotaTick, __lt: leashTick, __ms: milkingStallTick, __vt: voiceTick, __sync: syncCompanions, __gt: gearTick, __ht: homeTick, __addons: (h, ...a) => addonsEmit(h, ...a), __stateFor: (mn) => stateFor(mn), __leadTick: () => leadTick(), __ambient: () => ambientTick(), __about: (t) => aboutWhom(t), __announce: (t) => announce(t), __reply: (mn, t, ch) => reply(mn, t, ch), __office: () => officeCheck(), __namesHere: (t) => namesHere(t), __speciesCheck: (t) => QUESTIONS.find((q) => q.key === "species").check(t), __attach: () => attachListeners(), __tryLogin: () => tryLogin(), __beepText: (m) => beepText(m), __nameOnce: (t, mn) => nameOnce(t, mn), __buildContract: (n, mn, d) => buildContract(contractTemplate(n), mn, d), __potionTick: () => potionTick(), __penTick: () => penTick(), __trapTick: () => trapTick(), __corrupt: (m, n) => corrupt(m, n), __under: (m) => underOf(m), __goUnder: (m, n) => goUnder(m, n), __lend: () => state.lend, __keepTick: () => keepersTick(), __body: (m) => bodyOf(m), __drainMilk: (m, n) => drainMilk(m, n), __prodOf: (m) => prodOf(m), __shape: (m) => shapeFor(m), __pickFor: (m, k, l) => pickFor(m, k, l), __bodyWords: (m, t) => bodyWords(m, t), __strainGear: (m) => strainGear(m), __strainSerums: (m) => strainSerums(m), __strainParts: (s, n) => strainParts(s, n), __tFill: (t, m, v) => tFill(t, m, v), __conceive: (m, s, a, b, h) => rollConception(m, s, a, b, h), __birth: (m) => giveBirth(m), __milkCapOf: (m) => milkCap(m), __udderTick: () => {
       state.udderAt = 0;
       uddersTick();
     }, __wordsFor: (m, t) => wordsFor(m, t), __overdue: (m) => overdueStage(m), __milkCum: (m) => stallClimax(m), __intSev: (m, s) => intensitySev(m, s), __intTail: (m, k) => intensityTail(m, 5, 6, k), __holes: (m) => holesFor(m), __album: (m) => albumFor(m, 60), __holeTook: (m, h, a) => holeTook(m, h, a), __dreamTheme: (m) => dreamTheme(m), __eggsWorth: (t, n) => eggsWorth(t, n), __rank: (m) => rankX(m), __broodBook: (m) => broodBook(m), __belly: (m) => bellyStage(m), __happening: (m) => happeningFor(m), __gearOn: (m, s, l, d, x) => gearOn(m, s, l, d, x), __heard: (mn, t) => trapHeard(mn, t), __parasiteTick: () => parasiteTick(), __parts: (m) => parasiteParts(rec(m).parasite), __climax: (m) => parasiteClimax(m), __nurse: (a, b) => parasiteNurse(a, b), __parasiteChance: (m) => parasiteChance(m), __kiss: (a, f, s, t) => parasiteKiss(a, f, s, t), __load: (s, m, h, x) => parasiteLoad(s, m, h, x), __shot: (t, by, text, how) => applyShot(t, by, text, how), __slow: (mn) => slowOf(mn), __milkRate: (mn) => milkRate(mn), __benchTick: () => benchTick(), __roll: (m, s, a, b) => rollConception(m, s, a, b), __contractTick: () => {
@@ -5235,6 +5235,15 @@
       L.yield.w[mn] = (L.yield.w[mn] || 0) + amount;
       vatAdd(mn, amount);
     }
+    const MILK_LEAK = [
+      "{t}Every squeeze of %n's udder pushes a warm gush of %s seed back out of 'em (%a). What a mess, sugar.",
+      "{t}They pull on %n's tits and the rest of 'em lets go too: a warm rush of %s seed, back out the way it went in (%a). Somebody fetch a rag.",
+      "{t}%n's milkin' from the top and leakin' from the bottom, %s seed runnin' warm down their thighs with every pull (%a).",
+      "{nt}Every pull on %n's chest pushes a warm gush of %s seed back out of 'em (%a). What a mess, sugar.",
+      "{nt}They squeeze %n up top and %s seed comes out down below, a warm slow gush of it (%a). Full as a tick, that one.",
+      "Squeeze %n anywhere and somethin' comes out. Right now it's %s seed, sluicin' back out of 'em warm (%a).",
+      "%n's packed so full that milkin' 'em wrings %s seed back out too, a good warm splash of it on the straw (%a)."
+    ];
     function drainMilk(mn, amount, nursing) {
       const p = prodOf(mn);
       if (milkDenied(mn)) return 0;
@@ -5267,7 +5276,8 @@
         p.leakAcc = (p.leakAcc || 0) + out;
         if (charFor(mn) && now - (p.leakSaid || 0) > 6e4 && p.leakAcc >= 5) {
           p.leakSaid = now;
-          emote("\u{1F4A6} Every squeeze of " + plainName(mn) + "'s udder pushes a warm gush of " + (p.lastStud ? plainName(p.lastStud) + "'s" : "somebody's") + " seed back out of 'em (" + ml(p.leakAcc) + "). What a mess, sugar.");
+          const whose = p.lastStud ? plainName(p.lastStud) + "'s" : "somebody's";
+          emote("\u{1F4A6} " + bodyWords(mn, pickFor(mn, "milkleak", MILK_LEAK)).replace(/%n/g, plainName(mn)).replace(/%s/g, whose).replace(/%a/g, ml(p.leakAcc)));
           p.leakAcc = 0;
         }
       }
@@ -5293,7 +5303,7 @@
           emote(plainName(mn) + " flushes hot all over, comin' into heat.", mn);
           face(mn, "heat", 90);
         }
-        tell(mn, "\u{1F525} Ooh, you've come into heat, " + plainName(mn) + "! Gonna be mighty hard to miss for the next " + (hours || CFG.PROD.HEAT_H) + " hours, sweetie.");
+        tell(mn, "\u{1F525} Ooh, you've come into heat, " + plainName(mn) + "! Gonna be mighty hard to miss for " + ((h) => h === 1 ? "the next hour" : "the next " + h + " hours")(hours || CFG.PROD.HEAT_H) + ", sweetie.");
         for (const h of herdsOf(mn)) beep(h.leader, "\u{1F525} Heads up, hon: " + plainName(mn) + " just came into heat.");
       }
       saveLedger();
@@ -6759,11 +6769,13 @@
     }
     const SHOT_LINES = {
       "udder+": [
-        "%t's breasts swell and strain, heavier with every heartbeat, till they settle at %s.",
-        "%t gasps as their chest fills out, nipples stiffening while those tits plump up to %s."
+        "{t}%t's breasts swell and strain, heavier with every heartbeat, till they settle at %s.",
+        "{t}%t gasps as their chest fills out, nipples stiffening while those tits plump up to %s.",
+        "{nt}%t's chest goes hot and tight, the nipples puffin' up fat and sore while it fills out soft and heavy: %s now.",
+        "{nt}%t groans as their flat chest swells into a pair of soft little mounds, nipples standin' proud: %s."
       ],
       "udder-": [
-        "%t's breasts tingle and draw in, perkier and lighter, down to %s.",
+        "{t}%t's breasts tingle and draw in, perkier and lighter, down to %s.",
         "A cool ache, and %t's chest shrinks back to %s."
       ],
       "testes+": [
@@ -6796,9 +6808,15 @@
       "butt-": ["%t's ass clenches up nice and tight: %s again."],
       "throat+": ["%t's throat relaxes and the gag reflex just melts away: %s now. Open wide, sugar."],
       "throat-": ["%t's throat tightens back up, gaggy as ever: %s."],
-      lactation: ["%t's nipples tingle and bead with milk, breasts goin' heavy and achy to be milked."],
+      lactation: [
+        "{t}%t's nipples tingle and bead with milk, breasts goin' heavy and achy to be milked.",
+        "%t's nipples prickle and swell, and a bead of milk wells up on each. They'll be wantin' the pump soon."
+      ],
       virility: ["%t's balls churn and swell with fresh seed. Somebody's gonna be a fountain for a day."],
-      fertility: ["A warm, needy flush spreads through %t's belly. That womb is ripe and waitin'."],
+      fertility: [
+        "{v}A warm, needy flush spreads through %t's belly. That womb is ripe and waitin'.",
+        "{nv}A warm, needy flush spreads low in %t's belly. Whatever the farm's done in there, it's ripe and waitin' now."
+      ],
       contraceptive: ["%t gets a cool little shiver. Nothin's takin' root in there for a couple of days."],
       capacity: ["%t's belly goes warm and stretchy, ready to hold even more."],
       reducing: ["%t's belly draws in tight, and anything extra comes spillin' out."],
@@ -6817,7 +6835,7 @@
       const L0 = SHOT_LINES[k];
       if (!L0) return "";
       const sz = part ? part === "udder" ? CFG.SIZES.udder.cups[udderLevel(t) - 1] + " cup, " + CFG.SIZES.udder.names[udderLevel(t) - 1] : CFG.SIZES[part].inches ? sizeOf(t, part) + " inches" : sizeWord(part, sizeOf(t, part)) + " " + sizeOf(t, part) + "/" + CFG.SIZES[part].max : "";
-      return L0[Math.floor(Math.random() * L0.length)].replace(/%t/g, plainName(t)).replace(/%s/g, sz);
+      return bodyWords(t, pickFor(t, "shot:" + k, L0)).replace(/%t/g, plainName(t)).replace(/%s/g, sz);
     }
     function onActivity(data) {
       let meta = null;
@@ -14292,7 +14310,7 @@
         s = part === "udder" ? "udder growth" : part === "testes" ? "balls growth" : part === "penis" ? "cock growth" : part === "butt" ? "ass growth" : "fertility";
       }
       if (/fertil|hyper/.test(s) && limitBlocks(mn, "breed")) s = "capacity";
-      if (/lactation|udder/.test(s) && !makesMilk(mn)) s = "ass growth";
+      if (/lactation|udder/.test(s) && !makesMilk(mn) && !(s === "udder growth" && strainKey(rec(mn).parasite) === "grower" && bodyOf(mn).g === "femboy")) s = "ass growth";
       if (/egg/.test(s) && limitBlocks(mn, "eggs")) s = "capacity";
       if (/heat/.test(s) && limitBlocks(mn, "heat")) s = "capacity";
       return s;
@@ -14313,11 +14331,20 @@
       const belt = r.parasiteN > CFG.PARASITE_BELT_AFTER;
       r.parasite = { since: now, until: now + CFG.PARASITE_HOURS * 36e5, next: now + CFG.PARASITE_DOSE_MIN * 6e4, n: 0, fed: 0, form: belt ? "belt" : "lips" };
       parasiteBorn(mn);
+      const via = /^kissed/.test(how || "") ? "kiss" : /^nursed/.test(how || "") ? "nurse" : how === "grew back" ? "regrow" : /^hatched/.test(how || "") ? "hatch" : how === "given" ? "given" : "glory";
+      const came = {
+        glory: "Somethin' came through the hole with that last cock, sugar",
+        kiss: "That kiss left somethin' behind, sugar",
+        nurse: "Somethin' came down with that milk, sugar",
+        regrow: "The last one left a seed in you, sugar, and it's grown back",
+        hatch: "That egg in the nest had one of 'em curled up in it, sugar",
+        given: "The farm girl's put one on you, sugar"
+      }[via];
       if (belt) {
         saveLedger();
         audit(CFG.BOT_MEMBER, "PARASITE", mn + " latched as a belt" + (how ? " (" + how + ")" : ""));
-        emote("\u{1F444} " + paraLine("latchBelt", mn), mn);
-        tell(mn, "\u{1F444} It knows you now, sugar. This time it didn't stop at your mouth: it slid down your body and closed round your hips, a livin' belt with a root up inside you. " + CFG.PARASITE_HOURS + " hours. It feeds you the same serum every half hour, and now it's every load you take in your pussy or your ass that it drinks and turns into more. Your safeword takes it off right now.");
+        emote("\u{1F444} " + paraLine(via === "glory" ? "latchBelt" : "latchBeltAny", mn), mn);
+        tell(mn, "\u{1F444} " + came + ", and it knows you now. This time it didn't stop at your mouth: it slid down your body and closed round your hips, a livin' belt with a root up inside you. " + CFG.PARASITE_HOURS + " hours. It feeds you its serum, regular, and now it's every load you take in your " + (hasVulva(mn) ? "pussy or your ass" : "ass") + " that it drinks and turns into more. Your safeword takes it off right now.");
         face(mn, "edged", 60);
         arouse(mn, 25);
         syncCompanions(true);
@@ -14325,8 +14352,8 @@
       }
       saveLedger();
       audit(CFG.BOT_MEMBER, "PARASITE", mn + " latched" + (how ? " (" + how + ")" : ""));
-      emote("\u{1F444} " + paraLine("latch", mn), mn);
-      tell(mn, "\u{1F444} Somethin' came through the hole with that last cock, sugar, and it's sealed itself over your mouth: a pair of fat, livin' lips with a tentacle down your throat. It'll feed you serum every half hour for the next " + CFG.PARASITE_HOURS + " hours (it grows your tits, cock, balls and ass, stretches how much you hold, and makes you catch easy and carry big), and every load you swallow, it turns into more. It gets hungry, and so will you. Kiss somebody who said ?parasite on and it'll bud onto them. It drops off on its own when it's done. Your safeword takes it off right now.");
+      if (via !== "regrow") emote("\u{1F444} " + paraLine(via === "glory" ? "latch" : "latch_" + via, mn), mn);
+      tell(mn, "\u{1F444} " + came + (via === "regrow" ? " over your mouth" : ", and it's sealed itself over your mouth") + ": a pair of fat, livin' lips with a tentacle down your throat. It'll feed you its serum, regular, for the next " + CFG.PARASITE_HOURS + " hours, and every load you swallow, it turns into more. It gets hungry, and so will you. Kiss somebody who said ?parasite on and it'll bud onto them. It drops off on its own when it's done. Your safeword takes it off right now.");
       face(mn, "edged", 60);
       arouse(mn, 20);
       syncCompanions(true);
@@ -14584,6 +14611,32 @@
         "Somethin' was ridin' on that cock. It lets go as the stranger pulls out and fastens over %n's open mouth, a pair of livin' lips, hot and tight, with a long slippery root that worms down their gullet and makes itself at home.",
         "A glistenin' bulb squeezes through the hole after the last spurt and kisses %n full on the mouth. By the time they get a hand up it has sealed itself on: big wet lips where theirs used to be, and a tentacle down their throat already pulsin'."
       ],
+      // the other ways on: what was passed to them takes hold
+      latch_kiss: [
+        "The little bud on %n's tongue doesn't stay little. It swells, spreads over their lips from the inside, and seals there, plump and wet, while a thin root of it slides down their throat.",
+        "%n tries to spit and can't. What came over in that kiss is already growin', pink and glossy, till a fat pair of livin' lips has closed over their own and somethin' long has settled down their gullet.",
+        "It takes a minute. %n licks their lips, then licks them again, and then the lips are licking back: plump, hot, not theirs, with a tentacle easin' down past their tongue."
+      ],
+      latch_nurse: [
+        "The milk goes down, and the thing that came with it climbs back up. Pink flesh wells over %n's tongue and seals across their mouth, and a slick root of it settles in their throat.",
+        "%n swallows the last of the milk and coughs. Somethin' is growin' up out of them, quick and wet, till a fat pair of livin' lips has sealed over their own.",
+        "Whatever was in that teat isn't done with %n. It surfaces in their mouth, spreads into a plump rubbery pout over their lips, and sends a tentacle back down the way the milk went."
+      ],
+      latch_hatch: [
+        "It lands on %n's mouth like a slap and stays there, spreadin' and swellin' into a pair of fat livin' lips, with a tentacle already feedin' itself down their throat.",
+        "The hatchlin' goes for %n's face and gets there. By the time they've caught their breath it's sealed over their mouth, plump and pink and wet, and settled a root down their gullet.",
+        "%n opens their mouth to yelp and that's all it needs. The little thing pours inside, then wells back out over their lips, swells, and seals, a tentacle stretched down their throat."
+      ],
+      latch_given: [
+        "The farm girl holds up a jar, tips it, and somethin' pink and wet slides out onto %n's mouth. It seals on like a kiss that doesn't end, plump and glossy, and a tentacle slips down their throat.",
+        "A farmhand cups somethin' wet in both hands and presses it to %n's lips. It takes from there: fat livin' lips sealed over their own, and a slow warm root sinkin' down their gullet.",
+        "%n's handed a parasite like a present. It doesn't wait to be unwrapped: it leaps, seals over their mouth in a plump pink pout, and settles a tentacle down their throat."
+      ],
+      latchBeltAny: [
+        "It doesn't stop at %n's mouth this time. It pours down their chin, their chest, their belly, and closes round their hips in a wide glossy band. A thick root pushes up inside them and takes hold.",
+        "The parasite knows %n by now. It slides down their body like spilled honey and knits itself into a belt of livin' flesh, snug between their legs, with a tendril seated deep in each hole.",
+        "This time it wants more of %n than their mouth. It flows down between their thighs, seals itself front to back, and sinks two slow fat roots up into them. %n's knees buckle as it settles in."
+      ],
       dose: [
         "The lips on %n's mouth pucker and throb. Down their throat the tentacle squeezes, and somethin' thick and sweet pumps straight into their belly.",
         "%n's throat bobs without them tellin' it to: the parasite is feedin' them again, a long warm gush of serum they couldn't spit out if they tried.",
@@ -14640,6 +14693,7 @@
     const strainOf = (g) => STRAINS[g && g.strain] || STRAINS.grower;
     function pickStrain(mn) {
       const can = Object.keys(STRAINS).filter((k) => STRAINS[k].can(mn));
+      if (W.__FARMHAND_TEST__ && can.includes(W.__forceStrain)) return W.__forceStrain;
       return can[Math.floor(Math.random() * can.length)] || "grower";
     }
     function parasiteParts(g) {
@@ -14808,8 +14862,10 @@
       ],
       bloom_root: [
         "The parasite isn't done growin'. A thick strand of it slides down %n's belly, wraps their hips in a hot wet band, and pushes a fat root up into each hole below. %n's knees buckle.",
-        "It's found the rest of %n. A sash of livin' flesh knots itself round their hips, and two slow thick tendrils work their way up inside, front and back, and settle there, pulsin'.",
-        "%n feels it creep lower, and lower, and then it's between their legs, sealin' over them, rootin' up into their cunt and their ass both. Lips, teats and holes: it has all of them now."
+        "{nv}It's found the rest of %n. A sash of livin' flesh knots itself round their hips, and one slow thick tendril works its way up their ass and settles there, pulsin'.",
+        "{v}It's found the rest of %n. A sash of livin' flesh knots itself round their hips, and two slow thick tendrils work their way up inside, front and back, and settle there, pulsin'.",
+        "{v}%n feels it creep lower, and lower, and then it's between their legs, sealin' over them, rootin' up into their cunt and their ass both. Lips, teats and holes: it has all of them now.",
+        "{nv}%n feels it creep lower, and lower, and then it's between their legs, sealin' over them, rootin' slow and deep up their ass. Mouth, nipples and hole: it has every one of them now."
       ],
       bloom_lipsLate: [
         "The belt on %n sends a pink runner up their body, over their chest and throat. It reaches their mouth, flattens, and seals over their lips, and a tendril slides down their throat. It has all of them now.",
@@ -14913,6 +14969,7 @@
         lips: "Violet lips, thick and wet, feedin' in gulps every twenty minutes. Every swallow ends up as more of them somewhere.",
         suckers: "Violet cups latched on the tits, pullin' them out long, and they're a little heavier after every feed.",
         suckersFlat: "Violet cups latched on a flat chest that isn't goin' to stay flat. It's pullin' a pair of tits out of them.",
+        suckersMale: "Violet cups latched on the nipples, suckin' between feeds. Everything it pours in goes to the cock and balls.",
         root: "A violet band round the hips with a root in each hole, swellin' a little thicker every hour to keep up with what it's made of them.",
         rootCock: "A violet band round the hips and a root in the ass, pressin' on the spot that makes a cock fill and fatten.",
         cage: { name: "Grower's Sheath", items: ["ChastityPouch", "LatexNulge", "FullCasingCage"], stage: 3, desc: "A livin' violet sleeve swallowed over the cock and balls, kneadin', and both are bigger each time it loosens to let them see." }
@@ -14939,7 +14996,7 @@
       const r = rec(mn), g = r.parasite, P = parasiteParts(g), k = strainKey(g), S = STRAINS[k], D = STRAIN_GEAR[k], b = bodyOf(mn), out = [];
       const base = { always: true, color: STRAIN_COLOR[k], until: g.until }, add = (slot, name, desc, items) => out.push(Object.assign({ slot, name, desc: (S.name + " strain. " + desc).slice(0, 180) }, items ? { items } : {}, base));
       if (P.lips) add("lips", "Parasite Lips", D.lips);
-      if (P.suckers) add("cups", "Parasite Suckers", b.tits ? D.suckers : D.suckersFlat);
+      if (P.suckers) add("cups", "Parasite Suckers", b.tits ? D.suckers : b.g === "male" && D.suckersMale ? D.suckersMale : D.suckersFlat);
       if (P.root) add("belt", g.form === "belt" ? "Parasite Belt" : "Parasite Root", b.vulva ? D.root : D.rootCock);
       if (b.cock && D.cage && P.stage >= D.cage.stage) add("dildo", D.cage.name, D.cage.desc, D.cage.items);
       if (D.torso && P.stage >= 3) add("torso", D.torso.name, D.torso.desc, ["TentacleSuit"]);
@@ -14959,8 +15016,8 @@
       const g = rec(mn).parasite, k = strainKey(g), b = bodyOf(mn), late = stage >= 3;
       if (g.form === "belt") return late ? "It's reached your mouth now, sugar. All of it's on you." : "It's climbin', sugar. It has your nipples now.";
       const T = {
-        breeder: late ? "It has your " + (b.tits ? "teats" : "nipples") + " now, and it's wrapped your belly in a warm sac of itself to hold what it's bred into you. It lays once more before it goes." : b.vulva ? "It's rooted in you, right up against your womb, and it's laid its first clutch while it was down there." : "It's rooted in your ass, and it's made a place in there. It's laid its first clutch in it already.",
-        grower: late ? b.cock ? "It's grown a sheath over your cock and balls, sugar, and a root behind. They'll both be bigger when it lets you look." : "It's rooted in you now, sugar, swellin' as you do." : b.tits ? "It has your tits now, pullin' them out long. They'll be heavier after every feed." : "It's on your chest now, and it's pullin'. You're goin' to have somethin' there by the time it's done.",
+        breeder: late ? "It has your " + (b.tits ? "teats" : "nipples") + " now, and it's wrapped your belly in a warm sac of itself to hold what it's bred into you. It lays once more before it goes." : b.vulva ? "It's rooted in you, right up against your womb, keepin' it open and ripe. Half-way through its time it'll start layin' in there." : "It's rooted in your ass, and it's made a place in there to carry. Half-way through its time it'll start fillin' it with eggs.",
+        grower: late ? b.cock ? "It's grown a sheath over your cock and balls, sugar, and a root behind. They'll both be bigger when it lets you look." : "It's rooted in you now, sugar, swellin' as you do." : b.tits ? "It has your tits now, pullin' them out long. They'll be heavier after every feed." : b.g === "femboy" ? "It's on your chest now, and it's pullin'. You're goin' to have somethin' there by the time it's done." : "It's on your nipples now, suckin' between feeds just to keep you squirmin'. Every drop it pours in still goes to your cock and balls.",
         glutton: late ? "It's rooted below now as well. Anything anybody puts in you, it drinks before you've felt the warmth of it." : b.cock ? "It's swallowed your cock, sugar. From here on it milks you dry at every feed, and doses you so there's more next time." : "It's hungrier. It'll drain your teats lower at every feed from here on.",
         tyrant: late ? "It's webbed over all of you now. Every quarter hour it's goin' to walk you right to the edge and leave you standin' there." : "It has your nipples now, and it only uses them to wind you up."
       };

@@ -55,6 +55,7 @@
                torso: { name: "Brood Sac", desc: "A warm web of livin' flesh cradlin' the belly from underneath, holdin' the weight of what's been put in there and squeezin' when it moves." } },
     grower:  { lips: "Violet lips, thick and wet, feedin' in gulps every twenty minutes. Every swallow ends up as more of them somewhere.",
                suckers: "Violet cups latched on the tits, pullin' them out long, and they're a little heavier after every feed.", suckersFlat: "Violet cups latched on a flat chest that isn't goin' to stay flat. It's pullin' a pair of tits out of them.",
+               suckersMale: "Violet cups latched on the nipples, suckin' between feeds. Everything it pours in goes to the cock and balls.",
                root: "A violet band round the hips with a root in each hole, swellin' a little thicker every hour to keep up with what it's made of them.",
                rootCock: "A violet band round the hips and a root in the ass, pressin' on the spot that makes a cock fill and fatten.",
                cage: { name: "Grower's Sheath", items: ["ChastityPouch", "LatexNulge", "FullCasingCage"], stage: 3, desc: "A livin' violet sleeve swallowed over the cock and balls, kneadin', and both are bigger each time it loosens to let them see." } },
@@ -74,7 +75,7 @@
     const r = rec(mn), g = r.parasite, P = parasiteParts(g), k = strainKey(g), S = STRAINS[k], D = STRAIN_GEAR[k], b = bodyOf(mn), out = [];
     const base = { always: true, color: STRAIN_COLOR[k], until: g.until }, add = (slot, name, desc, items) => out.push(Object.assign({ slot, name, desc: (S.name+" strain. "+desc).slice(0, 180) }, items ? { items } : {}, base));
     if (P.lips) add("lips", "Parasite Lips", D.lips);
-    if (P.suckers) add("cups", "Parasite Suckers", b.tits ? D.suckers : D.suckersFlat);
+    if (P.suckers) add("cups", "Parasite Suckers", b.tits ? D.suckers : b.g === "male" && D.suckersMale ? D.suckersMale : D.suckersFlat);
     if (P.root) add("belt", g.form === "belt" ? "Parasite Belt" : "Parasite Root", b.vulva ? D.root : D.rootCock);
     if (b.cock && D.cage && P.stage >= D.cage.stage) add("dildo", D.cage.name, D.cage.desc, D.cage.items);
     if (D.torso && P.stage >= 3) add("torso", D.torso.name, D.torso.desc, ["TentacleSuit"]);
@@ -103,9 +104,11 @@
     if (g.form === "belt") return late ? "It's reached your mouth now, sugar. All of it's on you." : "It's climbin', sugar. It has your nipples now.";
     const T = {
       breeder: late ? "It has your "+(b.tits ? "teats" : "nipples")+" now, and it's wrapped your belly in a warm sac of itself to hold what it's bred into you. It lays once more before it goes."
-                    : (b.vulva ? "It's rooted in you, right up against your womb, and it's laid its first clutch while it was down there." : "It's rooted in your ass, and it's made a place in there. It's laid its first clutch in it already."),
+                    : (b.vulva ? "It's rooted in you, right up against your womb, keepin' it open and ripe. Half-way through its time it'll start layin' in there." : "It's rooted in your ass, and it's made a place in there to carry. Half-way through its time it'll start fillin' it with eggs."),
       grower:  late ? (b.cock ? "It's grown a sheath over your cock and balls, sugar, and a root behind. They'll both be bigger when it lets you look." : "It's rooted in you now, sugar, swellin' as you do.")
-                    : (b.tits ? "It has your tits now, pullin' them out long. They'll be heavier after every feed." : "It's on your chest now, and it's pullin'. You're goin' to have somethin' there by the time it's done."),
+                    : (b.tits ? "It has your tits now, pullin' them out long. They'll be heavier after every feed."
+                       : b.g === "femboy" ? "It's on your chest now, and it's pullin'. You're goin' to have somethin' there by the time it's done."
+                       : "It's on your nipples now, suckin' between feeds just to keep you squirmin'. Every drop it pours in still goes to your cock and balls."),
       glutton: late ? "It's rooted below now as well. Anything anybody puts in you, it drinks before you've felt the warmth of it."
                     : (b.cock ? "It's swallowed your cock, sugar. From here on it milks you dry at every feed, and doses you so there's more next time." : "It's hungrier. It'll drain your teats lower at every feed from here on."),
       tyrant:  late ? "It's webbed over all of you now. Every quarter hour it's goin' to walk you right to the edge and leave you standin' there."

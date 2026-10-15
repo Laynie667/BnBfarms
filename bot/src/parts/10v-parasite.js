@@ -29,7 +29,7 @@
       s = part === "udder" ? "udder growth" : part === "testes" ? "balls growth" : part === "penis" ? "cock growth" : part === "butt" ? "ass growth" : "fertility";
     }
     if (/fertil|hyper/.test(s) && limitBlocks(mn, "breed")) s = "capacity";
-    if (/lactation|udder/.test(s) && !makesMilk(mn)) s = "ass growth";
+    if (/lactation|udder/.test(s) && !makesMilk(mn) && !(s === "udder growth" && strainKey(rec(mn).parasite) === "grower" && bodyOf(mn).g === "femboy")) s = "ass growth";   // (a Grower gives a femboy the tits it promised, milk or no milk)
     if (/egg/.test(s) && limitBlocks(mn, "eggs")) s = "capacity";
     if (/heat/.test(s) && limitBlocks(mn, "heat")) s = "capacity";
     return s;
@@ -50,16 +50,21 @@
     const belt = r.parasiteN > CFG.PARASITE_BELT_AFTER;
     r.parasite = { since: now, until: now + CFG.PARASITE_HOURS*3600000, next: now + CFG.PARASITE_DOSE_MIN*60000, n: 0, fed: 0, form: belt ? "belt" : "lips" };
     parasiteBorn(mn);   // its strain, its first urge (10v2-parasite-more.js)
+    // how it got on them: the line the room sees and the first words they're told both follow it. Only the glory hole
+    // comes with a cock; a kiss, a teat, an egg, a seed or the farm girl's hand each tell it their own way.
+    const via = /^kissed/.test(how || "") ? "kiss" : /^nursed/.test(how || "") ? "nurse" : how === "grew back" ? "regrow" : /^hatched/.test(how || "") ? "hatch" : how === "given" ? "given" : "glory";
+    const came = { glory: "Somethin' came through the hole with that last cock, sugar", kiss: "That kiss left somethin' behind, sugar", nurse: "Somethin' came down with that milk, sugar",
+                   regrow: "The last one left a seed in you, sugar, and it's grown back", hatch: "That egg in the nest had one of 'em curled up in it, sugar", given: "The farm girl's put one on you, sugar" }[via];
     if (belt){
       saveLedger(); audit(CFG.BOT_MEMBER, "PARASITE", mn+" latched as a belt"+(how ? " ("+how+")" : ""));
-      emote("👄 "+paraLine("latchBelt", mn), mn);
-      tell(mn, "👄 It knows you now, sugar. This time it didn't stop at your mouth: it slid down your body and closed round your hips, a livin' belt with a root up inside you. "+CFG.PARASITE_HOURS+" hours. It feeds you the same serum every half hour, and now it's every load you take in your pussy or your ass that it drinks and turns into more. Your safeword takes it off right now.");
+      emote("👄 "+paraLine(via === "glory" ? "latchBelt" : "latchBeltAny", mn), mn);
+      tell(mn, "👄 "+came+", and it knows you now. This time it didn't stop at your mouth: it slid down your body and closed round your hips, a livin' belt with a root up inside you. "+CFG.PARASITE_HOURS+" hours. It feeds you its serum, regular, and now it's every load you take in your "+(hasVulva(mn) ? "pussy or your ass" : "ass")+" that it drinks and turns into more. Your safeword takes it off right now.");
       face(mn, "edged", 60); arouse(mn, 25); syncCompanions(true);
       return;
     }
     saveLedger(); audit(CFG.BOT_MEMBER, "PARASITE", mn+" latched"+(how ? " ("+how+")" : ""));
-    emote("👄 "+paraLine("latch", mn), mn);
-    tell(mn, "👄 Somethin' came through the hole with that last cock, sugar, and it's sealed itself over your mouth: a pair of fat, livin' lips with a tentacle down your throat. It'll feed you serum every half hour for the next "+CFG.PARASITE_HOURS+" hours (it grows your tits, cock, balls and ass, stretches how much you hold, and makes you catch easy and carry big), and every load you swallow, it turns into more. It gets hungry, and so will you. Kiss somebody who said ?parasite on and it'll bud onto them. "+
+    if (via !== "regrow") emote("👄 "+paraLine(via === "glory" ? "latch" : "latch_"+via, mn), mn);   // (a seed growin' back has its own line already)
+    tell(mn, "👄 "+came+(via === "regrow" ? " over your mouth" : ", and it's sealed itself over your mouth")+": a pair of fat, livin' lips with a tentacle down your throat. It'll feed you its serum, regular, for the next "+CFG.PARASITE_HOURS+" hours, and every load you swallow, it turns into more. It gets hungry, and so will you. Kiss somebody who said ?parasite on and it'll bud onto them. "+
              "It drops off on its own when it's done. Your safeword takes it off right now.");
     face(mn, "edged", 60); arouse(mn, 20);
     syncCompanions(true);
@@ -238,6 +243,27 @@
       "Somethin' was ridin' on that cock. It lets go as the stranger pulls out and fastens over %n's open mouth, a pair of livin' lips, hot and tight, with a long slippery root that worms down their gullet and makes itself at home.",
       "A glistenin' bulb squeezes through the hole after the last spurt and kisses %n full on the mouth. By the time they get a hand up it has sealed itself on: big wet lips where theirs used to be, and a tentacle down their throat already pulsin'.",
     ],
+    // the other ways on: what was passed to them takes hold
+    latch_kiss: [
+      "The little bud on %n's tongue doesn't stay little. It swells, spreads over their lips from the inside, and seals there, plump and wet, while a thin root of it slides down their throat.",
+      "%n tries to spit and can't. What came over in that kiss is already growin', pink and glossy, till a fat pair of livin' lips has closed over their own and somethin' long has settled down their gullet.",
+      "It takes a minute. %n licks their lips, then licks them again, and then the lips are licking back: plump, hot, not theirs, with a tentacle easin' down past their tongue."],
+    latch_nurse: [
+      "The milk goes down, and the thing that came with it climbs back up. Pink flesh wells over %n's tongue and seals across their mouth, and a slick root of it settles in their throat.",
+      "%n swallows the last of the milk and coughs. Somethin' is growin' up out of them, quick and wet, till a fat pair of livin' lips has sealed over their own.",
+      "Whatever was in that teat isn't done with %n. It surfaces in their mouth, spreads into a plump rubbery pout over their lips, and sends a tentacle back down the way the milk went."],
+    latch_hatch: [
+      "It lands on %n's mouth like a slap and stays there, spreadin' and swellin' into a pair of fat livin' lips, with a tentacle already feedin' itself down their throat.",
+      "The hatchlin' goes for %n's face and gets there. By the time they've caught their breath it's sealed over their mouth, plump and pink and wet, and settled a root down their gullet.",
+      "%n opens their mouth to yelp and that's all it needs. The little thing pours inside, then wells back out over their lips, swells, and seals, a tentacle stretched down their throat."],
+    latch_given: [
+      "The farm girl holds up a jar, tips it, and somethin' pink and wet slides out onto %n's mouth. It seals on like a kiss that doesn't end, plump and glossy, and a tentacle slips down their throat.",
+      "A farmhand cups somethin' wet in both hands and presses it to %n's lips. It takes from there: fat livin' lips sealed over their own, and a slow warm root sinkin' down their gullet.",
+      "%n's handed a parasite like a present. It doesn't wait to be unwrapped: it leaps, seals over their mouth in a plump pink pout, and settles a tentacle down their throat."],
+    latchBeltAny: [
+      "It doesn't stop at %n's mouth this time. It pours down their chin, their chest, their belly, and closes round their hips in a wide glossy band. A thick root pushes up inside them and takes hold.",
+      "The parasite knows %n by now. It slides down their body like spilled honey and knits itself into a belt of livin' flesh, snug between their legs, with a tendril seated deep in each hole.",
+      "This time it wants more of %n than their mouth. It flows down between their thighs, seals itself front to back, and sinks two slow fat roots up into them. %n's knees buckle as it settles in."],
     dose: [
       "The lips on %n's mouth pucker and throb. Down their throat the tentacle squeezes, and somethin' thick and sweet pumps straight into their belly.",
       "%n's throat bobs without them tellin' it to: the parasite is feedin' them again, a long warm gush of serum they couldn't spit out if they tried.",

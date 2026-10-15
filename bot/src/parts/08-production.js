@@ -431,6 +431,17 @@
     vatAdd(mn, amount);   // their own vat: it buys potions and shots (10y6-keepers.js)
   }
 
+  // milkin' somebody who's still full of seed: %n them, %s whose seed, %a how much. Tagged for the body (10y9d-body-fit.js).
+  const MILK_LEAK = [
+    "{t}Every squeeze of %n's udder pushes a warm gush of %s seed back out of 'em (%a). What a mess, sugar.",
+    "{t}They pull on %n's tits and the rest of 'em lets go too: a warm rush of %s seed, back out the way it went in (%a). Somebody fetch a rag.",
+    "{t}%n's milkin' from the top and leakin' from the bottom, %s seed runnin' warm down their thighs with every pull (%a).",
+    "{nt}Every pull on %n's chest pushes a warm gush of %s seed back out of 'em (%a). What a mess, sugar.",
+    "{nt}They squeeze %n up top and %s seed comes out down below, a warm slow gush of it (%a). Full as a tick, that one.",
+    "Squeeze %n anywhere and somethin' comes out. Right now it's %s seed, sluicin' back out of 'em warm (%a).",
+    "%n's packed so full that milkin' 'em wrings %s seed back out too, a good warm splash of it on the straw (%a).",
+  ];
+
   function drainMilk(mn, amount, nursing){
     const p = prodOf(mn);
     if (milkDenied(mn)) return 0;
@@ -456,7 +467,8 @@
       p.leakAcc = (p.leakAcc||0) + out;
       if (charFor(mn) && now - (p.leakSaid||0) > 60000 && p.leakAcc >= 5){
         p.leakSaid = now;
-        emote("💦 Every squeeze of "+plainName(mn)+"'s udder pushes a warm gush of "+(p.lastStud ? plainName(p.lastStud)+"'s" : "somebody's")+" seed back out of 'em ("+ml(p.leakAcc)+"). What a mess, sugar.");
+        const whose = p.lastStud ? plainName(p.lastStud)+"'s" : "somebody's";
+        emote("💦 "+bodyWords(mn, pickFor(mn, "milkleak", MILK_LEAK)).replace(/%n/g, plainName(mn)).replace(/%s/g, whose).replace(/%a/g, ml(p.leakAcc)));
         p.leakAcc = 0;
       }
     }
@@ -479,7 +491,7 @@
     p.nextHeatAt = Date.now() + CFG.PROD.NATURAL_HEAT_EVERY_D*86400000;
     if (!already){
       if (charFor(mn)){ emote(plainName(mn)+" flushes hot all over, comin' into heat.", mn); face(mn, "heat", 90); }
-      tell(mn, "🔥 Ooh, you've come into heat, "+plainName(mn)+"! Gonna be mighty hard to miss for the next "+(hours||CFG.PROD.HEAT_H)+" hours, sweetie.");
+      tell(mn, "🔥 Ooh, you've come into heat, "+plainName(mn)+"! Gonna be mighty hard to miss for "+((h => h === 1 ? "the next hour" : "the next "+h+" hours")(hours||CFG.PROD.HEAT_H))+", sweetie.");
       for (const h of herdsOf(mn)) beep(h.leader, "🔥 Heads up, hon: "+plainName(mn)+" just came into heat.");
     }
     saveLedger();

@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.23.0
+// @version      0.24.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -230,7 +230,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.23.0";
+  var VERSION = "0.24.0";
 
   // extension/src/config.js
   var BOT_MEMBER = 260239;
@@ -4170,7 +4170,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     ["dares", "Dares", "Staff and the wheel can hand you a dare to do in half an hour"],
     ["watersports", "Watersports", "Piss play can find you: the spray trap, a feeder crafted for it, and the scenes that have it. Off until you say so"],
     ["parasite", "Parasite", "Swallow at the glory stalls and, rarely, a pair of livin' lips seals over your mouth for 12 hours: it feeds you fertility, growth, hyper pregnancy and capacity serum and turns every load you swallow into more"],
-    ["symbiote", "Symbiotes", "Livin' latex, milk moss or the nestling can bond to you. Each gives you somethin' for as long as it's fed: room to hold more, more milk, an easier catch. Your safeword sends it away"],
+    ["symbiote", "Symbiotes", "Livin' latex, milk moss or the nestling can bond to you. Each gives you somethin' for as long as it's fed: room to hold more, more milk, an easier catch. They grow into real clothes on you (latex, moss), and they spread: latex by a touch, moss in the milk, the nestling by a breedin', to others who switched this on. Your safeword sends it away"],
     ["eager", "Traps: no cooldown", "Test subjects: no breather between traps and no wait for a trap to reset. Step off and back on and it springs again"],
     ["bench", "Use bench", "Staff and the wheel can sentence you to time strapped over the use bench, where anybody can use you. Your safeword ends it at once"]
   ];
@@ -7649,7 +7649,15 @@ One of mods you are using is using an old version of SDK. It will work for now b
     "Kissin' Gate",
     "The Fence",
     "Collection Bench",
-    "Auction Block"
+    "Auction Block",
+    "Livin' Latex (hands)",
+    "Livin' Latex (arms)",
+    "Livin' Latex (feet)",
+    "Livin' Latex (legs)",
+    "Livin' Latex (body)",
+    "Livin' Latex (heels)",
+    "Milk Moss",
+    "Milk Moss (bloom)"
   ];
   var GEAR_SLOTS = {
     plug: { groups: ["ItemButt"], names: ["InflVibeButtPlug", "BlackButtPlug", "ButtPlug", "ButtPump"], re: /ButtPlug|Plug/, color: "#2B2B2B" },
@@ -7667,6 +7675,15 @@ One of mods you are using is using an old version of SDK. It will work for now b
     torso: { groups: ["ItemTorso", "ItemTorso2"], names: ["TentacleSuit", "HempRopeHarness"], re: /Harness/ },
     tag: { groups: ["ItemNeckAccessories"], names: ["CollarNameTagLivestock", "CollarNameTag"], re: /NameTag/, needs: "ItemNeck" },
     // the big pieces (Oct 15): the game's own devices, only the ones a piece names (no stray device off the list)
+    // clothes a symbiote grows into (Oct 15): these take the spot over if you're wearing something there, and put yours
+    // back when the piece comes off (takeover)
+    gloves: { groups: ["Gloves"], names: ["LatexShortGloves"], re: /^Latex/, takeover: true },
+    socks: { groups: ["Socks"], names: ["LatexSocks1"], re: /^Latex/, takeover: true },
+    suit: { groups: ["Suit"], names: ["LatexCatsuit"], re: /^LatexCatsuit$/, takeover: true },
+    suitLower: { groups: ["SuitLower"], names: ["LatexCatsuit"], re: /^LatexCatsuit$/, takeover: true },
+    bra: { groups: ["Bra"], names: ["FlowerBra"], re: /^FlowerBra$/, takeover: true },
+    hat: { groups: ["Hat"], names: ["FlowerCrown"], re: /^FlowerCrown$/, takeover: true },
+    boots: { groups: ["ItemBoots"], names: ["ThighHighLatexHeels"], re: /^ThighHighLatexHeels$/ },
     device: { groups: ["ItemDevices"], names: ["WoodenStocks"], re: /^(WoodenStocks|SaddleStand|WoodenHorse|Net|Kennel|LowCage|KabeshiriWall|WheelFortune|LuckyWheel|X-Cross|BondageBench|TheDisplayFrame|MilkCan)$/ }
   };
   function gearAsset(group, slot, prefer) {
@@ -7727,6 +7744,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       if (!n || want.some((g) => g.name === n) || stuck.has(b.Group)) continue;
       next = next.filter((x) => x !== b);
       did.off.push(n);
+      if (mem[n] && mem[n].was && !next.some((x) => x.Group === b.Group)) next.push(mem[n].was);
       delete mem[n];
     }
     for (const n of Object.keys(mem)) if (!want.some((g) => g.name === n) && !next.some((b) => gearNameOf(b, mem) === n)) delete mem[n];
@@ -7734,10 +7752,20 @@ One of mods you are using is using an old version of SDK. It will work for now b
       if (next.some((b) => gearNameOf(b, mem) === g.name)) continue;
       const slot = GEAR_SLOTS[g.slot];
       if (slot.needs && !next.some((b) => b.Group === slot.needs)) continue;
-      const group = slot.groups.find((x) => !next.some((b) => b.Group === x) && groupOf2(x));
+      let group = slot.groups.find((x) => !next.some((b) => b.Group === x) && groupOf2(x)), was = null;
+      if (!group && slot.takeover) {
+        group = slot.groups.find((x) => groupOf2(x) && !stuck.has(x) && next.some((b) => b.Group === x && !gearNameOf(b, mem)));
+        if (group) {
+          was = next.find((b) => b.Group === group);
+          next = next.filter((b) => b !== was);
+        }
+      }
       if (!group) continue;
       const item = gearAsset(group, slot, g.items);
-      if (!item) continue;
+      if (!item) {
+        if (was) next.push(was);
+        continue;
+      }
       const color = (typeof g.color === "string" && /^#[0-9a-fA-F]{6}$/.test(g.color) ? g.color : null) || slot.color || "Default";
       const it = {
         Group: group,
@@ -7762,7 +7790,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       if (color !== "Default") it.Color = color;
       next.push(it);
       did.on.push(g.name);
-      mem[g.name] = { group, item };
+      mem[g.name] = was ? { group, item, was: JSON.parse(JSON.stringify(was)) } : { group, item };
       learnName(String(g.name).slice(0, 30));
     }
     gearMemSave(mem);

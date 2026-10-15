@@ -91,6 +91,7 @@
     try {
       if (!(mlIn > 0)) return;
       symbioteFed(mn, "load", hole);   // a symbiote eats too (10v4-symbiotes.js)
+      symbioteBred(stud, mn, hole);     // ...and the nestling buds into whoever its host breeds (10v5)
       const r = rec(mn), p = prodOf(mn); if (!r || !p) return;
       // as a belt it drinks from the other end
       if (hole !== "mouth"){

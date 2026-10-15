@@ -5,7 +5,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 | Script | File in `dist/` | Where it runs | Current |
 |---|---|---|---|
-| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.32.1** |
+| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.33.0** |
 | Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.7.0** |
 | Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.2.1** |
 | Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **1.1.0** |
@@ -13,7 +13,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 | Map tools, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.4** |
 | Dairy | `farmhand-dairy.user.js` | the bot's PC | **1.1.0** |
 | Shows | `farmhand-shows.user.js` | the bot's PC | **1.1.0** |
-| Farmhand Companion | `farmhand-companion.user.js` | each player | **0.23.0** |
+| Farmhand Companion | `farmhand-companion.user.js` | each player | **0.24.0** |
 | Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.4** |
 
 ## Sending a watch report
@@ -23,6 +23,8 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 - Running the watcher on more than one game at once (the bot, yours, a tester's) lets Claude line them up into one timeline.
 
 ## Latest changes (newest first)
+
+- **Bot 0.33.0, Companion 0.24.0: symbiotes spread, and you wear them.** Laynie: "id love the symbiotes to actually spread, with real clothes or gear~". (1) **Spreading**, only to somebody else who said ?symbiote on and hasn't one (limits rule): livin' latex by a touch (kiss, hug, cuddle, caress, grope, lick) once it's past its first stage; milk moss in the milk, to somebody who nurses from a host and makes milk; the nestling buds into whoever its host breeds. A quarter of the time, once in ten minutes per pair, and the new one starts small. (2) **Real clothes** (no second switch: ?symbiote on is the say-so): livin' latex grows from latex gloves, to latex socks and catsuit legs, to the catsuit to the neck with elbow gloves, to thigh-high latex heels, all glossy black; milk moss is a mossy green flower bra, then a crown of its flowers when it blooms. The nestling is inside them, nothin' to wear. A piece that goes where they're already wearin' somethin' takes that spot for as long as it's on, and their own goes back on after (new in the Companion: *clothing* pieces that borrow a spot). (3) Studio: the symbiotes' clothes by stage are presets too. (4) Splatters: the studio has a first pass of the farm's own painted messes (studio/web/splatters.js), for Laynie to mark up before the Companion draws them. **Bot and Companion.**
 
 - **Studio: the farm's equipment as presets; bot 0.32.1.** Laynie: "added the farm items to the studio as presets, so i can view each set without having to wait in game to trigger". A *Farm equipment* section in the studio: pick any of 56 sets (every trap's gear, with and without a pussy where it matters, the mystery box, the livin' suit stage by stage) and put it on in one click, the way the Companion would; buttons for every mess colour. `node tools/farm-presets.mjs` rewrites the list from the built bot after gear changes. Bot 0.32.1 only adds a test hook the tool reads (nothing changes in play).
 

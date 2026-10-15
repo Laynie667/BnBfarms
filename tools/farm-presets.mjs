@@ -54,6 +54,13 @@ for (const [kind, C] of Object.entries(F.CURSES)) {
 }
 const suit = [];
 F.SUIT_STAGES.forEach((G, i) => { if (!G.slot) return; suit.push(pieceOut({ slot: G.slot, label: G.name, desc: G.desc, items: G.items, color: F.SUIT_COLOR }, "pussy")); sets.push({ group: "Livin' suit", name: "🖤 stage " + i + ": " + G.where, what: "as far as it has spread", pieces: suit.filter(Boolean).slice() }); });
+for (const [kind, list] of Object.entries(F.SYM_GEAR || {})) {
+  const top = Math.max(0, ...list.map((P) => P.at));
+  for (let st = 1; st <= top; st++) {
+    const pieces = list.filter((P) => st >= P.at && !(P.upTo && st > P.upTo)).map((P) => pieceOut({ slot: P.slot, label: P.name, desc: P.desc, items: P.items, color: P.color }, "pussy")).filter(Boolean);
+    if (pieces.length) sets.push({ group: "Symbiotes", name: (kind === "latex" ? "🖤 livin' latex" : "🌱 milk moss") + ", stage " + st, what: "as far as it has grown", pieces });
+  }
+}
 const messes = Object.entries(F.MESS).map(([name, color]) => ({ name, color, traps: Object.entries(F.MESS_BY_TRAP).filter(([, m]) => m[0] === name).map(([k]) => k) }));
 writeFileSync(join(ROOT, "studio/web/farm-presets.json"), JSON.stringify({ made: new Date().toISOString(), sets, messes }, null, 1));
 quiet("✅ " + sets.length + " equipment sets and " + messes.length + " messes → studio/web/farm-presets.json");

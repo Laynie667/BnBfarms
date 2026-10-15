@@ -1,5 +1,5 @@
 {
- "made": "2026-10-15T07:12:01.242Z",
+ "made": "2026-10-15T07:20:57.457Z",
  "sets": [
   {
    "group": "Traps",
@@ -1781,6 +1781,310 @@
      "when": "on",
      "mins": null,
      "desc": "The last of it: a smooth black sheath over the face from the nose down, and a tongue of itself in the mouth. Every inch of them is inside it now."
+    }
+   ]
+  },
+  {
+   "group": "Symbiotes",
+   "name": "🖤 livin' latex, stage 1",
+   "what": "as far as it has grown",
+   "pieces": [
+    {
+     "slot": "gloves",
+     "groups": [
+      "Gloves"
+     ],
+     "items": [
+      "LatexShortGloves",
+      "LatexShortGloves"
+     ],
+     "color": "#121214",
+     "label": "Livin' Latex (hands)",
+     "when": "on",
+     "mins": null,
+     "desc": "Glossy black livin' latex over both hands, warm as skin and tighter, and it's spreading."
+    }
+   ]
+  },
+  {
+   "group": "Symbiotes",
+   "name": "🖤 livin' latex, stage 2",
+   "what": "as far as it has grown",
+   "pieces": [
+    {
+     "slot": "gloves",
+     "groups": [
+      "Gloves"
+     ],
+     "items": [
+      "LatexShortGloves",
+      "LatexShortGloves"
+     ],
+     "color": "#121214",
+     "label": "Livin' Latex (hands)",
+     "when": "on",
+     "mins": null,
+     "desc": "Glossy black livin' latex over both hands, warm as skin and tighter, and it's spreading."
+    },
+    {
+     "slot": "socks",
+     "groups": [
+      "Socks"
+     ],
+     "items": [
+      "LatexSocks1",
+      "LatexSocks1"
+     ],
+     "color": "#121214",
+     "label": "Livin' Latex (feet)",
+     "when": "on",
+     "mins": null,
+     "desc": "Black latex grown smooth over feet and calves, seamless."
+    },
+    {
+     "slot": "suitLower",
+     "groups": [
+      "SuitLower"
+     ],
+     "items": [
+      "LatexCatsuit",
+      "LatexCatsuit"
+     ],
+     "color": "#121214",
+     "label": "Livin' Latex (legs)",
+     "when": "on",
+     "mins": null,
+     "desc": "The livin' latex has taken both legs and the hips, a glossy second skin that squeezes with every step."
+    }
+   ]
+  },
+  {
+   "group": "Symbiotes",
+   "name": "🖤 livin' latex, stage 3",
+   "what": "as far as it has grown",
+   "pieces": [
+    {
+     "slot": "gloves",
+     "groups": [
+      "Gloves"
+     ],
+     "items": [
+      "LatexElbowGloves",
+      "LatexShortGloves"
+     ],
+     "color": "#121214",
+     "label": "Livin' Latex (arms)",
+     "when": "on",
+     "mins": null,
+     "desc": "The livin' latex has run up both arms to the elbow, shining wet-black."
+    },
+    {
+     "slot": "socks",
+     "groups": [
+      "Socks"
+     ],
+     "items": [
+      "LatexSocks1",
+      "LatexSocks1"
+     ],
+     "color": "#121214",
+     "label": "Livin' Latex (feet)",
+     "when": "on",
+     "mins": null,
+     "desc": "Black latex grown smooth over feet and calves, seamless."
+    },
+    {
+     "slot": "suitLower",
+     "groups": [
+      "SuitLower"
+     ],
+     "items": [
+      "LatexCatsuit",
+      "LatexCatsuit"
+     ],
+     "color": "#121214",
+     "label": "Livin' Latex (legs)",
+     "when": "on",
+     "mins": null,
+     "desc": "The livin' latex has taken both legs and the hips, a glossy second skin that squeezes with every step."
+    },
+    {
+     "slot": "suit",
+     "groups": [
+      "Suit"
+     ],
+     "items": [
+      "LatexCatsuit",
+      "LatexCatsuit"
+     ],
+     "color": "#121214",
+     "label": "Livin' Latex (body)",
+     "when": "on",
+     "mins": null,
+     "desc": "Black latex sealed from the neck down, moulded to every curve, warm, alive, and very pleased with itself."
+    }
+   ]
+  },
+  {
+   "group": "Symbiotes",
+   "name": "🖤 livin' latex, stage 4",
+   "what": "as far as it has grown",
+   "pieces": [
+    {
+     "slot": "gloves",
+     "groups": [
+      "Gloves"
+     ],
+     "items": [
+      "LatexElbowGloves",
+      "LatexShortGloves"
+     ],
+     "color": "#121214",
+     "label": "Livin' Latex (arms)",
+     "when": "on",
+     "mins": null,
+     "desc": "The livin' latex has run up both arms to the elbow, shining wet-black."
+    },
+    {
+     "slot": "socks",
+     "groups": [
+      "Socks"
+     ],
+     "items": [
+      "LatexSocks1",
+      "LatexSocks1"
+     ],
+     "color": "#121214",
+     "label": "Livin' Latex (feet)",
+     "when": "on",
+     "mins": null,
+     "desc": "Black latex grown smooth over feet and calves, seamless."
+    },
+    {
+     "slot": "suitLower",
+     "groups": [
+      "SuitLower"
+     ],
+     "items": [
+      "LatexCatsuit",
+      "LatexCatsuit"
+     ],
+     "color": "#121214",
+     "label": "Livin' Latex (legs)",
+     "when": "on",
+     "mins": null,
+     "desc": "The livin' latex has taken both legs and the hips, a glossy second skin that squeezes with every step."
+    },
+    {
+     "slot": "suit",
+     "groups": [
+      "Suit"
+     ],
+     "items": [
+      "LatexCatsuit",
+      "LatexCatsuit"
+     ],
+     "color": "#121214",
+     "label": "Livin' Latex (body)",
+     "when": "on",
+     "mins": null,
+     "desc": "Black latex sealed from the neck down, moulded to every curve, warm, alive, and very pleased with itself."
+    },
+    {
+     "slot": "boots",
+     "groups": [
+      "ItemBoots"
+     ],
+     "items": [
+      "ThighHighLatexHeels",
+      "ThighHighLatexHeels"
+     ],
+     "color": "#121214",
+     "label": "Livin' Latex (heels)",
+     "when": "on",
+     "mins": null,
+     "desc": "It's grown itself a pair of thigh-high heels. Its idea, not theirs."
+    }
+   ]
+  },
+  {
+   "group": "Symbiotes",
+   "name": "🌱 milk moss, stage 1",
+   "what": "as far as it has grown",
+   "pieces": [
+    {
+     "slot": "bra",
+     "groups": [
+      "Bra"
+     ],
+     "items": [
+      "FlowerBra",
+      "FlowerBra"
+     ],
+     "color": "#5E8F3A",
+     "label": "Milk Moss",
+     "when": "on",
+     "mins": null,
+     "desc": "Soft green moss grown over the chest, damp and humming, sweet-smelling, and making milk like mad."
+    }
+   ]
+  },
+  {
+   "group": "Symbiotes",
+   "name": "🌱 milk moss, stage 2",
+   "what": "as far as it has grown",
+   "pieces": [
+    {
+     "slot": "bra",
+     "groups": [
+      "Bra"
+     ],
+     "items": [
+      "FlowerBra",
+      "FlowerBra"
+     ],
+     "color": "#5E8F3A",
+     "label": "Milk Moss",
+     "when": "on",
+     "mins": null,
+     "desc": "Soft green moss grown over the chest, damp and humming, sweet-smelling, and making milk like mad."
+    }
+   ]
+  },
+  {
+   "group": "Symbiotes",
+   "name": "🌱 milk moss, stage 3",
+   "what": "as far as it has grown",
+   "pieces": [
+    {
+     "slot": "bra",
+     "groups": [
+      "Bra"
+     ],
+     "items": [
+      "FlowerBra",
+      "FlowerBra"
+     ],
+     "color": "#5E8F3A",
+     "label": "Milk Moss",
+     "when": "on",
+     "mins": null,
+     "desc": "Soft green moss grown over the chest, damp and humming, sweet-smelling, and making milk like mad."
+    },
+    {
+     "slot": "hat",
+     "groups": [
+      "Hat"
+     ],
+     "items": [
+      "FlowerCrown",
+      "FlowerCrown"
+     ],
+     "color": "#F4F0E2",
+     "label": "Milk Moss (bloom)",
+     "when": "on",
+     "mins": null,
+     "desc": "The moss has bloomed: little white flowers, and a crown of them in the hair."
     }
    ]
   }

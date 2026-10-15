@@ -96,7 +96,7 @@ createServer(async (req, res) => {
       const idx = await gameFile("index.html"); if (!idx) { res.writeHead(502).end("the game's page couldn't be fetched"); return; }
       let html = await readFile(idx, "utf8");
       if (LIVE) html = html.replace("</head>", "<script>window.__studioLive = " + JSON.stringify(LIVE.ver) + ";</script>\n</head>");   // (studio.js: the live game's own drawing is used as it is)
-      html = html.replace("</body>", `<link rel="stylesheet" href="/__studio/studio.css">\n<script src="/__studio/belly-drawing.js"></script>\n<script src="/__studio/breasts-drawing.js"></script>\n<script src="/__studio/cock-drawing.js"></script>\n<script src="/__studio/body-engine.js"></script>\n<script src="/__studio/studio.js"></script>\n</body>`).replace("<title>Bondage Club</title>", "<title>B&B outfit studio</title>");
+      html = html.replace("</body>", `<link rel="stylesheet" href="/__studio/studio.css">\n<script src="/__studio/belly-drawing.js"></script>\n<script src="/__studio/breasts-drawing.js"></script>\n<script src="/__studio/cock-drawing.js"></script>\n<script src="/__studio/body-engine.js"></script>\n<script src="/__studio/splatters.js"></script>\n<script src="/__studio/studio.js"></script>\n</body>`).replace("<title>Bondage Club</title>", "<title>B&B outfit studio</title>");
       res.writeHead(200, { "Content-Type": TYPES[".html"], "Cache-Control": "no-cache" }).end(html);
       return;
     }
@@ -117,6 +117,17 @@ createServer(async (req, res) => {
         res.writeHead(200, { "Content-Type": "text/plain" }).end("saved"); return;
       }
       return send(res, file);
+    }
+    // a picture the studio made to show Laynie (a preview sheet): kept beside the project, never in it, since it can be
+    // her own character (pictures of characters stay out of the public repo)
+    if (path.startsWith("/__studio/preview/") && req.method === "POST") {
+      const name = path.slice("/__studio/preview/".length);
+      if (!/^[a-z0-9-]{1,60}\.png$/.test(name)) { res.writeHead(400).end("bad name"); return; }
+      let body = ""; for await (const chunk of req) { body += chunk; if (body.length > 12000000) { res.writeHead(413).end("too big"); return; } }
+      const m = /^data:image\/png;base64,([A-Za-z0-9+/=]+)$/.exec(body.trim()); if (!m) { res.writeHead(400).end("not a png"); return; }
+      const dir = join(HERE, "..", "..", "scratch-previews"); await mkdir(dir, { recursive: true });
+      await writeFile(join(dir, name), Buffer.from(m[1], "base64"));
+      res.writeHead(200, { "Content-Type": "text/plain" }).end("saved"); return;
     }
     if (path.startsWith("/__studio/fits/")) {
       const name = path.slice("/__studio/fits/".length);

@@ -112,7 +112,7 @@
       const hungry = now - g.fedAt > CFG.SYM.HUNGRY_MIN*60000;
       // it grows while it's fed
       if (!hungry && g.stage < S.stages && now - g.stageAt >= CFG.SYM.STAGE_MIN*60000){
-        g.stage++; g.stageAt = now; saveLedger();
+        g.stage++; g.stageAt = now; saveLedger(); state.gearDirty = true;
         emote(S.icon+" "+symLine("grow_"+g.kind+"_"+g.stage, mn), mn);
         syncCompanions(true);
         continue;

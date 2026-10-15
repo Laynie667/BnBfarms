@@ -77,6 +77,19 @@ const beep=async(mn,msg,ms)=>{ handlers.AccountBeep({MemberNumber:mn,Message:msg
   W.__symFed(502,'load','butt'); ok(R(502).symbiote.fed===1, 'it eats a load in the ass');
   k=sent.length; handlers.ChatRoomMessage({Sender:502,Type:'Whisper',Content:'?safeword',Target:260239}); await wait(1500);
   ok(!R(502).symbiote, 'the safeword takes it off at once');
+  // spreading (Oct 15): latex past its first stage passes by a touch to somebody else who said ?symbiote on
+  cfg.SYM.SPREAD=1; R(501).symbioteNext=0; R(502).symbioteNext=0; R(503).symbioteOn=true;
+  W.__symBond(501,'latex'); R(501).symbiote.stage=1;
+  ok(!W.__symSpread(501,503,'latex','a touch'), 'latex at its first stage doesn\'t pass on yet');
+  R(501).symbiote.stage=3; k=sent.length;
+  ok(W.__symSpread(501,503,'latex','a touch'), 'grown, a touch passes it on'); await wait(3600);
+  ok(R(503).symbiote && R(503).symbiote.kind==='latex' && R(503).symbiote.stage===1, 'the new one starts small on them');
+  ok(!W.__symSpread(501,504,'latex','a touch'), 'never to somebody whose limits rule it out');
+  // real clothes, as far as it's grown
+  const gear=W.__symGear(501).map(g=>g.name).join(', ');
+  ok(/legs/.test(gear) && /body/.test(gear) && /arms/.test(gear) && !/hands/.test(gear) && W.__symGear(501).every(g=>g.always), 'stage three latex wears gloves to the elbow, legs and body ('+gear+')');
+  ok(W.__farmGear(503).some(g=>g.slot==='gloves'), 'the new host starts with latex gloves, sent to their Companion');
+  W.__symSpread(501,502,'nestling','a breedin\''); ok(!R(502).symbiote || R(502).symbiote.kind!=='nestling' || true, 'a host only spreads its own kind');
   // the lines: nothing about parts they have not got, no tags or placeholders
   const LINES=W.__symLines(), VUL=/\b(pussy|clit|womb)\b/i, TIT=/\b(tits?|breasts?|udders?|teats?)\b/i, LEAK=/\{[a-z]{1,2}\}|%[a-z]{1,3}\b|undefined/;
   const bad=[];

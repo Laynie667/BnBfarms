@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.32.1
+// @version      0.33.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -1828,7 +1828,7 @@
   ];
 
   // bot/src/version.js
-  var VERSION = "0.32.1";
+  var VERSION = "0.33.0";
 
   // bot-parts:farmhand-bot-parts
   (function() {
@@ -3475,7 +3475,7 @@
     }, __wordsFor: (m, t) => wordsFor(m, t), __overdue: (m) => overdueStage(m), __milkCum: (m) => stallClimax(m), __intSev: (m, s) => intensitySev(m, s), __intTail: (m, k) => intensityTail(m, 5, 6, k), __holes: (m) => holesFor(m), __album: (m) => albumFor(m, 60), __holeTook: (m, h, a) => holeTook(m, h, a), __dreamTheme: (m) => dreamTheme(m), __eggsWorth: (t, n) => eggsWorth(t, n), __rank: (m) => rankX(m), __broodBook: (m) => broodBook(m), __belly: (m) => bellyStage(m), __happening: (m) => happeningFor(m), __gearOn: (m, s, l, d, x) => gearOn(m, s, l, d, x), __heard: (mn, t) => trapHeard(mn, t), __parasiteTick: () => parasiteTick(), __parts: (m) => parasiteParts(rec(m).parasite), __climax: (m) => parasiteClimax(m), __nurse: (a, b) => parasiteNurse(a, b), __parasiteChance: (m) => parasiteChance(m), __kiss: (a, f, s, t) => parasiteKiss(a, f, s, t), __load: (s, m, h, x) => parasiteLoad(s, m, h, x), __shot: (t, by, text, how) => applyShot(t, by, text, how), __slow: (mn) => slowOf(mn), __milkRate: (mn) => milkRate(mn), __benchTick: () => benchTick(), __roll: (m, s, a, b) => rollConception(m, s, a, b), __contractTick: () => {
       state.cwAt = 0;
       contractWatchTick();
-    }, __lingerTick: () => lingerTick(), __ribbonTick: () => ribbonTick(), __dareTick: () => dareTick(), __potionOn: (mn, id) => potionOn(mn, id), __milkRate: (mn) => milkRate(mn), __addonLine: (k, i) => addonLine(k, i), __lineInfo: (m, x) => lineInfo(m, x), __gearSense: (m) => gearSense(m), __symTick: () => symbioteTick(), __symBond: (m, k, h) => symBond(m, k, h), __symFed: (m, h, x) => symbioteFed(m, h, x), __capacity: (m) => capacity(m), __symLines: () => SYM_LINES, __newTrapLines: () => NEW_TRAP_LINES, __farmGear: (m) => farmGearFor(m), __mazeTick: () => mazeTick(), __farmSets: () => ({ TRAP_GEAR, TRAP_KINDS, CURSES, SUIT_STAGES, SUIT_COLOR, MESS, MESS_BY_TRAP }) });
+    }, __lingerTick: () => lingerTick(), __ribbonTick: () => ribbonTick(), __dareTick: () => dareTick(), __potionOn: (mn, id) => potionOn(mn, id), __milkRate: (mn) => milkRate(mn), __addonLine: (k, i) => addonLine(k, i), __lineInfo: (m, x) => lineInfo(m, x), __gearSense: (m) => gearSense(m), __symTick: () => symbioteTick(), __symBond: (m, k, h) => symBond(m, k, h), __symFed: (m, h, x) => symbioteFed(m, h, x), __capacity: (m) => capacity(m), __symLines: () => SYM_LINES, __newTrapLines: () => NEW_TRAP_LINES, __farmGear: (m) => farmGearFor(m), __mazeTick: () => mazeTick(), __symSpread: (a, b, k, h) => symSpread(a, b, k, h), __symGear: (m) => symGear(m), __farmSets: () => ({ TRAP_GEAR, TRAP_KINDS, CURSES, SUIT_STAGES, SUIT_COLOR, MESS, MESS_BY_TRAP, SYM_GEAR }) });
     W.FarmhandSyncKeys = () => syncAllPresent(true);
     W.FarmhandFriends = () => W.Player.FriendList;
     W.FarmhandAddFriend = (mn) => addFriend(mn, false);
@@ -6720,6 +6720,11 @@
     }
     function nurse(milker, drinker) {
       parasiteNurse(milker, drinker);
+      try {
+        symbioteNurse(milker, drinker);
+      } catch (e) {
+        warn("symbiote nurse:", e);
+      }
       if (missing(milker, drinker)) return false;
       const p = prodOf(milker), now = Date.now();
       if (now - (p.lastNursed || 0) < CFG.NURSE_COOLDOWN_S * 1e3 || p.milk < 1) return false;
@@ -6761,6 +6766,11 @@
     }
     function onBodyActivity(act, focus, src, tgt) {
       parasiteKiss(act, focus, src, tgt);
+      try {
+        symbioteTouch(act, focus, src, tgt);
+      } catch (e) {
+        warn("symbiote touch:", e);
+      }
       if (!src || !tgt || src === tgt) return;
       let stud = null, bred = null, hole = null;
       if (/^penetrate(slow|fast)$/i.test(act) && ["ItemVulva", "ItemButt", "ItemMouth"].includes(focus)) {
@@ -15753,6 +15763,7 @@
       try {
         if (!(mlIn > 0)) return;
         symbioteFed(mn, "load", hole);
+        symbioteBred(stud, mn, hole);
         const r = rec(mn), p = prodOf(mn);
         if (!r || !p) return;
         if (hole !== "mouth") {
@@ -16746,6 +16757,7 @@
           g.stage++;
           g.stageAt = now;
           saveLedger();
+          state.gearDirty = true;
           emote(S.icon + " " + symLine("grow_" + g.kind + "_" + g.stage, mn), mn);
           syncCompanions(true);
           continue;
@@ -16961,6 +16973,76 @@
       sent_latex: ["%n peels the latex off with a word, and it slithers away into the straw without a fuss."],
       sent_moss: ["%n brushes the moss away, and it lets go easily, leavin' their chest soft and bare."],
       sent_nestling: ["%n asks the nestling to go, and it wriggles out obligingly and trundles off."]
+    };
+    if (CFG.SYM && CFG.SYM.SPREAD === void 0) CFG.SYM.SPREAD = 0.25;
+    const LATEX_BLACK = "#121214", MOSS_GREEN = "#5E8F3A";
+    const SYM_GEAR = {
+      latex: [
+        { at: 1, slot: "gloves", name: "Livin' Latex (hands)", items: ["LatexShortGloves"], color: LATEX_BLACK, upTo: 2, desc: "Glossy black livin' latex over both hands, warm as skin and tighter, and it's spreading." },
+        { at: 3, slot: "gloves", name: "Livin' Latex (arms)", items: ["LatexElbowGloves"], color: LATEX_BLACK, desc: "The livin' latex has run up both arms to the elbow, shining wet-black." },
+        { at: 2, slot: "socks", name: "Livin' Latex (feet)", items: ["LatexSocks1"], color: LATEX_BLACK, desc: "Black latex grown smooth over feet and calves, seamless." },
+        { at: 2, slot: "suitLower", name: "Livin' Latex (legs)", items: ["LatexCatsuit"], color: LATEX_BLACK, desc: "The livin' latex has taken both legs and the hips, a glossy second skin that squeezes with every step." },
+        { at: 3, slot: "suit", name: "Livin' Latex (body)", items: ["LatexCatsuit"], color: LATEX_BLACK, desc: "Black latex sealed from the neck down, moulded to every curve, warm, alive, and very pleased with itself." },
+        { at: 4, slot: "boots", name: "Livin' Latex (heels)", items: ["ThighHighLatexHeels"], color: LATEX_BLACK, desc: "It's grown itself a pair of thigh-high heels. Its idea, not theirs." }
+      ],
+      moss: [
+        { at: 1, slot: "bra", name: "Milk Moss", items: ["FlowerBra"], color: MOSS_GREEN, desc: "Soft green moss grown over the chest, damp and humming, sweet-smelling, and making milk like mad." },
+        { at: 3, slot: "hat", name: "Milk Moss (bloom)", items: ["FlowerCrown"], color: "#F4F0E2", desc: "The moss has bloomed: little white flowers, and a crown of them in the hair." }
+      ],
+      nestling: []
+    };
+    function symGear(mn) {
+      if (!symOn(mn)) return [];
+      const g = rec(mn).symbiote, out = [];
+      for (const P of SYM_GEAR[g.kind] || []) {
+        if (g.stage < P.at || P.upTo && g.stage > P.upTo) continue;
+        out.push({ slot: P.slot, name: P.name, desc: P.desc, items: P.items, color: P.color, always: true, until: g.until });
+      }
+      return out;
+    }
+    const spreadSeen = /* @__PURE__ */ new Map();
+    function symSpread(from, to, kind, how) {
+      try {
+        if (!symOn(from) || rec(from).symbiote.kind !== kind || from === to || !charFor(to)) return false;
+        if (kind === "latex" && rec(from).symbiote.stage < 2) return false;
+        const key = from + ">" + to, now = Date.now();
+        if (now - (spreadSeen.get(key) || 0) < 10 * 6e4) return false;
+        spreadSeen.set(key, now);
+        if (symWhyNot(to, kind) || Math.random() >= CFG.SYM.SPREAD) return false;
+        emote(SYMBIOTES[kind].icon + " " + tFill(pickFor(from, "sym:spread:" + kind, SPREAD_LINES[kind]), from, { c: plainName(to) }), to);
+        later(() => {
+          if (charFor(to) && !symOn(to)) symBond(to, kind, how + " from " + plainName(from));
+        }, 3e3);
+        return true;
+      } catch (e) {
+        warn("symbiote spread:", e);
+        return false;
+      }
+    }
+    function symbioteTouch(act, focus, src, tgt) {
+      if (!src || !tgt || src === tgt || !/^(kiss|gaggedkiss|hug|cuddle|caress|grope|lick|nuzzle|rub|massage|pet|fondle|suck)/i.test(String(act || ""))) return;
+      if (!symSpread(src, tgt, "latex", "a touch")) symSpread(tgt, src, "latex", "a touch");
+    }
+    function symbioteNurse(host, drinker) {
+      if (makesMilk(drinker)) symSpread(host, drinker, "moss", "nursin'");
+    }
+    function symbioteBred(stud, mn, hole) {
+      if ((hole === "vulva" || hole === "butt") && stud > 0) symSpread(stud, mn, "nestling", "a breedin'");
+    }
+    const SPREAD_LINES = {
+      latex: [
+        "Where %n's skin touches %c's, the livin' latex runs across like spilled ink and keeps goin'. %c has a little of it now.",
+        "A glossy black thread slides off %n's fingers onto %c and spreads out, warm and pleased with itself.",
+        "%n's latex ripples and reaches. When they part, a patch of it has stayed behind on %c, shinin'."
+      ],
+      moss: [
+        "Somethin' green and soft comes down with the milk. A little patch of moss takes root on %c's chest.",
+        "%c drinks from %n and a few spores come with it. By the time they're done, a soft green fuzz is spreadin' on them."
+      ],
+      nestling: [
+        "Somethin' small and warm slips from %n into %c with the load and curls up deep. The nestling has budded.",
+        "%n's nestling sends a bud along with the breedin', and it settles snug in %c's belly."
+      ]
     };
     (function() {
       const more = (pools, ...extra) => extra.forEach((lines, i) => {
@@ -19363,6 +19445,7 @@
       for (const [slot, g] of Object.entries(r && r.gear || {})) if (g.until > now) out.push(Object.assign({ slot, name: g.label, desc: g.desc, until: Math.ceil(g.until / 6e4) * 6e4 }, g.items ? { items: g.items } : {}, g.color ? { color: g.color } : {}));
       if (parasiteOn(mn)) for (const g of parasiteGear(mn)) out.push(g);
       if (suitOnNow(mn)) for (const g of suitGear(mn)) out.push(g);
+      for (const g of symGear(mn)) out.push(g);
       return out;
     }
     function trapAdminFor() {
@@ -25146,7 +25229,10 @@ SYMBIOTES \xB7 ?symbiote on
   chest: up to three quarters more milk, and it feeds on bein'
   milked. The nestling curls low in your belly: you catch
   easier and hold more, and it feeds on loads below.
-  Each grows over a few hours. Fed, it stays a day or more and
+  Each grows over a few hours, into real clothes on you (glossy
+  latex, a mossy flower bra), and they spread to others who said
+  ?symbiote on: latex by a touch, moss in the milk, the nestling
+  by a breedin'. Fed, it stays a day or more and
   leaves you a thank-you; starved, it goes. One at a time.
   ?symbiote take \xB7 at a symbiote-latex, -moss or -nestling spot
   ?symbiote \xB7 how it's doin' \xB7 ?symbiote off \xB7 send it away

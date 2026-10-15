@@ -527,7 +527,10 @@ SYMBIOTES · ?symbiote on
   chest: up to three quarters more milk, and it feeds on bein'
   milked. The nestling curls low in your belly: you catch
   easier and hold more, and it feeds on loads below.
-  Each grows over a few hours. Fed, it stays a day or more and
+  Each grows over a few hours, into real clothes on you (glossy
+  latex, a mossy flower bra), and they spread to others who said
+  ?symbiote on: latex by a touch, moss in the milk, the nestling
+  by a breedin'. Fed, it stays a day or more and
   leaves you a thank-you; starved, it goes. One at a time.
   ?symbiote take · at a symbiote-latex, -moss or -nestling spot
   ?symbiote · how it's doin' · ?symbiote off · send it away

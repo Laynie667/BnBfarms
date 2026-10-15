@@ -78,6 +78,13 @@ const wait=ms=>new Promise(r=>setTimeout(r,ms));
   P.Appearance=[mk('ItemDevices','Net',{ Craft:{ Name:'Her own net', Description:'mine' } })];
   d=syncFarmGear([{ slot:'device', name:'Fair Stocks', desc:'x', items:['WoodenStocks'], until:far }], true);
   ok(has('ItemDevices','Net') && !has('ItemDevices','WoodenStocks'), 'a device she\'s already in is left alone');
+  // a symbiote's clothes take the spot over and give hers back after
+  ASSETS.Gloves=['LatexShortGloves','Gloves1']; ASSETS.Suit=['LatexCatsuit','Catsuit'];
+  P.Appearance=[mk('Gloves','Gloves1',{ Color:'#FF0000' }), mk('Suit','Catsuit')];
+  d=syncFarmGear([{ slot:'gloves', name:"Livin' Latex (hands)", desc:'x', items:['LatexShortGloves'], color:'#121214', always:true, until:far }], false);
+  ok(has('Gloves','LatexShortGloves') && !has('Gloves','Gloves1'), 'the latex gloves take the spot her own gloves were in');
+  d=syncFarmGear([], false);
+  ok(has('Gloves','Gloves1') && P.Appearance.find(it=>it.Asset.Group.Name==='Gloves').Color==='#FF0000' && has('Suit','Catsuit'), '...and her own red gloves go back on when it lets go');
   try { fs.unlinkSync(tmp); } catch(e){}
 
   // ── the bot's half: a trap lists its gear and takes it off ──

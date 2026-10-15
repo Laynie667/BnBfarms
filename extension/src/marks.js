@@ -131,7 +131,8 @@ const FARM_NAMES = ["Parasite Lips", "Parasite Belt", "Pump Bung", "Egg Post Plu
   // Oct 15: the newer traps' equipment
   "Buckin' Saddle", "Saddle Post", "Hayloft Net", "Lost Cow Bell", "Teasin' Stall", "Sheep Dip", "Breedin' Crate", "Sire's Stopper", "Carousel Milkers", "Carousel Cuffs",
   "Plow Bit", "Plow Harness", "Bale Twine", "Scarecrow Post", "Scarecrow Ropes", "Clothespins", "Washin' Line", "Fair Stocks", "The Pillory", "Breedin' Wheel",
-  "Windmill Sails", "Kissin' Gate", "The Fence", "Collection Bench", "Auction Block"];
+  "Windmill Sails", "Kissin' Gate", "The Fence", "Collection Bench", "Auction Block",
+  "Livin' Latex (hands)", "Livin' Latex (arms)", "Livin' Latex (feet)", "Livin' Latex (legs)", "Livin' Latex (body)", "Livin' Latex (heels)", "Milk Moss", "Milk Moss (bloom)"];
 // slot → where it can go and which game item it is: the first that this game has; the pattern is a fallback
 export const GEAR_SLOTS = {
   plug:     { groups: ["ItemButt"], names: ["InflVibeButtPlug", "BlackButtPlug", "ButtPlug", "ButtPump"], re: /ButtPlug|Plug/, color: "#2B2B2B" },
@@ -148,6 +149,15 @@ export const GEAR_SLOTS = {
   torso:    { groups: ["ItemTorso", "ItemTorso2"], names: ["TentacleSuit", "HempRopeHarness"], re: /Harness/ },
   tag:      { groups: ["ItemNeckAccessories"], names: ["CollarNameTagLivestock", "CollarNameTag"], re: /NameTag/, needs: "ItemNeck" },
   // the big pieces (Oct 15): the game's own devices, only the ones a piece names (no stray device off the list)
+  // clothes a symbiote grows into (Oct 15): these take the spot over if you're wearing something there, and put yours
+  // back when the piece comes off (takeover)
+  gloves:   { groups: ["Gloves"], names: ["LatexShortGloves"], re: /^Latex/, takeover: true },
+  socks:    { groups: ["Socks"], names: ["LatexSocks1"], re: /^Latex/, takeover: true },
+  suit:     { groups: ["Suit"], names: ["LatexCatsuit"], re: /^LatexCatsuit$/, takeover: true },
+  suitLower:{ groups: ["SuitLower"], names: ["LatexCatsuit"], re: /^LatexCatsuit$/, takeover: true },
+  bra:      { groups: ["Bra"], names: ["FlowerBra"], re: /^FlowerBra$/, takeover: true },
+  hat:      { groups: ["Hat"], names: ["FlowerCrown"], re: /^FlowerCrown$/, takeover: true },
+  boots:    { groups: ["ItemBoots"], names: ["ThighHighLatexHeels"], re: /^ThighHighLatexHeels$/ },
   device:   { groups: ["ItemDevices"], names: ["WoodenStocks"], re: /^(WoodenStocks|SaddleStand|WoodenHorse|Net|Kennel|LowCage|KabeshiriWall|WheelFortune|LuckyWheel|X-Cross|BondageBench|TheDisplayFrame|MilkCan)$/ },
 };
 function gearAsset(group, slot, prefer) {
@@ -178,7 +188,9 @@ export function syncFarmGear(list, allow) {
   for (const b of cur) {
     const n = gearNameOf(b, mem);
     if (!n || want.some((g) => g.name === n) || stuck.has(b.Group)) continue;
-    next = next.filter((x) => x !== b); did.off.push(n); delete mem[n];
+    next = next.filter((x) => x !== b); did.off.push(n);
+    if (mem[n] && mem[n].was && !next.some((x) => x.Group === b.Group)) next.push(mem[n].was);   // your own clothes back on
+    delete mem[n];
   }
   for (const n of Object.keys(mem)) if (!want.some((g) => g.name === n) && !next.some((b) => gearNameOf(b, mem) === n)) delete mem[n];   // gone some other way
   // on: listed, and not on you
@@ -186,16 +198,20 @@ export function syncFarmGear(list, allow) {
     if (next.some((b) => gearNameOf(b, mem) === g.name)) continue;
     const slot = GEAR_SLOTS[g.slot];
     if (slot.needs && !next.some((b) => b.Group === slot.needs)) continue;            // a chain needs a collar to clip to
-    const group = slot.groups.find((x) => !next.some((b) => b.Group === x) && groupOf(x));
+    let group = slot.groups.find((x) => !next.some((b) => b.Group === x) && groupOf(x)), was = null;
+    if (!group && slot.takeover) {
+      group = slot.groups.find((x) => groupOf(x) && !stuck.has(x) && next.some((b) => b.Group === x && !gearNameOf(b, mem)));
+      if (group) { was = next.find((b) => b.Group === group); next = next.filter((b) => b !== was); }
+    }
     if (!group) continue;                                                              // that spot's taken: it's on the farm's books just the same
     const item = gearAsset(group, slot, g.items);
-    if (!item) continue;
+    if (!item) { if (was) next.push(was); continue; }   // (nothing to put there after all: theirs stays)
     const color = (typeof g.color === "string" && /^#[0-9a-fA-F]{6}$/.test(g.color) ? g.color : null) || slot.color || "Default";
     const it = { Group: group, Name: item, Difficulty: 20, Property: {},
       Craft: { Item: item, Name: String(g.name).slice(0, 30), Description: (FARM_TAG + " " + String(g.desc || "").slice(0, 180)).trim(),
         Property: "Normal", Color: Array.isArray(color) ? color.join(",") : color, Lock: "", Private: true, MemberNumber: P().MemberNumber, MemberName: P().Name, ItemProperty: {}, Type: null, TypeRecord: null } };
     if (color !== "Default") it.Color = color;
-    next.push(it); did.on.push(g.name); mem[g.name] = { group, item }; learnName(String(g.name).slice(0, 30));
+    next.push(it); did.on.push(g.name); mem[g.name] = was ? { group, item, was: JSON.parse(JSON.stringify(was)) } : { group, item }; learnName(String(g.name).slice(0, 30));
   }
   gearMemSave(mem);
   if (did.on.length || did.off.length) commit(next);

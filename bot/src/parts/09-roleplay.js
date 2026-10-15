@@ -94,6 +94,7 @@
   // someone drinks from the milker: a little at a time over a few seconds
   function nurse(milker, drinker){
     parasiteNurse(milker, drinker);   // it passes in milk (10v2-parasite-more.js)
+    try { symbioteNurse(milker, drinker); } catch(e){ warn("symbiote nurse:", e); }   // milk moss spores (10v5-symbiote-spread.js)
     if (missing(milker, drinker)) return false;
     const p = prodOf(milker), now = Date.now();
     if (now - (p.lastNursed||0) < CFG.NURSE_COOLDOWN_S*1000 || p.milk < 1) return false;
@@ -137,6 +138,7 @@
      When someone sucks or nibbles a milker's nipples, I drain a little milk, like a nursing emote. */
   function onBodyActivity(act, focus, src, tgt){
     parasiteKiss(act, focus, src, tgt);   // a kiss on the mouth can pass the parasite on (10v-parasite.js)
+    try { symbioteTouch(act, focus, src, tgt); } catch(e){ warn("symbiote touch:", e); }   // livin' latex flows across (10v5-symbiote-spread.js)
     if (!src || !tgt || src === tgt) return;
     let stud = null, bred = null, hole = null;
     if (/^penetrate(slow|fast)$/i.test(act) && ["ItemVulva","ItemButt","ItemMouth"].includes(focus)){

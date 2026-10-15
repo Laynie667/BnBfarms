@@ -13,7 +13,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 | Map tools, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.4** |
 | Dairy | `farmhand-dairy.user.js` | the bot's PC | **1.1.0** |
 | Shows | `farmhand-shows.user.js` | the bot's PC | **1.1.0** |
-| Farmhand Companion | `farmhand-companion.user.js` | each player | **0.26.0** |
+| Farmhand Companion | `farmhand-companion.user.js` | each player | **0.26.1** |
 | Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.4** |
 
 ## Sending a watch report
@@ -23,6 +23,8 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 - Running the watcher on more than one game at once (the bot, yours, a tester's) lets Claude line them up into one timeline.
 
 ## Latest changes (newest first)
+
+- **Companion 0.26.1: messes don't pile up pictures.** Laynie: "the web page kept crashing too". The game keeps every picture it's handed, and a copy on the graphics card, for good; 0.26.0 made a new mess picture for every pose, every new mess and every minute a fresh one runs, and never let the old ones go, so a long night would have filled the page up. The old picture now comes out of the game's lists a few seconds after the new one goes on, the way the drawn body already did. (Her crashes on Oct 15 came before the messes went live, so this one is a guard; the cause of those is still being looked for.) **Companion.**
 
 - **Companion 0.26.0, bot 0.33.2: bigger loads, bigger messes; and they run.** The bot tells the Companion how much landed (a ?cum, a breedin', a stud), and the mess is drawn to match: a little spurt is a splash, a flood covers them. A fresh mess keeps running down for its first five minutes, drawn again once a minute. Players' own loads already marked the same way as the farm's.
 

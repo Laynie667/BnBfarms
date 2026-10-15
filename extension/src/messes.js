@@ -77,6 +77,19 @@ if (W.FarmMess && W.FarmMess.loadStamps) W.FarmMess.loadStamps("").then((n) => {
 const BODY = /(?:^|\/)Assets\/[^/]+\/(?:BodyUpper|BodyLower|Head|Arms|ArmsLeft|ArmsRight|Hands|HandsLeft|HandsRight|Pussy)\//;
 // one picture per character, made again only when their list or their body changes
 const made = new Map();   // member → { key, src, dx, dy }
+// an old picture comes out of the game's lists once the new one has had time to load: the game keeps every picture it's
+// handed (and a copy on the graphics card) for good, so without this every pose, every new mess and every minute of a
+// fresh one running piled up another picture till the page ran out of room and crashed
+function forget(src) {
+  if (!src) return;
+  setTimeout(() => {
+    for (const p of made.values()) if (p.src === src) return;   // somebody's wearing that very picture again
+    try { const m = W.GLDrawImageCache; if (m && typeof m.delete === "function") m.delete(src); } catch (e) { /* fine */ }
+    try { const m = W.DrawImageCache; if (m && typeof m.delete === "function") m.delete(src); } catch (e) { /* fine */ }
+    try { const gl = W.GLDrawCanvas && W.GLDrawCanvas.GL, tc = gl && gl.textureCache; const t2 = tc && tc.get(src); if (t2) { if (t2.texture) gl.deleteTexture(t2.texture); tc.delete(src); } } catch (e) { /* fine */ }
+  }, 5000);
+}
+function keep(mn, p) { const was = made.get(mn); made.set(mn, p); if (was && was.src && was.src !== p.src) forget(was.src); }
 function messPicture(C, list, body) {
   const over = W.CanvasUpperOverflow || 700, h = (C.Canvas && C.Canvas.height) || 1000 + over;
   const up = body.find((b) => /\/BodyUpper\//.test(b[0])), ox = up ? up[1] : 0, oy = up ? up[2] - over : 0;
@@ -91,9 +104,9 @@ function messPicture(C, list, body) {
   // trimmed to what's on it, handed over by address (the live game takes pictures by name: see drawnbody.js)
   const d = g.getImageData(0, 0, c.width, c.height).data; let x0 = c.width, y0 = c.height, x1 = -1, y1 = -1;
   for (let y = 0; y < c.height; y++) for (let x = 0; x < c.width; x++) if (d[(y * c.width + x) * 4 + 3]) { if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y; }
-  if (x1 < 0) { const p = { key, src: null }; made.set(C.MemberNumber, p); return p; }
+  if (x1 < 0) { const p = { key, src: null }; keep(C.MemberNumber, p); return p; }
   const t = W.document.createElement("canvas"); t.width = x1 - x0 + 1; t.height = y1 - y0 + 1; t.getContext("2d").drawImage(c, -x0, -y0);
-  const p = { key, src: t.toDataURL("image/png"), dx: x0, dy: y0, fresh: true }; made.set(C.MemberNumber, p);
+  const p = { key, src: t.toDataURL("image/png"), dx: x0, dy: y0, fresh: true }; keep(C.MemberNumber, p);
   return p;
 }
 function hook() {

@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.26.0
+// @version      0.26.1
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -230,7 +230,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.26.0";
+  var VERSION = "0.26.1";
 
   // extension/src/config.js
   var BOT_MEMBER = 260239;
@@ -1241,7 +1241,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
         }
         const key = src + "|" + Math.round(x) + "," + Math.round(y) + "|" + mode + "|" + (ext ? ext.top + "-" + ext.bottom : "") + "|" + ctx2.sig;
         if (MOULD.out.has(key)) return MOULD.out.get(key);
-        const keep = (res) => {
+        const keep2 = (res) => {
           if (MOULD.out.size > 80) MOULD.out.clear();
           MOULD.out.set(key, res);
           return res;
@@ -1254,7 +1254,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
           g2.drawImage(im, M, 0);
           g2.globalCompositeOperation = "destination-out";
           g2.drawImage(ctx2.belly.cv, ctx2.belly.dx - x + M, ctx2.belly.dy - y);
-          return keep(c2);
+          return keep2(c2);
         }
         const ol = ctx2.outline || (ctx2.outline = outline(ctx2));
         if (!ol) return null;
@@ -1386,7 +1386,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
           g.drawImage(im, l0, j, r0 - l0 + 1, 1, M + l1, j, r1 - l1 + 1, 1);
           if (r0 + 1 < w) g.drawImage(im, r0 + 1, j, w - r0 - 1, 1, M + r1 + 1, j, w - r0 - 1, 1);
         }
-        return keep(changed ? c : false);
+        return keep2(changed ? c : false);
       }
       const BREAST = { band: {}, solid: {}, tuck: true, on: {}, free: true, holds: {}, holdSig: "", wear: {}, dress: true, cover: /* @__PURE__ */ new Map(), cup: null, full: 1, hang: 1, apart: 1, x: 0, y: 0, nip: 1, nipY: 0, nipX: 0, cv: null, cvKey: "", halves: /* @__PURE__ */ new Map(), out: /* @__PURE__ */ new Map() };
       const BREAST_SLIDERS = [
@@ -7138,7 +7138,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       const ctx2 = this.ctx(), view = this.view(), V = VIEWS[view];
       const tabs = view === "guest" ? V.tabs : withExtras(V.tabs, view, ctx2);
       const tabKey = "tab_" + view, tab = tabs.find((t) => t.id === this.ui[tabKey]) || tabs[0];
-      const scroll = this.el.querySelector(".fhc-body"), keep = scroll ? scroll.scrollTop : 0;
+      const scroll = this.el.querySelector(".fhc-body"), keep2 = scroll ? scroll.scrollTop : 0;
       this.el.classList.toggle("compact", !!this.prefs.compact);
       const full = !!this.prefs.full;
       this.top.replaceChildren(
@@ -7185,7 +7185,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
         h("div", { class: "fhc-body" }, this.banners(), safeRender(tab, ctx2))
       );
       const body = this.el.querySelector(".fhc-body");
-      if (body) body.scrollTop = keep;
+      if (body) body.scrollTop = keep2;
     }
     // questions waitin' on you, on every tab
     banners() {
@@ -8565,6 +8565,36 @@ One of mods you are using is using an old version of SDK. It will work for now b
   });
   var BODY = /(?:^|\/)Assets\/[^/]+\/(?:BodyUpper|BodyLower|Head|Arms|ArmsLeft|ArmsRight|Hands|HandsLeft|HandsRight|Pussy)\//;
   var made2 = /* @__PURE__ */ new Map();
+  function forget(src) {
+    if (!src) return;
+    setTimeout(() => {
+      for (const p of made2.values()) if (p.src === src) return;
+      try {
+        const m = W3.GLDrawImageCache;
+        if (m && typeof m.delete === "function") m.delete(src);
+      } catch (e) {
+      }
+      try {
+        const m = W3.DrawImageCache;
+        if (m && typeof m.delete === "function") m.delete(src);
+      } catch (e) {
+      }
+      try {
+        const gl = W3.GLDrawCanvas && W3.GLDrawCanvas.GL, tc = gl && gl.textureCache;
+        const t2 = tc && tc.get(src);
+        if (t2) {
+          if (t2.texture) gl.deleteTexture(t2.texture);
+          tc.delete(src);
+        }
+      } catch (e) {
+      }
+    }, 5e3);
+  }
+  function keep(mn, p) {
+    const was = made2.get(mn);
+    made2.set(mn, p);
+    if (was && was.src && was.src !== p.src) forget(was.src);
+  }
   function messPicture(C, list, body) {
     const over = W3.CanvasUpperOverflow || 700, h2 = C.Canvas && C.Canvas.height || 1e3 + over;
     const up = body.find((b) => /\/BodyUpper\//.test(b[0])), ox = up ? up[1] : 0, oy = up ? up[2] - over : 0;
@@ -8600,7 +8630,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     }
     if (x1 < 0) {
       const p2 = { key, src: null };
-      made2.set(C.MemberNumber, p2);
+      keep(C.MemberNumber, p2);
       return p2;
     }
     const t = W3.document.createElement("canvas");
@@ -8608,7 +8638,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     t.height = y1 - y0 + 1;
     t.getContext("2d").drawImage(c, -x0, -y0);
     const p = { key, src: t.toDataURL("image/png"), dx: x0, dy: y0, fresh: true };
-    made2.set(C.MemberNumber, p);
+    keep(C.MemberNumber, p);
     return p;
   }
   function hook2() {

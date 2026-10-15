@@ -11,6 +11,7 @@
     addonsBoot();       // add-on scripts can plug in from here on (10f-addons.js)
     makeBadge();
     setBadge("waiting for game…");
+    storageBoot();      // the 💾 chip: the books backed up to a folder (03b-storage.js)
     attachListeners();
 
     if (!startWorkerTimer()){

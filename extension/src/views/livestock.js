@@ -8,6 +8,8 @@ import { h, card, title, muted, btn, chip, bar, toggle, ml } from "../dom.js";
 import { guidesTab, safetyTab } from "./common.js";
 import { storeTab } from "./store.js";
 import { gearLore } from "../gearlore.js";
+import { localSaveState, localSavePick, localSaveReconnect, localSaveNow, localSaveLoad } from "../localsave.js";
+import { VERSION } from "../version.js";
 import { drawnBodyState, drawnBodySet, drawnBodyCup, drawnBodyPaste, drawnBodyFromStudio, drawnBodySeeOthers, drawnBodyBelly, drawnBodyUseFarm } from "../drawnbody.js";
 
 const pct = (a, b) => (b ? (100 * a) / b : 0);
@@ -215,7 +217,22 @@ export function panelPrefs(ctx) {
       !!ctx.prefs.strip, () => ctx.setPref("strip", !ctx.prefs.strip)),
     // (the scale trial and the belly experiment are gone: the drawn body does both. Laynie, Oct 14: "can also remove the
     // scaling test from earlier from the companion")
-    btn("Put the button and panel back (size and full screen too)", () => ctx.resetPlaces && ctx.resetPlaces()));
+    btn("Put the button and panel back (size and full screen too)", () => ctx.resetPlaces && ctx.resetPlaces()),
+    // everything above, and the drawn body, messes and memory log, kept as a file on this computer too (localsave.js)
+    saveCard(ctx));
+}
+function saveCard(ctx) {
+  const ls = localSaveState(), say = (t) => ctx.hint(t), t = (ms) => new Date(ms).toTimeString().slice(0, 5);
+  const line = !ls.folder ? (ls.can ? "Not saving to a folder yet." : "This browser can't save to a folder (Chrome and Edge can). You can still load a file.")
+    : ls.perm !== "granted" ? "Saving to " + ls.folder + " is paused till you reconnect it (the browser asks again after a restart)."
+    : ls.err ? "Trouble saving to " + ls.folder + ": " + ls.err
+    : "Saving to " + ls.folder + " every minute" + (ls.at ? ", last at " + t(ls.at) : "") + ", as " + ls.file + ".";
+  return h("div", {},
+    muted("Your settings as a file on this computer: everything here, your drawn body, your messes and the memory log. It survives a crash, a cleared browser or a new one. " + line),
+    ls.folder && ls.perm !== "granted" ? btn("Reconnect " + ls.folder, () => localSaveReconnect(VERSION)) : null,
+    ls.can ? btn(ls.folder ? "Save to a different folder" : "Save my settings to a folder…", () => localSavePick(VERSION)) : null,
+    ls.folder && ls.perm === "granted" ? btn("Save now", () => localSaveNow(VERSION).then(() => say("Saved."))) : null,
+    btn("Load my settings from a file…", () => { say("Pick the farmhand-companion file to load…"); localSaveLoad(say); }));
 }
 // The drawn body, from the outfit studio: breasts past the game's biggest, your belly, and what you wear fitted to them.
 // Off until you switch it on. Everyone with the Companion sees it (drawnbody.js shares the settings with the room).

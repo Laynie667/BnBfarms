@@ -15,6 +15,7 @@
   function loadLedger(){
     try {
       const raw = GM_getValue(LEDGER_KEY,"");
+      try { storeRecover(!raw); } catch(e){}   // Tampermonkey lost them: the browser's database copy comes back (03b-storage.js)
       L = raw ? JSON.parse(raw) : blankLedger();
       if (!L || typeof L !== "object") L = blankLedger();
     } catch(e){ warn("Ledger load failed:",e); L = blankLedger(); }
@@ -69,12 +70,13 @@
 
   let saveTimer = null;
   function saveLedger(){
-    if (state.dormant) return;   // a quiet copy (wrong account, or another copy in charge) never writes the books
+    if (state.dormant || STORE.restoring) return;   // a quiet copy (wrong account, or another copy in charge) never writes the books, nor one puttin' a backup back
     if (saveTimer) return;
     saveTimer = later(()=>{
       saveTimer = null;
-      if (!officeCheck()) return;   // checked again at the moment of writing: a copy that just opened never saves over the one in charge
-      try { GM_setValue(LEDGER_KEY, JSON.stringify(L)); } catch(e){ warn("save:",e); }
+      if (!officeCheck() || STORE.restoring) return;   // checked again at the moment of writing: a copy that just opened never saves over the one in charge
+      let json = ""; try { json = JSON.stringify(L); GM_setValue(LEDGER_KEY, json); } catch(e){ warn("save:",e); }
+      if (json) storeMirror(json);   // and into the browser's own database (03b-storage.js)
     }, 1500);   // a burst of changes saves once (the ledger gets big)
   }
 

@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.33.2
+// @version      0.34.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -1828,7 +1828,7 @@
   ];
 
   // bot/src/version.js
-  var VERSION = "0.33.2";
+  var VERSION = "0.34.0";
 
   // bot-parts:farmhand-bot-parts
   (function() {
@@ -2787,6 +2787,10 @@
     function loadLedger() {
       try {
         const raw = GM_getValue(LEDGER_KEY, "");
+        try {
+          storeRecover(!raw);
+        } catch (e) {
+        }
         L = raw ? JSON.parse(raw) : blankLedger();
         if (!L || typeof L !== "object") L = blankLedger();
       } catch (e) {
@@ -2853,16 +2857,19 @@
     }
     let saveTimer = null;
     function saveLedger() {
-      if (state.dormant) return;
+      if (state.dormant || STORE.restoring) return;
       if (saveTimer) return;
       saveTimer = later(() => {
         saveTimer = null;
-        if (!officeCheck()) return;
+        if (!officeCheck() || STORE.restoring) return;
+        let json = "";
         try {
-          GM_setValue(LEDGER_KEY, JSON.stringify(L));
+          json = JSON.stringify(L);
+          GM_setValue(LEDGER_KEY, json);
         } catch (e) {
           warn("save:", e);
         }
+        if (json) storeMirror(json);
       }, 1500);
     }
     function newRecord(mn) {
@@ -2906,6 +2913,241 @@
       }
       if (L.log.length > 500) L.log = L.log.slice(-500);
       saveLedger();
+    }
+    const STORE = { db: null, dir: null, perm: "none", savedAt: 0, latestAt: 0, hourKey: "", chip: null, menu: null, err: "" };
+    function storeDb() {
+      if (STORE.db) return STORE.db;
+      STORE.db = new Promise((ok, no) => {
+        try {
+          const IDB = W.indexedDB || (typeof indexedDB !== "undefined" ? indexedDB : null);
+          if (!IDB) return no(new Error("no database here"));
+          const rq = IDB.open("farmhand-bot", 1);
+          rq.onupgradeneeded = () => {
+            try {
+              rq.result.createObjectStore("kv");
+            } catch (e) {
+            }
+          };
+          rq.onsuccess = () => ok(rq.result);
+          rq.onerror = () => no(rq.error);
+        } catch (e) {
+          no(e);
+        }
+      });
+      STORE.db.catch(() => {
+        STORE.db = null;
+      });
+      return STORE.db;
+    }
+    async function storeGet(k) {
+      const db = await storeDb();
+      return new Promise((ok, no) => {
+        const rq = db.transaction("kv").objectStore("kv").get(k);
+        rq.onsuccess = () => ok(rq.result);
+        rq.onerror = () => no(rq.error);
+      });
+    }
+    async function storePut(k, v) {
+      const db = await storeDb();
+      return new Promise((ok, no) => {
+        const tx = db.transaction("kv", "readwrite");
+        tx.objectStore("kv").put(v, k);
+        tx.oncomplete = () => ok(true);
+        tx.onerror = () => no(tx.error);
+      });
+    }
+    function storeMirror(json) {
+      storePut("ledger", { at: Date.now(), json }).then(() => {
+        STORE.savedAt = Date.now();
+      }).catch((e) => {
+        STORE.err = String(e && e.message || e);
+      });
+    }
+    function storeRecover(rawWasEmpty) {
+      if (!rawWasEmpty) return;
+      storeGet("ledger").then((v) => {
+        if (!v || typeof v.json !== "string") return;
+        let n = 0;
+        try {
+          n = Object.keys(JSON.parse(v.json).people || {}).length;
+        } catch (e) {
+          return;
+        }
+        if (n < 2 || GM_getValue(LEDGER_KEY, "")) return;
+        warn("The books were missing from Tampermonkey; putting back the copy from the browser's database (" + n + " people, saved " + new Date(v.at).toLocaleString() + ").");
+        STORE.restoring = true;
+        GM_setValue(LEDGER_KEY, v.json);
+        later(() => W.location.reload(), 500);
+      }).catch(() => {
+      });
+    }
+    const stamp = (d) => d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0") + "-" + String(d.getHours()).padStart(2, "0");
+    async function storeWrite(name, text) {
+      const fh = await STORE.dir.getFileHandle(name, { create: true }), w = await fh.createWritable();
+      await w.write(text);
+      await w.close();
+    }
+    async function storeFolderTick(force) {
+      if (!STORE.dir || STORE.perm !== "granted" || !L || state.dormant) return;
+      if (!force && typeof officeCheck === "function" && !officeCheck()) return;
+      const now = /* @__PURE__ */ new Date(), json = JSON.stringify(L);
+      try {
+        if (force || Date.now() - STORE.latestAt > 10 * 6e4) {
+          await storeWrite("bnb-ledger-latest.json", json);
+          STORE.latestAt = Date.now();
+        }
+        const hk = stamp(now);
+        if (force || STORE.hourKey !== hk) {
+          await storeWrite("bnb-ledger-" + hk + ".json", json);
+          STORE.hourKey = hk;
+          const cut = stamp(new Date(Date.now() - 48 * 36e5));
+          for await (const [name] of STORE.dir.entries()) {
+            const m = /^bnb-ledger-(\d{4}-\d\d-\d\d-\d\d)\.json$/.exec(name);
+            if (m && m[1] < cut) {
+              try {
+                await STORE.dir.removeEntry(name);
+              } catch (e) {
+              }
+            }
+          }
+        }
+        STORE.err = "";
+      } catch (e) {
+        STORE.err = String(e && e.message || e);
+        warn("backup folder:", e);
+        if (/permission|not allowed/i.test(STORE.err)) STORE.perm = "prompt";
+      }
+      storeChipText();
+    }
+    async function storePickFolder() {
+      try {
+        if (typeof W.showDirectoryPicker !== "function") {
+          W.alert(`This browser can't save to a folder (Chrome and Edge can). Use "Farmhand: export ledger" in the Tampermonkey menu instead.`);
+          return;
+        }
+        const d = await W.showDirectoryPicker({ id: "bnb-farm", mode: "readwrite" });
+        STORE.dir = d;
+        STORE.perm = "granted";
+        await storePut("dir", d);
+        await storeFolderTick(true);
+      } catch (e) {
+        if (!/abort/i.test(String(e && e.name))) {
+          STORE.err = String(e && e.message || e);
+          warn("pick folder:", e);
+        }
+      }
+      storeChipText();
+    }
+    async function storeReconnect() {
+      try {
+        STORE.perm = await STORE.dir.requestPermission({ mode: "readwrite" });
+        if (STORE.perm === "granted") await storeFolderTick(true);
+      } catch (e) {
+        STORE.err = String(e && e.message || e);
+      }
+      storeChipText();
+    }
+    function storeLoadFile() {
+      const inp = W.document.createElement("input");
+      inp.type = "file";
+      inp.accept = ".json,application/json";
+      inp.onchange = () => {
+        const f = inp.files && inp.files[0];
+        if (!f) return;
+        f.text().then((t) => {
+          let d = null;
+          try {
+            d = JSON.parse(t);
+          } catch (e) {
+          }
+          if (!d || typeof d !== "object" || !d.people || typeof d.people !== "object") {
+            W.alert("That file isn't the farm's books.");
+            return;
+          }
+          const n = Object.keys(d.people).length, now = Object.keys(L && L.people || {}).length;
+          if (!W.confirm("Put these books back?\n\n" + f.name + "\n" + n + " people in it (the books now have " + now + ").\n\nWhat's in the books now is replaced. The bot restarts.")) return;
+          STORE.restoring = true;
+          const json = JSON.stringify(d);
+          GM_setValue(LEDGER_KEY, json);
+          storePut("ledger", { at: Date.now(), json }).catch(() => {
+          }).then(() => W.location.reload());
+        });
+      };
+      inp.click();
+    }
+    function storeChipText() {
+      const c = STORE.chip;
+      if (!c) return;
+      const t = (ms) => new Date(ms).toTimeString().slice(0, 5);
+      if (!STORE.dir) {
+        c.textContent = "\u{1F4BE} back up the books: pick a folder";
+        c.style.color = "#ffd98a";
+      } else if (STORE.perm !== "granted") {
+        c.textContent = "\u{1F4BE} click to reconnect the backup folder";
+        c.style.color = "#ff9a7a";
+      } else if (STORE.err) {
+        c.textContent = "\u{1F4BE} backup trouble: " + STORE.err.slice(0, 60);
+        c.style.color = "#ff9a7a";
+      } else {
+        c.textContent = "\u{1F4BE} backed up " + (STORE.latestAt ? t(STORE.latestAt) : "soon") + " \xB7 " + STORE.dir.name;
+        c.style.color = "#b8e08a";
+      }
+    }
+    function storeMenu() {
+      if (STORE.menu) {
+        STORE.menu.remove();
+        STORE.menu = null;
+        return;
+      }
+      const m = W.document.createElement("div");
+      m.style.cssText = "position:fixed;top:48px;left:4px;z-index:2147483647;background:rgba(20,15,10,.95);border:1px solid #8a6a3a;border-radius:5px;padding:6px;display:flex;flex-direction:column;gap:4px;font:12px/1.4 monospace";
+      const b = (label, fn) => {
+        const x = W.document.createElement("button");
+        x.textContent = label;
+        x.style.cssText = "background:#3a2a18;color:#ffd98a;border:1px solid #8a6a3a;border-radius:4px;padding:3px 8px;cursor:pointer;text-align:left;font:inherit";
+        x.onclick = () => {
+          m.remove();
+          STORE.menu = null;
+          fn();
+        };
+        m.appendChild(x);
+      };
+      if (STORE.dir && STORE.perm !== "granted") b("Reconnect " + STORE.dir.name, storeReconnect);
+      b(STORE.dir ? "Pick a different folder" : "Pick a folder for backups", storePickFolder);
+      if (STORE.dir && STORE.perm === "granted") b("Back up now", () => storeFolderTick(true));
+      b("Load the books from a file\u2026", storeLoadFile);
+      W.document.body.appendChild(m);
+      STORE.menu = m;
+    }
+    function storageBoot() {
+      try {
+        if (CFG.SHOW_BADGE && W.document && W.document.body && !STORE.chip) {
+          const c = W.document.createElement("div");
+          c.style.cssText = "position:fixed;top:30px;left:4px;z-index:2147483647;background:rgba(20,15,10,.88);font:11px/1.4 monospace;padding:3px 8px;border:1px solid #8a6a3a;border-radius:5px;cursor:pointer;user-select:none;max-width:320px";
+          c.title = "The farm's books, backed up to a folder on this computer";
+          c.addEventListener("click", () => STORE.dir && STORE.perm !== "granted" ? storeReconnect() : storeMenu());
+          W.document.body.appendChild(c);
+          STORE.chip = c;
+          storeChipText();
+        }
+        storeGet("dir").then(async (d) => {
+          if (!d) return;
+          STORE.dir = d;
+          try {
+            STORE.perm = await d.queryPermission({ mode: "readwrite" });
+          } catch (e) {
+            STORE.perm = "prompt";
+          }
+          storeChipText();
+          if (STORE.perm === "granted") storeFolderTick(false);
+        }).catch(() => {
+        });
+        every(() => {
+          storeFolderTick(false);
+        }, 6e4);
+      } catch (e) {
+        warn("storage:", e);
+      }
     }
     function hasRole(mn, role) {
       const r = rec(mn);
@@ -30780,6 +31022,7 @@ Welcome to B&B Farm, hon. \u{1F33E}`
       addonsBoot();
       makeBadge();
       setBadge("waiting for game\u2026");
+      storageBoot();
       attachListeners();
       if (!startWorkerTimer()) {
         setInterval(heartbeat, CFG.HEARTBEAT_MS);

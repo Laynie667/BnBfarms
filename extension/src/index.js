@@ -19,6 +19,7 @@ import { initDrawnBody, onBodyMsg, onFarmLook, farmLookWanted, drawnBodyFarmStat
 import { initMesses, onMessMsg, messFromMark, messWash } from "./messes.js";
 import { initMemlog } from "./memlog.js";
 import { initTrim } from "./trimpics.js";
+import { initLocalSave } from "./localsave.js";
 import { initCues, cueOff, lead, face, sound, trance, drawMarkers, arouse, vibe, initBody } from "./cues.js";
 
 // the SDK ships as an old-style module; this digs the real thing out either way
@@ -333,6 +334,7 @@ function start() {
   initDrawnBody(mod);  // the drawn body from the outfit studio, on your own character (drawnbody.js)
   initMesses(mod);     // the farm's own messes on everybody (messes.js)
   initMemlog();        // a log of how big things are, for chasing a page that runs out of room (memlog.js, /farmmem)
+  initLocalSave(VERSION, () => st.panel && st.panel.render && st.panel.render());   // your settings as a file in a folder you pick (localsave.js)
   initTrim(mod);       // the game never lets go of a picture: past 380 MB on the graphics card, old unused ones go (trimpics.js)
   setTimeout(() => scaleTrialCleanup(), 15000);   // what the old scale trial left on anybody (marks.js)
   initBody(mod);   // slowed walkin' when you're carryin' a lot, and bein' held at the edge while denied (cues.js)

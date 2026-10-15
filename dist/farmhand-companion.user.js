@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.28.1
+// @version      0.29.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -230,7 +230,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.28.1";
+  var VERSION = "0.29.0";
 
   // extension/src/config.js
   var BOT_MEMBER = 260239;
@@ -572,6 +572,162 @@ One of mods you are using is using an old version of SDK. It will work for now b
   };
   var gearLore = (name) => GEAR_LORE[name] || "";
 
+  // extension/src/localsave.js
+  var W = window;
+  var MINE = /^(fhc-|farmhand-)/;
+  var S = { db: null, dir: null, perm: "none", at: 0, last: "", err: "" };
+  var onChange = () => {
+  };
+  function db() {
+    if (S.db) return S.db;
+    S.db = new Promise((ok2, no) => {
+      try {
+        const rq = W.indexedDB.open("farmhand-companion", 1);
+        rq.onupgradeneeded = () => {
+          try {
+            rq.result.createObjectStore("kv");
+          } catch (e) {
+          }
+        };
+        rq.onsuccess = () => ok2(rq.result);
+        rq.onerror = () => no(rq.error);
+      } catch (e) {
+        no(e);
+      }
+    });
+    S.db.catch(() => {
+      S.db = null;
+    });
+    return S.db;
+  }
+  async function get(k) {
+    const d = await db();
+    return new Promise((ok2, no) => {
+      const rq = d.transaction("kv").objectStore("kv").get(k);
+      rq.onsuccess = () => ok2(rq.result);
+      rq.onerror = () => no(rq.error);
+    });
+  }
+  async function put(k, v) {
+    const d = await db();
+    return new Promise((ok2, no) => {
+      const tx = d.transaction("kv", "readwrite");
+      tx.objectStore("kv").put(v, k);
+      tx.oncomplete = () => ok2(true);
+      tx.onerror = () => no(tx.error);
+    });
+  }
+  var me = () => W.Player && W.Player.MemberNumber || 0;
+  var fileName = () => "farmhand-companion-" + (me() || "player") + ".json";
+  function snapshot(version) {
+    const data = {};
+    try {
+      for (let i = 0; i < W.localStorage.length; i++) {
+        const k = W.localStorage.key(i);
+        if (k && MINE.test(k)) data[k] = W.localStorage.getItem(k);
+      }
+    } catch (e) {
+    }
+    return { kind: "farmhand-companion", v: 1, member: me(), version, data };
+  }
+  async function writeNow(version, force) {
+    if (!S.dir || S.perm !== "granted" || !me()) return;
+    const snap2 = snapshot(version), body = JSON.stringify(snap2.data);
+    if (!force && body === S.last) return;
+    const errWas = S.err;
+    try {
+      const fh = await S.dir.getFileHandle(fileName(), { create: true }), w = await fh.createWritable();
+      await w.write(JSON.stringify(Object.assign(snap2, { savedAt: (/* @__PURE__ */ new Date()).toISOString() }), null, 1));
+      await w.close();
+      S.last = body;
+      S.at = Date.now();
+      S.err = "";
+    } catch (e) {
+      S.err = String(e && e.message || e);
+      if (/permission|not allowed/i.test(S.err)) S.perm = "prompt";
+    }
+    if (force || S.err !== errWas) onChange();
+  }
+  function localSaveState() {
+    return { can: typeof W.showDirectoryPicker === "function", folder: S.dir ? S.dir.name : "", perm: S.perm, at: S.at, err: S.err, file: fileName() };
+  }
+  async function localSavePick(version) {
+    try {
+      const d = await W.showDirectoryPicker({ id: "bnb-farm", mode: "readwrite" });
+      S.dir = d;
+      S.perm = "granted";
+      await put("dir", d);
+      await writeNow(version, true);
+    } catch (e) {
+      if (!/abort/i.test(String(e && e.name))) S.err = String(e && e.message || e);
+    }
+    onChange();
+  }
+  async function localSaveReconnect(version) {
+    try {
+      S.perm = await S.dir.requestPermission({ mode: "readwrite" });
+      if (S.perm === "granted") await writeNow(version, true);
+    } catch (e) {
+      S.err = String(e && e.message || e);
+    }
+    onChange();
+  }
+  function localSaveNow(version) {
+    return writeNow(version, true);
+  }
+  function localSaveLoad(say) {
+    const inp = W.document.createElement("input");
+    inp.type = "file";
+    inp.accept = ".json,application/json";
+    inp.onchange = () => {
+      const f = inp.files && inp.files[0];
+      if (!f) return;
+      f.text().then((t) => {
+        let d = null;
+        try {
+          d = JSON.parse(t);
+        } catch (e) {
+        }
+        if (!d || d.kind !== "farmhand-companion" || !d.data || typeof d.data !== "object") {
+          say && say("That file isn't a Farmhand Companion save.");
+          return;
+        }
+        const keys = Object.keys(d.data).filter((k) => MINE.test(k) && typeof d.data[k] === "string");
+        if (!W.confirm("Load these settings?\n\n" + f.name + (d.savedAt ? "\nsaved " + new Date(d.savedAt).toLocaleString() : "") + "\n" + keys.length + " things in it.\n\nWhat this browser has now is replaced, and the page reloads.")) return;
+        try {
+          for (let i = W.localStorage.length - 1; i >= 0; i--) {
+            const k = W.localStorage.key(i);
+            if (k && MINE.test(k) && !(k in d.data)) W.localStorage.removeItem(k);
+          }
+          for (const k of keys) W.localStorage.setItem(k, d.data[k]);
+        } catch (e) {
+          say && say("Couldn't load it: " + (e && e.message || e));
+          return;
+        }
+        W.location.reload();
+      });
+    };
+    inp.click();
+  }
+  function initLocalSave(version, changed) {
+    if (typeof changed === "function") onChange = changed;
+    get("dir").then(async (d) => {
+      if (!d) return;
+      S.dir = d;
+      try {
+        S.perm = await d.queryPermission({ mode: "readwrite" });
+      } catch (e) {
+        S.perm = "prompt";
+      }
+      onChange();
+      if (S.perm === "granted") writeNow(version, true);
+    }).catch(() => {
+    });
+    setInterval(() => {
+      writeNow(version, false);
+    }, 6e4);
+  }
+
   // studio/web/breasts-drawing.js
   (() => {
     const NATIVE = ["FlatSmall", "FlatMedium", "Small", "Normal", "Large", "XLarge"];
@@ -591,7 +747,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       return { cup, i, k, r, sag, top, bx, by };
     }
     const GAME = { dx: 42, cy: 330, ro: 34, rv: 42, y1: 252, y2: 289, y3: 398 };
-    const heldScale = (S2) => S2.r / 41;
+    const heldScale = (S3) => S3.r / 41;
     function heldY(y, sc) {
       if (y <= GAME.y1) return y;
       const top = GAME.y1 + (GAME.y2 - GAME.y1) * (1 + sc) / 2;
@@ -599,35 +755,35 @@ One of mods you are using is using an old version of SDK. It will work for now b
       const t = (y - GAME.y1) / (GAME.y2 - GAME.y1);
       return GAME.y1 + (GAME.y2 - GAME.y1) * (t + (sc - 1) * (t * t * t - t * t * t * t / 2));
     }
-    function held(S2) {
-      const sc = heldScale(S2);
-      return Object.assign({}, S2, { held: true, sc, bx: GAME.dx * sc, by: heldY(GAME.cy, sc) - ROOT_Y, ro: GAME.ro * sc, ri: GAME.dx * sc, rv: GAME.rv * sc, r: GAME.rv * sc, sag: 0, top: 1 });
+    function held(S3) {
+      const sc = heldScale(S3);
+      return Object.assign({}, S3, { held: true, sc, bx: GAME.dx * sc, by: heldY(GAME.cy, sc) - ROOT_Y, ro: GAME.ro * sc, ri: GAME.dx * sc, rv: GAME.rv * sc, r: GAME.rv * sc, sag: 0, top: 1 });
     }
-    function point(S2, s, t) {
+    function point(S3, s, t) {
       const sn = Math.sin(t), cs = Math.cos(t);
-      if (S2.held) return [s * S2.bx + (s * cs > 0 ? S2.ro : S2.ri) * cs, S2.by + S2.rv * sn];
-      if (sn >= 0) return [s * S2.bx + S2.r * cs * (1 + S2.sag * 0.3 * sn * sn) + s * S2.r * 0.06 * S2.k * sn * sn, S2.by + S2.r * sn * (1 + S2.sag)];
+      if (S3.held) return [s * S3.bx + (s * cs > 0 ? S3.ro : S3.ri) * cs, S3.by + S3.rv * sn];
+      if (sn >= 0) return [s * S3.bx + S3.r * cs * (1 + S3.sag * 0.3 * sn * sn) + s * S3.r * 0.06 * S3.k * sn * sn, S3.by + S3.r * sn * (1 + S3.sag)];
       const up = -sn;
-      return [s * S2.bx + S2.r * cs * (1 - 0.5 * up * up) - s * S2.r * 0.2 * up * up, S2.by - S2.r * S2.top * up];
+      return [s * S3.bx + S3.r * cs * (1 - 0.5 * up * up) - s * S3.r * 0.2 * up * up, S3.by - S3.r * S3.top * up];
     }
-    function path(g, S2, s, from, to, ox, oy) {
+    function path(g, S3, s, from, to, ox, oy) {
       const steps = 80;
       for (let j = 0; j <= steps; j++) {
-        const p = point(S2, s, from + (to - from) * j / steps);
+        const p = point(S3, s, from + (to - from) * j / steps);
         if (j) g.lineTo(ox + p[0], oy + p[1]);
         else g.moveTo(ox + p[0], oy + p[1]);
       }
     }
-    function nipples(S2) {
-      if (S2.held) {
-        const hx = S2.bx + 4 * S2.sc, hy = S2.by - 0.43 * S2.rv;
+    function nipples(S3) {
+      if (S3.held) {
+        const hx = S3.bx + 4 * S3.sc, hy = S3.by - 0.43 * S3.rv;
         return [[-hx, hy], [hx, hy]];
       }
-      const x = S2.bx + S2.r * (0.02 + 0.2 * S2.k), y = S2.by + S2.r * (-0.15 + 0.42 * S2.k);
+      const x = S3.bx + S3.r * (0.02 + 0.2 * S3.k), y = S3.by + S3.r * (-0.15 + 0.42 * S3.k);
       return [[-x, y], [x, y]];
     }
-    function canvas(S2, skin) {
-      const pad = 8, half = S2.bx + S2.r * (1 + S2.sag * 0.35) + pad, up = Math.max(0, S2.r * S2.top - S2.by) + pad, down = S2.by + S2.r * (1 + S2.sag) + pad + 10;
+    function canvas(S3, skin) {
+      const pad = 8, half = S3.bx + S3.r * (1 + S3.sag * 0.35) + pad, up = Math.max(0, S3.r * S3.top - S3.by) + pad, down = S3.by + S3.r * (1 + S3.sag) + pad + 10;
       const out = document.createElement("canvas");
       out.width = Math.ceil(Math.max(half, 110) * 2);
       out.height = Math.ceil(up + Math.max(down, 110));
@@ -637,7 +793,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       const g = cv.getContext("2d"), ox = out.width / 2, oy = up;
       cv.ax = ox;
       cv.ay = oy;
-      cv.nips = nipples(S2);
+      cv.nips = nipples(S3);
       const side = (s, draw) => {
         g.save();
         g.beginPath();
@@ -649,12 +805,12 @@ One of mods you are using is using an old version of SDK. It will work for now b
       };
       const whole = (s) => {
         g.beginPath();
-        path(g, S2, s, 0, Math.PI * 2, ox, oy);
+        path(g, S3, s, 0, Math.PI * 2, ox, oy);
         g.closePath();
       };
       for (const s of [-1, 1]) side(s, () => {
         g.save();
-        g.translate(0, 5 + S2.r * 0.04);
+        g.translate(0, 5 + S3.r * 0.04);
         g.filter = "blur(4px)";
         g.fillStyle = "rgba(120,60,50,0.22)";
         whole(s);
@@ -662,8 +818,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
         g.restore();
       });
       for (const s of [-1, 1]) side(s, () => {
-        const cx = ox + s * S2.bx, low = oy + S2.by + S2.r * 0.25;
-        const grad = g.createRadialGradient(cx - S2.r * 0.25, low - S2.r * 0.5, S2.r * 0.1, cx, low, S2.r * 1.25);
+        const cx = ox + s * S3.bx, low = oy + S3.by + S3.r * 0.25;
+        const grad = g.createRadialGradient(cx - S3.r * 0.25, low - S3.r * 0.5, S3.r * 0.1, cx, low, S3.r * 1.25);
         grad.addColorStop(0, rgb2(skin, 1.03));
         grad.addColorStop(0.55, rgb2(skin, 1));
         grad.addColorStop(1, rgb2([skin[0], skin[1] * 0.93, skin[2] * 0.92], 0.94));
@@ -673,32 +829,32 @@ One of mods you are using is using an old version of SDK. It will work for now b
         g.save();
         whole(s);
         g.clip();
-        const under = g.createLinearGradient(0, low + S2.r * 0.2, 0, oy + S2.by + S2.r * (1 + S2.sag));
+        const under = g.createLinearGradient(0, low + S3.r * 0.2, 0, oy + S3.by + S3.r * (1 + S3.sag));
         under.addColorStop(0, "rgba(150,70,60,0)");
         under.addColorStop(1, "rgba(150,70,60,0.24)");
         g.fillStyle = under;
         g.fillRect(0, 0, cv.width, cv.height);
-        const cl = g.createLinearGradient(ox, 0, ox + s * S2.r * 0.3, 0);
+        const cl = g.createLinearGradient(ox, 0, ox + s * S3.r * 0.3, 0);
         cl.addColorStop(0, "rgba(150,70,60,0.20)");
         cl.addColorStop(1, "rgba(150,70,60,0)");
         g.fillStyle = cl;
-        g.fillRect(0, oy + S2.by - S2.r * 0.6, cv.width, cv.height);
-        g.translate(cx - S2.r * 0.38, low - S2.r * 0.42);
+        g.fillRect(0, oy + S3.by - S3.r * 0.6, cv.width, cv.height);
+        g.translate(cx - S3.r * 0.38, low - S3.r * 0.42);
         g.rotate(-0.25);
-        const sh = g.createRadialGradient(0, 0, 0, 0, 0, S2.r * 0.34);
+        const sh = g.createRadialGradient(0, 0, 0, 0, 0, S3.r * 0.34);
         sh.addColorStop(0, "rgba(255,255,255,0.8)");
         sh.addColorStop(0.5, "rgba(255,255,255,0.3)");
         sh.addColorStop(1, "rgba(255,255,255,0)");
         g.fillStyle = sh;
         g.scale(0.36, 1);
         g.beginPath();
-        g.arc(0, 0, S2.r * 0.34, 0, Math.PI * 2);
+        g.arc(0, 0, S3.r * 0.34, 0, Math.PI * 2);
         g.fill();
         g.restore();
       });
       g.globalCompositeOperation = "destination-out";
       {
-        const topY = oy + S2.by - S2.r * S2.top, fx = Math.min(S2.bx * 1.15, 72), fy = S2.r * S2.top * 0.95;
+        const topY = oy + S3.by - S3.r * S3.top, fx = Math.min(S3.bx * 1.15, 72), fy = S3.r * S3.top * 0.95;
         g.save();
         g.translate(ox, topY);
         g.scale(1, fy / fx);
@@ -716,30 +872,30 @@ One of mods you are using is using an old version of SDK. It will work for now b
       g.lineCap = "round";
       g.lineJoin = "round";
       for (const s of [-1, 1]) side(s, () => {
-        const hi = (0.22 + 0.16 * S2.k) * Math.PI, outer = s > 0 ? [-hi, Math.PI * 1.02] : [Math.PI + hi, -0.02 * Math.PI];
+        const hi = (0.22 + 0.16 * S3.k) * Math.PI, outer = s > 0 ? [-hi, Math.PI * 1.02] : [Math.PI + hi, -0.02 * Math.PI];
         g.lineWidth = 1.5;
         g.beginPath();
-        path(g, S2, s, outer[0], outer[1], ox, oy);
+        path(g, S3, s, outer[0], outer[1], ox, oy);
         g.stroke();
         g.lineWidth = 2.2;
         g.beginPath();
-        path(g, S2, s, Math.PI * 0.15, Math.PI * 0.85, ox, oy);
+        path(g, S3, s, Math.PI * 0.15, Math.PI * 0.85, ox, oy);
         g.stroke();
       });
       let y0 = Infinity, y1 = -Infinity;
       for (let t = 0; t < Math.PI * 2; t += 0.02) {
-        const p = point(S2, 1, t);
+        const p = point(S3, 1, t);
         if (p[0] <= 0) {
           y0 = Math.min(y0, p[1]);
           y1 = Math.max(y1, p[1]);
         }
       }
-      if (S2.held) {
-        y0 = S2.by - S2.rv * 0.2;
-        y1 = S2.by + S2.rv * 0.72;
+      if (S3.held) {
+        y0 = S3.by - S3.rv * 0.2;
+        y1 = S3.by + S3.rv * 0.72;
       }
       if (y1 > y0) {
-        const a = Math.max(y0, S2.by - S2.r * 0.45), lg = g.createLinearGradient(0, oy + a, 0, oy + y1);
+        const a = Math.max(y0, S3.by - S3.r * 0.45), lg = g.createLinearGradient(0, oy + a, 0, oy + y1);
         lg.addColorStop(0, "rgba(0,0,0,0)");
         lg.addColorStop(0.35, rgb2(skin, 0.28));
         lg.addColorStop(1, rgb2(skin, 0.28));
@@ -779,7 +935,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       mg.fillStyle = "#000";
       for (const s of [-1, 1]) {
         mg.beginPath();
-        path(mg, S2, s, 0, Math.PI * 2, ox, oy);
+        path(mg, S3, s, 0, Math.PI * 2, ox, oy);
         mg.closePath();
         mg.fill();
       }
@@ -787,16 +943,16 @@ One of mods you are using is using an old version of SDK. It will work for now b
       return out;
     }
     const GAME_ALLFOURS = { dx: 33, cy: 288, ro: 22, rv: 25, y1: 236, y2: 262, y3: 318 }, GROUND = 398;
-    function fitOf(S2, pose, nip) {
+    function fitOf(S3, pose, nip) {
       if (pose === "AllFours") {
-        const G2 = GAME_ALLFOURS, ro2 = S2.r * (1 + S2.sag * 0.3), rv2 = S2.r * (1 + S2.sag), kx2 = (S2.bx + ro2) / (G2.dx + G2.ro);
-        const bottom = Math.min(GROUND, ROOT_Y + S2.by + rv2), top2 = Math.max(G2.y1 + 4, Math.min(bottom - 40, ROOT_Y + S2.by - S2.r * S2.top * 0.8)), ky2 = (bottom - top2) / (G2.cy + G2.rv - G2.y2);
-        return { G: G2, gi: G2.dx - G2.ro, go: G2.dx + G2.ro, ti: Math.max(0, S2.bx - S2.r), to: S2.bx + ro2, kx: kx2, ro: ro2, ri: Math.min(S2.r, S2.bx), rv: rv2, mapY: (y) => y <= G2.y1 ? y : y >= G2.y2 ? top2 + (y - G2.y2) * ky2 : G2.y1 + (top2 - G2.y1) * (y - G2.y1) / (G2.y2 - G2.y1) };
+        const G2 = GAME_ALLFOURS, ro2 = S3.r * (1 + S3.sag * 0.3), rv2 = S3.r * (1 + S3.sag), kx2 = (S3.bx + ro2) / (G2.dx + G2.ro);
+        const bottom = Math.min(GROUND, ROOT_Y + S3.by + rv2), top2 = Math.max(G2.y1 + 4, Math.min(bottom - 40, ROOT_Y + S3.by - S3.r * S3.top * 0.8)), ky2 = (bottom - top2) / (G2.cy + G2.rv - G2.y2);
+        return { G: G2, gi: G2.dx - G2.ro, go: G2.dx + G2.ro, ti: Math.max(0, S3.bx - S3.r), to: S3.bx + ro2, kx: kx2, ro: ro2, ri: Math.min(S3.r, S3.bx), rv: rv2, mapY: (y) => y <= G2.y1 ? y : y >= G2.y2 ? top2 + (y - G2.y2) * ky2 : G2.y1 + (top2 - G2.y1) * (y - G2.y1) / (G2.y2 - G2.y1) };
       }
-      if (S2.held) return { kx: S2.sc, ro: S2.ro, ri: S2.ri, rv: S2.rv, mapY: (y) => heldY(y, S2.sc) };
-      const ro = S2.r * (1 + S2.sag * 0.3), rv = S2.r * (1 + S2.sag), kx = (S2.bx + ro) / (GAME.dx + GAME.ro), ky = rv / GAME.rv;
-      const cy = ROOT_Y + S2.by, top = Math.max(GAME.y1 + 4, cy - (GAME.cy - GAME.y2) * ky);
-      const gnx = GAME.dx + 4, gny = GAME.cy - 0.43 * GAME.rv, pn = nipples(S2)[1], tnx = nip ? nip[0] : pn[0], tny = ROOT_Y + (nip ? nip[1] : pn[1]), bot = cy + rv, gbot = GAME.cy + GAME.rv;
+      if (S3.held) return { kx: S3.sc, ro: S3.ro, ri: S3.ri, rv: S3.rv, mapY: (y) => heldY(y, S3.sc) };
+      const ro = S3.r * (1 + S3.sag * 0.3), rv = S3.r * (1 + S3.sag), kx = (S3.bx + ro) / (GAME.dx + GAME.ro), ky = rv / GAME.rv;
+      const cy = ROOT_Y + S3.by, top = Math.max(GAME.y1 + 4, cy - (GAME.cy - GAME.y2) * ky);
+      const gnx = GAME.dx + 4, gny = GAME.cy - 0.43 * GAME.rv, pn = nipples(S3)[1], tnx = nip ? nip[0] : pn[0], tny = ROOT_Y + (nip ? nip[1] : pn[1]), bot = cy + rv, gbot = GAME.cy + GAME.rv;
       const okY = tny > top + 6 && tny < bot - 6;
       const mapY = (y) => y <= GAME.y1 ? y : y >= GAME.y2 ? top + (y - GAME.y2) * ky : GAME.y1 + (top - GAME.y1) * (y - GAME.y1) / (GAME.y2 - GAME.y1);
       const mapYN = (y) => {
@@ -806,8 +962,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
         if (y <= gny) return top + (y - GAME.y2) * (tny - top) / (gny - GAME.y2);
         return tny + (y - gny) * (bot - tny) / (gbot - gny);
       };
-      const ti = Math.max(0, S2.bx - S2.r), to = S2.bx + ro;
-      return { gi: 0, go: GAME.dx + GAME.ro, gn: gnx, tn: tnx > ti + 6 && tnx < to - 6 ? tnx : null, ti, to, kx, ro, ri: Math.min(S2.r, S2.bx), rv, mapY, mapYN };
+      const ti = Math.max(0, S3.bx - S3.r), to = S3.bx + ro;
+      return { gi: 0, go: GAME.dx + GAME.ro, gn: gnx, tn: tnx > ti + 6 && tnx < to - 6 ? tnx : null, ti, to, kx, ro, ri: Math.min(S3.r, S3.bx), rv, mapY, mapYN };
     }
     window.FarmBreasts = { fitOf, NATIVE, CUPS, DRAWN_FROM, ROOT_Y, GAME, shape, held, heldY, point, nipples, canvas };
   })();
@@ -816,7 +972,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   (() => {
     window.FarmBodyEngine = function(host) {
       "use strict";
-      const S2 = host.S;
+      const S3 = host.S;
       const bodyItem = (g) => host.bodyItem(g);
       const setBody = (g, n) => host.setBody(g, n);
       const bellyDraw = () => {
@@ -829,8 +985,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
       const FIT0 = () => ({ on: false, rx: 70, ry: 80, sag: 0.22, x: 0, y: 0, behind: false, flat: false, cut: 0.74 });
       const BELLY = { fits: { std: FIT0(), AllFours: Object.assign(FIT0(), { behind: true, y: -60 }), Hogtied: Object.assign(FIT0(), { behind: true, y: -75 }) }, skin: /* @__PURE__ */ new Map() };
       const poseKey = () => {
-        const m = S2.C && S2.C.PoseMapping || {};
-        const all = Object.values(m).concat(S2.C && S2.C.Pose || []);
+        const m = S3.C && S3.C.PoseMapping || {};
+        const all = Object.values(m).concat(S3.C && S3.C.Pose || []);
         return all.includes("AllFours") ? "AllFours" : all.includes("Hogtied") ? "Hogtied" : "std";
       };
       const fitNow = () => BELLY.fits[poseKey()];
@@ -868,10 +1024,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
       }
       const MOULD = { ver: 0, lies: /* @__PURE__ */ new Set(), span: /* @__PURE__ */ new Map(), cover: /* @__PURE__ */ new Map(), items: /* @__PURE__ */ new Set(), mode: /* @__PURE__ */ new Map(), ext: /* @__PURE__ */ new Map(), img: /* @__PURE__ */ new Map(), prof: /* @__PURE__ */ new Map(), out: /* @__PURE__ */ new Map(), M: 150 };
       const mouldKey = (it) => it.Asset.Group.Name + "/" + it.Asset.Name;
-      const W7 = window;
+      const W8 = window;
       const mapSrc = host.mapSrc || ((src) => {
-        if (typeof W7.DrawGetImage !== "function") return src;
-        const lists = [typeof DrawCacheImage !== "undefined" ? DrawCacheImage : W7.DrawCacheImage, W7.DrawImageCache].filter((c) => c && typeof c.get === "function");
+        if (typeof W8.DrawGetImage !== "function") return src;
+        const lists = [typeof DrawCacheImage !== "undefined" ? DrawCacheImage : W8.DrawCacheImage, W8.DrawImageCache].filter((c) => c && typeof c.get === "function");
         if (!lists.length) return src;
         let seen2 = null;
         const kept = lists.map((c) => [c, Object.prototype.hasOwnProperty.call(c, "get"), c.get]);
@@ -880,7 +1036,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
             if (seen2 == null) seen2 = k;
             return { isLoaded: () => false, data: void 0, complete: false };
           };
-          W7.DrawGetImage(src);
+          W8.DrawGetImage(src);
         } catch (e) {
         } finally {
           for (const [c, own, g] of kept) {
@@ -1242,7 +1398,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
         const key = src + "|" + Math.round(x) + "," + Math.round(y) + "|" + mode + "|" + (ext ? ext.top + "-" + ext.bottom : "") + "|" + ctx2.sig;
         if (MOULD.out.has(key)) return MOULD.out.get(key);
         const keep2 = (res) => {
-          put(MOULD.out, key, res);
+          put2(MOULD.out, key, res);
           return res;
         };
         if (mode === "under") {
@@ -1369,7 +1525,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
             g.drawImage(im, sa, j, sb - sa, 1, M + (nl2 - x) + (sa - (gl - x)) * k, j, (sb - sa) * k, 1);
           }
           const res2 = changed ? c : false;
-          put(MOULD.out, key2, res2);
+          put2(MOULD.out, key2, res2);
           return res2;
         }
         for (let j = 0; j < h2; j++) {
@@ -1397,7 +1553,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
         }
         return n;
       };
-      function put(map, key, v) {
+      function put2(map, key, v) {
         map.delete(key);
         map.set(key, v);
         const maps = [BREAST.out, MOULD.out];
@@ -1501,8 +1657,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
         {
           let finish = null, seenNow = null, handFNow = null;
           try {
-            const fit = C === S2.C ? fitNow() : null, br = C === S2.C ? breastNow() : null, real = cb;
-            const put2 = (name, img2, x, y, o) => {
+            const fit = C === S3.C ? fitNow() : null, br = C === S3.C ? breastNow() : null, real = cb;
+            const put3 = (name, img2, x, y, o) => {
               if (img2 && typeof img2 !== "string" && img2.MX != null && o && o.TextureAlphaMask) o = Object.assign({}, o, { TextureAlphaMask: void 0 });
               if (typeof img2 === "string" || !host.picture) return real[name](img2, x, y, o);
               const p = host.picture(img2);
@@ -1522,8 +1678,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
                 const m = slot.exec(src);
                 return m ? m[1] : "";
               };
-              const mouldList = S2.C.Appearance.filter((it) => MOULD.items.has(mouldKey(it))).map((it) => ({ folders: [it.Asset.Group.Name, it.Asset.DynamicGroupName], name: it.Asset.Name, key: mouldKey(it), mode: MOULD.mode.get(mouldKey(it)) || "wide" }));
-              const wornList = S2.C.Appearance.map((it) => ({ folders: [it.Asset.Group.Name, it.Asset.DynamicGroupName], name: it.Asset.Name, desc: String(it.Asset.Description || ""), key: mouldKey(it), flat: !!(it.Asset.Prerequisite || []).includes("HasFlatChest") && !InventoryIsItemInList(S2.C, "BodyUpper", ["FlatSmall", "FlatMedium"]) })).sort((a, b) => b.name.length - a.name.length);
+              const mouldList = S3.C.Appearance.filter((it) => MOULD.items.has(mouldKey(it))).map((it) => ({ folders: [it.Asset.Group.Name, it.Asset.DynamicGroupName], name: it.Asset.Name, key: mouldKey(it), mode: MOULD.mode.get(mouldKey(it)) || "wide" }));
+              const wornList = S3.C.Appearance.map((it) => ({ folders: [it.Asset.Group.Name, it.Asset.DynamicGroupName], name: it.Asset.Name, desc: String(it.Asset.Description || ""), key: mouldKey(it), flat: !!(it.Asset.Prerequisite || []).includes("HasFlatChest") && !InventoryIsItemInList(S3.C, "BodyUpper", ["FlatSmall", "FlatMedium"]) })).sort((a, b) => b.name.length - a.name.length);
               const pieceOf = (src) => {
                 const g = groupOf3(src), file = src.slice(src.lastIndexOf("/") + 1);
                 return wornList.find((w) => w.folders.includes(g) && file.startsWith(w.name)) || null;
@@ -1546,22 +1702,22 @@ One of mods you are using is using an old version of SDK. It will work for now b
                   const cv0 = FarmBelly.bellyCanvas(shape, bellySkin(upper[2], upper[3], FarmBelly.bellyPose(upper[2])), !!fit.flat);
                   const dx = upper[0] + 250 - cv0.width / 2 + fit.x, dy = upper[1] + 392 + fit.ry * 0.62 - cv0.height / 2 + fit.y;
                   const cv = br || fit.behind ? cv0 : bellyUnder(cv0, dx, dy, upper[2], upper[0], upper[1]);
-                  put2("drawImage", cv, dx, dy, {});
-                  if (typeof real.drawImageBlink === "function") put2("drawImageBlink", cv, dx, dy, {});
+                  put3("drawImage", cv, dx, dy, {});
+                  if (typeof real.drawImageBlink === "function") put3("drawImageBlink", cv, dx, dy, {});
                   ctx2.belly = { cv, dx, dy };
                   ctx2.sig = [fit.rx, fit.ry, fit.sag, fit.cut, fit.flat ? 1 : 0, Math.round(dx), Math.round(dy)].join(",") + "|" + ctx2.bodies.map((b) => b.src + "@" + Math.round(b.x) + "," + Math.round(b.y)).join(";");
                 }
                 if (ctx2.cock) {
                   const k = ctx2.cock;
                   ctx2.cock = null;
-                  put2("drawImage", k[0], k[1], k[2], {});
-                  if (typeof real.drawImageBlink === "function") put2("drawImageBlink", k[0], k[1], k[2], {});
+                  put3("drawImage", k[0], k[1], k[2], {});
+                  if (typeof real.drawImageBlink === "function") put3("drawImageBlink", k[0], k[1], k[2], {});
                 }
                 if (br) {
-                  const isHeld = FarmBelly.bellyPose(upper[2]) !== "AllFours" && heldNow(), freeS = FarmBreasts.shape(br.cup, br), S3 = isHeld ? FarmBreasts.held(freeS) : freeS;
+                  const isHeld = FarmBelly.bellyPose(upper[2]) !== "AllFours" && heldNow(), freeS = FarmBreasts.shape(br.cup, br), S32 = isHeld ? FarmBreasts.held(freeS) : freeS;
                   const key = [br.cup, br.full, br.hang, br.apart, isHeld ? "held" : "free"].join(",") + "|" + bellySkin(upper[2], upper[3], FarmBelly.bellyPose(upper[2])).join(",");
                   if (BREAST.cvKey !== key) {
-                    BREAST.cv = FarmBreasts.canvas(S3, bellySkin(upper[2], upper[3], FarmBelly.bellyPose(upper[2])));
+                    BREAST.cv = FarmBreasts.canvas(S32, bellySkin(upper[2], upper[3], FarmBelly.bellyPose(upper[2])));
                     BREAST.cvKey = key;
                   }
                   const bpose = FarmBelly.bellyPose(upper[2]), rx = upper[0] + 250 + br.x, ry = upper[1] + FarmBreasts.ROOT_Y + br.y, ground = upper[1] + 398;
@@ -1620,9 +1776,9 @@ One of mods you are using is using an old version of SDK. It will work for now b
                     }
                     bc = BREAST.flat;
                   }
-                  put2("drawImage", bc, rx - bc.ax, ry - bc.ay, {});
-                  if (typeof real.drawImageBlink === "function") put2("drawImageBlink", bc, rx - bc.ax, ry - bc.ay, {});
-                  ctx2.breast = { fit: FarmBreasts.fitOf(S3, FarmBelly.bellyPose(upper[2]), [bc.nips[1][0] + br.nipX, bc.nips[1][1] + br.nipY]), held: isHeld, upperSrc: upper[2], ux: upper[0], pose: bpose, ground: bpose === "AllFours" ? ground : Infinity, S: S3, rx, ry, uy: upper[1], mask: bc.mask, mx: rx - bc.ax, my: ry - bc.ay, nips: bc.nips.map((p, i) => [rx + p[0] + (i ? 1 : -1) * br.nipX, ry + p[1] + br.nipY]), k: FarmBreasts.shape(br.cup, br).k, kN: (1 + 0.45 * FarmBreasts.shape(br.cup, br).k) * br.nip, sig: key + "|" + Math.round(rx) + "," + Math.round(ry) + "|" + [br.nip, br.nipX, br.nipY].join(","), mid: upper[0] + 250 };
+                  put3("drawImage", bc, rx - bc.ax, ry - bc.ay, {});
+                  if (typeof real.drawImageBlink === "function") put3("drawImageBlink", bc, rx - bc.ax, ry - bc.ay, {});
+                  ctx2.breast = { fit: FarmBreasts.fitOf(S32, FarmBelly.bellyPose(upper[2]), [bc.nips[1][0] + br.nipX, bc.nips[1][1] + br.nipY]), held: isHeld, upperSrc: upper[2], ux: upper[0], pose: bpose, ground: bpose === "AllFours" ? ground : Infinity, S: S32, rx, ry, uy: upper[1], mask: bc.mask, mx: rx - bc.ax, my: ry - bc.ay, nips: bc.nips.map((p, i) => [rx + p[0] + (i ? 1 : -1) * br.nipX, ry + p[1] + br.nipY]), k: FarmBreasts.shape(br.cup, br).k, kN: (1 + 0.45 * FarmBreasts.shape(br.cup, br).k) * br.nip, sig: key + "|" + Math.round(rx) + "," + Math.round(ry) + "|" + [br.nip, br.nipX, br.nipY].join(","), mid: upper[0] + 250 };
                   if (!held.length) {
                     const B = ctx2.breast, sk = bellySkin(upper[2], upper[3], bpose), rad = 7 * B.kN, ncKey = rad.toFixed(2) + "|" + sk.join(",");
                     let nc = BREAST.nc;
@@ -1642,13 +1798,13 @@ One of mods you are using is using an old version of SDK. It will work for now b
                       BREAST.ncKey = ncKey;
                     }
                     for (const p of B.nips) if (p[1] + rad < B.ground) {
-                      put2("drawImage", nc, p[0] - nc.width / 2, p[1] - nc.height / 2, {});
-                      if (typeof real.drawImageBlink === "function") put2("drawImageBlink", nc, p[0] - nc.width / 2, p[1] - nc.height / 2, {});
+                      put3("drawImage", nc, p[0] - nc.width / 2, p[1] - nc.height / 2, {});
+                      if (typeof real.drawImageBlink === "function") put3("drawImageBlink", nc, p[0] - nc.width / 2, p[1] - nc.height / 2, {});
                     }
                   }
                   for (const h2 of held.splice(0)) {
                     try {
-                      if (!nipDraw(...h2)) put2(h2[0], h2[1], h2[2], h2[3], h2[4]);
+                      if (!nipDraw(...h2)) put3(h2[0], h2[1], h2[2], h2[3], h2[4]);
                     } catch (e) {
                       console.warn("[studio] nipples:", e);
                     }
@@ -1709,9 +1865,9 @@ One of mods you are using is using an old version of SDK. It will work for now b
                       console.warn("[body] belly form:", e);
                     }
                   }
-                  put2(BREAST.out, key, c);
+                  put3(BREAST.out, key, c);
                 }
-                put2(name, c, x - ox, y, o);
+                put3(name, c, x - ox, y, o);
                 return true;
               };
               const frameCover = (src, im, x, y, B) => {
@@ -1859,7 +2015,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
                   cs.push({ sd, cx: cx + B.mx, cy: cy + B.my, edge });
                 }
                 v = cs;
-                put2(BREAST.out, key, v);
+                put3(BREAST.out, key, v);
                 return v;
               };
               const frameDraw = (name, src, x, y, o) => {
@@ -1892,7 +2048,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
                   }
                   g.drawImage(B.mask, MX + B.mx - x, MY + B.my - y);
                   g.globalCompositeOperation = "source-over";
-                  const ho = herOutline(B), W8 = fm.width, rgb2 = (q2, k) => "rgb(" + q2.map((u) => Math.max(0, Math.min(255, Math.round(u * k)))).join(",") + ")";
+                  const ho = herOutline(B), W9 = fm.width, rgb2 = (q2, k) => "rgb(" + q2.map((u) => Math.max(0, Math.min(255, Math.round(u * k)))).join(",") + ")";
                   for (const hv of ho) {
                     const sv = fm.sides.find((q2) => q2.sd === hv.sd);
                     if (!sv) continue;
@@ -1901,7 +2057,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
                     for (let k = 0; k <= FRAME_N; k++) {
                       const a = k % FRAME_N, ta = a / FRAME_N * Math.PI * 2, on = !!sv.hit[a] && hv.edge[a] > 0 && Math.sin(ta) < 0.3 && Math.cos(ta) > -0.6;
                       if (on) {
-                        const t = a / FRAME_N * Math.PI * 2, ux = Math.cos(t) * hv.sd, uy = Math.sin(t), rr = hv.edge[a] - W8 * 0.45;
+                        const t = a / FRAME_N * Math.PI * 2, ux = Math.cos(t) * hv.sd, uy = Math.sin(t), rr = hv.edge[a] - W9 * 0.45;
                         (cur || (cur = [])).push([MX + hv.cx - x + ux * rr, MY + hv.cy - y + uy * rr]);
                       } else if (cur) {
                         segs.push(cur);
@@ -1920,33 +2076,33 @@ One of mods you are using is using an old version of SDK. It will work for now b
                     g.lineCap = "round";
                     g.lineJoin = "round";
                     for (const at of sv.att || []) {
-                      const t = at.a / FRAME_N * Math.PI * 2, ux = Math.cos(t) * hv.sd, uy = Math.sin(t), rr = hv.edge[at.a] - W8 * 0.45;
+                      const t = at.a / FRAME_N * Math.PI * 2, ux = Math.cos(t) * hv.sd, uy = Math.sin(t), rr = hv.edge[at.a] - W9 * 0.45;
                       segs.push([[MX + at.x, MY + at.y], [MX + hv.cx - x + ux * rr, MY + hv.cy - y + uy * rr]]);
                     }
                     for (const pts of segs) {
                       if (pts.length < 2) continue;
                       path(pts);
                       g.strokeStyle = rgb2(fm.col, 0.55);
-                      g.lineWidth = W8 + 1.5;
+                      g.lineWidth = W9 + 1.5;
                       g.stroke();
                       path(pts);
                       g.strokeStyle = rgb2(fm.col, 1);
-                      g.lineWidth = W8;
+                      g.lineWidth = W9;
                       g.stroke();
                       path(pts.map((p, i) => {
                         const q2 = pts[Math.min(pts.length - 1, i + 1)], pp = pts[Math.max(0, i - 1)], dx = q2[0] - pp[0], dy = q2[1] - pp[1], L = Math.hypot(dx, dy) || 1;
-                        return [p[0] - dy / L * W8 * 0.18, p[1] + dx / L * W8 * 0.18];
+                        return [p[0] - dy / L * W9 * 0.18, p[1] + dx / L * W9 * 0.18];
                       }));
                       g.globalAlpha = 0.55;
                       g.strokeStyle = rgb2(fm.hi, 1);
-                      g.lineWidth = Math.max(1, W8 * 0.22);
+                      g.lineWidth = Math.max(1, W9 * 0.22);
                       g.stroke();
                       g.globalAlpha = 1;
                     }
                   }
-                  put2(BREAST.out, key, c);
+                  put3(BREAST.out, key, c);
                 }
-                put2(name, c, x - c.MX, y - c.MY, o);
+                put3(name, c, x - c.MX, y - c.MY, o);
                 return true;
               };
               const underBand = (src, im, x, y, B) => {
@@ -2002,9 +2158,9 @@ One of mods you are using is using an old version of SDK. It will work for now b
                     strip.getContext("2d").drawImage(im, 0, b0, w, b1 - b0, 0, 0, w, b1 - b0);
                     g.drawImage(strip, MX + mid - mid * kx, MY + b0 + dy, w * kx, b1 - b0);
                   }
-                  put2(BREAST.out, key, c);
+                  put3(BREAST.out, key, c);
                 }
-                put2(name, c, x - c.MX, y - c.MY, o);
+                put3(name, c, x - c.MX, y - c.MY, o);
                 return true;
               };
               const chestCover = (src, im, x, y, B, wide) => {
@@ -2238,11 +2394,11 @@ One of mods you are using is using an old version of SDK. It will work for now b
                         }
                       }
                       if (n >= 2 && bt >= 1) {
-                        const dr = sp[hi] - sp[lo], dg = sp[hi + 1] - sp[lo + 1], db = sp[hi + 2] - sp[lo + 2], dd = dr * dr + dg * dg + db * db;
+                        const dr = sp[hi] - sp[lo], dg = sp[hi + 1] - sp[lo + 1], db2 = sp[hi + 2] - sp[lo + 2], dd = dr * dr + dg * dg + db2 * db2;
                         if (dd > 900) {
                           let two = true, ends = 0;
                           for (const p of Q) {
-                            const er = sp[p] - sp[lo], eg = sp[p + 1] - sp[lo + 1], eb = sp[p + 2] - sp[lo + 2], u = Math.max(0, Math.min(1, (er * dr + eg * dg + eb * db) / dd)), qr = er - u * dr, qg = eg - u * dg, qb = eb - u * db;
+                            const er = sp[p] - sp[lo], eg = sp[p + 1] - sp[lo + 1], eb = sp[p + 2] - sp[lo + 2], u = Math.max(0, Math.min(1, (er * dr + eg * dg + eb * db2) / dd)), qr = er - u * dr, qg = eg - u * dg, qb = eb - u * db2;
                             if (qr * qr + qg * qg + qb * qb > dd * 0.03 + 60) {
                               two = false;
                               break;
@@ -2252,11 +2408,11 @@ One of mods you are using is using an old version of SDK. It will work for now b
                           if (ends < Q.length * 0.5) two = false;
                           if (two) {
                             const br2 = (spb[p00] * b00 + spb[p10] * b10 + spb[p01] * b01 + spb[p11] * b11) / bt, bg = (spb[p00 + 1] * b00 + spb[p10 + 1] * b10 + spb[p01 + 1] * b01 + spb[p11 + 1] * b11) / bt, bb = (spb[p00 + 2] * b00 + spb[p10 + 2] * b10 + spb[p01 + 2] * b01 + spb[p11 + 2] * b11) / bt;
-                            const ts = sharp(((br2 - sp[lo]) * dr + (bg - sp[lo + 1]) * dg + (bb - sp[lo + 2]) * db) / dd, w2), tr = ((r - sp[lo]) * dr + (gg - sp[lo + 1]) * dg + (bl - sp[lo + 2]) * db) / dd;
+                            const ts = sharp(((br2 - sp[lo]) * dr + (bg - sp[lo + 1]) * dg + (bb - sp[lo + 2]) * db2) / dd, w2), tr = ((r - sp[lo]) * dr + (gg - sp[lo + 1]) * dg + (bl - sp[lo + 2]) * db2) / dd;
                             const t = Math.abs(tr - ts) > 0.65 ? Math.max(0, Math.min(1, tr)) : ts;
                             r = sp[lo] + dr * t;
                             gg = sp[lo + 1] + dg * t;
-                            bl = sp[lo + 2] + db * t;
+                            bl = sp[lo + 2] + db2 * t;
                           }
                         }
                       }
@@ -2392,7 +2548,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
                     const texOf = (() => {
                       const tx = TEX[(pieceOf(src) || {}).name];
                       if (!tx) return null;
-                      const BL = tx.bl || 7, S3 = tx.cell || 30;
+                      const BL = tx.bl || 7, S4 = tx.cell || 30;
                       const spL = (() => {
                         const cb2 = document.createElement("canvas");
                         cb2.width = CW;
@@ -2450,15 +2606,15 @@ One of mods you are using is using an old version of SDK. It will work for now b
                         return (I[d2 * (RW + 1) + c2] - I[b * (RW + 1) + c2] - I[d2 * (RW + 1) + a] + I[b * (RW + 1) + a]) / ((2 * r + 1) * (2 * r + 1));
                       };
                       const srcs = [];
-                      for (let yy = S3; yy < RH - S3; yy += 3) for (let xx = S3; xx < RW - S3; xx += 3) if (clean3[yy * RW + xx] && box(xx, yy, S3) > 0.8) srcs.push([xx + rx0, yy + ry0]);
+                      for (let yy = S4; yy < RH - S4; yy += 3) for (let xx = S4; xx < RW - S4; xx += 3) if (clean3[yy * RW + xx] && box(xx, yy, S4) > 0.8) srcs.push([xx + rx0, yy + ry0]);
                       if (srcs.length < 4) return null;
-                      return { S: S3, spL, srcs, bn, base: bl / nC, det, cleanAt: (x2, y4) => {
+                      return { S: S4, spL, srcs, bn, base: bl / nC, det, cleanAt: (x2, y4) => {
                         const xx = Math.round(x2) - rx0, yy = Math.round(y4) - ry0;
                         return xx >= 0 && yy >= 0 && xx < RW && yy < RH && clean3[yy * RW + xx] === 1;
                       } };
                     })();
                     if (texOf) {
-                      const { S: S3, spL, srcs, bn, base, cleanAt } = texOf, lum = (A, p) => A[p] * 0.3 + A[p + 1] * 0.59 + A[p + 2] * 0.11;
+                      const { S: S4, spL, srcs, bn, base, cleanAt } = texOf, lum = (A, p) => A[p] * 0.3 + A[p + 1] * 0.59 + A[p + 2] * 0.11;
                       const bil = (A, fx, fy, k) => {
                         const ix = Math.floor(fx), iy = Math.floor(fy);
                         if (ix < 0 || iy < 0 || ix >= CW - 1 || iy >= CH - 1) return -1;
@@ -2488,11 +2644,11 @@ One of mods you are using is using an old version of SDK. It will work for now b
                         const we = Math.max(0, Math.min(1, 1 - (pg - 14) / 24));
                         const w2 = wm2 * wc * we;
                         if (w2 <= 0.01) continue;
-                        const qx = i + x0, qy = j + y0, u = qx / S3 - 0.5, v = qy / S3 - 0.5, ci = Math.floor(u), cj = Math.floor(v), du = sm2(u - ci), dv = sm2(v - cj);
+                        const qx = i + x0, qy = j + y0, u = qx / S4 - 0.5, v = qy / S4 - 0.5, ci = Math.floor(u), cj = Math.floor(v), du = sm2(u - ci), dv = sm2(v - cj);
                         let sr = 0, sg2 = 0, sb = 0, sw = 0, sw2 = 0;
                         for (const [di, dj, bwt] of [[0, 0, (1 - du) * (1 - dv)], [1, 0, du * (1 - dv)], [0, 1, (1 - du) * dv], [1, 1, du * dv]]) {
                           if (bwt <= 1e-3) continue;
-                          const P3 = pick(ci + di, cj + dj), cx = (ci + di + 0.5) * S3, cy = (cj + dj + 0.5) * S3, sx = P3[0] + (qx - cx), sy = P3[1] + (qy - cy);
+                          const P3 = pick(ci + di, cj + dj), cx = (ci + di + 0.5) * S4, cy = (cj + dj + 0.5) * S4, sx = P3[0] + (qx - cx), sy = P3[1] + (qy - cy);
                           if (!cleanAt(sx, sy)) continue;
                           const p = (Math.round(sy) * CW + Math.round(sx)) * 4;
                           sr += bwt * (sp[p] - spL[p]);
@@ -2668,9 +2824,9 @@ One of mods you are using is using an old version of SDK. It will work for now b
                       console.warn("[body] belly form:", e);
                     }
                   }
-                  put2(BREAST.out, key, c);
+                  put3(BREAST.out, key, c);
                 }
-                put2(name, c, x - c.MX, y - c.MY, o);
+                put3(name, c, x - c.MX, y - c.MY, o);
                 return true;
               };
               const ownColour = (src, im) => {
@@ -2802,9 +2958,9 @@ One of mods you are using is using an old version of SDK. It will work for now b
                       });
                     }
                   }
-                  put2(BREAST.out, key, c);
+                  put3(BREAST.out, key, c);
                 }
-                put2(name, c, x - c.MX, y - c.MY, o);
+                put3(name, c, x - c.MX, y - c.MY, o);
                 return true;
               };
               const held = [];
@@ -2841,9 +2997,9 @@ One of mods you are using is using an old version of SDK. It will work for now b
                     }
                   }
                   PUMP.cups.forEach(([sx, sy, sw, sh], i) => g.drawImage(im, sx, sy, sw, sh, MX + N[i][0] - (PUMP.cupMid[i][0] - sx), MY + N[i][1] - (PUMP.cupMid[i][1] - sy), sw, sh));
-                  put2(BREAST.out, key, c);
+                  put3(BREAST.out, key, c);
                 }
-                put2(name, c, x - c.MX, y - c.MY, o);
+                put3(name, c, x - c.MX, y - c.MY, o);
                 return true;
               };
               const nipDraw = (name, src, x, y, o) => {
@@ -2876,9 +3032,9 @@ One of mods you are using is using an old version of SDK. It will work for now b
                     const T = B.nips[i];
                     g.drawImage(im, sx, 0, sw, h2, MX + (T[0] - x) + (sx + x - N[0]) * kN, MY + (T[1] - y) + (y - N[1]) * kN, sw * kN, h2 * kN);
                   });
-                  put2(BREAST.out, key, c);
+                  put3(BREAST.out, key, c);
                 }
-                put2(name, c, x - c.MX, y - c.MY, o);
+                put3(name, c, x - c.MX, y - c.MY, o);
                 return true;
               };
               const before = (src, x, y, o) => {
@@ -2939,7 +3095,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
                         }
                         if (t0 >= 0) {
                           const cyL = y + (t0 + t1) / 2 - ctx2.breast.uy;
-                          put2(name, src, x, y + (ctx2.breast.fit.mapY(cyL) - cyL), o);
+                          put3(name, src, x, y + (ctx2.breast.fit.mapY(cyL) - cyL), o);
                           return;
                         }
                       }
@@ -2994,7 +3150,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
                       if (!blink) ctx2.cock = [GEN.cv, x + 49.5 - GEN.cv.ax, y + 110 - GEN.cv.ay];
                       return;
                     }
-                    put2(blink ? "drawImageBlink" : "drawImage", GEN.cv, x + 49.5 - GEN.cv.ax, y + 110 - GEN.cv.ay, {});
+                    put3(blink ? "drawImageBlink" : "drawImage", GEN.cv, x + 49.5 - GEN.cv.ax, y + 110 - GEN.cv.ay, {});
                     return;
                   } catch (e) {
                     console.warn("[studio] cock:", e);
@@ -3006,17 +3162,17 @@ One of mods you are using is using an old version of SDK. It will work for now b
                     const q2 = isMoulded(src), m = q2 ? mouldCanvas(src, x, y, ctx2, q2.key, q2.mode) : bellyAuto(src, x, y, ctx2, fit.behind, (pieceOf(src) || {}).key);
                     const gname2 = groupOf3(src), formed = done && chestSlot(gname2) && gname2 !== "Panties" && (!q2 || q2.mode !== "under") ? m ? bellyShade(m, x - MOULD.M, y, ctx2) : bellyShade(mouldImg(src), x, y, ctx2) : null;
                     if (formed) {
-                      put2(name, formed, m ? x - MOULD.M : x, y, o);
+                      put3(name, formed, m ? x - MOULD.M : x, y, o);
                       drawn = true;
                     } else if (m) {
-                      put2(name, m, x - MOULD.M, y, o);
+                      put3(name, m, x - MOULD.M, y, o);
                       drawn = true;
                     }
                   }
                 } catch (e) {
                   console.warn("[studio] mould:", e);
                 }
-                if (!drawn) put2(name, src, x, y, o);
+                if (!drawn) put3(name, src, x, y, o);
                 if (!blink) {
                   try {
                     after(src, x, y, o);
@@ -3103,23 +3259,23 @@ One of mods you are using is using an old version of SDK. It will work for now b
   })();
 
   // extension/src/belly.js
-  var W = window;
+  var W2 = window;
   var SKIN_TOP = 12;
   var trial = 0;
   var SIZES = [null, { rx: 50, ry: 54, sag: 0.16 }, { rx: 70, ry: 80, sag: 0.22, lift: 5 }, { rx: 92, ry: 112, sag: 0.28, lift: 20 }];
   var FALLBACK = { White: [236, 204, 196], Asian: [232, 200, 164], Black: [120, 86, 70] };
   var clamp = (v) => Math.max(0, Math.min(255, Math.round(v)));
   var rgb = (c, k) => "rgb(" + clamp(c[0] * k) + "," + clamp(c[1] * k) + "," + clamp(c[2] * k) + ")";
-  function bellyPoint(S2, cx, cy, t) {
+  function bellyPoint(S3, cx, cy, t) {
     const sn = Math.sin(t), cs = Math.cos(t);
-    const wide = 1 + S2.sag * sn - S2.sag * 0.55 * (sn < 0 ? sn * sn : 0);
-    const drop = sn > 0 ? 1 + S2.sag * 0.35 * sn : 1 - S2.sag * 0.25 * -sn;
-    return [cx + S2.rx * cs * wide / (1 + S2.sag), cy + S2.ry * sn * drop / (1 + S2.sag * 0.35)];
+    const wide = 1 + S3.sag * sn - S3.sag * 0.55 * (sn < 0 ? sn * sn : 0);
+    const drop = sn > 0 ? 1 + S3.sag * 0.35 * sn : 1 - S3.sag * 0.25 * -sn;
+    return [cx + S3.rx * cs * wide / (1 + S3.sag), cy + S3.ry * sn * drop / (1 + S3.sag * 0.35)];
   }
-  function bellyPath(g, S2, cx, cy, from, to) {
+  function bellyPath(g, S3, cx, cy, from, to) {
     const steps = 72;
     for (let i = 0; i <= steps; i++) {
-      const p = bellyPoint(S2, cx, cy, from + (to - from) * i / steps);
+      const p = bellyPoint(S3, cx, cy, from + (to - from) * i / steps);
       if (i) g.lineTo(p[0], p[1]);
       else g.moveTo(p[0], p[1]);
     }
@@ -3127,17 +3283,17 @@ One of mods you are using is using an old version of SDK. It will work for now b
   function bellyCanvas(size, skin, pressed) {
     const byHand = typeof size === "object" && !!size, S0 = byHand ? size : SIZES[size];
     if (byHand) size = S0.rx >= 84 ? 3 : S0.rx >= 60 ? 2 : 1;
-    const S2 = pressed && !byHand ? { rx: S0.rx * 1.2, ry: S0.ry * 0.6, sag: S0.sag + 0.12 } : S0, pad = 6, w = S2.rx * 2 + pad * 2, hgt = S2.ry * 2 + pad * 2, cx = w / 2, cy = hgt / 2, low = cy + S2.ry * 0.28;
+    const S3 = pressed && !byHand ? { rx: S0.rx * 1.2, ry: S0.ry * 0.6, sag: S0.sag + 0.12 } : S0, pad = 6, w = S3.rx * 2 + pad * 2, hgt = S3.ry * 2 + pad * 2, cx = w / 2, cy = hgt / 2, low = cy + S3.ry * 0.28;
     const cv = document.createElement("canvas");
     cv.width = w;
     cv.height = hgt;
     const g = cv.getContext("2d");
     const whole = () => {
       g.beginPath();
-      bellyPath(g, S2, cx, cy, 0, Math.PI * 2);
+      bellyPath(g, S3, cx, cy, 0, Math.PI * 2);
       g.closePath();
     };
-    const grad = g.createRadialGradient(cx - S2.rx * 0.22, low - S2.ry * 0.42, S2.rx * 0.1, cx, low, S2.ry * 1.05);
+    const grad = g.createRadialGradient(cx - S3.rx * 0.22, low - S3.ry * 0.42, S3.rx * 0.1, cx, low, S3.ry * 1.05);
     grad.addColorStop(0, rgb(skin, 1.03));
     grad.addColorStop(0.55, rgb(skin, 1));
     grad.addColorStop(1, rgb([skin[0], skin[1] * 0.93, skin[2] * 0.92], 0.94));
@@ -3147,34 +3303,34 @@ One of mods you are using is using an old version of SDK. It will work for now b
     g.save();
     whole();
     g.clip();
-    const under = g.createLinearGradient(0, low + S2.ry * 0.25, 0, cy + S2.ry + pad);
+    const under = g.createLinearGradient(0, low + S3.ry * 0.25, 0, cy + S3.ry + pad);
     under.addColorStop(0, "rgba(150,70,60,0)");
     under.addColorStop(1, "rgba(150,70,60,0.22)");
     g.fillStyle = under;
     g.fillRect(0, 0, w, hgt);
-    const blush = g.createRadialGradient(cx, low + S2.ry * 0.2, 2, cx, low + S2.ry * 0.2, S2.rx * 0.85);
+    const blush = g.createRadialGradient(cx, low + S3.ry * 0.2, 2, cx, low + S3.ry * 0.2, S3.rx * 0.85);
     blush.addColorStop(0, "rgba(214,120,120,0.14)");
     blush.addColorStop(1, "rgba(214,120,120,0)");
     g.fillStyle = blush;
     g.fillRect(0, 0, w, hgt);
-    g.translate(cx - S2.rx * 0.36, low - S2.ry * 0.3);
+    g.translate(cx - S3.rx * 0.36, low - S3.ry * 0.3);
     g.rotate(-0.22);
-    const sh = g.createRadialGradient(0, 0, 0, 0, 0, S2.ry * 0.36);
+    const sh = g.createRadialGradient(0, 0, 0, 0, 0, S3.ry * 0.36);
     sh.addColorStop(0, "rgba(255,255,255,0.8)");
     sh.addColorStop(0.5, "rgba(255,255,255,0.3)");
     sh.addColorStop(1, "rgba(255,255,255,0)");
     g.fillStyle = sh;
     g.scale(0.34, 1);
     g.beginPath();
-    g.arc(0, 0, S2.ry * 0.36, 0, Math.PI * 2);
+    g.arc(0, 0, S3.ry * 0.36, 0, Math.PI * 2);
     g.fill();
     g.restore();
     g.globalCompositeOperation = "destination-out";
     {
-      const fr = Math.min(S2.rx * 0.9, 56);
+      const fr = Math.min(S3.rx * 0.9, 56);
       g.save();
-      g.translate(cx, cy - S2.ry * 0.98);
-      g.scale(1, S2.ry * 0.7 / fr);
+      g.translate(cx, cy - S3.ry * 0.98);
+      g.scale(1, S3.ry * 0.7 / fr);
       const fade = g.createRadialGradient(0, 0, fr * 0.3, 0, 0, fr);
       fade.addColorStop(0, "rgba(0,0,0,1)");
       fade.addColorStop(1, "rgba(0,0,0,0)");
@@ -3191,21 +3347,21 @@ One of mods you are using is using an old version of SDK. It will work for now b
     g.lineJoin = "round";
     g.lineWidth = 1.5;
     g.beginPath();
-    bellyPath(g, S2, cx, cy, -up, Math.PI + up);
+    bellyPath(g, S3, cx, cy, -up, Math.PI + up);
     g.stroke();
     g.lineWidth = 2.1;
     g.beginPath();
-    bellyPath(g, S2, cx, cy, Math.PI * 0.2, Math.PI * 0.8);
+    bellyPath(g, S3, cx, cy, Math.PI * 0.2, Math.PI * 0.8);
     g.stroke();
     g.strokeStyle = rgb(skin, 0.45);
     g.lineWidth = 1.4;
     g.beginPath();
-    const ny = low + S2.ry * 0.12;
+    const ny = low + S3.ry * 0.12;
     if (size >= 3) {
       g.ellipse(cx, ny, 4.5, 3.2, 0, 0, Math.PI * 2);
     } else {
-      g.moveTo(cx - 0.5, ny - S2.ry * 0.07);
-      g.quadraticCurveTo(cx + 3, ny, cx - 0.5, ny + S2.ry * 0.07);
+      g.moveTo(cx - 0.5, ny - S3.ry * 0.07);
+      g.quadraticCurveTo(cx + 3, ny, cx - 0.5, ny + S3.ry * 0.07);
     }
     g.stroke();
     if (size >= 2) {
@@ -3214,16 +3370,16 @@ One of mods you are using is using an old version of SDK. It will work for now b
       g.globalAlpha = 0.45;
       g.beginPath();
       g.moveTo(cx, ny + 6);
-      g.lineTo(cx, cy + S2.ry * 0.86);
+      g.lineTo(cx, cy + S3.ry * 0.86);
       g.stroke();
       g.globalAlpha = 1;
     }
     if (pressed) {
-      const cut = Math.round(cy + S2.ry * (byHand && S0.cut > 0 ? S0.cut : 0.74));
+      const cut = Math.round(cy + S3.ry * (byHand && S0.cut > 0 ? S0.cut : 0.74));
       g.clearRect(0, cut, w, hgt - cut);
       let x0 = cx, x1 = cx;
       for (let t = 0; t <= Math.PI; t += 0.01) {
-        const p = bellyPoint(S2, cx, cy, t);
+        const p = bellyPoint(S3, cx, cy, t);
         if (p[1] >= cut) {
           x0 = Math.min(x0, p[0]);
           x1 = Math.max(x1, p[0]);
@@ -3241,10 +3397,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
     return cv;
   }
   function bellyPlace(size, upperX, upperY, cv, pose) {
-    const S2 = SIZES[size];
+    const S3 = SIZES[size];
     if (pose === "AllFours") return [upperX + 250 - cv.width / 2, upperY + GROUND_Y - (cv.cut || cv.height)];
-    if (pose === "Hogtied") return [upperX + 250 - cv.width / 2, upperY + 300 + S2.ry * 0.34 - cv.height / 2];
-    return [upperX + 250 - cv.width / 2, upperY + 392 + S2.ry * 0.62 - (S2.lift || 0) - cv.height / 2];
+    if (pose === "Hogtied") return [upperX + 250 - cv.width / 2, upperY + 300 + S3.ry * 0.34 - cv.height / 2];
+    return [upperX + 250 - cv.width / 2, upperY + 392 + S3.ry * 0.62 - (S3.lift || 0) - cv.height / 2];
   }
   var ALL_FOURS_BELLY = false;
   var GROUND_Y = 386;
@@ -3291,7 +3447,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     let n = 0;
     try {
       for (const name of ["DrawImageCache", "GLDrawImageCache"]) {
-        const m = W[name];
+        const m = W2[name];
         if (m && typeof m.forEach === "function" && typeof m.delete === "function") {
           const bad = [];
           m.forEach((v, k) => {
@@ -3345,7 +3501,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       }
       skinSeen.set(key, c);
       try {
-        if (trial && W.Player && typeof W.CharacterLoadCanvas === "function") W.CharacterLoadCanvas(W.Player);
+        if (trial && W2.Player && typeof W2.CharacterLoadCanvas === "function") W2.CharacterLoadCanvas(W2.Player);
       } catch (e) {
       }
     };
@@ -3366,14 +3522,14 @@ One of mods you are using is using an old version of SDK. It will work for now b
         let finish = null;
         try {
           const C = args[0], cb = args[1];
-          if (trial && !W.__farmDrawnBody && C && W.Player && C.MemberNumber === W.Player.MemberNumber && cb && typeof cb.drawImage === "function") {
+          if (trial && !W2.__farmDrawnBody && C && W2.Player && C.MemberNumber === W2.Player.MemberNumber && cb && typeof cb.drawImage === "function") {
             let upper = null, lower = false, done = false;
             const gate = skinGate(C);
             const prio = (src) => {
               const m = new RegExp("(?:^|/)Assets/[^/]+/(?:Override/[^/]+/)?([^/]+)/").exec(src);
               if (!m) return 99;
               try {
-                const g = W.AssetGroupGet && W.AssetGroupGet(C.AssetFamily, m[1]);
+                const g = W2.AssetGroupGet && W2.AssetGroupGet(C.AssetFamily, m[1]);
                 return g && typeof g.DrawingPriority === "number" ? g.DrawingPriority : 99;
               } catch (e) {
                 return 99;
@@ -3382,7 +3538,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
             const paint = () => {
               if (done || !upper || !lower) return;
               done = true;
-              const S2 = SIZES[trial], cv = bellyPicture(trial, skinFor(upper[2], upper[3]), upper[4] === "AllFours");
+              const S3 = SIZES[trial], cv = bellyPicture(trial, skinFor(upper[2], upper[3]), upper[4] === "AllFours");
               const [dx, dy] = bellyPlace(trial, upper[0], upper[1], cv, upper[4]);
               cb.drawImage(cv.url, dx, dy, {});
               if (typeof cb.drawImageBlink === "function") cb.drawImageBlink(cv.url, dx, dy, {});
@@ -3448,7 +3604,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     if (trial) hookBelly(sdk);
     const redraw2 = () => {
       try {
-        if (W.Player && typeof W.CharacterLoadCanvas === "function") W.CharacterLoadCanvas(W.Player);
+        if (W2.Player && typeof W2.CharacterLoadCanvas === "function") W2.CharacterLoadCanvas(W2.Player);
       } catch (e) {
         console.warn("[Farmhand Companion] belly redraw:", e);
       }
@@ -3460,14 +3616,14 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/drawnbody.js
-  var W2 = window;
+  var W3 = window;
   var KEY = "farmhand-drawn-body";
   var SEE_KEY = "farmhand-drawn-body-see";
   var FARM_KEY = "farmhand-drawn-body-farm";
   var CODE_HEAD = "FARMBODY1:";
   var STUDIO = "http://localhost:4780";
   var DEFAULTS = () => ({ v: 1, on: false, cup: 12, breast: {}, wear: {}, belly: null, auto: true, tuck: true, dress: true, mould: { items: [], mode: {} } });
-  var S = DEFAULTS();
+  var S2 = DEFAULTS();
   var sdk2 = null;
   var hooked2 = false;
   var seeOthers = true;
@@ -3476,27 +3632,27 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var others = /* @__PURE__ */ new Map();
   function load() {
     try {
-      const d = JSON.parse(W2.localStorage.getItem(KEY));
-      if (d && typeof d === "object") S = Object.assign(DEFAULTS(), d);
+      const d = JSON.parse(W3.localStorage.getItem(KEY));
+      if (d && typeof d === "object") S2 = Object.assign(DEFAULTS(), d);
     } catch (e) {
     }
     try {
-      seeOthers = W2.localStorage.getItem(SEE_KEY) !== "0";
+      seeOthers = W3.localStorage.getItem(SEE_KEY) !== "0";
     } catch (e) {
     }
     try {
-      const f = JSON.parse(W2.localStorage.getItem(FARM_KEY));
+      const f = JSON.parse(W3.localStorage.getItem(FARM_KEY));
       if (f && typeof f.at === "number" && f.body) {
         const b = clean(f.body);
         if (b) farm = { at: f.at, body: b };
       }
     } catch (e) {
     }
-    mine.S = S;
+    mine.S = S2;
   }
   var farmMe = null;
   var BELLY_STAGES = [null, { k: 50 / 92, kr: 54 / 112, sag: 0.16, lift: 0 }, { k: 70 / 92, kr: 80 / 112, sag: 0.22, lift: 5 }, { k: 1, kr: 1, sag: 0.28, lift: 20 }, { k: 1.2, kr: 1.2, sag: 0.32, lift: 30 }];
-  var bellyMode = () => S.bellyMode || (S.bellyOn ? "on" : "farm");
+  var bellyMode = () => S2.bellyMode || (S2.bellyOn ? "on" : "farm");
   function bellyAt(base, stage) {
     const out = {}, s = BELLY_STAGES[stage], ref = BELLY_STAGES[3];
     for (const k of ["std", "AllFours", "Hogtied"]) {
@@ -3511,8 +3667,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
     return out;
   }
   function eff() {
-    const base = S.saved || !farm ? S : farm.body, e = Object.assign({}, base, { on: S.on });
-    if (S.cupSet) e.cup = S.cup;
+    const base = S2.saved || !farm ? S2 : farm.body, e = Object.assign({}, base, { on: S2.on });
+    if (S2.cupSet) e.cup = S2.cup;
     else if (farmMe && farmMe.cup >= 1) e.cup = farmMe.cup;
     const mode = bellyMode();
     e.belly = mode === "studio" ? base.belly : bellyAt(base.belly, mode === "off" ? 0 : mode === "on" ? 3 : Math.max(0, Math.min(4, Math.round(Number(farmMe && farmMe.belly) || 0))));
@@ -3523,14 +3679,14 @@ One of mods you are using is using an old version of SDK. It will work for now b
     const cup = Math.max(0, Math.min(20, Math.round(Number(d.cup) || 0))), belly = Math.max(0, Math.min(4, Math.round(Number(d.belly) || 0)));
     if (farmMe && farmMe.cup === cup && farmMe.belly === belly) return;
     farmMe = { cup, belly };
-    if (!S.on) return;
+    if (!S2.on) return;
     if (mine.E) apply(mine.E, eff());
     redraw(60);
     tell(true);
   }
   function save() {
     try {
-      W2.localStorage.setItem(KEY, JSON.stringify(S));
+      W3.localStorage.setItem(KEY, JSON.stringify(S2));
     } catch (e) {
     }
   }
@@ -3571,7 +3727,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       made.set(cv, p);
       return null;
     }
-    const c = W2.document.createElement("canvas");
+    const c = W3.document.createElement("canvas");
     c.width = x1 - x0 + 1;
     c.height = y1 - y0 + 1;
     c.getContext("2d").drawImage(cv, -x0, -y0);
@@ -3590,17 +3746,17 @@ One of mods you are using is using an old version of SDK. It will work for now b
       gone.add(src);
       n++;
       try {
-        const m = W2.GLDrawImageCache;
+        const m = W3.GLDrawImageCache;
         if (m && typeof m.delete === "function") m.delete(src);
       } catch (e) {
       }
       try {
-        const m = W2.DrawImageCache;
+        const m = W3.DrawImageCache;
         if (m && typeof m.delete === "function") m.delete(src);
       } catch (e) {
       }
       try {
-        const gl = W2.GLDrawCanvas && W2.GLDrawCanvas.GL, tc = gl && gl.textureCache;
+        const gl = W3.GLDrawCanvas && W3.GLDrawCanvas.GL, tc = gl && gl.textureCache;
         const t2 = tc && tc.get(src);
         if (t2) {
           if (t2.texture) gl.deleteTexture(t2.texture);
@@ -3614,7 +3770,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     for (const [mn, o] of others) if (o.E && Date.now() - o.at > 12e4 && !charOf(mn)) o.E = null;
     return n;
   }
-  var charOf = (mn) => W2.Player && W2.Player.MemberNumber === mn ? W2.Player : (W2.ChatRoomCharacter || []).find((c) => c && c.MemberNumber === mn) || null;
+  var charOf = (mn) => W3.Player && W3.Player.MemberNumber === mn ? W3.Player : (W3.ChatRoomCharacter || []).find((c) => c && c.MemberNumber === mn) || null;
   var itemOf = (C, g) => C && Array.isArray(C.Appearance) ? C.Appearance.find((a) => a && a.Asset && a.Asset.Group && a.Asset.Group.Name === g) : void 0;
   var againT = /* @__PURE__ */ new Map();
   function redrawMn(mn, soon) {
@@ -3622,20 +3778,20 @@ One of mods you are using is using an old version of SDK. It will work for now b
     againT.set(mn, setTimeout(() => {
       try {
         const C = charOf(mn);
-        if (C && typeof W2.CharacterLoadCanvas === "function") W2.CharacterLoadCanvas(C);
+        if (C && typeof W3.CharacterLoadCanvas === "function") W3.CharacterLoadCanvas(C);
       } catch (e) {
         console.warn("[Farmhand Companion] drawn body redraw:", e);
       }
     }, soon || 60));
   }
   var redraw = (soon) => {
-    if (W2.Player) redrawMn(W2.Player.MemberNumber, soon);
+    if (W3.Player) redrawMn(W3.Player.MemberNumber, soon);
   };
   function makeEngine(mn) {
-    if (!W2.FarmBelly) W2.FarmBelly = bellyDrawing;
-    if (typeof W2.FarmBodyEngine !== "function" || !W2.FarmBreasts) return null;
-    const who = mn == null ? () => W2.Player || null : () => charOf(mn);
-    return W2.FarmBodyEngine({
+    if (!W3.FarmBelly) W3.FarmBelly = bellyDrawing;
+    if (typeof W3.FarmBodyEngine !== "function" || !W3.FarmBreasts) return null;
+    const who = mn == null ? () => W3.Player || null : () => charOf(mn);
+    return W3.FarmBodyEngine({
       S: { get C() {
         return who();
       } },
@@ -3650,14 +3806,14 @@ One of mods you are using is using an old version of SDK. It will work for now b
     });
   }
   function engine() {
-    if (!mine.E && W2.Player) mine.E = makeEngine(null);
+    if (!mine.E && W3.Player) mine.E = makeEngine(null);
     if (mine.E) apply(mine.E, eff());
     return mine.E;
   }
   function apply(E, s) {
     if (!E) return;
     const B = E.BREAST, b = s.breast || {};
-    B.cup = Math.max(0, Math.min(W2.FarmBreasts.CUPS.length - 1, Math.round(Number(s.cup) || 0)));
+    B.cup = Math.max(0, Math.min(W3.FarmBreasts.CUPS.length - 1, Math.round(Number(s.cup) || 0)));
     for (const k of ["full", "hang", "apart", "x", "y", "nip", "nipY", "nipX"]) if (typeof b[k] === "number" && isFinite(b[k])) B[k] = b[k];
     B.wear = s.wear && typeof s.wear === "object" ? Object.assign({}, s.wear) : {};
     B.out.clear();
@@ -3710,7 +3866,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var shareOf = (s) => ({ cup: s.cup, breast: s.breast, wear: s.wear, belly: s.belly, auto: s.auto, tuck: s.tuck, dress: s.dress, mould: s.mould });
   var send = (type, data) => {
     try {
-      if (W2.ServerSend && W2.ServerPlayerIsInChatRoom && W2.ServerPlayerIsInChatRoom()) W2.ServerSend("ChatRoomChat", makeMsg(type, data));
+      if (W3.ServerSend && W3.ServerPlayerIsInChatRoom && W3.ServerPlayerIsInChatRoom()) W3.ServerSend("ChatRoomChat", makeMsg(type, data));
     } catch (e) {
     }
   };
@@ -3719,7 +3875,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   function tell(force) {
     if (!force && Date.now() - toldAt < 8e3) return;
     toldAt = Date.now();
-    send("body", S.on ? { on: true, body: shareOf(eff()) } : { on: false });
+    send("body", S2.on ? { on: true, body: shareOf(eff()) } : { on: false });
   }
   function ask() {
     if (Date.now() - askedAt < 8e3) return;
@@ -3728,9 +3884,9 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
   function onBodyMsg(m) {
     const mn = m.from;
-    if (!mn || W2.Player && mn === W2.Player.MemberNumber) return;
+    if (!mn || W3.Player && mn === W3.Player.MemberNumber) return;
     if (m.type === "bodyAsk") {
-      if (S.on) setTimeout(() => tell(), 300 + Math.random() * 1500);
+      if (S2.on) setTimeout(() => tell(), 300 + Math.random() * 1500);
       return;
     }
     if (m.type !== "body") return;
@@ -3761,8 +3917,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
         const C = args[0];
         if (!C) return next(args);
         let E = null;
-        if (C === W2.Player) {
-          if (S.on) E = mine.E || engine();
+        if (C === W3.Player) {
+          if (S2.on) E = mine.E || engine();
         } else if (seeOthers && typeof C.MemberNumber === "number") {
           const o = others.get(C.MemberNumber);
           if (o) {
@@ -3796,7 +3952,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       sdk2.hookFunction("ChatRoomSync", 0, (args, next) => {
         const r = next(args);
         setTimeout(() => {
-          if (S.on) tell(true);
+          if (S2.on) tell(true);
           if (seeOthers) ask();
         }, 2500);
         return r;
@@ -3811,29 +3967,29 @@ One of mods you are using is using an old version of SDK. It will work for now b
     load();
     setInterval(prune, 2e4);
     setTimeout(() => {
-      if (S.on && engine()) {
-        W2.__farmDrawnBody = true;
+      if (S2.on && engine()) {
+        W3.__farmDrawnBody = true;
         redraw(500);
       }
       hook();
-      if (S.on) tell(true);
+      if (S2.on) tell(true);
       if (seeOthers) ask();
     }, 3e3);
   }
   function drawnBodyState() {
-    const up = itemOf(W2.Player, "BodyUpper"), cups = W2.FarmBreasts && W2.FarmBreasts.CUPS || [], e = eff();
+    const up = itemOf(W3.Player, "BodyUpper"), cups = W3.FarmBreasts && W3.FarmBreasts.CUPS || [], e = eff();
     return {
-      on: !!S.on,
+      on: !!S2.on,
       cup: e.cup,
       cupName: cups[e.cup] || "?",
       cups,
-      cupSet: !!S.cupSet,
+      cupSet: !!S2.cupSet,
       farmCup: farmMe && farmMe.cup >= 1 ? farmMe.cup : 0,
       farmBelly: farmMe ? farmMe.belly : 0,
       bellyMode: bellyMode(),
       chest: up && up.Asset ? up.Asset.Name : "",
-      fromStudio: !!S.saved,
-      fromFarm: !S.saved && !!farm,
+      fromStudio: !!S2.saved,
+      fromFarm: !S2.saved && !!farm,
       belly: !!(e.belly && e.belly.std && e.belly.std.on),
       seeOthers,
       othersHere: Array.from(others.keys()).filter((mn) => charOf(mn)).length
@@ -3849,28 +4005,28 @@ One of mods you are using is using an old version of SDK. It will work for now b
     if (farm && farm.at === at) return;
     farm = { at, body: b };
     try {
-      W2.localStorage.setItem(FARM_KEY, JSON.stringify(farm));
+      W3.localStorage.setItem(FARM_KEY, JSON.stringify(farm));
     } catch (e) {
     }
-    if (S.saved) return;
+    if (S2.saved) return;
     if (mine.E) apply(mine.E, eff());
-    if (S.on) {
+    if (S2.on) {
       redraw(60);
       tell(true);
     }
   }
   function drawnBodyBelly(mode, say) {
-    S.bellyMode = ["farm", "on", "off", "studio"].includes(mode) ? mode : "farm";
-    delete S.bellyOn;
+    S2.bellyMode = ["farm", "on", "off", "studio"].includes(mode) ? mode : "farm";
+    delete S2.bellyOn;
     save();
     if (mine.E) apply(mine.E, eff());
     redraw(60);
     tell(true);
-    if (say) say({ farm: "Your belly follows the farm: it shows, and grows, as you fill up or get bred.", on: "Belly always on.", off: "Belly off.", studio: "Your belly is the one your own studio has." }[S.bellyMode]);
+    if (say) say({ farm: "Your belly follows the farm: it shows, and grows, as you fill up or get bred.", on: "Belly always on.", off: "Belly off.", studio: "Your belly is the one your own studio has." }[S2.bellyMode]);
   }
   function drawnBodyUseFarm(say) {
-    delete S.saved;
-    S.cupSet = false;
+    delete S2.saved;
+    S2.cupSet = false;
     save();
     if (mine.E) apply(mine.E, eff());
     redraw(60);
@@ -3878,32 +4034,32 @@ One of mods you are using is using an old version of SDK. It will work for now b
     if (say) say(farm ? "Back to the farm's look." : "Back to the farm's look: it comes from the farm girl when you're in her room.");
   }
   function drawnBodySet(on, say) {
-    S.on = !!on;
+    S2.on = !!on;
     save();
-    if (S.on) {
+    if (S2.on) {
       if (!engine()) {
-        S.on = false;
+        S2.on = false;
         save();
         return say && say("The drawn body didn't load. Reload the page and try again.");
       }
       bellyTrial(0);
-      W2.__farmDrawnBody = true;
+      W3.__farmDrawnBody = true;
       hook();
-    } else W2.__farmDrawnBody = false;
+    } else W3.__farmDrawnBody = false;
     tell(true);
     redraw(60);
     setTimeout(() => redraw(0), 800);
     if (say) {
       const st2 = drawnBodyState();
-      if (!S.on) say("Drawn body off. You're the game's own picture again, for you and everybody else.");
-      else if (S.cup >= 6 && st2.chest !== "XLarge") say("Drawn body on, " + st2.cupName + " cup. Your chest needs to be the game's biggest size (wardrobe, body, upper body: the largest) for the drawn breasts to show; the belly and fitting work already.");
+      if (!S2.on) say("Drawn body off. You're the game's own picture again, for you and everybody else.");
+      else if (S2.cup >= 6 && st2.chest !== "XLarge") say("Drawn body on, " + st2.cupName + " cup. Your chest needs to be the game's biggest size (wardrobe, body, upper body: the largest) for the drawn breasts to show; the belly and fitting work already.");
       else say("Drawn body on: " + st2.cupName + " cup" + (st2.belly ? " with your belly" : "") + ". Everyone here with the Companion sees it too.");
     }
   }
   function drawnBodySeeOthers(on, say) {
     seeOthers = !!on;
     try {
-      W2.localStorage.setItem(SEE_KEY, on ? "1" : "0");
+      W3.localStorage.setItem(SEE_KEY, on ? "1" : "0");
     } catch (e) {
     }
     for (const mn of others.keys()) redrawMn(mn, 60);
@@ -3914,9 +4070,9 @@ One of mods you are using is using an old version of SDK. It will work for now b
     if (say) say(on ? "You'll see other people's drawn bodies." : "Other people are drawn the game's own way on your screen.");
   }
   function drawnBodyCup(i, say) {
-    const n = W2.FarmBreasts ? W2.FarmBreasts.CUPS.length : 21;
+    const n = W3.FarmBreasts ? W3.FarmBreasts.CUPS.length : 21;
     if (i === "auto") {
-      S.cupSet = false;
+      S2.cupSet = false;
       save();
       if (mine.E) apply(mine.E, eff());
       redraw(60);
@@ -3924,8 +4080,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
       if (say) say("Your cup follows the farm: " + drawnBodyState().cupName + " now, and it changes as you grow.");
       return;
     }
-    S.cup = Math.max(6, Math.min(n - 1, Math.round(Number(i) || 0)));
-    S.cupSet = true;
+    S2.cup = Math.max(6, Math.min(n - 1, Math.round(Number(i) || 0)));
+    S2.cupSet = true;
     save();
     if (mine.E) apply(mine.E, eff());
     redraw(60);
@@ -3935,26 +4091,26 @@ One of mods you are using is using an old version of SDK. It will work for now b
   function take(d, say, from) {
     const s = clean(d);
     if (!s) throw new Error("the settings are damaged");
-    s.on = S.on;
-    s.bellyMode = S.bellyMode;
-    s.bellyOn = S.bellyOn;
-    s.cupSet = S.cupSet;
-    s.cup = S.cupSet ? S.cup : s.cup;
+    s.on = S2.on;
+    s.bellyMode = S2.bellyMode;
+    s.bellyOn = S2.bellyOn;
+    s.cupSet = S2.cupSet;
+    s.cup = S2.cupSet ? S2.cup : s.cup;
     s.saved = typeof d.saved === "string" ? d.saved.slice(0, 40) : (/* @__PURE__ */ new Date()).toISOString();
-    S = s;
-    mine.S = S;
+    S2 = s;
+    mine.S = S2;
     save();
     if (mine.E) apply(mine.E, eff());
     redraw(60);
     tell(true);
-    if (say) say("Settings " + from + " put in: " + drawnBodyState().cupName + " cup" + (S.belly.std && S.belly.std.on ? ", your belly" : "") + ", " + Object.keys(S.wear).length + " piece choices. " + (S.on ? "" : "Switch the drawn body on to see it."));
+    if (say) say("Settings " + from + " put in: " + drawnBodyState().cupName + " cup" + (S2.belly.std && S2.belly.std.on ? ", your belly" : "") + ", " + Object.keys(S2.wear).length + " piece choices. " + (S2.on ? "" : "Switch the drawn body on to see it."));
     return true;
   }
   function drawnBodyPaste(text, say) {
     try {
       const t = String(text || "").trim();
       if (!t.startsWith(CODE_HEAD)) throw new Error("that isn't a code from the studio (it starts with " + CODE_HEAD + ")");
-      const raw = W2.LZString && typeof W2.LZString.decompressFromBase64 === "function" ? W2.LZString.decompressFromBase64(t.slice(CODE_HEAD.length)) : null;
+      const raw = W3.LZString && typeof W3.LZString.decompressFromBase64 === "function" ? W3.LZString.decompressFromBase64(t.slice(CODE_HEAD.length)) : null;
       const d = raw && JSON.parse(raw);
       if (!d || typeof d !== "object" || d.v !== 1) throw new Error("the code is damaged or from a newer studio");
       return take(d, say, "from the code");
@@ -3965,12 +4121,12 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
   async function drawnBodyFromStudio(say) {
     try {
-      const get = async (f) => {
+      const get2 = async (f) => {
         const r = await fetch(STUDIO + "/__studio/fits/" + f, { cache: "no-store" });
         if (!r.ok) throw new Error(f + ": " + r.status);
         return r.json();
       };
-      const [br, be, it] = await Promise.all([get("breasts.json"), get("belly.json").catch(() => null), get("items.json").catch(() => null)]);
+      const [br, be, it] = await Promise.all([get2("breasts.json"), get2("belly.json").catch(() => null), get2("items.json").catch(() => null)]);
       if (!br) throw new Error("the studio hasn't saved any breasts yet (Save the breasts)");
       return take({ cup: br.cup, breast: br, wear: br.wear, belly: be && be.fits, tuck: br.tuck, dress: br.dress, mould: it ? { items: it.mould || [], mode: it.mouldMode || {} } : null, saved: br.saved }, say, "from your studio");
     } catch (e) {
@@ -4007,7 +4163,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       )
     );
   }
-  function me(ctx2) {
+  function me2(ctx2) {
     const s = ctx2.s;
     const chips = [
       s.tier && chip(s.tier, "acc"),
@@ -4306,7 +4462,25 @@ One of mods you are using is using an old version of SDK. It will work for now b
       ),
       // (the scale trial and the belly experiment are gone: the drawn body does both. Laynie, Oct 14: "can also remove the
       // scaling test from earlier from the companion")
-      btn("Put the button and panel back (size and full screen too)", () => ctx2.resetPlaces && ctx2.resetPlaces())
+      btn("Put the button and panel back (size and full screen too)", () => ctx2.resetPlaces && ctx2.resetPlaces()),
+      // everything above, and the drawn body, messes and memory log, kept as a file on this computer too (localsave.js)
+      saveCard(ctx2)
+    );
+  }
+  function saveCard(ctx2) {
+    const ls = localSaveState(), say = (t2) => ctx2.hint(t2), t = (ms) => new Date(ms).toTimeString().slice(0, 5);
+    const line2 = !ls.folder ? ls.can ? "Not saving to a folder yet." : "This browser can't save to a folder (Chrome and Edge can). You can still load a file." : ls.perm !== "granted" ? "Saving to " + ls.folder + " is paused till you reconnect it (the browser asks again after a restart)." : ls.err ? "Trouble saving to " + ls.folder + ": " + ls.err : "Saving to " + ls.folder + " every minute" + (ls.at ? ", last at " + t(ls.at) : "") + ", as " + ls.file + ".";
+    return h(
+      "div",
+      {},
+      muted("Your settings as a file on this computer: everything here, your drawn body, your messes and the memory log. It survives a crash, a cleared browser or a new one. " + line2),
+      ls.folder && ls.perm !== "granted" ? btn("Reconnect " + ls.folder, () => localSaveReconnect(VERSION)) : null,
+      ls.can ? btn(ls.folder ? "Save to a different folder" : "Save my settings to a folder\u2026", () => localSavePick(VERSION)) : null,
+      ls.folder && ls.perm === "granted" ? btn("Save now", () => localSaveNow(VERSION).then(() => say("Saved."))) : null,
+      btn("Load my settings from a file\u2026", () => {
+        say("Pick the farmhand-companion file to load\u2026");
+        localSaveLoad(say);
+      })
     );
   }
   function drawnBodyCard(ctx2) {
@@ -4410,7 +4584,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     ];
   }
   var LIVESTOCK_TABS = [
-    { id: "me", label: "Me", render: me },
+    { id: "me", label: "Me", render: me2 },
     { id: "safety", label: "\u{1F198} Safety", render: safetyTab },
     { id: "milk", label: "Milking", render: milking },
     { id: "breed", label: "Breeding", render: breeding },
@@ -6330,7 +6504,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     { class: "fhc-sel", onchange: (e) => ctx2.setUi({ [key]: e.target.value }, true) },
     opts.map(([v, l]) => h("option", { value: v, selected: (ctx2.ui[key] || opts[0][0]) === v ? "selected" : null }, l))
   );
-  function me2(ctx2) {
+  function me3(ctx2) {
     const s = ctx2.s;
     return [
       card(
@@ -6510,7 +6684,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     ];
   }
   var STAFF_TABS = [
-    { id: "me", label: "Me", render: me2 },
+    { id: "me", label: "Me", render: me3 },
     { id: "herd", label: "Herd", render: herd },
     { id: "office", label: "Office", render: office, badge: (ctx2) => ctx2.docs.length },
     { id: "queue", label: "Queue", render: queue, badge: (ctx2) => (ctx2.s.apps || []).length },
@@ -7572,12 +7746,12 @@ One of mods you are using is using an old version of SDK. It will work for now b
         }
         if (it) {
           const pr = it.Property = Object.assign({}, it.Property || {}), tr = pr.TypeRecord = Object.assign({}, pr.TypeRecord || {});
-          const put = (place, line2, text) => {
+          const put2 = (place, line2, text) => {
             pr["Text" + (place * 3 + line2)] = cleanText(text).toUpperCase();
             tr[String.fromCharCode(97 + place)] = 1;
           };
           if (m.tally) {
-            put(TALLY_PLACE, 1, String(m.tally));
+            put2(TALLY_PLACE, 1, String(m.tally));
             did.push("tally");
           }
           if (m.write && cleanText(m.write.line)) {
@@ -7592,7 +7766,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
               if (spot) break;
             }
             if (!spot) spot = [pref2[0], 1 + Math.floor(Math.random() * 3)];
-            put(spot[0], spot[1], m.write.line);
+            put2(spot[0], spot[1], m.write.line);
             did.push("writing");
           }
           save2(mem);
@@ -7732,15 +7906,15 @@ One of mods you are using is using an old version of SDK. It will work for now b
     device: { groups: ["ItemDevices"], names: ["WoodenStocks"], re: /^(WoodenStocks|SaddleStand|WoodenHorse|Net|Kennel|LowCage|KabeshiriWall|WheelFortune|LuckyWheel|X-Cross|BondageBench|TheDisplayFrame|MilkCan)$/ }
   };
   function gearAsset(group, slot, prefer) {
-    const fam = P2().AssetFamily, get = (n) => {
+    const fam = P2().AssetFamily, get2 = (n) => {
       try {
         return typeof window.AssetGet === "function" ? window.AssetGet(fam, group, n) : null;
       } catch (e) {
         return null;
       }
     };
-    for (const n of Array.isArray(prefer) ? prefer.map(String) : []) if (/^[A-Za-z0-9_]{2,40}$/.test(n) && get(n)) return n;
-    for (const n of slot.names) if (get(n)) return n;
+    for (const n of Array.isArray(prefer) ? prefer.map(String) : []) if (/^[A-Za-z0-9_]{2,40}$/.test(n) && get2(n)) return n;
+    for (const n of slot.names) if (get2(n)) return n;
     const all = Array.isArray(window.Asset) ? window.Asset : [];
     const hit = all.find((a) => a && a.Group && a.Group.Name === group && slot.re.test(a.Name) && !a.OwnerOnly && !a.LoverOnly && !a.FamilyOnly);
     return hit ? hit.Name : typeof window.AssetGet !== "function" ? slot.names[0] : null;
@@ -8195,14 +8369,14 @@ One of mods you are using is using an old version of SDK. It will work for now b
       c.height = img2.height;
       const x = c.getContext("2d");
       x.drawImage(img2, 0, 0);
-      const W7 = c.width, H = c.height, d = x.getImageData(0, 0, W7, H).data, seen2 = new Uint8Array(W7 * H), out = [];
-      for (let i = 0; i < W7 * H; i++) {
+      const W8 = c.width, H = c.height, d = x.getImageData(0, 0, W8, H).data, seen2 = new Uint8Array(W8 * H), out = [];
+      for (let i = 0; i < W8 * H; i++) {
         if (seen2[i] || d[i * 4 + 3] < 16) continue;
         const q2 = [i];
         seen2[i] = 1;
-        let x0 = W7, y0 = H, x1 = 0, y1 = 0, n = 0;
+        let x0 = W8, y0 = H, x1 = 0, y1 = 0, n = 0;
         while (q2.length) {
-          const p = q2.pop(), px = p % W7, py = p / W7 | 0;
+          const p = q2.pop(), px = p % W8, py = p / W8 | 0;
           n++;
           if (px < x0) x0 = px;
           if (px > x1) x1 = px;
@@ -8210,8 +8384,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
           if (py > y1) y1 = py;
           for (let dy = -2; dy <= 2; dy++) for (let dx = -2; dx <= 2; dx++) {
             const nx = px + dx, ny = py + dy;
-            if (nx < 0 || ny < 0 || nx >= W7 || ny >= H) continue;
-            const k = ny * W7 + nx;
+            if (nx < 0 || ny < 0 || nx >= W8 || ny >= H) continue;
+            const k = ny * W8 + nx;
             if (!seen2[k] && d[k * 4 + 3] >= 16) {
               seen2[k] = 1;
               q2.push(k);
@@ -8478,7 +8652,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   })(typeof window !== "undefined" ? window : globalThis);
 
   // extension/src/messes.js
-  var W3 = window;
+  var W4 = window;
   var KEY3 = "farmhand-messes";
   var MAX = 60;
   var sdk3 = null;
@@ -8501,7 +8675,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var AREA_OF = { face: "face", forehead: "forehead", chest: "chest", tummy: "tummy", hair: "hair", thighs: "thighL", back: "back" };
   function load3() {
     try {
-      const v = JSON.parse(W3.localStorage.getItem(KEY3));
+      const v = JSON.parse(W4.localStorage.getItem(KEY3));
       if (Array.isArray(v)) mine2 = v.filter(ok).slice(-MAX);
     } catch (e) {
       mine2 = [];
@@ -8509,15 +8683,15 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
   function save3() {
     try {
-      W3.localStorage.setItem(KEY3, JSON.stringify(mine2));
+      W4.localStorage.setItem(KEY3, JSON.stringify(mine2));
     } catch (e) {
     }
   }
-  var ok = (e) => e && typeof e.k === "string" && W3.FarmMess && W3.FarmMess.KINDS[e.k] && Array.isArray(e.a) && Number.isFinite(e.s);
-  var clean2 = (list) => Array.isArray(list) ? list.filter(ok).slice(-MAX).map((e) => ({ k: e.k, a: e.a.filter((x) => typeof x === "string" && W3.FarmMess.AREAS[x]).slice(0, 6), s: e.s | 0, t: +e.t || 0, m: Math.max(0.5, Math.min(3, Number(e.m) || 1)) })) : [];
+  var ok = (e) => e && typeof e.k === "string" && W4.FarmMess && W4.FarmMess.KINDS[e.k] && Array.isArray(e.a) && Number.isFinite(e.s);
+  var clean2 = (list) => Array.isArray(list) ? list.filter(ok).slice(-MAX).map((e) => ({ k: e.k, a: e.a.filter((x) => typeof x === "string" && W4.FarmMess.AREAS[x]).slice(0, 6), s: e.s | 0, t: +e.t || 0, m: Math.max(0.5, Math.min(3, Number(e.m) || 1)) })) : [];
   function messFromMark(m) {
-    if (!m || !Array.isArray(m.splat) || !m.splat.length || !W3.FarmMess) return false;
-    const kind = typeof m.mess === "string" && W3.FarmMess.KINDS[m.mess] ? m.mess : (typeof m.color === "string" ? BY_COLOR[m.color.toLowerCase()] : null) || "cum";
+    if (!m || !Array.isArray(m.splat) || !m.splat.length || !W4.FarmMess) return false;
+    const kind = typeof m.mess === "string" && W4.FarmMess.KINDS[m.mess] ? m.mess : (typeof m.color === "string" ? BY_COLOR[m.color.toLowerCase()] : null) || "cum";
     const a = [];
     for (const x of m.splat) {
       const k = AREA_OF[x];
@@ -8543,7 +8717,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
   var send2 = (type, data) => {
     try {
-      if (W3.ServerSend && W3.ServerPlayerIsInChatRoom && W3.ServerPlayerIsInChatRoom()) W3.ServerSend("ChatRoomChat", makeMsg(type, data));
+      if (W4.ServerSend && W4.ServerPlayerIsInChatRoom && W4.ServerPlayerIsInChatRoom()) W4.ServerSend("ChatRoomChat", makeMsg(type, data));
     } catch (e) {
     }
   };
@@ -8561,7 +8735,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
   function onMessMsg(m) {
     const mn = m.from;
-    if (!mn || W3.Player && mn === W3.Player.MemberNumber) return;
+    if (!mn || W4.Player && mn === W4.Player.MemberNumber) return;
     if (m.type === "messAsk") {
       if (mine2.length) setTimeout(() => tell2(), 300 + Math.random() * 1500);
       return;
@@ -8576,22 +8750,22 @@ One of mods you are using is using an old version of SDK. It will work for now b
     hook2();
     redrawMn2(mn);
   }
-  var charOf2 = (mn) => W3.Player && W3.Player.MemberNumber === mn ? W3.Player : (W3.ChatRoomCharacter || []).find((c) => c && c.MemberNumber === mn) || null;
+  var charOf2 = (mn) => W4.Player && W4.Player.MemberNumber === mn ? W4.Player : (W4.ChatRoomCharacter || []).find((c) => c && c.MemberNumber === mn) || null;
   var againT2 = /* @__PURE__ */ new Map();
   function redrawMn2(mn, soon) {
     clearTimeout(againT2.get(mn));
     againT2.set(mn, setTimeout(() => {
       try {
         const C = charOf2(mn);
-        if (C && typeof W3.CharacterLoadCanvas === "function") W3.CharacterLoadCanvas(C);
+        if (C && typeof W4.CharacterLoadCanvas === "function") W4.CharacterLoadCanvas(C);
       } catch (e) {
       }
     }, soon || 80));
   }
   var redrawMe = () => {
-    if (W3.Player) redrawMn2(W3.Player.MemberNumber);
+    if (W4.Player) redrawMn2(W4.Player.MemberNumber);
   };
-  var listFor = (C) => C === W3.Player ? mine2 : (others2.get(C.MemberNumber) || {}).list || [];
+  var listFor = (C) => C === W4.Player ? mine2 : (others2.get(C.MemberNumber) || {}).list || [];
   var imgs = /* @__PURE__ */ new Map();
   function img(src, mn) {
     let i = imgs.get(src);
@@ -8602,7 +8776,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     imgs.set(src, i);
     return null;
   }
-  if (W3.FarmMess && W3.FarmMess.loadStamps) W3.FarmMess.loadStamps("").then((n) => {
+  if (W4.FarmMess && W4.FarmMess.loadStamps) W4.FarmMess.loadStamps("").then((n) => {
     if (n) {
       redrawMe();
       for (const mn of others2.keys()) redrawMn2(mn);
@@ -8615,17 +8789,17 @@ One of mods you are using is using an old version of SDK. It will work for now b
     setTimeout(() => {
       for (const p of made2.values()) if (p.src === src) return;
       try {
-        const m = W3.GLDrawImageCache;
+        const m = W4.GLDrawImageCache;
         if (m && typeof m.delete === "function") m.delete(src);
       } catch (e) {
       }
       try {
-        const m = W3.DrawImageCache;
+        const m = W4.DrawImageCache;
         if (m && typeof m.delete === "function") m.delete(src);
       } catch (e) {
       }
       try {
-        const gl = W3.GLDrawCanvas && W3.GLDrawCanvas.GL, tc = gl && gl.textureCache;
+        const gl = W4.GLDrawCanvas && W4.GLDrawCanvas.GL, tc = gl && gl.textureCache;
         const t2 = tc && tc.get(src);
         if (t2) {
           if (t2.texture) gl.deleteTexture(t2.texture);
@@ -8641,13 +8815,13 @@ One of mods you are using is using an old version of SDK. It will work for now b
     if (was && was.src && was.src !== p.src) forget(was.src);
   }
   function messPicture(C, list, body) {
-    const over = W3.CanvasUpperOverflow || 700, h2 = C.Canvas && C.Canvas.height || 1e3 + over;
+    const over = W4.CanvasUpperOverflow || 700, h2 = C.Canvas && C.Canvas.height || 1e3 + over;
     const up = body.find((b) => /\/BodyUpper\//.test(b[0])), ox = up ? up[1] : 0, oy = up ? up[2] - over : 0;
     const age = (e) => Math.min(5, Math.floor((Date.now() - (e.t || 0)) / 6e4));
     const key = JSON.stringify(list) + "|" + list.map(age).join("") + "|" + body.map((b) => b[0] + "@" + b[1] + "," + b[2]).join(";");
     const was = made2.get(C.MemberNumber);
     if (was && was.key === key) return was;
-    const mask = W3.document.createElement("canvas");
+    const mask = W4.document.createElement("canvas");
     mask.width = 500;
     mask.height = h2;
     const mg = mask.getContext("2d");
@@ -8656,15 +8830,15 @@ One of mods you are using is using an old version of SDK. It will work for now b
       if (!i) return was || null;
       mg.drawImage(i, x, y);
     }
-    const c = W3.document.createElement("canvas");
+    const c = W4.document.createElement("canvas");
     c.width = 500;
     c.height = h2;
     const g = c.getContext("2d");
     const at = (names) => names.map((n) => {
-      const A = W3.FarmMess.AREAS[n];
+      const A = W4.FarmMess.AREAS[n];
       return [A[0] + ox, A[1] + over + oy, A[2]];
     });
-    for (const e of list) W3.FarmMess.paintOn(g, mask, e.k, { at: at(e.a), seed: e.s, amount: e.m || 1, runX: 0.55 + 0.09 * age(e) });
+    for (const e of list) W4.FarmMess.paintOn(g, mask, e.k, { at: at(e.a), seed: e.s, amount: e.m || 1, runX: 0.55 + 0.09 * age(e) });
     const d = g.getImageData(0, 0, c.width, c.height).data;
     let x0 = c.width, y0 = c.height, x1 = -1, y1 = -1;
     for (let y = 0; y < c.height; y++) for (let x = 0; x < c.width; x++) if (d[(y * c.width + x) * 4 + 3]) {
@@ -8678,7 +8852,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       keep(C.MemberNumber, p2);
       return p2;
     }
-    const t = W3.document.createElement("canvas");
+    const t = W4.document.createElement("canvas");
     t.width = x1 - x0 + 1;
     t.height = y1 - y0 + 1;
     t.getContext("2d").drawImage(c, -x0, -y0);
@@ -8694,7 +8868,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       const groupRe = /(?:^|\/)Assets\/[^/]+\/(?:Override\/[^/]+\/)?([^/]+)\//;
       sdk3.hookFunction("CommonDrawAppearanceBuild", 3, (args, next) => {
         const C = args[0], real = args[1];
-        if (!C || !real || typeof real.drawImage !== "function" || !W3.FarmMess) return next(args);
+        if (!C || !real || typeof real.drawImage !== "function" || !W4.FarmMess) return next(args);
         const list = listFor(C);
         if (!list.length) return next(args);
         const body = [];
@@ -8772,7 +8946,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/trimpics.js
-  var W4 = window;
+  var W5 = window;
   var LIMIT = 38e7;
   var TARGET = 26e7;
   var IDLE = 5 * 6e4;
@@ -8786,7 +8960,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     return n;
   }
   function trimPictures(force, idle, target) {
-    const gl = W4.GLDrawCanvas && W4.GLDrawCanvas.GL, tc = gl && gl.textureCache, cache = W4.GLDrawImageCache;
+    const gl = W5.GLDrawCanvas && W5.GLDrawCanvas.GL, tc = gl && gl.textureCache, cache = W5.GLDrawImageCache;
     if (!tc || !cache || typeof tc.forEach !== "function") return 0;
     let total = bytes(tc);
     if (!force && total <= LIMIT) return 0;
@@ -8821,7 +8995,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
   function initTrim(mod2) {
     sdk4 = mod2;
-    W4.__farmTrim = trimPictures;
+    W5.__farmTrim = trimPictures;
     try {
       sdk4.hookFunction("GLDrawLoadImage", 0, (args, next) => {
         if (typeof args[1] === "string") seen.set(args[1], Date.now());
@@ -8841,12 +9015,12 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/memlog.js
-  var W5 = window;
+  var W6 = window;
   var KEY4 = "farmhand-memlog";
   var MAX2 = 120;
   var log = [];
   try {
-    const v = JSON.parse(W5.localStorage.getItem(KEY4));
+    const v = JSON.parse(W6.localStorage.getItem(KEY4));
     if (Array.isArray(v)) log = v.slice(-MAX2);
   } catch (e) {
     log = [];
@@ -8854,11 +9028,11 @@ One of mods you are using is using an old version of SDK. It will work for now b
   function snap() {
     const s = { t: Date.now() };
     try {
-      if (W5.performance && W5.performance.memory) s.heapMB = Math.round(W5.performance.memory.usedJSHeapSize / 1e6);
+      if (W6.performance && W6.performance.memory) s.heapMB = Math.round(W6.performance.memory.usedJSHeapSize / 1e6);
     } catch (e) {
     }
     try {
-      const m = W5.GLDrawImageCache;
+      const m = W6.GLDrawImageCache;
       if (m) {
         s.gamePics = m.size;
         let d = 0, dk = 0;
@@ -8869,7 +9043,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
         s.madePics = d;
         s.madePicsKB = Math.round(dk / 1e3);
       }
-      const gl = W5.GLDrawCanvas && W5.GLDrawCanvas.GL, tc = gl && gl.textureCache;
+      const gl = W6.GLDrawCanvas && W6.GLDrawCanvas.GL, tc = gl && gl.textureCache;
       if (tc) {
         let px = 0;
         for (const v of tc.values()) px += (v.width || 0) * (v.height || 0);
@@ -8891,15 +9065,15 @@ One of mods you are using is using an old version of SDK. It will work for now b
     } catch (e) {
     }
     try {
-      s.room = (W5.ChatRoomCharacter || []).length;
-      s.screen = W5.CurrentScreen;
+      s.room = (W6.ChatRoomCharacter || []).length;
+      s.screen = W6.CurrentScreen;
     } catch (e) {
     }
     return s;
   }
   function save4() {
     try {
-      W5.localStorage.setItem(KEY4, JSON.stringify(log));
+      W6.localStorage.setItem(KEY4, JSON.stringify(log));
     } catch (e) {
       log = log.slice(-30);
     }
@@ -8916,7 +9090,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var born = Date.now();
   var fast = [];
   try {
-    const v = JSON.parse(W5.localStorage.getItem(FAST));
+    const v = JSON.parse(W6.localStorage.getItem(FAST));
     if (Array.isArray(v)) fast = v.slice(-40);
   } catch (e) {
     fast = [];
@@ -8925,23 +9099,23 @@ One of mods you are using is using an old version of SDK. It will work for now b
   function quick() {
     const x = { t: Date.now() };
     try {
-      if (W5.performance && W5.performance.memory) x.h = Math.round(W5.performance.memory.usedJSHeapSize / 1e6);
+      if (W6.performance && W6.performance.memory) x.h = Math.round(W6.performance.memory.usedJSHeapSize / 1e6);
     } catch (e) {
     }
     try {
-      const gl = W5.GLDrawCanvas && W5.GLDrawCanvas.GL, tc = gl && gl.textureCache;
+      const gl = W6.GLDrawCanvas && W6.GLDrawCanvas.GL, tc = gl && gl.textureCache;
       if (tc) x.p = tc.size;
     } catch (e) {
     }
     try {
-      x.r = (W5.ChatRoomCharacter || []).length;
-      x.s = W5.CurrentScreen;
+      x.r = (W6.ChatRoomCharacter || []).length;
+      x.s = W6.CurrentScreen;
     } catch (e) {
     }
     fast.push(x);
     if (fast.length > 40) fast = fast.slice(-40);
     try {
-      W5.localStorage.setItem(FAST, JSON.stringify(fast));
+      W6.localStorage.setItem(FAST, JSON.stringify(fast));
     } catch (e) {
     }
   }
@@ -8953,22 +9127,22 @@ One of mods you are using is using an old version of SDK. It will work for now b
     setTimeout(tick, 2e4);
     setInterval(tick, 3e4);
     setInterval(quick, 3e3);
-    if (typeof W5.CommandCombine === "function") {
-      W5.CommandCombine([{ Tag: "farmmem", Description: ": the Farmhand Companion's memory log (the last hour), and copies it", Action: () => {
+    if (typeof W6.CommandCombine === "function") {
+      W6.CommandCombine([{ Tag: "farmmem", Description: ": the Farmhand Companion's memory log (the last hour), and copies it", Action: () => {
         tick();
         const text = "Companion v" + VERSION + "\n" + memlogText(24) + (lastPage.length ? "\nThe last seconds of the page before this one:\n" + lastPage.map(quickLine).join("\n") : "");
         try {
-          W5.navigator.clipboard.writeText(JSON.stringify(log));
+          W6.navigator.clipboard.writeText(JSON.stringify(log));
         } catch (e) {
         }
-        if (typeof W5.ChatRoomSendLocal === "function") W5.ChatRoomSendLocal("Farmhand memory log (copied, paste it to Claude):\n" + text, 12e4);
+        if (typeof W6.ChatRoomSendLocal === "function") W6.ChatRoomSendLocal("Farmhand memory log (copied, paste it to Claude):\n" + text, 12e4);
         else console.log(text);
       } }]);
     }
   }
 
   // extension/src/cues.js
-  var W6 = window;
+  var W7 = window;
   var ctx = null;
   function initCues(c) {
     ctx = c;
@@ -8985,16 +9159,16 @@ One of mods you are using is using an old version of SDK. It will work for now b
     stir: ctx.panel.prefs.stir ? void 0 : true,
     gear: ctx.panel.prefs.gear ? void 0 : true
   });
-  var mapOn = () => typeof W6.ChatRoomMapViewIsActive === "function" && W6.ChatRoomMapViewIsActive() && W6.Player && W6.Player.MapData && W6.Player.MapData.Pos;
-  var others3 = () => (W6.ChatRoomCharacter || []).filter((c) => c && c.MemberNumber !== (W6.Player && W6.Player.MemberNumber));
+  var mapOn = () => typeof W7.ChatRoomMapViewIsActive === "function" && W7.ChatRoomMapViewIsActive() && W7.Player && W7.Player.MapData && W7.Player.MapData.Pos;
+  var others3 = () => (W7.ChatRoomCharacter || []).filter((c) => c && c.MemberNumber !== (W7.Player && W7.Player.MemberNumber));
   var lastSight = "";
   function sightTick() {
     try {
-      if (W6.CurrentScreen !== "ChatRoom" || !mapOn() || typeof W6.ChatRoomMapViewCharacterIsVisible !== "function") return;
-      const see = others3().filter((c) => W6.ChatRoomMapViewCharacterIsVisible(c)).map((c) => c.MemberNumber).sort();
-      const hear = others3().filter((c) => typeof W6.ChatRoomMapViewCharacterIsHearable === "function" && W6.ChatRoomMapViewCharacterIsHearable(c)).map((c) => c.MemberNumber).sort();
-      const LS = W6.Player && W6.Player.LSCG, S2 = LS && LS.SplatterModule;
-      const splat = S2 ? !!(S2.enabled && S2.taker !== false && (!LS.GlobalModule || LS.GlobalModule.enabled !== false)) : void 0;
+      if (W7.CurrentScreen !== "ChatRoom" || !mapOn() || typeof W7.ChatRoomMapViewCharacterIsVisible !== "function") return;
+      const see = others3().filter((c) => W7.ChatRoomMapViewCharacterIsVisible(c)).map((c) => c.MemberNumber).sort();
+      const hear = others3().filter((c) => typeof W7.ChatRoomMapViewCharacterIsHearable === "function" && W7.ChatRoomMapViewCharacterIsHearable(c)).map((c) => c.MemberNumber).sort();
+      const LS = W7.Player && W7.Player.LSCG, S3 = LS && LS.SplatterModule;
+      const splat = S3 ? !!(S3.enabled && S3.taker !== false && (!LS.GlobalModule || LS.GlobalModule.enabled !== false)) : void 0;
       const key = see.join(",") + "|" + hear.join(",") + "|" + splat;
       if (key === lastSight && Date.now() - (sightTick.at || 0) < 12e4) return;
       lastSight = key;
@@ -9008,13 +9182,13 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var DIRS = [["North", 0, -1], ["South", 0, 1], ["West", -1, 0], ["East", 1, 0]];
   function canStep(x, y) {
     try {
-      return W6.ChatRoomMapViewCanEnterTile(x, y) > 0;
+      return W7.ChatRoomMapViewCanEnterTile(x, y) > 0;
     } catch (e) {
       return false;
     }
   }
   function findPath(from, to) {
-    const wide = W6.ChatRoomMapViewWidth || 40, high = W6.ChatRoomMapViewHeight || 40, key = (x, y) => x + "," + y;
+    const wide = W7.ChatRoomMapViewWidth || 40, high = W7.ChatRoomMapViewHeight || 40, key = (x, y) => x + "," + y;
     const goal = (x, y) => Math.max(Math.abs(x - to.X), Math.abs(y - to.Y)) <= (canStep(to.X, to.Y) ? 0 : 1);
     const prev = /* @__PURE__ */ new Map([[key(from.X, from.Y), null]]), q2 = [[from.X, from.Y]];
     while (q2.length) {
@@ -9044,8 +9218,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
       walk = null;
       ctx.toBot("leadNo", { id: m.id });
     };
-    if (!pref("noLead") || !mapOn() || typeof W6.ChatRoomMapViewMove !== "function") return no();
-    const from = W6.Player.MapData.Pos, to = { X: m.X, Y: m.Y };
+    if (!pref("noLead") || !mapOn() || typeof W7.ChatRoomMapViewMove !== "function") return no();
+    const from = W7.Player.MapData.Pos, to = { X: m.X, Y: m.Y };
     const path = findPath(from, to);
     if (!path) return no();
     if (!path.length) {
@@ -9058,7 +9232,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
   function stepWalk() {
     if (!walk) return;
-    const w = walk, p = W6.Player && W6.Player.MapData && W6.Player.MapData.Pos;
+    const w = walk, p = W7.Player && W7.Player.MapData && W7.Player.MapData.Pos;
     if (!p) {
       walk = null;
       return;
@@ -9087,9 +9261,9 @@ One of mods you are using is using an old version of SDK. It will work for now b
       }
       Object.assign(w, { path, i: 0, stuck: Date.now(), retried: true });
     }
-    if (W6.ChatRoomMapViewMovement == null) {
+    if (W7.ChatRoomMapViewMovement == null) {
       try {
-        W6.ChatRoomMapViewMove(w.path[w.i]);
+        W7.ChatRoomMapViewMove(w.path[w.i]);
       } catch (e) {
       }
     }
@@ -9107,12 +9281,12 @@ One of mods you are using is using an old version of SDK. It will work for now b
   };
   function face(m) {
     const f = FACES[m.mood];
-    if (!f || !pref("noFace") || typeof W6.CharacterSetFacialExpression !== "function" || !W6.Player) return;
+    if (!f || !pref("noFace") || typeof W7.CharacterSetFacialExpression !== "function" || !W7.Player) return;
     const secs = m.mood === "clear" ? null : Math.max(5, Math.min(1800, Number(m.secs) || 30));
     for (const [g, e] of Object.entries(f)) {
       try {
-        W6.CharacterSetFacialExpression(W6.Player, g, e, secs);
-        if (g === "Eyes") W6.CharacterSetFacialExpression(W6.Player, "Eyes2", e, secs);
+        W7.CharacterSetFacialExpression(W7.Player, g, e, secs);
+        if (g === "Eyes") W7.CharacterSetFacialExpression(W7.Player, "Eyes2", e, secs);
       } catch (e2) {
       }
     }
@@ -9161,35 +9335,35 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var QUIET = { stall: 0.35, latch: 0.35, unlatch: 0.35, pump: 0.4, machine: 0.4, inflate: 0.4, hiss: 0.4, buzz: 0.3, zap: 0.35, clamp: 0.45, softgate: 0.4 };
   function sound(m) {
     const f = SOUNDS[m.name];
-    if (!f || !pref("noSound") || typeof W6.AudioPlayInstantSound !== "function") return;
-    const vol = W6.Player && W6.Player.AudioSettings && W6.Player.AudioSettings.Volume || 0;
+    if (!f || !pref("noSound") || typeof W7.AudioPlayInstantSound !== "function") return;
+    const vol = W7.Player && W7.Player.AudioSettings && W7.Player.AudioSettings.Volume || 0;
     try {
-      W6.AudioPlayInstantSound("Audio/" + f + ".mp3", vol * (QUIET[m.name] || 0.6));
+      W7.AudioPlayInstantSound("Audio/" + f + ".mp3", vol * (QUIET[m.name] || 0.6));
     } catch (e) {
     }
   }
   function trance(m) {
-    let el = W6.document.getElementById("fhc-trance");
+    let el = W7.document.getElementById("fhc-trance");
     const lvl = pref("noTrance") ? Math.max(0, Math.min(3, Number(m.level) || 0)) : 0;
     if (!lvl) {
       if (el) el.remove();
       return;
     }
     if (!el) {
-      el = W6.document.createElement("div");
+      el = W7.document.createElement("div");
       el.id = "fhc-trance";
       el.style.cssText = "position:fixed;inset:0;pointer-events:none;z-index:9998;transition:opacity 4s;opacity:0;animation:fhcTrance 6s ease-in-out infinite";
-      if (!W6.document.getElementById("fhc-trance-css")) {
-        const s = W6.document.createElement("style");
+      if (!W7.document.getElementById("fhc-trance-css")) {
+        const s = W7.document.createElement("style");
         s.id = "fhc-trance-css";
         s.textContent = "@keyframes fhcTrance{0%,100%{filter:brightness(1)}50%{filter:brightness(0.85)}}";
-        W6.document.head.appendChild(s);
+        W7.document.head.appendChild(s);
       }
-      W6.document.body.appendChild(el);
+      W7.document.body.appendChild(el);
     }
     const edge = [0, 0.25, 0.45, 0.65][lvl], inner = [0, 55, 42, 30][lvl];
     el.style.background = "radial-gradient(ellipse at center, transparent " + inner + "%, rgba(70,20,90," + edge + ") 100%)";
-    (W6.requestAnimationFrame || ((f) => setTimeout(f, 16)))(() => {
+    (W7.requestAnimationFrame || ((f) => setTimeout(f, 16)))(() => {
       el.style.opacity = "1";
     });
   }
@@ -9261,13 +9435,13 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var recentFeel = [];
   function feelTick() {
     try {
-      if (!pref("noFeelings") || W6.CurrentScreen !== "ChatRoom" || !W6.Player || !ctx.panel.s || !ctx.panel.s.onBooks) return;
+      if (!pref("noFeelings") || W7.CurrentScreen !== "ChatRoom" || !W7.Player || !ctx.panel.s || !ctx.panel.s.onBooks) return;
       if (Date.now() < (feelTick.next || 0)) return;
       feelTick.next = Date.now() + (7 + Math.random() * 6) * 6e4;
-      const s = ctx.panel.s, items = (W6.Player.Appearance || []).filter((x) => x && x.Asset && x.Asset.Group);
+      const s = ctx.panel.s, items = (W7.Player.Appearance || []).filter((x) => x && x.Asset && x.Asset.Group);
       const grp = (g) => items.find((x) => x.Asset.Group.Name === g);
       const eff2 = (x) => [].concat(x.Property && x.Property.Effect || [], x.Asset.Effect || []);
-      const arousal = W6.Player.ArousalSettings && W6.Player.ArousalSettings.Progress || 0;
+      const arousal = W7.Player.ArousalSettings && W7.Player.ArousalSettings.Progress || 0;
       const kinds = [];
       if (grp("ItemButt")) kinds.push("plug");
       if (items.some((x) => eff2(x).includes("Chaste")) && arousal > 40) kinds.push("chaste");
@@ -9291,20 +9465,20 @@ One of mods you are using is using an old version of SDK. It will work for now b
   function drawMarkers() {
     try {
       const s = ctx.panel.s;
-      if (!s || !s.staff || !Array.isArray(s.herd) || !pref("noMarkers") || !mapOn() || typeof W6.DrawText !== "function") return;
-      const R = W6.ChatRoomMapViewPerceptionRange || 6, tile = 1e3 / (R * 2 + 1), me3 = W6.Player.MapData.Pos;
+      if (!s || !s.staff || !Array.isArray(s.herd) || !pref("noMarkers") || !mapOn() || typeof W7.DrawText !== "function") return;
+      const R = W7.ChatRoomMapViewPerceptionRange || 6, tile = 1e3 / (R * 2 + 1), me4 = W7.Player.MapData.Pos;
       for (const x of s.herd) {
-        const C = (W6.ChatRoomCharacter || []).find((c) => c.MemberNumber === x.mn);
-        if (!C || !C.MapData || !C.MapData.Pos || !W6.ChatRoomMapViewCharacterIsVisible(C)) continue;
+        const C = (W7.ChatRoomCharacter || []).find((c) => c.MemberNumber === x.mn);
+        if (!C || !C.MapData || !C.MapData.Pos || !W7.ChatRoomMapViewCharacterIsVisible(C)) continue;
         const tags = [];
         if (x.milk !== null && x.milk >= 75) tags.push(["M", "#7fa8c9"]);
         if (x.heat) tags.push(["H", "#d9534f"]);
         if (x.preg) tags.push(["B", "#8fbf6a"]);
         if (x.denied) tags.push(["X", "#c9a35b"]);
         if (!tags.length) continue;
-        const sx = (C.MapData.Pos.X - me3.X + R) * tile, sy = (C.MapData.Pos.Y - me3.Y) * tile + R * tile;
+        const sx = (C.MapData.Pos.X - me4.X + R) * tile, sy = (C.MapData.Pos.Y - me4.Y) * tile + R * tile;
         if (sx < 0 || sy < 0 || sx > 1e3 || sy > 1e3) continue;
-        tags.forEach(([t, col], i) => W6.DrawText(t, sx + tile * 0.2 + i * tile * 0.22, sy + tile * 0.15, col, "black"));
+        tags.forEach(([t, col], i) => W7.DrawText(t, sx + tile * 0.2 + i * tile * 0.22, sy + tile * 0.15, col, "black"));
       }
     } catch (e) {
     }
@@ -9321,11 +9495,11 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
   function arouse(m) {
     try {
-      if (!stirOn() || !W6.Player || !W6.Player.ArousalSettings || typeof W6.ActivitySetArousal !== "function") return;
-      if (W6.Player.ArousalSettings.Active === "Inactive" || W6.Player.ArousalSettings.Active === "NoMeter") return;
-      const cur = Number(W6.Player.ArousalSettings.Progress) || 0, cap = Math.max(0, Math.min(deniedNow() ? 94 : 100, Number(m.cap) || 100));
+      if (!stirOn() || !W7.Player || !W7.Player.ArousalSettings || typeof W7.ActivitySetArousal !== "function") return;
+      if (W7.Player.ArousalSettings.Active === "Inactive" || W7.Player.ArousalSettings.Active === "NoMeter") return;
+      const cur = Number(W7.Player.ArousalSettings.Progress) || 0, cap = Math.max(0, Math.min(deniedNow() ? 94 : 100, Number(m.cap) || 100));
       const next = Math.max(0, Math.min(cap, cur + (Number(m.add) || 0)));
-      if (next > cur || m.add < 0) W6.ActivitySetArousal(W6.Player, next);
+      if (next > cur || m.add < 0) W7.ActivitySetArousal(W7.Player, next);
     } catch (e) {
       console.warn("[Farmhand Companion] arouse:", e);
     }
@@ -9333,11 +9507,11 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var VIBE_MODE = ["Low", "Medium", "High", "Maximum"];
   var vibeWas = null;
   var vibeTimer = null;
-  var vibeToys = () => (W6.Player && Array.isArray(W6.Player.Appearance) ? W6.Player.Appearance : []).filter((it) => it && it.Asset && it.Asset.Group && it.Property && typeof it.Property.Intensity === "number" && !(it.Property.LockedBy && typeof W6.DialogCanUnlock === "function" && !W6.DialogCanUnlock(W6.Player, it)));
+  var vibeToys = () => (W7.Player && Array.isArray(W7.Player.Appearance) ? W7.Player.Appearance : []).filter((it) => it && it.Asset && it.Asset.Group && it.Property && typeof it.Property.Intensity === "number" && !(it.Property.LockedBy && typeof W7.DialogCanUnlock === "function" && !W7.DialogCanUnlock(W7.Player, it)));
   function vibePush(toys) {
-    if (typeof W6.CharacterRefresh === "function") W6.CharacterRefresh(W6.Player, false);
-    if (typeof W6.ChatRoomCharacterItemUpdate === "function") toys.forEach((it) => W6.ChatRoomCharacterItemUpdate(W6.Player, it.Asset.Group.Name));
-    else if (typeof W6.ChatRoomCharacterUpdate === "function") W6.ChatRoomCharacterUpdate(W6.Player);
+    if (typeof W7.CharacterRefresh === "function") W7.CharacterRefresh(W7.Player, false);
+    if (typeof W7.ChatRoomCharacterItemUpdate === "function") toys.forEach((it) => W7.ChatRoomCharacterItemUpdate(W7.Player, it.Asset.Group.Name));
+    else if (typeof W7.ChatRoomCharacterUpdate === "function") W7.ChatRoomCharacterUpdate(W7.Player);
   }
   function vibeSet(it, level, mode) {
     it.Property.Intensity = level;
@@ -9393,7 +9567,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
         const t = next(args);
         try {
           const f = slowFactor();
-          return t > 0 && f > 1 && !(typeof W6.ChatRoomMapViewHasSuperPowers === "function" && W6.ChatRoomMapViewHasSuperPowers()) ? t * f : t;
+          return t > 0 && f > 1 && !(typeof W7.ChatRoomMapViewHasSuperPowers === "function" && W7.ChatRoomMapViewHasSuperPowers()) ? t * f : t;
         } catch (e) {
           return t;
         }
@@ -9816,6 +9990,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     initDrawnBody(mod);
     initMesses(mod);
     initMemlog();
+    initLocalSave(VERSION, () => st.panel && st.panel.render && st.panel.render());
     initTrim(mod);
     setTimeout(() => scaleTrialCleanup(), 15e3);
     initBody(mod);

@@ -69,6 +69,15 @@ const wait=ms=>new Promise(r=>setTimeout(r,ms));
   P.Appearance=[mk('ItemMouth','LipGag',{ Craft:{ Name:'Parasite Lips', Description:'old, no tag' } })];
   d=syncFarmGear([{ slot:'belt', name:'Parasite Belt', desc:'x', always:true, until:far }], false);
   ok(!has('ItemMouth') && has('ItemPelvis','PolishedChastityBelt'), 'lips from an older Companion come off, and the belt goes on');
+  // the big pieces (Oct 15): a device the piece names goes on, and comes off again; a cowbell clips to a collar
+  ASSETS.ItemDevices=['WoodenStocks','SaddleStand','Net']; ASSETS.ItemNeckAccessories=['CollarCowBell','CollarNameTag'];
+  P.Appearance=[mk('ItemNeck','LeatherCollar')];
+  d=syncFarmGear([{ slot:'device', name:'Buckin\' Saddle', desc:'x', items:['SaddleStand'], until:far }, { slot:'tag', name:'Lost Cow Bell', desc:'x', items:['CollarCowBell'], until:far }], true);
+  ok(has('ItemDevices','SaddleStand') && has('ItemNeckAccessories','CollarCowBell'), 'the saddle stand goes on as a device, and the cowbell on the collar');
+  d=syncFarmGear([], true); ok(!has('ItemDevices') && !has('ItemNeckAccessories'), '...and both come off when the trap lets go');
+  P.Appearance=[mk('ItemDevices','Net',{ Craft:{ Name:'Her own net', Description:'mine' } })];
+  d=syncFarmGear([{ slot:'device', name:'Fair Stocks', desc:'x', items:['WoodenStocks'], until:far }], true);
+  ok(has('ItemDevices','Net') && !has('ItemDevices','WoodenStocks'), 'a device she\'s already in is left alone');
   try { fs.unlinkSync(tmp); } catch(e){}
 
   // ── the bot's half: a trap lists its gear and takes it off ──

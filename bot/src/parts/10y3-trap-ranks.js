@@ -21,7 +21,8 @@
                        mud: ["boar", "spray", "dip"], glue: ["paddle", "tickle", "brand"], pump: ["eggs", "mud"], lantern: ["mirror", "kennel"], spray: ["mud", "brand"], milker: ["cups", "bull"], injector: ["breeder", "milker", "gas"],
                        pillory: ["brand", "pricetag"], paddle: ["pillory"], cups: ["milker", "bull"], chute: ["pump", "sow"], slime: ["vines", "eggs"], weights: ["breeder"],
                        saddle: ["paddle", "milker", "dip"], net: ["pillory", "tickle", "bell"], bell: ["winch", "scale"], scale: ["pricetag", "cups", "brand"], teaser: ["weights", "milker", "crate"], dip: ["mud", "spray", "net"],
-                       crate: ["milker", "carousel", "bale"], carousel: ["cups", "crate", "dip"], plow: ["paddle", "dip", "scarecrow"], bale: ["scarecrow", "pillory"], scarecrow: ["plow", "net", "washline"], washline: ["paddle", "dip"] };
+                       crate: ["milker", "carousel", "bale"], carousel: ["cups", "crate", "dip"], plow: ["paddle", "dip", "scarecrow"], bale: ["scarecrow", "pillory", "kissgate"], scarecrow: ["plow", "net", "washline", "maze"], washline: ["paddle", "dip", "stocks"],
+                       auction: ["pillory", "wheel"], maze: ["wolves", "scarecrow"], honey: ["dip", "stocks"], incubator: ["eggs", "vines"], collection: ["weights", "teaser"], wheel: ["crate", "incubator"], stocks: ["honey", "dip"], kissgate: ["wall", "pillory"], windmill: ["net", "bell"], mudpit: ["dip", "mud"] };
   // called when a trap has finished with them (10u-traps.js trapRun)
   function trapAfter(mn, kind, before){
     const r = rec(mn), p = prodOf(mn), now = Date.now();

@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.22.0
+// @version      0.23.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -230,7 +230,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.22.0";
+  var VERSION = "0.23.0";
 
   // extension/src/config.js
   var BOT_MEMBER = 260239;
@@ -7623,7 +7623,33 @@ One of mods you are using is using an old version of SDK. It will work for now b
     "Living Suit (hips)",
     "Living Suit (chest)",
     "Living Suit (arms)",
-    "Living Suit (mouth)"
+    "Living Suit (mouth)",
+    // Oct 15: the newer traps' equipment
+    "Buckin' Saddle",
+    "Saddle Post",
+    "Hayloft Net",
+    "Lost Cow Bell",
+    "Teasin' Stall",
+    "Sheep Dip",
+    "Breedin' Crate",
+    "Sire's Stopper",
+    "Carousel Milkers",
+    "Carousel Cuffs",
+    "Plow Bit",
+    "Plow Harness",
+    "Bale Twine",
+    "Scarecrow Post",
+    "Scarecrow Ropes",
+    "Clothespins",
+    "Washin' Line",
+    "Fair Stocks",
+    "The Pillory",
+    "Breedin' Wheel",
+    "Windmill Sails",
+    "Kissin' Gate",
+    "The Fence",
+    "Collection Bench",
+    "Auction Block"
   ];
   var GEAR_SLOTS = {
     plug: { groups: ["ItemButt"], names: ["InflVibeButtPlug", "BlackButtPlug", "ButtPlug", "ButtPump"], re: /ButtPlug|Plug/, color: "#2B2B2B" },
@@ -7639,7 +7665,9 @@ One of mods you are using is using an old version of SDK. It will work for now b
     // (a piece can ask for a spreader bar here instead)
     lips: { groups: ["ItemMouth", "ItemMouth2", "ItemMouth3"], names: ["LipGag"], re: /LipGag/, color: ["#E0607F", "#7A2B47", "#7A2B47"] },
     torso: { groups: ["ItemTorso", "ItemTorso2"], names: ["TentacleSuit", "HempRopeHarness"], re: /Harness/ },
-    tag: { groups: ["ItemNeckAccessories"], names: ["CollarNameTagLivestock", "CollarNameTag"], re: /NameTag/, needs: "ItemNeck" }
+    tag: { groups: ["ItemNeckAccessories"], names: ["CollarNameTagLivestock", "CollarNameTag"], re: /NameTag/, needs: "ItemNeck" },
+    // the big pieces (Oct 15): the game's own devices, only the ones a piece names (no stray device off the list)
+    device: { groups: ["ItemDevices"], names: ["WoodenStocks"], re: /^(WoodenStocks|SaddleStand|WoodenHorse|Net|Kennel|LowCage|KabeshiriWall|WheelFortune|LuckyWheel|X-Cross|BondageBench|TheDisplayFrame|MilkCan)$/ }
   };
   function gearAsset(group, slot, prefer) {
     const fam = P2().AssetFamily, get = (n) => {

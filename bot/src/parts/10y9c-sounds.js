@@ -12,7 +12,8 @@
     tickle: "cuffs", mirror: "softgate", paddle: "paddle", wall: "wood", mister: "hiss", weights: "latch", trough: "wet", pricetag: "bell",
     saddle: "machine", net: "ropelong", bell: "cowbell", scale: "clip", teaser: "softgate", dip: "wet",
     crate: "softgate", carousel: "machine", plow: "chain", bale: "straw", scarecrow: "ropelong", washline: "clip",
+    auction: "bell", maze: "straw", honey: "wet", incubator: "clip", collection: "latch", wheel: "chainlong", stocks: "wood", kissgate: "softgate", windmill: "ropelong", mudpit: "wet",
     suit: "latex",
   };
-  const TRAP_SOUND_END = { saddle: "unlatch", net: "straw", crate: "gate", carousel: "unlatch", milker: "unlatch", clamp: "lock", pump: "hiss", winch: "chain", kennel: "gate", cups: "unlatch", weights: "unlatch", breeder: "unlatch", paddle: "paddle", wolves: "chain" };
+  const TRAP_SOUND_END = { collection: "unlatch", stocks: "wood", saddle: "unlatch", net: "straw", crate: "gate", carousel: "unlatch", milker: "unlatch", clamp: "lock", pump: "hiss", winch: "chain", kennel: "gate", cups: "unlatch", weights: "unlatch", breeder: "unlatch", paddle: "paddle", wolves: "chain" };
   const CUSTOM_SOUND = { dose: "clip", hold: "cuffs", fill: "inflate", breed: "machine", strip: "rip", write: "clip" };

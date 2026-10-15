@@ -6,7 +6,7 @@
      moment it isn't (time up, the trap's done, the safeword), and a piece pulled off early is put back.
      Trap gear only goes on somebody who switched "Farm can put real gear on me" on in their Companion's Toggles.
      The parasite needs no second switch: ?parasite on is the say-so.
-     Slots (the Companion picks the game item): plug · dildo · belt · cups · leash · funnel · arms · legs · ropeFeet · lips · torso · tag
+     Slots (the Companion picks the game item): plug · dildo · belt · cups · leash · funnel · arms · legs · ropeFeet · lips · torso · tag · device (Companion 0.23.0+)
      The items named on each piece are real game item names, read from the game's own list (Oct 12).
      A piece can name the game items it would rather be ("Tentacles", "Slime") and a colour.
   */

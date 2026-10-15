@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm add-on: Breeding
 // @namespace    bnbfarm
-// @version      1.2.0
+// @version      1.2.1
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-breeding.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-breeding.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -284,14 +284,14 @@
     },
     CALL_STUD: [
       "\u{1F525} %name% is in heat %where% and can't keep still. They're askin' for a stud, sugar, and you're on the list.",
-      "\u{1F525} Heat call: %name%, %where%, rump up and achin'. You signed up for this.",
-      "\u{1F525} %name% is ripe and callin' %where%. Go see to them before somebody else does.",
+      "\u{1F525} A heat call: %name%, %where%, rump up and achin' with it. You signed up for this.",
+      "\u{1F525} %name% is ripe and in heat %where%. Go see to them before somebody else does.",
       "\u{1F525} %name%'s in season %where%, and their call's gone out to every stud on the farm. Including you."
     ],
     CALLED: [
-      "\u{1F525} The call's out to %n% stud%s%. Find somewhere soft and wait, sugar.",
+      "\u{1F525} The call's out to %n% stud%s% on the farm. Find somewhere soft and wait, sugar.",
       "\u{1F525} %n% stud%s% will be catchin' your scent about now. Stay where you are.",
-      "\u{1F525} Heard by %n% stud%s%. Get comfortable, sugar, and get presentin'."
+      "\u{1F525} %n% stud%s% heard that. Get comfortable, sugar, and get presentin'."
     ],
     MATED: [
       "\u{1F49E} %a% and %b% bump foreheads and that's that: mates for the day. The farm girl chalks a heart on the barn door.",

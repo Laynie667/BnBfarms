@@ -127,7 +127,11 @@ const OLD_TAG = "[B&B Farm gear]";
 const FARM_NAMES = ["Parasite Lips", "Parasite Belt", "Pump Bung", "Egg Post Plug", "Slime Seal", "Boar's Plug", "Seed Pod Stem", "Denial Clamp", "Growth Cups",
   "Trap Milker", "Winch Chain", "Feed Chute", "Snare Rope", "Breedin' Frame Cuffs", "Kennel Lead", "The Water's Grip", "The Water's Coils", "Slime Sleeves", "Slime Stockings",
   "Snare Hobble", "Pack's Knot", "Stud's Stopper", "Pillory Spreader", "Parasite Suckers", "Parasite Root", "The Water's Embrace", "Brood Sac", "Grower's Sheath", "Glutton's Sleeve", "Tyrant's Cage", "Tyrant's Web",
-  "Growin' Plug", "Hungry Belt", "Milkmaid's Cups", "Glutton's Funnel", "The Hobble", "Living Suit (legs)", "Living Suit (hips)", "Living Suit (chest)", "Living Suit (arms)", "Living Suit (mouth)"];
+  "Growin' Plug", "Hungry Belt", "Milkmaid's Cups", "Glutton's Funnel", "The Hobble", "Living Suit (legs)", "Living Suit (hips)", "Living Suit (chest)", "Living Suit (arms)", "Living Suit (mouth)",
+  // Oct 15: the newer traps' equipment
+  "Buckin' Saddle", "Saddle Post", "Hayloft Net", "Lost Cow Bell", "Teasin' Stall", "Sheep Dip", "Breedin' Crate", "Sire's Stopper", "Carousel Milkers", "Carousel Cuffs",
+  "Plow Bit", "Plow Harness", "Bale Twine", "Scarecrow Post", "Scarecrow Ropes", "Clothespins", "Washin' Line", "Fair Stocks", "The Pillory", "Breedin' Wheel",
+  "Windmill Sails", "Kissin' Gate", "The Fence", "Collection Bench", "Auction Block"];
 // slot → where it can go and which game item it is: the first that this game has; the pattern is a fallback
 const GEAR_SLOTS = {
   plug:     { groups: ["ItemButt"], names: ["InflVibeButtPlug", "BlackButtPlug", "ButtPlug", "ButtPump"], re: /ButtPlug|Plug/, color: "#2B2B2B" },
@@ -143,6 +147,8 @@ const GEAR_SLOTS = {
   lips:     { groups: ["ItemMouth", "ItemMouth2", "ItemMouth3"], names: ["LipGag"], re: /LipGag/, color: ["#E0607F", "#7A2B47", "#7A2B47"] },
   torso:    { groups: ["ItemTorso", "ItemTorso2"], names: ["TentacleSuit", "HempRopeHarness"], re: /Harness/ },
   tag:      { groups: ["ItemNeckAccessories"], names: ["CollarNameTagLivestock", "CollarNameTag"], re: /NameTag/, needs: "ItemNeck" },
+  // the big pieces (Oct 15): the game's own devices, only the ones a piece names (no stray device off the list)
+  device:   { groups: ["ItemDevices"], names: ["WoodenStocks"], re: /^(WoodenStocks|SaddleStand|WoodenHorse|Net|Kennel|LowCage|KabeshiriWall|WheelFortune|LuckyWheel|X-Cross|BondageBench|TheDisplayFrame|MilkCan)$/ },
 };
 function gearAsset(group, slot, prefer) {
   const fam = P().AssetFamily, get = (n) => { try { return typeof window.AssetGet === "function" ? window.AssetGet(fam, group, n) : null; } catch (e) { return null; } };

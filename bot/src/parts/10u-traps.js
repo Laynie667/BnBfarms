@@ -109,7 +109,8 @@
       try { if (charFor(mn)) keepersAfter(mn, kind, before); toysAfter(mn); } catch(e){ warn("keepsake:", e); }
       try { if (charFor(mn) && TRAP_SOUND_END[kind]) sound(mn, TRAP_SOUND_END[kind]); } catch(e){}   // ...and when it lets go   // the album card; toys go still or back how they were (10y6-keepers.js)
       try { if (charFor(mn)) trapAfter(mn, kind, before); } catch(e){ warn("trap after:", e); }
-      try { if (charFor(mn)) symbioteAfterTrap(mn, kind); } catch(e){ warn("trap symbiote:", e); }   // somethin' waitin' in it (10v4-symbiotes.js)   // ranks, bets, bein' handed on (10y3-trap-ranks.js)   // (what they're left wearin': 10x-trap-extras.js)
+      try { if (charFor(mn)) symbioteAfterTrap(mn, kind); } catch(e){ warn("trap symbiote:", e); }
+      try { if (charFor(mn)) trapMess(mn, kind); } catch(e){ warn("trap mess:", e); }   // the mess its equipment leaves (10u7-traps-3.js)   // somethin' waitin' in it (10v4-symbiotes.js)   // ranks, bets, bein' handed on (10y3-trap-ranks.js)   // (what they're left wearin': 10x-trap-extras.js)
       trapFree(mn); saveLedger(); syncCompanions(true);
     };
     step();
@@ -312,8 +313,8 @@
         break;
       }
       case "tentacle": tentacleScene(mn, spot); break;
-      default: if (ANTHRO[kind]) anthroScene(mn, kind, spot);   // somebody's waitin' in this one (10u3-anthro-traps.js)
-               else if (MORE_TRAPS[kind]) MORE_TRAPS[kind](mn, spot);   // 10u4-more-traps.js
+      default: if (MORE_TRAPS[kind]) MORE_TRAPS[kind](mn, spot);   // 10u4-more-traps.js and on (a trap with its own way of runnin' comes first: the corn maze)
+               else if (ANTHRO[kind]) anthroScene(mn, kind, spot);   // somebody's waitin' in this one (10u3-anthro-traps.js)
     }
     saveLedger(); syncCompanions(true);
     return null;
@@ -371,7 +372,7 @@
         if (((wk === "tentacle" && parasiteKin(mn, now)) || Math.random() < Math.min(1, CFG.TENTACLE_CHANCE*nightX().water*dangerX(mn).chance*rankX(mn).water*(potionOn(mn, "tentaclemusk") ? CFG.MUSK_WATER_X : 1))) && !springTrap(mn, wk, here)){ r.trapAt = now; saveLedger(); }   // (three times as hungry after dark)
       }
     }
-    toyTick(); moreTrapTick(); newTrapTick(); trapExtrasTick(); farmGearTick(Date.now()); broodTick(); corruptionTick(); cursedTick(); keepersTick(); uddersTick();
+    toyTick(); moreTrapTick(); newTrapTick(); mazeTick(); trapExtrasTick(); farmGearTick(Date.now()); broodTick(); corruptionTick(); cursedTick(); keepersTick(); uddersTick();
   }
 
   // ── toys that do things on their own ───────────────────────

@@ -96,14 +96,14 @@ export const MORE2 = {
   },
   CALL_STUD: [
     "🔥 %name% is in heat %where% and can't keep still. They're askin' for a stud, sugar, and you're on the list.",
-    "🔥 Heat call: %name%, %where%, rump up and achin'. You signed up for this.",
-    "🔥 %name% is ripe and callin' %where%. Go see to them before somebody else does.",
+    "🔥 A heat call: %name%, %where%, rump up and achin' with it. You signed up for this.",
+    "🔥 %name% is ripe and in heat %where%. Go see to them before somebody else does.",
     "🔥 %name%'s in season %where%, and their call's gone out to every stud on the farm. Including you.",
   ],
   CALLED: [
-    "🔥 The call's out to %n% stud%s%. Find somewhere soft and wait, sugar.",
+    "🔥 The call's out to %n% stud%s% on the farm. Find somewhere soft and wait, sugar.",
     "🔥 %n% stud%s% will be catchin' your scent about now. Stay where you are.",
-    "🔥 Heard by %n% stud%s%. Get comfortable, sugar, and get presentin'.",
+    "🔥 %n% stud%s% heard that. Get comfortable, sugar, and get presentin'.",
   ],
   MATED: [
     "💞 %a% and %b% bump foreheads and that's that: mates for the day. The farm girl chalks a heart on the barn door.",

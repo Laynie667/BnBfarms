@@ -26,6 +26,7 @@
 //   bot  -> ext        bodyFarm { at, body }                  the farm's look for the drawn body (10y9e-farm-look.js)
 //   ext  -> bot        bodyFarmAsk { at }                     "send me the farm's look if it's newer than mine"
 //   ext  -> room       body     { on, body } / bodyAsk {}     a Companion's own drawn body, Companion to Companion
+//   ext  -> room       mess     { list } / messAsk {}         a Companion's own messes (what landed where), Companion to Companion
 //
 // Older Companions ignore the v2 types, and older bots never send them, so either side can update first.
 

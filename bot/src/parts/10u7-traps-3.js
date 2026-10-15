@@ -15,7 +15,7 @@
      "Farm can mark my body" on): cream, honey, syrups, slime, milk, mud, mash. ?wash takes it all off.
      %n name · %c the cock, or the other wrestler · %h the hole · %ml how much · %x a word (the syrup, the count)
   */
-  const MESS = { cream: "#FFF4DC", honey: "#E0A030", maple: "#8B4A1C", chocolate: "#4A2A18", strawberry: "#E04A6A",
+  const MESS = { cake: "#FFD8E6", cream: "#FFF4DC", honey: "#E0A030", maple: "#8B4A1C", chocolate: "#4A2A18", strawberry: "#E04A6A",
                  milk: "#F7F7F0", slime: "#5FAE3A", mud: "#6B4A2B", mash: "#D8C08A" };
   // which mess each piece of the farm's equipment leaves, and where (old traps and new)
   const MESS_BY_TRAP = {
@@ -26,9 +26,10 @@
   };
   function trapMess(mn, kind, what){
     try {
-      const m = what ? [what, ["face", "chest", "tummy"]] : MESS_BY_TRAP[kind];
+      let m = what ? [what, ["face", "chest", "tummy"]] : MESS_BY_TRAP[kind];
+      if (kind === "stocks" && Math.random() < 0.5) m = ["cake", m[1]];   // some of the pies are cake
       if (!m || !MESS[m[0]]) return false;
-      return bodyMark(mn, { splat: m[1], color: MESS[m[0]] });
+      return bodyMark(mn, { splat: m[1], color: MESS[m[0]], mess: m[0] });
     } catch(e){ return false; }
   }
   Object.assign(TRAP_KINDS, {

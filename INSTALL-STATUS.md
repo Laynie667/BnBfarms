@@ -5,7 +5,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 | Script | File in `dist/` | Where it runs | Current |
 |---|---|---|---|
-| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.33.0** |
+| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.33.1** |
 | Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.7.0** |
 | Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.2.1** |
 | Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **1.1.0** |
@@ -13,7 +13,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 | Map tools, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.4** |
 | Dairy | `farmhand-dairy.user.js` | the bot's PC | **1.1.0** |
 | Shows | `farmhand-shows.user.js` | the bot's PC | **1.1.0** |
-| Farmhand Companion | `farmhand-companion.user.js` | each player | **0.24.0** |
+| Farmhand Companion | `farmhand-companion.user.js` | each player | **0.25.0** |
 | Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.4** |
 
 ## Sending a watch report
@@ -23,6 +23,8 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 - Running the watcher on more than one game at once (the bot, yours, a tester's) lets Claude line them up into one timeline.
 
 ## Latest changes (newest first)
+
+- **Companion 0.25.0, bot 0.33.1: the farm's own messes, drawn on everybody.** Laynie: "we need our own splatters so we can get the look and textures of those right", then after six passes in the studio, "much much better... i love it and it needs to be integrated". Every time the farm marks you (a load, a trap's mess; *Farm can mark my body* on), your Companion keeps what landed where and draws it on you: the game's own splatter strands, cut apart and stamped, flipped, turned and narrowed, as deep as it piles up; tinted and textured for each substance (piss thin and long with a wet sheen, milk, honey and maple with streaks of light, chocolate with a hard shine, strawberry with seeds, slime wide and bubbly), smears for cream, cake (with frosting patches and lots of sprinkles), mud and mash; blended and smudged at the edges so layers run into each other. It sits on the skin under clothes and hands, keeps to the body, and moves with you when you kneel. Your Companion tells the room your messes and every other Companion draws them on you the same way (players without it still see the game's own splatters). ?wash clears them. Bot 0.33.1: a trap's mess says what it is, and the fair stocks throw cake half the time. The look is studio/web/splatters.js, shared by the studio and the Companion. **Companion and bot.**
 
 - **Bot 0.33.0, Companion 0.24.0: symbiotes spread, and you wear them.** Laynie: "id love the symbiotes to actually spread, with real clothes or gear~". (1) **Spreading**, only to somebody else who said ?symbiote on and hasn't one (limits rule): livin' latex by a touch (kiss, hug, cuddle, caress, grope, lick) once it's past its first stage; milk moss in the milk, to somebody who nurses from a host and makes milk; the nestling buds into whoever its host breeds. A quarter of the time, once in ten minutes per pair, and the new one starts small. (2) **Real clothes** (no second switch: ?symbiote on is the say-so): livin' latex grows from latex gloves, to latex socks and catsuit legs, to the catsuit to the neck with elbow gloves, to thigh-high latex heels, all glossy black; milk moss is a mossy green flower bra, then a crown of its flowers when it blooms. The nestling is inside them, nothin' to wear. A piece that goes where they're already wearin' somethin' takes that spot for as long as it's on, and their own goes back on after (new in the Companion: *clothing* pieces that borrow a spot). (3) Studio: the symbiotes' clothes by stage are presets too. (4) Splatters: the studio has a first pass of the farm's own painted messes (studio/web/splatters.js), for Laynie to mark up before the Companion draws them. **Bot and Companion.**
 

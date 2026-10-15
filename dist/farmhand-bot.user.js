@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.33.0
+// @version      0.33.1
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -1828,7 +1828,7 @@
   ];
 
   // bot/src/version.js
-  var VERSION = "0.33.0";
+  var VERSION = "0.33.1";
 
   // bot-parts:farmhand-bot-parts
   (function() {
@@ -15124,6 +15124,7 @@
       }
     });
     const MESS = {
+      cake: "#FFD8E6",
       cream: "#FFF4DC",
       honey: "#E0A030",
       maple: "#8B4A1C",
@@ -15153,9 +15154,10 @@
     };
     function trapMess(mn, kind, what) {
       try {
-        const m = what ? [what, ["face", "chest", "tummy"]] : MESS_BY_TRAP[kind];
+        let m = what ? [what, ["face", "chest", "tummy"]] : MESS_BY_TRAP[kind];
+        if (kind === "stocks" && Math.random() < 0.5) m = ["cake", m[1]];
         if (!m || !MESS[m[0]]) return false;
-        return bodyMark(mn, { splat: m[1], color: MESS[m[0]] });
+        return bodyMark(mn, { splat: m[1], color: MESS[m[0]], mess: m[0] });
       } catch (e) {
         return false;
       }

@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.24.0
+// @version      0.25.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -230,7 +230,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.24.0";
+  var VERSION = "0.25.0";
 
   // extension/src/config.js
   var BOT_MEMBER = 260239;
@@ -840,15 +840,15 @@ One of mods you are using is using an old version of SDK. It will work for now b
         const guess = /_Black\./.test(src) ? FarmBelly.FALLBACK.Black : /_Asian\./.test(src) ? FarmBelly.FALLBACK.Asian : FarmBelly.FALLBACK.White;
         if (!v) {
           BELLY.skin.set(key, "loading");
-          const img = new Image();
-          img.onload = () => {
+          const img2 = new Image();
+          img2.onload = () => {
             let c = guess;
             try {
               const at = FarmBelly.skinPatch(pose), cv = document.createElement("canvas");
               cv.width = 48;
               cv.height = 40;
               const g = cv.getContext("2d");
-              g.drawImage(img, -at[0], -at[1]);
+              g.drawImage(img2, -at[0], -at[1]);
               const d = g.getImageData(0, 0, 48, 40).data, good = [];
               for (let i = 0; i < d.length; i += 4) if (d[i + 3] > 200 && d[i] + d[i + 1] + d[i + 2] > 90 && Math.min(d[i], d[i + 1], d[i + 2]) < 238) good.push([d[i], d[i + 1], d[i + 2]]);
               if (good.length >= 40) {
@@ -861,17 +861,17 @@ One of mods you are using is using an old version of SDK. It will work for now b
             BELLY.skin.set(key, c);
             bellyDraw();
           };
-          img.onerror = () => BELLY.skin.set(key, guess);
-          img.src = src;
+          img2.onerror = () => BELLY.skin.set(key, guess);
+          img2.src = src;
         }
         return guess;
       }
       const MOULD = { ver: 0, lies: /* @__PURE__ */ new Set(), span: /* @__PURE__ */ new Map(), cover: /* @__PURE__ */ new Map(), items: /* @__PURE__ */ new Set(), mode: /* @__PURE__ */ new Map(), ext: /* @__PURE__ */ new Map(), img: /* @__PURE__ */ new Map(), prof: /* @__PURE__ */ new Map(), out: /* @__PURE__ */ new Map(), M: 150 };
       const mouldKey = (it) => it.Asset.Group.Name + "/" + it.Asset.Name;
-      const W4 = window;
+      const W5 = window;
       const mapSrc = host.mapSrc || ((src) => {
-        if (typeof W4.DrawGetImage !== "function") return src;
-        const lists = [typeof DrawCacheImage !== "undefined" ? DrawCacheImage : W4.DrawCacheImage, W4.DrawImageCache].filter((c) => c && typeof c.get === "function");
+        if (typeof W5.DrawGetImage !== "function") return src;
+        const lists = [typeof DrawCacheImage !== "undefined" ? DrawCacheImage : W5.DrawCacheImage, W5.DrawImageCache].filter((c) => c && typeof c.get === "function");
         if (!lists.length) return src;
         let seen = null;
         const kept = lists.map((c) => [c, Object.prototype.hasOwnProperty.call(c, "get"), c.get]);
@@ -880,7 +880,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
             if (seen == null) seen = k;
             return { isLoaded: () => false, data: void 0, complete: false };
           };
-          W4.DrawGetImage(src);
+          W5.DrawGetImage(src);
         } catch (e) {
         } finally {
           for (const [c, own, g] of kept) {
@@ -1157,15 +1157,15 @@ One of mods you are using is using an old version of SDK. It will work for now b
         return c;
       }
       const shadeSeen = /* @__PURE__ */ new WeakMap();
-      function bellyShade(img, sx, sy, ctx2) {
+      function bellyShade(img2, sx, sy, ctx2) {
         const b = ctx2.belly;
-        if (!b || !img) return null;
+        if (!b || !img2) return null;
         const fm = bellyForm(b.cv);
         if (!fm) return null;
-        const w = img.naturalWidth || img.width, h2 = img.naturalHeight || img.height;
+        const w = img2.naturalWidth || img2.width, h2 = img2.naturalHeight || img2.height;
         if (!w || !h2) return null;
         const key = Math.round(sx) + "," + Math.round(sy) + "|" + ctx2.sig + "|" + (ctx2.breast ? ctx2.breast.sig : "");
-        let e = shadeSeen.get(img);
+        let e = shadeSeen.get(img2);
         if (e && e.key === key) return e.out;
         const ox = Math.round(b.dx - sx), oy = Math.round(b.dy - sy), x0 = Math.max(0, ox), y0 = Math.max(0, oy), x1 = Math.min(w, ox + fm.w), y1 = Math.min(h2, oy + fm.h);
         let out = null;
@@ -1174,7 +1174,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
           c.width = w;
           c.height = h2;
           const g = c.getContext("2d", { willReadFrequently: true });
-          g.drawImage(img, 0, 0);
+          g.drawImage(img2, 0, 0);
           const part = g.getImageData(x0, y0, x1 - x0, y1 - y0), d = part.data;
           let any = false;
           let bm = null;
@@ -1204,7 +1204,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
             out = c;
           }
         }
-        shadeSeen.set(img, { key, out });
+        shadeSeen.set(img2, { key, out });
         return out;
       }
       function bellyRows(ctx2) {
@@ -1468,10 +1468,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
           let finish = null, seenNow = null, handFNow = null;
           try {
             const fit = C === S2.C ? fitNow() : null, br = C === S2.C ? breastNow() : null, real = cb;
-            const put = (name, img, x, y, o) => {
-              if (img && typeof img !== "string" && img.MX != null && o && o.TextureAlphaMask) o = Object.assign({}, o, { TextureAlphaMask: void 0 });
-              if (typeof img === "string" || !host.picture) return real[name](img, x, y, o);
-              const p = host.picture(img);
+            const put = (name, img2, x, y, o) => {
+              if (img2 && typeof img2 !== "string" && img2.MX != null && o && o.TextureAlphaMask) o = Object.assign({}, o, { TextureAlphaMask: void 0 });
+              if (typeof img2 === "string" || !host.picture) return real[name](img2, x, y, o);
+              const p = host.picture(img2);
               if (p) return real[name](p.src, x + p.dx, y + p.dy, o);
             };
             if (fit && cb && typeof cb.drawImage === "function") {
@@ -1719,16 +1719,16 @@ One of mods you are using is using an old version of SDK. It will work for now b
                         cols.push(d[o], d[o + 1], d[o + 2]);
                       } else if (r0 >= 0) break;
                     }
-                    const ok = r0 >= 0 && r1 - r0 >= 1.5 && r1 - r0 <= R * 0.35;
-                    hit.push(ok ? [r0, r1] : null);
+                    const ok2 = r0 >= 0 && r1 - r0 >= 1.5 && r1 - r0 <= R * 0.35;
+                    hit.push(ok2 ? [r0, r1] : null);
                     all++;
-                    if (ok) {
+                    if (ok2) {
                       hits++;
                       runs.push(r1 - r0);
                     }
                     if (uy < -0.3) {
                       tAll++;
-                      if (ok) top++;
+                      if (ok2) top++;
                     }
                   }
                   for (let a = 0; a < FRAME_N; a++) if (!hit[a]) {
@@ -1860,7 +1860,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
                   }
                   g.drawImage(B.mask, MX + B.mx - x, MY + B.my - y);
                   g.globalCompositeOperation = "source-over";
-                  const ho = herOutline(B), W5 = fm.width, rgb2 = (q2, k) => "rgb(" + q2.map((u) => Math.max(0, Math.min(255, Math.round(u * k)))).join(",") + ")";
+                  const ho = herOutline(B), W6 = fm.width, rgb2 = (q2, k) => "rgb(" + q2.map((u) => Math.max(0, Math.min(255, Math.round(u * k)))).join(",") + ")";
                   for (const hv of ho) {
                     const sv = fm.sides.find((q2) => q2.sd === hv.sd);
                     if (!sv) continue;
@@ -1869,7 +1869,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
                     for (let k = 0; k <= FRAME_N; k++) {
                       const a = k % FRAME_N, ta = a / FRAME_N * Math.PI * 2, on = !!sv.hit[a] && hv.edge[a] > 0 && Math.sin(ta) < 0.3 && Math.cos(ta) > -0.6;
                       if (on) {
-                        const t = a / FRAME_N * Math.PI * 2, ux = Math.cos(t) * hv.sd, uy = Math.sin(t), rr = hv.edge[a] - W5 * 0.45;
+                        const t = a / FRAME_N * Math.PI * 2, ux = Math.cos(t) * hv.sd, uy = Math.sin(t), rr = hv.edge[a] - W6 * 0.45;
                         (cur || (cur = [])).push([MX + hv.cx - x + ux * rr, MY + hv.cy - y + uy * rr]);
                       } else if (cur) {
                         segs.push(cur);
@@ -1888,26 +1888,26 @@ One of mods you are using is using an old version of SDK. It will work for now b
                     g.lineCap = "round";
                     g.lineJoin = "round";
                     for (const at of sv.att || []) {
-                      const t = at.a / FRAME_N * Math.PI * 2, ux = Math.cos(t) * hv.sd, uy = Math.sin(t), rr = hv.edge[at.a] - W5 * 0.45;
+                      const t = at.a / FRAME_N * Math.PI * 2, ux = Math.cos(t) * hv.sd, uy = Math.sin(t), rr = hv.edge[at.a] - W6 * 0.45;
                       segs.push([[MX + at.x, MY + at.y], [MX + hv.cx - x + ux * rr, MY + hv.cy - y + uy * rr]]);
                     }
                     for (const pts of segs) {
                       if (pts.length < 2) continue;
                       path(pts);
                       g.strokeStyle = rgb2(fm.col, 0.55);
-                      g.lineWidth = W5 + 1.5;
+                      g.lineWidth = W6 + 1.5;
                       g.stroke();
                       path(pts);
                       g.strokeStyle = rgb2(fm.col, 1);
-                      g.lineWidth = W5;
+                      g.lineWidth = W6;
                       g.stroke();
                       path(pts.map((p, i) => {
                         const q2 = pts[Math.min(pts.length - 1, i + 1)], pp = pts[Math.max(0, i - 1)], dx = q2[0] - pp[0], dy = q2[1] - pp[1], L = Math.hypot(dx, dy) || 1;
-                        return [p[0] - dy / L * W5 * 0.18, p[1] + dx / L * W5 * 0.18];
+                        return [p[0] - dy / L * W6 * 0.18, p[1] + dx / L * W6 * 0.18];
                       }));
                       g.globalAlpha = 0.55;
                       g.strokeStyle = rgb2(fm.hi, 1);
-                      g.lineWidth = Math.max(1, W5 * 0.22);
+                      g.lineWidth = Math.max(1, W6 * 0.22);
                       g.stroke();
                       g.globalAlpha = 1;
                     }
@@ -2390,7 +2390,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
                         return a[a.length >> 1];
                       });
                       const rx0 = Math.max(1, Math.round(midX - G.dx - G.ro - 30)), rx1 = Math.min(CW - 2, Math.round(midX + G.dx + G.ro + 30)), ry0 = Math.max(1, Math.round(uyc + G.y1)), ry1 = Math.min(CH - 2, Math.round(uyc + G.y3 + 90));
-                      const RW = rx1 - rx0 + 1, RH = ry1 - ry0 + 1, clean2 = new Uint8Array(RW * RH);
+                      const RW = rx1 - rx0 + 1, RH = ry1 - ry0 + 1, clean3 = new Uint8Array(RW * RH);
                       let nC = 0, sD = 0, bl = 0;
                       for (let yy = ry0; yy <= ry1; yy++) for (let xx = rx0; xx <= rx1; xx++) {
                         const p = (yy * CW + xx) * 4;
@@ -2399,7 +2399,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
                         if (Math.abs(spL[p] / t - bn[0]) + Math.abs(spL[p + 1] / t - bn[1]) + Math.abs(spL[p + 2] / t - bn[2]) > 0.05) continue;
                         const gr = Math.abs(lum(spL, p + 4) - lum(spL, p - 4)) + Math.abs(lum(spL, p + CW * 4) - lum(spL, p - CW * 4));
                         if (gr > 9) continue;
-                        clean2[(yy - ry0) * RW + (xx - rx0)] = 1;
+                        clean3[(yy - ry0) * RW + (xx - rx0)] = 1;
                         nC++;
                         sD += Math.abs(lum(sp, p) - lum(spL, p));
                         bl += lum(spL, p);
@@ -2411,7 +2411,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
                       for (let yy = 0; yy < RH; yy++) {
                         let row = 0;
                         for (let xx = 0; xx < RW; xx++) {
-                          row += clean2[yy * RW + xx];
+                          row += clean3[yy * RW + xx];
                           I[(yy + 1) * (RW + 1) + xx + 1] = I[yy * (RW + 1) + xx + 1] + row;
                         }
                       }
@@ -2420,11 +2420,11 @@ One of mods you are using is using an old version of SDK. It will work for now b
                         return (I[d2 * (RW + 1) + c2] - I[b * (RW + 1) + c2] - I[d2 * (RW + 1) + a] + I[b * (RW + 1) + a]) / ((2 * r + 1) * (2 * r + 1));
                       };
                       const srcs = [];
-                      for (let yy = S3; yy < RH - S3; yy += 3) for (let xx = S3; xx < RW - S3; xx += 3) if (clean2[yy * RW + xx] && box(xx, yy, S3) > 0.8) srcs.push([xx + rx0, yy + ry0]);
+                      for (let yy = S3; yy < RH - S3; yy += 3) for (let xx = S3; xx < RW - S3; xx += 3) if (clean3[yy * RW + xx] && box(xx, yy, S3) > 0.8) srcs.push([xx + rx0, yy + ry0]);
                       if (srcs.length < 4) return null;
                       return { S: S3, spL, srcs, bn, base: bl / nC, det, cleanAt: (x2, y4) => {
                         const xx = Math.round(x2) - rx0, yy = Math.round(y4) - ry0;
-                        return xx >= 0 && yy >= 0 && xx < RW && yy < RH && clean2[yy * RW + xx] === 1;
+                        return xx >= 0 && yy >= 0 && xx < RW && yy < RH && clean3[yy * RW + xx] === 1;
                       } };
                     })();
                     if (texOf) {
@@ -3298,15 +3298,15 @@ One of mods you are using is using an old version of SDK. It will work for now b
     return skinGuess(src, hex);
   }
   function skinLoad(key, src, hex) {
-    const img = new Image();
-    img.onload = () => {
+    const img2 = new Image();
+    img2.onload = () => {
       let c = skinGuess(src, hex);
       try {
         const bw = 48, bh = 40, cv = document.createElement("canvas");
         cv.width = bw;
         cv.height = bh;
         const g = cv.getContext("2d"), at = skinPatch(bellyPose(src));
-        g.drawImage(img, -at[0], -at[1]);
+        g.drawImage(img2, -at[0], -at[1]);
         const d = g.getImageData(0, 0, bw, bh).data, good = [];
         for (let i = 0; i < d.length; i += 4) if (d[i + 3] > 200 && d[i] + d[i + 1] + d[i + 2] > 90 && Math.min(d[i], d[i + 1], d[i + 2]) < 238) good.push([d[i], d[i + 1], d[i + 2]]);
         if (good.length >= 40) {
@@ -3322,8 +3322,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
       } catch (e) {
       }
     };
-    img.onerror = () => skinSeen.set(key, skinGuess(src, hex));
-    img.src = src;
+    img2.onerror = () => skinSeen.set(key, skinGuess(src, hex));
+    img2.src = src;
   }
   var hooked = false;
   var sdk = null;
@@ -4316,8 +4316,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
       }) : null,
       h("div", { style: { marginTop: "8px" } }, muted("Got an outfit studio of your own? Bring its settings over:")),
       h("div", { style: { marginTop: "4px" } }, btn("Get my studio's settings", () => {
-        drawnBodyFromStudio(say).then((ok) => {
-          if (ok) ctx2.setPref("drawnBodyAt", Date.now());
+        drawnBodyFromStudio(say).then((ok2) => {
+          if (ok2) ctx2.setPref("drawnBodyAt", Date.now());
         });
       }, true)),
       muted("Works while the studio is running on this computer: it takes what you last saved there (Save the breasts, Save all the fits)."),
@@ -6144,7 +6144,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   function spotsCard(ctx2) {
     const sp = Object.entries(ctx2.s.spots || {});
     const nm = () => (ctx2.ui.spotName || "").trim().toLowerCase();
-    const ok = () => /^[a-z][a-z0-9_-]{1,19}$/.test(nm()) || (ctx2.hint("Give the spot a one-word name, like speaker-barn, trough-1 or glory-1."), false);
+    const ok2 = () => /^[a-z][a-z0-9_-]{1,19}$/.test(nm()) || (ctx2.hint("Give the spot a one-word name, like speaker-barn, trough-1 or glory-1."), false);
     return card(
       title("Spots"),
       muted("home \xB7 speaker-\u2026 (the bot talks from these) \xB7 trough-\u2026 \xB7 water-\u2026 \xB7 glory-1 and glory-1-visitor \xB7 placard-\u2026"),
@@ -6164,11 +6164,11 @@ One of mods you are using is using an old version of SDK. It will work for now b
         "div",
         null,
         btn("Click it on the map", () => {
-          if (!ok()) return;
+          if (!ok2()) return;
           const n = nm();
           ctx2.api.pickTiles(1, "spot '" + n + "'", ([p]) => ctx2.send("spot place " + n + " " + p.X + " " + p.Y));
         }, true),
-        btn("Set where I stand", () => ok() && ctx2.send("spot set " + nm()))
+        btn("Set where I stand", () => ok2() && ctx2.send("spot set " + nm()))
       ),
       // clearin' old ones: everything with a name startin' like the box (speaker- clears every speaker), or all, with a second press
       sp.length ? h(
@@ -7373,12 +7373,12 @@ One of mods you are using is using an old version of SDK. It will work for now b
     const outfit = JSON.parse(window.LZString.decompressFromBase64(String(data)) || "null");
     if (!outfit || !Array.isArray(outfit.items)) return { ok: false, why: "that outfit didn't come through right" };
     const cur = window.ServerAppearanceBundle(P().Appearance), stuck = lockedGroups();
-    const mine2 = new Set(outfit.items.map((i) => i.Group));
+    const mine3 = new Set(outfit.items.map((i) => i.Group));
     const next = cur.filter((b) => {
       if (stuck.has(b.Group)) return true;
       const g = groupOf(b.Group);
       if (isClothes(g)) return false;
-      return !mine2.has(b.Group);
+      return !mine3.has(b.Group);
     });
     let worn = 0, locks = 0, skipped = 0;
     const added = [];
@@ -7485,8 +7485,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
     if (Array.isArray(m.splat) && m.splat.length) {
       const col = typeof m.color === "string" && /^#[0-9a-fA-F]{6}$/.test(m.color) ? m.color.toUpperCase() : null;
       const colOf = (b) => typeof b.Color === "string" && /^#/.test(b.Color) ? b.Color.toUpperCase() : null;
-      const mine2 = next.filter((b) => b.Name === "Splatters" && SPLAT_GROUPS.includes(b.Group));
-      let it = mine2.find((b) => colOf(b) === col);
+      const mine3 = next.filter((b) => b.Name === "Splatters" && SPLAT_GROUPS.includes(b.Group));
+      let it = mine3.find((b) => colOf(b) === col);
       if (!it) {
         const g = SPLAT_GROUPS.find((x) => !has(x) && groupOf2(x));
         if (g) {
@@ -7494,7 +7494,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
           if (col) it.Color = col;
           next.push(it);
           mem.splatGroup = g;
-        } else it = mine2[0];
+        } else it = mine3[0];
       }
       if (it) {
         it.Property = Object.assign({}, it.Property || {});
@@ -7905,8 +7905,787 @@ One of mods you are using is using an old version of SDK. It will work for now b
     return { ok: true, did: ["dress"] };
   }
 
-  // extension/src/cues.js
+  // studio/web/splatters.js
+  (function(root) {
+    "use strict";
+    function rng(seed) {
+      let a = seed >>> 0 || 1;
+      return () => {
+        a |= 0;
+        a = a + 1831565813 | 0;
+        let t = Math.imul(a ^ a >>> 15, 1 | a);
+        t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+        return ((t ^ t >>> 14) >>> 0) / 4294967296;
+      };
+    }
+    const KINDS = {
+      // cum matches the game's own Splatters (Laynie: "match the color and translucency of the games own splatters"): read off its
+      // pictures, a cool white, #E3E4E5 in the middle, #C2C3C5 in the shade, #FBFBFB at the shine, solid in the middle, soft at the edges
+      cum: { style: "run", base: "#E6E7E8", edge: "#B4B6B9", gloss: "#FDFDFD", alpha: 0.97, run: 1, width: 1, ropes: 1, beads: 0.6 },
+      cumThick: { style: "run", base: "#E1E2E3", edge: "#AEB0B3", gloss: "#FDFDFD", alpha: 1, run: 0.7, width: 1.4, ropes: 0.6, beads: 0.8 },
+      piss: { style: "run", tint: "#F6D23A", stampAlpha: 0.55, narrow: [0.45, 0.75], long: 1.35, turn: 0.3, texture: "sheen", base: "#F0D040", edge: "#C9A422", gloss: "#FFF6C0", alpha: 0.34, run: 1.6, width: 0.7, beads: 0.3, droplets: 1.5 },
+      milk: { style: "run", tint: "#FFFFFF", stampAlpha: 0.8, narrow: [0.6, 0.9], long: 1.2, turn: 0.4, texture: "milky", base: "#FBFBF6", edge: "#DADAD0", gloss: "#FFFFFF", alpha: 0.72, run: 1.4, width: 0.8, beads: 0.4, droplets: 0.8 },
+      honey: { style: "run", tint: "#E9A21C", stampAlpha: 0.88, narrow: [1, 1.35], long: 1.15, turn: 0.25, texture: "streaks", base: "#E09A18", edge: "#9C6208", gloss: "#FFE7A3", alpha: 0.74, run: 1.1, width: 1.2, beads: 0.9 },
+      maple: { style: "run", tint: "#9A521A", stampAlpha: 0.9, narrow: [0.9, 1.25], long: 1.2, turn: 0.3, texture: "streaks", base: "#94501A", edge: "#56290A", gloss: "#F0B47A", alpha: 0.78, run: 1.3, width: 1, beads: 0.7 },
+      chocolate: { style: "run", tint: "#5A3018", narrow: [1, 1.3], long: 1, turn: 0.4, texture: "shine", base: "#4A2814", edge: "#251208", gloss: "#B98A6A", alpha: 0.95, run: 1, width: 1.2, beads: 0.8 },
+      strawberry: { style: "run", tint: "#E0304E", stampAlpha: 0.9, narrow: [0.9, 1.2], long: 1.1, turn: 0.35, texture: "seeds", base: "#D52F4C", edge: "#951628", gloss: "#FFB3C0", alpha: 0.8, run: 1.2, width: 1, beads: 0.7, seeds: "#F6E27A" },
+      slime: { style: "smear", tint: "#79D04F", stampAlpha: 0.7, narrow: [1.2, 1.6], long: 0.9, turn: 1.2, texture: "bubbles", stampToo: true, base: "#6CC24A", edge: "#3A8226", gloss: "#D9FFC8", alpha: 0.6, run: 1, width: 1.1, beads: 0.6, bubbles: true, also: "run" },
+      cream: { style: "smear", base: "#FFF6E4", edge: "#E2D4B4", gloss: "#FFFFFF", alpha: 0.96, run: 0.35, width: 1.2 },
+      cake: { style: "smear", smudge: 0.3, sprinkleN: 30, base: "#FFD8E6", edge: "#E3A9BC", gloss: "#FFFFFF", alpha: 0.97, run: 0.2, width: 1.3, patches: "#FFFFFF", crumbs: ["#E8C27A", "#D9A85B", "#C98F45", "#7A4A2A"], sprinkles: ["#FF5C8A", "#5CC8FF", "#FFE05C", "#7CE07C"] },
+      mud: { style: "smear", base: "#6B4A2B", edge: "#45301A", gloss: "#9C7A55", alpha: 0.9, run: 0.5, width: 1.2, specks: "#3A2614", also: "run" },
+      mash: { style: "smear", base: "#D9C28C", edge: "#B09860", gloss: "#F5E8C2", alpha: 0.95, run: 0.25, width: 1.2, specks: "#A88A4A" }
+    };
+    function ribbon(ctx2, pts) {
+      const L = [], R = [];
+      for (let i = 0; i < pts.length; i++) {
+        const p = pts[i], q2 = pts[Math.min(i + 1, pts.length - 1)], o = pts[Math.max(i - 1, 0)];
+        let dx = q2[0] - o[0], dy = q2[1] - o[1];
+        const l = Math.hypot(dx, dy) || 1;
+        dx /= l;
+        dy /= l;
+        L.push([p[0] - dy * p[2] / 2, p[1] + dx * p[2] / 2]);
+        R.push([p[0] + dy * p[2] / 2, p[1] - dx * p[2] / 2]);
+      }
+      ctx2.beginPath();
+      ctx2.moveTo(L[0][0], L[0][1]);
+      for (let i = 1; i < L.length; i++) {
+        const m = [(L[i - 1][0] + L[i][0]) / 2, (L[i - 1][1] + L[i][1]) / 2];
+        ctx2.quadraticCurveTo(L[i - 1][0], L[i - 1][1], m[0], m[1]);
+      }
+      ctx2.lineTo(L[L.length - 1][0], L[L.length - 1][1]);
+      ctx2.lineTo(R[R.length - 1][0], R[R.length - 1][1]);
+      for (let i = R.length - 2; i >= 0; i--) {
+        const m = [(R[i + 1][0] + R[i][0]) / 2, (R[i + 1][1] + R[i][1]) / 2];
+        ctx2.quadraticCurveTo(R[i + 1][0], R[i + 1][1], m[0], m[1]);
+      }
+      ctx2.lineTo(R[0][0], R[0][1]);
+      ctx2.closePath();
+      return { L, R };
+    }
+    function puddle(ctx2, r, x, y, w, h2, rough) {
+      const n = 14, pts = [];
+      for (let i = 0; i < n; i++) {
+        const a = i / n * Math.PI * 2, k = 1 + (r() - 0.5) * rough;
+        pts.push([x + Math.cos(a) * w * k, y + Math.sin(a) * h2 * k]);
+      }
+      ctx2.beginPath();
+      for (let i = 0; i <= n; i++) {
+        const p = pts[i % n], q2 = pts[(i + 1) % n], m = [(p[0] + q2[0]) / 2, (p[1] + q2[1]) / 2];
+        if (i === 0) ctx2.moveTo(m[0], m[1]);
+        else ctx2.quadraticCurveTo(p[0], p[1], m[0], m[1]);
+      }
+      ctx2.closePath();
+    }
+    function wet(ctx2, K, a) {
+      ctx2.globalAlpha = K.alpha * (a || 1);
+      ctx2.fillStyle = K.base;
+      ctx2.fill();
+      ctx2.globalAlpha = Math.min(1, K.alpha * 0.8);
+      ctx2.strokeStyle = K.edge;
+      ctx2.lineWidth = 0.9;
+      ctx2.stroke();
+    }
+    function shine(ctx2, K, side, from, to) {
+      ctx2.globalAlpha = 0.7;
+      ctx2.strokeStyle = K.gloss;
+      ctx2.lineWidth = 1.1;
+      ctx2.lineCap = "round";
+      ctx2.beginPath();
+      for (let i = from; i < to; i++) {
+        const p = side[i];
+        if (i === from) ctx2.moveTo(p[0] + 1.2, p[1]);
+        else ctx2.lineTo(p[0] + 1.2, p[1]);
+      }
+      ctx2.stroke();
+    }
+    function strandPts(r, x, y, len, w, ang) {
+      const n = 12, pts = [], beads = [r(), r(), r()].map((v) => [v, 0.6 + r() * 0.9]);
+      let px = x, py = y, a = ang;
+      for (let i = 0; i <= n; i++) {
+        const t = i / n;
+        a += (r() - 0.5) * 0.35;
+        px += Math.sin(a) * len / n;
+        py += Math.cos(a) * len / n;
+        let ww = w * (0.55 + 0.25 * (1 - t));
+        for (const [bt, bs] of beads) ww += w * bs * Math.exp(-Math.pow((t - bt) / 0.07, 2));
+        pts.push([px, py, Math.max(1, ww)]);
+      }
+      return pts;
+    }
+    function strandDraw(ctx2, K, pts) {
+      const wide = pts.map((p) => [p[0], p[1], p[2] + 1.8]);
+      ribbon(ctx2, wide);
+      ctx2.globalAlpha = Math.min(1, K.alpha + 0.05);
+      ctx2.fillStyle = K.edge;
+      ctx2.fill();
+      const side = ribbon(ctx2, pts);
+      ctx2.globalAlpha = K.alpha;
+      ctx2.fillStyle = K.base;
+      ctx2.fill();
+      ctx2.globalAlpha = 0.85;
+      ctx2.strokeStyle = K.gloss;
+      ctx2.lineWidth = 1;
+      ctx2.lineCap = "round";
+      ctx2.beginPath();
+      side.L.forEach((p, i) => {
+        const q2 = pts[i];
+        const x = p[0] * 0.35 + q2[0] * 0.65, y = p[1] * 0.35 + q2[1] * 0.65;
+        if (i === 0) ctx2.moveTo(x, y);
+        else ctx2.lineTo(x, y);
+      });
+      ctx2.stroke();
+    }
+    function strand(ctx2, r, K, x, y, size, ang0) {
+      const len = size * (0.25 + r() * 0.55) * (0.6 + K.run * 0.4), w = Math.max(1.6, size * 0.032 * K.width * (0.7 + r() * 0.6)), ang = ang0 !== void 0 ? ang0 : (r() - 0.5) * 0.9;
+      const pts = strandPts(r, x, y, len, w, ang);
+      if (r() < 0.3) {
+        const cut = 4 + Math.floor(r() * 4);
+        strandDraw(ctx2, K, pts.slice(0, cut));
+        strandDraw(ctx2, K, pts.slice(cut + 2));
+      } else strandDraw(ctx2, K, pts);
+      {
+        const e = pts[pts.length - 1], d = w * (1.1 + r() * 0.6);
+        strandDraw(ctx2, K, [[e[0], e[1] - d * 0.4, d], [e[0], e[1], d * 1.25], [e[0], e[1] + d * 0.4, d]]);
+      }
+      for (let b = 0, nb = r() < 0.6 ? 1 + (r() < 0.35 ? 1 : 0) : 0; b < nb; b++) {
+        const p = pts[2 + Math.floor(r() * 7)], side = r() < 0.5 ? -1 : 1;
+        strandDraw(ctx2, K, strandPts(r, p[0], p[1], len * (0.3 + r() * 0.35), w * 0.8, ang + side * (0.4 + r() * 0.5)));
+      }
+      for (let d = 0, nd = Math.floor(r() * 3); d < nd; d++) {
+        const p = pts[Math.floor(r() * pts.length)], bx = p[0] + (r() - 0.5) * size * 0.5, by = p[1] + (r() - 0.5) * size * 0.3, bw = w * (0.8 + r() * 0.6);
+        strandDraw(ctx2, K, [[bx, by - bw * 0.5, bw], [bx, by, bw * 1.2], [bx, by + bw * 0.5, bw]]);
+      }
+    }
+    function run(ctx2, r, K, x, y, len, w) {
+      const steps = 14, pts = [], wob = (r() - 0.5) * 6, swell = r() * Math.PI * 2;
+      let px = x;
+      for (let i = 0; i <= steps; i++) {
+        const t = i / steps;
+        px += (r() - 0.5) * 1.4 + wob * 0.06;
+        const ww = w * (0.55 + 0.35 * Math.sin(t * 6 + swell) * (r() * 0.5 + 0.5)) * (1 - t * 0.25);
+        pts.push([px, y + t * len, Math.max(1.2, ww)]);
+      }
+      const side = ribbon(ctx2, pts);
+      wet(ctx2, K);
+      shine(ctx2, K, side.L, 1, Math.floor(steps * 0.7));
+      const end = pts[pts.length - 1];
+      if (r() < 0.55) {
+        puddle(ctx2, r, end[0], end[1] + w * 0.15, w * (0.9 + r() * 0.6), w * (0.45 + r() * 0.25), 0.35);
+        wet(ctx2, K);
+      } else {
+        ctx2.beginPath();
+        ctx2.ellipse(end[0], end[1] + w * 0.25, w * 0.55, w * 0.75, 0, 0, Math.PI * 2);
+        wet(ctx2, K);
+      }
+      ctx2.globalAlpha = 0.85;
+      ctx2.fillStyle = K.gloss;
+      ctx2.beginPath();
+      ctx2.arc(end[0] - w * 0.2, end[1], Math.max(0.7, w * 0.12), 0, Math.PI * 2);
+      ctx2.fill();
+    }
+    function splash(ctx2, r, K, x, y, size, amount) {
+      const w = size * (0.11 + r() * 0.12) * K.width, h2 = w * (0.35 + r() * 0.2), ang = (r() - 0.5) * 1.2;
+      ctx2.save();
+      ctx2.translate(x, y);
+      ctx2.rotate(ang);
+      puddle(ctx2, r, 0, 0, w, h2, 0.55);
+      ctx2.restore();
+      wet(ctx2, K);
+      const n = 1 + Math.round(r() * 2.2 * Math.min(1.4, K.run));
+      for (let i = 0; i < n; i++) {
+        const sx = x + (r() - 0.5) * w * 1.2, len = size * (0.4 + r() * 1.3) * K.run * (0.8 + amount * 0.25), sw = Math.max(2, w * (0.3 + r() * 0.3));
+        run(ctx2, r, K, sx, y + h2 * 0.3, len, sw);
+      }
+    }
+    function rope(ctx2, r, K, x, y, size) {
+      const a = (r() - 0.5) * 1.4 + (r() < 0.5 ? 0 : Math.PI), l = size * (0.5 + r() * 0.8), pts = [];
+      for (let i = 0; i <= 10; i++) {
+        const t = i / 10;
+        pts.push([x + Math.cos(a) * l * t, y + Math.sin(a) * l * t * 0.5 + Math.sin(t * Math.PI) * 6, 1.4 + Math.sin(t * Math.PI) * size * 0.05 * K.width]);
+      }
+      const side = ribbon(ctx2, pts);
+      wet(ctx2, K);
+      shine(ctx2, K, side.L, 2, 8);
+      if (r() < 0.6) {
+        const p = pts[3 + Math.floor(r() * 5)];
+        run(ctx2, r, K, p[0], p[1], size * (0.3 + r() * 0.6) * K.run, Math.max(2, p[2] * 1.3));
+      }
+    }
+    function smear(ctx2, r, K, x, y, size) {
+      const a = (r() - 0.5) * 1.8, l = size * (0.5 + r() * 0.8), w0 = size * (0.18 + r() * 0.14) * K.width, pts = [];
+      for (let i = 0; i <= 12; i++) {
+        const t = i / 12;
+        pts.push([x + Math.cos(a) * l * (t - 0.5) + (r() - 0.5) * 2, y + Math.sin(a) * l * (t - 0.5) * 0.6 + (r() - 0.5) * 2, w0 * (0.4 + Math.sin(t * Math.PI) * 0.8) * (0.8 + r() * 0.4)]);
+      }
+      const side = ribbon(ctx2, pts);
+      wet(ctx2, K);
+      ctx2.globalAlpha = 0.45;
+      ctx2.strokeStyle = K.gloss;
+      ctx2.lineWidth = 0.9;
+      for (let s = 0; s < 3; s++) {
+        const off = (r() - 0.5) * w0 * 0.6;
+        ctx2.beginPath();
+        pts.forEach((p, i) => i ? ctx2.lineTo(p[0], p[1] + off) : ctx2.moveTo(p[0], p[1] + off));
+        ctx2.stroke();
+      }
+      if (K.patches) {
+        ctx2.fillStyle = K.patches;
+        for (let s = 0; s < 6; s++) {
+          const p = (r() < 0.5 ? side.L : side.R)[Math.floor(r() * side.L.length)];
+          ctx2.globalAlpha = 0.9;
+          puddle(ctx2, r, p[0], p[1], 2 + r() * w0 * 0.35, 1.5 + r() * w0 * 0.2, 0.6);
+          ctx2.fill();
+        }
+      }
+      if (r() < K.run) {
+        const p = pts[Math.floor(r() * pts.length)];
+        run(ctx2, r, K, p[0], p[1] + p[2] * 0.3, size * (0.3 + r() * 0.7) * K.run, Math.max(2.5, p[2] * 0.4));
+      }
+    }
+    const STAMP_FILES = ["Chest1", "Chest2", "Chest3", "Chest4", "Face1", "Face2", "Face3", "Forehead1", "Forehead2", "Forehead3", "Tummy1", "Tummy2", "Tummy3", "Tummy4"];
+    const STAMPS = [];
+    function cutStamps(img2) {
+      const c = document.createElement("canvas");
+      c.width = img2.width;
+      c.height = img2.height;
+      const x = c.getContext("2d");
+      x.drawImage(img2, 0, 0);
+      const W5 = c.width, H = c.height, d = x.getImageData(0, 0, W5, H).data, seen = new Uint8Array(W5 * H), out = [];
+      for (let i = 0; i < W5 * H; i++) {
+        if (seen[i] || d[i * 4 + 3] < 16) continue;
+        const q2 = [i];
+        seen[i] = 1;
+        let x0 = W5, y0 = H, x1 = 0, y1 = 0, n = 0;
+        while (q2.length) {
+          const p = q2.pop(), px = p % W5, py = p / W5 | 0;
+          n++;
+          if (px < x0) x0 = px;
+          if (px > x1) x1 = px;
+          if (py < y0) y0 = py;
+          if (py > y1) y1 = py;
+          for (let dy = -2; dy <= 2; dy++) for (let dx = -2; dx <= 2; dx++) {
+            const nx = px + dx, ny = py + dy;
+            if (nx < 0 || ny < 0 || nx >= W5 || ny >= H) continue;
+            const k = ny * W5 + nx;
+            if (!seen[k] && d[k * 4 + 3] >= 16) {
+              seen[k] = 1;
+              q2.push(k);
+            }
+          }
+        }
+        if (n < 25) continue;
+        const s2 = document.createElement("canvas");
+        s2.width = x1 - x0 + 3;
+        s2.height = y1 - y0 + 3;
+        s2.getContext("2d").drawImage(c, x0 - 1, y0 - 1, s2.width, s2.height, 0, 0, s2.width, s2.height);
+        out.push(s2);
+      }
+      return out;
+    }
+    async function loadStamps(base) {
+      if (STAMPS.length) return STAMPS.length;
+      for (const n of STAMP_FILES) {
+        try {
+          const img2 = new Image();
+          img2.crossOrigin = "anonymous";
+          await new Promise((ok2, no) => {
+            img2.onload = ok2;
+            img2.onerror = no;
+            setTimeout(no, 8e3);
+            img2.src = (base || "") + "Assets/Female3DCG/BodyMarkings/Splatters_" + n + ".png";
+          });
+          STAMPS.push(...cutStamps(img2));
+        } catch (e) {
+        }
+      }
+      return STAMPS.length;
+    }
+    const tintCache = /* @__PURE__ */ new Map();
+    function tinted(st2, K) {
+      if (!K.tint) return st2;
+      const key = STAMPS.indexOf(st2) + K.tint;
+      if (tintCache.has(key)) return tintCache.get(key);
+      const c = document.createElement("canvas");
+      c.width = st2.width;
+      c.height = st2.height;
+      const x = c.getContext("2d");
+      x.drawImage(st2, 0, 0);
+      x.globalCompositeOperation = "multiply";
+      x.fillStyle = K.tint;
+      x.fillRect(0, 0, c.width, c.height);
+      x.globalCompositeOperation = "destination-in";
+      x.drawImage(st2, 0, 0);
+      if (K.texture) {
+        x.globalCompositeOperation = "source-atop";
+        TEXTURES[K.texture](x, c.width, c.height, rng(st2.width * 31 + st2.height));
+      }
+      tintCache.set(key, c);
+      return c;
+    }
+    const TEXTURES = {
+      streaks: (x, w, h2, r) => {
+        x.globalAlpha = 0.55;
+        x.strokeStyle = "#FFF2B8";
+        x.lineWidth = 1;
+        for (let i = 0; i < 3; i++) {
+          const sx = r() * w;
+          x.beginPath();
+          x.moveTo(sx, 0);
+          x.lineTo(sx + (r() - 0.5) * 4, h2);
+          x.stroke();
+        }
+      },
+      bubbles: (x, w, h2, r) => {
+        x.globalAlpha = 0.7;
+        x.strokeStyle = "#E4FFD6";
+        x.lineWidth = 0.8;
+        for (let i = 0; i < Math.max(2, w * h2 / 120); i++) {
+          x.beginPath();
+          x.arc(r() * w, r() * h2, 0.8 + r() * 2, 0, Math.PI * 2);
+          x.stroke();
+        }
+      },
+      seeds: (x, w, h2, r) => {
+        x.globalAlpha = 0.9;
+        x.fillStyle = "#F7E27A";
+        for (let i = 0; i < Math.max(1, w * h2 / 160); i++) {
+          x.beginPath();
+          x.ellipse(r() * w, r() * h2, 0.6, 1, r() * 3, 0, Math.PI * 2);
+          x.fill();
+        }
+      },
+      shine: (x, w, h2, r) => {
+        x.globalAlpha = 0.45;
+        x.strokeStyle = "#D8B49A";
+        x.lineWidth = 1.2;
+        x.beginPath();
+        x.moveTo(w * 0.3, 0);
+        x.lineTo(w * 0.35, h2);
+        x.stroke();
+      },
+      sheen: (x, w, h2, r) => {
+        x.globalAlpha = 0.35;
+        x.fillStyle = "#FFFBE0";
+        x.fillRect(w * 0.25, 0, w * 0.2, h2);
+      },
+      milky: (x, w, h2, r) => {
+        x.globalAlpha = 0.4;
+        x.fillStyle = "#FFFFFF";
+        x.fillRect(0, 0, w, h2);
+      }
+    };
+    function stamp(ctx2, r, K, x, y, size) {
+      const st2 = STAMPS[Math.floor(r() * STAMPS.length)], img2 = tinted(st2, K), sc = size / 60 * (0.75 + r() * 0.5);
+      const flip = r() < 0.5 ? -1 : 1, narrow = K.narrow ? K.narrow[0] + r() * (K.narrow[1] - K.narrow[0]) : 0.85 + r() * 0.3, long = K.long || 1;
+      ctx2.save();
+      ctx2.translate(x, y);
+      ctx2.rotate((r() - 0.5) * (K.turn || 0.6));
+      ctx2.scale(sc * flip * narrow, sc * long);
+      ctx2.globalAlpha = K.stampAlpha || 1;
+      ctx2.drawImage(img2, -img2.width / 2, -img2.height * 0.3);
+      ctx2.restore();
+    }
+    function paint(ctx2, kind, opt) {
+      const K = KINDS[kind] || KINDS.cum, r = rng(opt && opt.seed || 1), amount = Math.max(0.3, opt && opt.amount || 1), at = opt && opt.at || [[250, 330, 40]];
+      ctx2.save();
+      ctx2.lineJoin = "round";
+      for (const [ax, ay, size] of at) {
+        const spot = () => [ax + (r() - 0.5) * size * 1.5, ay + (r() - 0.5) * size * 0.9];
+        if (K.style === "smear") {
+          for (let i = 0, n = Math.round((2 + r() * 2) * amount); i < n; i++) {
+            const [x, y] = spot();
+            smear(ctx2, r, K, x, y, size);
+          }
+          if (K.also === "run") for (let i = 0, n = Math.round(r() * 2 * amount); i < n; i++) {
+            const [x, y] = spot();
+            splash(ctx2, r, K, x, y, size * 0.8, amount);
+          }
+          if (K.stampToo && STAMPS.length) for (let i = 0, n = Math.round((4 + r() * 4) * amount); i < n; i++) {
+            const [x, y] = spot();
+            stamp(ctx2, r, K, x, y, size);
+          }
+        } else if (STAMPS.length && K.stamp !== false) {
+          for (let i = 0, n = Math.round((10 + r() * 8) * amount); i < n; i++) {
+            const a = r() * Math.PI * 2, d = size * Math.sqrt(r()) * 1.5;
+            stamp(ctx2, r, K, ax + Math.cos(a) * d, ay + Math.sin(a) * d * 0.7 - size * 0.2, size);
+          }
+          for (let i = 0, n = Math.round(r() * 1.2 * amount * Math.min(1, K.run - 0.2)); i < n; i++) {
+            const [x, y] = spot();
+            const p = [x, y];
+            run(ctx2, r, K, p[0], p[1], size * (0.4 + r() * 0.9) * K.run, Math.max(2, size * 0.05));
+          }
+        } else if (K.strands !== false) {
+          for (let i = 0, n = Math.round((7 + r() * 6) * amount); i < n; i++) {
+            const a = r() * Math.PI * 2, d = size * (0.1 + r() * 0.75), x = ax + Math.cos(a) * d, y = ay + Math.sin(a) * d * 0.7;
+            const out = Math.atan2(Math.cos(a), Math.sin(a) * 0.7) * 0.6;
+            strand(ctx2, r, K, x, y, size, out + (r() - 0.5) * 0.4);
+          }
+          for (let i = 0, n = Math.round(r() * 1.6 * amount * Math.min(1, K.run)); i < n; i++) {
+            const [x, y] = spot();
+            splash(ctx2, r, K, x, y, size * 0.8, amount);
+          }
+        } else {
+          for (let i = 0, n = Math.round((1.5 + r() * 2) * amount); i < n; i++) {
+            const [x, y] = spot();
+            splash(ctx2, r, K, x, y, size, amount);
+          }
+          for (let i = 0, n = K.ropes ? Math.round(r() * 2 * K.ropes * amount) : 0; i < n; i++) {
+            const [x, y] = spot();
+            rope(ctx2, r, K, x, y, size);
+          }
+        }
+        for (let i = 0, n = Math.round((4 + r() * 6) * amount * (K.droplets || 0.5)); i < n; i++) {
+          const a = r() * Math.PI * 2, d = size * (0.5 + r() * 0.8);
+          ctx2.beginPath();
+          ctx2.ellipse(ax + Math.cos(a) * d, ay + Math.sin(a) * d * 0.7, 0.8 + r() * 1.6, 0.8 + r() * 2.2, 0, 0, Math.PI * 2);
+          wet(ctx2, K, 0.9);
+        }
+        if (K.bubbles) for (let i = 0; i < 6 * amount; i++) {
+          const [x, y] = spot();
+          ctx2.globalAlpha = 0.55;
+          ctx2.strokeStyle = K.gloss;
+          ctx2.lineWidth = 0.9;
+          ctx2.beginPath();
+          ctx2.arc(x, y, 1.2 + r() * 3, 0, Math.PI * 2);
+          ctx2.stroke();
+        }
+        if (K.seeds) for (let i = 0; i < 8 * amount; i++) {
+          const [x, y] = spot();
+          ctx2.globalAlpha = 0.9;
+          ctx2.fillStyle = K.seeds;
+          ctx2.beginPath();
+          ctx2.ellipse(x, y, 0.8, 1.3, r() * 3, 0, Math.PI * 2);
+          ctx2.fill();
+        }
+        if (K.specks) for (let i = 0; i < 16 * amount; i++) {
+          const [x, y] = spot();
+          ctx2.globalAlpha = 0.75;
+          ctx2.fillStyle = K.specks;
+          ctx2.beginPath();
+          ctx2.arc(x, y, 0.5 + r() * 1.3, 0, Math.PI * 2);
+          ctx2.fill();
+        }
+        if (K.crumbs) for (let i = 0; i < 14 * amount; i++) {
+          const [x, y] = spot();
+          ctx2.globalAlpha = 1;
+          puddle(ctx2, r, x, y, 1.2 + r() * (r() < 0.15 ? 5 : 2.2), 1 + r() * 2, 0.7);
+          ctx2.fillStyle = K.crumbs[Math.floor(r() * K.crumbs.length)];
+          ctx2.fill();
+        }
+        if (K.sprinkles) for (let i = 0; i < (K.sprinkleN || 12) * amount; i++) {
+          const [x, y] = spot(), a = r() * Math.PI;
+          ctx2.globalAlpha = 1;
+          ctx2.strokeStyle = K.sprinkles[Math.floor(r() * K.sprinkles.length)];
+          ctx2.lineWidth = 1.6;
+          ctx2.lineCap = "round";
+          ctx2.beginPath();
+          ctx2.moveTo(x - Math.cos(a) * 2.2, y - Math.sin(a) * 2.2);
+          ctx2.lineTo(x + Math.cos(a) * 2.2, y + Math.sin(a) * 2.2);
+          ctx2.stroke();
+        }
+      }
+      ctx2.restore();
+    }
+    function paintOn(ctx2, body, kind, opt) {
+      const c = document.createElement("canvas");
+      c.width = ctx2.canvas.width;
+      c.height = ctx2.canvas.height;
+      const x = c.getContext("2d");
+      paint(x, kind, opt);
+      const m = document.createElement("canvas");
+      m.width = c.width;
+      m.height = c.height;
+      const mx = m.getContext("2d");
+      const sm = KINDS[kind] && KINDS[kind].smudge !== void 0 ? KINDS[kind].smudge : 1;
+      mx.filter = "blur(" + 5 * sm + "px)";
+      mx.globalAlpha = 0.5 * sm;
+      mx.drawImage(c, 0, 4);
+      mx.filter = "blur(" + 3 * sm + "px)";
+      mx.globalAlpha = 0.45 * sm;
+      mx.drawImage(c, 1, 2);
+      mx.filter = "blur(" + Math.max(0.3, 1.2 * sm) + "px)";
+      mx.globalAlpha = 0.5;
+      mx.drawImage(c, 0, 1);
+      mx.filter = "blur(" + Math.max(0.2, 0.9 * sm) + "px)";
+      mx.globalAlpha = 0.95;
+      mx.drawImage(c, 0, 0);
+      if (body) {
+        mx.filter = "none";
+        mx.globalCompositeOperation = "destination-in";
+        mx.drawImage(body, 0, 0);
+      }
+      ctx2.drawImage(m, 0, 0);
+    }
+    const AREAS3 = {
+      face: [250, 185, 34],
+      forehead: [250, 150, 26],
+      hair: [250, 120, 40],
+      chest: [250, 330, 60],
+      tummy: [250, 450, 50],
+      crotch: [250, 560, 30],
+      thighL: [215, 650, 30],
+      thighR: [285, 650, 30],
+      armL: [150, 380, 22],
+      armR: [350, 380, 22],
+      back: [250, 380, 60]
+    };
+    root.FarmMess = { KINDS, AREAS: AREAS3, paint, paintOn, rng, loadStamps, STAMPS };
+  })(typeof window !== "undefined" ? window : globalThis);
+
+  // extension/src/messes.js
   var W3 = window;
+  var KEY3 = "farmhand-messes";
+  var MAX = 60;
+  var sdk3 = null;
+  var hooked3 = false;
+  var mine2 = [];
+  var others2 = /* @__PURE__ */ new Map();
+  var BY_COLOR = {
+    "#fff4dc": "cream",
+    "#e0a030": "honey",
+    "#8b4a1c": "maple",
+    "#4a2a18": "chocolate",
+    "#e04a6a": "strawberry",
+    "#f7f7f0": "milk",
+    "#5fae3a": "slime",
+    "#6b4a2b": "mud",
+    "#d8c08a": "mash",
+    "#d9c13a": "piss",
+    "#ffd8e6": "cake"
+  };
+  var AREA_OF = { face: "face", forehead: "forehead", chest: "chest", tummy: "tummy", hair: "hair", thighs: "thighL", back: "back" };
+  function load3() {
+    try {
+      const v = JSON.parse(W3.localStorage.getItem(KEY3));
+      if (Array.isArray(v)) mine2 = v.filter(ok).slice(-MAX);
+    } catch (e) {
+      mine2 = [];
+    }
+  }
+  function save3() {
+    try {
+      W3.localStorage.setItem(KEY3, JSON.stringify(mine2));
+    } catch (e) {
+    }
+  }
+  var ok = (e) => e && typeof e.k === "string" && W3.FarmMess && W3.FarmMess.KINDS[e.k] && Array.isArray(e.a) && Number.isFinite(e.s);
+  var clean2 = (list) => Array.isArray(list) ? list.filter(ok).slice(-MAX).map((e) => ({ k: e.k, a: e.a.filter((x) => typeof x === "string" && W3.FarmMess.AREAS[x]).slice(0, 6), s: e.s | 0, t: +e.t || 0 })) : [];
+  function messFromMark(m) {
+    if (!m || !Array.isArray(m.splat) || !m.splat.length || !W3.FarmMess) return false;
+    const kind = typeof m.mess === "string" && W3.FarmMess.KINDS[m.mess] ? m.mess : (typeof m.color === "string" ? BY_COLOR[m.color.toLowerCase()] : null) || "cum";
+    const a = [];
+    for (const x of m.splat) {
+      const k = AREA_OF[x];
+      if (k && !a.includes(k)) a.push(k);
+    }
+    if (a.includes("tummy") && ["cum", "piss", "milk", "honey", "maple", "chocolate", "strawberry", "slime"].includes(kind) && Math.random() < 0.4) a.push(Math.random() < 0.5 ? "thighL" : "thighR");
+    if (!a.length) a.push("chest");
+    mine2.push({ k: kind, a, s: Math.random() * 1e9 | 0, t: Date.now() });
+    if (mine2.length > MAX) mine2 = mine2.slice(-MAX);
+    save3();
+    tell2(true);
+    redrawMe();
+    return true;
+  }
+  function messWash() {
+    if (!mine2.length) return false;
+    mine2 = [];
+    save3();
+    tell2(true);
+    redrawMe();
+    return true;
+  }
+  var send2 = (type, data) => {
+    try {
+      if (W3.ServerSend && W3.ServerPlayerIsInChatRoom && W3.ServerPlayerIsInChatRoom()) W3.ServerSend("ChatRoomChat", makeMsg(type, data));
+    } catch (e) {
+    }
+  };
+  var toldAt2 = 0;
+  var askedAt2 = 0;
+  function tell2(force) {
+    if (!force && Date.now() - toldAt2 < 8e3) return;
+    toldAt2 = Date.now();
+    send2("mess", { list: mine2 });
+  }
+  function ask2() {
+    if (Date.now() - askedAt2 < 8e3) return;
+    askedAt2 = Date.now();
+    send2("messAsk", {});
+  }
+  function onMessMsg(m) {
+    const mn = m.from;
+    if (!mn || W3.Player && mn === W3.Player.MemberNumber) return;
+    if (m.type === "messAsk") {
+      if (mine2.length) setTimeout(() => tell2(), 300 + Math.random() * 1500);
+      return;
+    }
+    if (m.type !== "mess") return;
+    const list = clean2(m.list);
+    if (!list.length) {
+      if (others2.delete(mn)) redrawMn2(mn);
+      return;
+    }
+    others2.set(mn, { list, at: Date.now() });
+    hook2();
+    redrawMn2(mn);
+  }
+  var charOf2 = (mn) => W3.Player && W3.Player.MemberNumber === mn ? W3.Player : (W3.ChatRoomCharacter || []).find((c) => c && c.MemberNumber === mn) || null;
+  var againT2 = /* @__PURE__ */ new Map();
+  function redrawMn2(mn, soon) {
+    clearTimeout(againT2.get(mn));
+    againT2.set(mn, setTimeout(() => {
+      try {
+        const C = charOf2(mn);
+        if (C && typeof W3.CharacterLoadCanvas === "function") W3.CharacterLoadCanvas(C);
+      } catch (e) {
+      }
+    }, soon || 80));
+  }
+  var redrawMe = () => {
+    if (W3.Player) redrawMn2(W3.Player.MemberNumber);
+  };
+  var listFor = (C) => C === W3.Player ? mine2 : (others2.get(C.MemberNumber) || {}).list || [];
+  var imgs = /* @__PURE__ */ new Map();
+  function img(src, mn) {
+    let i = imgs.get(src);
+    if (i) return i.complete && i.naturalWidth ? i : null;
+    i = new Image();
+    i.onload = () => redrawMn2(mn, 100);
+    i.src = src;
+    imgs.set(src, i);
+    return null;
+  }
+  if (W3.FarmMess && W3.FarmMess.loadStamps) W3.FarmMess.loadStamps("").then((n) => {
+    if (n) {
+      redrawMe();
+      for (const mn of others2.keys()) redrawMn2(mn);
+    }
+  });
+  var BODY = /(?:^|\/)Assets\/[^/]+\/(?:BodyUpper|BodyLower|Head|Arms|ArmsLeft|ArmsRight|Hands|HandsLeft|HandsRight|Pussy)\//;
+  var made2 = /* @__PURE__ */ new Map();
+  function messPicture(C, list, body) {
+    const over = W3.CanvasUpperOverflow || 700, h2 = C.Canvas && C.Canvas.height || 1e3 + over;
+    const up = body.find((b) => /\/BodyUpper\//.test(b[0])), ox = up ? up[1] : 0, oy = up ? up[2] - over : 0;
+    const key = JSON.stringify(list) + "|" + body.map((b) => b[0] + "@" + b[1] + "," + b[2]).join(";");
+    const was = made2.get(C.MemberNumber);
+    if (was && was.key === key) return was;
+    const mask = W3.document.createElement("canvas");
+    mask.width = 500;
+    mask.height = h2;
+    const mg = mask.getContext("2d");
+    for (const [src, x, y] of body) {
+      const i = img(src, C.MemberNumber);
+      if (!i) return was || null;
+      mg.drawImage(i, x, y);
+    }
+    const c = W3.document.createElement("canvas");
+    c.width = 500;
+    c.height = h2;
+    const g = c.getContext("2d");
+    const at = (names) => names.map((n) => {
+      const A = W3.FarmMess.AREAS[n];
+      return [A[0] + ox, A[1] + over + oy, A[2]];
+    });
+    for (const e of list) W3.FarmMess.paintOn(g, mask, e.k, { at: at(e.a), seed: e.s, amount: 1 });
+    const d = g.getImageData(0, 0, c.width, c.height).data;
+    let x0 = c.width, y0 = c.height, x1 = -1, y1 = -1;
+    for (let y = 0; y < c.height; y++) for (let x = 0; x < c.width; x++) if (d[(y * c.width + x) * 4 + 3]) {
+      if (x < x0) x0 = x;
+      if (x > x1) x1 = x;
+      if (y < y0) y0 = y;
+      if (y > y1) y1 = y;
+    }
+    if (x1 < 0) {
+      const p2 = { key, src: null };
+      made2.set(C.MemberNumber, p2);
+      return p2;
+    }
+    const t = W3.document.createElement("canvas");
+    t.width = x1 - x0 + 1;
+    t.height = y1 - y0 + 1;
+    t.getContext("2d").drawImage(c, -x0, -y0);
+    const p = { key, src: t.toDataURL("image/png"), dx: x0, dy: y0, fresh: true };
+    made2.set(C.MemberNumber, p);
+    return p;
+  }
+  function hook2() {
+    if (hooked3 || !sdk3) return;
+    hooked3 = true;
+    try {
+      const SKIN = /^(BodyUpper|BodyLower|Head|Arms|ArmsLeft|ArmsRight|Hands|HandsLeft|HandsRight|Pussy|Nipples|Eyes|Eyes2|Eyebrows|Mouth|Blush|Fluids|Emoticon|BodyMarkings|FaceMarkings|Mask|HairBack|HairFront|Height|BodyStyle)$/;
+      const groupRe = /(?:^|\/)Assets\/[^/]+\/(?:Override\/[^/]+\/)?([^/]+)\//;
+      sdk3.hookFunction("CommonDrawAppearanceBuild", 3, (args, next) => {
+        const C = args[0], real = args[1];
+        if (!C || !real || typeof real.drawImage !== "function" || !W3.FarmMess) return next(args);
+        const list = listFor(C);
+        if (!list.length) return next(args);
+        const body = [];
+        let done = false;
+        const lay = () => {
+          if (done) return;
+          done = true;
+          try {
+            const p = messPicture(C, list, body);
+            if (p && p.src) {
+              real.drawImage(p.src, p.dx, p.dy, {});
+              if (typeof real.drawImageBlink === "function") real.drawImageBlink(p.src, p.dx, p.dy, {});
+              if (p.fresh) {
+                p.fresh = false;
+                const mn = C.MemberNumber;
+                redrawMn2(mn, 250);
+                setTimeout(() => redrawMn2(mn, 0), 1200);
+              }
+            }
+          } catch (e) {
+            console.warn("[Farmhand Companion] messes:", e);
+          }
+        };
+        const seen = (name) => (src, x, y, ...rest) => {
+          if (typeof src === "string" && !done) {
+            if (BODY.test(src)) body.push([src, x, y]);
+            else {
+              const m = groupRe.exec(src);
+              if (m && !SKIN.test(m[1]) && body.length) lay();
+            }
+          }
+          return real[name](src, x, y, ...rest);
+        };
+        const wrap = {};
+        for (const n of ["drawImage", "drawImageBlink", "drawImageColorize", "drawImageColorizeBlink"]) if (typeof real[n] === "function") wrap[n] = seen(n);
+        args[1] = Object.assign({}, real, wrap);
+        const out = next(args);
+        lay();
+        return out;
+      });
+      sdk3.hookFunction("ChatRoomSync", 0, (args, next) => {
+        const r = next(args);
+        setTimeout(() => {
+          if (mine2.length) tell2(true);
+          ask2();
+        }, 3e3);
+        return r;
+      });
+    } catch (e) {
+      console.warn("[Farmhand Companion] messes unavailable:", e);
+      hooked3 = false;
+    }
+  }
+  function initMesses(mod2) {
+    sdk3 = mod2;
+    load3();
+    setTimeout(() => {
+      hook2();
+      if (mine2.length) {
+        tell2(true);
+        redrawMe();
+      }
+      ask2();
+    }, 3500);
+  }
+
+  // extension/src/cues.js
+  var W4 = window;
   var ctx = null;
   function initCues(c) {
     ctx = c;
@@ -7923,15 +8702,15 @@ One of mods you are using is using an old version of SDK. It will work for now b
     stir: ctx.panel.prefs.stir ? void 0 : true,
     gear: ctx.panel.prefs.gear ? void 0 : true
   });
-  var mapOn = () => typeof W3.ChatRoomMapViewIsActive === "function" && W3.ChatRoomMapViewIsActive() && W3.Player && W3.Player.MapData && W3.Player.MapData.Pos;
-  var others2 = () => (W3.ChatRoomCharacter || []).filter((c) => c && c.MemberNumber !== (W3.Player && W3.Player.MemberNumber));
+  var mapOn = () => typeof W4.ChatRoomMapViewIsActive === "function" && W4.ChatRoomMapViewIsActive() && W4.Player && W4.Player.MapData && W4.Player.MapData.Pos;
+  var others3 = () => (W4.ChatRoomCharacter || []).filter((c) => c && c.MemberNumber !== (W4.Player && W4.Player.MemberNumber));
   var lastSight = "";
   function sightTick() {
     try {
-      if (W3.CurrentScreen !== "ChatRoom" || !mapOn() || typeof W3.ChatRoomMapViewCharacterIsVisible !== "function") return;
-      const see = others2().filter((c) => W3.ChatRoomMapViewCharacterIsVisible(c)).map((c) => c.MemberNumber).sort();
-      const hear = others2().filter((c) => typeof W3.ChatRoomMapViewCharacterIsHearable === "function" && W3.ChatRoomMapViewCharacterIsHearable(c)).map((c) => c.MemberNumber).sort();
-      const LS = W3.Player && W3.Player.LSCG, S2 = LS && LS.SplatterModule;
+      if (W4.CurrentScreen !== "ChatRoom" || !mapOn() || typeof W4.ChatRoomMapViewCharacterIsVisible !== "function") return;
+      const see = others3().filter((c) => W4.ChatRoomMapViewCharacterIsVisible(c)).map((c) => c.MemberNumber).sort();
+      const hear = others3().filter((c) => typeof W4.ChatRoomMapViewCharacterIsHearable === "function" && W4.ChatRoomMapViewCharacterIsHearable(c)).map((c) => c.MemberNumber).sort();
+      const LS = W4.Player && W4.Player.LSCG, S2 = LS && LS.SplatterModule;
       const splat = S2 ? !!(S2.enabled && S2.taker !== false && (!LS.GlobalModule || LS.GlobalModule.enabled !== false)) : void 0;
       const key = see.join(",") + "|" + hear.join(",") + "|" + splat;
       if (key === lastSight && Date.now() - (sightTick.at || 0) < 12e4) return;
@@ -7946,13 +8725,13 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var DIRS = [["North", 0, -1], ["South", 0, 1], ["West", -1, 0], ["East", 1, 0]];
   function canStep(x, y) {
     try {
-      return W3.ChatRoomMapViewCanEnterTile(x, y) > 0;
+      return W4.ChatRoomMapViewCanEnterTile(x, y) > 0;
     } catch (e) {
       return false;
     }
   }
   function findPath(from, to) {
-    const wide = W3.ChatRoomMapViewWidth || 40, high = W3.ChatRoomMapViewHeight || 40, key = (x, y) => x + "," + y;
+    const wide = W4.ChatRoomMapViewWidth || 40, high = W4.ChatRoomMapViewHeight || 40, key = (x, y) => x + "," + y;
     const goal = (x, y) => Math.max(Math.abs(x - to.X), Math.abs(y - to.Y)) <= (canStep(to.X, to.Y) ? 0 : 1);
     const prev = /* @__PURE__ */ new Map([[key(from.X, from.Y), null]]), q2 = [[from.X, from.Y]];
     while (q2.length) {
@@ -7982,8 +8761,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
       walk = null;
       ctx.toBot("leadNo", { id: m.id });
     };
-    if (!pref("noLead") || !mapOn() || typeof W3.ChatRoomMapViewMove !== "function") return no();
-    const from = W3.Player.MapData.Pos, to = { X: m.X, Y: m.Y };
+    if (!pref("noLead") || !mapOn() || typeof W4.ChatRoomMapViewMove !== "function") return no();
+    const from = W4.Player.MapData.Pos, to = { X: m.X, Y: m.Y };
     const path = findPath(from, to);
     if (!path) return no();
     if (!path.length) {
@@ -7996,7 +8775,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
   function stepWalk() {
     if (!walk) return;
-    const w = walk, p = W3.Player && W3.Player.MapData && W3.Player.MapData.Pos;
+    const w = walk, p = W4.Player && W4.Player.MapData && W4.Player.MapData.Pos;
     if (!p) {
       walk = null;
       return;
@@ -8025,9 +8804,9 @@ One of mods you are using is using an old version of SDK. It will work for now b
       }
       Object.assign(w, { path, i: 0, stuck: Date.now(), retried: true });
     }
-    if (W3.ChatRoomMapViewMovement == null) {
+    if (W4.ChatRoomMapViewMovement == null) {
       try {
-        W3.ChatRoomMapViewMove(w.path[w.i]);
+        W4.ChatRoomMapViewMove(w.path[w.i]);
       } catch (e) {
       }
     }
@@ -8045,12 +8824,12 @@ One of mods you are using is using an old version of SDK. It will work for now b
   };
   function face(m) {
     const f = FACES[m.mood];
-    if (!f || !pref("noFace") || typeof W3.CharacterSetFacialExpression !== "function" || !W3.Player) return;
+    if (!f || !pref("noFace") || typeof W4.CharacterSetFacialExpression !== "function" || !W4.Player) return;
     const secs = m.mood === "clear" ? null : Math.max(5, Math.min(1800, Number(m.secs) || 30));
     for (const [g, e] of Object.entries(f)) {
       try {
-        W3.CharacterSetFacialExpression(W3.Player, g, e, secs);
-        if (g === "Eyes") W3.CharacterSetFacialExpression(W3.Player, "Eyes2", e, secs);
+        W4.CharacterSetFacialExpression(W4.Player, g, e, secs);
+        if (g === "Eyes") W4.CharacterSetFacialExpression(W4.Player, "Eyes2", e, secs);
       } catch (e2) {
       }
     }
@@ -8099,35 +8878,35 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var QUIET = { stall: 0.35, latch: 0.35, unlatch: 0.35, pump: 0.4, machine: 0.4, inflate: 0.4, hiss: 0.4, buzz: 0.3, zap: 0.35, clamp: 0.45, softgate: 0.4 };
   function sound(m) {
     const f = SOUNDS[m.name];
-    if (!f || !pref("noSound") || typeof W3.AudioPlayInstantSound !== "function") return;
-    const vol = W3.Player && W3.Player.AudioSettings && W3.Player.AudioSettings.Volume || 0;
+    if (!f || !pref("noSound") || typeof W4.AudioPlayInstantSound !== "function") return;
+    const vol = W4.Player && W4.Player.AudioSettings && W4.Player.AudioSettings.Volume || 0;
     try {
-      W3.AudioPlayInstantSound("Audio/" + f + ".mp3", vol * (QUIET[m.name] || 0.6));
+      W4.AudioPlayInstantSound("Audio/" + f + ".mp3", vol * (QUIET[m.name] || 0.6));
     } catch (e) {
     }
   }
   function trance(m) {
-    let el = W3.document.getElementById("fhc-trance");
+    let el = W4.document.getElementById("fhc-trance");
     const lvl = pref("noTrance") ? Math.max(0, Math.min(3, Number(m.level) || 0)) : 0;
     if (!lvl) {
       if (el) el.remove();
       return;
     }
     if (!el) {
-      el = W3.document.createElement("div");
+      el = W4.document.createElement("div");
       el.id = "fhc-trance";
       el.style.cssText = "position:fixed;inset:0;pointer-events:none;z-index:9998;transition:opacity 4s;opacity:0;animation:fhcTrance 6s ease-in-out infinite";
-      if (!W3.document.getElementById("fhc-trance-css")) {
-        const s = W3.document.createElement("style");
+      if (!W4.document.getElementById("fhc-trance-css")) {
+        const s = W4.document.createElement("style");
         s.id = "fhc-trance-css";
         s.textContent = "@keyframes fhcTrance{0%,100%{filter:brightness(1)}50%{filter:brightness(0.85)}}";
-        W3.document.head.appendChild(s);
+        W4.document.head.appendChild(s);
       }
-      W3.document.body.appendChild(el);
+      W4.document.body.appendChild(el);
     }
     const edge = [0, 0.25, 0.45, 0.65][lvl], inner = [0, 55, 42, 30][lvl];
     el.style.background = "radial-gradient(ellipse at center, transparent " + inner + "%, rgba(70,20,90," + edge + ") 100%)";
-    (W3.requestAnimationFrame || ((f) => setTimeout(f, 16)))(() => {
+    (W4.requestAnimationFrame || ((f) => setTimeout(f, 16)))(() => {
       el.style.opacity = "1";
     });
   }
@@ -8199,13 +8978,13 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var recentFeel = [];
   function feelTick() {
     try {
-      if (!pref("noFeelings") || W3.CurrentScreen !== "ChatRoom" || !W3.Player || !ctx.panel.s || !ctx.panel.s.onBooks) return;
+      if (!pref("noFeelings") || W4.CurrentScreen !== "ChatRoom" || !W4.Player || !ctx.panel.s || !ctx.panel.s.onBooks) return;
       if (Date.now() < (feelTick.next || 0)) return;
       feelTick.next = Date.now() + (7 + Math.random() * 6) * 6e4;
-      const s = ctx.panel.s, items = (W3.Player.Appearance || []).filter((x) => x && x.Asset && x.Asset.Group);
+      const s = ctx.panel.s, items = (W4.Player.Appearance || []).filter((x) => x && x.Asset && x.Asset.Group);
       const grp = (g) => items.find((x) => x.Asset.Group.Name === g);
       const eff2 = (x) => [].concat(x.Property && x.Property.Effect || [], x.Asset.Effect || []);
-      const arousal = W3.Player.ArousalSettings && W3.Player.ArousalSettings.Progress || 0;
+      const arousal = W4.Player.ArousalSettings && W4.Player.ArousalSettings.Progress || 0;
       const kinds = [];
       if (grp("ItemButt")) kinds.push("plug");
       if (items.some((x) => eff2(x).includes("Chaste")) && arousal > 40) kinds.push("chaste");
@@ -8229,11 +9008,11 @@ One of mods you are using is using an old version of SDK. It will work for now b
   function drawMarkers() {
     try {
       const s = ctx.panel.s;
-      if (!s || !s.staff || !Array.isArray(s.herd) || !pref("noMarkers") || !mapOn() || typeof W3.DrawText !== "function") return;
-      const R = W3.ChatRoomMapViewPerceptionRange || 6, tile = 1e3 / (R * 2 + 1), me3 = W3.Player.MapData.Pos;
+      if (!s || !s.staff || !Array.isArray(s.herd) || !pref("noMarkers") || !mapOn() || typeof W4.DrawText !== "function") return;
+      const R = W4.ChatRoomMapViewPerceptionRange || 6, tile = 1e3 / (R * 2 + 1), me3 = W4.Player.MapData.Pos;
       for (const x of s.herd) {
-        const C = (W3.ChatRoomCharacter || []).find((c) => c.MemberNumber === x.mn);
-        if (!C || !C.MapData || !C.MapData.Pos || !W3.ChatRoomMapViewCharacterIsVisible(C)) continue;
+        const C = (W4.ChatRoomCharacter || []).find((c) => c.MemberNumber === x.mn);
+        if (!C || !C.MapData || !C.MapData.Pos || !W4.ChatRoomMapViewCharacterIsVisible(C)) continue;
         const tags = [];
         if (x.milk !== null && x.milk >= 75) tags.push(["M", "#7fa8c9"]);
         if (x.heat) tags.push(["H", "#d9534f"]);
@@ -8242,7 +9021,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
         if (!tags.length) continue;
         const sx = (C.MapData.Pos.X - me3.X + R) * tile, sy = (C.MapData.Pos.Y - me3.Y) * tile + R * tile;
         if (sx < 0 || sy < 0 || sx > 1e3 || sy > 1e3) continue;
-        tags.forEach(([t, col], i) => W3.DrawText(t, sx + tile * 0.2 + i * tile * 0.22, sy + tile * 0.15, col, "black"));
+        tags.forEach(([t, col], i) => W4.DrawText(t, sx + tile * 0.2 + i * tile * 0.22, sy + tile * 0.15, col, "black"));
       }
     } catch (e) {
     }
@@ -8259,11 +9038,11 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
   function arouse(m) {
     try {
-      if (!stirOn() || !W3.Player || !W3.Player.ArousalSettings || typeof W3.ActivitySetArousal !== "function") return;
-      if (W3.Player.ArousalSettings.Active === "Inactive" || W3.Player.ArousalSettings.Active === "NoMeter") return;
-      const cur = Number(W3.Player.ArousalSettings.Progress) || 0, cap = Math.max(0, Math.min(deniedNow() ? 94 : 100, Number(m.cap) || 100));
+      if (!stirOn() || !W4.Player || !W4.Player.ArousalSettings || typeof W4.ActivitySetArousal !== "function") return;
+      if (W4.Player.ArousalSettings.Active === "Inactive" || W4.Player.ArousalSettings.Active === "NoMeter") return;
+      const cur = Number(W4.Player.ArousalSettings.Progress) || 0, cap = Math.max(0, Math.min(deniedNow() ? 94 : 100, Number(m.cap) || 100));
       const next = Math.max(0, Math.min(cap, cur + (Number(m.add) || 0)));
-      if (next > cur || m.add < 0) W3.ActivitySetArousal(W3.Player, next);
+      if (next > cur || m.add < 0) W4.ActivitySetArousal(W4.Player, next);
     } catch (e) {
       console.warn("[Farmhand Companion] arouse:", e);
     }
@@ -8271,11 +9050,11 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var VIBE_MODE = ["Low", "Medium", "High", "Maximum"];
   var vibeWas = null;
   var vibeTimer = null;
-  var vibeToys = () => (W3.Player && Array.isArray(W3.Player.Appearance) ? W3.Player.Appearance : []).filter((it) => it && it.Asset && it.Asset.Group && it.Property && typeof it.Property.Intensity === "number" && !(it.Property.LockedBy && typeof W3.DialogCanUnlock === "function" && !W3.DialogCanUnlock(W3.Player, it)));
+  var vibeToys = () => (W4.Player && Array.isArray(W4.Player.Appearance) ? W4.Player.Appearance : []).filter((it) => it && it.Asset && it.Asset.Group && it.Property && typeof it.Property.Intensity === "number" && !(it.Property.LockedBy && typeof W4.DialogCanUnlock === "function" && !W4.DialogCanUnlock(W4.Player, it)));
   function vibePush(toys) {
-    if (typeof W3.CharacterRefresh === "function") W3.CharacterRefresh(W3.Player, false);
-    if (typeof W3.ChatRoomCharacterItemUpdate === "function") toys.forEach((it) => W3.ChatRoomCharacterItemUpdate(W3.Player, it.Asset.Group.Name));
-    else if (typeof W3.ChatRoomCharacterUpdate === "function") W3.ChatRoomCharacterUpdate(W3.Player);
+    if (typeof W4.CharacterRefresh === "function") W4.CharacterRefresh(W4.Player, false);
+    if (typeof W4.ChatRoomCharacterItemUpdate === "function") toys.forEach((it) => W4.ChatRoomCharacterItemUpdate(W4.Player, it.Asset.Group.Name));
+    else if (typeof W4.ChatRoomCharacterUpdate === "function") W4.ChatRoomCharacterUpdate(W4.Player);
   }
   function vibeSet(it, level, mode) {
     it.Property.Intensity = level;
@@ -8331,7 +9110,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
         const t = next(args);
         try {
           const f = slowFactor();
-          return t > 0 && f > 1 && !(typeof W3.ChatRoomMapViewHasSuperPowers === "function" && W3.ChatRoomMapViewHasSuperPowers()) ? t * f : t;
+          return t > 0 && f > 1 && !(typeof W4.ChatRoomMapViewHasSuperPowers === "function" && W4.ChatRoomMapViewHasSuperPowers()) ? t * f : t;
         } catch (e) {
           return t;
         }
@@ -8451,8 +9230,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
         return false;
       }
     })();
-    const ok = text && names.some((n) => text.toLowerCase().includes(n)) && !st.panel.prefs.noRelay && !blocked && st.relayed.length < 8;
-    if (!ok) {
+    const ok2 = text && names.some((n) => text.toLowerCase().includes(n)) && !st.panel.prefs.noRelay && !blocked && st.relayed.length < 8;
+    if (!ok2) {
       toBot("relayNo", { id: m.id });
       return;
     }
@@ -8518,6 +9297,14 @@ One of mods you are using is using an old version of SDK. It will work for now b
         onBodyMsg(m);
       } catch (e) {
         console.warn("[Farmhand Companion] drawn body:", e);
+      }
+      return;
+    }
+    if (m.type === "mess" || m.type === "messAsk") {
+      try {
+        onMessMsg(m);
+      } catch (e) {
+        console.warn("[Farmhand Companion] messes:", e);
       }
       return;
     }
@@ -8599,10 +9386,15 @@ One of mods you are using is using an old version of SDK. It will work for now b
         let r = { ok: false };
         try {
           const prefs = st.panel.prefs;
-          if (m.wash) r = washMarks();
-          else if (m.strip) r = stripMe(prefs);
+          if (m.wash) {
+            r = washMarks();
+            messWash();
+          } else if (m.strip) r = stripMe(prefs);
           else if (m.dress) r = dressMe();
-          else r = markBody(m, prefs);
+          else {
+            r = markBody(m, prefs);
+            if (prefs.marks && Array.isArray(m.splat) && m.splat.length) messFromMark(m);
+          }
         } catch (e) {
           r = { ok: false, why: e.message };
         }
@@ -8739,6 +9531,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     setInterval(parasiteSync, 6e4);
     initBelly(mod);
     initDrawnBody(mod);
+    initMesses(mod);
     setTimeout(() => scaleTrialCleanup(), 15e3);
     initBody(mod);
     window.__farmhandOwnPanel = (data) => {

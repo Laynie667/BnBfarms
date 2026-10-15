@@ -16,6 +16,7 @@ import { captureOutfit, wearOutfit, changeBack, hasBackup } from "./outfits.js";
 import { markBody, washMarks, stripMe, dressMe, syncFarmGear, syncShape, scaleTrialCleanup } from "./marks.js";
 import { initBelly } from "./belly.js";
 import { initDrawnBody, onBodyMsg, onFarmLook, farmLookWanted, drawnBodyFarmState } from "./drawnbody.js";
+import { initMesses, onMessMsg, messFromMark, messWash } from "./messes.js";
 import { initCues, cueOff, lead, face, sound, trance, drawMarkers, arouse, vibe, initBody } from "./cues.js";
 
 // the SDK ships as an old-style module; this digs the real thing out either way
@@ -171,6 +172,7 @@ function parasiteSync() {
 }
 function onFarmMsg(m) {
   if (m.type === "body" || m.type === "bodyAsk") { try { onBodyMsg(m); } catch (e) { console.warn("[Farmhand Companion] drawn body:", e); } return; }   // another Companion's drawn body (drawnbody.js)
+  if (m.type === "mess" || m.type === "messAsk") { try { onMessMsg(m); } catch (e) { console.warn("[Farmhand Companion] messes:", e); } return; }   // another Companion's messes (messes.js)
   if (m.from !== BOT_MEMBER) return;     // only the farm bot gets to talk to the panel
   if (m.type !== "ping" && m.type !== "state") st.lastHeard = Date.now();
   switch (m.type) {
@@ -229,10 +231,10 @@ function onFarmMsg(m) {
       let r = { ok: false };
       try {
         const prefs = st.panel.prefs;
-        if (m.wash) r = washMarks();
+        if (m.wash) { r = washMarks(); messWash(); }
         else if (m.strip) r = stripMe(prefs);
         else if (m.dress) r = dressMe();
-        else r = markBody(m, prefs);
+        else { r = markBody(m, prefs); if (prefs.marks && Array.isArray(m.splat) && m.splat.length) messFromMark(m); }   // and our own mess, drawn by the Companion (messes.js)
       } catch (e) { r = { ok: false, why: e.message }; }
       toBot("markDone", { ok: !!r.ok, did: r.did || [], why: r.why || "" });
       break;
@@ -327,6 +329,7 @@ function start() {
   setInterval(parasiteSync, 60000);
   initBelly(mod);  // the drawn-belly test (belly.js)
   initDrawnBody(mod);  // the drawn body from the outfit studio, on your own character (drawnbody.js)
+  initMesses(mod);     // the farm's own messes on everybody (messes.js)
   setTimeout(() => scaleTrialCleanup(), 15000);   // what the old scale trial left on anybody (marks.js)
   initBody(mod);   // slowed walkin' when you're carryin' a lot, and bein' held at the edge while denied (cues.js)
   // the bot hands this page's own-account messages straight here (see toBot above)

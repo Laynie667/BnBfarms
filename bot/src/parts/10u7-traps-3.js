@@ -28,8 +28,8 @@
     try {
       let m = what ? [what, ["face", "chest", "tummy"]] : MESS_BY_TRAP[kind];
       if (kind === "stocks" && Math.random() < 0.5) m = ["cake", m[1]];   // some of the pies are cake
-      if (!m || !MESS[m[0]]) return false;
-      return bodyMark(mn, { splat: m[1], color: MESS[m[0]], mess: m[0] });
+      if (!m || (!MESS[m[0]] && m[0] !== "cum")) return false;
+      return bodyMark(mn, Object.assign({ splat: m[1], mess: m[0] }, MESS[m[0]] ? { color: MESS[m[0]] } : {}));   // (cum keeps the game's own white splatters)
     } catch(e){ return false; }
   }
   Object.assign(TRAP_KINDS, {

@@ -131,14 +131,15 @@
   function storeItem(word){
     const w = String(word || "").toLowerCase().replace(/^potion[-:\s]?/, "potion-").replace(/[^a-z0-9-]/g, "");
     const items = storeItems();
-    return items.find(it => it.id === w) || items.find(it => it.potion && ("potion-"+it.potion === w || it.potion === w.replace(/^potion-/, ""))) ||
+    return items.find(it => it.id === w || it.id === "mess-"+w) || items.find(it => it.potion && ("potion-"+it.potion === w || it.potion === w.replace(/^potion-/, ""))) ||
            items.find(it => it.name.toLowerCase().replace(/[^a-z0-9]/g, "").includes(w.replace(/-/g, "")) && w.length >= 4) || null;
   }
   function storeText(mn){
     const items = storeItems().filter(it => !it.off);
     const row = it => "  "+it.price+"🎀 · "+(it.potion ? it.potion : it.id)+" · "+it.name;
     return "🛍️ THE FARM STORE · you've got "+ribbonsOf(mn)+" ribbons\n"+
-      "\nTREATS & FAVORS\n"+items.filter(it => !it.potion && !it.id.startsWith("shot")).map(row).join("\n")+
+      "\nTREATS & FAVORS\n"+items.filter(it => !it.potion && !it.id.startsWith("shot") && it.shelf !== "mess").map(row).join("\n")+
+      "\n\nMESSES (?buy <one> for <who>: they say yes first, unless they're ?messes on)\n"+items.filter(it => it.shelf === "mess").map(row).join("\n")+
       "\n\nSHOTS\n"+items.filter(it => it.id.startsWith("shot")).map(row).join("\n")+
       "\n\nPOTIONS (they wear off · ?potions on to let others gift you one)\n"+items.filter(it => it.potion).map(row).join("\n")+
       "\n\n?buy <item> · ?buy <potion> for <who> (they say yes first) · ?potions shows what each one does";
@@ -167,6 +168,7 @@
     if (limit && (r.buys.n[it.id] || 0) >= limit){ R("Just "+limit+" of those a day, sugar. Come back tomorrow."); return; }
     const done = (what) => { r.buys.n[it.id] = (r.buys.n[it.id] || 0) + 1; audit(sender, "BUY", it.id+(forWho ? " for "+forWho : "")+" "+price); saveLedger(); if (what) R(what); };
 
+    if (it.shelf === "mess"){ messBuy(it, sender, forWho, price, R, done); return; }   // a mess off the shelf, on you or on somebody (10u9-mess-store.js)
     if (it.potion){
       if (forWho){
         if (!rec(forWho)){ R("I don't know who that is, sugar."); return; }

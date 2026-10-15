@@ -97,7 +97,7 @@
       p.fullTold = st; saveLedger();
       if (st < 2 || quietNow(mn) || !charFor(mn)) return;   // (tight is only the clock startin')
       privateLine(mn, uLine("over"+st, mn), "emote");
-      if (st >= 2){ emote("🥛 "+uLine("overRoom"+st, mn), mn); bodyMark(mn, { splat: ["chest"], color: "#FFFFFF" }); }
+      if (st >= 2){ emote("🥛 "+uLine("overRoom"+st, mn), mn); bodyMark(mn, { splat: ["chest"], color: "#FFFFFF", mess: "milk" }); }
     }
     if (st >= 4 && now - (p.fullNag || 0) > 10*60000 && !quietNow(mn) && charFor(mn)){ p.fullNag = now; privateLine(mn, uLine("over4nag", mn), "emote"); arouse(mn, 8, 90); }
   }

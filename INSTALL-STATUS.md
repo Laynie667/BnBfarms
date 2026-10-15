@@ -5,7 +5,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 | Script | File in `dist/` | Where it runs | Current |
 |---|---|---|---|
-| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.34.0** |
+| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.35.0** |
 | Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.7.0** |
 | Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.2.1** |
 | Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **1.1.0** |
@@ -23,6 +23,8 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 - Running the watcher on more than one game at once (the bot, yours, a tester's) lets Claude line them up into one timeline.
 
 ## Latest changes (newest first)
+
+- **Bot 0.35.0: messes in the traps, four mess traps, and messes off the shelf.** Laynie: "need to wire the new messes into traps. new traps for messes, and store messes to i can creampie other players and such." The breedin' traps (pump, saddle, wheel, scarecrow, crate, kissin' gate, collection bench) were leavin' whipped cream; they leave cum now, and milk splashes say milk. New traps, each with real gear: **trap-fountain** (the chocolate fountain, licked clean), **trap-bakery** (piped with frosting, sprinkled and sold by the slice, a price tag after), **trap-creamery** (whipped cream cannon, strawberry, somebody hungry), **trap-seedshower** (a ring of strangers, every one finishes on them). **The mess shelf** in ?store: creampie, facial, cream pie, cake smash, honey, maple, chocolate, strawberry, slime, mud, milk, piss (both on ?watersports), 1 or 2 ribbons: ?buy <one> for <who>, asked first unless they've said **?messes on**; limits count; a shelf creampie is only the look, no breedin'. **docs/EQUIPMENT.md**: every trap, its gear, how to get it, what rules it out and its mess, the mystery box, the livin' suit, the symbiotes and the shelf (tools/equipment-list.mjs rebuilds it). tests/mess-store.test.cjs. **Bot.**
 
 - **Bot 0.34.0, Companion 0.29.0: storage past Tampermonkey.** Laynie: "i mean better storage than what tampermonkey has". **Bot:** every save of the books also goes into the browser's own database; if Tampermonkey's copy is ever missing at start-up, the bot puts the database copy back and restarts (nothing saves over it first). A 💾 chip under the badge picks a folder on the computer: the books are written there as bnb-ledger-latest.json every ten minutes and bnb-ledger-<date>-<hour>.json every hour, the last two days kept. 💾 → Load the books from a file puts a backup back (asks first, says how many people). The login is never in any of it. **Companion:** Toggles → This panel → Save my settings to a folder: every minute, everything it remembers (the toggles, the drawn body, messes, the memory log) goes into farmhand-companion-<number>.json there; Load my settings from a file puts it back in any browser. Folders work in Chrome and Edge; after a browser restart, one click reconnects. tests/storage.test.cjs. **Bot and Companion.**
 

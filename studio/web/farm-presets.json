@@ -1,5 +1,5 @@
 {
- "made": "2026-10-15T07:20:57.457Z",
+ "made": "2026-10-15T21:51:22.409Z",
  "sets": [
   {
    "group": "Traps",
@@ -1365,6 +1365,136 @@
    ]
   },
   {
+   "group": "Traps",
+   "name": "🍫 fountain",
+   "what": "the chocolate fountain: tipped in, held under the flow, licked clean",
+   "pieces": [
+    {
+     "slot": "arms",
+     "groups": [
+      "ItemArms"
+     ],
+     "items": [
+      "LeatherCuffs",
+      "SteelCuffs",
+      "HempRope",
+      "LeatherCuffs"
+     ],
+     "color": null,
+     "label": "Fountain Cuffs",
+     "when": "hold",
+     "mins": null,
+     "desc": "Brass cuffs on short chains bolted to the fountain's rim, holding them right under the warm, slow curtain of chocolate."
+    }
+   ]
+  },
+  {
+   "group": "Traps",
+   "name": "🎂 bakery",
+   "what": "the bakery bench: piped with frosting, sprinkled, and served",
+   "pieces": [
+    {
+     "slot": "device",
+     "groups": [
+      "ItemDevices"
+     ],
+     "items": [
+      "BondageBench",
+      "Table",
+      "WoodenStocks"
+     ],
+     "color": null,
+     "label": "Bakery Bench",
+     "when": "hold",
+     "mins": null,
+     "desc": "A long floured baker's bench with leather straps at wrist, waist and knee, built to hold something still while it's decorated."
+    },
+    {
+     "slot": "tag",
+     "groups": [
+      "ItemNeckAccessories"
+     ],
+     "items": [
+      "CollarNameTag",
+      "CollarBell",
+      "CollarNameTagLivestock",
+      "CollarNameTag"
+     ],
+     "color": null,
+     "label": "Price Tag",
+     "when": "after",
+     "mins": 20,
+     "desc": "A little card tag on a ribbon at the collar, in the baker's curly hand: FRESH TODAY, ONE SLICE PER CUSTOMER."
+    }
+   ]
+  },
+  {
+   "group": "Traps",
+   "name": "🍓 creamery",
+   "what": "the creamery: whipped cream from the cannon, strawberries, and someone hungry",
+   "pieces": [
+    {
+     "slot": "funnel",
+     "groups": [
+      "ItemMouth",
+      "ItemMouth2",
+      "ItemMouth3"
+     ],
+     "items": [
+      "FunnelGag",
+      "RingGag",
+      "FunnelGag"
+     ],
+     "color": null,
+     "label": "Cream Funnel",
+     "when": "hold",
+     "mins": null,
+     "desc": "A wide steel funnel buckled between the teeth, so the cream that misses the skin goes somewhere useful."
+    }
+   ]
+  },
+  {
+   "group": "Traps",
+   "name": "💦 seedshower",
+   "what": "the seed shower: a ring of strangers, and every one of them finishes on you",
+   "pieces": [
+    {
+     "slot": "legs",
+     "groups": [
+      "ItemLegs"
+     ],
+     "items": [
+      "SpreaderMetal",
+      "SpreaderDildoBar",
+      "HempRope",
+      "LeatherLegCuffs"
+     ],
+     "color": null,
+     "label": "Kneeling Spreader",
+     "when": "hold",
+     "mins": null,
+     "desc": "A short steel bar between the knees, keeping them knelt wide and low in the middle of the ring."
+    },
+    {
+     "slot": "arms",
+     "groups": [
+      "ItemArms"
+     ],
+     "items": [
+      "LeatherCuffs",
+      "SteelCuffs",
+      "HempRope",
+      "LeatherCuffs"
+     ],
+     "color": null,
+     "label": "Behind-the-Back Cuffs",
+     "when": "hold",
+     "mins": null,
+     "desc": "Cuffs that keep their hands behind them, so there's nothing to wipe with and nothing to hide behind."
+    }
+   ]
+  },
+  {
    "group": "Mystery box",
    "name": "🎁 Growin' Plug (pussy)",
    "what": "It swells a size every ten minutes.",
@@ -2091,17 +2221,15 @@
  ],
  "messes": [
   {
+   "name": "cake",
+   "color": "#FFD8E6",
+   "traps": []
+  },
+  {
    "name": "cream",
    "color": "#FFF4DC",
    "traps": [
-    "pump",
-    "stocks",
-    "saddle",
-    "wheel",
-    "scarecrow",
-    "crate",
-    "kissgate",
-    "collection"
+    "stocks"
    ]
   },
   {

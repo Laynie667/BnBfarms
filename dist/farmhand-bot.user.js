@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.34.0
+// @version      0.35.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -1828,7 +1828,7 @@
   ];
 
   // bot/src/version.js
-  var VERSION = "0.34.0";
+  var VERSION = "0.35.0";
 
   // bot-parts:farmhand-bot-parts
   (function() {
@@ -3717,7 +3717,7 @@
     }, __wordsFor: (m, t) => wordsFor(m, t), __overdue: (m) => overdueStage(m), __milkCum: (m) => stallClimax(m), __intSev: (m, s) => intensitySev(m, s), __intTail: (m, k) => intensityTail(m, 5, 6, k), __holes: (m) => holesFor(m), __album: (m) => albumFor(m, 60), __holeTook: (m, h, a) => holeTook(m, h, a), __dreamTheme: (m) => dreamTheme(m), __eggsWorth: (t, n) => eggsWorth(t, n), __rank: (m) => rankX(m), __broodBook: (m) => broodBook(m), __belly: (m) => bellyStage(m), __happening: (m) => happeningFor(m), __gearOn: (m, s, l, d, x) => gearOn(m, s, l, d, x), __heard: (mn, t) => trapHeard(mn, t), __parasiteTick: () => parasiteTick(), __parts: (m) => parasiteParts(rec(m).parasite), __climax: (m) => parasiteClimax(m), __nurse: (a, b) => parasiteNurse(a, b), __parasiteChance: (m) => parasiteChance(m), __kiss: (a, f, s, t) => parasiteKiss(a, f, s, t), __load: (s, m, h, x) => parasiteLoad(s, m, h, x), __shot: (t, by, text, how) => applyShot(t, by, text, how), __slow: (mn) => slowOf(mn), __milkRate: (mn) => milkRate(mn), __benchTick: () => benchTick(), __roll: (m, s, a, b) => rollConception(m, s, a, b), __contractTick: () => {
       state.cwAt = 0;
       contractWatchTick();
-    }, __lingerTick: () => lingerTick(), __ribbonTick: () => ribbonTick(), __dareTick: () => dareTick(), __potionOn: (mn, id) => potionOn(mn, id), __milkRate: (mn) => milkRate(mn), __addonLine: (k, i) => addonLine(k, i), __lineInfo: (m, x) => lineInfo(m, x), __gearSense: (m) => gearSense(m), __symTick: () => symbioteTick(), __symBond: (m, k, h) => symBond(m, k, h), __symFed: (m, h, x) => symbioteFed(m, h, x), __capacity: (m) => capacity(m), __symLines: () => SYM_LINES, __newTrapLines: () => NEW_TRAP_LINES, __farmGear: (m) => farmGearFor(m), __mazeTick: () => mazeTick(), __symSpread: (a, b, k, h) => symSpread(a, b, k, h), __symGear: (m) => symGear(m), __farmSets: () => ({ TRAP_GEAR, TRAP_KINDS, CURSES, SUIT_STAGES, SUIT_COLOR, MESS, MESS_BY_TRAP, SYM_GEAR }) });
+    }, __lingerTick: () => lingerTick(), __ribbonTick: () => ribbonTick(), __dareTick: () => dareTick(), __potionOn: (mn, id) => potionOn(mn, id), __milkRate: (mn) => milkRate(mn), __addonLine: (k, i) => addonLine(k, i), __lineInfo: (m, x) => lineInfo(m, x), __gearSense: (m) => gearSense(m), __symTick: () => symbioteTick(), __symBond: (m, k, h) => symBond(m, k, h), __symFed: (m, h, x) => symbioteFed(m, h, x), __capacity: (m) => capacity(m), __symLines: () => SYM_LINES, __newTrapLines: () => NEW_TRAP_LINES, __farmGear: (m) => farmGearFor(m), __mazeTick: () => mazeTick(), __symSpread: (a, b, k, h) => symSpread(a, b, k, h), __symGear: (m) => symGear(m), __farmSets: () => ({ TRAP_GEAR, TRAP_KINDS, CURSES, SUIT_STAGES, SUIT_COLOR, MESS, MESS_BY_TRAP, SYM_GEAR }), __messShelf: () => MESS_SHELF });
     W.FarmhandSyncKeys = () => syncAllPresent(true);
     W.FarmhandFriends = () => W.Player.FriendList;
     W.FarmhandAddFriend = (mn) => addFriend(mn, false);
@@ -9856,12 +9856,12 @@
     function storeItem(word) {
       const w = String(word || "").toLowerCase().replace(/^potion[-:\s]?/, "potion-").replace(/[^a-z0-9-]/g, "");
       const items = storeItems();
-      return items.find((it) => it.id === w) || items.find((it) => it.potion && ("potion-" + it.potion === w || it.potion === w.replace(/^potion-/, ""))) || items.find((it) => it.name.toLowerCase().replace(/[^a-z0-9]/g, "").includes(w.replace(/-/g, "")) && w.length >= 4) || null;
+      return items.find((it) => it.id === w || it.id === "mess-" + w) || items.find((it) => it.potion && ("potion-" + it.potion === w || it.potion === w.replace(/^potion-/, ""))) || items.find((it) => it.name.toLowerCase().replace(/[^a-z0-9]/g, "").includes(w.replace(/-/g, "")) && w.length >= 4) || null;
     }
     function storeText(mn) {
       const items = storeItems().filter((it) => !it.off);
       const row = (it) => "  " + it.price + "\u{1F380} \xB7 " + (it.potion ? it.potion : it.id) + " \xB7 " + it.name;
-      return "\u{1F6CD}\uFE0F THE FARM STORE \xB7 you've got " + ribbonsOf(mn) + " ribbons\n\nTREATS & FAVORS\n" + items.filter((it) => !it.potion && !it.id.startsWith("shot")).map(row).join("\n") + "\n\nSHOTS\n" + items.filter((it) => it.id.startsWith("shot")).map(row).join("\n") + "\n\nPOTIONS (they wear off \xB7 ?potions on to let others gift you one)\n" + items.filter((it) => it.potion).map(row).join("\n") + "\n\n?buy <item> \xB7 ?buy <potion> for <who> (they say yes first) \xB7 ?potions shows what each one does";
+      return "\u{1F6CD}\uFE0F THE FARM STORE \xB7 you've got " + ribbonsOf(mn) + " ribbons\n\nTREATS & FAVORS\n" + items.filter((it) => !it.potion && !it.id.startsWith("shot") && it.shelf !== "mess").map(row).join("\n") + "\n\nMESSES (?buy <one> for <who>: they say yes first, unless they're ?messes on)\n" + items.filter((it) => it.shelf === "mess").map(row).join("\n") + "\n\nSHOTS\n" + items.filter((it) => it.id.startsWith("shot")).map(row).join("\n") + "\n\nPOTIONS (they wear off \xB7 ?potions on to let others gift you one)\n" + items.filter((it) => it.potion).map(row).join("\n") + "\n\n?buy <item> \xB7 ?buy <potion> for <who> (they say yes first) \xB7 ?potions shows what each one does";
     }
     function buy(sender, args, R) {
       const r = rec(sender);
@@ -9907,6 +9907,10 @@
         saveLedger();
         if (what) R(what);
       };
+      if (it.shelf === "mess") {
+        messBuy(it, sender, forWho, price, R, done);
+        return;
+      }
       if (it.potion) {
         if (forWho) {
           if (!rec(forWho)) {
@@ -15398,8 +15402,8 @@
       try {
         let m = what ? [what, ["face", "chest", "tummy"]] : MESS_BY_TRAP[kind];
         if (kind === "stocks" && Math.random() < 0.5) m = ["cake", m[1]];
-        if (!m || !MESS[m[0]]) return false;
-        return bodyMark(mn, { splat: m[1], color: MESS[m[0]], mess: m[0] });
+        if (!m || !MESS[m[0]] && m[0] !== "cum") return false;
+        return bodyMark(mn, Object.assign({ splat: m[1], mess: m[0] }, MESS[m[0]] ? { color: MESS[m[0]] } : {}));
       } catch (e) {
         return false;
       }
@@ -15913,6 +15917,342 @@
         endOver: ["The gate lets %n go glazed from both ends, and the path's never been so popular."]
       }
     });
+    Object.assign(TRAP_KINDS, {
+      fountain: { icon: "\u{1F36B}", what: "the chocolate fountain: tipped in, held under the flow, licked clean", limit: /\b(chocolate|food|messy|splosh|lick)/i },
+      bakery: { icon: "\u{1F382}", what: "the bakery bench: piped with frosting, sprinkled, and served", limit: /\b(cake|frosting|food|messy|splosh|humiliat)/i },
+      creamery: { icon: "\u{1F353}", what: "the creamery: whipped cream from the cannon, strawberries, and someone hungry", limit: /\b(cream|food|messy|splosh|lick)/i },
+      seedshower: { icon: "\u{1F4A6}", what: "the seed shower: a ring of strangers, and every one of them finishes on you", limit: /\b(bukkake|facial|cum|gang|public)/i }
+    });
+    Object.assign(MESS_BY_TRAP, {
+      pump: ["cum", ["tummy"]],
+      saddle: ["cum", ["tummy"]],
+      wheel: ["cum", ["tummy", "chest"]],
+      scarecrow: ["cum", ["tummy", "chest"]],
+      crate: ["cum", ["tummy"]],
+      kissgate: ["cum", ["face", "tummy"]],
+      collection: ["cum", ["tummy"]]
+    });
+    const MESS_LINES = {
+      fountain: {
+        beats: [
+          [
+            "The path tips %n forward into the base of the great chocolate fountain, and the warm brown curtain pours over their head.",
+            "%n stumbles against the fountain's rim and two brass cuffs click shut, holding them right under the slow, warm flow.",
+            "A hand on %n's back, a nudge, and they're kneeling in the fountain's bowl with chocolate sheeting down their hair and shoulders."
+          ],
+          [
+            "It runs everywhere: down the back of the neck, over the collarbones, in rivers between every curve and fold.",
+            "{t}The chocolate pools between %n's tits and spills over, thick and glossy, sliding down to their belly.",
+            "{c}It coats %n's cock in a slow brown sheath, drips off the tip and pools between their knees.",
+            "{v}It finds its way between %n's legs, warm and slick, and keeps on finding it.",
+            "The fountain keeps pourin'. %n can taste it on their lips, feel it settle into the small of their back."
+          ],
+          [
+            "Then the farm hands come with their spoons, and when the spoons are too slow, their tongues.",
+            "Three of the hands take turns, lickin' it off %n's neck, their fingers, the backs of their knees, slow and greedy.",
+            "{t}Somebody sucks the chocolate off %n's nipples one at a time, takin' their time about it.",
+            "{c}Somebody kneels and licks the chocolate off %n's cock, root to tip, till they're shakin'.",
+            "{v}A warm mouth works the chocolate out from between %n's legs, thorough and unhurried, and doesn't stop when it's gone."
+          ]
+        ],
+        end: [
+          "The cuffs open and %n crawls out of the bowl, half licked clean and half still glazed, smellin' like a sweet shop.",
+          "%n is let go glossy and brown in all the places nobody got to, sticky and flushed and very well tasted.",
+          "When the hands are full, %n is left kneeling in the bowl, chocolate dryin' tacky in their hair."
+        ]
+      },
+      bakery: {
+        beats: [
+          [
+            "A floury pair of hands steers %n onto the long bakery bench and the straps go over wrists, waist and knees.",
+            "%n wanders past the bakery door and the baker hauls them in by the collar, laughin': just what the window needed.",
+            "The bench is warm from the ovens. %n is laid on it and strapped down before they've worked out why it's so long."
+          ],
+          [
+            "The baker fills a piping bag and starts at the collarbones, rosettes in neat pink rows.",
+            "Frosting goes on cool and sweet, swirled down %n's belly in long ribbons, the baker humming as they work.",
+            "{t}Each of %n's tits gets a ring of rosettes and a cherry on top, very carefully placed.",
+            "{c}The baker pipes a tidy spiral up %n's cock and steps back to admire it, then adds a few more.",
+            "{v}A line of little frosting stars goes down, down, and right between %n's legs, the baker very pleased with themselves."
+          ],
+          [
+            "Sprinkles come next, a whole jar of them, shaken over everything and pressed in with a palm.",
+            "The baker stands back, tuts, and adds another layer of frosting over the top, smoothed with a knife.",
+            "A little card goes on %n's collar, and the bakery door is propped open so passers-by can see the window."
+          ],
+          [
+            "Customers come in. Some take a finger of frosting. Some take a lot more than that.",
+            "A farm hand buys the first slice and eats it straight off %n's belly, licking the plate clean.",
+            "Folk queue at the counter for a taste, and the baker rings every one of them up."
+          ]
+        ],
+        end: [
+          "The straps come off and %n sits up, frosted and sprinkled and licked in patches, sugar crunchin' at every move.",
+          "%n is let off the bench a walking cake, pink and sticky, with sprinkles in places they'll be findin' all week.",
+          "The baker dusts %n with sugar for luck and sends them on their way, still wearin' half the window display."
+        ]
+      },
+      creamery: {
+        beats: [
+          [
+            "The creamery door swings shut behind %n and a big brass nozzle on a hose swivels round to point at them.",
+            "%n is caught by the creamery girls, who think they look like they need topping, and stood against the cold tiles.",
+            "A funnel gets buckled between %n's teeth before they can ask, and somebody cranks the handle on the whippin' cannon."
+          ],
+          [
+            "Whipped cream comes out in great cool billows, over their face, their chest, their belly, piled thick and soft.",
+            "The cannon sweeps up and down %n, and in a minute they're a snowdrift of cream with just their eyes peeking out.",
+            "{t}The creamery girls pile it highest on %n's tits, two great soft mounds, and giggle while they do.",
+            "{c}%n's cock disappears under a heap of cream, and somebody pokes it to see if it's still in there.",
+            "Some of it goes down the funnel. %n swallows sweet cream till they can't."
+          ],
+          [
+            "Then the strawberries: a bowl of them, pressed into the cream one by one and crushed so the red runs through the white.",
+            "Somebody pours strawberry syrup over the top, and it bleeds pink through the cream and down their thighs.",
+            "{t}A strawberry on each nipple, pressed in firm, and the syrup trickled over after."
+          ],
+          [
+            "Somebody hungry comes in from the fields, and doesn't use a spoon.",
+            "The creamery girls take turns eatin' strawberries and cream off %n, and they're very, very slow about it.",
+            "{v}A tongue follows the syrup all the way down, and right between %n's legs, and stays there.",
+            "{c}A mouth finds %n's cock under the cream and cleans it with long, greedy licks."
+          ]
+        ],
+        end: [
+          "%n is let out of the creamery pink and white and sticky everywhere, smellin' of strawberries.",
+          "The funnel comes out and %n is sent on their way creamed and syruped, a trail of drips behind them.",
+          "%n leaves the creamery licked clean in the middle and dripping everywhere else."
+        ]
+      },
+      seedshower: {
+        beats: [
+          [
+            "Round the back of the barn there's a ring of straw, and %n is knelt in the middle of it with a bar between their knees.",
+            "A hand on each shoulder and %n is on their knees in the straw, wrists cuffed behind them, and the strangers start filin' in.",
+            "The back barn door rolls shut, and %n finds themselves kneelin' in the middle of a ring of strangers with their belts already open."
+          ],
+          [
+            "Every one of them is stroking, slow, eyes on %n, waitin' their turn.",
+            "The ring tightens. There's nowhere to look that isn't another cock, hard and close and ready.",
+            "Somebody tips %n's chin up so they can't look away, and tells them to keep their mouth open."
+          ],
+          [
+            "The first one finishes across %n's face with a grunt, hot and thick, and steps back for the next.",
+            "One after another they finish on %n: cheeks, lips, hair, tongue, every load landin' on the last.",
+            "{t}Two of them aim lower and paint %n's tits in long white ropes.",
+            "A big one empties on %n's forehead and it runs down into their eyes, and they're told not to blink.",
+            "Somebody finishes in %n's open mouth and tells them to show it, then to swallow."
+          ],
+          [
+            "More come in from the yard. The ring never seems to get smaller.",
+            "%n stops countin' after a dozen. It drips off their chin in strings and pools on their thighs.",
+            "{c}One of them reaches down and strokes %n till they add their own to the mess.",
+            "The last few take their time, rubbin' it in, spreadin' it with the head, makin' sure nothin' is missed."
+          ]
+        ],
+        end: [
+          "The cuffs come off and %n kneels there dripping, glazed from hair to belly, %ml of it at least.",
+          "When the last of them buckles up, %n is left in the straw coated and sticky, %ml of strangers drying on their skin.",
+          "%n is let up at last, painted white from head to waist, every step dripping, smellin' of a dozen strangers."
+        ]
+      }
+    };
+    const messLine = (kind, key, mn, v) => tFill(pickFor(mn, "trap:" + kind + ":" + key, MESS_LINES[kind][key]), mn, v);
+    Object.assign(MORE_TRAPS, {
+      fountain(mn) {
+        trapHold(mn, 4, "the chocolate fountain");
+        trapRun(mn, "fountain", MESS_LINES.fountain.beats, () => {
+          trapMess(mn, "fountain", "chocolate");
+          emote("\u{1F36B} " + messLine("fountain", "end", mn), mn);
+          arouse(mn, 30);
+          face(mn, "edged", 60);
+        });
+      },
+      bakery(mn) {
+        trapHold(mn, 5, "the bakery bench");
+        trapRun(mn, "bakery", MESS_LINES.bakery.beats, () => {
+          try {
+            bodyMark(mn, { splat: ["chest", "tummy", "face"], color: MESS.cake, mess: "cake", amount: 2 });
+          } catch (e) {
+          }
+          emote("\u{1F382} " + messLine("bakery", "end", mn), mn);
+          arouse(mn, 25);
+          face(mn, "afterglow", 60);
+        });
+      },
+      creamery(mn) {
+        trapHold(mn, 4, "the creamery");
+        trapRun(mn, "creamery", MESS_LINES.creamery.beats, () => {
+          try {
+            bodyMark(mn, { splat: ["face", "chest", "tummy"], color: MESS.cream, mess: "cream", amount: 2.2 });
+          } catch (e) {
+          }
+          later(() => {
+            try {
+              bodyMark(mn, { splat: ["chest", "tummy"], color: MESS.strawberry, mess: "strawberry" });
+            } catch (e) {
+            }
+          }, 1500);
+          emote("\u{1F353} " + messLine("creamery", "end", mn), mn);
+          arouse(mn, 35);
+          face(mn, "edged", 60);
+        });
+      },
+      seedshower(mn) {
+        const n = 8 + Math.floor(Math.random() * 8), ml2 = n * (15 + Math.floor(Math.random() * 15)), v = { ml: ml2 + " mL" };
+        trapHold(mn, 6, "the seed shower");
+        trapRun(mn, "seedshower", MESS_LINES.seedshower.beats, () => {
+          const amt = Math.max(1.5, Math.min(3, ml2 / 120));
+          try {
+            bodyMark(mn, { splat: ["face", "forehead", "chest"], mess: "cum", amount: amt });
+          } catch (e) {
+          }
+          later(() => {
+            try {
+              bodyMark(mn, { splat: ["hair", "tummy"], mess: "cum", amount: amt * 0.7 });
+            } catch (e) {
+            }
+          }, 1500);
+          emote("\u{1F4A6} " + messLine("seedshower", "end", mn, v), mn);
+          arouse(mn, 50);
+          face(mn, "afterglow", 120);
+        }, v);
+      }
+    });
+    const MESS_SHELF = [
+      { id: "creampie", mess: "cum", where: ["tummy", "tummy"], name: "A creampie", price: 2, limit: /\b(creampie|cum|seed|breed)/i, desc: "Filled up and left drippin' down the thighs." },
+      { id: "facial", mess: "cum", where: ["face", "forehead"], name: "A facial", price: 2, limit: /\b(facial|cum|bukkake)/i, desc: "A hot load right across the face." },
+      { id: "mess-pie", mess: "cream", where: ["face", "forehead"], name: "A cream pie in the face", price: 1, limit: /\b(food|messy|splosh|pie)/i, desc: "Splat. Whipped cream and pie crust, right in the kisser." },
+      { id: "mess-cake", mess: "cake", where: ["face", "chest"], name: "A cake smash", price: 2, limit: /\b(food|messy|splosh|cake)/i, desc: "A whole frosted cake, sprinkles and all, smushed on." },
+      { id: "mess-honey", mess: "honey", where: ["chest", "tummy"], name: "A honey drizzle", price: 1, limit: /\b(food|messy|honey)/i, desc: "Slow and golden and very sticky." },
+      { id: "mess-maple", mess: "maple", where: ["chest", "tummy"], name: "A maple syrup pour", price: 1, limit: /\b(food|messy|syrup)/i, desc: "Dark sweet syrup, runnin' everywhere." },
+      { id: "mess-choc", mess: "chocolate", where: ["chest", "tummy"], name: "A chocolate sauce pour", price: 1, limit: /\b(food|messy|chocolate)/i, desc: "Warm chocolate, poured slow." },
+      { id: "mess-berry", mess: "strawberry", where: ["chest", "tummy"], name: "A strawberry syrup pour", price: 1, limit: /\b(food|messy|syrup)/i, desc: "Bright red and sweet, drippin' down." },
+      { id: "mess-slime", mess: "slime", where: ["face", "chest", "tummy"], name: "A bucket of slime", price: 2, limit: /\b(slime|goo|messy)/i, desc: "Green, cold, wobbly, everywhere." },
+      { id: "mess-mud", mess: "mud", where: ["face", "chest", "tummy"], name: "A mud bath", price: 1, limit: /\b(mud|filth|messy)/i, desc: "A bucket from the wallow, straight over the head." },
+      { id: "mess-milk", mess: "milk", where: ["chest", "face"], name: "A pail of milk", price: 1, limit: /\b(milk|messy)/i, desc: "Fresh from the parlour, over their head." },
+      { id: "mess-piss", mess: "piss", where: ["face", "chest", "tummy"], name: "A golden shower", price: 2, limit: /\b(piss|pee|water ?sports|urin)/i, ws: true, desc: "Both of you need ?watersports on." }
+    ];
+    for (const it of MESS_SHELF) STORE_BASE.push(Object.assign({ shelf: "mess" }, it));
+    const MESS_DO = {
+      creampie: {
+        self: [
+          "%b squats over a bucket of the farm's best, and when they stand up, it's runnin' down the insides of their thighs.",
+          "%b gets themselves good and filled at the stud stall, and walks out drippin' with every step."
+        ],
+        other: [
+          "%b pins %t down in the straw, buries deep, and fills them till it spills, then pulls out slow to watch it run down %t's thighs.",
+          "%b takes %t from behind against the rail and empties into them, deep and hot, and holds there while %t squirms. When %b pulls out it comes with them.",
+          "%b bends %t over a hay bale and breeds them hard and messy, and leaves them creamed and drippin' onto the straw.",
+          "%b fills %t up, slow and thorough, and then spreads them open with two fingers just to watch it leak out."
+        ]
+      },
+      facial: {
+        self: ["%b kneels at the stud stall with their mouth open and comes away with a face full, drippin' off the chin."],
+        other: [
+          "%b strokes themselves over %t's upturned face and finishes across it, cheek to brow, thick and hot.",
+          "%b grabs %t by the hair, holds them still and paints their face, every pulse landin' on the last.",
+          "%b makes %t kneel and keep their eyes open, and gives them a facial they'll be wipin' off for an hour."
+        ]
+      },
+      "mess-pie": {
+        self: ["%b shoves a cream pie in their own face and comes up laughin', cream to the ears."],
+        other: ["SPLAT. %b plants a cream pie square in %t's face and gives it a good twist for luck.", "%b sneaks up on %t with a cream pie and the whole barn hears the splat.", "%b holds %t's chin and smushes a cream pie into their face, slow, makin' sure every bit lands."]
+      },
+      "mess-cake": {
+        self: ["%b faceplants into a whole frosted cake, on purpose, and comes up covered in frostin' and sprinkles."],
+        other: ["%b smashes a whole birthday cake into %t's face and down their front, sprinkles everywhere.", "%b gives %t a cake smash they'll never forget, frostin' in the hair and down the cleavage.", "%b shoves %t face first into a cake on the table, then smears what's left down their chest."]
+      },
+      "mess-honey": {
+        self: ["%b drizzles a pot of honey over themselves, slow and golden, and licks their fingers."],
+        other: ["%b tips a pot of honey over %t, slow, and watches it creep down every curve.", "%b drizzles honey over %t's chest and belly, and has a taste."]
+      },
+      "mess-maple": { self: ["%b pours maple syrup over their own chest and lets it run."], other: ["%b upends a jug of maple syrup over %t's shoulders and lets it run.", "%b glazes %t in maple syrup like a stack of pancakes."] },
+      "mess-choc": { self: ["%b pours warm chocolate down their own front, slow and glossy."], other: ["%b pours warm chocolate sauce down %t's front, slow and glossy.", "%b paints %t with chocolate sauce, then licks a long stripe of it off."] },
+      "mess-berry": { self: ["%b squeezes strawberry syrup over themselves, bright red and sticky."], other: ["%b squeezes a bottle of strawberry syrup over %t, red drippin' everywhere.", "%b drizzles strawberry syrup over %t and adds a cherry on top."] },
+      "mess-slime": { self: ["%b tips a bucket of slime over their own head and shivers as it oozes down."], other: ["%b dumps a whole bucket of green slime over %t's head. It goes everywhere.", "%b creeps up behind %t with a bucket of slime, and %t's shriek fills the barn."] },
+      "mess-mud": { self: ["%b flops into the wallow and comes up brown from head to toe."], other: ["%b upends a bucket of wallow mud over %t, head to toe.", "%b tackles %t into the mud and rolls them in it good."] },
+      "mess-milk": { self: ["%b pours a pail of fresh milk over their own head."], other: ["%b tips a pail of fresh milk over %t's head, and it runs white down everything.", "%b soaks %t with a whole pail of milk from the parlour."] },
+      "mess-piss": { self: ["%b stands in the trough and gets themselves good and soaked."], other: ["%b stands over %t and lets go, hot and golden, soakin' them through.", "%b marks %t properly, a long hot stream from the face down.", "%b has %t kneel and hosts them a golden shower, and doesn't miss a spot."] }
+    };
+    const messFill = (t, by, to) => t.replace(/%b/g, plainName(by)).replace(/%t/g, plainName(to));
+    function messWhyNot(it, sender, to) {
+      const r = rec(to);
+      if (!r) return plainName(to) + " isn't on the books, sugar.";
+      if (it.limit && it.limit.test(String(r.limits || ""))) return plainName(to) + "'s limits rule that one out.";
+      if (/\bmess(y|es)?\b/i.test(String(r.limits || "")) && to !== sender) return plainName(to) + " doesn't want messes, sugar.";
+      if (it.ws && !(rec(sender).watersports && r.watersports)) return "That one needs you both on ?watersports, sugar.";
+      if (!onMap(to)) return plainName(to) + " isn't here, hon.";
+      return null;
+    }
+    function messApply(it, sender, to) {
+      const pool = MESS_DO[it.id] || {}, lines = to === sender ? pool.self : pool.other;
+      if (lines && lines.length) emote("\u{1F6CD}\uFE0F " + messFill(lines[Math.floor(Math.random() * lines.length)], sender, to), to);
+      try {
+        bodyMark(to, Object.assign({ splat: it.where.slice(), mess: it.mess, amount: it.mess === "cum" ? 1.6 : 1.4 }, MESS[it.mess] ? { color: MESS[it.mess] } : it.mess === "piss" ? { color: CFG.PISS_COLOR } : {}));
+      } catch (e) {
+        warn("mess store:", e);
+      }
+      if (it.id === "creampie") later(() => {
+        try {
+          bodyMark(to, { splat: ["tummy"], mess: "cum", amount: 1.2 });
+        } catch (e) {
+        }
+      }, 1200);
+      try {
+        const tp = prodOf(to);
+        if (tp) {
+          tp.painted = { areas: Array.from(new Set((tp.painted && tp.painted.until > Date.now() ? tp.painted.areas : []).concat(it.where))), until: Date.now() + CFG.PAINT_H * 36e5, by: sender };
+        }
+      } catch (e) {
+      }
+      arouse(to, it.mess === "cum" ? 25 : 10);
+    }
+    function messBuy(it, sender, forWho, price, R, done) {
+      const to = forWho || sender, why = messWhyNot(it, sender, to);
+      if (why) {
+        R(why);
+        return;
+      }
+      if (to === sender || rec(to).messesOn) {
+        spendRibbons(sender, price, it.name + (to === sender ? "" : " for " + plainName(to)));
+        messApply(it, sender, to);
+        done("\u{1F6CD}\uFE0F " + it.name + (to === sender ? "" : " for " + plainName(to)) + ". (" + ribbonsOf(sender) + " ribbons left)");
+        return;
+      }
+      R("\u{1F6CD}\uFE0F I've asked " + plainName(to) + " if they'll take your " + it.name.replace(/^an? /i, "") + ". You only pay if they say yes.");
+      farmAsk(to, "\u{1F6CD}\uFE0F " + plainName(sender) + " wants to give you " + it.name.toLowerCase() + " (" + it.desc + ") Say yes or no. (?messes on and nobody needs to ask.)", (yes) => {
+        if (!yes) {
+          tell(sender, "\u{1F6CD}\uFE0F " + plainName(to) + " said no to your " + it.name.replace(/^an? /i, "") + ", sugar. Your ribbons are still yours.");
+          return;
+        }
+        if (messWhyNot(it, sender, to)) {
+          tell(sender, "\u{1F6CD}\uFE0F " + plainName(to) + " isn't here for it anymore, hon.");
+          return;
+        }
+        if (!spendRibbons(sender, price, it.name + " for " + plainName(to))) {
+          tell(sender, "You didn't have the ribbons anymore, hon.");
+          return;
+        }
+        messApply(it, sender, to);
+        done();
+      });
+    }
+    function messesCommand(sender, args, R) {
+      const r = rec(sender);
+      if (!r) {
+        R("You're not on the books yet, sugar.");
+        return;
+      }
+      const a = String(args[0] || "").toLowerCase();
+      if (a === "on" || a === "off") {
+        r.messesOn = a === "on";
+        saveLedger();
+        R(a === "on" ? "\u{1F6CD}\uFE0F Messes on: anybody can buy a mess off the shelf and put it on you, no askin'. Your limits still count, and ?wash cleans you up." : "\u{1F6CD}\uFE0F Messes off: you'll be asked first, every time.");
+        return;
+      }
+      R("\u{1F6CD}\uFE0F Messes off the shelf (" + (r.messesOn ? "ON: no askin'" : "off: you're asked first") + "). " + MESS_SHELF.map((it) => it.id.replace(/^mess-/, "") + " " + it.price + "\u{1F380}").join(", ") + ". ?buy <one> for <who>. ?messes on|off.");
+    }
     const PARASITE_SERUMS = ["growth", "fertility", "growth", "hyper pregnancy", "growth", "capacity"];
     const PARASITE_GROWS = ["udder", "penis", "testes", "butt"];
     function parasiteChance(mn) {
@@ -21985,7 +22325,7 @@
         privateLine(mn, uLine("over" + st, mn), "emote");
         if (st >= 2) {
           emote("\u{1F95B} " + uLine("overRoom" + st, mn), mn);
-          bodyMark(mn, { splat: ["chest"], color: "#FFFFFF" });
+          bodyMark(mn, { splat: ["chest"], color: "#FFFFFF", mess: "milk" });
         }
       }
       if (st >= 4 && now - (p.fullNag || 0) > 10 * 6e4 && !quietNow(mn) && charFor(mn)) {
@@ -23957,6 +24297,55 @@
         desc: "Up on the auction block in the display frame, turned slowly so every bidder can see every inch of the lot."
       }]
     });
+    Object.assign(TRAP_GEAR, {
+      fountain: [{
+        when: "hold",
+        slot: "arms",
+        label: "Fountain Cuffs",
+        items: ["LeatherCuffs", "SteelCuffs"],
+        desc: "Brass cuffs on short chains bolted to the fountain's rim, holding them right under the warm, slow curtain of chocolate."
+      }],
+      bakery: [
+        {
+          when: "hold",
+          slot: "device",
+          label: "Bakery Bench",
+          items: ["BondageBench", "Table"],
+          desc: "A long floured baker's bench with leather straps at wrist, waist and knee, built to hold something still while it's decorated."
+        },
+        {
+          when: "after",
+          slot: "tag",
+          label: "Price Tag",
+          items: ["CollarNameTag", "CollarBell"],
+          mins: 20,
+          desc: "A little card tag on a ribbon at the collar, in the baker's curly hand: FRESH TODAY, ONE SLICE PER CUSTOMER."
+        }
+      ],
+      creamery: [{
+        when: "hold",
+        slot: "funnel",
+        label: "Cream Funnel",
+        items: ["FunnelGag", "RingGag"],
+        desc: "A wide steel funnel buckled between the teeth, so the cream that misses the skin goes somewhere useful."
+      }],
+      seedshower: [
+        {
+          when: "hold",
+          slot: "legs",
+          label: "Kneeling Spreader",
+          items: ["SpreaderMetal", "SpreaderDildoBar"],
+          desc: "A short steel bar between the knees, keeping them knelt wide and low in the middle of the ring."
+        },
+        {
+          when: "hold",
+          slot: "arms",
+          label: "Behind-the-Back Cuffs",
+          items: ["LeatherCuffs", "SteelCuffs"],
+          desc: "Cuffs that keep their hands behind them, so there's nothing to wipe with and nothing to hide behind."
+        }
+      ]
+    });
     const SEVERITY = [null, { name: "mild", x: 1, t: 1 }, { name: "strong", x: 2, t: 1.5 }, { name: "brutal", x: 3, t: 2.5 }];
     function dangerX(mn) {
       const n = potionX(mn, "danger");
@@ -24057,7 +24446,7 @@
           arouse(mn, 10 * S.x);
         } },
         milk: { can: () => true, hold: 2, go(mn, S) {
-          bodyMark(mn, { splat: ["face", "chest", "tummy", "chest"].slice(0, 1 + S.x), color: "#F3EEDD" });
+          bodyMark(mn, { splat: ["face", "chest", "tummy", "chest"].slice(0, 1 + S.x), color: "#F3EEDD", mess: "milk" });
           if (S.x >= 2 && !holeBlocked(mn, "mouth")) {
             const p = prodOf(mn), k = trapFill(mn, "mouth", 80 * S.x);
             p.milk = Math.min(milkCap(mn), p.milk + k * CFG.PROD.SWALLOW_TO_MILK);
@@ -26505,6 +26894,7 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
       "ribbon",
       "store",
       "buy",
+      "messes",
       "gift",
       "potions",
       "potion",
@@ -29005,6 +29395,10 @@ Welcome to B&B Farm, hon. \u{1F33E}`
           symbioteCommand(sender, args, R);
           break;
         // 10v4-symbiotes.js
+        case "messes":
+          messesCommand(sender, args, R);
+          break;
+        // 10u9-mess-store.js
         case "quiet":
         case "tend":
           if (cmd !== "tend" || !bedTend(sender, args, R)) broodCommand(cmd, sender, args, R);

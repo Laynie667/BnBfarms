@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.32.0
+// @version      0.32.1
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -1828,7 +1828,7 @@
   ];
 
   // bot/src/version.js
-  var VERSION = "0.32.0";
+  var VERSION = "0.32.1";
 
   // bot-parts:farmhand-bot-parts
   (function() {
@@ -3475,7 +3475,7 @@
     }, __wordsFor: (m, t) => wordsFor(m, t), __overdue: (m) => overdueStage(m), __milkCum: (m) => stallClimax(m), __intSev: (m, s) => intensitySev(m, s), __intTail: (m, k) => intensityTail(m, 5, 6, k), __holes: (m) => holesFor(m), __album: (m) => albumFor(m, 60), __holeTook: (m, h, a) => holeTook(m, h, a), __dreamTheme: (m) => dreamTheme(m), __eggsWorth: (t, n) => eggsWorth(t, n), __rank: (m) => rankX(m), __broodBook: (m) => broodBook(m), __belly: (m) => bellyStage(m), __happening: (m) => happeningFor(m), __gearOn: (m, s, l, d, x) => gearOn(m, s, l, d, x), __heard: (mn, t) => trapHeard(mn, t), __parasiteTick: () => parasiteTick(), __parts: (m) => parasiteParts(rec(m).parasite), __climax: (m) => parasiteClimax(m), __nurse: (a, b) => parasiteNurse(a, b), __parasiteChance: (m) => parasiteChance(m), __kiss: (a, f, s, t) => parasiteKiss(a, f, s, t), __load: (s, m, h, x) => parasiteLoad(s, m, h, x), __shot: (t, by, text, how) => applyShot(t, by, text, how), __slow: (mn) => slowOf(mn), __milkRate: (mn) => milkRate(mn), __benchTick: () => benchTick(), __roll: (m, s, a, b) => rollConception(m, s, a, b), __contractTick: () => {
       state.cwAt = 0;
       contractWatchTick();
-    }, __lingerTick: () => lingerTick(), __ribbonTick: () => ribbonTick(), __dareTick: () => dareTick(), __potionOn: (mn, id) => potionOn(mn, id), __milkRate: (mn) => milkRate(mn), __addonLine: (k, i) => addonLine(k, i), __lineInfo: (m, x) => lineInfo(m, x), __gearSense: (m) => gearSense(m), __symTick: () => symbioteTick(), __symBond: (m, k, h) => symBond(m, k, h), __symFed: (m, h, x) => symbioteFed(m, h, x), __capacity: (m) => capacity(m), __symLines: () => SYM_LINES, __newTrapLines: () => NEW_TRAP_LINES, __farmGear: (m) => farmGearFor(m), __mazeTick: () => mazeTick() });
+    }, __lingerTick: () => lingerTick(), __ribbonTick: () => ribbonTick(), __dareTick: () => dareTick(), __potionOn: (mn, id) => potionOn(mn, id), __milkRate: (mn) => milkRate(mn), __addonLine: (k, i) => addonLine(k, i), __lineInfo: (m, x) => lineInfo(m, x), __gearSense: (m) => gearSense(m), __symTick: () => symbioteTick(), __symBond: (m, k, h) => symBond(m, k, h), __symFed: (m, h, x) => symbioteFed(m, h, x), __capacity: (m) => capacity(m), __symLines: () => SYM_LINES, __newTrapLines: () => NEW_TRAP_LINES, __farmGear: (m) => farmGearFor(m), __mazeTick: () => mazeTick(), __farmSets: () => ({ TRAP_GEAR, TRAP_KINDS, CURSES, SUIT_STAGES, SUIT_COLOR, MESS, MESS_BY_TRAP }) });
     W.FarmhandSyncKeys = () => syncAllPresent(true);
     W.FarmhandFriends = () => W.Player.FriendList;
     W.FarmhandAddFriend = (mn) => addFriend(mn, false);

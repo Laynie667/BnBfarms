@@ -587,6 +587,7 @@
       $("div", { className: "row" }, $("label", { textContent: "Colour what's on in this slot:" }),
         $("input", { id: "fh-colour", type: "color", value: "#c9577a", onchange: (e) => tint(document.getElementById("fh-slot").value, e.target.value) }),
         $("button", { type: "button", textContent: "Game's own colours", onclick: () => tint(document.getElementById("fh-slot").value, "Default") })),
+      $("h2", { textContent: "Farm equipment" }), farmPanel(),
       $("h2", { textContent: "Wearing now" }), $("div", { className: "row", id: "fh-worn" }),
       $("div", { id: "fh-fit" }),
       $("h2", { textContent: "Breasts" }), breastPanel(),
@@ -601,6 +602,59 @@
     document.getElementById("fh-slot").value = "ItemNipples";
     fillItems(); fillWorn();
     syncButtons();
+  }
+
+  // ── the farm's equipment, as presets (Laynie, Oct 15: "added the farm items to the studio as presets, so i can view
+  // each set without having to wait in game to trigger") ──
+  // farm-presets.json is written by tools/farm-presets.mjs from the bot itself: every trap's gear, the mystery box, the
+  // livin' suit by stage, and every mess colour. A piece goes where the Companion would put it: the first of its groups
+  // that's free (or the one it's already in), as the first of its items this game has.
+  const FARM = { data: null, on: [] };
+  async function farmLoad() { try { FARM.data = await (await fetch("/__studio/farm-presets.json", { cache: "no-store" })).json(); } catch (e) { FARM.data = { sets: [], messes: [] }; } }
+  function farmOff() {
+    let n = 0;
+    for (const p of FARM.on) { const it = worn(p.group); if (it && it.Asset.Name === p.item) { InventoryRemove(S.C, p.group, false); n++; } }
+    FARM.on = []; redraw(); return n;
+  }
+  function farmWear(set) {
+    farmOff();
+    const got = [], missed = [];
+    for (const p of set.pieces) {
+      const group = p.groups.find((g) => !worn(g)) || p.groups[0];
+      const item = p.items.find((n) => { try { return !!AssetGet(S.C.AssetFamily, group, n); } catch (e) { return false; } });
+      if (!item) { missed.push(p.label); continue; }
+      InventoryWear(S.C, item, group, null, null, null, null, false);
+      const it = worn(group);
+      if (!it || it.Asset.Name !== item) { missed.push(p.label); continue; }
+      if (p.color) it.Color = Array.isArray(p.color) ? p.color.slice() : ((it.Asset.Layer || []).filter((l) => l.AllowColorize !== false).length > 1 ? (it.Asset.Layer || []).filter((l) => l.AllowColorize !== false).map(() => p.color) : p.color);
+      FARM.on.push({ group, item }); got.push(p.label + " (" + item + ")");
+    }
+    redraw();
+    say(set.name + ": " + (got.length ? got.join(", ") : "nothing") + (missed.length ? ". Not in this game: " + missed.join(", ") : "") + ".", !got.length);
+  }
+  // a mess: the game's Splatters in its colour, on the face, chest and tummy (the Companion's own splatters come later)
+  function farmMess(m) {
+    const group = ["Mask", "FaceMarkings", "BodyMarkings"].find((g) => !worn(g)) || "BodyMarkings";
+    InventoryWear(S.C, "Splatters", group, null, null, null, null, false);
+    const it = worn(group); if (!it || it.Asset.Name !== "Splatters") { say("The game wouldn't put Splatters on there.", true); return; }
+    it.Color = m.color; it.Property = Object.assign({}, it.Property || {}, { TypeRecord: { d: 1, e: 1, g: 1, h: 1, i: 1, k: 1, l: 1, m: 1 } });
+    FARM.on.push({ group, item: "Splatters" }); redraw();
+    say("Mess: " + m.name + (m.traps.length ? " (left by " + m.traps.join(", ") + ")" : "") + ".");
+  }
+  function farmPanel() {
+    const box = $("div", {}, $("p", { className: "note", textContent: "Loading the farm's equipment…" }));
+    farmLoad().then(() => {
+      const D = FARM.data, groups = [...new Set(D.sets.map((x) => x.group))];
+      box.replaceChildren(
+        $("p", { className: "note", textContent: "Every set the farm puts on somebody, as the Companion would. Read from the bot (tools/farm-presets.mjs)." }),
+        $("div", { className: "row" },
+          $("select", { id: "fh-farmset" }, groups.map((g) => $("optgroup", { label: g }, D.sets.map((x, i) => x.group === g ? $("option", { value: String(i), textContent: x.name }) : null)))),
+          $("button", { type: "button", className: "go", textContent: "Put the set on", onclick: () => farmWear(D.sets[Number(document.getElementById("fh-farmset").value)]) }),
+          $("button", { type: "button", textContent: "Take the farm's pieces off", onclick: () => say(farmOff() + " pieces off.") })),
+        $("p", { className: "note", textContent: "Messes:" }),
+        $("div", { className: "row" }, D.messes.map((m) => $("button", { type: "button", textContent: m.name, style: "border-left: 14px solid " + m.color, onclick: () => farmMess(m) }))));
+    });
+    return box;
   }
 
   // where she starts in her own canvas: Echo widens it, and with the live game's files it centres her in the width

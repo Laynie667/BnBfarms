@@ -5,7 +5,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 | Script | File in `dist/` | Where it runs | Current |
 |---|---|---|---|
-| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.32.0** |
+| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.32.1** |
 | Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.7.0** |
 | Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.2.1** |
 | Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **1.1.0** |
@@ -23,6 +23,8 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 - Running the watcher on more than one game at once (the bot, yours, a tester's) lets Claude line them up into one timeline.
 
 ## Latest changes (newest first)
+
+- **Studio: the farm's equipment as presets; bot 0.32.1.** Laynie: "added the farm items to the studio as presets, so i can view each set without having to wait in game to trigger". A *Farm equipment* section in the studio: pick any of 56 sets (every trap's gear, with and without a pussy where it matters, the mystery box, the livin' suit stage by stage) and put it on in one click, the way the Companion would; buttons for every mess colour. `node tools/farm-presets.mjs` rewrites the list from the built bot after gear changes. Bot 0.32.1 only adds a test hook the tool reads (nothing changes in play).
 
 - **Bot 0.32.0, Companion 0.23.0: the farm's equipment on you, messes, and ten more traps.** Laynie: "i love those traps, and i would love more equipment, and messes for the farm equipment anyway, just no feces ones :3 but creampies, slime, syrups and such would be awesome."
   (1) **Ten more traps** (66 now): **auction** (up on the block: three minutes of ?bid, and the winner walks them through three traps; they keep half), **maze** (the corn maze: with spots called maze-start and maze-exit they're put in and have five minutes to get out, a ribbon if they do; otherwise, or with no maze laid out, the thing in the corn finds them and breeds them), **honey** (drenched in honey, or maple, chocolate or strawberry syrup, and licked clean by the barn critters; sticky and slow after), **incubator** (a clutch they carry comes half again bigger and due within half an hour; carryin' nothin', they come out in heat and ripe), **collection** (studs: the collection bench drains them dry into their own vat), **wheel** (the breedin' wheel: three spins, a different kind of stud's cock each time, three loads), **stocks** (the fair stocks and a queue with cream pies), **kissgate** (stuck halfway through the kissin' gate; the toll is them), **windmill** (tied to the sails, turnin' slow over the farm; dizzy after), **mudpit** (needs a second subject close by: both pulled in to wrestle, the winner has the loser, a ribbon for the winner).

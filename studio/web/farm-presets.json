@@ -1,0 +1,1855 @@
+{
+ "made": "2026-10-15T07:12:01.242Z",
+ "sets": [
+  {
+   "group": "Traps",
+   "name": "🎈 pump (pussy)",
+   "what": "a hose finds a hole and pumps your belly round and tight",
+   "pieces": [
+    {
+     "slot": "dildo",
+     "groups": [
+      "ItemVulva"
+     ],
+     "items": [
+      "ButtPump",
+      "HollowButtPlug",
+      "InflatableVibeDildo",
+      "InflatableVibeDildo",
+      "VibratingDildo",
+      "ClitoralStimulator"
+     ],
+     "color": "#2B2B2B",
+     "label": "Pump Bung",
+     "when": "after",
+     "mins": 10,
+     "desc": "A fat black rubber bung, swollen tight inside, corking a belly pumped round and sloshing. It doesn't come out until every drop has soaked in."
+    }
+   ]
+  },
+  {
+   "group": "Traps",
+   "name": "🎈 pump (no pussy)",
+   "what": "a hose finds a hole and pumps your belly round and tight",
+   "pieces": [
+    {
+     "slot": "plug",
+     "groups": [
+      "ItemButt"
+     ],
+     "items": [
+      "ButtPump",
+      "HollowButtPlug",
+      "InflatableVibeDildo",
+      "InflVibeButtPlug",
+      "BlackButtPlug",
+      "ButtPlug",
+      "ButtPump"
+     ],
+     "color": "#2B2B2B",
+     "label": "Pump Bung",
+     "when": "after",
+     "mins": 10,
+     "desc": "A fat black rubber bung, swollen tight inside, corking a belly pumped round and sloshing. It doesn't come out until every drop has soaked in."
+    }
+   ]
+  },
+  {
+   "group": "Traps",
+   "name": "🥚 eggs (pussy)",
+   "what": "a post rises up under you and lays a clutch in you",
+   "pieces": [
+    {
+     "slot": "dildo",
+     "groups": [
+      "ItemVulva"
+     ],
+     "items": [
+      "EggVibePlugXXL",
+      "PenisDildo",
+      "InflatableVibeDildo",
+      "VibratingDildo",
+      "ClitoralStimulator"
+     ],
+     "color": "#2B2B2B",
+     "label": "Egg Post Plug",
+     "when": "after",
+     "mins": 15,
+     "desc": "The egg post's parting gift: a thick ridged plug seated deep behind a fresh clutch, holding every egg in a stretched, slick hole while they settle."
+    }
+   ]
+  },
+  {
+   "group": "Traps",
+   "name": "🥚 eggs (no pussy)",
+   "what": "a post rises up under you and lays a clutch in you",
+   "pieces": [
+    {
+     "slot": "plug",
+     "groups": [
+      "ItemButt"
+     ],
+     "items": [
+      "EggVibePlugXXL",
+      "PenisDildo",
+      "InflVibeButtPlug",
+      "BlackButtPlug",
+      "ButtPlug",
+      "ButtPump"
+     ],
+     "color": "#2B2B2B",
+     "label": "Egg Post Plug",
+     "when": "after",
+     "mins": 15,
+     "desc": "The egg post's parting gift: a thick ridged plug seated deep behind a fresh clutch, holding every egg in a stretched, slick hole while they settle."
+    }
+   ]
+  },
+  {
+   "group": "Traps",
+   "name": "🐙 tentacle (pussy)",
+   "what": "the thing in the water. It always leaves eggs",
+   "pieces": [
+    {
+     "slot": "arms",
+     "groups": [
+      "ItemArms"
+     ],
+     "items": [
+      "Tentacles",
+      "HempRope",
+      "LeatherCuffs"
+     ],
+     "color": "#C9577A",
+     "label": "The Water's Grip",
+     "when": "hold",
+     "mins": null,
+     "desc": "Thick, wet, suckered arms wound tight round wrists and elbows, holding them spread while the rest of it breeds them. They squeeze in time."
+    },
+    {
+     "slot": "torso",
+     "groups": [
+      "ItemTorso",
+      "ItemTorso2"
+     ],
+     "items": [
+      "TentacleSuit",
+      "TentacleSuit",
+      "HempRopeHarness"
+     ],
+     "color": "#C9577A",
+     "label": "The Water's Embrace",
+     "when": "hold",
+     "mins": null,
+     "desc": "It has them round the middle too: thick wet arms wound over belly and ribs and between the breasts, squeezing slow, holding them up out of the water like a catch."
+    },
+    {
+     "slot": "legs",
+     "groups": [
+      "ItemLegs"
+     ],
+     "items": [
+      "Tentacles",
+      "HempRope",
+      "LeatherLegCuffs"
+     ],
+     "color": "#C9577A",
+     "label": "The Water's Coils",
+     "when": "hold",
+     "mins": null,
+     "desc": "Slick coils round both thighs, hauling them wide and keeping them there. There is no closing these legs until it has finished laying."
+    },
+    {
+     "slot": "dildo",
+     "groups": [
+      "ItemVulva"
+     ],
+     "items": [
+      "Tentacles",
+      "DoubleEndDildo",
+      "PenisDildo",
+      "InflatableVibeDildo",
+      "VibratingDildo",
+      "ClitoralStimulator"
+     ],
+     "color": "#C9577A",
+     "label": "Slime Seal",
+     "when": "after",
+     "mins": 15,
+     "desc": "The thing left the tip of itself behind: a fat knot of living flesh buried to the root, pulsing, sealing a womb packed full of its eggs."
+    }
+   ]
+  },
+  {
+   "group": "Traps",
+   "name": "🐙 tentacle (no pussy)",
+   "what": "the thing in the water. It always leaves eggs",
+   "pieces": [
+    {
+     "slot": "arms",
+     "groups": [
+      "ItemArms"
+     ],
+     "items": [
+      "Tentacles",
+      "HempRope",
+      "LeatherCuffs"
+     ],
+     "color": "#C9577A",
+     "label": "The Water's Grip",
+     "when": "hold",
+     "mins": null,
+     "desc": "Thick, wet, suckered arms wound tight round wrists and elbows, holding them spread while the rest of it breeds them. They squeeze in time."
+    },
+    {
+     "slot": "torso",
+     "groups": [
+      "ItemTorso",
+      "ItemTorso2"
+     ],
+     "items": [
+      "TentacleSuit",
+      "TentacleSuit",
+      "HempRopeHarness"
+     ],
+     "color": "#C9577A",
+     "label": "The Water's Embrace",
+     "when": "hold",
+     "mins": null,
+     "desc": "It has them round the middle too: thick wet arms wound over belly and ribs and between the breasts, squeezing slow, holding them up out of the water like a catch."
+    },
+    {
+     "slot": "legs",
+     "groups": [
+      "ItemLegs"
+     ],
+     "items": [
+      "Tentacles",
+      "HempRope",
+      "LeatherLegCuffs"
+     ],
+     "color": "#C9577A",
+     "label": "The Water's Coils",
+     "when": "hold",
+     "mins": null,
+     "desc": "Slick coils round both thighs, hauling them wide and keeping them there. There is no closing these legs until it has finished laying."
+    },
+    {
+     "slot": "plug",
+     "groups": [
+      "ItemButt"
+     ],
+     "items": [
+      "Tentacles",
+      "DoubleEndDildo",
+      "PenisDildo",
+      "InflVibeButtPlug",
+      "BlackButtPlug",
+      "ButtPlug",
+      "ButtPump"
+     ],
+     "color": "#C9577A",
+     "label": "Slime Seal",
+     "when": "after",
+     "mins": 15,
+     "desc": "The thing left the tip of itself behind: a fat knot of living flesh buried to the root, pulsing, sealing a womb packed full of its eggs."
+    }
+   ]
+  },
+  {
+   "group": "Traps",
+   "name": "🐗 boar (pussy)",
+   "what": "the boar that lives in the wallow, and a long, muddy tie",
+   "pieces": [
+    {
+     "slot": "dildo",
+     "groups": [
+      "ItemVulva"
+     ],
+     "items": [
+      "FuckPlug",
+      "PenisPlug",
+      "PenisDildo",
+      "InflatableVibeDildo",
+      "VibratingDildo",
+      "ClitoralStimulator"
+     ],
+     "color": "#2B2B2B",
+     "label": "Boar's Plug",
+     "when": "after",
+     "mins": 20,
+     "desc": "What a boar leaves so nothing leaks: a hard waxy plug as thick as a wrist, set deep, with a bellyful of hog seed sloshing behind it."
+    }
+   ]
+  },
+  {
+   "group": "Traps",
+   "name": "🐗 boar (no pussy)",
+   "what": "the boar that lives in the wallow, and a long, muddy tie",
+   "pieces": [
+    {
+     "slot": "plug",
+     "groups": [
+      "ItemButt"
+     ],
+     "items": [
+      "FuckPlug",
+      "PenisPlug",
+      "PenisDildo",
+      "InflVibeButtPlug",
+      "BlackButtPlug",
+      "ButtPlug",
+      "ButtPump"
+     ],
+     "color": "#2B2B2B",
+     "label": "Boar's Plug",
+     "when": "after",
+     "mins": 20,
+     "desc": "What a boar leaves so nothing leaks: a hard waxy plug as thick as a wrist, set deep, with a bellyful of hog seed sloshing behind it."
+    }
+   ]
+  },
+  {
+   "group": "Traps",
+   "name": "🌿 vines (pussy)",
+   "what": "vines, pollen that puts you in heat, and seed pods planted deep",
+   "pieces": [
+    {
+     "slot": "dildo",
+     "groups": [
+      "ItemVulva"
+     ],
+     "items": [
+      "Tentacles",
+      "PenisDildo",
+      "InflatableVibeDildo",
+      "VibratingDildo",
+      "ClitoralStimulator"
+     ],
+     "color": "#3E8A3A",
+     "label": "Seed Pod Stem",
+     "when": "after",
+     "mins": 10,
+     "desc": "A cut length of thick green vine, still rooted inside and dripping sap, holding its seed pods where it planted them."
+    }
+   ]
+  },
+  {
+   "group": "Traps",
+   "name": "🌿 vines (no pussy)",
+   "what": "vines, pollen that puts you in heat, and seed pods planted deep",
+   "pieces": [
+    {
+     "slot": "plug",
+     "groups": [
+      "ItemButt"
+     ],
+     "items": [
+      "Tentacles",
+      "PenisDildo",
+      "InflVibeButtPlug",
+      "BlackButtPlug",
+      "ButtPlug",
+      "ButtPump"
+     ],
+     "color": "#3E8A3A",
+     "label": "Seed Pod Stem",
+     "when": "after",
+     "mins": 10,
+     "desc": "A cut length of thick green vine, still rooted inside and dripping sap, holding its seed pods where it planted them."
+    }
+   ]
+  },
+  {
+   "group": "Traps",
+   "name": "🟢 slime",
+   "what": "slime that eats your clothes, gets in everywhere and leaves you slow and green",
+   "pieces": [
+    {
+     "slot": "arms",
+     "groups": [
+      "ItemArms"
+     ],
+     "items": [
+      "Slime",
+      "HempRope",
+      "LeatherCuffs"
+     ],
+     "color": "#5FAE3A",
+     "label": "Slime Sleeves",
+     "when": "after",
+     "mins": null,
+     "desc": "Thick green slime still clinging from fingers to shoulders, warm and tacky, stringing between arm and ribs with every move."
+    },
+    {
+     "slot": "legs",
+     "groups": [
+      "ItemLegs"
+     ],
+     "items": [
+      "Slime",
+      "HempRope",
+      "LeatherLegCuffs"
+     ],
+     "color": "#5FAE3A",
+     "label": "Slime Stockings",
+     "when": "after",
+     "mins": null,
+     "desc": "Slime coating both legs to the hip, oozing down the thighs and sucking at the floor. Whatever it crawled into is still in there too."
+    }
+   ]
+  },
+  {
+   "group": "Traps",
+   "name": "🚫 clamp",
+   "what": "a clamp shuts over you: no cummin' for half an hour, and it keeps you right on the edge",
+   "pieces": [
+    {
+     "slot": "belt",
+     "groups": [
+      "ItemPelvis"
+     ],
+     "items": [
+      "SteelChastityPanties",
+      "HeavyDutyBelt",
+      "MetalChastityBelt",
+      "PolishedChastityBelt",
+      "LeatherChastityBelt",
+      "SleekLeatherChastityBelt",
+      "MetalChastityBelt"
+     ],
+     "color": null,
+     "label": "Denial Clamp",
+     "when": "after",
+     "mins": null,
+     "desc": "Cold steel locked over everything worth touching. Inside, something soft licks and hums and stops, over and over. No cumming until it lets go."
+    }
+   ]
+  },
+  {
+   "group": "Traps",
+   "name": "🍼 cups",
+   "what": "growth cups that latch on your teats and leave them bigger and runnin' double",
+   "pieces": [
+    {
+     "slot": "cups",
+     "groups": [
+      "ItemNipples"
+     ],
+     "items": [
+      "NippleSuctionCups",
+      "LactationPump",
+      "NippleSuctionCups"
+     ],
+     "color": null,
+     "label": "Growth Cups",
+     "when": "after",
+     "mins": 30,
+     "desc": "Two wide glass bells sucking hard at swollen teats, drawing them long and dark and fat. They stay on until these tits are a size bigger."
+    }
+   ]
+  },
+  {
+   "group": "Traps",
+   "name": "🥛 milker",
+   "what": "cups snap on and you're held till you're drained dry",
+   "pieces": [
+    {
+     "slot": "cups",
+     "groups": [
+      "ItemNipples"
+     ],
+     "items": [
+      "LactationPump",
+      "LactationPump",
+      "NippleSuctionCups"
+     ],
+     "color": null,
+     "label": "Trap Milker",
+     "when": "hold",
+     "mins": null,
+     "desc": "Steel milking cups latched on with a greedy pull, nipples stretched down the glass, pumping this animal dry whether there's anything left or not."
+    }
+   ]
+  },
+  {
+   "group": "Traps",
+   "name": "⛓️ winch",
+   "what": "a collar on a chain that drags you off to the pen and leaves you there",
+   "pieces": [
+    {
+     "slot": "leash",
+     "groups": [
+      "ItemNeckRestraints"
+     ],
+     "items": [
+      "CollarChainShort",
+      "CollarChainMedium",
+      "CollarChainLong",
+      "CollarLeash",
+      "CollarChainShort"
+     ],
+     "color": null,
+     "label": "Winch Chain",
+     "when": "after",
+     "mins": null,
+     "desc": "The chain that walked them across the yard on their toes, in front of everybody, like a heifer going to market. It's still clipped on."
+    }
+   ]
+  },
+  {
+   "group": "Traps",
+   "name": "🌽 chute",
+   "what": "a feed funnel in your mouth and mash till your belly's tight",
+   "pieces": [
+    {
+     "slot": "funnel",
+     "groups": [
+      "ItemMouth",
+      "ItemMouth2",
+      "ItemMouth3"
+     ],
+     "items": [
+      "FunnelGag",
+      "FunnelGag"
+     ],
+     "color": null,
+     "label": "Feed Chute",
+     "when": "hold",
+     "mins": null,
+     "desc": "A wide rubber funnel strapped between the teeth, throat held open, with a hopper of warm sweet mash pouring down until this belly is tight as a drum."
+    }
+   ]
+  },
+  {
+   "group": "Traps",
+   "name": "🪢 snare",
+   "what": "a rope round the ankle: held where you stand and teased",
+   "pieces": [
+    {
+     "slot": "arms",
+     "groups": [
+      "ItemArms"
+     ],
+     "items": [
+      "HempRope",
+      "LeatherCuffs"
+     ],
+     "color": null,
+     "label": "Snare Rope",
+     "when": "hold",
+     "mins": null,
+     "desc": "Rough rope cinched round both wrists and hauled up overhead, stringing them out helpless while the little machine teases."
+    },
+    {
+     "slot": "ropeFeet",
+     "groups": [
+      "ItemFeet"
+     ],
+     "items": [
+      "HempRope"
+     ],
+     "color": null,
+     "label": "Snare Hobble",
+     "when": "hold",
+     "mins": null,
+     "desc": "Rope round both ankles, pulling them wide apart. Everything between them is on show and out of their own reach."
+    }
+   ]
+  },
+  {
+   "group": "Traps",
+   "name": "🐎 breeder",
+   "what": "a frame folds you over and a machine cock breeds you",
+   "pieces": [
+    {
+     "slot": "arms",
+     "groups": [
+      "ItemArms"
+     ],
+     "items": [
+      "SteelCuffs",
+      "WristShackles",
+      "LeatherCuffs",
+      "HempRope",
+      "LeatherCuffs"
+     ],
+     "color": null,
+     "label": "Breedin' Frame Cuffs",
+     "when": "hold",
+     "mins": null,
+     "desc": "Padded steel cuffs locking both wrists to the breeding frame: bent over, hips up, held still for the machine like a mare for the stud."
+    }
+   ]
+  },
+  {
+   "group": "Traps",
+   "name": "🐕 kennel",
+   "what": "a latched kennel and a mastiff who trains you on his knot",
+   "pieces": [
+    {
+     "slot": "leash",
+     "groups": [
+      "ItemNeckRestraints"
+     ],
+     "items": [
+      "CollarLeash",
+      "ChainLeash",
+      "CollarChainLong",
+      "CollarLeash",
+      "CollarChainShort"
+     ],
+     "color": null,
+     "label": "Kennel Lead",
+     "when": "hold",
+     "mins": null,
+     "desc": "A short lead clipped to the ring at the back of the kennel. Long enough to get on all fours. Not long enough to reach the door."
+    }
+   ]
+  },
+  {
+   "group": "Traps",
+   "name": "🐺 wolves (pussy)",
+   "what": "a den of wolf-men who take turns, and every one of them knots",
+   "pieces": [
+    {
+     "slot": "dildo",
+     "groups": [
+      "ItemVulva"
+     ],
+     "items": [
+      "PenisDildo",
+      "PenisPlug",
+      "InflatableVibeDildo",
+      "VibratingDildo",
+      "ClitoralStimulator"
+     ],
+     "color": "#B3323A",
+     "label": "Pack's Knot",
+     "when": "after",
+     "mins": 10,
+     "desc": "The last wolf's knot, still swollen fat inside and throbbing, tying them to a bellyful of the whole pack's seed until it finally goes down."
+    }
+   ]
+  },
+  {
+   "group": "Traps",
+   "name": "🐺 wolves (no pussy)",
+   "what": "a den of wolf-men who take turns, and every one of them knots",
+   "pieces": [
+    {
+     "slot": "plug",
+     "groups": [
+      "ItemButt"
+     ],
+     "items": [
+      "PenisDildo",
+      "PenisPlug",
+      "InflVibeButtPlug",
+      "BlackButtPlug",
+      "ButtPlug",
+      "ButtPump"
+     ],
+     "color": "#B3323A",
+     "label": "Pack's Knot",
+     "when": "after",
+     "mins": 10,
+     "desc": "The last wolf's knot, still swollen fat inside and throbbing, tying them to a bellyful of the whole pack's seed until it finally goes down."
+    }
+   ]
+  },
+  {
+   "group": "Traps",
+   "name": "🐴 stallion (pussy)",
+   "what": "a stallion stud, far too big, who fills you till you waddle",
+   "pieces": [
+    {
+     "slot": "dildo",
+     "groups": [
+      "ItemVulva"
+     ],
+     "items": [
+      "HollowButtPlug",
+      "PenisDildo",
+      "InflatableVibeDildo",
+      "VibratingDildo",
+      "ClitoralStimulator"
+     ],
+     "color": "#2B2B2B",
+     "label": "Stud's Stopper",
+     "when": "after",
+     "mins": 10,
+     "desc": "A stable hand's rubber stopper, shoved in after the stallion pulled out, to keep a mare's worth of horse cum from pouring down their legs."
+    }
+   ]
+  },
+  {
+   "group": "Traps",
+   "name": "🐴 stallion (no pussy)",
+   "what": "a stallion stud, far too big, who fills you till you waddle",
+   "pieces": [
+    {
+     "slot": "plug",
+     "groups": [
+      "ItemButt"
+     ],
+     "items": [
+      "HollowButtPlug",
+      "PenisDildo",
+      "InflVibeButtPlug",
+      "BlackButtPlug",
+      "ButtPlug",
+      "ButtPump"
+     ],
+     "color": "#2B2B2B",
+     "label": "Stud's Stopper",
+     "when": "after",
+     "mins": 10,
+     "desc": "A stable hand's rubber stopper, shoved in after the stallion pulled out, to keep a mare's worth of horse cum from pouring down their legs."
+    }
+   ]
+  },
+  {
+   "group": "Traps",
+   "name": "🪵 pillory",
+   "what": "a pillory that locks your neck and wrists for ten minutes, and anybody passin' can use you",
+   "pieces": [
+    {
+     "slot": "device",
+     "groups": [
+      "ItemDevices"
+     ],
+     "items": [
+      "WoodenStocks",
+      "WoodenStocks"
+     ],
+     "color": null,
+     "label": "The Pillory",
+     "when": "hold",
+     "mins": null,
+     "desc": "The farm's pillory, neck and wrists locked through the boards. Anybody walking past is welcome to the rest."
+    },
+    {
+     "slot": "ropeFeet",
+     "groups": [
+      "ItemFeet"
+     ],
+     "items": [
+      "SpreaderMetal",
+      "HeavySpreaderMetal",
+      "HempRope"
+     ],
+     "color": null,
+     "label": "Pillory Spreader",
+     "when": "after",
+     "mins": null,
+     "desc": "A bar ratcheted between the ankles so the legs can't close while they're bent in the pillory. Whoever walks up gets whichever hole they like."
+    }
+   ]
+  },
+  {
+   "group": "Traps",
+   "name": "🪱 leeches",
+   "what": "fat leeches out of the trough, latched on your teats and anywhere else that's soft",
+   "pieces": [
+    {
+     "slot": "cups",
+     "groups": [
+      "ItemNipples"
+     ],
+     "items": [
+      "LactationPump",
+      "NippleSuctionCups"
+     ],
+     "color": "#3B2A2A",
+     "label": "Trough Leeches",
+     "when": "after",
+     "mins": 20,
+     "desc": "Two fat black leeches latched on swollen teats, pulsing as they feed. They drop off when they're full, and not a minute sooner."
+    }
+   ]
+  },
+  {
+   "group": "Traps",
+   "name": "🏇 saddle (pussy)",
+   "what": "a buckin' saddle with somethin' in the seat, and a long hard ride",
+   "pieces": [
+    {
+     "slot": "device",
+     "groups": [
+      "ItemDevices"
+     ],
+     "items": [
+      "SaddleStand",
+      "WoodenHorse",
+      "WoodenStocks"
+     ],
+     "color": null,
+     "label": "Buckin' Saddle",
+     "when": "hold",
+     "mins": null,
+     "desc": "A sprung steel horse with a worn leather saddle, cinched on at the thighs and bucking hard. Something thick in the seat rides them right back."
+    },
+    {
+     "slot": "dildo",
+     "groups": [
+      "ItemVulva"
+     ],
+     "items": [
+      "PenisDildo",
+      "VibratingDildo",
+      "InflatableVibeDildo",
+      "VibratingDildo",
+      "ClitoralStimulator"
+     ],
+     "color": "#2B2B2B",
+     "label": "Saddle Post",
+     "when": "hold",
+     "mins": null,
+     "desc": "The fat greased post that rises out of the saddle's seat, buried deep and bouncing with every buck."
+    }
+   ]
+  },
+  {
+   "group": "Traps",
+   "name": "🏇 saddle (no pussy)",
+   "what": "a buckin' saddle with somethin' in the seat, and a long hard ride",
+   "pieces": [
+    {
+     "slot": "device",
+     "groups": [
+      "ItemDevices"
+     ],
+     "items": [
+      "SaddleStand",
+      "WoodenHorse",
+      "WoodenStocks"
+     ],
+     "color": null,
+     "label": "Buckin' Saddle",
+     "when": "hold",
+     "mins": null,
+     "desc": "A sprung steel horse with a worn leather saddle, cinched on at the thighs and bucking hard. Something thick in the seat rides them right back."
+    },
+    {
+     "slot": "plug",
+     "groups": [
+      "ItemButt"
+     ],
+     "items": [
+      "PenisDildo",
+      "VibratingDildo",
+      "InflVibeButtPlug",
+      "BlackButtPlug",
+      "ButtPlug",
+      "ButtPump"
+     ],
+     "color": "#2B2B2B",
+     "label": "Saddle Post",
+     "when": "hold",
+     "mins": null,
+     "desc": "The fat greased post that rises out of the saddle's seat, buried deep and bouncing with every buck."
+    }
+   ]
+  },
+  {
+   "group": "Traps",
+   "name": "🕸️ net",
+   "what": "a net out of the hayloft and a long dangle in the rafters",
+   "pieces": [
+    {
+     "slot": "device",
+     "groups": [
+      "ItemDevices"
+     ],
+     "items": [
+      "Net",
+      "WoodenStocks"
+     ],
+     "color": null,
+     "label": "Hayloft Net",
+     "when": "hold",
+     "mins": null,
+     "desc": "A coarse rope net hauled up into the rafters, its catch dangling and turning slowly, every curve pushed out through the mesh."
+    }
+   ]
+  },
+  {
+   "group": "Traps",
+   "name": "🔔 bell",
+   "what": "a cowbell collar locked on for half an hour, so the whole farm hears you comin'",
+   "pieces": [
+    {
+     "slot": "tag",
+     "groups": [
+      "ItemNeckAccessories"
+     ],
+     "items": [
+      "CollarCowBell",
+      "CollarBell",
+      "CollarNameTagLivestock",
+      "CollarNameTag"
+     ],
+     "color": null,
+     "label": "Lost Cow Bell",
+     "when": "after",
+     "mins": 30,
+     "desc": "A big iron cowbell padlocked to the collar. Its tag reads LOST COW, RETURN TO THE BARN. It clanks at every step."
+    }
+   ]
+  },
+  {
+   "group": "Traps",
+   "name": "💢 teaser",
+   "what": "for studs: a teasin' stall that smells of heat, and no way to reach it",
+   "pieces": [
+    {
+     "slot": "device",
+     "groups": [
+      "ItemDevices"
+     ],
+     "items": [
+      "LowCage",
+      "Kennel",
+      "WoodenStocks"
+     ],
+     "color": null,
+     "label": "Teasin' Stall",
+     "when": "hold",
+     "mins": null,
+     "desc": "A narrow steel stall that smells of heat, with a padded dummy rocking just out of reach on the other side of the bars."
+    }
+   ]
+  },
+  {
+   "group": "Traps",
+   "name": "🛁 dip",
+   "what": "the sheep dip: dunked, scrubbed and rinsed clean",
+   "pieces": [
+    {
+     "slot": "device",
+     "groups": [
+      "ItemDevices"
+     ],
+     "items": [
+      "MilkCan",
+      "WoodenStocks"
+     ],
+     "color": null,
+     "label": "Sheep Dip",
+     "when": "hold",
+     "mins": null,
+     "desc": "A tall can of warm, soapy dip, filled to the chin, with brushes waiting to scrub everything below the waterline."
+    }
+   ]
+  },
+  {
+   "group": "Traps",
+   "name": "🐖 crate (pussy)",
+   "what": "a breedin' crate, rump to the gate, and the herd sire let in for as many rounds as he's got",
+   "pieces": [
+    {
+     "slot": "device",
+     "groups": [
+      "ItemDevices"
+     ],
+     "items": [
+      "Kennel",
+      "LowCage",
+      "WoodenStocks"
+     ],
+     "color": null,
+     "label": "Breedin' Crate",
+     "when": "hold",
+     "mins": null,
+     "desc": "A steel breeding crate built so the dam can't turn, can't kneel, can't do anything but stand and be bred, rump to the gate."
+    },
+    {
+     "slot": "dildo",
+     "groups": [
+      "ItemVulva"
+     ],
+     "items": [
+      "PenisDildo",
+      "HollowButtPlug",
+      "InflatableVibeDildo",
+      "VibratingDildo",
+      "ClitoralStimulator"
+     ],
+     "color": "#2B2B2B",
+     "label": "Sire's Stopper",
+     "when": "after",
+     "mins": 15,
+     "desc": "The stable hand's rubber stopper, pushed in after the herd sire backed out, to keep three rounds of stud where he put them."
+    }
+   ]
+  },
+  {
+   "group": "Traps",
+   "name": "🐖 crate (no pussy)",
+   "what": "a breedin' crate, rump to the gate, and the herd sire let in for as many rounds as he's got",
+   "pieces": [
+    {
+     "slot": "device",
+     "groups": [
+      "ItemDevices"
+     ],
+     "items": [
+      "Kennel",
+      "LowCage",
+      "WoodenStocks"
+     ],
+     "color": null,
+     "label": "Breedin' Crate",
+     "when": "hold",
+     "mins": null,
+     "desc": "A steel breeding crate built so the dam can't turn, can't kneel, can't do anything but stand and be bred, rump to the gate."
+    },
+    {
+     "slot": "plug",
+     "groups": [
+      "ItemButt"
+     ],
+     "items": [
+      "PenisDildo",
+      "HollowButtPlug",
+      "InflVibeButtPlug",
+      "BlackButtPlug",
+      "ButtPlug",
+      "ButtPump"
+     ],
+     "color": "#2B2B2B",
+     "label": "Sire's Stopper",
+     "when": "after",
+     "mins": 15,
+     "desc": "The stable hand's rubber stopper, pushed in after the herd sire backed out, to keep three rounds of stud where he put them."
+    }
+   ]
+  },
+  {
+   "group": "Traps",
+   "name": "🎠 carousel",
+   "what": "the milkin' carousel: milked, filled, and round again",
+   "pieces": [
+    {
+     "slot": "cups",
+     "groups": [
+      "ItemNipples"
+     ],
+     "items": [
+      "LactationPump",
+      "LactationPump",
+      "NippleSuctionCups"
+     ],
+     "color": null,
+     "label": "Carousel Milkers",
+     "when": "hold",
+     "mins": null,
+     "desc": "The milking carousel's cups, latched on at the first station and pulling hard as the platform turns."
+    },
+    {
+     "slot": "arms",
+     "groups": [
+      "ItemArms"
+     ],
+     "items": [
+      "LeatherCuffs",
+      "SteelCuffs",
+      "HempRope",
+      "LeatherCuffs"
+     ],
+     "color": null,
+     "label": "Carousel Cuffs",
+     "when": "hold",
+     "mins": null,
+     "desc": "Padded cuffs that hold them bent over the carousel's rail, station after station, lap after lap."
+    }
+   ]
+  },
+  {
+   "group": "Traps",
+   "name": "🌾 plow",
+   "what": "hitched to the plow and driven down a furrow with a crop",
+   "pieces": [
+    {
+     "slot": "funnel",
+     "groups": [
+      "ItemMouth",
+      "ItemMouth2",
+      "ItemMouth3"
+     ],
+     "items": [
+      "HarnessPonyBits",
+      "PonyGag",
+      "BitGag",
+      "FunnelGag"
+     ],
+     "color": null,
+     "label": "Plow Bit",
+     "when": "hold",
+     "mins": null,
+     "desc": "A bit between the teeth with reins running back to the plow handles. Every turn of the furrow is steered by a tug."
+    },
+    {
+     "slot": "torso",
+     "groups": [
+      "ItemTorso",
+      "ItemTorso2"
+     ],
+     "items": [
+      "LeatherHarness",
+      "LeatherStrapHarness",
+      "TentacleSuit",
+      "HempRopeHarness"
+     ],
+     "color": null,
+     "label": "Plow Harness",
+     "when": "hold",
+     "mins": null,
+     "desc": "A heavy leather harness girthed tight at the chest and hips, traces buckled on behind to the old plow."
+    }
+   ]
+  },
+  {
+   "group": "Traps",
+   "name": "🌾 bale",
+   "what": "baled in tight with your rump out, and anybody passin' can use you",
+   "pieces": [
+    {
+     "slot": "ropeFeet",
+     "groups": [
+      "ItemFeet"
+     ],
+     "items": [
+      "HempRope",
+      "HempRope"
+     ],
+     "color": null,
+     "label": "Bale Twine",
+     "when": "after",
+     "mins": null,
+     "desc": "Baling twine knotted round the ankles to keep the legs apart and the rump right where it is, sticking out of the hay."
+    }
+   ]
+  },
+  {
+   "group": "Traps",
+   "name": "🌽 scarecrow",
+   "what": "tied up on the scarecrow post, and the farmhands take their turns",
+   "pieces": [
+    {
+     "slot": "device",
+     "groups": [
+      "ItemDevices"
+     ],
+     "items": [
+      "X-Cross",
+      "WoodenStocks"
+     ],
+     "color": null,
+     "label": "Scarecrow Post",
+     "when": "hold",
+     "mins": null,
+     "desc": "The old scarecrow's crossbar in the middle of the cornfield, with a new scarecrow lashed to it, straw hat and all."
+    },
+    {
+     "slot": "arms",
+     "groups": [
+      "ItemArms"
+     ],
+     "items": [
+      "HempRope",
+      "HempRope",
+      "LeatherCuffs"
+     ],
+     "color": null,
+     "label": "Scarecrow Ropes",
+     "when": "hold",
+     "mins": null,
+     "desc": "Rough rope lashing both arms out along the crossbar. The crows aren't scared. The farmhands aren't either."
+    }
+   ]
+  },
+  {
+   "group": "Traps",
+   "name": "🧺 washline",
+   "what": "pegged out on the washin' line with clothespins wherever they'll grip",
+   "pieces": [
+    {
+     "slot": "cups",
+     "groups": [
+      "ItemNipples"
+     ],
+     "items": [
+      "Clothespins",
+      "LactationPump",
+      "NippleSuctionCups"
+     ],
+     "color": null,
+     "label": "Clothespins",
+     "when": "hold",
+     "mins": null,
+     "desc": "Wooden clothespins biting everywhere they'll grip, a whole basketful, each one stinging as the line sways."
+    },
+    {
+     "slot": "arms",
+     "groups": [
+      "ItemArms"
+     ],
+     "items": [
+      "HempRope",
+      "HempRope",
+      "LeatherCuffs"
+     ],
+     "color": null,
+     "label": "Washin' Line",
+     "when": "hold",
+     "mins": null,
+     "desc": "Strung up by the wrists on the washing line between two posts, hung out to dry with the sheets."
+    }
+   ]
+  },
+  {
+   "group": "Traps",
+   "name": "🥧 stocks",
+   "what": "the fair stocks, and a queue of folks with cream pies",
+   "pieces": [
+    {
+     "slot": "device",
+     "groups": [
+      "ItemDevices"
+     ],
+     "items": [
+      "WoodenStocks",
+      "WoodenStocks"
+     ],
+     "color": null,
+     "label": "Fair Stocks",
+     "when": "hold",
+     "mins": null,
+     "desc": "The fairground stocks, head and hands through the boards, with a pie stall doing brisk trade right next to them."
+    }
+   ]
+  },
+  {
+   "group": "Traps",
+   "name": "🎡 wheel",
+   "what": "the breedin' wheel: three spins, a different stud every time",
+   "pieces": [
+    {
+     "slot": "device",
+     "groups": [
+      "ItemDevices"
+     ],
+     "items": [
+      "WheelFortune",
+      "LuckyWheel",
+      "WoodenStocks"
+     ],
+     "color": null,
+     "label": "Breedin' Wheel",
+     "when": "hold",
+     "mins": null,
+     "desc": "A great painted wheel, spread-eagled across it and spinning, with a different stud waiting at every stop."
+    }
+   ]
+  },
+  {
+   "group": "Traps",
+   "name": "🌬️ windmill",
+   "what": "tied to the windmill sails, turnin' slow over the farm",
+   "pieces": [
+    {
+     "slot": "device",
+     "groups": [
+      "ItemDevices"
+     ],
+     "items": [
+      "X-Cross",
+      "WoodenStocks"
+     ],
+     "color": null,
+     "label": "Windmill Sails",
+     "when": "hold",
+     "mins": null,
+     "desc": "Lashed to the windmill's sails, turning slow over the whole farm, sky then fields then sky again."
+    }
+   ]
+  },
+  {
+   "group": "Traps",
+   "name": "🚪 kissgate",
+   "what": "stuck in the kissin' gate, and the toll to pass is you",
+   "pieces": [
+    {
+     "slot": "device",
+     "groups": [
+      "ItemDevices"
+     ],
+     "items": [
+      "KabeshiriWall",
+      "WoodenStocks"
+     ],
+     "color": null,
+     "label": "Kissin' Gate",
+     "when": "hold",
+     "mins": null,
+     "desc": "Stuck halfway through the kissing gate, front in one field and rump in the other. The toll to pass is posted on the post."
+    }
+   ]
+  },
+  {
+   "group": "Traps",
+   "name": "🧱 wall",
+   "what": "stuck halfway through a fence, with strangers at both ends",
+   "pieces": [
+    {
+     "slot": "device",
+     "groups": [
+      "ItemDevices"
+     ],
+     "items": [
+      "KabeshiriWall",
+      "WoodenStocks"
+     ],
+     "color": null,
+     "label": "The Fence",
+     "when": "hold",
+     "mins": null,
+     "desc": "Stuck halfway through a hole in the fence, with strangers at both ends."
+    }
+   ]
+  },
+  {
+   "group": "Traps",
+   "name": "🧪 collection",
+   "what": "for studs: the collection bench, milked into the vat",
+   "pieces": [
+    {
+     "slot": "device",
+     "groups": [
+      "ItemDevices"
+     ],
+     "items": [
+      "BondageBench",
+      "WoodenStocks"
+     ],
+     "color": null,
+     "label": "Collection Bench",
+     "when": "hold",
+     "mins": null,
+     "desc": "The collection bench: strapped face down, hips up, with a jar waiting underneath and a sign that reads VAT COLLECTION."
+    }
+   ]
+  },
+  {
+   "group": "Traps",
+   "name": "🔨 auction",
+   "what": "the auction block: three minutes of bids, and the winner walks you through three traps",
+   "pieces": [
+    {
+     "slot": "device",
+     "groups": [
+      "ItemDevices"
+     ],
+     "items": [
+      "TheDisplayFrame",
+      "WoodenStocks"
+     ],
+     "color": null,
+     "label": "Auction Block",
+     "when": "hold",
+     "mins": null,
+     "desc": "Up on the auction block in the display frame, turned slowly so every bidder can see every inch of the lot."
+    }
+   ]
+  },
+  {
+   "group": "Mystery box",
+   "name": "🎁 Growin' Plug (pussy)",
+   "what": "It swells a size every ten minutes.",
+   "pieces": [
+    {
+     "slot": "dildo",
+     "groups": [
+      "ItemVulva"
+     ],
+     "items": [
+      "InflatableVibeDildo",
+      "VibratingDildo",
+      "ClitoralStimulator"
+     ],
+     "color": "#2B2B2B",
+     "label": "Growin' Plug",
+     "when": "on",
+     "mins": null,
+     "desc": "A sleek black plug that seemed a sensible size going in. It isn't any more. Every ten minutes it swells a little fatter, and it will not come out until it's done."
+    }
+   ]
+  },
+  {
+   "group": "Mystery box",
+   "name": "🎁 Growin' Plug (no pussy)",
+   "what": "It swells a size every ten minutes.",
+   "pieces": [
+    {
+     "slot": "plug",
+     "groups": [
+      "ItemButt"
+     ],
+     "items": [
+      "InflVibeButtPlug",
+      "BlackButtPlug",
+      "ButtPlug",
+      "ButtPump"
+     ],
+     "color": "#2B2B2B",
+     "label": "Growin' Plug",
+     "when": "on",
+     "mins": null,
+     "desc": "A sleek black plug that seemed a sensible size going in. It isn't any more. Every ten minutes it swells a little fatter, and it will not come out until it's done."
+    }
+   ]
+  },
+  {
+   "group": "Mystery box",
+   "name": "🎁 Hungry Belt",
+   "what": "No cummin', and it keeps you stirred.",
+   "pieces": [
+    {
+     "slot": "dildo",
+     "groups": [
+      "ItemVulva"
+     ],
+     "items": [
+      "InflatableVibeDildo",
+      "VibratingDildo",
+      "ClitoralStimulator"
+     ],
+     "color": "#2B2B2B",
+     "label": "Hungry Belt",
+     "when": "on",
+     "mins": null,
+     "desc": "A pretty filigree belt that locked itself the moment it touched skin. It hums against everything it covers, never quite enough, and it eats every orgasm before it starts."
+    }
+   ]
+  },
+  {
+   "group": "Mystery box",
+   "name": "🎁 Milkmaid's Cups",
+   "what": "Your milk comes in double, and the cups drink it.",
+   "pieces": [
+    {
+     "slot": "dildo",
+     "groups": [
+      "ItemVulva"
+     ],
+     "items": [
+      "InflatableVibeDildo",
+      "VibratingDildo",
+      "ClitoralStimulator"
+     ],
+     "color": "#2B2B2B",
+     "label": "Milkmaid's Cups",
+     "when": "on",
+     "mins": null,
+     "desc": "Two silver cups that latched on by themselves and began to pull. Whatever they're doing in there, the udders behind them are filling twice as fast to keep up."
+    }
+   ]
+  },
+  {
+   "group": "Mystery box",
+   "name": "🎁 Glutton's Funnel",
+   "what": "A bellyful every ten minutes.",
+   "pieces": [
+    {
+     "slot": "dildo",
+     "groups": [
+      "ItemVulva"
+     ],
+     "items": [
+      "InflatableVibeDildo",
+      "VibratingDildo",
+      "ClitoralStimulator"
+     ],
+     "color": "#2B2B2B",
+     "label": "Glutton's Funnel",
+     "when": "on",
+     "mins": null,
+     "desc": "A gilded funnel that strapped itself between the teeth. Every ten minutes it pours another helping down, warm and thick, whether there's room or not."
+    }
+   ]
+  },
+  {
+   "group": "Mystery box",
+   "name": "🎁 The Hobble",
+   "what": "Short steps.",
+   "pieces": [
+    {
+     "slot": "dildo",
+     "groups": [
+      "ItemVulva"
+     ],
+     "items": [
+      "InflatableVibeDildo",
+      "VibratingDildo",
+      "ClitoralStimulator"
+     ],
+     "color": "#2B2B2B",
+     "label": "The Hobble",
+     "when": "on",
+     "mins": null,
+     "desc": "Two dainty cuffs joined by a hand's length of chain. They looked like anklets in the box. Every step now is a tiny, swaying shuffle."
+    }
+   ]
+  },
+  {
+   "group": "Livin' suit",
+   "name": "🖤 stage 1: both thighs, to the hip",
+   "what": "as far as it has spread",
+   "pieces": [
+    {
+     "slot": "legs",
+     "groups": [
+      "ItemLegs"
+     ],
+     "items": [
+      "Slime",
+      "HempRope",
+      "LeatherLegCuffs"
+     ],
+     "color": "#1A1A1F",
+     "label": "Living Suit (legs)",
+     "when": "on",
+     "mins": null,
+     "desc": "Glossy black living latex, grown up both legs to the hip, warm as skin and tighter. It ripples when they walk, and it is still spreading."
+    }
+   ]
+  },
+  {
+   "group": "Livin' suit",
+   "name": "🖤 stage 2: your hips and everything between",
+   "what": "as far as it has spread",
+   "pieces": [
+    {
+     "slot": "legs",
+     "groups": [
+      "ItemLegs"
+     ],
+     "items": [
+      "Slime",
+      "HempRope",
+      "LeatherLegCuffs"
+     ],
+     "color": "#1A1A1F",
+     "label": "Living Suit (legs)",
+     "when": "on",
+     "mins": null,
+     "desc": "Glossy black living latex, grown up both legs to the hip, warm as skin and tighter. It ripples when they walk, and it is still spreading."
+    },
+    {
+     "slot": "belt",
+     "groups": [
+      "ItemPelvis"
+     ],
+     "items": [
+      "PolishedChastityBelt",
+      "LeatherChastityBelt",
+      "SleekLeatherChastityBelt",
+      "MetalChastityBelt"
+     ],
+     "color": "#1A1A1F",
+     "label": "Living Suit (hips)",
+     "when": "on",
+     "mins": null,
+     "desc": "The suit has closed over hips and groin in a seamless black skin, with a soft thick root of itself pushed up inside. It squeezes when they get close, and holds them there."
+    }
+   ]
+  },
+  {
+   "group": "Livin' suit",
+   "name": "🖤 stage 3: your chest",
+   "what": "as far as it has spread",
+   "pieces": [
+    {
+     "slot": "legs",
+     "groups": [
+      "ItemLegs"
+     ],
+     "items": [
+      "Slime",
+      "HempRope",
+      "LeatherLegCuffs"
+     ],
+     "color": "#1A1A1F",
+     "label": "Living Suit (legs)",
+     "when": "on",
+     "mins": null,
+     "desc": "Glossy black living latex, grown up both legs to the hip, warm as skin and tighter. It ripples when they walk, and it is still spreading."
+    },
+    {
+     "slot": "belt",
+     "groups": [
+      "ItemPelvis"
+     ],
+     "items": [
+      "PolishedChastityBelt",
+      "LeatherChastityBelt",
+      "SleekLeatherChastityBelt",
+      "MetalChastityBelt"
+     ],
+     "color": "#1A1A1F",
+     "label": "Living Suit (hips)",
+     "when": "on",
+     "mins": null,
+     "desc": "The suit has closed over hips and groin in a seamless black skin, with a soft thick root of itself pushed up inside. It squeezes when they get close, and holds them there."
+    },
+    {
+     "slot": "cups",
+     "groups": [
+      "ItemNipples"
+     ],
+     "items": [
+      "NippleSuctionCups",
+      "LactationPump",
+      "NippleSuctionCups"
+     ],
+     "color": "#1A1A1F",
+     "label": "Living Suit (chest)",
+     "when": "on",
+     "mins": null,
+     "desc": "Living latex moulded over both breasts, kneading in slow waves, with a wet little mouth of itself sealed over each nipple."
+    }
+   ]
+  },
+  {
+   "group": "Livin' suit",
+   "name": "🖤 stage 4: your arms, to the fingertips",
+   "what": "as far as it has spread",
+   "pieces": [
+    {
+     "slot": "legs",
+     "groups": [
+      "ItemLegs"
+     ],
+     "items": [
+      "Slime",
+      "HempRope",
+      "LeatherLegCuffs"
+     ],
+     "color": "#1A1A1F",
+     "label": "Living Suit (legs)",
+     "when": "on",
+     "mins": null,
+     "desc": "Glossy black living latex, grown up both legs to the hip, warm as skin and tighter. It ripples when they walk, and it is still spreading."
+    },
+    {
+     "slot": "belt",
+     "groups": [
+      "ItemPelvis"
+     ],
+     "items": [
+      "PolishedChastityBelt",
+      "LeatherChastityBelt",
+      "SleekLeatherChastityBelt",
+      "MetalChastityBelt"
+     ],
+     "color": "#1A1A1F",
+     "label": "Living Suit (hips)",
+     "when": "on",
+     "mins": null,
+     "desc": "The suit has closed over hips and groin in a seamless black skin, with a soft thick root of itself pushed up inside. It squeezes when they get close, and holds them there."
+    },
+    {
+     "slot": "cups",
+     "groups": [
+      "ItemNipples"
+     ],
+     "items": [
+      "NippleSuctionCups",
+      "LactationPump",
+      "NippleSuctionCups"
+     ],
+     "color": "#1A1A1F",
+     "label": "Living Suit (chest)",
+     "when": "on",
+     "mins": null,
+     "desc": "Living latex moulded over both breasts, kneading in slow waves, with a wet little mouth of itself sealed over each nipple."
+    },
+    {
+     "slot": "arms",
+     "groups": [
+      "ItemArms"
+     ],
+     "items": [
+      "Slime",
+      "HempRope",
+      "LeatherCuffs"
+     ],
+     "color": "#1A1A1F",
+     "label": "Living Suit (arms)",
+     "when": "on",
+     "mins": null,
+     "desc": "The suit has run down both arms and webbed the fingers together. Their hands are its hands now, and it does not let them touch themselves."
+    }
+   ]
+  },
+  {
+   "group": "Livin' suit",
+   "name": "🖤 stage 5: all of you, mouth and all",
+   "what": "as far as it has spread",
+   "pieces": [
+    {
+     "slot": "legs",
+     "groups": [
+      "ItemLegs"
+     ],
+     "items": [
+      "Slime",
+      "HempRope",
+      "LeatherLegCuffs"
+     ],
+     "color": "#1A1A1F",
+     "label": "Living Suit (legs)",
+     "when": "on",
+     "mins": null,
+     "desc": "Glossy black living latex, grown up both legs to the hip, warm as skin and tighter. It ripples when they walk, and it is still spreading."
+    },
+    {
+     "slot": "belt",
+     "groups": [
+      "ItemPelvis"
+     ],
+     "items": [
+      "PolishedChastityBelt",
+      "LeatherChastityBelt",
+      "SleekLeatherChastityBelt",
+      "MetalChastityBelt"
+     ],
+     "color": "#1A1A1F",
+     "label": "Living Suit (hips)",
+     "when": "on",
+     "mins": null,
+     "desc": "The suit has closed over hips and groin in a seamless black skin, with a soft thick root of itself pushed up inside. It squeezes when they get close, and holds them there."
+    },
+    {
+     "slot": "cups",
+     "groups": [
+      "ItemNipples"
+     ],
+     "items": [
+      "NippleSuctionCups",
+      "LactationPump",
+      "NippleSuctionCups"
+     ],
+     "color": "#1A1A1F",
+     "label": "Living Suit (chest)",
+     "when": "on",
+     "mins": null,
+     "desc": "Living latex moulded over both breasts, kneading in slow waves, with a wet little mouth of itself sealed over each nipple."
+    },
+    {
+     "slot": "arms",
+     "groups": [
+      "ItemArms"
+     ],
+     "items": [
+      "Slime",
+      "HempRope",
+      "LeatherCuffs"
+     ],
+     "color": "#1A1A1F",
+     "label": "Living Suit (arms)",
+     "when": "on",
+     "mins": null,
+     "desc": "The suit has run down both arms and webbed the fingers together. Their hands are its hands now, and it does not let them touch themselves."
+    },
+    {
+     "slot": "lips",
+     "groups": [
+      "ItemMouth",
+      "ItemMouth2",
+      "ItemMouth3"
+     ],
+     "items": [
+      "LatexSheathGag",
+      "LatexMuzzleMask",
+      "LipGag"
+     ],
+     "color": "#1A1A1F",
+     "label": "Living Suit (mouth)",
+     "when": "on",
+     "mins": null,
+     "desc": "The last of it: a smooth black sheath over the face from the nose down, and a tongue of itself in the mouth. Every inch of them is inside it now."
+    }
+   ]
+  }
+ ],
+ "messes": [
+  {
+   "name": "cream",
+   "color": "#FFF4DC",
+   "traps": [
+    "pump",
+    "stocks",
+    "saddle",
+    "wheel",
+    "scarecrow",
+    "crate",
+    "kissgate",
+    "collection"
+   ]
+  },
+  {
+   "name": "honey",
+   "color": "#E0A030",
+   "traps": []
+  },
+  {
+   "name": "maple",
+   "color": "#8B4A1C",
+   "traps": []
+  },
+  {
+   "name": "chocolate",
+   "color": "#4A2A18",
+   "traps": []
+  },
+  {
+   "name": "strawberry",
+   "color": "#E04A6A",
+   "traps": []
+  },
+  {
+   "name": "milk",
+   "color": "#F7F7F0",
+   "traps": [
+    "milker",
+    "cups",
+    "carousel"
+   ]
+  },
+  {
+   "name": "slime",
+   "color": "#5FAE3A",
+   "traps": [
+    "vines"
+   ]
+  },
+  {
+   "name": "mud",
+   "color": "#6B4A2B",
+   "traps": [
+    "plow",
+    "mudpit"
+   ]
+  },
+  {
+   "name": "mash",
+   "color": "#D8C08A",
+   "traps": [
+    "chute"
+   ]
+  }
+ ]
+}

@@ -133,7 +133,7 @@ const FARM_NAMES = ["Parasite Lips", "Parasite Belt", "Pump Bung", "Egg Post Plu
   "Plow Bit", "Plow Harness", "Bale Twine", "Scarecrow Post", "Scarecrow Ropes", "Clothespins", "Washin' Line", "Fair Stocks", "The Pillory", "Breedin' Wheel",
   "Windmill Sails", "Kissin' Gate", "The Fence", "Collection Bench", "Auction Block"];
 // slot → where it can go and which game item it is: the first that this game has; the pattern is a fallback
-const GEAR_SLOTS = {
+export const GEAR_SLOTS = {
   plug:     { groups: ["ItemButt"], names: ["InflVibeButtPlug", "BlackButtPlug", "ButtPlug", "ButtPump"], re: /ButtPlug|Plug/, color: "#2B2B2B" },
   dildo:    { groups: ["ItemVulva"], names: ["InflatableVibeDildo", "VibratingDildo", "ClitoralStimulator"], re: /Dildo/, color: "#2B2B2B" },
   belt:     { groups: ["ItemPelvis"], names: ["PolishedChastityBelt", "LeatherChastityBelt", "SleekLeatherChastityBelt", "MetalChastityBelt"], re: /ChastityBelt/ },

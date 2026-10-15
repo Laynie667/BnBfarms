@@ -13,9 +13,9 @@ import { VERSION } from "./version.js";
 import { BOT_MEMBER, HELLO_EVERY_MS } from "./config.js";
 import { Panel } from "./panel.js";
 import { captureOutfit, wearOutfit, changeBack, hasBackup } from "./outfits.js";
-import { markBody, washMarks, stripMe, dressMe, syncFarmGear, syncShape } from "./marks.js";
+import { markBody, washMarks, stripMe, dressMe, syncFarmGear, syncShape, scaleTrialCleanup } from "./marks.js";
 import { initBelly } from "./belly.js";
-import { initDrawnBody, onBodyMsg } from "./drawnbody.js";
+import { initDrawnBody, onBodyMsg, onFarmLook, farmLookWanted } from "./drawnbody.js";
 import { initCues, cueOff, lead, face, sound, trance, drawMarkers, arouse, vibe, initBody } from "./cues.js";
 
 // the SDK ships as an old-style module; this digs the real thing out either way
@@ -177,6 +177,7 @@ function onFarmMsg(m) {
     case "ping": hello(); break;
     case "welcome":
       st.welcomed = true;
+      try { const at = onBotAccount() ? null : farmLookWanted(m.look); if (at != null) toBot("bodyFarmAsk", { at }); } catch (e) { /* the drawn body isn't loaded */ }   // the farm's look for the drawn body (drawnbody.js)
       st.panel.setWelcome(m);
       if (!m.proto || m.proto < 2) {
         // an older bot never sends the panel your roles, so Staff and Dashboard can't show: say so
@@ -188,6 +189,9 @@ function onFarmMsg(m) {
         // the bot sends your state right after hello; if it doesn't come, say so
         setTimeout(() => { if (!st.gotState) st.panel.add("Connected, but the farm girl hasn't sent your roles yet. If Staff or Dashboard don't show up, reload the page.", "notice"); }, 12000);
       }
+      break;
+    case "bodyFarm":
+      try { if (!onBotAccount()) onFarmLook(m); } catch (e) { console.warn("[Farmhand Companion] farm look:", e); }   // (on the bot's own account, its settings ARE the farm's look)
       break;
     case "state":
       if (m.state && typeof m.state === "object") { st.gotState = true; st.panel.setState(m.state); parasiteSync(); }
@@ -323,6 +327,7 @@ function start() {
   setInterval(parasiteSync, 60000);
   initBelly(mod);  // the drawn-belly test (belly.js)
   initDrawnBody(mod);  // the drawn body from the outfit studio, on your own character (drawnbody.js)
+  setTimeout(() => scaleTrialCleanup(), 15000);   // what the old scale trial left on anybody (marks.js)
   initBody(mod);   // slowed walkin' when you're carryin' a lot, and bein' held at the edge while denied (cues.js)
   // the bot hands this page's own-account messages straight here (see toBot above)
   window.__farmhandOwnPanel = (data) => { if (!onBotAccount()) return; const m = readMsg(data); if (m) { try { onFarmMsg(m); } catch (e) { console.warn("[Farmhand Companion]", e); } } };

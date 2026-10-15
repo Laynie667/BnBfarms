@@ -590,7 +590,9 @@
   // ── our screen, in place of the game's sign-in screen ──
   function run() {
     DrawRect(0, 0, 2000, 1000, "#2a2e36");
-    if (S.C) DrawCharacter(S.C, 290, 0, 1, false);
+    // (Echo widens every character's canvas, to 1000 from 500, and draws it half that much further left to make up: she
+    // jumped to the left once it was loaded. Laynie, Oct 14. She's put back where she stands.)
+    if (S.C) DrawCharacter(S.C, 290 + (S.echo && S.C.Canvas && S.C.Canvas.width > 500 ? (S.C.Canvas.width - 500) / 2 : 0), 0, 1, false);
   }
   function takeOver() {
     try { CurrentScreenFunctions.Unload && CurrentScreenFunctions.Unload(); } catch (e) { console.warn("[studio] leaving the sign-in screen:", e); }
@@ -602,6 +604,11 @@
     try { hookDrawn(); } catch (e) { console.warn("[studio] drawn parts:", e); }
     if (window.FarmBelly) hookBelly(); else console.warn("[studio] the belly drawing didn't load: no belly section");
     S.C = CharacterLoadSimple("FarmStudio");
+    // (a character made here has no arousal settings, which a signed-in one always has. A piece that reads them when it
+    // draws, Echo's Portable Breast Pump, failed, and the whole character vanished with it. Laynie, Oct 14.)
+    try { if (typeof PreferenceArousalUpdateValidation === "function" && !PreferenceArousalSettingsDefault.Zone) PreferenceArousalUpdateValidation(); } catch (e) { /* the plain defaults below */ }
+    if (!S.C.ArousalSettings || typeof S.C.ArousalSettings.Zone !== "string") S.C.ArousalSettings = Object.assign(JSON.parse(JSON.stringify(typeof PreferenceArousalSettingsDefault === "object" ? PreferenceArousalSettingsDefault : {})), { Active: "Inactive" });
+    for (const k of ["Zone", "Activity", "Fetish"]) if (typeof S.C.ArousalSettings[k] !== "string") S.C.ArousalSettings[k] = "";
     CharacterAppearanceSetDefault(S.C);
     CharacterRefresh(S.C, false, false);
     panel(); S.ready = true; loadFits(false); loadItemFits(); loadBreasts(false);

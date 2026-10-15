@@ -93,10 +93,8 @@ createServer(async (req, res) => {
     // its site here (the newer game copy the studio draws with asks the site in a way it refuses from a page).
     if (path.startsWith("/__echo/")) {
       const rel = decodeURIComponent(path.slice("/__echo/".length)).split("/").slice(1).join("/");   // (the first part is the version)
-      // Echo carries its own copies of the game's body pictures, drawn for the game it was made for. The studio's newer game
-      // draws the body differently and those copies come out in pieces, so any picture the game has itself is the game's.
-      const own = inside(GAME, rel);
-      if (own && existsSync(own)) return send(res, own);
+      // (Echo also carries its own redrawn copies of many of the game's pictures, the body's among them: same size, more
+      // shading. Those are what the game shows with Echo in, so the studio shows them too.)
       const local = ECHO_RES && inside(ECHO_RES, rel);
       if (local && existsSync(local)) return send(res, local);
       const ver = path.slice("/__echo/".length).split("/")[0];

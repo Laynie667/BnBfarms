@@ -11,7 +11,11 @@
    for you and for them.
 
    It is the studio's own drawing (studio/web/body-engine.js), so what the studio shows is what you get. The settings
-   are made in the studio and either fetched from it (while it's running on this computer) or copied over as a code.
+   are made in the studio. THE FARM'S LOOK comes from the bot (Laynie, Oct 14: "the outfit studio settings should route
+   through the bot anyway"): the bot hands every Companion the settings its own Companion has (Laynie's, from her
+   studio), so a phone with no studio gets them too. On top of it each player picks their own cup and whether their
+   belly shows. Somebody with a studio of their own can fetch theirs from it, or paste its code, and theirs wins until
+   they go back to the farm's.
 
    How it hands its drawings to the game: the live game only takes a picture by its name (an address), and a drawing
    handed over as itself broke every character refresh once (Companion 0.16.2, see belly.js). So every drawing of ours
@@ -24,18 +28,31 @@ import { bellyDrawing, bellyTrial } from "./belly.js";
 import { makeMsg } from "../../shared/protocol.js";
 
 const W = window;
-const KEY = "farmhand-drawn-body", SEE_KEY = "farmhand-drawn-body-see";
+const KEY = "farmhand-drawn-body", SEE_KEY = "farmhand-drawn-body-see", FARM_KEY = "farmhand-drawn-body-farm";
 const CODE_HEAD = "FARMBODY1:";
 const STUDIO = "http://localhost:4780";
 const DEFAULTS = () => ({ v: 1, on: false, cup: 12, breast: {}, wear: {}, belly: null, auto: true, tuck: true, dress: true, mould: { items: [], mode: {} } });
 let S = DEFAULTS(), sdk = null, hooked = false, seeOthers = true;
+let farm = null;                                   // { at, body }: the farm's look, from the bot (S.saved: they brought their own instead)
 const mine = { S: null, E: null };                 // you
 const others = new Map();                          // member number → { S, E, at }: what other Companions told us
 
 function load() {
   try { const d = JSON.parse(W.localStorage.getItem(KEY)); if (d && typeof d === "object") S = Object.assign(DEFAULTS(), d); } catch (e) { /* fresh */ }
   try { seeOthers = W.localStorage.getItem(SEE_KEY) !== "0"; } catch (e) { /* on */ }
+  try { const f = JSON.parse(W.localStorage.getItem(FARM_KEY)); if (f && typeof f.at === "number" && f.body) { const b = clean(f.body); if (b) farm = { at: f.at, body: b }; } } catch (e) { /* none yet */ }
   mine.S = S;
+}
+// what you're drawn with: your own studio's settings if you brought them, otherwise the farm's look with your own cup
+// and belly on top (and plain settings till the farm's look arrives)
+function eff() {
+  if (S.saved || !farm) return S;
+  const f = farm.body, e = Object.assign({}, f, { on: S.on });
+  if (S.cupSet) e.cup = S.cup;
+  e.belly = {};
+  for (const k of ["std", "AllFours", "Hogtied"]) { const fk = f.belly && f.belly[k]; if (fk) e.belly[k] = Object.assign({}, fk, { on: !!S.bellyOn && !!fk.on }); }
+  if (S.bellyOn && !(e.belly.std && e.belly.std.on)) e.belly.std = Object.assign({}, e.belly.std || {}, { on: true });   // (the farm's look has no belly of its own: the usual one)
+  return e;
 }
 function save() { try { W.localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { /* private window: fine */ } }
 
@@ -86,18 +103,22 @@ function redrawMn(mn, soon) {
 const redraw = (soon) => { if (W.Player) redrawMn(W.Player.MemberNumber, soon); };
 
 // ── an engine per body, set up from its settings ──
+// (yours follows the game's Player itself: it was made by member number, and made before the game knew yours, so it
+// looked for nobody and never drew you, while everyone else's worked. Laynie, Oct 14: "i can see changes on others,
+// but not on myself", on her phone and on the bot.)
 function makeEngine(mn) {
   if (!W.FarmBelly) W.FarmBelly = bellyDrawing;
   if (typeof W.FarmBodyEngine !== "function" || !W.FarmBreasts) return null;
+  const who = mn == null ? () => W.Player || null : () => charOf(mn);
   return W.FarmBodyEngine({
-    S: { get C() { return charOf(mn); } },
-    bodyItem: (g) => itemOf(charOf(mn), g),
+    S: { get C() { return who(); } },
+    bodyItem: (g) => itemOf(who(), g),
     setBody: () => {},          // never: their body items are theirs
-    redraw: () => redrawMn(mn, 60),
+    redraw: () => (mn == null ? redraw(60) : redrawMn(mn, 60)),
     picture,
   });
 }
-function engine() { if (!mine.E && W.Player) mine.E = makeEngine(W.Player.MemberNumber); if (mine.E) apply(mine.E, S); return mine.E; }
+function engine() { if (!mine.E && W.Player) mine.E = makeEngine(null); if (mine.E) apply(mine.E, eff()); return mine.E; }
 function apply(E, s) {
   if (!E) return;
   const B = E.BREAST, b = s.breast || {};
@@ -136,7 +157,7 @@ const send = (type, data) => { try { if (W.ServerSend && W.ServerPlayerIsInChatR
 let toldAt = 0, askedAt = 0;
 function tell(force) {
   if (!force && Date.now() - toldAt < 8000) return; toldAt = Date.now();
-  send("body", S.on ? { on: true, body: shareOf(S) } : { on: false });
+  send("body", S.on ? { on: true, body: shareOf(eff()) } : { on: false });
 }
 function ask() { if (Date.now() - askedAt < 8000) return; askedAt = Date.now(); send("bodyAsk", {}); }
 // a message from another Companion (index.js hands these over)
@@ -184,8 +205,30 @@ export function initDrawnBody(mod) {
 
 // ── what the Toggles screen shows and does ──
 export function drawnBodyState() {
-  const up = itemOf(W.Player, "BodyUpper"), cups = (W.FarmBreasts && W.FarmBreasts.CUPS) || [];
-  return { on: !!S.on, cup: S.cup, cupName: cups[S.cup] || "?", cups, chest: up && up.Asset ? up.Asset.Name : "", fromStudio: !!S.saved, belly: !!(S.belly && S.belly.std && S.belly.std.on), seeOthers, othersHere: Array.from(others.keys()).filter((mn) => charOf(mn)).length };
+  const up = itemOf(W.Player, "BodyUpper"), cups = (W.FarmBreasts && W.FarmBreasts.CUPS) || [], e = eff();
+  return { on: !!S.on, cup: e.cup, cupName: cups[e.cup] || "?", cups, chest: up && up.Asset ? up.Asset.Name : "", fromStudio: !!S.saved, fromFarm: !S.saved && !!farm, bellyOn: !!S.bellyOn,
+           belly: !!(e.belly && e.belly.std && e.belly.std.on), seeOthers, othersHere: Array.from(others.keys()).filter((mn) => charOf(mn)).length };
+}
+// ── the farm's look, from the bot (index.js hands these over) ──
+// the bot's welcome says which look it has: the "at" to ask with, or null when this one's already here
+export function farmLookWanted(look) { const at = Number(look) || 0; return at && (!farm || farm.at !== at) ? (farm ? farm.at : 0) : null; }
+export function onFarmLook(m) {
+  const at = Number(m && m.at), b = clean(m && m.body); if (!at || !b) return;
+  if (farm && farm.at === at) return;
+  farm = { at, body: b }; try { W.localStorage.setItem(FARM_KEY, JSON.stringify(farm)); } catch (e) { /* private window: fine */ }
+  if (S.saved) return;                                   // they're using their own
+  if (mine.E) apply(mine.E, eff());
+  if (S.on) { redraw(60); tell(true); }
+}
+// your belly on the drawn body, the farm's shape for it
+export function drawnBodyBelly(on, say) {
+  S.bellyOn = !!on; save(); if (mine.E) apply(mine.E, eff()); redraw(60); tell(true);
+  if (say) say(on ? (S.saved ? "Belly on. You're using your own studio settings, so it's the belly you set there (switch it on in the studio if it isn't)." : "Belly on.") : "Belly off.");
+}
+// back to the farm's look, from settings of your own
+export function drawnBodyUseFarm(say) {
+  delete S.saved; S.cupSet = false; save(); if (mine.E) apply(mine.E, eff()); redraw(60); tell(true);
+  if (say) say(farm ? "Back to the farm's look." : "Back to the farm's look: it comes from the farm girl when you're in her room.");
 }
 export function drawnBodySet(on, say) {
   S.on = !!on; save();
@@ -211,13 +254,13 @@ export function drawnBodySeeOthers(on, say) {
 }
 export function drawnBodyCup(i, say) {
   const n = W.FarmBreasts ? W.FarmBreasts.CUPS.length : 21;
-  S.cup = Math.max(6, Math.min(n - 1, Math.round(Number(i) || 0))); save(); if (mine.E) apply(mine.E, S); redraw(60); tell(true);
+  S.cup = Math.max(6, Math.min(n - 1, Math.round(Number(i) || 0))); S.cupSet = true; save(); if (mine.E) apply(mine.E, eff()); redraw(60); tell(true);
   if (say) say("Cup: " + drawnBodyState().cupName + ".");
 }
 function take(d, say, from) {
   const s = clean(d); if (!s) throw new Error("the settings are damaged");
-  s.on = S.on; s.saved = typeof d.saved === "string" ? d.saved.slice(0, 40) : new Date().toISOString();
-  S = s; mine.S = S; save(); if (mine.E) apply(mine.E, S); redraw(60); tell(true);
+  s.on = S.on; s.bellyOn = S.bellyOn; s.saved = typeof d.saved === "string" ? d.saved.slice(0, 40) : new Date().toISOString();
+  S = s; mine.S = S; save(); if (mine.E) apply(mine.E, eff()); redraw(60); tell(true);
   if (say) say("Settings " + from + " put in: " + drawnBodyState().cupName + " cup" + (S.belly.std && S.belly.std.on ? ", your belly" : "") + ", " + Object.keys(S.wear).length + " piece choices. " + (S.on ? "" : "Switch the drawn body on to see it."));
   return true;
 }

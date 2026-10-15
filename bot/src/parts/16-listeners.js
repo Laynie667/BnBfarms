@@ -47,7 +47,7 @@
           // a Companion runnin' on the bot's own account talks to the bot like any other panel;
           // everything else from the bot is its own echo, ignored
           const own = data.Type === "Hidden" && typeof W.__farmhandOwnPanel !== "function" && readMsg(data);
-          if (own && ["hello","bye","cmd","outfitSave","outfitAnswer","relayNo","sight","leadOk","leadNo"].includes(own.type)) onCompanion(own);
+          if (own && ["hello","bye","cmd","outfitSave","outfitAnswer","relayNo","sight","leadOk","leadNo","bodyFarmAsk"].includes(own.type)) onCompanion(own);
           return;
         }
 

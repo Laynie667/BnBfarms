@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.19.1
+// @version      0.20.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -230,7 +230,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.19.1";
+  var VERSION = "0.20.0";
 
   // extension/src/config.js
   var BOT_MEMBER = 260239;
@@ -571,779 +571,6 @@ One of mods you are using is using an old version of SDK. It will work for now b
     "Living Suit (mouth)": "The last of it: a smooth black sheath over your face from the nose down, and a tongue of itself in your mouth, fillin' it. Every inch of you is inside it now. It walks you where it likes, and you go."
   };
   var gearLore = (name) => GEAR_LORE[name] || "";
-
-  // extension/src/marks.js
-  var KEY = "fhc-marks";
-  var STRIP_KEY = "fhc-strip-backup";
-  var SPLAT_GROUPS = ["Mask", "FaceMarkings", "BodyMarkings"];
-  var WRITE_GROUPS = ["BodyMarkings", "ClothAccessory"];
-  var TREATISE = { group: "BodyMarkings2_Luzi", name: "\u8EAB\u4F53\u8BBA\u6587" };
-  var T_AREAS = { collar: [0, 1, 2], chest: [3, 4, 5], ribs: [6, 7, 8], waist: [9, 10, 11], hips: [12, 13, 14] };
-  var TALLY_PLACE = 11;
-  var AREAS2 = { forehead: ["a", "b", "c"], face: ["d", "e", "f"], chest: ["g", "h", "i", "j"], tummy: ["k", "l", "m", "n"] };
-  var SPILL = { forehead: "face", face: "chest", chest: "tummy", tummy: "chest" };
-  var SPILL_CHANCE = 0.35;
-  var P = () => window.Player;
-  var load = () => {
-    try {
-      return JSON.parse(window.localStorage.getItem(KEY)) || {};
-    } catch (e) {
-      return {};
-    }
-  };
-  var save = (v) => {
-    try {
-      window.localStorage.setItem(KEY, JSON.stringify(v));
-    } catch (e) {
-    }
-  };
-  var groupOf = (name) => typeof window.AssetGroupGet === "function" ? window.AssetGroupGet(P().AssetFamily, name) : null;
-  var bundle = () => window.ServerAppearanceBundle(P().Appearance);
-  var lockedGroups = () => new Set(P().Appearance.filter((it) => it.Property && it.Property.LockedBy).map((it) => it.Asset.Group.Name));
-  function commit(next) {
-    window.ServerAppearanceLoadFromBundle(P(), P().AssetFamily, next, P().MemberNumber);
-    if (typeof window.CharacterRefresh === "function") window.CharacterRefresh(P());
-    window.ChatRoomCharacterUpdate(P());
-  }
-  var cleanText = (t) => String(t || "").replace(/[^A-Za-z0-9 !?.,'&#*+-]/g, "").slice(0, 20);
-  function markBody(m, prefs) {
-    if (!P() || !Array.isArray(P().Appearance) || typeof window.ServerAppearanceBundle !== "function") return { ok: false, why: "not in a room" };
-    const did = [];
-    if (m.wash) return washMarks();
-    if (!prefs.marks) return { ok: false, why: "off" };
-    let next = bundle(), mem = load();
-    const has = (g) => next.find((b) => b.Group === g);
-    if (Array.isArray(m.splat) && m.splat.length) {
-      const col = typeof m.color === "string" && /^#[0-9a-fA-F]{6}$/.test(m.color) ? m.color.toUpperCase() : null;
-      const colOf = (b) => typeof b.Color === "string" && /^#/.test(b.Color) ? b.Color.toUpperCase() : null;
-      const mine2 = next.filter((b) => b.Name === "Splatters" && SPLAT_GROUPS.includes(b.Group));
-      let it = mine2.find((b) => colOf(b) === col);
-      if (!it) {
-        const g = SPLAT_GROUPS.find((x) => !has(x) && groupOf(x));
-        if (g) {
-          it = { Group: g, Name: "Splatters", Property: { TypeRecord: {} } };
-          if (col) it.Color = col;
-          next.push(it);
-          mem.splatGroup = g;
-        } else it = mine2[0];
-      }
-      if (it) {
-        it.Property = Object.assign({}, it.Property || {});
-        const tr = it.Property.TypeRecord = Object.assign({}, it.Property.TypeRecord || {});
-        for (const area of m.splat) {
-          const want = (AREAS2[area] || []).filter((k2) => !tr[k2]);
-          const any = Object.values(AREAS2).flat().filter((k2) => !tr[k2]);
-          const k = (want.length ? want : any)[Math.floor(Math.random() * (want.length ? want : any).length)];
-          if (k) {
-            tr[k] = 1;
-            did.push(area);
-          }
-          if (k && SPILL[area] && Math.random() < SPILL_CHANCE) {
-            const down = AREAS2[SPILL[area]].filter((x) => !tr[x]);
-            if (down.length) {
-              tr[down[Math.floor(Math.random() * down.length)]] = 1;
-              did.push(SPILL[area]);
-            }
-          }
-        }
-      }
-    }
-    if (m.write && cleanText(m.write.line) || m.tally) {
-      if (groupOf(TREATISE.group)) {
-        let it = next.find((b) => b.Group === TREATISE.group && b.Name === TREATISE.name);
-        if (!it && !has(TREATISE.group)) {
-          it = { Group: TREATISE.group, Name: TREATISE.name, Property: { TypeRecord: {} } };
-          next.push(it);
-          mem.treatise = true;
-        }
-        if (it) {
-          const pr = it.Property = Object.assign({}, it.Property || {}), tr = pr.TypeRecord = Object.assign({}, pr.TypeRecord || {});
-          const put = (place, line, text) => {
-            pr["Text" + (place * 3 + line)] = cleanText(text).toUpperCase();
-            tr[String.fromCharCode(97 + place)] = 1;
-          };
-          if (m.tally) {
-            put(TALLY_PLACE, 1, String(m.tally));
-            did.push("tally");
-          }
-          if (m.write && cleanText(m.write.line)) {
-            const pref2 = T_AREAS[m.write.area] || (m.write.pos !== void 0 ? [Math.min(14, Number(m.write.pos))] : [13, 10, 4, 1, 7]);
-            const all = [...pref2, ...Array.from({ length: 15 }, (_, i) => i).filter((i) => !pref2.includes(i) && i !== TALLY_PLACE)];
-            let spot = null;
-            for (const pl of all) {
-              for (const ln of [1, 2, 3]) if (!pr["Text" + (pl * 3 + ln)]) {
-                spot = [pl, ln];
-                break;
-              }
-              if (spot) break;
-            }
-            if (!spot) spot = [pref2[0], 1 + Math.floor(Math.random() * 3)];
-            put(spot[0], spot[1], m.write.line);
-            did.push("writing");
-          }
-          save(mem);
-          commit(next);
-          return { ok: true, did };
-        }
-      }
-    }
-    if (m.write && cleanText(m.write.line)) {
-      let it = next.find((b) => b.Name === "BodyWritings" && WRITE_GROUPS.includes(b.Group));
-      if (!it) {
-        const g = WRITE_GROUPS.find((x) => !has(x) && groupOf(x));
-        if (g) {
-          it = { Group: g, Name: "BodyWritings", Property: { Text: "", Text2: "", Text3: "", TypeRecord: { p: 4, s: 0, t: 1 } } };
-          next.push(it);
-          mem.writeGroup = g;
-        }
-      }
-      if (it) {
-        const pr = it.Property = Object.assign({ Text: "", Text2: "", Text3: "" }, it.Property || {});
-        pr.Text3 = pr.Text2 || "";
-        pr.Text2 = pr.Text || "";
-        pr.Text = cleanText(m.write.line).toUpperCase();
-        pr.TypeRecord = Object.assign({ p: 4, s: 0, t: 1 }, pr.TypeRecord || {}, m.write.pos !== void 0 ? { p: m.write.pos } : {}, m.write.style !== void 0 ? { s: m.write.style } : {}, { t: 1 });
-        did.push("writing");
-      }
-    }
-    if (!did.length) return { ok: false, why: "no room" };
-    save(mem);
-    commit(next);
-    return { ok: true, did };
-  }
-  var FARM_TAG = "BnB Farm gear.";
-  var OLD_TAG = "[B&B Farm gear]";
-  var FARM_NAMES = [
-    "Parasite Lips",
-    "Parasite Belt",
-    "Pump Bung",
-    "Egg Post Plug",
-    "Slime Seal",
-    "Boar's Plug",
-    "Seed Pod Stem",
-    "Denial Clamp",
-    "Growth Cups",
-    "Trap Milker",
-    "Winch Chain",
-    "Feed Chute",
-    "Snare Rope",
-    "Breedin' Frame Cuffs",
-    "Kennel Lead",
-    "The Water's Grip",
-    "The Water's Coils",
-    "Slime Sleeves",
-    "Slime Stockings",
-    "Snare Hobble",
-    "Pack's Knot",
-    "Stud's Stopper",
-    "Pillory Spreader",
-    "Parasite Suckers",
-    "Parasite Root",
-    "The Water's Embrace",
-    "Brood Sac",
-    "Grower's Sheath",
-    "Glutton's Sleeve",
-    "Tyrant's Cage",
-    "Tyrant's Web",
-    "Growin' Plug",
-    "Hungry Belt",
-    "Milkmaid's Cups",
-    "Glutton's Funnel",
-    "The Hobble",
-    "Living Suit (legs)",
-    "Living Suit (hips)",
-    "Living Suit (chest)",
-    "Living Suit (arms)",
-    "Living Suit (mouth)"
-  ];
-  var GEAR_SLOTS = {
-    plug: { groups: ["ItemButt"], names: ["InflVibeButtPlug", "BlackButtPlug", "ButtPlug", "ButtPump"], re: /ButtPlug|Plug/, color: "#2B2B2B" },
-    dildo: { groups: ["ItemVulva"], names: ["InflatableVibeDildo", "VibratingDildo", "ClitoralStimulator"], re: /Dildo/, color: "#2B2B2B" },
-    belt: { groups: ["ItemPelvis"], names: ["PolishedChastityBelt", "LeatherChastityBelt", "SleekLeatherChastityBelt", "MetalChastityBelt"], re: /ChastityBelt/ },
-    cups: { groups: ["ItemNipples"], names: ["LactationPump", "NippleSuctionCups"], re: /Pump|Suction/ },
-    leash: { groups: ["ItemNeckRestraints"], names: ["CollarChainLong", "CollarLeash", "CollarChainShort"], re: /Chain|Leash/, needs: "ItemNeck" },
-    funnel: { groups: ["ItemMouth", "ItemMouth2", "ItemMouth3"], names: ["FunnelGag"], re: /Funnel/ },
-    ropeArms: { groups: ["ItemArms"], names: ["HempRope"], re: /Rope/ },
-    arms: { groups: ["ItemArms"], names: ["HempRope", "LeatherCuffs"], re: /Rope|Cuffs/ },
-    legs: { groups: ["ItemLegs"], names: ["HempRope", "LeatherLegCuffs"], re: /Rope|Cuffs/ },
-    ropeFeet: { groups: ["ItemFeet"], names: ["HempRope"], re: /Rope/ },
-    // (a piece can ask for a spreader bar here instead)
-    lips: { groups: ["ItemMouth", "ItemMouth2", "ItemMouth3"], names: ["LipGag"], re: /LipGag/, color: ["#E0607F", "#7A2B47", "#7A2B47"] },
-    torso: { groups: ["ItemTorso", "ItemTorso2"], names: ["TentacleSuit", "HempRopeHarness"], re: /Harness/ },
-    tag: { groups: ["ItemNeckAccessories"], names: ["CollarNameTagLivestock", "CollarNameTag"], re: /NameTag/, needs: "ItemNeck" }
-  };
-  function gearAsset(group, slot, prefer) {
-    const fam = P().AssetFamily, get = (n) => {
-      try {
-        return typeof window.AssetGet === "function" ? window.AssetGet(fam, group, n) : null;
-      } catch (e) {
-        return null;
-      }
-    };
-    for (const n of Array.isArray(prefer) ? prefer.map(String) : []) if (/^[A-Za-z0-9_]{2,40}$/.test(n) && get(n)) return n;
-    for (const n of slot.names) if (get(n)) return n;
-    const all = Array.isArray(window.Asset) ? window.Asset : [];
-    const hit = all.find((a) => a && a.Group && a.Group.Name === group && slot.re.test(a.Name) && !a.OwnerOnly && !a.LoverOnly && !a.FamilyOnly);
-    return hit ? hit.Name : typeof window.AssetGet !== "function" ? slot.names[0] : null;
-  }
-  var NAMES_KEY = "fhc-gear-names";
-  var knownNames = () => {
-    try {
-      return FARM_NAMES.concat(JSON.parse(window.localStorage.getItem(NAMES_KEY)) || []);
-    } catch (e) {
-      return FARM_NAMES;
-    }
-  };
-  var learnName = (n) => {
-    try {
-      const have = JSON.parse(window.localStorage.getItem(NAMES_KEY)) || [];
-      if (!FARM_NAMES.includes(n) && !have.includes(n)) window.localStorage.setItem(NAMES_KEY, JSON.stringify(have.concat(n).slice(-80)));
-    } catch (e) {
-    }
-  };
-  var isFarmGear = (b) => {
-    const c = b.Craft, d = c ? String(c.Description || "") : "";
-    return !!(c && (d.includes(FARM_TAG) || d.includes(OLD_TAG) || knownNames().includes(c.Name) && (!c.MemberNumber || c.MemberNumber === P().MemberNumber)));
-  };
-  var GEAR_KEY = "fhc-gear";
-  var gearMem = () => {
-    try {
-      return JSON.parse(window.localStorage.getItem(GEAR_KEY)) || {};
-    } catch (e) {
-      return {};
-    }
-  };
-  var gearMemSave = (m) => {
-    try {
-      window.localStorage.setItem(GEAR_KEY, JSON.stringify(m));
-    } catch (e) {
-    }
-  };
-  var gearNameOf = (b, mem) => isFarmGear(b) ? b.Craft.Name : Object.keys(mem).find((n) => mem[n].group === b.Group && mem[n].item === b.Name && (!(b.Craft && b.Craft.Name) || b.Craft.Name === n)) || null;
-  function syncFarmGear(list, allow) {
-    if (!P() || !Array.isArray(P().Appearance) || typeof window.ServerAppearanceBundle !== "function") return { on: [], off: [] };
-    const want = (Array.isArray(list) ? list : []).filter((g) => g && GEAR_SLOTS[g.slot] && (g.always || allow) && (!g.until || g.until > Date.now()));
-    const cur = bundle(), stuck = lockedGroups(), did = { on: [], off: [] }, mem = gearMem();
-    let next = cur.slice();
-    for (const b of cur) {
-      const n = gearNameOf(b, mem);
-      if (!n || want.some((g) => g.name === n) || stuck.has(b.Group)) continue;
-      next = next.filter((x) => x !== b);
-      did.off.push(n);
-      delete mem[n];
-    }
-    for (const n of Object.keys(mem)) if (!want.some((g) => g.name === n) && !next.some((b) => gearNameOf(b, mem) === n)) delete mem[n];
-    for (const g of want) {
-      if (next.some((b) => gearNameOf(b, mem) === g.name)) continue;
-      const slot = GEAR_SLOTS[g.slot];
-      if (slot.needs && !next.some((b) => b.Group === slot.needs)) continue;
-      const group = slot.groups.find((x) => !next.some((b) => b.Group === x) && groupOf(x));
-      if (!group) continue;
-      const item = gearAsset(group, slot, g.items);
-      if (!item) continue;
-      const color = (typeof g.color === "string" && /^#[0-9a-fA-F]{6}$/.test(g.color) ? g.color : null) || slot.color || "Default";
-      const it = {
-        Group: group,
-        Name: item,
-        Difficulty: 20,
-        Property: {},
-        Craft: {
-          Item: item,
-          Name: String(g.name).slice(0, 30),
-          Description: (FARM_TAG + " " + String(g.desc || "").slice(0, 180)).trim(),
-          Property: "Normal",
-          Color: Array.isArray(color) ? color.join(",") : color,
-          Lock: "",
-          Private: true,
-          MemberNumber: P().MemberNumber,
-          MemberName: P().Name,
-          ItemProperty: {},
-          Type: null,
-          TypeRecord: null
-        }
-      };
-      if (color !== "Default") it.Color = color;
-      next.push(it);
-      did.on.push(g.name);
-      mem[g.name] = { group, item };
-      learnName(String(g.name).slice(0, 30));
-    }
-    gearMemSave(mem);
-    if (did.on.length || did.off.length) commit(next);
-    return did;
-  }
-  var SHAPES = { BodyUpper: ["FlatSmall", "FlatMedium", "Small", "Normal", "Large", "XLarge"], BodyLower: ["Small", "Normal", "Large", "XLarge"] };
-  var SHAPE_KEY = "fhc-shape";
-  function syncShape(shape, allow) {
-    if (!P() || !Array.isArray(P().Appearance) || typeof window.ServerAppearanceBundle !== "function") return [];
-    let mem;
-    try {
-      mem = JSON.parse(window.localStorage.getItem(SHAPE_KEY)) || {};
-    } catch (e) {
-      mem = {};
-    }
-    const next = bundle().map((b) => Object.assign({}, b)), did = [];
-    for (const [group, steps] of [["BodyUpper", shape && allow ? Number(shape.up) || 0 : 0], ["BodyLower", shape && allow ? Number(shape.low) || 0 : 0]]) {
-      const order = SHAPES[group], b = next.find((x) => x.Group === group);
-      if (!b) continue;
-      const m = mem[group];
-      const own = m && m.set === b.Name && order.includes(m.own) ? m.own : b.Name;
-      const at = order.indexOf(own);
-      if (at < 0) continue;
-      const want = order[Math.max(0, Math.min(order.length - 1, at + Math.round(steps)))];
-      if (typeof window.AssetGet === "function" && !window.AssetGet(P().AssetFamily, group, want)) continue;
-      if (want !== b.Name) {
-        b.Name = want;
-        did.push(group + " " + want);
-      }
-      if (want === own) delete mem[group];
-      else mem[group] = { own, set: want };
-    }
-    try {
-      window.localStorage.setItem(SHAPE_KEY, JSON.stringify(mem));
-    } catch (e) {
-    }
-    if (did.length) commit(next);
-    return did;
-  }
-  var TRIAL_GROUPS = ["ItemNipples", "ItemBreast", "ItemTorso"];
-  var TRIAL_CLEAN = ["BodyUpper", "BodyLower", "Bra", "ItemNipples", "ItemBreast", "ItemTorso"];
-  function scaleTrial(on, say) {
-    try {
-      if (!P() || !Array.isArray(P().Appearance)) return say("I can't see your character right now.");
-      const items = P().Appearance.filter((it) => it && it.Asset && it.Asset.Group && TRIAL_GROUPS.includes(it.Asset.Group.Name));
-      for (const it of items) {
-        const p = Object.assign({}, it.Property || {});
-        if (on) {
-          p.ScaleX = 1.15;
-          p.ScaleY = 1.15;
-          p.TranslationY = -12;
-        } else {
-          delete p.ScaleX;
-          delete p.ScaleY;
-          delete p.TranslationY;
-        }
-        it.Property = p;
-      }
-      if (!on) for (const it of P().Appearance) {
-        if (!it || !it.Asset || !it.Asset.Group || !TRIAL_CLEAN.includes(it.Asset.Group.Name) || !it.Property) continue;
-        if (it.Property.ScaleX === 1.15) delete it.Property.ScaleX;
-        if (it.Property.ScaleY === 1.15) delete it.Property.ScaleY;
-        if (it.Property.TranslationY === -12) delete it.Property.TranslationY;
-      }
-      if (typeof window.CharacterRefresh === "function") window.CharacterRefresh(P());
-      if (typeof window.ChatRoomCharacterUpdate === "function" && window.CurrentScreen === "ChatRoom") window.ChatRoomCharacterUpdate(P());
-      if (!on) return say("Scale trial undone: everything is back to its own size.");
-      setTimeout(() => {
-        const now = P().Appearance.filter((it) => it && it.Asset && it.Asset.Group && TRIAL_GROUPS.includes(it.Asset.Group.Name));
-        const kept = now.filter((it) => it.Property && it.Property.ScaleX === 1.15).map((it) => it.Asset.Group.Name), lost = now.filter((it) => !(it.Property && it.Property.ScaleX === 1.15)).map((it) => it.Asset.Group.Name);
-        say("Scale trial, 15% bigger. The game KEPT it on: " + (kept.join(", ") || "nothing") + ". It DROPPED it on: " + (lost.join(", ") || "nothing") + '. Look at your character: is the chest bigger? Ask somebody else in the room if they see it too, then tell Claude all three answers. "Undo the scale trial" puts it back.');
-      }, 3e3);
-    } catch (e) {
-      say("The scale trial hit an error: " + (e && e.message || e));
-    }
-  }
-  function washMarks() {
-    const mem = load(), stuck = lockedGroups();
-    const next = bundle().filter((b) => stuck.has(b.Group) || !(b.Name === "Splatters" && SPLAT_GROUPS.includes(b.Group) || b.Name === "BodyWritings" && b.Group === mem.writeGroup || mem.treatise && b.Group === TREATISE.group));
-    save({});
-    commit(next);
-    return { ok: true, did: ["wash"] };
-  }
-  function stripMe(prefs) {
-    if (!prefs.strip) return { ok: false, why: "off" };
-    const cur = bundle(), stuck = lockedGroups();
-    if (!window.localStorage.getItem(STRIP_KEY)) {
-      try {
-        window.localStorage.setItem(STRIP_KEY, JSON.stringify({ at: Date.now(), bundle: cur }));
-      } catch (e) {
-      }
-    }
-    const mem = load();
-    const next = cur.filter((b) => {
-      const g = groupOf(b.Group);
-      return !(g && g.Clothing) || stuck.has(b.Group) || b.Name === "BodyWritings" || b.Name === "Splatters" || b.Group === TREATISE.group;
-    });
-    if (next.length === cur.length) return { ok: false, why: "nothin' to take off" };
-    commit(next);
-    return { ok: true, did: ["strip"] };
-  }
-  function dressMe() {
-    let bk = null;
-    try {
-      bk = JSON.parse(window.localStorage.getItem(STRIP_KEY));
-    } catch (e) {
-    }
-    if (!bk || !Array.isArray(bk.bundle)) return { ok: false, why: "no clothes kept" };
-    const next = bundle(), have = new Set(next.map((b) => b.Group));
-    for (const b of bk.bundle) {
-      const g = groupOf(b.Group);
-      if (g && g.Clothing && !have.has(b.Group)) next.push(b);
-    }
-    commit(next);
-    try {
-      window.localStorage.removeItem(STRIP_KEY);
-    } catch (e) {
-    }
-    return { ok: true, did: ["dress"] };
-  }
-
-  // extension/src/belly.js
-  var W = window;
-  var SKIN_TOP = 12;
-  var trial = 0;
-  var SIZES = [null, { rx: 50, ry: 54, sag: 0.16 }, { rx: 70, ry: 80, sag: 0.22, lift: 5 }, { rx: 92, ry: 112, sag: 0.28, lift: 20 }];
-  var FALLBACK = { White: [236, 204, 196], Asian: [232, 200, 164], Black: [120, 86, 70] };
-  var clamp = (v) => Math.max(0, Math.min(255, Math.round(v)));
-  var rgb = (c, k) => "rgb(" + clamp(c[0] * k) + "," + clamp(c[1] * k) + "," + clamp(c[2] * k) + ")";
-  function bellyPoint(S2, cx, cy, t) {
-    const sn = Math.sin(t), cs = Math.cos(t);
-    const wide = 1 + S2.sag * sn - S2.sag * 0.55 * (sn < 0 ? sn * sn : 0);
-    const drop = sn > 0 ? 1 + S2.sag * 0.35 * sn : 1 - S2.sag * 0.25 * -sn;
-    return [cx + S2.rx * cs * wide / (1 + S2.sag), cy + S2.ry * sn * drop / (1 + S2.sag * 0.35)];
-  }
-  function bellyPath(g, S2, cx, cy, from, to) {
-    const steps = 72;
-    for (let i = 0; i <= steps; i++) {
-      const p = bellyPoint(S2, cx, cy, from + (to - from) * i / steps);
-      if (i) g.lineTo(p[0], p[1]);
-      else g.moveTo(p[0], p[1]);
-    }
-  }
-  function bellyCanvas(size, skin, pressed) {
-    const byHand = typeof size === "object" && !!size, S0 = byHand ? size : SIZES[size];
-    if (byHand) size = S0.rx >= 84 ? 3 : S0.rx >= 60 ? 2 : 1;
-    const S2 = pressed && !byHand ? { rx: S0.rx * 1.2, ry: S0.ry * 0.6, sag: S0.sag + 0.12 } : S0, pad = 6, w = S2.rx * 2 + pad * 2, hgt = S2.ry * 2 + pad * 2, cx = w / 2, cy = hgt / 2, low = cy + S2.ry * 0.28;
-    const cv = document.createElement("canvas");
-    cv.width = w;
-    cv.height = hgt;
-    const g = cv.getContext("2d");
-    const whole = () => {
-      g.beginPath();
-      bellyPath(g, S2, cx, cy, 0, Math.PI * 2);
-      g.closePath();
-    };
-    const grad = g.createRadialGradient(cx - S2.rx * 0.22, low - S2.ry * 0.42, S2.rx * 0.1, cx, low, S2.ry * 1.05);
-    grad.addColorStop(0, rgb(skin, 1.03));
-    grad.addColorStop(0.55, rgb(skin, 1));
-    grad.addColorStop(1, rgb([skin[0], skin[1] * 0.93, skin[2] * 0.92], 0.94));
-    g.fillStyle = grad;
-    whole();
-    g.fill();
-    g.save();
-    whole();
-    g.clip();
-    const under = g.createLinearGradient(0, low + S2.ry * 0.25, 0, cy + S2.ry + pad);
-    under.addColorStop(0, "rgba(150,70,60,0)");
-    under.addColorStop(1, "rgba(150,70,60,0.22)");
-    g.fillStyle = under;
-    g.fillRect(0, 0, w, hgt);
-    const blush = g.createRadialGradient(cx, low + S2.ry * 0.2, 2, cx, low + S2.ry * 0.2, S2.rx * 0.85);
-    blush.addColorStop(0, "rgba(214,120,120,0.14)");
-    blush.addColorStop(1, "rgba(214,120,120,0)");
-    g.fillStyle = blush;
-    g.fillRect(0, 0, w, hgt);
-    g.translate(cx - S2.rx * 0.36, low - S2.ry * 0.3);
-    g.rotate(-0.22);
-    const sh = g.createRadialGradient(0, 0, 0, 0, 0, S2.ry * 0.36);
-    sh.addColorStop(0, "rgba(255,255,255,0.8)");
-    sh.addColorStop(0.5, "rgba(255,255,255,0.3)");
-    sh.addColorStop(1, "rgba(255,255,255,0)");
-    g.fillStyle = sh;
-    g.scale(0.34, 1);
-    g.beginPath();
-    g.arc(0, 0, S2.ry * 0.36, 0, Math.PI * 2);
-    g.fill();
-    g.restore();
-    g.globalCompositeOperation = "destination-out";
-    {
-      const fr = Math.min(S2.rx * 0.9, 56);
-      g.save();
-      g.translate(cx, cy - S2.ry * 0.98);
-      g.scale(1, S2.ry * 0.7 / fr);
-      const fade = g.createRadialGradient(0, 0, fr * 0.3, 0, 0, fr);
-      fade.addColorStop(0, "rgba(0,0,0,1)");
-      fade.addColorStop(1, "rgba(0,0,0,0)");
-      g.fillStyle = fade;
-      g.beginPath();
-      g.arc(0, 0, fr, 0, Math.PI * 2);
-      g.fill();
-      g.restore();
-    }
-    g.globalCompositeOperation = "source-over";
-    const up = [0, -0.14, 0.02, 0.3][size] * Math.PI;
-    g.strokeStyle = rgb(skin, 0.28);
-    g.lineCap = "round";
-    g.lineJoin = "round";
-    g.lineWidth = 1.5;
-    g.beginPath();
-    bellyPath(g, S2, cx, cy, -up, Math.PI + up);
-    g.stroke();
-    g.lineWidth = 2.1;
-    g.beginPath();
-    bellyPath(g, S2, cx, cy, Math.PI * 0.2, Math.PI * 0.8);
-    g.stroke();
-    g.strokeStyle = rgb(skin, 0.45);
-    g.lineWidth = 1.4;
-    g.beginPath();
-    const ny = low + S2.ry * 0.12;
-    if (size >= 3) {
-      g.ellipse(cx, ny, 4.5, 3.2, 0, 0, Math.PI * 2);
-    } else {
-      g.moveTo(cx - 0.5, ny - S2.ry * 0.07);
-      g.quadraticCurveTo(cx + 3, ny, cx - 0.5, ny + S2.ry * 0.07);
-    }
-    g.stroke();
-    if (size >= 2) {
-      g.strokeStyle = rgb(skin, 0.72);
-      g.lineWidth = 1;
-      g.globalAlpha = 0.45;
-      g.beginPath();
-      g.moveTo(cx, ny + 6);
-      g.lineTo(cx, cy + S2.ry * 0.86);
-      g.stroke();
-      g.globalAlpha = 1;
-    }
-    if (pressed) {
-      const cut = Math.round(cy + S2.ry * (byHand && S0.cut > 0 ? S0.cut : 0.74));
-      g.clearRect(0, cut, w, hgt - cut);
-      let x0 = cx, x1 = cx;
-      for (let t = 0; t <= Math.PI; t += 0.01) {
-        const p = bellyPoint(S2, cx, cy, t);
-        if (p[1] >= cut) {
-          x0 = Math.min(x0, p[0]);
-          x1 = Math.max(x1, p[0]);
-        }
-      }
-      g.strokeStyle = rgb(skin, 0.28);
-      g.lineWidth = 2;
-      g.lineCap = "round";
-      g.beginPath();
-      g.moveTo(x0, cut - 1);
-      g.lineTo(x1, cut - 1);
-      g.stroke();
-      cv.cut = cut;
-    }
-    return cv;
-  }
-  function bellyPlace(size, upperX, upperY, cv, pose) {
-    const S2 = SIZES[size];
-    if (pose === "AllFours") return [upperX + 250 - cv.width / 2, upperY + GROUND_Y - (cv.cut || cv.height)];
-    if (pose === "Hogtied") return [upperX + 250 - cv.width / 2, upperY + 300 + S2.ry * 0.34 - cv.height / 2];
-    return [upperX + 250 - cv.width / 2, upperY + 392 + S2.ry * 0.62 - (S2.lift || 0) - cv.height / 2];
-  }
-  var ALL_FOURS_BELLY = false;
-  var GROUND_Y = 386;
-  function bellyPose(src) {
-    const m = /\/BodyUpper\/(AllFours|Hogtied)\//.exec(String(src));
-    return m ? m[1] : "";
-  }
-  function skinPatch(pose) {
-    return pose === "AllFours" ? [226, 236] : pose === "Hogtied" ? [226, 236] : [226, 388];
-  }
-  var SKIN_UNDER = { BodyUpper: 1, BodyLower: 1, Pussy: 1 };
-  function skinGate(C) {
-    const layers = C && C.AppearanceLayers;
-    if (!Array.isArray(layers) || !layers.length) return null;
-    const groupOf3 = (l) => l && l.Asset && l.Asset.Group && l.Asset.Group.Name || "";
-    let last = -1, at = 0;
-    for (let i = 0; i < layers.length; i++) if (SKIN_UNDER[groupOf3(layers[i])]) last = i;
-    if (last < 0) return null;
-    const slot = new RegExp("(?:^|/)Assets/[^/]+/(?:Override/[^/]+/)?([^/]+)/");
-    return (src) => {
-      const m = slot.exec(String(src));
-      if (!m) return false;
-      let i = at;
-      while (i < layers.length && groupOf3(layers[i]) !== m[1] && (layers[i].Asset && layers[i].Asset.DynamicGroupName) !== m[1]) i++;
-      if (i >= layers.length) return false;
-      at = i + 1;
-      return i > last;
-    };
-  }
-  var bellyDrawing = { SIZES, bellyCanvas, bellyPlace, bellyPose, skinPatch, skinGate, FALLBACK };
-  var pictures = /* @__PURE__ */ new Map();
-  function bellyPicture(size, skin, pressed) {
-    const key = size + (pressed ? "p" : "") + ":" + skin.map((v) => Math.round(v / 4) * 4).join(",");
-    let p = pictures.get(key);
-    if (!p) {
-      const cv = bellyCanvas(size, skin, pressed);
-      p = { url: cv.toDataURL("image/png"), width: cv.width, height: cv.height, cut: cv.cut };
-      if (pictures.size > 24) pictures.clear();
-      pictures.set(key, p);
-    }
-    return p;
-  }
-  function scrubCache() {
-    let n = 0;
-    try {
-      for (const name of ["DrawImageCache", "GLDrawImageCache"]) {
-        const m = W[name];
-        if (m && typeof m.forEach === "function" && typeof m.delete === "function") {
-          const bad = [];
-          m.forEach((v, k) => {
-            if (typeof k !== "string") bad.push(k);
-          });
-          for (const k of bad) {
-            m.delete(k);
-            n++;
-          }
-        }
-      }
-    } catch (e) {
-    }
-    return n;
-  }
-  var skinSeen = /* @__PURE__ */ new Map();
-  var hexRGB = (h2) => [parseInt(h2.slice(1, 3), 16), parseInt(h2.slice(3, 5), 16), parseInt(h2.slice(5, 7), 16)];
-  function skinGuess(src, hex) {
-    if (hex) return hexRGB(hex).map((v) => clamp(v * 1.62));
-    return /_Black\./.test(src) ? FALLBACK.Black : /_Asian\./.test(src) ? FALLBACK.Asian : FALLBACK.White;
-  }
-  function skinFor(src, hex) {
-    hex = typeof hex === "string" && /^#[0-9a-fA-F]{6}$/.test(hex) ? hex : "";
-    const key = src + "|" + hex, v = skinSeen.get(key);
-    if (Array.isArray(v)) return v;
-    if (!v) {
-      if (skinSeen.size > 16) skinSeen.clear();
-      skinSeen.set(key, "loading");
-      skinLoad(key, src, hex);
-    }
-    return skinGuess(src, hex);
-  }
-  function skinLoad(key, src, hex) {
-    const img = new Image();
-    img.onload = () => {
-      let c = skinGuess(src, hex);
-      try {
-        const bw = 48, bh = 40, cv = document.createElement("canvas");
-        cv.width = bw;
-        cv.height = bh;
-        const g = cv.getContext("2d"), at = skinPatch(bellyPose(src));
-        g.drawImage(img, -at[0], -at[1]);
-        const d = g.getImageData(0, 0, bw, bh).data, good = [];
-        for (let i = 0; i < d.length; i += 4) if (d[i + 3] > 200 && d[i] + d[i + 1] + d[i + 2] > 90 && Math.min(d[i], d[i + 1], d[i + 2]) < 238) good.push([d[i], d[i + 1], d[i + 2]]);
-        if (good.length >= 40) {
-          good.sort((m, n) => m[0] + m[1] + m[2] - (n[0] + n[1] + n[2]));
-          const p = good[Math.floor(good.length * 0.7)];
-          c = hex ? hexRGB(hex).map((v) => clamp(v * (p[0] + p[1] + p[2]) / 383)) : p;
-        }
-      } catch (e) {
-      }
-      skinSeen.set(key, c);
-      try {
-        if (trial && W.Player && typeof W.CharacterLoadCanvas === "function") W.CharacterLoadCanvas(W.Player);
-      } catch (e) {
-      }
-    };
-    img.onerror = () => skinSeen.set(key, skinGuess(src, hex));
-    img.src = src;
-  }
-  var hooked = false;
-  var sdk = null;
-  function initBelly(mod2) {
-    sdk = mod2;
-    setTimeout(scrubCache, 4e3);
-  }
-  function hookBelly(mod2) {
-    if (hooked || !mod2) return;
-    hooked = true;
-    try {
-      mod2.hookFunction("CommonDrawAppearanceBuild", 1, (args, next) => {
-        let finish = null;
-        try {
-          const C = args[0], cb = args[1];
-          if (trial && !W.__farmDrawnBody && C && W.Player && C.MemberNumber === W.Player.MemberNumber && cb && typeof cb.drawImage === "function") {
-            let upper = null, lower = false, done = false;
-            const gate = skinGate(C);
-            const prio = (src) => {
-              const m = new RegExp("(?:^|/)Assets/[^/]+/(?:Override/[^/]+/)?([^/]+)/").exec(src);
-              if (!m) return 99;
-              try {
-                const g = W.AssetGroupGet && W.AssetGroupGet(C.AssetFamily, m[1]);
-                return g && typeof g.DrawingPriority === "number" ? g.DrawingPriority : 99;
-              } catch (e) {
-                return 99;
-              }
-            };
-            const paint = () => {
-              if (done || !upper || !lower) return;
-              done = true;
-              const S2 = SIZES[trial], cv = bellyPicture(trial, skinFor(upper[2], upper[3]), upper[4] === "AllFours");
-              const [dx, dy] = bellyPlace(trial, upper[0], upper[1], cv, upper[4]);
-              cb.drawImage(cv.url, dx, dy, {});
-              if (typeof cb.drawImageBlink === "function") cb.drawImageBlink(cv.url, dx, dy, {});
-            };
-            const before = (src, x, y, o) => {
-              if (done || typeof src !== "string") return;
-              if (src.includes("/BodyUpper/")) {
-                const pose = bellyPose(src);
-                if (pose === "AllFours" && !ALL_FOURS_BELLY) {
-                  done = true;
-                  return;
-                }
-                if (pose === "AllFours" || pose === "Hogtied") {
-                  upper = [x, y, src, o && o.HexColor, pose];
-                  lower = true;
-                  paint();
-                  return;
-                }
-              }
-              if (gate ? gate(src) : lower && prio(src) > SKIN_TOP) paint();
-            };
-            const after = (src, x, y, o) => {
-              if (typeof src !== "string") return;
-              if (src.includes("/BodyUpper/")) upper = [x, y, src, o && o.HexColor, bellyPose(src)];
-              if (src.includes("/BodyLower/")) lower = true;
-            };
-            const wrap = (name) => typeof cb[name] === "function" ? (src, x, y, o) => {
-              try {
-                before(src, x, y, o);
-              } catch (e) {
-                console.warn("[Farmhand Companion] belly:", e);
-              }
-              cb[name](src, x, y, o);
-              try {
-                after(src, x, y, o);
-              } catch (e) {
-                console.warn("[Farmhand Companion] belly:", e);
-              }
-            } : cb[name];
-            args[1] = Object.assign({}, cb, { drawImage: wrap("drawImage"), drawImageColorize: wrap("drawImageColorize") });
-            finish = paint;
-          }
-        } catch (e) {
-          console.warn("[Farmhand Companion] belly hook:", e);
-        }
-        const out = next(args);
-        if (finish) {
-          try {
-            finish();
-          } catch (e) {
-            console.warn("[Farmhand Companion] belly:", e);
-          }
-        }
-        return out;
-      });
-    } catch (e) {
-      console.warn("[Farmhand Companion] belly test unavailable:", e);
-    }
-  }
-  function bellyTrial(n, say) {
-    trial = Math.max(0, Math.min(3, Math.round(Number(n)) || 0));
-    scrubCache();
-    if (trial) hookBelly(sdk);
-    const redraw2 = () => {
-      try {
-        if (W.Player && typeof W.CharacterLoadCanvas === "function") W.CharacterLoadCanvas(W.Player);
-      } catch (e) {
-        console.warn("[Farmhand Companion] belly redraw:", e);
-      }
-    };
-    redraw2();
-    setTimeout(redraw2, 500);
-    setTimeout(redraw2, 1800);
-    if (say) say(trial ? "Belly test: " + ["", "small", "medium", "large"][trial] + ". Look at your character with nothing over your middle. Only you can see it. Tell Claude how it looks: the shape, the colour match, where it sits." : "Belly test off.");
-  }
 
   // studio/web/breasts-drawing.js
   (() => {
@@ -1852,6 +1079,83 @@ One of mods you are using is using an old version of SDK. It will work for now b
         for (let i = 0, j = 0; j < F.length; i += 4, j++) F[j] = dd[i] / 200;
         return cv.formF = { F, w, h: h2 };
       }
+      const underSeen = /* @__PURE__ */ new Map();
+      function gameUnder(src) {
+        if (underSeen.has(src)) return underSeen.get(src);
+        const im = mouldImg(src);
+        if (!im || !im.naturalWidth) return null;
+        let out = null;
+        try {
+          const w = im.naturalWidth, h2 = im.naturalHeight, c = document.createElement("canvas");
+          c.width = w;
+          c.height = h2;
+          const g = c.getContext("2d", { willReadFrequently: true });
+          g.drawImage(im, 0, 0);
+          const d = g.getImageData(0, 0, w, h2).data;
+          const L = (x, y) => {
+            if (x < 0 || x >= w || y < 0 || y >= h2) return -1;
+            const o = (y * w + x) * 4;
+            return d[o + 3] < 128 ? -1 : 0.3 * d[o] + 0.59 * d[o + 1] + 0.11 * d[o + 2];
+          };
+          const vals = [];
+          for (let y = 300; y < Math.min(h2, 420); y += 4) for (let x = 200; x < 300; x += 4) {
+            const v = L(x, y);
+            if (v >= 0) vals.push(v);
+          }
+          vals.sort((p, q2) => p - q2);
+          const skin = vals[vals.length >> 1];
+          if (skin > 0) {
+            const u = new Int16Array(w).fill(-1);
+            let first = -1, last = -1;
+            for (let x = 0; x < w; x++) {
+              for (let y = 250; y < Math.min(h2, 420); y++) {
+                const v = L(x, y);
+                if (v >= 0 && v < skin * 0.6 && L(x - 3, y) >= 0 && L(x + 3, y) >= 0) u[x] = y;
+              }
+              if (u[x] >= 0) {
+                if (first < 0) first = x;
+                last = x;
+              }
+            }
+            if (first >= 0) {
+              for (let x = first, p = first; x <= last; x++) if (u[x] >= 0) {
+                for (let k = p + 1; k < x; k++) u[k] = Math.round(u[p] + (u[x] - u[p]) * (k - p) / (x - p));
+                p = x;
+              }
+              for (let k = 1; k <= 30; k++) {
+                if (first - k >= 0) u[first - k] = u[first];
+                if (last + k < w) u[last + k] = u[last];
+              }
+              out = u;
+            }
+          }
+        } catch (e) {
+          out = null;
+        }
+        underSeen.set(src, out);
+        if (underSeen.size > 40) underSeen.delete(underSeen.keys().next().value);
+        return out;
+      }
+      function bellyUnder(cv, dx, dy, src, ux, uy) {
+        const u = gameUnder(src);
+        if (!u) return cv;
+        const key = [Math.round(dx), Math.round(dy), Math.round(ux), Math.round(uy), src].join("|");
+        if (cv.underKey === key) return cv.under;
+        const c = document.createElement("canvas");
+        c.width = cv.width;
+        c.height = cv.height;
+        const g = c.getContext("2d");
+        g.drawImage(cv, 0, 0);
+        for (let cx = 0; cx < cv.width; cx++) {
+          const px = Math.round(cx + dx - ux);
+          if (px < 0 || px >= u.length || u[px] < 0) continue;
+          const cut = Math.round(uy + u[px] + 1 - dy);
+          if (cut > 0) g.clearRect(cx, 0, 1, cut);
+        }
+        cv.underKey = key;
+        cv.under = c;
+        return c;
+      }
       const shadeSeen = /* @__PURE__ */ new WeakMap();
       function bellyShade(img, sx, sy, ctx2) {
         const b = ctx2.belly;
@@ -2098,6 +1402,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       const NIP_GROUPS = /* @__PURE__ */ new Set(["Nipples", "ItemNipples", "ItemNipplesPiercings"]);
       const HAND_GROUPS = /* @__PURE__ */ new Set(["HandsLeft", "HandsRight", "ItemHands", "Gloves"]);
       const NIP_PIECES = new RegExp("Forbidden|Pastie|Nipple|Shield|Tape|Heart|Tassel|Piercing", "i");
+      const NIP_DESC = new RegExp("Pastie|Nipple|Tassel|Breast Pump|Suction Cup", "i");
       const ARM_GROUPS = /* @__PURE__ */ new Set(["ItemArms", "Bracelet"]);
       const heldNow = () => false;
       const chestSlot = (g) => !!g && !/^Hair/.test(g) && !NIP_GROUPS.has(g) && !HAND_GROUPS.has(g) && !/^(Body|Arms|Head|Eyes|Eyebrows|Mouth|Blush|Fluids|Pussy|Emoticon|Height)/.test(g);
@@ -2184,7 +1489,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
                 return m ? m[1] : "";
               };
               const mouldList = S2.C.Appearance.filter((it) => MOULD.items.has(mouldKey(it))).map((it) => ({ folders: [it.Asset.Group.Name, it.Asset.DynamicGroupName], name: it.Asset.Name, key: mouldKey(it), mode: MOULD.mode.get(mouldKey(it)) || "wide" }));
-              const wornList = S2.C.Appearance.map((it) => ({ folders: [it.Asset.Group.Name, it.Asset.DynamicGroupName], name: it.Asset.Name, key: mouldKey(it), flat: !!(it.Asset.Prerequisite || []).includes("HasFlatChest") && !InventoryIsItemInList(S2.C, "BodyUpper", ["FlatSmall", "FlatMedium"]) })).sort((a, b) => b.name.length - a.name.length);
+              const wornList = S2.C.Appearance.map((it) => ({ folders: [it.Asset.Group.Name, it.Asset.DynamicGroupName], name: it.Asset.Name, desc: String(it.Asset.Description || ""), key: mouldKey(it), flat: !!(it.Asset.Prerequisite || []).includes("HasFlatChest") && !InventoryIsItemInList(S2.C, "BodyUpper", ["FlatSmall", "FlatMedium"]) })).sort((a, b) => b.name.length - a.name.length);
               const pieceOf = (src) => {
                 const g = groupOf3(src), file = src.slice(src.lastIndexOf("/") + 1);
                 return wornList.find((w) => w.folders.includes(g) && file.startsWith(w.name)) || null;
@@ -2204,8 +1509,9 @@ One of mods you are using is using an old version of SDK. It will work for now b
                 done = true;
                 if (fit.on) {
                   const shape = { rx: fit.rx, ry: fit.ry, sag: fit.sag, cut: fit.cut };
-                  const cv = FarmBelly.bellyCanvas(shape, bellySkin(upper[2], upper[3], FarmBelly.bellyPose(upper[2])), !!fit.flat);
-                  const dx = upper[0] + 250 - cv.width / 2 + fit.x, dy = upper[1] + 392 + fit.ry * 0.62 - cv.height / 2 + fit.y;
+                  const cv0 = FarmBelly.bellyCanvas(shape, bellySkin(upper[2], upper[3], FarmBelly.bellyPose(upper[2])), !!fit.flat);
+                  const dx = upper[0] + 250 - cv0.width / 2 + fit.x, dy = upper[1] + 392 + fit.ry * 0.62 - cv0.height / 2 + fit.y;
+                  const cv = br || fit.behind ? cv0 : bellyUnder(cv0, dx, dy, upper[2], upper[0], upper[1]);
                   put("drawImage", cv, dx, dy, {});
                   if (typeof real.drawImageBlink === "function") put("drawImageBlink", cv, dx, dy, {});
                   ctx2.belly = { cv, dx, dy };
@@ -2768,7 +2074,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
                   }
                 }
                 if (chestCover(src, im, x, y, B, false) < 0.012 && !BREAST.on[pk0]) return BREAST.holds[pk0] ? handDraw(name, src, x, y, o) : false;
-                const pc0 = pieceOf(src), flatK = pc0 && pc0.flat ? 0.87 : 1, wm = pc0 && BREAST.wear[pc0.key] || "", pin = wm === "nipple" || wm === "" && !!pc0 && NIP_PIECES.test(pc0.name), mapYp = pin && B.fit.mapYN ? B.fit.mapYN : B.fit.mapY;
+                const pc0 = pieceOf(src), flatK = pc0 && pc0.flat ? 0.87 : 1, wm = pc0 && BREAST.wear[pc0.key] || "", pin = wm === "nipple" || wm === "" && !!pc0 && (NIP_PIECES.test(pc0.name) || NIP_DESC.test(pc0.desc)), mapYp = pin && B.fit.mapYN ? B.fit.mapYN : B.fit.mapY;
                 const key = "dress|" + (pin ? "pin|" : "") + src + "|" + Math.round(x) + "," + Math.round(y) + "|" + B.sig + "|" + (ctx2.belly && !fit.behind && BELLY.auto !== false ? ctx2.sig : "") + "|" + MOULD.ver;
                 let c = BREAST.out.get(key);
                 if (!c) {
@@ -3763,10 +3069,368 @@ One of mods you are using is using an old version of SDK. It will work for now b
     };
   })();
 
+  // extension/src/belly.js
+  var W = window;
+  var SKIN_TOP = 12;
+  var trial = 0;
+  var SIZES = [null, { rx: 50, ry: 54, sag: 0.16 }, { rx: 70, ry: 80, sag: 0.22, lift: 5 }, { rx: 92, ry: 112, sag: 0.28, lift: 20 }];
+  var FALLBACK = { White: [236, 204, 196], Asian: [232, 200, 164], Black: [120, 86, 70] };
+  var clamp = (v) => Math.max(0, Math.min(255, Math.round(v)));
+  var rgb = (c, k) => "rgb(" + clamp(c[0] * k) + "," + clamp(c[1] * k) + "," + clamp(c[2] * k) + ")";
+  function bellyPoint(S2, cx, cy, t) {
+    const sn = Math.sin(t), cs = Math.cos(t);
+    const wide = 1 + S2.sag * sn - S2.sag * 0.55 * (sn < 0 ? sn * sn : 0);
+    const drop = sn > 0 ? 1 + S2.sag * 0.35 * sn : 1 - S2.sag * 0.25 * -sn;
+    return [cx + S2.rx * cs * wide / (1 + S2.sag), cy + S2.ry * sn * drop / (1 + S2.sag * 0.35)];
+  }
+  function bellyPath(g, S2, cx, cy, from, to) {
+    const steps = 72;
+    for (let i = 0; i <= steps; i++) {
+      const p = bellyPoint(S2, cx, cy, from + (to - from) * i / steps);
+      if (i) g.lineTo(p[0], p[1]);
+      else g.moveTo(p[0], p[1]);
+    }
+  }
+  function bellyCanvas(size, skin, pressed) {
+    const byHand = typeof size === "object" && !!size, S0 = byHand ? size : SIZES[size];
+    if (byHand) size = S0.rx >= 84 ? 3 : S0.rx >= 60 ? 2 : 1;
+    const S2 = pressed && !byHand ? { rx: S0.rx * 1.2, ry: S0.ry * 0.6, sag: S0.sag + 0.12 } : S0, pad = 6, w = S2.rx * 2 + pad * 2, hgt = S2.ry * 2 + pad * 2, cx = w / 2, cy = hgt / 2, low = cy + S2.ry * 0.28;
+    const cv = document.createElement("canvas");
+    cv.width = w;
+    cv.height = hgt;
+    const g = cv.getContext("2d");
+    const whole = () => {
+      g.beginPath();
+      bellyPath(g, S2, cx, cy, 0, Math.PI * 2);
+      g.closePath();
+    };
+    const grad = g.createRadialGradient(cx - S2.rx * 0.22, low - S2.ry * 0.42, S2.rx * 0.1, cx, low, S2.ry * 1.05);
+    grad.addColorStop(0, rgb(skin, 1.03));
+    grad.addColorStop(0.55, rgb(skin, 1));
+    grad.addColorStop(1, rgb([skin[0], skin[1] * 0.93, skin[2] * 0.92], 0.94));
+    g.fillStyle = grad;
+    whole();
+    g.fill();
+    g.save();
+    whole();
+    g.clip();
+    const under = g.createLinearGradient(0, low + S2.ry * 0.25, 0, cy + S2.ry + pad);
+    under.addColorStop(0, "rgba(150,70,60,0)");
+    under.addColorStop(1, "rgba(150,70,60,0.22)");
+    g.fillStyle = under;
+    g.fillRect(0, 0, w, hgt);
+    const blush = g.createRadialGradient(cx, low + S2.ry * 0.2, 2, cx, low + S2.ry * 0.2, S2.rx * 0.85);
+    blush.addColorStop(0, "rgba(214,120,120,0.14)");
+    blush.addColorStop(1, "rgba(214,120,120,0)");
+    g.fillStyle = blush;
+    g.fillRect(0, 0, w, hgt);
+    g.translate(cx - S2.rx * 0.36, low - S2.ry * 0.3);
+    g.rotate(-0.22);
+    const sh = g.createRadialGradient(0, 0, 0, 0, 0, S2.ry * 0.36);
+    sh.addColorStop(0, "rgba(255,255,255,0.8)");
+    sh.addColorStop(0.5, "rgba(255,255,255,0.3)");
+    sh.addColorStop(1, "rgba(255,255,255,0)");
+    g.fillStyle = sh;
+    g.scale(0.34, 1);
+    g.beginPath();
+    g.arc(0, 0, S2.ry * 0.36, 0, Math.PI * 2);
+    g.fill();
+    g.restore();
+    g.globalCompositeOperation = "destination-out";
+    {
+      const fr = Math.min(S2.rx * 0.9, 56);
+      g.save();
+      g.translate(cx, cy - S2.ry * 0.98);
+      g.scale(1, S2.ry * 0.7 / fr);
+      const fade = g.createRadialGradient(0, 0, fr * 0.3, 0, 0, fr);
+      fade.addColorStop(0, "rgba(0,0,0,1)");
+      fade.addColorStop(1, "rgba(0,0,0,0)");
+      g.fillStyle = fade;
+      g.beginPath();
+      g.arc(0, 0, fr, 0, Math.PI * 2);
+      g.fill();
+      g.restore();
+    }
+    g.globalCompositeOperation = "source-over";
+    const up = [0, -0.14, 0.02, 0.3][size] * Math.PI;
+    g.strokeStyle = rgb(skin, 0.28);
+    g.lineCap = "round";
+    g.lineJoin = "round";
+    g.lineWidth = 1.5;
+    g.beginPath();
+    bellyPath(g, S2, cx, cy, -up, Math.PI + up);
+    g.stroke();
+    g.lineWidth = 2.1;
+    g.beginPath();
+    bellyPath(g, S2, cx, cy, Math.PI * 0.2, Math.PI * 0.8);
+    g.stroke();
+    g.strokeStyle = rgb(skin, 0.45);
+    g.lineWidth = 1.4;
+    g.beginPath();
+    const ny = low + S2.ry * 0.12;
+    if (size >= 3) {
+      g.ellipse(cx, ny, 4.5, 3.2, 0, 0, Math.PI * 2);
+    } else {
+      g.moveTo(cx - 0.5, ny - S2.ry * 0.07);
+      g.quadraticCurveTo(cx + 3, ny, cx - 0.5, ny + S2.ry * 0.07);
+    }
+    g.stroke();
+    if (size >= 2) {
+      g.strokeStyle = rgb(skin, 0.72);
+      g.lineWidth = 1;
+      g.globalAlpha = 0.45;
+      g.beginPath();
+      g.moveTo(cx, ny + 6);
+      g.lineTo(cx, cy + S2.ry * 0.86);
+      g.stroke();
+      g.globalAlpha = 1;
+    }
+    if (pressed) {
+      const cut = Math.round(cy + S2.ry * (byHand && S0.cut > 0 ? S0.cut : 0.74));
+      g.clearRect(0, cut, w, hgt - cut);
+      let x0 = cx, x1 = cx;
+      for (let t = 0; t <= Math.PI; t += 0.01) {
+        const p = bellyPoint(S2, cx, cy, t);
+        if (p[1] >= cut) {
+          x0 = Math.min(x0, p[0]);
+          x1 = Math.max(x1, p[0]);
+        }
+      }
+      g.strokeStyle = rgb(skin, 0.28);
+      g.lineWidth = 2;
+      g.lineCap = "round";
+      g.beginPath();
+      g.moveTo(x0, cut - 1);
+      g.lineTo(x1, cut - 1);
+      g.stroke();
+      cv.cut = cut;
+    }
+    return cv;
+  }
+  function bellyPlace(size, upperX, upperY, cv, pose) {
+    const S2 = SIZES[size];
+    if (pose === "AllFours") return [upperX + 250 - cv.width / 2, upperY + GROUND_Y - (cv.cut || cv.height)];
+    if (pose === "Hogtied") return [upperX + 250 - cv.width / 2, upperY + 300 + S2.ry * 0.34 - cv.height / 2];
+    return [upperX + 250 - cv.width / 2, upperY + 392 + S2.ry * 0.62 - (S2.lift || 0) - cv.height / 2];
+  }
+  var ALL_FOURS_BELLY = false;
+  var GROUND_Y = 386;
+  function bellyPose(src) {
+    const m = /\/BodyUpper\/(AllFours|Hogtied)\//.exec(String(src));
+    return m ? m[1] : "";
+  }
+  function skinPatch(pose) {
+    return pose === "AllFours" ? [226, 236] : pose === "Hogtied" ? [226, 236] : [226, 388];
+  }
+  var SKIN_UNDER = { BodyUpper: 1, BodyLower: 1, Pussy: 1 };
+  function skinGate(C) {
+    const layers = C && C.AppearanceLayers;
+    if (!Array.isArray(layers) || !layers.length) return null;
+    const groupOf3 = (l) => l && l.Asset && l.Asset.Group && l.Asset.Group.Name || "";
+    let last = -1, at = 0;
+    for (let i = 0; i < layers.length; i++) if (SKIN_UNDER[groupOf3(layers[i])]) last = i;
+    if (last < 0) return null;
+    const slot = new RegExp("(?:^|/)Assets/[^/]+/(?:Override/[^/]+/)?([^/]+)/");
+    return (src) => {
+      const m = slot.exec(String(src));
+      if (!m) return false;
+      let i = at;
+      while (i < layers.length && groupOf3(layers[i]) !== m[1] && (layers[i].Asset && layers[i].Asset.DynamicGroupName) !== m[1]) i++;
+      if (i >= layers.length) return false;
+      at = i + 1;
+      return i > last;
+    };
+  }
+  var bellyDrawing = { SIZES, bellyCanvas, bellyPlace, bellyPose, skinPatch, skinGate, FALLBACK };
+  var pictures = /* @__PURE__ */ new Map();
+  function bellyPicture(size, skin, pressed) {
+    const key = size + (pressed ? "p" : "") + ":" + skin.map((v) => Math.round(v / 4) * 4).join(",");
+    let p = pictures.get(key);
+    if (!p) {
+      const cv = bellyCanvas(size, skin, pressed);
+      p = { url: cv.toDataURL("image/png"), width: cv.width, height: cv.height, cut: cv.cut };
+      if (pictures.size > 24) pictures.clear();
+      pictures.set(key, p);
+    }
+    return p;
+  }
+  function scrubCache() {
+    let n = 0;
+    try {
+      for (const name of ["DrawImageCache", "GLDrawImageCache"]) {
+        const m = W[name];
+        if (m && typeof m.forEach === "function" && typeof m.delete === "function") {
+          const bad = [];
+          m.forEach((v, k) => {
+            if (typeof k !== "string") bad.push(k);
+          });
+          for (const k of bad) {
+            m.delete(k);
+            n++;
+          }
+        }
+      }
+    } catch (e) {
+    }
+    return n;
+  }
+  var skinSeen = /* @__PURE__ */ new Map();
+  var hexRGB = (h2) => [parseInt(h2.slice(1, 3), 16), parseInt(h2.slice(3, 5), 16), parseInt(h2.slice(5, 7), 16)];
+  function skinGuess(src, hex) {
+    if (hex) return hexRGB(hex).map((v) => clamp(v * 1.62));
+    return /_Black\./.test(src) ? FALLBACK.Black : /_Asian\./.test(src) ? FALLBACK.Asian : FALLBACK.White;
+  }
+  function skinFor(src, hex) {
+    hex = typeof hex === "string" && /^#[0-9a-fA-F]{6}$/.test(hex) ? hex : "";
+    const key = src + "|" + hex, v = skinSeen.get(key);
+    if (Array.isArray(v)) return v;
+    if (!v) {
+      if (skinSeen.size > 16) skinSeen.clear();
+      skinSeen.set(key, "loading");
+      skinLoad(key, src, hex);
+    }
+    return skinGuess(src, hex);
+  }
+  function skinLoad(key, src, hex) {
+    const img = new Image();
+    img.onload = () => {
+      let c = skinGuess(src, hex);
+      try {
+        const bw = 48, bh = 40, cv = document.createElement("canvas");
+        cv.width = bw;
+        cv.height = bh;
+        const g = cv.getContext("2d"), at = skinPatch(bellyPose(src));
+        g.drawImage(img, -at[0], -at[1]);
+        const d = g.getImageData(0, 0, bw, bh).data, good = [];
+        for (let i = 0; i < d.length; i += 4) if (d[i + 3] > 200 && d[i] + d[i + 1] + d[i + 2] > 90 && Math.min(d[i], d[i + 1], d[i + 2]) < 238) good.push([d[i], d[i + 1], d[i + 2]]);
+        if (good.length >= 40) {
+          good.sort((m, n) => m[0] + m[1] + m[2] - (n[0] + n[1] + n[2]));
+          const p = good[Math.floor(good.length * 0.7)];
+          c = hex ? hexRGB(hex).map((v) => clamp(v * (p[0] + p[1] + p[2]) / 383)) : p;
+        }
+      } catch (e) {
+      }
+      skinSeen.set(key, c);
+      try {
+        if (trial && W.Player && typeof W.CharacterLoadCanvas === "function") W.CharacterLoadCanvas(W.Player);
+      } catch (e) {
+      }
+    };
+    img.onerror = () => skinSeen.set(key, skinGuess(src, hex));
+    img.src = src;
+  }
+  var hooked = false;
+  var sdk = null;
+  function initBelly(mod2) {
+    sdk = mod2;
+    setTimeout(scrubCache, 4e3);
+  }
+  function hookBelly(mod2) {
+    if (hooked || !mod2) return;
+    hooked = true;
+    try {
+      mod2.hookFunction("CommonDrawAppearanceBuild", 1, (args, next) => {
+        let finish = null;
+        try {
+          const C = args[0], cb = args[1];
+          if (trial && !W.__farmDrawnBody && C && W.Player && C.MemberNumber === W.Player.MemberNumber && cb && typeof cb.drawImage === "function") {
+            let upper = null, lower = false, done = false;
+            const gate = skinGate(C);
+            const prio = (src) => {
+              const m = new RegExp("(?:^|/)Assets/[^/]+/(?:Override/[^/]+/)?([^/]+)/").exec(src);
+              if (!m) return 99;
+              try {
+                const g = W.AssetGroupGet && W.AssetGroupGet(C.AssetFamily, m[1]);
+                return g && typeof g.DrawingPriority === "number" ? g.DrawingPriority : 99;
+              } catch (e) {
+                return 99;
+              }
+            };
+            const paint = () => {
+              if (done || !upper || !lower) return;
+              done = true;
+              const S2 = SIZES[trial], cv = bellyPicture(trial, skinFor(upper[2], upper[3]), upper[4] === "AllFours");
+              const [dx, dy] = bellyPlace(trial, upper[0], upper[1], cv, upper[4]);
+              cb.drawImage(cv.url, dx, dy, {});
+              if (typeof cb.drawImageBlink === "function") cb.drawImageBlink(cv.url, dx, dy, {});
+            };
+            const before = (src, x, y, o) => {
+              if (done || typeof src !== "string") return;
+              if (src.includes("/BodyUpper/")) {
+                const pose = bellyPose(src);
+                if (pose === "AllFours" && !ALL_FOURS_BELLY) {
+                  done = true;
+                  return;
+                }
+                if (pose === "AllFours" || pose === "Hogtied") {
+                  upper = [x, y, src, o && o.HexColor, pose];
+                  lower = true;
+                  paint();
+                  return;
+                }
+              }
+              if (gate ? gate(src) : lower && prio(src) > SKIN_TOP) paint();
+            };
+            const after = (src, x, y, o) => {
+              if (typeof src !== "string") return;
+              if (src.includes("/BodyUpper/")) upper = [x, y, src, o && o.HexColor, bellyPose(src)];
+              if (src.includes("/BodyLower/")) lower = true;
+            };
+            const wrap = (name) => typeof cb[name] === "function" ? (src, x, y, o) => {
+              try {
+                before(src, x, y, o);
+              } catch (e) {
+                console.warn("[Farmhand Companion] belly:", e);
+              }
+              cb[name](src, x, y, o);
+              try {
+                after(src, x, y, o);
+              } catch (e) {
+                console.warn("[Farmhand Companion] belly:", e);
+              }
+            } : cb[name];
+            args[1] = Object.assign({}, cb, { drawImage: wrap("drawImage"), drawImageColorize: wrap("drawImageColorize") });
+            finish = paint;
+          }
+        } catch (e) {
+          console.warn("[Farmhand Companion] belly hook:", e);
+        }
+        const out = next(args);
+        if (finish) {
+          try {
+            finish();
+          } catch (e) {
+            console.warn("[Farmhand Companion] belly:", e);
+          }
+        }
+        return out;
+      });
+    } catch (e) {
+      console.warn("[Farmhand Companion] belly test unavailable:", e);
+    }
+  }
+  function bellyTrial(n, say) {
+    trial = Math.max(0, Math.min(3, Math.round(Number(n)) || 0));
+    scrubCache();
+    if (trial) hookBelly(sdk);
+    const redraw2 = () => {
+      try {
+        if (W.Player && typeof W.CharacterLoadCanvas === "function") W.CharacterLoadCanvas(W.Player);
+      } catch (e) {
+        console.warn("[Farmhand Companion] belly redraw:", e);
+      }
+    };
+    redraw2();
+    setTimeout(redraw2, 500);
+    setTimeout(redraw2, 1800);
+    if (say) say(trial ? "Belly test: " + ["", "small", "medium", "large"][trial] + ". Look at your character with nothing over your middle. Only you can see it. Tell Claude how it looks: the shape, the colour match, where it sits." : "Belly test off.");
+  }
+
   // extension/src/drawnbody.js
   var W2 = window;
-  var KEY2 = "farmhand-drawn-body";
+  var KEY = "farmhand-drawn-body";
   var SEE_KEY = "farmhand-drawn-body-see";
+  var FARM_KEY = "farmhand-drawn-body-farm";
   var CODE_HEAD = "FARMBODY1:";
   var STUDIO = "http://localhost:4780";
   var DEFAULTS = () => ({ v: 1, on: false, cup: 12, breast: {}, wear: {}, belly: null, auto: true, tuck: true, dress: true, mould: { items: [], mode: {} } });
@@ -3774,11 +3438,12 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var sdk2 = null;
   var hooked2 = false;
   var seeOthers = true;
+  var farm = null;
   var mine = { S: null, E: null };
   var others = /* @__PURE__ */ new Map();
-  function load2() {
+  function load() {
     try {
-      const d = JSON.parse(W2.localStorage.getItem(KEY2));
+      const d = JSON.parse(W2.localStorage.getItem(KEY));
       if (d && typeof d === "object") S = Object.assign(DEFAULTS(), d);
     } catch (e) {
     }
@@ -3786,11 +3451,31 @@ One of mods you are using is using an old version of SDK. It will work for now b
       seeOthers = W2.localStorage.getItem(SEE_KEY) !== "0";
     } catch (e) {
     }
+    try {
+      const f = JSON.parse(W2.localStorage.getItem(FARM_KEY));
+      if (f && typeof f.at === "number" && f.body) {
+        const b = clean(f.body);
+        if (b) farm = { at: f.at, body: b };
+      }
+    } catch (e) {
+    }
     mine.S = S;
   }
-  function save2() {
+  function eff() {
+    if (S.saved || !farm) return S;
+    const f = farm.body, e = Object.assign({}, f, { on: S.on });
+    if (S.cupSet) e.cup = S.cup;
+    e.belly = {};
+    for (const k of ["std", "AllFours", "Hogtied"]) {
+      const fk = f.belly && f.belly[k];
+      if (fk) e.belly[k] = Object.assign({}, fk, { on: !!S.bellyOn && !!fk.on });
+    }
+    if (S.bellyOn && !(e.belly.std && e.belly.std.on)) e.belly.std = Object.assign({}, e.belly.std || {}, { on: true });
+    return e;
+  }
+  function save() {
     try {
-      W2.localStorage.setItem(KEY2, JSON.stringify(S));
+      W2.localStorage.setItem(KEY, JSON.stringify(S));
     } catch (e) {
     }
   }
@@ -3893,21 +3578,22 @@ One of mods you are using is using an old version of SDK. It will work for now b
   function makeEngine(mn) {
     if (!W2.FarmBelly) W2.FarmBelly = bellyDrawing;
     if (typeof W2.FarmBodyEngine !== "function" || !W2.FarmBreasts) return null;
+    const who = mn == null ? () => W2.Player || null : () => charOf(mn);
     return W2.FarmBodyEngine({
       S: { get C() {
-        return charOf(mn);
+        return who();
       } },
-      bodyItem: (g) => itemOf(charOf(mn), g),
+      bodyItem: (g) => itemOf(who(), g),
       setBody: () => {
       },
       // never: their body items are theirs
-      redraw: () => redrawMn(mn, 60),
+      redraw: () => mn == null ? redraw(60) : redrawMn(mn, 60),
       picture
     });
   }
   function engine() {
-    if (!mine.E && W2.Player) mine.E = makeEngine(W2.Player.MemberNumber);
-    if (mine.E) apply(mine.E, S);
+    if (!mine.E && W2.Player) mine.E = makeEngine(null);
+    if (mine.E) apply(mine.E, eff());
     return mine.E;
   }
   function apply(E, s) {
@@ -3975,7 +3661,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   function tell(force) {
     if (!force && Date.now() - toldAt < 8e3) return;
     toldAt = Date.now();
-    send("body", S.on ? { on: true, body: shareOf(S) } : { on: false });
+    send("body", S.on ? { on: true, body: shareOf(eff()) } : { on: false });
   }
   function ask() {
     if (Date.now() - askedAt < 8e3) return;
@@ -4060,7 +3746,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
   function initDrawnBody(mod2) {
     sdk2 = mod2;
-    load2();
+    load();
     setInterval(prune, 2e4);
     setTimeout(() => {
       if (S.on && engine()) {
@@ -4073,16 +3759,65 @@ One of mods you are using is using an old version of SDK. It will work for now b
     }, 3e3);
   }
   function drawnBodyState() {
-    const up = itemOf(W2.Player, "BodyUpper"), cups = W2.FarmBreasts && W2.FarmBreasts.CUPS || [];
-    return { on: !!S.on, cup: S.cup, cupName: cups[S.cup] || "?", cups, chest: up && up.Asset ? up.Asset.Name : "", fromStudio: !!S.saved, belly: !!(S.belly && S.belly.std && S.belly.std.on), seeOthers, othersHere: Array.from(others.keys()).filter((mn) => charOf(mn)).length };
+    const up = itemOf(W2.Player, "BodyUpper"), cups = W2.FarmBreasts && W2.FarmBreasts.CUPS || [], e = eff();
+    return {
+      on: !!S.on,
+      cup: e.cup,
+      cupName: cups[e.cup] || "?",
+      cups,
+      chest: up && up.Asset ? up.Asset.Name : "",
+      fromStudio: !!S.saved,
+      fromFarm: !S.saved && !!farm,
+      bellyOn: !!S.bellyOn,
+      belly: !!(e.belly && e.belly.std && e.belly.std.on),
+      seeOthers,
+      othersHere: Array.from(others.keys()).filter((mn) => charOf(mn)).length
+    };
+  }
+  function farmLookWanted(look) {
+    const at = Number(look) || 0;
+    return at && (!farm || farm.at !== at) ? farm ? farm.at : 0 : null;
+  }
+  function onFarmLook(m) {
+    const at = Number(m && m.at), b = clean(m && m.body);
+    if (!at || !b) return;
+    if (farm && farm.at === at) return;
+    farm = { at, body: b };
+    try {
+      W2.localStorage.setItem(FARM_KEY, JSON.stringify(farm));
+    } catch (e) {
+    }
+    if (S.saved) return;
+    if (mine.E) apply(mine.E, eff());
+    if (S.on) {
+      redraw(60);
+      tell(true);
+    }
+  }
+  function drawnBodyBelly(on, say) {
+    S.bellyOn = !!on;
+    save();
+    if (mine.E) apply(mine.E, eff());
+    redraw(60);
+    tell(true);
+    if (say) say(on ? S.saved ? "Belly on. You're using your own studio settings, so it's the belly you set there (switch it on in the studio if it isn't)." : "Belly on." : "Belly off.");
+  }
+  function drawnBodyUseFarm(say) {
+    delete S.saved;
+    S.cupSet = false;
+    save();
+    if (mine.E) apply(mine.E, eff());
+    redraw(60);
+    tell(true);
+    if (say) say(farm ? "Back to the farm's look." : "Back to the farm's look: it comes from the farm girl when you're in her room.");
   }
   function drawnBodySet(on, say) {
     S.on = !!on;
-    save2();
+    save();
     if (S.on) {
       if (!engine()) {
         S.on = false;
-        save2();
+        save();
         return say && say("The drawn body didn't load. Reload the page and try again.");
       }
       bellyTrial(0);
@@ -4115,8 +3850,9 @@ One of mods you are using is using an old version of SDK. It will work for now b
   function drawnBodyCup(i, say) {
     const n = W2.FarmBreasts ? W2.FarmBreasts.CUPS.length : 21;
     S.cup = Math.max(6, Math.min(n - 1, Math.round(Number(i) || 0)));
-    save2();
-    if (mine.E) apply(mine.E, S);
+    S.cupSet = true;
+    save();
+    if (mine.E) apply(mine.E, eff());
     redraw(60);
     tell(true);
     if (say) say("Cup: " + drawnBodyState().cupName + ".");
@@ -4125,11 +3861,12 @@ One of mods you are using is using an old version of SDK. It will work for now b
     const s = clean(d);
     if (!s) throw new Error("the settings are damaged");
     s.on = S.on;
+    s.bellyOn = S.bellyOn;
     s.saved = typeof d.saved === "string" ? d.saved.slice(0, 40) : (/* @__PURE__ */ new Date()).toISOString();
     S = s;
     mine.S = S;
-    save2();
-    if (mine.E) apply(mine.E, S);
+    save();
+    if (mine.E) apply(mine.E, eff());
     redraw(60);
     tell(true);
     if (say) say("Settings " + from + " put in: " + drawnBodyState().cupName + " cup" + (S.belly.std && S.belly.std.on ? ", your belly" : "") + ", " + Object.keys(S.wear).length + " piece choices. " + (S.on ? "" : "Switch the drawn body on to see it."));
@@ -4477,24 +4214,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
         !!ctx2.prefs.strip,
         () => ctx2.setPref("strip", !ctx2.prefs.strip)
       ),
-      // a one-off experiment for the outfit studio idea (marks.js: scaleTrial)
-      h(
-        "div",
-        { style: { marginTop: "10px" } },
-        muted("Experiment: can the game draw your chest and what's on it bigger than its biggest size? Try it in a chat room, look, and undo."),
-        btn("Scale trial: chest 15% bigger", () => scaleTrial(true, (t) => ctx2.hint(t))),
-        btn("Undo the scale trial", () => scaleTrial(false, (t) => ctx2.hint(t)))
-      ),
-      // the drawn-belly test (belly.js): only you see it, on your own character
-      h(
-        "div",
-        { style: { marginTop: "10px" } },
-        muted("Experiment: a drawn belly on your own character, in your skin colour, under your clothes. Only you see it. Take off whatever covers your middle first."),
-        btn("Belly: small", () => bellyTrial(1, (t) => ctx2.hint(t))),
-        btn("Belly: medium", () => bellyTrial(2, (t) => ctx2.hint(t))),
-        btn("Belly: large", () => bellyTrial(3, (t) => ctx2.hint(t))),
-        btn("Belly: off", () => bellyTrial(0, (t) => ctx2.hint(t)))
-      ),
+      // (the scale trial and the belly experiment are gone: the drawn body does both. Laynie, Oct 14: "can also remove the
+      // scaling test from earlier from the companion")
       btn("Put the button and panel back (size and full screen too)", () => ctx2.resetPlaces && ctx2.resetPlaces())
     );
   }
@@ -4526,7 +4247,22 @@ One of mods you are using is using an old version of SDK. It will work for now b
         )
       ),
       st2.on && st2.cup >= 6 && st2.chest && st2.chest !== "XLarge" ? muted("Your chest is set to " + st2.chest + " in the wardrobe. Set it to the biggest for the drawn breasts to show.") : null,
-      h("div", { style: { marginTop: "6px" } }, btn("Get my studio's settings", () => {
+      toggle(
+        "Show my belly",
+        "A round belly on your drawn body, in the farm's shape for it, with what you wear fitted over it.",
+        st2.bellyOn,
+        () => {
+          drawnBodyBelly(!st2.bellyOn, say);
+          ctx2.setPref("drawnBodyBelly", !st2.bellyOn);
+        }
+      ),
+      muted(st2.fromStudio ? "Using your own studio settings." : st2.fromFarm ? "Using the farm's look, with your own cup and belly." : "The farm's look comes from the farm girl once you're in her room; plain settings till then."),
+      st2.fromStudio ? btn("Use the farm's look instead", () => {
+        drawnBodyUseFarm(say);
+        ctx2.setPref("drawnBodyAt", Date.now());
+      }) : null,
+      h("div", { style: { marginTop: "8px" } }, muted("Got an outfit studio of your own? Bring its settings over:")),
+      h("div", { style: { marginTop: "4px" } }, btn("Get my studio's settings", () => {
         drawnBodyFromStudio(say).then((ok) => {
           if (ok) ctx2.setPref("drawnBodyAt", Date.now());
         });
@@ -4536,7 +4272,6 @@ One of mods you are using is using an old version of SDK. It will work for now b
       btn("Put in the pasted code", () => {
         if (drawnBodyPaste(code.value, say)) ctx2.setPref("drawnBodyAt", Date.now());
       }),
-      muted(st2.fromStudio ? "Using your studio settings." : "Using the plain settings until you bring yours over from the studio."),
       toggle(
         "See other people's drawn bodies",
         "Draw other Companion users the way their studio settings say" + (st2.othersHere ? " (" + st2.othersHere + " here now)" : "") + ". Off: everybody else is the game's own picture on your screen.",
@@ -7552,26 +7287,26 @@ One of mods you are using is using an old version of SDK. It will work for now b
     "MemberNumberListKeys",
     "RemoveOnUnlock"
   ];
-  var P2 = () => window.Player;
-  var groupOf2 = (name) => typeof window.AssetGroupGet === "function" ? window.AssetGroupGet(P2().AssetFamily, name) : null;
+  var P = () => window.Player;
+  var groupOf = (name) => typeof window.AssetGroupGet === "function" ? window.AssetGroupGet(P().AssetFamily, name) : null;
   var isClothes = (g) => !!(g && g.Clothing);
   var isItem = (g) => !!(g && g.Category === "Item");
-  var lockedGroups2 = () => new Set(P2().Appearance.filter((it) => it.Property && it.Property.LockedBy).map((it) => it.Asset.Group.Name));
+  var lockedGroups = () => new Set(P().Appearance.filter((it) => it.Property && it.Property.LockedBy).map((it) => it.Asset.Group.Name));
   function unlocked(prop) {
     const c = Object.assign({}, prop || {});
     for (const k of LOCK_FIELDS) delete c[k];
     if (Array.isArray(c.Effect)) c.Effect = c.Effect.filter((e) => e !== "Lock");
     return c;
   }
-  function commit2(bundle2) {
-    window.ServerAppearanceLoadFromBundle(P2(), P2().AssetFamily, bundle2, P2().MemberNumber);
-    if (typeof window.CharacterRefresh === "function") window.CharacterRefresh(P2());
-    window.ChatRoomCharacterUpdate(P2());
+  function commit(bundle2) {
+    window.ServerAppearanceLoadFromBundle(P(), P().AssetFamily, bundle2, P().MemberNumber);
+    if (typeof window.CharacterRefresh === "function") window.CharacterRefresh(P());
+    window.ChatRoomCharacterUpdate(P());
   }
   function captureOutfit() {
     const items = [];
     let locks = 0;
-    for (const it of P2().Appearance) {
+    for (const it of P().Appearance) {
       const g = it.Asset && it.Asset.Group;
       if (!g || !(isClothes(g) || isItem(g))) continue;
       const b = window.ServerBundledItemFromAppearanceItem(it);
@@ -7584,18 +7319,18 @@ One of mods you are using is using an old version of SDK. It will work for now b
   function wearOutfit(data, keys) {
     const outfit = JSON.parse(window.LZString.decompressFromBase64(String(data)) || "null");
     if (!outfit || !Array.isArray(outfit.items)) return { ok: false, why: "that outfit didn't come through right" };
-    const cur = window.ServerAppearanceBundle(P2().Appearance), stuck = lockedGroups2();
+    const cur = window.ServerAppearanceBundle(P().Appearance), stuck = lockedGroups();
     const mine2 = new Set(outfit.items.map((i) => i.Group));
     const next = cur.filter((b) => {
       if (stuck.has(b.Group)) return true;
-      const g = groupOf2(b.Group);
+      const g = groupOf(b.Group);
       if (isClothes(g)) return false;
       return !mine2.has(b.Group);
     });
     let worn = 0, locks = 0, skipped = 0;
     const added = [];
     for (const it of outfit.items) {
-      const g = groupOf2(it.Group);
+      const g = groupOf(it.Group);
       if (!g || !(isClothes(g) || isItem(g))) continue;
       if (stuck.has(it.Group)) {
         skipped++;
@@ -7604,7 +7339,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       const b = { Group: it.Group, Name: it.Name, Color: it.Color, Difficulty: it.Difficulty, Craft: it.Craft, Property: unlocked(it.Property) };
       if (it.locked && keys && keys.length) {
         b.Property.Effect = (b.Property.Effect || []).concat(["Lock"]);
-        Object.assign(b.Property, { LockedBy: "HighSecurityPadlock", LockMemberNumber: P2().MemberNumber, MemberNumberListKeys: keys.join(",") });
+        Object.assign(b.Property, { LockedBy: "HighSecurityPadlock", LockMemberNumber: P().MemberNumber, MemberNumberListKeys: keys.join(",") });
         locks++;
       }
       next.push(b);
@@ -7615,7 +7350,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       window.localStorage.setItem(BACKUP_KEY, JSON.stringify({ at: Date.now(), bundle: cur, added }));
     } catch (e) {
     }
-    commit2(next);
+    commit(next);
     return { ok: true, worn, locks, skipped };
   }
   function changeBack() {
@@ -7625,20 +7360,20 @@ One of mods you are using is using an old version of SDK. It will work for now b
     } catch (e) {
     }
     if (!bk || !Array.isArray(bk.bundle)) return { ok: false, why: "I don't have your own clothes saved on this computer" };
-    const stuck = lockedGroups2();
-    const next = window.ServerAppearanceBundle(P2().Appearance).filter((b) => {
+    const stuck = lockedGroups();
+    const next = window.ServerAppearanceBundle(P().Appearance).filter((b) => {
       if (stuck.has(b.Group)) return true;
-      const g = groupOf2(b.Group);
+      const g = groupOf(b.Group);
       if (isClothes(g)) return false;
       return !(bk.added || []).includes(b.Group);
     });
     const have = new Set(next.map((b) => b.Group));
     for (const b of bk.bundle) {
-      const g = groupOf2(b.Group);
+      const g = groupOf(b.Group);
       if (have.has(b.Group) || stuck.has(b.Group)) continue;
       if (isClothes(g) || isItem(g) && (bk.added || []).includes(b.Group)) next.push(b);
     }
-    commit2(next);
+    commit(next);
     try {
       window.localStorage.removeItem(BACKUP_KEY);
     } catch (e) {
@@ -7652,6 +7387,414 @@ One of mods you are using is using an old version of SDK. It will work for now b
       return false;
     }
   };
+
+  // extension/src/marks.js
+  var KEY2 = "fhc-marks";
+  var STRIP_KEY = "fhc-strip-backup";
+  var SPLAT_GROUPS = ["Mask", "FaceMarkings", "BodyMarkings"];
+  var WRITE_GROUPS = ["BodyMarkings", "ClothAccessory"];
+  var TREATISE = { group: "BodyMarkings2_Luzi", name: "\u8EAB\u4F53\u8BBA\u6587" };
+  var T_AREAS = { collar: [0, 1, 2], chest: [3, 4, 5], ribs: [6, 7, 8], waist: [9, 10, 11], hips: [12, 13, 14] };
+  var TALLY_PLACE = 11;
+  var AREAS2 = { forehead: ["a", "b", "c"], face: ["d", "e", "f"], chest: ["g", "h", "i", "j"], tummy: ["k", "l", "m", "n"] };
+  var SPILL = { forehead: "face", face: "chest", chest: "tummy", tummy: "chest" };
+  var SPILL_CHANCE = 0.35;
+  var P2 = () => window.Player;
+  var load2 = () => {
+    try {
+      return JSON.parse(window.localStorage.getItem(KEY2)) || {};
+    } catch (e) {
+      return {};
+    }
+  };
+  var save2 = (v) => {
+    try {
+      window.localStorage.setItem(KEY2, JSON.stringify(v));
+    } catch (e) {
+    }
+  };
+  var groupOf2 = (name) => typeof window.AssetGroupGet === "function" ? window.AssetGroupGet(P2().AssetFamily, name) : null;
+  var bundle = () => window.ServerAppearanceBundle(P2().Appearance);
+  var lockedGroups2 = () => new Set(P2().Appearance.filter((it) => it.Property && it.Property.LockedBy).map((it) => it.Asset.Group.Name));
+  function commit2(next) {
+    window.ServerAppearanceLoadFromBundle(P2(), P2().AssetFamily, next, P2().MemberNumber);
+    if (typeof window.CharacterRefresh === "function") window.CharacterRefresh(P2());
+    window.ChatRoomCharacterUpdate(P2());
+  }
+  var cleanText = (t) => String(t || "").replace(/[^A-Za-z0-9 !?.,'&#*+-]/g, "").slice(0, 20);
+  function markBody(m, prefs) {
+    if (!P2() || !Array.isArray(P2().Appearance) || typeof window.ServerAppearanceBundle !== "function") return { ok: false, why: "not in a room" };
+    const did = [];
+    if (m.wash) return washMarks();
+    if (!prefs.marks) return { ok: false, why: "off" };
+    let next = bundle(), mem = load2();
+    const has = (g) => next.find((b) => b.Group === g);
+    if (Array.isArray(m.splat) && m.splat.length) {
+      const col = typeof m.color === "string" && /^#[0-9a-fA-F]{6}$/.test(m.color) ? m.color.toUpperCase() : null;
+      const colOf = (b) => typeof b.Color === "string" && /^#/.test(b.Color) ? b.Color.toUpperCase() : null;
+      const mine2 = next.filter((b) => b.Name === "Splatters" && SPLAT_GROUPS.includes(b.Group));
+      let it = mine2.find((b) => colOf(b) === col);
+      if (!it) {
+        const g = SPLAT_GROUPS.find((x) => !has(x) && groupOf2(x));
+        if (g) {
+          it = { Group: g, Name: "Splatters", Property: { TypeRecord: {} } };
+          if (col) it.Color = col;
+          next.push(it);
+          mem.splatGroup = g;
+        } else it = mine2[0];
+      }
+      if (it) {
+        it.Property = Object.assign({}, it.Property || {});
+        const tr = it.Property.TypeRecord = Object.assign({}, it.Property.TypeRecord || {});
+        for (const area of m.splat) {
+          const want = (AREAS2[area] || []).filter((k2) => !tr[k2]);
+          const any = Object.values(AREAS2).flat().filter((k2) => !tr[k2]);
+          const k = (want.length ? want : any)[Math.floor(Math.random() * (want.length ? want : any).length)];
+          if (k) {
+            tr[k] = 1;
+            did.push(area);
+          }
+          if (k && SPILL[area] && Math.random() < SPILL_CHANCE) {
+            const down = AREAS2[SPILL[area]].filter((x) => !tr[x]);
+            if (down.length) {
+              tr[down[Math.floor(Math.random() * down.length)]] = 1;
+              did.push(SPILL[area]);
+            }
+          }
+        }
+      }
+    }
+    if (m.write && cleanText(m.write.line) || m.tally) {
+      if (groupOf2(TREATISE.group)) {
+        let it = next.find((b) => b.Group === TREATISE.group && b.Name === TREATISE.name);
+        if (!it && !has(TREATISE.group)) {
+          it = { Group: TREATISE.group, Name: TREATISE.name, Property: { TypeRecord: {} } };
+          next.push(it);
+          mem.treatise = true;
+        }
+        if (it) {
+          const pr = it.Property = Object.assign({}, it.Property || {}), tr = pr.TypeRecord = Object.assign({}, pr.TypeRecord || {});
+          const put = (place, line, text) => {
+            pr["Text" + (place * 3 + line)] = cleanText(text).toUpperCase();
+            tr[String.fromCharCode(97 + place)] = 1;
+          };
+          if (m.tally) {
+            put(TALLY_PLACE, 1, String(m.tally));
+            did.push("tally");
+          }
+          if (m.write && cleanText(m.write.line)) {
+            const pref2 = T_AREAS[m.write.area] || (m.write.pos !== void 0 ? [Math.min(14, Number(m.write.pos))] : [13, 10, 4, 1, 7]);
+            const all = [...pref2, ...Array.from({ length: 15 }, (_, i) => i).filter((i) => !pref2.includes(i) && i !== TALLY_PLACE)];
+            let spot = null;
+            for (const pl of all) {
+              for (const ln of [1, 2, 3]) if (!pr["Text" + (pl * 3 + ln)]) {
+                spot = [pl, ln];
+                break;
+              }
+              if (spot) break;
+            }
+            if (!spot) spot = [pref2[0], 1 + Math.floor(Math.random() * 3)];
+            put(spot[0], spot[1], m.write.line);
+            did.push("writing");
+          }
+          save2(mem);
+          commit2(next);
+          return { ok: true, did };
+        }
+      }
+    }
+    if (m.write && cleanText(m.write.line)) {
+      let it = next.find((b) => b.Name === "BodyWritings" && WRITE_GROUPS.includes(b.Group));
+      if (!it) {
+        const g = WRITE_GROUPS.find((x) => !has(x) && groupOf2(x));
+        if (g) {
+          it = { Group: g, Name: "BodyWritings", Property: { Text: "", Text2: "", Text3: "", TypeRecord: { p: 4, s: 0, t: 1 } } };
+          next.push(it);
+          mem.writeGroup = g;
+        }
+      }
+      if (it) {
+        const pr = it.Property = Object.assign({ Text: "", Text2: "", Text3: "" }, it.Property || {});
+        pr.Text3 = pr.Text2 || "";
+        pr.Text2 = pr.Text || "";
+        pr.Text = cleanText(m.write.line).toUpperCase();
+        pr.TypeRecord = Object.assign({ p: 4, s: 0, t: 1 }, pr.TypeRecord || {}, m.write.pos !== void 0 ? { p: m.write.pos } : {}, m.write.style !== void 0 ? { s: m.write.style } : {}, { t: 1 });
+        did.push("writing");
+      }
+    }
+    if (!did.length) return { ok: false, why: "no room" };
+    save2(mem);
+    commit2(next);
+    return { ok: true, did };
+  }
+  var FARM_TAG = "BnB Farm gear.";
+  var OLD_TAG = "[B&B Farm gear]";
+  var FARM_NAMES = [
+    "Parasite Lips",
+    "Parasite Belt",
+    "Pump Bung",
+    "Egg Post Plug",
+    "Slime Seal",
+    "Boar's Plug",
+    "Seed Pod Stem",
+    "Denial Clamp",
+    "Growth Cups",
+    "Trap Milker",
+    "Winch Chain",
+    "Feed Chute",
+    "Snare Rope",
+    "Breedin' Frame Cuffs",
+    "Kennel Lead",
+    "The Water's Grip",
+    "The Water's Coils",
+    "Slime Sleeves",
+    "Slime Stockings",
+    "Snare Hobble",
+    "Pack's Knot",
+    "Stud's Stopper",
+    "Pillory Spreader",
+    "Parasite Suckers",
+    "Parasite Root",
+    "The Water's Embrace",
+    "Brood Sac",
+    "Grower's Sheath",
+    "Glutton's Sleeve",
+    "Tyrant's Cage",
+    "Tyrant's Web",
+    "Growin' Plug",
+    "Hungry Belt",
+    "Milkmaid's Cups",
+    "Glutton's Funnel",
+    "The Hobble",
+    "Living Suit (legs)",
+    "Living Suit (hips)",
+    "Living Suit (chest)",
+    "Living Suit (arms)",
+    "Living Suit (mouth)"
+  ];
+  var GEAR_SLOTS = {
+    plug: { groups: ["ItemButt"], names: ["InflVibeButtPlug", "BlackButtPlug", "ButtPlug", "ButtPump"], re: /ButtPlug|Plug/, color: "#2B2B2B" },
+    dildo: { groups: ["ItemVulva"], names: ["InflatableVibeDildo", "VibratingDildo", "ClitoralStimulator"], re: /Dildo/, color: "#2B2B2B" },
+    belt: { groups: ["ItemPelvis"], names: ["PolishedChastityBelt", "LeatherChastityBelt", "SleekLeatherChastityBelt", "MetalChastityBelt"], re: /ChastityBelt/ },
+    cups: { groups: ["ItemNipples"], names: ["LactationPump", "NippleSuctionCups"], re: /Pump|Suction/ },
+    leash: { groups: ["ItemNeckRestraints"], names: ["CollarChainLong", "CollarLeash", "CollarChainShort"], re: /Chain|Leash/, needs: "ItemNeck" },
+    funnel: { groups: ["ItemMouth", "ItemMouth2", "ItemMouth3"], names: ["FunnelGag"], re: /Funnel/ },
+    ropeArms: { groups: ["ItemArms"], names: ["HempRope"], re: /Rope/ },
+    arms: { groups: ["ItemArms"], names: ["HempRope", "LeatherCuffs"], re: /Rope|Cuffs/ },
+    legs: { groups: ["ItemLegs"], names: ["HempRope", "LeatherLegCuffs"], re: /Rope|Cuffs/ },
+    ropeFeet: { groups: ["ItemFeet"], names: ["HempRope"], re: /Rope/ },
+    // (a piece can ask for a spreader bar here instead)
+    lips: { groups: ["ItemMouth", "ItemMouth2", "ItemMouth3"], names: ["LipGag"], re: /LipGag/, color: ["#E0607F", "#7A2B47", "#7A2B47"] },
+    torso: { groups: ["ItemTorso", "ItemTorso2"], names: ["TentacleSuit", "HempRopeHarness"], re: /Harness/ },
+    tag: { groups: ["ItemNeckAccessories"], names: ["CollarNameTagLivestock", "CollarNameTag"], re: /NameTag/, needs: "ItemNeck" }
+  };
+  function gearAsset(group, slot, prefer) {
+    const fam = P2().AssetFamily, get = (n) => {
+      try {
+        return typeof window.AssetGet === "function" ? window.AssetGet(fam, group, n) : null;
+      } catch (e) {
+        return null;
+      }
+    };
+    for (const n of Array.isArray(prefer) ? prefer.map(String) : []) if (/^[A-Za-z0-9_]{2,40}$/.test(n) && get(n)) return n;
+    for (const n of slot.names) if (get(n)) return n;
+    const all = Array.isArray(window.Asset) ? window.Asset : [];
+    const hit = all.find((a) => a && a.Group && a.Group.Name === group && slot.re.test(a.Name) && !a.OwnerOnly && !a.LoverOnly && !a.FamilyOnly);
+    return hit ? hit.Name : typeof window.AssetGet !== "function" ? slot.names[0] : null;
+  }
+  var NAMES_KEY = "fhc-gear-names";
+  var knownNames = () => {
+    try {
+      return FARM_NAMES.concat(JSON.parse(window.localStorage.getItem(NAMES_KEY)) || []);
+    } catch (e) {
+      return FARM_NAMES;
+    }
+  };
+  var learnName = (n) => {
+    try {
+      const have = JSON.parse(window.localStorage.getItem(NAMES_KEY)) || [];
+      if (!FARM_NAMES.includes(n) && !have.includes(n)) window.localStorage.setItem(NAMES_KEY, JSON.stringify(have.concat(n).slice(-80)));
+    } catch (e) {
+    }
+  };
+  var isFarmGear = (b) => {
+    const c = b.Craft, d = c ? String(c.Description || "") : "";
+    return !!(c && (d.includes(FARM_TAG) || d.includes(OLD_TAG) || knownNames().includes(c.Name) && (!c.MemberNumber || c.MemberNumber === P2().MemberNumber)));
+  };
+  var GEAR_KEY = "fhc-gear";
+  var gearMem = () => {
+    try {
+      return JSON.parse(window.localStorage.getItem(GEAR_KEY)) || {};
+    } catch (e) {
+      return {};
+    }
+  };
+  var gearMemSave = (m) => {
+    try {
+      window.localStorage.setItem(GEAR_KEY, JSON.stringify(m));
+    } catch (e) {
+    }
+  };
+  var gearNameOf = (b, mem) => isFarmGear(b) ? b.Craft.Name : Object.keys(mem).find((n) => mem[n].group === b.Group && mem[n].item === b.Name && (!(b.Craft && b.Craft.Name) || b.Craft.Name === n)) || null;
+  function syncFarmGear(list, allow) {
+    if (!P2() || !Array.isArray(P2().Appearance) || typeof window.ServerAppearanceBundle !== "function") return { on: [], off: [] };
+    const want = (Array.isArray(list) ? list : []).filter((g) => g && GEAR_SLOTS[g.slot] && (g.always || allow) && (!g.until || g.until > Date.now()));
+    const cur = bundle(), stuck = lockedGroups2(), did = { on: [], off: [] }, mem = gearMem();
+    let next = cur.slice();
+    for (const b of cur) {
+      const n = gearNameOf(b, mem);
+      if (!n || want.some((g) => g.name === n) || stuck.has(b.Group)) continue;
+      next = next.filter((x) => x !== b);
+      did.off.push(n);
+      delete mem[n];
+    }
+    for (const n of Object.keys(mem)) if (!want.some((g) => g.name === n) && !next.some((b) => gearNameOf(b, mem) === n)) delete mem[n];
+    for (const g of want) {
+      if (next.some((b) => gearNameOf(b, mem) === g.name)) continue;
+      const slot = GEAR_SLOTS[g.slot];
+      if (slot.needs && !next.some((b) => b.Group === slot.needs)) continue;
+      const group = slot.groups.find((x) => !next.some((b) => b.Group === x) && groupOf2(x));
+      if (!group) continue;
+      const item = gearAsset(group, slot, g.items);
+      if (!item) continue;
+      const color = (typeof g.color === "string" && /^#[0-9a-fA-F]{6}$/.test(g.color) ? g.color : null) || slot.color || "Default";
+      const it = {
+        Group: group,
+        Name: item,
+        Difficulty: 20,
+        Property: {},
+        Craft: {
+          Item: item,
+          Name: String(g.name).slice(0, 30),
+          Description: (FARM_TAG + " " + String(g.desc || "").slice(0, 180)).trim(),
+          Property: "Normal",
+          Color: Array.isArray(color) ? color.join(",") : color,
+          Lock: "",
+          Private: true,
+          MemberNumber: P2().MemberNumber,
+          MemberName: P2().Name,
+          ItemProperty: {},
+          Type: null,
+          TypeRecord: null
+        }
+      };
+      if (color !== "Default") it.Color = color;
+      next.push(it);
+      did.on.push(g.name);
+      mem[g.name] = { group, item };
+      learnName(String(g.name).slice(0, 30));
+    }
+    gearMemSave(mem);
+    if (did.on.length || did.off.length) commit2(next);
+    return did;
+  }
+  var SHAPES = { BodyUpper: ["FlatSmall", "FlatMedium", "Small", "Normal", "Large", "XLarge"], BodyLower: ["Small", "Normal", "Large", "XLarge"] };
+  var SHAPE_KEY = "fhc-shape";
+  function syncShape(shape, allow) {
+    if (!P2() || !Array.isArray(P2().Appearance) || typeof window.ServerAppearanceBundle !== "function") return [];
+    let mem;
+    try {
+      mem = JSON.parse(window.localStorage.getItem(SHAPE_KEY)) || {};
+    } catch (e) {
+      mem = {};
+    }
+    const next = bundle().map((b) => Object.assign({}, b)), did = [];
+    for (const [group, steps] of [["BodyUpper", shape && allow ? Number(shape.up) || 0 : 0], ["BodyLower", shape && allow ? Number(shape.low) || 0 : 0]]) {
+      const order = SHAPES[group], b = next.find((x) => x.Group === group);
+      if (!b) continue;
+      const m = mem[group];
+      const own = m && m.set === b.Name && order.includes(m.own) ? m.own : b.Name;
+      const at = order.indexOf(own);
+      if (at < 0) continue;
+      const want = order[Math.max(0, Math.min(order.length - 1, at + Math.round(steps)))];
+      if (typeof window.AssetGet === "function" && !window.AssetGet(P2().AssetFamily, group, want)) continue;
+      if (want !== b.Name) {
+        b.Name = want;
+        did.push(group + " " + want);
+      }
+      if (want === own) delete mem[group];
+      else mem[group] = { own, set: want };
+    }
+    try {
+      window.localStorage.setItem(SHAPE_KEY, JSON.stringify(mem));
+    } catch (e) {
+    }
+    if (did.length) commit2(next);
+    return did;
+  }
+  var TRIAL_CLEAN = ["BodyUpper", "BodyLower", "Bra", "ItemNipples", "ItemBreast", "ItemTorso"];
+  function scaleTrialCleanup() {
+    try {
+      const C = P2();
+      if (!C || !Array.isArray(C.Appearance)) return false;
+      let n = 0;
+      for (const it of C.Appearance) {
+        if (!it || !it.Asset || !it.Asset.Group || !TRIAL_CLEAN.includes(it.Asset.Group.Name) || !it.Property) continue;
+        if (it.Property.ScaleX === 1.15) {
+          delete it.Property.ScaleX;
+          n++;
+        }
+        if (it.Property.ScaleY === 1.15) {
+          delete it.Property.ScaleY;
+          n++;
+        }
+        if (it.Property.TranslationY === -12) {
+          delete it.Property.TranslationY;
+          n++;
+        }
+      }
+      if (!n) return false;
+      if (typeof window.CharacterRefresh === "function") window.CharacterRefresh(C);
+      if (typeof window.ChatRoomCharacterUpdate === "function" && window.CurrentScreen === "ChatRoom") window.ChatRoomCharacterUpdate(C);
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+  function washMarks() {
+    const mem = load2(), stuck = lockedGroups2();
+    const next = bundle().filter((b) => stuck.has(b.Group) || !(b.Name === "Splatters" && SPLAT_GROUPS.includes(b.Group) || b.Name === "BodyWritings" && b.Group === mem.writeGroup || mem.treatise && b.Group === TREATISE.group));
+    save2({});
+    commit2(next);
+    return { ok: true, did: ["wash"] };
+  }
+  function stripMe(prefs) {
+    if (!prefs.strip) return { ok: false, why: "off" };
+    const cur = bundle(), stuck = lockedGroups2();
+    if (!window.localStorage.getItem(STRIP_KEY)) {
+      try {
+        window.localStorage.setItem(STRIP_KEY, JSON.stringify({ at: Date.now(), bundle: cur }));
+      } catch (e) {
+      }
+    }
+    const mem = load2();
+    const next = cur.filter((b) => {
+      const g = groupOf2(b.Group);
+      return !(g && g.Clothing) || stuck.has(b.Group) || b.Name === "BodyWritings" || b.Name === "Splatters" || b.Group === TREATISE.group;
+    });
+    if (next.length === cur.length) return { ok: false, why: "nothin' to take off" };
+    commit2(next);
+    return { ok: true, did: ["strip"] };
+  }
+  function dressMe() {
+    let bk = null;
+    try {
+      bk = JSON.parse(window.localStorage.getItem(STRIP_KEY));
+    } catch (e) {
+    }
+    if (!bk || !Array.isArray(bk.bundle)) return { ok: false, why: "no clothes kept" };
+    const next = bundle(), have = new Set(next.map((b) => b.Group));
+    for (const b of bk.bundle) {
+      const g = groupOf2(b.Group);
+      if (g && g.Clothing && !have.has(b.Group)) next.push(b);
+    }
+    commit2(next);
+    try {
+      window.localStorage.removeItem(STRIP_KEY);
+    } catch (e) {
+    }
+    return { ok: true, did: ["dress"] };
+  }
 
   // extension/src/cues.js
   var W3 = window;
@@ -7952,17 +8095,17 @@ One of mods you are using is using an old version of SDK. It will work for now b
       feelTick.next = Date.now() + (7 + Math.random() * 6) * 6e4;
       const s = ctx.panel.s, items = (W3.Player.Appearance || []).filter((x) => x && x.Asset && x.Asset.Group);
       const grp = (g) => items.find((x) => x.Asset.Group.Name === g);
-      const eff = (x) => [].concat(x.Property && x.Property.Effect || [], x.Asset.Effect || []);
+      const eff2 = (x) => [].concat(x.Property && x.Property.Effect || [], x.Asset.Effect || []);
       const arousal = W3.Player.ArousalSettings && W3.Player.ArousalSettings.Progress || 0;
       const kinds = [];
       if (grp("ItemButt")) kinds.push("plug");
-      if (items.some((x) => eff(x).includes("Chaste")) && arousal > 40) kinds.push("chaste");
+      if (items.some((x) => eff2(x).includes("Chaste")) && arousal > 40) kinds.push("chaste");
       if (s.milk && s.milk.cap && s.milk.ml / s.milk.cap > 0.8) kinds.push("udders");
       if (s.milk && s.milk.cap && s.milk.lastAt && Date.now() - s.milk.lastAt < 30 * 6e4 && s.milk.ml / s.milk.cap < 0.35) kinds.push("milked");
       if (s.holding && s.holding.cap && s.holding.ml / s.holding.cap > 0.6) kinds.push("sloshing");
       if (s.heatUntil && s.heatUntil > Date.now()) kinds.push("heat");
       if (s.preg) kinds.push("preg");
-      if (grp("ItemMouth") && items.some((x) => ["ItemMouth", "ItemMouth2", "ItemMouth3"].includes(x.Asset.Group.Name) && eff(x).includes("BlockMouth"))) kinds.push("drool");
+      if (grp("ItemMouth") && items.some((x) => ["ItemMouth", "ItemMouth2", "ItemMouth3"].includes(x.Asset.Group.Name) && eff2(x).includes("BlockMouth"))) kinds.push("drool");
       if (arousal > 85) kinds.push("edge");
       const pool = [].concat(...kinds.map((k) => FEEL[k])).filter((l) => !recentFeel.includes(l));
       if (!pool.length) return;
@@ -8028,10 +8171,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
   function vibeSet(it, level, mode) {
     it.Property.Intensity = level;
     it.Property.Mode = mode || (level < 0 ? "Off" : VIBE_MODE[level]);
-    const eff = new Set(Array.isArray(it.Property.Effect) ? it.Property.Effect : []);
-    if (level < 0) eff.delete("Vibrating");
-    else eff.add("Vibrating");
-    it.Property.Effect = Array.from(eff);
+    const eff2 = new Set(Array.isArray(it.Property.Effect) ? it.Property.Effect : []);
+    if (level < 0) eff2.delete("Vibrating");
+    else eff2.add("Vibrating");
+    it.Property.Effect = Array.from(eff2);
   }
   function vibeRestore() {
     clearTimeout(vibeTimer);
@@ -8277,6 +8420,11 @@ One of mods you are using is using an old version of SDK. It will work for now b
         break;
       case "welcome":
         st.welcomed = true;
+        try {
+          const at = onBotAccount() ? null : farmLookWanted(m.look);
+          if (at != null) toBot("bodyFarmAsk", { at });
+        } catch (e) {
+        }
         st.panel.setWelcome(m);
         if (!m.proto || m.proto < 2) {
           st.panel.setStatus("connected \xB7 farm girl v" + m.ver + " (needs updatin')");
@@ -8286,6 +8434,13 @@ One of mods you are using is using an old version of SDK. It will work for now b
           setTimeout(() => {
             if (!st.gotState) st.panel.add("Connected, but the farm girl hasn't sent your roles yet. If Staff or Dashboard don't show up, reload the page.", "notice");
           }, 12e3);
+        }
+        break;
+      case "bodyFarm":
+        try {
+          if (!onBotAccount()) onFarmLook(m);
+        } catch (e) {
+          console.warn("[Farmhand Companion] farm look:", e);
         }
         break;
       case "state":
@@ -8470,6 +8625,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     setInterval(parasiteSync, 6e4);
     initBelly(mod);
     initDrawnBody(mod);
+    setTimeout(() => scaleTrialCleanup(), 15e3);
     initBody(mod);
     window.__farmhandOwnPanel = (data) => {
       if (!onBotAccount()) return;

@@ -293,7 +293,7 @@
       // the Companion on the bot's own account talks to the bot here, on the page
       own: (dict) => {
         try {
-          if (!dict || typeof dict !== "object" || !["hello","bye","cmd","outfitSave","outfitAnswer","relayNo","sight","leadOk","leadNo"].includes(dict.type)) return false;
+          if (!dict || typeof dict !== "object" || !["hello","bye","cmd","outfitSave","outfitAnswer","relayNo","sight","leadOk","leadNo","bodyFarmAsk"].includes(dict.type)) return false;
           onCompanion(Object.assign({}, JSON.parse(JSON.stringify(dict)), { from: CFG.BOT_MEMBER }));
           return true;
         } catch(e){ warn("own panel:", e); return false; }

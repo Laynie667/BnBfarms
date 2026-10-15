@@ -8,9 +8,7 @@ import { h, card, title, muted, btn, chip, bar, toggle, ml } from "../dom.js";
 import { guidesTab, safetyTab } from "./common.js";
 import { storeTab } from "./store.js";
 import { gearLore } from "../gearlore.js";
-import { scaleTrial } from "../marks.js";
-import { bellyTrial } from "../belly.js";
-import { drawnBodyState, drawnBodySet, drawnBodyCup, drawnBodyPaste, drawnBodyFromStudio, drawnBodySeeOthers } from "../drawnbody.js";
+import { drawnBodyState, drawnBodySet, drawnBodyCup, drawnBodyPaste, drawnBodyFromStudio, drawnBodySeeOthers, drawnBodyBelly, drawnBodyUseFarm } from "../drawnbody.js";
 
 const pct = (a, b) => (b ? (100 * a) / b : 0);
 const hoursLeft = (t) => Math.max(0, Math.ceil((t - Date.now()) / 3600000));
@@ -214,17 +212,15 @@ export function panelPrefs(ctx) {
       !!ctx.prefs.marks, () => ctx.setPref("marks", !ctx.prefs.marks)),
     toggle("Farm can strip me", "When the farm says so, your clothes come off (locked pieces stay). They're kept on this computer so you can dress again.",
       !!ctx.prefs.strip, () => ctx.setPref("strip", !ctx.prefs.strip)),
-    // a one-off experiment for the outfit studio idea (marks.js: scaleTrial)
-    h("div", { style: { marginTop: "10px" } }, muted("Experiment: can the game draw your chest and what's on it bigger than its biggest size? Try it in a chat room, look, and undo."),
-      btn("Scale trial: chest 15% bigger", () => scaleTrial(true, (t) => ctx.hint(t))), btn("Undo the scale trial", () => scaleTrial(false, (t) => ctx.hint(t)))),
-    // the drawn-belly test (belly.js): only you see it, on your own character
-    h("div", { style: { marginTop: "10px" } }, muted("Experiment: a drawn belly on your own character, in your skin colour, under your clothes. Only you see it. Take off whatever covers your middle first."),
-      btn("Belly: small", () => bellyTrial(1, (t) => ctx.hint(t))), btn("Belly: medium", () => bellyTrial(2, (t) => ctx.hint(t))), btn("Belly: large", () => bellyTrial(3, (t) => ctx.hint(t))), btn("Belly: off", () => bellyTrial(0, (t) => ctx.hint(t)))),
+    // (the scale trial and the belly experiment are gone: the drawn body does both. Laynie, Oct 14: "can also remove the
+    // scaling test from earlier from the companion")
     btn("Put the button and panel back (size and full screen too)", () => ctx.resetPlaces && ctx.resetPlaces()));
 }
 // The drawn body, from the outfit studio: breasts past the game's biggest, your belly, and what you wear fitted to them.
 // Off until you switch it on. Everyone with the Companion sees it (drawnbody.js shares the settings with the room).
 // Its own card, at the top of every Toggles tab: tucked inside "This panel" it wasn't found (Laynie, Oct 14).
+// It's drawn with the farm's look, which the farm girl hands out, plus your own cup and belly; a studio of your own
+// can replace the farm's look with yours.
 export function drawnBodyCard(ctx) {
   const st = drawnBodyState(), say = (t) => ctx.hint(t);
   const code = h("textarea", { class: "fhc-in", rows: 2, placeholder: "…or paste the code from the studio's Copy for the Companion button" });
@@ -235,11 +231,15 @@ export function drawnBodyCard(ctx) {
       h("select", { class: "fhc-sel", onchange: (e) => { drawnBodyCup(Number(e.target.value), say); ctx.setPref("drawnBodyCup", Number(e.target.value)); } },
         st.cups.map((c, i) => (i < 6 ? null : h("option", { value: String(i), selected: i === st.cup }, c))))),
     st.on && st.cup >= 6 && st.chest && st.chest !== "XLarge" ? muted("Your chest is set to " + st.chest + " in the wardrobe. Set it to the biggest for the drawn breasts to show.") : null,
-    h("div", { style: { marginTop: "6px" } }, btn("Get my studio's settings", () => { drawnBodyFromStudio(say).then((ok) => { if (ok) ctx.setPref("drawnBodyAt", Date.now()); }); }, true)),
+    toggle("Show my belly", "A round belly on your drawn body, in the farm's shape for it, with what you wear fitted over it.",
+      st.bellyOn, () => { drawnBodyBelly(!st.bellyOn, say); ctx.setPref("drawnBodyBelly", !st.bellyOn); }),
+    muted(st.fromStudio ? "Using your own studio settings." : st.fromFarm ? "Using the farm's look, with your own cup and belly." : "The farm's look comes from the farm girl once you're in her room; plain settings till then."),
+    st.fromStudio ? btn("Use the farm's look instead", () => { drawnBodyUseFarm(say); ctx.setPref("drawnBodyAt", Date.now()); }) : null,
+    h("div", { style: { marginTop: "8px" } }, muted("Got an outfit studio of your own? Bring its settings over:")),
+    h("div", { style: { marginTop: "4px" } }, btn("Get my studio's settings", () => { drawnBodyFromStudio(say).then((ok) => { if (ok) ctx.setPref("drawnBodyAt", Date.now()); }); }, true)),
     muted("Works while the studio is running on this computer: it takes what you last saved there (Save the breasts, Save all the fits)."),
     h("div", { style: { marginTop: "6px" } }, code),
     btn("Put in the pasted code", () => { if (drawnBodyPaste(code.value, say)) ctx.setPref("drawnBodyAt", Date.now()); }),
-    muted(st.fromStudio ? "Using your studio settings." : "Using the plain settings until you bring yours over from the studio."),
     toggle("See other people's drawn bodies", "Draw other Companion users the way their studio settings say" + (st.othersHere ? " (" + st.othersHere + " here now)" : "") + ". Off: everybody else is the game's own picture on your screen.",
       st.seeOthers, () => { drawnBodySeeOthers(!st.seeOthers, say); ctx.setPref("drawnBodySee", !st.seeOthers); }));
 }

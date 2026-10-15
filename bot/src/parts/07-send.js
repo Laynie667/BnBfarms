@@ -483,11 +483,12 @@
     if (m.type === "hello"){
       state.companions.set(mn, { at:Date.now(), ver:String(m.ver||"?"), relay: m.relay !== false, off: (m.off && typeof m.off === "object") ? m.off : {} });
       log("Companion hello from "+mn+" (v"+(m.ver||"?")+")");
-      enqueue(makeMsg("welcome", { ver:VERSION, proto:PROTOCOL, name:plainName(mn), staff:isStaff(mn) }, mn));
+      enqueue(makeMsg("welcome", { ver:VERSION, proto:PROTOCOL, name:plainName(mn), staff:isStaff(mn), look:farmLookAt() }, mn));   // look: which farm look for the drawn body the bot has (10y9e-farm-look.js)
       later(()=>syncCompanions(), 800);
       return;
     }
     if (m.type === "bye"){ state.companions.delete(mn); return; }
+    if (m.type === "bodyFarmAsk"){ farmLookAsk(mn, m); return; }
     if (m.type === "outfitSave"){ saveOutfit(mn, m); return; }
     if (m.type === "outfitAnswer"){ outfitAnswer(mn, m); return; }
     if (m.type === "cmd"){

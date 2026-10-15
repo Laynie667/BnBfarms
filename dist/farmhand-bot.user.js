@@ -3463,7 +3463,7 @@
     };
     W.FarmhandExport = exportLedger;
     W.FarmhandLedger = () => L;
-    if (W.__FARMHAND_TEST__) Object.assign(W, { __st: () => state, __cfg: CFG, __pt: prodTick, __qt: quotaTick, __lt: leashTick, __ms: milkingStallTick, __vt: voiceTick, __sync: syncCompanions, __gt: gearTick, __ht: homeTick, __addons: (h, ...a) => addonsEmit(h, ...a), __stateFor: (mn) => stateFor(mn), __leadTick: () => leadTick(), __ambient: () => ambientTick(), __about: (t) => aboutWhom(t), __announce: (t) => announce(t), __reply: (mn, t, ch) => reply(mn, t, ch), __office: () => officeCheck(), __namesHere: (t) => namesHere(t), __speciesCheck: (t) => QUESTIONS.find((q) => q.key === "species").check(t), __attach: () => attachListeners(), __tryLogin: () => tryLogin(), __beepText: (m) => beepText(m), __nameOnce: (t, mn) => nameOnce(t, mn), __buildContract: (n, mn, d) => buildContract(contractTemplate(n), mn, d), __potionTick: () => potionTick(), __penTick: () => penTick(), __trapTick: () => trapTick(), __corrupt: (m, n) => corrupt(m, n), __under: (m) => underOf(m), __goUnder: (m, n) => goUnder(m, n), __lend: () => state.lend, __keepTick: () => keepersTick(), __body: (m) => bodyOf(m), __drainMilk: (m, n) => drainMilk(m, n), __prodOf: (m) => prodOf(m), __shape: (m) => shapeFor(m), __pickFor: (m, k, l) => pickFor(m, k, l), __bodyWords: (m, t) => bodyWords(m, t), __strainGear: (m) => strainGear(m), __strainSerums: (m) => strainSerums(m), __strainParts: (s, n) => strainParts(s, n), __tFill: (t, m, v) => tFill(t, m, v), __conceive: (m, s, a, b, h) => rollConception(m, s, a, b, h), __birth: (m) => giveBirth(m), __milkCapOf: (m) => milkCap(m), __udderTick: () => {
+    if (W.__FARMHAND_TEST__) Object.assign(W, { __st: () => state, __cfg: CFG, __pt: prodTick, __qt: quotaTick, __lt: leashTick, __ms: milkingStallTick, __vt: voiceTick, __sync: syncCompanions, __gt: gearTick, __ht: homeTick, __addons: (h, ...a) => addonsEmit(h, ...a), __stateFor: (mn) => stateFor(mn), __leadTick: () => leadTick(), __ambient: () => ambientTick(), __about: (t) => aboutWhom(t), __announce: (t) => announce(t), __reply: (mn, t, ch) => reply(mn, t, ch), __office: () => officeCheck(), __namesHere: (t) => namesHere(t), __speciesCheck: (t) => QUESTIONS.find((q) => q.key === "species").check(t), __attach: () => attachListeners(), __tryLogin: () => tryLogin(), __beepText: (m) => beepText(m), __nameOnce: (t, mn) => nameOnce(t, mn), __buildContract: (n, mn, d) => buildContract(contractTemplate(n), mn, d), __potionTick: () => potionTick(), __penTick: () => penTick(), __trapTick: () => trapTick(), __corrupt: (m, n) => corrupt(m, n), __under: (m) => underOf(m), __goUnder: (m, n) => goUnder(m, n), __lend: () => state.lend, __keepTick: () => keepersTick(), __body: (m) => bodyOf(m), __drainMilk: (m, n) => drainMilk(m, n), __farmLookTick: () => farmLookTick(), __prodOf: (m) => prodOf(m), __shape: (m) => shapeFor(m), __pickFor: (m, k, l) => pickFor(m, k, l), __bodyWords: (m, t) => bodyWords(m, t), __strainGear: (m) => strainGear(m), __strainSerums: (m) => strainSerums(m), __strainParts: (s, n) => strainParts(s, n), __tFill: (t, m, v) => tFill(t, m, v), __conceive: (m, s, a, b, h) => rollConception(m, s, a, b, h), __birth: (m) => giveBirth(m), __milkCapOf: (m) => milkCap(m), __udderTick: () => {
       state.udderAt = 0;
       uddersTick();
     }, __wordsFor: (m, t) => wordsFor(m, t), __overdue: (m) => overdueStage(m), __milkCum: (m) => stallClimax(m), __intSev: (m, s) => intensitySev(m, s), __intTail: (m, k) => intensityTail(m, 5, 6, k), __holes: (m) => holesFor(m), __album: (m) => albumFor(m, 60), __holeTook: (m, h, a) => holeTook(m, h, a), __dreamTheme: (m) => dreamTheme(m), __eggsWorth: (t, n) => eggsWorth(t, n), __rank: (m) => rankX(m), __broodBook: (m) => broodBook(m), __belly: (m) => bellyStage(m), __happening: (m) => happeningFor(m), __gearOn: (m, s, l, d, x) => gearOn(m, s, l, d, x), __heard: (mn, t) => trapHeard(mn, t), __parasiteTick: () => parasiteTick(), __parts: (m) => parasiteParts(rec(m).parasite), __climax: (m) => parasiteClimax(m), __nurse: (a, b) => parasiteNurse(a, b), __parasiteChance: (m) => parasiteChance(m), __kiss: (a, f, s, t) => parasiteKiss(a, f, s, t), __load: (s, m, h, x) => parasiteLoad(s, m, h, x), __shot: (t, by, text, how) => applyShot(t, by, text, how), __slow: (mn) => slowOf(mn), __milkRate: (mn) => milkRate(mn), __benchTick: () => benchTick(), __roll: (m, s, a, b) => rollConception(m, s, a, b), __contractTick: () => {
@@ -4220,12 +4220,16 @@
       if (m.type === "hello") {
         state.companions.set(mn, { at: Date.now(), ver: String(m.ver || "?"), relay: m.relay !== false, off: m.off && typeof m.off === "object" ? m.off : {} });
         log("Companion hello from " + mn + " (v" + (m.ver || "?") + ")");
-        enqueue(makeMsg("welcome", { ver: VERSION, proto: PROTOCOL, name: plainName(mn), staff: isStaff(mn) }, mn));
+        enqueue(makeMsg("welcome", { ver: VERSION, proto: PROTOCOL, name: plainName(mn), staff: isStaff(mn), look: farmLookAt() }, mn));
         later(() => syncCompanions(), 800);
         return;
       }
       if (m.type === "bye") {
         state.companions.delete(mn);
+        return;
+      }
+      if (m.type === "bodyFarmAsk") {
+        farmLookAsk(mn, m);
         return;
       }
       if (m.type === "outfitSave") {
@@ -8200,7 +8204,7 @@
         // the Companion on the bot's own account talks to the bot here, on the page
         own: (dict) => {
           try {
-            if (!dict || typeof dict !== "object" || !["hello", "bye", "cmd", "outfitSave", "outfitAnswer", "relayNo", "sight", "leadOk", "leadNo"].includes(dict.type)) return false;
+            if (!dict || typeof dict !== "object" || !["hello", "bye", "cmd", "outfitSave", "outfitAnswer", "relayNo", "sight", "leadOk", "leadNo", "bodyFarmAsk"].includes(dict.type)) return false;
             onCompanion(Object.assign({}, JSON.parse(JSON.stringify(dict)), { from: CFG.BOT_MEMBER }));
             return true;
           } catch (e) {
@@ -19980,6 +19984,39 @@
       cups: { c: ["%n's cock twitches every time the cups pull.", "%n's chest is drawn up into the glass, nipples stretchin'."], v: ["Every pull on %n's teats makes their pussy clench.", "%n's tits are swellin' in the glass."] },
       weights: { c: ["The sleeve drains %n's cock dry and keeps goin'.", "%n's balls ache, empty, and already fillin'."] }
     };
+    const FARM_LOOK_KEY = "farmhand-drawn-body";
+    function farmLookRead() {
+      try {
+        const raw = W.localStorage && W.localStorage.getItem(FARM_LOOK_KEY);
+        if (!raw || raw.length > 6e4) return null;
+        const d = JSON.parse(raw);
+        if (!d || typeof d !== "object" || Array.isArray(d)) return null;
+        const body = {};
+        for (const k of ["cup", "breast", "wear", "belly", "auto", "tuck", "dress", "mould"]) if (d[k] !== void 0) body[k] = d[k];
+        return typeof body.cup === "number" ? body : null;
+      } catch (e) {
+        return null;
+      }
+    }
+    const farmLookAt = () => L.drawnFarm && L.drawnFarm.at || 0;
+    function farmLookTick() {
+      try {
+        const b = farmLookRead();
+        if (!b) return;
+        if (L.drawnFarm && JSON.stringify(L.drawnFarm.body) === JSON.stringify(b)) return;
+        L.drawnFarm = { at: Date.now(), body: b };
+        saveLedger();
+        log("The farm's look for the drawn body changed (cup " + b.cup + "); tellin' the Companions.");
+        if (state.companions && state.companions.size) enqueue(makeMsg("bodyFarm", { at: L.drawnFarm.at, body: b }));
+      } catch (e) {
+        warn("farm look:", e);
+      }
+    }
+    function farmLookAsk(mn, m) {
+      if (!L.drawnFarm || !L.drawnFarm.body) return;
+      if (Number(m && m.at) === L.drawnFarm.at) return;
+      enqueue(makeMsg("bodyFarm", { at: L.drawnFarm.at, body: L.drawnFarm.body }, mn));
+    }
     const SEVERITY = [null, { name: "mild", x: 1, t: 1 }, { name: "strong", x: 2, t: 1.5 }, { name: "brutal", x: 3, t: 2.5 }];
     function dangerX(mn) {
       const n = potionX(mn, "danger");
@@ -26483,7 +26520,7 @@ Welcome to B&B Farm, hon. \u{1F33E}`
           if (!data || state.dormant) return;
           if (data.Sender === CFG.BOT_MEMBER) {
             const own = data.Type === "Hidden" && typeof W.__farmhandOwnPanel !== "function" && readMsg(data);
-            if (own && ["hello", "bye", "cmd", "outfitSave", "outfitAnswer", "relayNo", "sight", "leadOk", "leadNo"].includes(own.type)) onCompanion(own);
+            if (own && ["hello", "bye", "cmd", "outfitSave", "outfitAnswer", "relayNo", "sight", "leadOk", "leadNo", "bodyFarmAsk"].includes(own.type)) onCompanion(own);
             return;
           }
           if (data.Type === "Hidden") {
@@ -26732,6 +26769,7 @@ Welcome to B&B Farm, hon. \u{1F33E}`
         contractWatchTick();
         trapTick();
         parasiteTick();
+        farmLookTick();
         workTick();
         if (Date.now() - (state.wlTick || 0) > 5 * 6e4) {
           state.wlTick = Date.now();

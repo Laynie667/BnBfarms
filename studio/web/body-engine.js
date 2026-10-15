@@ -170,6 +170,43 @@ window.FarmBodyEngine = function (host) {
     for (let i = 0, j = 0; j < F.length; i += 4, j++) F[j] = dd[i] / 200;
     return (cv.formF = { F, w, h });
   }
+  // Where the game's OWN breasts end, column by column, in a picture of her upper body: the y (in that picture) of the
+  // line drawn under each breast, or -1 where there's no breast. With breasts the game's size (up to a D) the belly went
+  // on over them, its outline across their undersides (Laynie, Oct 14: "the belly outline still overlaps the breast too,
+  // and it should underlap it"). That line is the darkest thing inside the chest; it's found the same way at every size
+  // and skin (checked: small to the biggest, light and dark).
+  const underSeen = new Map();
+  function gameUnder(src) {
+    if (underSeen.has(src)) return underSeen.get(src);
+    const im = mouldImg(src); if (!im || !im.naturalWidth) return null;
+    let out = null;
+    try {
+      const w = im.naturalWidth, h = im.naturalHeight, c = document.createElement("canvas"); c.width = w; c.height = h;
+      const g = c.getContext("2d", { willReadFrequently: true }); g.drawImage(im, 0, 0); const d = g.getImageData(0, 0, w, h).data;
+      const L = (x, y) => { if (x < 0 || x >= w || y < 0 || y >= h) return -1; const o = (y * w + x) * 4; return d[o + 3] < 128 ? -1 : 0.3 * d[o] + 0.59 * d[o + 1] + 0.11 * d[o + 2]; };
+      const vals = []; for (let y = 300; y < Math.min(h, 420); y += 4) for (let x = 200; x < 300; x += 4) { const v = L(x, y); if (v >= 0) vals.push(v); }
+      vals.sort((p, q) => p - q); const skin = vals[vals.length >> 1];
+      if (skin > 0) {
+        const u = new Int16Array(w).fill(-1); let first = -1, last = -1;
+        for (let x = 0; x < w; x++) { for (let y = 250; y < Math.min(h, 420); y++) { const v = L(x, y); if (v >= 0 && v < skin * 0.6 && L(x - 3, y) >= 0 && L(x + 3, y) >= 0) u[x] = y; } if (u[x] >= 0) { if (first < 0) first = x; last = x; } }
+        if (first >= 0) {
+          for (let x = first, p = first; x <= last; x++) if (u[x] >= 0) { for (let k = p + 1; k < x; k++) u[k] = Math.round(u[p] + (u[x] - u[p]) * (k - p) / (x - p)); p = x; }   // (gaps in the line, the cleavage: drawn across)
+          for (let k = 1; k <= 30; k++) { if (first - k >= 0) u[first - k] = u[first]; if (last + k < w) u[last + k] = u[last]; }   // (out to her sides, where the line runs into her outline)
+          out = u;
+        }
+      }
+    } catch (e) { out = null; }
+    underSeen.set(src, out); if (underSeen.size > 40) underSeen.delete(underSeen.keys().next().value);
+    return out;
+  }
+  // the belly canvas with what lies behind the game's own breasts taken out (drawn at dx, dy; the upper body at ux, uy)
+  function bellyUnder(cv, dx, dy, src, ux, uy) {
+    const u = gameUnder(src); if (!u) return cv;
+    const key = [Math.round(dx), Math.round(dy), Math.round(ux), Math.round(uy), src].join("|"); if (cv.underKey === key) return cv.under;
+    const c = document.createElement("canvas"); c.width = cv.width; c.height = cv.height; const g = c.getContext("2d"); g.drawImage(cv, 0, 0);
+    for (let cx = 0; cx < cv.width; cx++) { const px = Math.round(cx + dx - ux); if (px < 0 || px >= u.length || u[px] < 0) continue; const cut = Math.round(uy + u[px] + 1 - dy); if (cut > 0) g.clearRect(cx, 0, 1, cut); }
+    cv.underKey = key; cv.under = c; return c;
+  }
   // img (a picture or a canvas) drawn with its corner at (sx, sy): a copy with the belly's form on it, or null if it
   // doesn't lie over the belly
   const shadeSeen = new WeakMap();
@@ -300,6 +337,9 @@ window.FarmBodyEngine = function (host) {
   const HAND_GROUPS = new Set(["HandsLeft", "HandsRight", "ItemHands", "Gloves"]);
   // pieces with something made for the nipple itself (a shield, a pastie, a hole, a ring): those are fitted with the game's nipple pinned to hers
   const NIP_PIECES = new RegExp("Forbidden|Pastie|Nipple|Shield|Tape|Heart|Tassel|Piercing", "i");
+  // (and by the name the game shows, for pieces named in another language: Echo's are named in Chinese. Its Portable Breast
+  // Pump sat where a D cup's nipples are, Oct 14. Only words that can't mean anything but the nipples.)
+  const NIP_DESC = new RegExp("Pastie|Nipple|Tassel|Breast Pump|Suction Cup", "i");
   const ARM_GROUPS = new Set(["ItemArms", "Bracelet"]);
   // What holds a breast: anything worn round or over the chest. With one of these on, the drawn breasts take the game's
   // own shape a size up (see HELD in breasts-drawing.js) and the piece is drawn a size up to match.
@@ -381,7 +421,7 @@ window.FarmBodyEngine = function (host) {
           const groupOf = (src) => { const m = slot.exec(src); return m ? m[1] : ""; };
           // (a piece's pictures are in its slot's folder or the folder of the slot it borrows its art from, named for the piece)
           const mouldList = S.C.Appearance.filter((it) => MOULD.items.has(mouldKey(it))).map((it) => ({ folders: [it.Asset.Group.Name, it.Asset.DynamicGroupName], name: it.Asset.Name, key: mouldKey(it), mode: MOULD.mode.get(mouldKey(it)) || "wide" }));
-          const wornList = S.C.Appearance.map((it) => ({ folders: [it.Asset.Group.Name, it.Asset.DynamicGroupName], name: it.Asset.Name, key: mouldKey(it), flat: !!(it.Asset.Prerequisite || []).includes("HasFlatChest") && !InventoryIsItemInList(S.C, "BodyUpper", ["FlatSmall", "FlatMedium"]) })).sort((a, b) => b.name.length - a.name.length);
+          const wornList = S.C.Appearance.map((it) => ({ folders: [it.Asset.Group.Name, it.Asset.DynamicGroupName], name: it.Asset.Name, desc: String(it.Asset.Description || ""), key: mouldKey(it), flat: !!(it.Asset.Prerequisite || []).includes("HasFlatChest") && !InventoryIsItemInList(S.C, "BodyUpper", ["FlatSmall", "FlatMedium"]) })).sort((a, b) => b.name.length - a.name.length);
           const pieceOf = (src) => { const g = groupOf(src), file = src.slice(src.lastIndexOf("/") + 1); return wornList.find((w) => w.folders.includes(g) && file.startsWith(w.name)) || null; };
           const isMoulded = (src) => { if (!mouldList.length) return null; const g = groupOf(src), file = src.slice(src.lastIndexOf("/") + 1); return mouldList.find((q) => q.folders.includes(g) && file.startsWith(q.name)) || null; };
           const gate = FarmBelly.skinGate(C);   // true once a picture comes after all the skin, genitals included
@@ -390,9 +430,11 @@ window.FarmBodyEngine = function (host) {
             if (done || !upper) return; done = true;   /* (runs once, after the last of the skin: belly, then a standing cock, then breasts) */
             if (fit.on) {
             const shape = { rx: fit.rx, ry: fit.ry, sag: fit.sag, cut: fit.cut };
-            const cv = FarmBelly.bellyCanvas(shape, bellySkin(upper[2], upper[3], FarmBelly.bellyPose(upper[2])), !!fit.flat);
+            const cv0 = FarmBelly.bellyCanvas(shape, bellySkin(upper[2], upper[3], FarmBelly.bellyPose(upper[2])), !!fit.flat);
             // hung from just under the ribs, then moved by the sliders; pressed flat, its ground line is what the sliders place
-            const dx = upper[0] + 250 - cv.width / 2 + fit.x, dy = upper[1] + 392 + fit.ry * 0.62 - cv.height / 2 + fit.y;
+            const dx = upper[0] + 250 - cv0.width / 2 + fit.x, dy = upper[1] + 392 + fit.ry * 0.62 - cv0.height / 2 + fit.y;
+            // (under the game's own breasts when they're the game's size: our drawn ones go on after it anyway)
+            const cv = br || fit.behind ? cv0 : bellyUnder(cv0, dx, dy, upper[2], upper[0], upper[1]);
             put("drawImage", cv, dx, dy, {}); if (typeof real.drawImageBlink === "function") put("drawImageBlink", cv, dx, dy, {});
             ctx.belly = { cv, dx, dy };
             ctx.sig = [fit.rx, fit.ry, fit.sag, fit.cut, fit.flat ? 1 : 0, Math.round(dx), Math.round(dy)].join(",") + "|" + ctx.bodies.map((b) => b.src + "@" + Math.round(b.x) + "," + Math.round(b.y)).join(";");
@@ -660,7 +702,7 @@ window.FarmBodyEngine = function (host) {
             // a piece that starts below the game's breasts (a waist strap, a belt) is under her bigger ones: they hang in front of it
             if (chestCover(src, im, x, y, B, false) < 0.012 && !BREAST.on[pk0]) { const e0 = edgesOf(src); if (e0) { let t0 = -1; for (let j = 0; j < e0.h; j++) if (e0.L[j] >= 0) { t0 = j; break; } if (t0 >= 0 && y + t0 > B.uy + gameBreast(B).y) return handDraw(name, src, x, y, o); } }   /* (every layer of a banded piece goes the same way: its clasp in the middle too) */
             if (chestCover(src, im, x, y, B, false) < 0.012 && !BREAST.on[pk0])   /* (a rope or a thin strap across the breast covers very little of it, and is still ON it: the box-tie ropes were being taken for an underbust piece and hidden behind her breasts. Found in the catalogue, Oct 14.) */ return BREAST.holds[pk0] ? handDraw(name, src, x, y, o) : false;
-            const pc0 = pieceOf(src), flatK = pc0 && pc0.flat ? 0.87 : 1, wm = (pc0 && BREAST.wear[pc0.key]) || "", pin = wm === "nipple" || (wm === "" && !!pc0 && NIP_PIECES.test(pc0.name)), mapYp = pin && B.fit.mapYN ? B.fit.mapYN : B.fit.mapY;
+            const pc0 = pieceOf(src), flatK = pc0 && pc0.flat ? 0.87 : 1, wm = (pc0 && BREAST.wear[pc0.key]) || "", pin = wm === "nipple" || (wm === "" && !!pc0 && (NIP_PIECES.test(pc0.name) || NIP_DESC.test(pc0.desc))), mapYp = pin && B.fit.mapYN ? B.fit.mapYN : B.fit.mapY;
             const key = "dress|" + (pin ? "pin|" : "") + src + "|" + Math.round(x) + "," + Math.round(y) + "|" + B.sig + "|" + (ctx.belly && !fit.behind && BELLY.auto !== false ? ctx.sig : "") + "|" + MOULD.ver;
             let c = BREAST.out.get(key);
             if (!c) {

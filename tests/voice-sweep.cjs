@@ -54,7 +54,7 @@ const report={bodies:{},kinds:[],problems:[]};
       for (const t of [...new Set(lines)]){   // (a call beeped to everybody comes back once per person: counted once)
         heard.push([k,t]);
         const why=[]; if(!b.vulva&&VULVA.test(t)) why.push('pussy word: '+t.match(VULVA)[0]);
-        const u=t.replace(/like (a|any other|strippin' a|milkin' a) teat/gi,''), m=u.match(TITS); if(!b.tits&&m) why.push('tit word: ...'+u.slice(Math.max(0,m.index-60),m.index+30));   // (a cock milked like a teat is fine)
+        const u=t.replace(/like (a|any other|strippin' a|milkin' a) teat/gi,'').replace(/Heavy Udder Draught/g,''), m=u.match(TITS); if(!b.tits&&m) why.push('tit word: ...'+u.slice(Math.max(0,m.index-60),m.index+30));   // (a cock milked like a teat is fine)
         if(b.g==='male'&&GIRL.test(t)) why.push('girl word: '+t.match(GIRL)[0]); if(CLINICAL.test(t)) why.push('clinical: '+t.match(CLINICAL)[0]); if(LEAK.test(t)) why.push('leak: '+t.match(LEAK)[0]);
         if(why.length) probs.push({kind:k,why,text:t});
       }

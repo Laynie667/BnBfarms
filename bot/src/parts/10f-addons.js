@@ -103,6 +103,9 @@
 
   // what add-ons get to use. Kept small on purpose: anything risky (keys, roles, the ledger as a whole)
   // stays in the bot.
+  // a line an add-on says about somebody, fitted to the body they've got (10y9d-body-fit.js): a word for a part they
+  // lack is swapped for one they have, and a {tag} on the front never shows. Every add-on gets this, old ones too.
+  const fitTo = (mn, t) => (mn && typeof mn === "number" && mn > 0 ? bodyWords(mn, t) : String(t).replace(BODY_TAG, ""));
   function addonApi(a){
     return Object.freeze({
       version: VERSION, cfg: CFG,   // (api.name is the name lookup below, not the add-on's name)
@@ -112,15 +115,20 @@
       // talkin'
       say: (t, urgent, who) => say(t, urgent, who),
       announce: (t, urgent) => announce(t, urgent),   // for the whole farm, even when it names somebody
-      emote: (t, who) => emote(t, who),
-      whisper: (mn, t) => whisper(mn, t),
-      privateEmote: (mn, t) => privateLine(mn, t, "emote"),
-      privateSay: (mn, t) => privateLine(mn, t, "chat"),
+      emote: (t, who) => emote(fitTo(who, t), who),
+      whisper: (mn, t) => whisper(mn, fitTo(mn, t)),
+      privateEmote: (mn, t) => privateLine(mn, fitTo(mn, t), "emote"),
+      privateSay: (mn, t) => privateLine(mn, fitTo(mn, t), "chat"),
       // a "listen to my voice" line: purple and private in the Companion, an out-of-character whisper otherwise
       voice: (mn, t) => hasCompanion(mn) ? enqueue(makeMsg("voice", { text: String(t) }, mn)) : whisper(mn, "[Voice] "+t),
-      tell: (mn, t) => tell(mn, t),
+      tell: (mn, t) => tell(mn, fitTo(mn, t)),
       // a private note: the Companion if they have it, otherwise a beep (friends) or a whisper
-      notice: (mn, t) => hasCompanion(mn) ? toCompanion(mn, t, "notice") : tell(mn, t),
+      notice: (mn, t) => hasCompanion(mn) ? toCompanion(mn, fitTo(mn, t), "notice") : tell(mn, fitTo(mn, t)),
+      // bodies, for writin' lines that fit (Laynie, Oct 14: "checking that they make sense via gender, equipped anatomy,
+      // equipped items, species"): body(mn) → { g, vulva, cock, tits } · pickFor(mn, key, pool) picks a fresh line that
+      // fits, honourin' {v} {nv} {c} {nc} {t} {nt} {f} {m} {fu} {fb} tags · fit(mn, text) swaps any word that doesn't
+      body: (mn) => bodyOf(mn), pickFor: (mn, key, pool) => pickFor(mn, a.name+":"+key, pool), fit: (mn, t) => fitTo(mn, t),
+      wears: (mn) => { try { return wornTags(mn); } catch(e){ return ""; } },
       reply: (mn, t, ch) => reply(mn, t, ch),
       notifyStaff: (t, routine) => notifyStaff(t, routine),
       ask: (mn, text, cb) => { addonAsks.set(mn, { addon:a.name, cb, at:Date.now() }); askCard(mn, a.name, text); },

@@ -210,7 +210,7 @@
          "He pins %n in the nest under one hand and looks them over with his head tilted, the way he'd look over somethin' he means to keep."],
       ],
       in: [
-        ["His cock slides out of its slit already wet, ridged like a washboard from tip to root. He feeds it into %n's %h ridge by ridge, and each one pops in with a jolt.",
+        ["His cock slides out of its sheath already wet, ridged like a washboard from tip to root. He feeds it into %n's %h ridge by ridge, and each one pops in with a jolt.",
          "He pushes his %c cock into %n's %h slow, so they feel every ridge go by, and he's so hot inside them it's like bein' filled with bathwater."],
         ["He breeds %n in long rollin' thrusts, growlin' in a language older than the farm, and then somethin' at the root of him swells: not a knot. An egg.",
          "He takes his time and he goes deep, and when he's as deep as he can get he holds there, shudderin', and %n feels the first hard round shape start up the length of him."],
@@ -226,7 +226,7 @@
          "%n reaches up for a sack on the top shelf and the shelf moves. Green-gold coils pour down round them, cool and dry and very, very strong."],
         ["The naga lowers the rest of herself after: a long handsome torso, a forked tongue, a lazy smile. She wraps %n three times round and lifts them off the floor.",
          "Loop after loop winds round %n's chest and hips and thighs till only their head and their backside stick out. A face comes down level with theirs, tongue flickin'. \"Warm,\" it says, pleased."],
-        ["Her coils squeeze and roll, kneadin' %n like dough, turnin' them, spreadin' their legs just by shiftin' her grip. Lower down, a slit in her scales parts, and what slides out of it comes as a pair.",
+        ["Her coils squeeze and roll, kneadin' %n like dough, turnin' them, spreadin' their legs just by shiftin' her grip. Lower down, a seam in her scales parts, and what slides out of it comes as a pair.",
          "She tastes %n's throat with her tongue, then lower, then lower. Somewhere down in the coils two slick tapered shapes nudge up against them, side by side."],
       ],
       in: [

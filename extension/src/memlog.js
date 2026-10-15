@@ -5,6 +5,7 @@
 // grew, and copies the whole log so it can be pasted to whoever's looking into it.
 import { drawnBodyMemory } from "./drawnbody.js";
 import { messMemory } from "./messes.js";
+import { trimStats } from "./trimpics.js";
 
 const W = window, KEY = "farmhand-memlog", MAX = 120;
 let log = [];
@@ -20,6 +21,7 @@ function snap() {
   } catch (e) { /* fine */ }
   try { s.body = drawnBodyMemory(); } catch (e) { /* fine */ }
   try { s.mess = messMemory(); } catch (e) { /* fine */ }
+  try { s.let = trimStats().trimmed; } catch (e) { /* fine */ }
   try { s.room = (W.ChatRoomCharacter || []).length; s.screen = W.CurrentScreen; } catch (e) { /* fine */ }
   return s;
 }
@@ -31,7 +33,7 @@ function tick() {
 }
 const line = (s) => new Date(s.t).toTimeString().slice(0, 5) + (s.gap ? " (after a gap)" : "") +
   "  page " + (s.heapMB ?? "?") + " MB · game pictures " + (s.gamePics ?? "?") + " (" + (s.madePics ?? 0) + " ours, " + (s.madePicsKB ?? 0) + " KB) · graphics card " + (s.textureMB ?? "?") + " MB in " + (s.textures ?? "?") +
-  " · drawn bodies " + (s.body ? s.body.engines + ", keeping " + s.body.keptMB + " MB" : "?") + " · messes " + (s.mess ? s.mess.pictures : "?") + " · " + (s.room ?? "?") + " in the room";
+  " · drawn bodies " + (s.body ? s.body.engines + ", keeping " + s.body.keptMB + " MB" : "?") + " · messes " + (s.mess ? s.mess.pictures : "?") + " · " + (s.room ?? "?") + " in the room" + (s.let ? " · " + s.let + " old pictures let go" : "");
 
 export function memlogText(n) { return log.slice(-(n || 20)).map(line).join("\n"); }
 export function initMemlog() {

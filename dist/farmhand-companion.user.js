@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.27.0
+// @version      0.28.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -230,7 +230,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.27.0";
+  var VERSION = "0.28.0";
 
   // extension/src/config.js
   var BOT_MEMBER = 260239;
@@ -868,19 +868,19 @@ One of mods you are using is using an old version of SDK. It will work for now b
       }
       const MOULD = { ver: 0, lies: /* @__PURE__ */ new Set(), span: /* @__PURE__ */ new Map(), cover: /* @__PURE__ */ new Map(), items: /* @__PURE__ */ new Set(), mode: /* @__PURE__ */ new Map(), ext: /* @__PURE__ */ new Map(), img: /* @__PURE__ */ new Map(), prof: /* @__PURE__ */ new Map(), out: /* @__PURE__ */ new Map(), M: 150 };
       const mouldKey = (it) => it.Asset.Group.Name + "/" + it.Asset.Name;
-      const W6 = window;
+      const W7 = window;
       const mapSrc = host.mapSrc || ((src) => {
-        if (typeof W6.DrawGetImage !== "function") return src;
-        const lists = [typeof DrawCacheImage !== "undefined" ? DrawCacheImage : W6.DrawCacheImage, W6.DrawImageCache].filter((c) => c && typeof c.get === "function");
+        if (typeof W7.DrawGetImage !== "function") return src;
+        const lists = [typeof DrawCacheImage !== "undefined" ? DrawCacheImage : W7.DrawCacheImage, W7.DrawImageCache].filter((c) => c && typeof c.get === "function");
         if (!lists.length) return src;
-        let seen = null;
+        let seen2 = null;
         const kept = lists.map((c) => [c, Object.prototype.hasOwnProperty.call(c, "get"), c.get]);
         try {
           for (const [c] of kept) c.get = function(k) {
-            if (seen == null) seen = k;
+            if (seen2 == null) seen2 = k;
             return { isLoaded: () => false, data: void 0, complete: false };
           };
-          W6.DrawGetImage(src);
+          W7.DrawGetImage(src);
         } catch (e) {
         } finally {
           for (const [c, own, g] of kept) {
@@ -888,7 +888,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
             else delete c.get;
           }
         }
-        return typeof seen === "string" && seen ? seen : src;
+        return typeof seen2 === "string" && seen2 ? seen2 : src;
       });
       function mouldImg(src) {
         let e = MOULD.img.get(src);
@@ -1892,7 +1892,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
                   }
                   g.drawImage(B.mask, MX + B.mx - x, MY + B.my - y);
                   g.globalCompositeOperation = "source-over";
-                  const ho = herOutline(B), W7 = fm.width, rgb2 = (q2, k) => "rgb(" + q2.map((u) => Math.max(0, Math.min(255, Math.round(u * k)))).join(",") + ")";
+                  const ho = herOutline(B), W8 = fm.width, rgb2 = (q2, k) => "rgb(" + q2.map((u) => Math.max(0, Math.min(255, Math.round(u * k)))).join(",") + ")";
                   for (const hv of ho) {
                     const sv = fm.sides.find((q2) => q2.sd === hv.sd);
                     if (!sv) continue;
@@ -1901,7 +1901,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
                     for (let k = 0; k <= FRAME_N; k++) {
                       const a = k % FRAME_N, ta = a / FRAME_N * Math.PI * 2, on = !!sv.hit[a] && hv.edge[a] > 0 && Math.sin(ta) < 0.3 && Math.cos(ta) > -0.6;
                       if (on) {
-                        const t = a / FRAME_N * Math.PI * 2, ux = Math.cos(t) * hv.sd, uy = Math.sin(t), rr = hv.edge[a] - W7 * 0.45;
+                        const t = a / FRAME_N * Math.PI * 2, ux = Math.cos(t) * hv.sd, uy = Math.sin(t), rr = hv.edge[a] - W8 * 0.45;
                         (cur || (cur = [])).push([MX + hv.cx - x + ux * rr, MY + hv.cy - y + uy * rr]);
                       } else if (cur) {
                         segs.push(cur);
@@ -1920,26 +1920,26 @@ One of mods you are using is using an old version of SDK. It will work for now b
                     g.lineCap = "round";
                     g.lineJoin = "round";
                     for (const at of sv.att || []) {
-                      const t = at.a / FRAME_N * Math.PI * 2, ux = Math.cos(t) * hv.sd, uy = Math.sin(t), rr = hv.edge[at.a] - W7 * 0.45;
+                      const t = at.a / FRAME_N * Math.PI * 2, ux = Math.cos(t) * hv.sd, uy = Math.sin(t), rr = hv.edge[at.a] - W8 * 0.45;
                       segs.push([[MX + at.x, MY + at.y], [MX + hv.cx - x + ux * rr, MY + hv.cy - y + uy * rr]]);
                     }
                     for (const pts of segs) {
                       if (pts.length < 2) continue;
                       path(pts);
                       g.strokeStyle = rgb2(fm.col, 0.55);
-                      g.lineWidth = W7 + 1.5;
+                      g.lineWidth = W8 + 1.5;
                       g.stroke();
                       path(pts);
                       g.strokeStyle = rgb2(fm.col, 1);
-                      g.lineWidth = W7;
+                      g.lineWidth = W8;
                       g.stroke();
                       path(pts.map((p, i) => {
                         const q2 = pts[Math.min(pts.length - 1, i + 1)], pp = pts[Math.max(0, i - 1)], dx = q2[0] - pp[0], dy = q2[1] - pp[1], L = Math.hypot(dx, dy) || 1;
-                        return [p[0] - dy / L * W7 * 0.18, p[1] + dx / L * W7 * 0.18];
+                        return [p[0] - dy / L * W8 * 0.18, p[1] + dx / L * W8 * 0.18];
                       }));
                       g.globalAlpha = 0.55;
                       g.strokeStyle = rgb2(fm.hi, 1);
-                      g.lineWidth = Math.max(1, W7 * 0.22);
+                      g.lineWidth = Math.max(1, W8 * 0.22);
                       g.stroke();
                       g.globalAlpha = 1;
                     }
@@ -8195,14 +8195,14 @@ One of mods you are using is using an old version of SDK. It will work for now b
       c.height = img2.height;
       const x = c.getContext("2d");
       x.drawImage(img2, 0, 0);
-      const W6 = c.width, H = c.height, d = x.getImageData(0, 0, W6, H).data, seen = new Uint8Array(W6 * H), out = [];
-      for (let i = 0; i < W6 * H; i++) {
-        if (seen[i] || d[i * 4 + 3] < 16) continue;
+      const W7 = c.width, H = c.height, d = x.getImageData(0, 0, W7, H).data, seen2 = new Uint8Array(W7 * H), out = [];
+      for (let i = 0; i < W7 * H; i++) {
+        if (seen2[i] || d[i * 4 + 3] < 16) continue;
         const q2 = [i];
-        seen[i] = 1;
-        let x0 = W6, y0 = H, x1 = 0, y1 = 0, n = 0;
+        seen2[i] = 1;
+        let x0 = W7, y0 = H, x1 = 0, y1 = 0, n = 0;
         while (q2.length) {
-          const p = q2.pop(), px = p % W6, py = p / W6 | 0;
+          const p = q2.pop(), px = p % W7, py = p / W7 | 0;
           n++;
           if (px < x0) x0 = px;
           if (px > x1) x1 = px;
@@ -8210,10 +8210,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
           if (py > y1) y1 = py;
           for (let dy = -2; dy <= 2; dy++) for (let dx = -2; dx <= 2; dx++) {
             const nx = px + dx, ny = py + dy;
-            if (nx < 0 || ny < 0 || nx >= W6 || ny >= H) continue;
-            const k = ny * W6 + nx;
-            if (!seen[k] && d[k * 4 + 3] >= 16) {
-              seen[k] = 1;
+            if (nx < 0 || ny < 0 || nx >= W7 || ny >= H) continue;
+            const k = ny * W7 + nx;
+            if (!seen2[k] && d[k * 4 + 3] >= 16) {
+              seen2[k] = 1;
               q2.push(k);
             }
           }
@@ -8718,7 +8718,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
             console.warn("[Farmhand Companion] messes:", e);
           }
         };
-        const seen = (name) => (src, x, y, ...rest) => {
+        const seen2 = (name) => (src, x, y, ...rest) => {
           if (typeof src === "string" && !done) {
             if (BODY.test(src)) body.push([src, x, y]);
             else {
@@ -8729,7 +8729,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
           return real[name](src, x, y, ...rest);
         };
         const wrap = {};
-        for (const n of ["drawImage", "drawImageBlink", "drawImageColorize", "drawImageColorizeBlink"]) if (typeof real[n] === "function") wrap[n] = seen(n);
+        for (const n of ["drawImage", "drawImageBlink", "drawImageColorize", "drawImageColorizeBlink"]) if (typeof real[n] === "function") wrap[n] = seen2(n);
         args[1] = Object.assign({}, real, wrap);
         const out = next(args);
         lay();
@@ -8771,13 +8771,82 @@ One of mods you are using is using an old version of SDK. It will work for now b
     return { pictures: pics, bytesKB: Math.round(Array.from(made2.values()).reduce((n, p) => n + (p.src ? p.src.length : 0), 0) / 1e3), imgs: imgs.size, others: others2.size };
   }
 
-  // extension/src/memlog.js
+  // extension/src/trimpics.js
   var W4 = window;
+  var LIMIT = 38e7;
+  var TARGET = 26e7;
+  var IDLE = 5 * 6e4;
+  var seen = /* @__PURE__ */ new Map();
+  var sdk4 = null;
+  var trimmed = 0;
+  var started = Date.now();
+  function bytes(tc) {
+    let n = 0;
+    for (const v of tc.values()) n += (v.width || 0) * (v.height || 0) * 4;
+    return n;
+  }
+  function trimPictures(force, idle, target) {
+    const gl = W4.GLDrawCanvas && W4.GLDrawCanvas.GL, tc = gl && gl.textureCache, cache = W4.GLDrawImageCache;
+    if (!tc || !cache || typeof tc.forEach !== "function") return 0;
+    let total = bytes(tc);
+    if (!force && total <= LIMIT) return 0;
+    const now = Date.now(), old = [];
+    for (const [url, v] of tc) {
+      if (typeof url !== "string") continue;
+      const t = seen.get(url) || started;
+      if (now - t < (idle ?? IDLE)) continue;
+      const img2 = cache.get(url);
+      if (img2 && img2.complete === false) continue;
+      old.push([t, url, v]);
+    }
+    old.sort((a, b) => a[0] - b[0]);
+    let n = 0;
+    for (const [, url, v] of old) {
+      if (total <= (target ?? TARGET)) break;
+      try {
+        if (v.texture) gl.deleteTexture(v.texture);
+      } catch (e) {
+      }
+      tc.delete(url);
+      cache.delete(url);
+      seen.delete(url);
+      total -= (v.width || 0) * (v.height || 0) * 4;
+      n++;
+    }
+    trimmed += n;
+    return n;
+  }
+  function trimStats() {
+    return { trimmed };
+  }
+  function initTrim(mod2) {
+    sdk4 = mod2;
+    W4.__farmTrim = trimPictures;
+    try {
+      sdk4.hookFunction("GLDrawLoadImage", 0, (args, next) => {
+        if (typeof args[1] === "string") seen.set(args[1], Date.now());
+        return next(args);
+      });
+    } catch (e) {
+      console.warn("[Farmhand Companion] picture trim unavailable:", e);
+      return;
+    }
+    setInterval(() => {
+      try {
+        trimPictures(false);
+      } catch (e) {
+        console.warn("[Farmhand Companion] picture trim:", e);
+      }
+    }, 6e4);
+  }
+
+  // extension/src/memlog.js
+  var W5 = window;
   var KEY4 = "farmhand-memlog";
   var MAX2 = 120;
   var log = [];
   try {
-    const v = JSON.parse(W4.localStorage.getItem(KEY4));
+    const v = JSON.parse(W5.localStorage.getItem(KEY4));
     if (Array.isArray(v)) log = v.slice(-MAX2);
   } catch (e) {
     log = [];
@@ -8785,11 +8854,11 @@ One of mods you are using is using an old version of SDK. It will work for now b
   function snap() {
     const s = { t: Date.now() };
     try {
-      if (W4.performance && W4.performance.memory) s.heapMB = Math.round(W4.performance.memory.usedJSHeapSize / 1e6);
+      if (W5.performance && W5.performance.memory) s.heapMB = Math.round(W5.performance.memory.usedJSHeapSize / 1e6);
     } catch (e) {
     }
     try {
-      const m = W4.GLDrawImageCache;
+      const m = W5.GLDrawImageCache;
       if (m) {
         s.gamePics = m.size;
         let d = 0, dk = 0;
@@ -8800,7 +8869,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
         s.madePics = d;
         s.madePicsKB = Math.round(dk / 1e3);
       }
-      const gl = W4.GLDrawCanvas && W4.GLDrawCanvas.GL, tc = gl && gl.textureCache;
+      const gl = W5.GLDrawCanvas && W5.GLDrawCanvas.GL, tc = gl && gl.textureCache;
       if (tc) {
         let px = 0;
         for (const v of tc.values()) px += (v.width || 0) * (v.height || 0);
@@ -8818,15 +8887,19 @@ One of mods you are using is using an old version of SDK. It will work for now b
     } catch (e) {
     }
     try {
-      s.room = (W4.ChatRoomCharacter || []).length;
-      s.screen = W4.CurrentScreen;
+      s.let = trimStats().trimmed;
+    } catch (e) {
+    }
+    try {
+      s.room = (W5.ChatRoomCharacter || []).length;
+      s.screen = W5.CurrentScreen;
     } catch (e) {
     }
     return s;
   }
   function save4() {
     try {
-      W4.localStorage.setItem(KEY4, JSON.stringify(log));
+      W5.localStorage.setItem(KEY4, JSON.stringify(log));
     } catch (e) {
       log = log.slice(-30);
     }
@@ -8838,29 +8911,29 @@ One of mods you are using is using an old version of SDK. It will work for now b
     if (log.length > MAX2) log = log.slice(-MAX2);
     save4();
   }
-  var line = (s) => new Date(s.t).toTimeString().slice(0, 5) + (s.gap ? " (after a gap)" : "") + "  page " + (s.heapMB ?? "?") + " MB \xB7 game pictures " + (s.gamePics ?? "?") + " (" + (s.madePics ?? 0) + " ours, " + (s.madePicsKB ?? 0) + " KB) \xB7 graphics card " + (s.textureMB ?? "?") + " MB in " + (s.textures ?? "?") + " \xB7 drawn bodies " + (s.body ? s.body.engines + ", keeping " + s.body.keptMB + " MB" : "?") + " \xB7 messes " + (s.mess ? s.mess.pictures : "?") + " \xB7 " + (s.room ?? "?") + " in the room";
+  var line = (s) => new Date(s.t).toTimeString().slice(0, 5) + (s.gap ? " (after a gap)" : "") + "  page " + (s.heapMB ?? "?") + " MB \xB7 game pictures " + (s.gamePics ?? "?") + " (" + (s.madePics ?? 0) + " ours, " + (s.madePicsKB ?? 0) + " KB) \xB7 graphics card " + (s.textureMB ?? "?") + " MB in " + (s.textures ?? "?") + " \xB7 drawn bodies " + (s.body ? s.body.engines + ", keeping " + s.body.keptMB + " MB" : "?") + " \xB7 messes " + (s.mess ? s.mess.pictures : "?") + " \xB7 " + (s.room ?? "?") + " in the room" + (s.let ? " \xB7 " + s.let + " old pictures let go" : "");
   function memlogText(n) {
     return log.slice(-(n || 20)).map(line).join("\n");
   }
   function initMemlog() {
     setTimeout(tick, 2e4);
     setInterval(tick, 3e4);
-    if (typeof W4.CommandCombine === "function") {
-      W4.CommandCombine([{ Tag: "farmmem", Description: ": the Farmhand Companion's memory log (the last hour), and copies it", Action: () => {
+    if (typeof W5.CommandCombine === "function") {
+      W5.CommandCombine([{ Tag: "farmmem", Description: ": the Farmhand Companion's memory log (the last hour), and copies it", Action: () => {
         tick();
         const text = memlogText(24);
         try {
-          W4.navigator.clipboard.writeText(JSON.stringify(log));
+          W5.navigator.clipboard.writeText(JSON.stringify(log));
         } catch (e) {
         }
-        if (typeof W4.ChatRoomSendLocal === "function") W4.ChatRoomSendLocal("Farmhand memory log (copied, paste it to Claude):\n" + text, 12e4);
+        if (typeof W5.ChatRoomSendLocal === "function") W5.ChatRoomSendLocal("Farmhand memory log (copied, paste it to Claude):\n" + text, 12e4);
         else console.log(text);
       } }]);
     }
   }
 
   // extension/src/cues.js
-  var W5 = window;
+  var W6 = window;
   var ctx = null;
   function initCues(c) {
     ctx = c;
@@ -8877,15 +8950,15 @@ One of mods you are using is using an old version of SDK. It will work for now b
     stir: ctx.panel.prefs.stir ? void 0 : true,
     gear: ctx.panel.prefs.gear ? void 0 : true
   });
-  var mapOn = () => typeof W5.ChatRoomMapViewIsActive === "function" && W5.ChatRoomMapViewIsActive() && W5.Player && W5.Player.MapData && W5.Player.MapData.Pos;
-  var others3 = () => (W5.ChatRoomCharacter || []).filter((c) => c && c.MemberNumber !== (W5.Player && W5.Player.MemberNumber));
+  var mapOn = () => typeof W6.ChatRoomMapViewIsActive === "function" && W6.ChatRoomMapViewIsActive() && W6.Player && W6.Player.MapData && W6.Player.MapData.Pos;
+  var others3 = () => (W6.ChatRoomCharacter || []).filter((c) => c && c.MemberNumber !== (W6.Player && W6.Player.MemberNumber));
   var lastSight = "";
   function sightTick() {
     try {
-      if (W5.CurrentScreen !== "ChatRoom" || !mapOn() || typeof W5.ChatRoomMapViewCharacterIsVisible !== "function") return;
-      const see = others3().filter((c) => W5.ChatRoomMapViewCharacterIsVisible(c)).map((c) => c.MemberNumber).sort();
-      const hear = others3().filter((c) => typeof W5.ChatRoomMapViewCharacterIsHearable === "function" && W5.ChatRoomMapViewCharacterIsHearable(c)).map((c) => c.MemberNumber).sort();
-      const LS = W5.Player && W5.Player.LSCG, S2 = LS && LS.SplatterModule;
+      if (W6.CurrentScreen !== "ChatRoom" || !mapOn() || typeof W6.ChatRoomMapViewCharacterIsVisible !== "function") return;
+      const see = others3().filter((c) => W6.ChatRoomMapViewCharacterIsVisible(c)).map((c) => c.MemberNumber).sort();
+      const hear = others3().filter((c) => typeof W6.ChatRoomMapViewCharacterIsHearable === "function" && W6.ChatRoomMapViewCharacterIsHearable(c)).map((c) => c.MemberNumber).sort();
+      const LS = W6.Player && W6.Player.LSCG, S2 = LS && LS.SplatterModule;
       const splat = S2 ? !!(S2.enabled && S2.taker !== false && (!LS.GlobalModule || LS.GlobalModule.enabled !== false)) : void 0;
       const key = see.join(",") + "|" + hear.join(",") + "|" + splat;
       if (key === lastSight && Date.now() - (sightTick.at || 0) < 12e4) return;
@@ -8900,13 +8973,13 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var DIRS = [["North", 0, -1], ["South", 0, 1], ["West", -1, 0], ["East", 1, 0]];
   function canStep(x, y) {
     try {
-      return W5.ChatRoomMapViewCanEnterTile(x, y) > 0;
+      return W6.ChatRoomMapViewCanEnterTile(x, y) > 0;
     } catch (e) {
       return false;
     }
   }
   function findPath(from, to) {
-    const wide = W5.ChatRoomMapViewWidth || 40, high = W5.ChatRoomMapViewHeight || 40, key = (x, y) => x + "," + y;
+    const wide = W6.ChatRoomMapViewWidth || 40, high = W6.ChatRoomMapViewHeight || 40, key = (x, y) => x + "," + y;
     const goal = (x, y) => Math.max(Math.abs(x - to.X), Math.abs(y - to.Y)) <= (canStep(to.X, to.Y) ? 0 : 1);
     const prev = /* @__PURE__ */ new Map([[key(from.X, from.Y), null]]), q2 = [[from.X, from.Y]];
     while (q2.length) {
@@ -8936,8 +9009,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
       walk = null;
       ctx.toBot("leadNo", { id: m.id });
     };
-    if (!pref("noLead") || !mapOn() || typeof W5.ChatRoomMapViewMove !== "function") return no();
-    const from = W5.Player.MapData.Pos, to = { X: m.X, Y: m.Y };
+    if (!pref("noLead") || !mapOn() || typeof W6.ChatRoomMapViewMove !== "function") return no();
+    const from = W6.Player.MapData.Pos, to = { X: m.X, Y: m.Y };
     const path = findPath(from, to);
     if (!path) return no();
     if (!path.length) {
@@ -8950,7 +9023,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
   function stepWalk() {
     if (!walk) return;
-    const w = walk, p = W5.Player && W5.Player.MapData && W5.Player.MapData.Pos;
+    const w = walk, p = W6.Player && W6.Player.MapData && W6.Player.MapData.Pos;
     if (!p) {
       walk = null;
       return;
@@ -8979,9 +9052,9 @@ One of mods you are using is using an old version of SDK. It will work for now b
       }
       Object.assign(w, { path, i: 0, stuck: Date.now(), retried: true });
     }
-    if (W5.ChatRoomMapViewMovement == null) {
+    if (W6.ChatRoomMapViewMovement == null) {
       try {
-        W5.ChatRoomMapViewMove(w.path[w.i]);
+        W6.ChatRoomMapViewMove(w.path[w.i]);
       } catch (e) {
       }
     }
@@ -8999,12 +9072,12 @@ One of mods you are using is using an old version of SDK. It will work for now b
   };
   function face(m) {
     const f = FACES[m.mood];
-    if (!f || !pref("noFace") || typeof W5.CharacterSetFacialExpression !== "function" || !W5.Player) return;
+    if (!f || !pref("noFace") || typeof W6.CharacterSetFacialExpression !== "function" || !W6.Player) return;
     const secs = m.mood === "clear" ? null : Math.max(5, Math.min(1800, Number(m.secs) || 30));
     for (const [g, e] of Object.entries(f)) {
       try {
-        W5.CharacterSetFacialExpression(W5.Player, g, e, secs);
-        if (g === "Eyes") W5.CharacterSetFacialExpression(W5.Player, "Eyes2", e, secs);
+        W6.CharacterSetFacialExpression(W6.Player, g, e, secs);
+        if (g === "Eyes") W6.CharacterSetFacialExpression(W6.Player, "Eyes2", e, secs);
       } catch (e2) {
       }
     }
@@ -9053,35 +9126,35 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var QUIET = { stall: 0.35, latch: 0.35, unlatch: 0.35, pump: 0.4, machine: 0.4, inflate: 0.4, hiss: 0.4, buzz: 0.3, zap: 0.35, clamp: 0.45, softgate: 0.4 };
   function sound(m) {
     const f = SOUNDS[m.name];
-    if (!f || !pref("noSound") || typeof W5.AudioPlayInstantSound !== "function") return;
-    const vol = W5.Player && W5.Player.AudioSettings && W5.Player.AudioSettings.Volume || 0;
+    if (!f || !pref("noSound") || typeof W6.AudioPlayInstantSound !== "function") return;
+    const vol = W6.Player && W6.Player.AudioSettings && W6.Player.AudioSettings.Volume || 0;
     try {
-      W5.AudioPlayInstantSound("Audio/" + f + ".mp3", vol * (QUIET[m.name] || 0.6));
+      W6.AudioPlayInstantSound("Audio/" + f + ".mp3", vol * (QUIET[m.name] || 0.6));
     } catch (e) {
     }
   }
   function trance(m) {
-    let el = W5.document.getElementById("fhc-trance");
+    let el = W6.document.getElementById("fhc-trance");
     const lvl = pref("noTrance") ? Math.max(0, Math.min(3, Number(m.level) || 0)) : 0;
     if (!lvl) {
       if (el) el.remove();
       return;
     }
     if (!el) {
-      el = W5.document.createElement("div");
+      el = W6.document.createElement("div");
       el.id = "fhc-trance";
       el.style.cssText = "position:fixed;inset:0;pointer-events:none;z-index:9998;transition:opacity 4s;opacity:0;animation:fhcTrance 6s ease-in-out infinite";
-      if (!W5.document.getElementById("fhc-trance-css")) {
-        const s = W5.document.createElement("style");
+      if (!W6.document.getElementById("fhc-trance-css")) {
+        const s = W6.document.createElement("style");
         s.id = "fhc-trance-css";
         s.textContent = "@keyframes fhcTrance{0%,100%{filter:brightness(1)}50%{filter:brightness(0.85)}}";
-        W5.document.head.appendChild(s);
+        W6.document.head.appendChild(s);
       }
-      W5.document.body.appendChild(el);
+      W6.document.body.appendChild(el);
     }
     const edge = [0, 0.25, 0.45, 0.65][lvl], inner = [0, 55, 42, 30][lvl];
     el.style.background = "radial-gradient(ellipse at center, transparent " + inner + "%, rgba(70,20,90," + edge + ") 100%)";
-    (W5.requestAnimationFrame || ((f) => setTimeout(f, 16)))(() => {
+    (W6.requestAnimationFrame || ((f) => setTimeout(f, 16)))(() => {
       el.style.opacity = "1";
     });
   }
@@ -9153,13 +9226,13 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var recentFeel = [];
   function feelTick() {
     try {
-      if (!pref("noFeelings") || W5.CurrentScreen !== "ChatRoom" || !W5.Player || !ctx.panel.s || !ctx.panel.s.onBooks) return;
+      if (!pref("noFeelings") || W6.CurrentScreen !== "ChatRoom" || !W6.Player || !ctx.panel.s || !ctx.panel.s.onBooks) return;
       if (Date.now() < (feelTick.next || 0)) return;
       feelTick.next = Date.now() + (7 + Math.random() * 6) * 6e4;
-      const s = ctx.panel.s, items = (W5.Player.Appearance || []).filter((x) => x && x.Asset && x.Asset.Group);
+      const s = ctx.panel.s, items = (W6.Player.Appearance || []).filter((x) => x && x.Asset && x.Asset.Group);
       const grp = (g) => items.find((x) => x.Asset.Group.Name === g);
       const eff2 = (x) => [].concat(x.Property && x.Property.Effect || [], x.Asset.Effect || []);
-      const arousal = W5.Player.ArousalSettings && W5.Player.ArousalSettings.Progress || 0;
+      const arousal = W6.Player.ArousalSettings && W6.Player.ArousalSettings.Progress || 0;
       const kinds = [];
       if (grp("ItemButt")) kinds.push("plug");
       if (items.some((x) => eff2(x).includes("Chaste")) && arousal > 40) kinds.push("chaste");
@@ -9183,11 +9256,11 @@ One of mods you are using is using an old version of SDK. It will work for now b
   function drawMarkers() {
     try {
       const s = ctx.panel.s;
-      if (!s || !s.staff || !Array.isArray(s.herd) || !pref("noMarkers") || !mapOn() || typeof W5.DrawText !== "function") return;
-      const R = W5.ChatRoomMapViewPerceptionRange || 6, tile = 1e3 / (R * 2 + 1), me3 = W5.Player.MapData.Pos;
+      if (!s || !s.staff || !Array.isArray(s.herd) || !pref("noMarkers") || !mapOn() || typeof W6.DrawText !== "function") return;
+      const R = W6.ChatRoomMapViewPerceptionRange || 6, tile = 1e3 / (R * 2 + 1), me3 = W6.Player.MapData.Pos;
       for (const x of s.herd) {
-        const C = (W5.ChatRoomCharacter || []).find((c) => c.MemberNumber === x.mn);
-        if (!C || !C.MapData || !C.MapData.Pos || !W5.ChatRoomMapViewCharacterIsVisible(C)) continue;
+        const C = (W6.ChatRoomCharacter || []).find((c) => c.MemberNumber === x.mn);
+        if (!C || !C.MapData || !C.MapData.Pos || !W6.ChatRoomMapViewCharacterIsVisible(C)) continue;
         const tags = [];
         if (x.milk !== null && x.milk >= 75) tags.push(["M", "#7fa8c9"]);
         if (x.heat) tags.push(["H", "#d9534f"]);
@@ -9196,7 +9269,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
         if (!tags.length) continue;
         const sx = (C.MapData.Pos.X - me3.X + R) * tile, sy = (C.MapData.Pos.Y - me3.Y) * tile + R * tile;
         if (sx < 0 || sy < 0 || sx > 1e3 || sy > 1e3) continue;
-        tags.forEach(([t, col], i) => W5.DrawText(t, sx + tile * 0.2 + i * tile * 0.22, sy + tile * 0.15, col, "black"));
+        tags.forEach(([t, col], i) => W6.DrawText(t, sx + tile * 0.2 + i * tile * 0.22, sy + tile * 0.15, col, "black"));
       }
     } catch (e) {
     }
@@ -9213,11 +9286,11 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
   function arouse(m) {
     try {
-      if (!stirOn() || !W5.Player || !W5.Player.ArousalSettings || typeof W5.ActivitySetArousal !== "function") return;
-      if (W5.Player.ArousalSettings.Active === "Inactive" || W5.Player.ArousalSettings.Active === "NoMeter") return;
-      const cur = Number(W5.Player.ArousalSettings.Progress) || 0, cap = Math.max(0, Math.min(deniedNow() ? 94 : 100, Number(m.cap) || 100));
+      if (!stirOn() || !W6.Player || !W6.Player.ArousalSettings || typeof W6.ActivitySetArousal !== "function") return;
+      if (W6.Player.ArousalSettings.Active === "Inactive" || W6.Player.ArousalSettings.Active === "NoMeter") return;
+      const cur = Number(W6.Player.ArousalSettings.Progress) || 0, cap = Math.max(0, Math.min(deniedNow() ? 94 : 100, Number(m.cap) || 100));
       const next = Math.max(0, Math.min(cap, cur + (Number(m.add) || 0)));
-      if (next > cur || m.add < 0) W5.ActivitySetArousal(W5.Player, next);
+      if (next > cur || m.add < 0) W6.ActivitySetArousal(W6.Player, next);
     } catch (e) {
       console.warn("[Farmhand Companion] arouse:", e);
     }
@@ -9225,11 +9298,11 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var VIBE_MODE = ["Low", "Medium", "High", "Maximum"];
   var vibeWas = null;
   var vibeTimer = null;
-  var vibeToys = () => (W5.Player && Array.isArray(W5.Player.Appearance) ? W5.Player.Appearance : []).filter((it) => it && it.Asset && it.Asset.Group && it.Property && typeof it.Property.Intensity === "number" && !(it.Property.LockedBy && typeof W5.DialogCanUnlock === "function" && !W5.DialogCanUnlock(W5.Player, it)));
+  var vibeToys = () => (W6.Player && Array.isArray(W6.Player.Appearance) ? W6.Player.Appearance : []).filter((it) => it && it.Asset && it.Asset.Group && it.Property && typeof it.Property.Intensity === "number" && !(it.Property.LockedBy && typeof W6.DialogCanUnlock === "function" && !W6.DialogCanUnlock(W6.Player, it)));
   function vibePush(toys) {
-    if (typeof W5.CharacterRefresh === "function") W5.CharacterRefresh(W5.Player, false);
-    if (typeof W5.ChatRoomCharacterItemUpdate === "function") toys.forEach((it) => W5.ChatRoomCharacterItemUpdate(W5.Player, it.Asset.Group.Name));
-    else if (typeof W5.ChatRoomCharacterUpdate === "function") W5.ChatRoomCharacterUpdate(W5.Player);
+    if (typeof W6.CharacterRefresh === "function") W6.CharacterRefresh(W6.Player, false);
+    if (typeof W6.ChatRoomCharacterItemUpdate === "function") toys.forEach((it) => W6.ChatRoomCharacterItemUpdate(W6.Player, it.Asset.Group.Name));
+    else if (typeof W6.ChatRoomCharacterUpdate === "function") W6.ChatRoomCharacterUpdate(W6.Player);
   }
   function vibeSet(it, level, mode) {
     it.Property.Intensity = level;
@@ -9285,7 +9358,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
         const t = next(args);
         try {
           const f = slowFactor();
-          return t > 0 && f > 1 && !(typeof W5.ChatRoomMapViewHasSuperPowers === "function" && W5.ChatRoomMapViewHasSuperPowers()) ? t * f : t;
+          return t > 0 && f > 1 && !(typeof W6.ChatRoomMapViewHasSuperPowers === "function" && W6.ChatRoomMapViewHasSuperPowers()) ? t * f : t;
         } catch (e) {
           return t;
         }
@@ -9708,6 +9781,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     initDrawnBody(mod);
     initMesses(mod);
     initMemlog();
+    initTrim(mod);
     setTimeout(() => scaleTrialCleanup(), 15e3);
     initBody(mod);
     window.__farmhandOwnPanel = (data) => {

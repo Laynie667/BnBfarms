@@ -13,7 +13,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 | Map tools, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.4** |
 | Dairy | `farmhand-dairy.user.js` | the bot's PC | **1.1.0** |
 | Shows | `farmhand-shows.user.js` | the bot's PC | **1.1.0** |
-| Farmhand Companion | `farmhand-companion.user.js` | each player | **0.28.0** |
+| Farmhand Companion | `farmhand-companion.user.js` | each player | **0.28.1** |
 | Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.4** |
 
 ## Sending a watch report
@@ -23,6 +23,8 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 - Running the watcher on more than one game at once (the bot, yours, a tester's) lets Claude line them up into one timeline.
 
 ## Latest changes (newest first)
+
+- **Companion 0.28.1: /farmmem catches the last seconds.** Laynie's page died again at about 400 MB counted in all, so whatever does it fills the page faster than the half-minute log. Now the Companion also takes a quick look every three seconds (the page's memory, the game's pictures, who's in the room, which screen), keeps the last two minutes, and /farmmem shows the last of those from the page before (the one that died), with the Companion's version at the top. **Companion.**
 
 - **Companion 0.28.0: the game's old pictures are let go.** Laynie's memory log from the crash at 06:10: drawn body and messes holding nothing, the page itself steady at 150 MB, but the game's own pictures climbing all night, 1,117 of them and 632 MB on the graphics card with eight in the room. The game keeps every clothing and body picture it has ever drawn until the page closes. Now, past 380 MB, the ones nobody has drawn for five minutes go, oldest first, down to 260 MB; anything wanted again just loads again. /farmmem says how many have been let go. **Companion.**
 

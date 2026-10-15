@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.28.0
+// @version      0.28.1
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -230,7 +230,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.28.0";
+  var VERSION = "0.28.1";
 
   // extension/src/config.js
   var BOT_MEMBER = 260239;
@@ -8912,16 +8912,51 @@ One of mods you are using is using an old version of SDK. It will work for now b
     save4();
   }
   var line = (s) => new Date(s.t).toTimeString().slice(0, 5) + (s.gap ? " (after a gap)" : "") + "  page " + (s.heapMB ?? "?") + " MB \xB7 game pictures " + (s.gamePics ?? "?") + " (" + (s.madePics ?? 0) + " ours, " + (s.madePicsKB ?? 0) + " KB) \xB7 graphics card " + (s.textureMB ?? "?") + " MB in " + (s.textures ?? "?") + " \xB7 drawn bodies " + (s.body ? s.body.engines + ", keeping " + s.body.keptMB + " MB" : "?") + " \xB7 messes " + (s.mess ? s.mess.pictures : "?") + " \xB7 " + (s.room ?? "?") + " in the room" + (s.let ? " \xB7 " + s.let + " old pictures let go" : "");
+  var FAST = "farmhand-memfast";
+  var born = Date.now();
+  var fast = [];
+  try {
+    const v = JSON.parse(W5.localStorage.getItem(FAST));
+    if (Array.isArray(v)) fast = v.slice(-40);
+  } catch (e) {
+    fast = [];
+  }
+  var lastPage = fast.filter((x) => x.t < born).slice(-12);
+  function quick() {
+    const x = { t: Date.now() };
+    try {
+      if (W5.performance && W5.performance.memory) x.h = Math.round(W5.performance.memory.usedJSHeapSize / 1e6);
+    } catch (e) {
+    }
+    try {
+      const gl = W5.GLDrawCanvas && W5.GLDrawCanvas.GL, tc = gl && gl.textureCache;
+      if (tc) x.p = tc.size;
+    } catch (e) {
+    }
+    try {
+      x.r = (W5.ChatRoomCharacter || []).length;
+      x.s = W5.CurrentScreen;
+    } catch (e) {
+    }
+    fast.push(x);
+    if (fast.length > 40) fast = fast.slice(-40);
+    try {
+      W5.localStorage.setItem(FAST, JSON.stringify(fast));
+    } catch (e) {
+    }
+  }
+  var quickLine = (x) => new Date(x.t).toTimeString().slice(0, 8) + "  page " + (x.h ?? "?") + " MB \xB7 " + (x.p ?? "?") + " pictures \xB7 " + (x.r ?? "?") + " in the room \xB7 " + (x.s || "");
   function memlogText(n) {
     return log.slice(-(n || 20)).map(line).join("\n");
   }
   function initMemlog() {
     setTimeout(tick, 2e4);
     setInterval(tick, 3e4);
+    setInterval(quick, 3e3);
     if (typeof W5.CommandCombine === "function") {
       W5.CommandCombine([{ Tag: "farmmem", Description: ": the Farmhand Companion's memory log (the last hour), and copies it", Action: () => {
         tick();
-        const text = memlogText(24);
+        const text = "Companion v" + VERSION + "\n" + memlogText(24) + (lastPage.length ? "\nThe last seconds of the page before this one:\n" + lastPage.map(quickLine).join("\n") : "");
         try {
           W5.navigator.clipboard.writeText(JSON.stringify(log));
         } catch (e) {

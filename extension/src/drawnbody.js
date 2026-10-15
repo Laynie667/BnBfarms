@@ -113,6 +113,8 @@ function prune() {
   if (gone.size > 400) gone.clear();
   // and anybody who's left the room and not been seen for an hour
   for (const [mn, o] of others) if (Date.now() - o.at > 3600000 && !charOf(mn)) others.delete(mn);
+  // somebody who's left the room: their drawings go (they're big); what they look like stays, and is drawn fresh if they're back
+  for (const [mn, o] of others) if (o.E && Date.now() - o.at > 120000 && !charOf(mn)) o.E = null;
   return n;
 }
 
@@ -142,6 +144,7 @@ function makeEngine(mn) {
     setBody: () => {},          // never: their body items are theirs
     redraw: () => (mn == null ? redraw(60) : redrawMn(mn, 60)),
     picture,
+    budget: mn == null ? 128e6 : 48e6,   // how much of its drawings it keeps (body-engine.js): yours more, everybody else's less
   });
 }
 function engine() { if (!mine.E && W.Player) mine.E = makeEngine(null); if (mine.E) apply(mine.E, eff()); return mine.E; }
@@ -206,7 +209,7 @@ function hook() {
       const C = args[0]; if (!C) return next(args);
       let E = null;
       if (C === W.Player) { if (S.on) E = mine.E || engine(); }
-      else if (seeOthers && typeof C.MemberNumber === "number") { const o = others.get(C.MemberNumber); if (o) { o.at = Date.now(); E = o.E; } }
+      else if (seeOthers && typeof C.MemberNumber === "number") { const o = others.get(C.MemberNumber); if (o) { o.at = Date.now(); if (!o.E) { o.E = makeEngine(C.MemberNumber); if (o.E) apply(o.E, o.S); } E = o.E; } }
       if (!E) return next(args);
       fresh = false;
       let out;

@@ -86,6 +86,7 @@
   }
   if (window.__studioLive) setInterval(() => { const old = Date.now() - 30000; for (const [src, t] of used) if (t < old) { used.delete(src); try { if (window.GLDrawImageCache) GLDrawImageCache.delete(src); if (window.DrawImageCache) DrawImageCache.delete(src); const gl = window.GLDrawCanvas && GLDrawCanvas.GL, tc = gl && gl.textureCache, t2 = tc && tc.get(src); if (t2) { if (t2.texture) gl.deleteTexture(t2.texture); tc.delete(src); } } catch (e) { /* fine */ } } }, 20000);
   const E = window.FarmBodyEngine({ S, bodyItem: (g) => bodyItem(g), setBody: (g, n) => setBody(g, n), redraw: () => bellyDraw(), picture: window.__studioLive ? picture : undefined });
+  window.__studioEngine = E;   // (for looking in from the console: how much it keeps, E.keptBytes())
   const { BELLY, FIT0, poseKey, fitNow, bellySkin, MOULD, mouldKey, mouldImg, edges, edgesOf, outline, bellyCover, bellyAuto, pieceSpan, bellyRows, mouldCanvas,
     BREAST, BREAST_SLIDERS, NIP_GROUPS, HAND_GROUPS, NIP_PIECES, ARM_GROUPS, heldNow, chestSlot, STRAPS, gameBreast, upperName, breastNow, setCup, cupNow, nipHalves, GEN } = E;
   // step into the game's drawing of our character

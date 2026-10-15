@@ -13,7 +13,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 | Map tools, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.4** |
 | Dairy | `farmhand-dairy.user.js` | the bot's PC | **1.1.0** |
 | Shows | `farmhand-shows.user.js` | the bot's PC | **1.1.0** |
-| Farmhand Companion | `farmhand-companion.user.js` | each player | **0.26.1** |
+| Farmhand Companion | `farmhand-companion.user.js` | each player | **0.26.2** |
 | Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.4** |
 
 ## Sending a watch report
@@ -23,6 +23,8 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 - Running the watcher on more than one game at once (the bot, yours, a tester's) lets Claude line them up into one timeline.
 
 ## Latest changes (newest first)
+
+- **Companion 0.26.2: the drawn body keeps less.** Laynie: "it said it stopped working, and even the devtools got disconnected", so the page itself ran out of room. The drawn body keeps every fitted piece it draws so the next drawing is quick, kept by count (60 and 80 pieces), and every Companion-drawn player in the room has a set of their own, kept for an hour after they leave. Now it keeps by size (128 MB for you, 48 MB for each other player, the oldest going first), and a player who's left the room for two minutes has theirs let go (drawn fresh if they come back). The studio keeps 96 MB.
 
 - **Companion 0.26.1: messes don't pile up pictures.** Laynie: "the web page kept crashing too". The game keeps every picture it's handed, and a copy on the graphics card, for good; 0.26.0 made a new mess picture for every pose, every new mess and every minute a fresh one runs, and never let the old ones go, so a long night would have filled the page up. The old picture now comes out of the game's lists a few seconds after the new one goes on, the way the drawn body already did. (Her crashes on Oct 15 came before the messes went live, so this one is a guard; the cause of those is still being looked for.) **Companion.**
 

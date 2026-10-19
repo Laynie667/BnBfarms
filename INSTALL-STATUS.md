@@ -5,7 +5,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 | Script | File in `dist/` | Where it runs | Current |
 |---|---|---|---|
-| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.37.0** |
+| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.37.1** |
 | Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.8.0** |
 | Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.2.1** |
 | Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **1.1.0** |
@@ -23,6 +23,8 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 - Running the watcher on more than one game at once (the bot, yours, a tester's) lets Claude line them up into one timeline.
 
 ## Latest changes (newest first)
+
+- **Bot 0.37.1: trap tiles named for their place.** Laynie: "i tried trap-kennels-1 and am getting traps not in its list." A tile named trap-<place>, plural or not, now springs that place's traps: trap-kennels-1, trap-cabin-2, trap-pigsty, trap-office, trap-gloryholes, trap-goblins, trap-pasture… (and a few other words: barn, sty, woods, pond, camp, field). A trap's own name still wins: trap-kennel is the kennel trap itself, trap-stocks the stocks. ?traps themes says so. **Bot.**
 
 - **Companion 0.30.1: the Farmhand settings page fits a phone.** Laynie: "need to tweak the extension menu so it resides properly on mobile as well." On a phone (or any narrow screen) Preferences → Extensions → Farmhand Companion takes the whole screen, scrolls inside itself, keeps its tabs at the top while you scroll, and nothing spills off the side; boxes are phone-sized so the browser doesn't zoom. (The Log tab was already only on 221397's Companion: CFG.LOG_READERS.) **Companion.**
 

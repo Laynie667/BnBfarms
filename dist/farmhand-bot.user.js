@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.37.0
+// @version      0.37.1
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -1895,7 +1895,7 @@
   ];
 
   // bot/src/version.js
-  var VERSION = "0.37.0";
+  var VERSION = "0.37.1";
 
   // bot-parts:farmhand-bot-parts
   (function() {
@@ -16376,10 +16376,50 @@
       wildlife: { label: "the wild places", near: /^water|^well|^nest|pond|stream|wood|forest|wild|river|lake|creek/, kinds: ["naga", "drake", "hive", "warren", "toms", "wolves", "leeches", "vines", "boar", "goat", "slime", "eggs", "stag"] },
       office: { label: "the office", near: /office|desk|^staff$|clerk/, kinds: ["desk", "inspection", "brand", "pricetag", "scale", "injector", "mirror", "auction", "stamp"] }
     };
+    const THEME_WORDS = {
+      kennels: "kennel",
+      dogyard: "kennel",
+      stall: "stalls",
+      barn: "stalls",
+      dairy: "stalls",
+      milking: "stalls",
+      benches: "bench",
+      stockades: "stockade",
+      square: "stockade",
+      cabins: "cabin",
+      lodge: "cabin",
+      pigsties: "pigsty",
+      sty: "pigsty",
+      pigs: "pigsty",
+      wallow: "pigsty",
+      pastures: "pasture",
+      field: "pasture",
+      fields: "pasture",
+      meadow: "pasture",
+      gloryhole: "glory",
+      gloryholes: "glory",
+      glories: "glory",
+      troughs: "trough",
+      feed: "trough",
+      wild: "wildlife",
+      woods: "wildlife",
+      forest: "wildlife",
+      pond: "wildlife",
+      offices: "office",
+      goblins: "goblin",
+      camp: "goblin",
+      cave: "goblin",
+      orcs: "goblin"
+    };
     function trapTheme(spot) {
       const name = String(spot || "");
       const m = /^trap-theme-([a-z]+)/.exec(name);
       if (m && TRAP_THEMES[m[1]]) return m[1];
+      const w = (/^trap-([a-z]+)/.exec(name) || [])[1];
+      if (w && !TRAP_KINDS[w]) {
+        const th = THEME_WORDS[w] || (TRAP_THEMES[w] ? w : null);
+        if (th) return th;
+      }
       if (!/^trap(?:-\d+)?$/.test(name)) return null;
       const at = L.spots && L.spots[name];
       if (!at) return null;
@@ -16402,7 +16442,7 @@
       return TRAP_THEMES[th].kinds.filter((k) => TRAP_KINDS[k] && !trapWhyNot(mn, k));
     }
     function themesText() {
-      return "\u{1F5FA}\uFE0F TRAPS BY PLACE \xB7 a plain trap tile springs one from the place it's nearest; trap-theme-<place> picks a place outright\n" + Object.entries(TRAP_THEMES).map(([k, T]) => "\n" + k + " (" + T.label + "): " + T.kinds.filter((x) => TRAP_KINDS[x]).join(", ")).join("");
+      return "\u{1F5FA}\uFE0F TRAPS BY PLACE \xB7 name a tile trap-<place> (trap-kennels-1, trap-cabin-2, trap-gloryholes) for that place's traps; a plain trap tile (trap, trap-3) springs from the place it's nearest\n" + Object.entries(TRAP_THEMES).map(([k, T]) => "\n" + k + " (" + T.label + "): " + T.kinds.filter((x) => TRAP_KINDS[x]).join(", ")).join("");
     }
     Object.assign(TRAP_KINDS, {
       groomer: { icon: "\u{1FAAE}", what: "the kennel's grooming table: bathed, brushed, fluffed and shown off", limit: /\b(groom|bath|wash|pet ?play)/i },

@@ -22,10 +22,19 @@
     wildlife: { label: "the wild places", near: /^water|^well|^nest|pond|stream|wood|forest|wild|river|lake|creek/, kinds: ["naga", "drake", "hive", "warren", "toms", "wolves", "leeches", "vines", "boar", "goat", "slime", "eggs", "stag"] },
     office:   { label: "the office",      near: /office|desk|^staff$|clerk/,          kinds: ["desk", "inspection", "brand", "pricetag", "scale", "injector", "mirror", "auction", "stamp"] },
   };
+  const THEME_WORDS = { kennels: "kennel", dogyard: "kennel", stall: "stalls", barn: "stalls", dairy: "stalls", milking: "stalls", benches: "bench",
+    stockades: "stockade", square: "stockade", cabins: "cabin", lodge: "cabin", pigsties: "pigsty", sty: "pigsty", pigs: "pigsty", wallow: "pigsty",
+    pastures: "pasture", field: "pasture", fields: "pasture", meadow: "pasture", gloryhole: "glory", gloryholes: "glory", glories: "glory",
+    troughs: "trough", feed: "trough", wild: "wildlife", woods: "wildlife", forest: "wildlife", pond: "wildlife", offices: "office",
+    goblins: "goblin", camp: "goblin", cave: "goblin", orcs: "goblin" };
   // which place a trap tile is in: named for it, or the nearest of the farm's spots that says so
   function trapTheme(spot){
     const name = String(spot || "");
     const m = /^trap-theme-([a-z]+)/.exec(name); if (m && TRAP_THEMES[m[1]]) return m[1];
+    // trap-kennels-1, trap-cabin, trap-gloryholes-2 (Laynie, Oct 19: "i tried trap-kennels-1"): a place's name, or its
+    // plural, after trap-. A trap's own name still wins (trap-kennel is the kennel trap, trap-kennels any kennel trap).
+    const w = (/^trap-([a-z]+)/.exec(name) || [])[1];
+    if (w && !TRAP_KINDS[w]){ const th = THEME_WORDS[w] || (TRAP_THEMES[w] ? w : null); if (th) return th; }
     if (!/^trap(?:-\d+)?$/.test(name)) return null;            // a trap-<kind> tile is its own trap
     const at = L.spots && L.spots[name]; if (!at) return null;
     let best = null, bestD = 11;
@@ -43,6 +52,6 @@
     return TRAP_THEMES[th].kinds.filter(k => TRAP_KINDS[k] && !trapWhyNot(mn, k));
   }
   function themesText(){
-    return "🗺️ TRAPS BY PLACE · a plain trap tile springs one from the place it's nearest; trap-theme-<place> picks a place outright\n"+
+    return "🗺️ TRAPS BY PLACE · name a tile trap-<place> (trap-kennels-1, trap-cabin-2, trap-gloryholes) for that place's traps; a plain trap tile (trap, trap-3) springs from the place it's nearest\n"+
       Object.entries(TRAP_THEMES).map(([k, T]) => "\n"+k+" ("+T.label+"): "+T.kinds.filter(x => TRAP_KINDS[x]).join(", ")).join("");
   }

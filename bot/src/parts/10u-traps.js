@@ -465,7 +465,18 @@
   }
 
   // ── commands ───────────────────────────────────────────────
-  function trapsList(){ return Object.entries(TRAP_KINDS).map(([k, t]) => t.icon+" "+k+": "+t.what).join("\n"); }
+  // the traps by place, names only (there are over a hundred now: ?traps <name> says what one does)
+  function trapsList(){
+    const placed = new Set(), out = [];
+    for (const T of Object.values(TRAP_THEMES)){ const ks = T.kinds.filter(k => TRAP_KINDS[k]); ks.forEach(k => placed.add(k)); if (ks.length) out.push(T.label+": "+ks.join(", ")); }
+    const rest = Object.keys(TRAP_KINDS).filter(k => !placed.has(k) && !/^keep-|^custom/.test(k));
+    if (rest.length) out.push("anywhere: "+rest.join(", "));
+    return out.join("\n")+"\n?traps <name> says what one does.";
+  }
+  function trapAbout(k){
+    const T = TRAP_KINDS[k], lim = T.limit ? String(T.limit.source).replace(/\\b|[()?^$]|\\s/g, "").split("|").filter(Boolean).join(", ") : "";
+    return T.icon+" "+k+": "+T.what+"."+(lim ? " Limits that mention "+lim+" rule it out." : "");
+  }
   function trapCommand(cmd, sender, args, R){
     const r = rec(sender), a0 = String(args[0] || "").toLowerCase();
     if (cmd === "watersports"){
@@ -516,7 +527,8 @@
       return true;
     }
     if (cmd === "traps" || cmd === "trap"){
-      if (a0 === "themes" || a0 === "places"){ R(themesText()); return true; }   // which traps each place springs (10ua-trap-themes.js)
+      if (a0 === "themes" || a0 === "places"){ R(themesText()); return true; }
+      if (a0 && TRAP_KINDS[a0]){ R(trapAbout(a0)); return true; }   // ?traps bearskin: what that one does   // which traps each place springs (10ua-trap-themes.js)
       if (a0 === "on" || a0 === "off"){
         if (!isSubject(sender)){ R("Only a test subject has traps to switch, sugar."); return true; }
         r.trapsOff = a0 === "off"; if (r.trapsOff) trapStop(sender, 0); r.trapQuiet = 0; saveLedger();

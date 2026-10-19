@@ -28,6 +28,7 @@
 */
 import { fitting, fits, untag } from "../_lib/connect.js";
 import { OWN, GEAR, KIND, SOUND, MORE as M2 } from "./scenes-more.js";
+import * as VM from "./visitors-more.js";   // more visitors: goblins, orcs, a minotaur, tentacles, an imp, and more farm folk (Oct 19)
 
 const pickFrom = (a) => a[Math.floor(Math.random() * a.length)];
 const between = (lo, hi) => lo + Math.random() * (hi - lo);
@@ -44,7 +45,7 @@ export const TYPES = {
 };
 export const SIZES = { modest: { w: 30, ml: [10, 20] }, thick: { w: 34, ml: [18, 35] }, huge: { w: 24, ml: [30, 60] }, hyper: { w: 12, ml: [60, 140] } };
 const LOAD_X = { human: 1, canine: 1.2, equine: 1.6, feline: 0.9, draconic: 1.3, double: 1.5 };
-const BIG = (v) => v.size === "huge" || v.size === "hyper" || v.type === "equine";
+const BIG = (v) => v.size === "huge" || v.size === "hyper" || v.type === "equine" || v.type === "bovine" || v.type === "orc";
 
 export function pickVisitor(holes) {
   const types = Object.entries(TYPES).filter(([k]) => k !== "double" || (holes.includes("vulva") && holes.includes("butt")));
@@ -53,6 +54,8 @@ export function pickVisitor(holes) {
   const sz = Object.entries(SIZES); let s = Math.random() * sz.reduce((a, [, x]) => a + x.w, 0), size = "thick";
   for (const [k, x] of sz) { s -= x.w; if (s <= 0) { size = k; break; } }
   if (type === "equine" && size === "modest") size = "thick";   // there's no such thing as a modest horse
+  if ((type === "orc" || type === "bovine") && (size === "modest" || size === "thick")) size = "huge";   // nor a modest orc or minotaur
+  if (type === "goblin" && size === "hyper") size = "thick";   // a goblin's all balls
   return { type, size };
 }
 // a real visitor's own cock, in the same words
@@ -129,10 +132,13 @@ const PERSONAS = {
     pace: "rough", short: true,
   },
 };
-function pickPersona(hole, rough) {
+function pickPersona(hole, rough, v) {
+  // a visitor of a kind with its own characters (goblins, the orc, the minotaur…) is usually one of them
+  const own = Object.keys(PERSONAS).filter((k) => PERSONAS[k].type && v && PERSONAS[k].type === v.type);
+  if (own.length && chance(0.8)) return own[Math.floor(Math.random() * own.length)];
   // on a punishment shift, mostly the rough and the deep ones
-  if (rough && chance(0.75)) { const r = Object.keys(PERSONAS).filter((k) => ["rough", "deep"].includes(PERSONAS[k].pace)); if (r.length) return r[Math.floor(Math.random() * r.length)]; }
-  const keys = Object.keys(PERSONAS).filter((k) => !PERSONAS[k].prefers || PERSONAS[k].prefers === hole || chance(0.3));
+  if (rough && chance(0.75)) { const r = Object.keys(PERSONAS).filter((k) => !PERSONAS[k].type && ["rough", "deep"].includes(PERSONAS[k].pace)); if (r.length) return r[Math.floor(Math.random() * r.length)]; }
+  const keys = Object.keys(PERSONAS).filter((k) => !PERSONAS[k].type && (!PERSONAS[k].prefers || PERSONAS[k].prefers === hole || chance(0.3)));
   return keys[Math.floor(Math.random() * keys.length)];
 }
 
@@ -411,7 +417,8 @@ function finishLine(v, hole, ml, inside, funnel, pick = pickFrom) {
     case "feline": return "It cums in quick hard jerks deep in " + place + ": " + amt + ", and the barbs rake every inch of %n on the way out.";
     case "draconic": return "Every ridge swells and throbs at once as it empties into " + place + ": " + amt + ", hot as bathwater.";
     case "double": return "Both cocks unload at once, one into %n's pussy and one into %n's ass: " + amt + " between them, filling %n from both ends.";
-    default: return pick(["It buries itself to the hilt and cums deep in " + place + ": " + amt + ", throbbing with every spurt while %n shudders around it.",
+    default: if (VM.FINISH[v.type]) return VM.FINISH[v.type](place, amt);
+      return pick(["It buries itself to the hilt and cums deep in " + place + ": " + amt + ", throbbing with every spurt while %n shudders around it.",
                               "With a strangled groan it empties into " + place + ": " + amt + ", pulse after pulse, until %n can feel the heat of it spreading."]);
   }
 }
@@ -631,7 +638,7 @@ function freshPicker(body) {
 
 // one stranger, start to finish, as a little story
 function oneVisitor(beats, { hole, visitor, funnel, degrade, praise, rounds, first, holes, pick, rough, gear, animal, body }) {
-  const v = visitor, persona = PERSONAS[pickPersona(hole, rough)];
+  const v = visitor, persona = PERSONAS[pickPersona(hole, rough, v)];
   const add = (t, extra) => { if (t) beats.push(Object.assign({ t }, extra || {})); };
   const talk = () => (chance(0.6) ? "A voice through the boards: " + pick(persona.talk) : null);
   const voice = () => (degrade && chance(0.35) ? "A voice through the boards: " + kindWords(pick(TAUNTS), animal) : praise && chance(0.35) ? "A voice through the boards: " + kindWords(pick(PRAISES), animal) : null);
@@ -1068,3 +1075,11 @@ export function buildRealScene({ hole, visitor, funnel, ml, inside, body }) {
 }
 
 addOct15();
+
+// the new visitors (visitors-more.js), into the pools above
+Object.assign(TYPES, VM.TYPES);
+Object.assign(LOAD_X, VM.LOAD_X);
+Object.assign(REVEAL, VM.REVEAL);
+Object.assign(ENTRY, VM.ENTRY);
+Object.assign(TYPE_RHYTHM, VM.TYPE_RHYTHM);
+Object.assign(PERSONAS, VM.PERSONAS);

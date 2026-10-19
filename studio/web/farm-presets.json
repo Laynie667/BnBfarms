@@ -1,5 +1,5 @@
 {
- "made": "2026-10-19T18:01:49.337Z",
+ "made": "2026-10-19T18:51:25.730Z",
  "sets": [
   {
    "group": "Traps",
@@ -1864,6 +1864,333 @@
    ]
   },
   {
+   "group": "Traps",
+   "name": "👺 goblinraid",
+   "what": "a goblin raiding party: caught, tied and taken turns on by every one of them",
+   "pieces": [
+    {
+     "slot": "ropeArms",
+     "groups": [
+      "ItemArms"
+     ],
+     "items": [
+      "HempRope",
+      "HempRope"
+     ],
+     "color": null,
+     "label": "Goblin Rope",
+     "when": "hold",
+     "mins": null,
+     "desc": "Far too much rope, tied with far too many knots, by a dozen goblins who all wanted to help."
+    },
+    {
+     "slot": "tag",
+     "groups": [
+      "ItemNeckAccessories"
+     ],
+     "items": [
+      "CollarNameTag",
+      "CollarBell",
+      "CollarNameTagLivestock",
+      "CollarNameTag"
+     ],
+     "color": null,
+     "label": "Goblin Trophy Token",
+     "when": "after",
+     "mins": 30,
+     "desc": "A carved bone token on a thong round the neck: the raiding party's mark, meaning CAUGHT."
+    }
+   ]
+  },
+  {
+   "group": "Traps",
+   "name": "🕳️ goblinpit",
+   "what": "the goblins' breeding pit, and the goblins who keep it",
+   "pieces": [
+    {
+     "slot": "ropeFeet",
+     "groups": [
+      "ItemFeet"
+     ],
+     "items": [
+      "HempRope",
+      "HempRope"
+     ],
+     "color": null,
+     "label": "Pit Stakes",
+     "when": "hold",
+     "mins": null,
+     "desc": "Ankles staked wide in the straw of the breeding pit, so the goblins can work in turns."
+    }
+   ]
+  },
+  {
+   "group": "Traps",
+   "name": "💰 goblinmarket",
+   "what": "the goblin market: put on a block and haggled over",
+   "pieces": [
+    {
+     "slot": "leash",
+     "groups": [
+      "ItemNeckRestraints"
+     ],
+     "items": [
+      "CollarLeash",
+      "ChainLeash",
+      "CollarChainLong",
+      "CollarLeash",
+      "CollarChainShort"
+     ],
+     "color": null,
+     "label": "Market Rope",
+     "when": "hold",
+     "mins": null,
+     "desc": "A frayed rope round the neck, held by whichever goblin's bid is highest this minute."
+    }
+   ]
+  },
+  {
+   "group": "Traps",
+   "name": "🛒 goblincart",
+   "what": "trussed up on the goblin cart and paraded round the camp",
+   "pieces": [
+    {
+     "slot": "ropeArms",
+     "groups": [
+      "ItemArms"
+     ],
+     "items": [
+      "HempRope",
+      "HempRope"
+     ],
+     "color": null,
+     "label": "Cart Lashings",
+     "when": "hold",
+     "mins": null,
+     "desc": "Every bit of string the goblins own, lashing wrists and ankles to the cart bed."
+    },
+    {
+     "slot": "ropeFeet",
+     "groups": [
+      "ItemFeet"
+     ],
+     "items": [
+      "HempRope",
+      "HempRope"
+     ],
+     "color": null,
+     "label": "Cart Lashings (legs)",
+     "when": "hold",
+     "mins": null,
+     "desc": "More string, round the ankles, tied to the cart wheels' axle."
+    }
+   ]
+  },
+  {
+   "group": "Traps",
+   "name": "🪓 warband",
+   "what": "the orc warchief's tent, and his idea of tribute",
+   "pieces": [
+    {
+     "slot": "tag",
+     "groups": [
+      "ItemNeckAccessories"
+     ],
+     "items": [
+      "CollarNameTag",
+      "CollarNameTagLivestock",
+      "CollarNameTagLivestock",
+      "CollarNameTag"
+     ],
+     "color": null,
+     "label": "Tribute Token",
+     "when": "after",
+     "mins": 30,
+     "desc": "A tusk on a leather thong: the warchief's tribute token, meaning his."
+    }
+   ]
+  },
+  {
+   "group": "Traps",
+   "name": "🪑 studchair",
+   "what": "the breeding chair, and a line of studs with appointments",
+   "pieces": [
+    {
+     "slot": "device",
+     "groups": [
+      "ItemDevices"
+     ],
+     "items": [
+      "BondageBench",
+      "Table",
+      "WoodenStocks"
+     ],
+     "color": null,
+     "label": "Breeding Chair",
+     "when": "hold",
+     "mins": null,
+     "desc": "A tilted chair in worn red leather with stirrups, straps at the wrists and waist, built to keep hips up."
+    }
+   ]
+  },
+  {
+   "group": "Traps",
+   "name": "🚧 squeezechute",
+   "what": "the cattle squeeze chute: clamped in, handled, and let out when they're done",
+   "pieces": [
+    {
+     "slot": "device",
+     "groups": [
+      "ItemDevices"
+     ],
+     "items": [
+      "WoodenStocks",
+      "LowCage",
+      "Kennel",
+      "WoodenStocks"
+     ],
+     "color": null,
+     "label": "Squeeze Chute",
+     "when": "hold",
+     "mins": null,
+     "desc": "The cattle chute's padded steel sides, closed snug, and a head gate across the neck."
+    }
+   ]
+  },
+  {
+   "group": "Traps",
+   "name": "🧶 twine",
+   "what": "baler twine in the hayloft, and somebody who knows knots",
+   "pieces": [
+    {
+     "slot": "ropeArms",
+     "groups": [
+      "ItemArms"
+     ],
+     "items": [
+      "HempRope",
+      "HempRope"
+     ],
+     "color": null,
+     "label": "Baler Twine",
+     "when": "hold",
+     "mins": null,
+     "desc": "Orange baler twine, wrists to elbows to back, tied by somebody who knows exactly what they're doing."
+    },
+    {
+     "slot": "torso",
+     "groups": [
+      "ItemTorso",
+      "ItemTorso2"
+     ],
+     "items": [
+      "HempRopeHarness",
+      "Harness",
+      "TentacleSuit",
+      "HempRopeHarness"
+     ],
+     "color": null,
+     "label": "Twine Harness",
+     "when": "hold",
+     "mins": null,
+     "desc": "A diamond of twine over the chest and down the belly, knotted tight."
+    }
+   ]
+  },
+  {
+   "group": "Traps",
+   "name": "🪵 yoke",
+   "what": "the milkmaid's yoke: locked across your shoulders with full buckets on it",
+   "pieces": [
+    {
+     "slot": "arms",
+     "groups": [
+      "ItemArms"
+     ],
+     "items": [
+      "Pillory",
+      "WoodenCuffs",
+      "HempRope",
+      "LeatherCuffs"
+     ],
+     "color": null,
+     "label": "Milkmaid's Yoke",
+     "when": "hold",
+     "mins": null,
+     "desc": "A shaped wooden yoke across the shoulders, wrists cuffed at either end, a bucket hook on each side."
+    }
+   ]
+  },
+  {
+   "group": "Traps",
+   "name": "🐴 ponycart",
+   "what": "harnessed to the pony cart, bit in, and driven round the farm",
+   "pieces": [
+    {
+     "slot": "funnel",
+     "groups": [
+      "ItemMouth",
+      "ItemMouth2",
+      "ItemMouth3"
+     ],
+     "items": [
+      "HarnessPonyBits",
+      "BitGag",
+      "FunnelGag"
+     ],
+     "color": null,
+     "label": "Cart Bit",
+     "when": "hold",
+     "mins": null,
+     "desc": "A steel bit and bridle, reins running back to the driver's hands."
+    },
+    {
+     "slot": "torso",
+     "groups": [
+      "ItemTorso",
+      "ItemTorso2"
+     ],
+     "items": [
+      "HarnessPonyBits",
+      "Harness",
+      "LeatherHarness",
+      "TentacleSuit",
+      "HempRopeHarness"
+     ],
+     "color": null,
+     "label": "Cart Harness",
+     "when": "hold",
+     "mins": null,
+     "desc": "A pony's harness: breastcollar, girth, traces to the cart shafts."
+    }
+   ]
+  },
+  {
+   "group": "Traps",
+   "name": "🧈 buttermill",
+   "what": "the butter churn: strapped to it and churned till there's butter everywhere",
+   "pieces": [
+    {
+     "slot": "torso",
+     "groups": [
+      "ItemTorso",
+      "ItemTorso2"
+     ],
+     "items": [
+      "LeatherHarness",
+      "Harness",
+      "TentacleSuit",
+      "HempRopeHarness"
+     ],
+     "color": null,
+     "label": "Churn Harness",
+     "when": "hold",
+     "mins": null,
+     "desc": "A leather harness hooked to the churn's arm, for walking round and round."
+    }
+   ]
+  },
+  {
    "group": "Mystery box",
    "name": "🎁 Growin' Plug (pussy)",
    "what": "It swells a size every ten minutes.",
@@ -2598,7 +2925,9 @@
    "name": "cream",
    "color": "#FFF4DC",
    "traps": [
-    "stocks"
+    "stocks",
+    "buttermill",
+    "pieeat"
    ]
   },
   {
@@ -2609,7 +2938,9 @@
   {
    "name": "maple",
    "color": "#8B4A1C",
-   "traps": []
+   "traps": [
+    "syruptap"
+   ]
   },
   {
    "name": "chocolate",
@@ -2630,14 +2961,16 @@
     "milker",
     "cups",
     "carousel",
-    "milkinghole"
+    "milkinghole",
+    "yoke"
    ]
   },
   {
    "name": "slime",
    "color": "#5FAE3A",
    "traps": [
-    "vines"
+    "vines",
+    "clutch"
    ]
   },
   {
@@ -2646,7 +2979,9 @@
    "traps": [
     "plow",
     "mudpit",
-    "hogtie"
+    "hogtie",
+    "goblincart",
+    "mudslide"
    ]
   },
   {

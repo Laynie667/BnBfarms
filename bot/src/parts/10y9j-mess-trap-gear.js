@@ -38,3 +38,22 @@
     inspection:  [{ when: "after", slot: "tag", label: "Inspection Tag", items: ["CollarNameTagLivestock", "CollarNameTag"], mins: 30, desc: "An inspection tag on the collar: FIT FOR PURPOSE, the clerk's initials, and a number." }],
     stamp:       [],
   });
+  // the second batch (10uc-traps-batch2.js), Oct 19
+  Object.assign(TRAP_GEAR, {
+    goblinraid:   [{ when: "hold", slot: "ropeArms", label: "Goblin Rope", items: ["HempRope"], desc: "Far too much rope, tied with far too many knots, by a dozen goblins who all wanted to help." },
+                   { when: "after", slot: "tag", label: "Goblin Trophy Token", items: ["CollarNameTag", "CollarBell"], mins: 30, desc: "A carved bone token on a thong round the neck: the raiding party's mark, meaning CAUGHT." }],
+    goblinpit:    [{ when: "hold", slot: "ropeFeet", label: "Pit Stakes", items: ["HempRope"], desc: "Ankles staked wide in the straw of the breeding pit, so the goblins can work in turns." }],
+    goblinmarket: [{ when: "hold", slot: "leash", label: "Market Rope", items: ["CollarLeash", "ChainLeash"], desc: "A frayed rope round the neck, held by whichever goblin's bid is highest this minute." }],
+    goblincart:   [{ when: "hold", slot: "ropeArms", label: "Cart Lashings", items: ["HempRope"], desc: "Every bit of string the goblins own, lashing wrists and ankles to the cart bed." },
+                   { when: "hold", slot: "ropeFeet", label: "Cart Lashings (legs)", items: ["HempRope"], desc: "More string, round the ankles, tied to the cart wheels' axle." }],
+    warband:      [{ when: "after", slot: "tag", label: "Tribute Token", items: ["CollarNameTag", "CollarNameTagLivestock"], mins: 30, desc: "A tusk on a leather thong: the warchief's tribute token, meaning his." }],
+    werewolf:     [],
+    studchair:    [{ when: "hold", slot: "device", label: "Breeding Chair", items: ["BondageBench", "Table"], desc: "A tilted chair in worn red leather with stirrups, straps at the wrists and waist, built to keep hips up." }],
+    squeezechute: [{ when: "hold", slot: "device", label: "Squeeze Chute", items: ["WoodenStocks", "LowCage", "Kennel"], desc: "The cattle chute's padded steel sides, closed snug, and a head gate across the neck." }],
+    twine:        [{ when: "hold", slot: "ropeArms", label: "Baler Twine", items: ["HempRope"], desc: "Orange baler twine, wrists to elbows to back, tied by somebody who knows exactly what they're doing." },
+                   { when: "hold", slot: "torso", label: "Twine Harness", items: ["HempRopeHarness", "Harness"], desc: "A diamond of twine over the chest and down the belly, knotted tight." }],
+    yoke:         [{ when: "hold", slot: "arms", label: "Milkmaid's Yoke", items: ["Pillory", "WoodenCuffs"], desc: "A shaped wooden yoke across the shoulders, wrists cuffed at either end, a bucket hook on each side." }],
+    ponycart:     [{ when: "hold", slot: "funnel", label: "Cart Bit", items: ["HarnessPonyBits", "BitGag"], desc: "A steel bit and bridle, reins running back to the driver's hands." },
+                   { when: "hold", slot: "torso", label: "Cart Harness", items: ["HarnessPonyBits", "Harness", "LeatherHarness"], desc: "A pony's harness: breastcollar, girth, traces to the cart shafts." }],
+    buttermill:   [{ when: "hold", slot: "torso", label: "Churn Harness", items: ["LeatherHarness", "Harness"], desc: "A leather harness hooked to the churn's arm, for walking round and round." }],
+  });

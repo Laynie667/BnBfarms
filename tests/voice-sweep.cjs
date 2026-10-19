@@ -38,7 +38,7 @@ const report={bodies:{},kinds:[],problems:[]};
   chars[1].Name='Laynie'; BODIES.forEach(([mn,name],i)=>chars[i+2].Name=name);
   for (const [mn] of BODIES) await say(mn,'?stats',800);
   let n=sent.length; await say(221397,'?trap spring Moo nosuchkind',900);
-  const kinds=((since(n).join(' ').match(/Kinds: ([a-z, ]+)\./)||[])[1]||"").split(/,\s*/).filter(Boolean);
+  const kinds=Object.keys(W.__farmSets().TRAP_KINDS).filter(k=>!/^keep-|^custom/.test(k));   // (the ?trap spring list got too long for one message)
   report.kinds=kinds; ok(kinds.length>=20, 'found the traps: '+kinds.length);
   const only=(process.env.SWEEP_KINDS||'').split(',').filter(Boolean), run=only.length?kinds.filter(k=>only.includes(k)):kinds;   // SWEEP_KINDS=leeches,milker for a quick look
   for (const [mn,name,g,sp] of BODIES){

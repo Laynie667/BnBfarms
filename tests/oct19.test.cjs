@@ -40,7 +40,7 @@ const done=async(mn,ms)=>{ for(let i=0;i<60;i++){ await wait(250); if(!(W.__st()
   const marks=(n,mn)=>sent.slice(n).filter(([e,d])=>d&&d.Content==='FarmhandMsg'&&d.Dictionary&&d.Dictionary.type==='mark'&&(!mn||d.Target===mn)).map(([e,d])=>d.Dictionary);
   const farmTo=(mn,type,n)=>sent.slice(n||0).filter(([e,d])=>d&&d.Content==='FarmhandMsg'&&d.Target===mn&&d.Dictionary.type===type).map(([e,d])=>d.Dictionary);
   // ── the new themed traps all run, start to finish, with lines that fit ──
-  const NEW=["groomer","whelping","leashpost","teatcheck","wax","tomatoes","bearskin","trophy","hottub","slop","hogtie","booth","milkinghole","feedbag","stag","desk","inspection","stamp"];
+  const NEW=["groomer","whelping","leashpost","teatcheck","wax","tomatoes","bearskin","trophy","hottub","slop","hogtie","booth","milkinghole","feedbag","stag","desk","inspection","stamp","goblinraid","goblinpit","goblinmarket","goblincart","warband","minotaur","werewolf","foxden","lionpride","ramstud","shrine","studchair","clutch","buttermill","syruptap","pieeat","mudslide","squeezechute","twine","yoke","ponycart"];
   const broke=[], silent=[];
   for (const k of NEW){
     free(500); prod(500).milk=400; let n=sent.length;
@@ -57,7 +57,7 @@ const done=async(mn,ms)=>{ for(let i=0;i<60;i++){ await wait(250); if(!(W.__st()
   const kinds=(spot,times)=>{ const got=new Set(); for(let i=0;i<times;i++){ free(500); const r=P(500); r.trapLog=[]; W.__heard; } return got; };
   const picks=new Set();
   for (let i=0;i<14;i++){ free(500); let n=sent.length; moveTo(500,22,21); W.__st().trapAt=new Map(); P(500).spotTrapAt={}; P(500).trapAt=0; W.__trapTick(); await wait(150); const lg=P(500).trapLog||[]; const last=lg[lg.length-1]; if (last && last.spot==="trap-7") picks.add(last.kind); if (W.__st().trapRuns) W.__st().trapRuns.delete(500); }
-  const KENNEL=["kennel","wolves","teaser","crate","bell","groomer","whelping","leashpost"];
+  const KENNEL=W.__themes ? W.__themes().kennel.kinds : ["kennel","wolves","teaser","crate","bell","groomer","whelping","leashpost","werewolf","foxden"];
   ok(picks.size && [...picks].every(k=>KENNEL.includes(k)), 'a plain trap tile by the kennels springs kennel traps ('+[...picks].join(", ")+')');
   let n=sent.length; await say(221397,'?traps themes',900);
   ok(/TRAPS BY PLACE/.test(all(n)) && /cabin/.test(all(n)) && /bearskin/.test(all(n)), '?traps themes lists the places and their traps');

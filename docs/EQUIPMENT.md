@@ -96,6 +96,16 @@ A bull-man who locks your neck in the gate and milks you while he ruts you.
 - **How to get it:** a tile named `trap-bull`.
 - **Equipment:** none yet.
 
+### 🧈 buttermill
+
+The butter churn: strapped to it and churned till there's butter everywhere.
+
+- **How to get it:** a tile named `trap-buttermill`.
+- **Ruled out by limits mentioning:** food, messy, milk, splosh.
+- **Mess it leaves:** cream on the face and chest and tummy.
+- **Equipment:**
+  - **Churn Harness** (torso, while the trap holds them). Game items: LeatherHarness, Harness, TentacleSuit, HempRopeHarness. A leather harness hooked to the churn's arm, for walking round and round.
+
 ### 🎠 carousel
 
 The milkin' carousel: milked, filled, and round again.
@@ -125,6 +135,15 @@ A clamp shuts over you: no cummin' for half an hour, and it keeps you right on t
 - **Ruled out by limits mentioning:** denial, chast, orgasm, edg.
 - **Equipment:**
   - **Denial Clamp** (belt, after the trap, for a while). Game items: SteelChastityPanties, HeavyDutyBelt, MetalChastityBelt, PolishedChastityBelt, LeatherChastityBelt, SleekLeatherChastityBelt. Cold steel locked over everything worth touching. Inside, something soft licks and hums and stops, over and over. No cumming until it lets go.
+
+### 🥚 clutch
+
+The thing in the pond that lays its eggs in whoever wades in.
+
+- **How to get it:** a tile named `trap-clutch`.
+- **Ruled out by limits mentioning:** egg, ovipo, tentacl.
+- **Mess it leaves:** slime on the tummy.
+- **Equipment:** none yet.
 
 ### 🧪 collection
 
@@ -219,6 +238,15 @@ The chocolate fountain: tipped in, held under the flow, licked clean.
 - **Equipment:**
   - **Fountain Cuffs** (arms, while the trap holds them). Game items: LeatherCuffs, SteelCuffs, HempRope. Brass cuffs on short chains bolted to the fountain's rim, holding them right under the warm, slow curtain of chocolate.
 
+### 🦊 foxden
+
+The fox-brothers' den: teased silly, then shared.
+
+- **How to get it:** a tile named `trap-foxden`.
+- **Ruled out by limits mentioning:** tickl, gang, breed, anthro.
+- **Mess it leaves:** cum on the tummy.
+- **Equipment:** none yet.
+
 ### 💨 gas
 
 A puff of pink mist and you're in heat for an hour.
@@ -242,6 +270,47 @@ A billy goat who puts you on your knees and uses your mouth.
 - **How to get it:** a tile named `trap-goat`.
 - **Ruled out by limits mentioning:** oral, throat.
 - **Equipment:** none yet.
+
+### 🛒 goblincart
+
+Trussed up on the goblin cart and paraded round the camp.
+
+- **How to get it:** a tile named `trap-goblincart`.
+- **Ruled out by limits mentioning:** goblin, rope, display, humiliat.
+- **Mess it leaves:** mud on the chest and tummy.
+- **Equipment:**
+  - **Cart Lashings** (ropeArms, while the trap holds them). Game items: HempRope. Every bit of string the goblins own, lashing wrists and ankles to the cart bed.
+  - **Cart Lashings (legs)** (ropeFeet, while the trap holds them). Game items: HempRope. More string, round the ankles, tied to the cart wheels' axle.
+
+### 💰 goblinmarket
+
+The goblin market: put on a block and haggled over.
+
+- **How to get it:** a tile named `trap-goblinmarket`.
+- **Ruled out by limits mentioning:** goblin, auction, sold, humiliat.
+- **Equipment:**
+  - **Market Rope** (leash, while the trap holds them). Game items: CollarLeash, ChainLeash, CollarChainLong, CollarChainShort. A frayed rope round the neck, held by whichever goblin's bid is highest this minute.
+
+### 🕳️ goblinpit
+
+The goblins' breeding pit, and the goblins who keep it.
+
+- **How to get it:** a tile named `trap-goblinpit`.
+- **Ruled out by limits mentioning:** goblin, breed, pregnan.
+- **Mess it leaves:** cum on the tummy.
+- **Equipment:**
+  - **Pit Stakes** (ropeFeet, while the trap holds them). Game items: HempRope. Ankles staked wide in the straw of the breeding pit, so the goblins can work in turns.
+
+### 👺 goblinraid
+
+A goblin raiding party: caught, tied and taken turns on by every one of them.
+
+- **How to get it:** a tile named `trap-goblinraid`.
+- **Ruled out by limits mentioning:** goblin, gang, breed.
+- **Mess it leaves:** cum on the tummy and face.
+- **Equipment:**
+  - **Goblin Rope** (ropeArms, while the trap holds them). Game items: HempRope. Far too much rope, tied with far too many knots, by a dozen goblins who all wanted to help.
+  - **Goblin Trophy Token** (tag, after the trap, for 30 min). Game items: CollarNameTag, CollarBell, CollarNameTagLivestock. A carved bone token on a thong round the neck: the raiding party's mark, meaning CAUGHT.
 
 ### 🪮 groomer
 
@@ -360,6 +429,15 @@ Fat leeches out of the trough, latched on your teats and anywhere else that's so
 - **Equipment:**
   - **Trough Leeches** (cups, after the trap, for 20 min). Game items: LactationPump, NippleSuctionCups. Two fat black leeches latched on swollen teats, pulsing as they feed. They drop off when they're full, and not a minute sooner.
 
+### 🦁 lionpride
+
+The pride's lion, and a lioness who holds you down for him.
+
+- **How to get it:** a tile named `trap-lionpride`.
+- **Ruled out by limits mentioning:** breed, beast, anthro, barb.
+- **Mess it leaves:** cum on the tummy.
+- **Equipment:** none yet.
+
 ### 🌽 maze
 
 The corn maze, and somethin' in the corn huntin' you.
@@ -387,6 +465,15 @@ The milking hole: something on the other side of the wall wants your milk.
 - **Mess it leaves:** milk on the chest.
 - **Equipment:**
   - **Through-the-Wall Cups** (cups, while the trap holds them). Game items: LactationPump, NippleSuctionCups. Whatever's on the other side of the milking hole has cups, and they are very, very strong.
+
+### 🐂 minotaur
+
+The minotaur in the back paddock, and a bull's idea of a cow.
+
+- **How to get it:** a tile named `trap-minotaur`.
+- **Ruled out by limits mentioning:** size, breed, beast, anthro.
+- **Mess it leaves:** cum on the tummy and chest.
+- **Equipment:** none yet.
 
 ### 🪞 mirror
 
@@ -421,6 +508,15 @@ The mud pit, with another subject: wrestle, and the winner has the loser.
 - **Mess it leaves:** mud on the face and chest and tummy.
 - **Equipment:** none yet.
 
+### 🛝 mudslide
+
+The mudslide in the bottom field, and the mud at the end of it.
+
+- **How to get it:** a tile named `trap-mudslide`.
+- **Ruled out by limits mentioning:** mud, messy, filth.
+- **Mess it leaves:** mud on the face and chest and tummy.
+- **Equipment:** none yet.
+
 ### 🐍 naga
 
 A naga who coils you up and takes two holes at once.
@@ -446,6 +542,15 @@ A paddle wheel: twenty strokes, counted for the whole yard.
 - **Ruled out by limits mentioning:** spank, paddl, pain, impact.
 - **Equipment:** none yet.
 
+### 🥧 pieeat
+
+The pie-eating contest: hands tied, face first, and you don't win.
+
+- **How to get it:** a tile named `trap-pieeat`.
+- **Ruled out by limits mentioning:** food, messy, feed, splosh.
+- **Mess it leaves:** cream on the face and forehead and chest.
+- **Equipment:** none yet.
+
 ### 🪵 pillory
 
 A pillory that locks your neck and wrists for ten minutes, and anybody passin' can use you.
@@ -467,6 +572,16 @@ Hitched to the plow and driven down a furrow with a crop.
   - **Plow Bit** (funnel, while the trap holds them). Game items: HarnessPonyBits, PonyGag, BitGag, FunnelGag. A bit between the teeth with reins running back to the plow handles. Every turn of the furrow is steered by a tug.
   - **Plow Harness** (torso, while the trap holds them). Game items: LeatherHarness, LeatherStrapHarness, TentacleSuit, HempRopeHarness. A heavy leather harness girthed tight at the chest and hips, traces buckled on behind to the old plow.
 
+### 🐴 ponycart
+
+Harnessed to the pony cart, bit in, and driven round the farm.
+
+- **How to get it:** a tile named `trap-ponycart`.
+- **Ruled out by limits mentioning:** pony, harnes, bit, pet play.
+- **Equipment:**
+  - **Cart Bit** (funnel, while the trap holds them). Game items: HarnessPonyBits, BitGag, FunnelGag. A steel bit and bridle, reins running back to the driver's hands.
+  - **Cart Harness** (torso, while the trap holds them). Game items: HarnessPonyBits, Harness, LeatherHarness, TentacleSuit, HempRopeHarness. A pony's harness: breastcollar, girth, traces to the cart shafts.
+
 ### 🏷️ pricetag
 
 A price written on your ass, and the farm girl callin' the sale.
@@ -484,6 +599,15 @@ A hose finds a hole and pumps your belly round and tight.
 - **Mess it leaves:** cum on the tummy.
 - **Equipment:**
   - **Pump Bung** (the hole they have (a dildo slot with a pussy, a plug slot without), after the trap, for 10 min). Game items: ButtPump, HollowButtPlug, InflatableVibeDildo. A fat black rubber bung, swollen tight inside, corking a belly pumped round and sloshing. It doesn't come out until every drop has soaked in.
+
+### 🐏 ramstud
+
+The ram in the paddock, rutting for the season.
+
+- **How to get it:** a tile named `trap-ramstud`.
+- **Ruled out by limits mentioning:** breed, beast, anthro, rut.
+- **Mess it leaves:** cum on the tummy.
+- **Equipment:** none yet.
 
 ### 🏇 saddle
 
@@ -524,6 +648,14 @@ The seed shower: a ring of strangers, and every one of them finishes on you.
 - **Equipment:**
   - **Kneeling Spreader** (legs, while the trap holds them). Game items: SpreaderMetal, SpreaderDildoBar, HempRope, LeatherLegCuffs. A short steel bar between the knees, keeping them knelt wide and low in the middle of the ring.
   - **Behind-the-Back Cuffs** (arms, while the trap holds them). Game items: LeatherCuffs, SteelCuffs, HempRope. Cuffs that keep their hands behind them, so there's nothing to wipe with and nothing to hide behind.
+
+### 🪔 shrine
+
+The fertility shrine: incense, a blessing, and a womb that won't stay empty.
+
+- **How to get it:** a tile named `trap-shrine`.
+- **Ruled out by limits mentioning:** heat, pregnan, breed, fertil.
+- **Equipment:** none yet.
 
 ### 🟢 slime
 
@@ -570,6 +702,15 @@ Nozzles hose you down with warm seed, or worse if you said ?watersports on.
 - **Ruled out by limits mentioning:** cum, spray, bukkake.
 - **Equipment:** none yet.
 
+### 🚧 squeezechute
+
+The cattle squeeze chute: clamped in, handled, and let out when they're done.
+
+- **How to get it:** a tile named `trap-squeezechute`.
+- **Ruled out by limits mentioning:** immobil, restrain, squeez.
+- **Equipment:**
+  - **Squeeze Chute** (device, while the trap holds them). Game items: WoodenStocks, LowCage, Kennel. The cattle chute's padded steel sides, closed snug, and a head gate across the neck.
+
 ### 🦌 stag
 
 The rutting stag in the trees, and it's his season.
@@ -606,12 +747,31 @@ The fair stocks, and a queue of folks with cream pies.
 - **Equipment:**
   - **Fair Stocks** (device, while the trap holds them). Game items: WoodenStocks. The fairground stocks, head and hands through the boards, with a pie stall doing brisk trade right next to them.
 
+### 🪑 studchair
+
+The breeding chair, and a line of studs with appointments.
+
+- **How to get it:** a tile named `trap-studchair`.
+- **Ruled out by limits mentioning:** breed, gang, pregnan.
+- **Mess it leaves:** cum on the tummy.
+- **Equipment:**
+  - **Breeding Chair** (device, while the trap holds them). Game items: BondageBench, Table, WoodenStocks. A tilted chair in worn red leather with stirrups, straps at the wrists and waist, built to keep hips up.
+
 ### 🖤 suit
 
 A patch of livin' latex that spreads over you for hours, stage by stage, and takes you where it likes.
 
 - **How to get it:** a tile named `trap-suit`.
 - **Ruled out by limits mentioning:** latex, suit, enca, parasit.
+- **Equipment:** none yet.
+
+### 🍁 syruptap
+
+The maple grove taps, and a bucket of syrup with your name on it.
+
+- **How to get it:** a tile named `trap-syruptap`.
+- **Ruled out by limits mentioning:** food, messy, syrup, splosh.
+- **Mess it leaves:** maple on the face and chest and tummy.
 - **Equipment:** none yet.
 
 ### 💢 teaser
@@ -687,6 +847,16 @@ The golden trough, only if you said ?watersports on.
 - **Ruled out by limits mentioning:** pis, watersport, urin, golden.
 - **Equipment:** none yet.
 
+### 🧶 twine
+
+Baler twine in the hayloft, and somebody who knows knots.
+
+- **How to get it:** a tile named `trap-twine`.
+- **Ruled out by limits mentioning:** rope, shibari, bondage, immobil.
+- **Equipment:**
+  - **Baler Twine** (ropeArms, while the trap holds them). Game items: HempRope. Orange baler twine, wrists to elbows to back, tied by somebody who knows exactly what they're doing.
+  - **Twine Harness** (torso, while the trap holds them). Game items: HempRopeHarness, Harness, TentacleSuit. A diamond of twine over the chest and down the belly, knotted tight.
+
 ### 🌿 vines
 
 Vines, pollen that puts you in heat, and seed pods planted deep.
@@ -705,6 +875,16 @@ Stuck halfway through a fence, with strangers at both ends.
 - **Ruled out by limits mentioning:** stuck, public, free use, gang.
 - **Equipment:**
   - **The Fence** (device, while the trap holds them). Game items: KabeshiriWall, WoodenStocks. Stuck halfway through a hole in the fence, with strangers at both ends.
+
+### 🪓 warband
+
+The orc warchief's tent, and his idea of tribute.
+
+- **How to get it:** a tile named `trap-warband`.
+- **Ruled out by limits mentioning:** orc, breed, size, rough.
+- **Mess it leaves:** cum on the tummy.
+- **Equipment:**
+  - **Tribute Token** (tag, after the trap, for 30 min). Game items: CollarNameTag, CollarNameTagLivestock. A tusk on a leather thong: the warchief's tribute token, meaning his.
 
 ### 🐇 warren
 
@@ -747,6 +927,15 @@ The thing in the well. It pulls you down and keeps you a long while, and it alwa
 
 - **How to get it:** a tile named `trap-well`.
 - **Ruled out by limits mentioning:** tentacle, egg, ovipo, clutch, monster.
+- **Equipment:** none yet.
+
+### 🌕 werewolf
+
+The full moon, the woods, and the werewolf who finds you there.
+
+- **How to get it:** a tile named `trap-werewolf`.
+- **Ruled out by limits mentioning:** knot, breed, beast, anthro.
+- **Mess it leaves:** cum on the tummy.
 - **Equipment:** none yet.
 
 ### 🎡 wheel
@@ -803,6 +992,16 @@ A den of wolf-men who take turns, and every one of them knots.
 - **Ruled out by limits mentioning:** gang, knot.
 - **Equipment:**
   - **Pack's Knot** (the hole they have (a dildo slot with a pussy, a plug slot without), after the trap, for 10 min). Game items: PenisDildo, PenisPlug. The last wolf's knot, still swollen fat inside and throbbing, tying them to a bellyful of the whole pack's seed until it finally goes down.
+
+### 🪵 yoke
+
+The milkmaid's yoke: locked across your shoulders with full buckets on it.
+
+- **How to get it:** a tile named `trap-yoke`.
+- **Ruled out by limits mentioning:** yoke, restrain, milk, carry.
+- **Mess it leaves:** milk on the chest and tummy.
+- **Equipment:**
+  - **Milkmaid's Yoke** (arms, while the trap holds them). Game items: Pillory, WoodenCuffs, HempRope, LeatherCuffs. A shaped wooden yoke across the shoulders, wrists cuffed at either end, a bucket hook on each side.
 
 ## The mystery box
 
@@ -893,16 +1092,16 @@ For players who said `?symbiote on`. They bond after a trap now and then, from a
 Each mess is drawn by the Companion on top of the game's own splatters. `?wash` takes them off.
 
 - **cake** #FFD8E6: from its own traps or the shelf
-- **cream** #FFF4DC: stocks
+- **cream** #FFF4DC: stocks, buttermill, pieeat
 - **honey** #E0A030: from its own traps or the shelf
-- **maple** #8B4A1C: from its own traps or the shelf
+- **maple** #8B4A1C: syruptap
 - **chocolate** #4A2A18: from its own traps or the shelf
 - **strawberry** #E04A6A: tomatoes
-- **milk** #F7F7F0: milker, cups, carousel, milkinghole
-- **slime** #5FAE3A: vines
-- **mud** #6B4A2B: plow, mudpit, hogtie
+- **milk** #F7F7F0: milker, cups, carousel, milkinghole, yoke
+- **slime** #5FAE3A: vines, clutch
+- **mud** #6B4A2B: plow, mudpit, hogtie, goblincart, mudslide
 - **mash** #D8C08A: chute, slop, feedbag
-- **cum**: the breeding traps pump, saddle, wheel, scarecrow, crate, kissgate, collection, leashpost, whelping, bearskin, hottub, stag, booth, every load in the stalls, and the seed shower
+- **cum**: the breeding traps pump, saddle, wheel, scarecrow, crate, kissgate, collection, leashpost, whelping, bearskin, hottub, stag, booth, goblinraid, goblinpit, warband, minotaur, werewolf, foxden, lionpride, ramstud, studchair, every load in the stalls, and the seed shower
 
 ## The mess shelf
 

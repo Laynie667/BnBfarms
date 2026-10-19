@@ -63,11 +63,11 @@ function check(mn, t, where, cowOk){
   C5.Appearance=[{Asset:{Name:'BallGag',Description:'Ball Gag',Group:{Name:'ItemMouth'},Effect:['BlockMouth','GagNormal']}},{Asset:{Name:'HempRope',Description:'Hemp Rope',Group:{Name:'ItemArms'}}},{Asset:{Name:'CowBell',Description:'Cow Bell',Group:{Name:'ItemNeckAccessories'}}}];
   const g=W.__gearSense(505);
   ok(g.gag && g.arms && g.bell && !g.collar, 'gear is seen: gag, arms, bell (and no collar)');
-  // barn life: Hamlet can't eat with a gag in; the others eat and get groomed in their own kind's way
+  // barn life: Hamlet eats round his gag (Oct 19: gags never keep anybody from the trough); the others eat and get groomed in their own kind's way
   for (const mn of [501,502,503,504,505]) L().mods['barn-life'].optIn[mn]=true;
   { const n=L().mods['barn-life'].needs; n[505]=n[505]||{food:10,water:10,groom:100,t:Date.now(),warned:{},said:0}; n[505].food=10; }
   let k=sent.length; handlers.AccountBeep({MemberNumber:505,Message:'eat'}); await wait(5600);
-  ok(sent.slice(k).some(([e,d])=>d&&/mouth stopped up/.test(JSON.stringify(d))), "a gagged pig is told they can't eat like that");
+  ok(!sent.slice(k).some(([e,d])=>d&&/mouth stopped up/.test(JSON.stringify(d))) && L().mods['barn-life'].needs[505].food>10, "a gagged pig still eats, round the gag (Oct 19)");
   for (let r=0;r<3;r++) for (const mn of [501,502,503,504]){
     const n=L().mods['barn-life'].needs[mn]; if(n){ n.food=10; n.water=10; }
     k=sent.length; handlers.AccountBeep({MemberNumber:mn,Message:'eat'}); await wait(5200);

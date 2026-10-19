@@ -5,8 +5,8 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 | Script | File in `dist/` | Where it runs | Current |
 |---|---|---|---|
-| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.36.0** |
-| Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.7.0** |
+| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.37.0** |
+| Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.8.0** |
 | Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.2.1** |
 | Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **1.1.0** |
 | Barn life | `farmhand-barn-life.user.js` | the bot's PC | **1.2.1** |
@@ -23,6 +23,16 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 - Running the watcher on more than one game at once (the bot, yours, a tester's) lets Claude line them up into one timeline.
 
 ## Latest changes (newest first)
+
+- **Bot 0.37.0, Glory stalls 1.8.0: goblins, furry, pregnancy, messy and restraint traps, and more glory hole visitors.** Laynie: "I need a ton of sexy farm traps, furry traps, pregnancy traps, messy traps, and restraints traps, and more in any combination. its my players favorite features. id also like more gloryhole visitors and types. goblin traps and visitors too."
+  - **A new place, the goblin camp** (spots named goblin…, cave…, camp…, orc…): goblinraid (a raiding party, every goblin takes a turn, goblin litters), goblinpit (the breeding pit, with a goblin and his clipboard), goblinmarket (auctioned for turnips), goblincart (trussed and paraded), warband (the orc warchief's tribute).
+  - **Furry:** minotaur, werewolf (knotted under the full moon), foxden (tickled, then shared), lionpride (the lionesses hold you down), ramstud.
+  - **Pregnancy:** shrine (heat and a fertility blessing), studchair (the breeding chair and five studs with appointments), clutch (the egg-layer in the pond); the goblin and furry ones breed too.
+  - **Messy:** buttermill (the butter churn), syruptap (maple, then licked), pieeat (the pie contest, hands tied), mudslide.
+  - **Restraint:** squeezechute, twine (baler twine in the hayloft), yoke (the milkmaid's yoke and full pails), ponycart (harnessed and driven).
+  - Each belongs to its places (?traps themes), with lines fitted to the body, real gear, and its mess.
+  - **Glory hole visitors:** five new kinds through the hole, goblin (small, all balls, huge loads), orc, bovine (a minotaur's), tentacle, imp (spade-tipped), each with its own character (the goblin gang, the orc raider, the minotaur, the thing with tentacles, the imp), and six more farm folk: the old farmer, the tourist with a camera, the overseer on inspection, the lumberjack off shift, the best man and his wedding party, the stable boy.
+  - tests/oct19.test.cjs (every new trap runs), tests/glory-visitors.test.cjs; the voice sweep finds traps from the bot's own list now. **Bot and Glory stalls.**
 
 - **Bot 0.36.0, Companion 0.30.0, Barn life 1.2.1: Laynie's Oct 19 list.**
   - **The game's R133.** The game now takes a drawing handed to it as itself (and keeps nothing), and keeps and lets go of its own pictures. The drawn body, the messes and the studio hand their drawings over directly on R133 (no picture addresses made, trimmed or kept), the picture trim stands aside, and the memory log reads R133's picture list. Same look in the studio side by side; older game versions still work as before.

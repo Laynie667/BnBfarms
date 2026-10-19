@@ -12,6 +12,7 @@
     makeBadge();
     setBadge("waiting for game…");
     storageBoot();      // the 💾 chip: the books backed up to a folder (03b-storage.js)
+    every(chatlogTick, 60000);   // the record, saved by the hour (10z9-chatlog.js)
     attachListeners();
 
     if (!startWorkerTimer()){

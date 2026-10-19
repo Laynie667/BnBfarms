@@ -92,9 +92,7 @@ const roomText=s=>{ const d=s&&s[1]; if(!d) return null;
   k=sent.length; await B(700,'inseminate hana 4'); await SAY(166990,'yes','Whisper',260239);
   out('E1 jar insemination is seen in the room -> '+/fills the (long )?syringe/.test(chatEm(k)));
   k=sent.length; await B(700,'summon hana');    out('E2 summon moves them and tells them privately -> '+sent.slice(k).some(([e,d])=>d&&d.Content==='ChatRoomMapViewTeleport'&&d.Target===166990)+' '+routes(k,166990));
-  L().people[166990].hypno=true; await B(700,'voice add hana Quiet now, %name%.'); await B(700,'voice on hana');
-  W.__st().voiceNext=new Map([[166990,1]]); k=sent.length; W.__vt(); await wait(800);
-  expect('E3 voice line, no Companion → whisper to them only', routes(k,166990)+(/Quiet now/.test(chatEm(k))?'+LEAKED':''), 'WHISPER');
+  // (E3, the herd's voice lines: retired Oct 19, Laynie: "we can probably strip out ... the herd voicelines")
   k=sent.length; await FM(500,{type:'outfitAnswer',answer:'worn',slot:'cow|*',locks:1});
   out('E4 putting on a farm outfit is a public emote -> '+/padlocks click shut/.test(chatEm(k)));
   await FM(221397,{type:'outfitSave',slot:'cow|*',data:'X',items:3,locks:1}); k=sent.length; await B(700,'outfit offer hana');

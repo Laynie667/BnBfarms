@@ -42,26 +42,19 @@ const C=mn=>chars.find(c=>c.MemberNumber===mn);
   await B(800,'spot set sneaky');
   out('1 ...or spots ->', !(L().spots||{}).sneaky);
   out('1 farmhands get the map to look at ->', !!W.__stateFor(800).zones && W.__stateFor(800).mapEdit===false, W.__stateFor(700).mapEdit===true);
-  // 2. voice: herd leader only, opt-in only
-  await B(800,'voice add 500 Moo for me.');
-  out('2 not their herd leader ->', /herd leader/.test(lastTo(800)), !(L().voice&&L().voice.member[500]));
-  await B(700,'voice add herd Good cows stand still, %name%.'); await B(700,'voice on herd');
+  // 2. voice lines: retired Oct 19 (Laynie: "we can probably strip out ... the herd voicelines")
   for (const mn of [500,700]) await H(mn,{type:'hello',ver:'0.4.0'});
-  W.__st().voiceNext = new Map([[500,1]]); let n=sent.length; W.__vt(); await wait(300);
-  out('2 nothing before ?hypno on ->', farmTo(500,'voice',n).length===0);
-  await B(500,'hypno on');
-  W.__st().voiceNext.set(500,1); n=sent.length; W.__vt(); await wait(300);
-  const v=farmTo(500,'voice',n)[0]||{};
-  out('2 voice reaches them privately ->', v.text==='Good cows stand still, Moo.');
-  out('2 never said in the room ->', !sent.slice(n).some(s=>s[1]&&(s[1].Type==='Chat'||s[1].Type==='Emote')&&/stand still/.test(s[1].Content)));
+  await B(700,'voice add herd Good cows stand still, %name%.');
+  out('2 ?voice says it is retired, and keeps nothing ->', /retired/.test(lastTo(700)) || farmTo(700,'reply').some(d => /retired/.test(d.text)), !(L().voice&&L().voice.herd&&L().voice.herd[700]&&L().voice.herd[700].lines.length));
+  let n;
   // 3. staff state for the Companion
   n=sent.length; W.__sync(true); await wait(300);
   const st=(farmTo(700,'state',n).pop()||{}).state||{};
   const moo=(st.herd||[]).find(x=>x.mn===500)||{};
   out('3 herd list with where and mine ->', moo.where==='barn', moo.mine===true);
-  out('3 zones and voice in state ->', !!(st.zones&&st.zones['barn-1']), st.voice&&st.voice.herd.lines.length===1, st.voice&&st.voice.members.some(m=>m.mn===500&&m.hypno));
+  out('3 zones in state ->', !!(st.zones&&st.zones['barn-1']));
   out('3 shift info ->', !!st.shift && Array.isArray(st.shift.onDuty));
   const moost=(farmTo(500,'state',n).pop()||{}).state||{};
-  out('3 stock get no staff data ->', !moost.herd && !moost.zones, moost.switches&&moost.switches.hypno===true);
+  out('3 stock get no staff data ->', !moost.herd && !moost.zones);
   process.exit(0);
 })();

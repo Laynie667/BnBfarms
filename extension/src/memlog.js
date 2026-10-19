@@ -16,9 +16,11 @@ function snap() {
   const s = { t: Date.now() };
   try { if (W.performance && W.performance.memory) s.heapMB = Math.round(W.performance.memory.usedJSHeapSize / 1e6); } catch (e) { /* not this browser */ }
   try {
-    const m = W.GLDrawImageCache; if (m) { s.gamePics = m.size; let d = 0, dk = 0; for (const k of m.keys()) if (typeof k === "string" && k.startsWith("data:")) { d++; dk += k.length; } s.madePics = d; s.madePicsKB = Math.round(dk / 1000); }
+    const c0 = W.GLDrawImageCache, m = c0 && c0.cache instanceof Map ? c0.cache : c0;   // (R133 on: an ImageCache, its Map inside)
+    if (m && typeof m.keys === "function") { s.gamePics = m.size; let d = 0, dk = 0; for (const k of m.keys()) if (typeof k === "string" && k.startsWith("data:")) { d++; dk += k.length; } s.madePics = d; s.madePicsKB = Math.round(dk / 1000); }
     const gl = W.GLDrawCanvas && W.GLDrawCanvas.GL, tc = gl && gl.textureCache;
     if (tc) { let px = 0; for (const v of tc.values()) px += (v.width || 0) * (v.height || 0); s.textures = tc.size; s.textureMB = Math.round(px * 4 / 1e6); }
+    else if (m && m !== c0) { let px = 0, n = 0; for (const v of m.values()) { const dd = v && v.data; if (dd && dd.width) { px += dd.width * dd.height; n++; } } s.textures = n; s.textureMB = Math.round(px * 4 / 1e6); }
   } catch (e) { /* fine */ }
   try { s.body = drawnBodyMemory(); } catch (e) { /* fine */ }
   try { s.mess = messMemory(); } catch (e) { /* fine */ }
@@ -44,7 +46,7 @@ const lastPage = fast.filter((x) => x.t < born).slice(-12);
 function quick() {
   const x = { t: Date.now() };
   try { if (W.performance && W.performance.memory) x.h = Math.round(W.performance.memory.usedJSHeapSize / 1e6); } catch (e) { /* fine */ }
-  try { const gl = W.GLDrawCanvas && W.GLDrawCanvas.GL, tc = gl && gl.textureCache; if (tc) x.p = tc.size; } catch (e) { /* fine */ }
+  try { const gl = W.GLDrawCanvas && W.GLDrawCanvas.GL, tc = gl && gl.textureCache, c0 = W.GLDrawImageCache; x.p = tc ? tc.size : c0 && c0.cache instanceof Map ? c0.cache.size : undefined; } catch (e) { /* fine */ }
   try { x.r = (W.ChatRoomCharacter || []).length; x.s = W.CurrentScreen; } catch (e) { /* fine */ }
   fast.push(x); if (fast.length > 40) fast = fast.slice(-40);
   try { W.localStorage.setItem(FAST, JSON.stringify(fast)); } catch (e) { /* fine */ }

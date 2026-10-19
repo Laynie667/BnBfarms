@@ -5,10 +5,11 @@
 // The staff panel: duty, the Office (lookups about other people land here), contracts, the barn, guides, switches.
 import { h, card, title, muted, btn, chip, toggle } from "../dom.js";
 import { guidesTab } from "./common.js";
-import { panelPrefs, drawnBodyCard } from "./livestock.js";
+import { panelPrefs, panelPrefsOrLink, drawnBodyCard } from "./livestock.js";
 import { DURATIONS } from "../../../shared/bcplus.js";
 import { summonReady } from "../addons.js";
-import { herd, tease, zones, voice, shift } from "./staffdata.js";
+import { herd, zones, voice, shift } from "./staffdata.js";
+import { logTab } from "./log.js";
 import { BOT_MEMBER } from "../config.js";
 
 // the most recent answer from the bot, shown under the forms so staff needn't flip to the Inbox
@@ -65,13 +66,37 @@ function office(ctx) {
 function contracts(ctx) {
   // read the boxes when the button's pressed, not when the tab was drawn
   const tpl = () => (ctx.ui.ctTpl || "deep").trim(), who = () => (ctx.ui.ctWho || "").trim(), dur = () => ctx.ui.ctDur || "1w";
+  // when the rules apply (BC+'s conditions), from the boxes: nothing filled in means always
+  const q = (v) => /\s/.test(v) ? "\"" + v + "\"" : v;
+  const when = () => {
+    const u = ctx.ui, p = [];
+    if (u.ctRoom) p.push("room=" + u.ctRoom);
+    if ((u.ctNames || "").trim()) p.push((u.ctNamesMode === "notin" ? "notnames=" : "names=") + q(u.ctNames.trim()));
+    if ((u.ctMembers || "").trim()) p.push((u.ctMembersMode === "absent" ? "without=" : "with=") + u.ctMembers.trim().replace(/\s+/g, ""));
+    if (u.ctRole) p.push((u.ctRoleMode === "absent" ? "norole=" : "role=") + u.ctRole);
+    if (u.ctFrom && u.ctTo) p.push("time=" + u.ctFrom + "-" + u.ctTo);
+    if ((u.ctOnly || "").trim()) p.push("only=" + u.ctOnly.trim().replace(/\s+/g, ""));
+    return p.length ? " when " + p.join(" ") : "";
+  };
+  const sel = (key, opts) => h("select", { class: "fhc-sel", onchange: (e) => ctx.setUi({ [key]: e.target.value }, true) }, opts.map(([v, l]) => h("option", { value: v, selected: (ctx.ui[key] || "") === v ? "selected" : null }, l)));
+  const timeIn = (key) => h("input", { class: "fhc-in", type: "time", value: ctx.ui[key] || "", style: { width: "110px" }, oninput: (e) => ctx.setUi({ [key]: e.target.value }, true) });
   return [
     card(title("Offer a BC+ contract"), muted("They read it in their own BC+ and only sign if they want it. Herdmasters and proprietors can offer."),
       field("Contract", h("input", { class: "fhc-in", value: ctx.ui.ctTpl || "deep", placeholder: "fun, deep, nhl, or one of yours", oninput: (e) => ctx.setUi({ ctTpl: e.target.value }, true) })),
       field("For (name or member number, here in the room)", input("Bessie", "ctWho", ctx)),
       field("How long", select("ctDur", DURATIONS.map((d) => [d.key, d.label]), ctx)),
-      h("div", null, btn("Preview", () => ctx.send("contract show " + tpl() + (who() ? " " + who() : ""))),
-        btn("Offer it", () => who() ? ctx.send("contract offer " + tpl() + " " + who() + " " + dur()) : ctx.hint("Type who it's for first, in the For box."), true))),
+      h("details", { style: { margin: "6px 0" } }, h("summary", null, "When the rules apply (BC+ conditions: leave empty for always)"),
+        field("Rooms", sel("ctRoom", [["", "Any room"], ["public", "Public rooms only"], ["private", "Private rooms only"]])),
+        field("Room names", h("div", { class: "fhc-row", style: { padding: "0", border: "none" } }, sel("ctNamesMode", [["in", "Only in"], ["notin", "Not in"]]),
+          h("input", { class: "fhc-in", value: ctx.ui.ctNames || "", placeholder: "farm, barn (part of the name)", oninput: (e) => ctx.setUi({ ctNames: e.target.value }, true) }))),
+        field("Who's there", h("div", { class: "fhc-row", style: { padding: "0", border: "none" } }, sel("ctMembersMode", [["present", "While one of these is there"], ["absent", "While none of these is there"]]),
+          h("input", { class: "fhc-in", value: ctx.ui.ctMembers || "", placeholder: "member numbers, like 221397, 232922", oninput: (e) => ctx.setUi({ ctMembers: e.target.value }, true) }))),
+        field("Their BC+ roles", h("div", { class: "fhc-row", style: { padding: "0", border: "none" } }, sel("ctRoleMode", [["present", "While somebody this close is there"], ["absent", "While nobody this close is there"]]),
+          sel("ctRole", [["", "Anybody"], ["owner", "Owner"], ["lover", "Lover"], ["mistress", "Mistress"], ["whitelist", "Whitelist"], ["friend", "Friend"]]))),
+        field("Time of day", h("div", { class: "fhc-row", style: { padding: "0", border: "none" } }, "from", timeIn("ctFrom"), "to", timeIn("ctTo"))),
+        field("Only these rules (empty: all of them)", h("input", { class: "fhc-in", value: ctx.ui.ctOnly || "", placeholder: "pet.speech, pet.hearing", oninput: (e) => ctx.setUi({ ctOnly: e.target.value }, true) }))),
+      h("div", null, btn("Preview", () => ctx.send("contract show " + tpl() + (who() ? " " + who() : "") + when())),
+        btn("Offer it", () => who() ? ctx.send("contract offer " + tpl() + " " + who() + " " + dur() + when()) : ctx.hint("Type who it's for first, in the For box."), true))),
     card(title("In force"), btn("List farm contracts", () => ctx.send("contract list")),
       field("Somebody's contracts", input("Bessie", "ctLook", ctx)),
       h("div", null, btn("Ask their BC+", () => ctx.ui.ctLook ? ctx.send("contract check " + ctx.ui.ctLook) : ctx.hint("Type whose contracts first.")),
@@ -132,7 +157,7 @@ function toggles(ctx) {
         : toggle("On call", "Let the office summon you from anywhere with BCX or BC+ summoning", !!sw.forced, () => ctx.send("forced")),
       s.onCall && summonCheck()),
     muted("Your own milkin' and breedin' switches are on your Livestock panel."),
-    panelPrefs(ctx),
+    panelPrefsOrLink(ctx),
   ];
 }
 
@@ -143,10 +168,10 @@ export const STAFF_TABS = [
   { id: "queue", label: "Queue", render: queue, badge: (ctx) => (ctx.s.apps || []).length },
   { id: "contracts", label: "Contracts", render: contracts },
   { id: "barn", label: "Barn", render: barn },
-  { id: "tease", label: "Tease lines", render: tease },
-  { id: "voice", label: "Voice", render: voice },
+  { id: "voice", label: "ECHS", render: voice },
   { id: "zones", label: "Zones", render: zones },
   { id: "shift", label: "Shift", render: shift },
   { id: "guides", label: "Guides", render: (ctx) => guidesTab(ctx, true) },
   { id: "toggles", label: "Toggles", render: toggles },
+  { id: "log", label: "Log", render: logTab, show: (ctx) => !!ctx.s.logReader },   // the record (chatlog.js), for whoever may read it
 ];

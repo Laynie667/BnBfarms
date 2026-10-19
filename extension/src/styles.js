@@ -8,6 +8,9 @@ export const THEME = {
 };
 
 export const CSS = `
+#fhc-settings{background:var(--fh-ground);color:var(--fh-text);border:2px solid var(--fh-accent);font:14px/1.4 "Source Sans 3","Segoe UI",sans-serif}
+#fhc-settings button{font:inherit;cursor:pointer}
+#fhc-settings h2{font-family:Bitter,Georgia,serif;color:var(--fh-accent)}
 #fhc-btn{position:fixed;right:12px;bottom:12px;z-index:9999;width:46px;height:46px;border-radius:50%;
   border:2px solid var(--fh-accent);background:#3b2a1a;color:#fff;font-size:22px;cursor:pointer;box-shadow:0 2px 8px #0008}
 #fhc-btn[data-unread]:after{content:attr(data-unread);position:absolute;top:-4px;right:-4px;background:var(--fh-alert);

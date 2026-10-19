@@ -35,8 +35,8 @@ export const fill = (text, vars) => String(text).replace(/%(\w+)%/g, (m, k) => (
 //   {f} female · {m} male · {fu} futa · {fb} femboy            (several tags: all must fit)
 // An untagged line is checked by its words: one about a pussy or a womb is left out for somebody without one, the same
 // for tits and udders on a flat chest, and "girl", "heifer" or "mare" for a male.
-const TAG_ANY = /\{(?:nv|nc|nt|fu|fb|ok|v|c|t|f|m)\}/g;
-const TAG_LEAD = /^((?:\{(?:nv|nc|nt|fu|fb|v|c|t|f|m)\})+)/;
+const TAG_ANY = /\{(?:nv|nc|nt|fu|fb|nb|ok|v|c|t|f|m)\}/g;
+const TAG_LEAD = /^((?:\{(?:nv|nc|nt|fu|fb|nb|v|c|t|f|m)\})+)/;
 const VULVA_W = /\b(pussy|pussies|cunt|cunts|slit|womb|clit|cervix)\b/i;
 const TITS_W = /\b(tits?|titties|breasts?|udders?|teats?|cleavage)\b/i;
 const GIRL_W = /\b(girl|heifer|mare|broodmare)\b/i;
@@ -52,7 +52,7 @@ export function fits(line, b) {
     for (const t of m[1].slice(1, -1).split("}{")) {
       if ((t === "v" && !b.vulva) || (t === "nv" && b.vulva) || (t === "c" && !b.cock) || (t === "nc" && b.cock) ||
           (t === "t" && !b.tits) || (t === "nt" && b.tits) || (t === "f" && b.g !== "female") || (t === "m" && b.g !== "male") ||
-          (t === "fu" && b.g !== "futa") || (t === "fb" && b.g !== "femboy")) return false;
+          (t === "fu" && b.g !== "futa") || (t === "fb" && b.g !== "femboy") || (t === "nb" && b.g !== "nonbinary")) return false;
     }
     return true;
   }

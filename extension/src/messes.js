@@ -81,7 +81,7 @@ const made = new Map();   // member → { key, src, dx, dy }
 // handed (and a copy on the graphics card) for good, so without this every pose, every new mess and every minute of a
 // fresh one running piled up another picture till the page ran out of room and crashed
 function forget(src) {
-  if (!src) return;
+  if (!src || typeof src !== "string") return;   // (a drawing handed over as itself, R133 on: nothing was kept)
   setTimeout(() => {
     for (const p of made.values()) if (p.src === src) return;   // somebody's wearing that very picture again
     try { const m = W.GLDrawImageCache; if (m && typeof m.delete === "function") m.delete(src); } catch (e) { /* fine */ }
@@ -101,7 +101,9 @@ function messPicture(C, list, body) {
   const c = W.document.createElement("canvas"); c.width = 500; c.height = h; const g = c.getContext("2d");
   const at = (names) => names.map((n) => { const A = W.FarmMess.AREAS[n]; return [A[0] + ox, A[1] + over + oy, A[2]]; });
   for (const e of list) W.FarmMess.paintOn(g, mask, e.k, { at: at(e.a), seed: e.s, amount: e.m || 1, runX: 0.55 + 0.09 * age(e) });
-  // trimmed to what's on it, handed over by address (the live game takes pictures by name: see drawnbody.js)
+  // R133 on: the drawing itself goes to the game (nothing made, nothing kept)
+  if (typeof W.GLDrawLoadTransient === "function") { const p = { key, src: c, dx: 0, dy: 0 }; keep(C.MemberNumber, p); return p; }
+  // before R133: trimmed to what's on it, handed over by address (that game takes pictures by name: see drawnbody.js)
   const d = g.getImageData(0, 0, c.width, c.height).data; let x0 = c.width, y0 = c.height, x1 = -1, y1 = -1;
   for (let y = 0; y < c.height; y++) for (let x = 0; x < c.width; x++) if (d[(y * c.width + x) * 4 + 3]) { if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y; }
   if (x1 < 0) { const p = { key, src: null }; keep(C.MemberNumber, p); return p; }

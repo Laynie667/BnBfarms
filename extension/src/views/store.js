@@ -37,8 +37,23 @@ export function storeTab(ctx) {
           s.vat && (it.kind || /^shot-/.test(it.id)) ? btn("Pay with milk", () => ctx.send("buy " + it.id + " with milk")) : null,
           it.gift ? btn("Gift it", () => (who() ? ctx.send("buy " + it.id + " for " + who()) : ctx.hint("Type who it's for in the box above the potions first."))) : null));
   const shelf = (label, list) => list.length ? card(title(label), list.map(row)) : null;
-  const potions = items.filter((it) => it.kind), shots = items.filter((it) => /^shot-/.test(it.id)), treats = items.filter((it) => !it.kind && !/^shot-/.test(it.id));
+  const potions = items.filter((it) => it.kind), shots = items.filter((it) => /^shot-/.test(it.id)), messes = items.filter((it) => it.shelf === "mess"), treats = items.filter((it) => !it.kind && !/^shot-/.test(it.id) && it.shelf !== "mess");
+  // the mess shelf (Laynie, Oct 19: "I didnt see the options to buy... to gift messes to people"): on you, or on somebody
+  const messWho = () => String(ctx.ui.messWho || "").trim();
+  const messRow = (it) => h("div", { class: "fhc-box", style: { padding: "8px", marginTop: "6px" } },
+    h("div", { class: "fhc-kv", style: { borderBottom: "none", padding: "0" } }, h("b", null, it.name), chip(it.price + " 🎀", (s.ribbons || 0) >= it.price ? "good" : "")),
+    muted(it.desc),
+    h("div", null,
+      btn("On them", () => (messWho() ? ctx.send("buy " + it.id + " for " + messWho()) : ctx.hint("Type who it's for in the box above the messes first.")), true),
+      btn("On me", () => ctx.send("buy " + it.id))));
+  const messCard = messes.length ? card(title("💦 Messes"),
+    muted("Put a mess on somebody: they're asked first, unless they've said ?messes on. Their limits count. It shows on them with \"Farm can mark my body\" switched on, and ?wash cleans it off."),
+    h("label", { class: "fhc-label" }, "For (name or member number)",
+      h("input", { class: "fhc-in", value: ctx.ui.messWho || "", oninput: (e) => ctx.setUi({ messWho: e.target.value }, true) })),
+    h("div", { style: { marginTop: "4px" } }, btn(s.messesOn ? "Messes on me: no askin' (switch off)" : "Let anybody mess me up without askin'", () => ctx.send("messes " + (s.messesOn ? "off" : "on")))),
+    messes.map(messRow)) : null;
   return [purse, vat, now, dare, pen,
+    messCard,
     shelf("🛍️ Treats and favors", treats),
     shelf("💉 Shots", shots),
     potions.length ? card(title("🧪 Potions"),

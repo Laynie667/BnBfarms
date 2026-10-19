@@ -27,7 +27,7 @@
     return null;
   }
   // a template, made real for one person
-  function buildContract(tpl, mn, durKey){
+  function buildContract(tpl, mn, durKey, when){
     const r = rec(mn) || {};
     // asked for: one contract, a nickname per person ("BnB Cow Vicky", "BnB Pet Rya"): {name}, {Species}… are
     // filled in when it's offered (see fillWho in shared/bcplus.js)
@@ -37,6 +37,7 @@
     for (const [id, set] of Object.entries(tpl.add || {}))
       rules[id] = BCPLUS.makeSpec(id, Object.assign({}, rules[id] ? rules[id].settings : {}, JSON.parse(JSON.stringify(set))));
     BCPLUS.fillRules(rules, who);
+    if (when && when.conditions) BCPLUS.applyConditions(rules, when.conditions, when.only);   // when they apply (Oct 19: ?contract offer … when room=private)
     return BCPLUS.makeContract({ title: BCPLUS.fillWho(tpl.title, who), terms: BCPLUS.fillWho(fill(tpl.terms || "", mn), who), duration: BCPLUS.durationFrom(durKey),
                                  depth: tpl.base, policy: tpl.policy, rules });
   }
@@ -71,25 +72,33 @@
       const def = BCPLUS.RULES.get(id);
       const set = Object.entries(spec.settings || {}).filter(([,v]) => !(Array.isArray(v) && !v.length) && v !== "")
         .map(([k,v]) => k+"="+(Array.isArray(v) ? v.join("|") : v)).join(" ");
-      lines.push("  • "+(def ? def.name : id)+(set ? " · "+set : ""));
+      lines.push("  • "+(def ? def.name : id)+(set ? " · "+set : "")+(spec.conditions ? " · only "+BCPLUS.describeConditions(spec.conditions) : ""));
     }
     return lines.join("\n");
   }
-  function offerContract(sender, tplName, t, durText){
+  // "when room=private time=20:00-06:00 only=pet.speech" → BC+'s conditions, or a reason it can't be
+  function contractWhen(text){
+    const t = String(text || "").trim(); if (!t) return { conditions: null, only: null, errs: [] };
+    return BCPLUS.conditionsFrom(parsePairs(t));
+  }
+  function offerContract(sender, tplName, t, durText, whenText){
+    const when = contractWhen(whenText);
+    if (when.errs.length) return "I couldn't read when the rules apply, sugar:\n• "+when.errs.join("\n• ")+"\nLike: when room=private names=farm with=221397 role=owner time=20:00-06:00 only=pet.speech";
     contractsLedger();
     const tpl = contractTemplate(tplName);
     if (!tpl) return "There's no contract called '"+tplName+"', sugar. ?contract list shows them (fun, deep and nhl are always there).";
     const d = BCPLUS.durationFrom(durText);
     if (!d) return "How long, hon? Say 1h, 12h, 1d, 1w, 2w, 1m or perm.";
     if (!charFor(t)) return plainName(t)+" has to be here in the room for a contract offer, sugar. BC+ only takes 'em in person.";
-    const c = buildContract(tpl, t, d.key);
+    const c = buildContract(tpl, t, d.key, when);
     const problems = BCPLUS.checkContract(c);
     if (problems.length) return "That one wouldn't work in BC+, sugar, so I didn't send it:\n• "+problems.join("\n• ");
     const mine = L.contracts.filter(x => x.mn === t && (x.status === "signed" || x.status === "offered"));
     if (mine.filter(x => x.status === "signed").length >= BCPLUS.LIMITS.MAX_ACTIVE) return plainName(t)+" already holds "+BCPLUS.LIMITS.MAX_ACTIVE+" farm contracts, and BC+ won't take more.";
     enqueue(BCPLUS.offerMsg(c, t, CFG.ROOM_NAME));
     const entry = { mn: t, by: sender, tpl: String(tplName).toLowerCase(), title: c.title, depth: tpl.base || "custom",
-                    durationMin: c.durationMin, policy: c.policy, rules: Object.keys(c.rules), status: "offered", at: Date.now() };
+                    durationMin: c.durationMin, policy: c.policy, rules: Object.keys(c.rules), status: "offered", at: Date.now(),
+                    when: when.conditions ? BCPLUS.describeConditions(when.conditions)+(when.only ? " (for "+when.only.join(", ")+")" : "") : "" };
     const prepared = trackedContract(t, null, ["prepared"]);   // the one their application asked for
     if (prepared) Object.assign(prepared, entry); else L.contracts.push(Object.assign({ key: Date.now().toString(36) }, entry));
     if (L.contracts.length > 300) L.contracts = L.contracts.slice(-300);

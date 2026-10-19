@@ -74,6 +74,10 @@ window.FarmBodyEngine = function (host) {
   // in the game's picture list. So that lookup is watched for a moment (and answered with nothing, so nothing is loaded
   // or kept), and the address it was asked for is the one.
   const W = window;
+  // R133 (Oct 2026) on: the game draws a drawing handed to it as itself (GLDrawLoadTransient: put on the graphics card
+  // for that one drawing and not kept), so nothing has to be turned into a picture address, trimmed or let go after.
+  // That's quicker, and it keeps nothing. Before R133 it only took addresses (host.picture makes one).
+  const takesDrawings = () => typeof W.GLDrawLoadTransient === "function";
   const mapSrc = host.mapSrc || ((src) => {
     if (typeof W.DrawGetImage !== "function") return src;
     /* (the game's live version keeps that list in a const, which isn't on window: named bare, it still answers) */
@@ -436,7 +440,7 @@ window.FarmBodyEngine = function (host) {
         // breast the game's size, and on a fitted piece it cut square holes through the cloth with her bare breast showing
         // in each. Echo's newer dresses all carry one. Found in the Echo catalogue, Oct 14. Her hands are drawn on their own.)
         const put = (name, img, x, y, o) => { if (img && typeof img !== "string" && img.MX != null && o && o.TextureAlphaMask) o = Object.assign({}, o, { TextureAlphaMask: undefined });
-          if (typeof img === "string" || !host.picture) return real[name](img, x, y, o); const p = host.picture(img); if (p) return real[name](p.src, x + p.dx, y + p.dy, o); };
+          if (typeof img === "string" || !host.picture || takesDrawings()) return real[name](img, x, y, o); const p = host.picture(img); if (p) return real[name](p.src, x + p.dx, y + p.dy, o); };
         if (fit && cb && typeof cb.drawImage === "function") {
           let upper = null, lower = false, done = false;
           const ctx = { bodies: [], belly: null, sig: "", seen: {} }; if (br) { seenNow = ctx.seen; handFNow = { get v() { return ctx.handF; } }; }

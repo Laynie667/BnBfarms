@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.29.1
+// @version      0.30.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -230,7 +230,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.29.1";
+  var VERSION = "0.30.0";
 
   // extension/src/config.js
   var BOT_MEMBER = 260239;
@@ -251,6 +251,9 @@ One of mods you are using is using an old version of SDK. It will work for now b
     well: "#140e09"
   };
   var CSS = `
+#fhc-settings{background:var(--fh-ground);color:var(--fh-text);border:2px solid var(--fh-accent);font:14px/1.4 "Source Sans 3","Segoe UI",sans-serif}
+#fhc-settings button{font:inherit;cursor:pointer}
+#fhc-settings h2{font-family:Bitter,Georgia,serif;color:var(--fh-accent)}
 #fhc-btn{position:fixed;right:12px;bottom:12px;z-index:9999;width:46px;height:46px;border-radius:50%;
   border:2px solid var(--fh-accent);background:#3b2a1a;color:#fff;font-size:22px;cursor:pointer;box-shadow:0 2px 8px #0008}
 #fhc-btn[data-unread]:after{content:attr(data-unread);position:absolute;top:-4px;right:-4px;background:var(--fh-alert);
@@ -352,12 +355,12 @@ One of mods you are using is using an old version of SDK. It will work for now b
       h("div", { class: "fhc-bar-track" }, h("div", { class: "fhc-bar-fill" + (kind ? " fhc-fill-" + kind : ""), style: { width: Math.max(0, Math.min(100, pct2)) + "%" } }))
     );
   }
-  function toggle(label, desc, on, onflip) {
+  function toggle(label, desc, on2, onflip) {
     return h(
       "div",
       { class: "fhc-tog" },
       h("div", null, h("div", { class: "fhc-tog-l" }, label), desc ? h("div", { class: "fhc-muted" }, desc) : null),
-      h("button", { type: "button", class: "fhc-sw" + (on ? " on" : ""), "aria-pressed": on ? "true" : "false", "aria-label": label, onclick: onflip }, h("span"))
+      h("button", { type: "button", class: "fhc-sw" + (on2 ? " on" : ""), "aria-pressed": on2 ? "true" : "false", "aria-label": label, onclick: onflip }, h("span"))
     );
   }
   var ml = (n) => n >= 1e3 ? (n / 1e3).toFixed(1) + " L" : Math.round(n) + " mL";
@@ -398,12 +401,12 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var cmdStem = (cmd) => cmd.replace(/\s*<.*$/, "").trim();
 
   // extension/src/views/common.js
-  function safetyTab(ctx2) {
-    const big = (label, cmd, red, note) => h(
+  function safetyTab(ctx3) {
+    const big = (label, cmd, red, note2) => h(
       "div",
       { style: { marginBottom: "10px" } },
-      h("button", { type: "button", class: "fhc-safe" + (red ? " red" : ""), style: { width: "100%", minHeight: "48px", fontSize: "16px" }, onclick: () => ctx2.send(cmd) }, label),
-      muted(note)
+      h("button", { type: "button", class: "fhc-safe" + (red ? " red" : ""), style: { width: "100%", minHeight: "48px", fontSize: "16px" }, onclick: () => ctx3.send(cmd) }, label),
+      muted(note2)
     );
     return [
       card(
@@ -415,28 +418,28 @@ One of mods you are using is using an old version of SDK. It will work for now b
       muted("From chat, without the panel: ?safe \xB7 ?stuck \xB7 ?staff")
     ];
   }
-  function guidesTab(ctx2, staff) {
-    const q2 = (ctx2.ui.search || "").toLowerCase();
+  function guidesTab(ctx3, staff) {
+    const q2 = (ctx3.ui.search || "").toLowerCase();
     const groups = PUBLIC_GROUPS.concat(
       staff ? STAFF_GROUPS : [],
-      staff && ctx2.s.proprietor ? OWNER_GROUPS : [],
-      (ctx2.s.addonCmds || []).map((g) => ({ name: "\u{1F9E9} " + g.name, cmds: (g.cmds || []).map(String) }))
+      staff && ctx3.s.proprietor ? OWNER_GROUPS : [],
+      (ctx3.s.addonCmds || []).map((g) => ({ name: "\u{1F9E9} " + g.name, cmds: (g.cmds || []).map(String) }))
     );
     const shown = groups.map((g) => ({ name: g.name, cmds: g.cmds.filter((c) => !q2 || c.includes(q2) || g.name.toLowerCase().includes(q2)) })).filter((g) => g.cmds.length);
     const input2 = h("input", {
       class: "fhc-in",
       placeholder: "milk, breed, keys\u2026",
-      value: ctx2.ui.search || "",
-      oninput: (e) => ctx2.setUi({ search: e.target.value }, true)
+      value: ctx3.ui.search || "",
+      oninput: (e) => ctx3.setUi({ search: e.target.value }, true)
     });
     return [
       h("label", { class: "fhc-label" }, "Search guides and commands", input2),
-      h("div", null, BOOKS.map(([label, cmd]) => btn(label, () => ctx2.send(cmd), true))),
+      h("div", null, BOOKS.map(([label, cmd]) => btn(label, () => ctx3.send(cmd), true))),
       shown.map((g) => card(title(g.name), h("div", null, g.cmds.map((c) => h("button", {
         type: "button",
         class: "fhc-cmd",
         title: needsInput(c) ? "Fill in the rest, then send" : "Send it",
-        onclick: () => needsInput(c) ? ctx2.fillBox(cmdStem(c) + " ") : ctx2.send(c)
+        onclick: () => needsInput(c) ? ctx3.fillBox(cmdStem(c) + " ") : ctx3.send(c)
       }, "?" + c))))),
       staff ? null : muted("Staff see their own commands on the Staff panel.")
     ];
@@ -456,15 +459,15 @@ One of mods you are using is using an old version of SDK. It will work for now b
   // extension/src/views/store.js
   var minsLeft = (t) => Math.max(0, Math.ceil((t - Date.now()) / 6e4));
   var KIND = { reward: "\u{1F36C}", punish: "\u{1F53B}", silly: "\u{1F3AD}" };
-  function storeTab(ctx2) {
-    const s = ctx2.s, items = s.store || [], fx = s.fx || [], log2 = s.ribbonLog || [];
+  function storeTab(ctx3) {
+    const s = ctx3.s, items = s.store || [], fx = s.fx || [], log2 = s.ribbonLog || [];
     const purse = card(
       title("\u{1F380} Your ribbons"),
       h("div", { style: { fontSize: "28px", fontWeight: "700", margin: "4px 0" } }, String(s.ribbons || 0)),
       s.quotaGrace ? chip("quota grace \xD7 " + s.quotaGrace, "good") : null,
       log2.length ? h("div", { style: { marginTop: "6px" } }, log2.map((e) => h("div", { class: "fhc-kv" }, h("span", null, e.why), h("b", null, (e.n > 0 ? "+" : "") + e.n)))) : null,
       muted("Earn 'em: your milk quota, a full stall session, chores, glory shifts, dares, shows, best of the week, and staff who think you've been good."),
-      h("div", { style: { marginTop: "6px" } }, btn("This week's board", () => ctx2.send("ribbons top")))
+      h("div", { style: { marginTop: "6px" } }, btn("This week's board", () => ctx3.send("ribbons top")))
     );
     const vat = s.vat ? card(
       title("\u{1F95B} Your vat"),
@@ -480,10 +483,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
       title(s.dare.reckless ? "\u{1F3B2} A reckless dare" : "\u{1F3B2} Your dare"),
       h("p", null, s.dare.text),
       muted(minsLeft(s.dare.until) + " minutes left."),
-      h("div", null, btn("I did it", () => ctx2.send("dared"), true), btn("Chicken out (1 ribbon)", () => ctx2.send("dare skip")))
+      h("div", null, btn("I did it", () => ctx3.send("dared"), true), btn("Chicken out (1 ribbon)", () => ctx3.send("dare skip")))
     ) : null;
     const pen = s.penned ? card(title("\u{1F6A7} Corralled"), muted("At " + s.penned.at + " for " + minsLeft(s.penned.until) + " more minutes. Wander off and you'll be walked back.")) : null;
-    const who = () => String(ctx2.ui.giftWho || "").trim();
+    const who = () => String(ctx3.ui.giftWho || "").trim();
     const row = (it) => h(
       "div",
       { class: "fhc-box", style: { padding: "8px", marginTop: "6px" } },
@@ -494,22 +497,48 @@ One of mods you are using is using an old version of SDK. It will work for now b
         chip(it.price + " \u{1F380}", (s.ribbons || 0) >= it.price ? "good" : "")
       ),
       muted(it.desc),
-      it.id === "bounty" || it.id === "greeting" || it.id === "tag" || it.id === "dedicate" ? btn("Write it\u2026", () => ctx2.fillBox("buy " + it.id + " ")) : h(
+      it.id === "bounty" || it.id === "greeting" || it.id === "tag" || it.id === "dedicate" ? btn("Write it\u2026", () => ctx3.fillBox("buy " + it.id + " ")) : h(
         "div",
         null,
-        btn("Buy", () => ctx2.send("buy " + it.id), true),
-        s.vat && (it.kind || /^shot-/.test(it.id)) ? btn("Pay with milk", () => ctx2.send("buy " + it.id + " with milk")) : null,
-        it.gift ? btn("Gift it", () => who() ? ctx2.send("buy " + it.id + " for " + who()) : ctx2.hint("Type who it's for in the box above the potions first.")) : null
+        btn("Buy", () => ctx3.send("buy " + it.id), true),
+        s.vat && (it.kind || /^shot-/.test(it.id)) ? btn("Pay with milk", () => ctx3.send("buy " + it.id + " with milk")) : null,
+        it.gift ? btn("Gift it", () => who() ? ctx3.send("buy " + it.id + " for " + who()) : ctx3.hint("Type who it's for in the box above the potions first.")) : null
       )
     );
     const shelf = (label, list) => list.length ? card(title(label), list.map(row)) : null;
-    const potions = items.filter((it) => it.kind), shots = items.filter((it) => /^shot-/.test(it.id)), treats = items.filter((it) => !it.kind && !/^shot-/.test(it.id));
+    const potions = items.filter((it) => it.kind), shots = items.filter((it) => /^shot-/.test(it.id)), messes = items.filter((it) => it.shelf === "mess"), treats = items.filter((it) => !it.kind && !/^shot-/.test(it.id) && it.shelf !== "mess");
+    const messWho = () => String(ctx3.ui.messWho || "").trim();
+    const messRow = (it) => h(
+      "div",
+      { class: "fhc-box", style: { padding: "8px", marginTop: "6px" } },
+      h("div", { class: "fhc-kv", style: { borderBottom: "none", padding: "0" } }, h("b", null, it.name), chip(it.price + " \u{1F380}", (s.ribbons || 0) >= it.price ? "good" : "")),
+      muted(it.desc),
+      h(
+        "div",
+        null,
+        btn("On them", () => messWho() ? ctx3.send("buy " + it.id + " for " + messWho()) : ctx3.hint("Type who it's for in the box above the messes first."), true),
+        btn("On me", () => ctx3.send("buy " + it.id))
+      )
+    );
+    const messCard = messes.length ? card(
+      title("\u{1F4A6} Messes"),
+      muted(`Put a mess on somebody: they're asked first, unless they've said ?messes on. Their limits count. It shows on them with "Farm can mark my body" switched on, and ?wash cleans it off.`),
+      h(
+        "label",
+        { class: "fhc-label" },
+        "For (name or member number)",
+        h("input", { class: "fhc-in", value: ctx3.ui.messWho || "", oninput: (e) => ctx3.setUi({ messWho: e.target.value }, true) })
+      ),
+      h("div", { style: { marginTop: "4px" } }, btn(s.messesOn ? "Messes on me: no askin' (switch off)" : "Let anybody mess me up without askin'", () => ctx3.send("messes " + (s.messesOn ? "off" : "on")))),
+      messes.map(messRow)
+    ) : null;
     return [
       purse,
       vat,
       now,
       dare,
       pen,
+      messCard,
       shelf("\u{1F6CD}\uFE0F Treats and favors", treats),
       shelf("\u{1F489} Shots", shots),
       potions.length ? card(
@@ -519,7 +548,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
           "label",
           { class: "fhc-label" },
           "Gift to (name or member number)",
-          h("input", { class: "fhc-in", value: ctx2.ui.giftWho || "", oninput: (e) => ctx2.setUi({ giftWho: e.target.value }, true) })
+          h("input", { class: "fhc-in", value: ctx3.ui.giftWho || "", oninput: (e) => ctx3.setUi({ giftWho: e.target.value }, true) })
         ),
         potions.map(row)
       ) : null
@@ -632,14 +661,14 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
   async function writeNow(version, force) {
     if (!S.dir || S.perm !== "granted" || !me()) return;
-    const snap2 = snapshot(version), body = JSON.stringify(snap2.data);
-    if (!force && body === S.last) return;
+    const snap2 = snapshot(version), body2 = JSON.stringify(snap2.data);
+    if (!force && body2 === S.last) return;
     const errWas = S.err;
     try {
       const fh = await S.dir.getFileHandle(fileName(), { create: true }), w = await fh.createWritable();
       await w.write(JSON.stringify(Object.assign(snap2, { savedAt: (/* @__PURE__ */ new Date()).toISOString() }), null, 1));
       await w.close();
-      S.last = body;
+      S.last = body2;
       S.at = Date.now();
       S.err = "";
     } catch (e) {
@@ -794,13 +823,13 @@ One of mods you are using is using an old version of SDK. It will work for now b
       cv.ax = ox;
       cv.ay = oy;
       cv.nips = nipples(S3);
-      const side = (s, draw) => {
+      const side = (s, draw2) => {
         g.save();
         g.beginPath();
         if (s < 0) g.rect(0, 0, ox, cv.height);
         else g.rect(ox, 0, cv.width - ox, cv.height);
         g.clip();
-        draw();
+        draw2();
         g.restore();
       };
       const whole = (s) => {
@@ -1024,10 +1053,11 @@ One of mods you are using is using an old version of SDK. It will work for now b
       }
       const MOULD = { ver: 0, lies: /* @__PURE__ */ new Set(), span: /* @__PURE__ */ new Map(), cover: /* @__PURE__ */ new Map(), items: /* @__PURE__ */ new Set(), mode: /* @__PURE__ */ new Map(), ext: /* @__PURE__ */ new Map(), img: /* @__PURE__ */ new Map(), prof: /* @__PURE__ */ new Map(), out: /* @__PURE__ */ new Map(), M: 150 };
       const mouldKey = (it) => it.Asset.Group.Name + "/" + it.Asset.Name;
-      const W8 = window;
+      const W10 = window;
+      const takesDrawings = () => typeof W10.GLDrawLoadTransient === "function";
       const mapSrc = host.mapSrc || ((src) => {
-        if (typeof W8.DrawGetImage !== "function") return src;
-        const lists = [typeof DrawCacheImage !== "undefined" ? DrawCacheImage : W8.DrawCacheImage, W8.DrawImageCache].filter((c) => c && typeof c.get === "function");
+        if (typeof W10.DrawGetImage !== "function") return src;
+        const lists = [typeof DrawCacheImage !== "undefined" ? DrawCacheImage : W10.DrawCacheImage, W10.DrawImageCache].filter((c) => c && typeof c.get === "function");
         if (!lists.length) return src;
         let seen2 = null;
         const kept = lists.map((c) => [c, Object.prototype.hasOwnProperty.call(c, "get"), c.get]);
@@ -1036,7 +1066,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
             if (seen2 == null) seen2 = k;
             return { isLoaded: () => false, data: void 0, complete: false };
           };
-          W8.DrawGetImage(src);
+          W10.DrawGetImage(src);
         } catch (e) {
         } finally {
           for (const [c, own, g] of kept) {
@@ -1105,14 +1135,14 @@ One of mods you are using is using an old version of SDK. It will work for now b
         MOULD.prof.set(src, p);
         return p;
       }
-      function outline(ctx2) {
+      function outline(ctx3) {
         const parts = [];
-        for (const b of ctx2.bodies) {
+        for (const b of ctx3.bodies) {
           const p = edgesOf(b.src);
           if (!p) return null;
           parts.push({ p, x: b.x, y: b.y });
         }
-        const bp = ctx2.belly.prof || (ctx2.belly.prof = edges(ctx2.belly.cv, ctx2.belly.cv.width, ctx2.belly.cv.height));
+        const bp = ctx3.belly.prof || (ctx3.belly.prof = edges(ctx3.belly.cv, ctx3.belly.cv.width, ctx3.belly.cv.height));
         const row = (yy, withBelly) => {
           let l = Infinity, r = -Infinity;
           for (const q2 of parts) {
@@ -1124,20 +1154,20 @@ One of mods you are using is using an old version of SDK. It will work for now b
           }
           if (l === Infinity) return null;
           if (withBelly) {
-            const j = yy - Math.round(ctx2.belly.dy);
+            const j = yy - Math.round(ctx3.belly.dy);
             if (j >= 0 && j < bp.h && bp.L[j] >= 0) {
-              l = Math.min(l, ctx2.belly.dx + bp.L[j]);
-              r = Math.max(r, ctx2.belly.dx + bp.R[j]);
+              l = Math.min(l, ctx3.belly.dx + bp.L[j]);
+              r = Math.max(r, ctx3.belly.dx + bp.R[j]);
             }
           }
           return { l, r };
         };
         return { old: (yy) => row(yy, false), neu: (yy) => row(yy, true) };
       }
-      function bellyCover(src, x, y, ctx2) {
+      function bellyCover(src, x, y, ctx3) {
         const im = mouldImg(src);
         if (!im) return 0;
-        const b = ctx2.belly, key = "bc|" + src + "|" + Math.round(x) + "," + Math.round(y) + "|" + Math.round(b.dx) + "," + Math.round(b.dy) + "," + b.cv.width + "," + b.cv.height;
+        const b = ctx3.belly, key = "bc|" + src + "|" + Math.round(x) + "," + Math.round(y) + "|" + Math.round(b.dx) + "," + Math.round(b.dy) + "," + b.cv.width + "," + b.cv.height;
         let v = MOULD.cover.get(key);
         if (v != null) return v;
         const w = im.naturalWidth, h2 = im.naturalHeight, c = document.createElement("canvas");
@@ -1158,16 +1188,16 @@ One of mods you are using is using an old version of SDK. It will work for now b
         MOULD.cover.set(key, v);
         return v;
       }
-      function bellyAuto(src, x, y, ctx2, behind, pieceKey) {
-        if (!ctx2.belly || behind || BELLY.auto === false || typeof src !== "string") return null;
+      function bellyAuto(src, x, y, ctx3, behind, pieceKey) {
+        if (!ctx3.belly || behind || BELLY.auto === false || typeof src !== "string") return null;
         const m0 = new RegExp("(?:^|/)Assets/[^/]+/(?:Override/[^/]+/)?([^/]+)/").exec(src);
         if (!m0) return false;
         if (m0[1] !== "Panties" && !chestSlot(m0[1])) return false;
-        if (m0[1] === "Panties") return mouldCanvas(src, x, y, ctx2, "under|" + (pieceKey || src), "under");
+        if (m0[1] === "Panties") return mouldCanvas(src, x, y, ctx3, "under|" + (pieceKey || src), "under");
         const pk = pieceKey || src;
-        if (bellyCover(src, x, y, ctx2) >= 0.15) MOULD.lies.add(pk);
+        if (bellyCover(src, x, y, ctx3) >= 0.15) MOULD.lies.add(pk);
         if (!MOULD.lies.has(pk)) return false;
-        return mouldCanvas(src, x, y, ctx2, "auto|" + (pieceKey || src), "auto");
+        return mouldCanvas(src, x, y, ctx3, "auto|" + (pieceKey || src), "auto");
       }
       function pieceSpan(pk, src, x, y) {
         const span = MOULD.span.get("p|" + pk) || { L: new Float32Array(2600).fill(1e9), R: new Float32Array(2600).fill(-1e9), v: 0, bottom: -1 };
@@ -1313,14 +1343,14 @@ One of mods you are using is using an old version of SDK. It will work for now b
         return c;
       }
       const shadeSeen = /* @__PURE__ */ new WeakMap();
-      function bellyShade(img2, sx, sy, ctx2) {
-        const b = ctx2.belly;
+      function bellyShade(img2, sx, sy, ctx3) {
+        const b = ctx3.belly;
         if (!b || !img2) return null;
         const fm = bellyForm(b.cv);
         if (!fm) return null;
         const w = img2.naturalWidth || img2.width, h2 = img2.naturalHeight || img2.height;
         if (!w || !h2) return null;
-        const key = Math.round(sx) + "," + Math.round(sy) + "|" + ctx2.sig + "|" + (ctx2.breast ? ctx2.breast.sig : "");
+        const key = Math.round(sx) + "," + Math.round(sy) + "|" + ctx3.sig + "|" + (ctx3.breast ? ctx3.breast.sig : "");
         let e = shadeSeen.get(img2);
         if (e && e.key === key) return e.out;
         const ox = Math.round(b.dx - sx), oy = Math.round(b.dy - sy), x0 = Math.max(0, ox), y0 = Math.max(0, oy), x1 = Math.min(w, ox + fm.w), y1 = Math.min(h2, oy + fm.h);
@@ -1334,7 +1364,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
           const part = g.getImageData(x0, y0, x1 - x0, y1 - y0), d = part.data;
           let any = false;
           let bm = null;
-          const Bb = ctx2.breast;
+          const Bb = ctx3.breast;
           if (Bb && Bb.mask) {
             const mc = document.createElement("canvas");
             mc.width = x1 - x0;
@@ -1363,8 +1393,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
         shadeSeen.set(img2, { key, out });
         return out;
       }
-      function bellyRows(ctx2) {
-        const b = ctx2.belly, bp = b.prof || (b.prof = edges(b.cv, b.cv.width, b.cv.height));
+      function bellyRows(ctx3) {
+        const b = ctx3.belly, bp = b.prof || (b.prof = edges(b.cv, b.cv.width, b.cv.height));
         let t = -1, e = -1;
         for (let j = 0; j < bp.h; j++) if (bp.L[j] >= 0) {
           if (t < 0) t = j;
@@ -1372,7 +1402,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
         }
         return t < 0 ? null : { top: Math.round(b.dy) + t, bottom: Math.round(b.dy) + e };
       }
-      function mouldCanvas(src, x, y, ctx2, piece, mode) {
+      function mouldCanvas(src, x, y, ctx3, piece, mode) {
         let im = mouldImg(src);
         if (!im) return null;
         const M = MOULD.M, w = im.naturalWidth;
@@ -1395,7 +1425,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
             }
           }
         }
-        const key = src + "|" + Math.round(x) + "," + Math.round(y) + "|" + mode + "|" + (ext ? ext.top + "-" + ext.bottom : "") + "|" + ctx2.sig;
+        const key = src + "|" + Math.round(x) + "," + Math.round(y) + "|" + mode + "|" + (ext ? ext.top + "-" + ext.bottom : "") + "|" + ctx3.sig;
         if (MOULD.out.has(key)) return MOULD.out.get(key);
         const keep2 = (res) => {
           keepIn(MOULD.out, key, res);
@@ -1408,14 +1438,14 @@ One of mods you are using is using an old version of SDK. It will work for now b
           const g2 = c2.getContext("2d");
           g2.drawImage(im, M, 0);
           g2.globalCompositeOperation = "destination-out";
-          g2.drawImage(ctx2.belly.cv, ctx2.belly.dx - x + M, ctx2.belly.dy - y);
+          g2.drawImage(ctx3.belly.cv, ctx3.belly.dx - x + M, ctx3.belly.dy - y);
           return keep2(c2);
         }
-        const ol = ctx2.outline || (ctx2.outline = outline(ctx2));
+        const ol = ctx3.outline || (ctx3.outline = outline(ctx3));
         if (!ol) return null;
         let changed = false;
         if (mode === "over" && ext) {
-          const br = bellyRows(ctx2), from = br ? Math.max(ext.top, br.top) : 0, to = br ? br.bottom - 2 : 0;
+          const br = bellyRows(ctx3), from = br ? Math.max(ext.top, br.top) : 0, to = br ? br.bottom - 2 : 0;
           if (br && ext.bottom > from + 4 && ext.bottom < to) {
             const a = from - Math.round(y), b = ext.bottom - Math.round(y), b2 = to - Math.round(y), tall = document.createElement("canvas");
             tall.width = w;
@@ -1435,8 +1465,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
         const g = c.getContext("2d");
         let longSrc = false;
         if (mode === "auto" && ext) {
-          const br = bellyRows(ctx2), mid = br ? (br.top + br.bottom) / 2 : 0, to = br ? br.bottom - 2 : 0, from = br ? Math.max(ext.top, br.top) : 0;
-          const ps = pieceSpan(piece, src, x, y), bp0 = ctx2.belly.prof || (ctx2.belly.prof = edges(ctx2.belly.cv, ctx2.belly.cv.width, ctx2.belly.cv.height));
+          const br = bellyRows(ctx3), mid = br ? (br.top + br.bottom) / 2 : 0, to = br ? br.bottom - 2 : 0, from = br ? Math.max(ext.top, br.top) : 0;
+          const ps = pieceSpan(piece, src, x, y), bp0 = ctx3.belly.prof || (ctx3.belly.prof = edges(ctx3.belly.cv, ctx3.belly.cv.width, ctx3.belly.cv.height));
           let endW = 1e9, bW = 0;
           for (let k = 3; k <= 8; k++) {
             const yy = ext.bottom - k;
@@ -1460,7 +1490,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
           }
         }
         if (mode === "auto") {
-          const b = ctx2.belly, bp = b.prof || (b.prof = edges(b.cv, b.cv.width, b.cv.height)), cxs = b.dx + b.cv.width / 2;
+          const b = ctx3.belly, bp = b.prof || (b.prof = edges(b.cv, b.cv.width, b.cv.height)), cxs = b.dx + b.cv.width / 2;
           if (longSrc) {
             c.height = h2;
           }
@@ -1496,7 +1526,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
             if (gl > cxs || gr < cxs) return null;
             return { gl, gr, nl: Math.min(gl, bl), nr: Math.max(gr, br2), bw: br2 - bl };
           };
-          const strappy = bellyCover(src, x, y, ctx2) < 0.35;
+          const strappy = bellyCover(src, x, y, ctx3) < 0.35;
           for (let j = 0; j < h2; j++) {
             const yy = Math.round(y) + j;
             g.drawImage(im, 0, j, w, 1, M, j, w, 1);
@@ -1655,7 +1685,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
         return v;
       }
       const GEN = { inches: 6, box: {}, drawn: true, kind: "human", knot: false, girth: 1, balls: 3, cv: null, cvKey: "" };
-      function draw(C, cb, game) {
+      function draw2(C, cb, game) {
         trim();
         {
           let finish = null, seenNow = null, handFNow = null;
@@ -1663,17 +1693,17 @@ One of mods you are using is using an old version of SDK. It will work for now b
             const fit = C === S3.C ? fitNow() : null, br = C === S3.C ? breastNow() : null, real = cb;
             const put2 = (name, img2, x, y, o) => {
               if (img2 && typeof img2 !== "string" && img2.MX != null && o && o.TextureAlphaMask) o = Object.assign({}, o, { TextureAlphaMask: void 0 });
-              if (typeof img2 === "string" || !host.picture) return real[name](img2, x, y, o);
+              if (typeof img2 === "string" || !host.picture || takesDrawings()) return real[name](img2, x, y, o);
               const p = host.picture(img2);
               if (p) return real[name](p.src, x + p.dx, y + p.dy, o);
             };
             if (fit && cb && typeof cb.drawImage === "function") {
               let upper = null, lower = false, done = false;
-              const ctx2 = { bodies: [], belly: null, sig: "", seen: {} };
+              const ctx3 = { bodies: [], belly: null, sig: "", seen: {} };
               if (br) {
-                seenNow = ctx2.seen;
+                seenNow = ctx3.seen;
                 handFNow = { get v() {
-                  return ctx2.handF;
+                  return ctx3.handF;
                 } };
               }
               const slot = new RegExp("(?:^|/)Assets/[^/]+/(?:Override/[^/]+/)?([^/]+)/");
@@ -1707,12 +1737,12 @@ One of mods you are using is using an old version of SDK. It will work for now b
                   const cv = br || fit.behind ? cv0 : bellyUnder(cv0, dx, dy, upper[2], upper[0], upper[1]);
                   put2("drawImage", cv, dx, dy, {});
                   if (typeof real.drawImageBlink === "function") put2("drawImageBlink", cv, dx, dy, {});
-                  ctx2.belly = { cv, dx, dy };
-                  ctx2.sig = [fit.rx, fit.ry, fit.sag, fit.cut, fit.flat ? 1 : 0, Math.round(dx), Math.round(dy)].join(",") + "|" + ctx2.bodies.map((b) => b.src + "@" + Math.round(b.x) + "," + Math.round(b.y)).join(";");
+                  ctx3.belly = { cv, dx, dy };
+                  ctx3.sig = [fit.rx, fit.ry, fit.sag, fit.cut, fit.flat ? 1 : 0, Math.round(dx), Math.round(dy)].join(",") + "|" + ctx3.bodies.map((b) => b.src + "@" + Math.round(b.x) + "," + Math.round(b.y)).join(";");
                 }
-                if (ctx2.cock) {
-                  const k = ctx2.cock;
-                  ctx2.cock = null;
+                if (ctx3.cock) {
+                  const k = ctx3.cock;
+                  ctx3.cock = null;
                   put2("drawImage", k[0], k[1], k[2], {});
                   if (typeof real.drawImageBlink === "function") put2("drawImageBlink", k[0], k[1], k[2], {});
                 }
@@ -1781,9 +1811,9 @@ One of mods you are using is using an old version of SDK. It will work for now b
                   }
                   put2("drawImage", bc, rx - bc.ax, ry - bc.ay, {});
                   if (typeof real.drawImageBlink === "function") put2("drawImageBlink", bc, rx - bc.ax, ry - bc.ay, {});
-                  ctx2.breast = { fit: FarmBreasts.fitOf(S32, FarmBelly.bellyPose(upper[2]), [bc.nips[1][0] + br.nipX, bc.nips[1][1] + br.nipY]), held: isHeld, upperSrc: upper[2], ux: upper[0], pose: bpose, ground: bpose === "AllFours" ? ground : Infinity, S: S32, rx, ry, uy: upper[1], mask: bc.mask, mx: rx - bc.ax, my: ry - bc.ay, nips: bc.nips.map((p, i) => [rx + p[0] + (i ? 1 : -1) * br.nipX, ry + p[1] + br.nipY]), k: FarmBreasts.shape(br.cup, br).k, kN: (1 + 0.45 * FarmBreasts.shape(br.cup, br).k) * br.nip, sig: key + "|" + Math.round(rx) + "," + Math.round(ry) + "|" + [br.nip, br.nipX, br.nipY].join(","), mid: upper[0] + 250 };
+                  ctx3.breast = { fit: FarmBreasts.fitOf(S32, FarmBelly.bellyPose(upper[2]), [bc.nips[1][0] + br.nipX, bc.nips[1][1] + br.nipY]), held: isHeld, upperSrc: upper[2], ux: upper[0], pose: bpose, ground: bpose === "AllFours" ? ground : Infinity, S: S32, rx, ry, uy: upper[1], mask: bc.mask, mx: rx - bc.ax, my: ry - bc.ay, nips: bc.nips.map((p, i) => [rx + p[0] + (i ? 1 : -1) * br.nipX, ry + p[1] + br.nipY]), k: FarmBreasts.shape(br.cup, br).k, kN: (1 + 0.45 * FarmBreasts.shape(br.cup, br).k) * br.nip, sig: key + "|" + Math.round(rx) + "," + Math.round(ry) + "|" + [br.nip, br.nipX, br.nipY].join(","), mid: upper[0] + 250 };
                   if (!held.length) {
-                    const B = ctx2.breast, sk = bellySkin(upper[2], upper[3], bpose), rad = 7 * B.kN, ncKey = rad.toFixed(2) + "|" + sk.join(",");
+                    const B = ctx3.breast, sk = bellySkin(upper[2], upper[3], bpose), rad = 7 * B.kN, ncKey = rad.toFixed(2) + "|" + sk.join(",");
                     let nc = BREAST.nc;
                     if (!nc || BREAST.ncKey !== ncKey) {
                       nc = document.createElement("canvas");
@@ -1815,7 +1845,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
                 }
               };
               const handHidden = (src, x, y) => {
-                const B = ctx2.breast, im = B && mouldImg(src);
+                const B = ctx3.breast, im = B && mouldImg(src);
                 if (!im) return null;
                 const key = "hh|" + src + "|" + Math.round(x) + "," + Math.round(y) + "|" + B.sig;
                 let v = BREAST.cover.get(key);
@@ -1841,16 +1871,16 @@ One of mods you are using is using an old version of SDK. It will work for now b
               };
               const LOWER_GROUPS = /^(Panties|ClothLower|SuitLower|ItemPelvis|ItemVulva|ItemButt|ItemLegs|Garters|Socks)$/;
               const handDraw = (name, src, x, y, o) => {
-                const B = ctx2.breast, im = B && mouldImg(src);
+                const B = ctx3.breast, im = B && mouldImg(src);
                 if (!im) return false;
                 let bv = null;
                 try {
-                  bv = ctx2.belly && !fit.behind && LOWER_GROUPS.test(groupOf3(src)) ? bellyAuto(src, x, y, ctx2, fit.behind, (pieceOf(src) || {}).key) : null;
+                  bv = ctx3.belly && !fit.behind && LOWER_GROUPS.test(groupOf3(src)) ? bellyAuto(src, x, y, ctx3, fit.behind, (pieceOf(src) || {}).key) : null;
                 } catch (e) {
                   bv = null;
                 }
                 const base = bv || im, ox = bv ? MOULD.M : 0;
-                const key = "hand|" + src + "|" + Math.round(x) + "," + Math.round(y) + "|" + B.sig + (bv ? "|b" + ctx2.sig + "|" + MOULD.ver + "|" + base.width + "x" + base.height : "") + (ctx2.belly ? "|s" + ctx2.sig : "");
+                const key = "hand|" + src + "|" + Math.round(x) + "," + Math.round(y) + "|" + B.sig + (bv ? "|b" + ctx3.sig + "|" + MOULD.ver + "|" + base.width + "x" + base.height : "") + (ctx3.belly ? "|s" + ctx3.sig : "");
                 let c = BREAST.out.get(key);
                 if (!c) {
                   c = document.createElement("canvas");
@@ -1860,9 +1890,9 @@ One of mods you are using is using an old version of SDK. It will work for now b
                   g.drawImage(base, 0, 0);
                   g.globalCompositeOperation = "destination-out";
                   g.drawImage(B.mask, B.mx - (x - ox), B.my - y);
-                  if (ctx2.belly && !fit.behind && chestSlot(groupOf3(src)) && groupOf3(src) !== "Panties") {
+                  if (ctx3.belly && !fit.behind && chestSlot(groupOf3(src)) && groupOf3(src) !== "Panties") {
                     try {
-                      const sh = bellyShade(c, x - ox, y, ctx2);
+                      const sh = bellyShade(c, x - ox, y, ctx3);
                       if (sh) c = sh;
                     } catch (e) {
                       console.warn("[body] belly form:", e);
@@ -1903,8 +1933,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
                     let r0 = -1, r1 = -1;
                     for (let rr2 = R * 0.8; rr2 <= R * 1.32; rr2 += 0.5) {
                       const px = Math.round(cx + ux * rr2), py = Math.round(cy + uy * rr2);
-                      const on = px >= 0 && py >= 0 && px < w && py < h2 && d[(py * w + px) * 4 + 3] > 60;
-                      if (on) {
+                      const on2 = px >= 0 && py >= 0 && px < w && py < h2 && d[(py * w + px) * 4 + 3] > 60;
+                      if (on2) {
                         if (r0 < 0) r0 = rr2;
                         r1 = rr2;
                         const o = (py * w + px) * 4;
@@ -1935,18 +1965,18 @@ One of mods you are using is using an old version of SDK. It will work for now b
                   let grp = [];
                   for (let a = 0; a <= FRAME_N; a++) {
                     const k = a % FRAME_N, hr = hit[k], t = k / FRAME_N * Math.PI * 2, ux = Math.cos(t) * sd, uy = Math.sin(t);
-                    let on = false;
+                    let on2 = false;
                     if (hr && uy < -0.3 && Math.cos(t) > -0.6 && a < FRAME_N) {
-                      on = true;
+                      on2 = true;
                       for (let q2 = 2; q2 <= 7; q2++) {
                         const px = Math.round(cx + ux * (hr[1] + q2)), py = Math.round(cy + uy * (hr[1] + q2));
                         if (!(px >= 0 && py >= 0 && px < w && py < h2 && d[(py * w + px) * 4 + 3] > 60)) {
-                          on = false;
+                          on2 = false;
                           break;
                         }
                       }
                     }
-                    if (on) grp.push(k);
+                    if (on2) grp.push(k);
                     else if (grp.length) {
                       const m = grp[grp.length >> 1], hm = hit[m], tm = m / FRAME_N * Math.PI * 2;
                       att.push({ a: m, x: cx + Math.cos(tm) * sd * (hm[1] + 1), y: cy + Math.sin(tm) * (hm[1] + 1) });
@@ -2022,7 +2052,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
                 return v;
               };
               const frameDraw = (name, src, x, y, o) => {
-                const B = ctx2.breast, im = B && mouldImg(src);
+                const B = ctx3.breast, im = B && mouldImg(src);
                 if (!im || B.pose === "AllFours" || cupNow() <= 5) return false;
                 const fm = frameMeasure(src, im, x, y, B);
                 if (!fm) return false;
@@ -2051,16 +2081,16 @@ One of mods you are using is using an old version of SDK. It will work for now b
                   }
                   g.drawImage(B.mask, MX + B.mx - x, MY + B.my - y);
                   g.globalCompositeOperation = "source-over";
-                  const ho = herOutline(B), W9 = fm.width, rgb2 = (q2, k) => "rgb(" + q2.map((u) => Math.max(0, Math.min(255, Math.round(u * k)))).join(",") + ")";
+                  const ho = herOutline(B), W11 = fm.width, rgb2 = (q2, k) => "rgb(" + q2.map((u) => Math.max(0, Math.min(255, Math.round(u * k)))).join(",") + ")";
                   for (const hv of ho) {
                     const sv = fm.sides.find((q2) => q2.sd === hv.sd);
                     if (!sv) continue;
                     const segs = [];
                     let cur = null;
                     for (let k = 0; k <= FRAME_N; k++) {
-                      const a = k % FRAME_N, ta = a / FRAME_N * Math.PI * 2, on = !!sv.hit[a] && hv.edge[a] > 0 && Math.sin(ta) < 0.3 && Math.cos(ta) > -0.6;
-                      if (on) {
-                        const t = a / FRAME_N * Math.PI * 2, ux = Math.cos(t) * hv.sd, uy = Math.sin(t), rr = hv.edge[a] - W9 * 0.45;
+                      const a = k % FRAME_N, ta = a / FRAME_N * Math.PI * 2, on2 = !!sv.hit[a] && hv.edge[a] > 0 && Math.sin(ta) < 0.3 && Math.cos(ta) > -0.6;
+                      if (on2) {
+                        const t = a / FRAME_N * Math.PI * 2, ux = Math.cos(t) * hv.sd, uy = Math.sin(t), rr = hv.edge[a] - W11 * 0.45;
                         (cur || (cur = [])).push([MX + hv.cx - x + ux * rr, MY + hv.cy - y + uy * rr]);
                       } else if (cur) {
                         segs.push(cur);
@@ -2079,26 +2109,26 @@ One of mods you are using is using an old version of SDK. It will work for now b
                     g.lineCap = "round";
                     g.lineJoin = "round";
                     for (const at of sv.att || []) {
-                      const t = at.a / FRAME_N * Math.PI * 2, ux = Math.cos(t) * hv.sd, uy = Math.sin(t), rr = hv.edge[at.a] - W9 * 0.45;
+                      const t = at.a / FRAME_N * Math.PI * 2, ux = Math.cos(t) * hv.sd, uy = Math.sin(t), rr = hv.edge[at.a] - W11 * 0.45;
                       segs.push([[MX + at.x, MY + at.y], [MX + hv.cx - x + ux * rr, MY + hv.cy - y + uy * rr]]);
                     }
                     for (const pts of segs) {
                       if (pts.length < 2) continue;
                       path(pts);
                       g.strokeStyle = rgb2(fm.col, 0.55);
-                      g.lineWidth = W9 + 1.5;
+                      g.lineWidth = W11 + 1.5;
                       g.stroke();
                       path(pts);
                       g.strokeStyle = rgb2(fm.col, 1);
-                      g.lineWidth = W9;
+                      g.lineWidth = W11;
                       g.stroke();
                       path(pts.map((p, i) => {
                         const q2 = pts[Math.min(pts.length - 1, i + 1)], pp = pts[Math.max(0, i - 1)], dx = q2[0] - pp[0], dy = q2[1] - pp[1], L = Math.hypot(dx, dy) || 1;
-                        return [p[0] - dy / L * W9 * 0.18, p[1] + dx / L * W9 * 0.18];
+                        return [p[0] - dy / L * W11 * 0.18, p[1] + dx / L * W11 * 0.18];
                       }));
                       g.globalAlpha = 0.55;
                       g.strokeStyle = rgb2(fm.hi, 1);
-                      g.lineWidth = Math.max(1, W9 * 0.22);
+                      g.lineWidth = Math.max(1, W11 * 0.22);
                       g.stroke();
                       g.globalAlpha = 1;
                     }
@@ -2137,7 +2167,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
                 return v;
               };
               const bandDraw = (name, src, x, y, o) => {
-                const B = ctx2.breast, im = mouldImg(src);
+                const B = ctx3.breast, im = mouldImg(src);
                 if (!B || !im) return false;
                 const key = "band|" + src + "|" + Math.round(x) + "," + Math.round(y) + "|" + B.sig;
                 let c = BREAST.out.get(key);
@@ -2249,7 +2279,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
               };
               const TEX = { FuzzyDress: {}, FurCoat: {}, FurBolero: {}, DressFur: {}, FlowerDress: { bl: 9, cell: 34 } };
               const dressDraw = (name, src, x, y, o) => {
-                const B = ctx2.breast, im = B && mouldImg(src);
+                const B = ctx3.breast, im = B && mouldImg(src);
                 if (!im) return false;
                 const pk0 = (pieceOf(src) || {}).key;
                 if (!BREAST.on[pk0] && chestCover(src, im, x, y, B, false) < 0.012 && frameCover(src, im, x, y, B) >= 0.55) {
@@ -2270,7 +2300,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
                 }
                 if (chestCover(src, im, x, y, B, false) < 0.012 && !BREAST.on[pk0]) return BREAST.holds[pk0] ? handDraw(name, src, x, y, o) : false;
                 const pc0 = pieceOf(src), flatK = pc0 && pc0.flat ? 0.87 : 1, wm = pc0 && BREAST.wear[pc0.key] || "", pin = wm === "nipple" || wm === "" && !!pc0 && (NIP_PIECES.test(pc0.name) || NIP_DESC.test(pc0.desc)), mapYp = pin && B.fit.mapYN ? B.fit.mapYN : B.fit.mapY;
-                const key = "dress|" + (pin ? "pin|" : "") + src + "|" + Math.round(x) + "," + Math.round(y) + "|" + B.sig + "|" + (ctx2.belly && !fit.behind && BELLY.auto !== false ? ctx2.sig : "") + "|" + MOULD.ver;
+                const key = "dress|" + (pin ? "pin|" : "") + src + "|" + Math.round(x) + "," + Math.round(y) + "|" + B.sig + "|" + (ctx3.belly && !fit.behind && BELLY.auto !== false ? ctx3.sig : "") + "|" + MOULD.ver;
                 let c = BREAST.out.get(key);
                 if (!c) {
                   const MX = 260, MY = 480, w = im.naturalWidth, h2 = im.naturalHeight, S22 = Object.assign({}, B.S, { sc: B.fit.kx, ro: B.fit.ro, ri: B.fit.ri, rv: B.fit.rv }), G = B.fit.G || FarmBreasts.GAME, sc = S22.sc;
@@ -2281,7 +2311,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
                   c.MY = MY;
                   const g = c.getContext("2d", { willReadFrequently: true }), midX = MX + B.mid - x, uyc = MY + B.uy - y;
                   const pk = (pieceOf(src) || {}).key || src, CW = c.width, CH = c.height;
-                  const overBelly = bellyAuto(src, x, y, ctx2, fit.behind, pk);
+                  const overBelly = bellyAuto(src, x, y, ctx3, fit.behind, pk);
                   if (overBelly) g.drawImage(overBelly, MX - MOULD.M, MY);
                   else g.drawImage(im, MX, MY);
                   let sleeves = null, spA = null;
@@ -2399,17 +2429,17 @@ One of mods you are using is using an old version of SDK. It will work for now b
                       if (n >= 2 && bt >= 1) {
                         const dr = sp[hi] - sp[lo], dg = sp[hi + 1] - sp[lo + 1], db2 = sp[hi + 2] - sp[lo + 2], dd = dr * dr + dg * dg + db2 * db2;
                         if (dd > 900) {
-                          let two = true, ends = 0;
+                          let two2 = true, ends = 0;
                           for (const p of Q) {
                             const er = sp[p] - sp[lo], eg = sp[p + 1] - sp[lo + 1], eb = sp[p + 2] - sp[lo + 2], u = Math.max(0, Math.min(1, (er * dr + eg * dg + eb * db2) / dd)), qr = er - u * dr, qg = eg - u * dg, qb = eb - u * db2;
                             if (qr * qr + qg * qg + qb * qb > dd * 0.03 + 60) {
-                              two = false;
+                              two2 = false;
                               break;
                             }
                             if (u < 0.12 || u > 0.88) ends++;
                           }
-                          if (ends < Q.length * 0.5) two = false;
-                          if (two) {
+                          if (ends < Q.length * 0.5) two2 = false;
+                          if (two2) {
                             const br2 = (spb[p00] * b00 + spb[p10] * b10 + spb[p01] * b01 + spb[p11] * b11) / bt, bg = (spb[p00 + 1] * b00 + spb[p10 + 1] * b10 + spb[p01 + 1] * b01 + spb[p11 + 1] * b11) / bt, bb = (spb[p00 + 2] * b00 + spb[p10 + 2] * b10 + spb[p01 + 2] * b01 + spb[p11 + 2] * b11) / bt;
                             const ts = sharp(((br2 - sp[lo]) * dr + (bg - sp[lo + 1]) * dg + (bb - sp[lo + 2]) * db2) / dd, w2), tr = ((r - sp[lo]) * dr + (gg - sp[lo + 1]) * dg + (bl - sp[lo + 2]) * db2) / dd;
                             const t = Math.abs(tr - ts) > 0.65 ? Math.max(0, Math.min(1, tr)) : ts;
@@ -2604,12 +2634,12 @@ One of mods you are using is using an old version of SDK. It will work for now b
                           I[(yy + 1) * (RW + 1) + xx + 1] = I[yy * (RW + 1) + xx + 1] + row;
                         }
                       }
-                      const box = (x2, y4, r) => {
+                      const box2 = (x2, y4, r) => {
                         const a = Math.max(0, x2 - r), b = Math.max(0, y4 - r), c2 = Math.min(RW, x2 + r + 1), d2 = Math.min(RH, y4 + r + 1);
                         return (I[d2 * (RW + 1) + c2] - I[b * (RW + 1) + c2] - I[d2 * (RW + 1) + a] + I[b * (RW + 1) + a]) / ((2 * r + 1) * (2 * r + 1));
                       };
                       const srcs = [];
-                      for (let yy = S4; yy < RH - S4; yy += 3) for (let xx = S4; xx < RW - S4; xx += 3) if (clean3[yy * RW + xx] && box(xx, yy, S4) > 0.8) srcs.push([xx + rx0, yy + ry0]);
+                      for (let yy = S4; yy < RH - S4; yy += 3) for (let xx = S4; xx < RW - S4; xx += 3) if (clean3[yy * RW + xx] && box2(xx, yy, S4) > 0.8) srcs.push([xx + rx0, yy + ry0]);
                       if (srcs.length < 4) return null;
                       return { S: S4, spL, srcs, bn, base: bl / nC, det, cleanAt: (x2, y4) => {
                         const xx = Math.round(x2) - rx0, yy = Math.round(y4) - ry0;
@@ -2719,10 +2749,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
                     g.globalCompositeOperation = "destination-out";
                     g.drawImage(hole, x0, y0);
                     g.globalCompositeOperation = "source-over";
-                    const atop = (draw2) => {
+                    const atop = (draw3) => {
                       g.save();
                       g.globalCompositeOperation = "source-atop";
-                      draw2();
+                      draw3();
                       g.restore();
                     };
                     const ell = (k, grow, dy) => {
@@ -2815,9 +2845,9 @@ One of mods you are using is using an old version of SDK. It will work for now b
                     g.drawImage(sleeves, 0, 0);
                     g.restore();
                   }
-                  if (ctx2.belly && !fit.behind) {
+                  if (ctx3.belly && !fit.behind) {
                     try {
-                      const sh = bellyShade(c, x - c.MX, y - c.MY, ctx2);
+                      const sh = bellyShade(c, x - c.MX, y - c.MY, ctx3);
                       if (sh) {
                         sh.MX = c.MX;
                         sh.MY = c.MY;
@@ -2850,7 +2880,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
               };
               const strapBase = {};
               const strapDraw = (name, src, x, y, o, piece) => {
-                const B = ctx2.breast, im = B && mouldImg(src);
+                const B = ctx3.breast, im = B && mouldImg(src);
                 if (!im) return false;
                 if (!strapBase[piece.key]) strapBase[piece.key] = src;
                 const base = strapBase[piece.key] === src, R = STRAPS[piece.name], tinted = !!(o && o.HexColor);
@@ -2906,13 +2936,13 @@ One of mods you are using is using an old version of SDK. It will work for now b
                       g.stroke();
                       g.restore();
                     };
-                    const side = (sd, draw2) => {
+                    const side = (sd, draw3) => {
                       g.save();
                       g.beginPath();
                       if (sd < 0) g.rect(0, 0, ox, c.height);
                       else g.rect(ox, 0, c.width - ox, c.height);
                       g.clip();
-                      draw2();
+                      draw3();
                       g.restore();
                     };
                     const nipY = oy + S22.by + S22.r * (-0.15 + 0.42 * S22.k), topY = oy + S22.by - S22.r * S22.top, botY = oy + S22.by + S22.r * (1 + S22.sag);
@@ -2969,7 +2999,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
               const held = [];
               const PUMP = { cups: [[188, 296, 40, 42], [272, 296, 40, 42]], cupMid: [[207, 316], [293, 316]], join: [250, 376], pumpTop: 700 };
               const pumpDraw = (name, src, x, y, o) => {
-                const B = ctx2.breast, im = B && mouldImg(src);
+                const B = ctx3.breast, im = B && mouldImg(src);
                 if (!im || im.naturalHeight < 900) return false;
                 const key = "pump|" + src + "|" + Math.round(x) + "," + Math.round(y) + "|" + B.sig;
                 let c = BREAST.out.get(key);
@@ -3013,12 +3043,12 @@ One of mods you are using is using an old version of SDK. It will work for now b
                     console.warn("[studio] pump:", e);
                   }
                 }
-                const B = ctx2.breast, im = B && mouldImg(src);
+                const B = ctx3.breast, im = B && mouldImg(src);
                 if (!im) return false;
                 const split = Math.max(0, Math.min(im.naturalWidth, Math.round(B.mid - x))), own = nipHalves(src, split);
                 if (!own) return false;
-                if (!ctx2.native && groupOf3(src) === "Nipples") ctx2.native = own.map((p) => p && [x + p[0], y + p[1]]);
-                const key = src + "|" + Math.round(x) + "," + Math.round(y) + "|" + B.sig + "|" + (ctx2.native ? "n" : "o");
+                if (!ctx3.native && groupOf3(src) === "Nipples") ctx3.native = own.map((p) => p && [x + p[0], y + p[1]]);
+                const key = src + "|" + Math.round(x) + "," + Math.round(y) + "|" + B.sig + "|" + (ctx3.native ? "n" : "o");
                 let c = BREAST.out.get(key);
                 if (!c) {
                   const MX = 320, MY = 460, w = im.naturalWidth, h2 = im.naturalHeight, kN = B.kN;
@@ -3030,7 +3060,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
                   const g = c.getContext("2d");
                   [[0, split], [split, w - split]].forEach(([sx, sw], i) => {
                     if (sw <= 0) return;
-                    const N = ctx2.native && ctx2.native[i] || own[i] && [x + own[i][0], y + own[i][1]];
+                    const N = ctx3.native && ctx3.native[i] || own[i] && [x + own[i][0], y + own[i][1]];
                     if (!N) return;
                     const T = B.nips[i];
                     g.drawImage(im, sx, 0, sw, h2, MX + (T[0] - x) + (sx + x - N[0]) * kN, MY + (T[1] - y) + (y - N[1]) * kN, sw * kN, h2 * kN);
@@ -3058,11 +3088,11 @@ One of mods you are using is using an old version of SDK. It will work for now b
                   } catch (e) {
                   }
                   upper = [x, y, src, o && o.HexColor];
-                  ctx2.bodies.push({ src, x, y });
+                  ctx3.bodies.push({ src, x, y });
                 }
                 if (src.includes("/BodyLower/")) {
                   lower = true;
-                  ctx2.bodies.push({ src, x, y });
+                  ctx3.bodies.push({ src, x, y });
                 }
               };
               const wrap = (name) => typeof real[name] === "function" ? (src, x, y, o) => {
@@ -3087,7 +3117,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
                       console.warn("[studio] nipples:", e);
                     }
                   }
-                  if (done && /Decal/i.test(gname) && ctx2.breast && ctx2.breast.pose !== "AllFours") {
+                  if (done && /Decal/i.test(gname) && ctx3.breast && ctx3.breast.pose !== "AllFours") {
                     try {
                       const p0 = edgesOf(src);
                       if (p0) {
@@ -3097,8 +3127,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
                           t1 = j;
                         }
                         if (t0 >= 0) {
-                          const cyL = y + (t0 + t1) / 2 - ctx2.breast.uy;
-                          put2(name, src, x, y + (ctx2.breast.fit.mapY(cyL) - cyL), o);
+                          const cyL = y + (t0 + t1) / 2 - ctx3.breast.uy;
+                          put2(name, src, x, y + (ctx3.breast.fit.mapY(cyL) - cyL), o);
                           return;
                         }
                       }
@@ -3109,10 +3139,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
                   if (done && chestSlot(gname) && !/Decal/i.test(gname) && !isMoulded(src)) {
                     const piece = pieceOf(src), how = piece && BREAST.wear[piece.key] || "";
                     try {
-                      const im0 = piece && ctx2.breast && mouldImg(src);
-                      if (im0 && chestCover(src, im0, x, y, ctx2.breast, true) >= 0.05) ctx2.seen[piece.key] = true;
-                      if (im0 && chestCover(src, im0, x, y, ctx2.breast, false) >= 0.012) ctx2.seen["on:" + piece.key] = true;
-                      if (im0 && chestCover(src, im0, x, y, ctx2.breast, false) >= 0.6) ctx2.seen["solid:" + piece.key] = true;
+                      const im0 = piece && ctx3.breast && mouldImg(src);
+                      if (im0 && chestCover(src, im0, x, y, ctx3.breast, true) >= 0.05) ctx3.seen[piece.key] = true;
+                      if (im0 && chestCover(src, im0, x, y, ctx3.breast, false) >= 0.012) ctx3.seen["on:" + piece.key] = true;
+                      if (im0 && chestCover(src, im0, x, y, ctx3.breast, false) >= 0.6) ctx3.seen["solid:" + piece.key] = true;
                     } catch (e) {
                     }
                     try {
@@ -3125,11 +3155,11 @@ One of mods you are using is using an old version of SDK. It will work for now b
                       console.warn("[studio] chest wear:", e);
                     }
                   }
-                  if (done && BREAST.tuck && (HAND_GROUPS.has(gname) || ARM_GROUPS.has(gname) && !/Rope|Harness|Binder|Jacket|Strait|Dress|Suit|Belt|Yoke|Pillory|Chain|Web|Tape|Bondage/i.test(src.slice(src.lastIndexOf("/") + 1)) || /Hand|Glove|Nail|Ring|Bracelet|Sleeve/i.test(gname)) && ctx2.breast && ctx2.breast.pose !== "AllFours") {
+                  if (done && BREAST.tuck && (HAND_GROUPS.has(gname) || ARM_GROUPS.has(gname) && !/Rope|Harness|Binder|Jacket|Strait|Dress|Suit|Belt|Yoke|Pillory|Chain|Web|Tape|Bondage/i.test(src.slice(src.lastIndexOf("/") + 1)) || /Hand|Glove|Nail|Ring|Bracelet|Sleeve/i.test(gname)) && ctx3.breast && ctx3.breast.pose !== "AllFours") {
                     try {
                       if (/^Hands/.test(gname)) {
                         const fr = handHidden(src, x, y);
-                        if (fr != null) ctx2.handF = Math.max(ctx2.handF || 0, fr);
+                        if (fr != null) ctx3.handF = Math.max(ctx3.handF || 0, fr);
                       }
                     } catch (e) {
                       console.warn("[studio] hands:", e);
@@ -3150,7 +3180,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
                       GEN.cvKey = key;
                     }
                     if (hard) {
-                      if (!blink) ctx2.cock = [GEN.cv, x + 49.5 - GEN.cv.ax, y + 110 - GEN.cv.ay];
+                      if (!blink) ctx3.cock = [GEN.cv, x + 49.5 - GEN.cv.ax, y + 110 - GEN.cv.ay];
                       return;
                     }
                     put2(blink ? "drawImageBlink" : "drawImage", GEN.cv, x + 49.5 - GEN.cv.ax, y + 110 - GEN.cv.ay, {});
@@ -3161,9 +3191,9 @@ One of mods you are using is using an old version of SDK. It will work for now b
                 }
                 let drawn = false;
                 try {
-                  if (ctx2.belly && !fit.behind && typeof src === "string") {
-                    const q2 = isMoulded(src), m = q2 ? mouldCanvas(src, x, y, ctx2, q2.key, q2.mode) : bellyAuto(src, x, y, ctx2, fit.behind, (pieceOf(src) || {}).key);
-                    const gname2 = groupOf3(src), formed = done && chestSlot(gname2) && gname2 !== "Panties" && (!q2 || q2.mode !== "under") ? m ? bellyShade(m, x - MOULD.M, y, ctx2) : bellyShade(mouldImg(src), x, y, ctx2) : null;
+                  if (ctx3.belly && !fit.behind && typeof src === "string") {
+                    const q2 = isMoulded(src), m = q2 ? mouldCanvas(src, x, y, ctx3, q2.key, q2.mode) : bellyAuto(src, x, y, ctx3, fit.behind, (pieceOf(src) || {}).key);
+                    const gname2 = groupOf3(src), formed = done && chestSlot(gname2) && gname2 !== "Panties" && (!q2 || q2.mode !== "under") ? m ? bellyShade(m, x - MOULD.M, y, ctx3) : bellyShade(mouldImg(src), x, y, ctx3) : null;
                     if (formed) {
                       put2(name, formed, m ? x - MOULD.M : x, y, o);
                       drawn = true;
@@ -3256,7 +3286,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
         cupNow,
         nipHalves,
         GEN,
-        draw
+        draw: draw2
       };
     };
   })();
@@ -4036,8 +4066,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
     tell(true);
     if (say) say(farm ? "Back to the farm's look." : "Back to the farm's look: it comes from the farm girl when you're in her room.");
   }
-  function drawnBodySet(on, say) {
-    S2.on = !!on;
+  function drawnBodySet(on2, say) {
+    S2.on = !!on2;
     save();
     if (S2.on) {
       if (!engine()) {
@@ -4059,18 +4089,18 @@ One of mods you are using is using an old version of SDK. It will work for now b
       else say("Drawn body on: " + st2.cupName + " cup" + (st2.belly ? " with your belly" : "") + ". Everyone here with the Companion sees it too.");
     }
   }
-  function drawnBodySeeOthers(on, say) {
-    seeOthers = !!on;
+  function drawnBodySeeOthers(on2, say) {
+    seeOthers = !!on2;
     try {
-      W3.localStorage.setItem(SEE_KEY, on ? "1" : "0");
+      W3.localStorage.setItem(SEE_KEY, on2 ? "1" : "0");
     } catch (e) {
     }
     for (const mn of others.keys()) redrawMn(mn, 60);
-    if (on) {
+    if (on2) {
       hook();
       ask();
     }
-    if (say) say(on ? "You'll see other people's drawn bodies." : "Other people are drawn the game's own way on your screen.");
+    if (say) say(on2 ? "You'll see other people's drawn bodies." : "Other people are drawn the game's own way on your screen.");
   }
   function drawnBodyCup(i, say) {
     const n = W3.FarmBreasts ? W3.FarmBreasts.CUPS.length : 21;
@@ -4149,11 +4179,1178 @@ One of mods you are using is using an old version of SDK. It will work for now b
     return { engines, others: others.size, pictures: used.size, keptMB: Math.round(kept / 1e6) };
   }
 
+  // studio/web/splatters.js
+  (function(root) {
+    "use strict";
+    function rng(seed) {
+      let a = seed >>> 0 || 1;
+      return () => {
+        a |= 0;
+        a = a + 1831565813 | 0;
+        let t = Math.imul(a ^ a >>> 15, 1 | a);
+        t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+        return ((t ^ t >>> 14) >>> 0) / 4294967296;
+      };
+    }
+    const KINDS2 = {
+      // cum matches the game's own Splatters (Laynie: "match the color and translucency of the games own splatters"): read off its
+      // pictures, a cool white, #E3E4E5 in the middle, #C2C3C5 in the shade, #FBFBFB at the shine, solid in the middle, soft at the edges
+      cum: { style: "run", base: "#E6E7E8", edge: "#B4B6B9", gloss: "#FDFDFD", alpha: 0.97, run: 1, width: 1, ropes: 1, beads: 0.6 },
+      cumThick: { style: "run", base: "#E1E2E3", edge: "#AEB0B3", gloss: "#FDFDFD", alpha: 1, run: 0.7, width: 1.4, ropes: 0.6, beads: 0.8 },
+      piss: { style: "run", tint: "#F6D23A", stampAlpha: 0.55, narrow: [0.45, 0.75], long: 1.35, turn: 0.3, texture: "sheen", base: "#F0D040", edge: "#C9A422", gloss: "#FFF6C0", alpha: 0.34, run: 1.6, width: 0.7, beads: 0.3, droplets: 1.5 },
+      milk: { style: "run", tint: "#FFFFFF", stampAlpha: 0.8, narrow: [0.6, 0.9], long: 1.2, turn: 0.4, texture: "milky", base: "#FBFBF6", edge: "#DADAD0", gloss: "#FFFFFF", alpha: 0.72, run: 1.4, width: 0.8, beads: 0.4, droplets: 0.8 },
+      honey: { style: "run", tint: "#E9A21C", stampAlpha: 0.88, narrow: [1, 1.35], long: 1.15, turn: 0.25, texture: "streaks", base: "#E09A18", edge: "#9C6208", gloss: "#FFE7A3", alpha: 0.74, run: 1.1, width: 1.2, beads: 0.9 },
+      maple: { style: "run", tint: "#9A521A", stampAlpha: 0.9, narrow: [0.9, 1.25], long: 1.2, turn: 0.3, texture: "streaks", base: "#94501A", edge: "#56290A", gloss: "#F0B47A", alpha: 0.78, run: 1.3, width: 1, beads: 0.7 },
+      chocolate: { style: "run", tint: "#5A3018", narrow: [1, 1.3], long: 1, turn: 0.4, texture: "shine", base: "#4A2814", edge: "#251208", gloss: "#B98A6A", alpha: 0.95, run: 1, width: 1.2, beads: 0.8 },
+      strawberry: { style: "run", tint: "#E0304E", stampAlpha: 0.9, narrow: [0.9, 1.2], long: 1.1, turn: 0.35, texture: "seeds", base: "#D52F4C", edge: "#951628", gloss: "#FFB3C0", alpha: 0.8, run: 1.2, width: 1, beads: 0.7, seeds: "#F6E27A" },
+      slime: { style: "smear", tint: "#79D04F", stampAlpha: 0.7, narrow: [1.2, 1.6], long: 0.9, turn: 1.2, texture: "bubbles", stampToo: true, base: "#6CC24A", edge: "#3A8226", gloss: "#D9FFC8", alpha: 0.6, run: 1, width: 1.1, beads: 0.6, bubbles: true, also: "run" },
+      cream: { style: "smear", base: "#FFF6E4", edge: "#E2D4B4", gloss: "#FFFFFF", alpha: 0.96, run: 0.35, width: 1.2 },
+      cake: { style: "smear", smudge: 0.3, sprinkleN: 30, base: "#FFD8E6", edge: "#E3A9BC", gloss: "#FFFFFF", alpha: 0.97, run: 0.2, width: 1.3, patches: "#FFFFFF", crumbs: ["#E8C27A", "#D9A85B", "#C98F45", "#7A4A2A"], sprinkles: ["#FF5C8A", "#5CC8FF", "#FFE05C", "#7CE07C"] },
+      mud: { style: "smear", base: "#6B4A2B", edge: "#45301A", gloss: "#9C7A55", alpha: 0.9, run: 0.5, width: 1.2, specks: "#3A2614", also: "run" },
+      mash: { style: "smear", base: "#D9C28C", edge: "#B09860", gloss: "#F5E8C2", alpha: 0.95, run: 0.25, width: 1.2, specks: "#A88A4A" }
+    };
+    function ribbon(ctx3, pts) {
+      const L = [], R = [];
+      for (let i = 0; i < pts.length; i++) {
+        const p = pts[i], q2 = pts[Math.min(i + 1, pts.length - 1)], o = pts[Math.max(i - 1, 0)];
+        let dx = q2[0] - o[0], dy = q2[1] - o[1];
+        const l = Math.hypot(dx, dy) || 1;
+        dx /= l;
+        dy /= l;
+        L.push([p[0] - dy * p[2] / 2, p[1] + dx * p[2] / 2]);
+        R.push([p[0] + dy * p[2] / 2, p[1] - dx * p[2] / 2]);
+      }
+      ctx3.beginPath();
+      ctx3.moveTo(L[0][0], L[0][1]);
+      for (let i = 1; i < L.length; i++) {
+        const m = [(L[i - 1][0] + L[i][0]) / 2, (L[i - 1][1] + L[i][1]) / 2];
+        ctx3.quadraticCurveTo(L[i - 1][0], L[i - 1][1], m[0], m[1]);
+      }
+      ctx3.lineTo(L[L.length - 1][0], L[L.length - 1][1]);
+      ctx3.lineTo(R[R.length - 1][0], R[R.length - 1][1]);
+      for (let i = R.length - 2; i >= 0; i--) {
+        const m = [(R[i + 1][0] + R[i][0]) / 2, (R[i + 1][1] + R[i][1]) / 2];
+        ctx3.quadraticCurveTo(R[i + 1][0], R[i + 1][1], m[0], m[1]);
+      }
+      ctx3.lineTo(R[0][0], R[0][1]);
+      ctx3.closePath();
+      return { L, R };
+    }
+    function puddle(ctx3, r, x, y, w, h2, rough) {
+      const n = 14, pts = [];
+      for (let i = 0; i < n; i++) {
+        const a = i / n * Math.PI * 2, k = 1 + (r() - 0.5) * rough;
+        pts.push([x + Math.cos(a) * w * k, y + Math.sin(a) * h2 * k]);
+      }
+      ctx3.beginPath();
+      for (let i = 0; i <= n; i++) {
+        const p = pts[i % n], q2 = pts[(i + 1) % n], m = [(p[0] + q2[0]) / 2, (p[1] + q2[1]) / 2];
+        if (i === 0) ctx3.moveTo(m[0], m[1]);
+        else ctx3.quadraticCurveTo(p[0], p[1], m[0], m[1]);
+      }
+      ctx3.closePath();
+    }
+    function wet(ctx3, K, a) {
+      ctx3.globalAlpha = K.alpha * (a || 1);
+      ctx3.fillStyle = K.base;
+      ctx3.fill();
+      ctx3.globalAlpha = Math.min(1, K.alpha * 0.8);
+      ctx3.strokeStyle = K.edge;
+      ctx3.lineWidth = 0.9;
+      ctx3.stroke();
+    }
+    function shine(ctx3, K, side, from, to) {
+      ctx3.globalAlpha = 0.7;
+      ctx3.strokeStyle = K.gloss;
+      ctx3.lineWidth = 1.1;
+      ctx3.lineCap = "round";
+      ctx3.beginPath();
+      for (let i = from; i < to; i++) {
+        const p = side[i];
+        if (i === from) ctx3.moveTo(p[0] + 1.2, p[1]);
+        else ctx3.lineTo(p[0] + 1.2, p[1]);
+      }
+      ctx3.stroke();
+    }
+    function strandPts(r, x, y, len, w, ang) {
+      const n = 12, pts = [], beads = [r(), r(), r()].map((v) => [v, 0.6 + r() * 0.9]);
+      let px = x, py = y, a = ang;
+      for (let i = 0; i <= n; i++) {
+        const t = i / n;
+        a += (r() - 0.5) * 0.35;
+        px += Math.sin(a) * len / n;
+        py += Math.cos(a) * len / n;
+        let ww = w * (0.55 + 0.25 * (1 - t));
+        for (const [bt, bs] of beads) ww += w * bs * Math.exp(-Math.pow((t - bt) / 0.07, 2));
+        pts.push([px, py, Math.max(1, ww)]);
+      }
+      return pts;
+    }
+    function strandDraw(ctx3, K, pts) {
+      const wide = pts.map((p) => [p[0], p[1], p[2] + 1.8]);
+      ribbon(ctx3, wide);
+      ctx3.globalAlpha = Math.min(1, K.alpha + 0.05);
+      ctx3.fillStyle = K.edge;
+      ctx3.fill();
+      const side = ribbon(ctx3, pts);
+      ctx3.globalAlpha = K.alpha;
+      ctx3.fillStyle = K.base;
+      ctx3.fill();
+      ctx3.globalAlpha = 0.85;
+      ctx3.strokeStyle = K.gloss;
+      ctx3.lineWidth = 1;
+      ctx3.lineCap = "round";
+      ctx3.beginPath();
+      side.L.forEach((p, i) => {
+        const q2 = pts[i];
+        const x = p[0] * 0.35 + q2[0] * 0.65, y = p[1] * 0.35 + q2[1] * 0.65;
+        if (i === 0) ctx3.moveTo(x, y);
+        else ctx3.lineTo(x, y);
+      });
+      ctx3.stroke();
+    }
+    function strand(ctx3, r, K, x, y, size, ang0) {
+      const len = size * (0.25 + r() * 0.55) * (0.6 + K.run * 0.4), w = Math.max(1.6, size * 0.032 * K.width * (0.7 + r() * 0.6)), ang = ang0 !== void 0 ? ang0 : (r() - 0.5) * 0.9;
+      const pts = strandPts(r, x, y, len, w, ang);
+      if (r() < 0.3) {
+        const cut = 4 + Math.floor(r() * 4);
+        strandDraw(ctx3, K, pts.slice(0, cut));
+        strandDraw(ctx3, K, pts.slice(cut + 2));
+      } else strandDraw(ctx3, K, pts);
+      {
+        const e = pts[pts.length - 1], d = w * (1.1 + r() * 0.6);
+        strandDraw(ctx3, K, [[e[0], e[1] - d * 0.4, d], [e[0], e[1], d * 1.25], [e[0], e[1] + d * 0.4, d]]);
+      }
+      for (let b = 0, nb = r() < 0.6 ? 1 + (r() < 0.35 ? 1 : 0) : 0; b < nb; b++) {
+        const p = pts[2 + Math.floor(r() * 7)], side = r() < 0.5 ? -1 : 1;
+        strandDraw(ctx3, K, strandPts(r, p[0], p[1], len * (0.3 + r() * 0.35), w * 0.8, ang + side * (0.4 + r() * 0.5)));
+      }
+      for (let d = 0, nd = Math.floor(r() * 3); d < nd; d++) {
+        const p = pts[Math.floor(r() * pts.length)], bx = p[0] + (r() - 0.5) * size * 0.5, by = p[1] + (r() - 0.5) * size * 0.3, bw = w * (0.8 + r() * 0.6);
+        strandDraw(ctx3, K, [[bx, by - bw * 0.5, bw], [bx, by, bw * 1.2], [bx, by + bw * 0.5, bw]]);
+      }
+    }
+    function run(ctx3, r, K, x, y, len, w) {
+      const steps = 14, pts = [], wob = (r() - 0.5) * 6, swell = r() * Math.PI * 2;
+      let px = x;
+      for (let i = 0; i <= steps; i++) {
+        const t = i / steps;
+        px += (r() - 0.5) * 1.4 + wob * 0.06;
+        const ww = w * (0.55 + 0.35 * Math.sin(t * 6 + swell) * (r() * 0.5 + 0.5)) * (1 - t * 0.25);
+        pts.push([px, y + t * len, Math.max(1.2, ww)]);
+      }
+      const side = ribbon(ctx3, pts);
+      wet(ctx3, K);
+      shine(ctx3, K, side.L, 1, Math.floor(steps * 0.7));
+      const end = pts[pts.length - 1];
+      if (r() < 0.55) {
+        puddle(ctx3, r, end[0], end[1] + w * 0.15, w * (0.9 + r() * 0.6), w * (0.45 + r() * 0.25), 0.35);
+        wet(ctx3, K);
+      } else {
+        ctx3.beginPath();
+        ctx3.ellipse(end[0], end[1] + w * 0.25, w * 0.55, w * 0.75, 0, 0, Math.PI * 2);
+        wet(ctx3, K);
+      }
+      ctx3.globalAlpha = 0.85;
+      ctx3.fillStyle = K.gloss;
+      ctx3.beginPath();
+      ctx3.arc(end[0] - w * 0.2, end[1], Math.max(0.7, w * 0.12), 0, Math.PI * 2);
+      ctx3.fill();
+    }
+    function splash(ctx3, r, K, x, y, size, amount) {
+      const w = size * (0.11 + r() * 0.12) * K.width, h2 = w * (0.35 + r() * 0.2), ang = (r() - 0.5) * 1.2;
+      ctx3.save();
+      ctx3.translate(x, y);
+      ctx3.rotate(ang);
+      puddle(ctx3, r, 0, 0, w, h2, 0.55);
+      ctx3.restore();
+      wet(ctx3, K);
+      const n = 1 + Math.round(r() * 2.2 * Math.min(1.4, K.run));
+      for (let i = 0; i < n; i++) {
+        const sx = x + (r() - 0.5) * w * 1.2, len = size * (0.4 + r() * 1.3) * K.run * (0.8 + amount * 0.25), sw = Math.max(2, w * (0.3 + r() * 0.3));
+        run(ctx3, r, K, sx, y + h2 * 0.3, len, sw);
+      }
+    }
+    function rope(ctx3, r, K, x, y, size) {
+      const a = (r() - 0.5) * 1.4 + (r() < 0.5 ? 0 : Math.PI), l = size * (0.5 + r() * 0.8), pts = [];
+      for (let i = 0; i <= 10; i++) {
+        const t = i / 10;
+        pts.push([x + Math.cos(a) * l * t, y + Math.sin(a) * l * t * 0.5 + Math.sin(t * Math.PI) * 6, 1.4 + Math.sin(t * Math.PI) * size * 0.05 * K.width]);
+      }
+      const side = ribbon(ctx3, pts);
+      wet(ctx3, K);
+      shine(ctx3, K, side.L, 2, 8);
+      if (r() < 0.6) {
+        const p = pts[3 + Math.floor(r() * 5)];
+        run(ctx3, r, K, p[0], p[1], size * (0.3 + r() * 0.6) * K.run, Math.max(2, p[2] * 1.3));
+      }
+    }
+    function smear(ctx3, r, K, x, y, size) {
+      const a = (r() - 0.5) * 1.8, l = size * (0.5 + r() * 0.8), w0 = size * (0.18 + r() * 0.14) * K.width, pts = [];
+      for (let i = 0; i <= 12; i++) {
+        const t = i / 12;
+        pts.push([x + Math.cos(a) * l * (t - 0.5) + (r() - 0.5) * 2, y + Math.sin(a) * l * (t - 0.5) * 0.6 + (r() - 0.5) * 2, w0 * (0.4 + Math.sin(t * Math.PI) * 0.8) * (0.8 + r() * 0.4)]);
+      }
+      const side = ribbon(ctx3, pts);
+      wet(ctx3, K);
+      ctx3.globalAlpha = 0.45;
+      ctx3.strokeStyle = K.gloss;
+      ctx3.lineWidth = 0.9;
+      for (let s = 0; s < 3; s++) {
+        const off = (r() - 0.5) * w0 * 0.6;
+        ctx3.beginPath();
+        pts.forEach((p, i) => i ? ctx3.lineTo(p[0], p[1] + off) : ctx3.moveTo(p[0], p[1] + off));
+        ctx3.stroke();
+      }
+      if (K.patches) {
+        ctx3.fillStyle = K.patches;
+        for (let s = 0; s < 6; s++) {
+          const p = (r() < 0.5 ? side.L : side.R)[Math.floor(r() * side.L.length)];
+          ctx3.globalAlpha = 0.9;
+          puddle(ctx3, r, p[0], p[1], 2 + r() * w0 * 0.35, 1.5 + r() * w0 * 0.2, 0.6);
+          ctx3.fill();
+        }
+      }
+      if (r() < K.run) {
+        const p = pts[Math.floor(r() * pts.length)];
+        run(ctx3, r, K, p[0], p[1] + p[2] * 0.3, size * (0.3 + r() * 0.7) * K.run, Math.max(2.5, p[2] * 0.4));
+      }
+    }
+    const STAMP_FILES = ["Chest1", "Chest2", "Chest3", "Chest4", "Face1", "Face2", "Face3", "Forehead1", "Forehead2", "Forehead3", "Tummy1", "Tummy2", "Tummy3", "Tummy4"];
+    const STAMPS = [];
+    function cutStamps(img2) {
+      const c = document.createElement("canvas");
+      c.width = img2.width;
+      c.height = img2.height;
+      const x = c.getContext("2d");
+      x.drawImage(img2, 0, 0);
+      const W10 = c.width, H = c.height, d = x.getImageData(0, 0, W10, H).data, seen2 = new Uint8Array(W10 * H), out = [];
+      for (let i = 0; i < W10 * H; i++) {
+        if (seen2[i] || d[i * 4 + 3] < 16) continue;
+        const q2 = [i];
+        seen2[i] = 1;
+        let x0 = W10, y0 = H, x1 = 0, y1 = 0, n = 0;
+        while (q2.length) {
+          const p = q2.pop(), px = p % W10, py = p / W10 | 0;
+          n++;
+          if (px < x0) x0 = px;
+          if (px > x1) x1 = px;
+          if (py < y0) y0 = py;
+          if (py > y1) y1 = py;
+          for (let dy = -2; dy <= 2; dy++) for (let dx = -2; dx <= 2; dx++) {
+            const nx = px + dx, ny = py + dy;
+            if (nx < 0 || ny < 0 || nx >= W10 || ny >= H) continue;
+            const k = ny * W10 + nx;
+            if (!seen2[k] && d[k * 4 + 3] >= 16) {
+              seen2[k] = 1;
+              q2.push(k);
+            }
+          }
+        }
+        if (n < 25) continue;
+        const s2 = document.createElement("canvas");
+        s2.width = x1 - x0 + 3;
+        s2.height = y1 - y0 + 3;
+        s2.getContext("2d").drawImage(c, x0 - 1, y0 - 1, s2.width, s2.height, 0, 0, s2.width, s2.height);
+        out.push(s2);
+      }
+      return out;
+    }
+    async function loadStamps(base) {
+      if (STAMPS.length) return STAMPS.length;
+      for (const n of STAMP_FILES) {
+        try {
+          const img2 = new Image();
+          img2.crossOrigin = "anonymous";
+          await new Promise((ok2, no) => {
+            img2.onload = ok2;
+            img2.onerror = no;
+            setTimeout(no, 8e3);
+            img2.src = (base || "") + "Assets/Female3DCG/BodyMarkings/Splatters_" + n + ".png";
+          });
+          STAMPS.push(...cutStamps(img2));
+        } catch (e) {
+        }
+      }
+      return STAMPS.length;
+    }
+    const tintCache = /* @__PURE__ */ new Map();
+    function tinted(st2, K) {
+      if (!K.tint) return st2;
+      const key = STAMPS.indexOf(st2) + K.tint;
+      if (tintCache.has(key)) return tintCache.get(key);
+      const c = document.createElement("canvas");
+      c.width = st2.width;
+      c.height = st2.height;
+      const x = c.getContext("2d");
+      x.drawImage(st2, 0, 0);
+      x.globalCompositeOperation = "multiply";
+      x.fillStyle = K.tint;
+      x.fillRect(0, 0, c.width, c.height);
+      x.globalCompositeOperation = "destination-in";
+      x.drawImage(st2, 0, 0);
+      if (K.texture) {
+        x.globalCompositeOperation = "source-atop";
+        TEXTURES[K.texture](x, c.width, c.height, rng(st2.width * 31 + st2.height));
+      }
+      tintCache.set(key, c);
+      return c;
+    }
+    const TEXTURES = {
+      streaks: (x, w, h2, r) => {
+        x.globalAlpha = 0.55;
+        x.strokeStyle = "#FFF2B8";
+        x.lineWidth = 1;
+        for (let i = 0; i < 3; i++) {
+          const sx = r() * w;
+          x.beginPath();
+          x.moveTo(sx, 0);
+          x.lineTo(sx + (r() - 0.5) * 4, h2);
+          x.stroke();
+        }
+      },
+      bubbles: (x, w, h2, r) => {
+        x.globalAlpha = 0.7;
+        x.strokeStyle = "#E4FFD6";
+        x.lineWidth = 0.8;
+        for (let i = 0; i < Math.max(2, w * h2 / 120); i++) {
+          x.beginPath();
+          x.arc(r() * w, r() * h2, 0.8 + r() * 2, 0, Math.PI * 2);
+          x.stroke();
+        }
+      },
+      seeds: (x, w, h2, r) => {
+        x.globalAlpha = 0.9;
+        x.fillStyle = "#F7E27A";
+        for (let i = 0; i < Math.max(1, w * h2 / 160); i++) {
+          x.beginPath();
+          x.ellipse(r() * w, r() * h2, 0.6, 1, r() * 3, 0, Math.PI * 2);
+          x.fill();
+        }
+      },
+      shine: (x, w, h2, r) => {
+        x.globalAlpha = 0.45;
+        x.strokeStyle = "#D8B49A";
+        x.lineWidth = 1.2;
+        x.beginPath();
+        x.moveTo(w * 0.3, 0);
+        x.lineTo(w * 0.35, h2);
+        x.stroke();
+      },
+      sheen: (x, w, h2, r) => {
+        x.globalAlpha = 0.35;
+        x.fillStyle = "#FFFBE0";
+        x.fillRect(w * 0.25, 0, w * 0.2, h2);
+      },
+      milky: (x, w, h2, r) => {
+        x.globalAlpha = 0.4;
+        x.fillStyle = "#FFFFFF";
+        x.fillRect(0, 0, w, h2);
+      }
+    };
+    function stamp(ctx3, r, K, x, y, size) {
+      const st2 = STAMPS[Math.floor(r() * STAMPS.length)], img2 = tinted(st2, K), sc = size / 60 * (0.75 + r() * 0.5);
+      const flip = r() < 0.5 ? -1 : 1, narrow = K.narrow ? K.narrow[0] + r() * (K.narrow[1] - K.narrow[0]) : 0.85 + r() * 0.3, long = (K.long || 1) * (K.runX || 1);
+      ctx3.save();
+      ctx3.translate(x, y);
+      ctx3.rotate((r() - 0.5) * (K.turn || 0.6));
+      ctx3.scale(sc * flip * narrow, sc * long);
+      ctx3.globalAlpha = K.stampAlpha || 1;
+      ctx3.drawImage(img2, -img2.width / 2, -img2.height * 0.3);
+      ctx3.restore();
+    }
+    function paint(ctx3, kind, opt) {
+      const K0 = KINDS2[kind] || KINDS2.cum, K = opt && opt.runX ? Object.assign({}, K0, { run: K0.run * opt.runX, runX: 0.85 + 0.15 * opt.runX }) : K0, r = rng(opt && opt.seed || 1), amount = Math.max(0.3, opt && opt.amount || 1), at = opt && opt.at || [[250, 330, 40]];
+      ctx3.save();
+      ctx3.lineJoin = "round";
+      for (const [ax, ay, size] of at) {
+        const spot = () => [ax + (r() - 0.5) * size * 1.5, ay + (r() - 0.5) * size * 0.9];
+        if (K.style === "smear") {
+          for (let i = 0, n = Math.round((2 + r() * 2) * amount); i < n; i++) {
+            const [x, y] = spot();
+            smear(ctx3, r, K, x, y, size);
+          }
+          if (K.also === "run") for (let i = 0, n = Math.round(r() * 2 * amount); i < n; i++) {
+            const [x, y] = spot();
+            splash(ctx3, r, K, x, y, size * 0.8, amount);
+          }
+          if (K.stampToo && STAMPS.length) for (let i = 0, n = Math.round((4 + r() * 4) * amount); i < n; i++) {
+            const [x, y] = spot();
+            stamp(ctx3, r, K, x, y, size);
+          }
+        } else if (STAMPS.length && K.stamp !== false) {
+          for (let i = 0, n = Math.round((10 + r() * 8) * amount); i < n; i++) {
+            const a = r() * Math.PI * 2, d = size * Math.sqrt(r()) * 1.5;
+            stamp(ctx3, r, K, ax + Math.cos(a) * d, ay + Math.sin(a) * d * 0.7 - size * 0.2, size);
+          }
+          for (let i = 0, n = Math.round(r() * 1.2 * amount * Math.min(1, K.run - 0.2)); i < n; i++) {
+            const [x, y] = spot();
+            const p = [x, y];
+            run(ctx3, r, K, p[0], p[1], size * (0.4 + r() * 0.9) * K.run, Math.max(2, size * 0.05));
+          }
+        } else if (K.strands !== false) {
+          for (let i = 0, n = Math.round((7 + r() * 6) * amount); i < n; i++) {
+            const a = r() * Math.PI * 2, d = size * (0.1 + r() * 0.75), x = ax + Math.cos(a) * d, y = ay + Math.sin(a) * d * 0.7;
+            const out = Math.atan2(Math.cos(a), Math.sin(a) * 0.7) * 0.6;
+            strand(ctx3, r, K, x, y, size, out + (r() - 0.5) * 0.4);
+          }
+          for (let i = 0, n = Math.round(r() * 1.6 * amount * Math.min(1, K.run)); i < n; i++) {
+            const [x, y] = spot();
+            splash(ctx3, r, K, x, y, size * 0.8, amount);
+          }
+        } else {
+          for (let i = 0, n = Math.round((1.5 + r() * 2) * amount); i < n; i++) {
+            const [x, y] = spot();
+            splash(ctx3, r, K, x, y, size, amount);
+          }
+          for (let i = 0, n = K.ropes ? Math.round(r() * 2 * K.ropes * amount) : 0; i < n; i++) {
+            const [x, y] = spot();
+            rope(ctx3, r, K, x, y, size);
+          }
+        }
+        for (let i = 0, n = Math.round((4 + r() * 6) * amount * (K.droplets || 0.5)); i < n; i++) {
+          const a = r() * Math.PI * 2, d = size * (0.5 + r() * 0.8);
+          ctx3.beginPath();
+          ctx3.ellipse(ax + Math.cos(a) * d, ay + Math.sin(a) * d * 0.7, 0.8 + r() * 1.6, 0.8 + r() * 2.2, 0, 0, Math.PI * 2);
+          wet(ctx3, K, 0.9);
+        }
+        if (K.bubbles) for (let i = 0; i < 6 * amount; i++) {
+          const [x, y] = spot();
+          ctx3.globalAlpha = 0.55;
+          ctx3.strokeStyle = K.gloss;
+          ctx3.lineWidth = 0.9;
+          ctx3.beginPath();
+          ctx3.arc(x, y, 1.2 + r() * 3, 0, Math.PI * 2);
+          ctx3.stroke();
+        }
+        if (K.seeds) for (let i = 0; i < 8 * amount; i++) {
+          const [x, y] = spot();
+          ctx3.globalAlpha = 0.9;
+          ctx3.fillStyle = K.seeds;
+          ctx3.beginPath();
+          ctx3.ellipse(x, y, 0.8, 1.3, r() * 3, 0, Math.PI * 2);
+          ctx3.fill();
+        }
+        if (K.specks) for (let i = 0; i < 16 * amount; i++) {
+          const [x, y] = spot();
+          ctx3.globalAlpha = 0.75;
+          ctx3.fillStyle = K.specks;
+          ctx3.beginPath();
+          ctx3.arc(x, y, 0.5 + r() * 1.3, 0, Math.PI * 2);
+          ctx3.fill();
+        }
+        if (K.crumbs) for (let i = 0; i < 14 * amount; i++) {
+          const [x, y] = spot();
+          ctx3.globalAlpha = 1;
+          puddle(ctx3, r, x, y, 1.2 + r() * (r() < 0.15 ? 5 : 2.2), 1 + r() * 2, 0.7);
+          ctx3.fillStyle = K.crumbs[Math.floor(r() * K.crumbs.length)];
+          ctx3.fill();
+        }
+        if (K.sprinkles) for (let i = 0; i < (K.sprinkleN || 12) * amount; i++) {
+          const [x, y] = spot(), a = r() * Math.PI;
+          ctx3.globalAlpha = 1;
+          ctx3.strokeStyle = K.sprinkles[Math.floor(r() * K.sprinkles.length)];
+          ctx3.lineWidth = 1.6;
+          ctx3.lineCap = "round";
+          ctx3.beginPath();
+          ctx3.moveTo(x - Math.cos(a) * 2.2, y - Math.sin(a) * 2.2);
+          ctx3.lineTo(x + Math.cos(a) * 2.2, y + Math.sin(a) * 2.2);
+          ctx3.stroke();
+        }
+      }
+      ctx3.restore();
+    }
+    function paintOn(ctx3, body2, kind, opt) {
+      const c = document.createElement("canvas");
+      c.width = ctx3.canvas.width;
+      c.height = ctx3.canvas.height;
+      const x = c.getContext("2d");
+      paint(x, kind, opt);
+      const m = document.createElement("canvas");
+      m.width = c.width;
+      m.height = c.height;
+      const mx = m.getContext("2d");
+      const sm = KINDS2[kind] && KINDS2[kind].smudge !== void 0 ? KINDS2[kind].smudge : 1;
+      mx.filter = "blur(" + 5 * sm + "px)";
+      mx.globalAlpha = 0.5 * sm;
+      mx.drawImage(c, 0, 4);
+      mx.filter = "blur(" + 3 * sm + "px)";
+      mx.globalAlpha = 0.45 * sm;
+      mx.drawImage(c, 1, 2);
+      mx.filter = "blur(" + Math.max(0.3, 1.2 * sm) + "px)";
+      mx.globalAlpha = 0.5;
+      mx.drawImage(c, 0, 1);
+      mx.filter = "blur(" + Math.max(0.2, 0.9 * sm) + "px)";
+      mx.globalAlpha = 0.95;
+      mx.drawImage(c, 0, 0);
+      if (body2) {
+        mx.filter = "none";
+        mx.globalCompositeOperation = "destination-in";
+        mx.drawImage(body2, 0, 0);
+      }
+      ctx3.drawImage(m, 0, 0);
+    }
+    const AREAS3 = {
+      face: [250, 185, 34],
+      forehead: [250, 150, 26],
+      hair: [250, 120, 40],
+      chest: [250, 330, 60],
+      tummy: [250, 450, 50],
+      crotch: [250, 560, 30],
+      thighL: [215, 650, 30],
+      thighR: [285, 650, 30],
+      armL: [150, 380, 22],
+      armR: [350, 380, 22],
+      back: [250, 380, 60]
+    };
+    root.FarmMess = { KINDS: KINDS2, AREAS: AREAS3, paint, paintOn, rng, loadStamps, STAMPS };
+  })(typeof window !== "undefined" ? window : globalThis);
+
+  // extension/src/messes.js
+  var W4 = window;
+  var KEY2 = "farmhand-messes";
+  var MAX = 60;
+  var sdk3 = null;
+  var hooked3 = false;
+  var mine2 = [];
+  var others2 = /* @__PURE__ */ new Map();
+  var BY_COLOR = {
+    "#fff4dc": "cream",
+    "#e0a030": "honey",
+    "#8b4a1c": "maple",
+    "#4a2a18": "chocolate",
+    "#e04a6a": "strawberry",
+    "#f7f7f0": "milk",
+    "#5fae3a": "slime",
+    "#6b4a2b": "mud",
+    "#d8c08a": "mash",
+    "#d9c13a": "piss",
+    "#ffd8e6": "cake"
+  };
+  var AREA_OF = { face: "face", forehead: "forehead", chest: "chest", tummy: "tummy", hair: "hair", thighs: "thighL", back: "back" };
+  function load2() {
+    try {
+      const v = JSON.parse(W4.localStorage.getItem(KEY2));
+      if (Array.isArray(v)) mine2 = v.filter(ok).slice(-MAX);
+    } catch (e) {
+      mine2 = [];
+    }
+  }
+  function save2() {
+    try {
+      W4.localStorage.setItem(KEY2, JSON.stringify(mine2));
+    } catch (e) {
+    }
+  }
+  var ok = (e) => e && typeof e.k === "string" && W4.FarmMess && W4.FarmMess.KINDS[e.k] && Array.isArray(e.a) && Number.isFinite(e.s);
+  var clean2 = (list) => Array.isArray(list) ? list.filter(ok).slice(-MAX).map((e) => ({ k: e.k, a: e.a.filter((x) => typeof x === "string" && W4.FarmMess.AREAS[x]).slice(0, 6), s: e.s | 0, t: +e.t || 0, m: Math.max(0.5, Math.min(3, Number(e.m) || 1)) })) : [];
+  function messFromMark(m) {
+    if (!m || !Array.isArray(m.splat) || !m.splat.length || !W4.FarmMess) return false;
+    const kind = typeof m.mess === "string" && W4.FarmMess.KINDS[m.mess] ? m.mess : (typeof m.color === "string" ? BY_COLOR[m.color.toLowerCase()] : null) || "cum";
+    const a = [];
+    for (const x of m.splat) {
+      const k = AREA_OF[x];
+      if (k && !a.includes(k)) a.push(k);
+    }
+    if (a.includes("tummy") && ["cum", "piss", "milk", "honey", "maple", "chocolate", "strawberry", "slime"].includes(kind) && Math.random() < 0.4) a.push(Math.random() < 0.5 ? "thighL" : "thighR");
+    if (!a.length) a.push("chest");
+    const amt = Number(m.amount) > 0 ? Math.max(0.5, Math.min(3, Number(m.amount))) : 1;
+    mine2.push({ k: kind, a, s: Math.random() * 1e9 | 0, t: Date.now(), m: Math.round(amt * 10) / 10 });
+    if (mine2.length > MAX) mine2 = mine2.slice(-MAX);
+    save2();
+    tell2(true);
+    redrawMe();
+    return true;
+  }
+  function messWash() {
+    if (!mine2.length) return false;
+    mine2 = [];
+    save2();
+    tell2(true);
+    redrawMe();
+    return true;
+  }
+  var send2 = (type, data) => {
+    try {
+      if (W4.ServerSend && W4.ServerPlayerIsInChatRoom && W4.ServerPlayerIsInChatRoom()) W4.ServerSend("ChatRoomChat", makeMsg(type, data));
+    } catch (e) {
+    }
+  };
+  var toldAt2 = 0;
+  var askedAt2 = 0;
+  function tell2(force) {
+    if (!force && Date.now() - toldAt2 < 8e3) return;
+    toldAt2 = Date.now();
+    send2("mess", { list: mine2 });
+  }
+  function ask2() {
+    if (Date.now() - askedAt2 < 8e3) return;
+    askedAt2 = Date.now();
+    send2("messAsk", {});
+  }
+  function onMessMsg(m) {
+    const mn = m.from;
+    if (!mn || W4.Player && mn === W4.Player.MemberNumber) return;
+    if (m.type === "messAsk") {
+      if (mine2.length) setTimeout(() => tell2(), 300 + Math.random() * 1500);
+      return;
+    }
+    if (m.type !== "mess") return;
+    const list = clean2(m.list);
+    if (!list.length) {
+      if (others2.delete(mn)) redrawMn2(mn);
+      return;
+    }
+    others2.set(mn, { list, at: Date.now() });
+    hook2();
+    redrawMn2(mn);
+  }
+  var charOf2 = (mn) => W4.Player && W4.Player.MemberNumber === mn ? W4.Player : (W4.ChatRoomCharacter || []).find((c) => c && c.MemberNumber === mn) || null;
+  var againT2 = /* @__PURE__ */ new Map();
+  function redrawMn2(mn, soon) {
+    clearTimeout(againT2.get(mn));
+    againT2.set(mn, setTimeout(() => {
+      try {
+        const C = charOf2(mn);
+        if (C && typeof W4.CharacterLoadCanvas === "function") W4.CharacterLoadCanvas(C);
+      } catch (e) {
+      }
+    }, soon || 80));
+  }
+  var redrawMe = () => {
+    if (W4.Player) redrawMn2(W4.Player.MemberNumber);
+  };
+  var listFor = (C) => C === W4.Player ? mine2 : (others2.get(C.MemberNumber) || {}).list || [];
+  var imgs = /* @__PURE__ */ new Map();
+  function img(src, mn) {
+    let i = imgs.get(src);
+    if (i) return i.complete && i.naturalWidth ? i : null;
+    i = new Image();
+    i.onload = () => redrawMn2(mn, 100);
+    i.src = src;
+    imgs.set(src, i);
+    return null;
+  }
+  if (W4.FarmMess && W4.FarmMess.loadStamps) W4.FarmMess.loadStamps("").then((n) => {
+    if (n) {
+      redrawMe();
+      for (const mn of others2.keys()) redrawMn2(mn);
+    }
+  });
+  var BODY = /(?:^|\/)Assets\/[^/]+\/(?:BodyUpper|BodyLower|Head|Arms|ArmsLeft|ArmsRight|Hands|HandsLeft|HandsRight|Pussy)\//;
+  var made2 = /* @__PURE__ */ new Map();
+  function forget(src) {
+    if (!src || typeof src !== "string") return;
+    setTimeout(() => {
+      for (const p of made2.values()) if (p.src === src) return;
+      try {
+        const m = W4.GLDrawImageCache;
+        if (m && typeof m.delete === "function") m.delete(src);
+      } catch (e) {
+      }
+      try {
+        const m = W4.DrawImageCache;
+        if (m && typeof m.delete === "function") m.delete(src);
+      } catch (e) {
+      }
+      try {
+        const gl = W4.GLDrawCanvas && W4.GLDrawCanvas.GL, tc = gl && gl.textureCache;
+        const t2 = tc && tc.get(src);
+        if (t2) {
+          if (t2.texture) gl.deleteTexture(t2.texture);
+          tc.delete(src);
+        }
+      } catch (e) {
+      }
+    }, 5e3);
+  }
+  function keep(mn, p) {
+    const was = made2.get(mn);
+    made2.set(mn, p);
+    if (was && was.src && was.src !== p.src) forget(was.src);
+  }
+  function messPicture(C, list, body2) {
+    const over = W4.CanvasUpperOverflow || 700, h2 = C.Canvas && C.Canvas.height || 1e3 + over;
+    const up = body2.find((b) => /\/BodyUpper\//.test(b[0])), ox = up ? up[1] : 0, oy = up ? up[2] - over : 0;
+    const age = (e) => Math.min(5, Math.floor((Date.now() - (e.t || 0)) / 6e4));
+    const key = JSON.stringify(list) + "|" + list.map(age).join("") + "|" + body2.map((b) => b[0] + "@" + b[1] + "," + b[2]).join(";");
+    const was = made2.get(C.MemberNumber);
+    if (was && was.key === key) return was;
+    const mask = W4.document.createElement("canvas");
+    mask.width = 500;
+    mask.height = h2;
+    const mg = mask.getContext("2d");
+    for (const [src, x, y] of body2) {
+      const i = img(src, C.MemberNumber);
+      if (!i) return was || null;
+      mg.drawImage(i, x, y);
+    }
+    const c = W4.document.createElement("canvas");
+    c.width = 500;
+    c.height = h2;
+    const g = c.getContext("2d");
+    const at = (names) => names.map((n) => {
+      const A = W4.FarmMess.AREAS[n];
+      return [A[0] + ox, A[1] + over + oy, A[2]];
+    });
+    for (const e of list) W4.FarmMess.paintOn(g, mask, e.k, { at: at(e.a), seed: e.s, amount: e.m || 1, runX: 0.55 + 0.09 * age(e) });
+    if (typeof W4.GLDrawLoadTransient === "function") {
+      const p2 = { key, src: c, dx: 0, dy: 0 };
+      keep(C.MemberNumber, p2);
+      return p2;
+    }
+    const d = g.getImageData(0, 0, c.width, c.height).data;
+    let x0 = c.width, y0 = c.height, x1 = -1, y1 = -1;
+    for (let y = 0; y < c.height; y++) for (let x = 0; x < c.width; x++) if (d[(y * c.width + x) * 4 + 3]) {
+      if (x < x0) x0 = x;
+      if (x > x1) x1 = x;
+      if (y < y0) y0 = y;
+      if (y > y1) y1 = y;
+    }
+    if (x1 < 0) {
+      const p2 = { key, src: null };
+      keep(C.MemberNumber, p2);
+      return p2;
+    }
+    const t = W4.document.createElement("canvas");
+    t.width = x1 - x0 + 1;
+    t.height = y1 - y0 + 1;
+    t.getContext("2d").drawImage(c, -x0, -y0);
+    const p = { key, src: t.toDataURL("image/png"), dx: x0, dy: y0, fresh: true };
+    keep(C.MemberNumber, p);
+    return p;
+  }
+  function hook2() {
+    if (hooked3 || !sdk3) return;
+    hooked3 = true;
+    try {
+      const SKIN = /^(BodyUpper|BodyLower|Head|Arms|ArmsLeft|ArmsRight|Hands|HandsLeft|HandsRight|Pussy|Nipples|Eyes|Eyes2|Eyebrows|Mouth|Blush|Fluids|Emoticon|BodyMarkings|FaceMarkings|Mask|HairBack|HairFront|Height|BodyStyle)$/;
+      const groupRe = /(?:^|\/)Assets\/[^/]+\/(?:Override\/[^/]+\/)?([^/]+)\//;
+      sdk3.hookFunction("CommonDrawAppearanceBuild", 3, (args, next) => {
+        const C = args[0], real = args[1];
+        if (!C || !real || typeof real.drawImage !== "function" || !W4.FarmMess) return next(args);
+        const list = listFor(C);
+        if (!list.length) return next(args);
+        const body2 = [];
+        let done = false;
+        const lay = () => {
+          if (done) return;
+          done = true;
+          try {
+            const p = messPicture(C, list, body2);
+            if (p && p.src) {
+              real.drawImage(p.src, p.dx, p.dy, {});
+              if (typeof real.drawImageBlink === "function") real.drawImageBlink(p.src, p.dx, p.dy, {});
+              if (p.fresh) {
+                p.fresh = false;
+                const mn = C.MemberNumber;
+                redrawMn2(mn, 250);
+                setTimeout(() => redrawMn2(mn, 0), 1200);
+              }
+            }
+          } catch (e) {
+            console.warn("[Farmhand Companion] messes:", e);
+          }
+        };
+        const seen2 = (name) => (src, x, y, ...rest) => {
+          if (typeof src === "string" && !done) {
+            if (BODY.test(src)) body2.push([src, x, y]);
+            else {
+              const m = groupRe.exec(src);
+              if (m && !SKIN.test(m[1]) && body2.length) lay();
+            }
+          }
+          return real[name](src, x, y, ...rest);
+        };
+        const wrap = {};
+        for (const n of ["drawImage", "drawImageBlink", "drawImageColorize", "drawImageColorizeBlink"]) if (typeof real[n] === "function") wrap[n] = seen2(n);
+        args[1] = Object.assign({}, real, wrap);
+        const out = next(args);
+        lay();
+        return out;
+      });
+      sdk3.hookFunction("ChatRoomSync", 0, (args, next) => {
+        const r = next(args);
+        setTimeout(() => {
+          if (mine2.length) tell2(true);
+          ask2();
+        }, 3e3);
+        return r;
+      });
+    } catch (e) {
+      console.warn("[Farmhand Companion] messes unavailable:", e);
+      hooked3 = false;
+    }
+  }
+  function initMesses(mod2) {
+    sdk3 = mod2;
+    load2();
+    setInterval(() => {
+      const fresh2 = (l) => l.some((e) => Date.now() - (e.t || 0) < 6 * 6e4);
+      if (fresh2(mine2)) redrawMe();
+      for (const [mn, o] of others2) if (fresh2(o.list)) redrawMn2(mn);
+    }, 6e4);
+    setTimeout(() => {
+      hook2();
+      if (mine2.length) {
+        tell2(true);
+        redrawMe();
+      }
+      ask2();
+    }, 3500);
+  }
+  function messMemory() {
+    let pics = 0;
+    for (const p of made2.values()) if (p.src) pics++;
+    return { pictures: pics, bytesKB: Math.round(Array.from(made2.values()).reduce((n, p) => n + (p.src ? p.src.length : 0), 0) / 1e3), imgs: imgs.size, others: others2.size };
+  }
+
+  // extension/src/trimpics.js
+  var W5 = window;
+  var LIMIT = 38e7;
+  var TARGET = 26e7;
+  var IDLE = 5 * 6e4;
+  var seen = /* @__PURE__ */ new Map();
+  var sdk4 = null;
+  var trimmed = 0;
+  var started = Date.now();
+  function bytes(tc) {
+    let n = 0;
+    for (const v of tc.values()) n += (v.width || 0) * (v.height || 0) * 4;
+    return n;
+  }
+  function trimPictures(force, idle, target) {
+    const gl = W5.GLDrawCanvas && W5.GLDrawCanvas.GL, tc = gl && gl.textureCache, cache = W5.GLDrawImageCache;
+    if (!cache || typeof cache.purge === "function") return 0;
+    if (!tc || typeof tc.forEach !== "function") return 0;
+    let total = bytes(tc);
+    if (!force && total <= LIMIT) return 0;
+    const now = Date.now(), old = [];
+    for (const [url, v] of tc) {
+      if (typeof url !== "string") continue;
+      const t = seen.get(url) || started;
+      if (now - t < (idle ?? IDLE)) continue;
+      const img2 = cache.get(url);
+      if (img2 && img2.complete === false) continue;
+      old.push([t, url, v]);
+    }
+    old.sort((a, b) => a[0] - b[0]);
+    let n = 0;
+    for (const [, url, v] of old) {
+      if (total <= (target ?? TARGET)) break;
+      try {
+        if (v.texture) gl.deleteTexture(v.texture);
+      } catch (e) {
+      }
+      tc.delete(url);
+      cache.delete(url);
+      seen.delete(url);
+      total -= (v.width || 0) * (v.height || 0) * 4;
+      n++;
+    }
+    trimmed += n;
+    return n;
+  }
+  function trimStats() {
+    return { trimmed };
+  }
+  function initTrim(mod2) {
+    sdk4 = mod2;
+    W5.__farmTrim = trimPictures;
+    try {
+      sdk4.hookFunction("GLDrawLoadImage", 0, (args, next) => {
+        if (typeof args[1] === "string") seen.set(args[1], Date.now());
+        return next(args);
+      });
+    } catch (e) {
+      console.warn("[Farmhand Companion] picture trim unavailable:", e);
+      return;
+    }
+    setInterval(() => {
+      try {
+        trimPictures(false);
+      } catch (e) {
+        console.warn("[Farmhand Companion] picture trim:", e);
+      }
+    }, 6e4);
+  }
+
+  // extension/src/memlog.js
+  var W6 = window;
+  var KEY3 = "farmhand-memlog";
+  var MAX2 = 120;
+  var log = [];
+  try {
+    const v = JSON.parse(W6.localStorage.getItem(KEY3));
+    if (Array.isArray(v)) log = v.slice(-MAX2);
+  } catch (e) {
+    log = [];
+  }
+  function snap() {
+    const s = { t: Date.now() };
+    try {
+      if (W6.performance && W6.performance.memory) s.heapMB = Math.round(W6.performance.memory.usedJSHeapSize / 1e6);
+    } catch (e) {
+    }
+    try {
+      const c0 = W6.GLDrawImageCache, m = c0 && c0.cache instanceof Map ? c0.cache : c0;
+      if (m && typeof m.keys === "function") {
+        s.gamePics = m.size;
+        let d = 0, dk = 0;
+        for (const k of m.keys()) if (typeof k === "string" && k.startsWith("data:")) {
+          d++;
+          dk += k.length;
+        }
+        s.madePics = d;
+        s.madePicsKB = Math.round(dk / 1e3);
+      }
+      const gl = W6.GLDrawCanvas && W6.GLDrawCanvas.GL, tc = gl && gl.textureCache;
+      if (tc) {
+        let px = 0;
+        for (const v of tc.values()) px += (v.width || 0) * (v.height || 0);
+        s.textures = tc.size;
+        s.textureMB = Math.round(px * 4 / 1e6);
+      } else if (m && m !== c0) {
+        let px = 0, n = 0;
+        for (const v of m.values()) {
+          const dd = v && v.data;
+          if (dd && dd.width) {
+            px += dd.width * dd.height;
+            n++;
+          }
+        }
+        s.textures = n;
+        s.textureMB = Math.round(px * 4 / 1e6);
+      }
+    } catch (e) {
+    }
+    try {
+      s.body = drawnBodyMemory();
+    } catch (e) {
+    }
+    try {
+      s.mess = messMemory();
+    } catch (e) {
+    }
+    try {
+      s.let = trimStats().trimmed;
+    } catch (e) {
+    }
+    try {
+      s.room = (W6.ChatRoomCharacter || []).length;
+      s.screen = W6.CurrentScreen;
+    } catch (e) {
+    }
+    return s;
+  }
+  function save3() {
+    try {
+      W6.localStorage.setItem(KEY3, JSON.stringify(log));
+    } catch (e) {
+      log = log.slice(-30);
+    }
+  }
+  function tick() {
+    const s = snap(), prev = log[log.length - 1];
+    if (prev && s.t - prev.t > 5 * 6e4) s.gap = true;
+    log.push(s);
+    if (log.length > MAX2) log = log.slice(-MAX2);
+    save3();
+  }
+  var line = (s) => new Date(s.t).toTimeString().slice(0, 5) + (s.gap ? " (after a gap)" : "") + "  page " + (s.heapMB ?? "?") + " MB \xB7 game pictures " + (s.gamePics ?? "?") + " (" + (s.madePics ?? 0) + " ours, " + (s.madePicsKB ?? 0) + " KB) \xB7 graphics card " + (s.textureMB ?? "?") + " MB in " + (s.textures ?? "?") + " \xB7 drawn bodies " + (s.body ? s.body.engines + ", keeping " + s.body.keptMB + " MB" : "?") + " \xB7 messes " + (s.mess ? s.mess.pictures : "?") + " \xB7 " + (s.room ?? "?") + " in the room" + (s.let ? " \xB7 " + s.let + " old pictures let go" : "");
+  var FAST = "farmhand-memfast";
+  var born = Date.now();
+  var fast = [];
+  try {
+    const v = JSON.parse(W6.localStorage.getItem(FAST));
+    if (Array.isArray(v)) fast = v.slice(-40);
+  } catch (e) {
+    fast = [];
+  }
+  var lastPage = fast.filter((x) => x.t < born).slice(-12);
+  function quick() {
+    const x = { t: Date.now() };
+    try {
+      if (W6.performance && W6.performance.memory) x.h = Math.round(W6.performance.memory.usedJSHeapSize / 1e6);
+    } catch (e) {
+    }
+    try {
+      const gl = W6.GLDrawCanvas && W6.GLDrawCanvas.GL, tc = gl && gl.textureCache, c0 = W6.GLDrawImageCache;
+      x.p = tc ? tc.size : c0 && c0.cache instanceof Map ? c0.cache.size : void 0;
+    } catch (e) {
+    }
+    try {
+      x.r = (W6.ChatRoomCharacter || []).length;
+      x.s = W6.CurrentScreen;
+    } catch (e) {
+    }
+    fast.push(x);
+    if (fast.length > 40) fast = fast.slice(-40);
+    try {
+      W6.localStorage.setItem(FAST, JSON.stringify(fast));
+    } catch (e) {
+    }
+  }
+  var quickLine = (x) => new Date(x.t).toTimeString().slice(0, 8) + "  page " + (x.h ?? "?") + " MB \xB7 " + (x.p ?? "?") + " pictures \xB7 " + (x.r ?? "?") + " in the room \xB7 " + (x.s || "");
+  function memlogText(n) {
+    return log.slice(-(n || 20)).map(line).join("\n");
+  }
+  function initMemlog() {
+    setTimeout(tick, 2e4);
+    setInterval(tick, 3e4);
+    setInterval(quick, 3e3);
+    if (typeof W6.CommandCombine === "function") {
+      W6.CommandCombine([{ Tag: "farmmem", Description: ": the Farmhand Companion's memory log (the last hour), and copies it", Action: () => {
+        tick();
+        const text = "Companion v" + VERSION + "\n" + memlogText(24) + (lastPage.length ? "\nThe last seconds of the page before this one:\n" + lastPage.map(quickLine).join("\n") : "");
+        try {
+          W6.navigator.clipboard.writeText(JSON.stringify(log));
+        } catch (e) {
+        }
+        if (typeof W6.ChatRoomSendLocal === "function") W6.ChatRoomSendLocal("Farmhand memory log (copied, paste it to Claude):\n" + text, 12e4);
+        else console.log(text);
+      } }]);
+    }
+  }
+
+  // extension/src/settings.js
+  var W7 = window;
+  var ID = "FarmhandCompanion";
+  var panel = null;
+  var box = null;
+  var tab = "switches";
+  var settingsAvailable = () => typeof W7.PreferenceRegisterExtensionSetting === "function";
+  function ctx() {
+    const c = panel.ctx();
+    return Object.assign({}, c, {
+      setPref: (k, v) => {
+        c.setPref(k, v);
+        draw();
+      },
+      setUi: (p, quiet) => {
+        c.setUi(p, true);
+        if (!quiet) draw();
+      },
+      send: (cmd) => {
+        c.send(cmd);
+        setTimeout(draw, 1500);
+      },
+      hint: (m) => {
+        c.hint(m);
+        note(m);
+      }
+    });
+  }
+  function note(m) {
+    const n = box && box.querySelector("#fhc-set-note");
+    if (n) {
+      n.textContent = m;
+      n.style.display = "block";
+    }
+  }
+  var TABS = [
+    ["switches", "Switches"],
+    ["guides", "Guides"],
+    ["files", "Your settings file"],
+    ["about", "About"]
+  ];
+  function body(c) {
+    const p = c.prefs, s = c.s || {};
+    if (tab === "guides") return guidesTab(c, !!s.staff);
+    if (tab === "files") return [card(
+      title("\u{1F9E0} Memory log"),
+      muted("For chasing a page that runs out of room: how big things were, every half minute, for the last hour. /farmmem in chat shows it too."),
+      h("pre", { style: { whiteSpace: "pre-wrap", fontSize: "11px", maxHeight: "300px", overflowY: "auto" } }, memlogText(12) || "Nothing yet.")
+    )];
+    if (tab === "about") return [card(
+      title("\u{1F33E} Farmhand Companion v" + VERSION),
+      muted("The B&B Farm's helper: the \u{1F33E} panel, the drawn body, the farm's messes and gear on you, and your switches. It only talks to the farm girl."),
+      toggle(
+        "Farmhand Companion on",
+        "Switched off, the Companion stays quiet after your next reload: no panel, no drawn body, no messes or farm gear on you, nothing sent to the farm. This page stays, so you can switch it back on.",
+        !p.off,
+        () => c.setPref("off", !p.off)
+      ),
+      p.off ? h("div", { style: { marginTop: "6px" } }, btn("Reload now", () => W7.location.reload(), true)) : null
+    )];
+    return [drawnBodyCard(c), panelPrefs(c)];
+  }
+  function draw() {
+    if (!box) return;
+    const c = ctx();
+    box.replaceChildren(
+      h(
+        "div",
+        { style: { display: "flex", alignItems: "center", gap: "10px", marginBottom: "8px" } },
+        h("h2", { style: { margin: "0", flex: "1" } }, "\u{1F33E} Farmhand Companion"),
+        btn("Back", () => {
+          if (typeof W7.PreferenceSubscreenExtensionsClear === "function") W7.PreferenceSubscreenExtensionsClear();
+          else close();
+        }, true)
+      ),
+      h("nav", { class: "fhc-row" }, TABS.map(([id, label]) => h("button", { type: "button", class: "fhc-pill" + (tab === id ? " on" : ""), onclick: () => {
+        tab = id;
+        draw();
+      } }, label))),
+      h("div", { id: "fhc-set-note", style: { display: "none", margin: "6px 0", color: "#c9a35b" } }),
+      h("div", { style: { marginTop: "8px" } }, body(c))
+    );
+  }
+  function open() {
+    close();
+    box = W7.document.createElement("div");
+    box.id = "fhc-settings";
+    box.style.cssText = "position:fixed;left:50%;top:3%;transform:translateX(-50%);width:min(860px,96vw);max-height:94vh;overflow-y:auto;z-index:2147483000;padding:14px 18px;border-radius:10px;box-shadow:0 6px 30px rgba(0,0,0,0.6)";
+    W7.document.body.appendChild(box);
+    draw();
+  }
+  function close() {
+    if (box) {
+      box.remove();
+      box = null;
+    }
+  }
+  function initSettings(p) {
+    panel = p;
+    if (!settingsAvailable()) return false;
+    try {
+      W7.PreferenceRegisterExtensionSetting({
+        Identifier: ID,
+        ButtonText: "Farmhand Companion",
+        load: () => open(),
+        run: () => {
+        },
+        click: () => {
+        },
+        exit: () => {
+          close();
+          return true;
+        },
+        unload: () => close()
+      });
+      return true;
+    } catch (e) {
+      console.warn("[Farmhand Companion] settings page unavailable:", e);
+      return false;
+    }
+  }
+  function openSettings(which) {
+    if (which) tab = which;
+    try {
+      if (typeof W7.PreferenceSubscreenExtensionsOpen === "function") {
+        W7.PreferenceSubscreenExtensionsOpen(ID);
+        return true;
+      }
+    } catch (e) {
+    }
+    return false;
+  }
+
   // extension/src/views/livestock.js
   var pct = (a, b) => b ? 100 * a / b : 0;
   var hoursLeft = (t) => Math.max(0, Math.ceil((t - Date.now()) / 36e5));
-  function happeningCard(ctx2) {
-    const s = ctx2.s, hp = s.happening || [], quiet = s.quietUntil && s.quietUntil > Date.now();
+  function happeningCard(ctx3) {
+    const s = ctx3.s, hp = s.happening || [], quiet = s.quietUntil && s.quietUntil > Date.now();
     if (!hp.length && !s.onBooks) return null;
     return card(
       h("div", { class: "fhc-kv" }, title("What's happenin' to you"), quiet ? chip("quiet", "acc") : null),
@@ -4161,13 +5358,13 @@ One of mods you are using is using an old version of SDK. It will work for now b
       h(
         "div",
         null,
-        quiet ? btn("End the quiet", () => ctx2.send("quiet off")) : btn("An hour's quiet", () => ctx2.send("quiet 60")),
+        quiet ? btn("End the quiet", () => ctx3.send("quiet off")) : btn("An hour's quiet", () => ctx3.send("quiet 60")),
         muted(quiet ? "Nothin' new starts on you till it's over." : "Quiet: no new traps, urges, scents or teasin' for an hour. It doesn't stop what already has you; the safe word does.")
       )
     );
   }
-  function me2(ctx2) {
-    const s = ctx2.s;
+  function me2(ctx3) {
+    const s = ctx3.s;
     const chips = [
       s.tier && chip(s.tier, "acc"),
       s.species && chip(s.species),
@@ -4184,7 +5381,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     ];
     return [
       card(h("div", { class: "fhc-title" }, s.name), h("div", { style: { marginTop: "6px" } }, chips)),
-      happeningCard(ctx2),
+      happeningCard(ctx3),
       bars.some(Boolean) && card(
         title("Today"),
         bars,
@@ -4206,16 +5403,16 @@ One of mods you are using is using an old version of SDK. It will work for now b
         s.kept.tag ? muted("Your tag: " + s.kept.tag) : null,
         s.kept.name ? muted("This week you're called: " + s.kept.name) : null,
         (s.kept.milk || []).length ? muted("Milked at " + s.kept.milk.map((x) => x + ":00").join(" and ")) : null,
-        h("div", null, btn("What that means", () => ctx2.send("kept")), btn("End it", () => ctx2.send("kept off")))
+        h("div", null, btn("What that means", () => ctx3.send("kept")), btn("End it", () => ctx3.send("kept off")))
       ),
       s.intensity && card(
         title("How the farm talks to you"),
-        h("div", null, [["tender", "Tender"], ["rough", "Rough"], ["filthy", "Filthy"]].map(([id, label]) => h("button", { type: "button", class: "fhc-pill" + (s.intensity === id ? " on" : ""), onclick: () => ctx2.send("intensity " + id) }, label))),
+        h("div", null, [["tender", "Tender"], ["rough", "Rough"], ["filthy", "Filthy"]].map(([id, label]) => h("button", { type: "button", class: "fhc-pill" + (s.intensity === id ? " on" : ""), onclick: () => ctx3.send("intensity " + id) }, label))),
         muted(s.intensity === "tender" ? "Softer words, and the traps lean mild." : s.intensity === "filthy" ? "Dirtier words, and the traps lean brutal." : "As written."),
         muted("It calls you: " + (((s.words || {}).call || []).join(", ") || "whatever comes to mind") + " \xB7 never: " + (((s.words || {}).never || []).join(", ") || "nothin' ruled out")),
-        h("div", null, btn("Names I love\u2026", () => ctx2.fillBox("callme ")), btn("Never call me\u2026", () => ctx2.fillBox("nevercall ")))
+        h("div", null, btn("Names I love\u2026", () => ctx3.fillBox("callme ")), btn("Never call me\u2026", () => ctx3.fillBox("nevercall ")))
       ),
-      h("div", { class: "fhc-quick" }, ["stats", "measure", "record", "pedigree", "keys"].map((c) => btn(c[0].toUpperCase() + c.slice(1), () => ctx2.send(c))))
+      h("div", { class: "fhc-quick" }, ["stats", "measure", "record", "pedigree", "keys"].map((c) => btn(c[0].toUpperCase() + c.slice(1), () => ctx3.send(c))))
     ];
   }
   function gearCard(s) {
@@ -4236,8 +5433,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
       g.funnel && h("div", { class: "fhc-kv" }, h("span", null, "Funnel gag"), h("span", { class: "fhc-muted" }, "fitted, and it counts as open"))
     );
   }
-  function milking(ctx2) {
-    const s = ctx2.s;
+  function milking(ctx3) {
+    const s = ctx3.s;
     if (!s.milk && !s.semen) return [card(title("Milking"), muted("You're not makin' milk right now. Flip Milkable on in Toggles if you'd like to."))];
     return [
       s.milk && card(
@@ -4256,16 +5453,16 @@ One of mods you are using is using an old version of SDK. It will work for now b
       ), muted("It drains you down to a quarter of what you hold, then lets go.")),
       s.dial && card(
         h("div", { class: "fhc-kv" }, title("The stall dial"), s.milkCums ? chip("milked till you came \xD7 " + s.milkCums, "acc") : null),
-        h("div", null, [["gentle", "Gentle"], ["steady", "Steady"], ["hard", "Hard"], ["punishing", "Punishin'"]].map(([id, label]) => h("button", { type: "button", class: "fhc-pill" + (s.dial === id ? " on" : ""), onclick: () => ctx2.send("stalldial " + id) }, label))),
+        h("div", null, [["gentle", "Gentle"], ["steady", "Steady"], ["hard", "Hard"], ["punishing", "Punishin'"]].map(([id, label]) => h("button", { type: "button", class: "fhc-pill" + (s.dial === id ? " on" : ""), onclick: () => ctx3.send("stalldial " + id) }, label))),
         muted({ gentle: "Slow and sweet. It leaves you a third.", steady: "It drains you to a quarter.", hard: "Fast and deep, down to an eighth, and sore teats after.", punishing: "Past empty. You'll be sensitive for an hour after." }[s.dial] || ""),
         muted("Run hot enough in the stall and the cups will tip you over.")
       ),
-      h("div", null, btn("Quota", () => ctx2.send("quota")), btn("Milk board", () => ctx2.send("board")))
+      h("div", null, btn("Quota", () => ctx3.send("quota")), btn("Milk board", () => ctx3.send("board")))
     ];
   }
-  function breeding(ctx2) {
-    const s = ctx2.s, sw = s.switches || {};
-    const rows = [
+  function breeding(ctx3) {
+    const s = ctx3.s, sw = s.switches || {};
+    const rows2 = [
       ["Breedable", sw.breedable],
       ["Fertile", sw.fertile],
       ["Jar insemination", sw.jarok ? "asks first" : "never"],
@@ -4275,19 +5472,19 @@ One of mods you are using is using an old version of SDK. It will work for now b
     return [
       card(
         title("Breedin'"),
-        rows.map(([k, v]) => h("div", { class: "fhc-kv" }, h("span", null, k), h("span", { class: "fhc-muted" }, v === true ? "on" : v === false ? "off" : v))),
+        rows2.map(([k, v]) => h("div", { class: "fhc-kv" }, h("span", null, k), h("span", { class: "fhc-muted" }, v === true ? "on" : v === false ? "off" : v))),
         s.heatUntil && muted("\u{1F525} In heat \xB7 " + hoursLeft(s.heatUntil) + " h left"),
         s.preg && muted("\u{1F37C} Carryin' for " + s.preg.sires.join(" & ")),
         s.eggs && muted("\u{1F95A} Carryin' " + s.eggs.n + " eggs \xB7 ?lay at the nest, or they come when they're due")
       ),
       s.trapCard && muted("\u{1F9EA} Your trap card is on the Traps tab."),
-      h("div", null, btn("My tally", () => ctx2.send("tally")), btn("Eggs", () => ctx2.send("eggs")), btn("Wash up", () => ctx2.send("wash")), btn("Pedigree", () => ctx2.send("pedigree")))
+      h("div", null, btn("My tally", () => ctx3.send("tally")), btn("Eggs", () => ctx3.send("eggs")), btn("Wash up", () => ctx3.send("wash")), btn("Pedigree", () => ctx3.send("pedigree")))
     ];
   }
-  function traps(ctx2) {
-    const s = ctx2.s, tc = s.trapCard, ad = s.trapAdmin, gear = s.farmGear || [];
+  function traps(ctx3) {
+    const s = ctx3.s, tc = s.trapCard, ad = s.trapAdmin, gear = s.farmGear || [];
     return [
-      happeningCard(ctx2),
+      happeningCard(ctx3),
       s.stateErr && card(title("Somethin' broke on the farm girl's end"), muted("Part of your panel didn't arrive. Tell the proprietors this line: " + s.stateErr)),
       tc ? card(
         h("div", { class: "fhc-kv" }, title("Trap card" + (tc.rank ? " \xB7 " + tc.rank : "")), chip(tc.total + " sprung" + (tc.nextRank ? " \xB7 next rank at " + tc.nextRank : ""), "acc")),
@@ -4298,24 +5495,24 @@ One of mods you are using is using an old version of SDK. It will work for now b
         h(
           "div",
           null,
-          btn("Struggle", () => ctx2.send("struggle")),
-          btn(tc.paused ? "Traps on" : "Pause traps", () => ctx2.send("traps " + (tc.paused ? "on" : "off"))),
-          btn(tc.eager ? "Eager: on" : "Eager: off", () => ctx2.send("traps eager " + (tc.eager ? "off" : "on"))),
-          btn("What's out there", () => ctx2.send("traps")),
-          btn("Lay (at the nest)", () => ctx2.send("lay")),
-          btn("My brood book", () => ctx2.send("brood"))
+          btn("Struggle", () => ctx3.send("struggle")),
+          btn(tc.paused ? "Traps on" : "Pause traps", () => ctx3.send("traps " + (tc.paused ? "on" : "off"))),
+          btn(tc.eager ? "Eager: on" : "Eager: off", () => ctx3.send("traps eager " + (tc.eager ? "off" : "on"))),
+          btn("What's out there", () => ctx3.send("traps")),
+          btn("Lay (at the nest)", () => ctx3.send("lay")),
+          btn("My brood book", () => ctx3.send("brood"))
         )
       ) : (s.roles || []).includes("SUBJECT") ? card(
         title("Trap card"),
-        muted("You're a test subject, and the traps are live for you. Your card isn't showin' because the farm girl's bot (v" + (ctx2.welcome && ctx2.welcome.ver || "?") + ") is older than this panel: it needs 0.22 or newer on her computer to send it."),
-        h("div", null, btn("Struggle", () => ctx2.send("struggle")), btn("What's out there", () => ctx2.send("traps")))
+        muted("You're a test subject, and the traps are live for you. Your card isn't showin' because the farm girl's bot (v" + (ctx3.welcome && ctx3.welcome.ver || "?") + ") is older than this panel: it needs 0.22 or newer on her computer to send it."),
+        h("div", null, btn("Struggle", () => ctx3.send("struggle")), btn("What's out there", () => ctx3.send("traps")))
       ) : card(title("Traps"), muted("The farm's traps spring for test subjects and nobody else. A proprietor signs a volunteer up; you're not one right now, so you can walk right over them.")),
       card(
         title("On you right now"),
         gear.length ? gear.map((g) => h("div", { style: { marginTop: "6px" } }, h("div", { class: "fhc-kv" }, h("b", null, g.name), h("span", { class: "fhc-muted" }, Math.max(0, Math.ceil((g.until - Date.now()) / 6e4)) + " min")), muted(gearLore(g.name) || g.desc || ""))) : muted("No farm gear on you."),
-        !ctx2.prefs.gear && muted('Trap gear only goes on for real with "Farm can put real gear on me" switched on (Toggles \u2192 This panel).')
+        !ctx3.prefs.gear && muted('Trap gear only goes on for real with "Farm can put real gear on me" switched on (Toggles \u2192 This panel).')
       ),
-      s.sitting && card(title("\u{1FABA} Sittin' the nest"), muted(s.sitting.n + " eggs under you. They hatch in about " + Math.max(1, Math.ceil((s.sitting.until - Date.now()) / 6e4)) + " min."), h("div", null, btn("Get up", () => ctx2.send("sit up")))),
+      s.sitting && card(title("\u{1FABA} Sittin' the nest"), muted(s.sitting.n + " eggs under you. They hatch in about " + Math.max(1, Math.ceil((s.sitting.until - Date.now()) / 6e4)) + " min."), h("div", null, btn("Get up", () => ctx3.send("sit up")))),
       s.holes && s.holes.length ? card(
         title("What you've taken"),
         s.holes.map((x) => h("div", { class: "fhc-kv" }, h("span", null, "Your " + x.hole + " \xB7 " + x.rank), h("span", { class: "fhc-muted" }, x.loads + " loads" + (x.knots ? " \xB7 " + x.knots + " knots" : "") + (x.next ? " \xB7 next at " + x.next : "")))),
@@ -4335,19 +5532,19 @@ One of mods you are using is using an old version of SDK. It will work for now b
         h(
           "div",
           null,
-          btn("Kinds & spots", () => ctx2.send("traps")),
-          btn("Subjects", () => ctx2.send("subject")),
-          btn(ad.hunt ? "Stop the hunt" : "Start a hunt", () => ctx2.send(ad.hunt ? "hunt stop" : "hunt start")),
-          btn("Gather eggs", () => ctx2.send("gather"))
+          btn("Kinds & spots", () => ctx3.send("traps")),
+          btn("Subjects", () => ctx3.send("subject")),
+          btn(ad.hunt ? "Stop the hunt" : "Start a hunt", () => ctx3.send(ad.hunt ? "hunt stop" : "hunt start")),
+          btn("Gather eggs", () => ctx3.send("gather"))
         )
       )
     ];
   }
-  function inbox(ctx2) {
-    const f = ctx2.ui.filter || "all";
-    const items = ctx2.feed.filter((x) => f === "all" || x.kind === f);
+  function inbox(ctx3) {
+    const f = ctx3.ui.filter || "all";
+    const items = ctx3.feed.filter((x) => f === "all" || x.kind === f);
     return [
-      h("div", null, [["all", "All"], ["notice", "From the farm"], ["reply", "Answers"], ["mine", "You asked"]].map(([id, label]) => h("button", { type: "button", class: "fhc-pill" + (f === id ? " on" : ""), onclick: () => ctx2.setUi({ filter: id }) }, label))),
+      h("div", null, [["all", "All"], ["notice", "From the farm"], ["reply", "Answers"], ["mine", "You asked"]].map(([id, label]) => h("button", { type: "button", class: "fhc-pill" + (f === id ? " on" : ""), onclick: () => ctx3.setUi({ filter: id }) }, label))),
       items.length ? items.slice().reverse().map((x) => h(
         "div",
         { class: "fhc-card " + x.kind },
@@ -4368,8 +5565,6 @@ One of mods you are using is using an old version of SDK. It will work for now b
     ["praise", "Praise", "Let staff's praise count"],
     ["degrade", "Degrade", "Let staff's degradin' count"],
     ["tally", "Tally marks", "Show your tally on ?who and the board"],
-    ["teaseme", "Tease me", "Let staff tease lines name you"],
-    ["hypno", "Hypno", "Let your herd leader's voice lines reach you, privately"],
     ["potions", "Potions", "Staff and the wheel can give you potions, and others can gift you one (you're asked first). Your limits still rule some out"],
     ["dares", "Dares", "Staff and the wheel can hand you a dare to do in half an hour"],
     ["watersports", "Watersports", "Piss play can find you: the spray trap, a feeder crafted for it, and the scenes that have it. Off until you say so"],
@@ -4379,15 +5574,25 @@ One of mods you are using is using an old version of SDK. It will work for now b
     ["bench", "Use bench", "Staff and the wheel can sentence you to time strapped over the use bench, where anybody can use you. Your safeword ends it at once"]
   ];
   var NEEDS = { freeuse: ["breedable", "Turn Breedable on first"] };
-  function farmSwitches(ctx2, list) {
-    const sw = ctx2.s.switches || {};
+  function farmSwitches(ctx3, list) {
+    const sw = ctx3.s.switches || {};
     return list.map(([cmd, label, desc]) => {
       const need = NEEDS[cmd];
-      if (need && !sw[need[0]] && !sw[cmd]) return toggle(label, need[1] + " \xB7 " + desc, false, () => ctx2.send(cmd + " on"));
-      return toggle(label, desc, !!sw[cmd], () => ctx2.send(cmd + " " + (sw[cmd] ? "off" : "on")));
+      if (need && !sw[need[0]] && !sw[cmd]) return toggle(label, need[1] + " \xB7 " + desc, false, () => ctx3.send(cmd + " on"));
+      return toggle(label, desc, !!sw[cmd], () => ctx3.send(cmd + " " + (sw[cmd] ? "off" : "on")));
     });
   }
-  function panelPrefs(ctx2) {
+  function panelPrefsOrLink(ctx3) {
+    if (!settingsAvailable()) return panelPrefs(ctx3);
+    return card(
+      title("This panel, your settings file and the full guides"),
+      muted("They're in the game's own settings now: Preferences \u2192 Extensions \u2192 Farmhand Companion."),
+      btn("Open the Farmhand settings", () => {
+        if (!openSettings("switches")) ctx3.hint("Open the game's Preferences, then Extensions, then Farmhand Companion.");
+      }, true)
+    );
+  }
+  function panelPrefs(ctx3) {
     return card(
       title("This panel"),
       muted("Only on your computer."),
@@ -4397,14 +5602,14 @@ One of mods you are using is using an old version of SDK. It will work for now b
         ["chime", "Chime on notices", "A soft sound when the farm messages you"],
         ["popopen", "Open on new notice", "Pop the panel open by itself"],
         ["btnPinned", "Pin the \u{1F33E} button", "Unpinned, you can drag it anywhere (mouse or finger). Pin it so it stays put."]
-      ].map(([k, label, desc]) => toggle(label, desc, !!ctx2.prefs[k], () => ctx2.setPref(k, !ctx2.prefs[k]))),
+      ].map(([k, label, desc]) => toggle(label, desc, !!ctx3.prefs[k], () => ctx3.setPref(k, !ctx3.prefs[k]))),
       toggle(
         "Farm emotes about me come from me",
         "Belly kicks, milkin', breedin'\u2026 are posted as your own emote (no name in front), so the people who can see you see them and the farm girl needn't move. Only lines about you.",
-        !ctx2.prefs.noRelay,
+        !ctx3.prefs.noRelay,
         () => {
-          ctx2.setPref("noRelay", !ctx2.prefs.noRelay);
-          ctx2.api.rehello && ctx2.api.rehello();
+          ctx3.setPref("noRelay", !ctx3.prefs.noRelay);
+          ctx3.api.rehello && ctx3.api.rehello();
         }
       ),
       // the farm's little cues on your own screen (cues.js); each one on unless you switch it off
@@ -4416,67 +5621,74 @@ One of mods you are using is using an old version of SDK. It will work for now b
         ["noFeelings", "Private feelings", "Now and then, a line only you see about what you're feelin' (your gear, your arousal, how full you are)"],
         ["noSlow", "Carryin' slows me down", "The fuller you are (a pumped belly, a late litter, a clutch of eggs), the slower you walk on the map"],
         ["noMarkers", "Map markers (staff)", "Small badges over stock on your map: M needs milkin', H in heat, B expectin', X teats capped"]
-      ].map(([k, label, desc]) => toggle(label, desc, !ctx2.prefs[k], () => {
-        ctx2.setPref(k, !ctx2.prefs[k]);
-        ctx2.api.rehello && ctx2.api.rehello();
+      ].map(([k, label, desc]) => toggle(label, desc, !ctx3.prefs[k], () => {
+        ctx3.setPref(k, !ctx3.prefs[k]);
+        ctx3.api.rehello && ctx3.api.rehello();
       })),
       // OFF until you turn it on: the farm touchin' your arousal meter (cues.js)
       toggle(
         "Farm can stir me up",
         "Traps, toys and scenes nudge your arousal meter up, and while the farm has you denied you're held at the edge instead of cummin'. A buzzin' toy you're wearin' follows a trap too: low while it teases, high when it breeds you, still while you're denied, then back how you had it. Your safeword still stops everything.",
-        !!ctx2.prefs.stir,
+        !!ctx3.prefs.stir,
         () => {
-          ctx2.setPref("stir", !ctx2.prefs.stir);
-          ctx2.api.rehello && ctx2.api.rehello();
+          ctx3.setPref("stir", !ctx3.prefs.stir);
+          ctx3.api.rehello && ctx3.api.rehello();
         }
       ),
       // OFF until you turn it on: real items from the traps (marks.js)
       toggle(
         "Farm can put real gear on me",
         "A trap that plugs, cups, clamps, chains, ropes or funnels you puts the real item on your character, and takes it off again when its time's up. Pull one off early and it goes back. Your safeword takes it all off. (The parasite doesn't need this: ?parasite on is its switch.)",
-        !!ctx2.prefs.gear,
+        !!ctx3.prefs.gear,
         () => {
-          ctx2.setPref("gear", !ctx2.prefs.gear);
-          ctx2.api.rehello && ctx2.api.rehello();
+          ctx3.setPref("gear", !ctx3.prefs.gear);
+          ctx3.api.rehello && ctx3.api.rehello();
         }
       ),
       // OFF until you turn it on: your character's own chest and hips growin' with the farm's sizes (marks.js)
       toggle(
         "Farm can change my body shape",
         "Your chest grows a size on your character for every two udder sizes the farm gives you (up to the game's biggest), and your hips widen with a growin' ass or a heavy belly. Everything you're wearin' is redrawn to fit. Your own shape is remembered and comes back when the growth goes, when you switch this off, and for an hour after your safeword.",
-        !!ctx2.prefs.shape,
+        !!ctx3.prefs.shape,
         () => {
-          ctx2.setPref("shape", !ctx2.prefs.shape);
-          ctx2.api.rehello && ctx2.api.rehello();
+          ctx3.setPref("shape", !ctx3.prefs.shape);
+          ctx3.api.rehello && ctx3.api.rehello();
         }
       ),
       // these two are OFF until you turn them on, and anybody can: the farm changin' what your character looks like (marks.js)
       toggle(
         "Farm can mark my body",
         "Loads leave the game's own splatters on your face, chest or tummy, wherever there's room, and farm words can be written on your body. ?wash takes them off.",
-        !!ctx2.prefs.marks,
-        () => ctx2.setPref("marks", !ctx2.prefs.marks)
+        !!ctx3.prefs.marks,
+        () => ctx3.setPref("marks", !ctx3.prefs.marks)
       ),
       toggle(
         "Farm can strip me",
         "When the farm says so, your clothes come off (locked pieces stay). They're kept on this computer so you can dress again.",
-        !!ctx2.prefs.strip,
-        () => ctx2.setPref("strip", !ctx2.prefs.strip)
+        !!ctx3.prefs.strip,
+        () => ctx3.setPref("strip", !ctx3.prefs.strip)
       ),
       // (the scale trial and the belly experiment are gone: the drawn body does both. Laynie, Oct 14: "can also remove the
       // scaling test from earlier from the companion")
-      btn("Put the button and panel back (size and full screen too)", () => ctx2.resetPlaces && ctx2.resetPlaces()),
+      btn("Put the button and panel back (size and full screen too)", () => ctx3.resetPlaces && ctx3.resetPlaces()),
       // everything above, and the drawn body, messes and memory log, kept as a file on this computer too (localsave.js)
-      saveCard(ctx2)
+      saveCard(ctx3),
+      // the record (chatlog.js): opt-in, at the very bottom. Proprietors are always recorded, so they get no switch.
+      ctx3.s.logMust ? muted("\u{1F4DC} Your chat, beeps and commands are recorded for the farm (always, for proprietors).") : toggle(
+        "Send a record of commands sent to and received from the bot",
+        "Everything that lands in your chat (whispers, beeps, the farm's lines and answers) and the commands you send go to the farm girl once a minute, privately, and she keeps them by the hour. It helps staff find what went wrong when somethin' does. The same line from two places is kept once. Off unless you switch it on.",
+        !!ctx3.prefs.chatlog,
+        () => ctx3.setPref("chatlog", !ctx3.prefs.chatlog)
+      )
     );
   }
-  function saveCard(ctx2) {
-    const ls = localSaveState(), say = (t2) => ctx2.hint(t2), t = (ms) => new Date(ms).toTimeString().slice(0, 5);
-    const line2 = !ls.folder ? ls.can ? "Not saving to a folder yet." : "This browser can't save to a folder (Chrome and Edge can). You can still load a file." : ls.perm !== "granted" ? "Saving to " + ls.folder + " is paused till you reconnect it (the browser asks again after a restart)." : ls.err ? "Trouble saving to " + ls.folder + ": " + ls.err : "Saving to " + ls.folder + " every minute" + (ls.at ? ", last at " + t(ls.at) : "") + ", as " + ls.file + ".";
+  function saveCard(ctx3) {
+    const ls = localSaveState(), say = (t2) => ctx3.hint(t2), t = (ms) => new Date(ms).toTimeString().slice(0, 5);
+    const line3 = !ls.folder ? ls.can ? "Not saving to a folder yet." : "This browser can't save to a folder (Chrome and Edge can). You can still load a file." : ls.perm !== "granted" ? "Saving to " + ls.folder + " is paused till you reconnect it (the browser asks again after a restart)." : ls.err ? "Trouble saving to " + ls.folder + ": " + ls.err : "Saving to " + ls.folder + " every minute" + (ls.at ? ", last at " + t(ls.at) : "") + ", as " + ls.file + ".";
     return h(
       "div",
       {},
-      muted("Your settings as a file on this computer: everything here, your drawn body, your messes and the memory log. It survives a crash, a cleared browser or a new one. " + line2),
+      muted("Your settings as a file on this computer: everything here, your drawn body, your messes and the memory log. It survives a crash, a cleared browser or a new one. " + line3),
       ls.folder && ls.perm !== "granted" ? btn("Reconnect " + ls.folder, () => localSaveReconnect(VERSION)) : null,
       ls.can ? btn(ls.folder ? "Save to a different folder" : "Save my settings to a folder\u2026", () => localSavePick(VERSION)) : null,
       ls.folder && ls.perm === "granted" ? btn("Save now", () => localSaveNow(VERSION).then(() => say("Saved."))) : null,
@@ -4486,8 +5698,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
       })
     );
   }
-  function drawnBodyCard(ctx2) {
-    const st2 = drawnBodyState(), say = (t) => ctx2.hint(t);
+  function drawnBodyCard(ctx3) {
+    const st2 = drawnBodyState(), say = (t) => ctx3.hint(t);
     const code = h("textarea", { class: "fhc-in", rows: 2, placeholder: "\u2026or paste the code from the studio's Copy for the Companion button" });
     return card(
       title("Drawn body (outfit studio)"),
@@ -4497,7 +5709,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
         st2.on,
         () => {
           drawnBodySet(!st2.on, say);
-          ctx2.setPref("drawnBody", !st2.on);
+          ctx3.setPref("drawnBody", !st2.on);
         }
       ),
       h(
@@ -4509,7 +5721,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
           { class: "fhc-sel", onchange: (e) => {
             const v = e.target.value;
             drawnBodyCup(v === "auto" ? "auto" : Number(v), say);
-            ctx2.setPref("drawnBodyCup", v);
+            ctx3.setPref("drawnBodyCup", v);
           } },
           [h("option", { value: "auto", selected: !st2.cupSet }, "Follow the farm" + (st2.farmCup ? " (" + (st2.cups[st2.farmCup] || "?") + " now)" : ""))].concat(
             st2.cups.map((c, i) => i < 6 ? null : h("option", { value: String(i), selected: st2.cupSet && i === st2.cup }, c))
@@ -4525,7 +5737,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
           "select",
           { class: "fhc-sel", onchange: (e) => {
             drawnBodyBelly(e.target.value, say);
-            ctx2.setPref("drawnBodyBelly", e.target.value);
+            ctx3.setPref("drawnBodyBelly", e.target.value);
           } },
           [["farm", "Follow the farm" + (st2.farmBelly ? " (showing now)" : " (flat now)")], ["on", "Always"], ["off", "Never"]].concat(st2.fromStudio ? [["studio", "As my studio has it"]] : []).map(([v, label]) => h("option", { value: v, selected: st2.bellyMode === v }, label))
         )
@@ -4534,18 +5746,18 @@ One of mods you are using is using an old version of SDK. It will work for now b
       muted(st2.fromStudio ? "Using your own studio settings." : st2.fromFarm ? "Using the farm's look, with your own cup and belly." : "The farm's look comes from the farm girl once you're in her room; plain settings till then."),
       st2.fromStudio ? btn("Use the farm's look instead", () => {
         drawnBodyUseFarm(say);
-        ctx2.setPref("drawnBodyAt", Date.now());
+        ctx3.setPref("drawnBodyAt", Date.now());
       }) : null,
       h("div", { style: { marginTop: "8px" } }, muted("Got an outfit studio of your own? Bring its settings over:")),
       h("div", { style: { marginTop: "4px" } }, btn("Get my studio's settings", () => {
         drawnBodyFromStudio(say).then((ok2) => {
-          if (ok2) ctx2.setPref("drawnBodyAt", Date.now());
+          if (ok2) ctx3.setPref("drawnBodyAt", Date.now());
         });
       }, true)),
       muted("Works while the studio is running on this computer: it takes what you last saved there (Save the breasts, Save all the fits)."),
       h("div", { style: { marginTop: "6px" } }, code),
       btn("Put in the pasted code", () => {
-        if (drawnBodyPaste(code.value, say)) ctx2.setPref("drawnBodyAt", Date.now());
+        if (drawnBodyPaste(code.value, say)) ctx3.setPref("drawnBodyAt", Date.now());
       }),
       toggle(
         "See other people's drawn bodies",
@@ -4553,37 +5765,37 @@ One of mods you are using is using an old version of SDK. It will work for now b
         st2.seeOthers,
         () => {
           drawnBodySeeOthers(!st2.seeOthers, say);
-          ctx2.setPref("drawnBodySee", !st2.seeOthers);
+          ctx3.setPref("drawnBodySee", !st2.seeOthers);
         }
       )
     );
   }
-  function extraSwitches(ctx2) {
+  function extraSwitches(ctx3) {
     const list = [];
-    for (const m of Object.values(ctx2.s.mods || {})) for (const c of (m.cards || []).filter((c2) => c2 && !c2.staff)) for (const t of c.toggles || []) list.push([m.label, t]);
+    for (const m of Object.values(ctx3.s.mods || {})) for (const c of (m.cards || []).filter((c2) => c2 && !c2.staff)) for (const t of c.toggles || []) list.push([m.label, t]);
     if (!list.length) return null;
     return card(
       title("Farm extras"),
       muted("The farm's add-ons. Each one is off until you switch it on."),
-      list.map(([label, t]) => toggle(String(t.label), (t.desc ? String(t.desc) + " " : "") + "(" + label + ")", !!t.on, () => ctx2.send(String(t.cmd))))
+      list.map(([label, t]) => toggle(String(t.label), (t.desc ? String(t.desc) + " " : "") + "(" + label + ")", !!t.on, () => ctx3.send(String(t.cmd))))
     );
   }
-  function toggles(ctx2) {
+  function toggles(ctx3) {
     return [
-      drawnBodyCard(ctx2),
-      card(title("Farm settings"), muted("Saved by the farm girl. Your limits still win."), farmSwitches(ctx2, SWITCH_INFO)),
-      extraSwitches(ctx2),
+      drawnBodyCard(ctx3),
+      card(title("Farm settings"), muted("Saved by the farm girl. Your limits still win."), farmSwitches(ctx3, SWITCH_INFO)),
+      extraSwitches(ctx3),
       card(
         title("Gender"),
         muted("How the farm sees you. It picks your farm outfit."),
-        h("div", { style: { marginTop: "6px" } }, ["female", "male", "futa", "femboy"].map((g) => h("button", { type: "button", class: "fhc-pill" + (ctx2.s.gender === g ? " on" : ""), onclick: () => ctx2.send("gender " + g) }, g)))
+        h("div", { style: { marginTop: "6px" } }, ["female", "male", "futa", "femboy", "nonbinary"].map((g) => h("button", { type: "button", class: "fhc-pill" + (ctx3.s.gender === g ? " on" : ""), onclick: () => ctx3.send("gender " + g) }, g)))
       ),
-      ctx2.api.hasBackup && ctx2.api.hasBackup() ? card(
+      ctx3.api.hasBackup && ctx3.api.hasBackup() ? card(
         title("Farm outfit"),
         muted("The farm dressed you, and your own clothes are kept on this computer."),
-        btn("Change back into my own clothes", () => ctx2.api.back && ctx2.api.back())
+        btn("Change back into my own clothes", () => ctx3.api.back && ctx3.api.back())
       ) : null,
-      panelPrefs(ctx2)
+      panelPrefsOrLink(ctx3)
     ];
   }
   var LIVESTOCK_TABS = [
@@ -4594,25 +5806,25 @@ One of mods you are using is using an old version of SDK. It will work for now b
     { id: "traps", label: "\u{1F9EA} Traps", render: traps },
     { id: "store", label: "\u{1F380} Store", render: storeTab },
     { id: "inbox", label: "Inbox", render: inbox },
-    { id: "guides", label: "Guides", render: (ctx2) => guidesTab(ctx2, false) },
+    { id: "guides", label: "Guides", render: (ctx3) => guidesTab(ctx3, false) },
     { id: "toggles", label: "Toggles", render: toggles }
   ];
 
   // extension/src/views/guest.js
   var GUEST_TABS = [
-    { id: "welcome", label: "Welcome", render: (ctx2) => [
+    { id: "welcome", label: "Welcome", render: (ctx3) => [
       card(
-        h("div", { class: "fhc-title" }, "Howdy, " + (ctx2.welcome.name || "sugar") + "!"),
+        h("div", { class: "fhc-title" }, "Howdy, " + (ctx3.welcome.name || "sugar") + "!"),
         h("p", null, "Welcome to B&B Farm. Everybody here chose to be here and signed to say so. Have a look around, mind the ruts, and holler if you need a hand."),
-        btn("Take the tour", () => ctx2.send("tour"), true),
-        btn("Apply to join", () => ctx2.send("apply")),
-        btn("Luxury stay", () => ctx2.send("luxury"))
+        btn("Take the tour", () => ctx3.send("tour"), true),
+        btn("Apply to join", () => ctx3.send("apply")),
+        btn("Luxury stay", () => ctx3.send("luxury"))
       ),
       card(title("Your keys"), muted("Guests don't carry keys. Staff can let you through any door."))
     ] },
     { id: "safety", label: "\u{1F198} Safety", render: safetyTab },
     { id: "farm", label: "The farm", render: () => AREAS.map(([n, key, d]) => card(h("div", { class: "fhc-kv" }, h("b", null, n), h("span", { class: "fhc-muted" }, key)), muted(d))) },
-    { id: "rules", label: "Rules", render: (ctx2) => [
+    { id: "rules", label: "Rules", render: (ctx3) => [
       h(
         "div",
         { class: "fhc-box alert" },
@@ -4620,11 +5832,11 @@ One of mods you are using is using an old version of SDK. It will work for now b
         muted("Anywhere, from anybody. No contract overrides it. Beepin' the farm girl works from anywhere on the property, too.")
       ),
       card(title("On consent"), h("p", null, "Every animal and every hand here chose to be here, and signed for it. What you see in the pens, stalls and barn was asked for. The contract's a fence that holds both ways: what ain't in it, don't happen.")),
-      h("div", null, btn("Full rules", () => ctx2.send("rules")), btn("Consent", () => ctx2.send("consent")), btn("What opens what", () => ctx2.send("doors")))
+      h("div", null, btn("Full rules", () => ctx3.send("rules")), btn("Consent", () => ctx3.send("consent")), btn("What opens what", () => ctx3.send("doors")))
     ] },
     { id: "inbox", label: "Inbox", render: inbox },
-    { id: "guides", label: "Guides", render: (ctx2) => guidesTab(ctx2, false) },
-    { id: "settings", label: "Settings", render: (ctx2) => [card(title("Farm settings"), muted("Once you're on the books, your milkin', breedin' and teasin' switches show up here."), btn("Apply to join", () => ctx2.send("apply"), true)), drawnBodyCard(ctx2), panelPrefs(ctx2)] }
+    { id: "guides", label: "Guides", render: (ctx3) => guidesTab(ctx3, false) },
+    { id: "settings", label: "Settings", render: (ctx3) => [card(title("Farm settings"), muted("Once you're on the books, your milkin', breedin' and teasin' switches show up here."), btn("Apply to join", () => ctx3.send("apply"), true)), drawnBodyCard(ctx3), panelPrefsOrLink(ctx3)] }
   ];
 
   // shared/bcplus-rules.json
@@ -6216,11 +7428,11 @@ One of mods you are using is using an old version of SDK. It will work for now b
   // extension/src/views/staffdata.js
   var MAP = 40;
   var PX = 7;
-  function herd(ctx2) {
-    const f = ctx2.ui.herdF || "all", list = (ctx2.s.herd || []).filter((x) => f === "all" || f === "mine" && x.mine || f === "milk" && x.milk !== null && x.milk >= 75 || f === "heat" && x.heat);
-    const act = (c, x) => () => ctx2.send(c + " " + x.mn);
+  function herd(ctx3) {
+    const f = ctx3.ui.herdF || "all", list = (ctx3.s.herd || []).filter((x) => f === "all" || f === "mine" && x.mine || f === "milk" && x.milk !== null && x.milk >= 75 || f === "heat" && x.heat);
+    const act = (c, x) => () => ctx3.send(c + " " + x.mn);
     return [
-      h("div", null, [["all", "On the map"], ["mine", "My herd"], ["milk", "Needs milkin'"], ["heat", "In heat"]].map(([id, l]) => h("button", { type: "button", class: "fhc-pill" + (f === id ? " on" : ""), onclick: () => ctx2.setUi({ herdF: id }) }, l))),
+      h("div", null, [["all", "On the map"], ["mine", "My herd"], ["milk", "Needs milkin'"], ["heat", "In heat"]].map(([id, l]) => h("button", { type: "button", class: "fhc-pill" + (f === id ? " on" : ""), onclick: () => ctx3.setUi({ herdF: id }) }, l))),
       list.length ? list.map((x) => card(
         h("div", { class: "fhc-kv" }, h("b", null, x.name), h("span", { class: "fhc-muted" }, x.role + (x.where ? " \xB7 " + x.where : ""))),
         x.milk !== null ? h(
@@ -6249,44 +7461,15 @@ One of mods you are using is using an old version of SDK. It will work for now b
       )) : muted("Nobody matches right now.")
     ];
   }
-  function tease(ctx2) {
-    const lines = ctx2.s.tease;
-    if (!lines) return [muted("Tease lines are for herdmasters and proprietors.")];
-    return [
-      card(
-        h("div", { class: "fhc-kv" }, title("Tease lines"), h("span", { class: "fhc-muted" }, lines.length + " lines \xB7 " + (ctx2.s.teaseOpted || 0) + " opted in")),
-        lines.length ? lines.map((t, i) => h(
-          "div",
-          { class: "fhc-kv" },
-          h("span", null, h("b", null, i + 1 + ". "), t),
-          h("button", { type: "button", class: "fhc-b", onclick: () => ctx2.send("tease remove " + (i + 1)) }, "Remove")
-        )) : muted("No lines yet.")
-      ),
-      card(
-        h(
-          "label",
-          { class: "fhc-label" },
-          "New line \xB7 %name% becomes their name",
-          h("textarea", { class: "fhc-in", rows: 2, oninput: (e) => ctx2.setUi({ teaseDraft: e.target.value }, true) }, ctx2.ui.teaseDraft || "")
-        ),
-        btn("Add line", () => {
-          const t = (ctx2.ui.teaseDraft || "").trim();
-          if (!t) return ctx2.hint("Write the line first.");
-          ctx2.send("tease add " + t);
-          ctx2.setUi({ teaseDraft: "" });
-        }, true)
-      )
-    ];
-  }
   var COLORS = ["#8fbf6a", "#c9a35b", "#b8403a", "#7fa8c9", "#c48bd9", "#d98c6a"];
-  function zones(ctx2) {
-    const zs = ctx2.s.zones;
+  function zones(ctx3) {
+    const zs = ctx3.s.zones;
     if (!zs) return [muted("The farm map is for staff.")];
-    const canEdit = ctx2.s.mapEdit !== false;
+    const canEdit = ctx3.s.mapEdit !== false;
     const groups = [...new Set(Object.values(zs).map((z) => z.group))];
     const color = (g) => COLORS[groups.indexOf(g) % COLORS.length];
-    const sel = ctx2.ui.zone && zs[ctx2.ui.zone] ? ctx2.ui.zone : Object.keys(zs)[0];
-    const name = () => (ctx2.ui.zoneName || sel || "").trim().toLowerCase();
+    const sel = ctx3.ui.zone && zs[ctx3.ui.zone] ? ctx3.ui.zone : Object.keys(zs)[0];
+    const name = () => (ctx3.ui.zoneName || sel || "").trim().toLowerCase();
     return [
       card(
         title("Farm map"),
@@ -6297,7 +7480,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
             type: "button",
             title: n,
             "aria-label": n,
-            onclick: () => ctx2.setUi({ zone: n }),
+            onclick: () => ctx3.setUi({ zone: n }),
             style: {
               position: "absolute",
               padding: "0",
@@ -6310,7 +7493,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
             }
           })),
           // spots: little dots, hover for the name
-          Object.entries(ctx2.s.spots || {}).filter(([, p]) => p && Number.isFinite(p.X)).map(([n, p]) => h("span", {
+          Object.entries(ctx3.s.spots || {}).filter(([, p]) => p && Number.isFinite(p.X)).map(([n, p]) => h("span", {
             title: n + " \xB7 " + p.X + "," + p.Y,
             style: {
               position: "absolute",
@@ -6330,43 +7513,43 @@ One of mods you are using is using an old version of SDK. It will work for now b
         title("Zones"),
         Object.keys(zs).length ? Object.entries(zs).map(([n, z]) => h(
           "button",
-          { type: "button", class: "fhc-doc" + (n === sel ? " on" : ""), style: { width: "100%", marginBottom: "4px" }, onclick: () => ctx2.setUi({ zone: n }) },
+          { type: "button", class: "fhc-doc" + (n === sel ? " on" : ""), style: { width: "100%", marginBottom: "4px" }, onclick: () => ctx3.setUi({ zone: n }) },
           h("b", null, n),
           h("div", { class: "fhc-muted" }, "part of " + z.group + " \xB7 A " + (z.a ? z.a.X + "," + z.a.Y : "\u2014") + " \u2192 B " + (z.b ? z.b.X + "," + z.b.Y : "\u2014"))
         )) : muted("No zones yet."),
-        btn("Who's where", () => ctx2.send("zone who"))
+        btn("Who's where", () => ctx3.send("zone who"))
       ),
       canEdit ? card(
         title(sel ? "Editin' " + sel : "New zone"),
-        h("label", { class: "fhc-label" }, "Zone name (one word)", h("input", { class: "fhc-in", value: ctx2.ui.zoneName || sel || "", oninput: (e) => ctx2.setUi({ zoneName: e.target.value }, true) })),
+        h("label", { class: "fhc-label" }, "Zone name (one word)", h("input", { class: "fhc-in", value: ctx3.ui.zoneName || sel || "", oninput: (e) => ctx3.setUi({ zoneName: e.target.value }, true) })),
         h("div", null, btn("Draw it on the map", () => {
           const n = name();
-          if (!n) return ctx2.hint("Name the zone first.");
-          ctx2.api.pickTiles(2, "zone '" + n + "'", ([a, b]) => ctx2.send("zone box " + n + " " + a.X + " " + a.Y + " " + b.X + " " + b.Y));
+          if (!n) return ctx3.hint("Name the zone first.");
+          ctx3.api.pickTiles(2, "zone '" + n + "'", ([a, b]) => ctx3.send("zone box " + n + " " + a.X + " " + a.Y + " " + b.X + " " + b.Y));
         }, true)),
         muted("Or walk it: stand on one corner, then the other."),
-        h("div", null, btn("Set A where I stand", () => name() ? ctx2.send("zone a " + name()) : ctx2.hint("Name the zone first.")), btn("Set B where I stand", () => name() ? ctx2.send("zone b " + name()) : ctx2.hint("Name the zone first."))),
-        h("label", { class: "fhc-label" }, "Pair with (one place, odd shapes)", h("input", { class: "fhc-in", placeholder: "barn", value: ctx2.ui.zonePair || "", oninput: (e) => ctx2.setUi({ zonePair: e.target.value }, true) })),
+        h("div", null, btn("Set A where I stand", () => name() ? ctx3.send("zone a " + name()) : ctx3.hint("Name the zone first.")), btn("Set B where I stand", () => name() ? ctx3.send("zone b " + name()) : ctx3.hint("Name the zone first."))),
+        h("label", { class: "fhc-label" }, "Pair with (one place, odd shapes)", h("input", { class: "fhc-in", placeholder: "barn", value: ctx3.ui.zonePair || "", oninput: (e) => ctx3.setUi({ zonePair: e.target.value }, true) })),
         h(
           "div",
           null,
-          btn("Pair", () => name() && ctx2.ui.zonePair ? ctx2.send("zone pair " + name() + " " + ctx2.ui.zonePair.trim().toLowerCase()) : ctx2.hint("Name the zone, and the place to pair it with.")),
-          btn("Unpair", () => name() ? ctx2.send("zone unpair " + name()) : ctx2.hint("Name the zone first.")),
-          btn("Delete", () => name() ? ctx2.send("zone clear " + name()) : ctx2.hint("Name the zone first."))
+          btn("Pair", () => name() && ctx3.ui.zonePair ? ctx3.send("zone pair " + name() + " " + ctx3.ui.zonePair.trim().toLowerCase()) : ctx3.hint("Name the zone, and the place to pair it with.")),
+          btn("Unpair", () => name() ? ctx3.send("zone unpair " + name()) : ctx3.hint("Name the zone first.")),
+          btn("Delete", () => name() ? ctx3.send("zone clear " + name()) : ctx3.hint("Name the zone first."))
         )
       ) : null,
-      canEdit ? spotsCard(ctx2) : spotsList(ctx2),
+      canEdit ? spotsCard(ctx3) : spotsList(ctx3),
       canEdit ? null : muted("Zones and spots are set by herdmasters and proprietors.")
     ];
   }
-  function spotsList(ctx2) {
-    const sp = Object.entries(ctx2.s.spots || {});
+  function spotsList(ctx3) {
+    const sp = Object.entries(ctx3.s.spots || {});
     return card(title("Spots"), sp.length ? sp.map(([n, p]) => h("div", { class: "fhc-kv" }, h("b", null, n), h("span", { class: "fhc-muted" }, p.X + "," + p.Y))) : muted("No spots yet."));
   }
-  function spotsCard(ctx2) {
-    const sp = Object.entries(ctx2.s.spots || {});
-    const nm = () => (ctx2.ui.spotName || "").trim().toLowerCase();
-    const ok2 = () => /^[a-z][a-z0-9_-]{1,19}$/.test(nm()) || (ctx2.hint("Give the spot a one-word name, like speaker-barn, trough-1 or glory-1."), false);
+  function spotsCard(ctx3) {
+    const sp = Object.entries(ctx3.s.spots || {});
+    const nm = () => (ctx3.ui.spotName || "").trim().toLowerCase();
+    const ok2 = () => /^[a-z][a-z0-9_-]{1,19}$/.test(nm()) || (ctx3.hint("Give the spot a one-word name, like speaker-barn, trough-1 or glory-1."), false);
     return card(
       title("Spots"),
       muted("home \xB7 speaker-\u2026 (the bot talks from these) \xB7 trough-\u2026 \xB7 water-\u2026 \xB7 glory-1 and glory-1-visitor \xB7 placard-\u2026"),
@@ -6377,20 +7560,20 @@ One of mods you are using is using an old version of SDK. It will work for now b
         h(
           "span",
           null,
-          h("button", { type: "button", class: "fhc-b", onclick: () => ctx2.setUi({ spotName: n }) }, "Pick"),
-          h("button", { type: "button", class: "fhc-b", onclick: () => ctx2.send("spot clear " + n) }, "Clear")
+          h("button", { type: "button", class: "fhc-b", onclick: () => ctx3.setUi({ spotName: n }) }, "Pick"),
+          h("button", { type: "button", class: "fhc-b", onclick: () => ctx3.send("spot clear " + n) }, "Clear")
         )
       )) : muted("No spots yet."),
-      h("label", { class: "fhc-label" }, "Spot name", h("input", { class: "fhc-in", placeholder: "speaker-barn", value: ctx2.ui.spotName || "", oninput: (e) => ctx2.setUi({ spotName: e.target.value }, true) })),
+      h("label", { class: "fhc-label" }, "Spot name", h("input", { class: "fhc-in", placeholder: "speaker-barn", value: ctx3.ui.spotName || "", oninput: (e) => ctx3.setUi({ spotName: e.target.value }, true) })),
       h(
         "div",
         null,
         btn("Click it on the map", () => {
           if (!ok2()) return;
           const n = nm();
-          ctx2.api.pickTiles(1, "spot '" + n + "'", ([p]) => ctx2.send("spot place " + n + " " + p.X + " " + p.Y));
+          ctx3.api.pickTiles(1, "spot '" + n + "'", ([p]) => ctx3.send("spot place " + n + " " + p.X + " " + p.Y));
         }, true),
-        btn("Set where I stand", () => ok2() && ctx2.send("spot set " + nm()))
+        btn("Set where I stand", () => ok2() && ctx3.send("spot set " + nm()))
       ),
       // clearin' old ones: everything with a name startin' like the box (speaker- clears every speaker), or all, with a second press
       sp.length ? h(
@@ -6398,66 +7581,18 @@ One of mods you are using is using an old version of SDK. It will work for now b
         { style: { marginTop: "6px" } },
         btn("Clear all startin' with the name", () => {
           const n = nm();
-          if (!n) return ctx2.hint("Type the start of the names first, like speaker-");
-          ctx2.send("spot clear " + n + "*");
+          if (!n) return ctx3.hint("Type the start of the names first, like speaker-");
+          ctx3.send("spot clear " + n + "*");
         }),
-        ctx2.s.proprietor && (ctx2.ui.clearAllSpots ? btn("Yes, clear all " + sp.length + " spots", () => {
-          ctx2.setUi({ clearAllSpots: false });
-          ctx2.send("spot clear all yes");
-        }, true) : btn("Clear all spots\u2026", () => ctx2.setUi({ clearAllSpots: true })))
+        ctx3.s.proprietor && (ctx3.ui.clearAllSpots ? btn("Yes, clear all " + sp.length + " spots", () => {
+          ctx3.setUi({ clearAllSpots: false });
+          ctx3.send("spot clear all yes");
+        }, true) : btn("Clear all spots\u2026", () => ctx3.setUi({ clearAllSpots: true })))
       ) : null
     );
   }
-  function voice(ctx2) {
-    const v = ctx2.s.voice;
-    if (!v) return [muted("Listen to my voice is for herd leaders.")];
-    const target = ctx2.ui.vTarget || "herd";
-    const member = v.members.find((m) => String(m.mn) === String(target));
-    const cur = target === "herd" ? v.herd : member || { on: false, lines: [], every: "15" };
-    const who = target === "herd" ? "herd" : String(target);
+  function voice() {
     return [
-      card(
-        h(
-          "div",
-          { class: "fhc-kv" },
-          h("div", null, title("Listen to my voice"), muted("Lines drift in privately, like a voice in their head. Only for stock who said ?hypno on.")),
-          h("button", {
-            type: "button",
-            class: "fhc-sw" + (cur.on ? " on" : ""),
-            "aria-pressed": cur.on ? "true" : "false",
-            "aria-label": "Voice on or off",
-            onclick: () => ctx2.send("voice " + (cur.on ? "off" : "on") + " " + who)
-          }, h("span"))
-        ),
-        h(
-          "div",
-          { style: { marginTop: "6px" } },
-          h("button", { type: "button", class: "fhc-pill" + (target === "herd" ? " on" : ""), onclick: () => ctx2.setUi({ vTarget: "herd" }) }, "Whole herd"),
-          v.members.map((m) => h(
-            "button",
-            { type: "button", class: "fhc-pill" + (String(target) === String(m.mn) ? " on" : ""), onclick: () => ctx2.setUi({ vTarget: m.mn }) },
-            m.name + (m.hypno ? "" : " (no ?hypno)")
-          ))
-        ),
-        (cur.lines || []).length ? cur.lines.map((l, i) => h(
-          "div",
-          { class: "fhc-kv" },
-          h("i", { style: { color: "#c9a3e6" } }, "[Voice] " + l),
-          h("button", { type: "button", class: "fhc-b", onclick: () => ctx2.send("voice remove " + who + " " + (i + 1)) }, "Remove")
-        )) : muted("No lines yet."),
-        h("label", { class: "fhc-label" }, "New line \xB7 %name% works", h("input", { class: "fhc-in", maxlength: 200, value: ctx2.ui.vDraft || "", oninput: (e) => ctx2.setUi({ vDraft: e.target.value }, true) })),
-        btn("Add", () => {
-          const t = (ctx2.ui.vDraft || "").trim();
-          if (!t) return ctx2.hint("Write the line first.");
-          ctx2.send("voice add " + who + " " + t);
-          ctx2.setUi({ vDraft: "" });
-        }, true),
-        h("label", { class: "fhc-label" }, "How often", h(
-          "select",
-          { class: "fhc-sel", onchange: (e) => ctx2.send("voice every " + who + " " + e.target.value) },
-          [["5", "Every 5 minutes"], ["15", "Every 15 minutes"], ["30", "Every 30 minutes"], ["chores", "Only during milkin' and chores"]].map(([k, l]) => h("option", { value: k, selected: String(cur.every) === k ? "selected" : null }, l))
-        ))
-      ),
       card(
         title("ECHS sessions by depth"),
         muted("Still their ECHS: they agree to every induction, and their own switches and safeword win."),
@@ -6469,14 +7604,14 @@ One of mods you are using is using an old version of SDK. It will work for now b
       )
     ];
   }
-  function shift(ctx2) {
-    const sh = ctx2.s.shift || {};
+  function shift(ctx3) {
+    const sh = ctx3.s.shift || {};
     return [
       card(h(
         "div",
         { class: "fhc-kv" },
         h("div", null, title("Your shift"), muted((sh.clocked ? "On the clock" : "Off the clock") + " \xB7 " + (sh.weekH || 0) + " h this week")),
-        btn(sh.clocked ? "Clock out" : "Clock in", () => ctx2.send(sh.clocked ? "clockout" : "clockin"), !sh.clocked)
+        btn(sh.clocked ? "Clock out" : "Clock in", () => ctx3.send(sh.clocked ? "clockout" : "clockin"), !sh.clocked)
       )),
       card(title("On duty"), (sh.onDuty || []).length ? sh.onDuty.map((n) => chip(n)) : muted("Nobody on duty here.")),
       card(
@@ -6484,31 +7619,99 @@ One of mods you are using is using an old version of SDK. It will work for now b
         muted("Mandated farmhands, plus staff who switched it on. Only these can be pulled in from other rooms."),
         (sh.onCall || []).length ? sh.onCall.map((o) => chip(o.name + (o.mandated ? " \xB7 mandated" : "") + (o.here ? " \xB7 here" : " \xB7 away"), o.here ? "good" : null)) : muted("Nobody's on call.")
       ),
-      ctx2.s.log && card(title("Farm log"), ctx2.s.log.map((e) => h(
+      ctx3.s.log && card(title("Farm log"), ctx3.s.log.map((e) => h(
         "div",
         { class: "fhc-kv", style: { fontFamily: "ui-monospace,Consolas,monospace", fontSize: "11px" } },
         h("span", { class: "fhc-muted" }, new Date(e.t).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })),
         h("span", { style: { color: "var(--fh-accent)" } }, e.a),
         h("span", null, e.by + (e.d ? " \xB7 " + e.d : ""))
       ))),
-      h("div", null, btn("Hours", () => ctx2.send("hours")), btn("Chores", () => ctx2.send("chores")), btn("Spin the wheel", () => ctx2.send("spin")))
+      h("div", null, btn("Hours", () => ctx3.send("hours")), btn("Chores", () => ctx3.send("chores")), btn("Spin the wheel", () => ctx3.send("spin")))
+    ];
+  }
+
+  // extension/src/views/log.js
+  var KINDS = [["", "Everything"], ["whisper", "Whispers"], ["beep", "Beeps"], ["cmd", "Commands"], ["farm", "The farm"], ["chat", "Chat"], ["emote", "Emotes"], ["action", "Actions"]];
+  var two = (n) => String(n).padStart(2, "0");
+  var when = (t) => {
+    const d = new Date(t);
+    return two(d.getMonth() + 1) + "-" + two(d.getDate()) + " " + two(d.getHours()) + ":" + two(d.getMinutes()) + ":" + two(d.getSeconds());
+  };
+  var line2 = (r) => when(r.t) + " [" + r.k + "] " + (r.n || r.f || "") + (r.w ? " \u2192 " + r.w : "") + ": " + r.x;
+  function logTab(ctx3) {
+    const ui = ctx3.ui, who = ctx3.s.logWho || [], res = ui.logRows;
+    const ask3 = () => ctx3.api.logAsk({ who: Number(ui.logWho) || 0, hours: Number(ui.logHours) || 3, kind: ui.logKind || "", q: String(ui.logQ || "").trim().slice(0, 80) });
+    const save5 = () => {
+      try {
+        const blob = new Blob([(res.rows || []).map(line2).join("\n")], { type: "text/plain" }), a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = "farm-log-" + (ui.logWho || "all") + "-" + (/* @__PURE__ */ new Date()).toISOString().slice(0, 13).replace("T", "-") + ".txt";
+        a.click();
+        setTimeout(() => URL.revokeObjectURL(a.href), 5e3);
+      } catch (e) {
+        ctx3.hint("Couldn't save it: " + e.message);
+      }
+    };
+    return [
+      card(
+        title("\u{1F4DC} The record"),
+        muted("What players see in their chat, the beeps they get and the commands they send the farm, kept by the hour. Proprietors are always recorded; anybody else only if they switched it on."),
+        h(
+          "label",
+          { class: "fhc-label" },
+          "Whose",
+          h(
+            "select",
+            { class: "fhc-sel", onchange: (e) => ctx3.setUi({ logWho: e.target.value }, true) },
+            [["", "Everybody"]].concat(who.map((w) => [String(w.mn), w.name + " (" + w.mn + ")"])).map(([v, l]) => h("option", { value: v, selected: String(ui.logWho || "") === v ? "selected" : null }, l))
+          )
+        ),
+        h(
+          "label",
+          { class: "fhc-label" },
+          "How far back",
+          h(
+            "select",
+            { class: "fhc-sel", onchange: (e) => ctx3.setUi({ logHours: e.target.value }, true) },
+            [["1", "The last hour"], ["3", "3 hours"], ["12", "12 hours"], ["24", "A day"], ["72", "3 days"], ["168", "A week"]].map(([v, l]) => h("option", { value: v, selected: String(ui.logHours || "3") === v ? "selected" : null }, l))
+          )
+        ),
+        h("div", { style: { marginTop: "4px" } }, KINDS.map(([k, l]) => h("button", { type: "button", class: "fhc-pill" + ((ui.logKind || "") === k ? " on" : ""), onclick: () => ctx3.setUi({ logKind: k }) }, l))),
+        h(
+          "label",
+          { class: "fhc-label" },
+          "Words to look for",
+          h("input", { class: "fhc-in", value: ui.logQ || "", placeholder: "a name, a command, anything", oninput: (e) => ctx3.setUi({ logQ: e.target.value }, true), onkeydown: (e) => {
+            if (e.key === "Enter") ask3();
+          } })
+        ),
+        h("div", { style: { marginTop: "6px" } }, btn("Show", ask3, true), res && (res.rows || []).length ? btn("Save as a file", save5) : null)
+      ),
+      res ? card(
+        title(res.busy ? "Lookin'\u2026" : (res.total || 0) + " lines" + (res.total > (res.rows || []).length ? ", the newest " + res.rows.length + " shown" : "")),
+        (res.rows || []).length ? h(
+          "div",
+          { style: { fontFamily: "monospace", fontSize: "11px", maxHeight: "420px", overflowY: "auto", whiteSpace: "pre-wrap" } },
+          res.rows.map((r) => h("div", { style: { borderBottom: "1px solid rgba(255,255,255,0.06)", padding: "2px 0" } }, line2(r)))
+        ) : muted(res.busy ? "" : "Nothing matches.")
+      ) : null
     ];
   }
 
   // extension/src/views/staff.js
-  function latest(ctx2) {
-    const r = ctx2.feed.filter((x) => x.kind === "reply").slice(-1)[0];
+  function latest(ctx3) {
+    const r = ctx3.feed.filter((x) => x.kind === "reply").slice(-1)[0];
     return r ? card(title("Latest answer"), h("div", { class: "fhc-card" }, r.text)) : null;
   }
   var field = (label, input2) => h("label", { class: "fhc-label" }, label, input2);
-  var input = (ph, key, ctx2) => h("input", { class: "fhc-in", placeholder: ph, value: ctx2.ui[key] || "", oninput: (e) => ctx2.setUi({ [key]: e.target.value }, true) });
-  var select = (key, opts, ctx2) => h(
+  var input = (ph, key, ctx3) => h("input", { class: "fhc-in", placeholder: ph, value: ctx3.ui[key] || "", oninput: (e) => ctx3.setUi({ [key]: e.target.value }, true) });
+  var select = (key, opts, ctx3) => h(
     "select",
-    { class: "fhc-sel", onchange: (e) => ctx2.setUi({ [key]: e.target.value }, true) },
-    opts.map(([v, l]) => h("option", { value: v, selected: (ctx2.ui[key] || opts[0][0]) === v ? "selected" : null }, l))
+    { class: "fhc-sel", onchange: (e) => ctx3.setUi({ [key]: e.target.value }, true) },
+    opts.map(([v, l]) => h("option", { value: v, selected: (ctx3.ui[key] || opts[0][0]) === v ? "selected" : null }, l))
   );
-  function me3(ctx2) {
-    const s = ctx2.s;
+  function me3(ctx3) {
+    const s = ctx3.s;
     return [
       card(
         h("div", { class: "fhc-title" }, s.name),
@@ -6526,17 +7729,17 @@ One of mods you are using is using an old version of SDK. It will work for now b
           "div",
           { class: "fhc-kv" },
           h("div", null, title("Duty"), muted(s.onDuty ? "On duty \xB7 silver and gold keys out" : "Out to pasture \xB7 bronze key only \xB7 your Livestock panel is yours")),
-          s.pastureLock ? chip("kept out by " + s.pastureLock, "alert") : btn(s.onDuty ? "Go to pasture" : "Back on duty", () => ctx2.send(s.onDuty ? "pasture" : "onduty"), !s.onDuty)
+          s.pastureLock ? chip("kept out by " + s.pastureLock, "alert") : btn(s.onDuty ? "Go to pasture" : "Back on duty", () => ctx3.send(s.onDuty ? "pasture" : "onduty"), !s.onDuty)
         ),
         muted("Pasture puts your silver and gold keys away, makes you livestock for the visit, and takes you off call (mandated staff stay summonable). It doesn't lock you out. Only a ?turnout from your herd leader does that.")
       ),
-      h("div", null, ["record", "hours", "myherd", "keys", "chores"].map((c) => btn(c[0].toUpperCase() + c.slice(1), () => ctx2.send(c)))),
-      latest(ctx2)
+      h("div", null, ["record", "hours", "myherd", "keys", "chores"].map((c) => btn(c[0].toUpperCase() + c.slice(1), () => ctx3.send(c)))),
+      latest(ctx3)
     ];
   }
-  function safeCards(ctx2) {
-    const recent = ctx2.feed.filter((x) => x.kind === "notice" && /SAFEWORD/.test(x.text) && Date.now() - x.at < 60 * 6e4 && !ctx2.ui["done" + x.at]);
-    return recent.map((x) => h(
+  function safeCards(ctx3) {
+    const recent2 = ctx3.feed.filter((x) => x.kind === "notice" && /SAFEWORD/.test(x.text) && Date.now() - x.at < 60 * 6e4 && !ctx3.ui["done" + x.at]);
+    return recent2.map((x) => h(
       "div",
       { class: "fhc-box alert" },
       h("b", null, x.text),
@@ -6544,26 +7747,26 @@ One of mods you are using is using an old version of SDK. It will work for now b
       h(
         "div",
         { style: { marginTop: "8px" } },
-        btn("I'm goin' to them", () => ctx2.send("where"), true),
-        btn("All okay, close it", () => ctx2.setUi({ ["done" + x.at]: true }))
+        btn("I'm goin' to them", () => ctx3.send("where"), true),
+        btn("All okay, close it", () => ctx3.setUi({ ["done" + x.at]: true }))
       )
     ));
   }
-  function office(ctx2) {
-    const docs = ctx2.docs.slice().reverse();
-    const sel = docs.find((d) => d.id === ctx2.ui.doc) || docs[0];
+  function office(ctx3) {
+    const docs = ctx3.docs.slice().reverse();
+    const sel = docs.find((d) => d.id === ctx3.ui.doc) || docs[0];
     return [
-      safeCards(ctx2),
+      safeCards(ctx3),
       muted("Anything you look up about somebody else lands here, not in the chat: record, stats, vet, quota, keys, size, pedigree."),
       h("div", null, h("input", {
         class: "fhc-in",
         placeholder: "Look somebody up: vet Bessie",
-        value: ctx2.ui.look || "",
-        oninput: (e) => ctx2.setUi({ look: e.target.value }, true),
+        value: ctx3.ui.look || "",
+        oninput: (e) => ctx3.setUi({ look: e.target.value }, true),
         onkeydown: (e) => {
-          if (e.key === "Enter" && ctx2.ui.look) {
-            ctx2.send(ctx2.ui.look);
-            ctx2.setUi({ look: "" });
+          if (e.key === "Enter" && ctx3.ui.look) {
+            ctx3.send(ctx3.ui.look);
+            ctx3.setUi({ look: "" });
           }
         }
       })),
@@ -6572,7 +7775,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
         { class: "fhc-split" },
         h("div", { class: "fhc-docs" }, docs.map((d) => h(
           "button",
-          { type: "button", class: "fhc-doc" + (sel && d.id === sel.id ? " on" : ""), onclick: () => ctx2.setUi({ doc: d.id }) },
+          { type: "button", class: "fhc-doc" + (sel && d.id === sel.id ? " on" : ""), onclick: () => ctx3.setUi({ doc: d.id }) },
           h("b", null, d.who),
           h("div", { class: "fhc-muted" }, d.kind + " \xB7 " + new Date(d.at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }))
         ))),
@@ -6580,67 +7783,106 @@ One of mods you are using is using an old version of SDK. It will work for now b
           "div",
           { class: "fhc-box", style: { flex: "1", minWidth: "0" } },
           h("div", { class: "fhc-card" }, sel.text),
-          h("div", { style: { marginTop: "8px" } }, btn("Refresh", () => ctx2.send(sel.kind + " " + sel.about)), btn("Close", () => ctx2.closeDoc(sel.id)))
+          h("div", { style: { marginTop: "8px" } }, btn("Refresh", () => ctx3.send(sel.kind + " " + sel.about)), btn("Close", () => ctx3.closeDoc(sel.id)))
         )
       ) : card(title("Nothin' on the desk"), muted("Try ?vet, ?record or ?stats with somebody's name."))
     ];
   }
-  function contracts(ctx2) {
-    const tpl = () => (ctx2.ui.ctTpl || "deep").trim(), who = () => (ctx2.ui.ctWho || "").trim(), dur = () => ctx2.ui.ctDur || "1w";
+  function contracts(ctx3) {
+    const tpl = () => (ctx3.ui.ctTpl || "deep").trim(), who = () => (ctx3.ui.ctWho || "").trim(), dur = () => ctx3.ui.ctDur || "1w";
+    const q2 = (v) => /\s/.test(v) ? '"' + v + '"' : v;
+    const when2 = () => {
+      const u = ctx3.ui, p = [];
+      if (u.ctRoom) p.push("room=" + u.ctRoom);
+      if ((u.ctNames || "").trim()) p.push((u.ctNamesMode === "notin" ? "notnames=" : "names=") + q2(u.ctNames.trim()));
+      if ((u.ctMembers || "").trim()) p.push((u.ctMembersMode === "absent" ? "without=" : "with=") + u.ctMembers.trim().replace(/\s+/g, ""));
+      if (u.ctRole) p.push((u.ctRoleMode === "absent" ? "norole=" : "role=") + u.ctRole);
+      if (u.ctFrom && u.ctTo) p.push("time=" + u.ctFrom + "-" + u.ctTo);
+      if ((u.ctOnly || "").trim()) p.push("only=" + u.ctOnly.trim().replace(/\s+/g, ""));
+      return p.length ? " when " + p.join(" ") : "";
+    };
+    const sel = (key, opts) => h("select", { class: "fhc-sel", onchange: (e) => ctx3.setUi({ [key]: e.target.value }, true) }, opts.map(([v, l]) => h("option", { value: v, selected: (ctx3.ui[key] || "") === v ? "selected" : null }, l)));
+    const timeIn = (key) => h("input", { class: "fhc-in", type: "time", value: ctx3.ui[key] || "", style: { width: "110px" }, oninput: (e) => ctx3.setUi({ [key]: e.target.value }, true) });
     return [
       card(
         title("Offer a BC+ contract"),
         muted("They read it in their own BC+ and only sign if they want it. Herdmasters and proprietors can offer."),
-        field("Contract", h("input", { class: "fhc-in", value: ctx2.ui.ctTpl || "deep", placeholder: "fun, deep, nhl, or one of yours", oninput: (e) => ctx2.setUi({ ctTpl: e.target.value }, true) })),
-        field("For (name or member number, here in the room)", input("Bessie", "ctWho", ctx2)),
-        field("How long", select("ctDur", DURATIONS.map((d) => [d.key, d.label]), ctx2)),
+        field("Contract", h("input", { class: "fhc-in", value: ctx3.ui.ctTpl || "deep", placeholder: "fun, deep, nhl, or one of yours", oninput: (e) => ctx3.setUi({ ctTpl: e.target.value }, true) })),
+        field("For (name or member number, here in the room)", input("Bessie", "ctWho", ctx3)),
+        field("How long", select("ctDur", DURATIONS.map((d) => [d.key, d.label]), ctx3)),
+        h(
+          "details",
+          { style: { margin: "6px 0" } },
+          h("summary", null, "When the rules apply (BC+ conditions: leave empty for always)"),
+          field("Rooms", sel("ctRoom", [["", "Any room"], ["public", "Public rooms only"], ["private", "Private rooms only"]])),
+          field("Room names", h(
+            "div",
+            { class: "fhc-row", style: { padding: "0", border: "none" } },
+            sel("ctNamesMode", [["in", "Only in"], ["notin", "Not in"]]),
+            h("input", { class: "fhc-in", value: ctx3.ui.ctNames || "", placeholder: "farm, barn (part of the name)", oninput: (e) => ctx3.setUi({ ctNames: e.target.value }, true) })
+          )),
+          field("Who's there", h(
+            "div",
+            { class: "fhc-row", style: { padding: "0", border: "none" } },
+            sel("ctMembersMode", [["present", "While one of these is there"], ["absent", "While none of these is there"]]),
+            h("input", { class: "fhc-in", value: ctx3.ui.ctMembers || "", placeholder: "member numbers, like 221397, 232922", oninput: (e) => ctx3.setUi({ ctMembers: e.target.value }, true) })
+          )),
+          field("Their BC+ roles", h(
+            "div",
+            { class: "fhc-row", style: { padding: "0", border: "none" } },
+            sel("ctRoleMode", [["present", "While somebody this close is there"], ["absent", "While nobody this close is there"]]),
+            sel("ctRole", [["", "Anybody"], ["owner", "Owner"], ["lover", "Lover"], ["mistress", "Mistress"], ["whitelist", "Whitelist"], ["friend", "Friend"]])
+          )),
+          field("Time of day", h("div", { class: "fhc-row", style: { padding: "0", border: "none" } }, "from", timeIn("ctFrom"), "to", timeIn("ctTo"))),
+          field("Only these rules (empty: all of them)", h("input", { class: "fhc-in", value: ctx3.ui.ctOnly || "", placeholder: "pet.speech, pet.hearing", oninput: (e) => ctx3.setUi({ ctOnly: e.target.value }, true) }))
+        ),
         h(
           "div",
           null,
-          btn("Preview", () => ctx2.send("contract show " + tpl() + (who() ? " " + who() : ""))),
-          btn("Offer it", () => who() ? ctx2.send("contract offer " + tpl() + " " + who() + " " + dur()) : ctx2.hint("Type who it's for first, in the For box."), true)
+          btn("Preview", () => ctx3.send("contract show " + tpl() + (who() ? " " + who() : "") + when2())),
+          btn("Offer it", () => who() ? ctx3.send("contract offer " + tpl() + " " + who() + " " + dur() + when2()) : ctx3.hint("Type who it's for first, in the For box."), true)
         )
       ),
       card(
         title("In force"),
-        btn("List farm contracts", () => ctx2.send("contract list")),
-        field("Somebody's contracts", input("Bessie", "ctLook", ctx2)),
+        btn("List farm contracts", () => ctx3.send("contract list")),
+        field("Somebody's contracts", input("Bessie", "ctLook", ctx3)),
         h(
           "div",
           null,
-          btn("Ask their BC+", () => ctx2.ui.ctLook ? ctx2.send("contract check " + ctx2.ui.ctLook) : ctx2.hint("Type whose contracts first.")),
-          btn("Release", () => ctx2.ui.ctLook ? ctx2.send("contract release " + ctx2.ui.ctLook) : ctx2.hint("Type whose contract to release first."))
+          btn("Ask their BC+", () => ctx3.ui.ctLook ? ctx3.send("contract check " + ctx3.ui.ctLook) : ctx3.hint("Type whose contracts first.")),
+          btn("Release", () => ctx3.ui.ctLook ? ctx3.send("contract release " + ctx3.ui.ctLook) : ctx3.hint("Type whose contract to release first."))
         )
       ),
-      latest(ctx2)
+      latest(ctx3)
     ];
   }
-  function barn(ctx2) {
-    const who = () => (ctx2.ui.barnWho || "").trim();
-    const act = (c) => () => who() ? ctx2.send(c + " " + who()) : ctx2.hint("Type who first, in the Who box.");
+  function barn(ctx3) {
+    const who = () => (ctx3.ui.barnWho || "").trim();
+    const act = (c) => () => who() ? ctx3.send(c + " " + who()) : ctx3.hint("Type who first, in the Who box.");
     return [
       card(
         title("Barn work"),
-        field("Who", input("Bessie", "barnWho", ctx2)),
+        field("Who", input("Bessie", "barnWho", ctx3)),
         h("div", null, ["milk", "collect", "drain", "edge", "denial", "ruin", "inspect", "vet", "quota"].map((c) => btn(c[0].toUpperCase() + c.slice(1), act(c))))
       ),
       card(
         title("Jars"),
-        btn("The jar shelf", () => ctx2.send("jars")),
+        btn("The jar shelf", () => ctx3.send("jars")),
         muted("To inseminate: ?inseminate <who> <jar> [hole]. They always get asked first, and anyone with jar insemination off can't be."),
-        h("div", null, btn("Inseminate\u2026", () => ctx2.fillBox("inseminate " + (who() ? who() + " " : ""))))
+        h("div", null, btn("Inseminate\u2026", () => ctx3.fillBox("inseminate " + (who() ? who() + " " : ""))))
       ),
       card(
         title("Herd"),
-        h("div", null, ["myherd", "herdcall", "herdsummon", "roster", "stock", "queue"].map((c) => btn(c, () => ctx2.send(c)))),
+        h("div", null, ["myherd", "herdcall", "herdsummon", "roster", "stock", "queue"].map((c) => btn(c, () => ctx3.send(c)))),
         h("div", null, btn("Summon to me", act("summon")), btn("Claim", act("claim")), btn("Turn out", act("turnout")), btn("Let up", act("letup")))
       ),
-      latest(ctx2)
+      latest(ctx3)
     ];
   }
-  function queue(ctx2) {
-    const apps = ctx2.s.apps || [], m = ctx2.s.mail;
-    const role = (a) => ctx2.ui["role" + a.mn] || (a.staffTrack ? "farmhand" : "livestock");
+  function queue(ctx3) {
+    const apps = ctx3.s.apps || [], m = ctx3.s.mail;
+    const role = (a) => ctx3.ui["role" + a.mn] || (a.staffTrack ? "farmhand" : "livestock");
     return [
       card(
         h("div", { class: "fhc-kv" }, title("Applications"), chip(apps.length + " waitin'", apps.length ? "alert" : null)),
@@ -6651,10 +7893,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
           muted(a.sum + (a.staffTrack ? " \xB7 wants to be staff" : "")),
           h("label", { class: "fhc-label" }, "Approve as", h(
             "select",
-            { class: "fhc-sel", onchange: (e) => ctx2.setUi({ ["role" + a.mn]: e.target.value }, true) },
+            { class: "fhc-sel", onchange: (e) => ctx3.setUi({ ["role" + a.mn]: e.target.value }, true) },
             ["livestock", "guest", "luxury", "gloryhole", "farmhand", "mandated", "herdmaster"].map((r) => h("option", { value: r, selected: role(a) === r ? "selected" : null }, r))
           )),
-          h("div", null, btn("Read it", () => ctx2.send("app " + a.n)), btn("Approve", () => ctx2.send("approve " + a.mn + " " + role(a)), true), btn("Deny", () => ctx2.send("deny " + a.mn)))
+          h("div", null, btn("Read it", () => ctx3.send("app " + a.n)), btn("Approve", () => ctx3.send("approve " + a.mn + " " + role(a)), true), btn("Deny", () => ctx3.send("deny " + a.mn)))
         )) : muted("Nobody's waitin'. New ones beep you as well as showin' here.")
       ),
       m && card(
@@ -6664,7 +7906,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
         h("div", { class: "fhc-kv" }, h("span", null, "Online and beep-able (friends both ways)"), h("b", null, m.beepable === null ? "checkin'\u2026" : String(m.beepable))),
         muted("Held messages turn into one short summary when that person's back.")
       ),
-      latest(ctx2)
+      latest(ctx3)
     ];
   }
   function summonCheck() {
@@ -6672,41 +7914,42 @@ One of mods you are using is using an old version of SDK. It will work for now b
     if (r === null) return muted("BCX isn't loaded here. If you use BC+'s Ready to be summoned instead, add the farm bot (" + BOT_MEMBER + ") to it.");
     return h("div", { class: "fhc-kv" }, h("span", null, "Summon rule"), chip(r.ok ? "ready" : r.why, r.ok ? "good" : "alert"));
   }
-  function toggles2(ctx2) {
-    const s = ctx2.s, sw = s.switches || {};
+  function toggles2(ctx3) {
+    const s = ctx3.s, sw = s.switches || {};
     return [
-      drawnBodyCard(ctx2),
+      drawnBodyCard(ctx3),
       card(
         title("Work"),
         muted("Most staff leave this off. Mandated farmhands are always on call."),
-        s.mandated ? h("div", { class: "fhc-kv" }, h("span", null, "On call"), chip("always (mandated)", "alert")) : toggle("On call", "Let the office summon you from anywhere with BCX or BC+ summoning", !!sw.forced, () => ctx2.send("forced")),
+        s.mandated ? h("div", { class: "fhc-kv" }, h("span", null, "On call"), chip("always (mandated)", "alert")) : toggle("On call", "Let the office summon you from anywhere with BCX or BC+ summoning", !!sw.forced, () => ctx3.send("forced")),
         s.onCall && summonCheck()
       ),
       muted("Your own milkin' and breedin' switches are on your Livestock panel."),
-      panelPrefs(ctx2)
+      panelPrefsOrLink(ctx3)
     ];
   }
   var STAFF_TABS = [
     { id: "me", label: "Me", render: me3 },
     { id: "herd", label: "Herd", render: herd },
-    { id: "office", label: "Office", render: office, badge: (ctx2) => ctx2.docs.length },
-    { id: "queue", label: "Queue", render: queue, badge: (ctx2) => (ctx2.s.apps || []).length },
+    { id: "office", label: "Office", render: office, badge: (ctx3) => ctx3.docs.length },
+    { id: "queue", label: "Queue", render: queue, badge: (ctx3) => (ctx3.s.apps || []).length },
     { id: "contracts", label: "Contracts", render: contracts },
     { id: "barn", label: "Barn", render: barn },
-    { id: "tease", label: "Tease lines", render: tease },
-    { id: "voice", label: "Voice", render: voice },
+    { id: "voice", label: "ECHS", render: voice },
     { id: "zones", label: "Zones", render: zones },
     { id: "shift", label: "Shift", render: shift },
-    { id: "guides", label: "Guides", render: (ctx2) => guidesTab(ctx2, true) },
-    { id: "toggles", label: "Toggles", render: toggles2 }
+    { id: "guides", label: "Guides", render: (ctx3) => guidesTab(ctx3, true) },
+    { id: "toggles", label: "Toggles", render: toggles2 },
+    { id: "log", label: "Log", render: logTab, show: (ctx3) => !!ctx3.s.logReader }
+    // the record (chatlog.js), for whoever may read it
   ];
 
   // extension/src/views/dashboard.js
   var field2 = (label, el) => h("label", { class: "fhc-label" }, label, el);
   var q = (v) => '"' + String(v).replace(/"/g, "'") + '"';
-  function settingControl(ctx2, rule, s) {
-    const key = "set:" + rule.id + ":" + s.name, cur = ctx2.ui[key];
-    const set = (v) => ctx2.setUi({ [key]: v }, true);
+  function settingControl(ctx3, rule, s) {
+    const key = "set:" + rule.id + ":" + s.name, cur = ctx3.ui[key];
+    const set = (v) => ctx3.setUi({ [key]: v }, true);
     const def = Array.isArray(s.default) ? s.default.join("\n") : String(s.default);
     switch (s.type) {
       case "checkbox":
@@ -6734,44 +7977,44 @@ One of mods you are using is using an old version of SDK. It will work for now b
         return h("input", { class: "fhc-in", maxlength: s.maxChars || 256, value: cur !== void 0 ? cur : def, oninput: (e) => set(e.target.value) });
     }
   }
-  function addCommand(ctx2, name, rule) {
+  function addCommand(ctx3, name, rule) {
     const pairs = rule.settings.map((s) => {
       const key = "set:" + rule.id + ":" + s.name;
-      let v = ctx2.ui[key];
+      let v = ctx3.ui[key];
       if (v === void 0) v = s.type === "checkbox" ? s.default ? "on" : "off" : s.type === "members" ? "farm" : Array.isArray(s.default) ? s.default.join("\n") : s.default;
       if (s.type === "stringList") v = String(v).split("\n").map((x) => x.trim()).filter(Boolean).join("|");
       return s.name + "=" + q(v);
     });
     return ("contract add " + name + " " + rule.id + " " + pairs.join(" ")).trim();
   }
-  function contracts2(ctx2) {
-    const nm = () => (ctx2.ui.dName || "").trim().toLowerCase();
+  function contracts2(ctx3) {
+    const nm = () => (ctx3.ui.dName || "").trim().toLowerCase();
     const name = nm();
     const cats = [...new Set([...RULES.values()].map((r) => r.category))];
-    const cat = ctx2.ui.dCat || cats[0];
+    const cat = ctx3.ui.dCat || cats[0];
     const inCat = [...RULES.values()].filter((r) => r.category === cat);
-    const rule = RULES.get(ctx2.ui.dRule) && RULES.get(ctx2.ui.dRule).category === cat ? RULES.get(ctx2.ui.dRule) : inCat[0];
-    const need = () => !nm() && (ctx2.hint("Give your contract a name first (one word, like prizecow)."), true);
+    const rule = RULES.get(ctx3.ui.dRule) && RULES.get(ctx3.ui.dRule).category === cat ? RULES.get(ctx3.ui.dRule) : inCat[0];
+    const need = () => !nm() && (ctx3.hint("Give your contract a name first (one word, like prizecow)."), true);
     return [
       card(
         title("Your contract"),
-        field2("Name (one word)", h("input", { class: "fhc-in", placeholder: "prizecow", value: ctx2.ui.dName || "", oninput: (e) => ctx2.setUi({ dName: e.target.value }, true) })),
-        ctx2.ui.dWarn && !name ? muted("Give it a name first, sugar.") : null,
+        field2("Name (one word)", h("input", { class: "fhc-in", placeholder: "prizecow", value: ctx3.ui.dName || "", oninput: (e) => ctx3.setUi({ dName: e.target.value }, true) })),
+        ctx3.ui.dWarn && !name ? muted("Give it a name first, sugar.") : null,
         h(
           "div",
           null,
-          ["fun", "deep", "nhl"].map((b) => btn("New from " + b, () => !need() && ctx2.send("contract new " + nm() + " from " + b))),
-          btn("New, empty", () => !need() && ctx2.send("contract new " + nm()))
+          ["fun", "deep", "nhl"].map((b) => btn("New from " + b, () => !need() && ctx3.send("contract new " + nm() + " from " + b))),
+          btn("New, empty", () => !need() && ctx3.send("contract new " + nm()))
         ),
-        field2("Title", h("input", { class: "fhc-in", maxlength: 60, value: ctx2.ui.dTitle || "", oninput: (e) => ctx2.setUi({ dTitle: e.target.value }, true) })),
-        field2("Terms they'll read (%name% becomes their name)", h("textarea", { class: "fhc-in", rows: 3, maxlength: 1e3, oninput: (e) => ctx2.setUi({ dTerms: e.target.value }, true) }, ctx2.ui.dTerms || "")),
+        field2("Title", h("input", { class: "fhc-in", maxlength: 60, value: ctx3.ui.dTitle || "", oninput: (e) => ctx3.setUi({ dTitle: e.target.value }, true) })),
+        field2("Terms they'll read (%name% becomes their name)", h("textarea", { class: "fhc-in", rows: 3, maxlength: 1e3, oninput: (e) => ctx3.setUi({ dTerms: e.target.value }, true) }, ctx3.ui.dTerms || "")),
         h(
           "div",
           null,
-          btn("Save title", () => !need() && (ctx2.ui.dTitle ? ctx2.send("contract title " + nm() + " " + ctx2.ui.dTitle) : ctx2.hint("Type the title first."))),
-          btn("Save terms", () => !need() && (ctx2.ui.dTerms ? ctx2.send("contract terms " + nm() + " " + ctx2.ui.dTerms) : ctx2.hint("Write the terms first."))),
-          btn("Farm ends it", () => !need() && ctx2.send("contract policy " + nm() + " farm")),
-          btn("Either side ends it", () => !need() && ctx2.send("contract policy " + nm() + " either"))
+          btn("Save title", () => !need() && (ctx3.ui.dTitle ? ctx3.send("contract title " + nm() + " " + ctx3.ui.dTitle) : ctx3.hint("Type the title first."))),
+          btn("Save terms", () => !need() && (ctx3.ui.dTerms ? ctx3.send("contract terms " + nm() + " " + ctx3.ui.dTerms) : ctx3.hint("Write the terms first."))),
+          btn("Farm ends it", () => !need() && ctx3.send("contract policy " + nm() + " farm")),
+          btn("Either side ends it", () => !need() && ctx3.send("contract policy " + nm() + " either"))
         )
       ),
       card(
@@ -6779,36 +8022,36 @@ One of mods you are using is using an old version of SDK. It will work for now b
         muted("Every rule and setting BC+ " + BCPLUS_VERSION + " has. Only values BC+ accepts can be picked."),
         field2("Kind", h(
           "select",
-          { class: "fhc-sel", onchange: (e) => ctx2.setUi({ dCat: e.target.value, dRule: "" }) },
+          { class: "fhc-sel", onchange: (e) => ctx3.setUi({ dCat: e.target.value, dRule: "" }) },
           cats.map((c) => h("option", { value: c, selected: c === cat ? "selected" : null }, c))
         )),
         field2("Rule", h(
           "select",
-          { class: "fhc-sel", onchange: (e) => ctx2.setUi({ dRule: e.target.value }) },
+          { class: "fhc-sel", onchange: (e) => ctx3.setUi({ dRule: e.target.value }) },
           inCat.map((r) => h("option", { value: r.id, selected: r === rule ? "selected" : null }, r.name + (NEVER[r.id] ? " (never on the farm)" : "")))
         )),
         rule && muted(rule.description),
         rule && NEVER[rule.id] ? h("div", { class: "fhc-box alert" }, "The farm never uses this one: it " + NEVER[rule.id] + ".") : rule && [
-          rule.settings.map((s) => field2((s.label || s.name).replace(/:$/, ""), settingControl(ctx2, rule, s))),
+          rule.settings.map((s) => field2((s.label || s.name).replace(/:$/, ""), settingControl(ctx3, rule, s))),
           h(
             "div",
             null,
-            btn("Add to " + (name || "contract"), () => !need() && ctx2.send(addCommand(ctx2, nm(), rule)), true),
-            btn("Take it out", () => !need() && ctx2.send("contract remove " + nm() + " " + rule.id))
+            btn("Add to " + (name || "contract"), () => !need() && ctx3.send(addCommand(ctx3, nm(), rule)), true),
+            btn("Take it out", () => !need() && ctx3.send("contract remove " + nm() + " " + rule.id))
           )
         ]
       ),
       card(title("Check and send"), h(
         "div",
         null,
-        btn("Preview", () => !need() && ctx2.send("contract show " + nm())),
-        btn("All contracts", () => ctx2.send("contract list")),
-        btn("Delete", () => !need() && ctx2.send("contract delete " + nm()))
+        btn("Preview", () => !need() && ctx3.send("contract show " + nm())),
+        btn("All contracts", () => ctx3.send("contract list")),
+        btn("Delete", () => !need() && ctx3.send("contract delete " + nm()))
       ), muted("Offer it from the Staff panel's Contracts tab.")),
-      latest(ctx2)
+      latest(ctx3)
     ];
   }
-  function addons(ctx2) {
+  function addons(ctx3) {
     const b = bcplusStatus(), s = summonReady(BOT_MEMBER);
     return [
       card(
@@ -6825,11 +8068,11 @@ One of mods you are using is using an old version of SDK. It will work for now b
     ];
   }
   var SPECIES = ["cow", "bull", "pony", "horse", "goat", "sheep", "pig", "bunny", "rabbit", "pup", "dog", "kitt", "cat", "fox", "wolf", "deer", "goblin"];
-  var GENDERS = ["female", "male", "futa", "femboy"];
+  var GENDERS = ["female", "male", "futa", "femboy", "nonbinary"];
   var KEYS_TEXT = { staff: "farm staff + their herd leader", leader: "their herd leader only", owners: "the proprietors only" };
-  function outfits(ctx2) {
-    const saved = ctx2.s.outfits || {}, rules = ctx2.s.outfitRules || {};
-    const sp = ctx2.ui.oSp || "cow";
+  function outfits(ctx3) {
+    const saved = ctx3.s.outfits || {}, rules = ctx3.s.outfitRules || {};
+    const sp = ctx3.ui.oSp || "cow";
     const slotBox = (key, label) => h(
       "div",
       { class: "fhc-box", style: { padding: "8px", borderColor: saved[key] ? "var(--fh-good)" : "var(--fh-line)", borderStyle: saved[key] ? "solid" : "dashed" } },
@@ -6838,8 +8081,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
       h(
         "div",
         { style: { marginTop: "6px" } },
-        btn("Save what I'm wearin'", () => ctx2.api.save && ctx2.api.save(key)),
-        saved[key] ? btn("Clear", () => ctx2.send("outfit clear " + key.replace("uniform:", "").replace("special:", "special ").replace("|", " ").replace("*", "any"))) : null
+        btn("Save what I'm wearin'", () => ctx3.api.save && ctx3.api.save(key)),
+        saved[key] ? btn("Clear", () => ctx3.send("outfit clear " + key.replace("uniform:", "").replace("special:", "special ").replace("|", " ").replace("*", "any"))) : null
       )
     );
     const specials = Object.keys(saved).filter((k) => k.startsWith("special:"));
@@ -6856,7 +8099,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
         title("New stock, by species and gender"),
         h("label", { class: "fhc-label" }, "Species", h(
           "select",
-          { class: "fhc-sel", onchange: (e) => ctx2.setUi({ oSp: e.target.value }) },
+          { class: "fhc-sel", onchange: (e) => ctx3.setUi({ oSp: e.target.value }) },
           SPECIES.map((x) => h("option", { value: x, selected: x === sp ? "selected" : null }, x))
         )),
         h(
@@ -6883,12 +8126,12 @@ One of mods you are using is using an old version of SDK. It will work for now b
           "label",
           { class: "fhc-label" },
           "New special (one word: luxury, fairday, prizecow\u2026)",
-          h("input", { class: "fhc-in", value: ctx2.ui.oSpecial || "", oninput: (e) => ctx2.setUi({ oSpecial: e.target.value }, true) })
+          h("input", { class: "fhc-in", value: ctx3.ui.oSpecial || "", oninput: (e) => ctx3.setUi({ oSpecial: e.target.value }, true) })
         ),
         btn("Save what I'm wearin' as this special", () => {
-          const n = (ctx2.ui.oSpecial || "").trim().toLowerCase().replace(/[^a-z0-9_-]/g, "");
-          if (n.length < 2) return ctx2.hint("Name the special first (one word, like luxury).");
-          ctx2.api.save && ctx2.api.save("special:" + n);
+          const n = (ctx3.ui.oSpecial || "").trim().toLowerCase().replace(/[^a-z0-9_-]/g, "");
+          if (n.length < 2) return ctx3.hint("Name the special first (one word, like luxury).");
+          ctx3.api.save && ctx3.api.save("special:" + n);
         })
       ),
       card(
@@ -6896,7 +8139,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
         h("div", { class: "fhc-kv" }, h("b", null, "High security padlock"), chip("every farm lock", "good")),
         h("label", { class: "fhc-label" }, "Who holds the keys", h(
           "select",
-          { class: "fhc-sel", onchange: (e) => ctx2.send("outfit keys " + e.target.value) },
+          { class: "fhc-sel", onchange: (e) => ctx3.send("outfit keys " + e.target.value) },
           Object.entries(KEYS_TEXT).map(([k, v]) => h("option", { value: k, selected: (rules.keys || "staff") === k ? "selected" : null }, v))
         ))
       ),
@@ -6915,12 +8158,12 @@ One of mods you are using is using an old version of SDK. It will work for now b
             class: "fhc-sw" + (rules[k] ? " on" : ""),
             "aria-pressed": rules[k] ? "true" : "false",
             "aria-label": label,
-            onclick: () => ctx2.send("outfit rule " + cmd + " " + (rules[k] ? "off" : "on"))
+            onclick: () => ctx3.send("outfit rule " + cmd + " " + (rules[k] ? "off" : "on"))
           }, h("span"))
         )),
         muted("Contracts offer an outfit when they're signed, too: ?contract outfit <name> auto|none|<slot>.")
       ),
-      latest(ctx2)
+      latest(ctx3)
     ];
   }
   var EDIT_FIELDS = [
@@ -6944,58 +8187,58 @@ One of mods you are using is using an old version of SDK. It will work for now b
     ["app.sideways", "Application (staff): steppin' in"]
   ];
   var EDIT_HINT = {
-    gender: "female, male, futa or femboy",
+    gender: "female, male, futa, femboy or nonbinary",
     stay: "1 hour, 12 hours, 1 day, 1 week, 2 weeks, 1 month, permanent",
     depth: "fun, deep or no human left",
     species: "cow, pony, bunny, kitty\u2026 any animal",
     name: "what the farm calls them; clear goes back to their game nickname"
   };
-  function records(ctx2) {
-    const who = () => String(ctx2.ui.eWho || "").trim().replace(/\s+/g, " ");
-    const fld = ctx2.ui.eField || "species";
-    const need = () => who() ? false : (ctx2.hint("Who? Their member number is safest."), true);
+  function records(ctx3) {
+    const who = () => String(ctx3.ui.eWho || "").trim().replace(/\s+/g, " ");
+    const fld = ctx3.ui.eField || "species";
+    const need = () => who() ? false : (ctx3.hint("Who? Their member number is safest."), true);
     return [
       card(
         title("Edit a record"),
         muted("Fix a mistake on somebody's application or change their details. Member numbers are safest; a name works if it's on the books."),
-        field2("Who (member number or name)", h("input", { class: "fhc-in", value: ctx2.ui.eWho || "", oninput: (e) => ctx2.setUi({ eWho: e.target.value }, true) })),
-        btn("Show what's on file", () => !need() && ctx2.send("edit " + who())),
+        field2("Who (member number or name)", h("input", { class: "fhc-in", value: ctx3.ui.eWho || "", oninput: (e) => ctx3.setUi({ eWho: e.target.value }, true) })),
+        btn("Show what's on file", () => !need() && ctx3.send("edit " + who())),
         field2("What to change", h(
           "select",
-          { class: "fhc-sel", onchange: (e) => ctx2.setUi({ eField: e.target.value }) },
+          { class: "fhc-sel", onchange: (e) => ctx3.setUi({ eField: e.target.value }) },
           EDIT_FIELDS.map(([k, label]) => h("option", { value: k, selected: k === fld ? "selected" : null }, label))
         )),
-        field2("New value", h("input", { class: "fhc-in", placeholder: EDIT_HINT[fld] || "", value: ctx2.ui.eVal || "", oninput: (e) => ctx2.setUi({ eVal: e.target.value }, true) })),
+        field2("New value", h("input", { class: "fhc-in", placeholder: EDIT_HINT[fld] || "", value: ctx3.ui.eVal || "", oninput: (e) => ctx3.setUi({ eVal: e.target.value }, true) })),
         h(
           "div",
           null,
           btn("Save", () => {
             if (need()) return;
-            const v = String(ctx2.ui.eVal || "").replace(/\s+/g, " ").trim();
-            if (!v) return ctx2.hint("Type the new value first (or press Clear it).");
-            ctx2.send("edit " + who() + " " + fld + " " + v);
-            ctx2.setUi({ eVal: "" });
+            const v = String(ctx3.ui.eVal || "").replace(/\s+/g, " ").trim();
+            if (!v) return ctx3.hint("Type the new value first (or press Clear it).");
+            ctx3.send("edit " + who() + " " + fld + " " + v);
+            ctx3.setUi({ eVal: "" });
           }),
-          btn("Clear it", () => !need() && ctx2.send("edit " + who() + " " + fld + " clear"))
+          btn("Clear it", () => !need() && ctx3.send("edit " + who() + " " + fld + " clear"))
         ),
         muted("Changes are saved on their record and in the audit log. Typed: ?edit <who> <field> <value>.")
       ),
-      latest(ctx2)
+      latest(ctx3)
     ];
   }
   var FB_ICON = { feedback: "\u{1F4AC}", idea: "\u{1F4A1}", bug: "\u{1F41B}", meh: "\u{1F44E}", more: "\u2764\uFE0F" };
   var FB_STATUS = { open: ["open", "acc"], done: ["done", "good"], later: ["later", ""], no: ["not now", "alert"] };
-  function suggestions(ctx2) {
-    const all = ctx2.s.feedback || [], f = ctx2.ui.fbFilter || "open";
+  function suggestions(ctx3) {
+    const all = ctx3.s.feedback || [], f = ctx3.ui.fbFilter || "open";
     const shown = all.filter((x) => f === "all" ? true : f === "open" ? x.status === "open" : f === "lines" ? (x.kind === "meh" || x.kind === "more") && x.status === "open" : x.kind === f && x.status === "open");
-    const pill = (id, label) => h("button", { type: "button", class: "fhc-pill" + (f === id ? " on" : ""), onclick: () => ctx2.setUi({ fbFilter: id }) }, label);
+    const pill = (id, label) => h("button", { type: "button", class: "fhc-pill" + (f === id ? " on" : ""), onclick: () => ctx3.setUi({ fbFilter: id }) }, label);
     return [
       h("div", null, pill("open", "Open"), pill("idea", "\u{1F4A1} Ideas"), pill("bug", "\u{1F41B} Bugs"), pill("feedback", "\u{1F4AC} Feedback"), pill("lines", "\u{1F44E}\u2764\uFE0F Lines"), pill("all", "Everything")),
       shown.length ? shown.map((x) => {
         const key = "fbnote_" + x.id, act = (what) => {
-          const note = (ctx2.ui[key] || "").trim();
-          ctx2.send("feedback " + what + " " + x.id + (note ? " " + note : ""));
-          ctx2.setUi({ [key]: "" });
+          const note2 = (ctx3.ui[key] || "").trim();
+          ctx3.send("feedback " + what + " " + x.id + (note2 ? " " + note2 : ""));
+          ctx3.setUi({ [key]: "" });
         };
         return card(
           h(
@@ -7007,18 +8250,18 @@ One of mods you are using is using an old version of SDK. It will work for now b
           h("div", { class: "fhc-card", style: { whiteSpace: "pre-wrap" } }, (x.kind === "meh" || x.kind === "more" ? "Line: " : "") + x.text),
           x.why && muted("Why: " + x.why),
           x.note && muted("Your note: " + x.note),
-          h("input", { class: "fhc-in", placeholder: "a note back to " + x.name + " (optional)", value: ctx2.ui[key] || "", oninput: (e) => ctx2.setUi({ [key]: e.target.value }, true) }),
+          h("input", { class: "fhc-in", placeholder: "a note back to " + x.name + " (optional)", value: ctx3.ui[key] || "", oninput: (e) => ctx3.setUi({ [key]: e.target.value }, true) }),
           h(
             "div",
             { style: { marginTop: "6px" } },
             btn("Done", () => act("done"), true),
             btn("Later", () => act("later")),
             btn("Not now", () => act("no")),
-            btn("Delete", () => ctx2.send("feedback del " + x.id))
+            btn("Delete", () => ctx3.send("feedback del " + x.id))
           )
         );
       }) : muted(f === "all" ? "The suggestion box is empty." : "Nothin' open here. Players send them with ?suggest, ?bug and ?feedback."),
-      h("div", { style: { marginTop: "6px" } }, btn("Export everything (for Claude)", () => ctx2.send("feedback export")))
+      h("div", { style: { marginTop: "6px" } }, btn("Export everything (for Claude)", () => ctx3.send("feedback export")))
     ];
   }
   var DASHBOARD_TABS = [
@@ -7026,15 +8269,15 @@ One of mods you are using is using an old version of SDK. It will work for now b
     { id: "outfits", label: "Outfits", render: outfits },
     { id: "addons", label: "Other addons", render: addons },
     { id: "records", label: "Records", render: records },
-    { id: "suggestions", label: "\u{1F4A1} Suggestions", render: suggestions, badge: (ctx2) => (ctx2.s.feedback || []).filter((x) => x.status === "open").length }
+    { id: "suggestions", label: "\u{1F4A1} Suggestions", render: suggestions, badge: (ctx3) => (ctx3.s.feedback || []).filter((x) => x.status === "open").length }
   ];
 
   // extension/src/views/extras.js
-  function modsFor(ctx2, view) {
-    const mods = ctx2.s.mods || {};
+  function modsFor(ctx3, view) {
+    const mods = ctx3.s.mods || {};
     return Object.entries(mods).filter(([, m]) => m && typeof m === "object" && (!Array.isArray(m.views) || m.views.includes(view)) && Array.isArray(m.cards)).map(([name, m]) => [name, Object.assign({}, m, { cards: m.cards.filter((c) => c && (view === "staff" ? true : !c.staff)) })]).filter(([, m]) => m.cards.length);
   }
-  function drawCard(ctx2, name, c, i) {
+  function drawCard(ctx3, name, c, i) {
     const key = "x_" + name + "_" + i;
     return card(
       c.title && title(String(c.title)),
@@ -7042,34 +8285,34 @@ One of mods you are using is using an old version of SDK. It will work for now b
       Array.isArray(c.lines) && c.lines.map((l) => h("div", { class: "fhc-kv" }, h("span", null, String(l[0] ?? l)), l[1] !== void 0 ? h("b", null, String(l[1])) : null)),
       Array.isArray(c.bars) && c.bars.map((b) => bar(String(b.label || ""), String(b.value ?? ""), Number(b.pct) || 0, b.kind)),
       Array.isArray(c.chips) && c.chips.length ? h("div", null, c.chips.map((x) => chip(String(x.text ?? x), x.kind))) : null,
-      Array.isArray(c.toggles) && c.toggles.map((t) => toggle(String(t.label || ""), t.desc ? String(t.desc) : "", !!t.on, () => ctx2.send(String(t.cmd)))),
+      Array.isArray(c.toggles) && c.toggles.map((t) => toggle(String(t.label || ""), t.desc ? String(t.desc) : "", !!t.on, () => ctx3.send(String(t.cmd)))),
       c.input && h(
         "div",
         null,
-        h("input", { class: "fhc-in", placeholder: String(c.input.placeholder || ""), value: ctx2.ui[key] || "", oninput: (e) => ctx2.setUi({ [key]: e.target.value }, true) }),
+        h("input", { class: "fhc-in", placeholder: String(c.input.placeholder || ""), value: ctx3.ui[key] || "", oninput: (e) => ctx3.setUi({ [key]: e.target.value }, true) }),
         btn(String(c.input.label || "Send"), () => {
-          const v = (ctx2.ui[key] || "").trim();
-          if (!v) return ctx2.hint("Type somethin' in the box first.");
-          ctx2.send(String(c.input.cmd) + " " + v);
-          ctx2.setUi({ [key]: "" });
+          const v = (ctx3.ui[key] || "").trim();
+          if (!v) return ctx3.hint("Type somethin' in the box first.");
+          ctx3.send(String(c.input.cmd) + " " + v);
+          ctx3.setUi({ [key]: "" });
         }, true)
       ),
-      Array.isArray(c.buttons) && c.buttons.length ? h("div", { style: { marginTop: "6px" } }, c.buttons.map((b) => btn(String(b.label || b.cmd), () => ctx2.send(String(b.cmd)), !!b.accent))) : null,
+      Array.isArray(c.buttons) && c.buttons.length ? h("div", { style: { marginTop: "6px" } }, c.buttons.map((b) => btn(String(b.label || b.cmd), () => ctx3.send(String(b.cmd)), !!b.accent))) : null,
       c.note && muted(String(c.note))
     );
   }
-  function render(ctx2, view) {
-    const list = modsFor(ctx2, view);
+  function render(ctx3, view) {
+    const list = modsFor(ctx3, view);
     if (!list.length) return [muted("No farm extras for you right now.")];
     return list.map(([name, m]) => h(
       "div",
       null,
       h("div", { class: "fhc-muted", style: { margin: "8px 2px 2px" } }, "\u{1F9E9} " + String(m.label || name)),
-      m.cards.map((c, i) => drawCard(ctx2, name, c, i))
+      m.cards.map((c, i) => drawCard(ctx3, name, c, i))
     ));
   }
-  function withExtras(tabs, view, ctx2) {
-    if (!modsFor(ctx2, view).length) return tabs;
+  function withExtras(tabs, view, ctx3) {
+    if (!modsFor(ctx3, view).length) return tabs;
     const t = { id: "extras", label: "Farm extras", render: (c) => render(c, view) };
     const at = tabs.findIndex((x) => x.id === "guides");
     return at < 0 ? tabs.concat(t) : tabs.slice(0, at).concat(t, tabs.slice(at));
@@ -7267,15 +8510,15 @@ One of mods you are using is using an old version of SDK. It will work for now b
       this.add(cmd, "mine");
       this.onCommand(cmd, !!typed);
     }
-    toggle(open = !this.el.classList.contains("open")) {
-      if (open) this.placePanel();
-      this.el.classList.toggle("open", open);
-      if (open) {
+    toggle(open2 = !this.el.classList.contains("open")) {
+      if (open2) this.placePanel();
+      this.el.classList.toggle("open", open2);
+      if (open2) {
         this.unread = 0;
         this.btn.removeAttribute("data-unread");
       }
       clearInterval(this.clock);
-      if (open) this.clock = setInterval(() => {
+      if (open2) this.clock = setInterval(() => {
         if ((this.s.now || []).some((x) => x.until)) this.render();
       }, 3e4);
     }
@@ -7357,9 +8600,9 @@ One of mods you are using is using an old version of SDK. It will work for now b
       };
     }
     render() {
-      const ctx2 = this.ctx(), view = this.view(), V = VIEWS[view];
-      const tabs = view === "guest" ? V.tabs : withExtras(V.tabs, view, ctx2);
-      const tabKey = "tab_" + view, tab = tabs.find((t) => t.id === this.ui[tabKey]) || tabs[0];
+      const ctx3 = this.ctx(), view = this.view(), V = VIEWS[view];
+      const tabs = (view === "guest" ? V.tabs : withExtras(V.tabs, view, ctx3)).filter((t) => !t.show || t.show(ctx3));
+      const tabKey = "tab_" + view, tab2 = tabs.find((t) => t.id === this.ui[tabKey]) || tabs[0];
       const scroll = this.el.querySelector(".fhc-body"), keep2 = scroll ? scroll.scrollTop : 0;
       this.el.classList.toggle("compact", !!this.prefs.compact);
       const full = !!this.prefs.full;
@@ -7398,16 +8641,16 @@ One of mods you are using is using an old version of SDK. It will work for now b
         ),
         // Safe word, I'm stuck and Call staff live in the Safety tab (Guest and Livestock panels; staff reach it from Livestock)
         h("nav", { class: "fhc-row", "aria-label": "Panel sections" }, tabs.map((t) => {
-          const n = t.badge ? t.badge(ctx2) : 0;
-          return h("button", { type: "button", class: "fhc-pill" + (t === tab ? " on" : ""), onclick: () => {
+          const n = t.badge ? t.badge(ctx3) : 0;
+          return h("button", { type: "button", class: "fhc-pill" + (t === tab2 ? " on" : ""), onclick: () => {
             this.ui[tabKey] = t.id;
             this.render();
           } }, t.label + (n ? " \xB7 " + n : ""));
         })),
-        h("div", { class: "fhc-body" }, this.banners(), safeRender(tab, ctx2))
+        h("div", { class: "fhc-body" }, this.banners(), safeRender(tab2, ctx3))
       );
-      const body = this.el.querySelector(".fhc-body");
-      if (body) body.scrollTop = keep2;
+      const body2 = this.el.querySelector(".fhc-body");
+      if (body2) body2.scrollTop = keep2;
     }
     // questions waitin' on you, on every tab
     banners() {
@@ -7533,9 +8776,9 @@ One of mods you are using is using an old version of SDK. It will work for now b
       return false;
     }
   }
-  function safeRender(tab, ctx2) {
+  function safeRender(tab2, ctx3) {
     try {
-      return tab.render(ctx2);
+      return tab2.render(ctx3);
     } catch (e) {
       console.warn("[Farmhand Companion]", e);
       return h("div", { class: "fhc-box alert" }, "This tab hit a snag. The rest of the panel still works.");
@@ -7664,7 +8907,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   };
 
   // extension/src/marks.js
-  var KEY2 = "fhc-marks";
+  var KEY4 = "fhc-marks";
   var STRIP_KEY = "fhc-strip-backup";
   var SPLAT_GROUPS = ["Mask", "FaceMarkings", "BodyMarkings"];
   var WRITE_GROUPS = ["BodyMarkings", "ClothAccessory"];
@@ -7675,16 +8918,16 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var SPILL = { forehead: "face", face: "chest", chest: "tummy", tummy: "chest" };
   var SPILL_CHANCE = 0.35;
   var P2 = () => window.Player;
-  var load2 = () => {
+  var load3 = () => {
     try {
-      return JSON.parse(window.localStorage.getItem(KEY2)) || {};
+      return JSON.parse(window.localStorage.getItem(KEY4)) || {};
     } catch (e) {
       return {};
     }
   };
-  var save2 = (v) => {
+  var save4 = (v) => {
     try {
-      window.localStorage.setItem(KEY2, JSON.stringify(v));
+      window.localStorage.setItem(KEY4, JSON.stringify(v));
     } catch (e) {
     }
   };
@@ -7702,7 +8945,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     const did = [];
     if (m.wash) return washMarks();
     if (!prefs.marks) return { ok: false, why: "off" };
-    let next = bundle(), mem = load2();
+    let next = bundle(), mem = load3();
     const has = (g) => next.find((b) => b.Group === g);
     if (Array.isArray(m.splat) && m.splat.length) {
       const col = typeof m.color === "string" && /^#[0-9a-fA-F]{6}$/.test(m.color) ? m.color.toUpperCase() : null;
@@ -7749,8 +8992,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
         }
         if (it) {
           const pr = it.Property = Object.assign({}, it.Property || {}), tr = pr.TypeRecord = Object.assign({}, pr.TypeRecord || {});
-          const put2 = (place, line2, text) => {
-            pr["Text" + (place * 3 + line2)] = cleanText(text).toUpperCase();
+          const put2 = (place, line3, text) => {
+            pr["Text" + (place * 3 + line3)] = cleanText(text).toUpperCase();
             tr[String.fromCharCode(97 + place)] = 1;
           };
           if (m.tally) {
@@ -7772,7 +9015,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
             put2(spot[0], spot[1], m.write.line);
             did.push("writing");
           }
-          save2(mem);
+          save4(mem);
           commit2(next);
           return { ok: true, did };
         }
@@ -7798,7 +9041,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       }
     }
     if (!did.length) return { ok: false, why: "no room" };
-    save2(mem);
+    save4(mem);
     commit2(next);
     return { ok: true, did };
   }
@@ -8083,9 +9326,9 @@ One of mods you are using is using an old version of SDK. It will work for now b
     }
   }
   function washMarks() {
-    const mem = load2(), stuck = lockedGroups2();
+    const mem = load3(), stuck = lockedGroups2();
     const next = bundle().filter((b) => stuck.has(b.Group) || !(b.Name === "Splatters" && SPLAT_GROUPS.includes(b.Group) || b.Name === "BodyWritings" && b.Group === mem.writeGroup || mem.treatise && b.Group === TREATISE.group));
-    save2({});
+    save4({});
     commit2(next);
     return { ok: true, did: ["wash"] };
   }
@@ -8098,7 +9341,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       } catch (e) {
       }
     }
-    const mem = load2();
+    const mem = load3();
     const next = cur.filter((b) => {
       const g = groupOf2(b.Group);
       return !(g && g.Clothing) || stuck.has(b.Group) || b.Name === "BodyWritings" || b.Name === "Splatters" || b.Group === TREATISE.group;
@@ -8127,1056 +9370,164 @@ One of mods you are using is using an old version of SDK. It will work for now b
     return { ok: true, did: ["dress"] };
   }
 
-  // studio/web/splatters.js
-  (function(root) {
-    "use strict";
-    function rng(seed) {
-      let a = seed >>> 0 || 1;
-      return () => {
-        a |= 0;
-        a = a + 1831565813 | 0;
-        let t = Math.imul(a ^ a >>> 15, 1 | a);
-        t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
-        return ((t ^ t >>> 14) >>> 0) / 4294967296;
-      };
-    }
-    const KINDS = {
-      // cum matches the game's own Splatters (Laynie: "match the color and translucency of the games own splatters"): read off its
-      // pictures, a cool white, #E3E4E5 in the middle, #C2C3C5 in the shade, #FBFBFB at the shine, solid in the middle, soft at the edges
-      cum: { style: "run", base: "#E6E7E8", edge: "#B4B6B9", gloss: "#FDFDFD", alpha: 0.97, run: 1, width: 1, ropes: 1, beads: 0.6 },
-      cumThick: { style: "run", base: "#E1E2E3", edge: "#AEB0B3", gloss: "#FDFDFD", alpha: 1, run: 0.7, width: 1.4, ropes: 0.6, beads: 0.8 },
-      piss: { style: "run", tint: "#F6D23A", stampAlpha: 0.55, narrow: [0.45, 0.75], long: 1.35, turn: 0.3, texture: "sheen", base: "#F0D040", edge: "#C9A422", gloss: "#FFF6C0", alpha: 0.34, run: 1.6, width: 0.7, beads: 0.3, droplets: 1.5 },
-      milk: { style: "run", tint: "#FFFFFF", stampAlpha: 0.8, narrow: [0.6, 0.9], long: 1.2, turn: 0.4, texture: "milky", base: "#FBFBF6", edge: "#DADAD0", gloss: "#FFFFFF", alpha: 0.72, run: 1.4, width: 0.8, beads: 0.4, droplets: 0.8 },
-      honey: { style: "run", tint: "#E9A21C", stampAlpha: 0.88, narrow: [1, 1.35], long: 1.15, turn: 0.25, texture: "streaks", base: "#E09A18", edge: "#9C6208", gloss: "#FFE7A3", alpha: 0.74, run: 1.1, width: 1.2, beads: 0.9 },
-      maple: { style: "run", tint: "#9A521A", stampAlpha: 0.9, narrow: [0.9, 1.25], long: 1.2, turn: 0.3, texture: "streaks", base: "#94501A", edge: "#56290A", gloss: "#F0B47A", alpha: 0.78, run: 1.3, width: 1, beads: 0.7 },
-      chocolate: { style: "run", tint: "#5A3018", narrow: [1, 1.3], long: 1, turn: 0.4, texture: "shine", base: "#4A2814", edge: "#251208", gloss: "#B98A6A", alpha: 0.95, run: 1, width: 1.2, beads: 0.8 },
-      strawberry: { style: "run", tint: "#E0304E", stampAlpha: 0.9, narrow: [0.9, 1.2], long: 1.1, turn: 0.35, texture: "seeds", base: "#D52F4C", edge: "#951628", gloss: "#FFB3C0", alpha: 0.8, run: 1.2, width: 1, beads: 0.7, seeds: "#F6E27A" },
-      slime: { style: "smear", tint: "#79D04F", stampAlpha: 0.7, narrow: [1.2, 1.6], long: 0.9, turn: 1.2, texture: "bubbles", stampToo: true, base: "#6CC24A", edge: "#3A8226", gloss: "#D9FFC8", alpha: 0.6, run: 1, width: 1.1, beads: 0.6, bubbles: true, also: "run" },
-      cream: { style: "smear", base: "#FFF6E4", edge: "#E2D4B4", gloss: "#FFFFFF", alpha: 0.96, run: 0.35, width: 1.2 },
-      cake: { style: "smear", smudge: 0.3, sprinkleN: 30, base: "#FFD8E6", edge: "#E3A9BC", gloss: "#FFFFFF", alpha: 0.97, run: 0.2, width: 1.3, patches: "#FFFFFF", crumbs: ["#E8C27A", "#D9A85B", "#C98F45", "#7A4A2A"], sprinkles: ["#FF5C8A", "#5CC8FF", "#FFE05C", "#7CE07C"] },
-      mud: { style: "smear", base: "#6B4A2B", edge: "#45301A", gloss: "#9C7A55", alpha: 0.9, run: 0.5, width: 1.2, specks: "#3A2614", also: "run" },
-      mash: { style: "smear", base: "#D9C28C", edge: "#B09860", gloss: "#F5E8C2", alpha: 0.95, run: 0.25, width: 1.2, specks: "#A88A4A" }
-    };
-    function ribbon(ctx2, pts) {
-      const L = [], R = [];
-      for (let i = 0; i < pts.length; i++) {
-        const p = pts[i], q2 = pts[Math.min(i + 1, pts.length - 1)], o = pts[Math.max(i - 1, 0)];
-        let dx = q2[0] - o[0], dy = q2[1] - o[1];
-        const l = Math.hypot(dx, dy) || 1;
-        dx /= l;
-        dy /= l;
-        L.push([p[0] - dy * p[2] / 2, p[1] + dx * p[2] / 2]);
-        R.push([p[0] + dy * p[2] / 2, p[1] - dx * p[2] / 2]);
+  // extension/src/chatlog.js
+  var W8 = window;
+  var KEY5 = "farmhand-chatlog";
+  var MAX3 = 1500;
+  var CHUNK = 6e3;
+  var rows = [];
+  var sdk5 = null;
+  var on = () => false;
+  var botMn = 0;
+  var botHere = () => false;
+  var saveT = null;
+  var recent = /* @__PURE__ */ new Map();
+  try {
+    const v = JSON.parse(W8.localStorage.getItem(KEY5));
+    if (Array.isArray(v)) rows = v.slice(-MAX3);
+  } catch (e) {
+    rows = [];
+  }
+  function saveSoon() {
+    clearTimeout(saveT);
+    saveT = setTimeout(() => {
+      try {
+        W8.localStorage.setItem(KEY5, JSON.stringify(rows));
+      } catch (e) {
+        rows = rows.slice(-300);
       }
-      ctx2.beginPath();
-      ctx2.moveTo(L[0][0], L[0][1]);
-      for (let i = 1; i < L.length; i++) {
-        const m = [(L[i - 1][0] + L[i][0]) / 2, (L[i - 1][1] + L[i][1]) / 2];
-        ctx2.quadraticCurveTo(L[i - 1][0], L[i - 1][1], m[0], m[1]);
-      }
-      ctx2.lineTo(L[L.length - 1][0], L[L.length - 1][1]);
-      ctx2.lineTo(R[R.length - 1][0], R[R.length - 1][1]);
-      for (let i = R.length - 2; i >= 0; i--) {
-        const m = [(R[i + 1][0] + R[i][0]) / 2, (R[i + 1][1] + R[i][1]) / 2];
-        ctx2.quadraticCurveTo(R[i + 1][0], R[i + 1][1], m[0], m[1]);
-      }
-      ctx2.lineTo(R[0][0], R[0][1]);
-      ctx2.closePath();
-      return { L, R };
-    }
-    function puddle(ctx2, r, x, y, w, h2, rough) {
-      const n = 14, pts = [];
-      for (let i = 0; i < n; i++) {
-        const a = i / n * Math.PI * 2, k = 1 + (r() - 0.5) * rough;
-        pts.push([x + Math.cos(a) * w * k, y + Math.sin(a) * h2 * k]);
-      }
-      ctx2.beginPath();
-      for (let i = 0; i <= n; i++) {
-        const p = pts[i % n], q2 = pts[(i + 1) % n], m = [(p[0] + q2[0]) / 2, (p[1] + q2[1]) / 2];
-        if (i === 0) ctx2.moveTo(m[0], m[1]);
-        else ctx2.quadraticCurveTo(p[0], p[1], m[0], m[1]);
-      }
-      ctx2.closePath();
-    }
-    function wet(ctx2, K, a) {
-      ctx2.globalAlpha = K.alpha * (a || 1);
-      ctx2.fillStyle = K.base;
-      ctx2.fill();
-      ctx2.globalAlpha = Math.min(1, K.alpha * 0.8);
-      ctx2.strokeStyle = K.edge;
-      ctx2.lineWidth = 0.9;
-      ctx2.stroke();
-    }
-    function shine(ctx2, K, side, from, to) {
-      ctx2.globalAlpha = 0.7;
-      ctx2.strokeStyle = K.gloss;
-      ctx2.lineWidth = 1.1;
-      ctx2.lineCap = "round";
-      ctx2.beginPath();
-      for (let i = from; i < to; i++) {
-        const p = side[i];
-        if (i === from) ctx2.moveTo(p[0] + 1.2, p[1]);
-        else ctx2.lineTo(p[0] + 1.2, p[1]);
-      }
-      ctx2.stroke();
-    }
-    function strandPts(r, x, y, len, w, ang) {
-      const n = 12, pts = [], beads = [r(), r(), r()].map((v) => [v, 0.6 + r() * 0.9]);
-      let px = x, py = y, a = ang;
-      for (let i = 0; i <= n; i++) {
-        const t = i / n;
-        a += (r() - 0.5) * 0.35;
-        px += Math.sin(a) * len / n;
-        py += Math.cos(a) * len / n;
-        let ww = w * (0.55 + 0.25 * (1 - t));
-        for (const [bt, bs] of beads) ww += w * bs * Math.exp(-Math.pow((t - bt) / 0.07, 2));
-        pts.push([px, py, Math.max(1, ww)]);
-      }
-      return pts;
-    }
-    function strandDraw(ctx2, K, pts) {
-      const wide = pts.map((p) => [p[0], p[1], p[2] + 1.8]);
-      ribbon(ctx2, wide);
-      ctx2.globalAlpha = Math.min(1, K.alpha + 0.05);
-      ctx2.fillStyle = K.edge;
-      ctx2.fill();
-      const side = ribbon(ctx2, pts);
-      ctx2.globalAlpha = K.alpha;
-      ctx2.fillStyle = K.base;
-      ctx2.fill();
-      ctx2.globalAlpha = 0.85;
-      ctx2.strokeStyle = K.gloss;
-      ctx2.lineWidth = 1;
-      ctx2.lineCap = "round";
-      ctx2.beginPath();
-      side.L.forEach((p, i) => {
-        const q2 = pts[i];
-        const x = p[0] * 0.35 + q2[0] * 0.65, y = p[1] * 0.35 + q2[1] * 0.65;
-        if (i === 0) ctx2.moveTo(x, y);
-        else ctx2.lineTo(x, y);
-      });
-      ctx2.stroke();
-    }
-    function strand(ctx2, r, K, x, y, size, ang0) {
-      const len = size * (0.25 + r() * 0.55) * (0.6 + K.run * 0.4), w = Math.max(1.6, size * 0.032 * K.width * (0.7 + r() * 0.6)), ang = ang0 !== void 0 ? ang0 : (r() - 0.5) * 0.9;
-      const pts = strandPts(r, x, y, len, w, ang);
-      if (r() < 0.3) {
-        const cut = 4 + Math.floor(r() * 4);
-        strandDraw(ctx2, K, pts.slice(0, cut));
-        strandDraw(ctx2, K, pts.slice(cut + 2));
-      } else strandDraw(ctx2, K, pts);
-      {
-        const e = pts[pts.length - 1], d = w * (1.1 + r() * 0.6);
-        strandDraw(ctx2, K, [[e[0], e[1] - d * 0.4, d], [e[0], e[1], d * 1.25], [e[0], e[1] + d * 0.4, d]]);
-      }
-      for (let b = 0, nb = r() < 0.6 ? 1 + (r() < 0.35 ? 1 : 0) : 0; b < nb; b++) {
-        const p = pts[2 + Math.floor(r() * 7)], side = r() < 0.5 ? -1 : 1;
-        strandDraw(ctx2, K, strandPts(r, p[0], p[1], len * (0.3 + r() * 0.35), w * 0.8, ang + side * (0.4 + r() * 0.5)));
-      }
-      for (let d = 0, nd = Math.floor(r() * 3); d < nd; d++) {
-        const p = pts[Math.floor(r() * pts.length)], bx = p[0] + (r() - 0.5) * size * 0.5, by = p[1] + (r() - 0.5) * size * 0.3, bw = w * (0.8 + r() * 0.6);
-        strandDraw(ctx2, K, [[bx, by - bw * 0.5, bw], [bx, by, bw * 1.2], [bx, by + bw * 0.5, bw]]);
-      }
-    }
-    function run(ctx2, r, K, x, y, len, w) {
-      const steps = 14, pts = [], wob = (r() - 0.5) * 6, swell = r() * Math.PI * 2;
-      let px = x;
-      for (let i = 0; i <= steps; i++) {
-        const t = i / steps;
-        px += (r() - 0.5) * 1.4 + wob * 0.06;
-        const ww = w * (0.55 + 0.35 * Math.sin(t * 6 + swell) * (r() * 0.5 + 0.5)) * (1 - t * 0.25);
-        pts.push([px, y + t * len, Math.max(1.2, ww)]);
-      }
-      const side = ribbon(ctx2, pts);
-      wet(ctx2, K);
-      shine(ctx2, K, side.L, 1, Math.floor(steps * 0.7));
-      const end = pts[pts.length - 1];
-      if (r() < 0.55) {
-        puddle(ctx2, r, end[0], end[1] + w * 0.15, w * (0.9 + r() * 0.6), w * (0.45 + r() * 0.25), 0.35);
-        wet(ctx2, K);
-      } else {
-        ctx2.beginPath();
-        ctx2.ellipse(end[0], end[1] + w * 0.25, w * 0.55, w * 0.75, 0, 0, Math.PI * 2);
-        wet(ctx2, K);
-      }
-      ctx2.globalAlpha = 0.85;
-      ctx2.fillStyle = K.gloss;
-      ctx2.beginPath();
-      ctx2.arc(end[0] - w * 0.2, end[1], Math.max(0.7, w * 0.12), 0, Math.PI * 2);
-      ctx2.fill();
-    }
-    function splash(ctx2, r, K, x, y, size, amount) {
-      const w = size * (0.11 + r() * 0.12) * K.width, h2 = w * (0.35 + r() * 0.2), ang = (r() - 0.5) * 1.2;
-      ctx2.save();
-      ctx2.translate(x, y);
-      ctx2.rotate(ang);
-      puddle(ctx2, r, 0, 0, w, h2, 0.55);
-      ctx2.restore();
-      wet(ctx2, K);
-      const n = 1 + Math.round(r() * 2.2 * Math.min(1.4, K.run));
-      for (let i = 0; i < n; i++) {
-        const sx = x + (r() - 0.5) * w * 1.2, len = size * (0.4 + r() * 1.3) * K.run * (0.8 + amount * 0.25), sw = Math.max(2, w * (0.3 + r() * 0.3));
-        run(ctx2, r, K, sx, y + h2 * 0.3, len, sw);
-      }
-    }
-    function rope(ctx2, r, K, x, y, size) {
-      const a = (r() - 0.5) * 1.4 + (r() < 0.5 ? 0 : Math.PI), l = size * (0.5 + r() * 0.8), pts = [];
-      for (let i = 0; i <= 10; i++) {
-        const t = i / 10;
-        pts.push([x + Math.cos(a) * l * t, y + Math.sin(a) * l * t * 0.5 + Math.sin(t * Math.PI) * 6, 1.4 + Math.sin(t * Math.PI) * size * 0.05 * K.width]);
-      }
-      const side = ribbon(ctx2, pts);
-      wet(ctx2, K);
-      shine(ctx2, K, side.L, 2, 8);
-      if (r() < 0.6) {
-        const p = pts[3 + Math.floor(r() * 5)];
-        run(ctx2, r, K, p[0], p[1], size * (0.3 + r() * 0.6) * K.run, Math.max(2, p[2] * 1.3));
-      }
-    }
-    function smear(ctx2, r, K, x, y, size) {
-      const a = (r() - 0.5) * 1.8, l = size * (0.5 + r() * 0.8), w0 = size * (0.18 + r() * 0.14) * K.width, pts = [];
-      for (let i = 0; i <= 12; i++) {
-        const t = i / 12;
-        pts.push([x + Math.cos(a) * l * (t - 0.5) + (r() - 0.5) * 2, y + Math.sin(a) * l * (t - 0.5) * 0.6 + (r() - 0.5) * 2, w0 * (0.4 + Math.sin(t * Math.PI) * 0.8) * (0.8 + r() * 0.4)]);
-      }
-      const side = ribbon(ctx2, pts);
-      wet(ctx2, K);
-      ctx2.globalAlpha = 0.45;
-      ctx2.strokeStyle = K.gloss;
-      ctx2.lineWidth = 0.9;
-      for (let s = 0; s < 3; s++) {
-        const off = (r() - 0.5) * w0 * 0.6;
-        ctx2.beginPath();
-        pts.forEach((p, i) => i ? ctx2.lineTo(p[0], p[1] + off) : ctx2.moveTo(p[0], p[1] + off));
-        ctx2.stroke();
-      }
-      if (K.patches) {
-        ctx2.fillStyle = K.patches;
-        for (let s = 0; s < 6; s++) {
-          const p = (r() < 0.5 ? side.L : side.R)[Math.floor(r() * side.L.length)];
-          ctx2.globalAlpha = 0.9;
-          puddle(ctx2, r, p[0], p[1], 2 + r() * w0 * 0.35, 1.5 + r() * w0 * 0.2, 0.6);
-          ctx2.fill();
+    }, 2e3);
+  }
+  var squash = (t) => String(t).toLowerCase().replace(/\s+/g, " ").replace(/[^\p{L}\p{N} ]/gu, "").trim().slice(0, 240);
+  function logRow(k, f, x) {
+    try {
+      if (!on()) return;
+      x = String(x == null ? "" : x).replace(/\s+/g, " ").trim();
+      if (!x) return;
+      const n = squash(x), now = Date.now();
+      if (n) {
+        const t0 = recent.get(n);
+        if (t0 && now - t0 < 9e4) return;
+        recent.set(n, now);
+        if (recent.size > 800) {
+          for (const [kk, tt] of recent) if (now - tt > 9e4) recent.delete(kk);
         }
       }
-      if (r() < K.run) {
-        const p = pts[Math.floor(r() * pts.length)];
-        run(ctx2, r, K, p[0], p[1] + p[2] * 0.3, size * (0.3 + r() * 0.7) * K.run, Math.max(2.5, p[2] * 0.4));
+      rows.push({ t: now, k: String(k).slice(0, 12), f: Number(f) || 0, x: x.slice(0, 600) });
+      if (rows.length > MAX3) rows = rows.slice(-MAX3);
+      saveSoon();
+    } catch (e) {
+    }
+  }
+  function flush() {
+    if (!on() || !rows.length || !botHere() || typeof W8.ServerSend !== "function") return;
+    let sent = 0;
+    for (let part = 0; part < 4 && rows.length; part++) {
+      const batch = [];
+      let size = 0;
+      while (rows.length && batch.length < 120) {
+        const r = rows[0], s = JSON.stringify(r).length;
+        if (size + s > CHUNK && batch.length) break;
+        batch.push(rows.shift());
+        size += s;
+      }
+      try {
+        W8.ServerSend("ChatRoomChat", makeMsg("chatlog", { rows: batch }, botMn));
+        sent += batch.length;
+      } catch (e) {
+        rows = batch.concat(rows);
+        break;
       }
     }
-    const STAMP_FILES = ["Chest1", "Chest2", "Chest3", "Chest4", "Face1", "Face2", "Face3", "Forehead1", "Forehead2", "Forehead3", "Tummy1", "Tummy2", "Tummy3", "Tummy4"];
-    const STAMPS = [];
-    function cutStamps(img2) {
-      const c = document.createElement("canvas");
-      c.width = img2.width;
-      c.height = img2.height;
-      const x = c.getContext("2d");
-      x.drawImage(img2, 0, 0);
-      const W8 = c.width, H = c.height, d = x.getImageData(0, 0, W8, H).data, seen2 = new Uint8Array(W8 * H), out = [];
-      for (let i = 0; i < W8 * H; i++) {
-        if (seen2[i] || d[i * 4 + 3] < 16) continue;
-        const q2 = [i];
-        seen2[i] = 1;
-        let x0 = W8, y0 = H, x1 = 0, y1 = 0, n = 0;
-        while (q2.length) {
-          const p = q2.pop(), px = p % W8, py = p / W8 | 0;
-          n++;
-          if (px < x0) x0 = px;
-          if (px > x1) x1 = px;
-          if (py < y0) y0 = py;
-          if (py > y1) y1 = py;
-          for (let dy = -2; dy <= 2; dy++) for (let dx = -2; dx <= 2; dx++) {
-            const nx = px + dx, ny = py + dy;
-            if (nx < 0 || ny < 0 || nx >= W8 || ny >= H) continue;
-            const k = ny * W8 + nx;
-            if (!seen2[k] && d[k * 4 + 3] >= 16) {
-              seen2[k] = 1;
-              q2.push(k);
-            }
-          }
-        }
-        if (n < 25) continue;
-        const s2 = document.createElement("canvas");
-        s2.width = x1 - x0 + 3;
-        s2.height = y1 - y0 + 3;
-        s2.getContext("2d").drawImage(c, x0 - 1, y0 - 1, s2.width, s2.height, 0, 0, s2.width, s2.height);
-        out.push(s2);
-      }
-      return out;
-    }
-    async function loadStamps(base) {
-      if (STAMPS.length) return STAMPS.length;
-      for (const n of STAMP_FILES) {
+    if (sent) saveSoon();
+  }
+  function initChatlog(mod2, opts) {
+    sdk5 = mod2;
+    on = opts.on;
+    botMn = opts.botMn;
+    botHere = opts.botHere;
+    try {
+      sdk5.hookFunction("ChatRoomAppendChat", 0, (args, next) => {
         try {
-          const img2 = new Image();
-          img2.crossOrigin = "anonymous";
-          await new Promise((ok2, no) => {
-            img2.onload = ok2;
-            img2.onerror = no;
-            setTimeout(no, 8e3);
-            img2.src = (base || "") + "Assets/Female3DCG/BodyMarkings/Splatters_" + n + ".png";
-          });
-          STAMPS.push(...cutStamps(img2));
+          const div = args[0];
+          if (div && div.classList && on()) {
+            const cls = Array.from(div.classList).find((c) => /^ChatMessage[A-Z]/.test(c) && c !== "ChatMessageName") || "ChatMessageChat";
+            logRow(cls.replace(/^ChatMessage/, "").toLowerCase().replace("localmessage", "local").replace("servermessage", "server"), div.dataset && div.dataset.sender, div.textContent);
+          }
         } catch (e) {
         }
-      }
-      return STAMPS.length;
-    }
-    const tintCache = /* @__PURE__ */ new Map();
-    function tinted(st2, K) {
-      if (!K.tint) return st2;
-      const key = STAMPS.indexOf(st2) + K.tint;
-      if (tintCache.has(key)) return tintCache.get(key);
-      const c = document.createElement("canvas");
-      c.width = st2.width;
-      c.height = st2.height;
-      const x = c.getContext("2d");
-      x.drawImage(st2, 0, 0);
-      x.globalCompositeOperation = "multiply";
-      x.fillStyle = K.tint;
-      x.fillRect(0, 0, c.width, c.height);
-      x.globalCompositeOperation = "destination-in";
-      x.drawImage(st2, 0, 0);
-      if (K.texture) {
-        x.globalCompositeOperation = "source-atop";
-        TEXTURES[K.texture](x, c.width, c.height, rng(st2.width * 31 + st2.height));
-      }
-      tintCache.set(key, c);
-      return c;
-    }
-    const TEXTURES = {
-      streaks: (x, w, h2, r) => {
-        x.globalAlpha = 0.55;
-        x.strokeStyle = "#FFF2B8";
-        x.lineWidth = 1;
-        for (let i = 0; i < 3; i++) {
-          const sx = r() * w;
-          x.beginPath();
-          x.moveTo(sx, 0);
-          x.lineTo(sx + (r() - 0.5) * 4, h2);
-          x.stroke();
-        }
-      },
-      bubbles: (x, w, h2, r) => {
-        x.globalAlpha = 0.7;
-        x.strokeStyle = "#E4FFD6";
-        x.lineWidth = 0.8;
-        for (let i = 0; i < Math.max(2, w * h2 / 120); i++) {
-          x.beginPath();
-          x.arc(r() * w, r() * h2, 0.8 + r() * 2, 0, Math.PI * 2);
-          x.stroke();
-        }
-      },
-      seeds: (x, w, h2, r) => {
-        x.globalAlpha = 0.9;
-        x.fillStyle = "#F7E27A";
-        for (let i = 0; i < Math.max(1, w * h2 / 160); i++) {
-          x.beginPath();
-          x.ellipse(r() * w, r() * h2, 0.6, 1, r() * 3, 0, Math.PI * 2);
-          x.fill();
-        }
-      },
-      shine: (x, w, h2, r) => {
-        x.globalAlpha = 0.45;
-        x.strokeStyle = "#D8B49A";
-        x.lineWidth = 1.2;
-        x.beginPath();
-        x.moveTo(w * 0.3, 0);
-        x.lineTo(w * 0.35, h2);
-        x.stroke();
-      },
-      sheen: (x, w, h2, r) => {
-        x.globalAlpha = 0.35;
-        x.fillStyle = "#FFFBE0";
-        x.fillRect(w * 0.25, 0, w * 0.2, h2);
-      },
-      milky: (x, w, h2, r) => {
-        x.globalAlpha = 0.4;
-        x.fillStyle = "#FFFFFF";
-        x.fillRect(0, 0, w, h2);
-      }
-    };
-    function stamp(ctx2, r, K, x, y, size) {
-      const st2 = STAMPS[Math.floor(r() * STAMPS.length)], img2 = tinted(st2, K), sc = size / 60 * (0.75 + r() * 0.5);
-      const flip = r() < 0.5 ? -1 : 1, narrow = K.narrow ? K.narrow[0] + r() * (K.narrow[1] - K.narrow[0]) : 0.85 + r() * 0.3, long = (K.long || 1) * (K.runX || 1);
-      ctx2.save();
-      ctx2.translate(x, y);
-      ctx2.rotate((r() - 0.5) * (K.turn || 0.6));
-      ctx2.scale(sc * flip * narrow, sc * long);
-      ctx2.globalAlpha = K.stampAlpha || 1;
-      ctx2.drawImage(img2, -img2.width / 2, -img2.height * 0.3);
-      ctx2.restore();
-    }
-    function paint(ctx2, kind, opt) {
-      const K0 = KINDS[kind] || KINDS.cum, K = opt && opt.runX ? Object.assign({}, K0, { run: K0.run * opt.runX, runX: 0.85 + 0.15 * opt.runX }) : K0, r = rng(opt && opt.seed || 1), amount = Math.max(0.3, opt && opt.amount || 1), at = opt && opt.at || [[250, 330, 40]];
-      ctx2.save();
-      ctx2.lineJoin = "round";
-      for (const [ax, ay, size] of at) {
-        const spot = () => [ax + (r() - 0.5) * size * 1.5, ay + (r() - 0.5) * size * 0.9];
-        if (K.style === "smear") {
-          for (let i = 0, n = Math.round((2 + r() * 2) * amount); i < n; i++) {
-            const [x, y] = spot();
-            smear(ctx2, r, K, x, y, size);
-          }
-          if (K.also === "run") for (let i = 0, n = Math.round(r() * 2 * amount); i < n; i++) {
-            const [x, y] = spot();
-            splash(ctx2, r, K, x, y, size * 0.8, amount);
-          }
-          if (K.stampToo && STAMPS.length) for (let i = 0, n = Math.round((4 + r() * 4) * amount); i < n; i++) {
-            const [x, y] = spot();
-            stamp(ctx2, r, K, x, y, size);
-          }
-        } else if (STAMPS.length && K.stamp !== false) {
-          for (let i = 0, n = Math.round((10 + r() * 8) * amount); i < n; i++) {
-            const a = r() * Math.PI * 2, d = size * Math.sqrt(r()) * 1.5;
-            stamp(ctx2, r, K, ax + Math.cos(a) * d, ay + Math.sin(a) * d * 0.7 - size * 0.2, size);
-          }
-          for (let i = 0, n = Math.round(r() * 1.2 * amount * Math.min(1, K.run - 0.2)); i < n; i++) {
-            const [x, y] = spot();
-            const p = [x, y];
-            run(ctx2, r, K, p[0], p[1], size * (0.4 + r() * 0.9) * K.run, Math.max(2, size * 0.05));
-          }
-        } else if (K.strands !== false) {
-          for (let i = 0, n = Math.round((7 + r() * 6) * amount); i < n; i++) {
-            const a = r() * Math.PI * 2, d = size * (0.1 + r() * 0.75), x = ax + Math.cos(a) * d, y = ay + Math.sin(a) * d * 0.7;
-            const out = Math.atan2(Math.cos(a), Math.sin(a) * 0.7) * 0.6;
-            strand(ctx2, r, K, x, y, size, out + (r() - 0.5) * 0.4);
-          }
-          for (let i = 0, n = Math.round(r() * 1.6 * amount * Math.min(1, K.run)); i < n; i++) {
-            const [x, y] = spot();
-            splash(ctx2, r, K, x, y, size * 0.8, amount);
-          }
-        } else {
-          for (let i = 0, n = Math.round((1.5 + r() * 2) * amount); i < n; i++) {
-            const [x, y] = spot();
-            splash(ctx2, r, K, x, y, size, amount);
-          }
-          for (let i = 0, n = K.ropes ? Math.round(r() * 2 * K.ropes * amount) : 0; i < n; i++) {
-            const [x, y] = spot();
-            rope(ctx2, r, K, x, y, size);
-          }
-        }
-        for (let i = 0, n = Math.round((4 + r() * 6) * amount * (K.droplets || 0.5)); i < n; i++) {
-          const a = r() * Math.PI * 2, d = size * (0.5 + r() * 0.8);
-          ctx2.beginPath();
-          ctx2.ellipse(ax + Math.cos(a) * d, ay + Math.sin(a) * d * 0.7, 0.8 + r() * 1.6, 0.8 + r() * 2.2, 0, 0, Math.PI * 2);
-          wet(ctx2, K, 0.9);
-        }
-        if (K.bubbles) for (let i = 0; i < 6 * amount; i++) {
-          const [x, y] = spot();
-          ctx2.globalAlpha = 0.55;
-          ctx2.strokeStyle = K.gloss;
-          ctx2.lineWidth = 0.9;
-          ctx2.beginPath();
-          ctx2.arc(x, y, 1.2 + r() * 3, 0, Math.PI * 2);
-          ctx2.stroke();
-        }
-        if (K.seeds) for (let i = 0; i < 8 * amount; i++) {
-          const [x, y] = spot();
-          ctx2.globalAlpha = 0.9;
-          ctx2.fillStyle = K.seeds;
-          ctx2.beginPath();
-          ctx2.ellipse(x, y, 0.8, 1.3, r() * 3, 0, Math.PI * 2);
-          ctx2.fill();
-        }
-        if (K.specks) for (let i = 0; i < 16 * amount; i++) {
-          const [x, y] = spot();
-          ctx2.globalAlpha = 0.75;
-          ctx2.fillStyle = K.specks;
-          ctx2.beginPath();
-          ctx2.arc(x, y, 0.5 + r() * 1.3, 0, Math.PI * 2);
-          ctx2.fill();
-        }
-        if (K.crumbs) for (let i = 0; i < 14 * amount; i++) {
-          const [x, y] = spot();
-          ctx2.globalAlpha = 1;
-          puddle(ctx2, r, x, y, 1.2 + r() * (r() < 0.15 ? 5 : 2.2), 1 + r() * 2, 0.7);
-          ctx2.fillStyle = K.crumbs[Math.floor(r() * K.crumbs.length)];
-          ctx2.fill();
-        }
-        if (K.sprinkles) for (let i = 0; i < (K.sprinkleN || 12) * amount; i++) {
-          const [x, y] = spot(), a = r() * Math.PI;
-          ctx2.globalAlpha = 1;
-          ctx2.strokeStyle = K.sprinkles[Math.floor(r() * K.sprinkles.length)];
-          ctx2.lineWidth = 1.6;
-          ctx2.lineCap = "round";
-          ctx2.beginPath();
-          ctx2.moveTo(x - Math.cos(a) * 2.2, y - Math.sin(a) * 2.2);
-          ctx2.lineTo(x + Math.cos(a) * 2.2, y + Math.sin(a) * 2.2);
-          ctx2.stroke();
-        }
-      }
-      ctx2.restore();
-    }
-    function paintOn(ctx2, body, kind, opt) {
-      const c = document.createElement("canvas");
-      c.width = ctx2.canvas.width;
-      c.height = ctx2.canvas.height;
-      const x = c.getContext("2d");
-      paint(x, kind, opt);
-      const m = document.createElement("canvas");
-      m.width = c.width;
-      m.height = c.height;
-      const mx = m.getContext("2d");
-      const sm = KINDS[kind] && KINDS[kind].smudge !== void 0 ? KINDS[kind].smudge : 1;
-      mx.filter = "blur(" + 5 * sm + "px)";
-      mx.globalAlpha = 0.5 * sm;
-      mx.drawImage(c, 0, 4);
-      mx.filter = "blur(" + 3 * sm + "px)";
-      mx.globalAlpha = 0.45 * sm;
-      mx.drawImage(c, 1, 2);
-      mx.filter = "blur(" + Math.max(0.3, 1.2 * sm) + "px)";
-      mx.globalAlpha = 0.5;
-      mx.drawImage(c, 0, 1);
-      mx.filter = "blur(" + Math.max(0.2, 0.9 * sm) + "px)";
-      mx.globalAlpha = 0.95;
-      mx.drawImage(c, 0, 0);
-      if (body) {
-        mx.filter = "none";
-        mx.globalCompositeOperation = "destination-in";
-        mx.drawImage(body, 0, 0);
-      }
-      ctx2.drawImage(m, 0, 0);
-    }
-    const AREAS3 = {
-      face: [250, 185, 34],
-      forehead: [250, 150, 26],
-      hair: [250, 120, 40],
-      chest: [250, 330, 60],
-      tummy: [250, 450, 50],
-      crotch: [250, 560, 30],
-      thighL: [215, 650, 30],
-      thighR: [285, 650, 30],
-      armL: [150, 380, 22],
-      armR: [350, 380, 22],
-      back: [250, 380, 60]
-    };
-    root.FarmMess = { KINDS, AREAS: AREAS3, paint, paintOn, rng, loadStamps, STAMPS };
-  })(typeof window !== "undefined" ? window : globalThis);
-
-  // extension/src/messes.js
-  var W4 = window;
-  var KEY3 = "farmhand-messes";
-  var MAX = 60;
-  var sdk3 = null;
-  var hooked3 = false;
-  var mine2 = [];
-  var others2 = /* @__PURE__ */ new Map();
-  var BY_COLOR = {
-    "#fff4dc": "cream",
-    "#e0a030": "honey",
-    "#8b4a1c": "maple",
-    "#4a2a18": "chocolate",
-    "#e04a6a": "strawberry",
-    "#f7f7f0": "milk",
-    "#5fae3a": "slime",
-    "#6b4a2b": "mud",
-    "#d8c08a": "mash",
-    "#d9c13a": "piss",
-    "#ffd8e6": "cake"
-  };
-  var AREA_OF = { face: "face", forehead: "forehead", chest: "chest", tummy: "tummy", hair: "hair", thighs: "thighL", back: "back" };
-  function load3() {
-    try {
-      const v = JSON.parse(W4.localStorage.getItem(KEY3));
-      if (Array.isArray(v)) mine2 = v.filter(ok).slice(-MAX);
-    } catch (e) {
-      mine2 = [];
-    }
-  }
-  function save3() {
-    try {
-      W4.localStorage.setItem(KEY3, JSON.stringify(mine2));
-    } catch (e) {
-    }
-  }
-  var ok = (e) => e && typeof e.k === "string" && W4.FarmMess && W4.FarmMess.KINDS[e.k] && Array.isArray(e.a) && Number.isFinite(e.s);
-  var clean2 = (list) => Array.isArray(list) ? list.filter(ok).slice(-MAX).map((e) => ({ k: e.k, a: e.a.filter((x) => typeof x === "string" && W4.FarmMess.AREAS[x]).slice(0, 6), s: e.s | 0, t: +e.t || 0, m: Math.max(0.5, Math.min(3, Number(e.m) || 1)) })) : [];
-  function messFromMark(m) {
-    if (!m || !Array.isArray(m.splat) || !m.splat.length || !W4.FarmMess) return false;
-    const kind = typeof m.mess === "string" && W4.FarmMess.KINDS[m.mess] ? m.mess : (typeof m.color === "string" ? BY_COLOR[m.color.toLowerCase()] : null) || "cum";
-    const a = [];
-    for (const x of m.splat) {
-      const k = AREA_OF[x];
-      if (k && !a.includes(k)) a.push(k);
-    }
-    if (a.includes("tummy") && ["cum", "piss", "milk", "honey", "maple", "chocolate", "strawberry", "slime"].includes(kind) && Math.random() < 0.4) a.push(Math.random() < 0.5 ? "thighL" : "thighR");
-    if (!a.length) a.push("chest");
-    const amt = Number(m.amount) > 0 ? Math.max(0.5, Math.min(3, Number(m.amount))) : 1;
-    mine2.push({ k: kind, a, s: Math.random() * 1e9 | 0, t: Date.now(), m: Math.round(amt * 10) / 10 });
-    if (mine2.length > MAX) mine2 = mine2.slice(-MAX);
-    save3();
-    tell2(true);
-    redrawMe();
-    return true;
-  }
-  function messWash() {
-    if (!mine2.length) return false;
-    mine2 = [];
-    save3();
-    tell2(true);
-    redrawMe();
-    return true;
-  }
-  var send2 = (type, data) => {
-    try {
-      if (W4.ServerSend && W4.ServerPlayerIsInChatRoom && W4.ServerPlayerIsInChatRoom()) W4.ServerSend("ChatRoomChat", makeMsg(type, data));
-    } catch (e) {
-    }
-  };
-  var toldAt2 = 0;
-  var askedAt2 = 0;
-  function tell2(force) {
-    if (!force && Date.now() - toldAt2 < 8e3) return;
-    toldAt2 = Date.now();
-    send2("mess", { list: mine2 });
-  }
-  function ask2() {
-    if (Date.now() - askedAt2 < 8e3) return;
-    askedAt2 = Date.now();
-    send2("messAsk", {});
-  }
-  function onMessMsg(m) {
-    const mn = m.from;
-    if (!mn || W4.Player && mn === W4.Player.MemberNumber) return;
-    if (m.type === "messAsk") {
-      if (mine2.length) setTimeout(() => tell2(), 300 + Math.random() * 1500);
-      return;
-    }
-    if (m.type !== "mess") return;
-    const list = clean2(m.list);
-    if (!list.length) {
-      if (others2.delete(mn)) redrawMn2(mn);
-      return;
-    }
-    others2.set(mn, { list, at: Date.now() });
-    hook2();
-    redrawMn2(mn);
-  }
-  var charOf2 = (mn) => W4.Player && W4.Player.MemberNumber === mn ? W4.Player : (W4.ChatRoomCharacter || []).find((c) => c && c.MemberNumber === mn) || null;
-  var againT2 = /* @__PURE__ */ new Map();
-  function redrawMn2(mn, soon) {
-    clearTimeout(againT2.get(mn));
-    againT2.set(mn, setTimeout(() => {
-      try {
-        const C = charOf2(mn);
-        if (C && typeof W4.CharacterLoadCanvas === "function") W4.CharacterLoadCanvas(C);
-      } catch (e) {
-      }
-    }, soon || 80));
-  }
-  var redrawMe = () => {
-    if (W4.Player) redrawMn2(W4.Player.MemberNumber);
-  };
-  var listFor = (C) => C === W4.Player ? mine2 : (others2.get(C.MemberNumber) || {}).list || [];
-  var imgs = /* @__PURE__ */ new Map();
-  function img(src, mn) {
-    let i = imgs.get(src);
-    if (i) return i.complete && i.naturalWidth ? i : null;
-    i = new Image();
-    i.onload = () => redrawMn2(mn, 100);
-    i.src = src;
-    imgs.set(src, i);
-    return null;
-  }
-  if (W4.FarmMess && W4.FarmMess.loadStamps) W4.FarmMess.loadStamps("").then((n) => {
-    if (n) {
-      redrawMe();
-      for (const mn of others2.keys()) redrawMn2(mn);
-    }
-  });
-  var BODY = /(?:^|\/)Assets\/[^/]+\/(?:BodyUpper|BodyLower|Head|Arms|ArmsLeft|ArmsRight|Hands|HandsLeft|HandsRight|Pussy)\//;
-  var made2 = /* @__PURE__ */ new Map();
-  function forget(src) {
-    if (!src) return;
-    setTimeout(() => {
-      for (const p of made2.values()) if (p.src === src) return;
-      try {
-        const m = W4.GLDrawImageCache;
-        if (m && typeof m.delete === "function") m.delete(src);
-      } catch (e) {
-      }
-      try {
-        const m = W4.DrawImageCache;
-        if (m && typeof m.delete === "function") m.delete(src);
-      } catch (e) {
-      }
-      try {
-        const gl = W4.GLDrawCanvas && W4.GLDrawCanvas.GL, tc = gl && gl.textureCache;
-        const t2 = tc && tc.get(src);
-        if (t2) {
-          if (t2.texture) gl.deleteTexture(t2.texture);
-          tc.delete(src);
-        }
-      } catch (e) {
-      }
-    }, 5e3);
-  }
-  function keep(mn, p) {
-    const was = made2.get(mn);
-    made2.set(mn, p);
-    if (was && was.src && was.src !== p.src) forget(was.src);
-  }
-  function messPicture(C, list, body) {
-    const over = W4.CanvasUpperOverflow || 700, h2 = C.Canvas && C.Canvas.height || 1e3 + over;
-    const up = body.find((b) => /\/BodyUpper\//.test(b[0])), ox = up ? up[1] : 0, oy = up ? up[2] - over : 0;
-    const age = (e) => Math.min(5, Math.floor((Date.now() - (e.t || 0)) / 6e4));
-    const key = JSON.stringify(list) + "|" + list.map(age).join("") + "|" + body.map((b) => b[0] + "@" + b[1] + "," + b[2]).join(";");
-    const was = made2.get(C.MemberNumber);
-    if (was && was.key === key) return was;
-    const mask = W4.document.createElement("canvas");
-    mask.width = 500;
-    mask.height = h2;
-    const mg = mask.getContext("2d");
-    for (const [src, x, y] of body) {
-      const i = img(src, C.MemberNumber);
-      if (!i) return was || null;
-      mg.drawImage(i, x, y);
-    }
-    const c = W4.document.createElement("canvas");
-    c.width = 500;
-    c.height = h2;
-    const g = c.getContext("2d");
-    const at = (names) => names.map((n) => {
-      const A = W4.FarmMess.AREAS[n];
-      return [A[0] + ox, A[1] + over + oy, A[2]];
-    });
-    for (const e of list) W4.FarmMess.paintOn(g, mask, e.k, { at: at(e.a), seed: e.s, amount: e.m || 1, runX: 0.55 + 0.09 * age(e) });
-    const d = g.getImageData(0, 0, c.width, c.height).data;
-    let x0 = c.width, y0 = c.height, x1 = -1, y1 = -1;
-    for (let y = 0; y < c.height; y++) for (let x = 0; x < c.width; x++) if (d[(y * c.width + x) * 4 + 3]) {
-      if (x < x0) x0 = x;
-      if (x > x1) x1 = x;
-      if (y < y0) y0 = y;
-      if (y > y1) y1 = y;
-    }
-    if (x1 < 0) {
-      const p2 = { key, src: null };
-      keep(C.MemberNumber, p2);
-      return p2;
-    }
-    const t = W4.document.createElement("canvas");
-    t.width = x1 - x0 + 1;
-    t.height = y1 - y0 + 1;
-    t.getContext("2d").drawImage(c, -x0, -y0);
-    const p = { key, src: t.toDataURL("image/png"), dx: x0, dy: y0, fresh: true };
-    keep(C.MemberNumber, p);
-    return p;
-  }
-  function hook2() {
-    if (hooked3 || !sdk3) return;
-    hooked3 = true;
-    try {
-      const SKIN = /^(BodyUpper|BodyLower|Head|Arms|ArmsLeft|ArmsRight|Hands|HandsLeft|HandsRight|Pussy|Nipples|Eyes|Eyes2|Eyebrows|Mouth|Blush|Fluids|Emoticon|BodyMarkings|FaceMarkings|Mask|HairBack|HairFront|Height|BodyStyle)$/;
-      const groupRe = /(?:^|\/)Assets\/[^/]+\/(?:Override\/[^/]+\/)?([^/]+)\//;
-      sdk3.hookFunction("CommonDrawAppearanceBuild", 3, (args, next) => {
-        const C = args[0], real = args[1];
-        if (!C || !real || typeof real.drawImage !== "function" || !W4.FarmMess) return next(args);
-        const list = listFor(C);
-        if (!list.length) return next(args);
-        const body = [];
-        let done = false;
-        const lay = () => {
-          if (done) return;
-          done = true;
-          try {
-            const p = messPicture(C, list, body);
-            if (p && p.src) {
-              real.drawImage(p.src, p.dx, p.dy, {});
-              if (typeof real.drawImageBlink === "function") real.drawImageBlink(p.src, p.dx, p.dy, {});
-              if (p.fresh) {
-                p.fresh = false;
-                const mn = C.MemberNumber;
-                redrawMn2(mn, 250);
-                setTimeout(() => redrawMn2(mn, 0), 1200);
-              }
-            }
-          } catch (e) {
-            console.warn("[Farmhand Companion] messes:", e);
-          }
-        };
-        const seen2 = (name) => (src, x, y, ...rest) => {
-          if (typeof src === "string" && !done) {
-            if (BODY.test(src)) body.push([src, x, y]);
-            else {
-              const m = groupRe.exec(src);
-              if (m && !SKIN.test(m[1]) && body.length) lay();
-            }
-          }
-          return real[name](src, x, y, ...rest);
-        };
-        const wrap = {};
-        for (const n of ["drawImage", "drawImageBlink", "drawImageColorize", "drawImageColorizeBlink"]) if (typeof real[n] === "function") wrap[n] = seen2(n);
-        args[1] = Object.assign({}, real, wrap);
-        const out = next(args);
-        lay();
-        return out;
-      });
-      sdk3.hookFunction("ChatRoomSync", 0, (args, next) => {
-        const r = next(args);
-        setTimeout(() => {
-          if (mine2.length) tell2(true);
-          ask2();
-        }, 3e3);
-        return r;
-      });
-    } catch (e) {
-      console.warn("[Farmhand Companion] messes unavailable:", e);
-      hooked3 = false;
-    }
-  }
-  function initMesses(mod2) {
-    sdk3 = mod2;
-    load3();
-    setInterval(() => {
-      const fresh2 = (l) => l.some((e) => Date.now() - (e.t || 0) < 6 * 6e4);
-      if (fresh2(mine2)) redrawMe();
-      for (const [mn, o] of others2) if (fresh2(o.list)) redrawMn2(mn);
-    }, 6e4);
-    setTimeout(() => {
-      hook2();
-      if (mine2.length) {
-        tell2(true);
-        redrawMe();
-      }
-      ask2();
-    }, 3500);
-  }
-  function messMemory() {
-    let pics = 0;
-    for (const p of made2.values()) if (p.src) pics++;
-    return { pictures: pics, bytesKB: Math.round(Array.from(made2.values()).reduce((n, p) => n + (p.src ? p.src.length : 0), 0) / 1e3), imgs: imgs.size, others: others2.size };
-  }
-
-  // extension/src/trimpics.js
-  var W5 = window;
-  var LIMIT = 38e7;
-  var TARGET = 26e7;
-  var IDLE = 5 * 6e4;
-  var seen = /* @__PURE__ */ new Map();
-  var sdk4 = null;
-  var trimmed = 0;
-  var started = Date.now();
-  function bytes(tc) {
-    let n = 0;
-    for (const v of tc.values()) n += (v.width || 0) * (v.height || 0) * 4;
-    return n;
-  }
-  function trimPictures(force, idle, target) {
-    const gl = W5.GLDrawCanvas && W5.GLDrawCanvas.GL, tc = gl && gl.textureCache, cache = W5.GLDrawImageCache;
-    if (!tc || !cache || typeof tc.forEach !== "function") return 0;
-    let total = bytes(tc);
-    if (!force && total <= LIMIT) return 0;
-    const now = Date.now(), old = [];
-    for (const [url, v] of tc) {
-      if (typeof url !== "string") continue;
-      const t = seen.get(url) || started;
-      if (now - t < (idle ?? IDLE)) continue;
-      const img2 = cache.get(url);
-      if (img2 && img2.complete === false) continue;
-      old.push([t, url, v]);
-    }
-    old.sort((a, b) => a[0] - b[0]);
-    let n = 0;
-    for (const [, url, v] of old) {
-      if (total <= (target ?? TARGET)) break;
-      try {
-        if (v.texture) gl.deleteTexture(v.texture);
-      } catch (e) {
-      }
-      tc.delete(url);
-      cache.delete(url);
-      seen.delete(url);
-      total -= (v.width || 0) * (v.height || 0) * 4;
-      n++;
-    }
-    trimmed += n;
-    return n;
-  }
-  function trimStats() {
-    return { trimmed };
-  }
-  function initTrim(mod2) {
-    sdk4 = mod2;
-    W5.__farmTrim = trimPictures;
-    try {
-      sdk4.hookFunction("GLDrawLoadImage", 0, (args, next) => {
-        if (typeof args[1] === "string") seen.set(args[1], Date.now());
         return next(args);
       });
     } catch (e) {
-      console.warn("[Farmhand Companion] picture trim unavailable:", e);
-      return;
-    }
-    setInterval(() => {
-      try {
-        trimPictures(false);
-      } catch (e) {
-        console.warn("[Farmhand Companion] picture trim:", e);
-      }
-    }, 6e4);
-  }
-
-  // extension/src/memlog.js
-  var W6 = window;
-  var KEY4 = "farmhand-memlog";
-  var MAX2 = 120;
-  var log = [];
-  try {
-    const v = JSON.parse(W6.localStorage.getItem(KEY4));
-    if (Array.isArray(v)) log = v.slice(-MAX2);
-  } catch (e) {
-    log = [];
-  }
-  function snap() {
-    const s = { t: Date.now() };
-    try {
-      if (W6.performance && W6.performance.memory) s.heapMB = Math.round(W6.performance.memory.usedJSHeapSize / 1e6);
-    } catch (e) {
+      console.warn("[Farmhand Companion] record: chat log unavailable:", e);
     }
     try {
-      const m = W6.GLDrawImageCache;
-      if (m) {
-        s.gamePics = m.size;
-        let d = 0, dk = 0;
-        for (const k of m.keys()) if (typeof k === "string" && k.startsWith("data:")) {
-          d++;
-          dk += k.length;
-        }
-        s.madePics = d;
-        s.madePicsKB = Math.round(dk / 1e3);
-      }
-      const gl = W6.GLDrawCanvas && W6.GLDrawCanvas.GL, tc = gl && gl.textureCache;
-      if (tc) {
-        let px = 0;
-        for (const v of tc.values()) px += (v.width || 0) * (v.height || 0);
-        s.textures = tc.size;
-        s.textureMB = Math.round(px * 4 / 1e6);
-      }
-    } catch (e) {
-    }
-    try {
-      s.body = drawnBodyMemory();
-    } catch (e) {
-    }
-    try {
-      s.mess = messMemory();
-    } catch (e) {
-    }
-    try {
-      s.let = trimStats().trimmed;
-    } catch (e) {
-    }
-    try {
-      s.room = (W6.ChatRoomCharacter || []).length;
-      s.screen = W6.CurrentScreen;
-    } catch (e) {
-    }
-    return s;
-  }
-  function save4() {
-    try {
-      W6.localStorage.setItem(KEY4, JSON.stringify(log));
-    } catch (e) {
-      log = log.slice(-30);
-    }
-  }
-  function tick() {
-    const s = snap(), prev = log[log.length - 1];
-    if (prev && s.t - prev.t > 5 * 6e4) s.gap = true;
-    log.push(s);
-    if (log.length > MAX2) log = log.slice(-MAX2);
-    save4();
-  }
-  var line = (s) => new Date(s.t).toTimeString().slice(0, 5) + (s.gap ? " (after a gap)" : "") + "  page " + (s.heapMB ?? "?") + " MB \xB7 game pictures " + (s.gamePics ?? "?") + " (" + (s.madePics ?? 0) + " ours, " + (s.madePicsKB ?? 0) + " KB) \xB7 graphics card " + (s.textureMB ?? "?") + " MB in " + (s.textures ?? "?") + " \xB7 drawn bodies " + (s.body ? s.body.engines + ", keeping " + s.body.keptMB + " MB" : "?") + " \xB7 messes " + (s.mess ? s.mess.pictures : "?") + " \xB7 " + (s.room ?? "?") + " in the room" + (s.let ? " \xB7 " + s.let + " old pictures let go" : "");
-  var FAST = "farmhand-memfast";
-  var born = Date.now();
-  var fast = [];
-  try {
-    const v = JSON.parse(W6.localStorage.getItem(FAST));
-    if (Array.isArray(v)) fast = v.slice(-40);
-  } catch (e) {
-    fast = [];
-  }
-  var lastPage = fast.filter((x) => x.t < born).slice(-12);
-  function quick() {
-    const x = { t: Date.now() };
-    try {
-      if (W6.performance && W6.performance.memory) x.h = Math.round(W6.performance.memory.usedJSHeapSize / 1e6);
-    } catch (e) {
-    }
-    try {
-      const gl = W6.GLDrawCanvas && W6.GLDrawCanvas.GL, tc = gl && gl.textureCache;
-      if (tc) x.p = tc.size;
-    } catch (e) {
-    }
-    try {
-      x.r = (W6.ChatRoomCharacter || []).length;
-      x.s = W6.CurrentScreen;
-    } catch (e) {
-    }
-    fast.push(x);
-    if (fast.length > 40) fast = fast.slice(-40);
-    try {
-      W6.localStorage.setItem(FAST, JSON.stringify(fast));
-    } catch (e) {
-    }
-  }
-  var quickLine = (x) => new Date(x.t).toTimeString().slice(0, 8) + "  page " + (x.h ?? "?") + " MB \xB7 " + (x.p ?? "?") + " pictures \xB7 " + (x.r ?? "?") + " in the room \xB7 " + (x.s || "");
-  function memlogText(n) {
-    return log.slice(-(n || 20)).map(line).join("\n");
-  }
-  function initMemlog() {
-    setTimeout(tick, 2e4);
-    setInterval(tick, 3e4);
-    setInterval(quick, 3e3);
-    if (typeof W6.CommandCombine === "function") {
-      W6.CommandCombine([{ Tag: "farmmem", Description: ": the Farmhand Companion's memory log (the last hour), and copies it", Action: () => {
-        tick();
-        const text = "Companion v" + VERSION + "\n" + memlogText(24) + (lastPage.length ? "\nThe last seconds of the page before this one:\n" + lastPage.map(quickLine).join("\n") : "");
+      sdk5.hookFunction("ServerAccountBeep", 0, (args, next) => {
         try {
-          W6.navigator.clipboard.writeText(JSON.stringify(log));
+          const d = args[0];
+          if (d && on() && !d.BeepType) {
+            const msg = typeof d.Message === "string" ? d.Message : "";
+            if (!/^\s*[{[]/.test(msg)) logRow("beep", d.MemberNumber, (d.MemberName || "") + (msg ? ": " + msg : " beeped you"));
+          }
         } catch (e) {
         }
-        if (typeof W6.ChatRoomSendLocal === "function") W6.ChatRoomSendLocal("Farmhand memory log (copied, paste it to Claude):\n" + text, 12e4);
-        else console.log(text);
-      } }]);
+        return next(args);
+      });
+    } catch (e) {
+      console.warn("[Farmhand Companion] record: beeps unavailable:", e);
     }
+    try {
+      sdk5.hookFunction("ServerSend", 0, (args, next) => {
+        try {
+          const [ev, d] = args;
+          if (on() && d) {
+            if (ev === "AccountBeep" && !d.BeepType && typeof d.Message === "string" && d.Message && !/^\s*[{[]/.test(d.Message)) logRow("beep-out", d.MemberNumber, d.Message);
+            else if (ev === "ChatRoomChat" && d.Type === "Hidden" && d.Content === FARM_MSG && d.Dictionary && d.Dictionary.type === "cmd") logRow("cmd", botMn, "?" + String(d.Dictionary.text || ""));
+          }
+        } catch (e) {
+        }
+        return next(args);
+      });
+    } catch (e) {
+      console.warn("[Farmhand Companion] record: sending unavailable:", e);
+    }
+    setInterval(flush, 6e4);
+    setTimeout(flush, 15e3);
   }
 
   // extension/src/cues.js
-  var W7 = window;
-  var ctx = null;
+  var W9 = window;
+  var ctx2 = null;
   function initCues(c) {
-    ctx = c;
+    ctx2 = c;
     setInterval(sightTick, 4e3);
     setInterval(feelTick, 6e4);
   }
-  var pref = (k) => !ctx.panel.prefs[k];
+  var pref = (k) => !ctx2.panel.prefs[k];
   var cueOff = () => ({
     face: !pref("noFace") || void 0,
     sound: !pref("noSound") || void 0,
     trance: !pref("noTrance") || void 0,
     lead: !pref("noLead") || void 0,
     slow: !pref("noSlow") || void 0,
-    stir: ctx.panel.prefs.stir ? void 0 : true,
-    gear: ctx.panel.prefs.gear ? void 0 : true
+    stir: ctx2.panel.prefs.stir ? void 0 : true,
+    gear: ctx2.panel.prefs.gear ? void 0 : true
   });
-  var mapOn = () => typeof W7.ChatRoomMapViewIsActive === "function" && W7.ChatRoomMapViewIsActive() && W7.Player && W7.Player.MapData && W7.Player.MapData.Pos;
-  var others3 = () => (W7.ChatRoomCharacter || []).filter((c) => c && c.MemberNumber !== (W7.Player && W7.Player.MemberNumber));
+  var mapOn = () => typeof W9.ChatRoomMapViewIsActive === "function" && W9.ChatRoomMapViewIsActive() && W9.Player && W9.Player.MapData && W9.Player.MapData.Pos;
+  var others3 = () => (W9.ChatRoomCharacter || []).filter((c) => c && c.MemberNumber !== (W9.Player && W9.Player.MemberNumber));
   var lastSight = "";
   function sightTick() {
     try {
-      if (W7.CurrentScreen !== "ChatRoom" || !mapOn() || typeof W7.ChatRoomMapViewCharacterIsVisible !== "function") return;
-      const see = others3().filter((c) => W7.ChatRoomMapViewCharacterIsVisible(c)).map((c) => c.MemberNumber).sort();
-      const hear = others3().filter((c) => typeof W7.ChatRoomMapViewCharacterIsHearable === "function" && W7.ChatRoomMapViewCharacterIsHearable(c)).map((c) => c.MemberNumber).sort();
-      const LS = W7.Player && W7.Player.LSCG, S3 = LS && LS.SplatterModule;
+      if (W9.CurrentScreen !== "ChatRoom" || !mapOn() || typeof W9.ChatRoomMapViewCharacterIsVisible !== "function") return;
+      const see = others3().filter((c) => W9.ChatRoomMapViewCharacterIsVisible(c)).map((c) => c.MemberNumber).sort();
+      const hear = others3().filter((c) => typeof W9.ChatRoomMapViewCharacterIsHearable === "function" && W9.ChatRoomMapViewCharacterIsHearable(c)).map((c) => c.MemberNumber).sort();
+      const LS = W9.Player && W9.Player.LSCG, S3 = LS && LS.SplatterModule;
       const splat = S3 ? !!(S3.enabled && S3.taker !== false && (!LS.GlobalModule || LS.GlobalModule.enabled !== false)) : void 0;
       const key = see.join(",") + "|" + hear.join(",") + "|" + splat;
       if (key === lastSight && Date.now() - (sightTick.at || 0) < 12e4) return;
       lastSight = key;
       sightTick.at = Date.now();
-      ctx.toBot("sight", splat === void 0 ? { see, hear } : { see, hear, splat });
+      ctx2.toBot("sight", splat === void 0 ? { see, hear } : { see, hear, splat });
     } catch (e) {
       console.warn("[Farmhand Companion] sight:", e);
     }
@@ -9185,13 +9536,13 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var DIRS = [["North", 0, -1], ["South", 0, 1], ["West", -1, 0], ["East", 1, 0]];
   function canStep(x, y) {
     try {
-      return W7.ChatRoomMapViewCanEnterTile(x, y) > 0;
+      return W9.ChatRoomMapViewCanEnterTile(x, y) > 0;
     } catch (e) {
       return false;
     }
   }
   function findPath(from, to) {
-    const wide = W7.ChatRoomMapViewWidth || 40, high = W7.ChatRoomMapViewHeight || 40, key = (x, y) => x + "," + y;
+    const wide = W9.ChatRoomMapViewWidth || 40, high = W9.ChatRoomMapViewHeight || 40, key = (x, y) => x + "," + y;
     const goal = (x, y) => Math.max(Math.abs(x - to.X), Math.abs(y - to.Y)) <= (canStep(to.X, to.Y) ? 0 : 1);
     const prev = /* @__PURE__ */ new Map([[key(from.X, from.Y), null]]), q2 = [[from.X, from.Y]];
     while (q2.length) {
@@ -9219,23 +9570,23 @@ One of mods you are using is using an old version of SDK. It will work for now b
   function lead(m) {
     const no = () => {
       walk = null;
-      ctx.toBot("leadNo", { id: m.id });
+      ctx2.toBot("leadNo", { id: m.id });
     };
-    if (!pref("noLead") || !mapOn() || typeof W7.ChatRoomMapViewMove !== "function") return no();
-    const from = W7.Player.MapData.Pos, to = { X: m.X, Y: m.Y };
+    if (!pref("noLead") || !mapOn() || typeof W9.ChatRoomMapViewMove !== "function") return no();
+    const from = W9.Player.MapData.Pos, to = { X: m.X, Y: m.Y };
     const path = findPath(from, to);
     if (!path) return no();
     if (!path.length) {
-      ctx.toBot("leadOk", { id: m.id });
+      ctx2.toBot("leadOk", { id: m.id });
       return;
     }
-    ctx.local("You're led " + (m.why ? m.why : "along") + "\u2026", "#c9a35b", true);
+    ctx2.local("You're led " + (m.why ? m.why : "along") + "\u2026", "#c9a35b", true);
     walk = { id: m.id, to, path, i: 0, last: { X: from.X, Y: from.Y }, stuck: Date.now(), retried: false };
     stepWalk();
   }
   function stepWalk() {
     if (!walk) return;
-    const w = walk, p = W7.Player && W7.Player.MapData && W7.Player.MapData.Pos;
+    const w = walk, p = W9.Player && W9.Player.MapData && W9.Player.MapData.Pos;
     if (!p) {
       walk = null;
       return;
@@ -9247,26 +9598,26 @@ One of mods you are using is using an old version of SDK. It will work for now b
     }
     if (w.i >= w.path.length || Math.max(Math.abs(p.X - w.to.X), Math.abs(p.Y - w.to.Y)) <= 0) {
       walk = null;
-      ctx.toBot("leadOk", { id: w.id });
+      ctx2.toBot("leadOk", { id: w.id });
       return;
     }
     if (Date.now() - w.stuck > 3e3) {
       if (w.retried) {
         walk = null;
-        ctx.toBot("leadNo", { id: w.id });
+        ctx2.toBot("leadNo", { id: w.id });
         return;
       }
       const path = findPath(p, w.to);
       if (!path) {
         walk = null;
-        ctx.toBot("leadNo", { id: w.id });
+        ctx2.toBot("leadNo", { id: w.id });
         return;
       }
       Object.assign(w, { path, i: 0, stuck: Date.now(), retried: true });
     }
-    if (W7.ChatRoomMapViewMovement == null) {
+    if (W9.ChatRoomMapViewMovement == null) {
       try {
-        W7.ChatRoomMapViewMove(w.path[w.i]);
+        W9.ChatRoomMapViewMove(w.path[w.i]);
       } catch (e) {
       }
     }
@@ -9284,12 +9635,12 @@ One of mods you are using is using an old version of SDK. It will work for now b
   };
   function face(m) {
     const f = FACES[m.mood];
-    if (!f || !pref("noFace") || typeof W7.CharacterSetFacialExpression !== "function" || !W7.Player) return;
+    if (!f || !pref("noFace") || typeof W9.CharacterSetFacialExpression !== "function" || !W9.Player) return;
     const secs = m.mood === "clear" ? null : Math.max(5, Math.min(1800, Number(m.secs) || 30));
     for (const [g, e] of Object.entries(f)) {
       try {
-        W7.CharacterSetFacialExpression(W7.Player, g, e, secs);
-        if (g === "Eyes") W7.CharacterSetFacialExpression(W7.Player, "Eyes2", e, secs);
+        W9.CharacterSetFacialExpression(W9.Player, g, e, secs);
+        if (g === "Eyes") W9.CharacterSetFacialExpression(W9.Player, "Eyes2", e, secs);
       } catch (e2) {
       }
     }
@@ -9338,35 +9689,35 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var QUIET = { stall: 0.35, latch: 0.35, unlatch: 0.35, pump: 0.4, machine: 0.4, inflate: 0.4, hiss: 0.4, buzz: 0.3, zap: 0.35, clamp: 0.45, softgate: 0.4 };
   function sound(m) {
     const f = SOUNDS[m.name];
-    if (!f || !pref("noSound") || typeof W7.AudioPlayInstantSound !== "function") return;
-    const vol = W7.Player && W7.Player.AudioSettings && W7.Player.AudioSettings.Volume || 0;
+    if (!f || !pref("noSound") || typeof W9.AudioPlayInstantSound !== "function") return;
+    const vol = W9.Player && W9.Player.AudioSettings && W9.Player.AudioSettings.Volume || 0;
     try {
-      W7.AudioPlayInstantSound("Audio/" + f + ".mp3", vol * (QUIET[m.name] || 0.6));
+      W9.AudioPlayInstantSound("Audio/" + f + ".mp3", vol * (QUIET[m.name] || 0.6));
     } catch (e) {
     }
   }
   function trance(m) {
-    let el = W7.document.getElementById("fhc-trance");
+    let el = W9.document.getElementById("fhc-trance");
     const lvl = pref("noTrance") ? Math.max(0, Math.min(3, Number(m.level) || 0)) : 0;
     if (!lvl) {
       if (el) el.remove();
       return;
     }
     if (!el) {
-      el = W7.document.createElement("div");
+      el = W9.document.createElement("div");
       el.id = "fhc-trance";
       el.style.cssText = "position:fixed;inset:0;pointer-events:none;z-index:9998;transition:opacity 4s;opacity:0;animation:fhcTrance 6s ease-in-out infinite";
-      if (!W7.document.getElementById("fhc-trance-css")) {
-        const s = W7.document.createElement("style");
+      if (!W9.document.getElementById("fhc-trance-css")) {
+        const s = W9.document.createElement("style");
         s.id = "fhc-trance-css";
         s.textContent = "@keyframes fhcTrance{0%,100%{filter:brightness(1)}50%{filter:brightness(0.85)}}";
-        W7.document.head.appendChild(s);
+        W9.document.head.appendChild(s);
       }
-      W7.document.body.appendChild(el);
+      W9.document.body.appendChild(el);
     }
     const edge = [0, 0.25, 0.45, 0.65][lvl], inner = [0, 55, 42, 30][lvl];
     el.style.background = "radial-gradient(ellipse at center, transparent " + inner + "%, rgba(70,20,90," + edge + ") 100%)";
-    (W7.requestAnimationFrame || ((f) => setTimeout(f, 16)))(() => {
+    (W9.requestAnimationFrame || ((f) => setTimeout(f, 16)))(() => {
       el.style.opacity = "1";
     });
   }
@@ -9438,13 +9789,13 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var recentFeel = [];
   function feelTick() {
     try {
-      if (!pref("noFeelings") || W7.CurrentScreen !== "ChatRoom" || !W7.Player || !ctx.panel.s || !ctx.panel.s.onBooks) return;
+      if (!pref("noFeelings") || W9.CurrentScreen !== "ChatRoom" || !W9.Player || !ctx2.panel.s || !ctx2.panel.s.onBooks) return;
       if (Date.now() < (feelTick.next || 0)) return;
       feelTick.next = Date.now() + (7 + Math.random() * 6) * 6e4;
-      const s = ctx.panel.s, items = (W7.Player.Appearance || []).filter((x) => x && x.Asset && x.Asset.Group);
+      const s = ctx2.panel.s, items = (W9.Player.Appearance || []).filter((x) => x && x.Asset && x.Asset.Group);
       const grp = (g) => items.find((x) => x.Asset.Group.Name === g);
       const eff2 = (x) => [].concat(x.Property && x.Property.Effect || [], x.Asset.Effect || []);
-      const arousal = W7.Player.ArousalSettings && W7.Player.ArousalSettings.Progress || 0;
+      const arousal = W9.Player.ArousalSettings && W9.Player.ArousalSettings.Progress || 0;
       const kinds = [];
       if (grp("ItemButt")) kinds.push("plug");
       if (items.some((x) => eff2(x).includes("Chaste")) && arousal > 40) kinds.push("chaste");
@@ -9457,22 +9808,22 @@ One of mods you are using is using an old version of SDK. It will work for now b
       if (arousal > 85) kinds.push("edge");
       const pool = [].concat(...kinds.map((k) => FEEL[k])).filter((l) => !recentFeel.includes(l));
       if (!pool.length) return;
-      const line2 = pool[Math.floor(Math.random() * pool.length)];
-      recentFeel.push(line2);
+      const line3 = pool[Math.floor(Math.random() * pool.length)];
+      recentFeel.push(line3);
       while (recentFeel.length > 8) recentFeel.shift();
-      ctx.local(line2, "#b58ad9", true);
+      ctx2.local(line3, "#b58ad9", true);
     } catch (e) {
       console.warn("[Farmhand Companion] feelings:", e);
     }
   }
   function drawMarkers() {
     try {
-      const s = ctx.panel.s;
-      if (!s || !s.staff || !Array.isArray(s.herd) || !pref("noMarkers") || !mapOn() || typeof W7.DrawText !== "function") return;
-      const R = W7.ChatRoomMapViewPerceptionRange || 6, tile = 1e3 / (R * 2 + 1), me4 = W7.Player.MapData.Pos;
+      const s = ctx2.panel.s;
+      if (!s || !s.staff || !Array.isArray(s.herd) || !pref("noMarkers") || !mapOn() || typeof W9.DrawText !== "function") return;
+      const R = W9.ChatRoomMapViewPerceptionRange || 6, tile = 1e3 / (R * 2 + 1), me4 = W9.Player.MapData.Pos;
       for (const x of s.herd) {
-        const C = (W7.ChatRoomCharacter || []).find((c) => c.MemberNumber === x.mn);
-        if (!C || !C.MapData || !C.MapData.Pos || !W7.ChatRoomMapViewCharacterIsVisible(C)) continue;
+        const C = (W9.ChatRoomCharacter || []).find((c) => c.MemberNumber === x.mn);
+        if (!C || !C.MapData || !C.MapData.Pos || !W9.ChatRoomMapViewCharacterIsVisible(C)) continue;
         const tags = [];
         if (x.milk !== null && x.milk >= 75) tags.push(["M", "#7fa8c9"]);
         if (x.heat) tags.push(["H", "#d9534f"]);
@@ -9481,28 +9832,28 @@ One of mods you are using is using an old version of SDK. It will work for now b
         if (!tags.length) continue;
         const sx = (C.MapData.Pos.X - me4.X + R) * tile, sy = (C.MapData.Pos.Y - me4.Y) * tile + R * tile;
         if (sx < 0 || sy < 0 || sx > 1e3 || sy > 1e3) continue;
-        tags.forEach(([t, col], i) => W7.DrawText(t, sx + tile * 0.2 + i * tile * 0.22, sy + tile * 0.15, col, "black"));
+        tags.forEach(([t, col], i) => W9.DrawText(t, sx + tile * 0.2 + i * tile * 0.22, sy + tile * 0.15, col, "black"));
       }
     } catch (e) {
     }
   }
-  var stirOn = () => !!ctx.panel.prefs.stir;
+  var stirOn = () => !!ctx2.panel.prefs.stir;
   var deniedNow = () => {
-    const s = ctx.panel.s;
+    const s = ctx2.panel.s;
     return !!(s && s.deniedUntil && s.deniedUntil > Date.now());
   };
   function slowFactor() {
-    const s = ctx && ctx.panel && ctx.panel.s;
+    const s = ctx2 && ctx2.panel && ctx2.panel.s;
     if (!s || !pref("noSlow") || !(s.slow > 1)) return 1;
     return Math.max(1, Math.min(3, Number(s.slow) || 1));
   }
   function arouse(m) {
     try {
-      if (!stirOn() || !W7.Player || !W7.Player.ArousalSettings || typeof W7.ActivitySetArousal !== "function") return;
-      if (W7.Player.ArousalSettings.Active === "Inactive" || W7.Player.ArousalSettings.Active === "NoMeter") return;
-      const cur = Number(W7.Player.ArousalSettings.Progress) || 0, cap = Math.max(0, Math.min(deniedNow() ? 94 : 100, Number(m.cap) || 100));
+      if (!stirOn() || !W9.Player || !W9.Player.ArousalSettings || typeof W9.ActivitySetArousal !== "function") return;
+      if (W9.Player.ArousalSettings.Active === "Inactive" || W9.Player.ArousalSettings.Active === "NoMeter") return;
+      const cur = Number(W9.Player.ArousalSettings.Progress) || 0, cap = Math.max(0, Math.min(deniedNow() ? 94 : 100, Number(m.cap) || 100));
       const next = Math.max(0, Math.min(cap, cur + (Number(m.add) || 0)));
-      if (next > cur || m.add < 0) W7.ActivitySetArousal(W7.Player, next);
+      if (next > cur || m.add < 0) W9.ActivitySetArousal(W9.Player, next);
     } catch (e) {
       console.warn("[Farmhand Companion] arouse:", e);
     }
@@ -9510,11 +9861,11 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var VIBE_MODE = ["Low", "Medium", "High", "Maximum"];
   var vibeWas = null;
   var vibeTimer = null;
-  var vibeToys = () => (W7.Player && Array.isArray(W7.Player.Appearance) ? W7.Player.Appearance : []).filter((it) => it && it.Asset && it.Asset.Group && it.Property && typeof it.Property.Intensity === "number" && !(it.Property.LockedBy && typeof W7.DialogCanUnlock === "function" && !W7.DialogCanUnlock(W7.Player, it)));
+  var vibeToys = () => (W9.Player && Array.isArray(W9.Player.Appearance) ? W9.Player.Appearance : []).filter((it) => it && it.Asset && it.Asset.Group && it.Property && typeof it.Property.Intensity === "number" && !(it.Property.LockedBy && typeof W9.DialogCanUnlock === "function" && !W9.DialogCanUnlock(W9.Player, it)));
   function vibePush(toys) {
-    if (typeof W7.CharacterRefresh === "function") W7.CharacterRefresh(W7.Player, false);
-    if (typeof W7.ChatRoomCharacterItemUpdate === "function") toys.forEach((it) => W7.ChatRoomCharacterItemUpdate(W7.Player, it.Asset.Group.Name));
-    else if (typeof W7.ChatRoomCharacterUpdate === "function") W7.ChatRoomCharacterUpdate(W7.Player);
+    if (typeof W9.CharacterRefresh === "function") W9.CharacterRefresh(W9.Player, false);
+    if (typeof W9.ChatRoomCharacterItemUpdate === "function") toys.forEach((it) => W9.ChatRoomCharacterItemUpdate(W9.Player, it.Asset.Group.Name));
+    else if (typeof W9.ChatRoomCharacterUpdate === "function") W9.ChatRoomCharacterUpdate(W9.Player);
   }
   function vibeSet(it, level, mode) {
     it.Property.Intensity = level;
@@ -9570,7 +9921,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
         const t = next(args);
         try {
           const f = slowFactor();
-          return t > 0 && f > 1 && !(typeof W7.ChatRoomMapViewHasSuperPowers === "function" && W7.ChatRoomMapViewHasSuperPowers()) ? t * f : t;
+          return t > 0 && f > 1 && !(typeof W9.ChatRoomMapViewHasSuperPowers === "function" && W9.ChatRoomMapViewHasSuperPowers()) ? t * f : t;
         } catch (e) {
           return t;
         }
@@ -9586,7 +9937,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
             C.ArousalSettings.Progress = 94;
             if (Date.now() - (initBody.told || 0) > 6e4) {
               initBody.told = Date.now();
-              ctx.local("Right at the edge, and the farm won't let you over it. Not yet, sugar.", "#c9a35b", true);
+              ctx2.local("Right at the edge, and the farm won't let you over it. Not yet, sugar.", "#c9a35b", true);
             }
             return;
           }
@@ -9602,15 +9953,15 @@ One of mods you are using is using an old version of SDK. It will work for now b
   // extension/src/index.js
   var bcModSdk = import_bondage_club_mod_sdk.default.default || import_bondage_club_mod_sdk.default;
   function twoCopies(running) {
-    const note = "\u{1F33E} Two copies of the Farmhand Companion are installed" + (running ? " (v" + running + " is running, v" + VERSION + " stepped aside)" : "") + ". Open Tampermonkey's dashboard and delete the older one, then reload.";
-    console.warn("[Farmhand Companion] " + note);
+    const note2 = "\u{1F33E} Two copies of the Farmhand Companion are installed" + (running ? " (v" + running + " is running, v" + VERSION + " stepped aside)" : "") + ". Open Tampermonkey's dashboard and delete the older one, then reload.";
+    console.warn("[Farmhand Companion] " + note2);
     const t = setInterval(() => {
       if (window.CurrentScreen !== "ChatRoom" || typeof window.ChatRoomSendLocal !== "function") return;
       clearInterval(t);
       try {
         const p = window.document.createElement("div");
         p.style.cssText = "color:#c9a35b;white-space:pre-wrap";
-        p.textContent = note;
+        p.textContent = note2;
         window.ChatRoomSendLocal(p.outerHTML);
       } catch (e) {
       }
@@ -9664,7 +10015,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     if (depth >= 3) out = out.toLowerCase();
     return out;
   }
-  var botHere = () => window.CurrentScreen === "ChatRoom" && Array.isArray(window.ChatRoomCharacter) && window.ChatRoomCharacter.some((c) => c.MemberNumber === BOT_MEMBER);
+  var botHere2 = () => window.CurrentScreen === "ChatRoom" && Array.isArray(window.ChatRoomCharacter) && window.ChatRoomCharacter.some((c) => c.MemberNumber === BOT_MEMBER);
   var onBotAccount = () => !!(window.Player && window.Player.MemberNumber === BOT_MEMBER);
   var direct = () => onBotAccount() && window.Farmhand && typeof window.Farmhand.own === "function";
   function toBot(type, data) {
@@ -9701,7 +10052,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   function sendCommand(text, typed) {
     text = String(text || "").trim();
     if (!text) return;
-    if (botHere()) {
+    if (botHere2()) {
       if (!st.welcomed) hello();
       toBot("cmd", typed ? { text } : { text, btn: true });
       const sentAt = Date.now();
@@ -9815,6 +10166,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       case "notice": {
         const text = collect(m);
         if (text === null) break;
+        logRow("farm", BOT_MEMBER, text);
         st.panel.add(text, m.type);
         if (m.type === "notice" && st.panel.prefs.chatToo !== false) toChat(text, "#c9a35b");
         break;
@@ -9886,19 +10238,28 @@ One of mods you are using is using an old version of SDK. It will work for now b
         trance(m);
         break;
       case "voice": {
-        const line2 = String(m.text || "").slice(0, 300);
-        if (!toChat("[Voice] " + line2, "#a67fd4", true)) st.panel.add("[Voice] " + line2, "notice");
+        const line3 = String(m.text || "").slice(0, 300);
+        if (!toChat("[Voice] " + line3, "#a67fd4", true)) st.panel.add("[Voice] " + line3, "notice");
         break;
       }
       case "roomline": {
-        const line2 = String(m.text || "").slice(0, 1200);
+        const line3 = String(m.text || "").slice(0, 1200);
         if (typeof window.ChatRoomSendLocal === "function") {
           const p = window.document.createElement("div");
           p.className = m.kind === "emote" ? "ChatMessage ChatMessageEmote" : "ChatMessage ChatMessageChat";
           p.style.cssText = m.kind === "emote" ? "font-style:italic" : "";
-          p.textContent = forChat(m.kind === "emote" ? line2 : "Farm girl: " + line2);
+          p.textContent = forChat(m.kind === "emote" ? line3 : "Farm girl: " + line3);
           window.ChatRoomSendLocal(p.outerHTML);
-        } else st.panel.add(line2, "notice");
+        } else st.panel.add(line3, "notice");
+        break;
+      }
+      case "logRows": {
+        const ui = st.panel.ui, cur = ui.logRows && ui.logRows.id === m.id ? ui.logRows : { id: m.id, rows: [], total: 0 };
+        cur.rows = cur.rows.concat(Array.isArray(m.rows) ? m.rows : []);
+        cur.total = Number(m.total) || cur.rows.length;
+        cur.busy = (Number(m.part) || 1) < (Number(m.of) || 1);
+        ui.logRows = cur;
+        st.panel.render();
         break;
       }
       case "outfitBack": {
@@ -9943,6 +10304,12 @@ One of mods you are using is using an old version of SDK. It will work for now b
     hasBackup,
     rehello: () => hello(),
     // tell the bot a setting changed (the relay switch)
+    // the Log tab asks the farm girl for the record (views/log.js)
+    logAsk(q2) {
+      st.panel.ui.logRows = { id: 0, rows: [], total: 0, busy: true };
+      st.panel.render();
+      toBot("logAsk", q2);
+    },
     // map tool: the next `count` clicks on the game's map pick tiles instead of walkin' you there
     pickTiles(count, what, done) {
       if (typeof window.ChatRoomMapViewIsActive === "function" && !window.ChatRoomMapViewIsActive()) {
@@ -9986,12 +10353,19 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
   function start() {
     st.panel = new Panel(sendCommand, api);
+    initSettings(st.panel);
+    if (st.panel.prefs.off) {
+      st.panel.show(false);
+      console.log("[Farmhand Companion] v" + VERSION + " is switched off (Preferences \u2192 Extensions \u2192 Farmhand Companion)");
+      return;
+    }
     st.panel.setStatus("waitin' for the farm girl");
     initCues({ toBot, panel: st.panel, local: toChat });
     setInterval(parasiteSync, 6e4);
     initBelly(mod);
     initDrawnBody(mod);
     initMesses(mod);
+    initChatlog(mod, { on: () => !!(st.panel && st.panel.s && st.panel.s.logMust) || !!(st.panel && st.panel.prefs.chatlog), botMn: BOT_MEMBER, botHere: botHere2 });
     initMemlog();
     initLocalSave(VERSION, () => st.panel && st.panel.render && st.panel.render());
     initTrim(mod);
@@ -10106,7 +10480,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       }]);
     }
     setInterval(() => {
-      const here = botHere();
+      const here = botHere2();
       st.panel.show(window.CurrentScreen === "ChatRoom");
       if (!here) {
         if (st.welcomed) st.panel.setStatus("farm girl's not in this room");

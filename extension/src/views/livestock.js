@@ -10,6 +10,7 @@ import { storeTab } from "./store.js";
 import { gearLore } from "../gearlore.js";
 import { localSaveState, localSavePick, localSaveReconnect, localSaveNow, localSaveLoad } from "../localsave.js";
 import { VERSION } from "../version.js";
+import { settingsAvailable, openSettings } from "../settings.js";
 import { drawnBodyState, drawnBodySet, drawnBodyCup, drawnBodyPaste, drawnBodyFromStudio, drawnBodySeeOthers, drawnBodyBelly, drawnBodyUseFarm } from "../drawnbody.js";
 
 const pct = (a, b) => (b ? (100 * a) / b : 0);
@@ -163,8 +164,6 @@ export const SWITCH_INFO = [
   ["futa", "Futa", "Cock and vulva both, milk and semen both"], ["milkable", "Milkable", "Make milk"],
   ["naturalheat", "Natural heat", "Come into heat on your own every 7 days"], ["praise", "Praise", "Let staff's praise count"],
   ["degrade", "Degrade", "Let staff's degradin' count"], ["tally", "Tally marks", "Show your tally on ?who and the board"],
-  ["teaseme", "Tease me", "Let staff tease lines name you"],
-  ["hypno", "Hypno", "Let your herd leader's voice lines reach you, privately"],
   ["potions", "Potions", "Staff and the wheel can give you potions, and others can gift you one (you're asked first). Your limits still rule some out"],
   ["dares", "Dares", "Staff and the wheel can hand you a dare to do in half an hour"],
   ["watersports", "Watersports", "Piss play can find you: the spray trap, a feeder crafted for it, and the scenes that have it. Off until you say so"],
@@ -182,6 +181,13 @@ export function farmSwitches(ctx, list) {
     if (need && !sw[need[0]] && !sw[cmd]) return toggle(label, need[1] + " · " + desc, false, () => ctx.send(cmd + " on"));
     return toggle(label, desc, !!sw[cmd], () => ctx.send(cmd + " " + (sw[cmd] ? "off" : "on")));
   });
+}
+// in the panel: the game's settings page has this panel's switches, the record, your settings file and the full guides
+export function panelPrefsOrLink(ctx) {
+  if (!settingsAvailable()) return panelPrefs(ctx);
+  return card(title("This panel, your settings file and the full guides"),
+    muted("They're in the game's own settings now: Preferences → Extensions → Farmhand Companion."),
+    btn("Open the Farmhand settings", () => { if (!openSettings("switches")) ctx.hint("Open the game's Preferences, then Extensions, then Farmhand Companion."); }, true));
 }
 export function panelPrefs(ctx) {
   return card(title("This panel"), muted("Only on your computer."),
@@ -219,7 +225,11 @@ export function panelPrefs(ctx) {
     // scaling test from earlier from the companion")
     btn("Put the button and panel back (size and full screen too)", () => ctx.resetPlaces && ctx.resetPlaces()),
     // everything above, and the drawn body, messes and memory log, kept as a file on this computer too (localsave.js)
-    saveCard(ctx));
+    saveCard(ctx),
+    // the record (chatlog.js): opt-in, at the very bottom. Proprietors are always recorded, so they get no switch.
+    ctx.s.logMust ? muted("📜 Your chat, beeps and commands are recorded for the farm (always, for proprietors).")
+      : toggle("Send a record of commands sent to and received from the bot", "Everything that lands in your chat (whispers, beeps, the farm's lines and answers) and the commands you send go to the farm girl once a minute, privately, and she keeps them by the hour. It helps staff find what went wrong when somethin' does. The same line from two places is kept once. Off unless you switch it on.",
+        !!ctx.prefs.chatlog, () => ctx.setPref("chatlog", !ctx.prefs.chatlog)));
 }
 function saveCard(ctx) {
   const ls = localSaveState(), say = (t) => ctx.hint(t), t = (ms) => new Date(ms).toTimeString().slice(0, 5);
@@ -278,11 +288,11 @@ function toggles(ctx) {
           card(title("Farm settings"), muted("Saved by the farm girl. Your limits still win."), farmSwitches(ctx, SWITCH_INFO)),
           extraSwitches(ctx),
           card(title("Gender"), muted("How the farm sees you. It picks your farm outfit."),
-            h("div", { style: { marginTop: "6px" } }, ["female", "male", "futa", "femboy"].map((g) =>
+            h("div", { style: { marginTop: "6px" } }, ["female", "male", "futa", "femboy", "nonbinary"].map((g) =>
               h("button", { type: "button", class: "fhc-pill" + (ctx.s.gender === g ? " on" : ""), onclick: () => ctx.send("gender " + g) }, g)))),
           ctx.api.hasBackup && ctx.api.hasBackup() ? card(title("Farm outfit"), muted("The farm dressed you, and your own clothes are kept on this computer."),
             btn("Change back into my own clothes", () => ctx.api.back && ctx.api.back())) : null,
-          panelPrefs(ctx)];
+          panelPrefsOrLink(ctx)];
 }
 
 export const LIVESTOCK_TABS = [

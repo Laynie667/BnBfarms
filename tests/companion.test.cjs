@@ -96,7 +96,7 @@ const STATE = { name: "Laynie", onBooks: true, roles: ["PROPRIETOR", "LIVESTOCK"
   bot({ type: "state", state: STAFF5B });
   click("Herd"); out("5b herd shows where and flags ->", /barn/.test(text()), /in heat/.test(text()));
   click("Summon to me"); out("5b summon from herd ->", cmds().includes("summon 500"));
-  click("Tease lines"); click("Remove"); out("5b tease remove ->", cmds().includes("tease remove 1"));
+  out("5b tease lines retired (Oct 19) ->", ![...D.querySelectorAll("#fhc-panel button")].some((b) => b.textContent === "Tease lines"));
   click("Zones"); out("5b zone map drawn ->", !!D.querySelector('#fhc-panel button[aria-label="barn-1"]'));
   click("Set A where I stand"); out("5b zone corner ->", cmds().includes("zone a barn-1"));
   // a farmhand sees the map, zones and spots, but nothing to change them with
@@ -107,7 +107,7 @@ const STATE = { name: "Laynie", onBooks: true, roles: ["PROPRIETOR", "LIVESTOCK"
   out("5b farmhand sees the map ->", !!D.querySelector('#fhc-panel button[aria-label="barn-1"]'), /milking1/.test(text()), btns.includes("Who's where"));
   out("5b ...but can't change it ->", !btns.some((b) => /Draw it on the map|Set A where I stand|Delete|Clear|Pick|Click it on the map|Set where I stand/.test(b)), /set by herdmasters and proprietors/.test(text()));
   bot({ type: "state", state: STAFF5B });   // back to a herdmaster for the rest
-  click("Voice"); out("5b voice lines ->", /\[Voice\] Good cows stand still/.test(text()));
+  click("ECHS"); out("5b voice lines retired, the ECHS card stays ->", !/\[Voice\]/.test(text()) && /ECHS sessions by depth/.test(text()));
   click("Shift"); out("5b shift and log ->", /6\.5 h this week/.test(text()), /TEASE_ADD/.test(text()));
   bot({ type: "voice", text: "Moo for me." });
 

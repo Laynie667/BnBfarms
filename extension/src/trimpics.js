@@ -12,7 +12,8 @@ let sdk = null, trimmed = 0, started = Date.now();
 function bytes(tc) { let n = 0; for (const v of tc.values()) n += (v.width || 0) * (v.height || 0) * 4; return n; }
 export function trimPictures(force, idle, target) {
   const gl = W.GLDrawCanvas && W.GLDrawCanvas.GL, tc = gl && gl.textureCache, cache = W.GLDrawImageCache;
-  if (!tc || !cache || typeof tc.forEach !== "function") return 0;
+  if (!cache || typeof cache.purge === "function") return 0;   // R133 on: the game's own cache lets go of old pictures by itself
+  if (!tc || typeof tc.forEach !== "function") return 0;
   let total = bytes(tc); if (!force && total <= LIMIT) return 0;
   const now = Date.now(), old = [];
   for (const [url, v] of tc) {

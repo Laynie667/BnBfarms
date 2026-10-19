@@ -223,3 +223,43 @@ export function offerCode(contract, author, authorName, LZ) {
   const payload = Object.assign({ author, authorName }, contract);
   return "BCP1:contract:" + LZ.compressToBase64(JSON.stringify(payload));
 }
+
+// ── when the rules apply (Oct 19, Laynie: "we need to include a way to modify the conditions on rules for bc plus when
+// we offer them") ──
+// BC+'s own conditions (src/system/conditions/Conditions.ts): which rooms, who's there, what time of day. Typed as pairs:
+//   room=public|private · names=farm,barn (rooms whose names have one of these) · notnames=… · with=221397,232922
+//   (while one of them's in the room) · without=… · role=owner|lover|mistress|whitelist|friend (while somebody of that
+//   rank or above is there) · norole=… · time=20:00-06:00 · only=pet.speech,pet.hearing (just those rules; all by default)
+export const ROLE_WORDS = { bcowner: 0, owner: 1, coowner: 1, lover: 2, mistress: 3, whitelist: 4, friend: 5, public: 6 };
+const hhmm = (t) => { const m = /^(\d{1,2})(?::(\d\d))?$/.exec(String(t).trim()); if (!m) return null; const h = +m[1], mi = +(m[2] || 0); return h < 24 && mi < 60 ? h * 60 + mi : null; };
+export function conditionsFrom(pairs) {
+  const c = {}, errs = []; let only = null;
+  for (const [k0, v0] of Object.entries(pairs || {})) {
+    const k = k0.toLowerCase(), v = String(v0 == null ? "" : v0).trim();
+    if (k === "room") { if (/^(public|private)$/i.test(v)) c.roomType = v.toLowerCase(); else errs.push("room= public or private"); }
+    else if (k === "names" || k === "notnames") { const w = v.split(/[,|]/).map((x) => x.trim()).filter(Boolean).join(","); if (w) { c.roomNamesMode = k === "names" ? "in" : "notin"; c.roomNames = w.slice(0, 300); } else errs.push(k + "= needs room names"); }
+    else if (k === "with" || k === "without") { const m = v.split(/[,|\s]+/).filter((x) => /^\d+$/.test(x)); if (m.length) { c.membersMode = k === "with" ? "present" : "absent"; c.members = m.join(",").slice(0, 300); } else errs.push(k + "= needs member numbers"); }
+    else if (k === "role" || k === "norole") { const r = ROLE_WORDS[v.toLowerCase().replace(/[^a-z]/g, "")]; if (r !== undefined) { c.roleMode = k === "role" ? "present" : "absent"; c.role = r; } else errs.push(k + "= owner, lover, mistress, whitelist or friend"); }
+    else if (k === "time") { const [a, b] = v.split("-"), s = hhmm(a), e = hhmm(b); if (s != null && e != null && s !== e) { c.timeStart = s; c.timeEnd = e; } else errs.push("time= like 20:00-06:00"); }
+    else if (k === "only") { only = v.split(/[,|]/).map((x) => x.trim()).filter(Boolean); const bad = only.filter((id) => !RULES.has(id)); if (bad.length) errs.push("only= doesn't know " + bad.join(", ")); }
+    else errs.push("I don't know " + k + "=");
+  }
+  return { conditions: Object.keys(c).length ? c : null, only, errs };
+}
+// the conditions put on a contract's rules: all of them, or just `only`
+export function applyConditions(rules, conditions, only) {
+  if (!conditions) return rules;
+  for (const [id, spec] of Object.entries(rules)) if (!only || only.includes(id)) { spec.useGlobal = false; spec.conditions = Object.assign({}, conditions); }
+  return rules;
+}
+const two = (n) => String(n).padStart(2, "0"), clock = (m) => two(Math.floor(m / 60)) + ":" + two(m % 60);
+export function describeConditions(c) {
+  if (!c) return "";
+  const out = [];
+  if (c.roomType) out.push("in " + c.roomType + " rooms");
+  if (c.roomNamesMode) out.push((c.roomNamesMode === "in" ? "in rooms called " : "not in rooms called ") + c.roomNames.split(",").join(" or "));
+  if (c.membersMode) out.push((c.membersMode === "present" ? "while " : "while none of ") + c.members.split(",").join(", ") + (c.membersMode === "present" ? " is there" : " are there"));
+  if (c.roleMode) out.push((c.roleMode === "present" ? "while a " : "while no ") + Object.keys(ROLE_WORDS).find((k) => ROLE_WORDS[k] === c.role && k !== "coowner" && k !== "bcowner") + " or above is there");
+  if (c.timeStart != null) out.push("from " + clock(c.timeStart) + " to " + clock(c.timeEnd));
+  return out.join(", ");
+}

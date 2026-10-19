@@ -5,7 +5,10 @@
   /* ───────────── APPLICATION ───────────── */
 
   // Each question has a key. Some take only certain answers (check), and those offer buttons in the Companion (choices).
-  const GENDERS = ["female","male","futa","femboy"];
+  const GENDERS = ["female","male","futa","femboy","nonbinary"];
+  // the other ways folks say it
+  const GENDER_WORDS = { enby: "nonbinary", nb: "nonbinary", "non-binary": "nonbinary", "non binary": "nonbinary", nonbinary: "nonbinary", "they": "nonbinary" };
+  const genderWord = (t) => { const g = String(t || "").trim().toLowerCase(); return GENDER_WORDS[g] || g; };
   // what a kind is called out loud and on their record ("kitt" is only the farm's own short key: "kitty" still
   // matches it everywhere; seen live, applicants saw "kitt" and thought it was a typo)
   const SHOWN_SPECIES = { kitt:"kitty" };
@@ -55,8 +58,8 @@
                     return { err:"I didn't catch an animal there, sugar. Just type one, like cow, pony, pup or kitten (or any other animal), or say not stock." }; },
       // stock only: somebody who said they're just staff or a guest isn't asked
       skip: (s) => { const role = String((s.byKey||{}).role||"").toLowerCase(); return !!role && !/stock|cow|animal|both|not sure|unsure|undecided|pet/.test(role) && /staff|farmhand|guest|luxury|visit|hand/.test(role); } },
-    { key:"gender", text:"How should the farm see you?  female / male / futa / femboy", choices: () => GENDERS,
-      check: t => { const g = String(t).trim().toLowerCase(); return GENDERS.includes(g) ? { value:g } : { err:"Just one of these, hon: female, male, futa or femboy." }; } },
+    { key:"gender", text:"How should the farm see you?  female / male / futa / femboy / nonbinary", choices: () => GENDERS,
+      check: t => { const g = genderWord(t); return GENDERS.includes(g) ? { value:g } : { err:"Just one of these, hon: female, male, futa, femboy or nonbinary." }; } },
     { key:"stay",   text:"How long you plannin' on stayin' with us?  1 hour / 12 hours / 1 day / 1 week / 2 weeks / 1 month / permanent / not sure",
       choices: () => BCPLUS.DURATIONS.map(d => d.label).concat(["not sure"]),
       check: t => notSure(t) ? { value:"" } : (BCPLUS.durationFrom(t) ? { value: BCPLUS.durationFrom(t).key } : { err:"Pick one, sugar: 1 hour, 12 hours, 1 day, 1 week, 2 weeks, 1 month, permanent, or not sure." }) },

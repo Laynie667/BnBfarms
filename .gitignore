@@ -19,3 +19,7 @@ tests/out/
 
 # the outfit studio's copy of the live game's files (fetched from its site as they're needed)
 studio/game-cache/
+
+# the bot's backup folder, if it's picked inside the project (03b-storage.js): the books, never on GitHub
+Backups/
+bnb-ledger-*.json

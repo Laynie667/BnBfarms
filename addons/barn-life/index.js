@@ -17,8 +17,8 @@
    • Milk-drunk: drinking somebody's milk (?nurse / nursing) makes you content, then sleepy, then
      milk-drunk. It wears off one step every 7 minutes. Richer milk (grade A) counts extra.
    • Lines fit who's eatin' or bein' groomed (more-lines.js): their kind (a cow chews, a pig roots, a cat picks), their
-     hands (tied or pawed: face first into the trough), a gag (no eatin' till it's out; a funnel gets water poured
-     down it), and what they wear gets groomed too (latex polished, a harness oiled).
+     hands (tied or pawed: face first into the trough), a gag (they eat and drink round it, messily; a funnel gets
+     water poured down it), and what they wear gets groomed too (latex polished, a harness oiled).
 */
 import { connect, pick, between, fill, lineFor, gearOf, animalOf } from "../_lib/connect.js";
 import * as M from "./more-lines.js";
@@ -79,12 +79,14 @@ for (const k of Object.keys(M.DRUNK_LINES)) DRUNK_LINES[k].push(...M.DRUNK_LINES
 const kindOf = (mn) => animalOf(api, mn);
 const bound = (g) => !!(g.arms || g.paws || g.hands);
 function eatPool(mn, g) {
+  if (mouthFull(mn) && Math.random() < 0.8) return M.EAT_GAG;
   const k = M.EAT_KIND[kindOf(mn).key];
   if (bound(g) && Math.random() < 0.7) return M.EAT_BOUND;
   return k && Math.random() < 0.6 ? k : EAT;
 }
 function drinkPool(mn, g) {
   if (api.funnelOn && api.funnelOn(mn)) return M.DRINK_FUNNEL;
+  if (mouthFull(mn) && Math.random() < 0.8) return M.DRINK_GAG;
   const k = M.DRINK_KIND[kindOf(mn).key];
   if (bound(g) && Math.random() < 0.7) return M.DRINK_BOUND;
   return k && Math.random() < 0.5 ? k : DRINK;
@@ -95,8 +97,9 @@ function groomPool(mn) {
   return k && r < 0.75 ? k : GROOM;
 }
 const words = (mn, extra) => Object.assign({ name: api.name(mn), a: kindOf(mn).a, call: kindOf(mn).call }, extra || {});
-// a mouth that's gagged shut can't eat or drink (a funnel can be poured into, but there's no chewin' through one)
-const mouthShut = (mn) => !!(api.holeBlocked && api.holeBlocked(mn, "mouth")) || !!gearOf(api, mn).gag;
+// a gag never keeps them from the trough or the water: they eat and drink round it, messily (Laynie, Oct 19: "the gags
+// stop players from eating and drinking at the trough, so need to skip checking gags when it comes to their barn life")
+const mouthFull = (mn) => { const g = gearOf(api, mn); return !!(api.holeBlocked && api.holeBlocked(mn, "mouth")) || !!g.gag || !!g.ringGag; };
 
 // ── needs over time ────────────────────────────────────────
 function tick() {
@@ -137,7 +140,6 @@ function eat(mn, reply, how) {
   if (left <= 0) { api.notifyStaff("🌾 " + t + " is empty and " + api.name(mn) + " is hungry. ?refill " + t + " standing next to it.", true); return reply("The trough's licked clean, hon. I've told staff it needs fillin'."); }
   const n = needsOf(mn);
   if (n.food >= 95) return reply("You're stuffed already, sugar.");
-  if (mouthShut(mn) || (api.funnelOn && api.funnelOn(mn))) return reply("You can't eat with your mouth stopped up like that, sugar. Get somebody to take it out first.");
   d.troughs[t] = left - 1; n.food = Math.min(FULL, n.food + 50); n.warned.food = 100;
   api.emote("🌾 " + fill(lineFor(api, mn, eatPool(mn, gearOf(api, mn)), "eat"), words(mn)), mn);
   api.save();
@@ -148,7 +150,6 @@ function drink(mn, reply, how) {
   if (!near(mn, "water")) return reply("You need to be at a water spot to drink, sugar (a spot called water-…).");
   const n = needsOf(mn);
   if (n.water >= 95) return reply("You're not thirsty right now, hon.");
-  if (mouthShut(mn)) return reply("You can't drink with your mouth stopped up like that, sugar. Get somebody to take it out first.");
   n.water = Math.min(FULL, n.water + 60); n.warned.water = 100;
   api.emote("💧 " + fill(lineFor(api, mn, drinkPool(mn, gearOf(api, mn)), "drink"), words(mn)), mn);
   api.save();

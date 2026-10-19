@@ -8,7 +8,7 @@
   // ledger field → the command that flips it
   const SWITCH_CMDS = { breedable:"breedable", fertile:"fertile", jarok:"jarok", freeuse:"freeuse", futa:"futa",
                         milkable:"milkable", naturalHeat:"naturalheat", praiseMe:"praise", degradeMe:"degrade",
-                        tally:"tally", teaseOptIn:"teaseme", forced:"forced", hypno:"hypno", potionsOn:"potions", daresOn:"dares", benchOn:"bench", mpreg:"mpreg", watersports:"watersports", parasiteOn:"parasite", symbioteOn:"symbiote", trapEager:"eager" };
+                        tally:"tally", forced:"forced", potionsOn:"potions", daresOn:"dares", benchOn:"bench", mpreg:"mpreg", watersports:"watersports", parasiteOn:"parasite", symbioteOn:"symbiote", trapEager:"eager" };
   // staff lookups about somebody else go to the Companion's Office tab
   const DOC_CMDS = ["record","stats","vet","quota","keys","size","measure","pedigree"];
 
@@ -57,9 +57,10 @@
       if (g.milk || g.machine || g.funnel) s.gear = { milk: g.milk || null, machine: g.machine || null, funnel: !!g.funnel };
       s.today = { tally: tallyToday(mn), naughty: r.naughtyMarks || 0, praised: r.praised || 0, degraded: r.degraded || 0 };
       // ribbons, the store, potions, a dare (the 🎀 Store tab)
-      s.ribbons = r.ribbons || 0; s.quotaGrace = r.quotaGrace || 0;
+      s.ribbons = r.ribbons || 0; s.quotaGrace = r.quotaGrace || 0; s.messesOn = !!r.messesOn;
+      try { chatlogState(mn, s); } catch(e){ warn("record state:", e); }   // recorded always? reads the record? (10z9-chatlog.js)
       s.ribbonLog = (L.ribbonLog || []).filter(e => e.mn === mn).slice(-6).reverse().map(e => ({ n: e.n, why: e.why }));
-      s.store = storeItems().filter(it => !it.off).map(it => ({ id: it.potion || it.id, name: it.name, price: it.price, desc: it.desc, gift: !!it.gift, kind: it.kind || "" }));
+      s.store = storeItems().filter(it => !it.off).map(it => ({ id: it.potion || it.id, name: it.name, price: it.price, desc: it.desc, gift: !!it.gift, kind: it.kind || "", shelf: it.shelf || "" }));
       s.fx = activePotions(mn).map(f => ({ id: f.id, name: (potionDef(f.id) || {}).name || f.id, until: Math.ceil(f.until/60000)*60000 }));
       if (r.dare) s.dare = { text: r.dare.text, until: r.dare.until, reckless: !!r.dare.reckless };
       if (r.penned) s.penned = { until: r.penned.until, at: r.penned.name };
@@ -112,8 +113,7 @@
     out.zones = L.zones; out.spots = L.spots || {};   // name → {X,Y}, drawn on the Zones map
     out.mapEdit = isHerdmaster(mn);
     if (isHerdmaster(mn)){
-      out.tease = (L.tease || []).slice(0, 60).map(x => x.text);
-      out.teaseOpted = Object.values(L.people).filter(x => x.teaseOptIn).length;
+      // (the tease lines: retired Oct 19)
       out.log = (L.log || []).slice(-10).reverse().map(e => ({ t: e.t, a: e.a, by: plainName(e.by), d: String(e.d||"").slice(0, 40) }));
     }
     if (canHoldHerd(mn)){

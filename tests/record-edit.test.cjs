@@ -40,7 +40,7 @@ const since=(mn,n)=>sent.slice(n).filter(s=>(s[0]==='AccountBeep'&&s[1].MemberNu
   await B(221397,'?edit 900 gender futa');
   ok(D().gender==='futa' && D().futa===true, 'gender changed (futa on)');
   n=sent.length; await B(221397,'?edit 900 gender girl');
-  ok(/female, male, futa or femboy/.test(since(221397,n)) && D().gender==='futa', 'a gender that is not one of the four is refused');
+  ok(/female, male, futa, femboy or nonbinary/.test(since(221397,n)) && D().gender==='futa', 'a gender that is not one of the five is refused');
   await B(221397,'?edit 900 stay 2 weeks'); await B(221397,'?edit 900 depth no human left');
   ok(D().stayType && D().wantDepth==='nhl' || D().wantDepth, 'stay and depth changed ('+D().stayType+', '+D().wantDepth+')');
   await B(221397,'?edit 900 limits no blood, no needles');

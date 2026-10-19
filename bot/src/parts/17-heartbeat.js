@@ -47,8 +47,7 @@
         syncAllPresent(true);
       }
 
-      teaseTick();
-      voiceTick();
+      // (teaseTick and voiceTick retired Oct 19: the tease lines and the herd's voice lines are gone)
       rutTick();
       quotaTick();
       prodTick();

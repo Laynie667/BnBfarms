@@ -20,6 +20,8 @@ import { initMesses, onMessMsg, messFromMark, messWash } from "./messes.js";
 import { initMemlog } from "./memlog.js";
 import { initTrim } from "./trimpics.js";
 import { initLocalSave } from "./localsave.js";
+import { initChatlog, logRow } from "./chatlog.js";
+import { initSettings } from "./settings.js";
 import { initCues, cueOff, lead, face, sound, trance, drawMarkers, arouse, vibe, initBody } from "./cues.js";
 
 // the SDK ships as an old-style module; this digs the real thing out either way
@@ -205,6 +207,7 @@ function onFarmMsg(m) {
     case "notice": {
       const text = collect(m);
       if (text === null) break;
+      logRow("farm", BOT_MEMBER, text);   // the record (chatlog.js): the farm's answers in the panel count too
       st.panel.add(text, m.type);
       // farm messages you didn't ask for (tease lines, heat, summons…) also land in your chat,
       // so you see them even when the panel's closed (Toggles → "Farm messages in chat too")
@@ -267,6 +270,14 @@ function onFarmMsg(m) {
       } else st.panel.add(line, "notice");
       break;
     }
+    case "logRows": {
+      // the record, for the Log tab (views/log.js): sent in parts when it's long
+      const ui = st.panel.ui, cur = ui.logRows && ui.logRows.id === m.id ? ui.logRows : { id: m.id, rows: [], total: 0 };
+      cur.rows = cur.rows.concat(Array.isArray(m.rows) ? m.rows : []); cur.total = Number(m.total) || cur.rows.length;
+      cur.busy = (Number(m.part) || 1) < (Number(m.of) || 1);
+      ui.logRows = cur; st.panel.render();
+      break;
+    }
     case "outfitBack": {
       const r = changeBack();
       st.panel.add(r.ok ? "👗 Back in your own clothes" + (r.stillLocked ? " (farm-locked pieces stay till a keyholder opens 'em)" : "") + "." : "👗 " + r.why + ".", "notice");
@@ -295,6 +306,8 @@ const api = {
   },
   hasBackup,
   rehello: () => hello(),   // tell the bot a setting changed (the relay switch)
+  // the Log tab asks the farm girl for the record (views/log.js)
+  logAsk(q) { st.panel.ui.logRows = { id: 0, rows: [], total: 0, busy: true }; st.panel.render(); toBot("logAsk", q); },
   // map tool: the next `count` clicks on the game's map pick tiles instead of walkin' you there
   pickTiles(count, what, done) {
     if (typeof window.ChatRoomMapViewIsActive === "function" && !window.ChatRoomMapViewIsActive()) {
@@ -327,12 +340,18 @@ function pickClick() {
 
 function start() {
   st.panel = new Panel(sendCommand, api);
+  initSettings(st.panel);   // Preferences → Extensions → Farmhand Companion (settings.js)
+  // switched off on that page: nothin' else starts (the page stays, to switch it back on)
+  if (st.panel.prefs.off) { st.panel.show(false); console.log("[Farmhand Companion] v" + VERSION + " is switched off (Preferences → Extensions → Farmhand Companion)"); return; }
   st.panel.setStatus("waitin' for the farm girl");
   initCues({ toBot, panel: st.panel, local: toChat });
   setInterval(parasiteSync, 60000);
   initBelly(mod);  // the drawn-belly test (belly.js)
   initDrawnBody(mod);  // the drawn body from the outfit studio, on your own character (drawnbody.js)
   initMesses(mod);     // the farm's own messes on everybody (messes.js)
+  // the record: what lands in your chat, your beeps and your commands, to the farm girl by the hour (chatlog.js).
+  // Always for the proprietors; anybody else only with Toggles → "Send a record..." on.
+  initChatlog(mod, { on: () => !!(st.panel && st.panel.s && st.panel.s.logMust) || !!(st.panel && st.panel.prefs.chatlog), botMn: BOT_MEMBER, botHere });
   initMemlog();        // a log of how big things are, for chasing a page that runs out of room (memlog.js, /farmmem)
   initLocalSave(VERSION, () => st.panel && st.panel.render && st.panel.render());   // your settings as a file in a folder you pick (localsave.js)
   initTrim(mod);       // the game never lets go of a picture: past 380 MB on the graphics card, old unused ones go (trimpics.js)

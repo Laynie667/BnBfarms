@@ -7,6 +7,8 @@
      CONFIGURATION
      ═══════════════════════════════════════════════════════════ */
 
+  const RETIRED_ON = false;   // (the tease lines and herd voice lines, retired Oct 19: true brings the old commands back)
+
   const CFG = {
     ROOM_NAME: "B&B Farm",
     ROOM_DESC: "Bred & Bound. Bed & Breakfast. Say ?help out loud — or beep the farm office from anywhere.",
@@ -16,6 +18,7 @@
 
     ROOM_ADMINS: [221397, 232922, 260239],
     PROPRIETORS: [221397, 232922],
+    LOG_READERS: [221397],          // who gets the Log tab: the record of what players see and send (10z9-chatlog.js)
     BOT_MEMBER: 260239,
 
     PREFIXES: ["?", "-", "!", "."],

@@ -182,7 +182,7 @@ export class Panel {
   }
   render() {
     const ctx = this.ctx(), view = this.view(), V = VIEWS[view];
-    const tabs = view === "guest" ? V.tabs : withExtras(V.tabs, view, ctx);   // + "Farm extras" when an add-on has somethin'
+    const tabs = (view === "guest" ? V.tabs : withExtras(V.tabs, view, ctx)).filter((t) => !t.show || t.show(ctx));   // + "Farm extras" when an add-on has somethin'; a tab with show() only when it says so (the Log tab)
     const tabKey = "tab_" + view, tab = tabs.find((t) => t.id === this.ui[tabKey]) || tabs[0];
     const scroll = this.el.querySelector(".fhc-body"), keep = scroll ? scroll.scrollTop : 0;
     this.el.classList.toggle("compact", !!this.prefs.compact);

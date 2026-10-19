@@ -1,6 +1,6 @@
 # B&B Farm equipment
 
-Everything the farm puts on somebody, built from the bot  on 2026-10-15.
+Everything the farm puts on somebody, built from the bot  on 2026-10-19.
 
 How traps are set up: staff mark a map tile with `?spot set trap-<name>` (for example `trap-bakery`). A tile named just `trap` springs a random one. Water tiles (named for a pond, stream, trough or well) hide the water traps. A subject who steps on the tile can be caught once it's reset (a few minutes; faster at night and with Danger Draught). `?trap spring <who> <name>` sets one off by hand (staff). Nobody is caught by a trap their limits rule out, or while they've paused traps.
 Real gear goes on only for players who switched on **Farm can put real gear on me** in the Companion; messes show for **Farm can mark my body**.
@@ -35,6 +35,15 @@ Baled in tight with your rump out, and anybody passin' can use you.
 - **Equipment:**
   - **Bale Twine** (ropeFeet, after the trap, for a while). Game items: HempRope. Baling twine knotted round the ankles to keep the legs apart and the rump right where it is, sticking out of the hay.
 
+### 🐻 bearskin
+
+The trapper's cabin: the rug by the fire, and the trapper.
+
+- **How to get it:** a tile named `trap-bearskin`.
+- **Ruled out by limits mentioning:** breed, cum, creampie.
+- **Mess it leaves:** cum on the tummy.
+- **Equipment:** none yet.
+
 ### 🔔 bell
 
 A cowbell collar locked on for half an hour, so the whole farm hears you comin'.
@@ -52,6 +61,16 @@ The boar that lives in the wallow, and a long, muddy tie.
 - **Ruled out by limits mentioning:** mud, filth, humiliat, knot.
 - **Equipment:**
   - **Boar's Plug** (the hole they have (a dildo slot with a pussy, a plug slot without), after the trap, for 20 min). Game items: FuckPlug, PenisPlug, PenisDildo. What a boar leaves so nothing leaks: a hard waxy plug as thick as a wrist, set deep, with a bellyful of hog seed sloshing behind it.
+
+### 🎟️ booth
+
+The peep booth: a window, a coin slot, and holes in the walls.
+
+- **How to get it:** a tile named `trap-booth`.
+- **Ruled out by limits mentioning:** public, display, glory, exhibit.
+- **Mess it leaves:** cum on the face and chest.
+- **Equipment:**
+  - **Booth Ring** (lips, while the trap holds them). Game items: RingGag, LipGag. A ring gag the booth hands out at the door, so the customers get their copper's worth.
 
 ### 🖋️ brand
 
@@ -147,6 +166,15 @@ Growth cups that latch on your teats and leave them bigger and runnin' double.
 - **Equipment:**
   - **Growth Cups** (cups, after the trap, for 30 min). Game items: NippleSuctionCups, LactationPump. Two wide glass bells sucking hard at swollen teats, drawing them long and dark and fat. They stay on until these tits are a size bigger.
 
+### 🗄️ desk
+
+The overseer's desk: bent over it, and an audit.
+
+- **How to get it:** a tile named `trap-desk`.
+- **Ruled out by limits mentioning:** spank, paddle, office, humiliat.
+- **Equipment:**
+  - **AUDITED Tag** (tag, after the trap, for 20 min). Game items: CollarNameTag, CollarNameTagLivestock. A brass tag on the collar stamped AUDITED, with the date punched in underneath.
+
 ### 🛁 dip
 
 The sheep dip: dunked, scrubbed and rinsed clean.
@@ -171,6 +199,16 @@ A post rises up under you and lays a clutch in you.
 - **Ruled out by limits mentioning:** egg, ovipo, clutch.
 - **Equipment:**
   - **Egg Post Plug** (the hole they have (a dildo slot with a pussy, a plug slot without), after the trap, for 15 min). Game items: EggVibePlugXXL, PenisDildo. The egg post's parting gift: a thick ridged plug seated deep behind a fresh clutch, holding every egg in a stretched, slick hole while they settle.
+
+### 👜 feedbag
+
+A feedbag strapped over your face till it's empty.
+
+- **How to get it:** a tile named `trap-feedbag`.
+- **Ruled out by limits mentioning:** feed, stuff, food, force.
+- **Mess it leaves:** mash on the face and chest.
+- **Equipment:**
+  - **Feedbag** (funnel, while the trap holds them). Game items: HarnessPonyBits, BitGag, FunnelGag. A canvas feedbag strapped over the face, full of warm mash, and it doesn't come off till it's empty.
 
 ### 🍫 fountain
 
@@ -205,6 +243,16 @@ A billy goat who puts you on your knees and uses your mouth.
 - **Ruled out by limits mentioning:** oral, throat.
 - **Equipment:** none yet.
 
+### 🪮 groomer
+
+The kennel's grooming table: bathed, brushed, fluffed and shown off.
+
+- **How to get it:** a tile named `trap-groomer`.
+- **Ruled out by limits mentioning:** groom, bath, wash, pet play.
+- **Equipment:**
+  - **Grooming Noose** (leash, while the trap holds them). Game items: CollarLeash, ChainLeash, CollarChainLong, CollarChainShort. The grooming table's steel arm and its loop, clipped to the collar so they stand still and pretty for the brush.
+  - **Best in Kennel Rosette** (tag, after the trap, for 30 min). Game items: CollarNameTagPet, CollarBell, CollarNameTagLivestock, CollarNameTag. A big satin rosette on the collar, BEST IN KENNEL in gold thread, still smelling of show shampoo.
+
 ### 🐝 hive
 
 A hive queen who feeds you honey and lays in you.
@@ -213,6 +261,17 @@ A hive queen who feeds you honey and lays in you.
 - **Ruled out by limits mentioning:** insect, bug.
 - **Equipment:** none yet.
 
+### 🐷 hogtie
+
+Hogtied in the sty and left in the muck for the boar.
+
+- **How to get it:** a tile named `trap-hogtie`.
+- **Ruled out by limits mentioning:** hogtie, mud, filth, rope.
+- **Mess it leaves:** mud on the face and chest and tummy.
+- **Equipment:**
+  - **Hog Tie** (ropeFeet, while the trap holds them). Game items: HempRope. Rough sty rope, wrists to ankles behind the back, tied with the pig girl's rodeo knot.
+  - **Hog Tie (arms)** (ropeArms, while the trap holds them). Game items: HempRope. The other half of the hogtie, the wrists, cinched to the ankles.
+
 ### 🍯 honey
 
 The honey pot: drenched in honey or syrup and licked clean.
@@ -220,6 +279,16 @@ The honey pot: drenched in honey or syrup and licked clean.
 - **How to get it:** a tile named `trap-honey`.
 - **Ruled out by limits mentioning:** honey, syrup, food, messy, lick.
 - **Equipment:** none yet.
+
+### ♨️ hottub
+
+The lumberjacks' hot tub, and the lumberjacks.
+
+- **How to get it:** a tile named `trap-hottub`.
+- **Ruled out by limits mentioning:** gang, water, breed.
+- **Mess it leaves:** cum on the tummy and chest.
+- **Equipment:**
+  - **Lumberjack's Grip** (arms, while the trap holds them). Game items: HempRope, LeatherCuffs. A length of logging rope round the wrists, so they don't float off while they're passed round the tub.
 
 ### 💡 incubator
 
@@ -235,6 +304,15 @@ A needle on a spring arm: a dose of whatever it's loaded with.
 
 - **How to get it:** a tile named `trap-injector`.
 - **Equipment:** none yet.
+
+### 📋 inspection
+
+The clipboard inspection: every inch checked, measured and written up.
+
+- **How to get it:** a tile named `trap-inspection`.
+- **Ruled out by limits mentioning:** inspect, exam, humiliat, measure.
+- **Equipment:**
+  - **Inspection Tag** (tag, after the trap, for 30 min). Game items: CollarNameTagLivestock, CollarNameTag. An inspection tag on the collar: FIT FOR PURPOSE, the clerk's initials, and a number.
 
 ### 🐕 kennel
 
@@ -263,6 +341,16 @@ A swingin' light you can't look away from, and a head full of fog.
 - **Ruled out by limits mentioning:** hypno, trance, mind.
 - **Equipment:** none yet.
 
+### 🦮 leashpost
+
+Clipped to the post in the dog yard and left for anybody passin'.
+
+- **How to get it:** a tile named `trap-leashpost`.
+- **Ruled out by limits mentioning:** public, free use, leash, tie.
+- **Mess it leaves:** cum on the tummy and face.
+- **Equipment:**
+  - **Yard Post Lead** (leash, while the trap holds them). Game items: ChainLeash, CollarLeash, CollarChainLong, CollarChainShort. A short chain from the collar to the iron post in the dog yard: just long enough to kneel, too short to go anywhere.
+
 ### 🪱 leeches
 
 Fat leeches out of the trough, latched on your teats and anywhere else that's soft.
@@ -289,6 +377,16 @@ Cups snap on and you're held till you're drained dry.
 - **Mess it leaves:** milk on the chest.
 - **Equipment:**
   - **Trap Milker** (cups, while the trap holds them). Game items: LactationPump, NippleSuctionCups. Steel milking cups latched on with a greedy pull, nipples stretched down the glass, pumping this animal dry whether there's anything left or not.
+
+### 🕳️ milkinghole
+
+The milking hole: something on the other side of the wall wants your milk.
+
+- **How to get it:** a tile named `trap-milkinghole`.
+- **Ruled out by limits mentioning:** milk, lactat, glory, machine.
+- **Mess it leaves:** milk on the chest.
+- **Equipment:**
+  - **Through-the-Wall Cups** (cups, while the trap holds them). Game items: LactationPump, NippleSuctionCups. Whatever's on the other side of the milking hole has cups, and they are very, very strong.
 
 ### 🪞 mirror
 
@@ -437,6 +535,15 @@ Slime that eats your clothes, gets in everywhere and leaves you slow and green.
   - **Slime Sleeves** (arms, after the trap, for a while). Game items: Slime, HempRope, LeatherCuffs. Thick green slime still clinging from fingers to shoulders, warm and tacky, stringing between arm and ribs with every move.
   - **Slime Stockings** (legs, after the trap, for a while). Game items: Slime, HempRope, LeatherLegCuffs. Slime coating both legs to the hip, oozing down the thighs and sucking at the floor. Whatever it crawled into is still in there too.
 
+### 🪣 slop
+
+The slop bucket, over your head, and the pigs come runnin'.
+
+- **How to get it:** a tile named `trap-slop`.
+- **Ruled out by limits mentioning:** mud, filth, food, messy, humiliat.
+- **Mess it leaves:** mash on the face and chest and tummy.
+- **Equipment:** none yet.
+
 ### 🪢 snare
 
 A rope round the ankle: held where you stand and teased.
@@ -463,6 +570,15 @@ Nozzles hose you down with warm seed, or worse if you said ?watersports on.
 - **Ruled out by limits mentioning:** cum, spray, bukkake.
 - **Equipment:** none yet.
 
+### 🦌 stag
+
+The rutting stag in the trees, and it's his season.
+
+- **How to get it:** a tile named `trap-stag`.
+- **Ruled out by limits mentioning:** breed, beast, anthro, rut.
+- **Mess it leaves:** cum on the tummy.
+- **Equipment:** none yet.
+
 ### 🐴 stallion
 
 A stallion stud, far too big, who fills you till you waddle.
@@ -471,6 +587,14 @@ A stallion stud, far too big, who fills you till you waddle.
 - **Ruled out by limits mentioning:** size, inflat.
 - **Equipment:**
   - **Stud's Stopper** (the hole they have (a dildo slot with a pussy, a plug slot without), after the trap, for 10 min). Game items: HollowButtPlug, PenisDildo. A stable hand's rubber stopper, shoved in after the stallion pulled out, to keep a mare's worth of horse cum from pouring down their legs.
+
+### 🖃 stamp
+
+The office stamps: inked, approved and filed.
+
+- **How to get it:** a tile named `trap-stamp`.
+- **Ruled out by limits mentioning:** writ, mark, stamp, humiliat.
+- **Equipment:** none yet.
 
 ### 🥧 stocks
 
@@ -499,6 +623,15 @@ For studs: a teasin' stall that smells of heat, and no way to reach it.
 - **Equipment:**
   - **Teasin' Stall** (device, while the trap holds them). Game items: LowCage, Kennel, WoodenStocks. A narrow steel stall that smells of heat, with a padded dummy rocking just out of reach on the other side of the bars.
 
+### 🍼 teatcheck
+
+The mornin' teat check: squeezed, measured, graded and stripped.
+
+- **How to get it:** a tile named `trap-teatcheck`.
+- **Ruled out by limits mentioning:** milk, lactat, nipple.
+- **Equipment:**
+  - **Check Stall Cups** (cups, while the trap holds them). Game items: LactationPump, NippleClamp, NippleSuctionCups. The dairy girl's own stripping cups, cold steel, for gettin' the last drops out after the hand check.
+
 ### 🐙 tentacle
 
 The thing in the water. It always leaves eggs.
@@ -519,6 +652,16 @@ A tickle rack that only lets go when you ?beg.
 - **Ruled out by limits mentioning:** tickl.
 - **Equipment:** none yet.
 
+### 🍅 tomatoes
+
+The stocks in the square, and a cart of soft fruit for throwin'.
+
+- **How to get it:** a tile named `trap-tomatoes`.
+- **Ruled out by limits mentioning:** stock, pillory, messy, food, humiliat.
+- **Mess it leaves:** strawberry on the face and forehead and chest.
+- **Equipment:**
+  - **Square Stocks** (device, while the trap holds them). Game items: WoodenStocks. The old wooden stocks in the middle of the square, stained red from a hundred fruit-throwing Sundays.
+
 ### 🐈 toms
 
 Two barn toms with barbs that leave you in heat.
@@ -526,6 +669,15 @@ Two barn toms with barbs that leave you in heat.
 - **How to get it:** a tile named `trap-toms`.
 - **Ruled out by limits mentioning:** barb, pain.
 - **Equipment:** none yet.
+
+### 🦌 trophy
+
+Mounted on the cabin's trophy wall, on display.
+
+- **How to get it:** a tile named `trap-trophy`.
+- **Ruled out by limits mentioning:** display, suspen, object, humiliat.
+- **Equipment:**
+  - **Trophy Mount** (device, while the trap holds them). Game items: XFrame, X-Cross, TheDisplayFrame, WoodenStocks. A plank frame on the cabin's trophy wall, between the elk and the bear, with a brass plate underneath: LOCAL GAME.
 
 ### 💛 trough
 
@@ -572,6 +724,15 @@ Pegged out on the washin' line with clothespins wherever they'll grip.
   - **Clothespins** (cups, while the trap holds them). Game items: Clothespins, LactationPump, NippleSuctionCups. Wooden clothespins biting everywhere they'll grip, a whole basketful, each one stinging as the line sways.
   - **Washin' Line** (arms, while the trap holds them). Game items: HempRope, LeatherCuffs. Strung up by the wrists on the washing line between two posts, hung out to dry with the sheets.
 
+### 🕯️ wax
+
+The bench and a lit candle, drip by drip.
+
+- **How to get it:** a tile named `trap-wax`.
+- **Ruled out by limits mentioning:** wax, heat, burn, candle.
+- **Equipment:**
+  - **The Bench** (device, while the trap holds them). Game items: BondageBench, Table, WoodenStocks. The farm's punishment bench, buckled at the wrists, waist and knees, with a candle burning on the shelf beside it.
+
 ### ⚖️ weights
 
 For studs: a sleeve that drains you dry, and balls a size heavier after.
@@ -597,6 +758,16 @@ The breedin' wheel: three spins, a different stud every time.
 - **Mess it leaves:** cum on the tummy and chest.
 - **Equipment:**
   - **Breedin' Wheel** (device, while the trap holds them). Game items: WheelFortune, LuckyWheel, WoodenStocks. A great painted wheel, spread-eagled across it and spinning, with a different stud waiting at every stop.
+
+### 🐕 whelping
+
+The whelping box, and the kennel's champion stud.
+
+- **How to get it:** a tile named `trap-whelping`.
+- **Ruled out by limits mentioning:** breed, knot, beast.
+- **Mess it leaves:** cum on the tummy.
+- **Equipment:**
+  - **Whelping Box** (device, while the trap holds them). Game items: Kennel, LowCage, WoodenStocks. A low padded box in a warm shed, built for one thing, with a sign above it: BREEDING IN PROGRESS.
 
 ### ⛓️ winch
 
@@ -726,12 +897,12 @@ Each mess is drawn by the Companion on top of the game's own splatters. `?wash` 
 - **honey** #E0A030: from its own traps or the shelf
 - **maple** #8B4A1C: from its own traps or the shelf
 - **chocolate** #4A2A18: from its own traps or the shelf
-- **strawberry** #E04A6A: from its own traps or the shelf
-- **milk** #F7F7F0: milker, cups, carousel
+- **strawberry** #E04A6A: tomatoes
+- **milk** #F7F7F0: milker, cups, carousel, milkinghole
 - **slime** #5FAE3A: vines
-- **mud** #6B4A2B: plow, mudpit
-- **mash** #D8C08A: chute
-- **cum**: the breeding traps pump, saddle, wheel, scarecrow, crate, kissgate, collection, every load in the stalls, and the seed shower
+- **mud** #6B4A2B: plow, mudpit, hogtie
+- **mash** #D8C08A: chute, slop, feedbag
+- **cum**: the breeding traps pump, saddle, wheel, scarecrow, crate, kissgate, collection, leashpost, whelping, bearskin, hottub, stag, booth, every load in the stalls, and the seed shower
 
 ## The mess shelf
 

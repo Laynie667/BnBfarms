@@ -146,7 +146,6 @@ THE TIERS, lowest to highest
 COMMANDS
   ?record · your tier      ?board · this week's top producers
   ?beg <the words> · knocks a quarter off your stocks time
-  ?teaseme on|off · let staff tease lines name you
 
 MAKIN' PRIZE
   • Staff say so, top producer or best milk of the week, best in show
@@ -359,7 +358,8 @@ COMMANDS
   ?size <part> <size> · set one, e.g. ?size udder DD · ?size penis 9
   ?measure · I measure you out loud for the room
   ?futa on|off · cock and vulva both, milk and semen both
-  ?gender female|male|futa|femboy · how the farm sees you (picks your outfit)
+  ?gender female|male|futa|femboy|nonbinary · how the farm sees you (picks your outfit)
+  ?chest flat|tits · what's up top, as the farm's lines see you (nonbinary goes by your body otherwise)
 
 THE PARTS
   Udder · bra cup, AA to H. Bigger makes and holds more milk.
@@ -627,11 +627,7 @@ THE STOCKS
 
 CARDS
   ?vet <who> · limits, triggers, aftercare, tier, who bred 'em
-  ?inspect <who> · a hands-on inspection, out loud for the room
-
-TEASE LINES · %name% becomes their name
-  ?tease add <line> · ?tease list · ?tease remove <n>
-  Stock opt in with ?teaseme on.`,
+  ?inspect <who> · a hands-on inspection, out loud for the room`,
 
     barnstaff: `🥛 THE BARN (staff)
 

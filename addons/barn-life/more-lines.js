@@ -60,6 +60,20 @@ export const DRINK_BOUND = [
   "No hands, so %name% gets down and laps from the water trough like any animal would.",
   "%name% kneels at the water and drinks face-first, water drippin' off their nose and chin.",
 ];
+// gagged: they still eat and drink, round whatever's in their mouth, and it's a mess (Oct 19)
+export const EAT_GAG = [
+  "%name% presses their gagged face into the trough and works the mash in round the edges of the gag, most of it endin' up on their chin.",
+  "%name% can't chew past the gag, so they suck the soft feed in a bit at a time, droolin' mash down their front.",
+  "%name% mashes their face into the feed and gets what they can past the gag, snortin', smeared to the ears.",
+  "Feed squeezes in round the gag a mouthful at a time while %name% gulps and dribbles, determined not to go hungry.",
+  "%name% laps the wet mash off the trough's edge round the gag, slow and sloppy, and comes up glazed in it.",
+];
+export const DRINK_GAG = [
+  "%name% dunks their gagged mouth in the water and lets it run in round the gag, gulpin' and splutterin'.",
+  "Water dribbles in past the gag a sip at a time while %name% kneels at the trough, half of it runnin' down their chest.",
+  "%name% tips their head and lets the water pour in round the gag, swallowin' hard, soaked to the collar.",
+  "%name% slurps noisily through the gag, chin drippin', and keeps at it till the thirst lets go.",
+];
 export const DRINK_FUNNEL = [
   "A farmhand tips a ladle of water into %name%'s funnel, and they swallow it down, eyes watering.",
   "%name% stands by the water while someone pours it down their funnel for them, a gurgle at a time.",

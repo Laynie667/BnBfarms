@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm add-on: Barn life
 // @namespace    bnbfarm
-// @version      1.1.0
+// @version      1.2.1
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-barn-life.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-barn-life.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -51,8 +51,8 @@
   }
   var pick = (list) => list[Math.floor(Math.random() * list.length)];
   var fill = (text, vars) => String(text).replace(/%(\w+)%/g, (m, k) => vars[k] !== void 0 ? vars[k] : m);
-  var TAG_ANY = /\{(?:nv|nc|nt|fu|fb|ok|v|c|t|f|m)\}/g;
-  var TAG_LEAD = /^((?:\{(?:nv|nc|nt|fu|fb|v|c|t|f|m)\})+)/;
+  var TAG_ANY = /\{(?:nv|nc|nt|fu|fb|nb|ok|v|c|t|f|m)\}/g;
+  var TAG_LEAD = /^((?:\{(?:nv|nc|nt|fu|fb|nb|v|c|t|f|m)\})+)/;
   var VULVA_W = /\b(pussy|pussies|cunt|cunts|slit|womb|clit|cervix)\b/i;
   var TITS_W = /\b(tits?|titties|breasts?|udders?|teats?|cleavage)\b/i;
   var GIRL_W = /\b(girl|heifer|mare|broodmare)\b/i;
@@ -76,7 +76,7 @@
     if (!b) return !m;
     if (m) {
       for (const t of m[1].slice(1, -1).split("}{")) {
-        if (t === "v" && !b.vulva || t === "nv" && b.vulva || t === "c" && !b.cock || t === "nc" && b.cock || t === "t" && !b.tits || t === "nt" && b.tits || t === "f" && b.g !== "female" || t === "m" && b.g !== "male" || t === "fu" && b.g !== "futa" || t === "fb" && b.g !== "femboy") return false;
+        if (t === "v" && !b.vulva || t === "nv" && b.vulva || t === "c" && !b.cock || t === "nc" && b.cock || t === "t" && !b.tits || t === "nt" && b.tits || t === "f" && b.g !== "female" || t === "m" && b.g !== "male" || t === "fu" && b.g !== "futa" || t === "fb" && b.g !== "femboy" || t === "nb" && b.g !== "nonbinary") return false;
       }
       return true;
     }
@@ -207,6 +207,19 @@
   var DRINK_BOUND = [
     "No hands, so %name% gets down and laps from the water trough like any animal would.",
     "%name% kneels at the water and drinks face-first, water drippin' off their nose and chin."
+  ];
+  var EAT_GAG = [
+    "%name% presses their gagged face into the trough and works the mash in round the edges of the gag, most of it endin' up on their chin.",
+    "%name% can't chew past the gag, so they suck the soft feed in a bit at a time, droolin' mash down their front.",
+    "%name% mashes their face into the feed and gets what they can past the gag, snortin', smeared to the ears.",
+    "Feed squeezes in round the gag a mouthful at a time while %name% gulps and dribbles, determined not to go hungry.",
+    "%name% laps the wet mash off the trough's edge round the gag, slow and sloppy, and comes up glazed in it."
+  ];
+  var DRINK_GAG = [
+    "%name% dunks their gagged mouth in the water and lets it run in round the gag, gulpin' and splutterin'.",
+    "Water dribbles in past the gag a sip at a time while %name% kneels at the trough, half of it runnin' down their chest.",
+    "%name% tips their head and lets the water pour in round the gag, swallowin' hard, soaked to the collar.",
+    "%name% slurps noisily through the gag, chin drippin', and keeps at it till the thirst lets go."
   ];
   var DRINK_FUNNEL = [
     "A farmhand tips a ladle of water into %name%'s funnel, and they swallow it down, eyes watering.",
@@ -642,12 +655,14 @@
   var kindOf = (mn) => animalOf(api2, mn);
   var bound = (g) => !!(g.arms || g.paws || g.hands);
   function eatPool(mn, g) {
+    if (mouthFull(mn) && Math.random() < 0.8) return EAT_GAG;
     const k = EAT_KIND[kindOf(mn).key];
     if (bound(g) && Math.random() < 0.7) return EAT_BOUND;
     return k && Math.random() < 0.6 ? k : EAT2;
   }
   function drinkPool(mn, g) {
     if (api2.funnelOn && api2.funnelOn(mn)) return DRINK_FUNNEL;
+    if (mouthFull(mn) && Math.random() < 0.8) return DRINK_GAG;
     const k = DRINK_KIND[kindOf(mn).key];
     if (bound(g) && Math.random() < 0.7) return DRINK_BOUND;
     return k && Math.random() < 0.5 ? k : DRINK2;
@@ -658,7 +673,10 @@
     return k && r < 0.75 ? k : GROOM2;
   }
   var words = (mn, extra) => Object.assign({ name: api2.name(mn), a: kindOf(mn).a, call: kindOf(mn).call }, extra || {});
-  var mouthShut = (mn) => !!(api2.holeBlocked && api2.holeBlocked(mn, "mouth")) || !!gearOf(api2, mn).gag;
+  var mouthFull = (mn) => {
+    const g = gearOf(api2, mn);
+    return !!(api2.holeBlocked && api2.holeBlocked(mn, "mouth")) || !!g.gag || !!g.ringGag;
+  };
   function tick() {
     if (D2().farmOff) return;
     const now = Date.now(), here = new Set(api2.here());
@@ -706,7 +724,6 @@
     }
     const n = needsOf2(mn);
     if (n.food >= 95) return reply("You're stuffed already, sugar.");
-    if (mouthShut(mn) || api2.funnelOn && api2.funnelOn(mn)) return reply("You can't eat with your mouth stopped up like that, sugar. Get somebody to take it out first.");
     d.troughs[t] = left - 1;
     n.food = Math.min(FULL, n.food + 50);
     n.warned.food = 100;
@@ -719,7 +736,6 @@
     if (!near(mn, "water")) return reply("You need to be at a water spot to drink, sugar (a spot called water-\u2026).");
     const n = needsOf2(mn);
     if (n.water >= 95) return reply("You're not thirsty right now, hon.");
-    if (mouthShut(mn)) return reply("You can't drink with your mouth stopped up like that, sugar. Get somebody to take it out first.");
     n.water = Math.min(FULL, n.water + 60);
     n.warned.water = 100;
     api2.emote("\u{1F4A7} " + fill(lineFor(api2, mn, drinkPool(mn, gearOf(api2, mn)), "drink"), words(mn)), mn);

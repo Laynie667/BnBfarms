@@ -16,4 +16,25 @@
                  { when: "hold", slot: "arms", label: "Behind-the-Back Cuffs", items: ["LeatherCuffs", "SteelCuffs"],
                    desc: "Cuffs that keep their hands behind them, so there's nothing to wipe with and nothing to hide behind." }],
   });
-
+  // the themed traps (10ub-themed-traps.js), Oct 19
+  Object.assign(TRAP_GEAR, {
+    groomer:     [{ when: "hold", slot: "leash", label: "Grooming Noose", items: ["CollarLeash", "ChainLeash"], desc: "The grooming table's steel arm and its loop, clipped to the collar so they stand still and pretty for the brush." },
+                  { when: "after", slot: "tag", label: "Best in Kennel Rosette", items: ["CollarNameTagPet", "CollarBell"], mins: 30, desc: "A big satin rosette on the collar, BEST IN KENNEL in gold thread, still smelling of show shampoo." }],
+    whelping:    [{ when: "hold", slot: "device", label: "Whelping Box", items: ["Kennel", "LowCage"], desc: "A low padded box in a warm shed, built for one thing, with a sign above it: BREEDING IN PROGRESS." }],
+    leashpost:   [{ when: "hold", slot: "leash", label: "Yard Post Lead", items: ["ChainLeash", "CollarLeash"], desc: "A short chain from the collar to the iron post in the dog yard: just long enough to kneel, too short to go anywhere." }],
+    teatcheck:   [{ when: "hold", slot: "cups", label: "Check Stall Cups", items: ["LactationPump", "NippleClamp"], desc: "The dairy girl's own stripping cups, cold steel, for gettin' the last drops out after the hand check." }],
+    wax:         [{ when: "hold", slot: "device", label: "The Bench", items: ["BondageBench", "Table"], desc: "The farm's punishment bench, buckled at the wrists, waist and knees, with a candle burning on the shelf beside it." }],
+    tomatoes:    [{ when: "hold", slot: "device", label: "Square Stocks", items: ["WoodenStocks"], desc: "The old wooden stocks in the middle of the square, stained red from a hundred fruit-throwing Sundays." }],
+    trophy:      [{ when: "hold", slot: "device", label: "Trophy Mount", items: ["XFrame", "X-Cross", "TheDisplayFrame"], desc: "A plank frame on the cabin's trophy wall, between the elk and the bear, with a brass plate underneath: LOCAL GAME." }],
+    hottub:      [{ when: "hold", slot: "arms", label: "Lumberjack's Grip", items: ["HempRope", "LeatherCuffs"], desc: "A length of logging rope round the wrists, so they don't float off while they're passed round the tub." }],
+    slop:        [],
+    hogtie:      [{ when: "hold", slot: "ropeFeet", label: "Hog Tie", items: ["HempRope"], desc: "Rough sty rope, wrists to ankles behind the back, tied with the pig girl's rodeo knot." },
+                  { when: "hold", slot: "ropeArms", label: "Hog Tie (arms)", items: ["HempRope"], desc: "The other half of the hogtie, the wrists, cinched to the ankles." }],
+    booth:       [{ when: "hold", slot: "lips", label: "Booth Ring", items: ["RingGag"], desc: "A ring gag the booth hands out at the door, so the customers get their copper's worth." }],
+    milkinghole: [{ when: "hold", slot: "cups", label: "Through-the-Wall Cups", items: ["LactationPump"], desc: "Whatever's on the other side of the milking hole has cups, and they are very, very strong." }],
+    feedbag:     [{ when: "hold", slot: "funnel", label: "Feedbag", items: ["HarnessPonyBits", "BitGag", "FunnelGag"], desc: "A canvas feedbag strapped over the face, full of warm mash, and it doesn't come off till it's empty." }],
+    stag:        [],
+    desk:        [{ when: "after", slot: "tag", label: "AUDITED Tag", items: ["CollarNameTag", "CollarNameTagLivestock"], mins: 20, desc: "A brass tag on the collar stamped AUDITED, with the date punched in underneath." }],
+    inspection:  [{ when: "after", slot: "tag", label: "Inspection Tag", items: ["CollarNameTagLivestock", "CollarNameTag"], mins: 30, desc: "An inspection tag on the collar: FIT FOR PURPOSE, the clerk's initials, and a number." }],
+    stamp:       [],
+  });

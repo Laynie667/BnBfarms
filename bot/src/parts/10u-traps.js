@@ -175,7 +175,9 @@
 
   function springTrap(mn, kind, spot, force){
     if (kind === "random"){
-      const can = Object.keys(TRAP_KINDS).filter(k => k !== "tentacle" && !trapWhyNot(mn, k));
+      // a tile in a place springs that place's traps (10ua-trap-themes.js); nothin' fits there, or no place: any trap
+      const placed = spot ? themePool(mn, spot) : [];
+      const can = placed.length ? placed : Object.keys(TRAP_KINDS).filter(k => k !== "tentacle" && !trapWhyNot(mn, k));
       if (!can.length) return "nothin' they can spring right now";
       kind = can[Math.floor(Math.random()*can.length)];
     }
@@ -514,6 +516,7 @@
       return true;
     }
     if (cmd === "traps" || cmd === "trap"){
+      if (a0 === "themes" || a0 === "places"){ R(themesText()); return true; }   // which traps each place springs (10ua-trap-themes.js)
       if (a0 === "on" || a0 === "off"){
         if (!isSubject(sender)){ R("Only a test subject has traps to switch, sugar."); return true; }
         r.trapsOff = a0 === "off"; if (r.trapsOff) trapStop(sender, 0); r.trapQuiet = 0; saveLedger();

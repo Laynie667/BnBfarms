@@ -12,14 +12,16 @@
      • bodyTail(mn, kind): now and then a trap beat gets one more sentence about the parts they DO have: cock and
        balls, pussy, both, or a femboy's. Each named trap has its own, and there are shared ones.
   */
-  const BODY_TAG = /^(?:\{(?:nv|nc|nt|fu|fb|ok|v|c|t|f|m)\})+/;   // {ok}: already fitted (an add-on did it), leave it be
+  const BODY_TAG = /^(?:\{(?:nv|nc|nt|fu|fb|nb|ok|v|c|t|f|m)\})+/;   // {nb}: nonbinary (Oct 19)   // {ok}: already fitted (an add-on did it), leave it be
   const VULVA_WORDS = /\b(pussy|pussies|cunt|cunts|slit|womb|clit|cervix)\b/i;
   const TITS_WORDS = /\b(tits?|titties|breasts?|udders?|teats?|cleavage)\b/i;
   const GIRL_WORDS = /\b(girl|heifer|mare|broodmare)\b/i;
   function bodyOf(mn){
     const r = rec(mn) || {}, set = r.gender || "", vulva = hasVulva(mn), cock = makesSemen(mn);
     const g = set || (r.futa || (vulva && cock) ? "futa" : vulva ? "female" : "male");
-    return { g, vulva, cock, tits: g === "female" || g === "futa" };
+    // tits: their ?chest says first; then a nonbinary body goes by what's there (a pussy, tits too), the rest by gender
+    const tits = r.chest ? r.chest === "tits" : g === "nonbinary" ? vulva : (g === "female" || g === "futa");
+    return { g, vulva, cock, tits };
   }
   function tagsFit(line, b){
     const m = String(line).match(BODY_TAG); if (!m) return true;
@@ -29,6 +31,7 @@
       if (t === "t" && !b.tits) return false;    if (t === "nt" && b.tits) return false;
       if (t === "f" && b.g !== "female") return false; if (t === "m" && b.g !== "male") return false;
       if (t === "fu" && b.g !== "futa") return false;  if (t === "fb" && b.g !== "femboy") return false;
+      if (t === "nb" && b.g !== "nonbinary") return false;
     }
     return true;
   }
@@ -37,7 +40,7 @@
     if (BODY_TAG.test(s)) return true;                       // a tagged line was written for this body
     if (!b.vulva && VULVA_WORDS.test(s)) return false;
     if (!b.tits && TITS_WORDS.test(s)) return false;
-    if (b.g === "male" && GIRL_WORDS.test(s)) return false;
+    if ((b.g === "male" || b.g === "nonbinary") && GIRL_WORDS.test(s)) return false;
     return true;
   }
   function pickFor(mn, key, list){
@@ -51,6 +54,7 @@
   const SWAP_NO_VULVA = [[/\bpussies\b/g, "asses"], [/\bpussy\b/g, "ass"], [/\bcunts\b/g, "holes"], [/\bcunt\b/g, "hole"], [/\bslit\b/g, "crack"], [/\bwomb\b/g, "belly"], [/\bcervix\b/g, "guts"], [/\bclit\b/g, "cock"]];
   const SWAP_FLAT = [[/\btits\b/g, "chest"], [/\btit\b/g, "nipple"], [/\btitties\b/g, "chest"], [/\bbreasts\b/g, "chest"], [/\bbreast\b/g, "chest"], [/\budders\b/g, "chest"], [/\budder\b/g, "chest"], [/\bteats\b/g, "nipples"], [/\bteat\b/g, "nipple"], [/\bcleavage\b/g, "chest"]];
   const SWAP_FEMBOY = [[/\btits\b/g, "soft little chest"], [/\btitties\b/g, "soft little chest"], [/\bbreasts\b/g, "soft little chest"], [/\bbreast\b/g, "chest"], [/\budders\b/g, "puffy nipples"], [/\budder\b/g, "chest"], [/\bteats\b/g, "puffy nipples"], [/\bteat\b/g, "nipple"], [/\bcleavage\b/g, "chest"]];
+  const SWAP_NB = [[/\bgood girl\b/g, "good pet"], [/\bgirl\b/g, "darlin'"], [/\bheifer\b/g, "yearlin'"], [/\bbroodmare\b/g, "breeder"], [/\bmare\b/g, "breeder"]];
   const SWAP_MALE = [[/\bgood girl\b/g, "good boy"], [/\bgirl\b/g, "boy"], [/\bheifer\b/g, "steer"], [/\bbroodmare\b/g, "stud"], [/\bmare\b/g, "colt"]];
   function bodyWords(mn, text){
     try {
@@ -62,6 +66,7 @@
       if (!b.vulva) for (const [re, w] of SWAP_NO_VULVA) t = t.replace(re, w);
       if (!b.tits) for (const [re, w] of (b.g === "femboy" ? SWAP_FEMBOY : SWAP_FLAT)) t = t.replace(re, w);
       if (b.g === "male") for (const [re, w] of SWAP_MALE) t = t.replace(re, w);
+      if (b.g === "nonbinary") for (const [re, w] of SWAP_NB) t = t.replace(re, w);
       return t;
     } catch(e){ return String(text); }
   }

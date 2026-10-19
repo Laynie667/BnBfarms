@@ -32,7 +32,7 @@ const toSince=(mn,n)=>sent.slice(n).filter(s=>(s[0]==='AccountBeep'&&s[1].Member
   out('1 not an animal: asked again ->', /didn't catch an animal/.test(toSince(900,n)), /what kind of animal/i.test(toSince(900,n)));
   await B(900,'goat');
   n=sent.length; await B(900,'girl');
-  out('2 wrong gender asked again ->', /female, male, futa or femboy/.test(toSince(900,n)));
+  out('2 wrong gender asked again ->', /female, male, futa, femboy or nonbinary/.test(toSince(900,n)));
   await B(900,'femboy');
   n=sent.length; await B(900,'a fortnight');
   out('3 length understood ->', !/Pick one/.test(toSince(900,n)));

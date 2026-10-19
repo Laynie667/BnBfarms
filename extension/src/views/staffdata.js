@@ -104,28 +104,9 @@ function spotsCard(ctx) {
         : btn("Clear all spots…", () => ctx.setUi({ clearAllSpots: true })))) : null);
 }
 
-export function voice(ctx) {
-  const v = ctx.s.voice;
-  if (!v) return [muted("Listen to my voice is for herd leaders.")];
-  const target = ctx.ui.vTarget || "herd";
-  const member = v.members.find((m) => String(m.mn) === String(target));
-  const cur = target === "herd" ? v.herd : member || { on: false, lines: [], every: "15" };
-  const who = target === "herd" ? "herd" : String(target);
+// (the herd's voice lines: retired Oct 19. What's left here is the ECHS card.)
+export function voice() {
   return [
-    card(h("div", { class: "fhc-kv" }, h("div", null, title("Listen to my voice"), muted("Lines drift in privately, like a voice in their head. Only for stock who said ?hypno on.")),
-        h("button", { type: "button", class: "fhc-sw" + (cur.on ? " on" : ""), "aria-pressed": cur.on ? "true" : "false", "aria-label": "Voice on or off",
-          onclick: () => ctx.send("voice " + (cur.on ? "off" : "on") + " " + who) }, h("span"))),
-      h("div", { style: { marginTop: "6px" } },
-        h("button", { type: "button", class: "fhc-pill" + (target === "herd" ? " on" : ""), onclick: () => ctx.setUi({ vTarget: "herd" }) }, "Whole herd"),
-        v.members.map((m) => h("button", { type: "button", class: "fhc-pill" + (String(target) === String(m.mn) ? " on" : ""), onclick: () => ctx.setUi({ vTarget: m.mn }) },
-          m.name + (m.hypno ? "" : " (no ?hypno)")))),
-      (cur.lines || []).length ? cur.lines.map((l, i) => h("div", { class: "fhc-kv" }, h("i", { style: { color: "#c9a3e6" } }, "[Voice] " + l),
-        h("button", { type: "button", class: "fhc-b", onclick: () => ctx.send("voice remove " + who + " " + (i + 1)) }, "Remove"))) : muted("No lines yet."),
-      h("label", { class: "fhc-label" }, "New line · %name% works", h("input", { class: "fhc-in", maxlength: 200, value: ctx.ui.vDraft || "", oninput: (e) => ctx.setUi({ vDraft: e.target.value }, true) })),
-      btn("Add", () => { const t = (ctx.ui.vDraft || "").trim(); if (!t) return ctx.hint("Write the line first."); ctx.send("voice add " + who + " " + t); ctx.setUi({ vDraft: "" }); }, true),
-      h("label", { class: "fhc-label" }, "How often", h("select", { class: "fhc-sel", onchange: (e) => ctx.send("voice every " + who + " " + e.target.value) },
-        [["5", "Every 5 minutes"], ["15", "Every 15 minutes"], ["30", "Every 30 minutes"], ["chores", "Only during milkin' and chores"]].map(([k, l]) =>
-          h("option", { value: k, selected: String(cur.every) === k ? "selected" : null }, l))))),
     card(title("ECHS sessions by depth"), muted("Still their ECHS: they agree to every induction, and their own switches and safeword win."),
       [["Fun", "Drifting · Yielding", "Not noticin' clothes or touches, posture, can't touch yourself, made to act"],
        ["Deep", "Entranced", "Follow and leash, made to speak, hears only your voice, arousal and orgasm"],

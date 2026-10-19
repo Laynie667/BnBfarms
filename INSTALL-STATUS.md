@@ -5,15 +5,15 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 | Script | File in `dist/` | Where it runs | Current |
 |---|---|---|---|
-| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.35.0** |
+| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.36.0** |
 | Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.7.0** |
 | Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.2.1** |
 | Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **1.1.0** |
-| Barn life | `farmhand-barn-life.user.js` | the bot's PC | **1.1.0** |
+| Barn life | `farmhand-barn-life.user.js` | the bot's PC | **1.2.1** |
 | Map tools, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.4** |
 | Dairy | `farmhand-dairy.user.js` | the bot's PC | **1.1.0** |
 | Shows | `farmhand-shows.user.js` | the bot's PC | **1.1.0** |
-| Farmhand Companion | `farmhand-companion.user.js` | each player | **0.29.1** |
+| Farmhand Companion | `farmhand-companion.user.js` | each player | **0.30.0** |
 | Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.4** |
 
 ## Sending a watch report
@@ -23,6 +23,18 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 - Running the watcher on more than one game at once (the bot, yours, a tester's) lets Claude line them up into one timeline.
 
 ## Latest changes (newest first)
+
+- **Bot 0.36.0, Companion 0.30.0, Barn life 1.2.1: Laynie's Oct 19 list.**
+  - **The game's R133.** The game now takes a drawing handed to it as itself (and keeps nothing), and keeps and lets go of its own pictures. The drawn body, the messes and the studio hand their drawings over directly on R133 (no picture addresses made, trimmed or kept), the picture trim stands aside, and the memory log reads R133's picture list. Same look in the studio side by side; older game versions still work as before.
+  - **Gags never keep anybody from the trough or the water** (Barn life; Laynie: "the gags stop players from eating and drinking at the trough, so need to skip checking gags"): gagged, they eat and drink round it, with their own messy lines.
+  - **The mess shelf** has its own card in the Store tab: "On them" with a name box, "On me", and the ?messes on switch.
+  - **Retired:** the tease lines (?tease, ?teaseme) and the herd's voice lines (?voice, ?hypno). The commands say so; the Staff panel's Tease and Voice tabs are gone (the ECHS card stays, under ECHS).
+  - **The record.** Everything that lands in a player's chat, their beeps, and the commands they send the farm go to the bot once a minute, privately, the same words from two places kept once. Always for the proprietors (no switch), opt-in for everybody else (the last switch in their settings). The bot keeps it by the hour in the browser's database for two weeks and, with the 💾 folder picked, writes logs/record-<member>-<date>-<hour>.txt. Laynie (CFG.LOG_READERS) has a **Log** tab on the Staff panel: whose, how far back, which kind of line, words to look for, and save as a file.
+  - **Preferences → Extensions → Farmhand Companion.** The Companion's own page in the game's settings: switching the Companion off (after a reload, nothing runs but that page), the drawn body, this panel's switches, the record, the settings file, the memory log and the guides. The panel's Toggles keep the farm's switches and a button to it.
+  - **Contracts with BC+ conditions.** The Contracts tab has "When the rules apply": rooms (public/private), room names in or not in, who's there (member numbers), BC+ roles there or not, a time of day, and which rules (all by default). Typed: ?contract offer deep Bessie 1w when room=private names=farm with=221397 role=owner time=20:00-06:00 only=pet.speech. Preview shows them.
+  - **Traps by place.** A plain trap tile (trap, trap-1…) springs the traps of the place it's nearest (a spot named kennel…, cabin…, pigsty…, office…, glory-…, trough-…, milking…, stocks, bench, pasture, water-…/well…); trap-theme-<place> picks a place outright; ?traps themes lists them. **18 new traps**: groomer, whelping, leashpost (kennel) · teatcheck (stalls) · wax (bench) · tomatoes (stockade) · bearskin, trophy, hottub (cabin) · slop, hogtie (pigsty) · booth, milkinghole (glory) · feedbag (trough) · stag (wildlife, pasture) · desk, inspection, stamp (office); each with lines that fit the body, gear, and a mess.
+  - **Nonbinary.** ?gender nonbinary (or enby, nb): their body goes by what their character has (?futa on for both), ?chest flat or ?chest tits says what's up top, no "girl" words, and {nb} lines are theirs.
+  - tests/oct19.test.cjs. **Bot, Companion and Barn life.**
 
 - **Companion 0.29.1, studio: clothes and restraints fit the drawn body again.** Laynie: "for some reason, the draw order changed on the studio between breast, belly and clothes/restraints." Since Companion 0.26.2 the helper that keeps the fitted pieces was called put, the same name the drawing step uses for its brush, so inside the drawing the fitted pieces were drawn raw instead of kept: shirts and harnesses unfitted, under the breasts and cut off. Fixed (keepIn), and the kept pieces are only ever let go between drawings. Side by side in the studio with the version from before, the same. **Companion and studio.**
 

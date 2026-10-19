@@ -293,8 +293,11 @@
           case "show": {
             const tpl = contractTemplate(name);
             if (!tpl){ R("There's no contract called '"+name+"', hon. ?contract list shows them."); break; }
-            const who = args[2] ? resolveTarget(args[2]) : sender;
-            const c = buildContract(tpl, who || sender, "1w");
+            const wi = args.findIndex(a => /^when$/i.test(a)), plain = wi >= 0 ? args.slice(0, wi) : args;
+            const when = contractWhen(wi >= 0 ? args.slice(wi + 1).join(" ") : "");
+            if (when.errs.length){ R("I couldn't read when the rules apply, sugar:\n• "+when.errs.join("\n• ")); break; }
+            const who = plain[2] ? resolveTarget(plain[2]) : sender;
+            const c = buildContract(tpl, who || sender, "1w", when);
             const problems = BCPLUS.checkContract(c);
             R(describeContract(c)+"\n\n"+(problems.length ? "⚠️ BC+ wouldn't take it yet:\n• "+problems.join("\n• ") : "✅ BC+ "+BCPLUS.BCPLUS_VERSION+" will take this one as it is."));
             break;
@@ -302,8 +305,9 @@
           case "offer": {
             if (!boss){ R("Offerin' contracts is for herdmasters and proprietors, sugar."); break; }
             const t = resolveTarget(args[2]);
-            if (!name || !t || !args[3]){ R("Here's how, sugar: ?contract offer <contract> <who> <how long>. How long is 1h, 12h, 1d, 1w, 2w, 1m or perm. For example: ?contract offer deep Bessie 1w"); break; }
-            const err = offerContract(sender, name, t, args.slice(3).join(" "));
+            if (!name || !t || !args[3]){ R("Here's how, sugar: ?contract offer <contract> <who> <how long>. How long is 1h, 12h, 1d, 1w, 2w, 1m or perm. For example: ?contract offer deep Bessie 1w. Add when the rules apply at the end: when room=private names=farm with=221397 role=owner time=20:00-06:00 only=pet.speech"); break; }
+            const wi = args.findIndex(a => /^when$/i.test(a));   // ?contract offer deep Bessie 1w when room=private time=20:00-06:00
+            const err = offerContract(sender, name, t, (wi >= 0 ? args.slice(3, wi) : args.slice(3)).join(" "), wi >= 0 ? args.slice(wi + 1).join(" ") : "");
             R(err || "📜 Offered to "+plainName(t)+"! It's on their BC+ Contracts page now. I'll tell you when they sign.");
             break;
           }
@@ -507,7 +511,9 @@
         break;
       }
 
-      case "hypno": {
+      case "hypno": case "voice": case "tease": case "teaseme": if (!RETIRED_ON) { R("That one's been retired, sugar: the farm doesn't send tease lines or herd voice lines any more."); break; }
+      // eslint-disable-next-line no-fallthrough
+      case "hypno-old": {
         const r = rec(sender);
         if (!r || !r.roles.length){ R("That's just for folks on the books, sugar."); break; }
         const v = String(args[0]||"").toLowerCase();
@@ -518,7 +524,7 @@
         break;
       }
 
-      case "voice": {
+      case "voice-old": {
         // herd leaders: ?voice · ?voice on|off herd|<who> · ?voice add herd|<who> <line> · ?voice remove herd|<who> <n> · ?voice every herd|<who> 5|15|30|chores
         voiceLedger();
         const sub = String(args[0]||"").toLowerCase(), who = String(args[1]||"").toLowerCase();
@@ -1620,10 +1626,10 @@ Welcome to B&B Farm, hon. 🌾`);
           setApp("species", r.species);
           said = "their species";
         } else if (key === "gender"){
-          const g = val.toLowerCase();
+          const g = genderWord(val);
           if (clear){ if (r.gender === "futa") r.futa = false; r.gender = ""; }
           else {
-            if (!GENDERS.includes(g)){ R("Just one of these, hon: female, male, futa or femboy (or clear)."); break; }
+            if (!GENDERS.includes(g)){ R("Just one of these, hon: female, male, futa, femboy or nonbinary (or clear)."); break; }
             if (g === "futa" && limitBlocks(t, "futa")){ R("Their hard limits rule out futa, sugar, so I'll leave it."); break; }
             const was = r.gender; r.gender = g;
             if (g === "futa") r.futa = true; else if (was === "futa") r.futa = false;
@@ -1787,7 +1793,7 @@ Welcome to B&B Farm, hon. 🌾`);
       }
 
       /* ── TEASING ── */
-      case "tease": {
+      case "tease-old": {
         const sub = String(args[0]||"list").toLowerCase();
         if (sub === "add"){
           const line = args.slice(1).join(" ").trim();
@@ -1809,7 +1815,7 @@ Welcome to B&B Farm, hon. 🌾`);
         break;
       }
 
-      case "teaseme": {
+      case "teaseme-old": {
         const r = rec(sender);
         if (!r || !r.roles.length){ R("That's just for folks on the books, sugar. Say ?apply first!"); break; }
         const v = String(args[0]||"").toLowerCase();
@@ -1871,21 +1877,31 @@ Welcome to B&B Farm, hon. 🌾`);
       }
 
       case "gender": {
-        // ?gender → yours · ?gender <female|male|futa|femboy> · staff: ?gender <who> <gender>
-        let t = sender, g = String(args[0]||"").toLowerCase();
-        if (args.length > 1){ t = resolveTarget(args[0]); g = String(args[1]||"").toLowerCase(); if (t !== sender && !isStaff(sender)){ R("Only staff can set somebody else's, sugar."); break; } }
+        // ?gender → yours · ?gender <female|male|futa|femboy|nonbinary> · staff: ?gender <who> <gender>
+        let t = sender, g = genderWord(args[0]);
+        if (args.length > 1 && !/^non$/i.test(args[0])){ t = resolveTarget(args[0]); g = genderWord(args.slice(1).join(" ")); if (t !== sender && !isStaff(sender)){ R("Only staff can set somebody else's, sugar."); break; } }
+        else if (args.length > 1) g = genderWord(args.join(" "));
         const r = t && rec(t);
         if (!r || !r.roles.length){ R("That's just for folks on the books, sugar. ?apply first!"); break; }
-        if (!g){ R((t === sender ? "You're" : plainName(t)+" is")+" down as "+(r.gender || "not set yet")+", hon. Pick one with ?gender female, male, futa or femboy."); break; }
-        if (!GENDERS.includes(g)){ R("Just one of these, hon: ?gender female, male, futa or femboy."); break; }
+        if (!g){ R((t === sender ? "You're" : plainName(t)+" is")+" down as "+(r.gender || "not set yet")+", hon. Pick one with ?gender female, male, futa, femboy or nonbinary."); break; }
+        if (!GENDERS.includes(g)){ R("Just one of these, hon: ?gender female, male, futa, femboy or nonbinary."); break; }
         if (g === "futa" && limitBlocks(t,"futa")){ R("Their hard limits rule out futa, sugar, so I'll leave it."); break; }
         const was = r.gender; r.gender = g;
         if (g === "futa") r.futa = true; else if (was === "futa") r.futa = false;
         prodOf(t); saveLedger(); audit(sender, "GENDER", t+" "+g);
-        R("🌸 "+(t === sender ? "You're" : plainName(t)+" is")+" down as "+g+" now, sugar."+(g === "futa" ? " Futa makes milk and semen both." : "")+" It picks your farm outfit, too.");
+        R("🌸 "+(t === sender ? "You're" : plainName(t)+" is")+" down as "+g+" now, sugar."+(g === "futa" ? " Futa makes milk and semen both." : "")+
+          (g === "nonbinary" ? " Your body's whatever your character has (?futa on for both), and ?chest flat or ?chest tits says which up top." : "")+" It picks your farm outfit, too.");
         break;
       }
 
+      case "chest": {
+        const r = rec(sender), a = String(args[0] || "").toLowerCase();
+        if (!r || !r.roles.length){ R("That's just for folks on the books, sugar."); break; }
+        if (!/^(flat|tits|clear)$/.test(a)){ R("Your chest, as the farm's lines see it: "+(r.chest || "as your gender says")+". ?chest flat · ?chest tits · ?chest clear"); break; }
+        r.chest = a === "clear" ? "" : a; saveLedger(); audit(sender, "CHEST", a);
+        R(a === "clear" ? "🌸 Your chest goes by your gender again, sugar." : "🌸 The farm's lines will see you "+(a === "flat" ? "flat-chested" : "with tits")+" from now on, sugar.");
+        break;
+      }
       case "futa": {
         const r = rec(sender);
         if (!r || !r.roles.length){ R("You'll need to be on the books first, hon. ?apply and we'll get you sorted. 🌾"); break; }

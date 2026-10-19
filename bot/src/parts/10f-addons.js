@@ -107,7 +107,7 @@
   // lack is swapped for one they have, and a {tag} on the front never shows. Every add-on gets this, old ones too.
   // A tag anywhere in the line (an add-on puttin' "🔥 " in front of a fitted line, or joinin' fitted pieces) means it was
   // written or fitted for the body already: the tags come off and nothin' is swapped.
-  const ANY_TAG = /\{(?:nv|nc|nt|fu|fb|ok|v|c|t|f|m)\}/g;
+  const ANY_TAG = /\{(?:nv|nc|nt|fu|fb|nb|ok|v|c|t|f|m)\}/g;
   const untag = (t) => String(t).replace(ANY_TAG, "");
   const fitTo = (mn, t) => {
     const s = String(t);

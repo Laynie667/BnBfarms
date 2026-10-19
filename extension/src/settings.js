@@ -57,7 +57,7 @@ function open() {
   close();
   box = W.document.createElement("div");
   box.id = "fhc-settings";
-  box.style.cssText = "position:fixed;left:50%;top:3%;transform:translateX(-50%);width:min(860px,96vw);max-height:94vh;overflow-y:auto;z-index:2147483000;padding:14px 18px;border-radius:10px;box-shadow:0 6px 30px rgba(0,0,0,0.6)";
+  // where it sits is in styles.js (#fhc-settings): a centred card on a wide screen, the whole screen on a phone
   W.document.body.appendChild(box);
   draw();
 }

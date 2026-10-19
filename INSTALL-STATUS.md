@@ -13,7 +13,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 | Map tools, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.4** |
 | Dairy | `farmhand-dairy.user.js` | the bot's PC | **1.1.0** |
 | Shows | `farmhand-shows.user.js` | the bot's PC | **1.1.0** |
-| Farmhand Companion | `farmhand-companion.user.js` | each player | **0.30.0** |
+| Farmhand Companion | `farmhand-companion.user.js` | each player | **0.30.1** |
 | Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.4** |
 
 ## Sending a watch report
@@ -23,6 +23,8 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 - Running the watcher on more than one game at once (the bot, yours, a tester's) lets Claude line them up into one timeline.
 
 ## Latest changes (newest first)
+
+- **Companion 0.30.1: the Farmhand settings page fits a phone.** Laynie: "need to tweak the extension menu so it resides properly on mobile as well." On a phone (or any narrow screen) Preferences → Extensions → Farmhand Companion takes the whole screen, scrolls inside itself, keeps its tabs at the top while you scroll, and nothing spills off the side; boxes are phone-sized so the browser doesn't zoom. (The Log tab was already only on 221397's Companion: CFG.LOG_READERS.) **Companion.**
 
 - **Bot 0.37.0, Glory stalls 1.8.0: goblins, furry, pregnancy, messy and restraint traps, and more glory hole visitors.** Laynie: "I need a ton of sexy farm traps, furry traps, pregnancy traps, messy traps, and restraints traps, and more in any combination. its my players favorite features. id also like more gloryhole visitors and types. goblin traps and visitors too."
   - **A new place, the goblin camp** (spots named goblin…, cave…, camp…, orc…): goblinraid (a raiding party, every goblin takes a turn, goblin litters), goblinpit (the breeding pit, with a goblin and his clipboard), goblinmarket (auctioned for turnips), goblincart (trussed and paraded), warband (the orc warchief's tribute).

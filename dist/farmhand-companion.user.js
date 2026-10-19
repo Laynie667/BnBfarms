@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.30.0
+// @version      0.30.1
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -230,7 +230,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.30.0";
+  var VERSION = "0.30.1";
 
   // extension/src/config.js
   var BOT_MEMBER = 260239;
@@ -251,8 +251,11 @@ One of mods you are using is using an old version of SDK. It will work for now b
     well: "#140e09"
   };
   var CSS = `
-#fhc-settings{background:var(--fh-ground);color:var(--fh-text);border:2px solid var(--fh-accent);font:14px/1.4 "Source Sans 3","Segoe UI",sans-serif}
+#fhc-settings{position:fixed;left:50%;top:3%;transform:translateX(-50%);width:min(860px,96vw);max-height:94vh;max-height:94dvh;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;z-index:2147483000;padding:14px 18px;border-radius:10px;box-shadow:0 6px 30px rgba(0,0,0,0.6);box-sizing:border-box;background:var(--fh-ground);color:var(--fh-text);border:2px solid var(--fh-accent);font:14px/1.4 "Source Sans 3","Segoe UI",sans-serif}
+@media (max-width:700px),(pointer:coarse) and (max-width:1000px){#fhc-settings{left:0;top:0;transform:none;width:100vw;height:100vh;height:100dvh;max-height:none;border-radius:0;border-width:0;padding:10px 12px calc(10px + env(safe-area-inset-bottom))}#fhc-settings h2{font-size:18px}#fhc-settings .fhc-row{position:sticky;top:-10px;background:var(--fh-ground);z-index:1}}
+@media (pointer:coarse){#fhc-settings input,#fhc-settings select,#fhc-settings textarea{font-size:16px}#fhc-settings button{min-height:38px}}
 #fhc-settings button{font:inherit;cursor:pointer}
+#fhc-settings{overflow-x:hidden}#fhc-settings input,#fhc-settings select,#fhc-settings textarea{max-width:100%;min-width:0;box-sizing:border-box}#fhc-settings label select,#fhc-settings .fhc-kv select{flex:1 1 0;width:auto}
 #fhc-settings h2{font-family:Bitter,Georgia,serif;color:var(--fh-accent)}
 #fhc-btn{position:fixed;right:12px;bottom:12px;z-index:9999;width:46px;height:46px;border-radius:50%;
   border:2px solid var(--fh-accent);background:#3b2a1a;color:#fff;font-size:22px;cursor:pointer;box-shadow:0 2px 8px #0008}
@@ -5300,7 +5303,6 @@ One of mods you are using is using an old version of SDK. It will work for now b
     close();
     box = W7.document.createElement("div");
     box.id = "fhc-settings";
-    box.style.cssText = "position:fixed;left:50%;top:3%;transform:translateX(-50%);width:min(860px,96vw);max-height:94vh;overflow-y:auto;z-index:2147483000;padding:14px 18px;border-radius:10px;box-shadow:0 6px 30px rgba(0,0,0,0.6)";
     W7.document.body.appendChild(box);
     draw();
   }

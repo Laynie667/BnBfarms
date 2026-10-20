@@ -13,7 +13,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 | Map tools, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.4** |
 | Dairy | `farmhand-dairy.user.js` | the bot's PC | **1.1.0** |
 | Shows | `farmhand-shows.user.js` | the bot's PC | **1.1.0** |
-| Farmhand Companion | `farmhand-companion.user.js` | each player | **0.31.4** |
+| Farmhand Companion | `farmhand-companion.user.js` | each player | **0.31.5** |
 | Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.4** |
 
 ## Sending a watch report
@@ -23,6 +23,8 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 - Running the watcher on more than one game at once (the bot, yours, a tester's) lets Claude line them up into one timeline.
 
 ## Latest changes (newest first)
+
+- **Companion 0.31.5: messes on Echo bodies.** Laynie's /farmmess found it: her body comes from Echo's mod (Override/EchoV2), which draws worn things first and the skin late. The mess went on as soon as the first piece of skin (her kneeling legs) was drawn, trimmed to just that, before her upper body and head were even drawn, so nothing showed. Now the mess waits until all of the skin is drawn (as much as the last whole drawing had) and is trimmed to all of it. Checked with Echo's drawing order in a simulation.
 
 - **Companion 0.31.4: a mess shows even when the Companion can't find your skin.** Laynie's /farmmess: 11 messes on her list, drawn 32 times, "skin pictures seen: NONE", so every mess was trimmed to nothing. Skin is now found by its folder wherever the picture comes from, and with none found the mess goes on untrimmed instead of vanishing. /farmmess also shows the first pictures drawn, to find out why.
 

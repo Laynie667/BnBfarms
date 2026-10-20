@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.31.4
+// @version      0.31.5
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -230,7 +230,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.31.4";
+  var VERSION = "0.31.5";
 
   // extension/src/config.js
   var BOT_MEMBER = 260239;
@@ -4845,6 +4845,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   });
   var BODY = /(?:^|\/)(?:BodyUpper|BodyLower|Head|Arms|ArmsLeft|ArmsRight|Hands|HandsLeft|HandsRight|Pussy)\/[^?#]*\.(?:png|webp|jpe?g)/i;
   var made2 = /* @__PURE__ */ new Map();
+  var skinOf = /* @__PURE__ */ new Map();
   function forget(src) {
     if (!src || typeof src !== "string") return;
     setTimeout(() => {
@@ -4941,12 +4942,18 @@ One of mods you are using is using an old version of SDK. It will work for now b
         const list = listFor(C);
         if (C === W4.Player) DIAG.got++;
         if (!list.length) return next(args);
-        const body2 = [], sample = [];
+        const body2 = [], all = [], sample = [];
         let canv = 0, done = false;
+        const before = skinOf.get(C.MemberNumber) || [];
         const lay = () => {
           if (done) return;
           done = true;
           try {
+            const have = new Set(body2.map((b) => b[0]));
+            for (const b of before) if (!have.has(b[0])) {
+              body2.push(b);
+              have.add(b[0]);
+            }
             const p = messPicture(C, list, body2);
             if (C === W4.Player) {
               DIAG.draws++;
@@ -4973,11 +4980,13 @@ One of mods you are using is using an old version of SDK. It will work for now b
               if (sample.length < 6) sample.push(src.replace(/^.*\/(?=[^/]+\/[^/]+$)/, ""));
             } else canv++;
           }
+          if (typeof src === "string" && BODY.test(src) && !all.some((b) => b[0] === src)) all.push([src, x, y]);
           if (typeof src === "string" && !done) {
-            if (BODY.test(src)) body2.push([src, x, y]);
-            else {
+            if (BODY.test(src)) {
+              if (!body2.some((b) => b[0] === src)) body2.push([src, x, y]);
+            } else {
               const m = groupRe.exec(src);
-              if (m && !SKIN.test(m[1]) && body2.length) lay();
+              if (m && !SKIN.test(m[1]) && body2.length && body2.length >= before.length) lay();
             }
           }
           return real[name](src, x, y, ...rest);
@@ -4987,6 +4996,11 @@ One of mods you are using is using an old version of SDK. It will work for now b
         args[1] = Object.assign({}, real, wrap);
         const out = next(args);
         lay();
+        if (all.length) {
+          const was = skinOf.get(C.MemberNumber);
+          skinOf.set(C.MemberNumber, all);
+          if (!was || was.map((b) => b[0]).join() !== all.map((b) => b[0]).join()) redrawMn2(C.MemberNumber, 120);
+        }
         return out;
       });
       sdk3.hookFunction("ChatRoomSync", 0, (args, next) => {

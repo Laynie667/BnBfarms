@@ -80,6 +80,9 @@ if (W.FarmMess && W.FarmMess.loadStamps) W.FarmMess.loadStamps("").then((n) => {
 const BODY = /(?:^|\/)(?:BodyUpper|BodyLower|Head|Arms|ArmsLeft|ArmsRight|Hands|HandsLeft|HandsRight|Pussy)\/[^?#]*\.(?:png|webp|jpe?g)/i;
 // one picture per character, made again only when their list or their body changes
 const made = new Map();   // member → { key, src, dx, dy }
+// every skin picture of their last whole drawing: some bodies (Echo's, EchoV2) draw the skin late, after what's worn,
+// so this drawing's skin isn't all there yet when the mess goes on (Laynie, Oct 20: only her kneeling legs were seen)
+const skinOf = new Map();   // member → [[src, x, y]]
 // an old picture comes out of the game's lists once the new one has had time to load: the game keeps every picture it's
 // handed (and a copy on the graphics card) for good, so without this every pose, every new mess and every minute of a
 // fresh one running piled up another picture till the page ran out of room and crashed
@@ -127,10 +130,14 @@ function hook() {
       const C = args[0], real = args[1];
       if (!C || !real || typeof real.drawImage !== "function" || !W.FarmMess) return next(args);
       const list = listFor(C); if (C === W.Player) DIAG.got++; if (!list.length) return next(args);
-      const body = [], sample = []; let canv = 0, done = false;
+      const body = [], all = [], sample = []; let canv = 0, done = false;
+      const before = skinOf.get(C.MemberNumber) || [];
       const lay = () => {
         if (done) return; done = true;
         try {
+          // this drawing's skin so far, and the rest from the last whole drawing
+          const have = new Set(body.map((b) => b[0]));
+          for (const b of before) if (!have.has(b[0])) { body.push(b); have.add(b[0]); }
           const p = messPicture(C, list, body);
           if (C === W.Player) { DIAG.draws++; DIAG.draw = { at: Date.now(), list: list.length, body: body.map((b) => String(b[0]).replace(/^.*Assets\/[^/]+\//, "") + "@" + b[1] + "," + b[2]), sample: sample.slice(), canv, pic: p ? (p.src ? (typeof p.src === "string" ? "picture" : "drawing " + p.src.width + "x" + p.src.height) : "empty") : "waiting for the body pictures" }; }
           if (p && p.src) {
@@ -141,9 +148,11 @@ function hook() {
       };
       const seen = (name) => (src, x, y, ...rest) => {
         if (C === W.Player) { if (typeof src === "string") { if (sample.length < 6) sample.push(src.replace(/^.*\/(?=[^/]+\/[^/]+$)/, "")); } else canv++; }
+        if (typeof src === "string" && BODY.test(src) && !all.some((b) => b[0] === src)) all.push([src, x, y]);
         if (typeof src === "string" && !done) {
-          if (BODY.test(src)) body.push([src, x, y]);
-          else { const m = groupRe.exec(src); if (m && !SKIN.test(m[1]) && body.length) lay(); }   // the first thing worn over the skin
+          if (BODY.test(src)) { if (!body.some((b) => b[0] === src)) body.push([src, x, y]); }
+          // the first thing worn over the skin, once all of it is drawn (as many skin pictures as last time)
+          else { const m = groupRe.exec(src); if (m && !SKIN.test(m[1]) && body.length && body.length >= before.length) lay(); }
         }
         return real[name](src, x, y, ...rest);
       };
@@ -151,6 +160,8 @@ function hook() {
       args[1] = Object.assign({}, real, wrap);
       const out = next(args);
       lay();
+      if (all.length) { const was = skinOf.get(C.MemberNumber); skinOf.set(C.MemberNumber, all);
+        if (!was || was.map((b) => b[0]).join() !== all.map((b) => b[0]).join()) redrawMn(C.MemberNumber, 120); }   // (the whole skin is known now: draw again with it)
       return out;
     });
     sdk.hookFunction("ChatRoomSync", 0, (args, next) => { const r = next(args); setTimeout(() => { if (mine.length) tell(true); ask(); }, 3000); return r; });

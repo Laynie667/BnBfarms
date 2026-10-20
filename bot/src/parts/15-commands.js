@@ -2622,6 +2622,14 @@ Welcome to B&B Farm, hon. 🌾`);
     const pc = state.pendingClaims.get(sender);
     if (!pc){
       const low0 = String(raw).trim().toLowerCase().replace(/^[?!.\-\/]/,"").replace(/^bot\s+/,"");
+      // the newest question gets the answer: an old breedin' ask left hangin' used to swallow the yes meant for a mess
+      // off the shelf (or an add-on's question), and the newer one just sat there (Laynie, Oct 20: the cake smash)
+      if (low0 === "yes" || low0 === "no"){
+        const atOf = (m) => { const v = m && m.get(sender); return v ? (v.at || 0) : -1; };
+        const pend = Math.max(atOf(state.breedAsks), atOf(state.jarAsks)), fa = atOf(state.farmAsks), aa = atOf(addonAsks);
+        if (fa >= 0 && fa >= pend && fa >= aa) return farmYesNo(sender, low0 === "yes");
+        if (aa >= 0 && aa >= pend) return addonYesNo(sender, low0 === "yes");
+      }
       if ((low0 === "yes" || low0 === "no") && (state.breedAsks.has(sender) || state.jarAsks.has(sender))) return answerPending(sender, low0 === "yes");
       if ((low0 === "yes" || low0 === "no") && state.farmAsks && state.farmAsks.has(sender)) return farmYesNo(sender, low0 === "yes");
       if ((low0 === "yes" || low0 === "no") && addonAsks.has(sender)) return addonYesNo(sender, low0 === "yes");

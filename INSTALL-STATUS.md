@@ -5,7 +5,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 | Script | File in `dist/` | Where it runs | Current |
 |---|---|---|---|
-| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.38.2** |
+| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.38.3** |
 | Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.9.0** |
 | Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.2.1** |
 | Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **1.1.0** |
@@ -23,6 +23,8 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 - Running the watcher on more than one game at once (the bot, yours, a tester's) lets Claude line them up into one timeline.
 
 ## Latest changes (newest first)
+
+- **Bot 0.38.3: a yes goes to the newest question.** An old breedin' or jar ask left hangin' used to take the yes meant for a mess off the shelf (or an add-on's question), so the newer one never happened. Now the newest question gets the answer.
 
 - **Bot 0.38.2, Companion 0.31.2: a mess is drawn even when the game's splatters fail.** Laynie had "Farm can mark my body" on and still saw nothing. The Companion put the game's own Splatters on first and drew the farm's mess after; if the splatters failed on somebody's outfit, the mess never went on either. Now the mess is drawn first, on its own, and if a bought mess still can't be drawn, both people hear why.
 

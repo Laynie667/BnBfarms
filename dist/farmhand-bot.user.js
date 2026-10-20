@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.38.2
+// @version      0.38.3
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -1895,7 +1895,7 @@
   ];
 
   // bot/src/version.js
-  var VERSION = "0.38.2";
+  var VERSION = "0.38.3";
 
   // bot-parts:farmhand-bot-parts
   (function() {
@@ -33092,6 +33092,15 @@ Welcome to B&B Farm, hon. \u{1F33E}`
       const pc = state.pendingClaims.get(sender);
       if (!pc) {
         const low0 = String(raw).trim().toLowerCase().replace(/^[?!.\-\/]/, "").replace(/^bot\s+/, "");
+        if (low0 === "yes" || low0 === "no") {
+          const atOf = (m) => {
+            const v = m && m.get(sender);
+            return v ? v.at || 0 : -1;
+          };
+          const pend = Math.max(atOf(state.breedAsks), atOf(state.jarAsks)), fa = atOf(state.farmAsks), aa = atOf(addonAsks);
+          if (fa >= 0 && fa >= pend && fa >= aa) return farmYesNo(sender, low0 === "yes");
+          if (aa >= 0 && aa >= pend) return addonYesNo(sender, low0 === "yes");
+        }
         if ((low0 === "yes" || low0 === "no") && (state.breedAsks.has(sender) || state.jarAsks.has(sender))) return answerPending(sender, low0 === "yes");
         if ((low0 === "yes" || low0 === "no") && state.farmAsks && state.farmAsks.has(sender)) return farmYesNo(sender, low0 === "yes");
         if ((low0 === "yes" || low0 === "no") && addonAsks.has(sender)) return addonYesNo(sender, low0 === "yes");

@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.38.0
+// @version      0.38.1
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -1895,7 +1895,7 @@
   ];
 
   // bot/src/version.js
-  var VERSION = "0.38.0";
+  var VERSION = "0.38.1";
 
   // bot-parts:farmhand-bot-parts
   (function() {
@@ -16338,17 +16338,19 @@
     function messApply(it, sender, to) {
       const pool = MESS_DO[it.id] || {}, lines = to === sender ? pool.self : pool.other;
       if (lines && lines.length) emote("\u{1F6CD}\uFE0F " + messFill(lines[Math.floor(Math.random() * lines.length)], sender, to), to);
+      let drawn = false;
       try {
-        bodyMark(to, Object.assign({ splat: it.where.slice(), mess: it.mess, amount: it.mess === "cum" ? 1.6 : 1.4 }, MESS[it.mess] ? { color: MESS[it.mess] } : it.mess === "piss" ? { color: CFG.PISS_COLOR } : {}));
+        drawn = bodyMark(to, Object.assign({ splat: it.where.slice(), mess: it.mess, amount: it.mess === "cum" ? 1.6 : 1.4, asked: true }, MESS[it.mess] ? { color: MESS[it.mess] } : it.mess === "piss" ? { color: CFG.PISS_COLOR } : {}));
       } catch (e) {
         warn("mess store:", e);
       }
-      if (it.id === "creampie") later(() => {
+      if (drawn && it.id === "creampie") later(() => {
         try {
-          bodyMark(to, { splat: ["tummy"], mess: "cum", amount: 1.2 });
+          bodyMark(to, { splat: ["tummy"], mess: "cum", amount: 1.2, asked: true });
         } catch (e) {
         }
       }, 1200);
+      if (!drawn && to !== CFG.BOT_MEMBER) tell(sender, "\u{1F6CD}\uFE0F " + (to === sender ? "You don't" : plainName(to) + " doesn't") + " have the Farmhand Companion, so the room hears it but nobody can see it on " + (to === sender ? "you" : "them") + ".");
       try {
         const tp = prodOf(to);
         if (tp) {

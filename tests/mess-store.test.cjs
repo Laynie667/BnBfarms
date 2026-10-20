@@ -58,6 +58,7 @@ const done=async(mn,ms)=>{ for(let i=0;i<60;i++){ await wait(250); if(!(W.__st()
   await say(500,'?messes on',900); ok(P(500).messesOn===true, '?messes on');
   const rb=P(221397).ribbons; n=sent.length; await say(221397,'?buy cake for Moo',1200);
   ok(marks(n,500).some(m=>m.mess==='cake') && P(221397).ribbons<rb, 'with ?messes on: no askin\', the cake goes straight on');
+  ok(marks(n,500).every(m=>m.asked===true), 'a bought mess is drawn even with "Farm can mark my body" off (asked)');
   n=sent.length; await say(221397,'?buy pie for Moo',1200);
   ok(marks(n,500).some(m=>m.mess==='cream'), '?buy pie finds the cream pie');
   P(500).limits="no food messes, nothing messy"; n=sent.length; await say(221397,'?buy honey for Moo',1200);

@@ -5,7 +5,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 | Script | File in `dist/` | Where it runs | Current |
 |---|---|---|---|
-| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.38.0** |
+| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.38.1** |
 | Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.9.0** |
 | Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.2.1** |
 | Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **1.1.0** |
@@ -13,7 +13,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 | Map tools, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.4** |
 | Dairy | `farmhand-dairy.user.js` | the bot's PC | **1.1.0** |
 | Shows | `farmhand-shows.user.js` | the bot's PC | **1.1.0** |
-| Farmhand Companion | `farmhand-companion.user.js` | each player | **0.31.0** |
+| Farmhand Companion | `farmhand-companion.user.js` | each player | **0.31.1** |
 | Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.4** |
 
 ## Sending a watch report
@@ -23,6 +23,8 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 - Running the watcher on more than one game at once (the bot, yours, a tester's) lets Claude line them up into one timeline.
 
 ## Latest changes (newest first)
+
+- **Bot 0.38.1, Companion 0.31.1: a mess off the shelf always shows.** Laynie: "I smashed cake on someone and I see it on them, but when they smashed it on me, I dont see it and they dont see it either." With "Farm can mark my body" off, the Companion drew nothing and told nobody. Now a bought mess they said yes to (or with ?messes on) is drawn whatever that switch says, and the buyer hears it plainly when the other player has no Companion to draw it.
 
 - **Bot 0.38.0, Companion 0.31.0, Glory stalls 1.9.0, Conditioning 1.1.0: polish.** Laynie: "the scenes could be expanded, more detailed, and longer... conditioning could use some polish, and the farm equipment could use some polish. like I had a knee spreader described as being a knee spreader, but it was just hemp rope and the cuffs weren't restraining me at all with their configuration."
   - **Farm gear that restrains.** The game puts most restraints on in their loosest setting, so the Companion now sets each one the way its description says: leather and steel cuffs locked at the wrists, shackles behind, wooden cuffs hands-back, leg cuffs chained, a spreader bar wide, a funnel gag with its funnel in, the milk pump on, the bench strapped, rope arms in a box tie (a piece can ask for its own, like the hogtie's Hogtied). And a piece's own item goes where that item really lives: the seed shower's spreader bar was asked for "on the legs", found no spreader there and put on hemp rope; now it goes on the ankles, wide. Checked in the studio on R133.

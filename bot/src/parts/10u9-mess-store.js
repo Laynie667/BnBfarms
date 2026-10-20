@@ -62,8 +62,11 @@
   function messApply(it, sender, to){
     const pool = MESS_DO[it.id] || {}, lines = to === sender ? pool.self : pool.other;
     if (lines && lines.length) emote("🛍️ "+messFill(lines[Math.floor(Math.random()*lines.length)], sender, to), to);
-    try { bodyMark(to, Object.assign({ splat: it.where.slice(), mess: it.mess, amount: it.mess === "cum" ? 1.6 : 1.4 }, MESS[it.mess] ? { color: MESS[it.mess] } : it.mess === "piss" ? { color: CFG.PISS_COLOR } : {})); } catch(e){ warn("mess store:", e); }
-    if (it.id === "creampie") later(() => { try { bodyMark(to, { splat: ["tummy"], mess: "cum", amount: 1.2 }); } catch(e){} }, 1200);   // and it runs
+    // asked: they bought it, or said yes, or have ?messes on, so their Companion draws it even with "Farm can mark my body" off
+    let drawn = false;
+    try { drawn = bodyMark(to, Object.assign({ splat: it.where.slice(), mess: it.mess, amount: it.mess === "cum" ? 1.6 : 1.4, asked: true }, MESS[it.mess] ? { color: MESS[it.mess] } : it.mess === "piss" ? { color: CFG.PISS_COLOR } : {})); } catch(e){ warn("mess store:", e); }
+    if (drawn && it.id === "creampie") later(() => { try { bodyMark(to, { splat: ["tummy"], mess: "cum", amount: 1.2, asked: true }); } catch(e){} }, 1200);   // and it runs
+    if (!drawn && to !== CFG.BOT_MEMBER) tell(sender, "🛍️ "+(to === sender ? "You don't" : plainName(to)+" doesn't")+" have the Farmhand Companion, so the room hears it but nobody can see it on "+(to === sender ? "you" : "them")+".");
     try { const tp = prodOf(to); if (tp){ tp.painted = { areas: Array.from(new Set(((tp.painted && tp.painted.until > Date.now()) ? tp.painted.areas : []).concat(it.where))), until: Date.now() + CFG.PAINT_H*3600000, by: sender }; } } catch(e){}
     arouse(to, it.mess === "cum" ? 25 : 10);
   }

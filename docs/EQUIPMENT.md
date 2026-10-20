@@ -1,6 +1,6 @@
 # B&B Farm equipment
 
-Everything the farm puts on somebody, built from the bot  on 2026-10-19.
+Everything the farm puts on somebody, built from the bot  on 2026-10-20.
 
 How traps are set up: staff mark a map tile with `?spot set trap-<name>` (for example `trap-bakery`). A tile named just `trap` springs a random one. Water tiles (named for a pond, stream, trough or well) hide the water traps. A subject who steps on the tile can be caught once it's reset (a few minutes; faster at night and with Danger Draught). `?trap spring <who> <name>` sets one off by hand (staff). Nobody is caught by a trap their limits rule out, or while they've paused traps.
 Real gear goes on only for players who switched on **Farm can put real gear on me** in the Companion; messes show for **Farm can mark my body**.

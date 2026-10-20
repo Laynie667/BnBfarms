@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.30.1
+// @version      0.31.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -230,7 +230,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.30.1";
+  var VERSION = "0.31.0";
 
   // extension/src/config.js
   var BOT_MEMBER = 260239;
@@ -5556,6 +5556,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     ];
   }
   var SWITCH_INFO = [
+    ["hypno", "Hypno", "Conditioning's trance sessions can take you, in the farm's voice, never deeper than your ?depth (fun, deep or no human left). ?wake ends one"],
     ["breedable", "Breedable", "You can be bred and filled"],
     ["fertile", "Fertile", "You can catch"],
     ["mpreg", "Mpreg", "A load in your ass can take too, no item needed (with Breedable and Fertile on)"],
@@ -9153,6 +9154,46 @@ One of mods you are using is using an old version of SDK. It will work for now b
     boots: { groups: ["ItemBoots"], names: ["ThighHighLatexHeels"], re: /^ThighHighLatexHeels$/ },
     device: { groups: ["ItemDevices"], names: ["WoodenStocks"], re: /^(WoodenStocks|SaddleStand|WoodenHorse|Net|Kennel|LowCage|KabeshiriWall|WheelFortune|LuckyWheel|X-Cross|BondageBench|TheDisplayFrame|MilkCan)$/ }
   };
+  var GEAR_OPT = {
+    "ItemArms:LeatherCuffs": "Wrist",
+    "ItemArms:SteelCuffs": "Wrist",
+    "ItemArms:WristShackles": "Behind",
+    "ItemArms:WoodenCuffs": "HandsBack",
+    "ItemArms:HempRope": "BoxTie",
+    "ItemLegs:LeatherLegCuffs": "Chained",
+    "ItemLegs:HempRope": "Basic",
+    "ItemFeet:HempRope": "Basic",
+    "ItemFeet:SpreaderMetal": "Wide",
+    "ItemFeet:HeavySpreaderMetal": "Wide",
+    "ItemFeet:WoodenCuffs": "Spread2",
+    "ItemMouth:FunnelGag": "Funnel",
+    "ItemMouth2:FunnelGag": "Funnel",
+    "ItemMouth3:FunnelGag": "Funnel",
+    "ItemNipples:LactationPump": "MediumSuction",
+    "ItemDevices:BondageBench": "Normal",
+    "ItemTorso:HempRopeHarness": "Harness",
+    "ItemTorso2:HempRopeHarness": "Harness"
+  };
+  function itemHome(name, slot, taken) {
+    const all = Array.isArray(window.Asset) ? window.Asset : [];
+    const homes = all.filter((a) => a && a.Name === name && a.Group && a.Group.Family === P2().AssetFamily && /^Item/.test(a.Group.Name)).map((a) => a.Group.Name);
+    return homes.find((g) => slot.groups.includes(g) && !taken(g)) || homes.find((g) => !taken(g)) || null;
+  }
+  function setGearOpt(group, name, want) {
+    try {
+      const it = typeof window.InventoryGet === "function" ? window.InventoryGet(P2(), group) : null;
+      if (!it || it.Asset.Name !== name || typeof window.ExtendedItemGetData !== "function" || typeof window.ExtendedItemSetOptionByRecord !== "function") return false;
+      const data = window.ExtendedItemGetData(it.Asset, it.Asset.Archetype);
+      if (!data || data.archetype !== "typed" || !Array.isArray(data.options)) return false;
+      const i = data.options.findIndex((o) => o.Name === want);
+      if (i < 0) return false;
+      window.ExtendedItemSetOptionByRecord(P2(), it, { typed: i }, { push: true, refresh: true, C_Source: P2() });
+      return true;
+    } catch (e) {
+      console.warn("[Farmhand Companion] gear setting:", e);
+      return false;
+    }
+  }
   function gearAsset(group, slot, prefer) {
     const fam = P2().AssetFamily, get2 = (n) => {
       try {
@@ -9204,7 +9245,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   function syncFarmGear(list, allow) {
     if (!P2() || !Array.isArray(P2().Appearance) || typeof window.ServerAppearanceBundle !== "function") return { on: [], off: [] };
     const want = (Array.isArray(list) ? list : []).filter((g) => g && GEAR_SLOTS[g.slot] && (g.always || allow) && (!g.until || g.until > Date.now()));
-    const cur = bundle(), stuck = lockedGroups2(), did = { on: [], off: [] }, mem = gearMem();
+    const cur = bundle(), stuck = lockedGroups2(), did = { on: [], off: [] }, mem = gearMem(), setLater = [];
     let next = cur.slice();
     for (const b of cur) {
       const n = gearNameOf(b, mem);
@@ -9219,7 +9260,16 @@ One of mods you are using is using an old version of SDK. It will work for now b
       if (next.some((b) => gearNameOf(b, mem) === g.name)) continue;
       const slot = GEAR_SLOTS[g.slot];
       if (slot.needs && !next.some((b) => b.Group === slot.needs)) continue;
-      let group = slot.groups.find((x) => !next.some((b) => b.Group === x) && groupOf2(x)), was = null;
+      let group = slot.groups.find((x) => !next.some((b) => b.Group === x) && groupOf2(x)), was = null, item = null;
+      for (const n of Array.isArray(g.items) ? g.items.map(String) : []) {
+        if (!/^[A-Za-z0-9_-]{2,40}$/.test(n)) continue;
+        const home = itemHome(n, slot, (x) => next.some((b) => b.Group === x) || stuck.has(x) || !groupOf2(x));
+        if (home) {
+          group = home;
+          item = n;
+          break;
+        }
+      }
       if (!group && slot.takeover) {
         group = slot.groups.find((x) => groupOf2(x) && !stuck.has(x) && next.some((b) => b.Group === x && !gearNameOf(b, mem)));
         if (group) {
@@ -9228,7 +9278,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
         }
       }
       if (!group) continue;
-      const item = gearAsset(group, slot, g.items);
+      if (!item) item = gearAsset(group, slot, g.items);
       if (!item) {
         if (was) next.push(was);
         continue;
@@ -9259,9 +9309,12 @@ One of mods you are using is using an old version of SDK. It will work for now b
       did.on.push(g.name);
       mem[g.name] = was ? { group, item, was: JSON.parse(JSON.stringify(was)) } : { group, item };
       learnName(String(g.name).slice(0, 30));
+      const opt = typeof g.opt === "string" && g.opt || GEAR_OPT[group + ":" + item];
+      if (opt) setLater.push([group, item, opt]);
     }
     gearMemSave(mem);
     if (did.on.length || did.off.length) commit2(next);
+    for (const [gr, nm, op] of setLater) setGearOpt(gr, nm, op);
     return did;
   }
   var SHAPES = { BodyUpper: ["FlatSmall", "FlatMedium", "Small", "Normal", "Large", "XLarge"], BodyLower: ["Small", "Normal", "Large", "XLarge"] };

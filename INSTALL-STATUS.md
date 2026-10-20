@@ -5,15 +5,15 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 | Script | File in `dist/` | Where it runs | Current |
 |---|---|---|---|
-| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.37.1** |
-| Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.8.0** |
+| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.38.0** |
+| Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.9.0** |
 | Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.2.1** |
 | Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **1.1.0** |
 | Barn life | `farmhand-barn-life.user.js` | the bot's PC | **1.2.1** |
 | Map tools, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.4** |
 | Dairy | `farmhand-dairy.user.js` | the bot's PC | **1.1.0** |
 | Shows | `farmhand-shows.user.js` | the bot's PC | **1.1.0** |
-| Farmhand Companion | `farmhand-companion.user.js` | each player | **0.30.1** |
+| Farmhand Companion | `farmhand-companion.user.js` | each player | **0.31.0** |
 | Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.4** |
 
 ## Sending a watch report
@@ -23,6 +23,14 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 - Running the watcher on more than one game at once (the bot, yours, a tester's) lets Claude line them up into one timeline.
 
 ## Latest changes (newest first)
+
+- **Bot 0.38.0, Companion 0.31.0, Glory stalls 1.9.0, Conditioning 1.1.0: polish.** Laynie: "the scenes could be expanded, more detailed, and longer... conditioning could use some polish, and the farm equipment could use some polish. like I had a knee spreader described as being a knee spreader, but it was just hemp rope and the cuffs weren't restraining me at all with their configuration."
+  - **Farm gear that restrains.** The game puts most restraints on in their loosest setting, so the Companion now sets each one the way its description says: leather and steel cuffs locked at the wrists, shackles behind, wooden cuffs hands-back, leg cuffs chained, a spreader bar wide, a funnel gag with its funnel in, the milk pump on, the bench strapped, rope arms in a box tie (a piece can ask for its own, like the hogtie's Hogtied). And a piece's own item goes where that item really lives: the seed shower's spreader bar was asked for "on the legs", found no spreader there and put on hemp rope; now it goes on the ankles, wide. Checked in the studio on R133.
+  - **Conditioning:** ?hypno works again (retiring the voice lines had taken it with them); it's the switch for trance sessions again, in the Toggles. ?hyp me takes you under yourself; a handler can put their own words in a session (?hyp Bessie deep say Good cows love the milker); deep and No human left sessions keep them stirred up on the way down; and a session ends with a word to both of them, how it went and how far to the next tier; a "Take me under" button on the card.
+  - **Longer trap scenes:** every trap weaves two more beats into the middle of its own story (one on ?intensity tender, three on filthy), from what kind of trap it is: bein' bred, bein' held, bein' made a mess of, bein' milked, bein' teased, and the folk who stop to watch. Each picked for the body it's about.
+  - **Glory holes:** long scenes more often (fewer quick singles), a fuller middle in every one, and more lines for every hole's middle and for the barn around them.
+  - **Milking stalls:** more lines for the long middle of a session (milk and cock) and the barn around it.
+  - **Bot, Companion, Glory stalls and Conditioning.**
 
 - **Bot 0.37.1: trap tiles named for their place.** Laynie: "i tried trap-kennels-1 and am getting traps not in its list." A tile named trap-<place>, plural or not, now springs that place's traps: trap-kennels-1, trap-cabin-2, trap-pigsty, trap-office, trap-gloryholes, trap-goblins, trap-pasture… (and a few other words: barn, sty, woods, pond, camp, field). A trap's own name still wins: trap-kennel is the kennel trap itself, trap-stocks the stocks. ?traps themes says so. **Bot.**
 

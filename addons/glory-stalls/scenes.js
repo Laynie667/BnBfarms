@@ -685,6 +685,7 @@ function oneVisitor(beats, { hole, visitor, funnel, degrade, praise, rounds, fir
   add(talk());
   add(gearBit(h));
   if (!persona.short) { add(pick(RHYTHM[h].mid)); add(voice() || atmos()); }
+  if (!persona.short) { add(pick(REACT[h].mid)); add(pick(RHYTHM[h].mid)); add(own(h, "mid", 0.5) || atmos()); }   // a fuller middle (Oct 19)
 
   // 4. more rounds for the ones who take their time, sometimes moving to another hole
   for (let r = 0; r < rounds; r++) {
@@ -1038,7 +1039,8 @@ export function buildScene({ hole, visitor, funnel, degrade, praise, holes, leng
   const canTogether = usable.length >= 2 && visitor.type !== "double" && usable.includes(hole);
   // a punishment shift runs longer: more strangers, more rounds
   const r = setup === "punished" ? 0.3 + Math.random() * 0.7 : Math.random();
-  let kind = length || (r < 0.45 ? "single" : r < 0.7 ? "long" : r < 0.88 && canTogether ? "together" : r < 0.88 ? "long" : "marathon");
+  // (Oct 19, "longer scenes would be amazing": fewer quick singles, more long ones)
+  let kind = length || (r < 0.3 ? "single" : r < 0.62 ? "long" : r < 0.84 && canTogether ? "together" : r < 0.84 ? "long" : "marathon");
   if (kind === "together" && !canTogether) kind = "long";
   if (kind === "together") {
     together(beats, { hole, visitor, holes: usable, degrade, praise, pick, rough: setup === "punished", gear, animal, body });
@@ -1083,3 +1085,6 @@ Object.assign(REVEAL, VM.REVEAL);
 Object.assign(ENTRY, VM.ENTRY);
 Object.assign(TYPE_RHYTHM, VM.TYPE_RHYTHM);
 Object.assign(PERSONAS, VM.PERSONAS);
+// and fuller middles (visitors-more.js DEEPER)
+for (const h of ["mouth", "vulva", "butt"]) { into(RHYTHM[h].mid, VM.DEEPER.RHYTHM[h]); into(REACT[h].mid, VM.DEEPER.REACT[h]); }
+into(ATMOS, VM.DEEPER.ATMOS);

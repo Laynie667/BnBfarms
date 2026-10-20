@@ -60,6 +60,7 @@
     r.gear = r.gear || {};
     r.gear[slot] = { label: String(label).slice(0, 28), desc: String(desc || "").slice(0, 180), until: Date.now() + Math.max(0.5, mins || 5)*60000, src: src || "trap" };
     if (x && x.items) r.gear[slot].items = x.items.slice(0, 4); if (x && x.color) r.gear[slot].color = x.color;
+    if (x && x.opt) r.gear[slot].opt = String(x.opt).slice(0, 30);   // how it's set: "Hogtied", "Wide"… (the Companion's GEAR_OPT has the usual)
     saveLedger(); syncCompanions(true);
     return true;
   }
@@ -95,7 +96,7 @@
   // what their Companion should have on them right now
   function farmGearFor(mn){
     const r = rec(mn), now = Date.now(), out = [];
-    for (const [slot, g] of Object.entries((r && r.gear) || {})) if (g.until > now) out.push(Object.assign({ slot, name: g.label, desc: g.desc, until: Math.ceil(g.until/60000)*60000 }, g.items ? { items: g.items } : {}, g.color ? { color: g.color } : {}));
+    for (const [slot, g] of Object.entries((r && r.gear) || {})) if (g.until > now) out.push(Object.assign({ slot, name: g.label, desc: g.desc, until: Math.ceil(g.until/60000)*60000 }, g.items ? { items: g.items } : {}, g.color ? { color: g.color } : {}, g.opt ? { opt: g.opt } : {}));
     if (parasiteOn(mn)) for (const g of parasiteGear(mn)) out.push(g);
     if (suitOnNow(mn)) for (const g of suitGear(mn)) out.push(g);
     for (const g of symGear(mn)) out.push(g);   // a symbiote, as far as it's grown (10v5-symbiote-spread.js)   // the livin' suit, as far as it has spread (10y5-cursed.js)   // lips, suckers, root: whatever has bloomed (10v2-parasite-more.js)

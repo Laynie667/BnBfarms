@@ -169,3 +169,44 @@ export const PERSONAS = {
     pace: "nervous", short: true,
   },
 };
+
+// longer, fuller scenes (Oct 19: "the scenes could be expanded, more detailed, and longer"): more of the middle, for every hole
+export const DEEPER = {
+  RHYTHM: {
+    mouth: ["The stranger holds %n's head still through the hole with nothing but the angle of it and fucks their mouth slow and deep.",
+            "Spit runs down %n's chin in long strings with every stroke, and the stranger groans at the wet sound of it.",
+            "It slides along %n's tongue and nudges the back of their throat, again and again, until %n stops fighting the urge to swallow round it.",
+            "The stranger pulls almost all the way out, lets %n breathe once, and sinks back in to the root.",
+            "%n's lips are stretched tight and shining, and every stroke drags them a little further out."],
+    vulva: ["Long, wet, unhurried strokes, every one dragging out of %n's pussy and sinking back in with a sound that fills the stall.",
+            "The stranger grinds in deep and stays, rocking, pressed so hard against the wall the boards creak.",
+            "%n's pussy grips on every pull back like it's trying to keep it, and the stranger swears softly through the wall.",
+            "The pace picks up, slows, picks up again, the stranger finding exactly what makes %n's knees buckle and doing it over and over.",
+            "Every stroke squelches now, %n so wet it runs down the inside of their thighs."],
+    butt:  ["Each stroke into %n's ass is long and heavy, the stretch never quite going away, the fullness building and building.",
+            "The stranger works %n's ass in short deep grinds, then long strokes, then short again, keeping them guessing.",
+            "%n's ring clings and drags on every pull back, and the stranger groans like it's the best thing they've ever felt.",
+            "It's buried to the root and held there, throbbing, until %n squirms, and only then does it start moving again.",
+            "Slick sounds and the slap of hips on boards, over and over, steady as a pump."],
+  },
+  REACT: {
+    mouth: ["%n's eyes water and their throat flutters round it, and they keep their mouth open anyway, wanting more.",
+            "A muffled moan buzzes round the cock in %n's mouth, and the stranger shudders at the feel of it.",
+            "%n's jaw aches sweetly, their lips tingling, the taste of the stranger everywhere."],
+    vulva: ["%n's pussy clenches and flutters round it, and their hips push back to the wall without asking.",
+            "Heat climbs up %n's belly in slow waves, and every stroke pushes it a little higher.",
+            "{t}%n's tits press and drag against the boards with every thrust, nipples aching.",
+            "%n's legs tremble so hard they have to lean their whole weight on the wall."],
+    butt:  ["%n's ass clenches and relaxes in waves, and every time it relaxes the stranger sinks in deeper.",
+            "A deep, low fullness spreads through %n's belly, and they moan into the boards.",
+            "{c}%n's cock leaks steadily onto the straw, every stroke in their ass pushing a little more out."],
+  },
+  ATMOS: [
+    "Down the row, another stall's boards are rattling in time with %n's. Somebody laughs.",
+    "The barn cat sits on the rafter above %n's stall and watches with perfect indifference.",
+    "A queue's forming outside. %n can hear boots shuffling and somebody complaining about the wait.",
+    "Rain starts drumming on the barn roof, loud and steady, and the stall feels warmer for it.",
+    "Somebody's left a lantern burning outside, and the light through the hole flickers on %n's skin.",
+    "The straw under %n's knees is damp now, and it smells of sweat and hay and sex.",
+  ],
+};

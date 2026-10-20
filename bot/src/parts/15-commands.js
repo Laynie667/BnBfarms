@@ -511,16 +511,16 @@
         break;
       }
 
-      case "hypno": case "voice": case "tease": case "teaseme": if (!RETIRED_ON) { R("That one's been retired, sugar: the farm doesn't send tease lines or herd voice lines any more."); break; }
+      case "voice": case "tease": case "teaseme": if (!RETIRED_ON) { R("That one's been retired, sugar: the farm doesn't send tease lines or herd voice lines any more."); break; }
       // eslint-disable-next-line no-fallthrough
-      case "hypno-old": {
+      case "hypno": {   // (still the switch for Conditioning's trance sessions: the voice lines it used to let in are retired)
         const r = rec(sender);
         if (!r || !r.roles.length){ R("That's just for folks on the books, sugar."); break; }
         const v = String(args[0]||"").toLowerCase();
-        if (v && !["on","off"].includes(v)){ R("?hypno on lets your herd leader's voice lines reach you · ?hypno off stops them."); break; }
+        if (v && !["on","off"].includes(v)){ R("?hypno on lets your herd leader or a proprietor run Conditioning's trance sessions on you · ?hypno off stops them. ?depth fun|deep|nhl sets how deep."); break; }
         r.hypno = v ? v === "on" : !r.hypno; saveLedger(); audit(sender, "HYPNO", r.hypno ? "on" : "off");
-        R(r.hypno ? "🌀 Hypno: ON. If your herd leader sets voice lines for you, they'll drift in now and then, just for you. ?hypno off stops them any time."
-                  : "🌀 Hypno: off. No voice lines will reach you.");
+        R(r.hypno ? "🌀 Hypno: ON. Your herd leader or a proprietor can take you into a Conditioning session now, never deeper than your ?depth. ?wake or your safeword ends one; ?hypno off stops them."
+                  : "🌀 Hypno: off. No trance sessions for you.");
         break;
       }
 

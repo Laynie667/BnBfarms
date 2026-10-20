@@ -160,6 +160,37 @@ export const GEAR_SLOTS = {
   boots:    { groups: ["ItemBoots"], names: ["ThighHighLatexHeels"], re: /^ThighHighLatexHeels$/ },
   device:   { groups: ["ItemDevices"], names: ["WoodenStocks"], re: /^(WoodenStocks|SaddleStand|WoodenHorse|Net|Kennel|LowCage|KabeshiriWall|WheelFortune|LuckyWheel|X-Cross|BondageBench|TheDisplayFrame|MilkCan)$/ },
 };
+// HOW EACH PIECE IS SET (Laynie, Oct 19: "I had a knee spreader described as being a knee spreader, but it was just hemp
+// rope and the cuffs weren't restraining me at all with their configuration"). The game puts most restraints on in their
+// loosest setting: cuffs unchained, a funnel gag with no funnel, a bench with no straps, the pump switched off. So each
+// one the farm uses is set the way its description says: cuffs locked together behind, a spreader wide, the funnel in.
+// A piece can ask for its own (opt: "Hogtied"); otherwise this list; otherwise the game's own first setting.
+export const GEAR_OPT = {
+  "ItemArms:LeatherCuffs": "Wrist", "ItemArms:SteelCuffs": "Wrist", "ItemArms:WristShackles": "Behind", "ItemArms:WoodenCuffs": "HandsBack",
+  "ItemArms:HempRope": "BoxTie", "ItemLegs:LeatherLegCuffs": "Chained", "ItemLegs:HempRope": "Basic", "ItemFeet:HempRope": "Basic",
+  "ItemFeet:SpreaderMetal": "Wide", "ItemFeet:HeavySpreaderMetal": "Wide", "ItemFeet:WoodenCuffs": "Spread2",
+  "ItemMouth:FunnelGag": "Funnel", "ItemMouth2:FunnelGag": "Funnel", "ItemMouth3:FunnelGag": "Funnel",
+  "ItemNipples:LactationPump": "MediumSuction", "ItemDevices:BondageBench": "Normal",
+  "ItemTorso:HempRopeHarness": "Harness", "ItemTorso2:HempRopeHarness": "Harness",
+};
+// a piece's own item may live in another spot than its slot's (a spreader bar is at the ankles): find where
+function itemHome(name, slot, taken) {
+  const all = Array.isArray(window.Asset) ? window.Asset : [];
+  const homes = all.filter((a) => a && a.Name === name && a.Group && a.Group.Family === P().AssetFamily && /^Item/.test(a.Group.Name)).map((a) => a.Group.Name);
+  return homes.find((g) => slot.groups.includes(g) && !taken(g)) || homes.find((g) => !taken(g)) || null;
+}
+// set an item the way GEAR_OPT (or the piece) says, through the game's own extended-item setter
+function setGearOpt(group, name, want) {
+  try {
+    const it = typeof window.InventoryGet === "function" ? window.InventoryGet(P(), group) : null;
+    if (!it || it.Asset.Name !== name || typeof window.ExtendedItemGetData !== "function" || typeof window.ExtendedItemSetOptionByRecord !== "function") return false;
+    const data = window.ExtendedItemGetData(it.Asset, it.Asset.Archetype);
+    if (!data || data.archetype !== "typed" || !Array.isArray(data.options)) return false;
+    const i = data.options.findIndex((o) => o.Name === want); if (i < 0) return false;
+    window.ExtendedItemSetOptionByRecord(P(), it, { typed: i }, { push: true, refresh: true, C_Source: P() });
+    return true;
+  } catch (e) { console.warn("[Farmhand Companion] gear setting:", e); return false; }
+}
 function gearAsset(group, slot, prefer) {
   const fam = P().AssetFamily, get = (n) => { try { return typeof window.AssetGet === "function" ? window.AssetGet(fam, group, n) : null; } catch (e) { return null; } };
   for (const n of (Array.isArray(prefer) ? prefer.map(String) : [])) if (/^[A-Za-z0-9_]{2,40}$/.test(n) && get(n)) return n;   // the piece's own choice, if this game has it there
@@ -182,7 +213,7 @@ const gearNameOf = (b, mem) => (isFarmGear(b) ? b.Craft.Name : (Object.keys(mem)
 export function syncFarmGear(list, allow) {
   if (!P() || !Array.isArray(P().Appearance) || typeof window.ServerAppearanceBundle !== "function") return { on: [], off: [] };
   const want = (Array.isArray(list) ? list : []).filter((g) => g && GEAR_SLOTS[g.slot] && (g.always || allow) && (!g.until || g.until > Date.now()));
-  const cur = bundle(), stuck = lockedGroups(), did = { on: [], off: [] }, mem = gearMem();
+  const cur = bundle(), stuck = lockedGroups(), did = { on: [], off: [] }, mem = gearMem(), setLater = [];
   let next = cur.slice();
   // off: ours, and not on the list any more
   for (const b of cur) {
@@ -198,13 +229,19 @@ export function syncFarmGear(list, allow) {
     if (next.some((b) => gearNameOf(b, mem) === g.name)) continue;
     const slot = GEAR_SLOTS[g.slot];
     if (slot.needs && !next.some((b) => b.Group === slot.needs)) continue;            // a chain needs a collar to clip to
-    let group = slot.groups.find((x) => !next.some((b) => b.Group === x) && groupOf(x)), was = null;
+    let group = slot.groups.find((x) => !next.some((b) => b.Group === x) && groupOf(x)), was = null, item = null;
+    // the piece's own item first, in whichever spot it lives (a spreader bar asked for in "legs" goes to the ankles)
+    for (const n of (Array.isArray(g.items) ? g.items.map(String) : [])) {
+      if (!/^[A-Za-z0-9_-]{2,40}$/.test(n)) continue;
+      const home = itemHome(n, slot, (x) => next.some((b) => b.Group === x) || stuck.has(x) || !groupOf(x));
+      if (home) { group = home; item = n; break; }
+    }
     if (!group && slot.takeover) {
       group = slot.groups.find((x) => groupOf(x) && !stuck.has(x) && next.some((b) => b.Group === x && !gearNameOf(b, mem)));
       if (group) { was = next.find((b) => b.Group === group); next = next.filter((b) => b !== was); }
     }
     if (!group) continue;                                                              // that spot's taken: it's on the farm's books just the same
-    const item = gearAsset(group, slot, g.items);
+    if (!item) item = gearAsset(group, slot, g.items);
     if (!item) { if (was) next.push(was); continue; }   // (nothing to put there after all: theirs stays)
     const color = (typeof g.color === "string" && /^#[0-9a-fA-F]{6}$/.test(g.color) ? g.color : null) || slot.color || "Default";
     const it = { Group: group, Name: item, Difficulty: 20, Property: {},
@@ -212,9 +249,13 @@ export function syncFarmGear(list, allow) {
         Property: "Normal", Color: Array.isArray(color) ? color.join(",") : color, Lock: "", Private: true, MemberNumber: P().MemberNumber, MemberName: P().Name, ItemProperty: {}, Type: null, TypeRecord: null } };
     if (color !== "Default") it.Color = color;
     next.push(it); did.on.push(g.name); mem[g.name] = was ? { group, item, was: JSON.parse(JSON.stringify(was)) } : { group, item }; learnName(String(g.name).slice(0, 30));
+    const opt = (typeof g.opt === "string" && g.opt) || GEAR_OPT[group + ":" + item];
+    if (opt) setLater.push([group, item, opt]);
   }
   gearMemSave(mem);
   if (did.on.length || did.off.length) commit(next);
+  // and set the way they're meant to be (cuffs chained, the spreader wide), once they're on
+  for (const [gr, nm, op] of setLater) setGearOpt(gr, nm, op);
   return did;
 }
 

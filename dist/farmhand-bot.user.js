@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.37.1
+// @version      0.38.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -1895,7 +1895,7 @@
   ];
 
   // bot/src/version.js
-  var VERSION = "0.37.1";
+  var VERSION = "0.38.0";
 
   // bot-parts:farmhand-bot-parts
   (function() {
@@ -4857,6 +4857,7 @@
       degradeMe: "degrade",
       tally: "tally",
       forced: "forced",
+      hypno: "hypno",
       potionsOn: "potions",
       daresOn: "dares",
       benchOn: "bench",
@@ -8445,6 +8446,8 @@
         face: (mn, mood, secs) => face(mn, mood, secs),
         sound: (mn, name) => sound(mn, name),
         trance: (mn, level) => trance(mn, level),
+        arouse: (mn, n, cap) => arouse(mn, n, cap),
+        // (stir them up, for add-ons: Conditioning's deeper sessions)
         // time
         later,
         dayKey,
@@ -9793,6 +9796,42 @@
     for (const part of ["milk", "cock"]) for (const [phase, lines] of Object.entries(STALL_MORE[part])) STALL_STORY[part][phase].push(...lines);
     for (const k of ["both", "bothFinish", "atmos", "praise", "degrade"]) STALL_STORY[k].push(...STALL_MORE[k]);
     for (const [k, lines] of Object.entries(STALL_MORE_TRAITS)) if (STALL_TRAITS[k]) STALL_TRAITS[k].lines.push(...lines);
+    STALL_STORY.milk.rhythm.push(
+      "The pump settles into a long, rolling pull, and %n's whole chest rises and falls with it like a tide.",
+      "Milk beads at the edge of a liner and runs down %n's ribs, warm, and the cup pulls harder to make up for it.",
+      "%n can feel each pull all the way down to their belly, a deep tug that leaves them softer every time.",
+      "The lines thrum. %n's nipples are drawn long and swollen into the cups, aching sweet with every stroke of the pump.",
+      "A drip, a squirt, a steady stream: %n can hear their own milk rattling down the glass into the can.",
+      'Somebody walks past, taps the glass to check the flow, and says "Good stock" to the stall in general.',
+      "%n's breathing has slowed right down to match the machine: in with the pull, out with the release."
+    );
+    STALL_STORY.milk.build.push(
+      "The pump speeds up a notch, and %n's let-down comes in a hot rush that makes them gasp.",
+      "%n's chest feels heavy and light at once, full and emptying, the ache of it turning into something warm.",
+      "The cups clamp tighter for a few long pulls, as if the machine's decided to get every drop out of %n today."
+    );
+    STALL_STORY.cock.rhythm.push(
+      "The sleeve ripples along %n's %c cock in a slow wave from root to tip, and back down again, and again.",
+      "The machine finds a pace and keeps it, patient as a farm hand, milking %n in long even strokes.",
+      "Wet sucking sounds fill the stall as the sleeve works %n, slick and warm and relentless.",
+      "%n's hips twitch forward into every stroke without them deciding to, chasing the machine.",
+      "The sleeve slows to a crawl, almost still, until %n is squirming, and then speeds up again without warning.",
+      "%n's balls draw tight and heavy, and the machine seems to know it and eases off, keeping them there.",
+      "Precum beads and is sucked away, beads and is sucked away, the line twitching with every drop."
+    );
+    STALL_STORY.cock.build.push(
+      "The sleeve tightens around the head of %n's %c cock and stays there, sucking in short hard pulses.",
+      "%n's thighs start to shake against the stall boards, and the machine doesn't slow down one bit.",
+      "It's milking %n faster now, the hum of the pump climbing, and %n can't stop the sounds coming out of them."
+    );
+    STALL_STORY.atmos.push(
+      "Down the line, somebody else's pump coughs and settles, and a contented moo drifts over the partition.",
+      "A farmhand hums as they walk the row, checking cans, sliding each full one out and a clean one in.",
+      "Rain on the dairy roof, the drone of the pumps, the warm smell of milk and straw: the barn's own lullaby.",
+      "A barn swallow darts in through the high window, circles once, and goes out again.",
+      "The radio in the office plays something old and slow, faint through the wall.",
+      "Somebody's mucking out the next stall over, and the scrape of the shovel keeps time with the pump."
+    );
     function ribbonsOf(mn) {
       const r = rec(mn);
       return r ? r.ribbons || 0 : 0;
@@ -12481,6 +12520,7 @@
     const tFill = (t, mn, v) => bodyWords(mn, t).replace(/%n/g, plainName(mn)).replace(/%ml/g, v && v.ml || "").replace(/%c/g, v && v.c || "").replace(/%h/g, v && v.h || "").replace(/%x/g, v && v.x || "");
     function trapRun(mn, kind, beats, done, v) {
       state.trapRuns = state.trapRuns || /* @__PURE__ */ new Map();
+      beats = deepenBeats(mn, kind, beats);
       const run = { kind, i: 0, timer: null, beats: beats = beats.slice() };
       const before = { pissed: (rec(mn) || {}).pissed || 0, eggs: ((prodOf(mn) || {}).eggs || {}).n || 0 };
       try {
@@ -17724,6 +17764,265 @@
       office: ["goblinmarket"],
       glory: ["studchair"]
     })) for (const k of kinds) if (TRAP_THEMES[place] && !TRAP_THEMES[place].kinds.includes(k)) TRAP_THEMES[place].kinds.push(k);
+    const DEPTH_KIND = {};
+    const depthOf = (list, kinds) => {
+      for (const k of kinds) DEPTH_KIND[k] = (DEPTH_KIND[k] || []).concat(list);
+    };
+    depthOf(["breed"], [
+      "breeder",
+      "pump",
+      "crate",
+      "wheel",
+      "kissgate",
+      "wall",
+      "bale",
+      "studchair",
+      "seedshower",
+      "booth",
+      "wolves",
+      "stallion",
+      "bull",
+      "warren",
+      "boar",
+      "toms",
+      "drake",
+      "naga",
+      "kennel",
+      "hive",
+      "goat",
+      "sow",
+      "maze",
+      "whelping",
+      "bearskin",
+      "hottub",
+      "stag",
+      "goblinraid",
+      "goblinpit",
+      "warband",
+      "minotaur",
+      "werewolf",
+      "foxden",
+      "lionpride",
+      "ramstud",
+      "clutch",
+      "tentacle",
+      "vines",
+      "eggs",
+      "saddle",
+      "scarecrow",
+      "leashpost"
+    ]);
+    depthOf(["held"], [
+      "snare",
+      "net",
+      "pillory",
+      "stocks",
+      "squeezechute",
+      "twine",
+      "yoke",
+      "hogtie",
+      "trophy",
+      "ponycart",
+      "winch",
+      "scarecrow",
+      "washline",
+      "windmill",
+      "carousel",
+      "goblincart",
+      "saddle",
+      "desk",
+      "wax",
+      "glue",
+      "bench",
+      "crate",
+      "studchair",
+      "groomer",
+      "tomatoes",
+      "auction",
+      "goblinmarket",
+      "wall",
+      "kissgate",
+      "plow"
+    ]);
+    depthOf(["mess"], [
+      "mud",
+      "mudpit",
+      "slop",
+      "honey",
+      "fountain",
+      "bakery",
+      "creamery",
+      "buttermill",
+      "syruptap",
+      "pieeat",
+      "mudslide",
+      "tomatoes",
+      "dip",
+      "glue",
+      "slime",
+      "spray",
+      "mister",
+      "chute",
+      "feedbag",
+      "trough",
+      "stocks",
+      "seedshower",
+      "hogtie",
+      "goblincart"
+    ]);
+    depthOf(["milk"], ["milker", "cups", "carousel", "teatcheck", "milkinghole", "collection", "yoke", "bull", "buttermill"]);
+    depthOf(["tease"], [
+      "teaser",
+      "tickle",
+      "lantern",
+      "mirror",
+      "gas",
+      "foxden",
+      "wax",
+      "desk",
+      "inspection",
+      "groomer",
+      "stamp",
+      "leashpost",
+      "auction",
+      "goblinmarket",
+      "pricetag",
+      "brand",
+      "scale",
+      "weights",
+      "clamp",
+      "paddle",
+      "injector",
+      "wire",
+      "bell",
+      "shrine",
+      "trophy",
+      "squeezechute"
+    ]);
+    depthOf(["watched"], [
+      "stocks",
+      "pillory",
+      "auction",
+      "goblinmarket",
+      "tomatoes",
+      "leashpost",
+      "trophy",
+      "booth",
+      "wall",
+      "kissgate",
+      "bale",
+      "ponycart",
+      "goblincart",
+      "washline",
+      "windmill",
+      "scarecrow",
+      "pieeat",
+      "wheel",
+      "carousel"
+    ]);
+    const DEPTH_LINES = {
+      breed: [
+        "There's no hurry in it now: every stroke goes all the way, and %n feels each one land deep and settle.",
+        "%n loses the count. The rhythm is all there is: the push, the drag, the slap of skin, the creak of whatever's holding them.",
+        "{v}Every thrust nudges something deep inside %n's pussy, and their whole body clenches around it without asking them first.",
+        "{nv}%n's ass is worked open wider with every stroke, until the stretch turns into something warm and hungry.",
+        "{c}%n's own cock bobs and drips with every push, untouched and aching, leaving a wet trail wherever it swings.",
+        "{t}%n's tits sway and bounce in time, heavy, nipples dragging and catching on everything under them.",
+        "A big hand settles on the small of %n's back and holds them right where they're wanted. They don't argue.",
+        "The breath on %n's neck goes ragged, hot, close. Whoever's in them is getting near and wants them to know it.",
+        "%n's belly is already warm and full from earlier, and every new push shoves it a little deeper.",
+        "{v}%n can feel the head of it kissing the very end of them, again and again, like knocking to be let in.",
+        "%n's legs start to shake and give, and it doesn't matter: they're held up by what's in them.",
+        "There's a pause, buried to the hilt, a long throbbing stillness, and then it starts again harder.",
+        "%n's whole world narrows to being filled: in, out, in, the warm wet sound of it, the weight on their back.",
+        "{fu}Both of %n's halves ache at once: their pussy squeezing tight round what's in it and their cock dripping in the straw.",
+        "Something drips down %n's thigh from the last load while the next one's still being worked into them.",
+        "%n's toes curl and their fingers dig into whatever they can reach, and they make a sound they'll be embarrassed about later."
+      ],
+      held: [
+        "%n tests what's holding them, wrist, ankle, hip. Nothing gives. It just holds, patient and certain.",
+        "Every wriggle pulls something tighter. %n stops wriggling. Then starts again, because it feels so good to be stopped.",
+        "%n can't reach anything, can't cover anything, can't close anything. They're exactly as open as the farm wants them.",
+        "The straps creak when %n breathes. That's the most they can move now: breathing.",
+        "{t}Whatever's round %n's chest squeezes their tits out round and tight, and they throb with their own heartbeat.",
+        "{c}%n's cock strains against nothing at all, bobbing, the one part of them that's still free to move.",
+        "%n's arms have gone heavy and floaty in the ties. Their head drops. It's easier to just hang there.",
+        "Somebody checks the buckles, snugs one a notch tighter, and pats %n's flank like a well-tied calf.",
+        "There's an itch on %n's nose they can't scratch, and it's the most maddening thing in the world.",
+        "%n's knees are wide and they can't close them, and the cool air on everything between is its own kind of touch.",
+        "The longer %n's held, the quieter they go, until struggling is a memory and waiting is all they are.",
+        "A loose strand of hair falls in %n's eyes. Nobody moves it. They can't either.",
+        "%n's muscles ache in the pose, a sweet steady burn, and every minute of it makes them a little softer."
+      ],
+      mess: [
+        "It's everywhere now: in %n's hair, behind their ears, between their fingers and toes, slowly sliding down their back.",
+        "%n squelches when they shift, and the sound alone makes them blush to the ears.",
+        "It drips off %n's chin in slow strings and lands on their chest, and nobody wipes it.",
+        "{t}It pools between %n's tits and slowly overflows, a sticky trickle running down over their belly.",
+        "{c}It runs down %n's cock and drips off the end, and somebody laughs at the sight of it.",
+        "{v}It finds its way between %n's legs, warm and slick, and keeps on finding it.",
+        "%n tries to blink it out of their eyes and only smears it further. They give up and let it be.",
+        "It's drying tacky in places now and still wet in others, and every move peels and sticks.",
+        "%n can taste it on their lips no matter how they lick them, and they keep licking them anyway.",
+        "Somebody draws a finger through the mess on %n's back and writes their initial in it.",
+        "The smell of it is everywhere, thick and sweet and filthy, and %n will be smelling it for hours.",
+        "There isn't a clean inch of %n left, and the farm hands agree that's an improvement."
+      ],
+      milk: [
+        "The pull comes in long, patient waves, and with every one %n feels themselves let down a little more.",
+        "{t}%n's udders tingle, then ache, then let go, warm milk running down the lines in steady pulses.",
+        "{t}Every pull drags %n's nipples long and swollen, and the ache of it sinks right down into their belly.",
+        "{nt}Even flat, %n's nipples are sucked swollen and tender, pulled again and again till they throb.",
+        "{c}The milker on %n's cock pulls in slow rippling strokes, drawing every drop up and out of them.",
+        "%n can hear it: the rhythmic wheeze of the pump and the drip into the can, and their breathing falls into time with it.",
+        "The milk can fills a finger's width at a time. Somebody taps it, nods, and leaves them to it.",
+        "%n's whole body has gone slack and warm, the way a good milker makes a cow go, eyes half closed.",
+        "There's a hand on %n's flank, slow circles, like calming a heifer at her first milking.",
+        "Drained, and still it pulls, gentle now, coaxing out drops %n didn't know they had."
+      ],
+      tease: [
+        "It stops just short, every time. %n's hips chase it and catch nothing.",
+        "Somebody blows softly across %n's skin, and every hair on their body stands up.",
+        "%n's breath hitches, and hitches, and the farm hand watching smiles and slows down even more.",
+        "{v}A fingertip traces the very edge of %n's pussy, round and round, never quite where they need it.",
+        "{c}A thumb rubs slow circles just under the head of %n's cock, and stops, and starts, and stops.",
+        "{t}A nail drags lightly round %n's nipple, close, closer, and away again.",
+        "%n is brought right up to the edge and held there, trembling, then left to cool, then brought up again.",
+        "The worst part is the waiting: %n never knows when the next touch is coming, or where.",
+        '"Not yet," somebody murmurs, and %n whines like the animal they are.',
+        "Every inch of %n is listening now, skin humming, ready for the smallest touch.",
+        "%n's thighs are shaking and wet and it hasn't even properly started."
+      ],
+      watched: [
+        "A little crowd has gathered. Somebody's eating an apple. Somebody else has brought a stool.",
+        "%n can hear them talking about them like stock at a fair: the shape of their rump, the noise they make, whether they'll take.",
+        "A farm kid points and asks a question, and a farm hand answers it in loving detail.",
+        "Every gasp %n makes gets a little murmur from the onlookers, and that makes it so much worse, and better.",
+        "Somebody takes bets on how long %n will last. The odds are not in %n's favour.",
+        "Passers-by slow down, look, and stop. Nobody moves on.",
+        "%n catches someone's eye in the crowd. They wink. %n goes red to the collarbones.",
+        "A farmer leans on the fence with his arms folded, like he's watching the weather, and doesn't look away once."
+      ]
+    };
+    function deepenBeats(mn, kind, beats) {
+      try {
+        const kinds = DEPTH_KIND[kind] || ["tease"];
+        if (!Array.isArray(beats) || beats.length < 2) return beats;
+        const it = intensityOf(mn), gentle = it === "tender", hard = it === "filthy";
+        const n = gentle ? 1 : hard ? 3 : 2;
+        const out = beats.slice();
+        for (let i = 0; i < n; i++) {
+          const k = kinds[Math.floor(Math.random() * kinds.length)];
+          const pool = DEPTH_LINES[k];
+          if (!pool) continue;
+          const at = 1 + Math.floor(Math.random() * (out.length - 1));
+          out.splice(at, 0, pool.slice());
+        }
+        return out;
+      } catch (e) {
+        return beats;
+      }
+    }
     const PARASITE_SERUMS = ["growth", "fertility", "growth", "hyper pregnancy", "growth", "capacity"];
     const PARASITE_GROWS = ["udder", "penis", "testes", "butt"];
     function parasiteChance(mn) {
@@ -21447,6 +21746,7 @@
       r.gear[slot] = { label: String(label).slice(0, 28), desc: String(desc || "").slice(0, 180), until: Date.now() + Math.max(0.5, mins || 5) * 6e4, src: src || "trap" };
       if (x && x.items) r.gear[slot].items = x.items.slice(0, 4);
       if (x && x.color) r.gear[slot].color = x.color;
+      if (x && x.opt) r.gear[slot].opt = String(x.opt).slice(0, 30);
       saveLedger();
       syncCompanions(true);
       return true;
@@ -21497,7 +21797,7 @@
     }
     function farmGearFor(mn) {
       const r = rec(mn), now = Date.now(), out = [];
-      for (const [slot, g] of Object.entries(r && r.gear || {})) if (g.until > now) out.push(Object.assign({ slot, name: g.label, desc: g.desc, until: Math.ceil(g.until / 6e4) * 6e4 }, g.items ? { items: g.items } : {}, g.color ? { color: g.color } : {}));
+      for (const [slot, g] of Object.entries(r && r.gear || {})) if (g.until > now) out.push(Object.assign({ slot, name: g.label, desc: g.desc, until: Math.ceil(g.until / 6e4) * 6e4 }, g.items ? { items: g.items } : {}, g.color ? { color: g.color } : {}, g.opt ? { opt: g.opt } : {}));
       if (parasiteOn(mn)) for (const g of parasiteGear(mn)) out.push(g);
       if (suitOnNow(mn)) for (const g of suitGear(mn)) out.push(g);
       for (const g of symGear(mn)) out.push(g);
@@ -25835,8 +26135,8 @@
       hottub: [{ when: "hold", slot: "arms", label: "Lumberjack's Grip", items: ["HempRope", "LeatherCuffs"], desc: "A length of logging rope round the wrists, so they don't float off while they're passed round the tub." }],
       slop: [],
       hogtie: [
-        { when: "hold", slot: "ropeFeet", label: "Hog Tie", items: ["HempRope"], desc: "Rough sty rope, wrists to ankles behind the back, tied with the pig girl's rodeo knot." },
-        { when: "hold", slot: "ropeArms", label: "Hog Tie (arms)", items: ["HempRope"], desc: "The other half of the hogtie, the wrists, cinched to the ankles." }
+        { when: "hold", slot: "ropeFeet", label: "Hog Tie", items: ["HempRope"], opt: "Basic", desc: "Rough sty rope, wrists to ankles behind the back, tied with the pig girl's rodeo knot." },
+        { when: "hold", slot: "ropeArms", label: "Hog Tie (arms)", items: ["HempRope"], opt: "Hogtied", desc: "The other half of the hogtie, the wrists, cinched to the ankles." }
       ],
       booth: [{ when: "hold", slot: "lips", label: "Booth Ring", items: ["RingGag"], desc: "A ring gag the booth hands out at the door, so the customers get their copper's worth." }],
       milkinghole: [{ when: "hold", slot: "cups", label: "Through-the-Wall Cups", items: ["LactationPump"], desc: "Whatever's on the other side of the milking hole has cups, and they are very, very strong." }],
@@ -29671,7 +29971,6 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
           R("?zone \xB7 ?zone who \xB7 ?zone a|b <name> \xB7 ?zone pair <name> <group> \xB7 ?zone unpair <name> \xB7 ?zone clear <name>");
           break;
         }
-        case "hypno":
         case "voice":
         case "tease":
         case "teaseme":
@@ -29680,7 +29979,7 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
             break;
           }
         // eslint-disable-next-line no-fallthrough
-        case "hypno-old": {
+        case "hypno": {
           const r = rec(sender);
           if (!r || !r.roles.length) {
             R("That's just for folks on the books, sugar.");
@@ -29688,13 +29987,13 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
           }
           const v = String(args[0] || "").toLowerCase();
           if (v && !["on", "off"].includes(v)) {
-            R("?hypno on lets your herd leader's voice lines reach you \xB7 ?hypno off stops them.");
+            R("?hypno on lets your herd leader or a proprietor run Conditioning's trance sessions on you \xB7 ?hypno off stops them. ?depth fun|deep|nhl sets how deep.");
             break;
           }
           r.hypno = v ? v === "on" : !r.hypno;
           saveLedger();
           audit(sender, "HYPNO", r.hypno ? "on" : "off");
-          R(r.hypno ? "\u{1F300} Hypno: ON. If your herd leader sets voice lines for you, they'll drift in now and then, just for you. ?hypno off stops them any time." : "\u{1F300} Hypno: off. No voice lines will reach you.");
+          R(r.hypno ? "\u{1F300} Hypno: ON. Your herd leader or a proprietor can take you into a Conditioning session now, never deeper than your ?depth. ?wake or your safeword ends one; ?hypno off stops them." : "\u{1F300} Hypno: off. No trance sessions for you.");
           break;
         }
         case "voice-old": {

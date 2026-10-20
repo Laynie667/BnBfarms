@@ -173,7 +173,7 @@
       penisType: (mn) => { try { return penisType(mn); } catch(e){ return "human"; } },
       cockInches: (mn) => { try { return sizeOf(mn, "penis"); } catch(e){ return 7; } },
       // little cues their own Companion plays (v0.10+): a face, a sound for whoever's around, the trance haze
-      face: (mn, mood, secs) => face(mn, mood, secs), sound: (mn, name) => sound(mn, name), trance: (mn, level) => trance(mn, level),
+      face: (mn, mood, secs) => face(mn, mood, secs), sound: (mn, name) => sound(mn, name), trance: (mn, level) => trance(mn, level), arouse: (mn, n, cap) => arouse(mn, n, cap),   // (stir them up, for add-ons: Conditioning's deeper sessions)
       // time
       later, dayKey, weekKey,
     });

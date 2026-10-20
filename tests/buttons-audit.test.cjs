@@ -41,7 +41,7 @@ async function press(mn, cmd){
   L().people[500].prod && (L().people[500].prod.milk=1500);
 
   // 1. every switch on the Toggles tabs: press it, and the panel's switch must flip
-  const SW=['fertile','jarok','freeuse','futa','milkable','naturalheat','praise','degrade','tally','breedable'];   // free use needs breedable, so breedable goes last (teaseme and hypno: retired Oct 19)
+  const SW=['fertile','jarok','freeuse','futa','milkable','naturalheat','praise','degrade','tally','hypno','breedable'];   // free use needs breedable, so breedable goes last (teaseme: retired Oct 19)
   const stuck=[];
   for (const sw of SW){
     W.__sync(true); await wait(400);

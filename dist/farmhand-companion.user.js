@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.31.2
+// @version      0.31.3
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -230,7 +230,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.31.2";
+  var VERSION = "0.31.3";
 
   // extension/src/config.js
   var BOT_MEMBER = 260239;
@@ -4716,6 +4716,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var sdk3 = null;
   var hooked3 = false;
   var mine2 = [];
+  var DIAG = { marks: [], draw: null, draws: 0, lastErr: "", got: 0 };
   var others2 = /* @__PURE__ */ new Map();
   var BY_COLOR = {
     "#fff4dc": "cream",
@@ -4748,6 +4749,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var ok = (e) => e && typeof e.k === "string" && W4.FarmMess && W4.FarmMess.KINDS[e.k] && Array.isArray(e.a) && Number.isFinite(e.s);
   var clean2 = (list) => Array.isArray(list) ? list.filter(ok).slice(-MAX).map((e) => ({ k: e.k, a: e.a.filter((x) => typeof x === "string" && W4.FarmMess.AREAS[x]).slice(0, 6), s: e.s | 0, t: +e.t || 0, m: Math.max(0.5, Math.min(3, Number(e.m) || 1)) })) : [];
   function messFromMark(m) {
+    DIAG.marks.push({ at: Date.now(), mess: m && m.mess, splat: m && m.splat, farmMess: !!W4.FarmMess });
+    if (DIAG.marks.length > 5) DIAG.marks.shift();
     if (!m || !Array.isArray(m.splat) || !m.splat.length || !W4.FarmMess) return false;
     const kind = typeof m.mess === "string" && W4.FarmMess.KINDS[m.mess] ? m.mess : (typeof m.color === "string" ? BY_COLOR[m.color.toLowerCase()] : null) || "cum";
     const a = [];
@@ -4933,6 +4936,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
         const C = args[0], real = args[1];
         if (!C || !real || typeof real.drawImage !== "function" || !W4.FarmMess) return next(args);
         const list = listFor(C);
+        if (C === W4.Player) DIAG.got++;
         if (!list.length) return next(args);
         const body2 = [];
         let done = false;
@@ -4941,6 +4945,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
           done = true;
           try {
             const p = messPicture(C, list, body2);
+            if (C === W4.Player) {
+              DIAG.draws++;
+              DIAG.draw = { at: Date.now(), list: list.length, body: body2.map((b) => String(b[0]).replace(/^.*Assets\/[^/]+\//, "") + "@" + b[1] + "," + b[2]), pic: p ? p.src ? typeof p.src === "string" ? "picture" : "drawing " + p.src.width + "x" + p.src.height : "empty" : "waiting for the body pictures" };
+            }
             if (p && p.src) {
               real.drawImage(p.src, p.dx, p.dy, {});
               if (typeof real.drawImageBlink === "function") real.drawImageBlink(p.src, p.dx, p.dy, {});
@@ -4952,6 +4960,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
               }
             }
           } catch (e) {
+            DIAG.lastErr = String(e && e.message || e);
             console.warn("[Farmhand Companion] messes:", e);
           }
         };
@@ -4981,6 +4990,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
         return r;
       });
     } catch (e) {
+      DIAG.lastErr = "hook: " + String(e && e.message || e);
       console.warn("[Farmhand Companion] messes unavailable:", e);
       hooked3 = false;
     }
@@ -5006,6 +5016,18 @@ One of mods you are using is using an old version of SDK. It will work for now b
     let pics = 0;
     for (const p of made2.values()) if (p.src) pics++;
     return { pictures: pics, bytesKB: Math.round(Array.from(made2.values()).reduce((n, p) => n + (p.src ? p.src.length : 0), 0) / 1e3), imgs: imgs.size, others: others2.size };
+  }
+  function messDiag() {
+    const ago = (t) => t ? Math.round((Date.now() - t) / 1e3) + "s ago" : "never";
+    const L = [];
+    L.push("hooked: " + hooked3 + " \xB7 splatter kit: " + !!W4.FarmMess + (W4.FarmMess && W4.FarmMess.KINDS ? " (" + Object.keys(W4.FarmMess.KINDS).length + " kinds)" : ""));
+    L.push("on you now: " + mine2.length + (mine2.length ? " \xB7 newest " + mine2[mine2.length - 1].k + " on " + mine2[mine2.length - 1].a.join("+") + ", " + ago(mine2[mine2.length - 1].t) : ""));
+    L.push("marks from the bot: " + (DIAG.marks.length ? DIAG.marks.map((x) => (x.mess || "?") + " " + ago(x.at)).join(", ") : "none since this page opened"));
+    L.push("your body drawn: " + DIAG.got + " times, with a mess " + DIAG.draws + " times");
+    if (DIAG.draw) L.push("last mess drawing: " + ago(DIAG.draw.at) + ", " + DIAG.draw.list + " messes, " + DIAG.draw.pic + "; skin pictures seen: " + (DIAG.draw.body.join(" ") || "NONE"));
+    if (DIAG.lastErr) L.push("last error: " + DIAG.lastErr);
+    L.push("others with messes: " + others2.size);
+    return L.join("\n");
   }
 
   // extension/src/trimpics.js
@@ -5211,6 +5233,20 @@ One of mods you are using is using an old version of SDK. It will work for now b
         } catch (e) {
         }
         if (typeof W6.ChatRoomSendLocal === "function") W6.ChatRoomSendLocal("Farmhand memory log (copied, paste it to Claude):\n" + text, 12e4);
+        else console.log(text);
+      } }, { Tag: "farmmess", Description: ": where the farm's messes on you got to (for Claude)", Action: () => {
+        let text = "";
+        try {
+          text = messDiag();
+        } catch (e) {
+          text = "couldn't check: " + e.message;
+        }
+        text = "Companion v" + VERSION + "\n" + text;
+        try {
+          W6.navigator.clipboard.writeText(text);
+        } catch (e) {
+        }
+        if (typeof W6.ChatRoomSendLocal === "function") W6.ChatRoomSendLocal("Farmhand messes (copied, paste it to Claude):\n" + text, 12e4);
         else console.log(text);
       } }]);
     }

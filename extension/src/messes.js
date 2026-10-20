@@ -17,7 +17,9 @@ import { makeMsg } from "../../shared/protocol.js";
 
 const W = window, KEY = "farmhand-messes", MAX = 60;
 let sdk = null, hooked = false;
-let mine = [];                                  // [{ k: kind, a: [areas], s: seed, t: when }]
+let mine = [];
+// what happened last, for /farmmess (Laynie, Oct 20: a mess drawn on everybody but her)
+const DIAG = { marks: [], draw: null, draws: 0, lastErr: "", got: 0 };                                  // [{ k: kind, a: [areas], s: seed, t: when }]
 const others = new Map();                       // member → { list, at }
 // the bot's colours for its messes (10u7-traps-3.js MESS, CFG.PISS_COLOR), back to the kind of mess
 const BY_COLOR = { "#fff4dc": "cream", "#e0a030": "honey", "#8b4a1c": "maple", "#4a2a18": "chocolate", "#e04a6a": "strawberry", "#f7f7f0": "milk",
@@ -31,6 +33,7 @@ const clean = (list) => (Array.isArray(list) ? list.filter(ok).slice(-MAX).map((
 
 // ── the farm marked you: what landed, and where ──
 export function messFromMark(m) {
+  DIAG.marks.push({ at: Date.now(), mess: m && m.mess, splat: m && m.splat, farmMess: !!W.FarmMess }); if (DIAG.marks.length > 5) DIAG.marks.shift();
   if (!m || !Array.isArray(m.splat) || !m.splat.length || !W.FarmMess) return false;
   const kind = (typeof m.mess === "string" && W.FarmMess.KINDS[m.mess]) ? m.mess : (typeof m.color === "string" ? BY_COLOR[m.color.toLowerCase()] : null) || "cum";
   const a = [];
@@ -122,17 +125,18 @@ function hook() {
     sdk.hookFunction("CommonDrawAppearanceBuild", 3, (args, next) => {
       const C = args[0], real = args[1];
       if (!C || !real || typeof real.drawImage !== "function" || !W.FarmMess) return next(args);
-      const list = listFor(C); if (!list.length) return next(args);
+      const list = listFor(C); if (C === W.Player) DIAG.got++; if (!list.length) return next(args);
       const body = []; let done = false;
       const lay = () => {
         if (done) return; done = true;
         try {
           const p = messPicture(C, list, body);
+          if (C === W.Player) { DIAG.draws++; DIAG.draw = { at: Date.now(), list: list.length, body: body.map((b) => String(b[0]).replace(/^.*Assets\/[^/]+\//, "") + "@" + b[1] + "," + b[2]), pic: p ? (p.src ? (typeof p.src === "string" ? "picture" : "drawing " + p.src.width + "x" + p.src.height) : "empty") : "waiting for the body pictures" }; }
           if (p && p.src) {
             real.drawImage(p.src, p.dx, p.dy, {}); if (typeof real.drawImageBlink === "function") real.drawImageBlink(p.src, p.dx, p.dy, {});
             if (p.fresh) { p.fresh = false; const mn = C.MemberNumber; redrawMn(mn, 250); setTimeout(() => redrawMn(mn, 0), 1200); }   // (a new picture takes a moment to load)
           }
-        } catch (e) { console.warn("[Farmhand Companion] messes:", e); }
+        } catch (e) { DIAG.lastErr = String(e && e.message || e); console.warn("[Farmhand Companion] messes:", e); }
       };
       const seen = (name) => (src, x, y, ...rest) => {
         if (typeof src === "string" && !done) {
@@ -148,7 +152,7 @@ function hook() {
       return out;
     });
     sdk.hookFunction("ChatRoomSync", 0, (args, next) => { const r = next(args); setTimeout(() => { if (mine.length) tell(true); ask(); }, 3000); return r; });
-  } catch (e) { console.warn("[Farmhand Companion] messes unavailable:", e); hooked = false; }
+  } catch (e) { DIAG.lastErr = "hook: " + String(e && e.message || e); console.warn("[Farmhand Companion] messes unavailable:", e); hooked = false; }
 }
 export function initMesses(mod) {
   sdk = mod; load();
@@ -163,3 +167,17 @@ export function initMesses(mod) {
 
 // ── how much it's holding (memlog.js) ──
 export function messMemory() { let pics = 0; for (const p of made.values()) if (p.src) pics++; return { pictures: pics, bytesKB: Math.round(Array.from(made.values()).reduce((n, p) => n + (p.src ? p.src.length : 0), 0) / 1000), imgs: imgs.size, others: others.size }; }
+
+// ── /farmmess: where a mess on you got to ──
+export function messDiag() {
+  const ago = (t) => (t ? Math.round((Date.now() - t) / 1000) + "s ago" : "never");
+  const L = [];
+  L.push("hooked: " + hooked + " · splatter kit: " + !!W.FarmMess + (W.FarmMess && W.FarmMess.KINDS ? " (" + Object.keys(W.FarmMess.KINDS).length + " kinds)" : ""));
+  L.push("on you now: " + mine.length + (mine.length ? " · newest " + mine[mine.length - 1].k + " on " + mine[mine.length - 1].a.join("+") + ", " + ago(mine[mine.length - 1].t) : ""));
+  L.push("marks from the bot: " + (DIAG.marks.length ? DIAG.marks.map((x) => (x.mess || "?") + " " + ago(x.at)).join(", ") : "none since this page opened"));
+  L.push("your body drawn: " + DIAG.got + " times, with a mess " + DIAG.draws + " times");
+  if (DIAG.draw) L.push("last mess drawing: " + ago(DIAG.draw.at) + ", " + DIAG.draw.list + " messes, " + DIAG.draw.pic + "; skin pictures seen: " + (DIAG.draw.body.join(" ") || "NONE"));
+  if (DIAG.lastErr) L.push("last error: " + DIAG.lastErr);
+  L.push("others with messes: " + others.size);
+  return L.join("\n");
+}

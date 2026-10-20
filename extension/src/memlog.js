@@ -7,6 +7,7 @@ import { drawnBodyMemory } from "./drawnbody.js";
 import { messMemory } from "./messes.js";
 import { trimStats } from "./trimpics.js";
 import { VERSION } from "./version.js";
+import { messDiag } from "./messes.js";
 
 const W = window, KEY = "farmhand-memlog", MAX = 120;
 let log = [];
@@ -62,6 +63,11 @@ export function initMemlog() {
       try { W.navigator.clipboard.writeText(JSON.stringify(log)); } catch (e) { /* no clipboard: fine */ }
       if (typeof W.ChatRoomSendLocal === "function") W.ChatRoomSendLocal("Farmhand memory log (copied, paste it to Claude):\n" + text, 120000);
       else console.log(text);
+    } }, { Tag: "farmmess", Description: ": where the farm's messes on you got to (for Claude)", Action: () => {
+      let text = ""; try { text = messDiag(); } catch (e) { text = "couldn't check: " + e.message; }
+      text = "Companion v" + VERSION + "\n" + text;
+      try { W.navigator.clipboard.writeText(text); } catch (e) { /* no clipboard: fine */ }
+      if (typeof W.ChatRoomSendLocal === "function") W.ChatRoomSendLocal("Farmhand messes (copied, paste it to Claude):\n" + text, 120000); else console.log(text);
     } }]);
   }
 }

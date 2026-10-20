@@ -13,7 +13,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 | Map tools, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.4** |
 | Dairy | `farmhand-dairy.user.js` | the bot's PC | **1.1.0** |
 | Shows | `farmhand-shows.user.js` | the bot's PC | **1.1.0** |
-| Farmhand Companion | `farmhand-companion.user.js` | each player | **0.31.2** |
+| Farmhand Companion | `farmhand-companion.user.js` | each player | **0.31.3** |
 | Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.4** |
 
 ## Sending a watch report
@@ -23,6 +23,8 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 - Running the watcher on more than one game at once (the bot, yours, a tester's) lets Claude line them up into one timeline.
 
 ## Latest changes (newest first)
+
+- **Companion 0.31.3: /farmmess.** Shows where the farm's messes on you got to: the marks the bot sent, what's on your list, and what your body looked like when the mess was drawn. For chasing a mess that shows on everybody but Laynie.
 
 - **Bot 0.38.3: a yes goes to the newest question.** An old breedin' or jar ask left hangin' used to take the yes meant for a mess off the shelf (or an add-on's question), so the newer one never happened. Now the newest question gets the answer.
 

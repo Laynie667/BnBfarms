@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.38.1
+// @version      0.38.2
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -1895,7 +1895,7 @@
   ];
 
   // bot/src/version.js
-  var VERSION = "0.38.1";
+  var VERSION = "0.38.2";
 
   // bot-parts:farmhand-bot-parts
   (function() {
@@ -4525,6 +4525,10 @@
       }
       if (m.type === "markDone") {
         dbg("mark", mn, m.ok, (m.did || []).join(","), m.why || "");
+        try {
+          messMarkDone(mn, m);
+        } catch (e) {
+        }
         return;
       }
       if (m.type === "chatlog") {
@@ -16339,6 +16343,8 @@
       const pool = MESS_DO[it.id] || {}, lines = to === sender ? pool.self : pool.other;
       if (lines && lines.length) emote("\u{1F6CD}\uFE0F " + messFill(lines[Math.floor(Math.random() * lines.length)], sender, to), to);
       let drawn = false;
+      state.messWait = state.messWait || /* @__PURE__ */ new Map();
+      state.messWait.set(to, { by: sender, name: it.name, at: Date.now() });
       try {
         drawn = bodyMark(to, Object.assign({ splat: it.where.slice(), mess: it.mess, amount: it.mess === "cum" ? 1.6 : 1.4, asked: true }, MESS[it.mess] ? { color: MESS[it.mess] } : it.mess === "piss" ? { color: CFG.PISS_COLOR } : {}));
       } catch (e) {
@@ -16404,6 +16410,15 @@
         return;
       }
       R("\u{1F6CD}\uFE0F Messes off the shelf (" + (r.messesOn ? "ON: no askin'" : "off: you're asked first") + "). " + MESS_SHELF.map((it) => it.id.replace(/^mess-/, "") + " " + it.price + "\u{1F380}").join(", ") + ". ?buy <one> for <who>. ?messes on|off.");
+    }
+    function messMarkDone(mn, m) {
+      const w = state.messWait && state.messWait.get(mn);
+      if (!w) return;
+      state.messWait.delete(mn);
+      if (m.ok || Date.now() - w.at > 6e4) return;
+      const why = String(m.why || "no reason given").slice(0, 80);
+      tell(mn, "\u{1F6CD}\uFE0F Your Companion couldn't put " + w.name.toLowerCase() + " on you (" + why + "). Reload your page, and if it keeps happenin', tell Laynie, sugar.");
+      if (w.by !== mn) tell(w.by, "\u{1F6CD}\uFE0F " + plainName(mn) + "'s Companion couldn't draw your " + w.name.replace(/^an? /i, "") + " on them (" + why + ").");
     }
     const TRAP_THEMES = {
       kennel: { label: "the kennels", near: /kennel|dog|pup|hound/, kinds: ["kennel", "wolves", "teaser", "crate", "bell", "groomer", "whelping", "leashpost"] },

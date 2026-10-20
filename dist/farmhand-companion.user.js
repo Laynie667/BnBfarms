@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.31.1
+// @version      0.31.2
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -230,7 +230,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.31.1";
+  var VERSION = "0.31.2";
 
   // extension/src/config.js
   var BOT_MEMBER = 260239;
@@ -10259,8 +10259,19 @@ One of mods you are using is using an old version of SDK. It will work for now b
           } else if (m.strip) r = stripMe(prefs);
           else if (m.dress) r = dressMe();
           else {
-            r = markBody(m, prefs);
-            if (prefs.marks && Array.isArray(m.splat) && m.splat.length) messFromMark(m);
+            let drew = false;
+            try {
+              if (prefs.marks && Array.isArray(m.splat) && m.splat.length) drew = messFromMark(m);
+            } catch (e) {
+              console.warn("[Farmhand Companion] mess:", e);
+            }
+            try {
+              r = markBody(m, prefs);
+            } catch (e) {
+              console.warn("[Farmhand Companion] splatters:", e);
+              r = { ok: drew, did: drew ? ["mess"] : [], why: e.message };
+            }
+            if (drew && !r.ok) r = { ok: true, did: ["mess"], why: r.why || "" };
           }
         } catch (e) {
           r = { ok: false, why: e.message };

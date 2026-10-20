@@ -63,7 +63,7 @@
     const pool = MESS_DO[it.id] || {}, lines = to === sender ? pool.self : pool.other;
     if (lines && lines.length) emote("🛍️ "+messFill(lines[Math.floor(Math.random()*lines.length)], sender, to), to);
     // asked: they bought it, or said yes, or have ?messes on, so their Companion draws it even with "Farm can mark my body" off
-    let drawn = false;
+    let drawn = false; state.messWait = state.messWait || new Map(); state.messWait.set(to, { by: sender, name: it.name, at: Date.now() });
     try { drawn = bodyMark(to, Object.assign({ splat: it.where.slice(), mess: it.mess, amount: it.mess === "cum" ? 1.6 : 1.4, asked: true }, MESS[it.mess] ? { color: MESS[it.mess] } : it.mess === "piss" ? { color: CFG.PISS_COLOR } : {})); } catch(e){ warn("mess store:", e); }
     if (drawn && it.id === "creampie") later(() => { try { bodyMark(to, { splat: ["tummy"], mess: "cum", amount: 1.2, asked: true }); } catch(e){} }, 1200);   // and it runs
     if (!drawn && to !== CFG.BOT_MEMBER) tell(sender, "🛍️ "+(to === sender ? "You don't" : plainName(to)+" doesn't")+" have the Farmhand Companion, so the room hears it but nobody can see it on "+(to === sender ? "you" : "them")+".");
@@ -94,4 +94,13 @@
     const a = String(args[0] || "").toLowerCase();
     if (a === "on" || a === "off"){ r.messesOn = a === "on"; saveLedger(); R(a === "on" ? "🛍️ Messes on: anybody can buy a mess off the shelf and put it on you, no askin'. Your limits still count, and ?wash cleans you up." : "🛍️ Messes off: you'll be asked first, every time."); return; }
     R("🛍️ Messes off the shelf ("+(r.messesOn ? "ON: no askin'" : "off: you're asked first")+"). "+MESS_SHELF.map(it => it.id.replace(/^mess-/, "")+" "+it.price+"🎀").join(", ")+". ?buy <one> for <who>. ?messes on|off.");
+  }
+  // their Companion's answer to a bought mess: when it couldn't be drawn, they both hear why (so it's never a silent miss)
+  function messMarkDone(mn, m){
+    const w = state.messWait && state.messWait.get(mn); if (!w) return;
+    state.messWait.delete(mn);
+    if (m.ok || Date.now() - w.at > 60000) return;
+    const why = String(m.why || "no reason given").slice(0, 80);
+    tell(mn, "🛍️ Your Companion couldn't put "+w.name.toLowerCase()+" on you ("+why+"). Reload your page, and if it keeps happenin', tell Laynie, sugar.");
+    if (w.by !== mn) tell(w.by, "🛍️ "+plainName(mn)+"'s Companion couldn't draw your "+w.name.replace(/^an? /i, "")+" on them ("+why+").");
   }

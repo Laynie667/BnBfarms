@@ -241,7 +241,14 @@ function onFarmMsg(m) {
         if (m.wash) { r = washMarks(); messWash(); }
         else if (m.strip) r = stripMe(prefs);
         else if (m.dress) r = dressMe();
-        else { r = markBody(m, prefs); if (prefs.marks && Array.isArray(m.splat) && m.splat.length) messFromMark(m); }   // and our own mess, drawn by the Companion (messes.js)
+        else {
+          // our own mess, drawn by the Companion (messes.js), first and on its own: when the game's splatters below failed
+          // on somebody's outfit, the mess never went on either, and nobody saw a thing (Laynie, Oct 20: the cake smash)
+          let drew = false;
+          try { if (prefs.marks && Array.isArray(m.splat) && m.splat.length) drew = messFromMark(m); } catch (e) { console.warn("[Farmhand Companion] mess:", e); }
+          try { r = markBody(m, prefs); } catch (e) { console.warn("[Farmhand Companion] splatters:", e); r = { ok: drew, did: drew ? ["mess"] : [], why: e.message }; }
+          if (drew && !r.ok) r = { ok: true, did: ["mess"], why: r.why || "" };
+        }
       } catch (e) { r = { ok: false, why: e.message }; }
       toBot("markDone", { ok: !!r.ok, did: r.did || [], why: r.why || "" });
       break;

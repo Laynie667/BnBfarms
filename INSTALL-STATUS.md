@@ -5,7 +5,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 | Script | File in `dist/` | Where it runs | Current |
 |---|---|---|---|
-| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.38.1** |
+| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.38.2** |
 | Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.9.0** |
 | Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.2.1** |
 | Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **1.1.0** |
@@ -13,7 +13,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 | Map tools, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.4** |
 | Dairy | `farmhand-dairy.user.js` | the bot's PC | **1.1.0** |
 | Shows | `farmhand-shows.user.js` | the bot's PC | **1.1.0** |
-| Farmhand Companion | `farmhand-companion.user.js` | each player | **0.31.1** |
+| Farmhand Companion | `farmhand-companion.user.js` | each player | **0.31.2** |
 | Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.4** |
 
 ## Sending a watch report
@@ -23,6 +23,8 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 - Running the watcher on more than one game at once (the bot, yours, a tester's) lets Claude line them up into one timeline.
 
 ## Latest changes (newest first)
+
+- **Bot 0.38.2, Companion 0.31.2: a mess is drawn even when the game's splatters fail.** Laynie had "Farm can mark my body" on and still saw nothing. The Companion put the game's own Splatters on first and drew the farm's mess after; if the splatters failed on somebody's outfit, the mess never went on either. Now the mess is drawn first, on its own, and if a bought mess still can't be drawn, both people hear why.
 
 - **Bot 0.38.1, Companion 0.31.1: a mess off the shelf always shows.** Laynie: "I smashed cake on someone and I see it on them, but when they smashed it on me, I dont see it and they dont see it either." With "Farm can mark my body" off, the Companion drew nothing and told nobody. Now a bought mess they said yes to (or with ?messes on) is drawn whatever that switch says, and the buyer hears it plainly when the other player has no Companion to draw it.
 

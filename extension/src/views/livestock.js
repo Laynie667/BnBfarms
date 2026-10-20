@@ -117,13 +117,9 @@ function traps(ctx) {
       muted(tc.left + " kind" + (tc.left === 1 ? "" : "s") + " still to find" + (tc.eggs ? " · " + tc.eggs + " eggs laid" : "") + (tc.paused ? " · traps paused" : "") + (tc.eager ? " · eager (no waits)" : "") + (tc.danger ? " · Danger Draught in you" : "")),
       (tc.corr || tc.under) ? bar("Corruption", tc.corr + " of 100" + (tc.under ? " · gone under, depth " + tc.under : ""), tc.corr, "alert") : null,
       tc.hunt && muted("🔔 The hunt is on: get to " + tc.hunt.goal),
-      h("div", null, btn("Struggle", () => ctx.send("struggle")), btn(tc.paused ? "Traps on" : "Pause traps", () => ctx.send("traps " + (tc.paused ? "on" : "off"))),
+      h("div", null, btn("Struggle", () => ctx.send("struggle")), btn("Switch traps off", () => ctx.send("traps off")),
         btn(tc.eager ? "Eager: on" : "Eager: off", () => ctx.send("traps eager " + (tc.eager ? "off" : "on"))), btn("What's out there", () => ctx.send("traps")), btn("Lay (at the nest)", () => ctx.send("lay")), btn("My brood book", () => ctx.send("brood"))))
-       : (s.roles || []).includes("SUBJECT")
-         // a subject, but the farm girl sent no card: her bot is older than this panel
-         ? card(title("Trap card"), muted("You're a test subject, and the traps are live for you. Your card isn't showin' because the farm girl's bot (v" + ((ctx.welcome && ctx.welcome.ver) || "?") + ") is older than this panel: it needs 0.22 or newer on her computer to send it."),
-             h("div", null, btn("Struggle", () => ctx.send("struggle")), btn("What's out there", () => ctx.send("traps"))))
-       : card(title("Traps"), muted("The farm's traps spring for test subjects and nobody else. A proprietor signs a volunteer up; you're not one right now, so you can walk right over them.")),
+       : card(title("Traps"), muted("The farm's traps are off for you, so you can walk right over them. Switch them on and every trap spot on the farm can spring for you."), h("div", null, btn("Switch traps on", () => ctx.send("traps on")))),
     card(title("On you right now"), gear.length ? gear.map((g) => h("div", { style: { marginTop: "6px" } }, h("div", { class: "fhc-kv" }, h("b", null, g.name), h("span", { class: "fhc-muted" }, Math.max(0, Math.ceil((g.until - Date.now()) / 60000)) + " min")), muted(gearLore(g.name) || g.desc || "")))
       : muted("No farm gear on you."),
       !ctx.prefs.gear && muted("Trap gear only goes on for real with \"Farm can put real gear on me\" switched on (Toggles → This panel).")),
@@ -134,9 +130,9 @@ function traps(ctx) {
     (s.album && s.album.length) ? card(title("📔 Keepsakes"),
       s.album.map((e) => h("div", { style: { marginTop: "6px" } }, h("div", { class: "fhc-kv" }, h("b", null, e.i + " " + e.h), h("span", { class: "fhc-muted" }, new Date(e.t).toLocaleDateString())), muted(e.x))),
       muted("Only you can open this album.")) : null,
-    ad && card(h("div", { class: "fhc-kv" }, title("Proprietor: subjects & traps"), chip(ad.subjects.length + " subject" + (ad.subjects.length === 1 ? "" : "s"), "acc")),
+    ad && card(h("div", { class: "fhc-kv" }, title("Proprietor: traps"), chip(ad.subjects.length + " with traps on", "acc")),
       ad.subjects.length ? ad.subjects.map((x) => h("div", { class: "fhc-kv" }, h("span", null, (x.here ? "● " : "") + x.name), h("span", { class: "fhc-muted" }, x.n + " sprung" + (x.paused ? " · paused" : ""))))
-        : muted("Nobody's signed up yet: ?subject add <who>."),
+        : muted("Nobody's switched their traps on yet."),
       muted("Trap spots: " + (ad.spots.length ? ad.spots.join(", ") : "none yet (?spot set trap-<kind>)")),
       muted("Water: " + (ad.water.length ? ad.water.join(", ") : "none yet (?spot set pond)") + (ad.nest ? " · " + ad.nest + " eggs in the nest" : "") + (ad.pack ? " · pack at " + ad.pack : "")),
       ad.hunt && muted("🔔 Hunt on: finish at " + ad.hunt.goal + ", " + ad.hunt.done + " home"),
@@ -170,7 +166,8 @@ export const SWITCH_INFO = [
   ["watersports", "Watersports", "Piss play can find you: the spray trap, a feeder crafted for it, and the scenes that have it. Off until you say so"],
   ["parasite", "Parasite", "Swallow at the glory stalls and, rarely, a pair of livin' lips seals over your mouth for 12 hours: it feeds you fertility, growth, hyper pregnancy and capacity serum and turns every load you swallow into more"],
   ["symbiote", "Symbiotes", "Livin' latex, milk moss or the nestling can bond to you. Each gives you somethin' for as long as it's fed: room to hold more, more milk, an easier catch. They grow into real clothes on you (latex, moss), and they spread: latex by a touch, moss in the milk, the nestling by a breedin', to others who switched this on. Your safeword sends it away"],
-  ["eager", "Traps: no cooldown", "Test subjects: no breather between traps and no wait for a trap to reset. Step off and back on and it springs again"],
+  ["traps", "Traps", "The farm's traps spring for you: step on a trap spot and it might dose, drain, breed, strip, pump or fill you with eggs, and the water's not safe either. Off: you walk right over them. Your limits and your safeword still rule"],
+  ["eager", "Traps: no cooldown", "With traps on: no breather between traps and no wait for a trap to reset. Step off and back on and it springs again"],
   ["bench", "Use bench", "Staff and the wheel can sentence you to time strapped over the use bench, where anybody can use you. Your safeword ends it at once"],
 ];
 // some switches only work once another is on; say so instead of lettin' a click do nothin'

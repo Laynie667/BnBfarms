@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.31.5
+// @version      0.32.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -230,7 +230,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.31.5";
+  var VERSION = "0.32.0";
 
   // extension/src/config.js
   var BOT_MEMBER = 260239;
@@ -5556,17 +5556,13 @@ One of mods you are using is using an old version of SDK. It will work for now b
           "div",
           null,
           btn("Struggle", () => ctx3.send("struggle")),
-          btn(tc.paused ? "Traps on" : "Pause traps", () => ctx3.send("traps " + (tc.paused ? "on" : "off"))),
+          btn("Switch traps off", () => ctx3.send("traps off")),
           btn(tc.eager ? "Eager: on" : "Eager: off", () => ctx3.send("traps eager " + (tc.eager ? "off" : "on"))),
           btn("What's out there", () => ctx3.send("traps")),
           btn("Lay (at the nest)", () => ctx3.send("lay")),
           btn("My brood book", () => ctx3.send("brood"))
         )
-      ) : (s.roles || []).includes("SUBJECT") ? card(
-        title("Trap card"),
-        muted("You're a test subject, and the traps are live for you. Your card isn't showin' because the farm girl's bot (v" + (ctx3.welcome && ctx3.welcome.ver || "?") + ") is older than this panel: it needs 0.22 or newer on her computer to send it."),
-        h("div", null, btn("Struggle", () => ctx3.send("struggle")), btn("What's out there", () => ctx3.send("traps")))
-      ) : card(title("Traps"), muted("The farm's traps spring for test subjects and nobody else. A proprietor signs a volunteer up; you're not one right now, so you can walk right over them.")),
+      ) : card(title("Traps"), muted("The farm's traps are off for you, so you can walk right over them. Switch them on and every trap spot on the farm can spring for you."), h("div", null, btn("Switch traps on", () => ctx3.send("traps on")))),
       card(
         title("On you right now"),
         gear.length ? gear.map((g) => h("div", { style: { marginTop: "6px" } }, h("div", { class: "fhc-kv" }, h("b", null, g.name), h("span", { class: "fhc-muted" }, Math.max(0, Math.ceil((g.until - Date.now()) / 6e4)) + " min")), muted(gearLore(g.name) || g.desc || ""))) : muted("No farm gear on you."),
@@ -5584,8 +5580,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
         muted("Only you can open this album.")
       ) : null,
       ad && card(
-        h("div", { class: "fhc-kv" }, title("Proprietor: subjects & traps"), chip(ad.subjects.length + " subject" + (ad.subjects.length === 1 ? "" : "s"), "acc")),
-        ad.subjects.length ? ad.subjects.map((x) => h("div", { class: "fhc-kv" }, h("span", null, (x.here ? "\u25CF " : "") + x.name), h("span", { class: "fhc-muted" }, x.n + " sprung" + (x.paused ? " \xB7 paused" : "")))) : muted("Nobody's signed up yet: ?subject add <who>."),
+        h("div", { class: "fhc-kv" }, title("Proprietor: traps"), chip(ad.subjects.length + " with traps on", "acc")),
+        ad.subjects.length ? ad.subjects.map((x) => h("div", { class: "fhc-kv" }, h("span", null, (x.here ? "\u25CF " : "") + x.name), h("span", { class: "fhc-muted" }, x.n + " sprung" + (x.paused ? " \xB7 paused" : "")))) : muted("Nobody's switched their traps on yet."),
         muted("Trap spots: " + (ad.spots.length ? ad.spots.join(", ") : "none yet (?spot set trap-<kind>)")),
         muted("Water: " + (ad.water.length ? ad.water.join(", ") : "none yet (?spot set pond)") + (ad.nest ? " \xB7 " + ad.nest + " eggs in the nest" : "") + (ad.pack ? " \xB7 pack at " + ad.pack : "")),
         ad.hunt && muted("\u{1F514} Hunt on: finish at " + ad.hunt.goal + ", " + ad.hunt.done + " home"),
@@ -5631,7 +5627,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
     ["watersports", "Watersports", "Piss play can find you: the spray trap, a feeder crafted for it, and the scenes that have it. Off until you say so"],
     ["parasite", "Parasite", "Swallow at the glory stalls and, rarely, a pair of livin' lips seals over your mouth for 12 hours: it feeds you fertility, growth, hyper pregnancy and capacity serum and turns every load you swallow into more"],
     ["symbiote", "Symbiotes", "Livin' latex, milk moss or the nestling can bond to you. Each gives you somethin' for as long as it's fed: room to hold more, more milk, an easier catch. They grow into real clothes on you (latex, moss), and they spread: latex by a touch, moss in the milk, the nestling by a breedin', to others who switched this on. Your safeword sends it away"],
-    ["eager", "Traps: no cooldown", "Test subjects: no breather between traps and no wait for a trap to reset. Step off and back on and it springs again"],
+    ["traps", "Traps", "The farm's traps spring for you: step on a trap spot and it might dose, drain, breed, strip, pump or fill you with eggs, and the water's not safe either. Off: you walk right over them. Your limits and your safeword still rule"],
+    ["eager", "Traps: no cooldown", "With traps on: no breather between traps and no wait for a trap to reset. Step off and back on and it springs again"],
     ["bench", "Use bench", "Staff and the wheel can sentence you to time strapped over the use bench, where anybody can use you. Your safeword ends it at once"]
   ];
   var NEEDS = { freeuse: ["breedable", "Turn Breedable on first"] };

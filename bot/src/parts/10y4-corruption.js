@@ -140,7 +140,7 @@
     if (cmd === "cleanse"){
       if (!isStaff(sender)){ R("Cleansin' is staff work, sugar."); return; }
       const t = resolveTarget(args[0]);
-      if (!t || !isSubject(t)){ R("Cleanse who, sugar? ?cleanse <a test subject>. It costs you 5 ribbons and takes 20 off their corruption."); return; }
+      if (!t || !isSubject(t)){ R("Cleanse who, sugar? ?cleanse <somebody with traps on>. It costs you 5 ribbons and takes 20 off their corruption."); return; }
       if (corruptionOf(t) <= 0){ R(plainName(t)+" is clean as a whistle, sugar."); return; }
       if (ribbonsOf(sender) < CFG.CLEANSE_COST){ R("That takes "+CFG.CLEANSE_COST+" ribbons, sugar, and you haven't got them."); return; }
       spendRibbons(sender, CFG.CLEANSE_COST, "cleansin' "+plainName(t));
@@ -150,7 +150,7 @@
     }
     if (cmd === "corruption"){
       const t = args[0] && isStaff(sender) ? resolveTarget(args[0]) : sender;
-      if (!t || !rec(t) || !isSubject(t)){ R("Corruption's a thing that happens to test subjects, sugar."); return; }
+      if (!t || !rec(t) || !isSubject(t)){ R("Corruption's a thing the traps do, sugar, and their traps are off."); return; }
       const m = rec(t).corrMarks || [], next = CORR_MARKS.find(x => corruptionOf(t) < x);
       R("🖤 "+plainName(t)+": corruption "+corruptionOf(t)+" of 100."+(m.length ? " Changed for good at "+m.slice().sort((a, b) => a - b).join(", ")+"." : "")+(next ? " Next change at "+next+"." : " Nothin' left to change.")+(underOf(t) ? " Gone under: depth "+underOf(t)+"." : "")); return;
     }
@@ -167,7 +167,7 @@
     }
     if (cmd === "lend"){
       if (a0 !== "me"){ R("🕯️ ?lend me puts you up for three minutes, sugar. Whoever bids the most ribbons picks three traps to walk you through, and you keep half."); return; }
-      if (!isSubject(sender)){ R("Only a test subject can be lent to the traps, sugar."); return; }
+      if (!isSubject(sender)){ R("Switch your traps on first (?traps on), sugar."); return; }
       if (state.lend){ R("Somebody's already on the block, sugar. Wait your turn."); return; }
       if (quietNow(sender) || heldByTrap(sender)){ R("Not just now, sugar."); return; }
       state.lend = { mn: sender, stage: "bids", until: now + CFG.LEND_BID_S*1000, bids: [] };

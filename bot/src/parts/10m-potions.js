@@ -44,16 +44,19 @@
     { id: "danger", name: "Danger Draught", kind: "punish", mins: 120, price: 8, stack: 4, desc: "For two hours your luck runs bad: you catch half again as easy, the water and every chancy thing on the farm are half again as likely to get you, and whatever a trap does to you lasts twice as long (three times with a second bottle). Every bottle adds a quarter to the parasite's chance at the glory stalls: four bottles deep, it is certain.",
       limit: /\b(danger|risk)/i, drink: "It's black, it smokes a little, and it tastes like a dare. Somethin' in your belly goes cold and reckless.",
       seen: "%n knocks back a Danger Draught and shivers. They've just made themselves the unluckiest animal on the farm." },
-    { id: "tentaclemusk", name: "Tentacle Musk", kind: "punish", mins: 120, price: 10, stack: 3, desc: "A perfume. For two hours the thing in the water can smell you from the bottom of the pond: it's twenty times as likely to come for you, it looks for you every minute you stand near water, and every clutch anything lays in you comes in three times the size (five with a second dab, seven with a third). The parasite likes it too. Test subjects only for the water.",
+    { id: "tentaclemusk", name: "Tentacle Musk", kind: "punish", mins: 120, price: 10, stack: 3, desc: "A perfume. For two hours the thing in the water can smell you from the bottom of the pond: it's twenty times as likely to come for you, it looks for you every minute you stand near water, and every clutch anything lays in you comes in three times the size (five with a second dab, seven with a third). The parasite likes it too. Only with your traps on, for the water.",
       limit: /\b(tentacle|eggs?|ovipos|clutch|monster)/i, drink: "You dab it on your throat, your wrists, the insides of your thighs. It smells of salt and deep water and somethin' sweet rottin'. Somewhere, somethin' wakes up.",
       seen: "%n dabs on a perfume that smells like low tide and sex. The surface of every trough and puddle nearby shivers, just once." },
-    { id: "wolfscent", name: "Wolf Scent", kind: "punish", mins: 60, price: 6, desc: "A scent. For an hour you smell like a bitch in season to anything with a muzzle, and the pack will come and find you wherever you're standin'. Test subjects only.",
+    { id: "wolfscent", name: "Wolf Scent", kind: "punish", mins: 60, price: 6, desc: "A scent. For an hour you smell like a bitch in season to anything with a muzzle, and the pack will come and find you wherever you're standin'. Only with your traps on.",
       limit: /\b(gang|knot|anthro|furr)/i, drink: "You dab it behind your ears and between your legs. Musky, sharp, a little like wet fur. Somewhere far off, somethin' lifts its nose.",
       seen: "%n dabs on somethin' sharp and musky. Out past the fence, a howl goes up." },
-    { id: "mareheat", name: "Mare's Heat", kind: "punish", mins: 60, price: 6, desc: "A scent. For an hour you smell like a mare ready for the stud, and the stallion will leave his stall and come for you. Test subjects only.",
+    { id: "goblinmusk", name: "Goblin Musk", kind: "punish", mins: 90, price: 7, desc: "A musk. For an hour and a half you smell like the best thing a goblin ever stole: the raiding party, the pit, the market and the cart come lookin' for you wherever you're standin', and at the glory stalls more of the visitors are goblins, all balls and no manners. Only with your traps on, for the traps.",
+      limit: /\b(goblin|gang|anthro|monster)/i, drink: "You dab it on your neck and wrists and the backs of your knees. It smells of woodsmoke, wet moss and somethin' green and rank and sweet. Somewhere in the hedges, little ears prick up.",
+      seen: "%n dabs on a little bottle of somethin' green and pungent. From the hedge at the edge of the yard comes a high, delighted giggle." },
+    { id: "mareheat", name: "Mare's Heat", kind: "punish", mins: 60, price: 6, desc: "A scent. For an hour you smell like a mare ready for the stud, and the stallion will leave his stall and come for you. Only with your traps on.",
       limit: /\b(size|inflat|anthro|furr)/i, drink: "It's thick and sweet and a little rank, and you stroke it up the insides of your thighs. In the stud barn, a hoof strikes a door.",
       seen: "%n smears on a scent that makes every stallion on the place stamp and snort." },
-    { id: "sowslop", name: "Sow's Slop", kind: "punish", mins: 60, price: 6, desc: "A scent. For an hour you smell like slop and sow, and the boar will break out of the sty to get at you. Test subjects only.",
+    { id: "sowslop", name: "Sow's Slop", kind: "punish", mins: 60, price: 6, desc: "A scent. For an hour you smell like slop and sow, and the boar will break out of the sty to get at you. Only with your traps on.",
       limit: /\b(mud|filth|humiliat|knot|anthro|furr)/i, drink: "It stinks. You rub it on anyway, belly and backside, and from the sty comes a long, hungry grunt.",
       seen: "%n rubs on somethin' that reeks of the sty. The boar's rails creak." },
     { id: "hiccup", name: "Hiccup Fizz", kind: "silly", mins: 15, price: 3, desc: "Fifteen minutes of hiccups. At the worst possible moments.",
@@ -142,6 +145,11 @@
       "%n uncorks the Tentacle Musk. It smells like the sea at night, and something in the deep water turns toward 'em.",
       "A drop of Tentacle Musk behind each ear, and every trough on the farm ripples once, all at the same time.",
       "%n smooths the Tentacle Musk down over their belly. The water's going to come lookin' for 'em now."],
+    goblinmusk: [
+      "%n dabs Goblin Musk behind their ears. Every hedge on the farm starts giggling.",
+      "%n uncorks the Goblin Musk and the whole yard wrinkles its nose. Somewhere, a goblin drops what it's stealin' and turns round.",
+      "A dab of Goblin Musk on each wrist and one between the legs, and %n is the shiniest thing a goblin's ever smelled.",
+      "%n rubs Goblin Musk into their thighs. Little feet start pattering in the long grass."],
     wolfscent: [
       "%n rubs Wolf Scent into the hollow of their throat. From the treeline, something answers with a low, interested growl.",
       "%n dabs Wolf Scent between their legs, and the dogs in the yard all lift their heads at once.",
@@ -233,7 +241,9 @@
     if (!was) potionStart(mn, P, f); else potionStack(mn, P, f);
     saveLedger(); audit(by || CFG.BOT_MEMBER, "POTION", mn+" "+id+(how ? " ("+how+")" : ""));
     tell(mn, "🧪 "+P.name+(how ? " ("+how+")" : "")+": "+bodyWords(mn, P.drink)+" "+P.desc+(was ? (stacked ? " That's bottle number "+f.x+" on top of the last: it hits harder and runs longer." : " You're as deep in that one as it goes, so it just runs longer.") : "")+" Your safeword pours it out.");
-    if (onMap(mn)) emote("🧪 "+tFill(pickFor(mn, "potion-seen:"+P.id, [P.seen].concat(POTION_SEEN[P.id] || [])), mn), mn);
+    // (breathed in off a trap's gas or spray, it wasn't drunk: the trap already told the room, and "drinks the Needy
+    // Nectar" after a cloud of pink gas made no sense. Laynie, Oct 20)
+    if (onMap(mn) && !/^(gas|spray|from a trap)$/.test(how || "")) emote("🧪 "+tFill(pickFor(mn, "potion-seen:"+P.id, [P.seen].concat(POTION_SEEN[P.id] || [])), mn), mn);
     syncCompanions(true);
     return true;
   }

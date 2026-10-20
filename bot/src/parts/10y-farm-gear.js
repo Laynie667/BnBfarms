@@ -104,7 +104,7 @@
   }
   // the proprietors' own card: who's signed up, what's set, what's runnin'
   function trapAdminFor(){
-    const subs = Object.values(L.people).filter(x => x.roles && x.roles.includes(ROLE.SUBJECT));
+    const subs = Object.values(L.people).filter(x => isSubject(x.mn));
     return { subjects: subs.map(x => ({ mn: x.mn, name: plainName(x.mn), here: !!charFor(x.mn), n: x.trapN || 0, paused: !!x.trapsOff })),
              spots: trapSpots().map(([n]) => n), water: waterSpots().map(([n]) => n), nest: (L.nest && L.nest.eggs) || 0,
              hunt: huntOn() ? { until: L.hunt.until, goal: L.hunt.goal, done: L.hunt.done.length } : null, pack: packOn() ? (L.pack ? L.pack.spot : "out") : null };

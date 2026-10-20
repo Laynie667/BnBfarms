@@ -24,7 +24,14 @@
   function thingName(mn){
     return mn === -2 ? "the thing in the water" : mn === -3 ? "the toy buried in them" : mn === -4 ? "the breedin' frame" : mn === -5 ? "the egg post" : mn === -6 ? "the vine patch" : mn === -7 ? "the parasite" : mn <= -10 ? anthroSireName(mn) : null;
   }
-  function isSubject(mn){ return hasRole(mn, ROLE.SUBJECT); }
+  // TRAPS ARE OPT-IN (Laynie, Oct 20: "remove the subject role and make traps purely a opt-in with a toggle for everyone"):
+  // anybody on the books says ?traps on (or flips Traps in the Companion's Toggles), and the traps spring for them; ?traps
+  // off and they never do. The old test-subject role turns into the switch, on, the first time it's looked at.
+  function isSubject(mn){
+    const r = rec(mn); if (!r) return false;
+    if (Array.isArray(r.roles) && r.roles.includes(ROLE.SUBJECT)){ r.roles = r.roles.filter(x => x !== ROLE.SUBJECT); if (r.trapsOn === undefined) r.trapsOn = !r.trapsOff; r.trapsOff = false; }
+    return !!r.trapsOn;
+  }
   const TRAP_KINDS = {
     injector: { icon: "💉", what: "a needle on a spring arm: a dose of whatever it's loaded with", limit: null },
     milker:   { icon: "🥛", what: "cups snap on and you're held till you're drained dry", limit: /\bmilk|lactat/i },
@@ -52,7 +59,7 @@
   function trapWhyNot(mn, kind){
     const r = rec(mn), K = TRAP_KINDS[kind];
     if (!r || !K) return "no such trap";
-    if (!isSubject(mn)) return "not a subject";
+    if (!isSubject(mn)) return "they haven't switched traps on (?traps on)";
     if (r.trapsOff) return "they've paused the traps";
     if ((r.trapSkip || []).includes(kind)) return "they've ruled that one out";
     if ((r.trapQuiet || 0) > Date.now()) return "they called their safeword not long ago";
@@ -83,10 +90,16 @@
   }
   function trapFree(mn){ const r = rec(mn); if (r && r.penned && r.penned.trap && !r.penned.wait){ r.penned = null; saveLedger(); } }   // (the rack and the box keep hold: 10u4)
 
-  const tFill = (t, mn, v) => bodyWords(mn, t).replace(/%n/g, plainName(mn)).replace(/%ml/g, (v && v.ml) || "").replace(/%c/g, (v && v.c) || "").replace(/%h/g, (v && v.h) || "").replace(/%x/g, (v && v.x) || "");
+  // a load they couldn't hold any more of: "0 mL of stallion seed" read like nothin' happened (Laynie, Oct 20: "make sure
+  // they all make sense"). Under 15 mL kept, the words say how much there was, not the number.
+  const tinyMl = (v) => { const n = parseFloat(String((v && v.ml) || "").replace(/[^0-9.]/g, "")); return v && v.ml !== undefined && v.ml !== "" && Number.isFinite(n) && n < 15; };
+  const mlWords = (t, v) => !tinyMl(v) ? t : t.replace(/(drained|milked)( down)? (of|by) %ml/g, "$1$2 of every last drop").replace(/%ml (fuller|heavier)/g, "a whole lot $1")
+    .replace(/%ml of /g, "a flood of ").replace(/with %ml\b/g, "with a flood").replace(/%ml/g, "more than they could hold");
+  const tFill = (t, mn, v) => bodyWords(mn, mlWords(t, v)).replace(/%n/g, plainName(mn)).replace(/%ml/g, (v && v.ml) || "").replace(/%c/g, (v && v.c) || "").replace(/%h/g, (v && v.h) || "").replace(/%x/g, (v && v.x) || "");
   // a trap's story, a beat at a time, then what it leaves behind
   function trapRun(mn, kind, beats, done, v){
     state.trapRuns = state.trapRuns || new Map();
+    beats = sceneBeats(kind, beats);        // the trap's own two extra beats, before its last (10ue-trap-scenes.js)
     beats = deepenBeats(mn, kind, beats);   // two or three more beats in the middle, from what kind of trap it is (10ud-trap-depth.js)
     const run = { kind, i: 0, timer: null, beats: (beats = beats.slice()) };   // (a copy: ?struggle can add to it)
     const before = { pissed: (rec(mn) || {}).pissed || 0, eggs: ((prodOf(mn) || {}).eggs || {}).n || 0 };
@@ -492,58 +505,37 @@
       syncCompanions(true); return true;
     }
     if (cmd === "subject" || cmd === "subjects"){
-      if (a0 === "quit" || a0 === "leave"){
-        if (!isSubject(sender)){ R("You're not signed up as a test subject, sugar."); return true; }
-        trapStop(sender, 0); r.roles = r.roles.filter(x => x !== ROLE.SUBJECT); r.trapQuiet = 0; saveLedger(); audit(sender, "SUBJECT", "quit");
-        R("🧪 You're off the subject list, sugar. Not one trap on this farm will spring for you now. Thank you for volunteerin'.");
-        syncCompanions(true); return true;
-      }
-      if (a0 === "add" || a0 === "remove"){
-        if (!isProprietor(sender)){ R("Sorry, sugar, signin' subjects up is just for the proprietors."); return true; }
-        const t = resolveTarget(args[1]);
-        if (!t || t === BOTMN()){ R("Who, sugar? ?subject "+a0+" <who>, like ?subject "+a0+" Daisy or ?subject "+a0+" 123456."); return true; }
-        const tr = rec(t, true); tr.name = plainName(t);
-        if (a0 === "add"){
-          if (isSubject(t)){ R(plainName(t)+" is already a test subject, sugar."); return true; }
-          tr.roles.push(ROLE.SUBJECT); saveLedger(); audit(sender, "SUBJECT", "add "+t);
-          R("🧪 "+plainName(t)+" is signed up as a test subject. Every trap on the farm will spring for them now, and the water's not safe either.");
-          tell(t, "🧪 "+plainName(sender)+" has signed you up as a TEST SUBJECT at B&B Farm, sugar. From here on the farm's traps spring for you and nobody else: step on the wrong spot and you might get dosed, drained, bred, stripped, pumped full or filled with eggs. And mind the water.\n"+
-                  "?traps shows what's out there · ?traps off pauses every one · ?traps skip <kind> rules one out · ?subject quit takes you off the list for good · your SAFEWORD stops a trap cold. Your hard limits still rule.");
-        } else {
-          if (!isSubject(t)){ R(plainName(t)+" isn't a test subject, sugar."); return true; }
-          trapStop(t, 0); tr.roles = tr.roles.filter(x => x !== ROLE.SUBJECT); tr.trapQuiet = 0; saveLedger(); audit(sender, "SUBJECT", "remove "+t);
-          R("🧪 "+plainName(t)+" is off the subject list."); tell(t, "🧪 You've been taken off the test subject list, sugar. The traps won't spring for you any more.");
-        }
-        syncCompanions(true); return true;
-      }
+      // (there's no subject list any more: traps are each player's own switch)
       if (isProprietor(sender) && (!a0 || a0 === "list")){
-        const subs = Object.values(L.people).filter(x => x.roles && x.roles.includes(ROLE.SUBJECT));
-        R(subs.length ? "🧪 TEST SUBJECTS\n"+subs.map(x => "• "+plainName(x.mn)+" ("+x.mn+")"+(charFor(x.mn) ? " ●" : "")+" · traps sprung: "+(x.trapN || 0)+(x.tentacled ? " · taken by the water: "+x.tentacled : "")+(x.trapsOff ? " · paused" : "")+((x.trapSkip || []).length ? " · skips "+x.trapSkip.join(", ") : "")).join("\n")+
-                        "\n?subject add <who> · ?subject remove <who> · ?traps for the spots"
-                      : "🧪 No test subjects yet, sugar. ?subject add <who> signs a volunteer up, and then the trap spots (?traps) spring for them and nobody else.");
+        const subs = Object.values(L.people).filter(x => isSubject(x.mn));
+        R(subs.length ? "🧪 TRAPS SWITCHED ON\n"+subs.map(x => "• "+plainName(x.mn)+" ("+x.mn+")"+(charFor(x.mn) ? " ●" : "")+" · traps sprung: "+(x.trapN || 0)+(x.tentacled ? " · taken by the water: "+x.tentacled : "")).join("\n")
+                      : "🧪 Nobody's got their traps switched on right now, sugar.");
         return true;
       }
-      R(isSubject(sender) ? "🧪 You're a test subject, sugar. Traps sprung on you so far: "+(r.trapN || 0)+". ?traps shows what's out there, ?traps off pauses them, ?subject quit takes you off the list."
-                          : "🧪 Test subjects are volunteers the proprietors sign up. The farm's traps spring for them and nobody else. Ask a proprietor if you fancy it.");
+      if (a0 === "quit" || a0 === "leave") return trapCommand("traps", sender, ["off"], R);
+      R("🧪 There's no test subject list any more, sugar: the traps are everybody's own choice. ?traps on and they spring for you, ?traps off and they never do. It's in your Companion's Toggles too.");
       return true;
     }
     if (cmd === "traps" || cmd === "trap"){
       if (a0 === "themes" || a0 === "places"){ R(themesText()); return true; }
       if (a0 && TRAP_KINDS[a0]){ R(trapAbout(a0)); return true; }   // ?traps bearskin: what that one does   // which traps each place springs (10ua-trap-themes.js)
       if (a0 === "on" || a0 === "off"){
-        if (!isSubject(sender)){ R("Only a test subject has traps to switch, sugar."); return true; }
-        r.trapsOff = a0 === "off"; if (r.trapsOff) trapStop(sender, 0); r.trapQuiet = 0; saveLedger();
-        R(r.trapsOff ? "🧪 Traps paused. Not one will spring for you till you say ?traps on." : "🧪 Traps are live again, sugar. Watch your step."); return true;
+        const was = isSubject(sender);
+        r.trapsOn = a0 === "on"; r.trapsOff = false; if (!r.trapsOn) trapStop(sender, 0); r.trapQuiet = 0; saveLedger(); audit(sender, "TRAPS", a0); syncCompanions(true);
+        R(r.trapsOn ? (was ? "🧪 Your traps are already on, sugar. Watch your step."
+                           : "🧪 Traps: ON. Every trap on the farm will spring for you now, and the water's not safe either: step on the wrong spot and you might get dosed, drained, bred, stripped, pumped full or filled with eggs. "+
+                             "?traps shows what's out there · ?traps skip <kind> rules one out · ?traps off and not one springs · your SAFEWORD stops a trap cold. Your hard limits still rule.")
+                    : "🧪 Traps: off. Not one will spring for you till you say ?traps on."); return true;
       }
       if (a0 === "eager"){
-        if (!isSubject(sender)){ R("Only a test subject has traps to hurry up, sugar."); return true; }
+        if (!isSubject(sender)){ R("Switch your traps on first (?traps on), sugar: then you've got traps to hurry up, sugar."); return true; }
         const v = String(args[1] || "").toLowerCase();
         if (v !== "on" && v !== "off"){ R("🧪 Eager is "+(r.trapEager ? "ON" : "off")+" for you, sugar: ?traps eager on skips the breather between traps and the wait for a trap to reset. Step off a trap and back on, and it has you again."); return true; }
         r.trapEager = v === "on"; saveLedger(); syncCompanions(true);
         R(r.trapEager ? "🧪 Eager: ON. No breather between traps, no waitin' for one to reset. Step off and back on and it springs again. ?traps eager off when you've had enough." : "🧪 Eager: off. The traps go back to takin' their time with you."); return true;
       }
       if (a0 === "skip" || a0 === "allow"){
-        if (!isSubject(sender)){ R("Only a test subject has traps to rule out, sugar."); return true; }
+        if (!isSubject(sender)){ R("Switch your traps on first (?traps on), sugar: then you've got traps to rule out, sugar."); return true; }
         const k = String(args[1] || "").toLowerCase();
         if (!TRAP_KINDS[k]){ R("Which one, sugar? ?traps "+a0+" <kind>: "+Object.keys(TRAP_KINDS).join(", ")+"."); return true; }
         r.trapSkip = (r.trapSkip || []).filter(x => x !== k); if (a0 === "skip") r.trapSkip.push(k); saveLedger();
@@ -587,17 +579,17 @@
       }
       const spots = trapSpots(), water = waterSpots();
       if (isStaff(sender))
-        R("🧪 TRAPS (they spring for test subjects and nobody else)\n"+trapsList()+
+        R("🧪 TRAPS (they spring for whoever has ?traps on, and nobody else)\n"+trapsList()+
           "\n\nSet one: stand on the spot and say ?spot set trap-<kind> (trap-milker-2 for a second one; plain ?spot set trap springs pot luck)."+
           "\nOut there now: "+(spots.length ? spots.map(([n]) => n+(L.trapLoads && L.trapLoads[n] ? " ["+L.trapLoads[n]+"]" : "")).join(", ") : "none yet")+
           "\nWater the thing lives in: "+(water.length ? water.map(([n]) => n).join(", ") : "none yet (?spot set pond, pool, creek, water, well, bath…)")+
-          "\n?trap load <spot> <words> · ?trap bait <spot> <ribbons> · ?trap spring <who> <kind> · ?subject for the list"+
+          "\n?trap load <spot> <words> · ?trap bait <spot> <ribbons> · ?trap spring <who> <kind> · ?subject for who has them on"+
           "\n?trap make <name> <what it does>… builds one of your own (?trap made) · ?whistle <which> <who> calls one of the farm's own to them"+
           "\n?hunt start [minutes] · ?pack on|off · nest spots (?spot set nest) and ?gather · crate spots (?spot set crate)");
       else if (isSubject(sender))
         R("🧪 WHAT'S OUT THERE FOR YOU\n"+trapsList()+"\n\nThere are "+spots.length+" trap"+(spots.length === 1 ? "" : "s")+" hidden on the farm"+(water.length ? ", and somethin' lives in the water" : "")+". I'm not tellin' you where."+
-          "\n?struggle when one has you (one try) · ?traps eager on skips the waits · ?traps off pauses them · ?traps skip <kind> rules one out"+((r.trapSkip || []).length ? " (you skip: "+r.trapSkip.join(", ")+")" : "")+" · your safeword stops one cold.");
-      else R("🧪 The farm's traps only spring for test subjects, sugar, and you're not one. You can walk right over 'em.");
+          "\n?struggle when one has you (one try) · ?traps eager on skips the waits · ?traps off switches them off · ?traps skip <kind> rules one out"+((r.trapSkip || []).length ? " (you skip: "+r.trapSkip.join(", ")+")" : "")+" · your safeword stops one cold.");
+      else R("🧪 Your traps are off, sugar, so you can walk right over 'em. ?traps on and every trap on the farm springs for you (your limits and your safeword still rule). Here's what's out there:\n"+trapsList());
       return true;
     }
     return false;

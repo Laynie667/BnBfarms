@@ -79,7 +79,9 @@ const named = (text, mn) => api.nameOnce ? api.nameOnce(String(text), mn) : Stri
 function startScene(id, mn) {
   const holes = openHoles(mn);
   if (!holes.length) return;
-  const visitor = pickVisitor(holes);
+  let visitor = pickVisitor(holes);
+  // wearin' Goblin Musk (the farm shop): the goblins smell it through the boards and queue up at that hole
+  try { if (api.potions && api.potions(mn).includes("goblinmusk") && Math.random() < 0.6) visitor = { type: "goblin", size: Math.random() < 0.5 ? "thick" : "huge" }; } catch (e) { /* an older bot: fine */ }
   // a double takes pussy and ass together; everyone else picks one open hole
   const hole = visitor.type === "double" ? "vulva" : pick(holes);
   const r = api.rec(mn) || {}, funnel = hole === "mouth" && api.funnelOn(mn);

@@ -5,15 +5,15 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 | Script | File in `dist/` | Where it runs | Current |
 |---|---|---|---|
-| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.38.3** |
-| Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.9.0** |
+| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.39.0** |
+| Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.10.0** |
 | Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.2.1** |
 | Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **1.1.0** |
 | Barn life | `farmhand-barn-life.user.js` | the bot's PC | **1.2.1** |
 | Map tools, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.4** |
 | Dairy | `farmhand-dairy.user.js` | the bot's PC | **1.1.0** |
 | Shows | `farmhand-shows.user.js` | the bot's PC | **1.1.0** |
-| Farmhand Companion | `farmhand-companion.user.js` | each player | **0.31.5** |
+| Farmhand Companion | `farmhand-companion.user.js` | each player | **0.32.0** |
 | Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.4** |
 
 ## Sending a watch report
@@ -23,6 +23,12 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 - Running the watcher on more than one game at once (the bot, yours, a tester's) lets Claude line them up into one timeline.
 
 ## Latest changes (newest first)
+
+- **Bot 0.39.0, Companion 0.32.0, Glory stalls 1.10.0: traps for everybody, fuller trap scenes, Goblin Musk.**
+  - **Traps are opt-in for everyone.** Laynie: "remove the subject role and make traps purely a opt-in with a toggle for everyone." ?traps on and they spring for you, ?traps off and they never do; it's "Traps" in the Companion's Toggles too, and the trap card has a "Switch traps off" button. No more subject role and no proprietor sign-up: anybody who was a test subject already has their traps on. ?subject now just lists, for the proprietors, who has them on.
+  - **Fuller trap scenes.** Laynie: "make sure they all make sense, are detailed, avoid clinical or purposefully vague detail, and had naughtier feels." All 109 traps have two new beats of their own, written for what that trap does, before the end of their story (10ue-trap-scenes.js, 10ue2-trap-scenes-2.js). Fixed what didn't make sense: the shared extra beats now come in the back half of a scene, after the trap's got going (no more "drained, and still it pulls" before the milking starts), never the same line twice in one scene; a load too big to keep says so instead of "0 mL"; breathing in a trap's gas or mist no longer says they "drink" the potion.
+  - **Goblin Musk** on the shelf (7 ribbons, 90 minutes): the goblins come and find you (the raid, the pit, the market or the cart), and at the glory stalls more of the visitors are goblins.
+  - Also: the stud-scent tick (a stud smelling another stud's load on somebody) never ran, because a later tick had the same name. Fixed.
 
 - **Companion 0.31.5: messes on Echo bodies.** Laynie's /farmmess found it: her body comes from Echo's mod (Override/EchoV2), which draws worn things first and the skin late. The mess went on as soon as the first piece of skin (her kneeling legs) was drawn, trimmed to just that, before her upper body and head were even drawn, so nothing showed. Now the mess waits until all of the skin is drawn (as much as the last whole drawing had) and is trimmed to all of it. Checked with Echo's drawing order in a simulation.
 

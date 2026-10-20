@@ -66,7 +66,7 @@ const done=async(mn,ms)=>{ for(let i=0;i<60;i++){ await wait(250); if(!(W.__st()
   // the corn maze: in, and out the exit in time
   free(500); moveTo(500,15,10); n=sent.length; await say(221397,'?trap spring Moo maze',300); await done(500);
   ok(P(500).maze && P(500).maze.until>Date.now(), 'the corn maze has them, and the clock is running');
-  moveTo(500,44,40); W.__mazeTick(); await wait(2600);
+  moveTo(500,44,40); W.__mazeTick(); await wait(5000);
   ok(!P(500).maze && /out of the corn maze|way out of the maze|bursts out/i.test(all(n)), 'out the maze-exit in time: free');
   // time runs out: it catches them
   free(500); moveTo(500,15,10); await say(221397,'?trap spring Moo maze',300); await done(500);

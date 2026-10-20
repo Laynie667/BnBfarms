@@ -174,7 +174,6 @@
         case "mandated": case "mandatedfarmhand": out.push(ROLE.MANDATED); break;
         case "herdmaster": out.push(ROLE.HERDMASTER); break;
         case "gloryhole": out.push(ROLE.GLORYHOLE); break;
-        case "subject": case "testsubject": case "subjects": out.push(ROLE.SUBJECT); break;
       }
     }
     return out;

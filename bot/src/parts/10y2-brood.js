@@ -110,13 +110,14 @@
   }
 
   // ── scents: somebody comes and finds them ──
-  const SCENTS = { wolfscent: "wolves", mareheat: "stallion", sowslop: "boar" };
-  function scentTick(now){
+  const SCENTS = { wolfscent: "wolves", mareheat: "stallion", sowslop: "boar", goblinmusk: ["goblinraid", "goblinpit", "goblinmarket", "goblincart"] };   // (Goblin Musk: whichever goblins get there first, Oct 20)
+  function scentCallTick(now){   // (was scentTick, the same name as the stud-scent tick in 08-production.js: one hid the other)
     for (const C of (W.ChatRoomCharacter || [])){
       const mn = C.MemberNumber; if (!isSubject(mn) || quietNow(mn)) continue;
       const r = rec(mn);
-      for (const [id, kind] of Object.entries(SCENTS)){
+      for (const [id, k0] of Object.entries(SCENTS)){
         const f = r.fx && r.fx[id]; if (!f || f.until <= now || f.came) continue;
+        const kind = Array.isArray(k0) ? (k0.filter(k => TRAP_KINDS[k] && !trapWhyNot(mn, k)).sort(() => Math.random() - 0.5)[0]) : k0; if (!kind) continue;
         if (now - f.at < CFG.SCENT_WAIT_MIN*60000 || heldByTrap(mn) || (state.sceneRuns && state.sceneRuns.has(mn)) || Math.random() >= CFG.SCENT_CHANCE) continue;
         f.came = true; saveLedger();
         emote(TRAP_KINDS[kind].icon+" "+bLine("scent_"+kind, mn), mn);
@@ -202,7 +203,7 @@
   }
   function broodTick(){
     const now = Date.now();
-    try { bellyTick(now); scentTick(now); } catch(e){ warn("brood tick:", e); }
+    try { bellyTick(now); scentCallTick(now); } catch(e){ warn("brood tick:", e); }
   }
 
   const BROOD_LINES = {
@@ -268,6 +269,15 @@
              "%n is so full they can hardly walk. That belly reaches halfway to their knees, drum-tight and movin', and they need a rail to get up from the straw."],
     bellySeen: ["%n's belly is %c. You can't stop lookin' at it.", "Standin' this close, you can see %n's swollen belly move. Somethin' in there just rolled over.",
                 "%n is %c with it. You could set a mug on that belly.", "You catch yourself wantin' to lay a hand on %n's belly, just to feel what's in there."],
+    scent_goblinraid: ["A giggle in the hedge. Then another, closer. Then a lot of little feet. The goblins have caught %n's scent.",
+      "Somethin' small and green pops its head up out of the long grass, sniffs the air, and points straight at %n. \"THERE!\"",
+      "The hedges rustle all along the lane, and a raiding party of goblins comes boilin' out of them, noses up, followin' the musk to %n."],
+    scent_goblinpit: ["A trail of shiny buttons and spoons starts at %n's feet and leads off toward the trees. Somebody's laid it on purpose, and they're giggling about it.",
+      "A goblin with a clipboard steps out of the bushes, sniffs, checks a list, and beckons. \"You'll do. This way.\""],
+    scent_goblinmarket: ["A goblin trader sniffs the air, follows the musk right up to %n, and starts measurin' them with a bit of string.",
+      "Three goblins with a sack come hurryin' across the yard toward %n, arguin' about the price they'll fetch."],
+    scent_goblincart: ["A goblin cart comes rattlin' round the corner, flowers on the wheels, a dozen goblins on board, and every nose on it pointed at %n.",
+      "Pots bang in the distance, then closer: a goblin parade, and it's followin' the musk."],
     scent_wolves: ["A howl goes up from the far side of the yard. Then another, closer. They've caught %n's scent.",
                    "Somethin' is trottin' this way through the long grass, more than one of them, noses down. %n smells like a bitch in season to anything with a muzzle."],
     scent_stallion: ["A stall door bangs open somewhere. Hoofbeats, heavy and unhurried, comin' straight for %n. The stud's smelled a mare.",

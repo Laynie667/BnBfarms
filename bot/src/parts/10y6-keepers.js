@@ -308,7 +308,7 @@
     const r = rec(sender), now = Date.now();
     if (cmd === "herdtraps"){
       const mine = herdMembers(sender).filter(x => isSubject(x.mn));
-      if (!mine.length){ R("None of your herd are test subjects, sugar."); return; }
+      if (!mine.length){ R("None of your herd have their traps on, sugar."); return; }
       R("🧪 YOUR HERD'S TRAP CARDS\n"+mine.map(x => { const p = prodOf(x.mn); return "• "+plainName(x.mn)+(charFor(x.mn) ? " ●" : "")+": "+SUBJECT_RANKS[rankOfSubject(x.mn)].name+", "+(x.trapN || 0)+" sprung, corruption "+corruptionOf(x.mn)+(p && p.eggs ? ", carryin' "+p.eggs.n+" eggs" : "")+(p && p.preg ? ", bred" : "")+(x.trapsOff ? ", paused" : ""); }).join("\n")+
         "\n?send <who> <trap> · ?dose <who> <shot words> · ?trap bait <spot> <ribbons>");
       return;

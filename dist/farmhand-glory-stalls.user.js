@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm add-on: Glory stalls
 // @namespace    bnbfarm
-// @version      1.9.0
+// @version      1.10.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-glory-stalls.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-glory-stalls.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -2415,7 +2415,11 @@
   function startScene(id, mn) {
     const holes = openHoles(mn);
     if (!holes.length) return;
-    const visitor = pickVisitor(holes);
+    let visitor = pickVisitor(holes);
+    try {
+      if (api.potions && api.potions(mn).includes("goblinmusk") && Math.random() < 0.6) visitor = { type: "goblin", size: Math.random() < 0.5 ? "thick" : "huge" };
+    } catch (e) {
+    }
     const hole = visitor.type === "double" ? "vulva" : pick(holes);
     const r = api.rec(mn) || {}, funnel = hole === "mouth" && api.funnelOn(mn);
     const sh = D().shifts[mn], C = api.char(mn);

@@ -321,7 +321,7 @@ TOYS THAT ACT ON THEIR OWN · crafted words on what you wear
     auto-injector · the item doses you every half hour with the
       other words on it: "auto-injector lactation x2"
     ovipositor · on a gag, belt, plug or dildo: it lays a clutch in
-      you now and then (needs ?eggs on, or bein' a test subject)
+      you now and then (needs ?eggs on, or your traps on)
     auto-feed · on a funnel gag: a bellyful poured down you every
       ten minutes. Add "piss" and say ?watersports on for that.
     a cock type (canine, equine, feline, draconic), knotted, or a
@@ -477,13 +477,12 @@ THE USE BENCH · ?bench on
   Your limits, your gear and ?breedable still count.
   Your safeword (or ?bench off) ends it at once.
 
-TEST SUBJECTS & TRAPS
-  A proprietor can sign a volunteer up as a test subject. The
-  farm's hidden traps spring for subjects and nobody else, and
-  somethin' lives in the water.
-  ?traps · what's out there · ?traps off|on · pause them
+TRAPS (your own switch)
+  The farm's hidden traps spring for whoever switches them on,
+  and nobody else, and somethin' lives in the water.
+  ?traps on · they spring for you · ?traps off · they never do
+  ?traps · what's out there · ?traps <name> · what one does
   ?traps skip <kind> · rule one out · ?traps allow <kind>
-  ?subject quit · off the list for good
   ?quiet [minutes] · an hour where nothin' new starts on you
   ?tend <who> · help somebody lay (a ribbon in it)
   ?brood · your brood book: what's bred you, what you carried
@@ -726,7 +725,7 @@ RIBBONS, POTIONS, DARES, THE CORRAL
   ?bench <who> [minutes, 5-120] · ?unbench <who>
      only for people who said ?bench on · bench spots:
      ?spot set bench (bench-2, bench-3…)
-  ?subject add|remove <who> · proprietors: test subjects
+  ?subject · proprietors: who has traps switched on
   ?traps · the kinds, the spots, the water
      trap spots: ?spot set trap-<kind> (trap-milker-2…), or a
      plain ?spot set trap for pot luck. A pillory, a tickle rack

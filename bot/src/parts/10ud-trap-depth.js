@@ -112,11 +112,18 @@
       if (!Array.isArray(beats) || beats.length < 2) return beats;
       const it = intensityOf(mn), gentle = it === "tender", hard = it === "filthy";   // ?intensity tender | rough | filthy (10y7-udders.js)
       const n = gentle ? 1 : hard ? 3 : 2;
-      const out = beats.slice();
+      const out = beats.slice(), used = new Set();
       for (let i = 0; i < n; i++){
         const k = kinds[Math.floor(Math.random()*kinds.length)];
-        const pool = DEPTH_LINES[k]; if (!pool) continue;
-        const at = 1 + Math.floor(Math.random()*(out.length - 1));   // never first, never after the last
+        // a different share of the pool for each beat, so no line comes up twice in one scene
+        const all = DEPTH_LINES[k]; if (!all) continue;
+        const left = all.filter(t => !used.has(t)).sort(() => Math.random() - 0.5), size = Math.max(4, Math.ceil(left.length / n));
+        const plain = left.filter(t => !/^\{/.test(t)).slice(0, 2);   // (two that fit any body, always)
+        const pool = plain.concat(left.filter(t => !plain.includes(t)).slice(0, size - plain.length));
+        if (!pool.length) continue; pool.forEach(t => used.add(t));
+        // in the back half, never after the last: once the trap has got going, so a mess has landed before it's dripping
+        // and the milking's started before it's "drained, and still it pulls" (Laynie, Oct 20: "make sure they all make sense")
+        const lo = Math.max(1, Math.ceil((out.length - 1) / 2)), at = lo + Math.floor(Math.random()*(out.length - lo));
         out.splice(at, 0, pool.slice());
       }
       return out;

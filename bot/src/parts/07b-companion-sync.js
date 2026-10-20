@@ -8,7 +8,7 @@
   // ledger field → the command that flips it
   const SWITCH_CMDS = { breedable:"breedable", fertile:"fertile", jarok:"jarok", freeuse:"freeuse", futa:"futa",
                         milkable:"milkable", naturalHeat:"naturalheat", praiseMe:"praise", degradeMe:"degrade",
-                        tally:"tally", forced:"forced", hypno:"hypno", potionsOn:"potions", daresOn:"dares", benchOn:"bench", mpreg:"mpreg", watersports:"watersports", parasiteOn:"parasite", symbioteOn:"symbiote", trapEager:"eager" };
+                        tally:"tally", forced:"forced", hypno:"hypno", potionsOn:"potions", daresOn:"dares", benchOn:"bench", mpreg:"mpreg", watersports:"watersports", parasiteOn:"parasite", symbioteOn:"symbiote", trapEager:"eager", trapsOn:"traps" };
   // staff lookups about somebody else go to the Companion's Office tab
   const DOC_CMDS = ["record","stats","vet","quota","keys","size","measure","pedigree"];
 
@@ -37,7 +37,7 @@
       switches: {}
     });
     for (const k in SWITCH_CMDS) s.switches[SWITCH_CMDS[k]] =
-      k === "jarok" ? r.jarok !== false : k === "milkable" ? makesMilk(mn) : !!r[k];
+      k === "jarok" ? r.jarok !== false : k === "trapsOn" ? isSubject(mn) : k === "milkable" ? makesMilk(mn) : !!r[k];
     try {
       const p = prodOf(mn), now = Date.now();
       // milk rounds to 10 mL so a slowly fillin' udder doesn't resend every minute

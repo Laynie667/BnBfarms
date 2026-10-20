@@ -37,10 +37,11 @@ const C=mn=>chars.find(c=>c.MemberNumber===mn);
   const roles=mn=>P(mn).roles, prod=mn=>P(mn).prod;
   await say(500,'?stats'); await say(600,'?stats');
   // ── the role ──
-  let n=sent.length; await say(400,'?subject add Moo'); ok(/just for the proprietors/.test(to(400,n)) && !roles(500).includes('SUBJECT'), 'only a proprietor signs a subject up');
-  n=sent.length; await say(221397,'?subject add Moo');
-  ok(roles(500).includes('SUBJECT') && roles(500).includes('LIVESTOCK'), 'subject rides alongside their other roles');
-  ok(/TEST SUBJECT/.test(to(500,n)) && /subject quit/.test(to(500,n)) && /SAFEWORD/i.test(to(500,n)), 'the subject is told what it means and how to get out');
+  // (Oct 20: no more subject role: traps are each player's own switch)
+  let n=sent.length; await say(221397,'?subject add Moo'); ok(/no test subject list/.test(to(221397,n)) && !P(500).trapsOn, 'nobody can switch somebody else\'s traps on');
+  n=sent.length; await say(500,'?traps on');
+  ok(P(500).trapsOn===true && roles(500).includes('LIVESTOCK') && !roles(500).includes('SUBJECT'), '?traps on switches them on, alongside their roles');
+  ok(/Traps: ON/.test(to(500,n)) && /traps off/.test(to(500,n)) && /SAFEWORD/i.test(to(500,n)), 'they are told what it means and how to switch it off');
   n=sent.length; await say(221397,'?subject',4000); ok(/Moo .500. /.test(to(221397,n)), '?subject lists them for a proprietor');
   n=sent.length; await say(221397,'?traps'); ok(/trap-injector/.test(to(221397,n)) && /pond/.test(to(221397,n)) && /tentacle/.test(to(221397,n)), '?traps shows staff the kinds, the spots and the water');
   n=sent.length; await say(500,'?traps'); ok(!/trap-injector/.test(to(500,n)) && /not tellin' you where/.test(to(500,n)), '...a subject hears what is out there, not where');
@@ -49,7 +50,7 @@ const C=mn=>chars.find(c=>c.MemberNumber===mn);
   ok(!/sprung a trap/.test(all(n)), 'a trap does nothin\' for stock who are not subjects');
   moveTo(600,14,10);
   await say(221397,'?trap load trap-injector lactation x3');
-  moveTo(500,20,20); n=sent.length; W.__trapTick(); await wait(1500);
+  moveTo(500,20,20); n=sent.length; W.__trapTick(); await wait(3500);
   ok(/sprung a trap/.test(to(500,n)), 'a subject steppin\' on it springs it');
   ok(prod(500).boosts.milk > Date.now() && prod(500).boostX.milk === 3, 'the loaded injector lands its dose: lactation x3 is level 3');
   ok(/triple dose/.test(all(n)), '...and the room sees the story and the dose');
@@ -64,7 +65,7 @@ const C=mn=>chars.find(c=>c.MemberNumber===mn);
   ok(!/sprung a trap/.test(to(500,n)) && !(prod(500).heat && prod(500).heat.until > Date.now()), 'a kind they ruled out never springs');
   await say(500,'?traps allow gas'); await say(221397,'?trap load trap-gas heat strong'); moveTo(500,15,10); W.__trapTick(); moveTo(500,22,20); n=sent.length; W.__trapTick(); await wait(1500);
   ok(prod(500).heat && prod(500).heat.until > Date.now(), 'the gas trap leaves them in heat');
-  await say(221397,'?subject add Rex'); moveTo(600,24,20); n=sent.length; W.__trapTick(); await wait(1000);
+  await say(600,'?traps on'); moveTo(600,24,20); n=sent.length; W.__trapTick(); await wait(1000);
   ok(!prod(600).eggs, 'hard limits rule a trap out (eggs)');
   moveTo(600,14,10);
   // ── the thing in the water ──
@@ -77,13 +78,13 @@ const C=mn=>chars.find(c=>c.MemberNumber===mn);
   ok(W.__slow(500) > 1 && W.__stateFor(500).slow > 1, 'carryin\' a clutch slows them down ('+W.__slow(500)+'x)');
   ok(W.__slow(221397) === 1, '...nobody else');
   // ── the safeword ──
-  await say(221397,'?subject add Laynie'); cfg.TRAP_BEAT_S=5;
+  await say(221397,'?traps on'); cfg.TRAP_BEAT_S=5;
   n=sent.length; await say(221397,'?trap spring Laynie clamp'); ok(/Sprung on Laynie/.test(to(221397,n)), 'a proprietor can spring one by hand');
   await say(221397,'?safeword',2500); cfg.TRAP_BEAT_S=0.15; await wait(600);
   ok(!(P(221397).prod && P(221397).prod.deniedUntil > Date.now()), 'the safeword stops a trap before it lands');
   n=sent.length; await say(221397,'?trap spring Laynie mud'); ok(/safeword not long ago/.test(to(221397,n)), '...and every trap stays quiet for an hour after');
   // ── the ones with somebody waitin' in them ──
-  await say(221397,'?subject add Hand'); P(400).breedable=true; P(400).fertile=true; await say(400,'?stats');
+  await say(400,'?traps on'); P(400).breedable=true; P(400).fertile=true; await say(400,'?stats');
   n=sent.length; await say(221397,'?trap spring Hand wolves'); await wait(1800);
   ok(/wolf/i.test(all(n)) && P(400).prod.held.vulva > 100 && W.__stateFor(400).today.tally >= 3, 'the wolf den: three loads, three on the tally');
   cfg.TRAP_COOLDOWN_MIN=0; cfg.CHAIN_CHANCE=0; P(400).prod.held={vulva:0,butt:0,mouth:0}; P(400).prod.preg=null;
@@ -161,7 +162,7 @@ const C=mn=>chars.find(c=>c.MemberNumber===mn);
   ok(P(400).fx.danger.x === 2 && P(400).gluedUntil > Date.now()+58*60000, '...a second bottle triples it');
   await wait(1200); delete P(400).fx.danger; P(400).gluedUntil=0; P(400).penned=null;
   // ── quit ──
-  await say(500,'?subject quit'); ok(!roles(500).includes('SUBJECT') && roles(500).includes('LIVESTOCK'), '?subject quit takes them off the list, nothin\' else');
+  await say(500,'?traps off'); ok(!P(500).trapsOn && roles(500).includes('LIVESTOCK'), '?traps off switches them off, nothin\' else');
   // ── potions stack ──
   await say(221397,'?potion give Moo clover'); await say(221397,'?potion give Moo clover',2600);
   ok(P(500).fx.clover && P(500).fx.clover.x === 2 && P(500).fx.clover.until > Date.now()+100*60000, 'a second bottle stacks: stronger and longer');

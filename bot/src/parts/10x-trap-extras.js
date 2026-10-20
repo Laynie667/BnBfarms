@@ -146,9 +146,9 @@
       if (!goal){ R("I need somewhere to finish, sugar: ?spot set hunt-goal (or a pasture, barn or trough spot)."); return; }
       const mins = Math.max(5, Math.min(60, parseInt(args[1], 10) || CFG.HUNT_MIN));
       L.hunt = { id: Date.now(), until: Date.now() + mins*60000, goal, by: sender, done: [] };
-      for (const r of Object.values(L.people)) if (r.roles && r.roles.includes(ROLE.SUBJECT)){ r.trapAt = 0; r.spotTrapAt = {}; }
+      for (const r of Object.values(L.people)) if (isSubject(r.mn)){ r.trapAt = 0; r.spotTrapAt = {}; }
       saveLedger(); audit(sender, "HUNT", goal+" "+mins+"m");
-      announce("🔔 THE HUNT IS ON! Every trap on the farm's been reset. Test subjects: get yourselves to "+goal+" inside "+mins+" minutes and there's "+CFG.HUNT_RIBBONS+" ribbons in it. Whatever catches you on the way, catches you.");
+      announce("🔔 THE HUNT IS ON! Every trap on the farm's been reset. Everybody with traps on: get yourselves to "+goal+" inside "+mins+" minutes and there's "+CFG.HUNT_RIBBONS+" ribbons in it. Whatever catches you on the way, catches you.");
       R("🔔 Hunt started: finish at "+goal+", "+mins+" minutes."); return;
     }
     if (a0 === "stop"){

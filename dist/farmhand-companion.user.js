@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.31.3
+// @version      0.31.4
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -230,7 +230,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.31.3";
+  var VERSION = "0.31.4";
 
   // extension/src/config.js
   var BOT_MEMBER = 260239;
@@ -4843,7 +4843,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       for (const mn of others2.keys()) redrawMn2(mn);
     }
   });
-  var BODY = /(?:^|\/)Assets\/[^/]+\/(?:BodyUpper|BodyLower|Head|Arms|ArmsLeft|ArmsRight|Hands|HandsLeft|HandsRight|Pussy)\//;
+  var BODY = /(?:^|\/)(?:BodyUpper|BodyLower|Head|Arms|ArmsLeft|ArmsRight|Hands|HandsLeft|HandsRight|Pussy)\/[^?#]*\.(?:png|webp|jpe?g)/i;
   var made2 = /* @__PURE__ */ new Map();
   function forget(src) {
     if (!src || typeof src !== "string") return;
@@ -4882,14 +4882,17 @@ One of mods you are using is using an old version of SDK. It will work for now b
     const key = JSON.stringify(list) + "|" + list.map(age).join("") + "|" + body2.map((b) => b[0] + "@" + b[1] + "," + b[2]).join(";");
     const was = made2.get(C.MemberNumber);
     if (was && was.key === key) return was;
-    const mask = W4.document.createElement("canvas");
-    mask.width = 500;
-    mask.height = h2;
-    const mg = mask.getContext("2d");
-    for (const [src, x, y] of body2) {
-      const i = img(src, C.MemberNumber);
-      if (!i) return was || null;
-      mg.drawImage(i, x, y);
+    let mask = null;
+    if (body2.length) {
+      mask = W4.document.createElement("canvas");
+      mask.width = 500;
+      mask.height = h2;
+      const mg = mask.getContext("2d");
+      for (const [src, x, y] of body2) {
+        const i = img(src, C.MemberNumber);
+        if (!i) return was || null;
+        mg.drawImage(i, x, y);
+      }
     }
     const c = W4.document.createElement("canvas");
     c.width = 500;
@@ -4938,8 +4941,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
         const list = listFor(C);
         if (C === W4.Player) DIAG.got++;
         if (!list.length) return next(args);
-        const body2 = [];
-        let done = false;
+        const body2 = [], sample = [];
+        let canv = 0, done = false;
         const lay = () => {
           if (done) return;
           done = true;
@@ -4947,7 +4950,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
             const p = messPicture(C, list, body2);
             if (C === W4.Player) {
               DIAG.draws++;
-              DIAG.draw = { at: Date.now(), list: list.length, body: body2.map((b) => String(b[0]).replace(/^.*Assets\/[^/]+\//, "") + "@" + b[1] + "," + b[2]), pic: p ? p.src ? typeof p.src === "string" ? "picture" : "drawing " + p.src.width + "x" + p.src.height : "empty" : "waiting for the body pictures" };
+              DIAG.draw = { at: Date.now(), list: list.length, body: body2.map((b) => String(b[0]).replace(/^.*Assets\/[^/]+\//, "") + "@" + b[1] + "," + b[2]), sample: sample.slice(), canv, pic: p ? p.src ? typeof p.src === "string" ? "picture" : "drawing " + p.src.width + "x" + p.src.height : "empty" : "waiting for the body pictures" };
             }
             if (p && p.src) {
               real.drawImage(p.src, p.dx, p.dy, {});
@@ -4965,6 +4968,11 @@ One of mods you are using is using an old version of SDK. It will work for now b
           }
         };
         const seen2 = (name) => (src, x, y, ...rest) => {
+          if (C === W4.Player) {
+            if (typeof src === "string") {
+              if (sample.length < 6) sample.push(src.replace(/^.*\/(?=[^/]+\/[^/]+$)/, ""));
+            } else canv++;
+          }
           if (typeof src === "string" && !done) {
             if (BODY.test(src)) body2.push([src, x, y]);
             else {
@@ -5024,7 +5032,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     L.push("on you now: " + mine2.length + (mine2.length ? " \xB7 newest " + mine2[mine2.length - 1].k + " on " + mine2[mine2.length - 1].a.join("+") + ", " + ago(mine2[mine2.length - 1].t) : ""));
     L.push("marks from the bot: " + (DIAG.marks.length ? DIAG.marks.map((x) => (x.mess || "?") + " " + ago(x.at)).join(", ") : "none since this page opened"));
     L.push("your body drawn: " + DIAG.got + " times, with a mess " + DIAG.draws + " times");
-    if (DIAG.draw) L.push("last mess drawing: " + ago(DIAG.draw.at) + ", " + DIAG.draw.list + " messes, " + DIAG.draw.pic + "; skin pictures seen: " + (DIAG.draw.body.join(" ") || "NONE"));
+    if (DIAG.draw) L.push("last mess drawing: " + ago(DIAG.draw.at) + ", " + DIAG.draw.list + " messes, " + DIAG.draw.pic + "; skin pictures seen: " + (DIAG.draw.body.join(" ") || "NONE") + "; first pictures: " + (DIAG.draw.sample || []).join(" ") + "; drawings handed over: " + (DIAG.draw.canv || 0));
     if (DIAG.lastErr) L.push("last error: " + DIAG.lastErr);
     L.push("others with messes: " + others2.size);
     return L.join("\n");

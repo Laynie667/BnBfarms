@@ -77,7 +77,7 @@ function img(src, mn) {
   i = new Image(); i.onload = () => redrawMn(mn, 100); i.src = src; imgs.set(src, i); return null;
 }
 if (W.FarmMess && W.FarmMess.loadStamps) W.FarmMess.loadStamps("").then((n) => { if (n) { redrawMe(); for (const mn of others.keys()) redrawMn(mn); } });
-const BODY = /(?:^|\/)Assets\/[^/]+\/(?:BodyUpper|BodyLower|Head|Arms|ArmsLeft|ArmsRight|Hands|HandsLeft|HandsRight|Pussy)\//;
+const BODY = /(?:^|\/)(?:BodyUpper|BodyLower|Head|Arms|ArmsLeft|ArmsRight|Hands|HandsLeft|HandsRight|Pussy)\/[^?#]*\.(?:png|webp|jpe?g)/i;
 // one picture per character, made again only when their list or their body changes
 const made = new Map();   // member → { key, src, dx, dy }
 // an old picture comes out of the game's lists once the new one has had time to load: the game keeps every picture it's
@@ -99,8 +99,9 @@ function messPicture(C, list, body) {
   const age = (e) => Math.min(5, Math.floor((Date.now() - (e.t || 0)) / 60000));
   const key = JSON.stringify(list) + "|" + list.map(age).join("") + "|" + body.map((b) => b[0] + "@" + b[1] + "," + b[2]).join(";");
   const was = made.get(C.MemberNumber); if (was && was.key === key) return was;
-  const mask = W.document.createElement("canvas"); mask.width = 500; mask.height = h; const mg = mask.getContext("2d");
-  for (const [src, x, y] of body) { const i = img(src, C.MemberNumber); if (!i) return was || null; mg.drawImage(i, x, y); }
+  let mask = null;
+  if (body.length) { mask = W.document.createElement("canvas"); mask.width = 500; mask.height = h; const mg = mask.getContext("2d");
+    for (const [src, x, y] of body) { const i = img(src, C.MemberNumber); if (!i) return was || null; mg.drawImage(i, x, y); } }
   const c = W.document.createElement("canvas"); c.width = 500; c.height = h; const g = c.getContext("2d");
   const at = (names) => names.map((n) => { const A = W.FarmMess.AREAS[n]; return [A[0] + ox, A[1] + over + oy, A[2]]; });
   for (const e of list) W.FarmMess.paintOn(g, mask, e.k, { at: at(e.a), seed: e.s, amount: e.m || 1, runX: 0.55 + 0.09 * age(e) });
@@ -126,12 +127,12 @@ function hook() {
       const C = args[0], real = args[1];
       if (!C || !real || typeof real.drawImage !== "function" || !W.FarmMess) return next(args);
       const list = listFor(C); if (C === W.Player) DIAG.got++; if (!list.length) return next(args);
-      const body = []; let done = false;
+      const body = [], sample = []; let canv = 0, done = false;
       const lay = () => {
         if (done) return; done = true;
         try {
           const p = messPicture(C, list, body);
-          if (C === W.Player) { DIAG.draws++; DIAG.draw = { at: Date.now(), list: list.length, body: body.map((b) => String(b[0]).replace(/^.*Assets\/[^/]+\//, "") + "@" + b[1] + "," + b[2]), pic: p ? (p.src ? (typeof p.src === "string" ? "picture" : "drawing " + p.src.width + "x" + p.src.height) : "empty") : "waiting for the body pictures" }; }
+          if (C === W.Player) { DIAG.draws++; DIAG.draw = { at: Date.now(), list: list.length, body: body.map((b) => String(b[0]).replace(/^.*Assets\/[^/]+\//, "") + "@" + b[1] + "," + b[2]), sample: sample.slice(), canv, pic: p ? (p.src ? (typeof p.src === "string" ? "picture" : "drawing " + p.src.width + "x" + p.src.height) : "empty") : "waiting for the body pictures" }; }
           if (p && p.src) {
             real.drawImage(p.src, p.dx, p.dy, {}); if (typeof real.drawImageBlink === "function") real.drawImageBlink(p.src, p.dx, p.dy, {});
             if (p.fresh) { p.fresh = false; const mn = C.MemberNumber; redrawMn(mn, 250); setTimeout(() => redrawMn(mn, 0), 1200); }   // (a new picture takes a moment to load)
@@ -139,6 +140,7 @@ function hook() {
         } catch (e) { DIAG.lastErr = String(e && e.message || e); console.warn("[Farmhand Companion] messes:", e); }
       };
       const seen = (name) => (src, x, y, ...rest) => {
+        if (C === W.Player) { if (typeof src === "string") { if (sample.length < 6) sample.push(src.replace(/^.*\/(?=[^/]+\/[^/]+$)/, "")); } else canv++; }
         if (typeof src === "string" && !done) {
           if (BODY.test(src)) body.push([src, x, y]);
           else { const m = groupRe.exec(src); if (m && !SKIN.test(m[1]) && body.length) lay(); }   // the first thing worn over the skin
@@ -176,7 +178,7 @@ export function messDiag() {
   L.push("on you now: " + mine.length + (mine.length ? " · newest " + mine[mine.length - 1].k + " on " + mine[mine.length - 1].a.join("+") + ", " + ago(mine[mine.length - 1].t) : ""));
   L.push("marks from the bot: " + (DIAG.marks.length ? DIAG.marks.map((x) => (x.mess || "?") + " " + ago(x.at)).join(", ") : "none since this page opened"));
   L.push("your body drawn: " + DIAG.got + " times, with a mess " + DIAG.draws + " times");
-  if (DIAG.draw) L.push("last mess drawing: " + ago(DIAG.draw.at) + ", " + DIAG.draw.list + " messes, " + DIAG.draw.pic + "; skin pictures seen: " + (DIAG.draw.body.join(" ") || "NONE"));
+  if (DIAG.draw) L.push("last mess drawing: " + ago(DIAG.draw.at) + ", " + DIAG.draw.list + " messes, " + DIAG.draw.pic + "; skin pictures seen: " + (DIAG.draw.body.join(" ") || "NONE") + "; first pictures: " + (DIAG.draw.sample || []).join(" ") + "; drawings handed over: " + (DIAG.draw.canv || 0));
   if (DIAG.lastErr) L.push("last error: " + DIAG.lastErr);
   L.push("others with messes: " + others.size);
   return L.join("\n");

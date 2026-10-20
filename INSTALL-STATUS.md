@@ -13,7 +13,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 | Map tools, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.4** |
 | Dairy | `farmhand-dairy.user.js` | the bot's PC | **1.1.0** |
 | Shows | `farmhand-shows.user.js` | the bot's PC | **1.1.0** |
-| Farmhand Companion | `farmhand-companion.user.js` | each player | **0.31.3** |
+| Farmhand Companion | `farmhand-companion.user.js` | each player | **0.31.4** |
 | Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.4** |
 
 ## Sending a watch report
@@ -23,6 +23,8 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 - Running the watcher on more than one game at once (the bot, yours, a tester's) lets Claude line them up into one timeline.
 
 ## Latest changes (newest first)
+
+- **Companion 0.31.4: a mess shows even when the Companion can't find your skin.** Laynie's /farmmess: 11 messes on her list, drawn 32 times, "skin pictures seen: NONE", so every mess was trimmed to nothing. Skin is now found by its folder wherever the picture comes from, and with none found the mess goes on untrimmed instead of vanishing. /farmmess also shows the first pictures drawn, to find out why.
 
 - **Companion 0.31.3: /farmmess.** Shows where the farm's messes on you got to: the marks the bot sent, what's on your list, and what your body looked like when the mess was drawn. For chasing a mess that shows on everybody but Laynie.
 

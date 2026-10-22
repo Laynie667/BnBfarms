@@ -29,7 +29,7 @@ export const CSS = `
 .fhc-grip{position:absolute;right:0;bottom:0;width:22px;height:22px;cursor:nwse-resize;touch-action:none;z-index:2;
   background:linear-gradient(135deg,transparent 50%,var(--fh-accent) 50%,var(--fh-accent) 58%,transparent 58%,transparent 70%,var(--fh-accent) 70%,var(--fh-accent) 78%,transparent 78%)}
 /* phones: 16px text in boxes, or the browser zooms the whole page in when one gets focus */
-@media (pointer:coarse){#fhc-panel input,#fhc-panel select,#fhc-panel textarea{font-size:16px}}
+@media (pointer:coarse),(max-width:1000px){#fhc-panel input,#fhc-panel select,#fhc-panel textarea,#fhc-settings input,#fhc-settings select,#fhc-settings textarea{font-size:16px!important}}
 #fhc-panel.compact{font-size:12.5px}
 #fhc-panel button{font:inherit;cursor:pointer}
 .fhc-head{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 12px;border-bottom:1px solid var(--fh-line);cursor:move}
@@ -43,6 +43,10 @@ export const CSS = `
 .fhc-body{flex:1;min-height:0;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:10px}
 .fhc-box{background:var(--fh-card);border:1px solid var(--fh-line);border-radius:10px;padding:11px}
 .fhc-box.ask{border-color:var(--fh-accent)}
+.fhc-fold{cursor:pointer;user-select:none}.fhc-fold::after{content:" ▾";color:var(--fh-muted);font-size:11px}.fhc-box.fold>:not(:first-child){display:none}.fhc-box.fold .fhc-fold::after{content:" ▸"}.fhc-box.fold{padding:8px 11px}
+nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:contain;scrollbar-width:thin;-webkit-overflow-scrolling:touch}nav.fhc-row.fhc-tabs .fhc-pill{flex:0 0 auto;white-space:nowrap}
+@media (min-width:701px) and (pointer:fine){nav.fhc-row.fhc-tabs{flex-wrap:wrap;overflow-x:visible}}
+.fhc-sos{background:var(--fh-alert)!important;color:#fff!important;border-color:var(--fh-alert)!important;font-weight:700}
 .fhc-box.alert{border:2px solid var(--fh-alert)}
 .fhc-h{font-family:Bitter,Georgia,serif;font-weight:700;color:var(--fh-accent);margin-bottom:6px}
 .fhc-muted{color:var(--fh-muted);font-size:12px}

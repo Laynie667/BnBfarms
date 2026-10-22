@@ -294,13 +294,13 @@ function toggles(ctx) {
 }
 
 export const LIVESTOCK_TABS = [
-  { id: "me", label: "Me", render: me },
-  { id: "safety", label: "🆘 Safety", render: safetyTab },
-  { id: "milk", label: "Milking", render: milking },
-  { id: "breed", label: "Breeding", render: breeding },
+  { id: "me", label: "🐄 Me", render: me },
+  { id: "milk", label: "🥛 Milking", render: milking },
+  { id: "breed", label: "🐂 Breeding", render: breeding },
   { id: "traps", label: "🧪 Traps", render: traps },
   { id: "store", label: "🎀 Store", render: storeTab },
-  { id: "inbox", label: "Inbox", render: inbox },
-  { id: "guides", label: "Guides", render: (ctx) => guidesTab(ctx, false) },
-  { id: "toggles", label: "Toggles", render: toggles },
+  { id: "inbox", label: "📬 Inbox", render: inbox },
+  { id: "toggles", label: "⚙️ Toggles", render: toggles },
+  { id: "guides", label: "📖 Guides", render: (ctx) => guidesTab(ctx, false) },
+  { id: "safety", label: "🆘 Safety", render: safetyTab, offRow: true },   // (the 🆘 button in the header opens it)
 ];

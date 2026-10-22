@@ -127,7 +127,7 @@ const C=mn=>chars.find(c=>c.MemberNumber===mn);
   ok(/Got 'em out/.test(to(600,n)) && !P(400).penned, '?free: somebody standin\' by can get them out');
   cfg.TRAP_BEAT_S=0.15; moveTo(600,14,10); P(400).trapAt=0; P(400).trapQuiet=0;
   await spring('mud'); ok(P(400).dirt && P(400).dirt.mud && W.__stateFor(400).now.some(x=>/mud/i.test(x.text)), 'aftermath: muddy shows on their right-now strip');
-  n=sent.length; await say(400,'?wash',2600); ok(!P(400).dirt || !P(400).dirt.mud, '...till they wash');
+  W.__cfg.WASH_BEAT_S=0.1; n=sent.length; await say(400,'?wash',2600); ok(!P(400).dirt || !P(400).dirt.mud, '...till they wash');
   const tc=W.__stateFor(400).trapCard; ok(tc && tc.total >= 5 && tc.kinds.some(k=>k.kind==='glue') && tc.left > 0, 'the trap card counts every kind that has had them');
   await say(221397,'?trap bait trap-gas 3'); const rb0=P(400).ribbons||0; P(400).trapAt=0; P(400).spotTrapAt={}; moveTo(400,15,10); W.__trapTick(); moveTo(400,22,20); W.__trapTick(); await wait(4500);
   ok((P(400).ribbons||0) === rb0+3, 'bait: the next subject that trap catches is paid');

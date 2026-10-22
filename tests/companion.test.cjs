@@ -22,7 +22,9 @@ const bot = (d) => w.ChatRoomMessage({ Sender: 260239, Type: "Hidden", Content: 
 const toBot = (type) => sent.filter((s) => s[1].Content === "FarmhandMsg" && s[1].Target === 260239 && s[1].Dictionary.type === type);
 const cmds = () => toBot("cmd").map((s) => s[1].Dictionary.text);
 const pills = () => [...D.querySelectorAll("#fhc-panel .fhc-pill")];
-const click = (label) => { const b = [...D.querySelectorAll("#fhc-panel button")].find((x) => x.textContent.trim().startsWith(label)); if (b) b.click(); return !!b; };
+// (tab labels have an icon in front since Oct 22: "🐄 Me" is found by "Me")
+const bare = (t) => t.trim().replace(/^[^\p{L}\d?]+/u, "");
+const click = (label) => { const b = [...D.querySelectorAll("#fhc-panel button")].find((x) => x.textContent.trim().startsWith(label)) || (bare(label) && [...D.querySelectorAll("#fhc-panel button")].find((x) => bare(x.textContent).startsWith(bare(label)))); if (b) b.click(); return !!b; };
 const text = () => D.getElementById("fhc-panel").textContent;
 
 const STATE = { name: "Laynie", onBooks: true, roles: ["PROPRIETOR", "LIVESTOCK"], tier: "prize", species: "cow", gender: "female",
@@ -135,7 +137,7 @@ const STATE = { name: "Laynie", onBooks: true, roles: ["PROPRIETOR", "LIVESTOCK"
   const rowSafe = () => [...D.querySelectorAll("#fhc-panel .fhc-row button")].some((b) => /^(Safe word|I'm stuck|Call staff)$/.test(b.textContent.trim()));
   out("7 no safety row on the staff panel ->", !rowSafe());
   click("Livestock"); out("7 ...or the livestock panel ->", !rowSafe());
-  const nSafe = cmds().length; click("🆘 Safety");
+  const nSafe = cmds().length; click("🆘");   // (the 🆘 button in the header, Oct 22)
   out("7 the Safety tab has all three ->", /Safe word/.test(text()) && /I'm stuck/.test(text()) && /Call staff/.test(text()));
   click("Safe word"); out("7 ...and the safe word works from it ->", cmds().slice(nSafe).includes("safe"));
   // phones: an update never rebuilds or refocuses the box (that popped the keyboard and zoomed the screen)
@@ -143,7 +145,7 @@ const STATE = { name: "Laynie", onBooks: true, roles: ["PROPRIETOR", "LIVESTOCK"
   bot({ type: "notice", text: "another notice", id: 6, part: 1, of: 1 });
   bot({ type: "state", state: STAFF5B });
   out("7 updates leave the box alone ->", D.getElementById("fhc-input") === box && focused === 0 && D.activeElement !== box);
-  out("7 boxes are 16px on touch screens (no zoom) ->", /@media \(pointer:coarse\)\{#fhc-panel input,#fhc-panel select,#fhc-panel textarea\{font-size:16px\}\}/.test(D.head.innerHTML));
+  out("7 boxes are 16px on touch screens (no zoom) ->", /@media \(pointer:coarse\),\(max-width:1000px\)\{#fhc-panel input,#fhc-panel select,#fhc-panel textarea,[^}]*\{font-size:16px!important\}\}/.test(D.head.innerHTML));
   // full screen and back
   const panelEl = D.getElementById("fhc-panel");
   const fsBtn = () => [...D.querySelectorAll("#fhc-panel button")].find((b) => /Full screen|Back to a panel/.test(b.getAttribute("aria-label") || ""));
@@ -333,5 +335,13 @@ const STATE = { name: "Laynie", onBooks: true, roles: ["PROPRIETOR", "LIVESTOCK"
   click("Staff"); click("Farm extras");
   out("16 the Staff panel shows the staff ones ->", /staff only bits/.test(text()));
   out("15 ?wash takes the splatters and writing off ->", !(loaded || []).some((b) => b.Name === "Splatters" || b.Name === "BodyWritings"), (loaded || []).some((b) => b.Group === "HairFront"));
+  // 17. Oct 22, on a phone: news from the farm doesn't redraw the panel mid-swipe (it jumped back to the top), and catches up after
+  const body0 = D.querySelector("#fhc-panel .fhc-body");
+  D.getElementById("fhc-panel").dispatchEvent(new w.Event("touchmove", { bubbles: true }));
+  bot({ type: "state", state: Object.assign({}, STATE, { ribbons: 99 }) });
+  const held = D.querySelector("#fhc-panel .fhc-body") === body0;
+  await wait(1600);
+  out("17 a farm update waits while they scroll, then catches up ->", held, D.querySelector("#fhc-panel .fhc-body") !== body0);
+  out("17 the cards fold, and the 🆘 button is always in the header ->", !!D.querySelector("#fhc-panel .fhc-fold"), !!D.querySelector("#fhc-panel .fhc-head .fhc-sos"));
   process.exit(0);
 })();

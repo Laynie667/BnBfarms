@@ -238,7 +238,9 @@ function onFarmMsg(m) {
       try {
         // a mess off the shelf they said yes to (or ?messes on) is drawn even with "Farm can mark my body" off
         const prefs = m.asked ? Object.assign({}, st.panel.prefs, { marks: true }) : st.panel.prefs;
-        if (m.wash) { r = washMarks(); messWash(); }
+        // the farm's own messes first, on their own: if takin' the game's splatters off failed on somebody's outfit, the
+        // messes stayed on and ?wash "wouldn't let me clean all the messes on me" (Laynie, Oct 22)
+        if (m.wash) { try { messWash(); } catch (e) { console.warn("[Farmhand Companion] wash:", e); } try { r = washMarks(); } catch (e) { console.warn("[Farmhand Companion] wash splatters:", e); r = { ok: true, did: ["mess"], why: e.message }; } }
         else if (m.strip) r = stripMe(prefs);
         else if (m.dress) r = dressMe();
         else {

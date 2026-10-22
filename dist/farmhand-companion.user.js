@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.32.0
+// @version      0.33.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -230,7 +230,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.32.0";
+  var VERSION = "0.33.0";
 
   // extension/src/config.js
   var BOT_MEMBER = 260239;
@@ -272,7 +272,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
 .fhc-grip{position:absolute;right:0;bottom:0;width:22px;height:22px;cursor:nwse-resize;touch-action:none;z-index:2;
   background:linear-gradient(135deg,transparent 50%,var(--fh-accent) 50%,var(--fh-accent) 58%,transparent 58%,transparent 70%,var(--fh-accent) 70%,var(--fh-accent) 78%,transparent 78%)}
 /* phones: 16px text in boxes, or the browser zooms the whole page in when one gets focus */
-@media (pointer:coarse){#fhc-panel input,#fhc-panel select,#fhc-panel textarea{font-size:16px}}
+@media (pointer:coarse),(max-width:1000px){#fhc-panel input,#fhc-panel select,#fhc-panel textarea,#fhc-settings input,#fhc-settings select,#fhc-settings textarea{font-size:16px!important}}
 #fhc-panel.compact{font-size:12.5px}
 #fhc-panel button{font:inherit;cursor:pointer}
 .fhc-head{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 12px;border-bottom:1px solid var(--fh-line);cursor:move}
@@ -286,6 +286,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
 .fhc-body{flex:1;min-height:0;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:10px}
 .fhc-box{background:var(--fh-card);border:1px solid var(--fh-line);border-radius:10px;padding:11px}
 .fhc-box.ask{border-color:var(--fh-accent)}
+.fhc-fold{cursor:pointer;user-select:none}.fhc-fold::after{content:" \u25BE";color:var(--fh-muted);font-size:11px}.fhc-box.fold>:not(:first-child){display:none}.fhc-box.fold .fhc-fold::after{content:" \u25B8"}.fhc-box.fold{padding:8px 11px}
+nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:contain;scrollbar-width:thin;-webkit-overflow-scrolling:touch}nav.fhc-row.fhc-tabs .fhc-pill{flex:0 0 auto;white-space:nowrap}
+@media (min-width:701px) and (pointer:fine){nav.fhc-row.fhc-tabs{flex-wrap:wrap;overflow-x:visible}}
+.fhc-sos{background:var(--fh-alert)!important;color:#fff!important;border-color:var(--fh-alert)!important;font-weight:700}
 .fhc-box.alert{border:2px solid var(--fh-alert)}
 .fhc-h{font-family:Bitter,Georgia,serif;font-weight:700;color:var(--fh-accent);margin-bottom:6px}
 .fhc-muted{color:var(--fh-muted);font-size:12px}
@@ -345,7 +349,52 @@ One of mods you are using is using an old version of SDK. It will work for now b
       else el.appendChild(typeof k === "object" ? k : window.document.createTextNode(String(k)));
     }
   }
-  var card = (...kids) => h("div", { class: "fhc-box" }, ...kids);
+  var FOLD_KEY = "fhc-folded";
+  var folded = null;
+  var foldSet = () => {
+    if (!folded) {
+      try {
+        folded = new Set(JSON.parse(window.localStorage.getItem(FOLD_KEY)) || []);
+      } catch (e) {
+        folded = /* @__PURE__ */ new Set();
+      }
+    }
+    return folded;
+  };
+  var foldSave = () => {
+    try {
+      window.localStorage.setItem(FOLD_KEY, JSON.stringify([...foldSet()].slice(-200)));
+    } catch (e) {
+    }
+  };
+  var card = (...kids) => {
+    const box2 = h("div", { class: "fhc-box" }, ...kids);
+    const first = box2.firstElementChild, t = first && (first.classList.contains("fhc-h") ? first : first.querySelector(":scope > .fhc-h"));
+    if (!t || box2.children.length < 2) return box2;
+    const key = (t.textContent || "").replace(/[·:].*$/, "").replace(/\d+/g, "").trim().slice(0, 40);
+    if (!key) return box2;
+    t.classList.add("fhc-fold");
+    t.setAttribute("role", "button");
+    t.setAttribute("tabindex", "0");
+    const set = (on2) => {
+      box2.classList.toggle("fold", on2);
+      t.setAttribute("aria-expanded", on2 ? "false" : "true");
+    };
+    set(foldSet().has(key));
+    const flip = (e) => {
+      e.preventDefault();
+      const on2 = !box2.classList.contains("fold");
+      if (on2) foldSet().add(key);
+      else foldSet().delete(key);
+      foldSave();
+      set(on2);
+    };
+    t.addEventListener("click", flip);
+    t.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") flip(e);
+    });
+    return box2;
+  };
   var title = (text) => h("div", { class: "fhc-h" }, text);
   var muted = (text) => h("div", { class: "fhc-muted" }, text);
   var btn = (label, onclick, accent) => h("button", { type: "button", class: accent ? "fhc-b fhc-b-acc" : "fhc-b", onclick }, label);
@@ -5857,20 +5906,21 @@ One of mods you are using is using an old version of SDK. It will work for now b
     ];
   }
   var LIVESTOCK_TABS = [
-    { id: "me", label: "Me", render: me2 },
-    { id: "safety", label: "\u{1F198} Safety", render: safetyTab },
-    { id: "milk", label: "Milking", render: milking },
-    { id: "breed", label: "Breeding", render: breeding },
+    { id: "me", label: "\u{1F404} Me", render: me2 },
+    { id: "milk", label: "\u{1F95B} Milking", render: milking },
+    { id: "breed", label: "\u{1F402} Breeding", render: breeding },
     { id: "traps", label: "\u{1F9EA} Traps", render: traps },
     { id: "store", label: "\u{1F380} Store", render: storeTab },
-    { id: "inbox", label: "Inbox", render: inbox },
-    { id: "guides", label: "Guides", render: (ctx3) => guidesTab(ctx3, false) },
-    { id: "toggles", label: "Toggles", render: toggles }
+    { id: "inbox", label: "\u{1F4EC} Inbox", render: inbox },
+    { id: "toggles", label: "\u2699\uFE0F Toggles", render: toggles },
+    { id: "guides", label: "\u{1F4D6} Guides", render: (ctx3) => guidesTab(ctx3, false) },
+    { id: "safety", label: "\u{1F198} Safety", render: safetyTab, offRow: true }
+    // (the 🆘 button in the header opens it)
   ];
 
   // extension/src/views/guest.js
   var GUEST_TABS = [
-    { id: "welcome", label: "Welcome", render: (ctx3) => [
+    { id: "welcome", label: "\u{1F44B} Welcome", render: (ctx3) => [
       card(
         h("div", { class: "fhc-title" }, "Howdy, " + (ctx3.welcome.name || "sugar") + "!"),
         h("p", null, "Welcome to B&B Farm. Everybody here chose to be here and signed to say so. Have a look around, mind the ruts, and holler if you need a hand."),
@@ -5880,9 +5930,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
       ),
       card(title("Your keys"), muted("Guests don't carry keys. Staff can let you through any door."))
     ] },
-    { id: "safety", label: "\u{1F198} Safety", render: safetyTab },
-    { id: "farm", label: "The farm", render: () => AREAS.map(([n, key, d]) => card(h("div", { class: "fhc-kv" }, h("b", null, n), h("span", { class: "fhc-muted" }, key)), muted(d))) },
-    { id: "rules", label: "Rules", render: (ctx3) => [
+    { id: "farm", label: "\u{1F33E} The farm", render: () => AREAS.map(([n, key, d]) => card(h("div", { class: "fhc-kv" }, h("b", null, n), h("span", { class: "fhc-muted" }, key)), muted(d))) },
+    { id: "rules", label: "\u{1F4CF} Rules", render: (ctx3) => [
       h(
         "div",
         { class: "fhc-box alert" },
@@ -5892,9 +5941,11 @@ One of mods you are using is using an old version of SDK. It will work for now b
       card(title("On consent"), h("p", null, "Every animal and every hand here chose to be here, and signed for it. What you see in the pens, stalls and barn was asked for. The contract's a fence that holds both ways: what ain't in it, don't happen.")),
       h("div", null, btn("Full rules", () => ctx3.send("rules")), btn("Consent", () => ctx3.send("consent")), btn("What opens what", () => ctx3.send("doors")))
     ] },
-    { id: "inbox", label: "Inbox", render: inbox },
-    { id: "guides", label: "Guides", render: (ctx3) => guidesTab(ctx3, false) },
-    { id: "settings", label: "Settings", render: (ctx3) => [card(title("Farm settings"), muted("Once you're on the books, your milkin', breedin' and teasin' switches show up here."), btn("Apply to join", () => ctx3.send("apply"), true)), drawnBodyCard(ctx3), panelPrefsOrLink(ctx3)] }
+    { id: "inbox", label: "\u{1F4EC} Inbox", render: inbox },
+    { id: "guides", label: "\u{1F4D6} Guides", render: (ctx3) => guidesTab(ctx3, false) },
+    { id: "safety", label: "\u{1F198} Safety", render: safetyTab, offRow: true },
+    // (the 🆘 button in the header opens it)
+    { id: "settings", label: "\u2699\uFE0F Settings", render: (ctx3) => [card(title("Farm settings"), muted("Once you're on the books, your milkin', breedin' and teasin' switches show up here."), btn("Apply to join", () => ctx3.send("apply"), true)), drawnBodyCard(ctx3), panelPrefsOrLink(ctx3)] }
   ];
 
   // shared/bcplus-rules.json
@@ -7453,7 +7504,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     "speech.gaggedOOC": "stops them speakin' out of character"
   };
   var DURATIONS = [
-    { key: "1h", label: "1 hour", min: 60, words: ["1h", "hour", "1 hour", "an hour"] },
+    // (no 1 hour any more: Laynie, Oct 22, "change the minimum contract length to 12 hours, even in the applications")
     { key: "12h", label: "12 hours", min: 720, words: ["12h", "12 hours", "half a day", "a night", "night", "overnight"] },
     { key: "1d", label: "1 day", min: 1440, words: ["1d", "day", "1 day", "a day"] },
     { key: "1w", label: "1 week", min: 10080, words: ["1w", "week", "1 week", "a week"] },
@@ -7987,18 +8038,18 @@ One of mods you are using is using an old version of SDK. It will work for now b
     ];
   }
   var STAFF_TABS = [
-    { id: "me", label: "Me", render: me3 },
-    { id: "herd", label: "Herd", render: herd },
-    { id: "office", label: "Office", render: office, badge: (ctx3) => ctx3.docs.length },
-    { id: "queue", label: "Queue", render: queue, badge: (ctx3) => (ctx3.s.apps || []).length },
-    { id: "contracts", label: "Contracts", render: contracts },
-    { id: "barn", label: "Barn", render: barn },
-    { id: "voice", label: "ECHS", render: voice },
-    { id: "zones", label: "Zones", render: zones },
-    { id: "shift", label: "Shift", render: shift },
-    { id: "guides", label: "Guides", render: (ctx3) => guidesTab(ctx3, true) },
-    { id: "toggles", label: "Toggles", render: toggles2 },
-    { id: "log", label: "Log", render: logTab, show: (ctx3) => !!ctx3.s.logReader }
+    { id: "me", label: "\u{1F9D1}\u200D\u{1F33E} Me", render: me3 },
+    { id: "shift", label: "\u23F1\uFE0F Shift", render: shift },
+    { id: "herd", label: "\u{1F411} Herd", render: herd },
+    { id: "queue", label: "\u{1F4DD} Queue", render: queue, badge: (ctx3) => (ctx3.s.apps || []).length },
+    { id: "office", label: "\u{1F5C2}\uFE0F Office", render: office, badge: (ctx3) => ctx3.docs.length },
+    { id: "contracts", label: "\u{1F4DC} Contracts", render: contracts },
+    { id: "barn", label: "\u{1F3DA}\uFE0F Barn", render: barn },
+    { id: "zones", label: "\u{1F5FA}\uFE0F Zones", render: zones },
+    { id: "voice", label: "\u{1F50A} ECHS", render: voice },
+    { id: "toggles", label: "\u2699\uFE0F Toggles", render: toggles2 },
+    { id: "guides", label: "\u{1F4D6} Guides", render: (ctx3) => guidesTab(ctx3, true) },
+    { id: "log", label: "\u{1F4D2} Log", render: logTab, show: (ctx3) => !!ctx3.s.logReader }
     // the record (chatlog.js), for whoever may read it
   ];
 
@@ -8246,7 +8297,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   ];
   var EDIT_HINT = {
     gender: "female, male, futa, femboy or nonbinary",
-    stay: "1 hour, 12 hours, 1 day, 1 week, 2 weeks, 1 month, permanent",
+    stay: "12 hours, 1 day, 1 week, 2 weeks, 1 month, permanent",
     depth: "fun, deep or no human left",
     species: "cow, pony, bunny, kitty\u2026 any animal",
     name: "what the farm calls them; clear goes back to their game nickname"
@@ -8429,6 +8480,36 @@ One of mods you are using is using an old version of SDK. It will work for now b
       });
       this.el = h("div", { id: "fhc-panel", role: "dialog", "aria-label": "B&B Farm" });
       this.el.addEventListener("keydown", (e) => e.stopPropagation());
+      this.quietUntil = 0;
+      this.pending = false;
+      const busy = () => {
+        this.quietUntil = Date.now() + 900;
+        this.later();
+      };
+      for (const ev of ["touchmove", "wheel", "scroll"]) this.el.addEventListener(ev, busy, { passive: true, capture: true });
+      this.el.addEventListener("focusout", () => setTimeout(() => this.later(), 300));
+      const vp = () => doc.querySelector('meta[name="viewport"]');
+      let vpWas = null;
+      doc.addEventListener("focusin", (e) => {
+        const t = e.target;
+        if (!t || !/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName) || !t.closest || !t.closest("#fhc-panel,#fhc-settings")) return;
+        let m = vp();
+        if (!m) {
+          m = doc.createElement("meta");
+          m.name = "viewport";
+          m.content = "width=device-width, initial-scale=1";
+          doc.head.appendChild(m);
+        }
+        if (vpWas === null) vpWas = m.getAttribute("content") || "";
+        if (!/maximum-scale/.test(vpWas)) m.setAttribute("content", (vpWas ? vpWas + ", " : "") + "maximum-scale=1");
+      });
+      doc.addEventListener("focusout", (e) => {
+        const t = e.target;
+        if (vpWas === null || !t || !t.closest || !t.closest("#fhc-panel,#fhc-settings")) return;
+        const m = vp();
+        if (m) m.setAttribute("content", vpWas);
+        vpWas = null;
+      });
       this.top = h("div", { class: "fhc-top" });
       this.form = h(
         "form",
@@ -8526,18 +8607,19 @@ One of mods you are using is using an old version of SDK. It will work for now b
     }
     setWelcome(w) {
       this.welcome = w || {};
-      this.render();
+      this.renderSoon();
     }
     setState(s) {
       this.s = s || this.s;
-      this.render();
+      this.renderSoon();
     }
     add(text, kind = "reply") {
       this.feed.push({ text: String(text), kind, at: Date.now() });
       if (kind !== "mine") this.fresh = { text: String(text), kind };
       while (this.feed.length > HISTORY_MAX) this.feed.shift();
       if (kind !== "mine") this.ping();
-      this.render();
+      if (kind === "mine") this.render();
+      else this.renderSoon();
     }
     addDoc(d) {
       this.docs = this.docs.filter((x) => !(x.about === d.about && x.kind === d.kind));
@@ -8545,22 +8627,22 @@ One of mods you are using is using an old version of SDK. It will work for now b
       this.ui.doc = this.docs[this.docs.length - 1].id;
       if (this.view() === "staff") this.ui.tab_staff = "office";
       this.ping();
-      this.render();
+      this.renderSoon();
     }
     addAsk(a) {
       this.asks = this.asks.filter((x) => Date.now() - x.at < 10 * 6e4).concat([Object.assign({ at: Date.now() }, a)]);
       this.ping(true);
-      this.render();
+      this.renderSoon();
     }
     setChoose(c) {
       this.choose = c;
       this.ping(true);
-      this.render();
+      this.renderSoon();
     }
     setOutfit(o) {
       this.outfit = o;
       this.ping(true);
-      this.render();
+      this.renderSoon();
     }
     // typed: they wrote it (or picked one of the bot's offered answers), so it may be an answer to a question the bot
     // asked; anything else is a button or a switch, and the bot is told so
@@ -8577,7 +8659,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       }
       clearInterval(this.clock);
       if (open2) this.clock = setInterval(() => {
-        if ((this.s.now || []).some((x) => x.until)) this.render();
+        if ((this.s.now || []).some((x) => x.until)) this.renderSoon();
       }, 3e4);
     }
     show(visible) {
@@ -8657,11 +8739,35 @@ One of mods you are using is using an old version of SDK. It will work for now b
         }
       };
     }
+    // somebody's in the middle of somethin' in here: swipin', or typin' in a box a redraw would replace
+    busy() {
+      if (Date.now() < this.quietUntil) return true;
+      const a = window.document.activeElement;
+      return !!(a && this.top && this.top.contains(a) && /^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName));
+    }
+    later() {
+      clearTimeout(this.laterT);
+      if (this.pending) this.laterT = setTimeout(() => {
+        if (!this.pending) return;
+        if (this.busy()) return this.later();
+        this.render();
+      }, 350);
+    }
+    renderSoon() {
+      if (this.busy()) {
+        this.pending = true;
+        this.later();
+        return;
+      }
+      this.render();
+    }
     render() {
+      this.pending = false;
       const ctx3 = this.ctx(), view = this.view(), V = VIEWS[view];
       const tabs = (view === "guest" ? V.tabs : withExtras(V.tabs, view, ctx3)).filter((t) => !t.show || t.show(ctx3));
       const tabKey = "tab_" + view, tab2 = tabs.find((t) => t.id === this.ui[tabKey]) || tabs[0];
       const scroll = this.el.querySelector(".fhc-body"), keep2 = scroll ? scroll.scrollTop : 0;
+      const nav0 = this.el.querySelector("nav.fhc-tabs"), navKeep = nav0 ? nav0.scrollLeft : 0;
       this.el.classList.toggle("compact", !!this.prefs.compact);
       const full = !!this.prefs.full;
       this.top.replaceChildren(
@@ -8672,6 +8778,13 @@ One of mods you are using is using an old version of SDK. It will work for now b
           h(
             "div",
             { style: { display: "flex", gap: "6px" } },
+            h("button", {
+              type: "button",
+              class: "fhc-pill fhc-sos",
+              title: "Safety: safe word, I'm stuck, call staff",
+              "aria-label": "Safety",
+              onclick: () => this.goSafety()
+            }, "\u{1F198}"),
             h("button", {
               type: "button",
               class: "fhc-pill",
@@ -8698,7 +8811,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
           } }, VIEWS[v].label))
         ),
         // Safe word, I'm stuck and Call staff live in the Safety tab (Guest and Livestock panels; staff reach it from Livestock)
-        h("nav", { class: "fhc-row", "aria-label": "Panel sections" }, tabs.map((t) => {
+        h("nav", { class: "fhc-row fhc-tabs", "aria-label": "Panel sections" }, tabs.filter((t) => !t.offRow || t === tab2).map((t) => {
           const n = t.badge ? t.badge(ctx3) : 0;
           return h("button", { type: "button", class: "fhc-pill" + (t === tab2 ? " on" : ""), onclick: () => {
             this.ui[tabKey] = t.id;
@@ -8709,6 +8822,26 @@ One of mods you are using is using an old version of SDK. It will work for now b
       );
       const body2 = this.el.querySelector(".fhc-body");
       if (body2) body2.scrollTop = keep2;
+      const nav = this.el.querySelector("nav.fhc-tabs");
+      if (nav) {
+        nav.scrollLeft = navKeep;
+        const on2 = nav.querySelector(".fhc-pill.on");
+        if (on2 && (on2.offsetLeft < nav.scrollLeft || on2.offsetLeft + on2.offsetWidth > nav.scrollLeft + nav.clientWidth)) nav.scrollLeft = Math.max(0, on2.offsetLeft - 12);
+      }
+    }
+    // 🆘: the Safety tab, from whichever panel they're on (staff go to it in their Livestock panel)
+    goSafety() {
+      let view = this.view();
+      if (!VIEWS[view].tabs.some((t) => t.id === "safety")) {
+        const alt = this.views().find((v) => VIEWS[v].tabs.some((t) => t.id === "safety"));
+        if (alt) {
+          view = alt;
+          this.prefs.view = alt;
+          savePrefs(this.prefs);
+        }
+      }
+      this.ui["tab_" + view] = "safety";
+      this.render();
     }
     // questions waitin' on you, on every tab
     banners() {
@@ -10309,8 +10442,17 @@ One of mods you are using is using an old version of SDK. It will work for now b
         try {
           const prefs = m.asked ? Object.assign({}, st.panel.prefs, { marks: true }) : st.panel.prefs;
           if (m.wash) {
-            r = washMarks();
-            messWash();
+            try {
+              messWash();
+            } catch (e) {
+              console.warn("[Farmhand Companion] wash:", e);
+            }
+            try {
+              r = washMarks();
+            } catch (e) {
+              console.warn("[Farmhand Companion] wash splatters:", e);
+              r = { ok: true, did: ["mess"], why: e.message };
+            }
           } else if (m.strip) r = stripMe(prefs);
           else if (m.dress) r = dressMe();
           else {

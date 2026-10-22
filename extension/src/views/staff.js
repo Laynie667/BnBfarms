@@ -162,16 +162,16 @@ function toggles(ctx) {
 }
 
 export const STAFF_TABS = [
-  { id: "me", label: "Me", render: me },
-  { id: "herd", label: "Herd", render: herd },
-  { id: "office", label: "Office", render: office, badge: (ctx) => ctx.docs.length },
-  { id: "queue", label: "Queue", render: queue, badge: (ctx) => (ctx.s.apps || []).length },
-  { id: "contracts", label: "Contracts", render: contracts },
-  { id: "barn", label: "Barn", render: barn },
-  { id: "voice", label: "ECHS", render: voice },
-  { id: "zones", label: "Zones", render: zones },
-  { id: "shift", label: "Shift", render: shift },
-  { id: "guides", label: "Guides", render: (ctx) => guidesTab(ctx, true) },
-  { id: "toggles", label: "Toggles", render: toggles },
-  { id: "log", label: "Log", render: logTab, show: (ctx) => !!ctx.s.logReader },   // the record (chatlog.js), for whoever may read it
+  { id: "me", label: "🧑‍🌾 Me", render: me },
+  { id: "shift", label: "⏱️ Shift", render: shift },
+  { id: "herd", label: "🐑 Herd", render: herd },
+  { id: "queue", label: "📝 Queue", render: queue, badge: (ctx) => (ctx.s.apps || []).length },
+  { id: "office", label: "🗂️ Office", render: office, badge: (ctx) => ctx.docs.length },
+  { id: "contracts", label: "📜 Contracts", render: contracts },
+  { id: "barn", label: "🏚️ Barn", render: barn },
+  { id: "zones", label: "🗺️ Zones", render: zones },
+  { id: "voice", label: "🔊 ECHS", render: voice },
+  { id: "toggles", label: "⚙️ Toggles", render: toggles },
+  { id: "guides", label: "📖 Guides", render: (ctx) => guidesTab(ctx, true) },
+  { id: "log", label: "📒 Log", render: logTab, show: (ctx) => !!ctx.s.logReader },   // the record (chatlog.js), for whoever may read it
 ];

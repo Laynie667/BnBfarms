@@ -5,7 +5,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 | Script | File in `dist/` | Where it runs | Current |
 |---|---|---|---|
-| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.39.0** |
+| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.40.0** |
 | Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.10.0** |
 | Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.2.1** |
 | Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **1.1.0** |
@@ -13,7 +13,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 | Map tools, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.4** |
 | Dairy | `farmhand-dairy.user.js` | the bot's PC | **1.1.0** |
 | Shows | `farmhand-shows.user.js` | the bot's PC | **1.1.0** |
-| Farmhand Companion | `farmhand-companion.user.js` | each player | **0.32.0** |
+| Farmhand Companion | `farmhand-companion.user.js` | each player | **0.33.0** |
 | Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.4** |
 
 ## Sending a watch report
@@ -23,6 +23,12 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 - Running the watcher on more than one game at once (the bot, yours, a tester's) lets Claude line them up into one timeline.
 
 ## Latest changes (newest first)
+
+- **Bot 0.40.0, Companion 0.33.0: a proper wash, twelve-hour contracts, tidier panels, and a steadier panel on phones.** Laynie, Oct 22.
+  - **?wash** "needs more beats, and to reliably wash all messes off". It only washed when the bot itself had paint on its books for them, so once that ran out it said "clean as a whistle" with messes still drawn on them. Now every ?wash washes everything the farm put on them (the drawn messes, the game's splatters, the writing, and what a trap left), in five beats at the trough: the water, two scrubs, the rinse, the towel. The Companion takes the drawn messes off first, on their own, so a splatter that won't come off can't stop it.
+  - **Contracts: twelve hours is the shortest**, in ?contract offer, the staff Contracts tab, and the application's "how long are you stayin'".
+  - **Panels:** every tab has an icon and they sit in one row that scrolls sideways on a phone, keeping the open tab in sight; the everyday ones come first. Tap a card's title to fold it away (▸), and it stays folded. The 🆘 button is always in the panel's header and opens Safety from any panel, so Safety is off the tab row.
+  - **On a phone:** the panel no longer jumps back to the top when the chat or the farm updates while you scroll, or while you're typing in one of its boxes: it catches up when you stop. Its boxes are 16px on phones and narrow screens, and while one has the focus the page is told not to zoom.
 
 - **Bot 0.39.0, Companion 0.32.0, Glory stalls 1.10.0: traps for everybody, fuller trap scenes, Goblin Musk.**
   - **Traps are opt-in for everyone.** Laynie: "remove the subject role and make traps purely a opt-in with a toggle for everyone." ?traps on and they spring for you, ?traps off and they never do; it's "Traps" in the Companion's Toggles too, and the trap card has a "Switch traps off" button. No more subject role and no proprietor sign-up: anybody who was a test subject already has their traps on. ?subject now just lists, for the proprietors, who has them on.

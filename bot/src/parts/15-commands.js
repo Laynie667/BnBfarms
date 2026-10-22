@@ -305,7 +305,7 @@
           case "offer": {
             if (!boss){ R("Offerin' contracts is for herdmasters and proprietors, sugar."); break; }
             const t = resolveTarget(args[2]);
-            if (!name || !t || !args[3]){ R("Here's how, sugar: ?contract offer <contract> <who> <how long>. How long is 1h, 12h, 1d, 1w, 2w, 1m or perm. For example: ?contract offer deep Bessie 1w. Add when the rules apply at the end: when room=private names=farm with=221397 role=owner time=20:00-06:00 only=pet.speech"); break; }
+            if (!name || !t || !args[3]){ R("Here's how, sugar: ?contract offer <contract> <who> <how long>. How long is 12h, 1d, 1w, 2w, 1m or perm. For example: ?contract offer deep Bessie 1w. Add when the rules apply at the end: when room=private names=farm with=221397 role=owner time=20:00-06:00 only=pet.speech"); break; }
             const wi = args.findIndex(a => /^when$/i.test(a));   // ?contract offer deep Bessie 1w when room=private time=20:00-06:00
             const err = offerContract(sender, name, t, (wi >= 0 ? args.slice(3, wi) : args.slice(3)).join(" "), wi >= 0 ? args.slice(wi + 1).join(" ") : "");
             R(err || "📜 Offered to "+plainName(t)+"! It's on their BC+ Contracts page now. I'll tell you when they sign.");
@@ -1639,7 +1639,7 @@ Welcome to B&B Farm, hon. 🌾`);
           said = "their gender";
         } else if (key === "stay"){
           const d = !clear && BCPLUS.durationFrom(val);
-          if (!clear && !d){ R("Pick one, sugar: 1 hour, 12 hours, 1 day, 1 week, 2 weeks, 1 month or permanent (or clear)."); break; }
+          if (!clear && !d){ R("Pick one, sugar: 12 hours, 1 day, 1 week, 2 weeks, 1 month or permanent (or clear)."); break; }
           r.stayType = d ? d.key : ""; setApp("stay", r.stayType);
           said = "their stay";
         } else if (key === "depth"){
@@ -2064,18 +2064,12 @@ Welcome to B&B Farm, hon. 🌾`);
 
       case "wash": {
         const t = args[0] && isStaff(sender) ? resolveTarget(args[0]) : sender;
-        const p = t && rec(t) ? prodOf(t) : null;
-        if (p && !paintedText(t) && aftermathOf(t).length){   // nothin' painted on, but a trap left them filthy
-          bodyMark(t, { wash: true }); aftermathWash(t); saveLedger(); syncCompanions(true);
-          if (onMap(t)) emote("🚿 "+plainName(t)+" gets scrubbed down at the trough till the water runs clear.", t); else R("All washed up, sugar.");
-          break;
-        }
-        if (!p || !paintedText(t)){ R((t === sender ? "You're" : plainName(t)+" is")+" clean as a whistle, sugar."); break; }
+        // Every ?wash washes: the farm's messes live in their Companion (what's drawn on them), not only in what the bot
+        // remembers paintin' on, so "clean as a whistle" turned folk away with messes still on them (Laynie, Oct 22: "it
+        // doesn't want to let me clean all the messes on me"). And it takes a few beats now, a proper scrub (10ug-wash.js).
+        if (!t || !rec(t)){ R("I don't know who that is, sugar."); break; }
         if (t === sender){ const no = addonVeto("wash", t); if (no){ R(no); break; } }   // an add-on can keep somebody messy (their own switch)
-        bodyMark(t, { wash: true });   // the splatters and writing their Companion put on (10s-marks.js)
-        const was = paintedText(t); p.painted = null; aftermathWash(t); saveLedger();
-        if (onMap(t)) emote("🚿 "+plainName(t)+" gets hosed down at the trough, washin' the "+was+" clean. Shame, it was a good look.", t);
-        else R("All washed up, sugar.");
+        washScene(t, sender);
         break;
       }
 

@@ -148,7 +148,7 @@ const EDIT_FIELDS = [["name", "Name"], ["species", "Species"], ["gender", "Gende
   ["app.name", "Application: what to call them"], ["app.role", "Application: here as"], ["app.likes", "Application: what sounds good"],
   ["app.curious", "Application: curious about"], ["app.soft", "Application: soft limits"], ["app.else", "Application: anything else"],
   ["app.handled", "Application (staff): handled before"], ["app.duties", "Application (staff): duties"], ["app.sideways", "Application (staff): steppin' in"]];
-const EDIT_HINT = { gender: "female, male, futa, femboy or nonbinary", stay: "1 hour, 12 hours, 1 day, 1 week, 2 weeks, 1 month, permanent", depth: "fun, deep or no human left",
+const EDIT_HINT = { gender: "female, male, futa, femboy or nonbinary", stay: "12 hours, 1 day, 1 week, 2 weeks, 1 month, permanent", depth: "fun, deep or no human left",
   species: "cow, pony, bunny, kitty… any animal", name: "what the farm calls them; clear goes back to their game nickname" };
 function records(ctx) {
   const who = () => String(ctx.ui.eWho || "").trim().replace(/\s+/g, " ");

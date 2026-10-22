@@ -88,7 +88,7 @@
     const tpl = contractTemplate(tplName);
     if (!tpl) return "There's no contract called '"+tplName+"', sugar. ?contract list shows them (fun, deep and nhl are always there).";
     const d = BCPLUS.durationFrom(durText);
-    if (!d) return "How long, hon? Say 1h, 12h, 1d, 1w, 2w, 1m or perm.";
+    if (!d) return "How long, hon? Say 12h, 1d, 1w, 2w, 1m or perm (twelve hours is the shortest).";
     if (!charFor(t)) return plainName(t)+" has to be here in the room for a contract offer, sugar. BC+ only takes 'em in person.";
     const c = buildContract(tpl, t, d.key, when);
     const problems = BCPLUS.checkContract(c);

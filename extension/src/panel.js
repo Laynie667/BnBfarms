@@ -52,6 +52,28 @@ export class Panel {
     this.btn.addEventListener("click", () => { if (!this.btnDragged) this.toggle(); this.btnDragged = false; });
     this.el = h("div", { id: "fhc-panel", role: "dialog", "aria-label": "B&B Farm" });
     this.el.addEventListener("keydown", (e) => e.stopPropagation());   // keep BC from treatin' panel typin' as game keys
+    // On a phone (Laynie, Oct 22): "any time the chat or room updates, the add on jumps back to the top while I am trying
+    // to scroll". A message arrivin' redrew the panel mid-swipe. Now a redraw that comes from outside (the farm's news,
+    // the clocks) waits while they're scrollin' or typin' in one of the panel's boxes, then catches up. Their own taps
+    // still redraw at once.
+    this.quietUntil = 0; this.pending = false;
+    const busy = () => { this.quietUntil = Date.now() + 900; this.later(); };
+    for (const ev of ["touchmove", "wheel", "scroll"]) this.el.addEventListener(ev, busy, { passive: true, capture: true });
+    this.el.addEventListener("focusout", () => setTimeout(() => this.later(), 300));   // (after the tap that blurred it has landed)
+    // ...and "it zooms in when I select text boxes": a phone zooms to a box whose text is small. Our boxes are 16px on a
+    // phone now (styles.js), and while one of ours has the focus the page is told not to zoom; that's lifted again after.
+    const vp = () => doc.querySelector('meta[name="viewport"]');
+    let vpWas = null;
+    doc.addEventListener("focusin", (e) => {
+      const t = e.target; if (!t || !/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName) || !t.closest || !t.closest("#fhc-panel,#fhc-settings")) return;
+      let m = vp(); if (!m){ m = doc.createElement("meta"); m.name = "viewport"; m.content = "width=device-width, initial-scale=1"; doc.head.appendChild(m); }
+      if (vpWas === null) vpWas = m.getAttribute("content") || "";
+      if (!/maximum-scale/.test(vpWas)) m.setAttribute("content", (vpWas ? vpWas + ", " : "") + "maximum-scale=1");
+    });
+    doc.addEventListener("focusout", (e) => {
+      const t = e.target; if (vpWas === null || !t || !t.closest || !t.closest("#fhc-panel,#fhc-settings")) return;
+      const m = vp(); if (m) m.setAttribute("content", vpWas); vpWas = null;
+    });
     // what changes is redrawn in here; the command box below is built once and never touched again, so a message
     // arrivin' never steals focus, pops a phone's keyboard back up, or zooms the screen
     this.top = h("div", { class: "fhc-top" });
@@ -113,26 +135,26 @@ export class Panel {
 
   /* ── what the rest of the Companion calls ── */
   setStatus(text) { this.status = text; const s = this.el.querySelector("#fhc-status"); if (s) s.textContent = text; }
-  setWelcome(w) { this.welcome = w || {}; this.render(); }
-  setState(s) { this.s = s || this.s; this.render(); }
+  setWelcome(w) { this.welcome = w || {}; this.renderSoon(); }
+  setState(s) { this.s = s || this.s; this.renderSoon(); }
   add(text, kind = "reply") {
     this.feed.push({ text: String(text), kind, at: Date.now() });
     // the newest answer shows on whatever tab you're on, so a button never looks like it did nothin'
     if (kind !== "mine") this.fresh = { text: String(text), kind };
     while (this.feed.length > HISTORY_MAX) this.feed.shift();
     if (kind !== "mine") this.ping();
-    this.render();
+    if (kind === "mine") this.render(); else this.renderSoon();
   }
   addDoc(d) {
     this.docs = this.docs.filter((x) => !(x.about === d.about && x.kind === d.kind));   // a fresh lookup replaces the old one
     this.docs.push(Object.assign({ id: "d" + Date.now() + Math.random().toString(36).slice(2, 6), at: Date.now() }, d));
     this.ui.doc = this.docs[this.docs.length - 1].id;
     if (this.view() === "staff") this.ui.tab_staff = "office";
-    this.ping(); this.render();
+    this.ping(); this.renderSoon();
   }
-  addAsk(a) { this.asks = this.asks.filter((x) => Date.now() - x.at < 10 * 60000).concat([Object.assign({ at: Date.now() }, a)]); this.ping(true); this.render(); }
-  setChoose(c) { this.choose = c; this.ping(true); this.render(); }
-  setOutfit(o) { this.outfit = o; this.ping(true); this.render(); }
+  addAsk(a) { this.asks = this.asks.filter((x) => Date.now() - x.at < 10 * 60000).concat([Object.assign({ at: Date.now() }, a)]); this.ping(true); this.renderSoon(); }
+  setChoose(c) { this.choose = c; this.ping(true); this.renderSoon(); }
+  setOutfit(o) { this.outfit = o; this.ping(true); this.renderSoon(); }
   // typed: they wrote it (or picked one of the bot's offered answers), so it may be an answer to a question the bot
   // asked; anything else is a button or a switch, and the bot is told so
   ask(cmd, typed) { this.add(cmd, "mine"); this.onCommand(cmd, !!typed); }
@@ -142,7 +164,7 @@ export class Panel {
     this.el.classList.toggle("open", open);
     if (open) { this.unread = 0; this.btn.removeAttribute("data-unread"); }
     clearInterval(this.clock);
-    if (open) this.clock = setInterval(() => { if ((this.s.now || []).some((x) => x.until)) this.render(); }, 30000);   // the right-now clocks tick down
+    if (open) this.clock = setInterval(() => { if ((this.s.now || []).some((x) => x.until)) this.renderSoon(); }, 30000);   // the right-now clocks tick down
   }
   show(visible) { this.btn.style.display = visible ? "" : "none"; if (!visible) this.toggle(false); }
 
@@ -180,17 +202,29 @@ export class Panel {
       resetPlaces: () => { this.resetPlaces(); this.add("👉 The 🌾 button and panel are back in the corner, at their usual size.", "notice"); },
     };
   }
+  // somebody's in the middle of somethin' in here: swipin', or typin' in a box a redraw would replace
+  busy() {
+    if (Date.now() < this.quietUntil) return true;
+    const a = window.document.activeElement;
+    return !!(a && this.top && this.top.contains(a) && /^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName));
+  }
+  later() { clearTimeout(this.laterT); if (this.pending) this.laterT = setTimeout(() => { if (!this.pending) return; if (this.busy()) return this.later(); this.render(); }, 350); }
+  renderSoon() { if (this.busy()) { this.pending = true; this.later(); return; } this.render(); }
   render() {
+    this.pending = false;
     const ctx = this.ctx(), view = this.view(), V = VIEWS[view];
     const tabs = (view === "guest" ? V.tabs : withExtras(V.tabs, view, ctx)).filter((t) => !t.show || t.show(ctx));   // + "Farm extras" when an add-on has somethin'; a tab with show() only when it says so (the Log tab)
     const tabKey = "tab_" + view, tab = tabs.find((t) => t.id === this.ui[tabKey]) || tabs[0];
     const scroll = this.el.querySelector(".fhc-body"), keep = scroll ? scroll.scrollTop : 0;
+    const nav0 = this.el.querySelector("nav.fhc-tabs"), navKeep = nav0 ? nav0.scrollLeft : 0;
     this.el.classList.toggle("compact", !!this.prefs.compact);
     const full = !!this.prefs.full;
     this.top.replaceChildren(
       h("div", { class: "fhc-head", style: { touchAction: "none" }, onpointerdown: (e) => this.drag(e) },
         h("div", null, h("div", { class: "fhc-title" }, "🌾 B&B Farm"), h("div", { id: "fhc-status", class: "fhc-muted" }, this.status)),
         h("div", { style: { display: "flex", gap: "6px" } },
+          h("button", { type: "button", class: "fhc-pill fhc-sos", title: "Safety: safe word, I'm stuck, call staff", "aria-label": "Safety",
+            onclick: () => this.goSafety() }, "🆘"),
           h("button", { type: "button", class: "fhc-pill", title: full ? "Back to a panel" : "Full screen", "aria-label": full ? "Back to a panel" : "Full screen",
             onclick: () => { this.prefs.full = !full; savePrefs(this.prefs); this.placePanel(); this.render(); } }, full ? "🗗" : "⛶"),
           h("button", { type: "button", class: "fhc-pill", "aria-label": "Close the panel", onclick: () => this.toggle(false) }, "✕"))),
@@ -198,12 +232,21 @@ export class Panel {
         this.views().map((v) => h("button", { type: "button", class: "fhc-pill" + (v === view ? " on" : ""), onclick: () => { this.prefs.view = v; savePrefs(this.prefs); this.render(); } }, VIEWS[v].label))),
       // Safe word, I'm stuck and Call staff live in the Safety tab (Guest and Livestock panels; staff reach it from Livestock)
 
-      h("nav", { class: "fhc-row", "aria-label": "Panel sections" }, tabs.map((t) => {
+      h("nav", { class: "fhc-row fhc-tabs", "aria-label": "Panel sections" }, tabs.filter((t) => !t.offRow || t === tab).map((t) => {
         const n = t.badge ? t.badge(ctx) : 0;
         return h("button", { type: "button", class: "fhc-pill" + (t === tab ? " on" : ""), onclick: () => { this.ui[tabKey] = t.id; this.render(); } }, t.label + (n ? " · " + n : ""));
       })),
       h("div", { class: "fhc-body" }, this.banners(), safeRender(tab, ctx)));
     const body = this.el.querySelector(".fhc-body"); if (body) body.scrollTop = keep;
+    const nav = this.el.querySelector("nav.fhc-tabs");
+    if (nav) { nav.scrollLeft = navKeep; const on = nav.querySelector(".fhc-pill.on");
+      if (on && (on.offsetLeft < nav.scrollLeft || on.offsetLeft + on.offsetWidth > nav.scrollLeft + nav.clientWidth)) nav.scrollLeft = Math.max(0, on.offsetLeft - 12); }
+  }
+  // 🆘: the Safety tab, from whichever panel they're on (staff go to it in their Livestock panel)
+  goSafety() {
+    let view = this.view();
+    if (!VIEWS[view].tabs.some((t) => t.id === "safety")) { const alt = this.views().find((v) => VIEWS[v].tabs.some((t) => t.id === "safety")); if (alt) { view = alt; this.prefs.view = alt; savePrefs(this.prefs); } }
+    this.ui["tab_" + view] = "safety"; this.render();
   }
   // questions waitin' on you, on every tab
   banners() {

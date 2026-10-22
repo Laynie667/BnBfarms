@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.39.0
+// @version      0.40.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -1597,7 +1597,7 @@
     "speech.gaggedOOC": "stops them speakin' out of character"
   };
   var DURATIONS = [
-    { key: "1h", label: "1 hour", min: 60, words: ["1h", "hour", "1 hour", "an hour"] },
+    // (no 1 hour any more: Laynie, Oct 22, "change the minimum contract length to 12 hours, even in the applications")
     { key: "12h", label: "12 hours", min: 720, words: ["12h", "12 hours", "half a day", "a night", "night", "overnight"] },
     { key: "1d", label: "1 day", min: 1440, words: ["1d", "day", "1 day", "a day"] },
     { key: "1w", label: "1 week", min: 10080, words: ["1w", "week", "1 week", "a week"] },
@@ -1895,7 +1895,7 @@
   ];
 
   // bot/src/version.js
-  var VERSION = "0.39.0";
+  var VERSION = "0.40.0";
 
   // bot-parts:farmhand-bot-parts
   (function() {
@@ -2427,6 +2427,8 @@
       // traps, the thing in the water, and toys that act on their own (10u-traps.js)
       TRAP_BEAT_S: 18,
       // seconds between the beats of a trap's story (slow enough to read and to answer)
+      WASH_BEAT_S: 8,
+      // seconds between the beats of a ?wash (10ug-wash.js)
       DANGER_CHANCE_X: 1.5,
       // a Danger Draught: everything on a chance is this much likelier for them (timers double, triple with a second bottle)
       TRAP_COOLDOWN_MIN: 3,
@@ -7766,7 +7768,7 @@
       const tpl = contractTemplate(tplName);
       if (!tpl) return "There's no contract called '" + tplName + "', sugar. ?contract list shows them (fun, deep and nhl are always there).";
       const d = durationFrom(durText);
-      if (!d) return "How long, hon? Say 1h, 12h, 1d, 1w, 2w, 1m or perm.";
+      if (!d) return "How long, hon? Say 12h, 1d, 1w, 2w, 1m or perm (twelve hours is the shortest).";
       if (!charFor(t)) return plainName(t) + " has to be here in the room for a contract offer, sugar. BC+ only takes 'em in person.";
       const c = buildContract(tpl, t, d.key, when);
       const problems = checkContract(c);
@@ -19670,6 +19672,70 @@
         "One last slippery tumble, and somebody's on top, and the crowd goes wild."
       ]
     );
+    const WASH_LINES = {
+      start: [
+        '%n steps up to the wash trough and somebody hands them a bucket, a brush and a cake of yellow soap. "Go on, then."',
+        'A farmhand drags the hose over to %n, thumbs the nozzle and grins. "Hold still, you mucky thing."',
+        "%n climbs into the big tin wash tub by the pump while a farmhand works the handle, and the first cold gush makes them yelp.",
+        "The wash-down stall's free. %n steps in, the gate swings shut, and the water comes on warm from the tank on the roof."
+      ],
+      scrub: [
+        "The brush goes round in hard soapy circles, shoulders first, then down the back, and the water underneath runs every colour of the farm.",
+        "Soap suds pile up on %n like a snowdrift, and a farmhand scrubs behind their ears and under their chin like they're a muddy calf.",
+        "{t}The suds go on thick over %n's tits and the brush works round and round them, slow, till every sticky streak is gone.",
+        "{c}A soapy hand works down %n's cock and balls, thorough as a groom with a show bull, and doesn't hurry.",
+        "{v}The farmhand soaps between %n's legs with a flat warm hand, front to back and again, till the last of the mess slides off.",
+        "Every crease gets the brush: elbows, knees, the backs of the thighs, the soft places between. %n squirms and the farmhand just scrubs harder."
+      ],
+      rinse: [
+        "Then the rinse: a whole bucket over the head, cold, and the suds run off %n in a white sheet and gurgle away down the drain.",
+        "The hose sweeps over %n from crown to heels, slow, chasing the last of the soap, and the water at their feet runs clear at last.",
+        "Somebody tips a bucket of warm water over %n's head, then another, then a cold one for luck, and the farm's mess goes swirlin' off down the gutter.",
+        "%n stands under the pump with their eyes shut while the water pours, and every last drip of it washes off clean."
+      ],
+      dry: [
+        "A rough towel, a brisk rub all over, and %n steps out pink and squeaky and smellin' of nothin' but soap. Clean, for now.",
+        "The farmhand wraps %n in a sun-warm towel and rubs them dry like a foal. Not a speck left on them. It won't last.",
+        "%n is towelled off, fluffed up and sent on their way scrubbed raw and clean as a new pail. The farm will fix that soon enough.",
+        "Wrung out, rubbed down and squeaky clean from scalp to toes, %n shakes off the last drops like a dog."
+      ]
+    };
+    function washNow(t) {
+      bodyMark(t, { wash: true });
+      const p = prodOf(t);
+      if (p) p.painted = null;
+      aftermathWash(t);
+      saveLedger();
+      syncCompanions(true);
+    }
+    function washScene(t, by) {
+      state.washing = state.washing || /* @__PURE__ */ new Map();
+      if (state.washing.get(t) > Date.now()) {
+        tell(by, "\u{1F6BF} " + (t === by ? "You're" : plainName(t) + " is") + " already at the wash trough, sugar.");
+        return;
+      }
+      if (!onMap(t)) {
+        washNow(t);
+        tell(by, "\u{1F6BF} All washed up, sugar: everything the farm put on " + (t === by ? "you" : plainName(t)) + " is off.");
+        return;
+      }
+      const beats = ["start", "scrub", "scrub", "rinse", "dry"], gap = CFG.WASH_BEAT_S * 1e3;
+      state.washing.set(t, Date.now() + beats.length * gap + 5e3);
+      const beat = (k, i) => {
+        try {
+          emote("\u{1F6BF} " + tFill(pickFor(t, "wash:" + k + ":" + i, WASH_LINES[k]), t), t);
+          if (i === beats.length - 1) {
+            washNow(t);
+            state.washing.delete(t);
+          }
+        } catch (e) {
+          warn("wash:", e);
+          washNow(t);
+          state.washing.delete(t);
+        }
+      };
+      beats.forEach((k, i) => i === 0 ? beat(k, i) : later(() => beat(k, i), i * gap));
+    }
     const PARASITE_SERUMS = ["growth", "fertility", "growth", "hyper pregnancy", "growth", "capacity"];
     const PARASITE_GROWS = ["udder", "penis", "testes", "butt"];
     function parasiteChance(mn) {
@@ -30121,9 +30187,9 @@ Say ?apply and pick 'luxury guest'.
       },
       {
         key: "stay",
-        text: "How long you plannin' on stayin' with us?  1 hour / 12 hours / 1 day / 1 week / 2 weeks / 1 month / permanent / not sure",
+        text: "How long you plannin' on stayin' with us?  12 hours / 1 day / 1 week / 2 weeks / 1 month / permanent / not sure",
         choices: () => DURATIONS.map((d) => d.label).concat(["not sure"]),
-        check: (t) => notSure(t) ? { value: "" } : durationFrom(t) ? { value: durationFrom(t).key } : { err: "Pick one, sugar: 1 hour, 12 hours, 1 day, 1 week, 2 weeks, 1 month, permanent, or not sure." }
+        check: (t) => notSure(t) ? { value: "" } : durationFrom(t) ? { value: durationFrom(t).key } : { err: "Pick one, sugar: 12 hours, 1 day, 1 week, 2 weeks, 1 month, permanent, or not sure." }
       },
       {
         key: "depth",
@@ -31260,7 +31326,7 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
               }
               const t = resolveTarget(args[2]);
               if (!name || !t || !args[3]) {
-                R("Here's how, sugar: ?contract offer <contract> <who> <how long>. How long is 1h, 12h, 1d, 1w, 2w, 1m or perm. For example: ?contract offer deep Bessie 1w. Add when the rules apply at the end: when room=private names=farm with=221397 role=owner time=20:00-06:00 only=pet.speech");
+                R("Here's how, sugar: ?contract offer <contract> <who> <how long>. How long is 12h, 1d, 1w, 2w, 1m or perm. For example: ?contract offer deep Bessie 1w. Add when the rules apply at the end: when room=private names=farm with=221397 role=owner time=20:00-06:00 only=pet.speech");
                 break;
               }
               const wi = args.findIndex((a) => /^when$/i.test(a));
@@ -33233,7 +33299,7 @@ Welcome to B&B Farm, hon. \u{1F33E}`
           } else if (key === "stay") {
             const d = !clear && durationFrom(val);
             if (!clear && !d) {
-              R("Pick one, sugar: 1 hour, 12 hours, 1 day, 1 week, 2 weeks, 1 month or permanent (or clear).");
+              R("Pick one, sugar: 12 hours, 1 day, 1 week, 2 weeks, 1 month or permanent (or clear).");
               break;
             }
             r.stayType = d ? d.key : "";
@@ -33883,18 +33949,8 @@ Welcome to B&B Farm, hon. \u{1F33E}`
         }
         case "wash": {
           const t = args[0] && isStaff(sender) ? resolveTarget(args[0]) : sender;
-          const p2 = t && rec(t) ? prodOf(t) : null;
-          if (p2 && !paintedText(t) && aftermathOf(t).length) {
-            bodyMark(t, { wash: true });
-            aftermathWash(t);
-            saveLedger();
-            syncCompanions(true);
-            if (onMap(t)) emote("\u{1F6BF} " + plainName(t) + " gets scrubbed down at the trough till the water runs clear.", t);
-            else R("All washed up, sugar.");
-            break;
-          }
-          if (!p2 || !paintedText(t)) {
-            R((t === sender ? "You're" : plainName(t) + " is") + " clean as a whistle, sugar.");
+          if (!t || !rec(t)) {
+            R("I don't know who that is, sugar.");
             break;
           }
           if (t === sender) {
@@ -33904,13 +33960,7 @@ Welcome to B&B Farm, hon. \u{1F33E}`
               break;
             }
           }
-          bodyMark(t, { wash: true });
-          const was = paintedText(t);
-          p2.painted = null;
-          aftermathWash(t);
-          saveLedger();
-          if (onMap(t)) emote("\u{1F6BF} " + plainName(t) + " gets hosed down at the trough, washin' the " + was + " clean. Shame, it was a good look.", t);
-          else R("All washed up, sugar.");
+          washScene(t, sender);
           break;
         }
         case "quota": {

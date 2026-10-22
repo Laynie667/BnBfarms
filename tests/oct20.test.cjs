@@ -58,6 +58,13 @@ const done=async(mn,ms)=>{ for(let i=0;i<60;i++){ await wait(250); if(!(W.__st()
   // ── a trap's gas is breathed, not drunk ──
   n=sent.length; W.__givePotion(500,'needy',260239); await wait(800);
   ok(/Needy Nectar/.test(all(n)), 'a bottle given by hand is still seen');
+  // ── Oct 22: ?wash always washes, in beats, even when the bot has nothin' painted on them on its books ──
+  cfg.WASH_BEAT_S=0.15; free(500); P(500).prod.painted=null; delete P(500).fx.goblinmusk;
+  n=sent.length; await say(500,'?wash',2500);
+  ok(/🚿/.test(all(n)) && !/clean as a whistle/.test(all(n)) && (all(n).match(/🚿/g)||[]).length>=4, '?wash scrubs them down in beats ('+(all(n).match(/🚿/g)||[]).length+')');
+  const marks=(k,mn)=>sent.slice(k).filter(([e,d])=>d&&d.Content==='FarmhandMsg'&&d.Dictionary&&d.Dictionary.type==='mark'&&d.Target===mn).map(([e,d])=>d.Dictionary);
+  ok(marks(n,500).some(m=>m.wash), '...and their Companion is told to wash everything off');
+  n=sent.length; await say(221397,'?contract offer fun Moo 1h',1200); ok(/12h, 1d/.test(all(n)), 'contracts: the shortest is twelve hours now');
   const errs=warns.filter(w=>!/Worker/.test(w)&&/command failed|TypeError|ReferenceError|brood tick/i.test(w)); ok(!errs.length, 'no errors '+errs.join(' | ').slice(0,300));
   out(fails ? '\n❌ '+fails+' failed' : '\n✅ all passed'); process.exit(fails?1:0);
 })();

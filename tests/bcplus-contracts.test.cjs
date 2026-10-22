@@ -61,6 +61,6 @@ const c5 = base(); c5.durationMin = 50000;
 out("3 over 30 days caught ->", farm.checkContract(c5).some((p) => /30 days/.test(p)));
 
 // 4. words people type
-out("4 durations ->", ["an hour", "12h", "a day", "week", "two weeks", "a month", "forever"].map((w) => (farm.durationFrom(w) || {}).key).join(",") === "1h,12h,1d,1w,2w,1m,perm");
+out("4 durations (twelve hours the shortest since Oct 22) ->", ["12h", "a day", "week", "two weeks", "a month", "forever"].map((w) => (farm.durationFrom(w) || {}).key).join(",") === "12h,1d,1w,2w,1m,perm" && !farm.durationFrom("an hour"));
 out("4 depths ->", ["playful", "deep", "no human left"].map((w) => (farm.depthFrom(w) || {}).key).join(",") === "fun,deep,nhl");
 out("4 pet sounds ->", farm.petFor("bull").animal === "Cow" && farm.petFor("pig").animal === "Custom" && farm.petFor("pig").sounds.includes("oink"));

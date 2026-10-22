@@ -26,7 +26,26 @@ function add(el, kids) {
 }
 
 // small pieces every view uses
-export const card = (...kids) => h("div", { class: "fhc-box" }, ...kids);
+// A card folds: tap its title and the rest tucks away (a ▸ shows it's folded); it stays that way till tapped again.
+// (Laynie, Oct 22: the panels needed tidyin', so each player can put away the cards they don't use.)
+const FOLD_KEY = "fhc-folded";
+let folded = null;
+const foldSet = () => { if (!folded) { try { folded = new Set(JSON.parse(window.localStorage.getItem(FOLD_KEY)) || []); } catch (e) { folded = new Set(); } } return folded; };
+const foldSave = () => { try { window.localStorage.setItem(FOLD_KEY, JSON.stringify([...foldSet()].slice(-200))); } catch (e) { /* fine */ } };
+export const card = (...kids) => {
+  const box = h("div", { class: "fhc-box" }, ...kids);
+  const first = box.firstElementChild, t = first && (first.classList.contains("fhc-h") ? first : first.querySelector(":scope > .fhc-h"));
+  if (!t || box.children.length < 2) return box;
+  const key = (t.textContent || "").replace(/[·:].*$/, "").replace(/\d+/g, "").trim().slice(0, 40);
+  if (!key) return box;
+  t.classList.add("fhc-fold"); t.setAttribute("role", "button"); t.setAttribute("tabindex", "0");
+  const set = (on) => { box.classList.toggle("fold", on); t.setAttribute("aria-expanded", on ? "false" : "true"); };
+  set(foldSet().has(key));
+  const flip = (e) => { e.preventDefault(); const on = !box.classList.contains("fold"); if (on) foldSet().add(key); else foldSet().delete(key); foldSave(); set(on); };
+  t.addEventListener("click", flip);
+  t.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") flip(e); });
+  return box;
+};
 export const title = (text) => h("div", { class: "fhc-h" }, text);
 export const muted = (text) => h("div", { class: "fhc-muted" }, text);
 export const btn = (label, onclick, accent) => h("button", { type: "button", class: accent ? "fhc-b fhc-b-acc" : "fhc-b", onclick }, label);

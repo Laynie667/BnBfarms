@@ -23,7 +23,7 @@ export const NEVER = {
 };
 
 export const DURATIONS = [
-  { key: "1h", label: "1 hour", min: 60, words: ["1h", "hour", "1 hour", "an hour"] },
+  // (no 1 hour any more: Laynie, Oct 22, "change the minimum contract length to 12 hours, even in the applications")
   { key: "12h", label: "12 hours", min: 720, words: ["12h", "12 hours", "half a day", "a night", "night", "overnight"] },
   { key: "1d", label: "1 day", min: 1_440, words: ["1d", "day", "1 day", "a day"] },
   { key: "1w", label: "1 week", min: 10_080, words: ["1w", "week", "1 week", "a week"] },

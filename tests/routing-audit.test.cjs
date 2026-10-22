@@ -99,7 +99,7 @@ const roomText=s=>{ const d=s&&s[1]; if(!d) return null;
   out('E5 outfit offer to someone without the Companion is refused politely -> '+/isn't runnin' the Companion/.test(textTo(k,700)));
 
   // F. contracts: the offer goes only to them; the notice to them is private
-  k=sent.length; await B(700,'contract offer fun hana 1h');
+  k=sent.length; await B(700,'contract offer fun hana 12h');
   out('F1 BC+ offer is hidden and only to Hana -> '+sent.slice(k).some(([e,d])=>d&&d.Content==='BCP'&&d.Target===166990)+' '+!sent.slice(k).some(([e,d])=>d&&d.Content==='BCP'&&!d.Target));
   expect('F1 …and she\'s told privately', routes(k,166990), 'WHISPER');
 

@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.40.0
+// @version      0.41.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -1862,6 +1862,355 @@
     return out.join(", ");
   }
 
+  // shared/farm-outfit-props.js
+  var OUTFIT_PROPS = {
+    "ItemArms:PawPaddedPetsuitArms:Padding": {},
+    "ItemLegs:PawPaddedPetsuitLegs:Padding": {},
+    "ItemNipples:LactationPump:MediumSuction": { TypeRecord: { typed: 2 } },
+    "ItemMouth:HarnessPonyBits:Attached": {},
+    "ItemArms:LeatherArmbinder:WrapStrap": { TypeRecord: { typed: 2 } },
+    "ItemArms:HempRope:BoxTie": { TypeRecord: { typed: 1 } },
+    "ItemLegs:HempRope:Crossed": { TypeRecord: { typed: 4 } },
+    "ItemPelvis:HempRope:Crotch": {},
+    "ItemMouth:RopeBallGag:Normal": {},
+    "ItemArms:WristShackles:Behind": { TypeRecord: { typed: 1 } },
+    "ItemArms:LeatherCuffs:Wrist": { TypeRecord: { typed: 1 } },
+    "ItemLegs:LeatherLegCuffs:Closed": { TypeRecord: { typed: 1 } },
+    "ItemFeet:LeatherAnkleCuffs:Chained": { TypeRecord: { typed: 2 } },
+    "ItemArms:LeatherCuffs:Both": { TypeRecord: { typed: 3 } },
+    "ItemArms:HempRope:WristElbowTie": { TypeRecord: { typed: 4 } },
+    "ItemFeet:HempRope:Basic": {},
+    "ItemHands:ElbowLengthMittens:Unchained": {},
+    "ItemHands:PonyMittensBinder:Chained": { TypeRecord: { typed: 1 } }
+  };
+
+  // shared/farm-outfits.js
+  var L = true;
+  var C = {
+    pink: "#E67FA3",
+    pinkpig: "#EFA3B6",
+    rose: "#D9638E",
+    lav: "#9370C8",
+    lilac: "#AE8FD6",
+    mint: "#7CC4A6",
+    blue: "#6FA3D9",
+    peach: "#E8A07A",
+    cream: "#F2E6D0",
+    black: "#161214",
+    wine: "#6E1F33",
+    plum: "#4A2850",
+    silver: "#B8B8C0",
+    brass: "#A8843A",
+    cognac: "#8C4A22",
+    rope: "#C8A26A",
+    hoof: "#3A2A1E"
+  };
+  var WEAR = {
+    pastel: {
+      female: [
+        ["Bra", "OuvertPerl1", "$a"],
+        ["Panties", "CrotchPanties1", "$a"],
+        ["Socks", "Socks6", "$leg"],
+        ["Garters", "SocksBow", "$b"],
+        ["Shoes", "PumpHighHeels", "$a"],
+        ["ItemNipples", "BellClamps", "Default"]
+      ],
+      futa: [
+        ["Bra", "OuvertPerl1", "$a"],
+        ["Panties", "CrotchPanties1", "$a"],
+        ["Socks", "Socks6", "$leg"],
+        ["Garters", "SocksBow", "$b"],
+        ["Shoes", "PumpHighHeels", "$a"],
+        ["ItemNipples", "BellClamps", "Default"]
+      ],
+      nonbinary: [
+        ["Bra", "CorsetBikini1", "$a"],
+        ["Panties", "CrotchPanties1", "$a"],
+        ["Socks", "Socks6", "$leg"],
+        ["Garters", "SocksBow", "$b"],
+        ["Shoes", "MaryJaneShoes", "$a"],
+        ["ItemNipples", "ChainClamp", "Default"]
+      ],
+      male: [
+        ["Panties", "Jockstrap", "$a"],
+        ["ItemTorso", "LeatherChestHarness1", C.cognac],
+        ["Socks", "Socks6", "$leg"],
+        ["Garters", "SocksBow", "$b"],
+        ["Shoes", "MaryJaneShoes", "$a"]
+      ]
+    },
+    goth: {
+      female: [
+        ["Corset", "LatexCorset1", "$a"],
+        ["Bra", "StarHarnessBra", "$a"],
+        ["Panties", "LatexCrotchlessPanties", "$a"],
+        ["Socks", "SilkStockings3", "$leg"],
+        ["Shoes", "StilettoHeels", "$a"],
+        ["Gloves", "LatexElbowGloves", "$a"],
+        ["ItemNipples", "BellClamps", "Default"]
+      ],
+      futa: [
+        ["Corset", "LatexCorset1", "$a"],
+        ["Bra", "StarHarnessBra", "$a"],
+        ["Panties", "LatexCrotchlessPanties", "$a"],
+        ["Socks", "SilkStockings3", "$leg"],
+        ["Shoes", "StilettoHeels", "$a"],
+        ["Gloves", "LatexElbowGloves", "$a"],
+        ["ItemNipples", "BellClamps", "Default"]
+      ],
+      nonbinary: [
+        ["Corset", "ClassicLatexCorset", "$a"],
+        ["Bra", "LatexBra1", "$b"],
+        ["Panties", "LatexCrotchlessPanties", "$a"],
+        ["Socks", "LatexSocks1", "$a"],
+        ["Shoes", "StilettoHeels", "$a"],
+        ["ItemNipples", "ChainClamp", "Default"]
+      ],
+      male: [
+        ["Panties", "Jockstrap", "$a"],
+        ["ItemTorso", "LeatherChestHarness1", "$a"],
+        ["Garters", "HipHarness", "$b"],
+        ["Socks", "LongFishnets", "$a"],
+        ["Shoes", "ThighBoots", "$a"],
+        ["Gloves", "LatexElbowGloves", "$a"]
+      ]
+    }
+  };
+  var FEMBOY = [
+    ["Cloth", "MaidBikini", C.pink],
+    ["Corset", "RibbonCorset", C.pink],
+    ["ClothLower", "TulleSkirt", C.pink],
+    ["Panties", "Bikini1", C.pink],
+    ["Socks", "Socks6", C.pink],
+    ["Garters", "SocksBow", C.cream],
+    ["Shoes", "MaryJaneShoes", C.pink],
+    ["HairAccessory3", "Ribbons1", C.pink],
+    ["ItemNipples", "NippleClamps1", "Default"]
+  ];
+  var CHASTITY = {
+    male: [["ItemVulva", "FlatChastityCage", "$a", L]],
+    femboy: [["ItemVulva", "PlasticChastityCage1", C.pink, L]],
+    nonbinary: [["ItemPelvis", "SleekLeatherChastityBelt", "$a", L]]
+  };
+  var petsuit = (base, lace, trim, pad, paws, straps, buckle) => ({
+    arms: [base, "Default", lace, lace, trim, pad, paws, straps, buckle],
+    legs: [base, "Default", lace, lace, trim, straps, pad, paws, buckle]
+  });
+  var COW_SUIT = petsuit(C.cream, C.pink, C.cognac, C.pink, C.cream, C.cognac, C.brass);
+  var KIT_SUIT = petsuit(C.lilac, C.cream, C.lav, C.pink, C.cream, C.cognac, C.brass);
+  var PUP_SUIT = petsuit(C.black, C.wine, C.plum, C.wine, C.black, C.black, C.silver);
+  var FOX_SUIT = petsuit(C.black, C.cognac, C.wine, C.cream, C.cream, C.cognac, C.brass);
+  var PIG_SUIT = petsuit(C.pinkpig, C.rose, C.cognac, C.rose, C.hoof, C.cognac, C.brass);
+  var GOAT_LEGS = petsuit(C.blue, C.cream, C.cognac, C.cream, C.hoof, C.cognac, C.brass).legs;
+  var mitts = (mitt, shoe, cuff, ring) => [mitt, shoe, cuff, ring, "Default", mitt, shoe, cuff, ring, cuff, ring, "Default", "Default"];
+  var KIT = {
+    cow: {
+      label: "Cow",
+      look: "pastel",
+      pal: { a: C.pink, b: C.cream, leg: C.pink },
+      pieces: [
+        ["HairAccessory2", "CowEars", "Default"],
+        ["HairAccessory1", "CowHorns", C.cream],
+        ["TailStraps", "CowtailStrap", "Default"],
+        ["ItemNeck", "LeatherCollar", C.cognac, L],
+        ["ItemNeckAccessories", "CollarCowBell", "Default"],
+        ["ItemNose", "NoseRing", C.brass],
+        ["ItemNeckRestraints", "CollarLeash", [C.pink, C.cognac, C.brass]],
+        ["ItemMouth", "RingGag", C.pink],
+        ["ItemArms", "PawPaddedPetsuitArms", COW_SUIT.arms, false, "Padding"],
+        ["ItemLegs", "PawPaddedPetsuitLegs", COW_SUIT.legs, false, "Padding"]
+      ],
+      tits: [["Bra", "CowPrintedBra", "Default"], ["ItemNipples", "LactationPump", "Default", false, "MediumSuction"]],
+      pussy: [["Panties", "CowPrintedPanties", "Default"]]
+    },
+    kitt: {
+      label: "Kitty",
+      look: "pastel",
+      pal: { a: C.lav, b: C.pink, leg: C.lilac },
+      pieces: [
+        ["HairAccessory2", "KittenEars2", C.lav],
+        ["TailStraps", "KittenTailStrap1", "#7650B5"],
+        ["ItemNeck", "LeatherCollarBell", C.pink, L],
+        ["ItemNeckRestraints", "CollarLeash", [C.pink, C.cognac, C.brass]],
+        ["ItemMouth", "RingGag", C.pink],
+        ["ItemArms", "PawPaddedPetsuitArms", KIT_SUIT.arms, false, "Padding"],
+        ["ItemLegs", "PawPaddedPetsuitLegs", KIT_SUIT.legs, false, "Padding"]
+      ]
+    },
+    bunny: {
+      label: "Bunny",
+      look: "pastel",
+      pal: { a: C.pink, b: C.cream, leg: C.pink },
+      pieces: [
+        ["HairAccessory2", "BunnyEars1", C.cream],
+        ["TailStraps", "BunnyTailStrap", C.cream],
+        ["ItemNeck", "LeatherCollarBow", C.pink, L],
+        ["ClothAccessory", "BunnyCollarCuffs", "Default"],
+        ["Shoes", "Heels1", C.pink],
+        /* (thigh-high stockings with bows, not fishnets: Laynie, Oct 23) */
+        ["ItemArms", "LeatherCuffs", [C.pink, C.brass], L, "Both"],
+        ["ItemFeet", "LeatherAnkleCuffs", [C.brass, C.pink, C.brass], false, "Chained"],
+        ["ItemNeckRestraints", "CollarLeash", [C.pink, C.cognac, C.brass]],
+        ["ItemMouth", "RingGag", C.pink]
+      ],
+      tits: [["Cloth", "TransparentBunnyGirl", C.pink]],
+      noBow: true
+    },
+    goat: {
+      label: "Goat",
+      look: "pastel",
+      pal: { a: C.blue, b: C.cream, leg: C.blue },
+      pieces: [
+        ["HairAccessory1", "Horns2", C.cream],
+        ["HairAccessory2", "Ears2", C.cream],
+        ["TailStraps", "BunnyTailStrap", C.cream],
+        ["ItemNeck", "LeatherCollar", C.cognac, L],
+        ["ItemNeckAccessories", "CollarBell", C.brass],
+        ["ItemNose", "NoseRing", C.brass],
+        ["ItemMouth", "BitGag", [C.cream, C.cognac]],
+        ["ItemHands", "PonyMittensBinder", mitts(C.cream, C.hoof, C.cognac, C.brass), L, "Chained"],
+        ["ItemLegs", "PawPaddedPetsuitLegs", GOAT_LEGS, false, "Padding"]
+      ]
+    },
+    deer: {
+      label: "Deer",
+      look: "pastel",
+      pal: { a: C.peach, b: C.mint, leg: C.peach },
+      pieces: [
+        ["Hat", "ReindeerBand", "Default"],
+        ["HairAccessory2", "Ears2", C.peach],
+        ["TailStraps", "BunnyTailStrap", C.cream],
+        ["ItemNeck", "LeatherCollar", C.cognac, L],
+        ["ItemNeckAccessories", "CollarBell", C.brass],
+        ["ItemTorso", "HempRopeHarness", C.rope],
+        ["ItemLegs", "HempRope", C.rope, false, "Crossed"],
+        ["ItemHands", "PonyMittensBinder", mitts(C.peach, C.hoof, C.cognac, C.brass), L, "Chained"],
+        ["ItemMouth", "BitGag", [C.cream, C.cognac]],
+        ["Shoes", "HeellessHoof", C.hoof]
+      ],
+      noBow: true
+    },
+    pony: {
+      label: "Pony",
+      look: "goth",
+      pal: { a: C.black, b: C.wine, leg: C.black },
+      pieces: [
+        ["HairAccessory2", "PonyEars1", C.black],
+        ["TailStraps", "HorseTailStrap", C.black],
+        ["ItemNeck", "PostureCollar", C.black, L],
+        ["ItemMouth", "HarnessPonyBits", [C.brass, C.cognac, C.brass], false, "Attached"],
+        ["ItemTorso", "LeatherHarness", C.cognac],
+        ["ItemHands", "PonyMittensBinder", mitts(C.black, C.brass, C.wine, C.brass), L, "Chained"],
+        ["ItemBoots", "PonyBoots", C.black],
+        ["ItemFeet", "LeatherAnkleCuffs", [C.brass, C.wine, C.brass], false, "Chained"],
+        ["ItemNeckRestraints", "CollarLeash", [C.cognac, C.black, C.brass]]
+      ]
+    },
+    pup: {
+      label: "Pup",
+      look: "goth",
+      pal: { a: C.black, b: C.wine, leg: C.black },
+      pieces: [
+        ["HairAccessory2", "PuppyEars1", C.black],
+        ["TailStraps", "PuppyTailStrap", C.black],
+        ["ItemNeck", "DogCollar", C.wine, L],
+        ["ItemNeckAccessories", "CollarPupBone", "Default"],
+        ["ItemNeckRestraints", "CollarLeash", [C.wine, C.cognac, C.brass]],
+        ["ItemMouth", "RingGag", C.wine],
+        ["ItemArms", "PawPaddedPetsuitArms", PUP_SUIT.arms, false, "Padding"],
+        ["ItemLegs", "PawPaddedPetsuitLegs", PUP_SUIT.legs, false, "Padding"]
+      ]
+    },
+    fox: {
+      label: "Fox",
+      look: "goth",
+      pal: { a: C.black, b: C.wine, leg: C.black },
+      pieces: [
+        ["HairAccessory2", "FoxEars1", C.cognac],
+        ["TailStraps", "FoxTailsStrap", [C.cream, C.cognac]],
+        ["ItemNeck", "LeatherCollar", C.wine, L],
+        ["ItemNeckRestraints", "CollarLeash", [C.wine, C.black, C.brass]],
+        ["ItemMouth", "RingGag", C.wine],
+        ["ItemArms", "PawPaddedPetsuitArms", FOX_SUIT.arms, false, "Padding"],
+        ["ItemLegs", "PawPaddedPetsuitLegs", FOX_SUIT.legs, false, "Padding"]
+      ]
+    },
+    // (Laynie, Oct 23: pet arms and legs for foxes too)
+    // pigs (Laynie, Oct 23: "also need pig outfits too"): a sow on all fours in a pink petsuit with dark trotters, the
+    // snout hooked up, floppy ears (the game has no curly tail: a spade or a cat's looked wrong, so none), a livestock tag on a locked collar, a rope harness for haulin' by
+    pig: {
+      label: "Pig",
+      look: "pastel",
+      pal: { a: C.rose, b: C.cream, leg: C.rose },
+      pieces: [
+        ["HairAccessory2", "PuppyEars2", C.pinkpig],
+        ["ItemNose", "PigNoseHook", [C.cognac, C.brass]],
+        ["ItemNeck", "LeatherCollar", C.cognac, L],
+        ["ItemNeckAccessories", "CollarBell", C.brass],
+        ["ItemNeckRestraints", "CollarLeash", [C.rose, C.cognac, C.brass]],
+        ["ItemMouth", "RingGag", C.rose],
+        ["ItemTorso", "HempRopeHarness", C.rope],
+        ["ItemArms", "PawPaddedPetsuitArms", PIG_SUIT.arms, false, "Padding"],
+        ["ItemLegs", "PawPaddedPetsuitLegs", PIG_SUIT.legs, false, "Padding"]
+      ]
+    },
+    // goblins (Laynie, Oct 23: "I did love the rags on the goblins. maybe give the goblins frog cuffs and the long mittens
+    // without the back cuffs"): rags, frog-tied on their knees, long mittens on and nothing at the back, barefoot
+    goblin: {
+      label: "Goblin",
+      look: "goth",
+      pal: { a: "#2E3A22", b: C.cognac, leg: "#2E3A22" },
+      barefoot: true,
+      skip: { male: ["Cloth"], femboy: ["Cloth"] },
+      // (the game doesn't draw the rags on a flat chest: they keep their own)
+      pieces: [
+        ["HairAccessory2", "ElfEars", "#7A9440"],
+        ["Cloth", "SlaveRags", "#6E6248"],
+        ["ItemNeck", "SlaveCollar", "Default", L],
+        ["ItemLegs", "FrogtieMetalCuffs", "Default", L],
+        ["ItemHands", "ElbowLengthMittens", ["#4A3A28", C.cognac, C.brass, C.brass, "Default"], L, "Unchained"],
+        ["ItemNose", "NoseRing", C.brass],
+        ["ItemMouth", "BitGag", [C.hoof, C.cognac]]
+      ]
+    }
+  };
+  var OUTFIT_SPECIES = Object.keys(KIT);
+  var ALIAS = { bull: "cow", horse: "pony", dog: "pup", wolf: "pup", cat: "kitt", rabbit: "bunny", sheep: "goat" };
+  var BODY = { female: { tits: true, pussy: true }, male: { cock: true, flat: true }, futa: { tits: true, pussy: true, cock: true }, femboy: { cock: true, flat: true }, nonbinary: { pussy: true, flat: true } };
+  function outfitPieces(species, gender) {
+    const K = KIT[species] || KIT[ALIAS[species]], B = BODY[gender];
+    const W = gender === "femboy" ? FEMBOY : (WEAR[K && K.look] || {})[gender];
+    if (!K || !W) return null;
+    const by = /* @__PURE__ */ new Map();
+    const col = (c) => typeof c === "string" && c[0] === "$" ? K.pal[c.slice(1)] || "Default" : c;
+    const put = ([Group, Name, Color, locked, opt]) => {
+      const p = { Group, Name, Color: Array.isArray(Color) ? Color.slice() : col(Color), locked: !!locked };
+      if (opt) {
+        p.opt = opt;
+        const prop = OUTFIT_PROPS[Group + ":" + Name + ":" + opt];
+        if (prop) p.Property = JSON.parse(JSON.stringify(prop));
+      }
+      by.set(Group, p);
+    };
+    W.forEach(put);
+    K.pieces.filter((p) => !((K.skip || {})[gender] || []).includes(p[0])).forEach(put);
+    for (const part of ["tits", "pussy", "cock", "flat"]) if (B[part] && K[part]) K[part].forEach(put);
+    (CHASTITY[gender] || []).forEach(put);
+    const has = (g, re) => by.has(g) && re.test(by.get(g).Name);
+    if (has("ItemLegs", /Petsuit/)) for (const g of ["Socks", "Garters", "Shoes"]) by.delete(g);
+    if (has("ItemBoots", /./) || has("Shoes", /Hoof/)) by.delete("Garters");
+    if (has("ItemArms", /Petsuit|Armbinder|Cuffs/) || by.has("ItemHands")) by.delete("Gloves");
+    if (has("Cloth", /Bunny|Rags/)) {
+      by.delete("Bra");
+      by.delete("Corset");
+    }
+    if (has("Cloth", /Bunny/)) by.delete("Panties");
+    if (by.has("SuitLower")) by.delete("Socks");
+    if (K.noBow) by.delete("HairAccessory3");
+    if (K.barefoot) for (const g of ["Shoes", "Socks", "Garters"]) by.delete(g);
+    return [...by.values()];
+  }
+
   // shared/guides.js
   var PUBLIC_GROUPS = [
     { name: "Safety", cmds: ["safe", "stuck", "staff", "report"] },
@@ -1895,7 +2244,7 @@
   ];
 
   // bot/src/version.js
-  var VERSION = "0.40.0";
+  var VERSION = "0.41.0";
 
   // bot-parts:farmhand-bot-parts
   (function() {
@@ -2843,7 +3192,7 @@
       lastSpoke: /* @__PURE__ */ new Map()
     };
     const LEDGER_KEY = "bnb_ledger_v1";
-    let L = null;
+    let L2 = null;
     function blankLedger() {
       return {
         v: 4,
@@ -2863,23 +3212,23 @@
           storeRecover(!raw);
         } catch (e) {
         }
-        L = raw ? JSON.parse(raw) : blankLedger();
-        if (!L || typeof L !== "object") L = blankLedger();
+        L2 = raw ? JSON.parse(raw) : blankLedger();
+        if (!L2 || typeof L2 !== "object") L2 = blankLedger();
       } catch (e) {
         warn("Ledger load failed:", e);
-        L = blankLedger();
+        L2 = blankLedger();
       }
-      if (!L.people) L.people = {};
-      if (!L.applications) L.applications = [];
-      if (!L.archive) L.archive = {};
-      if (!L.log) L.log = [];
-      if (!L.stuckLog) L.stuckLog = [];
-      if (!L.spots || typeof L.spots !== "object") L.spots = {};
-      if (L.rescuePoint && !L.spots.rescue) L.spots.rescue = { X: L.rescuePoint.X, Y: L.rescuePoint.Y, by: 0, at: Date.now() };
-      if (!Array.isArray(L.tease)) L.tease = [];
-      if (L.notice === void 0) L.notice = null;
-      if (!L.life) L.life = { feedingOn: true, curfewOn: true };
-      for (const r of Object.values(L.people || {})) if (r && r.species === "kitt") r.species = "kitty";
+      if (!L2.people) L2.people = {};
+      if (!L2.applications) L2.applications = [];
+      if (!L2.archive) L2.archive = {};
+      if (!L2.log) L2.log = [];
+      if (!L2.stuckLog) L2.stuckLog = [];
+      if (!L2.spots || typeof L2.spots !== "object") L2.spots = {};
+      if (L2.rescuePoint && !L2.spots.rescue) L2.spots.rescue = { X: L2.rescuePoint.X, Y: L2.rescuePoint.Y, by: 0, at: Date.now() };
+      if (!Array.isArray(L2.tease)) L2.tease = [];
+      if (L2.notice === void 0) L2.notice = null;
+      if (!L2.life) L2.life = { feedingOn: true, curfewOn: true };
+      for (const r of Object.values(L2.people || {})) if (r && r.species === "kitt") r.species = "kitty";
       {
         const JUNK = /[\s​-‏-]*\{[^{}]*"(messageType|messageColor|bceMessageType)"[^{}]*\}/gi;
         const clean = (o, depth) => {
@@ -2893,14 +3242,14 @@
             JUNK.lastIndex = 0;
           }
         };
-        for (const r of Object.values(L.people || {})) clean(r, 0);
-        for (const a of L.applications || []) clean(a, 0);
+        for (const r of Object.values(L2.people || {})) clean(r, 0);
+        for (const a of L2.applications || []) clean(a, 0);
       }
-      if (!Array.isArray(L.chores)) L.chores = CFG.CHORES.map((text) => ({ text, by: 0 }));
-      if (!Array.isArray(L.wheel)) L.wheel = [];
-      if (L.zones && (typeof L.zones !== "object" || Object.values(L.zones).some((z) => !z || typeof z !== "object" || !("group" in z)))) delete L.zones;
-      for (const k in L.people) {
-        const r = L.people[k];
+      if (!Array.isArray(L2.chores)) L2.chores = CFG.CHORES.map((text) => ({ text, by: 0 }));
+      if (!Array.isArray(L2.wheel)) L2.wheel = [];
+      if (L2.zones && (typeof L2.zones !== "object" || Object.values(L2.zones).some((z) => !z || typeof z !== "object" || !("group" in z)))) delete L2.zones;
+      for (const k in L2.people) {
+        const r = L2.people[k];
         if (r.forced === void 0) r.forced = false;
         if (!Array.isArray(r.tempKeys)) r.tempKeys = [];
         if (!Array.isArray(r.cover)) r.cover = [];
@@ -2919,13 +3268,13 @@
         delete r.herdEnds;
         delete r.herdWarned;
       }
-      L.v = 5;
+      L2.v = 5;
       for (const mn of CFG.PROPRIETORS) {
-        if (!L.people[mn]) L.people[mn] = newRecord(mn);
-        if (!L.people[mn].roles.includes(ROLE.PROPRIETOR)) L.people[mn].roles.push(ROLE.PROPRIETOR);
+        if (!L2.people[mn]) L2.people[mn] = newRecord(mn);
+        if (!L2.people[mn].roles.includes(ROLE.PROPRIETOR)) L2.people[mn].roles.push(ROLE.PROPRIETOR);
       }
       saveLedger();
-      log("Ledger v5 loaded. Registered: " + Object.keys(L.people).length);
+      log("Ledger v5 loaded. Registered: " + Object.keys(L2.people).length);
     }
     let saveTimer = null;
     function saveLedger() {
@@ -2936,7 +3285,7 @@
         if (!officeCheck() || STORE.restoring) return;
         let json = "";
         try {
-          json = JSON.stringify(L);
+          json = JSON.stringify(L2);
           GM_setValue(LEDGER_KEY, json);
         } catch (e) {
           warn("save:", e);
@@ -2974,16 +3323,16 @@
       };
     }
     function rec(mn, create) {
-      if (!L.people[mn] && create) L.people[mn] = newRecord(mn);
-      return L.people[mn] || null;
+      if (!L2.people[mn] && create) L2.people[mn] = newRecord(mn);
+      return L2.people[mn] || null;
     }
     function audit(actor, action, detail) {
-      L.log.push({ t: Date.now(), by: actor, a: action, d: detail || "" });
+      L2.log.push({ t: Date.now(), by: actor, a: action, d: detail || "" });
       try {
         addonsEmit("audit", actor, action, detail || "");
       } catch (e) {
       }
-      if (L.log.length > 500) L.log = L.log.slice(-500);
+      if (L2.log.length > 500) L2.log = L2.log.slice(-500);
       saveLedger();
     }
     const STORE = { db: null, dir: null, perm: "none", savedAt: 0, latestAt: 0, hourKey: "", chip: null, menu: null, err: "" };
@@ -3060,9 +3409,9 @@
       await w.close();
     }
     async function storeFolderTick(force) {
-      if (!STORE.dir || STORE.perm !== "granted" || !L || state.dormant) return;
+      if (!STORE.dir || STORE.perm !== "granted" || !L2 || state.dormant) return;
       if (!force && typeof officeCheck === "function" && !officeCheck()) return;
-      const now = /* @__PURE__ */ new Date(), json = JSON.stringify(L);
+      const now = /* @__PURE__ */ new Date(), json = JSON.stringify(L2);
       try {
         if (force || Date.now() - STORE.latestAt > 10 * 6e4) {
           await storeWrite("bnb-ledger-latest.json", json);
@@ -3136,7 +3485,7 @@
             W.alert("That file isn't the farm's books.");
             return;
           }
-          const n = Object.keys(d.people).length, now = Object.keys(L && L.people || {}).length;
+          const n = Object.keys(d.people).length, now = Object.keys(L2 && L2.people || {}).length;
           if (!W.confirm("Put these books back?\n\n" + f.name + "\n" + n + " people in it (the books now have " + now + ").\n\nWhat's in the books now is replaced. The bot restarts.")) return;
           STORE.restoring = true;
           const json = JSON.stringify(d);
@@ -3285,7 +3634,7 @@
         }
       }
       const now = Date.now();
-      if (CFG.CURFEW_TAKES_BRONZE && typeof curfewBound === "function" && L.life && curfewBound(mn)) k.delete("bronze");
+      if (CFG.CURFEW_TAKES_BRONZE && typeof curfewBound === "function" && L2.life && curfewBound(mn)) k.delete("bronze");
       r.tempKeys = (r.tempKeys || []).filter((t) => !t.until || t.until > now);
       for (const t of r.tempKeys) k.add(t.tier);
       return Array.from(k);
@@ -3343,7 +3692,7 @@
       return herdsOf(mn).find((h) => h.leader === leader) || null;
     }
     function herdMembers(leader) {
-      return Object.values(L.people).filter((r) => (r.herds || []).some((h) => h.leader === leader));
+      return Object.values(L2.people).filter((r) => (r.herds || []).some((h) => h.leader === leader));
     }
     function herdWord(leader) {
       const r = rec(leader);
@@ -3410,8 +3759,8 @@
     }
     function expireHerdClaims() {
       const now = Date.now();
-      for (const k in L.people) {
-        const r = L.people[k];
+      for (const k in L2.people) {
+        const r = L2.people[k];
         for (const h of (r.herds || []).slice()) {
           if (h.type !== "temp" || !h.ends) continue;
           if (now >= h.ends) {
@@ -3478,16 +3827,16 @@
     }
     function syncAllPresent(quiet) {
       let n = 0;
-      for (const C of W.ChatRoomCharacter || []) {
-        if (C.MemberNumber === CFG.BOT_MEMBER) continue;
-        if (syncKeys(C.MemberNumber, quiet)) n++;
+      for (const C2 of W.ChatRoomCharacter || []) {
+        if (C2.MemberNumber === CFG.BOT_MEMBER) continue;
+        if (syncKeys(C2.MemberNumber, quiet)) n++;
       }
       state.lastFullSync = Date.now();
       return n;
     }
     function spotFor(name) {
       const n = String(name || "").toLowerCase();
-      return L.spots && L.spots[n] || null;
+      return L2.spots && L2.spots[n] || null;
     }
     function firstSpot(...names) {
       for (const n of names) {
@@ -3506,7 +3855,7 @@
       if (!force && Date.now() - (state.wlAt || 0) < 2e4) return;
       state.wlAt = Date.now();
       const wl = new Set((W.ChatRoomData.Whitelist || []).map(Number));
-      L.wlAdded = L.wlAdded || {};
+      L2.wlAdded = L2.wlAdded || {};
       let changed = 0;
       state.wlSent = state.wlSent || /* @__PURE__ */ new Map();
       const recent = (mn, act) => {
@@ -3518,21 +3867,21 @@
         state.wlSent.set(mn, { act, at: Date.now() });
         changed++;
       };
-      const people = new Set(Object.keys(L.people).map(Number).concat(CFG.PROPRIETORS));
+      const people = new Set(Object.keys(L2.people).map(Number).concat(CFG.PROPRIETORS));
       for (const mn of people) {
         if (changed >= 15) break;
         if (isOnBooks(mn) && !wl.has(mn)) {
-          L.wlAdded[mn] = L.wlAdded[mn] || Date.now();
+          L2.wlAdded[mn] = L2.wlAdded[mn] || Date.now();
           wl.add(mn);
           if (!recent(mn, "Whitelist")) ask(mn, "Whitelist");
         }
       }
-      for (const k of Object.keys(L.wlAdded)) {
+      for (const k of Object.keys(L2.wlAdded)) {
         const mn = Number(k);
         if (changed >= 15) break;
         if (isOnBooks(mn)) continue;
         if (wl.has(mn) && !recent(mn, "Unwhitelist")) ask(mn, "Unwhitelist");
-        delete L.wlAdded[k];
+        delete L2.wlAdded[k];
       }
       if (changed) saveLedger();
     }
@@ -3554,8 +3903,8 @@
       state.tpCheck.set(mn, id);
       later(() => {
         if (state.tpCheck.get(mn) !== id) return;
-        const C = charFor(mn), p = C && C.MapData && C.MapData.Pos;
-        if (!C || !p || Math.abs(p.X - pt.X) <= 1 && Math.abs(p.Y - pt.Y) <= 1) {
+        const C2 = charFor(mn), p = C2 && C2.MapData && C2.MapData.Pos;
+        if (!C2 || !p || Math.abs(p.X - pt.X) <= 1 && Math.abs(p.Y - pt.Y) <= 1) {
           state.tpCheck.delete(mn);
           return;
         }
@@ -3570,7 +3919,7 @@
       return true;
     }
     function spotBeside(mn) {
-      const C = charFor(mn), p = C && C.MapData && C.MapData.Pos;
+      const C2 = charFor(mn), p = C2 && C2.MapData && C2.MapData.Pos;
       if (!p) return null;
       const taken = new Set((W.ChatRoomCharacter || []).filter((c) => c.MapData && c.MapData.Pos).map((c) => c.MapData.Pos.X + "," + c.MapData.Pos.Y));
       const wide = W.ChatRoomMapViewWidth || 40, high = W.ChatRoomMapViewHeight || 40;
@@ -3596,9 +3945,9 @@
     }
     function forcedStaff() {
       const out = [];
-      for (const k in L.people) {
+      for (const k in L2.people) {
         const mn = parseInt(k, 10);
-        const r = L.people[k];
+        const r = L2.people[k];
         if (!r) continue;
         if (!isStaff(mn)) continue;
         if (!onDuty(mn)) continue;
@@ -3743,10 +4092,10 @@
       } catch (e) {
       }
       const mins = Math.round((Date.now() - state.lastHealthy) / 6e4);
-      return "Farmhand v" + VERSION + "\n\nGame found:   " + (typeof W.ServerSend === "function") + "\nLogged in:    " + isLoggedIn() + "\nIn room:      " + inRoom() + "\nRoom admin:   " + botIsAdmin() + "\nTimer:        " + (state.worker ? "worker \u2705" : "setInterval \u26A0\uFE0F") + "\nLast healthy: " + mins + " min ago\nFriends:      " + fl + "\nHeard msgs:   " + state.heard + "\nCompanions:   " + companionCount() + "\nSend queue:   " + state.queue.length + (state.urgent.length ? " (+" + state.urgent.length + " urgent)" : "") + "\nMap saved:    " + (L && L.roomSnapshot ? new Date(L.roomSnapshot.at).toLocaleString() : "not yet") + "\nRegistered:   " + Object.keys(L ? L.people : {}).length + "\nOn call:      " + forcedStaff().length + "\nPending apps: " + (L ? L.applications.length : 0) + "\nUser saved:   " + (c.user ? "yes (" + c.user + ")" : "NO");
+      return "Farmhand v" + VERSION + "\n\nGame found:   " + (typeof W.ServerSend === "function") + "\nLogged in:    " + isLoggedIn() + "\nIn room:      " + inRoom() + "\nRoom admin:   " + botIsAdmin() + "\nTimer:        " + (state.worker ? "worker \u2705" : "setInterval \u26A0\uFE0F") + "\nLast healthy: " + mins + " min ago\nFriends:      " + fl + "\nHeard msgs:   " + state.heard + "\nCompanions:   " + companionCount() + "\nSend queue:   " + state.queue.length + (state.urgent.length ? " (+" + state.urgent.length + " urgent)" : "") + "\nMap saved:    " + (L2 && L2.roomSnapshot ? new Date(L2.roomSnapshot.at).toLocaleString() : "not yet") + "\nRegistered:   " + Object.keys(L2 ? L2.people : {}).length + "\nOn call:      " + forcedStaff().length + "\nPending apps: " + (L2 ? L2.applications.length : 0) + "\nUser saved:   " + (c.user ? "yes (" + c.user + ")" : "NO");
     }
     function exportLedger() {
-      const txt = JSON.stringify(L, null, 2);
+      const txt = JSON.stringify(L2, null, 2);
       console.log(TAG + " ===== LEDGER BACKUP BEGIN =====");
       console.log(txt);
       console.log(TAG + " ===== LEDGER BACKUP END =====");
@@ -3769,7 +4118,7 @@
       GM_registerMenuCommand("Farmhand: resync all keys", () => W.alert("Synced " + syncAllPresent(true) + " people."));
       GM_registerMenuCommand("Farmhand: friend everyone registered", () => {
         let n = 0;
-        for (const mn in L.people) if (addFriend(parseInt(mn, 10), true)) n++;
+        for (const mn in L2.people) if (addFriend(parseInt(mn, 10), true)) n++;
         W.alert("Friended " + n + " new. Total: " + (W.Player.FriendList || []).length);
       });
       GM_registerMenuCommand("Farmhand: force reload", () => W.location.reload());
@@ -3782,7 +4131,7 @@
       return statusText();
     };
     W.FarmhandExport = exportLedger;
-    W.FarmhandLedger = () => L;
+    W.FarmhandLedger = () => L2;
     if (W.__FARMHAND_TEST__) Object.assign(W, { __st: () => state, __cfg: CFG, __pt: prodTick, __qt: quotaTick, __lt: leashTick, __ms: milkingStallTick, __vt: voiceTick, __sync: syncCompanions, __gt: gearTick, __ht: homeTick, __addons: (h, ...a) => addonsEmit(h, ...a), __stateFor: (mn) => stateFor(mn), __leadTick: () => leadTick(), __ambient: () => ambientTick(), __about: (t) => aboutWhom(t), __announce: (t) => announce(t), __reply: (mn, t, ch) => reply(mn, t, ch), __office: () => officeCheck(), __namesHere: (t) => namesHere(t), __speciesCheck: (t) => QUESTIONS.find((q) => q.key === "species").check(t), __attach: () => attachListeners(), __tryLogin: () => tryLogin(), __beepText: (m) => beepText(m), __nameOnce: (t, mn) => nameOnce(t, mn), __buildContract: (n, mn, d) => buildContract(contractTemplate(n), mn, d), __potionTick: () => potionTick(), __penTick: () => penTick(), __trapTick: () => trapTick(), __corrupt: (m, n) => corrupt(m, n), __under: (m) => underOf(m), __goUnder: (m, n) => goUnder(m, n), __lend: () => state.lend, __keepTick: () => keepersTick(), __body: (m) => bodyOf(m), __drainMilk: (m, n) => drainMilk(m, n), __farmLookTick: () => farmLookTick(), __givePotion: (m, id, by) => givePotion(m, id, by), __lines: () => ({ TRAP_LINES, TOY_LINES, ANTHRO_LINES, MORE_LINES, EXTRA_LINES, VARIANT_LINES, BENCH_LINES, BROOD_LINES, CURSE_LINES, KEEP_LINES, UDDER_LINES, CORR_LINES, RANK_LINES, PARASITE_LINES, PARASITE_MORE, GEAR_LINES, FX_LINES, SHOT_LINES, INTENSITY_BY_TRAP, STALL_TRAITS, STALL_PEAK, FX_MORE, FX_OFF, FX_BITS, MORE_KEEP, MORE_UDDER, STALL_STORY, STALL_MORE, STALL_MORE_TRAITS, SCENES, TAIL_BITS }), __prodOf: (m) => prodOf(m), __shape: (m) => shapeFor(m), __pickFor: (m, k, l) => pickFor(m, k, l), __bodyWords: (m, t) => bodyWords(m, t), __strainGear: (m) => strainGear(m), __strainSerums: (m) => strainSerums(m), __strainParts: (s, n) => strainParts(s, n), __tFill: (t, m, v) => tFill(t, m, v), __conceive: (m, s, a, b, h) => rollConception(m, s, a, b, h), __birth: (m) => giveBirth(m), __milkCapOf: (m) => milkCap(m), __udderTick: () => {
       state.udderAt = 0;
       uddersTick();
@@ -3980,8 +4329,8 @@
           MapData: d.MapData
         };
         const json = JSON.stringify(snap);
-        if (L.roomSnapshot && JSON.stringify(L.roomSnapshot.room) === json) return;
-        L.roomSnapshot = { at: now, room: JSON.parse(json) };
+        if (L2.roomSnapshot && JSON.stringify(L2.roomSnapshot.room) === json) return;
+        L2.roomSnapshot = { at: now, room: JSON.parse(json) };
         saveLedger();
         dbg("room snapshot saved" + (d.MapData && d.MapData.Type ? " (map: " + d.MapData.Type + ")" : ""));
       } catch (e) {
@@ -3990,7 +4339,7 @@
     }
     function tryCreateRoom() {
       setBadge("rebuilding room\u2026");
-      const s = L.roomSnapshot && L.roomSnapshot.room || {};
+      const s = L2.roomSnapshot && L2.roomSnapshot.room || {};
       log("Rebuilding room: " + CFG.ROOM_NAME + (s.MapData ? " (with saved map)" : " (NO saved map)"));
       const visibility = s.Visibility || (CFG.ROOM_PRIVATE ? ["Admin"] : ["All"]);
       const access = s.Access || ["All"];
@@ -4032,8 +4381,8 @@
       if (now - state.lastNudge < CFG.NUDGE_MIN * 6e4) return;
       state.lastNudge = now;
       try {
-        const C = charFor(CFG.BOT_MEMBER);
-        const pos = C && C.MapData && C.MapData.Pos;
+        const C2 = charFor(CFG.BOT_MEMBER);
+        const pos = C2 && C2.MapData && C2.MapData.Pos;
         if (!pos) return;
         const back = { X: pos.X, Y: pos.Y };
         const tryDirs = [[1, 0], [-1, 0], [0, 1], [0, -1]];
@@ -4041,13 +4390,13 @@
           const nx = pos.X + dx, ny = pos.Y + dy;
           if (typeof W.ChatRoomMapViewIsWall === "function" && W.ChatRoomMapViewIsWall(nx, ny)) continue;
           if (nx < 0 || ny < 0 || nx >= 40 || ny >= 40) continue;
-          C.MapData.Pos = { X: nx, Y: ny };
-          send("ChatRoomCharacterMapDataUpdate", C.MapData);
+          C2.MapData.Pos = { X: nx, Y: ny };
+          send("ChatRoomCharacterMapDataUpdate", C2.MapData);
           later(() => {
             try {
-              if (C.MapData.Pos.X !== nx || C.MapData.Pos.Y !== ny) return;
-              C.MapData.Pos = back;
-              send("ChatRoomCharacterMapDataUpdate", C.MapData);
+              if (C2.MapData.Pos.X !== nx || C2.MapData.Pos.Y !== ny) return;
+              C2.MapData.Pos = back;
+              send("ChatRoomCharacterMapDataUpdate", C2.MapData);
             } catch (e) {
             }
           }, 2500);
@@ -4229,7 +4578,7 @@
       const me = charFor(CFG.BOT_MEMBER), them = charFor(mn);
       const a = me && me.MapData && me.MapData.Pos, b = them && them.MapData && them.MapData.Pos;
       if (!a || !b || b.X < 0 || b.Y < 0) return;
-      const speakers = Object.entries(L.spots || {}).filter(([n]) => n.startsWith("speaker")).map(([, s]) => s);
+      const speakers = Object.entries(L2.spots || {}).filter(([n]) => n.startsWith("speaker")).map(([, s]) => s);
       if (speakers.length) {
         const d = (s) => Math.max(Math.abs(s.X - b.X), Math.abs(s.Y - b.Y));
         const best = speakers.reduce((x, y) => d(y) < d(x) ? y : x);
@@ -4249,7 +4598,7 @@
     function homeTick() {
       const home = spotFor("home"), me = charFor(CFG.BOT_MEMBER), p = me && me.MapData && me.MapData.Pos;
       if (!home || !p || !mapRoom()) return;
-      if (Object.keys(L.spots || {}).some((n) => n.startsWith("speaker"))) return;
+      if (Object.keys(L2.spots || {}).some((n) => n.startsWith("speaker"))) return;
       if (p.X === home.X && p.Y === home.Y) return;
       if (Date.now() - (state.walkedAt || 0) < CFG.HOME_AFTER_S * 1e3) return;
       me.MapData.Pos = { X: home.X, Y: home.Y };
@@ -4404,7 +4753,7 @@
         else for (const part of splitMessage(line, 900)) enqueue({ Content: "(" + part.replace(/\(/g, "[").replace(/\)/g, "]"), Type: "Whisper", Target: mn }, urgent);
       }
     }
-    const speakersOn = () => mapRoom() && CFG.SPEAKER_MODE === "voice" && Object.keys(L.spots || {}).some((n) => n.startsWith("speaker"));
+    const speakersOn = () => mapRoom() && CFG.SPEAKER_MODE === "voice" && Object.keys(L2.spots || {}).some((n) => n.startsWith("speaker"));
     function speakerSend(anchor, text, kind, urgent) {
       const who = audienceFor(anchor, text, kind);
       if (!who) return false;
@@ -4423,7 +4772,7 @@
       };
       const at = anchor && pos(anchor);
       if (!at) return null;
-      const speakers = Object.entries(L.spots || {}).filter(([n]) => n.startsWith("speaker")).map(([, s]) => s);
+      const speakers = Object.entries(L2.spots || {}).filter(([n]) => n.startsWith("speaker")).map(([, s]) => s);
       const dist = (p, q) => Math.max(Math.abs(p.X - q.X), Math.abs(p.Y - q.Y));
       const spot = speakers.length ? speakers.reduce((x, y) => dist(y, at) < dist(x, at) ? y : x) : at;
       const R = CFG.SPEAKER_RANGE;
@@ -4435,11 +4784,11 @@
       return who;
     }
     function onMap(mn) {
-      const C = charFor(mn);
-      if (!C) return false;
+      const C2 = charFor(mn);
+      if (!C2) return false;
       const mapRoom2 = !!(W.ChatRoomData && W.ChatRoomData.MapData && W.ChatRoomData.MapData.Type && W.ChatRoomData.MapData.Type !== "Never");
       if (!mapRoom2) return true;
-      const pos = C.MapData && C.MapData.Pos;
+      const pos = C2.MapData && C2.MapData.Pos;
       return !!(pos && pos.X >= 0 && pos.Y >= 0);
     }
     function missing(...mns) {
@@ -4619,14 +4968,14 @@
         send("AccountBeep", { MemberNumber: mn, BeepType: "", Message: "(\u2026I had to cut that one short, sugar. It's a long one! Try narrowin' it down.)" }, urgent);
     }
     function holdMail(mn, msg) {
-      L.mailbox = L.mailbox || {};
+      L2.mailbox = L2.mailbox || {};
       const gist = String(msg).split("\n")[0].replace(/\s+/g, " ").trim().slice(0, 90);
-      const box = L.mailbox[mn] = (L.mailbox[mn] || []).concat({ t: Date.now(), gist }).slice(-10);
+      const box = L2.mailbox[mn] = (L2.mailbox[mn] || []).concat({ t: Date.now(), gist }).slice(-10);
       saveLedger();
       dbg("held for " + mn + ": " + box.length);
     }
     function deliverMail(mn) {
-      const box = L.mailbox && L.mailbox[mn];
+      const box = L2.mailbox && L2.mailbox[mn];
       if (!box || !box.length) return;
       const latest = box.slice(-3).reverse(), more = box.length - latest.length;
       const text = "\u{1F4EC} " + box.length + " farm message" + (box.length === 1 ? "" : "s") + " while you were away. The latest:\n" + latest.map((x) => "\u2022 " + x.gist).join("\n") + (more > 0 ? "\n\u2026and " + more + " older." : "");
@@ -4634,7 +4983,7 @@
       else if (charFor(mn)) whisper(mn, text);
       else if (canBeep(mn)) send("AccountBeep", { MemberNumber: mn, BeepType: "", Message: text.slice(0, 1e3) });
       else return;
-      delete L.mailbox[mn];
+      delete L2.mailbox[mn];
       saveLedger();
     }
     function selfLine(text) {
@@ -4697,15 +5046,15 @@
         const tn = thingName(mn);
         if (tn) return tn;
       }
-      const r0 = L.people[mn];
+      const r0 = L2.people[mn];
       if (r0 && r0.nameSet) return r0.nameSet;
-      const C = charFor(mn);
-      if (C) {
+      const C2 = charFor(mn);
+      if (C2) {
         try {
-          if (typeof W.CharacterNickname === "function") return W.CharacterNickname(C);
+          if (typeof W.CharacterNickname === "function") return W.CharacterNickname(C2);
         } catch (e) {
         }
-        return C.Nickname || C.Name || "stranger";
+        return C2.Nickname || C2.Name || "stranger";
       }
       const r = rec(mn);
       return r && r.name ? r.name : "#" + mn;
@@ -4726,17 +5075,17 @@
       });
     }
     function titledName(mn) {
-      const C = charFor(mn), n = plainName(mn);
-      if (!C) return n;
-      const t = C.Title && C.Title !== "None" ? C.Title : "";
+      const C2 = charFor(mn), n = plainName(mn);
+      if (!C2) return n;
+      const t = C2.Title && C2.Title !== "None" ? C2.Title : "";
       return t ? t + " " + n : n;
     }
     function fill(t, mn) {
       return String(t).replace(/%titled_name%/g, titledName(mn)).replace(/%name%/g, plainName(mn));
     }
     function namesOf(mn) {
-      const C = charFor(mn), r = rec(mn), out = [];
-      for (const n of [C && C.Nickname, C && C.Name, r && r.name]) if (n) out.push(String(n).toLowerCase());
+      const C2 = charFor(mn), r = rec(mn), out = [];
+      for (const n of [C2 && C2.Nickname, C2 && C2.Name, r && r.name]) if (n) out.push(String(n).toLowerCase());
       return out;
     }
     function resolveTarget(arg) {
@@ -4746,7 +5095,7 @@
       const low = arg.toLowerCase();
       if (!low) return null;
       const room = (W.ChatRoomCharacter || []).map((c) => c.MemberNumber).filter((m) => m !== CFG.BOT_MEMBER);
-      const books = Object.keys(L.people).map((k) => parseInt(k, 10));
+      const books = Object.keys(L2.people).map((k) => parseInt(k, 10));
       const all = [...new Set(room.concat(books))];
       const onBooks2 = (m) => {
         const r = rec(m);
@@ -4796,7 +5145,7 @@
       if (Date.now() - last < CFG.GREET_COOLDOWN_MIN * 6e4) return;
       state.greeted.set(mn, Date.now());
       const r0 = rec(mn);
-      const known = L.archive[mn] || r0 && r0.roles && r0.roles.length;
+      const known = L2.archive[mn] || r0 && r0.roles && r0.roles.length;
       const pool = (known ? RETURN_GREETINGS : GREETINGS).filter(greetFits);
       const own = customGreeting(mn);
       const line = own || pool[Math.floor(Math.random() * pool.length)];
@@ -4816,8 +5165,8 @@
           if (pt) later(() => teleport(mn, pt, true), 2500);
         }
       }
-      if (CFG.NOTICE_ON_JOIN && L.notice && state.greeted.get(mn) > Date.now() - 5e3)
-        later(() => whisper(mn, "\u{1F4CC} " + L.notice.text), 3500);
+      if (CFG.NOTICE_ON_JOIN && L2.notice && state.greeted.get(mn) > Date.now() - 5e3)
+        later(() => whisper(mn, "\u{1F4CC} " + L2.notice.text), 3500);
       const r = rec(mn);
       if (CFG.ANNIVERSARY_ENABLED && r && r.roles.length && r.registeredAt) {
         const d0 = new Date(r.registeredAt), now = /* @__PURE__ */ new Date();
@@ -4830,11 +5179,11 @@
       }
     }
     function teaseTick() {
-      if (!CFG.TEASE_ENABLED || !L.tease.length) return;
+      if (!CFG.TEASE_ENABLED || !L2.tease.length) return;
       const now = Date.now();
       const gap = () => (CFG.TEASE_MIN_GAP_MIN + Math.random() * (CFG.TEASE_MAX_GAP_MIN - CFG.TEASE_MIN_GAP_MIN)) * 6e4;
-      for (const C of W.ChatRoomCharacter || []) {
-        const mn = C.MemberNumber;
+      for (const C2 of W.ChatRoomCharacter || []) {
+        const mn = C2.MemberNumber;
         const r = rec(mn);
         if (!r || !r.teaseOptIn || quietNow(mn)) {
           state.teaseNext.delete(mn);
@@ -4847,7 +5196,7 @@
         }
         if (now < next) continue;
         state.teaseNext.set(mn, now + gap());
-        const line = L.tease[Math.floor(Math.random() * L.tease.length)];
+        const line = L2.tease[Math.floor(Math.random() * L2.tease.length)];
         whisper(mn, "\u{1F608} " + fill(line.text, mn));
       }
     }
@@ -4872,7 +5221,8 @@
       parasiteOn: "parasite",
       symbioteOn: "symbiote",
       trapEager: "eager",
-      trapsOn: "traps"
+      trapsOn: "traps",
+      ownOutfit: "ownoutfit"
     };
     const DOC_CMDS = ["record", "stats", "vet", "quota", "keys", "size", "measure", "pedigree"];
     function shownMl(n) {
@@ -4931,7 +5281,7 @@
         } catch (e) {
           warn("record state:", e);
         }
-        s.ribbonLog = (L.ribbonLog || []).filter((e) => e.mn === mn).slice(-6).reverse().map((e) => ({ n: e.n, why: e.why }));
+        s.ribbonLog = (L2.ribbonLog || []).filter((e) => e.mn === mn).slice(-6).reverse().map((e) => ({ n: e.n, why: e.why }));
         s.store = storeItems().filter((it) => !it.off).map((it) => ({ id: it.potion || it.id, name: it.name, price: it.price, desc: it.desc, gift: !!it.gift, kind: it.kind || "", shelf: it.shelf || "" }));
         s.fx = activePotions(mn).map((f) => ({ id: f.id, name: (potionDef(f.id) || {}).name || f.id, until: Math.ceil(f.until / 6e4) * 6e4 }));
         if (r.dare) s.dare = { text: r.dare.text, until: r.dare.until, reckless: !!r.dare.reckless };
@@ -4996,8 +5346,8 @@
         if (isProprietor(mn)) {
           outfitsLedger();
           s.outfits = {};
-          for (const [k, o] of Object.entries(L.outfits)) s.outfits[k] = { items: o.items, locks: o.locks, at: o.at };
-          s.outfitRules = Object.assign({}, L.outfitRules);
+          for (const [k, o] of Object.entries(L2.outfits)) s.outfits[k] = { items: o.items, locks: o.locks, at: o.at };
+          s.outfitRules = Object.assign({}, L2.outfitRules);
           s.feedback = fbLedger().slice(-60).reverse().map((f) => ({ id: f.id, t: f.t, name: f.name, mn: f.mn, kind: f.kind, text: f.text, why: f.why || "", status: f.status, note: f.note || "" }));
         }
       } catch (e) {
@@ -5031,21 +5381,21 @@
         onCall: forcedStaff().map((m) => ({ name: plainName(m), mandated: isMandated(m), here: !!charFor(m) }))
       };
       zonesLedger();
-      out.zones = L.zones;
-      out.spots = L.spots || {};
+      out.zones = L2.zones;
+      out.spots = L2.spots || {};
       out.mapEdit = isHerdmaster(mn);
       if (isHerdmaster(mn)) {
-        out.log = (L.log || []).slice(-10).reverse().map((e) => ({ t: e.t, a: e.a, by: plainName(e.by), d: String(e.d || "").slice(0, 40) }));
+        out.log = (L2.log || []).slice(-10).reverse().map((e) => ({ t: e.t, a: e.a, by: plainName(e.by), d: String(e.d || "").slice(0, 40) }));
       }
       if (canHoldHerd(mn)) {
         voiceLedger();
-        const members = Object.keys(L.people).map(Number).filter((m) => herdLeaderOf(m) === mn);
+        const members = Object.keys(L2.people).map(Number).filter((m) => herdLeaderOf(m) === mn);
         out.voice = {
-          herd: L.voice.herd[mn] || { on: false, lines: [], every: "15" },
-          members: members.slice(0, 40).map((m) => Object.assign({ mn: m, name: plainName(m), hypno: !!rec(m).hypno }, L.voice.member[m] || { on: false, lines: [], every: "15" }))
+          herd: L2.voice.herd[mn] || { on: false, lines: [], every: "15" },
+          members: members.slice(0, 40).map((m) => Object.assign({ mn: m, name: plainName(m), hypno: !!rec(m).hypno }, L2.voice.member[m] || { on: false, lines: [], every: "15" }))
         };
       }
-      out.apps = (L.applications || []).slice(0, 30).map((a, i) => ({
+      out.apps = (L2.applications || []).slice(0, 30).map((a, i) => ({
         n: i + 1,
         mn: a.mn,
         name: a.name,
@@ -5055,7 +5405,7 @@
       }));
       out.mail = {
         sending: state.queue.length + state.urgent.length,
-        held: Object.keys(L.mailbox || {}).length,
+        held: Object.keys(L2.mailbox || {}).length,
         beepable: state.mutual ? state.mutual.set.size : null
       };
       return out;
@@ -5211,15 +5561,15 @@
       return v;
     }
     function wornTagsNow(mn) {
-      const C = charFor(mn), out = /* @__PURE__ */ new Set();
-      for (const it of C && C.Appearance || []) for (const t of tagsIn(craftText(it))) out.add(t);
+      const C2 = charFor(mn), out = /* @__PURE__ */ new Set();
+      for (const it of C2 && C2.Appearance || []) for (const t of tagsIn(craftText(it))) out.add(t);
       return out;
     }
     function seePenis(mn) {
-      const C = charFor(mn);
+      const C2 = charFor(mn);
       const p = prodOf(mn);
-      if (!C || !p || !Array.isArray(C.Appearance)) return;
-      p.hasPenis = C.Appearance.some((it) => it && it.Asset && it.Asset.Group && it.Asset.Group.Name === "Pussy" && /penis/i.test(it.Asset.Name || ""));
+      if (!C2 || !p || !Array.isArray(C2.Appearance)) return;
+      p.hasPenis = C2.Appearance.some((it) => it && it.Asset && it.Asset.Group && it.Asset.Group.Name === "Pussy" && /penis/i.test(it.Asset.Name || ""));
     }
     function capacity(mn) {
       const p = prodOf(mn);
@@ -5351,7 +5701,7 @@
       return String(hole).split("+").map((h) => h === "mouth" ? "throat" : h).join(" and ");
     }
     function onBreedingStand(mn) {
-      const C = charFor(mn), pos = C && C.MapData && C.MapData.Pos, s = (L.spots || {})[CFG.BREEDING_STAND];
+      const C2 = charFor(mn), pos = C2 && C2.MapData && C2.MapData.Pos, s = (L2.spots || {})[CFG.BREEDING_STAND];
       return !!(pos && s && Math.abs(s.X - pos.X) <= 1 && Math.abs(s.Y - pos.Y) <= 1);
     }
     function isRut() {
@@ -5378,20 +5728,20 @@
     function rutTick() {
       if (!isRut() || !inRoom()) return;
       const now = Date.now();
-      if (L.rutDay !== dayKey()) {
-        L.rutDay = dayKey();
-        L.rutSaid = now;
+      if (L2.rutDay !== dayKey()) {
+        L2.rutDay = dayKey();
+        L2.rutSaid = now;
         saveLedger();
         announce("\u{1F525} RUT DAY, y'all! All day today every fill is twice as likely to take, and studs get pent up twice as fast. Get breedin'! \u{1F402}");
         return;
       }
-      if (now - (L.rutSaid || 0) > CFG.RUT_EMOTE_MIN * 6e4 * (0.75 + Math.random() * 0.5)) {
-        L.rutSaid = now;
+      if (now - (L2.rutSaid || 0) > CFG.RUT_EMOTE_MIN * 6e4 * (0.75 + Math.random() * 0.5)) {
+        L2.rutSaid = now;
         emote(RUT_LINES[Math.floor(Math.random() * RUT_LINES.length)].replace(/^🔥 /, "\u{1F525} "));
       }
     }
     function nearHeat(mn) {
-      const C = charFor(mn), pos = C && C.MapData && C.MapData.Pos;
+      const C2 = charFor(mn), pos = C2 && C2.MapData && C2.MapData.Pos;
       if (!pos) return null;
       for (const O of W.ChatRoomCharacter || []) {
         const om = O.MemberNumber, op = O.MapData && O.MapData.Pos;
@@ -5428,8 +5778,8 @@
     function itemLabel(it) {
       return it.Craft && it.Craft.Name || it.Asset.Description || it.Asset.Name;
     }
-    function findItem(C, groups, effects) {
-      return (C.Appearance || []).find((it) => {
+    function findItem(C2, groups, effects) {
+      return (C2.Appearance || []).find((it) => {
         if (!it || !it.Asset || !it.Asset.Group) return false;
         const eff = [].concat(it.Property && it.Property.Effect || [], it.Asset.Effect || []);
         const blk = [].concat(it.Property && it.Property.Block || [], it.Asset.Block || []);
@@ -5438,9 +5788,9 @@
     }
     function holeBlocked(mn, hole) {
       if (!CFG.BLOCK_CHECK) return null;
-      const C = charFor(mn);
-      if (!C || !Array.isArray(C.Appearance)) return null;
-      const items = C.Appearance.filter((x) => x && x.Asset && x.Asset.Group);
+      const C2 = charFor(mn);
+      if (!C2 || !Array.isArray(C2.Appearance)) return null;
+      const items = C2.Appearance.filter((x) => x && x.Asset && x.Asset.Group);
       const grp = (x) => x.Asset.Group.Name;
       const eff = (x) => [].concat(x.Property && x.Property.Effect || [], x.Asset.Effect || []);
       const blk = (x) => [].concat(x.Property && x.Property.Block || [], x.Asset.Block || []);
@@ -5533,8 +5883,8 @@
       return d.getUTCFullYear() + "-W" + (1 + Math.round(((d - w1) / 864e5 - 3 + (w1.getUTCDay() + 6) % 7) / 7));
     }
     function rollBoard() {
-      if (!L.yield) L.yield = { day: dayKey(), week: weekKey(), d: {}, w: {} };
-      const Y = L.yield;
+      if (!L2.yield) L2.yield = { day: dayKey(), week: weekKey(), d: {}, w: {} };
+      const Y = L2.yield;
       if (Y.day !== dayKey()) {
         Y.d = {};
         Y.u = {};
@@ -5580,8 +5930,8 @@
     }
     function credit(mn, amount) {
       rollBoard();
-      L.yield.d[mn] = (L.yield.d[mn] || 0) + amount;
-      L.yield.w[mn] = (L.yield.w[mn] || 0) + amount;
+      L2.yield.d[mn] = (L2.yield.d[mn] || 0) + amount;
+      L2.yield.w[mn] = (L2.yield.w[mn] || 0) + amount;
       vatAdd(mn, amount);
     }
     const MILK_LEAK = [
@@ -5615,7 +5965,7 @@
         const sc = sessionScore(mn, gapH);
         p.grades = (p.grades || []).concat(sc).slice(-20);
         rollBoard();
-        const g = L.yield.g || (L.yield.g = {});
+        const g = L2.yield.g || (L2.yield.g = {});
         g[mn] = g[mn] || { sum: 0, n: 0 };
         g[mn].sum += sc;
         g[mn].n++;
@@ -5673,7 +6023,7 @@
       saveLedger();
     }
     function heatLines() {
-      return L.heatLines && L.heatLines.length ? L.heatLines.map((x) => x.text) : CFG.HEAT_LINES;
+      return L2.heatLines && L2.heatLines.length ? L2.heatLines.map((x) => x.text) : CFG.HEAT_LINES;
     }
     function mpregOn(mn) {
       const p = prodOf(mn), r = rec(mn);
@@ -5750,9 +6100,9 @@
         const sp = prodOf(s);
         if (sp) sp.totals.sired += 1;
       }
-      if (!L.studbook) L.studbook = [];
-      L.studbook.push({ t: Date.now(), dam: mn, sires: g.sires.slice(), kids });
-      if (L.studbook.length > 1e3) L.studbook = L.studbook.slice(-1e3);
+      if (!L2.studbook) L2.studbook = [];
+      L2.studbook.push({ t: Date.now(), dam: mn, sires: g.sires.slice(), kids });
+      if (L2.studbook.length > 1e3) L2.studbook = L2.studbook.slice(-1e3);
       const sires = g.sires.slice();
       p.preg = null;
       p.freshUntil = Date.now() + CFG.PROD.FRESH_DAYS * 864e5;
@@ -5774,7 +6124,7 @@
       else beep(mn, msg);
       try {
         const split = revealSplit(mn, sires, g.count);
-        if (split) L.studbook[L.studbook.length - 1].split = split;
+        if (split) L2.studbook[L2.studbook.length - 1].split = split;
       } catch (e) {
         warn("split:", e);
       }
@@ -5808,8 +6158,8 @@
     }
     function prodTick() {
       const now = Date.now();
-      for (const k in L.people) {
-        const mn = parseInt(k, 10), r = L.people[k];
+      for (const k in L2.people) {
+        const mn = parseInt(k, 10), r = L2.people[k];
         if (!r.prod && !makesMilk(mn) && r.milkable !== true && !r.futa) continue;
         const p = prodOf(mn);
         if (charFor(mn)) seePenis(mn);
@@ -5918,8 +6268,8 @@
             p.eggs = null;
             p.offspring.eggs = (p.offspring.eggs || 0) + e.n;
             eggsLaid(mn, e.n, false);
-            if (!L.studbook) L.studbook = [];
-            L.studbook.push({ t: now, dam: mn, sires: [e.by], kids: { male: 0, female: 0, futa: 0 }, eggs: e.n });
+            if (!L2.studbook) L2.studbook = [];
+            L2.studbook.push({ t: now, dam: mn, sires: [e.by], kids: { male: 0, female: 0, futa: 0 }, eggs: e.n });
             saveLedger();
             audit(CFG.BOT_MEMBER, "EGGS", mn + " " + e.n);
             if (here) emote("\u{1F95A} " + plainName(mn) + " squats and strains, belly rollin', and one by one pushes out " + e.n + " slick, warm eggs from " + plainName(e.by) + "'s clutch. The farm girl gathers 'em into a nest of straw.");
@@ -6020,14 +6370,14 @@
       saveLedger();
     }
     function milkingStallTick() {
-      const stalls = Object.entries(L.spots || {}).filter(([n]) => n.startsWith("milking"));
+      const stalls = Object.entries(L2.spots || {}).filter(([n]) => n.startsWith("milking"));
       if (!stalls.length) return;
       const dtMin = CFG.HEARTBEAT_MS / 6e4;
-      for (const C of W.ChatRoomCharacter || []) {
-        const pos = C.MapData && C.MapData.Pos;
-        if (!pos || C.MemberNumber === CFG.BOT_MEMBER) continue;
+      for (const C2 of W.ChatRoomCharacter || []) {
+        const pos = C2.MapData && C2.MapData.Pos;
+        if (!pos || C2.MemberNumber === CFG.BOT_MEMBER) continue;
         const on = stalls.some(([, s]) => Math.abs(s.X - pos.X) <= 1 && Math.abs(s.Y - pos.Y) <= 1);
-        const mn = C.MemberNumber, now = Date.now();
+        const mn = C2.MemberNumber, now = Date.now();
         if (!on || !rec(mn)) {
           const p0 = rec(mn) && prodOf(mn);
           if (p0) {
@@ -6288,7 +6638,7 @@
         tp.boosts.hungry = Date.now() + 36e5;
       }
       const sc0 = state.scenes.get(stud);
-      const F = L.life && L.life.fair;
+      const F = L2.life && L2.life.fair;
       if (F && F.open && F.cls === "load" && F.entrants[stud]) {
         F.loads = F.loads || {};
         F.loads[stud] = Math.max(F.loads[stud] || 0, load);
@@ -6323,7 +6673,7 @@
         if (caught) {
           sp.totals.conceived = (sp.totals.conceived || 0) + 1;
           rollBoard();
-          const Y = L.yield;
+          const Y = L2.yield;
           Y.s = Y.s || {};
           Y.s[stud] = (Y.s[stud] || 0) + 1;
         }
@@ -6482,8 +6832,8 @@
       return true;
     }
     function inseminate(sender, t, jarId, hole, machine) {
-      L.jars = (L.jars || []).filter((j) => Date.now() - j.t < CFG.JAR_DAYS * 864e5);
-      const jar = L.jars.find((j) => String(j.id) === String(jarId));
+      L2.jars = (L2.jars || []).filter((j) => Date.now() - j.t < CFG.JAR_DAYS * 864e5);
+      const jar = L2.jars.find((j) => String(j.id) === String(jarId));
       const err = inseminateProblem(t, jar, hole);
       if (err) return err;
       const tp = prodOf(t);
@@ -6491,7 +6841,7 @@
       tp.held[hole] = (tp.held[hole] || 0) + kept;
       tp.totals.received += kept;
       tp.lastStud = jar.stud;
-      L.jars = L.jars.filter((j) => j !== jar);
+      L2.jars = L2.jars.filter((j) => j !== jar);
       let caught = null;
       if (canCatchIn(t, hole)) {
         tp.lastFill = { at: Date.now(), stud: jar.stud, ml: kept, hole };
@@ -6500,7 +6850,7 @@
           const sp = prodOf(jar.stud);
           sp.totals.conceived = (sp.totals.conceived || 0) + 1;
           rollBoard();
-          const Y = L.yield;
+          const Y = L2.yield;
           Y.s = Y.s || {};
           Y.s[jar.stud] = (Y.s[jar.stud] || 0) + 1;
         }
@@ -6644,10 +6994,10 @@
       }
     }
     function lscgSplatsOn(mn) {
-      const C = charFor(mn);
-      if (!C) return false;
-      const S = C.LSCG && C.LSCG.SplatterModule;
-      if (S) return !!(S.enabled && S.taker !== false && (!C.LSCG.GlobalModule || C.LSCG.GlobalModule.enabled !== false));
+      const C2 = charFor(mn);
+      if (!C2) return false;
+      const S = C2.LSCG && C2.LSCG.SplatterModule;
+      if (S) return !!(S.enabled && S.taker !== false && (!C2.LSCG.GlobalModule || C2.LSCG.GlobalModule.enabled !== false));
       const k = state.lscgSeen && state.lscgSeen.get(mn);
       if (k) return k.on;
       const r = rec(mn);
@@ -6703,7 +7053,7 @@
       if (!p.tally || p.tally.day !== d) p.tally = { day: d, n: 0 };
       p.tally.n++;
       rollBoard();
-      const Y = L.yield;
+      const Y = L2.yield;
       Y.u = Y.u || {};
       if (r && r.tally) Y.u[t] = p.tally.n;
       if (r && r.tally && [5, 10, 20, 30, 50, 100].includes(p.tally.n) && onMap(t))
@@ -6718,7 +7068,7 @@
       return p && p.scent && p.scent.until > Date.now() ? p.scent.stud : 0;
     }
     function scentTick(mn) {
-      const C = charFor(mn), pos = C && C.MapData && C.MapData.Pos, p = prodOf(mn), now = Date.now();
+      const C2 = charFor(mn), pos = C2 && C2.MapData && C2.MapData.Pos, p = prodOf(mn), now = Date.now();
       if (!pos || !makesSemen(mn)) return;
       p.smelled = p.smelled || {};
       for (const O of W.ChatRoomCharacter || []) {
@@ -6733,7 +7083,7 @@
       }
     }
     function sloshTick(mn) {
-      const C = charFor(mn), pos = C && C.MapData && C.MapData.Pos, p = prodOf(mn), now = Date.now();
+      const C2 = charFor(mn), pos = C2 && C2.MapData && C2.MapData.Pos, p = prodOf(mn), now = Date.now();
       if (!pos) return;
       const moved = p.lastPos && (p.lastPos.X !== pos.X || p.lastPos.Y !== pos.Y);
       p.lastPos = { X: pos.X, Y: pos.Y };
@@ -6854,13 +7204,13 @@
     }
     function quotaTick() {
       const today = dayKey();
-      if (L.quotaDay === today) return;
-      const prev = L.quotaDay;
-      L.quotaDay = today;
+      if (L2.quotaDay === today) return;
+      const prev = L2.quotaDay;
+      L2.quotaDay = today;
       saveLedger();
       if (!prev) return;
-      for (const k in L.people) {
-        const mn = parseInt(k, 10), r = L.people[k], q = quotaOf(mn), p = r.prod;
+      for (const k in L2.people) {
+        const mn = parseInt(k, 10), r = L2.people[k], q = quotaOf(mn), p = r.prod;
         if (!q || !p || p.seenDay !== prev) continue;
         if (!p.seenMin || p.seenMin.day !== prev || p.seenMin.min < CFG.QUOTA_MIN_PRESENT) continue;
         if (r.registeredAt && dayKey(new Date(r.registeredAt)) === prev) continue;
@@ -7255,7 +7605,7 @@
       const tool = giver && (giver.Appearance || []).find((it) => it && it.Asset && it.Asset.Group && it.Asset.Group.Name === "ItemHandheld");
       const text = craftText(tool);
       const tags = tagsIn(text), sizeTags = sizeTagsIn(text), ptags = penisTagsIn(text);
-      L.shotLog = (L.shotLog || []).concat({
+      L2.shotLog = (L2.shotLog || []).concat({
         t: Date.now(),
         by: data.Sender,
         to: target,
@@ -7521,7 +7871,7 @@
       return (W.ChatRoomCharacter || []).map((c) => c.MemberNumber).filter((m) => m !== CFG.BOT_MEMBER && hasRole(m, ROLE.LIVESTOCK) && !(isStaff(m) && onDuty(m)));
     }
     function inCurfew() {
-      if (!L.life.curfewOn) return false;
+      if (!L2.life.curfewOn) return false;
       const h = hourNow(), { start, end } = CFG.CURFEW;
       return start > end ? h >= start || h < end : h >= start && h < end;
     }
@@ -7530,20 +7880,20 @@
     }
     function weatherToday() {
       const d = dayKey();
-      if (!L.life.weather || L.life.weather.day !== d) {
+      if (!L2.life.weather || L2.life.weather.day !== d) {
         const w = CFG.WEATHER[Math.floor(Math.random() * CFG.WEATHER.length)];
-        L.life.weather = { day: d, key: w.key, line: w.line, indoors: !!w.indoors };
-        for (const r of Object.values(L.people)) delete r.begged;
+        L2.life.weather = { day: d, key: w.key, line: w.line, indoors: !!w.indoors };
+        for (const r of Object.values(L2.people)) delete r.begged;
         saveLedger();
         if (inRoom()) announce("\u{1F324}\uFE0F " + w.line);
       }
-      return L.life.weather;
+      return L2.life.weather;
     }
     function lifeTick() {
       const h = hourNow(), d = dayKey();
       weatherToday();
-      if (L.life.feedingOn && CFG.FEED_HOURS.includes(h) && L.life.lastFeed !== d + "@" + h) {
-        L.life.lastFeed = d + "@" + h;
+      if (L2.life.feedingOn && CFG.FEED_HOURS.includes(h) && L2.life.lastFeed !== d + "@" + h) {
+        L2.life.lastFeed = d + "@" + h;
         saveLedger();
         const w = weatherToday();
         const pt = w.indoors ? firstSpot("barn", "trough") : firstSpot("trough");
@@ -7553,8 +7903,8 @@
         if (pt) for (const m of stock) teleport(m, pt, false);
       }
       const cur = inCurfew();
-      if (cur !== !!L.life.curfewActive) {
-        L.life.curfewActive = cur;
+      if (cur !== !!L2.life.curfewActive) {
+        L2.life.curfewActive = cur;
         saveLedger();
         if (cur) {
           announce("\u{1F319} Curfew, y'all! Stock to the barn and snuggle in" + (CFG.CURFEW_TAKES_BRONZE ? ", and I'll hold onto those bronze keys till mornin'" : "") + ". Sweet dreams!");
@@ -7565,11 +7915,11 @@
           }
         } else {
           announce("\u{1F305} Rise and shine, sweeties! Curfew's lifted.");
-          for (const r of Object.values(L.people)) delete r.begged;
+          for (const r of Object.values(L2.people)) delete r.begged;
           syncAllPresent(true);
         }
       }
-      for (const r of Object.values(L.people)) {
+      for (const r of Object.values(L2.people)) {
         const s = r.stocked;
         if (!s) continue;
         if (Date.now() >= s.until) {
@@ -7578,13 +7928,13 @@
           whisper(r.mn, "\u{1F513} Time's up, " + plainName(r.mn) + "! Out of the stocks you come, sugar.");
           continue;
         }
-        const C = charFor(r.mn), pos = C && C.MapData && C.MapData.Pos, pt = spotFor("stocks");
+        const C2 = charFor(r.mn), pos = C2 && C2.MapData && C2.MapData.Pos, pt = spotFor("stocks");
         if (pt && pos && (Math.abs(pos.X - pt.X) > 1 || Math.abs(pos.Y - pt.Y) > 1)) {
           teleport(r.mn, pt, false, true);
           whisper(r.mn, "Uh-uh, back in the stocks you go, hon! " + Math.ceil((s.until - Date.now()) / 6e4) + " minutes left.");
         }
       }
-      for (const r of Object.values(L.people)) {
+      for (const r of Object.values(L2.people)) {
         if (r.tierUntil && Date.now() >= r.tierUntil) {
           r.tier = r.tierPrev || "";
           r.tierUntil = null;
@@ -7644,7 +7994,7 @@
       return n;
     }
     function runTour(mn) {
-      const stops = L.life.tour || [];
+      const stops = L2.life.tour || [];
       if (!stops.length || !botIsAdmin()) return false;
       state.tours.set(mn, 0);
       const step = () => {
@@ -7678,17 +8028,17 @@
       nhl: "No human left, %name%. You belong to B&B Farm as an animal for the length of this contract, and only the farm can end it early. A safeword always reaches staff, and they'll come check on you."
     };
     function contractsLedger() {
-      L.contractTemplates = L.contractTemplates || {};
-      L.contracts = L.contracts || [];
+      L2.contractTemplates = L2.contractTemplates || {};
+      L2.contracts = L2.contracts || [];
     }
     function farmInfo() {
-      const staff = Object.keys(L.people).map(Number).filter((m) => isStaff(m));
+      const staff = Object.keys(L2.people).map(Number).filter((m) => isStaff(m));
       return { bot: CFG.BOT_MEMBER, staff, rooms: CFG.CONTRACT_ROOMS && CFG.CONTRACT_ROOMS.length ? CFG.CONTRACT_ROOMS : [CFG.ROOM_NAME] };
     }
     function contractTemplate(name) {
       contractsLedger();
       const n = String(name || "").toLowerCase();
-      if (L.contractTemplates[n]) return L.contractTemplates[n];
+      if (L2.contractTemplates[n]) return L2.contractTemplates[n];
       const d = depthFrom(n);
       if (d && d.key === n) return { title: "B&B Farm \xB7 " + d.label, terms: DEFAULT_TERMS[d.key], base: d.key, add: {}, remove: [] };
       return null;
@@ -7773,7 +8123,7 @@
       const c = buildContract(tpl, t, d.key, when);
       const problems = checkContract(c);
       if (problems.length) return "That one wouldn't work in BC+, sugar, so I didn't send it:\n\u2022 " + problems.join("\n\u2022 ");
-      const mine = L.contracts.filter((x) => x.mn === t && (x.status === "signed" || x.status === "offered"));
+      const mine = L2.contracts.filter((x) => x.mn === t && (x.status === "signed" || x.status === "offered"));
       if (mine.filter((x) => x.status === "signed").length >= LIMITS.MAX_ACTIVE) return plainName(t) + " already holds " + LIMITS.MAX_ACTIVE + " farm contracts, and BC+ won't take more.";
       enqueue(offerMsg(c, t, CFG.ROOM_NAME));
       const entry = {
@@ -7791,8 +8141,8 @@
       };
       const prepared = trackedContract(t, null, ["prepared"]);
       if (prepared) Object.assign(prepared, entry);
-      else L.contracts.push(Object.assign({ key: Date.now().toString(36) }, entry));
-      if (L.contracts.length > 300) L.contracts = L.contracts.slice(-300);
+      else L2.contracts.push(Object.assign({ key: Date.now().toString(36) }, entry));
+      if (L2.contracts.length > 300) L2.contracts = L2.contracts.slice(-300);
       saveLedger();
       audit(sender, "CONTRACT_OFFER", t + " " + c.title + " " + d.key);
       tell(t, "\u{1F4DC} " + plainName(sender) + ' offers you the farm contract "' + c.title + '" (' + d.label + "). Read it on your BC+ Contracts page, and only sign if you want it. Nothin' applies till you do.");
@@ -7800,8 +8150,8 @@
     }
     function trackedContract(mn, title, statuses) {
       contractsLedger();
-      for (let i = L.contracts.length - 1; i >= 0; i--) {
-        const x = L.contracts[i];
+      for (let i = L2.contracts.length - 1; i >= 0; i--) {
+        const x = L2.contracts[i];
         if (x.mn === mn && (!title || x.title === title) && (!statuses || statuses.includes(x.status))) return x;
       }
       return null;
@@ -7823,8 +8173,13 @@
         contractSignedNow(mn);
         notifyStaff("\u{1F4DC} " + plainName(mn) + ' signed the farm contract "' + m[1] + '".', true);
         const tpl = x && contractTemplate(x.tpl), dress = tpl ? tpl.outfit === void 0 ? "auto" : tpl.outfit : "";
-        const slot = dress === "auto" ? outfitSlotFor(mn) : dress;
-        if (slot) later(() => offerOutfit(mn, slot, "It goes with your new contract"), 3e3);
+        const slot = dress === "auto" ? outfitSlotFor(mn) : dress, r = rec(mn);
+        if (slot && r && r.ownOutfit) later(() => tell(mn, "\u{1F457} You brought your own outfit, sugar, so you're stayin' in the look you came in. (?ownoutfit off and the farm dresses you for your next contract.)"), 3e3);
+        else if (slot && r && !r.contractDressedAt) {
+          r.contractDressedAt = Date.now();
+          saveLedger();
+          later(() => offerOutfit(mn, slot, "It goes with your new contract", true), 3e3);
+        }
         later(() => enqueue(queryMsg(mn)), 2e3);
         return true;
       }
@@ -7853,7 +8208,7 @@
       const mn = m.from, held = m.contracts;
       contractsLedger();
       for (const bc of held) {
-        const x = trackedContract(mn, bc.title, ["offered", "signed", "releasing"]) || (L.contracts.push({
+        const x = trackedContract(mn, bc.title, ["offered", "signed", "releasing"]) || (L2.contracts.push({
           key: Date.now().toString(36),
           mn,
           title: bc.title,
@@ -7863,7 +8218,7 @@
           rules: Object.keys(bc.rules || {}),
           status: "signed",
           at: bc.signedAt
-        }), L.contracts[L.contracts.length - 1]);
+        }), L2.contracts[L2.contracts.length - 1]);
         if (x.status === "offered") {
           x.status = "signed";
           contractSignedNow(mn);
@@ -7872,7 +8227,7 @@
         x.signedAt = bc.signedAt;
         x.until = bc.until;
       }
-      for (const x of L.contracts) if (x.mn === mn && (x.status === "signed" || x.status === "releasing") && x.bcpId && !held.some((bc) => bc.id === x.bcpId)) {
+      for (const x of L2.contracts) if (x.mn === mn && (x.status === "signed" || x.status === "releasing") && x.bcpId && !held.some((bc) => bc.id === x.bcpId)) {
         x.status = "ended";
         x.endedAt = Date.now();
       }
@@ -7896,7 +8251,7 @@
     }
     function myContractsText(mn) {
       contractsLedger();
-      const mine = L.contracts.filter((x) => x.mn === mn && ["prepared", "offered", "signed", "releasing"].includes(x.status));
+      const mine = L2.contracts.filter((x) => x.mn === mn && ["prepared", "offered", "signed", "releasing"].includes(x.status));
       const how = {
         prepared: "ready for staff to offer you",
         offered: "waitin' on you: read it on your BC+ Contracts page, and sign only if you want it",
@@ -7912,8 +8267,8 @@
     }
     const OUTFIT_MAX_CHARS = 6e4;
     function outfitsLedger() {
-      L.outfits = L.outfits || {};
-      L.outfitRules = Object.assign({ onApprove: true, onClockIn: true, changeBack: true, keys: "staff" }, L.outfitRules || {});
+      L2.outfits = L2.outfits || {};
+      L2.outfitRules = Object.assign({ onApprove: true, onClockIn: true, changeBack: true, keys: "staff" }, L2.outfitRules || {});
     }
     function genderOf(mn) {
       const r = rec(mn) || {};
@@ -7922,18 +8277,26 @@
     function outfitSlotFor(mn) {
       outfitsLedger();
       const r = rec(mn) || {}, sp = String(r.species || "").toLowerCase(), g = genderOf(mn);
-      return [sp + "|" + g, sp + "|*", "*|" + g, "stock"].find((k) => L.outfits[k]) || null;
+      return [sp + "|" + g, sp + "|*", "*|" + g].find((k) => L2.outfits[k]) || (farmOutfit("farm:" + sp + "|" + g) ? "farm:" + sp + "|" + g : null) || (L2.outfits.stock ? "stock" : null);
+    }
+    function farmOutfit(slot) {
+      const m = /^farm:([a-z]+)\|([a-z]+)$/.exec(String(slot || ""));
+      if (!m) return null;
+      const pieces = outfitPieces(m[1], m[2]);
+      if (!pieces || !W.LZString) return null;
+      const items = pieces.map((p) => ({ Group: p.Group, Name: p.Name, Color: p.Color, Property: p.Property ? JSON.parse(JSON.stringify(p.Property)) : {}, locked: !!p.locked }));
+      return { data: W.LZString.compressToBase64(JSON.stringify({ v: 1, items })), items: items.length, locks: items.filter((i) => i.locked).length, farm: true };
     }
     function uniformSlotFor(mn) {
       outfitsLedger();
       const order = isProprietor(mn) ? ["proprietor", "herdmaster", "farmhand"] : hasRole(mn, ROLE.HERDMASTER) ? ["herdmaster", "farmhand"] : isMandated(mn) ? ["mandated", "farmhand"] : ["farmhand"];
-      return order.map((x) => "uniform:" + x).find((k) => L.outfits[k]) || null;
+      return order.map((x) => "uniform:" + x).find((k) => L2.outfits[k]) || null;
     }
     function outfitKeysFor(mn) {
       outfitsLedger();
       const leader = herdLeaderOf(mn), owners = CFG.PROPRIETORS.slice();
-      const staff = Object.keys(L.people).map(Number).filter((m) => isStaff(m));
-      const k = L.outfitRules.keys === "owners" ? owners : L.outfitRules.keys === "leader" ? leader ? [leader] : owners : staff.concat(leader ? [leader] : []);
+      const staff = Object.keys(L2.people).map(Number).filter((m) => isStaff(m));
+      const k = L2.outfitRules.keys === "owners" ? owners : L2.outfitRules.keys === "leader" ? leader ? [leader] : owners : staff.concat(leader ? [leader] : []);
       return Array.from(new Set(k.concat([CFG.BOT_MEMBER]))).filter((m) => m !== mn).slice(0, 100);
     }
     function outfitSlotFrom(words) {
@@ -7949,16 +8312,16 @@
       if (/^[a-z][a-z0-9_-]{1,19}$/.test(w[0]) && !speciesFrom(w[0])) return "special:" + w[0];
       return null;
     }
-    const slotLabel = (k) => k === "stock" ? "Any new stock" : k.startsWith("uniform:") ? k.slice(8) + " uniform" : k.startsWith("special:") ? k.slice(8) : k.split("|").map((x) => x === "*" ? "any" : x).join(" \xB7 ");
-    function offerOutfit(mn, slot, why) {
+    const slotLabel = (k) => k.startsWith("farm:") ? "farm " + k.slice(5).split("|").map((x) => x === "kitt" ? "kitty" : x).join(" \xB7 ") + " outfit" : k === "stock" ? "Any new stock" : k.startsWith("uniform:") ? k.slice(8) + " uniform" : k.startsWith("special:") ? k.slice(8) : k.split("|").map((x) => x === "*" ? "any" : x).join(" \xB7 ");
+    function offerOutfit(mn, slot, why, auto) {
       outfitsLedger();
-      const o = slot && L.outfits[slot];
+      const o = slot && (L2.outfits[slot] || farmOutfit(slot));
       if (!o) return "There's no outfit saved for that, sugar. ?outfit shows what's saved.";
       if (!hasCompanion(mn)) {
         tell(mn, "\u{1F457} The farm has your " + slotLabel(slot) + " ready" + (why ? " (" + why + ")" : "") + ". The Companion can put it on you in one tap; without it, staff can help you dress by hand.");
         return plainName(mn) + " isn't runnin' the Companion, so I can't hand 'em an outfit. I've told 'em it's ready, and they can dress by hand.";
       }
-      enqueue(makeMsg("outfit", { slot, label: slotLabel(slot), data: o.data, keys: outfitKeysFor(mn), why: why || "", id: ++companionSeq }, mn));
+      enqueue(makeMsg("outfit", { slot, label: slotLabel(slot), data: o.data, keys: outfitKeysFor(mn), why: why || "", auto: !!auto, id: ++companionSeq }, mn));
       audit(CFG.BOT_MEMBER, "OUTFIT_OFFER", mn + " " + slot);
       return "";
     }
@@ -7977,7 +8340,7 @@
         return;
       }
       outfitsLedger();
-      L.outfits[slot] = { data, items: Math.max(0, m.items | 0), locks: Math.max(0, m.locks | 0), by: mn, at: Date.now() };
+      L2.outfits[slot] = { data, items: Math.max(0, m.items | 0), locks: Math.max(0, m.locks | 0), by: mn, at: Date.now() };
       saveLedger();
       audit(mn, "OUTFIT_SAVE", slot);
       toCompanion(mn, "\u{1F457} Saved " + slotLabel(slot) + ": " + (m.items | 0) + " pieces" + (m.locks | 0 ? ", " + (m.locks | 0) + " locked" : "") + ".", "reply");
@@ -7990,42 +8353,58 @@
       } else if (m.answer === "declined") audit(mn, "OUTFIT_DECLINED", String(m.slot || ""));
       else if (m.answer === "back") audit(mn, "OUTFIT_BACK", "");
     }
+    function ownOutfitCommand(sender, args, R) {
+      const r = rec(sender);
+      if (!r) {
+        R("You need to be on the books first, sugar.");
+        return;
+      }
+      const a = String(args[0] || "").toLowerCase();
+      if (a !== "on" && a !== "off") {
+        R("\u{1F457} Bring your own outfit is " + (r.ownOutfit ? "ON: the farm won't dress you for a contract, you keep your own look" : "off: your first contract dresses you in the farm's outfit for your kind") + ". ?ownoutfit on|off.");
+        return;
+      }
+      r.ownOutfit = a === "on";
+      saveLedger();
+      syncCompanions(true);
+      R(r.ownOutfit ? "\u{1F457} Bring your own outfit: ON. Sign a contract and you stay in the look you came in. Staff can still offer you one, and you can say no." : "\u{1F457} Bring your own outfit: off. " + (r.contractDressedAt ? "You've had your farm outfit already, so nothin' changes unless staff offer you one." : "Your first contract dresses you in the farm's outfit for your kind."));
+    }
     function zonesLedger() {
-      L.zones = L.zones || {};
+      L2.zones = L2.zones || {};
     }
     function inZone(z, p) {
       if (!z || !z.a || !z.b || !p) return false;
       return p.X >= Math.min(z.a.X, z.b.X) && p.X <= Math.max(z.a.X, z.b.X) && p.Y >= Math.min(z.a.Y, z.b.Y) && p.Y <= Math.max(z.a.Y, z.b.Y);
     }
     function whereName(mn) {
-      const C = charFor(mn), p = C && C.MapData && C.MapData.Pos;
+      const C2 = charFor(mn), p = C2 && C2.MapData && C2.MapData.Pos;
       if (!p) return null;
       zonesLedger();
-      for (const [n, z] of Object.entries(L.zones)) if (inZone(z, p)) return z.group || n;
-      for (const [n, s] of Object.entries(L.spots || {})) if (Math.abs(s.X - p.X) <= 1 && Math.abs(s.Y - p.Y) <= 1) return n;
+      for (const [n, z] of Object.entries(L2.zones)) if (inZone(z, p)) return z.group || n;
+      for (const [n, s] of Object.entries(L2.spots || {})) if (Math.abs(s.X - p.X) <= 1 && Math.abs(s.Y - p.Y) <= 1) return n;
       return null;
     }
     const zoneText = (n, z) => n + (z.group && z.group !== n ? " (part of " + z.group + ")" : "") + " \xB7 A " + (z.a ? z.a.X + "," + z.a.Y : "not set") + " \u2192 B " + (z.b ? z.b.X + "," + z.b.Y : "not set");
     function voiceLedger() {
-      L.voice = L.voice || {};
-      L.voice.herd = L.voice.herd || {};
-      L.voice.member = L.voice.member || {};
+      L2.voice = L2.voice || {};
+      L2.voice.herd = L2.voice.herd || {};
+      L2.voice.member = L2.voice.member || {};
     }
     function voiceFor(mn) {
       voiceLedger();
       const r = rec(mn);
       if (!r || !r.hypno) return null;
-      const m = L.voice.member[mn];
+      const m = L2.voice.member[mn];
       if (m && m.on && m.lines.length) return m;
-      const lead2 = herdLeaderOf(mn), h = lead2 && L.voice.herd[lead2];
+      const lead2 = herdLeaderOf(mn), h = lead2 && L2.voice.herd[lead2];
       return h && h.on && h.lines.length ? h : null;
     }
     function voiceTick() {
       voiceLedger();
       state.voiceNext = state.voiceNext || /* @__PURE__ */ new Map();
       const now = Date.now();
-      for (const C of W.ChatRoomCharacter || []) {
-        const mn = C.MemberNumber, v = mn !== CFG.BOT_MEMBER && voiceFor(mn);
+      for (const C2 of W.ChatRoomCharacter || []) {
+        const mn = C2.MemberNumber, v = mn !== CFG.BOT_MEMBER && voiceFor(mn);
         if (!v) {
           state.voiceNext.delete(mn);
           continue;
@@ -8050,22 +8429,22 @@
     }
     const typeRec = (it) => it && it.Property && it.Property.TypeRecord || {};
     function wornItem(mn, group, name) {
-      const C = charFor(mn);
-      return C && Array.isArray(C.Appearance) ? C.Appearance.find((x) => x && x.Asset && x.Asset.Group && x.Asset.Group.Name === group && x.Asset.Name === name) || null : null;
+      const C2 = charFor(mn);
+      return C2 && Array.isArray(C2.Appearance) ? C2.Appearance.find((x) => x && x.Asset && x.Asset.Group && x.Asset.Group.Name === group && x.Asset.Name === name) || null : null;
     }
     function funnelOn(mn) {
-      const C = charFor(mn);
-      return !!(C && Array.isArray(C.Appearance) && C.Appearance.find((x) => x && x.Asset && x.Asset.Name === "FunnelGag" && x.Property && (x.Property.Type === "Funnel" || typeRec(x).typed === 1)));
+      const C2 = charFor(mn);
+      return !!(C2 && Array.isArray(C2.Appearance) && C2.Appearance.find((x) => x && x.Asset && x.Asset.Name === "FunnelGag" && x.Property && (x.Property.Type === "Funnel" || typeRec(x).typed === 1)));
     }
     function gearOf(mn) {
-      const C = charFor(mn), g = {};
-      if (!C) return g;
+      const C2 = charFor(mn), g = {};
+      if (!C2) return g;
       const pump2 = wornItem(mn, "ItemNipples", "LactationPump");
       if (pump2) {
         const lv = Math.min(4, Number(pump2.Property && pump2.Property.SuctionLevel) || Number(typeRec(pump2).typed) || 0);
         if (lv > 0) g.milk = { kind: "pump", name: "lactation pump", level: lv, ml: CFG.GEAR.PUMP_ML[lv] };
       }
-      const arousal = Math.max(0, Math.min(100, C.ArousalSettings && C.ArousalSettings.Progress || 0));
+      const arousal = Math.max(0, Math.min(100, C2.ArousalSettings && C2.ArousalSettings.Progress || 0));
       const intensityOf2 = (it) => it && it.Property && typeof it.Property.Intensity === "number" ? it.Property.Intensity : -1;
       const echo = (name, it) => {
         const i = intensityOf2(it);
@@ -8129,8 +8508,8 @@
     function gearTick() {
       const dtMin = CFG.HEARTBEAT_MS / 6e4, now = Date.now();
       state.machineLoads = state.machineLoads || /* @__PURE__ */ new Map();
-      for (const C of W.ChatRoomCharacter || []) {
-        const mn = C.MemberNumber;
+      for (const C2 of W.ChatRoomCharacter || []) {
+        const mn = C2.MemberNumber;
         if (mn === CFG.BOT_MEMBER || !rec(mn)) continue;
         const g = gearOf(mn), p = prodOf(mn), jitter = () => CFG.GEAR.EMOTE_MIN * 6e4 * (0.75 + Math.random() * 0.5);
         if (g.milk && makesMilk(mn) && !milkDenied(mn)) {
@@ -8172,7 +8551,7 @@
     const ANON_STUD = -1;
     function staffPoints(mn, n, why) {
       if (!mn || mn < 0) return;
-      const S = L.staffScore = L.staffScore || {}, wk = weekKey();
+      const S = L2.staffScore = L2.staffScore || {}, wk = weekKey();
       const x = S[mn] = S[mn] || { week: wk, pts: 0, total: 0, why: {} };
       if (x.week !== wk) {
         x.week = wk;
@@ -8191,8 +8570,8 @@
       return isProprietor(mn) ? 3 : isHerdmaster(mn) ? 2 : isStaff(mn) ? 1 : 0;
     }
     function addonData(name) {
-      L.mods = L.mods || {};
-      return L.mods[name] = L.mods[name] || {};
+      L2.mods = L2.mods || {};
+      return L2.mods[name] = L2.mods[name] || {};
     }
     function addonCall(a, what, fn, ...args) {
       try {
@@ -8208,11 +8587,11 @@
       for (const a of ADDONS.values()) if (a.on && typeof a.on[hook] === "function" && a.enabled !== false) addonCall(a, hook, a.on[hook], ...args);
     }
     function posOf(mn) {
-      const C = charFor(mn);
-      return C && C.MapData && C.MapData.Pos ? { X: C.MapData.Pos.X, Y: C.MapData.Pos.Y } : null;
+      const C2 = charFor(mn);
+      return C2 && C2.MapData && C2.MapData.Pos ? { X: C2.MapData.Pos.X, Y: C2.MapData.Pos.Y } : null;
     }
     function onSpot(mn, name, reach) {
-      const p = posOf(mn), s = L.spots && L.spots[name];
+      const p = posOf(mn), s = L2.spots && L2.spots[name];
       if (!p || !s) return false;
       return Math.max(Math.abs(p.X - s.X), Math.abs(p.Y - s.Y)) <= (reach || 0);
     }
@@ -8222,7 +8601,7 @@
     function zonesOf(mn) {
       zonesLedger();
       const p = posOf(mn);
-      return p ? Object.entries(L.zones).filter(([, z]) => z.a && z.b && inZone(z, p)).map(([n, z]) => ({ name: n, group: z.group })) : [];
+      return p ? Object.entries(L2.zones).filter(([, z]) => z.a && z.b && inZone(z, p)).map(([n, z]) => ({ name: n, group: z.group })) : [];
     }
     function inZoneNamed(mn, name) {
       return zonesOf(mn).some((z) => z.name === name || z.group === name);
@@ -8398,15 +8777,15 @@
         milkGrade,
         gradeLetter,
         staffPoints,
-        staffScores: () => JSON.parse(JSON.stringify(L.staffScore || {})),
+        staffScores: () => JSON.parse(JSON.stringify(L2.staffScore || {})),
         // another add-on's saved data, read-only (a copy), so add-ons can work together
-        peek: (other) => JSON.parse(JSON.stringify(L.mods && L.mods[other] || {})),
+        peek: (other) => JSON.parse(JSON.stringify(L2.mods && L2.mods[other] || {})),
         yieldWeek: (mn) => {
           rollBoard();
-          return L.yield && L.yield.w && L.yield.w[mn] || 0;
+          return L2.yield && L2.yield.w && L2.yield.w[mn] || 0;
         },
         // milk (and seed) given this week
-        studbook: () => JSON.parse(JSON.stringify(L.studbook || [])),
+        studbook: () => JSON.parse(JSON.stringify(L2.studbook || [])),
         clockedIn,
         isMandated,
         hoursThisWeek: (mn) => {
@@ -8422,15 +8801,15 @@
         funnelOn,
         // the map
         pos: posOf,
-        spot: (n) => L.spots && L.spots[n] || null,
-        spots: () => Object.assign({}, L.spots || {}),
+        spot: (n) => L2.spots && L2.spots[n] || null,
+        spots: () => Object.assign({}, L2.spots || {}),
         onSpot,
         whoOnSpot,
         zonesOf,
         inZone: inZoneNamed,
         zones: () => {
           zonesLedger();
-          return L.zones;
+          return L2.zones;
         },
         teleport,
         spotBeside,
@@ -8480,7 +8859,7 @@
         vetoes: def.vetoes || null,
         guide: def.guide || "",
         commands: {},
-        enabled: !(L.addonsOff && L.addonsOff[name]),
+        enabled: !(L2.addonsOff && L2.addonsOff[name]),
         errors: 0,
         // a private add-on (only: [member numbers]): nobody else can use it, and it's never listed anywhere
         only: Array.isArray(def.only) && def.only.length ? def.only.map(Number) : null
@@ -9388,8 +9767,8 @@
         "%n's breasts have been making milk for their young, and they don't hold back now."
       ] },
       pierced: { part: "milk", when: (mn) => {
-        const C = charFor(mn);
-        return !!(C && (C.Appearance || []).some((x) => x && x.Asset && x.Asset.Group && x.Asset.Group.Name === "ItemNipplesPiercings"));
+        const C2 = charFor(mn);
+        return !!(C2 && (C2.Appearance || []).some((x) => x && x.Asset && x.Asset.Group && x.Asset.Group.Name === "ItemNipplesPiercings"));
       }, lines: [
         "The rings through %n's nipples tug and clink inside the cups with every pull.",
         "%n's nipple piercings catch the suction just so, and they gasp each time the liners squeeze.",
@@ -9849,9 +10228,9 @@
       return r.rw;
     }
     function ribbonLog(mn, n, why, by) {
-      L.ribbonLog = L.ribbonLog || [];
-      L.ribbonLog.push({ at: Date.now(), mn, n, why: String(why || "").slice(0, 80), by: by || 0 });
-      if (L.ribbonLog.length > 600) L.ribbonLog = L.ribbonLog.slice(-600);
+      L2.ribbonLog = L2.ribbonLog || [];
+      L2.ribbonLog.push({ at: Date.now(), mn, n, why: String(why || "").slice(0, 80), by: by || 0 });
+      if (L2.ribbonLog.length > 600) L2.ribbonLog = L2.ribbonLog.slice(-600);
     }
     function earnRibbons(mn, n, why, by, quiet) {
       const r = rec(mn);
@@ -9891,7 +10270,7 @@
     }
     function ribbonTick() {
       const now = Date.now();
-      for (const [k, r] of Object.entries(L.people)) {
+      for (const [k, r] of Object.entries(L2.people)) {
         const mn = parseInt(k, 10);
         if (r.luxuryTemp && r.luxuryUntil < now) {
           r.roles = (r.roles || []).filter((x) => x !== ROLE.LUXURY);
@@ -9914,16 +10293,16 @@
         }
       }
       const wk = weekKey();
-      if (!L.ribbonWeekKey) {
-        L.ribbonWeekKey = wk;
+      if (!L2.ribbonWeekKey) {
+        L2.ribbonWeekKey = wk;
         saveLedger();
         return;
       }
-      if (L.ribbonWeekKey === wk) return;
-      const prev = L.ribbonWeekKey;
-      L.ribbonWeekKey = wk;
+      if (L2.ribbonWeekKey === wk) return;
+      const prev = L2.ribbonWeekKey;
+      L2.ribbonWeekKey = wk;
       saveLedger();
-      const rows = Object.entries(L.people).filter(([, r]) => r.rw && r.rw.key === prev).map(([k, r]) => [parseInt(k, 10), r.rw]);
+      const rows = Object.entries(L2.people).filter(([, r]) => r.rw && r.rw.key === prev).map(([k, r]) => [parseInt(k, 10), r.rw]);
       const top = rows.filter(([, w]) => w.earned > 0).sort((a, b) => b[1].earned - a[1].earned)[0];
       const big = rows.filter(([, w]) => w.spent > 0).sort((a, b) => b[1].spent - a[1].spent)[0];
       if (top) earnRibbons(top[0], CFG.RIBBON_TOP_BONUS, "bein' the top earner of the week", CFG.BOT_MEMBER);
@@ -9984,7 +10363,7 @@
       { id: "shot-cock", name: "A cock growth shot", price: 7, words: "cock growth", part: "penis", desc: "Cock a size bigger, for good." }
     ];
     function storeItems() {
-      const S = L.store || {}, price = S.price || {}, off = S.off || {};
+      const S = L2.store || {}, price = S.price || {}, off = S.off || {};
       const potions = POTIONS.map((p) => ({ id: "potion-" + p.id, name: p.name, price: p.price, desc: p.desc, potion: p.id, gift: true, kind: p.kind }));
       return STORE_BASE.concat(potions).map((it) => Object.assign({}, it, { price: price[it.id] !== void 0 ? price[it.id] : it.price, off: !!off[it.id] }));
     }
@@ -10193,7 +10572,7 @@
             return;
           }
           spendRibbons(sender, n, "bounty: " + job);
-          L.chores.push({ text: job, by: sender, bounty: n, key: Date.now().toString(36) });
+          L2.chores.push({ text: job, by: sender, bounty: n, key: Date.now().toString(36) });
           saveLedger();
           done("\u{1F4CC} Bounty posted: " + n + ' ribbons to whoever does "' + job.replace(/\s*@[a-z0-9_-]+\s*$/i, "") + '".');
           return;
@@ -10275,17 +10654,17 @@
             R("Which item, sugar? The words from ?store, like ?store price luxury 30");
             return;
           }
-          L.store = L.store || {};
-          L.store.price = L.store.price || {};
-          L.store.off = L.store.off || {};
+          L2.store = L2.store || {};
+          L2.store.price = L2.store.price || {};
+          L2.store.off = L2.store.off || {};
           if (sub === "price") {
             const n = parseInt(args[2], 10);
             if (!(n >= 0 && n <= 999)) {
               R("A price from 0 to 999, sugar.");
               return;
             }
-            L.store.price[it.id] = n;
-          } else L.store.off[it.id] = sub === "off";
+            L2.store.price[it.id] = n;
+          } else L2.store.off[it.id] = sub === "off";
           saveLedger();
           audit(sender, "STORE", sub + " " + it.id + " " + (args[2] || ""));
           R("\u{1F6CD}\uFE0F " + it.name + ": " + (sub === "price" ? args[2] + " ribbons now." : sub === "off" ? "off the shelf." : "back on the shelf."));
@@ -10347,7 +10726,7 @@
       }
       if (sub === "top" || sub === "board") {
         const wk = weekKey();
-        const rows = Object.entries(L.people).filter(([, r2]) => r2.rw && r2.rw.key === wk && r2.rw.earned > 0).sort((a, b) => b[1].rw.earned - a[1].rw.earned).slice(0, 8);
+        const rows = Object.entries(L2.people).filter(([, r2]) => r2.rw && r2.rw.key === wk && r2.rw.earned > 0).sort((a, b) => b[1].rw.earned - a[1].rw.earned).slice(0, 8);
         R("\u{1F380} RIBBONS THIS WEEK\n" + (rows.length ? rows.map(([k, r2], i) => "  " + (i + 1) + ". " + plainName(parseInt(k, 10)) + " \xB7 " + r2.rw.earned + " earned").join("\n") : "  nobody's earned any yet") + "\nThe Sunday till pays the top earner a bonus.");
         return;
       }
@@ -10361,7 +10740,7 @@
         R("I don't know who that is, sugar.");
         return;
       }
-      const mine = (L.ribbonLog || []).filter((e) => e.mn === t).slice(-6).reverse();
+      const mine = (L2.ribbonLog || []).filter((e) => e.mn === t).slice(-6).reverse();
       const d = dayKey(), today = r.rday && r.rday.d === d ? r.rday.n : 0;
       R("\u{1F380} " + (t === sender ? "YOUR RIBBONS" : plainName(t).toUpperCase() + "'S RIBBONS") + ": " + (r.ribbons || 0) + "\nEarned today: " + today + " of " + CFG.RIBBON_DAY_CAP + (r.quotaGrace ? " \xB7 quota grace held: " + r.quotaGrace : "") + (mine.length ? "\n\nLately\n" + mine.map((e) => "  " + (e.n > 0 ? "+" : "") + e.n + " \xB7 " + e.why).join("\n") : "") + "\n\nEARN 'EM: make your milk quota \xB7 finish a stall session \xB7 do a chore \xB7 work a glory shift \xB7 best milk or top sire of the week \xB7 staff hand 'em out for good behavior\nSPEND 'EM: ?store");
     }
@@ -10926,7 +11305,7 @@
     }
     function potionTick() {
       const now = Date.now();
-      for (const [k, r] of Object.entries(L.people)) {
+      for (const [k, r] of Object.entries(L2.people)) {
         if (!r.fx) continue;
         const mn = parseInt(k, 10);
         for (const [id, f] of Object.entries(r.fx)) {
@@ -10956,7 +11335,7 @@
           if (id === "moo" && every2(6, 10)) emote(fxLine("moo", mn), mn);
           if (id === "brood" && every2(8, 14)) privateTo(mn, "\u{1F95A} " + fxLine("brood", mn), "emote");
           if (id === "bell") {
-            const C = charFor(mn), pos = C && C.MapData && C.MapData.Pos;
+            const C2 = charFor(mn), pos = C2 && C2.MapData && C2.MapData.Pos;
             if (pos) {
               const moved = f.pos && (f.pos.X !== pos.X || f.pos.Y !== pos.Y);
               f.pos = { X: pos.X, Y: pos.Y };
@@ -11052,7 +11431,7 @@
     }
     function dareTick() {
       const now = Date.now();
-      for (const [k, r] of Object.entries(L.people)) {
+      for (const [k, r] of Object.entries(L2.people)) {
         if (!r.dare || r.dare.until > now) continue;
         const mn = parseInt(k, 10);
         r.dare = null;
@@ -11127,16 +11506,16 @@
       R("\u{1F3B2} Dared " + plainName(t) + ".");
     }
     function penSpots() {
-      return Object.entries(L.spots || {}).filter(([n]) => n === "pen" || /^pens?-/.test(n) || n === "pens");
+      return Object.entries(L2.spots || {}).filter(([n]) => n === "pen" || /^pens?-/.test(n) || n === "pens");
     }
     function milkSpots() {
-      return Object.entries(L.spots || {}).filter(([n]) => n.startsWith("milking"));
+      return Object.entries(L2.spots || {}).filter(([n]) => n.startsWith("milking"));
     }
     function penIn(mn, mins, by, where) {
       const r = rec(mn);
       if (!r) return null;
       let spots = where === "milking" ? milkSpots() : penSpots();
-      if (where && where !== "milking") spots = Object.entries(L.spots || {}).filter(([n]) => n === where);
+      if (where && where !== "milking") spots = Object.entries(L2.spots || {}).filter(([n]) => n === where);
       if (!spots.length) return null;
       const taken = (s2) => (W.ChatRoomCharacter || []).some((c) => c.MemberNumber !== mn && c.MapData && c.MapData.Pos && c.MapData.Pos.X === s2.X && c.MapData.Pos.Y === s2.Y);
       const pick = spots.find(([, s2]) => !taken(s2)) || spots[0];
@@ -11158,14 +11537,14 @@
     }
     function penTick() {
       const now = Date.now();
-      for (const [k, r] of Object.entries(L.people)) {
+      for (const [k, r] of Object.entries(L2.people)) {
         if (!r.penned) continue;
         const mn = parseInt(k, 10);
         if (r.penned.until <= now) {
           unpen(mn, !charFor(mn));
           continue;
         }
-        const C = charFor(mn), pos = C && C.MapData && C.MapData.Pos;
+        const C2 = charFor(mn), pos = C2 && C2.MapData && C2.MapData.Pos;
         if (!pos || pos.X < 0) continue;
         if (Math.max(Math.abs(pos.X - r.penned.X), Math.abs(pos.Y - r.penned.Y)) <= 2) continue;
         if (now - (r.penned.pullAt || 0) < 3e4) continue;
@@ -11473,7 +11852,7 @@
           const d = addonData("glory-stalls"), mins = Math.max(10, Math.min(240, n || 30));
           d.shifts = d.shifts || {};
           d.shifts[t] = { until: Date.now() + mins * 6e4, by: spinner, punish: true };
-          const free = Object.entries(L.spots || {}).filter(([k]) => /^glory-\d+$/.test(k)).find(([, s]) => !(W.ChatRoomCharacter || []).some((c) => c.MemberNumber !== t && c.MapData && c.MapData.Pos && c.MapData.Pos.X === s.X && c.MapData.Pos.Y === s.Y));
+          const free = Object.entries(L2.spots || {}).filter(([k]) => /^glory-\d+$/.test(k)).find(([, s]) => !(W.ChatRoomCharacter || []).some((c) => c.MemberNumber !== t && c.MapData && c.MapData.Pos && c.MapData.Pos.X === s.X && c.MapData.Pos.Y === s.Y));
           if (free) teleport(t, { X: free[1].X, Y: free[1].Y }, true);
           saveLedger();
           tell(t, "\u{1F573}\uFE0F The wheel sentenced you to " + mins + " minutes in the glory stalls" + (free ? ", " + free[0].replace("glory-", "stall ") : ". Find a free stall") + ". Strangers come more often on a punishment shift. Your safeword still works.");
@@ -11540,8 +11919,8 @@
       }
     }
     function spinWheel(by, t, kind, actingAs) {
-      const custom = (L.wheel || []).map((e) => Object.assign({ custom: true }, e));
-      const farm = L.wheelFarm === false ? [] : FARM_SLICES;
+      const custom = (L2.wheel || []).map((e) => Object.assign({ custom: true }, e));
+      const farm = L2.wheelFarm === false ? [] : FARM_SLICES;
       let all = custom.concat(farm).filter((e) => wheelAllowed(e, t) && actPossible(e.act, t, by));
       if (kind === "lucky") all = Math.random() < 0.8 ? all.filter((e) => e.kind === "reward") : all;
       else if (["reward", "punish", "silly"].includes(kind)) all = all.filter((e) => e.kind === kind);
@@ -11565,14 +11944,14 @@
       return { text: m[0].trim(), act: m[1] ? m[1].trim().toLowerCase() : "" };
     }
     function benchSpots() {
-      return Object.entries(L.spots || {}).filter(([n]) => n === "bench" || /^bench-[a-z0-9]+$/.test(n));
+      return Object.entries(L2.spots || {}).filter(([n]) => n === "bench" || /^bench-[a-z0-9]+$/.test(n));
     }
     function benchedNow(mn) {
       const r = rec(mn);
       return !!(r && r.benched && r.benched.until > Date.now());
     }
     function benchedHere() {
-      return Object.keys(L.people).map(Number).filter((m) => benchedNow(m) && onMap(m));
+      return Object.keys(L2.people).map(Number).filter((m) => benchedNow(m) && onMap(m));
     }
     const BENCH_HOLES = { mouth: "mouth", vulva: "pussy", butt: "ass" };
     function benchHole(w) {
@@ -11674,8 +12053,8 @@
     };
     function benchWeek() {
       const k = weekKey();
-      if (!L.benchBoard || L.benchBoard.week !== k) L.benchBoard = { week: k, n: {}, by: {} };
-      return L.benchBoard;
+      if (!L2.benchBoard || L2.benchBoard.week !== k) L2.benchBoard = { week: k, n: {}, by: {} };
+      return L2.benchBoard;
     }
     function benchIn(mn, mins, by, why) {
       if (benchWhyNot(mn)) return null;
@@ -11713,7 +12092,7 @@
     }
     function benchTick() {
       const now = Date.now();
-      for (const [k, r] of Object.entries(L.people)) {
+      for (const [k, r] of Object.entries(L2.people)) {
         if (!r.benched) continue;
         const mn = parseInt(k, 10), b = r.benched;
         if (!r.benchOn && !b.trap || limitBlocks(mn, "breed")) {
@@ -11724,7 +12103,7 @@
           unbench(mn, "time");
           continue;
         }
-        const C = charFor(mn), pos = C && C.MapData && C.MapData.Pos;
+        const C2 = charFor(mn), pos = C2 && C2.MapData && C2.MapData.Pos;
         if (!pos || pos.X < 0) continue;
         if (Math.max(Math.abs(pos.X - b.X), Math.abs(pos.Y - b.Y)) > 1) {
           if (now - (b.pullAt || 0) < 3e4) continue;
@@ -11830,7 +12209,7 @@
           if (caught) {
             sp.totals.conceived = (sp.totals.conceived || 0) + 1;
             rollBoard();
-            const Y = L.yield;
+            const Y = L2.yield;
             Y.s = Y.s || {};
             Y.s[sender] = (Y.s[sender] || 0) + 1;
           }
@@ -11862,7 +12241,7 @@
       if (caught === "new") later(() => tell(t, "\u{1F37C} A warm, heavy feelin' settles low in your belly, sugar. Somethin' from the bench took. (?stats shows it)"), 2e4);
     }
     function benchText(mn) {
-      const r = rec(mn), here = Object.keys(L.people).map(Number).filter(benchedNow);
+      const r = rec(mn), here = Object.keys(L2.people).map(Number).filter(benchedNow);
       const list = here.length ? here.map((m) => "\u2022 " + plainName(m) + ": " + rec(m).benched.uses + " use" + (rec(m).benched.uses === 1 ? "" : "s") + ", " + Math.max(1, Math.ceil((rec(m).benched.until - Date.now()) / 6e4)) + " min left").join("\n") : "Nobody's on it right now.";
       const mine = r && r.benched ? "\nYou're on it: " + r.benched.uses + " use" + (r.benched.uses === 1 ? "" : "s") + " so far, " + Math.max(1, Math.ceil((r.benched.until - Date.now()) / 6e4)) + " minutes to go." : "";
       return "\u{1FAB5} THE USE BENCH\n" + list + mine + "\n\nYou're " + (r && r.benchOn ? "ON" : "off") + " for it (?bench on|off). Stand by somebody on it and ?use [mouth|pussy|ass]. ?bench top for the week.";
@@ -11874,7 +12253,7 @@
     }
     function benchBoardLine() {
       const B = benchWeek(), top = Object.entries(B.n).sort((a, b) => b[1] - a[1])[0];
-      const now = Object.keys(L.people).map(Number).filter(benchedNow);
+      const now = Object.keys(L2.people).map(Number).filter(benchedNow);
       if (!top && !now.length) return "";
       return "\n\n\u{1FAB5} Use bench" + (top ? ": most used this week, " + plainName(parseInt(top[0], 10)) + " (" + top[1] + ")" : "") + (now.length ? (top ? " \xB7 " : ": ") + "on it now, " + now.map((m) => plainName(m) + " (" + rec(m).benched.uses + ")").join(", ") : "");
     }
@@ -12027,18 +12406,18 @@
     ];
     function awayText(mn, since) {
       const r = rec(mn), out = [];
-      const book = (L.studbook || []).filter((e) => e.t >= since);
+      const book = (L2.studbook || []).filter((e) => e.t >= since);
       for (const e of book.slice(-5)) {
         const n = e.eggs || e.kids.male + e.kids.female + e.kids.futa;
         out.push("\u{1F37C} " + plainName(e.dam) + " dropped " + n + (e.eggs ? " eggs" : "") + ", bred by " + e.sires.map((s) => s > 0 ? plainName(s) : "a stranger").join(" & ") + (e.dam === mn ? ". That's you, sugar!" : "."));
       }
       if (book.length > 5) out.push("\u{1F37C} \u2026and " + (book.length - 5) + " more litters.");
-      const rl = (L.ribbonLog || []).filter((e) => e.mn === mn && e.at >= since);
+      const rl = (L2.ribbonLog || []).filter((e) => e.mn === mn && e.at >= since);
       const won = rl.filter((e) => e.n > 0).reduce((a, e) => a + e.n, 0), lost = -rl.filter((e) => e.n < 0).reduce((a, e) => a + e.n, 0);
       if (won || lost) out.push("\u{1F380} " + (won ? "+" + won + " ribbons" : "") + (won && lost ? ", " : "") + (lost ? lost + " spent or fined" : "") + ". You've got " + (r.ribbons || 0) + ".");
-      const season = L.mods && L.mods.breeding && L.mods.breeding.week;
+      const season = L2.mods && L2.mods.breeding && L2.mods.breeding.week;
       if (season && season.bred && season.bred[mn]) out.push("\u{1F525} You've been bred " + season.bred[mn] + " time" + (season.bred[mn] === 1 ? "" : "s") + " this breedin' season.");
-      const B = L.benchBoard;
+      const B = L2.benchBoard;
       if (B && B.n && B.n[mn]) out.push("\u{1FAB5} Used " + B.n[mn] + " time" + (B.n[mn] === 1 ? "" : "s") + " on the bench this week.");
       if (!out.length) return null;
       const h = Math.round((Date.now() - since) / 36e5);
@@ -12074,14 +12453,14 @@
         if (!state.arrivedAt.has(mn)) state.arrivedAt.set(mn, now);
         const at = state.arrivedAt.get(mn), r = rec(mn);
         if (now - at < CFG.LINGER_MIN * 6e4 || r && r.roles && r.roles.length) continue;
-        L.nudged = L.nudged || {};
-        if (now - (L.nudged[mn] || 0) < 7 * 864e5) continue;
+        L2.nudged = L2.nudged || {};
+        if (now - (L2.nudged[mn] || 0) < 7 * 864e5) continue;
         const said = state.lastCmd && state.lastCmd.get(mn);
-        if (said && said.at >= at || state.sessions.has(mn) || (L.applications || []).some((a) => a.mn === mn)) {
-          L.nudged[mn] = now;
+        if (said && said.at >= at || state.sessions.has(mn) || (L2.applications || []).some((a) => a.mn === mn)) {
+          L2.nudged[mn] = now;
           continue;
         }
-        L.nudged[mn] = now;
+        L2.nudged[mn] = now;
         saveLedger();
         whisper(mn, pickFresh("linger", [
           "Still just lookin', " + plainName(mn) + "? Say ?tour and I'll walk you round: the milkin' stalls, the breedin' pens, the bench. Or ?apply when you want a collar of your own.",
@@ -12097,16 +12476,16 @@
       const out = ["\u{1F4C5} TODAY ON THE FARM \xB7 " + here.length + " on the books here right now"];
       if (isRut()) out.push("\u{1F525} It's rut day: every fill is twice as likely to take.");
       const d = /* @__PURE__ */ new Date(), day = d.getDate();
-      const season = L.mods && L.mods.breeding && L.mods.breeding.week;
+      const season = L2.mods && L2.mods.breeding && L2.mods.breeding.week;
       if (ADDONS.has("breeding")) {
         if (day >= 15 && day <= 21) {
           const top2 = season && season.bred ? Object.entries(season.bred).filter(([m]) => Number(m) > 0).sort((a, b) => b[1] - a[1])[0] : null;
           out.push("\u{1F4D6} Breedin' season, night " + (day - 14) + " of 7" + (top2 ? ": " + plainName(Number(top2[0])) + " leads the stud book, bred " + top2[1] + " time" + (top2[1] === 1 ? "" : "s") : ": the stud book's still empty") + ". ?season book");
         } else if (day < 15) out.push("\u{1F4D6} Breedin' season starts in " + (15 - day) + " day" + (15 - day === 1 ? "" : "s") + " (?season on to be in it).");
       }
-      const bell = L.mods && L.mods["barn-life"] && L.mods["barn-life"].herd && L.mods["barn-life"].herd.bell;
+      const bell = L2.mods && L2.mods["barn-life"] && L2.mods["barn-life"].herd && L2.mods["barn-life"].herd.bell;
       if (ADDONS.has("barn-life") && !(bell && bell.off)) out.push("\u{1F514} Evenin' turn-out at " + (bell && bell.hour !== void 0 ? bell.hour : 19) + ":00, out in the pasture. A ribbon for comin'.");
-      if (L.life && L.life.feedingOn) out.push("\u{1F33E} Feedin' time at " + CFG.FEED_HOURS.map((h) => h + ":00").join(" and ") + ".");
+      if (L2.life && L2.life.feedingOn) out.push("\u{1F33E} Feedin' time at " + CFG.FEED_HOURS.map((h) => h + ":00").join(" and ") + ".");
       const heat = here.filter((m) => {
         const p = prodOf(m);
         return inHeat(p) && !p.heat.quiet;
@@ -12125,13 +12504,13 @@
       });
       if (due.length) out.push("\u{1F37C} Due any time: " + names(due) + ".");
       rollBoard();
-      const top = Object.entries(L.yield && L.yield.d || {}).sort((a, b) => b[1] - a[1])[0];
+      const top = Object.entries(L2.yield && L2.yield.d || {}).sort((a, b) => b[1] - a[1])[0];
       if (top) out.push("\u{1F3C6} Top of today's milk board: " + plainName(parseInt(top[0], 10)) + ", " + ml(top[1]) + ". ?board");
-      const F = L.life && L.life.fair;
+      const F = L2.life && L2.life.fair;
       if (F && F.open) out.push("\u{1F3AA} The fair's open. ?fair");
       const r = rec(mn);
       if (r && r.dare) out.push("\u{1F3B2} You've got a dare waitin': ?dare");
-      if (L.notice && L.notice.text) out.push("\u{1F4CC} " + L.notice.text);
+      if (L2.notice && L2.notice.text) out.push("\u{1F4CC} " + L2.notice.text);
       if (out.length === 1) out.push("A quiet one so far, sugar. ?help me shows everything there is to do.");
       return out.join("\n");
     }
@@ -12152,7 +12531,7 @@
       [/^(pasture|turnout)/, ["\u{1F514} What happens here: evenin' turn-out. The bell rings, the herd comes out together, and everybody who shows gets a ribbon."]]
     ];
     function tourShow(stop) {
-      for (const [name, s] of Object.entries(L.spots || {})) {
+      for (const [name, s] of Object.entries(L2.spots || {})) {
         if (Math.max(Math.abs(s.X - stop.X), Math.abs(s.Y - stop.Y)) > 2) continue;
         const hit = TOUR_SHOW.find(([re]) => re.test(name));
         if (hit) return hit[1][Math.floor(Math.random() * hit[1].length)];
@@ -12176,7 +12555,7 @@
         if (bs) out.push({ icon: "\u{1F930}", text: "Belly: " + BELLY[bs] });
       }
       if (quietNow(mn)) out.push({ icon: "\u{1F92B}", text: "Quiet", until: r.quietUntil });
-      if (huntOn() && isSubject(mn)) out.push({ icon: "\u{1F514}", text: "The hunt: get to " + L.hunt.goal, until: L.hunt.until });
+      if (huntOn() && isSubject(mn)) out.push({ icon: "\u{1F514}", text: "The hunt: get to " + L2.hunt.goal, until: L2.hunt.until });
       if (p.milkDeniedUntil > now) out.push({ icon: "\u{1F6AB}", text: "Teats capped", until: p.milkDeniedUntil });
       if (p.pentUp) out.push({ icon: "\u{1F624}", text: "Pent up" });
       if (r.dare && r.dare.until > now) out.push({ icon: "\u{1F3B2}", text: "Dare", until: r.dare.until });
@@ -12208,18 +12587,18 @@
       }
       const line = a[a.length - 1], why = String(rest || "").trim();
       const list = fbLedger();
-      const f = { id: ++L.fbSeq, t: Date.now(), mn: sender, name: plainName(sender), kind: cmd, text: line.slice(0, CFG.FEEDBACK_MAX), why: why.slice(0, 300), status: "open", where: channelNote(sender) };
+      const f = { id: ++L2.fbSeq, t: Date.now(), mn: sender, name: plainName(sender), kind: cmd, text: line.slice(0, CFG.FEEDBACK_MAX), why: why.slice(0, 300), status: "open", where: channelNote(sender) };
       list.push(f);
-      if (list.length > 1e3) L.feedback = list.slice(-1e3);
+      if (list.length > 1e3) L2.feedback = list.slice(-1e3);
       saveLedger();
       audit(sender, "LINE_" + cmd.toUpperCase(), "#" + f.id);
       R(cmd === "more" ? "\u2764\uFE0F Noted, sugar: more like that one. The proprietors get it word for word." : "\u{1F44E} Noted, sugar: that one's off. The proprietors get it word for word" + (why ? ", with your why" : "") + ", and it'll get fixed.");
     }
     const FB_STATUS = { open: "open", done: "done \u2705", later: "later \u23F3", no: "not this time" };
     function fbLedger() {
-      L.feedback = L.feedback || [];
-      L.fbSeq = L.fbSeq || 0;
-      return L.feedback;
+      L2.feedback = L2.feedback || [];
+      L2.fbSeq = L2.fbSeq || 0;
+      return L2.feedback;
     }
     function fbLine(f, full) {
       const d = new Date(f.t), when = d.getMonth() + 1 + "/" + d.getDate();
@@ -12242,9 +12621,9 @@
         R("You've sent " + today + " today already, sugar. Thank you! The proprietors will get to 'em. Try again tomorrow.");
         return;
       }
-      const f = { id: ++L.fbSeq, t: Date.now(), mn: sender, name: plainName(sender), kind, text: text.slice(0, CFG.FEEDBACK_MAX), status: "open", where: channelNote(sender) };
+      const f = { id: ++L2.fbSeq, t: Date.now(), mn: sender, name: plainName(sender), kind, text: text.slice(0, CFG.FEEDBACK_MAX), status: "open", where: channelNote(sender) };
       list.push(f);
-      if (list.length > 1e3) L.feedback = list.slice(-1e3);
+      if (list.length > 1e3) L2.feedback = list.slice(-1e3);
       saveLedger();
       audit(sender, "FEEDBACK", "#" + f.id + " " + kind);
       R(FB_KINDS[kind] + " Thank you, " + plainName(sender) + "! That's #" + f.id + " in the suggestion box. The proprietors read every one, and I'll tell you when somethin' comes of it. (?feedback mine to see yours)");
@@ -12287,7 +12666,7 @@
         return;
       }
       if (sub === "del" || sub === "delete") {
-        L.feedback = list.filter((x) => x !== f);
+        L2.feedback = list.filter((x) => x !== f);
         saveLedger();
         audit(sender, "FEEDBACK_DEL", "#" + id);
         R("\u{1F5D1}\uFE0F #" + id + " is out of the box.");
@@ -12321,9 +12700,9 @@
       [/demon|devil|succubus/i, "devil"]
     ];
     function tailOf(mn) {
-      const C = charFor(mn);
-      if (!C || !Array.isArray(C.Appearance)) return null;
-      const items = C.Appearance.filter((x) => x && x.Asset && x.Asset.Group);
+      const C2 = charFor(mn);
+      if (!C2 || !Array.isArray(C2.Appearance)) return null;
+      const items = C2.Appearance.filter((x) => x && x.Asset && x.Asset.Group);
       const plug = items.find((x) => x.Asset.Group.Name === "ItemButt" && /tail/i.test(x.Asset.Name));
       const strap = items.find((x) => x.Asset.Group.Name === "TailStraps");
       const it = plug || strap;
@@ -12383,7 +12762,7 @@
     }
     function hasSignedContract(mn) {
       contractsLedger();
-      return L.contracts.some((x) => x.mn === mn && x.status === "signed" && (!x.until || x.until > Date.now()));
+      return L2.contracts.some((x) => x.mn === mn && x.status === "signed" && (!x.until || x.until > Date.now()));
     }
     function contractSignedNow(mn) {
       const r = rec(mn);
@@ -12411,7 +12790,7 @@
       if (now - (state.cwAt || 0) < 6e4) return;
       state.cwAt = now;
       contractsLedger();
-      for (const x of L.contracts) {
+      for (const x of L2.contracts) {
         if (x.status === "signed" && x.until && x.until <= now) {
           x.status = "ended";
           x.endedAt = now;
@@ -12419,7 +12798,7 @@
           contractEndedNow(x.mn);
         }
       }
-      for (const [k, r] of Object.entries(L.people)) {
+      for (const [k, r] of Object.entries(L2.people)) {
         if (!r.contractBy) continue;
         const mn = parseInt(k, 10);
         if (hasSignedContract(mn) || r.contractSigned) {
@@ -12449,12 +12828,12 @@
         saveLedger();
         return;
       }
-      for (const k in L.people) {
-        const p = L.people[k];
+      for (const k in L2.people) {
+        const p = L2.people[k];
         if ((p.herds || []).some((h) => h.leader === mn)) p.herds = p.herds.filter((h) => h.leader !== mn);
       }
-      L.archive[mn] = JSON.parse(JSON.stringify(r));
-      delete L.people[mn];
+      L2.archive[mn] = JSON.parse(JSON.stringify(r));
+      delete L2.people[mn];
       saveLedger();
       audit(CFG.BOT_MEMBER, "UNREGISTER", mn + " (no contract within " + CFG.CONTRACT_GRACE_H + "h)");
       try {
@@ -12502,10 +12881,10 @@
       return m[1] && TRAP_KINDS[m[1]] ? m[1] : "random";
     }
     function trapSpots() {
-      return Object.entries(L.spots || {}).filter(([n]) => trapKindOf(n));
+      return Object.entries(L2.spots || {}).filter(([n]) => trapKindOf(n));
     }
     function waterSpots() {
-      return Object.entries(L.spots || {}).filter(([n]) => (WATER_SPOT.test(n) || /^trough/.test(n)) && !trapKindOf(n));
+      return Object.entries(L2.spots || {}).filter(([n]) => (WATER_SPOT.test(n) || /^trough/.test(n)) && !trapKindOf(n));
     }
     function trapWhyNot(mn, kind) {
       const r = rec(mn), K = TRAP_KINDS[kind];
@@ -12726,7 +13105,7 @@
       tell(mn, TRAP_KINDS[kind].icon + " You've sprung a trap, sugar: " + TRAP_KINDS[kind].what + ". Your safeword stops it cold.");
       face(mn, kind === "lantern" ? "trance" : "edged", 60);
       {
-        const snd = TRAP_SOUND[kind] || L.customTraps && L.customTraps[kind] && CUSTOM_SOUND[L.customTraps[kind].does];
+        const snd = TRAP_SOUND[kind] || L2.customTraps && L2.customTraps[kind] && CUSTOM_SOUND[L2.customTraps[kind].does];
         if (snd) sound(mn, snd);
       }
       if (variantTrap(mn, kind, spot)) {
@@ -12736,7 +13115,7 @@
       }
       switch (kind) {
         case "injector": {
-          const loaded = L.trapLoads && spot && L.trapLoads[spot];
+          const loaded = L2.trapLoads && spot && L2.trapLoads[spot];
           const pool = INJECTOR_LOADS.filter((t) => (!/lactation|udder/.test(t) || makesMilk(mn)) && (!/virility/.test(t) || makesSemen(mn)) && (!/heat/.test(t) || !limitBlocks(mn, "heat")) && (!/egg/.test(t) || !limitBlocks(mn, "eggs")) && (!/fertil|hyper/.test(t) || !limitBlocks(mn, "breed")));
           const text = loaded || pool[Math.floor(Math.random() * pool.length)] || "ass growth";
           trapHold(mn, 2, "the injector post");
@@ -12916,8 +13295,8 @@
     function trapTick() {
       const now = Date.now();
       state.trapAt = state.trapAt || /* @__PURE__ */ new Map();
-      for (const C of W.ChatRoomCharacter || []) {
-        const mn = C.MemberNumber;
+      for (const C2 of W.ChatRoomCharacter || []) {
+        const mn = C2.MemberNumber;
         if (mn === BOTMN() || !isSubject(mn)) continue;
         const r = rec(mn);
         const on = trapSpots().find(([n]) => onSpot(mn, n, 0)), wet = !on && waterSpots().find(([n]) => onSpot(mn, n, 1));
@@ -12980,13 +13359,13 @@
     }
     function toyTick() {
       const now = Date.now();
-      for (const C of W.ChatRoomCharacter || []) {
-        const mn = C.MemberNumber, r = rec(mn);
-        if (mn === BOTMN() || !r || !r.roles || !r.roles.length || !Array.isArray(C.Appearance)) continue;
+      for (const C2 of W.ChatRoomCharacter || []) {
+        const mn = C2.MemberNumber, r = rec(mn);
+        if (mn === BOTMN() || !r || !r.roles || !r.roles.length || !Array.isArray(C2.Appearance)) continue;
         if ((r.trapQuiet || 0) > now && isSubject(mn) || quietNow(mn)) continue;
         const p = prodOf(mn);
         p.toyAt = p.toyAt || {};
-        for (const it of C.Appearance) {
+        for (const it of C2.Appearance) {
           if (!it || !it.Craft || !it.Asset || !it.Asset.Group) continue;
           const g = it.Asset.Group.Name, text = craftText(it), key = g + ":" + (it.Craft.Name || it.Asset.Name);
           if (!text || !/^Item/.test(g)) continue;
@@ -13110,7 +13489,7 @@
       }
       if (cmd === "subject" || cmd === "subjects") {
         if (isProprietor(sender) && (!a0 || a0 === "list")) {
-          const subs = Object.values(L.people).filter((x) => isSubject(x.mn));
+          const subs = Object.values(L2.people).filter((x) => isSubject(x.mn));
           R(subs.length ? "\u{1F9EA} TRAPS SWITCHED ON\n" + subs.map((x) => "\u2022 " + plainName(x.mn) + " (" + x.mn + ")" + (charFor(x.mn) ? " \u25CF" : "") + " \xB7 traps sprung: " + (x.trapN || 0) + (x.tentacled ? " \xB7 taken by the water: " + x.tentacled : "")).join("\n") : "\u{1F9EA} Nobody's got their traps switched on right now, sugar.");
           return true;
         }
@@ -13178,21 +13557,21 @@
             return true;
           }
           const spot = String(args[1] || "").toLowerCase(), n = parseInt(args[2], 10);
-          if (!L.spots || !L.spots[spot] || !trapKindOf(spot)) {
+          if (!L2.spots || !L2.spots[spot] || !trapKindOf(spot)) {
             R("Which trap, sugar? ?trap bait <spot> <ribbons>, like ?trap bait trap-wolves 3. ?trap bait <spot> 0 takes it back.");
             return true;
           }
-          L.trapBait = L.trapBait || {};
+          L2.trapBait = L2.trapBait || {};
           if (!(n > 0)) {
-            delete L.trapBait[spot];
+            delete L2.trapBait[spot];
             saveLedger();
             R("\u{1F380} Bait taken off " + spot + ".");
             return true;
           }
-          L.trapBait[spot] = Math.min(10, n);
+          L2.trapBait[spot] = Math.min(10, n);
           saveLedger();
-          audit(sender, "TRAPBAIT", spot + " " + L.trapBait[spot]);
-          R("\u{1F380} " + spot + " is baited with " + L.trapBait[spot] + " ribbon" + (L.trapBait[spot] === 1 ? "" : "s") + ". The next subject it catches gets paid for it.");
+          audit(sender, "TRAPBAIT", spot + " " + L2.trapBait[spot]);
+          R("\u{1F380} " + spot + " is baited with " + L2.trapBait[spot] + " ribbon" + (L2.trapBait[spot] === 1 ? "" : "s") + ". The next subject it catches gets paid for it.");
           return true;
         }
         if (a0 === "load") {
@@ -13201,13 +13580,13 @@
             return true;
           }
           const spot = String(args[1] || "").toLowerCase(), words = args.slice(2).join(" ").trim();
-          if (!L.spots || !L.spots[spot] || !trapKindOf(spot)) {
+          if (!L2.spots || !L2.spots[spot] || !trapKindOf(spot)) {
             R("Which trap, sugar? ?trap load <spot> <words>, like ?trap load trap-injector lactation x3. ?trap load <spot> empty goes back to pot luck.");
             return true;
           }
-          L.trapLoads = L.trapLoads || {};
+          L2.trapLoads = L2.trapLoads || {};
           if (!words || /^(empty|none|clear|random)$/i.test(words)) {
-            delete L.trapLoads[spot];
+            delete L2.trapLoads[spot];
             saveLedger();
             R("\u{1F489} " + spot + " is back to pot luck.");
             return true;
@@ -13215,7 +13594,7 @@
           {
             const vk = trapKindOf(spot), pl = VARIANTS[vk] ? parseTrapLoad(vk, words) : null;
             if (pl) {
-              L.trapLoads[spot] = words.slice(0, 80).toLowerCase();
+              L2.trapLoads[spot] = words.slice(0, 80).toLowerCase();
               saveLedger();
               audit(sender, "TRAPLOAD", spot + " " + words);
               R("\u{1F9EA} " + spot + " is set: " + (pl.variant || "any kind") + ", " + (pl.sev ? SEVERITY[pl.sev].name : "any strength") + ".");
@@ -13231,7 +13610,7 @@
             R("I can't find a shot word in that, sugar. It takes the same words a crafted needle does: lactation, virility, fertility, heat inducer, egg laying, hyper pregnancy, mpreg, udder growth\u2026 and x2 to x5 on the end for a stronger dose.");
             return true;
           }
-          L.trapLoads[spot] = words.slice(0, 80).toLowerCase();
+          L2.trapLoads[spot] = words.slice(0, 80).toLowerCase();
           saveLedger();
           audit(sender, "TRAPLOAD", spot + " " + words);
           R("\u{1F489} " + spot + " is loaded: " + tg.join(", ") + (shotTimes(words) > 1 ? ", " + shotTimes(words) + " doses at once" : "") + ".");
@@ -13263,7 +13642,7 @@
         }
         const spots = trapSpots(), water = waterSpots();
         if (isStaff(sender))
-          R("\u{1F9EA} TRAPS (they spring for whoever has ?traps on, and nobody else)\n" + trapsList() + "\n\nSet one: stand on the spot and say ?spot set trap-<kind> (trap-milker-2 for a second one; plain ?spot set trap springs pot luck).\nOut there now: " + (spots.length ? spots.map(([n]) => n + (L.trapLoads && L.trapLoads[n] ? " [" + L.trapLoads[n] + "]" : "")).join(", ") : "none yet") + "\nWater the thing lives in: " + (water.length ? water.map(([n]) => n).join(", ") : "none yet (?spot set pond, pool, creek, water, well, bath\u2026)") + "\n?trap load <spot> <words> \xB7 ?trap bait <spot> <ribbons> \xB7 ?trap spring <who> <kind> \xB7 ?subject for who has them on\n?trap make <name> <what it does>\u2026 builds one of your own (?trap made) \xB7 ?whistle <which> <who> calls one of the farm's own to them\n?hunt start [minutes] \xB7 ?pack on|off \xB7 nest spots (?spot set nest) and ?gather \xB7 crate spots (?spot set crate)");
+          R("\u{1F9EA} TRAPS (they spring for whoever has ?traps on, and nobody else)\n" + trapsList() + "\n\nSet one: stand on the spot and say ?spot set trap-<kind> (trap-milker-2 for a second one; plain ?spot set trap springs pot luck).\nOut there now: " + (spots.length ? spots.map(([n]) => n + (L2.trapLoads && L2.trapLoads[n] ? " [" + L2.trapLoads[n] + "]" : "")).join(", ") : "none yet") + "\nWater the thing lives in: " + (water.length ? water.map(([n]) => n).join(", ") : "none yet (?spot set pond, pool, creek, water, well, bath\u2026)") + "\n?trap load <spot> <words> \xB7 ?trap bait <spot> <ribbons> \xB7 ?trap spring <who> <kind> \xB7 ?subject for who has them on\n?trap make <name> <what it does>\u2026 builds one of your own (?trap made) \xB7 ?whistle <which> <who> calls one of the farm's own to them\n?hunt start [minutes] \xB7 ?pack on|off \xB7 nest spots (?spot set nest) and ?gather \xB7 crate spots (?spot set crate)");
         else if (isSubject(sender))
           R("\u{1F9EA} WHAT'S OUT THERE FOR YOU\n" + trapsList() + "\n\nThere are " + spots.length + " trap" + (spots.length === 1 ? "" : "s") + " hidden on the farm" + (water.length ? ", and somethin' lives in the water" : "") + ". I'm not tellin' you where.\n?struggle when one has you (one try) \xB7 ?traps eager on skips the waits \xB7 ?traps off switches them off \xB7 ?traps skip <kind> rules one out" + ((r.trapSkip || []).length ? " (you skip: " + r.trapSkip.join(", ") + ")" : "") + " \xB7 your safeword stops one cold.");
         else R("\u{1F9EA} Your traps are off, sugar, so you can walk right over 'em. ?traps on and every trap on the farm springs for you (your limits and your safeword still rule). Here's what's out there:\n" + trapsList());
@@ -14479,7 +14858,7 @@
     }
     function moreTrapTick() {
       const now = Date.now();
-      for (const [k, r] of Object.entries(L.people)) {
+      for (const [k, r] of Object.entries(L2.people)) {
         const w = r.trapWait;
         if (!w) continue;
         const mn = parseInt(k, 10);
@@ -15005,7 +15384,7 @@
     });
     function newTrapTick() {
       const now = Date.now();
-      for (const [k, r] of Object.entries(L.people)) {
+      for (const [k, r] of Object.entries(L2.people)) {
         const b = r.belled;
         if (!b) continue;
         const mn = parseInt(k, 10);
@@ -15575,7 +15954,7 @@
         const q = posOf(o);
         return !!q && Math.max(Math.abs(q.X - p.X), Math.abs(q.Y - p.Y)) <= 6;
       };
-      return Object.keys(L.people).map(Number).find((o) => o !== mn && canWrestle(o) && near2(o)) || null;
+      return Object.keys(L2.people).map(Number).find((o) => o !== mn && canWrestle(o) && near2(o)) || null;
     }
     Object.assign(TRAP_NEEDS, {
       collection: (mn) => makesSemen(mn) ? null : "no cock to collect from",
@@ -15597,7 +15976,7 @@
         });
       },
       maze(mn) {
-        const start = L.spots && L.spots["maze-start"], exit = L.spots && L.spots["maze-exit"];
+        const start = L2.spots && L2.spots["maze-start"], exit = L2.spots && L2.spots["maze-exit"];
         if (start && exit) {
           trapRun(mn, "maze", TRAPS3_LINES.maze.lost, () => {
             teleport(mn, start, true);
@@ -15733,8 +16112,8 @@
       }
     });
     function mazeTick() {
-      const now = Date.now(), exit = L.spots && L.spots["maze-exit"];
-      for (const [k, r] of Object.entries(L.people)) {
+      const now = Date.now(), exit = L2.spots && L2.spots["maze-exit"];
+      for (const [k, r] of Object.entries(L2.people)) {
         const z = r.maze;
         if (!z) continue;
         const mn = parseInt(k, 10);
@@ -16460,10 +16839,10 @@
         if (th) return th;
       }
       if (!/^trap(?:-\d+)?$/.test(name)) return null;
-      const at = L.spots && L.spots[name];
+      const at = L2.spots && L2.spots[name];
       if (!at) return null;
       let best = null, bestD = 11;
-      for (const [n, p] of Object.entries(L.spots || {})) {
+      for (const [n, p] of Object.entries(L2.spots || {})) {
         if (/^trap/.test(n) || !p) continue;
         const d = Math.max(Math.abs(p.X - at.X), Math.abs(p.Y - at.Y));
         if (d >= bestD) continue;
@@ -19913,7 +20292,7 @@
       } catch (e) {
         warn("parasite world:", e);
       }
-      for (const [k, r] of Object.entries(L.people)) {
+      for (const [k, r] of Object.entries(L2.people)) {
         if (r.crave && r.crave.until <= now) {
           r.crave = null;
           saveLedger();
@@ -19921,7 +20300,7 @@
         }
         if (r.parasite || r.crave) craveTick(parseInt(k, 10), r, now);
       }
-      for (const [k, r] of Object.entries(L.people)) {
+      for (const [k, r] of Object.entries(L2.people)) {
         if (!r.parasite) continue;
         const mn = parseInt(k, 10);
         if (r.parasite.until <= now) {
@@ -20210,7 +20589,7 @@
         arouse(mn, 40, 94);
         saveLedger();
         syncCompanions(true);
-      } else if (g.urge && g.urge.kind === "glory" && Object.keys(L.spots || {}).some((n) => /^glory-\d+$/.test(n) && onSpot(mn, n, 0))) parasiteUrgeDone(mn, "glory");
+      } else if (g.urge && g.urge.kind === "glory" && Object.keys(L2.spots || {}).some((n) => /^glory-\d+$/.test(n) && onSpot(mn, n, 0))) parasiteUrgeDone(mn, "glory");
       else if (g.urge && g.urge.kind === "nest" && nestSpots().some((n) => onSpot(mn, n, 0))) parasiteUrgeDone(mn, "nest");
       else if (g.urge && g.urge.kind === "kneel" && kneelingNow(mn)) {
         g.urge.knelt = (g.urge.knelt || 0) + 1;
@@ -20232,7 +20611,7 @@
     const STRAIN_URGES = { breeder: ["bred", "kiss", "nest"], grower: ["swallow", "milked", "glory"], glutton: ["milked", "swallow", "glory"], tyrant: ["kneel", "beg", "kiss"] };
     const URGE_MINS = { swallow: 15, bred: 15, milked: 15, nest: 10, glory: 10, kiss: 10, kneel: 10, beg: 10 };
     function urgeKinds(mn, g, P) {
-      const glory = Object.keys(L.spots || {}).some((n) => /^glory-\d+$/.test(n));
+      const glory = Object.keys(L2.spots || {}).some((n) => /^glory-\d+$/.test(n));
       return (STRAIN_URGES[strainKey(g)] || ["kiss", "swallow", "glory"]).filter((k) => k === "swallow" ? !!P.lips && !holeBlocked(mn, "mouth") : k === "glory" ? glory : k === "nest" ? nestSpots().length > 0 : k === "bred" ? !limitBlocks(mn, "breed") : k === "milked" ? makesMilk(mn) && !limitBlocks(mn, "milk") || makesSemen(mn) : true);
     }
     function urgeAsk(mn, kind) {
@@ -20249,9 +20628,9 @@
       }[kind] || "do as it says";
     }
     function kneelingNow(mn) {
-      const C = charFor(mn);
-      if (!C) return false;
-      const a = [].concat(C.ActivePose || [], C.Pose || []);
+      const C2 = charFor(mn);
+      if (!C2) return false;
+      const a = [].concat(C2.ActivePose || [], C2.Pose || []);
       return a.some((p) => /^(Kneel|KneelingSpread|AllFours)$/.test(String(p)));
     }
     const BEG_WORDS = /\b(please|plea+se|beg|begging|beggin'?|pretty please|i need (it|you|this|to)|let me cum|need to cum|have mercy|mercy)\b/i;
@@ -20317,7 +20696,7 @@
       }
     }
     function parasiteWorldTick(now) {
-      for (const [k, r] of Object.entries(L.people)) {
+      for (const [k, r] of Object.entries(L2.people)) {
         if (!r.parasiteSeed || now < r.parasiteSeed) continue;
         const mn = parseInt(k, 10);
         if (!charFor(mn)) continue;
@@ -20329,12 +20708,12 @@
         emote("\u{1F444} " + pmLine("regrow", mn), mn);
         parasiteLatch(mn, "grew back");
       }
-      if (L.nestBrood > 0) {
-        for (const C of W.ChatRoomCharacter || []) {
-          const mn = C.MemberNumber, r = rec(mn);
+      if (L2.nestBrood > 0) {
+        for (const C2 of W.ChatRoomCharacter || []) {
+          const mn = C2.MemberNumber, r = rec(mn);
           if (mn === CFG.BOT_MEMBER || !r || !r.parasiteOn || parasiteOn(mn) || (r.parasiteNext || 0) > now || /\bparasit/i.test(r.limits || "")) continue;
           if (!nestSpots().some((n) => onSpot(mn, n, 0))) continue;
-          L.nestBrood--;
+          L2.nestBrood--;
           saveLedger();
           emote("\u{1F95A} " + pmLine("hatch", mn), mn);
           later(() => {
@@ -20802,7 +21181,7 @@
     }
     function symbioteTick() {
       const now = Date.now();
-      for (const [key, r] of Object.entries(L.people)) {
+      for (const [key, r] of Object.entries(L2.people)) {
         const g = r.symbiote;
         if (!g) continue;
         const mn = parseInt(key, 10), S = SYMBIOTES[g.kind];
@@ -20880,7 +21259,7 @@
         return true;
       }
       if (a0 === "take") {
-        const spot = Object.keys(L.spots || {}).find((n) => /^symbiote-/.test(n) && onSpot(sender, n, 1));
+        const spot = Object.keys(L2.spots || {}).find((n) => /^symbiote-/.test(n) && onSpot(sender, n, 1));
         if (!spot) {
           R("You'd need to be standin' at one of the farm's symbiote spots, sugar (symbiote-latex, symbiote-moss, symbiote-nestling).");
           return true;
@@ -22699,24 +23078,24 @@
     const xLine = (key, mn, v) => tFill(pickFor(mn, "trapx:" + key, EXTRA_LINES[key]), mn, v);
     function subjWeek() {
       const k = weekKey();
-      if (!L.subjWeek || L.subjWeek.week !== k) L.subjWeek = { week: k, traps: {}, eggs: {}, fur: {} };
-      return L.subjWeek;
+      if (!L2.subjWeek || L2.subjWeek.week !== k) L2.subjWeek = { week: k, traps: {}, eggs: {}, fur: {} };
+      return L2.subjWeek;
     }
     const bump1 = (o, mn, n) => {
       o[mn] = (o[mn] || 0) + (n || 1);
     };
     const nightX = () => inCurfew() ? { reset: 0.5, water: 3 } : { reset: 1, water: 1 };
     function huntOn() {
-      return !!(L.hunt && L.hunt.until > Date.now());
+      return !!(L2.hunt && L2.hunt.until > Date.now());
     }
     function trapSprung(mn, kind, spot) {
       const r = rec(mn);
       r.trapKinds = r.trapKinds || {};
       r.trapKinds[kind] = (r.trapKinds[kind] || 0) + 1;
       bump1(subjWeek().traps, mn);
-      if (spot && L.trapBait && L.trapBait[spot]) {
-        const n = L.trapBait[spot];
-        delete L.trapBait[spot];
+      if (spot && L2.trapBait && L2.trapBait[spot]) {
+        const n = L2.trapBait[spot];
+        delete L2.trapBait[spot];
         later(() => earnRibbons(mn, n, "takin' the bait"), 3e3);
       }
     }
@@ -22787,8 +23166,8 @@
     function smellTick(now) {
       if (now - (state.smellAt || 0) < CFG.SMELL_MIN * 6e4) return;
       state.smellAt = now;
-      for (const C of W.ChatRoomCharacter || []) {
-        const mn = C.MemberNumber, d = (rec(mn) || {}).dirt;
+      for (const C2 of W.ChatRoomCharacter || []) {
+        const mn = C2.MemberNumber, d = (rec(mn) || {}).dirt;
         if (!d || !(d.mud || d.slime || d.piss || d.reek)) continue;
         const near2 = (W.ChatRoomCharacter || []).map((c) => c.MemberNumber).filter((m) => m !== mn && m !== CFG.BOT_MEMBER && rec(m) && (() => {
           const a = posOf(mn), b = posOf(m);
@@ -22893,15 +23272,15 @@
           R("There's a hunt on already, sugar. ?hunt stop ends it.");
           return;
         }
-        const goals = Object.keys(L.spots || {}).filter((n) => n === "hunt-goal" || HUNT_GOALS.test(n));
-        const goal = (L.spots || {})["hunt-goal"] ? "hunt-goal" : goals[Math.floor(Math.random() * goals.length)];
+        const goals = Object.keys(L2.spots || {}).filter((n) => n === "hunt-goal" || HUNT_GOALS.test(n));
+        const goal = (L2.spots || {})["hunt-goal"] ? "hunt-goal" : goals[Math.floor(Math.random() * goals.length)];
         if (!goal) {
           R("I need somewhere to finish, sugar: ?spot set hunt-goal (or a pasture, barn or trough spot).");
           return;
         }
         const mins = Math.max(5, Math.min(60, parseInt(args[1], 10) || CFG.HUNT_MIN));
-        L.hunt = { id: Date.now(), until: Date.now() + mins * 6e4, goal, by: sender, done: [] };
-        for (const r of Object.values(L.people)) if (isSubject(r.mn)) {
+        L2.hunt = { id: Date.now(), until: Date.now() + mins * 6e4, goal, by: sender, done: [] };
+        for (const r of Object.values(L2.people)) if (isSubject(r.mn)) {
           r.trapAt = 0;
           r.spotTrapAt = {};
         }
@@ -22924,24 +23303,24 @@
         R("\u{1F514} Hunt called off.");
         return;
       }
-      R(huntOn() ? "\u{1F514} The hunt's on for " + Math.ceil((L.hunt.until - Date.now()) / 6e4) + " more minutes. Finish: " + L.hunt.goal + ". Made it so far: " + (L.hunt.done.length ? L.hunt.done.map(plainName).join(", ") : "nobody") + "." : "\u{1F514} No hunt right now." + (isProprietor(sender) ? " ?hunt start [minutes] rings the bell." : ""));
+      R(huntOn() ? "\u{1F514} The hunt's on for " + Math.ceil((L2.hunt.until - Date.now()) / 6e4) + " more minutes. Finish: " + L2.hunt.goal + ". Made it so far: " + (L2.hunt.done.length ? L2.hunt.done.map(plainName).join(", ") : "nobody") + "." : "\u{1F514} No hunt right now." + (isProprietor(sender) ? " ?hunt start [minutes] rings the bell." : ""));
     }
     function huntEnd() {
-      const h = L.hunt;
+      const h = L2.hunt;
       if (!h) return;
-      L.hunt = null;
+      L2.hunt = null;
       saveLedger();
       announce("\u{1F514} The hunt's over. " + (h.done.length ? "Made it through: " + h.done.map(plainName).join(", ") + "." : "Not one subject made it to the finish. The traps had a fine day."));
     }
     function huntTick(now) {
-      const h = L.hunt;
+      const h = L2.hunt;
       if (!h) return;
       if (h.until <= now) {
         huntEnd();
         return;
       }
-      for (const C of W.ChatRoomCharacter || []) {
-        const mn = C.MemberNumber;
+      for (const C2 of W.ChatRoomCharacter || []) {
+        const mn = C2.MemberNumber;
         if (!isSubject(mn) || h.done.includes(mn) || heldByTrap(mn) || !onSpot(mn, h.goal, 1)) continue;
         h.done.push(mn);
         saveLedger();
@@ -22951,22 +23330,22 @@
     }
     const PACK_AVOID = /^(safe|rescue|summon|staff|speaker|glory|milking|bench|pen|stocks|trap|nest|crate|hunt)/;
     function packOn() {
-      return L.packOn !== false && trapSpots().some(([n]) => /^trap-wolves/.test(n));
+      return L2.packOn !== false && trapSpots().some(([n]) => /^trap-wolves/.test(n));
     }
     function packTick(now) {
       if (!packOn()) return;
       const subjectsHere = (W.ChatRoomCharacter || []).map((c) => c.MemberNumber).filter(isSubject);
-      if (!L.pack || now - L.pack.at > CFG.PACK_MOVE_MIN * 6e4) {
-        const spots = Object.keys(L.spots || {}).filter((n) => !PACK_AVOID.test(n) && !WATER_SPOT.test(n));
+      if (!L2.pack || now - L2.pack.at > CFG.PACK_MOVE_MIN * 6e4) {
+        const spots = Object.keys(L2.spots || {}).filter((n) => !PACK_AVOID.test(n) && !WATER_SPOT.test(n));
         if (!spots.length) return;
-        L.pack = { spot: spots[Math.floor(Math.random() * spots.length)], at: now };
+        L2.pack = { spot: spots[Math.floor(Math.random() * spots.length)], at: now };
         saveLedger();
-        for (const mn of subjectsHere) if (!trapWhyNot(mn, "wolves") || heldByTrap(mn)) tell(mn, "\u{1F43A} " + xLine("packHeard", mn, { c: L.pack.spot.replace(/-?\d+$/, "") }));
+        for (const mn of subjectsHere) if (!trapWhyNot(mn, "wolves") || heldByTrap(mn)) tell(mn, "\u{1F43A} " + xLine("packHeard", mn, { c: L2.pack.spot.replace(/-?\d+$/, "") }));
       }
       for (const mn of subjectsHere) {
         const r = rec(mn);
-        if (!onSpot(mn, L.pack.spot, 1) || !huntOn() && now - (r.trapAt || 0) < CFG.TRAP_COOLDOWN_MIN * 6e4 || now - (r.packAt || 0) < 30 * 6e4) continue;
-        if (!springTrap(mn, "wolves", L.pack.spot)) {
+        if (!onSpot(mn, L2.pack.spot, 1) || !huntOn() && now - (r.trapAt || 0) < CFG.TRAP_COOLDOWN_MIN * 6e4 || now - (r.packAt || 0) < 30 * 6e4) continue;
+        if (!springTrap(mn, "wolves", L2.pack.spot)) {
           r.trapAt = now;
           r.packAt = now;
           saveLedger();
@@ -22974,17 +23353,17 @@
       }
     }
     function crateTick(now) {
-      const crates = Object.keys(L.spots || {}).filter((n) => n === "crate" || /^crate-[a-z0-9]+$/.test(n));
+      const crates = Object.keys(L2.spots || {}).filter((n) => n === "crate" || /^crate-[a-z0-9]+$/.test(n));
       if (!crates.length) return;
-      L.crateAt = L.crateAt || {};
-      for (const C of W.ChatRoomCharacter || []) {
-        const mn = C.MemberNumber;
+      L2.crateAt = L2.crateAt || {};
+      for (const C2 of W.ChatRoomCharacter || []) {
+        const mn = C2.MemberNumber;
         if (!isSubject(mn) || heldByTrap(mn)) continue;
         const r = rec(mn);
         if (r.trapsOff || (r.trapQuiet || 0) > now) continue;
         const c = crates.find((n) => onSpot(mn, n, 0));
-        if (!c || now - (L.crateAt[c] || 0) < CFG.CRATE_RESET_MIN * 6e4) continue;
-        L.crateAt[c] = now;
+        if (!c || now - (L2.crateAt[c] || 0) < CFG.CRATE_RESET_MIN * 6e4) continue;
+        L2.crateAt[c] = now;
         saveLedger();
         const roll = Math.random() / dangerX(mn).chance;
         if (roll < 0.27) {
@@ -23007,7 +23386,7 @@
       }
     }
     function nestSpots() {
-      return Object.keys(L.spots || {}).filter((n) => n === "nest" || /^nest-[a-z0-9]+$/.test(n));
+      return Object.keys(L2.spots || {}).filter((n) => n === "nest" || /^nest-[a-z0-9]+$/.test(n));
     }
     function eggsLaid(mn, n, atNest, types) {
       bump1(subjWeek().eggs, mn, n);
@@ -23017,11 +23396,11 @@
       } catch (e) {
       }
       if (!atNest) return;
-      L.nest = L.nest || { eggs: 0, by: {} };
-      L.nest.eggs += n;
-      bump1(L.nest.by, mn, n);
-      L.nest.types = L.nest.types || {};
-      const mine = L.nest.types[mn] = L.nest.types[mn] || {};
+      L2.nest = L2.nest || { eggs: 0, by: {} };
+      L2.nest.eggs += n;
+      bump1(L2.nest.by, mn, n);
+      L2.nest.types = L2.nest.types || {};
+      const mine = L2.nest.types[mn] = L2.nest.types[mn] || {};
       const tt = types && Object.keys(types).length ? types : { stud: n };
       for (const [t, k] of Object.entries(tt)) mine[t] = (mine[t] || 0) + k;
     }
@@ -23053,10 +23432,10 @@
         const e = p.eggs;
         p.eggs = null;
         p.offspring.eggs = (p.offspring.eggs || 0) + e.n;
-        if (!L.studbook) L.studbook = [];
-        L.studbook.push({ t: Date.now(), dam: sender, sires: [e.by], kids: { male: 0, female: 0, futa: 0 }, eggs: e.n });
+        if (!L2.studbook) L2.studbook = [];
+        L2.studbook.push({ t: Date.now(), dam: sender, sires: [e.by], kids: { male: 0, female: 0, futa: 0 }, eggs: e.n });
         eggsLaid(sender, e.n, true, e.types);
-        if (e.para) L.nestBrood = (L.nestBrood || 0) + 1;
+        if (e.para) L2.nestBrood = (L2.nestBrood || 0) + 1;
         saveLedger();
         audit(sender, "EGGS", sender + " " + e.n + " at the nest");
         emote("\u{1F95A} " + xLine(e.n >= 12 ? "layBig" : "lay", sender, { x: String(e.n), c: plainName(e.by) }), sender);
@@ -23069,7 +23448,7 @@
         R("Gatherin' eggs is a job for staff, sugar.");
         return;
       }
-      const n = L.nest && L.nest.eggs;
+      const n = L2.nest && L2.nest.eggs;
       if (!n) {
         R("The nest's empty, sugar.");
         return;
@@ -23078,8 +23457,8 @@
         R("Come over to the nest to gather, sugar.");
         return;
       }
-      const by = L.nest.by, types = L.nest.types || {};
-      L.nest = { eggs: 0, by: {} };
+      const by = L2.nest.by, types = L2.nest.types || {};
+      L2.nest = { eggs: 0, by: {} };
       saveLedger();
       audit(sender, "GATHER", String(n));
       for (const [m, k] of Object.entries(by)) leaderShare(parseInt(m, 10), earnRibbons(parseInt(m, 10), Math.min(CFG.GATHER_MAX_RIBBONS, eggsWorth(types[m], k)), "eggs sold at market" + (eggTypesText(types[m]) ? " (" + eggTypesText(types[m]) + ")" : "")));
@@ -23100,13 +23479,13 @@
       }
     }
     function baitTick(now) {
-      if (!L.trapBait || !Object.keys(L.trapBait).length) return;
-      for (const C of W.ChatRoomCharacter || []) {
-        const mn = C.MemberNumber;
+      if (!L2.trapBait || !Object.keys(L2.trapBait).length) return;
+      for (const C2 of W.ChatRoomCharacter || []) {
+        const mn = C2.MemberNumber;
         if (!isSubject(mn)) continue;
         const r = rec(mn);
         if (now - (r.baitTold || 0) < 10 * 6e4) continue;
-        if (Object.keys(L.trapBait).some((s) => onSpot(mn, s, 3) && !onSpot(mn, s, 0))) {
+        if (Object.keys(L2.trapBait).some((s) => onSpot(mn, s, 3) && !onSpot(mn, s, 0))) {
           r.baitTold = now;
           privateLine(mn, tFill(pickFor(mn, "trapx:bait", EXTRA_LINES.bait), mn), "emote");
         }
@@ -23128,7 +23507,7 @@
         under: underOf(mn),
         rank: SUBJECT_RANKS[rankOfSubject(mn)].name,
         nextRank: (SUBJECT_RANKS[rankOfSubject(mn) + 1] || {}).at || 0,
-        hunt: huntOn() ? { until: L.hunt.until, goal: L.hunt.goal } : null
+        hunt: huntOn() ? { until: L2.hunt.until, goal: L2.hunt.goal } : null
       };
     }
     function subjBoardLine() {
@@ -23151,13 +23530,13 @@
             R("The pack answers to the proprietors, sugar.");
             return;
           }
-          L.packOn = a0 === "on";
-          if (!L.packOn) L.pack = null;
+          L2.packOn = a0 === "on";
+          if (!L2.packOn) L2.pack = null;
           saveLedger();
-          R(L.packOn ? "\u{1F43A} The pack's loose. It moves every hour, and it needs a trap-wolves den somewhere on the farm." : "\u{1F43A} The pack's kennelled. They'll stay in their den.");
+          R(L2.packOn ? "\u{1F43A} The pack's loose. It moves every hour, and it needs a trap-wolves den somewhere on the farm." : "\u{1F43A} The pack's kennelled. They'll stay in their den.");
           return;
         }
-        R(!packOn() ? "\u{1F43A} No pack roamin', sugar." + (isProprietor(sender) ? " It needs a trap-wolves spot, and ?pack on." : "") : isStaff(sender) && L.pack ? "\u{1F43A} The pack's at " + L.pack.spot + " right now. ?pack off kennels them." : "\u{1F43A} The pack's out there somewhere. " + (L.pack ? "Last heard near " + L.pack.spot.replace(/-?\d+$/, "") + "." : "Nobody's heard them yet today."));
+        R(!packOn() ? "\u{1F43A} No pack roamin', sugar." + (isProprietor(sender) ? " It needs a trap-wolves spot, and ?pack on." : "") : isStaff(sender) && L2.pack ? "\u{1F43A} The pack's at " + L2.pack.spot + " right now. ?pack off kennels them." : "\u{1F43A} The pack's out there somewhere. " + (L2.pack ? "Last heard near " + L2.pack.spot.replace(/-?\d+$/, "") + "." : "Nobody's heard them yet today."));
       }
     }
     const EXTRA_LINES = {
@@ -23491,7 +23870,7 @@
       for (const x of plan || []) if (x.when === "after" && x.slot) gearOn(mn, x.slot, x.label, x.desc, tmin(mn, typeof x.mins === "function" ? x.mins() : x.mins), "trap", x);
     }
     function farmGearTick(now) {
-      for (const [k, r] of Object.entries(L.people)) {
+      for (const [k, r] of Object.entries(L2.people)) {
         if (!r.gear) continue;
         let did = false;
         for (const s of Object.keys(r.gear)) if (r.gear[s].until <= now) {
@@ -23517,14 +23896,14 @@
       return out;
     }
     function trapAdminFor() {
-      const subs = Object.values(L.people).filter((x) => isSubject(x.mn));
+      const subs = Object.values(L2.people).filter((x) => isSubject(x.mn));
       return {
         subjects: subs.map((x) => ({ mn: x.mn, name: plainName(x.mn), here: !!charFor(x.mn), n: x.trapN || 0, paused: !!x.trapsOff })),
         spots: trapSpots().map(([n]) => n),
         water: waterSpots().map(([n]) => n),
-        nest: L.nest && L.nest.eggs || 0,
-        hunt: huntOn() ? { until: L.hunt.until, goal: L.hunt.goal, done: L.hunt.done.length } : null,
-        pack: packOn() ? L.pack ? L.pack.spot : "out" : null
+        nest: L2.nest && L2.nest.eggs || 0,
+        hunt: huntOn() ? { until: L2.hunt.until, goal: L2.hunt.goal, done: L2.hunt.done.length } : null,
+        pack: packOn() ? L2.pack ? L2.pack.spot : "out" : null
       };
     }
     const bLine = (key, mn, v) => tFill(pickFor(mn, "brood:" + key, BROOD_LINES[key]), mn, v);
@@ -23584,10 +23963,10 @@
         if (!p.eggs) return;
         p.eggs = null;
         p.offspring.eggs = (p.offspring.eggs || 0) + n;
-        if (!L.studbook) L.studbook = [];
-        L.studbook.push({ t: Date.now(), dam: mn, sires: [e.by], kids: { male: 0, female: 0, futa: 0 }, eggs: n });
+        if (!L2.studbook) L2.studbook = [];
+        L2.studbook.push({ t: Date.now(), dam: mn, sires: [e.by], kids: { male: 0, female: 0, futa: 0 }, eggs: n });
         eggsLaid(mn, n, true, e.types);
-        if (e.para) L.nestBrood = (L.nestBrood || 0) + 1;
+        if (e.para) L2.nestBrood = (L2.nestBrood || 0) + 1;
         audit(mn, "EGGS", mn + " " + n + " at the nest" + (helper ? " tended by " + helper : ""));
         if (here) emote("\u{1F95A} " + bLine(n >= 50 ? "layEndHuge" : n >= 12 ? "layEndBig" : "layEnd", mn, v), mn);
         tell(mn, "\u{1F95A} " + n + " eggs in the nest, sugar. Staff'll gather them, and there's ribbons in it for you when they do.");
@@ -23626,8 +24005,8 @@
       return w >= 8 ? 4 : w >= 4 ? 3 : w >= 2 ? 2 : w >= 0.8 ? 1 : 0;
     }
     function bellyTick(now) {
-      for (const C of W.ChatRoomCharacter || []) {
-        const mn = C.MemberNumber, r = rec(mn);
+      for (const C2 of W.ChatRoomCharacter || []) {
+        const mn = C2.MemberNumber, r = rec(mn);
         if (mn === CFG.BOT_MEMBER || !r || !r.roles || !r.roles.length) continue;
         const p = prodOf(mn), st = bellyStage(mn);
         if (st > (p.bellyTold || 0) && !quietNow(mn)) {
@@ -23650,8 +24029,8 @@
     }
     const SCENTS = { wolfscent: "wolves", mareheat: "stallion", sowslop: "boar", goblinmusk: ["goblinraid", "goblinpit", "goblinmarket", "goblincart"] };
     function scentCallTick(now) {
-      for (const C of W.ChatRoomCharacter || []) {
-        const mn = C.MemberNumber;
+      for (const C2 of W.ChatRoomCharacter || []) {
+        const mn = C2.MemberNumber;
         if (!isSubject(mn) || quietNow(mn)) continue;
         const r = rec(mn);
         for (const [id, k0] of Object.entries(SCENTS)) {
@@ -24103,7 +24482,7 @@
     function broodBook(mn) {
       const r = rec(mn), p = prodOf(mn);
       if (!r || !p) return "They're not on the books, sugar.";
-      const book = (L.studbook || []).filter((e) => e.dam === mn), by = {};
+      const book = (L2.studbook || []).filter((e) => e.dam === mn), by = {};
       let eggs = 0, kids = 0, litters = 0, biggest = 0;
       for (const e of book) {
         const who = (e.sires || []).map(plainName).join(" & ") || "somebody";
@@ -24252,7 +24631,7 @@
       if (!inCurfew() || now - (state.raidAt || 0) < CFG.RAID_EVERY_MIN * 6e4) return;
       state.raidAt = now;
       if (Math.random() >= CFG.RAID_CHANCE) return;
-      const barn = Object.keys(L.spots || {}).filter((n) => /^barn/.test(n));
+      const barn = Object.keys(L2.spots || {}).filter((n) => /^barn/.test(n));
       const there = (W.ChatRoomCharacter || []).map((c) => c.MemberNumber).filter((m) => isSubject(m) && barn.some((b) => onSpot(m, b, 4)) && !trapWhyNot(m, "wolves"));
       if (!there.length) return;
       emote("\u{1F43A} " + cLine("raid", there[0]), there[0]);
@@ -24264,12 +24643,12 @@
       }, 6e3 + i * 4e3));
     }
     function gauntletOn() {
-      return !!(L.spots && L.spots["gauntlet-start"] && L.spots["gauntlet-end"]);
+      return !!(L2.spots && L2.spots["gauntlet-start"] && L2.spots["gauntlet-end"]);
     }
     function gauntletTick(now) {
       if (!gauntletOn()) return;
-      for (const C of W.ChatRoomCharacter || []) {
-        const mn = C.MemberNumber;
+      for (const C2 of W.ChatRoomCharacter || []) {
+        const mn = C2.MemberNumber;
         if (!isSubject(mn)) continue;
         const r = rec(mn);
         if (!r.run && onSpot(mn, "gauntlet-start", 0) && !quietNow(mn) && now - (r.runEnded || 0) > 6e4) {
@@ -24278,19 +24657,19 @@
           r.spotTrapAt = {};
           saveLedger();
           emote("\u{1F3C1} " + cLine("runStart", mn), mn);
-          tell(mn, "\u{1F3C1} You're on the gauntlet, sugar. Get to the far end. Every trap on the way is awake and none of them will wait their turn. Pot: " + (L.gauntletPot || CFG.GAUNTLET_POT) + " ribbons. Your safeword ends the run.");
+          tell(mn, "\u{1F3C1} You're on the gauntlet, sugar. Get to the far end. Every trap on the way is awake and none of them will wait their turn. Pot: " + (L2.gauntletPot || CFG.GAUNTLET_POT) + " ribbons. Your safeword ends the run.");
         } else if (r.run && onSpot(mn, "gauntlet-end", 1) && !heldByTrap(mn)) {
           const ms = now - r.run.at, traps = (r.trapN || 0) - r.run.traps;
           r.run = null;
           r.runEnded = now;
-          L.gauntlet = L.gauntlet || {};
-          const fast = !L.gauntlet.fast || ms < L.gauntlet.fast.ms, most = !L.gauntlet.ruined || traps > L.gauntlet.ruined.n;
-          if (fast) L.gauntlet.fast = { mn, ms, t: now };
-          if (most && traps > 0) L.gauntlet.ruined = { mn, n: traps, t: now };
+          L2.gauntlet = L2.gauntlet || {};
+          const fast = !L2.gauntlet.fast || ms < L2.gauntlet.fast.ms, most = !L2.gauntlet.ruined || traps > L2.gauntlet.ruined.n;
+          if (fast) L2.gauntlet.fast = { mn, ms, t: now };
+          if (most && traps > 0) L2.gauntlet.ruined = { mn, n: traps, t: now };
           saveLedger();
           const mins = Math.floor(ms / 6e4), secs = Math.round(ms % 6e4 / 1e3);
           emote("\u{1F3C1} " + cLine(traps >= 3 ? "runEndRuined" : "runEnd", mn, { x: mins + "m " + secs + "s", c: String(traps) }), mn);
-          earnRibbons(mn, (L.gauntletPot || CFG.GAUNTLET_POT) + (fast ? 2 : 0), fast ? "the fastest gauntlet run on the board" : "finishin' the gauntlet");
+          earnRibbons(mn, (L2.gauntletPot || CFG.GAUNTLET_POT) + (fast ? 2 : 0), fast ? "the fastest gauntlet run on the board" : "finishin' the gauntlet");
         } else if (r.run && now - r.run.at > CFG.GAUNTLET_MAX_MIN * 6e4) {
           r.run = null;
           r.runEnded = now;
@@ -24381,13 +24760,13 @@
             R("The pot's for the proprietors to set, sugar.");
             return;
           }
-          L.gauntletPot = Math.max(0, Math.min(30, parseInt(args[1], 10) || 0));
+          L2.gauntletPot = Math.max(0, Math.min(30, parseInt(args[1], 10) || 0));
           saveLedger();
-          R("\u{1F3C1} The gauntlet pot is " + L.gauntletPot + " ribbons.");
+          R("\u{1F3C1} The gauntlet pot is " + L2.gauntletPot + " ribbons.");
           return;
         }
-        const g = L.gauntlet || {};
-        R(!gauntletOn() ? "\u{1F3C1} There's no gauntlet laid out, sugar." + (isStaff(sender) ? " Mark the two ends: ?spot set gauntlet-start and ?spot set gauntlet-end, with trap spots between." : "") : "\u{1F3C1} THE GAUNTLET \xB7 pot " + (L.gauntletPot || CFG.GAUNTLET_POT) + " ribbons\nStep on the start to run it. No breather between traps on the way.\nFastest: " + (g.fast ? plainName(g.fast.mn) + ", " + Math.floor(g.fast.ms / 6e4) + "m " + Math.round(g.fast.ms % 6e4 / 1e3) + "s" : "nobody yet") + "\nMost ruined: " + (g.ruined ? plainName(g.ruined.mn) + ", " + g.ruined.n + " traps in one run" : "nobody yet"));
+        const g = L2.gauntlet || {};
+        R(!gauntletOn() ? "\u{1F3C1} There's no gauntlet laid out, sugar." + (isStaff(sender) ? " Mark the two ends: ?spot set gauntlet-start and ?spot set gauntlet-end, with trap spots between." : "") : "\u{1F3C1} THE GAUNTLET \xB7 pot " + (L2.gauntletPot || CFG.GAUNTLET_POT) + " ribbons\nStep on the start to run it. No breather between traps on the way.\nFastest: " + (g.fast ? plainName(g.fast.mn) + ", " + Math.floor(g.fast.ms / 6e4) + "m " + Math.round(g.fast.ms % 6e4 / 1e3) + "s" : "nobody yet") + "\nMost ruined: " + (g.ruined ? plainName(g.ruined.mn) + ", " + g.ruined.n + " traps in one run" : "nobody yet"));
         return;
       }
       if (cmd === "lend") {
@@ -24561,9 +24940,9 @@
       const r = rec(mn), lim = String(r.limits || "");
       const can = Object.keys(CURSES).filter((k) => !CURSES[k].limit.test(lim) && (!CURSES[k].can || CURSES[k].can(mn)) && CURSES[k].slot(mn) && !(r.gear && r.gear[CURSES[k].slot(mn)]));
       if (!can.length) return null;
-      const kind = can[Math.floor(Math.random() * can.length)], C = CURSES[kind], slot = C.slot(mn), p = prodOf(mn), mins = tmin(mn, C.mins);
-      r.curse = { kind, slot, name: C.name, what: C.what, until: Date.now() + mins * 6e4, next: Date.now() + 10 * 6e4 };
-      gearOn(mn, slot, C.name, C.desc, mins, "curse");
+      const kind = can[Math.floor(Math.random() * can.length)], C2 = CURSES[kind], slot = C2.slot(mn), p = prodOf(mn), mins = tmin(mn, C2.mins);
+      r.curse = { kind, slot, name: C2.name, what: C2.what, until: Date.now() + mins * 6e4, next: Date.now() + 10 * 6e4 };
+      gearOn(mn, slot, C2.name, C2.desc, mins, "curse");
       if (kind === "belt") p.deniedUntil = Math.max(p.deniedUntil || 0, r.curse.until);
       if (kind === "cups") addBoost(p, "milk", mins * 6e4, 1);
       if (kind === "hobble") r.gluedUntil = Math.max(r.gluedUntil || 0, r.curse.until);
@@ -24571,7 +24950,7 @@
       audit(mn, "CURSE", kind);
       syncCompanions(true);
       emote("\u{1F381} " + zLine("open_" + kind, mn), mn);
-      tell(mn, "\u{1F381} It's the " + C.name + ", sugar. " + C.what + " It stays " + mins + " minutes." + (hasCompanion(mn) ? ` With "Farm can put real gear on me" on, you're wearin' it for real.` : "") + " Your safeword takes it off.");
+      tell(mn, "\u{1F381} It's the " + C2.name + ", sugar. " + C2.what + " It stays " + mins + " minutes." + (hasCompanion(mn) ? ` With "Farm can put real gear on me" on, you're wearin' it for real.` : "") + " Your safeword takes it off.");
       return kind;
     }
     function cursedOff(mn, how) {
@@ -24650,7 +25029,7 @@
     TRAP_NEEDS.suit = (mn) => suitOnNow(mn) ? "it already has them" : null;
     function cursedTick() {
       const now = Date.now();
-      for (const [k, r] of Object.entries(L.people)) {
+      for (const [k, r] of Object.entries(L2.people)) {
         const mn = parseInt(k, 10);
         if (r.curse) {
           const c = r.curse, p = prodOf(mn);
@@ -24711,13 +25090,13 @@
           }
           if (st >= 2 && now >= (s.walkAt || 0) && !r.penned && !r.benched && !(p && p.stall)) {
             s.walkAt = now + CFG.SUIT_WALK_MIN * 6e4 * (0.7 + Math.random() * 0.6);
-            const spots = Object.keys(L.spots || {}).filter((n) => !/^(safe|rescue|staff|summon|speaker|hunt|gauntlet)/.test(n));
+            const spots = Object.keys(L2.spots || {}).filter((n) => !/^(safe|rescue|staff|summon|speaker|hunt|gauntlet)/.test(n));
             const to = spots[Math.floor(Math.random() * spots.length)];
             if (to) {
               saveLedger();
               emote("\u{1F5A4} " + zLine("suitWalk", mn), mn);
               later(() => {
-                if (suitOnNow(mn) && charFor(mn)) lead(mn, L.spots[to], false, "by the suit");
+                if (suitOnNow(mn) && charFor(mn)) lead(mn, L2.spots[to], false, "by the suit");
               }, 3e3);
             }
           }
@@ -24897,7 +25276,7 @@
     function customLoad() {
       if (state.customLoaded) return;
       state.customLoaded = true;
-      for (const [k, c] of Object.entries(L.customTraps || {})) {
+      for (const [k, c] of Object.entries(L2.customTraps || {})) {
         try {
           customRegister(k, c);
         } catch (e) {
@@ -24906,7 +25285,7 @@
       }
     }
     function customTrap(mn, k, spot) {
-      const c = L.customTraps[k], D = CUSTOM_DOES[c.does], r = rec(mn), p = prodOf(mn), sev = SEV_N[c.sev] || 1, v = {};
+      const c = L2.customTraps[k], D = CUSTOM_DOES[c.does], r = rec(mn), p = prodOf(mn), sev = SEV_N[c.sev] || 1, v = {};
       const beats = c.lines && c.lines.length ? c.lines.map((x) => [x]) : KEEP_LINES["custom_" + c.does];
       trapHold(mn, D.hold[sev - 1], "the " + k + " trap");
       trapRun(mn, k, beats, () => {
@@ -24980,19 +25359,19 @@
         R("Buildin' traps is just for the proprietors, sugar.");
         return true;
       }
-      L.customTraps = L.customTraps || {};
+      L2.customTraps = L2.customTraps || {};
       if (a0 === "made") {
-        const all = Object.entries(L.customTraps);
+        const all = Object.entries(L2.customTraps);
         R(all.length ? "\u{1F6E0}\uFE0F HOME-BUILT TRAPS\n" + all.map(([k2, c2]) => "\u2022 " + k2 + ": " + c2.does + ", " + c2.sev + (c2.words ? " [" + c2.words + "]" : "") + " \xB7 " + (c2.lines.length || "stock") + " line" + (c2.lines.length === 1 ? "" : "s") + " \xB7 spot name trap-" + k2).join("\n") + "\n?trap unmake <name> takes one apart." : "\u{1F6E0}\uFE0F Nothin' home-built yet, sugar.\n?trap make <name> <dose|hold|fill|breed|strip|write> [mild|strong|brutal] [words] | first line | second line\u2026\nUse %n for their name. Then stand where you want it and ?spot set trap-<name>.");
         return true;
       }
       const k = String(args[1] || "").toLowerCase();
       if (a0 === "unmake") {
-        if (!L.customTraps[k]) {
+        if (!L2.customTraps[k]) {
           R("There's no home-built trap by that name, sugar. ?trap made lists them.");
           return true;
         }
-        delete L.customTraps[k];
+        delete L2.customTraps[k];
         delete TRAP_KINDS[k];
         delete MORE_TRAPS[k];
         delete TRAP_NEEDS[k];
@@ -25006,7 +25385,7 @@
         R("\u{1F6E0}\uFE0F ?trap make <name> <dose|hold|fill|breed|strip|write> [mild|strong|brutal] [words] | first line | second line\u2026\nThe name is one word, letters only. The words are a shot's words for a dose (lactation, heat inducer\u2026) or what to write, with / between lines. Use %n for their name in your lines.");
         return true;
       }
-      if (TRAP_KINDS[k] && !L.customTraps[k]) {
+      if (TRAP_KINDS[k] && !L2.customTraps[k]) {
         R("There's already a trap called " + k + ", sugar. Pick another name.");
         return true;
       }
@@ -25023,7 +25402,7 @@
         return true;
       }
       const lines = parts.filter(Boolean).slice(0, 8).map((x) => x.slice(0, 240));
-      const c = L.customTraps[k] = { does, sev, words: does === "write" ? words : words.toLowerCase(), lines, by: sender, t: Date.now() };
+      const c = L2.customTraps[k] = { does, sev, words: does === "write" ? words : words.toLowerCase(), lines, by: sender, t: Date.now() };
       customRegister(k, c);
       saveLedger();
       audit(sender, "TRAPMAKE", k + " " + does + " " + sev);
@@ -25031,7 +25410,7 @@
       return true;
     }
     function sitStart(mn, by, R) {
-      const r = rec(mn), now = Date.now(), n = L.nest && L.nest.eggs || 0, pos = posOf(mn);
+      const r = rec(mn), now = Date.now(), n = L2.nest && L2.nest.eggs || 0, pos = posOf(mn);
       if (!r || !r.roles || !r.roles.length) {
         R("That's for folks on the books, sugar.");
         return;
@@ -25057,8 +25436,8 @@
         R("Somethin' else has " + (by === mn ? "you" : "them") + " right now, sugar.");
         return;
       }
-      r.sitting = { since: now, until: now + CFG.SIT_MIN * 6e4, n, by: L.nest.by || {}, types: L.nest.types || {}, next: now + CFG.SIT_LINE_MIN * 6e4, nest, setBy: by };
-      L.nest = { eggs: 0, by: {} };
+      r.sitting = { since: now, until: now + CFG.SIT_MIN * 6e4, n, by: L2.nest.by || {}, types: L2.nest.types || {}, next: now + CFG.SIT_LINE_MIN * 6e4, nest, setBy: by };
+      L2.nest = { eggs: 0, by: {} };
       r.penned = { until: r.sitting.until + 12e4, X: pos.X, Y: pos.Y, name: "the nest", by: BOTMN(), sit: true };
       saveLedger();
       audit(by, "SIT", mn + " on " + n);
@@ -25074,12 +25453,12 @@
       const s = r.sitting;
       r.sitting = null;
       if (r.penned && r.penned.sit) r.penned = null;
-      L.nest = L.nest || { eggs: 0, by: {} };
-      L.nest.eggs += s.n;
-      L.nest.types = L.nest.types || {};
-      for (const [m, k] of Object.entries(s.by)) L.nest.by[m] = (L.nest.by[m] || 0) + k;
+      L2.nest = L2.nest || { eggs: 0, by: {} };
+      L2.nest.eggs += s.n;
+      L2.nest.types = L2.nest.types || {};
+      for (const [m, k] of Object.entries(s.by)) L2.nest.by[m] = (L2.nest.by[m] || 0) + k;
       for (const [m, t] of Object.entries(s.types)) {
-        const mine = L.nest.types[m] = L.nest.types[m] || {};
+        const mine = L2.nest.types[m] = L2.nest.types[m] || {};
         for (const [kk, q] of Object.entries(t)) mine[kk] = (mine[kk] || 0) + q;
       }
       saveLedger();
@@ -25094,7 +25473,7 @@
       const w = subjWeek();
       w.hatched = w.hatched || {};
       bump1(w.hatched, mn, s.n);
-      L.hatched = (L.hatched || 0) + s.n;
+      L2.hatched = (L2.hatched || 0) + s.n;
       for (const [m, k] of Object.entries(s.by)) {
         const layer = parseInt(m, 10), got = earnRibbons(layer, Math.max(1, Math.round(Math.min(CFG.GATHER_MAX_RIBBONS, eggsWorth(s.types[m], k)) / 2)), "your eggs hatched under " + plainName(mn));
         leaderShare(layer, got);
@@ -25114,7 +25493,7 @@
       return out;
     }
     function sitTick(now) {
-      for (const [k, r] of Object.entries(L.people)) {
+      for (const [k, r] of Object.entries(L2.people)) {
         if (!r.sitting) continue;
         const mn = parseInt(k, 10);
         if (!charFor(mn)) {
@@ -25266,7 +25645,7 @@
     }
     function dreamTick(now) {
       if (!inCurfew()) {
-        for (const [k, r] of Object.entries(L.people)) {
+        for (const [k, r] of Object.entries(L2.people)) {
           if (!r.dream || !r.dream.n) {
             if (r.dream) r.dream = null;
             continue;
@@ -25286,9 +25665,9 @@
       }
       if (now - (state.dreamAt || 0) < 6e4) return;
       state.dreamAt = now;
-      const barn = Object.keys(L.spots || {}).filter((n) => /^barn/.test(n));
-      for (const C of W.ChatRoomCharacter || []) {
-        const mn = C.MemberNumber, r = rec(mn);
+      const barn = Object.keys(L2.spots || {}).filter((n) => /^barn/.test(n));
+      for (const C2 of W.ChatRoomCharacter || []) {
+        const mn = C2.MemberNumber, r = rec(mn);
         if (mn === BOTMN() || !r || !(isSubject(mn) || hasRole(mn, ROLE.LIVESTOCK)) || quietNow(mn) || !barn.some((b) => onSpot(mn, b, 4))) continue;
         if (state.trapRuns && state.trapRuns.has(mn) || state.sceneRuns && state.sceneRuns.has(mn)) continue;
         if (!r.dream) r.dream = { n: 0, at: now };
@@ -25382,7 +25761,7 @@
       if (r && amount > 0) r.vat = (r.vat || 0) + amount;
     }
     function vatTop(mn) {
-      const w = L.yield && L.yield.w || {}, e = Object.entries(w).sort((a, b) => b[1] - a[1])[0];
+      const w = L2.yield && L2.yield.w || {}, e = Object.entries(w).sort((a, b) => b[1] - a[1])[0];
       return !!e && parseInt(e[0], 10) === mn && e[1] > 0;
     }
     function vatCost(mn, price) {
@@ -25418,7 +25797,7 @@
         R("\u{1F95B} The vat's bought you " + CFG.VAT_DAY_MAX + " today already, sugar. Tomorrow.");
         return true;
       }
-      const before = r.ribbons || 0, spent0 = ribbonWeek(r).spent, logN = (L.ribbonLog || []).length, said = [];
+      const before = r.ribbons || 0, spent0 = ribbonWeek(r).spent, logN = (L2.ribbonLog || []).length, said = [];
       r.ribbons = before + it.price;
       try {
         buy(sender, args.slice(0, i), (t) => said.push(t));
@@ -25433,7 +25812,7 @@
         R(said.join("\n") || "That didn't go through, sugar.");
         return true;
       }
-      if (L.ribbonLog && L.ribbonLog.length > logN) L.ribbonLog.length = logN;
+      if (L2.ribbonLog && L2.ribbonLog.length > logN) L2.ribbonLog.length = logN;
       r.vat -= cost;
       r.vatDay.n++;
       saveLedger();
@@ -25693,8 +26072,8 @@
       return !!(A && B && Math.max(Math.abs(A.X - B.X), Math.abs(A.Y - B.Y)) <= (d || 2));
     };
     function arousalOf(mn) {
-      const C = charFor(mn);
-      return Math.max(0, Math.min(100, C && C.ArousalSettings && C.ArousalSettings.Progress || 0));
+      const C2 = charFor(mn);
+      return Math.max(0, Math.min(100, C2 && C2.ArousalSettings && C2.ArousalSettings.Progress || 0));
     }
     function stallCumTick(mn, st, now) {
       const p = prodOf(mn);
@@ -26027,7 +26406,7 @@
         return;
       }
       if (!big || r.noBed || !charFor(mn) || quietNow(mn) || (r.bedQuiet || 0) > now || r.penned || benchedNow(mn) || stockedNow(mn) || p.stall || r.sitting || p.labour || state.trapRuns && state.trapRuns.has(mn) || state.sceneRuns && state.sceneRuns.has(mn) || /\b(immobil|bed ?rest)/i.test(r.limits || "")) return;
-      const spot = Object.keys(L.spots || {}).find((n) => /^farrow/.test(n)), pos = spot && L.spots[spot];
+      const spot = Object.keys(L2.spots || {}).find((n) => /^farrow/.test(n)), pos = spot && L2.spots[spot];
       if (!pos) return;
       r.bedded = { since: now, spot: spot || "" };
       r.penned = { until: now + 12 * 36e5, X: pos.X, Y: pos.Y, name: "the farrowin' stall", by: BOTMN(), bed: true };
@@ -26082,7 +26461,7 @@
     }
     function wordsFor(mn, text) {
       try {
-        const r = L && L.people && L.people[mn];
+        const r = L2 && L2.people && L2.people[mn];
         if (!r || !r.callMe && !r.neverCall && !(r.kept && r.kept.name)) return text;
         const liked = likedWords(mn), never = (r.neverCall || []).map((w) => w.toLowerCase());
         const pick = () => liked[Math.floor(Math.random() * liked.length)];
@@ -26319,7 +26698,7 @@
       const now = Date.now();
       if (now - (state.udderAt || 0) < 3e4) return;
       state.udderAt = now;
-      for (const [k, r] of Object.entries(L.people)) {
+      for (const [k, r] of Object.entries(L2.people)) {
         const mn = parseInt(k, 10), p = r.prod;
         if (!p) continue;
         try {
@@ -26853,7 +27232,7 @@
       try {
         const written = BODY_TAG.test(String(text));
         let t = String(text).replace(BODY_TAG, "");
-        if (written || !mn || !L || !L.people || !L.people[mn]) return t;
+        if (written || !mn || !L2 || !L2.people || !L2.people[mn]) return t;
         if (!VULVA_WORDS.test(t) && !TITS_WORDS.test(t) && !GIRL_WORDS.test(t)) return t;
         const b = bodyOf(mn);
         if (!b.vulva) for (const [re, w] of SWAP_NO_VULVA) t = t.replace(re, w);
@@ -26982,30 +27361,30 @@
         return null;
       }
     }
-    const farmLookAt = () => L.drawnFarm && L.drawnFarm.at || 0;
+    const farmLookAt = () => L2.drawnFarm && L2.drawnFarm.at || 0;
     function farmLookTick() {
       try {
         const b = farmLookRead();
         if (!b) return;
-        if (L.drawnFarm && JSON.stringify(L.drawnFarm.body) === JSON.stringify(b)) return;
-        L.drawnFarm = { at: Date.now(), body: b };
+        if (L2.drawnFarm && JSON.stringify(L2.drawnFarm.body) === JSON.stringify(b)) return;
+        L2.drawnFarm = { at: Date.now(), body: b };
         saveLedger();
         log("The farm's look for the drawn body changed (cup " + b.cup + "); tellin' the Companions.");
-        if (state.companions && state.companions.size) enqueue(makeMsg("bodyFarm", { at: L.drawnFarm.at, body: b }));
+        if (state.companions && state.companions.size) enqueue(makeMsg("bodyFarm", { at: L2.drawnFarm.at, body: b }));
       } catch (e) {
         warn("farm look:", e);
       }
     }
     function farmLookAsk(mn, m) {
-      if (!L.drawnFarm || !L.drawnFarm.body) return;
-      if (Number(m && m.at) === L.drawnFarm.at) return;
-      enqueue(makeMsg("bodyFarm", { at: L.drawnFarm.at, body: L.drawnFarm.body }, mn));
+      if (!L2.drawnFarm || !L2.drawnFarm.body) return;
+      if (Number(m && m.at) === L2.drawnFarm.at) return;
+      enqueue(makeMsg("bodyFarm", { at: L2.drawnFarm.at, body: L2.drawnFarm.body }, mn));
     }
     (function() {
       const more = (pool, lines) => {
         if (Array.isArray(pool)) pool.push(...lines);
       };
-      const B = BROOD_LINES, C = CURSE_LINES;
+      const B = BROOD_LINES, C2 = CURSE_LINES;
       more(B.layStart, [
         "%n circles the nest twice like a hen and sinks into the straw, thighs spread, both hands under a belly that's gone hard and low. Here it comes.",
         "%n kneels up in the nest, gripping the rail, and rocks. Somethin' heavy inside them has started to move toward the way out."
@@ -27128,92 +27507,92 @@
         "Down here the dark is total, and warm, and wet, and alive. Coils slide over %n from every side, curious, unhurried, explorin' every inch.",
         "The shaft echoes %n's gasps back up at them. Somethin' cradles them in the black, turnin' them slowly, as if lookin' them over by touch."
       ]);
-      more(C.open_plug, [
+      more(C2.open_plug, [
         "%n tips the box and a glossy black plug rolls into their palm, warm as skin. It squirms. Then it's gone, and %n's eyes go very wide.",
         `The box is lined with red velvet and holds a single plug, polished to a shine. It's seated in %n before they've finished sayin' "oh, that's cute".`
       ]);
-      more(C.open_belt, [
+      more(C2.open_belt, [
         "A slim belt of linked silver lies coiled in the box like a sleeping snake. It wakes. It wraps. It locks.",
         "%n lifts a jewelled belt from the box to admire it, and it slithers round their hips and clicks shut with a sound like a promise."
       ]);
-      more(C.open_cups, [
+      more(C2.open_cups, [
         "{nt}Two silver cups leap out of the box and seal over %n's nipples, suckin' them up into the cold metal with a greedy little kiss.",
         "{t}A pair of silver milkmaid's cups spring out and latch onto %n's tits before the lid's even fallen."
       ]);
-      more(C.open_funnel, [
+      more(C2.open_funnel, [
         "A gold funnel in the box, polished bright. %n leans in to look, and it leans in back, and buckles itself into their mouth.",
         "The funnel in the box has a strap and a purpose. It finds %n's open mouth on the first try."
       ]);
-      more(C.open_hobble, [
+      more(C2.open_hobble, [
         "Two pretty anklets with a little chain between them. %n holds them up, and they drop and snap round both ankles at once.",
         "The box tips over and two cuffs roll out, find %n's ankles, and close. Their stride just got a great deal shorter."
       ]);
-      more(C.tick_plug, [
+      more(C2.tick_plug, [
         "There's a slow, thick swell inside %n's %h, and they have to stop and grip somethin' while it settles. Bigger again.",
         "%n's %h clenches round the plug as it fattens another size, and a little whine escapes them before they can stop it."
       ]);
-      more(C.tick_belt, [
+      more(C2.tick_belt, [
         "The belt purrs against you, slow, climbin', and you're right at the brink when it clicks off, smug as a cat.",
         "A long teasing hum from the belt, and then nothin'. It's waitin' for you to calm down so it can do it again."
       ]);
-      more(C.tick_cups, [
+      more(C2.tick_cups, [
         "{nt}The cups suck hard at %n's nipples and %ml slides up into them. %n's chest is tight and tingly again almost at once.",
         "{t}The cups draw long and deep and %ml disappears into them. %n's tits fill right back up behind it, achin'."
       ]);
-      more(C.tick_funnel, [
+      more(C2.tick_funnel, [
         "The funnel tips another %ml down %n's throat. They swallow, gasping, and their belly sloshes when they shift.",
         "Warm and thick, %ml more, straight down. %n's belly is round as a melon and the funnel's still not finished."
       ]);
-      more(C.off, [
+      more(C2.off, [
         "The %c lets go of %n with a little sigh and goes still, just a pretty thing on the ground now. %n wobbles.",
         "It's over. The %c slips off %n and lies there gleamin' innocently in the straw, like it never did a thing."
       ]);
-      more(C.suitTrap[0], [
+      more(C2.suitTrap[0], [
         "Somethin' glossy drips from a cobweb onto %n's knee and spreads into a little black disc, warm as a hand.",
         "%n sits on a bench and gets up with a black shiny patch stuck to the back of their thigh."
       ]);
-      more(C.suitTrap[1], [
+      more(C2.suitTrap[1], [
         "It doesn't peel. It doesn't smear. It just grows, a hair at a time, and where it grows %n's skin goes warm and sensitive.",
         "%n picks at the edge of it. The edge moves away from their nail and settles a little further up their leg."
       ]);
-      more(C.suitTrap[2], [
+      more(C2.suitTrap[2], [
         "The black creeps up %n's thigh in a slow glossy tide. It's warm. It's squeezing. It seems very pleased to meet them.",
         "Every brush of %n's hand only feeds it. It's the size of a dinner plate now and pulsin' gently."
       ]);
-      more(C.suit1, [
+      more(C2.suit1, [
         "Black latex flows down to %n's toes and up to their hips, seamless and gleamin', and it hugs every step they take.",
         "%n's legs are sheathed in livin' black from hip to heel, warm and tight and alive, flexin' a little out of time with them."
       ]);
-      more(C.suit2, [
+      more(C2.suit2, [
         "{nv}The suit seals over %n's hips and between their legs in one smooth sweep, and a soft fat root of it slides up their ass and settles, pulsin'.",
         "{v}The suit flows between %n's legs and seals, and two soft roots of it push in, front and back, slow and certain, and begin to throb.",
         "Black latex closes over %n's hips and groin in one glossy sweep, and somethin' warm and patient pushes up inside them to stay."
       ]);
-      more(C.suit3, [
+      more(C2.suit3, [
         "{nt}It climbs %n's belly and spreads over their chest, cuppin', kneadin', and a soft wet mouth forms over each nipple and starts to suck.",
         "The suit closes over %n's chest and squeezes, slow and rhythmic, like a pair of hands that know exactly what they're doin'."
       ]);
-      more(C.suit4, [
+      more(C2.suit4, [
         "The black runs down %n's arms and welds their fingers into smooth glossy mitts. Their hands are the suit's now.",
         "It sheathes %n's arms to the fingertips and folds their wrists together behind their back, gently, to show who's in charge."
       ]);
-      more(C.suit5, [
+      more(C2.suit5, [
         "The last of it slides up over %n's chin and seals their lips with a glossy kiss, and a slim tongue of it presses inside. Only their eyes are their own now.",
         "It finishes the job: throat, jaw, mouth, a smooth gleamin' gag of itself. %n is all suit now, breathin' through it, held by it."
       ]);
-      more(C.suitFeed, [
+      more(C2.suitFeed, [
         "The suit ripples over you, everywhere at once, and you shudder, and it drinks the shudder down.",
         "It squeezes you slow from head to toe, like a long hug that never ends, and you're so wet inside it."
       ]);
-      more(C.suitWalk, [
+      more(C2.suitWalk, [
         "The suit decides it wants a walk. %n's legs agree before %n does.",
         "%n's feet carry them off toward somewhere the suit has in mind, and their protests come out muffled behind the latex."
       ]);
-      more(C.suitOff, [
+      more(C2.suitOff, [
         "The suit loosens all at once, peels away down %n's body like a shed skin, and slithers off into the shadows, sated.",
         "It's done with them. The latex splits, slides off, and leaves %n shiverin', pink and gleamin' with sweat in the open air."
       ]);
-      more(C.suitPeeled, [
+      more(C2.suitPeeled, [
         "Two farmhands and a lot of warm oil, and the suit finally gives %n up, strip by clingy strip, with a sulky wet sound.",
         "It doesn't want to go. It takes coaxin', soapin' and a firm hand, and the last bit lets go of %n with a reluctant pop."
       ]);
@@ -27540,11 +27919,11 @@
         naked: false
       };
       try {
-        const C = charFor(mn);
-        if (!C || !Array.isArray(C.Appearance)) return g;
+        const C2 = charFor(mn);
+        if (!C2 || !Array.isArray(C2.Appearance)) return g;
         const CLOTHES = ["Cloth", "ClothLower", "Suit", "SuitLower", "Bra", "Panties", "Corset", "ClothOuter"];
         let dressed = false, mouthItem = false, gagEff = false;
-        for (const it of C.Appearance) {
+        for (const it of C2.Appearance) {
           if (!it || !it.Asset || !it.Asset.Group) continue;
           const grp = it.Asset.Group.Name, nm = ((it.Asset.Name || "") + " " + (it.Asset.Description || "") + " " + (it.Craft && it.Craft.Name || "")).toLowerCase();
           const eff = [].concat(it.Property && it.Property.Effect || [], it.Asset.Effect || []);
@@ -28056,7 +28435,7 @@
     }
     function variantTrap(mn, kind, spot) {
       if (!VARIANTS[kind]) return false;
-      const r = rec(mn), loaded = L.trapLoads && spot ? L.trapLoads[spot] : null, fixed = loaded ? parseTrapLoad(kind, loaded) : null;
+      const r = rec(mn), loaded = L2.trapLoads && spot ? L2.trapLoads[spot] : null, fixed = loaded ? parseTrapLoad(kind, loaded) : null;
       if (kind === "injector" && loaded && !fixed) return false;
       const S = SEVERITY[pickSeverity(mn, fixed && fixed.sev)], T = VARIANT_LINES[kind], v = { x: S.name };
       if (kind === "injector") {
@@ -29016,7 +29395,7 @@
         s.logReader = true;
         const ids = new Set(CHATLOG.who.keys());
         for (const p of CFG.PROPRIETORS) ids.add(p);
-        for (const [k, r] of Object.entries(L.people)) if (r && r.chatlogOn) ids.add(Number(k));
+        for (const [k, r] of Object.entries(L2.people)) if (r && r.chatlogOn) ids.add(Number(k));
         s.logWho = Array.from(ids).slice(0, 80).map((x) => ({ mn: x, name: chatlogName(x) }));
       }
     }
@@ -29036,13 +29415,13 @@
       saveLedger();
       audit(mn, "CLOCKOUT", why || "");
       outfitsLedger();
-      if (L.outfitRules.changeBack && hasCompanion(mn)) enqueue(makeMsg("outfitBack", { why: "shift's over" }, mn));
+      if (L2.outfitRules.changeBack && hasCompanion(mn)) enqueue(makeMsg("outfitBack", { why: "shift's over" }, mn));
       return ms;
     }
     const hrs = (ms) => (ms / 36e5).toFixed(1) + "h";
     function workTick() {
       const now = Date.now();
-      for (const r of Object.values(L.people)) {
+      for (const r of Object.values(L2.people)) {
         if (!r.shift || !r.shift.in) continue;
         const idle = now - (state.lastSpoke.get(r.mn) || r.shift.in);
         if (!charFor(r.mn) || idle > CFG.SHIFT_IDLE_MIN * 6e4) {
@@ -29050,8 +29429,8 @@
           beep(r.mn, "\u23F1\uFE0F I clocked you out, hon \u2014 " + (charFor(r.mn) ? "you'd gone quiet for " + CFG.SHIFT_IDLE_MIN + " minutes" : "you left the farm") + ". That shift came to " + hrs(ms) + ". Thanks for all your hard work!");
           continue;
         }
-        if (!r.chore && L.chores.length && (!r.nextChore || now >= r.nextChore)) {
-          const c = L.chores[Math.floor(Math.random() * L.chores.length)];
+        if (!r.chore && L2.chores.length && (!r.nextChore || now >= r.nextChore)) {
+          const c = L2.chores[Math.floor(Math.random() * L2.chores.length)];
           r.chore = { text: c.text, at: now, bounty: c.bounty || 0, key: c.key, by: c.by };
           r.nextChore = now + CFG.CHORE_EVERY_MIN * 6e4;
           saveLedger();
@@ -29060,13 +29439,13 @@
         }
       }
       const wk = weekKey();
-      if (L.life.reportWeek && L.life.reportWeek !== wk) {
-        const prev = L.life.reportWeek;
-        const rows = Object.values(L.people).filter((r) => r.shift && r.shift.week && r.shift.week.key === prev).sort((a, b) => b.shift.week.ms - a.shift.week.ms).map((r) => "  \u2022 " + (r.name || plainName(r.mn)) + " \u2014 " + hrs(r.shift.week.ms) + " \xB7 " + (r.choreWeek && r.choreWeek.key === prev ? r.choreWeek.n : 0) + " chores");
+      if (L2.life.reportWeek && L2.life.reportWeek !== wk) {
+        const prev = L2.life.reportWeek;
+        const rows = Object.values(L2.people).filter((r) => r.shift && r.shift.week && r.shift.week.key === prev).sort((a, b) => b.shift.week.ms - a.shift.week.ms).map((r) => "  \u2022 " + (r.name || plainName(r.mn)) + " \u2014 " + hrs(r.shift.week.ms) + " \xB7 " + (r.choreWeek && r.choreWeek.key === prev ? r.choreWeek.n : 0) + " chores");
         for (const p of CFG.PROPRIETORS) beep(p, "\u23F1\uFE0F STAFF HOURS, " + prev + "\n\n" + (rows.join("\n") || "  nobody clocked in that week"));
       }
-      if (L.life.reportWeek !== wk) {
-        L.life.reportWeek = wk;
+      if (L2.life.reportWeek !== wk) {
+        L2.life.reportWeek = wk;
         saveLedger();
       }
     }
@@ -29077,7 +29456,7 @@
     }
     function begPhraseOk(text) {
       const norm = (s) => String(s).toLowerCase().replace(/[^a-z ]/g, "").replace(/\s+/g, " ").trim();
-      return norm(text).includes(norm(L.life.begPhrase || CFG.BEG_PHRASE));
+      return norm(text).includes(norm(L2.life.begPhrase || CFG.BEG_PHRASE));
     }
     const TEXT = {};
     TEXT.help = `\u{1F33E} THE FARM OFFICE \xB7 B&B FARM \u{1F33E}
@@ -30356,7 +30735,7 @@ Chat in the room all you like; I'll only count what you send me direct.`,
       const s = state.sessions.get(mn);
       if (!s) return;
       state.sessions.delete(mn);
-      L.applications.push({
+      L2.applications.push({
         id: Date.now().toString(36),
         mn,
         name: plainName(mn),
@@ -30400,7 +30779,7 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
     }
     function notifyStaff(msg, routine, ping) {
       const present = [];
-      for (const k in L.people) {
+      for (const k in L2.people) {
         const m = parseInt(k, 10);
         if (m !== CFG.BOT_MEMBER && isStaff(m) && onDuty(m) && charFor(m)) present.push(m);
       }
@@ -30617,6 +30996,8 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
       "store",
       "buy",
       "messes",
+      "ownoutfit",
+      "myoutfit",
       "chest",
       "gift",
       "potions",
@@ -31110,7 +31491,7 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
       const waiting = (txt) => {
         if (!/\?apply/.test(String(txt)) || !/books|apply first|\?apply first|Say \?apply/i.test(String(txt))) return txt;
         const r0 = rec(sender);
-        if (r0 && r0.roles && r0.roles.length || !L.applications.some((a) => a.mn === sender)) return txt;
+        if (r0 && r0.roles && r0.roles.length || !L2.applications.some((a) => a.mn === sender)) return txt;
         return "\u{1F4CB} Your application's in, sugar, and waitin' on the proprietors. Once you're approved that'll work for you. Till then, look around: ?help start, ?tour, ?rules.";
       };
       const R = docAbout && docAbout !== sender ? (txt) => toCompanion(sender, txt, "doc", false, { kind: cmd, who: plainName(docAbout), about: docAbout }) : (txt) => reply(sender, waiting(txt), replyCh);
@@ -31133,9 +31514,9 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
               break;
             }
             a.enabled = sub === "on";
-            L.addonsOff = L.addonsOff || {};
-            if (a.enabled) delete L.addonsOff[a.name];
-            else L.addonsOff[a.name] = true;
+            L2.addonsOff = L2.addonsOff || {};
+            if (a.enabled) delete L2.addonsOff[a.name];
+            else L2.addonsOff[a.name] = true;
             saveLedger();
             audit(sender, "ADDON_" + sub.toUpperCase(), a.name);
             R("\u{1F9E9} " + a.label + " is " + (a.enabled ? "on" : "off") + ".");
@@ -31167,7 +31548,7 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
             R("Tour's over, sweetie! Come back and look around any time.");
             break;
           }
-          if (charFor(sender) && (L.life.tour || []).length && runTour(sender)) break;
+          if (charFor(sender) && (L2.life.tour || []).length && runTour(sender)) break;
           R(fill(TEXT.tour, sender));
           break;
         case "drain": {
@@ -31254,14 +31635,14 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
           break;
         }
         case "jars": {
-          L.jars = (L.jars || []).filter((j) => Date.now() - j.t < CFG.JAR_DAYS * 864e5);
-          R(L.jars.length ? "\u{1FAD9} SEED JARS\n" + L.jars.map((j) => "#" + j.id + ": " + ml(j.ml) + " of " + plainName(j.stud) + "'s, bottled " + new Date(j.t).toLocaleString()).join("\n") + "\n?inseminate <who> <jar> [hole] asks them, and uses one on their yes." : "\u{1FAD9} No seed jars on the shelf, hon. ?collect a stud to bottle some.");
+          L2.jars = (L2.jars || []).filter((j) => Date.now() - j.t < CFG.JAR_DAYS * 864e5);
+          R(L2.jars.length ? "\u{1FAD9} SEED JARS\n" + L2.jars.map((j) => "#" + j.id + ": " + ml(j.ml) + " of " + plainName(j.stud) + "'s, bottled " + new Date(j.t).toLocaleString()).join("\n") + "\n?inseminate <who> <jar> [hole] asks them, and uses one on their yes." : "\u{1FAD9} No seed jars on the shelf, hon. ?collect a stud to bottle some.");
           break;
         }
         case "inseminate": {
           const t = resolveTarget(args[0]);
-          L.jars = (L.jars || []).filter((j) => Date.now() - j.t < CFG.JAR_DAYS * 864e5);
-          const jar = L.jars.find((j) => String(j.id) === String(args[1] || "").replace(/^#/, ""));
+          L2.jars = (L2.jars || []).filter((j) => Date.now() - j.t < CFG.JAR_DAYS * 864e5);
+          const jar = L2.jars.find((j) => String(j.id) === String(args[1] || "").replace(/^#/, ""));
           const hole = args[2] ? holeFrom(args[2]) : "vulva";
           if (!t || !jar || !hole) {
             R("Here's how, sugar: ?inseminate <who> <jar number> [hole]. ?jars shows what's on the shelf. They always get asked first. For example: ?inseminate Bessie 3");
@@ -31293,11 +31674,11 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
             R("Writin' farm contracts is for the proprietors, sugar.");
             return false;
           };
-          const tplFor = (n) => L.contractTemplates[n];
+          const tplFor = (n) => L2.contractTemplates[n];
           switch (sub) {
             case "list": {
-              const saved = Object.keys(L.contractTemplates);
-              const live = L.contracts.filter((x) => x.status === "signed" || x.status === "offered" || x.status === "releasing");
+              const saved = Object.keys(L2.contractTemplates);
+              const live = L2.contracts.filter((x) => x.status === "signed" || x.status === "offered" || x.status === "releasing");
               R("\u{1F4DC} FARM CONTRACTS\nReady-made: fun \xB7 deep \xB7 nhl" + (saved.length ? "\nYours: " + saved.join(" \xB7 ") : "") + "\n\nIN FORCE OR OFFERED\n" + (live.length ? live.map(contractLine).join("\n") : "  none right now") + "\n\n?contract show <name> [who] \xB7 ?contract offer <name> <who> <1h|12h|1d|1w|2w|1m|perm> \xB7 ?contract release <who> \xB7 ?contract check <who>" + (owner ? '\n?contract new <name> [from fun|deep|nhl] \xB7 add \xB7 set \xB7 remove \xB7 title \xB7 terms \xB7 policy \xB7 delete \xB7 ?contract rules\nMade for each person when offered: {name} {Species} {species} {pet} in any text, like nickname="BnB {Species} {name}" \u2192 BnB Cow Vicky' : ""));
               break;
             }
@@ -31359,7 +31740,7 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
               enqueue(queryMsg(t));
               R("\u{1F4DC} Askin' " + plainName(t) + "'s BC+ what farm contracts they hold\u2026");
               later(() => {
-                const mine = L.contracts.filter((x) => x.mn === t && x.status !== "declined");
+                const mine = L2.contracts.filter((x) => x.mn === t && x.status !== "declined");
                 reply(sender, mine.length ? "\u{1F4DC} " + mine.map(contractLine).join("\n") : plainName(t) + " holds no farm contracts.", replyCh);
               }, 4e3);
               break;
@@ -31390,7 +31771,7 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
                 break;
               }
               const base = String(args[2] || "").toLowerCase() === "from" ? (depthFrom(args[3] || "") || {}).key || null : null;
-              L.contractTemplates[name] = { title: "B&B Farm \xB7 " + name, terms: base ? DEFAULT_TERMS[base] : "", base, add: {}, remove: [], by: sender, at: Date.now() };
+              L2.contractTemplates[name] = { title: "B&B Farm \xB7 " + name, terms: base ? DEFAULT_TERMS[base] : "", base, add: {}, remove: [], by: sender, at: Date.now() };
               saveLedger();
               audit(sender, "CONTRACT_NEW", name);
               R("\u{1F4DC} Made '" + name + "'" + (base ? " from " + base : " (empty)") + ". Now ?contract add " + name + " <rule> key=value\u2026, ?contract title " + name + " <text>, ?contract terms " + name + " <text>, then ?contract show " + name + ".");
@@ -31522,7 +31903,7 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
                 R("There's no saved contract called '" + name + "', sugar.");
                 break;
               }
-              delete L.contractTemplates[name];
+              delete L2.contractTemplates[name];
               saveLedger();
               audit(sender, "CONTRACT_DELETE", name);
               R("\u{1F4DC} Deleted '" + name + "'. Contracts already signed keep goin' till they end.");
@@ -31539,8 +31920,8 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
           outfitsLedger();
           const sub = String(args[0] || "").toLowerCase();
           if (!sub || sub === "list") {
-            const ks = Object.keys(L.outfits);
-            R("\u{1F457} FARM OUTFITS\n" + (ks.length ? ks.map((k) => "  " + slotLabel(k) + " \xB7 " + L.outfits[k].items + " pieces" + (L.outfits[k].locks ? ", " + L.outfits[k].locks + " locked" : "")).join("\n") : "  none saved yet") + "\n\nKeys to farm locks: " + { staff: "farm staff + their herd leader", leader: "their herd leader", owners: "the proprietors" }[L.outfitRules.keys] + "\nOffered on approval: " + (L.outfitRules.onApprove ? "yes" : "no") + " \xB7 uniforms at clock-in: " + (L.outfitRules.onClockIn ? "yes" : "no") + " \xB7 change back at clock-out: " + (L.outfitRules.changeBack ? "yes" : "no") + "\n\nProprietors save outfits from the Companion's Dashboard. ?outfit offer <who> [slot] hands one over.");
+            const ks = Object.keys(L2.outfits);
+            R("\u{1F457} FARM OUTFITS\n" + (ks.length ? ks.map((k) => "  " + slotLabel(k) + " \xB7 " + L2.outfits[k].items + " pieces" + (L2.outfits[k].locks ? ", " + L2.outfits[k].locks + " locked" : "")).join("\n") : "  none saved yet") + "\n\nKeys to farm locks: " + { staff: "farm staff + their herd leader", leader: "their herd leader", owners: "the proprietors" }[L2.outfitRules.keys] + "\nOffered on approval: " + (L2.outfitRules.onApprove ? "yes" : "no") + " \xB7 uniforms at clock-in: " + (L2.outfitRules.onClockIn ? "yes" : "no") + " \xB7 change back at clock-out: " + (L2.outfitRules.changeBack ? "yes" : "no") + "\n\nProprietors save outfits from the Companion's Dashboard. ?outfit offer <who> [slot] hands one over.");
             break;
           }
           if (sub === "back") {
@@ -31572,11 +31953,11 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
           }
           if (sub === "clear") {
             const slot = outfitSlotFrom(args.slice(1));
-            if (!slot || !L.outfits[slot]) {
+            if (!slot || !L2.outfits[slot]) {
               R("There's no outfit saved there, sugar.");
               break;
             }
-            delete L.outfits[slot];
+            delete L2.outfits[slot];
             saveLedger();
             audit(sender, "OUTFIT_CLEAR", slot);
             R("\u{1F457} Cleared " + slotLabel(slot) + ".");
@@ -31589,7 +31970,7 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
               R("Who holds the keys to farm locks? ?outfit keys staff (farm staff + their herd leader), leader (their herd leader only) or owners (proprietors only).");
               break;
             }
-            L.outfitRules.keys = v;
+            L2.outfitRules.keys = v;
             saveLedger();
             R("\u{1F512} Farm locks open for: " + { staff: "farm staff + their herd leader", leader: "their herd leader", owners: "the proprietors" }[v] + ".");
             syncCompanions(true);
@@ -31602,7 +31983,7 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
               R("?outfit rule approve on|off \xB7 clockin on|off \xB7 changeback on|off");
               break;
             }
-            L.outfitRules[k] = v === "on";
+            L2.outfitRules[k] = v === "on";
             saveLedger();
             R("\u{1F457} Got it.");
             syncCompanions(true);
@@ -31616,8 +31997,8 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
           zonesLedger();
           const sub = String(args[0] || "").toLowerCase(), name = String(args[1] || "").toLowerCase();
           if (!sub || sub === "list") {
-            const ks = Object.keys(L.zones);
-            R("\u{1F5FA}\uFE0F ZONES\n" + (ks.length ? ks.map((n) => "  " + zoneText(n, L.zones[n])).join("\n") : "  none yet") + "\n\nHerdmasters: stand on a corner and ?zone a <name>, the opposite corner and ?zone b <name>. ?zone pair <name> <group> joins boxes into one place. ?zone who shows who's where.");
+            const ks = Object.keys(L2.zones);
+            R("\u{1F5FA}\uFE0F ZONES\n" + (ks.length ? ks.map((n) => "  " + zoneText(n, L2.zones[n])).join("\n") : "  none yet") + "\n\nHerdmasters: stand on a corner and ?zone a <name>, the opposite corner and ?zone b <name>. ?zone pair <name> <group> joins boxes into one place. ?zone who shows who's where.");
             break;
           }
           if (sub === "who") {
@@ -31644,7 +32025,7 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
               R("I need two corners on the map, sugar: ?zone box " + name + " <ax> <ay> <bx> <by>.");
               break;
             }
-            const z2 = L.zones[name] = L.zones[name] || { group: name };
+            const z2 = L2.zones[name] = L2.zones[name] || { group: name };
             z2.a = { X: n[0], Y: n[1] };
             z2.b = { X: n[2], Y: n[3] };
             saveLedger();
@@ -31653,19 +32034,19 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
             break;
           }
           if (sub === "a" || sub === "b") {
-            const C = charFor(sender), p2 = C && C.MapData && C.MapData.Pos;
+            const C2 = charFor(sender), p2 = C2 && C2.MapData && C2.MapData.Pos;
             if (!p2) {
               R("Step onto the map first, hon, so I can see where you're standin'.");
               break;
             }
-            const z2 = L.zones[name] = L.zones[name] || { group: name };
+            const z2 = L2.zones[name] = L2.zones[name] || { group: name };
             z2[sub] = { X: p2.X, Y: p2.Y };
             saveLedger();
             audit(sender, "ZONE_SET", name + " " + sub + " " + p2.X + "," + p2.Y);
             R("\u{1F5FA}\uFE0F " + zoneText(name, z2) + (z2.a && z2.b ? "" : "\nNow stand on the opposite corner and ?zone " + (sub === "a" ? "b" : "a") + " " + name + "."));
             break;
           }
-          const z = L.zones[name];
+          const z = L2.zones[name];
           if (!z) {
             R("There's no zone called '" + name + "', sugar.");
             break;
@@ -31688,7 +32069,7 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
             break;
           }
           if (sub === "clear") {
-            delete L.zones[name];
+            delete L2.zones[name];
             saveLedger();
             audit(sender, "ZONE_CLEAR", name);
             R("\u{1F5FA}\uFE0F Cleared " + name + ".");
@@ -31726,9 +32107,9 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
           voiceLedger();
           const sub = String(args[0] || "").toLowerCase(), who = String(args[1] || "").toLowerCase();
           const key = who === "herd" ? "herd" : resolveTarget(args[1]);
-          const slotOf = (k) => k === "herd" ? L.voice.herd[sender] = L.voice.herd[sender] || { on: false, lines: [], every: "15" } : L.voice.member[k] = L.voice.member[k] || { on: false, lines: [], every: "15", by: sender };
+          const slotOf = (k) => k === "herd" ? L2.voice.herd[sender] = L2.voice.herd[sender] || { on: false, lines: [], every: "15" } : L2.voice.member[k] = L2.voice.member[k] || { on: false, lines: [], every: "15", by: sender };
           if (!sub) {
-            const h = L.voice.herd[sender], mine = Object.entries(L.voice.member).filter(([m, v2]) => v2.by === sender || herdLeaderOf(+m) === sender);
+            const h = L2.voice.herd[sender], mine = Object.entries(L2.voice.member).filter(([m, v2]) => v2.by === sender || herdLeaderOf(+m) === sender);
             R("\u{1F300} LISTEN TO MY VOICE\nYour herd: " + (h ? (h.on ? "on" : "off") + " \xB7 " + h.lines.length + " lines \xB7 every " + h.every : "not set") + (mine.length ? "\n" + mine.map(([m, v2]) => plainName(+m) + ": " + (v2.on ? "on" : "off") + " \xB7 " + v2.lines.length + " lines \xB7 every " + v2.every + (rec(+m) && rec(+m).hypno ? "" : " (they haven't said ?hypno on)")).join("\n") : "") + "\n\n?voice add herd|<who> <line> \xB7 ?voice on|off herd|<who> \xB7 ?voice list herd|<who> \xB7 ?voice remove herd|<who> <n> \xB7 ?voice every herd|<who> 5|15|30|chores");
             break;
           }
@@ -31813,8 +32194,8 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
             R("?machine \xB7 ?machine load <who> <jar> [hole] \xB7 ?machine unload <who>");
             break;
           }
-          L.jars = (L.jars || []).filter((j) => Date.now() - j.t < CFG.JAR_DAYS * 864e5);
-          const jar = L.jars.find((j) => String(j.id) === String(args[2] || "").replace(/^#/, ""));
+          L2.jars = (L2.jars || []).filter((j) => Date.now() - j.t < CFG.JAR_DAYS * 864e5);
+          const jar = L2.jars.find((j) => String(j.id) === String(args[2] || "").replace(/^#/, ""));
           const hole = args[3] ? holeFrom(args[3]) : "vulva";
           if (!t || !jar || !hole) {
             R("Here's how, sugar: ?machine load <who> <jar number> [hole]. ?jars shows the shelf.");
@@ -31872,7 +32253,7 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
           }
           if (!args.length) {
             const mine = r.rights && r.rights.until > now ? "Only " + [r.rights.stud].concat(r.rights.allow || []).map(plainName).join(" or ") + " can take you till " + new Date(r.rights.until).toLocaleDateString() + "." : "Nobody holds breedin' rights on you.";
-            const held2 = Object.entries(L.people).filter(([, x]) => x.rights && x.rights.stud === sender && x.rights.until > now).map(([m]) => plainName(parseInt(m, 10)));
+            const held2 = Object.entries(L2.people).filter(([, x]) => x.rights && x.rights.stud === sender && x.rights.until > now).map(([m]) => plainName(parseInt(m, 10)));
             R("\u{1F50F} " + mine + (held2.length ? " You hold rights on " + held2.join(", ") + "." : "") + " ?rights <who> asks for theirs (they say ?accept), and ?rights off ends rights on you.");
             break;
           }
@@ -32088,7 +32469,7 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
         }
         /* ── THE BOOKS ── */
         case "roster": {
-          const all = Object.values(L.people);
+          const all = Object.values(L2.people);
           if (!all.length) {
             R("The books are plumb empty, sugar.");
             break;
@@ -32139,7 +32520,7 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
         }
         case "stock": {
           const spq = String(rest || "").toLowerCase().trim();
-          const herd = Object.values(L.people).filter((r) => r.roles && r.roles.includes(ROLE.LIVESTOCK) && (!spq || (r.species || "").toLowerCase().includes(spq)));
+          const herd = Object.values(L2.people).filter((r) => r.roles && r.roles.includes(ROLE.LIVESTOCK) && (!spq || (r.species || "").toLowerCase().includes(spq)));
           if (spq && !herd.length) {
             state.ambiguous = null;
             const who = resolveTarget(rest);
@@ -32178,9 +32559,9 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
             R("Find who, sugar? Give me part of a name, a member number, a species or a stay type. For example: ?find Bessie  or  ?find cow  or  ?find 1234");
             break;
           }
-          const hits = Object.values(L.people).filter((r) => (r.name || "").toLowerCase().includes(q) || String(r.mn).includes(q) || (r.species || "").toLowerCase().includes(q) || (r.stayType || "").toLowerCase().includes(q));
+          const hits = Object.values(L2.people).filter((r) => (r.name || "").toLowerCase().includes(q) || String(r.mn).includes(q) || (r.species || "").toLowerCase().includes(q) || (r.stayType || "").toLowerCase().includes(q));
           if (!hits.length) {
-            const arch = Object.values(L.archive || {}).filter((r) => (r.name || "").toLowerCase().includes(q) || String(r.mn).includes(q));
+            const arch = Object.values(L2.archive || {}).filter((r) => (r.name || "").toLowerCase().includes(q) || String(r.mn).includes(q));
             R(arch.length ? "Nobody current, hon, but I found " + arch.length + " in the drawer:\n\n" + arch.map((r) => "  \u2022 " + (r.name || "#" + r.mn) + " (" + r.mn + ") \u2014 archived").join("\n") : "Couldn't find a soul by that, sugar. Try part of a name, a member number or a species.");
             break;
           }
@@ -32504,8 +32885,8 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
         }
         /* ── PERSONAL ── */
         case "where": {
-          const C = charFor(sender);
-          const pos = C && C.MapData && C.MapData.Pos;
+          const C2 = charFor(sender);
+          const pos = C2 && C2.MapData && C2.MapData.Pos;
           R(pos ? "\u{1F4CD} You're at X:" + pos.X + "  Y:" + pos.Y + ", sugar." : "Hmm, I can't see where you're standin', sugar. You need to be on the farm map.");
           break;
         }
@@ -32541,11 +32922,11 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
           break;
         }
         case "keydump": {
-          const rows = (W.ChatRoomCharacter || []).filter((c) => c.MemberNumber !== CFG.BOT_MEMBER).map((C) => {
-            const led = keysOf(C.MemberNumber).join("+") || "-";
-            const ps = C.MapData && C.MapData.PrivateState;
+          const rows = (W.ChatRoomCharacter || []).filter((c) => c.MemberNumber !== CFG.BOT_MEMBER).map((C2) => {
+            const led = keysOf(C2.MemberNumber).join("+") || "-";
+            const ps = C2.MapData && C2.MapData.PrivateState;
             const act = ps ? ALL_TIERS.filter((t) => ps["HasKey" + t[0].toUpperCase() + t.slice(1)]).join("+") || "-" : "?";
-            return "\u2022 " + plainName(C.MemberNumber) + "\n    ledger: " + led + "\n    theirs: " + act;
+            return "\u2022 " + plainName(C2.MemberNumber) + "\n    ledger: " + led + "\n    theirs: " + act;
           });
           R("\u{1F511} LEDGER vs ACTUAL\n\n" + (rows.join("\n") || "nobody about right now"));
           break;
@@ -32622,8 +33003,8 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
           break;
         }
         case "stuck": {
-          const C = charFor(sender);
-          const pos = C && C.MapData && C.MapData.Pos;
+          const C2 = charFor(sender);
+          const pos = C2 && C2.MapData && C2.MapData.Pos;
           const now = Date.now();
           const last = state.stuckCooldown.get(sender) || 0;
           if (now - last < CFG.STUCK_COOLDOWN_MIN * 6e4) {
@@ -32632,13 +33013,13 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
           }
           state.stuckCooldown.set(sender, now);
           const where = pos ? pos.X + "," + pos.Y : "unknown";
-          L.stuckLog.push({ t: now, mn: sender, name: plainName(sender), pos: where });
-          if (L.stuckLog.length > 300) L.stuckLog = L.stuckLog.slice(-300);
+          L2.stuckLog.push({ t: now, mn: sender, name: plainName(sender), pos: where });
+          if (L2.stuckLog.length > 300) L2.stuckLog = L2.stuckLog.slice(-300);
           saveLedger();
           audit(sender, "STUCK", where);
           say("Hold still, " + plainName(sender) + ". I'm gettin' you some help.", true, sender);
           const staffHere = [];
-          for (const k in L.people) {
+          for (const k in L2.people) {
             const m = parseInt(k, 10);
             if (isStaff(m) && onDuty(m) && charFor(m)) staffHere.push(m);
           }
@@ -32672,43 +33053,43 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
             R("Sorry, sugar, that one's just for herdmasters and proprietors.");
             break;
           }
-          const C = charFor(sender);
-          const pos = C && C.MapData && C.MapData.Pos;
+          const C2 = charFor(sender);
+          const pos = C2 && C2.MapData && C2.MapData.Pos;
           if (!pos) {
             R("I can't see where you're standin', hon. You need to be on the farm map.");
             break;
           }
-          L.spots.rescue = { X: pos.X, Y: pos.Y, by: sender, at: Date.now() };
+          L2.spots.rescue = { X: pos.X, Y: pos.Y, by: sender, at: Date.now() };
           saveLedger();
           R("\u{1F4CD} Rescue spot set to " + pos.X + "," + pos.Y + ", sugar. (Same as ?spot set rescue.)");
           break;
         }
         case "stucklog": {
-          if (!L.stuckLog.length) {
+          if (!L2.stuckLog.length) {
             R("Nobody's got wedged yet. Map's behavin' itself!");
             break;
           }
           const byPos = {};
-          for (const s of L.stuckLog) {
+          for (const s of L2.stuckLog) {
             byPos[s.pos] = byPos[s.pos] || { n: 0, who: /* @__PURE__ */ new Set() };
             byPos[s.pos].n++;
             byPos[s.pos].who.add(s.name);
           }
           const rows = Object.entries(byPos).sort((a, b) => b[1].n - a[1].n);
-          let o = "\u{1FAA2} STUCK SPOTS (" + L.stuckLog.length + " incidents)\n\nSpots that keep showin' up are map bugs, not misbehavin'.\n";
+          let o = "\u{1FAA2} STUCK SPOTS (" + L2.stuckLog.length + " incidents)\n\nSpots that keep showin' up are map bugs, not misbehavin'.\n";
           for (const [pos, v] of rows.slice(0, 15)) o += "\n\u2022 " + pos + " \u2014 " + v.n + "\xD7 \u2014 " + Array.from(v.who).slice(0, 4).join(", ");
           R(o);
           break;
         }
         /* ── PAPERWORK ── */
         case "queue": {
-          const mailLine = "\u{1F4EE} Messages: " + (state.queue.length + state.urgent.length) + " waitin' to send \xB7 " + Object.keys(L.mailbox || {}).length + " people with messages held \xB7 " + (state.mutual ? state.mutual.set.size : "?") + " online and beep-able";
-          if (!L.applications.length) {
+          const mailLine = "\u{1F4EE} Messages: " + (state.queue.length + state.urgent.length) + " waitin' to send \xB7 " + Object.keys(L2.mailbox || {}).length + " people with messages held \xB7 " + (state.mutual ? state.mutual.set.size : "?") + " online and beep-able";
+          if (!L2.applications.length) {
             R("Queue's empty, hon. Quiet week!\n" + mailLine);
             break;
           }
-          let o = "\u{1F4CB} PENDING APPLICATIONS (" + L.applications.length + ")\n";
-          L.applications.forEach((a, i) => {
+          let o = "\u{1F4CB} PENDING APPLICATIONS (" + L2.applications.length + ")\n";
+          L2.applications.forEach((a, i) => {
             o += "\n" + (i + 1) + ". " + a.name + " (" + a.mn + ")" + (a.staffTrack ? " [staff]" : "") + "\n   " + ["role", "species", "gender", "stay", "depth"].map((k) => appAnswer(a, k) || "?").join(" \u2022 ");
           });
           o += "\n\nSay ?app and the number to read one, like ?app 1.\n" + mailLine;
@@ -32717,12 +33098,12 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
         }
         case "app": {
           const n0 = String(args[0] || "");
-          let a = /^\d{1,3}$/.test(n0) ? L.applications[parseInt(n0, 10) - 1] : null;
+          let a = /^\d{1,3}$/.test(n0) ? L2.applications[parseInt(n0, 10) - 1] : null;
           if (!a && n0) {
             state.ambiguous = null;
             const who = resolveTarget(n0);
             if (who) {
-              a = L.applications.find((x) => x.mn === who) || null;
+              a = L2.applications.find((x) => x.mn === who) || null;
               if (!a && rec(who) && rec(who).application) {
                 R("\u{1F4CB} " + plainName(who) + " (" + who + "), approved\n\n" + applicationText(rec(who).application, false));
                 break;
@@ -32773,12 +33154,12 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
           r.name = plainName(t);
           r.registeredAt = Date.now();
           for (const role of roles) if (!r.roles.includes(role)) r.roles.push(role);
-          const idx = L.applications.findIndex((a) => a.mn === t);
+          const idx = L2.applications.findIndex((a) => a.mn === t);
           let wants = null;
           if (idx >= 0) {
-            wants = applyApplication(t, L.applications[idx]);
-            keepApplication(t, L.applications[idx]);
-            L.applications.splice(idx, 1);
+            wants = applyApplication(t, L2.applications[idx]);
+            keepApplication(t, L2.applications[idx]);
+            L2.applications.splice(idx, 1);
           }
           if (!isStaff(t) && !r.contractSigned && !hasSignedContract(t)) r.contractBy = Date.now() + CFG.CONTRACT_GRACE_H * 36e5;
           saveLedger();
@@ -32789,7 +33170,7 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
           if (wants && wants.depth && wants.stay && roles.includes(ROLE.LIVESTOCK)) {
             const d = durationFrom(wants.stay), dp = depthFrom(wants.depth);
             contractsLedger();
-            L.contracts.push({
+            L2.contracts.push({
               key: Date.now().toString(36),
               mn: t,
               by: sender,
@@ -32807,7 +33188,7 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
           }
           R("\u2705 " + plainName(t) + " \u2014 " + roleString(t) + "\n\u{1F511} " + keyString(t) + (r.species ? "\n\u{1F43E} " + r.species : "") + (r.gender ? " \xB7 " + r.gender : "") + ready + (r.contractBy ? "\n\u23F3 They have " + CFG.CONTRACT_GRACE_H + " hours to sign a farm contract, or they come off the books." : ""));
           outfitsLedger();
-          if (L.outfitRules.onApprove && roles.includes(ROLE.LIVESTOCK) && outfitSlotFor(t)) later(() => offerOutfit(t, outfitSlotFor(t), "Welcome to the farm"), 4e3);
+          if (L2.outfitRules.onApprove && roles.includes(ROLE.LIVESTOCK) && outfitSlotFor(t) && !/^farm:/.test(outfitSlotFor(t)) && !rec(t).ownOutfit) later(() => offerOutfit(t, outfitSlotFor(t), "Welcome to the farm"), 4e3);
           beep(
             t,
             `\u{1F33E} You're in, ` + plainName(t) + `! Welcome to the family, sweetie. \u{1F495}
@@ -32834,8 +33215,8 @@ Welcome to B&B Farm, hon. \u{1F33E}`
             R("Sorry, sugar, that's not your call to make.");
             break;
           }
-          const idx = L.applications.findIndex((a) => a.mn === t);
-          if (idx >= 0) L.applications.splice(idx, 1);
+          const idx = L2.applications.findIndex((a) => a.mn === t);
+          if (idx >= 0) L2.applications.splice(idx, 1);
           saveLedger();
           audit(sender, "DENY", String(t));
           R("Denied and cleared, hon.");
@@ -32894,12 +33275,12 @@ Welcome to B&B Farm, hon. \u{1F33E}`
             }
             full = true;
           }
-          for (const k in L.people) {
-            const p2 = L.people[k];
+          for (const k in L2.people) {
+            const p2 = L2.people[k];
             if ((p2.herds || []).some((h) => h.leader === t)) p2.herds = p2.herds.filter((h) => h.leader !== t);
           }
-          L.archive[t] = JSON.parse(JSON.stringify(r));
-          delete L.people[t];
+          L2.archive[t] = JSON.parse(JSON.stringify(r));
+          delete L2.people[t];
           saveLedger();
           audit(sender, "UNREGISTER", String(t));
           pushKeys(t, [], true);
@@ -33131,7 +33512,11 @@ Welcome to B&B Farm, hon. \u{1F33E}`
         case "messes":
           messesCommand(sender, args, R);
           break;
-        // 10u9-mess-store.js
+        case "ownoutfit":
+        case "myoutfit":
+          ownOutfitCommand(sender, args, R);
+          break;
+        // bring your own outfit (10c-outfits.js)   // 10u9-mess-store.js
         case "quiet":
         case "tend":
           if (cmd !== "tend" || !bedTend(sender, args, R)) broodCommand(cmd, sender, args, R);
@@ -33230,7 +33615,7 @@ Welcome to B&B Farm, hon. \u{1F33E}`
           };
           const setApp = (k, v) => {
             keptApp()[k] = v;
-            for (const a of L.applications) if (a.mn === t) {
+            for (const a of L2.applications) if (a.mn === t) {
               if (!a.byKey) {
                 a.byKey = {};
                 OLD_ORDER.forEach((k2) => {
@@ -33340,9 +33725,9 @@ Welcome to B&B Farm, hon. \u{1F33E}`
           const sub = String(args[0] || "").toLowerCase();
           const name = String(args[1] || "").toLowerCase();
           if (!sub || sub === "list") {
-            const names = Object.keys(L.spots).sort();
+            const names = Object.keys(L2.spots).sort();
             const age = (s) => s.at ? Math.floor((Date.now() - s.at) / 864e5) : null;
-            R(names.length ? "\u{1F4CD} SPOTS\n\n" + names.map((n) => "  \u2022 " + n + " \u2014 " + L.spots[n].X + "," + L.spots[n].Y + (age(L.spots[n]) !== null ? " \xB7 set " + (age(L.spots[n]) ? age(L.spots[n]) + "d ago" : "today") : "")).join("\n") + "\n\n?spot set <name> where you stand \xB7 ?spot clear <name> [more names] \xB7 ?spot clear speaker-* \xB7 ?spot clear all \xB7 ?spot go <name>" : "No spots set yet, hon. Stand somewhere and say ?spot set summon (or safe, staff, rescue, trough, barn, stocks, milking1).");
+            R(names.length ? "\u{1F4CD} SPOTS\n\n" + names.map((n) => "  \u2022 " + n + " \u2014 " + L2.spots[n].X + "," + L2.spots[n].Y + (age(L2.spots[n]) !== null ? " \xB7 set " + (age(L2.spots[n]) ? age(L2.spots[n]) + "d ago" : "today") : "")).join("\n") + "\n\n?spot set <name> where you stand \xB7 ?spot clear <name> [more names] \xB7 ?spot clear speaker-* \xB7 ?spot clear all \xB7 ?spot go <name>" : "No spots set yet, hon. Stand somewhere and say ?spot set summon (or safe, staff, rescue, trough, barn, stocks, milking1).");
             break;
           }
           if (!isHerdmaster(sender)) {
@@ -33361,17 +33746,17 @@ Welcome to B&B Farm, hon. \u{1F33E}`
                 R("Clearin' every spot is for proprietors, sugar. You can clear them by name.");
                 break;
               }
-              hit = Object.keys(L.spots);
+              hit = Object.keys(L2.spots);
               if (words[1] !== "yes") {
                 R("That would clear all " + hit.length + " spots (" + hit.join(", ") + "). Say ?spot clear all yes to be sure.");
                 break;
               }
-            } else hit = Object.keys(L.spots).filter((n) => words.some((w) => w.endsWith("*") ? n.startsWith(w.slice(0, -1)) : n === w));
+            } else hit = Object.keys(L2.spots).filter((n) => words.some((w) => w.endsWith("*") ? n.startsWith(w.slice(0, -1)) : n === w));
             if (!hit.length) {
               R("No spots match " + words.join(" ") + ", hon. Plain ?spot shows the list.");
               break;
             }
-            for (const n of hit) delete L.spots[n];
+            for (const n of hit) delete L2.spots[n];
             saveLedger();
             audit(sender, "SPOT_CLEAR", hit.join(" ").slice(0, 200));
             R("\u{1F4CD} Cleared " + hit.length + " spot" + (hit.length === 1 ? "" : "s") + ": " + hit.join(", ") + ".");
@@ -33382,13 +33767,13 @@ Welcome to B&B Farm, hon. \u{1F33E}`
             break;
           }
           if (sub === "set") {
-            const C = charFor(sender);
-            const pos = C && C.MapData && C.MapData.Pos;
+            const C2 = charFor(sender);
+            const pos = C2 && C2.MapData && C2.MapData.Pos;
             if (!pos) {
               R("Hmm, I can't see where you're standin', hon. You need to be on the farm map.");
               break;
             }
-            L.spots[name] = { X: pos.X, Y: pos.Y, by: sender, at: Date.now() };
+            L2.spots[name] = { X: pos.X, Y: pos.Y, by: sender, at: Date.now() };
             saveLedger();
             audit(sender, "SPOT", name + " " + pos.X + "," + pos.Y);
             R("\u{1F4CD} '" + name + "' is set to " + pos.X + "," + pos.Y + ", sugar!");
@@ -33398,16 +33783,16 @@ Welcome to B&B Farm, hon. \u{1F33E}`
               R("I need a tile on the map, sugar: ?spot place " + name + " <x> <y>, like ?spot place speaker-barn 12 7.");
               break;
             }
-            L.spots[name] = { X: x, Y: y, by: sender, at: Date.now() };
+            L2.spots[name] = { X: x, Y: y, by: sender, at: Date.now() };
             saveLedger();
             audit(sender, "SPOT", name + " " + x + "," + y);
             R("\u{1F4CD} '" + name + "' is set to " + x + "," + y + ", sugar!");
           } else if (sub === "clear") {
-            if (!L.spots[name]) {
+            if (!L2.spots[name]) {
               R("There's no spot called '" + name + "', hon. Plain ?spot shows the list.");
               break;
             }
-            delete L.spots[name];
+            delete L2.spots[name];
             saveLedger();
             audit(sender, "SPOT_CLEAR", name);
             R("\u{1F4CD} '" + name + "' is cleared, sugar.");
@@ -33540,23 +33925,23 @@ Welcome to B&B Farm, hon. \u{1F33E}`
               R("Give me a line, sugar! ?tease add <line> adds one (%name% becomes their name), ?tease list shows them all, ?tease remove <number> takes one off. For example: ?tease add Somebody looks awful cute today, %name%.");
               break;
             }
-            L.tease.push({ text: line, by: sender, at: Date.now() });
+            L2.tease.push({ text: line, by: sender, at: Date.now() });
             saveLedger();
             audit(sender, "TEASE_ADD", line.slice(0, 60));
-            R("Added! " + L.tease.length + " teasin' line" + (L.tease.length === 1 ? "" : "s") + " on file.");
+            R("Added! " + L2.tease.length + " teasin' line" + (L2.tease.length === 1 ? "" : "s") + " on file.");
           } else if (sub === "remove" || sub === "del") {
             const i = parseInt(args[1], 10) - 1;
-            if (!(i >= 0 && i < L.tease.length)) {
+            if (!(i >= 0 && i < L2.tease.length)) {
               R("Which number, hon? Say ?tease remove and a number from ?tease list, like ?tease remove 2.");
               break;
             }
-            const gone = L.tease.splice(i, 1)[0];
+            const gone = L2.tease.splice(i, 1)[0];
             saveLedger();
             audit(sender, "TEASE_REMOVE", gone.text.slice(0, 60));
             R("Took it off: " + gone.text);
           } else {
-            const opted = Object.values(L.people).filter((r) => r.teaseOptIn).length;
-            R(L.tease.length ? "\u{1F608} TEASING LINES (" + L.tease.length + ") \xB7 " + opted + " opted in\n\n" + L.tease.map((x, i) => i + 1 + ". " + x.text).join("\n") + "\n\n?tease add <line> \xB7 ?tease remove <n>" : "No lines yet, sugar. ?tease add <line> adds one (%name% becomes their name), ?tease list shows them all, ?tease remove <number> takes one off. For example: ?tease add Somebody looks awful cute today, %name%.");
+            const opted = Object.values(L2.people).filter((r) => r.teaseOptIn).length;
+            R(L2.tease.length ? "\u{1F608} TEASING LINES (" + L2.tease.length + ") \xB7 " + opted + " opted in\n\n" + L2.tease.map((x, i) => i + 1 + ". " + x.text).join("\n") + "\n\n?tease add <line> \xB7 ?tease remove <n>" : "No lines yet, sugar. ?tease add <line> adds one (%name% becomes their name), ?tease list shows them all, ?tease remove <number> takes one off. For example: ?tease add Somebody looks awful cute today, %name%.");
           }
           break;
         }
@@ -33576,16 +33961,16 @@ Welcome to B&B Farm, hon. \u{1F33E}`
         /* ── NOTICE BOARD ── */
         case "notice": {
           if (!args.length || !isProprietor(sender)) {
-            R(L.notice ? "\u{1F4CC} NOTICE BOARD\n\n" + L.notice.text + "\n\n\u2014 " + plainName(L.notice.by) + ", " + new Date(L.notice.at).toLocaleDateString() : "Notice board's bare right now, hon.");
+            R(L2.notice ? "\u{1F4CC} NOTICE BOARD\n\n" + L2.notice.text + "\n\n\u2014 " + plainName(L2.notice.by) + ", " + new Date(L2.notice.at).toLocaleDateString() : "Notice board's bare right now, hon.");
             break;
           }
           if (String(args[0]).toLowerCase() === "clear") {
-            L.notice = null;
+            L2.notice = null;
             saveLedger();
             R("Notice board's all cleared.");
             break;
           }
-          L.notice = { text: rest, by: sender, at: Date.now() };
+          L2.notice = { text: rest, by: sender, at: Date.now() };
           saveLedger();
           audit(sender, "NOTICE", rest.slice(0, 80));
           R("\u{1F4CC} Pinned it up! Everybody who walks in gets it.");
@@ -33610,7 +33995,7 @@ Welcome to B&B Farm, hon. \u{1F33E}`
         }
         /* ── PRODUCTION & BREEDING ── */
         case "shotlog": {
-          const rows = (L.shotLog || []).slice(-10).reverse();
+          const rows = (L2.shotLog || []).slice(-10).reverse();
           R(rows.length ? "\u{1F489} LAST SHOTS I SAW\n\n" + rows.map((x) => new Date(x.t).toLocaleTimeString() + " \u2014 " + plainName(x.by) + " \u2192 " + plainName(x.to) + "\n    " + x.item + " \xB7 tags: " + (x.tags.join(", ") || "none I know")).join("\n") : "I haven't seen a single shot yet, hon. If somebody just used an injector and it's not here, I'm not seein' the Inject at all.");
           break;
         }
@@ -34213,11 +34598,11 @@ Welcome to B&B Farm, hon. \u{1F33E}`
             break;
           }
           if (cmd === "collect") {
-            L.jars = (L.jars || []).filter((j) => Date.now() - j.t < CFG.JAR_DAYS * 864e5);
-            L.nextJar = (L.nextJar || 0) + 1;
-            L.jars.push({ id: L.nextJar, stud: t, ml: got, t: Date.now(), pent: false });
+            L2.jars = (L2.jars || []).filter((j) => Date.now() - j.t < CFG.JAR_DAYS * 864e5);
+            L2.nextJar = (L2.nextJar || 0) + 1;
+            L2.jars.push({ id: L2.nextJar, stud: t, ml: got, t: Date.now(), pent: false });
             saveLedger();
-            R("\u{1FAD9} Bottled as jar #" + L.nextJar + " (" + ml(got) + " of " + plainName(t) + "'s). Staff can ?inseminate <who> " + L.nextJar + " [hole] within " + CFG.JAR_DAYS + " days.");
+            R("\u{1FAD9} Bottled as jar #" + L2.nextJar + " (" + ml(got) + " of " + plainName(t) + "'s). Staff can ?inseminate <who> " + L2.nextJar + " [hole] within " + CFG.JAR_DAYS + " days.");
           }
           const scene = (cmd === "milk" ? "milk" : "collect") + (t === sender ? "Self" : "");
           if (!runScene(scene, t, { n: plainName(t), b: plainName(sender), bMn: sender, ml: ml(got), icon: cmd === "milk" ? "\u{1F95B}" : "\u{1F9EA}" }))
@@ -34241,9 +34626,9 @@ Welcome to B&B Farm, hon. \u{1F33E}`
         case "board": {
           rollBoard();
           const top = (o) => Object.entries(o).sort((a, b) => b[1] - a[1]).slice(0, 5).map(([m, v], i) => "  " + (i + 1) + ". " + plainName(parseInt(m, 10)) + " \u2014 " + ml(v) + " (grade " + milkGrade(parseInt(m, 10)) + ")").join("\n") || "  (nobody yet)";
-          const sires = Object.entries(L.yield.s || {}).sort((a, b) => b[1] - a[1]).slice(0, 5).map(([m, n], i) => "  " + (i + 1) + ". " + plainName(parseInt(m, 10)) + " \u2014 " + n + " caught").join("\n") || "  (nobody yet)";
-          const dump = Object.entries(L.yield.u || {}).sort((a, b) => b[1] - a[1])[0];
-          R("\u{1F95B} YIELD BOARD\n\nToday\n" + top(L.yield.d) + "\n\nThis week (top goes prize)\n" + top(L.yield.w) + "\n\n\u{1F402} Top sires this week\n" + sires + (dump ? "\n\n\u{1FAA3} Farm cumdump of the day: " + plainName(parseInt(dump[0], 10)) + " (" + dump[1] + " times)" : "") + subjBoardLine() + benchBoardLine());
+          const sires = Object.entries(L2.yield.s || {}).sort((a, b) => b[1] - a[1]).slice(0, 5).map(([m, n], i) => "  " + (i + 1) + ". " + plainName(parseInt(m, 10)) + " \u2014 " + n + " caught").join("\n") || "  (nobody yet)";
+          const dump = Object.entries(L2.yield.u || {}).sort((a, b) => b[1] - a[1])[0];
+          R("\u{1F95B} YIELD BOARD\n\nToday\n" + top(L2.yield.d) + "\n\nThis week (top goes prize)\n" + top(L2.yield.w) + "\n\n\u{1F402} Top sires this week\n" + sires + (dump ? "\n\n\u{1FAA3} Farm cumdump of the day: " + plainName(parseInt(dump[0], 10)) + " (" + dump[1] + " times)" : "") + subjBoardLine() + benchBoardLine());
           break;
         }
         case "pedigree": {
@@ -34252,7 +34637,7 @@ Welcome to B&B Farm, hon. \u{1F33E}`
             R("I don't know that one, sugar. Just ?pedigree shows your own stud book; add a name or member number for somebody else's, like ?pedigree Bessie or ?pedigree 123456.");
             break;
           }
-          const book = L.studbook || [], kidsIn = (e) => e.eggs ? e.eggs : e.kids.male + e.kids.female + e.kids.futa;
+          const book = L2.studbook || [], kidsIn = (e) => e.eggs ? e.eggs : e.kids.male + e.kids.female + e.kids.futa;
           const withWhom = (rows, who) => {
             const m = /* @__PURE__ */ new Map();
             for (const e of rows) for (const w of who(e)) m.set(w, (m.get(w) || 0) + 1);
@@ -34288,7 +34673,7 @@ Welcome to B&B Farm, hon. \u{1F33E}`
           break;
         }
         case "heatline": {
-          if (!L.heatLines) L.heatLines = [];
+          if (!L2.heatLines) L2.heatLines = [];
           const sub = String(args[0] || "list").toLowerCase();
           if (sub === "add") {
             const line = args.slice(1).join(" ").trim();
@@ -34296,19 +34681,19 @@ Welcome to B&B Farm, hon. \u{1F33E}`
               R("Give me a line, sugar! ?heatline add <line> adds one (%name% becomes their name), ?heatline list shows yours, ?heatline remove <number> takes one off. For example: ?heatline add %name% grinds against the rails.");
               break;
             }
-            L.heatLines.push({ text: line, by: sender, at: Date.now() });
+            L2.heatLines.push({ text: line, by: sender, at: Date.now() });
             saveLedger();
-            R("Added! " + L.heatLines.length + " heat line(s) of your own now.");
+            R("Added! " + L2.heatLines.length + " heat line(s) of your own now.");
           } else if (sub === "remove" || sub === "del") {
             const i = parseInt(args[1], 10) - 1;
-            if (!(i >= 0 && i < L.heatLines.length)) {
+            if (!(i >= 0 && i < L2.heatLines.length)) {
               R("Which number, hon? Say ?heatline remove and a number from ?heatline list, like ?heatline remove 2.");
               break;
             }
-            R("Took it off: " + L.heatLines.splice(i, 1)[0].text);
+            R("Took it off: " + L2.heatLines.splice(i, 1)[0].text);
             saveLedger();
           } else {
-            R(L.heatLines.length ? "\u{1F525} HEAT LINES\n\n" + L.heatLines.map((x, i) => i + 1 + ". " + x.text).join("\n") : "I'm usin' the built-in heat lines right now, sugar. ?heatline add <line> adds one (%name% becomes their name), ?heatline list shows yours, ?heatline remove <number> takes one off. For example: ?heatline add %name% grinds against the rails.");
+            R(L2.heatLines.length ? "\u{1F525} HEAT LINES\n\n" + L2.heatLines.map((x, i) => i + 1 + ". " + x.text).join("\n") : "I'm usin' the built-in heat lines right now, sugar. ?heatline add <line> adds one (%name% becomes their name), ?heatline list shows yours, ?heatline remove <number> takes one off. For example: ?heatline add %name% grinds against the rails.");
           }
           break;
         }
@@ -34316,7 +34701,7 @@ Welcome to B&B Farm, hon. \u{1F33E}`
         case "feeding":
         case "curfew": {
           if (!isProprietor(sender)) {
-            R(cmd === "feeding" ? "\u{1F514} Feedin' time's at " + CFG.FEED_HOURS.map((h) => h + ":00").join(" and ") + (L.life.feedingOn ? "" : " (switched off right now)") + ", sugar." : "\u{1F319} Curfew runs " + CFG.CURFEW.start + ":00 to " + CFG.CURFEW.end + ":00" + (L.life.curfewOn ? "" : " (switched off right now)") + ", sugar.");
+            R(cmd === "feeding" ? "\u{1F514} Feedin' time's at " + CFG.FEED_HOURS.map((h) => h + ":00").join(" and ") + (L2.life.feedingOn ? "" : " (switched off right now)") + ", sugar." : "\u{1F319} Curfew runs " + CFG.CURFEW.start + ":00 to " + CFG.CURFEW.end + ":00" + (L2.life.curfewOn ? "" : " (switched off right now)") + ", sugar.");
             break;
           }
           const key = cmd === "feeding" ? "feedingOn" : "curfewOn";
@@ -34325,11 +34710,11 @@ Welcome to B&B Farm, hon. \u{1F33E}`
             R("Just say ?" + cmd + " on or ?" + cmd + " off, sugar. For example: ?" + cmd + " off");
             break;
           }
-          L.life[key] = v ? v === "on" : !L.life[key];
+          L2.life[key] = v ? v === "on" : !L2.life[key];
           saveLedger();
-          audit(sender, cmd.toUpperCase(), L.life[key] ? "on" : "off");
+          audit(sender, cmd.toUpperCase(), L2.life[key] ? "on" : "off");
           if (cmd === "curfew") syncAllPresent(true);
-          R((cmd === "feeding" ? "\u{1F514} Feedin' times are " : "\u{1F319} Curfew is ") + (L.life[key] ? "ON" : "off") + " now. ?" + cmd + " on or ?" + cmd + " off sets it; plain ?" + cmd + " flips it.");
+          R((cmd === "feeding" ? "\u{1F514} Feedin' times are " : "\u{1F319} Curfew is ") + (L2.life[key] ? "ON" : "off") + " now. ?" + cmd + " on or ?" + cmd + " off sets it; plain ?" + cmd + " flips it.");
           break;
         }
         case "weather": {
@@ -34398,29 +34783,29 @@ Welcome to B&B Farm, hon. \u{1F33E}`
             R("Sorry, sugar, that one's just for herdmasters and proprietors.");
             break;
           }
-          if (!L.life.tour) L.life.tour = [];
+          if (!L2.life.tour) L2.life.tour = [];
           const sub = String(args[0] || "list").toLowerCase();
           if (sub === "add") {
-            const C = charFor(sender), pos = C && C.MapData && C.MapData.Pos;
+            const C2 = charFor(sender), pos = C2 && C2.MapData && C2.MapData.Pos;
             const text = args.slice(1).join(" ").trim();
             if (!pos || !text) {
               R("Stand right at the stop, sugar, and say ?tourstop add and what they're lookin' at (%name% becomes the visitor's name). For example: ?tourstop add The pasture. Mind the ruts, %name%.");
               break;
             }
-            L.life.tour.push({ X: pos.X, Y: pos.Y, text });
+            L2.life.tour.push({ X: pos.X, Y: pos.Y, text });
             saveLedger();
-            R("\u{1F4CD} Stop " + L.life.tour.length + " added at " + pos.X + "," + pos.Y + "!");
+            R("\u{1F4CD} Stop " + L2.life.tour.length + " added at " + pos.X + "," + pos.Y + "!");
           } else if (sub === "remove") {
             const i = parseInt(args[1], 10) - 1;
-            if (!(i >= 0 && i < L.life.tour.length)) {
+            if (!(i >= 0 && i < L2.life.tour.length)) {
               R("Which stop, hon? Say ?tourstop remove and a number from ?tourstop list, like ?tourstop remove 2.");
               break;
             }
-            L.life.tour.splice(i, 1);
+            L2.life.tour.splice(i, 1);
             saveLedger();
             R("Took off stop " + (i + 1) + ", sugar.");
           } else {
-            R(L.life.tour.length ? "\u{1F5FA}\uFE0F TOUR STOPS\n\n" + L.life.tour.map((s, i) => i + 1 + ". " + s.X + "," + s.Y + " \u2014 " + s.text).join("\n") : "No stops yet, sugar. Stand somewhere and say ?tourstop add and a line, like ?tourstop add The barn. Smells like home, don't it?");
+            R(L2.life.tour.length ? "\u{1F5FA}\uFE0F TOUR STOPS\n\n" + L2.life.tour.map((s, i) => i + 1 + ". " + s.X + "," + s.Y + " \u2014 " + s.text).join("\n") : "No stops yet, sugar. Stand somewhere and say ?tourstop add and a line, like ?tourstop add The barn. Smells like home, don't it?");
           }
           break;
         }
@@ -34450,7 +34835,7 @@ Welcome to B&B Farm, hon. \u{1F33E}`
           audit(sender, "CLOCKIN", "");
           R("\u23F1\uFE0F You're on the clock, sweetie! Keep chattin', or I'll clock you out after " + CFG.SHIFT_IDLE_MIN + " quiet minutes.");
           outfitsLedger();
-          if (L.outfitRules.onClockIn && uniformSlotFor(sender)) later(() => offerOutfit(sender, uniformSlotFor(sender), "Your shift's startin'"), 1500);
+          if (L2.outfitRules.onClockIn && uniformSlotFor(sender)) later(() => offerOutfit(sender, uniformSlotFor(sender), "Your shift's startin'"), 1500);
           break;
         }
         case "clockout": {
@@ -34495,7 +34880,7 @@ Welcome to B&B Farm, hon. \u{1F33E}`
           staffPoints(sender, 1, "chore");
           earnRibbons(sender, CFG.RIBBONS_FOR.chore, "a chore done");
           if (bounty) {
-            L.chores = L.chores.filter((c) => c.key !== bkey);
+            L2.chores = L2.chores.filter((c) => c.key !== bkey);
             saveLedger();
             earnRibbons(sender, bounty, 'the bounty on "' + String(btext).replace(/\s*@[a-z0-9_-]+\s*$/i, "") + '"', bby || CFG.BOT_MEMBER);
             if (bby && bby !== sender) tell(bby, "\u{1F4CC} " + plainName(sender) + " did your bounty job and collected the " + bounty + " ribbons.");
@@ -34512,22 +34897,22 @@ Welcome to B&B Farm, hon. \u{1F33E}`
               R("What's the job, sugar? Say ?chore add and the job, like ?chore add Polish the cowbells. Add @place to make it count only there, like ?chore add Muck out the pens @pens.");
               break;
             }
-            L.chores.push({ text, by: sender });
+            L2.chores.push({ text, by: sender });
             saveLedger();
-            R("Added! " + L.chores.length + " chores on the board now.");
+            R("Added! " + L2.chores.length + " chores on the board now.");
           } else if (sub === "remove") {
             const i = parseInt(args[1], 10) - 1;
-            if (!(i >= 0 && i < L.chores.length)) {
+            if (!(i >= 0 && i < L2.chores.length)) {
               R("Which number, hon? Say ?chore remove and a number from the ?chores list, like ?chore remove 3.");
               break;
             }
-            R("Took it off: " + L.chores.splice(i, 1)[0].text);
+            R("Took it off: " + L2.chores.splice(i, 1)[0].text);
             saveLedger();
           } else {
             const wk = weekKey();
-            const board = Object.values(L.people).filter((r) => r.choreWeek && r.choreWeek.key === wk).sort((a, b) => b.choreWeek.n - a.choreWeek.n).slice(0, 5).map((r, i) => "  " + (i + 1) + ". " + (r.name || plainName(r.mn)) + " \u2014 " + r.choreWeek.n).join("\n");
+            const board = Object.values(L2.people).filter((r) => r.choreWeek && r.choreWeek.key === wk).sort((a, b) => b.choreWeek.n - a.choreWeek.n).slice(0, 5).map((r, i) => "  " + (i + 1) + ". " + (r.name || plainName(r.mn)) + " \u2014 " + r.choreWeek.n).join("\n");
             const mine = rec(sender) && rec(sender).chore;
-            R("\u{1F9F9} CHORES\n" + (mine ? "\nYours: " + mine.text + " (say ?done when it's finished)\n" : "") + "\nThis week\n" + (board || "  nobody yet") + "\n\nOn the board (" + L.chores.length + "):\n" + L.chores.map((c, i) => i + 1 + ". " + c.text).join("\n") + "\n\n?chore add <job> \xB7 ?chore remove <number>");
+            R("\u{1F9F9} CHORES\n" + (mine ? "\nYours: " + mine.text + " (say ?done when it's finished)\n" : "") + "\nThis week\n" + (board || "  nobody yet") + "\n\nOn the board (" + L2.chores.length + "):\n" + L2.chores.map((c, i) => i + 1 + ". " + c.text).join("\n") + "\n\n?chore add <job> \xB7 ?chore remove <number>");
           }
           break;
         }
@@ -34541,10 +34926,10 @@ Welcome to B&B Farm, hon. \u{1F33E}`
                 R("Herdmasters and up switch the farm's slices, sugar.");
                 break;
               }
-              L.wheelFarm = v === "on";
+              L2.wheelFarm = v === "on";
               saveLedger();
             }
-            R("\u{1F3A1} The farm's own slices (" + FARM_SLICES.length + ": stocks, the pen, glory shifts, potions, dares, ribbons\u2026) are " + (L.wheelFarm === false ? "OFF" : "ON") + ". ?wheel farm on|off");
+            R("\u{1F3A1} The farm's own slices (" + FARM_SLICES.length + ": stocks, the pen, glory shifts, potions, dares, ribbons\u2026) are " + (L2.wheelFarm === false ? "OFF" : "ON") + ". ?wheel farm on|off");
             break;
           }
           if (sub === "add") {
@@ -34562,20 +34947,20 @@ Welcome to B&B Farm, hon. \u{1F33E}`
               R("There's no potion called that, sugar. ?potions lists 'em.");
               break;
             }
-            L.wheel.push({ kind, text, act, by: sender });
+            L2.wheel.push({ kind, text, act, by: sender });
             saveLedger();
-            R("Added to the wheel! " + L.wheel.length + " slices of your own now" + (act ? ", and that one does somethin' (" + act + ")" : "") + ".");
+            R("Added to the wheel! " + L2.wheel.length + " slices of your own now" + (act ? ", and that one does somethin' (" + act + ")" : "") + ".");
           } else if (sub === "remove") {
             const i = parseInt(args[1], 10) - 1;
-            if (!(i >= 0 && i < L.wheel.length)) {
+            if (!(i >= 0 && i < L2.wheel.length)) {
               R("Which number, hon? Say ?wheel remove and a number from the ?wheel list, like ?wheel remove 2.");
               break;
             }
-            R("Took it off: " + L.wheel.splice(i, 1)[0].text);
+            R("Took it off: " + L2.wheel.splice(i, 1)[0].text);
             saveLedger();
           } else {
             const icon = (e) => e.kind === "reward" ? "\u{1F36C}" : e.kind === "silly" ? "\u{1F3AD}" : "\u{1F53B}";
-            R("\u{1F3A1} THE WHEEL\n\nYOURS\n" + (L.wheel.length ? L.wheel.map((e, i) => i + 1 + ". " + icon(e) + " " + e.text + (e.act ? "  \u21D2 " + e.act : "")).join("\n") : "  none yet") + "\n\nTHE FARM'S (" + (L.wheelFarm === false ? "off" : "on") + ", ?wheel farm on|off)\n" + FARM_SLICES.map((e) => "  " + icon(e) + " " + e.text.replace(/%name%/g, "\u2026")).join("\n") + "\n\n?spin <who> [reward|punish|silly] \xB7 ?wheel add <kind> <text> [=> action] \xB7 ?wheel remove <number>. A slice that can't happen to them (limits, switches) is skipped.");
+            R("\u{1F3A1} THE WHEEL\n\nYOURS\n" + (L2.wheel.length ? L2.wheel.map((e, i) => i + 1 + ". " + icon(e) + " " + e.text + (e.act ? "  \u21D2 " + e.act : "")).join("\n") : "  none yet") + "\n\nTHE FARM'S (" + (L2.wheelFarm === false ? "off" : "on") + ", ?wheel farm on|off)\n" + FARM_SLICES.map((e) => "  " + icon(e) + " " + e.text.replace(/%name%/g, "\u2026")).join("\n") + "\n\n?spin <who> [reward|punish|silly] \xB7 ?wheel add <kind> <text> [=> action] \xB7 ?wheel remove <number>. A slice that can't happen to them (limits, switches) is skipped.");
           }
           break;
         }
@@ -34603,7 +34988,7 @@ Welcome to B&B Farm, hon. \u{1F33E}`
           }
           const text = cmd === "please" ? "please " + rest : rest;
           if (!begPhraseOk(text)) {
-            R('Manners, sugar! Ask properly: ?beg and then "' + (L.life.begPhrase || CFG.BEG_PHRASE) + '". For example: ?beg ' + (L.life.begPhrase || CFG.BEG_PHRASE));
+            R('Manners, sugar! Ask properly: ?beg and then "' + (L2.life.begPhrase || CFG.BEG_PHRASE) + '". For example: ?beg ' + (L2.life.begPhrase || CFG.BEG_PHRASE));
             break;
           }
           const last = state.cooldowns.get("beg:" + sender) || 0;
@@ -34642,10 +35027,10 @@ Welcome to B&B Farm, hon. \u{1F33E}`
             break;
           }
           if (!rest) {
-            R(`The beggin' phrase is "` + (L.life.begPhrase || CFG.BEG_PHRASE) + '", hon. Say ?begphrase and new words to change it, like ?begphrase pretty please, Farmhand');
+            R(`The beggin' phrase is "` + (L2.life.begPhrase || CFG.BEG_PHRASE) + '", hon. Say ?begphrase and new words to change it, like ?begphrase pretty please, Farmhand');
             break;
           }
-          L.life.begPhrase = rest;
+          L2.life.begPhrase = rest;
           saveLedger();
           R('Got it! Stock have to say "' + rest + '" now.');
           break;
@@ -34653,7 +35038,7 @@ Welcome to B&B Farm, hon. \u{1F33E}`
         /* ── COUNTY FAIR ── */
         case "fair": {
           const sub = String(args[0] || "").toLowerCase();
-          const F = L.life.fair;
+          const F = L2.life.fair;
           if (sub === "open") {
             if (!isProprietor(sender)) {
               R("Only the proprietors can open the fair, sugar.");
@@ -34673,9 +35058,9 @@ Welcome to B&B Farm, hon. \u{1F33E}`
               throat: "Deepest Throat",
               load: "Biggest Load"
             };
-            L.life.fair = { open: true, at: Date.now(), entrants: {}, cls, loads: {}, title: rest2.join(" ") || CLASS_TITLE[cls] };
+            L2.life.fair = { open: true, at: Date.now(), entrants: {}, cls, loads: {}, title: rest2.join(" ") || CLASS_TITLE[cls] };
             saveLedger();
-            announce("\u{1F3AA} Y'all, the " + L.life.fair.title + " is open! " + (cls === "show" ? "Stock: say ?enter to show. Staff: ?score <who> <1-10>, like ?score Bessie 8." : cls === "load" ? "Studs: say ?enter, then give it your best ?cum. Biggest single load wins!" : "Say ?enter and I'll measure you up when it closes. Biggest wins, and judges' scores break a tie!"));
+            announce("\u{1F3AA} Y'all, the " + L2.life.fair.title + " is open! " + (cls === "show" ? "Stock: say ?enter to show. Staff: ?score <who> <1-10>, like ?score Bessie 8." : cls === "load" ? "Studs: say ?enter, then give it your best ?cum. Biggest single load wins!" : "Say ?enter and I'll measure you up when it closes. Biggest wins, and judges' scores break a tie!"));
           } else if (sub === "close") {
             if (!isProprietor(sender)) {
               R("Only the proprietors can close the fair, sugar.");
@@ -34723,7 +35108,7 @@ Welcome to B&B Farm, hon. \u{1F33E}`
           break;
         }
         case "enter": {
-          const F = L.life.fair;
+          const F = L2.life.fair;
           if (!F || !F.open) {
             R("There's no fair runnin' right now, hon. I'll holler when there is!");
             break;
@@ -34751,7 +35136,7 @@ Welcome to B&B Farm, hon. \u{1F33E}`
           break;
         }
         case "score": {
-          const F = L.life.fair;
+          const F = L2.life.fair;
           const t = resolveTarget(args[0]), n = parseFloat(args[1]);
           if (!F || !F.open) {
             R("There's no fair runnin' right now, hon.");
@@ -34776,7 +35161,7 @@ Welcome to B&B Farm, hon. \u{1F33E}`
             break;
           }
           exportLedger();
-          R("All backed up, hon! The ledger's downloaded on the bot's machine. " + Object.keys(L.people).length + " on the books.");
+          R("All backed up, hon! The ledger's downloaded on the bot's machine. " + Object.keys(L2.people).length + " on the books.");
           break;
         }
       }
@@ -35001,7 +35386,7 @@ Welcome to B&B Farm, hon. \u{1F33E}`
         try {
           if (!d || d.Query !== "OnlineFriends" || !Array.isArray(d.Result)) return;
           state.mutual = { at: Date.now(), set: new Set(d.Result.map((x) => x && x.MemberNumber).filter(Number.isFinite)) };
-          for (const mn of state.mutual.set) if (L.mailbox && L.mailbox[mn]) deliverMail(mn);
+          for (const mn of state.mutual.set) if (L2.mailbox && L2.mailbox[mn]) deliverMail(mn);
         } catch (e) {
           warn("friends result:", e);
         }
@@ -35088,7 +35473,7 @@ Welcome to B&B Farm, hon. \u{1F33E}`
         } catch (e) {
         }
         const oc = forcedStaff().length;
-        setBadge("on duty \u2014 " + Object.values(L.people).filter((r) => r.roles && r.roles.length).length + " reg \xB7 " + fl + " friends \xB7 " + oc + " on call" + (admin ? "" : " \u26A0\uFE0FNOT ADMIN"), admin ? "#b8ff9b" : "#ffc49b");
+        setBadge("on duty \u2014 " + Object.values(L2.people).filter((r) => r.roles && r.roles.length).length + " reg \xB7 " + fl + " friends \xB7 " + oc + " on call" + (admin ? "" : " \u26A0\uFE0FNOT ADMIN"), admin ? "#b8ff9b" : "#ffc49b");
         keepalive();
         runWaiting();
         pump();

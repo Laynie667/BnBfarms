@@ -94,5 +94,19 @@ const bcpTo=(mn,n)=>sent.slice(n).filter(s=>s[0]==='ChatRoomChat'&&s[1].Content=
   n=sent.length; await B(221397,'contract offer prizecow 500 perm');
   const c2=(bcpTo(500,n)[0]||{}).payload||{};
   out('5 custom offer sent, permanent ->', c2.durationMin===0, !!(c2.rules&&c2.rules['other.listenToMyVoice']), c2.rules&&c2.rules['other.listenToMyVoice'].settings.sentences.length===2);
+  // 6. Oct 23: the outfit goes on ONCE, when they accept their first contract, and never again by itself; ?ownoutfit on keeps their own look
+  W.LZString={ compressToBase64:(t)=>Buffer.from(t).toString('base64'), decompressFromBase64:(t)=>Buffer.from(t,'base64').toString() };
+  handlers.ChatRoomMessage({Sender:500,Type:'Hidden',Content:'FarmhandMsg',Dictionary:{v:2,type:'hello',ver:'0.33.0'}}); await wait(500);
+  const outfitTo=(mn,k)=>sent.slice(k).filter(([e,d])=>d&&d.Content==='FarmhandMsg'&&d.Target===mn&&d.Dictionary&&d.Dictionary.type==='outfit').map(([e,d])=>d.Dictionary);
+  const sign=async()=>{ const k=sent.length; await B(700,'contract offer fun 500 1w'); const t=((bcpTo(500,k)[0]||{}).payload||{}).title;
+    handlers.ChatRoomMessage({Sender:500,Type:'Activity',Content:'BCPAction',Target:260239,Dictionary:[{Tag:'x',Text:'BC+: Bessie has signed your contract "'+t+'".'}]}); await wait(3800); };
+  delete L().people[500].contractDressedAt; delete L().people[500].ownOutfit;
+  n=sent.length; await sign();
+  const d6=outfitTo(500,n)[0]||{};
+  out('6 the first contract dresses them, straight on ->', d6.slot==='farm:cow|female', d6.auto===true, !!L().people[500].contractDressedAt);
+  n=sent.length; await sign();
+  out('6 ...and a later contract leaves what staff changed alone ->', outfitTo(500,n).length===0);
+  delete L().people[500].contractDressedAt; n=sent.length; await B(500,'ownoutfit on'); await sign();
+  out('6 bring your own outfit: they keep their look ->', L().people[500].ownOutfit===true, outfitTo(500,n).length===0, sent.slice(n).some(([e,d])=>d&&/brought your own outfit/.test(JSON.stringify(d))));
   process.exit(0);
 })();

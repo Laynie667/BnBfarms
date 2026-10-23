@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.33.0
+// @version      0.34.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -230,7 +230,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.33.0";
+  var VERSION = "0.34.0";
 
   // extension/src/config.js
   var BOT_MEMBER = 260239;
@@ -5677,6 +5677,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     ["parasite", "Parasite", "Swallow at the glory stalls and, rarely, a pair of livin' lips seals over your mouth for 12 hours: it feeds you fertility, growth, hyper pregnancy and capacity serum and turns every load you swallow into more"],
     ["symbiote", "Symbiotes", "Livin' latex, milk moss or the nestling can bond to you. Each gives you somethin' for as long as it's fed: room to hold more, more milk, an easier catch. They grow into real clothes on you (latex, moss), and they spread: latex by a touch, moss in the milk, the nestling by a breedin', to others who switched this on. Your safeword sends it away"],
     ["traps", "Traps", "The farm's traps spring for you: step on a trap spot and it might dose, drain, breed, strip, pump or fill you with eggs, and the water's not safe either. Off: you walk right over them. Your limits and your safeword still rule"],
+    ["ownoutfit", "Bring my own outfit", "Keep the look you came in when you sign a contract. Off: your first contract dresses you, once, in the farm's outfit for your kind, and nothin' changes it back after"],
     ["eager", "Traps: no cooldown", "With traps on: no breather between traps and no wait for a trap to reset. Step off and back on and it springs again"],
     ["bench", "Use bench", "Staff and the wheel can sentence you to time strapped over the use bench, where anybody can use you. Your safeword ends it at once"]
   ];
@@ -10428,6 +10429,11 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
         toChat(String(m.text || "") + "  (pick in your \u{1F33E} panel)", "#c9a35b");
         break;
       case "outfit":
+        if (m.auto) {
+          api.wear({ slot: String(m.slot || ""), label: String(m.label || "farm outfit"), data: String(m.data || ""), keys: Array.isArray(m.keys) ? m.keys.filter(Number.isInteger) : [] });
+          toChat("\u{1F457} You've been dressed in your " + String(m.label || "farm outfit") + " for your new contract.", "#c9a35b");
+          break;
+        }
         st.panel.setOutfit({
           slot: String(m.slot || ""),
           label: String(m.label || "farm outfit"),

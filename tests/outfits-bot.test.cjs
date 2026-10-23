@@ -59,5 +59,17 @@ const roomText=s=>{ const d=s&&s[1]; if(!d) return null;
   // 6. list and clear
   await B(221397,'outfit clear goat any');
   out('6 cleared ->', !L().outfits['goat|*']);
+  // 7. Oct 23: the farm's own starter outfits fill every slot nobody has saved (shared/farm-outfits.js)
+  W.LZString={ compressToBase64:(t)=>Buffer.from(t).toString('base64'), decompressFromBase64:(t)=>Buffer.from(t,'base64').toString() };
+  for (const k of Object.keys(L().outfits)) delete L().outfits[k];
+  n=sent.length; await B(700,'outfit offer 900');
+  const o7=farmTo(900,'outfit',n)[0]||{}, it7=o7.data?JSON.parse(W.LZString.decompressFromBase64(o7.data)).items:[];
+  const g=(grp)=>it7.find(i=>i.Group===grp)||{};
+  out('7 a goat femboy is offered the farm goat outfit ->', o7.slot==='farm:goat|femboy', g('ItemHands').Name==='PonyMittensBinder', !!(g('ItemHands').Property&&g('ItemHands').Property.TypeRecord));
+  out('7 ...locked collar and cage, the sissy set, every hole open ->', g('ItemNeck').locked===true, g('ItemVulva').Name==='PlasticChastityCage1'&&g('ItemVulva').locked===true, g('Cloth').Name==='MaidBikini', !g('ItemButt').Name, /RingGag|BitGag|Pony/.test(g('ItemMouth').Name||''));
+  L().people[900].species='bull'; L().people[900].gender='female';
+  n=sent.length; await B(700,'outfit offer 900');
+  const o8=farmTo(900,'outfit',n)[0]||{}, it8=o8.data?JSON.parse(W.LZString.decompressFromBase64(o8.data)).items:[];
+  out('7 a bull wears the cow outfit; women go without chastity ->', o8.slot==='farm:bull|female', it8.some(i=>i.Name==='PawPaddedPetsuitArms'), !it8.some(i=>/Chastity|Cockring/.test(i.Name)));
   process.exit(0);
 })();

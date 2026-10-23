@@ -20,7 +20,15 @@
   function outfitSlotFor(mn){
     outfitsLedger();
     const r = rec(mn) || {}, sp = String(r.species || "").toLowerCase(), g = genderOf(mn);
-    return [sp+"|"+g, sp+"|*", "*|"+g, "stock"].find(k => L.outfits[k]) || null;
+    return [sp+"|"+g, sp+"|*", "*|"+g].find(k => L.outfits[k]) || (farmOutfit("farm:"+sp+"|"+g) ? "farm:"+sp+"|"+g : null) || (L.outfits.stock ? "stock" : null);
+  }
+  // the farm's own starter outfit for a species and gender (shared/farm-outfits.js, Oct 22): fills every slot no proprietor
+  // has dressed yet, and a proprietor's own saved outfit always wins. "farm:cow|female" → { data, items, locks }
+  function farmOutfit(slot){
+    const m = /^farm:([a-z]+)\|([a-z]+)$/.exec(String(slot || "")); if (!m) return null;
+    const pieces = FARM_OUTFITS.outfitPieces(m[1], m[2]); if (!pieces || !W.LZString) return null;
+    const items = pieces.map(p => ({ Group: p.Group, Name: p.Name, Color: p.Color, Property: p.Property ? JSON.parse(JSON.stringify(p.Property)) : {}, locked: !!p.locked }));
+    return { data: W.LZString.compressToBase64(JSON.stringify({ v: 1, items })), items: items.length, locks: items.filter(i => i.locked).length, farm: true };
   }
   function uniformSlotFor(mn){
     outfitsLedger();
@@ -50,19 +58,19 @@
     if (/^[a-z][a-z0-9_-]{1,19}$/.test(w[0]) && !speciesFrom(w[0])) return "special:"+w[0];
     return null;
   }
-  const slotLabel = (k) => k === "stock" ? "Any new stock" : k.startsWith("uniform:") ? k.slice(8)+" uniform" : k.startsWith("special:") ? k.slice(8)
+  const slotLabel = (k) => k.startsWith("farm:") ? "farm "+k.slice(5).split("|").map(x => x === "kitt" ? "kitty" : x).join(" · ")+" outfit" : k === "stock" ? "Any new stock" : k.startsWith("uniform:") ? k.slice(8)+" uniform" : k.startsWith("special:") ? k.slice(8)
                          : k.split("|").map(x => x === "*" ? "any" : x).join(" · ");
 
-  function offerOutfit(mn, slot, why){
+  function offerOutfit(mn, slot, why, auto){
     outfitsLedger();
-    const o = slot && L.outfits[slot];
+    const o = slot && (L.outfits[slot] || farmOutfit(slot));
     if (!o) return "There's no outfit saved for that, sugar. ?outfit shows what's saved.";
     if (!hasCompanion(mn)){
       // they still hear about it, so nothin' happens behind their back
       tell(mn, "👗 The farm has your "+slotLabel(slot)+" ready"+(why ? " ("+why+")" : "")+". The Companion can put it on you in one tap; without it, staff can help you dress by hand.");
       return plainName(mn)+" isn't runnin' the Companion, so I can't hand 'em an outfit. I've told 'em it's ready, and they can dress by hand.";
     }
-    enqueue(makeMsg("outfit", { slot, label: slotLabel(slot), data: o.data, keys: outfitKeysFor(mn), why: why || "", id: ++companionSeq }, mn));
+    enqueue(makeMsg("outfit", { slot, label: slotLabel(slot), data: o.data, keys: outfitKeysFor(mn), why: why || "", auto: !!auto, id: ++companionSeq }, mn));
     audit(CFG.BOT_MEMBER, "OUTFIT_OFFER", mn+" "+slot);
     return "";
   }
@@ -87,3 +95,13 @@
     else if (m.answer === "back") audit(mn, "OUTFIT_BACK", "");
   }
 
+
+  // ?ownoutfit on|off: they bring their own outfit, and keep the look they came in when they sign a contract
+  function ownOutfitCommand(sender, args, R){
+    const r = rec(sender); if (!r){ R("You need to be on the books first, sugar."); return; }
+    const a = String(args[0] || "").toLowerCase();
+    if (a !== "on" && a !== "off"){ R("👗 Bring your own outfit is "+(r.ownOutfit ? "ON: the farm won't dress you for a contract, you keep your own look" : "off: your first contract dresses you in the farm's outfit for your kind")+". ?ownoutfit on|off."); return; }
+    r.ownOutfit = a === "on"; saveLedger(); syncCompanions(true);
+    R(r.ownOutfit ? "👗 Bring your own outfit: ON. Sign a contract and you stay in the look you came in. Staff can still offer you one, and you can say no."
+                  : "👗 Bring your own outfit: off. "+(r.contractDressedAt ? "You've had your farm outfit already, so nothin' changes unless staff offer you one." : "Your first contract dresses you in the farm's outfit for your kind."));
+  }

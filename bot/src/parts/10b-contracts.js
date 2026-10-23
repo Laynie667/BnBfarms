@@ -126,10 +126,13 @@
       if (x){ x.status = "signed"; x.signedAt = Date.now(); x.until = x.durationMin ? Date.now() + x.durationMin*60000 : null; saveLedger(); audit(mn, "CONTRACT_SIGNED", x.title); }
       contractSignedNow(mn);   // ?signed follows it (10t-contract-watch.js)
       notifyStaff("📜 "+plainName(mn)+" signed the farm contract \""+m[1]+"\".", true);
-      // the outfit that goes with it: "auto" picks theirs by species and gender
+      // the outfit that goes with it ("auto" picks theirs by species and gender), put on ONCE: the first contract they
+      // accept dresses them, and nothin' dresses them again by itself after, so whatever staff change on them stays
+      // changed. Somebody who brings their own outfit (?ownoutfit on) keeps the look they came in (Laynie, Oct 23).
       const tpl = x && contractTemplate(x.tpl), dress = tpl ? (tpl.outfit === undefined ? "auto" : tpl.outfit) : "";
-      const slot = dress === "auto" ? outfitSlotFor(mn) : dress;
-      if (slot) later(() => offerOutfit(mn, slot, "It goes with your new contract"), 3000);
+      const slot = dress === "auto" ? outfitSlotFor(mn) : dress, r = rec(mn);
+      if (slot && r && r.ownOutfit) later(() => tell(mn, "👗 You brought your own outfit, sugar, so you're stayin' in the look you came in. (?ownoutfit off and the farm dresses you for your next contract.)"), 3000);
+      else if (slot && r && !r.contractDressedAt){ r.contractDressedAt = Date.now(); saveLedger(); later(() => offerOutfit(mn, slot, "It goes with your new contract", true), 3000); }
       later(() => enqueue(BCPLUS.queryMsg(mn)), 2000);   // fetch BC+'s id for it, so we can release it later
       return true;
     }

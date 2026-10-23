@@ -197,6 +197,11 @@ const STATE = { name: "Laynie", onBooks: true, roles: ["PROPRIETOR", "LIVESTOCK"
   const by2 = (g) => (loaded || []).find((b) => b.Group === g) || {};
   out("9 change back: own dress back on ->", by2("Cloth").Name === "Dress");
   out("9 farm-locked rope stays till a keyholder opens it ->", by2("ItemArms").Name === "HempRope");
+  // Oct 23: a contract's outfit (auto) goes straight on, no second askin'
+  const nAns = toBot("outfitAnswer").length;
+  bot({ type: "outfit", slot: "farm:cow|female", label: "farm cow · female outfit", data: outfitData, keys: [700], why: "It goes with your new contract", auto: true, id: 10 });
+  const by3 = (g) => (loaded || []).find((b) => b.Group === g) || {};
+  out("9 a contract's outfit goes straight on ->", by3("Cloth").Name === "Shirt", toBot("outfitAnswer").length > nAns, !/put on your farm cow/.test(text()));
 
   // 10. the 🌾 button: drag it (mouse or finger), a tap still opens, pin keeps it put
   const fb = D.getElementById("fhc-btn"), ev = (t, x, y, el) => (el || w).dispatchEvent(new w.MouseEvent(t, { clientX: x, clientY: y, bubbles: true }));

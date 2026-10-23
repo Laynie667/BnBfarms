@@ -1341,7 +1341,7 @@
         R("✅ "+plainName(t)+" — "+roleString(t)+"\n🔑 "+keyString(t)+(r.species ? "\n🐾 "+r.species : "")+(r.gender ? " · "+r.gender : "")+ready+
           (r.contractBy ? "\n⏳ They have "+CFG.CONTRACT_GRACE_H+" hours to sign a farm contract, or they come off the books." : ""));
         outfitsLedger();
-        if (L.outfitRules.onApprove && roles.includes(ROLE.LIVESTOCK) && outfitSlotFor(t)) later(() => offerOutfit(t, outfitSlotFor(t), "Welcome to the farm"), 4000);
+        if (L.outfitRules.onApprove && roles.includes(ROLE.LIVESTOCK) && outfitSlotFor(t) && !/^farm:/.test(outfitSlotFor(t)) && !rec(t).ownOutfit) later(() => offerOutfit(t, outfitSlotFor(t), "Welcome to the farm"), 4000);   // (the farm's own starter outfits go on with their first contract, once: 10b-contracts.js)
         beep(t,
 `🌾 You're in, `+plainName(t)+`! Welcome to the family, sweetie. 💕
 
@@ -1566,7 +1566,8 @@ Welcome to B&B Farm, hon. 🌾`);
       case "subject": case "subjects": case "traps": case "trap": case "watersports": case "watersport": trapCommand(cmd === "watersport" ? "watersports" : cmd, sender, args, R); break;   // 10u-traps.js
       case "parasite": case "parasites": case "purge": parasiteCommand(cmd === "parasites" ? "parasite" : cmd, sender, args, R); break;   // 10v-parasite.js
       case "symbiote": case "symbiotes": symbioteCommand(sender, args, R); break;   // 10v4-symbiotes.js
-      case "messes": messesCommand(sender, args, R); break;   // 10u9-mess-store.js
+      case "messes": messesCommand(sender, args, R); break;
+      case "ownoutfit": case "myoutfit": ownOutfitCommand(sender, args, R); break;   // bring your own outfit (10c-outfits.js)   // 10u9-mess-store.js
       case "quiet": case "tend": if (cmd !== "tend" || !bedTend(sender, args, R)) broodCommand(cmd, sender, args, R); break;   // 10y2-brood.js
       case "brood": case "bet": ranksCommand(cmd, sender, args, R); break;   // 10y3-trap-ranks.js
       case "cleanse": case "corruption": case "gauntlet": case "lend": case "bid": case "route": corruptionCommand(cmd, sender, args, R); break;   // 10y4-corruption.js

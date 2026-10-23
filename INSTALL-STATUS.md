@@ -5,7 +5,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 | Script | File in `dist/` | Where it runs | Current |
 |---|---|---|---|
-| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.40.0** |
+| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.41.0** |
 | Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.10.0** |
 | Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.2.1** |
 | Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **1.1.0** |
@@ -13,7 +13,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 | Map tools, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.4** |
 | Dairy | `farmhand-dairy.user.js` | the bot's PC | **1.1.0** |
 | Shows | `farmhand-shows.user.js` | the bot's PC | **1.1.0** |
-| Farmhand Companion | `farmhand-companion.user.js` | each player | **0.33.0** |
+| Farmhand Companion | `farmhand-companion.user.js` | each player | **0.34.0** |
 | Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.4** |
 
 ## Sending a watch report
@@ -23,6 +23,14 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 - Running the watcher on more than one game at once (the bot, yours, a tester's) lets Claude line them up into one timeline.
 
 ## Latest changes (newest first)
+
+- **Bot 0.41.0, Companion 0.34.0: the farm's own outfits, one for every species and gender.** Laynie, Oct 22-23: "build some basic outfits for each species and gender combination", designed with her over an evening in the studio, and "perfect, i like what we have now for the contract outfits. apply them exactly".
+  - 50 outfits (cow, kitty, bunny, goat, deer, pig, pony, pup, fox, goblin × female, male, futa, femboy, nonbinary) in shared/farm-outfits.js; bulls wear the cow's, horses the pony's, dogs and wolves the pup's, cats the kitty's, rabbits the bunny's, sheep the goat's. They fill every slot no proprietor has saved an outfit for (a saved one always wins).
+  - **Put on once, with the first contract.** Laynie: "make sure it only applies the outfit once, on acceptance of a contract. So if any staff change the outfit around, it doesnt get reset." The first contract somebody accepts dresses them, straight on (they agreed when they signed); after that nothin's put back by itself, not a later contract, not approval, so whatever staff change stays changed. Staff can still ?outfit offer by hand.
+  - **Bring my own outfit:** "need a option to bring their own outfit, if they decide to keep a look they want". ?ownoutfit on, or the switch in the Companion's Toggles: signing a contract keeps the look they came in.
+  - Two looks with rustic leather and brass through both: pastel sissy (cows, kitties, bunnies, goats, deer, pigs) and goth mommy (ponies, pups, foxes, goblins); every femboy dressed sissy pink.
+  - The restraints go on set the way they're meant to be (mittens chained, cuffs at wrist and elbow, frog-tied, petsuits padded), collars locked with the farm's padlock. Cows, kitties, pups, foxes and pigs in padded petsuits; ponies, deer and goats in pony mittens; goblins in rags, frog cuffs and long mittens. No chains to the floor or a wall.
+  - Every hole stays usable: O-ring and bit gags, tails on straps. Locked chastity on males, femboys and nonbinary only; women and futas go free for breedin'.
 
 - **Bot 0.40.0, Companion 0.33.0: a proper wash, twelve-hour contracts, tidier panels, and a steadier panel on phones.** Laynie, Oct 22.
   - **?wash** "needs more beats, and to reliably wash all messes off". It only washed when the bot itself had paint on its books for them, so once that ran out it said "clean as a whistle" with messes still drawn on them. Now every ?wash washes everything the farm put on them (the drawn messes, the game's splatters, the writing, and what a trap left), in five beats at the trough: the water, two scrubs, the rinse, the towel. The Companion takes the drawn messes off first, on their own, so a splatter that won't come off can't stop it.

@@ -4,6 +4,7 @@
 */
 import { FARM_MSG, PROTOCOL, makeMsg, readMsg } from "../../shared/protocol.js";
 import * as BCPLUS from "../../shared/bcplus.js";
+import * as FARM_OUTFITS from "../../shared/farm-outfits.js";
 import { PUBLIC_GROUPS, STAFF_GROUPS, OWNER_GROUPS } from "../../shared/guides.js";
 import { VERSION } from "./version.js";
 

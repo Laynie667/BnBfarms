@@ -33,6 +33,14 @@
     // filled in when it's offered (see fillWho in shared/bcplus.js)
     const who = { name: shortName(mn), species: r.species || "" };
     const rules = tpl.base ? BCPLUS.templateRules(tpl.base, who, Object.assign(farmInfo(), { nickname: CFG.CONTRACT_NICKNAME })) : {};
+    // Laynie, Oct 23: "anyone with a penis shouldn't have [the control orgasm] rule unless they specifically register as
+    // non binary or as a male. all contracts should have the forbid leaving room rule, as well as keep restraints when
+    // relogging, and return to chatrooms rules." (A template can still drop one of those on purpose: tpl.remove below.)
+    let cock = false; try { cock = bodyOf(mn).cock; } catch(e){ cock = !!r.futa || makesSemen(mn); }
+    if (cock && !["male", "nonbinary"].includes(r.gender)) delete rules["body.controlOrgasms"];
+    rules["chat.forbidLeaving"] = rules["chat.forbidLeaving"] || BCPLUS.makeSpec("chat.forbidLeaving");
+    rules["settings.relogKeepsRestraints"] = BCPLUS.makeSpec("settings.relogKeepsRestraints", { value: "Restraints kept" });
+    rules["settings.roomRejoin"] = BCPLUS.makeSpec("settings.roomRejoin", { value: "Returns to the room" });
     for (const id of tpl.remove || []) delete rules[id];
     for (const [id, set] of Object.entries(tpl.add || {}))
       rules[id] = BCPLUS.makeSpec(id, Object.assign({}, rules[id] ? rules[id].settings : {}, JSON.parse(JSON.stringify(set))));

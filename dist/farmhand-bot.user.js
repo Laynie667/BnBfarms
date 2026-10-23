@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.41.0
+// @version      0.41.1
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -2244,7 +2244,7 @@
   ];
 
   // bot/src/version.js
-  var VERSION = "0.41.0";
+  var VERSION = "0.41.1";
 
   // bot-parts:farmhand-bot-parts
   (function() {
@@ -8047,6 +8047,16 @@
       const r = rec(mn) || {};
       const who = { name: shortName(mn), species: r.species || "" };
       const rules = tpl.base ? templateRules(tpl.base, who, Object.assign(farmInfo(), { nickname: CFG.CONTRACT_NICKNAME })) : {};
+      let cock = false;
+      try {
+        cock = bodyOf(mn).cock;
+      } catch (e) {
+        cock = !!r.futa || makesSemen(mn);
+      }
+      if (cock && !["male", "nonbinary"].includes(r.gender)) delete rules["body.controlOrgasms"];
+      rules["chat.forbidLeaving"] = rules["chat.forbidLeaving"] || makeSpec("chat.forbidLeaving");
+      rules["settings.relogKeepsRestraints"] = makeSpec("settings.relogKeepsRestraints", { value: "Restraints kept" });
+      rules["settings.roomRejoin"] = makeSpec("settings.roomRejoin", { value: "Returns to the room" });
       for (const id of tpl.remove || []) delete rules[id];
       for (const [id, set] of Object.entries(tpl.add || {}))
         rules[id] = makeSpec(id, Object.assign({}, rules[id] ? rules[id].settings : {}, JSON.parse(JSON.stringify(set))));

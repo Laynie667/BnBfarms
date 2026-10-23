@@ -5,7 +5,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 | Script | File in `dist/` | Where it runs | Current |
 |---|---|---|---|
-| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.41.0** |
+| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.41.1** |
 | Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.10.0** |
 | Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.2.1** |
 | Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **1.1.0** |
@@ -23,6 +23,8 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 - Running the watcher on more than one game at once (the bot, yours, a tester's) lets Claude line them up into one timeline.
 
 ## Latest changes (newest first)
+
+- **Bot 0.41.1: contract rules.** Laynie: "anyone with a penis shouldnt have [the control orgasm] rule unless they specifically register as non binary or as a male. all contacts should have the forbid leaving room rule, as well as keep restraints when relogging, and return to chatrooms rules." Every farm contract now carries Forbid leaving the room, Keep all restraints when relogging (kept) and Return to chatrooms on relog (returns to the room). Control orgasms is left out for anybody with a cock unless their ?gender is male or nonbinary (futas and femboys go without it). A custom contract can still drop one of these with ?contract remove.
 
 - **Bot 0.41.0, Companion 0.34.0: the farm's own outfits, one for every species and gender.** Laynie, Oct 22-23: "build some basic outfits for each species and gender combination", designed with her over an evening in the studio, and "perfect, i like what we have now for the contract outfits. apply them exactly".
   - 50 outfits (cow, kitty, bunny, goat, deer, pig, pony, pup, fox, goblin × female, male, futa, femboy, nonbinary) in shared/farm-outfits.js; bulls wear the cow's, horses the pony's, dogs and wolves the pup's, cats the kitty's, rabbits the bunny's, sheep the goat's. They fill every slot no proprietor has saved an outfit for (a saved one always wins).

@@ -5,7 +5,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 | Script | File in `dist/` | Where it runs | Current |
 |---|---|---|---|
-| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.43.0** |
+| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.43.1** |
 | Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.10.0** |
 | Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.2.1** |
 | Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **1.1.0** |
@@ -23,6 +23,8 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 - Running the watcher on more than one game at once (the bot, yours, a tester's) lets Claude line them up into one timeline.
 
 ## Latest changes (newest first)
+
+- **Bot 0.43.1: the farm girl stays on her home spot.** Laynie: "why is the bot moving from its home spot again?" 0.43.0 stepped over beside everybody it asked through ECHS (and asks every 2 hours for ?hypno on folk), and with speaker spots set she never walked back. Now an ECHS request reaches them from wherever she stands; she only steps beside somebody while she's actually talkin' them under or ?allow-ing them, and goes straight back to where she stood after. tests/echs.test.cjs.
 
 - **Bot 0.43.0, Companion 0.36.0: Say it, for pets who can't.** Laynie, Oct 23: "speech impaired pets need a guaranteed way to be able to say what they need to say, in the companion or otherwise - because as is, someone with a nhl contract cant effectively answer when a trap needs them to say a specific thing."
   - **When the farm is waitin' on words, the words are a button.** The mirror box's line, a parasite wantin' begged at, the tickle rack and the Needy Nectar: a box at the top of every tab in their Companion says what's wanted, with the line on it. **Say it** sends it.

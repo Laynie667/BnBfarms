@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.43.0
+// @version      0.43.1
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -2244,7 +2244,7 @@
   ];
 
   // bot/src/version.js
-  var VERSION = "0.43.0";
+  var VERSION = "0.43.1";
 
   // bot-parts:farmhand-bot-parts
   (function() {
@@ -4148,7 +4148,7 @@
     }, __wordsFor: (m, t) => wordsFor(m, t), __overdue: (m) => overdueStage(m), __milkCum: (m) => stallClimax(m), __intSev: (m, s) => intensitySev(m, s), __intTail: (m, k) => intensityTail(m, 5, 6, k), __holes: (m) => holesFor(m), __album: (m) => albumFor(m, 60), __holeTook: (m, h, a) => holeTook(m, h, a), __dreamTheme: (m) => dreamTheme(m), __eggsWorth: (t, n) => eggsWorth(t, n), __rank: (m) => rankX(m), __broodBook: (m) => broodBook(m), __belly: (m) => bellyStage(m), __happening: (m) => happeningFor(m), __gearOn: (m, s, l, d, x) => gearOn(m, s, l, d, x), __heard: (mn, t) => trapHeard(mn, t), __parasiteTick: () => parasiteTick(), __parts: (m) => parasiteParts(rec(m).parasite), __climax: (m) => parasiteClimax(m), __nurse: (a, b) => parasiteNurse(a, b), __parasiteChance: (m) => parasiteChance(m), __kiss: (a, f, s, t) => parasiteKiss(a, f, s, t), __load: (s, m, h, x) => parasiteLoad(s, m, h, x), __shot: (t, by, text, how) => applyShot(t, by, text, how), __slow: (mn) => slowOf(mn), __milkRate: (mn) => milkRate(mn), __benchTick: () => benchTick(), __roll: (m, s, a, b) => rollConception(m, s, a, b), __contractTick: () => {
       state.cwAt = 0;
       contractWatchTick();
-    }, __lingerTick: () => lingerTick(), __ribbonTick: () => ribbonTick(), __dareTick: () => dareTick(), __potionOn: (mn, id) => potionOn(mn, id), __milkRate: (mn) => milkRate(mn), __addonLine: (k, i) => addonLine(k, i), __lineInfo: (m, x) => lineInfo(m, x), __gearSense: (m) => gearSense(m), __symTick: () => symbioteTick(), __symBond: (m, k, h) => symBond(m, k, h), __symFed: (m, h, x) => symbioteFed(m, h, x), __capacity: (m) => capacity(m), __symLines: () => SYM_LINES, __newTrapLines: () => NEW_TRAP_LINES, __farmGear: (m) => farmGearFor(m), __mazeTick: () => mazeTick(), __symSpread: (a, b, k, h) => symSpread(a, b, k, h), __symGear: (m) => symGear(m), __farmSets: () => ({ TRAP_GEAR, TRAP_KINDS, CURSES, SUIT_STAGES, SUIT_COLOR, MESS, MESS_BY_TRAP, SYM_GEAR }), __messShelf: () => MESS_SHELF, __broodTick: () => broodTick(), __teaseTick: () => teaseMeTick(), __teaseLine: (m) => teaseLine(m), __teaseCtx: (m) => teaseContexts(m).map((c) => c[0]) });
+    }, __lingerTick: () => lingerTick(), __ribbonTick: () => ribbonTick(), __dareTick: () => dareTick(), __potionOn: (mn, id) => potionOn(mn, id), __milkRate: (mn) => milkRate(mn), __addonLine: (k, i) => addonLine(k, i), __lineInfo: (m, x) => lineInfo(m, x), __gearSense: (m) => gearSense(m), __symTick: () => symbioteTick(), __symBond: (m, k, h) => symBond(m, k, h), __symFed: (m, h, x) => symbioteFed(m, h, x), __capacity: (m) => capacity(m), __symLines: () => SYM_LINES, __newTrapLines: () => NEW_TRAP_LINES, __farmGear: (m) => farmGearFor(m), __mazeTick: () => mazeTick(), __symSpread: (a, b, k, h) => symSpread(a, b, k, h), __symGear: (m) => symGear(m), __farmSets: () => ({ TRAP_GEAR, TRAP_KINDS, CURSES, SUIT_STAGES, SUIT_COLOR, MESS, MESS_BY_TRAP, SYM_GEAR }), __messShelf: () => MESS_SHELF, __broodTick: () => broodTick(), __teaseTick: () => teaseMeTick(), __echsTick: () => echsTick(), __teaseLine: (m) => teaseLine(m), __teaseCtx: (m) => teaseContexts(m).map((c) => c[0]) });
     W.FarmhandSyncKeys = () => syncAllPresent(true);
     W.FarmhandFriends = () => W.Player.FriendList;
     W.FarmhandAddFriend = (mn) => addFriend(mn, false);
@@ -20932,11 +20932,21 @@
     function echsBeside(mn) {
       if (!mapRoom()) return;
       const me = charFor(CFG.BOT_MEMBER), a = me && me.MapData && me.MapData.Pos, b = posOf(mn);
-      state.walkedAt = Date.now();
       if (!a || !b || b.X < 0 || Math.max(Math.abs(a.X - b.X), Math.abs(a.Y - b.Y)) <= 1) return;
       const to = spotBeside(mn);
       if (!to) return;
+      if (!state.echsFrom) state.echsFrom = { X: a.X, Y: a.Y };
+      state.echsBusyUntil = Date.now() + 2e4;
       me.MapData.Pos = { X: to.X, Y: to.Y };
+      send("ChatRoomCharacterMapDataUpdate", me.MapData);
+    }
+    function echsHome() {
+      if (!state.echsFrom || Date.now() < (state.echsBusyUntil || 0)) return;
+      if ([...(state.echs || /* @__PURE__ */ new Map()).values()].some((v) => v.phase === "InductionInProgress" || v.phase === "Hypnotized")) return;
+      const me = charFor(CFG.BOT_MEMBER), from = state.echsFrom;
+      state.echsFrom = null;
+      if (!me || !me.MapData || !mapRoom()) return;
+      me.MapData.Pos = { X: from.X, Y: from.Y };
       send("ChatRoomCharacterMapDataUpdate", me.MapData);
     }
     function echsSay(mn, text) {
@@ -20967,7 +20977,6 @@
       const r = rec(mn);
       r.echs = Object.assign(r.echs || {}, { askedAt: v.at });
       saveLedger();
-      echsBeside(mn);
       if (retry) echsSend(mn, { type: "session-continue" });
       else echsSend(mn, { type: "session-attempt", hypnotistName: plainName(CFG.BOT_MEMBER) || "The farm girl", skill: CFG.ECHS_SKILL });
       log("ECHS: asked " + mn + " (" + (why || "?") + ")");
@@ -21043,6 +21052,7 @@
       }, 2500 + i * 11e3));
     }
     function echsTick() {
+      echsHome();
       if (!CFG.ECHS_ON || !CFG.ECHS_OFFER_EVERY_MIN) return;
       const now = Date.now();
       if (now - (state.echsTickAt || 0) < 6e4) return;

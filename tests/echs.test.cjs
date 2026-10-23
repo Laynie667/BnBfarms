@@ -43,13 +43,15 @@ const near=(mn)=>{ const a=chars[0].MapData.Pos, b=chars.find(c=>c.MemberNumber=
   let n=sent.length; await say(500,'?hypno on',5000);
   const ask=hyp(n,500)[0];
   ok(ask && ask.type==='session-attempt' && ask.hypnotistName==='Farmhand' && typeof ask.skill==='number', '?hypno on sends their ECHS its own request: '+JSON.stringify(ask));
-  ok(near(500), 'and she steps right beside them, so a whisper carries');
+  const home0=Object.assign({},chars[0].MapData.Pos);
+  ok(!near(500), 'the request reaches them anywhere: she stays where she is');
   ok(/I'll reach for you through it/.test(all(n)), 'and says so');
   // their ECHS: the box is up, then the induction minute
   echs(500,{phase:'AttemptMade'}); await wait(200);
   n=sent.length; echs(500,{phase:'InductionInProgress',windowRemaining:60000}); await wait(3500);
   const pat=inChar(n,500);
   ok(pat.length>=1 && pat.every(t=>t.length>=15 && !/[()]/.test(t)), 'the induction minute: she talks them down, in character, so every line counts: '+(pat[0]||'').slice(0,70));
+  ok(near(500), 'and for that she steps right beside them, so a whisper carries');
   // under: Conditioning runs through ECHS
   n=sent.length; echs(500,{phase:'Hypnotized',depthBand:'deeply under'}); await wait(1500);
   const under=inChar(n,500);
@@ -71,6 +73,8 @@ const near=(mn)=>{ const a=chars[0].MapData.Pos, b=chars.find(c=>c.MemberNumber=
   ok(/don't know how to release/.test(all(n)), 'somethin\' it can\'t release is said so');
   // ── wakin' ──
   n=sent.length; echs(500,{phase:'Idle',ended:'timeout'}); await wait(400);
+  W.__st().echsBusyUntil=0; W.__echsTick && W.__echsTick();
+  ok(chars[0].MapData.Pos.X===home0.X && chars[0].MapData.Pos.Y===home0.Y, 'when it is over she goes back to where she stood');
   n=sent.length; await say(500,'?echs',1000);
   ok(/nothin' runnin' with me/.test(all(n)) && P(500).echs && P(500).echs.n===1, 'when ECHS says they\'re awake, it\'s over, and it\'s counted');
   // ── ?hypnotize me, and who it won't ──

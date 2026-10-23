@@ -45,14 +45,27 @@
   const echsOf = (mn) => { state.echs = state.echs || new Map(); return state.echs.get(mn) || null; };
   const echsUnder = (mn) => { const v = echsOf(mn); return !!(v && v.phase === "Hypnotized"); };
   function echsSend(mn, message){ send("ChatRoomChat", { Content: ECHS_TAG, Type: "Hidden", Target: mn, Dictionary: [{ message }] }); }
-  // in character, right beside them, so their ECHS hears it
+  // in character, right beside them, so their ECHS hears it. Only while I'm actually talkin' to their ECHS (the
+  // induction minute, a session, an ?allow), and back where I was the moment that's over (Laynie, Oct 23: "why is the
+  // bot moving from its home spot again?": 0.43.0 stepped over for every request, and with speaker spots set she
+  // never walked back)
   function echsBeside(mn){
     if (!mapRoom()) return;
     const me = charFor(CFG.BOT_MEMBER), a = me && me.MapData && me.MapData.Pos, b = posOf(mn);
-    state.walkedAt = Date.now();
     if (!a || !b || b.X < 0 || Math.max(Math.abs(a.X - b.X), Math.abs(a.Y - b.Y)) <= 1) return;
     const to = spotBeside(mn); if (!to) return;
+    if (!state.echsFrom) state.echsFrom = { X: a.X, Y: a.Y };
+    state.echsBusyUntil = Date.now() + 20000;
     me.MapData.Pos = { X: to.X, Y: to.Y };
+    send("ChatRoomCharacterMapDataUpdate", me.MapData);
+  }
+  // nothin' left to say to anybody's ECHS: back to where I stood
+  function echsHome(){
+    if (!state.echsFrom || Date.now() < (state.echsBusyUntil || 0)) return;
+    if ([...(state.echs || new Map()).values()].some(v => v.phase === "InductionInProgress" || v.phase === "Hypnotized")) return;
+    const me = charFor(CFG.BOT_MEMBER), from = state.echsFrom; state.echsFrom = null;
+    if (!me || !me.MapData || !mapRoom()) return;
+    me.MapData.Pos = { X: from.X, Y: from.Y };
     send("ChatRoomCharacterMapDataUpdate", me.MapData);
   }
   function echsSay(mn, text){
@@ -80,8 +93,7 @@
     const prev = echsOf(mn), retry = prev && prev.phase === "AttemptFailed" && Date.now() - (prev.at || 0) < 30 * 60000;
     const v = { phase: "Asked", at: Date.now(), by: by || CFG.BOT_MEMBER, why: why || "", band: null, heard: false, patter: 0 };
     state.echs.set(mn, v);
-    const r = rec(mn); r.echs = Object.assign(r.echs || {}, { askedAt: v.at }); saveLedger();
-    echsBeside(mn);
+    const r = rec(mn); r.echs = Object.assign(r.echs || {}, { askedAt: v.at }); saveLedger();   // (the request itself reaches them anywhere: no walkin' over for it)
     if (retry) echsSend(mn, { type: "session-continue" });
     else echsSend(mn, { type: "session-attempt", hypnotistName: plainName(CFG.BOT_MEMBER) || "The farm girl", skill: CFG.ECHS_SKILL });
     log("ECHS: asked "+mn+" ("+(why || "?")+")");
@@ -140,6 +152,7 @@
   }
   // ?hypno on folk who are around and idle get asked now and then
   function echsTick(){
+    echsHome();
     if (!CFG.ECHS_ON || !CFG.ECHS_OFFER_EVERY_MIN) return;
     const now = Date.now();
     if (now - (state.echsTickAt || 0) < 60000) return; state.echsTickAt = now;

@@ -98,6 +98,6 @@ const done=async(mn,ms)=>{ for(let i=0;i<60;i++){ await wait(250); if(!(W.__st()
   // ── the mess shelf in the panel's state ──
   const st=W.__stateFor(500); ok((st.store||[]).some(it=>it.shelf==="mess" && it.id==="creampie") && st.messesOn===false, 'the store sends the mess shelf to the panel');
   // ── tease lines and herd voice lines are gone ──
-  n=sent.length; await say(500,'?teaseme on',900); ok(/retired/.test(all(n)) && !P(500).teaseOptIn, '?teaseme is retired');
+  n=sent.length; await say(221397,'?voice on',900); ok(/retired/.test(all(n)), '?voice is still retired (Tease Me came back Oct 23: teaseme.test.cjs)');
   out(fails ? 'FAILED '+fails : 'all passed'); process.exit(fails?1:0);
 })();

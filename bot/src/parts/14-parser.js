@@ -133,7 +133,7 @@
 
   const PUBLIC_CMDS = ["help","commands","info","guide","rules","consent","tour","species","luxury","doors",
                        "ping","apply","record","keys","who","herd","safe","safeword","red","report",
-                       "staff","stuck","friend","notice","teaseme",
+                       "staff","stuck","friend","notice","teaseme","tease",
                        "stats","board","pedigree","breedable","fertile","mpreg","naturalheat","breed","cum","milkable","futa","size","sizes","measure","penis","cock","rights","accept",
                        "freeuse","jarok","gender","outfit","outfits","uniform","hypno","tally","eggs","yes","no","wash","quota","praise","degrade",
                        "weather","feeding","curfew","beg","please","fair","enter","addons","addon",
@@ -144,7 +144,7 @@
                        "backup","staffhelp","note","keysync","keydump","where",
                        "roster","stock","find","signed","setrescue","stucklog","addfriend",
                        "forced","summon","health",
-                       "tier","vet","brand","tease","spot","spots","appclear",
+                       "tier","vet","brand","spot","spots","appclear",
                        "milk","collect","heat","heatline","shotlog",
                        "stocks","unstock","walk","tourstop","clockin","clockout","hours","done","chore","chores",
                        "wheel","spin","begphrase","score","drain","denial","ruin","jars","inseminate","nomilk","inspect","edge",

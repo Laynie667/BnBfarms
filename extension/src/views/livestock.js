@@ -155,6 +155,7 @@ export function inbox(ctx) {
 // the farm switches you hold, flipped with the same commands you'd type
 export const SWITCH_INFO = [
   ["hypno", "Hypno", "Conditioning's trance sessions can take you, in the farm's voice, never deeper than your ?depth (fun, deep or no human left). ?wake ends one"],
+  ["teaseme", "Tease me", "The farm whispers you a tease 3 or 4 times an hour while you're here, about whatever's goin' on with you: full udders, a load still in you, a heat, a mess. ?teaseme steady or needy for more. Your herd leader can switch it for you too"],
   ["breedable", "Breedable", "You can be bred and filled"], ["fertile", "Fertile", "You can catch"],
   ["mpreg", "Mpreg", "A load in your ass can take too, no item needed (with Breedable and Fertile on)"],
   ["jarok", "Jar insemination", "On: staff still ask every time · Off: never"], ["freeuse", "Free use", "Any stud may have you without askin'"],

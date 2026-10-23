@@ -242,7 +242,7 @@
         const how = /tease|degrade|mean/i.test(text) ? "tease" : "praise";
         if (!t || !rec(t) || t === sender){ R("Who's it for, sugar? ?buy dedicate <who> praise or ?buy dedicate <who> tease"); return; }
         if (!onMap(t)){ R(plainName(t)+" isn't here to hear it, hon."); return; }
-        if (how === "tease" && !(rec(t).degradeMe || rec(t).teaseOptIn)){ R(plainName(t)+" hasn't said they like bein' teased, sugar. Try praise."); return; }
+        if (how === "tease" && !(rec(t).degradeMe || teaseRate(rec(t)))){ R(plainName(t)+" hasn't said they like bein' teased, sugar. Try praise."); return; }
         spendRibbons(sender, price, it.name+" for "+plainName(t));
         const pool = how === "tease" ? DEDICATE_TEASE : DEDICATE_PRAISE;
         emote("🎀 "+pool[Math.floor(Math.random()*pool.length)].replace(/%t/g, plainName(t)).replace(/%b/g, plainName(sender)), t);

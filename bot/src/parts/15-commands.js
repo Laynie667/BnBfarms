@@ -511,7 +511,9 @@
         break;
       }
 
-      case "voice": case "tease": case "teaseme": if (!RETIRED_ON) { R("That one's been retired, sugar: the farm doesn't send tease lines or herd voice lines any more."); break; }
+      case "teaseme": teaseMeCommand(sender, args, R); break;   // (Tease Me, rebuilt Oct 23: 10uh-teaseme.js)
+      case "tease": teaseLinesCommand(sender, args, R); break;
+      case "voice": if (!RETIRED_ON) { R("That one's been retired, sugar: the farm doesn't send herd voice lines any more."); break; }
       // eslint-disable-next-line no-fallthrough
       case "hypno": {   // (still the switch for Conditioning's trance sessions: the voice lines it used to let in are retired)
         const r = rec(sender);
@@ -1790,41 +1792,6 @@ Welcome to B&B Farm, hon. 🌾`);
         r.brand = { mark, by:sender, at:Date.now() }; saveLedger(); audit(sender,"BRAND",t+" "+mark);
         R("🔥 "+plainName(t)+" carries "+mark+" now!");
         beep(t, "🔥 "+plainName(sender)+" branded you, sweetie: "+mark+". It shows on ?who and on your record.");
-        break;
-      }
-
-      /* ── TEASING ── */
-      case "tease-old": {
-        const sub = String(args[0]||"list").toLowerCase();
-        if (sub === "add"){
-          const line = args.slice(1).join(" ").trim();
-          if (!line){ R("Give me a line, sugar! "+"?tease add <line> adds one (%name% becomes their name), ?tease list shows them all, ?tease remove <number> takes one off. For example: ?tease add Somebody looks awful cute today, %name%."); break; }
-          L.tease.push({ text:line, by:sender, at:Date.now() }); saveLedger(); audit(sender,"TEASE_ADD",line.slice(0,60));
-          R("Added! "+L.tease.length+" teasin' line"+(L.tease.length===1?"":"s")+" on file.");
-        } else if (sub === "remove" || sub === "del"){
-          const i = parseInt(args[1],10)-1;
-          if (!(i>=0 && i<L.tease.length)){ R("Which number, hon? Say ?tease remove and a number from ?tease list, like ?tease remove 2."); break; }
-          const gone = L.tease.splice(i,1)[0]; saveLedger(); audit(sender,"TEASE_REMOVE",gone.text.slice(0,60));
-          R("Took it off: "+gone.text);
-        } else {
-          const opted = Object.values(L.people).filter(r=>r.teaseOptIn).length;
-          R(L.tease.length
-            ? "😈 TEASING LINES ("+L.tease.length+") · "+opted+" opted in\n\n"+L.tease.map((x,i)=>(i+1)+". "+x.text).join("\n")+
-              "\n\n?tease add <line> · ?tease remove <n>"
-            : "No lines yet, sugar. "+"?tease add <line> adds one (%name% becomes their name), ?tease list shows them all, ?tease remove <number> takes one off. For example: ?tease add Somebody looks awful cute today, %name%.");
-        }
-        break;
-      }
-
-      case "teaseme-old": {
-        const r = rec(sender);
-        if (!r || !r.roles.length){ R("That's just for folks on the books, sugar. Say ?apply first!"); break; }
-        const v = String(args[0]||"").toLowerCase();
-        r.teaseOptIn = v ? (v === "on" || v === "yes") : !r.teaseOptIn;
-        state.teaseNext.delete(sender);
-        saveLedger();
-        R(r.teaseOptIn ? "😈 Ooh, you'll hear from me now and then while you're on the farm, sugar. Say ?teaseme off to stop."
-                       : "Alright, hon. No more whisperin' in your ear. Say ?teaseme on if you miss me.");
         break;
       }
 

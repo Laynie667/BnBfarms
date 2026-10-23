@@ -96,7 +96,8 @@
     /* ── TEASING ── opted-in stock get a random line now and then while they're here */
     TEASE_ENABLED: true,
     TEASE_MIN_GAP_MIN: 25,     // never closer together than this, per person
-    TEASE_MAX_GAP_MIN: 70,     // ...and usually by this
+    TEASE_MAX_GAP_MIN: 70,     // ...and usually by this (the old tease: Tease Me now goes by ?teaseme light|steady|needy, 10uh-teaseme.js)
+    TEASE_DAY_MAX: 40,         // Tease Me: never more than this many to one person in a day
 
     /* ── PRODUCTION & BREEDING ── amounts in mL, rates per hour. See doc section 16. */
     /* ── MILKING GEAR ── worn anywhere on the farm, it milks at a rate to match the gear.

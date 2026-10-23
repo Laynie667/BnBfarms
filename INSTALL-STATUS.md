@@ -5,7 +5,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 | Script | File in `dist/` | Where it runs | Current |
 |---|---|---|---|
-| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.41.1** |
+| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.42.0** |
 | Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.10.0** |
 | Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.2.1** |
 | Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **1.1.0** |
@@ -13,7 +13,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 | Map tools, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.4** |
 | Dairy | `farmhand-dairy.user.js` | the bot's PC | **1.1.0** |
 | Shows | `farmhand-shows.user.js` | the bot's PC | **1.1.0** |
-| Farmhand Companion | `farmhand-companion.user.js` | each player | **0.34.0** |
+| Farmhand Companion | `farmhand-companion.user.js` | each player | **0.35.0** |
 | Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.4** |
 
 ## Sending a watch report
@@ -23,6 +23,14 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 - Running the watcher on more than one game at once (the bot, yours, a tester's) lets Claude line them up into one timeline.
 
 ## Latest changes (newest first)
+
+- **Bot 0.42.0, Companion 0.35.0: Tease Me is back, rebuilt.** Laynie, Oct 23: "some of my users want the teaseme function back", "maybe 3-4 a hour at light to set a base line. switching it on should be by pet or herdleader."
+  - **?teaseme on|off**, or the Tease me switch in the Companion's Toggles. **?teaseme light|steady|needy**: light is 3 or 4 an hour, steady about 6, needy about 10. Anybody who had the old ?teaseme on starts at light.
+  - **Their herd leader can switch it for them:** ?teaseme <who> on|off|light|steady|needy, and the pet is told who did it. Nobody else can, not even a proprietor outside the herd.
+  - **It notices them.** Every tease is about what's goin' on with them right now: full udders or full balls, a load still in them, a heat, a denial, a chastity cage, a round belly, a mess they haven't washed off, a trap they just crawled out of, their tally, a contract signed today. Otherwise one for their kind (cow, pony, pup, kitty, bunny, goat, pig, deer, fox, goblin) or the farm's general ones. Fitted to their body like the trap lines.
+  - **Private:** whispered, or a notice in their Companion. Never while they're on ?quiet, in a trap or a scene, or gone quiet for half an hour. Nothin' they've heard lately, and no more than 40 in a day.
+  - **Lines of your own:** staff ?tease add <line> for everybody (%name% is their name), mixed in now and then; a herd leader's **?tease for <who> <line>** is a line only that pet ever hears. ?tease list, ?tease remove <n>.
+  - bot/src/parts/10uh-teaseme.js; tests/teaseme.test.cjs.
 
 - **Bot 0.41.1: contract rules.** Laynie: "anyone with a penis shouldnt have [the control orgasm] rule unless they specifically register as non binary or as a male. all contacts should have the forbid leaving room rule, as well as keep restraints when relogging, and return to chatrooms rules." Every farm contract now carries Forbid leaving the room, Keep all restraints when relogging (kept) and Return to chatrooms on relog (returns to the room). Control orgasms is left out for anybody with a cock unless their ?gender is male or nonbinary (futas and femboys go without it). A custom contract can still drop one of these with ?contract remove.
 

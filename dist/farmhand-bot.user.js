@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.41.1
+// @version      0.42.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -2222,14 +2222,14 @@
     { name: "Breedin'", cmds: ["breedable", "fertile", "mpreg", "freeuse", "jarok", "yes", "no", "naturalheat", "breed <who>", "cum <who>", "wash", "tally", "eggs", "praise", "degrade", "rights", "accept", "pedigree"] },
     { name: "Body", cmds: ["size", "measure", "penis", "futa", "gender <word>"] },
     { name: "Clothes", cmds: ["outfit", "outfits", "uniform", "outfit back"] },
-    { name: "Mind", cmds: ["hypno", "teaseme"] },
+    { name: "Mind", cmds: ["hypno", "teaseme", "teaseme light", "teaseme steady", "teaseme needy", "teaseme off"] },
     { name: "Fun", cmds: ["fair", "enter"] },
     { name: "Ribbons and the store", cmds: ["ribbons", "ribbons top", "store", "buy <item>", "gift <who> <potion>", "potions", "potions on", "dares on", "dare", "dared", "dare skip", "bench", "bench on", "bench me <minutes>", "use <mouth|pussy|ass>", "bench top"] }
   ];
   var STAFF_GROUPS = [
     { name: "Books", cmds: ["queue", "app <n>", "approve <who> livestock", "deny <who>", "appclear", "roster", "stock", "find <who>", "record <who>", "note <who>", "signed", "addfriend <who>", "unregister <who>", "unregister <who> <role>"] },
     { name: "Herd", cmds: ["claim <who>", "release <who>", "myherd", "herdname <name>", "herdcall", "herdsummon", "turnout <who>", "letup <who>", "brand <who>", "walk <who>"] },
-    { name: "Stock", cmds: ["tier <who> <tier>", "stocks <who>", "unstock <who>", "vet <who>", "inspect <who>", "tease list"] },
+    { name: "Stock", cmds: ["tier <who> <tier>", "stocks <who>", "unstock <who>", "vet <who>", "inspect <who>", "tease list", "tease add <line>", "tease for <who> <line>", "teaseme <who> on"] },
     { name: "Contracts", cmds: ["contract list", "contract show deep <who>", "contract offer deep <who> 1w", "contract check <who>", "contract release <who>", "contract rules", "contracts"] },
     { name: "Outfits", cmds: ["outfit", "outfit offer <who>", "outfit offer <who> <species> <gender>"] },
     { name: "Barn", cmds: ["milk <who>", "collect <who>", "jars", "inseminate <who> <jar>", "machine <who> <jar>", "drain <who>", "edge <who>", "denial <who>", "ruin <who>", "nomilk <who> <hours>", "quota <who>", "heat <who>", "heatline", "shotlog"] },
@@ -2244,7 +2244,7 @@
   ];
 
   // bot/src/version.js
-  var VERSION = "0.41.1";
+  var VERSION = "0.42.0";
 
   // bot-parts:farmhand-bot-parts
   (function() {
@@ -2343,7 +2343,9 @@
       TEASE_MIN_GAP_MIN: 25,
       // never closer together than this, per person
       TEASE_MAX_GAP_MIN: 70,
-      // ...and usually by this
+      // ...and usually by this (the old tease: Tease Me now goes by ?teaseme light|steady|needy, 10uh-teaseme.js)
+      TEASE_DAY_MAX: 40,
+      // Tease Me: never more than this many to one person in a day
       /* ── PRODUCTION & BREEDING ── amounts in mL, rates per hour. See doc section 16. */
       /* ── MILKING GEAR ── worn anywhere on the farm, it milks at a rate to match the gear.
          Echo's pumps top out near 40 mL a minute, so the farm does too. */
@@ -4138,7 +4140,7 @@
     }, __wordsFor: (m, t) => wordsFor(m, t), __overdue: (m) => overdueStage(m), __milkCum: (m) => stallClimax(m), __intSev: (m, s) => intensitySev(m, s), __intTail: (m, k) => intensityTail(m, 5, 6, k), __holes: (m) => holesFor(m), __album: (m) => albumFor(m, 60), __holeTook: (m, h, a) => holeTook(m, h, a), __dreamTheme: (m) => dreamTheme(m), __eggsWorth: (t, n) => eggsWorth(t, n), __rank: (m) => rankX(m), __broodBook: (m) => broodBook(m), __belly: (m) => bellyStage(m), __happening: (m) => happeningFor(m), __gearOn: (m, s, l, d, x) => gearOn(m, s, l, d, x), __heard: (mn, t) => trapHeard(mn, t), __parasiteTick: () => parasiteTick(), __parts: (m) => parasiteParts(rec(m).parasite), __climax: (m) => parasiteClimax(m), __nurse: (a, b) => parasiteNurse(a, b), __parasiteChance: (m) => parasiteChance(m), __kiss: (a, f, s, t) => parasiteKiss(a, f, s, t), __load: (s, m, h, x) => parasiteLoad(s, m, h, x), __shot: (t, by, text, how) => applyShot(t, by, text, how), __slow: (mn) => slowOf(mn), __milkRate: (mn) => milkRate(mn), __benchTick: () => benchTick(), __roll: (m, s, a, b) => rollConception(m, s, a, b), __contractTick: () => {
       state.cwAt = 0;
       contractWatchTick();
-    }, __lingerTick: () => lingerTick(), __ribbonTick: () => ribbonTick(), __dareTick: () => dareTick(), __potionOn: (mn, id) => potionOn(mn, id), __milkRate: (mn) => milkRate(mn), __addonLine: (k, i) => addonLine(k, i), __lineInfo: (m, x) => lineInfo(m, x), __gearSense: (m) => gearSense(m), __symTick: () => symbioteTick(), __symBond: (m, k, h) => symBond(m, k, h), __symFed: (m, h, x) => symbioteFed(m, h, x), __capacity: (m) => capacity(m), __symLines: () => SYM_LINES, __newTrapLines: () => NEW_TRAP_LINES, __farmGear: (m) => farmGearFor(m), __mazeTick: () => mazeTick(), __symSpread: (a, b, k, h) => symSpread(a, b, k, h), __symGear: (m) => symGear(m), __farmSets: () => ({ TRAP_GEAR, TRAP_KINDS, CURSES, SUIT_STAGES, SUIT_COLOR, MESS, MESS_BY_TRAP, SYM_GEAR }), __messShelf: () => MESS_SHELF, __broodTick: () => broodTick() });
+    }, __lingerTick: () => lingerTick(), __ribbonTick: () => ribbonTick(), __dareTick: () => dareTick(), __potionOn: (mn, id) => potionOn(mn, id), __milkRate: (mn) => milkRate(mn), __addonLine: (k, i) => addonLine(k, i), __lineInfo: (m, x) => lineInfo(m, x), __gearSense: (m) => gearSense(m), __symTick: () => symbioteTick(), __symBond: (m, k, h) => symBond(m, k, h), __symFed: (m, h, x) => symbioteFed(m, h, x), __capacity: (m) => capacity(m), __symLines: () => SYM_LINES, __newTrapLines: () => NEW_TRAP_LINES, __farmGear: (m) => farmGearFor(m), __mazeTick: () => mazeTick(), __symSpread: (a, b, k, h) => symSpread(a, b, k, h), __symGear: (m) => symGear(m), __farmSets: () => ({ TRAP_GEAR, TRAP_KINDS, CURSES, SUIT_STAGES, SUIT_COLOR, MESS, MESS_BY_TRAP, SYM_GEAR }), __messShelf: () => MESS_SHELF, __broodTick: () => broodTick(), __teaseTick: () => teaseMeTick(), __teaseLine: (m) => teaseLine(m), __teaseCtx: (m) => teaseContexts(m).map((c) => c[0]) });
     W.FarmhandSyncKeys = () => syncAllPresent(true);
     W.FarmhandFriends = () => W.Player.FriendList;
     W.FarmhandAddFriend = (mn) => addFriend(mn, false);
@@ -5222,7 +5224,8 @@
       symbioteOn: "symbiote",
       trapEager: "eager",
       trapsOn: "traps",
-      ownOutfit: "ownoutfit"
+      ownOutfit: "ownoutfit",
+      teaseMe: "teaseme"
     };
     const DOC_CMDS = ["record", "stats", "vet", "quota", "keys", "size", "measure", "pedigree"];
     function shownMl(n) {
@@ -5258,7 +5261,7 @@
         herdLeader: herdLeaderOf(mn) ? plainName(herdLeaderOf(mn)) : null,
         switches: {}
       });
-      for (const k in SWITCH_CMDS) s.switches[SWITCH_CMDS[k]] = k === "jarok" ? r.jarok !== false : k === "trapsOn" ? isSubject(mn) : k === "milkable" ? makesMilk(mn) : !!r[k];
+      for (const k in SWITCH_CMDS) s.switches[SWITCH_CMDS[k]] = k === "jarok" ? r.jarok !== false : k === "trapsOn" ? isSubject(mn) : k === "teaseMe" ? !!teaseRate(r) : k === "milkable" ? makesMilk(mn) : !!r[k];
       try {
         const p = prodOf(mn), now = Date.now();
         if (makesMilk(mn)) s.milk = { ml: shownMl(p.milk), cap: Math.round(milkCap(mn)), grade: milkGrade(mn), lastAt: p.lastMilkAt || 0 };
@@ -6214,7 +6217,7 @@
         }
         if (makesSemen(mn) && p.semen >= semenCap(mn) - 0.5) {
           if (!p.semenFullSince) p.semenFullSince = now;
-          const caged = !!holeBlocked(mn, "penis");
+          const caged2 = !!holeBlocked(mn, "penis");
           if (isRut() && !p.pentUp) p.semenFullSince -= Math.min(now - (p.last2 || now), CFG.HEARTBEAT_MS * 2);
           const scent = nearHeat(mn);
           if (scent && !p.pentUp) {
@@ -6224,7 +6227,7 @@
               emote("\u{1F443} " + plainName(mn) + " catches the scent of " + plainName(scent) + "'s heat, and those balls start achin' to empty.");
             }
           }
-          const need = (caged ? CFG.PENTUP_CAGED_H : CFG.PENTUP_H) * 36e5;
+          const need = (caged2 ? CFG.PENTUP_CAGED_H : CFG.PENTUP_H) * 36e5;
           if (!p.pentUp && now - p.semenFullSince >= need) {
             p.pentUp = true;
             tell(mn, "\u{1F624} You're all pent up, " + plainName(mn) + "! Next load's gonna be a big one, and extra potent too.");
@@ -10561,7 +10564,7 @@
             R(plainName(t) + " isn't here to hear it, hon.");
             return;
           }
-          if (how === "tease" && !(rec(t).degradeMe || rec(t).teaseOptIn)) {
+          if (how === "tease" && !(rec(t).degradeMe || teaseRate(rec(t)))) {
             R(plainName(t) + " hasn't said they like bein' teased, sugar. Try praise.");
             return;
           }
@@ -20124,6 +20127,391 @@
         }
       };
       beats.forEach((k, i) => i === 0 ? beat(k, i) : later(() => beat(k, i), i * gap));
+    }
+    const TEASE_RATE = { light: [15, 20], steady: [8, 12], needy: [5, 7] };
+    const TEASE_SAY = { light: "3 or 4 times an hour", steady: "about 6 times an hour", needy: "about 10 times an hour" };
+    const TEASE_LINES = {
+      udders: [
+        "{t}Those udders are gettin' heavy, sugar. I can see them sway from here. Somebody ought to strip you out before you start drippin' on the floor.",
+        "{t}You're full, aren't you? Tight and achin' and beadin' at the tips. Ask a farmhand real sweet and maybe they'll milk you by hand.",
+        "{t}Every step you take, those swollen tits bounce and ache. The pump's waitin' in the parlour, sugar. It misses you.",
+        "{t}I bet if somebody so much as brushed your nipples right now, you'd squirt all down your front. Want to find out?",
+        "{t}The parlour's quiet and your udders are not. Go get yourself hooked up before they start to throb.",
+        "{t}There's a wet spot spreadin' on your front, hon. Everybody you walk past can see you're leakin'.",
+        "{t}Cup those heavy tits in your hands and feel how full they are. Now think about the cups pullin' on them, slow and steady.",
+        "{nt}Your chest is achin' full, sugar, and those puffy little nipples are about ready to drip. The pump would love to have you."
+      ],
+      balls: [
+        "{c}Those balls are swollen tight, sugar. Full to the brim and nobody's milked you. Doesn't that ache?",
+        "{c}You're carryin' a heavy load down there. The collection bench could take care of that for you, nice and slow.",
+        "{c}All that seed, backed up and achin', and nobody's done a thing about it. Poor thing.",
+        "{c}Your cock twitches every time somebody bends over. The farm notices, sugar. The farm always notices.",
+        "{c}Heavy and full and throbbin'. Somebody should strap a sleeve on you and drain you dry.",
+        "{c}You're leakin' a little already, aren't you? That's how full you are. Go find a stall that needs a stud."
+      ],
+      seeded: [
+        "Still full from earlier, aren't you? I can tell by the way you're walkin'. Careful, it'll start to run.",
+        "{v}You've still got somebody's seed sloshin' in you, sugar. Every time you sit down you can feel it shift.",
+        "Somebody left a load in you and you're still carryin' it around like a good little breeder. Don't you dare wash.",
+        "{v}Squeeze those thighs together, hon, or it's goin' to drip right down to your knees in front of everybody.",
+        "{nv}Your ass is still full and warm from the last one. You're leakin' a little, did you know?",
+        "Every breath, you can feel it in you, warm and heavy. That's what a well-used animal feels like.",
+        "Keep that load in you. Clench. The farm wants it to take.",
+        "{v}Every step pushes a little more of it out of you and down your thigh. Leave it. It suits you."
+      ],
+      heat: [
+        "You're in heat and the whole barn can smell it, sugar. Every stud you walk past turns to look.",
+        "{v}You're drippin'. Nobody's even touched you and you're drippin'. That's the heat talkin'.",
+        "That itch won't go away on its own, sugar. You need a stud in you, and you know it.",
+        "Rub your thighs together all you like, hon. It won't help. Only one thing helps a heat.",
+        "You keep lookin' at the stud stalls. I see you. Go on and present for somebody.",
+        "You keep liftin' your hips when you think nobody's lookin'. Every stud on the farm knows what that means.",
+        "{v}You're so hot and swollen down there you can barely think. Good. Thinkin' is overrated in a heat.",
+        "Bend over anywhere, sugar. Somebody'll take the hint. Somebody always does."
+      ],
+      denied: [
+        "Still achin', still throbbin', still not allowed. Isn't that the sweetest kind of torture?",
+        "Right to the edge, and no further. Not today, sugar. Maybe not tomorrow either.",
+        "{c}Bet that cock's throbbin' right now, beggin' for it. Good. It's meant to.",
+        "You could beg, you know. It prob'ly won't work. But it'd be fun to hear.",
+        "Every time you get close, remember: you don't get to. The farm decides when.",
+        "{v}Your pussy's so swollen and needy, and it's goin' to stay that way. Don't touch.",
+        "Hands off, sugar. You finish when the farm says, and the farm hasn't said.",
+        "Think about the last time somebody had you right at the edge and stopped. Now think about how long it'll be till they let you finish."
+      ],
+      caged: [
+        "{c}That cage must feel awful tight right now. Good. It's meant to.",
+        "{c}Strainin' against that little cage again? You'll get used to it. Or you won't. Either way, it stays on.",
+        "{c}Locked up nice and tight. Nobody's touchin' that cock till the farm says so, not even you.",
+        "{c}Every time you get hard, the cage reminds you who it belongs to. And it isn't you.",
+        "{c}The key's hangin' up in the office, sugar. You'll be walkin' past it all day."
+      ],
+      belly: [
+        "Look at that belly, so round and full. You're carryin' for the farm now, sugar, and everybody can see it.",
+        "Your belly's gettin' heavy. Every time you shift, you remember whose breeder you are.",
+        "So swollen and tight. Somebody should rub that belly for you while they breed you again.",
+        "You waddle now, did you know? It's adorable. The studs think so too.",
+        "Hands on your belly, sugar. Feel how full you are. Feel how much the farm put in you.",
+        "Big and round and stuffed full. A belly like that is a good animal's belly."
+      ],
+      messy: [
+        "You've still got it all over you, sugar. Sticky and filthy and you haven't even tried to wash. Good animal.",
+        "You smell like the farm, hon. Like the trough and the stalls and everybody that's had you. Don't you dare wash it off.",
+        "There's still a mess dryin' on you. Everybody you walk past can see what you've been up to.",
+        "Leave it on. You look better filthy.",
+        "Somebody's goin' to want to add to that mess. Stand still and let them.",
+        "You're a sight, sugar. Sticky in places you can't even reach. You could wash, but I'd rather you didn't."
+      ],
+      trap: [
+        "Back on your feet already? That trap sure made a mess of you. There's more out there, you know.",
+        "You're still shakin' from that trap. Mind your step, sugar, the next one's closer than you think.",
+        "The traps have had a taste of you now. They'll want more.",
+        "You walked right into that one, didn't you? Almost like you wanted to.",
+        "Your legs are still wobbly. Whatever got you, it got you good.",
+        "I heard you out there. The whole farm heard you."
+      ],
+      tally: [
+        "That's quite a tally on your thigh today, sugar. Somebody's been popular.",
+        "How many is it now? You've lost count, haven't you? The farm hasn't.",
+        "Used and used and used again today, and you're still lookin' for more. Greedy thing.",
+        "Every mark on that tally is somebody who had you today. Want to make it one more?",
+        "%tally today, and the day isn't done. Let's see how high it goes."
+      ],
+      contract: [
+        "You signed today, sugar. Every word of it. You belong to the farm now, and the farm intends to enjoy it.",
+        "Remember what you agreed to this mornin'? The farm does.",
+        "Fresh contract, fresh animal. Let's see how long before you forget you were ever anything else."
+      ],
+      general: [
+        "Somebody's thinkin' about you, sugar. Somebody with very rough hands.",
+        "You look like you could use a good, hard milkin'. Or a breedin'. Or both.",
+        "Bet you can't go five minutes without thinkin' about the stud barn now.",
+        "Don't fidget, hon. Everybody notices when you fidget.",
+        "Wouldn't it be nice to just kneel, right where you are, and wait to be used?",
+        "There's a hay bale in the back barn with your shape pressed into it. Go lie in it and think about why.",
+        "One of the farmhands asked about you today. Asked what you sound like when you're bred.",
+        "Some animals on this farm earn their keep. Some just get used. Which one are you?",
+        "The farm's been very patient with you today. It won't last.",
+        "Spread your knees a little when you sit, sugar. Let the farm see what it owns."
+      ],
+      species: [
+        "Such a good %sp. You know what you're for, don't you?",
+        "Every %sp on this farm has a purpose, sugar. Yours is to be used.",
+        "Go on, make that noise for me, little %sp. Nobody's listenin'. Prob'ly.",
+        "A good %sp stays close to the barn and does what it's told. Are you bein' a good %sp?"
+      ]
+    };
+    const TEASE_KIND = {
+      cow: [
+        "Moo for me, sugar. Nice and low, like a good cow at milkin' time.",
+        "A good cow stands still for the cups and doesn't fuss. Are you a good cow?",
+        "There's a stall in the dairy barn with your name on it. Go stand in it and wait."
+      ],
+      pony: [
+        "Pick those feet up high, pony. Prance for me.",
+        "A pony's mouth is made for a bit, sugar. Open wide.",
+        "Somebody's fixin' to hitch you to the cart. Stand still and let them buckle you in."
+      ],
+      pup: [
+        "Sit. Stay. Good pup. Now roll over and show your belly.",
+        "Whose good pup are you? Wag for me.",
+        "Fetch, sugar. On all fours, mouth only."
+      ],
+      kitty: [
+        "Purr for me, kitty. Louder.",
+        "Stretch out in the sun, kitty, and stick that rump up high.",
+        "Somebody's got a saucer of cream with your name on it. Crawl over and lap it up."
+      ],
+      bunny: [
+        "Twitch that little nose for me, bunny. You know what bunnies are famous for.",
+        "Bunnies breed like nothin' else on the farm, sugar. Hop to it.",
+        "Ears up, bunny. Somebody's comin'."
+      ],
+      goat: [
+        "Stubborn little goat. The farm knows how to break stubborn.",
+        "Bleat for me, sugar. Nice and loud.",
+        "Goats'll put anything in their mouths, they say. Open up and let's find out."
+      ],
+      pig: [
+        "Oink for me, piggy. Louder. Let the whole sty hear.",
+        "Such a greedy little piggy. Always hungry, always wantin' more.",
+        "Roll around in the mud for me, piggy. Get nice and filthy."
+      ],
+      deer: [
+        "Easy, little deer. Skittish thing. Nobody's goin' to hurt you. Much.",
+        "Those big eyes won't save you, sugar. Kneel.",
+        "Standin' in the meadow waitin' for a stag to find you, little deer?"
+      ],
+      fox: [
+        "Sly little fox. You think you'll slip away. You won't.",
+        "Every fox gets caught sooner or later, sugar. Then it gets bred.",
+        "Swish that big tail for me, fox."
+      ],
+      goblin: [
+        "Filthy little goblin. Rags and mud and that grin. Come here.",
+        "Goblins are made for the dirty jobs, sugar. Guess what job needs doin'.",
+        "Back in your rags, goblin, and down on your knees where you belong."
+      ]
+    };
+    const TEASE_KIN = { bull: "cow", horse: "pony", dog: "pup", wolf: "pup", kitt: "kitty", cat: "kitty", rabbit: "bunny", sheep: "goat" };
+    const teaseKind = (mn) => {
+      const s = String((rec(mn) || {}).species || "").toLowerCase();
+      return TEASE_KIN[s] || s;
+    };
+    const teaseSp = (mn) => {
+      const s = String((rec(mn) || {}).species || "").toLowerCase();
+      return s === "kitt" ? "kitty" : s || "pet";
+    };
+    function teaseRate(r) {
+      if (!r) return null;
+      if (r.teaseOptIn && r.teaseMe === void 0) {
+        r.teaseMe = "light";
+        delete r.teaseOptIn;
+      }
+      return TEASE_RATE[r.teaseMe] ? r.teaseMe : null;
+    }
+    const caged = (mn) => {
+      try {
+        return ((charFor(mn) || {}).Appearance || []).some((a) => /Chastity/i.test(a.Asset && a.Asset.Name || ""));
+      } catch (e) {
+        return false;
+      }
+    };
+    function teaseContexts(mn) {
+      const p = prodOf(mn), r = rec(mn) || {}, now = Date.now(), out = [["general", 2], ["species", 2]];
+      const add = (k, w, f) => {
+        try {
+          if (f()) out.push([k, w]);
+        } catch (e) {
+        }
+      };
+      add("udders", 4, () => p && makesMilk(mn) && p.milk > 0.7 * milkCap(mn));
+      add("balls", 3, () => p && makesSemen(mn) && p.semen > 0.7 * semenCap(mn));
+      add("seeded", 4, () => p && p.held && heldTotal(p) > 0.25 * capacity(mn));
+      add("heat", 5, () => inHeat(p));
+      add("denied", 4, () => p && p.deniedUntil > now);
+      add("caged", 3, () => caged(mn));
+      add("belly", 3, () => bellyStage(mn) >= 2);
+      add("messy", 3, () => paintedText(mn) || aftermathOf(mn).length);
+      add("trap", 3, () => r.trapAt && now - r.trapAt < 40 * 6e4);
+      add("tally", 3, () => tallyToday(mn) >= 3);
+      add("contract", 2, () => (L2.contracts || []).some((x) => x.mn === mn && x.status === "signed" && x.signedAt && now - x.signedAt < 864e5));
+      return out;
+    }
+    function teaseLine(mn) {
+      state.teaseHeard = state.teaseHeard || /* @__PURE__ */ new Map();
+      const heard = state.teaseHeard.get(mn) || [];
+      const mine = (L2.tease || []).filter((x) => x.for === mn), all = (L2.tease || []).filter((x) => !x.for);
+      const fresh = (list) => {
+        const f = list.filter((l) => !heard.includes(l));
+        return f.length ? f : list;
+      };
+      const any = (list) => list[Math.floor(Math.random() * list.length)];
+      let line;
+      if (mine.length && Math.random() < 0.3) line = any(fresh(mine.map((x) => x.text)));
+      else if (all.length && Math.random() < 0.15) line = any(fresh(all.map((x) => x.text)));
+      else {
+        const ctx = teaseContexts(mn), total = ctx.reduce((a, c) => a + c[1], 0);
+        let roll = Math.random() * total, pick = "general";
+        for (const [k, w] of ctx) {
+          roll -= w;
+          if (roll <= 0) {
+            pick = k;
+            break;
+          }
+        }
+        let b = null;
+        try {
+          b = bodyOf(mn);
+        } catch (e) {
+        }
+        const poolFor = (k) => {
+          let pool = TEASE_LINES[k];
+          if (k === "species" && TEASE_KIND[teaseKind(mn)]) pool = pool.concat(TEASE_KIND[teaseKind(mn)], TEASE_KIND[teaseKind(mn)]);
+          return b ? pool.filter((l) => tagsFit(l, b) && wordsFit(l, b)) : pool;
+        };
+        const unheard = (list) => list.filter((l) => !heard.includes(l));
+        let cands = unheard(poolFor(pick));
+        if (!cands.length) cands = unheard([].concat(...ctx.map(([k]) => poolFor(k))));
+        if (!cands.length) {
+          const p0 = poolFor(pick).length ? poolFor(pick) : TEASE_LINES.general;
+          cands = p0.filter((l) => !heard.slice(-5).includes(l));
+          if (!cands.length) cands = p0;
+        }
+        line = any(cands);
+      }
+      heard.push(line);
+      if (heard.length > 15) heard.shift();
+      state.teaseHeard.set(mn, heard);
+      return fill(bodyWords(mn, line), mn).replace(/%sp/g, teaseSp(mn)).replace(/%tally/g, () => {
+        const n = tallyToday(mn);
+        return n + (n === 1 ? " mark" : " marks");
+      });
+    }
+    function teaseMeTick() {
+      if (!CFG.TEASE_ENABLED) return;
+      state.teaseNext = state.teaseNext || /* @__PURE__ */ new Map();
+      const now = Date.now(), day = dayKey();
+      for (const C2 of W.ChatRoomCharacter || []) {
+        const mn = C2.MemberNumber, r = rec(mn);
+        if (!r || mn === CFG.BOT_MEMBER) continue;
+        const rate = teaseRate(r);
+        if (!rate || quietNow(mn)) {
+          state.teaseNext.delete(mn);
+          continue;
+        }
+        const [lo, hi] = TEASE_RATE[rate], gap = (lo + Math.random() * (hi - lo)) * 6e4;
+        const next = state.teaseNext.get(mn);
+        if (!next) {
+          state.teaseNext.set(mn, now + gap);
+          continue;
+        }
+        if (now < next) continue;
+        const busy = heldByTrap(mn) || state.sceneRun && state.sceneRun.has(mn) || [...state.scenes || /* @__PURE__ */ new Map()].some(([s, sc]) => s === mn || (sc && sc.with || []).includes(mn));
+        if (busy) continue;
+        state.teaseNext.set(mn, now + gap);
+        if (now - (state.lastSpoke.get(mn) || 0) > 30 * 6e4) continue;
+        r.teaseDay = r.teaseDay && r.teaseDay.d === day ? r.teaseDay : { d: day, n: 0 };
+        if (r.teaseDay.n >= CFG.TEASE_DAY_MAX) continue;
+        r.teaseDay.n++;
+        try {
+          whisper(mn, "\u{1F608} " + teaseLine(mn));
+        } catch (e) {
+          warn("tease:", e);
+        }
+      }
+    }
+    function teaseMeCommand(sender, args, R) {
+      const SET = ["on", "off", "light", "steady", "needy"], a0 = String(args[0] || "").toLowerCase();
+      let t = sender, v = a0;
+      if (a0 && !SET.includes(a0)) {
+        t = resolveTarget(args[0]);
+        v = String(args[1] || "").toLowerCase();
+        if (!t || !rec(t)) {
+          R("Who, sugar? ?teaseme <who> on|off|light|steady|needy, for somebody in your herd.");
+          return;
+        }
+        if (t !== sender && !herdsOf(t).some((h) => h.leader === sender)) {
+          R("Only " + plainName(t) + " or their herd leader can switch their teasin', sugar.");
+          return;
+        }
+      }
+      const r = rec(t);
+      if (!r || !(r.roles || []).length) {
+        R(t === sender ? "That's just for folks on the books, sugar. Say ?apply first!" : plainName(t) + " isn't on the books yet, sugar.");
+        return;
+      }
+      const who = t === sender ? "you" : plainName(t), now0 = teaseRate(r);
+      if (!SET.includes(v)) {
+        R("\u{1F608} Tease me is " + (now0 ? now0 + " for " + who + ", " + TEASE_SAY[now0] : "off for " + who) + ". ?teaseme " + (t === sender ? "" : plainName(t) + " ") + "on, off, light, steady or needy.");
+        return;
+      }
+      r.teaseMe = v === "off" ? null : v === "on" ? now0 || "light" : v;
+      state.teaseNext && state.teaseNext.delete(t);
+      saveLedger();
+      syncCompanions(true);
+      audit(sender, "TEASEME", t + " " + (r.teaseMe || "off"));
+      if (!r.teaseMe) {
+        R(t === sender ? "Alright, hon. No more whisperin' in your ear. ?teaseme on if you miss me." : "\u{1F608} Teasin's off for " + plainName(t) + ".");
+        if (t !== sender) tell(t, "\u{1F608} " + plainName(sender) + " switched your teasin' off, sugar.");
+        return;
+      }
+      if (t === sender) R("\u{1F608} Ooh. You'll hear from me " + TEASE_SAY[r.teaseMe] + " while you're on the farm, sugar, and I'll be payin' attention. ?teaseme off to stop.");
+      else {
+        R("\u{1F608} " + plainName(t) + " will be teased " + TEASE_SAY[r.teaseMe] + ".");
+        tell(t, "\u{1F608} " + plainName(sender) + " asked me to keep you company, sugar. You'll hear from me " + TEASE_SAY[r.teaseMe] + ". ?teaseme off and I'll stop.");
+      }
+    }
+    function teaseLinesCommand(sender, args, R) {
+      L2.tease = L2.tease || [];
+      const sub = String(args[0] || "list").toLowerCase(), staff = isStaff(sender);
+      if (sub === "for") {
+        const t = resolveTarget(args[1]), line = args.slice(2).join(" ").trim();
+        if (!t || !rec(t) || !line) {
+          R("?tease for <who> <line>: a tease only they ever get, and %name% is their name. For example: ?tease for Bessie Your herd leader is thinkin' about you, %name%.");
+          return;
+        }
+        if (!herdsOf(t).some((h) => h.leader === sender) && !isProprietor(sender)) {
+          R("Only " + plainName(t) + "'s herd leader can write them a tease of their own, sugar.");
+          return;
+        }
+        L2.tease.push({ text: line, by: sender, at: Date.now(), for: t });
+        saveLedger();
+        audit(sender, "TEASE_FOR", t + " " + line.slice(0, 60));
+        R("\u{1F608} Saved. Only " + plainName(t) + " will ever hear that one." + (teaseRate(rec(t)) ? "" : " Their teasin's off right now: ?teaseme " + plainName(t) + " on."));
+        return;
+      }
+      if (sub === "add") {
+        if (!staff) {
+          R("Writin' teases for everybody is for staff, sugar. Herd leaders: ?tease for <who> <line> writes one for somebody in your herd.");
+          return;
+        }
+        const line = args.slice(1).join(" ").trim();
+        if (!line) {
+          R("?tease add <line>, and %name% becomes their name. For example: ?tease add Somebody looks awful cute today, %name%.");
+          return;
+        }
+        L2.tease.push({ text: line, by: sender, at: Date.now() });
+        saveLedger();
+        audit(sender, "TEASE_ADD", line.slice(0, 60));
+        R("\u{1F608} Added. " + L2.tease.filter((x) => !x.for).length + " of the staff's teases on file, mixed in with the farm's own.");
+        return;
+      }
+      const shown = L2.tease.map((x, i) => [x, i]).filter(([x]) => staff || x.by === sender);
+      if (sub === "remove" || sub === "del") {
+        const i = parseInt(args[1], 10) - 1, hit = L2.tease[i];
+        if (!hit || !(staff || hit.by === sender)) {
+          R("Which number, hon? ?tease list, then ?tease remove <n>.");
+          return;
+        }
+        L2.tease.splice(i, 1);
+        saveLedger();
+        audit(sender, "TEASE_REMOVE", hit.text.slice(0, 60));
+        R("Took it off: " + hit.text);
+        return;
+      }
+      const on = Object.values(L2.people).filter((r) => teaseRate(r)).length;
+      R("\u{1F608} TEASES \xB7 " + on + " switched on\n" + (shown.length ? shown.map(([x, i]) => i + 1 + ". " + (x.for ? "for " + plainName(x.for) + ": " : "") + x.text).join("\n") : "None written yet: the farm writes its own, fitted to each of them.") + "\n" + (staff ? "?tease add <line> \xB7 " : "") + "?tease for <who> <line> \xB7 ?tease remove <n>");
     }
     const PARASITE_SERUMS = ["growth", "fertility", "growth", "hyper pregnancy", "growth", "capacity"];
     const PARASITE_GROWS = ["udder", "penis", "testes", "butt"];
@@ -30959,6 +31347,7 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
       "friend",
       "notice",
       "teaseme",
+      "tease",
       "stats",
       "board",
       "pedigree",
@@ -31114,7 +31503,6 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
       "tier",
       "vet",
       "brand",
-      "tease",
       "spot",
       "spots",
       "appclear",
@@ -32088,11 +32476,16 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
           R("?zone \xB7 ?zone who \xB7 ?zone a|b <name> \xB7 ?zone pair <name> <group> \xB7 ?zone unpair <name> \xB7 ?zone clear <name>");
           break;
         }
-        case "voice":
-        case "tease":
         case "teaseme":
+          teaseMeCommand(sender, args, R);
+          break;
+        // (Tease Me, rebuilt Oct 23: 10uh-teaseme.js)
+        case "tease":
+          teaseLinesCommand(sender, args, R);
+          break;
+        case "voice":
           if (!RETIRED_ON) {
-            R("That one's been retired, sugar: the farm doesn't send tease lines or herd voice lines any more.");
+            R("That one's been retired, sugar: the farm doesn't send herd voice lines any more.");
             break;
           }
         // eslint-disable-next-line no-fallthrough
@@ -33926,48 +34319,6 @@ Welcome to B&B Farm, hon. \u{1F33E}`
           beep(t, "\u{1F525} " + plainName(sender) + " branded you, sweetie: " + mark + ". It shows on ?who and on your record.");
           break;
         }
-        /* ── TEASING ── */
-        case "tease-old": {
-          const sub = String(args[0] || "list").toLowerCase();
-          if (sub === "add") {
-            const line = args.slice(1).join(" ").trim();
-            if (!line) {
-              R("Give me a line, sugar! ?tease add <line> adds one (%name% becomes their name), ?tease list shows them all, ?tease remove <number> takes one off. For example: ?tease add Somebody looks awful cute today, %name%.");
-              break;
-            }
-            L2.tease.push({ text: line, by: sender, at: Date.now() });
-            saveLedger();
-            audit(sender, "TEASE_ADD", line.slice(0, 60));
-            R("Added! " + L2.tease.length + " teasin' line" + (L2.tease.length === 1 ? "" : "s") + " on file.");
-          } else if (sub === "remove" || sub === "del") {
-            const i = parseInt(args[1], 10) - 1;
-            if (!(i >= 0 && i < L2.tease.length)) {
-              R("Which number, hon? Say ?tease remove and a number from ?tease list, like ?tease remove 2.");
-              break;
-            }
-            const gone = L2.tease.splice(i, 1)[0];
-            saveLedger();
-            audit(sender, "TEASE_REMOVE", gone.text.slice(0, 60));
-            R("Took it off: " + gone.text);
-          } else {
-            const opted = Object.values(L2.people).filter((r) => r.teaseOptIn).length;
-            R(L2.tease.length ? "\u{1F608} TEASING LINES (" + L2.tease.length + ") \xB7 " + opted + " opted in\n\n" + L2.tease.map((x, i) => i + 1 + ". " + x.text).join("\n") + "\n\n?tease add <line> \xB7 ?tease remove <n>" : "No lines yet, sugar. ?tease add <line> adds one (%name% becomes their name), ?tease list shows them all, ?tease remove <number> takes one off. For example: ?tease add Somebody looks awful cute today, %name%.");
-          }
-          break;
-        }
-        case "teaseme-old": {
-          const r = rec(sender);
-          if (!r || !r.roles.length) {
-            R("That's just for folks on the books, sugar. Say ?apply first!");
-            break;
-          }
-          const v = String(args[0] || "").toLowerCase();
-          r.teaseOptIn = v ? v === "on" || v === "yes" : !r.teaseOptIn;
-          state.teaseNext.delete(sender);
-          saveLedger();
-          R(r.teaseOptIn ? "\u{1F608} Ooh, you'll hear from me now and then while you're on the farm, sugar. Say ?teaseme off to stop." : "Alright, hon. No more whisperin' in your ear. Say ?teaseme on if you miss me.");
-          break;
-        }
         /* ── NOTICE BOARD ── */
         case "notice": {
           if (!args.length || !isProprietor(sender)) {
@@ -35498,6 +35849,11 @@ Welcome to B&B Farm, hon. \u{1F33E}`
           if (Date.now() - pc.at > CFG.CLAIM_ASK_TIMEOUT_MIN * 6e4) state.pendingClaims.delete(mn);
         if (CFG.KEY_SYNC_ENABLED && admin && Date.now() - state.lastFullSync > CFG.KEY_RESYNC_MIN * 6e4) {
           syncAllPresent(true);
+        }
+        try {
+          teaseMeTick();
+        } catch (e) {
+          warn("tease:", e);
         }
         rutTick();
         quotaTick();

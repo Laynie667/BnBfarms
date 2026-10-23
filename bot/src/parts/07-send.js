@@ -493,6 +493,7 @@
     if (m.type === "bodyFarmAsk"){ farmLookAsk(mn, m); return; }
     if (m.type === "outfitSave"){ saveOutfit(mn, m); return; }
     if (m.type === "outfitAnswer"){ outfitAnswer(mn, m); return; }
+    if (m.type === "say"){ companionSaid(mn, m); return; }   // the Say it box (10ui-say.js)
     if (m.type === "cmd"){
       const text = String(m.text||"").trim().replace(/^[?\-!.\/]+/, "").slice(0, 2000);   // "/record Alexia" works too   // contract terms can run to 1,000
       if (!text) return;

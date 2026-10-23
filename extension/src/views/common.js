@@ -17,7 +17,22 @@ export function safetyTab(ctx) {
       big("I'm stuck", "stuck", false, "Can't move, can't reach a door, stuck in somethin'? Staff are told where you are, and you're brought somewhere safe."),
       big("Call staff", "staff", false, "Just want a hand, or somebody to talk to? This calls whoever's on duty.")),
     muted("From chat, without the panel: ?safe · ?stuck · ?staff"),
+    sayCard(ctx),
   ];
+}
+
+// Say it: when a gag, a no-human-left contract or a trance has their tongue, the words still get through
+// (a hidden message to the farm, which nothin' in the game rewrites). The farm hears it as if they'd said it plain.
+export function sayCard(ctx) {
+  if (!ctx.api || !ctx.api.say) return null;
+  const box = h("textarea", { class: "fhc-in", rows: 2, maxlength: 300, placeholder: "What you need to say…", value: ctx.ui.sayText || "",
+    oninput: (e) => ctx.setUi({ sayText: e.target.value }, true) });
+  const go = (to) => { if (ctx.api.say(box.value, to)) ctx.setUi({ sayText: "" }); };
+  return card(title("🗣️ Say it"),
+    muted("Gagged, made to moo, or held silent? Type it here and it gets through exactly as you typed it. A trap that wants a line said hears it, and so do yes, no and commands. Nobody else sees it."),
+    box,
+    h("div", { style: { marginTop: "6px" } }, btn("Say it to the farm", () => go("farm"), true), btn("Tell staff", () => go("staff"))),
+    muted("Tell staff sends it to whoever's on duty, and your herd leader."));
 }
 
 export function guidesTab(ctx, staff) {

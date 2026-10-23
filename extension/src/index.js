@@ -309,6 +309,17 @@ const api = {
     if (r.ok) toBot("outfitAnswer", { answer: "worn", slot: o.slot, locks: r.locks });
   },
   decline(o) { toBot("outfitAnswer", { answer: "declined", slot: o.slot }); },
+  // Say it: their words straight to the farm (or to staff) as a hidden message, so no gag, speech rule or trance
+  // rewrites them on the way (Laynie, Oct 23: "speech impaired pets need a guaranteed way to be able to say what they need to say")
+  say(text, to) {
+    text = String(text || "").trim().slice(0, 300);
+    if (!text) return false;
+    if (!botHere()) { st.panel.add("👉 The farm girl isn't in this room, so nobody's there to hear it.", "notice"); return false; }
+    if (!st.welcomed) hello();
+    toBot("say", { text, to: to === "staff" ? "staff" : "farm" });
+    st.panel.add("🗣️ You said" + (to === "staff" ? ", to staff" : "") + ": " + text, "mine");
+    return true;
+  },
   back() { onFarmMsg({ from: BOT_MEMBER, type: "outfitBack" }); },
   save(slot) {
     let c;

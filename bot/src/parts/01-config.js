@@ -98,6 +98,11 @@
     TEASE_MIN_GAP_MIN: 25,     // never closer together than this, per person
     TEASE_MAX_GAP_MIN: 70,     // ...and usually by this (the old tease: Tease Me now goes by ?teaseme light|steady|needy, 10uh-teaseme.js)
     TEASE_DAY_MAX: 40,         // Tease Me: never more than this many to one person in a day
+    /* ── ECHS ── the hypnosis add-on, through its front door (10uj-echs.js) */
+    ECHS_ON: true,
+    ECHS_SKILL: 0,              // the hypnotist skill I declare to their ECHS (their own setting decides whether it counts)
+    ECHS_ANSWER_S: 20,          // no answer by then: they haven't got ECHS running
+    ECHS_OFFER_EVERY_MIN: 120,  // ?hypno on folk who are around get asked this often (0: only when they ask, a trap, or their herd leader)
 
     /* ── PRODUCTION & BREEDING ── amounts in mL, rates per hour. See doc section 16. */
     /* ── MILKING GEAR ── worn anywhere on the farm, it milks at a rate to match the gear.

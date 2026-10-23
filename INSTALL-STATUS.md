@@ -5,7 +5,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 | Script | File in `dist/` | Where it runs | Current |
 |---|---|---|---|
-| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.42.0** |
+| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.43.0** |
 | Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.10.0** |
 | Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.2.1** |
 | Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **1.1.0** |
@@ -13,7 +13,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 | Map tools, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.4** |
 | Dairy | `farmhand-dairy.user.js` | the bot's PC | **1.1.0** |
 | Shows | `farmhand-shows.user.js` | the bot's PC | **1.1.0** |
-| Farmhand Companion | `farmhand-companion.user.js` | each player | **0.35.0** |
+| Farmhand Companion | `farmhand-companion.user.js` | each player | **0.36.0** |
 | Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.4** |
 
 ## Sending a watch report
@@ -23,6 +23,19 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 - Running the watcher on more than one game at once (the bot, yours, a tester's) lets Claude line them up into one timeline.
 
 ## Latest changes (newest first)
+
+- **Bot 0.43.0, Companion 0.36.0: Say it, for pets who can't.** Laynie, Oct 23: "speech impaired pets need a guaranteed way to be able to say what they need to say, in the companion or otherwise - because as is, someone with a nhl contract cant effectively answer when a trap needs them to say a specific thing."
+  - **When the farm is waitin' on words, the words are a button.** The mirror box's line, a parasite wantin' begged at, the tickle rack and the Needy Nectar: a box at the top of every tab in their Companion says what's wanted, with the line on it. **Say it** sends it.
+  - **The Say it box** in the Companion's Safety tab (the 🆘 button): type anything and it reaches the farm exactly as typed, as a hidden message no gag, moo-only contract or trance can rewrite. A trap that wants a line hears it, and so do yes, no and commands. **Tell staff** sends it to the staff on duty and their herd leader instead.
+  - **Without the Companion:** a line whispered to the farm girl counts for the mirror box now, and so do the plain words the game sends along with a gagged line (when the speaker has "no speech garbling" on).
+  - bot/src/parts/10ui-say.js; tests/say-it.test.cjs, companion.test.cjs step 18.
+- **Bot 0.43.0, Conditioning 1.2.0: the farm and ECHS.** Laynie, Oct 23: "the bot needs to detect when someone has set ?hypno on and to send a request to hypnotise them, or have a button", "some traps to also trigger a session", "need a way to release commands, and triggers from the bots end, like allowing them to cum, touch, etc."
+  - The farm girl goes through ECHS's front door like any hypnotist: she sends ECHS's own request, their ECHS shows its own agree, ignore or fight box, and their settings decide everything. /echs safeword always wins.
+  - **?hypno on** asks their ECHS straight away, and every 2 hours while they're around (ECHS_OFFER_EVERY_MIN, 0 turns that off). **?hypnotize me**, or **Ask my ECHS** on the Conditioning card, asks now; herd leaders and proprietors: ?hypnotize <who>. The **lantern** and the **mirror box** ask when they let somebody go.
+  - Under with her: Conditioning's session runs through ECHS, whispered right beside them in character (ECHS can't hear the farm's usual map whispers), with ECHS's own phrases worked in for the level. ?hyp <who> [level] echs asks first and starts when they're under. Waking themselves in ECHS stops the farm's session too; ?safe wakes ECHS.
+  - **?allow <who> cum|touch|move|follow|speak|hear|see|clothes|notice|all** (herd leaders and staff; ?release was already the herd one): ECHS's own release words, and the farm's denial lifts. **?echs [who]** shows where things stand.
+  - bot/src/parts/10uj-echs.js; tests/echs.test.cjs.
+- **Tease Me: about 170 more lines** (Laynie: "the teaseme portion will need a huge amount of messages fo its pools"), in every pool and for every kind of animal. bot/src/parts/10uh2-tease-lines.js.
 
 - **Bot 0.42.0, Companion 0.35.0: Tease Me is back, rebuilt.** Laynie, Oct 23: "some of my users want the teaseme function back", "maybe 3-4 a hour at light to set a base line. switching it on should be by pet or herdleader."
   - **?teaseme on|off**, or the Tease me switch in the Companion's Toggles. **?teaseme light|steady|needy**: light is 3 or 4 an hour, steady about 6, needy about 10. Anybody who had the old ?teaseme on starts at light.

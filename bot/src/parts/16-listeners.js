@@ -47,10 +47,11 @@
           // a Companion runnin' on the bot's own account talks to the bot like any other panel;
           // everything else from the bot is its own echo, ignored
           const own = data.Type === "Hidden" && typeof W.__farmhandOwnPanel !== "function" && readMsg(data);
-          if (own && ["hello","bye","cmd","outfitSave","outfitAnswer","relayNo","sight","leadOk","leadNo","bodyFarmAsk"].includes(own.type)) onCompanion(own);
+          if (own && ["hello","bye","cmd","outfitSave","outfitAnswer","relayNo","sight","leadOk","leadNo","bodyFarmAsk","say"].includes(own.type)) onCompanion(own);
           return;
         }
 
+        if (data.Type === "Hidden" && data.Content === "HypnoMsg"){ try { onHypnoMsg(data.Sender, data); } catch(e){ warn("echs:", e); } return; }   // ECHS (10uj-echs.js)
         if (data.Type === "Hidden"){
           const fm = readMsg(data);
           if (fm){ onCompanion(fm); return; }
@@ -78,8 +79,12 @@
         if (data.Type === "Activity" && /^(Orgasm\d|OrgasmResist|OrgasmFail)/.test(String(data.Content||""))){ try { onClimax(data.Sender, String(data.Content)); } catch(e){ warn("climax:",e); } addonsEmit("climax", data.Sender, String(data.Content)); return; }
         if (data.Type === "Activity"){ try { onActivity(data); } catch(e){ warn("activity:",e); } addonsEmit("activity", data); return; }
         if (data.Type === "Emote" || data.Type === "Chat"){ try { onRoleplay(data.Sender, String(data.Content||""), data.Type); } catch(e){ warn("rp:",e); } addonsEmit("roleplay", data.Sender, String(data.Content||""), data.Type); }
+        // the words the farm's waitin' for, heard past a gag (the plain copy BC sends along) or in a whisper to me (10ui-say.js)
+        let tookWords = false;
+        if (data.Type === "Chat" || data.Type === "Whisper"){ const plain = plainWordsOf(data), said = plain || (data.Type === "Whisper" ? String(data.Content||"") : ""); if (said && !/^\s*[?!.\-\/]/.test(said)) tookWords = heardWords(data.Sender, said); }
         if (data.Type!=="Chat" && data.Type!=="Whisper") return;
         if (typeof data.Content!=="string") return;
+        if (tookWords && data.Type === "Whisper") return;   // the mirror box (or a parasite) took it: it's not a question for me
 
         state.heard++;
         state.lastHealthy = Date.now();

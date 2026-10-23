@@ -142,7 +142,8 @@
         r.trapWait = { kind: "mirror", until: Date.now() + CFG.TRAP_WAIT_MIN*60000, next: Date.now() + 40000, line, n: 0 };
         if (pos) r.penned = { until: r.trapWait.until + 30000, X: pos.X, Y: pos.Y, name: "the mirror box", by: BOTMN(), trap: true, wait: true };
         trance(mn, 1);
-        tell(mn, "🪞 The voice in the box wants to hear you say it, out loud, five times:\n\""+line+"\"\nSay it in chat. The door opens on the fifth, or in "+CFG.TRAP_WAIT_MIN+" minutes if you won't.");
+        tell(mn, "🪞 The voice in the box wants to hear you say it, out loud, five times:\n\""+line+"\"\nSay it in chat"+(hasCompanion(mn) ? ", or tap Say it in your panel if a gag or a rule has your tongue" : ", or whisper it to me")+". The door opens on the fifth, or in "+CFG.TRAP_WAIT_MIN+" minutes if you won't.");
+        try { syncCompanions(); } catch(e){}   // its Say it button (10ui-say.js)
       });
     },
     paddle(mn){
@@ -191,7 +192,7 @@
     saveLedger();
     try { betsWaitEnd(mn, how); } catch(e){ warn("bets:", e); }
     if (how === "quiet") return true;
-    if (w.kind === "mirror"){ trance(mn, 0); if (how === "gave") goUnder(mn, 2); }
+    if (w.kind === "mirror"){ trance(mn, 0); if (how === "gave"){ goUnder(mn, 2); if (r.hypno) later(() => { try { echsAsk(mn, CFG.BOT_MEMBER, "mirror"); } catch(e){} }, 8000); } }   // (ECHS: 10uj-echs.js)
     if (charFor(mn)) emote(TRAP_KINDS[w.kind].icon+" "+moreLine(w.kind, how === "gave" ? "gave" : "held", mn), mn);
     if (how === "held") later(() => earnRibbons(mn, 1, "holdin' out against the "+(w.kind === "tickle" ? "tickle rack" : "mirror box")), 2000);
     syncCompanions(true);
@@ -216,9 +217,11 @@
     const r = rec(mn), w = r && r.trapWait;
     if (!w || w.kind !== "mirror" || squash(text).indexOf(squash(w.line)) < 0) return;
     w.n = (w.n || 0) + 1; saveLedger();
-    if (w.n >= 5){ trapWaitEnd(mn, "gave"); return; }
+    if (w.n >= 5){ trapWaitEnd(mn, "gave"); return true; }
     privateLine(mn, tFill(pickFor(mn, "trap:mirror:count", MORE_LINES.mirror.count), mn, { x: String(5 - w.n) }), "emote");
     arouse(mn, 8);
+    try { syncCompanions(); } catch(e){}   // the Say it button counts down too (10ui-say.js)
+    return true;
   }
 
   const MORE_LINES = {

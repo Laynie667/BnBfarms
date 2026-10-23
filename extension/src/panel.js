@@ -277,6 +277,13 @@ export class Panel {
         btn("Not now", () => { this.outfit = null; this.api.decline && this.api.decline(o); this.render(); }))));
     if (this.choose) out.push(h("div", { class: "fhc-box ask" }, h("div", { style: { whiteSpace: "pre-wrap" } }, this.choose.text),
       h("div", { style: { marginTop: "8px" } }, (this.choose.choices || []).map((c) => btn(c, () => { this.choose = null; this.ask(c, true); }, true)))));
+    // the farm is waitin' to hear somethin' from them: the words on a button, past any gag or speech rule (Say it)
+    for (const w of (this.s.wants || [])) out.push(h("div", { class: "fhc-box ask" },
+      h("b", null, (w.icon || "🗣️") + " " + w.label),
+      w.say ? h("div", { class: "fhc-muted" }, "“" + w.say + "”") : null,
+      h("div", { style: { marginTop: "8px" } },
+        w.say ? btn("Say it", () => { this.api.say && this.api.say(w.say); }, true) : btn(w.cmd.split(" ")[0] === "beg" ? "Beg" : "Do it", () => this.ask(w.cmd, true), true)),
+      h("div", { class: "fhc-muted" }, "Straight to the farm, past any gag or speech rule.")));
     for (const a of this.asks) out.push(h("div", { class: "fhc-box ask" }, h("div", null, a.text),
       h("div", { style: { marginTop: "8px" } },
         btn("Yes", () => { this.asks = this.asks.filter((x) => x !== a); this.ask("yes", true); }, true),

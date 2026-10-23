@@ -95,6 +95,7 @@
       g.urge = { kind, until: now + mins*60000 }; saveLedger();
       privateLine(mn, pmLine(PARASITE_MORE[strainKey(g)+"_urge_"+kind] ? strainKey(g)+"_urge_"+kind : "urge_"+kind, mn), "emote");
       tell(mn, "👄 It wants somethin', sugar: "+urgeAsk(mn, kind)+", inside "+mins+" minutes. Do it and it'll be sweet to you. Don't, and it'll hold you at the edge for an hour.");
+      if (kind === "beg") try { syncCompanions(); } catch(e){}   // its Say it button (10ui-say.js)
     }
   }
   // WHAT EACH STRAIN WANTS (Laynie, Oct 14: "lets do the parasites"). They all used to want the same three things. Now:
@@ -128,7 +129,7 @@
   function kneelingNow(mn){ const C = charFor(mn); if (!C) return false; const a = [].concat(C.ActivePose || [], C.Pose || []); return a.some(p => /^(Kneel|KneelingSpread|AllFours)$/.test(String(p))); }
   // a line in the room from them: the Tyrant wanted beggin'
   const BEG_WORDS = /\b(please|plea+se|beg|begging|beggin'?|pretty please|i need (it|you|this|to)|let me cum|need to cum|have mercy|mercy)\b/i;
-  function parasiteHeard(mn, text){ const g = rec(mn) && rec(mn).parasite; if (g && g.urge && g.urge.kind === "beg" && BEG_WORDS.test(String(text))) parasiteUrgeDone(mn, "beg"); }
+  function parasiteHeard(mn, text){ const g = rec(mn) && rec(mn).parasite; if (g && g.urge && g.urge.kind === "beg" && BEG_WORDS.test(String(text))) return parasiteUrgeDone(mn, "beg"); return false; }
   function parasiteUrgeDone(mn, kind){
     const r = rec(mn), g = r && r.parasite;
     if (!g || !g.urge || g.urge.kind !== kind || !parasiteOn(mn)) return false;

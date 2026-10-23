@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.42.0
+// @version      0.43.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -2222,14 +2222,14 @@
     { name: "Breedin'", cmds: ["breedable", "fertile", "mpreg", "freeuse", "jarok", "yes", "no", "naturalheat", "breed <who>", "cum <who>", "wash", "tally", "eggs", "praise", "degrade", "rights", "accept", "pedigree"] },
     { name: "Body", cmds: ["size", "measure", "penis", "futa", "gender <word>"] },
     { name: "Clothes", cmds: ["outfit", "outfits", "uniform", "outfit back"] },
-    { name: "Mind", cmds: ["hypno", "teaseme", "teaseme light", "teaseme steady", "teaseme needy", "teaseme off"] },
+    { name: "Mind", cmds: ["hypno", "hypnotize me", "echs", "teaseme", "teaseme light", "teaseme steady", "teaseme needy", "teaseme off"] },
     { name: "Fun", cmds: ["fair", "enter"] },
     { name: "Ribbons and the store", cmds: ["ribbons", "ribbons top", "store", "buy <item>", "gift <who> <potion>", "potions", "potions on", "dares on", "dare", "dared", "dare skip", "bench", "bench on", "bench me <minutes>", "use <mouth|pussy|ass>", "bench top"] }
   ];
   var STAFF_GROUPS = [
     { name: "Books", cmds: ["queue", "app <n>", "approve <who> livestock", "deny <who>", "appclear", "roster", "stock", "find <who>", "record <who>", "note <who>", "signed", "addfriend <who>", "unregister <who>", "unregister <who> <role>"] },
     { name: "Herd", cmds: ["claim <who>", "release <who>", "myherd", "herdname <name>", "herdcall", "herdsummon", "turnout <who>", "letup <who>", "brand <who>", "walk <who>"] },
-    { name: "Stock", cmds: ["tier <who> <tier>", "stocks <who>", "unstock <who>", "vet <who>", "inspect <who>", "tease list", "tease add <line>", "tease for <who> <line>", "teaseme <who> on"] },
+    { name: "Stock", cmds: ["tier <who> <tier>", "stocks <who>", "unstock <who>", "vet <who>", "inspect <who>", "tease list", "tease add <line>", "tease for <who> <line>", "teaseme <who> on", "hypnotize <who>", "allow <who> cum", "allow <who> all", "echs <who>"] },
     { name: "Contracts", cmds: ["contract list", "contract show deep <who>", "contract offer deep <who> 1w", "contract check <who>", "contract release <who>", "contract rules", "contracts"] },
     { name: "Outfits", cmds: ["outfit", "outfit offer <who>", "outfit offer <who> <species> <gender>"] },
     { name: "Barn", cmds: ["milk <who>", "collect <who>", "jars", "inseminate <who> <jar>", "machine <who> <jar>", "drain <who>", "edge <who>", "denial <who>", "ruin <who>", "nomilk <who> <hours>", "quota <who>", "heat <who>", "heatline", "shotlog"] },
@@ -2244,7 +2244,7 @@
   ];
 
   // bot/src/version.js
-  var VERSION = "0.42.0";
+  var VERSION = "0.43.0";
 
   // bot-parts:farmhand-bot-parts
   (function() {
@@ -2346,6 +2346,14 @@
       // ...and usually by this (the old tease: Tease Me now goes by ?teaseme light|steady|needy, 10uh-teaseme.js)
       TEASE_DAY_MAX: 40,
       // Tease Me: never more than this many to one person in a day
+      /* ── ECHS ── the hypnosis add-on, through its front door (10uj-echs.js) */
+      ECHS_ON: true,
+      ECHS_SKILL: 0,
+      // the hypnotist skill I declare to their ECHS (their own setting decides whether it counts)
+      ECHS_ANSWER_S: 20,
+      // no answer by then: they haven't got ECHS running
+      ECHS_OFFER_EVERY_MIN: 120,
+      // ?hypno on folk who are around get asked this often (0: only when they ask, a trap, or their herd leader)
       /* ── PRODUCTION & BREEDING ── amounts in mL, rates per hour. See doc section 16. */
       /* ── MILKING GEAR ── worn anywhere on the farm, it milks at a rate to match the gear.
          Echo's pumps top out near 40 mL a minute, so the farm does too. */
@@ -4923,6 +4931,10 @@
         outfitAnswer(mn, m);
         return;
       }
+      if (m.type === "say") {
+        companionSaid(mn, m);
+        return;
+      }
       if (m.type === "cmd") {
         const text = String(m.text || "").trim().replace(/^[?\-!.\/]+/, "").slice(0, 2e3);
         if (!text) return;
@@ -5333,6 +5345,10 @@
         });
         part("keepsakes", () => keepersStateFor(mn, s));
         part("udders", () => uddersStateFor(mn, s));
+        part("wants", () => {
+          const w = wantsFor(mn);
+          if (w.length) s.wants = w;
+        });
         part("happening", () => {
           const hp = happeningFor(mn);
           if (hp.length) s.happening = hp;
@@ -8842,6 +8858,11 @@
           }
         },
         // little cues their own Companion plays (v0.10+): a face, a sound for whoever's around, the trance haze
+        // ECHS (10uj-echs.js): under(mn) with me · say(mn, line) in character beside them, so ECHS hears it · wake(mn) · ask(mn, why) · take(mn): a session's yours
+        echs: { under: (mn) => echsUnder(mn), say: (mn, t) => echsSay(mn, fitTo(mn, t)), wake: (mn) => echsWake(mn), ask: (mn, why) => echsAsk(mn, CFG.BOT_MEMBER, why || a.name), take: (mn) => {
+          const v = echsOf(mn);
+          if (v) v.taken = a.name;
+        } },
         face: (mn, mood, secs) => face(mn, mood, secs),
         sound: (mn, name) => sound(mn, name),
         trance: (mn, level) => trance(mn, level),
@@ -9012,7 +9033,7 @@
         // the Companion on the bot's own account talks to the bot here, on the page
         own: (dict) => {
           try {
-            if (!dict || typeof dict !== "object" || !["hello", "bye", "cmd", "outfitSave", "outfitAnswer", "relayNo", "sight", "leadOk", "leadNo", "bodyFarmAsk"].includes(dict.type)) return false;
+            if (!dict || typeof dict !== "object" || !["hello", "bye", "cmd", "outfitSave", "outfitAnswer", "relayNo", "sight", "leadOk", "leadNo", "bodyFarmAsk", "say"].includes(dict.type)) return false;
             onCompanion(Object.assign({}, JSON.parse(JSON.stringify(dict)), { from: CFG.BOT_MEMBER }));
             return true;
           } catch (e) {
@@ -13267,6 +13288,12 @@
             trance(mn, 0);
             arouse(mn, 30);
             goUnder(mn, 2);
+            if (rec(mn) && rec(mn).hypno) later(() => {
+              try {
+                echsAsk(mn, CFG.BOT_MEMBER, "lantern");
+              } catch (e) {
+              }
+            }, 8e3);
             tell(mn, "\u{1F3EE} " + tFill(pickFor(mn, "trap:lantern:thought", T.thought), mn));
           });
           break;
@@ -14795,7 +14822,11 @@
           r.trapWait = { kind: "mirror", until: Date.now() + CFG.TRAP_WAIT_MIN * 6e4, next: Date.now() + 4e4, line, n: 0 };
           if (pos) r.penned = { until: r.trapWait.until + 3e4, X: pos.X, Y: pos.Y, name: "the mirror box", by: BOTMN(), trap: true, wait: true };
           trance(mn, 1);
-          tell(mn, '\u{1FA9E} The voice in the box wants to hear you say it, out loud, five times:\n"' + line + '"\nSay it in chat. The door opens on the fifth, or in ' + CFG.TRAP_WAIT_MIN + " minutes if you won't.");
+          tell(mn, '\u{1FA9E} The voice in the box wants to hear you say it, out loud, five times:\n"' + line + '"\nSay it in chat' + (hasCompanion(mn) ? ", or tap Say it in your panel if a gag or a rule has your tongue" : ", or whisper it to me") + ". The door opens on the fifth, or in " + CFG.TRAP_WAIT_MIN + " minutes if you won't.");
+          try {
+            syncCompanions();
+          } catch (e) {
+          }
         });
       },
       paddle(mn) {
@@ -14862,7 +14893,15 @@
       if (how === "quiet") return true;
       if (w.kind === "mirror") {
         trance(mn, 0);
-        if (how === "gave") goUnder(mn, 2);
+        if (how === "gave") {
+          goUnder(mn, 2);
+          if (r.hypno) later(() => {
+            try {
+              echsAsk(mn, CFG.BOT_MEMBER, "mirror");
+            } catch (e) {
+            }
+          }, 8e3);
+        }
       }
       if (charFor(mn)) emote(TRAP_KINDS[w.kind].icon + " " + moreLine(w.kind, how === "gave" ? "gave" : "held", mn), mn);
       if (how === "held") later(() => earnRibbons(mn, 1, "holdin' out against the " + (w.kind === "tickle" ? "tickle rack" : "mirror box")), 2e3);
@@ -14896,10 +14935,15 @@
       saveLedger();
       if (w.n >= 5) {
         trapWaitEnd(mn, "gave");
-        return;
+        return true;
       }
       privateLine(mn, tFill(pickFor(mn, "trap:mirror:count", MORE_LINES.mirror.count), mn, { x: String(5 - w.n) }), "emote");
       arouse(mn, 8);
+      try {
+        syncCompanions();
+      } catch (e) {
+      }
+      return true;
     }
     const MORE_LINES = {
       pillory: {
@@ -20513,6 +20557,598 @@
       const on = Object.values(L2.people).filter((r) => teaseRate(r)).length;
       R("\u{1F608} TEASES \xB7 " + on + " switched on\n" + (shown.length ? shown.map(([x, i]) => i + 1 + ". " + (x.for ? "for " + plainName(x.for) + ": " : "") + x.text).join("\n") : "None written yet: the farm writes its own, fitted to each of them.") + "\n" + (staff ? "?tease add <line> \xB7 " : "") + "?tease for <who> <line> \xB7 ?tease remove <n>");
     }
+    const TEASE_MORE = {
+      udders: [
+        "{t}Your udders are so tight the skin's shinin', sugar. One squeeze and you'd spray.",
+        "{t}Every time you breathe, those heavy tits rise and ache. Wouldn't the cups feel good right now?",
+        "{t}You keep cuppin' yourself when you think nobody's lookin'. Everybody's lookin'.",
+        "{t}Leakin' again. Two little wet circles, right where everybody can see.",
+        "{t}The parlour light is on, sugar. It's on for you.",
+        "{t}Imagine the pump catchin' hold, that first hard pull, and all that pressure finally lettin' go.",
+        "{t}You're so full a farmhand could milk you standin' up, right here, and you'd let them.",
+        "{t}Heavy, swollen, drippin'. You're the best kind of cow there is right now.",
+        "{t}I bet your nipples are stiff and sore and achin' to be pulled. Go on and ask somebody.",
+        "{t}All that milk sloshin' around in you and not a bucket in sight. What a waste of a good dairy animal.",
+        "{t}Don't you dare hide them. A full udder is somethin' to show off.",
+        "{t}Every step jiggles them and every jiggle makes you leak a little more.",
+        "{t}The stall's free. The cups are clean. The only thing missin' is you, on your knees, hooked up.",
+        "{t}You're carryin' so much milk the farm could fill a churn off you alone.",
+        "{t}Someone's goin' to grab those udders soon, sugar, whether you ask or not.",
+        "{t}Tug on them a little. Just a little. Feel how much is waitin' in there.",
+        "{t}You've gone past full into achin'. That's where a good cow learns to beg for the pump.",
+        "{nt}Your chest is swollen and sore, those nipples puffy and tender. The pump would love to work on them.",
+        "{nt}You're leakin' a little, sugar. Right through your shirt. Somebody ought to milk that out of you."
+      ],
+      balls: [
+        "{c}Those balls are hangin' heavy and full, sugar. Every step you take, you feel them.",
+        "{c}You're so backed up your cock's twitchin' at nothin'. A breeze could set you off.",
+        "{c}All that seed and nowhere to put it. The breedin' stalls are open, you know.",
+        "{c}A good stud keeps himself drained for the farm. You're lettin' it pile up.",
+        "{c}Feel that ache low down? That's a full load beggin' to be used.",
+        "{c}The collection sleeve's warm and waitin'. It'd have you emptied in minutes.",
+        "{c}Somebody on this farm needs breedin' and you're carryin' exactly what they need.",
+        "{c}You've got that hungry look a full stud gets. Every bent-over body in the barn looks like a stall.",
+        "{c}Hard again, aren't you? You've been hard on and off all hour.",
+        "{c}A drop's beadin' at the tip already. That's how full you are, sugar.",
+        "{c}Think about sinkin' into somebody warm and finally lettin' it all go. Now stop thinkin' about it. Not yet.",
+        "{c}The farm wants every drop of that, and it'll get it. One way or another.",
+        "{c}Those swollen balls would fill a jar to the brim. Maybe two."
+      ],
+      seeded: [
+        "Still full of somebody, sugar. You can feel it every time you shift your hips.",
+        "That load's warm in you yet. Hold it. Good breeders hold it.",
+        "Every time you sit you feel it slide a little. Every time you stand it slides a little more.",
+        "You're walkin' careful, like you're tryin' not to spill. You are spillin'.",
+        "Clench, sugar. Keep it in. It's not yours to waste.",
+        "{v}You're stuffed full and drippin' and you still want another one in you. Greedy breeder.",
+        "{v}Somebody bred you good. You can feel it sittin' deep in you, warm and heavy.",
+        "{v}It's leakin' out of your pussy and down your thigh in a slow sticky line. Leave it be.",
+        "{v}If you lie down and tip your hips up, it'll stay in longer. Go on. Help it take.",
+        "{nv}Your ass is still full and warm and sore. You can feel exactly where they were.",
+        "{nv}Every step squeezes a little more out of your ass. You're a mess back there, sugar.",
+        "You smell like the stud that had you. Everybody you walk past knows it.",
+        "There's more of them in you than you, right now. Doesn't that feel right?",
+        "A belly full of seed and a dumb happy look on your face. That's a well-kept animal.",
+        "Somebody's goin' to want to top you up before that settles. Stand still when they do.",
+        "You're still sloshin' when you walk. Every step reminds you who had you.",
+        "Don't wipe it. It's the farm's now, same as you."
+      ],
+      heat: [
+        "Your heat's got you so wet and twitchy you can't sit still, sugar.",
+        "The studs can smell you from across the yard. Their heads come up when you pass.",
+        "You keep brushin' up against things. Fences. Posts. People. Somethin's got to scratch that itch.",
+        "That hot needy throb won't quiet down till somebody fills you. You know it won't.",
+        "In heat and achin' and all you can think about is bein' mounted. Good. That's what heat's for.",
+        "{v}You're swollen and slick and pulsin' down there. Every step rubs it.",
+        "{v}Your pussy's so needy it's practically beggin' out loud. Maybe you should beg for it.",
+        "{v}Squeeze your thighs. Feel how wet you are. That's all for the studs, sugar.",
+        "Present for the next stud that looks at you. Don't think. Just turn and lift.",
+        "You're makin' little noises and you don't even notice. Every stud in the barn does.",
+        "The breedin' stall's got a spot that fits your knees just right. Go find it.",
+        "You'd let anybody in this barn have you right now, wouldn't you? Anybody at all.",
+        "Fanning yourself won't help, sugar. That heat's on the inside.",
+        "Heat's a hungry thing. It'll keep you squirmin' till you're bred full.",
+        "Your hips keep rockin' all on their own. Your body knows what it wants."
+      ],
+      denied: [
+        "Close again? Too bad. Breathe through it and stay right there.",
+        "You haven't been allowed in so long you've forgotten what it feels like. Good.",
+        "Every little touch drives you crazy, doesn't it? And none of them get you there.",
+        "Nobody's goin' to let you finish today. Get comfortable with the ache.",
+        "You're so wound up you're shakin'. Stay wound, sugar.",
+        "The edge is where the farm keeps its favourite animals.",
+        "Beg all you like. The answer's not yet.",
+        "Every hour you're denied, you get a little easier to handle. A little dumber. A little sweeter.",
+        "Rubbin' your thighs together doesn't count, hon. Stop that.",
+        "{c}Throbbin' and leakin' and not allowed. That's a well-trained cock.",
+        "{v}You're so slick and swollen down there and you still can't come. Doesn't that make you desperate?",
+        "Think about bein' let go. Think about it real hard. Now stop. Still no.",
+        "One day the farm will say yes and you'll scream. Not today, though."
+      ],
+      caged: [
+        "{c}That little cage is snug, isn't it? It's meant to be.",
+        "{c}You keep reachin' down and findin' steel. Every time, it's still there.",
+        "{c}All that wantin', locked up tight where you can't touch it.",
+        "{c}A caged stud is a calm stud. Mostly. You don't look calm.",
+        "{c}The farm holds the key. Ask nicely and maybe it'll think about you.",
+        "{c}Strainin' again? The cage doesn't care how hard you get.",
+        "{c}You'll leak through that cage before anybody lets you out. That's alright. Leakin's allowed.",
+        "{c}Locked and leakin' and achin'. You look so good like that."
+      ],
+      belly: [
+        "Your belly's so round now it leads you everywhere you go.",
+        "Rub it. Go on. Feel how full the farm's made you.",
+        "That stretched, heavy feelin' is your body doin' exactly what it's for.",
+        "Everybody can see what you've been up to just by lookin' at your middle.",
+        "Big and full and soft. A stud looks at that belly and wants to make it bigger.",
+        "You can't bend over properly any more, can you? You'll just have to kneel.",
+        "Waddlin' around the farm, stuffed full and glowin'. You've never looked more useful.",
+        "Every kick and shift and slosh reminds you whose breeder you are.",
+        "The farm keeps you full. That's the deal. You agreed to it.",
+        "So swollen your shirt won't sit right. Better take it off and show it proper."
+      ],
+      messy: [
+        "You've got it in your hair, sugar. Dried and sticky. Don't touch it.",
+        "Every inch of you smells like the barn and the studs. It suits you.",
+        "There's a crust on your thigh and a shine on your chin. What have you been doin'?",
+        "Filthy little thing. You're not goin' to wash, are you? Good.",
+        "The farmhands love it when you're messy. Gives them somethin' to add to.",
+        "You're painted up like a used stall wall. Wear it proud.",
+        "Sticky, smelly, used. You look like you belong here.",
+        "Somebody'll hose you down eventually. Till then, stay filthy for me.",
+        "You leave a little smear on everything you sit on. Everybody knows where you've been.",
+        "That mess is a record of your day, sugar. Every streak is somebody."
+      ],
+      trap: [
+        "That trap had you squealin'. I could hear it from the barn.",
+        "You're still a little dazed from it, aren't you? Still tinglin' where it got you.",
+        "Somethin' out there knows your scent now, sugar. It'll find you again.",
+        "You went right back toward that spot, didn't you? Can't stay away.",
+        "Your knees are still weak. Whatever it did, it did it well.",
+        "The farm's full of surprises like that. Most of them want you.",
+        "There's a dozen more where that came from, and every one of them's hungry.",
+        "You look so pretty after a trap's done with you. Flushed and shaky and used.",
+        "Walk soft out there. Or don't. I know which one you'll pick."
+      ],
+      tally: [
+        "Somebody's been busy. Your tally's lookin' crowded.",
+        "That's a lot of hands on you today, sugar. And more to come.",
+        "Every mark on your thigh is a load, a mouth, a hand. Count them. Lose count.",
+        "At this rate you'll need another thigh for tomorrow's tally.",
+        "%tally, and you're still lookin' around for the next one. Insatiable.",
+        "The busiest animal on the farm today. That's you.",
+        "Somebody'll add another mark soon. Stand still for the pen.",
+        "You've been passed around so much today you're practically shared property."
+      ],
+      contract: [
+        "That contract's got your name on it, sugar, and the farm's name all over you.",
+        "Signed and sealed. You can't take it back, and you don't want to.",
+        "You read every line, didn't you? You still signed.",
+        "Your first day as the farm's. Let's make it a long one.",
+        "The ink's barely dry and you're already lookin' the part.",
+        "Remember: you agreed to all of it. Every bit of what's comin'."
+      ],
+      general: [
+        "You've got that look like you're waitin' for somebody to tell you what to do.",
+        "The farm's quiet right now. That never lasts.",
+        "Somebody's goin' to put their hands on you before the hour's out. Be ready.",
+        "Go stand by the fence and look pretty. Somebody'll notice.",
+        "There's a bench in the back with straps your size. Just thought you should know.",
+        "You were made for this place, sugar. Everybody can tell.",
+        "Don't bother lookin' busy. Animals don't look busy. They wait.",
+        "If somebody snapped their fingers right now, you'd kneel. Admit it.",
+        "The studs were talkin' about you in the barn. Nothin' polite.",
+        "You'd look sweet in a stall, sugar. Tied by the neck, waitin' your turn.",
+        "Every hour on this farm makes you a little less of what you were.",
+        "Somebody left a collar on the hook by the gate. It'd fit you perfect.",
+        "Your mind keeps wanderin' back to the barn, doesn't it?",
+        "The farmhands are takin' bets on how long you last today.",
+        "You're the kind of animal that gets used first and asked later.",
+        "Lick your lips again, sugar. Somebody's watchin'.",
+        "If you're good, maybe someone'll breed you before supper.",
+        "There's straw in your hair and you don't even care. That's how I know you're settlin' in.",
+        "Your body's been warm and achy all day. The farm does that.",
+        "Look down at the ground, sugar. Good animals keep their eyes low.",
+        "The trough's full and the stalls are clean. Everything's ready for you.",
+        "You keep squirmin'. Somethin' botherin' you down there?",
+        "Nobody here thinks of you as a person, sugar. Doesn't that feel restful?",
+        "Every time you hear boots on the boards, your heart jumps. I know it does.",
+        "Somebody's goin' to want you on your knees soon. Practise."
+      ],
+      species: [
+        "A %sp like you belongs on a farm like this. Every day you prove it.",
+        "Good little %sp. Go on and act like one.",
+        "Nobody keeps a %sp around for its conversation, sugar.",
+        "The farm's got a stall with a %sp-sized dip in the straw. Yours.",
+        "Every %sp here gets used for what it's good for. You're good for plenty.",
+        "Be a proper %sp now. Noises, not words.",
+        "You make a darlin' %sp. Dumb and pretty and eager.",
+        "Somebody asked which %sp was the best behaved today. It wasn't you. Yet."
+      ]
+    };
+    const TEASE_KIND_MORE = {
+      cow: [
+        "Swing that bell, cow. Let the barn hear you comin'.",
+        "Good cows stand still and let down. Can you do that for me?",
+        "You're the farm's best milker and you know it. Act like it.",
+        "Low and slow, cow. Moo like you mean it.",
+        "Head down, rump up, waitin' for the cups. That's a good cow.",
+        "Cows don't need clothes, sugar. They need milkin'.",
+        "Go stand in the dairy line with the other cows. Wait your turn."
+      ],
+      pony: [
+        "Toss your mane for me, pony. Show off.",
+        "A good pony takes the bit without fussin'.",
+        "Somebody's polishin' the harness for you right now.",
+        "High steps, pony. Higher. Make that tail swing.",
+        "Ponies get ridden, sugar. That's just how it goes.",
+        "Stand square and let them check your teeth like a proper pony.",
+        "Whinny for me. Let the paddock know you're ready."
+      ],
+      pup: [
+        "Who's a good pup? Wag if it's you.",
+        "Down, pup. Belly to the floor. Good.",
+        "Pups don't use hands. Paws only, sugar.",
+        "Beg, pup. Up on your knees, paws up. Cute.",
+        "Somebody's got a leash with your name on it.",
+        "Bark for me. Just once. Good pup.",
+        "Pups sleep at their owner's feet. Go find yours."
+      ],
+      kitty: [
+        "Arch that back for me, kitty. Higher.",
+        "Kitties get their chins scratched when they're sweet.",
+        "Knead those paws, kitty. Make yourself a nice nest.",
+        "Mew for me, soft and needy.",
+        "Curious little kitty, pokin' your nose where it'll get you caught.",
+        "Present that rump, kitty. You know you want to.",
+        "Rub up against somebody's leg, kitty. Ask for attention."
+      ],
+      bunny: [
+        "Bunnies are made for one thing, sugar, and it isn't hoppin'.",
+        "Wiggle that little tail, bunny.",
+        "Nose twitchin', ears up, ready to be bred. Good bunny.",
+        "Thump your foot if you want it, bunny.",
+        "The warren's always got room for one more full belly.",
+        "Squeak for me, bunny. Nice and high.",
+        "Bunnies don't say no. They just hold still."
+      ],
+      goat: [
+        "Headstrong little goat. Somebody's goin' to have to tame you.",
+        "Goats climb on everything. Climb on somebody's lap.",
+        "A good goat gets milked twice a day and likes it.",
+        "Bleat for me, sugar, loud enough for the barn.",
+        "Nibble at somethin', goat. Somebody's fingers, maybe.",
+        "Down on all fours, goat, where you belong."
+      ],
+      pig: [
+        "Snuffle around, piggy. Find somethin' filthy.",
+        "Greedy piggy, always lookin' for the trough.",
+        "Squeal for me, piggy. Louder.",
+        "Pigs love the mud. Go roll in it.",
+        "A fat, happy piggy is a well-used piggy.",
+        "Oink if you want somebody to fill you up, piggy."
+      ],
+      deer: [
+        "Frozen like a deer in the lantern light. Cute.",
+        "Little deer, so jumpy. Somebody's goin' to catch you.",
+        "Soft ears, big eyes, shakin' knees. A perfect little deer.",
+        "The stag's been watchin' you all afternoon.",
+        "Deer bolt when they're scared. You're not boltin', are you?",
+        "Lie down in the long grass, little deer, and wait to be found."
+      ],
+      fox: [
+        "Clever fox, always lookin' for a way out. There isn't one.",
+        "Foxes get caught in snares, sugar. It's only a matter of time.",
+        "That bushy tail gives you away every time.",
+        "Yip for me, fox. Just a little one.",
+        "Sly foxes end up on leashes too.",
+        "Sneakin' around the henhouse again? Somebody'll catch you at it."
+      ],
+      goblin: [
+        "Grubby goblin, mud to the knees. Perfect.",
+        "Goblins do the jobs nobody else wants. On your knees.",
+        "Cackle for me, goblin. Show those teeth.",
+        "Rags don't cover much, goblin. Good.",
+        "Little goblin, stealin' scraps. Somebody'll put you to work.",
+        "Goblins breed in the muck, sugar. Get down in it."
+      ]
+    };
+    for (const k in TEASE_MORE) TEASE_LINES[k] = (TEASE_LINES[k] || []).concat(TEASE_MORE[k]);
+    for (const k in TEASE_KIND_MORE) TEASE_KIND[k] = (TEASE_KIND[k] || []).concat(TEASE_KIND_MORE[k]);
+    function wantsFor(mn) {
+      const r = rec(mn) || {}, out = [], w = r.trapWait, beg = "beg " + (L2.life && L2.life.begPhrase || CFG.BEG_PHRASE);
+      if (w && w.kind === "mirror" && w.line) out.push({ icon: "\u{1FA9E}", label: "The mirror box wants it said out loud, " + Math.max(1, 5 - (w.n || 0)) + " more time" + (5 - (w.n || 0) === 1 ? "" : "s"), say: w.line });
+      if (w && w.kind === "tickle") out.push({ icon: "\u{1FAB6}", label: "The tickle rack stops if you beg", cmd: beg });
+      try {
+        if (potionOn(mn, "needy")) out.push({ icon: "\u{1F497}", label: "The Needy Nectar lets up if you beg", cmd: beg });
+      } catch (e) {
+      }
+      try {
+        const g = r.parasite;
+        if (g && g.urge && g.urge.kind === "beg" && g.urge.until > Date.now()) out.push({ icon: "\u{1FAE6}", label: "Your parasite wants to hear you beg", say: "Please, I need it, please feed me" });
+      } catch (e) {
+      }
+      return out;
+    }
+    function heardWords(mn, text) {
+      let took = false;
+      try {
+        if (trapHeard(mn, text)) took = true;
+      } catch (e) {
+        warn("mirror box:", e);
+      }
+      try {
+        if (parasiteHeard(mn, text)) took = true;
+      } catch (e) {
+        warn("parasite beg:", e);
+      }
+      return took;
+    }
+    function plainWordsOf(data) {
+      const d = Array.isArray(data && data.Dictionary) ? data.Dictionary.find((x) => x && typeof x.Original === "string") : null;
+      return d ? d.Original : "";
+    }
+    function companionSaid(mn, m) {
+      const text = String(m.text || "").replace(/[\u0000-\u001f\u007f]/g, " ").replace(/\s+/g, " ").trim().slice(0, 300);
+      if (!text) return;
+      state.lastSpoke.set(mn, Date.now());
+      log("HEARD [say] " + mn + ": " + text.slice(0, 70));
+      if (m.to === "staff") {
+        const who = plainName(mn), line = "\u{1F5E3}\uFE0F " + who + " (" + mn + `) can't say it out loud, so they typed it: "` + text + '"';
+        notifyStaff(line, true, true);
+        for (const h of herdsOf(mn)) if (h.leader && h.leader !== mn && !isStaff(h.leader)) tell(h.leader, line);
+        whisper(mn, "\u{1F5E3}\uFE0F Sent to the staff on duty" + (herdsOf(mn).length ? " and your herd leader" : "") + ", sugar, just as you typed it.");
+        return;
+      }
+      if (/^[?!\/]/.test(text)) {
+        const c = text.replace(/^[?!\/]+/, "");
+        if (c && !handleYesNo(mn, c)) handleCommand(mn, c, "companion");
+        later(() => syncCompanions(), 1500);
+        return;
+      }
+      if (handleYesNo(mn, text)) return;
+      const took = heardWords(mn, text);
+      try {
+        potionHeard(mn, text, "Chat");
+      } catch (e) {
+      }
+      addonsEmit("roleplay", mn, text, "Chat");
+      if (!took) whisper(mn, '\u{1F5E3}\uFE0F The farm heard you, sugar: "' + text + '"');
+      later(() => syncCompanions(), 1500);
+    }
+    const ECHS_TAG = "HypnoMsg";
+    const ECHS_PATTER = [
+      "Shh now. Just listen to the farm, sugar, nothin' else needs you right now.",
+      "Breathe in the hay and the warm barn air, and let it out slow, slower than that.",
+      "Every breath out, your shoulders drop a little lower, and your thoughts get a little quieter.",
+      "The barn's warm and the straw is soft, and you don't have to hold yourself up any more.",
+      "Your eyes are gettin' heavy. It's alright to let them close. The farm's watchin' over you.",
+      "Sinkin' down now, slow and easy, like settlin' into a deep warm stall.",
+      "Good. You're doin' so well. Just let go a little more for me.",
+      "There's nothin' to decide and nothin' to do. Only my voice, and the sinkin' feelin'."
+    ];
+    const ECHS_RELEASE = {
+      cum: ["You may cum now, sugar. Go on."],
+      touch: ["You can touch yourself again.", "You can feel again."],
+      move: ["You can move again. Your body is your own."],
+      follow: ["You are free to go, sugar."],
+      speak: ["You can speak again. Your voice is back."],
+      hear: ["You can hear everyone again."],
+      see: ["You can see again. Your vision clears."],
+      clothes: ["You can change your clothes."],
+      notice: ["You notice everything again."]
+    };
+    const echsOf = (mn) => {
+      state.echs = state.echs || /* @__PURE__ */ new Map();
+      return state.echs.get(mn) || null;
+    };
+    const echsUnder = (mn) => {
+      const v = echsOf(mn);
+      return !!(v && v.phase === "Hypnotized");
+    };
+    function echsSend(mn, message) {
+      send("ChatRoomChat", { Content: ECHS_TAG, Type: "Hidden", Target: mn, Dictionary: [{ message }] });
+    }
+    function echsBeside(mn) {
+      if (!mapRoom()) return;
+      const me = charFor(CFG.BOT_MEMBER), a = me && me.MapData && me.MapData.Pos, b = posOf(mn);
+      state.walkedAt = Date.now();
+      if (!a || !b || b.X < 0 || Math.max(Math.abs(a.X - b.X), Math.abs(a.Y - b.Y)) <= 1) return;
+      const to = spotBeside(mn);
+      if (!to) return;
+      me.MapData.Pos = { X: to.X, Y: to.Y };
+      send("ChatRoomCharacterMapDataUpdate", me.MapData);
+    }
+    function echsSay(mn, text) {
+      if (!charFor(mn)) return false;
+      echsBeside(mn);
+      const t = String(text).replace(/[()]/g, "").replace(/\s+/g, " ").trim().slice(0, 900);
+      if (t) enqueue({ Content: t, Type: "Whisper", Target: mn });
+      return true;
+    }
+    function echsCan(mn) {
+      const r = rec(mn);
+      if (!r || !(r.roles || []).length) return "they're not on the books";
+      if (!r.hypno) return "they haven't said ?hypno on";
+      if (/\b(hypno|trance|mind)/i.test(r.limits || "")) return "hypnosis is in their limits";
+      if (!charFor(mn)) return "they're not here";
+      if (quietNow(mn)) return "they're on ?quiet";
+      const v = echsOf(mn);
+      if (v && v.phase && v.phase !== "Idle" && v.phase !== "AttemptFailed" && Date.now() - (v.at || 0) < 31 * 6e4) return v.phase === "Hypnotized" ? "they're already under with me" : "I'm already reachin' for them";
+      return "";
+    }
+    function echsAsk(mn, by, why) {
+      const no = echsCan(mn);
+      if (no) return no;
+      state.echs = state.echs || /* @__PURE__ */ new Map();
+      const prev = echsOf(mn), retry = prev && prev.phase === "AttemptFailed" && Date.now() - (prev.at || 0) < 30 * 6e4;
+      const v = { phase: "Asked", at: Date.now(), by: by || CFG.BOT_MEMBER, why: why || "", band: null, heard: false, patter: 0 };
+      state.echs.set(mn, v);
+      const r = rec(mn);
+      r.echs = Object.assign(r.echs || {}, { askedAt: v.at });
+      saveLedger();
+      echsBeside(mn);
+      if (retry) echsSend(mn, { type: "session-continue" });
+      else echsSend(mn, { type: "session-attempt", hypnotistName: plainName(CFG.BOT_MEMBER) || "The farm girl", skill: CFG.ECHS_SKILL });
+      log("ECHS: asked " + mn + " (" + (why || "?") + ")");
+      later(() => {
+        const v2 = echsOf(mn);
+        if (v2 !== v || v.heard) return;
+        state.echs.delete(mn);
+        if (v.by && v.by !== CFG.BOT_MEMBER) tell(v.by, "\u{1F300} No ECHS answered from " + plainName(mn) + ", sugar. They may not have it, or it's switched off.");
+      }, CFG.ECHS_ANSWER_S * 1e3);
+      return "";
+    }
+    function echsWake(mn, quiet) {
+      const v = echsOf(mn);
+      if (!v) return false;
+      if (!quiet && v.phase === "Hypnotized") echsSay(mn, "Wake up now, sugar. Come back up, slow and easy. Wake up.");
+      v.wakeSent = Date.now();
+      echsSend(mn, { type: "session-wake" });
+      return true;
+    }
+    function onHypnoMsg(sender, data) {
+      const m = data && Array.isArray(data.Dictionary) && data.Dictionary[0] && data.Dictionary[0].message;
+      if (!m || m.type !== "session-update") return;
+      state.echs = state.echs || /* @__PURE__ */ new Map();
+      const v = echsOf(sender) || { at: Date.now(), by: CFG.BOT_MEMBER, why: "" }, was = v.phase;
+      v.heard = true;
+      v.at = Date.now();
+      v.phase = String(m.phase || "Idle");
+      v.band = m.depthBand || null;
+      state.echs.set(sender, v);
+      const r = rec(sender);
+      if (r) {
+        r.echs = Object.assign(r.echs || {}, { seen: Date.now() });
+      }
+      const toBy = (t) => {
+        if (v.by && v.by !== CFG.BOT_MEMBER && v.by !== sender) tell(v.by, t);
+      };
+      if (m.refusedReason) {
+        log("ECHS: " + sender + " refused: " + m.refusedReason);
+        if (!/Already under/i.test(m.refusedReason)) {
+          state.echs.delete(sender);
+          toBy("\u{1F300} " + plainName(sender) + "'s ECHS said no: " + m.refusedReason);
+        }
+        saveLedger();
+        return;
+      }
+      if (v.phase === was && v.phase !== "Hypnotized") return;
+      if (v.phase === "InductionInProgress" && was !== "InductionInProgress") echsPatter(sender, v);
+      else if (v.phase === "Hypnotized" && was !== "Hypnotized") {
+        if (r) r.echs = Object.assign(r.echs || {}, { underAt: Date.now(), n: (r.echs && r.echs.n || 0) + 1 });
+        toBy("\u{1F300} " + plainName(sender) + " went under for me: " + (v.band || "under") + ".");
+        addonsEmit("echsUnder", sender, { by: v.by === CFG.BOT_MEMBER ? sender : v.by, why: v.why, band: v.band });
+        later(() => {
+          if (echsUnder(sender) && !v.taken) echsSay(sender, "That's it. So deep and so quiet. Stay right here with me a while.");
+        }, 4e3);
+      } else if (v.phase === "AttemptFailed") {
+        toBy("\u{1F300} " + plainName(sender) + " didn't go under this time.");
+      } else if (v.phase === "Idle" && was && was !== "Idle") {
+        state.echs.delete(sender);
+        const self = !v.wakeSent && m.ended !== "timeout";
+        addonsEmit("echsWoke", sender, { ended: m.ended || "", self });
+        if (was === "Hypnotized") toBy("\u{1F300} " + plainName(sender) + " is awake again" + (m.ended === "timeout" ? " (the trance ran its half hour)" : "") + ".");
+      }
+      saveLedger();
+    }
+    function echsPatter(mn, v) {
+      const lines = ECHS_PATTER.slice().sort(() => Math.random() - 0.5).slice(0, 5);
+      lines.forEach((l, i) => later(() => {
+        const v2 = echsOf(mn);
+        if (v2 === v && v.phase === "InductionInProgress") {
+          v.patter++;
+          echsSay(mn, l);
+        }
+      }, 2500 + i * 11e3));
+    }
+    function echsTick() {
+      if (!CFG.ECHS_ON || !CFG.ECHS_OFFER_EVERY_MIN) return;
+      const now = Date.now();
+      if (now - (state.echsTickAt || 0) < 6e4) return;
+      state.echsTickAt = now;
+      for (const C2 of W.ChatRoomCharacter || []) {
+        const mn = C2.MemberNumber, r = rec(mn);
+        if (!r || !r.hypno || mn === CFG.BOT_MEMBER || echsOf(mn)) continue;
+        if (now - Math.max(r.echs && r.echs.askedAt || 0, r.echs && r.echs.underAt || 0) < CFG.ECHS_OFFER_EVERY_MIN * 6e4) continue;
+        if (now - (state.lastSpoke.get(mn) || 0) > 20 * 6e4) continue;
+        if (heldByTrap(mn) || state.sceneRun && state.sceneRun.has(mn)) continue;
+        echsAsk(mn, CFG.BOT_MEMBER, "offer");
+        return;
+      }
+    }
+    function hypnotizeCommand(sender, args, R) {
+      const a0 = String(args[0] || "me").toLowerCase();
+      if (a0 === "stop" || a0 === "wake") {
+        const t2 = args[1] ? resolveTarget(args[1]) : sender;
+        if (!t2) {
+          R("Whose trance, sugar? ?hypnotize stop <who>");
+          return;
+        }
+        if (t2 !== sender && !isProprietor(sender) && !herdsOf(t2).some((h) => h.leader === sender) && !isStaff(sender)) {
+          R("That's not yours to end, hon. Their own /echs safeword always works.");
+          return;
+        }
+        R(echsWake(t2) ? "\u{1F300} Wakin' " + (t2 === sender ? "you" : plainName(t2)) + " up." : t2 === sender ? "You're not under with me, sugar." : plainName(t2) + " isn't under with me.");
+        return;
+      }
+      const t = /^(me|myself|self)$/.test(a0) ? sender : resolveTarget(args[0]);
+      if (!t || !rec(t)) {
+        R("?hypnotize me asks your ECHS for a trance with the farm. Herd leaders: ?hypnotize <who>.");
+        return;
+      }
+      if (t !== sender && !isProprietor(sender) && !herdsOf(t).some((h) => h.leader === sender)) {
+        R("Only " + plainName(t) + "'s herd leader, or a proprietor, can send me to them, sugar.");
+        return;
+      }
+      const no = echsAsk(t, sender, t === sender ? "asked" : "herd");
+      if (no) {
+        R("\u{1F300} Not right now: " + no + ".");
+        return;
+      }
+      R(t === sender ? "\u{1F300} I'm reachin' for you, sugar. Your ECHS will ask you: agree, ignore or fight. Nothin' happens if you haven't got ECHS." : "\u{1F300} I'm reachin' for " + plainName(t) + ". Their ECHS asks them, and they decide. I'll tell you how it goes.");
+    }
+    function releaseCommand(sender, args, R) {
+      const t = resolveTarget(args[0]);
+      const all = Object.keys(ECHS_RELEASE);
+      if (!t || !rec(t)) {
+        R("?allow <who> " + all.join("|") + "|all \xB7 lets go of what the farm put on them: their denial here, and in their ECHS what I told it.");
+        return;
+      }
+      if (t === sender && !isStaff(sender)) {
+        R("Your safe word or /echs safeword lets go of everything, sugar. ?allow is for your herd leader and staff.");
+        return;
+      }
+      if (!isStaff(sender) && !herdsOf(t).some((h) => h.leader === sender)) {
+        R("Only " + plainName(t) + "'s herd leader or staff can release them, hon.");
+        return;
+      }
+      let want = args.slice(1).map((x) => String(x).toLowerCase().replace(/[^a-z]/g, "")).map((x) => ({ orgasm: "cum", come: "cum", climax: "cum", self: "touch", feel: "touch", walk: "move", leash: "follow", talk: "speak", voice: "speak", hearing: "hear", sight: "see", blind: "see", clothing: "clothes", dress: "clothes", aware: "notice", awareness: "notice", illusion: "notice", everything: "all" })[x] || x).filter(Boolean);
+      if (!want.length) {
+        R("Let " + plainName(t) + " do what again? ?allow " + plainName(t) + " " + all.join(" | ") + " | all");
+        return;
+      }
+      if (want.includes("all")) want = all.slice();
+      const bad = want.filter((x) => !ECHS_RELEASE[x]);
+      if (bad.length) {
+        R(`I don't know how to release "` + bad.join(", ") + '", sugar. ' + all.join(", ") + ", or all.");
+        return;
+      }
+      const did = [], p = prodOf(t);
+      if (want.includes("cum") && p && p.deniedUntil > Date.now()) {
+        p.deniedUntil = 0;
+        did.push("their denial here");
+        tell(t, "\u{1F62E}\u200D\u{1F4A8} " + plainName(sender) + " lifted your denial, sugar. You may.");
+      }
+      if (want.includes("notice") || want.length === all.length) {
+        try {
+          trance(t, 0);
+        } catch (e2) {
+        }
+      }
+      const e = (rec(t) || {}).echs || {}, mine = echsOf(t) || e.underAt && Date.now() - e.underAt < 2 * 864e5;
+      if (mine && charFor(t)) {
+        const lines = [].concat(...want.map((x) => ECHS_RELEASE[x]));
+        lines.forEach((l, i) => later(() => echsSay(t, l), i * 2500));
+        did.push("in their ECHS: " + want.join(", "));
+      }
+      saveLedger();
+      audit(sender, "RELEASE", t + " " + want.join(","));
+      R(did.length ? "\u{1F54A}\uFE0F Released " + plainName(t) + ": " + did.join("; ") + "." : "\u{1F54A}\uFE0F Nothin' of the farm's had hold of " + plainName(t) + " for that" + (charFor(t) ? "" : ", and they're not here for me to tell their ECHS") + ". Their own /echs safeword clears everything in ECHS.");
+    }
+    function echsStatus(sender, args, R) {
+      const t = args[0] ? resolveTarget(args[0]) : sender;
+      if (!t || !rec(t)) {
+        R("Whose, sugar? ?echs <who>");
+        return;
+      }
+      if (t !== sender && !isStaff(sender) && !herdsOf(t).some((h) => h.leader === sender)) {
+        R("Only staff or their herd leader look at somebody else's, hon.");
+        return;
+      }
+      const v = echsOf(t), e = rec(t).echs || {}, ago = (x) => x ? Math.max(1, Math.round((Date.now() - x) / 6e4)) + " min ago" : "never";
+      R("\u{1F300} ECHS and the farm, " + plainName(t) + ": " + (v ? { Asked: "I've just reached for them", AttemptMade: "their box is up", InductionInProgress: "goin' under", AttemptFailed: "it didn't take this time", Hypnotized: "under with me, " + (v.band || "under") }[v.phase] || v.phase : "nothin' runnin' with me") + " \xB7 ?hypno " + (rec(t).hypno ? "on" : "off") + " \xB7 ECHS last answered: " + ago(e.seen) + " \xB7 last under with me: " + ago(e.underAt) + (e.n ? " (" + e.n + " times)" : "") + ".");
+    }
     const PARASITE_SERUMS = ["growth", "fertility", "growth", "hyper pregnancy", "growth", "capacity"];
     const PARASITE_GROWS = ["udder", "penis", "testes", "butt"];
     function parasiteChance(mn) {
@@ -21004,6 +21640,10 @@
         saveLedger();
         privateLine(mn, pmLine(PARASITE_MORE[strainKey(g) + "_urge_" + kind] ? strainKey(g) + "_urge_" + kind : "urge_" + kind, mn), "emote");
         tell(mn, "\u{1F444} It wants somethin', sugar: " + urgeAsk(mn, kind) + ", inside " + mins + " minutes. Do it and it'll be sweet to you. Don't, and it'll hold you at the edge for an hour.");
+        if (kind === "beg") try {
+          syncCompanions();
+        } catch (e) {
+        }
       }
     }
     const STRAIN_URGES = { breeder: ["bred", "kiss", "nest"], grower: ["swallow", "milked", "glory"], glutton: ["milked", "swallow", "glory"], tyrant: ["kneel", "beg", "kiss"] };
@@ -21034,7 +21674,8 @@
     const BEG_WORDS = /\b(please|plea+se|beg|begging|beggin'?|pretty please|i need (it|you|this|to)|let me cum|need to cum|have mercy|mercy)\b/i;
     function parasiteHeard(mn, text) {
       const g = rec(mn) && rec(mn).parasite;
-      if (g && g.urge && g.urge.kind === "beg" && BEG_WORDS.test(String(text))) parasiteUrgeDone(mn, "beg");
+      if (g && g.urge && g.urge.kind === "beg" && BEG_WORDS.test(String(text))) return parasiteUrgeDone(mn, "beg");
+      return false;
     }
     function parasiteUrgeDone(mn, kind) {
       const r = rec(mn), g = r && r.parasite;
@@ -31348,6 +31989,11 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
       "notice",
       "teaseme",
       "tease",
+      "hypnotize",
+      "hypnotise",
+      "allow",
+      "letgo",
+      "echs",
       "stats",
       "board",
       "pedigree",
@@ -32480,6 +33126,18 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
           teaseMeCommand(sender, args, R);
           break;
         // (Tease Me, rebuilt Oct 23: 10uh-teaseme.js)
+        case "hypnotize":
+        case "hypnotise":
+          hypnotizeCommand(sender, args, R);
+          break;
+        // ECHS (10uj-echs.js)
+        case "allow":
+        case "letgo":
+          releaseCommand(sender, args, R);
+          break;
+        case "echs":
+          echsStatus(sender, args, R);
+          break;
         case "tease":
           teaseLinesCommand(sender, args, R);
           break;
@@ -32503,7 +33161,18 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
           r.hypno = v ? v === "on" : !r.hypno;
           saveLedger();
           audit(sender, "HYPNO", r.hypno ? "on" : "off");
-          R(r.hypno ? "\u{1F300} Hypno: ON. Your herd leader or a proprietor can take you into a Conditioning session now, never deeper than your ?depth. ?wake or your safeword ends one; ?hypno off stops them." : "\u{1F300} Hypno: off. No trance sessions for you.");
+          R(r.hypno ? "\u{1F300} Hypno: ON. Your herd leader or a proprietor can take you into a Conditioning session now, never deeper than your ?depth. ?wake or your safeword ends one; ?hypno off stops them." + (CFG.ECHS_ON ? " Got ECHS? I'll reach for you through it now and then, and ?hypnotize me asks any time." : "") : "\u{1F300} Hypno: off. No trance sessions for you.");
+          if (r.hypno && CFG.ECHS_ON) later(() => {
+            try {
+              echsAsk(sender, sender, "hypno on");
+            } catch (e) {
+              warn("echs:", e);
+            }
+          }, 4e3);
+          if (!r.hypno) try {
+            echsWake(sender, true);
+          } catch (e) {
+          }
           break;
         }
         case "voice-old": {
@@ -33378,6 +34047,11 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
           notifyStaff("\u{1F534} SAFEWORD from " + plainName(sender) + " (" + sender + "). Please go to them now.", false);
           audit(sender, "SAFEWORD", channel);
           addonsEmit("safe", sender);
+          try {
+            echsWake(sender, true);
+          } catch (e) {
+            warn("safeword echs:", e);
+          }
           stopScene(sender);
           dropLeashes(sender);
           state.tours.delete(sender);
@@ -35619,7 +36293,15 @@ Welcome to B&B Farm, hon. \u{1F33E}`
           if (!data || state.dormant) return;
           if (data.Sender === CFG.BOT_MEMBER) {
             const own = data.Type === "Hidden" && typeof W.__farmhandOwnPanel !== "function" && readMsg(data);
-            if (own && ["hello", "bye", "cmd", "outfitSave", "outfitAnswer", "relayNo", "sight", "leadOk", "leadNo", "bodyFarmAsk"].includes(own.type)) onCompanion(own);
+            if (own && ["hello", "bye", "cmd", "outfitSave", "outfitAnswer", "relayNo", "sight", "leadOk", "leadNo", "bodyFarmAsk", "say"].includes(own.type)) onCompanion(own);
+            return;
+          }
+          if (data.Type === "Hidden" && data.Content === "HypnoMsg") {
+            try {
+              onHypnoMsg(data.Sender, data);
+            } catch (e) {
+              warn("echs:", e);
+            }
             return;
           }
           if (data.Type === "Hidden") {
@@ -35688,8 +36370,14 @@ Welcome to B&B Farm, hon. \u{1F33E}`
             }
             addonsEmit("roleplay", data.Sender, String(data.Content || ""), data.Type);
           }
+          let tookWords = false;
+          if (data.Type === "Chat" || data.Type === "Whisper") {
+            const plain = plainWordsOf(data), said = plain || (data.Type === "Whisper" ? String(data.Content || "") : "");
+            if (said && !/^\s*[?!.\-\/]/.test(said)) tookWords = heardWords(data.Sender, said);
+          }
           if (data.Type !== "Chat" && data.Type !== "Whisper") return;
           if (typeof data.Content !== "string") return;
+          if (tookWords && data.Type === "Whisper") return;
           state.heard++;
           state.lastHealthy = Date.now();
           if (CFG.LOG_HEARD) log("HEARD [" + data.Type + "] " + data.Sender + ": " + data.Content.slice(0, 70));
@@ -35854,6 +36542,11 @@ Welcome to B&B Farm, hon. \u{1F33E}`
           teaseMeTick();
         } catch (e) {
           warn("tease:", e);
+        }
+        try {
+          echsTick();
+        } catch (e) {
+          warn("echs:", e);
         }
         rutTick();
         quotaTick();

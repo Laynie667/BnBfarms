@@ -324,6 +324,7 @@
         trapHold(mn, 3, "the lantern");
         trapRun(mn, kind, T.beats, () => {
           trance(mn, 0); arouse(mn, 30); goUnder(mn, 2);
+          if (rec(mn) && rec(mn).hypno) later(() => { try { echsAsk(mn, CFG.BOT_MEMBER, "lantern"); } catch(e){} }, 8000);   // and the lantern reaches for their ECHS (10uj-echs.js)
           tell(mn, "🏮 "+tFill(pickFor(mn, "trap:lantern:thought", T.thought), mn));
         });
         break;

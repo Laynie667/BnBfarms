@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.35.0
+// @version      0.36.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -230,7 +230,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.35.0";
+  var VERSION = "0.36.0";
 
   // extension/src/config.js
   var BOT_MEMBER = 260239;
@@ -429,14 +429,14 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     { name: "Breedin'", cmds: ["breedable", "fertile", "mpreg", "freeuse", "jarok", "yes", "no", "naturalheat", "breed <who>", "cum <who>", "wash", "tally", "eggs", "praise", "degrade", "rights", "accept", "pedigree"] },
     { name: "Body", cmds: ["size", "measure", "penis", "futa", "gender <word>"] },
     { name: "Clothes", cmds: ["outfit", "outfits", "uniform", "outfit back"] },
-    { name: "Mind", cmds: ["hypno", "teaseme", "teaseme light", "teaseme steady", "teaseme needy", "teaseme off"] },
+    { name: "Mind", cmds: ["hypno", "hypnotize me", "echs", "teaseme", "teaseme light", "teaseme steady", "teaseme needy", "teaseme off"] },
     { name: "Fun", cmds: ["fair", "enter"] },
     { name: "Ribbons and the store", cmds: ["ribbons", "ribbons top", "store", "buy <item>", "gift <who> <potion>", "potions", "potions on", "dares on", "dare", "dared", "dare skip", "bench", "bench on", "bench me <minutes>", "use <mouth|pussy|ass>", "bench top"] }
   ];
   var STAFF_GROUPS = [
     { name: "Books", cmds: ["queue", "app <n>", "approve <who> livestock", "deny <who>", "appclear", "roster", "stock", "find <who>", "record <who>", "note <who>", "signed", "addfriend <who>", "unregister <who>", "unregister <who> <role>"] },
     { name: "Herd", cmds: ["claim <who>", "release <who>", "myherd", "herdname <name>", "herdcall", "herdsummon", "turnout <who>", "letup <who>", "brand <who>", "walk <who>"] },
-    { name: "Stock", cmds: ["tier <who> <tier>", "stocks <who>", "unstock <who>", "vet <who>", "inspect <who>", "tease list", "tease add <line>", "tease for <who> <line>", "teaseme <who> on"] },
+    { name: "Stock", cmds: ["tier <who> <tier>", "stocks <who>", "unstock <who>", "vet <who>", "inspect <who>", "tease list", "tease add <line>", "tease for <who> <line>", "teaseme <who> on", "hypnotize <who>", "allow <who> cum", "allow <who> all", "echs <who>"] },
     { name: "Contracts", cmds: ["contract list", "contract show deep <who>", "contract offer deep <who> 1w", "contract check <who>", "contract release <who>", "contract rules", "contracts"] },
     { name: "Outfits", cmds: ["outfit", "outfit offer <who>", "outfit offer <who> <species> <gender>"] },
     { name: "Barn", cmds: ["milk <who>", "collect <who>", "jars", "inseminate <who> <jar>", "machine <who> <jar>", "drain <who>", "edge <who>", "denial <who>", "ruin <who>", "nomilk <who> <hours>", "quota <who>", "heat <who>", "heatline", "shotlog"] },
@@ -467,8 +467,30 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
         big("I'm stuck", "stuck", false, "Can't move, can't reach a door, stuck in somethin'? Staff are told where you are, and you're brought somewhere safe."),
         big("Call staff", "staff", false, "Just want a hand, or somebody to talk to? This calls whoever's on duty.")
       ),
-      muted("From chat, without the panel: ?safe \xB7 ?stuck \xB7 ?staff")
+      muted("From chat, without the panel: ?safe \xB7 ?stuck \xB7 ?staff"),
+      sayCard(ctx3)
     ];
+  }
+  function sayCard(ctx3) {
+    if (!ctx3.api || !ctx3.api.say) return null;
+    const box2 = h("textarea", {
+      class: "fhc-in",
+      rows: 2,
+      maxlength: 300,
+      placeholder: "What you need to say\u2026",
+      value: ctx3.ui.sayText || "",
+      oninput: (e) => ctx3.setUi({ sayText: e.target.value }, true)
+    });
+    const go = (to) => {
+      if (ctx3.api.say(box2.value, to)) ctx3.setUi({ sayText: "" });
+    };
+    return card(
+      title("\u{1F5E3}\uFE0F Say it"),
+      muted("Gagged, made to moo, or held silent? Type it here and it gets through exactly as you typed it. A trap that wants a line said hears it, and so do yes, no and commands. Nobody else sees it."),
+      box2,
+      h("div", { style: { marginTop: "6px" } }, btn("Say it to the farm", () => go("farm"), true), btn("Tell staff", () => go("staff"))),
+      muted("Tell staff sends it to whoever's on duty, and your herd leader.")
+    );
   }
   function guidesTab(ctx3, staff) {
     const q2 = (ctx3.ui.search || "").toLowerCase();
@@ -8906,6 +8928,20 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
           this.ask(c, true);
         }, true)))
       ));
+      for (const w of this.s.wants || []) out.push(h(
+        "div",
+        { class: "fhc-box ask" },
+        h("b", null, (w.icon || "\u{1F5E3}\uFE0F") + " " + w.label),
+        w.say ? h("div", { class: "fhc-muted" }, "\u201C" + w.say + "\u201D") : null,
+        h(
+          "div",
+          { style: { marginTop: "8px" } },
+          w.say ? btn("Say it", () => {
+            this.api.say && this.api.say(w.say);
+          }, true) : btn(w.cmd.split(" ")[0] === "beg" ? "Beg" : "Do it", () => this.ask(w.cmd, true), true)
+        ),
+        h("div", { class: "fhc-muted" }, "Straight to the farm, past any gag or speech rule.")
+      ));
       for (const a of this.asks) out.push(h(
         "div",
         { class: "fhc-box ask" },
@@ -10553,6 +10589,20 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     },
     decline(o) {
       toBot("outfitAnswer", { answer: "declined", slot: o.slot });
+    },
+    // Say it: their words straight to the farm (or to staff) as a hidden message, so no gag, speech rule or trance
+    // rewrites them on the way (Laynie, Oct 23: "speech impaired pets need a guaranteed way to be able to say what they need to say")
+    say(text, to) {
+      text = String(text || "").trim().slice(0, 300);
+      if (!text) return false;
+      if (!botHere2()) {
+        st.panel.add("\u{1F449} The farm girl isn't in this room, so nobody's there to hear it.", "notice");
+        return false;
+      }
+      if (!st.welcomed) hello();
+      toBot("say", { text, to: to === "staff" ? "staff" : "farm" });
+      st.panel.add("\u{1F5E3}\uFE0F You said" + (to === "staff" ? ", to staff" : "") + ": " + text, "mine");
+      return true;
     },
     back() {
       onFarmMsg({ from: BOT_MEMBER, type: "outfitBack" });

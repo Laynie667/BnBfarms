@@ -339,10 +339,17 @@
       ]
     }
   };
+  var ECHS_LINES = {
+    fun: ["You cannot move now, sugar. Stay right there, still as a post.", "Kneel for me. Knees down in the straw, nice and easy.", "Hands behind your back, neat as a bow."],
+    deep: ["You hear only my voice now. Everything else in the barn is just the wind.", "Kneel spread for me, knees wide, the way a good {a} waits.", "You are very aroused, achin' and warm, and it only builds.", "You cannot cum. Not one drop till the farm says so."],
+    nhl: ["You cannot speak now. A {a} doesn't need words.", "Get on your hands and knees, down where a {a} belongs.", "You will not notice being undressed. Clothes don't matter to a {a}.", "You are right on the edge, and that's where you stay.", "You cannot cum. The farm decides when, and it hasn't."]
+  };
+  var forEchs = (t) => String(t).replace(/\bfeels\b/g, "seems").replace(/\bFeels\b/g, "Seems").replace(/\bfeeling\b/g, "sensation").replace(/\bfeel\b/g, "sense").replace(/\bFeel\b/g, "Sense");
   SCRIPT.settle.push(...SCRIPT_MORE.settle);
   for (const l of ["fun", "deep", "nhl"]) for (const part of ["deeper", "suggest", "wake"]) SCRIPT[part][l].push(...SCRIPT_MORE[part][l]);
   var api = null;
   var running = /* @__PURE__ */ new Map();
+  var waitingEchs = /* @__PURE__ */ new Map();
   function D() {
     const d = api.data();
     d.people = d.people || {};
@@ -373,7 +380,7 @@
     }
     return pool.slice(0, n).map(untag);
   };
-  function scriptFor(level, mn, own) {
+  function scriptFor(level, mn, own, echs) {
     const b = mn ? bodyOf(api, mn) : null, g = mn ? gearOf(api, mn) : {};
     const settle = handful(SCRIPT.settle, 4, b), deeper = handful(SCRIPT.deeper[level], level === "fun" ? 3 : 4, b);
     const worn = Object.keys(GEAR_SUGGEST).filter((k) => g[k]), gearLines = handful(worn.map((k) => pick(GEAR_SUGGEST[k])), Math.min(2, worn.length), b);
@@ -383,13 +390,17 @@
       suggest.splice(Math.min(1, suggest.length), 0, own);
       suggest.push(own);
     }
+    if (echs) {
+      const add = (level === "nhl" ? ECHS_LINES.deep.slice(0, 2) : level === "deep" ? ECHS_LINES.fun.slice(0, 1) : []).concat(ECHS_LINES[level]);
+      for (const l of add) suggest.splice(Math.floor(Math.random() * (suggest.length + 1)), 0, l);
+    }
     const wake = handful(SCRIPT.wake[level], 1, b);
     const lines = [].concat(settle, deeper, suggest, wake);
     lines.cut = [settle.length, deeper.length, suggest.length];
     return lines;
   }
-  function start(by, mn, level, own) {
-    running.set(mn, { by, level, lines: scriptFor(level, mn, own), i: 0 });
+  function start(by, mn, level, own, echs) {
+    running.set(mn, { by, level, lines: scriptFor(level, mn, own, echs), i: 0, echs: !!echs });
     step(mn);
   }
   function step(mn) {
@@ -411,13 +422,15 @@
       api.trance(mn, haze);
       api.face(mn, haze ? "trance" : "clear", haze ? 600 : 1);
     }
-    api.voice(mn, say(mn, line));
+    if (run.echs && api.echs && api.echs.under(mn)) api.echs.say(mn, forEchs(say(mn, line)));
+    else api.voice(mn, say(mn, line));
     if (run.level !== "fun" && run.i >= s && api.arouse) api.arouse(mn, run.level === "nhl" ? 7 : 5, run.level === "nhl" ? 92 : 85);
     run.i++;
     api.later(() => step(mn), between(35, 50) * 1e3);
   }
   function finish(mn, run) {
     running.delete(mn);
+    if (run.echs && run.level !== "nhl" && api.echs) api.later(() => api.echs.wake(mn), 4e3);
     api.later(() => {
       if (!running.has(mn)) {
         api.trance(mn, 0);
@@ -439,8 +452,11 @@
     if (run.by !== mn) api.notice(run.by, "\u{1F300} " + api.name(mn) + "'s " + LEVEL_NAME[run.level] + " session is done (" + x.total + " in all, tier " + x.tier + ").");
   }
   function stop(mn, why) {
+    waitingEchs.delete(mn);
     if (!running.has(mn)) return false;
+    const run = running.get(mn);
     running.delete(mn);
+    if (run.echs && api.echs) api.echs.wake(mn);
     api.trance(mn, 0);
     api.face(mn, "clear", 1);
     if (why) api.voice(mn, why);
@@ -465,6 +481,13 @@
     if (LEVELS.indexOf(want) > LEVELS.indexOf(me(t).max)) return c.reply(A.name(t) + " only allows " + LEVEL_NAME[me(t).max] + " sessions. That's their call.");
     const si = args.findIndex((a) => /^say$/i.test(a));
     const own = !self && si >= 0 ? args.slice(si + 1).join(" ").replace(/[()]/g, "").trim().slice(0, 160) : "";
+    if (args.slice(1, si >= 0 ? si : void 0).some((a) => /^echs$/i.test(a))) {
+      if (!A.echs) return c.reply("The farm's ECHS side isn't running, sugar.");
+      const no = A.echs.ask(t, "conditioning");
+      if (no) return c.reply("\u{1F300} Not through ECHS right now: " + no + ".");
+      waitingEchs.set(t, { by: sender, level: want, own: own || null, at: Date.now() });
+      return c.reply("\u{1F300} Reachin' for " + A.name(t) + " through their ECHS. When they go under, a " + LEVEL_NAME[want] + " session starts through it.");
+    }
     start(sender, t, want, own || null);
     c.reply("\u{1F300} " + LEVEL_NAME[want] + " session started for " + A.name(t) + " (about " + Math.round(((running.get(t) || {}).lines || []).length * 42 / 60) + " minutes). ?hyp stop " + A.name(t) + " ends it.");
   }
@@ -489,7 +512,7 @@
       text: r.hypno ? void 0 : "Sessions need ?hypno on (in your Toggles).",
       lines: [["Tier", x.tier + " \xB7 " + petName(mn)], ["Sessions", x.total], ["Deepest allowed", LEVEL_NAME[x.max]]],
       bars: next ? [{ label: "To the next tier", value: x.total + " / " + next, pct: x.total / next * 100 }] : void 0,
-      buttons: LEVELS.map((l) => ({ label: "Allow " + LEVEL_NAME[l], cmd: "depth " + l, accent: l === x.max })).concat(running.has(mn) ? [{ label: "Wake me up", cmd: "wake", accent: true }] : r.hypno ? [{ label: "Take me under", cmd: "hyp me" }] : [])
+      buttons: LEVELS.map((l) => ({ label: "Allow " + LEVEL_NAME[l], cmd: "depth " + l, accent: l === x.max })).concat(running.has(mn) ? [{ label: "Wake me up", cmd: "wake", accent: true }] : r.hypno ? [{ label: "Take me under", cmd: "hyp me" }, { label: "Ask my ECHS", cmd: "hypnotize me" }] : [])
     });
     if (api.isStaff(mn)) cards.push({
       staff: true,
@@ -502,8 +525,8 @@
   connect({
     name: "conditioning",
     label: "Conditioning",
-    version: "1.1.0",
-    guide: "Guided trance sessions written for your species, in the farm's voice. Needs ?hypno on; ?depth fun|deep|nhl sets the deepest you allow. Your herd leader runs them with ?hyp <who> [level] [say <their own words>], or take yourself under with ?hyp me. Sessions count toward conditioning tiers (3, 7, 15, 30). ?wake or ?safe ends one at once. Works alongside ECHS.",
+    version: "1.2.0",
+    guide: "Guided trance sessions written for your species, in the farm's voice. Needs ?hypno on; ?depth fun|deep|nhl sets the deepest you allow. Your herd leader runs them with ?hyp <who> [level] [say <their own words>], or take yourself under with ?hyp me. With ECHS: ?hypnotize me (or ?hyp <who> [level] echs) and the session runs through it. Sessions count toward conditioning tiers (3, 7, 15, 30). ?wake or ?safe ends one at once. Works alongside ECHS.",
     setup(a) {
       api = a;
       D();
@@ -518,7 +541,33 @@
         c.reply(t ? progressText(t) : "Who's that, hon?");
       } }
     },
-    on: { safe: (mn) => stop(mn, null), leave: (mn) => stop(mn, null) },
+    on: {
+      safe: (mn) => stop(mn, null),
+      leave: (mn) => stop(mn, null),
+      // under with the farm girl through ECHS: the session runs through it (asked for with ?hyp … echs, or not)
+      echsUnder: (mn, info) => {
+        const r = api.rec(mn);
+        if (!r || !r.hypno) return;
+        api.echs.take(mn);
+        if (running.has(mn)) {
+          running.get(mn).echs = true;
+          return;
+        }
+        const w = waitingEchs.get(mn);
+        waitingEchs.delete(mn);
+        const by = w && w.by || info && info.by || mn;
+        start(by, mn, w ? w.level : me(mn).max, w ? w.own : null, true);
+        if (by !== mn) api.notice(by, "\u{1F300} " + api.name(mn) + " is under with the farm: the " + LEVEL_NAME[running.get(mn).level] + " session's started through their ECHS.");
+      },
+      // they came up on their own (their /echs safeword): the farm's session stops too. ECHS's half hour: it carries on in the farm's voice
+      echsWoke: (mn, info) => {
+        waitingEchs.delete(mn);
+        const run = running.get(mn);
+        if (!run) return;
+        if (info && info.self) stop(mn, null);
+        else run.echs = false;
+      }
+    },
     companion
   });
 })();

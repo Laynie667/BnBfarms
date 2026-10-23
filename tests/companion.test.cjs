@@ -348,5 +348,19 @@ const STATE = { name: "Laynie", onBooks: true, roles: ["PROPRIETOR", "LIVESTOCK"
   await wait(1600);
   out("17 a farm update waits while they scroll, then catches up ->", held, D.querySelector("#fhc-panel .fhc-body") !== body0);
   out("17 the cards fold, and the 🆘 button is always in the header ->", !!D.querySelector("#fhc-panel .fhc-fold"), !!D.querySelector("#fhc-panel .fhc-head .fhc-sos"));
+  // 18. Oct 23, Say it: the line a trap wants is a button on every tab, and the box in Safety; both go to the farm hidden
+  await wait(1700);
+  bot({ type: "state", state: Object.assign({}, STATE, { wants: [{ icon: "🪞", label: "The mirror box wants it said out loud, 5 more times", say: "I am a good cow" }] }) });
+  await wait(100);
+  const saidOf = (n) => sent.slice(n).map(([e, d]) => d && d.Dictionary).find((x) => x && x.type === "say");
+  let n18 = sent.length; const tapped = click("Say it"); await wait(50);
+  const s1 = saidOf(n18);
+  out("18 the line a trap wants is a button, sent hidden to the farm ->", /mirror box wants it said/.test(text()), tapped, !!s1 && s1.text === "I am a good cow" && s1.to === "farm");
+  D.querySelector("#fhc-panel .fhc-sos").click(); await wait(50);
+  const sayBox = D.querySelector("#fhc-panel textarea");
+  if (sayBox) { sayBox.value = "please let me out, my legs are numb"; sayBox.dispatchEvent(new w.Event("input", { bubbles: true })); }
+  n18 = sent.length; click("Tell staff"); await wait(50);
+  const s2 = saidOf(n18);
+  out("18 Safety has a Say it box, and Tell staff sends it to staff ->", !!sayBox, /Say it to the farm/.test(text()), !!s2 && s2.to === "staff" && /legs are numb/.test(s2.text));
   process.exit(0);
 })();

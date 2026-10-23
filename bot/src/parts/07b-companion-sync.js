@@ -78,6 +78,7 @@
       part("under", () => { const u = underOf(mn); if (u >= 2) s.under = u; if (r.corrWord) s.corrWord = r.corrWord; });   // simpler words, and the word that slips out (10y4-corruption.js)
       part("keepsakes", () => keepersStateFor(mn, s));
       part("udders", () => uddersStateFor(mn, s));   // the dial, their words, intensity, kept (10y7-udders.js)   // the album, trained holes, the vat, sittin' the nest (10y6-keepers.js)
+      part("wants", () => { const w = wantsFor(mn); if (w.length) s.wants = w; });   // what the farm is waitin' to hear from them: Say it buttons (10ui-say.js)
       part("happening", () => { const hp = happeningFor(mn); if (hp.length) s.happening = hp; if (quietNow(mn)) s.quietUntil = Math.ceil(r.quietUntil / 60000) * 60000; });   // what has them right now (10y2-brood.js)
       const bh = benchHereFor(mn); if (bh.length) s.benchHere = bh;   // tap-to-use bench buttons
       s.at = now;

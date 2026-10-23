@@ -512,6 +512,9 @@
       }
 
       case "teaseme": teaseMeCommand(sender, args, R); break;   // (Tease Me, rebuilt Oct 23: 10uh-teaseme.js)
+      case "hypnotize": case "hypnotise": hypnotizeCommand(sender, args, R); break;   // ECHS (10uj-echs.js)
+      case "allow": case "letgo": releaseCommand(sender, args, R); break;
+      case "echs": echsStatus(sender, args, R); break;
       case "tease": teaseLinesCommand(sender, args, R); break;
       case "voice": if (!RETIRED_ON) { R("That one's been retired, sugar: the farm doesn't send herd voice lines any more."); break; }
       // eslint-disable-next-line no-fallthrough
@@ -521,8 +524,10 @@
         const v = String(args[0]||"").toLowerCase();
         if (v && !["on","off"].includes(v)){ R("?hypno on lets your herd leader or a proprietor run Conditioning's trance sessions on you · ?hypno off stops them. ?depth fun|deep|nhl sets how deep."); break; }
         r.hypno = v ? v === "on" : !r.hypno; saveLedger(); audit(sender, "HYPNO", r.hypno ? "on" : "off");
-        R(r.hypno ? "🌀 Hypno: ON. Your herd leader or a proprietor can take you into a Conditioning session now, never deeper than your ?depth. ?wake or your safeword ends one; ?hypno off stops them."
+        R(r.hypno ? "🌀 Hypno: ON. Your herd leader or a proprietor can take you into a Conditioning session now, never deeper than your ?depth. ?wake or your safeword ends one; ?hypno off stops them." + (CFG.ECHS_ON ? " Got ECHS? I'll reach for you through it now and then, and ?hypnotize me asks any time." : "")
                   : "🌀 Hypno: off. No trance sessions for you.");
+        if (r.hypno && CFG.ECHS_ON) later(() => { try { echsAsk(sender, sender, "hypno on"); } catch(e){ warn("echs:", e); } }, 4000);   // their ECHS asks them (10uj-echs.js)
+        if (!r.hypno) try { echsWake(sender, true); } catch(e){}
         break;
       }
 
@@ -1180,6 +1185,7 @@
         notifyStaff("🔴 SAFEWORD from "+plainName(sender)+" ("+sender+"). Please go to them now.", false);
         audit(sender,"SAFEWORD",channel);
         addonsEmit("safe", sender);
+        try { echsWake(sender, true); } catch(e){ warn("safeword echs:", e); }   // a trance I'm runnin' ends too
         stopScene(sender);            // a milkin', breedin' or edgin' scene stops mid-beat   // add-ons stop anything they're doin' to this person (scenes, sessions…)
         dropLeashes(sender); state.tours.delete(sender);
         { const r0 = rec(sender); if (r0 && r0.prod){ r0.prod.pin = null; r0.prod.unpinUntil = Date.now() + CFG.PROD.SAFEWORD_UNPIN_MIN*60000; saveLedger(); } }

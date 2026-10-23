@@ -10,7 +10,7 @@ export const GUEST_TABS = [
   { id: "welcome", label: "👋 Welcome", render: (ctx) => [
     card(h("div", { class: "fhc-title" }, "Howdy, " + (ctx.welcome.name || "sugar") + "!"),
       h("p", null, "Welcome to B&B Farm. Everybody here chose to be here and signed to say so. Have a look around, mind the ruts, and holler if you need a hand."),
-      btn("Take the tour", () => ctx.send("tour"), true), btn("Apply to join", () => ctx.send("apply")), btn("Luxury stay", () => ctx.send("luxury"))),
+      btn("Take the tour", () => ctx.send("tour"), true), btn("Apply to join", () => ctx.send("apply")), btn("Luxury stay", () => ctx.send("luxury")), btn("Dress me", () => ctx.send("dressme"))),
     card(title("Your keys"), muted("Guests don't carry keys. Staff can let you through any door.")) ] },
   { id: "farm", label: "🌾 The farm", render: () => AREAS.map(([n, key, d]) =>
     card(h("div", { class: "fhc-kv" }, h("b", null, n), h("span", { class: "fhc-muted" }, key)), muted(d))) },

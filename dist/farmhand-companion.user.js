@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.36.0
+// @version      0.37.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -230,7 +230,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.36.0";
+  var VERSION = "0.37.0";
 
   // extension/src/config.js
   var BOT_MEMBER = 260239;
@@ -428,7 +428,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     { name: "Stock with stock", cmds: ["milk <who>", "edge <who>", "groom <who>"] },
     { name: "Breedin'", cmds: ["breedable", "fertile", "mpreg", "freeuse", "jarok", "yes", "no", "naturalheat", "breed <who>", "cum <who>", "wash", "tally", "eggs", "praise", "degrade", "rights", "accept", "pedigree"] },
     { name: "Body", cmds: ["size", "measure", "penis", "futa", "gender <word>"] },
-    { name: "Clothes", cmds: ["outfit", "outfits", "uniform", "outfit back"] },
+    { name: "Clothes", cmds: ["dressme", "outfit", "outfits", "uniform", "outfit back"] },
     { name: "Mind", cmds: ["hypno", "hypnotize me", "echs", "teaseme", "teaseme light", "teaseme steady", "teaseme needy", "teaseme off"] },
     { name: "Fun", cmds: ["fair", "enter"] },
     { name: "Ribbons and the store", cmds: ["ribbons", "ribbons top", "store", "buy <item>", "gift <who> <potion>", "potions", "potions on", "dares on", "dare", "dared", "dare skip", "bench", "bench on", "bench me <minutes>", "use <mouth|pussy|ass>", "bench top"] }
@@ -5543,7 +5543,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
         muted("It calls you: " + (((s.words || {}).call || []).join(", ") || "whatever comes to mind") + " \xB7 never: " + (((s.words || {}).never || []).join(", ") || "nothin' ruled out")),
         h("div", null, btn("Names I love\u2026", () => ctx3.fillBox("callme ")), btn("Never call me\u2026", () => ctx3.fillBox("nevercall ")))
       ),
-      h("div", { class: "fhc-quick" }, ["stats", "measure", "record", "pedigree", "keys"].map((c) => btn(c[0].toUpperCase() + c.slice(1), () => ctx3.send(c))))
+      h("div", { class: "fhc-quick" }, ["stats", "measure", "record", "pedigree", "keys"].map((c) => btn(c[0].toUpperCase() + c.slice(1), () => ctx3.send(c))), btn("Dress me", () => ctx3.send("dressme")))
     ];
   }
   function gearCard(s) {
@@ -5921,11 +5921,12 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
         muted("How the farm sees you. It picks your farm outfit."),
         h("div", { style: { marginTop: "6px" } }, ["female", "male", "futa", "femboy", "nonbinary"].map((g) => h("button", { type: "button", class: "fhc-pill" + (ctx3.s.gender === g ? " on" : ""), onclick: () => ctx3.send("gender " + g) }, g)))
       ),
-      ctx3.api.hasBackup && ctx3.api.hasBackup() ? card(
+      card(
         title("Farm outfit"),
-        muted("The farm dressed you, and your own clothes are kept on this computer."),
-        btn("Change back into my own clothes", () => ctx3.api.back && ctx3.api.back())
-      ) : null,
+        muted("Dress me puts back on the outfit your record calls for (your species and gender, or your uniform while you're clocked in), in case it's come off or been changed."),
+        btn("Dress me", () => ctx3.send("dressme"), true),
+        ctx3.api.hasBackup && ctx3.api.hasBackup() ? h("div", null, muted("Your own clothes are kept on this computer."), btn("Change back into my own clothes", () => ctx3.api.back && ctx3.api.back())) : null
+      ),
       panelPrefsOrLink(ctx3)
     ];
   }
@@ -5950,7 +5951,8 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
         h("p", null, "Welcome to B&B Farm. Everybody here chose to be here and signed to say so. Have a look around, mind the ruts, and holler if you need a hand."),
         btn("Take the tour", () => ctx3.send("tour"), true),
         btn("Apply to join", () => ctx3.send("apply")),
-        btn("Luxury stay", () => ctx3.send("luxury"))
+        btn("Luxury stay", () => ctx3.send("luxury")),
+        btn("Dress me", () => ctx3.send("dressme"))
       ),
       card(title("Your keys"), muted("Guests don't carry keys. Staff can let you through any door."))
     ] },

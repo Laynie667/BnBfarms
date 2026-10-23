@@ -5,7 +5,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 | Script | File in `dist/` | Where it runs | Current |
 |---|---|---|---|
-| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.43.1** |
+| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.44.0** |
 | Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.10.0** |
 | Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.2.1** |
 | Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **1.1.0** |
@@ -13,7 +13,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 | Map tools, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.4** |
 | Dairy | `farmhand-dairy.user.js` | the bot's PC | **1.1.0** |
 | Shows | `farmhand-shows.user.js` | the bot's PC | **1.1.0** |
-| Farmhand Companion | `farmhand-companion.user.js` | each player | **0.36.0** |
+| Farmhand Companion | `farmhand-companion.user.js` | each player | **0.37.0** |
 | Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.4** |
 
 ## Sending a watch report
@@ -23,6 +23,8 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 - Running the watcher on more than one game at once (the bot, yours, a tester's) lets Claude line them up into one timeline.
 
 ## Latest changes (newest first)
+
+- **Bot 0.44.0, Companion 0.37.0: Dress me.** Laynie: "I need a dress me button on the livestock and guest panels, that will dress them in the outfit that matches their records, in case they need to restore the outfit." **Dress me** on the Me tab and in Toggles → Farm outfit (Livestock), and on the Welcome tab (Guest), or ?dressme: puts straight back on the outfit their record calls for (a proprietor's saved outfit for their species and gender first, then the farm's own; their uniform while staff are clocked in; the luxury outfit for a guest when one is saved). Needs the Companion. tests/say-it.test.cjs.
 
 - **Bot 0.43.1: the farm girl stays on her home spot.** Laynie: "why is the bot moving from its home spot again?" 0.43.0 stepped over beside everybody it asked through ECHS (and asks every 2 hours for ?hypno on folk), and with speaker spots set she never walked back. Now an ECHS request reaches them from wherever she stands; she only steps beside somebody while she's actually talkin' them under or ?allow-ing them, and goes straight back to where she stood after. tests/echs.test.cjs.
 

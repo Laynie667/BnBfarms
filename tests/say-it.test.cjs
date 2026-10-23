@@ -79,6 +79,13 @@ const mirror=(mn)=>{ const r=P(mn); r.trapWait={kind:"mirror",until:Date.now()+6
   P(600).parasite={urge:{kind:"beg",until:Date.now()+600000}};
   ok((W.__stateFor(600).wants||[]).some(x=>/beg/.test(x.label) && x.say), 'a parasite that wants beggin\' shows a Say it button too');
   P(600).parasite=null;
+  // ── Oct 23: Dress me, the outfit their record calls for ──
+  W.LZString={ compressToBase64:(t)=>Buffer.from(t).toString('base64'), decompressFromBase64:(t)=>Buffer.from(t,'base64').toString() };
+  n=sent.length; fm(500,{type:"cmd",text:"dressme",btn:true}); await wait(1200);
+  const dress=sent.slice(n).map(([e,d])=>d&&d.Dictionary).find(x=>x&&x.type==='outfit');
+  ok(dress && dress.slot==='farm:cow|female' && dress.auto===true, 'Dress me puts on the outfit their record calls for, straight on: '+(dress&&dress.slot));
+  n=sent.length; await say(600,'?dressme',900);
+  ok(/needs the Companion/.test(all(n)), 'without the Companion they\'re told it needs it');
   ok(!warns.some(w=>/say|mirror|parasite/i.test(w)), 'no errors: '+warns.filter(w=>/say|mirror|parasite/i.test(w)).slice(0,2).join(' | '));
   out(fails?'FAIL '+fails:'ALL OK'); process.exit(fails?1:0);
 })();

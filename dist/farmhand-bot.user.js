@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.43.1
+// @version      0.44.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -2221,7 +2221,7 @@
     { name: "Stock with stock", cmds: ["milk <who>", "edge <who>", "groom <who>"] },
     { name: "Breedin'", cmds: ["breedable", "fertile", "mpreg", "freeuse", "jarok", "yes", "no", "naturalheat", "breed <who>", "cum <who>", "wash", "tally", "eggs", "praise", "degrade", "rights", "accept", "pedigree"] },
     { name: "Body", cmds: ["size", "measure", "penis", "futa", "gender <word>"] },
-    { name: "Clothes", cmds: ["outfit", "outfits", "uniform", "outfit back"] },
+    { name: "Clothes", cmds: ["dressme", "outfit", "outfits", "uniform", "outfit back"] },
     { name: "Mind", cmds: ["hypno", "hypnotize me", "echs", "teaseme", "teaseme light", "teaseme steady", "teaseme needy", "teaseme off"] },
     { name: "Fun", cmds: ["fair", "enter"] },
     { name: "Ribbons and the store", cmds: ["ribbons", "ribbons top", "store", "buy <item>", "gift <who> <potion>", "potions", "potions on", "dares on", "dare", "dared", "dare skip", "bench", "bench on", "bench me <minutes>", "use <mouth|pussy|ass>", "bench top"] }
@@ -2244,7 +2244,7 @@
   ];
 
   // bot/src/version.js
-  var VERSION = "0.43.1";
+  var VERSION = "0.44.0";
 
   // bot-parts:farmhand-bot-parts
   (function() {
@@ -31999,6 +31999,8 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
       "notice",
       "teaseme",
       "tease",
+      "dressme",
+      "dress",
       "hypnotize",
       "hypnotise",
       "allow",
@@ -32966,6 +32968,26 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
             default:
               R("?contract list \xB7 show \xB7 offer \xB7 release \xB7 check \xB7 rules" + (owner ? " \xB7 new \xB7 add \xB7 set \xB7 remove \xB7 title \xB7 terms \xB7 policy \xB7 delete" : ""));
           }
+          break;
+        }
+        // ?dressme: put back on the outfit their record calls for (Laynie, Oct 23: "a dress me button on the livestock and guest
+        // panels, that will dress them in the outfit that matches their records, in case they need to restore the outfit")
+        case "dressme":
+        case "dress": {
+          outfitsLedger();
+          const r = rec(sender) || {};
+          const staffNow = (r.roles || []).some((x) => [ROLE.FARMHAND, ROLE.MANDATED, ROLE.HERDMASTER, ROLE.PROPRIETOR].includes(x)) && clockedIn(sender);
+          const slot = staffNow && uniformSlotFor(sender) || outfitSlotFor(sender) || (L2.outfits["special:luxury"] && !(r.roles || []).length ? "special:luxury" : null);
+          if (!slot) {
+            R("\u{1F457} There's no outfit on your record yet, sugar: it goes by your species and gender. " + (r.species ? "Staff can ?outfit offer you one." : "Once you're on the books with a species, this'll dress you."));
+            break;
+          }
+          if (!hasCompanion(sender)) {
+            R("\u{1F457} Dress me needs the Companion, sugar: it's what puts the outfit on you. Staff can help you dress by hand.");
+            break;
+          }
+          const err = offerOutfit(sender, slot, "You asked to be dressed", true);
+          R(err || "\u{1F457} Puttin' your " + slotLabel(slot) + " back on you now, sugar.");
           break;
         }
         case "outfit":

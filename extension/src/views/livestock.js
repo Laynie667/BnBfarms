@@ -55,7 +55,7 @@ function me(ctx) {
       muted(s.intensity === "tender" ? "Softer words, and the traps lean mild." : s.intensity === "filthy" ? "Dirtier words, and the traps lean brutal." : "As written."),
       muted("It calls you: " + (((s.words || {}).call || []).join(", ") || "whatever comes to mind") + " · never: " + (((s.words || {}).never || []).join(", ") || "nothin' ruled out")),
       h("div", null, btn("Names I love…", () => ctx.fillBox("callme ")), btn("Never call me…", () => ctx.fillBox("nevercall ")))),
-    h("div", { class: "fhc-quick" }, ["stats", "measure", "record", "pedigree", "keys"].map((c) => btn(c[0].toUpperCase() + c.slice(1), () => ctx.send(c)))),
+    h("div", { class: "fhc-quick" }, ["stats", "measure", "record", "pedigree", "keys"].map((c) => btn(c[0].toUpperCase() + c.slice(1), () => ctx.send(c))), btn("Dress me", () => ctx.send("dressme"))),
   ];
 }
 
@@ -290,8 +290,9 @@ function toggles(ctx) {
           card(title("Gender"), muted("How the farm sees you. It picks your farm outfit."),
             h("div", { style: { marginTop: "6px" } }, ["female", "male", "futa", "femboy", "nonbinary"].map((g) =>
               h("button", { type: "button", class: "fhc-pill" + (ctx.s.gender === g ? " on" : ""), onclick: () => ctx.send("gender " + g) }, g)))),
-          ctx.api.hasBackup && ctx.api.hasBackup() ? card(title("Farm outfit"), muted("The farm dressed you, and your own clothes are kept on this computer."),
-            btn("Change back into my own clothes", () => ctx.api.back && ctx.api.back())) : null,
+          card(title("Farm outfit"), muted("Dress me puts back on the outfit your record calls for (your species and gender, or your uniform while you're clocked in), in case it's come off or been changed."),
+            btn("Dress me", () => ctx.send("dressme"), true),
+            ctx.api.hasBackup && ctx.api.hasBackup() ? h("div", null, muted("Your own clothes are kept on this computer."), btn("Change back into my own clothes", () => ctx.api.back && ctx.api.back())) : null),
           panelPrefsOrLink(ctx)];
 }
 

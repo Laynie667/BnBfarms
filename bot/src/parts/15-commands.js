@@ -415,6 +415,19 @@
         break;
       }
 
+      // ?dressme: put back on the outfit their record calls for (Laynie, Oct 23: "a dress me button on the livestock and guest
+      // panels, that will dress them in the outfit that matches their records, in case they need to restore the outfit")
+      case "dressme": case "dress": {
+        outfitsLedger();
+        const r = rec(sender) || {};
+        const staffNow = (r.roles || []).some(x => [ROLE.FARMHAND, ROLE.MANDATED, ROLE.HERDMASTER, ROLE.PROPRIETOR].includes(x)) && clockedIn(sender);
+        const slot = (staffNow && uniformSlotFor(sender)) || outfitSlotFor(sender) || (L.outfits["special:luxury"] && !(r.roles || []).length ? "special:luxury" : null);
+        if (!slot){ R("👗 There's no outfit on your record yet, sugar: it goes by your species and gender. "+(r.species ? "Staff can ?outfit offer you one." : "Once you're on the books with a species, this'll dress you.")); break; }
+        if (!hasCompanion(sender)){ R("👗 Dress me needs the Companion, sugar: it's what puts the outfit on you. Staff can help you dress by hand."); break; }
+        const err = offerOutfit(sender, slot, "You asked to be dressed", true);
+        R(err || "👗 Puttin' your "+slotLabel(slot)+" back on you now, sugar.");
+        break;
+      }
       case "outfit": case "outfits": case "uniform": {
         // ?outfit · ?outfit offer <who> [slot] · ?outfit back · proprietors: ?outfit clear <slot> · ?outfit keys … · ?outfit rule …
         outfitsLedger();

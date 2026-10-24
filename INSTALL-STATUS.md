@@ -5,7 +5,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 | Script | File in `dist/` | Where it runs | Current |
 |---|---|---|---|
-| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.47.1** |
+| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.47.2** |
 | Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.10.0** |
 | Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.2.1** |
 | Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **1.1.0** |
@@ -23,6 +23,8 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 - Running the watcher on more than one game at once (the bot, yours, a tester's) lets Claude line them up into one timeline.
 
 ## Latest changes (newest first)
+
+- **Bot 0.47.2: pets with an old Companion are told to update.** Laynie: "registered and contracted pets being able to leave the room without roaming passes." The farm gate lives in the Companion (0.40.1 and up), and the watch showed a pet on 0.36.0 walk straight out; the summon did fetch her back ten seconds later, and marked her. Now anybody on a summonable contract with an older Companion is told, twice a day at most, how to update it, and anybody without the Companion is told to install it. Four contracts signed before Oct 23 (Eve the Kitty, Cutie Minnie, BnB Pup Nikto, BnB Cow Mira) have no summon rule, so they aren't fenced till they sign a new one.
 
 - **Bot 0.47.1: she stays on her home spot, and the milk streak counts.** Laynie, Oct 24: "the bot is still teleporting from its home spot" and "some players said that their milk streak hasn't updated". **Home spot:** the watch showed her stepping beside a pet for a whole half-hour ECHS trance, and hopping a tile every 11 minutes to keep the game from thinkin' she'd gone idle. She never moves now: for a trance the pet is brought to her side (led by their Companion, or teleported) once their ECHS box opens, and the hop is off (the hidden keep-alive does the job). **Milk streak:** it only counted at the farm's midnight (UTC: 7 in the evening Central), only for a day they'd spent an hour on the farm, and it went back to 0 every time they moved up a tier. Now it counts the moment today's pail reaches their quota (ribbons too), once a day, and keeps countin' past a tier (a tier every 5). Midnight still marks a short day they were here. tests: echs, shots-and-play J, pay-stingy, traps.
 

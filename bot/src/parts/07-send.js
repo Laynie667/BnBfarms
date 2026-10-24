@@ -487,6 +487,7 @@
       log("Companion hello from "+mn+" (v"+(m.ver||"?")+")");
       enqueue(makeMsg("welcome", { ver:VERSION, proto:PROTOCOL, name:plainName(mn), staff:isStaff(mn), look:farmLookAt() }, mn));   // look: which farm look for the drawn body the bot has (10y9e-farm-look.js)
       later(()=>syncCompanions(), 800);
+      try { companionTooOld(mn, String(m.ver||"")); } catch(e){}
       return;
     }
     if (m.type === "bye"){ state.companions.delete(mn); return; }

@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.47.1
+// @version      0.47.2
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -2242,7 +2242,7 @@
   ];
 
   // bot/src/version.js
-  var VERSION = "0.47.1";
+  var VERSION = "0.47.2";
 
   // bot-parts:farmhand-bot-parts
   (function() {
@@ -2365,6 +2365,8 @@
       // ribbons, with a naughty mark, for bein' late or slippin' off
       ROAM_SAFE_MIN: 30,
       // nobody's fetched for this long after their safeword
+      ROAM_GATE_MIN: "0.40.1",
+      // the oldest Companion with the farm gate in it
       ECHS_SKILL: 0,
       // the hypnotist skill I declare to their ECHS (their own setting decides whether it counts)
       ECHS_ANSWER_S: 20,
@@ -4943,6 +4945,10 @@
         log("Companion hello from " + mn + " (v" + (m.ver || "?") + ")");
         enqueue(makeMsg("welcome", { ver: VERSION, proto: PROTOCOL, name: plainName(mn), staff: isStaff(mn), look: farmLookAt() }, mn));
         later(() => syncCompanions(), 800);
+        try {
+          companionTooOld(mn, String(m.ver || ""));
+        } catch (e) {
+        }
         return;
       }
       if (m.type === "bye") {
@@ -21407,6 +21413,11 @@
           }
           g.strayAt = 0;
           g.summonedAt = 0;
+          if (charFor(mn) && !hasCompanion(mn) && state.companions && now - ((state.roamHere = state.roamHere || /* @__PURE__ */ new Map()).get(mn) || (state.roamHere.set(mn, now), now)) > 12e4 && now - (r.oldPanelTold || 0) > 12 * 36e5) {
+            r.oldPanelTold = now;
+            saveLedger();
+            tell(mn, "\u{1F9ED} Your contract keeps you on the farm, sugar, and the Farmhand Companion is what keeps the gate. Install it from the farm's page (it's the only script you need); without it you can walk out, but you'll be summoned straight back and marked.");
+          }
           continue;
         }
         if (where !== "away") continue;
@@ -21506,6 +21517,15 @@
       if (!x) return null;
       const g = roamOf(mn);
       return { left: roamLeft(mn), of: roamPasses(mn, x), until: g.until > Date.now() ? g.until : 0, price: CFG.ROAM_PASS_PRICE, safe: (rec(mn).roamSafeUntil || 0) > Date.now() };
+    }
+    const verNum = (v) => String(v || "0").split(".").map((n) => parseInt(n, 10) || 0).reduce((a, n, i) => a + n * Math.pow(1e3, 2 - i), 0);
+    function companionTooOld(mn, ver) {
+      if (!roamContract(mn) || verNum(ver) >= verNum(CFG.ROAM_GATE_MIN)) return;
+      const r = rec(mn);
+      if (!r || Date.now() - (r.oldPanelTold || 0) < 12 * 36e5) return;
+      r.oldPanelTold = Date.now();
+      saveLedger();
+      later(() => tell(mn, "\u{1F9ED} Your Companion is v" + ver + ", sugar, and the farm gate needs " + CFG.ROAM_GATE_MIN + " or newer. Update it: Tampermonkey's menu \u2192 Dashboard \u2192 Utilities \u2192 Check for userscript updates, then reload the game. (Or install it again from the farm's page.)"), 6e3);
     }
     POTIONS.push(
       {

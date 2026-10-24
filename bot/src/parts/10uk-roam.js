@@ -82,6 +82,11 @@
       if (where === "here"){
         if (g.until > now && g.wentAt){ g.until = 0; g.wentAt = 0; saveLedger(); syncCompanions(true); tell(mn, "🧭 Welcome home, sugar. That pass is spent; "+roamLeft(mn)+" left."); }
         g.strayAt = 0; g.summonedAt = 0;
+        // no Companion at all: no gate on the door either (they're fetched back, but they ought to know)
+        if (charFor(mn) && !hasCompanion(mn) && state.companions && now - ((state.roamHere = state.roamHere || new Map()).get(mn) || (state.roamHere.set(mn, now), now)) > 120000 && now - (r.oldPanelTold || 0) > 12*3600000){
+          r.oldPanelTold = now; saveLedger();
+          tell(mn, "🧭 Your contract keeps you on the farm, sugar, and the Farmhand Companion is what keeps the gate. Install it from the farm's page (it's the only script you need); without it you can walk out, but you'll be summoned straight back and marked.");
+        }
         continue;
       }
       if (where !== "away") continue;   // offline, or I can't tell: nothin' to do
@@ -146,4 +151,14 @@
     const x = roamContract(mn); if (!x) return null;
     const g = roamOf(mn);
     return { left: roamLeft(mn), of: roamPasses(mn, x), until: g.until > Date.now() ? g.until : 0, price: CFG.ROAM_PASS_PRICE, safe: (rec(mn).roamSafeUntil || 0) > Date.now() };   // safe: their Companion opens the gate (index.js)
+  }
+  // An old Companion has no farm gate (it came in 0.40): a pet on a summonable contract runnin' one walks straight out,
+  // and only the summon brings them back (Laynie, Oct 24: "registered and contracted pets being able to leave the room
+  // without roaming passes"; the watch showed one on 0.36.0). Tell them, twice a day at most, how to update.
+  const verNum = (v) => String(v || "0").split(".").map(n => parseInt(n, 10) || 0).reduce((a, n, i) => a + n * Math.pow(1000, 2 - i), 0);
+  function companionTooOld(mn, ver){
+    if (!roamContract(mn) || verNum(ver) >= verNum(CFG.ROAM_GATE_MIN)) return;
+    const r = rec(mn); if (!r || Date.now() - (r.oldPanelTold || 0) < 12*3600000) return;
+    r.oldPanelTold = Date.now(); saveLedger();
+    later(() => tell(mn, "🧭 Your Companion is v"+ver+", sugar, and the farm gate needs "+CFG.ROAM_GATE_MIN+" or newer. Update it: Tampermonkey's menu → Dashboard → Utilities → Check for userscript updates, then reload the game. (Or install it again from the farm's page.)"), 6000);
   }

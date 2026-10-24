@@ -111,6 +111,7 @@
     ROAM_RESUMMON_MIN: 5,        // still not home after a summon: try again this often
     ROAM_FINE: 1,                // ribbons, with a naughty mark, for bein' late or slippin' off
     ROAM_SAFE_MIN: 30,           // nobody's fetched for this long after their safeword
+    ROAM_GATE_MIN: "0.40.1",     // the oldest Companion with the farm gate in it
     ECHS_SKILL: 0,              // the hypnotist skill I declare to their ECHS (their own setting decides whether it counts)
     ECHS_ANSWER_S: 20,          // no answer by then: they haven't got ECHS running
     ECHS_OFFER_EVERY_MIN: 120,  // ?hypno on folk who are around get asked this often (0: only when they ask, a trap, or their herd leader)

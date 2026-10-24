@@ -117,7 +117,7 @@ const C=mn=>chars.find(c=>c.MemberNumber===mn);
   await spring('paddle'); ok(P(400).paddled === 20, 'the paddle wheel counts twenty');
   P(400).breedable=false;
   // ── what grew up round the traps ──
-  P(400).trapAt=0; P(400).penned=null; P(400).benched=null; cfg.STRUGGLE_CHANCE=1; cfg.TRAP_BEAT_S=5;
+  P(400).trapAt=0; P(400).penned=null; P(400).benched=null; cfg.STRUGGLE_CHANCE=1; cfg.TRAP_BEAT_S=5; W.__prodOf(400).held={}; W.__prodOf(400).eggs=null;   // (Oct 24: a full, heavy pet struggles worse)
   await say(221397,'?trap spring Hand glue'); n=sent.length; await say(400,'?struggle',2500);
   ok(/You're out/.test(to(400,n)) && !P(400).penned, '?struggle: one try, and a win gets them out');
   cfg.STRUGGLE_CHANCE=0; P(400).trapAt=0; P(400).trapQuiet=0;

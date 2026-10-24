@@ -103,6 +103,7 @@
     { id: "lucky",     name: "A lucky spin",          price: 8,  desc: "Mostly sweet slices. Mostly." },
     { id: "luxury",    name: "A luxury day",          price: 25, desc: "24 hours as a luxury guest: the soft straw, the good feed, and everybody calls you darlin'." },
     { id: "skipchore", name: "Skip a chore",          price: 4,  desc: "Your chore comes off the board. Nobody needs to know." },
+    { id: "purity",    name: "A Purity Tonic",        price: CFG.PURITY_PRICE, desc: "Bitter, cold and clean. Takes 20 off your corruption and lifts the newest thing it changed in you (and any latex it left). Once a week." },
     { id: "roampass",  name: "A roam pass",           price: CFG.ROAM_PASS_PRICE, desc: "An hour off the farm, for anybody whose contract has them ready to be summoned. ?roam start when you're ready to go; late back and you're fetched (10uk-roam.js)." },
     { id: "grace",     name: "Quota grace",           price: 10, desc: "Forgives one missed milk quota day before it becomes a naughty mark (hold up to 2)." },
     { id: "greeting",  name: "A greetin' of your own", price: 8, desc: "For a week, the farm girl greets you with a line you write (staff read it first). ?buy greeting <your line>" },
@@ -214,6 +215,16 @@
         if (!r.chore){ R("You haven't got a chore right now, sugar, so keep your ribbons."); return; }
         spendRibbons(sender, price, it.name); const was = r.chore.text; r.chore = null;
         done("🧹 \""+String(was).replace(/\s*@[a-z0-9_-]+\s*$/i, "")+"\" is off your list. Our little secret.");
+        return;
+      }
+      case "purity": {
+        if (!corruptionOf(sender) && !(r.corrMarks || []).length){ R("🕊️ You're clean as a whistle, sugar. Keep your ribbons."); return; }
+        const wait = (r.purityAt || 0) + CFG.PURITY_EVERY_DAYS*86400000 - Date.now();
+        if (wait > 0){ R("🕊️ One Purity Tonic a week, sugar. "+Math.ceil(wait/86400000)+" more day(s)."); return; }
+        spendRibbons(sender, price, it.name); r.purityAt = Date.now(); r.corr = Math.max(0, (r.corr || 0) - 20);
+        const top = newestMark(sender), lifted = top ? liftMark(sender, top, true) : false; try { gearOff(sender, null, "corruption"); } catch(e){}
+        saveLedger(); syncCompanions(true);
+        done("🕊️ It's foul and cold and you get every drop down. Corruption "+corruptionOf(sender)+" now"+(lifted ? ", and "+MARK_NAME[top]+" is gone from you" : "")+".");
         return;
       }
       case "roampass": {

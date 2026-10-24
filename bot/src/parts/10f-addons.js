@@ -35,6 +35,7 @@
   }
   // tell every add-on about a game event
   function addonsEmit(hook, ...args){
+    if (hook === "bred") try { titheBred(args[0], args[1], args[2]); } catch(e){ warn("tithe:", e); }   // the size-stealin' potions (10ul-tithes.js)
     for (const a of ADDONS.values()) if (a.on && typeof a.on[hook] === "function" && a.enabled !== false) addonCall(a, hook, a.on[hook], ...args);
   }
 

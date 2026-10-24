@@ -90,7 +90,8 @@
     const key = held === "run" ? run : held === "wait" ? r.trapWait : r.benched;
     if (key.struggled){ R("You've had your one try at this one, sugar. It's got you."); return; }
     key.struggled = true;
-    if (Math.random() < CFG.STRUGGLE_CHANCE){
+    let heavy = 1; try { const p = prodOf(mn); if (heldTotal(p) > 0.8*capacity(mn) || bellyStage(mn) >= 3 || (makesMilk(mn) && p.milk > 0.9*milkCap(mn))) heavy = 0.6; } catch(e){}   // full and heavy: harder to get loose (Oct 24)
+    if (Math.random() < CFG.STRUGGLE_CHANCE*heavy){
       if (held === "pillory") unbench(mn, "safe");
       trapStop(mn, 0);
       emote("💪 "+xLine("free", mn), mn);

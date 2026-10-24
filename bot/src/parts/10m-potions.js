@@ -215,6 +215,7 @@
     if (by !== mn && !r.potionsOn) return plainName(mn)+" hasn't said ?potions on, so nobody else can give 'em one.";
     const lim = String(r.limits || "");
     if (/\bpotion/i.test(lim) || (P.limit && P.limit.test(lim))) return plainName(mn)+"'s limits rule out a "+P.name+", sugar.";
+    if (P.needs){ const w = P.needs(mn); if (w) return plainName(mn)+": "+w; }   // (the tithes: 10ul-tithes.js)
     if (P.needsPanel && !hasCompanion(mn)) return "A "+P.name+" only works with the Companion, and "+(by === mn ? "you don't" : plainName(mn)+" doesn't")+" have it runnin'.";
     if ((P.id === "clover" || P.id === "heavy") && !makesMilk(mn) && !makesSemen(mn)) return plainName(mn)+" isn't makin' milk or seed, so it'd do nothin'.";
     if ((P.id === "bigbritches" || P.id === "shrink") && !potionPart(mn)) return plainName(mn)+" hasn't got anything that size changes on, sugar.";
@@ -239,6 +240,7 @@
     else f.until = now + P.mins*60000;
     r.fx[id] = f;
     if (!was) potionStart(mn, P, f); else potionStack(mn, P, f);
+    if (P.kind === "punish") try { corrupt(mn, 1, "potion"); } catch(e){}   // a nasty bottle leaves a little of the farm in them (10y4)
     saveLedger(); audit(by || CFG.BOT_MEMBER, "POTION", mn+" "+id+(how ? " ("+how+")" : ""));
     tell(mn, "🧪 "+P.name+(how ? " ("+how+")" : "")+": "+bodyWords(mn, P.drink)+" "+P.desc+(was ? (stacked ? " That's bottle number "+f.x+" on top of the last: it hits harder and runs longer." : " You're as deep in that one as it goes, so it just runs longer.") : "")+" Your safeword pours it out.");
     // (breathed in off a trap's gas or spray, it wasn't drunk: the trap already told the room, and "drinks the Needy

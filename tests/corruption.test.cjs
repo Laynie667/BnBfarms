@@ -37,11 +37,11 @@ const moveTo=(mn,X,Y)=>{ chars.find(c=>c.MemberNumber===mn).MapData.Pos={X,Y}; }
   n=sent.length; await say(221397,'?trap spring Moo mud'); await wait(1500);
   ok(P(500).corr===2, 'a trap leaves 2 points of corruption');
   W.__corrupt(600,10); ok(!P(600).corr, 'only test subjects are corrupted');
-  n=sent.length; W.__corrupt(500,18); await wait(10500);
+  n=sent.length; W.__corrupt(500,18); await wait(16000);
   ok(P(500).corrMarks.includes(20) && /Corruption 20/.test(to(500,n)), 'at 20 somethin\' changes for good, and they are told what');
-  const sz=JSON.stringify(prod(500).size||{}); W.__corrupt(500,20); await wait(10500);
+  const sz=JSON.stringify(prod(500).size||{}); W.__corrupt(500,20); await wait(16000);
   ok(P(500).corrMarks.includes(40) && JSON.stringify(prod(500).size||{})!==sz, 'at 40 a size goes up, for keeps');
-  W.__corrupt(500,45); await wait(11500);
+  W.__corrupt(500,45); await wait(18000);
   ok(P(500).crave && P(500).crave.forGood && P(500).corrWord && W.__stateFor(500).corrWord===P(500).corrWord, 'at 60 the cravin\' stays; at 80 a word is put in their mouth, and the Companion knows it');
   ok(W.__stateFor(500).trapCard.corr===85, 'the trap card shows the meter');
   const rb=P(221397).ribbons; n=sent.length; await say(221397,'?cleanse Moo');

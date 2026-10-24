@@ -308,6 +308,10 @@
     PARASITE_BELT_AFTER: 3,      // from the fourth time on the same host it comes back as a belt
     PARASITE_BIG_ML: [80, 200],  // a swallowed load this big counts double / triple when it's turned to serum
     STACK_MAX: 5,          // shots stack: a second dose (or an "x3" tag on the needle) raises the level, up to this
+    TITHE_FLOOR: 2,              // inches: the tithes never take a cock below this (10ul-tithes.js)
+    PURITY_PRICE: 40, PURITY_EVERY_DAYS: 7,   // the Purity Tonic in the store: 20 corruption off and the newest mark lifted, once a week (10y4)
+    CLEANSE_POOL_MIN: 15, CLEANSE_POOL_OFF: 10,   // standin' quiet in the cleansin' pool (?spot set cleanse-pool): this long, this much off, once a day
+    CORR_FADE_DAYS: 3,           // a mark lifts by itself when their corruption sits 10 below it this long
     POTION_STACK_MAX: 3,   // ...and so do potions: another bottle while one's workin' makes it stronger and longer
     EGG_BOOST_X: 3,        // an "eggs" item or shot: any stud's load can leave a clutch, three times as likely
     HYPER_LITTER_X: [2,4], // a "hyper" item or shot: a litter comes in two to four times as big (up to HYPER_MAX)

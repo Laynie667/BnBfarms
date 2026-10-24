@@ -18,11 +18,15 @@
        half the bid.
   */
   const cLine = (key, mn, v) => tFill(pickFor(mn, "corr:"+key, CORR_LINES[key]), mn, v);
-  const CORR_MARKS = [20, 40, 60, 80, 100];
+  const CORR_MARKS = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100];   // (Oct 24: a mark every ten, Laynie: "more effects and corruption")
+  const corrHas = (mn, m) => ((rec(mn) || {}).corrMarks || []).includes(m);
+  const CORR_SRC = (why) => /parasite/.test(why) ? "parasite" : /suit/.test(why) ? "suit" : /potion/.test(why) ? "potion" : /eggs|tentacle|vine|hive|drake|ovi/.test(String(why)) ? "eggs" : "traps";
   function corruptionOf(mn){ return Math.max(0, Math.min(100, Math.round((rec(mn) || {}).corr || 0))); }
   function corrupt(mn, n, why){
     const r = rec(mn); if (!r || !isSubject(mn) || !(n > 0)) return;
     const was = corruptionOf(mn); r.corr = Math.min(100, (r.corr || 0) + n);
+    r.corrBy = r.corrBy || {}; const src = CORR_SRC(String(why || "")); r.corrBy[src] = (r.corrBy[src] || 0) + n;   // where it came from
+    if ((r.corrPauseUntil || 0) > Date.now()){ r.corr = was; return; }   // ?corruption pause
     const now = corruptionOf(mn);
     r.corrMarks = r.corrMarks || [];
     for (const m of CORR_MARKS) if (was < m && now >= m && !r.corrMarks.includes(m)){ r.corrMarks.push(m); later(() => corruptMark(mn, m), 9000 + r.corrMarks.length*500); }
@@ -32,21 +36,88 @@
     const r = rec(mn), p = prodOf(mn); if (!r || !p) return;
     if (m === 40){
       const parts = bodyParts(mn).filter(k => ["udder", "butt", "testes", "penis"].includes(k) && CFG.SIZES[k]), part = parts[Math.floor(Math.random()*parts.length)];
-      if (part) setSize(mn, part, sizeOf(mn, part) + (CFG.SIZES[part].step || 1), true);
+      if (part){ r.corrGrew = { part, from: sizeOf(mn, part) }; setSize(mn, part, sizeOf(mn, part) + (CFG.SIZES[part].step || 1), true); }   // (kept, so it can go back)
     }
+    if (m === 50){ r.corrBrand = CORR_BRANDS[Math.floor(Math.random()*CORR_BRANDS.length)]; r.corrBrandDay = ""; corrBrandNow(mn); }
+    if (m === 70){ r.corrNoise = CORR_NOISE[String(r.species || "").toLowerCase()] || "moo"; }
+    // the livin' suit's share: a patch of latex that stays on them (and comes off: the Purity Tonic, the pool, a lifted mark, staff)
+    if (m >= 20 && ((r.corrBy && r.corrBy.suit) || 0) >= 0.3 * ((r.corr || 1)) && !suitOnNow(mn)) gearOn(mn, "legs", "Corrupted Latex", "A glossy black skin of the livin' suit that never let go, grown over both thighs and up onto the hips. It's warm, and it squeezes.", CFG.CORR_FADE_DAYS*24*60*7, "corruption", { items: ["Slime"], color: "#1A1A1F" });
     if (m === 60) r.crave = { until: Date.now() + 3650*86400000, ate: Date.now(), told: Date.now(), forGood: true };
     if (m === 80) r.corrWord = CORR_WORDS[Math.floor(Math.random()*CORR_WORDS.length)];
     saveLedger(); syncCompanions(true); audit(CFG.BOT_MEMBER, "CORRUPT", mn+" mark "+m);
-    if (charFor(mn)) emote("🖤 "+cLine("mark"+m, mn, { x: r.corrWord || "" }), mn);
-    tell(mn, "🖤 Corruption "+m+", sugar. "+CORR_TELL[m].replace("%x", r.corrWord || "")+" That one's for keeps.");
+    const xv = m === 50 ? r.corrBrand : m === 70 ? r.corrNoise : r.corrWord || "";
+    if (charFor(mn)) emote("🖤 "+cLine("mark"+m, mn, { x: xv }), mn);
+    tell(mn, "🖤 Corruption "+m+", sugar. "+CORR_TELL[m].replace("%x", xv)+" It stays till somethin' takes it back out of you.");
   }
   const CORR_WORDS = ["breed me", "more", "please", "use me", "fill me", "yes"];
-  const CORR_TELL = { 20: "Your heats come easier now, and they stay half again as long.", 40: "Somethin' on you has grown a size, and it isn't goin' back.",
+  const CORR_TELL = { 10: "The traps know your scent now: the water's hungrier for you.", 30: "The farm whispers to you at night now.", 50: "The farm's brand is on your skin: \"%x\". It comes back every day.",
+    70: "Your animal noise slips out when you talk now: %x.", 90: "When you go under, you stay under twice as long.", 20: "Your heats come easier now, and they stay half again as long.", 40: "Somethin' on you has grown a size, and it isn't goin' back.",
     60: "The cravin' for cum doesn't leave you any more. It only quiets when you're fed.", 80: "There's a word in your mouth now that comes out on its own: \"%x\".",
     100: "You're RUINED. Every gas, spray and needle on this farm goes for its worst with you now." };
   // heat lasts longer for the corrupted (used where the traps start a heat)
   function corrHeatX(mn){ return ((rec(mn) || {}).corrMarks || []).includes(20) ? 1.5 : 1; }
   function ruined(mn){ return ((rec(mn) || {}).corrMarks || []).includes(100); }
+  const CORR_NOISE = { cow: "moo", bull: "moo", pony: "neigh", horse: "neigh", pup: "woof", dog: "woof", wolf: "awoo", kitt: "mew", kitty: "mew", cat: "mew", bunny: "squeak", rabbit: "squeak", goat: "baa", sheep: "baa", pig: "oink", deer: "bleat", fox: "yip", goblin: "hehe" };
+  const CORR_BRANDS = ["FARM PROPERTY", "BREEDING STOCK", "USE ME", "BRED", "RUINED STOCK", "FARM ANIMAL"];
+  const MARK_NAME = { 10: "the traps' hunger for you", 20: "the easy heats", 30: "the night whispers", 40: "the size the farm gave you", 50: "the brand",
+    60: "the cravin'", 70: "the animal in your voice", 80: "the word in your mouth", 90: "the lingerin' haze", 100: "Ruined" };
+  // the brand, written back on every day they're here (?wash takes it off till tomorrow)
+  function corrBrandNow(mn){
+    const r = rec(mn); if (!r || !corrHas(mn, 50) || !r.corrBrand || !charFor(mn) || r.corrBrandDay === dayKey()) return;
+    r.corrBrandDay = dayKey(); saveLedger();
+    try { bodyMark(mn, { write: { line: r.corrBrand, area: "hips" } }); } catch(e){}
+  }
+  // take one mark back out of them: what it did comes undone
+  function liftMark(mn, m, quiet){
+    const r = rec(mn); if (!r || !(r.corrMarks || []).includes(m)) return false;
+    r.corrMarks = r.corrMarks.filter(x => x !== m);
+    if (m === 40 && r.corrGrew){ try { setSize(mn, r.corrGrew.part, r.corrGrew.from, true); } catch(e){} r.corrGrew = null; }
+    if (m === 50){ r.corrBrand = null; }
+    if (m === 60 && r.crave && r.crave.forGood) r.crave = null;
+    if (m === 70) r.corrNoise = null;
+    if (m === 80) r.corrWord = null;
+    try { gearOff(mn, null, "corruption"); } catch(e){}
+    r.corrFadeAt = 0; saveLedger(); syncCompanions(true); audit(CFG.BOT_MEMBER, "CORRUPT_LIFT", mn+" "+m);
+    if (!quiet) tell(mn, "🕊️ A little of the farm has gone out of you, sugar: "+MARK_NAME[m]+" is gone.");
+    return true;
+  }
+  const newestMark = (mn) => Math.max(0, ...(((rec(mn) || {}).corrMarks) || []));
+  const CORR_NIGHT = [
+    "Down in the dark, the barn breathes. It knows exactly where you're lyin', sugar, and it wants you closer.",
+    "Somethin' in the straw is whisperin' your name. It's tellin' you what the traps are goin' to do to you tomorrow.",
+    "The pond's callin' you tonight. Warm, deep, and full of hands. You could just walk on down.",
+    "You dream of the stalls again: the cups, the posts, the full warm weight of it. You wake up wet.",
+    "Every trap on this farm is lyin' awake thinkin' about you.",
+    "The farm's in your blood now, and at night it hums. You can feel it under your skin, waitin'."];
+  // the hourly part: night whispers, the brand, marks fadin' when they've stayed clean, the cleansin' pool
+  function corruptionHourly(now){
+    for (const C of (W.ChatRoomCharacter || [])){
+      const mn = C.MemberNumber, r = rec(mn); if (!r || mn === CFG.BOT_MEMBER || !(r.corrMarks || []).length) continue;
+      corrBrandNow(mn);
+      if (corrHas(mn, 30) && inCurfew() && !quietNow(mn) && now - (r.corrWhisperAt || 0) > 45*60000 && Math.random() < 0.5){ r.corrWhisperAt = now; tell(mn, "🖤 "+tFill(pickFor(mn, "corr:night", CORR_NIGHT), mn)); }
+      // a mark fades when their corruption has sat 10 below it for CORR_FADE_DAYS
+      const top = newestMark(mn);
+      if (top && corruptionOf(mn) <= top - 10){ if (!r.corrFadeAt) r.corrFadeAt = now; else if (now - r.corrFadeAt > CFG.CORR_FADE_DAYS*86400000) liftMark(mn, top); }
+      else r.corrFadeAt = 0;
+    }
+  }
+  function cleansePoolTick(now){
+    const pools = Object.keys(L.spots || {}).filter(n => /^cleanse(-pool)?(-\d+)?$/.test(n)); if (!pools.length) return;
+    state.poolAt = state.poolAt || new Map();
+    for (const C of (W.ChatRoomCharacter || [])){
+      const mn = C.MemberNumber, r = rec(mn); if (!r || !corruptionOf(mn)) { state.poolAt.delete(mn); continue; }
+      if (!pools.some(n => onSpot(mn, n, 0)) || heldByTrap(mn)){ state.poolAt.delete(mn); continue; }
+      const since = state.poolAt.get(mn) || now; state.poolAt.set(mn, since);
+      if (now - since < CFG.CLEANSE_POOL_MIN*60000 || r.poolDay === dayKey()) continue;
+      r.poolDay = dayKey(); r.corr = Math.max(0, (r.corr || 0) - CFG.CLEANSE_POOL_OFF); state.poolAt.delete(mn);
+      try { gearOff(mn, null, "corruption"); } catch(e){}
+      saveLedger(); syncCompanions(true);
+      emote("🕊️ "+tFill(pickFor(mn, "corr:pool", CORR_POOL), mn), mn);
+      tell(mn, "🕊️ The pool took "+CFG.CLEANSE_POOL_OFF+" corruption out of you, sugar: "+corruptionOf(mn)+" now. Once a day.");
+    }
+  }
+  const CORR_POOL = ["%n has stood in the cold clear pool so long the water's gone still around them. When they climb out, a little of the farm's fog has rinsed off with the mud.",
+    "The cleansin' pool is ice cold and %n has held still in it the whole while. They come out shiverin', clearer-eyed, a little less the farm's."];
 
   // ── what laid it ──
   const EGG_TYPES = { water: { price: 0.25, name: "water eggs" }, drake: { price: 0.4, name: "drake eggs" }, hive: { price: 0.3, name: "hive eggs" }, parasite: { price: 0.5, name: "parasite eggs" },
@@ -66,7 +137,7 @@
   // ── goin' under ──
   function underOf(mn){
     const r = rec(mn); if (!r || !r.under) return 0;
-    const steps = Math.floor((Date.now() - r.under.at) / (CFG.UNDER_STEP_MIN*60000));
+    const steps = Math.floor((Date.now() - r.under.at) / (CFG.UNDER_STEP_MIN*60000*(corrHas(mn, 90) ? 2 : 1)));   // (corruption 90: the haze lingers)
     return Math.max(0, Math.min(5, r.under.d - steps));
   }
   function goUnder(mn, n){
@@ -140,19 +211,29 @@
     if (cmd === "cleanse"){
       if (!isStaff(sender)){ R("Cleansin' is staff work, sugar."); return; }
       const t = resolveTarget(args[0]);
-      if (!t || !isSubject(t)){ R("Cleanse who, sugar? ?cleanse <somebody with traps on>. It costs you 5 ribbons and takes 20 off their corruption."); return; }
+      if (!t || !isSubject(t)){ R("Cleanse who, sugar? ?cleanse <somebody with traps on>. It costs you 5 ribbons and takes 20 off their corruption. Proprietors: ?cleanse <who> <mark> lifts one mark outright."); return; }
+      const mk = parseInt(args[1], 10);
+      if (mk){ if (!isProprietor(sender)){ R("Liftin' a mark is for the proprietors, sugar."); return; } R(liftMark(t, mk) ? "🕊️ Lifted "+MARK_NAME[mk]+" off "+plainName(t)+"." : plainName(t)+" doesn't carry the "+mk+" mark."); return; }
       if (corruptionOf(t) <= 0){ R(plainName(t)+" is clean as a whistle, sugar."); return; }
       if (ribbonsOf(sender) < CFG.CLEANSE_COST){ R("That takes "+CFG.CLEANSE_COST+" ribbons, sugar, and you haven't got them."); return; }
       spendRibbons(sender, CFG.CLEANSE_COST, "cleansin' "+plainName(t));
       rec(t).corr = Math.max(0, (rec(t).corr || 0) - 20); saveLedger(); audit(sender, "CLEANSE", String(t)); syncCompanions(true);
       if (charFor(t)) emote("🕊️ "+cLine("cleanse", t, { c: plainName(sender) }), t);
-      R("🕊️ Done. "+plainName(t)+"'s corruption is down to "+corruptionOf(t)+". What it already changed in them stays changed."); return;
+      try { gearOff(t, null, "corruption"); } catch(e){}
+      R("🕊️ Done. "+plainName(t)+"'s corruption is down to "+corruptionOf(t)+". Its marks lift by themselves if it stays 10 below them for "+CFG.CORR_FADE_DAYS+" days, or a Purity Tonic takes the newest."); return;
+    }
+    if (cmd === "corruption" && a0 === "pause"){
+      if (!isSubject(sender)){ R("Your traps are off, sugar: nothin' to pause."); return; }
+      r.corrPauseUntil = (r.corrPauseUntil || 0) > now ? 0 : now + 7*86400000; saveLedger();
+      R(r.corrPauseUntil ? "🖤 Paused for a week: the traps still bite, but none of it sinks in. ?corruption pause again to end it." : "🖤 Pause over. It sinks in again."); return;
     }
     if (cmd === "corruption"){
       const t = args[0] && isStaff(sender) ? resolveTarget(args[0]) : sender;
       if (!t || !rec(t) || !isSubject(t)){ R("Corruption's a thing the traps do, sugar, and their traps are off."); return; }
       const m = rec(t).corrMarks || [], next = CORR_MARKS.find(x => corruptionOf(t) < x);
-      R("🖤 "+plainName(t)+": corruption "+corruptionOf(t)+" of 100."+(m.length ? " Changed for good at "+m.slice().sort((a, b) => a - b).join(", ")+"." : "")+(next ? " Next change at "+next+"." : " Nothin' left to change.")+(underOf(t) ? " Gone under: depth "+underOf(t)+"." : "")); return;
+      R("🖤 "+plainName(t)+": corruption "+corruptionOf(t)+" of 100."+(m.length ? " Changed for good at "+m.slice().sort((a, b) => a - b).join(", ")+"." : "")+(next ? " Next change at "+next+"." : " Nothin' left to change.")+(underOf(t) ? " Gone under: depth "+underOf(t)+"." : "")+
+        (rec(t).corrBy ? " Mostly from: "+Object.entries(rec(t).corrBy).sort((a, b) => b[1] - a[1]).slice(0, 2).map(([k]) => k).join(" and ")+"." : "")+
+        "\nWays back: ?buy purity ("+CFG.PURITY_PRICE+" ribbons, the newest mark and 20 off, once a week)"+(Object.keys(L.spots || {}).some(n => /^cleanse/.test(n)) ? " · "+CFG.CLEANSE_POOL_MIN+" quiet minutes in the cleansin' pool" : "")+" · a mark fades if you stay 10 below it for "+CFG.CORR_FADE_DAYS+" days · ?corruption pause"); return;
     }
     if (cmd === "gauntlet"){
       if (a0 === "pot"){
@@ -198,9 +279,15 @@
   function corruptionTick(){
     const now = Date.now();
     try { raidTick(now); gauntletTick(now); lendTick(now); } catch(e){ warn("corruption tick:", e); }
+    try { cleansePoolTick(now); if (now - (state.corrHourAt || 0) > 10*60000){ state.corrHourAt = now; corruptionHourly(now); } } catch(e){ warn("corruption marks:", e); }
   }
 
   const CORR_LINES = {
+    mark10: ["Somethin' in the traps has caught %n's scent now. The water seems to lean toward them when they pass.", "%n feels watched by the farm itself. The traps know them by smell now."],
+    mark30: ["%n's dreams have changed. They wake damp and achin' with the barn still whisperin' in their ears.", "At night now the farm talks to %n, low and sweet, about what it wants to do to them next."],
+    mark50: ["Words have come up on %n's skin like a brand, dark and plain: %x. Wash it off and it comes back by mornin'.", "The farm has signed its name on %n, right across the hips for anybody to read: %x."],
+    mark70: ["%n opens their mouth and a little %x slips out with the words. The animal's comin' up through them.", "Halfway through a sentence %n makes a soft %x. They didn't mean to. They will again."],
+    mark90: ["The haze sits on %n longer now. When they go under they stay under, and comin' back up takes twice as long.", "%n's eyes have a soft, faraway look that doesn't clear. Every trip under goes deeper and lasts."],
     mark20: ["Somethin' in %n has shifted. There's a flush on them that doesn't quite fade any more, and a restlessness in the hips. Heat's goin' to find them easy from now on.",
              "%n's body has learned somethin' from the traps: how to want it, fast, and for a long time. It shows in the way they stand."],
     mark40: ["%n looks down at themselves and finds more than there was this mornin'. The farm's been addin' to them a dose at a time, and this part's stayin'.",

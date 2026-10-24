@@ -430,6 +430,7 @@ function start() {
           let text = d.Content;
           if (s.under >= 2) text = dumbDown(text, s.under);
           if (s.corrWord && Math.random() < 0.17) text = text.replace(/\s+$/, "") + " ..." + String(s.corrWord).slice(0, 20) + ".";
+          if (s.corrNoise && Math.random() < 0.12) text = text.replace(/\s+$/, "") + " ..." + String(s.corrNoise).slice(0, 12) + ".";   // (corruption 70: the animal slips out too)
           if (text !== d.Content) args = [args[0], Object.assign({}, d, { Content: text })];
         }
       } catch (e) { /* say it plain, then */ }

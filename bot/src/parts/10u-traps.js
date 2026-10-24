@@ -163,12 +163,31 @@
   // pour somethin' into a hole: what fits stays, the rest runs out. Returns what stayed.
   function trapFill(mn, hole, amount, over){
     amount *= holeX(mn, hole);   // a trained hole is given more (10y6-keepers.js)
+    // the body steers it (Oct 24): a roomy one is given more, a tight one less but stretched by it, and one already
+    // past full is flooded out first, then filled again
+    try {
+      const p0 = prodOf(mn), cap = capacity(mn), base = CFG.PROD.BASE_CAPACITY || cap;
+      amount *= Math.max(0.75, Math.min(1.5, cap / base));
+      if (heldTotal(p0) >= cap * 0.95 && (p0.held[hole] || 0) > 0){
+        const out0 = Math.round(p0.held[hole] * 0.6); p0.held[hole] -= out0;
+        later(() => emote("💦 "+tFill(pickFor(mn, "trap:flood", SIZE_TRAP_LINES.flood), mn, { ml: ml(out0) }), mn), 1500);
+        bodyMark(mn, { splat: ["thighs"] });
+      }
+      if (cap <= base * 1.1 && Math.random() < 0.15){ p0.capBonus = (p0.capBonus || 0) + Math.round(base * 0.1); later(() => tell(mn, "🫦 "+tFill(pickFor(mn, "trap:stretch", SIZE_TRAP_LINES.stretch), mn)), 3000); }   // (a body with no room to spare: it stretches)
+    } catch(e){ warn("size fill:", e); }
     const p = prodOf(mn), room = Math.max(0, capacity(mn)*(over || 1) - heldTotal(p)), kept = Math.min(amount, room);
     p.held[hole] = (p.held[hole] || 0) + kept; p.totals.received += kept;
     try { holeTook(mn, hole, kept); } catch(e){ warn("holes:", e); }
     if (hole === "mouth" && kept >= CFG.HUNGRY_ML){ p.boosts = p.boosts || {}; p.boosts.hungry = Date.now() + 3600000; }
     return kept;
   }
+  const SIZE_TRAP_LINES = {
+    flood: ["%n was already stuffed past full, so the first thing it does is flood them out: %ml of the last one gushes down their thighs before it starts fillin' them all over again.",
+            "There's no room left in %n, so it makes some. A hot rush of what they were holdin' pours out of them, %ml of it, and then it pushes back in.",
+            "%n's too full to take more, and it doesn't care. It squeezes %ml of the old load out of them in a slick flood, then sets to fillin' the space."],
+    stretch: ["That was more than you were built to hold, sugar, and you held it. You've stretched a little roomier, and you'll stay that way.",
+              "Tight as you are, it fit, and it left you a little bigger inside than you were. You'll hold more next time."],
+  };
   // a clutch laid in them by somethin' that isn't a stud. Adds to one they're already carryin'.
   // how much bigger a clutch comes in for this body: fertility (a shot or gas, by level; a worn fertility item), bein' in heat,
   // and most of all Tentacle Musk
@@ -394,7 +413,7 @@
         if (!fresh && now - (st.rolled || 0) < CFG.TENTACLE_LINGER_MIN*60000/(potionOn(mn, "tentaclemusk") ? 5 : 1)) continue;   // (with Tentacle Musk on, it looks again every minute)
         st.rolled = now;
         const wk = waterKindOf(here);   // tentacles, leeches, the well, or slime (10y2-brood.js)
-        if (((wk === "tentacle" && parasiteKin(mn, now)) || Math.random() < Math.min(1, CFG.TENTACLE_CHANCE*nightX().water*dangerX(mn).chance*rankX(mn).water*(potionOn(mn, "tentaclemusk") ? CFG.MUSK_WATER_X : 1))) && !springTrap(mn, wk, here)){ r.trapAt = now; saveLedger(); }   // (three times as hungry after dark)
+        if (((wk === "tentacle" && parasiteKin(mn, now)) || Math.random() < Math.min(1, CFG.TENTACLE_CHANCE*nightX().water*dangerX(mn).chance*rankX(mn).water*(corrHas(mn, 10) ? 1.25 : 1)*(potionOn(mn, "tentaclemusk") ? CFG.MUSK_WATER_X : 1))) && !springTrap(mn, wk, here)){ r.trapAt = now; saveLedger(); }   // (three times as hungry after dark)
       }
     }
     toyTick(); moreTrapTick(); newTrapTick(); mazeTick(); trapExtrasTick(); farmGearTick(Date.now()); broodTick(); corruptionTick(); cursedTick(); keepersTick(); uddersTick();

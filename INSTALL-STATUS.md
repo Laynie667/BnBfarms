@@ -5,7 +5,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 | Script | File in `dist/` | Where it runs | Current |
 |---|---|---|---|
-| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.46.1** |
+| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.47.0** |
 | Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.10.0** |
 | Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.2.1** |
 | Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **1.1.0** |
@@ -13,7 +13,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 | Map tools, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.4** |
 | Dairy | `farmhand-dairy.user.js` | the bot's PC | **1.1.0** |
 | Shows | `farmhand-shows.user.js` | the bot's PC | **1.1.0** |
-| Farmhand Companion | `farmhand-companion.user.js` | each player | **0.40.1** |
+| Farmhand Companion | `farmhand-companion.user.js` | each player | **0.41.0** |
 | Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.4** |
 
 ## Sending a watch report
@@ -23,6 +23,13 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 - Running the watcher on more than one game at once (the bot, yours, a tester's) lets Claude line them up into one timeline.
 
 ## Latest changes (newest first)
+
+- **Bot 0.47.0, Companion 0.41.0: the tithes, size-aware traps, and corruption with a way back.** Laynie, Oct 24: "no sizeplay toggle, or its default on ... maybe one that allows cows to suck a cock, steal its size and grow their own udders", "[sizes in traps] is great", "[corruption] needs work and a way to reverse effects, and more effects and corruption", "as long as the latex can come off too."
+  - **Bull's Tithe** (for a cock, 14 ribbons, four hours): every cock they breed loses two inches and theirs grows two, for good. **Cow's Tithe** (for udders): every cock they suck dry loses two inches and their udders grow a cup. Once per partner a day, never below two inches, and nobody with size in their limits. No switch: on for everybody. bot/src/parts/10ul-tithes.js.
+  - **The traps follow the body:** a roomy body is given more, a tight one is stretched a little roomier (sometimes, for good), and one already past full is flooded out first and then filled again. Full and heavy pets (a full belly, heavy udders, a big clutch) wriggle loose less often.
+  - **Corruption, a mark every ten:** 10 the water's hungrier for them, 30 the farm whispers at night, 50 a brand written on their hips every day, 70 their animal noise slips into their speech, 90 trances last twice as long (on top of 20, 40, 60, 80, 100). More of it, too: a punishin' potion adds a point. ?corruption shows where it mostly came from. A big share from the livin' suit leaves a patch of corrupted latex on them.
+  - **Ways back:** ?buy purity (40 ribbons, once a week: 20 off and the newest mark lifted, its effect undone, latex and all) · the cleansin' pool (?spot set cleanse-pool: 15 quiet minutes in it takes 10 off, once a day, and peels the latex) · a mark fades by itself when corruption stays 10 below it for 3 days · proprietors: ?cleanse <who> <mark> · ?corruption pause (a week of nothin' sinkin' in). Lifting the 40 mark puts the size back.
+  - tests/tithes-corruption.test.cjs; corruption, ranks, traps and traps-3 tests updated.
 
 - **Bot 0.46.1, Companion 0.40.1: traps only where they're meant to be, and the gate holds.** Laynie, Oct 24: "im triggering traps walking by the tiles, not on them, and if im standing still long enough no where near a tile, they are getting set off too. Eager off didn't seem to apply the cool down either", "a new player kept getting traps back to back to back", and "the safeword shouldn't open the fence gate, thats just reckless."
   - **On the tile, not beside it:** ponds, water and troughs only take somebody standin' in them (they reached a tile out and rolled every 5 minutes); the wolf pack only on the spot it's at (it went off a tile out from an ordinary spot that moves every hour); a night raid only in the barn (it reached four tiles out).

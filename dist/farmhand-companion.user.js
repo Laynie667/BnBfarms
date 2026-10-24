@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.40.1
+// @version      0.41.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -230,7 +230,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.40.1";
+  var VERSION = "0.41.0";
 
   // extension/src/config.js
   var BOT_MEMBER = 260239;
@@ -10787,6 +10787,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
             let text = d.Content;
             if (s.under >= 2) text = dumbDown(text, s.under);
             if (s.corrWord && Math.random() < 0.17) text = text.replace(/\s+$/, "") + " ..." + String(s.corrWord).slice(0, 20) + ".";
+            if (s.corrNoise && Math.random() < 0.12) text = text.replace(/\s+$/, "") + " ..." + String(s.corrNoise).slice(0, 12) + ".";
             if (text !== d.Content) args = [args[0], Object.assign({}, d, { Content: text })];
           }
         } catch (e) {

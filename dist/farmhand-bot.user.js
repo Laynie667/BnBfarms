@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.46.1
+// @version      0.47.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -2242,7 +2242,7 @@
   ];
 
   // bot/src/version.js
-  var VERSION = "0.46.1";
+  var VERSION = "0.47.0";
 
   // bot-parts:farmhand-bot-parts
   (function() {
@@ -2938,6 +2938,16 @@
       // a swallowed load this big counts double / triple when it's turned to serum
       STACK_MAX: 5,
       // shots stack: a second dose (or an "x3" tag on the needle) raises the level, up to this
+      TITHE_FLOOR: 2,
+      // inches: the tithes never take a cock below this (10ul-tithes.js)
+      PURITY_PRICE: 40,
+      PURITY_EVERY_DAYS: 7,
+      // the Purity Tonic in the store: 20 corruption off and the newest mark lifted, once a week (10y4)
+      CLEANSE_POOL_MIN: 15,
+      CLEANSE_POOL_OFF: 10,
+      // standin' quiet in the cleansin' pool (?spot set cleanse-pool): this long, this much off, once a day
+      CORR_FADE_DAYS: 3,
+      // a mark lifts by itself when their corruption sits 10 below it this long
       POTION_STACK_MAX: 3,
       // ...and so do potions: another bottle while one's workin' makes it stronger and longer
       EGG_BOOST_X: 3,
@@ -5362,6 +5372,7 @@
           const u = underOf(mn);
           if (u >= 2) s.under = u;
           if (r.corrWord) s.corrWord = r.corrWord;
+          if (r.corrNoise) s.corrNoise = r.corrNoise;
         });
         part("keepsakes", () => keepersStateFor(mn, s));
         part("udders", () => uddersStateFor(mn, s));
@@ -8645,6 +8656,11 @@
       }
     }
     function addonsEmit(hook, ...args) {
+      if (hook === "bred") try {
+        titheBred(args[0], args[1], args[2]);
+      } catch (e) {
+        warn("tithe:", e);
+      }
       for (const a of ADDONS.values()) if (a.on && typeof a.on[hook] === "function" && a.enabled !== false) addonCall(a, hook, a.on[hook], ...args);
     }
     function posOf(mn) {
@@ -10408,6 +10424,7 @@
       { id: "lucky", name: "A lucky spin", price: 8, desc: "Mostly sweet slices. Mostly." },
       { id: "luxury", name: "A luxury day", price: 25, desc: "24 hours as a luxury guest: the soft straw, the good feed, and everybody calls you darlin'." },
       { id: "skipchore", name: "Skip a chore", price: 4, desc: "Your chore comes off the board. Nobody needs to know." },
+      { id: "purity", name: "A Purity Tonic", price: CFG.PURITY_PRICE, desc: "Bitter, cold and clean. Takes 20 off your corruption and lifts the newest thing it changed in you (and any latex it left). Once a week." },
       { id: "roampass", name: "A roam pass", price: CFG.ROAM_PASS_PRICE, desc: "An hour off the farm, for anybody whose contract has them ready to be summoned. ?roam start when you're ready to go; late back and you're fetched (10uk-roam.js)." },
       { id: "grace", name: "Quota grace", price: 10, desc: "Forgives one missed milk quota day before it becomes a naughty mark (hold up to 2)." },
       { id: "greeting", name: "A greetin' of your own", price: 8, desc: "For a week, the farm girl greets you with a line you write (staff read it first). ?buy greeting <your line>" },
@@ -10573,6 +10590,29 @@
           const was = r.chore.text;
           r.chore = null;
           done('\u{1F9F9} "' + String(was).replace(/\s*@[a-z0-9_-]+\s*$/i, "") + '" is off your list. Our little secret.');
+          return;
+        }
+        case "purity": {
+          if (!corruptionOf(sender) && !(r.corrMarks || []).length) {
+            R("\u{1F54A}\uFE0F You're clean as a whistle, sugar. Keep your ribbons.");
+            return;
+          }
+          const wait = (r.purityAt || 0) + CFG.PURITY_EVERY_DAYS * 864e5 - Date.now();
+          if (wait > 0) {
+            R("\u{1F54A}\uFE0F One Purity Tonic a week, sugar. " + Math.ceil(wait / 864e5) + " more day(s).");
+            return;
+          }
+          spendRibbons(sender, price, it.name);
+          r.purityAt = Date.now();
+          r.corr = Math.max(0, (r.corr || 0) - 20);
+          const top = newestMark(sender), lifted = top ? liftMark(sender, top, true) : false;
+          try {
+            gearOff(sender, null, "corruption");
+          } catch (e) {
+          }
+          saveLedger();
+          syncCompanions(true);
+          done("\u{1F54A}\uFE0F It's foul and cold and you get every drop down. Corruption " + corruptionOf(sender) + " now" + (lifted ? ", and " + MARK_NAME[top] + " is gone from you" : "") + ".");
           return;
         }
         case "roampass": {
@@ -11244,6 +11284,10 @@
       if (by !== mn && !r.potionsOn) return plainName(mn) + " hasn't said ?potions on, so nobody else can give 'em one.";
       const lim = String(r.limits || "");
       if (/\bpotion/i.test(lim) || P.limit && P.limit.test(lim)) return plainName(mn) + "'s limits rule out a " + P.name + ", sugar.";
+      if (P.needs) {
+        const w = P.needs(mn);
+        if (w) return plainName(mn) + ": " + w;
+      }
       if (P.needsPanel && !hasCompanion(mn)) return "A " + P.name + " only works with the Companion, and " + (by === mn ? "you don't" : plainName(mn) + " doesn't") + " have it runnin'.";
       if ((P.id === "clover" || P.id === "heavy") && !makesMilk(mn) && !makesSemen(mn)) return plainName(mn) + " isn't makin' milk or seed, so it'd do nothin'.";
       if ((P.id === "bigbritches" || P.id === "shrink") && !potionPart(mn)) return plainName(mn) + " hasn't got anything that size changes on, sugar.";
@@ -11269,6 +11313,10 @@
       r.fx[id] = f;
       if (!was) potionStart(mn, P, f);
       else potionStack(mn, P, f);
+      if (P.kind === "punish") try {
+        corrupt(mn, 1, "potion");
+      } catch (e) {
+      }
       saveLedger();
       audit(by || CFG.BOT_MEMBER, "POTION", mn + " " + id + (how ? " (" + how + ")" : ""));
       tell(mn, "\u{1F9EA} " + P.name + (how ? " (" + how + ")" : "") + ": " + bodyWords(mn, P.drink) + " " + P.desc + (was ? stacked ? " That's bottle number " + f.x + " on top of the last: it hits harder and runs longer." : " You're as deep in that one as it goes, so it just runs longer." : "") + " Your safeword pours it out.");
@@ -13139,6 +13187,22 @@
     const TRAP_HOLE = { vulva: "pussy", butt: "ass", mouth: "throat" };
     function trapFill(mn, hole, amount, over) {
       amount *= holeX(mn, hole);
+      try {
+        const p0 = prodOf(mn), cap = capacity(mn), base = CFG.PROD.BASE_CAPACITY || cap;
+        amount *= Math.max(0.75, Math.min(1.5, cap / base));
+        if (heldTotal(p0) >= cap * 0.95 && (p0.held[hole] || 0) > 0) {
+          const out0 = Math.round(p0.held[hole] * 0.6);
+          p0.held[hole] -= out0;
+          later(() => emote("\u{1F4A6} " + tFill(pickFor(mn, "trap:flood", SIZE_TRAP_LINES.flood), mn, { ml: ml(out0) }), mn), 1500);
+          bodyMark(mn, { splat: ["thighs"] });
+        }
+        if (cap <= base * 1.1 && Math.random() < 0.15) {
+          p0.capBonus = (p0.capBonus || 0) + Math.round(base * 0.1);
+          later(() => tell(mn, "\u{1FAE6} " + tFill(pickFor(mn, "trap:stretch", SIZE_TRAP_LINES.stretch), mn)), 3e3);
+        }
+      } catch (e) {
+        warn("size fill:", e);
+      }
       const p = prodOf(mn), room = Math.max(0, capacity(mn) * (over || 1) - heldTotal(p)), kept = Math.min(amount, room);
       p.held[hole] = (p.held[hole] || 0) + kept;
       p.totals.received += kept;
@@ -13153,6 +13217,17 @@
       }
       return kept;
     }
+    const SIZE_TRAP_LINES = {
+      flood: [
+        "%n was already stuffed past full, so the first thing it does is flood them out: %ml of the last one gushes down their thighs before it starts fillin' them all over again.",
+        "There's no room left in %n, so it makes some. A hot rush of what they were holdin' pours out of them, %ml of it, and then it pushes back in.",
+        "%n's too full to take more, and it doesn't care. It squeezes %ml of the old load out of them in a slick flood, then sets to fillin' the space."
+      ],
+      stretch: [
+        "That was more than you were built to hold, sugar, and you held it. You've stretched a little roomier, and you'll stay that way.",
+        "Tight as you are, it fit, and it left you a little bigger inside than you were. You'll hold more next time."
+      ]
+    };
     function eggX(mn) {
       const p = prodOf(mn);
       let x = 1;
@@ -13423,7 +13498,7 @@
           if (!fresh && now - (st.rolled || 0) < CFG.TENTACLE_LINGER_MIN * 6e4 / (potionOn(mn, "tentaclemusk") ? 5 : 1)) continue;
           st.rolled = now;
           const wk = waterKindOf(here);
-          if ((wk === "tentacle" && parasiteKin(mn, now) || Math.random() < Math.min(1, CFG.TENTACLE_CHANCE * nightX().water * dangerX(mn).chance * rankX(mn).water * (potionOn(mn, "tentaclemusk") ? CFG.MUSK_WATER_X : 1))) && !springTrap(mn, wk, here)) {
+          if ((wk === "tentacle" && parasiteKin(mn, now) || Math.random() < Math.min(1, CFG.TENTACLE_CHANCE * nightX().water * dangerX(mn).chance * rankX(mn).water * (corrHas(mn, 10) ? 1.25 : 1) * (potionOn(mn, "tentaclemusk") ? CFG.MUSK_WATER_X : 1))) && !springTrap(mn, wk, here)) {
             r.trapAt = now;
             saveLedger();
           }
@@ -21409,6 +21484,120 @@
       const g = roamOf(mn);
       return { left: roamLeft(mn), of: roamPasses(mn, x), until: g.until > Date.now() ? g.until : 0, price: CFG.ROAM_PASS_PRICE, safe: (rec(mn).roamSafeUntil || 0) > Date.now() };
     }
+    POTIONS.push(
+      {
+        id: "bulltithe",
+        name: "Bull's Tithe",
+        kind: "reward",
+        mins: 240,
+        price: 14,
+        desc: "For four hours, every cock you breed gives up some of itself to yours: they shrink two inches, you grow two, for good. Once per partner a day. Only for somebody with a cock.",
+        limit: /\b(size|shrink|grow)/i,
+        needs: (mn) => {
+          try {
+            return bodyOf(mn).cock ? "" : "It only works on somebody with a cock to grow.";
+          } catch (e) {
+            return "";
+          }
+        },
+        drink: "It's thick and dark as stout and it burns all the way down, and your cock throbs once, hard, like somethin' hungry just woke up in it.",
+        seen: "%n knocks back somethin' dark and thick and grins. Any stud in the room with any sense takes a step back."
+      },
+      {
+        id: "cowtithe",
+        name: "Cow's Tithe",
+        kind: "reward",
+        mins: 240,
+        price: 14,
+        desc: "For four hours, every cock you suck dry shrinks two inches for good, and your own udders swell a cup for every one. Once per cock a day. Only for somebody with udders.",
+        limit: /\b(size|shrink|grow)/i,
+        needs: (mn) => {
+          try {
+            return bodyOf(mn).tits ? "" : "It needs udders to grow into.";
+          } catch (e) {
+            return "";
+          }
+        },
+        drink: "It's warm and creamy and sweet as fresh milk, and your udders tighten and tingle as it goes down, achin' to be filled.",
+        seen: "%n drinks a little bottle of somethin' creamy and licks their lips, eyes driftin' to every crotch in the room."
+      }
+    );
+    const TITHE_LINES = {
+      bull: [
+        "%s sinks into %t and somethin' in the dark draught drinks deep. %t feels their cock shrink, inch by inch, while %s swells inside them to match.",
+        "As %s fills %t, the Bull's Tithe takes its due: %t's cock draws up smaller, and %s's grows heavier, thicker, longer.",
+        "%t gasps as %s breeds them and feels it go: two inches of their cock, pulled away and into %s, who's bigger than ever when they pull out."
+      ],
+      cow: [
+        "%t sucks %s dry and keeps suckin', and %s's cock shrinks between their lips while %t's udders swell and tighten another cup.",
+        "The Cow's Tithe drinks through %t's mouth: %s's cock gets smaller with every swallow, and %t's udders fill out round and heavy.",
+        "%t pulls off with a wet pop, and %s looks down at a cock two inches smaller than it was. %t's udders have grown a cup, and they're smilin'."
+      ]
+    };
+    const titheLine = (k, s, t) => pickFor(t, "tithe:" + k, TITHE_LINES[k]).replace(/%s/g, plainName(s)).replace(/%t/g, plainName(t));
+    function titheSafe(mn) {
+      return /\b(size|shrink)/i.test(String((rec(mn) || {}).limits || ""));
+    }
+    function titheOnce(by, from) {
+      const r = rec(by);
+      if (!r) return false;
+      const day = dayKey();
+      r.tithe = r.tithe && r.tithe.day === day ? r.tithe : { day, from: [] };
+      if (r.tithe.from.includes(from)) return false;
+      r.tithe.from.push(from);
+      return true;
+    }
+    function titheCock(mn) {
+      try {
+        return !!bodyOf(mn).cock;
+      } catch (e) {
+        return false;
+      }
+    }
+    function titheShrink(mn) {
+      const S = CFG.SIZES.penis, now = sizeOf(mn, "penis"), to = Math.max(CFG.TITHE_FLOOR, now - (S.step || 2));
+      if (to >= now) return 0;
+      setSize(mn, "penis", to, true);
+      return now - to;
+    }
+    function titheBred(stud, t, hole) {
+      if (!stud || !t || stud === t || !rec(stud) || !rec(t)) return;
+      try {
+        if (potionOn(stud, "bulltithe") && titheCock(stud) && titheCock(t) && !titheSafe(t) && titheOnce(stud, t)) {
+          const got = titheShrink(t);
+          if (got > 0) {
+            setSize(stud, "penis", Math.min(CFG.SIZES.penis.max, sizeOf(stud, "penis") + got), true);
+            later(() => emote("\u{1F402} " + titheLine("bull", stud, t), t), 2500);
+            tell(t, "\u{1F402} " + plainName(stud) + "'s Bull's Tithe took " + got + " inches of your cock, sugar. It's " + sizeOf(t, "penis") + " now, and it's stayin' that way.");
+            tell(stud, "\u{1F402} You took " + got + " inches off " + plainName(t) + ". You're " + sizeOf(stud, "penis") + " now.");
+            audit(stud, "TITHE", "bull " + t + " " + got);
+            saveLedger();
+            syncCompanions(true);
+          }
+        }
+        if (hole === "mouth" && potionOn(t, "cowtithe") && titheCock(stud) && !titheSafe(stud) && titheOnce(t, stud)) {
+          let tits = false;
+          try {
+            tits = bodyOf(t).tits;
+          } catch (e) {
+          }
+          if (tits) {
+            const got = titheShrink(stud);
+            if (got > 0) {
+              setSize(t, "udder", Math.min(CFG.SIZES.udder.max, sizeOf(t, "udder") + 1), true);
+              later(() => emote("\u{1F404} " + titheLine("cow", stud, t), t), 2500);
+              tell(stud, "\u{1F404} " + plainName(t) + "'s Cow's Tithe sucked " + got + " inches out of your cock, sugar. It's " + sizeOf(stud, "penis") + " now, for good.");
+              tell(t, "\u{1F404} That's " + got + " inches off " + plainName(stud) + " and a cup on you: " + sizeWord("udder", sizeOf(t, "udder")) + ".");
+              audit(t, "TITHE", "cow " + stud + " " + got);
+              saveLedger();
+              syncCompanions(true);
+            }
+          }
+        }
+      } catch (e) {
+        warn("tithe:", e);
+      }
+    }
     const PARASITE_SERUMS = ["growth", "fertility", "growth", "hyper pregnancy", "growth", "capacity"];
     const PARASITE_GROWS = ["udder", "penis", "testes", "butt"];
     function parasiteChance(mn) {
@@ -24490,7 +24679,13 @@
         return;
       }
       key.struggled = true;
-      if (Math.random() < CFG.STRUGGLE_CHANCE) {
+      let heavy = 1;
+      try {
+        const p = prodOf(mn);
+        if (heldTotal(p) > 0.8 * capacity(mn) || bellyStage(mn) >= 3 || makesMilk(mn) && p.milk > 0.9 * milkCap(mn)) heavy = 0.6;
+      } catch (e) {
+      }
+      if (Math.random() < CFG.STRUGGLE_CHANCE * heavy) {
         if (held === "pillory") unbench(mn, "safe");
         trapStop(mn, 0);
         emote("\u{1F4AA} " + xLine("free", mn), mn);
@@ -25836,7 +26031,9 @@
       betDone: ["%x. The ones who called it right about %n: %c.", "It's settled: %x. Winnin's to %c.", "%x, for all the yard to see. %c had the right of it."]
     };
     const cLine = (key, mn, v) => tFill(pickFor(mn, "corr:" + key, CORR_LINES[key]), mn, v);
-    const CORR_MARKS = [20, 40, 60, 80, 100];
+    const CORR_MARKS = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
+    const corrHas = (mn, m) => ((rec(mn) || {}).corrMarks || []).includes(m);
+    const CORR_SRC = (why) => /parasite/.test(why) ? "parasite" : /suit/.test(why) ? "suit" : /potion/.test(why) ? "potion" : /eggs|tentacle|vine|hive|drake|ovi/.test(String(why)) ? "eggs" : "traps";
     function corruptionOf(mn) {
       return Math.max(0, Math.min(100, Math.round((rec(mn) || {}).corr || 0)));
     }
@@ -25845,6 +26042,13 @@
       if (!r || !isSubject(mn) || !(n > 0)) return;
       const was = corruptionOf(mn);
       r.corr = Math.min(100, (r.corr || 0) + n);
+      r.corrBy = r.corrBy || {};
+      const src = CORR_SRC(String(why || ""));
+      r.corrBy[src] = (r.corrBy[src] || 0) + n;
+      if ((r.corrPauseUntil || 0) > Date.now()) {
+        r.corr = was;
+        return;
+      }
       const now = corruptionOf(mn);
       r.corrMarks = r.corrMarks || [];
       for (const m of CORR_MARKS) if (was < m && now >= m && !r.corrMarks.includes(m)) {
@@ -25858,18 +26062,36 @@
       if (!r || !p) return;
       if (m === 40) {
         const parts = bodyParts(mn).filter((k) => ["udder", "butt", "testes", "penis"].includes(k) && CFG.SIZES[k]), part = parts[Math.floor(Math.random() * parts.length)];
-        if (part) setSize(mn, part, sizeOf(mn, part) + (CFG.SIZES[part].step || 1), true);
+        if (part) {
+          r.corrGrew = { part, from: sizeOf(mn, part) };
+          setSize(mn, part, sizeOf(mn, part) + (CFG.SIZES[part].step || 1), true);
+        }
       }
+      if (m === 50) {
+        r.corrBrand = CORR_BRANDS[Math.floor(Math.random() * CORR_BRANDS.length)];
+        r.corrBrandDay = "";
+        corrBrandNow(mn);
+      }
+      if (m === 70) {
+        r.corrNoise = CORR_NOISE[String(r.species || "").toLowerCase()] || "moo";
+      }
+      if (m >= 20 && (r.corrBy && r.corrBy.suit || 0) >= 0.3 * (r.corr || 1) && !suitOnNow(mn)) gearOn(mn, "legs", "Corrupted Latex", "A glossy black skin of the livin' suit that never let go, grown over both thighs and up onto the hips. It's warm, and it squeezes.", CFG.CORR_FADE_DAYS * 24 * 60 * 7, "corruption", { items: ["Slime"], color: "#1A1A1F" });
       if (m === 60) r.crave = { until: Date.now() + 3650 * 864e5, ate: Date.now(), told: Date.now(), forGood: true };
       if (m === 80) r.corrWord = CORR_WORDS[Math.floor(Math.random() * CORR_WORDS.length)];
       saveLedger();
       syncCompanions(true);
       audit(CFG.BOT_MEMBER, "CORRUPT", mn + " mark " + m);
-      if (charFor(mn)) emote("\u{1F5A4} " + cLine("mark" + m, mn, { x: r.corrWord || "" }), mn);
-      tell(mn, "\u{1F5A4} Corruption " + m + ", sugar. " + CORR_TELL[m].replace("%x", r.corrWord || "") + " That one's for keeps.");
+      const xv = m === 50 ? r.corrBrand : m === 70 ? r.corrNoise : r.corrWord || "";
+      if (charFor(mn)) emote("\u{1F5A4} " + cLine("mark" + m, mn, { x: xv }), mn);
+      tell(mn, "\u{1F5A4} Corruption " + m + ", sugar. " + CORR_TELL[m].replace("%x", xv) + " It stays till somethin' takes it back out of you.");
     }
     const CORR_WORDS = ["breed me", "more", "please", "use me", "fill me", "yes"];
     const CORR_TELL = {
+      10: "The traps know your scent now: the water's hungrier for you.",
+      30: "The farm whispers to you at night now.",
+      50: `The farm's brand is on your skin: "%x". It comes back every day.`,
+      70: "Your animal noise slips out when you talk now: %x.",
+      90: "When you go under, you stay under twice as long.",
       20: "Your heats come easier now, and they stay half again as long.",
       40: "Somethin' on you has grown a size, and it isn't goin' back.",
       60: "The cravin' for cum doesn't leave you any more. It only quiets when you're fed.",
@@ -25882,6 +26104,117 @@
     function ruined(mn) {
       return ((rec(mn) || {}).corrMarks || []).includes(100);
     }
+    const CORR_NOISE = { cow: "moo", bull: "moo", pony: "neigh", horse: "neigh", pup: "woof", dog: "woof", wolf: "awoo", kitt: "mew", kitty: "mew", cat: "mew", bunny: "squeak", rabbit: "squeak", goat: "baa", sheep: "baa", pig: "oink", deer: "bleat", fox: "yip", goblin: "hehe" };
+    const CORR_BRANDS = ["FARM PROPERTY", "BREEDING STOCK", "USE ME", "BRED", "RUINED STOCK", "FARM ANIMAL"];
+    const MARK_NAME = {
+      10: "the traps' hunger for you",
+      20: "the easy heats",
+      30: "the night whispers",
+      40: "the size the farm gave you",
+      50: "the brand",
+      60: "the cravin'",
+      70: "the animal in your voice",
+      80: "the word in your mouth",
+      90: "the lingerin' haze",
+      100: "Ruined"
+    };
+    function corrBrandNow(mn) {
+      const r = rec(mn);
+      if (!r || !corrHas(mn, 50) || !r.corrBrand || !charFor(mn) || r.corrBrandDay === dayKey()) return;
+      r.corrBrandDay = dayKey();
+      saveLedger();
+      try {
+        bodyMark(mn, { write: { line: r.corrBrand, area: "hips" } });
+      } catch (e) {
+      }
+    }
+    function liftMark(mn, m, quiet) {
+      const r = rec(mn);
+      if (!r || !(r.corrMarks || []).includes(m)) return false;
+      r.corrMarks = r.corrMarks.filter((x) => x !== m);
+      if (m === 40 && r.corrGrew) {
+        try {
+          setSize(mn, r.corrGrew.part, r.corrGrew.from, true);
+        } catch (e) {
+        }
+        r.corrGrew = null;
+      }
+      if (m === 50) {
+        r.corrBrand = null;
+      }
+      if (m === 60 && r.crave && r.crave.forGood) r.crave = null;
+      if (m === 70) r.corrNoise = null;
+      if (m === 80) r.corrWord = null;
+      try {
+        gearOff(mn, null, "corruption");
+      } catch (e) {
+      }
+      r.corrFadeAt = 0;
+      saveLedger();
+      syncCompanions(true);
+      audit(CFG.BOT_MEMBER, "CORRUPT_LIFT", mn + " " + m);
+      if (!quiet) tell(mn, "\u{1F54A}\uFE0F A little of the farm has gone out of you, sugar: " + MARK_NAME[m] + " is gone.");
+      return true;
+    }
+    const newestMark = (mn) => Math.max(0, ...(rec(mn) || {}).corrMarks || []);
+    const CORR_NIGHT = [
+      "Down in the dark, the barn breathes. It knows exactly where you're lyin', sugar, and it wants you closer.",
+      "Somethin' in the straw is whisperin' your name. It's tellin' you what the traps are goin' to do to you tomorrow.",
+      "The pond's callin' you tonight. Warm, deep, and full of hands. You could just walk on down.",
+      "You dream of the stalls again: the cups, the posts, the full warm weight of it. You wake up wet.",
+      "Every trap on this farm is lyin' awake thinkin' about you.",
+      "The farm's in your blood now, and at night it hums. You can feel it under your skin, waitin'."
+    ];
+    function corruptionHourly(now) {
+      for (const C2 of W.ChatRoomCharacter || []) {
+        const mn = C2.MemberNumber, r = rec(mn);
+        if (!r || mn === CFG.BOT_MEMBER || !(r.corrMarks || []).length) continue;
+        corrBrandNow(mn);
+        if (corrHas(mn, 30) && inCurfew() && !quietNow(mn) && now - (r.corrWhisperAt || 0) > 45 * 6e4 && Math.random() < 0.5) {
+          r.corrWhisperAt = now;
+          tell(mn, "\u{1F5A4} " + tFill(pickFor(mn, "corr:night", CORR_NIGHT), mn));
+        }
+        const top = newestMark(mn);
+        if (top && corruptionOf(mn) <= top - 10) {
+          if (!r.corrFadeAt) r.corrFadeAt = now;
+          else if (now - r.corrFadeAt > CFG.CORR_FADE_DAYS * 864e5) liftMark(mn, top);
+        } else r.corrFadeAt = 0;
+      }
+    }
+    function cleansePoolTick(now) {
+      const pools = Object.keys(L2.spots || {}).filter((n) => /^cleanse(-pool)?(-\d+)?$/.test(n));
+      if (!pools.length) return;
+      state.poolAt = state.poolAt || /* @__PURE__ */ new Map();
+      for (const C2 of W.ChatRoomCharacter || []) {
+        const mn = C2.MemberNumber, r = rec(mn);
+        if (!r || !corruptionOf(mn)) {
+          state.poolAt.delete(mn);
+          continue;
+        }
+        if (!pools.some((n) => onSpot(mn, n, 0)) || heldByTrap(mn)) {
+          state.poolAt.delete(mn);
+          continue;
+        }
+        const since = state.poolAt.get(mn) || now;
+        state.poolAt.set(mn, since);
+        if (now - since < CFG.CLEANSE_POOL_MIN * 6e4 || r.poolDay === dayKey()) continue;
+        r.poolDay = dayKey();
+        r.corr = Math.max(0, (r.corr || 0) - CFG.CLEANSE_POOL_OFF);
+        state.poolAt.delete(mn);
+        try {
+          gearOff(mn, null, "corruption");
+        } catch (e) {
+        }
+        saveLedger();
+        syncCompanions(true);
+        emote("\u{1F54A}\uFE0F " + tFill(pickFor(mn, "corr:pool", CORR_POOL), mn), mn);
+        tell(mn, "\u{1F54A}\uFE0F The pool took " + CFG.CLEANSE_POOL_OFF + " corruption out of you, sugar: " + corruptionOf(mn) + " now. Once a day.");
+      }
+    }
+    const CORR_POOL = [
+      "%n has stood in the cold clear pool so long the water's gone still around them. When they climb out, a little of the farm's fog has rinsed off with the mud.",
+      "The cleansin' pool is ice cold and %n has held still in it the whole while. They come out shiverin', clearer-eyed, a little less the farm's."
+    ];
     const EGG_TYPES = {
       water: { price: 0.25, name: "water eggs" },
       drake: { price: 0.4, name: "drake eggs" },
@@ -25915,7 +26248,7 @@
     function underOf(mn) {
       const r = rec(mn);
       if (!r || !r.under) return 0;
-      const steps = Math.floor((Date.now() - r.under.at) / (CFG.UNDER_STEP_MIN * 6e4));
+      const steps = Math.floor((Date.now() - r.under.at) / (CFG.UNDER_STEP_MIN * 6e4 * (corrHas(mn, 90) ? 2 : 1)));
       return Math.max(0, Math.min(5, r.under.d - steps));
     }
     function goUnder(mn, n) {
@@ -26024,7 +26357,16 @@
         }
         const t = resolveTarget(args[0]);
         if (!t || !isSubject(t)) {
-          R("Cleanse who, sugar? ?cleanse <somebody with traps on>. It costs you 5 ribbons and takes 20 off their corruption.");
+          R("Cleanse who, sugar? ?cleanse <somebody with traps on>. It costs you 5 ribbons and takes 20 off their corruption. Proprietors: ?cleanse <who> <mark> lifts one mark outright.");
+          return;
+        }
+        const mk = parseInt(args[1], 10);
+        if (mk) {
+          if (!isProprietor(sender)) {
+            R("Liftin' a mark is for the proprietors, sugar.");
+            return;
+          }
+          R(liftMark(t, mk) ? "\u{1F54A}\uFE0F Lifted " + MARK_NAME[mk] + " off " + plainName(t) + "." : plainName(t) + " doesn't carry the " + mk + " mark.");
           return;
         }
         if (corruptionOf(t) <= 0) {
@@ -26041,7 +26383,21 @@
         audit(sender, "CLEANSE", String(t));
         syncCompanions(true);
         if (charFor(t)) emote("\u{1F54A}\uFE0F " + cLine("cleanse", t, { c: plainName(sender) }), t);
-        R("\u{1F54A}\uFE0F Done. " + plainName(t) + "'s corruption is down to " + corruptionOf(t) + ". What it already changed in them stays changed.");
+        try {
+          gearOff(t, null, "corruption");
+        } catch (e) {
+        }
+        R("\u{1F54A}\uFE0F Done. " + plainName(t) + "'s corruption is down to " + corruptionOf(t) + ". Its marks lift by themselves if it stays 10 below them for " + CFG.CORR_FADE_DAYS + " days, or a Purity Tonic takes the newest.");
+        return;
+      }
+      if (cmd === "corruption" && a0 === "pause") {
+        if (!isSubject(sender)) {
+          R("Your traps are off, sugar: nothin' to pause.");
+          return;
+        }
+        r.corrPauseUntil = (r.corrPauseUntil || 0) > now ? 0 : now + 7 * 864e5;
+        saveLedger();
+        R(r.corrPauseUntil ? "\u{1F5A4} Paused for a week: the traps still bite, but none of it sinks in. ?corruption pause again to end it." : "\u{1F5A4} Pause over. It sinks in again.");
         return;
       }
       if (cmd === "corruption") {
@@ -26051,7 +26407,7 @@
           return;
         }
         const m = rec(t).corrMarks || [], next = CORR_MARKS.find((x) => corruptionOf(t) < x);
-        R("\u{1F5A4} " + plainName(t) + ": corruption " + corruptionOf(t) + " of 100." + (m.length ? " Changed for good at " + m.slice().sort((a, b) => a - b).join(", ") + "." : "") + (next ? " Next change at " + next + "." : " Nothin' left to change.") + (underOf(t) ? " Gone under: depth " + underOf(t) + "." : ""));
+        R("\u{1F5A4} " + plainName(t) + ": corruption " + corruptionOf(t) + " of 100." + (m.length ? " Changed for good at " + m.slice().sort((a, b) => a - b).join(", ") + "." : "") + (next ? " Next change at " + next + "." : " Nothin' left to change.") + (underOf(t) ? " Gone under: depth " + underOf(t) + "." : "") + (rec(t).corrBy ? " Mostly from: " + Object.entries(rec(t).corrBy).sort((a, b) => b[1] - a[1]).slice(0, 2).map(([k]) => k).join(" and ") + "." : "") + "\nWays back: ?buy purity (" + CFG.PURITY_PRICE + " ribbons, the newest mark and 20 off, once a week)" + (Object.keys(L2.spots || {}).some((n) => /^cleanse/.test(n)) ? " \xB7 " + CFG.CLEANSE_POOL_MIN + " quiet minutes in the cleansin' pool" : "") + " \xB7 a mark fades if you stay 10 below it for " + CFG.CORR_FADE_DAYS + " days \xB7 ?corruption pause");
         return;
       }
       if (cmd === "gauntlet") {
@@ -26141,8 +26497,22 @@
       } catch (e) {
         warn("corruption tick:", e);
       }
+      try {
+        cleansePoolTick(now);
+        if (now - (state.corrHourAt || 0) > 10 * 6e4) {
+          state.corrHourAt = now;
+          corruptionHourly(now);
+        }
+      } catch (e) {
+        warn("corruption marks:", e);
+      }
     }
     const CORR_LINES = {
+      mark10: ["Somethin' in the traps has caught %n's scent now. The water seems to lean toward them when they pass.", "%n feels watched by the farm itself. The traps know them by smell now."],
+      mark30: ["%n's dreams have changed. They wake damp and achin' with the barn still whisperin' in their ears.", "At night now the farm talks to %n, low and sweet, about what it wants to do to them next."],
+      mark50: ["Words have come up on %n's skin like a brand, dark and plain: %x. Wash it off and it comes back by mornin'.", "The farm has signed its name on %n, right across the hips for anybody to read: %x."],
+      mark70: ["%n opens their mouth and a little %x slips out with the words. The animal's comin' up through them.", "Halfway through a sentence %n makes a soft %x. They didn't mean to. They will again."],
+      mark90: ["The haze sits on %n longer now. When they go under they stay under, and comin' back up takes twice as long.", "%n's eyes have a soft, faraway look that doesn't clear. Every trip under goes deeper and lasts."],
       mark20: [
         "Somethin' in %n has shifted. There's a flush on them that doesn't quite fade any more, and a restlessness in the hips. Heat's goin' to find them easy from now on.",
         "%n's body has learned somethin' from the traps: how to want it, fast, and for a long time. It shows in the way they stand."

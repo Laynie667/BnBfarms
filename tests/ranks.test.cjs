@@ -40,7 +40,8 @@ const ADDON=(name)=>path.join(__dirname,'../dist/farmhand-'+name+'.user.js');
   ok(W.__rank(500).water===1.25 && W.__rank(500).eggs===1.1 && W.__stateFor(500).trapCard.rank==='Trap Fodder' && W.__stateFor(500).trapCard.nextRank===25, 'the rank makes the water hungrier and clutches bigger, and shows on the trap card');
   ok(W.__rank(600).rank===0 && W.__rank(600).water===1, '...only for subjects');
   // ── handed on ──
-  free(); cfg.CHAIN_CHANCE=1; n=sent.length; const R0=Math.random; Math.random=()=>0.01;   // (the chance is capped at 90%: make the roll sure)
+  free(); P(500).trapEager=true; cfg.CHAIN_CHANCE=1;   // (Oct 24: hand-ons only with eager on)
+  n=sent.length; const R0=Math.random; Math.random=()=>0.01;   // (the chance is capped at 90%: make the roll sure)
   await say(221397,'?trap spring Moo wire'); await wait(16000); Math.random=R0;
   const sprung=(to(500,n).match(/sprung a trap/g)||[]).length;
   ok(sprung>=2 && /hands them straight|passed along|second one's already|tipped, slid/.test(all(n)), 'one trap hands them on to the next ('+sprung+' sprung)');

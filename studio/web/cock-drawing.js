@@ -49,9 +49,103 @@
   // how big each ball is across, for a farm level of 1 to 20 (3 is where the farm starts them)
   const ballR = (level) => 5 + 2.1 * Math.max(0, level - 1) + 0.18 * Math.pow(Math.max(0, level - 6), 2);   // (at the farm's starting 3 the sack is about as wide as the game draws it)
 
-  // o: { kind, knot, inches, girth (1 = usual for the length), balls (1..20), hard, skin [r,g,b] }
+  // ── STAMPS (Oct 24) ──
+  // After five drawn passes Laynie said these "simply won't do" and brought painted references instead. For each kind she
+  // has settled, pictures cut from those take the place of the drawing (they live in studio/web/_stamps/<kind>/, never
+  // in the repo). Human, her picks: hard, one of three shafts (18.1, 35.3, 33.2) standing in front of a separate sack,
+  // drained (4.3) or pent up (37.16); soft, 24.4, split into its cock and its sack so each can be its own size. All of it
+  // tinted to the body's skin. Until they've loaded, or for a kind with none, the drawing further down is used.
+  const STAMP_FILES = { human: { hard: ["hard-18-1", "hard-35-3", "hard-33-2"], drained: "balls-4-3", pent: "balls-37-16", softShaft: "soft-24-4-shaft", softSack: "soft-24-4-sack" } };
+  const stamps = {};   // kind -> the same names, each a picture { img, w, h, ref (its own lit skin colour), jx, nx }
+  let ver = 0;         // goes up as stamps arrive, so a drawing made before them is made again
+  const mk = (w, h) => { const c = document.createElement("canvas"); c.width = Math.max(1, Math.ceil(w)); c.height = Math.max(1, Math.ceil(h)); return c; };
+  // what a picture is: its size, the skin colour its shading sits on (the 60th brightest of its drawn pixels: the lit
+  // skin, not the shadow), where a standing shaft's root is across (the middle of its row 85% down) and where a hanging
+  // one's top is across (the middle of its first row)
+  function picOf(img) {
+    const w = img.naturalWidth || img.width, h = img.naturalHeight || img.height, c = mk(w, h), g = c.getContext("2d"); g.drawImage(img, 0, 0);
+    const d = g.getImageData(0, 0, w, h).data, ch = [[], [], []];
+    for (let i = 0; i < d.length; i += 16) if (d[i + 3] > 200) for (let k = 0; k < 3; k++) ch[k].push(d[i + k]);
+    const ref = ch.map((a) => a.sort((x, y) => x - y)[Math.floor(a.length * 0.6)] || 200);
+    const span = (y) => { let l = -1, r = -1; for (let x = 0; x < w; x++) if (d[(y * w + x) * 4 + 3] > 120) { if (l < 0) l = x; r = x; } return l < 0 ? null : [l, r]; };
+    const mid = (y) => { const s = span(y); return s ? (s[0] + s[1]) / 2 : -1; }, wide = (y) => { const s = span(y); return s ? s[1] - s[0] : 0; };
+    let top = 0; while (top < h - 1 && mid(top) < 0) top++;
+    const jx = mid(Math.round(h * 0.85)), nx = mid(top);
+    // a hanging sack's neck: from its top down to where it starts to widen out (a quarter wider than at the top)
+    const topW = [0, 5, 10, 15, 20].map((k) => wide(Math.min(h - 1, top + k))).sort((a, b) => a - b)[2];
+    let neck = top + 20; while (neck < h * 0.6 && wide(neck) < topW * 1.25) neck++;
+    return { img: c, w, h, ref, jx: jx < 0 ? w / 2 : jx, nx: nx < 0 ? w / 2 : nx, neck };
+  }
+  // base: where the folders are ("/__studio/_stamps/"); or pics: { kind: { name: a data: URL } }, as the Companion would
+  // carry them. done is called each time a kind is complete.
+  function loadStamps(base, done, pics) {
+    for (const [kind, files] of Object.entries(STAMP_FILES)) {
+      const names = Object.values(files).flat(), got = {};
+      for (const n of names) {
+        const im = new Image(), src = pics && pics[kind] && pics[kind][n];
+        im.onload = () => { got[n] = picOf(im); if (Object.keys(got).length < names.length) return;
+          stamps[kind] = { hard: files.hard.map((x) => got[x]), drained: got[files.drained], pent: got[files.pent], softShaft: got[files.softShaft], softSack: got[files.softSack] };
+          ver++; if (done) done(kind); };
+        im.onerror = () => {};   // not there: that kind stays drawn
+        im.src = src || base + kind + "/" + n + ".png";
+      }
+    }
+  }
+  const hasStamps = (kind) => !!stamps[kind];
+  // a picture at a size, its colours moved from its own skin to hers (each channel by skin / its skin, shading kept).
+  // draw(g, w, h), if given, puts the picture on the canvas some other way than stretched to fill it.
+  function tinted(pic, w, h, skin, ref, draw) {
+    const c = mk(w, h), g = c.getContext("2d"); g.imageSmoothingQuality = "high";
+    if (draw) draw(g, c.width, c.height); else g.drawImage(pic.img, 0, 0, c.width, c.height);
+    const r = ref || pic.ref, k = [skin[0] / r[0], skin[1] / r[1], skin[2] / r[2]], img = g.getImageData(0, 0, c.width, c.height), d = img.data;
+    for (let i = 0; i < d.length; i += 4) { d[i] = Math.min(255, d[i] * k[0]); d[i + 1] = Math.min(255, d[i + 1] * k[1]); d[i + 2] = Math.min(255, d[i + 2] * k[2]); }
+    g.putImageData(img, 0, 0); return c;
+  }
+  // the sack's width across for a farm ball level: about as wide as the drawn one; pent up, swollen a third wider
+  const sackW = (level, pent) => 3.6 * ballR(level || 3) * (pent ? 1.3 : 1);
+  function stampCanvas(st, o, bellyLit) {
+    const inches = o.inches || 6, girth = o.girth || 1;
+    // the skin colour handed over is read off the lit belly; between her legs the game's skin is a touch rosier (5% less
+    // green and blue, measured on the white and the asian bodies alike), and that's what these have to sit in
+    const skin = [bellyLit[0], bellyLit[1] * 0.948, bellyLit[2] * 0.955];
+    if (o.hard) {
+      // the shaft stands root to tip at inches x 9 x 1.06 pixels (as the drawn one does), its own shape, made thicker or
+      // thinner by the girth; the sack hangs behind its root with its top tucked up behind it
+      const n = st.hard.length, pic = st.hard[(((o.style | 0) % n) + n) % n], sack = o.pent ? st.pent : st.drained;
+      const k = (inches * PX_PER_INCH * 1.06) / pic.h, sw = pic.w * k * girth, sh = pic.h * k;
+      const bw = sackW(o.balls, o.pent), bh = (sack.h * bw) / sack.w;
+      const cv = mk(Math.max(sw, bw) + 8, sh + bh + 10), g = cv.getContext("2d"), ax = cv.width / 2, ay = sh + 3;
+      g.drawImage(tinted(sack, bw, bh, skin), ax - bw / 2, ay - bh * 0.22);
+      g.drawImage(tinted(pic, sw, sh, skin), ax - pic.jx * k * girth, ay - sh);
+      cv.ax = ax; cv.ay = ay - bh * 0.05; return cv;
+    }
+    // soft: at 7 inches and the farm's starting balls this is 24.4 as she picked it (two thirds of the whole picture at
+    // inches x 9 x 1.15); the cock follows the inches and the sack the ball size, both hung from the top middle, and
+    // both moved to her skin by the same amount so the two halves stay one colour
+    const sack = st.softSack, cock = st.softShaft, k7 = (7 * PX_PER_INCH * 1.15 * 0.67) / sack.h;
+    const kc = (k7 * inches) / 7, ks = (k7 * ballR(o.balls || 3)) / ballR(3) * (o.pent ? 1.15 : 1);
+    // a big sack hangs from a short neck: the neck is stretched no longer than the cock's own size (or the picked one),
+    // so heavy balls sit up against her instead of dangling off a long tube
+    const kn = Math.min(ks, Math.max(kc, k7)), neckH = sack.neck * kn, sw = sack.w * ks, sh = neckH + (sack.h - sack.neck) * ks;
+    const cw = cock.w * kc * girth, chh = cock.h * kc, nx = sack.nx;
+    const left = Math.max(nx * ks, nx * kc * girth), right = Math.max((sack.w - nx) * ks, (cock.w - nx) * kc * girth);
+    const cv = mk(left + right + 8, Math.max(sh, chh) + 8), g = cv.getContext("2d"), ax = left + 4, ay = 2;
+    const twoPart = (sg, w, h) => { sg.drawImage(sack.img, 0, 0, sack.w, sack.neck, 0, 0, w, neckH); sg.drawImage(sack.img, 0, sack.neck, sack.w, sack.h - sack.neck, 0, neckH, w, h - neckH); };
+    // the sack's top melts into her: a little at the picked size, more as it grows, so a big one has no cap on it
+    const sc = tinted(sack, sw, sh, skin, null, twoPart), sg = sc.getContext("2d"), melt = Math.min(0.3, 0.05 * ks / k7);
+    sg.globalCompositeOperation = "destination-out"; const mg = sg.createLinearGradient(0, 0, 0, sc.height * melt);
+    mg.addColorStop(0, "rgba(0,0,0,1)"); mg.addColorStop(1, "rgba(0,0,0,0)"); sg.fillStyle = mg; sg.fillRect(0, 0, sc.width, sc.height * melt);
+    g.drawImage(sc, ax - nx * ks, ay);
+    g.drawImage(tinted(cock, cw, chh, skin, sack.ref), ax - nx * kc * girth, ay);
+    cv.ax = ax; cv.ay = ay + 2 + chh * 0.1; return cv;   // (hung from a little below its top, as the whole picture was)
+  }
+
+  // o: { kind, knot, inches, girth (1 = usual for the length), balls (1..20), hard, skin [r,g,b], and for stamps: style
+  // (which of the kind's hard ones), pent (the pent-up sack), stamps (false: the drawing even where there are stamps) }
   // Gives a canvas, with .ax .ay: the point in it where the cock joins her.
   function canvas(o) {
+    const st = o.stamps !== false && stamps[o.kind || "human"];
+    if (st) return stampCanvas(st, o, o.skin || [236, 204, 196]);
     const K = KINDS[o.kind] || KINDS.human, skin = o.skin || [236, 204, 196], hard = !!o.hard;
     const full = Math.max(16, (o.inches || 6) * PX_PER_INCH), L = full * (hard ? 1.06 : 0.9 * (0.55 + 0.45 * K.soft));   // soft, an animal's is partly drawn back
     const W = Math.max(7, (8 + full * 0.072) * (o.girth || 1) * (K.slim || 1) * (hard ? 1.06 : 1));                  // half-width: thicker as it gets longer, but not in step
@@ -139,5 +233,5 @@
     g.globalCompositeOperation = "source-over";
     return cv;
   }
-  window.FarmCock = { KINDS, PX_PER_INCH, ballR, canvas };
+  window.FarmCock = { KINDS, PX_PER_INCH, ballR, canvas, loadStamps, hasStamps, STAMP_FILES, get ver() { return ver; } };
 })();

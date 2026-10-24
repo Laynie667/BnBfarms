@@ -423,7 +423,7 @@ window.FarmBodyEngine = function (host) {
     v = acc.map((a) => (a[2] ? [a[0] / a[2], a[1] / a[2]] : null)); BREAST.halves.set(key, v); return v;
   }
   // ── between the legs ── (the studio's drawn cock; drawn: false leaves the game's own)
-  const GEN = { inches: 6, box: {}, drawn: true, kind: "human", knot: false, girth: 1, balls: 3, cv: null, cvKey: "" };   // drawn: ours (cock-drawing.js) in place of the game's picture
+  const GEN = { inches: 6, box: {}, drawn: true, kind: "human", knot: false, girth: 1, balls: 3, style: 0, pent: false, cv: null, cvKey: "" };   // drawn: ours (cock-drawing.js) in place of the game's picture; style and pent pick among its stamps
 
   // step into the game's drawing of our character: lay the belly in (after all the skin, or before the upper body), and
   // redraw any moulded piece to the new outline
@@ -1176,8 +1176,8 @@ window.FarmBodyEngine = function (host) {
             // a drawn cock, in place of the game's picture of one (soft or hard, whichever the game was about to draw)
             if (GEN.drawn && window.FarmCock && typeof src === "string" && groupOf(src) === "Pussy" && /Penis/.test(src)) {
               try { const hard = /\/Hard\//.test(src), skin = upperSkin || FarmBelly.FALLBACK.White;
-                const key = [GEN.kind, GEN.knot, GEN.inches, GEN.girth, GEN.balls, hard, skin.join(",")].join("|");
-                if (GEN.cvKey !== key) { GEN.cv = FarmCock.canvas({ kind: GEN.kind, knot: GEN.knot, inches: GEN.inches, girth: GEN.girth, balls: GEN.balls, hard, skin }); GEN.cvKey = key; }
+                const key = [GEN.kind, GEN.knot, GEN.inches, GEN.girth, GEN.balls, GEN.style, GEN.pent, FarmCock.ver || 0, hard, skin.join(",")].join("|");
+                if (GEN.cvKey !== key) { GEN.cv = FarmCock.canvas({ kind: GEN.kind, knot: GEN.knot, inches: GEN.inches, girth: GEN.girth, balls: GEN.balls, style: GEN.style, pent: GEN.pent, hard, skin }); GEN.cvKey = key; }
                 if (hard) { if (!blink) ctx.cock = [GEN.cv, x + 49.5 - GEN.cv.ax, y + 110 - GEN.cv.ay]; return; }   // standing: held back, and drawn once the belly is on, in front of it
                 put(blink ? "drawImageBlink" : "drawImage", GEN.cv, x + 49.5 - GEN.cv.ax, y + 110 - GEN.cv.ay, {}); return; } catch (e) { console.warn("[studio] cock:", e); }
             }

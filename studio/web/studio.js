@@ -386,6 +386,10 @@
           $("button", { type: "button", className: GEN.drawn ? "on" : "", textContent: GEN.drawn ? "Ours, drawn" : "The game's picture", title: "Ours can be any length, any kind, with balls of any size. The game's is one picture.", onclick: () => { GEN.drawn = !GEN.drawn; genFit(); bellyDraw(); fill(); } }),
           GEN.drawn ? $("select", { title: "What kind", onchange: (e) => { GEN.kind = e.target.value; bellyDraw(); } }, Object.keys(FarmCock.KINDS).map((k) => $("option", { value: k, textContent: FarmCock.KINDS[k].label, selected: k === GEN.kind }))) : "",
           GEN.drawn ? $("button", { type: "button", className: GEN.knot ? "on" : "", textContent: GEN.knot ? "Knotted" : "No knot", title: "A canine one always has a knot. It shows when it's hard.", onclick: () => { GEN.knot = !GEN.knot; bellyDraw(); fill(); } }) : "") : "",
+        // a kind drawn from stamps (Laynie's picked pictures): which shaft stands, and whether the sack is drained or pent up
+        cock && GEN.drawn && window.FarmCock && FarmCock.hasStamps && FarmCock.hasStamps(GEN.kind) ? $("div", { className: "row" },
+          genHard() ? FarmCock.STAMP_FILES[GEN.kind].hard.map((n, i) => $("button", { type: "button", className: (GEN.style | 0) === i ? "on" : "", textContent: n.replace(/^hard-/, "").replace("-", "."), title: "Which of her picked pictures stands", onclick: () => { GEN.style = i; bellyDraw(); fill(); } })) : "",
+          $("button", { type: "button", className: GEN.pent ? "on" : "", textContent: GEN.pent ? "Pent up" : "Drained", title: "The sack: drained and loose, or full and swollen", onclick: () => { GEN.pent = !GEN.pent; bellyDraw(); fill(); } })) : "",
         cock && GEN.drawn && window.FarmCock ? [["girth", "Girth", 0.6, 2, 0.05, ""], ["balls", "Balls, as the farm counts them (1 to 20)", 1, 20, 1, ""]].map(([k, label, min, max, step]) => { const v2 = $("span", { className: "fh-val", textContent: String(GEN[k]) });
           return $("div", { className: "fh-slide" }, $("label", { textContent: label }), $("input", { type: "range", min, max, step, value: GEN[k], oninput: (e) => { GEN[k] = Number(e.target.value); v2.textContent = String(GEN[k]); bellyDraw(); } }), v2); }) : ""].flat(Infinity)); };
     GEN.fill = fill; fill(); return box;
@@ -685,6 +689,8 @@
     CharacterAppearanceSetDefault(S.C);
     CharacterRefresh(S.C, false, false);
     panel(); S.ready = true; loadFits(false); loadItemFits(); loadBreasts(false);
+    // the stamps cut from Laynie's references (studio/web/_stamps, never in the repo): as each kind's come in, draw again
+    if (window.FarmCock && FarmCock.loadStamps) FarmCock.loadStamps("/__studio/_stamps/", () => { GEN.cvKey = ""; bellyDraw(); if (GEN.fill) GEN.fill(); });
     window.FarmStudio = { S, wear, decode, encode, setBody, setSkin, setPose, redraw, putOn, tint, slots, BELLY, bellyDraw, saveFits, loadFits, FIT, select, saveFit, fitSet, fitDraw, orderSet, orderNow, colourSet, colourLayers, configure, configureDone, stashFits, MOULD, BREAST, catalogue, CAT_SLOTS, GEN, genSet, genHardSet, genFit, chestAudit, setCup, cupNow, saveBreasts, loadBreasts };   // for poking at from the console
     say("Ready. Paste an outfit code, or change the body and pose below.");
   }

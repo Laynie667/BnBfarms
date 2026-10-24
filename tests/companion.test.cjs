@@ -164,7 +164,7 @@ const STATE = { name: "Laynie", onBooks: true, roles: ["PROPRIETOR", "LIVESTOCK"
 
   // 9. outfits: save, wear (with high security padlocks), leave locked spots alone, change back
   const G = { Cloth: { Name: "Cloth", Clothing: true, Category: "Appearance" }, HairFront: { Name: "HairFront", Clothing: false, Category: "Appearance" },
-              ItemArms: { Name: "ItemArms", Clothing: false, Category: "Item" }, ItemNeck: { Name: "ItemNeck", Clothing: false, Category: "Item" } };
+              ItemArms: { Name: "ItemArms", Clothing: false, Category: "Item" }, ItemNeck: { Name: "ItemNeck", Clothing: false, Category: "Item" }, ItemLegs: { Name: "ItemLegs", Clothing: false, Category: "Item" } };
   const item = (g, n, p) => ({ Asset: { Name: n, Group: G[g] }, Property: p || {} });
   const fromBundle = (b) => b.map((x) => item(x.Group, x.Name, x.Property));
   let loaded = null, updates = 0;
@@ -184,7 +184,8 @@ const STATE = { name: "Laynie", onBooks: true, roles: ["PROPRIETOR", "LIVESTOCK"
   w.Player.Appearance = [item("Cloth", "Dress"), item("HairFront", "Hair2"), item("ItemNeck", "Collar", { LockedBy: "OwnerPadlock", Effect: ["Lock"] })];
   const outfitData = w.LZString.compressToBase64(JSON.stringify({ v: 1, items: [
     { Group: "Cloth", Name: "Shirt", Property: {}, locked: false }, { Group: "ItemArms", Name: "HempRope", Property: {}, locked: true },
-    { Group: "ItemNeck", Name: "Choker", Property: {}, locked: false }] }));
+    { Group: "ItemNeck", Name: "Choker", Property: {}, locked: false }, { Group: "ItemLegs", Name: "LeatherBelt", Property: {}, locked: false }] }));
+  w.AssetGet = (fam, g, n) => ({ AllowLock: g.startsWith("Item") });   // the game: restraints take a lock, clothes don't
   bot({ type: "outfit", slot: "cow|female", label: "cow · female", data: outfitData, keys: [700, 800], why: "Welcome to the farm", id: 9 });
   out("9 offer banner ->", /put on your cow · female/.test(text()));
   click("Yes, dress me");
@@ -192,6 +193,7 @@ const STATE = { name: "Laynie", onBooks: true, roles: ["PROPRIETOR", "LIVESTOCK"
   out("9 clothes swapped, hair kept ->", by("Cloth").Name === "Shirt", by("HairFront").Name === "Hair2");
   out("9 locked piece gets a high security padlock ->", by("ItemArms").Property.LockedBy === "HighSecurityPadlock", by("ItemArms").Property.MemberNumberListKeys === "700,800");
   out("9 already-locked spot left alone ->", by("ItemNeck").Name === "Collar");
+  out("9 Oct 24: every piece that can take a lock gets one, clothes that can't don't ->", by("ItemLegs").Property.LockedBy === "HighSecurityPadlock", !by("Cloth").Property.LockedBy);
   out("9 room told, bot told ->", updates > 0, toBot("outfitAnswer").some((s) => s[1].Dictionary.answer === "worn"));
   bot({ type: "outfitBack", why: "shift's over" });
   const by2 = (g) => (loaded || []).find((b) => b.Group === g) || {};

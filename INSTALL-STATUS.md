@@ -13,7 +13,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 | Map tools, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.4** |
 | Dairy | `farmhand-dairy.user.js` | the bot's PC | **1.1.0** |
 | Shows | `farmhand-shows.user.js` | the bot's PC | **1.1.0** |
-| Farmhand Companion | `farmhand-companion.user.js` | each player | **0.37.0** |
+| Farmhand Companion | `farmhand-companion.user.js` | each player | **0.38.0** |
 | Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.4** |
 
 ## Sending a watch report
@@ -23,6 +23,8 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 - Running the watcher on more than one game at once (the bot, yours, a tester's) lets Claude line them up into one timeline.
 
 ## Latest changes (newest first)
+
+- **Companion 0.38.0: farm outfits lock on.** Laynie: "the outfits need to come with high security locks so they dont accidentally get swapped out." Every piece of a farm outfit that the game lets take a lock now gets the farm's high security padlock when it goes on (keyed to the farm's keyholders, ?outfit keys): collars, cuffs, mittens, gags, petsuits, chastity, tails. Plain clothes can't take a lock in the game itself, so those stay unlocked; Dress me puts them back. tests/companion.test.cjs step 9.
 
 - **Bot 0.44.0, Companion 0.37.0: Dress me.** Laynie: "I need a dress me button on the livestock and guest panels, that will dress them in the outfit that matches their records, in case they need to restore the outfit." **Dress me** on the Me tab and in Toggles → Farm outfit (Livestock), and on the Welcome tab (Guest), or ?dressme: puts straight back on the outfit their record calls for (a proprietor's saved outfit for their species and gender first, then the farm's own; their uniform while staff are clocked in; the luxury outfit for a guest when one is saved). Needs the Companion. tests/say-it.test.cjs.
 

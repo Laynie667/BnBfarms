@@ -45,6 +45,16 @@ export function captureOutfit() {
   return { data: window.LZString.compressToBase64(JSON.stringify({ v: 1, items })), items: items.length, locks };
 }
 
+// whether the game lets this piece take a lock (BC's InventoryDoesItemAllowLock, read off the asset)
+function canLock(it) {
+  try {
+    const A = window.AssetGet && window.AssetGet(P().AssetFamily || "Female3DCG", it.Group, it.Name);
+    if (!A) return false;
+    const tr = it.Property && it.Property.TypeRecord;
+    if (A.AllowLockType && tr && typeof tr === "object") return Object.entries(tr).some(([k, i]) => A.AllowLockType[k] && A.AllowLockType[k].has && A.AllowLockType[k].has(i));
+    return !!A.AllowLock;
+  } catch (e) { return false; }
+}
 // put a saved outfit on; keys = member numbers who may open the farm's locks
 export function wearOutfit(data, keys) {
   const outfit = JSON.parse(window.LZString.decompressFromBase64(String(data)) || "null");
@@ -65,7 +75,10 @@ export function wearOutfit(data, keys) {
     if (!g || !(isClothes(g) || isItem(g))) continue;
     if (stuck.has(it.Group)) { skipped++; continue; }
     const b = { Group: it.Group, Name: it.Name, Color: it.Color, Difficulty: it.Difficulty, Craft: it.Craft, Property: unlocked(it.Property) };
-    if (it.locked && keys && keys.length) {
+    // every piece the game lets take a lock gets the farm's high security padlock, so nothin' gets swapped out by accident
+    // (Laynie, Oct 24: "the outfits need to come with high security locks so they dont accidentally get swapped out").
+    // Most clothes can't take a lock in the game at all; the restraints, collars, mittens, gags and petsuits can.
+    if ((it.locked || canLock(it)) && keys && keys.length) {
       b.Property.Effect = (b.Property.Effect || []).concat(["Lock"]);
       Object.assign(b.Property, { LockedBy: "HighSecurityPadlock", LockMemberNumber: P().MemberNumber, MemberNumberListKeys: keys.join(",") });
       locks++;

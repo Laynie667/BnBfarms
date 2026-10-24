@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.37.0
+// @version      0.38.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -230,7 +230,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.37.0";
+  var VERSION = "0.38.0";
 
   // extension/src/config.js
   var BOT_MEMBER = 260239;
@@ -9065,6 +9065,17 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     }
     return { data: window.LZString.compressToBase64(JSON.stringify({ v: 1, items })), items: items.length, locks };
   }
+  function canLock(it) {
+    try {
+      const A = window.AssetGet && window.AssetGet(P().AssetFamily || "Female3DCG", it.Group, it.Name);
+      if (!A) return false;
+      const tr = it.Property && it.Property.TypeRecord;
+      if (A.AllowLockType && tr && typeof tr === "object") return Object.entries(tr).some(([k, i]) => A.AllowLockType[k] && A.AllowLockType[k].has && A.AllowLockType[k].has(i));
+      return !!A.AllowLock;
+    } catch (e) {
+      return false;
+    }
+  }
   function wearOutfit(data, keys) {
     const outfit = JSON.parse(window.LZString.decompressFromBase64(String(data)) || "null");
     if (!outfit || !Array.isArray(outfit.items)) return { ok: false, why: "that outfit didn't come through right" };
@@ -9086,7 +9097,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
         continue;
       }
       const b = { Group: it.Group, Name: it.Name, Color: it.Color, Difficulty: it.Difficulty, Craft: it.Craft, Property: unlocked(it.Property) };
-      if (it.locked && keys && keys.length) {
+      if ((it.locked || canLock(it)) && keys && keys.length) {
         b.Property.Effect = (b.Property.Effect || []).concat(["Lock"]);
         Object.assign(b.Property, { LockedBy: "HighSecurityPadlock", LockMemberNumber: P().MemberNumber, MemberNumberListKeys: keys.join(",") });
         locks++;

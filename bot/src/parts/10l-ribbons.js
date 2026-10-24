@@ -103,6 +103,7 @@
     { id: "lucky",     name: "A lucky spin",          price: 8,  desc: "Mostly sweet slices. Mostly." },
     { id: "luxury",    name: "A luxury day",          price: 25, desc: "24 hours as a luxury guest: the soft straw, the good feed, and everybody calls you darlin'." },
     { id: "skipchore", name: "Skip a chore",          price: 4,  desc: "Your chore comes off the board. Nobody needs to know." },
+    { id: "roampass",  name: "A roam pass",           price: CFG.ROAM_PASS_PRICE, desc: "An hour off the farm, for anybody whose contract has them ready to be summoned. ?roam start when you're ready to go; late back and you're fetched (10uk-roam.js)." },
     { id: "grace",     name: "Quota grace",           price: 10, desc: "Forgives one missed milk quota day before it becomes a naughty mark (hold up to 2)." },
     { id: "greeting",  name: "A greetin' of your own", price: 8, desc: "For a week, the farm girl greets you with a line you write (staff read it first). ?buy greeting <your line>" },
     { id: "tag",       name: "A ribbon tag",          price: 5,  desc: "A little tag by your name on ?who for a week. ?buy tag <up to 24 letters>, like ?buy tag Good Girl" },
@@ -213,6 +214,13 @@
         if (!r.chore){ R("You haven't got a chore right now, sugar, so keep your ribbons."); return; }
         spendRibbons(sender, price, it.name); const was = r.chore.text; r.chore = null;
         done("🧹 \""+String(was).replace(/\s*@[a-z0-9_-]+\s*$/i, "")+"\" is off your list. Our little secret.");
+        return;
+      }
+      case "roampass": {
+        if (!roamContract(sender)){ R("🧭 You're not under a contract that has you ready to be summoned, sugar, so you come and go as you please. Keep your ribbons."); return; }
+        if ((r.roamPasses || 0) >= CFG.ROAM_PASS_HOLD){ R("🧭 You're already holdin' "+CFG.ROAM_PASS_HOLD+" passes, sugar. Use one first."); return; }
+        spendRibbons(sender, price, it.name); r.roamPasses = (r.roamPasses || 0) + 1; syncCompanions(true);
+        done("🧭 A roam pass in your pocket ("+r.roamPasses+" now). ?roam start when you want your hour; walk off the farm and it starts by itself.");
         return;
       }
       case "grace": {

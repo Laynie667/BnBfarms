@@ -528,6 +528,7 @@
       case "hypnotize": case "hypnotise": hypnotizeCommand(sender, args, R); break;   // ECHS (10uj-echs.js)
       case "allow": case "letgo": releaseCommand(sender, args, R); break;
       case "echs": echsStatus(sender, args, R); break;
+      case "roam": roamCommand(sender, args, R); break;   // roam passes (10uk-roam.js)
       case "tease": teaseLinesCommand(sender, args, R); break;
       case "voice": if (!RETIRED_ON) { R("That one's been retired, sugar: the farm doesn't send herd voice lines any more."); break; }
       // eslint-disable-next-line no-fallthrough
@@ -1199,6 +1200,7 @@
         audit(sender,"SAFEWORD",channel);
         addonsEmit("safe", sender);
         try { echsWake(sender, true); } catch(e){ warn("safeword echs:", e); }   // a trance I'm runnin' ends too
+        { const r1 = rec(sender); if (r1){ r1.roamSafeUntil = Date.now() + CFG.ROAM_SAFE_MIN*60000; saveLedger(); } }   // and nobody fetches them home for a while (10uk-roam.js)
         stopScene(sender);            // a milkin', breedin' or edgin' scene stops mid-beat   // add-ons stop anything they're doin' to this person (scenes, sessions…)
         dropLeashes(sender); state.tours.delete(sender);
         { const r0 = rec(sender); if (r0 && r0.prod){ r0.prod.pin = null; r0.prod.unpinUntil = Date.now() + CFG.PROD.SAFEWORD_UNPIN_MIN*60000; saveLedger(); } }

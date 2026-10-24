@@ -12,6 +12,7 @@ export const PUBLIC_GROUPS = [
   { name: "Stock with stock", cmds: ["milk <who>", "edge <who>", "groom <who>"] },
   { name: "Breedin'", cmds: ["breedable", "fertile", "mpreg", "freeuse", "jarok", "yes", "no", "naturalheat", "breed <who>", "cum <who>", "wash", "tally", "eggs", "praise", "degrade", "rights", "accept", "pedigree"] },
   { name: "Body", cmds: ["size", "measure", "penis", "futa", "gender <word>"] },
+  { name: "Roamin'", cmds: ["roam", "roam start", "roam back"] },
   { name: "Clothes", cmds: ["dressme", "outfit", "outfits", "uniform", "outfit back"] },
   { name: "Mind", cmds: ["hypno", "hypnotize me", "echs", "teaseme", "teaseme light", "teaseme steady", "teaseme needy", "teaseme off"] },
   { name: "Fun", cmds: ["fair", "enter"] },
@@ -21,7 +22,7 @@ export const PUBLIC_GROUPS = [
 export const STAFF_GROUPS = [
   { name: "Books", cmds: ["queue", "app <n>", "approve <who> livestock", "deny <who>", "appclear", "roster", "stock", "find <who>", "record <who>", "note <who>", "signed", "addfriend <who>", "unregister <who>", "unregister <who> <role>"] },
   { name: "Herd", cmds: ["claim <who>", "release <who>", "myherd", "herdname <name>", "herdcall", "herdsummon", "turnout <who>", "letup <who>", "brand <who>", "walk <who>"] },
-  { name: "Stock", cmds: ["tier <who> <tier>", "stocks <who>", "unstock <who>", "vet <who>", "inspect <who>", "tease list", "tease add <line>", "tease for <who> <line>", "teaseme <who> on", "hypnotize <who>", "allow <who> cum", "allow <who> all", "echs <who>"] },
+  { name: "Stock", cmds: ["tier <who> <tier>", "stocks <who>", "unstock <who>", "vet <who>", "inspect <who>", "tease list", "tease add <line>", "tease for <who> <line>", "teaseme <who> on", "roam give <who>", "roam <who>", "hypnotize <who>", "allow <who> cum", "allow <who> all", "echs <who>"] },
   { name: "Contracts", cmds: ["contract list", "contract show deep <who>", "contract offer deep <who> 1w", "contract check <who>", "contract release <who>", "contract rules", "contracts"] },
   { name: "Outfits", cmds: ["outfit", "outfit offer <who>", "outfit offer <who> <species> <gender>"] },
   { name: "Barn", cmds: ["milk <who>", "collect <who>", "jars", "inseminate <who> <jar>", "machine <who> <jar>", "drain <who>", "edge <who>", "denial <who>", "ruin <who>", "nomilk <who> <hours>", "quota <who>", "heat <who>", "heatline", "shotlog"] },

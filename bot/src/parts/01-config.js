@@ -100,6 +100,17 @@
     TEASE_DAY_MAX: 40,         // Tease Me: never more than this many to one person in a day
     /* ── ECHS ── the hypnosis add-on, through its front door (10uj-echs.js) */
     ECHS_ON: true,
+    /* ── ROAM ── passes off the farm for summonable contracts, and fetchin' them home (10uk-roam.js) */
+    ROAM_ON: true,
+    ROAM_PASSES: { fun: 0, deep: 0, nhl: 0, custom: 0, unknown: 0 },   // free one-hour passes a day, by the contract's level (Oct 24: none; they buy them)
+    ROAM_PASS_PRICE: 20,         // ribbons for an hour's roam pass in the store (Laynie: "a high cost shop item")
+    ROAM_PASS_HOLD: 3,           // most passes they can carry
+    ROAM_PASS_MIN: 60,
+    ROAM_WARN_MIN: [10, 2],      // whispers before a pass runs out
+    ROAM_GRACE_S: 60,            // off the farm with no pass left: this long, then summoned
+    ROAM_RESUMMON_MIN: 5,        // still not home after a summon: try again this often
+    ROAM_FINE: 1,                // ribbons, with a naughty mark, for bein' late or slippin' off
+    ROAM_SAFE_MIN: 30,           // nobody's fetched for this long after their safeword
     ECHS_SKILL: 0,              // the hypnotist skill I declare to their ECHS (their own setting decides whether it counts)
     ECHS_ANSWER_S: 20,          // no answer by then: they haven't got ECHS running
     ECHS_OFFER_EVERY_MIN: 120,  // ?hypno on folk who are around get asked this often (0: only when they ask, a trap, or their herd leader)

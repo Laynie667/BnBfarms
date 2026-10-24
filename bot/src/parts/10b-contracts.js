@@ -38,7 +38,11 @@
     // relogging, and return to chatrooms rules." (A template can still drop one of those on purpose: tpl.remove below.)
     let cock = false; try { cock = bodyOf(mn).cock; } catch(e){ cock = !!r.futa || makesSemen(mn); }
     if (cock && !["male", "nonbinary"].includes(r.gender)) delete rules["body.controlOrgasms"];
-    rules["chat.forbidLeaving"] = rules["chat.forbidLeaving"] || BCPLUS.makeSpec("chat.forbidLeaving");
+    // Oct 24: Forbid leaving the room is out, the farm girl is the fence instead (10uk-roam.js): every contract has them ready
+    // to be summoned, roam passes let them out an hour at a time, and she fetches them home (Laynie: "pick when they roam,
+    // which will need to figure out how to enforce the prevent leaving rules in a different way"). A template can still add it.
+    delete rules["chat.forbidLeaving"]; delete rules["rooms.entry"];
+    if (!rules["other.summon"]){ const f = farmInfo(); rules["other.summon"] = BCPLUS.makeSpec("other.summon", { allowedMembers: [f.bot].concat(f.staff).filter(m => Number.isInteger(m)).slice(0, 100), summonText: "summon", delay: "10" }); }
     rules["settings.relogKeepsRestraints"] = BCPLUS.makeSpec("settings.relogKeepsRestraints", { value: "Restraints kept" });
     rules["settings.roomRejoin"] = BCPLUS.makeSpec("settings.roomRejoin", { value: "Returns to the room" });
     for (const id of tpl.remove || []) delete rules[id];

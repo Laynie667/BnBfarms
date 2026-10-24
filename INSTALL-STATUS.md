@@ -5,7 +5,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 | Script | File in `dist/` | Where it runs | Current |
 |---|---|---|---|
-| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.44.0** |
+| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.45.0** |
 | Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.10.0** |
 | Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.2.1** |
 | Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **1.1.0** |
@@ -13,7 +13,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 | Map tools, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.4** |
 | Dairy | `farmhand-dairy.user.js` | the bot's PC | **1.1.0** |
 | Shows | `farmhand-shows.user.js` | the bot's PC | **1.1.0** |
-| Farmhand Companion | `farmhand-companion.user.js` | each player | **0.38.0** |
+| Farmhand Companion | `farmhand-companion.user.js` | each player | **0.39.0** |
 | Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.4** |
 
 ## Sending a watch report
@@ -23,6 +23,12 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 - Running the watcher on more than one game at once (the bot, yours, a tester's) lets Claude line them up into one timeline.
 
 ## Latest changes (newest first)
+
+- **Bot 0.45.0, Companion 0.39.0: roam passes, and the summon with bite.** Laynie, Oct 24: "I need to give the contracts with a ready to be summoned rule some bite", "pick when they roam, which will need to figure out how to enforce the prevent leaving rules in a different way", "instead of a daily allotment, could have them earn to buy a hour roaming pass", and "I like them being able to wander the map but have the zones ready."
+  - **The farm girl is the fence now.** New contracts carry BC+'s Ready to be summoned (the farm girl and staff as summoners) instead of Forbid leaving the room, and no human left no longer has a room list. The whole map and every zone stay theirs to wander; leaving the farm room is what takes a pass. Contracts already signed keep Forbid leaving till they end.
+  - **Roam passes are bought:** ?buy roampass, 20 ribbons for an hour off the farm, up to 3 held. A herd leader or staff can give them (?roam give <who> [n]). ?roam start (or Roam for an hour on the Companion's Me tab) uses one; walking off the farm without startin' one uses one by itself.
+  - **The bite:** she sees where they are from the online friends list (they must be friends with her both ways). A whisper at 10 and 2 minutes left, then she summons them home. Late back, or off the farm with no pass (after a minute's grace), and it's a naughty mark and a ribbon, and their herd leader hears. Still out five minutes after a summon: she summons again. Never right after a safeword, and never once the contract's over.
+  - bot/src/parts/10uk-roam.js; tests/roam.test.cjs, contracts-bot step 7.
 
 - **Companion 0.38.0: farm outfits lock on.** Laynie: "the outfits need to come with high security locks so they dont accidentally get swapped out." Every piece of a farm outfit that the game lets take a lock now gets the farm's high security padlock when it goes on (keyed to the farm's keyholders, ?outfit keys): collars, cuffs, mittens, gags, petsuits, chastity, tails. Plain clothes can't take a lock in the game itself, so those stay unlocked; Dress me puts them back. tests/companion.test.cjs step 9.
 

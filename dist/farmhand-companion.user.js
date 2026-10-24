@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.38.0
+// @version      0.39.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -230,7 +230,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.38.0";
+  var VERSION = "0.39.0";
 
   // extension/src/config.js
   var BOT_MEMBER = 260239;
@@ -428,6 +428,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     { name: "Stock with stock", cmds: ["milk <who>", "edge <who>", "groom <who>"] },
     { name: "Breedin'", cmds: ["breedable", "fertile", "mpreg", "freeuse", "jarok", "yes", "no", "naturalheat", "breed <who>", "cum <who>", "wash", "tally", "eggs", "praise", "degrade", "rights", "accept", "pedigree"] },
     { name: "Body", cmds: ["size", "measure", "penis", "futa", "gender <word>"] },
+    { name: "Roamin'", cmds: ["roam", "roam start", "roam back"] },
     { name: "Clothes", cmds: ["dressme", "outfit", "outfits", "uniform", "outfit back"] },
     { name: "Mind", cmds: ["hypno", "hypnotize me", "echs", "teaseme", "teaseme light", "teaseme steady", "teaseme needy", "teaseme off"] },
     { name: "Fun", cmds: ["fair", "enter"] },
@@ -436,7 +437,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
   var STAFF_GROUPS = [
     { name: "Books", cmds: ["queue", "app <n>", "approve <who> livestock", "deny <who>", "appclear", "roster", "stock", "find <who>", "record <who>", "note <who>", "signed", "addfriend <who>", "unregister <who>", "unregister <who> <role>"] },
     { name: "Herd", cmds: ["claim <who>", "release <who>", "myherd", "herdname <name>", "herdcall", "herdsummon", "turnout <who>", "letup <who>", "brand <who>", "walk <who>"] },
-    { name: "Stock", cmds: ["tier <who> <tier>", "stocks <who>", "unstock <who>", "vet <who>", "inspect <who>", "tease list", "tease add <line>", "tease for <who> <line>", "teaseme <who> on", "hypnotize <who>", "allow <who> cum", "allow <who> all", "echs <who>"] },
+    { name: "Stock", cmds: ["tier <who> <tier>", "stocks <who>", "unstock <who>", "vet <who>", "inspect <who>", "tease list", "tease add <line>", "tease for <who> <line>", "teaseme <who> on", "roam give <who>", "roam <who>", "hypnotize <who>", "allow <who> cum", "allow <who> all", "echs <who>"] },
     { name: "Contracts", cmds: ["contract list", "contract show deep <who>", "contract offer deep <who> 1w", "contract check <who>", "contract release <who>", "contract rules", "contracts"] },
     { name: "Outfits", cmds: ["outfit", "outfit offer <who>", "outfit offer <who> <species> <gender>"] },
     { name: "Barn", cmds: ["milk <who>", "collect <who>", "jars", "inseminate <who> <jar>", "machine <who> <jar>", "drain <who>", "edge <who>", "denial <who>", "ruin <who>", "nomilk <who> <hours>", "quota <who>", "heat <who>", "heatline", "shotlog"] },
@@ -5513,6 +5514,16 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     return [
       card(h("div", { class: "fhc-title" }, s.name), h("div", { style: { marginTop: "6px" } }, chips)),
       happeningCard(ctx3),
+      s.roam && card(
+        h("div", { class: "fhc-kv" }, title("\u{1F9ED} Roam passes"), chip(s.roam.left + " held", s.roam.left ? "acc" : "alert")),
+        s.roam.until ? muted("Roamin' now: back on the farm by " + new Date(s.roam.until).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) + ", or the farm girl fetches you.") : muted("An hour off the farm each; the whole map is yours either way. Walk off without one and you're summoned home, and late back costs you."),
+        h(
+          "div",
+          null,
+          s.roam.until ? btn("I'm back", () => ctx3.send("roam back")) : s.roam.left ? btn("Roam for an hour", () => ctx3.send("roam start"), true) : null,
+          s.roam.until ? null : btn("Buy a pass \xB7 " + (s.roam.price || 20) + " \u{1F380}", () => ctx3.send("buy roampass"))
+        )
+      ),
       bars.some(Boolean) && card(
         title("Today"),
         bars,

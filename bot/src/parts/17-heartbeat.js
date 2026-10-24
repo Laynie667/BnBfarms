@@ -50,6 +50,7 @@
       // (voiceTick retired Oct 19: the herd's voice lines are gone; Tease Me came back Oct 23, 10uh-teaseme.js)
       try { teaseMeTick(); } catch(e){ warn("tease:", e); }
       try { echsTick(); } catch(e){ warn("echs:", e); }
+      try { roamTick(); } catch(e){ warn("roam:", e); }
       rutTick();
       quotaTick();
       prodTick();

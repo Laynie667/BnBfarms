@@ -133,6 +133,7 @@
       try {
         if (!d || d.Query !== "OnlineFriends" || !Array.isArray(d.Result)) return;
         state.mutual = { at: Date.now(), set: new Set(d.Result.map(x => x && x.MemberNumber).filter(Number.isFinite)) };
+        state.where = new Map(d.Result.filter(x => x && Number.isFinite(x.MemberNumber)).map(x => [x.MemberNumber, { room: x.ChatRoomName || null }]));   // which room each is in (roam passes, 10uk-roam.js)
         for (const mn of state.mutual.set) if (L.mailbox && L.mailbox[mn]) deliverMail(mn);
       } catch(e){ warn("friends result:", e); }
     });

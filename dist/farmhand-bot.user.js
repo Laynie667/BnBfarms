@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.44.0
+// @version      0.45.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -2221,6 +2221,7 @@
     { name: "Stock with stock", cmds: ["milk <who>", "edge <who>", "groom <who>"] },
     { name: "Breedin'", cmds: ["breedable", "fertile", "mpreg", "freeuse", "jarok", "yes", "no", "naturalheat", "breed <who>", "cum <who>", "wash", "tally", "eggs", "praise", "degrade", "rights", "accept", "pedigree"] },
     { name: "Body", cmds: ["size", "measure", "penis", "futa", "gender <word>"] },
+    { name: "Roamin'", cmds: ["roam", "roam start", "roam back"] },
     { name: "Clothes", cmds: ["dressme", "outfit", "outfits", "uniform", "outfit back"] },
     { name: "Mind", cmds: ["hypno", "hypnotize me", "echs", "teaseme", "teaseme light", "teaseme steady", "teaseme needy", "teaseme off"] },
     { name: "Fun", cmds: ["fair", "enter"] },
@@ -2229,7 +2230,7 @@
   var STAFF_GROUPS = [
     { name: "Books", cmds: ["queue", "app <n>", "approve <who> livestock", "deny <who>", "appclear", "roster", "stock", "find <who>", "record <who>", "note <who>", "signed", "addfriend <who>", "unregister <who>", "unregister <who> <role>"] },
     { name: "Herd", cmds: ["claim <who>", "release <who>", "myherd", "herdname <name>", "herdcall", "herdsummon", "turnout <who>", "letup <who>", "brand <who>", "walk <who>"] },
-    { name: "Stock", cmds: ["tier <who> <tier>", "stocks <who>", "unstock <who>", "vet <who>", "inspect <who>", "tease list", "tease add <line>", "tease for <who> <line>", "teaseme <who> on", "hypnotize <who>", "allow <who> cum", "allow <who> all", "echs <who>"] },
+    { name: "Stock", cmds: ["tier <who> <tier>", "stocks <who>", "unstock <who>", "vet <who>", "inspect <who>", "tease list", "tease add <line>", "tease for <who> <line>", "teaseme <who> on", "roam give <who>", "roam <who>", "hypnotize <who>", "allow <who> cum", "allow <who> all", "echs <who>"] },
     { name: "Contracts", cmds: ["contract list", "contract show deep <who>", "contract offer deep <who> 1w", "contract check <who>", "contract release <who>", "contract rules", "contracts"] },
     { name: "Outfits", cmds: ["outfit", "outfit offer <who>", "outfit offer <who> <species> <gender>"] },
     { name: "Barn", cmds: ["milk <who>", "collect <who>", "jars", "inseminate <who> <jar>", "machine <who> <jar>", "drain <who>", "edge <who>", "denial <who>", "ruin <who>", "nomilk <who> <hours>", "quota <who>", "heat <who>", "heatline", "shotlog"] },
@@ -2244,7 +2245,7 @@
   ];
 
   // bot/src/version.js
-  var VERSION = "0.44.0";
+  var VERSION = "0.45.0";
 
   // bot-parts:farmhand-bot-parts
   (function() {
@@ -2348,6 +2349,25 @@
       // Tease Me: never more than this many to one person in a day
       /* ── ECHS ── the hypnosis add-on, through its front door (10uj-echs.js) */
       ECHS_ON: true,
+      /* ── ROAM ── passes off the farm for summonable contracts, and fetchin' them home (10uk-roam.js) */
+      ROAM_ON: true,
+      ROAM_PASSES: { fun: 0, deep: 0, nhl: 0, custom: 0, unknown: 0 },
+      // free one-hour passes a day, by the contract's level (Oct 24: none; they buy them)
+      ROAM_PASS_PRICE: 20,
+      // ribbons for an hour's roam pass in the store (Laynie: "a high cost shop item")
+      ROAM_PASS_HOLD: 3,
+      // most passes they can carry
+      ROAM_PASS_MIN: 60,
+      ROAM_WARN_MIN: [10, 2],
+      // whispers before a pass runs out
+      ROAM_GRACE_S: 60,
+      // off the farm with no pass left: this long, then summoned
+      ROAM_RESUMMON_MIN: 5,
+      // still not home after a summon: try again this often
+      ROAM_FINE: 1,
+      // ribbons, with a naughty mark, for bein' late or slippin' off
+      ROAM_SAFE_MIN: 30,
+      // nobody's fetched for this long after their safeword
       ECHS_SKILL: 0,
       // the hypnotist skill I declare to their ECHS (their own setting decides whether it counts)
       ECHS_ANSWER_S: 20,
@@ -4148,7 +4168,10 @@
     }, __wordsFor: (m, t) => wordsFor(m, t), __overdue: (m) => overdueStage(m), __milkCum: (m) => stallClimax(m), __intSev: (m, s) => intensitySev(m, s), __intTail: (m, k) => intensityTail(m, 5, 6, k), __holes: (m) => holesFor(m), __album: (m) => albumFor(m, 60), __holeTook: (m, h, a) => holeTook(m, h, a), __dreamTheme: (m) => dreamTheme(m), __eggsWorth: (t, n) => eggsWorth(t, n), __rank: (m) => rankX(m), __broodBook: (m) => broodBook(m), __belly: (m) => bellyStage(m), __happening: (m) => happeningFor(m), __gearOn: (m, s, l, d, x) => gearOn(m, s, l, d, x), __heard: (mn, t) => trapHeard(mn, t), __parasiteTick: () => parasiteTick(), __parts: (m) => parasiteParts(rec(m).parasite), __climax: (m) => parasiteClimax(m), __nurse: (a, b) => parasiteNurse(a, b), __parasiteChance: (m) => parasiteChance(m), __kiss: (a, f, s, t) => parasiteKiss(a, f, s, t), __load: (s, m, h, x) => parasiteLoad(s, m, h, x), __shot: (t, by, text, how) => applyShot(t, by, text, how), __slow: (mn) => slowOf(mn), __milkRate: (mn) => milkRate(mn), __benchTick: () => benchTick(), __roll: (m, s, a, b) => rollConception(m, s, a, b), __contractTick: () => {
       state.cwAt = 0;
       contractWatchTick();
-    }, __lingerTick: () => lingerTick(), __ribbonTick: () => ribbonTick(), __dareTick: () => dareTick(), __potionOn: (mn, id) => potionOn(mn, id), __milkRate: (mn) => milkRate(mn), __addonLine: (k, i) => addonLine(k, i), __lineInfo: (m, x) => lineInfo(m, x), __gearSense: (m) => gearSense(m), __symTick: () => symbioteTick(), __symBond: (m, k, h) => symBond(m, k, h), __symFed: (m, h, x) => symbioteFed(m, h, x), __capacity: (m) => capacity(m), __symLines: () => SYM_LINES, __newTrapLines: () => NEW_TRAP_LINES, __farmGear: (m) => farmGearFor(m), __mazeTick: () => mazeTick(), __symSpread: (a, b, k, h) => symSpread(a, b, k, h), __symGear: (m) => symGear(m), __farmSets: () => ({ TRAP_GEAR, TRAP_KINDS, CURSES, SUIT_STAGES, SUIT_COLOR, MESS, MESS_BY_TRAP, SYM_GEAR }), __messShelf: () => MESS_SHELF, __broodTick: () => broodTick(), __teaseTick: () => teaseMeTick(), __echsTick: () => echsTick(), __teaseLine: (m) => teaseLine(m), __teaseCtx: (m) => teaseContexts(m).map((c) => c[0]) });
+    }, __lingerTick: () => lingerTick(), __ribbonTick: () => ribbonTick(), __dareTick: () => dareTick(), __potionOn: (mn, id) => potionOn(mn, id), __milkRate: (mn) => milkRate(mn), __addonLine: (k, i) => addonLine(k, i), __lineInfo: (m, x) => lineInfo(m, x), __gearSense: (m) => gearSense(m), __symTick: () => symbioteTick(), __symBond: (m, k, h) => symBond(m, k, h), __symFed: (m, h, x) => symbioteFed(m, h, x), __capacity: (m) => capacity(m), __symLines: () => SYM_LINES, __newTrapLines: () => NEW_TRAP_LINES, __farmGear: (m) => farmGearFor(m), __mazeTick: () => mazeTick(), __symSpread: (a, b, k, h) => symSpread(a, b, k, h), __symGear: (m) => symGear(m), __farmSets: () => ({ TRAP_GEAR, TRAP_KINDS, CURSES, SUIT_STAGES, SUIT_COLOR, MESS, MESS_BY_TRAP, SYM_GEAR }), __messShelf: () => MESS_SHELF, __broodTick: () => broodTick(), __teaseTick: () => teaseMeTick(), __echsTick: () => echsTick(), __roamTick: () => {
+      state.roamTickAt = 0;
+      roamTick();
+    }, __teaseLine: (m) => teaseLine(m), __teaseCtx: (m) => teaseContexts(m).map((c) => c[0]) });
     W.FarmhandSyncKeys = () => syncAllPresent(true);
     W.FarmhandFriends = () => W.Player.FriendList;
     W.FarmhandAddFriend = (mn) => addFriend(mn, false);
@@ -5345,6 +5368,10 @@
         });
         part("keepsakes", () => keepersStateFor(mn, s));
         part("udders", () => uddersStateFor(mn, s));
+        part("roam", () => {
+          const x = roamState(mn);
+          if (x) s.roam = x;
+        });
         part("wants", () => {
           const w = wantsFor(mn);
           if (w.length) s.wants = w;
@@ -8073,7 +8100,12 @@
         cock = !!r.futa || makesSemen(mn);
       }
       if (cock && !["male", "nonbinary"].includes(r.gender)) delete rules["body.controlOrgasms"];
-      rules["chat.forbidLeaving"] = rules["chat.forbidLeaving"] || makeSpec("chat.forbidLeaving");
+      delete rules["chat.forbidLeaving"];
+      delete rules["rooms.entry"];
+      if (!rules["other.summon"]) {
+        const f = farmInfo();
+        rules["other.summon"] = makeSpec("other.summon", { allowedMembers: [f.bot].concat(f.staff).filter((m) => Number.isInteger(m)).slice(0, 100), summonText: "summon", delay: "10" });
+      }
       rules["settings.relogKeepsRestraints"] = makeSpec("settings.relogKeepsRestraints", { value: "Restraints kept" });
       rules["settings.roomRejoin"] = makeSpec("settings.roomRejoin", { value: "Returns to the room" });
       for (const id of tpl.remove || []) delete rules[id];
@@ -10376,6 +10408,7 @@
       { id: "lucky", name: "A lucky spin", price: 8, desc: "Mostly sweet slices. Mostly." },
       { id: "luxury", name: "A luxury day", price: 25, desc: "24 hours as a luxury guest: the soft straw, the good feed, and everybody calls you darlin'." },
       { id: "skipchore", name: "Skip a chore", price: 4, desc: "Your chore comes off the board. Nobody needs to know." },
+      { id: "roampass", name: "A roam pass", price: CFG.ROAM_PASS_PRICE, desc: "An hour off the farm, for anybody whose contract has them ready to be summoned. ?roam start when you're ready to go; late back and you're fetched (10uk-roam.js)." },
       { id: "grace", name: "Quota grace", price: 10, desc: "Forgives one missed milk quota day before it becomes a naughty mark (hold up to 2)." },
       { id: "greeting", name: "A greetin' of your own", price: 8, desc: "For a week, the farm girl greets you with a line you write (staff read it first). ?buy greeting <your line>" },
       { id: "tag", name: "A ribbon tag", price: 5, desc: "A little tag by your name on ?who for a week. ?buy tag <up to 24 letters>, like ?buy tag Good Girl" },
@@ -10540,6 +10573,21 @@
           const was = r.chore.text;
           r.chore = null;
           done('\u{1F9F9} "' + String(was).replace(/\s*@[a-z0-9_-]+\s*$/i, "") + '" is off your list. Our little secret.');
+          return;
+        }
+        case "roampass": {
+          if (!roamContract(sender)) {
+            R("\u{1F9ED} You're not under a contract that has you ready to be summoned, sugar, so you come and go as you please. Keep your ribbons.");
+            return;
+          }
+          if ((r.roamPasses || 0) >= CFG.ROAM_PASS_HOLD) {
+            R("\u{1F9ED} You're already holdin' " + CFG.ROAM_PASS_HOLD + " passes, sugar. Use one first.");
+            return;
+          }
+          spendRibbons(sender, price, it.name);
+          r.roamPasses = (r.roamPasses || 0) + 1;
+          syncCompanions(true);
+          done("\u{1F9ED} A roam pass in your pocket (" + r.roamPasses + " now). ?roam start when you want your hour; walk off the farm and it starts by itself.");
           return;
         }
         case "grace": {
@@ -21158,6 +21206,196 @@
       }
       const v = echsOf(t), e = rec(t).echs || {}, ago = (x) => x ? Math.max(1, Math.round((Date.now() - x) / 6e4)) + " min ago" : "never";
       R("\u{1F300} ECHS and the farm, " + plainName(t) + ": " + (v ? { Asked: "I've just reached for them", AttemptMade: "their box is up", InductionInProgress: "goin' under", AttemptFailed: "it didn't take this time", Hypnotized: "under with me, " + (v.band || "under") }[v.phase] || v.phase : "nothin' runnin' with me") + " \xB7 ?hypno " + (rec(t).hypno ? "on" : "off") + " \xB7 ECHS last answered: " + ago(e.seen) + " \xB7 last under with me: " + ago(e.underAt) + (e.n ? " (" + e.n + " times)" : "") + ".");
+    }
+    function roamContract(mn) {
+      contractsLedger();
+      const now = Date.now();
+      return L2.contracts.filter((x) => x.mn === mn && x.status === "signed" && (!x.until || x.until > now) && (x.rules || []).includes("other.summon")).sort((a, b) => (CFG.ROAM_PASSES[b.depth] || 0) - (CFG.ROAM_PASSES[a.depth] || 0))[0] || null;
+    }
+    function roamOf(mn) {
+      const r = rec(mn);
+      if (!r) return null;
+      const day = dayKey();
+      if (!r.roam || r.roam.day !== day) r.roam = { day, used: 0, give: 0, until: r.roam && r.roam.until > Date.now() ? r.roam.until : 0 };
+      return r.roam;
+    }
+    const roamFree = (mn, x) => CFG.ROAM_PASSES[(x || roamContract(mn) || {}).depth] || CFG.ROAM_PASSES.custom || 0;
+    const roamHeld = (mn) => (rec(mn) || {}).roamPasses || 0;
+    const roamPasses = (mn, x) => roamFree(mn, x) + roamHeld(mn);
+    const roamLeft = (mn) => Math.max(0, roamFree(mn) - ((roamOf(mn) || {}).used || 0)) + roamHeld(mn);
+    const clockOf = (t) => {
+      const d = new Date(t);
+      return String(d.getHours()).padStart(2, "0") + ":" + String(d.getMinutes()).padStart(2, "0");
+    };
+    function roamWhere(mn) {
+      if (charFor(mn)) return "here";
+      const m = state.mutual;
+      if (!m || !m.set || !m.set.has(mn) || Date.now() - m.at > 5 * 6e4) return "";
+      const w = state.where && state.where.get(mn);
+      return w && w.room === CFG.ROOM_NAME ? "here" : "away";
+    }
+    function roamStart(mn, auto) {
+      const g = roamOf(mn);
+      if (!g) return false;
+      if (g.until > Date.now()) return true;
+      if (roamLeft(mn) <= 0) return false;
+      if (g.used < roamFree(mn)) g.used++;
+      else {
+        const r = rec(mn);
+        r.roamPasses = Math.max(0, (r.roamPasses || 0) - 1);
+      }
+      g.wentAt = auto ? Date.now() : 0;
+      g.until = Date.now() + CFG.ROAM_PASS_MIN * 6e4;
+      g.warned = [];
+      g.strayAt = 0;
+      saveLedger();
+      syncCompanions(true);
+      const back = clockOf(g.until), left = roamLeft(mn);
+      beep(mn, auto ? "\u{1F9ED} You wandered off the farm, sugar, so that's a roam pass spent. Back by " + back + ". " + left + " left." : "\u{1F9ED} Off you go, sugar. You've got an hour: back by " + back + ", or I'll fetch you. " + left + " left.");
+      audit(mn, "ROAM_START", auto ? "auto" : "asked");
+      return true;
+    }
+    function roamSummon(mn, why) {
+      const g = roamOf(mn);
+      if (!g) return;
+      g.summonedAt = Date.now();
+      saveLedger();
+      send("AccountBeep", { MemberNumber: mn, BeepType: "", IsSecret: false, Message: "summon \xB7 " + why });
+      log("ROAM: summoned " + mn + " (" + why + ")");
+    }
+    function roamPenalty(mn, what) {
+      const r = rec(mn);
+      if (!r) return;
+      r.naughtyMarks = (r.naughtyMarks || 0) + 1;
+      try {
+        fineRibbons(mn, CFG.ROAM_FINE, what, CFG.BOT_MEMBER);
+      } catch (e) {
+      }
+      saveLedger();
+      audit(mn, "ROAM_LATE", what);
+      for (const h of herdsOf(mn)) if (h.leader && h.leader !== mn) tell(h.leader, "\u{1F9ED} " + plainName(mn) + " " + what + ". I've fetched 'em home: a naughty mark and " + CFG.ROAM_FINE + " ribbon" + (CFG.ROAM_FINE === 1 ? "" : "s") + ".");
+    }
+    function roamTick() {
+      if (!CFG.ROAM_ON || !inRoom()) return;
+      const now = Date.now();
+      if (now - (state.roamTickAt || 0) < 15e3) return;
+      state.roamTickAt = now;
+      contractsLedger();
+      const pets = [...new Set(L2.contracts.filter((x) => x.status === "signed" && (!x.until || x.until > now) && (x.rules || []).includes("other.summon")).map((x) => x.mn))];
+      for (const mn of pets) {
+        const r = rec(mn), g = roamOf(mn);
+        if (!r || !g) continue;
+        if (r.roamSafeUntil > now) continue;
+        const where = roamWhere(mn);
+        if (where === "here") {
+          if (g.until > now && g.wentAt) {
+            g.until = 0;
+            g.wentAt = 0;
+            saveLedger();
+            syncCompanions(true);
+            tell(mn, "\u{1F9ED} Welcome home, sugar. That pass is spent; " + roamLeft(mn) + " left.");
+          }
+          g.strayAt = 0;
+          g.summonedAt = 0;
+          continue;
+        }
+        if (where !== "away") continue;
+        if (g.until > now) {
+          if (!g.wentAt) {
+            g.wentAt = now;
+            saveLedger();
+          }
+          const mins = Math.ceil((g.until - now) / 6e4);
+          for (const w of CFG.ROAM_WARN_MIN) if (mins <= w && !(g.warned || []).includes(w)) {
+            g.warned = (g.warned || []).concat(w);
+            saveLedger();
+            beep(mn, w > 2 ? "\u{1F9ED} " + mins + " minutes left on your pass, sugar. Start headin' home." : "\u{1F9ED} " + mins + " minutes, sugar. Be back on the farm or I'm comin' to get you.");
+            break;
+          }
+          continue;
+        }
+        if (g.summonedAt) {
+          if (now - g.summonedAt > CFG.ROAM_RESUMMON_MIN * 6e4) roamSummon(mn, "Still not home, sugar. Back to the farm.");
+          continue;
+        }
+        if (g.until && g.until <= now) {
+          g.until = 0;
+          beep(mn, "\u{1F9ED} Time's up, sugar. Home you come.");
+          roamSummon(mn, "Your roam's over. Home to the farm.");
+          roamPenalty(mn, "was late back from their roam");
+          continue;
+        }
+        if (roamStart(mn, true)) continue;
+        if (!g.strayAt) {
+          g.strayAt = now;
+          saveLedger();
+          beep(mn, "\u{1F9ED} You haven't got a roam pass, sugar. Get yourself back to the farm in the next minute, or I'll fetch you.");
+          continue;
+        }
+        if (now - g.strayAt >= CFG.ROAM_GRACE_S * 1e3) {
+          roamSummon(mn, "No passes left today. Home to the farm.");
+          roamPenalty(mn, "slipped off the farm with no roam passes left");
+        }
+      }
+    }
+    function roamCommand(sender, args, R) {
+      const a0 = String(args[0] || "").toLowerCase();
+      if (a0 === "give") {
+        const t2 = resolveTarget(args[1]), n = Math.max(1, Math.min(6, parseInt(args[2], 10) || 1));
+        if (!t2 || !rec(t2)) {
+          R("?roam give <who> [n]: extra roam passes for today.");
+          return;
+        }
+        if (!isStaff(sender) && !herdsOf(t2).some((h) => h.leader === sender)) {
+          R("Only " + plainName(t2) + "'s herd leader or staff hand out passes, sugar.");
+          return;
+        }
+        const g2 = roamOf(t2), rt = rec(t2);
+        rt.roamPasses = (rt.roamPasses || 0) + n;
+        g2.strayAt = 0;
+        saveLedger();
+        syncCompanions(true);
+        audit(sender, "ROAM_GIVE", t2 + " " + n);
+        R("\u{1F9ED} " + plainName(t2) + " has " + n + " more roam pass" + (n === 1 ? "" : "es") + " (" + roamLeft(t2) + " now).");
+        tell(t2, "\u{1F9ED} " + plainName(sender) + " gave you " + n + " roam pass" + (n === 1 ? "" : "es") + ", sugar. An hour off the farm each: ?roam start.");
+        return;
+      }
+      const other = a0 && !["start", "go", "now", "on", "back", "home", "end", "off"].includes(a0) ? resolveTarget(args[0]) : null;
+      const t = other || sender;
+      if (other && other !== sender && !isStaff(sender) && !herdsOf(other).some((h) => h.leader === sender)) {
+        R("Only staff or their herd leader look at somebody else's passes, hon.");
+        return;
+      }
+      const x = roamContract(t);
+      if (!x) {
+        R(t === sender ? "\u{1F9ED} You're not under a contract that has you ready to be summoned, sugar, so you come and go as you please." : "\u{1F9ED} " + plainName(t) + " isn't under a summonable contract.");
+        return;
+      }
+      const g = roamOf(t), now = Date.now();
+      if (!other && ["start", "go", "now", "on"].includes(a0)) {
+        if (g.until > now) {
+          R("\u{1F9ED} You're already roamin', sugar: back by " + clockOf(g.until) + ".");
+          return;
+        }
+        if (!roamStart(sender, false)) R("\u{1F9ED} You haven't got a roam pass, sugar. ?buy roampass, " + CFG.ROAM_PASS_PRICE + " ribbons for an hour, or your herd leader can give you one.");
+        return;
+      }
+      if (!other && ["back", "home", "end", "off"].includes(a0)) {
+        if (g.until > now) {
+          g.until = 0;
+          saveLedger();
+          syncCompanions(true);
+          R("\u{1F9ED} Pass ended, sugar. " + roamLeft(sender) + " left.");
+        } else R("\u{1F9ED} You're not roamin' right now.");
+        return;
+      }
+      R("\u{1F9ED} " + (t === sender ? "Your" : plainName(t) + "'s") + " roam passes: " + roamLeft(t) + ", an hour off the farm each (?buy roampass, " + CFG.ROAM_PASS_PRICE + " ribbons)" + (g.until > now ? " \xB7 roamin' now, back by " + clockOf(g.until) : "") + ". " + (t === sender ? "?roam start, then go where you like; walk off the farm and one starts by itself. Late back, or out with none left, and I fetch you." : ""));
+    }
+    function roamState(mn) {
+      const x = roamContract(mn);
+      if (!x) return null;
+      const g = roamOf(mn);
+      return { left: roamLeft(mn), of: roamPasses(mn, x), until: g.until > Date.now() ? g.until : 0, price: CFG.ROAM_PASS_PRICE };
     }
     const PARASITE_SERUMS = ["growth", "fertility", "growth", "hyper pregnancy", "growth", "capacity"];
     const PARASITE_GROWS = ["udder", "penis", "testes", "butt"];
@@ -32006,6 +32244,7 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
       "allow",
       "letgo",
       "echs",
+      "roam",
       "stats",
       "board",
       "pedigree",
@@ -33170,6 +33409,10 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
         case "echs":
           echsStatus(sender, args, R);
           break;
+        case "roam":
+          roamCommand(sender, args, R);
+          break;
+        // roam passes (10uk-roam.js)
         case "tease":
           teaseLinesCommand(sender, args, R);
           break;
@@ -34083,6 +34326,13 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
             echsWake(sender, true);
           } catch (e) {
             warn("safeword echs:", e);
+          }
+          {
+            const r1 = rec(sender);
+            if (r1) {
+              r1.roamSafeUntil = Date.now() + CFG.ROAM_SAFE_MIN * 6e4;
+              saveLedger();
+            }
           }
           stopScene(sender);
           dropLeashes(sender);
@@ -36467,6 +36717,7 @@ Welcome to B&B Farm, hon. \u{1F33E}`
         try {
           if (!d || d.Query !== "OnlineFriends" || !Array.isArray(d.Result)) return;
           state.mutual = { at: Date.now(), set: new Set(d.Result.map((x) => x && x.MemberNumber).filter(Number.isFinite)) };
+          state.where = new Map(d.Result.filter((x) => x && Number.isFinite(x.MemberNumber)).map((x) => [x.MemberNumber, { room: x.ChatRoomName || null }]));
           for (const mn of state.mutual.set) if (L2.mailbox && L2.mailbox[mn]) deliverMail(mn);
         } catch (e) {
           warn("friends result:", e);
@@ -36579,6 +36830,11 @@ Welcome to B&B Farm, hon. \u{1F33E}`
           echsTick();
         } catch (e) {
           warn("echs:", e);
+        }
+        try {
+          roamTick();
+        } catch (e) {
+          warn("roam:", e);
         }
         rutTick();
         quotaTick();

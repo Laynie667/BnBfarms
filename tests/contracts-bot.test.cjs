@@ -111,7 +111,7 @@ const bcpTo=(mn,n)=>sent.slice(n).filter(s=>s[0]==='ChatRoomChat'&&s[1].Content=
   // 7. Oct 23: every contract keeps them in the room and in their restraints through a relog; no orgasm control for a cock unless registered male or nonbinary
   const R7=(g,futa)=>{ const r=L().people[500]; r.gender=g; r.futa=!!futa; return (W.__buildContract('deep',500,'1w')||{}).rules||{}; };
   const fem=R7('female'), fut=R7('futa',true), mal=R7('male'), nb=R7('nonbinary'), fun=(L().people[500].gender='female', (W.__buildContract('fun',500,'1w')||{}).rules||{});
-  out('7 every contract: forbid leaving, keep restraints on relog, back to the room ->', !!fun['chat.forbidLeaving'], fun['settings.relogKeepsRestraints']&&fun['settings.relogKeepsRestraints'].settings.value==='Restraints kept', fun['settings.roomRejoin']&&fun['settings.roomRejoin'].settings.value==='Returns to the room');
+  out('7 every contract: ready to be summoned (Oct 24: the farm girl is the fence, not Forbid leaving), keep restraints on relog, back to the room ->', !!fun['other.summon'] && !fun['chat.forbidLeaving'], fun['settings.relogKeepsRestraints']&&fun['settings.relogKeepsRestraints'].settings.value==='Restraints kept', fun['settings.roomRejoin']&&fun['settings.roomRejoin'].settings.value==='Returns to the room');
   out('7 orgasm control: women yes, futas no, registered male and nonbinary yes ->', !!fem['body.controlOrgasms'], !fut['body.controlOrgasms'], !!mal['body.controlOrgasms'], !!nb['body.controlOrgasms']);
   process.exit(0);
 })();

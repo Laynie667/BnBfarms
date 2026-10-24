@@ -118,7 +118,7 @@
       for (const [id, k0] of Object.entries(SCENTS)){
         const f = r.fx && r.fx[id]; if (!f || f.until <= now || f.came) continue;
         const kind = Array.isArray(k0) ? (k0.filter(k => TRAP_KINDS[k] && !trapWhyNot(mn, k)).sort(() => Math.random() - 0.5)[0]) : k0; if (!kind) continue;
-        if (now - f.at < CFG.SCENT_WAIT_MIN*60000 || heldByTrap(mn) || (state.sceneRuns && state.sceneRuns.has(mn)) || Math.random() >= CFG.SCENT_CHANCE) continue;
+        if (now - f.at < CFG.SCENT_WAIT_MIN*60000 || trapBreathing(mn) || heldByTrap(mn) || (state.sceneRuns && state.sceneRuns.has(mn)) || Math.random() >= CFG.SCENT_CHANCE) continue;
         f.came = true; saveLedger();
         emote(TRAP_KINDS[kind].icon+" "+bLine("scent_"+kind, mn), mn);
         later(() => { const why = springTrap(mn, kind, "", true); if (!why){ rec(mn).trapAt = Date.now(); saveLedger(); } else f.came = false; }, 5000);

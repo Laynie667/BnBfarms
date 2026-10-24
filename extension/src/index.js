@@ -393,10 +393,10 @@ function start() {
 
   // ROAM PASSES (bot 10uk-roam.js): under a summonable contract, the farm's exit only opens with a pass. Holdin' one,
   // tryin' the door starts it; none, and the door stays shut (Laynie, Oct 24: "our in house system prevents them from
-  // leaving without a pass"). Never after a safeword, never when the farm girl's not here; forced moves always work.
+  // leaving without a pass"). A safeword doesn't open it (Oct 24: "thats just reckless"); it's open when the farm girl's not here, and forced moves always work.
   const roamGate = () => {   // "open", "start" (they hold a pass: walkin' out spends it) or "shut"
     const s = st.panel && st.panel.s, ro = s && s.roam;
-    if (!ro || ro.safe || !botHere() || (ro.until && ro.until > Date.now())) return "open";
+    if (!ro || !botHere() || (ro.until && ro.until > Date.now())) return "open";
     return ro.left > 0 ? "start" : "shut";
   };
   try {

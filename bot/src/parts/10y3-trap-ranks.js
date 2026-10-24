@@ -44,6 +44,9 @@
     }
     // handed on to the next one
     r.chainN = (now - (r.chainAt || 0) < 10*60000) ? (r.chainN || 0) : 0;
+    // (Oct 24, Laynie: "a new player kept getting traps back to back to back": a hand-on is a trap with no breather, so it's
+    // only for somebody with eager on, the ones who asked for no breather)
+    if (!r.trapEager && !huntOn() && !onGauntlet(mn)) return;
     if (r.chainN >= CFG.CHAIN_MAX - 1 || kind === "tentacle" || kind === "well" || r.trapWait || (r.benched && r.benched.trap) || quietNow(mn)) return;
     if (Math.random() >= Math.min(0.9, CFG.CHAIN_CHANCE * rankX(mn).chain * dangerX(mn).chance)) return;
     const want = (CHAIN_NEXT[kind] || []).filter(x => !trapWhyNotFree(mn, x));

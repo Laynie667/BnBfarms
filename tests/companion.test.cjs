@@ -375,7 +375,7 @@ const STATE = { name: "Laynie", onBooks: true, roles: ["PROPRIETOR", "LIVESTOCK"
   let n19 = sent.length; w.ChatRoomAttemptLeave();
   out("19 holdin' a pass: walkin' out starts it ->", w.__left === 1, cmdOf(n19).includes("roam start"));
   bot({ type: "state", state: Object.assign({}, STATE, { roam: { left: 0, of: 0, until: 0, price: 30, safe: true } }) }); await wait(50);
-  out("19 just safeworded, or no summonable contract: the door's open ->", w.ChatRoomCanLeave() === true);
+  out("19 just safeworded: the gate stays shut (Oct 24) ->", w.ChatRoomCanLeave() === false);
   bot({ type: "state", state: Object.assign({}, STATE) }); await wait(50);
   out("19 no roam contract at all: open ->", w.ChatRoomCanLeave() === true);
   process.exit(0);

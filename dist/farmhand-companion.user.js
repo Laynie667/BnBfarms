@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.40.0
+// @version      0.40.1
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -230,7 +230,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.40.0";
+  var VERSION = "0.40.1";
 
   // extension/src/config.js
   var BOT_MEMBER = 260239;
@@ -10740,7 +10740,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     }
     const roamGate = () => {
       const s = st.panel && st.panel.s, ro = s && s.roam;
-      if (!ro || ro.safe || !botHere2() || ro.until && ro.until > Date.now()) return "open";
+      if (!ro || !botHere2() || ro.until && ro.until > Date.now()) return "open";
       return ro.left > 0 ? "start" : "shut";
     };
     try {

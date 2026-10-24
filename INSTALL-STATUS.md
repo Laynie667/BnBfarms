@@ -5,7 +5,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 | Script | File in `dist/` | Where it runs | Current |
 |---|---|---|---|
-| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.46.0** |
+| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.46.1** |
 | Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.10.0** |
 | Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.2.1** |
 | Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **1.1.0** |
@@ -13,7 +13,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 | Map tools, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.4** |
 | Dairy | `farmhand-dairy.user.js` | the bot's PC | **1.1.0** |
 | Shows | `farmhand-shows.user.js` | the bot's PC | **1.1.0** |
-| Farmhand Companion | `farmhand-companion.user.js` | each player | **0.40.0** |
+| Farmhand Companion | `farmhand-companion.user.js` | each player | **0.40.1** |
 | Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.4** |
 
 ## Sending a watch report
@@ -23,6 +23,13 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 - Running the watcher on more than one game at once (the bot, yours, a tester's) lets Claude line them up into one timeline.
 
 ## Latest changes (newest first)
+
+- **Bot 0.46.1, Companion 0.40.1: traps only where they're meant to be, and the gate holds.** Laynie, Oct 24: "im triggering traps walking by the tiles, not on them, and if im standing still long enough no where near a tile, they are getting set off too. Eager off didn't seem to apply the cool down either", "a new player kept getting traps back to back to back", and "the safeword shouldn't open the fence gate, thats just reckless."
+  - **On the tile, not beside it:** ponds, water and troughs only take somebody standin' in them (they reached a tile out and rolled every 5 minutes); the wolf pack only on the spot it's at (it went off a tile out from an ordinary spot that moves every hour); a night raid only in the barn (it reached four tiles out).
+  - **The breather covers every trap now,** not just the tiles, and counts from when the last trap let go. Water, the pack, a raid, a scent, a botched rescue: all wait it out. Eager on still skips it.
+  - **No more back to back to back:** a trap ending used to hand them straight on to another, one time in four, up to three in a row, wherever they stood. Now only for players with eager on.
+  - **The farm gate stays shut after a safeword.** (Nobody is summoned home for half an hour after one, as before.)
+  - tests/trap-tiles.test.cjs; traps.test.cjs and companion.test.cjs step 19 updated.
 
 - **Bot 0.46.0, Companion 0.40.0: the farm gate.** Laynie: "I need to make sure our new roaming system isn't blocked by other parts of the contract, but our in house system prevents them from leaving without a pass." **Nothin' in a farm contract blocks leaving any more:** every contract the farm builds drops Forbid leaving the room and any room list, even from saved templates. **The Companion is the gate:** under a summonable contract, the game's exit button stays shut with no pass (and says why); holdin' one, walkin' out the door spends it. It opens on its own right after a safeword, when there's no summonable contract, or when the farm girl isn't in the room. Anybody who gets out another way (no Companion, another mod) is still summoned home. tests/companion.test.cjs step 19.
 

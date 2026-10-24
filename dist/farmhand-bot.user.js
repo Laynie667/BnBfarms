@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.46.0
+// @version      0.46.1
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -2242,7 +2242,7 @@
   ];
 
   // bot/src/version.js
-  var VERSION = "0.46.0";
+  var VERSION = "0.46.1";
 
   // bot-parts:farmhand-bot-parts
   (function() {
@@ -12968,6 +12968,11 @@
     function waterSpots() {
       return Object.entries(L2.spots || {}).filter(([n]) => (WATER_SPOT.test(n) || /^trough/.test(n)) && !trapKindOf(n));
     }
+    function trapBreathing(mn) {
+      const r = rec(mn);
+      if (!r || r.trapEager || huntOn() || onGauntlet(mn)) return false;
+      return Date.now() - (r.trapAt || 0) < CFG.TRAP_COOLDOWN_MIN * 6e4;
+    }
     function trapWhyNot(mn, kind) {
       const r = rec(mn), K = TRAP_KINDS[kind];
       if (!r || !K) return "no such trap";
@@ -13042,6 +13047,13 @@
           return;
         }
         state.trapRuns.delete(mn);
+        {
+          const re = rec(mn);
+          if (re) {
+            re.trapAt = Date.now();
+            saveLedger();
+          }
+        }
         if (charFor(mn)) {
           try {
             done();
@@ -13387,7 +13399,7 @@
         const mn = C2.MemberNumber;
         if (mn === BOTMN() || !isSubject(mn)) continue;
         const r = rec(mn);
-        const on = trapSpots().find(([n]) => onSpot(mn, n, 0)), wet = !on && waterSpots().find(([n]) => onSpot(mn, n, 1));
+        const on = trapSpots().find(([n]) => onSpot(mn, n, 0)), wet = !on && waterSpots().find(([n]) => onSpot(mn, n, 0));
         const here = on ? on[0] : wet ? wet[0] : null, was = state.trapAt.get(mn);
         if (!here) {
           state.trapAt.delete(mn);
@@ -24538,7 +24550,7 @@
       } else {
         emote("\u{1F91D} " + xLine("rescueFail", t, v), t);
         R("It wouldn't give, sugar." + (isSubject(sender) ? " And now it's noticed you." : ""));
-        if (isSubject(sender) && Math.random() < 0.5) later(() => {
+        if (isSubject(sender) && !trapBreathing(sender) && Math.random() < 0.5) later(() => {
           const why = springTrap(sender, "random", "", true);
           if (!why) {
             rec(sender).trapAt = Date.now();
@@ -24631,7 +24643,7 @@
       }
       for (const mn of subjectsHere) {
         const r = rec(mn);
-        if (!onSpot(mn, L2.pack.spot, 1) || !huntOn() && now - (r.trapAt || 0) < CFG.TRAP_COOLDOWN_MIN * 6e4 || now - (r.packAt || 0) < 30 * 6e4) continue;
+        if (!onSpot(mn, L2.pack.spot, 0) || trapBreathing(mn) || now - (r.packAt || 0) < 30 * 6e4) continue;
         if (!springTrap(mn, "wolves", L2.pack.spot)) {
           r.trapAt = now;
           r.packAt = now;
@@ -25325,7 +25337,7 @@
           if (!f || f.until <= now || f.came) continue;
           const kind = Array.isArray(k0) ? k0.filter((k) => TRAP_KINDS[k] && !trapWhyNot(mn, k)).sort(() => Math.random() - 0.5)[0] : k0;
           if (!kind) continue;
-          if (now - f.at < CFG.SCENT_WAIT_MIN * 6e4 || heldByTrap(mn) || state.sceneRuns && state.sceneRuns.has(mn) || Math.random() >= CFG.SCENT_CHANCE) continue;
+          if (now - f.at < CFG.SCENT_WAIT_MIN * 6e4 || trapBreathing(mn) || heldByTrap(mn) || state.sceneRuns && state.sceneRuns.has(mn) || Math.random() >= CFG.SCENT_CHANCE) continue;
           f.came = true;
           saveLedger();
           emote(TRAP_KINDS[kind].icon + " " + bLine("scent_" + kind, mn), mn);
@@ -25676,6 +25688,7 @@
         else if (bet.what === "wait") state.betsWait = (state.betsWait || /* @__PURE__ */ new Map()).set(mn, bet);
       }
       r.chainN = now - (r.chainAt || 0) < 10 * 6e4 ? r.chainN || 0 : 0;
+      if (!r.trapEager && !huntOn() && !onGauntlet(mn)) return;
       if (r.chainN >= CFG.CHAIN_MAX - 1 || kind === "tentacle" || kind === "well" || r.trapWait || r.benched && r.benched.trap || quietNow(mn)) return;
       if (Math.random() >= Math.min(0.9, CFG.CHAIN_CHANCE * rankX(mn).chain * dangerX(mn).chance)) return;
       const want = (CHAIN_NEXT[kind] || []).filter((x) => !trapWhyNotFree(mn, x));
@@ -25919,7 +25932,7 @@
       state.raidAt = now;
       if (Math.random() >= CFG.RAID_CHANCE) return;
       const barn = Object.keys(L2.spots || {}).filter((n) => /^barn/.test(n));
-      const there = (W.ChatRoomCharacter || []).map((c) => c.MemberNumber).filter((m) => isSubject(m) && barn.some((b) => onSpot(m, b, 4)) && !trapWhyNot(m, "wolves"));
+      const there = (W.ChatRoomCharacter || []).map((c) => c.MemberNumber).filter((m) => isSubject(m) && barn.some((b) => onSpot(m, b, 1)) && !trapBreathing(m) && !trapWhyNot(m, "wolves"));
       if (!there.length) return;
       emote("\u{1F43A} " + cLine("raid", there[0]), there[0]);
       there.slice(0, 3).forEach((m, i) => later(() => {

@@ -55,6 +55,13 @@
   }
   function trapSpots(){ return Object.entries(L.spots || {}).filter(([n]) => trapKindOf(n)); }
   function waterSpots(){ return Object.entries(L.spots || {}).filter(([n]) => (WATER_SPOT.test(n) || /^trough/.test(n)) && !trapKindOf(n)); }   // (a trough has leeches: 10y2-brood.js)
+  // the breather between traps (Laynie, Oct 24: "Eager off didn't seem to apply the cool down either"): every trap that
+  // finds them on its own (water, the pack, a raid, a scent, a botched rescue) waits it out, not only the tiles. It counts
+  // from when the last trap let go of them. Eager, a hunt and the gauntlet skip it, as before.
+  function trapBreathing(mn){
+    const r = rec(mn); if (!r || r.trapEager || huntOn() || onGauntlet(mn)) return false;
+    return Date.now() - (r.trapAt || 0) < CFG.TRAP_COOLDOWN_MIN*60000;
+  }
   // can this trap spring on them right now? null = yes
   function trapWhyNot(mn, kind){
     const r = rec(mn), K = TRAP_KINDS[kind];
@@ -118,6 +125,7 @@
         return;
       }
       state.trapRuns.delete(mn);
+      { const re = rec(mn); if (re){ re.trapAt = Date.now(); saveLedger(); } }   // the breather starts when it lets go
       if (charFor(mn)){ try { done(); trapDone(mn, kind, before); } catch(e){ warn("trap "+kind+":", e); } }
       try { trapGearDone(mn, charFor(mn) ? gearPlan : null); } catch(e){ warn("trap gear:", e); }
       try { if (charFor(mn)) keepersAfter(mn, kind, before); toysAfter(mn); } catch(e){ warn("keepsake:", e); }
@@ -368,7 +376,7 @@
       const mn = C.MemberNumber;
       if (mn === BOTMN() || !isSubject(mn)) continue;
       const r = rec(mn);
-      const on = trapSpots().find(([n]) => onSpot(mn, n, 0)), wet = !on && waterSpots().find(([n]) => onSpot(mn, n, 1));
+      const on = trapSpots().find(([n]) => onSpot(mn, n, 0)), wet = !on && waterSpots().find(([n]) => onSpot(mn, n, 0));   // (water and troughs too: on the tile, not beside it, Oct 24)
       const here = on ? on[0] : wet ? wet[0] : null, was = state.trapAt.get(mn);
       if (!here){ state.trapAt.delete(mn); continue; }
       const fresh = !was || was.spot !== here;

@@ -70,7 +70,7 @@ const C=mn=>chars.find(c=>c.MemberNumber===mn);
   moveTo(600,14,10);
   // ── the thing in the water ──
   cfg.TENTACLE_CHANCE=0; moveTo(500,30,30); n=sent.length; W.__trapTick(); await wait(500); ok(!prod(500).eggs, 'most times the water is just water');
-  cfg.TENTACLE_CHANCE=1; moveTo(500,15,10); W.__trapTick(); moveTo(500,30,31); n=sent.length; W.__trapTick(); await wait(600);
+  cfg.TENTACLE_CHANCE=1; moveTo(500,15,10); W.__trapTick(); moveTo(500,30,30); n=sent.length; W.__trapTick(); await wait(600);   // (in the water itself, Oct 24: not beside it)
   ok(P(500).penned && P(500).penned.trap, 'when it comes, it holds them there');
   await wait(3500);
   const e=prod(500).eggs; ok(e && e.n >= 4 && e.by === -2, 'it always leaves eggs ('+(e&&e.n)+')');

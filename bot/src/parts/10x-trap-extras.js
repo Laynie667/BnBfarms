@@ -130,7 +130,7 @@
     } else {
       emote("🤝 "+xLine("rescueFail", t, v), t);
       R("It wouldn't give, sugar."+(isSubject(sender) ? " And now it's noticed you." : ""));
-      if (isSubject(sender) && Math.random() < 0.5) later(() => { const why = springTrap(sender, "random", "", true); if (!why){ rec(sender).trapAt = Date.now(); saveLedger(); } }, 4000);
+      if (isSubject(sender) && !trapBreathing(sender) && Math.random() < 0.5) later(() => { const why = springTrap(sender, "random", "", true); if (!why){ rec(sender).trapAt = Date.now(); saveLedger(); } }, 4000);
     }
   }
 
@@ -190,7 +190,7 @@
     }
     for (const mn of subjectsHere){
       const r = rec(mn);
-      if (!onSpot(mn, L.pack.spot, 1) || (!huntOn() && now - (r.trapAt || 0) < CFG.TRAP_COOLDOWN_MIN*60000) || now - (r.packAt || 0) < 30*60000) continue;
+      if (!onSpot(mn, L.pack.spot, 0) || trapBreathing(mn) || now - (r.packAt || 0) < 30*60000) continue;   // (on its tile, not near it: Oct 24)
       if (!springTrap(mn, "wolves", L.pack.spot)){ r.trapAt = now; r.packAt = now; saveLedger(); }
     }
   }

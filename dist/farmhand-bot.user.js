@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.45.1
+// @version      0.45.2
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -1761,11 +1761,8 @@
     } else if (depth === "nhl") {
       rules["pet.speech"] = speech("Replace", "Max");
       rules["pet.hearing"] = makeSpec("pet.hearing", { animal: pet.animal, strength: "Heavy" });
-      rules["body.forcedPosition"] = makeSpec("body.forcedPosition", { fullPose: "All fours" });
       rules["body.secretOrgasms"] = makeSpec("body.secretOrgasms");
       rules["body.controlOrgasms"] = makeSpec("body.controlOrgasms", { mode: "Edged" });
-      rules["chat.forbidLeaving"] = makeSpec("chat.forbidLeaving");
-      if ((farm.rooms || []).length) rules["rooms.entry"] = makeSpec("rooms.entry", { allowedRooms: farm.rooms.slice(0, 50) });
       rules["other.summon"] = makeSpec("other.summon", { allowedMembers: summoners, summonText: "summon", delay: "10" });
       rules["control.leash"] = makeSpec("control.leash", { minimumRole: "Whitelist" });
       rules["control.nickname"] = makeSpec("control.nickname", { nickname: nick });
@@ -2245,7 +2242,7 @@
   ];
 
   // bot/src/version.js
-  var VERSION = "0.45.1";
+  var VERSION = "0.45.2";
 
   // bot-parts:farmhand-bot-parts
   (function() {
@@ -8069,9 +8066,10 @@
       return true;
     }
     const DEFAULT_TERMS = {
-      fun: "A light little contract with B&B Farm, %name%. You'll moo and wave, and you can end it whenever you like.",
-      deep: "You're properly kept by B&B Farm for the length of this contract, %name%. Only the farm can end it early, and a safeword always reaches staff.",
-      nhl: "No human left, %name%. You belong to B&B Farm as an animal for the length of this contract, and only the farm can end it early. A safeword always reaches staff, and they'll come check on you."
+      // (Oct 24: each one says how leavin' works now: a roam pass, or the farm girl fetches you home, 10uk-roam.js)
+      fun: "A light little contract with B&B Farm, %name%. You'll moo and wave, and you can end it whenever you like. You stay on the farm: an hour off it takes a roam pass from the store, and without one the farm girl fetches you home.",
+      deep: "You're properly kept by B&B Farm for the length of this contract, %name%. Only the farm can end it early, and a safeword always reaches staff. You stay on the farm: an hour off it takes a roam pass, and late back or out without one, you're summoned home with a naughty mark.",
+      nhl: "No human left, %name%. You belong to B&B Farm as an animal for the length of this contract, and only the farm can end it early. A safeword always reaches staff, and they'll come check on you. Animals stay on the farm: an hour off it takes a roam pass, and strays are summoned home and marked."
     };
     function contractsLedger() {
       L2.contractTemplates = L2.contractTemplates || {};

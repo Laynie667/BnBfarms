@@ -8,9 +8,10 @@
      Everything's checked against BC+'s own rule list first (shared/bcplus.js), because BC+ quietly
      drops any setting it doesn't like. */
   const DEFAULT_TERMS = {
-    fun:  "A light little contract with B&B Farm, %name%. You'll moo and wave, and you can end it whenever you like.",
-    deep: "You're properly kept by B&B Farm for the length of this contract, %name%. Only the farm can end it early, and a safeword always reaches staff.",
-    nhl:  "No human left, %name%. You belong to B&B Farm as an animal for the length of this contract, and only the farm can end it early. A safeword always reaches staff, and they'll come check on you."
+    // (Oct 24: each one says how leavin' works now: a roam pass, or the farm girl fetches you home, 10uk-roam.js)
+    fun:  "A light little contract with B&B Farm, %name%. You'll moo and wave, and you can end it whenever you like. You stay on the farm: an hour off it takes a roam pass from the store, and without one the farm girl fetches you home.",
+    deep: "You're properly kept by B&B Farm for the length of this contract, %name%. Only the farm can end it early, and a safeword always reaches staff. You stay on the farm: an hour off it takes a roam pass, and late back or out without one, you're summoned home with a naughty mark.",
+    nhl:  "No human left, %name%. You belong to B&B Farm as an animal for the length of this contract, and only the farm can end it early. A safeword always reaches staff, and they'll come check on you. Animals stay on the farm: an hour off it takes a roam pass, and strays are summoned home and marked."
   };
   function contractsLedger(){ L.contractTemplates = L.contractTemplates || {}; L.contracts = L.contracts || []; }
   function farmInfo(){

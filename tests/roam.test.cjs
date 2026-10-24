@@ -112,6 +112,7 @@ const tick=async()=>{ W.__roamTick(); await wait(500); };
   ok(f.rules['other.summon'] && !f.rules['chat.forbidLeaving'], 'fun ones too');
   const x=W.__buildContract('nhl',500,'1d');
   ok(x.rules['other.summon'] && !x.rules['chat.forbidLeaving'] && !x.rules['rooms.entry'], 'and no human left: roam passes, not a room list');
+  ok(!x.rules['body.forcedPosition'] && /roam pass/.test(x.terms), 'no human left has no forced all fours (Oct 24), and its terms say how leavin\' works');
   ok(!warns.some(w=>/roam/i.test(w)), 'no errors: '+warns.filter(w=>/roam/i.test(w)).slice(0,2).join(' | '));
   out(fails?'FAIL '+fails:'ALL OK'); process.exit(fails?1:0);
 })();

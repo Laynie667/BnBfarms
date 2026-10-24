@@ -5,7 +5,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 | Script | File in `dist/` | Where it runs | Current |
 |---|---|---|---|
-| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.45.1** |
+| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.45.2** |
 | Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.10.0** |
 | Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.2.1** |
 | Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **1.1.0** |
@@ -23,6 +23,8 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 - Running the watcher on more than one game at once (the bot, yours, a tester's) lets Claude line them up into one timeline.
 
 ## Latest changes (newest first)
+
+- **Bot 0.45.2: the base contracts, tidied.** Laynie: "are the base contracts updated? id also like to remove the forced position rule from NHL". No human left no longer forces all fours, and its own rule list no longer carries Forbid leaving or a room list. All three base contracts (fun, deep, no human left) say in their terms how leavin' works now: an hour off the farm takes a roam pass, and strays are summoned home.
 
 - **Bot 0.45.1, Companion 0.39.1: roam passes cost 30 ribbons.** Laynie: "the roam passes should be 30 ribbons or more". (?store price roampass <n> changes it any time.)
 

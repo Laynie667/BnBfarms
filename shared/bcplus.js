@@ -178,11 +178,10 @@ export function templateRules(depth, who, farm) {
   } else if (depth === "nhl") {
     rules["pet.speech"] = speech("Replace", "Max");
     rules["pet.hearing"] = makeSpec("pet.hearing", { animal: pet.animal, strength: "Heavy" });
-    rules["body.forcedPosition"] = makeSpec("body.forcedPosition", { fullPose: "All fours" });
+    // (Oct 24: no forced all fours any more, Laynie: "remove the forced position rule from NHL"; and no Forbid leaving or
+    // room list: roam passes and the summon are the fence now, bot/src/parts/10uk-roam.js)
     rules["body.secretOrgasms"] = makeSpec("body.secretOrgasms");
     rules["body.controlOrgasms"] = makeSpec("body.controlOrgasms", { mode: "Edged" });
-    rules["chat.forbidLeaving"] = makeSpec("chat.forbidLeaving");
-    if ((farm.rooms || []).length) rules["rooms.entry"] = makeSpec("rooms.entry", { allowedRooms: farm.rooms.slice(0, 50) });
     rules["other.summon"] = makeSpec("other.summon", { allowedMembers: summoners, summonText: "summon", delay: "10" });
     rules["control.leash"] = makeSpec("control.leash", { minimumRole: "Whitelist" });
     rules["control.nickname"] = makeSpec("control.nickname", { nickname: nick });

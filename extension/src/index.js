@@ -391,6 +391,28 @@ function start() {
   try { mod.hookFunction("ChatRoomMapViewDraw", 0, (args, next) => { const r = next(args); drawMarkers(); return r; }); }
   catch (e) { console.warn("[Farmhand Companion] map markers unavailable:", e); }
 
+  // ROAM PASSES (bot 10uk-roam.js): under a summonable contract, the farm's exit only opens with a pass. Holdin' one,
+  // tryin' the door starts it; none, and the door stays shut (Laynie, Oct 24: "our in house system prevents them from
+  // leaving without a pass"). Never after a safeword, never when the farm girl's not here; forced moves always work.
+  const roamGate = () => {   // "open", "start" (they hold a pass: walkin' out spends it) or "shut"
+    const s = st.panel && st.panel.s, ro = s && s.roam;
+    if (!ro || ro.safe || !botHere() || (ro.until && ro.until > Date.now())) return "open";
+    return ro.left > 0 ? "start" : "shut";
+  };
+  try {
+    // the exit button (it's asked every frame, so no side effects here: just shut with no pass)
+    mod.hookFunction("ChatRoomCanLeave", 5, (args, next) => { const ok = next(args); try { return ok && roamGate() !== "shut"; } catch (e) { return ok; } });
+    // pressin' it
+    mod.hookFunction("ChatRoomAttemptLeave", 5, (args, next) => {
+      try {
+        const g = roamGate();
+        if (g === "start") sendCommand("roam start");
+        if (g === "shut" && (!st.roamToldAt || Date.now() - st.roamToldAt > 15000)) { st.roamToldAt = Date.now(); st.panel.add("🧭 The farm gate's shut, sugar: leavin' takes a roam pass. ?buy roampass (" + ((st.panel.s.roam || {}).price || 30) + " ribbons), then try the door again.", "notice"); }
+      } catch (e) { /* let the game decide */ }
+      return next(args);
+    });
+  } catch (e) { console.warn("[Farmhand Companion] roam gate unavailable:", e); }
+
   mod.hookFunction("ChatRoomMessage", 10, (args, next) => {
     const m = readMsg(args[0]);
     if (m) { try { onFarmMsg(m); } catch (e) { console.warn("[Farmhand Companion]", e); } return; }

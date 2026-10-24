@@ -49,6 +49,8 @@
     for (const id of tpl.remove || []) delete rules[id];
     for (const [id, set] of Object.entries(tpl.add || {}))
       rules[id] = BCPLUS.makeSpec(id, Object.assign({}, rules[id] ? rules[id].settings : {}, JSON.parse(JSON.stringify(set))));
+    // nothin' in a contract may block the roam passes: the farm girl's gate (the Companion) and her summon do the fencin'
+    delete rules["chat.forbidLeaving"]; delete rules["rooms.entry"];
     BCPLUS.fillRules(rules, who);
     if (when && when.conditions) BCPLUS.applyConditions(rules, when.conditions, when.only);   // when they apply (Oct 19: ?contract offer … when room=private)
     return BCPLUS.makeContract({ title: BCPLUS.fillWho(tpl.title, who), terms: BCPLUS.fillWho(fill(tpl.terms || "", mn), who), duration: BCPLUS.durationFrom(durKey),

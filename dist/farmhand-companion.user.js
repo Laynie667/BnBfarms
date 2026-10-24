@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.39.1
+// @version      0.40.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -230,7 +230,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.39.1";
+  var VERSION = "0.40.0";
 
   // extension/src/config.js
   var BOT_MEMBER = 260239;
@@ -5516,7 +5516,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
       happeningCard(ctx3),
       s.roam && card(
         h("div", { class: "fhc-kv" }, title("\u{1F9ED} Roam passes"), chip(s.roam.left + " held", s.roam.left ? "acc" : "alert")),
-        s.roam.until ? muted("Roamin' now: back on the farm by " + new Date(s.roam.until).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) + ", or the farm girl fetches you.") : muted("An hour off the farm each; the whole map is yours either way. Walk off without one and you're summoned home, and late back costs you."),
+        s.roam.until ? muted("Roamin' now: back on the farm by " + new Date(s.roam.until).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) + ", or the farm girl fetches you.") : muted(s.roam.left ? "An hour off the farm each; the whole map is yours either way. Walk out the door and a pass starts. Late back costs you." : "The farm gate's shut till you have a pass. The whole map is still yours to wander."),
         h(
           "div",
           null,
@@ -10737,6 +10737,35 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
       });
     } catch (e) {
       console.warn("[Farmhand Companion] map markers unavailable:", e);
+    }
+    const roamGate = () => {
+      const s = st.panel && st.panel.s, ro = s && s.roam;
+      if (!ro || ro.safe || !botHere2() || ro.until && ro.until > Date.now()) return "open";
+      return ro.left > 0 ? "start" : "shut";
+    };
+    try {
+      mod.hookFunction("ChatRoomCanLeave", 5, (args, next) => {
+        const ok2 = next(args);
+        try {
+          return ok2 && roamGate() !== "shut";
+        } catch (e) {
+          return ok2;
+        }
+      });
+      mod.hookFunction("ChatRoomAttemptLeave", 5, (args, next) => {
+        try {
+          const g = roamGate();
+          if (g === "start") sendCommand("roam start");
+          if (g === "shut" && (!st.roamToldAt || Date.now() - st.roamToldAt > 15e3)) {
+            st.roamToldAt = Date.now();
+            st.panel.add("\u{1F9ED} The farm gate's shut, sugar: leavin' takes a roam pass. ?buy roampass (" + ((st.panel.s.roam || {}).price || 30) + " ribbons), then try the door again.", "notice");
+          }
+        } catch (e) {
+        }
+        return next(args);
+      });
+    } catch (e) {
+      console.warn("[Farmhand Companion] roam gate unavailable:", e);
     }
     mod.hookFunction("ChatRoomMessage", 10, (args, next) => {
       const m = readMsg(args[0]);

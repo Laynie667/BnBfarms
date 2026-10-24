@@ -5,7 +5,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 | Script | File in `dist/` | Where it runs | Current |
 |---|---|---|---|
-| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.45.2** |
+| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.46.0** |
 | Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.10.0** |
 | Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.2.1** |
 | Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **1.1.0** |
@@ -13,7 +13,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 | Map tools, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.4** |
 | Dairy | `farmhand-dairy.user.js` | the bot's PC | **1.1.0** |
 | Shows | `farmhand-shows.user.js` | the bot's PC | **1.1.0** |
-| Farmhand Companion | `farmhand-companion.user.js` | each player | **0.39.1** |
+| Farmhand Companion | `farmhand-companion.user.js` | each player | **0.40.0** |
 | Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.4** |
 
 ## Sending a watch report
@@ -23,6 +23,8 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 - Running the watcher on more than one game at once (the bot, yours, a tester's) lets Claude line them up into one timeline.
 
 ## Latest changes (newest first)
+
+- **Bot 0.46.0, Companion 0.40.0: the farm gate.** Laynie: "I need to make sure our new roaming system isn't blocked by other parts of the contract, but our in house system prevents them from leaving without a pass." **Nothin' in a farm contract blocks leaving any more:** every contract the farm builds drops Forbid leaving the room and any room list, even from saved templates. **The Companion is the gate:** under a summonable contract, the game's exit button stays shut with no pass (and says why); holdin' one, walkin' out the door spends it. It opens on its own right after a safeword, when there's no summonable contract, or when the farm girl isn't in the room. Anybody who gets out another way (no Companion, another mod) is still summoned home. tests/companion.test.cjs step 19.
 
 - **Bot 0.45.2: the base contracts, tidied.** Laynie: "are the base contracts updated? id also like to remove the forced position rule from NHL". No human left no longer forces all fours, and its own rule list no longer carries Forbid leaving or a room list. All three base contracts (fun, deep, no human left) say in their terms how leavin' works now: an hour off the farm takes a roam pass, and strays are summoned home.
 

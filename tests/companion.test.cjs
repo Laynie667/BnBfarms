@@ -13,6 +13,7 @@ w.CurrentScreen = "ChatRoom";
 w.ChatRoomCharacter = [{ MemberNumber: 221397 }, { MemberNumber: 260239 }];
 w.ServerSend = (ev, d) => sent.push([ev, d]);
 w.ChatRoomMessage = (data) => { w.__shown = (w.__shown || 0) + 1; };   // the game's own handler
+w.ChatRoomCanLeave = () => true; w.__left = 0; w.ChatRoomAttemptLeave = () => { if (w.ChatRoomCanLeave()) w.__left++; };   // the game's exit
 w.CommandCombine = (c) => { commands = commands.concat(c); };
 w.BCPlus = { loaded: true, version: { major: 0, minor: 14, patch: 0 } };
 w.eval(fs.readFileSync(path.join(__dirname, "../dist/farmhand-companion.user.js"), "utf8"));
@@ -364,5 +365,18 @@ const STATE = { name: "Laynie", onBooks: true, roles: ["PROPRIETOR", "LIVESTOCK"
   n18 = sent.length; click("Tell staff"); await wait(50);
   const s2 = saidOf(n18);
   out("18 Safety has a Say it box, and Tell staff sends it to staff ->", !!sayBox, /Say it to the farm/.test(text()), !!s2 && s2.to === "staff" && /legs are numb/.test(s2.text));
+  // 19. Oct 24, roam passes: under a summonable contract the farm's door only opens with a pass
+  w.ChatRoomCharacter = [{ MemberNumber: 221397 }, { MemberNumber: 260239 }];
+  const cmdOf = (n) => sent.slice(n).map(([e, d]) => d && d.Dictionary).filter((x) => x && x.type === "cmd").map((x) => x.text);
+  bot({ type: "state", state: Object.assign({}, STATE, { roam: { left: 0, of: 0, until: 0, price: 30 } }) }); await wait(50);
+  w.__left = 0; w.ChatRoomAttemptLeave();
+  out("19 no pass: the door stays shut, and they're told why ->", w.ChatRoomCanLeave() === false, w.__left === 0, /gate's shut/.test(text()));
+  bot({ type: "state", state: Object.assign({}, STATE, { roam: { left: 1, of: 1, until: 0, price: 30 } }) }); await wait(50);
+  let n19 = sent.length; w.ChatRoomAttemptLeave();
+  out("19 holdin' a pass: walkin' out starts it ->", w.__left === 1, cmdOf(n19).includes("roam start"));
+  bot({ type: "state", state: Object.assign({}, STATE, { roam: { left: 0, of: 0, until: 0, price: 30, safe: true } }) }); await wait(50);
+  out("19 just safeworded, or no summonable contract: the door's open ->", w.ChatRoomCanLeave() === true);
+  bot({ type: "state", state: Object.assign({}, STATE) }); await wait(50);
+  out("19 no roam contract at all: open ->", w.ChatRoomCanLeave() === true);
   process.exit(0);
 })();

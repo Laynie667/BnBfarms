@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.45.2
+// @version      0.46.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -2242,7 +2242,7 @@
   ];
 
   // bot/src/version.js
-  var VERSION = "0.45.2";
+  var VERSION = "0.46.0";
 
   // bot-parts:farmhand-bot-parts
   (function() {
@@ -8109,6 +8109,8 @@
       for (const id of tpl.remove || []) delete rules[id];
       for (const [id, set] of Object.entries(tpl.add || {}))
         rules[id] = makeSpec(id, Object.assign({}, rules[id] ? rules[id].settings : {}, JSON.parse(JSON.stringify(set))));
+      delete rules["chat.forbidLeaving"];
+      delete rules["rooms.entry"];
       fillRules(rules, who);
       if (when && when.conditions) applyConditions(rules, when.conditions, when.only);
       return makeContract({
@@ -21393,7 +21395,7 @@
       const x = roamContract(mn);
       if (!x) return null;
       const g = roamOf(mn);
-      return { left: roamLeft(mn), of: roamPasses(mn, x), until: g.until > Date.now() ? g.until : 0, price: CFG.ROAM_PASS_PRICE };
+      return { left: roamLeft(mn), of: roamPasses(mn, x), until: g.until > Date.now() ? g.until : 0, price: CFG.ROAM_PASS_PRICE, safe: (rec(mn).roamSafeUntil || 0) > Date.now() };
     }
     const PARASITE_SERUMS = ["growth", "fertility", "growth", "hyper pregnancy", "growth", "capacity"];
     const PARASITE_GROWS = ["udder", "penis", "testes", "butt"];

@@ -145,5 +145,5 @@
   function roamState(mn){
     const x = roamContract(mn); if (!x) return null;
     const g = roamOf(mn);
-    return { left: roamLeft(mn), of: roamPasses(mn, x), until: g.until > Date.now() ? g.until : 0, price: CFG.ROAM_PASS_PRICE };
+    return { left: roamLeft(mn), of: roamPasses(mn, x), until: g.until > Date.now() ? g.until : 0, price: CFG.ROAM_PASS_PRICE, safe: (rec(mn).roamSafeUntil || 0) > Date.now() };   // safe: their Companion opens the gate (index.js)
   }

@@ -40,7 +40,7 @@ function me(ctx) {
     happeningCard(ctx),
     s.roam && card(h("div", { class: "fhc-kv" }, title("🧭 Roam passes"), chip(s.roam.left + " held", s.roam.left ? "acc" : "alert")),
       s.roam.until ? muted("Roamin' now: back on the farm by " + new Date(s.roam.until).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) + ", or the farm girl fetches you.")
-                   : muted("An hour off the farm each; the whole map is yours either way. Walk off without one and you're summoned home, and late back costs you."),
+                   : muted(s.roam.left ? "An hour off the farm each; the whole map is yours either way. Walk out the door and a pass starts. Late back costs you." : "The farm gate's shut till you have a pass. The whole map is still yours to wander."),
       h("div", null, s.roam.until ? btn("I'm back", () => ctx.send("roam back")) : s.roam.left ? btn("Roam for an hour", () => ctx.send("roam start"), true) : null,
         s.roam.until ? null : btn("Buy a pass · " + (s.roam.price || 30) + " 🎀", () => ctx.send("buy roampass")))),
     bars.some(Boolean) && card(title("Today"), bars,

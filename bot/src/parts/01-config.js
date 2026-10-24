@@ -103,7 +103,7 @@
     /* ── ROAM ── passes off the farm for summonable contracts, and fetchin' them home (10uk-roam.js) */
     ROAM_ON: true,
     ROAM_PASSES: { fun: 0, deep: 0, nhl: 0, custom: 0, unknown: 0 },   // free one-hour passes a day, by the contract's level (Oct 24: none; they buy them)
-    ROAM_PASS_PRICE: 20,         // ribbons for an hour's roam pass in the store (Laynie: "a high cost shop item")
+    ROAM_PASS_PRICE: 30,         // ribbons for an hour's roam pass in the store (Laynie: "a high cost shop item")
     ROAM_PASS_HOLD: 3,           // most passes they can carry
     ROAM_PASS_MIN: 60,
     ROAM_WARN_MIN: [10, 2],      // whispers before a pass runs out

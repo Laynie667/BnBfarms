@@ -3,7 +3,7 @@
 
 const fs=require('fs'), path=require('path');
 const store={}; const sent=[]; const handlers={};
-const S=(mn,name,extra)=>Object.assign({mn,name,roles:["LIVESTOCK"],species:"cow",gender:"female",onDuty:true,herds:[],tempKeys:[],cover:[],limits:"",ribbons:50},extra||{});
+const S=(mn,name,extra)=>Object.assign({mn,name,roles:["LIVESTOCK"],species:"cow",gender:"female",onDuty:true,herds:[],tempKeys:[],cover:[],limits:"",ribbons:70},extra||{});
 const until=Date.now()+86400000*3;
 store.bnb_ledger_v1=JSON.stringify({v:4,people:{
  "221397":{mn:221397,name:"Laynie",roles:["PROPRIETOR"],onDuty:true,herds:[],tempKeys:[],cover:[]},
@@ -48,7 +48,7 @@ const tick=async()=>{ W.__roamTick(); await wait(500); };
   n=sent.length; await say(500,'?roam start');
   ok(/haven't got a roam pass/.test(all(n)) && !(P(500).roam.until>Date.now()), 'no pass, no roam');
   n=sent.length; await say(500,'?buy roampass'); await wait(6000); await say(500,'?buy roampass');
-  ok(P(500).roamPasses===2 && P(500).ribbons===10 && /roam pass in your pocket/.test(all(n)), 'they buy them in the store, 20 ribbons each');
+  ok(P(500).roamPasses===2 && P(500).ribbons===10 && /roam pass in your pocket/.test(all(n)), 'they buy them in the store, 30 ribbons each');
   n=sent.length; await say(700,'?buy roampass');
   ok(/come and go as you please/.test(all(n)) && !P(700).roamPasses, 'nobody without a summonable contract can buy one');
   n=sent.length; await say(700,'?roam');

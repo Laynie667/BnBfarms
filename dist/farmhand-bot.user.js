@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.45.0
+// @version      0.45.1
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -2245,7 +2245,7 @@
   ];
 
   // bot/src/version.js
-  var VERSION = "0.45.0";
+  var VERSION = "0.45.1";
 
   // bot-parts:farmhand-bot-parts
   (function() {
@@ -2353,7 +2353,7 @@
       ROAM_ON: true,
       ROAM_PASSES: { fun: 0, deep: 0, nhl: 0, custom: 0, unknown: 0 },
       // free one-hour passes a day, by the contract's level (Oct 24: none; they buy them)
-      ROAM_PASS_PRICE: 20,
+      ROAM_PASS_PRICE: 30,
       // ribbons for an hour's roam pass in the store (Laynie: "a high cost shop item")
       ROAM_PASS_HOLD: 3,
       // most passes they can carry

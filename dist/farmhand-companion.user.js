@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.39.0
+// @version      0.39.1
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -230,7 +230,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.39.0";
+  var VERSION = "0.39.1";
 
   // extension/src/config.js
   var BOT_MEMBER = 260239;
@@ -5521,7 +5521,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
           "div",
           null,
           s.roam.until ? btn("I'm back", () => ctx3.send("roam back")) : s.roam.left ? btn("Roam for an hour", () => ctx3.send("roam start"), true) : null,
-          s.roam.until ? null : btn("Buy a pass \xB7 " + (s.roam.price || 20) + " \u{1F380}", () => ctx3.send("buy roampass"))
+          s.roam.until ? null : btn("Buy a pass \xB7 " + (s.roam.price || 30) + " \u{1F380}", () => ctx3.send("buy roampass"))
         )
       ),
       bars.some(Boolean) && card(

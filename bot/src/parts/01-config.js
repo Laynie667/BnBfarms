@@ -46,7 +46,7 @@
     USE_WORKER_TIMER: true,      // browsers throttle setInterval in background tabs
     HEARTBEAT_MS: 20000,
     KEEPALIVE_MIN: 4,            // invisible server traffic every N minutes
-    KEEPALIVE_NUDGE: true,       // also shuffle position occasionally
+    KEEPALIVE_NUDGE: false,      // also shuffle position occasionally (off Oct 24: the hidden keep-alive is enough, and the hop read as the bot leavin' its home spot)
     NUDGE_MIN: 11,
     WATCHDOG_MIN: 5,             // reload the page if broken this long
     WATCHDOG_ENABLED: true,

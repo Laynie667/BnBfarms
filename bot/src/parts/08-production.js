@@ -453,6 +453,7 @@
       const d = dayKey(); if (!p.mday || p.mday.day !== d) p.mday = { day:d, ml:0 };
       // milk pays by the litre, stingy: a ribbon every CFG.LITRE_RIBBON_ML, CFG.LITRE_RIBBON_DAY a day at most
       const was = Math.floor(p.mday.ml / CFG.LITRE_RIBBON_ML); p.mday.ml += take;
+      try { quotaLive(mn); } catch(e){ warn("quota:", e); }   // the streak counts the moment the pail's full (Oct 24)
       const owe = Math.min(Math.floor(p.mday.ml / CFG.LITRE_RIBBON_ML) - was, CFG.LITRE_RIBBON_DAY - (p.mday.paid || 0));
       if (owe > 0){ p.mday.paid = (p.mday.paid || 0) + owe; later(() => earnRibbons(mn, owe, "every "+(CFG.LITRE_RIBBON_ML/1000)+" litres you're milked"), 2500); }
     }
@@ -1476,6 +1477,28 @@
     return hasRole(mn, ROLE.LIVESTOCK) ? CFG.MILK_QUOTA_ML : 0;
   }
   function milkedOn(mn, d){ const p = prodOf(mn); return p && p.mday && p.mday.day === d ? p.mday.ml : 0; }
+  // The streak (Oct 24, Laynie: "some players said that their milk streak hasn't updated"): it used to count only at the
+  // farm's midnight (UTC, so 7 in the evening Central), only for a day they'd spent an hour on the farm, and it went back
+  // to 0 every time they moved up a tier. Now it counts the moment today's pail reaches their quota, and keeps on
+  // countin' past a tier. Midnight still checks the day: short of quota on a day they were here is a naughty mark and
+  // the streak starts over (a quota grace forgives it).
+  function quotaLive(mn){
+    const q = quotaOf(mn), r = rec(mn), d = dayKey(); if (!q || !r || r.quotaMetDay === d) return;
+    const got = milkedOn(mn, d); if (got < q) return;
+    quotaCount(mn, d, got, q, false);
+  }
+  function quotaCount(mn, d, got, q, late){
+    const r = rec(mn); r.quotaMetDay = d;
+    r.quotaStreak = (r.quotaStreak||0) + 1;
+    earnRibbons(mn, CFG.RIBBONS_FOR.quota, "makin' your milk quota", 0, true);
+    const tier = tierOf(mn), up = { new:"trained", trained:"prize" }[tier];
+    if (r.quotaStreak >= CFG.QUOTA_STREAK_UP && r.quotaStreak % CFG.QUOTA_STREAK_UP === 0 && up){
+      r.tier = up; audit(CFG.BOT_MEMBER, "TIER", mn+" → "+up+" (milk quota)");
+      tell(mn, "🥛 "+r.quotaStreak+" days in a row on quota! You're "+tierName(up)+" now, sweetie. Good cow.");
+      if (onMap(mn)) emote("🎀 "+plainName(mn)+" has filled the pail every day for "+r.quotaStreak+" days, so the farm girl ties a "+tierName(up)+" ribbon on their collar. Such a good, productive cow.");
+    } else tell(mn, "🥛 Quota met"+(late ? " yesterday" : " for today")+" ("+ml(got)+" of "+ml(q)+"). That's "+r.quotaStreak+" day"+(r.quotaStreak===1?"":"s")+" in a row, sugar!");
+    saveLedger(); syncCompanions(true);
+  }
   function quotaTick(){
     const today = dayKey();
     if (L.quotaDay === today) return;
@@ -1490,14 +1513,7 @@
       if (r.registeredAt && dayKey(new Date(r.registeredAt)) === prev) continue;
       const got = milkedOn(mn, prev);
       if (got >= q){
-        r.quotaStreak = (r.quotaStreak||0) + 1;
-        earnRibbons(mn, CFG.RIBBONS_FOR.quota, "makin' your milk quota", 0, true);
-        const tier = tierOf(mn), up = { new:"trained", trained:"prize" }[tier];
-        if (r.quotaStreak >= CFG.QUOTA_STREAK_UP && up){
-          r.quotaStreak = 0; r.tier = up; audit(CFG.BOT_MEMBER, "TIER", mn+" → "+up+" (milk quota)");
-          tell(mn, "🥛 "+CFG.QUOTA_STREAK_UP+" days in a row on quota! You're "+tierName(up)+" now, sweetie. Good cow.");
-          if (onMap(mn)) emote("🎀 "+plainName(mn)+" has filled the pail every day for "+CFG.QUOTA_STREAK_UP+" days, so the farm girl ties a "+tierName(up)+" ribbon on their collar. Such a good, productive cow.");
-        } else tell(mn, "🥛 Quota met yesterday ("+ml(got)+" of "+ml(q)+"). That's "+r.quotaStreak+" day"+(r.quotaStreak===1?"":"s")+" in a row, sugar!");
+        if (r.quotaMetDay !== prev) quotaCount(mn, prev, got, q, true);   // (met it, but nothin' counted it on the day)
       } else if (r.quotaGrace > 0){
         // quota grace from the store: forgiven, once
         r.quotaGrace--;

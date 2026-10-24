@@ -5,7 +5,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 | Script | File in `dist/` | Where it runs | Current |
 |---|---|---|---|
-| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.47.0** |
+| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.47.1** |
 | Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.10.0** |
 | Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.2.1** |
 | Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **1.1.0** |
@@ -23,6 +23,8 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 - Running the watcher on more than one game at once (the bot, yours, a tester's) lets Claude line them up into one timeline.
 
 ## Latest changes (newest first)
+
+- **Bot 0.47.1: she stays on her home spot, and the milk streak counts.** Laynie, Oct 24: "the bot is still teleporting from its home spot" and "some players said that their milk streak hasn't updated". **Home spot:** the watch showed her stepping beside a pet for a whole half-hour ECHS trance, and hopping a tile every 11 minutes to keep the game from thinkin' she'd gone idle. She never moves now: for a trance the pet is brought to her side (led by their Companion, or teleported) once their ECHS box opens, and the hop is off (the hidden keep-alive does the job). **Milk streak:** it only counted at the farm's midnight (UTC: 7 in the evening Central), only for a day they'd spent an hour on the farm, and it went back to 0 every time they moved up a tier. Now it counts the moment today's pail reaches their quota (ribbons too), once a day, and keeps countin' past a tier (a tier every 5). Midnight still marks a short day they were here. tests: echs, shots-and-play J, pay-stingy, traps.
 
 - **Bot 0.47.0, Companion 0.41.0: the tithes, size-aware traps, and corruption with a way back.** Laynie, Oct 24: "no sizeplay toggle, or its default on ... maybe one that allows cows to suck a cock, steal its size and grow their own udders", "[sizes in traps] is great", "[corruption] needs work and a way to reverse effects, and more effects and corruption", "as long as the latex can come off too."
   - **Bull's Tithe** (for a cock, 14 ribbons, four hours): every cock they breed loses two inches and theirs grows two, for good. **Cow's Tithe** (for udders): every cock they suck dry loses two inches and their udders grow a cup. Once per partner a day, never below two inches, and nobody with size in their limits. No switch: on for everybody. bot/src/parts/10ul-tithes.js.

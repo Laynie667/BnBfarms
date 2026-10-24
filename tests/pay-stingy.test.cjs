@@ -31,6 +31,7 @@ let fails=0; const ok=(c,msg)=>{ out(msg+' -> '+(c?'true':'false')); if(!c) fail
   const cfg=W.__cfg;
   ok(cfg.EGG_MAX===400 && cfg.GATHER_MAX_RIBBONS===12, 'eggs: 400 carried, 12 a gatherin\' at most');
   // milk: a ribbon every 2 litres, 3 a day at most
+  R(501).quota=0;   // (Oct 24: the quota pays the moment it's met now; this one's only the litres)
   const p=W.__prodOf(501), r0=R(501).ribbons||0;
   p.milk=20000; W.__drainMilk(501,1500); await wait(2800);
   ok((R(501).ribbons||0)===r0, 'a litre and a half pays nothin\' yet');

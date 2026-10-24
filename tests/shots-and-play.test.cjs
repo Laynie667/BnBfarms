@@ -103,6 +103,13 @@ W.InventoryGroupIsBlocked=()=>true;   // what the live game does
     mp.seenDay='2000-01-03'; mp.seenMin={day:'2000-01-03',min:300}; mp.mday={day:'2000-01-03',ml:0}; const reg=L().people[500].registeredAt; L().people[500].registeredAt=Date.parse('2000-01-03T12:00:00Z');
     L().quotaDay='2000-01-03'; W.__qt(); L().people[500].registeredAt=reg;
     out('J the day they signed up: no mark ->', (L().people[500].naughtyMarks||0)===before); }
+  // Oct 24: the streak counts the moment today's pail is full, once a day, and keeps counting past a tier
+  { const r=L().people[500]; r.quota=500; r.quotaStreak=4; r.quotaMetDay=null; r.tier='new'; const today=new Date().toISOString().slice(0,10);
+    mp.mday={day:today,ml:0}; mp.milk=2000; W.__drainMilk(500,600); await wait(400);
+    out('J quota met today: the streak counts now, and five days moves them up a tier ->', r.quotaStreak===5, r.quotaMetDay===today, r.tier==='trained');
+    mp.milk=2000; W.__drainMilk(500,600); await wait(300);
+    out('J a second milkin\' the same day: counted once ->', r.quotaStreak===5);
+    L().quotaDay=today; W.__qt(); out('J and midnight doesn\'t count it again ->', r.quotaStreak===5); r.quota=undefined; }
   await B(221397,'stats'); out('STATS\n'+sent.filter(s=>s[1].Type==='Whisper'&&s[1].Target===221397).slice(-2).map(s=>s[1].Content).join('\n'));
   process.exit(0);
 })();

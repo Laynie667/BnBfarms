@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.47.0
+// @version      0.47.1
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -2242,7 +2242,7 @@
   ];
 
   // bot/src/version.js
-  var VERSION = "0.47.0";
+  var VERSION = "0.47.1";
 
   // bot-parts:farmhand-bot-parts
   (function() {
@@ -2291,8 +2291,8 @@
       HEARTBEAT_MS: 2e4,
       KEEPALIVE_MIN: 4,
       // invisible server traffic every N minutes
-      KEEPALIVE_NUDGE: true,
-      // also shuffle position occasionally
+      KEEPALIVE_NUDGE: false,
+      // also shuffle position occasionally (off Oct 24: the hidden keep-alive is enough, and the hop read as the bot leavin' its home spot)
       NUDGE_MIN: 11,
       WATCHDOG_MIN: 5,
       // reload the page if broken this long
@@ -6008,6 +6008,11 @@
         if (!p.mday || p.mday.day !== d) p.mday = { day: d, ml: 0 };
         const was = Math.floor(p.mday.ml / CFG.LITRE_RIBBON_ML);
         p.mday.ml += take;
+        try {
+          quotaLive(mn);
+        } catch (e) {
+          warn("quota:", e);
+        }
         const owe = Math.min(Math.floor(p.mday.ml / CFG.LITRE_RIBBON_ML) - was, CFG.LITRE_RIBBON_DAY - (p.mday.paid || 0));
         if (owe > 0) {
           p.mday.paid = (p.mday.paid || 0) + owe;
@@ -7256,6 +7261,28 @@
       const p = prodOf(mn);
       return p && p.mday && p.mday.day === d ? p.mday.ml : 0;
     }
+    function quotaLive(mn) {
+      const q = quotaOf(mn), r = rec(mn), d = dayKey();
+      if (!q || !r || r.quotaMetDay === d) return;
+      const got = milkedOn(mn, d);
+      if (got < q) return;
+      quotaCount(mn, d, got, q, false);
+    }
+    function quotaCount(mn, d, got, q, late) {
+      const r = rec(mn);
+      r.quotaMetDay = d;
+      r.quotaStreak = (r.quotaStreak || 0) + 1;
+      earnRibbons(mn, CFG.RIBBONS_FOR.quota, "makin' your milk quota", 0, true);
+      const tier = tierOf(mn), up = { new: "trained", trained: "prize" }[tier];
+      if (r.quotaStreak >= CFG.QUOTA_STREAK_UP && r.quotaStreak % CFG.QUOTA_STREAK_UP === 0 && up) {
+        r.tier = up;
+        audit(CFG.BOT_MEMBER, "TIER", mn + " \u2192 " + up + " (milk quota)");
+        tell(mn, "\u{1F95B} " + r.quotaStreak + " days in a row on quota! You're " + tierName(up) + " now, sweetie. Good cow.");
+        if (onMap(mn)) emote("\u{1F380} " + plainName(mn) + " has filled the pail every day for " + r.quotaStreak + " days, so the farm girl ties a " + tierName(up) + " ribbon on their collar. Such a good, productive cow.");
+      } else tell(mn, "\u{1F95B} Quota met" + (late ? " yesterday" : " for today") + " (" + ml(got) + " of " + ml(q) + "). That's " + r.quotaStreak + " day" + (r.quotaStreak === 1 ? "" : "s") + " in a row, sugar!");
+      saveLedger();
+      syncCompanions(true);
+    }
     function quotaTick() {
       const today = dayKey();
       if (L2.quotaDay === today) return;
@@ -7270,16 +7297,7 @@
         if (r.registeredAt && dayKey(new Date(r.registeredAt)) === prev) continue;
         const got = milkedOn(mn, prev);
         if (got >= q) {
-          r.quotaStreak = (r.quotaStreak || 0) + 1;
-          earnRibbons(mn, CFG.RIBBONS_FOR.quota, "makin' your milk quota", 0, true);
-          const tier = tierOf(mn), up = { new: "trained", trained: "prize" }[tier];
-          if (r.quotaStreak >= CFG.QUOTA_STREAK_UP && up) {
-            r.quotaStreak = 0;
-            r.tier = up;
-            audit(CFG.BOT_MEMBER, "TIER", mn + " \u2192 " + up + " (milk quota)");
-            tell(mn, "\u{1F95B} " + CFG.QUOTA_STREAK_UP + " days in a row on quota! You're " + tierName(up) + " now, sweetie. Good cow.");
-            if (onMap(mn)) emote("\u{1F380} " + plainName(mn) + " has filled the pail every day for " + CFG.QUOTA_STREAK_UP + " days, so the farm girl ties a " + tierName(up) + " ribbon on their collar. Such a good, productive cow.");
-          } else tell(mn, "\u{1F95B} Quota met yesterday (" + ml(got) + " of " + ml(q) + "). That's " + r.quotaStreak + " day" + (r.quotaStreak === 1 ? "" : "s") + " in a row, sugar!");
+          if (r.quotaMetDay !== prev) quotaCount(mn, prev, got, q, true);
         } else if (r.quotaGrace > 0) {
           r.quotaGrace--;
           tell(mn, "\u{1F95B} You only gave " + ml(got) + " of your " + ml(q) + " quota yesterday, sugar, but you had quota grace in your pocket. Forgiven, this once." + (r.quotaGrace ? " (" + r.quotaGrace + " left)" : ""));
@@ -21068,12 +21086,16 @@
       if (!mapRoom()) return;
       const me = charFor(CFG.BOT_MEMBER), a = me && me.MapData && me.MapData.Pos, b = posOf(mn);
       if (!a || !b || b.X < 0 || Math.max(Math.abs(a.X - b.X), Math.abs(a.Y - b.Y)) <= 1) return;
-      const to = spotBeside(mn);
+      const v = echsOf(mn);
+      if (v && v.broughtAt && Date.now() - v.broughtAt < 6e4) return;
+      if (v) v.broughtAt = Date.now();
+      const to = spotBeside(CFG.BOT_MEMBER);
       if (!to) return;
-      if (!state.echsFrom) state.echsFrom = { X: a.X, Y: a.Y };
-      state.echsBusyUntil = Date.now() + 2e4;
-      me.MapData.Pos = { X: to.X, Y: to.Y };
-      send("ChatRoomCharacterMapDataUpdate", me.MapData);
+      try {
+        teleport(mn, to, false);
+      } catch (e) {
+        warn("echs bring:", e);
+      }
     }
     function echsHome() {
       if (!state.echsFrom || Date.now() < (state.echsBusyUntil || 0)) return;
@@ -21158,6 +21180,7 @@
         return;
       }
       if (v.phase === was && v.phase !== "Hypnotized") return;
+      if (v.phase === "AttemptMade" && was !== "AttemptMade") echsBeside(sender);
       if (v.phase === "InductionInProgress" && was !== "InductionInProgress") echsPatter(sender, v);
       else if (v.phase === "Hypnotized" && was !== "Hypnotized") {
         if (r) r.echs = Object.assign(r.echs || {}, { underAt: Date.now(), n: (r.echs && r.echs.n || 0) + 1 });

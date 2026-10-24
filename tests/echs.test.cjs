@@ -51,7 +51,7 @@ const near=(mn)=>{ const a=chars[0].MapData.Pos, b=chars.find(c=>c.MemberNumber=
   n=sent.length; echs(500,{phase:'InductionInProgress',windowRemaining:60000}); await wait(3500);
   const pat=inChar(n,500);
   ok(pat.length>=1 && pat.every(t=>t.length>=15 && !/[()]/.test(t)), 'the induction minute: she talks them down, in character, so every line counts: '+(pat[0]||'').slice(0,70));
-  ok(near(500), 'and for that she steps right beside them, so a whisper carries');
+  ok(chars[0].MapData.Pos.X===home0.X && chars[0].MapData.Pos.Y===home0.Y && sent.some(([e,d])=>d&&d.Target===500&&(/MapViewTeleport/.test(d.Content||'')||(d.Dictionary&&/lead/.test(JSON.stringify(d.Dictionary))))), 'she never leaves her spot: they are brought to her side for it (Oct 24)');
   // under: Conditioning runs through ECHS
   n=sent.length; echs(500,{phase:'Hypnotized',depthBand:'deeply under'}); await wait(1500);
   const under=inChar(n,500);

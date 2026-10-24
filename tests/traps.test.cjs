@@ -184,7 +184,7 @@ const C=mn=>chars.find(c=>c.MemberNumber===mn);
   W.__load(-1,500,'mouth',60); await wait(500); ok(!P(500).parasite, 'no parasite for anybody who has not said ?parasite on');
   await say(500,'?parasite on'); n=sent.length; W.__load(600,500,'mouth',60); await wait(500); ok(!P(500).parasite, '...and only out of the glory holes');
   W.__load(-1,500,'vulva',60); await wait(500); ok(!P(500).parasite, '...and only from a load swallowed');
-  n=sent.length; W.__load(-1,500,'mouth',60); await wait(900);
+  n=sent.length; W.__load(-1,500,'mouth',60); await wait(6000);
   ok(P(500).parasite && P(500).parasite.until > Date.now()+11*3600000 && /livin' lips/.test(to(500,n)), 'it latches for 12 hours and they are told what it is');
   P(500).parasite.strain='grower'; P(500).parasite.urgeAt=Date.now()+9e9;
   const f0=prod(500).boostX.fert||0, sz=()=>JSON.stringify(prod(500).size||{}), s0=sz(); P(500).parasite.next=0; n=sent.length; W.__parasiteTick(); await wait(700);

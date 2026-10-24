@@ -44,7 +44,7 @@ function walkedThenEmoted(k, pos, rx){
   // 1. Moo rubs Laynie's belly with the game's own action: the bot walks over first, then the room sees the kick
   let k=sent.length;
   handlers.ChatRoomMessage({Sender:500,Type:'Activity',Content:'ChatOther-ItemPelvis-Rub',Dictionary:[{SourceCharacter:500},{TargetCharacter:221397},{FocusGroupName:'ItemPelvis'},{ActivityName:'Rub'}]});
-  await wait(1500);
+  await wait(4500);   // (the send queue paces: the day's weather and the whitelist go out first)
   // nobody here has the Companion, so lines about Laynie go privately to the people near her; the bot stays put
   const priv=(k0,mn,rx)=>sent.slice(k0).some(([e,d])=>d&&d.Type==='Whisper'&&d.Target===mn&&d.Content.startsWith('(')&&rx.test(d.Content));
   const moved=k0=>sent.slice(k0).some(([e])=>e==='ChatRoomCharacterMapDataUpdate');

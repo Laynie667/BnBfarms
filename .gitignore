@@ -23,3 +23,7 @@ studio/game-cache/
 # the bot's backup folder, if it's picked inside the project (03b-storage.js): the books, never on GitHub
 Backups/
 bnb-ledger-*.json
+
+# reference pictures copied in for the studio to look at (Oct 24): never on GitHub
+studio/web/_refs/
+studio/web/_stamps/

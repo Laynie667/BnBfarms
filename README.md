@@ -1,5 +1,8 @@
 # 🌾 B&B Farm: Farmhand
 
+> ## 👉 Players: the only script you need is the Farmhand Companion.
+> **[Install the Farmhand Companion](https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js)** with Tampermonkey, and it keeps itself up to date. That's it. Everything else on this page is for the farm bot's own computer, except the Farm Watcher, which you'd only install if staff ask you to.
+
 Two scripts that run the B&B Farm map room in Bondage Club:
 
 | Script | Who runs it | What it does |
@@ -18,10 +21,10 @@ Then click a link below. Tampermonkey opens its install page; press **Install**.
 
 | Script | What it does |
 |---|---|
-| [**Farmhand Companion**](https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js) | The 🌾 button and panel: your farm life, your record, your herd, the staff tabs for staff. Optional; the farm works without it. |
-| [**Farm Watcher**](https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farm-watcher.user.js) | Diagnostics only: records what your game sees for a while and saves a text file to send in when something's wrong. |
+| [**Farmhand Companion**](https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js) | **The one players need.** The 🌾 button and panel: your farm life, your record, your herd, the staff tabs for staff. Without it the farm still works, with beeps and whispers instead. |
+| [**Farm Watcher**](https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farm-watcher.user.js) | Not needed to play. Diagnostics only, if staff ask: records what your game sees for a while and saves a text file to send in when something's wrong. |
 
-**The farm bot's computer only** (account 260239)
+**The farm bot's computer only** (account 260239). Players: don't install these.
 
 | Script | What it does |
 |---|---|

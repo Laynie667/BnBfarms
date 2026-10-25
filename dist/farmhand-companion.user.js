@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.41.0
+// @version      0.41.1
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -230,7 +230,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.41.0";
+  var VERSION = "0.41.1";
 
   // extension/src/config.js
   var BOT_MEMBER = 260239;
@@ -429,7 +429,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     { name: "Breedin'", cmds: ["breedable", "fertile", "mpreg", "freeuse", "jarok", "yes", "no", "naturalheat", "breed <who>", "cum <who>", "wash", "tally", "eggs", "praise", "degrade", "rights", "accept", "pedigree"] },
     { name: "Body", cmds: ["size", "measure", "penis", "futa", "gender <word>"] },
     { name: "Roamin'", cmds: ["roam", "roam start", "roam back"] },
-    { name: "Clothes", cmds: ["dressme", "outfit", "outfits", "uniform", "outfit back"] },
+    { name: "Clothes", cmds: ["dressme", "outfit", "outfits", "uniform", "outfit back", "outfit starters", "outfit about <species> <gender>"] },
     { name: "Mind", cmds: ["hypno", "hypnotize me", "echs", "teaseme", "teaseme light", "teaseme steady", "teaseme needy", "teaseme off"] },
     { name: "Fun", cmds: ["fair", "enter"] },
     { name: "Ribbons and the store", cmds: ["ribbons", "ribbons top", "store", "buy <item>", "gift <who> <potion>", "potions", "potions on", "dares on", "dare", "dared", "dare skip", "bench", "bench on", "bench me <minutes>", "use <mouth|pussy|ass>", "bench top"] }
@@ -1759,7 +1759,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
         BREAST.halves.set(key, v);
         return v;
       }
-      const GEN = { inches: 6, box: {}, drawn: true, kind: "human", knot: false, girth: 1, balls: 3, cv: null, cvKey: "" };
+      const GEN = { inches: 6, box: {}, drawn: true, kind: "human", knot: false, girth: 1, balls: 3, style: 0, pent: false, cv: null, cvKey: "" };
       function draw2(C, cb, game) {
         trim();
         {
@@ -3249,9 +3249,9 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
                 if (GEN.drawn && window.FarmCock && typeof src === "string" && groupOf3(src) === "Pussy" && /Penis/.test(src)) {
                   try {
                     const hard = /\/Hard\//.test(src), skin = upperSkin || FarmBelly.FALLBACK.White;
-                    const key = [GEN.kind, GEN.knot, GEN.inches, GEN.girth, GEN.balls, hard, skin.join(",")].join("|");
+                    const key = [GEN.kind, GEN.knot, GEN.inches, GEN.girth, GEN.balls, GEN.style, GEN.pent, FarmCock.ver || 0, hard, skin.join(",")].join("|");
                     if (GEN.cvKey !== key) {
-                      GEN.cv = FarmCock.canvas({ kind: GEN.kind, knot: GEN.knot, inches: GEN.inches, girth: GEN.girth, balls: GEN.balls, hard, skin });
+                      GEN.cv = FarmCock.canvas({ kind: GEN.kind, knot: GEN.knot, inches: GEN.inches, girth: GEN.girth, balls: GEN.balls, style: GEN.style, pent: GEN.pent, hard, skin });
                       GEN.cvKey = key;
                     }
                     if (hard) {
@@ -8916,6 +8916,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
         "div",
         { class: "fhc-box ask" },
         h("b", null, "\u{1F457} " + (o.why ? o.why + ": " : "") + "put on your " + o.label + "?"),
+        o.desc ? h("div", { class: "fhc-card", style: { whiteSpace: "pre-wrap", margin: "6px 0" } }, o.desc) : null,
         h("div", { class: "fhc-muted" }, "Your own clothes are kept so you can change back. Body and hair aren't touched, and nothin' already locked on you moves." + (o.keys.length ? " Any locked pieces get high security padlocks the farm's keyholders can open." : "")),
         h(
           "div",
@@ -9402,7 +9403,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     bra: { groups: ["Bra"], names: ["FlowerBra"], re: /^FlowerBra$/, takeover: true },
     hat: { groups: ["Hat"], names: ["FlowerCrown"], re: /^FlowerCrown$/, takeover: true },
     boots: { groups: ["ItemBoots"], names: ["ThighHighLatexHeels"], re: /^ThighHighLatexHeels$/ },
-    device: { groups: ["ItemDevices"], names: ["WoodenStocks"], re: /^(WoodenStocks|SaddleStand|WoodenHorse|Net|Kennel|LowCage|KabeshiriWall|WheelFortune|LuckyWheel|X-Cross|BondageBench|TheDisplayFrame|MilkCan)$/ }
+    device: { groups: ["ItemDevices"], names: ["WoodenStocks"], re: /^(WoodenStocks|SaddleStand|WoodenHorse|Net|Kennel|LowCage|KabeshiriWall|WheelFortune|LuckyWheel|XFrame|BondageBench|TheDisplayFrame|MilkCan)$/ }
   };
   var GEAR_OPT = {
     "ItemArms:LeatherCuffs": "Wrist",
@@ -10498,6 +10499,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
         st.panel.setOutfit({
           slot: String(m.slot || ""),
           label: String(m.label || "farm outfit"),
+          desc: String(m.desc || "").slice(0, 1200),
           data: String(m.data || ""),
           keys: Array.isArray(m.keys) ? m.keys.filter(Number.isInteger) : [],
           why: String(m.why || "")

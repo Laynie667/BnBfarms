@@ -25,7 +25,7 @@
     teatcheck:   [{ when: "hold", slot: "cups", label: "Check Stall Cups", items: ["LactationPump", "NippleClamp"], desc: "The dairy girl's own stripping cups, cold steel, for gettin' the last drops out after the hand check." }],
     wax:         [{ when: "hold", slot: "device", label: "The Bench", items: ["BondageBench", "Table"], desc: "The farm's punishment bench, buckled at the wrists, waist and knees, with a candle burning on the shelf beside it." }],
     tomatoes:    [{ when: "hold", slot: "device", label: "Square Stocks", items: ["WoodenStocks"], desc: "The old wooden stocks in the middle of the square, stained red from a hundred fruit-throwing Sundays." }],
-    trophy:      [{ when: "hold", slot: "device", label: "Trophy Mount", items: ["XFrame", "X-Cross", "TheDisplayFrame"], desc: "A plank frame on the cabin's trophy wall, between the elk and the bear, with a brass plate underneath: LOCAL GAME." }],
+    trophy:      [{ when: "hold", slot: "device", label: "Trophy Mount", items: ["XFrame", "TheDisplayFrame"], desc: "A plank frame on the cabin's trophy wall, between the elk and the bear, with a brass plate underneath: LOCAL GAME." }],
     hottub:      [{ when: "hold", slot: "arms", label: "Lumberjack's Grip", items: ["HempRope", "LeatherCuffs"], desc: "A length of logging rope round the wrists, so they don't float off while they're passed round the tub." }],
     slop:        [],
     hogtie:      [{ when: "hold", slot: "ropeFeet", label: "Hog Tie", items: ["HempRope"], opt: "Basic", desc: "Rough sty rope, wrists to ankles behind the back, tied with the pig girl's rodeo knot." },

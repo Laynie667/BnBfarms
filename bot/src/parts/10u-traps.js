@@ -215,12 +215,14 @@
   function hyperEggs(mn, luck){ const p = prodOf(mn); return wornTags(mn).has("hyper") || boosted(p, "hyper") || Math.random() < (luck || 0); }
 
   function springTrap(mn, kind, spot, force){
+    let drewBy = "";
     if (kind === "random"){
       // a tile in a place springs that place's traps (10ua-trap-themes.js); nothin' fits there, or no place: any trap
       const placed = spot ? themePool(mn, spot) : [];
       const can = placed.length ? placed : Object.keys(TRAP_KINDS).filter(k => k !== "tentacle" && !trapWhyNot(mn, k));
       if (!can.length) return "nothin' they can spring right now";
-      kind = can[Math.floor(Math.random()*can.length)];
+      const pk = trapWeighted(mn, can);   // the moment makes some likelier: full udders, heat, the hour, a crowd (10ua2-trap-weights.js)
+      kind = pk.kind; drewBy = pk.why;
     }
     const why = trapWhyNot(mn, kind);
     if (why) return why;
@@ -229,7 +231,7 @@
     r.trapN = (r.trapN || 0) + 1;
     trapSprung(mn, kind, spot);   // tallies, the trap card, bait (10x-trap-extras.js)
     audit(BOTMN(), "TRAP", mn+" "+kind+(spot ? " at "+spot : "")+(force ? " (by hand)" : ""));
-    tell(mn, TRAP_KINDS[kind].icon+" You've sprung a trap, sugar: "+TRAP_KINDS[kind].what+". Your safeword stops it cold.");
+    tell(mn, TRAP_KINDS[kind].icon+" "+(drewBy ? drewBy+" " : "")+"You've sprung a trap, sugar: "+TRAP_KINDS[kind].what+". Your safeword stops it cold.");
     face(mn, kind === "lantern" ? "trance" : "edged", 60);
     { const snd = TRAP_SOUND[kind] || (L.customTraps && L.customTraps[kind] && CUSTOM_SOUND[L.customTraps[kind].does]); if (snd) sound(mn, snd); }   // what it sounds like when it gets you (10y9c-sounds.js)
     // gas, spray and the needle come in kinds and strengths (10z-trap-variants.js)

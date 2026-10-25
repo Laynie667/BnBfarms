@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.47.2
+// @version      0.48.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -1881,7 +1881,179 @@
     "ItemHands:PonyMittensBinder:Chained": { TypeRecord: { typed: 1 } }
   };
 
+  // shared/farm-outfit-names.js
+  var NAMES = {
+    cow: {
+      female: ["Dairy Darling", "Pastel pink and cream, a cowbell that rings with every crawl, and udders cupped and pumpin' on a slow, steady draw. Made for the milkin' line."],
+      male: ["Brass-Bell Bullock", "A jockstrap, a cognac chest harness and a cowbell on a locked collar: a young bull on all fours, caged and kept for the herd."],
+      futa: ["Cream Queen", "Everything a dairy girl wears, cow-print and milkin' cups, and nothin' locked between the legs to get in the way of breedin'."],
+      femboy: ["Buttercup Milkmaid", "A frilly pink maid bikini and a ribbon cincher on a crawlin' little cow, bell ringin', cage locked."],
+      nonbinary: ["Clover Heifer", "Pastel lingerie under a padded cream petsuit, horns, a nose ring and a cowbell, belted and locked."]
+    },
+    kitt: {
+      female: ["Lilac Lap Kitten", "Lavender ears, a lilac petsuit with pink paw pads and a belled pink collar: a pet that purrs on all fours."],
+      male: ["Alley Tom", "A tomcat in a jockstrap and a leather harness, belled, leashed and caged, crawlin' in lilac."],
+      futa: ["Velvet Pounce", "Open lace in lavender, a belled collar and a petsuit to crawl in, with nothin' locked between the legs."],
+      femboy: ["Ribbon Kitten", "A pink maid bikini, a tulle skirt and ribbons on a kitten in a lilac petsuit, caged and belled."],
+      nonbinary: ["Lavender Purr", "A corset bikini and crotchless lace under a lilac petsuit, belted and belled."]
+    },
+    bunny: {
+      female: ["Hutch Honey", "A see-through pink bunny suit, cream ears and a puff of a tail, bow collar and cuffs, wrists cuffed and ankles chained."],
+      male: ["Buck in Bows", "A jockstrap, a chest harness and bow-tied socks on a cuffed buck, leashed and caged."],
+      futa: ["Clover Hopper", "The see-through bunny suit with nothin' locked on: cuffed, collared and ready to be bred like a rabbit."],
+      femboy: ["Sugar Bun", "All pink frills: a maid bikini, a tulle skirt, ribbons and bunny ears, cuffed, chained at the ankles and caged."],
+      nonbinary: ["Cottontail Charm", "A corset bikini and crotchless lace, bunny ears and tail, cuffed and belted."]
+    },
+    goat: {
+      female: ["Bluebell Nanny", "Cream horns, a brass bell and nose ring, a bit between the teeth, hooves for hands and pet legs to kneel on, in pastel blue."],
+      male: ["Brass-Belled Billy", "A jockstrap and harness on a billy with hoof mittens, a bit and a bell, kneelin' and caged."],
+      futa: ["Mountain Milker", "Pastel blue lace, a bit, a bell and hoof mittens, horns up and everything below left free."],
+      femboy: ["Little Kid Frills", "A pink maid bikini and tulle skirt on a kid with horns, hoof mittens and a bit, caged and kneelin'."],
+      nonbinary: ["Meadow Caprine", "A corset bikini in pastel blue, hoof mittens, a bit and a bell, belted."]
+    },
+    deer: {
+      female: ["Twine-Bound Fawn", "Peach and mint, a reindeer band, a hemp rope harness and crossed rope on the legs, hooves on her hands and her feet."],
+      male: ["Stag in Hemp", "A jockstrap and a rope harness, hoof mittens and hooves, a bit and a bell, legs roped and caged."],
+      futa: ["Hart of the Hayloft", "Open peach lace under rope, hooves and a bit, tied pretty and left free to breed."],
+      femboy: ["Bambi Frills", "A pink maid bikini and tulle skirt under hemp rope, hoof mittens and hooves, caged."],
+      nonbinary: ["Mint Meadow Deer", "A corset bikini under a rope harness, hooves and a bit, belted."]
+    },
+    pony: {
+      female: ["Midnight Mare", "Goth black and wine: a posture collar, a bridle and bit, a leather harness, hoof mittens behind the back and pony boots. Show ring ready."],
+      male: ["Brass-Bit Stallion", "A jockstrap, a harness and long fishnets, bridled and bitted, hoof mittens and boots, caged."],
+      futa: ["Dark Horse", "Latex corset, harness bra and crotchless latex under the tack: a bridled filly nobody locks shut."],
+      femboy: ["Pink Ribbon Colt", "A pink maid bikini under a cognac harness, bridle, hoof mittens and pony boots, caged."],
+      nonbinary: ["Black Velvet Pony", "A classic latex corset under the harness and bridle, hoof mittens and pony boots, belted."]
+    },
+    pup: {
+      female: ["Good Girl in Black", "A black and wine padded petsuit, a bone tag on a locked dog collar, a ring gag and a lead: a pup who sits, crawls and opens wide."],
+      male: ["Wine-Collar Hound", "A jockstrap and harness on a hound in a black petsuit, collared, tagged, leashed and caged."],
+      futa: ["Alpha Bitch", "Latex and a harness bra under a black petsuit, collared and gagged open, nothin' locked below."],
+      femboy: ["Frilly Puppy", "Pink frills on a pup in a black petsuit: a maid bikini, a ribbon cincher, a bone tag, and a cage."],
+      nonbinary: ["Midnight Mutt", "A latex corset and bra under a black petsuit, a bone tag and a ring gag, belted."]
+    },
+    fox: {
+      female: ["Vixen Noir", "Black with rust lacing and cream paws, a fluffy pair of tails, a wine collar and a ring gag."],
+      male: ["Rust Reynard", "A jockstrap and harness on a fox in a black and rust petsuit, two tails, leashed and caged."],
+      futa: ["Fox in the Henhouse", "Latex and a harness bra under the fox suit, tails up, gagged open and free to breed."],
+      femboy: ["Kit in Ribbons", "A pink maid bikini and tulle skirt on a little fox in black and rust, caged."],
+      nonbinary: ["Ember Tail", "A latex corset and bra under the fox suit, two tails and a ring gag, belted."]
+    },
+    pig: {
+      female: ["Prize Sow", "Pink, with dark trotters, floppy ears and the snout hooked up, a rope harness for haulin' by and a bell on a locked collar."],
+      male: ["Penned Boar", "A jockstrap and harness on a boar in a pink petsuit, snout hooked, roped, belled and caged."],
+      futa: ["Truffle Queen", "Open lace in rose under the sow's petsuit and rope, snout hooked, nothin' locked below."],
+      femboy: ["Piglet Pink", "A pink maid bikini and tulle skirt on a little piglet in trotters, snout hooked and caged."],
+      nonbinary: ["Rosy Trotter", "A corset bikini in rose under the petsuit and rope harness, snout hooked, belted."]
+    },
+    goblin: {
+      female: ["Ragged Raider", "Rags, elf ears and a slave collar, frog-tied on her knees with long mittens on, a bit and a nose ring, barefoot."],
+      male: ["Rag-Tag Grunt", "A jockstrap and harness on a frog-tied goblin, mittened, bitted, barefoot and caged."],
+      futa: ["Warband Brood-Queen", "Rags and a slave collar, frog-tied and mittened, nothin' locked where the warband breeds her."],
+      femboy: ["Camp Trinket", "Pink frills on a frog-tied goblin, long mittens and a bit, barefoot and caged."],
+      nonbinary: ["Cave Scrapper", "Rags and a slave collar, frog-tied and mittened, a bit and a nose ring, belted."]
+    }
+  };
+  var ALIAS = { bull: "cow", horse: "pony", dog: "pup", wolf: "pup", cat: "kitt", rabbit: "bunny", sheep: "goat" };
+  var SAY = {
+    "Bra:CorsetBikini1": "corset bikini top",
+    "Bra:CowPrintedBra": "cow-print bra",
+    "Bra:LatexBra1": "latex bra",
+    "Bra:OuvertPerl1": "open-cup pearl lace bra",
+    "Bra:StarHarnessBra": "harness bra",
+    "Cloth:MaidBikini": "frilly maid bikini",
+    "Cloth:SlaveRags": "rags",
+    "Cloth:TransparentBunnyGirl": "see-through bunny suit",
+    "ClothAccessory:BunnyCollarCuffs": "bunny collar and cuffs",
+    "ClothLower:TulleSkirt": "tulle skirt",
+    "Corset:ClassicLatexCorset": "classic latex corset",
+    "Corset:LatexCorset1": "underbust latex corset",
+    "Corset:RibbonCorset": "ribbon waist cincher",
+    "Garters:SocksBow": "bows on the socks",
+    "HairAccessory1:CowHorns": "cow horns",
+    "HairAccessory1:Horns2": "goat horns",
+    "HairAccessory2:BunnyEars1": "bunny ears",
+    "HairAccessory2:CowEars": "cow ears",
+    "HairAccessory2:Ears2": "soft ears",
+    "HairAccessory2:ElfEars": "goblin ears",
+    "HairAccessory2:FoxEars1": "fox ears",
+    "HairAccessory2:KittenEars2": "kitten ears",
+    "HairAccessory2:PonyEars1": "pony ears",
+    "HairAccessory2:PuppyEars1": "puppy ears",
+    "HairAccessory2:PuppyEars2": "floppy ears",
+    "HairAccessory3:Ribbons1": "hair ribbons",
+    "Hat:ReindeerBand": "antler band",
+    "ItemArms:LeatherCuffs": "leather wrist cuffs",
+    "ItemArms:PawPaddedPetsuitArms": "padded petsuit arms",
+    "ItemBoots:PonyBoots": "pony boots",
+    "ItemFeet:LeatherAnkleCuffs": "ankle cuffs chained together",
+    "ItemHands:ElbowLengthMittens": "long mittens",
+    "ItemHands:PonyMittensBinder": "hoof mittens strapped together",
+    "ItemLegs:FrogtieMetalCuffs": "frog-tie cuffs",
+    "ItemLegs:HempRope": "rope on the legs",
+    "ItemLegs:PawPaddedPetsuitLegs": "padded petsuit legs",
+    "ItemMouth:BitGag": "bit gag",
+    "ItemMouth:HarnessPonyBits": "bridle and bit",
+    "ItemMouth:RingGag": "ring gag",
+    "ItemNeck:DogCollar": "dog collar",
+    "ItemNeck:LeatherCollar": "leather collar",
+    "ItemNeck:LeatherCollarBell": "belled collar",
+    "ItemNeck:LeatherCollarBow": "bow collar",
+    "ItemNeck:PostureCollar": "posture collar",
+    "ItemNeck:SlaveCollar": "slave collar",
+    "ItemNeckAccessories:CollarBell": "brass bell",
+    "ItemNeckAccessories:CollarCowBell": "cowbell",
+    "ItemNeckAccessories:CollarPupBone": "bone tag",
+    "ItemNeckRestraints:CollarLeash": "leash",
+    "ItemNipples:BellClamps": "bell nipple clamps",
+    "ItemNipples:ChainClamp": "chained nipple clamps",
+    "ItemNipples:LactationPump": "milkin' cups",
+    "ItemNipples:NippleClamps1": "nipple clamps",
+    "ItemNose:NoseRing": "nose ring",
+    "ItemNose:PigNoseHook": "nose hook",
+    "ItemPelvis:SleekLeatherChastityBelt": "leather chastity belt",
+    "ItemTorso:HempRopeHarness": "rope harness",
+    "ItemTorso:LeatherChestHarness1": "chest harness",
+    "ItemTorso:LeatherHarness": "leather harness",
+    "ItemVulva:FlatChastityCage": "chastity cage",
+    "ItemVulva:PlasticChastityCage1": "pink chastity cage",
+    "Panties:Bikini1": "bikini panties",
+    "Panties:CowPrintedPanties": "cow-print panties",
+    "Panties:CrotchPanties1": "crotchless lace panties",
+    "Panties:Jockstrap": "jockstrap",
+    "Panties:LatexCrotchlessPanties": "crotchless latex panties",
+    "Shoes:HeellessHoof": "hooves",
+    "Shoes:Heels1": "heels",
+    "Shoes:MaryJaneShoes": "Mary Janes",
+    "Shoes:StilettoHeels": "stilettos",
+    "Shoes:ThighBoots": "thigh boots",
+    "Socks:LatexSocks1": "latex stockings",
+    "Socks:LongFishnets": "long fishnets",
+    "Socks:SilkStockings3": "seamed stockings",
+    "Socks:Socks6": "fluffy thigh-high socks",
+    "TailStraps:BunnyTailStrap": "puff tail",
+    "TailStraps:CowtailStrap": "cow tail",
+    "TailStraps:FoxTailsStrap": "two fox tails",
+    "TailStraps:HorseTailStrap": "horse tail",
+    "TailStraps:KittenTailStrap1": "kitten tail",
+    "TailStraps:PuppyTailStrap": "puppy tail"
+  };
+  var say = (p) => SAY[p.Group + ":" + p.Name] || p.Name;
+  var list = (a) => a.length < 2 ? a.join("") : a.slice(0, -1).join(", ") + " and " + a[a.length - 1];
+  var entry = (species, gender) => (NAMES[species] || NAMES[ALIAS[species]] || {})[gender] || null;
+  function outfitName(species, gender) {
+    const e = entry(species, gender);
+    return e ? e[0] : null;
+  }
+  function outfitDesc(species, gender) {
+    const e = entry(species, gender), pieces = outfitPieces(species, gender);
+    if (!e || !pieces) return null;
+    const locked = pieces.filter((p) => p.locked).map(say);
+    return e[1] + "\nIn it: " + list(pieces.map(say)) + "." + (locked.length ? "\nPadlocked: " + list(locked) + "." : "");
+  }
+
   // shared/farm-outfits.js
+  var OUTFIT_GENDERS = ["female", "male", "futa", "femboy", "nonbinary"];
   var L = true;
   var C = {
     pink: "#E67FA3",
@@ -2172,10 +2344,11 @@
     }
   };
   var OUTFIT_SPECIES = Object.keys(KIT);
-  var ALIAS = { bull: "cow", horse: "pony", dog: "pup", wolf: "pup", cat: "kitt", rabbit: "bunny", sheep: "goat" };
+  var ALIAS2 = { bull: "cow", horse: "pony", dog: "pup", wolf: "pup", cat: "kitt", rabbit: "bunny", sheep: "goat" };
+  var speciesLabel = (sp) => (KIT[sp] || {}).label || sp;
   var BODY = { female: { tits: true, pussy: true }, male: { cock: true, flat: true }, futa: { tits: true, pussy: true, cock: true }, femboy: { cock: true, flat: true }, nonbinary: { pussy: true, flat: true } };
   function outfitPieces(species, gender) {
-    const K = KIT[species] || KIT[ALIAS[species]], B = BODY[gender];
+    const K = KIT[species] || KIT[ALIAS2[species]], B = BODY[gender];
     const W = gender === "femboy" ? FEMBOY : (WEAR[K && K.look] || {})[gender];
     if (!K || !W) return null;
     const by = /* @__PURE__ */ new Map();
@@ -2219,7 +2392,7 @@
     { name: "Breedin'", cmds: ["breedable", "fertile", "mpreg", "freeuse", "jarok", "yes", "no", "naturalheat", "breed <who>", "cum <who>", "wash", "tally", "eggs", "praise", "degrade", "rights", "accept", "pedigree"] },
     { name: "Body", cmds: ["size", "measure", "penis", "futa", "gender <word>"] },
     { name: "Roamin'", cmds: ["roam", "roam start", "roam back"] },
-    { name: "Clothes", cmds: ["dressme", "outfit", "outfits", "uniform", "outfit back"] },
+    { name: "Clothes", cmds: ["dressme", "outfit", "outfits", "uniform", "outfit back", "outfit starters", "outfit about <species> <gender>"] },
     { name: "Mind", cmds: ["hypno", "hypnotize me", "echs", "teaseme", "teaseme light", "teaseme steady", "teaseme needy", "teaseme off"] },
     { name: "Fun", cmds: ["fair", "enter"] },
     { name: "Ribbons and the store", cmds: ["ribbons", "ribbons top", "store", "buy <item>", "gift <who> <potion>", "potions", "potions on", "dares on", "dare", "dared", "dare skip", "bench", "bench on", "bench me <minutes>", "use <mouth|pussy|ass>", "bench top"] }
@@ -2242,7 +2415,7 @@
   ];
 
   // bot/src/version.js
-  var VERSION = "0.47.2";
+  var VERSION = "0.48.0";
 
   // bot-parts:farmhand-bot-parts
   (function() {
@@ -4598,9 +4771,9 @@
       later(tryIt, 2e3);
       return true;
     }
-    function say(t, urgent, who) {
+    function say2(t, urgent, who) {
       const subject = who || aboutWhom(t);
-      if (subject && waitPlaced(subject, () => say(t, urgent, subject), () => privateTo(subject, t, "chat"))) return;
+      if (subject && waitPlaced(subject, () => say2(t, urgent, subject), () => privateTo(subject, t, "chat"))) return;
       if (speakersOn() && speakerSend(subject, t, "chat", urgent)) return;
       if (mapRoom() && CFG.SPEAKER_MODE !== "walk") {
         if (subject && speakerSend(subject, t, "chat", urgent)) return;
@@ -5072,7 +5245,7 @@
         }
         if (String(text).length <= CFG.CHAT_REPLY_SAY_MAX) {
           if (mapRoom()) privateTo(mn, text, "chat");
-          else say(text, false, mn);
+          else say2(text, false, mn);
           return;
         }
         state.friendTipAt = state.friendTipAt || /* @__PURE__ */ new Map();
@@ -5152,9 +5325,9 @@
         return !!(r && r.roles && r.roles.length);
       };
       const score = (m) => (onBooks2(m) ? 2 : 0) + (charFor(m) ? 1 : 0);
-      const choose = (list) => {
-        if (list.length <= 1) return list[0] || null;
-        const best = Math.max(...list.map(score)), top = list.filter((m) => score(m) === best);
+      const choose = (list2) => {
+        if (list2.length <= 1) return list2[0] || null;
+        const best = Math.max(...list2.map(score)), top = list2.filter((m) => score(m) === best);
         if (top.length === 1) return top[0];
         state.ambiguous = { arg, list: top };
         return null;
@@ -5199,7 +5372,7 @@
       const pool = (known ? RETURN_GREETINGS : GREETINGS).filter(greetFits);
       const own = customGreeting(mn);
       const line = own || pool[Math.floor(Math.random() * pool.length)];
-      later(() => say(fill(line, mn), false, mn), 1500);
+      later(() => say2(fill(line, mn), false, mn), 1500);
       const r = rec(mn);
       if (r) {
         r.name = plainName(mn);
@@ -5224,7 +5397,7 @@
         if (years >= 1 && d0.getMonth() === now.getMonth() && d0.getDate() === now.getDate() && r.annivYear !== now.getFullYear()) {
           r.annivYear = now.getFullYear();
           saveLedger();
-          later(() => say("\u{1F389} " + years + " year" + (years === 1 ? "" : "s") + " on the books today, " + plainName(mn) + "! Somebody fetch this sweetie a ribbon!", false, mn), 4500);
+          later(() => say2("\u{1F389} " + years + " year" + (years === 1 ? "" : "s") + " on the books today, " + plainName(mn) + "! Somebody fetch this sweetie a ribbon!", false, mn), 4500);
         }
       }
     }
@@ -7380,10 +7553,10 @@
       return doCum(stud, t, holes[0], R, auto, o2);
     }
     const NAME_FILLER = new Set("the and of for with bnb b&b farm farms miss mister mistress master lady lord sir madam little big good bad pet doll thing princess queen king girl boy babe baby cow cows bull heifer pony horse mare stallion dog pup puppy doggy pig piglet sow cat kitty kitten kitt bunny rabbit goat sheep ewe fox vixen wolf deer doe goblin hucow slave toy".split(" "));
-    function namedIn(text, list) {
+    function namedIn(text, list2) {
       const low = " " + text.toLowerCase().replace(/[^a-z0-9'\s]/g, " ") + " ";
       const has = (w) => w.length > 1 && (low.includes(" " + w + " ") || low.includes(" " + w + "'s "));
-      return list.find((mn) => low.includes(" " + mn + " ") || namesOf(mn).some((n) => has(n) || n.split(/\s+/).some((w) => w.length > 2 && !NAME_FILLER.has(w) && has(w))));
+      return list2.find((mn) => low.includes(" " + mn + " ") || namesOf(mn).some((n) => has(n) || n.split(/\s+/).some((w) => w.length > 2 && !NAME_FILLER.has(w) && has(w))));
     }
     function holeFromRP(text, stud, t) {
       const low = String(text).toLowerCase(), found = [];
@@ -8222,7 +8395,7 @@
       const mine = L2.contracts.filter((x) => x.mn === t && (x.status === "signed" || x.status === "offered"));
       if (mine.filter((x) => x.status === "signed").length >= LIMITS.MAX_ACTIVE) return plainName(t) + " already holds " + LIMITS.MAX_ACTIVE + " farm contracts, and BC+ won't take more.";
       enqueue(offerMsg(c, t, CFG.ROOM_NAME));
-      const entry = {
+      const entry2 = {
         mn: t,
         by: sender,
         tpl: String(tplName).toLowerCase(),
@@ -8236,8 +8409,8 @@
         when: when.conditions ? describeConditions(when.conditions) + (when.only ? " (for " + when.only.join(", ") + ")" : "") : ""
       };
       const prepared = trackedContract(t, null, ["prepared"]);
-      if (prepared) Object.assign(prepared, entry);
-      else L2.contracts.push(Object.assign({ key: Date.now().toString(36) }, entry));
+      if (prepared) Object.assign(prepared, entry2);
+      else L2.contracts.push(Object.assign({ key: Date.now().toString(36) }, entry2));
       if (L2.contracts.length > 300) L2.contracts = L2.contracts.slice(-300);
       saveLedger();
       audit(sender, "CONTRACT_OFFER", t + " " + c.title + " " + d.key);
@@ -8408,7 +8581,10 @@
       if (/^[a-z][a-z0-9_-]{1,19}$/.test(w[0]) && !speciesFrom(w[0])) return "special:" + w[0];
       return null;
     }
-    const slotLabel = (k) => k.startsWith("farm:") ? "farm " + k.slice(5).split("|").map((x) => x === "kitt" ? "kitty" : x).join(" \xB7 ") + " outfit" : k === "stock" ? "Any new stock" : k.startsWith("uniform:") ? k.slice(8) + " uniform" : k.startsWith("special:") ? k.slice(8) : k.split("|").map((x) => x === "*" ? "any" : x).join(" \xB7 ");
+    const farmParts = (k) => k.slice(5).split("|");
+    const farmName = (k) => outfitName(...farmParts(k));
+    const outfitDescFor = (k) => /^farm:/.test(String(k || "")) ? outfitDesc(...farmParts(k)) || "" : "";
+    const slotLabel = (k) => k.startsWith("farm:") ? farmName(k) ? farmName(k) + " outfit" : "farm " + farmParts(k).map((x) => x === "kitt" ? "kitty" : x).join(" \xB7 ") + " outfit" : k === "stock" ? "Any new stock" : k.startsWith("uniform:") ? k.slice(8) + " uniform" : k.startsWith("special:") ? k.slice(8) : k.split("|").map((x) => x === "*" ? "any" : x).join(" \xB7 ");
     function offerOutfit(mn, slot, why, auto) {
       outfitsLedger();
       const o = slot && (L2.outfits[slot] || farmOutfit(slot));
@@ -8417,7 +8593,7 @@
         tell(mn, "\u{1F457} The farm has your " + slotLabel(slot) + " ready" + (why ? " (" + why + ")" : "") + ". The Companion can put it on you in one tap; without it, staff can help you dress by hand.");
         return plainName(mn) + " isn't runnin' the Companion, so I can't hand 'em an outfit. I've told 'em it's ready, and they can dress by hand.";
       }
-      enqueue(makeMsg("outfit", { slot, label: slotLabel(slot), data: o.data, keys: outfitKeysFor(mn), why: why || "", auto: !!auto, id: ++companionSeq }, mn));
+      enqueue(makeMsg("outfit", { slot, label: slotLabel(slot), desc: outfitDescFor(slot), data: o.data, keys: outfitKeysFor(mn), why: why || "", auto: !!auto, id: ++companionSeq }, mn));
       audit(CFG.BOT_MEMBER, "OUTFIT_OFFER", mn + " " + slot);
       return "";
     }
@@ -8445,7 +8621,7 @@
     function outfitAnswer(mn, m) {
       if (m.answer === "worn") {
         audit(mn, "OUTFIT_WORN", String(m.slot || ""));
-        if (onMap(mn)) emote("\u{1F457} " + plainName(mn) + " changes into " + (String(m.slot || "").startsWith("uniform:") ? "their farm uniform" : "their farm outfit") + (m.locks ? ", and the padlocks click shut" : "") + ".");
+        if (onMap(mn)) emote("\u{1F457} " + plainName(mn) + " changes into " + (String(m.slot || "").startsWith("uniform:") ? "their farm uniform" : /^farm:/.test(String(m.slot || "")) && farmName(String(m.slot)) ? "the " + farmName(String(m.slot)) : "their farm outfit") + (m.locks ? ", and the padlocks click shut" : "") + ".");
       } else if (m.answer === "declined") audit(mn, "OUTFIT_DECLINED", String(m.slot || ""));
       else if (m.answer === "back") audit(mn, "OUTFIT_BACK", "");
     }
@@ -8781,7 +8957,7 @@
         log: (...x) => log("[" + a.name + "]", ...x),
         audit: (by, action, detail) => audit(by, a.name.toUpperCase() + "_" + action, detail),
         // talkin'
-        say: (t, urgent, who) => say(untag(t), urgent, who),
+        say: (t, urgent, who) => say2(untag(t), urgent, who),
         announce: (t, urgent) => announce(untag(t), urgent),
         // for the whole farm, even when it names somebody
         emote: (t, who) => emote(fitTo(who, t), who),
@@ -9241,7 +9417,7 @@
         }
         const line = fillV(r.degradeMe && b.d || r.praiseMe && b.p || b.t);
         const from = vars.bMn && vars.b && line.startsWith(vars.b) ? vars.bMn : t;
-        if (b.say) say(line, false, t);
+        if (b.say) say2(line, false, t);
         else emote(vars.icon + " " + line, from, [t, vars.bMn]);
         later(step, (15 + Math.random() * 10) * 1e3);
       };
@@ -9416,10 +9592,10 @@
         plainName(t) + " presents for " + plainName(to) + " without a word. That's a yes."
       ]), t);
     }
-    function pickFresh(key, list) {
+    function pickFresh(key, list2) {
       state.lastPick = state.lastPick || /* @__PURE__ */ new Map();
       const last = state.lastPick.get(key);
-      const pool = list.length > 1 ? list.filter((x) => x !== last) : list;
+      const pool = list2.length > 1 ? list2.filter((x) => x !== last) : list2;
       const v = pool[Math.floor(Math.random() * pool.length)];
       state.lastPick.set(key, v);
       return v;
@@ -9769,23 +9945,23 @@
       const m = st.total.m > 0 ? st.got.m / st.total.m : 0, s = st.total.s > 0 ? st.got.s / st.total.s : 0;
       return Math.min(1, Math.max(m, s));
     }
-    function stallPick(st, key, list, inOrder) {
+    function stallPick(st, key, list2, inOrder) {
       st.used = st.used || {};
       const used = st.used[key] = st.used[key] || [];
       if (inOrder) {
         const i2 = used.length;
-        if (i2 >= list.length) return null;
+        if (i2 >= list2.length) return null;
         used.push(i2);
-        return list[i2];
+        return list2[i2];
       }
-      let free = list.map((_, i2) => i2).filter((i2) => !used.includes(i2));
+      let free = list2.map((_, i2) => i2).filter((i2) => !used.includes(i2));
       if (!free.length) {
         st.used[key] = [];
-        free = list.map((_, i2) => i2);
+        free = list2.map((_, i2) => i2);
       }
       const i = free[Math.floor(Math.random() * free.length)];
       st.used[key].push(i);
-      return list[i];
+      return list2[i];
     }
     function stallFill(mn, st, line) {
       const sounds = STALL_SOUNDS[speciesKey(mn)] || STALL_SOUNDS.default;
@@ -12087,7 +12263,7 @@
         }
         const icon = e.kind === "reward" ? "\u{1F36C} " : e.kind === "silly" ? "\u{1F3AD} " : "\u{1F53B} ";
         audit(by, "SPIN", t + " " + String(e.text).slice(0, 50) + (e.act ? " => " + e.act : ""));
-        say("\u{1F3A1} Round and round she goes! " + (by === t ? plainName(t) + " spins the wheel" : plainName(by === CFG.BOT_MEMBER ? t : by) + " spins the wheel for " + plainName(t)) + "\u2026 " + icon + fill(e.text, t), false, t);
+        say2("\u{1F3A1} Round and round she goes! " + (by === t ? plainName(t) + " spins the wheel" : plainName(by === CFG.BOT_MEMBER ? t : by) + " spins the wheel for " + plainName(t)) + "\u2026 " + icon + fill(e.text, t), false, t);
         syncCompanions(true);
         return e;
       }
@@ -12129,11 +12305,11 @@
       if (!benchSpots().length) return "There's no bench set up yet, sugar. Stand on it and say ?spot set bench (bench-2, bench-3\u2026 for more).";
       return null;
     }
-    function benchLine(key, list) {
+    function benchLine(key, list2) {
       state.benchDecks = state.benchDecks || /* @__PURE__ */ new Map();
       let d = state.benchDecks.get(key);
       if (!d || !d.length) {
-        d = list.slice().sort(() => Math.random() - 0.5);
+        d = list2.slice().sort(() => Math.random() - 0.5);
         state.benchDecks.set(key, d);
       }
       return d.pop();
@@ -12396,9 +12572,9 @@
     }
     function benchText(mn) {
       const r = rec(mn), here = Object.keys(L2.people).map(Number).filter(benchedNow);
-      const list = here.length ? here.map((m) => "\u2022 " + plainName(m) + ": " + rec(m).benched.uses + " use" + (rec(m).benched.uses === 1 ? "" : "s") + ", " + Math.max(1, Math.ceil((rec(m).benched.until - Date.now()) / 6e4)) + " min left").join("\n") : "Nobody's on it right now.";
+      const list2 = here.length ? here.map((m) => "\u2022 " + plainName(m) + ": " + rec(m).benched.uses + " use" + (rec(m).benched.uses === 1 ? "" : "s") + ", " + Math.max(1, Math.ceil((rec(m).benched.until - Date.now()) / 6e4)) + " min left").join("\n") : "Nobody's on it right now.";
       const mine = r && r.benched ? "\nYou're on it: " + r.benched.uses + " use" + (r.benched.uses === 1 ? "" : "s") + " so far, " + Math.max(1, Math.ceil((r.benched.until - Date.now()) / 6e4)) + " minutes to go." : "";
-      return "\u{1FAB5} THE USE BENCH\n" + list + mine + "\n\nYou're " + (r && r.benchOn ? "ON" : "off") + " for it (?bench on|off). Stand by somebody on it and ?use [mouth|pussy|ass]. ?bench top for the week.";
+      return "\u{1FAB5} THE USE BENCH\n" + list2 + mine + "\n\nYou're " + (r && r.benchOn ? "ON" : "off") + " for it (?bench on|off). Stand by somebody on it and ?use [mouth|pussy|ass]. ?bench top for the week.";
     }
     function benchTopText() {
       const B = benchWeek();
@@ -12626,7 +12802,7 @@
     }
     function todayText(mn) {
       const now = Date.now(), here = (W.ChatRoomCharacter || []).map((c) => c.MemberNumber).filter((m) => m !== CFG.BOT_MEMBER && rec(m) && (rec(m).roles || []).length);
-      const names = (list) => list.slice(0, 8).map(plainName).join(", ") + (list.length > 8 ? " and " + (list.length - 8) + " more" : "");
+      const names = (list2) => list2.slice(0, 8).map(plainName).join(", ") + (list2.length > 8 ? " and " + (list2.length - 8) + " more" : "");
       const out = ["\u{1F4C5} TODAY ON THE FARM \xB7 " + here.length + " on the books here right now"];
       if (isRut()) out.push("\u{1F525} It's rut day: every fill is twice as likely to take.");
       const d = /* @__PURE__ */ new Date(), day = d.getDate();
@@ -12740,10 +12916,10 @@
         return;
       }
       const line = a[a.length - 1], why = String(rest || "").trim();
-      const list = fbLedger();
+      const list2 = fbLedger();
       const f = { id: ++L2.fbSeq, t: Date.now(), mn: sender, name: plainName(sender), kind: cmd, text: line.slice(0, CFG.FEEDBACK_MAX), why: why.slice(0, 300), status: "open", where: channelNote(sender) };
-      list.push(f);
-      if (list.length > 1e3) L2.feedback = list.slice(-1e3);
+      list2.push(f);
+      if (list2.length > 1e3) L2.feedback = list2.slice(-1e3);
       saveLedger();
       audit(sender, "LINE_" + cmd.toUpperCase(), "#" + f.id);
       R(cmd === "more" ? "\u2764\uFE0F Noted, sugar: more like that one. The proprietors get it word for word." : "\u{1F44E} Noted, sugar: that one's off. The proprietors get it word for word" + (why ? ", with your why" : "") + ", and it'll get fixed.");
@@ -12760,7 +12936,7 @@
       return "#" + f.id + " " + FB_KINDS[f.kind] + " " + when + " " + f.name + (f.status !== "open" ? " \xB7 " + FB_STATUS[f.status] : "") + ": " + text + (f.why ? " (why: " + f.why + ")" : "") + (full && f.note ? "\n   \u21B3 " + f.note : "");
     }
     function fbSubmit(cmd, sender, rest, R) {
-      const list = fbLedger(), kind = cmd === "bug" ? "bug" : cmd === "suggest" || cmd === "idea" ? "idea" : "feedback";
+      const list2 = fbLedger(), kind = cmd === "bug" ? "bug" : cmd === "suggest" || cmd === "idea" ? "idea" : "feedback";
       const text = String(rest || "").trim();
       if (!text) {
         R(kind === "bug" ? "\u{1F41B} What went wrong, sugar? Say ?bug and then what happened, like ?bug the stall never let me go." : kind === "idea" ? "\u{1F4A1} What's your idea, sugar? Say ?suggest and then the idea, like ?suggest a hayride on Sundays." : "\u{1F4AC} What would you like to tell the proprietors? Say ?feedback and then your thoughts. (?suggest for an idea, ?bug for somethin' broken, ?feedback mine for what you've sent.)");
@@ -12770,14 +12946,14 @@
         R("That's a little short to go on, sugar. Tell me a bit more.");
         return;
       }
-      const today = list.filter((f2) => f2.mn === sender && Date.now() - f2.t < 864e5).length;
+      const today = list2.filter((f2) => f2.mn === sender && Date.now() - f2.t < 864e5).length;
       if (today >= CFG.FEEDBACK_PER_DAY && !isStaff(sender)) {
         R("You've sent " + today + " today already, sugar. Thank you! The proprietors will get to 'em. Try again tomorrow.");
         return;
       }
       const f = { id: ++L2.fbSeq, t: Date.now(), mn: sender, name: plainName(sender), kind, text: text.slice(0, CFG.FEEDBACK_MAX), status: "open", where: channelNote(sender) };
-      list.push(f);
-      if (list.length > 1e3) L2.feedback = list.slice(-1e3);
+      list2.push(f);
+      if (list2.length > 1e3) L2.feedback = list2.slice(-1e3);
       saveLedger();
       audit(sender, "FEEDBACK", "#" + f.id + " " + kind);
       R(FB_KINDS[kind] + " Thank you, " + plainName(sender) + "! That's #" + f.id + " in the suggestion box. The proprietors read every one, and I'll tell you when somethin' comes of it. (?feedback mine to see yours)");
@@ -12790,9 +12966,9 @@
     function feedbackCommand(cmd, sender, args, rest, R) {
       if (cmd === "meh" || cmd === "more") return lineVote(cmd, sender, rest, R);
       if (cmd !== "feedback") return fbSubmit(cmd, sender, rest, R);
-      const sub = String(args[0] || "").toLowerCase(), list = fbLedger();
+      const sub = String(args[0] || "").toLowerCase(), list2 = fbLedger();
       if (sub === "mine") {
-        const mine = list.filter((f2) => f2.mn === sender).slice(-15);
+        const mine = list2.filter((f2) => f2.mn === sender).slice(-15);
         R(mine.length ? "\u{1F4EC} WHAT YOU'VE SENT\n" + mine.map((f2) => fbLine(f2, true)).join("\n") : "\u{1F4EC} You haven't sent anything yet, sugar. ?feedback, ?suggest or ?bug and then what you've got to say.");
         return;
       }
@@ -12801,16 +12977,16 @@
       if (sub === "list") {
         const which = String(args[1] || "open").toLowerCase();
         const kind = { ideas: "idea", idea: "idea", bugs: "bug", bug: "bug", feedback: "feedback", meh: "meh", more: "more" }[which];
-        const rows = list.filter((f2) => which === "lines" ? (f2.kind === "meh" || f2.kind === "more") && f2.status === "open" : kind ? f2.kind === kind && f2.status === "open" : which === "all" ? true : f2.status === "open");
+        const rows = list2.filter((f2) => which === "lines" ? (f2.kind === "meh" || f2.kind === "more") && f2.status === "open" : kind ? f2.kind === kind && f2.status === "open" : which === "all" ? true : f2.status === "open");
         R(rows.length ? "\u{1F4EC} SUGGESTION BOX \xB7 " + (which === "all" ? "everything" : kind ? which + ", open" : "open") + " (" + rows.length + ")\n" + rows.slice(-30).map((f2) => fbLine(f2)).join("\n") + "\n?feedback <n> reads one \xB7 ?feedback done|later|no <n> [note] \xB7 ?feedback del <n>" : "\u{1F4EC} Nothin' " + (which === "all" ? "" : "open ") + "in the suggestion box, sugar.");
         return;
       }
       if (sub === "export") {
-        R(list.length ? "\u{1F4EC} EVERYTHING IN THE SUGGESTION BOX (" + list.length + ")\n" + list.map((f2) => fbLine(f2, true) + " [" + f2.mn + (f2.where ? ", " + f2.where : "") + "]").join("\n") : "\u{1F4EC} The suggestion box is empty.");
+        R(list2.length ? "\u{1F4EC} EVERYTHING IN THE SUGGESTION BOX (" + list2.length + ")\n" + list2.map((f2) => fbLine(f2, true) + " [" + f2.mn + (f2.where ? ", " + f2.where : "") + "]").join("\n") : "\u{1F4EC} The suggestion box is empty.");
         return;
       }
       const idArg = /^#?\d+$/.test(sub) ? sub : args[1];
-      const id = parseInt(String(idArg || "").replace("#", ""), 10), f = list.find((x) => x.id === id);
+      const id = parseInt(String(idArg || "").replace("#", ""), 10), f = list2.find((x) => x.id === id);
       if (!f) {
         R("There's no #" + (idArg || "?") + " in the suggestion box, sugar. ?feedback list shows the numbers.");
         return;
@@ -12820,7 +12996,7 @@
         return;
       }
       if (sub === "del" || sub === "delete") {
-        L2.feedback = list.filter((x) => x !== f);
+        L2.feedback = list2.filter((x) => x !== f);
         saveLedger();
         audit(sender, "FEEDBACK_DEL", "#" + id);
         R("\u{1F5D1}\uFE0F #" + id + " is out of the box.");
@@ -13282,11 +13458,14 @@
       return wornTags(mn).has("hyper") || boosted(p, "hyper") || Math.random() < (luck || 0);
     }
     function springTrap(mn, kind, spot, force) {
+      let drewBy = "";
       if (kind === "random") {
         const placed = spot ? themePool(mn, spot) : [];
         const can = placed.length ? placed : Object.keys(TRAP_KINDS).filter((k) => k !== "tentacle" && !trapWhyNot(mn, k));
         if (!can.length) return "nothin' they can spring right now";
-        kind = can[Math.floor(Math.random() * can.length)];
+        const pk = trapWeighted(mn, can);
+        kind = pk.kind;
+        drewBy = pk.why;
       }
       const why = trapWhyNot(mn, kind);
       if (why) return why;
@@ -13295,7 +13474,7 @@
       r.trapN = (r.trapN || 0) + 1;
       trapSprung(mn, kind, spot);
       audit(BOTMN(), "TRAP", mn + " " + kind + (spot ? " at " + spot : "") + (force ? " (by hand)" : ""));
-      tell(mn, TRAP_KINDS[kind].icon + " You've sprung a trap, sugar: " + TRAP_KINDS[kind].what + ". Your safeword stops it cold.");
+      tell(mn, TRAP_KINDS[kind].icon + " " + (drewBy ? drewBy + " " : "") + "You've sprung a trap, sugar: " + TRAP_KINDS[kind].what + ". Your safeword stops it cold.");
       face(mn, kind === "lantern" ? "trance" : "edged", 60);
       {
         const snd = TRAP_SOUND[kind] || L2.customTraps && L2.customTraps[kind] && CUSTOM_SOUND[L2.customTraps[kind].does];
@@ -17078,6 +17257,62 @@
     function themesText() {
       return "\u{1F5FA}\uFE0F TRAPS BY PLACE \xB7 name a tile trap-<place> (trap-kennels-1, trap-cabin-2, trap-gloryholes) for that place's traps; a plain trap tile (trap, trap-3) springs from the place it's nearest\n" + Object.entries(TRAP_THEMES).map(([k, T]) => "\n" + k + " (" + T.label + "): " + T.kinds.filter((x) => TRAP_KINDS[x]).join(", ")).join("");
     }
+    const TW = {
+      milk: { kinds: ["milker", "cups", "carousel", "teatcheck", "milkinghole", "leeches", "yoke"], x: 3, why: "Your udders are so full the farm could smell it on the wind." },
+      seed: { kinds: ["collection", "weights", "teaser"], x: 3, why: "You're so pent up the farm could hear your balls slosh." },
+      breed: {
+        kinds: ["crate", "wheel", "studchair", "breeder", "stallion", "bull", "boar", "sow", "stag", "minotaur", "werewolf", "ramstud", "lionpride", "whelping", "foxden", "warband", "goblinpit", "shrine", "bearskin", "hottub", "scarecrow", "bale"],
+        x: 2,
+        why: { heat: "You're in heat, sugar, and every stud on the farm knows it.", rut: "It's rut day, and the farm's breedin' anything that stands still." }
+      },
+      nest: { kinds: ["incubator", "shrine", "clutch", "eggs", "honey", "dip"], x: 2, why: "You're carryin', and the farm wants to fuss over its broodmare." },
+      corrupt: { kinds: ["slime", "suit", "vines", "well", "leeches", "clutch", "hive", "naga", "lantern", "mirror"], x: 2, why: "The farm's in you deep now, and the hungry things can tell." },
+      night: { kinds: ["werewolf", "maze", "lantern", "bearskin", "well", "stag", "hottub", "net", "goblinraid", "clutch", "wolves"], x: 2, why: "It's dark out, and the things that come out at night are out." },
+      day: { kinds: ["plow", "washline", "scarecrow", "windmill", "bale", "auction", "stocks", "tomatoes", "pieeat", "mudslide", "scale", "teatcheck"], x: 1, why: "" },
+      crowd: { kinds: ["pillory", "stocks", "auction", "pricetag", "tomatoes", "seedshower", "scale", "kissgate", "paddle", "brand", "inspection", "pieeat", "mirror"], x: 2, why: "There's a crowd about, and the farm loves an audience." },
+      alone: { kinds: ["vines", "slime", "well", "clutch", "stag", "werewolf", "naga", "drake", "hive", "net", "glue", "snare"], x: 2, why: "Nobody's about to see what happens to you out here." }
+    };
+    const TW_CROWD = 3, TW_REACH = 8, TW_RECENT = 3, TW_RECENT_X = 0.2, TW_FULL = 0.8, TW_CORRUPT = 40;
+    const twNight = (h) => h >= 21 || h < 5;
+    function trapFactors(mn) {
+      const out = [], p = prodOf(mn) || {};
+      try {
+        if (makesMilk(mn) && (p.milk || 0) >= milkCap(mn) * TW_FULL) out.push(["milk"]);
+        if (makesSemen(mn) && (p.semen || 0) >= semenCap(mn) * TW_FULL) out.push(["seed"]);
+        if (inHeat(p)) out.push(["breed", "heat"]);
+        else if (isRut()) out.push(["breed", "rut"]);
+        if (p.preg || p.eggs && p.eggs.n > 0) out.push(["nest"]);
+        if (corruptionOf(mn) >= TW_CORRUPT) out.push(["corrupt"]);
+        out.push([twNight(hourNow()) ? "night" : "day"]);
+        const at = posOf(mn);
+        if (at) {
+          const near2 = (W.ChatRoomCharacter || []).filter((c) => c.MemberNumber !== mn && c.MemberNumber !== CFG.BOT_MEMBER && c.MapData && c.MapData.Pos && Math.max(Math.abs(c.MapData.Pos.X - at.X), Math.abs(c.MapData.Pos.Y - at.Y)) <= TW_REACH).length;
+          out.push([near2 >= TW_CROWD ? "crowd" : near2 === 0 ? "alone" : null]);
+        }
+      } catch (e) {
+        warn("trap factors:", e);
+      }
+      return out.filter((f) => f[0]);
+    }
+    function trapWeighted(mn, can) {
+      const facts = trapFactors(mn), recent = ((rec(mn) || {}).trapLog || []).slice(-TW_RECENT).map((x) => x.kind);
+      const w = can.map((k) => {
+        let x = 1;
+        for (const [f2] of facts) if (TW[f2].kinds.includes(k)) x += TW[f2].x;
+        if (recent.includes(k)) x *= TW_RECENT_X;
+        return x;
+      });
+      let r = Math.random() * w.reduce((a, b) => a + b, 0), i = 0;
+      for (; i < can.length - 1; i++) {
+        r -= w[i];
+        if (r < 0) break;
+      }
+      const kind = can[i];
+      const f = facts.find(([n]) => TW[n].kinds.includes(kind) && TW[n].why);
+      const why = !f ? "" : typeof TW[f[0]].why === "string" ? TW[f[0]].why : TW[f[0]].why[f[1]] || "";
+      return { kind, why };
+    }
+    if (W.__FARMHAND_TEST__) Object.assign(W, { __trapWeighted: (m, c) => trapWeighted(m, c), __trapFactors: (m) => trapFactors(m).map((f) => f.join(":")) });
     Object.assign(TRAP_KINDS, {
       groomer: { icon: "\u{1FAAE}", what: "the kennel's grooming table: bathed, brushed, fluffed and shown off", limit: /\b(groom|bath|wash|pet ?play)/i },
       whelping: { icon: "\u{1F415}", what: "the whelping box, and the kennel's champion stud", limit: /\b(breed|knot|beast)/i },
@@ -17406,10 +17641,10 @@
           ],
           [
             "The pigs hear the slop hit and come running, snorting, rooting, and %n is covered in what they want.",
-            "Snouts everywhere: under %n's arms, in their hair, between their legs, snuffling the slop off them."
+            "Snouts everywhere: under %n's arms, in their hair, round their ankles, snuffling the slop off them."
           ],
           [
-            "{t}A big sow noses the mash off %n's tits and keeps nosing.",
+            "{t}The pig girl hops the rail, scoops the mash off %n's tits with both hands, and takes her time about it.",
             "The pigs root %n over in the muck till they're rolled in it, and the pig girl just laughs at the rail."
           ]
         ],
@@ -17429,13 +17664,13 @@
             "Hogtied in the muck, %n can only rock and squirm while the pigs gather round to sniff."
           ],
           [
-            "Then the boar comes over, heavy and slow, and stands over %n in the mud, grunting.",
-            "The boar takes a long interested look at the trussed thing in his wallow."
+            "Then the boar comes over, the boar-man who keeps the sty, heavy and slow on two legs, and stands over %n in the mud, grunting.",
+            "The boar-man takes a long interested look at the trussed thing in his wallow and scratches his belly."
           ],
           [
-            "{v}He noses between %n's bound legs and the pig girl doesn't call him off.",
+            "{v}He kneels in the mud and runs a thick hand between %n's bound legs, and the pig girl doesn't call him off.",
             "He rubs his bristly bulk all over %n, rolling them in the mud, marking them.",
-            "{c}He snuffles at %n's cock and %n squeals into the mud."
+            "{c}He gives %n's cock a squeeze in one big hand and %n squeals into the mud."
           ]
         ],
         end: [
@@ -18359,8 +18594,8 @@
       glory: ["studchair"]
     })) for (const k of kinds) if (TRAP_THEMES[place] && !TRAP_THEMES[place].kinds.includes(k)) TRAP_THEMES[place].kinds.push(k);
     const DEPTH_KIND = {};
-    const depthOf = (list, kinds) => {
-      for (const k of kinds) DEPTH_KIND[k] = (DEPTH_KIND[k] || []).concat(list);
+    const depthOf = (list2, kinds) => {
+      for (const k of kinds) DEPTH_KIND[k] = (DEPTH_KIND[k] || []).concat(list2);
     };
     depthOf(["breed"], [
       "breeder",
@@ -19807,13 +20042,13 @@
       [
         "The slop is warm and thick and it's in %n's hair, their ears, their mouth when they gasp.",
         "The pigs root at %n with their wet snouts, snuffling into every crease, looking for scraps.",
-        "{t}A pig's snout roots between %n's tits for a bit of turnip, and then keeps rooting.",
+        "A pig roots a bit of turnip out of %n's hair and squeals about it.",
         "The pig keeper pours another pail right over %n's head, laughing, and calls the pigs."
       ],
       [
         "%n's being rooted over by six pigs at once, and the pig keeper has pulled up a stool to watch.",
         "%n gives up trying to climb out and just wallows in it, filthy, squealing like one of them.",
-        "A big boar wanders in, sniffs %n, and decides they're the sweetest thing in the trough.",
+        "The boar-man who keeps the sty leans on the rail on two legs, looks %n over, and decides they're the sweetest thing in the trough.",
         `The pig keeper leans over the rail and slaps %n's slop-covered rump. "There's my best piggy."`
       ]
     );
@@ -19823,13 +20058,13 @@
         "The rope goes wrists to ankles behind %n's back, and the pig keeper yanks it tight, so they're bent like a bow.",
         "%n rocks on their belly in the mud, legs and arms tied up behind them, everything below on show.",
         "{t}%n's tits are pressed into the mud under them, and every rock squishes them deeper.",
-        "The boar sniffs round %n in a slow circle, grunting, interested."
+        "The boar-man walks round %n in a slow circle on his two big legs, grunting, interested."
       ],
       [
-        "The boar mounts %n where they lie, tied up and helpless in the mud, and grunts with every thrust.",
-        "%n's face is in the mud and their rump's in the air and the boar has no interest in letting up.",
-        "The pig keeper sits on the fence with a bag of apples and watches the boar work, and calls encouragement.",
-        "When the boar's done the pig keeper rolls %n over in the mud with her boot to see the state of them, and laughs."
+        "The boar-man kneels and takes %n where they lie, tied up and helpless in the mud, and grunts with every thrust.",
+        "%n's face is in the mud and their rump's in the air and the boar-man has no interest in letting up.",
+        "The pig keeper sits on the fence with a bag of apples and watches the boar-man work, and calls encouragement.",
+        "When the boar-man's done the pig keeper rolls %n over in the mud with her boot to see the state of them, and laughs."
       ]
     );
     trapScene(
@@ -20545,11 +20780,11 @@
       state.teaseHeard = state.teaseHeard || /* @__PURE__ */ new Map();
       const heard = state.teaseHeard.get(mn) || [];
       const mine = (L2.tease || []).filter((x) => x.for === mn), all = (L2.tease || []).filter((x) => !x.for);
-      const fresh = (list) => {
-        const f = list.filter((l) => !heard.includes(l));
-        return f.length ? f : list;
+      const fresh = (list2) => {
+        const f = list2.filter((l) => !heard.includes(l));
+        return f.length ? f : list2;
       };
-      const any = (list) => list[Math.floor(Math.random() * list.length)];
+      const any = (list2) => list2[Math.floor(Math.random() * list2.length)];
       let line;
       if (mine.length && Math.random() < 0.3) line = any(fresh(mine.map((x) => x.text)));
       else if (all.length && Math.random() < 0.15) line = any(fresh(all.map((x) => x.text)));
@@ -20573,7 +20808,7 @@
           if (k === "species" && TEASE_KIND[teaseKind(mn)]) pool = pool.concat(TEASE_KIND[teaseKind(mn)], TEASE_KIND[teaseKind(mn)]);
           return b ? pool.filter((l) => tagsFit(l, b) && wordsFit(l, b)) : pool;
         };
-        const unheard = (list) => list.filter((l) => !heard.includes(l));
+        const unheard = (list2) => list2.filter((l) => !heard.includes(l));
         let cands = unheard(poolFor(pick));
         if (!cands.length) cands = unheard([].concat(...ctx.map(([k]) => poolFor(k))));
         if (!cands.length) {
@@ -21652,8 +21887,8 @@
       return !!(r && r.parasite && r.parasite.until > Date.now());
     }
     function parasiteSerum(mn, i) {
-      const list = strainSerums(mn);
-      let s = list[i % list.length];
+      const list2 = strainSerums(mn);
+      let s = list2[i % list2.length];
       if (s === "growth") {
         const parts = PARASITE_GROWS.filter((k) => bodyParts(mn).includes(k) && CFG.SIZES[k]), g = rec(mn).parasite;
         const part = parts.length ? parts[(g.grew = (g.grew || 0) + 1) % parts.length] : null;
@@ -28712,8 +28947,8 @@
       ],
       cumCock: ["%n ruts the sleeve helplessly and comes apart in it: %ml, wrung out of them in long ropes while the cup rolls their balls."]
     };
-    for (const [k, list] of Object.entries(MORE_KEEP)) if (KEEP_LINES[k]) KEEP_LINES[k].push(...list);
-    for (const [k, list] of Object.entries(MORE_UDDER)) if (UDDER_LINES[k]) UDDER_LINES[k].push(...list);
+    for (const [k, list2] of Object.entries(MORE_KEEP)) if (KEEP_LINES[k]) KEEP_LINES[k].push(...list2);
+    for (const [k, list2] of Object.entries(MORE_UDDER)) if (UDDER_LINES[k]) UDDER_LINES[k].push(...list2);
     const INTENSITY_BY_TRAP = {
       injector: {
         tender: ["The arm steadies %n with a padded rest first, the way you'd gentle a filly for the vet.", "It rubs the spot after, a slow little circle, till the sting's gone.", "The dose goes in warm and slow, and somethin' holds %n's hip so they needn't hold still on their own."],
@@ -28821,6 +29056,344 @@
       if (!T || !T[k] || Math.random() >= 0.67) return "";
       return tFill(pickFor(mn, "udd:int:" + k + ":" + kind, T[k]), mn);
     }
+    Object.assign(INTENSITY_BY_TRAP, {
+      pillory: {
+        tender: ["Somebody tucks a folded sack under %n's chin so the wood doesn't bite.", "Whoever uses them first strokes their back after and says thank you.", "A farmhand brings water and holds the cup to %n's lips between visitors."],
+        filthy: ["%n's ass is up and open in the square with a queue behind it, and nobody's botherin' to ask their name.", "They've been used so many times the board under them is slick with it.", "Every passer-by takes a turn and slaps the wood on the way out, like ringin' a bell."]
+      },
+      brand: {
+        tender: ["The pen is warm and the letters go on slow, and a hand smooths each one when it's done.", "It writes what they are in a pretty hand, with a little heart at the end.", "When it's finished it lets %n look, and waits till they nod."],
+        filthy: ["It writes CUMDUMP across %n's ass in letters a field away could read.", "Arrows down to every hole, numbered, so nobody has to guess.", "It spells it out on their belly while they squirm, and underlines the dirtiest word twice."]
+      },
+      winch: {
+        tender: ["The chain winds in slow enough for %n to walk it, not be dragged.", "The pen it leaves them in has fresh straw and a blanket folded in the corner.", "Somebody comes by to scratch behind their ears through the bars."],
+        filthy: ["Hauled across the yard by the neck on their knees, %n leaves two muddy furrows the whole way.", "Clipped short in the pen with their ass to the gate, like a heifer waitin' on the bull.", "The chain's too short to sit and too short to hide, and that's the point of it."]
+      },
+      glue: {
+        tender: ["It holds %n like a hug, warm round the shins, and doesn't hurry them.", "When it lets go it lets go gently, a toe at a time.", "Somebody holds their hand while they wait it out."],
+        filthy: ["Stuck to the spot with their legs apart, and every farmhand walkin' by takes advantage.", "%n tugs and wobbles and their tits jiggle for the whole yard every time.", "They try to bend to pull free and give the barn a perfect view right up the middle."]
+      },
+      cups: {
+        tender: ["The cups are warm and they pull like a mouth, slow and sure.", "They let %n's teats rest between draws, and the ache that's left is a sweet one.", "When they come off somebody rubs balm into each swollen nipple."],
+        filthy: ["The cups suck %n's teats into the glass long and fat and they leak the whole way down.", "They're squirtin' before the cups are off, and they're humpin' the air for it.", "Their tits come out of it heavier, sorer, and a size more of a cow."]
+      },
+      chute: {
+        tender: ["The mash is warm and sweet and it comes slow enough to swallow without hurry.", "A hand rubs %n's throat to help it down, and then their belly as it rounds.", "When the funnel comes out somebody wipes their chin and tells them they did so well."],
+        filthy: ["%n's mouth is a feed hole now and the chute doesn't care if they're ready.", "Mash runs down their chin and over their tits while their belly swells tight as a drum.", "Fattened up like a hog for market, and they burp when it's done."]
+      },
+      vines: {
+        tender: ["The vines wrap %n like they're holdin' somethin' precious.", "The pollen comes in a warm sigh, and the heat it brings is slow and lovely.", "The pods go in gentle, and the vines stroke their belly after like they're proud."],
+        filthy: ["Vines up every hole at once and %n's lettin' them, hips goin' like a bitch in season.", "The pollen has them so wet the vines slide in and out squelchin'.", "Planted full of seed pods and left drippin' sap down both thighs."]
+      },
+      slime: {
+        tender: ["The slime is warm and it moves over %n like slow water, curious, not cruel.", "It eats their clothes a thread at a time and leaves their skin soft as a baby's.", "It settles in their lap and hums, and %n finds themselves strokin' it back."],
+        filthy: ["Slime pours into %n's mouth, cunt and ass all at once and they're gurglin' round it.", "Green goo's runnin' out of every hole and they're still pushin' more in with their fingers.", "Stripped bare, slimed to the eyes, and squelchin' with every step they take."]
+      },
+      tickle: {
+        tender: ["The feathers go soft and slow, mostly at the ribs, and %n's laughin' more than they're squirmin'.", "It stops whenever they're out of breath, and waits for them.", "When they beg, it lets them go the first time they ask."],
+        filthy: ["Feathers on their soles, their ribs and their swollen clit, and %n's screamin' and squirtin' both.", "They're drool and tears and laughin' till the beggin' comes out as moans.", "It tickles them till they're wettin' themselves and then tickles that too."]
+      },
+      mirror: {
+        tender: ["The mirror shows %n flushed and pretty, and it holds them there till they believe it.", "The words are kind ones, and they come easier every time they're said.", "The box opens itself on the fifth, and the light's soft when it does."],
+        filthy: ["Five times out loud, and the mirror makes them look while they say it: a slut, a cow, a hole.", "%n watches their own face go slack and wet while they say the filthiest thing they've ever said.", "By the fifth time they mean it, and the mirror shows them fingerin' themselves while they do."]
+      },
+      paddle: {
+        tender: ["The wheel's slow and the paddles are soft leather, more pat than spank.", "Somebody rubs the warmth in between each five.", "They count with %n, quietly, so they never lose their place."],
+        filthy: ["Twenty cracks across %n's ass, counted out for the yard, and they're grindin' the bench by fifteen.", "Their ass is glowin' red and their cunt's drippin' on the slats.", "They lose count on purpose so it starts again."]
+      },
+      wall: {
+        tender: ["The hands on both ends are slow and careful, and somebody always asks if they're all right.", "A soft blanket's been nailed round the gap so the planks don't rub.", "Whoever's at the front strokes %n's hair the whole time."],
+        filthy: ["Stuck in a fence with a cock in each end and no idea whose, and %n doesn't care.", "Spitroasted through the planks, and the queue goes back round the barn.", "They've stopped countin'. Both ends are drippin' and the fence is creakin'."]
+      },
+      mister: {
+        tender: ["The puff smells like clover and goes on cool, and the potion settles soft.", "It's just a little mist, and %n's flush comes up slow and pretty.", "It brushes their cheek after, like a kiss."],
+        filthy: ["A cloud of it right in the face, and %n's moanin' before it's even settled.", "It gets in their mouth, up their nose, and straight between their legs.", "Whatever it is, it's workin' on them already, and they're pawin' at themselves in front of everybody."]
+      },
+      weights: {
+        tender: ["The sleeve is warm and it strokes %n slow, takin' its time over every drop.", "It lets them finish properly, and then holds them while the last of it comes.", "The ache in their balls after is a full, pleasant thing, like after a big supper."],
+        filthy: ["The sleeve milks %n's cock like it's pumpin' a well and their balls slap the bench.", "Drained till they're dry-heavin' cum, and it keeps goin'.", "Their balls hang heavier after, swingin' between their thighs like a stud's."]
+      },
+      trough: {
+        tender: ["It's warm, and they're held while it happens, and nobody laughs.", "%n's hair is kept out of it, and a towel's waitin' after.", "Somebody tells them they're a good thing, the whole time."],
+        filthy: ["%n's face down in the golden trough and they're slurpin' like a hog.", "It runs off their chin and down their tits and they lick their lips after.", "They come up for air gaspin' and soaked and go straight back down."]
+      },
+      pricetag: {
+        tender: ["The price is a high one, and the farm girl says it proudly.", "She pats %n's rump while she calls it, like a prize heifer at the fair.", "Whoever buys them is told twice to be good to them."],
+        filthy: ["Two ribbons and a bucket, written right across their ass with an arrow to the hole.", "The farm girl spreads %n's cheeks to show what they're payin' for.", "Sold cheap, and the buyer tests the goods right there on the block."]
+      },
+      saddle: {
+        tender: ["The saddle rocks slow, and what's in the seat fills %n a little at a time.", "Every buck is a gentle one, and there's a hand on their back to steady them.", "When it stops, they're lifted off it, not dropped."],
+        filthy: ["Every buck slams %n down on the post in the seat and they're screamin' like a rodeo.", "Their tits are bouncin' and their cunt's squelchin' and they're ridin' it harder than it rides them.", "They come off it bowlegged and drippin' and can't remember their own name."]
+      },
+      net: {
+        tender: ["The net cradles %n like a hammock, and they swing slow in the warm air.", "The rafters smell of hay and somebody sings below.", "It lets them down soft, into a pile of straw."],
+        filthy: ["Dangled in the rafters with their holes pushed through the mesh for anybody with a ladder.", "Every farmhand on the ladder takes a turn and the net drips on the ones below.", "Swingin' in it bare with their tits squeezed through the holes like sausages."]
+      },
+      bell: {
+        tender: ["The bell has a sweet note, and folks smile when they hear %n comin'.", "Somebody ties a ribbon on it.", "Every ring sounds like somebody's glad to see them."],
+        filthy: ["The bell clangs every time %n moves and the whole farm knows exactly where to find a free hole.", "They try to creep and it rings out, and two farmhands come to see what it's for.", "Belled like a cow, and treated like one."]
+      },
+      scale: {
+        tender: ["Every number is read out like a compliment.", "The tape is warm, and the hands are slow, and there's a gold star at the end.", "They're told they're growin' just right."],
+        filthy: ["Tits, ass, holes and how much they take, read out loud to the whole yard.", "They measure how far %n's gape opens and write it on a board for everybody.", "The numbers go up on the barn wall, next to the cows'."]
+      },
+      teaser: {
+        tender: ["The stall smells sweet, and somebody brushes %n while they wait.", "The heat's close enough to feel and soft enough to bear.", "When it's over, someone gives them a slow hand to finish."],
+        filthy: ["%n's cock is hard enough to hammer nails and pressed to the boards, achin' for a cunt they can smell but can't reach.", "They're ruttin' against the gate leakin' like a tap.", "Teased till they'd breed a fencepost, and then left like that."]
+      },
+      dip: {
+        tender: ["The water's warm and smells of lavender, and the scrubbin' is a good one.", "Every bit of them is washed carefully, even behind the ears.", "They're wrapped in a big towel at the end, and kept there a minute."],
+        filthy: ["Dunked head first, scrubbed down rough like a muddy ewe, every hole rinsed out with the hose.", "They come up sputterin' with soap in their mouth and a brush between their legs.", "Hosed off on the slab after, legs spread, while the hands laugh."]
+      },
+      crate: {
+        tender: ["The sire is slow and heavy and patient, and %n's rump is stroked before every round.", "The crate's padded where it presses, and there's water when they're done.", "He stays in after, warm, and lets them feel it take."],
+        filthy: ["Rump to the gate and the sire mounts %n again before the last load's done drippin'.", "He breeds them till they're leakin' down the gate and lowin' like a cow.", "Round after round, and every round he pushes it deeper."]
+      },
+      carousel: {
+        tender: ["The carousel turns slow, and the music on it is a sweet one.", "Every stall is gentle, every hand is warm, and every round they're told they're good.", "It stops when they're tired, not when it's done."],
+        filthy: ["Round and round, milked at one stall, filled at the next, and drippin' at every one.", "By the third turn %n doesn't know if they're bein' milked or bred.", "They're a mess of milk and cum by the end and the ride's still goin'."]
+      },
+      plow: {
+        tender: ["The plow's light and the furrow's short, and they get a carrot at the end.", "The crop only taps, and every row there's praise.", "Somebody wipes their brow between rows."],
+        filthy: ["Driven down the furrow with a crop on their ass and a plug in it.", "Their tits swing with every pull and the farmhand behind them is laughin'.", "They're sweatin', mud to the knees, and the field's not half done."]
+      },
+      bale: {
+        tender: ["The hay's soft and sweet, and only their rump is out in the air.", "Whoever comes by is slow, and they pat the bale after.", "There's a little window in the hay for their face, and somebody leaves them an apple."],
+        filthy: ["Just an ass and a cunt stickin' out of a hay bale, and the field hands line up.", "Nobody even sees their face, and nobody needs to.", "By evenin' the bale's soakin' and so is the ground under it."]
+      },
+      scarecrow: {
+        tender: ["The ropes are soft and the post is smooth, and the turns are taken slowly.", "Every farmhand says thank you after.", "The crows keep away, and somebody brings them a drink."],
+        filthy: ["Tied up spread-eagle in the field and every farmhand takes their lunch break on them.", "Cum's runnin' down the post by noon.", "The crows watch. So does the whole bottom field."]
+      },
+      washline: {
+        tender: ["The pegs are wooden and soft, and only on the edges.", "The breeze is warm and the sun's out, and they're left to dry like fresh linen.", "Somebody takes them down carefully, peg by peg."],
+        filthy: ["Pegs on their nipples, their lips and their tongue, and they're swingin' on the line for the yard.", "Every gust makes them squeal and the wash-girls laugh.", "Pegged out wet and left to drip with the sheets."]
+      },
+      auction: {
+        tender: ["The bids are high, and every one comes with a compliment.", "The auctioneer calls them the finest stock of the season.", "Whoever wins them leads them down gently by the hand."],
+        filthy: ["Spread on the block while the bidders check their teeth, their tits and their holes.", "The auctioneer sticks two fingers in to show how wet the merchandise is.", "Sold, and the buyer starts usin' them before the hammer's done fallin'."]
+      },
+      maze: {
+        tender: ["Whatever's in the corn is playful, and it lets them almost win.", "When it catches them, it's warm and it purrs.", "It walks them out at the end, by the hand."],
+        filthy: ["It catches %n in the corn and fucks them right there in the dirt between the stalks.", "They run and it lets them, then drags them back by the ankle.", "They come out of the maze with corn silk stuck to their wet thighs."]
+      },
+      honey: {
+        tender: ["The honey's warm and goes on slow, and the tongues that clean it off are gentle.", "It's sweet in the mouth and sweeter on the skin.", "Every inch is licked clean, and then kissed."],
+        filthy: ["Drenched in honey from tits to toes and three tongues fightin' over the best bits.", "They lick it out of every crack and fold and %n's squirmin' and leakin'.", "Sticky, licked raw, and sweeter between the legs than anywhere."]
+      },
+      incubator: {
+        tender: ["The lamp is warm as a summer afternoon, and %n dozes under it.", "Their belly's stroked slow while the heat soaks in.", "They wake up feelin' full and sweet and broody."],
+        filthy: ["The lamp cooks %n into a ripe, needy nest beggin' to be filled.", "They're on their back legs spread, cunt hot and open, cluckin' for a stud.", "Broody, swollen and drippin', and the lamp's not done with them."]
+      },
+      collection: {
+        tender: ["The bench is padded and the hand on %n's cock is slow and sure.", "They're stroked to the edge and let over it gently, and every drop's thanked for.", "The vat fills, and somebody tells them it's the best seed in the county."],
+        filthy: ["Strapped down and milked into the vat like a prize stallion, cock jerkin' while the farmhands cheer.", "They're drained, and drained again, till it's just dribblin'.", "The vat's labelled with their name and the yard can see how much."]
+      },
+      wheel: {
+        tender: ["Every stud on the wheel is a gentle one, and each one takes his time.", "The spins are slow, and somebody holds their hand between.", "They're bred three times, and each one is tender as the first."],
+        filthy: ["Three spins, three studs, three loads, and the wheel's drippin' by the third.", "They don't even look at who's next. They just spread.", "By the end there's no tellin' whose cum is whose and nobody cares."]
+      },
+      stocks: {
+        tender: ["The cream pies are small and sweet and come with a kiss on the cheek.", "Somebody wipes their eyes between every pie.", "They're fed a strawberry off every plate."],
+        filthy: ["Pie after pie square in the face till %n's lickin' cream off their own chin.", "The queue's long and every one of them has a good arm.", "Cream in their hair, up their nose, and drippin' off their tits onto the boards."]
+      },
+      kissgate: {
+        tender: ["The toll is a kiss, and it's a sweet one, every time.", "Whoever passes strokes %n's cheek on the way.", "The gate swings soft and doesn't pinch."],
+        filthy: ["The toll is %n's mouth, and the whole lane's payin' it.", "Stuck in the gate with their ass on one side and their face on the other, and both sides are bein' used.", "Every walker passin' leaves a little somethin' on them."]
+      },
+      windmill: {
+        tender: ["The sails turn slow and the view's lovely, all gold fields and blue sky.", "The breeze holds %n like a hand.", "Every time they come round, somebody below waves."],
+        filthy: ["Spread on the sails with everything showin', turnin' over the farm like a weather vane.", "Every time they come down past the platform somebody gets a quick feel.", "The whole county can see them up there, legs open, drippin' in the wind."]
+      },
+      mudpit: {
+        tender: ["The wrestlin' is half play, and the winner is gentle with their prize.", "The mud's warm, and they're both laughin'.", "They're hosed down together after, and nobody hurries them."],
+        filthy: ["Rolled in the mud and pinned and fucked, slippin' and slidin' with the crowd cheerin'.", "The winner rides the loser in the pit till they're both filthy and moanin'.", "Mud in every crack, and cum on top of it."]
+      },
+      fountain: {
+        tender: ["The chocolate's warm, and it flows over %n soft as silk.", "They're licked clean slow, and every lick's a kiss.", "Somebody saves the last strawberry for them."],
+        filthy: ["Held under the chocolate till it's runnin' off their tits and out of their cunt.", "They're a dessert now, and the guests have spoons.", "Licked clean in front of everybody, every crack, every fold."]
+      },
+      bakery: {
+        tender: ["The frostin's piped on in little rosettes, and the sprinkles are pastel.", "They're served on a doily, with a candle.", "Every bite taken off them comes with a thank you."],
+        filthy: ["Frosted from tits to cunt with a cherry on top of each nipple.", "The bakers eat their cake off %n with their faces buried in it.", "There's cream in places frosting doesn't go, and they're beggin' for more."]
+      },
+      creamery: {
+        tender: ["The whipped cream goes on in soft drifts, and the strawberries are cold and sweet.", "Whoever's hungry eats slow, and makes it last.", "They're cleaned up after with a warm cloth."],
+        filthy: ["The cannon blasts cream right between their legs and somebody's face follows it in.", "Strawberries pushed in where strawberries don't go, and eaten back out.", "Whipped cream, a cherry on each tit, and a tongue in every hole."]
+      },
+      seedshower: {
+        tender: ["The strangers are polite about it and take turns, and nobody's rough.", "It's warm and it's a lot, and somebody keeps it out of their eyes.", "They're wiped off after with a soft cloth, and given a towel."],
+        filthy: ["A ring of cocks and every one of them pumpin' on %n's face, tits and tongue.", "They're glazed, dripping, eyes shut, mouth open for the next one.", "By the end they look like a bun at the bakery: shiny all over and drippin'."]
+      },
+      groomer: {
+        tender: ["The brush is soft and slow, and %n's tail's fluffed last, very gently.", "They're dried with a warm towel and told they're the prettiest in the kennel.", "A bow goes on at the end."],
+        filthy: ["Groomed like a show bitch, every hole washed out and inspected while the judges watch.", "They spread %n's legs on the table to show off the goods.", "Brushed, fluffed, and fingered for the ribbon."]
+      },
+      whelping: {
+        tender: ["The champion is careful and patient, and he licks %n's ear between.", "The box is warm with fresh straw.", "He curls round them after, and stays."],
+        filthy: ["The champion mounts %n in the box and knots them till they're howlin'.", "Tied and full and humpin' back on the knot like a bitch in heat.", "When he pulls out it comes out with him, all over the straw."]
+      },
+      leashpost: {
+        tender: ["Everybody who passes stops for a pat and a kind word.", "There's a bowl of water by the post, and a blanket.", "Someone sits with them a while, just because."],
+        filthy: ["Clipped to the post on all fours, and anybody walkin' by can mount them like a yard dog.", "%n's ass is up and their legs are apart before the first one even stops.", "By sundown the dirt round the post is soaked."]
+      },
+      teatcheck: {
+        tender: ["The squeeze is gentle, and the grade is a gold one.", "Each teat's measured with warm hands, and stripped slow.", "They're told they're the best milker in the line."],
+        filthy: ["Squeezed till they squirt, measured, and graded out loud to the line.", "Stripped by a farmhand who's not bein' careful about it.", "Their teats are pinched and pulled till they're drippin' on the floor."]
+      },
+      wax: {
+        tender: ["The wax is just warm, and it falls slow, in little petals.", "Every drop's followed by a cool hand.", "It peels off at the end in one pretty shape."],
+        filthy: ["Hot wax drippin' on their nipples and their clit, one drop at a time, while they squeal.", "They're coated in it and still beggin' for more.", "The candle's held right over their cunt, and they're holdin' still for it."]
+      },
+      tomatoes: {
+        tender: ["The fruit's soft, and the throws are gentle, and everyone's laughin' with them.", "Somebody wipes the seeds off their cheek.", "They're given a peach to eat at the end."],
+        filthy: ["Tomatoes splattered all over their tits and their face, juice runnin' down to their cunt.", "The whole square's throwin' and aimin' low.", "Soaked in fruit juice and drippin', with their mouth open for it."]
+      },
+      bearskin: {
+        tender: ["The rug is soft, the fire is warm, and the trapper is slow and careful.", "He wraps them in a fur after and feeds them stew.", "He tells %n they're the best thing he's caught all winter."],
+        filthy: ["Pinned on the bearskin and fucked like a fresh-caught animal, fur in their mouth.", "The trapper breeds them by the fire till they're drippin' on the rug.", "He keeps them there all night, takin' them whenever he wakes up."]
+      },
+      trophy: {
+        tender: ["The plaque says PRIZED in gold, and they're dusted off every mornin'.", "They're hung at a comfortable height, and the cabin's warm.", "Visitors admire them and say so."],
+        filthy: ["Mounted on the wall with their legs spread and their holes on display like a stuffed buck.", "Every hunter that comes in gives them a pat and a finger.", "The plaque under them says what they are, and it's not polite."]
+      },
+      hottub: {
+        tender: ["The water's hot and the lumberjacks are gentle giants, all hands and laughter.", "They take turns holdin' %n up, so nobody sinks.", "They're dried in a big flannel blanket after."],
+        filthy: ["Passed round the hot tub between four lumberjacks, every one of them havin' a go.", "The water's cloudy by the end, and %n's floatin' on their back drippin'.", "They hold %n down on a log and take turns while the tub steams."]
+      },
+      slop: {
+        tender: ["The slop's warm, mostly soft mash and apple peel, and the pigs only want the peelings.", "The pig girl rinses %n off with the warm hose and wraps them in a sack to dry.", "Somebody laughs, but it's a kind laugh, and they get an apple of their own."],
+        filthy: ["Slop over their head and down their tits, and the pig girl holds %n there in the trough while the farmhands watch.", "On all fours in the slop with their ass up and their cunt drippin' mash, and a farmhand decides to have a go right there.", "Fed, slopped and fucked in the trough like the farm's dirtiest little sow."]
+      },
+      hogtie: {
+        tender: ["The rope's soft and the mud's warm as a bath, and the pig girl checks the knots twice.", "She scratches %n behind the ears while they wait, and talks to them low.", "When she unties them she rubs the rope marks till they fade."],
+        filthy: ["Trussed like a hog for the spit, ass up in the muck, and every farmhand passin' climbs the rail for a turn.", "They're squealin' louder than the pigs with mud in their mouth and a cock in their cunt.", "Left in the wallow after, still tied, drippin' muck and cum both."]
+      },
+      booth: {
+        tender: ["The coin slot takes a coin, and a sweet note comes through the window with every one.", "Whoever's on the other side of the holes is careful.", "The booth's warm, and the curtain is velvet."],
+        filthy: ["Coins clatter and a cock comes through the wall, and another, and another.", "They're on their knees in the booth with their mouth open at the hole.", "The window shows the queue outside, every one of them jinglin' change."]
+      },
+      milkinghole: {
+        tender: ["Whatever's on the other side is soft and warm, and it suckles slow.", "It hums while it drinks.", "It strokes them through the hole after, like a thank you."],
+        filthy: ["Somethin' on the other side of the wall is suckin' %n's tits dry and it's not stoppin'.", "They're mashed against the wall with their teats through the hole, moanin' like a cow.", "It drinks till they're flat, and then it starts on the other side."]
+      },
+      feedbag: {
+        tender: ["The oats are sweet and there's a little honey in the bottom.", "The strap's loose, and somebody scratches behind their ears.", "When it's empty it comes off slow."],
+        filthy: ["Strapped on and snufflin' like a horse, oats up their nose and drool down their chin.", "They can't see a thing, and every farmhand uses that.", "Fed like a mare while the stable hands use the other end."]
+      },
+      stag: {
+        tender: ["The stag is a gentle one, all big eyes and soft breath.", "He nuzzles first, and waits till %n leans into him.", "He stays close after, keepin' watch."],
+        filthy: ["The stag mounts %n in the trees and ruts them like a doe in season.", "They're on their knees in the leaves and he's not stoppin'.", "It's his season, and he's breedin' them till it's over."]
+      },
+      desk: {
+        tender: ["The audit's a kind one: every line is a good mark.", "The overseer strokes their back as they read the figures.", "They're let up gently, and given a sweet from the jar."],
+        filthy: ["Bent over the desk with their rump bare while the overseer reads the figures and fucks them in time.", "Every mistake gets a stamp on the ass and another thrust.", "The papers are soaked by the end."]
+      },
+      inspection: {
+        tender: ["Every inch is checked gently, and every note says excellent.", "The clipboard comes with a warm hand.", "They're told they passed with flyin' colours."],
+        filthy: ["Every hole opened, measured and written up while the office watches.", "They're fingered for the report and graded on how wet they get.", "Certified livestock, stamped and filed."]
+      },
+      stamp: {
+        tender: ["The stamps are little hearts and stars, and the ink's warm.", "Each one's placed carefully, and blown on to dry.", "They're filed under SPECIAL."],
+        filthy: ["APPROVED stamped on every tit and BREED ME across their ass.", "The clerk stamps their cunt and then checks the ink took.", "Filed under PROPERTY, with a copy for the boss."]
+      },
+      goblinraid: {
+        tender: ["The goblins are rowdy but careful, and they argue about who gets to hold them after.", "Every one of them brings a little shiny gift.", "They're carried back to camp like a treasure."],
+        filthy: ["Tied up in the dirt and every goblin in the raid takes a turn, then another.", "They're passed round the war party, filled at both ends, and cackled over.", "By the time the raid's done there's goblin cum in every hole and it's still comin'."]
+      },
+      goblinpit: {
+        tender: ["The pit's lined with soft furs and the goblins are surprisingly patient.", "They stroke %n's belly and mutter blessings.", "The oldest one brings them water in a cup made of a skull."],
+        filthy: ["Down in the pit and the goblins swarm them, breedin' them in turns till they're bulgin'.", "Every one of them wants their brood in %n and every one of them gets a go.", "Left in the pit drippin' and moanin' for the night shift."]
+      },
+      goblinmarket: {
+        tender: ["The bids are shiny stones and every one's offered with a bow.", "The winner pets them like a new kitten.", "They're given the best cushion in the camp."],
+        filthy: ["Haggled over like a cow at market, and the goblins test the goods as they bid.", "Sold for a rusty spoon and used right there in the stall.", "Passed round the market as a sample before the sale's done."]
+      },
+      goblincart: {
+        tender: ["The cart's lined with straw and the goblins sing to them as they go.", "They're shown off proudly, like a prize turnip.", "Somebody gives them a garland of daisies."],
+        filthy: ["Trussed up on the cart with their legs spread, paraded round the camp like a trophy.", "Every goblin they pass gets a feel, a slap or a finger.", "The cart stops at every tent so the goblins can have a turn."]
+      },
+      warband: {
+        tender: ["The warchief is huge and surprisingly gentle, and he holds %n like somethin' that might break.", "He feeds them from his own plate.", "His tent is warm, and he lets them sleep against him."],
+        filthy: ["The warchief breeds them on his throne in front of the whole warband.", "They're stretched on his cock like a sheath and the orcs bang their shields.", "Tribute paid, and paid again, till they're leakin' on the furs."]
+      },
+      minotaur: {
+        tender: ["The minotaur is huge and slow and he breathes warm on %n's neck before anything.", "He waits for them to be ready, and they are.", "He lies down with them in the hay after and lets them rest on his chest."],
+        filthy: ["The minotaur mounts %n like a heifer and stretches them wide on a bull's cock.", "They're lowin' like a cow while he pumps them full.", "He breeds them till their belly's round and they're beggin' for it to be over and for it never to stop."]
+      },
+      werewolf: {
+        tender: ["The werewolf is fierce but careful, and he licks their face before he takes them.", "He holds them close under the moon, and growls soft.", "He carries them home after, all the way to the barn."],
+        filthy: ["The werewolf ruts them in the leaves, knot swellin' till they're tied and howlin'.", "They're pinned on all fours with his teeth on their neck.", "Bred under the full moon and left in the woods drippin'."]
+      },
+      foxden: {
+        tender: ["The fox brothers are playful and quick, and they tease with soft paws.", "They share %n nicely, and take turns cuddlin' after.", "The den is warm and smells of pine."],
+        filthy: ["Teased till they're beggin', and then the fox brothers take them at both ends.", "They switch back and forth so %n never knows which one's in them.", "Shared, filled and grinned at."]
+      },
+      lionpride: {
+        tender: ["The lioness holds %n gently, and purrs while the lion takes his time.", "He grooms them after, rough tongue on their neck.", "They nap in the sun with the pride."],
+        filthy: ["The lioness pins %n down while the lion mounts them like a breeding queen.", "He roars as he cums in them, and the pride watches.", "Bred, bitten and kept for the season."]
+      },
+      ramstud: {
+        tender: ["The ram nuzzles first, and his wool is soft.", "He's slow, and stops when they need it.", "He stays close after, keepin' them warm."],
+        filthy: ["The ram mounts them in the paddock and ruts them till their knees give out.", "Every round he bleats and shoves deeper.", "Bred like a ewe, and left in the grass for the next round."]
+      },
+      shrine: {
+        tender: ["The incense is sweet, and the blessing is said softly, with a hand on their belly.", "Warmth spreads through them like sunlight.", "They leave feelin' blessed and full."],
+        filthy: ["The shrine's blessing turns their womb into somethin' that won't stop wantin' to be filled.", "They're on their back on the altar beggin' for a stud.", "Blessed, bred and still beggin' for more."]
+      },
+      studchair: {
+        tender: ["The chair is padded, and every stud has an appointment and keeps it gently.", "Between each one somebody brings them water.", "They're told they're the farm's finest breeder."],
+        filthy: ["Strapped in the chair with their legs open and the queue of studs keepin' to their appointments.", "Every one of them unloads and the next one's already in.", "By noon the chair's drippin' and the queue's still long."]
+      },
+      clutch: {
+        tender: ["The thing in the pond is gentle, and the eggs it lays are warm.", "It strokes them as it lays, and croons.", "It leaves them in the shallows, soft and full."],
+        filthy: ["The thing in the pond packs %n full of eggs till they're bulgin'.", "They're on their back in the mud spread wide while it lays.", "Every egg pushes the last one deeper."]
+      },
+      buttermill: {
+        tender: ["The churn turns slow, and the butter comes up sweet.", "They're rubbed down with it after, slow, all over.", "It's warm, and soft, and smells like breakfast."],
+        filthy: ["Strapped to the churn and churned till there's butter in every crack.", "Every stroke of the paddle makes them squeal.", "Slick with butter, and somebody's usin' it."]
+      },
+      syruptap: {
+        tender: ["The syrup's warm, and dripped on slow, and licked off slower.", "It tastes like autumn, and so do they.", "They're wiped clean with a warm cloth."],
+        filthy: ["Bucket of syrup over their head and the farmhands lick it off every crack.", "They're sticky to the elbows and drippin' between the legs.", "Tapped, drenched and licked raw."]
+      },
+      pieeat: {
+        tender: ["The pie is cherry, and they're cheered for every bite.", "Somebody wipes their face between rounds.", "They don't win, but they get a ribbon anyway."],
+        filthy: ["Face first in the pie, hands tied, and somebody fucks them from behind while they eat.", "They come up with filling on their face and cum on their thighs.", "They lose, and the winner takes their prize out of them."]
+      },
+      mudslide: {
+        tender: ["The slide's slick and fast and they're laughin' all the way down.", "The mud at the bottom's warm and soft.", "They're hosed off after with the warm hose."],
+        filthy: ["They slide into the mud ass-first with their legs wide open and land on somebody waitin'.", "Mud in every hole and somebody fuckin' it deeper.", "They come out of the bottom field filthy and dripping."]
+      },
+      squeezechute: {
+        tender: ["The chute's padded, and the handlin' is slow and kind.", "Every check comes with a pat.", "They're let out gently and given a lick of salt."],
+        filthy: ["Clamped in the chute and handled like a heifer: teats, holes and all.", "The farmhands finger them while they're stuck.", "Every inch checked, squeezed and pinched."]
+      },
+      twine: {
+        tender: ["The knots are pretty ones, and the twine's soft as yarn.", "Somebody admires their work, and their subject.", "They're untied slow, one knot at a time."],
+        filthy: ["Trussed with twine till they're a parcel of tits and holes.", "They're hung from the beam and used while they spin.", "The knots press right where it matters."]
+      },
+      yoke: {
+        tender: ["The buckets are light, and the yoke is padded.", "They're thanked for every trip.", "Somebody holds the gate open for them."],
+        filthy: ["The yoke's heavy and the buckets slosh milk down their tits.", "Every step makes their ass bounce for the yard.", "They're spanked if they spill, and they spill."]
+      },
+      ponycart: {
+        tender: ["The cart's light and the driver's kind, and they trot at their own pace.", "They get a sugar lump at every turn.", "They're brushed down after."],
+        filthy: ["The bit's in, the reins are short, and the crop's busy on their ass.", "They trot round the yard with their tits bouncin' and a plug in.", "The driver makes them prance for the crowd."]
+      },
+      leeches: {
+        tender: ["The leeches are slow and their bites barely sting.", "They drink a little and let go.", "Somebody dabs salve on every mark."],
+        filthy: ["Fat leeches latched on every teat, every lip and the clit, suckin'.", "They're squirmin' and moanin' and the leeches only suck harder.", "Swollen, marked and still wantin' more."]
+      },
+      well: {
+        tender: ["The thing in the well is gentle and slow, and it sings in the dark.", "It holds them, and the eggs it leaves are warm.", "It lifts them back up into the light, carefully."],
+        filthy: ["Pulled down into the dark and bred by somethin' with too many arms.", "It fills them with eggs till they're stretched round.", "They come up the rope at last drippin' and full."]
+      },
+      suit: {
+        tender: ["The latex spreads slow and warm, like bein' wrapped in a second skin.", "It hums against them and holds them close.", "It takes them where it likes, but gently."],
+        filthy: ["The livin' latex crawls into every hole and fucks them from the inside.", "It squeezes their tits and their cock and won't let them finish.", "Sealed in shiny black with the suit usin' them however it wants."]
+      }
+    });
     const TRAP_SOUND = {
       injector: "clip",
       milker: "latch",
@@ -28927,13 +29500,13 @@
       if ((b.g === "male" || b.g === "nonbinary") && GIRL_WORDS.test(s)) return false;
       return true;
     }
-    function pickFor(mn, key, list) {
+    function pickFor(mn, key, list2) {
       try {
-        if (!Array.isArray(list) || !list.length || !rec(mn)) return pickFresh(key, list);
-        const b = bodyOf(mn), tagged = list.filter((l) => tagsFit(l, b)), best = tagged.filter((l) => wordsFit(l, b));
-        return pickFresh(key, best.length ? best : tagged.length ? tagged : list);
+        if (!Array.isArray(list2) || !list2.length || !rec(mn)) return pickFresh(key, list2);
+        const b = bodyOf(mn), tagged = list2.filter((l) => tagsFit(l, b)), best = tagged.filter((l) => wordsFit(l, b));
+        return pickFresh(key, best.length ? best : tagged.length ? tagged : list2);
       } catch (e) {
-        return pickFresh(key, list);
+        return pickFresh(key, list2);
       }
     }
     const SWAP_NO_VULVA = [[/\bpussies\b/g, "asses"], [/\bpussy\b/g, "ass"], [/\bcunts\b/g, "holes"], [/\bcunt\b/g, "hole"], [/\bslit\b/g, "crack"], [/\bwomb\b/g, "belly"], [/\bcervix\b/g, "guts"], [/\bclit\b/g, "cock"]];
@@ -29802,7 +30375,7 @@
           when: "hold",
           slot: "device",
           label: "Scarecrow Post",
-          items: ["X-Cross"],
+          items: ["XFrame"],
           desc: "The old scarecrow's crossbar in the middle of the cornfield, with a new scarecrow lashed to it, straw hat and all."
         },
         {
@@ -29864,7 +30437,7 @@
         when: "hold",
         slot: "device",
         label: "Windmill Sails",
-        items: ["X-Cross"],
+        items: ["XFrame"],
         desc: "Lashed to the windmill's sails, turning slow over the whole farm, sky then fields then sky again."
       }],
       kissgate: [{
@@ -29955,7 +30528,7 @@
       teatcheck: [{ when: "hold", slot: "cups", label: "Check Stall Cups", items: ["LactationPump", "NippleClamp"], desc: "The dairy girl's own stripping cups, cold steel, for gettin' the last drops out after the hand check." }],
       wax: [{ when: "hold", slot: "device", label: "The Bench", items: ["BondageBench", "Table"], desc: "The farm's punishment bench, buckled at the wrists, waist and knees, with a candle burning on the shelf beside it." }],
       tomatoes: [{ when: "hold", slot: "device", label: "Square Stocks", items: ["WoodenStocks"], desc: "The old wooden stocks in the middle of the square, stained red from a hundred fruit-throwing Sundays." }],
-      trophy: [{ when: "hold", slot: "device", label: "Trophy Mount", items: ["XFrame", "X-Cross", "TheDisplayFrame"], desc: "A plank frame on the cabin's trophy wall, between the elk and the bear, with a brass plate underneath: LOCAL GAME." }],
+      trophy: [{ when: "hold", slot: "device", label: "Trophy Mount", items: ["XFrame", "TheDisplayFrame"], desc: "A plank frame on the cabin's trophy wall, between the elk and the bear, with a brass plate underneath: LOCAL GAME." }],
       hottub: [{ when: "hold", slot: "arms", label: "Lumberjack's Grip", items: ["HempRope", "LeatherCuffs"], desc: "A length of logging rope round the wrists, so they don't float off while they're passed round the tub." }],
       slop: [],
       hogtie: [
@@ -30969,9 +31542,9 @@
         const t = Number(x.t) || now;
         if (Math.abs(now - t) > 2 * 864e5) continue;
         const row = { t, k: String(x.k || "?").slice(0, 12), f: Number(x.f) || 0, x: x.x.slice(0, 600) };
-        const key = mn + "|" + logHour(t), list = CHATLOG.live.get(key) || [];
-        if (list.length < 6e3) list.push(row);
-        CHATLOG.live.set(key, list);
+        const key = mn + "|" + logHour(t), list2 = CHATLOG.live.get(key) || [];
+        if (list2.length < 6e3) list2.push(row);
+        CHATLOG.live.set(key, list2);
       }
       CHATLOG.who.set(mn, now);
     }
@@ -31079,9 +31652,9 @@
         }
       } catch (e) {
       }
-      for (const [key, list] of CHATLOG.live) {
+      for (const [key, list2] of CHATLOG.live) {
         const [of, hk] = key.split("|");
-        if (hks.has(hk) && (!who || Number(of) === who)) for (const r of list) rows.push(Object.assign({ w: Number(of) }, r));
+        if (hks.has(hk) && (!who || Number(of) === who)) for (const r of list2) rows.push(Object.assign({ w: Number(of) }, r));
       }
       rows = rows.filter((r) => r.t >= from && (!kind || r.k === kind || kind === "beep" && /^beep/.test(r.k)) && (!q || r.x.toLowerCase().includes(q) || String(r.f) === q || chatlogName(r.f).toLowerCase().includes(q)));
       rows.sort((a, b) => a.t - b.t);
@@ -31162,10 +31735,10 @@
         saveLedger();
       }
     }
-    function wheelAllowed(entry, mn) {
+    function wheelAllowed(entry2, mn) {
       const lim = String((rec(mn) || {}).limits || "").toLowerCase();
       if (!lim) return true;
-      return !String(entry.text).toLowerCase().split(/[^a-z]+/).some((w) => w.length >= 4 && lim.includes(w));
+      return !String(entry2.text).toLowerCase().split(/[^a-z]+/).some((w) => w.length >= 4 && lim.includes(w));
     }
     function begPhraseOk(text) {
       const norm = (s) => String(s).toLowerCase().replace(/[^a-z ]/g, "").replace(/\s+/g, " ").trim();
@@ -32356,19 +32929,19 @@ Chat in the room all you like; I'll only count what you send me direct.`,
     function askNext(mn) {
       const s = state.sessions.get(mn);
       if (!s) return;
-      const list = s.staffTrack ? QUESTIONS.concat(STAFF_QUESTIONS) : QUESTIONS;
-      if (s.step >= list.length) {
+      const list2 = s.staffTrack ? QUESTIONS.concat(STAFF_QUESTIONS) : QUESTIONS;
+      if (s.step >= list2.length) {
         finishApplication(mn);
         return;
       }
-      if (list[s.step].skip && list[s.step].skip(s)) {
-        s.byKey[list[s.step].key] = "";
+      if (list2[s.step].skip && list2[s.step].skip(s)) {
+        s.byKey[list2[s.step].key] = "";
         s.answers.push("");
         s.step++;
         askNext(mn);
         return;
       }
-      const q = list[s.step], text = s.step + 1 + "/" + list.length + " \u2014 " + q.text;
+      const q = list2[s.step], text = s.step + 1 + "/" + list2.length + " \u2014 " + q.text;
       const asText = () => {
         const ch = q.choices ? q.choices() : [];
         const listed = ch.length && ch.every((c) => text.toLowerCase().includes(String(c).toLowerCase()));
@@ -32402,8 +32975,8 @@ Chat in the room all you like; I'll only count what you send me direct.`,
         startApplication(mn, channel);
         return true;
       }
-      const list = s.staffTrack ? QUESTIONS.concat(STAFF_QUESTIONS) : QUESTIONS;
-      const q = list[s.step];
+      const list2 = s.staffTrack ? QUESTIONS.concat(STAFF_QUESTIONS) : QUESTIONS;
+      const q = list2[s.step];
       let answer = low === "skip" ? "(skipped)" : raw;
       if (q && q.check && low !== "skip") {
         const got = q.check(raw);
@@ -32432,10 +33005,10 @@ Chat in the room all you like; I'll only count what you send me direct.`,
       };
     }
     function applicationText(a, onRecord) {
-      const list = a.staffTrack ? QUESTIONS.concat(STAFF_QUESTIONS) : QUESTIONS;
+      const list2 = a.staffTrack ? QUESTIONS.concat(STAFF_QUESTIONS) : QUESTIONS;
       const skip = onRecord ? ["limits", "triggers", "aftercare"] : [];
       let o = "\u{1F4CB} Application, " + new Date(a.at).toLocaleDateString() + "\n";
-      if (a.byKey) list.filter((q) => !skip.includes(q.key)).forEach((q) => {
+      if (a.byKey) list2.filter((q) => !skip.includes(q.key)).forEach((q) => {
         o += "\n\u25B8 " + q.text.split("\n")[0].split("  ")[0] + "\n   " + (a.byKey[q.key] || "\u2014") + "\n";
       });
       else (a.answers || []).forEach((ans, qi) => {
@@ -33665,6 +34238,25 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
             R("\u{1F457} FARM OUTFITS\n" + (ks.length ? ks.map((k) => "  " + slotLabel(k) + " \xB7 " + L2.outfits[k].items + " pieces" + (L2.outfits[k].locks ? ", " + L2.outfits[k].locks + " locked" : "")).join("\n") : "  none saved yet") + "\n\nKeys to farm locks: " + { staff: "farm staff + their herd leader", leader: "their herd leader", owners: "the proprietors" }[L2.outfitRules.keys] + "\nOffered on approval: " + (L2.outfitRules.onApprove ? "yes" : "no") + " \xB7 uniforms at clock-in: " + (L2.outfitRules.onClockIn ? "yes" : "no") + " \xB7 change back at clock-out: " + (L2.outfitRules.changeBack ? "yes" : "no") + "\n\nProprietors save outfits from the Companion's Dashboard. ?outfit offer <who> [slot] hands one over.");
             break;
           }
+          if (sub === "starters" || sub === "starter" || sub === "farm") {
+            const want = args[1] ? speciesFrom(args[1]) : null, kinds = OUTFIT_SPECIES.filter((sp) => !want || outfitName(want, "female") === outfitName(sp, "female"));
+            if (!kinds.length) {
+              R("I don't have starter outfits for that kind, sugar. ?outfit starters lists them all.");
+              break;
+            }
+            R("\u{1F457} THE FARM'S STARTER OUTFITS\n" + kinds.map((sp) => "  " + speciesLabel(sp) + ": " + OUTFIT_GENDERS.map((g) => outfitName(sp, g) + " (" + g + ")").join(" \xB7 ")).join("\n") + "\n\n?outfit about <species> <gender> tells you what's in one. A proprietor's own saved outfit for a slot always comes first.");
+            break;
+          }
+          if (sub === "about") {
+            const sp = speciesFrom(args[1] || ""), g = String(args[2] || "").toLowerCase();
+            const d = sp && outfitDesc(sp, g);
+            if (!d) {
+              R("?outfit about <species> <gender>, sugar, like ?outfit about cow female. Genders: " + OUTFIT_GENDERS.join(", ") + ".");
+              break;
+            }
+            R("\u{1F457} " + outfitName(sp, g).toUpperCase() + "\n" + d);
+            break;
+          }
           if (sub === "back") {
             if (!hasCompanion(sender)) {
               R("That needs the Companion, sugar: it's the one keepin' your own clothes.");
@@ -34211,7 +34803,7 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
           R(TEXT.doors);
           break;
         case "ping":
-          if (channel === "chat") say("Right here and mindin' the books, " + plainName(sender) + "! \u{1F33E}", false, sender);
+          if (channel === "chat") say2("Right here and mindin' the books, " + plainName(sender) + "! \u{1F33E}", false, sender);
           else R("Right here and mindin' the books, " + plainName(sender) + "! \u{1F33E}");
           break;
         case "apply":
@@ -34315,9 +34907,9 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
             (bySpecies[s] = bySpecies[s] || []).push(r);
           }
           let o = "\u{1F404} THE HERD \u2014 " + herd.length + " head\n";
-          for (const [sp, list] of Object.entries(bySpecies).sort((a, b) => b[1].length - a[1].length)) {
-            o += "\n" + sp.toUpperCase() + " (" + list.length + ")\n";
-            o += list.map((r) => {
+          for (const [sp, list2] of Object.entries(bySpecies).sort((a, b) => b[1].length - a[1].length)) {
+            o += "\n" + sp.toUpperCase() + " (" + list2.length + ")\n";
+            o += list2.map((r) => {
               const here = charFor(r.mn) ? " \u25CF" : "";
               const hm = (r.herds || []).length ? " \xB7 " + herdsLine(r.mn) : " \xB7 unclaimed";
               return "  \u2022 " + (r.name || "#" + r.mn) + here + hm;
@@ -34431,8 +35023,8 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
           const bySp = {};
           for (const r of mine) (bySp[(r.species || "unspecified").toLowerCase()] = bySp[(r.species || "unspecified").toLowerCase()] || []).push(r);
           let o = "\u{1F33E} YOUR " + word.toUpperCase() + " \u2014 " + all.length + "/" + herdCap(sender) + (spq ? " \xB7 showing " + spq : "") + "\n";
-          for (const [sp, list] of Object.entries(bySp).sort((a, b) => b[1].length - a[1].length))
-            o += "\n" + sp.toUpperCase() + " (" + list.length + ")\n" + list.map(line).join("\n") + "\n";
+          for (const [sp, list2] of Object.entries(bySp).sort((a, b) => b[1].length - a[1].length))
+            o += "\n" + sp.toUpperCase() + " (" + list2.length + ")\n" + list2.map(line).join("\n") + "\n";
           o += "\n?myherd <species> to filter (like ?myherd cow) \xB7 ?herdcall <message> \xB7 ?herdname <word>";
           R(o);
           break;
@@ -34743,7 +35335,7 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
           } catch (e) {
             warn("safeword symbiote:", e);
           }
-          say("\u{1F534} PAUSE CALLED. Everything stops, right now, everybody.", true, sender);
+          say2("\u{1F534} PAUSE CALLED. Everything stops, right now, everybody.", true, sender);
           beep(sender, "I've got you, " + plainName(sender) + ". Everything's stopped and I'm fetchin' somebody for you right now. You don't owe anybody an explanation. \u{1F534}", true);
           notifyStaff("\u{1F534} SAFEWORD from " + plainName(sender) + " (" + sender + "). Please go to them now.", false);
           audit(sender, "SAFEWORD", channel);
@@ -34802,7 +35394,7 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
           if (L2.stuckLog.length > 300) L2.stuckLog = L2.stuckLog.slice(-300);
           saveLedger();
           audit(sender, "STUCK", where);
-          say("Hold still, " + plainName(sender) + ". I'm gettin' you some help.", true, sender);
+          say2("Hold still, " + plainName(sender) + ". I'm gettin' you some help.", true, sender);
           const staffHere = [];
           for (const k in L2.people) {
             const m = parseInt(k, 10);
@@ -34903,9 +35495,9 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
             R("There's no application like that, sugar. Say ?app and a number from the ?queue list (?app 1), or a name or member number (?app Bessie).");
             break;
           }
-          const list = a.staffTrack ? QUESTIONS.concat(STAFF_QUESTIONS) : QUESTIONS;
+          const list2 = a.staffTrack ? QUESTIONS.concat(STAFF_QUESTIONS) : QUESTIONS;
           let o = "\u{1F4CB} APPLICATION \u2014 " + a.name + " (" + a.mn + ")\n" + new Date(a.at).toLocaleString() + "\n";
-          if (a.byKey) list.forEach((q) => {
+          if (a.byKey) list2.forEach((q) => {
             o += "\n\u25B8 " + q.text.split("\n")[0] + "\n   " + (a.byKey[q.key] || "\u2014") + "\n";
           });
           else a.answers.forEach((ans, qi) => {
@@ -35926,15 +36518,15 @@ Welcome to B&B Farm, hon. \u{1F33E}`
             break;
           }
           prodTick();
-          const mp = bodyParts(t), nm = plainName(t), say2 = [];
-          if (mp.includes("udder")) say2.push("loops the tape round " + nm + "'s chest and gives each breast a heft: " + CFG.SIZES.udder.cups[udderLevel(t) - 1] + " cup, " + CFG.SIZES.udder.names[udderLevel(t) - 1]);
-          if (mp.includes("penis")) say2.push("lays the tape along their " + penisLabel(t) + " cock: " + sizeOf(t, "penis") + " inches, " + sizeWord("penis", sizeOf(t, "penis")) + (mp.includes("knot") ? ", knot " + sizeWord("knot", sizeOf(t, "knot")) : ""));
-          if (mp.includes("testes")) say2.push("cups their balls in her palm: " + sizeWord("testes", sizeOf(t, "testes")));
+          const mp = bodyParts(t), nm = plainName(t), say22 = [];
+          if (mp.includes("udder")) say22.push("loops the tape round " + nm + "'s chest and gives each breast a heft: " + CFG.SIZES.udder.cups[udderLevel(t) - 1] + " cup, " + CFG.SIZES.udder.names[udderLevel(t) - 1]);
+          if (mp.includes("penis")) say22.push("lays the tape along their " + penisLabel(t) + " cock: " + sizeOf(t, "penis") + " inches, " + sizeWord("penis", sizeOf(t, "penis")) + (mp.includes("knot") ? ", knot " + sizeWord("knot", sizeOf(t, "knot")) : ""));
+          if (mp.includes("testes")) say22.push("cups their balls in her palm: " + sizeWord("testes", sizeOf(t, "testes")));
           const holes = ["vulva", "butt", "throat"].filter((k) => mp.includes(k)).map((k) => ({ vulva: "pussy", butt: "ass", throat: "throat" })[k] + " " + sizeWord(k, sizeOf(t, k)));
-          if (holes.length) say2.push("checks how much they'll take: " + holes.join(", "));
+          if (holes.length) say22.push("checks how much they'll take: " + holes.join(", "));
           const belly = bellyWord(t);
-          if (belly) say2.push("pats a belly that's " + belly);
-          emote("\u{1F4CF} The farm girl pulls out her tape measure and gets right up close with " + nm + ". She " + say2.join("; she ") + ". She jots it all down with a wicked little grin.", t);
+          if (belly) say22.push("pats a belly that's " + belly);
+          emote("\u{1F4CF} The farm girl pulls out her tape measure and gets right up close with " + nm + ". She " + say22.join("; she ") + ". She jots it all down with a wicked little grin.", t);
           break;
         }
         case "freeuse":
@@ -36517,7 +37109,7 @@ Welcome to B&B Farm, hon. \u{1F33E}`
           }
           state.leashes.set(t, sender);
           audit(sender, "WALK", String(t));
-          say("\u{1F9AE} " + plainName(sender) + " clips a lead on " + plainName(t) + ". Aww!", false, t);
+          say2("\u{1F9AE} " + plainName(sender) + " clips a lead on " + plainName(t) + ". Aww!", false, t);
           whisper(t, "You're on " + plainName(sender) + "'s lead now, sweetie. Wherever they go, you go. Safeword ends it.");
           break;
         }
@@ -36875,7 +37467,7 @@ Welcome to B&B Farm, hon. \u{1F33E}`
           }
           F.entrants[sender] = F.entrants[sender] || { scores: {} };
           saveLedger();
-          say("\u{1F3AA} Lookin' good! " + plainName(sender) + " steps into the show ring.", false, sender);
+          say2("\u{1F3AA} Lookin' good! " + plainName(sender) + " steps into the show ring.", false, sender);
           break;
         }
         case "score": {

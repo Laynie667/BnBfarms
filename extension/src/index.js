@@ -230,7 +230,7 @@ function onFarmMsg(m) {
     case "outfit":
       // with a contract they've just signed: on at once, no second askin' (they can still change back from the panel)
       if (m.auto) { api.wear({ slot: String(m.slot || ""), label: String(m.label || "farm outfit"), data: String(m.data || ""), keys: Array.isArray(m.keys) ? m.keys.filter(Number.isInteger) : [] }); toChat("👗 You've been dressed in your " + String(m.label || "farm outfit") + " for your new contract.", "#c9a35b"); break; }
-      st.panel.setOutfit({ slot: String(m.slot || ""), label: String(m.label || "farm outfit"), data: String(m.data || ""),
+      st.panel.setOutfit({ slot: String(m.slot || ""), label: String(m.label || "farm outfit"), desc: String(m.desc || "").slice(0, 1200), data: String(m.data || ""),
         keys: Array.isArray(m.keys) ? m.keys.filter(Number.isInteger) : [], why: String(m.why || "") });
       toChat("👗 The farm's offerin' you your " + String(m.label || "outfit") + ". Yes or Not now in your 🌾 panel.", "#c9a35b");
       break;

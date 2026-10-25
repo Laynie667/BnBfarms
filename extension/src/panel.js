@@ -270,6 +270,7 @@ export class Panel {
     const o = this.outfit;
     if (o) out.push(h("div", { class: "fhc-box ask" },
       h("b", null, "👗 " + (o.why ? o.why + ": " : "") + "put on your " + o.label + "?"),
+      o.desc ? h("div", { class: "fhc-card", style: { whiteSpace: "pre-wrap", margin: "6px 0" } }, o.desc) : null,
       h("div", { class: "fhc-muted" }, "Your own clothes are kept so you can change back. Body and hair aren't touched, and nothin' already locked on you moves." +
         (o.keys.length ? " Any locked pieces get high security padlocks the farm's keyholders can open." : "")),
       h("div", { style: { marginTop: "8px" } },

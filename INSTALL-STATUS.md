@@ -1,11 +1,11 @@
 # What to install (current versions)
 
-Updated 2026-10-15. Every file is in the `dist/` folder (it syncs through OneDrive, so the phone app has it too).
+Updated 2026-10-25. Every file is in the `dist/` folder (it syncs through OneDrive, so the phone app has it too).
 In Tampermonkey's dashboard, compare each script's version with this list. Anything already at these versions is up to date.
 
 | Script | File in `dist/` | Where it runs | Current |
 |---|---|---|---|
-| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.47.2** |
+| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.48.0** |
 | Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.10.0** |
 | Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.2.1** |
 | Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **1.1.0** |
@@ -13,7 +13,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 | Map tools, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.4** |
 | Dairy | `farmhand-dairy.user.js` | the bot's PC | **1.1.0** |
 | Shows | `farmhand-shows.user.js` | the bot's PC | **1.1.0** |
-| Farmhand Companion | `farmhand-companion.user.js` | each player | **0.41.0** |
+| Farmhand Companion | `farmhand-companion.user.js` | each player | **0.41.1** |
 | Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.4** |
 
 ## Sending a watch report
@@ -23,6 +23,14 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 - Running the watcher on more than one game at once (the bot, yours, a tester's) lets Claude line them up into one timeline.
 
 ## Latest changes (newest first)
+
+- **Bot 0.48.0, Companion 0.41.1: named outfits, the intensity dial for every trap, and pot luck that notices.** Laynie, Oct 25: starter outfits "we have them implemented, but they arent named and described", line pools three ways "yes", traps "more variety based on present factors would be fine".
+  - **The 45 starter outfits have names and descriptions** (Dairy Darling, Midnight Mare, Ragged Raider…), shared/farm-outfit-names.js. The offer card in the Companion shows what's in it and what gets padlocked, and the room hears "changes into the Dairy Darling". ?outfit starters lists them all, ?outfit about cow female describes one.
+  - **The intensity dial reaches every trap.** 25 traps had their own tender and filthy sentences; the other 84 have them now (bot/src/parts/10y9b2-intensity-more.js), so ?intensity tender or filthy changes how every trap talks.
+  - **Pot luck notices the moment** (bot/src/parts/10ua2-trap-weights.js). Every trap a tile could spring still can, but full udders draw the milkin' traps, a pent-up cock the collection ones, heat or rut day the breedin' ones, carryin' the nestin' ones, corruption 40 and up the slimy livin' things, night the things in the dark, a crowd of three within 8 tiles the public ones, nobody about the wild ones, and their last three traps are much less likely. The whisper says what drew it.
+  - **Scarecrow Post, Windmill Sails and Trophy Mount put real gear on now.** "X-Cross" isn't a game item, so the first two never dressed anybody; they use the game's XFrame (checked all 80 farm gear pieces against R133's item list).
+  - **Hogtie and slop: the boar is the boar-man who keeps the sty**, on two legs, and the pigs only root for scraps. Sexual partners in the farm's scenes are people, anthro folk or monsters, never farm animals; animals stay as scenery.
+  - tests: outfits-bot step 8, udders (every trap has its lines), trap-weights (new).
 
 - **Outfit studio: human stamps from Laynie's picked pictures.** The studio draws a human cock from her picks when the pictures are in `studio/web/_stamps/human/` (kept on her computer, never on GitHub). Length, girth and ball size each follow the farm's numbers, the stamps take the body's skin colour, and the panel picks the shaft and drained or pent-up balls. Without the pictures, or for the other kinds, the studio keeps its drawing. No script versions change: the Companion still uses the game's own picture.
 

@@ -13,7 +13,7 @@ export const PUBLIC_GROUPS = [
   { name: "Breedin'", cmds: ["breedable", "fertile", "mpreg", "freeuse", "jarok", "yes", "no", "naturalheat", "breed <who>", "cum <who>", "wash", "tally", "eggs", "praise", "degrade", "rights", "accept", "pedigree"] },
   { name: "Body", cmds: ["size", "measure", "penis", "futa", "gender <word>"] },
   { name: "Roamin'", cmds: ["roam", "roam start", "roam back"] },
-  { name: "Clothes", cmds: ["dressme", "outfit", "outfits", "uniform", "outfit back"] },
+  { name: "Clothes", cmds: ["dressme", "outfit", "outfits", "uniform", "outfit back", "outfit starters", "outfit about <species> <gender>"] },
   { name: "Mind", cmds: ["hypno", "hypnotize me", "echs", "teaseme", "teaseme light", "teaseme steady", "teaseme needy", "teaseme off"] },
   { name: "Fun", cmds: ["fair", "enter"] },
   { name: "Ribbons and the store", cmds: ["ribbons", "ribbons top", "store", "buy <item>", "gift <who> <potion>", "potions", "potions on", "dares on", "dare", "dared", "dare skip", "bench", "bench on", "bench me <minutes>", "use <mouth|pussy|ass>", "bench top"] },

@@ -440,6 +440,20 @@
             "\n\nProprietors save outfits from the Companion's Dashboard. ?outfit offer <who> [slot] hands one over.");
           break;
         }
+        // ?outfit starters [species] · ?outfit about <species> <gender>: the farm's own 45, by name (Oct 25)
+        if (sub === "starters" || sub === "starter" || sub === "farm"){
+          const want = args[1] ? speciesFrom(args[1]) : null, kinds = FARM_OUTFITS.OUTFIT_SPECIES.filter(sp => !want || FARM_OUTFITS.outfitName(want, "female") === FARM_OUTFITS.outfitName(sp, "female"));
+          if (!kinds.length){ R("I don't have starter outfits for that kind, sugar. ?outfit starters lists them all."); break; }
+          R("👗 THE FARM'S STARTER OUTFITS\n"+kinds.map(sp => "  "+FARM_OUTFITS.speciesLabel(sp)+": "+FARM_OUTFITS.OUTFIT_GENDERS.map(g => FARM_OUTFITS.outfitName(sp, g)+" ("+g+")").join(" · ")).join("\n")+
+            "\n\n?outfit about <species> <gender> tells you what's in one. A proprietor's own saved outfit for a slot always comes first.");
+          break;
+        }
+        if (sub === "about"){
+          const sp = speciesFrom(args[1] || ""), g = String(args[2] || "").toLowerCase();
+          const d = sp && FARM_OUTFITS.outfitDesc(sp, g);
+          if (!d){ R("?outfit about <species> <gender>, sugar, like ?outfit about cow female. Genders: "+FARM_OUTFITS.OUTFIT_GENDERS.join(", ")+"."); break; }
+          R("👗 "+FARM_OUTFITS.outfitName(sp, g).toUpperCase()+"\n"+d); break;
+        }
         if (sub === "back"){ if (!hasCompanion(sender)){ R("That needs the Companion, sugar: it's the one keepin' your own clothes."); break; } enqueue(makeMsg("outfitBack", { why: "you asked" }, sender)); break; }
         if (sub === "offer"){
           if (!isStaff(sender)){ R("Handin' out outfits is for staff, sugar."); break; }

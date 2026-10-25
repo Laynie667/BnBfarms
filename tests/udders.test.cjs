@@ -50,6 +50,8 @@ const rnd=Math.random;
   await say(500,'?intensity tender'); ok(W.__intSev(500,3)===2 && W.__intSev(500,1)===1, 'tender leans the traps a step milder');
   Math.random=()=>0; ok(/padded rest|rubs the spot|goes in warm/.test(W.__intTail(500,'injector')), 'tender has its own too'); Math.random=rnd;
   await say(500,'?intensity rough'); ok(W.__intSev(500,3)===3, 'rough leaves them as written');
+  { const I=W.__lines().INTENSITY_BY_TRAP, kinds=Object.keys(W.__farmSets().TRAP_KINDS), short=kinds.filter(k=>!I[k]||!(I[k].tender||[]).length||!(I[k].filthy||[]).length);
+    ok(!short.length, 'every trap has its own tender and filthy lines (Oct 25) '+short.join(',')); }
   // ── a body that shows its size ──
   ok(!W.__stateFor(500).shape, "at the farm's startin' size nothin' is asked of their body");
   prod(500).size=Object.assign(prod(500).size||{},{udder:7,butt:5});

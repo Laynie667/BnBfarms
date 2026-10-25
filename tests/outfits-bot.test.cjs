@@ -71,5 +71,13 @@ const roomText=s=>{ const d=s&&s[1]; if(!d) return null;
   n=sent.length; await B(700,'outfit offer 900');
   const o8=farmTo(900,'outfit',n)[0]||{}, it8=o8.data?JSON.parse(W.LZString.decompressFromBase64(o8.data)).items:[];
   out('7 a bull wears the cow outfit; women go without chastity ->', o8.slot==='farm:bull|female', it8.some(i=>i.Name==='PawPaddedPetsuitArms'), !it8.some(i=>/Chastity|Cockring/.test(i.Name)));
+  // 8. Oct 25: every starter outfit has a name and a description, and the offer carries them
+  out('8 the offer is named and described ->', o7.label==='Little Kid Frills outfit', /^A pink maid bikini/.test(o7.desc||''), /In it: .*hoof mittens strapped together/.test(o7.desc||''), /Padlocked: .*pink chastity cage/.test(o7.desc||''));
+  out('8 ...and the bull is offered the cow\'s ->', o8.label==='Dairy Darling outfit');
+  n=sent.length; await B(900,'outfit starters');
+  const st8=sent.slice(n).map(x=>JSON.stringify(x)).join(' ');
+  out('8 ?outfit starters lists all 45 by name ->', /Dairy Darling/.test(st8), /Cave Scrapper/.test(st8), /Midnight Mare/.test(st8));
+  n=sent.length; await B(900,'outfit about pony female');
+  out('8 ?outfit about pony female describes it ->', /MIDNIGHT MARE/.test(sent.slice(n).map(x=>JSON.stringify(x)).join(' ')));
   process.exit(0);
 })();

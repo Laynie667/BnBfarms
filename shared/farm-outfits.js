@@ -21,6 +21,7 @@
    Rustic accents run through both: cognac leather, aged brass, rope. Then each species' tack over the top.
 */
 import { OUTFIT_PROPS } from "./farm-outfit-props.js";
+export { outfitName, outfitDesc } from "./farm-outfit-names.js";
 export const OUTFIT_GENDERS = ["female", "male", "futa", "femboy", "nonbinary"];
 const L = true;   // (locked: the farm puts its own padlock on, keyed to staff)
 

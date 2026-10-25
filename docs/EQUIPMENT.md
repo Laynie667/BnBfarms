@@ -1,6 +1,6 @@
 # B&B Farm equipment
 
-Everything the farm puts on somebody, built from the bot  on 2026-10-20.
+Everything the farm puts on somebody, built from the bot  on 2026-10-25.
 
 How traps are set up: staff mark a map tile with `?spot set trap-<name>` (for example `trap-bakery`). A tile named just `trap` springs a random one. Water tiles (named for a pond, stream, trough or well) hide the water traps. A subject who steps on the tile can be caught once it's reset (a few minutes; faster at night and with Danger Draught). `?trap spring <who> <name>` sets one off by hand (staff). Nobody is caught by a trap their limits rule out, or while they've paused traps.
 Real gear goes on only for players who switched on **Farm can put real gear on me** in the Companion; messes show for **Farm can mark my body**.
@@ -636,7 +636,7 @@ Tied up on the scarecrow post, and the farmhands take their turns.
 - **Ruled out by limits mentioning:** public, free use, gang, rope.
 - **Mess it leaves:** cum on the tummy and chest.
 - **Equipment:**
-  - **Scarecrow Post** (device, while the trap holds them). Game items: X-Cross, WoodenStocks. The old scarecrow's crossbar in the middle of the cornfield, with a new scarecrow lashed to it, straw hat and all.
+  - **Scarecrow Post** (device, while the trap holds them). Game items: XFrame, WoodenStocks. The old scarecrow's crossbar in the middle of the cornfield, with a new scarecrow lashed to it, straw hat and all.
   - **Scarecrow Ropes** (arms, while the trap holds them). Game items: HempRope, LeatherCuffs. Rough rope lashing both arms out along the crossbar. The crows aren't scared. The farmhands aren't either.
 
 ### 💦 seedshower
@@ -837,7 +837,7 @@ Mounted on the cabin's trophy wall, on display.
 - **How to get it:** a tile named `trap-trophy`.
 - **Ruled out by limits mentioning:** display, suspen, object, humiliat.
 - **Equipment:**
-  - **Trophy Mount** (device, while the trap holds them). Game items: XFrame, X-Cross, TheDisplayFrame, WoodenStocks. A plank frame on the cabin's trophy wall, between the elk and the bear, with a brass plate underneath: LOCAL GAME.
+  - **Trophy Mount** (device, while the trap holds them). Game items: XFrame, TheDisplayFrame, WoodenStocks. A plank frame on the cabin's trophy wall, between the elk and the bear, with a brass plate underneath: LOCAL GAME.
 
 ### 💛 trough
 
@@ -974,7 +974,7 @@ Tied to the windmill sails, turnin' slow over the farm.
 - **How to get it:** a tile named `trap-windmill`.
 - **Ruled out by limits mentioning:** suspen, rope, spin, dizz.
 - **Equipment:**
-  - **Windmill Sails** (device, while the trap holds them). Game items: X-Cross, WoodenStocks. Lashed to the windmill's sails, turning slow over the whole farm, sky then fields then sky again.
+  - **Windmill Sails** (device, while the trap holds them). Game items: XFrame, WoodenStocks. Lashed to the windmill's sails, turning slow over the whole farm, sky then fields then sky again.
 
 ### ✂️ wire
 

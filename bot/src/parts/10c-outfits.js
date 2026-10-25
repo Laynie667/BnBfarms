@@ -58,7 +58,11 @@
     if (/^[a-z][a-z0-9_-]{1,19}$/.test(w[0]) && !speciesFrom(w[0])) return "special:"+w[0];
     return null;
   }
-  const slotLabel = (k) => k.startsWith("farm:") ? "farm "+k.slice(5).split("|").map(x => x === "kitt" ? "kitty" : x).join(" · ")+" outfit" : k === "stock" ? "Any new stock" : k.startsWith("uniform:") ? k.slice(8)+" uniform" : k.startsWith("special:") ? k.slice(8)
+  // a farm starter outfit goes by its own name (Oct 25): "farm:cow|female" → "Dairy Darling outfit"
+  const farmParts = (k) => k.slice(5).split("|");
+  const farmName = (k) => FARM_OUTFITS.outfitName(...farmParts(k));
+  const outfitDescFor = (k) => /^farm:/.test(String(k || "")) ? FARM_OUTFITS.outfitDesc(...farmParts(k)) || "" : "";
+  const slotLabel = (k) => k.startsWith("farm:") ? (farmName(k) ? farmName(k)+" outfit" : "farm "+farmParts(k).map(x => x === "kitt" ? "kitty" : x).join(" · ")+" outfit") : k === "stock" ? "Any new stock" : k.startsWith("uniform:") ? k.slice(8)+" uniform" : k.startsWith("special:") ? k.slice(8)
                          : k.split("|").map(x => x === "*" ? "any" : x).join(" · ");
 
   function offerOutfit(mn, slot, why, auto){
@@ -70,7 +74,7 @@
       tell(mn, "👗 The farm has your "+slotLabel(slot)+" ready"+(why ? " ("+why+")" : "")+". The Companion can put it on you in one tap; without it, staff can help you dress by hand.");
       return plainName(mn)+" isn't runnin' the Companion, so I can't hand 'em an outfit. I've told 'em it's ready, and they can dress by hand.";
     }
-    enqueue(makeMsg("outfit", { slot, label: slotLabel(slot), data: o.data, keys: outfitKeysFor(mn), why: why || "", auto: !!auto, id: ++companionSeq }, mn));
+    enqueue(makeMsg("outfit", { slot, label: slotLabel(slot), desc: outfitDescFor(slot), data: o.data, keys: outfitKeysFor(mn), why: why || "", auto: !!auto, id: ++companionSeq }, mn));
     audit(CFG.BOT_MEMBER, "OUTFIT_OFFER", mn+" "+slot);
     return "";
   }
@@ -90,7 +94,7 @@
   function outfitAnswer(mn, m){
     if (m.answer === "worn"){
       audit(mn, "OUTFIT_WORN", String(m.slot||""));
-      if (onMap(mn)) emote("👗 "+plainName(mn)+" changes into "+(String(m.slot||"").startsWith("uniform:") ? "their farm uniform" : "their farm outfit")+(m.locks ? ", and the padlocks click shut" : "")+".");
+      if (onMap(mn)) emote("👗 "+plainName(mn)+" changes into "+(String(m.slot||"").startsWith("uniform:") ? "their farm uniform" : /^farm:/.test(String(m.slot||"")) && farmName(String(m.slot)) ? "the "+farmName(String(m.slot)) : "their farm outfit")+(m.locks ? ", and the padlocks click shut" : "")+".");
     } else if (m.answer === "declined") audit(mn, "OUTFIT_DECLINED", String(m.slot||""));
     else if (m.answer === "back") audit(mn, "OUTFIT_BACK", "");
   }

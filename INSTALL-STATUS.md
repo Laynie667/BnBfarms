@@ -5,7 +5,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 | Script | File in `dist/` | Where it runs | Current |
 |---|---|---|---|
-| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.48.1** |
+| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.49.0** |
 | Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.10.0** |
 | Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.2.1** |
 | Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **1.1.0** |
@@ -13,7 +13,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 | Map tools, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.4** |
 | Dairy | `farmhand-dairy.user.js` | the bot's PC | **1.1.0** |
 | Shows | `farmhand-shows.user.js` | the bot's PC | **1.1.0** |
-| Farmhand Companion | `farmhand-companion.user.js` | each player | **0.41.1** |
+| Farmhand Companion | `farmhand-companion.user.js` | each player | **0.42.0** |
 | Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.4** |
 
 ## Sending a watch report
@@ -23,6 +23,13 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 - Running the watcher on more than one game at once (the bot, yours, a tester's) lets Claude line them up into one timeline.
 
 ## Latest changes (newest first)
+
+- **Bot 0.49.0 + Companion 0.42.0: symbiotes sooner, and the latex traps.** Laynie, Oct 25: "can you check the symbiotic cool downs, its a little long - also need to make sure every symbiotic is actually attainable, or atleast have a command way to give them. need more traps for the latex".
+  - **Shorter waits.** A symbiote grows a stage every 45 minutes (was 90). After one leaves, the next can find them in 15 minutes if they sent it off or it finished (was 1 hour), 2 hours if it starved (was 12), 4 hours after a safeword (was a day). Traps leave one twice as often (8%), and the new latex traps leave livin' latex a third of the time.
+  - **Every symbiote can be got.** Livin' latex: the latex traps, slime, glue, dip and the livin' suit, a touch from a host, or the symbiote-latex spot. Milk moss: the milkers (milker, cups, carousel, teat check, milkin' hole), nursin' from a host, or symbiote-moss (makers of milk only). The nestling: the breedin' traps (breeder, eggs, vines, warren, pump, clutch, breedin' chair, the shrine), a breedin' from a host, or symbiote-nestling. The spots only work once they're set with ?spot set symbiote-latex (and -moss, -nestling).
+  - **?symbiote give <who|me> latex|moss|nestling**: proprietors and now staff too, to themselves as well, and it doesn't wait for the last one to have been gone long. It still needs the player's ?symbiote on and their limits.
+  - **Eight latex traps**, each with real latex gear through the Companion, its own extra beats and tender/filthy lines: 🫧 vacbed (the vacuum bed) · 🛢️ rubbervat (dunked till it sets: a glossy catsuit and gloves for 20 minutes after) · 🎎 dollmaker (hooded, binder, polished, stood in the window) · 🍼 rubberstall (sealed in a sheath with only the teats out, and milked) · 🎈 bodybag (zipped in and pumped up tight) · 🧤 rubbermaid (the rubber dairymaid: mitts, a muzzle and her hands) · ⚫ blackpool (livin' latex in the woods that fills you and seals you in) · 🦴 rubberpup (latex pup hood and paws, taught to beg). A new place, **the rubber shed** (name a trap tile or spot rubber…, latex… or vat…), and they turn up in the stalls, kennels, office, cabin, bench, trough and wild places too. Somebody already wearin' livin' latex draws them a lot more. Limits that mention latex or rubber rule them out.
+  - **Companion 0.42.0** can put on a latex hood and latex mitts, the vacuum bed and the inflatable body bag. An older Companion just skips those pieces.
 
 - **Bot 0.48.1: it logs itself back in.** Laynie, Oct 25: "need a better relogin hook for opera gx". Three things kept it out:
   - **It never actually sent its login.** The game's login wants the name and password handed to it; the bot called it bare, so the game sent nothin' useful, answered "InvalidNamePassword", and the bot wrote its own good login off as refused ("saved login refused — log in by hand"). It hands them over now, and any refusal saved before this is cleared once.

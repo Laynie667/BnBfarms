@@ -532,6 +532,8 @@ SYMBIOTES · ?symbiote on
   by a breedin'. Fed, it stays a day or more and
   leaves you a thank-you; starved, it goes. One at a time.
   ?symbiote take · at a symbiote-latex, -moss or -nestling spot
+  Or one's waitin' after a trap: latex in the latex traps, moss
+  in the milkers, the nestling in the breedin' ones.
   ?symbiote · how it's doin' · ?symbiote off · send it away
   Your safeword takes it off at once.
 
@@ -756,7 +758,7 @@ RIBBONS, POTIONS, DARES, THE CORRAL
   ?gauntlet pot <n> · proprietors (ends: gauntlet-start, -end)
   ?purge <who> · take a parasite off them
   ?parasite give <who> · proprietors (they need ?parasite on)
-  ?symbiote give <who> latex|moss|nestling · proprietors (they need ?symbiote on)
+  ?symbiote give <who|me> latex|moss|nestling · proprietors, staff
   ?store approve|reject <who> · a bought greetin'
 
 BEGGIN'

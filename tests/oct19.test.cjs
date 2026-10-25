@@ -57,7 +57,7 @@ const done=async(mn,ms)=>{ for(let i=0;i<60;i++){ await wait(250); if(!(W.__st()
   const kinds=(spot,times)=>{ const got=new Set(); for(let i=0;i<times;i++){ free(500); const r=P(500); r.trapLog=[]; W.__heard; } return got; };
   const picks=new Set();
   for (let i=0;i<14;i++){ free(500); let n=sent.length; moveTo(500,22,21); W.__st().trapAt=new Map(); P(500).spotTrapAt={}; P(500).trapAt=0; W.__trapTick(); await wait(150); const lg=P(500).trapLog||[]; const last=lg[lg.length-1]; if (last && last.spot==="trap-7") picks.add(last.kind); if (W.__st().trapRuns) W.__st().trapRuns.delete(500); }
-  const KENNEL=W.__themes ? W.__themes().kennel.kinds : ["kennel","wolves","teaser","crate","bell","groomer","whelping","leashpost","werewolf","foxden"];
+  const KENNEL=W.__themes ? W.__themes().kennel.kinds : ["kennel","wolves","teaser","crate","bell","groomer","whelping","leashpost","werewolf","foxden","rubberpup"];
   ok(picks.size && [...picks].every(k=>KENNEL.includes(k)), 'a plain trap tile by the kennels springs kennel traps ('+[...picks].join(", ")+')');
   { L().spots['trap-kennels-1']={X:90,Y:90}; const got=new Set(); for (let i=0;i<10;i++){ free(500); moveTo(500,90,90); W.__st().trapAt=new Map(); P(500).spotTrapAt={}; P(500).trapAt=0; W.__trapTick(); await wait(150); const lg=P(500).trapLog||[]; const last=lg[lg.length-1]; if (last && last.spot==='trap-kennels-1') got.add(last.kind); if (W.__st().trapRuns) W.__st().trapRuns.delete(500); }
     ok(got.size && [...got].every(k=>KENNEL.includes(k)), 'a tile named trap-kennels-1 springs kennel traps ('+[...got].join(', ')+')'); }

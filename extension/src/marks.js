@@ -132,6 +132,8 @@ const FARM_NAMES = ["Parasite Lips", "Parasite Belt", "Pump Bung", "Egg Post Plu
   "Buckin' Saddle", "Saddle Post", "Hayloft Net", "Lost Cow Bell", "Teasin' Stall", "Sheep Dip", "Breedin' Crate", "Sire's Stopper", "Carousel Milkers", "Carousel Cuffs",
   "Plow Bit", "Plow Harness", "Bale Twine", "Scarecrow Post", "Scarecrow Ropes", "Clothespins", "Washin' Line", "Fair Stocks", "The Pillory", "Breedin' Wheel",
   "Windmill Sails", "Kissin' Gate", "The Fence", "Collection Bench", "Auction Block",
+  "Vacuum Bed", "Vat Skin", "Vat Skin (hands)", "Doll Hood", "Doll Binder", "Doll Tag", "Stall Sheath", "Rubber Cups", "Inflatable Body Bag",
+  "Dairymaid's Mitts", "Dairymaid's Muzzle", "Black Pool Latex (legs)", "Black Pool Latex (arms)", "Rubber Pup Hood", "Rubber Paws",
   "Livin' Latex (hands)", "Livin' Latex (arms)", "Livin' Latex (feet)", "Livin' Latex (legs)", "Livin' Latex (body)", "Livin' Latex (heels)", "Milk Moss", "Milk Moss (bloom)"];
 // slot → where it can go and which game item it is: the first that this game has; the pattern is a fallback
 export const GEAR_SLOTS = {
@@ -158,7 +160,10 @@ export const GEAR_SLOTS = {
   bra:      { groups: ["Bra"], names: ["FlowerBra"], re: /^FlowerBra$/, takeover: true },
   hat:      { groups: ["Hat"], names: ["FlowerCrown"], re: /^FlowerCrown$/, takeover: true },
   boots:    { groups: ["ItemBoots"], names: ["ThighHighLatexHeels"], re: /^ThighHighLatexHeels$/ },
-  device:   { groups: ["ItemDevices"], names: ["WoodenStocks"], re: /^(WoodenStocks|SaddleStand|WoodenHorse|Net|Kennel|LowCage|KabeshiriWall|WheelFortune|LuckyWheel|XFrame|BondageBench|TheDisplayFrame|MilkCan)$/ },
+  device:   { groups: ["ItemDevices"], names: ["WoodenStocks"], re: /^(WoodenStocks|SaddleStand|WoodenHorse|Net|Kennel|LowCage|KabeshiriWall|WheelFortune|LuckyWheel|XFrame|BondageBench|TheDisplayFrame|MilkCan|VacBedDeluxe|InflatableBodyBag)$/ },
+  // the latex traps (Oct 25): a hood and mitts
+  hood:     { groups: ["ItemHood"], names: ["LatexHood"], re: /^(LatexHood|TransparentLatexHood|LatexDogHood|VacHood)$/, color: "#121214" },
+  mitts:    { groups: ["ItemHands"], names: ["LatexBondageMitts"], re: /^LatexBondageMitts$/, color: "#121214" },
 };
 // HOW EACH PIECE IS SET (Laynie, Oct 19: "I had a knee spreader described as being a knee spreader, but it was just hemp
 // rope and the cuffs weren't restraining me at all with their configuration"). The game puts most restraints on in their

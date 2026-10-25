@@ -53,6 +53,16 @@ A cowbell collar locked on for half an hour, so the whole farm hears you comin'.
 - **Equipment:**
   - **Lost Cow Bell** (tag, after the trap, for 30 min). Game items: CollarCowBell, CollarBell, CollarNameTagLivestock, CollarNameTag. A big iron cowbell padlocked to the collar. Its tag reads LOST COW, RETURN TO THE BARN. It clanks at every step.
 
+### ⚫ blackpool
+
+The black pool in the woods: livin' latex that climbs out, fills you and seals you in.
+
+- **How to get it:** a tile named `trap-blackpool`.
+- **Ruled out by limits mentioning:** latex, rubber, monster, enca, tentacl.
+- **Equipment:**
+  - **Black Pool Latex (legs)** (legs, while the trap holds them). Game items: Slime, HempRope, LeatherLegCuffs. Livin' latex from the pool, climbed up both legs to the hip and set like warm tar, holdin' them knee-deep where they stood.
+  - **Black Pool Latex (arms)** (arms, while the trap holds them). Game items: Slime, HempRope, LeatherCuffs. A glossy black glove of it that ran up both arms and pulled them together, warm and pulsing, like it's breathin'.
+
 ### 🐗 boar
 
 The boar that lives in the wallow, and a long, muddy tie.
@@ -61,6 +71,15 @@ The boar that lives in the wallow, and a long, muddy tie.
 - **Ruled out by limits mentioning:** mud, filth, humiliat, knot.
 - **Equipment:**
   - **Boar's Plug** (the hole they have (a dildo slot with a pussy, a plug slot without), after the trap, for 20 min). Game items: FuckPlug, PenisPlug, PenisDildo. What a boar leaves so nothing leaks: a hard waxy plug as thick as a wrist, set deep, with a bellyful of hog seed sloshing behind it.
+
+### 🎈 bodybag
+
+The inflatable body bag: zipped in, pumped up tight, and teased through the rubber.
+
+- **How to get it:** a tile named `trap-bodybag`.
+- **Ruled out by limits mentioning:** latex, rubber, inflat, enca, immobil.
+- **Equipment:**
+  - **Inflatable Body Bag** (device, while the trap holds them). Game items: InflatableBodyBag, WoodenStocks. A thick black rubber bag zipped up to the chin and pumped till it hugs like a fist. Every squeeze from outside lands everywhere at once.
 
 ### 🎟️ booth
 
@@ -202,6 +221,17 @@ The sheep dip: dunked, scrubbed and rinsed clean.
 - **Ruled out by limits mentioning:** wash, bath, dunk, water.
 - **Equipment:**
   - **Sheep Dip** (device, while the trap holds them). Game items: MilkCan, WoodenStocks. A tall can of warm, soapy dip, filled to the chin, with brushes waiting to scrub everything below the waterline.
+
+### 🎎 dollmaker
+
+The doll press: hooded, bound and polished into the farm's rubber doll.
+
+- **How to get it:** a tile named `trap-dollmaker`.
+- **Ruled out by limits mentioning:** latex, rubber, doll, objectif, hood, display.
+- **Equipment:**
+  - **Doll Hood** (hood, while the trap holds them). Game items: LatexHood, TransparentLatexHood. A tight black latex hood pulled over the whole head and smoothed down, with a doll's painted smile where a face should be.
+  - **Doll Binder** (arms, while the trap holds them). Game items: SeamlessLatexArmbinder, LatexArmbinder, HempRope, LeatherCuffs. A seamless latex sleeve that swallows both arms behind them, laced to the shoulders, so a doll stands the way it's posed.
+  - **Doll Tag** (tag, after the trap, for 20 min). Game items: CollarNameTag, CollarNameTagLivestock. A little card on a string round the neck, in the press's tidy print: FARM DOLL. HANDLE FREELY. POLISH WEEKLY.
 
 ### 🐉 drake
 
@@ -609,6 +639,46 @@ The ram in the paddock, rutting for the season.
 - **Mess it leaves:** cum on the tummy.
 - **Equipment:** none yet.
 
+### 🧤 rubbermaid
+
+The rubber dairymaid: mitts, a muzzle, and her latex hands all over you.
+
+- **How to get it:** a tile named `trap-rubbermaid`.
+- **Ruled out by limits mentioning:** latex, rubber, mitt, muzzl, gag.
+- **Equipment:**
+  - **Dairymaid's Mitts** (mitts, while the trap holds them). Game items: LatexBondageMitts. Ball-shaped latex mitts strapped on at the wrist. No fingers, no grip, nothing to stop her hands with.
+  - **Dairymaid's Muzzle** (lips, while the trap holds them). Game items: LatexMuzzleMask, LatexSheathGag, LipGag. A smooth rubber muzzle over the mouth and chin, so the only sounds that get out are the wet, muffled ones.
+
+### 🦴 rubberpup
+
+The rubber kennel: a latex pup hood and mitts, and you're taught to beg.
+
+- **How to get it:** a tile named `trap-rubberpup`.
+- **Ruled out by limits mentioning:** latex, rubber, pup, pet play, hood.
+- **Equipment:**
+  - **Rubber Pup Hood** (hood, while the trap holds them). Game items: LatexDogHood, LatexHood. A black latex pup hood with floppy ears and a muzzle, pulled down snug and buckled, so the only words left are woofs.
+  - **Rubber Paws** (mitts, while the trap holds them). Game items: LatexBondageMitts. Round latex paw mitts strapped at the wrist. Good for walkin' on all fours, beggin', and nothin' else.
+
+### 🍼 rubberstall
+
+The rubber milkin' stall: sealed in a sheath with only your teats out, and milked.
+
+- **How to get it:** a tile named `trap-rubberstall`.
+- **Ruled out by limits mentioning:** latex, rubber, milk, enca.
+- **Equipment:**
+  - **Stall Sheath** (torso, while the trap holds them). Game items: LatexSuit, TentacleSuit, HempRopeHarness. A black rubber sheath that seals them in from collar to hip with two cut-outs, so the only thing the stall can see is teats.
+  - **Rubber Cups** (cups, while the trap holds them). Game items: LactationPump, NippleSuctionCups. Soft black rubber cups sucked on through the sheath's openings, pullin' slow and steady, droplets beadin' on the latex round them.
+
+### 🛢️ rubbervat
+
+The rubber vat: dunked in warm liquid latex until it sets into a second skin.
+
+- **How to get it:** a tile named `trap-rubbervat`.
+- **Ruled out by limits mentioning:** latex, rubber, enca, dunk.
+- **Equipment:**
+  - **Vat Skin** (suit, after the trap, for 20 min). Game items: LatexCatsuit. The vat's latex, set into a seamless glossy skin from the neck down. It peels off eventually. Not yet.
+  - **Vat Skin (hands)** (gloves, after the trap, for 20 min). Game items: LatexElbowGloves, LatexShortGloves. Dipped to the elbows and set: smooth black latex over every finger, squeakin' when they make a fist.
+
 ### 🏇 saddle
 
 A buckin' saddle with somethin' in the seat, and a long hard ride.
@@ -856,6 +926,15 @@ Baler twine in the hayloft, and somebody who knows knots.
 - **Equipment:**
   - **Baler Twine** (ropeArms, while the trap holds them). Game items: HempRope. Orange baler twine, wrists to elbows to back, tied by somebody who knows exactly what they're doing.
   - **Twine Harness** (torso, while the trap holds them). Game items: HempRopeHarness, Harness, TentacleSuit. A diamond of twine over the chest and down the belly, knotted tight.
+
+### 🫧 vacbed
+
+The vacuum bed in the rubber shed: sealed in a sheet of latex and the air sucked out.
+
+- **How to get it:** a tile named `trap-vacbed`.
+- **Ruled out by limits mentioning:** latex, rubber, vacuum, breath, enca, immobil.
+- **Equipment:**
+  - **Vacuum Bed** (device, while the trap holds them). Game items: VacBedDeluxe, WoodenStocks. A frame strung with a double sheet of black latex, zipped shut round them and sucked flat, every curve of them printed in rubber.
 
 ### 🌿 vines
 

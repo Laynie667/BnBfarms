@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.41.1
+// @version      0.42.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -230,7 +230,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.41.1";
+  var VERSION = "0.42.0";
 
   // extension/src/config.js
   var BOT_MEMBER = 260239;
@@ -9369,6 +9369,21 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     "The Fence",
     "Collection Bench",
     "Auction Block",
+    "Vacuum Bed",
+    "Vat Skin",
+    "Vat Skin (hands)",
+    "Doll Hood",
+    "Doll Binder",
+    "Doll Tag",
+    "Stall Sheath",
+    "Rubber Cups",
+    "Inflatable Body Bag",
+    "Dairymaid's Mitts",
+    "Dairymaid's Muzzle",
+    "Black Pool Latex (legs)",
+    "Black Pool Latex (arms)",
+    "Rubber Pup Hood",
+    "Rubber Paws",
     "Livin' Latex (hands)",
     "Livin' Latex (arms)",
     "Livin' Latex (feet)",
@@ -9403,7 +9418,10 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     bra: { groups: ["Bra"], names: ["FlowerBra"], re: /^FlowerBra$/, takeover: true },
     hat: { groups: ["Hat"], names: ["FlowerCrown"], re: /^FlowerCrown$/, takeover: true },
     boots: { groups: ["ItemBoots"], names: ["ThighHighLatexHeels"], re: /^ThighHighLatexHeels$/ },
-    device: { groups: ["ItemDevices"], names: ["WoodenStocks"], re: /^(WoodenStocks|SaddleStand|WoodenHorse|Net|Kennel|LowCage|KabeshiriWall|WheelFortune|LuckyWheel|XFrame|BondageBench|TheDisplayFrame|MilkCan)$/ }
+    device: { groups: ["ItemDevices"], names: ["WoodenStocks"], re: /^(WoodenStocks|SaddleStand|WoodenHorse|Net|Kennel|LowCage|KabeshiriWall|WheelFortune|LuckyWheel|XFrame|BondageBench|TheDisplayFrame|MilkCan|VacBedDeluxe|InflatableBodyBag)$/ },
+    // the latex traps (Oct 25): a hood and mitts
+    hood: { groups: ["ItemHood"], names: ["LatexHood"], re: /^(LatexHood|TransparentLatexHood|LatexDogHood|VacHood)$/, color: "#121214" },
+    mitts: { groups: ["ItemHands"], names: ["LatexBondageMitts"], re: /^LatexBondageMitts$/, color: "#121214" }
   };
   var GEAR_OPT = {
     "ItemArms:LeatherCuffs": "Wrist",

@@ -7,6 +7,7 @@
        · the hour: night (9 in the evenin' to 5 in the mornin', the bot's clock) → the things that come out in the dark ·
          day → the fieldwork and the fair
        · who's about: three or more folks within 8 tiles → the public traps · nobody → the wild ones
+       · wearin' livin' latex (the symbiote or the livin' suit) → the latex traps
        · and what they had last: their last three traps are a lot less likely to come round again.
      The trap's own whisper says what drew it, when somethin' did.
   */
@@ -21,6 +22,7 @@
     day:     { kinds: ["plow", "washline", "scarecrow", "windmill", "bale", "auction", "stocks", "tomatoes", "pieeat", "mudslide", "scale", "teatcheck"], x: 1, why: "" },
     crowd:   { kinds: ["pillory", "stocks", "auction", "pricetag", "tomatoes", "seedshower", "scale", "kissgate", "paddle", "brand", "inspection", "pieeat", "mirror"], x: 2, why: "There's a crowd about, and the farm loves an audience." },
     alone:   { kinds: ["vines", "slime", "well", "clutch", "stag", "werewolf", "naga", "drake", "hive", "net", "glue", "snare"], x: 2, why: "Nobody's about to see what happens to you out here." },
+    latex:   { kinds: ["slime", "suit", "glue"], x: 3, why: "Your second skin hums. It can smell more of itself out here." },   // (the latex traps add themselves: 10y9k-latex-traps.js)
   };
   const TW_CROWD = 3, TW_REACH = 8, TW_RECENT = 3, TW_RECENT_X = 0.2, TW_FULL = 0.8, TW_CORRUPT = 40;
   const twNight = (h) => h >= 21 || h < 5;
@@ -33,6 +35,7 @@
       if (inHeat(p)) out.push(["breed", "heat"]); else if (isRut()) out.push(["breed", "rut"]);
       if (p.preg || (p.eggs && p.eggs.n > 0)) out.push(["nest"]);
       if (corruptionOf(mn) >= TW_CORRUPT) out.push(["corrupt"]);
+      if (symKind(mn) === "latex" || suitOnNow(mn)) out.push(["latex"]);   // wearin' livin' latex, or the livin' suit
       out.push([twNight(hourNow()) ? "night" : "day"]);
       const at = posOf(mn);
       if (at){

@@ -1,5 +1,5 @@
 {
- "made": "2026-10-25T02:14:41.448Z",
+ "made": "2026-10-25T18:39:06.436Z",
  "sets": [
   {
    "group": "Traps",
@@ -2186,6 +2186,301 @@
      "when": "hold",
      "mins": null,
      "desc": "A leather harness hooked to the churn's arm, for walking round and round."
+    }
+   ]
+  },
+  {
+   "group": "Traps",
+   "name": "🫧 vacbed",
+   "what": "the vacuum bed in the rubber shed: sealed in a sheet of latex and the air sucked out",
+   "pieces": [
+    {
+     "slot": "device",
+     "groups": [
+      "ItemDevices"
+     ],
+     "items": [
+      "VacBedDeluxe",
+      "WoodenStocks"
+     ],
+     "color": "#121214",
+     "label": "Vacuum Bed",
+     "when": "hold",
+     "mins": null,
+     "desc": "A frame strung with a double sheet of black latex, zipped shut round them and sucked flat, every curve of them printed in rubber."
+    }
+   ]
+  },
+  {
+   "group": "Traps",
+   "name": "🛢️ rubbervat",
+   "what": "the rubber vat: dunked in warm liquid latex until it sets into a second skin",
+   "pieces": [
+    {
+     "slot": "suit",
+     "groups": [
+      "Suit"
+     ],
+     "items": [
+      "LatexCatsuit",
+      "LatexCatsuit"
+     ],
+     "color": "#121214",
+     "label": "Vat Skin",
+     "when": "after",
+     "mins": 20,
+     "desc": "The vat's latex, set into a seamless glossy skin from the neck down. It peels off eventually. Not yet."
+    },
+    {
+     "slot": "gloves",
+     "groups": [
+      "Gloves"
+     ],
+     "items": [
+      "LatexElbowGloves",
+      "LatexShortGloves"
+     ],
+     "color": "#121214",
+     "label": "Vat Skin (hands)",
+     "when": "after",
+     "mins": 20,
+     "desc": "Dipped to the elbows and set: smooth black latex over every finger, squeakin' when they make a fist."
+    }
+   ]
+  },
+  {
+   "group": "Traps",
+   "name": "🎎 dollmaker",
+   "what": "the doll press: hooded, bound and polished into the farm's rubber doll",
+   "pieces": [
+    {
+     "slot": "hood",
+     "groups": [
+      "ItemHood"
+     ],
+     "items": [
+      "LatexHood",
+      "TransparentLatexHood",
+      "LatexHood"
+     ],
+     "color": "#121214",
+     "label": "Doll Hood",
+     "when": "hold",
+     "mins": null,
+     "desc": "A tight black latex hood pulled over the whole head and smoothed down, with a doll's painted smile where a face should be."
+    },
+    {
+     "slot": "arms",
+     "groups": [
+      "ItemArms"
+     ],
+     "items": [
+      "SeamlessLatexArmbinder",
+      "LatexArmbinder",
+      "HempRope",
+      "LeatherCuffs"
+     ],
+     "color": "#121214",
+     "label": "Doll Binder",
+     "when": "hold",
+     "mins": null,
+     "desc": "A seamless latex sleeve that swallows both arms behind them, laced to the shoulders, so a doll stands the way it's posed."
+    },
+    {
+     "slot": "tag",
+     "groups": [
+      "ItemNeckAccessories"
+     ],
+     "items": [
+      "CollarNameTag",
+      "CollarNameTagLivestock",
+      "CollarNameTagLivestock",
+      "CollarNameTag"
+     ],
+     "color": null,
+     "label": "Doll Tag",
+     "when": "after",
+     "mins": 20,
+     "desc": "A little card on a string round the neck, in the press's tidy print: FARM DOLL. HANDLE FREELY. POLISH WEEKLY."
+    }
+   ]
+  },
+  {
+   "group": "Traps",
+   "name": "🍼 rubberstall",
+   "what": "the rubber milkin' stall: sealed in a sheath with only your teats out, and milked",
+   "pieces": [
+    {
+     "slot": "torso",
+     "groups": [
+      "ItemTorso",
+      "ItemTorso2"
+     ],
+     "items": [
+      "LatexSuit",
+      "TentacleSuit",
+      "HempRopeHarness"
+     ],
+     "color": "#121214",
+     "label": "Stall Sheath",
+     "when": "hold",
+     "mins": null,
+     "desc": "A black rubber sheath that seals them in from collar to hip with two cut-outs, so the only thing the stall can see is teats."
+    },
+    {
+     "slot": "cups",
+     "groups": [
+      "ItemNipples"
+     ],
+     "items": [
+      "LactationPump",
+      "NippleSuctionCups",
+      "LactationPump",
+      "NippleSuctionCups"
+     ],
+     "color": null,
+     "label": "Rubber Cups",
+     "when": "hold",
+     "mins": null,
+     "desc": "Soft black rubber cups sucked on through the sheath's openings, pullin' slow and steady, droplets beadin' on the latex round them."
+    }
+   ]
+  },
+  {
+   "group": "Traps",
+   "name": "🎈 bodybag",
+   "what": "the inflatable body bag: zipped in, pumped up tight, and teased through the rubber",
+   "pieces": [
+    {
+     "slot": "device",
+     "groups": [
+      "ItemDevices"
+     ],
+     "items": [
+      "InflatableBodyBag",
+      "WoodenStocks"
+     ],
+     "color": "#121214",
+     "label": "Inflatable Body Bag",
+     "when": "hold",
+     "mins": null,
+     "desc": "A thick black rubber bag zipped up to the chin and pumped till it hugs like a fist. Every squeeze from outside lands everywhere at once."
+    }
+   ]
+  },
+  {
+   "group": "Traps",
+   "name": "🧤 rubbermaid",
+   "what": "the rubber dairymaid: mitts, a muzzle, and her latex hands all over you",
+   "pieces": [
+    {
+     "slot": "mitts",
+     "groups": [
+      "ItemHands"
+     ],
+     "items": [
+      "LatexBondageMitts",
+      "LatexBondageMitts"
+     ],
+     "color": "#121214",
+     "label": "Dairymaid's Mitts",
+     "when": "hold",
+     "mins": null,
+     "desc": "Ball-shaped latex mitts strapped on at the wrist. No fingers, no grip, nothing to stop her hands with."
+    },
+    {
+     "slot": "lips",
+     "groups": [
+      "ItemMouth",
+      "ItemMouth2",
+      "ItemMouth3"
+     ],
+     "items": [
+      "LatexMuzzleMask",
+      "LatexSheathGag",
+      "LipGag"
+     ],
+     "color": "#121214",
+     "label": "Dairymaid's Muzzle",
+     "when": "hold",
+     "mins": null,
+     "desc": "A smooth rubber muzzle over the mouth and chin, so the only sounds that get out are the wet, muffled ones."
+    }
+   ]
+  },
+  {
+   "group": "Traps",
+   "name": "⚫ blackpool",
+   "what": "the black pool in the woods: livin' latex that climbs out, fills you and seals you in",
+   "pieces": [
+    {
+     "slot": "legs",
+     "groups": [
+      "ItemLegs"
+     ],
+     "items": [
+      "Slime",
+      "HempRope",
+      "LeatherLegCuffs"
+     ],
+     "color": "#121214",
+     "label": "Black Pool Latex (legs)",
+     "when": "hold",
+     "mins": null,
+     "desc": "Livin' latex from the pool, climbed up both legs to the hip and set like warm tar, holdin' them knee-deep where they stood."
+    },
+    {
+     "slot": "arms",
+     "groups": [
+      "ItemArms"
+     ],
+     "items": [
+      "Slime",
+      "HempRope",
+      "LeatherCuffs"
+     ],
+     "color": "#121214",
+     "label": "Black Pool Latex (arms)",
+     "when": "hold",
+     "mins": null,
+     "desc": "A glossy black glove of it that ran up both arms and pulled them together, warm and pulsing, like it's breathin'."
+    }
+   ]
+  },
+  {
+   "group": "Traps",
+   "name": "🦴 rubberpup",
+   "what": "the rubber kennel: a latex pup hood and mitts, and you're taught to beg",
+   "pieces": [
+    {
+     "slot": "hood",
+     "groups": [
+      "ItemHood"
+     ],
+     "items": [
+      "LatexDogHood",
+      "LatexHood"
+     ],
+     "color": "#121214",
+     "label": "Rubber Pup Hood",
+     "when": "hold",
+     "mins": null,
+     "desc": "A black latex pup hood with floppy ears and a muzzle, pulled down snug and buckled, so the only words left are woofs."
+    },
+    {
+     "slot": "mitts",
+     "groups": [
+      "ItemHands"
+     ],
+     "items": [
+      "LatexBondageMitts",
+      "LatexBondageMitts"
+     ],
+     "color": "#121214",
+     "label": "Rubber Paws",
+     "when": "hold",
+     "mins": null,
+     "desc": "Round latex paw mitts strapped at the wrist. Good for walkin' on all fours, beggin', and nothin' else."
     }
    ]
   },

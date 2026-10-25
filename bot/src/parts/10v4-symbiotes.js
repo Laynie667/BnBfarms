@@ -16,7 +16,11 @@
        ?symbiote take), now and then after a trap, or a proprietor's ?symbiote give <who> <kind>.
      • The SAFEWORD takes it off at once. ?symbiote shows how it's doin'; ?symbiote off sends it on its way.
   */
-  if (!CFG.SYM) CFG.SYM = { HOURS: 24, MAX_H: 72, FEED_ADD_H: 2, STAGE_MIN: 90, HUNGRY_MIN: 60, STARVE_H: 6, LINE_MIN: 25, FED_LINE_MIN: 5, CLEAN_MIN: 60, TRAP_CHANCE: 0.04 };
+  // (Oct 25, Laynie: "the cool downs are a little long": a stage every 45 minutes, not 90; after one leaves, the next can
+  // find them in 15 minutes if they sent it off or it finished, 2 hours if it starved, 4 after a safeword, where it was
+  // 1, 12 and 24 hours. Traps leave one twice as often, and the latex traps (10y9k-latex-traps.js) leave latex a third of the time.)
+  if (!CFG.SYM) CFG.SYM = { HOURS: 24, MAX_H: 72, FEED_ADD_H: 2, STAGE_MIN: 45, HUNGRY_MIN: 60, STARVE_H: 6, LINE_MIN: 25, FED_LINE_MIN: 5, CLEAN_MIN: 60, TRAP_CHANCE: 0.08,
+                            LATEX_TRAP_CHANCE: 0.33, AGAIN_MIN: { safe: 240, starved: 120, sent: 15, done: 15 } };
   const SYMBIOTES = {
     latex:    { name: "livin' latex", icon: "🖤", stages: 4, feeds: ["load", "climax"], gift: "room to hold more, and it keeps you clean",
                 can: mn => /\b(latex|rubber)/i.test((rec(mn) || {}).limits || "") ? "their limits rule out latex" : null },
@@ -26,22 +30,24 @@
                 can: mn => limitBlocks(mn, "breed") ? "their limits rule it out" : null },
   };
   // which kind a trap tends to leave behind (anything else: whichever will take)
-  const SYM_TRAP = { slime: "latex", glue: "latex", suit: "latex", dip: "latex", milker: "moss", cups: "moss", breeder: "nestling", eggs: "nestling", vines: "nestling", warren: "nestling", pump: "nestling" };
+  const SYM_TRAP = { slime: "latex", glue: "latex", suit: "latex", dip: "latex", milker: "moss", cups: "moss", carousel: "moss", teatcheck: "moss", milkinghole: "moss",
+                     breeder: "nestling", eggs: "nestling", vines: "nestling", warren: "nestling", pump: "nestling", clutch: "nestling", studchair: "nestling", shrine: "nestling" };
+  const LATEX_TRAPS = [];   // the latex traps fill this in (10y9k-latex-traps.js)
   const symLine = (key, mn, v) => tFill(pickFor(mn, "sym:"+key, SYM_LINES[key]), mn, v);
   function symOn(mn){ const r = rec(mn); return !!(r && r.symbiote && r.symbiote.until > Date.now()); }
   function symKind(mn){ return symOn(mn) ? rec(mn).symbiote.kind : null; }
   // can this kind bond to them right now? null = yes
-  function symWhyNot(mn, kind){
+  function symWhyNot(mn, kind, given){
     const r = rec(mn), S = SYMBIOTES[kind];
     if (!r || !S) return "no such symbiote";
     if (!r.symbioteOn) return "they haven't said ?symbiote on";
     if (/\bsymbio/i.test(r.limits || "")) return "their limits rule it out";
     if (symOn(mn)) return "they've already got one";
-    if ((r.symbioteNext || 0) > Date.now()) return "the last one only just left";
+    if (!given && (r.symbioteNext || 0) > Date.now()) return "the last one only just left (another can find them in "+Math.ceil((r.symbioteNext - Date.now())/60000)+" minutes)";   // (a proprietor's or staff's ?symbiote give doesn't wait)
     return S.can(mn);
   }
-  function symBond(mn, kind, how){
-    const why = symWhyNot(mn, kind); if (why) return why;
+  function symBond(mn, kind, how, given){
+    const why = symWhyNot(mn, kind, given); if (why) return why;
     const r = rec(mn), S = SYMBIOTES[kind], now = Date.now();
     r.symbiote = { kind, since: now, until: now + CFG.SYM.HOURS*3600000, fedAt: now, stage: 1, stageAt: now, fed: 0, told: 0, cleanAt: now + CFG.SYM.CLEAN_MIN*60000, how: how || "" };
     r.symbioteN = (r.symbioteN || 0) + 1;
@@ -58,7 +64,8 @@
     const r = rec(mn); if (!r || !r.symbiote) return false;
     const g = r.symbiote, S = SYMBIOTES[g.kind] || SYMBIOTES.latex, was = g.until > Date.now() || how === "done";
     r.symbiote = null;
-    r.symbioteNext = Date.now() + (how === "safe" ? 24 : how === "starved" ? 12 : 1)*3600000;
+    const A = CFG.SYM.AGAIN_MIN || {};
+    r.symbioteNext = Date.now() + (A[how] != null ? A[how] : A.done != null ? A.done : 60)*60000;
     saveLedger(); audit(CFG.BOT_MEMBER, "SYMBIOTE", mn+" off ("+(how || "done")+")");
     syncCompanions(true);
     if (how === "safe" || !charFor(mn) || !was) return true;
@@ -95,7 +102,8 @@
   }
   // after a trap: now and then, somethin' was waitin' in it
   function symbioteAfterTrap(mn, kind){
-    const r = rec(mn); if (!r || !r.symbioteOn || symOn(mn) || Math.random() >= CFG.SYM.TRAP_CHANCE) return;
+    const latexy = SYM_TRAP[kind] === "latex" && LATEX_TRAPS.includes(kind);
+    const r = rec(mn); if (!r || !r.symbioteOn || symOn(mn) || Math.random() >= (latexy ? CFG.SYM.LATEX_TRAP_CHANCE : CFG.SYM.TRAP_CHANCE)) return;
     const want = SYM_TRAP[kind], order = (want ? [want] : []).concat(Object.keys(SYMBIOTES).sort(() => Math.random() - 0.5));
     const k = order.find(x => !symWhyNot(mn, x)); if (!k) return;
     later(() => { if (charFor(mn) && !symOn(mn)) symBond(mn, k, "after the "+kind+" trap"); }, 6000);
@@ -141,10 +149,10 @@
     if (!r || !r.roles || !r.roles.length){ R("That's just for folks on the books, sugar."); return true; }
     const kindOf = (w) => { w = String(w || "").toLowerCase(); return /^(latex|rubber|suit|skin)/.test(w) ? "latex" : /^(moss|milk)/.test(w) ? "moss" : /^(nest|worm|belly)/.test(w) ? "nestling" : null; };
     if (a0 === "give"){
-      if (!isProprietor(sender)){ R("Givin' symbiotes is for proprietors, sugar."); return true; }
-      const t = resolveTarget(args[1]), k = kindOf(args[2]) || "latex";
-      if (!t || !rec(t) || !charFor(t)){ R("?symbiote give <who> latex|moss|nestling, and they need to be here, sugar."); return true; }
-      const why = symBond(t, k, "given");
+      if (!isProprietor(sender) && !isStaff(sender)){ R("Givin' symbiotes is for proprietors and staff, sugar."); return true; }
+      const w1 = String(args[1] || "").toLowerCase(), t = /^(me|myself)$/.test(w1) ? sender : resolveTarget(args[1]), k = kindOf(args[2]) || "latex";
+      if (!t || !rec(t) || !charFor(t)){ R("?symbiote give <who or me> latex|moss|nestling, and they need to be here, sugar. They need ?symbiote on; it doesn't wait for the last one to be gone long."); return true; }
+      const why = symBond(t, k, "given", true);
       R(why ? "It won't take to "+plainName(t)+": "+why+"." : SYMBIOTES[k].icon+" "+SYMBIOTES[k].name+" is on "+plainName(t)+" now.");
       return true;
     }

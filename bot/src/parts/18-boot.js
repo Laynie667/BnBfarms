@@ -29,6 +29,9 @@
         dbg("visibility:", W.document.visibilityState);
         if (W.document.visibilityState === "visible") heartbeat();
       });
+      // a frozen tab woken up (Opera GX's tab snoozing, Chrome's freezing) or the network back: check in right away
+      W.document.addEventListener("resume", ()=>{ log("Tab woke up."); state.lastHealthy = Math.max(state.lastHealthy, Date.now() - 60000); later(heartbeat, 1500); });
+      W.addEventListener("online", ()=>{ log("Network back."); later(heartbeat, 3000); });
     } catch(e){}
 
     log("Farmhand v"+VERSION+" online.");

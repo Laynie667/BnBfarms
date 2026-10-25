@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.48.0
+// @version      0.48.1
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -2415,7 +2415,7 @@
   ];
 
   // bot/src/version.js
-  var VERSION = "0.48.0";
+  var VERSION = "0.48.1";
 
   // bot-parts:farmhand-bot-parts
   (function() {
@@ -3373,6 +3373,7 @@
       booted: false,
       loginTried: 0,
       lastLoginAttempt: 0,
+      loginSent: false,
       lastRoomAttempt: 0,
       greeted: /* @__PURE__ */ new Map(),
       cooldowns: /* @__PURE__ */ new Map(),
@@ -4429,11 +4430,25 @@
       }
       return true;
     }
-    function isLoggedIn() {
+    function onLoginScreen() {
       try {
-        return !!(W.Player && W.Player.MemberNumber);
+        return W.CurrentScreen === "Relog" || W.CurrentScreen === "Login";
       } catch (e) {
         return false;
+      }
+    }
+    function isLoggedIn() {
+      try {
+        return !!(W.Player && W.Player.MemberNumber) && !onLoginScreen();
+      } catch (e) {
+        return false;
+      }
+    }
+    function serverUp() {
+      try {
+        return W.ServerIsConnected !== false;
+      } catch (e) {
+        return true;
       }
     }
     function currentRoomName() {
@@ -4464,9 +4479,13 @@
       for (const ch of String(user) + "\n" + String(pass)) h = (h << 5) + h + ch.charCodeAt(0) | 0;
       return String(h);
     };
+    if (GM_getValue("bnb_login_bad_fix", "") !== "0.48.1") {
+      GM_setValue("bnb_login_bad", "");
+      GM_setValue("bnb_login_bad_fix", "0.48.1");
+    }
     function loginRefused() {
       const { user, pass } = getCreds();
-      if (!user || !pass || Date.now() - state.lastLoginAttempt > 2e4) return;
+      if (!user || !pass || !state.loginSent || Date.now() - state.lastLoginAttempt > 2e4) return;
       GM_setValue("bnb_login_bad", credPrint(user, pass));
       warn("The game refused the saved login (wrong name or password). The bot won't try it again; log in by hand, or save the right one in the Tampermonkey menu.");
     }
@@ -4490,22 +4509,41 @@
         }
       } catch (e) {
       }
+      if (!serverUp()) {
+        setBadge("waitin' for the server to come back\u2026", "#ffc49b");
+        return;
+      }
       state.lastLoginAttempt = now;
       state.loginTried++;
-      setBadge("logging in\u2026 (" + state.loginTried + ")");
+      state.loginSent = false;
+      const relog = (() => {
+        try {
+          return W.CurrentScreen === "Relog";
+        } catch (e) {
+          return false;
+        }
+      })();
+      const name = relog && W.Player && W.Player.AccountName ? W.Player.AccountName : user;
+      setBadge((relog ? "loggin' back in" : "logging in") + "\u2026 (" + state.loginTried + ")");
+      try {
+        if (W.LoginSubmitted && typeof W.LoginStatusReset === "function") W.LoginStatusReset();
+      } catch (e) {
+      }
       try {
         const n = W.document.getElementById("InputName"), p = W.document.getElementById("InputPassword");
-        if (n && p && typeof W.LoginDoLogin === "function") {
-          n.value = user;
-          p.value = pass;
-          W.LoginDoLogin();
+        if (n) n.value = name;
+        if (p) p.value = pass;
+        if (typeof W.LoginDoLogin === "function") {
+          W.LoginDoLogin(name, pass);
+          state.loginSent = true;
           return;
         }
       } catch (e) {
         warn(e);
       }
       try {
-        W.ServerSend("AccountLogin", { AccountName: user, Password: pass });
+        W.ServerSend("AccountLogin", { AccountName: name, Password: pass });
+        state.loginSent = true;
       } catch (e) {
         warn(e);
       }
@@ -37762,6 +37800,8 @@ Welcome to B&B Farm, hon. \u{1F33E}`
       on("connect", () => {
         log("Socket reconnected.");
         state.lastHealthy = Date.now();
+        state.lastLoginAttempt = 0;
+        later(heartbeat, 2500);
       });
       try {
         if (typeof W.CommandCombine === "function" && !(W.Commands || []).some((c) => c && c.Tag === "office")) {
@@ -37926,6 +37966,15 @@ Welcome to B&B Farm, hon. \u{1F33E}`
         W.document.addEventListener("visibilitychange", () => {
           dbg("visibility:", W.document.visibilityState);
           if (W.document.visibilityState === "visible") heartbeat();
+        });
+        W.document.addEventListener("resume", () => {
+          log("Tab woke up.");
+          state.lastHealthy = Math.max(state.lastHealthy, Date.now() - 6e4);
+          later(heartbeat, 1500);
+        });
+        W.addEventListener("online", () => {
+          log("Network back.");
+          later(heartbeat, 3e3);
         });
       } catch (e) {
       }

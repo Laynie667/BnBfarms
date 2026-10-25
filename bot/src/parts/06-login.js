@@ -185,7 +185,11 @@
     return true;
   }
 
-  function isLoggedIn(){ try { return !!(W.Player && W.Player.MemberNumber); } catch(e){ return false; } }
+  // On the game's Relog screen (after a disconnect: the game keeps who you were but you're not signed in) the bot
+  // isn't logged in either, whatever Player still says (Oct 25, Opera GX: the bot sat there tryin' to join its room).
+  function onLoginScreen(){ try { return W.CurrentScreen === "Relog" || W.CurrentScreen === "Login"; } catch(e){ return false; } }
+  function isLoggedIn(){ try { return !!(W.Player && W.Player.MemberNumber) && !onLoginScreen(); } catch(e){ return false; } }
+  function serverUp(){ try { return W.ServerIsConnected !== false; } catch(e){ return true; } }
   function currentRoomName(){
     try {
       if (W.ChatRoomData && W.ChatRoomData.Name) return W.ChatRoomData.Name;
@@ -208,9 +212,13 @@
      refused login is remembered (a fingerprint of it, never the password) and not tried again until the saved
      login is changed; nobody's typin' gets overwritten; and repeated tries slow down. */
   const credPrint = (user, pass) => { let h = 5381; for (const ch of String(user)+"\n"+String(pass)) h = ((h << 5) + h + ch.charCodeAt(0)) | 0; return String(h); };
+  // (Oct 25: the game's LoginDoLogin wants the name and password handed to it; the bot used to call it bare, so it sent
+  // no login at all, the game said "InvalidNamePassword", and the bot wrote off its own good login as refused. Any
+  // fingerprint saved before 0.48.1 may be that mistake, so it's cleared once.)
+  if (GM_getValue("bnb_login_bad_fix", "") !== "0.48.1"){ GM_setValue("bnb_login_bad", ""); GM_setValue("bnb_login_bad_fix", "0.48.1"); }
   function loginRefused(){
     const { user, pass } = getCreds();
-    if (!user || !pass || Date.now() - state.lastLoginAttempt > 20000) return;   // only a reply to the bot's own try counts
+    if (!user || !pass || !state.loginSent || Date.now() - state.lastLoginAttempt > 20000) return;   // only a reply to the bot's own try, with the login really in it, counts
     GM_setValue("bnb_login_bad", credPrint(user, pass));
     warn("The game refused the saved login (wrong name or password). The bot won't try it again; log in by hand, or save the right one in the Tampermonkey menu.");
   }
@@ -225,13 +233,20 @@
       const a = W.document.activeElement;
       if (a && (a.id === "InputName" || a.id === "InputPassword")){ setBadge("waitin' while somebody logs in…"); return; }
     } catch(e){}
-    state.lastLoginAttempt = now; state.loginTried++;
-    setBadge("logging in… ("+state.loginTried+")");
+    // the server's gone: the game reconnects by itself, and a login sent now goes nowhere (and isn't counted)
+    if (!serverUp()){ setBadge("waitin' for the server to come back…","#ffc49b"); return; }
+    state.lastLoginAttempt = now; state.loginTried++; state.loginSent = false;
+    const relog = (() => { try { return W.CurrentScreen === "Relog"; } catch(e){ return false; } })();
+    const name = relog && W.Player && W.Player.AccountName ? W.Player.AccountName : user;
+    setBadge((relog ? "loggin' back in" : "logging in")+"… ("+state.loginTried+")");
+    // a try the game is still sat on (no answer came) would block every new one
+    try { if (W.LoginSubmitted && typeof W.LoginStatusReset === "function") W.LoginStatusReset(); } catch(e){}
     try {
       const n = W.document.getElementById("InputName"), p = W.document.getElementById("InputPassword");
-      if (n && p && typeof W.LoginDoLogin === "function"){ n.value=user; p.value=pass; W.LoginDoLogin(); return; }
+      if (n) n.value = name; if (p) p.value = pass;
+      if (typeof W.LoginDoLogin === "function"){ W.LoginDoLogin(name, pass); state.loginSent = true; return; }   // the Relog screen and the login screen both go through this
     } catch(e){ warn(e); }
-    try { W.ServerSend("AccountLogin",{ AccountName:user, Password:pass }); } catch(e){ warn(e); }
+    try { W.ServerSend("AccountLogin",{ AccountName:name, Password:pass }); state.loginSent = true; } catch(e){ warn(e); }
   }
 
   function tryEnterRoom(){

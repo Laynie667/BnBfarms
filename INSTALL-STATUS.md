@@ -5,7 +5,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 | Script | File in `dist/` | Where it runs | Current |
 |---|---|---|---|
-| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.48.0** |
+| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.48.1** |
 | Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.10.0** |
 | Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.2.1** |
 | Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **1.1.0** |
@@ -23,6 +23,13 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 - Running the watcher on more than one game at once (the bot, yours, a tester's) lets Claude line them up into one timeline.
 
 ## Latest changes (newest first)
+
+- **Bot 0.48.1: it logs itself back in.** Laynie, Oct 25: "need a better relogin hook for opera gx". Three things kept it out:
+  - **It never actually sent its login.** The game's login wants the name and password handed to it; the bot called it bare, so the game sent nothin' useful, answered "InvalidNamePassword", and the bot wrote its own good login off as refused ("saved login refused — log in by hand"). It hands them over now, and any refusal saved before this is cleared once.
+  - **The Relog screen counts as logged out.** After a disconnect the game keeps who you were and shows Relog; the bot thought it was still signed in and kept tryin' to walk into its room till the watchdog reloaded the page. Now it logs straight back in there, as the account the game remembers.
+  - **Waking up:** when the server comes back, the network comes back, or the browser wakes a frozen tab (Opera GX's tab snoozing), it checks in right away instead of at the next heartbeat. With the server gone it waits instead of countin' failed tries.
+  - In Opera GX, keep the bot's tab out of GX Control's RAM and tab limiters (or tab snoozing off for it): a frozen tab can't run anything till it wakes.
+  - tests/login-refused.test.cjs.
 
 - **Bot 0.48.0, Companion 0.41.1: named outfits, the intensity dial for every trap, and pot luck that notices.** Laynie, Oct 25: starter outfits "we have them implemented, but they arent named and described", line pools three ways "yes", traps "more variety based on present factors would be fine".
   - **The 45 starter outfits have names and descriptions** (Dairy Darling, Midnight Mare, Ragged Raider…), shared/farm-outfit-names.js. The offer card in the Companion shows what's in it and what gets padlocked, and the room hears "changes into the Dairy Darling". ?outfit starters lists them all, ?outfit about cow female describes one.

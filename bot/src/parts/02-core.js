@@ -22,7 +22,7 @@
 
   const state = {
     companions:new Map(), lastPing:0,
-    booted:false, loginTried:0, lastLoginAttempt:0, lastRoomAttempt:0,
+    booted:false, loginTried:0, lastLoginAttempt:0, loginSent:false, lastRoomAttempt:0,
     greeted:new Map(), cooldowns:new Map(), queue:[], urgent:[], sending:false, badge:null,
     lastSnapshot:0,
     sessions:new Map(), pendingClaims:new Map(), breedAsks:new Map(), breedOk:new Map(), jarAsks:new Map(),

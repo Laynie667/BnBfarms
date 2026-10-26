@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.50.0
+// @version      0.50.1
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -2748,7 +2748,7 @@
   ];
 
   // bot/src/version.js
-  var VERSION = "0.50.0";
+  var VERSION = "0.50.1";
 
   // bot-parts:farmhand-bot-parts
   (function() {
@@ -30569,13 +30569,16 @@
         L2.drawnFarm = { at: Date.now(), body: b };
         saveLedger();
         log("The farm's look for the drawn body changed (cup " + b.cup + "); tellin' the Companions.");
-        if (state.companions && state.companions.size) enqueue(makeMsg("bodyFarm", { at: L2.drawnFarm.at, body: b }));
       } catch (e) {
         warn("farm look:", e);
       }
     }
     function farmLookAsk(mn, m) {
       if (!L2.drawnFarm || !L2.drawnFarm.body) return;
+      {
+        const c = state.companions.get(mn);
+        if (c && !/^0\.([0-3]\d|4[0-3])\./.test(String(c.ver || "")) && c.ver !== "?") return;
+      }
       if (Number(m && m.at) === L2.drawnFarm.at) return;
       enqueue(makeMsg("bodyFarm", { at: L2.drawnFarm.at, body: L2.drawnFarm.body }, mn));
     }

@@ -5,7 +5,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 | Script | File in `dist/` | Where it runs | Current |
 |---|---|---|---|
-| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.50.0** |
+| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.50.1** |
 | Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.10.0** |
 | Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.2.1** |
 | Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **1.1.0** |
@@ -13,7 +13,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 | Map tools, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.4** |
 | Dairy | `farmhand-dairy.user.js` | the bot's PC | **1.1.0** |
 | Shows | `farmhand-shows.user.js` | the bot's PC | **1.1.0** |
-| Farmhand Companion | `farmhand-companion.user.js` | each player | **0.43.0** |
+| Farmhand Companion | `farmhand-companion.user.js` | each player | **0.44.0** |
 | Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.4** |
 
 ## Sending a watch report
@@ -24,6 +24,13 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 ## Latest changes (newest first)
 
+- **Companion 0.44.0 + Bot 0.50.1: drawing lag.** Laynie, Oct 26: "routing the settings from my pc to all the companions for what to render for the studio is bogging down my connection ... Would building them into the companion instead be feasible".
+  - The farm's look for the drawn body is **built into the Companion** now (`shared/farm-look.json`) and updates with it. The bot no longer sends it to anybody (only a Companion older than 0.44 still asks once).
+  - To change the look: Save in the studio, then `node tools/farm-look-bake.mjs`, then release the Companion.
+  - What goes round the room is cut to your cup and belly size (about 80 characters) instead of the whole look. Only someone who brought their own studio settings sends theirs whole.
+  - It's only sent when something actually changes, and a Companion doesn't redraw somebody whose size didn't change.
+  - **The bot's own account draws nobody** and sends nothing about bodies, so the bot's PC isn't drawing everyone in the room on top of running the farm.
+  - Players can switch drawing back on once they have 0.44.0.
 - **Bot 0.50.0 + Companion 0.43.0: Oct 26 batch.** Laynie, Oct 26: ?stuck teleports, kitty outfits/sounds, ratsluts, help leaking the private add-on, ?wash fitted, a seed-milking switch, friend the bot or come off the books, and "sometimes the outfit doesnt apply on contract signing".
   - **?stuck** always moves them to the `rescue` spot straight away; staff are told where they went.
   - **Smart species match** (shared/species.js): kitty, kitten, catgirl, neko → kitty outfit and cat sounds; hucow → cow; ratslut, mouse, rattie → rat. Contracts, outfits and production all read it the same way.

@@ -26,6 +26,8 @@ import "../../studio/web/breasts-drawing.js";   // window.FarmBreasts: the breas
 import "../../studio/web/body-engine.js";       // window.FarmBodyEngine: the studio's drawing
 import { bellyDrawing, bellyTrial } from "./belly.js";
 import { makeMsg } from "../../shared/protocol.js";
+import FARM_LOOK from "../../shared/farm-look.json";   // the farm's look, built in (tools/farm-look-bake.mjs, Oct 26)
+import { BOT_MEMBER } from "./config.js";
 
 const W = window;
 const KEY = "farmhand-drawn-body", SEE_KEY = "farmhand-drawn-body-see", FARM_KEY = "farmhand-drawn-body-farm";
@@ -33,14 +35,19 @@ const CODE_HEAD = "FARMBODY1:";
 const STUDIO = "http://localhost:4780";
 const DEFAULTS = () => ({ v: 1, on: false, cup: 12, breast: {}, wear: {}, belly: null, auto: true, tuck: true, dress: true, mould: { items: [], mode: {} } });
 let S = DEFAULTS(), sdk = null, hooked = false, seeOthers = true;
-let farm = null;                                   // { at, body }: the farm's look, from the bot (S.saved: they brought their own instead)
+// the farm's look is BUILT INTO the Companion now and updates with it (Laynie, Oct 26: routin' it from the bot's PC to
+// every Companion was "bogging down my connection"). Nothin' about it goes over the room any more.
+let farm = null;                                   // { at, body }: the farm's look (S.saved: they brought their own instead)
+// the bot's own account draws nobody: its PC has the whole farm to run (Oct 26)
+const onBot = () => !!(W.Player && W.Player.MemberNumber === BOT_MEMBER);
 const mine = { S: null, E: null };                 // you
 const others = new Map();                          // member number → { S, E, at }: what other Companions told us
 
 function load() {
   try { const d = JSON.parse(W.localStorage.getItem(KEY)); if (d && typeof d === "object") S = Object.assign(DEFAULTS(), d); } catch (e) { /* fresh */ }
   try { seeOthers = W.localStorage.getItem(SEE_KEY) !== "0"; } catch (e) { /* on */ }
-  try { const f = JSON.parse(W.localStorage.getItem(FARM_KEY)); if (f && typeof f.at === "number" && f.body) { const b = clean(f.body); if (b) farm = { at: f.at, body: b }; } } catch (e) { /* none yet */ }
+  { const b = clean(FARM_LOOK && FARM_LOOK.body); if (b) farm = { at: String(FARM_LOOK.id || "built-in"), body: b }; }
+  try { W.localStorage.removeItem(FARM_KEY); } catch (e) { /* fine */ }   // (the copy the bot used to send)
   mine.S = S;
 }
 // What you're drawn with: your own studio's settings if you brought them, otherwise the farm's look (plain settings till
@@ -184,19 +191,36 @@ const shareOf = (s) => ({ cup: s.cup, breast: s.breast, wear: s.wear, belly: s.b
 // ── telling the room, and hearing from it ──
 const send = (type, data) => { try { if (W.ServerSend && W.ServerPlayerIsInChatRoom && W.ServerPlayerIsInChatRoom()) W.ServerSend("ChatRoomChat", makeMsg(type, data)); } catch (e) { /* not in a room */ } };
 let toldAt = 0, askedAt = 0;
+// On the farm's look (nearly everybody) only your cup and belly go out: everybody's Companion has the look itself.
+// Only somebody who brought their own studio settings sends them whole.
+const bellyStage = () => { const m = bellyMode(); return m === "off" ? 0 : m === "on" ? 3 : Math.max(0, Math.min(4, Math.round(Number(farmMe && farmMe.belly) || 0))); };
+let lastTold = "";
 function tell(force) {
-  if (!force && Date.now() - toldAt < 8000) return; toldAt = Date.now();
-  send("body", S.on ? { on: true, body: shareOf(eff()) } : { on: false });
+  if (onBot()) return;
+  if (!force && Date.now() - toldAt < 8000) return;
+  const msg = !S.on ? { on: false } : S.saved || !farm ? { on: true, body: shareOf(eff()) } : { on: true, farm: farm.at, cup: eff().cup, bm: bellyMode(), bs: bellyStage() };
+  const sig = JSON.stringify(msg); if (!force && sig === lastTold) return;
+  toldAt = Date.now(); lastTold = sig;
+  send("body", msg);
 }
-function ask() { if (Date.now() - askedAt < 8000) return; askedAt = Date.now(); send("bodyAsk", {}); }
+// somebody on the farm's look, from the little they sent: our own copy of the look, their cup and belly
+function fromFarm(m) {
+  if (!farm) return null;
+  const s = clean(farm.body); if (!s) return null;
+  s.cup = Math.round(Math.max(0, Math.min(20, Number(m.cup) || 0)));
+  s.belly = m.bm === "studio" ? farm.body.belly : bellyAt(farm.body.belly, Math.max(0, Math.min(4, Math.round(Number(m.bs) || 0))));
+  return s;
+}
+function ask() { if (onBot() || Date.now() - askedAt < 8000) return; askedAt = Date.now(); send("bodyAsk", {}); }
 // a message from another Companion (index.js hands these over)
 export function onBodyMsg(m) {
-  const mn = m.from; if (!mn || (W.Player && mn === W.Player.MemberNumber)) return;
-  if (m.type === "bodyAsk") { if (S.on) setTimeout(() => tell(), 300 + Math.random() * 1500); return; }
+  const mn = m.from; if (!mn || (W.Player && mn === W.Player.MemberNumber) || onBot()) return;
+  if (m.type === "bodyAsk") { if (S.on) setTimeout(() => tell(true), 300 + Math.random() * 1500); return; }
   if (m.type !== "body") return;
   if (!m.on) { if (others.delete(mn)) redrawMn(mn, 60); return; }
-  const s = clean(m.body); if (!s) return;
+  const s = m.farm ? fromFarm(m) : clean(m.body); if (!s) return;
   let o = others.get(mn);
+  if (o && JSON.stringify(o.S) === JSON.stringify(s)) { o.at = Date.now(); return; }   // nothin' changed: no drawin' again
   if (!o) { o = { S: s, E: makeEngine(mn), at: Date.now() }; others.set(mn, o); } else { o.S = s; o.at = Date.now(); }
   if (o.E) apply(o.E, s);
   hook(); redrawMn(mn, 120); setTimeout(() => redrawMn(mn, 0), 1500);
@@ -206,7 +230,7 @@ function hook() {
   if (hooked || !sdk) return; hooked = true;
   try {
     sdk.hookFunction("CommonDrawAppearanceBuild", 2, (args, next) => {
-      const C = args[0]; if (!C) return next(args);
+      const C = args[0]; if (!C || onBot()) return next(args);
       let E = null;
       if (C === W.Player) { if (S.on) E = mine.E || engine(); }
       else if (seeOthers && typeof C.MemberNumber === "number") { const o = others.get(C.MemberNumber); if (o) { o.at = Date.now(); if (!o.E) { o.E = makeEngine(C.MemberNumber); if (o.E) apply(o.E, o.S); } E = o.E; } }
@@ -241,15 +265,9 @@ export function drawnBodyState() {
 }
 // ── the farm's look, from the bot (index.js hands these over) ──
 // the bot's welcome says which look it has: the "at" to ask with, or null when this one's already here
-export function farmLookWanted(look) { const at = Number(look) || 0; return at && (!farm || farm.at !== at) ? (farm ? farm.at : 0) : null; }
-export function onFarmLook(m) {
-  const at = Number(m && m.at), b = clean(m && m.body); if (!at || !b) return;
-  if (farm && farm.at === at) return;
-  farm = { at, body: b }; try { W.localStorage.setItem(FARM_KEY, JSON.stringify(farm)); } catch (e) { /* private window: fine */ }
-  if (S.saved) return;                                   // they're using their own
-  if (mine.E) apply(mine.E, eff());
-  if (S.on) { redraw(60); tell(true); }
-}
+// (built in since Oct 26: nothin' is asked for or taken from the bot any more)
+export function farmLookWanted() { return null; }
+export function onFarmLook() { /* an older bot still sendin' it: the built-in look wins */ }
 // your belly: "farm" (as full or pregnant as the farm has you, the default), "on" (always, the large one), "off", or
 // "studio" (as your own studio has it)
 export function drawnBodyBelly(mode, say) {
@@ -259,7 +277,7 @@ export function drawnBodyBelly(mode, say) {
 // back to the farm's look, from settings of your own
 export function drawnBodyUseFarm(say) {
   delete S.saved; S.cupSet = false; save(); if (mine.E) apply(mine.E, eff()); redraw(60); tell(true);
-  if (say) say(farm ? "Back to the farm's look." : "Back to the farm's look: it comes from the farm girl when you're in her room.");
+  if (say) say("Back to the farm's look.");
 }
 export function drawnBodySet(on, say) {
   S.on = !!on; save();

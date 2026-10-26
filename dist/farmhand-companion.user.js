@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.43.0
+// @version      0.44.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -230,7 +230,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.43.0";
+  var VERSION = "0.44.0";
 
   // shared/species.js
   var WORDS = {
@@ -3849,6 +3849,68 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     if (say) say(trial ? "Belly test: " + ["", "small", "medium", "large"][trial] + ". Look at your character with nothing over your middle. Only you can see it. Tell Claude how it looks: the shape, the colour match, where it sits." : "Belly test off.");
   }
 
+  // shared/farm-look.json
+  var farm_look_default = {
+    id: "96553188",
+    saved: "2026-10-14T23:37:16.273Z",
+    body: {
+      cup: 12,
+      breast: {
+        full: 1,
+        hang: 1,
+        apart: 1,
+        x: 0,
+        y: 0,
+        nip: 1,
+        nipY: 0,
+        nipX: 0
+      },
+      wear: {},
+      belly: {
+        std: {
+          on: true,
+          rx: 92,
+          ry: 112,
+          sag: 0.28,
+          x: 0,
+          y: -20,
+          behind: false,
+          flat: false,
+          cut: 0.74
+        },
+        AllFours: {
+          on: false,
+          rx: 70,
+          ry: 80,
+          sag: 0.22,
+          x: 0,
+          y: -60,
+          behind: true,
+          flat: false,
+          cut: 0.74
+        },
+        Hogtied: {
+          on: false,
+          rx: 70,
+          ry: 80,
+          sag: 0.22,
+          x: 0,
+          y: -75,
+          behind: true,
+          flat: false,
+          cut: 0.74
+        }
+      },
+      auto: true,
+      tuck: true,
+      dress: true,
+      mould: {
+        items: [],
+        mode: {}
+      }
+    }
+  };
+
   // extension/src/drawnbody.js
   var W3 = window;
   var KEY = "farmhand-drawn-body";
@@ -3862,6 +3924,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
   var hooked2 = false;
   var seeOthers = true;
   var farm = null;
+  var onBot = () => !!(W3.Player && W3.Player.MemberNumber === BOT_MEMBER);
   var mine = { S: null, E: null };
   var others = /* @__PURE__ */ new Map();
   function load() {
@@ -3874,12 +3937,12 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
       seeOthers = W3.localStorage.getItem(SEE_KEY) !== "0";
     } catch (e) {
     }
+    {
+      const b = clean(farm_look_default && farm_look_default.body);
+      if (b) farm = { at: String(farm_look_default.id || "built-in"), body: b };
+    }
     try {
-      const f = JSON.parse(W3.localStorage.getItem(FARM_KEY));
-      if (f && typeof f.at === "number" && f.body) {
-        const b = clean(f.body);
-        if (b) farm = { at: f.at, body: b };
-      }
+      W3.localStorage.removeItem(FARM_KEY);
     } catch (e) {
     }
     mine.S = S2;
@@ -4106,21 +4169,39 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
   };
   var toldAt = 0;
   var askedAt = 0;
+  var bellyStage = () => {
+    const m = bellyMode();
+    return m === "off" ? 0 : m === "on" ? 3 : Math.max(0, Math.min(4, Math.round(Number(farmMe && farmMe.belly) || 0)));
+  };
+  var lastTold = "";
   function tell(force) {
+    if (onBot()) return;
     if (!force && Date.now() - toldAt < 8e3) return;
+    const msg = !S2.on ? { on: false } : S2.saved || !farm ? { on: true, body: shareOf(eff()) } : { on: true, farm: farm.at, cup: eff().cup, bm: bellyMode(), bs: bellyStage() };
+    const sig = JSON.stringify(msg);
+    if (!force && sig === lastTold) return;
     toldAt = Date.now();
-    send("body", S2.on ? { on: true, body: shareOf(eff()) } : { on: false });
+    lastTold = sig;
+    send("body", msg);
+  }
+  function fromFarm(m) {
+    if (!farm) return null;
+    const s = clean(farm.body);
+    if (!s) return null;
+    s.cup = Math.round(Math.max(0, Math.min(20, Number(m.cup) || 0)));
+    s.belly = m.bm === "studio" ? farm.body.belly : bellyAt(farm.body.belly, Math.max(0, Math.min(4, Math.round(Number(m.bs) || 0))));
+    return s;
   }
   function ask() {
-    if (Date.now() - askedAt < 8e3) return;
+    if (onBot() || Date.now() - askedAt < 8e3) return;
     askedAt = Date.now();
     send("bodyAsk", {});
   }
   function onBodyMsg(m) {
     const mn = m.from;
-    if (!mn || W3.Player && mn === W3.Player.MemberNumber) return;
+    if (!mn || W3.Player && mn === W3.Player.MemberNumber || onBot()) return;
     if (m.type === "bodyAsk") {
-      if (S2.on) setTimeout(() => tell(), 300 + Math.random() * 1500);
+      if (S2.on) setTimeout(() => tell(true), 300 + Math.random() * 1500);
       return;
     }
     if (m.type !== "body") return;
@@ -4128,9 +4209,13 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
       if (others.delete(mn)) redrawMn(mn, 60);
       return;
     }
-    const s = clean(m.body);
+    const s = m.farm ? fromFarm(m) : clean(m.body);
     if (!s) return;
     let o = others.get(mn);
+    if (o && JSON.stringify(o.S) === JSON.stringify(s)) {
+      o.at = Date.now();
+      return;
+    }
     if (!o) {
       o = { S: s, E: makeEngine(mn), at: Date.now() };
       others.set(mn, o);
@@ -4149,7 +4234,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     try {
       sdk2.hookFunction("CommonDrawAppearanceBuild", 2, (args, next) => {
         const C = args[0];
-        if (!C) return next(args);
+        if (!C || onBot()) return next(args);
         let E = null;
         if (C === W3.Player) {
           if (S2.on) E = mine.E || engine();
@@ -4229,25 +4314,10 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
       othersHere: Array.from(others.keys()).filter((mn) => charOf(mn)).length
     };
   }
-  function farmLookWanted(look) {
-    const at = Number(look) || 0;
-    return at && (!farm || farm.at !== at) ? farm ? farm.at : 0 : null;
+  function farmLookWanted() {
+    return null;
   }
-  function onFarmLook(m) {
-    const at = Number(m && m.at), b = clean(m && m.body);
-    if (!at || !b) return;
-    if (farm && farm.at === at) return;
-    farm = { at, body: b };
-    try {
-      W3.localStorage.setItem(FARM_KEY, JSON.stringify(farm));
-    } catch (e) {
-    }
-    if (S2.saved) return;
-    if (mine.E) apply(mine.E, eff());
-    if (S2.on) {
-      redraw(60);
-      tell(true);
-    }
+  function onFarmLook() {
   }
   function drawnBodyBelly(mode, say) {
     S2.bellyMode = ["farm", "on", "off", "studio"].includes(mode) ? mode : "farm";
@@ -4265,7 +4335,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     if (mine.E) apply(mine.E, eff());
     redraw(60);
     tell(true);
-    if (say) say(farm ? "Back to the farm's look." : "Back to the farm's look: it comes from the farm girl when you're in her room.");
+    if (say) say("Back to the farm's look.");
   }
   function drawnBodySet(on2, say) {
     S2.on = !!on2;

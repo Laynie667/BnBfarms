@@ -41,7 +41,7 @@
     pillory:  mn => limitBlocks(mn, "breed") ? "their limits rule it out" : null,
     cups:     mn => (makesMilk(mn) || hasPart(mn, "udder")) && !limitBlocks(mn, "milk") ? null : "nothin' for the cups to work on",
     vines:    mn => limitBlocks(mn, "eggs") || limitBlocks(mn, "heat") ? "their limits rule it out" : null,
-    weights:  mn => makesSemen(mn) ? null : "no balls to weigh down",
+    weights:  mn => !makesSemen(mn) ? "no balls to weigh down" : !seedMilkable(mn) ? "they've said ?milkable seed off" : null,
     trough:   mn => rec(mn).watersports ? null : "they haven't said ?watersports on",
     wall:     mn => limitBlocks(mn, "breed") ? "their limits rule it out" : null,
   };

@@ -21,6 +21,7 @@
    Rustic accents run through both: cognac leather, aged brass, rope. Then each species' tack over the top.
 */
 import { OUTFIT_PROPS } from "./farm-outfit-props.js";
+import { speciesKeyOf } from "./species.js";
 export { outfitName, outfitDesc } from "./farm-outfit-names.js";
 export const OUTFIT_GENDERS = ["female", "male", "futa", "femboy", "nonbinary"];
 const L = true;   // (locked: the farm puts its own padlock on, keyed to staff)
@@ -78,6 +79,11 @@ const KIT_SUIT = petsuit(C.lilac, C.cream, C.lav, C.pink, C.cream, C.cognac, C.b
 const PUP_SUIT = petsuit(C.black, C.wine, C.plum, C.wine, C.black, C.black, C.silver);
 const FOX_SUIT = petsuit(C.black, C.cognac, C.wine, C.cream, C.cream, C.cognac, C.brass);   // (black with rust lacing and cream paws, like the tails)
 const PIG_SUIT = petsuit(C.pinkpig, C.rose, C.cognac, C.rose, C.hoof, C.cognac, C.brass);   // (dark trotters)
+const DOG_SUIT = petsuit(C.cognac, C.cream, C.hoof, C.cream, C.cream, C.hoof, C.brass);   // (tan with cream paws)
+const WOLF_SUIT = petsuit("#4A4A52", C.silver, C.black, C.silver, C.silver, C.black, C.silver);   // (storm grey and silver)
+const CAT_SUIT = petsuit(C.black, C.wine, C.plum, C.wine, C.black, C.black, C.silver);   // (a black cat)
+const RABBIT_LEGS = petsuit(C.mint, C.cream, C.cognac, C.cream, C.cream, C.cognac, C.brass).legs;
+const SHEEP_LEGS = petsuit(C.cream, C.lilac, C.lav, C.lilac, C.hoof, C.cognac, C.brass).legs;
 const GOAT_LEGS = petsuit(C.blue, C.cream, C.cognac, C.cream, C.hoof, C.cognac, C.brass).legs;
 // pony mitten binders, layer by layer: Mittens,Horseshoes,Cuffs,Rings,Lock and the same again on the binder, its harness
 // and its chain. Chained: the mittens strapped together behind the back
@@ -140,16 +146,71 @@ const KIT = {
     pieces: [["HairAccessory2", "ElfEars", "#7A9440"], ["Cloth", "SlaveRags", "#6E6248"], ["ItemNeck", "SlaveCollar", "Default", L],
       ["ItemLegs", "FrogtieMetalCuffs", "Default", L], ["ItemHands", "ElbowLengthMittens", ["#4A3A28", C.cognac, C.brass, C.brass, "Default"], L, "Unchained"],
       ["ItemNose", "NoseRing", C.brass], ["ItemMouth", "BitGag", [C.hoof, C.cognac]]] },
+  // rats (Laynie, Oct 26: "a ratslut option would be nice with a set of outfits"): the goth look in dusty grey and
+  // gutter pink, round mouse ears and a long bare tail, a livestock tag on a locked collar, cuffed and hobbled
+  rat: { label: "Rat", look: "goth", pal: { a: "#5E5862", b: C.rose, leg: C.black },
+    pieces: [["HairAccessory2", "MouseEars2", "#8A8290"], ["TailStraps", "MouseTailStrap1", C.pinkpig], ["ItemNeck", "LeatherCollar", C.rose, L],
+      ["ItemNeckAccessories", "CollarNameTagLivestock", "Default"], ["ItemNeckRestraints", "CollarLeash", [C.rose, C.black, C.silver]], ["ItemMouth", "RingGag", C.rose],
+      ["ItemArms", "LeatherCuffs", [C.black, C.silver], L, "Both"], ["ItemFeet", "LeatherAnkleCuffs", [C.silver, C.black, C.silver], false, "Chained"]] },
+  // their own sets (Laynie, Oct 26: they used to wear a cousin's): a bull isn't a cow, a horse isn't a pony, and so on
+  // bulls: black and cognac, horns dark, belled and nose-ringed, wrists cuffed and ankles hobbled
+  bull: { label: "Bull", look: "goth", pal: { a: C.black, b: C.cognac, leg: C.black },
+    pieces: [["HairAccessory2", "CowEars", "Default"], ["HairAccessory1", "CowHorns", C.hoof], ["TailStraps", "CowtailStrap", "Default"],
+      ["ItemNeck", "LeatherCollar", C.cognac, L], ["ItemNeckAccessories", "CollarCowBell", "Default"], ["ItemNose", "NoseRing", C.brass],
+      ["ItemNeckRestraints", "CollarLeash", [C.black, C.cognac, C.brass]], ["ItemMouth", "RingGag", C.black],
+      ["ItemArms", "LeatherCuffs", [C.cognac, C.brass], L, "Both"], ["ItemFeet", "LeatherAnkleCuffs", [C.brass, C.cognac, C.brass], false, "Chained"]],
+    tits: [["Bra", "CowPrintedBra", "Default"], ["ItemNipples", "LactationPump", "Default", false, "MediumSuction"]],
+    pussy: [["Panties", "CowPrintedPanties", "Default"]] },
+  // horses: chestnut and cream show tack (a pony's goth black, but in a big horse's colours)
+  horse: { label: "Horse", look: "goth", pal: { a: "#5A3420", b: C.cream, leg: "#5A3420" },
+    pieces: [["HairAccessory2", "PonyEars1", "#5A3420"], ["TailStraps", "HorseTailStrap", "#3A2214"], ["ItemNeck", "PostureCollar", C.cognac, L],
+      ["ItemMouth", "HarnessPonyBits", [C.silver, C.cognac, C.silver], false, "Attached"], ["ItemTorso", "LeatherHarness", C.cream],
+      ["ItemHands", "PonyMittensBinder", mitts("#5A3420", C.silver, C.cognac, C.silver), L, "Chained"], ["ItemBoots", "PonyBoots", "#5A3420"],
+      ["ItemFeet", "LeatherAnkleCuffs", [C.silver, C.cognac, C.silver], false, "Chained"], ["ItemNeckRestraints", "CollarLeash", [C.cream, C.cognac, C.silver]]] },
+  // dogs: a big tan farm dog in cognac and cream, brass-tagged
+  dog: { label: "Dog", look: "goth", pal: { a: C.cognac, b: C.cream, leg: C.cognac },
+    pieces: [["HairAccessory2", "PuppyEars1", C.cognac], ["TailStraps", "PuppyTailStrap", C.cognac], ["ItemNeck", "DogCollar", C.hoof, L],
+      ["ItemNeckAccessories", "CollarPupBone", "Default"], ["ItemNeckRestraints", "CollarLeash", [C.hoof, C.cognac, C.brass]], ["ItemMouth", "RingGag", C.hoof],
+      ["ItemArms", "PawPaddedPetsuitArms", DOG_SUIT.arms, false, "Padding"], ["ItemLegs", "PawPaddedPetsuitLegs", DOG_SUIT.legs, false, "Padding"]] },
+  // wolves: storm grey and silver, a black collar and a chain lead, tame-ish
+  wolf: { label: "Wolf", look: "goth", pal: { a: "#3A3A42", b: C.silver, leg: C.black },
+    pieces: [["HairAccessory2", "PuppyEars1", "#4A4A52"], ["TailStraps", "PuppyTailStrap", "#4A4A52"], ["ItemNeck", "LeatherCollar", C.black, L],
+      ["ItemNeckRestraints", "CollarLeash", [C.black, C.black, C.silver]], ["ItemMouth", "RingGag", C.black],
+      ["ItemArms", "PawPaddedPetsuitArms", WOLF_SUIT.arms, false, "Padding"], ["ItemLegs", "PawPaddedPetsuitLegs", WOLF_SUIT.legs, false, "Padding"]] },
+  // cats: the kitty's lilac turned black cat, wine and plum, belled
+  cat: { label: "Cat", look: "goth", pal: { a: C.black, b: C.wine, leg: C.black },
+    pieces: [["HairAccessory2", "KittenEars2", C.black], ["TailStraps", "KittenTailStrap1", C.black], ["ItemNeck", "LeatherCollarBell", C.wine, L],
+      ["ItemNeckRestraints", "CollarLeash", [C.wine, C.black, C.silver]], ["ItemMouth", "RingGag", C.wine],
+      ["ItemArms", "PawPaddedPetsuitArms", CAT_SUIT.arms, false, "Padding"], ["ItemLegs", "PawPaddedPetsuitLegs", CAT_SUIT.legs, false, "Padding"]] },
+  // rabbits: a mint and cream doe on pet legs (made to kneel and be bred), cuffed, bow collar
+  rabbit: { label: "Rabbit", look: "pastel", pal: { a: C.mint, b: C.cream, leg: C.mint },
+    pieces: [["HairAccessory2", "BunnyEars1", C.rope], ["TailStraps", "BunnyTailStrap", C.cream], ["ItemNeck", "LeatherCollarBow", C.mint, L],
+      ["ItemArms", "LeatherCuffs", [C.mint, C.brass], L, "Both"], ["ItemLegs", "PawPaddedPetsuitLegs", RABBIT_LEGS, false, "Padding"],
+      ["ItemNeckRestraints", "CollarLeash", [C.mint, C.cognac, C.brass]], ["ItemMouth", "RingGag", C.mint]],
+    tits: [["Cloth", "TransparentBunnyGirl", C.mint]], noBow: true },
+  // sheep: fluffy cream and lilac, curled horns, a puff of a tail, hoof mittens and pet legs, belled
+  sheep: { label: "Sheep", look: "pastel", pal: { a: C.lilac, b: C.cream, leg: C.cream },
+    pieces: [["HairAccessory1", "Horns2", C.cream], ["HairAccessory2", "Ears2", C.cream], ["TailStraps", "BunnyTailStrap", C.cream],
+      ["ItemNeck", "LeatherCollar", C.lav, L], ["ItemNeckAccessories", "CollarBell", C.brass], ["ItemMouth", "RingGag", C.lilac],
+      ["ItemHands", "PonyMittensBinder", mitts(C.cream, C.hoof, C.lav, C.brass), L, "Chained"],
+      ["ItemLegs", "PawPaddedPetsuitLegs", SHEEP_LEGS, false, "Padding"]] },
 };
 export const OUTFIT_SPECIES = Object.keys(KIT);
 // the farm's other kinds wear their cousins' outfits
-const ALIAS = { bull: "cow", horse: "pony", dog: "pup", wolf: "pup", cat: "kitt", rabbit: "bunny", sheep: "goat" };
+const ALIAS = { mouse: "rat" };   // (every other kind has its own set since Oct 26)
+// which kit somebody's species wears: "Kitty", "catgirl", "kitten" → kitt; "ratslut" → rat; a wolf wears the pup's (Oct 26)
+export function outfitSpeciesOf(species) {
+  const raw = String(species || "").toLowerCase().trim();
+  if (KIT[raw]) return raw;
+  const k = speciesKeyOf(raw) || raw;
+  return KIT[k] ? k : KIT[ALIAS[k]] ? ALIAS[k] : null;
+}
 export const speciesLabel = (sp) => (KIT[sp] || {}).label || sp;
 const BODY = { female: { tits: true, pussy: true }, male: { cock: true, flat: true }, futa: { tits: true, pussy: true, cock: true }, femboy: { cock: true, flat: true }, nonbinary: { pussy: true, flat: true } };
 
 // their outfit: the body's wear for the species' look, then the tack over it (a tack piece takes that slot), then chastity
 export function outfitPieces(species, gender) {
-  const K = KIT[species] || KIT[ALIAS[species]], B = BODY[gender];
+  const K = KIT[outfitSpeciesOf(species)], B = BODY[gender];
   const W = gender === "femboy" ? FEMBOY : (WEAR[K && K.look] || {})[gender];
   if (!K || !W) return null;
   const by = new Map();

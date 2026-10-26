@@ -267,6 +267,11 @@ const KIND_POOLS = {
     "%n trembles all over like a startled deer, but they don't bolt.",
     "%n's breath comes high and fast, a deer's breathing, every stroke a little gasp.",
   ],
+  rat: [
+    "%n squeaks on every thrust, high and helpless, whiskers twitchin' against the boards.",
+    "%n's long tail curls tight round their own thigh, and they chitter and push back for more like a greedy little gutter rat.",
+    "%n's round ears flatten back, and they squeak so needy the next stall over starts laughin'.",
+  ],
   goblin: [
     "%n cackles and moans by turns, enjoying themselves far too much for somebody stuck in a stall.",
     "%n mutters filthy goblin encouragement through the wall, and the stranger takes it to heart.",
@@ -276,7 +281,7 @@ export const KIND = {
   cow: KIND_POOLS.cow, bull: KIND_POOLS.cow, horse: KIND_POOLS.horse, pony: KIND_POOLS.horse,
   dog: KIND_POOLS.dog, pup: KIND_POOLS.dog, wolf: KIND_POOLS.dog, fox: KIND_POOLS.dog,
   cat: KIND_POOLS.cat, kitt: KIND_POOLS.cat, pig: KIND_POOLS.pig, bunny: KIND_POOLS.bunny, rabbit: KIND_POOLS.bunny,
-  goat: KIND_POOLS.goat, sheep: KIND_POOLS.goat, deer: KIND_POOLS.deer, goblin: KIND_POOLS.goblin,
+  goat: KIND_POOLS.goat, sheep: KIND_POOLS.goat, deer: KIND_POOLS.deer, goblin: KIND_POOLS.goblin, rat: KIND_POOLS.rat,
 };
 // %snd: a noise their kind makes ("a low moo", "a breathy whinny")
 export const SOUND = [

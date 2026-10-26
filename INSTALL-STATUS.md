@@ -1,11 +1,11 @@
 # What to install (current versions)
 
-Updated 2026-10-25. Every file is in the `dist/` folder (it syncs through OneDrive, so the phone app has it too).
+Updated 2026-10-26. Every file is in the `dist/` folder (it syncs through OneDrive, so the phone app has it too).
 In Tampermonkey's dashboard, compare each script's version with this list. Anything already at these versions is up to date.
 
 | Script | File in `dist/` | Where it runs | Current |
 |---|---|---|---|
-| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.49.1** |
+| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.50.0** |
 | Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.10.0** |
 | Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.2.1** |
 | Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **1.1.0** |
@@ -13,7 +13,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 | Map tools, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.4** |
 | Dairy | `farmhand-dairy.user.js` | the bot's PC | **1.1.0** |
 | Shows | `farmhand-shows.user.js` | the bot's PC | **1.1.0** |
-| Farmhand Companion | `farmhand-companion.user.js` | each player | **0.42.0** |
+| Farmhand Companion | `farmhand-companion.user.js` | each player | **0.43.0** |
 | Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.4** |
 
 ## Sending a watch report
@@ -24,6 +24,21 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 ## Latest changes (newest first)
 
+- **Bot 0.50.0 + Companion 0.43.0: Oct 26 batch.** Laynie, Oct 26: ?stuck teleports, kitty outfits/sounds, ratsluts, help leaking the private add-on, ?wash fitted, a seed-milking switch, friend the bot or come off the books, and "sometimes the outfit doesnt apply on contract signing".
+  - **?stuck** always moves them to the `rescue` spot straight away; staff are told where they went.
+  - **Smart species match** (shared/species.js): kitty, kitten, catgirl, neko → kitty outfit and cat sounds; hucow → cow; ratslut, mouse, rattie → rat. Contracts, outfits and production all read it the same way.
+  - **Ratsluts**: new kind (big litters, light milk) with 5 starter outfits (Gutter Sweetheart, Sewer Buck, Midden Queen, Squeak Toy, Hayloft Nibbler), mouse ears, rat tail, livestock tag. Contract speech: Mouse.
+  - **?help / ?addons** never show (or guess) an add-on the asker can't use, so the private add-on stays invisible.
+  - **?wash** lines are tagged and picked by what the person is: kind, body, on all fours / bound / gagged / caged / belted, latex, pregnant, and which messes are actually on them.
+  - **?seedmilk on|off** (also `?milkable seed off`, Companion switch "Milk my seed"): milked up top but nobody, no trap and no ?collect touches their seed.
+  - **Friend the bot**: someone on the books, in the room, who hasn't friended the bot gets a private reminder every 6 hours. 48 hours after the first one, still not friends, they're taken off the books (paperwork archived, staff told). Staff and proprietors only get reminders.
+  - **Every kind has its own outfits now** (Laynie: "yes, i think i do"): 7 new sets × 5 genders, so 90 starter outfits in all. Bull (black and cognac, dark horns, cowbell, nose ring, cuffed and hobbled), Horse (chestnut and cream show tack, silver bit), Dog (tan petsuit, cream paws, bone tag), Wolf (storm grey and silver petsuit), Cat (black cat in wine and plum), Rabbit (mint see-through bunny suit on pet legs), Sheep (cream and lilac, curled horns, hoof mittens, pet legs). Each has a name and blurb (`?outfit starters`, `?outfit about wolf female`). A proprietor's own saved outfit still always wins.
+  - **The outfit wheel** (Laynie: "build them into a new wheel command with a randomized timer for each outfit between 5 minutes and 4 hours"): `?outfitwheel` (or `?wheel outfit`) spins any of the 90 starter outfits for your body, puts it on at once and keeps it on for a random 5 minutes to 4 hours under the farm's padlocks. `?outfitwheel status` shows the time left. Staff can `?outfitwheel <who>` (they get the Yes / Not now card first) and `?outfitwheel stop <who>`. When the time's up the farm opens its own padlocks and puts them back in what they wore before; the safeword ends it at once. Never for anybody on `?ownoutfit` unless they spin it themselves.
+  - **Wrong Barn** now dresses them in their new animal's outfit for the hour too, and back when it wears off (with the Companion; not for anybody on `?ownoutfit`).
+  - **Companion 0.43.0**: "change back" can open the farm's own padlocks on the pieces the farm put on (only when the farm says so: the wheel or Wrong Barn ending). Nothin' anybody else locked is touched.
+  - **Parasite Suckers and Trough Leeches** now put on the **Forbidden Chastity Bra** instead of milking cups (Companion 0.43.0; an older Companion just skips the piece).
+  - **Every species checked** (Laynie: "double check all the available species for any missing things like that"). Gaps filled: stall moans for bunny, rabbit, fox, wolf, goat, sheep, rat; stall traits for bunnies, goats/sheep, rats (wolves and foxes now get the canine ones); barn life eat/drink/groom lines for bull, sheep, fox, wolf, deer, goblin, rat, and pups/kitties/ponies now use their cousin's lines instead of the plain ones; rat lines for conditioning, glory stalls, shows, tease, corruption voice, seed taste, Moo Juice; the corruption voice and tease read "catgirl"-style names right; the application understands neko, vixen, kitsune, ponygirl, wolfgirl and the like; "pirate" no longer counts as a rat or "scatterbrain" as a cat. A test now checks every kind × every gender has an outfit, its own contract sound and wash lines.
+  - **Contract outfit fix**: the outfit was marked "done" the moment a contract was signed, even if the Companion wasn't on, was offline, or the game refused it, so it never tried again. Now it's only marked done when the Companion says it's on; with no Companion it waits and goes on when their Companion checks in (up to a week, 3 tries); a contract signed outside the bot's books still dresses them; staff hear when there's no outfit for that kind or the game refuses it. **Companion 0.43.0** tells the bot when an outfit failed.
 - **Bot 0.49.1: contract rules.** Laynie, Oct 26: "all contracts need the forbid freeing self rules, and locks cannot be picked rule. and any contracts that are permanent need the forbid leaving room rule".
   - Every new contract the farm writes has **Forbid freeing self** (low-difficulty items included) and **Force 'Locks on you can't be picked'** (put back how it was when the contract ends).
   - **Permanent** contracts also have **Forbid leaving the room**, and their terms say so. Roam passes don't apply on one: `?roam start` says why and spends nothing.

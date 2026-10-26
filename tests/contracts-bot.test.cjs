@@ -103,7 +103,10 @@ const bcpTo=(mn,n)=>sent.slice(n).filter(s=>s[0]==='ChatRoomChat'&&s[1].Content=
   delete L().people[500].contractDressedAt; delete L().people[500].ownOutfit;
   n=sent.length; await sign();
   const d6=outfitTo(500,n)[0]||{};
-  out('6 the first contract dresses them, straight on ->', d6.slot==='farm:cow|female', d6.auto===true, !!L().people[500].contractDressedAt);
+  out('6 the first contract dresses them, straight on ->', d6.slot==='farm:cow|female', d6.auto===true, !L().people[500].contractDressedAt && !!L().people[500].outfitOwed);
+  // Oct 26: only marked dressed once their Companion says it's on
+  handlers.ChatRoomMessage({Sender:500,Type:'Hidden',Content:'FarmhandMsg',Dictionary:{v:2,type:'outfitAnswer',answer:'worn',slot:d6.slot}}); await wait(400);
+  out('6 ...and marked dressed when the Companion says it is on ->', !!L().people[500].contractDressedAt, !L().people[500].outfitOwed);
   n=sent.length; await sign();
   out('6 ...and a later contract leaves what staff changed alone ->', outfitTo(500,n).length===0);
   delete L().people[500].contractDressedAt; n=sent.length; await B(500,'ownoutfit on'); await sign();

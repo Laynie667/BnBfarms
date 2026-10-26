@@ -37,8 +37,8 @@
   function limitBlocks(mn, kind){ const r = rec(mn); return !!(r && LIMIT_WORDS[kind||"breed"].test(r.limits||"")); }
   function speciesKey(mn){
     const s = String((rec(mn)||{}).species||"").toLowerCase();
-    for (const k of Object.keys(CFG.SPECIES)) if (k !== "default" && s.includes(k)) return k;
-    return "default";
+    const k0 = speciesKeyOf(s); if (k0 && CFG.SPECIES[k0]) return k0;   // "Kitty", "catgirl", "ratslut" (shared/species.js)
+    return "default";   // (no more "anywhere inside the word": a "pirate" isn't a rat, a "scatterbrain" isn't a cat)
   }
   function speciesInfo(mn){ return CFG.SPECIES[speciesKey(mn)]; }
   const ml = n => n >= 1000 ? (n/1000).toFixed(1)+" L" : Math.round(n)+" mL";
@@ -356,6 +356,18 @@
     return (hasRole(mn, ROLE.LIVESTOCK) || !!r.futa) && !limitBlocks(mn,"milk");
   }
 
+  // the second milkable switch (Laynie, Oct 26: "anyone wanting to be milked up top, but not down below doesnt have
+  // their seed milked if they dont want it"): ?milkable seed off keeps the stall, the milkin' traps and ?collect off
+  // their cock and balls. Breedin' still spends what they make; only the milkin' of it stops.
+  function seedMilkable(mn){ const r = rec(mn); return !!r && makesSemen(mn) && r.seedMilk !== false; }
+  function seedMilkCommand(mn, r, v, R){
+    if (!makesSemen(mn)){ R("You've no seed to milk, sugar, so there's nothin' to switch. (?milkable is the one for milk.)"); return; }
+    if (!v){ R(switchStatus("seedmilk", r.seedMilk !== false)+" On: the stall, the milkin' traps and ?collect take your seed too. Off: they leave your cock and balls be."); return; }
+    if (!["on","off","yes","no"].includes(v)){ R("Just say ?seedmilk on or ?seedmilk off, sweetie (or ?milkable seed on|off)."); return; }
+    r.seedMilk = v === "on" || v === "yes"; saveLedger(); audit(mn, "SEEDMILK", r.seedMilk ? "on" : "off"); syncCompanions(true);
+    R(r.seedMilk ? "🐂 Your seed gets milked too now, sugar: the stall, the milkin' traps and ?collect will take it."
+                 : "🥛 Your seed's left be, sugar. The stall and the milkin' traps milk you up top only, and nobody can ?collect you. Breedin' still spends it, of course.");
+  }
   function milkRate(mn){
     const p = prodOf(mn), now = Date.now();
     let r = CFG.PROD.MILK_PER_H * speciesInfo(mn).milk * udderX(mn);
@@ -855,7 +867,7 @@
       // the stall drains down to a quarter of what they can hold, then stops (CFG.PROD.STALL_LEAVE_SHARE)
       const keepM = milkCap(mn) * stallShare(mn), keepS = semenCap(mn) * stallShare(mn);   // (the dial: 10y7-udders.js)
       const doM = makesMilk(mn) && !milkDenied(mn) && !gearOf(mn).milk && p.milk > keepM;   // a pump they're wearin' does its own milkin' (gearTick)
-      const doS = makesSemen(mn) && p.semen > keepS;
+      const doS = seedMilkable(mn) && p.semen > keepS;
       // standin' in the stall and it won't milk them: say why, once per visit (it used to say nothin' at all,
       // and folks thought the stall was broken)
       if (!p.stall && !doM && !doS){
@@ -1537,7 +1549,7 @@
     const by = { cow:"rich and creamy", bull:"thick, salty and heavy", horse:"musky and endless", pony:"musky and sweet",
                  dog:"hot, thin and salty", pup:"hot and salty", wolf:"wild and gamey", fox:"sharp and musky",
                  cat:"tangy and sharp", kitt:"tangy", pig:"thick and earthy", goat:"strong and musky", sheep:"mild and creamy",
-                 bunny:"sweet and light", rabbit:"sweet and light", deer:"clean and grassy", goblin:"funky and bitter", dragon:"smoky and hot" }[k];
+                 bunny:"sweet and light", rabbit:"sweet and light", deer:"clean and grassy", goblin:"funky and bitter", rat:"sharp and musky", dragon:"smoky and hot" }[k];
     return "It tastes "+(by || "salty and warm")+(pent ? ", and so thick from bein' pent up it clings to the throat" : "")+".";
   }
 

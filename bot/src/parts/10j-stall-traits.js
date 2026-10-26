@@ -121,7 +121,7 @@
     pig: { part:"any", when:(mn) => speciesKey(mn) === "pig", lines:[
       "%n grunts happily, snout twitching, wriggling deeper into the straw.",
       "%n's curly tail wiggles every time the pump pulls."] },
-    canid: { part:"any", when:(mn) => ["pup","dog"].includes(speciesKey(mn)), lines:[
+    canid: { part:"any", when:(mn) => ["pup","dog","wolf","fox"].includes(speciesKey(mn)), lines:[
       "%n's tail wags helplessly, thumping against the stall's boards.",
       "%n pants, tongue lolling, and lets out a happy little whine.",
       "%n's ears flatten, then perk, as the machine changes pace."] },
@@ -129,6 +129,18 @@
       "%n's tail lashes and curls, and a purr rumbles out of them despite themself.",
       "%n kneads the padded rail, purring.",
       "%n's ears flatten back as the machine pulls, then relax again."] },
+    leporid: { part:"any", when:(mn) => ["bunny","rabbit"].includes(speciesKey(mn)), lines:[
+      "%n's nose twitches nonstop and one foot starts thumpin' against the stall floor.",
+      "%n's long ears flop and quiver with every pull of the machine.",
+      "%n squeaks, breathless, and pushes back into the stall like a bunny that knows exactly what it's for."] },
+    caprid: { part:"any", when:(mn) => ["goat","sheep"].includes(speciesKey(mn)), lines:[
+      "%n bleats, high and wavering, and stamps at the stall's floor.",
+      "%n leans hard into the rail and lets out a long, wobbly bleat.",
+      "%n's ears flick and droop as the stall settles into its rhythm."] },
+    rodent: { part:"any", when:(mn) => speciesKey(mn) === "rat", lines:[
+      "%n's whiskers twitch and their long tail curls tight round the rail.",
+      "%n squeaks and chitters in the stall, little hands gripping the padding.",
+      "%n's round ears flatten back, then twitch forward again, every time the machine changes pace."] },
     goblin: { part:"any", when:(mn) => speciesKey(mn) === "goblin", lines:[
       "%n cackles breathlessly, then moans, then cackles again.",
       "%n's long ears droop and twitch as the stall works them.",

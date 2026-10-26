@@ -252,7 +252,7 @@
       }
       case "milker": {
         trapHold(mn, 4, "the milker");
-        const m0 = makesMilk(mn) ? p.milk : 0, s0 = makesSemen(mn) ? p.semen : 0;
+        const m0 = makesMilk(mn) ? p.milk : 0, s0 = seedMilkable(mn) ? p.semen : 0;
         trapRun(mn, kind, (m0 >= s0 ? T.milk : T.seed).concat(T.both), () => {
           const gotM = m0 > 0 ? drainMilk(mn, p.milk) : 0, gotS = s0 > 0 ? drainSemen(mn, p.semen) : 0;
           emote("🥛 "+tFill(pickFor(mn, "trap:milker:end", T.end), mn, { ml: ml(gotM + gotS) }), mn);

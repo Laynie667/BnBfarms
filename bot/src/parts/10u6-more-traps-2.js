@@ -29,7 +29,7 @@
     crate(mn, spot){ anthroScene(mn, "crate", spot); },
     scarecrow(mn, spot){ anthroScene(mn, "scarecrow", spot); },
     carousel(mn){
-      const T = TRAPS2_LINES.carousel, p = prodOf(mn), r = rec(mn), milk = makesMilk(mn) && p.milk >= 1, seed = makesSemen(mn);
+      const T = TRAPS2_LINES.carousel, p = prodOf(mn), r = rec(mn), milk = makesMilk(mn) && p.milk >= 1, seed = seedMilkable(mn);
       const hole = r.breedable && !limitBlocks(mn, "breed") ? openHole(mn, "vulva") : null, v = { h: hole && hole !== "mouth" ? TRAP_HOLE[hole] : "" };
       trapHold(mn, 5, "the milkin' carousel");
       trapRun(mn, "carousel", [T.board].concat([milk || !seed ? T.milk : T.sleeve], [v.h ? T.fill : T.tease], [T.round]), () => {

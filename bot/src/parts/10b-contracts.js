@@ -150,10 +150,15 @@
       // the outfit that goes with it ("auto" picks theirs by species and gender), put on ONCE: the first contract they
       // accept dresses them, and nothin' dresses them again by itself after, so whatever staff change on them stays
       // changed. Somebody who brings their own outfit (?ownoutfit on) keeps the look they came in (Laynie, Oct 23).
-      const tpl = x && contractTemplate(x.tpl), dress = tpl ? (tpl.outfit === undefined ? "auto" : tpl.outfit) : "";
+      // A contract I can't find on my books (signed from BC+ by hand, or a title that doesn't match) still dresses them
+      // "auto", and "dressed" is only written down once their Companion says the outfit is ON (outfitAnswer, 10c-outfits.js).
+      // No Companion here right then: the outfit is owed and goes on the moment their Companion checks in (Oct 26:
+      // "sometimes the outfit doesnt apply on contract signing").
+      const tpl = x && contractTemplate(x.tpl), dress = tpl ? (tpl.outfit === undefined ? "auto" : tpl.outfit) : "auto";
       const slot = dress === "auto" ? outfitSlotFor(mn) : dress, r = rec(mn);
       if (slot && r && r.ownOutfit) later(() => tell(mn, "👗 You brought your own outfit, sugar, so you're stayin' in the look you came in. (?ownoutfit off and the farm dresses you for your next contract.)"), 3000);
-      else if (slot && r && !r.contractDressedAt){ r.contractDressedAt = Date.now(); saveLedger(); later(() => offerOutfit(mn, slot, "It goes with your new contract", true), 3000); }
+      else if (slot && r && !r.contractDressedAt){ r.outfitOwed = { slot, at: Date.now() }; saveLedger(); later(() => contractOutfitNow(mn), 3000); }
+      else if (!slot && r && !r.contractDressedAt && !r.ownOutfit) notifyStaff("👗 "+plainName(mn)+" signed a contract but I have no outfit for their kind ("+(r.species||"no species")+", "+genderOf(mn)+"). ?outfit offer "+plainName(mn)+" <slot> to dress 'em by hand.", false);
       later(() => enqueue(BCPLUS.queryMsg(mn)), 2000);   // fetch BC+'s id for it, so we can release it later
       return true;
     }

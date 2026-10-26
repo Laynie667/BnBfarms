@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.49.1
+// @version      0.50.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -1585,6 +1585,132 @@
     ]
   };
 
+  // shared/species.js
+  var WORDS = {
+    cow: "cow",
+    cows: "cow",
+    cattle: "cow",
+    heifer: "cow",
+    hucow: "cow",
+    bovine: "cow",
+    calf: "cow",
+    dairy: "cow",
+    moo: "cow",
+    cowgirl: "cow",
+    bull: "bull",
+    ox: "bull",
+    steer: "bull",
+    pony: "pony",
+    filly: "pony",
+    foal: "pony",
+    colt: "pony",
+    ponygirl: "pony",
+    ponyboy: "pony",
+    horse: "horse",
+    mare: "horse",
+    stallion: "horse",
+    equine: "horse",
+    deer: "deer",
+    doe: "deer",
+    fawn: "deer",
+    stag: "deer",
+    reindeer: "deer",
+    pig: "pig",
+    piggy: "pig",
+    piglet: "pig",
+    sow: "pig",
+    hog: "pig",
+    swine: "pig",
+    oink: "pig",
+    boar: "pig",
+    pup: "pup",
+    puppy: "pup",
+    pupper: "pup",
+    pupgirl: "pup",
+    pupboy: "pup",
+    dog: "dog",
+    doggy: "dog",
+    doggie: "dog",
+    hound: "dog",
+    canine: "dog",
+    bitch: "dog",
+    kitt: "kitt",
+    kitty: "kitt",
+    kitten: "kitt",
+    kittie: "kitt",
+    kit: "kitt",
+    kitteh: "kitt",
+    neko: "kitt",
+    catgirl: "kitt",
+    catboy: "kitt",
+    cat: "cat",
+    feline: "cat",
+    tomcat: "cat",
+    pussycat: "kitt",
+    goblin: "goblin",
+    gob: "goblin",
+    gobbo: "goblin",
+    bunny: "bunny",
+    bun: "bunny",
+    bunbun: "bunny",
+    rabbit: "rabbit",
+    hare: "rabbit",
+    fox: "fox",
+    vixen: "fox",
+    foxy: "fox",
+    kitsune: "fox",
+    wolf: "wolf",
+    lupine: "wolf",
+    wolfie: "wolf",
+    goat: "goat",
+    nanny: "goat",
+    billy: "goat",
+    kid: "goat",
+    sheep: "sheep",
+    lamb: "sheep",
+    ewe: "sheep",
+    ram: "sheep",
+    rat: "rat",
+    ratty: "rat",
+    rattie: "rat",
+    ratgirl: "rat",
+    ratboy: "rat",
+    ratslut: "rat",
+    rodent: "rat",
+    mouse: "rat",
+    mousey: "rat",
+    mice: "rat"
+  };
+  var ENDINGS = /(girl|boy|gal|guy|kin|slut|sluts|whore|toy|pet|bimbo|s)$/;
+  var known = (w) => {
+    if (WORDS[w]) return WORDS[w];
+    const cut = w.replace(ENDINGS, "");
+    if (cut !== w && cut.length > 1) {
+      if (WORDS[cut]) return WORDS[cut];
+      const again = cut.replace(ENDINGS, "");
+      if (WORDS[again]) return WORDS[again];
+    }
+    if (/ves$/.test(w) && WORDS[w.replace(/ves$/, "f")]) return WORDS[w.replace(/ves$/, "f")];
+    return null;
+  };
+  var INSIDE = Object.keys(WORDS).filter((w) => w.length >= 3).sort((a, b) => b.length - a.length);
+  function speciesKeyOf(text) {
+    const low = String(text || "").toLowerCase().replace(/[^a-z\s\/-]/g, " ").replace(/\s+/g, " ").trim();
+    if (!low) return null;
+    const whole = low.replace(/[\s\/-]+/g, "");
+    if (known(whole)) return known(whole);
+    const words = low.split(/[\s\/-]+/).filter(Boolean);
+    for (const w of words) {
+      const k = known(w);
+      if (k) return k;
+    }
+    for (const w of words) {
+      const hit = INSIDE.find((x) => w.startsWith(x) || w.endsWith(x));
+      if (hit) return WORDS[hit];
+    }
+    return null;
+  }
+
   // shared/bcplus.js
   var BCPLUS_VERSION = bcplus_rules_default.bcplusVersion;
   var RULES = new Map(bcplus_rules_default.rules.map((r) => [r.id, r]));
@@ -1632,7 +1758,8 @@
     rabbit: "Bunny",
     fox: "Fox",
     wolf: "Wolf",
-    mouse: "Mouse"
+    mouse: "Mouse",
+    rat: "Mouse"
   };
   var SOUNDS = {
     pig: ["oink", "snort", "squee", "grunt"],
@@ -1642,7 +1769,7 @@
     goblin: ["heh", "gnuk", "skree", "hrrk"]
   };
   function petFor(species) {
-    const s = String(species || "").toLowerCase();
+    const s = speciesKeyOf(species) || String(species || "").toLowerCase();
     if (ANIMALS[s]) return { animal: ANIMALS[s], sounds: [] };
     return { animal: "Custom", sounds: SOUNDS[s] || ["moo"] };
   }
@@ -1946,15 +2073,72 @@
       femboy: ["Piglet Pink", "A pink maid bikini and tulle skirt on a little piglet in trotters, snout hooked and caged."],
       nonbinary: ["Rosy Trotter", "A corset bikini in rose under the petsuit and rope harness, snout hooked, belted."]
     },
+    rat: {
+      female: ["Gutter Sweetheart", "A dusty grey latex corset over a harness bra and crotchless latex, round mouse ears and a long pink tail: the barn's own ratslut, tagged, cuffed and hobbled."],
+      male: ["Sewer Buck", "A jockstrap and harness on a tagged, cuffed rat in fishnets and thigh boots, leashed and caged."],
+      futa: ["Midden Queen", "The ratslut's latex and harness bra with nothin' locked below, cuffed and hobbled and ready to breed the whole nest."],
+      femboy: ["Squeak Toy", "A pink maid bikini and tulle skirt on a little rat with round ears and a long tail, cuffed, hobbled and caged."],
+      nonbinary: ["Hayloft Nibbler", "A classic latex corset and latex stockings in grey, mouse ears and tail, tagged, cuffed and belted."]
+    },
     goblin: {
       female: ["Ragged Raider", "Rags, elf ears and a slave collar, frog-tied on her knees with long mittens on, a bit and a nose ring, barefoot."],
       male: ["Rag-Tag Grunt", "A jockstrap and harness on a frog-tied goblin, mittened, bitted, barefoot and caged."],
       futa: ["Warband Brood-Queen", "Rags and a slave collar, frog-tied and mittened, nothin' locked where the warband breeds her."],
       femboy: ["Camp Trinket", "Pink frills on a frog-tied goblin, long mittens and a bit, barefoot and caged."],
       nonbinary: ["Cave Scrapper", "Rags and a slave collar, frog-tied and mittened, a bit and a nose ring, belted."]
+    },
+    // their own sets (Oct 26)
+    bull: {
+      female: ["Herd Matriarch", "Black and cognac, dark horns, a cowbell and a brass nose ring, cow-print and cups for the milkin', wrists cuffed and ankles hobbled."],
+      male: ["Prize Stud Bull", "A jockstrap and harness on a horned, nose-ringed bull, belled, cuffed and hobbled, led by the ring and caged between breedings."],
+      futa: ["Breeding Line Bull", "Latex under the cow-print, horns, ring and bell, and nothin' locked below: the herd's own breeder."],
+      femboy: ["Little Bull Calf", "A pink maid bikini and tulle skirt on a horned little calf with a nose ring and a bell, cuffed and caged."],
+      nonbinary: ["Black Angus", "A classic latex corset in black and cognac, horns, ring and bell, cuffed, hobbled and belted."]
+    },
+    horse: {
+      female: ["Chestnut Show Mare", "Chestnut and cream show tack: a posture collar, a silver bit, a cream harness, hoof mittens behind the back and tall pony boots."],
+      male: ["Brass and Leather Stallion", "A jockstrap and harness on a bridled chestnut stallion with hoof mittens and boots, hobbled and caged."],
+      futa: ["Thoroughbred Broodmare", "Latex corset and harness bra under the cream harness, bitted and booted, nothin' locked where she's bred."],
+      femboy: ["Ribboned Yearling", "A pink maid bikini under chestnut tack, a bit, hoof mittens and boots, caged."],
+      nonbinary: ["Saddlebred", "A classic latex corset under the harness and bridle, hooves and boots, belted."]
+    },
+    dog: {
+      female: ["Good Farm Girl", "A tan petsuit with cream paws, a bone tag on a dark collar, a ring gag and a lead: the farm's own faithful bitch."],
+      male: ["Working Hound", "A jockstrap and harness on a big tan farm dog on all fours, tagged, leashed and caged."],
+      futa: ["Kennel Queen", "Latex and a harness bra under the tan petsuit, gagged open and free to breed the whole kennel."],
+      femboy: ["Lap Dog Frills", "Pink frills on a tan pup: a maid bikini, a ribbon cincher, a bone tag, and a cage."],
+      nonbinary: ["Barn Dog", "A latex corset and bra under the tan petsuit, a bone tag and a ring gag, belted."]
+    },
+    wolf: {
+      female: ["Tamed She-Wolf", "Storm grey and silver: a grey petsuit, a black collar on a short lead and a ring gag, wild but brought to heel."],
+      male: ["Pack Alpha on a Leash", "A jockstrap and harness on a grey wolf on all fours, leashed by the collar and caged."],
+      futa: ["Moonlit Breeder", "Latex and a harness bra under the grey wolf suit, gagged open, nothin' locked below."],
+      femboy: ["Little Pup of the Pack", "A pink maid bikini and tulle skirt on a grey wolf pup, leashed and caged."],
+      nonbinary: ["Silverback", "A classic latex corset under the grey petsuit, a lead and a ring gag, belted."]
+    },
+    cat: {
+      female: ["Black Cat Mistress", "A black cat in wine and plum: a black petsuit, a belled wine collar, a ring gag and a lead."],
+      male: ["Barn Tom", "A jockstrap and harness on a black tomcat in a petsuit, belled, leashed and caged."],
+      futa: ["Midnight Mouser", "Latex and a harness bra under the black cat suit, belled, gagged open and free to breed."],
+      femboy: ["Witch's Kitten", "A pink maid bikini and tulle skirt on a little black cat, belled and caged."],
+      nonbinary: ["Shadow Purr", "A classic latex corset under the black petsuit, a belled collar and a ring gag, belted."]
+    },
+    rabbit: {
+      female: ["Mint Warren Doe", "A see-through mint bunny suit, hare-brown ears, pet legs to kneel on and cuffed wrists: a doe kept for breedin'."],
+      male: ["Warren Buck", "A jockstrap and harness on a buck on pet legs, cuffed, collared and caged."],
+      futa: ["Spring Litter Queen", "The see-through mint suit with nothin' locked on: kneelin', cuffed and ready to be bred like a rabbit."],
+      femboy: ["Clover Kit", "A pink maid bikini and tulle skirt on a little rabbit on pet legs, cuffed and caged."],
+      nonbinary: ["Meadow Hare", "A corset bikini and crotchless lace in mint, hare ears and pet legs, cuffed and belted."]
+    },
+    sheep: {
+      female: ["Lilac Lamb", "Fluffy cream and lilac: curled horns, soft ears, a puff of a tail, a brass bell, hoof mittens and pet legs to kneel on."],
+      male: ["Shorn Ram", "A jockstrap and harness on a horned ram with hoof mittens, kneelin', belled and caged."],
+      futa: ["Woolly Ewe in Season", "Open lilac lace, horns and a bell, hoof mittens and nothin' locked below for the flock."],
+      femboy: ["Little Lamb Frills", "A pink maid bikini and tulle skirt on a lamb with hoof mittens and a bell, caged and kneelin'."],
+      nonbinary: ["Flock Darling", "A corset bikini in lilac, horns, hoof mittens and pet legs, belled and belted."]
     }
   };
-  var ALIAS = { bull: "cow", horse: "pony", dog: "pup", wolf: "pup", cat: "kitt", rabbit: "bunny", sheep: "goat" };
+  var ALIAS = {};
   var SAY = {
     "Bra:CorsetBikini1": "corset bikini top",
     "Bra:CowPrintedBra": "cow-print bra",
@@ -1979,6 +2163,10 @@
     "HairAccessory2:FoxEars1": "fox ears",
     "HairAccessory2:KittenEars2": "kitten ears",
     "HairAccessory2:PonyEars1": "pony ears",
+    "HairAccessory2:MouseEars2": "round mouse ears",
+    "TailStraps:MouseTailStrap1": "long bare rat tail",
+    "ItemNeckAccessories:CollarNameTagLivestock": "livestock tag",
+    "Garters:HipHarness": "hip harness",
     "HairAccessory2:PuppyEars1": "puppy ears",
     "HairAccessory2:PuppyEars2": "floppy ears",
     "HairAccessory3:Ribbons1": "hair ribbons",
@@ -2040,7 +2228,7 @@
   };
   var say = (p) => SAY[p.Group + ":" + p.Name] || p.Name;
   var list = (a) => a.length < 2 ? a.join("") : a.slice(0, -1).join(", ") + " and " + a[a.length - 1];
-  var entry = (species, gender) => (NAMES[species] || NAMES[ALIAS[species]] || {})[gender] || null;
+  var entry = (species, gender) => (NAMES[species] || NAMES[ALIAS[species]] || NAMES[outfitSpeciesOf(species)] || {})[gender] || null;
   function outfitName(species, gender) {
     const e = entry(species, gender);
     return e ? e[0] : null;
@@ -2170,6 +2358,11 @@
   var PUP_SUIT = petsuit(C.black, C.wine, C.plum, C.wine, C.black, C.black, C.silver);
   var FOX_SUIT = petsuit(C.black, C.cognac, C.wine, C.cream, C.cream, C.cognac, C.brass);
   var PIG_SUIT = petsuit(C.pinkpig, C.rose, C.cognac, C.rose, C.hoof, C.cognac, C.brass);
+  var DOG_SUIT = petsuit(C.cognac, C.cream, C.hoof, C.cream, C.cream, C.hoof, C.brass);
+  var WOLF_SUIT = petsuit("#4A4A52", C.silver, C.black, C.silver, C.silver, C.black, C.silver);
+  var CAT_SUIT = petsuit(C.black, C.wine, C.plum, C.wine, C.black, C.black, C.silver);
+  var RABBIT_LEGS = petsuit(C.mint, C.cream, C.cognac, C.cream, C.cream, C.cognac, C.brass).legs;
+  var SHEEP_LEGS = petsuit(C.cream, C.lilac, C.lav, C.lilac, C.hoof, C.cognac, C.brass).legs;
   var GOAT_LEGS = petsuit(C.blue, C.cream, C.cognac, C.cream, C.hoof, C.cognac, C.brass).legs;
   var mitts = (mitt, shoe, cuff, ring) => [mitt, shoe, cuff, ring, "Default", mitt, shoe, cuff, ring, cuff, ring, "Default", "Default"];
   var KIT = {
@@ -2341,14 +2534,154 @@
         ["ItemNose", "NoseRing", C.brass],
         ["ItemMouth", "BitGag", [C.hoof, C.cognac]]
       ]
+    },
+    // rats (Laynie, Oct 26: "a ratslut option would be nice with a set of outfits"): the goth look in dusty grey and
+    // gutter pink, round mouse ears and a long bare tail, a livestock tag on a locked collar, cuffed and hobbled
+    rat: {
+      label: "Rat",
+      look: "goth",
+      pal: { a: "#5E5862", b: C.rose, leg: C.black },
+      pieces: [
+        ["HairAccessory2", "MouseEars2", "#8A8290"],
+        ["TailStraps", "MouseTailStrap1", C.pinkpig],
+        ["ItemNeck", "LeatherCollar", C.rose, L],
+        ["ItemNeckAccessories", "CollarNameTagLivestock", "Default"],
+        ["ItemNeckRestraints", "CollarLeash", [C.rose, C.black, C.silver]],
+        ["ItemMouth", "RingGag", C.rose],
+        ["ItemArms", "LeatherCuffs", [C.black, C.silver], L, "Both"],
+        ["ItemFeet", "LeatherAnkleCuffs", [C.silver, C.black, C.silver], false, "Chained"]
+      ]
+    },
+    // their own sets (Laynie, Oct 26: they used to wear a cousin's): a bull isn't a cow, a horse isn't a pony, and so on
+    // bulls: black and cognac, horns dark, belled and nose-ringed, wrists cuffed and ankles hobbled
+    bull: {
+      label: "Bull",
+      look: "goth",
+      pal: { a: C.black, b: C.cognac, leg: C.black },
+      pieces: [
+        ["HairAccessory2", "CowEars", "Default"],
+        ["HairAccessory1", "CowHorns", C.hoof],
+        ["TailStraps", "CowtailStrap", "Default"],
+        ["ItemNeck", "LeatherCollar", C.cognac, L],
+        ["ItemNeckAccessories", "CollarCowBell", "Default"],
+        ["ItemNose", "NoseRing", C.brass],
+        ["ItemNeckRestraints", "CollarLeash", [C.black, C.cognac, C.brass]],
+        ["ItemMouth", "RingGag", C.black],
+        ["ItemArms", "LeatherCuffs", [C.cognac, C.brass], L, "Both"],
+        ["ItemFeet", "LeatherAnkleCuffs", [C.brass, C.cognac, C.brass], false, "Chained"]
+      ],
+      tits: [["Bra", "CowPrintedBra", "Default"], ["ItemNipples", "LactationPump", "Default", false, "MediumSuction"]],
+      pussy: [["Panties", "CowPrintedPanties", "Default"]]
+    },
+    // horses: chestnut and cream show tack (a pony's goth black, but in a big horse's colours)
+    horse: {
+      label: "Horse",
+      look: "goth",
+      pal: { a: "#5A3420", b: C.cream, leg: "#5A3420" },
+      pieces: [
+        ["HairAccessory2", "PonyEars1", "#5A3420"],
+        ["TailStraps", "HorseTailStrap", "#3A2214"],
+        ["ItemNeck", "PostureCollar", C.cognac, L],
+        ["ItemMouth", "HarnessPonyBits", [C.silver, C.cognac, C.silver], false, "Attached"],
+        ["ItemTorso", "LeatherHarness", C.cream],
+        ["ItemHands", "PonyMittensBinder", mitts("#5A3420", C.silver, C.cognac, C.silver), L, "Chained"],
+        ["ItemBoots", "PonyBoots", "#5A3420"],
+        ["ItemFeet", "LeatherAnkleCuffs", [C.silver, C.cognac, C.silver], false, "Chained"],
+        ["ItemNeckRestraints", "CollarLeash", [C.cream, C.cognac, C.silver]]
+      ]
+    },
+    // dogs: a big tan farm dog in cognac and cream, brass-tagged
+    dog: {
+      label: "Dog",
+      look: "goth",
+      pal: { a: C.cognac, b: C.cream, leg: C.cognac },
+      pieces: [
+        ["HairAccessory2", "PuppyEars1", C.cognac],
+        ["TailStraps", "PuppyTailStrap", C.cognac],
+        ["ItemNeck", "DogCollar", C.hoof, L],
+        ["ItemNeckAccessories", "CollarPupBone", "Default"],
+        ["ItemNeckRestraints", "CollarLeash", [C.hoof, C.cognac, C.brass]],
+        ["ItemMouth", "RingGag", C.hoof],
+        ["ItemArms", "PawPaddedPetsuitArms", DOG_SUIT.arms, false, "Padding"],
+        ["ItemLegs", "PawPaddedPetsuitLegs", DOG_SUIT.legs, false, "Padding"]
+      ]
+    },
+    // wolves: storm grey and silver, a black collar and a chain lead, tame-ish
+    wolf: {
+      label: "Wolf",
+      look: "goth",
+      pal: { a: "#3A3A42", b: C.silver, leg: C.black },
+      pieces: [
+        ["HairAccessory2", "PuppyEars1", "#4A4A52"],
+        ["TailStraps", "PuppyTailStrap", "#4A4A52"],
+        ["ItemNeck", "LeatherCollar", C.black, L],
+        ["ItemNeckRestraints", "CollarLeash", [C.black, C.black, C.silver]],
+        ["ItemMouth", "RingGag", C.black],
+        ["ItemArms", "PawPaddedPetsuitArms", WOLF_SUIT.arms, false, "Padding"],
+        ["ItemLegs", "PawPaddedPetsuitLegs", WOLF_SUIT.legs, false, "Padding"]
+      ]
+    },
+    // cats: the kitty's lilac turned black cat, wine and plum, belled
+    cat: {
+      label: "Cat",
+      look: "goth",
+      pal: { a: C.black, b: C.wine, leg: C.black },
+      pieces: [
+        ["HairAccessory2", "KittenEars2", C.black],
+        ["TailStraps", "KittenTailStrap1", C.black],
+        ["ItemNeck", "LeatherCollarBell", C.wine, L],
+        ["ItemNeckRestraints", "CollarLeash", [C.wine, C.black, C.silver]],
+        ["ItemMouth", "RingGag", C.wine],
+        ["ItemArms", "PawPaddedPetsuitArms", CAT_SUIT.arms, false, "Padding"],
+        ["ItemLegs", "PawPaddedPetsuitLegs", CAT_SUIT.legs, false, "Padding"]
+      ]
+    },
+    // rabbits: a mint and cream doe on pet legs (made to kneel and be bred), cuffed, bow collar
+    rabbit: {
+      label: "Rabbit",
+      look: "pastel",
+      pal: { a: C.mint, b: C.cream, leg: C.mint },
+      pieces: [
+        ["HairAccessory2", "BunnyEars1", C.rope],
+        ["TailStraps", "BunnyTailStrap", C.cream],
+        ["ItemNeck", "LeatherCollarBow", C.mint, L],
+        ["ItemArms", "LeatherCuffs", [C.mint, C.brass], L, "Both"],
+        ["ItemLegs", "PawPaddedPetsuitLegs", RABBIT_LEGS, false, "Padding"],
+        ["ItemNeckRestraints", "CollarLeash", [C.mint, C.cognac, C.brass]],
+        ["ItemMouth", "RingGag", C.mint]
+      ],
+      tits: [["Cloth", "TransparentBunnyGirl", C.mint]],
+      noBow: true
+    },
+    // sheep: fluffy cream and lilac, curled horns, a puff of a tail, hoof mittens and pet legs, belled
+    sheep: {
+      label: "Sheep",
+      look: "pastel",
+      pal: { a: C.lilac, b: C.cream, leg: C.cream },
+      pieces: [
+        ["HairAccessory1", "Horns2", C.cream],
+        ["HairAccessory2", "Ears2", C.cream],
+        ["TailStraps", "BunnyTailStrap", C.cream],
+        ["ItemNeck", "LeatherCollar", C.lav, L],
+        ["ItemNeckAccessories", "CollarBell", C.brass],
+        ["ItemMouth", "RingGag", C.lilac],
+        ["ItemHands", "PonyMittensBinder", mitts(C.cream, C.hoof, C.lav, C.brass), L, "Chained"],
+        ["ItemLegs", "PawPaddedPetsuitLegs", SHEEP_LEGS, false, "Padding"]
+      ]
     }
   };
   var OUTFIT_SPECIES = Object.keys(KIT);
-  var ALIAS2 = { bull: "cow", horse: "pony", dog: "pup", wolf: "pup", cat: "kitt", rabbit: "bunny", sheep: "goat" };
+  var ALIAS2 = { mouse: "rat" };
+  function outfitSpeciesOf(species) {
+    const raw = String(species || "").toLowerCase().trim();
+    if (KIT[raw]) return raw;
+    const k = speciesKeyOf(raw) || raw;
+    return KIT[k] ? k : KIT[ALIAS2[k]] ? ALIAS2[k] : null;
+  }
   var speciesLabel = (sp) => (KIT[sp] || {}).label || sp;
   var BODY = { female: { tits: true, pussy: true }, male: { cock: true, flat: true }, futa: { tits: true, pussy: true, cock: true }, femboy: { cock: true, flat: true }, nonbinary: { pussy: true, flat: true } };
   function outfitPieces(species, gender) {
-    const K = KIT[species] || KIT[ALIAS2[species]], B = BODY[gender];
+    const K = KIT[outfitSpeciesOf(species)], B = BODY[gender];
     const W = gender === "femboy" ? FEMBOY : (WEAR[K && K.look] || {})[gender];
     if (!K || !W) return null;
     const by = /* @__PURE__ */ new Map();
@@ -2387,12 +2720,12 @@
     { name: "Suggestion box", cmds: ["feedback <what you think>", "suggest <an idea>", "bug <what went wrong>", "feedback mine", "meh", "more"] },
     { name: "Gettin' started", cmds: ["help", "help me", "rules", "consent", "tour", "apply", "friend", "species", "luxury", "doors", "addons"] },
     { name: "You and the farm", cmds: ["today", "record", "keys", "who", "herd", "notice", "weather", "feeding", "curfew", "beg"] },
-    { name: "Milk", cmds: ["stats", "board", "milkable", "quota"] },
+    { name: "Milk", cmds: ["stats", "board", "milkable", "seedmilk", "quota"] },
     { name: "Stock with stock", cmds: ["milk <who>", "edge <who>", "groom <who>"] },
     { name: "Breedin'", cmds: ["breedable", "fertile", "mpreg", "freeuse", "jarok", "yes", "no", "naturalheat", "breed <who>", "cum <who>", "wash", "tally", "eggs", "praise", "degrade", "rights", "accept", "pedigree"] },
     { name: "Body", cmds: ["size", "measure", "penis", "futa", "gender <word>"] },
     { name: "Roamin'", cmds: ["roam", "roam start", "roam back"] },
-    { name: "Clothes", cmds: ["dressme", "outfit", "outfits", "uniform", "outfit back", "outfit starters", "outfit about <species> <gender>"] },
+    { name: "Clothes", cmds: ["dressme", "outfit", "outfits", "uniform", "outfit back", "outfit starters", "outfit about <species> <gender>", "outfitwheel", "outfitwheel status"] },
     { name: "Mind", cmds: ["hypno", "hypnotize me", "echs", "teaseme", "teaseme light", "teaseme steady", "teaseme needy", "teaseme off"] },
     { name: "Fun", cmds: ["fair", "enter"] },
     { name: "Ribbons and the store", cmds: ["ribbons", "ribbons top", "store", "buy <item>", "gift <who> <potion>", "potions", "potions on", "dares on", "dare", "dared", "dare skip", "bench", "bench on", "bench me <minutes>", "use <mouth|pussy|ass>", "bench top"] }
@@ -2402,7 +2735,7 @@
     { name: "Herd", cmds: ["claim <who>", "release <who>", "myherd", "herdname <name>", "herdcall", "herdsummon", "turnout <who>", "letup <who>", "brand <who>", "walk <who>"] },
     { name: "Stock", cmds: ["tier <who> <tier>", "stocks <who>", "unstock <who>", "vet <who>", "inspect <who>", "tease list", "tease add <line>", "tease for <who> <line>", "teaseme <who> on", "roam give <who>", "roam <who>", "hypnotize <who>", "allow <who> cum", "allow <who> all", "echs <who>"] },
     { name: "Contracts", cmds: ["contract list", "contract show deep <who>", "contract offer deep <who> 1w", "contract check <who>", "contract release <who>", "contract rules", "contracts"] },
-    { name: "Outfits", cmds: ["outfit", "outfit offer <who>", "outfit offer <who> <species> <gender>"] },
+    { name: "Outfits", cmds: ["outfit", "outfit offer <who>", "outfit offer <who> <species> <gender>", "outfitwheel <who>", "outfitwheel stop <who>"] },
     { name: "Barn", cmds: ["milk <who>", "collect <who>", "jars", "inseminate <who> <jar>", "machine <who> <jar>", "drain <who>", "edge <who>", "denial <who>", "ruin <who>", "nomilk <who> <hours>", "quota <who>", "heat <who>", "heatline", "shotlog"] },
     { name: "Map", cmds: ["spot", "spot set <name>", "spot place <name> <x> <y>", "zone", "zone who", "zone a <name>", "zone b <name>", "zone box <name> <ax> <ay> <bx> <by>", "zone pair <name> <group>", "tourstop", "setrescue", "where", "stucklog"] },
     { name: "Voice", cmds: ["voice", "voice on herd", "voice add herd <line>", "voice every herd 15"] },
@@ -2415,7 +2748,7 @@
   ];
 
   // bot/src/version.js
-  var VERSION = "0.49.1";
+  var VERSION = "0.50.0";
 
   // bot-parts:farmhand-bot-parts
   (function() {
@@ -3220,6 +3553,8 @@
         wolf: { milk: 1, fert: 1.1, litter: [3, 6] },
         goat: { milk: 1.5, fert: 1.1, litter: [1, 3] },
         sheep: { milk: 1, fert: 1, litter: [1, 2] },
+        rat: { milk: 1, fert: 1.7, litter: [6, 12] },
+        // (Oct 26: the ratsluts)
         default: { milk: 1, fert: 1, litter: [1, 2] }
       },
       // keywords in a crafted item's name or description (worn, or on an injector)
@@ -5160,6 +5495,11 @@
           companionTooOld(mn, String(m.ver || ""));
         } catch (e) {
         }
+        {
+          const r = rec(mn);
+          if (r && r.outfitOwed) later(() => contractOutfitNow(mn), 2500);
+          if (r && r.tempOutfit && r.tempOutfit.due) later(() => tempOutfitEnd(mn, r.tempOutfit && r.tempOutfit.due), 2e3);
+        }
         return;
       }
       if (m.type === "bye") {
@@ -5406,8 +5746,8 @@
       if (Date.now() - last < CFG.GREET_COOLDOWN_MIN * 6e4) return;
       state.greeted.set(mn, Date.now());
       const r0 = rec(mn);
-      const known = L2.archive[mn] || r0 && r0.roles && r0.roles.length;
-      const pool = (known ? RETURN_GREETINGS : GREETINGS).filter(greetFits);
+      const known2 = L2.archive[mn] || r0 && r0.roles && r0.roles.length;
+      const pool = (known2 ? RETURN_GREETINGS : GREETINGS).filter(greetFits);
       const own = customGreeting(mn);
       const line = own || pool[Math.floor(Math.random() * pool.length)];
       later(() => say2(fill(line, mn), false, mn), 1500);
@@ -5468,6 +5808,7 @@
       freeuse: "freeuse",
       futa: "futa",
       milkable: "milkable",
+      seedMilk: "seedmilk",
       naturalHeat: "naturalheat",
       praiseMe: "praise",
       degradeMe: "degrade",
@@ -5520,7 +5861,7 @@
         herdLeader: herdLeaderOf(mn) ? plainName(herdLeaderOf(mn)) : null,
         switches: {}
       });
-      for (const k in SWITCH_CMDS) s.switches[SWITCH_CMDS[k]] = k === "jarok" ? r.jarok !== false : k === "trapsOn" ? isSubject(mn) : k === "teaseMe" ? !!teaseRate(r) : k === "milkable" ? makesMilk(mn) : !!r[k];
+      for (const k in SWITCH_CMDS) s.switches[SWITCH_CMDS[k]] = k === "jarok" ? r.jarok !== false : k === "trapsOn" ? isSubject(mn) : k === "teaseMe" ? !!teaseRate(r) : k === "milkable" ? makesMilk(mn) : k === "seedMilk" ? r.seedMilk !== false : !!r[k];
       try {
         const p = prodOf(mn), now = Date.now();
         if (makesMilk(mn)) s.milk = { ml: shownMl(p.milk), cap: Math.round(milkCap(mn)), grade: milkGrade(mn), lastAt: p.lastMilkAt || 0 };
@@ -5745,7 +6086,8 @@
     }
     function speciesKey(mn) {
       const s = String((rec(mn) || {}).species || "").toLowerCase();
-      for (const k of Object.keys(CFG.SPECIES)) if (k !== "default" && s.includes(k)) return k;
+      const k0 = speciesKeyOf(s);
+      if (k0 && CFG.SPECIES[k0]) return k0;
       return "default";
     }
     function speciesInfo(mn) {
@@ -6118,6 +6460,29 @@
       if (!r) return false;
       if (r.milkable === true || r.milkable === false) return r.milkable;
       return (hasRole(mn, ROLE.LIVESTOCK) || !!r.futa) && !limitBlocks(mn, "milk");
+    }
+    function seedMilkable(mn) {
+      const r = rec(mn);
+      return !!r && makesSemen(mn) && r.seedMilk !== false;
+    }
+    function seedMilkCommand(mn, r, v, R) {
+      if (!makesSemen(mn)) {
+        R("You've no seed to milk, sugar, so there's nothin' to switch. (?milkable is the one for milk.)");
+        return;
+      }
+      if (!v) {
+        R(switchStatus("seedmilk", r.seedMilk !== false) + " On: the stall, the milkin' traps and ?collect take your seed too. Off: they leave your cock and balls be.");
+        return;
+      }
+      if (!["on", "off", "yes", "no"].includes(v)) {
+        R("Just say ?seedmilk on or ?seedmilk off, sweetie (or ?milkable seed on|off).");
+        return;
+      }
+      r.seedMilk = v === "on" || v === "yes";
+      saveLedger();
+      audit(mn, "SEEDMILK", r.seedMilk ? "on" : "off");
+      syncCompanions(true);
+      R(r.seedMilk ? "\u{1F402} Your seed gets milked too now, sugar: the stall, the milkin' traps and ?collect will take it." : "\u{1F95B} Your seed's left be, sugar. The stall and the milkin' traps milk you up top only, and nobody can ?collect you. Breedin' still spends it, of course.");
     }
     function milkRate(mn) {
       const p = prodOf(mn), now = Date.now();
@@ -6670,7 +7035,7 @@
         const p = prodOf(mn);
         const keepM = milkCap(mn) * stallShare(mn), keepS = semenCap(mn) * stallShare(mn);
         const doM = makesMilk(mn) && !milkDenied(mn) && !gearOf(mn).milk && p.milk > keepM;
-        const doS = makesSemen(mn) && p.semen > keepS;
+        const doS = seedMilkable(mn) && p.semen > keepS;
         if (!p.stall && !doM && !doS) {
           p.stallSeen = (p.stallSeen || 0) + 1;
           if (p.stallSeen >= 2 && !p.stallWhyTold) {
@@ -7552,6 +7917,7 @@
         rabbit: "sweet and light",
         deer: "clean and grassy",
         goblin: "funky and bitter",
+        rat: "sharp and musky",
         dragon: "smoky and hot"
       }[k];
       return "It tastes " + (by || "salty and warm") + (pent ? ", and so thick from bein' pent up it clings to the throat" : "") + ".";
@@ -8483,14 +8849,14 @@
         }
         contractSignedNow(mn);
         notifyStaff("\u{1F4DC} " + plainName(mn) + ' signed the farm contract "' + m[1] + '".', true);
-        const tpl = x && contractTemplate(x.tpl), dress = tpl ? tpl.outfit === void 0 ? "auto" : tpl.outfit : "";
+        const tpl = x && contractTemplate(x.tpl), dress = tpl ? tpl.outfit === void 0 ? "auto" : tpl.outfit : "auto";
         const slot = dress === "auto" ? outfitSlotFor(mn) : dress, r = rec(mn);
         if (slot && r && r.ownOutfit) later(() => tell(mn, "\u{1F457} You brought your own outfit, sugar, so you're stayin' in the look you came in. (?ownoutfit off and the farm dresses you for your next contract.)"), 3e3);
         else if (slot && r && !r.contractDressedAt) {
-          r.contractDressedAt = Date.now();
+          r.outfitOwed = { slot, at: Date.now() };
           saveLedger();
-          later(() => offerOutfit(mn, slot, "It goes with your new contract", true), 3e3);
-        }
+          later(() => contractOutfitNow(mn), 3e3);
+        } else if (!slot && r && !r.contractDressedAt && !r.ownOutfit) notifyStaff("\u{1F457} " + plainName(mn) + " signed a contract but I have no outfit for their kind (" + (r.species || "no species") + ", " + genderOf(mn) + "). ?outfit offer " + plainName(mn) + " <slot> to dress 'em by hand.", false);
         later(() => enqueue(queryMsg(mn)), 2e3);
         return true;
       }
@@ -8587,8 +8953,11 @@
     }
     function outfitSlotFor(mn) {
       outfitsLedger();
-      const r = rec(mn) || {}, sp = String(r.species || "").toLowerCase(), g = genderOf(mn);
-      return [sp + "|" + g, sp + "|*", "*|" + g].find((k) => L2.outfits[k]) || (farmOutfit("farm:" + sp + "|" + g) ? "farm:" + sp + "|" + g : null) || (L2.outfits.stock ? "stock" : null);
+      const r = rec(mn) || {}, raw = String(r.species || "").toLowerCase().trim(), g = genderOf(mn);
+      const key = speciesKeyOf(raw), kit = outfitSpeciesOf(raw);
+      const names = [...new Set([raw, key, kit, key === "kitt" ? "kitty" : null, key === "kitt" ? "cat" : null].filter(Boolean))];
+      const saved = names.map((sp) => sp + "|" + g).concat(names.map((sp) => sp + "|*"), ["*|" + g]).find((k) => L2.outfits[k]);
+      return saved || (kit && farmOutfit("farm:" + kit + "|" + g) ? "farm:" + kit + "|" + g : null) || (L2.outfits.stock ? "stock" : null);
     }
     function farmOutfit(slot) {
       const m = /^farm:([a-z]+)\|([a-z]+)$/.exec(String(slot || ""));
@@ -8639,6 +9008,44 @@
       audit(CFG.BOT_MEMBER, "OUTFIT_OFFER", mn + " " + slot);
       return "";
     }
+    function contractOutfitNow(mn) {
+      const r = rec(mn), o = r && r.outfitOwed;
+      if (!o || r.contractDressedAt || r.ownOutfit) {
+        if (r && o) {
+          r.outfitOwed = null;
+          saveLedger();
+        }
+        return;
+      }
+      if (Date.now() - o.at > 7 * 24 * 36e5) {
+        r.outfitOwed = null;
+        saveLedger();
+        return;
+      }
+      if (!hasCompanion(mn)) {
+        if (!o.told) {
+          o.told = true;
+          saveLedger();
+          tell(mn, "\u{1F457} Your new contract comes with the " + slotLabel(o.slot) + ". Turn on the Companion and it goes on you the moment it's back, or staff can help you dress by hand.");
+        }
+        return;
+      }
+      if (o.sentAt && Date.now() - o.sentAt < 6e4) return;
+      if ((o.sends || 0) >= 3) {
+        r.outfitOwed = null;
+        saveLedger();
+        return;
+      }
+      o.sentAt = Date.now();
+      o.sends = (o.sends || 0) + 1;
+      saveLedger();
+      const err = offerOutfit(mn, o.slot, "It goes with your new contract", true);
+      if (err) {
+        r.outfitOwed = null;
+        saveLedger();
+        notifyStaff("\u{1F457} Couldn't dress " + plainName(mn) + " for their contract: " + err, false);
+      }
+    }
     function saveOutfit(mn, m) {
       if (!isProprietor(mn)) {
         toCompanion(mn, "Savin' farm outfits is for the proprietors, sugar.", "reply");
@@ -8661,11 +9068,35 @@
       later(() => syncCompanions(true), 500);
     }
     function outfitAnswer(mn, m) {
+      try {
+        tempOutfitAnswer(mn, m);
+      } catch (e) {
+        warn("temp outfit:", e);
+      }
       if (m.answer === "worn") {
         audit(mn, "OUTFIT_WORN", String(m.slot || ""));
+        {
+          const r = rec(mn);
+          if (r && r.outfitOwed && r.outfitOwed.slot === String(m.slot || "")) {
+            r.outfitOwed = null;
+            r.contractDressedAt = Date.now();
+            saveLedger();
+          }
+        }
         if (onMap(mn)) emote("\u{1F457} " + plainName(mn) + " changes into " + (String(m.slot || "").startsWith("uniform:") ? "their farm uniform" : /^farm:/.test(String(m.slot || "")) && farmName(String(m.slot)) ? "the " + farmName(String(m.slot)) : "their farm outfit") + (m.locks ? ", and the padlocks click shut" : "") + ".");
       } else if (m.answer === "declined") audit(mn, "OUTFIT_DECLINED", String(m.slot || ""));
       else if (m.answer === "back") audit(mn, "OUTFIT_BACK", "");
+      else if (m.answer === "failed") {
+        audit(mn, "OUTFIT_FAILED", String(m.slot || "") + " " + String(m.why || "").slice(0, 120));
+        const r = rec(mn);
+        notifyStaff("\u{1F457} " + plainName(mn) + "'s Companion couldn't put on " + slotLabel(String(m.slot || "")) + ": " + String(m.why || "no reason given").slice(0, 160) + ". ?outfit offer " + plainName(mn) + " to try again.", false);
+        if (r && r.outfitOwed && r.outfitOwed.slot === String(m.slot || "")) {
+          r.outfitOwed.tries = (r.outfitOwed.tries || 0) + 1;
+          if (r.outfitOwed.tries >= 2) r.outfitOwed = null;
+          else r.outfitOwed.sentAt = 0;
+          saveLedger();
+        }
+      }
     }
     function ownOutfitCommand(sender, args, R) {
       const r = rec(sender);
@@ -8683,6 +9114,7 @@
       syncCompanions(true);
       R(r.ownOutfit ? "\u{1F457} Bring your own outfit: ON. Sign a contract and you stay in the look you came in. Staff can still offer you one, and you can say no." : "\u{1F457} Bring your own outfit: off. " + (r.contractDressedAt ? "You've had your farm outfit already, so nothin' changes unless staff offer you one." : "Your first contract dresses you in the farm's outfit for your kind."));
     }
+    if (W.__FARMHAND_TEST__) Object.assign(W, { __outfitSlot: (m) => outfitSlotFor(m), __contractOutfit: (m) => contractOutfitNow(m) });
     function zonesLedger() {
       L2.zones = L2.zones || {};
     }
@@ -9301,9 +9733,9 @@
       const hits = all.filter((a) => norm(a.name).startsWith(norm(q)) || norm(a.label).startsWith(norm(q)));
       return hits.length === 1 ? hits[0] : null;
     }
-    function addonsText(topic) {
+    function addonsText(topic, mn) {
       if (topic) {
-        const a = findAddon(topic);
+        const a0 = findAddon(topic), a = a0 && (mn === void 0 || addonVisible(a0, mn)) ? a0 : null;
         if (!a) return "There's no add-on called '" + topic + "', hon. ?addons lists 'em.";
         return "\u{1F9E9} " + a.label + " v" + a.version + (a.enabled === false ? " (switched off)" : "") + "\n" + (a.guide || "No guide written yet.") + "\n\nCommands: " + (Object.entries(a.commands).map(([w, c]) => "?" + (c.usage || w) + (c.rank && c.rank !== "anyone" ? " (" + c.rank + ")" : "")).join(" \xB7 ") || "none");
       }
@@ -9679,6 +10111,13 @@
       kitt: ["a needy mewl", "a soft, broken purr", "a breathy mew"],
       cat: ["a needy mewl", "a rumbling purr", "a breathy mew"],
       goblin: ["a ragged little cackle that turns into a moan", "a breathless giggle"],
+      bunny: ["a breathless little squeak", "a soft, hitching whimper", "a shaky squeak"],
+      rabbit: ["a breathless squeak", "a soft, hitching whimper", "a startled little squeak"],
+      fox: ["a high, needy yip", "a soft whine", "a breathless little yip"],
+      wolf: ["a low, wavering howl", "a needy whine", "a rough, shaky growl"],
+      goat: ["a shaky bleat", "a wavering little maa", "a breathless bleat"],
+      sheep: ["a soft, wobbly baa", "a needy little baa", "a breathy bleat"],
+      rat: ["a high, needy squeak", "a breathless chitter", "a shaky little squeak"],
       default: ["a soft moan", "a needy whimper", "a shaky gasp"]
     };
     const STALL_STORY = {
@@ -10191,7 +10630,7 @@
         "%n grunts happily, snout twitching, wriggling deeper into the straw.",
         "%n's curly tail wiggles every time the pump pulls."
       ] },
-      canid: { part: "any", when: (mn) => ["pup", "dog"].includes(speciesKey(mn)), lines: [
+      canid: { part: "any", when: (mn) => ["pup", "dog", "wolf", "fox"].includes(speciesKey(mn)), lines: [
         "%n's tail wags helplessly, thumping against the stall's boards.",
         "%n pants, tongue lolling, and lets out a happy little whine.",
         "%n's ears flatten, then perk, as the machine changes pace."
@@ -10200,6 +10639,21 @@
         "%n's tail lashes and curls, and a purr rumbles out of them despite themself.",
         "%n kneads the padded rail, purring.",
         "%n's ears flatten back as the machine pulls, then relax again."
+      ] },
+      leporid: { part: "any", when: (mn) => ["bunny", "rabbit"].includes(speciesKey(mn)), lines: [
+        "%n's nose twitches nonstop and one foot starts thumpin' against the stall floor.",
+        "%n's long ears flop and quiver with every pull of the machine.",
+        "%n squeaks, breathless, and pushes back into the stall like a bunny that knows exactly what it's for."
+      ] },
+      caprid: { part: "any", when: (mn) => ["goat", "sheep"].includes(speciesKey(mn)), lines: [
+        "%n bleats, high and wavering, and stamps at the stall's floor.",
+        "%n leans hard into the rail and lets out a long, wobbly bleat.",
+        "%n's ears flick and droop as the stall settles into its rhythm."
+      ] },
+      rodent: { part: "any", when: (mn) => speciesKey(mn) === "rat", lines: [
+        "%n's whiskers twitch and their long tail curls tight round the rail.",
+        "%n squeaks and chitters in the stall, little hands gripping the padding.",
+        "%n's round ears flatten back, then twitch forward again, every time the machine changes pace."
       ] },
       goblin: { part: "any", when: (mn) => speciesKey(mn) === "goblin", lines: [
         "%n cackles breathlessly, then moans, then cackles again.",
@@ -11316,7 +11770,7 @@
         kind: "silly",
         mins: 60,
         price: 5,
-        desc: "For an hour you're a different animal. Noises, stall story and all.",
+        desc: "For an hour you're a different animal. Noises, stall story, and its outfit too (with the Companion, unless you bring your own).",
         limit: /\bspecies/i,
         drink: "It tastes like somebody else's feed. Your whole body goes a bit\u2026 different.",
         seen: "%n drinks a Wrong Barn and blinks. They don't seem quite like themselves."
@@ -11598,6 +12052,13 @@
         f.was = r.species;
         f.to = SHOWN_SPECIES[to] || to;
         r.species = f.to;
+        later(() => {
+          try {
+            wrongBarnOutfit(mn, f.to, P.mins);
+          } catch (e) {
+            warn("wrong barn outfit:", e);
+          }
+        }, 1500);
       }
       if (P.id === "bigbritches" || P.id === "shrink") {
         const part = potionPart(mn);
@@ -11615,6 +12076,7 @@
       const p = prodOf(mn);
       if (id === "bitterroot" && p) p.deniedUntil = Math.min(p.deniedUntil || 0, Date.now());
       if (id === "wrongbarn" && r.species === f.to) r.species = f.was || r.species;
+      if (id === "wrongbarn" && r.tempOutfit && r.tempOutfit.src === "wrongbarn") tempOutfitEnd(mn, "potion");
       if ((id === "bigbritches" || id === "shrink") && f.part && f.was) setSize(mn, f.part, f.was, false);
       if (id === "heatmist" && p && p.heat && p.heat.by === f.by) p.heat.until = Math.min(p.heat.until, Date.now());
       if (id === "brood" && p && p.boosts) {
@@ -13124,6 +13586,7 @@
       body: ["chest", "tummy", "face"]
     };
     function bodyMark(mn, payload) {
+      if (mn && mn !== CFG.BOT_MEMBER) messNoted(mn, payload);
       if (!mn || mn === CFG.BOT_MEMBER || !hasCompanion(mn)) return false;
       enqueue(makeMsg("mark", payload, mn));
       return true;
@@ -13542,7 +14005,7 @@
         }
         case "milker": {
           trapHold(mn, 4, "the milker");
-          const m0 = makesMilk(mn) ? p.milk : 0, s0 = makesSemen(mn) ? p.semen : 0;
+          const m0 = makesMilk(mn) ? p.milk : 0, s0 = seedMilkable(mn) ? p.semen : 0;
           trapRun(mn, kind, (m0 >= s0 ? T.milk : T.seed).concat(T.both), () => {
             const gotM = m0 > 0 ? drainMilk(mn, p.milk) : 0, gotS = s0 > 0 ? drainSemen(mn, p.semen) : 0;
             emote("\u{1F95B} " + tFill(pickFor(mn, "trap:milker:end", T.end), mn, { ml: ml(gotM + gotS) }), mn);
@@ -15065,7 +15528,7 @@
       pillory: (mn) => limitBlocks(mn, "breed") ? "their limits rule it out" : null,
       cups: (mn) => (makesMilk(mn) || hasPart(mn, "udder")) && !limitBlocks(mn, "milk") ? null : "nothin' for the cups to work on",
       vines: (mn) => limitBlocks(mn, "eggs") || limitBlocks(mn, "heat") ? "their limits rule it out" : null,
-      weights: (mn) => makesSemen(mn) ? null : "no balls to weigh down",
+      weights: (mn) => !makesSemen(mn) ? "no balls to weigh down" : !seedMilkable(mn) ? "they've said ?milkable seed off" : null,
       trough: (mn) => rec(mn).watersports ? null : "they haven't said ?watersports on",
       wall: (mn) => limitBlocks(mn, "breed") ? "their limits rule it out" : null
     };
@@ -16074,7 +16537,7 @@
         anthroScene(mn, "scarecrow", spot);
       },
       carousel(mn) {
-        const T = TRAPS2_LINES.carousel, p = prodOf(mn), r = rec(mn), milk = makesMilk(mn) && p.milk >= 1, seed = makesSemen(mn);
+        const T = TRAPS2_LINES.carousel, p = prodOf(mn), r = rec(mn), milk = makesMilk(mn) && p.milk >= 1, seed = seedMilkable(mn);
         const hole = r.breedable && !limitBlocks(mn, "breed") ? openHole(mn, "vulva") : null, v = { h: hole && hole !== "mouth" ? TRAP_HOLE[hole] : "" };
         trapHold(mn, 5, "the milkin' carousel");
         trapRun(mn, "carousel", [T.board].concat([milk || !seed ? T.milk : T.sleeve], [v.h ? T.fill : T.tease], [T.round]), () => {
@@ -16394,7 +16857,7 @@
       return Object.keys(L2.people).map(Number).find((o) => o !== mn && canWrestle(o) && near2(o)) || null;
     }
     Object.assign(TRAP_NEEDS, {
-      collection: (mn) => makesSemen(mn) ? null : "no cock to collect from",
+      collection: (mn) => !makesSemen(mn) ? "no cock to collect from" : !seedMilkable(mn) ? "they've said ?milkable seed off" : null,
       mudpit: (mn) => mudPartner(mn) ? null : "nobody close by to wrestle",
       auction: (mn) => state.lend ? "somebody's already on the block" : null
     });
@@ -20549,34 +21012,196 @@
     );
     const WASH_LINES = {
       start: [
-        '%n steps up to the wash trough and somebody hands them a bucket, a brush and a cake of yellow soap. "Go on, then."',
+        '[walk]%n steps up to the wash trough and somebody hands them a bucket, a brush and a cake of yellow soap. "Go on, then."',
         'A farmhand drags the hose over to %n, thumbs the nozzle and grins. "Hold still, you mucky thing."',
-        "%n climbs into the big tin wash tub by the pump while a farmhand works the handle, and the first cold gush makes them yelp.",
-        "The wash-down stall's free. %n steps in, the gate swings shut, and the water comes on warm from the tank on the roof."
+        "[walk]%n climbs into the big tin wash tub by the pump while a farmhand works the handle, and the first cold gush makes them yelp.",
+        "[walk]The wash-down stall's free. %n steps in, the gate swings shut, and the water comes on warm from the tank on the roof.",
+        '[fours]%n crawls up to the wash trough on all fours, and a farmhand pats the slab beside it. "Up here. Stay."',
+        "[fours]A farmhand clips a lead to %n's collar and walks them on all fours into the wash-down stall, then shuts the gate behind them.",
+        "[bound]With their arms tied up the way they are, %n's not washin' anything themself. A farmhand rolls up their sleeves.",
+        `[bound]A farmhand takes one look at %n's bound arms, sighs, and fetches the long-handled brush. "Right. I'll do it, then."`,
+        "[cow]%n is led into the cow wash like any other heifer comin' in from the field, and the hose is already runnin'.",
+        "[pony]%n is walked into the wash bay like a pony after a long ride, cross-tied, and the farmhand checks the water's warm.",
+        `[pup]"Bath time," says the farmhand, and %n's ears go back. They get scooped into the tub anyway.`,
+        "[kitt]%n takes one look at the tub and tries to bolt, the way every kitty does, and gets caught by the scruff.",
+        "[bunny]%n is lifted into the wash tub like a rabbit, careful under the middle, and set down in the warm water.",
+        "[pig]%n is hosed off in the pen first, because no pig gets into the clean tub straight out of the wallow.",
+        "[goat]%n is tied up by the trough like any other goat at bath time, already tryin' to chew the soap.",
+        "[deer]%n edges up to the wash trough like a skittish doe, and the farmhand keeps their voice low and their hands slow.",
+        "[fox]%n gets the fox treatment: a farmhand on each side and the gate shut, because a fox will try to slip off wet.",
+        "[goblin]A goblin at the wash trough is a rare sight, and two farmhands hold %n there while a third fills the bucket.",
+        "[rat]%n gets fished out of the hayloft by the tail and dunked in the wash tub, squeakin' all the way down.",
+        `[gag]%n can't say much round what's in their mouth, so the farmhand does the talkin': "In you get. This won't take long."`,
+        "[mud]%n's so caked in mud that the farmhand hoses them off at the gate before they're allowed anywhere near the clean water.",
+        "[cum]%n comes up to the trough drippin' and sticky, and the farmhand just shakes their head and reaches for the big bar of soap.",
+        "[sweet]%n is so sticky with the farm's sweet things that they squeak on the slab, and the bees have already found them.",
+        "[slime]%n is still green and slick in places, and the farmhand pulls on rubber gloves before they start.",
+        "[latex]The livin' latex on %n shines under the pump. The farmhand eyes it, decides to wash round it, and gets on with it.",
+        "[preg]A farmhand helps %n settle onto the low wash stool, careful of that heavy belly, and brings the water to them."
       ],
       scrub: [
         "The brush goes round in hard soapy circles, shoulders first, then down the back, and the water underneath runs every colour of the farm.",
-        "Soap suds pile up on %n like a snowdrift, and a farmhand scrubs behind their ears and under their chin like they're a muddy calf.",
+        "Soap suds pile up on %n like a snowdrift, and a farmhand scrubs behind their ears and under their chin.",
+        "Every crease gets the brush: elbows, knees, the backs of the thighs, the soft places between. %n squirms and the farmhand just scrubs harder.",
         "{t}The suds go on thick over %n's tits and the brush works round and round them, slow, till every sticky streak is gone.",
+        "{t}A soapy hand lifts each of %n's tits in turn and washes underneath, thorough, where the mess always hides.",
+        "{nt}The farmhand scrubs %n's chest flat-handed, quick and brisk, down over the ribs and back up.",
         "{c}A soapy hand works down %n's cock and balls, thorough as a groom with a show bull, and doesn't hurry.",
+        "{c}{nv}The farmhand soaps %n's balls in one hand and rinses the other, and %n's cock has opinions about it.",
         "{v}The farmhand soaps between %n's legs with a flat warm hand, front to back and again, till the last of the mess slides off.",
-        "Every crease gets the brush: elbows, knees, the backs of the thighs, the soft places between. %n squirms and the farmhand just scrubs harder."
+        "{v}{nc}Warm water goes between %n's legs from a jug, and a soapy hand follows it, slow, every fold.",
+        "{fu}A soapy hand gets %n's cock and the pussy under it both, one after the other, and nothin' gets missed.",
+        "{fb}The farmhand scrubs down %n's soft thighs and their pretty little cock, and %n goes pink to the ears.",
+        "{nb}The farmhand works over %n from collar to knees with a soft cloth, thorough and matter-of-fact.",
+        "[cow]The farmhand scrubs %n like a show heifer the night before the fair: curry comb, then the soft brush, then the soap.",
+        "[cow]{t}The farmhand washes %n's udders like a dairy hand would, warm cloth and gentle, and checks each teat as they go.",
+        "[pony]%n is groomed as much as washed: soap on a sponge, then the curry comb in circles, then the body brush with the grain.",
+        "[pony][tail]The farmhand works soap through %n's tail and combs it out strand by strand, like a show pony's.",
+        "[pup]%n gets lathered up like a muddy dog, suds to the ears, and can't stop wigglin' while the farmhand scrubs.",
+        "[pup][tail]%n's tail won't stop waggin', and it flicks suds all over the farmhand, who just scrubs faster.",
+        "[kitt]%n hisses and squirms through the whole scrub like any wet kitty, and the farmhand just keeps a firm hold and gets it done.",
+        "[kitt][tail]The farmhand runs soap down %n's tail and %n yowls like it's the worst thing that's ever happened to them.",
+        "[bunny]%n gets washed soft and slow, ears last, the way you'd wash a nervous rabbit, and their nose never stops twitchin'.",
+        "[pig]%n gets a stiff brush and a lot of elbow grease, the way you'd scrub down a show pig, and still looks pleased about the mud.",
+        "[goat]%n keeps tryin' to eat the soap while they're scrubbed, and the farmhand keeps takin' it back.",
+        "[deer]The farmhand washes %n slow and quiet, a hand on their flank the whole time, the way you'd gentle a doe.",
+        "[fox]%n's scrubbed head to tail, and the farmhand fluffs their tail up in the suds just to watch it get huge.",
+        "[goblin]It takes two goes with the brush to find out what colour %n actually is under all that, and the farmhand's surprised.",
+        "[rat]%n gets scrubbed behind the ears and down the tail with a little bristle brush, squeakin' indignant the whole time.",
+        "[fours]%n stays on all fours on the slab while the farmhand scrubs them from neck to rump, like washin' down any other farm animal.",
+        "[bound]The farmhand washes round every strap and rope on %n, liftin' each one, scrubbin' under it, and settlin' it back.",
+        "[gag]Suds run down round the gag in %n's mouth, and the farmhand wipes their chin with the cloth, quick and kind.",
+        "[cage]The farmhand rinses round the cage on %n with a jug of warm water, carefully, and taps it once with a finger. Still locked.",
+        "[belt]The chastity belt gets a scrub of its own, all round the edges, and the farmhand doesn't so much as look for the key.",
+        "[latex]The soap slides right off the livin' latex. It ripples, clean on its own, and the farmhand only has to wash the skin it's left bare.",
+        "[cum]The cum comes off in sticky strings, and the farmhand has to go over %n twice before the soap even lathers.",
+        "[cum]{v}The farmhand rinses %n out from between the legs with a warm jug, and what comes out goes down the drain in long white ropes.",
+        "[cum]{nv}A warm jug and a patient hand, and the farm's seed comes out of %n's ass and goes swirlin' off down the gutter.",
+        "[mud]The mud comes off in brown sheets, and then in clumps, and then it's the bits that dried in, and those take a nail brush.",
+        "[slime]The slime peels off %n in cold green strips, and the last of it has to be picked out of their hair.",
+        "[sweet]The syrup won't shift with plain water, so the farmhand works warm soap into it till it lets go, sweet-smellin' suds everywhere.",
+        "[milk]The milk's dried tacky on %n's skin, and it comes up white in the suds and smells like the dairy.",
+        "[piss]The farmhand scrubs extra hard where %n was used as a toilet, and adds a second cake of soap for good measure.",
+        "[preg]The farmhand washes %n's big round belly slow and careful, in long strokes, and gets a kick for their trouble."
       ],
       rinse: [
         "Then the rinse: a whole bucket over the head, cold, and the suds run off %n in a white sheet and gurgle away down the drain.",
         "The hose sweeps over %n from crown to heels, slow, chasing the last of the soap, and the water at their feet runs clear at last.",
         "Somebody tips a bucket of warm water over %n's head, then another, then a cold one for luck, and the farm's mess goes swirlin' off down the gutter.",
-        "%n stands under the pump with their eyes shut while the water pours, and every last drip of it washes off clean."
+        "%n shuts their eyes while the water pours, and every last drip of it washes off clean.",
+        "[walk]%n stands under the pump with their face tipped up while the farmhand works the handle, and it all runs off.",
+        "[fours]%n stays on all fours while the hose goes over them, nose down, and the water drips off their chin and belly.",
+        "[bound]The farmhand turns %n round by the arm, rinses the back, turns them again, rinses the front. %n doesn't get a say.",
+        "[pony]The farmhand sponges %n off and then scrapes the water off them with a sweat scraper, the way you'd do a pony.",
+        "[pup]%n shakes halfway through the rinse and soaks the farmhand, who swears and keeps the hose on them.",
+        "[kitt]%n puts up with the rinse with the face of a kitty who'll be holdin' this against everybody for days.",
+        "[cow]The farmhand hoses %n down the way you'd hose off a heifer before milkin', and runs a hand down each leg after.",
+        "[pig]%n gets the rinse and immediately looks round for somethin' to roll in. The farmhand holds the gate shut.",
+        "[latex]The water beads and runs off the livin' latex, and it gleams under it like a fresh-polished boot.",
+        "[cum]The last of the cum slides off %n and down the drain, and the farmhand sluices the slab after it.",
+        "[preg]The farmhand pours warm water down over %n's belly, slow, and lets it run off the curve."
       ],
       dry: [
         "A rough towel, a brisk rub all over, and %n steps out pink and squeaky and smellin' of nothin' but soap. Clean, for now.",
-        "The farmhand wraps %n in a sun-warm towel and rubs them dry like a foal. Not a speck left on them. It won't last.",
+        "The farmhand wraps %n in a sun-warm towel and rubs them dry. Not a speck left on them. It won't last.",
         "%n is towelled off, fluffed up and sent on their way scrubbed raw and clean as a new pail. The farm will fix that soon enough.",
-        "Wrung out, rubbed down and squeaky clean from scalp to toes, %n shakes off the last drops like a dog."
+        "Wrung out, rubbed down and squeaky clean from scalp to toes, %n is turned loose smellin' of yellow soap.",
+        "[pup]Wrung out and rubbed down, %n shakes off the last drops like a dog, all over the farmhand's boots.",
+        "[pony]The farmhand rubs %n dry like a foal, a cooler blanket over their back after, and walks them out clean.",
+        "[kitt]%n is rubbed dry in a towel and sulks in it for a long minute, the cleanest and crossest kitty on the farm.",
+        "[cow]%n gets rubbed dry and a bit of shine combed into them, ready for the milkin' line or the show ring.",
+        "[bunny]%n is bundled in a towel and patted dry, ears and all, and set down blinkin' and fluffy.",
+        "[pig]%n gets dried off and lasts about a minute before they're lookin' for the wallow again.",
+        "[goat]%n is towelled off and immediately starts eatin' the towel.",
+        "[deer]%n is rubbed down soft and let go, and they bound off clean and shy into the yard.",
+        "[fox]%n's tail is towelled into a huge orange puff, and they strut off like it was their idea.",
+        "[goblin]%n is dried off and looks almost respectable, which won't last the hour.",
+        "[rat]%n is rubbed dry in a scrap of towel, whiskers and all, and scampers off clean for once.",
+        "[fours]%n is towelled off where they stand, on all fours, and sent trottin' out of the stall with a pat on the rump.",
+        "[bound]The farmhand dries %n off, straps and ropes and all, and leads them out by the arm, because %n's not wavin' anyone goodbye.",
+        "[latex]The farmhand towels the bare skin round the livin' latex and leaves the latex to dry itself, which it does, smug.",
+        "[preg]%n is helped up off the stool, dried, and wrapped in a warm blanket round that belly."
       ]
     };
+    const WASH_KIND = {
+      cow: "cow",
+      bull: "cow",
+      pony: "pony",
+      horse: "pony",
+      pup: "pup",
+      dog: "pup",
+      wolf: "pup",
+      kitt: "kitt",
+      cat: "kitt",
+      bunny: "bunny",
+      rabbit: "bunny",
+      goat: "goat",
+      sheep: "goat",
+      deer: "deer",
+      pig: "pig",
+      fox: "fox",
+      goblin: "goblin",
+      rat: "rat"
+    };
+    const SWEET = /^(honey|maple|chocolate|strawberry|cake|cream|mash)$/;
+    function washFacts(mn) {
+      const f = /* @__PURE__ */ new Set(), r = rec(mn) || {}, now = Date.now();
+      try {
+        const k = WASH_KIND[speciesKey(mn)];
+        if (k) {
+          f.add(k);
+          if (k !== "goblin") f.add("tail");
+        }
+        const C2 = charFor(mn), worn = new Map((C2 && C2.Appearance || []).map((a) => [a.Asset && a.Asset.Group && a.Asset.Group.Name, a.Asset && a.Asset.Name]));
+        const has = (g, re) => worn.has(g) && (!re || re.test(String(worn.get(g))));
+        const fours = has("ItemLegs", /Petsuit|Frogtie/) || has("ItemArms", /Petsuit/) || /AllFours|Hogtied/.test(String(C2 && C2.ActivePose || ""));
+        f.add(fours ? "fours" : "walk");
+        if (has("ItemArms") || has("ItemHands")) f.add("bound");
+        if (has("ItemMouth") || has("ItemMouth2") || has("ItemMouth3")) f.add("gag");
+        if (has("ItemVulva", /Chastity|Cage/)) f.add("cage");
+        if (has("ItemPelvis", /Chastity/)) f.add("belt");
+        if (typeof symKind === "function" && symKind(mn) === "latex" || typeof suitOnNow === "function" && suitOnNow(mn)) f.add("latex");
+        const p = prodOf(mn) || {}, d = r.dirt || {}, m = r.messKinds || {};
+        if (p.preg || p.eggs && p.eggs.n > 0) f.add("preg");
+        if (p.held && heldTotal(p) > 20 || p.painted && p.painted.until > now || m.cum > now - 3 * 36e5) f.add("cum");
+        if (d.mud || r.muddy > now - 3 * 36e5 || m.mud > now - 3 * 36e5) f.add("mud");
+        if (d.slime || m.slime > now - 3 * 36e5) f.add("slime");
+        if (d.piss || m.piss > now - 3 * 36e5) f.add("piss");
+        if (m.milk > now - 3 * 36e5) f.add("milk");
+        if (Object.keys(m).some((x) => SWEET.test(x) && m[x] > now - 3 * 36e5)) f.add("sweet");
+      } catch (e) {
+        warn("wash facts:", e);
+      }
+      return f;
+    }
+    function messNoted(mn, payload) {
+      try {
+        const r = rec(mn);
+        if (!r || !payload) return;
+        if (payload.wash) {
+          r.messKinds = null;
+          return;
+        }
+        if (!payload.splat && !payload.mess) return;
+        r.messKinds = r.messKinds || {};
+        r.messKinds[payload.mess || (payload.color ? "other" : "cum")] = Date.now();
+      } catch (e) {
+      }
+    }
+    const WASH_TAGS = /^(\[[a-z]+\])+/;
+    function washPick(t, key, pool, facts) {
+      const b = bodyOf(t), fits = pool.filter((l) => {
+        const m = l.match(WASH_TAGS);
+        return (!m || m[0].slice(1, -1).split("][").every((x) => facts.has(x))) && tagsFit(l.replace(WASH_TAGS, ""), b);
+      });
+      const own = fits.filter((l) => WASH_TAGS.test(l)), plain = fits.filter((l) => !WASH_TAGS.test(l));
+      const use = own.length && (Math.random() < 0.7 || !plain.length) ? own : plain.length ? plain : pool.filter((l) => !WASH_TAGS.test(l));
+      return pickFor(t, key, use.map((l) => l.replace(WASH_TAGS, "")));
+    }
     function washNow(t) {
       bodyMark(t, { wash: true });
+      const r = rec(t);
+      if (r) r.messKinds = null;
       const p = prodOf(t);
       if (p) p.painted = null;
       aftermathWash(t);
@@ -20594,11 +21219,11 @@
         tell(by, "\u{1F6BF} All washed up, sugar: everything the farm put on " + (t === by ? "you" : plainName(t)) + " is off.");
         return;
       }
-      const beats = ["start", "scrub", "scrub", "rinse", "dry"], gap = CFG.WASH_BEAT_S * 1e3;
+      const beats = ["start", "scrub", "scrub", "rinse", "dry"], gap = CFG.WASH_BEAT_S * 1e3, facts = washFacts(t);
       state.washing.set(t, Date.now() + beats.length * gap + 5e3);
       const beat = (k, i) => {
         try {
-          emote("\u{1F6BF} " + tFill(pickFor(t, "wash:" + k + ":" + i, WASH_LINES[k]), t), t);
+          emote("\u{1F6BF} " + tFill(washPick(t, "wash:" + k + ":" + i, WASH_LINES[k], facts), t), t);
           if (i === beats.length - 1) {
             washNow(t);
             state.washing.delete(t);
@@ -20611,6 +21236,7 @@
       };
       beats.forEach((k, i) => i === 0 ? beat(k, i) : later(() => beat(k, i), i * gap));
     }
+    if (W.__FARMHAND_TEST__) Object.assign(W, { __washFacts: (m) => [...washFacts(m)], __washPick: (m, k) => washPick(m, "t:" + k + ":" + Math.random(), WASH_LINES[k], washFacts(m)), __washLines: () => WASH_LINES });
     const TEASE_RATE = { light: [15, 20], steady: [8, 12], needy: [5, 7] };
     const TEASE_SAY = { light: "3 or 4 times an hour", steady: "about 6 times an hour", needy: "about 10 times an hour" };
     const TEASE_LINES = {
@@ -20770,6 +21396,11 @@
         "Every fox gets caught sooner or later, sugar. Then it gets bred.",
         "Swish that big tail for me, fox."
       ],
+      rat: [
+        "Squeak for me, ratslut. Nice and high.",
+        "Greedy little gutter rat, always sniffin' round for scraps. Here's somethin' to chew on.",
+        "Twitch those whiskers for me, rat. Somebody's settin' a trap with your name on it."
+      ],
       goblin: [
         "Filthy little goblin. Rags and mud and that grin. Come here.",
         "Goblins are made for the dirty jobs, sugar. Guess what job needs doin'.",
@@ -20778,7 +21409,7 @@
     };
     const TEASE_KIN = { bull: "cow", horse: "pony", dog: "pup", wolf: "pup", kitt: "kitty", cat: "kitty", rabbit: "bunny", sheep: "goat" };
     const teaseKind = (mn) => {
-      const s = String((rec(mn) || {}).species || "").toLowerCase();
+      const s = speciesKey(mn) || String((rec(mn) || {}).species || "").toLowerCase();
       return TEASE_KIN[s] || s;
     };
     const teaseSp = (mn) => {
@@ -21262,6 +21893,14 @@
         "Yip for me, fox. Just a little one.",
         "Sly foxes end up on leashes too.",
         "Sneakin' around the henhouse again? Somebody'll catch you at it."
+      ],
+      rat: [
+        "Scurry over here, rat. On all fours, quick.",
+        "Ratsluts breed by the dozen, sugar. Let's get you started.",
+        "Sniffin' round the feed bins again? Somebody'll catch you by the tail.",
+        "Little rat, cheeks stuffed, tail twitchin'. Cute.",
+        "Rats squeeze into the tightest spots. Show me.",
+        "Chitter for me, ratslut. Let the barn know you're hungry."
       ],
       goblin: [
         "Grubby goblin, mud to the knees. Perfect.",
@@ -21929,6 +22568,191 @@
         warn("tithe:", e);
       }
     }
+    if (CFG.FRIEND_NAG_H === void 0) CFG.FRIEND_NAG_H = 6;
+    if (CFG.FRIEND_GRACE_H === void 0) CFG.FRIEND_GRACE_H = 48;
+    const FRIEND_HOW = "Click my character, then my profile, and press Add to friends. Or type /friendlistadd " + CFG.BOT_MEMBER + " in chat.";
+    function offTheBooks(t, by, why) {
+      const r = rec(t);
+      if (!r) return false;
+      for (const k in L2.people) {
+        const p = L2.people[k];
+        if ((p.herds || []).some((h) => h.leader === t)) p.herds = p.herds.filter((h) => h.leader !== t);
+      }
+      L2.archive[t] = JSON.parse(JSON.stringify(r));
+      delete L2.people[t];
+      saveLedger();
+      audit(by, "UNREGISTER", String(t) + (why ? " (" + why + ")" : ""));
+      pushKeys(t, [], true);
+      whitelistSync(true);
+      return true;
+    }
+    function friendCheckTick() {
+      const m = state.mutual, now = Date.now();
+      if (!m || !m.set || now - m.at > 3 * 6e4) return;
+      if (now - (state.friendCheckAt || 0) < 6e4) return;
+      state.friendCheckAt = now;
+      state.friendMiss = state.friendMiss || /* @__PURE__ */ new Map();
+      for (const C2 of W.ChatRoomCharacter || []) {
+        const mn = C2 && C2.MemberNumber, r = rec(mn);
+        if (!mn || mn === CFG.BOT_MEMBER || !r || !r.roles || !r.roles.length) continue;
+        if (m.set.has(mn)) {
+          state.friendMiss.delete(mn);
+          if (r.friendNag) {
+            const was = r.friendNag;
+            r.friendNag = null;
+            saveLedger();
+            if (was.n) tell(mn, "\u{1F48C} Thank you for friendin' me, sugar! My notes reach you now, and you're all set.");
+          }
+          continue;
+        }
+        const miss = (state.friendMiss.get(mn) || 0) + 1;
+        state.friendMiss.set(mn, miss);
+        if (miss < 2) continue;
+        const g = r.friendNag = r.friendNag || { first: 0, last: 0, n: 0 };
+        const keep = isProprietor(mn) || isStaff(mn);
+        if (g.first && !keep && now - g.first >= CFG.FRIEND_GRACE_H * 36e5) {
+          whisper(mn, "\u{1F4CB} It's been " + CFG.FRIEND_GRACE_H + " hours and I still can't reach you, sugar, so I've taken you off the farm's books. Your paperwork's kept safe in the drawer: friend me and ?apply again whenever you like. " + FRIEND_HOW);
+          notifyStaff("\u{1F4CB} " + plainName(mn) + " (" + mn + ") never friended the bot in " + CFG.FRIEND_GRACE_H + " hours after bein' asked, so they're off the books (paperwork archived).", false);
+          offTheBooks(mn, CFG.BOT_MEMBER, "never friended the bot");
+          state.friendMiss.delete(mn);
+          continue;
+        }
+        if (now - g.last < CFG.FRIEND_NAG_H * 36e5) continue;
+        if (!g.first) g.first = now;
+        g.last = now;
+        g.n++;
+        saveLedger();
+        const left = Math.max(1, Math.ceil((g.first + CFG.FRIEND_GRACE_H * 36e5 - now) / 36e5));
+        whisper(mn, "\u{1F48C} Psst, " + plainName(mn) + ": you're on the farm's books, but you haven't friended me yet, so my notes, summons and safeword answers can't reach you. " + FRIEND_HOW + (keep ? "" : " Please do it within " + left + " hours, or I'll have to take you off the books."));
+      }
+    }
+    if (W.__FARMHAND_TEST__) Object.assign(W, { __friendTick: () => {
+      state.friendCheckAt = 0;
+      friendCheckTick();
+    } });
+    if (CFG.OUTFIT_WHEEL_MIN === void 0) CFG.OUTFIT_WHEEL_MIN = [5, 240];
+    const tmpMins = (m) => m >= 60 ? Math.floor(m / 60) + " h" + (m % 60 ? " " + m % 60 + " min" : "") : m + " min";
+    function tempOutfitStart(mn, slot, mins, src, auto, why) {
+      const r = rec(mn);
+      if (!r) return "They're not on the books, sugar.";
+      if (r.tempOutfit && (r.tempOutfit.until > Date.now() || Date.now() - (r.tempOutfit.sentAt || 0) < 3 * 6e4)) return plainName(mn) + " is already in a wheel outfit, sugar. ?outfitwheel status";
+      if (!hasCompanion(mn)) return plainName(mn) + " isn't runnin' the Companion, so I can't dress 'em.";
+      const err = offerOutfit(mn, slot, why, auto);
+      if (err) return err;
+      r.tempOutfit = { slot, src, mins: Math.max(1, Math.round(mins)), sentAt: Date.now(), until: 0 };
+      saveLedger();
+      return "";
+    }
+    function tempOutfitAnswer(mn, m) {
+      const r = rec(mn), t = r && r.tempOutfit;
+      if (!t || t.until || String(m.slot || "") !== t.slot) return;
+      if (m.answer === "worn") {
+        t.until = Date.now() + t.mins * 6e4;
+        saveLedger();
+        if (t.src === "wheel") tell(mn, "\u{1F3A1} The " + farmName(t.slot) + " is yours for " + tmpMins(t.mins) + ", sugar. The padlocks open themselves when the time's up.");
+      } else if (m.answer === "declined" || m.answer === "failed") {
+        r.tempOutfit = null;
+        saveLedger();
+      }
+    }
+    function tempOutfitEnd(mn, why) {
+      const r = rec(mn), t = r && r.tempOutfit;
+      if (!t) return false;
+      if (!hasCompanion(mn)) {
+        if (!t.due) {
+          t.due = why || "time";
+          saveLedger();
+        }
+        return false;
+      }
+      r.tempOutfit = null;
+      saveLedger();
+      enqueue(makeMsg("outfitBack", { why: t.src === "wrongbarn" ? "the Wrong Barn wore off" : "the wheel's time is up", farmLocks: true }, mn));
+      if (why !== "safe" && t.until) {
+        if (onMap(mn)) emote("\u{1F3A1} Click, click: the farm's padlocks open on " + plainName(mn) + ", and the " + (farmName(t.slot) || "wheel outfit") + " comes off.", mn);
+        else tell(mn, "\u{1F3A1} Your time in the " + (farmName(t.slot) || "wheel outfit") + " is up, sugar: you're back in your own things.");
+      }
+      return true;
+    }
+    function tempOutfitTick() {
+      const now = Date.now();
+      for (const r of Object.values(L2.people)) {
+        const t = r.tempOutfit;
+        if (!t) continue;
+        if (t.due || t.until && now >= t.until) tempOutfitEnd(r.mn, t.due || "time");
+        else if (!t.until && now - (t.sentAt || 0) > 10 * 6e4) {
+          r.tempOutfit = null;
+          saveLedger();
+        }
+      }
+    }
+    function wheelPick(mn) {
+      const g = genderOf(mn), kinds = OUTFIT_SPECIES.filter((sp2) => farmOutfit("farm:" + sp2 + "|" + g));
+      const sp = kinds[Math.floor(Math.random() * kinds.length)];
+      const [lo, hi] = CFG.OUTFIT_WHEEL_MIN, mins = lo + Math.floor(Math.random() * (hi - lo + 1));
+      return sp ? { slot: "farm:" + sp + "|" + g, mins } : null;
+    }
+    function outfitWheelCommand(sender, args, R) {
+      const a0 = String(args[0] || "").toLowerCase();
+      if (a0 === "status" || a0 === "left") {
+        const t2 = (rec(sender) || {}).tempOutfit;
+        if (!t2) {
+          R("\u{1F3A1} You're not in a wheel outfit right now, sugar. ?outfitwheel spins it.");
+          return;
+        }
+        R(t2.until ? "\u{1F3A1} You're in the " + farmName(t2.slot) + " for another " + tmpMins(Math.max(1, Math.ceil((t2.until - Date.now()) / 6e4))) + "." : "\u{1F3A1} The " + farmName(t2.slot) + " is waitin' on your Companion to put it on.");
+        return;
+      }
+      if (a0 === "stop") {
+        const t2 = resolveTarget(args[1] || "");
+        if (!isStaff(sender)) {
+          R("Only staff can stop the wheel early, sugar. (Your safeword always does.)");
+          return;
+        }
+        if (!t2 || !rec(t2) || !rec(t2).tempOutfit) {
+          R("They're not in a wheel outfit, sugar.");
+          return;
+        }
+        tempOutfitEnd(t2, "stop");
+        R("\u{1F3A1} Done: " + plainName(t2) + " is on their way back into their own things.");
+        return;
+      }
+      const t = a0 ? resolveTarget(args[0]) : sender;
+      if (!t || !rec(t)) {
+        R("Spin it for who, sugar? ?outfitwheel for yourself, or staff: ?outfitwheel <who>.");
+        return;
+      }
+      if (t !== sender && !isStaff(sender)) {
+        R("Spinnin' the wheel for somebody else is for staff, sugar. ?outfitwheel spins it for you.");
+        return;
+      }
+      if (rec(t).ownOutfit && t !== sender) {
+        R(plainName(t) + " brings their own outfit (?ownoutfit on), sugar, so the wheel leaves 'em be.");
+        return;
+      }
+      const p = wheelPick(t);
+      if (!p) {
+        R("The wheel's got nothin' that fits, sugar.");
+        return;
+      }
+      const err = tempOutfitStart(t, p.slot, p.mins, "wheel", t === sender, t === sender ? "The outfit wheel, for " + tmpMins(p.mins) : "The outfit wheel, from " + plainName(sender) + ", for " + tmpMins(p.mins));
+      if (err) {
+        R(err);
+        return;
+      }
+      const line = "\u{1F3A1} The outfit wheel clatters round for " + plainName(t) + "\u2026 and lands on the " + farmName(p.slot) + ", for " + tmpMins(p.mins) + "!";
+      if (onMap(t)) emote(line, t);
+      else R(line);
+      if (t !== sender) R("\u{1F3A1} " + plainName(t) + " gets the card to say yes or not now. The clock starts when it's on.");
+    }
+    function wrongBarnOutfit(mn, species, mins) {
+      const r = rec(mn);
+      if (!r || r.ownOutfit || !hasCompanion(mn)) return;
+      const kit = outfitSpeciesOf(species), slot = kit && "farm:" + kit + "|" + genderOf(mn);
+      if (!slot || !farmOutfit(slot)) return;
+      tempOutfitStart(mn, slot, mins, "wrongbarn", true, "Wrong Barn, for " + tmpMins(mins));
+    }
+    if (W.__FARMHAND_TEST__) Object.assign(W, { __tempOutfitTick: () => tempOutfitTick() });
     const PARASITE_SERUMS = ["growth", "fertility", "growth", "hyper pregnancy", "growth", "capacity"];
     const PARASITE_GROWS = ["udder", "penis", "testes", "butt"];
     function parasiteChance(mn) {
@@ -22346,7 +23170,7 @@
       if (CFG.STRAIN_GEAR) return strainGear(mn);
       const r = rec(mn), g = r.parasite, P = parasiteParts(g), S = strainOf(g), out = [], base = { always: true, color: "#E0607F", until: g.until };
       if (P.lips) out.push(Object.assign({ slot: "lips", name: "Parasite Lips", desc: S.name + " strain. Fat, wet, living lips sealed over the mouth, with a tentacle seated down the throat. It feeds its host serum and swallows every load they suck out." }, base));
-      if (P.suckers) out.push(Object.assign({ slot: "cups", name: "Parasite Suckers", desc: S.name + " strain. Two soft pink mouths latched over the teats, sucking in slow greedy pulls. They drink every drop of milk and give something hotter back." }, base));
+      if (P.suckers) out.push(Object.assign({ slot: "chestbra", items: ["ForbiddenChastityBra"], name: "Parasite Suckers", desc: S.name + " strain. Two soft pink mouths latched over the teats, sucking in slow greedy pulls. They drink every drop of milk and give something hotter back." }, base));
       if (P.root) out.push(Object.assign({ slot: "belt", name: g.form === "belt" ? "Parasite Belt" : "Parasite Root", desc: S.name + " strain. A band of hot living flesh sealed round the hips, with a thick root pulsing in each hole. It drinks every load they take and pumps its own brew back in." }, base));
       return out;
     }
@@ -22690,7 +23514,7 @@
       const r = rec(mn), g = r.parasite, P = parasiteParts(g), k = strainKey(g), S = STRAINS[k], D = STRAIN_GEAR[k], b = bodyOf(mn), out = [];
       const base = { always: true, color: STRAIN_COLOR[k], until: g.until }, add = (slot, name, desc, items) => out.push(Object.assign({ slot, name, desc: (S.name + " strain. " + desc).slice(0, 180) }, items ? { items } : {}, base));
       if (P.lips) add("lips", "Parasite Lips", D.lips);
-      if (P.suckers) add("cups", "Parasite Suckers", b.tits ? D.suckers : b.g === "male" && D.suckersMale ? D.suckersMale : D.suckersFlat);
+      if (P.suckers) add("chestbra", "Parasite Suckers", b.tits ? D.suckers : b.g === "male" && D.suckersMale ? D.suckersMale : D.suckersFlat, ["ForbiddenChastityBra"]);
       if (P.root) add("belt", g.form === "belt" ? "Parasite Belt" : "Parasite Root", b.vulva ? D.root : D.rootCock);
       if (b.cock && D.cage && P.stage >= D.cage.stage) add("dildo", D.cage.name, D.cage.desc, D.cage.items);
       if (D.torso && P.stage >= 3) add("torso", D.torso.name, D.torso.desc, ["TentacleSuit"]);
@@ -25936,10 +26760,12 @@
     };
     TRAP_GEAR.leeches = [{
       when: "after",
-      slot: "cups",
+      slot: "chestbra",
       label: "Trough Leeches",
+      items: ["ForbiddenChastityBra"],
       mins: 20,
       color: "#3B2A2A",
+      // (Oct 26: the Forbidden Chastity Bra)
       desc: "Two fat black leeches latched on swollen teats, pulsing as they feed. They drop off when they're full, and not a minute sooner."
     }];
     function broodCommand(cmd, sender, args, R) {
@@ -26438,7 +27264,7 @@
         corrBrandNow(mn);
       }
       if (m === 70) {
-        r.corrNoise = CORR_NOISE[String(r.species || "").toLowerCase()] || "moo";
+        r.corrNoise = CORR_NOISE[speciesKey(mn)] || CORR_NOISE[String(r.species || "").toLowerCase()] || "moo";
       }
       if (m >= 20 && (r.corrBy && r.corrBy.suit || 0) >= 0.3 * (r.corr || 1) && !suitOnNow(mn)) gearOn(mn, "legs", "Corrupted Latex", "A glossy black skin of the livin' suit that never let go, grown over both thighs and up onto the hips. It's warm, and it squeezes.", CFG.CORR_FADE_DAYS * 24 * 60 * 7, "corruption", { items: ["Slime"], color: "#1A1A1F" });
       if (m === 60) r.crave = { until: Date.now() + 3650 * 864e5, ate: Date.now(), told: Date.now(), forGood: true };
@@ -26469,7 +27295,7 @@
     function ruined(mn) {
       return ((rec(mn) || {}).corrMarks || []).includes(100);
     }
-    const CORR_NOISE = { cow: "moo", bull: "moo", pony: "neigh", horse: "neigh", pup: "woof", dog: "woof", wolf: "awoo", kitt: "mew", kitty: "mew", cat: "mew", bunny: "squeak", rabbit: "squeak", goat: "baa", sheep: "baa", pig: "oink", deer: "bleat", fox: "yip", goblin: "hehe" };
+    const CORR_NOISE = { cow: "moo", bull: "moo", pony: "neigh", horse: "neigh", pup: "woof", dog: "woof", wolf: "awoo", kitt: "mew", kitty: "mew", cat: "mew", bunny: "squeak", rabbit: "squeak", goat: "baa", sheep: "baa", pig: "oink", deer: "bleat", fox: "yip", goblin: "hehe", rat: "squeak" };
     const CORR_BRANDS = ["FARM PROPERTY", "BREEDING STOCK", "USE ME", "BRED", "RUINED STOCK", "FARM ANIMAL"];
     const MARK_NAME = {
       10: "the traps' hunger for you",
@@ -28127,7 +28953,7 @@
       if (!cock && makesMilk(mn)) {
         extra = drainMilk(mn, Math.min(p.milk, milkCap(mn) * CFG.MILKCUM_LETDOWN));
         st.got.m += extra;
-      } else if (makesSemen(mn)) {
+      } else if (seedMilkable(mn)) {
         extra = drainSemen(mn, Math.min(p.semen, semenCap(mn) * CFG.MILKCUM_LETDOWN));
         st.got.s += extra;
       }
@@ -32621,6 +33447,7 @@ COMMANDS
   ?stats \xB7 your milk, semen, sizes, how full you are
   ?board \xB7 today's and this week's yield, and top sires
   ?milkable on|off \xB7 make milk (stock does by default)
+  ?seedmilk on|off \xB7 the stall and milkin' traps take your seed too (on)
   ?futa on|off \xB7 make milk and semen both
   ?quota \xB7 your daily milk quota and streak
 
@@ -33324,10 +34151,11 @@ UPKEEP
       if (t === "me") return myCommands(sender);
       if (STAFF_GUIDES.includes(t) && !isStaff(sender)) return GUIDES[t + "s"] || "Aw, that guide's just for staff, sugar. Say ?help to see the ones for you.";
       if (GUIDES[t]) return GUIDES[t];
-      const a = ADDONS.get(t) || [...ADDONS.values()].find((x) => x.label.toLowerCase() === t || x.commands[t]);
+      const seen = [...ADDONS.values()].filter((x) => addonVisible(x, sender)), open = [...ADDONS.values()].filter((x) => !x.only);
+      const a = seen.find((x) => x.name === t || x.label.toLowerCase() === t || x.commands[t]);
       if (a) return addonsText(a.name);
       if (t.length >= 4 && !helpFor.guessing) {
-        const names = Object.keys(GUIDES).concat(Object.keys(GUIDE_ALIAS), [...ADDONS.keys()], ...[...ADDONS.values()].map((x) => Object.keys(x.commands || {})));
+        const names = Object.keys(GUIDES).concat(Object.keys(GUIDE_ALIAS), open.map((x) => x.name), ...open.map((x) => Object.keys(x.commands || {})));
         const dist = (a2, b) => {
           const d = Array.from({ length: a2.length + 1 }, (_, i) => [i]);
           for (let j = 1; j <= b.length; j++) d[0][j] = j;
@@ -33344,7 +34172,7 @@ UPKEEP
           }
         }
       }
-      return "Hmm, I don't have a guide called '" + t0 + "', hon. Try one of these: start, safety, keys, herds, tiers, barn, breeding, pregnancy, heat, body, cocks, shots, life, ribbons, fair or me" + (ADDONS.size ? ", or an add-on: " + [...ADDONS.keys()].join(", ") : "") + ". For example: ?help breeding";
+      return "Hmm, I don't have a guide called '" + t0 + "', hon. Try one of these: start, safety, keys, herds, tiers, barn, breeding, pregnancy, heat, body, cocks, shots, life, ribbons, fair or me" + (open.length ? ", or an add-on: " + open.map((x) => x.name).join(", ") : "") + ". For example: ?help breeding";
     }
     function myCommands(mn) {
       const line = (g) => "\n" + g.name + "\n  " + g.cmds.join(" \xB7 ") + (g.name === "Safety" ? "\n  (safe stops everything and fetches staff, so only say it when you need it. ?help safety explains)" : "");
@@ -33438,6 +34266,7 @@ Say ?keys to see what you're holdin', hon.`;
 \u{1F408} KITTENS \u2014 less obedient, more trouble, still ours
 \u{1F98C} DEER \u2014 skittish, and we like 'em that way
 \u{1F47A} GOBLINS \u2014 got in some years back, never left, breed like it's a sport
+\u{1F400} RATSLUTS \u2014 nest in the hayloft, squeak when they're caught, breed by the dozen
 \u{1F38E} DOLLS \u2014 posed, displayed, kept behind gold
 \u{1F573}\uFE0F GLORYHOLES \u2014 installed in the pens, left for whoever wanders past
 
@@ -33511,7 +34340,13 @@ Say ?apply and pick 'luxury guest'.
       nanny: "goat",
       billy: "goat",
       kid: "goat",
-      lupine: "wolf"
+      lupine: "wolf",
+      ratslut: "rat",
+      ratty: "rat",
+      rattie: "rat",
+      rodent: "rat",
+      mouse: "rat",
+      mousey: "rat"
     };
     const NOT_STOCK = /\b(no|nope|nah|not stock|not livestock|not an animal|not one|human|person|staff|farmhand|guest|luxury|visitor|none|skip|n\/?a)\b/;
     const NOT_ANIMAL = /^(yes|yeah|yep|ok|okay|sure|maybe|what|huh|help|hi|hello|stock|livestock|animal|both|me|it|idk)$/;
@@ -33521,21 +34356,25 @@ Say ?apply and pick 'luxury guest'.
       if (!low) return null;
       const other = low.match(/^other[:\s]+([a-z -]{2,30})$/);
       if (other) return other[1].trim();
-      const known = (w) => {
+      const known2 = (w) => {
         if (kinds.includes(w)) return w;
         if (SPECIES_ALIAS[w]) return SPECIES_ALIAS[w];
         for (const s of [w.replace(/ves$/, "f"), w.replace(/es$/, ""), w.replace(/s$/, "")]) {
           if (kinds.includes(s)) return s;
           if (SPECIES_ALIAS[s]) return SPECIES_ALIAS[s];
         }
-        const g = w.replace(/(girl|boy|gal|guy|kin)$/, "");
-        if (g !== w && g.length > 1) return known(g);
+        const g = w.replace(/(girl|boy|gal|guy|kin|slut)$/, "");
+        if (g !== w && g.length > 1) return known2(g);
         return null;
       };
       const words = low.split(/[\s\/-]+/).filter(Boolean);
       for (const w of words) {
-        const k = known(w);
+        const k = known2(w);
         if (k) return SHOWN_SPECIES[k] || k;
+      }
+      {
+        const k = speciesKeyOf(low);
+        if (k && kinds.includes(k)) return SHOWN_SPECIES[k] || k;
       }
       const filler = /* @__PURE__ */ new Set(["i", "im", "am", "a", "an", "the", "my", "please", "pls", "just", "really", "think", "maybe", "so"]);
       const rest = words.filter((w) => !filler.has(w));
@@ -33556,8 +34395,8 @@ Say ?apply and pick 'luxury guest'.
         choices: () => Object.keys(CFG.SPECIES).filter((k) => k !== "default").map((k) => SHOWN_SPECIES[k] || k).concat(["not stock"]),
         // an animal wins over everything else ("no, a cow"); then "not stock" or "not sure"; anything else is asked again
         check: (t) => {
-          const sp = speciesFrom(t), known = sp && (Object.keys(CFG.SPECIES).includes(sp) || Object.values(SHOWN_SPECIES).includes(sp));
-          if (known) return { value: sp };
+          const sp = speciesFrom(t), known2 = sp && (Object.keys(CFG.SPECIES).includes(sp) || Object.values(SHOWN_SPECIES).includes(sp));
+          if (known2) return { value: sp };
           if (notSure(t) || notStock(t)) return { value: "" };
           if (sp) return { value: sp };
           return { err: "I didn't catch an animal there, sugar. Just type one, like cow, pony, pup or kitten (or any other animal), or say not stock." };
@@ -33981,6 +34820,10 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
       "breed",
       "cum",
       "milkable",
+      "seedmilk",
+      "outfitwheel",
+      "dresswheel",
+      "wheeloutfit",
       "futa",
       "size",
       "sizes",
@@ -34544,7 +35387,7 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
             syncCompanions(true);
             break;
           }
-          R(addonsText(rest));
+          R(addonsText(rest, sender));
           break;
         }
         case "help":
@@ -36062,6 +36905,11 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
           } catch (e) {
             warn("safeword symbiote:", e);
           }
+          try {
+            tempOutfitEnd(sender, "safe");
+          } catch (e) {
+            warn("safeword outfit wheel:", e);
+          }
           say2("\u{1F534} PAUSE CALLED. Everything stops, right now, everybody.", true, sender);
           beep(sender, "I've got you, " + plainName(sender) + ". Everything's stopped and I'm fetchin' somebody for you right now. You don't owe anybody an explanation. \u{1F534}", true);
           notifyStaff("\u{1F534} SAFEWORD from " + plainName(sender) + " (" + sender + "). Please go to them now.", false);
@@ -36127,14 +36975,13 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
             const m = parseInt(k, 10);
             if (isStaff(m) && onDuty(m) && charFor(m)) staffHere.push(m);
           }
+          beep(sender, "\u{1FAA2} Pullin' you out to the rescue spot now, hon. Hold on just a moment.", true);
+          later(() => rescueTeleport(sender), 1500);
           if (staffHere.length) {
-            for (const m of staffHere) beep(m, "\u{1FAA2} " + plainName(sender) + " (" + sender + ") is wedged at " + where + ".", true);
-            beep(sender, "\u{1FAA2} I've called for a hand and somebody's on their way. Sit tight, you're okay.", true);
+            for (const m of staffHere) beep(m, "\u{1FAA2} " + plainName(sender) + " (" + sender + ") was wedged at " + where + ". I've moved 'em to the rescue spot; check on 'em if you can.", true);
           } else {
-            beep(sender, "\u{1FAA2} Nobody's around right now, so I'm pullin' you out myself. Hold on just a moment.", true);
-            notifyStaff("\u{1FAA2} " + plainName(sender) + " was stuck at " + where + ". Nobody was about, so I pulled 'em out.", true);
-            if (CFG.SUMMON_ON_STUCK) summonHelp("\u{1FAA2} " + plainName(sender) + " is wedged at " + where + ".", sender, false, "staff");
-            later(() => rescueTeleport(sender), 3e3);
+            notifyStaff("\u{1FAA2} " + plainName(sender) + " was stuck at " + where + ". I pulled 'em out to the rescue spot.", true);
+            if (CFG.SUMMON_ON_STUCK) summonHelp("\u{1FAA2} " + plainName(sender) + " was wedged at " + where + ".", sender, false, "staff");
           }
           break;
         }
@@ -36379,16 +37226,7 @@ Welcome to B&B Farm, hon. \u{1F33E}`
             }
             full = true;
           }
-          for (const k in L2.people) {
-            const p2 = L2.people[k];
-            if ((p2.herds || []).some((h) => h.leader === t)) p2.herds = p2.herds.filter((h) => h.leader !== t);
-          }
-          L2.archive[t] = JSON.parse(JSON.stringify(r));
-          delete L2.people[t];
-          saveLedger();
-          audit(sender, "UNREGISTER", String(t));
-          pushKeys(t, [], true);
-          whitelistSync(true);
+          offTheBooks(t, sender);
           R((words.length ? "That was their last role, so " : "") + "all done, sugar. " + plainName(t) + "'s keys are pulled, they're off the room whitelist, and their paperwork's tucked safe in the drawer.");
           beep(t, "Your contract's up, " + plainName(t) + ". Your keys are pulled, but the gate swings both ways, sweetie. I'll keep your paperwork safe in the drawer.");
           break;
@@ -37068,15 +37906,20 @@ Welcome to B&B Farm, hon. \u{1F33E}`
             break;
           }
           const v = String(args[0] || "").toLowerCase();
-          if (v && !["on", "off", "yes", "no"].includes(v)) {
-            R("Just say ?milkable on or ?milkable off, sweetie.");
+          if (/^(seed|cock|balls|semen|down|below|bottom)$/.test(v)) {
+            seedMilkCommand(sender, r, String(args[1] || "").toLowerCase(), R);
             break;
           }
-          if (!v) {
-            R(switchStatus("milkable", makesMilk(sender)));
+          const v2 = /^(top|milk|up|udders?|tits)$/.test(v) && args[1] ? String(args[1]).toLowerCase() : v;
+          if (v2 && !["on", "off", "yes", "no"].includes(v2)) {
+            R("Just say ?milkable on or ?milkable off, sweetie. ?milkable seed on|off is the one for your cock and balls.");
             break;
           }
-          const now = v === "on" || v === "yes";
+          if (!v2) {
+            R(switchStatus("milkable", makesMilk(sender)) + (makesSemen(sender) ? " Your seed: " + (r.seedMilk !== false ? "milked too" : "left be") + " (?seedmilk on|off)." : ""));
+            break;
+          }
+          const now = v2 === "on" || v2 === "yes";
           if (now && limitBlocks(sender, "milk")) {
             R("Your hard limits rule that out, sugar, so I'll keep it off. If you want it, change your limits with staff first.");
             break;
@@ -37086,6 +37929,20 @@ Welcome to B&B Farm, hon. \u{1F33E}`
           saveLedger();
           audit(sender, "MILKABLE", now ? "on" : "off");
           R(now ? "\u{1F95B} You're milkable now, darlin'! You'll start fillin' up by the hour. ?stats to watch it, and ?help barn for how grades work." : "Alrighty, no more milk for you. ?milkable on whenever you change your mind. \u{1F49B}");
+          break;
+        }
+        case "outfitwheel":
+        case "dresswheel":
+        case "wheeloutfit":
+          outfitWheelCommand(sender, args, R);
+          break;
+        case "seedmilk": {
+          const r = rec(sender);
+          if (!r || !r.roles.length) {
+            R("You'll need to be on the books first, hon. ?apply and we'll get you sorted. \u{1F33E}");
+            break;
+          }
+          seedMilkCommand(sender, r, String(args[0] || "").toLowerCase(), R);
           break;
         }
         case "gender": {
@@ -37652,6 +38509,10 @@ Welcome to B&B Farm, hon. \u{1F33E}`
             R("\u{1F6AB} " + plainName(t) + "'s teats are capped for another " + Math.ceil((prodOf(t).milkDeniedUntil - Date.now()) / 6e4) + " minutes, sugar. Let 'em ache.");
             break;
           }
+          if (cmd === "collect" && makesSemen(t) && !seedMilkable(t)) {
+            R("\u{1F6AB} " + plainName(t) + " has said ?milkable seed off, sugar: their seed isn't for collectin'.");
+            break;
+          }
           const got = cmd === "milk" ? drainMilk(t, amt) : drainSemen(t, amt);
           saveLedger();
           audit(sender, cmd.toUpperCase(), t + " " + Math.round(got));
@@ -37981,6 +38842,10 @@ Welcome to B&B Farm, hon. \u{1F33E}`
         /* ── PLAY ── */
         case "wheel": {
           const sub = String(args[0] || "list").toLowerCase();
+          if (sub === "outfit" || sub === "outfits" || sub === "dress") {
+            outfitWheelCommand(sender, args.slice(1), R);
+            break;
+          }
           if (sub === "farm") {
             const v = String(args[1] || "").toLowerCase();
             if (v === "on" || v === "off") {
@@ -38601,6 +39466,8 @@ Welcome to B&B Farm, hon. \u{1F33E}`
         parasiteTick();
         symbioteTick();
         farmLookTick();
+        friendCheckTick();
+        tempOutfitTick();
         workTick();
         if (Date.now() - (state.wlTick || 0) > 5 * 6e4) {
           state.wlTick = Date.now();

@@ -19,8 +19,12 @@
   function genderOf(mn){ const r = rec(mn) || {}; return r.gender || (r.futa ? "futa" : hasVulva(mn) ? "female" : "male"); }
   function outfitSlotFor(mn){
     outfitsLedger();
-    const r = rec(mn) || {}, sp = String(r.species || "").toLowerCase(), g = genderOf(mn);
-    return [sp+"|"+g, sp+"|*", "*|"+g].find(k => L.outfits[k]) || (farmOutfit("farm:"+sp+"|"+g) ? "farm:"+sp+"|"+g : null) || (L.outfits.stock ? "stock" : null);
+    // smart match (Oct 26): a kitty's record says "kitty", a saved slot may say "kitt" or "cat", the farm's kit is "kitt"
+    const r = rec(mn) || {}, raw = String(r.species || "").toLowerCase().trim(), g = genderOf(mn);
+    const key = speciesKeyOf(raw), kit = FARM_OUTFITS.outfitSpeciesOf(raw);
+    const names = [...new Set([raw, key, kit, key === "kitt" ? "kitty" : null, key === "kitt" ? "cat" : null].filter(Boolean))];
+    const saved = names.map(sp => sp+"|"+g).concat(names.map(sp => sp+"|*"), ["*|"+g]).find(k => L.outfits[k]);
+    return saved || (kit && farmOutfit("farm:"+kit+"|"+g) ? "farm:"+kit+"|"+g : null) || (L.outfits.stock ? "stock" : null);
   }
   // the farm's own starter outfit for a species and gender (shared/farm-outfits.js, Oct 22): fills every slot no proprietor
   // has dressed yet, and a proprietor's own saved outfit always wins. "farm:cow|female" → { data, items, locks }
@@ -78,6 +82,21 @@
     audit(CFG.BOT_MEMBER, "OUTFIT_OFFER", mn+" "+slot);
     return "";
   }
+  // the outfit a new contract owes them: on now if their Companion's here, else when it next says hello (07-send.js)
+  function contractOutfitNow(mn){
+    const r = rec(mn), o = r && r.outfitOwed;
+    if (!o || r.contractDressedAt || r.ownOutfit){ if (r && o) { r.outfitOwed = null; saveLedger(); } return; }
+    if (Date.now() - o.at > 7*24*3600000){ r.outfitOwed = null; saveLedger(); return; }   // a week on, let it go
+    if (!hasCompanion(mn)){
+      if (!o.told){ o.told = true; saveLedger(); tell(mn, "👗 Your new contract comes with the "+slotLabel(o.slot)+". Turn on the Companion and it goes on you the moment it's back, or staff can help you dress by hand."); }
+      return;
+    }
+    if (o.sentAt && Date.now() - o.sentAt < 60000) return;   // already on its way
+    if ((o.sends||0) >= 3){ r.outfitOwed = null; saveLedger(); return; }   // three tries and no answer: staff can ?outfit offer by hand
+    o.sentAt = Date.now(); o.sends = (o.sends||0) + 1; saveLedger();
+    const err = offerOutfit(mn, o.slot, "It goes with your new contract", true);
+    if (err){ r.outfitOwed = null; saveLedger(); notifyStaff("👗 Couldn't dress "+plainName(mn)+" for their contract: "+err, false); }
+  }
   // a proprietor's Companion sent what they're wearin'
   function saveOutfit(mn, m){
     if (!isProprietor(mn)){ toCompanion(mn, "Savin' farm outfits is for the proprietors, sugar.", "reply"); return; }
@@ -92,11 +111,20 @@
   }
   // their Companion tells me what happened, so staff and the room know
   function outfitAnswer(mn, m){
+    try { tempOutfitAnswer(mn, m); } catch(e){ warn("temp outfit:", e); }   // the outfit wheel, the Wrong Barn (10un-outfit-wheel.js)
     if (m.answer === "worn"){
       audit(mn, "OUTFIT_WORN", String(m.slot||""));
+      { const r = rec(mn); if (r && r.outfitOwed && r.outfitOwed.slot === String(m.slot||"")){ r.outfitOwed = null; r.contractDressedAt = Date.now(); saveLedger(); } }
       if (onMap(mn)) emote("👗 "+plainName(mn)+" changes into "+(String(m.slot||"").startsWith("uniform:") ? "their farm uniform" : /^farm:/.test(String(m.slot||"")) && farmName(String(m.slot)) ? "the "+farmName(String(m.slot)) : "their farm outfit")+(m.locks ? ", and the padlocks click shut" : "")+".");
     } else if (m.answer === "declined") audit(mn, "OUTFIT_DECLINED", String(m.slot||""));
     else if (m.answer === "back") audit(mn, "OUTFIT_BACK", "");
+    else if (m.answer === "failed"){
+      // the game wouldn't take it: they're NOT marked dressed, staff hear why, and it stays owed for one more go
+      audit(mn, "OUTFIT_FAILED", String(m.slot||"")+" "+String(m.why||"").slice(0,120));
+      const r = rec(mn);
+      notifyStaff("👗 "+plainName(mn)+"'s Companion couldn't put on "+slotLabel(String(m.slot||""))+": "+String(m.why||"no reason given").slice(0,160)+". ?outfit offer "+plainName(mn)+" to try again.", false);
+      if (r && r.outfitOwed && r.outfitOwed.slot === String(m.slot||"")){ r.outfitOwed.tries = (r.outfitOwed.tries||0) + 1; if (r.outfitOwed.tries >= 2) r.outfitOwed = null; else r.outfitOwed.sentAt = 0; saveLedger(); }
+    }
   }
 
 
@@ -109,3 +137,4 @@
     R(r.ownOutfit ? "👗 Bring your own outfit: ON. Sign a contract and you stay in the look you came in. Staff can still offer you one, and you can say no."
                   : "👗 Bring your own outfit: off. "+(r.contractDressedAt ? "You've had your farm outfit already, so nothin' changes unless staff offer you one." : "Your first contract dresses you in the farm's outfit for your kind."));
   }
+  if (W.__FARMHAND_TEST__) Object.assign(W, { __outfitSlot: (m) => outfitSlotFor(m), __contractOutfit: (m) => contractOutfitNow(m) });

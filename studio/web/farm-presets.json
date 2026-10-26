@@ -1,5 +1,5 @@
 {
- "made": "2026-10-25T18:39:06.436Z",
+ "made": "2026-10-26T06:25:57.178Z",
  "sets": [
   {
    "group": "Traps",
@@ -753,13 +753,15 @@
    "what": "fat leeches out of the trough, latched on your teats and anywhere else that's soft",
    "pieces": [
     {
-     "slot": "cups",
+     "slot": "chestbra",
      "groups": [
-      "ItemNipples"
+      "ItemBreast"
      ],
      "items": [
-      "LactationPump",
-      "NippleSuctionCups"
+      "ForbiddenChastityBra",
+      "ForbiddenChastityBra",
+      "PolishedChastityBra",
+      "MetalChastityBra"
      ],
      "color": "#3B2A2A",
      "label": "Trough Leeches",

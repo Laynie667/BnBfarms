@@ -10,6 +10,7 @@
   const SPLAT_AREAS = { mouth: ["face", "forehead", "face"], vulva: ["tummy", "tummy", "chest"], butt: ["tummy", "chest"],
                         face: ["face", "forehead"], chest: ["chest"], tits: ["chest"], back: ["tummy", "chest"], ass: ["tummy"], body: ["chest", "tummy", "face"] };
   function bodyMark(mn, payload){
+    if (mn && mn !== CFG.BOT_MEMBER) messNoted(mn, payload);   // what's on them, for ?wash's lines (10ug-wash.js)
     if (!mn || mn === CFG.BOT_MEMBER || !hasCompanion(mn)) return false;
     enqueue(makeMsg("mark", payload, mn));
     return true;

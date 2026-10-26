@@ -166,6 +166,7 @@ COMMANDS
   ?stats · your milk, semen, sizes, how full you are
   ?board · today's and this week's yield, and top sires
   ?milkable on|off · make milk (stock does by default)
+  ?seedmilk on|off · the stall and milkin' traps take your seed too (on)
   ?futa on|off · make milk and semen both
   ?quota · your daily milk quota and streak
 
@@ -847,11 +848,14 @@ UPKEEP
     if (STAFF_GUIDES.includes(t) && !isStaff(sender)) return GUIDES[t+"s"] || "Aw, that guide's just for staff, sugar. Say ?help to see the ones for you.";
     if (GUIDES[t]) return GUIDES[t];
     // an add-on, by its name, its label, or one of its commands (?help glory, ?help stalls)
-    const a = ADDONS.get(t) || [...ADDONS.values()].find(x => x.label.toLowerCase() === t || x.commands[t]);
+    // a private add-on (one with an `only` list) is only for its own people, and never offered or guessed at for anybody
+    // (Laynie, Oct 26: "help <wrong input> even shows things for my private addon, which it shouldnt")
+    const seen = [...ADDONS.values()].filter(x => addonVisible(x, sender)), open = [...ADDONS.values()].filter(x => !x.only);
+    const a = seen.find(x => x.name === t || x.label.toLowerCase() === t || x.commands[t]);
     if (a) return addonsText(a.name);
     // a typo (?help glorty, ?help bodyu, both seen live): one letter off a guide or an add-on, just open it
     if (t.length >= 4 && !helpFor.guessing){
-      const names = Object.keys(GUIDES).concat(Object.keys(GUIDE_ALIAS), [...ADDONS.keys()], ...[...ADDONS.values()].map(x => Object.keys(x.commands || {})));
+      const names = Object.keys(GUIDES).concat(Object.keys(GUIDE_ALIAS), open.map(x => x.name), ...open.map(x => Object.keys(x.commands || {})));
       const dist = (a, b) => { const d = Array.from({ length: a.length + 1 }, (_, i) => [i]); for (let j = 1; j <= b.length; j++) d[0][j] = j;
         for (let i = 1; i <= a.length; i++) for (let j = 1; j <= b.length; j++) d[i][j] = Math.min(d[i-1][j]+1, d[i][j-1]+1, d[i-1][j-1]+(a[i-1] === b[j-1] ? 0 : 1));
         return d[a.length][b.length]; };
@@ -859,7 +863,7 @@ UPKEEP
       if (best){ helpFor.guessing = true; try { return helpFor(sender, best); } finally { helpFor.guessing = false; } }
     }
     return "Hmm, I don't have a guide called '"+t0+"', hon. Try one of these: start, safety, keys, herds, tiers, barn, breeding, pregnancy, heat, body, cocks, shots, life, ribbons, fair or me"+
-           (ADDONS.size ? ", or an add-on: "+[...ADDONS.keys()].join(", ") : "")+". For example: ?help breeding";
+           (open.length ? ", or an add-on: "+open.map(x => x.name).join(", ") : "")+". For example: ?help breeding";
   }
   // every command they can use: the same groups the Companion's Guides tab shows (shared/guides.js),
   // plus the commands of whatever add-ons are runnin', for their rank
@@ -961,6 +965,7 @@ Say ?keys to see what you're holdin', hon.`;
 🐈 KITTENS — less obedient, more trouble, still ours
 🦌 DEER — skittish, and we like 'em that way
 👺 GOBLINS — got in some years back, never left, breed like it's a sport
+🐀 RATSLUTS — nest in the hayloft, squeak when they're caught, breed by the dozen
 🎎 DOLLS — posed, displayed, kept behind gold
 🕳️ GLORYHOLES — installed in the pens, left for whoever wanders past
 

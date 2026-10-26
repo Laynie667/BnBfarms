@@ -165,6 +165,7 @@ export const SWITCH_INFO = [
   ["mpreg", "Mpreg", "A load in your ass can take too, no item needed (with Breedable and Fertile on)"],
   ["jarok", "Jar insemination", "On: staff still ask every time · Off: never"], ["freeuse", "Free use", "Any stud may have you without askin'"],
   ["futa", "Futa", "Cock and vulva both, milk and semen both"], ["milkable", "Milkable", "Make milk"],
+  ["seedmilk", "Milk my seed", "The stall, the milkin' traps and ?collect take your seed as well as your milk. Off: they milk you up top and leave your cock and balls be"],
   ["naturalheat", "Natural heat", "Come into heat on your own every 7 days"], ["praise", "Praise", "Let staff's praise count"],
   ["degrade", "Degrade", "Let staff's degradin' count"], ["tally", "Tally marks", "Show your tally on ?who and the board"],
   ["potions", "Potions", "Staff and the wheel can give you potions, and others can gift you one (you're asked first). Your limits still rule some out"],

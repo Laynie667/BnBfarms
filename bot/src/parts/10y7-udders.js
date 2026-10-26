@@ -41,7 +41,7 @@
     r.milkCums = (r.milkCums || 0) + 1;
     let extra = 0;
     if (!cock && makesMilk(mn)){ extra = drainMilk(mn, Math.min(p.milk, milkCap(mn)*CFG.MILKCUM_LETDOWN)); st.got.m += extra; }
-    else if (makesSemen(mn)){ extra = drainSemen(mn, Math.min(p.semen, semenCap(mn)*CFG.MILKCUM_LETDOWN)); st.got.s += extra; }
+    else if (seedMilkable(mn)){ extra = drainSemen(mn, Math.min(p.semen, semenCap(mn)*CFG.MILKCUM_LETDOWN)); st.got.s += extra; }
     emote((cock ? "🐂 " : "🥛 ")+uLine(cock ? "cumCock" : "cumMilk", mn, { ml: ml(extra) }), mn);
     if (!real) arouse(mn, 100, 100);
     face(mn, "afterglow", 60);

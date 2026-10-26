@@ -40,7 +40,7 @@
     if (CFG.STRAIN_GEAR) return strainGear(mn);   // each strain's own pieces, colour and words, for the body it's on (10v3-parasite-strains.js)
     const r = rec(mn), g = r.parasite, P = parasiteParts(g), S = strainOf(g), out = [], base = { always: true, color: "#E0607F", until: g.until };
     if (P.lips) out.push(Object.assign({ slot: "lips", name: "Parasite Lips", desc: S.name+" strain. Fat, wet, living lips sealed over the mouth, with a tentacle seated down the throat. It feeds its host serum and swallows every load they suck out." }, base));
-    if (P.suckers) out.push(Object.assign({ slot: "cups", name: "Parasite Suckers", desc: S.name+" strain. Two soft pink mouths latched over the teats, sucking in slow greedy pulls. They drink every drop of milk and give something hotter back." }, base));
+    if (P.suckers) out.push(Object.assign({ slot: "chestbra", items: ["ForbiddenChastityBra"], name: "Parasite Suckers", desc: S.name+" strain. Two soft pink mouths latched over the teats, sucking in slow greedy pulls. They drink every drop of milk and give something hotter back." }, base));
     if (P.root) out.push(Object.assign({ slot: "belt", name: g.form === "belt" ? "Parasite Belt" : "Parasite Root", desc: S.name+" strain. A band of hot living flesh sealed round the hips, with a thick root pulsing in each hole. It drinks every load they take and pumps its own brew back in." }, base));
     return out;
   }

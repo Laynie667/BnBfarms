@@ -188,7 +188,7 @@
           saveLedger(); audit(sender, "ADDON_"+sub.toUpperCase(), a.name);
           R("🧩 "+a.label+" is "+(a.enabled ? "on" : "off")+"."); syncCompanions(true); break;
         }
-        R(addonsText(rest)); break;
+        R(addonsText(rest, sender)); break;
       }
 
       case "help": case "commands": case "info": case "guide":
@@ -440,7 +440,7 @@
             "\n\nProprietors save outfits from the Companion's Dashboard. ?outfit offer <who> [slot] hands one over.");
           break;
         }
-        // ?outfit starters [species] · ?outfit about <species> <gender>: the farm's own 45, by name (Oct 25)
+        // ?outfit starters [species] · ?outfit about <species> <gender>: the farm's own 90, by name (Oct 25; 18 kinds since Oct 26)
         if (sub === "starters" || sub === "starter" || sub === "farm"){
           const want = args[1] ? speciesFrom(args[1]) : null, kinds = FARM_OUTFITS.OUTFIT_SPECIES.filter(sp => !want || FARM_OUTFITS.outfitName(want, "female") === FARM_OUTFITS.outfitName(sp, "female"));
           if (!kinds.length){ R("I don't have starter outfits for that kind, sugar. ?outfit starters lists them all."); break; }
@@ -1208,6 +1208,7 @@
         try { trapStop(sender); } catch(e){ warn("safeword trap:", e); }           // a trap lets go mid-scene, and they all stay quiet for an hour
         try { parasiteOff(sender, "safe"); } catch(e){ warn("safeword parasite:", e); }
         try { symOff(sender, "safe"); } catch(e){ warn("safeword symbiote:", e); }
+        try { tempOutfitEnd(sender, "safe"); } catch(e){ warn("safeword outfit wheel:", e); }   // a wheel or Wrong Barn outfit comes off (10un-outfit-wheel.js)
         say("🔴 PAUSE CALLED. Everything stops, right now, everybody.", true, sender);   // I go stand by them, so everyone near them hears it
         beep(sender, "I've got you, "+plainName(sender)+". Everything's stopped and I'm fetchin' somebody for you right now. You don't owe anybody an explanation. 🔴", true);
         notifyStaff("🔴 SAFEWORD from "+plainName(sender)+" ("+sender+"). Please go to them now.", false);
@@ -1245,14 +1246,14 @@
           const m = parseInt(k,10);
           if (isStaff(m) && onDuty(m) && charFor(m)) staffHere.push(m);
         }
+        // Laynie, Oct 26: "?stuck should teleport them to the rescue spot": always, right away; staff still hear about it
+        beep(sender,"🪢 Pullin' you out to the rescue spot now, hon. Hold on just a moment.", true);
+        later(()=>rescueTeleport(sender), 1500);
         if (staffHere.length){
-          for (const m of staffHere) beep(m,"🪢 "+plainName(sender)+" ("+sender+") is wedged at "+where+".", true);
-          beep(sender,"🪢 I've called for a hand and somebody's on their way. Sit tight, you're okay.", true);
+          for (const m of staffHere) beep(m,"🪢 "+plainName(sender)+" ("+sender+") was wedged at "+where+". I've moved 'em to the rescue spot; check on 'em if you can.", true);
         } else {
-          beep(sender,"🪢 Nobody's around right now, so I'm pullin' you out myself. Hold on just a moment.", true);
-          notifyStaff("🪢 "+plainName(sender)+" was stuck at "+where+". Nobody was about, so I pulled 'em out.", true);
-          if (CFG.SUMMON_ON_STUCK) summonHelp("🪢 "+plainName(sender)+" is wedged at "+where+".", sender, false, "staff");
-          later(()=>rescueTeleport(sender), 3000);
+          notifyStaff("🪢 "+plainName(sender)+" was stuck at "+where+". I pulled 'em out to the rescue spot.", true);
+          if (CFG.SUMMON_ON_STUCK) summonHelp("🪢 "+plainName(sender)+" was wedged at "+where+".", sender, false, "staff");
         }
         break;
       }
@@ -1436,15 +1437,7 @@ Welcome to B&B Farm, hon. 🌾`);
           full = true;   // that was their last role
         }
         // off the books entirely: clear anyone they were holding, archive the paperwork, pull keys, off the whitelist
-        for (const k in L.people){
-          const p = L.people[k];
-          if ((p.herds||[]).some(h=>h.leader===t)) p.herds = p.herds.filter(h=>h.leader!==t);
-        }
-        L.archive[t] = JSON.parse(JSON.stringify(r));
-        delete L.people[t];
-        saveLedger(); audit(sender,"UNREGISTER",String(t));
-        pushKeys(t, [], true);
-        whitelistSync(true);
+        offTheBooks(t, sender);   // (10um-friend-check.js)
         R((words.length ? "That was their last role, so " : "")+"all done, sugar. "+plainName(t)+"'s keys are pulled, they're off the room whitelist, and their paperwork's tucked safe in the drawer.");
         beep(t,"Your contract's up, "+plainName(t)+". Your keys are pulled, but the gate swings both ways, sweetie. I'll keep your paperwork safe in the drawer.");
         break;
@@ -1869,15 +1862,20 @@ Welcome to B&B Farm, hon. 🌾`);
         const r = rec(sender);
         if (!r || !r.roles.length){ R("You'll need to be on the books first, hon. ?apply and we'll get you sorted. 🌾"); break; }
         const v = String(args[0]||"").toLowerCase();
-        if (v && !["on","off","yes","no"].includes(v)){ R("Just say ?milkable on or ?milkable off, sweetie."); break; }
-        if (!v){ R(switchStatus("milkable", makesMilk(sender))); break; }
-        const now = v === "on" || v === "yes";
+        if (/^(seed|cock|balls|semen|down|below|bottom)$/.test(v)){ seedMilkCommand(sender, r, String(args[1]||"").toLowerCase(), R); break; }   // ?milkable seed off
+        const v2 = /^(top|milk|up|udders?|tits)$/.test(v) && args[1] ? String(args[1]).toLowerCase() : v;   // ?milkable top on: the same as ?milkable on
+        if (v2 && !["on","off","yes","no"].includes(v2)){ R("Just say ?milkable on or ?milkable off, sweetie. ?milkable seed on|off is the one for your cock and balls."); break; }
+        if (!v2){ R(switchStatus("milkable", makesMilk(sender))+(makesSemen(sender) ? " Your seed: "+(r.seedMilk !== false ? "milked too" : "left be")+" (?seedmilk on|off)." : "")); break; }
+        const now = v2 === "on" || v2 === "yes";
         if (now && limitBlocks(sender,"milk")){ R("Your hard limits rule that out, sugar, so I'll keep it off. If you want it, change your limits with staff first."); break; }
         r.milkable = now; prodOf(sender); saveLedger(); audit(sender,"MILKABLE",now?"on":"off");
         R(now ? "🥛 You're milkable now, darlin'! You'll start fillin' up by the hour. ?stats to watch it, and ?help barn for how grades work."
               : "Alrighty, no more milk for you. ?milkable on whenever you change your mind. 💛");
         break;
       }
+
+      case "outfitwheel": case "dresswheel": case "wheeloutfit": outfitWheelCommand(sender, args, R); break;
+      case "seedmilk": { const r = rec(sender); if (!r || !r.roles.length){ R("You'll need to be on the books first, hon. ?apply and we'll get you sorted. 🌾"); break; } seedMilkCommand(sender, r, String(args[0]||"").toLowerCase(), R); break; }
 
       case "gender": {
         // ?gender → yours · ?gender <female|male|futa|femboy|nonbinary> · staff: ?gender <who> <gender>
@@ -2222,6 +2220,7 @@ Welcome to B&B Farm, hon. 🌾`);
         if (away){ R(away === sender ? "You've gotta be here on the map to do the milkin', sugar." : plainName(t)+" isn't here on the map right now, hon. You both need to be in the room."); break; }
         prodTick();
         if (cmd === "milk" && milkDenied(t)){ R("🚫 "+plainName(t)+"'s teats are capped for another "+Math.ceil((prodOf(t).milkDeniedUntil-Date.now())/60000)+" minutes, sugar. Let 'em ache."); break; }
+        if (cmd === "collect" && makesSemen(t) && !seedMilkable(t)){ R("🚫 "+plainName(t)+" has said ?milkable seed off, sugar: their seed isn't for collectin'."); break; }
         const got = cmd === "milk" ? drainMilk(t, amt) : drainSemen(t, amt);
         saveLedger(); audit(sender, cmd.toUpperCase(), t+" "+Math.round(got));
         if (got < 1){ R(plainName(t)+" is dry right now, sugar. Give 'em a while to fill back up."); break; }
@@ -2466,6 +2465,7 @@ Welcome to B&B Farm, hon. 🌾`);
       /* ── PLAY ── */
       case "wheel": {
         const sub = String(args[0]||"list").toLowerCase();
+        if (sub === "outfit" || sub === "outfits" || sub === "dress"){ outfitWheelCommand(sender, args.slice(1), R); break; }
         if (sub === "farm"){
           const v = String(args[1]||"").toLowerCase();
           if (v === "on" || v === "off"){ if (!isHerdmaster(sender)){ R("Herdmasters and up switch the farm's slices, sugar."); break; } L.wheelFarm = v === "on"; saveLedger(); }

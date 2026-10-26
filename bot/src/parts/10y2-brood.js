@@ -145,7 +145,7 @@
     });
   };
   MORE_TRAPS.well = function(mn, spot){ tentacleScene(mn, spot, true); };
-  TRAP_GEAR.leeches = [{ when: "after", slot: "cups", label: "Trough Leeches", mins: 20, color: "#3B2A2A",
+  TRAP_GEAR.leeches = [{ when: "after", slot: "chestbra", label: "Trough Leeches", items: ["ForbiddenChastityBra"], mins: 20, color: "#3B2A2A",   // (Oct 26: the Forbidden Chastity Bra)
     desc: "Two fat black leeches latched on swollen teats, pulsing as they feed. They drop off when they're full, and not a minute sooner." }];
 
   // ── ?quiet, ?tend ──

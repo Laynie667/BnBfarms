@@ -61,7 +61,7 @@
     return Object.keys(L.people).map(Number).find(o => o !== mn && canWrestle(o) && near(o)) || null;
   }
   Object.assign(TRAP_NEEDS, {
-    collection: mn => makesSemen(mn) ? null : "no cock to collect from",
+    collection: mn => !makesSemen(mn) ? "no cock to collect from" : !seedMilkable(mn) ? "they've said ?milkable seed off" : null,
     mudpit: mn => mudPartner(mn) ? null : "nobody close by to wrestle",
     auction: mn => state.lend ? "somebody's already on the block" : null,
   });

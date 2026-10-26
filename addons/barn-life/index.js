@@ -78,21 +78,23 @@ for (const k of Object.keys(M.DRUNK_LINES)) DRUNK_LINES[k].push(...M.DRUNK_LINES
 // which pool, for who they are and what they've got on
 const kindOf = (mn) => animalOf(api, mn);
 const bound = (g) => !!(g.arms || g.paws || g.hands);
+// their own kind's lines, else their closest cousin's (a pup eats like a dog, a kitty like a cat: connect.js KIN)
+const kindLines = (T, mn) => { const k = kindOf(mn); return T[k.key] || (k.kin && T[k.kin]) || null; };
 function eatPool(mn, g) {
   if (mouthFull(mn) && Math.random() < 0.8) return M.EAT_GAG;
-  const k = M.EAT_KIND[kindOf(mn).key];
+  const k = kindLines(M.EAT_KIND, mn);
   if (bound(g) && Math.random() < 0.7) return M.EAT_BOUND;
   return k && Math.random() < 0.6 ? k : EAT;
 }
 function drinkPool(mn, g) {
   if (api.funnelOn && api.funnelOn(mn)) return M.DRINK_FUNNEL;
   if (mouthFull(mn) && Math.random() < 0.8) return M.DRINK_GAG;
-  const k = M.DRINK_KIND[kindOf(mn).key];
+  const k = kindLines(M.DRINK_KIND, mn);
   if (bound(g) && Math.random() < 0.7) return M.DRINK_BOUND;
   return k && Math.random() < 0.5 ? k : DRINK;
 }
 function groomPool(mn) {
-  const g = gearOf(api, mn), on = Object.keys(M.GROOM_GEAR).filter((k) => g[k]), k = M.GROOM_KIND[kindOf(mn).key], r = Math.random();
+  const g = gearOf(api, mn), on = Object.keys(M.GROOM_GEAR).filter((k) => g[k]), k = kindLines(M.GROOM_KIND, mn), r = Math.random();
   if (on.length && r < 0.35) return M.GROOM_GEAR[pick(on)];
   return k && r < 0.75 ? k : GROOM;
 }

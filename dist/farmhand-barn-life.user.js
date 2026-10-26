@@ -120,8 +120,25 @@
     fox: { f: "vixen", m: "fox", young: ["kit", "kits"], call: "yip", sound: ["a high yip", "a breathy little whine", "a sharp, startled yip"] },
     wolf: { f: "wolf", m: "wolf", young: ["pup", "pups"], call: "howl", sound: ["a low, wavering howl", "a needy whine", "a rumbling growl"] },
     goat: { f: "nanny", m: "billy", young: ["kid", "kids"], call: "bleat", sound: ["a shaky bleat", "a soft bleat", "a loud, startled bleat"] },
+    rat: { f: "rat", m: "rat", young: ["pinkie", "pinkies"], call: "squeak", sound: ["a high, needy squeak", "a breathless little squeak", "a shaky chitter"] },
     sheep: { f: "ewe", m: "ram", young: ["lamb", "lambs"], call: "baa", sound: ["a soft baa", "a trembling baa"] },
     default: { f: "animal", m: "animal", young: ["little one", "little ones"], call: "moan", sound: ["a soft moan", "a needy whimper", "a shaky gasp"] }
+  };
+  var KIN = {
+    bull: "cow",
+    cow: "bull",
+    pony: "horse",
+    horse: "pony",
+    pup: "dog",
+    dog: "pup",
+    wolf: "dog",
+    fox: "dog",
+    kitt: "cat",
+    cat: "kitt",
+    rabbit: "bunny",
+    bunny: "rabbit",
+    sheep: "goat",
+    goat: "sheep"
   };
   function animalOf(api3, mn) {
     let k = "default";
@@ -130,7 +147,7 @@
     } catch (e) {
     }
     const w = ANIMALS[k] || ANIMALS.default, b = bodyOf(api3, mn), male = !!(b && (b.g === "male" || b.g === "femboy"));
-    return { key: ANIMALS[k] ? k : "default", a: male ? w.m : w.f, young: w.young, call: w.call, sound: pick(w.sound), sounds: w.sound, male };
+    return { key: ANIMALS[k] ? k : "default", kin: KIN[k] || null, a: male ? w.m : w.f, young: w.young, call: w.call, sound: pick(w.sound), sounds: w.sound, male };
   }
 
   // addons/barn-life/more-lines.js
@@ -179,6 +196,27 @@
       "%name% eats in quick, nervous little bites, lookin' up between every one.",
       "%name% nibbles at the feed delicately, ears flickin' at every sound in the barn."
     ],
+    bull: [
+      "%name% shoves their face into the trough and eats like a bull, huge mouthfuls, snortin' between them.",
+      "%name% clears half the trough in one go, chewin' slow and heavy, and dares anybody to say a word."
+    ],
+    sheep: [
+      "%name% crops at the hay in neat little bites, munchin' steady, never lookin' up.",
+      "%name% follows the next one over to the trough, because that's where everybody's goin', and eats."
+    ],
+    fox: [
+      "%name% snatches the best bits from the trough and darts off a step to eat them, eyes bright.",
+      "%name% eats with one ear turned back, like somebody might take it off 'em."
+    ],
+    wolf: [
+      "%name% bolts the feed down, growlin' softly at anybody who comes close to the trough.",
+      "%name% tears into the feed like it was hunted, then licks their chops."
+    ],
+    rat: [
+      "%name% nibbles at everything in the trough, one quick bite of each, whiskers twitchin'.",
+      "%name% stuffs their cheeks full and squirrels the rest away in a corner of the stall for later.",
+      "%name% picks through the feed with greedy little hands and eats the crumbs nobody else wanted."
+    ],
     goblin: [
       "%name% eats with both hands and no manners, grinnin' through a mouthful.",
       "%name% stuffs their pockets with feed for later, then eats what's left."
@@ -202,7 +240,14 @@
     dog: ["%name% laps at the water so fast and sloppy that most of it ends up on the floor."],
     cat: ["%name% laps delicately at the very edge of the water, then shakes a drop off their nose with disgust."],
     bunny: ["%name% takes quick little sips, nose wigglin', and keeps an eye out the whole time."],
-    goat: ["%name% drinks, then tries to climb into the water trough. It's a goat thing."]
+    goat: ["%name% drinks, then tries to climb into the water trough. It's a goat thing."],
+    bull: ["%name% drinks in great heavy gulps, then blows hard through their nose and splashes the whole trough."],
+    sheep: ["%name% drinks in neat little sips and keeps close to the others at the trough."],
+    fox: ["%name% laps quick and quiet, ears turnin' at every sound, ready to dart off."],
+    wolf: ["%name% laps the water loud and long, then shakes their head and showers everybody nearby."],
+    deer: ["%name% drinks with their head low and their eyes up, startin' at every creak of the barn."],
+    rat: ["%name% sips at the very edge of the trough, whiskers wet, then washes their face with their hands."],
+    goblin: ["%name% drinks straight from the trough with both hands, gulpin' and slurpin', and wipes their mouth on their arm."]
   };
   var DRINK_BOUND = [
     "No hands, so %name% gets down and laps from the water trough like any animal would.",
@@ -255,7 +300,16 @@
     ],
     bunny: ["%by% brushes %name% out till they're fluffy as a dandelion, and their nose twitches in thanks."],
     sheep: ["%by% fluffs up %name%'s wool, picks out the burrs, and gives them a pat on the rump."],
-    goat: ["%by% brushes %name% and gets nibbled for their trouble. %name% looks very pleased with themselves."]
+    goat: ["%by% brushes %name% and gets nibbled for their trouble. %name% looks very pleased with themselves."],
+    bull: ["%by% curries %name%'s broad back with a stiff brush, and %name% leans their whole weight into it with a low rumble."],
+    fox: ["%by% brushes out %name%'s tail till it's bushy and glossy, and %name% can't help showin' it off after."],
+    wolf: ["%by% works the brush through %name%'s thick ruff, and %name% goes still and sleepy-eyed under it."],
+    deer: ["%by% brushes %name% down slow and gentle, and %name% stops tremblin' halfway through."],
+    rat: [
+      "%by% brushes %name%'s fur smooth and cleans behind their round little ears, and %name% chitters the whole time.",
+      "%by% gives %name%'s long tail a wipe-down and a brush, and %name% grooms their own whiskers to match."
+    ],
+    goblin: ["%by% scrubs the mud off %name% with a stiff brush, and %name% complains about every inch of it, grinnin'."]
   };
   var GROOM_GEAR = {
     latex: ["%by% polishes %name%'s latex with a soft cloth until it shines like a wet apple.", "%by% wipes %name%'s rubber down and buffs it to a gleam, and %name% squeaks."],
@@ -654,21 +708,25 @@
   for (const k of Object.keys(DRUNK_LINES)) DRUNK_LINES2[k].push(...DRUNK_LINES[k]);
   var kindOf = (mn) => animalOf(api2, mn);
   var bound = (g) => !!(g.arms || g.paws || g.hands);
+  var kindLines = (T, mn) => {
+    const k = kindOf(mn);
+    return T[k.key] || k.kin && T[k.kin] || null;
+  };
   function eatPool(mn, g) {
     if (mouthFull(mn) && Math.random() < 0.8) return EAT_GAG;
-    const k = EAT_KIND[kindOf(mn).key];
+    const k = kindLines(EAT_KIND, mn);
     if (bound(g) && Math.random() < 0.7) return EAT_BOUND;
     return k && Math.random() < 0.6 ? k : EAT2;
   }
   function drinkPool(mn, g) {
     if (api2.funnelOn && api2.funnelOn(mn)) return DRINK_FUNNEL;
     if (mouthFull(mn) && Math.random() < 0.8) return DRINK_GAG;
-    const k = DRINK_KIND[kindOf(mn).key];
+    const k = kindLines(DRINK_KIND, mn);
     if (bound(g) && Math.random() < 0.7) return DRINK_BOUND;
     return k && Math.random() < 0.5 ? k : DRINK2;
   }
   function groomPool(mn) {
-    const g = gearOf(api2, mn), on2 = Object.keys(GROOM_GEAR).filter((k2) => g[k2]), k = GROOM_KIND[kindOf(mn).key], r = Math.random();
+    const g = gearOf(api2, mn), on2 = Object.keys(GROOM_GEAR).filter((k2) => g[k2]), k = kindLines(GROOM_KIND, mn), r = Math.random();
     if (on2.length && r < 0.35) return GROOM_GEAR[pick(on2)];
     return k && r < 0.75 ? k : GROOM2;
   }

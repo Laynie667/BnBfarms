@@ -134,7 +134,7 @@
   const PUBLIC_CMDS = ["help","commands","info","guide","rules","consent","tour","species","luxury","doors",
                        "ping","apply","record","keys","who","herd","safe","safeword","red","report",
                        "staff","stuck","friend","notice","teaseme","tease","dressme","dress","hypnotize","hypnotise","allow","letgo","echs","roam",
-                       "stats","board","pedigree","breedable","fertile","mpreg","naturalheat","breed","cum","milkable","futa","size","sizes","measure","penis","cock","rights","accept",
+                       "stats","board","pedigree","breedable","fertile","mpreg","naturalheat","breed","cum","milkable","seedmilk","outfitwheel","dresswheel","wheeloutfit","futa","size","sizes","measure","penis","cock","rights","accept",
                        "freeuse","jarok","gender","outfit","outfits","uniform","hypno","tally","eggs","yes","no","wash","quota","praise","degrade",
                        "weather","feeding","curfew","beg","please","fair","enter","addons","addon",
                        "ribbons","ribbon","store","buy","messes","ownoutfit","myoutfit","chest","gift","potions","potion","dares","dare","dared","bench","use","feedback","suggest","idea","bug","meh","more","today","subject","subjects","traps","trap","watersports","parasite","symbiote","symbiotes","struggle","free","goad","hunt","lay","gather","pack","watersport","parasites","eager","quiet","tend","brood","bet","cleanse","corruption","gauntlet","lend","bid","route","mysterybox","suit","whistle","send","dose","herdtraps","sit","broody","album","holes","vat","stalldial","bringin","bedrest","callme","nevercall","intensity","keep","kept"];

@@ -1,10 +1,10 @@
 /* WHAT'S IN THIS FILE (shared/farm-outfit-names.js)
-   A name and a description for each of the farm's 45 starter outfits (shared/farm-outfits.js), one for every species
+   A name and a description for each of the farm's 90 starter outfits (18 kinds × 5 genders since Oct 26) (shared/farm-outfits.js), one for every species
    and gender (Laynie, Oct 25: "we have them implemented, but they arent named and described").
    outfitName(species, gender) → "Dairy Darling" · outfitDesc(species, gender) → the blurb, then what's in it, read off
    the outfit's own pieces so it never says somethin' the outfit doesn't have.
 */
-import { outfitPieces } from "./farm-outfits.js";
+import { outfitPieces, outfitSpeciesOf } from "./farm-outfits.js";
 
 // [name, the blurb] for each species, by gender. The blurb is the look; the piece list after it is worked out.
 const NAMES = {
@@ -71,6 +71,13 @@ const NAMES = {
     femboy:    ["Piglet Pink", "A pink maid bikini and tulle skirt on a little piglet in trotters, snout hooked and caged."],
     nonbinary: ["Rosy Trotter", "A corset bikini in rose under the petsuit and rope harness, snout hooked, belted."],
   },
+  rat: {
+    female:    ["Gutter Sweetheart", "A dusty grey latex corset over a harness bra and crotchless latex, round mouse ears and a long pink tail: the barn's own ratslut, tagged, cuffed and hobbled."],
+    male:      ["Sewer Buck", "A jockstrap and harness on a tagged, cuffed rat in fishnets and thigh boots, leashed and caged."],
+    futa:      ["Midden Queen", "The ratslut's latex and harness bra with nothin' locked below, cuffed and hobbled and ready to breed the whole nest."],
+    femboy:    ["Squeak Toy", "A pink maid bikini and tulle skirt on a little rat with round ears and a long tail, cuffed, hobbled and caged."],
+    nonbinary: ["Hayloft Nibbler", "A classic latex corset and latex stockings in grey, mouse ears and tail, tagged, cuffed and belted."],
+  },
   goblin: {
     female:    ["Ragged Raider", "Rags, elf ears and a slave collar, frog-tied on her knees with long mittens on, a bit and a nose ring, barefoot."],
     male:      ["Rag-Tag Grunt", "A jockstrap and harness on a frog-tied goblin, mittened, bitted, barefoot and caged."],
@@ -78,8 +85,58 @@ const NAMES = {
     femboy:    ["Camp Trinket", "Pink frills on a frog-tied goblin, long mittens and a bit, barefoot and caged."],
     nonbinary: ["Cave Scrapper", "Rags and a slave collar, frog-tied and mittened, a bit and a nose ring, belted."],
   },
+  // their own sets (Oct 26)
+  bull: {
+    female:    ["Herd Matriarch", "Black and cognac, dark horns, a cowbell and a brass nose ring, cow-print and cups for the milkin', wrists cuffed and ankles hobbled."],
+    male:      ["Prize Stud Bull", "A jockstrap and harness on a horned, nose-ringed bull, belled, cuffed and hobbled, led by the ring and caged between breedings."],
+    futa:      ["Breeding Line Bull", "Latex under the cow-print, horns, ring and bell, and nothin' locked below: the herd's own breeder."],
+    femboy:    ["Little Bull Calf", "A pink maid bikini and tulle skirt on a horned little calf with a nose ring and a bell, cuffed and caged."],
+    nonbinary: ["Black Angus", "A classic latex corset in black and cognac, horns, ring and bell, cuffed, hobbled and belted."],
+  },
+  horse: {
+    female:    ["Chestnut Show Mare", "Chestnut and cream show tack: a posture collar, a silver bit, a cream harness, hoof mittens behind the back and tall pony boots."],
+    male:      ["Brass and Leather Stallion", "A jockstrap and harness on a bridled chestnut stallion with hoof mittens and boots, hobbled and caged."],
+    futa:      ["Thoroughbred Broodmare", "Latex corset and harness bra under the cream harness, bitted and booted, nothin' locked where she's bred."],
+    femboy:    ["Ribboned Yearling", "A pink maid bikini under chestnut tack, a bit, hoof mittens and boots, caged."],
+    nonbinary: ["Saddlebred", "A classic latex corset under the harness and bridle, hooves and boots, belted."],
+  },
+  dog: {
+    female:    ["Good Farm Girl", "A tan petsuit with cream paws, a bone tag on a dark collar, a ring gag and a lead: the farm's own faithful bitch."],
+    male:      ["Working Hound", "A jockstrap and harness on a big tan farm dog on all fours, tagged, leashed and caged."],
+    futa:      ["Kennel Queen", "Latex and a harness bra under the tan petsuit, gagged open and free to breed the whole kennel."],
+    femboy:    ["Lap Dog Frills", "Pink frills on a tan pup: a maid bikini, a ribbon cincher, a bone tag, and a cage."],
+    nonbinary: ["Barn Dog", "A latex corset and bra under the tan petsuit, a bone tag and a ring gag, belted."],
+  },
+  wolf: {
+    female:    ["Tamed She-Wolf", "Storm grey and silver: a grey petsuit, a black collar on a short lead and a ring gag, wild but brought to heel."],
+    male:      ["Pack Alpha on a Leash", "A jockstrap and harness on a grey wolf on all fours, leashed by the collar and caged."],
+    futa:      ["Moonlit Breeder", "Latex and a harness bra under the grey wolf suit, gagged open, nothin' locked below."],
+    femboy:    ["Little Pup of the Pack", "A pink maid bikini and tulle skirt on a grey wolf pup, leashed and caged."],
+    nonbinary: ["Silverback", "A classic latex corset under the grey petsuit, a lead and a ring gag, belted."],
+  },
+  cat: {
+    female:    ["Black Cat Mistress", "A black cat in wine and plum: a black petsuit, a belled wine collar, a ring gag and a lead."],
+    male:      ["Barn Tom", "A jockstrap and harness on a black tomcat in a petsuit, belled, leashed and caged."],
+    futa:      ["Midnight Mouser", "Latex and a harness bra under the black cat suit, belled, gagged open and free to breed."],
+    femboy:    ["Witch's Kitten", "A pink maid bikini and tulle skirt on a little black cat, belled and caged."],
+    nonbinary: ["Shadow Purr", "A classic latex corset under the black petsuit, a belled collar and a ring gag, belted."],
+  },
+  rabbit: {
+    female:    ["Mint Warren Doe", "A see-through mint bunny suit, hare-brown ears, pet legs to kneel on and cuffed wrists: a doe kept for breedin'."],
+    male:      ["Warren Buck", "A jockstrap and harness on a buck on pet legs, cuffed, collared and caged."],
+    futa:      ["Spring Litter Queen", "The see-through mint suit with nothin' locked on: kneelin', cuffed and ready to be bred like a rabbit."],
+    femboy:    ["Clover Kit", "A pink maid bikini and tulle skirt on a little rabbit on pet legs, cuffed and caged."],
+    nonbinary: ["Meadow Hare", "A corset bikini and crotchless lace in mint, hare ears and pet legs, cuffed and belted."],
+  },
+  sheep: {
+    female:    ["Lilac Lamb", "Fluffy cream and lilac: curled horns, soft ears, a puff of a tail, a brass bell, hoof mittens and pet legs to kneel on."],
+    male:      ["Shorn Ram", "A jockstrap and harness on a horned ram with hoof mittens, kneelin', belled and caged."],
+    futa:      ["Woolly Ewe in Season", "Open lilac lace, horns and a bell, hoof mittens and nothin' locked below for the flock."],
+    femboy:    ["Little Lamb Frills", "A pink maid bikini and tulle skirt on a lamb with hoof mittens and a bell, caged and kneelin'."],
+    nonbinary: ["Flock Darling", "A corset bikini in lilac, horns, hoof mittens and pet legs, belled and belted."],
+  },
 };
-const ALIAS = { bull: "cow", horse: "pony", dog: "pup", wolf: "pup", cat: "kitt", rabbit: "bunny", sheep: "goat" };
+const ALIAS = {};   // (every kind has its own names since Oct 26)
 
 // what each piece is called in a description (the game's own name is used for anything not here)
 const SAY = {
@@ -89,7 +146,8 @@ const SAY = {
   "Corset:LatexCorset1": "underbust latex corset", "Corset:RibbonCorset": "ribbon waist cincher", "Garters:SocksBow": "bows on the socks",
   "HairAccessory1:CowHorns": "cow horns", "HairAccessory1:Horns2": "goat horns", "HairAccessory2:BunnyEars1": "bunny ears", "HairAccessory2:CowEars": "cow ears",
   "HairAccessory2:Ears2": "soft ears", "HairAccessory2:ElfEars": "goblin ears", "HairAccessory2:FoxEars1": "fox ears", "HairAccessory2:KittenEars2": "kitten ears",
-  "HairAccessory2:PonyEars1": "pony ears", "HairAccessory2:PuppyEars1": "puppy ears", "HairAccessory2:PuppyEars2": "floppy ears", "HairAccessory3:Ribbons1": "hair ribbons",
+  "HairAccessory2:PonyEars1": "pony ears", "HairAccessory2:MouseEars2": "round mouse ears", "TailStraps:MouseTailStrap1": "long bare rat tail",
+  "ItemNeckAccessories:CollarNameTagLivestock": "livestock tag", "Garters:HipHarness": "hip harness", "HairAccessory2:PuppyEars1": "puppy ears", "HairAccessory2:PuppyEars2": "floppy ears", "HairAccessory3:Ribbons1": "hair ribbons",
   "Hat:ReindeerBand": "antler band", "ItemArms:LeatherCuffs": "leather wrist cuffs", "ItemArms:PawPaddedPetsuitArms": "padded petsuit arms",
   "ItemBoots:PonyBoots": "pony boots", "ItemFeet:LeatherAnkleCuffs": "ankle cuffs chained together", "ItemHands:ElbowLengthMittens": "long mittens",
   "ItemHands:PonyMittensBinder": "hoof mittens strapped together", "ItemLegs:FrogtieMetalCuffs": "frog-tie cuffs", "ItemLegs:HempRope": "rope on the legs",
@@ -110,7 +168,7 @@ const SAY = {
 const say = (p) => SAY[p.Group + ":" + p.Name] || p.Name;
 const list = (a) => a.length < 2 ? a.join("") : a.slice(0, -1).join(", ") + " and " + a[a.length - 1];
 
-const entry = (species, gender) => (NAMES[species] || NAMES[ALIAS[species]] || {})[gender] || null;
+const entry = (species, gender) => (NAMES[species] || NAMES[ALIAS[species]] || NAMES[outfitSpeciesOf(species)] || {})[gender] || null;
 export function outfitName(species, gender) { const e = entry(species, gender); return e ? e[0] : null; }
 export function outfitDesc(species, gender) {
   const e = entry(species, gender), pieces = outfitPieces(species, gender);

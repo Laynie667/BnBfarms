@@ -488,6 +488,7 @@
       enqueue(makeMsg("welcome", { ver:VERSION, proto:PROTOCOL, name:plainName(mn), staff:isStaff(mn), look:farmLookAt() }, mn));   // look: which farm look for the drawn body the bot has (10y9e-farm-look.js)
       later(()=>syncCompanions(), 800);
       try { companionTooOld(mn, String(m.ver||"")); } catch(e){}
+      { const r = rec(mn); if (r && r.outfitOwed) later(() => contractOutfitNow(mn), 2500); if (r && r.tempOutfit && r.tempOutfit.due) later(() => tempOutfitEnd(mn, r.tempOutfit && r.tempOutfit.due), 2000); }   // an outfit their contract still owes them (10c-outfits.js)
       return;
     }
     if (m.type === "bye"){ state.companions.delete(mn); return; }

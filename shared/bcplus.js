@@ -7,6 +7,7 @@
 // REFUSES a contract with an unknown rule. So nothing leaves the farm unless checkContract() says it's clean.
 import CATALOG from "./bcplus-rules.json";
 
+import { speciesKeyOf } from "./species.js";
 export const BCPLUS_VERSION = CATALOG.bcplusVersion;
 export const RULES = new Map(CATALOG.rules.map((r) => [r.id, r]));
 
@@ -51,11 +52,11 @@ export function depthFrom(text) {
 
 // farm species → BC+ pet sound set (the rest use Custom with their own sounds)
 const ANIMALS = { cow: "Cow", bull: "Cow", pony: "Pony", horse: "Pony", pup: "Dog", dog: "Dog", kitt: "Cat", cat: "Cat",
-                  bunny: "Bunny", rabbit: "Bunny", fox: "Fox", wolf: "Wolf", mouse: "Mouse" };
+                  bunny: "Bunny", rabbit: "Bunny", fox: "Fox", wolf: "Wolf", mouse: "Mouse", rat: "Mouse" };
 const SOUNDS = { pig: ["oink", "snort", "squee", "grunt"], goat: ["maa", "meh-eh", "bleat"], sheep: ["baa", "baaah", "meh"],
                  deer: ["bleat", "snort", "huff"], goblin: ["heh", "gnuk", "skree", "hrrk"] };
 export function petFor(species) {
-  const s = String(species || "").toLowerCase();
+  const s = speciesKeyOf(species) || String(species || "").toLowerCase();   // "Kitty", "catgirl", "ratslut" (shared/species.js)
   if (ANIMALS[s]) return { animal: ANIMALS[s], sounds: [] };
   return { animal: "Custom", sounds: SOUNDS[s] || ["moo"] };
 }

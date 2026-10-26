@@ -372,6 +372,7 @@
       bunny:{milk:1, fert:1.5, litter:[4,8]}, rabbit:{milk:1, fert:1.5, litter:[4,8]},
       fox:{milk:1, fert:1.1, litter:[2,5]},   wolf:{milk:1, fert:1.1, litter:[3,6]},
       goat:{milk:1.5, fert:1.1, litter:[1,3]}, sheep:{milk:1, fert:1.0, litter:[1,2]},
+      rat:{milk:1, fert:1.7, litter:[6,12]},   // (Oct 26: the ratsluts)
       default:{milk:1, fert:1.0, litter:[1,2]}
     },
     // keywords in a crafted item's name or description (worn, or on an injector)

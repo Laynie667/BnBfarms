@@ -8,6 +8,7 @@
 //   2. swap their clothes for the outfit's and add its restraints. Body and hair are never touched,
 //      and nothin' already locked on them is moved
 //   3. every piece that was locked in the saved outfit gets a high security padlock keyed to the farm
+import { BOT_MEMBER } from "./config.js";
 const BACKUP_KEY = "fhc-outfit-backup";
 // lock details are never saved or copied: the farm puts its own locks on
 const LOCK_FIELDS = ["LockedBy", "LockMemberNumber", "LockMemberName", "LockMessage", "CombinationNumber", "Password", "Hint", "LockSet",
@@ -91,12 +92,19 @@ export function wearOutfit(data, keys) {
   return { ok: true, worn, locks, skipped };
 }
 
-// back into what they wore before the farm dressed them (locked farm pieces stay till a keyholder opens 'em)
-export function changeBack() {
+// back into what they wore before the farm dressed them (locked farm pieces stay till a keyholder opens 'em).
+// farmLocks: the farm itself is the keyholder openin' them (the outfit wheel's timer ran out, Oct 26): the pieces the
+// farm put on, under the farm's own padlock, come off too. Nothin' anybody else locked is ever touched.
+export function changeBack(opts) {
   let bk = null;
   try { bk = JSON.parse(window.localStorage.getItem(BACKUP_KEY)); } catch (e) { /* none */ }
   if (!bk || !Array.isArray(bk.bundle)) return { ok: false, why: "I don't have your own clothes saved on this computer" };
   const stuck = lockedGroups();
+  if (opts && opts.farmLocks) for (const it of P().Appearance) {
+    const pr = it.Property || {}, g = it.Asset.Group.Name, keys = String(pr.MemberNumberListKeys || "").split(",").map(Number);
+    if (pr.LockedBy === "HighSecurityPadlock" && pr.LockMemberNumber === P().MemberNumber && keys.includes(BOT_MEMBER) &&
+        ((bk.added || []).includes(g) || isClothes(groupOf(g)))) stuck.delete(g);
+  }
   const next = window.ServerAppearanceBundle(P().Appearance).filter((b) => {
     if (stuck.has(b.Group)) return true;
     const g = groupOf(b.Group);

@@ -33,6 +33,17 @@ export const EAT_KIND = {
          "%name% headbutts the trough, gets what falls out, and chews it with great satisfaction."],
   deer: ["%name% eats in quick, nervous little bites, lookin' up between every one.",
          "%name% nibbles at the feed delicately, ears flickin' at every sound in the barn."],
+  bull: ["%name% shoves their face into the trough and eats like a bull, huge mouthfuls, snortin' between them.",
+         "%name% clears half the trough in one go, chewin' slow and heavy, and dares anybody to say a word."],
+  sheep: ["%name% crops at the hay in neat little bites, munchin' steady, never lookin' up.",
+          "%name% follows the next one over to the trough, because that's where everybody's goin', and eats."],
+  fox: ["%name% snatches the best bits from the trough and darts off a step to eat them, eyes bright.",
+        "%name% eats with one ear turned back, like somebody might take it off 'em."],
+  wolf: ["%name% bolts the feed down, growlin' softly at anybody who comes close to the trough.",
+         "%name% tears into the feed like it was hunted, then licks their chops."],
+  rat: ["%name% nibbles at everything in the trough, one quick bite of each, whiskers twitchin'.",
+        "%name% stuffs their cheeks full and squirrels the rest away in a corner of the stall for later.",
+        "%name% picks through the feed with greedy little hands and eats the crumbs nobody else wanted."],
   goblin: ["%name% eats with both hands and no manners, grinnin' through a mouthful.",
            "%name% stuffs their pockets with feed for later, then eats what's left."],
 };
@@ -55,6 +66,13 @@ export const DRINK_KIND = {
   cat: ["%name% laps delicately at the very edge of the water, then shakes a drop off their nose with disgust."],
   bunny: ["%name% takes quick little sips, nose wigglin', and keeps an eye out the whole time."],
   goat: ["%name% drinks, then tries to climb into the water trough. It's a goat thing."],
+  bull: ["%name% drinks in great heavy gulps, then blows hard through their nose and splashes the whole trough."],
+  sheep: ["%name% drinks in neat little sips and keeps close to the others at the trough."],
+  fox: ["%name% laps quick and quiet, ears turnin' at every sound, ready to dart off."],
+  wolf: ["%name% laps the water loud and long, then shakes their head and showers everybody nearby."],
+  deer: ["%name% drinks with their head low and their eyes up, startin' at every creak of the barn."],
+  rat: ["%name% sips at the very edge of the trough, whiskers wet, then washes their face with their hands."],
+  goblin: ["%name% drinks straight from the trough with both hands, gulpin' and slurpin', and wipes their mouth on their arm."],
 };
 export const DRINK_BOUND = [
   "No hands, so %name% gets down and laps from the water trough like any animal would.",
@@ -99,6 +117,13 @@ export const GROOM_KIND = {
   bunny: ["%by% brushes %name% out till they're fluffy as a dandelion, and their nose twitches in thanks."],
   sheep: ["%by% fluffs up %name%'s wool, picks out the burrs, and gives them a pat on the rump."],
   goat: ["%by% brushes %name% and gets nibbled for their trouble. %name% looks very pleased with themselves."],
+  bull: ["%by% curries %name%'s broad back with a stiff brush, and %name% leans their whole weight into it with a low rumble."],
+  fox: ["%by% brushes out %name%'s tail till it's bushy and glossy, and %name% can't help showin' it off after."],
+  wolf: ["%by% works the brush through %name%'s thick ruff, and %name% goes still and sleepy-eyed under it."],
+  deer: ["%by% brushes %name% down slow and gentle, and %name% stops tremblin' halfway through."],
+  rat: ["%by% brushes %name%'s fur smooth and cleans behind their round little ears, and %name% chitters the whole time.",
+        "%by% gives %name%'s long tail a wipe-down and a brush, and %name% grooms their own whiskers to match."],
+  goblin: ["%by% scrubs the mud off %name% with a stiff brush, and %name% complains about every inch of it, grinnin'."],
 };
 // what they're wearin' gets seen to as well
 export const GROOM_GEAR = {

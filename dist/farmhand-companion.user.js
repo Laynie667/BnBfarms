@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.42.0
+// @version      0.43.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -230,7 +230,133 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.42.0";
+  var VERSION = "0.43.0";
+
+  // shared/species.js
+  var WORDS = {
+    cow: "cow",
+    cows: "cow",
+    cattle: "cow",
+    heifer: "cow",
+    hucow: "cow",
+    bovine: "cow",
+    calf: "cow",
+    dairy: "cow",
+    moo: "cow",
+    cowgirl: "cow",
+    bull: "bull",
+    ox: "bull",
+    steer: "bull",
+    pony: "pony",
+    filly: "pony",
+    foal: "pony",
+    colt: "pony",
+    ponygirl: "pony",
+    ponyboy: "pony",
+    horse: "horse",
+    mare: "horse",
+    stallion: "horse",
+    equine: "horse",
+    deer: "deer",
+    doe: "deer",
+    fawn: "deer",
+    stag: "deer",
+    reindeer: "deer",
+    pig: "pig",
+    piggy: "pig",
+    piglet: "pig",
+    sow: "pig",
+    hog: "pig",
+    swine: "pig",
+    oink: "pig",
+    boar: "pig",
+    pup: "pup",
+    puppy: "pup",
+    pupper: "pup",
+    pupgirl: "pup",
+    pupboy: "pup",
+    dog: "dog",
+    doggy: "dog",
+    doggie: "dog",
+    hound: "dog",
+    canine: "dog",
+    bitch: "dog",
+    kitt: "kitt",
+    kitty: "kitt",
+    kitten: "kitt",
+    kittie: "kitt",
+    kit: "kitt",
+    kitteh: "kitt",
+    neko: "kitt",
+    catgirl: "kitt",
+    catboy: "kitt",
+    cat: "cat",
+    feline: "cat",
+    tomcat: "cat",
+    pussycat: "kitt",
+    goblin: "goblin",
+    gob: "goblin",
+    gobbo: "goblin",
+    bunny: "bunny",
+    bun: "bunny",
+    bunbun: "bunny",
+    rabbit: "rabbit",
+    hare: "rabbit",
+    fox: "fox",
+    vixen: "fox",
+    foxy: "fox",
+    kitsune: "fox",
+    wolf: "wolf",
+    lupine: "wolf",
+    wolfie: "wolf",
+    goat: "goat",
+    nanny: "goat",
+    billy: "goat",
+    kid: "goat",
+    sheep: "sheep",
+    lamb: "sheep",
+    ewe: "sheep",
+    ram: "sheep",
+    rat: "rat",
+    ratty: "rat",
+    rattie: "rat",
+    ratgirl: "rat",
+    ratboy: "rat",
+    ratslut: "rat",
+    rodent: "rat",
+    mouse: "rat",
+    mousey: "rat",
+    mice: "rat"
+  };
+  var ENDINGS = /(girl|boy|gal|guy|kin|slut|sluts|whore|toy|pet|bimbo|s)$/;
+  var known = (w) => {
+    if (WORDS[w]) return WORDS[w];
+    const cut = w.replace(ENDINGS, "");
+    if (cut !== w && cut.length > 1) {
+      if (WORDS[cut]) return WORDS[cut];
+      const again = cut.replace(ENDINGS, "");
+      if (WORDS[again]) return WORDS[again];
+    }
+    if (/ves$/.test(w) && WORDS[w.replace(/ves$/, "f")]) return WORDS[w.replace(/ves$/, "f")];
+    return null;
+  };
+  var INSIDE = Object.keys(WORDS).filter((w) => w.length >= 3).sort((a, b) => b.length - a.length);
+  function speciesKeyOf(text) {
+    const low = String(text || "").toLowerCase().replace(/[^a-z\s\/-]/g, " ").replace(/\s+/g, " ").trim();
+    if (!low) return null;
+    const whole = low.replace(/[\s\/-]+/g, "");
+    if (known(whole)) return known(whole);
+    const words = low.split(/[\s\/-]+/).filter(Boolean);
+    for (const w of words) {
+      const k = known(w);
+      if (k) return k;
+    }
+    for (const w of words) {
+      const hit = INSIDE.find((x) => w.startsWith(x) || w.endsWith(x));
+      if (hit) return WORDS[hit];
+    }
+    return null;
+  }
 
   // extension/src/config.js
   var BOT_MEMBER = 260239;
@@ -424,12 +550,12 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     { name: "Suggestion box", cmds: ["feedback <what you think>", "suggest <an idea>", "bug <what went wrong>", "feedback mine", "meh", "more"] },
     { name: "Gettin' started", cmds: ["help", "help me", "rules", "consent", "tour", "apply", "friend", "species", "luxury", "doors", "addons"] },
     { name: "You and the farm", cmds: ["today", "record", "keys", "who", "herd", "notice", "weather", "feeding", "curfew", "beg"] },
-    { name: "Milk", cmds: ["stats", "board", "milkable", "quota"] },
+    { name: "Milk", cmds: ["stats", "board", "milkable", "seedmilk", "quota"] },
     { name: "Stock with stock", cmds: ["milk <who>", "edge <who>", "groom <who>"] },
     { name: "Breedin'", cmds: ["breedable", "fertile", "mpreg", "freeuse", "jarok", "yes", "no", "naturalheat", "breed <who>", "cum <who>", "wash", "tally", "eggs", "praise", "degrade", "rights", "accept", "pedigree"] },
     { name: "Body", cmds: ["size", "measure", "penis", "futa", "gender <word>"] },
     { name: "Roamin'", cmds: ["roam", "roam start", "roam back"] },
-    { name: "Clothes", cmds: ["dressme", "outfit", "outfits", "uniform", "outfit back", "outfit starters", "outfit about <species> <gender>"] },
+    { name: "Clothes", cmds: ["dressme", "outfit", "outfits", "uniform", "outfit back", "outfit starters", "outfit about <species> <gender>", "outfitwheel", "outfitwheel status"] },
     { name: "Mind", cmds: ["hypno", "hypnotize me", "echs", "teaseme", "teaseme light", "teaseme steady", "teaseme needy", "teaseme off"] },
     { name: "Fun", cmds: ["fair", "enter"] },
     { name: "Ribbons and the store", cmds: ["ribbons", "ribbons top", "store", "buy <item>", "gift <who> <potion>", "potions", "potions on", "dares on", "dare", "dared", "dare skip", "bench", "bench on", "bench me <minutes>", "use <mouth|pussy|ass>", "bench top"] }
@@ -439,7 +565,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     { name: "Herd", cmds: ["claim <who>", "release <who>", "myherd", "herdname <name>", "herdcall", "herdsummon", "turnout <who>", "letup <who>", "brand <who>", "walk <who>"] },
     { name: "Stock", cmds: ["tier <who> <tier>", "stocks <who>", "unstock <who>", "vet <who>", "inspect <who>", "tease list", "tease add <line>", "tease for <who> <line>", "teaseme <who> on", "roam give <who>", "roam <who>", "hypnotize <who>", "allow <who> cum", "allow <who> all", "echs <who>"] },
     { name: "Contracts", cmds: ["contract list", "contract show deep <who>", "contract offer deep <who> 1w", "contract check <who>", "contract release <who>", "contract rules", "contracts"] },
-    { name: "Outfits", cmds: ["outfit", "outfit offer <who>", "outfit offer <who> <species> <gender>"] },
+    { name: "Outfits", cmds: ["outfit", "outfit offer <who>", "outfit offer <who> <species> <gender>", "outfitwheel <who>", "outfitwheel stop <who>"] },
     { name: "Barn", cmds: ["milk <who>", "collect <who>", "jars", "inseminate <who> <jar>", "machine <who> <jar>", "drain <who>", "edge <who>", "denial <who>", "ruin <who>", "nomilk <who> <hours>", "quota <who>", "heat <who>", "heatline", "shotlog"] },
     { name: "Map", cmds: ["spot", "spot set <name>", "spot place <name> <x> <y>", "zone", "zone who", "zone a <name>", "zone b <name>", "zone box <name> <ax> <ay> <bx> <by>", "zone pair <name> <group>", "tourstop", "setrescue", "where", "stucklog"] },
     { name: "Voice", cmds: ["voice", "voice on herd", "voice add herd <line>", "voice every herd 15"] },
@@ -5701,6 +5827,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     ["freeuse", "Free use", "Any stud may have you without askin'"],
     ["futa", "Futa", "Cock and vulva both, milk and semen both"],
     ["milkable", "Milkable", "Make milk"],
+    ["seedmilk", "Milk my seed", "The stall, the milkin' traps and ?collect take your seed as well as your milk. Off: they milk you up top and leave your cock and balls be"],
     ["naturalheat", "Natural heat", "Come into heat on your own every 7 days"],
     ["praise", "Praise", "Let staff's praise count"],
     ["degrade", "Degrade", "Let staff's degradin' count"],
@@ -8213,7 +8340,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
       card(title("Comin' soon"), muted("Echo's pumps and milk vendor, outfits by species and gender with high security locks, and the farm's own Listen to my voice (ECHS first)."))
     ];
   }
-  var SPECIES = ["cow", "bull", "pony", "horse", "goat", "sheep", "pig", "bunny", "rabbit", "pup", "dog", "kitt", "cat", "fox", "wolf", "deer", "goblin"];
+  var SPECIES = ["cow", "bull", "pony", "horse", "goat", "sheep", "pig", "bunny", "rabbit", "pup", "dog", "kitt", "cat", "fox", "wolf", "deer", "goblin", "rat"];
   var GENDERS = ["female", "male", "futa", "femboy", "nonbinary"];
   var KEYS_TEXT = { staff: "farm staff + their herd leader", leader: "their herd leader only", owners: "the proprietors only" };
   function outfits(ctx3) {
@@ -9125,7 +9252,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     commit(next);
     return { ok: true, worn, locks, skipped };
   }
-  function changeBack() {
+  function changeBack(opts) {
     let bk = null;
     try {
       bk = JSON.parse(window.localStorage.getItem(BACKUP_KEY));
@@ -9133,6 +9260,10 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     }
     if (!bk || !Array.isArray(bk.bundle)) return { ok: false, why: "I don't have your own clothes saved on this computer" };
     const stuck = lockedGroups();
+    if (opts && opts.farmLocks) for (const it of P().Appearance) {
+      const pr = it.Property || {}, g = it.Asset.Group.Name, keys = String(pr.MemberNumberListKeys || "").split(",").map(Number);
+      if (pr.LockedBy === "HighSecurityPadlock" && pr.LockMemberNumber === P().MemberNumber && keys.includes(BOT_MEMBER) && ((bk.added || []).includes(g) || isClothes(groupOf(g)))) stuck.delete(g);
+    }
     const next = window.ServerAppearanceBundle(P().Appearance).filter((b) => {
       if (stuck.has(b.Group)) return true;
       const g = groupOf(b.Group);
@@ -9421,7 +9552,9 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     device: { groups: ["ItemDevices"], names: ["WoodenStocks"], re: /^(WoodenStocks|SaddleStand|WoodenHorse|Net|Kennel|LowCage|KabeshiriWall|WheelFortune|LuckyWheel|XFrame|BondageBench|TheDisplayFrame|MilkCan|VacBedDeluxe|InflatableBodyBag)$/ },
     // the latex traps (Oct 25): a hood and mitts
     hood: { groups: ["ItemHood"], names: ["LatexHood"], re: /^(LatexHood|TransparentLatexHood|LatexDogHood|VacHood)$/, color: "#121214" },
-    mitts: { groups: ["ItemHands"], names: ["LatexBondageMitts"], re: /^LatexBondageMitts$/, color: "#121214" }
+    mitts: { groups: ["ItemHands"], names: ["LatexBondageMitts"], re: /^LatexBondageMitts$/, color: "#121214" },
+    // the parasite's suckers and the trough leeches (Laynie, Oct 26: "switch the parasites lactation pumps for the forbidden chastity bra")
+    chestbra: { groups: ["ItemBreast"], names: ["ForbiddenChastityBra", "PolishedChastityBra", "MetalChastityBra"], re: /ChastityBra$/ }
   };
   var GEAR_OPT = {
     "ItemArms:LeatherCuffs": "Wrist",
@@ -10319,10 +10452,12 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     fox: ["yip", "ack"],
     wolf: ["awoo", "grr"],
     deer: ["bleat", "mweh"],
-    goblin: ["heh", "nngh"]
+    goblin: ["heh", "nngh"],
+    rat: ["squeak", "eek", "chitter"],
+    kitt: ["mew", "nya", "mrrp"]
   };
   function mooify(text, species) {
-    const say = NOISES[String(species || "").toLowerCase()] || NOISES.cow;
+    const say = NOISES[String(species || "").toLowerCase()] || NOISES[speciesKeyOf(species)] || NOISES.cow;
     return String(text).replace(/[A-Za-z']{3,}/g, (w) => {
       if (Math.random() < 0.5) return w;
       const n = say[Math.floor(Math.random() * say.length)];
@@ -10510,8 +10645,8 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
         break;
       case "outfit":
         if (m.auto) {
-          api.wear({ slot: String(m.slot || ""), label: String(m.label || "farm outfit"), data: String(m.data || ""), keys: Array.isArray(m.keys) ? m.keys.filter(Number.isInteger) : [] });
-          toChat("\u{1F457} You've been dressed in your " + String(m.label || "farm outfit") + " for your new contract.", "#c9a35b");
+          const ok2 = api.wear({ slot: String(m.slot || ""), label: String(m.label || "farm outfit"), data: String(m.data || ""), keys: Array.isArray(m.keys) ? m.keys.filter(Number.isInteger) : [] });
+          if (ok2) toChat("\u{1F457} You've been dressed in your " + String(m.label || "farm outfit") + " for your new contract.", "#c9a35b");
           break;
         }
         st.panel.setOutfit({
@@ -10613,7 +10748,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
         break;
       }
       case "outfitBack": {
-        const r = changeBack();
+        const r = changeBack({ farmLocks: !!m.farmLocks });
         st.panel.add(r.ok ? "\u{1F457} Back in your own clothes" + (r.stillLocked ? " (farm-locked pieces stay till a keyholder opens 'em)" : "") + "." : "\u{1F457} " + r.why + ".", "notice");
         if (r.ok) toBot("outfitAnswer", { answer: "back" });
         break;
@@ -10630,6 +10765,8 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
       }
       st.panel.add(r.ok ? "\u{1F457} Dressed in " + o.label + ": " + r.worn + " pieces" + (r.locks ? ", " + r.locks + " locked with high security padlocks" : "") + (r.skipped ? ". " + r.skipped + " spots were already locked, so I left 'em be" : "") + "." : "\u{1F457} Couldn't dress you: " + r.why + ".", "notice");
       if (r.ok) toBot("outfitAnswer", { answer: "worn", slot: o.slot, locks: r.locks });
+      else toBot("outfitAnswer", { answer: "failed", slot: o.slot, why: String(r.why || "").slice(0, 200) });
+      return !!r.ok;
     },
     decline(o) {
       toBot("outfitAnswer", { answer: "declined", slot: o.slot });

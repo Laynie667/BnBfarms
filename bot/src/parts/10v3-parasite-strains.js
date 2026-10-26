@@ -75,7 +75,7 @@
     const r = rec(mn), g = r.parasite, P = parasiteParts(g), k = strainKey(g), S = STRAINS[k], D = STRAIN_GEAR[k], b = bodyOf(mn), out = [];
     const base = { always: true, color: STRAIN_COLOR[k], until: g.until }, add = (slot, name, desc, items) => out.push(Object.assign({ slot, name, desc: (S.name+" strain. "+desc).slice(0, 180) }, items ? { items } : {}, base));
     if (P.lips) add("lips", "Parasite Lips", D.lips);
-    if (P.suckers) add("cups", "Parasite Suckers", b.tits ? D.suckers : b.g === "male" && D.suckersMale ? D.suckersMale : D.suckersFlat);
+    if (P.suckers) add("chestbra", "Parasite Suckers", b.tits ? D.suckers : b.g === "male" && D.suckersMale ? D.suckersMale : D.suckersFlat, ["ForbiddenChastityBra"]);   // (Oct 26: the Forbidden Chastity Bra, not milking cups)
     if (P.root) add("belt", g.form === "belt" ? "Parasite Belt" : "Parasite Root", b.vulva ? D.root : D.rootCock);
     if (b.cock && D.cage && P.stage >= D.cage.stage) add("dildo", D.cage.name, D.cage.desc, D.cage.items);
     if (D.torso && P.stage >= 3) add("torso", D.torso.name, D.torso.desc, ["TentacleSuit"]);

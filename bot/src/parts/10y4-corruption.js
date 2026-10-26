@@ -39,7 +39,7 @@
       if (part){ r.corrGrew = { part, from: sizeOf(mn, part) }; setSize(mn, part, sizeOf(mn, part) + (CFG.SIZES[part].step || 1), true); }   // (kept, so it can go back)
     }
     if (m === 50){ r.corrBrand = CORR_BRANDS[Math.floor(Math.random()*CORR_BRANDS.length)]; r.corrBrandDay = ""; corrBrandNow(mn); }
-    if (m === 70){ r.corrNoise = CORR_NOISE[String(r.species || "").toLowerCase()] || "moo"; }
+    if (m === 70){ r.corrNoise = CORR_NOISE[speciesKey(mn)] || CORR_NOISE[String(r.species || "").toLowerCase()] || "moo"; }
     // the livin' suit's share: a patch of latex that stays on them (and comes off: the Purity Tonic, the pool, a lifted mark, staff)
     if (m >= 20 && ((r.corrBy && r.corrBy.suit) || 0) >= 0.3 * ((r.corr || 1)) && !suitOnNow(mn)) gearOn(mn, "legs", "Corrupted Latex", "A glossy black skin of the livin' suit that never let go, grown over both thighs and up onto the hips. It's warm, and it squeezes.", CFG.CORR_FADE_DAYS*24*60*7, "corruption", { items: ["Slime"], color: "#1A1A1F" });
     if (m === 60) r.crave = { until: Date.now() + 3650*86400000, ate: Date.now(), told: Date.now(), forGood: true };
@@ -57,7 +57,7 @@
   // heat lasts longer for the corrupted (used where the traps start a heat)
   function corrHeatX(mn){ return ((rec(mn) || {}).corrMarks || []).includes(20) ? 1.5 : 1; }
   function ruined(mn){ return ((rec(mn) || {}).corrMarks || []).includes(100); }
-  const CORR_NOISE = { cow: "moo", bull: "moo", pony: "neigh", horse: "neigh", pup: "woof", dog: "woof", wolf: "awoo", kitt: "mew", kitty: "mew", cat: "mew", bunny: "squeak", rabbit: "squeak", goat: "baa", sheep: "baa", pig: "oink", deer: "bleat", fox: "yip", goblin: "hehe" };
+  const CORR_NOISE = { cow: "moo", bull: "moo", pony: "neigh", horse: "neigh", pup: "woof", dog: "woof", wolf: "awoo", kitt: "mew", kitty: "mew", cat: "mew", bunny: "squeak", rabbit: "squeak", goat: "baa", sheep: "baa", pig: "oink", deer: "bleat", fox: "yip", goblin: "hehe", rat: "squeak" };
   const CORR_BRANDS = ["FARM PROPERTY", "BREEDING STOCK", "USE ME", "BRED", "RUINED STOCK", "FARM ANIMAL"];
   const MARK_NAME = { 10: "the traps' hunger for you", 20: "the easy heats", 30: "the night whispers", 40: "the size the farm gave you", 50: "the brand",
     60: "the cravin'", 70: "the animal in your voice", 80: "the word in your mouth", 90: "the lingerin' haze", 100: "Ruined" };

@@ -10,6 +10,7 @@
 import sdkModule from "bondage-club-mod-sdk";
 import { makeMsg, readMsg } from "../../shared/protocol.js";
 import { VERSION } from "./version.js";
+import { speciesKeyOf } from "../../shared/species.js";
 import { BOT_MEMBER, HELLO_EVERY_MS } from "./config.js";
 import { Panel } from "./panel.js";
 import { captureOutfit, wearOutfit, changeBack, hasBackup } from "./outfits.js";
@@ -55,9 +56,9 @@ const st = { panel: null, welcomed: false, lastHello: 0, parts: new Map() };
 const NOISES = { cow: ["moo", "mooo", "mrrrm"], bull: ["moo", "hrrmph"], pony: ["neigh", "nicker", "whinny"], horse: ["neigh", "whinny", "nicker"],
   pup: ["arf", "woof", "awoo"], dog: ["woof", "arf", "ruff"], kitty: ["mew", "nya", "mrrp"], cat: ["meow", "mrrp", "purr"], bunny: ["squeak", "eep"],
   rabbit: ["squeak", "eep"], pig: ["oink", "snrk"], goat: ["baa", "maa"], sheep: ["baa", "baaa"], fox: ["yip", "ack"], wolf: ["awoo", "grr"],
-  deer: ["bleat", "mweh"], goblin: ["heh", "nngh"] };
+  deer: ["bleat", "mweh"], goblin: ["heh", "nngh"], rat: ["squeak", "eek", "chitter"], kitt: ["mew", "nya", "mrrp"] };
 function mooify(text, species) {
-  const say = NOISES[String(species || "").toLowerCase()] || NOISES.cow;
+  const say = NOISES[String(species || "").toLowerCase()] || NOISES[speciesKeyOf(species)] || NOISES.cow;   // "catgirl", "ratslut" (shared/species.js)
   return String(text).replace(/[A-Za-z']{3,}/g, (w) => {
     if (Math.random() < 0.5) return w;
     const n = say[Math.floor(Math.random() * say.length)];
@@ -229,7 +230,7 @@ function onFarmMsg(m) {
       break;
     case "outfit":
       // with a contract they've just signed: on at once, no second askin' (they can still change back from the panel)
-      if (m.auto) { api.wear({ slot: String(m.slot || ""), label: String(m.label || "farm outfit"), data: String(m.data || ""), keys: Array.isArray(m.keys) ? m.keys.filter(Number.isInteger) : [] }); toChat("👗 You've been dressed in your " + String(m.label || "farm outfit") + " for your new contract.", "#c9a35b"); break; }
+      if (m.auto) { const ok = api.wear({ slot: String(m.slot || ""), label: String(m.label || "farm outfit"), data: String(m.data || ""), keys: Array.isArray(m.keys) ? m.keys.filter(Number.isInteger) : [] }); if (ok) toChat("👗 You've been dressed in your " + String(m.label || "farm outfit") + " for your new contract.", "#c9a35b"); break; }
       st.panel.setOutfit({ slot: String(m.slot || ""), label: String(m.label || "farm outfit"), desc: String(m.desc || "").slice(0, 1200), data: String(m.data || ""),
         keys: Array.isArray(m.keys) ? m.keys.filter(Number.isInteger) : [], why: String(m.why || "") });
       toChat("👗 The farm's offerin' you your " + String(m.label || "outfit") + ". Yes or Not now in your 🌾 panel.", "#c9a35b");
@@ -291,7 +292,7 @@ function onFarmMsg(m) {
       break;
     }
     case "outfitBack": {
-      const r = changeBack();
+      const r = changeBack({ farmLocks: !!m.farmLocks });   // (the outfit wheel's time is up: the farm opens its own padlocks)
       st.panel.add(r.ok ? "👗 Back in your own clothes" + (r.stillLocked ? " (farm-locked pieces stay till a keyholder opens 'em)" : "") + "." : "👗 " + r.why + ".", "notice");
       if (r.ok) toBot("outfitAnswer", { answer: "back" });
       break;
@@ -307,6 +308,8 @@ const api = {
     st.panel.add(r.ok ? "👗 Dressed in " + o.label + ": " + r.worn + " pieces" + (r.locks ? ", " + r.locks + " locked with high security padlocks" : "") +
       (r.skipped ? ". " + r.skipped + " spots were already locked, so I left 'em be" : "") + "." : "👗 Couldn't dress you: " + r.why + ".", "notice");
     if (r.ok) toBot("outfitAnswer", { answer: "worn", slot: o.slot, locks: r.locks });
+    else toBot("outfitAnswer", { answer: "failed", slot: o.slot, why: String(r.why || "").slice(0, 200) });   // so the farm doesn't think you're dressed
+    return !!r.ok;
   },
   decline(o) { toBot("outfitAnswer", { answer: "declined", slot: o.slot }); },
   // Say it: their words straight to the farm (or to staff) as a hidden message, so no gag, speech rule or trance

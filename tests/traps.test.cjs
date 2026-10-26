@@ -198,7 +198,7 @@ const C=mn=>chars.find(c=>c.MemberNumber===mn);
   // strains, bloomin', kin, the Tyrant, milk
   ok(['breeder','grower','glutton','tyrant'].includes(P(600).parasite.strain), 'it latches as one of four strains ('+P(600).parasite.strain+')');
   { const g=P(500).parasite, since=g.since; ok(W.__parts(500).lips && !W.__parts(500).suckers && !W.__parts(500).root, 'at first it is only lips');
-    g.since=Date.now()-5*3600000; W.__parasiteTick(); await wait(400); ok(W.__parts(500).suckers && (W.__stateFor(500).farmGear||[]).some(x=>x.slot==='cups' && /Suckers/.test(x.name)), 'from hour four: suckers on the teats, as real gear');
+    g.since=Date.now()-5*3600000; W.__parasiteTick(); await wait(400); ok(W.__parts(500).suckers && (W.__stateFor(500).farmGear||[]).some(x=>x.slot==='chestbra' && /Suckers/.test(x.name) && (x.items||[]).includes('ForbiddenChastityBra')), 'from hour four: suckers on the teats, as real gear (the Forbidden Chastity Bra)');
     g.since=Date.now()-9*3600000; W.__parasiteTick(); await wait(400); ok(W.__parts(500).root && (W.__stateFor(500).farmGear||[]).some(x=>x.slot==='belt'), 'from hour eight: a root below');
     prod(500).held.vulva=90; const n0=g.n; W.__load(600,500,'vulva',90); await wait(500); ok(prod(500).held.vulva===0 && g.n===n0+1, '...and with the root in, it drinks loads taken below too');
     g.strain='tyrant'; const n1=g.n; W.__climax(500); await wait(500); ok(g.n===n1+1 && g.eaten===1, 'a Tyrant eats an orgasm and pays in serum');

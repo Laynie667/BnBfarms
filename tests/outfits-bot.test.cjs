@@ -70,10 +70,10 @@ const roomText=s=>{ const d=s&&s[1]; if(!d) return null;
   L().people[900].species='bull'; L().people[900].gender='female';
   n=sent.length; await B(700,'outfit offer 900');
   const o8=farmTo(900,'outfit',n)[0]||{}, it8=o8.data?JSON.parse(W.LZString.decompressFromBase64(o8.data)).items:[];
-  out('7 a bull wears the cow outfit; women go without chastity ->', o8.slot==='farm:bull|female', it8.some(i=>i.Name==='PawPaddedPetsuitArms'), !it8.some(i=>/Chastity|Cockring/.test(i.Name)));
+  out('7 a bull wears its own bull outfit; women go without chastity ->', o8.slot==='farm:bull|female' && /CowHorns/.test(JSON.stringify(it8)), it8.some(i=>i.Name==='LeatherCuffs'), !it8.some(i=>/Chastity|Cockring/.test(i.Name)));
   // 8. Oct 25: every starter outfit has a name and a description, and the offer carries them
   out('8 the offer is named and described ->', o7.label==='Little Kid Frills outfit', /^A pink maid bikini/.test(o7.desc||''), /In it: .*hoof mittens strapped together/.test(o7.desc||''), /Padlocked: .*pink chastity cage/.test(o7.desc||''));
-  out('8 ...and the bull is offered the cow\'s ->', o8.label==='Dairy Darling outfit');
+  out('8 ...and the bull is offered its own ->', o8.label==='Herd Matriarch outfit', o8.label);
   n=sent.length; await B(900,'outfit starters');
   const st8=sent.slice(n).map(x=>JSON.stringify(x)).join(' ');
   out('8 ?outfit starters lists all 45 by name ->', /Dairy Darling/.test(st8), /Cave Scrapper/.test(st8), /Midnight Mare/.test(st8));

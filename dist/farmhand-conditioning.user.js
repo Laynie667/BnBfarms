@@ -101,6 +101,7 @@
     fox: { a: "fox", s: "yip", p: "bushy tail", act: "present and please", pose: "low on your elbows, tail high", names: ["sweet fox", "farm vixen", "eager vixen", "dumb little vixen"] },
     wolf: { a: "wolf", s: "howl", p: "thick ruff", act: "heel and obey", pose: "kneeling up, paws tucked", names: ["good wolf", "farm wolf", "obedient wolf", "dumb tame wolf"] },
     deer: { a: "doe", s: "bleat", p: "soft flanks", act: "stand still and wait", pose: "on all fours, head low", names: ["sweet doe", "farm doe", "tame doe", "dumb little doe"] },
+    rat: { a: "rat", s: "squeak", p: "twitching whiskers", act: "scurry and serve", pose: "crouched low, hands tucked under your chin", names: ["sweet ratslut", "farm rat", "greedy little rat", "dumb gutter rat"] },
     goblin: { a: "goblin", s: "giggle", p: "greedy hands", act: "fetch and serve", pose: "squatting low, hands on the floor", names: ["good goblin", "farm goblin", "useful goblin", "dumb goblin"] }
   };
   var MALE = {

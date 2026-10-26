@@ -65,7 +65,7 @@
     { id: "feather", name: "Featherlight", kind: "silly", mins: 15, price: 3, desc: "Fifteen minutes of bein' unbearably ticklish. Everything makes you giggle.",
       limit: /\btickl/i, drink: "Light as a feather, and suddenly your whole skin feels like one.",
       seen: "%n drinks a Featherlight and giggles when the breeze touches 'em." },
-    { id: "wrongbarn", name: "Wrong Barn", kind: "silly", mins: 60, price: 5, desc: "For an hour you're a different animal. Noises, stall story and all.",
+    { id: "wrongbarn", name: "Wrong Barn", kind: "silly", mins: 60, price: 5, desc: "For an hour you're a different animal. Noises, stall story, and its outfit too (with the Companion, unless you bring your own).",
       limit: /\bspecies/i, drink: "It tastes like somebody else's feed. Your whole body goes a bit… different.",
       seen: "%n drinks a Wrong Barn and blinks. They don't seem quite like themselves." },
     { id: "bigbritches", name: "Big Britches", kind: "silly", mins: 60, price: 4, desc: "Somethin' of yours grows two sizes for an hour, then snaps back.",
@@ -268,6 +268,7 @@
       const kinds = Object.keys(CFG.SPECIES).filter(k => k !== "default" && k !== speciesKey(mn));
       const to = kinds[Math.floor(Math.random()*kinds.length)];
       f.was = r.species; f.to = (SHOWN_SPECIES[to] || to); r.species = f.to;
+      later(() => { try { wrongBarnOutfit(mn, f.to, P.mins); } catch(e){ warn("wrong barn outfit:", e); } }, 1500);   // and its clothes, for the hour (10un-outfit-wheel.js)
     }
     if (P.id === "bigbritches" || P.id === "shrink"){
       const part = potionPart(mn);
@@ -281,6 +282,7 @@
     const p = prodOf(mn);
     if (id === "bitterroot" && p) p.deniedUntil = Math.min(p.deniedUntil || 0, Date.now());
     if (id === "wrongbarn" && r.species === f.to) r.species = f.was || r.species;
+    if (id === "wrongbarn" && r.tempOutfit && r.tempOutfit.src === "wrongbarn") tempOutfitEnd(mn, "potion");
     if ((id === "bigbritches" || id === "shrink") && f.part && f.was) setSize(mn, f.part, f.was, false);
     if (id === "heatmist" && p && p.heat && p.heat.by === f.by) p.heat.until = Math.min(p.heat.until, Date.now());
     if (id === "brood" && p && p.boosts){ p.boosts.eggs = Math.min(p.boosts.eggs || 0, Date.now()); p.boosts.hyper = Math.min(p.boosts.hyper || 0, Date.now()); }

@@ -132,11 +132,13 @@
            "Standin' in the meadow waitin' for a stag to find you, little deer?"],
     fox: ["Sly little fox. You think you'll slip away. You won't.", "Every fox gets caught sooner or later, sugar. Then it gets bred.",
           "Swish that big tail for me, fox."],
+    rat: ["Squeak for me, ratslut. Nice and high.", "Greedy little gutter rat, always sniffin' round for scraps. Here's somethin' to chew on.",
+          "Twitch those whiskers for me, rat. Somebody's settin' a trap with your name on it."],
     goblin: ["Filthy little goblin. Rags and mud and that grin. Come here.", "Goblins are made for the dirty jobs, sugar. Guess what job needs doin'.",
              "Back in your rags, goblin, and down on your knees where you belong."],
   };
   const TEASE_KIN = { bull: "cow", horse: "pony", dog: "pup", wolf: "pup", kitt: "kitty", cat: "kitty", rabbit: "bunny", sheep: "goat" };
-  const teaseKind = (mn) => { const s = String((rec(mn) || {}).species || "").toLowerCase(); return TEASE_KIN[s] || s; };
+  const teaseKind = (mn) => { const s = speciesKey(mn) || String((rec(mn) || {}).species || "").toLowerCase(); return TEASE_KIN[s] || s; };   // "catgirl", "ratslut" too (shared/species.js)
   const teaseSp = (mn) => { const s = String((rec(mn) || {}).species || "").toLowerCase(); return s === "kitt" ? "kitty" : s || "pet"; };
   // their switch (the old ?teaseme on carries over as light)
   function teaseRate(r){

@@ -41,7 +41,7 @@ W.InventoryGroupIsBlocked=()=>true;   // what the live game does
   const inject=async(giver,target,name)=>{C(giver).Appearance=(C(giver).Appearance||[]).filter(x=>x.Asset.Group.Name!=='ItemHandheld').concat([{Asset:{Name:'MedicalInjector',Group:{Name:'ItemHandheld'}},Craft:{Name:name,Description:''}}]); await ACT(giver,target,'ItemArms','Inject');};
   const P=mn=>L().people[mn].prod; let n;
   await B(221397,'breedable on'); await B(221397,'fertile on'); await B(700,'stats'); await B(232922,'stats'); await B(221397,'stats');
-  const typ=k=>sent.slice(k).filter(x=>x[0]!=='AccountQuery').map(x=>x[0]==='AccountBeep'?'BEEP':x[1].Type).join(',');
+  const typ=k=>sent.slice(k).filter(x=>x[0]!=='AccountQuery' && !/friended me/.test(JSON.stringify(x[1]||'')))   /* (the Oct 26 friend-the-bot reminder isn't a reply) */.map(x=>x[0]==='AccountBeep'?'BEEP':x[1].Type).join(',');
   let k=sent.length; await B(221397,'ping'); out('beep ping ->',typ(k));
   k=sent.length; handlers.ChatRoomMessage({Sender:221397,Type:'Hidden',Content:'ChatRoomBot health'}); await wait(5200); out('/bot health ->',typ(k));
   k=sent.length; handlers.ChatRoomMessage({Sender:166990,Type:'Hidden',Content:'ChatRoomBot ping'}); await wait(5200); out('/bot nonfriend ->',typ(k));

@@ -17,6 +17,10 @@
     pup:["a high, needy whine","a soft whimper","a breathless yip"], dog:["a needy whine","a low whimper","a shaky yip"],
     kitt:["a needy mewl","a soft, broken purr","a breathy mew"], cat:["a needy mewl","a rumbling purr","a breathy mew"],
     goblin:["a ragged little cackle that turns into a moan","a breathless giggle"],
+    bunny:["a breathless little squeak","a soft, hitching whimper","a shaky squeak"], rabbit:["a breathless squeak","a soft, hitching whimper","a startled little squeak"],
+    fox:["a high, needy yip","a soft whine","a breathless little yip"], wolf:["a low, wavering howl","a needy whine","a rough, shaky growl"],
+    goat:["a shaky bleat","a wavering little maa","a breathless bleat"], sheep:["a soft, wobbly baa","a needy little baa","a breathy bleat"],
+    rat:["a high, needy squeak","a breathless chitter","a shaky little squeak"],
     default:["a soft moan","a needy whimper","a shaky gasp"]
   };
 

@@ -289,9 +289,9 @@
     const hits = all.filter(a => norm(a.name).startsWith(norm(q)) || norm(a.label).startsWith(norm(q)));
     return hits.length === 1 ? hits[0] : null;
   }
-  function addonsText(topic){
+  function addonsText(topic, mn){
     if (topic){
-      const a = findAddon(topic);
+      const a0 = findAddon(topic), a = a0 && (mn === undefined || addonVisible(a0, mn)) ? a0 : null;   // somebody else's private add-on: as if it isn't there
       if (!a) return "There's no add-on called '"+topic+"', hon. ?addons lists 'em.";
       return "🧩 "+a.label+" v"+a.version+(a.enabled === false ? " (switched off)" : "")+"\n"+(a.guide || "No guide written yet.")+
              "\n\nCommands: "+(Object.entries(a.commands).map(([w, c]) => "?"+(c.usage || w)+(c.rank && c.rank !== "anyone" ? " ("+c.rank+")" : "")).join(" · ") || "none");

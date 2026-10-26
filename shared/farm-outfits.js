@@ -184,7 +184,7 @@ const KIT = {
       ["ItemArms", "PawPaddedPetsuitArms", CAT_SUIT.arms, false, "Padding"], ["ItemLegs", "PawPaddedPetsuitLegs", CAT_SUIT.legs, false, "Padding"]] },
   // rabbits: a mint and cream doe on pet legs (made to kneel and be bred), cuffed, bow collar
   rabbit: { label: "Rabbit", look: "pastel", pal: { a: C.mint, b: C.cream, leg: C.mint },
-    pieces: [["HairAccessory2", "BunnyEars1", C.rope], ["TailStraps", "BunnyTailStrap", C.cream], ["ItemNeck", "LeatherCollarBow", C.mint, L],
+    pieces: [["HairAccessory2", "BunnyEars1", "#8A5A34"]   /* (hare brown: the rope colour drew butter-yellow on ears) */, ["TailStraps", "BunnyTailStrap", C.cream], ["ItemNeck", "LeatherCollarBow", C.mint, L],
       ["ItemArms", "LeatherCuffs", [C.mint, C.brass], L, "Both"], ["ItemLegs", "PawPaddedPetsuitLegs", RABBIT_LEGS, false, "Padding"],
       ["ItemNeckRestraints", "CollarLeash", [C.mint, C.cognac, C.brass]], ["ItemMouth", "RingGag", C.mint]],
     tits: [["Cloth", "TransparentBunnyGirl", C.mint]], noBow: true },

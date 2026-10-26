@@ -2642,7 +2642,7 @@
       look: "pastel",
       pal: { a: C.mint, b: C.cream, leg: C.mint },
       pieces: [
-        ["HairAccessory2", "BunnyEars1", C.rope],
+        ["HairAccessory2", "BunnyEars1", "#8A5A34"],
         ["TailStraps", "BunnyTailStrap", C.cream],
         ["ItemNeck", "LeatherCollarBow", C.mint, L],
         ["ItemArms", "LeatherCuffs", [C.mint, C.brass], L, "Both"],

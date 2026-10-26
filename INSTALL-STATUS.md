@@ -5,15 +5,15 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 | Script | File in `dist/` | Where it runs | Current |
 |---|---|---|---|
-| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.50.1** |
+| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.51.0** |
 | Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.10.0** |
 | Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.2.1** |
 | Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **1.1.0** |
-| Barn life | `farmhand-barn-life.user.js` | the bot's PC | **1.2.1** |
+| Barn life | `farmhand-barn-life.user.js` | the bot's PC | **1.3.0** |
 | Map tools, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.4** |
 | Dairy | `farmhand-dairy.user.js` | the bot's PC | **1.1.0** |
 | Shows | `farmhand-shows.user.js` | the bot's PC | **1.1.0** |
-| Farmhand Companion | `farmhand-companion.user.js` | each player | **0.44.0** |
+| Farmhand Companion | `farmhand-companion.user.js` | each player | **0.45.0** |
 | Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.4** |
 
 ## Sending a watch report
@@ -24,6 +24,14 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 ## Latest changes (newest first)
 
+- **Bot 0.51.0 + Companion 0.45.0 + Barn life 1.3.0: less lag, water and grooming, the farm girl's brush, sire bottles.** Laynie, Oct 26.
+  - **Less traffic to every Companion.** Panel updates are bunched (many changes in a quarter second go as one), nothing is sent when nothing changed, the store shelf (most of each panel) is sent on its own only when it changes, and after the first full panel only the parts that changed are sent. Older Companions still get the whole panel.
+  - **Wrong Barn outfit for Laynie:** whoever drinks it themselves is dressed even with ?ownoutfit on, and when it can't dress them (no Companion in the room, no outfit for that kind) they're told why instead of nothing happening.
+  - **The water rinses** (a player's idea): stand on a water spot or trough with a mess on you and after a minute about a third of it rinses off (oldest first, plus one patch of game splatters), again every 3 minutes; the third rinse takes the rest, like ?wash.
+  - **The farm girl grooms** anyone on the books as livestock who stops on a tile right next to her (once every 30 min, fitted to their kind: hooves, fleece, dogs, cats, bunnies). Barn life counts it as a grooming. `?grooming off` to opt out.
+  - **Her futa grooming traps** (rare, only for people with traps on, only from her brush or a proprietor's `?trap spring`): `groomstand` (cross-tied on the grooming stand and bred), `groomtail` (brushed over the tail rail, then taken in the ass), `groombucket` (scrubbed at the wash bucket, then her cock in their mouth and over their face). She washes them clean first. Goes in the stud book as "the farm girl".
+  - **Sire's Claim** (9 ribbons, 2 h, needs a cock): the next person you breed who's already carrying, every litter and clutch in them becomes yours. **One Sire** (9 ribbons, 3 h, drunk by the one carrying): the next load in you, from anyone or anything, becomes the only sire of all of it; on an empty belly, if it takes, no other sire can join. Breeding rights still apply.
+  - The farm girl (and the kennel/dairy/milk girl) is no longer called "the farm boy" in lines about a male player.
 - **Companion 0.44.0 + Bot 0.50.1: drawing lag.** Laynie, Oct 26: "routing the settings from my pc to all the companions for what to render for the studio is bogging down my connection ... Would building them into the companion instead be feasible".
   - The farm's look for the drawn body is **built into the Companion** now (`shared/farm-look.json`) and updates with it. The bot no longer sends it to anybody (only a Companion older than 0.44 still asks once).
   - To change the look: Save in the studio, then `node tools/farm-look-bake.mjs`, then release the Companion.

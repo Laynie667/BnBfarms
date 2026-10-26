@@ -175,7 +175,7 @@
   }
   function washNow(t){
     bodyMark(t, { wash: true });   // their Companion: the messes, the splatters, the writing (10s-marks.js)
-    const r = rec(t); if (r) r.messKinds = null;
+    const r = rec(t); if (r){ r.messKinds = null; r.rinse = null; }
     const p = prodOf(t); if (p) p.painted = null;
     aftermathWash(t);              // mud, slime, glue, the reek a trap left (10x-trap-extras.js)
     saveLedger(); syncCompanions(true);

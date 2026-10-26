@@ -56,5 +56,15 @@ const STATE = { name: "Moo", onBooks: true, roles: ["LIVESTOCK"], tier: "new", s
   bot({ type: "state", state: Object.assign({}, STATE, { fx: [] }) });
   w.ServerSend("ChatRoomChat", { Type: "Chat", Content: "Hello there everybody, what lovely weather today" });
   ok(sent[sent.length - 1][1].Content === "Hello there everybody, what lovely weather today", "no potion, no moos");
+  // Oct 26 lag cut: the shelf comes on its own, and panels after the first come as changes only
+  const noStore = Object.assign({}, STATE, { fx: [] }); delete noStore.store;
+  bot({ type: "store", items: [{ id: "bell", name: "A brass bell", price: 4, desc: "Ding.", gift: false, kind: "" }] });
+  bot({ type: "state", state: noStore });
+  await wait(200); click("🎀 Store");
+  ok(/A brass bell/.test(text()), "a shelf sent on its own still shows on a state without one");
+  bot({ type: "stateDiff", set: { ribbons: 77 }, del: ["dare"] });
+  await wait(200); click("🎀 Store");
+  ok(/77/.test(text()) && /A brass bell/.test(text()), "a diff changes just the ribbons and keeps the shelf");
+  ok(!/Crawl to the trough/.test(text()), "a diff can take a part away (the dare)");
   out(fails ? fails + " FAILED" : "ALL PASSED"); process.exit(fails ? 1 : 0);
 })();

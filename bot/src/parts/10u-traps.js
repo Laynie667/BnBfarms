@@ -80,7 +80,7 @@
     if (ANTHRO[kind] && limitBlocks(mn, "breed")) return "their limits rule it out";
     if (TRAP_NEEDS[kind]){ const w = TRAP_NEEDS[kind](mn); if (w) return w; }
     if (r.trapWait) return "a trap already has them";
-    if (ANTHRO[kind] && /\b(anthro|furr|beast)/i.test(lim)) return "their limits rule it out";
+    if (ANTHRO[kind] && !ANTHRO[kind].person && /\b(anthro|furr|beast)/i.test(lim)) return "their limits rule it out";   // (the farm girl's a person: 10y9l)
     if (benchedNow(mn) || stockedNow(mn) || r.penned || (prodOf(mn) && prodOf(mn).stall)) return "they're held somewhere already";
     if (state.trapRuns && state.trapRuns.has(mn)) return "a trap already has them";
     return null;
@@ -603,7 +603,8 @@
         const t = resolveTarget(args[1]), k = String(args[2] || "random").toLowerCase();
         if (!t || (k !== "random" && !TRAP_KINDS[k])){ R("?trap spring <who> <kind>, sugar. Kinds: "+Object.keys(TRAP_KINDS).join(", ")+". Leave the kind off for pot luck."); return true; }
         if (!charFor(t)){ R(plainName(t)+" isn't here, sugar."); return true; }
-        const why = springTrap(t, k, "", true);
+        state.trapByHand = true; let why;
+        try { why = springTrap(t, k, "", true); } finally { state.trapByHand = false; }   // (a proprietor can spring the farm girl's own: 10y9l)
         if (!why){ const tr = rec(t); tr.trapAt = Date.now(); saveLedger(); }
         R(why ? "🧪 That trap won't spring on "+plainName(t)+": "+why+"." : "🧪 Sprung on "+plainName(t)+"."); return true;
       }

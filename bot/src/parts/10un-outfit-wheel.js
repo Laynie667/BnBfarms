@@ -84,10 +84,18 @@
     if (t !== sender) R("🎡 "+plainName(t)+" gets the card to say yes or not now. The clock starts when it's on.");
   }
   // the Wrong Barn's new animal, dressed for the hour (10m-potions.js)
-  function wrongBarnOutfit(mn, species, mins){
-    const r = rec(mn); if (!r || r.ownOutfit || !hasCompanion(mn)) return;
+  // (Laynie, Oct 26: "the outfits are not getting applied to me ... when I drink the wrong barn potion": it used to give
+  // up without a word. Now somebody who drinks it themselves is dressed even with ?ownoutfit on (they chose the bottle),
+  // and whenever it can't, they're told why.)
+  function wrongBarnOutfit(mn, species, mins, by){
+    const r = rec(mn); if (!r) return;
+    const self = !by || by === mn, why = (t) => tell(mn, "🧪 No Wrong Barn outfit this time, sugar: "+t);
+    if (r.ownOutfit && !self) return why("you bring your own outfit (?ownoutfit on), so a bottle somebody else gives you leaves your clothes be.");
+    if (!hasCompanion(mn)) return why("your Companion isn't on in the farm's room, and it's the one that dresses you.");
     const kit = FARM_OUTFITS.outfitSpeciesOf(species), slot = kit && "farm:"+kit+"|"+genderOf(mn);
-    if (!slot || !farmOutfit(slot)) return;
-    tempOutfitStart(mn, slot, mins, "wrongbarn", true, "Wrong Barn, for "+tmpMins(mins));
+    if (!slot || !farmOutfit(slot)) return why("there's no outfit for a "+species+".");
+    if (r.tempOutfit && r.tempOutfit.src !== "wheel"){ r.tempOutfit = null; saveLedger(); }   // a Wrong Barn before it gives way
+    const err = tempOutfitStart(mn, slot, mins, "wrongbarn", true, "Wrong Barn, for "+tmpMins(mins));
+    if (err) why(err.replace(/, sugar\. \?outfitwheel status$/, " (?outfitwheel status)."));
   }
   if (W.__FARMHAND_TEST__) Object.assign(W, { __tempOutfitTick: () => tempOutfitTick() });

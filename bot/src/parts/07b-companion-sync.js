@@ -133,13 +133,39 @@
   }
 
   // send each connected Companion its state, if it changed since last time (force: send anyway)
-  function syncCompanions(force){
+  // LAG (Laynie, Oct 26: "Is there more that we can do to improve the companion and the lag situation?"): a "forced" sync
+  // used to send EVERY Companion its whole panel again, changed or not, and about 80 things force one (a trap, gear, a
+  // potion…): one person's trap meant a full panel to everybody in the room, through the bot's one send queue, so the
+  // bot's own replies waited behind them. Now a burst of syncs in the same moment is gathered into one, and a panel goes
+  // only to the Companions whose panel actually changed.
+  function syncCompanions(){
+    if (state.syncPending) return;
+    state.syncPending = true;
+    later(() => { state.syncPending = false; syncNow(); }, 250);
+  }
+  // the store's shelf was 11 KB of every 13 KB panel: a Companion 0.45+ gets it on its own, only when it changes
+  const storeApart = (c) => { const m = /^(\d+)\.(\d+)\./.exec(String((c && c.ver) || "")); return !!m && (+m[1] > 0 || +m[2] >= 45); };
+  function syncNow(){
     for (const [mn, c] of state.companions){
       if (!hasCompanion(mn)) continue;
       let s; try { s = stateFor(mn); } catch(e){ warn("state for "+mn+":", e); continue; }   // one bad record never stalls everyone's panel
+      if (storeApart(c) && s.store){
+        const sk = JSON.stringify(s.store); delete s.store;
+        if (c.lastStore !== sk){ c.lastStore = sk; enqueue(makeMsg("store", { items: JSON.parse(sk) }, mn)); }
+      }
       const key = JSON.stringify(Object.assign({}, s, { at: 0 }));
-      if (!force && c.lastState === key) continue;
+      if (c.lastState === key) continue;
+      // a 0.45+ Companion that has a panel already gets only the parts that changed
+      if (storeApart(c) && c.lastParts){
+        const set = {}, del = [], parts = {};
+        for (const k of Object.keys(s)){ const v = JSON.stringify(s[k]); parts[k] = v; if (k !== "at" && c.lastParts[k] !== v) set[k] = s[k]; }
+        for (const k of Object.keys(c.lastParts)) if (!(k in s)) del.push(k);
+        c.lastState = key; c.lastParts = parts;
+        enqueue(makeMsg("stateDiff", { set, del }, mn));
+        continue;
+      }
       c.lastState = key;
+      if (storeApart(c)){ c.lastParts = {}; for (const k of Object.keys(s)) c.lastParts[k] = JSON.stringify(s[k]); }
       enqueue(makeMsg("state", { state: s }, mn));
     }
   }

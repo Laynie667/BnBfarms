@@ -319,6 +319,15 @@ export function washMarks() {
   return { ok: true, did: ["wash"] };
 }
 
+// a rinse at the water (Oct 26): one patch of the farm's splatters comes off (never the writing)
+export function rinseMarks() {
+  const stuck = lockedGroups(), cur = bundle();
+  const i = cur.findIndex((b) => b.Name === "Splatters" && SPLAT_GROUPS.includes(b.Group) && !stuck.has(b.Group));
+  if (i < 0) return { ok: true, did: [] };
+  cur.splice(i, 1); commit(cur);
+  return { ok: true, did: ["rinse"] };
+}
+
 // strip: clothes off (locked ones stay), kept on this computer · dress: back on
 export function stripMe(prefs) {
   if (!prefs.strip) return { ok: false, why: "off" };

@@ -527,6 +527,7 @@
   function rollConception(mother, stud, amount, bonus, hole){
     const p = prodOf(mother), r = rec(mother);
     hole = hole === "butt" ? "butt" : "vulva";
+    try { sireBottles(mother, stud); } catch(e){ warn("sire bottles:", e); }   // Sire's Claim and One Sire (10y9l-tile-care.js)
     if (!r.fertile || boosted(p,"contra")) return null;
     { const sc = secondCarry(mother, stud, amount, bonus, hole); if (sc !== undefined) return sc; }   // a second litter in the other hole (10y7-udders.js)
     if (hole === "butt" && !mpregOn(mother)) return null;
@@ -535,6 +536,7 @@
       // a second father can join only in the first day, and never the same stud twice
       if (now - p.preg.since > CFG.PROD.EXTRA_SIRE_WINDOW_H*3600000) return null;
       if (p.preg.sires.includes(stud)) return null;
+      if (p.preg.claimed && p.preg.claimed !== stud) return null;   // claimed by one sire (10y9l-tile-care.js)
     }
     let chance = CFG.PROD.CONCEIVE_BASE * speciesInfo(mother).fert *
                  (0.5 + Math.min(1, (p.held[hole]||0) / capacity(mother)));
@@ -567,6 +569,7 @@
     p.preg = { since:now, due: now + CFG.PROD.PREG_DAYS*86400000, sires:[stud], count, warned:false };
     try { bredBack(mother); } catch(e){ warn("bred back:", e); }
     if (hole === "butt") p.preg.via = "butt";   // carried in the ass (mpreg)
+    try { oneSireAfter(mother, stud, "new"); } catch(e){ warn("one sire:", e); }
     return "new";
   }
   function giveBirth(mn){

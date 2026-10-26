@@ -14,10 +14,10 @@ import { speciesKeyOf } from "../../shared/species.js";
 import { BOT_MEMBER, HELLO_EVERY_MS } from "./config.js";
 import { Panel } from "./panel.js";
 import { captureOutfit, wearOutfit, changeBack, hasBackup } from "./outfits.js";
-import { markBody, washMarks, stripMe, dressMe, syncFarmGear, syncShape, scaleTrialCleanup } from "./marks.js";
+import { markBody, washMarks, rinseMarks, stripMe, dressMe, syncFarmGear, syncShape, scaleTrialCleanup } from "./marks.js";
 import { initBelly } from "./belly.js";
 import { initDrawnBody, onBodyMsg, onFarmLook, farmLookWanted, drawnBodyFarmState } from "./drawnbody.js";
-import { initMesses, onMessMsg, messFromMark, messWash } from "./messes.js";
+import { initMesses, onMessMsg, messFromMark, messWash, messRinse } from "./messes.js";
 import { initMemlog } from "./memlog.js";
 import { initTrim } from "./trimpics.js";
 import { initLocalSave } from "./localsave.js";
@@ -201,8 +201,19 @@ function onFarmMsg(m) {
     case "bodyFarm":
       try { if (!onBotAccount()) onFarmLook(m); } catch (e) { console.warn("[Farmhand Companion] farm look:", e); }   // (on the bot's own account, its settings ARE the farm's look)
       break;
+    case "store":   // the store's shelf, on its own and only when it changes (Oct 26: it was most of every panel update)
+      if (Array.isArray(m.items)) { st.store = m.items; if (st.lastState) st.panel.setState(Object.assign({}, st.lastState, { store: st.store })); }
+      break;
+    case "stateDiff":   // only the parts of your panel that changed (Oct 26)
+      if (st.lastState && m.set && typeof m.set === "object") {
+        const s = Object.assign({}, st.lastState, m.set); for (const k of (Array.isArray(m.del) ? m.del : [])) delete s[k];
+        if (st.store) s.store = st.store;
+        st.lastState = s; st.panel.setState(s); parasiteSync(); try { if ("drawn" in m.set) drawnBodyFarmState(s.drawn); } catch (e) { /* fine */ }
+      } else toBot("hello", { ver: VERSION, again: true });   // (no panel to patch: ask for a whole one)
+      break;
     case "state":
-      if (m.state && typeof m.state === "object") { st.gotState = true; st.panel.setState(m.state); parasiteSync(); try { drawnBodyFarmState(m.state.drawn); } catch (e) { console.warn("[Farmhand Companion] drawn body size:", e); } }
+      if (m.state && typeof m.state === "object" && !("store" in m.state) && st.store) m.state.store = st.store;
+      if (m.state && typeof m.state === "object") { st.lastState = m.state; st.gotState = true; st.panel.setState(m.state); parasiteSync(); try { drawnBodyFarmState(m.state.drawn); } catch (e) { console.warn("[Farmhand Companion] drawn body size:", e); } }
       break;
     case "reply":
     case "notice": {
@@ -244,6 +255,7 @@ function onFarmMsg(m) {
         // the farm's own messes first, on their own: if takin' the game's splatters off failed on somebody's outfit, the
         // messes stayed on and ?wash "wouldn't let me clean all the messes on me" (Laynie, Oct 22)
         if (m.wash) { try { messWash(); } catch (e) { console.warn("[Farmhand Companion] wash:", e); } try { r = washMarks(); } catch (e) { console.warn("[Farmhand Companion] wash splatters:", e); r = { ok: true, did: ["mess"], why: e.message }; } }
+        else if (m.rinse) { let d = []; try { if (messRinse()) d.push("mess"); } catch (e) { console.warn("[Farmhand Companion] rinse:", e); } try { d = d.concat(rinseMarks().did || []); } catch (e) { console.warn("[Farmhand Companion] rinse splatters:", e); } r = { ok: true, did: d }; }
         else if (m.strip) r = stripMe(prefs);
         else if (m.dress) r = dressMe();
         else {

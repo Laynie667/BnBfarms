@@ -158,6 +158,12 @@ function drink(mn, reply, how) {
   if (how !== "bowl") reply("💧 Water " + Math.round(n.water) + "%.");
 }
 
+// the farm girl grooms whoever stands next to her (the bot, Oct 26): it counts like a staff brushin'
+function groomedByFarm(mn) {
+  if (!on(mn)) return;
+  const n = needsOf(mn); n.groom = Math.min(FULL, n.groom + 60); n.warned.groom = 100; api.save();
+}
+
 // milk-drunk: each drink of milk adds a step (grade A milk, or a big drink, adds two)
 function milkDrunk(milker, drinker, ml, grade) {
   if (!on(drinker)) return;
@@ -282,7 +288,7 @@ connect({
     refill: { usage: "refill <trough>", rank: "staff", run: cmdRefill },
     groom: { usage: "groom <who>", run: cmdGroom },   // stock can groom each other too
   },
-  on: { tick: () => { tick(); herdTick(); }, activity: onActivity, nurse: milkDrunk },
+  on: { tick: () => { tick(); herdTick(); }, activity: onActivity, nurse: milkDrunk, groomed: groomedByFarm },
   rates: { milk: rate },
   companion,
 });

@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm add-on: Barn life
 // @namespace    bnbfarm
-// @version      1.2.1
+// @version      1.3.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-barn-life.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-barn-life.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -800,6 +800,13 @@
     api2.save();
     if (how !== "bowl") reply("\u{1F4A7} Water " + Math.round(n.water) + "%.");
   }
+  function groomedByFarm(mn) {
+    if (!on(mn)) return;
+    const n = needsOf2(mn);
+    n.groom = Math.min(FULL, n.groom + 60);
+    n.warned.groom = 100;
+    api2.save();
+  }
   function milkDrunk(milker, drinker, ml, grade) {
     if (!on(drinker)) return;
     const d = D2(), x = d.drunk[drinker] = d.drunk[drinker] || { lvl: 0, t: Date.now() };
@@ -941,7 +948,7 @@
     on: { tick: () => {
       tick();
       herdTick();
-    }, activity: onActivity, nurse: milkDrunk },
+    }, activity: onActivity, nurse: milkDrunk, groomed: groomedByFarm },
     rates: { milk: rate },
     companion
   });

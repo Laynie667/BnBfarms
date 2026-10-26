@@ -1875,6 +1875,7 @@ Welcome to B&B Farm, hon. 🌾`);
       }
 
       case "outfitwheel": case "dresswheel": case "wheeloutfit": outfitWheelCommand(sender, args, R); break;
+      case "grooming": groomingCommand(sender, args, R); break;
       case "seedmilk": { const r = rec(sender); if (!r || !r.roles.length){ R("You'll need to be on the books first, hon. ?apply and we'll get you sorted. 🌾"); break; } seedMilkCommand(sender, r, String(args[0]||"").toLowerCase(), R); break; }
 
       case "gender": {

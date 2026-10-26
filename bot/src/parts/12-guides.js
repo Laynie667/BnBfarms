@@ -204,6 +204,8 @@ OPT IN FIRST · nobody gets bred who hasn't, sweetie
   ?yes / ?no · answer a stud or staff member who asked (whisper or beep works too)
   ?tally on|off · your tally marks on ?who and the board
   ?wash · clean off a paintin'
+  (standin' in the water or a trough rinses a third of the mess off every few minutes)
+  ?grooming on|off · the farm girl brushes you down when you stand next to her
   ?praise on|off · ?degrade on|off · let staff's words count
   Hard limits always win.
 

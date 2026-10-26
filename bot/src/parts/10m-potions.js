@@ -268,7 +268,7 @@
       const kinds = Object.keys(CFG.SPECIES).filter(k => k !== "default" && k !== speciesKey(mn));
       const to = kinds[Math.floor(Math.random()*kinds.length)];
       f.was = r.species; f.to = (SHOWN_SPECIES[to] || to); r.species = f.to;
-      later(() => { try { wrongBarnOutfit(mn, f.to, P.mins); } catch(e){ warn("wrong barn outfit:", e); } }, 1500);   // and its clothes, for the hour (10un-outfit-wheel.js)
+      later(() => { try { wrongBarnOutfit(mn, f.to, P.mins, f.by); } catch(e){ warn("wrong barn outfit:", e); } }, 1500);   // and its clothes, for the hour (10un-outfit-wheel.js)
     }
     if (P.id === "bigbritches" || P.id === "shrink"){
       const part = potionPart(mn);

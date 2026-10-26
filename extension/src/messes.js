@@ -49,6 +49,8 @@ export function messFromMark(m) {
 }
 export function messWash() { if (!mine.length) return false; mine = []; save(); tell(true); redrawMe(); return true; }
 export function messCount() { return mine.length; }
+// a rinse at the water (Oct 26): about a third of the messes come off, the oldest first
+export function messRinse() { if (!mine.length) return false; mine = mine.slice(Math.max(1, Math.ceil(mine.length / 3))); save(); tell(true); redrawMe(); return true; }
 
 // ── telling the room, and hearing from it ──
 const send = (type, data) => { try { if (W.ServerSend && W.ServerPlayerIsInChatRoom && W.ServerPlayerIsInChatRoom()) W.ServerSend("ChatRoomChat", makeMsg(type, data)); } catch (e) { /* not in a room */ } };

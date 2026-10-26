@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.44.0
+// @version      0.45.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -230,7 +230,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.44.0";
+  var VERSION = "0.45.0";
 
   // shared/species.js
   var WORDS = {
@@ -5039,6 +5039,14 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
   function messWash() {
     if (!mine2.length) return false;
     mine2 = [];
+    save2();
+    tell2(true);
+    redrawMe();
+    return true;
+  }
+  function messRinse() {
+    if (!mine2.length) return false;
+    mine2 = mine2.slice(Math.max(1, Math.ceil(mine2.length / 3)));
     save2();
     tell2(true);
     redrawMe();
@@ -9859,6 +9867,14 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     commit2(next);
     return { ok: true, did: ["wash"] };
   }
+  function rinseMarks() {
+    const stuck = lockedGroups2(), cur = bundle();
+    const i = cur.findIndex((b) => b.Name === "Splatters" && SPLAT_GROUPS.includes(b.Group) && !stuck.has(b.Group));
+    if (i < 0) return { ok: true, did: [] };
+    cur.splice(i, 1);
+    commit2(cur);
+    return { ok: true, did: ["rinse"] };
+  }
   function stripMe(prefs) {
     if (!prefs.strip) return { ok: false, why: "off" };
     const cur = bundle(), stuck = lockedGroups2();
@@ -10679,8 +10695,30 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
           console.warn("[Farmhand Companion] farm look:", e);
         }
         break;
+      case "store":
+        if (Array.isArray(m.items)) {
+          st.store = m.items;
+          if (st.lastState) st.panel.setState(Object.assign({}, st.lastState, { store: st.store }));
+        }
+        break;
+      case "stateDiff":
+        if (st.lastState && m.set && typeof m.set === "object") {
+          const s = Object.assign({}, st.lastState, m.set);
+          for (const k of Array.isArray(m.del) ? m.del : []) delete s[k];
+          if (st.store) s.store = st.store;
+          st.lastState = s;
+          st.panel.setState(s);
+          parasiteSync();
+          try {
+            if ("drawn" in m.set) drawnBodyFarmState(s.drawn);
+          } catch (e) {
+          }
+        } else toBot("hello", { ver: VERSION, again: true });
+        break;
       case "state":
+        if (m.state && typeof m.state === "object" && !("store" in m.state) && st.store) m.state.store = st.store;
         if (m.state && typeof m.state === "object") {
+          st.lastState = m.state;
           st.gotState = true;
           st.panel.setState(m.state);
           parasiteSync();
@@ -10745,6 +10783,19 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
               console.warn("[Farmhand Companion] wash splatters:", e);
               r = { ok: true, did: ["mess"], why: e.message };
             }
+          } else if (m.rinse) {
+            let d = [];
+            try {
+              if (messRinse()) d.push("mess");
+            } catch (e) {
+              console.warn("[Farmhand Companion] rinse:", e);
+            }
+            try {
+              d = d.concat(rinseMarks().did || []);
+            } catch (e) {
+              console.warn("[Farmhand Companion] rinse splatters:", e);
+            }
+            r = { ok: true, did: d };
           } else if (m.strip) r = stripMe(prefs);
           else if (m.dress) r = dressMe();
           else {

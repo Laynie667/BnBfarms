@@ -42,9 +42,12 @@
     const w = state.where && state.where.get(mn);
     return w && w.room === CFG.ROOM_NAME ? "here" : "away";
   }
+  function roamKeptIn(mn){ return !!(L.contracts && L.contracts.some(x => x.mn === mn && x.status === "signed" && (!x.until || x.until > Date.now()) && (x.rules || []).includes("chat.forbidLeaving"))); }
   function roamStart(mn, auto){
     const g = roamOf(mn); if (!g) return false;
     if (g.until > Date.now()) return true;
+    // a permanent contract forbids leavin' the room outright (Oct 26), so a pass would only be wasted
+    if (roamKeptIn(mn)) return false;
     if (roamLeft(mn) <= 0) return false;
     if (g.used < roamFree(mn)) g.used++; else { const r = rec(mn); r.roamPasses = Math.max(0, (r.roamPasses || 0) - 1); }
     g.wentAt = auto ? Date.now() : 0;
@@ -136,6 +139,7 @@
     const g = roamOf(t), now = Date.now();
     if (!other && ["start", "go", "now", "on"].includes(a0)){
       if (g.until > now){ R("🧭 You're already roamin', sugar: back by "+clockOf(g.until)+"."); return; }
+      if (roamKeptIn(sender)){ R("🧭 Your permanent contract keeps you in the room, sugar, so there's no roamin' on it. Your passes are still yours."); return; }
       if (!roamStart(sender, false)) R("🧭 You haven't got a roam pass, sugar. ?buy roampass, "+CFG.ROAM_PASS_PRICE+" ribbons for an hour, or your herd leader can give you one.");
       return;
     }

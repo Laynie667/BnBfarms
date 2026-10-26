@@ -5,7 +5,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 | Script | File in `dist/` | Where it runs | Current |
 |---|---|---|---|
-| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.49.0** |
+| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.49.1** |
 | Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.10.0** |
 | Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.2.1** |
 | Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **1.1.0** |
@@ -23,6 +23,11 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 - Running the watcher on more than one game at once (the bot, yours, a tester's) lets Claude line them up into one timeline.
 
 ## Latest changes (newest first)
+
+- **Bot 0.49.1: contract rules.** Laynie, Oct 26: "all contracts need the forbid freeing self rules, and locks cannot be picked rule. and any contracts that are permanent need the forbid leaving room rule".
+  - Every new contract the farm writes has **Forbid freeing self** (low-difficulty items included) and **Force 'Locks on you can't be picked'** (put back how it was when the contract ends).
+  - **Permanent** contracts also have **Forbid leaving the room**, and their terms say so. Roam passes don't apply on one: `?roam start` says why and spends nothing.
+  - Only contracts offered from now on get these; ones already signed keep the rules they were signed with.
 
 - **Bot 0.49.0 + Companion 0.42.0: symbiotes sooner, and the latex traps.** Laynie, Oct 25: "can you check the symbiotic cool downs, its a little long - also need to make sure every symbiotic is actually attainable, or atleast have a command way to give them. need more traps for the latex".
   - **Shorter waits.** A symbiote grows a stage every 45 minutes (was 90). After one leaves, the next can find them in 15 minutes if they sent it off or it finished (was 1 hour), 2 hours if it starved (was 12), 4 hours after a safeword (was a day). Traps leave one twice as often (8%), and the new latex traps leave livin' latex a third of the time.

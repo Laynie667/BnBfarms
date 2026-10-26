@@ -51,9 +51,15 @@
       rules[id] = BCPLUS.makeSpec(id, Object.assign({}, rules[id] ? rules[id].settings : {}, JSON.parse(JSON.stringify(set))));
     // nothin' in a contract may block the roam passes: the farm girl's gate (the Companion) and her summon do the fencin'
     delete rules["chat.forbidLeaving"]; delete rules["rooms.entry"];
+    // Laynie, Oct 26: "all contracts need the forbid freeing self rules, and locks cannot be picked rule. and any contracts
+    // that are permanent need the forbid leaving room rule" (so a permanent one is past the roam passes: they stay put)
+    rules["items.freeingSelf"] = BCPLUS.makeSpec("items.freeingSelf", { allowEasy: false });
+    rules["settings.lockpickingSelf"] = BCPLUS.makeSpec("settings.lockpickingSelf", { value: "Locks cannot be picked", restore: true });
+    const perm = (BCPLUS.durationFrom(durKey) || {}).key === "perm";
+    if (perm) rules["chat.forbidLeaving"] = BCPLUS.makeSpec("chat.forbidLeaving", {});
     BCPLUS.fillRules(rules, who);
     if (when && when.conditions) BCPLUS.applyConditions(rules, when.conditions, when.only);   // when they apply (Oct 19: ?contract offer … when room=private)
-    return BCPLUS.makeContract({ title: BCPLUS.fillWho(tpl.title, who), terms: BCPLUS.fillWho(fill(tpl.terms || "", mn), who), duration: BCPLUS.durationFrom(durKey),
+    return BCPLUS.makeContract({ title: BCPLUS.fillWho(tpl.title, who), terms: BCPLUS.fillWho(fill(tpl.terms || "", mn), who)+(perm ? " This one is permanent: you don't leave the room at all, so roam passes don't apply." : ""), duration: BCPLUS.durationFrom(durKey),
                                  depth: tpl.base, policy: tpl.policy, rules });
   }
   // "value as typed" → what BC+ wants for that setting

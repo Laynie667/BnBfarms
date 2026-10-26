@@ -113,6 +113,14 @@ const tick=async()=>{ W.__roamTick(); await wait(500); };
   const x=W.__buildContract('nhl',500,'1d');
   ok(x.rules['other.summon'] && !x.rules['chat.forbidLeaving'] && !x.rules['rooms.entry'], 'and no human left: roam passes, not a room list');
   ok(!x.rules['body.forcedPosition'] && /roam pass/.test(x.terms), 'no human left has no forced all fours (Oct 24), and its terms say how leavin\' works');
+  // Oct 26: every contract forbids freeing yourself and locks can't be picked; a permanent one forbids leavin' the room
+  { const cs=[c,f,x].concat(['fun','deep','nhl'].map(d=>W.__buildContract(d,500,'perm')));
+    ok(cs.every(k=>k.rules['items.freeingSelf'] && k.rules['settings.lockpickingSelf'] && k.rules['settings.lockpickingSelf'].settings.value==='Locks cannot be picked'), 'every contract: Forbid freeing self, and locks can\'t be picked');
+    ok(cs.every(k=>Object.keys(k.rules).length<=30), 'still within BC+\'s 30 rules ('+cs.map(k=>Object.keys(k.rules).length).join(',')+')');
+    const p=cs.slice(3); ok(p.every(k=>k.rules['chat.forbidLeaving'] && /permanent/.test(k.terms)) && !c.rules['chat.forbidLeaving'], 'permanent ones forbid leavin\' the room and say so; the others don\'t');
+    L().contracts=(L().contracts||[]).concat([{key:'pz',mn:500,status:'signed',durationMin:0,rules:Object.keys(p[1].rules)}]);
+    let n2=sent.length; await say(500,'?roam start',900); ok(/permanent contract keeps you in the room/.test(all(n2)) && !(P(500).roam.until>Date.now()), '?roam start on a permanent contract: no pass spent');
+    L().contracts=L().contracts.filter(k=>k.key!=='pz'); }
   ok(!warns.some(w=>/roam/i.test(w)), 'no errors: '+warns.filter(w=>/roam/i.test(w)).slice(0,2).join(' | '));
   out(fails?'FAIL '+fails:'ALL OK'); process.exit(fails?1:0);
 })();

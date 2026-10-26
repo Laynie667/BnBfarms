@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.49.0
+// @version      0.49.1
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -2415,7 +2415,7 @@
   ];
 
   // bot/src/version.js
-  var VERSION = "0.49.0";
+  var VERSION = "0.49.1";
 
   // bot-parts:farmhand-bot-parts
   (function() {
@@ -8357,11 +8357,15 @@
         rules[id] = makeSpec(id, Object.assign({}, rules[id] ? rules[id].settings : {}, JSON.parse(JSON.stringify(set))));
       delete rules["chat.forbidLeaving"];
       delete rules["rooms.entry"];
+      rules["items.freeingSelf"] = makeSpec("items.freeingSelf", { allowEasy: false });
+      rules["settings.lockpickingSelf"] = makeSpec("settings.lockpickingSelf", { value: "Locks cannot be picked", restore: true });
+      const perm = (durationFrom(durKey) || {}).key === "perm";
+      if (perm) rules["chat.forbidLeaving"] = makeSpec("chat.forbidLeaving", {});
       fillRules(rules, who);
       if (when && when.conditions) applyConditions(rules, when.conditions, when.only);
       return makeContract({
         title: fillWho(tpl.title, who),
-        terms: fillWho(fill(tpl.terms || "", mn), who),
+        terms: fillWho(fill(tpl.terms || "", mn), who) + (perm ? " This one is permanent: you don't leave the room at all, so roam passes don't apply." : ""),
         duration: durationFrom(durKey),
         depth: tpl.base,
         policy: tpl.policy,
@@ -21626,10 +21630,14 @@
       const w = state.where && state.where.get(mn);
       return w && w.room === CFG.ROOM_NAME ? "here" : "away";
     }
+    function roamKeptIn(mn) {
+      return !!(L2.contracts && L2.contracts.some((x) => x.mn === mn && x.status === "signed" && (!x.until || x.until > Date.now()) && (x.rules || []).includes("chat.forbidLeaving")));
+    }
     function roamStart(mn, auto) {
       const g = roamOf(mn);
       if (!g) return false;
       if (g.until > Date.now()) return true;
+      if (roamKeptIn(mn)) return false;
       if (roamLeft(mn) <= 0) return false;
       if (g.used < roamFree(mn)) g.used++;
       else {
@@ -21772,6 +21780,10 @@
       if (!other && ["start", "go", "now", "on"].includes(a0)) {
         if (g.until > now) {
           R("\u{1F9ED} You're already roamin', sugar: back by " + clockOf(g.until) + ".");
+          return;
+        }
+        if (roamKeptIn(sender)) {
+          R("\u{1F9ED} Your permanent contract keeps you in the room, sugar, so there's no roamin' on it. Your passes are still yours.");
           return;
         }
         if (!roamStart(sender, false)) R("\u{1F9ED} You haven't got a roam pass, sugar. ?buy roampass, " + CFG.ROAM_PASS_PRICE + " ribbons for an hour, or your herd leader can give you one.");

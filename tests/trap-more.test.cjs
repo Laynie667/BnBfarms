@@ -57,7 +57,7 @@ const LEAK=/\{(nv|nc|nt|fu|fb|nb|ok|v|c|t|f|m)\}|%[a-z]{1,8}\b|\bundefined\b|\bN
   }
   W.__studForce=null; W.__onTrapBeats=null;
   out('traps with more of their own lines:', KINDS.length);
-  ok(KINDS.length>=34, 'at least the first 34 traps have had their beats grown');
+  ok(KINDS.length>=79, 'at least the first 79 traps have had their beats grown');
 
   const unmatched=KINDS.flatMap(k=>missing(k).map(h=>k+': '+h));
   ok(!unmatched.length, 'every batch line found the beat it was written for'+(unmatched.length?' ('+unmatched.slice(0,6).join(' | ')+')':''));
@@ -71,9 +71,11 @@ const LEAK=/\{(nv|nc|nt|fu|fb|nb|ok|v|c|t|f|m)\}|%[a-z]{1,8}\b|\bundefined\b|\bN
 
   // ── every new line, on every body ──
   const extra=[...KINDS.flatMap(k=>TM[k].flatMap(([,l])=>l))];
+  const sceneLines=KINDS.flatMap(k=>[...(SC[k]||[]), ...Object.values(SF[k]||{}).flatMap(F=>F.scene||[])].flat());
   out('new lines in the batches:', extra.length);
   const bad=[]; for (const l of extra) for (const mn of [500,600,700,800]){ const t=W.__tFill(W.__pickFor(mn,'x',[l]),mn,{ml:'60 mL',c:'thick',h:'ass'}); if (LEAK.test(t)) bad.push(t.slice(0,80)); }
-  ok(!bad.length, 'every new line fills in for every body'+(bad.length?' ('+bad.slice(0,4).join(' | ')+')':''));
+  for (const l of sceneLines) for (const mn of [500,600,700,800]){ const t=W.__tFill(W.__pickFor(mn,'x',[l]),mn,{ml:'60 mL',c:'thick'}); if (LEAK.test(t)) bad.push(t.slice(0,80)); }
+  ok(!bad.length, 'every new line fills in for every body, the beats of their own too'+(bad.length?' ('+bad.slice(0,4).join(' | ')+')':''));
   const COCK=/(%n's|\btheir) (own )?(cock|balls|prick|shaft|sheath)\b/i;
   const untagged=extra.filter(l=>COCK.test(l) && !/\{(c|m|fu|fb)\}/.test((l.match(/^(\{[a-z]+\})+/)||[''])[0]));
   ok(!untagged.length, 'a line about their own cock is only ever for somebody with one'+(untagged.length?' ('+untagged.slice(0,3).map(s=>s.slice(0,60)).join(' | ')+')':''));
@@ -81,7 +83,7 @@ const LEAK=/\{(nv|nc|nt|fu|fb|nb|ok|v|c|t|f|m)\}|%[a-z]{1,8}\b|\bundefined\b|\bN
   ok(!hInScene.length, 'the beats of their own never name a hole (they can fall before or after it\'s chosen)'+(hInScene.length?' ('+hInScene.slice(0,2).join(' | ')+')':''));
 
   // ── the whole story, told to Rex (male) and Pip (femboy): nobody hears about a pussy or a womb they haven't got ──
-  const told=[]; const sample=['maze','stag','sowing','nixie','groomstand','vampire'].filter(k=>TM[k]);
+  const told=[]; const sample=['maze','stag','sowing','nixie','groomstand','vampire','crate','mistletoe','hollyking','bunnysuit','fairyring','cornmaiden'].filter(k=>TM[k]);
   for (const mn of [600,700]) for (const k of sample){ free(mn); W.__st().lastCmd&&W.__st().lastCmd.clear(); const n=sent.length; await say(221397,'?trap spring '+P(mn).name+' '+k,200); await done(mn,300); told.push([P(mn).name,all(n)]); free(mn); }
   const wrong=told.filter(([nm,t])=>new RegExp(nm+"'s (pussy|cunt|womb|clit|slit)","i").test(t));
   ok(told.every(([,t])=>t.length>200) && !wrong.length, 'the whole story runs, and a male or a femboy is never told about a pussy'+(wrong.length?' ('+wrong[0][0]+')':''));

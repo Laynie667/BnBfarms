@@ -5,7 +5,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 | Script | File in `dist/` | Where it runs | Current |
 |---|---|---|---|
-| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.58.0** |
+| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.59.0** |
 | Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.10.0** |
 | Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.2.1** |
 | Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **1.1.0** |
@@ -24,6 +24,10 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 ## Latest changes (newest first)
 
+- **Bot 0.59.0: 45 more traps tell their own story in eight lines a beat.** Same job as 0.58.0, next batch. No Companion update needed.
+  - About 1,250 new lines, every beat of these traps picks from eight or more, and their two beats of their own from eight. Each line fits the body it's about.
+  - **The traps:** the rest of Halloween (the cauldron, the broomstick, the candy apple, the taffy pull, the mummy, the haunted house, the costume trunk), the crate, all of winter (the frozen pond, the gingerbread, the mistletoe, the yeti, the gift wrap, the stockin', the sauna, the cocoa stand, the frost fae, the snowman), all of Yule (the Yule log, the Holly King, the wassail, the ivy, the longest night), the rest of Ostara (the March hares, the Green Man, the egg dyein', the balance), all of Easter (the hidden eggs, the chocolate fountain, the bunny suit, the basket, the marshmallow, the egg roll, the bonnet, the chocolate bunny), the rest of Litha (the Oak King, the fairy ring, the sun wheel, the mead, Puck) and the rest of Mabon (the corn maiden, the grape stomp, the cider press, the harvest crown, the harvest supper).
+  - **Next:** the farm's everyday traps (gas, wheel, spray, injector, tentacles), then the other studs' versions (minotaur, werewolf, fox den, lion pride, ram, wolves), then the shrine and the rest.
 - **Bot 0.58.0: the first 34 traps tell their own story in eight lines a beat, not two.** Laynie, Oct 27: "3-4 seems like a paltry amount". No Companion update needed.
   - Every beat of these traps now picks from eight lines or more (most had two), and their two beats of their own from eight (most had four). About 1,300 new lines, each one fitted to the body it's about: a line about tits, a cock or a pussy only goes to somebody who has them.
   - **The traps:** the corn maze, the kissin' gate, the tomato stocks, the bearskin rug, the hot tub, the peep booth, the stag (all four versions: the usual one, the twelve-pointer, the shy stag and the white hart), the goblin raid, the goblin pit, the warband, the stud chair, the clutch, the three groomin' tiles, the whelpin' shed, the mud pit (win or lose), the scarecrow, and from the seasons the trick-or-treat door, the vampire, the hellhounds, the spider, the revel, the hayride, the pumpkin patch, apple bobbin', the headless horseman, the demon, the ghost, the Wild Hunt, the spring sowin', the nixie, the midsummer bonfire and the last sheaf.

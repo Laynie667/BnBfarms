@@ -297,8 +297,8 @@
        "By the third swallow %n has stopped wantin' to leave. By the tenth, they wouldn't notice the barn burnin' down. Under them, somethin' stiff and thick is pressin' up."],
       ["\"Just you keep drinkin'.\" She lifts %n by the hips and settles them down on her cock, inch by fat inch, into their %h.",
        "She rocks, and it slides deeper into %n's %h, and they whimper round the teat, and she says, \"I know, sweet thing. I know. Take all of it.\""]);
-    A.sow.end.push("She breeds %n's %h slow and cums the same way: %ml, in long lazy pulses, hummin' an old milkin' song. Then she rocks them till the milk's gone down, and carries them out to the straw.",
-                   "%ml, deep in %n's %h, and a belly full of sow's milk on top. She kisses their forehead. \"Sleep now. You'll be hungry again by supper.\"");
+    A.sow.end.push("She breeds %n's %h slow and cums the same way: %ml, in long lazy pulses, hummin' an old milkin' song. Then she holds them close till the milk's gone down, and walks them out to the straw.",
+                   "%ml, deep in %n's %h, and a belly full of sow's milk on top. She kisses their forehead. \"Rest up. You'll be hungry again by supper.\"");
 
     // ── the parasite ──
     G.latch.push("The stranger grunts, finishes, and pulls back. What follows him through the hole isn't him: a soft pink mouth with no face round it, which fits itself over %n's lips and sinks a root down their throat like a key in a lock.",

@@ -133,6 +133,10 @@ const LEAK=/\{(nv|nc|nt|fu|fb|nb|ok|v|c|t|f|m)\}|%[a-z]{1,8}\b|\bundefined\b|\bN
   const sSceneBad=[]; for (const [w,p] of sScene) for (const l of p){ if (/%h\b/.test(l)) sSceneBad.push(w+' names a hole'); for (const mn of [500,600,700,800]){ const t=W.__tFill(W.__pickFor(mn,'x',[l]),mn,{ml:'60 mL',c:'thick'}); if (LEAK.test(t)) sSceneBad.push(w+': '+t.slice(0,60)); } }
   ok(!sThinScene.length && !sSceneBad.length, '...his two beats of his own eight lines or more, every version\'s too, never namin\' a hole, every line fillin\' in'+(sThinScene.length?' ('+sThinScene.slice(0,4).join(', ')+')':'')+(sSceneBad.length?' ('+sSceneBad.slice(0,3).join(' | ')+')':''));
   const swrong=stold.filter(([nm,,t])=>nm!=='Moo' && new RegExp(nm+"'s (pussy|cunt|womb|clit|slit)","i").test(t)), sshort=stold.filter(([,,t])=>t.length<200).map(([nm,w])=>nm+' '+w), sleak=stold.filter(([,,t])=>LEAK.test(t));
+  const AL=W.__lines().ANTHRO_LINES, sEnd=[];
+  for (const k of STUDS){ const L=[['usual',AL[k]], ...Object.entries(SF[k]||{}).filter(([f])=>f!=='classic').map(([f,F])=>[f,F.lines||{}])];
+    for (const [f,T] of L) for (const part of ['end','endOver']){ const p=(T&&T[part])||(AL[k]&&AL[k][part])||[]; if (p.length<8) sEnd.push(k+'/'+f+' '+part+' '+p.length); if (part==='endOver' && p.some(l=>/%h\b/.test(l))) sEnd.push(k+'/'+f+' endOver names a hole'); } }
+  ok(!sEnd.length, '...how every one of them leaves you, eight lines or more, and never a hole named when he made do'+(sEnd.length?' ('+sEnd.slice(0,5).join(', ')+')':''));
   ok(!sshort.length && !swrong.length && !sleak.length, '...and every one of their stories runs whole, fills in, and never tells a male or a femboy about a pussy'+(sshort.length?' (short: '+sshort.slice(0,4).join(', ')+')':'')+(swrong.length?' ('+swrong[0][0]+' '+swrong[0][1]+')':'')+(sleak.length?' ('+sleak[0][1]+': '+(sleak[0][2].match(LEAK)||[''])[0]+')':''));
 
   // ── the whole story, told to Rex (male) and Pip (femboy): nobody hears about a pussy or a womb they haven't got ──

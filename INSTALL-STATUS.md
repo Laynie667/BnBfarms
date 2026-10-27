@@ -5,7 +5,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 | Script | File in `dist/` | Where it runs | Current |
 |---|---|---|---|
-| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.61.0** |
+| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.62.0** |
 | Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.10.0** |
 | Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.2.1** |
 | Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **1.1.0** |
@@ -24,6 +24,11 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 ## Latest changes (newest first)
 
+- **Bot 0.62.0: every stud leaves you his own way, and the first farm machines get their full stories.** No Companion update needed.
+  - **How each stud leaves you:** every one of the eighteen studs, and every version of him (the alpha, the silver fox, the lazy king, the snow pack and the rest), now picks from eight lines or more for how he finishes and leaves you, and eight more for how he leaves you when he made do on the outside. About 420 new lines, each one fitted to the body it's about. The made-do endings never name a hole.
+  - **The first farm machines:** the milker (cups and sleeve), the breedin' frame, the snare, the hog wallow, the strippin' wire, the clamp and the belly pump. Every beat now picks from eight lines or more, and so do the two beats of their own. About 145 new lines.
+  - **A few words changed:** the old sow holds you close, cups the back of your head and says "Rest up" (no more rockin' or tuckin' in).
+  - **Next:** the rest of the farm's machines (eggs, lantern, pillory, brand, winch, glue and on down the list), then the shrine, goblin, rubber and messy traps.
 - **Bot 0.61.0: every stud and every version of him tells his own story in eight lines a beat.** No Companion update needed.
   - **The minotaur:** the usual one, the bull of the maze, the old herd bull, the hothead and the show bull.
   - **The werewolf:** the usual one, the grizzled alpha, the new-turned farmhand who keeps sayin' sorry, the blood moon wolf and the moon brothers.

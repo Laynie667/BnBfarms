@@ -309,7 +309,7 @@
         ["She's the old sow, the matron of the sty: big as a wardrobe, pink and warm, apron straps cuttin' into rolls of soft flesh, and a double row of fat teats down her front. She sits, and %n is in her lap.",
          "The sow-woman settles into her rockin' chair with a sigh and arranges %n across her knees like a lapful of washin'. Everything about her is soft and huge and smells of milk."],
         ["\"Hush now. I've got you.\" She unhooks her apron bib and pushes a teat the size of a thumb between %n's lips. It's already drippin'.",
-         "A broad hand cradles the back of %n's head and guides their mouth onto a fat warm nipple. \"Drink up, love. All of it.\""],
+         "A broad hand cups the back of %n's head and guides their mouth onto a fat warm nipple. \"Drink up, love. All of it.\""],
       ],
       in: [
         ["%n drinks. It's thick and sweet and there's no end to it, and the more they swallow the heavier their eyelids get. They hardly notice her other hand liftin' her apron, or what rises up from under it.",

@@ -172,8 +172,8 @@
     more(A.sow.over[0], [
       "She lets %n nurse till they're drowsy, rubbin' herself slow against their thigh under her apron, and grunts happily when she spills."]);
     more(A.sow.end, [
-      "She cums with a soft happy grunt, %ml deep in %n's %h, and lets them nurse through it. Then she wipes their chin and tucks them into the straw.",
-      "%ml of sow seed in %n's %h and a belly full of her milk on top. She pats them, rocks them a last minute, and sets them down. \"Come back hungry.\""]);
+      "She cums with a soft happy grunt, %ml deep in %n's %h, and lets them nurse through it. Then she wipes their chin and lays them down in the straw.",
+      "%ml of sow seed in %n's %h and a belly full of her milk on top. She pats them, holds them a last minute, and sets them down. \"Come back hungry.\""]);
     more(A.sow.endOver, [
       "She finishes against %n's thigh with a contented grunt, wipes their chin with her apron, and sets them on their feet, milk-drunk and swayin'."]);
   })();

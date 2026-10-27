@@ -44,7 +44,7 @@ const done=async(mn,ms)=>{ for(let i=0;i<60;i++){ await wait(250); if(!(W.__st()
   n=sent.length; await say(800,'?traps on');
   ok(P(800).trapsOn===true && /Traps: ON/.test(all(n)), '?traps on: anybody can switch them on');
   n=sent.length; await say(221397,'?trap spring Dot injector',300); await done(800);
-  ok(/gauge creeps toward FULL|cotton swab|plunger draw back|taps the barrel twice|spreadin', hot as a swallow|flush in a slow wave|goes heavy and hot|thickens in one slow throb|pools and swells|gauge reads EMPTY/.test(all(n)), 'the injector tells its own new beats');
+  ok(/gauge creeps toward FULL|cotton swab|plunger draw back|taps the barrel twice|spreadin', hot as a swallow|flush in a slow wave|goes heavy and hot|thickens in one slow throb|pools and swells|gauge reads EMPTY|countin' under its breath|EMPTY to READY|brass funnel|curve of the glass barrel|past the place the needle went in|pulse is thumpin'|throb in time with their heart|slow wet heat pools|balls draw up tight/.test(all(n)), 'the injector tells its own new beats');   // (its own beats are eight a pool since 0.60.0: any of them will do)
   n=sent.length; await say(800,'?traps off');
   ok(P(800).trapsOn===false && /Traps: off/.test(all(n)), '?traps off switches them off');
   free(800); n=sent.length; await say(221397,'?trap spring Dot injector',1500);

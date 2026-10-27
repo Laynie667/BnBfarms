@@ -1126,13 +1126,23 @@ The rubber dairymaid: mitts, a muzzle, and her latex hands all over you.
 
 ### 🦴 rubberpup
 
-The rubber kennel: a latex pup hood and mitts, and you're taught to beg.
+The rubber kennel: zipped into a whole rubber pup outfit (catsuit, pup hood, a petsuit with padded paws, collar and bone tag, leash and tail) and taught to beg.
 
 - **How to get it:** a tile named `trap-rubberpup`.
-- **Ruled out by limits mentioning:** latex, rubber, pup, pet play, hood.
+- **Ruled out by limits mentioning:** latex, rubber, pup, pet play, hood, petsuit.
 - **Equipment:**
-  - **Rubber Pup Hood** (hood, while the trap holds them). Game items: LatexDogHood, LatexHood. A black latex pup hood with floppy ears and a muzzle, pulled down snug and buckled, so the only words left are woofs.
-  - **Rubber Paws** (mitts, while the trap holds them). Game items: LatexBondageMitts. Round latex paw mitts strapped at the wrist. Good for walkin' on all fours, beggin', and nothin' else.
+  - **Rubber Pup Skin** (suit, while the trap holds them). Game items: LatexCatsuit. A black latex catsuit rolled on from the toes up and smoothed down tight, talc and all, so the pup underneath shines like a wet nose from the neck down.
+  - **Rubber Pup Skin (legs)** (suitLower, while the trap holds them). Game items: LatexCatsuit. The catsuit's legs, glossy and seamless, moulded over hips and thighs and down to the toes.
+  - **Rubber Pup Hood** (hood, while the trap holds them). Game items: LatexDogHood, LatexDogMask, LatexHood. A black latex pup hood with floppy ears and a muzzle, pulled down snug and buckled, so the only words left are woofs.
+  - **Rubber Petsuit** (arms, while the trap holds them). Game items: PawPaddedPetsuitArms, HempRope, LeatherCuffs. Arms folded at the elbow and laced into the petsuit's latex sleeves, with fat padded paws on the ends. Pups walk on their elbows here.
+  - **Rubber Petsuit (legs)** (legs, while the trap holds them). Game items: PawPaddedPetsuitLegs, HempRope, LeatherLegCuffs. Legs folded at the knee and laced snug into the petsuit, padded where they meet the floor. Pups kneel, and pups crawl.
+  - **Kennel Collar** (collar, while the trap holds them). Game items: DogCollar. A wide red dog collar buckled snug, with a ring at the front for the leash. It stays on a while after, so everybody knows.
+  - **Kennel Collar** (collar, after the trap, for 30 min). Game items: DogCollar. A wide red dog collar buckled snug, with a ring at the front for the leash. It stays on a while after, so everybody knows.
+  - **Good Pup Tag** (tag, while the trap holds them). Game items: CollarPupBone, CollarNameTagLivestock, CollarNameTag. A little bone-shaped tag on the collar: GOOD PUP on one side and, on the other, PROPERTY OF THE RUBBER KENNEL.
+  - **Good Pup Tag** (tag, after the trap, for 30 min). Game items: CollarPupBone, CollarNameTagLivestock, CollarNameTag. A little bone-shaped tag on the collar: GOOD PUP on one side and, on the other, PROPERTY OF THE RUBBER KENNEL.
+  - **Kennel Leash** (leash, while the trap holds them). Game items: CollarLeash, CollarChainLong, CollarChainShort. A short red lead clipped to the collar ring, held by the kennel hand, or looped over the kennel post when they're busy.
+  - **Pup's Tail Plug** (plug, unless their limits or a belt rule it out, while the trap holds them). Game items: PuppyTailPlug1, PuppyTailPlug. A fluffy puppy tail on a smooth plug, worked in slow and given a tug to check it's seated. It wags when they wiggle, and they wiggle.
+  - **Rubber Pup Tail** (tail, when a plug's ruled out, while the trap holds them). Game items: PuppyTailStrap, PuppyTailStrap1. A glossy black puppy tail strapped on at the base of the spine, and it wags when they wiggle.
 
 ### 🍼 rubberstall
 

@@ -527,9 +527,16 @@ THE PARASITE · ?parasite on
   mouth for 12 hours. It feeds you serum every half hour
   (fertility, growth, hyper pregnancy, capacity; the growth is
   for keeps) and turns every load you swallow into more.
-  It comes in four strains, blooms over its twelve hours (lips,
-  then teats, then below), gets urges, lays its own eggs at the
-  end, and passes by a kiss or by nursin'.
+  It comes in eight strains (Breeder, Grower, Glutton, Tyrant,
+  Oozer, Weaver, Deep, Gloss), blooms over its twelve hours
+  (lips, teats, below, each strain in its own order), gets
+  urges, lays its own eggs at the end, and passes by a kiss or
+  by nursin'. As it blooms it spreads over you as real clothes
+  with the Companion: a tail, sleeves and stockings; the Oozer
+  and the Gloss grow into a whole second skin, the Weaver spins
+  a silk harness (and cocoons your arms now and then), the Deep
+  wraps you in tentacles. Your limits rule strains out: slime,
+  spider, tentacle, latex.
   ?parasite · how long is left. Your safeword takes it off.
 
 SYMBIOTES · ?symbiote on
@@ -560,6 +567,11 @@ REAL GEAR
   is put on your character for real, and taken off when its
   time's up. Pull it off early and it goes back. Your safeword
   takes all of it off. The parasite needs no second switch.
+  Some traps dress you head to toe: the rubber kennel zips you
+  into a whole rubber pup (catsuit, pup hood, padded-paw petsuit,
+  collar with a bone tag, leash, and a tail), and the collar and
+  tag stay on half an hour after. Your own collar is never
+  swapped; the leash and tag clip to yours.
 
 CARRYIN' SLOWS YOU DOWN
   A pumped belly, a late litter or a clutch of eggs makes you

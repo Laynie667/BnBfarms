@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.49.0
+// @version      0.50.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -230,7 +230,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.49.0";
+  var VERSION = "0.50.0";
 
   // shared/species.js
   var WORDS = {
@@ -9986,7 +9986,42 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     "The Harvest Crown",
     "Table Ribbons",
     "Harvest Crown",
-    "Harvest Apron"
+    "Harvest Apron",
+    // Oct 27: the whole rubber pup, and the parasite strains' fuller outfits (10y9k-latex-traps.js, 10v6-parasite-strains-more.js)
+    "Rubber Pup Skin",
+    "Rubber Pup Skin (legs)",
+    "Rubber Petsuit",
+    "Rubber Petsuit (legs)",
+    "Kennel Collar",
+    "Good Pup Tag",
+    "Kennel Leash",
+    "Pup's Tail Plug",
+    "Rubber Pup Tail",
+    "Parasite Tail",
+    "Parasite Sleeves",
+    "Parasite Stockings",
+    "Ooze Gloves",
+    "Ooze Sleeves",
+    "Ooze Stockings",
+    "Ooze Skin (legs)",
+    "Ooze Skin (body)",
+    "Ooze Sleeve",
+    "Silk Harness",
+    "Silk Gloves",
+    "Silk Stockings",
+    "Weaver's Cocoon",
+    "Deep's Tail",
+    "Deep's Sleeves",
+    "Deep's Stockings",
+    "Deep's Embrace",
+    "Deep's Coil",
+    "Gloss Gloves",
+    "Gloss Sleeves",
+    "Gloss Stockings",
+    "Gloss Skin (legs)",
+    "Gloss Skin (body)",
+    "Gloss Heels",
+    "Gloss Sheath"
   ];
   var GEAR_SLOTS = {
     plug: { groups: ["ItemButt"], names: ["InflVibeButtPlug", "BlackButtPlug", "ButtPlug", "ButtPump"], re: /ButtPlug|Plug/, color: "#2B2B2B" },
@@ -10025,7 +10060,10 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     horns: { groups: ["HairAccessory1"], names: [], re: /^$/, takeover: true },
     tail: { groups: ["TailStraps"], names: [], re: /^$/, takeover: true },
     // the farm girl's winter shawl and Yule cloak (Oct 27): the same, over her own clothes' accessory spot
-    cloak: { groups: ["ClothAccessory"], names: [], re: /^$/, takeover: true }
+    cloak: { groups: ["ClothAccessory"], names: [], re: /^$/, takeover: true },
+    // a collar (Oct 27: the rubber pup's). Only the item a piece names, and never in place of a collar of yours: if you're
+    // wearin' one, the leash and the tag clip to it instead
+    collar: { groups: ["ItemNeck"], names: [], re: /^$/ }
   };
   var GEAR_OPT = {
     "ItemArms:LeatherCuffs": "Wrist",
@@ -10050,7 +10088,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
   function itemHome(name, slot, taken) {
     const all = Array.isArray(window.Asset) ? window.Asset : [];
     const homes = all.filter((a) => a && a.Name === name && a.Group && a.Group.Family === P3().AssetFamily && /^Item/.test(a.Group.Name)).map((a) => a.Group.Name);
-    return homes.find((g) => slot.groups.includes(g) && !taken(g)) || homes.find((g) => !taken(g)) || null;
+    return homes.find((g) => slot.groups.includes(g) && !taken(g)) || (slot.takeover ? null : homes.find((g) => !taken(g))) || null;
   }
   function setGearOpt(group, name, want) {
     try {
@@ -10118,7 +10156,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
   var gearNameOf = (b, mem) => isFarmGear(b) ? b.Craft.Name : Object.keys(mem).find((n) => mem[n].group === b.Group && mem[n].item === b.Name && (!(b.Craft && b.Craft.Name) || b.Craft.Name === n)) || null;
   function syncFarmGear(list, allow) {
     if (!P3() || !Array.isArray(P3().Appearance) || typeof window.ServerAppearanceBundle !== "function") return { on: [], off: [] };
-    const want = (Array.isArray(list) ? list : []).filter((g) => g && GEAR_SLOTS[g.slot] && (g.always || allow) && (!g.until || g.until > Date.now()));
+    const want = (Array.isArray(list) ? list : []).filter((g) => g && GEAR_SLOTS[g.slot] && (g.always || allow) && (!g.until || g.until > Date.now())).sort((a, b) => (GEAR_SLOTS[a.slot].needs ? 1 : 0) - (GEAR_SLOTS[b.slot].needs ? 1 : 0));
     const cur = bundle(), stuck = lockedGroups2(), did = { on: [], off: [] }, mem = gearMem(), setLater = [];
     let next = cur.slice();
     for (const b of cur) {

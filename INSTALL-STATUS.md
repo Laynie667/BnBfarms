@@ -5,7 +5,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 | Script | File in `dist/` | Where it runs | Current |
 |---|---|---|---|
-| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.56.0** |
+| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.57.0** |
 | Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.10.0** |
 | Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.2.1** |
 | Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **1.1.0** |
@@ -13,7 +13,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 | Map tools, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.4** |
 | Dairy | `farmhand-dairy.user.js` | the bot's PC | **1.1.0** |
 | Shows | `farmhand-shows.user.js` | the bot's PC | **1.1.0** |
-| Farmhand Companion | `farmhand-companion.user.js` | each player, and the bot's own tab | **0.49.0** |
+| Farmhand Companion | `farmhand-companion.user.js` | each player, and the bot's own tab | **0.50.0** |
 | Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.4** |
 
 ## Sending a watch report
@@ -24,6 +24,15 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 ## Latest changes (newest first)
 
+- **Bot 0.57.0 + Companion 0.50.0: the whole rubber pup, eight parasite strains that spread over you, and every trap meetin' the state you're in.** Laynie, Oct 27: "They should be immersive, detailed, non-clinical, expansive message pools for all traps ... like gender, equipment, species, fullness, and all those variables. Plus the rubberpup trap should really feature a full outfit. I think the parasites would benefit from more strains and fuller outfits to spread into."
+  - **Update every Companion to 0.50, the bot's own tab too.** The pup's collar, petsuit and tail and the parasites' new clothes need it.
+  - **The rubber kennel dresses you as a whole rubber pup** (with "Farm can put real gear on me"): a latex catsuit (body and legs), the latex pup hood, the padded-paw petsuit (arms and legs), a dog collar with a GOOD PUP bone tag, a leash clipped to it, and a puppy tail plug. If anal or plugs are in your limits, or your back's already filled, it's a strapped-on tail instead. The collar and tag stay on 30 minutes after. If you already wear a collar, yours stays, and the leash and tag clip to it. The trap's story is rewritten round the outfit: suited up, hooded and put in the petsuit, taught to beg, played with (four beats of 8 to 10 lines each, 8 endings, and its own tender and filthy lines).
+  - **Four new parasite strains.** The **Oozer** (green slime: slimes you at every feed and stretches you a little at a time), the **Weaver** (silk: spins you a harness and gloves, and about once an hour cocoons your arms for 3 minutes), the **Deep** (tentacles from the sea: a tentacle tail from the start, pumps brine into you, wants you in the water, and finds its kin twice as fast) and the **Gloss** (livin' rubber: drinks every climax and pays you a dose for it, squeezes you every 20 minutes, and polishes the mess off you). Each blooms in its own order, with its own brew, urges and lines. Your limits rule them out: slime, spider or web, tentacles, latex.
+  - **Every strain spreads into clothes as it blooms.** The old four grow a tentacle tail by hour four, then latex sleeves and stockings by hour eight. The Oozer and the Gloss go from gloves to a whole second skin (the Gloss with thigh-high heels), the Weaver adds silk gloves and stockings, the Deep a tail, sleeves, stockings and a full tentacle wrap. They're clothes, not restraints (except the Weaver's short cocoon), and your own clothes come back when it goes.
+  - **Each feed can tell you how it feels,** strain by strain, just to you (8 lines for each of the eight).
+  - **Every trap meets the state you're in.** A new layer runs under all of them: one extra beat (two on `?intensity filthy`) about what's true of you right now, and a sentence more on about a third of the beats. It knows if you're pregnant (just caught, showin', heavy, overdue), carryin' eggs, sloshin' or stuffed past full, still full from the last one, fit to burst with milk or milked flat, heavy in the balls or drained, in heat, denied, right on the edge, already a mess, wearin' a parasite, a symbiote or the livin' suit, or big in the tits, balls or cock. It knows your kind (14 kinds of stock: cow, bull, horse or pony, deer, pig, pup or dog, kitty or cat, goblin, bunny, fox, wolf, goat, sheep, rat), and each kind is bred, held, milked, messed, teased and watched its own way. And it knows what you wear: gag, ring gag, blindfold, hood, collar, leash, bell, nose ring, latex, hooves, heels, harness, cage, chastity, plugs, tail, ears, clothes pushed aside, or nothin' at all. About 800 new lines, every one picked for your body.
+  - **Next:** each trap's own lines grow, in batches.
+  - **Guides:** the parasite and real-gear guides explain the strains and the pup.
 - **Bot 0.56.0: the furry studs come in more than one version.** Laynie, Oct 27: "more trap versions, like the water beast could use alot more versions."
   - Like the water beast, the farm's furry studs aren't always the same one now. Most times it's the usual, but sometimes it's another, each with its own story and its own way of leavin' you. No Companion update needed.
   - **The werewolf:** the grizzled alpha (ties you longer, and fills you more), the new-turned one (a farmhand on his first full moon: six quick knots, and sorry about every one), the blood moon wolf (likelier after dark; his bite puts you in heat, unless heat's in your limits) and the moon brothers (two werewolves who share).

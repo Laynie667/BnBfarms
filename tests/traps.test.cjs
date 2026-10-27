@@ -196,7 +196,7 @@ const C=mn=>chars.find(c=>c.MemberNumber===mn);
   W.__cfg.PARASITE_KISS_CHANCE=1; W.__kiss('Kiss','ItemMouth',500,600); await wait(3600); ok(!P(600).parasite, 'a kiss cannot give it to somebody who never said ?parasite on');
   await say(600,'?parasite on'); W.__kiss('Kiss','ItemMouth',600,500); await wait(3600); ok(!!P(600).parasite, '...and does to somebody who did, whichever of them leaned in');
   // strains, bloomin', kin, the Tyrant, milk
-  ok(['breeder','grower','glutton','tyrant'].includes(P(600).parasite.strain), 'it latches as one of four strains ('+P(600).parasite.strain+')');
+  ok(['breeder','grower','glutton','tyrant','oozer','weaver','deep','gloss'].includes(P(600).parasite.strain), 'it latches as one of eight strains ('+P(600).parasite.strain+')');
   { const g=P(500).parasite, since=g.since; ok(W.__parts(500).lips && !W.__parts(500).suckers && !W.__parts(500).root, 'at first it is only lips');
     g.since=Date.now()-5*3600000; W.__parasiteTick(); await wait(400); ok(W.__parts(500).suckers && (W.__stateFor(500).farmGear||[]).some(x=>x.slot==='chestbra' && /Suckers/.test(x.name) && (x.items||[]).includes('ForbiddenChastityBra')), 'from hour four: suckers on the teats, as real gear (the Forbidden Chastity Bra)');
     g.since=Date.now()-9*3600000; W.__parasiteTick(); await wait(400); ok(W.__parts(500).root && (W.__stateFor(500).farmGear||[]).some(x=>x.slot==='belt'), 'from hour eight: a root below');

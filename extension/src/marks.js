@@ -148,7 +148,13 @@ const FARM_NAMES = ["Parasite Lips", "Parasite Belt", "Pump Bung", "Egg Post Plu
   "Basket Ribbon (legs)", "Sugar Twine", "Egg-Roll Ribbon", "Parade Bonnet", "Mould Straps", "Easter Bonnet", "Bunny Ears", "Bunny Tail",
   "Midsummer Ribbon", "Oak King's Crown", "Fae Ribbon", "The Sun Wheel", "Rose Garlands", "Barrel Rope", "Midsummer Crown",
   "Sheaf Twine", "Sheaf Twine (legs)", "Corn Dolly Plaits", "Corn Dolly Plaits (legs)", "Vintner's Ribbon", "Press Strap", "Wagon Ribbon",
-  "The Harvest Crown", "Table Ribbons", "Harvest Crown", "Harvest Apron"];
+  "The Harvest Crown", "Table Ribbons", "Harvest Crown", "Harvest Apron",
+  // Oct 27: the whole rubber pup, and the parasite strains' fuller outfits (10y9k-latex-traps.js, 10v6-parasite-strains-more.js)
+  "Rubber Pup Skin", "Rubber Pup Skin (legs)", "Rubber Petsuit", "Rubber Petsuit (legs)", "Kennel Collar", "Good Pup Tag", "Kennel Leash",
+  "Pup's Tail Plug", "Rubber Pup Tail", "Parasite Tail", "Parasite Sleeves", "Parasite Stockings", "Ooze Gloves", "Ooze Sleeves", "Ooze Stockings",
+  "Ooze Skin (legs)", "Ooze Skin (body)", "Ooze Sleeve", "Silk Harness", "Silk Gloves", "Silk Stockings", "Weaver's Cocoon", "Deep's Tail",
+  "Deep's Sleeves", "Deep's Stockings", "Deep's Embrace", "Deep's Coil", "Gloss Gloves", "Gloss Sleeves", "Gloss Stockings", "Gloss Skin (legs)",
+  "Gloss Skin (body)", "Gloss Heels", "Gloss Sheath"];
 // slot → where it can go and which game item it is: the first that this game has; the pattern is a fallback
 export const GEAR_SLOTS = {
   plug:     { groups: ["ItemButt"], names: ["InflVibeButtPlug", "BlackButtPlug", "ButtPlug", "ButtPump"], re: /ButtPlug|Plug/, color: "#2B2B2B" },
@@ -187,6 +193,9 @@ export const GEAR_SLOTS = {
   tail:     { groups: ["TailStraps"], names: [], re: /^$/, takeover: true },
   // the farm girl's winter shawl and Yule cloak (Oct 27): the same, over her own clothes' accessory spot
   cloak:    { groups: ["ClothAccessory"], names: [], re: /^$/, takeover: true },
+  // a collar (Oct 27: the rubber pup's). Only the item a piece names, and never in place of a collar of yours: if you're
+  // wearin' one, the leash and the tag clip to it instead
+  collar:   { groups: ["ItemNeck"], names: [], re: /^$/ },
 };
 // HOW EACH PIECE IS SET (Laynie, Oct 19: "I had a knee spreader described as being a knee spreader, but it was just hemp
 // rope and the cuffs weren't restraining me at all with their configuration"). The game puts most restraints on in their
@@ -205,7 +214,8 @@ export const GEAR_OPT = {
 function itemHome(name, slot, taken) {
   const all = Array.isArray(window.Asset) ? window.Asset : [];
   const homes = all.filter((a) => a && a.Name === name && a.Group && a.Group.Family === P().AssetFamily && /^Item/.test(a.Group.Name)).map((a) => a.Group.Name);
-  return homes.find((g) => slot.groups.includes(g) && !taken(g)) || homes.find((g) => !taken(g)) || null;
+  // (clothes never go anywhere but their own spot: a tentacle TAIL is not the game's tentacles for the arms, Oct 27)
+  return homes.find((g) => slot.groups.includes(g) && !taken(g)) || (slot.takeover ? null : homes.find((g) => !taken(g))) || null;
 }
 // set an item the way GEAR_OPT (or the piece) says, through the game's own extended-item setter
 function setGearOpt(group, name, want) {
@@ -242,7 +252,8 @@ const gearNameOf = (b, mem) => (isFarmGear(b) ? b.Craft.Name : (Object.keys(mem)
 // list: [{ slot, name, desc, color, always }] · allow: trap gear is switched on. Returns what it did.
 export function syncFarmGear(list, allow) {
   if (!P() || !Array.isArray(P().Appearance) || typeof window.ServerAppearanceBundle !== "function") return { on: [], off: [] };
-  const want = (Array.isArray(list) ? list : []).filter((g) => g && GEAR_SLOTS[g.slot] && (g.always || allow) && (!g.until || g.until > Date.now()));
+  const want = (Array.isArray(list) ? list : []).filter((g) => g && GEAR_SLOTS[g.slot] && (g.always || allow) && (!g.until || g.until > Date.now()))
+    .sort((a, b) => (GEAR_SLOTS[a.slot].needs ? 1 : 0) - (GEAR_SLOTS[b.slot].needs ? 1 : 0));   // (the collar first, then the leash and the tag that clip to it)
   const cur = bundle(), stuck = lockedGroups(), did = { on: [], off: [] }, mem = gearMem(), setLater = [];
   let next = cur.slice();
   // off: ours, and not on the list any more

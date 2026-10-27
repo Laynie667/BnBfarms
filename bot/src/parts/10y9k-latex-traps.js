@@ -8,7 +8,9 @@
        bodybag     the inflatable body bag: zipped in, pumped up tight as a drum, and teased through the rubber
        rubbermaid  the rubber dairymaid: a girl in head-to-toe latex who mitts you, muzzles you and has her way
        blackpool   the black pool in the woods: livin' latex that climbs out, fills you and seals you in it
-       rubberpup   the rubber kennel: a latex pup hood and mitts, and you're taught to beg
+       rubberpup   the rubber kennel: a whole rubber pup outfit (catsuit, pup hood, the paw-padded petsuit, a dog collar with
+                   a bone tag, a leash, and a puppy tail plug, or a strapped-on tail when a plug's ruled out), and you're taught to beg
+                   (Laynie, Oct 27: "the rubberpup trap should really feature a full outfit")
      Every one of them leaves livin' latex behind a third of the time, for somebody with ?symbiote on (10v4-symbiotes.js),
      and they come up more often for somebody already wearin' livin' latex (10ua2-trap-weights.js).
      A new place for them, the rubber shed (spots named rubber…, latex…, vat…), and they're in the older places too.
@@ -23,7 +25,7 @@
     bodybag:     { icon: "🎈", what: "the inflatable body bag: zipped in, pumped up tight, and teased through the rubber", limit: /\b(latex|rubber|inflat|encas|immobil)/i },
     rubbermaid:  { icon: "🧤", what: "the rubber dairymaid: mitts, a muzzle, and her latex hands all over you", limit: /\b(latex|rubber|mitt|muzzl|gag)/i },
     blackpool:   { icon: "⚫", what: "the black pool in the woods: livin' latex that climbs out, fills you and seals you in", limit: /\b(latex|rubber|monster|encas|tentacl)/i },
-    rubberpup:   { icon: "🦴", what: "the rubber kennel: a latex pup hood and mitts, and you're taught to beg", limit: /\b(latex|rubber|pup|pet ?play|hood)/i },
+    rubberpup:   { icon: "🦴", what: "the rubber kennel: zipped into a whole rubber pup outfit (catsuit, pup hood, a petsuit with padded paws, collar and bone tag, leash and tail) and taught to beg", limit: /\b(latex|rubber|pup|pet ?play|hood|petsuit)/i },
   });
   const LATEX_KINDS = ["vacbed", "rubbervat", "dollmaker", "rubberstall", "bodybag", "rubbermaid", "blackpool", "rubberpup"];
   Object.assign(TRAP_NEEDS, {
@@ -62,11 +64,37 @@
                     desc: "Livin' latex from the pool, climbed up both legs to the hip and set like warm tar, holdin' them knee-deep where they stood." },
                   { when: "hold", slot: "arms", label: "Black Pool Latex (arms)", items: ["Slime"], color: LATEX_BLACK_GEAR,
                     desc: "A glossy black glove of it that ran up both arms and pulled them together, warm and pulsing, like it's breathin'." }],
-    rubberpup:   [{ when: "hold", slot: "hood", label: "Rubber Pup Hood", items: ["LatexDogHood"], color: LATEX_BLACK_GEAR,
+    // the whole pup (Oct 27): the item names are the game's own (checked against its asset list). The petsuit, collar, tag
+    // and tail are only ever those items (only): if this game hasn't got one, nothin' goes on in its place
+    rubberpup:   [{ when: "hold", slot: "suit", label: "Rubber Pup Skin", items: ["LatexCatsuit"], color: LATEX_BLACK_GEAR,
+                    desc: "A black latex catsuit rolled on from the toes up and smoothed down tight, talc and all, so the pup underneath shines like a wet nose from the neck down." },
+                  { when: "hold", slot: "suitLower", label: "Rubber Pup Skin (legs)", items: ["LatexCatsuit"], color: LATEX_BLACK_GEAR,
+                    desc: "The catsuit's legs, glossy and seamless, moulded over hips and thighs and down to the toes." },
+                  { when: "hold", slot: "hood", label: "Rubber Pup Hood", items: ["LatexDogHood", "LatexDogMask"], color: LATEX_BLACK_GEAR,
                     desc: "A black latex pup hood with floppy ears and a muzzle, pulled down snug and buckled, so the only words left are woofs." },
-                  { when: "hold", slot: "mitts", label: "Rubber Paws", items: ["LatexBondageMitts"], color: LATEX_BLACK_GEAR,
-                    desc: "Round latex paw mitts strapped at the wrist. Good for walkin' on all fours, beggin', and nothin' else." }],
+                  { when: "hold", slot: "arms", label: "Rubber Petsuit", items: ["PawPaddedPetsuitArms"], only: true,
+                    desc: "Arms folded at the elbow and laced into the petsuit's latex sleeves, with fat padded paws on the ends. Pups walk on their elbows here." },
+                  { when: "hold", slot: "legs", label: "Rubber Petsuit (legs)", items: ["PawPaddedPetsuitLegs"], only: true,
+                    desc: "Legs folded at the knee and laced snug into the petsuit, padded where they meet the floor. Pups kneel, and pups crawl." },
+                  { when: "hold", slot: "collar", label: "Kennel Collar", items: ["DogCollar"], only: true, color: "#9E1B24",
+                    desc: "A wide red dog collar buckled snug, with a ring at the front for the leash. It stays on a while after, so everybody knows." },
+                  { when: "after", slot: "collar", label: "Kennel Collar", items: ["DogCollar"], only: true, color: "#9E1B24", mins: 30,
+                    desc: "A wide red dog collar buckled snug, with a ring at the front for the leash. It stays on a while after, so everybody knows." },
+                  { when: "hold", slot: "tag", label: "Good Pup Tag", items: ["CollarPupBone"], only: true,
+                    desc: "A little bone-shaped tag on the collar: GOOD PUP on one side and, on the other, PROPERTY OF THE RUBBER KENNEL." },
+                  { when: "after", slot: "tag", label: "Good Pup Tag", items: ["CollarPupBone"], only: true, mins: 30,
+                    desc: "A little bone-shaped tag on the collar: GOOD PUP on one side and, on the other, PROPERTY OF THE RUBBER KENNEL." },
+                  { when: "hold", slot: "leash", label: "Kennel Leash", items: ["CollarLeash"],
+                    desc: "A short red lead clipped to the collar ring, held by the kennel hand, or looped over the kennel post when they're busy." },
+                  { when: "hold", slot: mn => pupPlugOk(mn) ? "plug" : null, slotNote: "plug, unless their limits or a belt rule it out", label: "Pup's Tail Plug",
+                    items: ["PuppyTailPlug1", "PuppyTailPlug"], only: true,
+                    desc: "A fluffy puppy tail on a smooth plug, worked in slow and given a tug to check it's seated. It wags when they wiggle, and they wiggle." },
+                  { when: "hold", slot: mn => pupPlugOk(mn) ? null : "tail", slotNote: "tail, when a plug's ruled out", label: "Rubber Pup Tail",
+                    items: ["PuppyTailStrap", "PuppyTailStrap1"], only: true, color: LATEX_BLACK_GEAR,
+                    desc: "A glossy black puppy tail strapped on at the base of the spine, and it wags when they wiggle." }],
   });
+  // a tail plug only where nothin's against it: their limits, or a belt in the way
+  function pupPlugOk(mn){ return !/\b(anal|plug|butt ?plug|insert)/i.test((rec(mn) || {}).limits || "") && !holeBlocked(mn, "butt"); }
   Object.assign(TRAP_SOUND_END, { vacbed: "hiss", bodybag: "hiss", rubberstall: "unlatch", dollmaker: "unlatch", rubberpup: "gate" });
 
   const LATEX_LINES = {
@@ -211,23 +239,52 @@
     },
     rubberpup: {
       beats: [
-        ["A kennel hand with a squeaky toy calls %n over to the rubber kennel, and before they can ask, there's a hood comin' down over their head.",
-         "%n stops by the black-painted kennel at the end of the row, and a hand behind them pulls a latex pup hood over their head.",
-         "\"Here, pup,\" says the kennel hand, and holds up a black latex hood with floppy ears, and %n's head is in it a second later."],
-        ["The hood's snug and buckled at the back, with a muzzle and ears, and when %n tries to talk it comes out a woof.",
-         "Then the paws: round latex mitts strapped at the wrist, and %n is down on all fours because there's no other way to stand.",
-         "The kennel hand clips a leash to %n's collar and gives it a tug. \"Heel.\""],
+        ["A kennel hand with a squeaky toy calls %n over to the rubber kennel, and before they can ask what for, there's a black latex suit held open in front of them like a coat at the door.",
+         "%n stops by the black-painted kennel at the end of the row, and two kennel hands step out on either side of them with a catsuit, a hood and very big smiles.",
+         "\"Here, pup,\" says the kennel hand, holdin' up a glossy black catsuit by the shoulders, and %n's foot is in it before they've finished sayin' no.",
+         "The rubber kennel's gate is standin' open. There's a bowl in there with %n's name painted on it, and a kennel hand sat on an upturned crate, dustin' a black catsuit with talc.",
+         "%n sits down on the bench by the rubber kennel for a breather, and their boots are off before they notice, and somebody's rollin' black latex up over their toes.",
+         "\"New pup!\" the kennel hand calls over their shoulder, and three more come out of the rubber shed with their arms full of latex.",
+         "A whistle, two short notes, and %n turns toward it without thinkin'. The kennel hand who blew it grins. \"Good. You already come when you're called.\"",
+         "%n leans on the kennel fence, and a pair of talc-dusted hands starts peelin' their clothes off them from behind, quick and practised."],
+        ["The catsuit's rolled up their legs and over their hips and zipped to the throat, squeakin' all the way, and smoothed down everywhere till %n shines like a wet nose.",
+         "Then the hood: black latex with a muzzle and floppy ears, pulled down snug and buckled at the back. When %n tries to talk, it comes out a woof.",
+         "Their arms are folded at the elbow and laced into the petsuit's sleeves, fat padded paws on the ends, and their legs folded and laced the same, and %n is down on all fours because there's no other way left to be.",
+         "A red collar is buckled round %n's throat, snug, with a little bone-shaped tag that says GOOD PUP, and the leash clicks onto the ring.",
+         "The tail goes on last, black and fluffy, and the kennel hand gives it a tug to check it's seated, and %n's hips wiggle all on their own.",
+         "Every lace is pulled tight and every buckle done up, and the kennel hand runs a palm over %n from hood to tail, squeakin', to check the fit.",
+         "{t}The catsuit squeezes %n's tits up round and glossy, and the petsuit laces cross right under them, so they hang heavy and shinin' between %n's front paws.",
+         "{c}The catsuit's moulded tight over %n's cock, every inch of it shown off in black shine, and it's already stiffenin' under the rubber.",
+         "{v}The latex is smoothed down between %n's legs so tight that every fold of them shows through, glossy, and the kennel hand pats it the way you'd pat a good dog's flank.",
+         "%n tries to stand up, and the folded petsuit legs say no, and they tip forward onto their padded paws with a squeak. Everybody laughs, kindly."],
         ["Then lessons. Sit. Beg. Roll over. Every one gets a rub through the latex, and every miss gets a swat on the rump.",
-         "{t}\"Beg,\" and %n sits up on their heels, paws up, tits bouncin', and gets a treat for it.",
-         "%n is walked round the kennel yard on the leash, nose to the ground, while the other kennel hands watch and clap.",
-         "{c}A hand scratches behind %n's ears and then lower, and lower, till their cock's bobbin' and they're pantin' through the muzzle."],
-        ["The kennel hand plays fetch. %n fetches. Every time, they get their belly rubbed, and every time the hand rubs a bit lower.",
+         "{t}\"Beg,\" and %n sits back on their folded legs, paws up, tits bouncin' in the shine, and gets a treat for it.",
+         "%n is walked round the kennel yard on a short leash, crawlin' on elbows and knees, nose to the ground, while the other kennel hands watch and clap.",
+         "{c}A hand scratches behind %n's rubber ears and then lower, and lower, till their cock's bobbin' under the latex and they're pantin' through the muzzle.",
+         "\"Heel.\" %n heels. \"Down.\" %n goes down, chest to the straw, rump up. \"Stay.\" And they stay, tremblin', for a very long time.",
+         "\"Speak,\" says the kennel hand, and %n woofs through the hood, and the kennel hand says \"louder,\" and they woof louder, and the whole yard hears it.",
+         "%n is taught to shake a paw, and to roll over, and to show their belly, and every time they get it right somebody rubs the belly they showed.",
+         "{v}\"Present,\" says the kennel hand, and taps %n's rump, and %n learns what that means very quickly, and gets a long slow rub between the legs for learnin' it.",
+         "Every time %n wobbles, the leash comes up short and the kennel hand waits, patient, till they're square on their paws again.",
+         "A clicker, a treat, a pat: %n learns to come to the click faster than anybody has ever learned anythin'."],
+        ["The kennel hand plays fetch. %n fetches, crawlin' as fast as the petsuit lets them, and every time they get their belly rubbed, and every time the hand rubs a little lower.",
          "%n is told to roll over and show their belly, and the whole yard has a go at rubbin' it.",
-         "A bowl of water and a squeaky toy, and %n is left to wag at the end of the leash while folk come to pat the new pup."],
+         "A bowl of water and a squeaky toy, and %n is left to wag at the end of the leash while folk come by to pat the new pup.",
+         "{c}A good pup gets a treat, and %n's treat is a slick rubber-gloved hand round their cock, pumpin' slow, while they pant and wiggle.",
+         "{v}Good pups get their scratches, and the kennel hand scratches %n right between the legs, through the latex, till they're humpin' the air.",
+         "%n is let off the leash in the yard to play. The kennel hands throw a ball and sit in the shade to watch them chase it on folded legs.",
+         "%n learns to hump a kennel hand's boot, and learns it fast, and the hand says \"good,\" over and over, and doesn't move the boot.",
+         "Somebody gets down on the straw with %n and wrestles them, rough and laughin', and pins them, and rubs their belly till they're whinin'.",
+         "{t}The kennel hand rubs %n's rubber-tight tits like a dog's belly, both hands, round and round, and %n's back leg kicks."],
       ],
-      end: ["The hood comes off and the paws unbuckle, and %n's face is pink and sweaty and still makin' little woofs.",
-            "%n is let off the leash with a scratch behind the ears and a biscuit, still wanting to sit when they're told.",
-            "The kennel hand unbuckles the hood, ruffles %n's hair, and tells them they're a very good pup."],
+      end: ["The hood comes off and the paws are unlaced, and %n's face is pink and sweaty and still makin' little woofs.",
+            "%n is let off the leash with a scratch behind the ears and a biscuit, and they still want to sit when they're told.",
+            "The kennel hand unbuckles the hood, ruffles %n's sweaty hair, tells them they're a very good pup, and leaves the collar on.",
+            "They peel %n out of the rubber like a banana, steamin' and slick, and the collar with its little bone tag stays on, so everybody knows.",
+            "The petsuit laces come undone, and %n's arms and legs unfold stiff and tingly, and they stand up on two feet for the first time in ages, and wobble.",
+            "%n is rubbed down with a towel like a pup after a bath, the catsuit peeled off them, and sent on their way with GOOD PUP still hangin' at their throat.",
+            "\"Same time tomorrow,\" says the kennel hand, unclippin' the leash, and %n nods before they can stop themselves.",
+            "Out of the rubber at last, %n is printed all over with latex creases, and for the first few steps they've forgotten how to walk on two legs."],
     },
   };
   const latexLine = (kind, key, mn, v) => tFill(pickFor(mn, "trap:"+kind+":"+key, LATEX_LINES[kind][key]), mn, v);
@@ -255,7 +312,7 @@
       arouse(mn, 50); face(mn, "afterglow", 120);
       return { ml: ml(got || 0) };
     }); },
-    rubberpup(mn){ latexRun(mn, "rubberpup", 5, "the rubber kennel", () => { arouse(mn, 20); face(mn, "afterglow", 60); }); },
+    rubberpup(mn){ latexRun(mn, "rubberpup", 6, "the rubber kennel", () => { arouse(mn, 20); face(mn, "afterglow", 60); }); },
   });
 
   // ── their own extra beats (10ue-trap-scenes.js) ──
@@ -318,11 +375,20 @@
   trapScene("rubberpup",
     ["The kennel hand rubs %n's ears through the hood, and the latex squeaks, and %n's hips wiggle without askin'.",
      "Down, and %n's chest goes to the straw. Up, and they're on their paws again. Every one earns a pat.",
-     "A tail is clipped to the back of %n's belt, and the kennel hand gives it a tug to see them wag."],
-    ["{t}\"Show your belly,\" and %n rolls over, paws up, tits bare to the sky, and the kennel hand rubs and rubs.",
-     "{c}A good pup gets a treat: a hand wrapped round %n's cock, a few slow pumps, and then it stops. Good pup.",
-     "{v}The kennel hand scratches lower, and lower, till their fingers are rubbin' slick circles between %n's legs.",
-     "%n is taught to hump the kennel hand's boot, and they learn it fast, and the hand says \"good,\" over and over."]);
+     "The tail gets a tug, gentle, just to see %n wag it, and they do, and everybody coos.",
+     "Sweat's runnin' inside the catsuit now, and every move squelches, and %n's as wet and shiny as a seal.",
+     "%n's leash is looped over the kennel post while the kennel hand fetches a brush, and %n waits, pantin', because waitin' is what pups do.",
+     "The kennel hand brushes %n down with a stiff bristle brush, all over the rubber, in long strokes, and %n leans into every one.",
+     "A bowl of water is set down, and %n has to lap at it through the muzzle, and makes a terrible mess, and gets praised for it.",
+     "Somebody clips a little bell to %n's collar so the whole yard can hear the new pup comin'."],
+    ["{t}\"Show your belly,\" and %n rolls onto their back, paws up, rubber-tight tits bare to the sky, and the kennel hand rubs and rubs.",
+     "{c}A good pup gets a treat: a hand wrapped round %n's cock through the latex, a few slow pumps, and then it stops. Good pup.",
+     "{v}The kennel hand scratches lower, and lower, till their fingers are rubbin' slick circles between %n's legs through the rubber.",
+     "%n is taught to hump the kennel hand's boot, and they learn it fast, and the hand says \"good,\" over and over.",
+     "{v}Every time %n presents, a rubber-gloved finger slides along the shine between their legs, slow, and they wiggle back for more.",
+     "{c}%n's cock strains so hard against the catsuit that the kennel hand laughs and gives it a rub, the way you'd scratch a pup for bein' keen.",
+     "Somebody gets down nose to nose with %n and tells them what a good, good pup they are, and %n's whole back end wiggles.",
+     "%n gets a treat for every trick, and the treats are kisses on the muzzle and long slow strokes down their back to the root of their tail."]);
 
   // ── the intensity dial (10y9b-intensity-lines.js) ──
   Object.assign(INTENSITY_BY_TRAP, {
@@ -340,8 +406,13 @@
                    filthy: ["She fucks %n with her slick rubber fingers like she's milkin' a dumb cow, and calls them one.", "Drool runs out round the muzzle and %n's leakin' on the floor, and she laughs and makes them lick it off her glove.", "She edges %n till they're humpin' her rubber thigh like a dog, and then she does it again."] },
     blackpool:   { tender: ["The pool is warm, and it moves slow, and somethin' in how it holds %n feels almost fond.", "It fills them gently, like a tide comin' in.", "It hums when %n shivers, and goes slower."],
                    filthy: ["It pumps %n full of hot black slime till their belly bulges and it's oozin' out round every tendril.", "Every hole stuffed with livin' latex at once, %n is a host and a toy and nothin' else.", "It fucks %n like a breedin' pen fucks a sow, and they're beggin' for it to keep goin'."] },
-    rubberpup:   { tender: ["The kennel hand is all praise and scratches, and %n's tail really does start to wag.", "Every trick earns a treat and a cuddle, and nobody is cross with a pup that gets it wrong.", "The paws are padded soft, and the leash is never yanked."],
-                   filthy: ["A rubber bitch on a leash, %n is taught to present and hump boots and beg with their tongue out.", "Their cunt's drippin' on the straw and the whole kennel yard can smell what a needy pup they are.", "Good pups get bred, the kennel hand says, and %n wags so hard at that it's embarrassin'."] },
+    rubberpup:   { tender: ["The kennel hand is all praise and scratches, and %n's tail really does start to wag.", "Every trick earns a treat and a cuddle, and nobody is cross with a pup that gets it wrong.", "The paws are padded soft, and the leash is never yanked.",
+                            "The petsuit is laced snug, never tight, and the kennel hand checks %n's paws for pinches every few minutes.", "\"Good pup, good pup,\" over and over, soft, and a hand that never stops strokin' %n's back.",
+                            "Every time %n's unsure, the kennel hand gets down on the straw with them and shows them, patient."],
+                   filthy: ["A rubber bitch on a leash, %n is taught to present and hump boots and beg with their tongue out.", "Their cunt's drippin' on the straw and the whole kennel yard can smell what a needy pup they are.", "Good pups get bred, the kennel hand says, and %n wags so hard at that it's embarrassin'.",
+                            "\"Down,\" and %n's rubber face goes to the straw and their rump goes up, and everybody in the yard knows what for.",
+                            "%n's leash is tied off at the post and they're left presentin' for anybody walkin' past, under a sign: TRY BEFORE YOU BUY.",
+                            "{c}The kennel hands jerk %n's cock through the latex till it's drippin', and then make them lick it off a rubber glove."] },
   });
 
   // ── the general beats they draw on (10ud-trap-depth.js) ──

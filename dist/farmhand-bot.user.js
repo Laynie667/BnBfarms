@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.56.0
+// @version      0.57.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -2748,8 +2748,8 @@
   ];
 
   // bot/src/version.js
-  var VERSION = "0.56.0";
-  var COMPANION_VERSION = "0.49.0";
+  var VERSION = "0.57.0";
+  var COMPANION_VERSION = "0.50.0";
 
   // bot-parts:farmhand-bot-parts
   (function() {
@@ -14027,6 +14027,7 @@
       state.trapRuns = state.trapRuns || /* @__PURE__ */ new Map();
       beats = sceneBeats(kind, beats, opts && opts.scene);
       beats = deepenBeats(mn, kind, beats);
+      beats = stateBeats(mn, kind, beats);
       const run = { kind, i: 0, timer: null, beats: beats = beats.slice() };
       const before = { pissed: (rec(mn) || {}).pissed || 0, eggs: ((prodOf(mn) || {}).eggs || {}).n || 0, held: heldNow(mn), milk: (prodOf(mn) || {}).milk || 0, heat: inHeat(prodOf(mn)), t: Date.now() };
       try {
@@ -14044,7 +14045,7 @@
         if (state.trapRuns.get(mn) !== run) return;
         if (run.i < beats.length && charFor(mn)) {
           const b = beats[run.i++];
-          emote(TRAP_KINDS[kind].icon + " " + tFill(pickFor(mn, "trap:" + kind + ":" + run.i, Array.isArray(b) ? b : [b]), mn, v) + (intensityTail(mn, run.i, beats.length, kind) || bodyTail(mn, kind, run.i)), mn);
+          emote(TRAP_KINDS[kind].icon + " " + tFill(pickFor(mn, "trap:" + kind + ":" + run.i, Array.isArray(b) ? b : [b]), mn, v) + (intensityTail(mn, run.i, beats.length, kind) || bodyTail(mn, kind, run.i) || stateTail(mn, kind, run.i)), mn);
           toysBeat(mn, run.i, beats.length);
           run.timer = setTimeout(step, CFG.TRAP_BEAT_S * 1e3);
           return;
@@ -23725,6 +23726,7 @@
     function parasiteGone(mn, g, how) {
       const r = rec(mn), p = prodOf(mn);
       if (g && g.strain === "tyrant" && p) p.deniedUntil = Math.min(p.deniedUntil || 0, Date.now());
+      strainGoneMore(mn, g);
       if (how === "done" && r.parasiteOn && Math.random() < CFG.PARASITE_SEED_CHANCE) r.parasiteSeed = Date.now() + (2 + Math.random() * 18) * 36e5;
     }
     function parasiteMoreTick(mn, r, now) {
@@ -23733,7 +23735,7 @@
         g.stageTold = P.stage;
         saveLedger();
         const grew = g.form === "belt" ? P.stage === 2 ? "suckers" : "lipsLate" : bloomWhat(g, P.stage);
-        emote("\u{1F444} " + pmLine("bloom_" + grew, mn), mn);
+        emote("\u{1F444} " + pmLine(PARASITE_MORE[strainKey(g) + "_bloom_" + grew] ? strainKey(g) + "_bloom_" + grew : "bloom_" + grew, mn), mn);
         arouse(mn, 20);
         syncCompanions(true);
         {
@@ -23764,6 +23766,7 @@
         syncCompanions(true);
       } else if (g.urge && g.urge.kind === "glory" && Object.keys(L2.spots || {}).some((n) => /^glory-\d+$/.test(n) && onSpot(mn, n, 0))) parasiteUrgeDone(mn, "glory");
       else if (g.urge && g.urge.kind === "nest" && nestSpots().some((n) => onSpot(mn, n, 0))) parasiteUrgeDone(mn, "nest");
+      else if (g.urge && g.urge.kind === "water" && waterSpots().some(([n]) => onSpot(mn, n, 1))) parasiteUrgeDone(mn, "water");
       else if (g.urge && g.urge.kind === "kneel" && kneelingNow(mn)) {
         g.urge.knelt = (g.urge.knelt || 0) + 1;
         if (g.urge.knelt >= 3) parasiteUrgeDone(mn, "kneel");
@@ -23789,7 +23792,7 @@
     const URGE_MINS = { swallow: 15, bred: 15, milked: 15, nest: 10, glory: 10, kiss: 10, kneel: 10, beg: 10 };
     function urgeKinds(mn, g, P) {
       const glory = Object.keys(L2.spots || {}).some((n) => /^glory-\d+$/.test(n));
-      return (STRAIN_URGES[strainKey(g)] || ["kiss", "swallow", "glory"]).filter((k) => k === "swallow" ? !!P.lips && !holeBlocked(mn, "mouth") : k === "glory" ? glory : k === "nest" ? nestSpots().length > 0 : k === "bred" ? !limitBlocks(mn, "breed") : k === "milked" ? makesMilk(mn) && !limitBlocks(mn, "milk") || makesSemen(mn) : true);
+      return (STRAIN_URGES[strainKey(g)] || ["kiss", "swallow", "glory"]).filter((k) => k === "swallow" ? !!P.lips && !holeBlocked(mn, "mouth") : k === "glory" ? glory : k === "nest" ? nestSpots().length > 0 : k === "water" ? waterSpots().length > 0 : k === "bred" ? !limitBlocks(mn, "breed") : k === "milked" ? makesMilk(mn) && !limitBlocks(mn, "milk") || makesSemen(mn) : true);
     }
     function urgeAsk(mn, kind) {
       const v = hasVulva(mn);
@@ -23801,6 +23804,7 @@
         bred: v ? "take a load in your pussy or your ass" : "take a load up your ass",
         milked: makesMilk(mn) && !limitBlocks(mn, "milk") ? "get yourself milked" : "get your cock milked",
         kneel: "get down on your knees and stay there",
+        water: "go and get yourself in the water",
         beg: "beg for it, out loud, where folks can hear you"
       }[kind] || "do as it says";
     }
@@ -23852,7 +23856,9 @@
     }
     function parasiteClimax(mn) {
       const r = rec(mn), g = r && r.parasite;
-      if (!g || !parasiteOn(mn) || g.strain !== "tyrant") return;
+      if (!g || !parasiteOn(mn)) return;
+      if (g.strain === "gloss") return glossClimax(mn, g);
+      if (g.strain !== "tyrant") return;
       const now = Date.now();
       if (now - (g.ateAt || 0) < 6e4) return;
       g.ateAt = now;
@@ -23903,7 +23909,7 @@
     }
     function parasiteKin(mn, now) {
       const r = rec(mn);
-      if (!parasiteOn(mn) || now - (r.kinAt || 0) < 30 * 6e4) return false;
+      if (!parasiteOn(mn) || now - (r.kinAt || 0) < (strainKey(r.parasite) === "deep" ? CFG.DEEP_KIN_MIN : 30) * 6e4) return false;
       r.kinAt = now;
       return true;
     }
@@ -23981,6 +23987,7 @@
     const STRAIN_COLOR = { breeder: "#E0607F", grower: "#8E5BD6", glutton: "#E8C36A", tyrant: "#7A1F2B" };
     const strainKey = (g) => g && STRAINS[g.strain] ? g.strain : "grower";
     function strainParts(strain, stage) {
+      if (STRAIN_MORE[strain]) return STRAIN_MORE[strain].parts(stage);
       switch (strain) {
         case "breeder":
           return { stage, lips: true, root: stage >= 2, suckers: stage >= 3 };
@@ -23998,6 +24005,7 @@
     }
     function strainSerums(mn) {
       const g = rec(mn).parasite, k = strainKey(g), b = bodyOf(mn);
+      if (STRAIN_MORE[k]) return strainSerumsMore(k, mn, b);
       if (k === "breeder") return b.vulva ? STRAINS.breeder.serums : ["mpreg", "fertility", "egg laying", "capacity", "hyper pregnancy", "ass growth"];
       if (k === "grower") {
         if (b.g === "futa") return ["cock growth", "udder growth", "balls growth", "ass growth", "capacity", "growth"];
@@ -24052,11 +24060,13 @@
       if (P.suckers) add("chestbra", "Parasite Suckers", b.tits ? D.suckers : b.g === "male" && D.suckersMale ? D.suckersMale : D.suckersFlat, ["ForbiddenChastityBra"]);
       if (P.root) add("belt", g.form === "belt" ? "Parasite Belt" : "Parasite Root", b.vulva ? D.root : D.rootCock);
       if (b.cock && D.cage && P.stage >= D.cage.stage) add("dildo", D.cage.name, D.cage.desc, D.cage.items);
-      if (D.torso && P.stage >= 3) add("torso", D.torso.name, D.torso.desc, ["TentacleSuit"]);
+      if (D.torso && P.stage >= (D.torso.stage || 3)) add("torso", D.torso.name, D.torso.desc, D.torso.items || ["TentacleSuit"]);
+      for (const x of strainSpreadGear(mn, g, P, k, base)) out.push(x);
       return out;
     }
     function strainTell(mn) {
       const g = rec(mn).parasite, k = strainKey(g), b = bodyOf(mn);
+      if (STRAIN_MORE[k]) return strainTellMore(k, mn, b);
       const T = {
         breeder: b.vulva ? "It's a BREEDER: it wants you ripe. Fertility, hyper pregnancy, clutches of eggs, over and over, till anything that so much as looks at you leaves you carryin'. It'll root in you at hour four, and it lays in you twice." : "It's a BREEDER, and it doesn't care that you've no womb: it's makin' you one. For as long as it's on you a load in your ass can take, and it means to fill that hole with eggs twice before it goes.",
         grower: b.g === "futa" ? "It's a GROWER: it feeds you every twenty minutes and it grows all of you. Cock, balls, tits, ass, round and round, and every bit of it for keeps." : b.g === "femboy" ? "It's a GROWER, and it's decided what you ought to look like: wider hips, a fatter ass, and a pair of tits you didn't walk in with. Every twenty minutes, and all of it for keeps." : b.cock ? "It's a GROWER: it feeds you every twenty minutes, and it all goes to your cock and your balls. Thicker, heavier, fuller, for keeps. By hour eight it'll have a sheath over them to help." : "It's a GROWER: it feeds you every twenty minutes, and it all goes to your tits and your ass. Bigger, heavier, rounder, and every bit of it for keeps.",
@@ -24068,6 +24078,7 @@
     function strainBloomTell(mn, stage) {
       const g = rec(mn).parasite, k = strainKey(g), b = bodyOf(mn), late = stage >= 3;
       if (g.form === "belt") return late ? "It's reached your mouth now, sugar. All of it's on you." : "It's climbin', sugar. It has your nipples now.";
+      if (STRAIN_MORE[k]) return strainBloomTellMore(k, mn, b, late);
       const T = {
         breeder: late ? "It has your " + (b.tits ? "teats" : "nipples") + " now, and it's wrapped your belly in a warm sac of itself to hold what it's bred into you. It lays once more before it goes." : b.vulva ? "It's rooted in you, right up against your womb, keepin' it open and ripe. Half-way through its time it'll start layin' in there." : "It's rooted in your ass, and it's made a place in there to carry. Half-way through its time it'll start fillin' it with eggs.",
         grower: late ? b.cock ? "It's grown a sheath over your cock and balls, sugar, and a root behind. They'll both be bigger when it lets you look." : "It's rooted in you now, sugar, swellin' as you do." : b.tits ? "It has your tits now, pullin' them out long. They'll be heavier after every feed." : b.g === "femboy" ? "It's on your chest now, and it's pullin'. You're goin' to have somethin' there by the time it's done." : "It's on your nipples now, suckin' between feeds just to keep you squirmin'. Every drop it pours in still goes to your cock and balls.",
@@ -24093,6 +24104,7 @@
           saveLedger();
         }
       }
+      strainAfterDoseMore(mn, r, g, p, k, P);
     }
     function strainTick(mn, r, now) {
       const g = r.parasite, p = prodOf(mn), k = strainKey(g), P = parasiteParts(g);
@@ -24112,6 +24124,7 @@
         privateLine(mn, pmLine("tyrantEdge", mn), "emote");
         saveLedger();
       }
+      strainTickMore(mn, r, now, g, p, k, P);
     }
     Object.assign(PARASITE_MORE, {
       bloom_more: [
@@ -24702,6 +24715,444 @@
         "%n's nestling sends a bud along with the breedin', and it settles snug in %c's belly."
       ]
     };
+    if (CFG.WEAVER_COCOON_MIN === void 0) Object.assign(CFG, { WEAVER_COCOON_MIN: 60, WEAVER_COCOON_LEN: 3, GLOSS_SQUEEZE_MIN: 20, DEEP_BRINE_ML: 60, DEEP_KIN_MIN: 15 });
+    if (CFG.STRAIN_FEED_CHANCE === void 0) CFG.STRAIN_FEED_CHANCE = 0.4;
+    Object.assign(STRAIN_COLOR, { oozer: "#5FAE3A", weaver: "#EDE6D6", deep: "#2E8B7A", gloss: "#121214" });
+    const strainLim = (mn) => String((rec(mn) || {}).limits || "");
+    Object.assign(STRAINS, {
+      oozer: {
+        name: "Oozer",
+        serums: ["capacity", "fertility", "capacity", "growth", "capacity", "hyper pregnancy"],
+        every: 25,
+        can: (mn) => !/\b(slime|goo|ooze)/i.test(strainLim(mn)),
+        tell: "It's an OOZER: it's made of slime, and it means to make you as slick as it is. Every hole loose and wet and stretchin', and slime all over you at every feed."
+      },
+      weaver: {
+        name: "Weaver",
+        serums: ["egg laying", "capacity", "fertility", "growth", "egg laying", "heat inducer"],
+        every: 30,
+        can: (mn) => !/\b(spider|web|arachn|cocoon)/i.test(strainLim(mn)),
+        tell: "It's a WEAVER: it spins. Silk over your hands and round your body, and every so often it'll cocoon you and keep you hangin' a while."
+      },
+      deep: {
+        name: "Deep",
+        serums: ["capacity", "fertility", "egg laying", "hyper pregnancy", "capacity", "growth"],
+        every: 30,
+        can: (mn) => !/\b(tentacl|sea ?monster)/i.test(strainLim(mn)),
+        tell: "It's a DEEP: kin to the thing in the water. It'll keep you full of brine, and the water will come for you."
+      },
+      gloss: {
+        name: "Gloss",
+        serums: ["growth", "capacity", "growth", "udder growth", "ass growth", "capacity"],
+        every: 30,
+        can: (mn) => !/\b(latex|rubber)/i.test(strainLim(mn)),
+        tell: "It's a GLOSS: livin' rubber, and it wants you to cum. Every climax you have, it drinks, and pays you for it."
+      }
+    });
+    const STRAIN_MORE = {
+      oozer: { parts: (st) => ({ stage: st, lips: true, root: st >= 2, suckers: st >= 3 }) },
+      weaver: { parts: (st) => ({ stage: st, lips: true, suckers: st >= 2, root: st >= 3 }) },
+      deep: { parts: (st) => ({ stage: st, lips: true, root: st >= 2, suckers: st >= 3 }) },
+      gloss: { parts: (st) => ({ stage: st, lips: true, suckers: st >= 2, root: st >= 3 }) }
+    };
+    function strainSerumsMore(k, mn, b) {
+      if (k === "weaver" && !b.vulva) return ["capacity", "growth", "heat inducer", "capacity", "growth", "virility"];
+      if (k === "deep" && !b.vulva) return ["capacity", "growth", "capacity", "virility", "fertility", "growth"];
+      if (k === "gloss" && b.cock && !b.vulva) return ["growth", "capacity", "cock growth", "balls growth", "ass growth", "growth"];
+      return STRAINS[k].serums;
+    }
+    Object.assign(STRAIN_GEAR, {
+      oozer: {
+        lips: "Slick green lips of livin' slime sealed over the mouth, with a cool slippery tongue of it down the throat. Everythin' it touches, it leaves wet.",
+        suckers: "Two cool green blobs of slime clamped over the teats, sloshin' and suckin', and they never stop drippin'.",
+        suckersFlat: "Two cool green blobs of slime sealed over the nipples, suckin' gently and leavin' them glossy.",
+        root: "A sash of green slime round the hips with a fat slick plug of itself in each hole, keepin' them wet and loose and open.",
+        rootCock: "A sash of green slime round the hips and a slick fat plug of it deep in the ass, swellin' slow, keepin' it loose.",
+        cage: { name: "Ooze Sleeve", items: ["LatexNulge", "ChastityPouch"], stage: 3, desc: "A cool green sleeve of slime swallowed over the cock and balls, sloshin' and squeezin', and it drips wherever they go." }
+      },
+      weaver: {
+        lips: "Pale silk lips spun over the mouth, soft and sticky, with a fine thread of it down the throat that tugs when it feeds.",
+        suckers: "Two pale spun cups over the teats, sticky as cobweb, suckin' in slow pulls.",
+        suckersFlat: "Two little spun cups of silk over the nipples, sticky and tuggin'.",
+        root: "A girdle of silk round the hips, spun tight, with a soft thick spindle of it seated in each hole.",
+        rootCock: "A girdle of silk round the hips, with a soft thick spindle of it seated deep in the ass.",
+        torso: { name: "Silk Harness", items: ["HempRopeHarness"], stage: 2, desc: "Pale silk strands spun round and round the body, crossin' over the chest and under it, tight as a harness and sticky to the touch." }
+      },
+      deep: {
+        lips: "Thick sea-green lips sealed over the mouth, tastin' of salt, with a tentacle coiled down the throat that pumps when it feeds.",
+        suckers: "Two sea-green suckers on the teats, ringed and strong, pullin' like the tide.",
+        suckersFlat: "Two sea-green suckers on the nipples, ringed like an octopus's, pullin' slow.",
+        root: "A coil of sea-green tentacle round the hips with a thick arm of it in each hole, pumpin' brine in at every feed.",
+        rootCock: "A coil of sea-green tentacle round the hips with a thick arm of it deep in the ass, pumpin' brine in at every feed.",
+        cage: { name: "Deep's Coil", items: ["FullCasingCage", "LatexNulge"], stage: 3, desc: "A sea-green tentacle coiled tight round the cock and balls, suckers and all, squeezin' in slow waves like the sea." },
+        torso: { name: "Deep's Embrace", items: ["TentacleSuit"], stage: 3, desc: "Sea-green tentacles wound over the whole body, shoulders to thighs, ringed suckers kissin' every inch, cool and wet and never still." }
+      },
+      gloss: {
+        lips: "Glossy black rubber lips sealed smooth over the mouth, squeakin' when they move, with a rubber tongue down the throat.",
+        suckers: "Two black rubber cups sealed over the teats, sucked tight and shinin'.",
+        suckersFlat: "Two black rubber cups sealed over the nipples, sucked tight and shinin'.",
+        root: "Black rubber sealed over the hips and between the legs, seamless, with a rubber plug of itself in each hole that swells when it feeds.",
+        rootCock: "Black rubber sealed over the hips and moulded round the cock, with a rubber plug of itself deep in the ass.",
+        cage: { name: "Gloss Sheath", items: ["LatexNulge", "ChastityPouch"], stage: 3, desc: "A seamless black rubber sheath over the cock and balls, shinin', squeezin', and every time they cum it drinks it." }
+      }
+    });
+    const fleshSpread = (word) => [
+      { at: 2, slot: "tail", name: "Parasite Tail", items: ["Tentacles"], desc: "A thick " + word + " tendril sprouted from the base of the spine, curlin' and uncurlin', and it lifts whenever somebody stands behind them." },
+      { at: 3, slot: "gloves", name: "Parasite Sleeves", items: ["LatexElbowGloves"], desc: word.charAt(0).toUpperCase() + word.slice(1) + " livin' flesh grown down both arms to the fingertips, warm and damp, pulsin' faintly." },
+      { at: 3, slot: "socks", name: "Parasite Stockings", items: ["LatexSocks1"], desc: word.charAt(0).toUpperCase() + word.slice(1) + " livin' flesh grown up both legs to the thigh like stockings, warm and slick, squeezin' with every step." }
+    ];
+    const STRAIN_SPREAD = {
+      breeder: fleshSpread("rose-pink"),
+      grower: fleshSpread("violet"),
+      glutton: fleshSpread("golden"),
+      tyrant: fleshSpread("blood-dark"),
+      oozer: [
+        { at: 1, slot: "gloves", name: "Ooze Gloves", items: ["LatexShortGloves"], upTo: 2, desc: "Cool green slime gloved over both hands, drippin' from the fingertips, and it's spreadin'." },
+        { at: 3, slot: "gloves", name: "Ooze Sleeves", items: ["LatexElbowGloves"], desc: "The slime has run up both arms to the elbow, slick and green and never quite still." },
+        { at: 2, slot: "socks", name: "Ooze Stockings", items: ["LatexSocks1"], desc: "Green slime pooled round both feet and climbin' the calves, squelchin' at every step." },
+        { at: 2, slot: "suitLower", name: "Ooze Skin (legs)", items: ["LatexCatsuit"], desc: "A slick green skin of livin' slime from the hips to the toes, glossy as wet glass, and it drips." },
+        { at: 3, slot: "suit", name: "Ooze Skin (body)", items: ["LatexCatsuit"], desc: "Livin' slime from the throat down, a seamless green shine over every inch, sloshin' faintly when they move." }
+      ],
+      weaver: [
+        { at: 2, slot: "gloves", name: "Silk Gloves", items: ["LatexElbowGloves"], desc: "Pale silk spun round and round both arms to the fingertips, fine as cobweb, sticky to the touch." },
+        { at: 3, slot: "socks", name: "Silk Stockings", items: ["LatexSocks1"], desc: "Silk wound up both legs to the thigh, layer on layer, pale and sticky and fine." }
+      ],
+      deep: [
+        { at: 1, slot: "tail", name: "Deep's Tail", items: ["Tentacles"], desc: "A sea-green tentacle grown from the base of the spine, ringed with suckers, curlin' round anythin' it can reach." },
+        { at: 3, slot: "gloves", name: "Deep's Sleeves", items: ["LatexElbowGloves"], desc: "Sea-green tentacle wound down both arms to the wrist, suckers and all, cool and wet." },
+        { at: 3, slot: "socks", name: "Deep's Stockings", items: ["LatexSocks1"], desc: "Sea-green tentacle coiled up both legs to the thigh, ringed suckers kissin' the skin." }
+      ],
+      gloss: [
+        { at: 1, slot: "gloves", name: "Gloss Gloves", items: ["LatexShortGloves"], upTo: 2, desc: "Black livin' rubber sealed over both hands, smooth as a new boot, and it's spreadin'." },
+        { at: 3, slot: "gloves", name: "Gloss Sleeves", items: ["LatexElbowGloves"], desc: "The rubber has run up both arms to the elbow, glossy black and seamless." },
+        { at: 2, slot: "socks", name: "Gloss Stockings", items: ["LatexSocks1"], desc: "Black rubber grown smooth over the feet and calves." },
+        { at: 2, slot: "suitLower", name: "Gloss Skin (legs)", items: ["LatexCatsuit"], desc: "Livin' rubber sealed over the hips and down both legs, shinin', and it squeezes with every step." },
+        { at: 3, slot: "suit", name: "Gloss Skin (body)", items: ["LatexCatsuit"], desc: "Black rubber from the throat down, moulded to every curve, warm and alive, squeakin' when they breathe." },
+        { at: 3, slot: "boots", name: "Gloss Heels", items: ["ThighHighLatexHeels"], desc: "It's grown itself a pair of thigh-high rubber heels. Its idea, not theirs." }
+      ]
+    };
+    function strainSpreadGear(mn, g, P, k, base) {
+      const out = [];
+      for (const x of STRAIN_SPREAD[k] || []) {
+        if (P.stage < x.at || x.upTo && P.stage > x.upTo) continue;
+        out.push(Object.assign({ slot: x.slot, name: x.name, items: x.items, desc: (STRAINS[k].name + " strain. " + x.desc).slice(0, 180) }, base));
+      }
+      if (k === "weaver" && (g.cocoonUntil || 0) > Date.now())
+        out.push(Object.assign({ slot: "arms", name: "Weaver's Cocoon", items: ["Web"], only: true, desc: "Weaver strain. Both arms spun up tight in silk against the body, a cocoon from shoulder to wrist. It'll let go in a few minutes. Probably." }, base));
+      return out;
+    }
+    function strainTellMore(k, mn, b) {
+      return {
+        oozer: b.vulva ? "It's an OOZER, sugar: it's made of slime, and it means to make you as slick as it is. It feeds you every twenty-five minutes, it slimes you all over at every feed, and by hour four it'll be plugged in every hole you've got, keepin' them loose and wet and stretchin'." : "It's an OOZER, sugar: livin' slime, and it means to make you as slick as it is. It feeds you every twenty-five minutes, it slimes you all over every time, and by hour four it'll be plugged up your ass, keepin' you loose and wet and stretchin'.",
+        weaver: "It's a WEAVER, sugar: it spins. Silk over your hands and a silk harness round your body by hour four, and from then on, every hour or so, it'll cocoon your arms for a few minutes and keep you hangin' while it plays. It lays, too: a clutch, before it goes.",
+        deep: "It's a DEEP, sugar, kin to the thing in the water, and it's already given you a tail. From hour four it's rooted in you, and it'll pump you full of brine at every feed so you're never once empty. The water knows you now: it'll come for you twice as often. And it'll want you in it.",
+        gloss: b.cock ? "It's a GLOSS, sugar: livin' rubber, and it's the one that WANTS you to cum. Every climax you have, it drinks, and pays you a dose for it. It'll squeeze you up between feeds to make sure there's plenty, and it'll spread over you till you're rubber from the throat down." : "It's a GLOSS, sugar: livin' rubber, and it wants you to cum. Every climax you have, it drinks and pays you a dose for. It'll squeeze you up between feeds to keep you ready, and spread over you till you're rubber from the throat down."
+      }[k];
+    }
+    function strainBloomTellMore(k, mn, b, late) {
+      const T = {
+        oozer: late ? b.tits ? "It's got your teats now, sugar, two cool wet mouths of slime, and the rest of it's gone over you from the throat down." : "It's on your nipples now, sugar, and the slime's gone over you from the throat down." : b.vulva ? "It's rooted in you, sugar: a fat slick plug of slime in your pussy and your ass both, and it'll keep stretchin' them as it feeds." : "It's rooted in you, sugar: a fat slick plug of slime up your ass, and it'll keep stretchin' it as it feeds.",
+        weaver: late ? "It's rooted below now, sugar, a spindle of silk in you, and it's spun stockings up both legs. It'll lay before it goes." : "It's spun you a harness, sugar, and gloves, and cups over your teats. From here on, every hour or so, it'll cocoon you a while.",
+        deep: late ? "It has all of you now, sugar: suckers on your teats and tentacles wound round your whole body. You're its own, as far as the water's concerned." : "It's rooted in you, sugar, and from here on every feed comes with a bellyful of brine. You'll slosh.",
+        gloss: late ? "You're rubber from the throat down, sugar, heels and all, and it's rooted in you below. It still wants you to cum. Often." : "It's on your teats, sugar, and your legs are rubber to the hip. Cum for it. It pays well."
+      };
+      return T[k];
+    }
+    function strainAfterDoseMore(mn, r, g, p, k, P) {
+      if (k === "oozer") {
+        try {
+          trapMess(mn, null, "slime");
+        } catch (e) {
+        }
+        if (P.stage >= 2 && Math.random() < 0.5) {
+          const part = hasVulva(mn) && Math.random() < 0.5 ? "vulva" : "butt";
+          if (CFG.SIZES[part] && sizeOf(mn, part) < sizeBase(mn, part) + 3) {
+            setSize(mn, part, sizeOf(mn, part) + 1, false);
+            emote("\u{1F7E2} " + pmLine("oozerStretch", mn, { h: part === "vulva" ? "pussy" : "ass" }), mn);
+          }
+        } else if (Math.random() < 0.33) emote("\u{1F7E2} " + pmLine("oozerSlime", mn), mn);
+        saveLedger();
+      }
+      if (k === "deep" && P.stage >= 2) {
+        const h = openHole(mn, hasVulva(mn) ? "vulva" : "butt");
+        if (h && h !== "mouth") {
+          const got = trapFill(mn, h, CFG.DEEP_BRINE_ML);
+          if (got > 5 && Math.random() < 0.6) emote("\u{1F30A} " + pmLine("deepBrine", mn, { ml: ml(got), h: h === "vulva" ? "womb" : "belly" }), mn);
+          saveLedger();
+        }
+      }
+      if (k === "gloss" && P.stage >= 2 && p && p.painted && p.painted.until > Date.now()) {
+        p.painted = null;
+        bodyMark(mn, { wash: true });
+        try {
+          aftermathWash(mn);
+        } catch (e) {
+        }
+        emote("\u{1F5A4} " + pmLine("glossClean", mn), mn);
+        saveLedger();
+      }
+      if (PARASITE_MORE[k + "_feed"] && Math.random() < CFG.STRAIN_FEED_CHANCE) privateLine(mn, pmLine(k + "_feed", mn), "emote");
+    }
+    function strainTickMore(mn, r, now, g, p, k, P) {
+      if (k === "weaver" && P.stage >= 2 && !(g.cocoonUntil > now) && now - (g.cocoonAt || g.since) > CFG.WEAVER_COCOON_MIN * 6e4 && !quietNow(mn) && !heldByTrap(mn) && !r.benched && !r.penned) {
+        g.cocoonAt = now;
+        g.cocoonUntil = now + CFG.WEAVER_COCOON_LEN * 6e4;
+        r.gluedUntil = Math.max(r.gluedUntil || 0, g.cocoonUntil);
+        arouse(mn, 30, 92);
+        emote("\u{1F578}\uFE0F " + pmLine("weaverCocoon", mn), mn);
+        saveLedger();
+        syncCompanions(true);
+        later(() => {
+          if (parasiteOn(mn) && rec(mn).parasite === g) {
+            emote("\u{1F578}\uFE0F " + pmLine("weaverFree", mn), mn);
+            syncCompanions(true);
+          }
+        }, CFG.WEAVER_COCOON_LEN * 6e4 + 500);
+      }
+      if (k === "gloss" && now - (g.squeezeAt || g.since) > CFG.GLOSS_SQUEEZE_MIN * 6e4 && !quietNow(mn)) {
+        g.squeezeAt = now;
+        arouse(mn, 18, 90);
+        privateLine(mn, pmLine("glossSqueeze", mn), "emote");
+        saveLedger();
+      }
+    }
+    function glossClimax(mn, g) {
+      const now = Date.now();
+      if (now - (g.ateAt || 0) < 6e4) return;
+      g.ateAt = now;
+      g.eaten = (g.eaten || 0) + 1;
+      parasiteDose(mn, 1, pmLine("glossDrink", mn));
+    }
+    function strainGoneMore(mn, g) {
+      const r = rec(mn);
+      if (g && g.cocoonUntil > Date.now() && r && r.gluedUntil === g.cocoonUntil) r.gluedUntil = 0;
+    }
+    Object.assign(STRAIN_URGES, { oozer: ["bred", "swallow", "glory"], weaver: ["kneel", "nest", "kiss"], deep: ["water", "bred", "swallow"], gloss: ["beg", "kiss", "glory"] });
+    Object.assign(URGE_MINS, { water: 10 });
+    Object.assign(PARASITE_MORE, {
+      // bloomin', for the room
+      oozer_bloom_root: [
+        "{v}The slime on %n sloshes, thickens, and slides down their belly in a cool green sheet, and two fat slick plugs of it ooze up into their pussy and their ass and settle there, swellin'.",
+        "{nv}The slime on %n slides down their belly in a cool green sheet and oozes up their ass in a fat slick plug, and settles, swellin'.",
+        "Green slime runs down %n's body like somebody tipped a bucket of it, and it doesn't drip off: it finds every hole and fills it, slick and cool and heavy."
+      ],
+      oozer_bloom_suckers: [
+        "Two cool green blobs of slime crawl up %n's chest and clamp over their nipples, sloshin', and start to suck.",
+        "The slime on %n has reached their chest, and two wet green mouths of it seal over their teats, drippin'.",
+        "%n's chest goes slick and green as the Oozer covers it, and it finds their nipples and sucks."
+      ],
+      weaver_bloom_suckers: [
+        "Pale threads spin out from the lips on %n's face, round their chest and over their nipples, and knit into two sticky little cups that start to pull.",
+        "The Weaver on %n spins, quick, and silk runs down their arms and round their body in a harness, and over each nipple in a sticky cup.",
+        "Silk, everywhere, spun fast and tight: a harness round %n's chest, gloves to their fingertips, and cups over their teats that suck."
+      ],
+      weaver_bloom_root: [
+        "{v}The Weaver spins lower, round %n's hips, between their legs, and a soft thick spindle of silk winds up into their pussy and another into their ass.",
+        "{nv}The Weaver spins lower, round %n's hips and between their legs, and a soft thick spindle of silk winds up their ass and stays there.",
+        "Silk girdles %n's hips and winds up their legs to the thigh, and below, somethin' spun and soft is pushed up inside them."
+      ],
+      deep_bloom_root: [
+        "{v}The tentacle tail on %n curls round their hip and between their legs, and two thick sea-green arms of it slide up into their pussy and their ass. Then the first brine comes, cold and salty.",
+        "{nv}The tentacle tail on %n curls between their legs and a thick sea-green arm of it slides up their ass. Then the first brine comes, cold and salty.",
+        "%n gasps, legs buckling: the Deep has rooted, a coil of tentacle round their hips and an arm of it inside, pumpin' the first cold rush of brine into them."
+      ],
+      deep_bloom_suckers: [
+        "Sea-green tentacles wind up over %n's whole body, shoulder to thigh, and two ringed suckers clamp over their teats and pull like the tide.",
+        "The Deep has all of %n now: tentacles wound round their body, round their arms and legs, and suckers on their nipples, cool and wet and never still.",
+        "%n's covered in it, sea-green coils from throat to thigh, suckers kissin' everywhere, and two of them latch on their teats and pull."
+      ],
+      gloss_bloom_suckers: [
+        "Black rubber spreads down %n's legs to the toes and up over their chest, and two rubber cups seal over their nipples with a wet little pop.",
+        "The rubber on %n's hands crawls on, over their hips, down both legs, glossy and tight, and over their teats in two shinin' cups.",
+        "%n's legs are rubber to the hip now, and their nipples are sealed under two sucked-tight cups of it, and it squeaks when they move."
+      ],
+      gloss_bloom_root: [
+        "Black rubber closes over the rest of %n, throat to toes, and grows them a pair of thigh-high heels, and below it pushes a swellin' plug of itself up inside them.",
+        "%n is rubber from the throat down now, seamless and shinin', heels and all, and somethin' rubber has rooted between their legs.",
+        "The Gloss finishes %n: elbow-length rubber, a catsuit of it to the chin, heels, and a plug of itself sealed in below. It hums, very pleased."
+      ],
+      // their own tricks
+      oozerSlime: [
+        "Slime runs off %n in slow green ropes, all down their front and their thighs, and their skin shines with it.",
+        "The Oozer on %n sweats slime, cool and slick, till they're drippin' with it and leavin' wet green prints wherever they stand.",
+        "%n's covered in fresh slime after that feed, glossy green from chin to knees, and it squelches when they shift."
+      ],
+      oozerStretch: [
+        "The slime plug in %n's %h swells, slow and cool and relentless, and when it shrinks back they're looser than they were.",
+        "%n's %h is stretched a little wider by the slime in it, held there, and let go, and it doesn't quite close all the way.",
+        "The Oozer flexes in %n's %h, swellin' fat, and holds them open, and holds them open, and %n moans as it stretches them."
+      ],
+      weaverCocoon: [
+        "The Weaver spins without warnin': silk wraps round and round %n's arms, pinnin' them to their body, shoulder to wrist, and their feet are stuck where they stand.",
+        "%n's arms are drawn in tight and spun up in silk before they know it's happenin', a pale cocoon from shoulder to wrist, and the Weaver hums while it works.",
+        "Threads shoot out from the Weaver on %n and wrap, wrap, wrap, till their arms are spun tight to their sides and they're hangin' in silk, helpless, and the threads start to stroke."
+      ],
+      weaverFree: [
+        "The silk round %n's arms loosens, unspools, and slides off them in soft sticky skeins. The Weaver's done playin', for now.",
+        "The Weaver lets %n go, the cocoon slackenin' and fallin' away, leavin' their arms tingly and sticky.",
+        "%n's cocoon comes apart in pale threads, and they can move their arms again, and they're shakin'."
+      ],
+      deepBrine: [
+        "The Deep pumps a cold rush of brine into %n, %ml of it, and their %h rounds out and sloshes.",
+        "%n gasps as the tentacle in them swells and empties, %ml of salt-cold brine, and they're sloshin' with it.",
+        "Another feed, another bellyful: %ml of cold brine pumped into %n's %h by the thing coiled round their hips."
+      ],
+      glossDrink: [
+        "%n cums, and the Gloss drinks it, squeezin' every pulse out of them with rubber hands, and then pays them a long sweet dose for it.",
+        "Right at the peak the rubber on %n tightens all over and drinks it, every shudder of it, and hums, and pumps a dose into them like a tip.",
+        "%n's climax is swallowed whole by the rubber sealed over them, and it shivers, glossy and grateful, and feeds them for it."
+      ],
+      glossSqueeze: [
+        "The rubber on you squeezes, everywhere at once, slow and deliberate, right where it'll do the most, and doesn't stop until you're squirmin'. It wants you to cum. It's makin' sure you will.",
+        "Your rubber skin tightens and rubs, in waves, from your toes up, and settles between your legs and keeps goin'. It's hungry, and you're its food.",
+        "{c}The rubber round your cock tightens and strokes, slow, and you're hard in seconds. It wants you to cum. It's not subtle about it.",
+        "{v}The rubber between your legs presses and rolls, slow circles, right on your clit, and keeps goin'. It wants you to cum for it."
+      ],
+      glossClean: [
+        "The Gloss ripples over %n, and every splash and smear on them sinks into the rubber and is gone. Spotless, and shinin'.",
+        "Whatever mess was on %n is drunk into the rubber sealed over them, and it shines all the brighter for it."
+      ],
+      // what they want
+      // how each feed feels, strain by strain (strainAfterDoseMore)
+      oozer_feed: [
+        "The Ooze on %n swells and pulses, and a fresh warm gush of its brew slides down their throat, thick as syrup and sweet as sin. Everywhere it's spread over them goes slick and tingly all at once.",
+        "%n feels the Ooze move on them, one slow wet ripple from lips to hips, and then the swallow comes, warm and heavy, and their belly glows with it.",
+        "{v}A warm tendril of the Ooze slips between %n's thighs while it feeds them, just to keep their pussy wet. It does.",
+        "{c}The Ooze round %n's cock clenches and slurps while the brew goes down their throat, so they're fed at one end and milked at the other.",
+        "The Ooze burbles, a soft wet noise right against %n's ear, and floods their mouth with more than they can swallow tidy. It runs down their chin, and the Ooze licks it back up.",
+        "{t}The Ooze sucks at %n's nipples in slow pulses while it feeds them, and warm slime seeps out round their tits where it's sealed on.",
+        "%n's skin goes hot and buzzy under the Ooze as the brew hits, and the slime on them goes from clear to a deep, satisfied green.",
+        "The Ooze feeds %n the way it does everythin': messily, slowly, and far too much of it, till their throat works and works and it's still comin'."
+      ],
+      weaver_feed: [
+        "The Weaver's silk tightens over %n, every strand at once, one long slow squeeze from shoulders to thighs, and while they're held like that it pours its brew down their throat.",
+        "%n feels the Weaver's legs move on them, light and many and patient, and then the sweet heavy drink comes, and the silk round them goes warm.",
+        "The Weaver feeds %n with a shiver down every line of silk it's spun on them, a spider testin' its web for a catch, and findin' one.",
+        "{t}Fine silk threads draw tight round the base of %n's tits while the Weaver feeds them, liftin' them, bindin' them, till the teats stand hard in the cool air.",
+        "{v}A single silk thread pulled taut runs between %n's legs, and the Weaver plucks it, slow, like a harp string, while the brew goes down.",
+        "{c}The Weaver's silk wraps %n's cock in a fine, tight spiral while it feeds, and with every swallow they take, it draws the threads a little tighter.",
+        "The Weaver hums, a faint dry rustle against %n's lips, and the brew it gives them tastes of honey and somethin' darker, and their eyes go heavy.",
+        "%n's held so still in the silk that all they can do is swallow, and the Weaver knows it, and takes its time."
+      ],
+      deep_feed: [
+        "The Deep's coils roll over %n like a slow tide, and the brew comes with them, cool and salt-sweet, fillin' their mouth the way the sea fills a rock pool.",
+        "%n tastes the ocean as the Deep feeds them: salt, and cold, and then a heat underneath it that spreads all the way down into their belly.",
+        "Every sucker on the Deep's coils pulses at once against %n's skin, a hundred little kisses, and then the brew floods their throat.",
+        "{v}A slick tendril of the Deep curls up between %n's legs and stays there, pulsin' in time with the swallows, keepin' its place for later.",
+        "{c}The Deep's coil tightens wet and ridged round %n's cock while it feeds them, and squeezes in long slow waves like a swell comin' in.",
+        "{t}The Deep's suckers fasten on %n's nipples and pull in time with a tide only it can feel, while its brew goes down their throat.",
+        "%n hears the sea, faint and far off, while the Deep feeds them. There isn't a sea for miles. It doesn't matter.",
+        "The Deep's brew is thick and cold and goes down slow, and %n's belly rounds a little with every swallow, heavy and sloshin'."
+      ],
+      gloss_feed: [
+        "The Gloss creaks as it feeds %n, rubber squeezin' snug everywhere it covers them, and the brew it gives them is warm and sweet and tastes faintly of latex.",
+        "%n's gloss-black skin shines a little brighter as the brew goes down, slick and tight and polished like it's just been buffed.",
+        "The Gloss tightens on %n, one long rubbery hug from throat to toes, and pushes its brew into their mouth while they're held too snug to squirm.",
+        "{t}The Gloss over %n's tits pulls tight and shiny, mouldin' every curve, and their stiff nipples stand out plain through it.",
+        "{c}The Gloss sheathin' %n's cock squeezes slick and snug as they swallow, and the shape of it shows through the rubber, every vein.",
+        "{v}The Gloss between %n's legs presses in, smooth and tight, a rubbery hand cupped over their pussy, and holds there while it feeds them.",
+        "Every breath %n takes, the Gloss creaks with it. Every swallow, it squeaks. They're a rubber thing now, and it's feedin' its rubber thing.",
+        "The Gloss feeds %n slow and tidy, not a drop wasted, and buffs itself to a shine on them after, pleased with its work."
+      ],
+      breeder_feed: [
+        "The Breeder on %n swells and pumps its brew down their throat, thick and warm, and their belly gives a slow, deep flutter, like somethin' in there's gettin' ready.",
+        "{v}%n feels the Breeder's brew land in their womb like a hot hand pressed low on their belly, and their pussy clenches on nothin', achin' to be filled.",
+        "{nv}%n feels the Breeder's brew pool low and hot in their belly, makin' room in them that wasn't there this mornin'.",
+        "The Breeder hums against %n's mouth while it feeds them, and every swallow makes them feel heavier, riper, readier.",
+        "%n's hips roll on their own as the Breeder's brew goes down, a slow needy grind, like their body's practisin' for what it's for.",
+        "{t}%n's tits swell tight and tender as the Breeder feeds them, and their nipples ache like they're expectin' somethin'.",
+        "The Breeder's brew is sweet and heavy and settles in %n like a promise, and they can't stop thinkin' about bein' bred.",
+        "Every gulp of the Breeder's brew makes %n's belly feel warmer and rounder and emptier all at once, and the empty is the worst part."
+      ],
+      grower_feed: [
+        "The Grower floods %n's mouth with its brew and they feel it go straight to work, a tight, sweet stretch spreadin' out under their skin.",
+        "{t}%n's tits throb as the Grower's brew goes down, swellin' heavier on their chest, and they can feel every ounce of the new weight.",
+        "{c}%n's cock and balls go hot and tight as the Grower feeds them, swellin' fuller and heavier, achin' with it.",
+        "%n's ass and hips prickle and fill out under the Grower's brew, plumper by the swallow, and their clothes start to complain.",
+        "The Grower's brew tastes like cream and honey and %n can't stop gulpin' it, and every gulp leaves a little more of them.",
+        "%n squirms as the Grower feeds them, a deep sweet ache spreadin' everywhere it's decided they ought to be bigger.",
+        "The Grower pulses against %n's lips, slow and satisfied, like a gardener watchin' somethin' come along nicely.",
+        "%n's skin feels snug all over after the Grower's fed them, tight over new curves, and they keep runnin' their hands over themselves to check."
+      ],
+      glutton_feed: [
+        "The Glutton drinks from %n as much as it gives, a greedy suckin' pull, and the brew it pours back makes them hungry, hungry, hungry.",
+        "%n's stomach growls as the Glutton feeds them, and it isn't food they want.",
+        "The Glutton's brew is rich and thick and leaves %n lickin' their lips for more, starvin' for somethin' to swallow.",
+        "{c}The Glutton's sleeve squeezes greedy round %n's cock while it feeds them, suckin' at the tip, pullin' out every drop it can get.",
+        "%n's mouth waters and keeps waterin' as the Glutton pours its brew down, and every cock in the room starts lookin' like supper.",
+        "The Glutton smacks its fat lips against %n's and swallows, then gives back, and %n's belly goes warm and wantin'.",
+        "{t}The Glutton's suckers pull at %n's nipples while it feeds, drinkin' what it can, and leave a hot, hungry ache behind.",
+        "%n swallows the Glutton's brew and somehow ends up hungrier than before, throat workin' at nothin'."
+      ],
+      tyrant_feed: [
+        "The Tyrant feeds %n its brew in small, measured sips, never quite enough, and their whole body aches for the rest.",
+        "%n's every nerve lights up as the Tyrant's brew goes down, right up to the edge, and the Tyrant holds them there, and holds them, and lets go.",
+        "The Tyrant squeezes, slow and deliberate, everywhere it's got a hold of %n, and they whimper, and it likes that.",
+        "{c}%n's cock throbs and leaks under the Tyrant's hold while it feeds them, hard as iron and not allowed to do one thing about it.",
+        "{v}%n's pussy clenches and drips as the Tyrant's brew hits, so close, so close, and the Tyrant knows exactly how close.",
+        "The Tyrant's brew is hot and sharp and goes down like an order, and %n's body follows it.",
+        "{t}The Tyrant pinches %n's nipples through its hold while it feeds them, just hard enough to make them gasp round its lips.",
+        "%n feels the Tyrant's patience as it feeds them: unhurried, certain, and in charge of every last twitch."
+      ],
+      urge_water: [
+        "There's a pull in you like a tide goin' out. The water. It wants you in the water, now.",
+        "Your skin's gone dry and tight and the thing on you is achin' for the wet. Go to the water. Get in it."
+      ],
+      deep_urge_water: [
+        "The tail on you curls toward the water and pulls, and the brine in your belly sloshes like it's answerin' somethin'. It wants you in the water, where its kin can find you.",
+        "You can smell the water from here, salt and cold, and the Deep on you strains toward it like a dog on a lead. Go. Get in. Let the water see you.",
+        "Somethin' in the water is callin' to the thing on you, and it's draggin' you toward it. In. Now."
+      ],
+      deep_urge_bred: [
+        "The tentacles round your hips tighten, and the brine in you churns. It wants somethin' warmer in you than brine: a load, deep, and it wants it soon.",
+        "It's coiled round your hips and pullin' them open. It wants you bred, so it's got somethin' to keep warm in there."
+      ],
+      deep_urge_swallow: ["The tentacle down your throat flexes. It wants feedin': a load, swallowed, so it can turn it into brine and pump it back into you."],
+      oozer_urge_bred: [
+        "The slime in you swells and shivers and goes cool and empty. It wants somethin' warm poured into all that slick: a load, in you, soon.",
+        "Every hole it's stretched aches open and wet. It wants one of them filled. It doesn't care which, or by who."
+      ],
+      oozer_urge_swallow: [
+        "The slime down your throat goes thin and cold and hungry. It wants a load, swallowed, so it can be warm again.",
+        "Your mouth's floodin' with slime. It wants feedin', and only one thing will do it: somebody's cum, straight down."
+      ],
+      oozer_urge_glory: ["The glory stalls. All those cocks through the boards, and every one of them somethin' warm for it. It wants you on your knees in there, mouth open."],
+      weaver_urge_kneel: ["The silk on you tightens, and pulls, and your knees fold. It wants you low and still, the way it likes its catch. Kneel, and stay."],
+      weaver_urge_nest: [
+        "It wants a nest. Somewhere soft, somewhere it can spin round you. Go to the nest and settle, and let it work.",
+        "The Weaver's restless, threads twitchin', lookin' for a corner to fill. The nest. Take it to the nest."
+      ],
+      weaver_urge_kiss: ["It wants a taste of somebody else. A kiss, deep, so it can tell if they'd be worth a thread or two."],
+      gloss_urge_beg: [
+        "The rubber squeezes you to the edge and stops, and waits. It wants to hear you. Out loud. Beg to cum, so everybody hears what you are.",
+        "It's wound you tight and it wants you to ask for it. Beg. Please. Loud enough to carry."
+      ],
+      gloss_urge_kiss: ["Your rubber lips tingle. It wants them on somebody else's, slick and squeakin'. Kiss somebody. Long."],
+      gloss_urge_glory: ["It's thinkin' of the glory stalls, through you: a queue of cocks and you on your knees, and every one of them a climax it can drink off the end of somebody else. Go."],
+      oozer_urgeDone: [
+        "The Oozer on %n shivers, warm and pleased, and every slick plug of it swells at once and pumps them a long cool dose.",
+        "Fed, the slime on %n goes heavy and sweet and settles, and leaks a generous dose into them by way of thanks."
+      ],
+      weaver_urgeDone: [
+        "The Weaver on %n hums, spinnin' slow, pleased, and lets down a long sweet dose along every thread it's got in them.",
+        "Good catch. The silk on %n tightens like a hug and feeds them, slow and generous."
+      ],
+      deep_urgeDone: [
+        "The Deep on %n coils tighter, pleased as the sea, and pumps them a long cold-sweet dose that settles low and stays.",
+        "It got what it wanted, and it pays like the tide comes in: a slow, deep, heavy dose into %n."
+      ],
+      gloss_urgeDone: [
+        "The Gloss squeaks against %n, all over, delighted, and pumps them a hot sweet dose, and keeps rubbin' after.",
+        "The rubber on %n warms and purrs and pays them a long dose for doin' as it asked, and squeezes them right back up to the edge for good measure."
+      ],
+      oozer_urgeFail: [
+        "It didn't get fed, and it sulks the way slime does: it goes cold and heavy in every hole it's stretched, and stays there, aching, for an hour, and won't let you finish.",
+        "No load, no mercy. The Oozer holds every hole it has wide and cold and empty, right at the edge, for an hour."
+      ],
+      weaver_urgeFail: ["You didn't do as it said. The Weaver spins tight round everything it holds and strokes, and strokes, and stops, and keeps you hangin' at the edge for an hour."],
+      deep_urgeFail: ["You stayed out of the water. The Deep coils round you cold and tight and holds you right at the brink for an hour, like a wave that won't break."],
+      gloss_urgeFail: ["You wouldn't ask for it, so it won't give it. The rubber holds you at the edge, squeezin' and squeezin', for an hour, and drinks nothin', and lets you have nothin'."]
+    });
     (function() {
       const more = (pools, ...extra) => extra.forEach((lines, i) => {
         if (pools[i]) pools[i].push(...lines);
@@ -32048,7 +32499,7 @@
       bodybag: { icon: "\u{1F388}", what: "the inflatable body bag: zipped in, pumped up tight, and teased through the rubber", limit: /\b(latex|rubber|inflat|encas|immobil)/i },
       rubbermaid: { icon: "\u{1F9E4}", what: "the rubber dairymaid: mitts, a muzzle, and her latex hands all over you", limit: /\b(latex|rubber|mitt|muzzl|gag)/i },
       blackpool: { icon: "\u26AB", what: "the black pool in the woods: livin' latex that climbs out, fills you and seals you in", limit: /\b(latex|rubber|monster|encas|tentacl)/i },
-      rubberpup: { icon: "\u{1F9B4}", what: "the rubber kennel: a latex pup hood and mitts, and you're taught to beg", limit: /\b(latex|rubber|pup|pet ?play|hood)/i }
+      rubberpup: { icon: "\u{1F9B4}", what: "the rubber kennel: zipped into a whole rubber pup outfit (catsuit, pup hood, a petsuit with padded paws, collar and bone tag, leash and tail) and taught to beg", limit: /\b(latex|rubber|pup|pet ?play|hood|petsuit)/i }
     });
     const LATEX_KINDS = ["vacbed", "rubbervat", "dollmaker", "rubberstall", "bodybag", "rubbermaid", "blackpool", "rubberpup"];
     Object.assign(TRAP_NEEDS, {
@@ -32176,25 +32627,116 @@
           desc: "A glossy black glove of it that ran up both arms and pulled them together, warm and pulsing, like it's breathin'."
         }
       ],
+      // the whole pup (Oct 27): the item names are the game's own (checked against its asset list). The petsuit, collar, tag
+      // and tail are only ever those items (only): if this game hasn't got one, nothin' goes on in its place
       rubberpup: [
+        {
+          when: "hold",
+          slot: "suit",
+          label: "Rubber Pup Skin",
+          items: ["LatexCatsuit"],
+          color: LATEX_BLACK_GEAR,
+          desc: "A black latex catsuit rolled on from the toes up and smoothed down tight, talc and all, so the pup underneath shines like a wet nose from the neck down."
+        },
+        {
+          when: "hold",
+          slot: "suitLower",
+          label: "Rubber Pup Skin (legs)",
+          items: ["LatexCatsuit"],
+          color: LATEX_BLACK_GEAR,
+          desc: "The catsuit's legs, glossy and seamless, moulded over hips and thighs and down to the toes."
+        },
         {
           when: "hold",
           slot: "hood",
           label: "Rubber Pup Hood",
-          items: ["LatexDogHood"],
+          items: ["LatexDogHood", "LatexDogMask"],
           color: LATEX_BLACK_GEAR,
           desc: "A black latex pup hood with floppy ears and a muzzle, pulled down snug and buckled, so the only words left are woofs."
         },
         {
           when: "hold",
-          slot: "mitts",
-          label: "Rubber Paws",
-          items: ["LatexBondageMitts"],
+          slot: "arms",
+          label: "Rubber Petsuit",
+          items: ["PawPaddedPetsuitArms"],
+          only: true,
+          desc: "Arms folded at the elbow and laced into the petsuit's latex sleeves, with fat padded paws on the ends. Pups walk on their elbows here."
+        },
+        {
+          when: "hold",
+          slot: "legs",
+          label: "Rubber Petsuit (legs)",
+          items: ["PawPaddedPetsuitLegs"],
+          only: true,
+          desc: "Legs folded at the knee and laced snug into the petsuit, padded where they meet the floor. Pups kneel, and pups crawl."
+        },
+        {
+          when: "hold",
+          slot: "collar",
+          label: "Kennel Collar",
+          items: ["DogCollar"],
+          only: true,
+          color: "#9E1B24",
+          desc: "A wide red dog collar buckled snug, with a ring at the front for the leash. It stays on a while after, so everybody knows."
+        },
+        {
+          when: "after",
+          slot: "collar",
+          label: "Kennel Collar",
+          items: ["DogCollar"],
+          only: true,
+          color: "#9E1B24",
+          mins: 30,
+          desc: "A wide red dog collar buckled snug, with a ring at the front for the leash. It stays on a while after, so everybody knows."
+        },
+        {
+          when: "hold",
+          slot: "tag",
+          label: "Good Pup Tag",
+          items: ["CollarPupBone"],
+          only: true,
+          desc: "A little bone-shaped tag on the collar: GOOD PUP on one side and, on the other, PROPERTY OF THE RUBBER KENNEL."
+        },
+        {
+          when: "after",
+          slot: "tag",
+          label: "Good Pup Tag",
+          items: ["CollarPupBone"],
+          only: true,
+          mins: 30,
+          desc: "A little bone-shaped tag on the collar: GOOD PUP on one side and, on the other, PROPERTY OF THE RUBBER KENNEL."
+        },
+        {
+          when: "hold",
+          slot: "leash",
+          label: "Kennel Leash",
+          items: ["CollarLeash"],
+          desc: "A short red lead clipped to the collar ring, held by the kennel hand, or looped over the kennel post when they're busy."
+        },
+        {
+          when: "hold",
+          slot: (mn) => pupPlugOk(mn) ? "plug" : null,
+          slotNote: "plug, unless their limits or a belt rule it out",
+          label: "Pup's Tail Plug",
+          items: ["PuppyTailPlug1", "PuppyTailPlug"],
+          only: true,
+          desc: "A fluffy puppy tail on a smooth plug, worked in slow and given a tug to check it's seated. It wags when they wiggle, and they wiggle."
+        },
+        {
+          when: "hold",
+          slot: (mn) => pupPlugOk(mn) ? null : "tail",
+          slotNote: "tail, when a plug's ruled out",
+          label: "Rubber Pup Tail",
+          items: ["PuppyTailStrap", "PuppyTailStrap1"],
+          only: true,
           color: LATEX_BLACK_GEAR,
-          desc: "Round latex paw mitts strapped at the wrist. Good for walkin' on all fours, beggin', and nothin' else."
+          desc: "A glossy black puppy tail strapped on at the base of the spine, and it wags when they wiggle."
         }
       ]
     });
+    function pupPlugOk(mn) {
+      return !/\b(anal|plug|butt ?plug|insert)/i.test((rec(mn) || {}).limits || "") && !holeBlocked(mn, "butt");
+    }
     Object.assign(TRAP_SOUND_END, { vacbed: "hiss", bodybag: "hiss", rubberstall: "unlatch", dollmaker: "unlatch", rubberpup: "gate" });
     const LATEX_LINES = {
       vacbed: {
@@ -32409,31 +32951,60 @@
       rubberpup: {
         beats: [
           [
-            "A kennel hand with a squeaky toy calls %n over to the rubber kennel, and before they can ask, there's a hood comin' down over their head.",
-            "%n stops by the black-painted kennel at the end of the row, and a hand behind them pulls a latex pup hood over their head.",
-            `"Here, pup," says the kennel hand, and holds up a black latex hood with floppy ears, and %n's head is in it a second later.`
+            "A kennel hand with a squeaky toy calls %n over to the rubber kennel, and before they can ask what for, there's a black latex suit held open in front of them like a coat at the door.",
+            "%n stops by the black-painted kennel at the end of the row, and two kennel hands step out on either side of them with a catsuit, a hood and very big smiles.",
+            `"Here, pup," says the kennel hand, holdin' up a glossy black catsuit by the shoulders, and %n's foot is in it before they've finished sayin' no.`,
+            "The rubber kennel's gate is standin' open. There's a bowl in there with %n's name painted on it, and a kennel hand sat on an upturned crate, dustin' a black catsuit with talc.",
+            "%n sits down on the bench by the rubber kennel for a breather, and their boots are off before they notice, and somebody's rollin' black latex up over their toes.",
+            '"New pup!" the kennel hand calls over their shoulder, and three more come out of the rubber shed with their arms full of latex.',
+            `A whistle, two short notes, and %n turns toward it without thinkin'. The kennel hand who blew it grins. "Good. You already come when you're called."`,
+            "%n leans on the kennel fence, and a pair of talc-dusted hands starts peelin' their clothes off them from behind, quick and practised."
           ],
           [
-            "The hood's snug and buckled at the back, with a muzzle and ears, and when %n tries to talk it comes out a woof.",
-            "Then the paws: round latex mitts strapped at the wrist, and %n is down on all fours because there's no other way to stand.",
-            `The kennel hand clips a leash to %n's collar and gives it a tug. "Heel."`
+            "The catsuit's rolled up their legs and over their hips and zipped to the throat, squeakin' all the way, and smoothed down everywhere till %n shines like a wet nose.",
+            "Then the hood: black latex with a muzzle and floppy ears, pulled down snug and buckled at the back. When %n tries to talk, it comes out a woof.",
+            "Their arms are folded at the elbow and laced into the petsuit's sleeves, fat padded paws on the ends, and their legs folded and laced the same, and %n is down on all fours because there's no other way left to be.",
+            "A red collar is buckled round %n's throat, snug, with a little bone-shaped tag that says GOOD PUP, and the leash clicks onto the ring.",
+            "The tail goes on last, black and fluffy, and the kennel hand gives it a tug to check it's seated, and %n's hips wiggle all on their own.",
+            "Every lace is pulled tight and every buckle done up, and the kennel hand runs a palm over %n from hood to tail, squeakin', to check the fit.",
+            "{t}The catsuit squeezes %n's tits up round and glossy, and the petsuit laces cross right under them, so they hang heavy and shinin' between %n's front paws.",
+            "{c}The catsuit's moulded tight over %n's cock, every inch of it shown off in black shine, and it's already stiffenin' under the rubber.",
+            "{v}The latex is smoothed down between %n's legs so tight that every fold of them shows through, glossy, and the kennel hand pats it the way you'd pat a good dog's flank.",
+            "%n tries to stand up, and the folded petsuit legs say no, and they tip forward onto their padded paws with a squeak. Everybody laughs, kindly."
           ],
           [
             "Then lessons. Sit. Beg. Roll over. Every one gets a rub through the latex, and every miss gets a swat on the rump.",
-            `{t}"Beg," and %n sits up on their heels, paws up, tits bouncin', and gets a treat for it.`,
-            "%n is walked round the kennel yard on the leash, nose to the ground, while the other kennel hands watch and clap.",
-            "{c}A hand scratches behind %n's ears and then lower, and lower, till their cock's bobbin' and they're pantin' through the muzzle."
+            `{t}"Beg," and %n sits back on their folded legs, paws up, tits bouncin' in the shine, and gets a treat for it.`,
+            "%n is walked round the kennel yard on a short leash, crawlin' on elbows and knees, nose to the ground, while the other kennel hands watch and clap.",
+            "{c}A hand scratches behind %n's rubber ears and then lower, and lower, till their cock's bobbin' under the latex and they're pantin' through the muzzle.",
+            `"Heel." %n heels. "Down." %n goes down, chest to the straw, rump up. "Stay." And they stay, tremblin', for a very long time.`,
+            '"Speak," says the kennel hand, and %n woofs through the hood, and the kennel hand says "louder," and they woof louder, and the whole yard hears it.',
+            "%n is taught to shake a paw, and to roll over, and to show their belly, and every time they get it right somebody rubs the belly they showed.",
+            `{v}"Present," says the kennel hand, and taps %n's rump, and %n learns what that means very quickly, and gets a long slow rub between the legs for learnin' it.`,
+            "Every time %n wobbles, the leash comes up short and the kennel hand waits, patient, till they're square on their paws again.",
+            "A clicker, a treat, a pat: %n learns to come to the click faster than anybody has ever learned anythin'."
           ],
           [
-            "The kennel hand plays fetch. %n fetches. Every time, they get their belly rubbed, and every time the hand rubs a bit lower.",
+            "The kennel hand plays fetch. %n fetches, crawlin' as fast as the petsuit lets them, and every time they get their belly rubbed, and every time the hand rubs a little lower.",
             "%n is told to roll over and show their belly, and the whole yard has a go at rubbin' it.",
-            "A bowl of water and a squeaky toy, and %n is left to wag at the end of the leash while folk come to pat the new pup."
+            "A bowl of water and a squeaky toy, and %n is left to wag at the end of the leash while folk come by to pat the new pup.",
+            "{c}A good pup gets a treat, and %n's treat is a slick rubber-gloved hand round their cock, pumpin' slow, while they pant and wiggle.",
+            "{v}Good pups get their scratches, and the kennel hand scratches %n right between the legs, through the latex, till they're humpin' the air.",
+            "%n is let off the leash in the yard to play. The kennel hands throw a ball and sit in the shade to watch them chase it on folded legs.",
+            `%n learns to hump a kennel hand's boot, and learns it fast, and the hand says "good," over and over, and doesn't move the boot.`,
+            "Somebody gets down on the straw with %n and wrestles them, rough and laughin', and pins them, and rubs their belly till they're whinin'.",
+            "{t}The kennel hand rubs %n's rubber-tight tits like a dog's belly, both hands, round and round, and %n's back leg kicks."
           ]
         ],
         end: [
-          "The hood comes off and the paws unbuckle, and %n's face is pink and sweaty and still makin' little woofs.",
-          "%n is let off the leash with a scratch behind the ears and a biscuit, still wanting to sit when they're told.",
-          "The kennel hand unbuckles the hood, ruffles %n's hair, and tells them they're a very good pup."
+          "The hood comes off and the paws are unlaced, and %n's face is pink and sweaty and still makin' little woofs.",
+          "%n is let off the leash with a scratch behind the ears and a biscuit, and they still want to sit when they're told.",
+          "The kennel hand unbuckles the hood, ruffles %n's sweaty hair, tells them they're a very good pup, and leaves the collar on.",
+          "They peel %n out of the rubber like a banana, steamin' and slick, and the collar with its little bone tag stays on, so everybody knows.",
+          "The petsuit laces come undone, and %n's arms and legs unfold stiff and tingly, and they stand up on two feet for the first time in ages, and wobble.",
+          "%n is rubbed down with a towel like a pup after a bath, the catsuit peeled off them, and sent on their way with GOOD PUP still hangin' at their throat.",
+          `"Same time tomorrow," says the kennel hand, unclippin' the leash, and %n nods before they can stop themselves.`,
+          "Out of the rubber at last, %n is printed all over with latex creases, and for the first few steps they've forgotten how to walk on two legs."
         ]
       }
     };
@@ -32503,7 +33074,7 @@
         });
       },
       rubberpup(mn) {
-        latexRun(mn, "rubberpup", 5, "the rubber kennel", () => {
+        latexRun(mn, "rubberpup", 6, "the rubber kennel", () => {
           arouse(mn, 20);
           face(mn, "afterglow", 60);
         });
@@ -32612,13 +33183,22 @@
       [
         "The kennel hand rubs %n's ears through the hood, and the latex squeaks, and %n's hips wiggle without askin'.",
         "Down, and %n's chest goes to the straw. Up, and they're on their paws again. Every one earns a pat.",
-        "A tail is clipped to the back of %n's belt, and the kennel hand gives it a tug to see them wag."
+        "The tail gets a tug, gentle, just to see %n wag it, and they do, and everybody coos.",
+        "Sweat's runnin' inside the catsuit now, and every move squelches, and %n's as wet and shiny as a seal.",
+        "%n's leash is looped over the kennel post while the kennel hand fetches a brush, and %n waits, pantin', because waitin' is what pups do.",
+        "The kennel hand brushes %n down with a stiff bristle brush, all over the rubber, in long strokes, and %n leans into every one.",
+        "A bowl of water is set down, and %n has to lap at it through the muzzle, and makes a terrible mess, and gets praised for it.",
+        "Somebody clips a little bell to %n's collar so the whole yard can hear the new pup comin'."
       ],
       [
-        '{t}"Show your belly," and %n rolls over, paws up, tits bare to the sky, and the kennel hand rubs and rubs.',
-        "{c}A good pup gets a treat: a hand wrapped round %n's cock, a few slow pumps, and then it stops. Good pup.",
-        "{v}The kennel hand scratches lower, and lower, till their fingers are rubbin' slick circles between %n's legs.",
-        `%n is taught to hump the kennel hand's boot, and they learn it fast, and the hand says "good," over and over.`
+        '{t}"Show your belly," and %n rolls onto their back, paws up, rubber-tight tits bare to the sky, and the kennel hand rubs and rubs.',
+        "{c}A good pup gets a treat: a hand wrapped round %n's cock through the latex, a few slow pumps, and then it stops. Good pup.",
+        "{v}The kennel hand scratches lower, and lower, till their fingers are rubbin' slick circles between %n's legs through the rubber.",
+        `%n is taught to hump the kennel hand's boot, and they learn it fast, and the hand says "good," over and over.`,
+        "{v}Every time %n presents, a rubber-gloved finger slides along the shine between their legs, slow, and they wiggle back for more.",
+        "{c}%n's cock strains so hard against the catsuit that the kennel hand laughs and gives it a rub, the way you'd scratch a pup for bein' keen.",
+        "Somebody gets down nose to nose with %n and tells them what a good, good pup they are, and %n's whole back end wiggles.",
+        "%n gets a treat for every trick, and the treats are kisses on the muzzle and long slow strokes down their back to the root of their tail."
       ]
     );
     Object.assign(INTENSITY_BY_TRAP, {
@@ -32651,8 +33231,22 @@
         filthy: ["It pumps %n full of hot black slime till their belly bulges and it's oozin' out round every tendril.", "Every hole stuffed with livin' latex at once, %n is a host and a toy and nothin' else.", "It fucks %n like a breedin' pen fucks a sow, and they're beggin' for it to keep goin'."]
       },
       rubberpup: {
-        tender: ["The kennel hand is all praise and scratches, and %n's tail really does start to wag.", "Every trick earns a treat and a cuddle, and nobody is cross with a pup that gets it wrong.", "The paws are padded soft, and the leash is never yanked."],
-        filthy: ["A rubber bitch on a leash, %n is taught to present and hump boots and beg with their tongue out.", "Their cunt's drippin' on the straw and the whole kennel yard can smell what a needy pup they are.", "Good pups get bred, the kennel hand says, and %n wags so hard at that it's embarrassin'."]
+        tender: [
+          "The kennel hand is all praise and scratches, and %n's tail really does start to wag.",
+          "Every trick earns a treat and a cuddle, and nobody is cross with a pup that gets it wrong.",
+          "The paws are padded soft, and the leash is never yanked.",
+          "The petsuit is laced snug, never tight, and the kennel hand checks %n's paws for pinches every few minutes.",
+          `"Good pup, good pup," over and over, soft, and a hand that never stops strokin' %n's back.`,
+          "Every time %n's unsure, the kennel hand gets down on the straw with them and shows them, patient."
+        ],
+        filthy: [
+          "A rubber bitch on a leash, %n is taught to present and hump boots and beg with their tongue out.",
+          "Their cunt's drippin' on the straw and the whole kennel yard can smell what a needy pup they are.",
+          "Good pups get bred, the kennel hand says, and %n wags so hard at that it's embarrassin'.",
+          `"Down," and %n's rubber face goes to the straw and their rump goes up, and everybody in the yard knows what for.`,
+          "%n's leash is tied off at the post and they're left presentin' for anybody walkin' past, under a sign: TRY BEFORE YOU BUY.",
+          "{c}The kennel hands jerk %n's cock through the latex till it's drippin', and then make them lick it off a rubber glove."
+        ]
       }
     });
     depthOf(["held"], ["vacbed", "rubbervat", "dollmaker", "rubberstall", "bodybag", "rubbermaid", "blackpool", "rubberpup"]);
@@ -42481,6 +43075,1409 @@
       more(I.open[2], ["It empties the whole huge barrel into %n in long heavy strokes, and they slump in its grip, flushed and dizzy, as it hits."]);
       more(I.second, ["A second barrel clicks into place. Different colour. Same enthusiasm."]);
     })();
+    if (CFG.STATE_TAIL_CHANCE === void 0) CFG.STATE_TAIL_CHANCE = 0.3;
+    if (!CFG.STATE_BEATS) CFG.STATE_BEATS = { tender: 1, rough: 1, filthy: 2 };
+    const SP_GROUP = {
+      cow: "cow",
+      bull: "bull",
+      pony: "horse",
+      horse: "horse",
+      deer: "deer",
+      pig: "pig",
+      pup: "dog",
+      dog: "dog",
+      kitt: "cat",
+      cat: "cat",
+      goblin: "goblin",
+      bunny: "bunny",
+      rabbit: "bunny",
+      fox: "fox",
+      wolf: "wolf",
+      goat: "goat",
+      sheep: "sheep",
+      rat: "rat"
+    };
+    const STATE_GEAR = [
+      "gag",
+      "ringGag",
+      "blind",
+      "hood",
+      "collar",
+      "leash",
+      "bell",
+      "arms",
+      "paws",
+      "legs",
+      "nipples",
+      "breastGear",
+      "chastity",
+      "cage",
+      "plugFront",
+      "plugBack",
+      "harness",
+      "noseRing",
+      "ears",
+      "tail",
+      "hooves",
+      "heels",
+      "latex",
+      "naked"
+    ];
+    function stateOf(mn) {
+      const s = {}, now = Date.now();
+      try {
+        const p = prodOf(mn), b = bodyOf(mn);
+        if (p) {
+          const held = p.held ? heldTotal(p) : 0, cap = Math.max(1, capacity(mn));
+          if (held > cap) s.over = true;
+          else if (held > cap * 0.55) s.slosh = true;
+          if (p.held) {
+            if (b.vulva && (p.held.vulva || 0) >= 40) s.heldV = true;
+            if ((p.held.butt || 0) >= 40) s.heldB = true;
+            if ((p.held.mouth || 0) >= 60) s.heldM = true;
+          }
+          if (p.preg) {
+            const f = (now - p.preg.since) / Math.max(1, p.preg.due - p.preg.since);
+            s[now >= p.preg.due ? "overdue" : f >= 0.7 ? "pregHeavy" : f >= 0.3 ? "pregShow" : "pregEarly"] = true;
+          }
+          if (p.eggs && p.eggs.n > 0) s[p.eggs.n >= 8 ? "eggsMany" : "eggs"] = true;
+          if (makesMilk(mn)) {
+            const f = (p.milk || 0) / Math.max(1, milkCap(mn));
+            if (f >= 0.95) s.milkBurst = true;
+            else if (f >= 0.6) s.milkFull = true;
+            else if (f < 0.12) s.milkDry = true;
+          }
+          if (b.cock) {
+            const f = (p.semen || 0) / Math.max(1, CFG.PROD.SEMEN_CAP);
+            if (f >= 0.9) s.ballsHeavy = true;
+            else if (f < 0.2) s.ballsDry = true;
+          }
+          if (inHeat(p)) s.heat = true;
+          if ((p.deniedUntil || 0) > now) s.denied = true;
+          if (p.painted && p.painted.until > now) s.messy = true;
+          if (b.tits) {
+            const u = udderLevel(mn);
+            if (u >= 11) s.hugeTits = true;
+            else if (u >= 7) s.bigTits = true;
+          }
+          if (b.cock) {
+            if (sizeOf(mn, "testes") >= 8) s.bigBalls = true;
+            if (sizeOf(mn, "penis") >= 12) s.bigCock = true;
+          }
+          if (b.vulva && sizeOf(mn, "vulva") >= 5) s.gapedV = true;
+          if (sizeOf(mn, "butt") >= 5) s.gapedB = true;
+        }
+        if (arousalOf(mn) >= 75) s.edge = true;
+        if (parasiteOn(mn)) s.parasite = true;
+        const sk = symKind(mn);
+        if (sk) s["sym_" + sk] = true;
+        if (suitOnNow(mn)) s.suit = true;
+        const sp = SP_GROUP[speciesKey(mn)];
+        if (sp) s["sp_" + sp] = true;
+        const g = gearSense(mn);
+        for (const k of STATE_GEAR) if (g[k]) s["g_" + k] = true;
+        if (s.g_cage) delete s.g_chastity;
+        if (s.g_gag) delete s.g_ringGag;
+        if (charFor(mn) && !s.g_naked) s.g_dressed = true;
+      } catch (e) {
+      }
+      return s;
+    }
+    const whereOf = (mn) => {
+      const r = rec(mn);
+      return r && r.penned && r.penned.trap && r.penned.name ? r.penned.name : "the trap";
+    };
+    function weighOut(keys, w) {
+      const tot = keys.reduce((a, k) => a + w(k), 0);
+      let x = Math.random() * tot;
+      for (const k of keys) {
+        x -= w(k);
+        if (x <= 0) return k;
+      }
+      return keys[keys.length - 1];
+    }
+    const fitFor = (mn, pool) => {
+      const b = bodyOf(mn);
+      return (pool || []).filter((l) => tagsFit(l, b) && wordsFit(l, b));
+    };
+    const STATE_BEAT_W = {
+      overdue: 6,
+      pregHeavy: 5,
+      pregShow: 4,
+      pregEarly: 3,
+      eggsMany: 5,
+      eggs: 4,
+      over: 5,
+      slosh: 3,
+      heldV: 2,
+      heldB: 2,
+      heldM: 1,
+      milkBurst: 5,
+      milkFull: 2,
+      milkDry: 2,
+      ballsHeavy: 2,
+      ballsDry: 1,
+      heat: 5,
+      denied: 3,
+      edge: 2,
+      messy: 2,
+      parasite: 4,
+      sym_latex: 3,
+      sym_moss: 3,
+      sym_nestling: 3,
+      suit: 4,
+      hugeTits: 3,
+      bigTits: 2,
+      bigBalls: 2,
+      bigCock: 1,
+      gapedV: 1,
+      gapedB: 1,
+      g_ringGag: 2,
+      g_bell: 2,
+      g_noseRing: 2,
+      g_cage: 2,
+      g_chastity: 2,
+      g_collar: 0.5,
+      g_dressed: 0.5
+    };
+    function stateBeats(mn, kind, beats) {
+      try {
+        if (!Array.isArray(beats) || beats.length < 3) return beats;
+        const n = CFG.STATE_BEATS[intensityOf(mn)];
+        if (!n) return beats;
+        const s = stateOf(mn), fams = DEPTH_KIND[kind] || ["tease"], out = beats.slice(), used = /* @__PURE__ */ new Set(), where = whereOf(mn);
+        for (let i = 0; i < n; i++) {
+          const keys = Object.keys(s).filter((k2) => STATE_BEAT[k2] && !used.has(k2) && fitFor(mn, [].concat(...Object.values(STATE_BEAT[k2]))).length);
+          if (!keys.length) break;
+          const k = weighOut(keys, (x) => STATE_BEAT_W[x] || (/^sp_/.test(x) ? 2 : /^g_/.test(x) ? 1.5 : 1));
+          used.add(k);
+          const P = STATE_BEAT[k], fam = fams.find((f) => fitFor(mn, P[f]).length), own = fam ? fitFor(mn, P[fam]) : [], any = fitFor(mn, P.any);
+          const pool = own.length && (Math.random() < 0.67 || !any.length) ? own : any.length ? any : own;
+          if (!pool.length) continue;
+          const line = pickFresh("state:" + k + ":" + (pool === own ? fam : "any"), pool).replace(/%w/g, where);
+          const lo = Math.max(1, Math.ceil((out.length - 1) / 2)), at = lo + Math.floor(Math.random() * (out.length - lo));
+          out.splice(at, 0, [line]);
+        }
+        return out;
+      } catch (e) {
+        return beats;
+      }
+    }
+    const STATE_TAIL_W = {
+      overdue: 4,
+      pregHeavy: 4,
+      pregShow: 3,
+      pregEarly: 2,
+      eggsMany: 4,
+      eggs: 3,
+      over: 4,
+      slosh: 3,
+      heldV: 2,
+      heldB: 2,
+      heldM: 1,
+      milkBurst: 4,
+      milkFull: 2,
+      milkDry: 2,
+      ballsHeavy: 2,
+      ballsDry: 1,
+      heat: 4,
+      denied: 2,
+      edge: 2,
+      messy: 1.5,
+      parasite: 3,
+      sym_latex: 2,
+      sym_moss: 2,
+      sym_nestling: 2,
+      suit: 3,
+      hugeTits: 2,
+      bigTits: 2,
+      bigBalls: 2,
+      bigCock: 1.5,
+      gapedV: 1,
+      gapedB: 1,
+      g_dressed: 1,
+      g_collar: 1,
+      g_ears: 1
+    };
+    function stateTail(mn, kind, i) {
+      try {
+        if (i < 2 || Math.random() >= CFG.STATE_TAIL_CHANCE) return "";
+        const s = stateOf(mn), keys = Object.keys(s).filter((k2) => STATE_TAIL[k2] && fitFor(mn, STATE_TAIL[k2]).length);
+        if (!keys.length) return "";
+        const k = weighOut(keys, (x) => STATE_TAIL_W[x] || (/^sp_/.test(x) ? 3 : /^g_/.test(x) ? 1.5 : 1));
+        return " " + tFill(pickFresh("stail:" + k, fitFor(mn, STATE_TAIL[k])), mn);
+      } catch (e) {
+        return "";
+      }
+    }
+    const STATE_BEAT = {
+      pregEarly: {
+        any: [
+          "Somebody's hand finds the soft new curve low on %n's belly and stays there, warm, like they're checkin' on what's growin' in there.",
+          "%n's belly has only just started to round, and whoever's handlin' them keeps pattin' it, proud, like it was all their doin'.",
+          `"Took, did it?" somebody murmurs, runnin' a thumb over the little swell of %n's belly. "Barely showin', and already so needy."`,
+          "Carryin' early has made %n tender all over. Every touch lands twice as hard as it should, and they gasp at things that wouldn't have moved them last week.",
+          "{t}%n's tits have gone full and sore with the litter just startin' in them, and every jolt makes them throb.",
+          "There's a warm, sleepy heaviness low in %n that wasn't there before, and it makes them sway into every hand that comes near."
+        ],
+        breed: [
+          `"Already bred," somebody laughs, "and still takin' more. Greedy thing." And they give %n more anyway, slow and deep, palm spread over the little swell of their belly.`,
+          "Bein' bred again with a litter just started in them, %n feels every stroke settle low and warm, right where it's already growin'.",
+          "It doesn't matter that %n's already caught. Whoever's in them breeds them like it's the first time, both hands on the small new curve of their belly."
+        ],
+        held: ["Held still, %n can't even curl round the little swell of their belly. It's out there for anybody's hands, and plenty of hands find it."],
+        milk: ["{t}The litter just startin' in %n has brought their milk in early, and it comes down thin and sweet and much too quick."],
+        tease: ["Somebody draws slow circles on the little curve of %n's belly with one fingertip, round and round, and it does terrible things to them."]
+      },
+      pregShow: {
+        any: [
+          "%n's belly is round and full now, a proper swell under their ribs, and it rocks heavy with every jolt.",
+          "The litter in %n shifts and rolls right in the middle of it all, and %n gasps and grabs at nothin'.",
+          "Hands keep findin' %n's round belly: rubbin', pattin', feelin' for kicks. Nobody asks first. Nobody ever does with stock that's showin'.",
+          `"Look at the size of you," somebody croons, both palms on %n's belly. "Fillin' out lovely, you are."`,
+          "{t}Carryin' has made %n's tits heavy and dark-nippled, and they swing over the round of their belly with every jolt.",
+          "%n's back aches with the weight in front of them, and everything bein' done to them comes up against the round of that belly first.",
+          "Somethin' in %n kicks, hard, right at the worst moment, and %n lets out a startled little noise that makes everybody grin."
+        ],
+        breed: [
+          "Round with one litter, %n's bred for the next anyway: slow, deep strokes that rock their full belly and make it bump soft against whatever's under them.",
+          "Whoever's breedin' %n has both hands on their pregnant belly, holdin' it, feelin' it rock with every thrust.",
+          "%n's belly is so round now it lifts them up off whatever they're bent over, and every push from behind rocks them on it like a cradle.",
+          `"Already full," somebody murmurs, sinkin' in deep, "and you still want it. You just love bein' bred, don't you."`
+        ],
+        held: [
+          "Whatever's holdin' %n was never made for somebody carryin', and the swell of their belly presses tight against it at every point.",
+          "%n's held with their pregnant belly hangin' heavy and on show, and every passin' hand gives it a rub."
+        ],
+        milk: ["{t}Carryin' has %n's milk comin' in rich and heavy, and it lets down in long hot pulls every time the litter shifts."],
+        mess: ["Whatever's bein' poured on %n runs down over the round of their belly and drips off the bottom of it in long, slow strings."],
+        tease: ["Somebody kneels and kisses %n's round belly, right in the middle, and then lower, and lower, and stops just where %n needs them not to."],
+        watched: ["Folk stop to look at %n's belly as much as anythin' else, pointin', guessin' out loud how many are in there."]
+      },
+      pregHeavy: {
+        any: [
+          "%n's so heavy with their litter they can barely shift their own weight, belly huge and tight and low, and everything has to happen round it.",
+          "The litter in %n is big now, and busy, rollin' and kickin', and every jolt sets the whole tight round of their belly movin'.",
+          "Big as a barrel and due any day, %n pants and sways, and their belly takes up the whole of the world in front of them.",
+          "Somebody holds %n's huge belly up from underneath with both hands, takin' the weight, and %n nearly sobs at the relief of it.",
+          "{t}%n's tits are swollen fat and leakin' with what their litter's goin' to need, and they drip on the round of their belly with every move.",
+          "%n's belly is stretched so full and tight it shines, and the hands on it can feel everything inside.",
+          "Everything's harder this heavy, and slower, and %n's whole body is one long ache of bein' full."
+        ],
+        breed: [
+          "Heavy as they are, due any day, %n's still bred: slow, careful, endless strokes that rock their huge belly and set the litter kickin'.",
+          "%n's belly is so big now it rests on the ground under them, and whoever's breedin' them holds their hips up off it to get at them properly.",
+          `"One more for luck," somebody says, and breeds %n deep, though there's no room left anywhere in them for luck to go.`,
+          "Every thrust shoves %n's huge belly forward, and it rolls back heavy, and the litter inside kicks at bein' disturbed."
+        ],
+        held: [
+          "%n's held fast with their huge belly hangin' low and heavy, and every strap or rope or hand has to go round it, under it, over it.",
+          "Restrained this heavy, %n can't shift the weight at all. They just hang there, round and full and puffin', while it all goes on."
+        ],
+        milk: ["{t}So close to due, %n's milk is pourin' in thick and constant, and it hardly needs drawin' at all: it just runs."],
+        tease: ["Somebody runs their fingertips down the tight round of %n's belly, slow, from the top all the way to the bottom, and %n shivers the whole length of it."],
+        watched: ["A little crowd gathers to see how big %n's got, and somebody starts a pool on whether they'll drop the litter right here."]
+      },
+      overdue: {
+        any: [
+          "%n's overdue, belly huge and hard and achin', the litter pressin' low, and every jolt feels like it might be the one that starts it.",
+          "Past their time and still carryin', %n's whole body feels ready to burst, and it's all they can think about.",
+          "A cramp rolls through %n's huge belly, tight and long, and then lets go. Not yet. Nearly.",
+          `"Overdue," somebody tuts, both hands on %n's belly. "We'll have to shake that loose." They don't mean anythin' gentle by it.`,
+          "{t}%n's tits run with milk all the time now, so full and so overdue the drips never stop.",
+          "%n's belly sits so low and so heavy they can't do anythin' but sway with it, pantin', waitin' on a body that won't let go."
+        ],
+        breed: ["They say a good breedin' brings an overdue one on, and the farmhands are bein' very thorough about provin' it on %n."],
+        held: ["Held still and overdue, %n can feel every shift and press of the litter, low and heavy, with nowhere at all for it to go."]
+      },
+      eggs: {
+        any: [
+          "The clutch inside %n clicks and shifts with every jolt, warm smooth eggs knockin' together somewhere deep.",
+          "%n can feel the eggs in them, every one, round and heavy, pressin' on everything they press on.",
+          "Somebody presses a palm low on %n's belly, feels the clutch shift under it, and grins.",
+          "Every time %n clenches, the eggs in them roll, and every time they roll, %n clenches.",
+          "There's a slow, heavy fullness in %n from the clutch they're carryin', and it makes everythin' else feel tighter."
+        ],
+        breed: [
+          "Whatever's breedin' %n pushes right up against the clutch already in them, and the eggs shift deeper to make room.",
+          "Every thrust knocks against the eggs %n's carryin', and they clack softly, and %n moans at the strange full ache of it."
+        ],
+        held: ["Held tight, %n can't shift the eggs in them, and they settle heavier and lower the longer they're kept."],
+        tease: ["Somebody rolls the clutch inside %n with slow pressure from outside, one egg at a time, and %n's toes curl."]
+      },
+      eggsMany: {
+        any: [
+          "%n's packed so full of eggs their belly's lumpy with them, round shapes pressin' out under the skin, shiftin' with every breath.",
+          "So many eggs in %n that every move grinds them together, and the full, stretched ache never lets up.",
+          "%n's belly bulges with the clutch, and somebody counts the lumps out loud, and loses count, and starts again.",
+          "There's no room in %n that isn't egg, and their body keeps tryin' to push, and keeps not bein' allowed."
+        ],
+        breed: ["With a clutch that big already in them, every stroke into %n drives the eggs deeper, grindin', and %n wails at how full it makes them."],
+        held: ["Held still with a belly full of eggs, %n can feel the clutch slowly settle, heavier and lower, pressin' on everything."]
+      },
+      slosh: {
+        any: [
+          "%n's belly sloshes with everything they've already taken today, and every jolt sets it rollin' warm inside them.",
+          "There's so much in %n already their middle has rounded out with it, and it gurgles when they're moved.",
+          "Somebody pats %n's full belly, listens to it slosh, and laughs.",
+          "%n can feel what they're holdin' shift and settle inside them, heavy and warm, every time they move.",
+          "%n's belly is round and tight with it, and nobody's stoppin' to let it settle."
+        ],
+        breed: [
+          "Already sloshin' full from earlier, %n takes more anyway, and they can feel the new load push the old one deeper.",
+          "Every stroke into %n squelches with what's already in there, and some of it gets pushed back out round whatever's fillin' them."
+        ],
+        mess: ["Full as %n already is inside, they're bein' made a mess of outside too, and they couldn't say where one stops and the other starts."],
+        milk: ["Full belly, full udders, and the farm's still drawin' and still givin': %n's never felt so much like somethin' to be filled and emptied."],
+        held: ["Held still with a belly that heavy, %n can feel every slow slosh, and can't do a thing to ease it."]
+      },
+      over: {
+        any: [
+          "%n's stuffed past full, belly tight as a drum, and it's leakin' back out of them as fast as anythin' goes in.",
+          "There's no room left in %n anywhere, and every new push squeezes some of what's already there back out in a hot spill.",
+          "%n's belly is round and hard and gurglin', so full it aches, and nobody seems to think that's a reason to stop.",
+          "Overfull and drippin' from every hole they've got, %n can't tell any more what's leakin' out and what's bein' pushed in.",
+          "Somebody presses on %n's swollen belly, gentle, just to see, and a warm gush runs out of them, and they both moan."
+        ],
+        breed: [
+          "There's no room in %n for another load, and they're bein' given one anyway, and it all comes runnin' back out round whatever's in them.",
+          "Every thrust into %n's overfull belly squelches loud enough to hear across the barn, and it runs down their thighs in streams."
+        ],
+        mess: ["Overfull inside and covered outside, %n is drippin' from every part of them at once."],
+        held: ["Held fast and stuffed past full, %n can't curl up round the ache. It just sits in them, tight, while everything else goes on."]
+      },
+      heldV: {
+        any: [
+          "{v}%n's pussy is still full from the last one, and every jolt sends a warm trickle of it runnin' out of them.",
+          "{v}%n's still drippin' from earlier, pussy sloppy and swollen, and whoever's handlin' them notices right away.",
+          "{v}There's a load already sittin' in %n's pussy, and they can feel it every time they clench."
+        ],
+        breed: [
+          "{v}%n's pussy is still full from the last stud, and the next one slides in through it with a wet, filthy sound, pushin' it deeper.",
+          `{v}"Somebody's been here already," says whoever's breedin' %n, feelin' how slick and full they are, and doesn't mind one bit.`
+        ]
+      },
+      heldB: {
+        any: [
+          "%n's ass is still full from earlier, and it leaks with every jolt, warm and slow down the backs of their thighs.",
+          "There's a load sittin' in %n's ass from before, and it shifts warm inside them every time they're moved."
+        ],
+        breed: ["%n's ass is already sloppy with somebody else's load, and the next one sinks into it with a wet push, and it squelches out round them."]
+      },
+      heldM: {
+        any: [
+          "%n's still got the taste of the last load in their mouth, and their belly's warm with everything they've swallowed today.",
+          "%n hiccups, soft and embarrassed, and it tastes of what they've been swallowin' all day."
+        ]
+      },
+      milkBurst: {
+        any: [
+          "{t}%n's udders are fit to burst, swollen hard and hot, and every jolt squeezes a hot spray of milk out of them.",
+          "{t}%n's tits are so full they ache, tight and shinin', leakin' milk down their belly in white streams.",
+          "{t}Somebody brushes one of %n's swollen teats, barely a touch, and it sprays across the floor.",
+          "{t}Milk runs off %n's nipples in steady drips, too full to hold it if they tried, and every bounce sends more.",
+          "{t}%n's udders are so heavy with milk they pull, and the throb of them is louder in %n's head than anything else.",
+          "{nt}%n's chest is tight and swollen, hard with milk, and it beads and runs from both nipples."
+        ],
+        milk: [
+          "{t}%n's so full the milk comes out in hard hot jets the second anythin' touches their teats, and it rattles the bucket.",
+          "{t}It hardly needs to draw on %n at all: their udders are so overfull it pours, and the relief makes them moan out loud."
+        ],
+        breed: ["{t}Every thrust into %n squeezes their overfull udders against whatever's under them, and milk sprays out in time with it."],
+        held: ["{t}Held like that, %n's swollen udders hang heavy and full, drippin' a puddle under them, and nobody's milkin' them."],
+        tease: ["{t}Somebody rolls %n's swollen nipple between finger and thumb, slow, just enough to make it drip and never enough to bring it down."],
+        mess: ["{t}%n's own milk is part of the mess now, sprayin' from their swollen teats every time they're jostled."],
+        watched: ["{t}Folk watchin' can see the milk runnin' off %n's teats, and somebody goes to fetch a cup."]
+      },
+      milkFull: {
+        any: [
+          "{t}%n's tits are full and heavy, warm with milk, and they leak a little with every jolt.",
+          "{t}The milk's come in, and %n's tits are tight with it, nipples stiff and beadin' white."
+        ],
+        milk: ["{t}%n's full udders let down the second they're touched, warm and steady, like they've been waitin' for it all day."],
+        tease: ["{t}Somebody squeezes one of %n's full tits, just once, watches the milk bead up, and doesn't do anythin' about it."]
+      },
+      milkDry: {
+        any: [
+          "{t}%n's tits are milked soft and empty, nipples sore and puffy and tender as anything.",
+          "{t}Drained flat, %n's teats still twitch and ache, like they're tryin' to give somethin' that isn't there."
+        ],
+        milk: [
+          "{t}There's nothin' left in %n to give, and it draws on them anyway, long dry pulls on sore nipples that make them whimper.",
+          "{t}%n's been milked dry already today, and their empty udders ache at every pull, and still the pulls come."
+        ]
+      },
+      ballsHeavy: {
+        any: [
+          "{c}%n's balls are full and heavy and achin', drawn up tight, and every jolt makes them throb.",
+          "{c}There's so much built up in %n's balls they feel swollen with it, and their cock leaks a steady thread.",
+          "{c}Somebody cups %n's full sack and squeezes, gentle, feelin' the weight of it, and %n's cock jerks.",
+          "{c}%n hasn't emptied in far too long, and it shows: balls heavy and tight, cock drippin' at the slightest touch."
+        ],
+        milk: ["{c}%n's balls are so full they're practically beggin' to be milked, and somebody's finally gettin' round to it."],
+        tease: ["{c}A hand rolls %n's full balls slow in its palm, weighin' them, and lets go just as %n's cock starts to jerk."],
+        breed: ["{c}%n's own balls are full and swingin', and nobody cares: today it's %n gettin' bred."]
+      },
+      ballsDry: {
+        any: [
+          "{c}%n's been milked dry, balls empty and soft, and their cock still twitches at every touch with nothin' left to give.",
+          "{c}Drained as they are, %n's cock still tries, and a thin clear dribble is all it's got."
+        ]
+      },
+      heat: {
+        any: [
+          "%n's in heat, flushed and achin' and smellin' of it, and everybody near can tell.",
+          "The heat in %n has them pushin' back into every touch, hips rockin' on their own, shameless.",
+          "%n's skin is burnin' with heat, and the need in them is so loud they can hardly hear anythin' else.",
+          "Heat has %n's whole body ready and wantin', wet and open and achin', and it doesn't care what's doin' the takin'.",
+          "%n whines low and long, a heat-sick noise, and presents without bein' asked.",
+          "{v}%n's in heat and their pussy's swollen and drippin' with it, slick right down their thighs.",
+          "{c}Heat's got %n's cock stiff and leakin' and their hips rollin', desperate for any touch at all."
+        ],
+        breed: [
+          "In heat as %n is, bein' bred is all their body wants, and they push back onto every thrust, beggin' for it deeper.",
+          "Heat makes %n greedy: they clench and squeeze at whatever's in them like they could pull a litter out of it by wantin' hard enough.",
+          "%n's heat-swollen and so ready the first push goes all the way in, and they howl with the relief of it."
+        ],
+        held: [
+          "Held still in heat is a special kind of cruel: %n strains toward every touch and can't reach a single one of them.",
+          "%n's in heat and tied fast, and all they can do is rock and whine and drip and wait."
+        ],
+        tease: [
+          "Teasin' somebody in heat is a farm sport, and %n's makin' it look like a good one: every barely-there touch sets them sobbin'.",
+          "Nobody gives %n what their heat is screamin' for. They just touch, and stop, and touch, and watch."
+        ],
+        milk: ["{t}Heat's got %n's milk runnin' as hot as the rest of them, and it lets down in long, shudderin' pulls."],
+        watched: ["Everybody watchin' can smell %n's heat, and more than one of them shifts where they stand."]
+      },
+      denied: {
+        any: [
+          "%n's not allowed to cum, and their body hasn't been told: it climbs and climbs and has nowhere to go.",
+          "Denied as they are, every touch only winds %n tighter, and they're startin' to shake with it.",
+          "%n begs, out loud and shameless, to be let finish, and the answer is a pat on the head.",
+          "Every time %n gets close, it all goes still, as if the whole farm knows they're not allowed."
+        ],
+        tease: [
+          "Teasin' somebody denied is easy work. %n's already right on the edge, and it takes just one finger to keep them there.",
+          "%n's denied, and whoever's teasin' them knows it, and uses it, slow and cruel and smilin'."
+        ],
+        breed: ["Bred hard and not allowed to cum from it, %n sobs into every stroke, so full and so close and so stopped."]
+      },
+      edge: {
+        any: [
+          "%n's right on the edge now, shakin', breath catchin', one touch from goin' over.",
+          "Everything in %n is drawn up tight and tremblin'. They're so close they can taste it.",
+          "%n's whole body is beggin' now, close and closer, and everybody can see it.",
+          "A long, high noise comes out of %n, the noise of somebody hangin' right on the brink."
+        ],
+        tease: ["%n's so close, and whoever's handlin' them can tell, and stops dead, and waits, and smiles."],
+        breed: ["%n's so close that every thrust nearly tips them over, and they're clenchin' and gaspin' right on the edge of it."]
+      },
+      messy: {
+        any: [
+          "%n was already a mess before any of this, still sticky and streaked from earlier, and it's only gettin' worse.",
+          "Whatever was splattered on %n before is smeared fresh now, and new mess goes right on top of the old.",
+          "%n's still marked up from the last time, and folk are addin' to it like it's a guestbook.",
+          "There's dried mess on %n from earlier, crackin' as they move, and fresh mess runnin' over the top of it."
+        ],
+        mess: ["Already covered from the last one, %n is just layered over now, sticky on sticky, slick on slick."]
+      },
+      parasite: {
+        any: [
+          "The parasite on %n throbs and squeezes, tastin' everything that's bein' done to its host, and it likes it.",
+          "The thing livin' on %n pulses, greedy, and pumps them a little dose of somethin' sweet to make it all feel like more.",
+          "%n's parasite shivers and tightens, hungry, and %n can feel it wantin' whatever's comin'.",
+          "Somethin' wet and livin' moves on %n: the parasite, stirrin', interested."
+        ],
+        breed: [
+          "The parasite on %n quivers, eager, and every root of it squeezes, like it's helpin' whatever's breedin' them.",
+          "The parasite on %n tightens greedily every time a load goes in, waitin' for its share."
+        ],
+        milk: ["{t}The parasite's mouths on %n's teats pull along with the milkin', greedy, stealin' a share of their own."]
+      },
+      sym_latex: {
+        any: [
+          "%n's livin' latex ripples over them, warm, drinkin' in every shiver they make.",
+          "The latex on %n tightens and squeezes everywhere at once, pleased, like a hug from somethin' hungry.",
+          "%n's second skin squeaks and creaks and clings, glossy and warm and alive."
+        ],
+        breed: ["The livin' latex on %n quivers as the load goes into them, waitin' to drink its share."]
+      },
+      sym_moss: {
+        any: [
+          "{t}The moss on %n's chest dampens and hums, sweet-smellin', and their tits feel full and warm under it.",
+          "%n's moss fluffs up, soft and green, interested in what's bein' done to its host."
+        ],
+        milk: ["{t}The milk moss on %n drinks what drips, soft and greedy, and makes them let down more."]
+      },
+      sym_nestling: {
+        any: [
+          "Low in %n's belly the nestling turns over, slow and warm, and nudges, interested.",
+          "The nestling inside %n stirs, curious, and %n can feel it waitin'."
+        ],
+        breed: ["The nestling deep in %n wriggles, eager, as the load goes in, and drinks the first of it."]
+      },
+      suit: {
+        any: [
+          "The livin' suit on %n tightens, pleased, kneadin' them slow wherever it's spread.",
+          "%n's livin' suit ripples and squeezes, and doesn't let them forget for one second that it's there.",
+          "The suit on %n hums against their skin, feedin' on how worked up they are."
+        ]
+      },
+      hugeTits: {
+        any: [
+          "{t}%n's tits are so big they're in the way of everything: they rest on whatever's in front of them like two sacks of grain, and get handled like it.",
+          "{t}It takes both of somebody's arms to lift one of %n's tits out of the way, and they take their time about it.",
+          "{t}%n's enormous tits swing and slap and spill everywhere, and half the hands on the farm end up on them."
+        ],
+        milk: ["{t}Tits that big make a lot of milk, and %n's do: it comes in rivers."],
+        held: ["{t}Restraints weren't made for tits like %n's, and they bulge out round every strap and over every edge."]
+      },
+      bigTits: {
+        any: [
+          "{t}%n's big tits sway and bounce with every jolt, heavy and full, and nobody's lookin' anywhere else.",
+          "{t}A hand closes round one of %n's big tits, can't hold all of it, and squeezes anyway.",
+          "{t}%n's tits press and bulge against whatever they're pushed into, soft and heavy and spillin' out the sides."
+        ],
+        watched: ["{t}Folk watchin' keep their eyes on %n's big tits, bouncin' with every jolt, and somebody whistles."]
+      },
+      bigBalls: {
+        any: [
+          "{c}%n's swollen balls hang heavy and swing with every jolt, slappin' against their thighs.",
+          "{c}Somebody hefts %n's huge balls in one palm, weighin' them like fruit at the market, and whistles.",
+          "{c}%n's big balls are tight and full and in the way, and they get squeezed every time somebody reaches past them."
+        ]
+      },
+      bigCock: {
+        any: [
+          "{c}%n's big cock sways heavy and thick, drippin' a long string, and slaps their belly with every jolt.",
+          "{c}Somebody wraps a fist round %n's huge cock and gives it one long slow pull, just to feel the size of it."
+        ]
+      },
+      gapedV: {
+        any: ["{v}%n's pussy is well-used and loose, and it opens easy, slick and hungry, like it knows what's comin'."],
+        breed: ["{v}%n's pussy is so used to this by now it opens right up, loose and wet and waitin'."]
+      },
+      gapedB: { any: ["%n's ass is loose and well-used, and it opens far too easy for anythin' that presses on it."] },
+      // their kind
+      sp_cow: {
+        any: [
+          "%n lows, long and deep and helpless, a cow's noise from the bottom of the belly, and somewhere in the barn another cow answers.",
+          "%n's cow ears flick and their tufted tail swishes, and they shift their weight from foot to foot like stock in a crush.",
+          "{t}%n's heavy cow tits sway and swing, and somebody reaches for them out of pure farm habit."
+        ],
+        breed: ["%n moos, long and shaky, as they're bred: a sound every farmhand on the place has heard a hundred times, and still grins at."],
+        milk: ["{t}%n moos soft and content as their milk comes down, ears droopin', like a good cow at the end of the day."]
+      },
+      sp_bull: {
+        any: [
+          "%n snorts and stamps, horned head low, all that bull's strength strainin' against bein' handled, and losin'.",
+          "A bellow builds in %n's big chest and comes out as a whine, and they go red right up to the horns for it."
+        ],
+        breed: ["A bull bein' bred is a rare sight on any farm, and the farmhands make sure %n knows what a crowd they've drawn."]
+      },
+      sp_horse: {
+        any: [
+          "%n whinnies, high and ragged, and their hooves dance and their tail flags up high.",
+          "%n blows hard through their nose and tosses their mane, wild-eyed, and gets a firm hand on the neck to settle them.",
+          "%n's flanks are lathered and shivery and they won't stand still, so they're held still."
+        ],
+        breed: ["%n's tail flags high and to the side all on its own, and they stand square and still for it, the way they were trained to."]
+      },
+      sp_deer: {
+        any: [
+          "%n freezes the way deer do, every muscle locked and quiverin', big ears turnin' at every sound.",
+          "%n's little white tail flicks up, flashin', and their long legs tremble under them."
+        ]
+      },
+      sp_pig: {
+        any: [
+          "%n squeals, loud and piggy and unashamed, and their curly tail twitches, and the farmhands laugh.",
+          "%n grunts and snuffles with every jolt, soft pink piggy noises, and goes pink all over."
+        ],
+        breed: ["%n grunts in time with it, piggy little grunts, and their curly tail wiggles every time they're filled."]
+      },
+      sp_dog: {
+        any: [
+          "%n's tail is waggin' so hard it thumps, and they whine and pant and push their face into every hand that comes near.",
+          "A high, needy whine squeezes out of %n, then a soft woof, and somebody tells them they're a good pup."
+        ],
+        breed: [
+          "%n's tail swings aside all on its own and they push back, pantin', tongue out, the way a good pup does when it's their turn.",
+          "{c}%n's own knot swells fat at the root of their cock while they're bred, with nothin' at all to tie in."
+        ]
+      },
+      sp_cat: {
+        any: [
+          "%n yowls, long and wavering, tail lashin', claws out, and then the purr starts, loud, and won't stop.",
+          "%n's back arches high and their tail goes straight up, the way a cat's does when it's scratched just right."
+        ],
+        breed: ["%n's tail goes up and to the side and they push back with a rumblin' purr, kneadin' at whatever's under their hands."]
+      },
+      sp_goblin: {
+        any: [
+          "%n cackles, breathless and a bit unhinged, long ears floppin', the way goblins do when it's all gone too far to stop.",
+          "%n swears in goblin, colourful and constant, and the farmhands make them say every word again, slower."
+        ]
+      },
+      sp_bunny: {
+        any: [
+          "%n's long ears flop and then shoot straight up, quiverin', and a hind foot starts thumpin' the boards all by itself.",
+          "%n's nose wiggles quick and their fluffy tail twitches, and the farmhands say bunnies were made for this."
+        ],
+        breed: ["Bunnies are made for breedin', the farm says, and %n's body is doin' its level best to prove it, pushin' back eager and quick."]
+      },
+      sp_fox: {
+        any: [
+          "%n yips and gekkers and pants, their big brush of a tail fluffed out twice its size, sly even now.",
+          "%n's tail curls round their leg, tryin' to hide somethin' it can't, and their pointed ears go hot and red."
+        ]
+      },
+      sp_wolf: {
+        any: [
+          "%n throws their head back and a howl climbs out of them, half song and half sob, and it carries over the whole farm.",
+          "%n growls low, then whines, then bares their throat to whoever's handlin' them, the way wolves do to the one in charge."
+        ]
+      },
+      sp_goat: { any: ["%n bleats, loud and wavering, stamps their little hooves and butts their horns at nothin', ornery as ever."] },
+      sp_sheep: { any: ["%n baas, soft and shaky, their fleece damp and curlin' with sweat, huddlin' into it as much as they're let."] },
+      sp_rat: {
+        any: [
+          "%n squeaks and chitters, whiskers quiverin', long pink tail curlin' round anythin' it can reach.",
+          "%n bruxes their little teeth, grindin' them soft, and their round ears go hot and pink."
+        ]
+      },
+      // what they're wearin'
+      g_gag: { any: [
+        "%n tries to say somethin', somethin' important by the sound of it, and the gag turns it into a long, soggy, helpless noise. Everybody nods like they understood.",
+        "Drool's run out round %n's gag and down their chin and onto their chest, and somebody wipes it with a thumb, and wipes the thumb on %n."
+      ] },
+      g_ringGag: {
+        any: [
+          "%n's ring gag holds their mouth wide, and somebody can't resist: two fingers slide in over their tongue and play there while everything else goes on.",
+          "With their mouth held open by the ring, every moan %n makes comes out loud and wet, and there's nothin' they can do about how it sounds."
+        ],
+        breed: ["%n's ring-gagged mouth is too invitin' to leave empty, and somebody fills it while somebody else fills the rest of them."]
+      },
+      g_blind: { any: ["Blindfolded, %n can't see what's comin' next, only feel it, and every touch lands like a surprise."] },
+      g_hood: { any: ["Inside their hood %n can hear only their own hot breath and the muffled world outside, and every touch comes out of nowhere."] },
+      g_leash: { any: [
+        "Somebody takes up %n's leash and wraps it round their fist, short, and every tug brings %n's head right where they want it.",
+        "%n's leash is looped over a post and pulled tight, and they're not goin' anywhere till somebody unhooks it."
+      ] },
+      g_bell: { any: [
+        "%n's bell rings with every jolt, bright and steady, and folk at the far end of the barn turn to look, because they know what that ringin' means.",
+        "Ting, ting, ting: %n tries to hold still to stop their bell, and can't, and everybody can count."
+      ] },
+      g_noseRing: { any: ["Somebody hooks a finger through %n's nose ring and steers them by it, gentle and firm, and %n's eyes water and they go wherever they're led."] },
+      g_latex: { any: ["%n's latex is slick with sweat underneath and shinin' wet on top, and every hand that touches it slides and squeaks."] },
+      g_naked: { any: ["Not a stitch on %n, and every inch of them is out for anybody who cares to look, and a lot of folk care to look."] },
+      g_dressed: { any: ["%n's clothes are rucked up and pulled aside and hangin' off them, just far enough out of the way, and somehow that's worse than bein' bare."] },
+      g_hooves: { any: ["%n's hooves skid and clatter and can't find a grip, and every time they slip, somebody catches them by the hips."] },
+      g_harness: { any: ["Somebody takes hold of %n's harness by the back strap like a handle and steers them right where they're wanted."] },
+      g_cage: { any: [
+        "{c}%n's cock strains in its cage, swollen tight against the bars, and drips, because drippin' is all it's allowed.",
+        "{c}Somebody taps %n's cage with a fingernail, tink, tink, and %n's whole body jerks."
+      ] },
+      g_chastity: { any: [
+        "%n grinds against their chastity belt, desperate, and the locked steel doesn't care in the least.",
+        "{v}%n's juices leak out round the edge of their locked belt and run down their thighs, and still they can't touch."
+      ] },
+      g_plugBack: { any: ["Somebody gives the base of %n's plug a slow twist, just to hear them gasp, and then another."] },
+      g_plugFront: { any: ["{v}The toy already in %n's pussy grinds and shifts with every jolt, and they clench round it helplessly."] },
+      g_tail: { any: ["Somebody grabs %n's tail near the root and holds on, and %n yelps and pushes back into the grip."] },
+      g_collar: { any: ["Somebody hooks two fingers through %n's collar and holds them by it, close, and looks them right in the eye."] }
+    };
+    const STATE_TAIL = {
+      pregEarly: [
+        "The little curve low on %n's belly gets another pat.",
+        "%n's belly is only just showin', and every hand that passes finds it.",
+        "Carryin' early has %n tender all over, and it shows.",
+        "{t}%n's tits ache, full and sore with the litter startin' in them."
+      ],
+      pregShow: [
+        "%n's round belly rocks with every jolt.",
+        "Somethin' kicks inside %n, and they gasp.",
+        "%n's pregnant belly sways heavy under them.",
+        "Somebody rubs %n's round belly on the way past, like you'd pat a good cow.",
+        "{t}%n's heavy tits swing over the round of their belly.",
+        "The litter in %n rolls over, slow, and %n's breath catches."
+      ],
+      pregHeavy: [
+        "%n's huge belly sways, so heavy they pant with it.",
+        "The litter in %n kicks at bein' jostled.",
+        "%n's belly is stretched so tight and round it shines.",
+        "%n puffs and sways, due any day, and nobody's bein' gentle about it.",
+        "{t}%n's tits drip on the round of their belly."
+      ],
+      overdue: ["A long cramp rolls through %n's overdue belly, and passes.", "%n's overdue and achin', belly low and huge.", "Every jolt might be the one that starts %n's labour, and they know it."],
+      eggs: [
+        "The eggs in %n click softly together.",
+        "%n's clutch shifts inside them, round and heavy.",
+        "%n can feel every egg they're carryin' when they clench.",
+        "There's a clutch in %n, and it knows when they're bein' jostled."
+      ],
+      eggsMany: ["%n's lumpy, egg-stuffed belly bulges with every breath.", "So many eggs in %n they grind together with every move.", "%n's clutch is so big it shows through their belly."],
+      slosh: [
+        "%n's full belly sloshes.",
+        "Somethin' gurgles inside %n's round belly.",
+        "%n can feel everything they're holdin' roll inside them.",
+        "%n's belly is round and tight and warm with what they've taken.",
+        "Somebody pats %n's full belly and listens to it slosh."
+      ],
+      over: [
+        "It's leakin' out of %n as fast as anythin' goes in.",
+        "%n's belly is tight as a drum, and still it goes on.",
+        "Every move squelches somethin' out of %n.",
+        "%n's stuffed past full and drippin' with it.",
+        "There's no room left in %n, and nobody's stoppin'."
+      ],
+      heldV: ["{v}%n's pussy drips what's already in it with every jolt.", "{v}A warm trickle from earlier runs out of %n's pussy.", "{v}%n's sloppy pussy squelches."],
+      heldB: ["What's already in %n's ass leaks out down the backs of their thighs.", "%n's ass is still sloppy from earlier, and it shows."],
+      heldM: ["%n can still taste the last load.", "%n's belly is warm with everything they've swallowed today."],
+      milkBurst: [
+        "{t}%n's swollen udders spray with every jolt.",
+        "{t}Milk runs off %n's teats in white streams.",
+        "{t}%n's tits are so full they ache, hard and hot.",
+        "{t}A drip of milk swings from each of %n's nipples.",
+        "{t}Every bounce squeezes milk out of %n's overfull tits.",
+        "{nt}Milk beads and runs from %n's swollen nipples."
+      ],
+      milkFull: ["{t}%n's full tits leak a little.", "{t}%n's nipples are stiff and beadin' white.", "{t}%n's tits are warm and heavy with milk."],
+      milkDry: ["{t}%n's milked-out nipples are sore and puffy.", "{t}%n's empty udders twitch and ache.", "{t}Drained flat, %n's teats are tender to the air."],
+      ballsHeavy: [
+        "{c}%n's full balls throb.",
+        "{c}%n's heavy balls ache with what they're holdin'.",
+        "{c}%n's cock leaks a thread from balls fit to burst.",
+        "{c}%n's balls are drawn up tight and full."
+      ],
+      ballsDry: ["{c}%n's drained cock twitches with nothin' left to give.", "{c}%n's empty balls ache anyway."],
+      heat: [
+        "%n's in heat, and every touch lands like a match on dry straw.",
+        "%n whines, heat-sick and needy.",
+        "%n pushes back into it without meanin' to: heat does that.",
+        "The heat on %n is so strong anybody near can smell it.",
+        "{v}%n's heat-swollen pussy drips.",
+        "{c}Heat has %n's cock stiff and leakin'.",
+        "%n's skin is flushed hot with heat, all over.",
+        "%n's hips rock on their own, the way heat makes them."
+      ],
+      denied: [
+        "%n's not allowed to cum, and their body keeps tryin' anyway.",
+        "%n shakes, denied and climbin'.",
+        "%n's so wound up from bein' denied they're tremblin'.",
+        "Every bit of it builds in %n, and none of it's allowed to go anywhere."
+      ],
+      edge: ["%n's right on the edge, shakin'.", "%n's breath catches, close, so close.", "%n is one touch away, and everybody can tell.", "%n's toes curl hard."],
+      messy: ["%n's still sticky from earlier.", "Old mess cracks on %n's skin as they move.", "%n's already-mucky skin gets muckier.", "Fresh mess runs over the old on %n."],
+      parasite: [
+        "The parasite on %n throbs, tastin' it all.",
+        "%n's parasite squeezes, greedy.",
+        "The thing on %n pulses, and pumps them a little somethin' sweet.",
+        "%n's parasite shivers, wantin'."
+      ],
+      sym_latex: ["%n's livin' latex ripples, drinkin' in every shiver.", "%n's second skin squeezes, pleased.", "The latex on %n creaks and clings."],
+      sym_moss: ["{t}The moss on %n's chest dampens and hums.", "%n's moss fluffs up, sweet-smellin'."],
+      sym_nestling: ["The nestling in %n's belly stirs, interested.", "Low in %n, the nestling turns over, warm."],
+      suit: ["The livin' suit on %n tightens, pleased.", "%n's livin' suit kneads them slow.", "The suit on %n hums, feedin' on it."],
+      hugeTits: [
+        "{t}%n's enormous tits slap together.",
+        "{t}%n's tits are so big they're in the way of everything.",
+        "{t}%n's huge tits spill everywhere.",
+        "{t}It takes two hands to lift one of %n's tits out of the way."
+      ],
+      bigTits: [
+        "{t}%n's big tits bounce.",
+        "{t}%n's heavy tits sway and swing.",
+        "{t}A hand squeezes one of %n's big tits on the way past.",
+        "{t}%n's tits press and bulge against whatever's under them."
+      ],
+      bigBalls: ["{c}%n's swollen balls swing heavy.", "{c}%n's big balls slap their thighs.", "{c}Somebody hefts %n's heavy sack, impressed."],
+      bigCock: ["{c}%n's big cock slaps their belly.", "{c}%n's huge cock bobs and drips.", "{c}%n's heavy cock sways, leakin' a long string."],
+      gapedV: ["{v}%n's loose pussy gapes, slick and hungry.", "{v}%n's well-used pussy opens far too easy."],
+      gapedB: ["%n's loose ass doesn't close all the way any more.", "%n's well-used ass gapes, wet."],
+      // their kind: ears, tails, hooves, coats and the noises
+      sp_cow: [
+        "%n's soft cow ears flick, and a low moo slips out of them before they can swallow it.",
+        "%n's tufted tail swishes, slaps their own thigh, and swishes again.",
+        "{t}%n's heavy cow tits sway with it, the way a good milker's should.",
+        "A long, low moo rolls out of %n, and the barn seems to answer it.",
+        "%n's ears droop and their big eyes go soft and glassy, the dumb, happy look of a cow at the trough.",
+        "%n's tail lifts and holds, the tuft curled, without them ever decidin' to lift it.",
+        "%n lows, long and shaky, a proper cow's noise, and goes pink to the tips of their ears for it.",
+        "%n's little horns knock against whatever's in front of them, and they don't even notice.",
+        "{t}A bead of milk swells at one of %n's teats and drops.",
+        "%n stamps a foot like a cow bothered by flies, and their tail lashes."
+      ],
+      sp_bull: [
+        "%n snorts through their nose like a bull in a chute, hot and loud.",
+        "%n's horns swing low and their thick neck goes taut, all that strength with nowhere to go.",
+        "A deep bellow builds in %n's chest and comes out as a whimper, which is worse.",
+        "%n's tufted tail lashes like a bull's tormented by flies.",
+        "{c}%n's heavy bull balls swing with it, full and low.",
+        "%n's nostrils flare, breath comin' in hard snorts.",
+        "All that brawn, and %n's still bein' handled like a calf at the sale.",
+        "%n tosses their horned head, and it does no good at all."
+      ],
+      sp_horse: [
+        "%n's ears pin flat and a high, rattlin' whinny carries right across the yard.",
+        "%n's long tail swishes and lifts, flaggin' high the way it does when they're worked up.",
+        "%n blows hard through their nose, lips flutterin', a big shaky horse's sigh.",
+        "%n's hooves skitter and stamp, and they can't keep them still.",
+        "%n tosses their mane and dances sideways as far as they're let, which isn't far.",
+        "A long, low nicker comes out of %n, needy and embarrassed.",
+        "%n's flanks shiver and twitch the way a horse's do under a fly, except it isn't flies.",
+        "%n champs at nothin', jaw workin', like there ought to be a bit there.",
+        "{f}A soft, wanton whinny, and %n's tail lifts high and to the side like a mare in season."
+      ],
+      sp_deer: [
+        "%n's big ears swivel at every sound, wide-eyed, like a deer caught in the lantern light.",
+        "%n's little white tail flicks up, flashin' pale, the way a deer's does when it's spooked.",
+        "%n's long legs tremble, all knees, like a deer on ice.",
+        "A thin, breathy bleat escapes %n, the startled little noise deer make.",
+        "%n goes stock-still the way deer do, every muscle quiverin'.",
+        "%n's soft dappled hide prickles up in shivers wherever they're touched.",
+        "%n's dark eyes go huge and wet, and their nose twitches, testin' the air.",
+        "%n's ears flick flat back against their head, and their nose twitches."
+      ],
+      sp_pig: [
+        "%n squeals, high and loud, a proper piggy squeal that sets everybody grinnin'.",
+        "%n's little curly tail wiggles, and every time it does somebody laughs.",
+        "%n grunts with every jolt, soft piggy grunts they can't hold back.",
+        "%n's pink skin flushes darker from their snout right down to their thighs.",
+        "%n snuffles and oinks into the straw, and goes red to the ears for it.",
+        "%n's floppy pink ears flap with every jolt.",
+        "%n's snout wrinkles, wet and pink, snufflin' at everything.",
+        "{t}%n's soft round belly and full tits wobble with every jolt."
+      ],
+      sp_dog: [
+        "%n's tail is waggin', thumpin' against their own legs, and they can't make it stop.",
+        "A high, needy whine squeezes out of %n, and then another.",
+        "%n's ears go flat and then pop up again, like they can't decide.",
+        "%n pants with their tongue out, hot and wet, like a dog left out in the sun.",
+        'A soft little woof gets out of %n before they can stop it, and somebody says "good pup."',
+        "%n's hips wiggle with their tail, all of it goin' at once.",
+        "%n whimpers and nuzzles at whatever's nearest, beggin' with their whole face.",
+        "{c}%n's knot swells at the root of their cock, fat and dark, with nowhere to go.",
+        "%n's tail drags itself aside on its own, out of the way."
+      ],
+      sp_cat: [
+        "%n's tail lashes, fur all fluffed up, and their ears flatten back.",
+        "A loud, rumblin' purr starts up in %n's chest, and they hate how loud it is.",
+        "%n yowls, long and wavering, a proper alley-cat yowl that carries across the farm.",
+        "%n's claws come out and dig into whatever's under them.",
+        "%n's back arches high, tail straight up.",
+        "%n's whiskers twitch and their pupils have gone huge and black.",
+        "%n kneads at nothin' with their fingers, slow, the way a happy cat does.",
+        "A hiss, then a mewl, then a purr, all in a row, and %n doesn't know which they meant."
+      ],
+      sp_goblin: [
+        "%n's long pointed ears droop right down, then twitch, then droop.",
+        "A sharp goblin cackle gets out of %n in spite of everything, wild and breathless.",
+        "%n bares their little fangs and swears in goblin, which the farmhands find very funny.",
+        "%n's skin flushes darker, blotchy and hot.",
+        "%n's long ears flap with every jolt.",
+        "%n grins, wide and toothy and a bit unhinged.",
+        "%n's clawed little feet curl and uncurl in the straw.",
+        "%n chatters somethin' rude in goblin under their breath."
+      ],
+      sp_bunny: [
+        "%n's long ears flop down over their face, then shoot up straight, quiverin'.",
+        "%n's fluffy little tail twitches, fast as a heartbeat.",
+        "%n's nose wiggles, quick quick quick, and their whole face is pink.",
+        "A hind foot starts thumpin' all by itself, thump thump thump, and %n can't stop it.",
+        "%n squeaks, a tiny rabbit's squeak, high and helpless.",
+        "%n's ears lie flat down their back, and they freeze, every bit of them tremblin'.",
+        "%n's whiskers twitch and they nibble at their own lip.",
+        "Bunnies are made for this, the farmhands say, and %n's body seems to agree."
+      ],
+      sp_fox: [
+        "%n's big brush of a tail sweeps from side to side, fluffed out twice its size.",
+        "A sharp little yip escapes %n, then a whine, then a breathless foxy cackle.",
+        "%n's pointed ears swivel at every sound, sly even now.",
+        "%n's narrow muzzle drops open and they pant, tongue lollin'.",
+        "%n's tail curls round their own leg, tryin' to hide somethin' it can't.",
+        "%n gekkers, that chatterin' fox noise, and goes red under their fur.",
+        "%n's fur stands on end in a ripple from nape to tail.",
+        "{c}%n's knot swells at the root of their cock, and there's nothin' for it to catch in."
+      ],
+      sp_wolf: [
+        "%n throws their head back and a low howl climbs out of them, half song and half sob.",
+        "A deep growl rolls in %n's chest, then breaks into a whine.",
+        "%n's thick tail lashes, then tucks, then lashes again.",
+        "%n's ears go flat and their lips peel back from their teeth, and they still don't stop pushin' back.",
+        "%n's ruff bristles in a long ridge down their spine.",
+        "%n bares their throat without meanin' to, the way a wolf does to the one in charge.",
+        "{c}%n's knot swells thick at the root of their cock, achin' to tie with somethin'.",
+        "A whine, a yip, and then %n's pantin' hard, tongue out, eyes half-shut."
+      ],
+      sp_goat: [
+        "%n bleats, loud and wavering, a proper goat's noise, and it echoes off the barn.",
+        "%n's little horns knock the boards and they butt at nothin', stubborn even now.",
+        "%n's short tail flicks up and down, quick as a whip.",
+        "%n's slotted eyes have gone wide and glassy.",
+        "%n's hooves skitter and click and won't stay put.",
+        "%n stamps and bleats, ornery and flustered.",
+        "{t}%n's full goat's udder sways heavy under them, teats stiff.",
+        "A gruff little bleat, then a softer one, and %n's ears droop sideways."
+      ],
+      sp_sheep: [
+        "%n baas, soft and shaky.",
+        "%n's thick fleece is damp through with sweat and clings in curls.",
+        "%n's fluffy ears flick and droop, and their little tail wags, nervous.",
+        "%n's wool's all tangled with straw now, and nobody's goin' to comb it out for them.",
+        "A long, wobbly baa comes out of %n, and they go pink under their fleece.",
+        "%n's hooves shuffle close together in the straw, a sheep that wants its flock.",
+        "%n's soft woolly hair is pushed every which way, and it'll never lie flat again."
+      ],
+      sp_rat: [
+        "%n squeaks, high and breathless, a ratty little squeal.",
+        "%n's long pink tail curls and uncurls and wraps round anythin' it can reach.",
+        "%n's whiskers quiver and their round ears go hot and pink.",
+        "%n's buck teeth catch their lip and they chitter, quick and nervous.",
+        "A ratslut's what the farm calls %n, and right now they're earnin' it.",
+        "%n's nose twitches nonstop, sniffin' at everything.",
+        "%n's little clawed fingers grab and scrabble at whatever's near.",
+        "%n bruxes their teeth, grindin' them soft, the way a happy rat does."
+      ],
+      // what they're wearin'
+      g_gag: [
+        "Whatever %n wants to say comes out round the gag as a soggy, muffled noise.",
+        "Drool runs out round %n's gag and strings down their chin.",
+        "%n moans into their gag, and the gag keeps every word of it.",
+        "%n's gag is soaked through, and every breath whistles through their nose.",
+        "%n tries to beg, and the gag turns it into a wet, wordless mumble.",
+        "A thread of spit swings from %n's gagged mouth with every jolt.",
+        "%n bites down hard on their gag."
+      ],
+      g_ringGag: [
+        "%n drools helplessly through their ring gag.",
+        "%n's ring gag holds their mouth open and ready, and everybody walkin' past notices.",
+        "Every moan comes out of %n's held-open mouth loud and wet and shameless.",
+        "Somebody pokes two fingers through %n's ring gag just to feel their tongue squirm.",
+        "%n's tongue lolls in the ring, and they can't tuck it back in."
+      ],
+      g_blind: [
+        "Blindfolded, %n flinches at every touch.",
+        "%n turns their head toward every sound, blind, guessin', and guessin' wrong.",
+        "Behind the blindfold every touch lands like a surprise.",
+        "%n can't see who's watchin'. They can hear plenty."
+      ],
+      g_hood: [
+        "Inside the hood, %n's breath is hot and loud.",
+        "The hood hides %n's face, so all anybody sees is the body squirmin' under it.",
+        "%n's hooded head turns blindly toward every touch.",
+        "The hood muffles every sound %n makes into a soft whimper.",
+        "Sweat runs inside %n's hood, and there's no wipin' it."
+      ],
+      g_collar: [
+        "%n's collar gets a tug now and then, just to remind them it's there.",
+        "Somebody hooks a finger through %n's collar ring and holds them by it.",
+        "%n swallows, and feels their collar move with it.",
+        "A hand on the back of %n's collar keeps their head right where it's wanted."
+      ],
+      g_leash: [
+        "Somebody's holdin' %n's leash, short, and every tug brings them closer.",
+        "%n's leash is wrapped twice round a fist and pulled tight.",
+        "The leash on %n hangs slack, and then it doesn't.",
+        "%n is led a step this way, a step that way, by their leash, like stock at the fair.",
+        "%n's leash is looped over a post, and they're not goin' anywhere."
+      ],
+      g_bell: [
+        "%n's bell rings with every jolt, and the whole yard can count them.",
+        "Ting, ting, ting: %n's bell gives away every single shove.",
+        "%n tries to hold still so the bell will stop, and it never does.",
+        "Folk at the far end of the barn can hear %n's bell, and they know what that ringin' means.",
+        "Somebody flicks %n's bell just to make it ring, and laughs."
+      ],
+      g_arms: [
+        "With their arms bound, %n can't push anythin' away, or cover anythin' up.",
+        "%n's tied arms strain, and the bindings creak, and that's all that happens.",
+        "%n's bound wrists flex and clench, useless.",
+        "Arms locked away, %n has to take whatever comes with nothin' but their body.",
+        "%n tugs at their arm bindings out of habit, and they hold, as they always do."
+      ],
+      g_paws: [
+        "%n's mitted paws paddle at nothin', no fingers to grab with.",
+        "Without fingers, %n can only bat at things with their padded paws.",
+        "%n's mitts squeak as they clench them.",
+        "%n's paws scrabble uselessly, and everybody watchin' finds it adorable."
+      ],
+      g_legs: [
+        "%n's bound legs can't kick, can't close, can't do much of anythin'.",
+        "The straps on %n's legs hold them right where they were put.",
+        "%n tries to squeeze their thighs together, and their leg bindings say no.",
+        "With their legs tied, %n wobbles and leans on whatever's holdin' them up."
+      ],
+      g_nipples: [
+        "Whatever's on %n's nipples tugs with every jolt, sweet and sharp.",
+        "Somebody flicks %n's nipple, jewellery and all, and %n jolts like they've been stung.",
+        "%n's nipples have gone dark and throbbin' under what's on them.",
+        "The little bits of metal on %n's nipples catch the light and swing."
+      ],
+      g_breastGear: [
+        "{t}Whatever's locked over %n's tits keeps them squeezed and out of reach, even their own.",
+        "%n's chest is caged, and every jolt presses the metal to their nipples.",
+        "Nobody can get at %n's chest through what's locked on it, which only makes them try."
+      ],
+      g_chastity: [
+        "{v}%n's chastity belt keeps their pussy locked away, so all that need has nowhere to go.",
+        "%n humps at nothin' against their belt, and the steel doesn't care.",
+        "The belt on %n is locked, and everybody knows who's got the key.",
+        "{v}%n's juices leak out round the edge of their belt and trickle down their thighs.",
+        "Chastity steel and a needy body: %n's hips keep rockin' against it anyway."
+      ],
+      g_cage: [
+        "{c}%n's cock strains in its cage and gets nowhere, swollen tight against the bars.",
+        "{c}A slow drip falls from the tip of %n's caged cock, all it's allowed to do.",
+        "{c}%n's cage is too small for how hard they want to be, and it aches.",
+        "{c}Somebody taps %n's cage with a fingernail, and %n whimpers.",
+        "{c}Locked up and leakin': %n's caged cock dribbles every time they're pushed."
+      ],
+      g_plugFront: [
+        "{v}The plug in %n's pussy shifts with every jolt and presses right where it counts.",
+        "{v}%n's already stuffed in front, and it makes everything else feel tighter.",
+        "{v}Whatever's seated in %n's pussy grinds against them every time they move.",
+        "{v}%n clenches round the toy in their pussy without meanin' to."
+      ],
+      g_plugBack: [
+        "The plug in %n's ass shifts and nudges with every jolt.",
+        "%n's plug is pushed deeper every time they're bumped from behind.",
+        "%n can feel their plug every time they clench, and they're clenchin' a lot.",
+        "Somebody gives the base of %n's plug a little twist, just to hear them gasp."
+      ],
+      g_harness: [
+        "%n's harness creaks, and somebody uses the straps like handles.",
+        "A hand closes round the back strap of %n's harness and hauls them into place.",
+        "%n's harness pulls tight, the straps bitin' soft lines into their skin.",
+        "The rings on %n's harness clink every time they're moved."
+      ],
+      g_noseRing: [
+        "Somebody hooks a finger through %n's nose ring and steers them by it, and %n goes where they're steered.",
+        "%n's nose ring catches the light, and a little tug on it makes their eyes water.",
+        "A nose ring's for leadin' stock, and %n's bein' led.",
+        "%n snorts round their nose ring, and it jingles."
+      ],
+      g_ears: [
+        "%n's ears flatten and perk with every touch, as twitchy as the real thing.",
+        "Somebody scratches %n behind the ears, and their whole body leans into it.",
+        "%n's ears droop right down, and everybody can see exactly how they're feelin'."
+      ],
+      g_tail: [
+        "%n's tail curls and lashes and gives every feelin' away.",
+        "Somebody grabs %n by the tail and holds on.",
+        "%n's tail lifts high, out of the way, all on its own.",
+        "A tug on %n's tail, and they yelp and push back into it.",
+        "%n's tail wags, then tucks, then wags again, like it can't make its mind up."
+      ],
+      g_hooves: [
+        "%n's hooves skid and clatter on the boards.",
+        "Every time %n stamps, their hooves ring out like a pony's in a stall.",
+        "%n's hooves can't find any grip, and they slide and splay.",
+        "Stood in hooves, %n can't brace, can't balance, can only take it."
+      ],
+      g_heels: [
+        "%n wobbles on their heels, ankles shakin', and somebody steadies them by the hips.",
+        "%n's heels click and slip, and every wobble pushes them back onto it.",
+        "Up on their toes in those heels, %n's ass is high and on show.",
+        "%n's calves tremble in their heels, and nobody's goin' to let them take them off."
+      ],
+      g_latex: [
+        "%n's latex squeaks with every move, slick with sweat underneath.",
+        "%n's rubber shines wet, and every hand that touches it slides.",
+        "%n's latex creaks and clings and shows off every shiver.",
+        "Sweat pools under %n's latex and squelches when they squirm.",
+        "Somebody runs a palm down %n's shiny rubber flank just to hear it squeak."
+      ],
+      g_naked: [
+        "There's not a stitch on %n, and every inch of them is out for the farm to see.",
+        "Bare as the day they came to the farm, %n's got nothin' to hide behind.",
+        "%n's bare skin is goose-pimpled and flushed, and every bit of it's on show.",
+        "Naked as they are, %n can't hide one single twitch.",
+        "Without a stitch on, every wet, shamin' detail of %n is there for anybody walkin' by."
+      ],
+      g_dressed: [
+        "%n's clothes are pushed aside, hiked up and pulled down, just enough.",
+        "Somebody's undone %n's clothes just far enough, and left the rest to rumple.",
+        "%n's clothes are twisted and rucked up and damp through.",
+        "Every button on %n that could be undone has been."
+      ]
+    };
+    const STATE_KINDS = {
+      sp_cow: {
+        any: [
+          "%n's big soft eyes go glassy and a moo comes out of them so long and low it ends in a shiver, and a farmhand pats their flank the way you'd pat any good cow.",
+          "%n shifts their weight and their whole heavy body sways with it, a cow that knows it's in the barn and knows full well what the barn is for."
+        ],
+        breed: [
+          "%n plants their feet wide like a cow in the breedin' crate and lows through every stroke, ears flat, tail held off to the side for whoever's behind them.",
+          "{v}%n's cow tail lifts and stays lifted, tuft curled, and their pussy's left right there on show while they're bred, the way a heifer in season stands for it."
+        ],
+        held: [
+          "%n tugs once at %w and then gives up and just stands there chewin' at nothin', placid as a cow in the stanchion, which is somehow worse.",
+          "Held in %w, %n lows soft and steady, a patient cow's noise, waitin' to be seen to."
+        ],
+        milk: ["{t}%n's cow udders swing heavy and full, teats long and stiff, and they moo low and grateful every time a hand closes round one."],
+        mess: ["%n stands there drippin' and lowin', tail swishin' it all over their own thighs, a messy cow that's made itself a messier one."],
+        tease: ["Every brush of a hand along %n's flank gets a low, wantin' moo, and the farmhands start doin' it just to hear it."],
+        watched: ["A crowd leans on the rails to look %n over like a cow at the county fair, and somebody says they'd give a blue ribbon for those flanks alone."]
+      },
+      sp_bull: {
+        any: [
+          "%n paws at the ground with one foot, horns low, a big bull workin' itself up with nowhere at all to put it.",
+          "%n's thick neck strains till the veins stand out, and for a second it looks like they might break loose. They don't."
+        ],
+        breed: [
+          "%n bellows as they're bred, deep and ragged, every ounce of all that bull's strength pinned down and spent on takin' it.",
+          "{c}%n's heavy bull cock swings and drips while they're bred, a stud used like a heifer, and the crowd loves every second of it."
+        ],
+        held: [
+          "%n leans their whole weight into %w the way a bull leans on a gate, snortin', and %w doesn't so much as creak.",
+          "Held in %w, %n stands with their horned head low and their sides heavin', a bull in the chute waitin' on the vet."
+        ],
+        milk: ["{c}%n gets milked like a prize bull at the stud barn, steady and practical, and bellows when the first thick rope of it hits the jar."],
+        mess: ["%n's thick hide is streaked and drippin' and they snort and shake their head like a bull shakin' off flies, which only spatters it wider."],
+        tease: ["A hand slides over %n's big shoulders and they shiver all over like a bull bein' gentled, a snort meltin' into a whine."],
+        watched: ["Farmhands stand round %n sizin' them up like a bull at auction, talkin' breadth and weight and what they'd pay, right there in front of them."]
+      },
+      sp_horse: {
+        any: [
+          "%n's nostrils flare wide and red and they snort, a big ragged noise, every long muscle in them standin' out under the sweat.",
+          "%n's mane sticks to their sweaty neck, and they toss it, and it sticks again."
+        ],
+        breed: [
+          "%n's tail lifts high and off to the side, flagged the way horses flag in season, and they plant their hooves and take it with a long, shiverin' whinny.",
+          "{c}%n's big horse cock hangs heavy and swings with every stroke while they're bred, flarin' at the tip and drippin' into the straw."
+        ],
+        held: [
+          "%n dances in %w as far as it lets them, hooves clatterin', and a farmhand holds their halter and says easy, easy, easy.",
+          "Held in %w, %n stands hipshot and shiverin', ears swivellin', a horse tied at the rail waitin' its turn."
+        ],
+        milk: ["{t}%n gets milked like a mare at the dairy, and they stamp and whicker and swish their tail the whole time."],
+        mess: ["%n's glossy coat is lathered and streaked, mane in clumps, and they shake their whole body like a wet horse, which spreads it everywhere."],
+        tease: ["Someone strokes the long line of %n's neck the way you'd settle a nervous horse, and it settles nothin'. It only makes them nicker."],
+        watched: ["The crowd watches %n the way folks watch a show horse, and somebody calls out that they've got good legs on 'em, and everybody laughs."]
+      },
+      sp_deer: {
+        any: [
+          "%n's long throat works and a soft bleat comes out of them, and their ears flick back and forth, back and forth.",
+          "%n's dappled sides heave, fast and shallow, the way a deer breathes when it's cornered."
+        ],
+        breed: [
+          "%n's little tail flicks up and stays up, flashin' white, and they tremble from ears to hooves while they're bred, too startled to do anythin' but take it.",
+          "%n's slender legs shake so hard somebody has to hold them steady, and they bleat soft with every stroke."
+        ],
+        held: [
+          "Held in %w, %n is all wide dark eyes and twitchin' ears, holdin' so still they hardly breathe, like stillness might make them invisible. It doesn't.",
+          "%n strains once against %w, light and quick as a deer, and then freezes again, tremblin'."
+        ],
+        milk: ["{t}%n's milked slow and gentle like a doe, and their big ears droop and their eyes go soft and heavy."],
+        mess: ["%n's soft dappled coat is spattered and drippin', and they shake their head, ears flappin', lookin' so surprised about it."],
+        tease: ["Every touch on %n makes their skin shiver and twitch in a ripple, the way a deer's flank does under a fly."],
+        watched: ["With every eye on them, %n's ears swivel to every voice at once and they look ready to bolt, if only they could."]
+      },
+      sp_pig: {
+        any: [
+          "%n roots their snout into whatever's in front of them and grunts, deep and contented and filthy.",
+          "%n's round pink rump wiggles and their little curly tail spins like a corkscrew."
+        ],
+        breed: [
+          "%n grunts and squeals and shoves back like a sow in season, shameless about it, curly tail twitchin' with every stroke.",
+          "{v}%n's pink pussy gets stuffed and they squeal, high and long, a proper piggy squeal, and the farmhands cheer."
+        ],
+        held: [
+          "%n wriggles in %w and grunts and oinks about it, a pig that won't be quiet, and gets a slap on the rump for it.",
+          "Held in %w, %n snuffles at the straw and grunts low and steady, like a pig waitin' at the trough."
+        ],
+        milk: ["{t}%n's soft pink tits get milked and they grunt with every pull, snout wrinkled, eyes rolled up."],
+        mess: ["%n's in their element, honestly: pink and messy and gruntin', rolled in it like a happy pig in mud."],
+        tease: ["Someone scratches %n just behind the ears and they go boneless, gruntin', the way a pig does when it's scratched just right."],
+        watched: ["Folks gather round to look at %n like the prize sow at the fair, and somebody asks what they weigh."]
+      },
+      sp_dog: {
+        any: [
+          "%n's whole back end wags with their tail, and they whine up at whoever's nearest, eyes huge and beggin'.",
+          "%n's ears perk at every voice, hopin' every single one of them is about to say good pup."
+        ],
+        breed: [
+          "%n drops their chest low and pushes their rump up high like a bitch in heat, tail swung aside, pantin' and whinin' for more.",
+          "{c}%n's own knot swells and throbs, untied, at the root of their cock while they're bred, and every stroke makes it twitch and drip."
+        ],
+        held: [
+          "Held in %w, %n whines and paws at it and then lies down with their chin on their paws, a good pup waitin' to be let out.",
+          "%n's tail thumps against %w, slow and hopeful, every time somebody walks past."
+        ],
+        milk: ["{t}%n's milked on all fours, tongue out, tail thumpin' the boards, and they whimper every time the pull gets strong."],
+        mess: ["%n's soaked and drippin', and they shake like a wet dog, ears floppin', and spray it over everybody standin' near."],
+        tease: ["Somebody rubs %n's belly and one leg starts kickin' all on its own, and they whine, mortified and delighted."],
+        watched: ["%n shows off without meanin' to, ears up, tail high, pantin', the way a dog does when everybody's lookin' at it."]
+      },
+      sp_cat: {
+        any: [
+          "%n's tail twitches at the tip, slow and dangerous, and then their whole body melts into a stretch they never meant to do.",
+          "%n's ears swivel flat and they hiss, and then purr, and then hiss again, furious that they're purrin'."
+        ],
+        breed: [
+          "%n yowls like an alley cat in season, back dipped, tail straight up and off to the side, claws rakin' whatever's under them.",
+          "%n's purr gets louder with every stroke, a rumble they can't hide, and their hands knead and knead."
+        ],
+        held: [
+          "Held in %w, %n sulks with their ears flat and their tail lashin', a cat that's been put in a carrier and will never forgive it.",
+          "%n tests every inch of %w with patient claws, like a cat lookin' for the gap in a fence. There isn't one."
+        ],
+        milk: ["{t}%n gets milked and their purr goes ragged, tail curlin' round the milker's wrist like a cat claimin' them."],
+        mess: ["%n's fur is matted and sticky and they start washin' it with their tongue on pure instinct, which helps nobody."],
+        tease: ["A hand strokes down %n's spine to the base of their tail and their rump lifts right up into it, the way a cat's does."],
+        watched: ["%n pretends not to care that everybody's watchin', the way cats do, tail flickin', and fails completely."]
+      },
+      sp_goblin: {
+        any: [
+          "%n's long ears go bright red at the tips and they cackle, a high wheezy goblin cackle, like all this is a very good joke.",
+          "%n bares their little fangs and snarls, and then grins, because no goblin can hold a grudge while they're havin' this much fun."
+        ],
+        breed: [
+          "%n cackles and swears and pushes back greedy as a goblin at a feast, ears flappin' with every stroke.",
+          "Goblins breed like rabbits and brag about it after, and %n's braggin' already, between gasps."
+        ],
+        held: [
+          "Held in %w, %n picks at it with clever little claws, mutterin' in goblin, sure they'll have it open any minute. They won't.",
+          "%n kicks at %w and calls it every rude name goblins have, and goblins have a lot."
+        ],
+        milk: ["{t}%n gets milked and goes on cacklin' about it, a goblin who's found a new trick and wants the whole farm to see."],
+        mess: ["%n's covered and drippin' and they lick their fingers clean like a goblin after a stolen pie, completely unrepentant."],
+        tease: ["Somebody tweaks %n's long ear and they shriek and giggle and kick, a goblin that's ticklish all over."],
+        watched: ["%n plays to the crowd the way goblins do, cheekin' the farmhands and grinnin' at the onlookers, showin' off the whole time."]
+      },
+      sp_bunny: {
+        any: [
+          "%n's nose goes quick quick quick and their long ears quiver, and their whole body hums like a plucked string.",
+          "%n's back foot thumps three times, hard, a bunny's alarm, and nobody pays it the least bit of attention."
+        ],
+        breed: [
+          "%n's bred quick and eager, the way bunnies are, pushin' back so fast nobody else has to do any of the work.",
+          "%n's long ears flop and bounce with every stroke and their tail twitches and twitches, and they squeak, high and helpless."
+        ],
+        held: [
+          "Held in %w, %n is so still you'd think they were carved out of stone, except for the nose, which never stops.",
+          "%n freezes flat in %w, ears pressed down their back, every muscle quiverin', a rabbit hidin' in plain sight."
+        ],
+        milk: ["{t}%n gets milked and their nose twitches with every pull, and their ears go floppy and soft."],
+        mess: ["%n's fluffy tail and their soft fur are all clumped and drippin', and they look absolutely mortified about it, ears flat."],
+        tease: ["Somebody strokes %n's long ears from root to tip and they go limp as a rabbit bein' held, breath quick and shallow."],
+        watched: ["%n's ears swivel toward every voice in the crowd and their nose twitches like they can smell every eye on them."]
+      },
+      sp_fox: {
+        any: [
+          "%n grins, sharp and sly, even now, like a fox that's let itself be caught just to see what happens.",
+          "%n's tail swishes slow and low to the ground, and their amber eyes follow everybody."
+        ],
+        breed: [
+          "%n yips and gekkers and pushes back like a fox in season, tail swept aside, that sly grin gone soft and stupid.",
+          "{c}%n's knot swells fat and red at the root of their cock while they're bred, achin' for somethin' to tie in that isn't there."
+        ],
+        held: [
+          "Held in %w, %n works at it with clever hands, quiet and patient, a fox at the henhouse latch. It won't open.",
+          "%n curls up tight in %w with their tail over their nose, pretendin' this was their idea all along."
+        ],
+        milk: ["{t}%n's milked and they pant and yip, tail curlin' round their own leg, embarrassed and lovin' it."],
+        mess: ["%n's lovely brush of a tail is soaked and drippin', and they look at it like it's betrayed them personally."],
+        tease: ["Somebody scratches %n right at the base of the tail and their hips lift and they gekker, helpless."],
+        watched: ["%n can't help showin' off when there's a crowd, tail high, ears up, the vain little fox."]
+      },
+      sp_wolf: {
+        any: [
+          "%n's yellow eyes half-close and a low, rumblin' growl turns into a long whine they can't hold back.",
+          "%n's ears flatten and their hackles lift, all teeth and fur and fight, and then they go soft anyway."
+        ],
+        breed: [
+          "%n howls while they're bred, a long, wild, waverin' howl that carries over the whole farm, and somewhere far off in the woods, somethin' howls back.",
+          "%n's hackles rise and they growl, then whine, then push back hard, the way a wolf does once it's decided who's in charge."
+        ],
+        held: [
+          "Held in %w, %n paces the few inches it allows them, back and forth, a wolf in a cage, eyes never leavin' the gate.",
+          "%n snaps once at %w, teeth clackin', and then lies down with their head on their arms, watchin'."
+        ],
+        milk: ["{t}%n gets milked and growls the whole time, low and constant, and never once tells anybody to stop."],
+        mess: ["%n's thick fur is matted and drippin' and they shake it out, ruff to tail, a wet wolf sprayin' everybody near."],
+        tease: ["Somebody ruffles %n's thick ruff and their growl cracks into a whine and their tail starts, very slightly, to wag."],
+        watched: ["With the crowd watchin', %n stares right back, yellow eyes and bared teeth, and then a whine slips out and ruins it."]
+      },
+      sp_goat: {
+        any: [
+          "%n's yellow slotted eyes go wide and unfocused and they bleat, a long ragged complaint.",
+          "%n chews at nothin', jaw workin', ornery and stubborn even with all of it bein' done to them.",
+          "%n tosses their little horned head and stamps, a goat that's had enough and is gettin' more."
+        ],
+        breed: [
+          "%n bleats with every stroke, loud and indignant, and pushes back all the same, a goat that'll complain and take it anyway.",
+          "{t}%n's full udder swings under them while they're bred, teats leakin' a little with every stroke."
+        ],
+        held: [
+          "Held in %w, %n butts at it with their horns, again and again, stubborn as any goat at any fence.",
+          "%n tries to climb %w, because goats climb everythin', and gets nowhere at all."
+        ],
+        milk: ["{t}%n's milked like a nanny on the stand, quick and practised, and they bleat and chew and stamp the whole way through."],
+        mess: ["%n's shaggy coat is soaked and drippin' and they bleat, outraged, which only makes everybody laugh harder."],
+        tease: ["Somebody scratches %n between the horns and they lean right into it, bleatin' soft, all the fight gone out of them."],
+        watched: ["%n glares at the crowd with those strange slotted eyes, bleatin' at them, and every bleat gets a cheer."]
+      },
+      sp_sheep: {
+        any: [
+          "%n's woolly ears droop and they let out a long, shaky baa, soft and lost.",
+          "%n huddles into their own fleece as much as they can, a sheep that wants its flock.",
+          "%n's soft muzzle trembles and their eyes go wide and watery."
+        ],
+        breed: [
+          "%n baas soft and steady while they're bred, fleece bouncin', a docile little sheep that just lets it happen.",
+          "%n's fleece is grabbed in two big handfuls to hold them still, and they bleat, shaky and sweet, every time."
+        ],
+        held: [
+          "Held in %w, %n stands meek and quiet, a sheep in the pen waitin' to be sheared, and every so often lets out a small baa.",
+          "%n shuffles in %w as close to the side as it'll let them, huntin' for somebody to lean on."
+        ],
+        milk: ["{t}%n's milked like a ewe on the stand, and they baa softly with every pull, too gentle to fuss."],
+        mess: ["%n's thick fleece soaks it all up, and now it's clumped and drippin' and heavy, and they'll be wearin' it for hours."],
+        tease: ["Fingers sink deep into %n's warm fleece and scratch, and they lean into it with a long, grateful baa."],
+        watched: ["%n's looked over like a ewe at market, and somebody says they've a lovely fleece on 'em, and they go pink under the wool."]
+      },
+      sp_rat: {
+        any: [
+          "%n's whiskers twitch and their round ears flush bright pink, and they chitter fast under their breath.",
+          "%n's long tail lashes and curls and they squeak, a sharp, startled little noise."
+        ],
+        breed: [
+          "%n squeaks with every stroke, quick and breathless, long tail wound tight round whoever's holdin' them.",
+          "%n's bred and their little clawed hands scrabble at the boards, and they chitter and squeak and push back for more."
+        ],
+        held: [
+          "Held in %w, %n gnaws at it on pure instinct, teeth grindin' at the wood. It doesn't give.",
+          "%n squeezes into the tightest corner %w allows them, whiskers quiverin', like a rat in a wall."
+        ],
+        milk: ["{t}%n gets milked and squeaks with every pull, tail curlin' and uncurlin' round their ankle."],
+        mess: ["%n's fur is sticky and slick and they start cleanin' it with their hands and tongue, quick and fussy, and get nowhere."],
+        tease: ["Somebody strokes along %n's long tail from root to tip and they shiver and squeak and their ears go hot."],
+        watched: ["%n's beady eyes dart round every face in the crowd, nose twitchin', a rat that knows every one of them is lookin'."]
+      }
+    };
+    const STATE_KIND_TAILS = {
+      sp_cow: ["%n chews at nothin', slow and placid, like a cow with its cud.", "%n's big soft eyes blink, slow, and their long lashes are wet."],
+      sp_bull: ["%n lowers their horns like they mean to charge, and doesn't.", "{c}%n's bull cock twitches and drips, heavy as the rest of them.", "%n's breath comes in big hot snorts that steam in the barn air."],
+      sp_horse: ["%n's lips flutter in a big wet horsey snort.", "%n's mane falls in their eyes and they toss it back, wild."],
+      sp_deer: ["%n's little tail flashes white again, up and down, up and down.", "A soft bleat, then another, and %n's dark eyes shine wet."],
+      sp_pig: ["%n oinks, honest and loud, and doesn't even try to hide it now.", "%n's snout twitches and snuffles, wet and pink and greedy."],
+      sp_dog: ["%n's tongue lolls out the side of their mouth.", "%n's ears perk at their own name, hopeful."],
+      sp_cat: ["%n's tail tip twitches, slow, a cat thinkin' about scratchin' somebody.", "A ragged little mrrp escapes %n."],
+      sp_goblin: ["%n mutters a goblin curse, then giggles at it.", "%n's big eyes glint, wicked and pleased."],
+      sp_bunny: ["%n's whiskers quiver and their ears flick.", "A thump of a hind foot, then another, then another."],
+      sp_fox: ["%n's ears flatten and then pop up, sly again.", "%n's tail curls tight round their hips."],
+      sp_wolf: ["%n's lip curls and a soft growl rumbles out.", "%n's thick tail sweeps low, then lifts."],
+      sp_goat: ["%n's jaw works at nothin', chewin' stubborn.", "A bleat cracks halfway through and ends in a moan."],
+      sp_sheep: ["%n bleats, small and shaky, and huddles into their wool.", "%n's woolly tail wags, quick and nervous.", "A long wobbly baa, then a gasp."],
+      sp_rat: ["%n chitters fast under their breath.", "%n's pink nose twitches, wet and quick."]
+    };
+    for (const [k, more] of Object.entries(STATE_KINDS)) for (const [fam, l] of Object.entries(more)) ((STATE_BEAT[k] = STATE_BEAT[k] || {})[fam] = STATE_BEAT[k][fam] || []).push(...l);
+    for (const [k, l] of Object.entries(STATE_KIND_TAILS)) (STATE_TAIL[k] = STATE_TAIL[k] || []).push(...l);
+    if (W.__FARMHAND_TEST__) Object.assign(W, { __stateOf: stateOf, __stateBeat: STATE_BEAT, __stateTail: STATE_TAIL, __stateBeats: stateBeats, __stateTailFor: stateTail });
     const CHATLOG = { live: /* @__PURE__ */ new Map(), who: /* @__PURE__ */ new Map(), lastSave: 0, hourKey: "" };
     const logHour = (t) => {
       const d = new Date(t);
@@ -43209,9 +45206,16 @@ THE PARASITE \xB7 ?parasite on
   mouth for 12 hours. It feeds you serum every half hour
   (fertility, growth, hyper pregnancy, capacity; the growth is
   for keeps) and turns every load you swallow into more.
-  It comes in four strains, blooms over its twelve hours (lips,
-  then teats, then below), gets urges, lays its own eggs at the
-  end, and passes by a kiss or by nursin'.
+  It comes in eight strains (Breeder, Grower, Glutton, Tyrant,
+  Oozer, Weaver, Deep, Gloss), blooms over its twelve hours
+  (lips, teats, below, each strain in its own order), gets
+  urges, lays its own eggs at the end, and passes by a kiss or
+  by nursin'. As it blooms it spreads over you as real clothes
+  with the Companion: a tail, sleeves and stockings; the Oozer
+  and the Gloss grow into a whole second skin, the Weaver spins
+  a silk harness (and cocoons your arms now and then), the Deep
+  wraps you in tentacles. Your limits rule strains out: slime,
+  spider, tentacle, latex.
   ?parasite \xB7 how long is left. Your safeword takes it off.
 
 SYMBIOTES \xB7 ?symbiote on
@@ -43242,6 +45246,11 @@ REAL GEAR
   is put on your character for real, and taken off when its
   time's up. Pull it off early and it goes back. Your safeword
   takes all of it off. The parasite needs no second switch.
+  Some traps dress you head to toe: the rubber kennel zips you
+  into a whole rubber pup (catsuit, pup hood, padded-paw petsuit,
+  collar with a bone tag, leash, and a tail), and the collar and
+  tag stay on half an hour after. Your own collar is never
+  swapped; the leash and tag clip to yours.
 
 CARRYIN' SLOWS YOU DOWN
   A pumped belly, a late litter or a clutch of eggs makes you

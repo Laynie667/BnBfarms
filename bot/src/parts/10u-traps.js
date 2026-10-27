@@ -110,6 +110,7 @@
     state.trapRuns = state.trapRuns || new Map();
     beats = sceneBeats(kind, beats, opts && opts.scene);        // the trap's own two extra beats, before its last (10ue-trap-scenes.js)
     beats = deepenBeats(mn, kind, beats);   // two or three more beats in the middle, from what kind of trap it is (10ud-trap-depth.js)
+    beats = stateBeats(mn, kind, beats);    // and one about the state they're in: carryin', full, in heat, what they wear, their kind (10z4-trap-state.js)
     const run = { kind, i: 0, timer: null, beats: (beats = beats.slice()) };   // (a copy: ?struggle can add to it)
     const before = { pissed: (rec(mn) || {}).pissed || 0, eggs: ((prodOf(mn) || {}).eggs || {}).n || 0, held: heldNow(mn), milk: (prodOf(mn) || {}).milk || 0, heat: inHeat(prodOf(mn)), t: Date.now() };
     try { offerBets(mn, kind); } catch(e){ warn("bets:", e); }   // watchers get a flutter (10y3-trap-ranks.js)
@@ -121,7 +122,7 @@
       if (state.trapRuns.get(mn) !== run) return;
       if (run.i < beats.length && charFor(mn)){
         const b = beats[run.i++];
-        emote(TRAP_KINDS[kind].icon+" "+tFill(pickFor(mn, "trap:"+kind+":"+run.i, Array.isArray(b) ? b : [b]), mn, v)+(intensityTail(mn, run.i, beats.length, kind) || bodyTail(mn, kind, run.i)), mn);
+        emote(TRAP_KINDS[kind].icon+" "+tFill(pickFor(mn, "trap:"+kind+":"+run.i, Array.isArray(b) ? b : [b]), mn, v)+(intensityTail(mn, run.i, beats.length, kind) || bodyTail(mn, kind, run.i) || stateTail(mn, kind, run.i)), mn);
         toysBeat(mn, run.i, beats.length);   // any buzzin' toy they're wearin' follows the scene (10y6-keepers.js)
         run.timer = setTimeout(step, CFG.TRAP_BEAT_S*1000);
         return;

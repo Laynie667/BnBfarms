@@ -21,6 +21,7 @@
   const strainKey = g => (g && STRAINS[g.strain] ? g.strain : "grower");
   // which pieces have grown in by this stage (1, 2 or 3)
   function strainParts(strain, stage){
+    if (STRAIN_MORE[strain]) return STRAIN_MORE[strain].parts(stage);   // the Oozer, the Weaver, the Deep, the Gloss (10v6)
     switch (strain){
       case "breeder": return { stage, lips: true, root: stage >= 2, suckers: stage >= 3 };
       case "glutton": return { stage, lips: true, suckers: true, root: stage >= 3 };
@@ -36,6 +37,7 @@
   // its brew, for the body it's on
   function strainSerums(mn){
     const g = rec(mn).parasite, k = strainKey(g), b = bodyOf(mn);
+    if (STRAIN_MORE[k]) return strainSerumsMore(k, mn, b);
     if (k === "breeder") return b.vulva ? STRAINS.breeder.serums : ["mpreg", "fertility", "egg laying", "capacity", "hyper pregnancy", "ass growth"];
     if (k === "grower"){
       if (b.g === "futa")   return ["cock growth", "udder growth", "balls growth", "ass growth", "capacity", "growth"];
@@ -78,12 +80,14 @@
     if (P.suckers) add("chestbra", "Parasite Suckers", b.tits ? D.suckers : b.g === "male" && D.suckersMale ? D.suckersMale : D.suckersFlat, ["ForbiddenChastityBra"]);   // (Oct 26: the Forbidden Chastity Bra, not milking cups)
     if (P.root) add("belt", g.form === "belt" ? "Parasite Belt" : "Parasite Root", b.vulva ? D.root : D.rootCock);
     if (b.cock && D.cage && P.stage >= D.cage.stage) add("dildo", D.cage.name, D.cage.desc, D.cage.items);
-    if (D.torso && P.stage >= 3) add("torso", D.torso.name, D.torso.desc, ["TentacleSuit"]);
+    if (D.torso && P.stage >= (D.torso.stage || 3)) add("torso", D.torso.name, D.torso.desc, D.torso.items || ["TentacleSuit"]);
+    for (const x of strainSpreadGear(mn, g, P, k, base)) out.push(x);   // tail, sleeves, stockings, skins: what it spreads into (10v6)
     return out;
   }
   // what the host is told when it latches: its strain, for their body
   function strainTell(mn){
     const g = rec(mn).parasite, k = strainKey(g), b = bodyOf(mn);
+    if (STRAIN_MORE[k]) return strainTellMore(k, mn, b);
     const T = {
       breeder: b.vulva ? "It's a BREEDER: it wants you ripe. Fertility, hyper pregnancy, clutches of eggs, over and over, till anything that so much as looks at you leaves you carryin'. It'll root in you at hour four, and it lays in you twice."
                        : "It's a BREEDER, and it doesn't care that you've no womb: it's makin' you one. For as long as it's on you a load in your ass can take, and it means to fill that hole with eggs twice before it goes.",
@@ -102,6 +106,7 @@
   function strainBloomTell(mn, stage){
     const g = rec(mn).parasite, k = strainKey(g), b = bodyOf(mn), late = stage >= 3;
     if (g.form === "belt") return late ? "It's reached your mouth now, sugar. All of it's on you." : "It's climbin', sugar. It has your nipples now.";
+    if (STRAIN_MORE[k]) return strainBloomTellMore(k, mn, b, late);
     const T = {
       breeder: late ? "It has your "+(b.tits ? "teats" : "nipples")+" now, and it's wrapped your belly in a warm sac of itself to hold what it's bred into you. It lays once more before it goes."
                     : (b.vulva ? "It's rooted in you, right up against your womb, keepin' it open and ripe. Half-way through its time it'll start layin' in there." : "It's rooted in your ass, and it's made a place in there to carry. Half-way through its time it'll start fillin' it with eggs."),
@@ -130,6 +135,7 @@
       const got = drainSemen(mn, p.semen * 0.8);
       if (got >= 3){ g.drunk = (g.drunk || 0) + got; emote("👄 "+pmLine("sleeve", mn, { ml: ml(got) }), mn); addBoost(p, "semen", 6*3600000, 1); arouse(mn, 15, 94); saveLedger(); }
     }
+    strainAfterDoseMore(mn, r, g, p, k, P);   // the Oozer's slime, the Deep's brine, the Gloss keepin' them clean (10v6)
   }
   // every heartbeat
   function strainTick(mn, r, now){
@@ -148,6 +154,7 @@
       g.edgeAt = now; arouse(mn, 70, 94);
       privateLine(mn, pmLine("tyrantEdge", mn), "emote"); saveLedger();
     }
+    strainTickMore(mn, r, now, g, p, k, P);   // the Weaver's cocoon, the Gloss squeezin' them up (10v6)
   }
   Object.assign(PARASITE_MORE, {
     bloom_more: ["The parasite on %n shivers and thickens. It's grown again, and it's tightened its hold everywhere it already had one.",

@@ -54,7 +54,7 @@ const moveTo=(mn,X,Y)=>{ chars.find(c=>c.MemberNumber===mn).MapData.Pos={X,Y}; }
   prod(500).eggs=null; P(500).trapQuiet=0; moveTo(500,15,10); moveTo(600,14,10); W.__trapTick();
   // ── different water ──
   cfg.TENTACLE_CHANCE=1; cfg.TENTACLE_HYPER_CHANCE=0;
-  const dip=async(X,Y)=>{ P(500).trapAt=0; P(500).penned=null; P(500).gear=null; P(500).dirt=null; moveTo(500,15,10); W.__trapTick(); moveTo(500,X,Y); n=sent.length; W.__trapTick(); await wait(2600); return to(500,n); };
+  const dip=async(X,Y)=>{ P(500).trapAt=0; P(500).penned=null; P(500).gear=null; P(500).dirt=null; moveTo(500,15,10); W.__trapTick(); moveTo(500,X,Y); n=sent.length; W.__trapTick(); await wait(3400); return to(500,n); };   // (a beat longer since every trap tells the state they're in: 10z4-trap-state.js)
   let got=await dip(50,50); ok(/leeches/.test(got) && (W.__stateFor(500).farmGear||[]).some(g=>/Leeches/.test(g.name)), 'the trough has leeches, and they stay on as real gear');
   got=await dip(60,60); ok(/thing in the well/.test(got) && prod(500).eggs && prod(500).eggs.by===-2, 'the well pulls them down and leaves eggs');
   prod(500).eggs=null; got=await dip(70,70); ok(/slime/.test(got), 'a bath has slime');

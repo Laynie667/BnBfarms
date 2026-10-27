@@ -285,7 +285,7 @@
             const live = L.contracts.filter(x => x.status === "signed" || x.status === "offered" || x.status === "releasing");
             R("📜 FARM CONTRACTS\nReady-made: fun · deep · nhl"+(saved.length ? "\nYours: "+saved.join(" · ") : "")+
               "\n\nIN FORCE OR OFFERED\n"+(live.length ? live.map(contractLine).join("\n") : "  none right now")+
-              "\n\n?contract show <name> [who] · ?contract offer <name> <who> <1h|12h|1d|1w|2w|1m|perm> · ?contract release <who> · ?contract check <who>"+
+              "\n\n?contract show <name> [who] · ?contract offer <name> <who> <12h|1d|1w|2w|1m|perm> · ?contract release <who> · ?contract check <who> · ?renew (who'd like theirs again)"+
               (owner ? "\n?contract new <name> [from fun|deep|nhl] · add · set · remove · title · terms · policy · delete · ?contract rules"+
                        "\nMade for each person when offered: {name} {Species} {species} {pet} in any text, like nickname=\"BnB {Species} {name}\" → BnB Cow Vicky" : ""));
             break;
@@ -1209,6 +1209,7 @@
         try { parasiteOff(sender, "safe"); } catch(e){ warn("safeword parasite:", e); }
         try { symOff(sender, "safe"); } catch(e){ warn("safeword symbiote:", e); }
         try { tempOutfitEnd(sender, "safe"); } catch(e){ warn("safeword outfit wheel:", e); }   // a wheel or Wrong Barn outfit comes off (10un-outfit-wheel.js)
+        try { reinsLet(sender, "safe"); } catch(e){ warn("safeword reins:", e); }   // off anybody's reins (10y9s-reins.js)
         say("🔴 PAUSE CALLED. Everything stops, right now, everybody.", true, sender);   // I go stand by them, so everyone near them hears it
         beep(sender, "I've got you, "+plainName(sender)+". Everything's stopped and I'm fetchin' somebody for you right now. You don't owe anybody an explanation. 🔴", true);
         notifyStaff("🔴 SAFEWORD from "+plainName(sender)+" ("+sender+"). Please go to them now.", false);
@@ -1607,9 +1608,11 @@ Welcome to B&B Farm, hon. 🌾`);
       case "whistle": case "send": case "dose": case "herdtraps": case "sit": case "broody": case "album": case "holes": case "vat": keepersCommand(cmd, sender, args, R); break;   // 10y6-keepers.js
       case "stalldial": case "bringin": case "bedrest": case "callme": case "nevercall": case "intensity": case "keep": case "kept": uddersCommand(cmd, sender, args, R); break;   // 10y7-udders.js
       case "eager": trapCommand("traps", sender, ["eager"].concat(args), R); break;   // the no-cooldown switch, as its own command (and a Toggles switch)
-      case "seasons": case "calendar": seasonCommand(sender, args, R); break;   // (?season is the Breedin' add-on's)   // the farm's seasons (10y9m-seasons.js)
+      case "seasons": case "calendar": seasonCommand(sender, args, R); break;   // the farm's seasons (10y9m-seasons.js; ?season is the Breedin' add-on's)
       case "trickortreat": case "tot": trickOrTreat(sender, args, R); break;   // knockin' on the farm girl's door at Halloween (10y9n-halloween.js)
+      case "stocking": case "stockings": stockingCommand(sender, args, R); break;   // what's in your stockin' on the hearth, in winter (10y9u-winter.js)
       case "rate": rateCommand(sender, args, R); break;   // how a trap went for them (10y9o-trap-ratings.js)
+      case "renew": case "renewal": case "renewals": renewCommand(sender, args, R); break;   // another contract when this one ends (10y9t-renewals.js)
       case "struggle": case "free": case "goad": case "hunt": case "lay": case "gather": case "pack": extrasCommand(cmd, sender, args, R); break;   // 10x-trap-extras.js
       case "feedback": case "suggest": case "idea": case "bug": case "meh": case "more": feedbackCommand(cmd, sender, args, rest, R); break;   // the suggestion box (10q)
 
@@ -2352,6 +2355,8 @@ Welcome to B&B Farm, hon. 🌾`);
         break;
       }
 
+      case "reins": reinsCommand(sender, args, R); break;   // a pet at heel, a step behind (10y9s-reins.js)
+
       case "walk": {
         const t = resolveTarget(args[0]);
         if (!t){ R("Walk who, sugar? Say ?walk and the name or member number of stock in your own herd, like ?walk Bessie or ?walk 123456. Say the same thing again to let go of the lead."); break; }
@@ -2359,6 +2364,7 @@ Welcome to B&B Farm, hon. 🌾`);
         if (!membership(t, sender) && !isProprietor(sender)){ R("You can only walk stock in your own "+herdWord(sender)+", sugar."); break; }
         if (!charFor(t) || !charFor(sender)){ R("You both need to be here on the farm for that, hon."); break; }
         if (stockedNow(t)){ R("They're in the stocks right now, sugar. ?unstock 'em first."); break; }
+        if (reinsOf(t)){ R("They're on "+plainName(reinsOf(t).by)+"'s reins right now, sugar. ?reins off first."); break; }
         state.leashes.set(t, sender); audit(sender,"WALK",String(t));
         say("🦮 "+plainName(sender)+" clips a lead on "+plainName(t)+". Aww!", false, t);
         whisper(t, "You're on "+plainName(sender)+"'s lead now, sweetie. Wherever they go, you go. Safeword ends it.");

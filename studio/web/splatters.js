@@ -44,6 +44,14 @@
     cider:      { style: "run", tint: "#E3A23E", stampAlpha: 0.55, narrow: [0.5, 0.8], long: 1.3, turn: 0.3, texture: "sheen", base: "#D9902E", edge: "#A8661A", gloss: "#FFE6B0", alpha: 0.38, run: 1.5, width: 0.75, beads: 0.3, droplets: 1.4 },
     brew:       { style: "run", tint: "#8E4FCB", stampAlpha: 0.85, narrow: [0.9, 1.25], long: 1.1, turn: 0.4, texture: "bubbles", base: "#7A3FB0", edge: "#47206E", gloss: "#E6CCFF", alpha: 0.72, run: 1.2, width: 1.0, beads: 0.7, bubbles: true },
     ink:        { style: "run", tint: "#2A2433", stampAlpha: 0.95, narrow: [0.9, 1.25], long: 1.15, turn: 0.4, texture: "sheen", base: "#15121C", edge: "#000000", gloss: "#6E6880", alpha: 0.92, run: 1.2, width: 1.05, beads: 0.7, droplets: 1.2 },
+    // winter's and Yule's (Oct 27): royal icin' piped thick and white with red and green sprinkles, a milky cocoa run with
+    // little marshmallows in, pale eggnog with nutmeg dust, candy-cane peppermint syrup with white stripes, and red candle
+    // wax that runs a little way and sets in beads
+    icing:      { style: "smear", smudge: 0.35, sprinkleN: 10, base: "#FFFDF8", edge: "#E4DCCD", gloss: "#FFFFFF", alpha: 0.97, run: 0.15, width: 0.95, patches: "#FFFFFF", sprinkles: ["#D62B3A", "#2E8B47", "#FFFFFF"] },
+    cocoa:      { style: "run", tint: "#7A4A2E", stampAlpha: 0.8, narrow: [0.7, 1.0], long: 1.25, turn: 0.35, texture: "sheen", base: "#6E4128", edge: "#3E2414", gloss: "#D8B090", alpha: 0.74, run: 1.4, width: 0.9, beads: 0.5, droplets: 1.0, crumbs: ["#FFFFFF", "#F8F2EA", "#FFF9F2"] },
+    eggnog:     { style: "run", tint: "#F5E6B8", stampAlpha: 0.85, narrow: [0.8, 1.1], long: 1.15, turn: 0.35, texture: "milky", base: "#F1E0AA", edge: "#C9B27A", gloss: "#FFF8E0", alpha: 0.78, run: 1.2, width: 0.95, beads: 0.5, specks: "#8A5A2B" },
+    peppermint: { style: "run", tint: "#E8435A", stampAlpha: 0.88, narrow: [0.9, 1.2], long: 1.1, turn: 0.3, texture: "candy", base: "#E23A52", edge: "#9E1A2C", gloss: "#FFE0E6", alpha: 0.82, run: 1.1, width: 1.0, beads: 0.7 },
+    wax:        { style: "run", tint: "#B01E32", stampAlpha: 0.95, narrow: [0.7, 1.0], long: 0.7, turn: 0.25, texture: "shine", base: "#A3162B", edge: "#5E0A16", gloss: "#FF8A9A", alpha: 0.96, run: 0.5, width: 0.9, beads: 1.2 },
   };
 
   // a ribbon down a path of points, each with its own width; it ends where the last point is
@@ -219,7 +227,7 @@
     tintCache.set(key, c); return c;
   }
   // textures, painted inside a strand: honey's long streaks of light, slime's bubbles, strawberry's seeds, chocolate's
-  // hard shine, piss's thin bright wet sheen, milk's soft white middle
+  // hard shine, piss's thin bright wet sheen, milk's soft white middle, peppermint's stripes
   const TEXTURES = {
     streaks: (x, w, h, r) => { x.globalAlpha = 0.55; x.strokeStyle = "#FFF2B8"; x.lineWidth = 1; for (let i = 0; i < 3; i++) { const sx = r() * w; x.beginPath(); x.moveTo(sx, 0); x.lineTo(sx + (r() - 0.5) * 4, h); x.stroke(); } },
     bubbles: (x, w, h, r) => { x.globalAlpha = 0.7; x.strokeStyle = "#E4FFD6"; x.lineWidth = 0.8; for (let i = 0; i < Math.max(2, w * h / 120); i++) { x.beginPath(); x.arc(r() * w, r() * h, 0.8 + r() * 2, 0, Math.PI * 2); x.stroke(); } },
@@ -227,6 +235,8 @@
     shine: (x, w, h, r) => { x.globalAlpha = 0.45; x.strokeStyle = "#D8B49A"; x.lineWidth = 1.2; x.beginPath(); x.moveTo(w * 0.3, 0); x.lineTo(w * 0.35, h); x.stroke(); },
     sheen: (x, w, h, r) => { x.globalAlpha = 0.35; x.fillStyle = "#FFFBE0"; x.fillRect(w * 0.25, 0, w * 0.2, h); },
     milky: (x, w, h, r) => { x.globalAlpha = 0.4; x.fillStyle = "#FFFFFF"; x.fillRect(0, 0, w, h); },
+    // peppermint's candy-cane stripes, white and slantin'
+    candy: (x, w, h, r) => { x.globalAlpha = 0.55; x.strokeStyle = "#FFFFFF"; x.lineWidth = 1.4; for (let i = -h; i < w + h; i += 5) { x.beginPath(); x.moveTo(i, 0); x.lineTo(i + h * 0.6, h); x.stroke(); } },
   };
   // a stamp, varied: turned, flipped (mirrored), narrowed or stretched, sized, each substance its own way
   function stamp(ctx, r, K, x, y, size) {

@@ -203,6 +203,15 @@ The thing in the pond that lays its eggs in whoever wades in.
 - **Mess it leaves:** slime on the tummy.
 - **Equipment:** none yet.
 
+### ☕ cocoastand
+
+The cocoa stand at the winter fair: milked straight into the pot if you make milk, or the cocoa's poured over you, and either way the fair drinks up.
+
+- **How to get it:** a tile named `trap-cocoastand`.
+- **Ruled out by limits mentioning:** milk, lactat, food, messy, public, lick.
+- **Equipment:**
+  - **Cocoa Stand Ribbon** (legs, while the trap holds them). Game items: Ribbons, HempRope, LeatherLegCuffs. A brown satin ribbon round their knees, tied to the counter's leg so they can't wriggle off while they're bein' served.
+
 ### 🧪 collection
 
 For studs: the collection bench, milked into the vat.
@@ -334,6 +343,24 @@ The fox-brothers' den: teased silly, then shared.
 - **Mess it leaves:** cum on the tummy.
 - **Equipment:** none yet.
 
+### ❄️ frostfae
+
+The frost-fae in the hedgerow: cold kisses, frost on every bit of you, and kept right at the edge for their game.
+
+- **How to get it:** a tile named `trap-frostfae`.
+- **Ruled out by limits mentioning:** cold, ice, edg, denial, fae, fairy, ie, monster.
+- **Equipment:**
+  - **Frost Lace** (ropeArms, while the trap holds them). Game items: HempRope. Lace spun out of hoarfrost round their wrists, fine as spider silk. It doesn't melt, and it doesn't let go.
+
+### 🧊 frozenpond
+
+The frozen duck pond: your skates froze fast in the ice, and every skater on the pond takes a turn.
+
+- **How to get it:** a tile named `trap-frozenpond`.
+- **Ruled out by limits mentioning:** cold, ice, gang, free use, public.
+- **Equipment:**
+  - **Frozen Fast** (ropeFeet, while the trap holds them). Game items: HempRope. Ice up over both their boots and round the ankles, froze solid. They're not goin' anywhere till somebody fetches a kettle.
+
 ### 💨 gas
 
 A puff of pink mist and you're in heat for an hour.
@@ -350,6 +377,27 @@ The ghost in the old milkin' parlour: cold hands, warm hands, and a glowin' mess
 - **Ruled out by limits mentioning:** ghost, cold, temperature, spirit, haunt.
 - **Mess it leaves:** ecto on the chest and tummy and face.
 - **Equipment:** none yet.
+
+### 🎁 giftwrap
+
+Gift-wrapped: tied up in ribbon, popped in a box with a bow on top, tagged UNWRAP ME and left under the farm's big tree.
+
+- **How to get it:** a tile named `trap-giftwrap`.
+- **Ruled out by limits mentioning:** bondage, restrain, tied, public, display, free use.
+- **Equipment:**
+  - **Gift Ribbon (arms)** (arms, while the trap holds them). Game items: Ribbons, HempRope, LeatherCuffs. Red satin ribbon round and round their wrists, tied off in a fat bow.
+  - **Gift Ribbon (legs)** (legs, while the trap holds them). Game items: Ribbons, HempRope, LeatherLegCuffs. Red satin ribbon round their legs from the ankles up, neat as a parcel.
+  - **Gift Box** (device, while the trap holds them). Game items: GiftBox, WoodenStocks. A big gift box wrapped in red paper, the lid left off so everybody can see what's inside, tagged UNWRAP ME.
+
+### 🍪 gingerbread
+
+The gingerbread man the bakers brought to life: six foot of warm spiced dough, a candy-cane cock, and icin' all over you after.
+
+- **How to get it:** a tile named `trap-gingerbread`.
+- **Ruled out by limits mentioning:** food, messy, sticky, monster.
+- **Mess it leaves:** icing on the chest and tummy and face.
+- **Equipment:**
+  - **Bakery Ribbon** (ropeArms, while the trap holds them). Game items: Ribbons, HempRope. A red ribbon off the cake boxes, tied round their wrists and looped over the bakin' table's leg.
 
 ### 🍯 glue
 
@@ -495,6 +543,16 @@ Hogtied in the sty and left in the muck for the boar.
   - **Hog Tie** (ropeFeet, while the trap holds them). Game items: HempRope. Rough sty rope, wrists to ankles behind the back, tied with the pig girl's rodeo knot.
   - **Hog Tie (arms)** (ropeArms, while the trap holds them). Game items: HempRope. The other half of the hogtie, the wrists, cinched to the ankles.
 
+### 👑 hollyking
+
+The solstice play: the Holly King and the Oak King fight for the year, and the prize is you, and they share it.
+
+- **How to get it:** a tile named `trap-hollyking`.
+- **Ruled out by limits mentioning:** double, both hole, gang, public, threesome.
+- **Equipment:**
+  - **Solstice Ribbon** (ropeArms, while the trap holds them). Game items: Ribbons, HempRope. Green ribbon round their wrists, tyin' them to the post in the middle of the solstice ring.
+  - **Holly King's Crown** (hat, after the trap, for 30 min). Game items: FlowerCrown. The Holly King's own crown of holly and red berries, put on their head after the play. Till midsummer.
+
 ### 🍯 honey
 
 The honey pot: drenched in honey or syrup and licked clean.
@@ -536,6 +594,17 @@ The clipboard inspection: every inch checked, measured and written up.
 - **Ruled out by limits mentioning:** inspect, exam, humiliat, measure.
 - **Equipment:**
   - **Inspection Tag** (tag, after the trap, for 30 min). Game items: CollarNameTagLivestock, CollarNameTag. An inspection tag on the collar: FIT FOR PURPOSE, the clerk's initials, and a number.
+
+### 🌿 ivy
+
+The ivy on the old barn: it winds round you, holds you to the wall, and lays its berry pods in you.
+
+- **How to get it:** a tile named `trap-ivy`.
+- **Ruled out by limits mentioning:** plant, vine, tentacle, monster.
+- **Mess it leaves:** slime on the tummy and chest.
+- **Equipment:**
+  - **Ivy (arms)** (arms, while the trap holds them). Game items: HempRope, LeatherCuffs. Ivy wound round and round their wrists and arms, holdin' them to the old barn wall.
+  - **Ivy (legs)** (legs, while the trap holds them). Game items: HempRope, LeatherLegCuffs. Ivy wound round their legs, holdin' them apart against the warm stone.
 
 ### 🐕 kennel
 
@@ -592,6 +661,17 @@ The pride's lion, and a lioness who holds you down for him.
 - **Mess it leaves:** cum on the tummy.
 - **Equipment:** none yet.
 
+### 🕯️ longnight
+
+The longest night: tied in the ring of candles that has to burn till dawn, and the wax drips, an hour at a time, till the sun comes back.
+
+- **How to get it:** a tile named `trap-longnight`.
+- **Ruled out by limits mentioning:** wax, heat, hot, pain, candle, fire, burn.
+- **Mess it leaves:** wax on the chest and tummy.
+- **Equipment:**
+  - **Vigil Cord (arms)** (arms, while the trap holds them). Game items: HempRope, LeatherCuffs. Red cord round their wrists, tied out to a peg at the edge of the ring of candles.
+  - **Vigil Cord (legs)** (legs, while the trap holds them). Game items: HempRope, LeatherLegCuffs. Red cord round their ankles, tied out to the pegs, holdin' them spread in the middle of the candles.
+
 ### 🌽 maze
 
 The corn maze, and somethin' in the corn huntin' you.
@@ -644,6 +724,15 @@ A puff of whatever potion's loaded in it.
 - **How to get it:** a tile named `trap-mister`.
 - **Ruled out by limits mentioning:** potion.
 - **Equipment:** none yet.
+
+### 🌿 mistletoe
+
+The mistletoe over the kissin' gate: tied up under it, and everybody who passes owes a kiss, and collects.
+
+- **How to get it:** a tile named `trap-mistletoe`.
+- **Ruled out by limits mentioning:** kis, public, free use, gang.
+- **Equipment:**
+  - **Mistletoe Ribbon** (ropeArms, while the trap holds them). Game items: Ribbons, HempRope. A red velvet ribbon tyin' their wrists up to the kissin' gate's post, right under the mistletoe.
 
 ### 🐖 mud
 
@@ -845,6 +934,14 @@ A buckin' saddle with somethin' in the seat, and a long hard ride.
   - **Buckin' Saddle** (device, while the trap holds them). Game items: SaddleStand, WoodenHorse, WoodenStocks. A sprung steel horse with a worn leather saddle, cinched on at the thighs and bucking hard. Something thick in the seat rides them right back.
   - **Saddle Post** (the hole they have (a dildo slot with a pussy, a plug slot without), while the trap holds them). Game items: PenisDildo, VibratingDildo. The fat greased post that rises out of the saddle's seat, buried deep and bouncing with every buck.
 
+### 🧖 sauna
+
+The sauna by the pond: steamed pink, switched with birch, rolled in the snow, and back in the heat again.
+
+- **How to get it:** a tile named `trap-sauna`.
+- **Ruled out by limits mentioning:** heat, hot, cold, spank, impact, pain.
+- **Equipment:** none yet.
+
 ### 📏 scale
 
 The weigh-in: measured all over and the numbers read out to the farm.
@@ -911,6 +1008,15 @@ A rope round the ankle: held where you stand and teased.
   - **Snare Rope** (arms, while the trap holds them). Game items: HempRope, LeatherCuffs. Rough rope cinched round both wrists and hauled up overhead, stringing them out helpless while the little machine teases.
   - **Snare Hobble** (ropeFeet, while the trap holds them). Game items: HempRope. Rope round both ankles, pulling them wide apart. Everything between them is on show and out of their own reach.
 
+### ⛄ snowman
+
+The farmyard snowman: packed into him to the chin by the farmhands, the good bits dug out, and the whole yard plays.
+
+- **How to get it:** a tile named `trap-snowman`.
+- **Ruled out by limits mentioning:** cold, ice, enca, immobil, public, display.
+- **Equipment:**
+  - **The Farmyard Snowman** (device, while the trap holds them). Game items: Snowman, WoodenStocks. Packed into the farmyard snowman up to the chin, patted smooth, with a scarf on top and the good bits dug out.
+
 ### 🐖 sow
 
 A big matron who nurses you drowsy, then breeds you with what's under her apron.
@@ -971,6 +1077,16 @@ The office stamps: inked, approved and filed.
 - **How to get it:** a tile named `trap-stamp`.
 - **Ruled out by limits mentioning:** writ, mark, stamp, humiliat.
 - **Equipment:** none yet.
+
+### 🧦 stocking
+
+The giant stockin' on the hearth: popped in up to the chest, hung on its hook, and filled by everybody passin'.
+
+- **How to get it:** a tile named `trap-stocking`.
+- **Ruled out by limits mentioning:** bondage, restrain, toy, public, suspen.
+- **Equipment:**
+  - **The Big Stockin'** (arms, while the trap holds them). Game items: HempRope, LeatherCuffs. The giant stockin's red wool, snug round their arms and holdin' them to their sides while they hang on the hearth.
+  - **Stockin' Stuffer** (plug, after the trap, for 20 min). Game items: EggVibePlugXXL, InflVibeButtPlug, BlackButtPlug, ButtPlug. The buzzin' egg from the toe of the stockin', still buzzin', tucked in snug right where it settled.
 
 ### 🥧 stocks
 
@@ -1174,6 +1290,16 @@ Pegged out on the washin' line with clothespins wherever they'll grip.
   - **Clothespins** (cups, while the trap holds them). Game items: Clothespins, LactationPump, NippleSuctionCups. Wooden clothespins biting everywhere they'll grip, a whole basketful, each one stinging as the line sways.
   - **Washin' Line** (arms, while the trap holds them). Game items: HempRope, LeatherCuffs. Strung up by the wrists on the washing line between two posts, hung out to dry with the sheets.
 
+### 🍎 wassail
+
+Wassailin' the orchard: tied to the oldest apple tree, toasted with cider, licked clean, and the first wassailer gets the luck.
+
+- **How to get it:** a tile named `trap-wassail`.
+- **Ruled out by limits mentioning:** messy, food, public, lick, gang.
+- **Mess it leaves:** cider on the chest and tummy and face.
+- **Equipment:**
+  - **Wassail Ribbons** (ropeArms, while the trap holds them). Game items: Ribbons, HempRope. Red and green ribbons, like the ones tied on the oldest apple tree, tyin' their wrists round its trunk.
+
 ### 🕯️ wax
 
 The bench and a lit candle, drip by drip.
@@ -1228,6 +1354,15 @@ The whelping box, and the kennel's champion stud.
 - **Equipment:**
   - **Whelping Box** (device, while the trap holds them). Game items: Kennel, LowCage, WoodenStocks. A low padded box in a warm shed, built for one thing, with a sign above it: BREEDING IN PROGRESS.
 
+### 🏹 wildhunt
+
+The Wild Hunt: spectral huntsmen ride down out of the storm on the longest night, and you're the quarry they've caught.
+
+- **How to get it:** a tile named `trap-wildhunt`.
+- **Ruled out by limits mentioning:** gang, chase, hunt, ghost, spirit, monster, cnc, non.con.
+- **Equipment:**
+  - **The Hunt's Rope** (ropeArms, while the trap holds them). Game items: HempRope. A rope of silver mist from the Wild Hunt, round their wrists. It's cold as moonlight and it doesn't let go.
+
 ### ⛓️ winch
 
 A collar on a chain that drags you off to the pen and leaves you there.
@@ -1263,6 +1398,15 @@ A den of wolf-men who take turns, and every one of them knots.
 - **Equipment:**
   - **Pack's Knot** (the hole they have (a dildo slot with a pussy, a plug slot without), after the trap, for 10 min). Game items: PenisDildo, PenisPlug. The last wolf's knot, still swollen fat inside and throbbing, tying them to a bellyful of the whole pack's seed until it finally goes down.
 
+### 🏔️ yeti
+
+The yeti down from the hills: twice your size, warm as a stove under all that white fur, and he wants somebody to keep him company till spring.
+
+- **How to get it:** a tile named `trap-yeti`.
+- **Ruled out by limits mentioning:** size, monster, beast, big, cold.
+- **Equipment:**
+  - **Yeti's Fur Wrap** (device, after the trap, for 20 min). Game items: FurBlanketWrap, WoodenStocks. One of the yeti's own white furs, wrapped round them snug as a cocoon and tied off. Warm as anything. Not easy to get out of.
+
 ### 🪵 yoke
 
 The milkmaid's yoke: locked across your shoulders with full buckets on it.
@@ -1272,6 +1416,15 @@ The milkmaid's yoke: locked across your shoulders with full buckets on it.
 - **Mess it leaves:** milk on the chest and tummy.
 - **Equipment:**
   - **Milkmaid's Yoke** (arms, while the trap holds them). Game items: Pillory, WoodenCuffs, HempRope, LeatherCuffs. A shaped wooden yoke across the shoulders, wrists cuffed at either end, a bucket hook on each side.
+
+### 🪵 yulelog
+
+The Yule log: tied astride it as it's hauled in from the woods, and every bump of the track grinds the old knot into you.
+
+- **How to get it:** a tile named `trap-yulelog`.
+- **Ruled out by limits mentioning:** bondage, restrain, tied, public, edg, denial.
+- **Equipment:**
+  - **Yule Log Ribbons** (legs, while the trap holds them). Game items: Ribbons, HempRope, LeatherLegCuffs. Red ribbon round their ankles and knees, tyin' them astride the Yule log as it's hauled in.
 
 ## The mystery box
 
@@ -1368,15 +1521,20 @@ Each mess is drawn by the Companion on top of the game's own splatters. `?wash` 
 - **chocolate** #4A2A18: from its own traps or the shelf
 - **strawberry** #E04A6A: tomatoes
 - **milk** #F7F7F0: milker, cups, carousel, milkinghole, yoke
-- **slime** #5FAE3A: vines, clutch
+- **slime** #5FAE3A: vines, clutch, ivy
 - **mud** #6B4A2B: plow, mudpit, hogtie, goblincart, mudslide
 - **mash** #D8C08A: chute, slop, feedbag
 - **pumpkin** #E07A1F: headless, pumpkinpatch
 - **caramel** #B8702A: candyapple
 - **ecto** #7FEAD0: ghost
-- **cider** #D9902E: revel, bobbing
+- **cider** #D9902E: revel, bobbing, wassail
 - **brew** #7A3FB0: cauldron
 - **ink** #15121C: from its own traps or the shelf
+- **icing** #FFFDF8: gingerbread
+- **cocoa** #6E4128: from its own traps or the shelf
+- **eggnog** #F1E0AA: from its own traps or the shelf
+- **peppermint** #E23A52: from its own traps or the shelf
+- **wax** #A3162B: longnight
 - **cum**: the breeding traps pump, saddle, wheel, scarecrow, crate, kissgate, collection, leashpost, whelping, bearskin, hottub, stag, booth, goblinraid, goblinpit, warband, minotaur, werewolf, foxden, lionpride, ramstud, studchair, every load in the stalls, and the seed shower
 
 ## The mess shelf

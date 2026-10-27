@@ -5,7 +5,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 | Script | File in `dist/` | Where it runs | Current |
 |---|---|---|---|
-| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.53.0** |
+| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.54.0** |
 | Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.10.0** |
 | Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.2.1** |
 | Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **1.1.0** |
@@ -13,7 +13,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 | Map tools, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.4** |
 | Dairy | `farmhand-dairy.user.js` | the bot's PC | **1.1.0** |
 | Shows | `farmhand-shows.user.js` | the bot's PC | **1.1.0** |
-| Farmhand Companion | `farmhand-companion.user.js` | each player, and the bot's own tab | **0.47.0** |
+| Farmhand Companion | `farmhand-companion.user.js` | each player, and the bot's own tab | **0.48.0** |
 | Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.4** |
 
 ## Sending a watch report
@@ -24,6 +24,18 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 ## Latest changes (newest first)
 
+- **Bot 0.54.0 + Companion 0.48.0: on the reins, holdin' somebody's place, welcome home, another contract?, winter and Yule.** Laynie, Oct 27: "I love the features ideas, minus the daily report ... winter pack yes ... soltice and equinox based packs with pagan/wiccan themes would be cool."
+  - **Update the bot's own tab to Companion 0.48 too.** The winter costume, the new messes, the reins and the renewal cards need it.
+  - **On the reins.** `?reins <who> [minutes]`: a herd leader (or a proprietor) leads one of their own herd at heel on the map. They follow a step behind wherever the leader walks, at their own pace (their Companion walks them; without one, or with "Walk me places" off, I hop them along). An hour unless you say, 5 minutes to 4 hours. While a trap, the stocks, a pen, the bench, the milkin' stall or a knot has them they stay put, and the reins pick up again after. `?reins off [who]`, their safeword, either of them leavin' the room or the time runnin' out lets go. In the Companion: a chip for the one on the reins, a "Let go" card for the leader, and a Reins button on the Herd tab. (`?walk` is still the old lead.)
+  - **Holdin' somebody's place.** `?away hold <who> 30d [why]` (staff) pauses somebody's two weeks while they're away on purpose: a trip, exams, a hospital stay (12h, 2w, 30d all work, up to a year). They're told. While it's on they get no notes and never come off the books, and when it's up their clock carries on from where it stopped. `?away hold <who> off` ends it early; `?away` lists who's on hold. The 12-day note now says a hold can be asked for.
+  - **Welcome home.** Somebody who got the 12-day note and then steps back into the farm is greeted by name and told their place is kept, and their herd leader hears they're back.
+  - **Another contract?** A day before a timed farm contract ends (three hours before, for one that's a day long or less) I ask them if they'd like another, and tell their herd leader. In the room it's a yes/no card in their Companion; away, it's a beep, and I ask again when they come by. `?renew yes` or `?renew no` any time before it ends (changin' your mind is fine). A yes goes to staff and their herd leader, and to the top of the Staff panel's Contracts tab with an **Offer it** button: the same contract, the same length (BC+ only takes an offer in person, so they need to be in the room). It waits there a week after the old one ends. Staff: `?renew` (who's said what), `?renew offer <who>` (herdmasters and the proprietors).
+  - **Winter (Dec 1 to Jan 31): 10 traps.** The frozen duck pond (skates froze fast, and every skater takes a turn), the gingerbread man the bakers brought to life (icin' after), mistletoe over the kissin' gate, the yeti down from the hills (wrapped in his fur after), gift-wrapped in a box under the farm's big tree and tagged UNWRAP ME, the giant stockin' by the hearth, the sauna by the pond, the cocoa stand (milked into the pot if you make milk, or the cocoa poured over you), the frost-fae in the hedgerow (kept right at the edge), and the farmyard snowman. The trapper's bearskin rug, the lumberjacks' hot tub, the bakery bench and the kissin' gate come round more, and a tile named `trap-winter` (or `trap-snow`) springs only winter's. The farm girl wraps up in a red winter hat, shawl and fur gloves.
+  - **`?stocking`** all winter: once a day, look in your stockin' on the farm's hearth. A sweet that works like one of the sweet potions, a sweet mess (with "Farm can mark my body"), now and then a ribbon, or coal if you've been naughty since last time (a naughty mark, or a naughty or degraded tier), with NAUGHTY LIST written on you.
+  - **Yule (Dec 18 to 24, the winter solstice): 6 traps,** inside winter, so both packs spring that week. Tied astride the Yule log as it's hauled in from the woods; the solstice play, where two farmhands crowned the Holly King and the Oak King fight for the year and share the prize (you, and the Holly King's crown to wear after); the Wild Hunt ridin' down out of the storm; wassailin' the orchard; the old barn's ivy, which holds you to the wall and lays its berry pods in you; and the ring of candles through the longest night (red wax). The rutting stag, the lantern and the bearskin rug come round more. The farm girl wears a holly crown and a deep red hooded cloak.
+  - **Any time, too.** Like every season, a proprietor can run winter or Yule whenever they like: `?seasons start winter` (or `yule`, or both), or the Seasons card.
+  - **New messes the Companion draws:** royal icin' (with sprinkles), cocoa, eggnog, peppermint syrup (candy-striped) and candle wax. `?wash` takes them off like the rest.
+  - **Guides:** `?help` lists `?stocking`, and for staff `?reins`, `?away hold` and `?renew`.
 - **Bot 0.53.0 + Companion 0.47.0: Halloween week, rate a trap, the trap of the day, kinds of trap, how you're left, the things in the water.** Laynie, Oct 27: "I love the features ideas, minus the daily report ... more trap versions, like the water beast could use alot more versions. halloween pack, but alot more, full of tricks and treats ... aftermath lines, yes."
   - **Update the bot's own tab to Companion 0.47 too.** The farm girl's costume and the new gear pieces only go on with it.
   - **Seasons.** The farm has a calendar now (`?seasons`, or `?calendar`; `?season` stays the Breedin' add-on's breedin' week). While a season's on, about a third of what the plain trap tiles spring comes from its own pack (the ones that fit the place, when some do), a tile named `trap-halloween` springs nothin' else, the farm girl dresses for it, and the room is told when it starts and ends. Out of season its traps never spring, unless a proprietor starts it. Winter and Yule come next, then Ostara, Easter, Litha and Mabon.

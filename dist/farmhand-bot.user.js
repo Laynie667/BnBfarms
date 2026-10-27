@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.53.0
+// @version      0.54.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -2748,8 +2748,8 @@
   ];
 
   // bot/src/version.js
-  var VERSION = "0.53.0";
-  var COMPANION_VERSION = "0.47.0";
+  var VERSION = "0.54.0";
+  var COMPANION_VERSION = "0.48.0";
 
   // bot-parts:farmhand-bot-parts
   (function() {
@@ -5999,6 +5999,8 @@
           if (isProprietor(mn)) s.trapAdmin = trapAdminFor();
         });
         part("trap ratings", () => rateStateFor(mn, s));
+        part("reins", () => reinsStateFor(mn, s));
+        part("renewals", () => renewStateFor(mn, s));
         part("trap kinds", () => trapThemeStateFor(mn, s));
         part("seasons", () => seasonsStateFor(mn, s));
         part("under", () => {
@@ -6057,7 +6059,8 @@
           preg: !!p.preg,
           denied: milkDenied(m),
           mine: herdLeaderOf(m) === mn,
-          onDuty: r2.onDuty !== false
+          onDuty: r2.onDuty !== false,
+          reins: !!(r2.reins && r2.reins.by === mn && r2.reins.until > Date.now())
         };
       });
       const r = rec(mn), wk = weekKey(), week = r.shift && r.shift.week && r.shift.week.key === wk ? r.shift.week.ms : 0;
@@ -13628,6 +13631,10 @@
       if (r.dare && r.dare.until > now) out.push({ icon: "\u{1F3B2}", text: "Dare", until: r.dare.until });
       for (const f of activePotions(mn)) out.push({ icon: "\u{1F9EA}", text: (potionDef(f.id) || {}).name || f.id, until: f.until });
       if (p.tieUntil > now) out.push({ icon: "\u{1F512}", text: "Knotted", until: p.tieUntil });
+      {
+        const x = reinsOf(mn);
+        if (x) out.push({ icon: "\u{1F434}", text: "On " + plainName(x.by) + "'s reins", until: x.until });
+      }
       return out.map((x) => Object.assign(x, x.until ? { until: Math.ceil(x.until / 6e4) * 6e4 } : {}));
     }
     function benchHereFor(mn) {
@@ -13865,6 +13872,11 @@
           saveLedger();
           contractEndedNow(x.mn);
         }
+      }
+      try {
+        renewTick();
+      } catch (e) {
+        warn("renew:", e);
       }
       for (const [k, r] of Object.entries(L2.people)) {
         if (!r.contractBy) continue;
@@ -21456,7 +21468,7 @@
       goblin: "goblin",
       rat: "rat"
     };
-    const SWEET = /^(honey|maple|chocolate|strawberry|cake|cream|mash)$/;
+    const SWEET = /^(honey|maple|chocolate|strawberry|cake|cream|mash|caramel|icing|cocoa|eggnog|peppermint)$/;
     function washFacts(mn) {
       const f = /* @__PURE__ */ new Set(), r = rec(mn) || {}, now = Date.now();
       try {
@@ -23100,6 +23112,7 @@
     }
     function awayKept(mn, r) {
       if (!r || !r.roles || !r.roles.some((x) => AWAY_ROLES.includes(x))) return "not stock or a guest";
+      if (r.awayHold && r.awayHold.until > Date.now()) return "on hold till " + new Date(r.awayHold.until).toLocaleDateString();
       if (mn === CFG.BOT_MEMBER || isProprietor(mn)) return "a proprietor";
       if (isStaff(mn)) return "staff";
       if (permContract(mn)) return "a permanent contract";
@@ -23119,9 +23132,14 @@
       for (const C2 of W.ChatRoomCharacter || []) {
         const r = C2 && C2.MemberNumber !== CFG.BOT_MEMBER && rec(C2.MemberNumber);
         if (!r) continue;
+        const gone2 = r.awayWarned ? Math.floor(awayDays(r)) : 0;
         r.hereMin = A.min;
         r.hereAt = now;
-        if (r.awayWarned) r.awayWarned = 0;
+        if (r.awayHold) r.awayHold.days = 0;
+        if (r.awayWarned) {
+          r.awayWarned = 0;
+          welcomeHome(C2.MemberNumber, gone2 || CFG.AWAY_BOOKS_WARN_DAYS);
+        }
       }
       const off = [], gone = [];
       let changed = false;
@@ -23133,6 +23151,17 @@
           changed = true;
           continue;
         }
+        if (r.awayHold) {
+          const days = r.awayHold.days || 0;
+          if (r.awayHold.until > now) {
+            r.hereMin = A.min - days * 1440;
+            continue;
+          }
+          r.awayHold = null;
+          r.hereMin = A.min - days * 1440;
+          changed = true;
+          if (!awayKept(mn, r)) beep(mn, "\u{1F5D3}\uFE0F Your hold on the farm's run out, " + plainName(mn) + ", so your away clock's goin' again from where it stopped (" + Math.floor(days) + " of " + CFG.AWAY_BOOKS_DAYS + " days). Step into the farm room any time and it starts over. Hope it all went well, sugar.");
+        }
         if (awayKept(mn, r)) continue;
         const d = awayDays(r);
         if (d >= CFG.AWAY_BOOKS_DAYS) {
@@ -23142,7 +23171,7 @@
         if (d >= CFG.AWAY_BOOKS_WARN_DAYS && !r.awayWarned) {
           r.awayWarned = now;
           changed = true;
-          beep(mn, "\u{1F33E} We haven't seen you on the farm in " + Math.floor(d) + " days, " + plainName(mn) + ". Come by in the next couple of days (just step into the farm room) and you keep your place. After two weeks away I take folks off the books. Your paperwork's kept safe either way, sugar.");
+          beep(mn, "\u{1F33E} We haven't seen you on the farm in " + Math.floor(d) + " days, " + plainName(mn) + ". Come by in the next couple of days (just step into the farm room) and you keep your place. After two weeks away I take folks off the books. Your paperwork's kept safe either way, sugar. (Away on purpose for a while? Ask staff to put your place on hold.)");
         }
       }
       for (const mn of off) {
@@ -23166,17 +23195,98 @@
         if (d >= 1) rows.push([d, mn, r]);
       }
       rows.sort((a, b) => b[0] - a[0]);
+      if (String(args[0] || "").toLowerCase() === "hold") {
+        awayHoldCommand(sender, args.slice(1), R);
+        return;
+      }
       const kept = Object.keys(L2.people).map(Number).filter((mn) => awayKept(mn, rec(mn)) === "a permanent contract");
+      const held = Object.keys(L2.people).map(Number).filter((mn) => {
+        const h = rec(mn).awayHold;
+        return h && h.until > Date.now();
+      });
       const days = (n) => n + " day" + (n === 1 ? "" : "s");
       const line = ([d, mn, r]) => "  \u2022 " + plainName(mn) + " \xB7 " + days(Math.floor(d)) + " away" + (r.hereAt ? " (last here " + new Date(r.hereAt).toLocaleDateString() + ")" : "") + " \xB7 off the books in " + days(Math.max(0, Math.ceil(CFG.AWAY_BOOKS_DAYS - d))) + (r.awayWarned ? " \xB7 told" : "");
-      R("\u{1F5D3}\uFE0F AWAY FROM THE FARM\n" + (rows.length ? rows.slice(0, 20).map(line).join("\n") + (rows.length > 20 ? "\n  \u2026and " + (rows.length - 20) + " more." : "") : "  Nobody's been gone a whole day.") + "\n\nLivestock and guests come off the books after " + CFG.AWAY_BOOKS_DAYS + " days away (with a note at " + CFG.AWAY_BOOKS_WARN_DAYS + "). The days only count while I'm in the room. Never staff, the proprietors, or anybody on a permanent contract" + (kept.length ? " (" + kept.slice(0, 10).map(plainName).join(", ") + (kept.length > 10 ? "\u2026" : "") + ")" : "") + ".");
+      R("\u{1F5D3}\uFE0F AWAY FROM THE FARM\n" + (rows.length ? rows.slice(0, 20).map(line).join("\n") + (rows.length > 20 ? "\n  \u2026and " + (rows.length - 20) + " more." : "") : "  Nobody's been gone a whole day.") + "\n\nLivestock and guests come off the books after " + CFG.AWAY_BOOKS_DAYS + " days away (with a note at " + CFG.AWAY_BOOKS_WARN_DAYS + "). The days only count while I'm in the room. Never staff, the proprietors, or anybody on a permanent contract" + (kept.length ? " (" + kept.slice(0, 10).map(plainName).join(", ") + (kept.length > 10 ? "\u2026" : "") + ")" : "") + "." + (held.length ? "\n\n\u23F8\uFE0F ON HOLD\n" + held.map((m) => {
+        const h = rec(m).awayHold;
+        return "  \u2022 " + plainName(m) + " \xB7 till " + new Date(h.until).toLocaleDateString() + (h.why ? " \xB7 " + h.why : "") + " \xB7 " + Math.floor(h.days || 0) + " days used, kept";
+      }).join("\n") : "") + "\n?away hold <who> 30d [why] pauses somebody's clock (a trip, exams, a hospital stay) \xB7 ?away hold <who> off");
     }
-    if (W.__FARMHAND_TEST__) Object.assign(W, { __awayTick: (gap) => {
-      state.awayAt = gap ? Date.now() - gap : 0;
-      awayTick();
-    }, __awayAdd: (days) => {
-      awayClock().min += days * 1440;
-    } });
+    function holdLength(w) {
+      const m = /^(\d+(?:\.\d+)?)\s*(d|day|days|w|wk|week|weeks|h|hr|hrs|hour|hours|m|mo|month|months)?$/.exec(String(w || "").toLowerCase().trim());
+      if (!m) return 0;
+      const n = parseFloat(m[1]), u = (m[2] || "d")[0];
+      return n * (u === "h" ? 36e5 : u === "w" ? 7 * 864e5 : u === "m" ? 30 * 864e5 : 864e5);
+    }
+    function awayHoldCommand(sender, args, R) {
+      if (!isStaff(sender)) {
+        R("Holdin' somebody's place is for staff, sugar. Ask one of them.");
+        return;
+      }
+      const t = resolveTarget(args[0]), r = t && rec(t), v = String(args[1] || "").toLowerCase();
+      if (!t || !r) {
+        R("?away hold <who> 30d [why]: pauses their two weeks while they're away on purpose (a trip, exams, a hospital stay). 2w, 30d, 12h work; up to a year. ?away hold <who> off ends it.");
+        return;
+      }
+      const A = awayClock(), now = Date.now();
+      if (v === "off" || v === "end" || v === "stop") {
+        const h = r.awayHold;
+        if (!h || h.until <= now) {
+          R(plainName(t) + " isn't on hold, sugar.");
+          return;
+        }
+        r.awayHold = null;
+        r.hereMin = A.min - (h.days || 0) * 1440;
+        saveLedger();
+        audit(sender, "AWAY_HOLD", t + " off");
+        R("\u{1F5D3}\uFE0F " + plainName(t) + "'s hold is off. Their clock carries on from " + Math.floor(h.days || 0) + " days.");
+        beep(t, "\u{1F5D3}\uFE0F Your hold on the farm's been lifted, " + plainName(t) + ", so your away clock's goin' again from where it stopped (" + Math.floor(h.days || 0) + " of " + CFG.AWAY_BOOKS_DAYS + " days). Step into the farm room and it starts over, sugar.");
+        return;
+      }
+      r.roles = r.roles || [];
+      const why0 = awayKept(t, Object.assign({}, r, { awayHold: null }));
+      if (why0) {
+        R(plainName(t) + " doesn't need one, sugar: " + (why0 === "not stock or a guest" ? "the two weeks are only for livestock and guests." : "they're " + why0 + ", so the two weeks never apply to them."));
+        return;
+      }
+      const ms = holdLength(args[1]);
+      if (!ms || ms < 36e5 || ms > 366 * 864e5) {
+        R("How long, sugar? Like ?away hold " + plainName(t) + " 30d (or 2w, 12h). An hour to a year.");
+        return;
+      }
+      const used = r.awayHold && r.awayHold.until > now ? r.awayHold.days || 0 : awayDays(r), why = args.slice(2).join(" ").trim().slice(0, 80);
+      r.awayHold = { until: now + ms, days: used, by: sender, at: now, why };
+      saveLedger();
+      audit(sender, "AWAY_HOLD", t + " " + args[1] + (why ? " " + why : ""));
+      const till = new Date(now + ms).toLocaleDateString();
+      R("\u{1F5D3}\uFE0F " + plainName(t) + "'s place is on hold till " + till + ". Their clock stays at " + Math.floor(used) + " days and nobody takes them off the books meanwhile. ?away hold " + plainName(t) + " off ends it.");
+      beep(t, "\u{1F5D3}\uFE0F Your place on the farm is on hold till " + till + ", " + plainName(t) + (why ? " (" + why + ")" : "") + ". Your away clock's paused: no notes, and nobody takes you off the books while you're gone. When it's up, it carries on from where it stopped (" + Math.floor(used) + " of " + CFG.AWAY_BOOKS_DAYS + " days). Take care of yourself, sugar. We'll be here.");
+    }
+    const WELCOME_HOME = [
+      "\u{1F33E} Well, look who's home! Welcome back, %n. Your place on the farm's kept, sugar, right where you left it.",
+      "\u{1F33E} %n! You came back. Your stall's still got your name on it, sugar, and your place is kept.",
+      "\u{1F33E} Welcome home, %n. We missed you round here. Your place on the farm is kept, sugar: you're not goin' anywhere.",
+      "\u{1F33E} There's %n! Welcome back, sugar. The farm kept your place warm for you."
+    ];
+    function welcomeHome(mn, days) {
+      later(() => {
+        if (!charFor(mn) || !rec(mn)) return;
+        say2(pickFresh("away:welcome", WELCOME_HOME).replace(/%n/g, plainName(mn)), false, mn);
+        const lead2 = herdLeaderOf(mn);
+        if (lead2 && lead2 !== mn) beep(lead2, "\u{1F33E} " + plainName(mn) + " is back on the farm after " + days + " days away. Their place is kept.");
+        audit(CFG.BOT_MEMBER, "WELCOME_HOME", String(mn));
+      }, 5e3);
+    }
+    if (W.__FARMHAND_TEST__) Object.assign(W, {
+      __awayTick: (gap) => {
+        state.awayAt = gap ? Date.now() - gap : 0;
+        awayTick();
+      },
+      __awayAdd: (days) => {
+        awayClock().min += days * 1440;
+      },
+      __awayDays: (mn) => awayDays(rec(mn)),
+      __holdLength: (w) => holdLength(w)
+    });
     const PARASITE_SERUMS = ["growth", "fertility", "growth", "hyper pregnancy", "growth", "capacity"];
     const PARASITE_GROWS = ["udder", "penis", "testes", "butt"];
     function parasiteChance(mn) {
@@ -36029,6 +36139,1893 @@
       );
     }
     if (W.__FARMHAND_TEST__) Object.assign(W, { __waterForms: () => WATER_FORMS, __waterForm: (m) => waterForm(m) });
+    if (CFG.REINS_MIN === void 0) CFG.REINS_MIN = 60;
+    if (CFG.REINS_MAX_MIN === void 0) CFG.REINS_MAX_MIN = 240;
+    if (CFG.REINS_HOP_MS === void 0) CFG.REINS_HOP_MS = 4e3;
+    const REINS_ON = [
+      "%l clips the reins onto %n's collar and gives them a little tug. Heel, sugar.",
+      "%l gathers up %n's reins, nice and short, and brings them round to heel.",
+      "%l takes %n's reins in one hand and clicks their tongue. Walk on.",
+      "%l snaps a lead rein on %n and wraps the end round their fist. Where %l goes, %n goes.",
+      "%l loops the reins over %n's head, settles them, and gives the order: heel."
+    ];
+    const REINS_OFF = [
+      "%l unclips the reins from %n's collar. Free to wander, sugar.",
+      "%l drops %n's reins and gives them a pat. Off you go.",
+      "%l coils up the reins and lets %n loose."
+    ];
+    const reinsLine = (pool, key, pet, by) => pickFresh(key, pool).replace(/%l/g, plainName(by)).replace(/%n/g, plainName(pet));
+    function reinsOf(mn) {
+      const r = rec(mn), x = r && r.reins;
+      return x && x.until > Date.now() ? x : null;
+    }
+    function onReinsOf(leader) {
+      return Object.keys(L2.people).map(Number).filter((m) => {
+        const x = reinsOf(m);
+        return x && x.by === leader;
+      });
+    }
+    function reinsHeld(mn) {
+      const r = rec(mn) || {}, p = prodOf(mn) || {}, now = Date.now();
+      return !!(heldByTrap(mn) || r.penned && r.penned.until > now || r.stocked && r.stocked.until > now || r.benched && r.benched.until > now || p.stall && p.stall.until || p.tieUntil > now);
+    }
+    function reinsLet(mn, why, by) {
+      const r = rec(mn), x = r && r.reins;
+      if (!x) return false;
+      r.reins = null;
+      saveLedger();
+      syncCompanions();
+      if (state.reinsHop) state.reinsHop.delete(mn);
+      if (state.reinsHold) state.reinsHold.delete(mn);
+      const pet = plainName(mn), lead2 = plainName(x.by), here = !!charFor(mn);
+      if (why === "off") {
+        if (here) say2("\u{1F434} " + reinsLine(REINS_OFF, "reins:off", mn, x.by), false, mn);
+        if (here) whisper(mn, "\u{1F434} " + lead2 + " let go of your reins, sugar.");
+      } else if (why === "staff") {
+        if (here) whisper(mn, "\u{1F434} " + plainName(by) + " took your reins off, sugar.");
+        if (charFor(x.by)) whisper(x.by, "\u{1F434} " + plainName(by) + " took " + pet + " off your reins.");
+      } else if (why === "left") {
+        if (here) whisper(mn, "\u{1F434} " + lead2 + " left the farm, so I've taken your reins off, sugar.");
+      } else if (why === "gone") {
+        if (charFor(x.by)) whisper(x.by, "\u{1F434} " + pet + " left the room, so the reins came off.");
+      } else if (why === "time") {
+        if (here) whisper(mn, "\u{1F434} Time's up: you're off " + lead2 + "'s reins, sugar.");
+        if (charFor(x.by)) whisper(x.by, "\u{1F434} Time's up on " + pet + "'s reins. ?reins " + pet + " takes them up again.");
+      } else if (why === "safe") {
+        if (charFor(x.by)) whisper(x.by, "\u{1F434} " + pet + " called their safeword, so the reins are off.");
+      }
+      return true;
+    }
+    function reinsStep(mn, force) {
+      const x = reinsOf(mn);
+      if (!x) return;
+      const lp = posOf(x.by), pp = posOf(mn);
+      if (!lp || !pp || lp.X < 0 || pp.X < 0) return;
+      state.reinsTrail = state.reinsTrail || /* @__PURE__ */ new Map();
+      const tr = state.reinsTrail.get(x.by) || [], last = tr[tr.length - 1];
+      if (!last || last.X !== lp.X || last.Y !== lp.Y) {
+        tr.push({ X: lp.X, Y: lp.Y });
+        if (tr.length > 4) tr.shift();
+        state.reinsTrail.set(x.by, tr);
+      }
+      if (Math.max(Math.abs(pp.X - lp.X), Math.abs(pp.Y - lp.Y)) <= 1) return;
+      state.reinsHop = state.reinsHop || /* @__PURE__ */ new Map();
+      if (!force && Date.now() - (state.reinsHop.get(mn) || 0) < CFG.REINS_HOP_MS) return;
+      state.reinsHop.set(mn, Date.now());
+      const from = tr.length > 1 ? tr[tr.length - 2] : pp, dx = Math.sign(from.X - lp.X), dy = Math.sign(from.Y - lp.Y);
+      const back = { X: lp.X + dx, Y: lp.Y + dy };
+      let wall = false;
+      try {
+        wall = typeof W.ChatRoomMapViewIsWall === "function" && W.ChatRoomMapViewIsWall(back.X, back.Y);
+      } catch (e) {
+      }
+      const taken = (W.ChatRoomCharacter || []).some((c) => c && c.MemberNumber !== mn && c.MapData && c.MapData.Pos && c.MapData.Pos.X === back.X && c.MapData.Pos.Y === back.Y);
+      const to = (dx || dy) && !wall && !taken ? back : spotBeside(x.by);
+      if (to) teleport(mn, to, false, true);
+    }
+    function reinsTick() {
+      const now = Date.now();
+      state.reinsHold = state.reinsHold || /* @__PURE__ */ new Map();
+      for (const C2 of W.ChatRoomCharacter || []) {
+        const mn = C2 && C2.MemberNumber, r = mn && rec(mn), x = r && r.reins;
+        if (!x) continue;
+        if (x.until <= now) {
+          reinsLet(mn, "time");
+          continue;
+        }
+        if (!charFor(x.by)) {
+          reinsLet(mn, "left");
+          continue;
+        }
+        const held = reinsHeld(mn);
+        if (held !== !!state.reinsHold.get(mn)) {
+          state.reinsHold.set(mn, held);
+          syncCompanions();
+        }
+        if (held || canLead(mn)) continue;
+        reinsStep(mn);
+      }
+      if (now - (state.reinsSweepAt || 0) < 6e4) return;
+      state.reinsSweepAt = now;
+      for (const [k, r] of Object.entries(L2.people)) if (r.reins) {
+        const mn = parseInt(k, 10);
+        if (!charFor(mn) || r.reins.until <= now) reinsLet(mn, r.reins.until <= now ? "time" : "gone");
+      }
+    }
+    const minsLeft = (t) => Math.max(1, Math.ceil((t - Date.now()) / 6e4)) + " min";
+    function reinsCommand(sender, args, R) {
+      const a0 = String(args[0] || "").toLowerCase(), now = Date.now();
+      if (["off", "drop", "letgo", "free", "release"].includes(a0)) {
+        const t2 = args[1] ? resolveTarget(args[1]) : null;
+        if (args[1] && !t2) {
+          R("Whose reins, sugar? ?reins off <who>, or just ?reins off for all of yours.");
+          return;
+        }
+        const list2 = t2 ? [t2] : onReinsOf(sender);
+        if (!list2.length) {
+          R("You've nobody on your reins, sugar.");
+          return;
+        }
+        const done = [];
+        for (const m of list2) {
+          const x = reinsOf(m);
+          if (!x) {
+            R(plainName(m) + " isn't on anybody's reins, sugar.");
+            continue;
+          }
+          if (x.by !== sender && !isHerdmaster(sender)) {
+            R("Those are " + plainName(x.by) + "'s reins, sugar: only they (or a herdmaster) let go.");
+            continue;
+          }
+          reinsLet(m, x.by === sender ? "off" : "staff", sender);
+          audit(sender, "REINS", "off " + m);
+          done.push(plainName(m));
+        }
+        if (done.length) R("\u{1F434} Let go of " + done.join(", ") + ".");
+        return;
+      }
+      if (!a0) {
+        const mine = onReinsOf(sender), on = reinsOf(sender);
+        R("\u{1F434} " + (mine.length ? "On your reins: " + mine.map((m) => plainName(m) + " (" + minsLeft(reinsOf(m).until) + " left)").join(", ") + ". ?reins off [who] lets go." : "You've nobody on your reins.") + (on ? "\nYou're on " + plainName(on.by) + "'s reins, " + minsLeft(on.until) + " left." : "") + "\n?reins <who> [minutes]: somebody in your own " + herdWord(sender) + ", at heel a step behind you wherever you walk (" + CFG.REINS_MIN + " minutes unless you say, up to " + CFG.REINS_MAX_MIN + "). Their safeword lets go.");
+        return;
+      }
+      const t = resolveTarget(args[0]);
+      if (!t || !rec(t)) {
+        R("Lead who, sugar? ?reins <who> [minutes]: somebody in your own " + herdWord(sender) + ", here on the map. ?reins off lets go.");
+        return;
+      }
+      if (t === sender) {
+        R("You can't hold your own reins, sugar.");
+        return;
+      }
+      if (!membership(t, sender) && !isProprietor(sender)) {
+        R("You can only take up the reins of your own " + herdWord(sender) + ", sugar.");
+        return;
+      }
+      if (!charFor(t) || !charFor(sender)) {
+        R("You both need to be here on the farm for that, hon.");
+        return;
+      }
+      if (!onMap(t) || !onMap(sender)) {
+        R("You both need to be out on the map for the reins, sugar.");
+        return;
+      }
+      const x0 = reinsOf(t);
+      if (x0 && x0.by !== sender) {
+        R(plainName(t) + " is on " + plainName(x0.by) + "'s reins already, sugar.");
+        return;
+      }
+      const mins = Math.max(5, Math.min(CFG.REINS_MAX_MIN, parseInt(args[1], 10) || CFG.REINS_MIN));
+      if (state.leashes) state.leashes.delete(t);
+      rec(t).reins = { by: sender, at: now, until: now + mins * 6e4 };
+      saveLedger();
+      syncCompanions();
+      audit(sender, "REINS", t + " " + mins + "m");
+      if (x0) {
+        R("\u{1F434} " + plainName(t) + "'s on your reins for " + mins + " minutes from now.");
+        return;
+      }
+      say2("\u{1F434} " + reinsLine(REINS_ON, "reins:on", t, sender), false, t);
+      const walks = canLead(t);
+      whisper(t, "\u{1F434} You're on " + plainName(sender) + "'s reins for " + mins + " minutes, sugar: wherever they walk, you follow a step behind" + (walks ? "" : " (I'll hop you along after them)") + ". Your safeword lets go.");
+      R("\u{1F434} " + plainName(t) + " is on your reins for " + mins + " minutes. Walk, and they follow a step behind you. ?reins off lets go." + (reinsHeld(t) ? " Somethin's got hold of them just now: the reins pick up when it lets go." : "") + (walks ? "" : " (No Companion walkin' them, so I hop them along behind you.)"));
+      if (!walks && !reinsHeld(t)) reinsStep(t, true);
+    }
+    function reinsStateFor(mn, s) {
+      const x = reinsOf(mn);
+      if (x) s.reins = { mn: x.by, name: plainName(x.by), until: x.until, hold: state.reinsHold && state.reinsHold.get(mn) || void 0 };
+      const mine = onReinsOf(mn);
+      if (mine.length) s.reinsMine = mine.map((m) => ({ mn: m, name: plainName(m), until: reinsOf(m).until }));
+    }
+    if (W.__FARMHAND_TEST__) Object.assign(W, { __reinsTick: () => {
+      state.reinsSweepAt = 0;
+      reinsTick();
+    }, __reinsOf: (m) => reinsOf(m), __reinsHeld: (m) => reinsHeld(m), __reinsStep: (m) => reinsStep(m, true) });
+    if (CFG.RENEW_ASK_H === void 0) CFG.RENEW_ASK_H = 24;
+    if (CFG.RENEW_ASK_SHORT_H === void 0) CFG.RENEW_ASK_SHORT_H = 3;
+    const RENEW_KEEP = 7 * 864e5;
+    const durOfMin = (min) => DURATIONS.find((d) => d.min === min && d.min > 0) || null;
+    const renewAskAt = (x) => (x.durationMin && x.durationMin <= 1440 ? CFG.RENEW_ASK_SHORT_H : CFG.RENEW_ASK_H) * 36e5;
+    const renewHours = (x) => Math.max(1, Math.round((x.until - Date.now()) / 36e5));
+    const renewWhat = (x) => {
+      const d = durOfMin(x.durationMin);
+      return '"' + x.title + '"' + (d ? " (" + d.label + ")" : "");
+    };
+    function renewable(mn) {
+      contractsLedger();
+      const now = Date.now();
+      const live = L2.contracts.filter((x) => x.mn === mn && x.status === "signed" && x.until && x.until > now).sort((a, b) => a.until - b.until);
+      if (live.length) return live[0];
+      for (let i = L2.contracts.length - 1; i >= 0; i--) {
+        const x = L2.contracts[i];
+        if (x.mn === mn && x.status === "ended" && x.until && x.renewSaid === "yes" && !x.renewOffered && now - (x.endedAt || x.until) < RENEW_KEEP) return x;
+      }
+      return null;
+    }
+    function renewTick() {
+      const now = Date.now();
+      for (const x of L2.contracts) {
+        if (x.status !== "signed" || !x.until || x.until <= now || x.renewSaid) continue;
+        if (x.until - now > renewAskAt(x)) continue;
+        if (!x.renewAt) {
+          x.renewAt = now;
+          saveLedger();
+          renewAsk(x, true);
+          continue;
+        }
+        if (!x.renewAskedHere && charFor(x.mn)) renewAsk(x, false);
+      }
+    }
+    function renewAsk(x, first) {
+      const mn = x.mn, what = renewWhat(x);
+      const text = "\u{1F4DC} Your farm contract " + what + " ends in about " + renewHours(x) + " hour" + (renewHours(x) === 1 ? "" : "s") + ", " + plainName(mn) + ". Would you like another one, the same again?";
+      if (charFor(mn)) {
+        x.renewAskedHere = Date.now();
+        saveLedger();
+        farmAsk(mn, text + " (?renew yes or ?renew no works any time before it ends, too.)", (yes) => renewAnswer(mn, yes, x));
+      } else beep(mn, text + " Say ?renew yes or ?renew no, sugar: here, or next time you're on the farm.");
+      if (!first) return;
+      const lead2 = herdLeaderOf(mn);
+      if (lead2 && lead2 !== mn) beep(lead2, "\u{1F4DC} " + plainName(mn) + "'s farm contract " + what + " ends in about " + renewHours(x) + " hours. I've asked them if they'd like another.");
+    }
+    function renewAnswer(mn, yes, x) {
+      x = x || renewable(mn);
+      if (!x) {
+        tell(mn, "\u{1F4DC} You haven't a farm contract with an end date for me to ask about, sugar.");
+        return;
+      }
+      const said = yes ? "yes" : "no", what = renewWhat(x), lead2 = herdLeaderOf(mn), running = x.until > Date.now();
+      if (x.renewSaid === said) {
+        tell(mn, "\u{1F4DC} Already got it, sugar: " + (yes ? "you'd like another." : "no more after this one."));
+        return;
+      }
+      x.renewSaid = said;
+      x.renewSaidAt = Date.now();
+      saveLedger();
+      audit(mn, "RENEW", x.title + " " + said);
+      syncCompanions();
+      if (yes) {
+        tell(mn, "\u{1F4DC} Lovely. I've told staff and your herd leader you'd like " + what + " again, sugar. Somebody'll offer it to you in person, and it turns up on your BC+ Contracts page to read and sign, same as before.");
+        notifyStaff("\u{1F4DC} " + plainName(mn) + " would like their farm contract again: " + what + (running ? ", endin' in about " + renewHours(x) + " hours" : "") + ". One click: Staff panel \u2192 Contracts \u2192 Offer it, or ?renew offer " + plainName(mn) + " (they need to be in the room).", true);
+        if (lead2 && lead2 !== mn) beep(lead2, "\u{1F4DC} " + plainName(mn) + " said yes to another " + what + ". Staff can offer it with ?renew offer " + plainName(mn) + ".");
+      } else {
+        tell(mn, "\u{1F4DC} No more after this one, then." + (running ? " It ends in about " + renewHours(x) + " hours, and that's that." : "") + " (Change your mind before then? ?renew yes.)");
+        if (lead2 && lead2 !== mn) beep(lead2, "\u{1F4DC} " + plainName(mn) + " said no to another " + what + ".");
+      }
+    }
+    function renewalsList() {
+      contractsLedger();
+      const now = Date.now(), seen = /* @__PURE__ */ new Set(), out = [];
+      for (let i = L2.contracts.length - 1; i >= 0; i--) {
+        const x = L2.contracts[i];
+        if (!x.until || seen.has(x.mn) || !(x.renewAt || x.renewSaid)) continue;
+        const live = x.status === "signed" && x.until > now, waiting = x.status === "ended" && x.renewSaid === "yes" && !x.renewOffered && now - (x.endedAt || x.until) < RENEW_KEEP;
+        if (!live && !waiting) continue;
+        seen.add(x.mn);
+        out.push({
+          mn: x.mn,
+          name: plainName(x.mn),
+          title: x.title,
+          dur: (durOfMin(x.durationMin) || {}).label || "",
+          said: x.renewSaid || "",
+          offered: !!x.renewOffered,
+          until: x.until,
+          ended: !live,
+          here: !!charFor(x.mn)
+        });
+      }
+      const rank = (r) => r.said === "yes" && !r.offered ? 0 : !r.said ? 1 : 2;
+      return out.sort((a, b) => rank(a) - rank(b) || a.until - b.until).slice(0, 20);
+    }
+    function renewCommand(sender, args, R) {
+      const a0 = String(args[0] || "").toLowerCase();
+      if (["yes", "y", "no", "n"].includes(a0)) {
+        const x = renewable(sender);
+        if (!x) {
+          R("\u{1F4DC} You haven't a farm contract with an end date right now, sugar. (?contract shows yours.)");
+          return;
+        }
+        renewAnswer(sender, a0[0] === "y", x);
+        return;
+      }
+      if (a0 === "offer") {
+        if (!isHerdmaster(sender)) {
+          R("Offerin' contracts is for herdmasters and the proprietors, sugar.");
+          return;
+        }
+        const t = resolveTarget(args[1]);
+        if (!t || !rec(t)) {
+          R("?renew offer <who>: offers them the same farm contract again, the same length.");
+          return;
+        }
+        const x = renewable(t);
+        if (!x) {
+          R(plainName(t) + " hasn't a timed farm contract to renew, sugar. ?contract offer is the way for a new one.");
+          return;
+        }
+        const d = durOfMin(x.durationMin), tpl = contractTemplate(x.tpl) ? x.tpl : contractTemplate(x.depth) ? x.depth : null;
+        if (!tpl || !d) {
+          R("I can't tell which contract that one was, sugar (" + x.title + "). Offer it by hand: ?contract offer <name> " + plainName(t) + " <length>.");
+          return;
+        }
+        const err = offerContract(sender, tpl, t, d.key);
+        if (err) {
+          R(err);
+          return;
+        }
+        x.renewOffered = Date.now();
+        saveLedger();
+        syncCompanions();
+        audit(sender, "RENEW_OFFER", t + " " + x.title);
+        R("\u{1F4DC} Offered " + plainName(t) + " " + renewWhat(x) + " again. It starts when they sign it.");
+        return;
+      }
+      if (!isStaff(sender)) {
+        const x = renewable(sender);
+        if (!x) {
+          R("\u{1F4DC} You haven't a farm contract with an end date right now, sugar.");
+          return;
+        }
+        R("\u{1F4DC} Your farm contract " + renewWhat(x) + (x.until > Date.now() ? " ends in about " + renewHours(x) + " hours." : " has ended.") + (x.renewSaid === "yes" ? " You've said you'd like another: staff will offer it in person." : x.renewSaid === "no" ? " You've said no more after it." : "") + " ?renew yes or ?renew no.");
+        return;
+      }
+      const rows = renewalsList();
+      const line = (r) => "  \u2022 " + r.name + ' \xB7 "' + r.title + '"' + (r.dur ? " (" + r.dur + ")" : "") + " \xB7 " + (r.ended ? "ended" : "ends in " + Math.max(1, Math.round((r.until - Date.now()) / 36e5)) + " h") + " \xB7 " + (r.said === "yes" ? r.offered ? "offered again" : "SAID YES" + (r.here ? ", here now" : ", not here") : r.said === "no" ? "said no" : "asked, no answer yet");
+      R("\u{1F4DC} CONTRACT RENEWALS\n" + (rows.length ? rows.map(line).join("\n") : "  Nobody's been asked yet. I ask a day before a timed contract ends.") + "\n\n?renew offer <who> offers the same contract again (herdmasters and up, with them here in the room).");
+    }
+    function renewStateFor(mn, s) {
+      if (!isStaff(mn)) return;
+      const rows = renewalsList();
+      if (rows.length) s.renewals = rows.map((r) => Object.assign({}, r, { until: Math.ceil(r.until / 6e4) * 6e4 }));
+    }
+    if (W.__FARMHAND_TEST__) Object.assign(W, { __renewTick: () => renewTick(), __renewable: (m) => renewable(m), __renewals: () => renewalsList() });
+    Object.assign(MESS, { icing: "#FFFDF8", cocoa: "#6E4128", eggnog: "#F1E0AA", peppermint: "#E23A52" });
+    season("winter", {
+      label: "Winter",
+      icon: "\u2744\uFE0F",
+      alias: ["snow", "snowy", "midwinter", "christmas", "xmas", "holidays", "holiday", "festive", "wintertime", "december", "january", "winterfair"],
+      on: (dt) => dt.getMonth() === 11 || dt.getMonth() === 0,
+      // December and January
+      dates: () => "Dec 1 \u2013 Jan 31",
+      blurb: "snow on the barns, gingerbread, mistletoe, and a stockin' on the hearth",
+      hint: "?stocking: look in your stockin' on the farm's hearth, once a day (coal if you've been naughty).",
+      why: [
+        "It's winter on the farm, and the snow was hidin' somethin'.",
+        "Somethin' came in out of the cold for you, sugar.",
+        "The farm's all snow and tinsel this month, and this one was wrapped just for you.",
+        "Winter on the farm: nobody stays cold for long."
+      ],
+      start: [
+        "Winter's come to the farm. There's snow on the barn roofs, ice on the duck pond, gingerbread in the oven and mistletoe over the kissin' gate. Wrap up warm, sugar, and look in your stockin' on my hearth (?stocking).",
+        "The first snow's fallen on the farm, sugar. The pond's froze over, the bakery's been busy, and there are things out in the drifts that only come down from the hills this time of year.",
+        "It's winter on the farm! Lanterns on the fence posts, cocoa on the stove, a sauna steamin' by the pond, and a whole crop of traps that only come out when it snows."
+      ],
+      end: [
+        "Winter's done on the farm for another year. The snow's gone to slush, the gingerbread's all eaten, and the stockin's are back up in the attic.",
+        "The thaw's come, sugar. The pond's water again, the snowmen are puddles, and whatever came down from the hills has gone back up them. Till next winter."
+      ],
+      also: ["bearskin", "hottub", "bakery", "kissgate"],
+      // the farm girl's: the game's own red winter hat, short shawl and fur gloves (only those, never a stand-in), in their own colours
+      costume: [
+        { slot: "hat", name: "Winter Hat", items: ["Santa1"], desc: "A red winter hat with a white fur brim and a fluffy white bobble on the end that bounces when she walks." },
+        { slot: "cloak", name: "Winter Shawl", items: ["XmasShortShawl"], desc: "A short red shawl trimmed with white fur, done up at the throat with a little bow." },
+        { slot: "gloves", name: "Fur Gloves", items: ["GlovesFur"], desc: "Soft white fur gloves, warm as toast, for handin' out cocoa." }
+      ]
+    });
+    for (const [k, places] of Object.entries({ bearskin: ["cabin"], hottub: ["cabin", "wildlife"], bakery: ["trough", "bench"], kissgate: ["stockade", "glory"] }))
+      if (!SEASON_PLACES[k]) SEASON_PLACES[k] = places;
+    seasonTrap("winter", "frozenpond", {
+      icon: "\u{1F9CA}",
+      what: "the frozen duck pond: your skates froze fast in the ice, and every skater on the pond takes a turn",
+      limit: /\b(cold|ice|gang|free ?use|public)/i,
+      hold: 6,
+      where: "the frozen pond",
+      lines: {
+        beats: [
+          [
+            "The duck pond's froze solid and the whole farm's out skatin' on it, and %n's doin' fine right up until they glide over the soft spot by the spring.",
+            "%n laces up a pair of skates and goes out on the frozen pond, and halfway across, the ice under them goes slushy, and then, just as quick, hard again.",
+            "There's a skatin' party on the frozen pond, lanterns on poles all round the edge, and %n skates out into the middle to show off a spin."
+          ],
+          [
+            "Their skates are froze fast in the ice, both of them, solid as if they'd grown there. %n tugs, and wobbles, and stays exactly where they are.",
+            "%n tries to skate on and can't. The slush has set round both their boots like stone, and they're stuck standin' in the middle of the pond with their arms windmillin'.",
+            "Froze in, ankle-deep, right in the middle where everybody skates past. %n bends down to dig at it, and that's the wrong thing to do, because now they're bent over."
+          ],
+          [
+            "The first skater to come by gives %n's bottom a friendly slap on the way past. The second one stops to help, and helps themself to a feel instead.",
+            "Skaters circle %n like geese, round and round, and every lap somebody reaches out: a squeeze, a pinch, a cold glove slidin' up under their coat.",
+            "{t}A skater glides up behind %n, slips both gloved hands up under their jumper and cups their tits, and holds on for a whole lap of the pond.",
+            "{c}Somebody skates past and gets a hand down the front of %n's trousers on the way, and cold fingers wrap round %n's cock and stroke it once, twice, and they're gone.",
+            "{v}A skater pulls up behind %n, tugs their bottoms down a few inches, runs two cold fingers along %n's pussy, slow, and skates off laughin'."
+          ],
+          [
+            "Then one of them stops for good. Skates scrape to a halt behind %n, gloves take hold of their hips, and the whole pond slows down to watch.",
+            `A big skater in a striped scarf grinds to a stop behind %n, peels their bottoms down to their froze-in knees, and says, "Don't you worry. I'll warm you up."`,
+            "Somebody skates a slow circle round %n, sizin' them up, then comes in close behind and presses up warm against them, and %n isn't cold anywhere any more."
+          ]
+        ],
+        end: [
+          "The skater spills %ml into %n's %h with a groan that fogs the air, and somebody pours a kettle of hot water round their boots. The ice lets go, and so do %n's knees.",
+          "%n's thawed out at last with a kettle from the bank, %ml warm in their %h, and they wobble off the pond on their skates with everybody clappin'.",
+          "By the time the farmhands chip %n's skates free, the skater's long gone and %ml of them is runnin' down the inside of %n's thighs, steamin' a little in the cold."
+        ],
+        endOver: [
+          "The skater pulls back and spills %ml across %n's bare bottom, hot as a stove in the cold air, and the farmhands come with a kettle to melt their boots free.",
+          "%n's chipped out of the ice with %ml of somebody froze in streaks on their backside, and a red handprint on each cheek from the laps before."
+        ]
+      },
+      after(mn) {
+        const got = hwFill(mn, 150, 1.2);
+        arouse(mn, 35);
+        face(mn, got.h ? "bred" : "afterglow", 90);
+        return got.h ? { endKey: "end", ml: ml(got.ml), h: TRAP_HOLE[got.h] } : { endKey: "endOver", ml: ml(got.ml) };
+      },
+      scene: [
+        [
+          "The ice creaks under the skaters, a long low sound like the pond's thinkin' about somethin'.",
+          "Somebody's roastin' chestnuts on a brazier by the bank, and the smell drifts out across the ice.",
+          "A pair of ducks waddle over the ice to look at %n, decide they're not bread, and waddle off again.",
+          "The lanterns on their poles swing in the wind, and the shadows of the skaters wheel round %n in circles."
+        ],
+        [
+          "{t}A skater glides past and gives each of %n's tits a squeeze through their coat, like checkin' fruit at the market.",
+          "{c}A gloved hand finds %n's cock on the way past and gives it a long slow tug, and the glove's very cold and the hand inside it very warm.",
+          "{v}Cold fingers slip between %n's thighs on the way past and rub, quick and wicked, and they're gone before %n can squeak.",
+          "Somebody skates up and kisses %n on the mouth, warm and hot-chocolatey, and spins off backwards wavin'."
+        ]
+      ],
+      tender: [
+        "Somebody tucks a scarf round %n's neck first, so they're not cold up top while they wait.",
+        "The skaters are gentle, and every one of them asks %n if their feet are warm enough.",
+        "Somebody brings %n a cup of hot cider and holds it for them, sip by sip, between laps."
+      ],
+      filthy: [
+        "%n's stuck bent over on the ice like a fence post, and every skater on the pond treats them like one they're allowed to lean on.",
+        "The whole pond takes turns slappin' and squeezin' %n's bare bottom, and %n's moanin' loud enough to crack the ice.",
+        "%n's the skatin' party's free entertainment, froze in place and drippin', and nobody's in any hurry to fetch the kettle."
+      ],
+      gear: [{ when: "hold", slot: "ropeFeet", label: "Frozen Fast", items: ["HempRope"], color: "#CFE8F5", desc: "Ice up over both their boots and round the ankles, froze solid. They're not goin' anywhere till somebody fetches a kettle." }],
+      depth: ["held", "watched", "breed"],
+      tw: ["crowd", "day"],
+      places: ["wildlife", "pasture"],
+      sound: "creak",
+      tags: ["restraint", "public"],
+      writes: ["THIN ICE", "FROZEN ASSET", "SKATE BY", "ON ICE"]
+    });
+    seasonTrap("winter", "gingerbread", {
+      icon: "\u{1F36A}",
+      what: "the gingerbread man the bakers brought to life: six foot of warm spiced dough, a candy-cane cock, and icin' all over you after",
+      limit: /\b(food|messy|sticky|monster)/i,
+      stud: { sire: -70, name: "the gingerbread man", type: "human", loads: 2, ml: 200, hold: 6, hole: "vulva", bonus: 1.2, where: "the bakery", person: true },
+      lines: {
+        beats: [
+          [
+            "The bakery's warm as a summer kitchen, and on the coolin' rack by the oven there's a gingerbread man as tall as the door, iced buttons down his chest and a big frosted grin. He sits up when %n walks in.",
+            `%n follows the smell of ginger and cloves into the bakery, and somethin' tall and brown and sugar-dusted steps out from behind the flour sacks and says, "Run, run, as fast as you can." Then it catches them anyway.`,
+            "The bakers made a gingerbread man for the winter fair, six foot of him, and somebody must've put somethin' extra in the dough, because he's walkin' round the bakery now and he's very interested in %n."
+          ],
+          [
+            "He lifts %n onto the floury bakin' table like they weigh nothin' and leans over them, warm right through like he's fresh out of the oven, smellin' of treacle and spice.",
+            "He backs %n up against the warm bricks of the bread oven and pins them there with one big spiced hand on their chest, and his icin' grin gets wider.",
+            "He sweeps a whole gingerbread house off the table with one arm, roof and all, and lays %n down in the crumbs instead."
+          ],
+          [
+            "He undresses %n with careful dough fingers, button by button, and every inch he uncovers he licks, slow, like he's checkin' if it's sweet enough.",
+            "{c}He finds %n's cock and wraps a warm spiced hand round it, and it's like bein' stroked by fresh bread, soft and hot and smellin' of treacle.",
+            "{v}He spreads %n's thighs on the floury table and slides a thick warm finger into their pussy, and it comes out glistenin', and he licks it, and nods.",
+            "{t}He cups %n's tits in his big warm hands and pipes a little swirl of icin' on each nipple from a bag on the counter, then licks it off, one and then the other.",
+            "There's a candy-cane stripe painted down the front of him, red and white, and it leads right down to somethin' that's very definitely not just for decoration."
+          ]
+        ],
+        in: [
+          [
+            "He pushes into %n's %h slow and warm, a candy-cane cock as smooth as boiled sugar, and the whole bakery smells of ginger as he starts to move.",
+            "He takes %n's %h right there on the table, and the flour puffs up round them in clouds with every thrust, and the bakin' trays rattle on their hooks."
+          ],
+          [
+            "He fills %n twice, hot as a tray straight out of the oven, and the second time he groans so loud a gumdrop pops off his chest.",
+            "When he cums it's warm and thick and sweet, and he keeps goin' right through it, and fills them again before his icin' grin starts to droop."
+          ]
+        ],
+        over: [[
+          "He doesn't take them. He ruts his candy-cane cock between %n's floury thighs, slow and sticky, till he spills hot across their belly.",
+          "He sits %n up on the counter and strokes himself against them till he paints their belly, then pipes a little icin' heart on top of it."
+        ]],
+        end: [
+          "The gingerbread man pipes GOOD ENOUGH TO EAT across %n in icin', lifts them down off the table with %ml warm in their %h, and goes back to sit on his coolin' rack.",
+          "%n climbs off the bakin' table with %ml in their %h, flour in their hair and icin' all over, and the gingerbread man waves goodbye with a crumbly little wave.",
+          "He leaves %n slumped against the warm oven with %ml of him in their %h and a gumdrop pressed into their hand, and the bakers come back from lunch to a very floury bakery."
+        ],
+        endOver: [
+          "%n slides off the counter with %ml of gingerbread man drippin' down their belly, iced like a cake, and he tips a little icin' hat they hadn't noticed he had.",
+          "The gingerbread man wipes %n down with a tea towel, misses most of the %ml on their belly on purpose, and pipes a smile on their chest for the road."
+        ]
+      },
+      scene: [
+        [
+          "Flour drifts down off the shelves every time the table bumps the wall, and settles on them both like snow.",
+          "The oven ticks and hums behind them, and the whole bakery's as warm as a summer afternoon.",
+          "One of his gumdrop buttons pops loose and rolls away under the table. He doesn't notice. He's busy.",
+          "A tray of mince pies steams on the rack, and the steam fogs the bakery window so nobody outside can see in. Mostly."
+        ],
+        [
+          "{t}He licks a stripe of icin' off %n's tit and makes a happy crumbly noise about it.",
+          "{c}He gives %n's cock a squeeze with a hand so warm it might've just come out of the oven.",
+          "{v}His thumb rubs slow circles on %n's clit, sticky with icin', and he hums like a kettle.",
+          "He licks the flour off %n's neck, and his tongue's warm and tastes of ginger."
+        ]
+      ],
+      tender: [
+        "He's warm and soft and careful, and he keeps askin' if %n's comfy on the table.",
+        "He tucks a folded tea towel under %n's head so the table's not so hard.",
+        "He smells like a kitchen on bakin' day, and he holds %n like somethin' fresh and precious."
+      ],
+      filthy: [
+        "The gingerbread man bends %n over the flour sacks and fucks them like he's kneadin' dough, hard and slappy.",
+        "%n's a floury, sticky, icin'-smeared mess, moanin' like they're bein' paid for it, and the gingerbread man's not done yet.",
+        "He stuffs %n full of warm sweet seed and licks the overflow off them like it's the best part of the recipe."
+      ],
+      mess: ["icing", ["chest", "tummy", "face"]],
+      gear: [{ when: "hold", slot: "ropeArms", label: "Bakery Ribbon", items: ["Ribbons"], color: "#C8102E", desc: "A red ribbon off the cake boxes, tied round their wrists and looped over the bakin' table's leg." }],
+      depth: ["breed", "mess"],
+      tw: ["day", "breed"],
+      places: ["trough", "cabin", "office"],
+      sound: "wood",
+      tags: ["messy", "monsters"],
+      writes: ["FRESH BAKED", "GOOD ENOUGH TO EAT", "ICED", "SWEET TREAT"]
+    });
+    seasonTrap("winter", "mistletoe", {
+      icon: "\u{1F33F}",
+      what: "the mistletoe over the kissin' gate: tied up under it, and everybody who passes owes a kiss, and collects",
+      limit: /\b(kiss|public|free ?use|gang)/i,
+      hold: 5,
+      where: "under the mistletoe",
+      lines: {
+        beats: [
+          [
+            "Somebody's hung a big bunch of mistletoe over the kissin' gate this month, white berries and a red velvet bow, and %n's standin' right under it before they notice.",
+            `%n goes through the kissin' gate and somebody behind them clears their throat and points up. Mistletoe. "Rules are rules, sugar."`,
+            "There's a sprig of mistletoe hangin' over the kissin' gate and a little crowd waitin' by it, and they all look very pleased when %n walks up."
+          ],
+          [
+            "Before %n can duck out, somebody ties their wrists up to the gate post with a red velvet ribbon, right under the mistletoe, and a queue starts formin'.",
+            `The gate swings and catches %n in its little pen, and a farmhand ties a ribbon round their wrists and the post for good measure. "Stay put. You're popular."`,
+            `"Everybody gets a kiss," says the farmhand runnin' the gate, tyin' %n's wrists up under the mistletoe with a red ribbon. "Everybody."`
+          ],
+          [
+            "The first kiss is sweet, on the cheek. The second's on the mouth. The third one takes a long time and uses tongue, and the crowd cheers.",
+            "One by one they come up for their kiss, every one of them a little bolder than the last, and some of them go round to the back of the queue again.",
+            "Kisses on the mouth, kisses on the neck, a kiss on the inside of the wrist that makes %n shiver all over. Somebody keeps count out loud."
+          ],
+          [
+            `Then somebody kneels. "Didn't say where the kiss had to go," they say, and tugs %n's bottoms down.`,
+            "{t}Somebody unbuttons %n's top and kisses each of their tits in turn, slow, and sucks a nipple pink before they let it go.",
+            "{c}A farmhand gets down on their knees, pulls %n's cock out into the cold air and kisses the tip, then takes the whole of it in their warm mouth.",
+            "{v}Somebody kneels, nudges %n's knees apart and kisses their pussy the way they'd kiss their mouth, deep and slow and with a lot of tongue.",
+            "The kisses wander lower and lower, and by the end of the queue there's not an inch of %n that's not been kissed under the mistletoe."
+          ]
+        ],
+        end: [
+          "The last of the queue gets their kiss and the farmhand unties the ribbon. %n stumbles out of the kissin' gate kissed pink all over, lipstick on their neck and their knees not workin'.",
+          "The mistletoe's lost half its berries by the time the queue's done, one for every kiss, the old way, and %n's let go flushed and dazed and covered in lipstick.",
+          `"That's everybody," says the farmhand, and unties %n, and kisses them once more on the forehead for luck. %n's lips are numb, and the rest of them very much isn't.`
+        ]
+      },
+      after(mn) {
+        arouse(mn, 40);
+        face(mn, "afterglow", 90);
+        return null;
+      },
+      scene: [
+        [
+          "A robin sits on the gate post and watches the queue, head on one side.",
+          "Somebody at the back of the queue's brought a flask of mulled cider and is passin' it round.",
+          "Snow starts to fall, big soft flakes, and they land on %n's eyelashes between kisses.",
+          "The farmhand runnin' the gate plucks a berry off the mistletoe for every kiss, the old way, and there are a lot of berries goin'."
+        ],
+        [
+          "{t}Somebody kisses their way across %n's chest from one nipple to the other, and back again for luck.",
+          "{c}Somebody kneels in the snow, kisses all the way up %n's cock from the root to the tip, and gets back in the queue.",
+          "{v}A kiss lands right between %n's legs, warm and slow, and the next one in the queue says that one counted double.",
+          "Somebody kisses %n so deep and long that the crowd starts to count, and gets to forty."
+        ]
+      ],
+      tender: [
+        "Every kiss is soft, and every kisser says thank you.",
+        "The ribbon's tied loose and soft, and somebody checks it isn't pinchin' between kisses.",
+        "The queue's full of friendly faces, and every one of them wishes %n a warm winter."
+      ],
+      filthy: [
+        "%n's the kissin' gate's toll, tied up and kissed, licked and sucked by the whole farm, and they're moanin' for the next one.",
+        "The kisses stopped bein' kisses about halfway down the queue, and nobody minds, least of all %n.",
+        "%n's lipstick-smeared and drippin', squirmin' on the ribbon, and the queue's got longer, not shorter."
+      ],
+      gear: [{ when: "hold", slot: "ropeArms", label: "Mistletoe Ribbon", items: ["Ribbons"], color: "#B3122E", desc: "A red velvet ribbon tyin' their wrists up to the kissin' gate's post, right under the mistletoe." }],
+      depth: ["tease", "watched"],
+      tw: ["crowd", "day"],
+      places: ["stockade", "glory", "pasture"],
+      sound: "softgate",
+      soundEnd: "gate",
+      tags: ["public", "restraint"],
+      writes: ["KISSED", "KISS ME", "UNDER THE MISTLETOE", "KISSED BY EVERYBODY"]
+    });
+    seasonTrap("winter", "yeti", {
+      icon: "\u{1F3D4}\uFE0F",
+      what: "the yeti down from the hills: twice your size, warm as a stove under all that white fur, and he wants somebody to keep him company till spring",
+      limit: /\b(size|monster|beast|big|cold)/i,
+      stud: { sire: -71, name: "the yeti", type: "human", loads: 2, ml: 340, hold: 8, hole: "vulva", bonus: 1.6, where: "the yeti's cave" },
+      lines: {
+        beats: [
+          [
+            "Snow's driftin' deep up by the top field, and %n's wadin' through it when the biggest drift of all stands up. It's white and shaggy and twice as tall as they are, and it rumbles.",
+            "There are footprints in the snow by the top field, every one as long as %n's arm, and they lead straight up to %n, because whatever made them is standin' right behind them.",
+            "A blizzard comes down off the hills out of nowhere, and out of it walks a yeti, eight foot of white fur and frost, with eyes as blue as the ice on the pond."
+          ],
+          [
+            "He scoops %n up against his chest like a lost lamb and carries them off through the snow to a cave in the hillside, warm and dry inside, with a nest of furs in the back.",
+            "%n tries to run and gets about four steps. The yeti picks them up round the waist, tucks them under one shaggy arm and lopes off with them up to his cave.",
+            "He doesn't grab. He holds out one huge furry hand and waits, and when %n's fingers are too cold to say no to anything warm, he wraps them up in his arms and carries them home."
+          ],
+          [
+            "In the cave he lays %n down on a pile of furs and peels their froze-stiff clothes off, and then lies down over them, and it's like bein' buried in the warmest blanket in the world.",
+            "{c}His great warm hand closes round %n's cock and the whole of it disappears in his fist, and he rumbles, pleased, when it twitches.",
+            "{v}He parts %n's thighs with two big fingers and strokes their pussy, slow and warm and careful, like a man holdin' a bird's egg.",
+            "{t}He buries his face in %n's tits, fur ticklin' everywhere, and his breath's as hot as a kettle on their cold skin.",
+            `Under all that white fur he's hot as a stove, and hard, and very, very big, and he rumbles somethin' that might be "mine".`
+          ]
+        ],
+        in: [
+          [
+            "He eases into %n's %h a little at a time, and it's a lot, and he's patient about it, rumblin' soft every time they gasp, till he's all the way in.",
+            "He fills %n's %h with a cock as big as the rest of him, slow and deep, and the furs bunch up under them and the whole cave smells of snow and musk."
+          ],
+          [
+            "He breeds %n slow and heavy, the way snow falls, and when he cums it's a flood, hot as a bath, and he holds them through every bit of it.",
+            "Twice he fills %n, the second time with his whole huge body curled round theirs to keep the heat in, and his rumble shakes the icicles at the cave mouth."
+          ]
+        ],
+        over: [[
+          "He doesn't take them. He ruts between %n's thighs on the furs, slow and heavy, and spills across their belly and chest in a flood that steams in the cold air.",
+          "He holds %n against his chest and strokes himself against them till he floods their belly, then licks their face, rough and warm, like a big friendly cat."
+        ]],
+        end: [
+          "The yeti wraps %n up in his softest fur with %ml of him warm in their %h, carries them back down to the farm gate, and leaves them there tucked up like a parcel.",
+          "%n wakes up hours later in the cave with %ml in their %h, wrapped in furs and warmer than they've been all winter, the yeti snorin' like a landslide beside them.",
+          "He carries %n home through the snow with %ml of him in their %h and their belly full and warm, sets them down in the barn, and lopes off back up the hill."
+        ],
+        endOver: [
+          "The yeti wraps %n up in a fur, %ml of him still steamin' on their belly, and carries them home to the farm gate.",
+          "%n's carried back down to the farm wrapped in white fur and painted with %ml of yeti, and he gives them a gentle pat on the head before he goes."
+        ]
+      },
+      scene: [
+        [
+          "Icicles drip at the cave mouth, the blizzard howls outside, and in here it's warm as summer.",
+          "There's a little fire burnin' at the back of the cave. He must've lit it for them. That's thoughtful, for a yeti.",
+          "His fur's so thick %n can lose both hands in it, and they do, holdin' on.",
+          "He rumbles the whole time, low and steady, a sound %n can feel in their teeth."
+        ],
+        [
+          "{t}His huge thumbs circle %n's nipples till they're hard as hailstones, and then he warms them in his mouth.",
+          "{c}His fist works %n's cock slow and steady, warm as an oven glove, and he won't let go.",
+          "{v}His thumb rubs %n's clit in slow circles, and for somethin' that big he's very, very gentle.",
+          "He licks %n's neck, slow and rough, and the warmth of it goes all the way down."
+        ]
+      ],
+      tender: [
+        "He wraps %n up in his arms and his fur so not one inch of them is cold.",
+        "He's slow and patient, and he stops and rumbles a question every time %n gasps.",
+        "He hums somethin' low and soft the whole time, like a lullaby made of avalanches."
+      ],
+      filthy: [
+        "The yeti breeds %n like he means to have them carryin' by spring, and %n's beggin' him to.",
+        "%n's stretched round a monster cock in a cave in the snow, moanin' loud enough to bring the drifts down.",
+        "He fills %n so full they slosh, and then fills 'em again for the cold."
+      ],
+      gear: [{ when: "after", slot: "device", label: "Yeti's Fur Wrap", items: ["FurBlanketWrap"], mins: 20, desc: "One of the yeti's own white furs, wrapped round them snug as a cocoon and tied off. Warm as anything. Not easy to get out of." }],
+      depth: ["held", "breed"],
+      tw: ["alone", "night", "breed"],
+      places: ["wildlife", "pasture", "cabin"],
+      sound: "straw",
+      tags: ["monsters"],
+      writes: ["YETI'S MATE", "SNOWED IN", "WINTER BRED"]
+    });
+    seasonTrap("winter", "giftwrap", {
+      icon: "\u{1F381}",
+      what: "gift-wrapped: tied up in ribbon, popped in a box with a bow on top, tagged UNWRAP ME and left under the farm's big tree",
+      limit: /\b(bondage|restrain|tied|public|display|free ?use)/i,
+      hold: 6,
+      where: "under the farm's big tree",
+      before(mn, v) {
+        v.used = Math.random() < 0.55;
+      },
+      lines: {
+        beats: (mn, v) => {
+          const T = SEASON_LINES.giftwrap;
+          return [T.b1, T.b2, T.b3, v.used ? T.used : T.tease];
+        },
+        b1: [
+          `The farmhands are wrappin' presents in the big barn, a mountain of paper and ribbon, and one of them looks at %n and says, "Hold still. You'll fit."`,
+          "%n wanders into the barn where the presents are bein' wrapped and gets a ribbon looped round their wrists before they've even said hello.",
+          "There's a big empty box under the farm's tree, wrapped in red paper, with a tag on it that says UNWRAP ME. It's %n-sized. That's not an accident."
+        ],
+        b2: [
+          "Red ribbon round the wrists, round the ankles, criss-crossed over the chest, and finished with a big bow right where it'll be the most fun to pull.",
+          "They wrap %n up like a parcel, ribbon round and round, tie it off in a big fat bow on their hip, and stick a gift tag on their bottom.",
+          "{t}The ribbon goes under and over %n's tits, pushin' them up and out like they're the present, and the bow sits right between them.",
+          "{c}They tie a little red bow round the base of %n's cock, very neat, very festive, and step back to admire it."
+        ],
+        b3: [
+          "Into the box they go, ribbons and all, with the lid left off so everybody can see what's inside, and the box goes under the tree with the rest of the presents.",
+          "They pop %n in the gift box, up on their knees, bow on top, and slide them under the big tree between a sack of oats and a new saddle.",
+          '"To: everybody," a farmhand writes on the tag, "from: the farm," and pats %n on the head and leaves them under the tree.'
+        ],
+        used: [
+          "Somebody can't wait. They kneel by the box, pull one end of the bow, and unwrap just enough of %n to get at the best part.",
+          "Folk come by all evenin' to shake the presents, and one of them decides %n's the present they want, and climbs right into the box with them.",
+          "{v}A farmhand pulls the ribbon off %n's hips, nudges their knees apart in the box and helps themself to their pussy, slow, like openin' a present carefully to save the paper.",
+          "{c}Somebody unwraps the bow on %n's cock with their teeth, then turns %n round in the box and takes them from behind."
+        ],
+        tease: [
+          "Everybody who comes by gives the present a shake and a squeeze, and nobody's allowed to open it till the farm girl says so.",
+          "Folk come by to guess what's in the box, and every guess needs a good feel first, and %n's squirmin' in their ribbons before long.",
+          "{t}Somebody tugs the bow between %n's tits and the ribbon pulls tight round them, and then they tie it again, slower.",
+          "{c}Everybody who passes flicks the little bow on %n's cock, and some of them give it a good long stroke while they're there."
+        ],
+        endUsed: [
+          "Whoever unwrapped %n leaves %ml in their %h, ties the bow back on a bit wonky, and puts the lid on the box. The farm girl lets them out at suppertime.",
+          "%n's let out of the box at last, ribbons all tangled, %ml of somebody runnin' out of their %h and the gift tag still stuck to their bottom.",
+          "The ribbons come off one by one, and %n climbs out of the box with %ml in their %h and THANK YOU written on the tag in somebody's handwritin'."
+        ],
+        endUsedOver: [
+          "Whoever unwrapped %n spills %ml over them, re-ties the bow, and leaves them in the box, sticky and beribboned, till the farm girl lets them out.",
+          "%n climbs out of the box at suppertime with %ml painted across their ribbons and the gift tag stuck to them in a very sticky way."
+        ],
+        endTease: [
+          "At suppertime the farm girl pulls the big bow, and all the ribbons fall off %n at once, and they climb out of the box shiverin' and wantin' and squeezed all over.",
+          "Nobody was allowed to open the present after all. The farm girl unties %n at suppertime, tinglin' from an evenin' of shakes and squeezes, and never once unwrapped.",
+          `The farm girl lets %n out of their box with a kiss on the nose. "Best present I've had all year," she says, "and nobody even got to open it."`
+        ]
+      },
+      after(mn, v) {
+        arouse(mn, 40);
+        if (!v.used) {
+          face(mn, "edged", 90);
+          return { endKey: "endTease" };
+        }
+        const got = hwFill(mn, 140, 1.2);
+        face(mn, got.h ? "bred" : "afterglow", 90);
+        return got.h ? { endKey: "endUsed", ml: ml(got.ml), h: TRAP_HOLE[got.h] } : { endKey: "endUsedOver", ml: ml(got.ml) };
+      },
+      scene: [
+        [
+          "The tree's lit with little lanterns, and they glint off the ribbon every time %n wriggles.",
+          `Somebody shakes the box next to %n's and guesses "socks". It's socks.`,
+          "The barn smells of pine needles and paper and the mulled cider warmin' by the door.",
+          "A farmhand comes by with a roll of sticky tape and tapes the gift tag back on where it was peelin'."
+        ],
+        [
+          "{t}Somebody squeezes %n's tits through the ribbon, one and then the other, like guessin' what's in a stocking.",
+          `{c}Somebody gives %n's cock a squeeze through the ribbon and says, "Oh, I know what this one is."`,
+          "{v}Somebody runs a finger along the ribbon between %n's legs, and it comes back wet, and they grin.",
+          "Somebody tugs the big bow just a little, not enough to undo it, just enough to make %n gasp."
+        ]
+      ],
+      tender: [
+        "The ribbons are soft satin, tied snug and never tight.",
+        "The farm girl tucks a cushion into the box so %n's knees don't ache.",
+        "Everybody who comes by tells the present how lovely it looks."
+      ],
+      filthy: [
+        "%n's the farm's present to itself, tied up with a bow on and tagged for anybody to open.",
+        "Gift-wrapped and stuffed in a box, %n's the gift that keeps on givin', and everybody wants a turn unwrappin' it.",
+        "%n's squirmin' in their ribbons, drippin' through the satin, a present nobody's goin' to return."
+      ],
+      gear: [
+        { when: "hold", slot: "arms", label: "Gift Ribbon (arms)", items: ["Ribbons"], color: "#C8102E", desc: "Red satin ribbon round and round their wrists, tied off in a fat bow." },
+        { when: "hold", slot: "legs", label: "Gift Ribbon (legs)", items: ["Ribbons"], color: "#C8102E", desc: "Red satin ribbon round their legs from the ankles up, neat as a parcel." },
+        { when: "hold", slot: "device", label: "Gift Box", items: ["GiftBox"], desc: "A big gift box wrapped in red paper, the lid left off so everybody can see what's inside, tagged UNWRAP ME." }
+      ],
+      depth: ["held", "watched", "tease"],
+      tw: ["crowd", "night"],
+      places: ["cabin", "office", "stockade"],
+      sound: "rope",
+      soundEnd: "ropelong",
+      tags: ["restraint", "public"],
+      writes: ["UNWRAP ME", "TO: EVERYBODY", "OPEN ME FIRST", "BEST PRESENT"]
+    });
+    seasonTrap("winter", "stocking", {
+      icon: "\u{1F9E6}",
+      what: "the giant stockin' on the hearth: popped in up to the chest, hung on its hook, and filled by everybody passin'",
+      limit: /\b(bondage|restrain|toys?|public|suspen)/i,
+      hold: 6,
+      where: "the big hearth",
+      lines: {
+        beats: [
+          [
+            "The big hearth in the farmhouse has stockin's hung all along it, and one of them's enormous, red and white and big enough for a person. A farmhand holds it open for %n with a grin.",
+            "%n's warmin' their hands by the big hearth when two farmhands take them, one under each arm, and lower them feet first into a giant red stockin'.",
+            "There's a stockin' on the hearth hook with %n's name stitched on the cuff in white letters, and it's far too big for socks, and the farmhands are already holdin' it open."
+          ],
+          [
+            "In they go, feet first, right up to the armpits, arms pinned at their sides in the soft red wool, and the farmhands hang the stockin' back on its hook with %n in it, toes a hand's width off the hearth.",
+            "The stockin's snug as a sausage skin. It holds %n's arms to their sides and their knees together, and up they go on the big brass hook by the fire, toes kickin' in the wool.",
+            "Up on the hook they go, stuffed in the stockin' to the chest, swingin' gently, toasty warm from the fire and not able to do a single thing about anything."
+          ],
+          [
+            "Then folk start fillin' the stockin'. A hand reaches in at the top with a sweet, leaves it down the front of %n's shirt, and keeps goin'.",
+            "Everybody who walks past puts a little somethin' in %n's stockin': a sweet, a ribbon, a hand that wanders all the way down to the toe.",
+            "{t}A farmhand reaches in the top of the stockin' and finds %n's tits, tucks a sweet between them, and gives them a good long squeeze for luck.",
+            "{c}Somebody's hand goes all the way down the stockin' and finds %n's cock, and strokes it inside the warm wool till they're squirmin' on the hook.",
+            "{v}A hand slides down inside the stockin', between %n's thighs, finds their pussy and leaves two fingers there while its owner chats about the weather."
+          ],
+          [
+            "Somebody drops in a little egg that buzzes, and it works its way down the stockin' till it finds somewhere to settle, and settles there, and buzzes.",
+            "The stockin' gets fuller and fuller, sweets and ribbons and nuts and hands, and %n squirms on the hook in front of everybody, red as the wool.",
+            "The fire crackles, the stockin' sways, and every time %n wriggles, somethin' buzzin' down in the toe of it shifts and makes them wriggle more."
+          ]
+        ],
+        end: [
+          "The farmhands lift the stockin' down at last and tip %n out on the hearth rug in a heap of sweets and ribbons, flushed and sweaty and very, very well stuffed.",
+          "%n's lifted off the hook and unrolled from the stockin' like a sweet from its wrapper, and the little egg comes too, still buzzin', and stays put.",
+          "Down comes the stockin', and out comes %n, pink as a candy cane and pantin', with half the sweets in the farmhouse stuck to them somewhere."
+        ]
+      },
+      after(mn) {
+        arouse(mn, 40);
+        face(mn, "afterglow", 90);
+        later(() => {
+          if (charFor(mn)) treatCandy(mn, "a stockin' candy");
+        }, 3e3);
+        return null;
+      },
+      scene: [
+        [
+          "The fire crackles and pops, and the stockin' sways on its hook in the warm air comin' off it.",
+          "Somebody hangs a sprig of holly on the hook next to %n, for decoration.",
+          "The farm cat curls up on the hearth rug under %n's dangling toes and goes to sleep.",
+          'A log shifts in the grate and sends up a shower of sparks, and everybody in the room says "ooh".'
+        ],
+        [
+          "{t}A hand reaches into the stockin' and plays with %n's nipple while its owner reads a letter with the other.",
+          "{c}Somebody reaches all the way down and gives %n's cock a slow squeeze through the wool, like checkin' what's in a present.",
+          "{v}Fingers slide down inside the stockin' and rub %n's pussy slow, in time with the clock on the mantel.",
+          "Somebody tickles %n's toes where they poke out the bottom of the stockin', and %n swings like a bell."
+        ]
+      ],
+      tender: [
+        "The stockin's soft as a blanket and the fire's warm, and %n's never been so cosy while bein' groped.",
+        "Every hand that goes in the stockin' leaves a sweet behind, every single one.",
+        "The farm girl comes by now and then to check %n's not too warm by the fire, and gives them a sip of water."
+      ],
+      filthy: [
+        "%n's a stockin' stuffer, hung on the hearth for anybody to reach in and play with, and everybody does.",
+        "There's a buzzin' egg wedged somewhere deep and a dozen hands in the wool, and %n's moanin' for the whole farmhouse to hear.",
+        "%n's drippin' down the inside of the stockin' and the farmhands make jokes about it bein' damp."
+      ],
+      gear: [
+        { when: "hold", slot: "arms", label: "The Big Stockin'", items: ["HempRope"], color: "#C8102E", desc: "The giant stockin's red wool, snug round their arms and holdin' them to their sides while they hang on the hearth." },
+        { when: "after", slot: "plug", label: "Stockin' Stuffer", items: ["EggVibePlugXXL"], color: "#C8102E", mins: 20, desc: "The buzzin' egg from the toe of the stockin', still buzzin', tucked in snug right where it settled." }
+      ],
+      depth: ["held", "tease", "watched"],
+      tw: ["night", "crowd"],
+      places: ["cabin"],
+      sound: "rope",
+      tags: ["restraint", "public"],
+      writes: ["STOCKIN' STUFFER", "NAUGHTY OR NICE?", "FILLED"]
+    });
+    seasonTrap("winter", "sauna", {
+      icon: "\u{1F9D6}",
+      what: "the sauna by the pond: steamed pink, switched with birch, rolled in the snow, and back in the heat again",
+      limit: /\b(heat|hot|cold|spank|impact|pain)/i,
+      hold: 5,
+      where: "the sauna",
+      lines: {
+        beats: [
+          [
+            `There's a little wooden sauna by the frozen pond, smoke curlin' out of its chimney, and a big bearded sauna keeper in nothin' but a towel holds the door open for %n. "In. You look cold."`,
+            "%n's teeth are chatterin' when the sauna keepers spot them, and before they know it they're stripped to the skin and pushed into the steam.",
+            "The sauna door opens in a cloud of steam and a pair of big sauna keepers come out pink as hams, see %n, look at each other, and carry them back in."
+          ],
+          [
+            "Inside it's as hot as a summer noon, and they lay %n out on the top bench and ladle water on the stones till the steam's so thick they can't see their own hands.",
+            "The steam rolls over %n in waves, the sweat runs off them in rivers, and big hands rub them down with it, slow, everywhere.",
+            "They sit %n between them on the bench, pressed close on both sides, all heat and muscle and sweat, and somebody pours another ladle on the stones."
+          ],
+          [
+            "Then out come the birch switches, leafy and soaked, and they beat %n with them, swish swish swish, back and bottom and thighs, till the skin tingles bright pink.",
+            `"Good for the blood," says the bearded one, and switches %n's bottom with a bundle of birch twigs, swish swish, while the other holds them down.`,
+            "{c}One of them switches %n's thighs while the other strokes %n's cock, slow, and the swish and the stroke keep the same time.",
+            "{t}The birch leaves swish across %n's tits, soft and stingin', and their nipples go hard in the heat."
+          ],
+          [
+            "Then out the door they go, all three of them, straight into a snowdrift, and the sauna keepers roll %n in the snow, and %n shrieks loud enough to scare the crows.",
+            "Out into the snow, naked and steamin', rolled in a drift till they gasp, then picked up and carried straight back into the heat, and the heat's like a kiss all over.",
+            "The cold's like a slap and the heat after is like honey, and they do it twice more, and by the end %n doesn't know which way is up."
+          ]
+        ],
+        end: [
+          "The sauna keepers wrap %n in a big towel, pink from head to toe and tinglin' in every inch, and sit them by the stove with a mug of somethin' hot. They've never felt so alive.",
+          "%n stumbles out of the sauna glowin' like a coal, switched pink, sweaty and shiverin' at the same time, and the sauna keepers wave them off with a slap on the bottom.",
+          'The sauna keepers let %n go with a birch leaf stuck to their bottom, a glow all over and legs like jelly. "Same time tomorrow," says the bearded one.'
+        ]
+      },
+      after(mn) {
+        arouse(mn, 35);
+        face(mn, "afterglow", 120);
+        return null;
+      },
+      scene: [
+        [
+          "The stones hiss every time somebody ladles water on them, and the steam rolls up to the rafters.",
+          "The little window's fogged solid. Outside it's snowin'. In here it's July.",
+          "The wood's so hot it's nearly too hot to sit on, and the sauna keepers don't seem to notice.",
+          "Somebody hums a drinkin' song, and the steam swallows the tune."
+        ],
+        [
+          "{c}A big wet hand wraps round %n's cock and strokes it in the steam, slick with sweat, and doesn't hurry.",
+          "{v}A hand slides between %n's thighs, slick with sweat, and rubs their pussy slow while the steam rolls over them.",
+          "{t}Big sweaty hands squeeze %n's tits, and the sweat runs down between them.",
+          "A sauna keeper kisses %n, slow and hot, and tastes of salt and woodsmoke."
+        ]
+      ],
+      tender: [
+        "The sauna keepers keep a bucket of cold water by %n and splash their face whenever it gets too much.",
+        "The switches are soft and leafy, and they're switched like they're bein' dusted, not punished.",
+        "Every time they come in from the snow there's a warm towel waitin', and a big warm arm."
+      ],
+      filthy: [
+        "%n's sweaty and switched and squirmin' between two big naked sauna keepers, and they've stopped pretendin' it's for their health.",
+        "Every swish of the birch makes %n moan, and the sauna keepers swish harder to hear it.",
+        "%n's slick as a seal from head to toe, and nobody in the sauna's keepin' their hands to themselves."
+      ],
+      depth: ["tease", "held"],
+      tw: ["night", "alone"],
+      places: ["cabin", "wildlife"],
+      sound: "spank",
+      soundEnd: "creak",
+      tags: [],
+      writes: ["SWITCHED PINK", "STEAMED", "WELL DONE"]
+    });
+    seasonTrap("winter", "cocoastand", {
+      icon: "\u2615",
+      what: "the cocoa stand at the winter fair: milked straight into the pot if you make milk, or the cocoa's poured over you, and either way the fair drinks up",
+      limit: /\b(milk|lactat|food|messy|public|lick)/i,
+      hold: 6,
+      where: "the cocoa stand",
+      before(mn, v) {
+        const p = prodOf(mn);
+        v.milk = !!(makesMilk(mn) && p && p.milk > 40);
+      },
+      lines: {
+        beats: (mn, v) => {
+          const T = SEASON_LINES.cocoastand;
+          return v.milk ? [T.come, T.milk1, T.milk2, T.drink] : [T.come, T.pour1, T.pour2, T.lick];
+        },
+        come: [
+          "The cocoa stand at the winter fair has a pot as big as a cauldron and a queue right round the block, and the keeper's just run out of milk. Then she sees %n.",
+          `%n queues up at the cocoa stand for a mug, and the stand keeper looks them up and down and says, "Oh, you'll do nicely. Come round the back."`,
+          "There's a sign on the cocoa stand: HOT COCOA, MADE FRESH. Under it stands the keeper, holdin' out a hand to help %n up onto the counter."
+        ],
+        milk1: [
+          "They sit %n up on the counter over the big copper pot, and the stand keeper rolls up her sleeves and starts milkin' them by hand, straight into the cocoa.",
+          "{t}The keeper unbuttons %n's top, cups one of their heavy tits over the pot and squeezes, and a long white stream rings off the copper and swirls into the chocolate.",
+          "Warm hands on %n's chest, a slow squeeze, and the first stream of milk hits the cocoa with a hiss, and the queue cheers."
+        ],
+        milk2: [
+          "Squeeze and pull, squeeze and pull, and the pot gets paler and creamier, and the stand keeper hums while she works and never spills a drop.",
+          "{t}Both tits at once now, one in each hand, and the milk sprays into the pot in two warm streams while the front of the queue leans in to watch.",
+          "The keeper stirs with one hand and milks with the other, tastes it off the spoon, and decides it needs more of %n."
+        ],
+        drink: [
+          "Then the cocoa's poured, mug after mug, and every one that's handed over the counter, the drinker raises it to %n before they sip.",
+          "The whole fair drinks %n's cocoa, and the queue keeps comin', and the keeper keeps milkin', and %n's nipples are sore and tinglin' and very well looked after.",
+          '"Best batch all winter," says somebody with a cocoa moustache, and pats %n on the knee, and gets back in the queue for another.'
+        ],
+        pour1: [
+          "They sit %n up on the counter, and the stand keeper takes the big ladle out of the pot and tips warm cocoa over their shoulders, slow, and it runs down all over them.",
+          `"Can't make the milk?" says the stand keeper. "Then you'll be the mug," and she pours a whole jug of warm cocoa down %n's front.`,
+          "The cocoa's warm, not hot, and it pours over %n's head and shoulders and down their front in a thick brown sheet that smells of chocolate and cinnamon."
+        ],
+        pour2: [
+          "Then a squirt of whipped cream on top, a handful of little marshmallows and a sprinkle of cinnamon, and %n's served.",
+          "{t}The keeper tops %n with whipped cream, a swirl on each tit and a marshmallow on each nipple, and steps back to admire her work.",
+          "{c}A dollop of whipped cream goes right on the tip of %n's cock, with a marshmallow on top of that, and the queue whistles."
+        ],
+        lick: [
+          "Folk queue up to drink straight off %n, slurpin' cocoa off their collarbones and out of their belly button and goin' back round for seconds.",
+          "{t}Somebody licks the cocoa off %n's tits, slow, and sucks the marshmallow off one nipple and then the other.",
+          "{c}Somebody kneels and licks the cream off %n's cock, and keeps goin' long after the cream's all gone.",
+          "{v}A tongue chases a drip of cocoa all the way down %n's belly and between their legs, and finds it isn't the only thing wet down there."
+        ],
+        endMilk: [
+          "The stand keeper puts the lid on the pot at last, %ml of %n stirred into the cocoa and drunk by half the fair, and helps them down off the counter, light and empty and glowin'.",
+          "%n's milked of %ml into the cocoa pot before the stand closes, and the keeper gives them the last mug, made with their own milk, for the road.",
+          `By closin' time the whole fair's had a mug of %n, %ml of them gone into the pot, and the keeper buttons them back up and kisses their cheek. "Same time tomorrow."`
+        ],
+        endDry: [
+          "Not one more drop comes, however the keeper squeezes, so she pours %n a mug of the ordinary cocoa instead and lets them down off the counter, sore and tinglin'.",
+          "%n's run dry before the queue is, and the keeper laughs and lets them down with a mug of their own and a kiss on the cheek."
+        ],
+        endPour: [
+          "The stand closes, and %n climbs down off the counter licked mostly clean, sticky with cocoa in all the places tongues didn't reach.",
+          "%n's let down off the counter at closin' time with chocolate in their hair, cream in their ears and a marshmallow stuck somewhere they won't find till bedtime.",
+          "The keeper wipes %n down with a cloth, misses most of it, and sends them off smellin' like the best cocoa at the fair."
+        ]
+      },
+      after(mn, v) {
+        arouse(mn, 35);
+        if (v.milk) {
+          const got = drainMilk(mn, prodOf(mn).milk * 0.6);
+          trapMess(mn, "cocoastand", "milk", ["milk", ["chest"]]);
+          face(mn, "milked", 90);
+          return got > 0 ? { endKey: "endMilk", ml: ml(got) } : { endKey: "endDry" };
+        }
+        trapMess(mn, "cocoastand", "cocoa", ["cocoa", ["chest", "tummy", "face"]]);
+        face(mn, "afterglow", 90);
+        return { endKey: "endPour" };
+      },
+      scene: [
+        [
+          "The fair's lit up with lanterns, and somebody's playin' a fiddle by the roast chestnut cart.",
+          "The steam off the cocoa pot curls up into the cold air and smells like every good winter mornin' there ever was.",
+          "Somebody's sheepdog barks at the queue and gets shushed. The queue doesn't move. Nobody's leavin' this queue.",
+          "The keeper hands out mugs with one hand and takes pennies with the other, and never once stops smilin'."
+        ],
+        [
+          "{t}The keeper squeezes %n's tits, one then the other, slow, to see how they're holdin' up, and decides they'll do for a while yet.",
+          "{c}Somebody in the queue reaches over the counter and gives %n's cock a squeeze for luck.",
+          "{v}A hand slips up %n's thigh under the counter and gives their pussy a slow, sticky rub.",
+          "Somebody licks a drip of cocoa off %n's chin, and then their lips, and then gets told off for queue-jumpin'."
+        ]
+      ],
+      tender: [
+        "The keeper's hands are warm and slow, and she asks %n every so often if they'd like a break.",
+        "Every customer says thank you to %n, not the keeper, and means it.",
+        "There's a stool on the counter for %n, with a cushion on it, and a blanket over their knees."
+      ],
+      filthy: [
+        "%n's the fair's cocoa cow, sat on the counter and squeezed for every mug, and the queue goes right round the block.",
+        "%n's served up sticky and sweet on the counter for anybody with a penny and a tongue.",
+        "%n's moanin' louder than the fiddler by the time the queue's done with them."
+      ],
+      gear: [{ when: "hold", slot: "legs", label: "Cocoa Stand Ribbon", items: ["Ribbons"], color: "#7A3B1E", desc: "A brown satin ribbon round their knees, tied to the counter's leg so they can't wriggle off while they're bein' served." }],
+      depth: ["milk", "watched", "mess"],
+      tw: ["milk", "crowd", "day"],
+      places: ["trough", "stalls", "stockade"],
+      sound: "wet",
+      tags: ["milking", "messy", "public"],
+      writes: ["HOT COCOA", "MADE FRESH", "SERVED WARM", "ONE MUG, ONE PENNY"]
+    });
+    seasonTrap("winter", "frostfae", {
+      icon: "\u2744\uFE0F",
+      what: "the frost-fae in the hedgerow: cold kisses, frost on every bit of you, and kept right at the edge for their game",
+      limit: /\b(cold|ice|edg|denial|fae|fair(y|ies)|monster)/i,
+      hold: 5,
+      where: "the frosty hedgerow",
+      lines: {
+        beats: [
+          [
+            "The hedgerow by the lane's white with frost this mornin', every twig furred in it, and as %n walks past, the frost starts to laugh.",
+            "Blue lights dance over the frozen field at dusk, and when %n stops to look, they come driftin' over, and every one of them is a tall, pale, laughin' fae with hair like icicles.",
+            "%n's breath fogs in the cold, and the fog doesn't drift away. It hangs there and grows, and shapes itself into a tall, slender woman made of frost, and she smiles with lips like blue ice."
+          ],
+          [
+            `Three frost-fae step out of the hedge, beautiful and cold and laughin' like breakin' ice, and their long fingers have %n's clothes off before they've finished sayin' "wait."`,
+            "They spin a lace of hoarfrost round %n's wrists, fine as spider silk and strong as iron, and lift their arms up over their head and tie them to a branch of the old thorn.",
+            `"A warm one," the fae whisper all together, in voices like ice crackin' on a pond. "Let's play." And they wind frost round %n's wrists and hold them fast to the hedge.`
+          ],
+          [
+            "Then the kisses: cold kisses everywhere, three mouths at once, and wherever they land the frost blooms in ferns across %n's skin, and tingles.",
+            "{t}Two of the fae bend to %n's tits and blow on their nipples, slow, till they're hard as icicles and rimed with frost, and then they lick the frost off.",
+            "{c}A fae wraps her long cold fingers round %n's cock and strokes it, slow, and frost creeps up it in little ferns, and she laughs when it throbs.",
+            "{v}One of the fae kneels between %n's legs and blows a thin thread of cold air right on their clit, and %n's knees give."
+          ],
+          [
+            "Every time %n's about to tip over the edge, the fae stop, all at once, and stand there laughin', waitin' for the warmth to ebb, and then they start again.",
+            "The fae know exactly how close %n is. They can see it in the fog of their breath. And every time it's nearly there, they blow it cold.",
+            "It's a game, the fae's favourite: how close can a warm one get without tippin' over. %n loses, over and over, and the fae win every time."
+          ]
+        ],
+        end: [
+          "The sun comes up over the hill and the frost-fae melt away with it, laughin', and the frost lace drips off %n's wrists. They're left in the hedgerow achin' and edged, covered in frost ferns that won't fade for an hour.",
+          `"Again tomorrow," the fae whisper, and scatter like snow in the wind, and %n's left shiverin' and burnin' at the same time, right at the edge and nowhere near allowed over it.`,
+          "The fae get bored all at once, the way fae do, and blow away down the lane, and %n's left tied to the hedge with frost on their lashes and not one bit of relief till the lace melts."
+        ]
+      },
+      after(mn) {
+        const p = prodOf(mn);
+        if (p) p.deniedUntil = Math.max(p.deniedUntil || 0, Date.now() + 10 * 6e4);
+        arouse(mn, 45, 95);
+        face(mn, "edged", 120);
+        return null;
+      },
+      scene: [
+        [
+          "A robin lands on the thorn above %n's tied hands, looks at the fae, and thinks better of it.",
+          "Every breath %n takes turns to fog, and the fae breathe it in like perfume.",
+          "Frost creeps along the hedge as the fae play, twig by twig, till the whole lane's white.",
+          "One of the fae sings, high and thin, a song like wind in a chimney, and the others laugh."
+        ],
+        [
+          "{t}A fae circles each of %n's nipples with a fingertip of frost, round and round, and leaves a little star of ice on each.",
+          "{c}Frost blooms along %n's cock wherever the fae's fingers have been, and her warm breath melts it off again.",
+          "{v}A cold tongue flicks %n's clit, once, twice, and the fae laughs when they buck against the hedge.",
+          "A fae kisses %n's mouth, cold as snowmelt, and steals the warmth right out of their breath."
+        ]
+      ],
+      tender: [
+        "The fae are wicked, but they're never cruel: the frost tingles and never bites.",
+        "One of the fae keeps her cold hand on %n's cheek the whole time, gentle, like she's fond of them.",
+        "The frost lace is soft as silk, and the fae check it with a cool fingertip now and then."
+      ],
+      filthy: [
+        "The fae edge %n till they're sobbin' and beggin' a hedge for mercy, and the hedge laughs.",
+        "%n's drippin' and froze and tied to a thorn, humpin' the air, and the fae think it's the funniest thing they've seen all winter.",
+        "%n would sell their soul to the fae for one more second, and the fae know it, and don't take the deal."
+      ],
+      gear: [{ when: "hold", slot: "ropeArms", label: "Frost Lace", items: ["HempRope"], color: "#D8ECFA", desc: "Lace spun out of hoarfrost round their wrists, fine as spider silk. It doesn't melt, and it doesn't let go." }],
+      depth: ["tease", "held"],
+      tw: ["night", "alone"],
+      places: ["wildlife", "pasture"],
+      sound: "hiss",
+      tags: ["monsters"],
+      writes: ["FAE'S PLAYTHING", "FROSTBITTEN", "NOT YET"]
+    });
+    seasonTrap("winter", "snowman", {
+      icon: "\u26C4",
+      what: "the farmyard snowman: packed into him to the chin by the farmhands, the good bits dug out, and the whole yard plays",
+      limit: /\b(cold|ice|encas|immobil|public|display)/i,
+      hold: 6,
+      where: "the farmyard snowman",
+      lines: {
+        beats: [
+          [
+            "There's a snowball fight in the farmyard, and %n's winnin' it right up until four farmhands tackle them into the biggest drift.",
+            "The farmhands are buildin' a snowman in the yard, a big one, and they've done the bottom and the top and they're short a middle. Then %n walks out of the barn.",
+            `%n goes over to admire the farmyard snowman, and the farmhands who built it look at each other and grin, and one of them says, "Needs somethin', doesn't it."`
+          ],
+          [
+            "They pack the snow round %n handful by handful, patted smooth and firm, till they're the snowman's big round middle with just their head stickin' out the top. It's farm snow, the soft kind. It's never as cold as you'd think.",
+            "Round and round go the farmhands with armfuls of snow, packin' it tight, and in five minutes %n's the middle of a snowman from the ankles to the chin, and they can't so much as wiggle.",
+            "They pack %n into a ball of snow for the snowman's middle, pat it firm, set the snowman's head on a plank behind them, and step back to admire a snowman with a face that blushes."
+          ],
+          [
+            "Then they dig little windows in the snow, right where it matters, and step back and laugh.",
+            "{t}They scoop the snow away from %n's tits so they poke out the front like a pair of snowballs, and press two lumps of coal on them for buttons. The coal's cold. %n squeaks.",
+            "{c}They dig %n's cock out of the snow and leave it standin' out the front, and somebody says the snowman's carrot nose has come down to the wrong place.",
+            "{v}They dig a little hollow in the front, between %n's legs, and the cold air gets in, and so does a farmhand's warm hand."
+          ],
+          [
+            "Folk come by all mornin' to see the farmyard snowman, and every one of them stops to play with the bits that poke out.",
+            "Somebody wraps a scarf round %n's neck and puts a hat on their head, and somebody else warms their hands on the bits of %n that are bare, and takes their time about it.",
+            `{c}Everybody who passes gives the snowman's "carrot" a stroke for luck, and by midday it's the luckiest snowman on the farm.`,
+            "{t}Everybody who walks past pinches the snowman's coal buttons, and %n's as red as a holly berry from the neck up."
+          ]
+        ],
+        end: [
+          "By the afternoon the sun's out and the snowman's slumpin', and %n slides out of the slush pink and shivery and grinnin', and the farmhands wrap them up in a blanket by the stove.",
+          "The farmhands dig %n out at last and rub them warm with a big towel, and the snowman gets a new middle made of plain old snow, which nobody pays any attention to.",
+          "%n's thawed free by the farm girl with a kettle of warm water and a mug of cocoa, and the snowman's left with a %n-shaped hole in his tummy."
+        ]
+      },
+      after(mn) {
+        arouse(mn, 35);
+        face(mn, "edged", 90);
+        return null;
+      },
+      scene: [
+        [
+          "A crow lands on the snowman's head, looks down at %n, and caws, rude as anything.",
+          "The farmhands start a second snowman next to %n and argue about whether it's lookin' at them.",
+          "The sun comes out for a minute, and a drip of meltwater runs down the back of %n's neck.",
+          "Somebody sticks two twigs in the snow for arms and waves one of them at passers-by."
+        ],
+        [
+          "{t}Somebody warms %n's nipples in their mouth, one and then the other, and puts the coal buttons back on after.",
+          "{c}Somebody wraps a warm mitten round %n's cock and strokes it, slow, and says it's to stop it gettin' frostbite.",
+          "{v}A warm hand slips into the hollow between %n's legs and rubs, slow, and it's the only warm bit of them, and then it's very warm indeed.",
+          "Somebody gives the snowman a kiss on the mouth, and the snowman kisses back."
+        ]
+      ],
+      tender: [
+        "The farmhands check %n's toes are warm every half hour, and pack fresh warm snow where it's gone icy.",
+        "Somebody keeps a mug of cocoa to %n's lips the whole time, sip by sip.",
+        "The snow's packed soft and the farmhands are gentle, and %n's never been so cosy bein' a snowman."
+      ],
+      filthy: [
+        "%n's the farmyard snowman with the good bits on show, and everybody who walks past helps themself.",
+        "Packed in snow to the chin and squirmin', %n's the farm's favourite thing to play with this mornin'.",
+        "Every bit of %n that pokes out of the snow's been squeezed, stroked or sucked by noon, and the queue to build the next snowman's growin'."
+      ],
+      gear: [{ when: "hold", slot: "device", label: "The Farmyard Snowman", items: ["Snowman"], desc: "Packed into the farmyard snowman up to the chin, patted smooth, with a scarf on top and the good bits dug out." }],
+      depth: ["held", "watched", "tease"],
+      tw: ["day", "crowd"],
+      places: ["pasture", "stockade", "cabin"],
+      sound: "wet",
+      tags: ["restraint", "public"],
+      writes: ["FROSTY", "SNOW BUNNY", "PLAY WITH ME", "BUILT TO LAST"]
+    });
+    const STOCKING_SWEETS = {
+      clover: "a peppermint cream",
+      golden: "a gold-foil chocolate coin",
+      honey: "a honey gingerbread star",
+      musk: "a blue-striped candy cane",
+      feather: "a sugared snowflake",
+      heatmist: "a cinnamon heart"
+    };
+    const STOCKING_COAL = {
+      moo: "a lump of coal (it's liquorice, and it tastes of moo)",
+      bell: "a lump of coal with a jingle bell inside",
+      hiccup: "a lump of coal that fizzes",
+      needy: "a lump of coal with a pink sugar heart",
+      wrongbarn: "a lump of coal in the shape of somebody else's barn",
+      wolfscent: "a wolf-shaped lump of coal",
+      goblinmusk: "a lump of coal that smells of goblin",
+      tentaclemusk: "a squishy purple lump of coal with far too many arms"
+    };
+    const STOCKING_MESSES = ["peppermint", "cocoa", "icing", "eggnog", "honey", "chocolate"];
+    function candyOk(mn, c) {
+      const traps = isSubject(mn) && !(rec(mn) || {}).trapsOff;
+      return potionDef(c.id) && (!c.traps || traps) && !potionRefusal(mn, c.id, mn) && (c.id !== "heatmist" || !limitBlocks(mn, "heat"));
+    }
+    function stockingCommand(sender, args, R) {
+      const r = rec(sender);
+      if (!onBooks(sender)) {
+        R("\u{1F9E6} Stockin's are for folks on the books, sugar.");
+        return;
+      }
+      if (!seasonsOn().includes("winter")) {
+        R("\u{1F9E6} It's not winter, sugar. The stockin's go up on the farm's hearth on the first of December.");
+        return;
+      }
+      if (!charFor(sender)) {
+        R("\u{1F9E6} Your stockin's hangin' on the farm's hearth, sugar. Come by and look in it.");
+        return;
+      }
+      if (state.trapRuns && state.trapRuns.has(sender)) {
+        R("\u{1F9E6} You're a bit tied up right now, sugar. Your stockin'll keep.");
+        return;
+      }
+      if (r.stockingDay === dayKey()) {
+        R("\u{1F9E6} You've had today's, sugar. There'll be somethin' new in it tomorrow.");
+        return;
+      }
+      const marks = r.naughtyMarks || 0, naughty = CFG.PUNISH_TIERS.includes(r.tier) || r.stockingMarks !== void 0 && marks > r.stockingMarks;
+      r.stockingDay = dayKey();
+      r.stockingMarks = marks;
+      r.stockingN = (r.stockingN || 0) + 1;
+      saveLedger();
+      audit(sender, "STOCKING", naughty ? "coal" : "nice");
+      emote("\u{1F9E6} " + tFill(pickFor(sender, "stocking:look", STOCKING_LINES.look), sender), sender);
+      later(() => {
+        if (!charFor(sender)) return;
+        if (naughty) {
+          const c2 = TRICKS.filter((x) => STOCKING_COAL[x.id] && candyOk(sender, x));
+          const pick = c2.length ? c2[Math.floor(Math.random() * c2.length)] : null;
+          emote("\u{1F9E6} " + tFill(pickFor(sender, "stocking:coal", pick ? STOCKING_LINES.coal : STOCKING_LINES.plainCoal), sender, { x: pick ? STOCKING_COAL[pick.id] : "" }), sender);
+          if (pick) later(() => {
+            if (charFor(sender)) givePotion(sender, pick.id, BOTMN(), "a stockin' candy");
+          }, 1500);
+          later(() => {
+            if (charFor(sender)) bodyMark(sender, { write: { line: "NAUGHTY LIST", area: "hips" } });
+          }, 3500);
+          return;
+        }
+        const roll = Math.random();
+        if (roll < 0.08) {
+          emote("\u{1F9E6} " + tFill(pickFor(sender, "stocking:ribbon", STOCKING_LINES.ribbon), sender), sender);
+          earnRibbons(sender, 1, "your stockin'", BOTMN());
+          return;
+        }
+        if (roll < 0.33 && hasCompanion(sender)) {
+          const m = STOCKING_MESSES[Math.floor(Math.random() * STOCKING_MESSES.length)];
+          if (trapMess(sender, "stocking", m)) {
+            emote("\u{1F9E6} " + tFill(pickFor(sender, "stocking:mess:" + m, STOCKING_LINES.mess[m]), sender), sender);
+            return;
+          }
+        }
+        const c = TREATS.filter((x) => STOCKING_SWEETS[x.id] && candyOk(sender, x));
+        if (c.length) {
+          const pick = c[Math.floor(Math.random() * c.length)];
+          emote("\u{1F9E6} " + tFill(pickFor(sender, "stocking:sweet", STOCKING_LINES.sweet), sender, { x: STOCKING_SWEETS[pick.id] }), sender);
+          later(() => {
+            if (charFor(sender)) givePotion(sender, pick.id, BOTMN(), "a stockin' candy");
+          }, 1500);
+          return;
+        }
+        emote("\u{1F9E6} " + tFill(pickFor(sender, "stocking:plain", STOCKING_LINES.plain), sender), sender);
+      }, 2e3);
+    }
+    const STOCKING_LINES = {
+      look: [
+        "%n goes to the big hearth and finds their stockin', the one with their name stitched on the cuff, and it's lumpy. They reach in.",
+        "There's a stockin' on the farm's hearth with %n's name on it in white letters, and somethin's been put in it overnight. %n reaches down into the toe.",
+        "%n unhooks their stockin' from the hearth, gives it a shake, hears somethin' rattle, and tips it out into their hand.",
+        "The farm girl's by the hearth in her red winter hat when %n comes for their stockin', and she watches them reach in with a very innocent look on her face."
+      ],
+      sweet: [
+        `Down in the toe there's %x, wrapped in shiny paper, and a little note from the farm girl that says "for bein' good".`,
+        "%n finds %x in the toe of their stockin', and eats it right there by the fire.",
+        "There's %x in there, and a satsuma, and a handful of nuts. %n has the sweet first, obviously."
+      ],
+      coal: [
+        `There's somethin' in the toe, all right: %x, and a little note in the farm girl's writin' that says "NAUGHTY". %n eats it anyway.`,
+        `%n tips their stockin' out and gets %x and a puff of soot. The farm girl tuts. "Should've thought of that before, sugar."`,
+        `%x. That's all that's in it. The farm girl pats %n on the head. "Go on, eat it. It's good for you." It is not good for them.`
+      ],
+      plainCoal: [
+        "There's a lump of coal in the toe. A real one. %n gets soot all over their hands, and the farm girl tuts.",
+        "Coal. Just coal. The farm girl writes somethin' on her clipboard, and %n's fairly sure it's their name."
+      ],
+      ribbon: [
+        `There's a ribbon in the toe of %n's stockin', a real one, tied in a bow, with a note: "for a good winter."`,
+        "%n reaches into their stockin' and pulls out a little red rosette. It's a real ribbon. The farm girl winks."
+      ],
+      plain: [
+        "There's a satsuma in the toe, and a handful of walnuts, and a little wooden cow somebody's carved. It's sweet.",
+        "%n finds a pair of thick wool socks in their stockin'. Warm, soft, and in the farm's colours. Very practical."
+      ],
+      mess: {
+        peppermint: ["Somethin' in the toe bursts when %n squeezes it: a whole bag of peppermint syrup, and it runs down their arm and splashes all down their front, sticky and pink."],
+        cocoa: ["There's a little flask in the stockin', and when %n opens it, warm cocoa sloshes out all down their front. The farm girl laughs till her hat falls off."],
+        icing: [`%n reaches in and gets a handful of royal icin', thick and white, and before they can do anything about it the farm girl smears the rest of it on their chest. "Merry winter."`],
+        eggnog: ["A paper cup of eggnog's been wedged in the toe, and it tips all over %n when they pull the stockin' down, creamy and cold and smellin' of nutmeg."],
+        honey: ["There's a honeycomb in the stockin', and it's been squashed, and %n's covered in honey to the elbow before they've worked out what it is."],
+        chocolate: ["Somebody's left a chocolate orange in %n's stockin' right by the fire, and it's melted, and now %n's wearin' most of it."]
+      }
+    };
+    if (W.__FARMHAND_TEST__) Object.assign(W, { __stocking: (m) => stockingCommand(m, [], (t) => tell(m, t)) });
+    Object.assign(MESS, { wax: "#A3162B" });
+    season("yule", {
+      label: "Yule",
+      icon: "\u{1F56F}\uFE0F",
+      alias: ["wintersolstice", "yuletide", "jul", "longestnight", "midwinternight"],
+      on: (dt) => {
+        const d = md(dt);
+        return d >= 1218 && d <= 1224;
+      },
+      dates: () => "Dec 18 \u2013 24, the winter solstice",
+      blurb: "the longest night, the Holly King and the Oak King, and the sun comin' back",
+      why: [
+        "It's Yule, the longest night, and somethin' old is abroad on the farm.",
+        "The year's turnin' at the solstice, and this one turned on you.",
+        "Yule on the farm: the dark's long, and it's full of things.",
+        "The old customs want keepin' at Yule, sugar, and you've been kept."
+      ],
+      start: [
+        "Yule's come to the farm: the solstice, the longest night of the year. There's a log on the hearth that'll burn till mornin', holly over every door, and the Holly King and the Oak King fight for the year again tonight.",
+        "It's the turn of the year, sugar. The nights are as long as they get, there are candles lit all round the farm, and out in the storm the Wild Hunt's ridin'. Keep a light in the window.",
+        "Yule on the farm! Wassail in the orchard, the Yule log on the hearth, ivy creepin' over the old barn, and the longest night to get through. The sun comes back after. It always does."
+      ],
+      end: [
+        "Yule's over. The sun's comin' back a little more every day, the Yule log's ash on the fields, and the Holly King's crown is hangin' in the barn till next year.",
+        "The longest night's behind us, sugar. The Hunt's gone back up into the clouds, the candles are out, and the days are gettin' longer."
+      ],
+      also: ["stag", "lantern", "bearskin"],
+      // the farm girl's: a holly crown and a deep-red hooded cloak, and the fur gloves she wears all winter
+      costume: [
+        { slot: "hat", name: "Holly Crown", items: ["FlowerCrown"], color: "#1F5C2E", desc: "A crown of dark green holly, for the longest night." },
+        { slot: "cloak", name: "Yule Cloak", items: ["HoodedCloak"], color: "#7A1020", desc: "A long deep-red hooded cloak, for keepin' the longest night out." },
+        { slot: "gloves", name: "Fur Gloves", items: ["GlovesFur"], desc: "Soft white fur gloves, warm as toast, for handin' out cocoa." }
+      ]
+    });
+    for (const [k, places] of Object.entries({ stag: ["wildlife", "pasture"], lantern: ["wildlife", "cabin"], bearskin: ["cabin"] }))
+      if (!SEASON_PLACES[k]) SEASON_PLACES[k] = places;
+    seasonTrap("yule", "yulelog", {
+      icon: "\u{1FAB5}",
+      what: "the Yule log: tied astride it as it's hauled in from the woods, and every bump of the track grinds the old knot into you",
+      limit: /\b(bondage|restrain|tied|public|edg|denial)/i,
+      hold: 6,
+      where: "the Yule log",
+      lines: {
+        beats: [
+          [
+            "The farmhands are haulin' the Yule log in from the woods, a great old ash trunk on ropes, singin' as they go, and when they see %n they stop singin' and start grinnin'.",
+            `"Every Yule log wants a rider," says the head farmhand, and %n's lifted up and sat astride the great trunk before they can ask what that means.`,
+            "There's a log as big as a cow on the track from the woods, ropes on the end of it and half the farm on the ropes, and somebody's saved a seat on top of it for %n."
+          ],
+          [
+            "They tie %n's ankles under the log with red ribbon, and their knees to the bark, and there's a big smooth knot in the wood right between their legs, polished by every Yule there's ever been.",
+            "%n's tied on astride the log, thighs round it, ankles tied together underneath, and the old knot in the bark is pressed right up where it'll do the most mischief.",
+            "Red ribbon round the ankles, round the knees, and a sprig of holly tucked behind %n's ear, and then everybody on the ropes heaves, and the log lurches off down the track."
+          ],
+          [
+            "Every rut in the track bumps the log, and every bump grinds the knot up into %n, and the farmhands on the ropes sing louder to cover the noises they're makin'.",
+            "{c}The knot grinds against %n's cock and balls with every bump, slow and heavy, and they grip the bark with both hands and gasp.",
+            "{v}The smooth old knot rocks against %n's pussy with every heave of the ropes, and it's warm from the sun of a hundred summers, and it doesn't stop.",
+            "The track's bumpy, and the log's slow, and the farmhands take the long way round, past every pothole on the farm, and %n knows they're doin' it on purpose."
+          ],
+          [
+            "Folk come out of every barn to watch the log go by and toss holly at the rider, and somebody walks alongside for a while just to hold %n by the hips and rock them.",
+            "At the farmhouse door they stop, and the log has to be got over the step, and they rock it, and rock it, and rock it, and %n's moanin' like a gate in the wind.",
+            "Halfway home the farmhands stop for a sip of cider and leave the log rockin' gently on its ropes, and %n can't stop it rockin', and doesn't want to."
+          ]
+        ],
+        end: [
+          `The log's rolled onto the hearth at last, and the farmhands untie %n and lift them down, wobbly and flushed and achin' right on the edge. "Luck for the year," says the head farmhand, and lights the log.`,
+          "They untie %n at the hearth, legs shakin', red ribbon marks round their ankles and the knot's print on the inside of their thighs, and the Yule log's lit with the whole farm cheerin'.",
+          "%n's lifted off the log by the fire, hot and edgy and very well ridden, and given the first cup of wassail for bringin' the luck in."
+        ]
+      },
+      after(mn) {
+        arouse(mn, 45, 95);
+        face(mn, "edged", 120);
+        return null;
+      },
+      scene: [
+        [
+          "The farmhands on the ropes sing an old haulin' song, one line each, and everybody joins in on the chorus.",
+          "Snow sifts down off the branches as the log goes by, and lands on %n's shoulders and melts.",
+          "The log's bark is rough under %n's hands, and smells of moss and woodsmoke and the deep woods.",
+          "Somebody runs ahead to open every gate, and holds it, and stares."
+        ],
+        [
+          "{c}A farmhand walkin' alongside reaches up and strokes %n's cock where it's pressed to the bark, slow, in time with the haulin' song.",
+          "{v}A farmhand walkin' alongside slips a hand between %n and the knot and rubs, and the next bump presses their fingers deeper.",
+          "{t}Somebody walkin' alongside reaches up and squeezes %n's tits, one and then the other, for luck.",
+          "Somebody walks alongside and kisses %n every time the log stops, which is a lot of times."
+        ]
+      ],
+      tender: [
+        "The farmhands put a folded blanket on the log first, so the bark doesn't scratch.",
+        "Every time the log stops, somebody asks %n if they're all right up there, and means it.",
+        "The haulin' song's slow and kind, and the farmhands pull gentle on the ropes."
+      ],
+      filthy: [
+        "%n's humpin' a log in front of the whole farm, and the whole farm's singin' about it.",
+        "The knot's slick and %n's drippin' down the bark, and the farmhands take the bumpiest way home they can find.",
+        "%n's the Yule log's rider, moanin' at every pothole, and they'd ride it to the woods and back again if anybody asked."
+      ],
+      gear: [{ when: "hold", slot: "legs", label: "Yule Log Ribbons", items: ["Ribbons"], color: "#B3122E", desc: "Red ribbon round their ankles and knees, tyin' them astride the Yule log as it's hauled in." }],
+      depth: ["held", "watched", "tease"],
+      tw: ["crowd", "night"],
+      places: ["wildlife", "cabin", "pasture"],
+      sound: "rope",
+      soundEnd: "wood",
+      tags: ["restraint", "public"],
+      writes: ["LOG RIDER", "YULE LUCK", "WELL RIDDEN"]
+    });
+    seasonTrap("yule", "hollyking", {
+      icon: "\u{1F451}",
+      what: "the solstice play: the Holly King and the Oak King fight for the year, and the prize is you, and they share it",
+      limit: /\b(double|both holes|gang|public|threesome)/i,
+      stud: { sire: -72, name: "the Holly King and the Oak King", type: "human", loads: 2, ml: 220, hold: 8, hole: "vulva", bonus: 1.5, where: "the solstice play", person: true, both: true },
+      lines: {
+        beats: [
+          [
+            "The farm puts on the solstice play in the big barn at Yule, and two of the farmhands are crowned for it: the Holly King in green and berries, the Oak King in brown leaves and acorns. And somebody's put %n down as the prize.",
+            `There's a ring of straw bales in the big barn and the whole farm sat round it, and in the middle stand the Holly King and the Oak King, crowned and painted, and the farm girl leads %n into the ring by the hand. "Here's what you're fightin' for."`,
+            `%n wanders into the big barn at dusk and finds the solstice play about to start, and the Holly King takes one look at them and says, "That one. That's the prize this year."`
+          ],
+          [
+            "The kings fight for the year with wooden swords, round and round the ring, and the crowd cheers every whack, and %n's tied to the post in the middle in a crown of mistletoe, watchin' them.",
+            "Clack, clack, go the wooden swords. The Holly King's had the dark half of the year, and he doesn't want to give it up, and the Oak King's come for the light. %n's at the post in the middle with their wrists tied with green ribbon.",
+            "It's a proper fight, all bluster and stage-fallin', and the crowd boos the Holly King and cheers the Oak King, and at the end the Holly King goes down on one knee, as he does every year, and gives up the year."
+          ],
+          [
+            "Then the Oak King comes for his prize, and the Holly King gets up off his knee and comes too, because the play says the prize is shared, and has been since before anybody can remember.",
+            `{c}The two kings untie %n from the post, and the Oak King wraps a hand round %n's cock and says, "Fair's fair. The year's mine, but he gets his half."`,
+            "{v}The Oak King lays %n back on the straw and runs a hand up between their legs, and finds their pussy ready for him, and the Holly King kneels on the other side.",
+            "{t}The Holly King cups %n's tits from behind, a good loser, and the Oak King kisses them, and the crowd round the bales goes very quiet."
+          ]
+        ],
+        in: [
+          [
+            "{v}The Oak King takes %n's %h, slow and proud, and the Holly King settles in behind and takes what's left, and the two kings rock %n between them like the year turnin'.",
+            "{nv}The Oak King takes %n's %h, slow and proud, and the Holly King kneels at their head and feeds them his cock, and the two kings rock %n between them like the year turnin'.",
+            "The light half of the year and the dark half, both of them in %n at once, and the crowd round the bales is on its feet."
+          ],
+          [
+            "The Oak King fills %n with a groan that rattles the barn doors, and the Holly King follows him over, and %n's stuffed full at both ends of the year.",
+            "They finish together, the old way, one load for the dark half and one for the light, and the crowd throws holly and oak leaves into the ring."
+          ]
+        ],
+        over: [[
+          "They don't take them. They kneel either side of %n in the straw and stroke themselves over them, and paint them across the belly and chest, the dark half and the light half both, while the crowd cheers.",
+          "The kings rut against %n from both sides, between their thighs and against their back, and spill across them together, and the crowd throws leaves."
+        ]],
+        end: [
+          `The kings lay %n down in the straw with %ml of the year in their %h, and the Holly King puts his crown on %n's head. "Till midsummer," he says, "when I win it back."`,
+          "%n's carried out of the ring on the kings' shoulders, %ml drippin' from their %h, wearin' the Holly King's crown, and the whole farm cheers the turnin' of the year.",
+          "The play's over, the year's turned, and %n's left on the straw in the middle of the ring with %ml in their %h and holly in their hair."
+        ],
+        endOver: [
+          'The kings help %n up, painted with %ml of the both of them, and the Holly King crowns them with his holly. "Till midsummer."',
+          "%n's led out of the ring wearin' the Holly King's crown and %ml of the two kings, and the crowd's still throwin' oak leaves."
+        ]
+      },
+      scene: [
+        [
+          "The crowd round the bales stamps its feet and claps the rhythm, slow, like a heartbeat.",
+          "The barn's lit with lanterns and the Yule log's glow through the open door, and every shadow in the place is long.",
+          "Somebody at the back's playin' a fiddle, the old tune that goes with the play, and everybody knows the words.",
+          "The kings' crowns slip, the Holly King's berries scatter, and nobody stops to pick them up."
+        ],
+        [
+          "{t}The Holly King's hands are on %n's tits the whole time, squeezin' slow, and the Oak King's mouth is on their neck.",
+          "{c}One of the kings has a hand round %n's cock and won't let go, and they argue, very politely, about whose turn it is.",
+          "{v}The Oak King's thumb finds %n's clit and circles, slow as the year turnin', and the Holly King laughs into their hair.",
+          "Both kings kiss %n at once, one each side of their mouth, and then each other, over them."
+        ]
+      ],
+      tender: [
+        "The kings are gentle, and every time %n gasps, one of them asks if the prize is all right.",
+        "The Holly King holds %n's hand the whole time, a good loser, and strokes their hair.",
+        "It's slow and warm and ceremonial, and every touch feels like it means somethin'."
+      ],
+      filthy: [
+        "%n's the prize of the solstice play, spitroasted by two kings in front of the whole farm, and they're beggin' for the year to never turn.",
+        "The two kings use %n like they've won 'em, which they have, both of 'em.",
+        "%n's stuffed at both ends by the light and the dark, and the crowd's countin' strokes."
+      ],
+      gear: [
+        { when: "hold", slot: "ropeArms", label: "Solstice Ribbon", items: ["Ribbons"], color: "#1F5C2E", desc: "Green ribbon round their wrists, tyin' them to the post in the middle of the solstice ring." },
+        { when: "after", slot: "hat", label: "Holly King's Crown", items: ["FlowerCrown"], color: "#1F5C2E", mins: 30, desc: "The Holly King's own crown of holly and red berries, put on their head after the play. Till midsummer." }
+      ],
+      depth: ["watched", "breed"],
+      tw: ["crowd", "night", "breed"],
+      places: ["stalls", "stockade", "cabin"],
+      sound: "wood",
+      tags: ["public"],
+      writes: ["THE YEAR'S PRIZE", "BOTH KINGS", "SHARED", "TILL MIDSUMMER"]
+    });
+    seasonTrap("yule", "wildhunt", {
+      icon: "\u{1F3F9}",
+      what: "the Wild Hunt: spectral huntsmen ride down out of the storm on the longest night, and you're the quarry they've caught",
+      limit: /\b(gang|chase|hunt|ghost|spirit|monster|cnc|non.?con)/i,
+      stud: { sire: -73, name: "the Wild Hunt", type: "human", loads: 3, ml: 160, hold: 8, hole: "vulva", bonus: 1.4, where: "the Wild Hunt's road", person: true },
+      lines: {
+        beats: [
+          [
+            "The wind gets up all at once on the longest night, and over it comes the sound of horns, and hooves on the clouds, and %n looks up to see the Wild Hunt pourin' down out of the storm.",
+            "%n's crossin' the top field when the storm comes, and in the storm there are riders, pale and laughin', and their horns blow, and every one of them turns to look at %n.",
+            "There's a sound like a hundred horns in the wind, and the lanterns all over the farm go out at once, and the Wild Hunt comes down the lane like a flood, and %n's standin' right in the way."
+          ],
+          [
+            "%n runs. Everybody runs from the Hunt. The huntsmen laugh, and let them, and ride them down in the stubble at the end of the field, and a rope of silver mist drops round %n's shoulders.",
+            "The Huntmaster leans from his saddle, scoops %n up across his knees like a deer, and the whole Hunt rides on into the storm with %n slung over his saddlebow.",
+            "The Hunt rides round %n in a ring, horns blowin', and the ring gets smaller, and smaller, and then they're off their horses, which are only mist and moonlight, and their hands are on %n."
+          ],
+          [
+            "They lay their quarry down on the frosty grass in the middle of their ring, and their hands are cold and their eyes are like stars, and they strip %n the way you'd skin a hare, quick and certain.",
+            "{c}The Huntmaster kneels over %n and takes their cock in a cold hand and strokes it, and his eyes are silver, and he smiles like a man who's been huntin' for a thousand years.",
+            "{v}The huntsmen hold %n's knees apart and the Huntmaster slides two cold fingers into their pussy, and the horns of the Hunt blow in the storm overhead.",
+            "{t}Cold hands on %n's tits, two huntsmen at once, and their breath steams silver, and the storm howls round the ring like the hounds in the old stories."
+          ]
+        ],
+        in: [
+          [
+            "The Huntmaster takes %n's %h first, a huntsman's right, and he rides them like he rides the storm, hard and wild and fast.",
+            "One after another the huntsmen take their turn in %n's %h, cold at first and then not cold at all, and the storm roars round them."
+          ],
+          [
+            "Three of them fill %n before the Hunt's horn calls them on, each one colder and deeper than the last, and the stars wheel overhead.",
+            "The Huntmaster finishes in %n with a shout that turns into a horn call, and the next huntsman's already there, and the next."
+          ]
+        ],
+        over: [[
+          "They don't take them. They kneel round %n in the frost and stroke themselves, and spill across their quarry one after another, silver and cold, while the storm howls.",
+          "The huntsmen rut against %n in the frost, between their thighs, over their back, and paint them silver with what the Hunt leaves behind."
+        ]],
+        end: [
+          "The Hunt's horn calls, and the riders are gone back up into the storm all at once, and %n's left on the frosty grass with %ml of the Wild Hunt in their %h and frost in their hair.",
+          "The storm passes. The riders pass with it. %n lies in the middle of the field under the stars with %ml in their %h and the sound of horns still ringin' in their ears.",
+          '"Next Yule," says the Huntmaster, and kisses %n with lips like snowmelt, and rides off into the clouds, and leaves them %ml fuller than he found them.'
+        ],
+        endOver: [
+          "The Hunt rides off into the storm and leaves %n in the frost, painted with %ml of silver, the horns fadin' over the hills.",
+          "%n's left in the stubble under the stars with %ml of the Wild Hunt across their skin, and the storm's gone as quick as it came."
+        ]
+      },
+      scene: [
+        [
+          "The horns of the Hunt blow overhead, long and wild, and the wind answers them.",
+          "The Hunt's horses stand off in the dark, made of mist and moonlight, and wait, and don't come near.",
+          "Snow whips round the ring of huntsmen, and none of it touches them.",
+          "Somewhere far off, a farmhouse door slams. Nobody comes out on the longest night when the Hunt's ridin'."
+        ],
+        [
+          "{t}A huntsman's cold mouth closes on %n's nipple, and the cold of it goes all the way through them.",
+          "{c}A cold hand strokes %n's cock while they're taken, fast, in time with the horns.",
+          "{v}A huntsman's thumb rubs %n's clit, cold and quick, and the Hunt laughs when they buck.",
+          "The Huntmaster holds %n's face in his cold hands and makes them look at the stars while it happens."
+        ]
+      ],
+      tender: [
+        "The Huntmaster wraps %n in his cloak first, so the frost can't get at them.",
+        "For all their wildness the huntsmen are careful with their quarry, and every hand is steady.",
+        "The Huntmaster tells %n, low, that it's an honour to be caught by the Hunt, and they almost believe it."
+      ],
+      filthy: [
+        "%n's the Hunt's quarry, run down and spread in the frost and used by every rider in turn.",
+        "The huntsmen pass %n round the ring like a trophy, and %n's moanin' louder than their horns.",
+        "%n's stuffed and frosted and drippin' silver, and the Hunt's not done with its catch."
+      ],
+      gear: [{ when: "hold", slot: "ropeArms", label: "The Hunt's Rope", items: ["HempRope"], color: "#AEB9CC", desc: "A rope of silver mist from the Wild Hunt, round their wrists. It's cold as moonlight and it doesn't let go." }],
+      depth: ["held", "breed"],
+      tw: ["night", "alone", "breed"],
+      places: ["wildlife", "pasture"],
+      sound: "ropelong",
+      tags: ["monsters"],
+      writes: ["THE HUNT'S QUARRY", "CAUGHT", "RUN DOWN"]
+    });
+    seasonTrap("yule", "wassail", {
+      icon: "\u{1F34E}",
+      what: "wassailin' the orchard: tied to the oldest apple tree, toasted with cider, licked clean, and the first wassailer gets the luck",
+      limit: /\b(messy|food|public|lick|gang)/i,
+      hold: 6,
+      where: "the orchard",
+      lines: {
+        beats: [
+          [
+            "The farm goes out wassailin' the orchard at Yule, lanterns and pots and pans and a big bowl of hot cider, to wake the apple trees up for spring. %n's carryin' a lantern at the front, which is a mistake.",
+            `There's a crowd in the orchard with lanterns and a steamin' wassail bowl, bangin' pans to wake the trees, and when %n comes to see, the wassail master points at them with his ladle. "There's our toast."`,
+            "%n follows the singin' out to the orchard and finds the whole farm round the oldest apple tree, and the wassail master smiles and holds out a ribbon."
+          ],
+          [
+            "They tie %n to the oldest apple tree with red and green ribbon, their back to its old twisted trunk, and hang toast soaked in cider in the branches over their head for the robins.",
+            `"The old tree wants a gift," says the wassail master, tyin' %n's wrists round the trunk, "and a toast," and he tips a ladle of warm cider over their head.`,
+            "Ribbon round the wrists, round the trunk, a sprig of mistletoe out of the branches tucked behind %n's ear, and the wassail master raises the bowl."
+          ],
+          [
+            "Then everybody toasts the tree, and every toast's poured over %n, warm cider down their chest and belly and legs, till they're soaked and steamin' in the cold.",
+            `"Wassail!" shouts the crowd, and a ladle of cider goes over %n, and another, and the bangin' of the pots gets louder, and the cider runs into all their creases.`,
+            "{t}The wassail master pours a ladle of cider slow over %n's tits, and watches it run off the nipples, and pours another for luck."
+          ],
+          [
+            "Then the wassailers lick the tree's gift clean, one at a time, slow, and every one of them sings a line of the wassail song into %n's skin.",
+            "{c}A wassailer kneels at the roots and licks the cider off %n's cock, and sucks it, and the crowd sings louder.",
+            "{v}Somebody kneels in the frosty grass and licks the cider from between %n's legs, deep, and the old tree creaks.",
+            "The cider's lapped off %n's neck and collarbones and belly by a dozen tongues, and somebody keeps refillin' the ladle."
+          ]
+        ],
+        end: [
+          "The first wassailer gets the year's luck, the old way, and takes it against the tree: %ml of it in %n's %h, and the orchard cheers, and the pans bang, and the wassail master unties them.",
+          `%n's untied from the old apple tree with %ml in their %h, cider in their hair and a dozen kisses on their skin. "Good crop this year," says the wassail master.`,
+          "The first wassailer takes their luck in %n's %h against the old twisted trunk, %ml of it, and the robins come down for the toast."
+        ],
+        endOver: [
+          "The first wassailer takes their luck against the tree and spills %ml down %n's thighs, and the orchard cheers, and the pans bang.",
+          "%n's untied from the old apple tree soaked in cider and %ml of somebody's luck, and the wassail master hangs another piece of toast in the branches."
+        ]
+      },
+      after(mn) {
+        const got = hwFill(mn, 150, 1.3);
+        arouse(mn, 35);
+        face(mn, got.h ? "bred" : "afterglow", 90);
+        return got.h ? { endKey: "end", ml: ml(got.ml), h: TRAP_HOLE[got.h] } : { endKey: "endOver", ml: ml(got.ml) };
+      },
+      scene: [
+        [
+          "The pots and pans bang to wake the trees, and the old apple tree creaks like it's listenin'.",
+          "The wassail bowl goes round and round, hot and spicy, and everybody's cheeks are red.",
+          "A robin flutters down to the toast in the branches right over %n's head, and stares at them.",
+          "The singin' gets louder and further off key with every pass of the bowl."
+        ],
+        [
+          "{t}Somebody sucks a drop of cider off %n's nipple, and then the other, and then goes back to the first.",
+          "{c}Somebody's hand wraps round %n's cock, sticky with cider, and strokes it in time with the song.",
+          "{v}Fingers slip between %n's legs, slick with cider, and rub slow while the crowd sings.",
+          "The wassail master kisses %n, deep, and tastes of hot cider and cloves."
+        ]
+      ],
+      tender: [
+        "The cider's warm, not hot, and the wassail master checks it on his wrist before every ladle.",
+        "Somebody holds the wassail bowl to %n's lips between toasts so they get a sip too.",
+        "Every wassailer whispers %n a wish for the year before they lick."
+      ],
+      filthy: [
+        "%n's the orchard's offerin', tied to a tree and soaked in cider, and the whole farm's lappin' it off 'em.",
+        "Every tongue in the orchard's been on %n by the end, and %n's moanin' the wassail song.",
+        "%n's sticky and drippin' and tied to a tree, and the wassailers keep comin' back for seconds."
+      ],
+      mess: ["cider", ["chest", "tummy", "face"]],
+      gear: [{ when: "hold", slot: "ropeArms", label: "Wassail Ribbons", items: ["Ribbons"], color: "#B3122E", desc: "Red and green ribbons, like the ones tied on the oldest apple tree, tyin' their wrists round its trunk." }],
+      depth: ["held", "watched", "mess"],
+      tw: ["crowd", "night"],
+      places: ["pasture", "trough", "wildlife"],
+      sound: "wet",
+      tags: ["messy", "public", "restraint"],
+      writes: ["WASSAIL", "THE ORCHARD'S GIFT", "GOOD CROP"]
+    });
+    seasonTrap("yule", "ivy", {
+      icon: "\u{1F33F}",
+      what: "the ivy on the old barn: it winds round you, holds you to the wall, and lays its berry pods in you",
+      limit: /\b(plants?|vines?|tentacles?|monster)/i,
+      hold: 7,
+      where: "the old barn's ivy",
+      // (eggs in their limits: it only plays)
+      before(mn, v) {
+        v.h = !limitBlocks(mn, "eggs") ? openHole(mn) : null;
+        if (v.h === "mouth") v.h = null;
+      },
+      lines: {
+        beats: (mn, v) => {
+          const T = SEASON_LINES.ivy;
+          return [T.b1, T.b2, T.b3, v.h ? T.lay : T.tease];
+        },
+        b1: [
+          "The old stone barn at the bottom of the farm is green with ivy all year, and at Yule its berries come black and glossy, and as %n walks by, the ivy moves.",
+          "%n leans on the old barn wall to catch their breath, and the ivy on it is warm, which ivy shouldn't be, and it's windin' round their wrist.",
+          "There's a rustle in the ivy on the old barn like somethin' breathin', and a tendril as thick as a finger curls out and taps %n on the shoulder."
+        ],
+        b2: [
+          "The ivy has them round the wrists and ankles before they can pull away, and it draws them back against the warm stone, and holds them there, spread like a pressed flower.",
+          "Tendrils wind round %n's arms and legs and up under their clothes, and pull them flat to the barn wall, and the clothes come off in strips, eaten away by somethin' in the sap.",
+          "The ivy wraps %n round and round, wrists to the wall, ankles apart, and the leaves rustle like it's whisperin' to itself, very pleased."
+        ],
+        b3: [
+          "Then the little tendrils go everywhere, explorin', ticklin', curlin' round every bit of %n they can find and tastin' it.",
+          "{t}Tendrils curl round %n's tits and squeeze, and tiny ones wind round the nipples and tug, and the leaves shiver.",
+          "{c}A tendril winds round %n's cock from the root to the tip and squeezes, slow, like it's measurin' it.",
+          "{v}A tendril strokes along %n's pussy, slick with sap, and dips in, and out, and in again, explorin'."
+        ],
+        lay: [
+          "Then a thick green vine, heavy with berry pods, nudges into %n's %h, and pushes in deep, and %n feels the first pod go into them, and the next.",
+          "The fattest vine on the barn noses up between %n's legs, finds their %h, and slides in, and swells, and starts to lay, pod after glossy pod.",
+          "A vine as thick as a wrist works its way into %n's %h and pulses, and every pulse pushes another berry pod deep inside them."
+        ],
+        tease: [
+          "The ivy explores every inch of %n, slow and thorough, and seems to be lookin' for somethin' it can't find, and doesn't stop lookin'.",
+          "The tendrils stroke and squeeze and curl for what feels like hours, and the ivy never once lets %n finish.",
+          "The ivy holds %n to the wall and plays with them like a cat with a ball of wool, and the berries rustle."
+        ],
+        end: [
+          "The ivy lets go all at once and %n slides down the barn wall into the frosty grass, belly round with %x berry pods in their %h, sap drippin' down their thighs.",
+          "%n's let down off the barn wall slow, the vines unwindin' one by one, with %x of the ivy's pods snug in their %h and a few black berries caught in their hair.",
+          "The ivy pulls its fat vine out of %n's %h with a slick sound, and %x berry pods stay behind, and the leaves rustle like the barn's sighin'."
+        ],
+        endTease: [
+          "The ivy lets %n go as suddenly as it took them, and they slide down the wall into the grass, sap-slick and tinglin' and wound right up.",
+          "The tendrils unwind one by one, and %n's left leanin' on the old barn with leaf marks on their skin and nothin' at all to show for it but the ache."
+        ]
+      },
+      after(mn, v) {
+        arouse(mn, 40);
+        if (!v.h) {
+          face(mn, "edged", 90);
+          return { endKey: "endTease" };
+        }
+        const [lo, hi] = CFG.EGG_COUNT, n = layClutch(mn, lo + Math.floor(Math.random() * (hi - lo + 1)), -6);
+        face(mn, "bred", 120);
+        return { endKey: "end", x: String(n), h: TRAP_HOLE[v.h] };
+      },
+      scene: [
+        [
+          "The ivy rustles, though there's no wind, and the berries knock together like little beads.",
+          "Sap runs down %n's skin, warm and green-smellin', and wherever it runs it tingles.",
+          "A robin lands in the ivy above %n's head, pecks a berry, and flies off quick.",
+          "The old barn's stone is warm against %n's back, like the ivy's been keepin' it warm for them."
+        ],
+        [
+          "{t}Little tendrils wind round %n's nipples and tug in turn, and the leaves round them shiver.",
+          "{c}The tendril round %n's cock squeezes and strokes, slow, from root to tip and back.",
+          "{v}A tendril curls against %n's clit and rubs, slow and slick, and won't stop.",
+          "A tendril strokes along %n's lips, and then slips between them, and tastes of green and honey."
+        ]
+      ],
+      tender: [
+        "The ivy holds %n gently, every tendril snug and never tight.",
+        "The leaves stroke %n's face, soft as feathers, the whole time.",
+        "The ivy's warm and slow, and it seems to know exactly where %n's comfy."
+      ],
+      filthy: [
+        "The ivy's stuffed %n full of its pods and it's still lookin' for room.",
+        "%n's spread on the barn wall like a pressed flower, vines in every hole, and moanin' for more.",
+        "The ivy breeds %n like a field it's sowin', pod after pod, and %n's thighs are slick with sap."
+      ],
+      mess: ["slime", ["tummy", "chest"]],
+      gear: [
+        { when: "hold", slot: "arms", label: "Ivy (arms)", items: ["HempRope"], color: "#2F5E1F", desc: "Ivy wound round and round their wrists and arms, holdin' them to the old barn wall." },
+        { when: "hold", slot: "legs", label: "Ivy (legs)", items: ["HempRope"], color: "#2F5E1F", desc: "Ivy wound round their legs, holdin' them apart against the warm stone." }
+      ],
+      depth: ["held", "tease"],
+      tw: ["nest", "alone", "night"],
+      places: ["wildlife", "stalls", "pasture"],
+      sound: "creak",
+      tags: ["monsters", "pregnancy", "restraint"],
+      writes: ["SOWN", "POD FULL", "THE IVY'S"]
+    });
+    seasonTrap("yule", "longnight", {
+      icon: "\u{1F56F}\uFE0F",
+      what: "the longest night: tied in the ring of candles that has to burn till dawn, and the wax drips, an hour at a time, till the sun comes back",
+      limit: /\b(wax|heat|hot|pain|candles?|fire|burn)/i,
+      hold: 6,
+      where: "the ring of candles",
+      lines: {
+        beats: [
+          [
+            "On the longest night the farm keeps the candles lit till dawn, the old way, so the sun can find its way back. There's a ring of them in the big barn, and a space in the middle, and the farmhands are waitin' for somebody to fill it.",
+            `The farm girl takes %n by the hand at sundown and leads them into the big barn, where a ring of candles is burnin' on the floor. "Somebody keeps the vigil," she says. "Tonight it's you."`,
+            "There's a ring of candles in the big barn, red and white, and the farmhands sittin' round it look up when %n comes in, and smile, and make room in the middle."
+          ],
+          [
+            "They lay %n down on a blanket in the middle of the candles, and tie their wrists and ankles out to four pegs, and the candlelight makes their skin glow gold.",
+            "%n's stripped and laid in the ring, wrists tied over their head with red cord, and the candles flicker round them like a crown laid on the floor.",
+            "Red cord round %n's wrists, round their ankles, out to the pegs at the edge of the ring, and the farmhands each pick up a candle."
+          ],
+          [
+            "Then the first drip. Hot, not too hot, a little red star on %n's belly that sets as they gasp. Then another, and another, slow, an hour's worth at a time.",
+            "Each farmhand takes a turn with a candle, tippin' it so the red wax drips down onto %n in a slow patter, collarbone, belly, thigh, and every drop's a little shock.",
+            "{t}The wax drips onto %n's tits, slow, a drop on each nipple, and they set hard and red, and the next drop lands on top.",
+            "{c}A farmhand holds the candle high and lets the wax drip down along %n's cock, slow, and %n arches off the blanket.",
+            "{v}A drop lands right between %n's legs, hot and quick, and they cry out, and the farmhand blows on it gently after."
+          ],
+          [
+            "The night's long, the longest there is, and the wax keeps comin', and so do the hands in between, strokin' the red stars off, warm and slow, before the next ones fall.",
+            "Hour after hour the candles drip, and the farmhands take turns, and in between the drips their hands are everywhere, keepin' %n warm, keepin' them right on the edge.",
+            "%n loses count of the drips, and the hours, and the hands, and the ring of candles burns lower, and the dark outside the barn door is as deep as it ever gets."
+          ]
+        ],
+        end: [
+          'Then the barn door goes grey, then gold, and the sun comes back, the way it always does, and the farmhands untie %n and pick the wax off them one red star at a time. "Kept," says the farm girl.',
+          "Dawn comes in through the barn door, the first light of the new year, and the candles are blown out one by one, and %n's untied, spotted red all over and shakin' and glowin'.",
+          "The sun comes up. The vigil's kept. %n's untied in the grey light, wax all over them like red berries, and somebody wraps them in a warm blanket and kisses their forehead."
+        ]
+      },
+      after(mn) {
+        arouse(mn, 45);
+        face(mn, "afterglow", 120);
+        return null;
+      },
+      scene: [
+        [
+          "A candle gutters, and a farmhand lights a new one off it straight away, so the ring's never broken.",
+          "Outside, the wind howls round the barn on the longest night, and in here it's warm and gold and still.",
+          "Somebody hums an old tune, low, and the others pick it up, and it goes round the ring like the candlelight.",
+          "The wax pools on the barn floor round the candles, red and white, and sets."
+        ],
+        [
+          "{t}A farmhand picks the wax off %n's nipples with a fingernail, slow, and kisses each one before the next drop falls.",
+          "{c}Somebody strokes %n's cock between drips, slow and warm, and stops just when it matters.",
+          "{v}Warm fingers rub %n's clit between the drips, and stop, and the next drop lands, and they start again.",
+          "Somebody brushes %n's hair off their face and kisses their forehead, and the next drip lands on their chest."
+        ]
+      ],
+      tender: [
+        "Every drop's tested on a wrist first, and none of them is ever too hot.",
+        "The farm girl sits at %n's head the whole night and holds their hand.",
+        "Between the drips, warm hands rub %n's skin, and somebody whispers that they're doin' so well."
+      ],
+      filthy: [
+        "%n's spread out in a ring of fire and waxed like a candle themselves, moanin' every time a drop lands.",
+        "The farmhands drip and stroke and drip and stroke all night, and %n's beggin' for the sun to never come up.",
+        "%n's covered in red wax and drippin' wet, and every farmhand in the ring's had their hands on 'em."
+      ],
+      mess: ["wax", ["chest", "tummy"]],
+      gear: [
+        { when: "hold", slot: "arms", label: "Vigil Cord (arms)", items: ["HempRope"], color: "#7A1020", desc: "Red cord round their wrists, tied out to a peg at the edge of the ring of candles." },
+        { when: "hold", slot: "legs", label: "Vigil Cord (legs)", items: ["HempRope"], color: "#7A1020", desc: "Red cord round their ankles, tied out to the pegs, holdin' them spread in the middle of the candles." }
+      ],
+      depth: ["tease", "held", "watched"],
+      tw: ["night", "crowd"],
+      places: ["cabin", "bench", "stalls"],
+      sound: "creak",
+      tags: ["restraint"],
+      writes: ["KEPT THE VIGIL", "THE LONGEST NIGHT", "WAXED"]
+    });
     const SEVERITY = [null, { name: "mild", x: 1, t: 1 }, { name: "strong", x: 2, t: 1.5 }, { name: "brutal", x: 3, t: 2.5 }];
     function dangerX(mn) {
       const n = potionX(mn, "danger");
@@ -37677,6 +39674,7 @@ TRAPS (your own switch)
      ?rate ask off \xB7 stop askin' after each one
   ?seasons \xB7 the farm's calendar, and what's on (?calendar too)
   ?trickortreat \xB7 Halloween: knock on the farm girl's door
+  ?stocking \xB7 winter: what's in your stockin' on the hearth
   ?quiet [minutes] \xB7 an hour where nothin' new starts on you
   ?tend <who> \xB7 help somebody lay (a ribbon in it)
   ?brood \xB7 your brood book: what's bred you, what you carried
@@ -37786,7 +39784,11 @@ RECORDS
   ?unregister <who> \xB7 archive (herdmasters and up)
   ?away \xB7 who's been off the farm longest. Livestock and guests
      two weeks away come off the books on their own (never staff,
-     the proprietors or a permanent contract)`,
+     the proprietors or a permanent contract)
+  ?away hold <who> 30d [why] \xB7 pause their two weeks (a trip,
+     exams, a hospital stay); it carries on after. off ends it
+  ?renew \xB7 who'd like their contract again \xB7 ?renew offer <who>
+     offers them the same one again (herdmasters and up)`,
       herd: `\u{1F404} YOUR HERD (staff)
 
 CLAIMIN'
@@ -37804,6 +39806,10 @@ YOUR HERD
 
 HANDLIN' 'EM
   ?walk <who> \xB7 leash them to you; say it again to let go
+  ?reins <who> [minutes] \xB7 lead them at heel: they walk a step
+     behind you wherever you go (their Companion walks them, or
+     I hop them along). ?reins off [who] lets go; so does their
+     safeword. An hour unless you say (up to 4)
   ?brand <who> <mark> \xB7 up to 12 characters, shows on ?who
      ?brand <who> clear takes it off
   ?turnout <who> [note] \xB7 keep claimed staff out in pasture
@@ -38859,7 +40865,12 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
       "calendar",
       "trickortreat",
       "tot",
-      "rate"
+      "stocking",
+      "stockings",
+      "rate",
+      "renew",
+      "renewal",
+      "renewals"
     ];
     const STAFF_CMDS = [
       "queue",
@@ -38914,6 +40925,7 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
       "stocks",
       "unstock",
       "walk",
+      "reins",
       "tourstop",
       "clockin",
       "clockout",
@@ -39478,7 +41490,7 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
             case "list": {
               const saved = Object.keys(L2.contractTemplates);
               const live = L2.contracts.filter((x) => x.status === "signed" || x.status === "offered" || x.status === "releasing");
-              R("\u{1F4DC} FARM CONTRACTS\nReady-made: fun \xB7 deep \xB7 nhl" + (saved.length ? "\nYours: " + saved.join(" \xB7 ") : "") + "\n\nIN FORCE OR OFFERED\n" + (live.length ? live.map(contractLine).join("\n") : "  none right now") + "\n\n?contract show <name> [who] \xB7 ?contract offer <name> <who> <1h|12h|1d|1w|2w|1m|perm> \xB7 ?contract release <who> \xB7 ?contract check <who>" + (owner ? '\n?contract new <name> [from fun|deep|nhl] \xB7 add \xB7 set \xB7 remove \xB7 title \xB7 terms \xB7 policy \xB7 delete \xB7 ?contract rules\nMade for each person when offered: {name} {Species} {species} {pet} in any text, like nickname="BnB {Species} {name}" \u2192 BnB Cow Vicky' : ""));
+              R("\u{1F4DC} FARM CONTRACTS\nReady-made: fun \xB7 deep \xB7 nhl" + (saved.length ? "\nYours: " + saved.join(" \xB7 ") : "") + "\n\nIN FORCE OR OFFERED\n" + (live.length ? live.map(contractLine).join("\n") : "  none right now") + "\n\n?contract show <name> [who] \xB7 ?contract offer <name> <who> <12h|1d|1w|2w|1m|perm> \xB7 ?contract release <who> \xB7 ?contract check <who> \xB7 ?renew (who'd like theirs again)" + (owner ? '\n?contract new <name> [from fun|deep|nhl] \xB7 add \xB7 set \xB7 remove \xB7 title \xB7 terms \xB7 policy \xB7 delete \xB7 ?contract rules\nMade for each person when offered: {name} {Species} {species} {pet} in any text, like nickname="BnB {Species} {name}" \u2192 BnB Cow Vicky' : ""));
               break;
             }
             case "show": {
@@ -40845,6 +42857,11 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
           } catch (e) {
             warn("safeword outfit wheel:", e);
           }
+          try {
+            reinsLet(sender, "safe");
+          } catch (e) {
+            warn("safeword reins:", e);
+          }
           say2("\u{1F534} PAUSE CALLED. Everything stops, right now, everybody.", true, sender);
           beep(sender, "I've got you, " + plainName(sender) + ". Everything's stopped and I'm fetchin' somebody for you right now. You don't owe anybody an explanation. \u{1F534}", true);
           notifyStaff("\u{1F534} SAFEWORD from " + plainName(sender) + " (" + sender + "). Please go to them now.", false);
@@ -41453,16 +43470,27 @@ Welcome to B&B Farm, hon. \u{1F33E}`
         case "calendar":
           seasonCommand(sender, args, R);
           break;
-        // (?season is the Breedin' add-on's)   // the farm's seasons (10y9m-seasons.js)
+        // the farm's seasons (10y9m-seasons.js; ?season is the Breedin' add-on's)
         case "trickortreat":
         case "tot":
           trickOrTreat(sender, args, R);
           break;
         // knockin' on the farm girl's door at Halloween (10y9n-halloween.js)
+        case "stocking":
+        case "stockings":
+          stockingCommand(sender, args, R);
+          break;
+        // what's in your stockin' on the hearth, in winter (10y9u-winter.js)
         case "rate":
           rateCommand(sender, args, R);
           break;
         // how a trap went for them (10y9o-trap-ratings.js)
+        case "renew":
+        case "renewal":
+        case "renewals":
+          renewCommand(sender, args, R);
+          break;
+        // another contract when this one ends (10y9t-renewals.js)
         case "struggle":
         case "free":
         case "goad":
@@ -42627,6 +44655,10 @@ Welcome to B&B Farm, hon. \u{1F33E}`
           R("\u26D3\uFE0F " + plainName(t) + " is in the stocks for " + mins + " minutes, hon.");
           break;
         }
+        case "reins":
+          reinsCommand(sender, args, R);
+          break;
+        // a pet at heel, a step behind (10y9s-reins.js)
         case "walk": {
           const t = resolveTarget(args[0]);
           if (!t) {
@@ -42649,6 +44681,10 @@ Welcome to B&B Farm, hon. \u{1F33E}`
           }
           if (stockedNow(t)) {
             R("They're in the stocks right now, sugar. ?unstock 'em first.");
+            break;
+          }
+          if (reinsOf(t)) {
+            R("They're on " + plainName(reinsOf(t).by) + "'s reins right now, sugar. ?reins off first.");
             break;
           }
           state.leashes.set(t, sender);
@@ -43476,6 +45512,11 @@ Welcome to B&B Farm, hon. \u{1F33E}`
           if (inRoom()) leashTick();
         } catch (e) {
           warn("leash:", e);
+        }
+        try {
+          if (inRoom()) reinsTick();
+        } catch (e) {
+          warn("reins:", e);
         }
       }, CFG.LEASH_TICK_MS);
       later(heartbeat, 3e3);

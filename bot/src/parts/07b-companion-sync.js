@@ -76,6 +76,8 @@
       part("farm gear", () => { const fg = farmGearFor(mn); if (fg.length) s.farmGear = fg; });   // real gear their Companion keeps on them (10y-farm-gear.js)
       part("trap admin", () => { if (isProprietor(mn)) s.trapAdmin = trapAdminFor(); });
       part("trap ratings", () => rateStateFor(mn, s));   // how was it, the trap of the day (10y9o-trap-ratings.js)
+      part("reins", () => reinsStateFor(mn, s));         // on somebody's reins, or somebody on yours (10y9s-reins.js)
+      part("renewals", () => renewStateFor(mn, s));      // staff: who'd like their contract again (10y9t-renewals.js)
       part("trap kinds", () => trapThemeStateFor(mn, s));   // whole kinds of trap switched off (10y9q-trap-switches.js)
       part("seasons", () => seasonsStateFor(mn, s));        // proprietors: the Seasons card, any season any time (10y9m-seasons.js)
       part("under", () => { const u = underOf(mn); if (u >= 2) s.under = u; if (r.corrWord) s.corrWord = r.corrWord; if (r.corrNoise) s.corrNoise = r.corrNoise; });   // simpler words, and the word that slips out (10y4-corruption.js)
@@ -107,7 +109,7 @@
       const r = rec(m), p = prodOf(m);
       return { mn: m, name: plainName(m), role: (r.roles[0]||"").toLowerCase(), where: whereName(m) || "",
                milk: makesMilk(m) ? Math.round(100*p.milk/Math.max(1, milkCap(m))) : null, heat: inHeat(p) && !p.heat.quiet, preg: !!p.preg,
-               denied: milkDenied(m), mine: herdLeaderOf(m) === mn, onDuty: r.onDuty !== false };
+               denied: milkDenied(m), mine: herdLeaderOf(m) === mn, onDuty: r.onDuty !== false, reins: !!(r.reins && r.reins.by === mn && r.reins.until > Date.now()) };
     });
     const r = rec(mn), wk = weekKey(), week = (r.shift && r.shift.week && r.shift.week.key === wk) ? r.shift.week.ms : 0;
     out.shift = { clocked: clockedIn(mn), weekH: Math.round(10*(week + (clockedIn(mn) ? Date.now() - r.shift.in : 0))/3600000)/10,

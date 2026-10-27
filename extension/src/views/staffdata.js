@@ -20,7 +20,8 @@ export function herd(ctx) {
       h("div", null, x.mine && chip("my herd", "acc"), x.heat && chip("in heat", "alert"), x.preg && chip("carryin'", "good"),
         x.denied && chip("teats capped", "alert"), x.milk !== null && chip(x.milk + "% full")),
       h("div", { style: { marginTop: "6px" } }, btn("Record", act("record", x), true), btn("Milk", act("milk", x)), btn("Drain", act("drain", x)),
-        btn("Edge", act("edge", x)), btn("Summon to me", act("summon", x))))) : muted("Nobody matches right now."),
+        btn("Edge", act("edge", x)), btn("Summon to me", act("summon", x)),
+        x.mine && (x.reins ? btn("🐴 Let go", act("reins off", x)) : btn("🐴 Reins", act("reins", x)))))) : muted("Nobody matches right now."),
   ];
 }
 

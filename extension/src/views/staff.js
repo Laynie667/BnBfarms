@@ -80,7 +80,16 @@ function contracts(ctx) {
   };
   const sel = (key, opts) => h("select", { class: "fhc-sel", onchange: (e) => ctx.setUi({ [key]: e.target.value }, true) }, opts.map(([v, l]) => h("option", { value: v, selected: (ctx.ui[key] || "") === v ? "selected" : null }, l)));
   const timeIn = (key) => h("input", { class: "fhc-in", type: "time", value: ctx.ui[key] || "", style: { width: "110px" }, oninput: (e) => ctx.setUi({ [key]: e.target.value }, true) });
+  // another contract? (the farm's 10y9t-renewals.js): a day before a timed one ends I ask them; a yes lands here
+  const rn = ctx.s.renewals || [], hrs = (t) => Math.max(1, Math.round((t - Date.now()) / 3600000)) + " h";
+  const renewCard = rn.length ? card(title("📜 Renewals"), muted("A day before a timed contract ends, the farm asks if they'd like another. Offer it gives them the same one again, the same length (they need to be in the room)."),
+    rn.map((r) => h("div", { class: "fhc-kv" },
+      h("span", null, h("b", null, r.name), " · \"" + r.title + "\"" + (r.dur ? " (" + r.dur + ")" : "") + " · " + (r.ended ? "ended" : "ends in " + hrs(r.until))),
+      r.said === "yes" && !r.offered ? (r.here && ctx.s.herdmaster ? btn("Offer it", () => ctx.send("renew offer " + r.mn), true) : chip(r.here ? "said yes" : "said yes · not here", "acc"))
+        : chip(r.offered ? "offered again" : r.said === "no" ? "said no" : "asked", r.said === "no" ? "" : "acc"))),
+    h("div", null, btn("All renewals", () => ctx.send("renew")))) : null;
   return [
+    renewCard,
     card(title("Offer a BC+ contract"), muted("They read it in their own BC+ and only sign if they want it. Herdmasters and proprietors can offer."),
       field("Contract", h("input", { class: "fhc-in", value: ctx.ui.ctTpl || "deep", placeholder: "fun, deep, nhl, or one of yours", oninput: (e) => ctx.setUi({ ctTpl: e.target.value }, true) })),
       field("For (name or member number, here in the room)", input("Bessie", "ctWho", ctx)),

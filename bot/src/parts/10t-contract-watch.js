@@ -29,6 +29,7 @@
     for (const x of L.contracts){
       if (x.status === "signed" && x.until && x.until <= now){ x.status = "ended"; x.endedAt = now; saveLedger(); contractEndedNow(x.mn); }
     }
+    try { renewTick(); } catch(e){ warn("renew:", e); }   // a day left: another? (10y9t-renewals.js)
     // new approvals that haven't signed
     for (const [k, r] of Object.entries(L.people)){
       if (!r.contractBy) continue;

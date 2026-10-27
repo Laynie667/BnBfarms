@@ -140,6 +140,7 @@
     if (r.dare && r.dare.until > now) out.push({ icon: "🎲", text: "Dare", until: r.dare.until });
     for (const f of activePotions(mn)) out.push({ icon: "🧪", text: (potionDef(f.id) || {}).name || f.id, until: f.until });
     if (p.tieUntil > now) out.push({ icon: "🔒", text: "Knotted", until: p.tieUntil });
+    { const x = reinsOf(mn); if (x) out.push({ icon: "🐴", text: "On "+plainName(x.by)+"'s reins", until: x.until }); }   // (10y9s-reins.js)
     return out.map(x => Object.assign(x, x.until ? { until: Math.ceil(x.until / 60000) * 60000 } : {}));
   }
   // who's on the use bench (not you), with the holes that are open, for the tap-to-use card

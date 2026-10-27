@@ -295,6 +295,12 @@ export class Panel {
         h("div", { style: { marginTop: "6px" } }, btn("💖 Loved it", () => rate("loved"), true), btn("👍 Fine", () => rate("fine")), btn("🙅 Not for me", () => rate("no"))),
         h("div", { class: "fhc-muted" }, "Loved it: it finds you a bit more often. Not for me: less often, but never not at all (?traps skip " + rt.kind + " does that).")));
     }
+    // somebody's on your reins (the farm's 10y9s-reins.js): they follow a step behind you; let go here
+    const rm = (this.s.reinsMine || []).filter((x) => x.until > Date.now());
+    if (rm.length) out.push(h("div", { class: "fhc-box" },
+      h("b", null, "🐴 On your reins: " + rm.map((x) => x.name).join(", ")),
+      h("div", { class: "fhc-muted" }, "They follow a step behind you wherever you walk. Their safeword lets go too."),
+      h("div", { style: { marginTop: "6px" } }, rm.map((x) => btn("Let go of " + x.name, () => this.ask("reins off " + x.mn, true))))));
     for (const a of this.asks) out.push(h("div", { class: "fhc-box ask" }, h("div", null, a.text),
       h("div", { style: { marginTop: "8px" } },
         btn("Yes", () => { this.asks = this.asks.filter((x) => x !== a); this.ask("yes", true); }, true),

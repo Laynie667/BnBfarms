@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.47.0
+// @version      0.48.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -230,7 +230,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.47.0";
+  var VERSION = "0.48.0";
 
   // shared/species.js
   var WORDS = {
@@ -4584,7 +4584,15 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
       ecto: { style: "smear", tint: "#8FF5DC", stampAlpha: 0.6, narrow: [1.1, 1.5], long: 0.95, turn: 1.1, texture: "bubbles", stampToo: true, base: "#7FEAD0", edge: "#38A88E", gloss: "#E6FFF9", alpha: 0.5, run: 1, width: 1.1, beads: 0.6, bubbles: true, also: "run" },
       cider: { style: "run", tint: "#E3A23E", stampAlpha: 0.55, narrow: [0.5, 0.8], long: 1.3, turn: 0.3, texture: "sheen", base: "#D9902E", edge: "#A8661A", gloss: "#FFE6B0", alpha: 0.38, run: 1.5, width: 0.75, beads: 0.3, droplets: 1.4 },
       brew: { style: "run", tint: "#8E4FCB", stampAlpha: 0.85, narrow: [0.9, 1.25], long: 1.1, turn: 0.4, texture: "bubbles", base: "#7A3FB0", edge: "#47206E", gloss: "#E6CCFF", alpha: 0.72, run: 1.2, width: 1, beads: 0.7, bubbles: true },
-      ink: { style: "run", tint: "#2A2433", stampAlpha: 0.95, narrow: [0.9, 1.25], long: 1.15, turn: 0.4, texture: "sheen", base: "#15121C", edge: "#000000", gloss: "#6E6880", alpha: 0.92, run: 1.2, width: 1.05, beads: 0.7, droplets: 1.2 }
+      ink: { style: "run", tint: "#2A2433", stampAlpha: 0.95, narrow: [0.9, 1.25], long: 1.15, turn: 0.4, texture: "sheen", base: "#15121C", edge: "#000000", gloss: "#6E6880", alpha: 0.92, run: 1.2, width: 1.05, beads: 0.7, droplets: 1.2 },
+      // winter's and Yule's (Oct 27): royal icin' piped thick and white with red and green sprinkles, a milky cocoa run with
+      // little marshmallows in, pale eggnog with nutmeg dust, candy-cane peppermint syrup with white stripes, and red candle
+      // wax that runs a little way and sets in beads
+      icing: { style: "smear", smudge: 0.35, sprinkleN: 10, base: "#FFFDF8", edge: "#E4DCCD", gloss: "#FFFFFF", alpha: 0.97, run: 0.15, width: 0.95, patches: "#FFFFFF", sprinkles: ["#D62B3A", "#2E8B47", "#FFFFFF"] },
+      cocoa: { style: "run", tint: "#7A4A2E", stampAlpha: 0.8, narrow: [0.7, 1], long: 1.25, turn: 0.35, texture: "sheen", base: "#6E4128", edge: "#3E2414", gloss: "#D8B090", alpha: 0.74, run: 1.4, width: 0.9, beads: 0.5, droplets: 1, crumbs: ["#FFFFFF", "#F8F2EA", "#FFF9F2"] },
+      eggnog: { style: "run", tint: "#F5E6B8", stampAlpha: 0.85, narrow: [0.8, 1.1], long: 1.15, turn: 0.35, texture: "milky", base: "#F1E0AA", edge: "#C9B27A", gloss: "#FFF8E0", alpha: 0.78, run: 1.2, width: 0.95, beads: 0.5, specks: "#8A5A2B" },
+      peppermint: { style: "run", tint: "#E8435A", stampAlpha: 0.88, narrow: [0.9, 1.2], long: 1.1, turn: 0.3, texture: "candy", base: "#E23A52", edge: "#9E1A2C", gloss: "#FFE0E6", alpha: 0.82, run: 1.1, width: 1, beads: 0.7 },
+      wax: { style: "run", tint: "#B01E32", stampAlpha: 0.95, narrow: [0.7, 1], long: 0.7, turn: 0.25, texture: "shine", base: "#A3162B", edge: "#5E0A16", gloss: "#FF8A9A", alpha: 0.96, run: 0.5, width: 0.9, beads: 1.2 }
     };
     function ribbon(ctx3, pts) {
       const L = [], R = [];
@@ -4923,6 +4931,18 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
         x.globalAlpha = 0.4;
         x.fillStyle = "#FFFFFF";
         x.fillRect(0, 0, w, h2);
+      },
+      // peppermint's candy-cane stripes, white and slantin'
+      candy: (x, w, h2, r) => {
+        x.globalAlpha = 0.55;
+        x.strokeStyle = "#FFFFFF";
+        x.lineWidth = 1.4;
+        for (let i = -h2; i < w + h2; i += 5) {
+          x.beginPath();
+          x.moveTo(i, 0);
+          x.lineTo(i + h2 * 0.6, h2);
+          x.stroke();
+        }
       }
     };
     function stamp(ctx3, r, K, x, y, size) {
@@ -5110,7 +5130,12 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     "#7fead0": "ecto",
     "#d9902e": "cider",
     "#7a3fb0": "brew",
-    "#15121c": "ink"
+    "#15121c": "ink",
+    "#fffdf8": "icing",
+    "#6e4128": "cocoa",
+    "#f1e0aa": "eggnog",
+    "#e23a52": "peppermint",
+    "#a3162b": "wax"
   };
   var AREA_OF = { face: "face", forehead: "forehead", chest: "chest", tummy: "tummy", hair: "hair", thighs: "thighL", back: "back" };
   function load2() {
@@ -5139,7 +5164,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
       const k = AREA_OF[x];
       if (k && !a.includes(k)) a.push(k);
     }
-    if (a.includes("tummy") && ["cum", "piss", "milk", "honey", "maple", "chocolate", "strawberry", "slime", "caramel", "ecto", "cider", "brew", "ink"].includes(kind) && Math.random() < 0.4) a.push(Math.random() < 0.5 ? "thighL" : "thighR");
+    if (a.includes("tummy") && ["cum", "piss", "milk", "honey", "maple", "chocolate", "strawberry", "slime", "caramel", "ecto", "cider", "brew", "ink", "cocoa", "eggnog", "peppermint"].includes(kind) && Math.random() < 0.4) a.push(Math.random() < 0.5 ? "thighL" : "thighR");
     if (!a.length) a.push("chest");
     const amt = Number(m.amount) > 0 ? Math.max(0.5, Math.min(3, Number(m.amount))) : 1;
     mine2.push({ k: kind, a, s: Math.random() * 1e9 | 0, t: Date.now(), m: Math.round(amt * 10) / 10 });
@@ -8064,7 +8089,8 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
           btn("Milk", act("milk", x)),
           btn("Drain", act("drain", x)),
           btn("Edge", act("edge", x)),
-          btn("Summon to me", act("summon", x))
+          btn("Summon to me", act("summon", x)),
+          x.mine && (x.reins ? btn("\u{1F434} Let go", act("reins off", x)) : btn("\u{1F434} Reins", act("reins", x)))
         )
       )) : muted("Nobody matches right now.")
     ];
@@ -8411,7 +8437,20 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     };
     const sel = (key, opts) => h("select", { class: "fhc-sel", onchange: (e) => ctx3.setUi({ [key]: e.target.value }, true) }, opts.map(([v, l]) => h("option", { value: v, selected: (ctx3.ui[key] || "") === v ? "selected" : null }, l)));
     const timeIn = (key) => h("input", { class: "fhc-in", type: "time", value: ctx3.ui[key] || "", style: { width: "110px" }, oninput: (e) => ctx3.setUi({ [key]: e.target.value }, true) });
+    const rn = ctx3.s.renewals || [], hrs = (t) => Math.max(1, Math.round((t - Date.now()) / 36e5)) + " h";
+    const renewCard = rn.length ? card(
+      title("\u{1F4DC} Renewals"),
+      muted("A day before a timed contract ends, the farm asks if they'd like another. Offer it gives them the same one again, the same length (they need to be in the room)."),
+      rn.map((r) => h(
+        "div",
+        { class: "fhc-kv" },
+        h("span", null, h("b", null, r.name), ' \xB7 "' + r.title + '"' + (r.dur ? " (" + r.dur + ")" : "") + " \xB7 " + (r.ended ? "ended" : "ends in " + hrs(r.until))),
+        r.said === "yes" && !r.offered ? r.here && ctx3.s.herdmaster ? btn("Offer it", () => ctx3.send("renew offer " + r.mn), true) : chip(r.here ? "said yes" : "said yes \xB7 not here", "acc") : chip(r.offered ? "offered again" : r.said === "no" ? "said no" : "asked", r.said === "no" ? "" : "acc")
+      )),
+      h("div", null, btn("All renewals", () => ctx3.send("renew")))
+    ) : null;
     return [
+      renewCard,
       card(
         title("Offer a BC+ contract"),
         muted("They read it in their own BC+ and only sign if they want it. Herdmasters and proprietors can offer."),
@@ -9396,6 +9435,14 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
           h("div", { class: "fhc-muted" }, "Loved it: it finds you a bit more often. Not for me: less often, but never not at all (?traps skip " + rt.kind + " does that).")
         ));
       }
+      const rm = (this.s.reinsMine || []).filter((x) => x.until > Date.now());
+      if (rm.length) out.push(h(
+        "div",
+        { class: "fhc-box" },
+        h("b", null, "\u{1F434} On your reins: " + rm.map((x) => x.name).join(", ")),
+        h("div", { class: "fhc-muted" }, "They follow a step behind you wherever you walk. Their safeword lets go too."),
+        h("div", { style: { marginTop: "6px" } }, rm.map((x) => btn("Let go of " + x.name, () => this.ask("reins off " + x.mn, true))))
+      ));
       for (const a of this.asks) out.push(h(
         "div",
         { class: "fhc-box ask" },
@@ -9849,7 +9896,34 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     "Costume Tail",
     "Witch's Hat",
     "Black Cat Ears",
-    "Black Cat Tail"
+    "Black Cat Tail",
+    // Oct 27: winter's and Yule's
+    "Frozen Fast",
+    "Bakery Ribbon",
+    "Mistletoe Ribbon",
+    "Yeti's Fur Wrap",
+    "Gift Ribbon (arms)",
+    "Gift Ribbon (legs)",
+    "Gift Box",
+    "The Big Stockin'",
+    "Stockin' Stuffer",
+    "Cocoa Stand Ribbon",
+    "Frost Lace",
+    "The Farmyard Snowman",
+    "Winter Hat",
+    "Winter Shawl",
+    "Fur Gloves",
+    "Yule Log Ribbons",
+    "Solstice Ribbon",
+    "Holly King's Crown",
+    "The Hunt's Rope",
+    "Wassail Ribbons",
+    "Ivy (arms)",
+    "Ivy (legs)",
+    "Vigil Cord (arms)",
+    "Vigil Cord (legs)",
+    "Holly Crown",
+    "Yule Cloak"
   ];
   var GEAR_SLOTS = {
     plug: { groups: ["ItemButt"], names: ["InflVibeButtPlug", "BlackButtPlug", "ButtPlug", "ButtPump"], re: /ButtPlug|Plug/, color: "#2B2B2B" },
@@ -9886,7 +9960,9 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     // only ever put on the item the piece names, so there's no stand-in: if this game hasn't got it, nothin' goes on
     ears: { groups: ["HairAccessory2"], names: [], re: /^$/, takeover: true },
     horns: { groups: ["HairAccessory1"], names: [], re: /^$/, takeover: true },
-    tail: { groups: ["TailStraps"], names: [], re: /^$/, takeover: true }
+    tail: { groups: ["TailStraps"], names: [], re: /^$/, takeover: true },
+    // the farm girl's winter shawl and Yule cloak (Oct 27): the same, over her own clothes' accessory spot
+    cloak: { groups: ["ClothAccessory"], names: [], re: /^$/, takeover: true }
   };
   var GEAR_OPT = {
     "ItemArms:LeatherCuffs": "Wrist",
@@ -10300,6 +10376,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     ctx2 = c;
     setInterval(sightTick, 4e3);
     setInterval(feelTick, 6e4);
+    setInterval(heelTick, 500);
   }
   var pref = (k) => !ctx2.panel.prefs[k];
   var cueOff = () => ({
@@ -10368,7 +10445,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
   }
   function lead(m) {
     const no = () => {
-      walk = null;
+      if (walk && !walk.heel) walk = null;
       ctx2.toBot("leadNo", { id: m.id });
     };
     if (!pref("noLead") || !mapOn() || typeof W11.ChatRoomMapViewMove !== "function") return no();
@@ -10380,14 +10457,30 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
       return;
     }
     ctx2.local("You're led " + (m.why ? m.why : "along") + "\u2026", "#c9a35b", true);
-    walk = { id: m.id, to, path, i: 0, last: { X: from.X, Y: from.Y }, stuck: Date.now(), retried: false };
-    stepWalk();
+    startWalk({ id: m.id, to, path, i: 0, last: { X: from.X, Y: from.Y }, stuck: Date.now(), retried: false });
+  }
+  var stepping = false;
+  function startWalk(w) {
+    walk = w;
+    if (!stepping) {
+      stepping = true;
+      stepWalk();
+    }
   }
   function stepWalk() {
-    if (!walk) return;
     const w = walk, p = W11.Player && W11.Player.MapData && W11.Player.MapData.Pos;
+    const end = (ok2) => {
+      if (walk === w) walk = null;
+      stepping = false;
+      if (w && !w.heel) ctx2.toBot(ok2 ? "leadOk" : "leadNo", { id: w.id });
+    };
+    if (!w) {
+      stepping = false;
+      return;
+    }
     if (!p) {
       walk = null;
+      stepping = false;
       return;
     }
     if (p.X !== w.last.X || p.Y !== w.last.Y) {
@@ -10395,23 +10488,11 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
       w.stuck = Date.now();
       w.i++;
     }
-    if (w.i >= w.path.length || Math.max(Math.abs(p.X - w.to.X), Math.abs(p.Y - w.to.Y)) <= 0) {
-      walk = null;
-      ctx2.toBot("leadOk", { id: w.id });
-      return;
-    }
+    if (w.i >= w.path.length || Math.max(Math.abs(p.X - w.to.X), Math.abs(p.Y - w.to.Y)) <= 0) return end(true);
     if (Date.now() - w.stuck > 3e3) {
-      if (w.retried) {
-        walk = null;
-        ctx2.toBot("leadNo", { id: w.id });
-        return;
-      }
+      if (w.retried) return end(false);
       const path = findPath(p, w.to);
-      if (!path) {
-        walk = null;
-        ctx2.toBot("leadNo", { id: w.id });
-        return;
-      }
+      if (!path) return end(false);
       Object.assign(w, { path, i: 0, stuck: Date.now(), retried: true });
     }
     if (W11.ChatRoomMapViewMovement == null) {
@@ -10421,6 +10502,50 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
       }
     }
     setTimeout(stepWalk, 150);
+  }
+  var heel = null;
+  function reinsState(r) {
+    const on2 = r && Number(r.mn) && !r.hold && Number(r.until || 0) > Date.now();
+    if (!on2) {
+      if (heel && !(r && r.hold)) ctx2.local("\u{1F434} The reins come off.", "#c9a35b", true);
+      heel = r && r.hold && heel ? Object.assign(heel, { hold: true }) : null;
+      if (walk && walk.heel) walk = null;
+      return;
+    }
+    if (!heel || heel.mn !== Number(r.mn)) ctx2.local("\u{1F434} You're on " + String(r.name || "somebody") + "'s reins: you'll follow a step behind them till they let go. Your safeword frees you.", "#c9a35b", true);
+    if (!heel || heel.mn !== Number(r.mn)) heel = { mn: Number(r.mn), trail: [] };
+    heel.hold = false;
+    heel.until = Number(r.until);
+  }
+  function heelTick() {
+    try {
+      if (!heel || heel.hold || W11.CurrentScreen !== "ChatRoom" || !mapOn() || !pref("noLead") || typeof W11.ChatRoomMapViewMove !== "function") return;
+      if (heel.until && heel.until < Date.now()) {
+        heel = null;
+        return;
+      }
+      const C = others3().find((c) => c.MemberNumber === heel.mn), lp = C && C.MapData && C.MapData.Pos;
+      if (!lp || lp.X < 0) return;
+      const t = heel.trail, last = t[t.length - 1];
+      if (!last || last.X !== lp.X || last.Y !== lp.Y) {
+        t.push({ X: lp.X, Y: lp.Y });
+        if (t.length > 4) t.shift();
+      }
+      const me4 = W11.Player.MapData.Pos;
+      if (Math.max(Math.abs(me4.X - lp.X), Math.abs(me4.Y - lp.Y)) <= 1) {
+        if (walk && walk.heel) walk = null;
+        return;
+      }
+      if (walk && !walk.heel) return;
+      const from = t.length > 1 ? t[t.length - 2] : me4, dx = Math.sign(from.X - lp.X), dy = Math.sign(from.Y - lp.Y);
+      const to = (dx || dy) && canStep(lp.X + dx, lp.Y + dy) ? { X: lp.X + dx, Y: lp.Y + dy } : { X: lp.X, Y: lp.Y };
+      if (walk && walk.heel && walk.to.X === to.X && walk.to.Y === to.Y) return;
+      const path = findPath(me4, to);
+      if (!path || !path.length) return;
+      startWalk({ id: 0, heel: true, to, path, i: 0, last: { X: me4.X, Y: me4.Y }, stuck: Date.now(), retried: false });
+    } catch (e) {
+      console.warn("[Farmhand Companion] reins:", e);
+    }
   }
   var FACES = {
     milkdrunk: { Eyes: "Dazed", Blush: "Medium", Mouth: "HalfOpen" },
@@ -10998,6 +11123,13 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
             if ("drawn" in m.set) drawnBodyFarmState(s.drawn);
           } catch (e) {
           }
+          if ("reins" in m.set || (m.del || []).includes("reins")) {
+            try {
+              reinsState(s.reins);
+            } catch (e) {
+              console.warn("[Farmhand Companion] reins:", e);
+            }
+          }
         } else askWhole();
         break;
       case "state":
@@ -11012,6 +11144,11 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
             drawnBodyFarmState(m.state.drawn);
           } catch (e) {
             console.warn("[Farmhand Companion] drawn body size:", e);
+          }
+          try {
+            reinsState(m.state.reins);
+          } catch (e) {
+            console.warn("[Farmhand Companion] reins:", e);
           }
         }
         break;

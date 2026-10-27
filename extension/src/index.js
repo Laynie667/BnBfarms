@@ -24,7 +24,7 @@ import { initTrim } from "./trimpics.js";
 import { initLocalSave } from "./localsave.js";
 import { initChatlog, logRow } from "./chatlog.js";
 import { initSettings } from "./settings.js";
-import { initCues, cueOff, lead, face, sound, trance, drawMarkers, arouse, vibe, initBody } from "./cues.js";
+import { initCues, cueOff, lead, face, sound, trance, drawMarkers, arouse, vibe, initBody, reinsState } from "./cues.js";
 
 // the SDK ships as an old-style module; this digs the real thing out either way
 const bcModSdk = sdkModule.default || sdkModule;
@@ -232,11 +232,12 @@ function onFarmMsg(m) {
         if (st.store) s.store = st.store;
         if (m.seq != null) st.seq = m.seq;
         st.lastState = s; st.panel.setState(s); parasiteSync(); try { if ("drawn" in m.set) drawnBodyFarmState(s.drawn); } catch (e) { /* fine */ }
+        if ("reins" in m.set || (m.del || []).includes("reins")) { try { reinsState(s.reins); } catch (e) { console.warn("[Farmhand Companion] reins:", e); } }   // on somebody's reins (cues.js)
       } else askWhole();
       break;
     case "state":
       if (m.state && typeof m.state === "object" && !("store" in m.state) && st.store) m.state.store = st.store;
-      if (m.state && typeof m.state === "object") { st.seq = m.seq != null ? m.seq : 0; st.lastState = m.state; st.gotState = true; st.panel.setState(m.state); parasiteSync(); try { drawnBodyFarmState(m.state.drawn); } catch (e) { console.warn("[Farmhand Companion] drawn body size:", e); } }
+      if (m.state && typeof m.state === "object") { st.seq = m.seq != null ? m.seq : 0; st.lastState = m.state; st.gotState = true; st.panel.setState(m.state); parasiteSync(); try { drawnBodyFarmState(m.state.drawn); } catch (e) { console.warn("[Farmhand Companion] drawn body size:", e); } try { reinsState(m.state.reins); } catch (e) { console.warn("[Farmhand Companion] reins:", e); } }
       break;
     case "reply":
     case "notice": {

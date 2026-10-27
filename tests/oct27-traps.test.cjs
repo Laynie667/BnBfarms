@@ -2,6 +2,7 @@
 // it completely. more trap versions, like the water beast could use alot more versions ... aftermath lines, yes"):
 // rate a trap, the trap of the day, whole kinds of trap switched off, how they're left after, and the things in the water.
 const fs=require('fs'), path=require('path'), os=require('os');
+const CUR=JSON.parse(fs.readFileSync(path.join(__dirname,'..','package.json'),'utf8')).versions.companion;   // (the current Companion: no update notice mid-test)
 const store={}; const sent=[]; const handlers={};
 const S=(mn,name,extra)=>Object.assign({mn,name,roles:["LIVESTOCK","SUBJECT"],species:"cow",gender:"female",onDuty:true,herds:[],tempKeys:[],cover:[],limits:"",breedable:true,fertile:true,trapsOn:true},extra||{});
 store.bnb_ledger_v1=JSON.stringify({v:4,people:{
@@ -40,7 +41,7 @@ const spring=async(mn,kind)=>{ free(mn); const n=sent.length; await say(221397,'
   ['Laynie','Moo','Rex','Pip','Fu','Hank'].forEach((nm,i)=>chars[i+1].Name=nm);
   for (const mn of [500,600,700,800]) await say(mn,'?stats',700);
   // Moo, Pip and Fu have the Companion; Rex hasn't
-  for (const mn of [500,700,800,221397,260239]) handlers.ChatRoomMessage({Sender:mn,Type:"Hidden",Content:"FarmhandMsg",Dictionary:{v:2,type:"hello",ver:"0.47.0"}});
+  for (const mn of [500,700,800,221397,260239]) handlers.ChatRoomMessage({Sender:mn,Type:"Hidden",Content:"FarmhandMsg",Dictionary:{v:2,type:"hello",ver:CUR}});
   await wait(600);
 
   // ── rate a trap ──

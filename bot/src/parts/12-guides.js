@@ -495,6 +495,7 @@ TRAPS (your own switch)
      ?rate ask off · stop askin' after each one
   ?seasons · the farm's calendar, and what's on (?calendar too)
   ?trickortreat · Halloween: knock on the farm girl's door
+  ?stocking · winter: what's in your stockin' on the hearth
   ?quiet [minutes] · an hour where nothin' new starts on you
   ?tend <who> · help somebody lay (a ribbon in it)
   ?brood · your brood book: what's bred you, what you carried
@@ -606,7 +607,11 @@ RECORDS
   ?unregister <who> · archive (herdmasters and up)
   ?away · who's been off the farm longest. Livestock and guests
      two weeks away come off the books on their own (never staff,
-     the proprietors or a permanent contract)`,
+     the proprietors or a permanent contract)
+  ?away hold <who> 30d [why] · pause their two weeks (a trip,
+     exams, a hospital stay); it carries on after. off ends it
+  ?renew · who'd like their contract again · ?renew offer <who>
+     offers them the same one again (herdmasters and up)`,
 
     herd: `🐄 YOUR HERD (staff)
 
@@ -625,6 +630,10 @@ YOUR HERD
 
 HANDLIN' 'EM
   ?walk <who> · leash them to you; say it again to let go
+  ?reins <who> [minutes] · lead them at heel: they walk a step
+     behind you wherever you go (their Companion walks them, or
+     I hop them along). ?reins off [who] lets go; so does their
+     safeword. An hour unless you say (up to 4)
   ?brand <who> <mark> · up to 12 characters, shows on ?who
      ?brand <who> clear takes it off
   ?turnout <who> [note] · keep claimed staff out in pasture

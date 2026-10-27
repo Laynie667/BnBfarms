@@ -132,7 +132,7 @@
   // what's true about them right now, for the [tags]
   const WASH_KIND = { cow: "cow", bull: "cow", pony: "pony", horse: "pony", pup: "pup", dog: "pup", wolf: "pup", kitt: "kitt", cat: "kitt",
                       bunny: "bunny", rabbit: "bunny", goat: "goat", sheep: "goat", deer: "deer", pig: "pig", fox: "fox", goblin: "goblin", rat: "rat" };
-  const SWEET = /^(honey|maple|chocolate|strawberry|cake|cream|mash)$/;
+  const SWEET = /^(honey|maple|chocolate|strawberry|cake|cream|mash|caramel|icing|cocoa|eggnog|peppermint)$/;   // (the seasons' sweet ones too)
   function washFacts(mn){
     const f = new Set(), r = rec(mn) || {}, now = Date.now();
     try {

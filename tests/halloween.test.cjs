@@ -2,6 +2,7 @@
 // equinox based packs with pagan/wiccan themes would be cool"): the seasons, Halloween's traps, trick-or-treatin', and
 // the farm girl's costume.
 const fs=require('fs'), path=require('path');
+const CUR=JSON.parse(fs.readFileSync(path.join(__dirname,'..','package.json'),'utf8')).versions.companion;   // (the current Companion: no update notice mid-test)
 const store={}; const sent=[]; const handlers={};
 const S=(mn,name,extra)=>Object.assign({mn,name,roles:["LIVESTOCK","SUBJECT"],species:"cow",gender:"female",onDuty:true,herds:[],tempKeys:[],cover:[],limits:"",breedable:true,fertile:true,trapsOn:true},extra||{});
 store.bnb_ledger_v1=JSON.stringify({v:4,people:{
@@ -37,7 +38,7 @@ const LEAK=/\{(nv|nc|nt|fu|fb|nb|v|c|t|f|m)\}|%[a-z]{1,8}\b|\bundefined\b|\bNaN\
 (async()=>{ await wait(3500); const cfg=W.__cfg; cfg.USER_COOLDOWN_S=0; cfg.TRAP_BEAT_S=0.08; cfg.TRAP_COOLDOWN_MIN=0; cfg.CHAIN_CHANCE=0; cfg.SYM.TRAP_CHANCE=0; cfg.SYM.LATEX_TRAP_CHANCE=0; cfg.SEND_INTERVAL_MS=2;
   ['Laynie','Moo','Rex','Pip','Fu','Hank'].forEach((nm,i)=>chars[i+1].Name=nm);
   for (const mn of [500,600,700,800]) await say(mn,'?stats',700);
-  for (const mn of [500,221397,260239]) handlers.ChatRoomMessage({Sender:mn,Type:"Hidden",Content:"FarmhandMsg",Dictionary:{v:2,type:"hello",ver:"0.47.0"}});
+  for (const mn of [500,221397,260239]) handlers.ChatRoomMessage({Sender:mn,Type:"Hidden",Content:"FarmhandMsg",Dictionary:{v:2,type:"hello",ver:CUR}});
   await wait(600);
   const sets=W.__farmSets(), seasons=W.__seasons(), of=W.__seasonOf();
   const HW=seasons.halloween.kinds;

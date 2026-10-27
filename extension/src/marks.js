@@ -136,7 +136,12 @@ const FARM_NAMES = ["Parasite Lips", "Parasite Belt", "Pump Bung", "Egg Post Plu
   // Oct 27: Halloween's (and the farm girl's costume)
   "Horseman's Rope", "Hellhound's Knot", "Demon's Horns", "Spider's Web", "Spider Silk", "Samhain Antlers", "The Great Pumpkin", "Bobbin' Ties", "The Witch's Cauldron",
   "Broom Ties", "Candy Stick", "Taffy Hooks (arms)", "Taffy Hooks (legs)", "Mummy Wraps (arms)", "Mummy Wraps (body)", "Mummy Wraps (legs)", "Costume Ears", "Costume Tail",
-  "Witch's Hat", "Black Cat Ears", "Black Cat Tail"];
+  "Witch's Hat", "Black Cat Ears", "Black Cat Tail",
+  // Oct 27: winter's and Yule's
+  "Frozen Fast", "Bakery Ribbon", "Mistletoe Ribbon", "Yeti's Fur Wrap", "Gift Ribbon (arms)", "Gift Ribbon (legs)", "Gift Box", "The Big Stockin'", "Stockin' Stuffer",
+  "Cocoa Stand Ribbon", "Frost Lace", "The Farmyard Snowman", "Winter Hat", "Winter Shawl", "Fur Gloves",
+  "Yule Log Ribbons", "Solstice Ribbon", "Holly King's Crown", "The Hunt's Rope", "Wassail Ribbons", "Ivy (arms)", "Ivy (legs)", "Vigil Cord (arms)",
+  "Vigil Cord (legs)", "Holly Crown", "Yule Cloak"];
 // slot → where it can go and which game item it is: the first that this game has; the pattern is a fallback
 export const GEAR_SLOTS = {
   plug:     { groups: ["ItemButt"], names: ["InflVibeButtPlug", "BlackButtPlug", "ButtPlug", "ButtPump"], re: /ButtPlug|Plug/, color: "#2B2B2B" },
@@ -173,6 +178,8 @@ export const GEAR_SLOTS = {
   ears:     { groups: ["HairAccessory2"], names: [], re: /^$/, takeover: true },
   horns:    { groups: ["HairAccessory1"], names: [], re: /^$/, takeover: true },
   tail:     { groups: ["TailStraps"], names: [], re: /^$/, takeover: true },
+  // the farm girl's winter shawl and Yule cloak (Oct 27): the same, over her own clothes' accessory spot
+  cloak:    { groups: ["ClothAccessory"], names: [], re: /^$/, takeover: true },
 };
 // HOW EACH PIECE IS SET (Laynie, Oct 19: "I had a knee spreader described as being a knee spreader, but it was just hemp
 // rope and the cuffs weren't restraining me at all with their configuration"). The game puts most restraints on in their

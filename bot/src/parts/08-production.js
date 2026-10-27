@@ -222,7 +222,7 @@
     const hs = String(w||"").toLowerCase().split(/[+&,]/).map(x => holeFrom(x.trim()));
     return hs.length && hs.every(Boolean) ? Array.from(new Set(hs)) : null;
   }
-  function holeText(hole){ return String(hole).split("+").map(h => h === "mouth" ? "throat" : h).join(" and "); }
+  function holeText(hole){ return String(hole).split("+").map(h => HOLE_WORD[h] || h).join(" and "); }   // pussy, ass, throat (10g-scenes.js)
   function onBreedingStand(mn){
     const C = charFor(mn), pos = C && C.MapData && C.MapData.Pos, s = (L.spots||{})[CFG.BREEDING_STAND];
     return !!(pos && s && Math.abs(s.X-pos.X) <= 1 && Math.abs(s.Y-pos.Y) <= 1);
@@ -785,7 +785,7 @@
         if (now - (p.lastDrip[h]||0) < CFG.LEAKY_EMOTE_MIN*60000*(0.75+Math.random()*0.5)) continue;
         p.lastDrip[h] = now;
         const out = p.held[h] * 0.1; p.held[h] -= out;
-        emote("💧 "+plainName(mn)+"'s "+sizeWord(h, sizeOf(mn,h))+" "+h+" just can't hold it: "+ml(out)+" of "+(p.lastStud ? plainName(p.lastStud)+"'s" : "somebody's")+" seed dribbles down their thighs.");
+        emote("💧 "+plainName(mn)+"'s "+sizeWord(h, sizeOf(mn,h))+" "+(HOLE_WORD[h] || h)+" just can't hold it: "+ml(out)+" of "+(p.lastStud ? plainName(p.lastStud)+"'s" : "somebody's")+" seed dribbles down their thighs.");
       }
       // too full to move: pinned where they stand
       // what pins them: milk past its normal cap (held semen only if PIN_FROM_INFLATION), or a hyper udder or balls
@@ -1006,11 +1006,11 @@
     if (!opt.second && !breedConsent(stud, t)){ askBreed(stud, t, hole); R("I've asked "+plainName(t)+" first, sugar. Once they say yes, go right ahead."); return false; }
     const sp = prodOf(stud), tp = prodOf(t);
     seePenis(stud); seePenis(t);
-    if (hole === "vulva" && !hasVulva(t)){ R(plainName(t)+" doesn't have a vulva to fill, hon. Try butt or mouth, like ?cum "+plainName(t)+" butt. (If they're futa, they can say ?futa on.)"); return false; }
+    if (hole === "vulva" && !hasVulva(t)){ R(plainName(t)+" doesn't have a pussy to fill, hon. Try their ass or mouth, like ?cum "+plainName(t)+" ass. (If they're futa, they can say ?futa on.)"); return false; }
     const penBlock = makesSemen(stud) && holeBlocked(stud, "penis");
-    if (penBlock){ R("Can't do it, sugar: your penis is locked up in "+penBlock+". Get it off first!"); blockedTease(stud, t, hole, penBlock, true); return false; }
+    if (penBlock){ R("Can't do it, sugar: your cock is locked up in "+penBlock+". Get it off first!"); blockedTease(stud, t, hole, penBlock, true); return false; }
     const holeBlock = holeBlocked(t, hole);
-    if (holeBlock){ R("Whoa there, hon! "+plainName(t)+"'s "+(hole === "mouth" ? "mouth" : hole)+" is blocked by "+holeBlock+". That'll have to come off before you can fill it."); blockedTease(stud, t, hole, holeBlock, false); return false; }
+    if (holeBlock){ R("Whoa there, hon! "+plainName(t)+"'s "+({ vulva:"pussy", butt:"ass" }[hole] || hole)+" is blocked by "+holeBlock+". That'll have to come off before you can fill it."); blockedTease(stud, t, hole, holeBlock, false); return false; }
     // a pent-up stud empties everything, and then some
     if (sp.deniedUntil > Date.now()){ R("🚫 Not yet, sugar. You're denied for "+Math.ceil((sp.deniedUntil-Date.now())/60000)+" more minutes. Ache for it."); return false; }
     const T = makesSemen(stud) ? typeInfo(stud) : CFG.PENIS_TYPES.human;
@@ -1020,7 +1020,7 @@
     if (!opt.load){
       const base = pent ? sp.semen * CFG.PENTUP_LOAD_X
                         : Math.max(sp.semen * CFG.PROD.LOAD_SHARE, Math.min(sp.semen, CFG.PROD.MIN_LOAD));
-      if (base < 1){ R(makesSemen(stud) ? "Aw, you're drained plumb dry, sugar. Nothin' left to give till you build back up." : "You've got no semen to give, sugar. Wear a penis (or say ?futa on) and it'll build up by the hour."); return false; }
+      if (base < 1){ R(makesSemen(stud) ? "Aw, you're drained plumb dry, sugar. Nothin' left to give till you build back up." : "You've got no cum to give, sugar. Wear a cock (or say ?futa on) and it'll build up by the hour."); return false; }
       sp.semen = pent ? 0 : sp.semen - Math.min(sp.semen, base);
       if (pent){ sp.pentUp = false; sp.semenFullSince = 0; }
       load = base * (T.loadX || 1);            // a flared or ridged cock pumps more than it drains
@@ -1059,7 +1059,7 @@
     tp.lastStud = stud;
     const flavor = { equine:" That flared head swells wide with every pulse.", feline:" Those barbs make sure every last drop counts.",
                      draconic:" Every ridge drags deliciously on the way.", double:opt.load || opt.half ? " Both cocks throb and unload at once." : "" }[penisType(stud)] || "";
-    let o = "💦 "+(pent ? "All pent up, " : "")+plainName(stud)+" empties "+loadWord(load)+" ("+ml(load)+") "+(funnel ? "down "+plainName(t)+"'s funnel gag, and it pours straight to their belly" : "into "+plainName(t)+"'s "+(hole === "mouth" ? "throat" : hole))+"."+(makesSemen(stud) ? flavor : "")+" "+
+    let o = "💦 "+(pent ? "All pent up, " : "")+plainName(stud)+" empties "+loadWord(load)+" ("+ml(load)+") "+(funnel ? "down "+plainName(t)+"'s funnel gag, and it pours straight to their belly" : "into "+plainName(t)+"'s "+holeText(hole))+"."+(makesSemen(stud) ? flavor : "")+" "+
             plainName(t)+" is "+Math.round(100*heldTotal(tp)/capacity(t))+"% full"+(spilt>0 ? ", and "+ml(spilt)+" spills out" : "")+".";
     if (opt.edged) o += " Edged "+opt.edged+" time"+(opt.edged === 1 ? "" : "s")+" first, it just keeps on comin'.";
     if (hole === "mouth" && makesSemen(stud)) o += " "+seedTaste(stud, pent);
@@ -1190,15 +1190,15 @@
     const rt = rec(t);
     if (!rt || !rt.breedable || limitBlocks(t)) return plainName(t)+" ain't breedable, hon. They'd have to say ?breedable on themselves (and their limits have to allow it).";
     if (!onMap(t)) return plainName(t)+" needs to be here on the map for that, hon.";
-    if (hole === "vulva" && !hasVulva(t)) return plainName(t)+" doesn't have a vulva, sugar. Try butt or mouth.";
+    if (hole === "vulva" && !hasVulva(t)) return plainName(t)+" doesn't have a pussy, sugar. Try their ass or mouth.";
     const blk = holeBlocked(t, hole);
-    if (blk) return plainName(t)+"'s "+hole+" is blocked by "+blk+". That has to come off first.";
+    if (blk) return plainName(t)+"'s "+({ vulva:"pussy", butt:"ass" }[hole] || hole)+" is blocked by "+blk+". That has to come off first.";
     if (!jar) return "that jar's gone off the shelf, sugar.";
     return "";
   }
   function askJar(staff, t, jarId, hole, machine){
     state.jarAsks.set(t, { staff, jar: jarId, hole, machine: !!machine, at: Date.now() });
-    askCard(t, "jar", "💉 "+plainName(staff)+" wants to "+(machine ? "load jar #"+jarId+" into the machine for you ("+holeText(hole)+"), so it empties into you while it runs" : "inseminate you from jar #"+jarId+" ("+holeText(hole)+")")+", sugar. Say yes or no (?yes or ?no works too). "+
+    askCard(t, "jar", "💉 "+plainName(staff)+" wants to "+(machine ? "load jar #"+jarId+" into the machine for you ("+holeText(hole)+"), so it empties into you while it runs" : "fill you from seed jar #"+jarId+" ("+holeText(hole)+")")+", sugar. Say yes or no (?yes or ?no works too). "+
             "Say ?jarok off if you'd rather never be asked.");
   }
   function answerJar(t, yes){
@@ -1575,8 +1575,8 @@
   function cumInto(stud, t, holes, R, auto, o2){
     o2 = o2 || {};
     if (holes.length > 1){
-      if (!(makesSemen(stud) && typeInfo(stud).double)){ R("Two holes at once takes a double cock, sugar! Pick one, like ?cum "+plainName(t)+" "+holes[0]+". (?penis double, or a double cock shot.)"); return false; }
-      for (const h of holes){ const b = holeBlocked(t, h); if (b){ R("Whoa there, hon! "+plainName(t)+"'s "+h+" is blocked by "+b+". That'll have to come off first."); return false; } }
+      if (!(makesSemen(stud) && typeInfo(stud).double)){ R("Two holes at once takes a double cock, sugar! Pick one, like ?cum "+plainName(t)+" "+(HOLE_WORD[holes[0]] || holes[0])+". (?cock double, or a double cock shot.)"); return false; }
+      for (const h of holes){ const b = holeBlocked(t, h); if (b){ R("Whoa there, hon! "+plainName(t)+"'s "+(HOLE_WORD[h] || h)+" is blocked by "+b+". That'll have to come off first."); return false; } }
       const first = doCum(stud, t, holes[0], R, auto, Object.assign({ half:true }, o2));
       if (!first) return false;
       doCum(stud, t, holes[1], R, auto, Object.assign({ load:first.rest, pent:first.pent, second:true }, o2));

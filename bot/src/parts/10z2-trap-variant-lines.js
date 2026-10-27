@@ -137,7 +137,7 @@
           ["%n's womb gives a deep greedy clench, and another. They're ripe: one good load in them today and it'll take, no question.",
            "Heat pools low in %n and stays. Their body's made a decision without askin' them, and the decision is yes."],
           ["%n groans and clutches their belly as their womb drops open like a mouth. They're so fertile it aches, cunt swollen and gapin' a little, weepin' slick. Breathe on them wrong today and they'll catch a litter.",
-           "The green goes all the way in. %n can feel themselves ovulatin', a hot heavy pulse on each side, over and over. Whatever cums in them next isn't leavin' one pup. It's leavin' a houseful."],
+           "The green goes all the way in. A hot, heavy pulse starts low in %n's belly, on each side, over and over: ripe, and gettin' riper. Whatever cums in them next isn't leavin' one pup. It's leavin' a houseful."],
         ],
         after: ["The green fades. %n's body has been set like a trap of its own.",
                 "It clears, and leaves %n ripe as a peach and twice as easy to bruise.",

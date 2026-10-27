@@ -7,6 +7,7 @@
      "Farm can strip me"       your clothes come off when the farm says so; they're kept so you can dress again
    ?wash (or the Companion's Wash up) takes off the splatters and the writing the farm put on you.
 */
+import { commitLook } from "./look.js";
 const KEY = "fhc-marks";            // { splatGroup, writeGroup }: where the farm put things, so ?wash only takes those
 const STRIP_KEY = "fhc-strip-backup";
 const SPLAT_GROUPS = ["Mask", "FaceMarkings", "BodyMarkings"];     // Splatters fits any of these; the first free one is used
@@ -29,11 +30,8 @@ const save = (v) => { try { window.localStorage.setItem(KEY, JSON.stringify(v));
 const groupOf = (name) => (typeof window.AssetGroupGet === "function" ? window.AssetGroupGet(P().AssetFamily, name) : null);
 const bundle = () => window.ServerAppearanceBundle(P().Appearance);
 const lockedGroups = () => new Set(P().Appearance.filter((it) => it.Property && it.Property.LockedBy).map((it) => it.Asset.Group.Name));
-function commit(next) {
-  window.ServerAppearanceLoadFromBundle(P(), P().AssetFamily, next, P().MemberNumber);
-  if (typeof window.CharacterRefresh === "function") window.CharacterRefresh(P());
-  window.ChatRoomCharacterUpdate(P());
-}
+// on you at once; the room hears only the spots that changed, gathered with anything else in the same moment (look.js)
+const commit = (next) => commitLook(next);
 // game text boxes take letters, numbers, spaces and a little punctuation, 20 characters a line
 const cleanText = (t) => String(t || "").replace(/[^A-Za-z0-9 !?.,'&#*+-]/g, "").slice(0, 20);
 

@@ -7,9 +7,12 @@
 import { h, card, title, muted, btn, chip, bar, toggle, ml } from "../dom.js";
 import { guidesTab, safetyTab } from "./common.js";
 import { storeTab } from "./store.js";
+import { meCards } from "./extras.js";
 import { gearLore } from "../gearlore.js";
 import { localSaveState, localSavePick, localSaveReconnect, localSaveNow, localSaveLoad } from "../localsave.js";
 import { VERSION } from "../version.js";
+import { BOT_MEMBER } from "../config.js";
+import { redrawRoom } from "../botscreen.js";
 import { settingsAvailable, openSettings } from "../settings.js";
 import { drawnBodyState, drawnBodySet, drawnBodyCup, drawnBodyPaste, drawnBodyFromStudio, drawnBodySeeOthers, drawnBodyBelly, drawnBodyUseFarm } from "../drawnbody.js";
 
@@ -46,6 +49,7 @@ function me(ctx) {
     bars.some(Boolean) && card(title("Today"), bars,
       s.heatUntil && muted("In heat for " + hoursLeft(s.heatUntil) + " more hours"),
       s.preg && muted("Carryin' for " + s.preg.sires.join(" & ") + " · due in " + Math.max(0, Math.ceil((s.preg.due - Date.now()) / 86400000)) + " day(s)")),
+    ...meCards(ctx),   // add-on cards meant for here: barn life's food, water and grooming (extras.js)
     (s.body || []).length && card(title("Body"), h("div", { class: "fhc-grid" },
       s.body.map((b) => h("div", null, muted(b.label), h("div", { style: { fontWeight: 600 } }, b.size))))),
     s.today && card(title("Marks"), h("div", { class: "fhc-grid" },
@@ -72,7 +76,7 @@ function gearCard(s) {
   return card(title("Milkin' gear"),
     g.milk ? [h("div", { class: "fhc-kv" }, h("b", null, g.milk.name), h("span", null, g.milk.ml + " mL a minute")), steps(g.milk.level),
               muted(["", "Gentle", "Steady", "Hard", "Max"][g.milk.level] + (g.milk.kind === "echo" ? " · the more worked up you are, the faster it draws" : ""))]
-      : muted("No pump on right now. A lactation pump, Echo's portable pump, the milk vendor or a milkin' stall all milk you here."),
+      : muted("No pump on right now. A milk pump (the game's Lactation Pump), Echo's portable pump, the milk vendor or a milkin' stall all milk you here."),
     g.machine && h("div", { class: "fhc-kv" }, h("span", null, "⚙️ " + g.machine.name), h("span", { class: "fhc-muted" }, g.machine.intensity < 0 ? "off" : "intensity " + g.machine.intensity)),
     g.funnel && h("div", { class: "fhc-kv" }, h("span", null, "Funnel gag"), h("span", { class: "fhc-muted" }, "fitted, and it counts as open")));
 }
@@ -99,7 +103,7 @@ function milking(ctx) {
 
 function breeding(ctx) {
   const s = ctx.s, sw = s.switches || {};
-  const rows = [["Breedable", sw.breedable], ["Fertile", sw.fertile], ["Jar insemination", sw.jarok ? "asks first" : "never"],
+  const rows = [["Breedable", sw.breedable], ["Fertile", sw.fertile], ["Jar breedin'", sw.jarok ? "asks first" : "never"],
                 ["Free use", sw.freeuse], ["Natural heat", sw.naturalheat]];
   return [
     card(title("Breedin'"), rows.map(([k, v]) => h("div", { class: "fhc-kv" }, h("span", null, k), h("span", { class: "fhc-muted" }, v === true ? "on" : v === false ? "off" : v))),
@@ -163,8 +167,8 @@ export const SWITCH_INFO = [
   ["teaseme", "Tease me", "The farm whispers you a tease 3 or 4 times an hour while you're here, about whatever's goin' on with you: full udders, a load still in you, a heat, a mess. ?teaseme steady or needy for more. Your herd leader can switch it for you too"],
   ["breedable", "Breedable", "You can be bred and filled"], ["fertile", "Fertile", "You can catch"],
   ["mpreg", "Mpreg", "A load in your ass can take too, no item needed (with Breedable and Fertile on)"],
-  ["jarok", "Jar insemination", "On: staff still ask every time · Off: never"], ["freeuse", "Free use", "Any stud may have you without askin'"],
-  ["futa", "Futa", "Cock and vulva both, milk and semen both"], ["milkable", "Milkable", "Make milk"],
+  ["jarok", "Jar breedin'", "On: staff still ask every time · Off: never"], ["freeuse", "Free use", "Any stud may have you without askin'"],
+  ["futa", "Futa", "Cock and pussy both, milk and cum both"], ["milkable", "Milkable", "Make milk"],
   ["seedmilk", "Milk my seed", "The stall, the milkin' traps and ?collect take your seed as well as your milk. Off: they milk you up top and leave your cock and balls be"],
   ["naturalheat", "Natural heat", "Come into heat on your own every 7 days"], ["praise", "Praise", "Let staff's praise count"],
   ["degrade", "Degrade", "Let staff's degradin' count"], ["tally", "Tally marks", "Show your tally on ?who and the board"],
@@ -195,8 +199,16 @@ export function panelPrefsOrLink(ctx) {
     muted("They're in the game's own settings now: Preferences → Extensions → Farmhand Companion."),
     btn("Open the Farmhand settings", () => { if (!openSettings("switches")) ctx.hint("Open the game's Preferences, then Extensions, then Farmhand Companion."); }, true));
 }
+// the farm girl's own account: her screen draws nobody unless somebody at her keyboard wants to watch (botscreen.js)
+function botScreenPrefs(ctx) {
+  if (!(window.Player && window.Player.MemberNumber === BOT_MEMBER)) return null;
+  return h("div", {},
+    toggle("Draw the room on the farm girl's screen", "Off (the default), this tab doesn't draw anybody in the room: no pictures downloaded for what people wear, far less work and memory on this computer. The farm runs the same either way. Switch it on to watch the room or click on people from here.",
+      !!ctx.prefs.drawRoom, () => { const on = !ctx.prefs.drawRoom; ctx.setPref("drawRoom", on); if (on) setTimeout(redrawRoom, 50); }));
+}
 export function panelPrefs(ctx) {
   return card(title("This panel"), muted("Only on your computer."),
+    botScreenPrefs(ctx),
     [["chatToo", "Farm messages in chat too", "Tease lines, heat, summons and other farm messages also show in your chat log"],
      ["compact", "Compact cards", "Smaller text, more on screen"], ["chime", "Chime on notices", "A soft sound when the farm messages you"],
      ["popopen", "Open on new notice", "Pop the panel open by itself"],

@@ -349,7 +349,8 @@
     squeezechute: {
       beats: [
         ["%n walks into the cattle chute and the side panels squeeze in, snug, firm, until they can't turn, can't step back, can't do anything at all.",
-         "The head gate drops on %n's neck and the squeeze panels close, and they're held like a heifer at the vet's."],
+         "The head gate drops on %n's neck and the squeeze panels close, and they're held like a heifer at the vet's.",
+         "The chute closes on %n with a hiss of air, and the head gate catches their neck. They're held like any other beast waitin' on the vet."],
         ["Hands come through the bars from both sides. Ear tags checked. Teeth checked. Everything else checked.",
          "{t}A hand through the bars squeezes %n's tits like udders, judging.",
          "{v}A gloved hand slips between %n's legs through the gap and checks how ready they are.",

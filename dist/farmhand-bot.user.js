@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.51.0
+// @version      0.52.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -2748,7 +2748,8 @@
   ];
 
   // bot/src/version.js
-  var VERSION = "0.51.0";
+  var VERSION = "0.52.0";
+  var COMPANION_VERSION = "0.46.0";
 
   // bot-parts:farmhand-bot-parts
   (function() {
@@ -3705,6 +3706,8 @@
     const state = {
       companions: /* @__PURE__ */ new Map(),
       lastPing: 0,
+      syncSeq: Date.now(),
+      // (panel numbers start at the clock, so they never repeat after a restart)
       booted: false,
       loginTried: 0,
       lastLoginAttempt: 0,
@@ -3824,22 +3827,30 @@
       saveLedger();
       log("Ledger v5 loaded. Registered: " + Object.keys(L2.people).length);
     }
-    let saveTimer = null;
+    let saveTimer = null, savedAt = 0;
     function saveLedger() {
       if (state.dormant || STORE.restoring) return;
       if (saveTimer) return;
-      saveTimer = later(() => {
-        saveTimer = null;
-        if (!officeCheck() || STORE.restoring) return;
-        let json = "";
-        try {
-          json = JSON.stringify(L2);
-          GM_setValue(LEDGER_KEY, json);
-        } catch (e) {
-          warn("save:", e);
-        }
-        if (json) storeMirror(json);
-      }, 1500);
+      saveTimer = later(writeLedger, Math.max(1500, savedAt + 5e3 - Date.now()));
+    }
+    function writeLedger() {
+      saveTimer = null;
+      if (state.dormant || !officeCheck() || STORE.restoring) return;
+      savedAt = Date.now();
+      let json = "";
+      try {
+        json = JSON.stringify(L2);
+        GM_setValue(LEDGER_KEY, json);
+      } catch (e) {
+        warn("save:", e);
+      }
+      if (json) storeMirror(json);
+    }
+    try {
+      W.addEventListener("pagehide", () => {
+        if (saveTimer) writeLedger();
+      });
+    } catch (e) {
     }
     function newRecord(mn) {
       return {
@@ -3926,11 +3937,20 @@
       });
     }
     function storeMirror(json) {
-      storePut("ledger", { at: Date.now(), json }).then(() => {
-        STORE.savedAt = Date.now();
-      }).catch((e) => {
-        STORE.err = String(e && e.message || e);
-      });
+      STORE.pending = json;
+      if (STORE.mirrorTimer) return;
+      STORE.mirrorTimer = later(() => {
+        STORE.mirrorTimer = null;
+        const j = STORE.pending;
+        STORE.pending = null;
+        if (!j) return;
+        STORE.mirrorAt = Date.now();
+        storePut("ledger", { at: Date.now(), json: j }).then(() => {
+          STORE.savedAt = Date.now();
+        }).catch((e) => {
+          STORE.err = String(e && e.message || e);
+        });
+      }, Math.max(0, (STORE.mirrorAt || 0) + 6e4 - Date.now()));
     }
     function storeRecover(rawWasEmpty) {
       if (!rawWasEmpty) return;
@@ -4410,14 +4430,23 @@
         const s = state.wlSent.get(mn);
         return s && s.act === act && Date.now() - s.at < 12e4;
       };
+      state.wlTries = state.wlTries || /* @__PURE__ */ new Map();
+      const tired = (mn) => {
+        const t = state.wlTries.get(mn);
+        return !!(t && t.n >= 3 && Date.now() - t.at < 36e5);
+      };
       const ask = (mn, act) => {
+        if (tired(mn)) return;
         send("ChatRoomAdmin", { MemberNumber: mn, Action: act });
         state.wlSent.set(mn, { act, at: Date.now() });
         changed++;
+        const t = state.wlTries.get(mn);
+        state.wlTries.set(mn, t && Date.now() - t.at < 36e5 ? { n: t.n + 1, at: t.at } : { n: 1, at: Date.now() });
       };
       const people = new Set(Object.keys(L2.people).map(Number).concat(CFG.PROPRIETORS));
       for (const mn of people) {
         if (changed >= 15) break;
+        if (isOnBooks(mn) && wl.has(mn)) state.wlTries.delete(mn);
         if (isOnBooks(mn) && !wl.has(mn)) {
           L2.wlAdded[mn] = L2.wlAdded[mn] || Date.now();
           wl.add(mn);
@@ -4680,7 +4709,7 @@
     };
     W.FarmhandExport = exportLedger;
     W.FarmhandLedger = () => L2;
-    if (W.__FARMHAND_TEST__) Object.assign(W, { __st: () => state, __cfg: CFG, __pt: prodTick, __qt: quotaTick, __lt: leashTick, __ms: milkingStallTick, __vt: voiceTick, __sync: syncCompanions, __gt: gearTick, __ht: homeTick, __addons: (h, ...a) => addonsEmit(h, ...a), __stateFor: (mn) => stateFor(mn), __leadTick: () => leadTick(), __ambient: () => ambientTick(), __about: (t) => aboutWhom(t), __announce: (t) => announce(t), __reply: (mn, t, ch) => reply(mn, t, ch), __office: () => officeCheck(), __namesHere: (t) => namesHere(t), __speciesCheck: (t) => QUESTIONS.find((q) => q.key === "species").check(t), __attach: () => attachListeners(), __tryLogin: () => tryLogin(), __beepText: (m) => beepText(m), __nameOnce: (t, mn) => nameOnce(t, mn), __buildContract: (n, mn, d) => buildContract(contractTemplate(n), mn, d), __potionTick: () => potionTick(), __penTick: () => penTick(), __trapTick: () => trapTick(), __corrupt: (m, n) => corrupt(m, n), __under: (m) => underOf(m), __goUnder: (m, n) => goUnder(m, n), __lend: () => state.lend, __keepTick: () => keepersTick(), __body: (m) => bodyOf(m), __drainMilk: (m, n) => drainMilk(m, n), __farmLookTick: () => farmLookTick(), __givePotion: (m, id, by) => givePotion(m, id, by), __lines: () => ({ TRAP_LINES, TOY_LINES, ANTHRO_LINES, MORE_LINES, EXTRA_LINES, VARIANT_LINES, BENCH_LINES, BROOD_LINES, CURSE_LINES, KEEP_LINES, UDDER_LINES, CORR_LINES, RANK_LINES, PARASITE_LINES, PARASITE_MORE, GEAR_LINES, FX_LINES, SHOT_LINES, INTENSITY_BY_TRAP, STALL_TRAITS, STALL_PEAK, FX_MORE, FX_OFF, FX_BITS, MORE_KEEP, MORE_UDDER, STALL_STORY, STALL_MORE, STALL_MORE_TRAITS, SCENES, TAIL_BITS }), __prodOf: (m) => prodOf(m), __shape: (m) => shapeFor(m), __pickFor: (m, k, l) => pickFor(m, k, l), __bodyWords: (m, t) => bodyWords(m, t), __strainGear: (m) => strainGear(m), __strainSerums: (m) => strainSerums(m), __strainParts: (s, n) => strainParts(s, n), __tFill: (t, m, v) => tFill(t, m, v), __conceive: (m, s, a, b, h) => rollConception(m, s, a, b, h), __birth: (m) => giveBirth(m), __milkCapOf: (m) => milkCap(m), __udderTick: () => {
+    if (W.__FARMHAND_TEST__) Object.assign(W, { __st: () => state, __cfg: CFG, __heartbeat: () => heartbeat(), __pt: prodTick, __qt: quotaTick, __lt: leashTick, __ms: milkingStallTick, __vt: voiceTick, __sync: syncCompanions, __gt: gearTick, __ht: homeTick, __addons: (h, ...a) => addonsEmit(h, ...a), __stateFor: (mn) => stateFor(mn), __leadTick: () => leadTick(), __ambient: () => ambientTick(), __about: (t) => aboutWhom(t), __announce: (t) => announce(t), __emote: (t, who) => emote(t, who), __wl: () => whitelistSync(true), __mutualEvery: () => roamWatching() ? 6e4 : 12e4, __reply: (mn, t, ch) => reply(mn, t, ch), __office: () => officeCheck(), __namesHere: (t) => namesHere(t), __speciesCheck: (t) => QUESTIONS.find((q) => q.key === "species").check(t), __attach: () => attachListeners(), __tryLogin: () => tryLogin(), __beepText: (m) => beepText(m), __nameOnce: (t, mn) => nameOnce(t, mn), __buildContract: (n, mn, d) => buildContract(contractTemplate(n), mn, d), __potionTick: () => potionTick(), __penTick: () => penTick(), __trapTick: () => trapTick(), __corrupt: (m, n) => corrupt(m, n), __under: (m) => underOf(m), __goUnder: (m, n) => goUnder(m, n), __lend: () => state.lend, __keepTick: () => keepersTick(), __body: (m) => bodyOf(m), __drainMilk: (m, n) => drainMilk(m, n), __farmLookTick: () => farmLookTick(), __givePotion: (m, id, by) => givePotion(m, id, by), __lines: () => ({ TRAP_LINES, TOY_LINES, ANTHRO_LINES, MORE_LINES, EXTRA_LINES, VARIANT_LINES, BENCH_LINES, BROOD_LINES, CURSE_LINES, KEEP_LINES, UDDER_LINES, CORR_LINES, RANK_LINES, PARASITE_LINES, PARASITE_MORE, GEAR_LINES, FX_LINES, SHOT_LINES, INTENSITY_BY_TRAP, STALL_TRAITS, STALL_PEAK, FX_MORE, FX_OFF, FX_BITS, MORE_KEEP, MORE_UDDER, STALL_STORY, STALL_MORE, STALL_MORE_TRAITS, SCENES, TAIL_BITS }), __prodOf: (m) => prodOf(m), __shape: (m) => shapeFor(m), __pickFor: (m, k, l) => pickFor(m, k, l), __bodyWords: (m, t) => bodyWords(m, t), __strainGear: (m) => strainGear(m), __strainSerums: (m) => strainSerums(m), __strainParts: (s, n) => strainParts(s, n), __tFill: (t, m, v) => tFill(t, m, v), __conceive: (m, s, a, b, h) => rollConception(m, s, a, b, h), __birth: (m) => giveBirth(m), __milkCapOf: (m) => milkCap(m), __udderTick: () => {
       state.udderAt = 0;
       uddersTick();
     }, __wordsFor: (m, t) => wordsFor(m, t), __overdue: (m) => overdueStage(m), __milkCum: (m) => stallClimax(m), __intSev: (m, s) => intensitySev(m, s), __intTail: (m, k) => intensityTail(m, 5, 6, k), __holes: (m) => holesFor(m), __album: (m) => albumFor(m, 60), __holeTook: (m, h, a) => holeTook(m, h, a), __dreamTheme: (m) => dreamTheme(m), __eggsWorth: (t, n) => eggsWorth(t, n), __rank: (m) => rankX(m), __broodBook: (m) => broodBook(m), __belly: (m) => bellyStage(m), __happening: (m) => happeningFor(m), __gearOn: (m, s, l, d, x) => gearOn(m, s, l, d, x), __heard: (mn, t) => trapHeard(mn, t), __parasiteTick: () => parasiteTick(), __parts: (m) => parasiteParts(rec(m).parasite), __climax: (m) => parasiteClimax(m), __nurse: (a, b) => parasiteNurse(a, b), __parasiteChance: (m) => parasiteChance(m), __kiss: (a, f, s, t) => parasiteKiss(a, f, s, t), __load: (s, m, h, x) => parasiteLoad(s, m, h, x), __shot: (t, by, text, how) => applyShot(t, by, text, how), __slow: (mn) => slowOf(mn), __milkRate: (mn) => milkRate(mn), __benchTick: () => benchTick(), __roll: (m, s, a, b) => rollConception(m, s, a, b), __contractTick: () => {
@@ -4959,6 +4988,7 @@
     function keepalive() {
       const now = Date.now();
       if (now - state.lastKeepalive < CFG.KEEPALIVE_MIN * 6e4) return;
+      if (now - (state.sentAt || 0) < CFG.KEEPALIVE_MIN * 6e4) return;
       state.lastKeepalive = now;
       send("ChatRoomChat", { Content: "BnBKeepAlive", Type: "Hidden" });
       dbg("keepalive sent");
@@ -5248,7 +5278,7 @@
             const p = charFor(by) && charFor(by).MapData && charFor(by).MapData.Pos, q = charFor(m) && charFor(m).MapData && charFor(m).MapData.Pos;
             return !p || !q || Math.max(Math.abs(p.X - q.X), Math.abs(p.Y - q.Y)) > CFG.SPEAKER_RANGE;
           };
-          for (const m of new Set(parties.concat(also))) if (m !== by && (!seen ? also.includes(m) && far(m) : !seen.has(m))) privateTo(m, t, "emote");
+          linesTo([...new Set(parties.concat(also))].filter((m) => m !== by && (!seen ? also.includes(m) && far(m) : !seen.has(m))), t, "emote", false, true);
           return;
         }
         if (speakersOn() && speakerSend(subject, t, "emote")) return;
@@ -5260,7 +5290,7 @@
           }
           for (const m of also) who2.add(m);
           if (who2.size) {
-            for (const m of who2) privateTo(m, t, "emote");
+            linesTo([...who2], t, "emote", false, true);
             return;
           }
         }
@@ -5324,32 +5354,41 @@
         for (const c of splitMessage(r.text, 900)) enqueue({ Content: "*" + c, Type: "Emote" });
         return;
       }
-      for (const m of who) privateTo(m, r.text, "emote");
+      linesTo([...who], r.text, "emote", false, true);
     }
     function privateTo(mn, text, kind) {
-      noteLine(mn, text);
-      const line = (kind === "emote" ? "*" : "") + String(wordsFor(mn, text));
-      if (hasCompanion(mn)) enqueue(makeMsg("roomline", { text: line, kind }, mn));
-      else for (const part of splitMessage(line, 900)) enqueue({ Content: "(" + part.replace(/\(/g, "[").replace(/\)/g, "]"), Type: "Whisper", Target: mn });
+      linesTo([mn], text, kind, false, true);
+    }
+    function lineTo(mn, line, kind, urgent) {
+      if (hasCompanion(mn)) enqueue(makeMsg("roomline", { text: line, kind }, mn), urgent);
+      else for (const part of splitMessage(line, 900)) enqueue({ Content: "(" + part.replace(/\(/g, "[").replace(/\)/g, "]"), Type: "Whisper", Target: mn }, urgent);
+    }
+    function linesTo(list2, text, kind, urgent, own) {
+      const shared = /* @__PURE__ */ new Map();
+      for (const mn of new Set(list2)) {
+        if (!mn || mn === CFG.BOT_MEMBER) continue;
+        if (own) noteLine(mn, text);
+        const line = (kind === "emote" ? "*" : "") + String(own ? wordsFor(mn, text) : text);
+        const c = state.companions.get(mn);
+        if (hasCompanion(mn) && c && verAtLeast(c.ver, "0.46.0")) {
+          shared.set(line, (shared.get(line) || []).concat(mn));
+          continue;
+        }
+        lineTo(mn, line, kind, urgent);
+      }
+      for (const [line, to] of shared) {
+        if (to.length === 1) lineTo(to[0], line, kind, urgent);
+        else enqueue(makeMsg("roomlines", { to, text: line, kind }), urgent);
+      }
     }
     function toEveryone(text, kind, urgent) {
-      const line = (kind === "emote" ? "*" : "") + String(text);
-      for (const c of W.ChatRoomCharacter || []) {
-        const mn = c.MemberNumber;
-        if (mn === CFG.BOT_MEMBER) continue;
-        if (hasCompanion(mn)) enqueue(makeMsg("roomline", { text: line, kind }, mn), urgent);
-        else for (const part of splitMessage(line, 900)) enqueue({ Content: "(" + part.replace(/\(/g, "[").replace(/\)/g, "]"), Type: "Whisper", Target: mn }, urgent);
-      }
+      linesTo((W.ChatRoomCharacter || []).map((c) => c.MemberNumber), text, kind, urgent, false);
     }
     const speakersOn = () => mapRoom() && CFG.SPEAKER_MODE === "voice" && Object.keys(L2.spots || {}).some((n) => n.startsWith("speaker"));
     function speakerSend(anchor, text, kind, urgent) {
       const who = audienceFor(anchor, text, kind);
       if (!who) return false;
-      const line = (kind === "emote" ? "*" : "") + String(text);
-      for (const mn of who) {
-        if (hasCompanion(mn)) enqueue(makeMsg("roomline", { text: line, kind }, mn), urgent);
-        else for (const c of splitMessage(line, 900)) enqueue({ Content: "(" + c.replace(/\(/g, "[").replace(/\)/g, "]"), Type: "Whisper", Target: mn }, urgent);
-      }
+      linesTo([...who], text, kind, urgent, false);
       return true;
     }
     function audienceFor(anchor, text, kind) {
@@ -5455,6 +5494,26 @@
         }
       }, 3e4);
     }
+    function companionOutdated(mn, ver) {
+      if (mn === CFG.BOT_MEMBER || !/^\d+\.\d+\.\d+$/.test(ver) || verAtLeast(ver, COMPANION_VERSION)) return;
+      const r = rec(mn), told = r ? r.updateTold : (state.updateTold || (state.updateTold = /* @__PURE__ */ new Map())).get(mn);
+      if (told && told.v === COMPANION_VERSION && Date.now() - told.at < 24 * 36e5) return;
+      const note = { v: COMPANION_VERSION, at: Date.now() };
+      if (r) {
+        r.updateTold = note;
+        saveLedger();
+      } else state.updateTold.set(mn, note);
+      const text = "\u{1F33E} Your Farmhand Companion is v" + ver + ", sugar, and v" + COMPANION_VERSION + ` is out. Click the Tampermonkey icon, then "Check for userscript updates", then reload the game. (Or install it again from the farm's page: github.com/Laynie667/BnBfarms#install)`;
+      later(() => {
+        if (!hasCompanion(mn)) return;
+        toCompanion(mn, text, "notice");
+        if (canBeep(mn)) send("AccountBeep", { MemberNumber: mn, BeepType: "", Message: text });
+      }, 8e3);
+    }
+    function dropQueuedPanels(mn) {
+      const isPanel = (x) => x && x.ev === "ChatRoomChat" && x.data && x.data.Type === "Hidden" && x.data.Target === mn && x.data.Dictionary && (x.data.Dictionary.type === "state" || x.data.Dictionary.type === "stateDiff");
+      for (const lane of [state.urgent, state.replies || [], state.queue]) for (let i = lane.length - 1; i >= 0; i--) if (isPanel(lane[i])) lane.splice(i, 1);
+    }
     function onCompanion(m) {
       const mn = m.from;
       if (!mn) return;
@@ -5487,13 +5546,26 @@
         return;
       }
       if (m.type === "hello") {
-        state.companions.set(mn, { at: Date.now(), ver: String(m.ver || "?"), relay: m.relay !== false, off: m.off && typeof m.off === "object" ? m.off : {} });
-        log("Companion hello from " + mn + " (v" + (m.ver || "?") + ")");
-        enqueue(makeMsg("welcome", { ver: VERSION, proto: PROTOCOL, name: plainName(mn), staff: isStaff(mn), look: farmLookAt() }, mn));
+        const ver = String(m.ver || "?"), old = state.companions.get(mn);
+        const keep = !!(old && !m.again && m.seq && old.seq === m.seq && old.ver === ver);
+        const c = keep ? old : { ver };
+        c.at = Date.now();
+        c.relay = m.relay !== false;
+        c.off = m.off && typeof m.off === "object" ? m.off : {};
+        if (typeof m.sh === "string") c.lastStoreH = m.sh;
+        if (!keep) dropQueuedPanels(mn);
+        state.companions.set(mn, c);
+        if (!keep) log("Companion hello from " + mn + " (v" + (m.ver || "?") + ")");
+        if (!keep || !m.w) enqueue(makeMsg("welcome", { ver: VERSION, proto: PROTOCOL, name: plainName(mn), staff: isStaff(mn), look: farmLookAt() }, mn));
         later(() => syncCompanions(), 800);
         try {
           companionTooOld(mn, String(m.ver || ""));
         } catch (e) {
+        }
+        try {
+          if (!keep) companionOutdated(mn, ver);
+        } catch (e) {
+          warn("update note:", e);
         }
         {
           const r = rec(mn);
@@ -6034,6 +6106,14 @@
       const m = /^(\d+)\.(\d+)\./.exec(String(c && c.ver || ""));
       return !!m && (+m[1] > 0 || +m[2] >= 45);
     };
+    function shelfHash(text) {
+      let h = 2166136261;
+      for (let i = 0; i < text.length; i++) {
+        h ^= text.charCodeAt(i);
+        h = Math.imul(h, 16777619);
+      }
+      return (h >>> 0).toString(36) + "." + text.length.toString(36);
+    }
     function syncNow() {
       for (const [mn, c] of state.companions) {
         if (!hasCompanion(mn)) continue;
@@ -6045,15 +6125,16 @@
           continue;
         }
         if (storeApart(c) && s.store) {
-          const sk = JSON.stringify(s.store);
+          const sk = JSON.stringify(s.store), h = shelfHash(sk);
           delete s.store;
-          if (c.lastStore !== sk) {
-            c.lastStore = sk;
-            enqueue(makeMsg("store", { items: JSON.parse(sk) }, mn));
+          if (c.lastStoreH !== h) {
+            c.lastStoreH = h;
+            enqueue(makeMsg("store", { items: JSON.parse(sk), h }, mn));
           }
         }
         const key = JSON.stringify(Object.assign({}, s, { at: 0 }));
         if (c.lastState === key) continue;
+        const seq = ++state.syncSeq;
         if (storeApart(c) && c.lastParts) {
           const set = {}, del = [], parts = {};
           for (const k of Object.keys(s)) {
@@ -6064,7 +6145,8 @@
           for (const k of Object.keys(c.lastParts)) if (!(k in s)) del.push(k);
           c.lastState = key;
           c.lastParts = parts;
-          enqueue(makeMsg("stateDiff", { set, del }, mn));
+          enqueue(makeMsg("stateDiff", { set, del, base: c.seq || 0, seq }, mn));
+          c.seq = seq;
           continue;
         }
         c.lastState = key;
@@ -6072,7 +6154,8 @@
           c.lastParts = {};
           for (const k of Object.keys(s)) c.lastParts[k] = JSON.stringify(s[k]);
         }
-        enqueue(makeMsg("state", { state: s }, mn));
+        enqueue(makeMsg("state", { state: s, seq }, mn));
+        c.seq = seq;
       }
     }
     function askCard(mn, kind, text) {
@@ -6348,7 +6431,7 @@
       return hs.length && hs.every(Boolean) ? Array.from(new Set(hs)) : null;
     }
     function holeText(hole) {
-      return String(hole).split("+").map((h) => h === "mouth" ? "throat" : h).join(" and ");
+      return String(hole).split("+").map((h) => HOLE_WORD[h] || h).join(" and ");
     }
     function onBreedingStand(mn) {
       const C2 = charFor(mn), pos = C2 && C2.MapData && C2.MapData.Pos, s = (L2.spots || {})[CFG.BREEDING_STAND];
@@ -7009,7 +7092,7 @@
           p.lastDrip[h] = now;
           const out = p.held[h] * 0.1;
           p.held[h] -= out;
-          emote("\u{1F4A7} " + plainName(mn) + "'s " + sizeWord(h, sizeOf(mn, h)) + " " + h + " just can't hold it: " + ml(out) + " of " + (p.lastStud ? plainName(p.lastStud) + "'s" : "somebody's") + " seed dribbles down their thighs.");
+          emote("\u{1F4A7} " + plainName(mn) + "'s " + sizeWord(h, sizeOf(mn, h)) + " " + (HOLE_WORD[h] || h) + " just can't hold it: " + ml(out) + " of " + (p.lastStud ? plainName(p.lastStud) + "'s" : "somebody's") + " seed dribbles down their thighs.");
         }
         const swell = (CFG.PROD.PIN_FROM_INFLATION ? heldTotal(p) : 0) + (CFG.PROD.PIN_FROM_MILK ? Math.max(0, p.milk - milkCapNatural(mn)) : 0);
         const bySize = sizePinned(mn);
@@ -7253,18 +7336,18 @@
       seePenis(stud);
       seePenis(t);
       if (hole === "vulva" && !hasVulva(t)) {
-        R(plainName(t) + " doesn't have a vulva to fill, hon. Try butt or mouth, like ?cum " + plainName(t) + " butt. (If they're futa, they can say ?futa on.)");
+        R(plainName(t) + " doesn't have a pussy to fill, hon. Try their ass or mouth, like ?cum " + plainName(t) + " ass. (If they're futa, they can say ?futa on.)");
         return false;
       }
       const penBlock = makesSemen(stud) && holeBlocked(stud, "penis");
       if (penBlock) {
-        R("Can't do it, sugar: your penis is locked up in " + penBlock + ". Get it off first!");
+        R("Can't do it, sugar: your cock is locked up in " + penBlock + ". Get it off first!");
         blockedTease(stud, t, hole, penBlock, true);
         return false;
       }
       const holeBlock = holeBlocked(t, hole);
       if (holeBlock) {
-        R("Whoa there, hon! " + plainName(t) + "'s " + (hole === "mouth" ? "mouth" : hole) + " is blocked by " + holeBlock + ". That'll have to come off before you can fill it.");
+        R("Whoa there, hon! " + plainName(t) + "'s " + ({ vulva: "pussy", butt: "ass" }[hole] || hole) + " is blocked by " + holeBlock + ". That'll have to come off before you can fill it.");
         blockedTease(stud, t, hole, holeBlock, false);
         return false;
       }
@@ -7279,7 +7362,7 @@
       if (!opt.load) {
         const base = pent ? sp.semen * CFG.PENTUP_LOAD_X : Math.max(sp.semen * CFG.PROD.LOAD_SHARE, Math.min(sp.semen, CFG.PROD.MIN_LOAD));
         if (base < 1) {
-          R(makesSemen(stud) ? "Aw, you're drained plumb dry, sugar. Nothin' left to give till you build back up." : "You've got no semen to give, sugar. Wear a penis (or say ?futa on) and it'll build up by the hour.");
+          R(makesSemen(stud) ? "Aw, you're drained plumb dry, sugar. Nothin' left to give till you build back up." : "You've got no cum to give, sugar. Wear a cock (or say ?futa on) and it'll build up by the hour.");
           return false;
         }
         sp.semen = pent ? 0 : sp.semen - Math.min(sp.semen, base);
@@ -7339,7 +7422,7 @@
         draconic: " Every ridge drags deliciously on the way.",
         double: opt.load || opt.half ? " Both cocks throb and unload at once." : ""
       }[penisType(stud)] || "";
-      let o = "\u{1F4A6} " + (pent ? "All pent up, " : "") + plainName(stud) + " empties " + loadWord(load) + " (" + ml(load) + ") " + (funnel ? "down " + plainName(t) + "'s funnel gag, and it pours straight to their belly" : "into " + plainName(t) + "'s " + (hole === "mouth" ? "throat" : hole)) + "." + (makesSemen(stud) ? flavor : "") + " " + plainName(t) + " is " + Math.round(100 * heldTotal(tp) / capacity(t)) + "% full" + (spilt > 0 ? ", and " + ml(spilt) + " spills out" : "") + ".";
+      let o = "\u{1F4A6} " + (pent ? "All pent up, " : "") + plainName(stud) + " empties " + loadWord(load) + " (" + ml(load) + ") " + (funnel ? "down " + plainName(t) + "'s funnel gag, and it pours straight to their belly" : "into " + plainName(t) + "'s " + holeText(hole)) + "." + (makesSemen(stud) ? flavor : "") + " " + plainName(t) + " is " + Math.round(100 * heldTotal(tp) / capacity(t)) + "% full" + (spilt > 0 ? ", and " + ml(spilt) + " spills out" : "") + ".";
       if (opt.edged) o += " Edged " + opt.edged + " time" + (opt.edged === 1 ? "" : "s") + " first, it just keeps on comin'.";
       if (hole === "mouth" && makesSemen(stud)) o += " " + seedTaste(stud, pent);
       if (gagged >= 1) o += " " + plainName(t) + " gags on that " + pen + '" cock and drools ' + ml(gagged) + " back up" + (trained ? ", but that throat's learnin': it's " + sizeWord("throat", sizeOf(t, "throat")) + " now" : "") + ".";
@@ -7484,15 +7567,15 @@
       const rt = rec(t);
       if (!rt || !rt.breedable || limitBlocks(t)) return plainName(t) + " ain't breedable, hon. They'd have to say ?breedable on themselves (and their limits have to allow it).";
       if (!onMap(t)) return plainName(t) + " needs to be here on the map for that, hon.";
-      if (hole === "vulva" && !hasVulva(t)) return plainName(t) + " doesn't have a vulva, sugar. Try butt or mouth.";
+      if (hole === "vulva" && !hasVulva(t)) return plainName(t) + " doesn't have a pussy, sugar. Try their ass or mouth.";
       const blk = holeBlocked(t, hole);
-      if (blk) return plainName(t) + "'s " + hole + " is blocked by " + blk + ". That has to come off first.";
+      if (blk) return plainName(t) + "'s " + ({ vulva: "pussy", butt: "ass" }[hole] || hole) + " is blocked by " + blk + ". That has to come off first.";
       if (!jar) return "that jar's gone off the shelf, sugar.";
       return "";
     }
     function askJar(staff, t, jarId, hole, machine) {
       state.jarAsks.set(t, { staff, jar: jarId, hole, machine: !!machine, at: Date.now() });
-      askCard(t, "jar", "\u{1F489} " + plainName(staff) + " wants to " + (machine ? "load jar #" + jarId + " into the machine for you (" + holeText(hole) + "), so it empties into you while it runs" : "inseminate you from jar #" + jarId + " (" + holeText(hole) + ")") + ", sugar. Say yes or no (?yes or ?no works too). Say ?jarok off if you'd rather never be asked.");
+      askCard(t, "jar", "\u{1F489} " + plainName(staff) + " wants to " + (machine ? "load jar #" + jarId + " into the machine for you (" + holeText(hole) + "), so it empties into you while it runs" : "fill you from seed jar #" + jarId + " (" + holeText(hole) + ")") + ", sugar. Say yes or no (?yes or ?no works too). Say ?jarok off if you'd rather never be asked.");
     }
     function answerJar(t, yes) {
       const a = state.jarAsks.get(t);
@@ -7987,13 +8070,13 @@
       o2 = o2 || {};
       if (holes.length > 1) {
         if (!(makesSemen(stud) && typeInfo(stud).double)) {
-          R("Two holes at once takes a double cock, sugar! Pick one, like ?cum " + plainName(t) + " " + holes[0] + ". (?penis double, or a double cock shot.)");
+          R("Two holes at once takes a double cock, sugar! Pick one, like ?cum " + plainName(t) + " " + (HOLE_WORD[holes[0]] || holes[0]) + ". (?cock double, or a double cock shot.)");
           return false;
         }
         for (const h of holes) {
           const b = holeBlocked(t, h);
           if (b) {
-            R("Whoa there, hon! " + plainName(t) + "'s " + h + " is blocked by " + b + ". That'll have to come off first.");
+            R("Whoa there, hon! " + plainName(t) + "'s " + (HOLE_WORD[h] || h) + " is blocked by " + b + ". That'll have to come off first.");
             return false;
           }
         }
@@ -8210,7 +8293,12 @@
       ],
       "udder-": [
         "{t}%t's breasts tingle and draw in, perkier and lighter, down to %s.",
-        "A cool ache, and %t's chest shrinks back to %s."
+        "A cool ache, and %t's chest shrinks back to %s.",
+        "{t}%t gasps as the weight lifts off their chest: those tits draw in high and tight, down to %s.",
+        "{t}A prickly chill runs through %t's breasts, and they settle smaller and perkier: %s now.",
+        "{t}%t's top suddenly hangs loose. Those tits have slimmed right down to %s.",
+        "{nt}%t's chest goes cool and tight, the swell easin' back down to %s.",
+        "%t lets out a long breath as their chest lightens, a size smaller and a lot easier to carry: %s."
       ],
       "testes+": [
         "%t's balls throb and drop heavier, fat and churnin' (%s now). Somebody's gonna make bigger loads.",
@@ -8218,7 +8306,10 @@
       ],
       "testes-": [
         "%t's balls draw up tight and shrink down to %s.",
-        "A cold tingle, and %t's sack shrinks down to %s."
+        "A cold tingle, and %t's sack shrinks down to %s.",
+        "%t shivers as their heavy sack draws up and lightens, down to %s.",
+        "A cold little ache, and %t's balls settle smaller: %s. Lighter loads from here on.",
+        "%t's balls tighten and tuck up close, smaller and snugger: %s now."
       ],
       "penis+": [
         "%t's cock thickens and lengthens, throbbin' with every pulse, till it hangs at %s.",
@@ -8226,43 +8317,119 @@
       ],
       "penis-": [
         "%t's cock tingles and shrinks, smaller and softer, down to %s.",
-        "With a little shiver %t's shaft draws in to %s."
+        "With a little shiver %t's shaft draws in to %s.",
+        "A cool shiver runs down %t's shaft, and it settles a size smaller: %s now.",
+        "%t watches their cock draw back in, inch by inch, till it settles at %s.",
+        "%t's cock goes soft and tingly and comes back smaller: %s."
       ],
       "knot+": ["%t's knot swells fatter at the base, heavy and aching to lock into somebody: %s now."],
-      "knot-": ["%t's knot goes soft and shrinks down to %s."],
+      "knot-": [
+        "%t's knot goes soft and shrinks down to %s.",
+        "The fat swell at the base of %t's cock eases down to %s.",
+        "%t's knot tingles and slims: %s now. It still ties, just not so tight."
+      ],
       "vulva+": [
         "%t's pussy goes hot and slick as it loosens and opens up: %s now.",
         "%t squirms as their pussy relaxes and spreads, wetter and %s."
       ],
-      "vulva-": ["%t's pussy clenches and tightens right up: %s again."],
+      "vulva-": [
+        "%t's pussy clenches and tightens right up: %s again.",
+        "%t gasps as their pussy draws in snug and tight: %s now.",
+        "A tingle, a clench, and %t's pussy is %s again, like nobody ever stretched it.",
+        "%t squirms as everything down there tightens back up: %s."
+      ],
       "butt+": [
         "%t's ass loosens and opens, achin' to be filled: %s now.",
         "%t's hole relaxes and gapes a little wider, %s and ready."
       ],
-      "butt-": ["%t's ass clenches up nice and tight: %s again."],
-      "throat+": ["%t's throat relaxes and the gag reflex just melts away: %s now. Open wide, sugar."],
-      "throat-": ["%t's throat tightens back up, gaggy as ever: %s."],
+      "butt-": [
+        "%t's ass clenches up nice and tight: %s again.",
+        "%t's hole draws in snug, the stretch easin' right out of it: %s.",
+        "%t clenches, gasps, and their ass tightens back up: %s now."
+      ],
+      "throat+": [
+        "%t's throat relaxes and the gag reflex just melts away: %s now. Open wide, sugar.",
+        "%t swallows, and swallows again, and the gag just isn't there any more: %s now.",
+        "%t's throat goes slack and easy, open all the way down: %s."
+      ],
+      "throat-": [
+        "%t's throat tightens back up, gaggy as ever: %s.",
+        "%t swallows hard as their throat closes up and the gag comes back: %s.",
+        "%t coughs, and their throat goes snug again: %s. Takin' it deep is gonna be work again."
+      ],
       lactation: [
         "{t}%t's nipples tingle and bead with milk, breasts goin' heavy and achy to be milked.",
-        "%t's nipples prickle and swell, and a bead of milk wells up on each. They'll be wantin' the pump soon."
+        "%t's nipples prickle and swell, and a bead of milk wells up on each. They'll be wantin' the pump soon.",
+        "{t}%t's tits swell full and tight with milk, heavy enough to sway. The pump's gonna love 'em.",
+        "{nt}%t's chest goes warm and tight, and their nipples puff up hard. A bead of milk wells on each one, flat chest or not.",
+        "Warm prickles run out from %t's nipples, and in a minute they're wet. Milk's comin' in, sugar."
       ],
-      virility: ["%t's balls churn and swell with fresh seed. Somebody's gonna be a fountain for a day."],
+      virility: [
+        "{c}%t's balls churn and swell with fresh seed. Somebody's gonna be a fountain for a day.",
+        "{c}%t's balls draw up heavy and full, achin' already. Every load for a day comes out double.",
+        "{c}A hot rush goes straight to %t's balls, and their cock gives a hard twitch. There's a lot more seed in there now.",
+        "{c}%t's cock jumps and drips, and their sack swells fat and heavy. Somebody's gonna be messy for a day.",
+        "{nc}The shot goes in warm and finds nothin' to work on: no balls on %t to fill. Somebody spent good ribbons on that."
+      ],
       fertility: [
         "{v}A warm, needy flush spreads through %t's belly. That womb is ripe and waitin'.",
-        "{nv}A warm, needy flush spreads low in %t's belly. Whatever the farm's done in there, it's ripe and waitin' now."
+        "{nv}A warm, needy flush spreads low in %t's belly. Whatever the farm's done in there, it's ripe and waitin' now.",
+        "{v}%t's belly goes warm and heavy, and their pussy throbs once. Ripe as summer fruit, sugar.",
+        "{nv}A low, needy warmth settles in %t. If anything in there can take, it's takin' now."
       ],
-      contraceptive: ["%t gets a cool little shiver. Nothin's takin' root in there for a couple of days."],
-      capacity: ["%t's belly goes warm and stretchy, ready to hold even more."],
-      reducing: ["%t's belly draws in tight, and anything extra comes spillin' out."],
-      suppressant: ["%t's heat breaks like a fever. They sag, flushed and finally calm."],
-      "knot+new": ["A fat knot swells up at the base of %t's cock, throbbin' and ready to tie somebody down."],
-      "knot-new": ["%t's knot shrinks away to nothin'. No more tyin' anybody down."],
-      "type:canine": ["%t's cock reshapes, tapered and red with a thick canine knot at the base."],
-      "type:equine": ["%t's cock swells long and heavy, the head flaring wide like a stallion's."],
-      "type:feline": ["Little barbs prickle up along %t's cock. That's gonna be felt on the way out."],
-      "type:draconic": ["Thick ridges rise along %t's cock, hard and scaled and wicked."],
-      "type:double": ["%t's cock splits into two, both throbbin' and ready to fill two holes at once."],
-      "type:human": ["%t's cock settles back into a plain human shape."]
+      contraceptive: [
+        "%t gets a cool little shiver. Nothin's takin' root in there for a couple of days.",
+        "{v}A cool little shiver settles low in %t. That womb's shut for business for a couple of days.",
+        "%t feels a cold tingle spread through their belly. Nothin's catchin' in there for two days, however full they get."
+      ],
+      capacity: [
+        "%t's belly goes warm and stretchy, ready to hold even more.",
+        "%t's belly loosens and stretches, warm and roomy. There's space for a good deal more in there now.",
+        "A slow, deep stretch, low down: %t can hold more than they could, for good."
+      ],
+      reducing: [
+        "%t's belly draws in tight, and anything extra comes spillin' out.",
+        "%t's belly tightens up snug. It holds less from now on, and what doesn't fit trickles out.",
+        "A cool cramp, and %t's belly draws in small and firm: less room in there for good."
+      ],
+      suppressant: [
+        "%t's heat breaks like a fever. They sag, flushed and finally calm.",
+        "The heat drains out of %t like water out of a trough. They blink, cool and clear-headed, and a little disappointed.",
+        "%t's flush fades and the ache lets go. The heat's broken, for now."
+      ],
+      "knot+new": [
+        "A fat knot swells up at the base of %t's cock, throbbin' and ready to tie somebody down.",
+        "%t's cock thickens at the root, and a knot swells up there, round and hard. Somebody's gettin' tied.",
+        "A fat bulb fills out at the base of %t's cock, hot and tight. Next time they breed, they're stayin' put."
+      ],
+      "knot-new": [
+        "%t's knot shrinks away to nothin'. No more tyin' anybody down.",
+        "The swell at the base of %t's cock softens and goes. No more knot, no more stayin' put."
+      ],
+      "type:canine": [
+        "%t's cock reshapes, tapered and red with a thick canine knot at the base.",
+        "%t's cock goes slick and red and tapers to a point, and a knot swells at the root like a hound's."
+      ],
+      "type:equine": [
+        "%t's cock swells long and heavy, the head flaring wide like a stallion's.",
+        "%t's cock drops long and heavy, mottled and thick, with a broad flared head."
+      ],
+      "type:feline": [
+        "Little barbs prickle up along %t's cock. That's gonna be felt on the way out.",
+        "%t's cock slims a little and sprouts soft barbs round the head. Pullin' out's gonna be felt."
+      ],
+      "type:draconic": [
+        "Thick ridges rise along %t's cock, hard and scaled and wicked.",
+        "Scales and ridges rise along %t's cock, and it thickens in hard, knobbly rings."
+      ],
+      "type:double": [
+        "%t's cock splits into two, both throbbin' and ready to fill two holes at once.",
+        "Somethin' twists and splits, and %t's got two cocks now, stacked and throbbin'."
+      ],
+      "type:human": [
+        "%t's cock settles back into a plain human shape.",
+        "The shape drains out of %t's cock and it settles back to plain and human."
+      ]
     };
     function shotLine(key, t, part) {
       const k = key === "knot+" ? "knot+new" : key === "knot-" ? "knot-new" : key;
@@ -8481,8 +8648,8 @@
     }
     function noPartWhy(mn, part) {
       if (part === "penis" || part === "testes") return "there's no cock on that one to measure, hon. Wear one, or ?futa on";
-      if (part === "knot") return 'no knot on that cock yet, hon! A "knotting" shot gives one, or ?penis canine comes knotted';
-      if (part === "vulva") return "that one hasn't got a vulva, hon (futa: ?futa on)";
+      if (part === "knot") return 'no knot on that cock yet, hon! A "knotting" shot gives one, or ?cock canine comes knotted';
+      if (part === "vulva") return "that one hasn't got a pussy, hon (futa: ?futa on)";
       if (part === "udder") return "that one hasn't got an udder, hon. ?milkable on gives one";
       return "that part's not there, hon";
     }
@@ -8514,13 +8681,13 @@
         "Last milked " + ago(p.lastMilkAt),
         p.stall && p.stall.until && "In the milkin' stall: " + Math.max(0, Math.ceil((p.stall.until - Date.now()) / 6e4)) + " min till you're down to a quarter"
       ]);
-      if (makesSemen(mn)) sec("\u{1F4A6} SEMEN", [
+      if (makesSemen(mn)) sec("\u{1F4A6} CUM", [
         ml(p.semen) + " of " + ml(semenCap(mn)) + " \xB7 last collected " + ago(p.lastCollectAt),
         p.pentUp && "\u{1F624} Pent up: next load's a big one",
         p.deniedUntil > now && "\u{1F6AB} Denied: no fillin' anybody for " + hrsLeft(p.deniedUntil),
         p.tieUntil > now && "\u{1F512} Tied to " + plainName(p.tiedTo) + " for " + Math.ceil((p.tieUntil - now) / 6e4) + " more minutes"
       ]);
-      const holeName = { vulva: "Vulva", butt: "Butt", mouth: "Stomach" };
+      const holeName = { vulva: "Pussy", butt: "Ass", mouth: "Swallowed" };
       const holding = HOLES.filter((h) => h !== "vulva" || hasVulva(mn) || p.held.vulva > 0).map((h) => holeName[h] + " " + ml(p.held[h] || 0)).join(" \xB7 ");
       sec("\u{1FAD9} HOLDING \xB7 " + Math.round(100 * held / cap) + "% full", [
         holding,
@@ -8549,7 +8716,7 @@
       ]);
       if (titleNames(mn).length) sec("\u{1F396}\uFE0F TITLES", [titleNames(mn).join(" \xB7 ")]);
       const b = [];
-      for (const [k, label] of [["milk", "milk"], ["semen", "semen"], ["fert", "fertility"], ["contra", "contraceptive"]])
+      for (const [k, label] of [["milk", "milk"], ["semen", "cum"], ["fert", "fertility"], ["contra", "no catchin'"]])
         if (boosted(p, k)) b.push(label);
       const wt = Array.from(wornTags(mn));
       sec("\u2728 RIGHT NOW", [b.length && "\u{1F489} Boosted: " + b.join(", "), wt.length && "\u{1F3F7}\uFE0F Wearing: " + wt.join(", ")]);
@@ -9236,7 +9403,7 @@
       const pump2 = wornItem(mn, "ItemNipples", "LactationPump");
       if (pump2) {
         const lv = Math.min(4, Number(pump2.Property && pump2.Property.SuctionLevel) || Number(typeRec(pump2).typed) || 0);
-        if (lv > 0) g.milk = { kind: "pump", name: "lactation pump", level: lv, ml: CFG.GEAR.PUMP_ML[lv] };
+        if (lv > 0) g.milk = { kind: "pump", name: "milk pump", level: lv, ml: CFG.GEAR.PUMP_ML[lv] };
       }
       const arousal = Math.max(0, Math.min(100, C2.ArousalSettings && C2.ArousalSettings.Progress || 0));
       const intensityOf2 = (it) => it && it.Property && typeof it.Property.Intensity === "number" ? it.Property.Intensity : -1;
@@ -9259,16 +9426,16 @@
     const GEAR_LINES = {
       pump: [
         [
-          "The lactation pump on %n%'s nipples gives a soft, steady little tug. Milk beads and drips into the bottles, +%ml%.",
+          "The milk pump on %n%'s nipples gives a soft, steady little tug. Milk beads and drips into the bottles, +%ml%.",
           "%n%'s pump hums along nice and gentle, coaxin' out warm milk a drop at a time, +%ml%."
         ],
         [
-          "The lactation pump pulls in a slow, firm rhythm, and %n%'s teats stretch into the cups with every draw, +%ml%.",
+          "The milk pump pulls in a slow, firm rhythm, and %n%'s teats stretch into the cups with every draw, +%ml%.",
           "Milk runs in steady streams down the pump's tubes from %n%'s swollen nipples, +%ml%."
         ],
         [
           "The pump on %n% sucks hard, stretchin' those nipples long, and the bottles fill fast. %n% squirms in it, +%ml%.",
-          "%n%'s lactation pump is cranked up high. Every pull wrings a hot spurt of milk out of 'em, +%ml%."
+          "%n%'s milk pump is cranked up high. Every pull wrings a hot spurt of milk out of 'em, +%ml%."
         ]
       ],
       echo: [
@@ -11176,8 +11343,8 @@
       { id: "dedicate", name: "A dedication", price: 2, desc: "The farm girl sings somebody's praises (or teases 'em, if they like that) from you. ?buy dedicate <who> praise|tease" },
       { id: "bounty", name: "A bounty", price: 0, desc: "Pin ribbons to a job; the hand who does it collects. ?buy bounty <ribbons> <the job>" },
       { id: "mysterybox", name: "A mystery box", price: 4, desc: "Somethin' lovely is inside. It puts itself on, and it does somethin' to you till it comes off. ?mysterybox opens one." },
-      { id: "shot-milk", name: "A lactation shot", price: 6, desc: "Milk doubles for a day." },
-      { id: "shot-semen", name: "A virility shot", price: 6, desc: "Semen doubles for a day." },
+      { id: "shot-milk", name: "A milk-maker shot", price: 6, desc: "Milk doubles for a day." },
+      { id: "shot-semen", name: "A virility shot", price: 6, desc: "Your cum doubles for a day." },
       { id: "shot-fert", name: "A fertility shot", price: 6, desc: "Catchin' doubles for a day." },
       { id: "shot-contra", name: "A contraceptive shot", price: 4, desc: "No catchin' for two days." },
       { id: "shot-hyper", name: "A hyper pregnancy shot", price: 9, words: "hyper pregnancy", limit: "breed", desc: "For a day, anything that takes comes in as a huge litter. Stacks." },
@@ -11188,7 +11355,17 @@
       { id: "shot-udder", name: "An udder growth shot", price: 7, words: "udder growth", part: "udder", desc: "Tits a size bigger, for good." },
       { id: "shot-ass", name: "An ass growth shot", price: 7, words: "ass growth", part: "butt", desc: "Ass a size bigger, for good." },
       { id: "shot-balls", name: "A ball growth shot", price: 7, words: "balls growth", part: "testes", desc: "Balls a size heavier, for good." },
-      { id: "shot-cock", name: "A cock growth shot", price: 7, words: "cock growth", part: "penis", desc: "Cock a size bigger, for good." }
+      { id: "shot-cock", name: "A cock growth shot", price: 7, words: "cock growth", part: "penis", desc: "Cock a size bigger, for good." },
+      // shrinkin' shots: everything that grows can come back down, a size at a time, for good (Laynie, Oct 27: "I also need
+      // shots added to the store to reduce the size of all the things")
+      { id: "shot-udder-down", name: "An udder shrinkin' shot", price: 7, words: "udder reducing", part: "udder", down: true, shelf: "shrink", desc: "Tits a size smaller and lighter, for good." },
+      { id: "shot-balls-down", name: "A ball shrinkin' shot", price: 7, words: "ball reducing", part: "testes", down: true, shelf: "shrink", desc: "Balls a size lighter, for good." },
+      { id: "shot-cock-down", name: "A cock shrinkin' shot", price: 7, words: "cock reducer", part: "penis", down: true, shelf: "shrink", desc: "Cock a size smaller, for good." },
+      { id: "shot-knot-down", name: "A knot shrinkin' shot", price: 7, words: "knot reducer", part: "knot", down: true, shelf: "shrink", desc: "Knot a size smaller, for good." },
+      { id: "shot-ass-down", name: "An ass tightenin' shot", price: 7, words: "ass tightener", part: "butt", down: true, shelf: "shrink", desc: "Ass a size tighter, for good." },
+      { id: "shot-pussy-down", name: "A pussy tightenin' shot", price: 7, words: "pussy tightener", part: "vulva", down: true, shelf: "shrink", desc: "Pussy a size tighter, for good." },
+      { id: "shot-throat-down", name: "A gag reflex shot", price: 7, words: "throat tightener", part: "throat", down: true, shelf: "shrink", desc: "Throat a step tighter, gag and all, for good." },
+      { id: "shot-shrink", name: "A belly shrinkin' shot", price: 6, words: "reducing", down: true, shelf: "shrink", desc: "You hold less, for good. Whatever's in you past that spills out." }
     ];
     function storeItems() {
       const S = L2.store || {}, price = S.price || {}, off = S.off || {};
@@ -11203,7 +11380,7 @@
     function storeText(mn) {
       const items = storeItems().filter((it) => !it.off);
       const row = (it) => "  " + it.price + "\u{1F380} \xB7 " + (it.potion ? it.potion : it.id) + " \xB7 " + it.name;
-      return "\u{1F6CD}\uFE0F THE FARM STORE \xB7 you've got " + ribbonsOf(mn) + " ribbons\n\nTREATS & FAVORS\n" + items.filter((it) => !it.potion && !it.id.startsWith("shot") && it.shelf !== "mess").map(row).join("\n") + "\n\nMESSES (?buy <one> for <who>: they say yes first, unless they're ?messes on)\n" + items.filter((it) => it.shelf === "mess").map(row).join("\n") + "\n\nSHOTS\n" + items.filter((it) => it.id.startsWith("shot")).map(row).join("\n") + "\n\nPOTIONS (they wear off \xB7 ?potions on to let others gift you one)\n" + items.filter((it) => it.potion).map(row).join("\n") + "\n\n?buy <item> \xB7 ?buy <potion> for <who> (they say yes first) \xB7 ?potions shows what each one does";
+      return "\u{1F6CD}\uFE0F THE FARM STORE \xB7 you've got " + ribbonsOf(mn) + " ribbons\n\nTREATS & FAVORS\n" + items.filter((it) => !it.potion && !it.id.startsWith("shot") && it.shelf !== "mess").map(row).join("\n") + "\n\nMESSES (?buy <one> for <who>: they say yes first, unless they're ?messes on)\n" + items.filter((it) => it.shelf === "mess").map(row).join("\n") + "\n\nSHOTS\n" + items.filter((it) => it.id.startsWith("shot") && it.shelf !== "shrink").map(row).join("\n") + "\n\nSHRINKIN' SHOTS (a size back down, for good)\n" + items.filter((it) => it.shelf === "shrink").map(row).join("\n") + "\n\nPOTIONS (they wear off \xB7 ?potions on to let others gift you one)\n" + items.filter((it) => it.potion).map(row).join("\n") + "\n\n?buy <item> \xB7 ?buy <potion> for <who> (they say yes first) \xB7 ?potions shows what each one does";
     }
     function buy(sender, args, R) {
       const r = rec(sender);
@@ -11455,6 +11632,11 @@
             }
             if (it.part && !hasPart(sender, it.part)) {
               R("\u{1F489} That shot's got nothin' to work on in you, sugar, so I'll keep it on the shelf.");
+              return;
+            }
+            if (it.down && (it.part ? sizeOf(sender, it.part) <= 1 : !(prodOf(sender).capBonus > 0))) {
+              const what = !it.part ? "belly" : it.part === "udder" && !bodyOf(sender).tits ? "chest" : CFG.SIZES[it.part].label.toLowerCase();
+              R("\u{1F489} Your " + what + " can't go any " + (it.part && CFG.SIZES[it.part].gape ? "tighter" : "smaller") + ", sugar. Keep your ribbons.");
               return;
             }
             spendRibbons(sender, price, it.name);
@@ -17913,7 +18095,8 @@
           ],
           [
             `Two kennel hands kneel on either side and hold %n square in the straw, rump high, the way the breed book says. "Steady," one of them croons, to %n or the dog, it isn't clear.`,
-            "A hand presses %n's shoulders flat, another lifts their tail out of the way, and the champion is guided up and over like a mare at the stand."
+            "A hand presses %n's shoulders flat, another lifts their tail out of the way, and the champion is guided up and over like a mare at the stand.",
+            "Hands press %n's shoulders flat and lift their rump, and the champion's guided up and over them the way the breed book says."
           ]
         ],
         in: [
@@ -18115,12 +18298,15 @@
         beats: [
           [
             `"Teat check," the dairy girl calls, and %n is in the head gate before they've finished their first yawn.`,
-            "%n is walked into the check stall and the head gate drops shut. A clipboard, a tape, and cold hands."
+            "%n is walked into the check stall and the head gate drops shut. A clipboard, a tape, and cold hands.",
+            `{nt}"Nipple check," the dairy girl calls, and %n is in the head gate before they've finished their first yawn.`,
+            'The dairy girl snaps on a pair of cold gloves and swings the head gate shut on %n. "Inspection. Hold still."'
           ],
           [
             "Each teat is squeezed, rolled and pulled till it gives a drop, and the drop is held up to the light and graded.",
             "{t}The dairy girl weighs each of %n's udders in her palm, lets them drop, and writes a number down.",
-            "{nt}The dairy girl pinches and pulls at %n's flat nipples till they're red and sore, and writes NO YIELD with a little frown."
+            "{nt}The dairy girl pinches and pulls at %n's flat nipples till they're red and sore, and writes NO YIELD with a little frown.",
+            `{nt}%n's nipples are pinched, rolled and tugged till they stand up puffy and red, and the dairy girl writes "needs work" on the chart.`
           ],
           [
             "Then she strips them out by hand, long firm pulls, a pail between %n's knees.",
@@ -18129,7 +18315,8 @@
         ],
         end: [
           "Graded, measured and stripped, %n is let out of the head gate with sore teats and a mark on the dairy board.",
-          "The head gate lifts. %n's nipples throb. The clipboard says Grade B, could do better."
+          "The head gate lifts. %n's nipples throb. The clipboard says Grade B, could do better.",
+          "{nt}The head gate lifts. %n's nipples throb, and the chart on the gate says No yield, keep tryin'."
         ]
       },
       wax: {
@@ -18207,7 +18394,8 @@
           ],
           [
             "{t}The pig girl hops the rail, scoops the mash off %n's tits with both hands, and takes her time about it.",
-            "The pigs root %n over in the muck till they're rolled in it, and the pig girl just laughs at the rail."
+            "The pigs root %n over in the muck till they're rolled in it, and the pig girl just laughs at the rail.",
+            "{nt}The pig girl hops the rail, scoops the mash off %n's chest and belly with both hands, and takes her sweet time about it."
           ]
         ],
         end: [
@@ -18274,7 +18462,8 @@
           ],
           [
             "%n's belly rounds out with every mouthful. The feed girl pats it like a melon to check it's ripening.",
-            "{t}Mash dribbles out of the bag and down %n's tits. Nobody wipes it off."
+            "{t}Mash dribbles out of the bag and down %n's tits. Nobody wipes it off.",
+            "{nt}Mash dribbles out of the bag, down %n's chin and chest, and nobody wipes it off."
           ]
         ],
         end: [
@@ -18968,7 +19157,8 @@
         beats: [
           [
             "%n walks into the cattle chute and the side panels squeeze in, snug, firm, until they can't turn, can't step back, can't do anything at all.",
-            "The head gate drops on %n's neck and the squeeze panels close, and they're held like a heifer at the vet's."
+            "The head gate drops on %n's neck and the squeeze panels close, and they're held like a heifer at the vet's.",
+            "The chute closes on %n with a hiss of air, and the head gate catches their neck. They're held like any other beast waitin' on the vet."
           ],
           [
             "Hands come through the bars from both sides. Ear tags checked. Teeth checked. Everything else checked.",
@@ -22326,6 +22516,16 @@
       const w = state.where && state.where.get(mn);
       return w && w.room === CFG.ROOM_NAME ? "here" : "away";
     }
+    function roamWatching() {
+      try {
+        const m = state.mutual;
+        if (!CFG.ROAM_ON || !m || !m.set || !L2.contracts) return false;
+        const now = Date.now();
+        return L2.contracts.some((x) => x.status === "signed" && (!x.until || x.until > now) && (x.rules || []).includes("other.summon") && m.set.has(x.mn) && !charFor(x.mn));
+      } catch (e) {
+        return false;
+      }
+    }
     function roamKeptIn(mn) {
       return !!(L2.contracts && L2.contracts.some((x) => x.mn === mn && x.status === "signed" && (!x.until || x.until > Date.now()) && (x.rules || []).includes("chat.forbidLeaving")));
     }
@@ -22818,6 +23018,96 @@
       if (err) why(err.replace(/, sugar\. \?outfitwheel status$/, " (?outfitwheel status)."));
     }
     if (W.__FARMHAND_TEST__) Object.assign(W, { __tempOutfitTick: () => tempOutfitTick() });
+    if (CFG.AWAY_BOOKS_DAYS === void 0) CFG.AWAY_BOOKS_DAYS = 14;
+    if (CFG.AWAY_BOOKS_WARN_DAYS === void 0) CFG.AWAY_BOOKS_WARN_DAYS = 12;
+    const AWAY_ROLES = ["LIVESTOCK", "GUEST", "LUXURY"];
+    function awayClock() {
+      L2.away = L2.away || { min: 0, at: 0 };
+      return L2.away;
+    }
+    function permContract(mn) {
+      contractsLedger();
+      return L2.contracts.some((x) => x.mn === mn && x.status === "signed" && !x.until && !x.durationMin);
+    }
+    function awayKept(mn, r) {
+      if (!r || !r.roles || !r.roles.some((x) => AWAY_ROLES.includes(x))) return "not stock or a guest";
+      if (mn === CFG.BOT_MEMBER || isProprietor(mn)) return "a proprietor";
+      if (isStaff(mn)) return "staff";
+      if (permContract(mn)) return "a permanent contract";
+      return "";
+    }
+    function awayDays(r) {
+      const A = awayClock();
+      return Math.max(0, (A.min - (r.hereMin == null ? A.min : r.hereMin)) / 1440);
+    }
+    function awayTick() {
+      const now = Date.now(), A = awayClock();
+      if (now - (state.awayAt || 0) < 6e4) return;
+      const gap = state.awayAt ? now - state.awayAt : 6e4;
+      state.awayAt = now;
+      A.min += Math.min(gap, 3 * 6e4) / 6e4;
+      A.at = now;
+      for (const C2 of W.ChatRoomCharacter || []) {
+        const r = C2 && C2.MemberNumber !== CFG.BOT_MEMBER && rec(C2.MemberNumber);
+        if (!r) continue;
+        r.hereMin = A.min;
+        r.hereAt = now;
+        if (r.awayWarned) r.awayWarned = 0;
+      }
+      const off = [], gone = [];
+      let changed = false;
+      for (const [k, r] of Object.entries(L2.people)) {
+        const mn = parseInt(k, 10);
+        if (r.hereMin == null) {
+          r.hereMin = A.min;
+          r.hereAt = now;
+          changed = true;
+          continue;
+        }
+        if (awayKept(mn, r)) continue;
+        const d = awayDays(r);
+        if (d >= CFG.AWAY_BOOKS_DAYS) {
+          if (off.length < 5) off.push(mn);
+          continue;
+        }
+        if (d >= CFG.AWAY_BOOKS_WARN_DAYS && !r.awayWarned) {
+          r.awayWarned = now;
+          changed = true;
+          beep(mn, "\u{1F33E} We haven't seen you on the farm in " + Math.floor(d) + " days, " + plainName(mn) + ". Come by in the next couple of days (just step into the farm room) and you keep your place. After two weeks away I take folks off the books. Your paperwork's kept safe either way, sugar.");
+        }
+      }
+      for (const mn of off) {
+        const name = plainName(mn);
+        if (!offTheBooks(mn, CFG.BOT_MEMBER, "away " + CFG.AWAY_BOOKS_DAYS + " days")) continue;
+        beep(mn, "\u{1F4CB} You've been away from the farm for two weeks, " + name + ", so I've taken you off the books. Your paperwork's tucked safe in the drawer: come back and ?apply whenever you like, sugar.");
+        gone.push(name + " (" + mn + ")");
+      }
+      if (gone.length) notifyStaff("\u{1F4CB} Away from the farm for " + CFG.AWAY_BOOKS_DAYS + " days, so off the books now (paperwork archived): " + gone.join(", ") + ".", true);
+      if (changed || now - (state.awaySavedAt || 0) > 10 * 6e4) {
+        state.awaySavedAt = now;
+        saveLedger();
+      }
+    }
+    function awayCommand(sender, args, R) {
+      const rows = [];
+      for (const [k, r] of Object.entries(L2.people)) {
+        const mn = parseInt(k, 10);
+        if (awayKept(mn, r) || r.hereMin == null) continue;
+        const d = awayDays(r);
+        if (d >= 1) rows.push([d, mn, r]);
+      }
+      rows.sort((a, b) => b[0] - a[0]);
+      const kept = Object.keys(L2.people).map(Number).filter((mn) => awayKept(mn, rec(mn)) === "a permanent contract");
+      const days = (n) => n + " day" + (n === 1 ? "" : "s");
+      const line = ([d, mn, r]) => "  \u2022 " + plainName(mn) + " \xB7 " + days(Math.floor(d)) + " away" + (r.hereAt ? " (last here " + new Date(r.hereAt).toLocaleDateString() + ")" : "") + " \xB7 off the books in " + days(Math.max(0, Math.ceil(CFG.AWAY_BOOKS_DAYS - d))) + (r.awayWarned ? " \xB7 told" : "");
+      R("\u{1F5D3}\uFE0F AWAY FROM THE FARM\n" + (rows.length ? rows.slice(0, 20).map(line).join("\n") + (rows.length > 20 ? "\n  \u2026and " + (rows.length - 20) + " more." : "") : "  Nobody's been gone a whole day.") + "\n\nLivestock and guests come off the books after " + CFG.AWAY_BOOKS_DAYS + " days away (with a note at " + CFG.AWAY_BOOKS_WARN_DAYS + "). The days only count while I'm in the room. Never staff, the proprietors, or anybody on a permanent contract" + (kept.length ? " (" + kept.slice(0, 10).map(plainName).join(", ") + (kept.length > 10 ? "\u2026" : "") + ")" : "") + ".");
+    }
+    if (W.__FARMHAND_TEST__) Object.assign(W, { __awayTick: (gap) => {
+      state.awayAt = gap ? Date.now() - gap : 0;
+      awayTick();
+    }, __awayAdd: (days) => {
+      awayClock().min += days * 1440;
+    } });
     const PARASITE_SERUMS = ["growth", "fertility", "growth", "hyper pregnancy", "growth", "capacity"];
     const PARASITE_GROWS = ["udder", "penis", "testes", "butt"];
     function parasiteChance(mn) {
@@ -27787,7 +28077,9 @@
       ],
       mark100: [
         "%n is RUINED. There isn't a hole, a teat or a thought in them the traps haven't been through. They stand there swayin', wet, half-smilin', and the whole farm can see it's finished its work.",
-        "That's the last of what %n used to be. One hundred. Ruined stock: bred, stretched, dosed and hollowed out into exactly what this place makes. Every trap on the farm knows their name."
+        "That's the last of what %n used to be. One hundred. Ruined stock: bred, stretched, dosed and hollowed out into exactly what this place makes. Every trap on the farm knows their name.",
+        "{c}One hundred. %n is RUINED: milked dry, bred hollow, and so trained that their cock jumps at the creak of a gate. Every trap on the farm knows their name.",
+        "{nt}%n is RUINED. Every hole they've got has been bred, stretched and filled, and the last of who they were is somewhere in the straw. The whole farm can see the traps have finished their work."
       ],
       cleanse: [
         "%c scrubs %n down with cold well water and somethin' bitter, front and back, inside and out, till a little of the fog lifts from their eyes.",
@@ -30446,6 +30738,7 @@
     const VULVA_WORDS = /\b(pussy|pussies|cunt|cunts|slit|womb|clit|cervix)\b/i;
     const TITS_WORDS = /\b(tits?|titties|breasts?|udders?|teats?|cleavage)\b/i;
     const GIRL_WORDS = /\b(girl|heifer|mare|broodmare)\b/i;
+    const NPC_GIRL = /\b(?:farm|kennel|dairy|milk|pig|feed|stable|breeding|creamery) girls?\b/gi;
     function bodyOf(mn) {
       const r = rec(mn) || {}, set = r.gender || "", vulva = hasVulva(mn), cock = makesSemen(mn);
       const g = set || (r.futa || vulva && cock ? "futa" : vulva ? "female" : "male");
@@ -30475,13 +30768,14 @@
       if (BODY_TAG.test(s)) return true;
       if (!b.vulva && VULVA_WORDS.test(s)) return false;
       if (!b.tits && TITS_WORDS.test(s)) return false;
-      if ((b.g === "male" || b.g === "nonbinary") && GIRL_WORDS.test(s)) return false;
+      if ((b.g === "male" || b.g === "nonbinary") && GIRL_WORDS.test(s.replace(NPC_GIRL, ""))) return false;
       return true;
     }
     function pickFor(mn, key, list2) {
       try {
         if (!Array.isArray(list2) || !list2.length || !rec(mn)) return pickFresh(key, list2);
         const b = bodyOf(mn), tagged = list2.filter((l) => tagsFit(l, b)), best = tagged.filter((l) => wordsFit(l, b));
+        if (W.__FARMHAND_TEST__ && typeof W.__pickSeen === "function") W.__pickSeen(key, list2);
         return pickFresh(key, best.length ? best : tagged.length ? tagged : list2);
       } catch (e) {
         return pickFresh(key, list2);
@@ -30490,14 +30784,14 @@
     const SWAP_NO_VULVA = [[/\bpussies\b/g, "asses"], [/\bpussy\b/g, "ass"], [/\bcunts\b/g, "holes"], [/\bcunt\b/g, "hole"], [/\bslit\b/g, "crack"], [/\bwomb\b/g, "belly"], [/\bcervix\b/g, "guts"], [/\bclit\b/g, "cock"]];
     const SWAP_FLAT = [[/\btits\b/g, "chest"], [/\btit\b/g, "nipple"], [/\btitties\b/g, "chest"], [/\bbreasts\b/g, "chest"], [/\bbreast\b/g, "chest"], [/\budders\b/g, "chest"], [/\budder\b/g, "chest"], [/\bteats\b/g, "nipples"], [/\bteat\b/g, "nipple"], [/\bcleavage\b/g, "chest"]];
     const SWAP_FEMBOY = [[/\btits\b/g, "soft little chest"], [/\btitties\b/g, "soft little chest"], [/\bbreasts\b/g, "soft little chest"], [/\bbreast\b/g, "chest"], [/\budders\b/g, "puffy nipples"], [/\budder\b/g, "chest"], [/\bteats\b/g, "puffy nipples"], [/\bteat\b/g, "nipple"], [/\bcleavage\b/g, "chest"]];
-    const SWAP_NB = [[/\bgood girl\b/g, "good pet"], [/(?<!(?:farm|kennel|dairy|milk) )\bgirl\b/g, "darlin'"], [/\bheifer\b/g, "yearlin'"], [/\bbroodmare\b/g, "breeder"], [/\bmare\b/g, "breeder"]];
-    const SWAP_MALE = [[/\bgood girl\b/g, "good boy"], [/(?<!(?:farm|kennel|dairy|milk) )\bgirl\b/g, "boy"], [/\bheifer\b/g, "steer"], [/\bbroodmare\b/g, "stud"], [/\bmare\b/g, "colt"]];
+    const SWAP_NB = [[/\bgood girl\b/g, "good pet"], [/(?<!(?:farm|kennel|dairy|milk|pig|feed|stable|breeding|creamery) )\bgirl\b/g, "darlin'"], [/\bheifer\b/g, "yearlin'"], [/\bbroodmare\b/g, "breeder"], [/\bmare\b/g, "breeder"]];
+    const SWAP_MALE = [[/\bgood girl\b/g, "good boy"], [/(?<!(?:farm|kennel|dairy|milk|pig|feed|stable|breeding|creamery) )\bgirl\b/g, "boy"], [/\bheifer\b/g, "steer"], [/\bbroodmare\b/g, "stud"], [/\bmare\b/g, "colt"]];
     function bodyWords(mn, text) {
       try {
         const written = BODY_TAG.test(String(text));
         let t = String(text).replace(BODY_TAG, "");
         if (written || !mn || !L2 || !L2.people || !L2.people[mn]) return t;
-        if (!VULVA_WORDS.test(t) && !TITS_WORDS.test(t) && !GIRL_WORDS.test(t)) return t;
+        if (!VULVA_WORDS.test(t) && !TITS_WORDS.test(t) && !GIRL_WORDS.test(t.replace(NPC_GIRL, ""))) return t;
         const b = bodyOf(mn);
         if (!b.vulva) for (const [re, w] of SWAP_NO_VULVA) t = t.replace(re, w);
         if (!b.tits) for (const [re, w] of b.g === "femboy" ? SWAP_FEMBOY : SWAP_FLAT) t = t.replace(re, w);
@@ -30553,7 +30847,10 @@
           "%n's slit is runnin' like a tap.",
           "Their pussy flutters and squeezes, tryin' to pull somethin' in.",
           "You could hear how wet %n is from the gate.",
-          "%n's clit rubs on somethin' with every rock of their hips, and they whine."
+          "%n's clit rubs on somethin' with every rock of their hips, and they whine.",
+          "%n's pussy squelches with every jolt, wet enough to hear across the barn.",
+          "Their thighs shake and their cunt runs, drippin' off their lips in strings.",
+          "%n's clit is swollen and peekin' out, so tender the air alone makes them twitch."
         ],
         fu: [
           "%n's cock is hard and their pussy's drippin' under it, and neither one is gettin' any mercy.",
@@ -30561,7 +30858,12 @@
           "%n leaks from the tip and from the pussy behind their balls, both at once.",
           "Cock jerkin', pussy clenchin', tits swingin': every part of %n wants somethin' different and gets none of it.",
           "%n's balls are tight up against a pussy that's gapin' for it.",
-          "They could breed or be bred, and right now the farm's decided which."
+          "They could breed or be bred, and right now the farm's decided which.",
+          "%n's cock bobs hard over a pussy that's soaked through, and they couldn't say which one aches worse.",
+          "Their balls draw up tight against their wet slit, and both of 'em drip into the straw.",
+          "%n's cock leaks down its own shaft while their cunt clenches on nothin' underneath.",
+          "Every jolt slaps %n's cock on their belly and squeezes their pussy: twice the need, and none of it answered.",
+          "The farm doesn't care which end of %n it's usin'. Both of 'em are drippin' anyway."
         ],
         fb: [
           "%n's pretty little cock is stiff and pink and drippin', and nobody's lookin' at it. They're lookin' at the hole.",
@@ -30569,7 +30871,12 @@
           "%n's smooth little sack is drawn up tight under a cock that only ever gets to leak.",
           "A girlish whimper, a twitch, and %n's cock spits a thin clear thread it never earned.",
           "%n's cock is too small to matter here. It's their ass the farm has a use for.",
-          "Their hips are wider than a boy's ought to be, and they're pushin' them back for more."
+          "Their hips are wider than a boy's ought to be, and they're pushin' them back for more.",
+          "%n's little cock bounces with every shove, stiff and pink and no use to anybody.",
+          "A soft, girlish moan, and %n's cock dribbles on their own thighs.",
+          "%n's smooth thighs are wet with their own leakin', and their hips keep pushin' back.",
+          "Their little cock twitches in its own puddle while their ass gets all the attention.",
+          "%n blushes all the way down their flat chest, and their cock leaks like it's proud of itself."
         ]
       },
       injector: { c: ["The dose goes straight to %n's balls. They can feel them fill.", "%n's cock thickens while the plunger's still goin' down."], v: ["The warmth pools low and %n's pussy goes slick around nothin'.", "%n's clit swells while the plunger's still goin' down."] },
@@ -30611,6 +30918,7 @@
       cups: { c: ["%n's cock twitches every time the cups pull.", "%n's chest is drawn up into the glass, nipples stretchin'."], v: ["Every pull on %n's teats makes their pussy clench.", "%n's tits are swellin' in the glass."] },
       weights: { c: ["The sleeve drains %n's cock dry and keeps goin'.", "%n's balls ache, empty, and already fillin'."] }
     };
+    if (W.__FARMHAND_TEST__) Object.assign(W, { __lineFits: (line, b) => tagsFit(line, b) && wordsFit(line, b) });
     const FARM_LOOK_KEY = "farmhand-drawn-body";
     function farmLookRead() {
       try {
@@ -31807,7 +32115,8 @@
           [
             "It seals at the throat and the hip, glossy and tight, with two holes cut right where the teats come through.",
             "{t}%n's tits are pulled through the openings, and the latex squeezes round the base of each one, pushin' them out full and round.",
-            "{nt}The sheath's openings sit over %n's nipples and squeeze, and it pushes everything it can toward them."
+            "{nt}The sheath's openings sit over %n's nipples and squeeze, and it pushes everything it can toward them.",
+            "{nt}The latex is cut away over %n's nipples and squeezes in round them, so they stand out hard, puffy and pink against the shine."
           ],
           [
             "The cups go on: black rubber, warm, and they suck the teats in deep, slow at first and then steady.",
@@ -33069,7 +33378,7 @@
             ],
             [
               "%n groans and clutches their belly as their womb drops open like a mouth. They're so fertile it aches, cunt swollen and gapin' a little, weepin' slick. Breathe on them wrong today and they'll catch a litter.",
-              "The green goes all the way in. %n can feel themselves ovulatin', a hot heavy pulse on each side, over and over. Whatever cums in them next isn't leavin' one pup. It's leavin' a houseful."
+              "The green goes all the way in. A hot, heavy pulse starts low in %n's belly, on each side, over and over: ripe, and gettin' riper. Whatever cums in them next isn't leavin' one pup. It's leavin' a houseful."
             ]
           ],
           after: [
@@ -34000,11 +34309,11 @@ THE STOCKS
       barn: `\u{1F95B} THE BARN \u{1F95B}
 
 COMMANDS
-  ?stats \xB7 your milk, semen, sizes, how full you are
+  ?stats \xB7 your milk, cum, sizes, how full you are
   ?board \xB7 today's and this week's yield, and top sires
   ?milkable on|off \xB7 make milk (stock does by default)
   ?seedmilk on|off \xB7 the stall and milkin' traps take your seed too (on)
-  ?futa on|off \xB7 make milk and semen both
+  ?futa on|off \xB7 make milk and cum both
   ?quota \xB7 your daily milk quota and streak
 
 GETTIN' MILKED
@@ -34016,7 +34325,7 @@ GETTIN' MILKED
   \u2022 Everybody sees milkin' and nursin' as a room emote.
 
 FILLIN' UP
-  \u2022 Milk and semen fill by the hour, even while you're away. Cows fill
+  \u2022 Milk and cum fill by the hour, even while you're away. Cows fill
     twice as fast; pregnancy and a fresh birth faster still.
   \u2022 Full for a whole day and you start leakin', and everybody sees it.
 
@@ -34027,7 +34336,7 @@ QUOTA \xB7 stock owes the pail 1 L a day (staff can change yours)
 
 MILK GRADE (A+ to D) \xB7 the average of your last 5 milkin's
   Helps: milked every 6\u201316 hours, higher tier, fresh birth, heat,
-         a lactation shot or item
+         a milk-maker shot, or a "lactation" item
   Hurts: milked again inside 2 hours, left over 36 hours, leakin'
          for a day, a punishment tier`,
       breeding: `\u{1F402} BREEDING \u{1F402}
@@ -34132,7 +34441,7 @@ I read words in a crafted item's name or description, like LSCG does.
 INJECTORS \xB7 use Inject on someone
   Production
     lactation \xB7 milk doubles for a day
-    virility \xB7 semen doubles for a day
+    virility \xB7 cum doubles for a day
     fertility \xB7 catchin' doubles for a day
     contraceptive \xB7 no catchin' for two days
     egg laying (or clutch) \xB7 any stud can leave a clutch of eggs, 3x as likely
@@ -34146,7 +34455,7 @@ INJECTORS \xB7 use Inject on someone
     (worn, those two work for as long as you wear the item)
     heat inducer \xB7 heat now  \xB7  suppressant \xB7 heat ends
   Stackin'
-    Doses stack. A second lactation shot while the first is still
+    Doses stack. A second dose of the same while the first is still
       workin' makes it triple, a third four times, up to five deep.
     Put x2 to x5 on the needle for that many doses in one go:
       "lactation x3", "udder growth x2", "hyper pregnancy x2".
@@ -34171,7 +34480,7 @@ TOYS THAT ACT ON THEIR OWN \xB7 crafted words on what you wear
       pussy \xB7 ass (anal) \xB7 throat
     grow: grow, growth, enlarger, swell, gape, stretch, trainer\u2026
     shrink: shrink, reducer, tightener, restorer\u2026
-    e.g. "Shrink Penis", "Grow Balls", "Big Tit Growth Serum",
+    e.g. "Shrink Cock", "Grow Balls", "Big Tit Growth Serum",
     "Pussy Stretching Shot". Each one is a step, with a room emote.
   Cocks \xB7 canine, equine, feline (barbed), draconic, double cock,
     humanizer, knotting, knot remover \xB7 see ?help cocks
@@ -34190,38 +34499,38 @@ GOOD TO KNOW
 
 COMMANDS
   ?size \xB7 your sizes (only the parts you've got)
-  ?size <part> <size> \xB7 set one, e.g. ?size udder DD \xB7 ?size penis 9
+  ?size <part> <size> \xB7 set one, e.g. ?size udder DD \xB7 ?size cock 9
   ?measure \xB7 I measure you out loud for the room
-  ?futa on|off \xB7 cock and vulva both, milk and semen both
+  ?futa on|off \xB7 cock and pussy both, milk and cum both
   ?gender female|male|futa|femboy|nonbinary \xB7 how the farm sees you (picks your outfit)
   ?chest flat|tits \xB7 what's up top, as the farm's lines see you (nonbinary goes by your body otherwise)
 
 THE PARTS
   Udder \xB7 bra cup, AA to H. Bigger makes and holds more milk.
   Balls \xB7 1 to 10. Bigger makes bigger loads.
-  Penis \xB7 inches, up to 14". Too big for a hole stretches it.
-  Vulva / Butt \xB7 tight, snug, slightly gaped, gaped, loose\u2026 ruined.
+  Cock \xB7 inches, up to 14". Too big for a hole stretches it.
+  Pussy / Ass \xB7 tight, snug, slightly gaped, gaped, loose\u2026 ruined.
     Stretched holes tighten a level a day; looser drains faster.
   Throat \xB7 gaggy to bottomless. Too big gags some back up, and every
     3 of those trains it a level.
   Cock and balls only show if you've got 'em; udder if you're milkable
-  or have a vulva. ?help cocks for types and knots.
+  or have a pussy. ?help cocks for types and knots.
 
 \u2728 HYPER (shots only)
-  \u2022 Udder to an R cup, balls, gape and throat to 20, penis to 30".
+  \u2022 Udder to an R cup, balls, gape and throat to 20, cock to 30".
   \u2022 A P cup or size-17 balls pins you where you stand till a reducer.
 
 GOOD TO KNOW
-  \u2022 Pent up: semen full for a day (12h caged) and your next load
+  \u2022 Pent up: balls full for a day (12h caged) and your next load
     empties everything, half again more, and extra fertile.
   \u2022 Stamina: past 3 loads in an hour each one's smaller.
   \u2022 Swallow a big load and you fill faster for an hour.`,
       cocks: `\u{1F346} COCKS, KNOTS & CUMFLATION \u{1F346}
 
 COMMANDS
-  ?penis \xB7 your cock (?cock works too)
-  ?penis types \xB7 the list
-  ?penis <type> \xB7 set yours, e.g. ?penis equine
+  ?cock \xB7 your cock (?penis works too)
+  ?cock types \xB7 the list
+  ?cock <type> \xB7 set yours, e.g. ?cock equine
 
 THE TYPES
   human \xB7 the usual
@@ -34390,7 +34699,7 @@ COMMANDS
 
 THE CLASSES
   show \xB7 stock only, staff judge 1 to 10, best average wins
-  udder, balls, penis, gape, throat \xB7 I measure everyone at the
+  udder, balls, cock, gape, throat \xB7 I measure everyone at the
     close; biggest wins, judges' scores break a tie
   load \xB7 studs ?enter, then ?cum; biggest single load wins
 
@@ -34421,7 +34730,10 @@ RECORDS
      aftercare, notes, or app.<question>; clear empties one
   ?signed <who> \xB7 flip their contract signed or not
   ?addfriend <who> \xB7 friend 'em so my beeps reach 'em
-  ?unregister <who> \xB7 archive (herdmasters and up)`,
+  ?unregister <who> \xB7 archive (herdmasters and up)
+  ?away \xB7 who's been off the farm longest. Livestock and guests
+     two weeks away come off the books on their own (never staff,
+     the proprietors or a permanent contract)`,
       herd: `\u{1F404} YOUR HERD (staff)
 
 CLAIMIN'
@@ -34461,7 +34773,7 @@ CARDS
 
 MILKIN' & COLLECTIN'
   ?milk <who> [mL] \xB7 milk 'em by hand (all of it if left out)
-  ?collect <who> [mL] \xB7 collect semen, bottled as a seed jar
+  ?collect <who> [mL] \xB7 collect their cum, bottled as a seed jar
   ?stats <who> \xB7 anybody's numbers
 
 SEED JARS
@@ -34640,7 +34952,7 @@ THE FARM
   ?notice <text> \xB7 ?notice clear
   ?feeding on|off \xB7 ?curfew on|off (leave it out to flip)
   ?fair open [class] [title] \xB7 ?fair close
-     classes: show, udder, balls, penis, gape, throat, load
+     classes: show, udder, balls, cock, gape, throat, load
      e.g. ?fair open udder Moo Off
 
 YOU
@@ -35568,7 +35880,8 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
       "corral",
       "uncorral",
       "unbench",
-      "purge"
+      "purge",
+      "away"
     ];
     const SAFETY_CMDS = ["safe", "safeword", "red", "stuck"];
     const STOCK_PLAY = ["milk", "edge"];
@@ -35672,7 +35985,7 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
       if (notesView && r.notes) o += "\n\n\u{1F4DD} Staff notes:\n" + r.notes;
       if (staffView && r.prod && r.prod.held) {
         const p = prodOf(mn), cap = capacity(mn), held = heldTotal(p);
-        const parts = HOLES.filter((h) => h !== "vulva" || hasVulva(mn) || (p.held.vulva || 0) > 0).map((h) => ({ vulva: "Vulva", butt: "Butt", mouth: "Stomach" })[h] + " " + ml(p.held[h] || 0));
+        const parts = HOLES.filter((h) => h !== "vulva" || hasVulva(mn) || (p.held.vulva || 0) > 0).map((h) => ({ vulva: "Pussy", butt: "Ass", mouth: "Swallowed" })[h] + " " + ml(p.held[h] || 0));
         o += "\n\n\u{1FAD9} Holding: " + parts.join(" \xB7 ") + " (" + Math.round(100 * held / Math.max(1, cap)) + "% full)";
       }
       if (staffView && r.application) o += "\n\n" + applicationText(r.application, true);
@@ -36036,7 +36349,7 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
         case "ruin": {
           const t = resolveTarget(args[0]);
           if (!t || !rec(t) || !makesSemen(t)) {
-            R("Whose load are we ruinin', sugar? ?ruin <stud>, somebody who makes semen. For example: ?ruin Rex");
+            R("Whose load are we ruinin', sugar? ?ruin <stud>, somebody who makes cum. For example: ?ruin Rex");
             break;
           }
           if (!onMap(t)) {
@@ -36736,7 +37049,7 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
           if (!on) state.jarAsks.delete(sender);
           saveLedger();
           audit(sender, "JAROK", on ? "on" : "off");
-          R(on ? "\u{1F489} Jar insemination: ON. Staff still have to ask you every single time, and no is always a fine answer." : "\u{1F489} Jar insemination: OFF. Nobody puts a jar in you, and staff can't even ask. ?jarok on turns it back on.");
+          R(on ? "\u{1F489} Jar breedin': ON. Staff still have to ask you every single time, and no is always a fine answer." : "\u{1F489} Jar breedin': OFF. Nobody puts a jar in you, and staff can't even ask. ?jarok on turns it back on.");
           break;
         }
         case "rights": {
@@ -36805,7 +37118,7 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
             break;
           }
           if (!makesSemen(sender)) {
-            R("Breedin' rights are for studs, hon. You'd need a penis (or ?futa on).");
+            R("Breedin' rights are for studs, hon. You'd need a cock (or ?futa on).");
             break;
           }
           const days = args[1] ? parseFloat(args[1]) : CFG.RIGHTS_DAYS;
@@ -36840,13 +37153,13 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
         case "penis":
         case "cock": {
           const types = Object.keys(CFG.PENIS_TYPES);
-          const help = "Types: " + types.map((k) => CFG.PENIS_TYPES[k].label === k ? k : k + " (" + CFG.PENIS_TYPES[k].label + ")").join(", ") + `. Set yours with ?penis <type>, like ?penis equine. Any of 'em can carry a knot: a crafted shot with "knotting" gives one (canine comes knotted). Shots with canine, equine, feline (or barbed), draconic, double cock or humanizer change the type.`;
+          const help = "Types: " + types.map((k) => CFG.PENIS_TYPES[k].label === k ? k : k + " (" + CFG.PENIS_TYPES[k].label + ")").join(", ") + `. Set yours with ?cock <type>, like ?cock equine. Any of 'em can carry a knot: a crafted shot with "knotting" gives one (canine comes knotted). Shots with canine, equine, feline (or barbed), draconic, double cock or humanizer change the type.`;
           let t = sender, a = args.slice();
           if (a.length > 1 || a.length === 1 && !types.includes(a[0].toLowerCase()) && !/^(types|list)$/i.test(a[0])) {
             const w = resolveTarget(a[0]);
             if (w && w !== sender) {
               if (!isStaff(sender)) {
-                R("Only staff can change somebody else's cock, sugar. ?penis <type> sets yours.");
+                R("Only staff can change somebody else's cock, sugar. ?cock <type> sets yours.");
                 break;
               }
               t = w;
@@ -36858,7 +37171,7 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
             break;
           }
           if (!makesSemen(t) && !/^(types|list)$/i.test(a[0] || "")) {
-            R("\u{1F346} " + (t === sender ? "You haven't" : plainName(t) + " hasn't") + " got a cock right now, hon. Wear one, or ?futa on, and then ?penis <type> picks the kind. ?penis types shows 'em.");
+            R("\u{1F346} " + (t === sender ? "You haven't" : plainName(t) + " hasn't") + " got a cock right now, hon. Wear one, or ?futa on, and then ?cock <type> picks the kind. ?cock types shows 'em.");
             break;
           }
           if (!a.length) {
@@ -37733,6 +38046,10 @@ Welcome to B&B Farm, hon. \u{1F33E}`
           beep(t, "I had a look at your paperwork, " + plainName(t) + ", and it ain't quite a fit for us right now. No hard feelin's, sweetie. The gate's always open for a visit.");
           break;
         }
+        case "away":
+          awayCommand(sender, args, R);
+          break;
+        // who's been off the farm longest (10uo-away-books.js)
         case "unregister": {
           const t = resolveTarget(args[0]);
           if (!t) {
@@ -38541,7 +38858,7 @@ Welcome to B&B Farm, hon. \u{1F33E}`
           prodOf(t);
           saveLedger();
           audit(sender, "GENDER", t + " " + g);
-          R("\u{1F338} " + (t === sender ? "You're" : plainName(t) + " is") + " down as " + g + " now, sugar." + (g === "futa" ? " Futa makes milk and semen both." : "") + (g === "nonbinary" ? " Your body's whatever your character has (?futa on for both), and ?chest flat or ?chest tits says which up top." : "") + " It picks your farm outfit, too.");
+          R("\u{1F338} " + (t === sender ? "You're" : plainName(t) + " is") + " down as " + g + " now, sugar." + (g === "futa" ? " Futa makes milk and cum both." : "") + (g === "nonbinary" ? " Your body's whatever your character has (?futa on for both), and ?chest flat or ?chest tits says which up top." : "") + " It picks your farm outfit, too.");
           break;
         }
         case "chest": {
@@ -38584,7 +38901,7 @@ Welcome to B&B Farm, hon. \u{1F33E}`
           prodOf(sender);
           saveLedger();
           audit(sender, "FUTA", on ? "on" : "off");
-          R(on ? "\u{1F338} Futa it is, darlin'! You'll make milk and semen both, you can breed with ?breed and ?cum, and you can be bred in the vulva too (if you've said ?breedable on). ?futa off whenever you like." : "Alrighty, futa's off. I'll go by what you're wearin' again, sugar. \u{1F49B}");
+          R(on ? "\u{1F338} Futa it is, darlin'! You'll make milk and cum both, you can breed with ?breed and ?cum, and you can be bred in the pussy too (if you've said ?breedable on). ?futa off whenever you like." : "Alrighty, futa's off. I'll go by what you're wearin' again, sugar. \u{1F49B}");
           break;
         }
         case "size":
@@ -38612,9 +38929,9 @@ Welcome to B&B Farm, hon. \u{1F33E}`
             const mine = bodyParts(t);
             const label = (k) => k === "penis" ? "Cock" : CFG.SIZES[k].label;
             const lines = mine.map((k) => "  " + label(k) + ": " + sizeName(t, k) + (k === "penis" ? ", " + penisLabel(t) : ""));
-            const ex = { udder: "udder DD", penis: "penis 9", testes: "balls 5", vulva: "vulva snug", butt: "butt 3", throat: "throat 2" };
+            const ex = { udder: "udder DD", penis: "cock 9", testes: "balls 5", vulva: "pussy snug", butt: "ass 3", throat: "throat 2" };
             const eg = mine.filter((k) => ex[k]).slice(0, 2).map((k) => "?size " + ex[k]).join(" or ");
-            R("\u{1F4CF} " + plainName(t).toUpperCase() + "'S SIZES\n" + lines.join("\n") + "\n\nSet one with ?size <part> <size>, like " + eg + ". Your parts: " + mine.filter((k) => k !== "knot").map((k) => k === "testes" ? "balls" : k).join(", ") + ". \u2728Hyper sizes only come from shots. ?help body tells what they do.");
+            R("\u{1F4CF} " + plainName(t).toUpperCase() + "'S SIZES\n" + lines.join("\n") + "\n\nSet one with ?size <part> <size>, like " + eg + ". Your parts: " + mine.filter((k) => k !== "knot").map((k) => ({ testes: "balls", penis: "cock", vulva: "pussy", butt: "ass" })[k] || k).join(", ") + ". \u2728Hyper sizes only come from shots. ?help body tells what they do.");
             break;
           }
           const part = partFrom(a[0]), S = part && CFG.SIZES[part];
@@ -38632,7 +38949,7 @@ Welcome to B&B Farm, hon. \u{1F33E}`
           }
           const top = S && S.natural;
           if (!S || !(lvl >= 1 && lvl <= S.max)) {
-            R("Here's how, sugar: ?size, the part, then a size. Udder (or breasts, boobs, tits, chest) goes by cup, AA up to " + CFG.SIZES.udder.cups[CFG.SIZES.udder.natural - 1] + " (or 1 to " + CFG.SIZES.udder.natural + "). Balls (or testes, testicles, nuts), vulva (or pussy, cunt), butt (or ass, anus, anal) and throat (or mouth, oral) go from 1 to " + CFG.SIZES.udder.natural + " (or the name, like loose); penis (or cock, dick, shaft) goes by inches, 1 to " + CFG.SIZES.penis.natural + ". For example: ?size udder DD  or  ?size butt slightly gaped  or  ?size penis 9. Plain ?size shows 'em all.");
+            R("Here's how, sugar: ?size, the part, then a size. Udder (or breasts, boobs, tits, chest) goes by cup, AA up to " + CFG.SIZES.udder.cups[CFG.SIZES.udder.natural - 1] + " (or 1 to " + CFG.SIZES.udder.natural + "). Balls (or nuts), pussy (or cunt), ass (or butt, anal) and throat (or mouth) go from 1 to " + CFG.SIZES.udder.natural + " (or the name, like loose); cock (or dick) goes by inches, 1 to " + CFG.SIZES.penis.natural + ". For example: ?size udder DD  or  ?size ass slightly gaped  or  ?size cock 9. Plain ?size shows 'em all.");
             break;
           }
           if (lvl > top) {
@@ -38999,7 +39316,7 @@ Welcome to B&B Farm, hon. \u{1F33E}`
           const who = holeArg ? args.slice(0, -1) : args;
           const rest2 = who.map(resolveTarget).filter((t) => t && t !== stud);
           if (!rest2.length) {
-            R("Who're we breedin', sugar? Say ?breed, a name or member number (more than one is fine, separated by spaces), then the hole if you like. You're the stud. The hole can be vulva (or pussy, cunt), butt (or ass, anus, anal), or mouth (or throat, oral). Leave it out and it's vulva. For example: ?breed Bessie  or  ?breed Bessie butt  or  ?breed Bessie Daisy 123456 mouth. While it's open, just roleplay: say cum (or orgasm, climax, breed, fill them up) in your chat or emotes and I'll fill 'em. ?breed stop ends it.");
+            R("Who're we breedin', sugar? Say ?breed, a name or member number (more than one is fine, separated by spaces), then the hole if you like. You're the stud. The hole can be pussy (or cunt), ass (or butt, anal), or mouth (or throat). Leave it out and it's the pussy. For example: ?breed Bessie  or  ?breed Bessie butt  or  ?breed Bessie Daisy 123456 mouth. While it's open, just roleplay: say cum (or orgasm, climax, breed, fill them up) in your chat or emotes and I'll fill 'em. ?breed stop ends it.");
             break;
           }
           if (!rec(stud)) {
@@ -39043,7 +39360,7 @@ Welcome to B&B Farm, hon. \u{1F33E}`
           }
           const holes = args[1] ? holesFrom(args.slice(1).join("")) : ["vulva"];
           if (!t || t === stud || !holes) {
-            R("Here's how, sugar: ?cum, then who (a name or member number, not yourself), then the hole. You're the stud. The hole can be vulva (or pussy, cunt), butt (or ass, anus, anal), or mouth (or throat, oral). Leave it out and it's vulva. For example: ?cum Bessie butt  or  ?cum 123456");
+            R("Here's how, sugar: ?cum, then who (a name or member number, not yourself), then the hole. You're the stud. The hole can be pussy (or cunt), ass (or butt, anal), or mouth (or throat). Leave it out and it's the pussy. For example: ?cum Bessie butt  or  ?cum 123456");
             break;
           }
           cumInto(stud, t, holes, R, false);
@@ -39053,7 +39370,7 @@ Welcome to B&B Farm, hon. \u{1F33E}`
         case "collect": {
           const t = resolveTarget(args[0]);
           if (!t || !rec(t)) {
-            R("Here's how, sugar: ?milk (for milk) or ?collect (for semen), their name or member number, then an amount in mL if you like. Leave the amount out to take it all. For example: ?milk Bessie  or  ?milk Bessie 500  or  ?collect 123456 20");
+            R("Here's how, sugar: ?milk (for milk) or ?collect (for cum), their name or member number, then an amount in mL if you like. Leave the amount out to take it all. For example: ?milk Bessie  or  ?milk Bessie 500  or  ?collect 123456 20");
             break;
           }
           const amt = args[1] ? parseFloat(args[1]) : Infinity;
@@ -39534,6 +39851,7 @@ Welcome to B&B Farm, hon. \u{1F33E}`
               break;
             }
             let cls = String(args[1] || "").toLowerCase(), rest2 = args.slice(2);
+            if (cls === "cock" || cls === "dick") cls = "penis";
             if (!CFG.FAIR_CLASSES.includes(cls)) {
               cls = "show";
               rest2 = args.slice(1);
@@ -39586,7 +39904,7 @@ Welcome to B&B Farm, hon. \u{1F33E}`
             announce("\u{1F3AA}\u{1F3C6} And the " + F.title + " goes to... " + plainName(win) + " (" + shown(win, score) + ")! Blue ribbon" + (r.tierUntil ? " and prize tier for a week" : "") + "." + (ranked[1] ? " Runner-up: " + plainName(ranked[1][0]) + " (" + shown(ranked[1][0], ranked[1][1]) + ")." : ""));
           } else {
             if (!F || !F.open) {
-              R("There's no fair runnin' right now, sugar. Proprietors can start one with ?fair open, a class if they like (show, udder, balls, penis, gape, throat or load), and a title, like ?fair open Harvest Show or ?fair open udder Moo Off.");
+              R("There's no fair runnin' right now, sugar. Proprietors can start one with ?fair open, a class if they like (show, udder, balls, cock, gape, throat or load), and a title, like ?fair open Harvest Show or ?fair open udder Moo Off.");
               break;
             }
             R("\u{1F3AA} " + F.title + " \u2014 here's who's entered:\n\n" + Object.keys(F.entrants).map((m) => {
@@ -39612,7 +39930,7 @@ Welcome to B&B Farm, hon. \u{1F33E}`
             break;
           }
           if ((cls === "load" || cls === "balls" || cls === "penis") && !makesSemen(sender)) {
-            R("This one's for folks with a penis, hon (or futa: ?futa on).");
+            R("This one's for folks with a cock, hon (or futa: ?futa on).");
             break;
           }
           if (cls === "udder" && !makesMilk(sender)) {
@@ -39983,7 +40301,7 @@ Welcome to B&B Farm, hon. \u{1F33E}`
         keepalive();
         runWaiting();
         pump();
-        if (Date.now() - (state.lastMutualAsk || 0) > 6e4) {
+        if (Date.now() - (state.lastMutualAsk || 0) > (roamWatching() ? 6e4 : 12e4)) {
           state.lastMutualAsk = Date.now();
           askMutual();
         }
@@ -40029,6 +40347,7 @@ Welcome to B&B Farm, hon. \u{1F33E}`
         symbioteTick();
         farmLookTick();
         friendCheckTick();
+        awayTick();
         tempOutfitTick();
         tileCareTick();
         workTick();

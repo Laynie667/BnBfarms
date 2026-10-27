@@ -16,6 +16,9 @@
   const VULVA_WORDS = /\b(pussy|pussies|cunt|cunts|slit|womb|clit|cervix)\b/i;
   const TITS_WORDS = /\b(tits?|titties|breasts?|udders?|teats?|cleavage)\b/i;
   const GIRL_WORDS = /\b(girl|heifer|mare|broodmare)\b/i;
+  // the farm's own girls (the farm girl, the dairy girl…) are who they are whoever the line's about (Oct 27: a line naming
+  // the farm girl counted as "a girl word" for a male, so men and nonbinary folk only ever got the lines without her)
+  const NPC_GIRL = /\b(?:farm|kennel|dairy|milk|pig|feed|stable|breeding|creamery) girls?\b/gi;
   function bodyOf(mn){
     const r = rec(mn) || {}, set = r.gender || "", vulva = hasVulva(mn), cock = makesSemen(mn);
     const g = set || (r.futa || (vulva && cock) ? "futa" : vulva ? "female" : "male");
@@ -40,13 +43,14 @@
     if (BODY_TAG.test(s)) return true;                       // a tagged line was written for this body
     if (!b.vulva && VULVA_WORDS.test(s)) return false;
     if (!b.tits && TITS_WORDS.test(s)) return false;
-    if ((b.g === "male" || b.g === "nonbinary") && GIRL_WORDS.test(s)) return false;
+    if ((b.g === "male" || b.g === "nonbinary") && GIRL_WORDS.test(s.replace(NPC_GIRL, ""))) return false;
     return true;
   }
   function pickFor(mn, key, list){
     try {
       if (!Array.isArray(list) || !list.length || !rec(mn)) return pickFresh(key, list);
       const b = bodyOf(mn), tagged = list.filter(l => tagsFit(l, b)), best = tagged.filter(l => wordsFit(l, b));
+      if (W.__FARMHAND_TEST__ && typeof W.__pickSeen === "function") W.__pickSeen(key, list);   // (tests: which pools are thin for which body)
       return pickFresh(key, best.length ? best : tagged.length ? tagged : list);
     } catch(e){ return pickFresh(key, list); }
   }
@@ -55,14 +59,14 @@
   const SWAP_FLAT = [[/\btits\b/g, "chest"], [/\btit\b/g, "nipple"], [/\btitties\b/g, "chest"], [/\bbreasts\b/g, "chest"], [/\bbreast\b/g, "chest"], [/\budders\b/g, "chest"], [/\budder\b/g, "chest"], [/\bteats\b/g, "nipples"], [/\bteat\b/g, "nipple"], [/\bcleavage\b/g, "chest"]];
   const SWAP_FEMBOY = [[/\btits\b/g, "soft little chest"], [/\btitties\b/g, "soft little chest"], [/\bbreasts\b/g, "soft little chest"], [/\bbreast\b/g, "chest"], [/\budders\b/g, "puffy nipples"], [/\budder\b/g, "chest"], [/\bteats\b/g, "puffy nipples"], [/\bteat\b/g, "nipple"], [/\bcleavage\b/g, "chest"]];
   // (the farm girl stays the farm girl whoever she's talkin' about: "the farm boy brushes Rex" was her, Oct 26)
-  const SWAP_NB = [[/\bgood girl\b/g, "good pet"], [/(?<!(?:farm|kennel|dairy|milk) )\bgirl\b/g, "darlin'"], [/\bheifer\b/g, "yearlin'"], [/\bbroodmare\b/g, "breeder"], [/\bmare\b/g, "breeder"]];
-  const SWAP_MALE = [[/\bgood girl\b/g, "good boy"], [/(?<!(?:farm|kennel|dairy|milk) )\bgirl\b/g, "boy"], [/\bheifer\b/g, "steer"], [/\bbroodmare\b/g, "stud"], [/\bmare\b/g, "colt"]];
+  const SWAP_NB = [[/\bgood girl\b/g, "good pet"], [/(?<!(?:farm|kennel|dairy|milk|pig|feed|stable|breeding|creamery) )\bgirl\b/g, "darlin'"], [/\bheifer\b/g, "yearlin'"], [/\bbroodmare\b/g, "breeder"], [/\bmare\b/g, "breeder"]];
+  const SWAP_MALE = [[/\bgood girl\b/g, "good boy"], [/(?<!(?:farm|kennel|dairy|milk|pig|feed|stable|breeding|creamery) )\bgirl\b/g, "boy"], [/\bheifer\b/g, "steer"], [/\bbroodmare\b/g, "stud"], [/\bmare\b/g, "colt"]];
   function bodyWords(mn, text){
     try {
       const written = BODY_TAG.test(String(text));   // a tagged line was written for the body it's shown to: no swappin'
       let t = String(text).replace(BODY_TAG, "");
       if (written || !mn || !L || !L.people || !L.people[mn]) return t;
-      if (!VULVA_WORDS.test(t) && !TITS_WORDS.test(t) && !GIRL_WORDS.test(t)) return t;
+      if (!VULVA_WORDS.test(t) && !TITS_WORDS.test(t) && !GIRL_WORDS.test(t.replace(NPC_GIRL, ""))) return t;
       const b = bodyOf(mn);
       if (!b.vulva) for (const [re, w] of SWAP_NO_VULVA) t = t.replace(re, w);
       if (!b.tits) for (const [re, w] of (b.g === "femboy" ? SWAP_FEMBOY : SWAP_FLAT)) t = t.replace(re, w);
@@ -93,13 +97,21 @@
           "%n's cock twitches and dribbles, spendin' itself a drop at a time on the floor.", "Every stroke knocks a little more out of %n's cock, wasted in the dirt."],
       v: ["%n's pussy is swollen and shinin', and their thighs are slick to the knee.", "Their clit's stood out hard and throbbin', beggin' for a touch it won't get.", "%n's cunt clenches on nothin', drippin' in long strings.",
           "The lips of %n's pussy are puffed up dark and wet, open like they're askin'.", "%n's slit is runnin' like a tap.", "Their pussy flutters and squeezes, tryin' to pull somethin' in.",
-          "You could hear how wet %n is from the gate.", "%n's clit rubs on somethin' with every rock of their hips, and they whine."],
+          "You could hear how wet %n is from the gate.", "%n's clit rubs on somethin' with every rock of their hips, and they whine.",
+          "%n's pussy squelches with every jolt, wet enough to hear across the barn.", "Their thighs shake and their cunt runs, drippin' off their lips in strings.",
+          "%n's clit is swollen and peekin' out, so tender the air alone makes them twitch."],
       fu: ["%n's cock is hard and their pussy's drippin' under it, and neither one is gettin' any mercy.", "Their cock slaps their belly while their cunt runs down their thighs: twice the need and no relief for either.",
            "%n leaks from the tip and from the pussy behind their balls, both at once.", "Cock jerkin', pussy clenchin', tits swingin': every part of %n wants somethin' different and gets none of it.",
-           "%n's balls are tight up against a pussy that's gapin' for it.", "They could breed or be bred, and right now the farm's decided which."],
+           "%n's balls are tight up against a pussy that's gapin' for it.", "They could breed or be bred, and right now the farm's decided which.",
+           "%n's cock bobs hard over a pussy that's soaked through, and they couldn't say which one aches worse.", "Their balls draw up tight against their wet slit, and both of 'em drip into the straw.",
+           "%n's cock leaks down its own shaft while their cunt clenches on nothin' underneath.", "Every jolt slaps %n's cock on their belly and squeezes their pussy: twice the need, and none of it answered.",
+           "The farm doesn't care which end of %n it's usin'. Both of 'em are drippin' anyway."],
       fb: ["%n's pretty little cock is stiff and pink and drippin', and nobody's lookin' at it. They're lookin' at the hole.", "Their soft thighs shake. Their cock dribbles on the floor between them, forgotten.",
            "%n's smooth little sack is drawn up tight under a cock that only ever gets to leak.", "A girlish whimper, a twitch, and %n's cock spits a thin clear thread it never earned.",
-           "%n's cock is too small to matter here. It's their ass the farm has a use for.", "Their hips are wider than a boy's ought to be, and they're pushin' them back for more."],
+           "%n's cock is too small to matter here. It's their ass the farm has a use for.", "Their hips are wider than a boy's ought to be, and they're pushin' them back for more.",
+           "%n's little cock bounces with every shove, stiff and pink and no use to anybody.", "A soft, girlish moan, and %n's cock dribbles on their own thighs.",
+           "%n's smooth thighs are wet with their own leakin', and their hips keep pushin' back.", "Their little cock twitches in its own puddle while their ass gets all the attention.",
+           "%n blushes all the way down their flat chest, and their cock leaks like it's proud of itself."],
     },
     injector: { c: ["The dose goes straight to %n's balls. They can feel them fill.", "%n's cock thickens while the plunger's still goin' down."], v: ["The warmth pools low and %n's pussy goes slick around nothin'.", "%n's clit swells while the plunger's still goin' down."] },
     milker:   { c: ["The sleeve swallows %n's cock to the root and starts to milk, slow, like strippin' a teat.", "%n's balls are cupped and squeezed in time, and the jar ticks fuller.", "It milks %n's cock like any other teat on the farm, and it doesn't care that they're a stud."],
@@ -132,3 +144,4 @@
     cups:     { c: ["%n's cock twitches every time the cups pull.", "%n's chest is drawn up into the glass, nipples stretchin'."], v: ["Every pull on %n's teats makes their pussy clench.", "%n's tits are swellin' in the glass."] },
     weights:  { c: ["The sleeve drains %n's cock dry and keeps goin'.", "%n's balls ache, empty, and already fillin'."] },
   };
+  if (W.__FARMHAND_TEST__) Object.assign(W, { __lineFits: (line, b) => tagsFit(line, b) && wordsFit(line, b) });

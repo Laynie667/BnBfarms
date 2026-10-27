@@ -257,7 +257,8 @@ function companion(mn) {
   else {
     const n = needsOf(mn), x = d.drunk[mn];
     const kind = (v) => (v < 25 ? "alert" : v >= 60 ? "good" : undefined);
-    cards.push({ title: "Barn life", toggles: [tg],
+    // me: on the Livestock panel's Me tab, next to your milk (a Companion 0.46+; older ones show it under Farm extras)
+    cards.push({ title: "Barn life", me: true, toggles: [tg],
       bars: [{ label: "🌾 Food", value: bar(n.food), pct: n.food, kind: kind(n.food) }, { label: "💧 Water", value: bar(n.water), pct: n.water, kind: kind(n.water) },
         { label: "🪮 Grooming", value: bar(n.groom), pct: n.groom, kind: kind(n.groom) }],
       chips: x ? [{ text: "🥛 " + DRUNK[x.lvl], kind: "acc" }] : undefined,

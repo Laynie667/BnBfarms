@@ -148,7 +148,7 @@
                        "milk","collect","heat","heatline","shotlog",
                        "stocks","unstock","walk","tourstop","clockin","clockout","hours","done","chore","chores",
                        "wheel","spin","begphrase","score","drain","denial","ruin","jars","inseminate","nomilk","inspect","edge",
-                       "contract","contracts","zone","zones","voice","machine","edit","corral","uncorral","unbench","purge"];
+                       "contract","contracts","zone","zones","voice","machine","edit","corral","uncorral","unbench","purge","away"];
 
   const SAFETY_CMDS = ["safe","safeword","red","stuck"];
   // staff commands that stock can also use on other stock, with a yes from them first (15-commands.js)
@@ -206,7 +206,7 @@
     if (staffView && r.prod && r.prod.held){
       const p = prodOf(mn), cap = capacity(mn), held = heldTotal(p);
       const parts = HOLES.filter(h => h !== "vulva" || hasVulva(mn) || (p.held.vulva||0) > 0)
-                         .map(h => ({ vulva:"Vulva", butt:"Butt", mouth:"Stomach" })[h]+" "+ml(p.held[h]||0));
+                         .map(h => ({ vulva:"Pussy", butt:"Ass", mouth:"Swallowed" })[h]+" "+ml(p.held[h]||0));
       o += "\n\n🫙 Holding: "+parts.join(" · ")+" ("+Math.round(100*held/Math.max(1, cap))+"% full)";
     }
     // the application they filled in, kept when they were approved (staff, and they themselves)

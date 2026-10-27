@@ -26,7 +26,7 @@
     const pump = wornItem(mn, "ItemNipples", "LactationPump");
     if (pump){
       const lv = Math.min(4, Number(pump.Property && pump.Property.SuctionLevel) || Number(typeRec(pump).typed) || 0);
-      if (lv > 0) g.milk = { kind: "pump", name: "lactation pump", level: lv, ml: CFG.GEAR.PUMP_ML[lv] };
+      if (lv > 0) g.milk = { kind: "pump", name: "milk pump", level: lv, ml: CFG.GEAR.PUMP_ML[lv] };
     }
     // Echo's pump and vendor: the cup bein' attached ("s"/"m" module) isn't the same as runnin'.
     // They're vibratin'-type items, so the strength they're set to (Intensity, -1 = off) is what counts.
@@ -51,12 +51,12 @@
 
   const GEAR_LINES = {
     pump: [
-      ["The lactation pump on %n%'s nipples gives a soft, steady little tug. Milk beads and drips into the bottles, +%ml%.",
+      ["The milk pump on %n%'s nipples gives a soft, steady little tug. Milk beads and drips into the bottles, +%ml%.",
        "%n%'s pump hums along nice and gentle, coaxin' out warm milk a drop at a time, +%ml%."],
-      ["The lactation pump pulls in a slow, firm rhythm, and %n%'s teats stretch into the cups with every draw, +%ml%.",
+      ["The milk pump pulls in a slow, firm rhythm, and %n%'s teats stretch into the cups with every draw, +%ml%.",
        "Milk runs in steady streams down the pump's tubes from %n%'s swollen nipples, +%ml%."],
       ["The pump on %n% sucks hard, stretchin' those nipples long, and the bottles fill fast. %n% squirms in it, +%ml%.",
-       "%n%'s lactation pump is cranked up high. Every pull wrings a hot spurt of milk out of 'em, +%ml%."],
+       "%n%'s milk pump is cranked up high. Every pull wrings a hot spurt of milk out of 'em, +%ml%."],
     ],
     echo: [
       ["The %g% on %n% sighs along, and a thin line of milk creeps up the hose, +%ml%.",

@@ -8,6 +8,8 @@
   function keepalive(){
     const now = Date.now();
     if (now - state.lastKeepalive < CFG.KEEPALIVE_MIN*60000) return;
+    // anything else sent lately keeps the connection just as awake: no need for a message to the whole room (Oct 27)
+    if (now - (state.sentAt || 0) < CFG.KEEPALIVE_MIN*60000) return;
     state.lastKeepalive = now;
     // invisible server traffic — resets any idle timer, shows nothing in chat
     send("ChatRoomChat", { Content:"BnBKeepAlive", Type:"Hidden" });
@@ -288,7 +290,7 @@
         // (not knowin' who can see them: a scene's other person gets a copy only if they're out of range)
         const far = m => { const p = charFor(by) && charFor(by).MapData && charFor(by).MapData.Pos, q = charFor(m) && charFor(m).MapData && charFor(m).MapData.Pos;
                            return !p || !q || Math.max(Math.abs(p.X-q.X), Math.abs(p.Y-q.Y)) > CFG.SPEAKER_RANGE; };
-        for (const m of new Set(parties.concat(also))) if (m !== by && (!seen ? also.includes(m) && far(m) : !seen.has(m))) privateTo(m, t, "emote");
+        linesTo([...new Set(parties.concat(also))].filter(m => m !== by && (!seen ? also.includes(m) && far(m) : !seen.has(m))), t, "emote", false, true);
         return;
       }
       // 2. otherwise: the speaker spot near them, or privately to whoever's near them. No walkin' over.
@@ -298,7 +300,7 @@
         const who = new Set();
         for (const a of parties){ const s = audienceFor(a, t, "emote"); if (s) for (const m of s) who.add(m); }
         for (const m of also) who.add(m);
-        if (who.size){ for (const m of who) privateTo(m, t, "emote"); return; }
+        if (who.size){ linesTo([...who], t, "emote", false, true); return; }
       }
     } else if (mapRoom() && CFG.SPEAKER_MODE !== "walk"){ toEveryone(t, "emote"); return; }   // about nobody: everybody hears it
     // about somebody on a map, and nobody around them to tell: only them, never a public emote
@@ -352,24 +354,35 @@
     const who = new Set();
     for (const a of new Set([r.by, r.subject])){ const s = a && audienceFor(a, r.text, "emote"); if (s) for (const m of s) who.add(m); }
     if (!who.size){ for (const c of splitMessage(r.text, 900)) enqueue({ Content:"*"+c, Type:"Emote" }); return; }
-    for (const m of who) privateTo(m, r.text, "emote");
+    linesTo([...who], r.text, "emote", false, true);
   }
   // one line, privately, drawn in their chat (Companion) or whispered out-of-character
-  function privateTo(mn, text, kind){
-    noteLine(mn, text);   // for ?meh / ?more (10q-feedback.js)
-    const line = (kind === "emote" ? "*" : "")+String(wordsFor(mn, text));
-    if (hasCompanion(mn)) enqueue(makeMsg("roomline", { text: line, kind }, mn));
-    else for (const part of splitMessage(line, 900)) enqueue({ Content: "("+part.replace(/\(/g, "[").replace(/\)/g, "]"), Type:"Whisper", Target: mn });
+  function privateTo(mn, text, kind){ linesTo([mn], text, kind, false, true); }
+  function lineTo(mn, line, kind, urgent){
+    if (hasCompanion(mn)) enqueue(makeMsg("roomline", { text: line, kind }, mn), urgent);
+    else for (const part of splitMessage(line, 900)) enqueue({ Content: "("+part.replace(/\(/g, "[").replace(/\)/g, "]"), Type:"Whisper", Target: mn }, urgent);
+  }
+  // the same line to several people: Companions 0.46+ that get the very same words share ONE room-wide message that
+  // names them, instead of one message each through the bot's connection (Laynie, Oct 27: "limit how much has to be
+  // sent via my connection"). own: their own words for themselves go in, and it counts for ?meh / ?more
+  function linesTo(list, text, kind, urgent, own){
+    const shared = new Map();
+    for (const mn of new Set(list)){
+      if (!mn || mn === CFG.BOT_MEMBER) continue;
+      if (own) noteLine(mn, text);   // for ?meh / ?more (10q-feedback.js)
+      const line = (kind === "emote" ? "*" : "")+String(own ? wordsFor(mn, text) : text);
+      const c = state.companions.get(mn);
+      if (hasCompanion(mn) && c && verAtLeast(c.ver, "0.46.0")){ shared.set(line, (shared.get(line) || []).concat(mn)); continue; }
+      lineTo(mn, line, kind, urgent);
+    }
+    for (const [line, to] of shared){
+      if (to.length === 1) lineTo(to[0], line, kind, urgent);
+      else enqueue(makeMsg("roomlines", { to, text: line, kind }), urgent);
+    }
   }
   // an announcement about nobody in particular, on a map: privately to everybody here
   function toEveryone(text, kind, urgent){
-    const line = (kind === "emote" ? "*" : "")+String(text);
-    for (const c of (W.ChatRoomCharacter||[])){
-      const mn = c.MemberNumber;
-      if (mn === CFG.BOT_MEMBER) continue;
-      if (hasCompanion(mn)) enqueue(makeMsg("roomline", { text: line, kind }, mn), urgent);
-      else for (const part of splitMessage(line, 900)) enqueue({ Content: "("+part.replace(/\(/g, "[").replace(/\)/g, "]"), Type:"Whisper", Target: mn }, urgent);
-    }
+    linesTo((W.ChatRoomCharacter||[]).map(c => c.MemberNumber), text, kind, urgent, false);
   }
 
   /* SPEAKER SPOTS AS MY VOICE (CFG.SPEAKER_MODE "voice"): I stay put. The speaker spot nearest the action
@@ -380,11 +393,7 @@
   function speakerSend(anchor, text, kind, urgent){
     const who = audienceFor(anchor, text, kind);
     if (!who) return false;   // nobody to anchor it to: fall back to the room
-    const line = (kind === "emote" ? "*" : "")+String(text);
-    for (const mn of who){
-      if (hasCompanion(mn)) enqueue(makeMsg("roomline", { text: line, kind }, mn), urgent);
-      else for (const c of splitMessage(line, 900)) enqueue({ Content: "("+c.replace(/\(/g, "[").replace(/\)/g, "]"), Type:"Whisper", Target: mn }, urgent);
-    }
+    linesTo([...who], text, kind, urgent, false);
     return true;
   }
   // everybody a line about someone should reach: them, whoever it names, and whoever can see/hear them
@@ -473,6 +482,29 @@
     enqueue(makeMsg("ping", { ver:VERSION }, mn), true);
     later(()=>{ const c = state.companions.get(mn); if (c && c.at < t0){ state.companions.delete(mn); log("Companion of "+mn+" didn't answer; sendin' plain text from now on."); } }, 30000);
   }
+  // an older Companion than the one that came out with this bot: they're told, once a day for each new version, in
+  // their panel and with a real beep if the bot's on their friend list (Laynie, Oct 27: "when the bot detects a
+  // companion that needs updating, it should send a beep or notice")
+  function companionOutdated(mn, ver){
+    if (mn === CFG.BOT_MEMBER || !/^\d+\.\d+\.\d+$/.test(ver) || verAtLeast(ver, COMPANION_VERSION)) return;
+    const r = rec(mn), told = r ? r.updateTold : (state.updateTold || (state.updateTold = new Map())).get(mn);
+    if (told && told.v === COMPANION_VERSION && Date.now() - told.at < 24*3600000) return;
+    const note = { v: COMPANION_VERSION, at: Date.now() };
+    if (r){ r.updateTold = note; saveLedger(); } else state.updateTold.set(mn, note);
+    const text = "🌾 Your Farmhand Companion is v"+ver+", sugar, and v"+COMPANION_VERSION+" is out. Click the Tampermonkey icon, then \"Check for userscript updates\", "+
+                 "then reload the game. (Or install it again from the farm's page: github.com/Laynie667/BnBfarms#install)";
+    later(() => {
+      if (!hasCompanion(mn)) return;
+      toCompanion(mn, text, "notice");
+      if (canBeep(mn)) send("AccountBeep", { MemberNumber: mn, BeepType: "", Message: text });
+    }, 8000);
+  }
+  // panel updates for somebody still waitin' in the send queue (a fresh whole panel is on its way instead)
+  function dropQueuedPanels(mn){
+    const isPanel = x => x && x.ev === "ChatRoomChat" && x.data && x.data.Type === "Hidden" && x.data.Target === mn && x.data.Dictionary &&
+                         (x.data.Dictionary.type === "state" || x.data.Dictionary.type === "stateDiff");
+    for (const lane of [state.urgent, state.replies || [], state.queue]) for (let i = lane.length - 1; i >= 0; i--) if (isPanel(lane[i])) lane.splice(i, 1);
+  }
   function onCompanion(m){
     const mn = m.from;
     if (!mn) return;
@@ -483,11 +515,22 @@
     if (m.type === "sight"){ onSight(mn, m); return; }
     if (m.type === "leadOk" || m.type === "leadNo"){ leadAnswer(mn, m); return; }
     if (m.type === "hello"){
-      state.companions.set(mn, { at:Date.now(), ver:String(m.ver||"?"), relay: m.relay !== false, off: (m.off && typeof m.off === "object") ? m.off : {} });
-      log("Companion hello from "+mn+" (v"+(m.ver||"?")+")");
-      enqueue(makeMsg("welcome", { ver:VERSION, proto:PROTOCOL, name:plainName(mn), staff:isStaff(mn), look:farmLookAt() }, mn));   // look: which farm look for the drawn body the bot has (10y9e-farm-look.js)
+      // LAG (Laynie, Oct 27: "limit how much has to be sent via my connection"): every hello used to wipe what I knew
+      // about that panel, so the half-hourly hello, the ping and every switch flipped sent the whole panel and the whole
+      // store again, to everybody. A Companion 0.46+ says which panel it holds (seq) and which store (sh): if that's
+      // exactly what I last sent it, it keeps it, and only what changed goes after.
+      const ver = String(m.ver||"?"), old = state.companions.get(mn);
+      const keep = !!(old && !m.again && m.seq && old.seq === m.seq && old.ver === ver);
+      const c = keep ? old : { ver };
+      c.at = Date.now(); c.relay = m.relay !== false; c.off = (m.off && typeof m.off === "object") ? m.off : {};
+      if (typeof m.sh === "string") c.lastStoreH = m.sh;   // the store it has saved from last time
+      if (!keep) dropQueuedPanels(mn);   // a panel still waitin' to go would only be patched onto the wrong one
+      state.companions.set(mn, c);
+      if (!keep) log("Companion hello from "+mn+" (v"+(m.ver||"?")+")");
+      if (!keep || !m.w) enqueue(makeMsg("welcome", { ver:VERSION, proto:PROTOCOL, name:plainName(mn), staff:isStaff(mn), look:farmLookAt() }, mn));   // look: which farm look for the drawn body the bot has (10y9e-farm-look.js)
       later(()=>syncCompanions(), 800);
       try { companionTooOld(mn, String(m.ver||"")); } catch(e){}
+      try { if (!keep) companionOutdated(mn, ver); } catch(e){ warn("update note:", e); }
       { const r = rec(mn); if (r && r.outfitOwed) later(() => contractOutfitNow(mn), 2500); if (r && r.tempOutfit && r.tempOutfit.due) later(() => tempOutfitEnd(mn, r.tempOutfit && r.tempOutfit.due), 2000); }   // an outfit their contract still owes them (10c-outfits.js)
       return;
     }

@@ -145,28 +145,40 @@
   }
   // the store's shelf was 11 KB of every 13 KB panel: a Companion 0.45+ gets it on its own, only when it changes
   const storeApart = (c) => { const m = /^(\d+)\.(\d+)\./.exec(String((c && c.ver) || "")); return !!m && (+m[1] > 0 || +m[2] >= 45); };
+  // a short fingerprint of the shelf: a Companion 0.46+ keeps the store it was sent (even over a reload) and says which
+  // one in its hello, so the 11 KB only goes again when a price or an item really changed
+  function shelfHash(text){
+    let h = 2166136261;
+    for (let i = 0; i < text.length; i++){ h ^= text.charCodeAt(i); h = Math.imul(h, 16777619); }
+    return (h >>> 0).toString(36)+"."+text.length.toString(36);
+  }
   function syncNow(){
     for (const [mn, c] of state.companions){
       if (!hasCompanion(mn)) continue;
       let s; try { s = stateFor(mn); } catch(e){ warn("state for "+mn+":", e); continue; }   // one bad record never stalls everyone's panel
       if (storeApart(c) && s.store){
-        const sk = JSON.stringify(s.store); delete s.store;
-        if (c.lastStore !== sk){ c.lastStore = sk; enqueue(makeMsg("store", { items: JSON.parse(sk) }, mn)); }
+        const sk = JSON.stringify(s.store), h = shelfHash(sk); delete s.store;
+        if (c.lastStoreH !== h){ c.lastStoreH = h; enqueue(makeMsg("store", { items: JSON.parse(sk), h }, mn)); }
       }
       const key = JSON.stringify(Object.assign({}, s, { at: 0 }));
       if (c.lastState === key) continue;
+      // every panel I send gets a number; a patch says which panel it goes on (base), so a Companion that missed one asks
+      // for a whole panel instead of patchin' the wrong one
+      const seq = ++state.syncSeq;
       // a 0.45+ Companion that has a panel already gets only the parts that changed
       if (storeApart(c) && c.lastParts){
         const set = {}, del = [], parts = {};
         for (const k of Object.keys(s)){ const v = JSON.stringify(s[k]); parts[k] = v; if (k !== "at" && c.lastParts[k] !== v) set[k] = s[k]; }
         for (const k of Object.keys(c.lastParts)) if (!(k in s)) del.push(k);
         c.lastState = key; c.lastParts = parts;
-        enqueue(makeMsg("stateDiff", { set, del }, mn));
+        enqueue(makeMsg("stateDiff", { set, del, base: c.seq || 0, seq }, mn));
+        c.seq = seq;
         continue;
       }
       c.lastState = key;
       if (storeApart(c)){ c.lastParts = {}; for (const k of Object.keys(s)) c.lastParts[k] = JSON.stringify(s[k]); }
-      enqueue(makeMsg("state", { state: s }, mn));
+      enqueue(makeMsg("state", { state: s, seq }, mn));
+      c.seq = seq;
     }
   }
 

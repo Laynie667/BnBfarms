@@ -28,9 +28,15 @@
   async function storeGet(k){ const db = await storeDb(); return new Promise((ok, no) => { const rq = db.transaction("kv").objectStore("kv").get(k); rq.onsuccess = () => ok(rq.result); rq.onerror = () => no(rq.error); }); }
   async function storePut(k, v){ const db = await storeDb(); return new Promise((ok, no) => { const tx = db.transaction("kv", "readwrite"); tx.objectStore("kv").put(v, k); tx.oncomplete = () => ok(true); tx.onerror = () => no(tx.error); }); }
 
-  // every save of the books (03-ledger.js) lands here too
+  // every save of the books (03-ledger.js) lands here too, at most once a minute (the newest one waits its turn)
   function storeMirror(json){
-    storePut("ledger", { at: Date.now(), json }).then(() => { STORE.savedAt = Date.now(); }).catch(e => { STORE.err = String(e && e.message || e); });
+    STORE.pending = json;
+    if (STORE.mirrorTimer) return;
+    STORE.mirrorTimer = later(() => {
+      STORE.mirrorTimer = null; const j = STORE.pending; STORE.pending = null; if (!j) return;
+      STORE.mirrorAt = Date.now();
+      storePut("ledger", { at: Date.now(), json: j }).then(() => { STORE.savedAt = Date.now(); }).catch(e => { STORE.err = String(e && e.message || e); });
+    }, Math.max(0, (STORE.mirrorAt || 0) + 60000 - Date.now()));
   }
   // start-up: Tampermonkey's copy is missing but the database has one: put it back and start again
   function storeRecover(rawWasEmpty){

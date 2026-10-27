@@ -163,11 +163,11 @@ THE STOCKS
     barn: `🥛 THE BARN 🥛
 
 COMMANDS
-  ?stats · your milk, semen, sizes, how full you are
+  ?stats · your milk, cum, sizes, how full you are
   ?board · today's and this week's yield, and top sires
   ?milkable on|off · make milk (stock does by default)
   ?seedmilk on|off · the stall and milkin' traps take your seed too (on)
-  ?futa on|off · make milk and semen both
+  ?futa on|off · make milk and cum both
   ?quota · your daily milk quota and streak
 
 GETTIN' MILKED
@@ -179,7 +179,7 @@ GETTIN' MILKED
   • Everybody sees milkin' and nursin' as a room emote.
 
 FILLIN' UP
-  • Milk and semen fill by the hour, even while you're away. Cows fill
+  • Milk and cum fill by the hour, even while you're away. Cows fill
     twice as fast; pregnancy and a fresh birth faster still.
   • Full for a whole day and you start leakin', and everybody sees it.
 
@@ -190,7 +190,7 @@ QUOTA · stock owes the pail 1 L a day (staff can change yours)
 
 MILK GRADE (A+ to D) · the average of your last 5 milkin's
   Helps: milked every 6–16 hours, higher tier, fresh birth, heat,
-         a lactation shot or item
+         a milk-maker shot, or a "lactation" item
   Hurts: milked again inside 2 hours, left over 36 hours, leakin'
          for a day, a punishment tier`,
 
@@ -299,7 +299,7 @@ I read words in a crafted item's name or description, like LSCG does.
 INJECTORS · use Inject on someone
   Production
     lactation · milk doubles for a day
-    virility · semen doubles for a day
+    virility · cum doubles for a day
     fertility · catchin' doubles for a day
     contraceptive · no catchin' for two days
     egg laying (or clutch) · any stud can leave a clutch of eggs, 3x as likely
@@ -313,7 +313,7 @@ INJECTORS · use Inject on someone
     (worn, those two work for as long as you wear the item)
     heat inducer · heat now  ·  suppressant · heat ends
   Stackin'
-    Doses stack. A second lactation shot while the first is still
+    Doses stack. A second dose of the same while the first is still
       workin' makes it triple, a third four times, up to five deep.
     Put x2 to x5 on the needle for that many doses in one go:
       "lactation x3", "udder growth x2", "hyper pregnancy x2".
@@ -338,7 +338,7 @@ TOYS THAT ACT ON THEIR OWN · crafted words on what you wear
       pussy · ass (anal) · throat
     grow: grow, growth, enlarger, swell, gape, stretch, trainer…
     shrink: shrink, reducer, tightener, restorer…
-    e.g. "Shrink Penis", "Grow Balls", "Big Tit Growth Serum",
+    e.g. "Shrink Cock", "Grow Balls", "Big Tit Growth Serum",
     "Pussy Stretching Shot". Each one is a step, with a room emote.
   Cocks · canine, equine, feline (barbed), draconic, double cock,
     humanizer, knotting, knot remover · see ?help cocks
@@ -358,29 +358,29 @@ GOOD TO KNOW
 
 COMMANDS
   ?size · your sizes (only the parts you've got)
-  ?size <part> <size> · set one, e.g. ?size udder DD · ?size penis 9
+  ?size <part> <size> · set one, e.g. ?size udder DD · ?size cock 9
   ?measure · I measure you out loud for the room
-  ?futa on|off · cock and vulva both, milk and semen both
+  ?futa on|off · cock and pussy both, milk and cum both
   ?gender female|male|futa|femboy|nonbinary · how the farm sees you (picks your outfit)
   ?chest flat|tits · what's up top, as the farm's lines see you (nonbinary goes by your body otherwise)
 
 THE PARTS
   Udder · bra cup, AA to H. Bigger makes and holds more milk.
   Balls · 1 to 10. Bigger makes bigger loads.
-  Penis · inches, up to 14". Too big for a hole stretches it.
-  Vulva / Butt · tight, snug, slightly gaped, gaped, loose… ruined.
+  Cock · inches, up to 14". Too big for a hole stretches it.
+  Pussy / Ass · tight, snug, slightly gaped, gaped, loose… ruined.
     Stretched holes tighten a level a day; looser drains faster.
   Throat · gaggy to bottomless. Too big gags some back up, and every
     3 of those trains it a level.
   Cock and balls only show if you've got 'em; udder if you're milkable
-  or have a vulva. ?help cocks for types and knots.
+  or have a pussy. ?help cocks for types and knots.
 
 ✨ HYPER (shots only)
-  • Udder to an R cup, balls, gape and throat to 20, penis to 30".
+  • Udder to an R cup, balls, gape and throat to 20, cock to 30".
   • A P cup or size-17 balls pins you where you stand till a reducer.
 
 GOOD TO KNOW
-  • Pent up: semen full for a day (12h caged) and your next load
+  • Pent up: balls full for a day (12h caged) and your next load
     empties everything, half again more, and extra fertile.
   • Stamina: past 3 loads in an hour each one's smaller.
   • Swallow a big load and you fill faster for an hour.`,
@@ -388,9 +388,9 @@ GOOD TO KNOW
     cocks: `🍆 COCKS, KNOTS & CUMFLATION 🍆
 
 COMMANDS
-  ?penis · your cock (?cock works too)
-  ?penis types · the list
-  ?penis <type> · set yours, e.g. ?penis equine
+  ?cock · your cock (?penis works too)
+  ?cock types · the list
+  ?cock <type> · set yours, e.g. ?cock equine
 
 THE TYPES
   human · the usual
@@ -562,7 +562,7 @@ COMMANDS
 
 THE CLASSES
   show · stock only, staff judge 1 to 10, best average wins
-  udder, balls, penis, gape, throat · I measure everyone at the
+  udder, balls, cock, gape, throat · I measure everyone at the
     close; biggest wins, judges' scores break a tie
   load · studs ?enter, then ?cum; biggest single load wins
 
@@ -594,7 +594,10 @@ RECORDS
      aftercare, notes, or app.<question>; clear empties one
   ?signed <who> · flip their contract signed or not
   ?addfriend <who> · friend 'em so my beeps reach 'em
-  ?unregister <who> · archive (herdmasters and up)`,
+  ?unregister <who> · archive (herdmasters and up)
+  ?away · who's been off the farm longest. Livestock and guests
+     two weeks away come off the books on their own (never staff,
+     the proprietors or a permanent contract)`,
 
     herd: `🐄 YOUR HERD (staff)
 
@@ -637,7 +640,7 @@ CARDS
 
 MILKIN' & COLLECTIN'
   ?milk <who> [mL] · milk 'em by hand (all of it if left out)
-  ?collect <who> [mL] · collect semen, bottled as a seed jar
+  ?collect <who> [mL] · collect their cum, bottled as a seed jar
   ?stats <who> · anybody's numbers
 
 SEED JARS
@@ -823,7 +826,7 @@ THE FARM
   ?notice <text> · ?notice clear
   ?feeding on|off · ?curfew on|off (leave it out to flip)
   ?fair open [class] [title] · ?fair close
-     classes: show, udder, balls, penis, gape, throat, load
+     classes: show, udder, balls, cock, gape, throat, load
      e.g. ?fair open udder Moo Off
 
 YOU

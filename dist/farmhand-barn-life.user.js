@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm add-on: Barn life
 // @namespace    bnbfarm
-// @version      1.3.0
+// @version      1.4.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-barn-life.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-barn-life.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -903,6 +903,7 @@
       const kind = (v) => v < 25 ? "alert" : v >= 60 ? "good" : void 0;
       cards.push({
         title: "Barn life",
+        me: true,
         toggles: [tg],
         bars: [
           { label: "\u{1F33E} Food", value: bar(n.food), pct: n.food, kind: kind(n.food) },

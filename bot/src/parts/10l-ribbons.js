@@ -111,8 +111,8 @@
     { id: "dedicate",  name: "A dedication",          price: 2,  desc: "The farm girl sings somebody's praises (or teases 'em, if they like that) from you. ?buy dedicate <who> praise|tease" },
     { id: "bounty",    name: "A bounty",              price: 0,  desc: "Pin ribbons to a job; the hand who does it collects. ?buy bounty <ribbons> <the job>" },
     { id: "mysterybox", name: "A mystery box",       price: 4,  desc: "Somethin' lovely is inside. It puts itself on, and it does somethin' to you till it comes off. ?mysterybox opens one." },
-    { id: "shot-milk",  name: "A lactation shot",     price: 6,  desc: "Milk doubles for a day." },
-    { id: "shot-semen", name: "A virility shot",      price: 6,  desc: "Semen doubles for a day." },
+    { id: "shot-milk",  name: "A milk-maker shot",    price: 6,  desc: "Milk doubles for a day." },
+    { id: "shot-semen", name: "A virility shot",      price: 6,  desc: "Your cum doubles for a day." },
     { id: "shot-fert",  name: "A fertility shot",     price: 6,  desc: "Catchin' doubles for a day." },
     { id: "shot-contra",name: "A contraceptive shot", price: 4,  desc: "No catchin' for two days." },
     { id: "shot-hyper", name: "A hyper pregnancy shot", price: 9, words: "hyper pregnancy", limit: "breed", desc: "For a day, anything that takes comes in as a huge litter. Stacks." },
@@ -124,6 +124,16 @@
     { id: "shot-ass",   name: "An ass growth shot",   price: 7,  words: "ass growth", part: "butt", desc: "Ass a size bigger, for good." },
     { id: "shot-balls", name: "A ball growth shot",   price: 7,  words: "balls growth", part: "testes", desc: "Balls a size heavier, for good." },
     { id: "shot-cock",  name: "A cock growth shot",   price: 7,  words: "cock growth", part: "penis", desc: "Cock a size bigger, for good." },
+    // shrinkin' shots: everything that grows can come back down, a size at a time, for good (Laynie, Oct 27: "I also need
+    // shots added to the store to reduce the size of all the things")
+    { id: "shot-udder-down",  name: "An udder shrinkin' shot", price: 7, words: "udder reducing", part: "udder", down: true, shelf: "shrink", desc: "Tits a size smaller and lighter, for good." },
+    { id: "shot-balls-down",  name: "A ball shrinkin' shot",   price: 7, words: "ball reducing", part: "testes", down: true, shelf: "shrink", desc: "Balls a size lighter, for good." },
+    { id: "shot-cock-down",   name: "A cock shrinkin' shot",   price: 7, words: "cock reducer", part: "penis", down: true, shelf: "shrink", desc: "Cock a size smaller, for good." },
+    { id: "shot-knot-down",   name: "A knot shrinkin' shot",   price: 7, words: "knot reducer", part: "knot", down: true, shelf: "shrink", desc: "Knot a size smaller, for good." },
+    { id: "shot-ass-down",    name: "An ass tightenin' shot",  price: 7, words: "ass tightener", part: "butt", down: true, shelf: "shrink", desc: "Ass a size tighter, for good." },
+    { id: "shot-pussy-down",  name: "A pussy tightenin' shot", price: 7, words: "pussy tightener", part: "vulva", down: true, shelf: "shrink", desc: "Pussy a size tighter, for good." },
+    { id: "shot-throat-down", name: "A gag reflex shot",       price: 7, words: "throat tightener", part: "throat", down: true, shelf: "shrink", desc: "Throat a step tighter, gag and all, for good." },
+    { id: "shot-shrink",      name: "A belly shrinkin' shot",  price: 6, words: "reducing", down: true, shelf: "shrink", desc: "You hold less, for good. Whatever's in you past that spills out." },
   ];
   function storeItems(){
     const S = L.store || {}, price = S.price || {}, off = S.off || {};
@@ -142,7 +152,8 @@
     return "🛍️ THE FARM STORE · you've got "+ribbonsOf(mn)+" ribbons\n"+
       "\nTREATS & FAVORS\n"+items.filter(it => !it.potion && !it.id.startsWith("shot") && it.shelf !== "mess").map(row).join("\n")+
       "\n\nMESSES (?buy <one> for <who>: they say yes first, unless they're ?messes on)\n"+items.filter(it => it.shelf === "mess").map(row).join("\n")+
-      "\n\nSHOTS\n"+items.filter(it => it.id.startsWith("shot")).map(row).join("\n")+
+      "\n\nSHOTS\n"+items.filter(it => it.id.startsWith("shot") && it.shelf !== "shrink").map(row).join("\n")+
+      "\n\nSHRINKIN' SHOTS (a size back down, for good)\n"+items.filter(it => it.shelf === "shrink").map(row).join("\n")+
       "\n\nPOTIONS (they wear off · ?potions on to let others gift you one)\n"+items.filter(it => it.potion).map(row).join("\n")+
       "\n\n?buy <item> · ?buy <potion> for <who> (they say yes first) · ?potions shows what each one does";
   }
@@ -282,6 +293,11 @@
         if (it.id.startsWith("shot-") && it.words){   // the newer shots: the same words a crafted needle carries
           if (it.limit && limitBlocks(sender, it.limit)){ R("Your hard limits rule that one out, sugar, so I'll keep it on the shelf."); return; }
           if (it.part && !hasPart(sender, it.part)){ R("💉 That shot's got nothin' to work on in you, sugar, so I'll keep it on the shelf."); return; }
+          // a shrinkin' shot on somethin' already as small as it goes: no charge
+          if (it.down && (it.part ? sizeOf(sender, it.part) <= 1 : !(prodOf(sender).capBonus > 0))){
+            const what = !it.part ? "belly" : it.part === "udder" && !bodyOf(sender).tits ? "chest" : CFG.SIZES[it.part].label.toLowerCase();
+            R("💉 Your "+what+" can't go any "+(it.part && CFG.SIZES[it.part].gape ? "tighter" : "smaller")+", sugar. Keep your ribbons."); return;
+          }
           spendRibbons(sender, price, it.name);
           const ok = applyShot(sender, CFG.BOT_MEMBER, it.words, { open: "The farm girl pinches up a bit of "+plainName(sender)+"'s flank and slides the needle in, quick and practiced. \"There. You'll feel that by supper.\"", from: "the farm girl's shot" });
           if (!ok){ earnRibbons(sender, price, "a shot that had nothin' to work on", 0, true); R("💉 That shot's got nothin' to work on in you, sugar. Your ribbons are back in your purse."); return; }

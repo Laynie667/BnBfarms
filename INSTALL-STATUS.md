@@ -1,19 +1,19 @@
 # What to install (current versions)
 
-Updated 2026-10-26. Every file is in the `dist/` folder (it syncs through OneDrive, so the phone app has it too).
+Updated 2026-10-27. Every file is in the `dist/` folder (it syncs through OneDrive, so the phone app has it too).
 In Tampermonkey's dashboard, compare each script's version with this list. Anything already at these versions is up to date.
 
 | Script | File in `dist/` | Where it runs | Current |
 |---|---|---|---|
-| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.51.0** |
+| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.52.0** |
 | Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.10.0** |
 | Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.2.1** |
 | Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **1.1.0** |
-| Barn life | `farmhand-barn-life.user.js` | the bot's PC | **1.3.0** |
+| Barn life | `farmhand-barn-life.user.js` | the bot's PC | **1.4.0** |
 | Map tools, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.4** |
 | Dairy | `farmhand-dairy.user.js` | the bot's PC | **1.1.0** |
 | Shows | `farmhand-shows.user.js` | the bot's PC | **1.1.0** |
-| Farmhand Companion | `farmhand-companion.user.js` | each player | **0.45.0** |
+| Farmhand Companion | `farmhand-companion.user.js` | each player, and the bot's own tab | **0.46.0** |
 | Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.4** |
 
 ## Sending a watch report
@@ -24,6 +24,20 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 ## Latest changes (newest first)
 
+- **Bot 0.52.0 + Companion 0.46.0 + Barn life 1.4.0: less traffic on your connection, the away rule, shrinkin' shots.** Laynie, Oct 27: "looking for what can be merged into the companion to help with lag, and limit how much has to be sent via my connection", plus barn life on the Me tab, shots to shrink things, an update notice for old Companions, and taking people off the books after two weeks away.
+  - **Update the bot's own tab to Companion 0.46 first.** Most of the savings only switch on there.
+  - **Hellos don't cost a resend any more.** Every Companion says which panel and which store shelf it already holds (the shelf is kept on that computer), so a reload, a re-hello or a ping no longer sends the whole store and panel again. In testing, 10 Companions over 10 minutes went from 322 KB to 45 KB.
+  - **One room line for many people.** A line that goes to several Companions at once (a room emote, an announcement) is sent once, and each Companion shows it only if it names them.
+  - **Your look goes out in pieces.** When the farm splatters you, writes on you or puts a piece of gear on, only those pieces go to the room (the way the game sends someone tying you up), gathered for under a second. Big changes (an outfit, strip, dress) still go whole, once.
+  - **The farm girl's own screen isn't drawn.** On the bot's account the room isn't drawn at all, so its tab doesn't download and draw everyone's items. To sit at its keyboard: Preferences, Extensions, Farmhand Companion, "Draw the room on the farm girl's screen".
+  - **Quieter in the background:** sight reports at most every 8 seconds, the friends check every 2 minutes (every minute while a summonable pet is out), the ledger saved at most every 5 seconds (and when the tab closes), keepalives only when nothing else went out, and a whitelist add that never sticks is tried 3 times, then left for an hour.
+  - **Old Companions are told.** When someone arrives with an older Companion, a few seconds later they get a note and a beep with how to update (Tampermonkey, "Check for userscript updates", reload). Once a day per version at most.
+  - **Barn life on the Me tab.** Food, water, grooming and milk-drunk sit on the Companion's Me tab now, not only in Farm extras.
+  - **Shrinkin' shots** (the store's new shelf, a size back down for good): udder, balls, cock, knot (7 ribbons each), ass, pussy, throat (7) and belly (6). At the smallest size the shot refuses and keeps your ribbons.
+  - **Away two weeks, off the books.** Livestock, guests and luxury guests who haven't been in the farm room with the bot for 14 days are taken off the books (the same as `?unregister`: paperwork archived, keys pulled, off the whitelist), told by beep or a kept note, and staff are told. A note goes out at 12 days, and steppin' into the room clears it. Never staff, the proprietors, or anybody on a signed permanent contract. The days only count while the bot is in the room, so a bot that's off never costs anybody their place. Everybody's clock started with this release. `?away` (staff) shows who's furthest along.
+  - **Plainer words.** Stats, help, the store and room lines say cock, pussy, ass and cum instead of penis, vulva, butt and semen (the old words still work when you type them). "A milk-maker shot", the "milk pump", and "Jar breedin'" on the Companion. `?fair open cock` works.
+  - **More variety.** Lines that name the farm girl (or the dairy, kennel, pig, feed, stable or breeding girl) were being skipped for men and nonbinary folk, as if she were a word about *them*, so they saw fewer versions and more repeats. Now everybody gets them, and "the pig girl" never turns into "the pig boy". More lines for every shot (virility had one, now five), more body lines for futas, femboys and pussies, and flat-chest versions in the teat check, slop, feedbag and rubber stall traps. Every trap was sprung on six bodies (female and male cow, femboy bunny, futa and female pony, male goblin): about 1,050 to 1,100 different lines each, none about a part they haven't got, no clinical words, and a fifth fewer repeats than before (the futa body's went from 74 to 44).
+  - **Fixed:** a shaky glory stall test; the hello asking for a whole panel again now carries your switches too.
 - **Bot 0.51.0 + Companion 0.45.0 + Barn life 1.3.0: less lag, water and grooming, the farm girl's brush, sire bottles.** Laynie, Oct 26.
   - **Less traffic to every Companion.** Panel updates are bunched (many changes in a quarter second go as one), nothing is sent when nothing changed, the store shelf (most of each panel) is sent on its own only when it changes, and after the first full panel only the parts that changed are sent. Older Companions still get the whole panel.
   - **Wrong Barn outfit for Laynie:** whoever drinks it themselves is dressed even with ?ownoutfit on, and when it can't dress them (no Companion in the room, no outfit for that kind) they're told why instead of nothing happening.

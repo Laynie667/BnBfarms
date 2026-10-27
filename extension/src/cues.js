@@ -1,6 +1,6 @@
 /* WHAT'S IN THIS FILE (cues.js)
    Things the Companion does on YOUR screen for the farm, so the farm girl needn't move or whisper:
-   • sight:    when it changes (and every 2 minutes), tells the bot who you can see and hear, so private farm lines reach
+   • sight:    when it changes (at most every 8 s, and every 2 minutes), tells the bot who you can see and hear, so private farm lines reach
                exactly the people around you.
    • lead:     walks you somewhere step by step (pathfindin', at your own speed, slower when you're bound)
                instead of you bein' teleported. If there's no way through, the bot teleports you after all.
@@ -36,8 +36,10 @@ function sightTick() {
     const LS = W.Player && W.Player.LSCG, S = LS && LS.SplatterModule;
     const splat = S ? !!(S.enabled && S.taker !== false && (!LS.GlobalModule || LS.GlobalModule.enabled !== false)) : undefined;
     const key = see.join(",") + "|" + hear.join(",") + "|" + splat;
-    // send when it changes (checked every 4 s), and every 2 minutes anyway so the bot knows it's still fresh
+    // send when it changes (checked every 4 s, sent at most every 8: walkin' about changed it every check, and every one
+    // landed on the farm girl's connection, Oct 27), and every 2 minutes anyway so the bot knows it's still fresh
     if (key === lastSight && Date.now() - (sightTick.at || 0) < 120000) return;
+    if (Date.now() - (sightTick.at || 0) < 8000) return;
     lastSight = key; sightTick.at = Date.now();
     ctx.toBot("sight", splat === undefined ? { see, hear } : { see, hear, splat });
   } catch (e) { console.warn("[Farmhand Companion] sight:", e); }

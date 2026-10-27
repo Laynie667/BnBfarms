@@ -14,8 +14,12 @@
 */
 import "../../studio/web/splatters.js";
 import { makeMsg } from "../../shared/protocol.js";
+import { BOT_MEMBER } from "./config.js";
 
 const W = window, KEY = "farmhand-messes", MAX = 60;
+// the bot's own account never draws anybody's messes, so it never asks for them or keeps them (Oct 27: every ask made
+// every Companion in the room send its whole list, all of it downloaded on the bot's connection)
+const onBot = () => !!(W.Player && W.Player.MemberNumber === BOT_MEMBER);
 let sdk = null, hooked = false;
 let mine = [];
 // what happened last, for /farmmess (Laynie, Oct 20: a mess drawn on everybody but her)
@@ -56,9 +60,9 @@ export function messRinse() { if (!mine.length) return false; mine = mine.slice(
 const send = (type, data) => { try { if (W.ServerSend && W.ServerPlayerIsInChatRoom && W.ServerPlayerIsInChatRoom()) W.ServerSend("ChatRoomChat", makeMsg(type, data)); } catch (e) { /* not in a room */ } };
 let toldAt = 0, askedAt = 0;
 function tell(force) { if (!force && Date.now() - toldAt < 8000) return; toldAt = Date.now(); send("mess", { list: mine }); }
-function ask() { if (Date.now() - askedAt < 8000) return; askedAt = Date.now(); send("messAsk", {}); }
+function ask() { if (onBot() || Date.now() - askedAt < 8000) return; askedAt = Date.now(); send("messAsk", {}); }
 export function onMessMsg(m) {
-  const mn = m.from; if (!mn || (W.Player && mn === W.Player.MemberNumber)) return;
+  const mn = m.from; if (!mn || (W.Player && mn === W.Player.MemberNumber) || onBot()) return;
   if (m.type === "messAsk") { if (mine.length) setTimeout(() => tell(), 300 + Math.random() * 1500); return; }
   if (m.type !== "mess") return;
   const list = clean(m.list);
@@ -130,7 +134,7 @@ function hook() {
     const groupRe = /(?:^|\/)Assets\/[^/]+\/(?:Override\/[^/]+\/)?([^/]+)\//;
     sdk.hookFunction("CommonDrawAppearanceBuild", 3, (args, next) => {
       const C = args[0], real = args[1];
-      if (!C || !real || typeof real.drawImage !== "function" || !W.FarmMess) return next(args);
+      if (!C || !real || typeof real.drawImage !== "function" || !W.FarmMess || onBot()) return next(args);
       const list = listFor(C); if (C === W.Player) DIAG.got++; if (!list.length) return next(args);
       const body = [], all = [], sample = []; let canv = 0, done = false;
       const before = skinOf.get(C.MemberNumber) || [];

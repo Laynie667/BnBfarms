@@ -53,7 +53,7 @@ const STATE = { name: "Laynie", onBooks: true, roles: ["PROPRIETOR", "LIVESTOCK"
   D.querySelector(".fhc-quick button").click();
   out("2 Stats button sends ?stats ->", cmds().includes("stats"));
   click("Toggles");
-  const jar = [...D.querySelectorAll(".fhc-tog")].find((t) => /Jar insemination/.test(t.textContent));
+  const jar = [...D.querySelectorAll(".fhc-tog")].find((t) => /Jar breedin'/.test(t.textContent));
   jar.querySelector("button").click();
   out("2 jar switch sends jarok off ->", cmds().includes("jarok off"));
   click("femboy"); out("2 gender pill sends ->", cmds().includes("gender femboy"));

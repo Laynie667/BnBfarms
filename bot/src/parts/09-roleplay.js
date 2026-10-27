@@ -179,42 +179,90 @@
                 "{nt}%t's chest goes hot and tight, the nipples puffin' up fat and sore while it fills out soft and heavy: %s now.",
                 "{nt}%t groans as their flat chest swells into a pair of soft little mounds, nipples standin' proud: %s."],
     "udder-":  ["{t}%t's breasts tingle and draw in, perkier and lighter, down to %s.",
-                "A cool ache, and %t's chest shrinks back to %s."],
+                "A cool ache, and %t's chest shrinks back to %s.",
+                "{t}%t gasps as the weight lifts off their chest: those tits draw in high and tight, down to %s.",
+                "{t}A prickly chill runs through %t's breasts, and they settle smaller and perkier: %s now.",
+                "{t}%t's top suddenly hangs loose. Those tits have slimmed right down to %s.",
+                "{nt}%t's chest goes cool and tight, the swell easin' back down to %s.",
+                "%t lets out a long breath as their chest lightens, a size smaller and a lot easier to carry: %s."],
     "testes+": ["%t's balls throb and drop heavier, fat and churnin' (%s now). Somebody's gonna make bigger loads.",
                 "%t groans as their sack tightens, then swells, heavy and churnin': %s."],
     "testes-": ["%t's balls draw up tight and shrink down to %s.",
-                "A cold tingle, and %t's sack shrinks down to %s."],
+                "A cold tingle, and %t's sack shrinks down to %s.",
+                "%t shivers as their heavy sack draws up and lightens, down to %s.",
+                "A cold little ache, and %t's balls settle smaller: %s. Lighter loads from here on.",
+                "%t's balls tighten and tuck up close, smaller and snugger: %s now."],
     "penis+":  ["%t's cock thickens and lengthens, throbbin' with every pulse, till it hangs at %s.",
                 "%t whimpers as their shaft swells, vein by vein, out to %s."],
     "penis-":  ["%t's cock tingles and shrinks, smaller and softer, down to %s.",
-                "With a little shiver %t's shaft draws in to %s."],
+                "With a little shiver %t's shaft draws in to %s.",
+                "A cool shiver runs down %t's shaft, and it settles a size smaller: %s now.",
+                "%t watches their cock draw back in, inch by inch, till it settles at %s.",
+                "%t's cock goes soft and tingly and comes back smaller: %s."],
     "knot+":   ["%t's knot swells fatter at the base, heavy and aching to lock into somebody: %s now."],
-    "knot-":   ["%t's knot goes soft and shrinks down to %s."],
+    "knot-":   ["%t's knot goes soft and shrinks down to %s.",
+                "The fat swell at the base of %t's cock eases down to %s.",
+                "%t's knot tingles and slims: %s now. It still ties, just not so tight."],
     "vulva+":  ["%t's pussy goes hot and slick as it loosens and opens up: %s now.",
                 "%t squirms as their pussy relaxes and spreads, wetter and %s."],
-    "vulva-":  ["%t's pussy clenches and tightens right up: %s again."],
+    "vulva-":  ["%t's pussy clenches and tightens right up: %s again.",
+                "%t gasps as their pussy draws in snug and tight: %s now.",
+                "A tingle, a clench, and %t's pussy is %s again, like nobody ever stretched it.",
+                "%t squirms as everything down there tightens back up: %s."],
     "butt+":   ["%t's ass loosens and opens, achin' to be filled: %s now.",
                 "%t's hole relaxes and gapes a little wider, %s and ready."],
-    "butt-":   ["%t's ass clenches up nice and tight: %s again."],
-    "throat+": ["%t's throat relaxes and the gag reflex just melts away: %s now. Open wide, sugar."],
-    "throat-": ["%t's throat tightens back up, gaggy as ever: %s."],
+    "butt-":   ["%t's ass clenches up nice and tight: %s again.",
+                "%t's hole draws in snug, the stretch easin' right out of it: %s.",
+                "%t clenches, gasps, and their ass tightens back up: %s now."],
+    "throat+": ["%t's throat relaxes and the gag reflex just melts away: %s now. Open wide, sugar.",
+                "%t swallows, and swallows again, and the gag just isn't there any more: %s now.",
+                "%t's throat goes slack and easy, open all the way down: %s."],
+    "throat-": ["%t's throat tightens back up, gaggy as ever: %s.",
+                "%t swallows hard as their throat closes up and the gag comes back: %s.",
+                "%t coughs, and their throat goes snug again: %s. Takin' it deep is gonna be work again."],
     lactation: ["{t}%t's nipples tingle and bead with milk, breasts goin' heavy and achy to be milked.",
-                "%t's nipples prickle and swell, and a bead of milk wells up on each. They'll be wantin' the pump soon."],
-    virility:  ["%t's balls churn and swell with fresh seed. Somebody's gonna be a fountain for a day."],
+                "%t's nipples prickle and swell, and a bead of milk wells up on each. They'll be wantin' the pump soon.",
+                "{t}%t's tits swell full and tight with milk, heavy enough to sway. The pump's gonna love 'em.",
+                "{nt}%t's chest goes warm and tight, and their nipples puff up hard. A bead of milk wells on each one, flat chest or not.",
+                "Warm prickles run out from %t's nipples, and in a minute they're wet. Milk's comin' in, sugar."],
+    virility:  ["{c}%t's balls churn and swell with fresh seed. Somebody's gonna be a fountain for a day.",
+                "{c}%t's balls draw up heavy and full, achin' already. Every load for a day comes out double.",
+                "{c}A hot rush goes straight to %t's balls, and their cock gives a hard twitch. There's a lot more seed in there now.",
+                "{c}%t's cock jumps and drips, and their sack swells fat and heavy. Somebody's gonna be messy for a day.",
+                "{nc}The shot goes in warm and finds nothin' to work on: no balls on %t to fill. Somebody spent good ribbons on that."],
     fertility: ["{v}A warm, needy flush spreads through %t's belly. That womb is ripe and waitin'.",
-                "{nv}A warm, needy flush spreads low in %t's belly. Whatever the farm's done in there, it's ripe and waitin' now."],
-    contraceptive: ["%t gets a cool little shiver. Nothin's takin' root in there for a couple of days."],
-    capacity:  ["%t's belly goes warm and stretchy, ready to hold even more."],
-    reducing:  ["%t's belly draws in tight, and anything extra comes spillin' out."],
-    suppressant: ["%t's heat breaks like a fever. They sag, flushed and finally calm."],
-    "knot+new":["A fat knot swells up at the base of %t's cock, throbbin' and ready to tie somebody down."],
-    "knot-new":["%t's knot shrinks away to nothin'. No more tyin' anybody down."],
-    "type:canine":  ["%t's cock reshapes, tapered and red with a thick canine knot at the base."],
-    "type:equine":  ["%t's cock swells long and heavy, the head flaring wide like a stallion's."],
-    "type:feline":  ["Little barbs prickle up along %t's cock. That's gonna be felt on the way out."],
-    "type:draconic":["Thick ridges rise along %t's cock, hard and scaled and wicked."],
-    "type:double":  ["%t's cock splits into two, both throbbin' and ready to fill two holes at once."],
-    "type:human":   ["%t's cock settles back into a plain human shape."]
+                "{nv}A warm, needy flush spreads low in %t's belly. Whatever the farm's done in there, it's ripe and waitin' now.",
+                "{v}%t's belly goes warm and heavy, and their pussy throbs once. Ripe as summer fruit, sugar.",
+                "{nv}A low, needy warmth settles in %t. If anything in there can take, it's takin' now."],
+    contraceptive: ["%t gets a cool little shiver. Nothin's takin' root in there for a couple of days.",
+                "{v}A cool little shiver settles low in %t. That womb's shut for business for a couple of days.",
+                "%t feels a cold tingle spread through their belly. Nothin's catchin' in there for two days, however full they get."],
+    capacity:  ["%t's belly goes warm and stretchy, ready to hold even more.",
+                "%t's belly loosens and stretches, warm and roomy. There's space for a good deal more in there now.",
+                "A slow, deep stretch, low down: %t can hold more than they could, for good."],
+    reducing:  ["%t's belly draws in tight, and anything extra comes spillin' out.",
+                "%t's belly tightens up snug. It holds less from now on, and what doesn't fit trickles out.",
+                "A cool cramp, and %t's belly draws in small and firm: less room in there for good."],
+    suppressant: ["%t's heat breaks like a fever. They sag, flushed and finally calm.",
+                "The heat drains out of %t like water out of a trough. They blink, cool and clear-headed, and a little disappointed.",
+                "%t's flush fades and the ache lets go. The heat's broken, for now."],
+    "knot+new":["A fat knot swells up at the base of %t's cock, throbbin' and ready to tie somebody down.",
+                "%t's cock thickens at the root, and a knot swells up there, round and hard. Somebody's gettin' tied.",
+                "A fat bulb fills out at the base of %t's cock, hot and tight. Next time they breed, they're stayin' put."],
+    "knot-new":["%t's knot shrinks away to nothin'. No more tyin' anybody down.",
+                "The swell at the base of %t's cock softens and goes. No more knot, no more stayin' put."],
+    "type:canine":  ["%t's cock reshapes, tapered and red with a thick canine knot at the base.",
+                     "%t's cock goes slick and red and tapers to a point, and a knot swells at the root like a hound's."],
+    "type:equine":  ["%t's cock swells long and heavy, the head flaring wide like a stallion's.",
+                     "%t's cock drops long and heavy, mottled and thick, with a broad flared head."],
+    "type:feline":  ["Little barbs prickle up along %t's cock. That's gonna be felt on the way out.",
+                     "%t's cock slims a little and sprouts soft barbs round the head. Pullin' out's gonna be felt."],
+    "type:draconic":["Thick ridges rise along %t's cock, hard and scaled and wicked.",
+                     "Scales and ridges rise along %t's cock, and it thickens in hard, knobbly rings."],
+    "type:double":  ["%t's cock splits into two, both throbbin' and ready to fill two holes at once.",
+                     "Somethin' twists and splits, and %t's got two cocks now, stacked and throbbin'."],
+    "type:human":   ["%t's cock settles back into a plain human shape.",
+                     "The shape drains out of %t's cock and it settles back to plain and human."]
   };
   function shotLine(key, t, part){
     const k = key === "knot+" ? "knot+new" : key === "knot-" ? "knot-new" : key;
@@ -339,8 +387,8 @@
   function hasPart(mn, part){ return bodyParts(mn).includes(part); }
   function noPartWhy(mn, part){
     if (part === "penis" || part === "testes") return "there's no cock on that one to measure, hon. Wear one, or ?futa on";
-    if (part === "knot") return "no knot on that cock yet, hon! A \"knotting\" shot gives one, or ?penis canine comes knotted";
-    if (part === "vulva") return "that one hasn't got a vulva, hon (futa: ?futa on)";
+    if (part === "knot") return "no knot on that cock yet, hon! A \"knotting\" shot gives one, or ?cock canine comes knotted";
+    if (part === "vulva") return "that one hasn't got a pussy, hon (futa: ?futa on)";
     if (part === "udder") return "that one hasn't got an udder, hon. ?milkable on gives one";
     return "that part's not there, hon";
   }
@@ -368,14 +416,14 @@
       "Last milked "+ago(p.lastMilkAt),
       p.stall && p.stall.until && "In the milkin' stall: "+Math.max(0, Math.ceil((p.stall.until - Date.now())/60000))+" min till you're down to a quarter"
     ]);
-    if (makesSemen(mn)) sec("💦 SEMEN", [
+    if (makesSemen(mn)) sec("💦 CUM", [
       ml(p.semen)+" of "+ml(semenCap(mn))+" · last collected "+ago(p.lastCollectAt),
       p.pentUp && "😤 Pent up: next load's a big one",
       p.deniedUntil > now && "🚫 Denied: no fillin' anybody for "+hrsLeft(p.deniedUntil),
       p.tieUntil > now && "🔒 Tied to "+plainName(p.tiedTo)+" for "+Math.ceil((p.tieUntil-now)/60000)+" more minutes"
     ]);
     // what they're holding, per hole they've got (a mouthful ends up in the stomach)
-    const holeName = { vulva:"Vulva", butt:"Butt", mouth:"Stomach" };
+    const holeName = { vulva:"Pussy", butt:"Ass", mouth:"Swallowed" };
     const holding = HOLES.filter(h => h !== "vulva" || hasVulva(mn) || p.held.vulva > 0)
                          .map(h => holeName[h]+" "+ml(p.held[h]||0)).join(" · ");
     sec("🫙 HOLDING · "+Math.round(100*held/cap)+"% full", [
@@ -405,7 +453,7 @@
     ]);
     if (titleNames(mn).length) sec("🎖️ TITLES", [titleNames(mn).join(" · ")]);
     const b = [];
-    for (const [k,label] of [["milk","milk"],["semen","semen"],["fert","fertility"],["contra","contraceptive"]])
+    for (const [k,label] of [["milk","milk"],["semen","cum"],["fert","fertility"],["contra","no catchin'"]])
       if (boosted(p,k)) b.push(label);
     const wt = Array.from(wornTags(mn));
     sec("✨ RIGHT NOW", [ b.length && "💉 Boosted: "+b.join(", "), wt.length && "🏷️ Wearing: "+wt.join(", ") ]);

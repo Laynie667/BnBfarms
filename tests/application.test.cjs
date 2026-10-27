@@ -55,7 +55,7 @@ const toSince=(mn,n)=>sent.slice(n).filter(s=>(s[0]==='AccountBeep'&&s[1].Member
   out('8 the application is kept on their record ->', !!(L().people[900].application && L().people[900].application.byKey.likes==='milkin'));
   await B(221397,'record 900'); const rec900=beepsTo(221397).slice(-3).join('\n');
   out('8 ?record shows the application ->', /Application/.test(rec900) && /milkin/.test(rec900) && /ask first/.test(rec900) && /thank you/.test(rec900));
-  out('8 ?record shows what they hold ->', /Holding: Vulva .* · Butt .* · Stomach /.test(rec900));
+  out('8 ?record shows what they hold ->', /Holding: Pussy .* · Ass .* · Swallowed /.test(rec900));
   out('8 ...without the option lists ->', !/livestock \/ staff \/ guest/.test(rec900));
   await B(900,'record'); const own=beepsTo(900).slice(-3).join('\n');
   out('8 they see their own application ->', /Application/.test(own) && /milkin/.test(own));

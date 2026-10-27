@@ -71,7 +71,8 @@
   // returns true when it took the trap over
   function variantTrap(mn, kind, spot){
     if (!VARIANTS[kind]) return false;
-    const r = rec(mn), loaded = L.trapLoads && spot ? L.trapLoads[spot] : null, fixed = loaded ? parseTrapLoad(kind, loaded) : null;
+    const r = rec(mn), loaded = L.trapLoads && spot ? L.trapLoads[spot] : null, force = W.__FARMHAND_TEST__ && W.__variantForce && W.__variantForce[kind];
+    const fixed = force || (loaded ? parseTrapLoad(kind, loaded) : null);
     if (kind === "injector" && loaded && !fixed) return false;        // plain needle words: the old way handles those
     const S = SEVERITY[pickSeverity(mn, fixed && fixed.sev)], T = VARIANT_LINES[kind], v = { x: S.name };
     if (kind === "injector"){

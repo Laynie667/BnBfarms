@@ -233,7 +233,7 @@
       beats: [
         ["The pond's warm today, warm as a bath, and %n wades in to their waist before something smooth wraps round their ankle.",
          "%n kneels at the pond's edge for a drink and a slick grey arm rises out of the water and pulls them in."],
-        ["It's big, soft, many-armed, and it holds %n floating on their back in the warm water, gently, like a cradle.",
+        ["It's big, soft, many-armed, and it holds %n floating on their back in the warm water, gently, like a hammock.",
          "Under the water, more arms: one round their waist, two round their thighs, easing them apart."],
         ["Something long and smooth and tapered slides up between %n's legs, nuzzling, searching.",
          "The thing hums, a deep pleased vibration through the water, and its ovipositor finds %n."],

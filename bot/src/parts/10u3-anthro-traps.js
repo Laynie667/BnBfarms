@@ -305,11 +305,11 @@
     sow: {
       beats: [
         ["\"Oh, look at you. Skin and bone.\" A pair of big soft arms come round %n from behind and lift them clean off the ground.",
-         "%n is scooped up like a runt piglet and carried into the farrowin' shed before they can say a word."],
+         "%n is scooped up like a sack of oats and carried into the farrowin' shed before they can say a word."],
         ["She's the old sow, the matron of the sty: big as a wardrobe, pink and warm, apron straps cuttin' into rolls of soft flesh, and a double row of fat teats down her front. She sits, and %n is in her lap.",
          "The sow-woman settles into her rockin' chair with a sigh and arranges %n across her knees like a lapful of washin'. Everything about her is soft and huge and smells of milk."],
         ["\"Hush now. I've got you.\" She unhooks her apron bib and pushes a teat the size of a thumb between %n's lips. It's already drippin'.",
-         "A broad hand cradles the back of %n's head and guides their mouth onto a fat warm nipple. \"Drink up, piglet. All of it.\""],
+         "A broad hand cradles the back of %n's head and guides their mouth onto a fat warm nipple. \"Drink up, love. All of it.\""],
       ],
       in: [
         ["%n drinks. It's thick and sweet and there's no end to it, and the more they swallow the heavier their eyelids get. They hardly notice her other hand liftin' her apron, or what rises up from under it.",
@@ -333,7 +333,7 @@
                      "The alpha's a grey brute with a notched ear. He noses %n's thighs apart, takes one long breath of them, and licks his chops. The rest whine and crowd in.");
     W1.beats[2].push("A wolf at each end. One lifts %n's chin with a claw and holds their eyes while the other mounts up behind.");
     W1.in.splice(1, 0, [
-      "While the alpha's tied in %n's %h, a younger one comes round the front, red and drippin', and pushes into their mouth. %n is spitted between the two of them, rocked back and forth, knot at one end and cock at the other.",
+      "While the alpha's tied in %n's %h, a lean one comes round the front, red and drippin', and pushes into their mouth. %n is spitted between the two of them, rocked back and forth, knot at one end and cock at the other.",
       "The one at %n's head doesn't feel like waitin' his turn. He feeds himself between their lips and ruts their throat in time with the alpha, so every shove from behind chokes them further onto him.",
       "They're passed round the circle. Whoever isn't in %n's %h is in their mouth, or rubbin' off in their hand, or lickin' the last one's leavin's off their thighs."]);
     W1.in.push([
@@ -345,11 +345,11 @@
     R1.beats[0].push("There's a neat round hole in the bank with a little sign: KEEP OUT. %n leans over to read the small print and the edge crumbles.",
                      "%n hears gigglin' under the floorboards of the feed room. Then a board lifts, and a dozen paws pull them down through it.");
     R1.beats[1].push("There must be twenty of them down here. Does too, round and heavy with last month's litters, who settle %n's head in a soft lap and stroke their hair and tell the bucks to be quick about it.",
-                     "The whole warren's turned out to see. Big bucks, half-grown bucks, a grizzled old one with a torn ear who's sired half of them, all hard as carrots and bouncin' on their toes.");
+                     "The whole warren's turned out to see. Big bucks, lean bucks, a grizzled old one with a torn ear who's sired half of them, all hard as carrots and bouncin' on their toes.");
     R1.in.splice(1, 0, [
       "They don't take turns so much as take over. One in %n's %h, one in their mouth, one in each hand, two more rubbin' off on their feet, and the minute any of them finishes, another hops in.",
       "A doe holds %n's knees back for the bucks and counts out loud. \"Six. Seven. Oh, he was quick. Eight.\" Every number is another hot little squirt up their %h.",
-      "The old torn-eared buck goes slow, for a rabbit. That's a whole half minute. He grips %n's hips, thumps one foot, and lets go a load three times the size of the young ones'."]);
+      "The old torn-eared buck goes slow, for a rabbit. That's a whole half minute. He grips %n's hips, thumps one foot, and lets go a load three times the size of the others'."]);
     R1.in.push([
       "Somewhere past fifteen %n stops bein' able to tell them apart. It's all just one long quick hot blur of fur and squeakin' and bein' topped up.",
       "They've gone round twice and the first ones are ready again. They always are. %n's %h is frothin' over and they're still linin' up.",
@@ -358,16 +358,16 @@
                 "%ml, in more little loads than %n could count, and every one of those bucks breeds true. The does kiss their cheeks and tell them to come back when it's time to nest.");
     B1.beats[0].push("The sign on the sty says BEWARE OF THE BOAR, in his own handwritin'. %n was lookin' at the sign, not at where they were puttin' their feet.",
                      "A squeal of hinges, a shove from behind, and %n is through the sty gate and on their face in the wallow. The gate latches itself. It's a trap built for exactly this.");
-    B1.beats[1].push("He's not alone today. A second boar-man, younger, leaner, puts down his mug and comes over to see what the old man's caught. \"Share?\" \"After.\"",
+    B1.beats[1].push("He's not alone today. A second boar-man, leaner and quicker, puts down his mug and comes over to see what the old man's caught. \"Share?\" \"After.\"",
                      "The boar-man turns %n over in the mud with his big hands, noses under their arms and between their legs, and rolls them about like a truffle he's dug up, till they're slathered from end to end.");
     B1.beats[2].push("He hooks a tusk under %n's hips and hoists them up onto their knees, ass high, face in the mud. Hogs don't court.");
     B1.in.splice(1, 0, [
-      "The younger one won't wait. He comes round to the front, kneels in the mud at %n's head, takes a fistful of their hair, and feeds his own long twisted cock into their mouth. Mud, musk, and hog at both ends.",
+      "The lean one won't wait. He comes round to the front, kneels in the mud at %n's head, takes a fistful of their hair, and feeds his own long twisted cock into their mouth. Mud, musk, and hog at both ends.",
       "It's a slow, deep, grindin' kind of breedin'. He shifts his weight and %n sinks another inch into the wallow, mud oozin' up between their fingers and over their teats, his belly hot and heavy on their back.",
       "%n can feel the tip of him turnin' inside them, screwin' tighter and tighter into place. Every time they squirm he grunts and leans on them harder."]);
     B1.in.push([
       "Ten minutes. Fifteen. He's still cummin'. %n's belly has swelled till it's draggin' in the mud, and he just snorts and goes on pumpin' like he's fillin' a trough.",
-      "When the old boar's finally done he doesn't get off. He waits, locked in, till he's sure it's set. Then the young one takes his place and starts the whole thing over.",
+      "When the old boar's finally done he doesn't get off. He waits, locked in, till he's sure it's set. Then the lean one takes his place and starts the whole thing over.",
       "The sty hands lean on the rail to watch. One of the sow-women wipes the mud off %n's face with her apron, almost kind. \"He takes his time, love. Breathe.\""]);
     B1.end.push("Two boars, the better part of half an hour, and %ml of hog seed corked up in %n's %h behind a plug as thick as candle wax. They have to be helped over the rail. They look like they've been dipped.",
                 "By the time the sty gate swings open %n has %ml in their %h, a belly that sways when they crawl, mud in places mud's got no business, and the old boar's stink soaked right into their skin.");

@@ -318,7 +318,7 @@
              "{c}A velvet glove strokes %n's cock, slow, and another one cups their balls, and they can't tell whose hands they are because there aren't any.",
              "{v}A silk stocking slides up between %n's legs and rubs, slow and smooth, and won't stop.",
              "A feather duster tickles %n's ribs till they're squealin' in the dark."]],
-    tender: ["The costumes are soft and warm, and everything smells like an old, loved closet.", "The trunk rocks %n like a cradle between costumes.", "Somethin' velvet strokes %n's hair the whole time."],
+    tender: ["The costumes are soft and warm, and everything smells like an old, loved closet.", "The trunk rocks %n like a hammock between costumes.", "Somethin' velvet strokes %n's hair the whole time."],
     filthy: ["Groped by every costume in the trunk at once, %n's the dress-up doll the attic's been waitin' for.", "The gloves finger %n open and the boa rubs them raw, and %n's moanin' into a mask.",
              "%n comes out of that trunk dressed for the party and drippin' like they've already been to it."],
     // (before() picks the costume each time; this is the one the equipment list shows)

@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.59.0
+// @version      0.60.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -2748,7 +2748,7 @@
   ];
 
   // bot/src/version.js
-  var VERSION = "0.59.0";
+  var VERSION = "0.60.0";
   var COMPANION_VERSION = "0.50.0";
 
   // bot-parts:farmhand-bot-parts
@@ -11212,7 +11212,7 @@
     STALL_STORY.atmos.push(
       "Down the line, somebody else's pump coughs and settles, and a contented moo drifts over the partition.",
       "A farmhand hums as they walk the row, checking cans, sliding each full one out and a clean one in.",
-      "Rain on the dairy roof, the drone of the pumps, the warm smell of milk and straw: the barn's own lullaby.",
+      "Rain on the dairy roof, the drone of the pumps, the warm smell of milk and straw: the barn's own slow song.",
       "A barn swallow darts in through the high window, circles once, and goes out again.",
       "The radio in the office plays something old and slow, faint through the wall.",
       "Somebody's mucking out the next stall over, and the scrape of the shovel keeps time with the pump."
@@ -15723,7 +15723,7 @@
         beats: [
           [
             '"Oh, look at you. Skin and bone." A pair of big soft arms come round %n from behind and lift them clean off the ground.',
-            "%n is scooped up like a runt piglet and carried into the farrowin' shed before they can say a word."
+            "%n is scooped up like a sack of oats and carried into the farrowin' shed before they can say a word."
           ],
           [
             "She's the old sow, the matron of the sty: big as a wardrobe, pink and warm, apron straps cuttin' into rolls of soft flesh, and a double row of fat teats down her front. She sits, and %n is in her lap.",
@@ -15731,7 +15731,7 @@
           ],
           [
             `"Hush now. I've got you." She unhooks her apron bib and pushes a teat the size of a thumb between %n's lips. It's already drippin'.`,
-            `A broad hand cradles the back of %n's head and guides their mouth onto a fat warm nipple. "Drink up, piglet. All of it."`
+            `A broad hand cradles the back of %n's head and guides their mouth onto a fat warm nipple. "Drink up, love. All of it."`
           ]
         ],
         in: [
@@ -15764,7 +15764,7 @@
       );
       W1.beats[2].push("A wolf at each end. One lifts %n's chin with a claw and holds their eyes while the other mounts up behind.");
       W1.in.splice(1, 0, [
-        "While the alpha's tied in %n's %h, a younger one comes round the front, red and drippin', and pushes into their mouth. %n is spitted between the two of them, rocked back and forth, knot at one end and cock at the other.",
+        "While the alpha's tied in %n's %h, a lean one comes round the front, red and drippin', and pushes into their mouth. %n is spitted between the two of them, rocked back and forth, knot at one end and cock at the other.",
         "The one at %n's head doesn't feel like waitin' his turn. He feeds himself between their lips and ruts their throat in time with the alpha, so every shove from behind chokes them further onto him.",
         "They're passed round the circle. Whoever isn't in %n's %h is in their mouth, or rubbin' off in their hand, or lickin' the last one's leavin's off their thighs."
       ]);
@@ -15783,12 +15783,12 @@
       );
       R1.beats[1].push(
         "There must be twenty of them down here. Does too, round and heavy with last month's litters, who settle %n's head in a soft lap and stroke their hair and tell the bucks to be quick about it.",
-        "The whole warren's turned out to see. Big bucks, half-grown bucks, a grizzled old one with a torn ear who's sired half of them, all hard as carrots and bouncin' on their toes."
+        "The whole warren's turned out to see. Big bucks, lean bucks, a grizzled old one with a torn ear who's sired half of them, all hard as carrots and bouncin' on their toes."
       );
       R1.in.splice(1, 0, [
         "They don't take turns so much as take over. One in %n's %h, one in their mouth, one in each hand, two more rubbin' off on their feet, and the minute any of them finishes, another hops in.",
         `A doe holds %n's knees back for the bucks and counts out loud. "Six. Seven. Oh, he was quick. Eight." Every number is another hot little squirt up their %h.`,
-        "The old torn-eared buck goes slow, for a rabbit. That's a whole half minute. He grips %n's hips, thumps one foot, and lets go a load three times the size of the young ones'."
+        "The old torn-eared buck goes slow, for a rabbit. That's a whole half minute. He grips %n's hips, thumps one foot, and lets go a load three times the size of the others'."
       ]);
       R1.in.push([
         "Somewhere past fifteen %n stops bein' able to tell them apart. It's all just one long quick hot blur of fur and squeakin' and bein' topped up.",
@@ -15804,18 +15804,18 @@
         "A squeal of hinges, a shove from behind, and %n is through the sty gate and on their face in the wallow. The gate latches itself. It's a trap built for exactly this."
       );
       B1.beats[1].push(
-        `He's not alone today. A second boar-man, younger, leaner, puts down his mug and comes over to see what the old man's caught. "Share?" "After."`,
+        `He's not alone today. A second boar-man, leaner and quicker, puts down his mug and comes over to see what the old man's caught. "Share?" "After."`,
         "The boar-man turns %n over in the mud with his big hands, noses under their arms and between their legs, and rolls them about like a truffle he's dug up, till they're slathered from end to end."
       );
       B1.beats[2].push("He hooks a tusk under %n's hips and hoists them up onto their knees, ass high, face in the mud. Hogs don't court.");
       B1.in.splice(1, 0, [
-        "The younger one won't wait. He comes round to the front, kneels in the mud at %n's head, takes a fistful of their hair, and feeds his own long twisted cock into their mouth. Mud, musk, and hog at both ends.",
+        "The lean one won't wait. He comes round to the front, kneels in the mud at %n's head, takes a fistful of their hair, and feeds his own long twisted cock into their mouth. Mud, musk, and hog at both ends.",
         "It's a slow, deep, grindin' kind of breedin'. He shifts his weight and %n sinks another inch into the wallow, mud oozin' up between their fingers and over their teats, his belly hot and heavy on their back.",
         "%n can feel the tip of him turnin' inside them, screwin' tighter and tighter into place. Every time they squirm he grunts and leans on them harder."
       ]);
       B1.in.push([
         "Ten minutes. Fifteen. He's still cummin'. %n's belly has swelled till it's draggin' in the mud, and he just snorts and goes on pumpin' like he's fillin' a trough.",
-        "When the old boar's finally done he doesn't get off. He waits, locked in, till he's sure it's set. Then the young one takes his place and starts the whole thing over.",
+        "When the old boar's finally done he doesn't get off. He waits, locked in, till he's sure it's set. Then the lean one takes his place and starts the whole thing over.",
         `The sty hands lean on the rail to watch. One of the sow-women wipes the mud off %n's face with her apron, almost kind. "He takes his time, love. Breathe."`
       ]);
       B1.end.push(
@@ -19064,7 +19064,7 @@
             "%n kneels at the pond's edge for a drink and a slick grey arm rises out of the water and pulls them in."
           ],
           [
-            "It's big, soft, many-armed, and it holds %n floating on their back in the warm water, gently, like a cradle.",
+            "It's big, soft, many-armed, and it holds %n floating on their back in the warm water, gently, like a hammock.",
             "Under the water, more arms: one round their waist, two round their thighs, easing them apart."
           ],
           [
@@ -19890,7 +19890,7 @@
     trapScene(
       "tentacle",
       [
-        "More arms rise out of the water, slow and lazy, and wind round %n's arms and pull them out wide like they're bein' crucified on the surface.",
+        "More arms rise out of the water, slow and lazy, and wind round %n's arms and pull them out wide like a star floatin' on the surface.",
         "A thin arm explores %n's ear, their mouth, the hollow of their throat, gentle and curious, tastin' everything.",
         "{t}Two arms wrap round %n's tits and squeeze, and the suckers along them latch on all over, pulling, kissing.",
         "{c}A hollow arm swallows %n's cock and starts to suck, rippling, wet and cool and endless."
@@ -20087,7 +20087,7 @@
       [
         "The pack circles, close and closer, and every one of them gets a sniff and a lick, between %n's legs, under their arms, behind their ears.",
         "The alpha takes %n by the scruff in his teeth and growls low, and the whole pack goes still to watch.",
-        "{t}A young wolf noses at %n's tits and licks them, rough-tongued and slow, while the others wait their turn.",
+        "{t}A lean wolf noses at %n's tits and licks them, rough-tongued and slow, while the others wait their turn.",
         "{c}A wolf licks %n's cock from root to tip, once, curious, and then again because of the noise they make."
       ],
       [
@@ -20250,7 +20250,7 @@
     trapScene(
       "sow",
       [
-        "She hums an old lullaby while she rocks, and %n's eyes go heavy and their mouth goes slack round the teat.",
+        "She hums an old slow tune while she rocks, and %n's eyes go heavy and their mouth goes slack round the teat.",
         "Her milk is warm and endless and it makes %n's belly round and sleepy.",
         `{t}She squeezes one of %n's tits with her big soft hand, fond, and a bead of milk comes up. "Look at you. Takin' after me."`,
         "She smooths %n's hair and pats their bottom, and rocks, and rocks."
@@ -20259,7 +20259,7 @@
         "She's in no hurry. The rocking chair creaks and her cock rocks with it, deep and slow and fat.",
         "%n's pressed into her soft round belly, warm and full at both ends, and they've never felt so looked after.",
         "Every so often she shifts them to the other teat, and grinds a little deeper while she does.",
-        `"There's a good piglet," she says, every few minutes, and every time %n squeezes round her.`
+        `"That's the way, love," she says, every few minutes, and every time %n squeezes round her.`
       ]
     );
     trapScene(
@@ -25725,7 +25725,7 @@
       more(
         A.sow.beats,
         [
-          `"There you are, piglet. I've been callin'." %n hasn't heard anybody callin'. They're picked up anyway.`,
+          `"There you are, love. I've been callin'." %n hasn't heard anybody callin'. They're picked up anyway.`,
           'A warm, enormous softness closes round %n from behind and a voice like fresh bread says, "Oh, you poor hungry thing."'
         ],
         [
@@ -26251,7 +26251,7 @@
         "He's fast and he's deep and he doesn't stop till the knot's locked in %n's %h. Then he just holds them and empties himself, pant, pulse, pant."
       ]);
       more(A.wolves.in[1], [
-        "A younger wolf crouches by %n's head, cock bobbin', and they take him in their mouth because there's nothin' else to do with it. The alpha growls approval behind them.",
+        "A lean wolf crouches by %n's head, cock bobbin', and they take him in their mouth because there's nothin' else to do with it. The alpha growls approval behind them.",
         "The pack crowds close. Paws in %n's hair, a cock in their mouth, another rubbin' wet along their cheek, while the one in their %h holds them tied."
       ]);
       more(A.wolves.in[2], [
@@ -26429,7 +26429,7 @@
         "The orange one rubs his cheek along %n's jaw, markin' them, and the grey one does the same from behind. %n smells of tomcat now."
       ]);
       more(A.toms.beats[2], [
-        "The grey tom bites down on the back of %n's neck and %n goes still all over, like a kitten carried by the scruff. He purrs round the mouthful.",
+        "The grey tom bites down on the back of %n's neck and %n goes still all over, like a cat carried by the scruff. He purrs round the mouthful.",
         `"Down," says the orange one, and kneads %n's back with both hands until they sink, hips high, head on the hay.`
       ]);
       more(A.toms.in[0], [
@@ -26640,7 +26640,7 @@
         "He spatters %n's face and hair with %ml, laughs, and bounds off over the fence. They'll smell of buck for hours."
       ]);
       more(A.sow.beats[0], [
-        `%n stops to scratch a piglet behind the ears. A pair of enormous soft arms scoops them up from behind. "There's my baby."`,
+        `%n stops to scratch a piglet behind the ears. A pair of enormous soft arms scoops them up from behind. "There's my sweet thing."`,
         '"Look how thin you are." The voice is warm as an oven and the arms round %n are warmer. Their feet leave the ground.'
       ]);
       more(A.sow.beats[1], [
@@ -26661,7 +26661,7 @@
         "She rocks the chair, and every rock pushes her a little deeper into %n, and %n suckles harder without meanin' to."
       ]);
       more(A.sow.in[2], [
-        '"Good piglet." She lifts and lowers %n by the hips, patient as a churn, and keeps their mouth full of teat the whole time.',
+        `"That's it, love." She lifts and lowers %n by the hips, patient as a churn, and keeps their mouth full of teat the whole time.`,
         "The chair creaks, the milk flows, and %n's whole world is warm softness at both ends."
       ]);
       more(A.sow.over[0], [
@@ -33220,7 +33220,7 @@
         filthy: ["A rubber fuckdoll in a shop window, posed with its legs spread and its price on a card.", "Customers stick fingers in every hole the doll's got, and the dollmaker writes each one down.", "%n is nothin' but holes and shine under that hood, and everybody who comes in treats them that way."]
       },
       rubberstall: {
-        tender: ["The cups start soft and stay soft, coaxin' instead of pullin'.", "The milkmaid strokes %n's hair through the gap in the sheath, and murmurs.", "The rubber's warm, and it holds %n like a cradle while they let down."],
+        tender: ["The cups start soft and stay soft, coaxin' instead of pullin'.", "The milkmaid strokes %n's hair through the gap in the sheath, and murmurs.", "The rubber's warm, and it holds %n like a hammock while they let down."],
         filthy: ["Sealed in rubber with just their udders hangin' out, %n is a milk bag with legs.", "The cups suck %n's teats out long and dark and they're moanin' like a cow in season.", "Milk and cunt-juice both run down the inside of the sheath, and it squelches when they move."]
       },
       bodybag: {
@@ -34263,7 +34263,7 @@
           "She licks the two little marks on %n's neck clean, slow, and it sends a shiver all the way to their toes."
         ]
       ],
-      tender: ["Her bite never hurts. She makes sure of that, and asks before every one.", "She cradles %n's head in her hand the whole time, like somethin' precious.", "She hums an old lullaby against their neck while she drinks."],
+      tender: ["Her bite never hurts. She makes sure of that, and asks before every one.", "She cradles %n's head in her hand the whole time, like somethin' precious.", "She hums an old slow tune against their neck while she drinks."],
       filthy: [
         "She drinks from %n like a juice box and fucks them like she's makin' up for two hundred years.",
         "%n's the countess's snack and her cocksleeve, and she tells them so, sweetly, in three languages.",
@@ -35493,7 +35493,7 @@
           "A feather duster tickles %n's ribs till they're squealin' in the dark."
         ]
       ],
-      tender: ["The costumes are soft and warm, and everything smells like an old, loved closet.", "The trunk rocks %n like a cradle between costumes.", "Somethin' velvet strokes %n's hair the whole time."],
+      tender: ["The costumes are soft and warm, and everything smells like an old, loved closet.", "The trunk rocks %n like a hammock between costumes.", "Somethin' velvet strokes %n's hair the whole time."],
       filthy: [
         "Groped by every costume in the trunk at once, %n's the dress-up doll the attic's been waitin' for.",
         "The gloves finger %n open and the boa rubs them raw, and %n's moanin' into a mask.",
@@ -36407,8 +36407,8 @@
             "Somethin' enormous and gentle pushes into %n's %h and stretches them wider than anythin' ever has, slow, so slow, till they're full to the brim."
           ],
           sig: [
-            "The mother hums, deep enough to feel in the bones, and every arm round %n squeezes in time, cradlin' them, rockin' them while she fills them.",
-            "She's in no hurry. She holds %n in the water, strokin' their belly, their hair, their thighs, the way you'd settle a nervous heifer before a breedin'.",
+            "The mother hums, deep enough to feel in the bones, and every arm round %n squeezes in time, holdin' them close, rockin' them while she fills them.",
+            "She's in no hurry. She holds %n in the water, strokin' their belly, their hair, their thighs, the way you'd settle nervous stock before a breedin'.",
             "Smaller arms come up off her, dozens of them, and every one finds somewhere on %n to hold or stroke or fill.",
             "%n can feel the mother's heartbeat through the arm inside them, slow and huge, and their own starts to match it."
           ],
@@ -36420,7 +36420,7 @@
           end: [
             "The mother of the pond has laid %x eggs in %n's %h by the time she's done. She sets them on the bank so carefully, strokes their swollen belly once, and sinks away into the deep.",
             "%x eggs. The mother lets %n go like somethin' precious and slides back down, and the pond goes still and dark. %n's belly is the biggest it's ever been.",
-            "She leaves %x of her eggs in %n's %h and a smear of somethin' like a blessin' across their belly, and the pond swallows her up again. Folk will talk about this one."
+            "She leaves %x of her eggs in %n's %h and a smear of somethin' warm and shinin' across their belly, and the pond swallows her up again. Folk will talk about this one."
           ],
           endHyper: [
             "The mother fills %n till there's no room left, and then makes room: %x eggs, packed so tight %n's belly's hard as a barrel, and she has to carry them up the bank herself.",
@@ -36487,7 +36487,7 @@
           ],
           swell: [
             "The tune swells and so does the arm in %n, and the eggs come in time with the music, one on every long low note.",
-            "It sings %n a lullaby while it lays in them, egg by egg, and %n sways along, eyes heavy, belly fillin'."
+            "It sings %n somethin' slow and sleepy while it lays in them, egg by egg, and %n sways along, eyes heavy, belly fillin'."
           ],
           end: [
             "The song fades out. When %n comes to, they're sat on the bank with %x eggs in their %h and no idea how long they've been there. The tune's still in their head.",
@@ -36614,7 +36614,7 @@
             "It leaves %x eggs nestled warm in %n's %h and strokes their belly till they doze off on the bank. Warm eggs come sooner, folk say."
           ],
           endHyper: [
-            "It lays %x warm eggs in %n, slow and careful, till they're round as a harvest moon, then cradles them in the water till they stop tremblin'."
+            "It lays %x warm eggs in %n, slow and careful, till they're round as a harvest moon, then holds them close in the water till they stop tremblin'."
           ]
         }
       },
@@ -38548,7 +38548,7 @@
       tender: [
         "He wraps %n up in his arms and his fur so not one inch of them is cold.",
         "He's slow and patient, and he stops and rumbles a question every time %n gasps.",
-        "He hums somethin' low and soft the whole time, like a lullaby made of avalanches."
+        "He hums somethin' low and soft the whole time, like a slow song made of avalanches."
       ],
       filthy: [
         "The yeti breeds %n like he means to have them carryin' by spring, and %n's beggin' him to.",
@@ -42280,7 +42280,8 @@
     }
     function variantTrap(mn, kind, spot) {
       if (!VARIANTS[kind]) return false;
-      const r = rec(mn), loaded = L2.trapLoads && spot ? L2.trapLoads[spot] : null, fixed = loaded ? parseTrapLoad(kind, loaded) : null;
+      const r = rec(mn), loaded = L2.trapLoads && spot ? L2.trapLoads[spot] : null, force = W.__FARMHAND_TEST__ && W.__variantForce && W.__variantForce[kind];
+      const fixed = force || (loaded ? parseTrapLoad(kind, loaded) : null);
       if (kind === "injector" && loaded && !fixed) return false;
       const S = SEVERITY[pickSeverity(mn, fixed && fixed.sev)], T = VARIANT_LINES[kind], v = { x: S.name };
       if (kind === "injector") {
@@ -43015,7 +43016,7 @@
         "A hose fills %n's mouth and doesn't stop, and their belly swells round and sloshin' with the herd's milk while the rest pours over them.",
         "They're drowned in it and force-fed it, gallons of warm milk, till %n's belly's tight and they're coughin' white."
       ]);
-      more(S.milk.after, ["The rack lets %n go sticky and sweet and sloshin', smellin' like a newborn calf."]);
+      more(S.milk.after, ["The rack lets %n go sticky and sweet and sloshin', smellin' like the dairy."]);
       more(S.slime.cloud, ["The nozzles fill with somethin' green that doesn't so much pour as decide to come out."]);
       more(S.slime.hit[0], [
         "{nt}A cold glob lands on %n's chest and slithers slowly south.",
@@ -43347,7 +43348,7 @@
         breed: [
           "Round with one litter, %n's bred for the next anyway: slow, deep strokes that rock their full belly and make it bump soft against whatever's under them.",
           "Whoever's breedin' %n has both hands on their pregnant belly, holdin' it, feelin' it rock with every thrust.",
-          "%n's belly is so round now it lifts them up off whatever they're bent over, and every push from behind rocks them on it like a cradle.",
+          "%n's belly is so round now it lifts them up off whatever they're bent over, and every push from behind rocks them on it like a rockin' chair.",
           `"Already full," somebody murmurs, sinkin' in deep, "and you still want it. You just love bein' bred, don't you."`
         ],
         held: [
@@ -44502,6 +44503,12 @@
         if (F.scene[i] && p && p.length) F.scene[i] = F.scene[i].concat(p);
       });
     }
+    const POOL_MORE = [];
+    function poolMore(kind, name, pool, lines) {
+      if (!Array.isArray(pool) || !lines || !lines.length) return;
+      pool.push(...lines);
+      POOL_MORE.push({ kind, name, pool, lines });
+    }
     function moreBeats(kind, beats) {
       const L3 = TRAP_MORE[kind];
       if (!L3 || !Array.isArray(beats)) return beats;
@@ -44511,7 +44518,7 @@
         return more.length ? pool.concat(more) : b;
       });
     }
-    if (W.__FARMHAND_TEST__) Object.assign(W, { __trapMore: TRAP_MORE, __moreBeats: moreBeats, __trapScene: TRAP_SCENE });
+    if (W.__FARMHAND_TEST__) Object.assign(W, { __trapMore: TRAP_MORE, __poolMore: POOL_MORE, __moreBeats: moreBeats, __trapScene: TRAP_SCENE });
     trapMore(
       "maze",
       "The corn rustles. The rustlin' stops.",
@@ -49029,6 +49036,1682 @@
         "The cook kisses %n on the forehead between courses and says they're doin' a lovely job."
       ]
     );
+    {
+      const G = VARIANT_LINES.gas, P = (k, name, pool, l) => poolMore("gas", k + " " + name, pool, l);
+      P("heat", "cloud", G.heat.cloud, [
+        "The bulb pours out pink like syrup off a spoon, and it smells of crushed roses and the warm hollow of somebody's neck.",
+        "It's the pink of a flushed cheek, and it rolls up %n's body slow, stoppin' everywhere a hand would stop.",
+        "Sweet rose smoke fills the stall to the rafters. %n tries breathin' through their sleeve. The sleeve smells of it too.",
+        "The mist's warm as breath and pink as a tongue, and it licks its way up %n's legs before they can step out of it."
+      ]);
+      P("heat", "mild", G.heat.hit[0], [
+        "%n's skin goes pink to match the mist, and the waistband of their clothes suddenly feels like a hand restin' there.",
+        "A soft throb starts low in %n and keeps time with their heart. They lick their lips and don't know why.",
+        "{v}%n's pussy goes warm and plump and a little wet, like it's heard good news before the rest of them.",
+        "{c}%n's cock stirs and fattens in a slow warm pulse, and they shift on their feet to hide it, and it doesn't hide."
+      ]);
+      P("heat", "strong", G.heat.hit[1], [
+        "%n's breath comes short and shallow, and every brush of air across their skin feels like a mouth. They sway toward the nearest wall like they mean to rub on it.",
+        "{t}%n's tits go tight and achin', nipples stood up hard enough to show through anything, and their hands keep driftin' up to squeeze them.",
+        "The heat sinks into %n's hips and stays there, rollin', and they catch themselves arched and presentin' to a stall full of nobody.",
+        "{v}Slick runs down the inside of %n's thighs in warm trickles, and their pussy clenches on nothin' every time they breathe in."
+      ]);
+      P("heat", "brutal", G.heat.hit[2], [
+        "%n is on all fours in the pink before the cloud's half gone, back dipped, tail end high, swayin' it side to side and moanin' for the whole barn to come and see.",
+        "{v}%n's pussy is swollen, drippin' and gapin' a little, achin' so deep they're sobbin' with it, and they claw the straw and beg for anything thick enough to fill it.",
+        "{c}%n's cock is iron-hard and leakin' in strings, and their ass is clenchin' and windin' at the same time, and they don't know which end of them wants it more. Both. Both do.",
+        "The heat's in %n's blood like fever. They roll onto their back, legs wide, hands everywhere, and call out for a stud, any stud, by every name they can think of."
+      ]);
+      P("heat", "after", G.heat.after, [
+        "The pink wisps off under the door. %n stays down in the straw, rubbin' their thighs together, in season and not goin' out of it soon.",
+        "When it clears %n's still flushed to the ears and smellin' of rose and want, and their eyes go to every pair of hips that passes.",
+        "The air's clean. %n isn't. They'll be wet and willin' a good while yet, and every nose on the farm is goin' to know it.",
+        "The cloud's gone and the heat's settled in for the afternoon. %n can't sit still, can't stand still, can't think about anythin' but bein' bred."
+      ]);
+      P("milk", "cloud", G.milk.cloud, [
+        "It comes out of the floor like steam off a pail, white and soft, and it smells of warm cream and clean straw.",
+        "The fog's thick enough to taste, sweet as the top of the milk, and it settles on %n's chest in a heavy warm dew.",
+        "A milky haze billows up and hangs at chest height, right where it'll do the most good, and %n breathes it in to the bottom of their lungs.",
+        "White mist curls round %n like a calf nosin' for the teat, and their chest gives a little answerin' throb."
+      ]);
+      P("milk", "mild", G.milk.hit[0], [
+        "%n's nipples tingle and go tight, and when they look down there's a pearl of milk on each one, swellin'.",
+        "A warm heavy feelin' settles in %n's chest, the way it does just before milkin' time, and it doesn't go away.",
+        "{t}%n's tits fill out a cup size in a breath, soft and warm and heavy, and start to leak in slow drips.",
+        "A small damp patch blooms on the front of %n's shirt, then another beside it. They're lettin' down."
+      ]);
+      P("milk", "strong", G.milk.hit[1], [
+        "{t}%n's udders swell up hard and hot, skin shinin', and milk runs from both teats in warm steady streams down over their belly.",
+        "%n's chest aches full. They cup it without thinkin', and milk squirts through their fingers in thin hot jets and spatters on the boards.",
+        "{nt}%n's flat chest puffs up tender and swollen round the nipples, and milk dribbles off both in a steady patter they can't pinch shut.",
+        "Every heartbeat sends another let-down through %n, and every let-down puts another warm stream down their front."
+      ]);
+      P("milk", "brutal", G.milk.hit[2], [
+        "{t}%n's tits swell till they're tight as drums and veined blue, and both teats let go in hissin' arcs that patter on the far wall. They're moanin' like a cow overdue for the parlour.",
+        "%n's chest is so full it hurts, and it's sprayin' on its own, gushin' every time they breathe, and they drop to their knees in a puddle of their own milk, beggin' for cups.",
+        "{nt}%n's chest swells up into two hot, aching mounds that were never there before, and both nipples spray like hoses, and they hold them in both hands and wail.",
+        "%n makes milk faster than it can leave them. It soaks them from chest to knees, warm and sweet, and it's still comin', and their chest is still fillin' behind it."
+      ]);
+      P("milk", "after", G.milk.after, [
+        "The white thins away. %n's left heavy and drippin', with a ring of wet on the straw round their feet.",
+        "It clears, and %n's chest is still swollen and tender, and every step jiggles another drip out of them.",
+        "The fog's gone. %n's chest is full, warm and achin', and the milker's cups are hangin' on the wall lookin' very invitin'.",
+        "When it lifts %n's standin' in a sweet white puddle, leakin' steady, and they're goin' to keep leakin' till somebody milks them out."
+      ]);
+      P("musk", "cloud", G.musk.cloud, [
+        "It rolls out thick and gold, and it smells like a stud's neck after a long day's work, sweat and hay and somethin' sharper.",
+        "The cloud's heavy, low and warm, the colour of old honey, and it soaks into %n's hair like rain into straw.",
+        "A haze the colour of a summer evenin' fills the aisle, rank and wonderful, and %n gets a lungful before they can turn away.",
+        "It's stud musk, pure. It clings to %n's skin like a coat of oil and sinks into every crease they've got."
+      ]);
+      P("musk", "mild", G.musk.hit[0], [
+        "%n catches a whiff of themselves on the breeze and blushes. They smell like they've been rollin' in the breedin' shed.",
+        "The scent sits on %n faint and warm, like a stud's been leanin' on them. Folk in the yard start turnin' their heads.",
+        "A farmhand comes in for a pitchfork, stops dead, breathes in, and forgets what he came in for.",
+        "It's on %n's wrists and throat now, like a perfume that says somethin' rude."
+      ]);
+      P("musk", "strong", G.musk.hit[1], [
+        "%n reeks of rut now, sharp and gold, and somebody's whistlin' at them from the far end of the yard before they've even left the stall.",
+        "The musk soaks right through %n to the skin and stays, warm and heavy, and a big shape fills the doorway, sniffin'.",
+        "Every stall on the row has a head over its door, nostrils flarin', and every one of those heads is turned %n's way.",
+        "%n smells like the most ready thing on the farm, and the studs in the barn have started pacin' their stalls."
+      ]);
+      P("musk", "brutal", G.musk.hit[2], [
+        "%n is soaked in it so deep they can taste it, and outside a gate crashes open, and heavy footsteps come down the yard at a run.",
+        "The smell comes off %n so thick the air shimmers, and three studs are already crowded round the stall door, breathin' hard, cocks stirrin', arguin' over who's first.",
+        "%n reeks like a breedin' shed in high summer, and the whole farm's gone still and hungry. Somethin' big is comin', and it's followin' its nose.",
+        "It's a scent you could follow across three fields, and %n's wearin' every drop. The studs don't walk over. They come at a trot."
+      ]);
+      P("musk", "after", G.musk.after, [
+        "The gold thins out of the air. It doesn't thin out of %n. They're marked with it, and every stud on the place can tell.",
+        "When it clears %n's left smellin' like a stud's favourite, and they can feel eyes on them from every direction.",
+        "The haze is gone. The musk on %n isn't goin' anywhere, and neither are the three big shapes leanin' on the fence watchin' them.",
+        "It settles on %n for the afternoon. Wherever they go they'll be sniffed, nudged and followed, and probably more."
+      ]);
+      P("needy", "cloud", G.needy.cloud, [
+        "The fumes are the colour of a bruise and the smell of a sweet you're not allowed, and they go straight to %n's knees.",
+        "Purple vapour curls round %n slow as smoke off a pipe, and every curl seems to find a different place to tease.",
+        "It's lilac and cold goin' in, and then it blooms inside them, warm and wrong and wonderful.",
+        "The mist tastes of violets and sugar, and it fizzes on the tongue, and then it fizzes everywhere else."
+      ]);
+      P("needy", "mild", G.needy.hit[0], [
+        "%n squirms. There's an itch now, warm and low and just out of reach, and it's growin'.",
+        "Everything %n's wearin' has gone too tight in the wrong places and too loose in the right ones.",
+        "{c}%n's cock twitches half-hard and won't settle, and every step rubs it just enough to notice.",
+        "{v}%n's clit wakes up and starts to throb, small and steady, like it's knockin' on a door."
+      ]);
+      P("needy", "strong", G.needy.hit[1], [
+        "%n's hand's between their legs before they decide to put it there, rubbin' hard, and the ache just climbs and climbs and won't break.",
+        "They're pantin' and rockin' on their heels, every nerve standin' up, and every time they get close the feelin' slides off like soap.",
+        "{t}%n pinches their own nipples hard, chasin' it, and it helps for a breath and then makes everything worse.",
+        "%n leans on the stall door and grinds against the edge of it, slow and desperate, and it's not enough, it's never goin' to be enough."
+      ]);
+      P("needy", "brutal", G.needy.hit[2], [
+        "{v}%n's three fingers deep in themselves and grindin' the heel of their palm on their clit, sobbin', and the edge is right there and the gas won't let them touch it.",
+        "{c}%n's fuckin' their own fist, cock purple and drippin', hips snappin', and they've been an inch from cummin' for a minute that feels like an hour.",
+        "%n humps the corner of a hay bale with their whole body, frantic, sweatin', beggin' out loud, and they'd trade anything on the farm for a finish.",
+        "They're writhin' in the straw like a wild thing, every hole clenchin', every inch of them on fire, and the peak hangs there in front of them, laughin'."
+      ]);
+      P("needy", "after", G.needy.after, [
+        "The violet fades. %n's still twitchin' and wet and miles from relief, and they look at everybody like a starvin' thing looks at a pie.",
+        "It clears. The itch doesn't. %n is goin' to be squirmin', grindin' and askin' nicely for a long while yet.",
+        "When the mist lifts %n's flushed, shakin' and half-mad with it, and they'd say yes to anything with hands.",
+        "The air goes clean. %n doesn't. They're left right at the edge, and the edge has moved in for the day."
+      ]);
+      P("giggle", "cloud", G.giggle.cloud, [
+        "It's yellow as a buttercup and smells like lemon drops, and it tickles the back of %n's throat on the way down.",
+        "A bright fizzin' fog pops and crackles round %n like sherbet on a tongue.",
+        "The haze is the colour of custard and it sparkles, and the first breath of it makes %n's nose wrinkle.",
+        "It bubbles up round %n's ankles like a glass of somethin' fizzy and climbs, pop by pop."
+      ]);
+      P("giggle", "mild", G.giggle.hit[0], [
+        "A grin creeps over %n's face. They try to frown it off. It won't go.",
+        "%n's ribs start to tickle from the inside, and a little hiccup of a laugh gets out.",
+        "The seam of their own shirt brushes %n's side and they squeak.",
+        "%n chuckles at a fence post, and then at the chuckle, and then at everything."
+      ]);
+      P("giggle", "strong", G.giggle.hit[1], [
+        "%n's bent over laughin', clutchin' their sides, tears in their eyes, and a draught on the back of their neck nearly drops them.",
+        "Every breath sets %n off again. They snort, squeal, slap the wall, and can't get one word out straight.",
+        "Their own hair brushin' their shoulders tickles so much %n has to hold it up off their neck, gigglin' helplessly.",
+        "%n's knees go weak with it. They hang off a post, wheezin', and a passin' farmhand wiggles his fingers at them and they shriek."
+      ]);
+      P("giggle", "brutal", G.giggle.hit[2], [
+        "%n's down in the straw, kickin' and howlin', and the straw itself is ticklin' them everywhere it touches, which is everywhere.",
+        "They've laughed till they can't breathe and can't stop, and every itch of skin sends them off again, squealin' themselves hoarse.",
+        "%n rolls helpless in the hay, gaspin' between shrieks, too weak to sit up, too ticklish to lie still, tears runnin' into their ears.",
+        "Somebody blows on the back of %n's knee and they scream with laughter and curl up in a ball, and it doesn't help one bit."
+      ]);
+      P("giggle", "after", G.giggle.after, [
+        "The yellow fades. %n's lyin' there limp, sore from laughin', and the hiccups come back every time they remember.",
+        "It clears. %n sits up, sniffs, and then a fly lands on them and they're off again.",
+        "When it's gone %n's face hurts from grinnin', and their skin's still jumpy as a colt's.",
+        "The fizz goes. %n wheezes, wipes their eyes, and flinches giggly at their own sleeve for the next while."
+      ]);
+      P("haze", "cloud", G.haze.cloud, [
+        "Blue as dusk and quiet as snow, the haze settles round %n and the barn goes very far away.",
+        "It doesn't smell. It doesn't sting. It just pours into %n's head like water into a jug, and the jug fills.",
+        "A soft blue smoke rises off the boards, cool and still, and every sound in the barn goes muffled under it.",
+        "The haze is the colour of a deep pond, and lookin' at it is like lookin' down into one, and %n leans in."
+      ]);
+      P("haze", "mild", G.haze.hit[0], [
+        "%n's thoughts slow to a stroll. Nothin' seems urgent. Nothin' seems like a problem.",
+        "They yawn, and smile, and lean on the post, and can't for the life of them remember what they were worried about.",
+        "%n's eyelids go heavy and sweet. It feels good to be told where to stand. Somebody ought to tell them.",
+        "A warm blankness settles behind %n's eyes, and they watch a dust mote for a long happy while."
+      ]);
+      P("haze", "strong", G.haze.hit[1], [
+        "%n's lips part and stay parted. There's a nice blue nothin' where their objections used to be.",
+        `They sway on the spot, soft and easy, and when a voice in the yard says "come here" their feet start movin' toward it.`,
+        "%n's hands hang open at their sides. Their knees are loose. Their head's full of warm water, and they'd like to be touched now, please.",
+        "The haze has emptied %n out and left the door open. Whatever walks in next is goin' to get a very warm welcome."
+      ]);
+      P("haze", "brutal", G.haze.hit[2], [
+        "%n's gone. They kneel in the blue with their mouth open and their eyes glassy, swayin', and when a hand pats their head they push into it and sigh.",
+        "There's no one behind %n's eyes but a happy, dumb, willin' thing, and it spreads its knees and waits to be told what it's for.",
+        "%n drools a little and doesn't notice. They'd follow anybody anywhere by one finger hooked in their collar, and smile the whole way.",
+        "They've sunk so deep they've forgotten their own name, and when somebody tells them they're a good little breeder they nod, and nod, and believe it."
+      ]);
+      P("haze", "after", G.haze.after, [
+        "The blue thins away to nothin'. %n comes up slow, blinkin', and leaves a few of their thoughts behind in it.",
+        "It clears. %n's soft and agreeable and a bit far away, and saying no seems like an awful lot of work.",
+        "When it lifts %n's still half under, smilin' at nothin', with a warm empty place in their head where somebody could leave a word.",
+        "The haze is gone. Some of it stays with %n, a blue quiet behind the eyes that makes them very easy to lead."
+      ]);
+      P("rut", "cloud", G.rut.cloud, [
+        "The smoke's red as a stud's eye and hot as a forge, and it goes straight down %n's body and settles between their legs.",
+        "{c}It smells of stud sweat and iron and somethin' in heat, and %n's balls tighten before they've finished the first breath.",
+        "Rust-red fumes boil up out of the grate, thick and peppery, and %n coughs, and breathes in twice as much.",
+        "A red haze rolls round %n's hips and stays there, low and hot, like it knows exactly what it's lookin' for."
+      ]);
+      P("rut", "mild", G.rut.hit[0], [
+        "{c}%n's cock swells in a slow hot throb and lifts, and doesn't come back down.",
+        "{c}A heavy ache fills %n's balls, full and warm, and they have to shift how they're standin'.",
+        "{c}%n catches themselves palmin' their own cock through their clothes, slow, and it's harder every time.",
+        "{c}A bead of pre wells at %n's tip and soaks a dark spot into the front of whatever they're wearin'."
+      ]);
+      P("rut", "strong", G.rut.hit[1], [
+        "{c}%n's cock is standin' straight out and throbbin', balls drawn up fat and heavy, and they're breathin' through their teeth like a stallion at the fence.",
+        "{c}They're lookin' round the barn at every hole on two legs, cock jumpin', and their hips have started to jerk forward on their own.",
+        "{c}%n's balls are swollen tight and heavy as fruit, and their cock leaks a steady string onto the straw, and they can't think past it.",
+        "{c}%n grabs the stall door and humps the air twice before they catch themselves, cock slappin' wet against their belly."
+      ]);
+      P("rut", "brutal", G.rut.hit[2], [
+        "{c}%n's in full rut: snortin', sweatin', cock purple and drippin', balls hangin' heavy as a bull's, and they've got a feed sack pinned and they're fuckin' it like it's in season.",
+        "{c}They bellow. Their cock's so hard it hurts and their balls are achin' full to burstin', and they'd mount the farmhouse if it stood still long enough.",
+        "{c}%n is all cock and need, eyes wild, pre pourin' off them in ropes, ruttin' at anything with a curve to it, and moanin' for a hole to empty into.",
+        "{c}It's turned %n into a stud in the worst way. They're pawin' the boards, cock jabbin' at the air, and the first thing that bends over in front of them is goin' to get bred."
+      ]);
+      P("rut", "after", G.rut.after, [
+        "{c}The red clears away. %n's cock stays standin', and their balls stay heavy, and they're goin' to be like that till somebody empties them.",
+        "{c}It's gone, but %n's still pent up and achin', cock twitchin' every time they look at a backside.",
+        "{c}The smoke goes. The rut doesn't. %n's walkin' funny, hard as a fence post and leakin', and lookin' for somewhere to put it.",
+        "{c}When it lifts %n's balls are fuller than they've ever been, and every step makes their cock bob and drip."
+      ]);
+      P("ripen", "cloud", G.ripen.cloud, [
+        "{v}The vapour's the bright green of new shoots and it smells like a ploughed field after rain, and it settles low on %n's belly like a warm hand.",
+        "{v}Green mist pools round %n's hips and won't rise past them, as if it knows exactly where it's needed.",
+        "{v}It smells of spring: wet earth, cut grass, blossom. It sinks into %n through the skin, warm, and gathers somewhere deep.",
+        "{v}A soft green cloud blooms round %n's thighs and slips between them like it's been invited."
+      ]);
+      P("ripen", "mild", G.ripen.hit[0], [
+        "{v}A slow heavy warmth settles in %n's womb, and they lay a hand over it without meanin' to.",
+        "{v}%n's pussy goes soft and swollen and a little slick, and somethin' deeper down opens like a flower.",
+        "{v}They feel it: a little tug, low on one side, like somethin' ripe's come loose and is waitin'.",
+        "{v}%n's belly feels warm and hollow and hungry, in a way food won't help."
+      ]);
+      P("ripen", "strong", G.ripen.hit[1], [
+        "{v}%n's womb clenches deep and greedy, and their pussy swells plump and weepin', and every inch of them is sayin' the same word: now.",
+        "{v}They're so fertile it's like a heat in the belly, steady and pulsin', and they catch themselves starin' at the stud barn.",
+        "{v}%n's knees press together and their hips tip forward, and their body's decided: the next load in it takes.",
+        "{v}Somethin' in %n has ripened all at once, heavy and achin', and it wants filling so badly they groan."
+      ]);
+      P("ripen", "brutal", G.ripen.hit[2], [
+        "{v}%n's womb is wide open and achin', pussy swollen fat and drippin', and they can feel every fertile pulse like a fist knockin' on a door. They'd take a litter off anybody who asked.",
+        "{v}It's so strong it hurts. %n's on their knees holdin' their belly, ripe from the inside out, and they're beggin' the empty barn to breed them full.",
+        "{v}They're ripe enough to catch off a look. %n's body is doin' nothin' but gettin' ready, over and over, and every stud on the farm would leave twins in them.",
+        "{v}The green's soaked so deep into %n that their belly's already warm and round with wantin', and one load's goin' to give them a houseful."
+      ]);
+      P("ripen", "after", G.ripen.after, [
+        "{v}The green fades off. %n's left ripe as an August apple, and any load that lands in them today is stayin'.",
+        "{v}It clears, and %n's womb is still awake and waitin', soft and open and ready to catch.",
+        "{v}When it lifts %n smells like spring and feels like a field that's been ploughed and left open for seed.",
+        "{v}The mist's gone. %n walks out careful, one hand on their belly, ripe to the brim and every stud downwind knowin' it."
+      ]);
+      P("moo", "cloud", G.moo.cloud, [
+        "The gas is dusty gold like a hay field in August, and it smells exactly like the inside of the cow barn.",
+        "A grassy, cud-sweet fog rolls up round %n, warm as a cow's breath on a cold mornin'.",
+        "It tastes of clover and salt-lick and somethin' you'd find in a feed bin. %n swallows and their throat tickles.",
+        "A soft straw-coloured haze billows up and hangs there, smellin' of hay, milk and the herd."
+      ]);
+      P("moo", "mild", G.moo.hit[0], [
+        '%n says "oh no" and it comes out "oh moo". They clap a hand over their mouth.',
+        "A little moo slips out between %n's words, like a hiccup, and they go pink.",
+        '%n tries to say "help" and gets "hmmmoo". The cow in the next stall moos back, sympathetic.',
+        "Every third word from %n is comin' out a moo. They're tryin' to work out which third."
+      ]);
+      P("moo", "strong", G.moo.hit[1], [
+        "%n opens their mouth to argue and lets out a long, mournful low. Then another. Then they give up and just moo.",
+        "Not a word left. %n moos, bleats, moos again, and stamps their foot, and that comes out like a hoof too.",
+        "%n tries to tell the farmhand they're not a cow and moos at him so earnestly he pats them on the nose.",
+        "The words have all gone barnyard. %n's mooin' in sentences now, long ones, with feelin'."
+      ]);
+      P("moo", "brutal", G.moo.hit[2], [
+        "%n's down on all fours lowin' like a cow at the gate, long and loud, and their head keeps tippin' toward the trough.",
+        "There's not a human sound left in %n. They moo, they snort, they nuzzle the farmhand's pocket for a treat, and they swish an imaginary tail.",
+        "%n bawls for the milkin' parlour, loud enough to bring the dairymaid at a run with a halter in her hand.",
+        "They've forgotten words exist. %n moos happily at the herd through the fence, and the herd moos back like they're one of them."
+      ]);
+      P("moo", "after", G.moo.after, [
+        'The fog lifts. %n tries a word, carefully. "Mmm..." They try again later.',
+        "It clears. %n's got a lot to say about it, and it's all goin' to come out as mooin' for a while yet.",
+        "When it's gone %n still lows when they mean to speak, and every time they do it the herd answers.",
+        "The gas thins out. %n's English doesn't come back with it, and they moo crossly at the grate."
+      ]);
+    }
+    {
+      const S = VARIANT_LINES.spray, P = (k, name, pool, l) => poolMore("spray", k + " " + name, pool, l);
+      P("seed", "cloud", S.seed.cloud, [
+        "A gauge on the tank reads STUD BARN, MORNIN', and the needle's right up at FULL.",
+        "The pipe thumps and gurgles like somethin' thick is shoulderin' its way through it, and the first spout drools a long pearly string.",
+        "It smells like the collection shed on a warm day: salt, musk, and a lot of very satisfied studs.",
+        "The roses on the spouts are clogged white already, and they cough, and clear, and point at %n."
+      ]);
+      P("seed", "mild", S.seed.hit[0], [
+        "One spout spits a warm thick dollop onto %n's cheek, and it slides down to the corner of their mouth and sits there.",
+        "A lazy rope of seed lands in %n's hair and starts its slow way down the back of their neck.",
+        "{t}A warm splash lands between %n's tits and runs down the valley in a slow white line.",
+        "It marks %n once across the lips and once across the throat, warm and salty, like a pair of signatures."
+      ]);
+      P("seed", "strong", S.seed.hit[1], [
+        "The spouts take their time with %n, one after another, a long warm stripe across the face, then the chest, then the belly, till they're strung like a harp.",
+        "{t}%n's tits get a fat warm load each, and it drips off their nipples in long strings to the floor.",
+        "It glues one of %n's eyes shut and fills the dip of their collarbone and runs off their chin in a thick slow beard.",
+        "%n turns their face away and gets it in the ear instead, and in the hair, and down the back, and they're drippin' from every edge."
+      ]);
+      P("seed", "brutal", S.seed.hit[2], [
+        "The tank opens up all at once and %n's buried under it, hot and heavy and endless, coughin' it up and gulpin' it down and blinkin' through a white mask.",
+        "Every spout fires and keeps firin'. It sheets off %n's hair, pools in their open mouth, fills their navel, glues their thighs, and they're still gettin' more.",
+        "A fat nozzle finds %n's lips and stays there pumpin', so they're swallowin' load after load while the rest hoses them white from scalp to knees.",
+        "%n's plastered so thick it hangs off them in ropes. They can't see, can't spit fast enough, and the gauge on the tank's still only halfway down."
+      ]);
+      P("seed", "after", S.seed.after, [
+        "The spouts dribble and stop. %n's left stood in a white pool, glazed thick, the smell of stud on every inch of them.",
+        "It's over. %n drips. Long white strings stretch between their fingers when they lift their hands.",
+        "The cuffs open. %n wipes their eyes with the back of a sticky wrist, licks their lips, and finds they're still swallowin'.",
+        "%n is let go creamed like a cake, and every fly in the barn and every stud in the yard is very interested in them."
+      ]);
+      P("piss", "cloud", S.piss.cloud, [
+        "The tank's labelled GUTTER, STALL ROW, and it's warm to the touch, and it's comin' down.",
+        "The pipe overhead steams, and the first drops hiss on the boards, and the smell's sharp and unmistakable.",
+        "It's yellow, it's hot, and the whole barn's been fillin' it all mornin'.",
+        "A drip lands on the back of %n's neck, warm, and runs down their spine, and they know exactly what it is."
+      ]);
+      P("piss", "mild", S.piss.hit[0], [
+        "A thin warm stream patters on %n's belly and trickles down their thighs into their socks.",
+        "One spout wets %n's hair and the back of their neck, warm and steady, and runs off them in rivulets.",
+        "It splashes across %n's chest and drips off their chin, hot, and the smell climbs up their nose.",
+        "A lazy yellow arc lands on %n's feet and climbs, slow, to their knees."
+      ]);
+      P("piss", "strong", S.piss.hit[1], [
+        "Two streams cross on %n's chest and run hot between their legs, and a third finds their face when they turn to dodge.",
+        "It drums on %n's head and pours down their face, and they spit, and gasp, and get a mouthful for gaspin'.",
+        "%n's soaked through in a minute, clothes clingin', piss runnin' off their elbows and fingertips and nose.",
+        "The spouts paint %n yellow from collar to knees, steamin', and one keeps comin' back to their open mouth."
+      ]);
+      P("piss", "brutal", S.piss.hit[2], [
+        "Every pipe empties on %n at once, a hot steamin' torrent, and a spout locks onto their mouth so they drink or drown. They drink.",
+        "%n's hosed from six sides, drenched and gaspin', piss pourin' out of their hair and nose and the corners of their mouth.",
+        "It's like standin' under a gutter in a summer storm, if the storm was the whole stall row. %n's swallowin' without bein' asked now.",
+        "They're on their knees in a hot yellow flood, face tipped up, mouth open, because the spout won't take no for an answer."
+      ]);
+      P("piss", "after", S.piss.after, [
+        "The pipes go quiet. %n kneels drippin' and steamin' in a warm yellow puddle, marked like a gatepost.",
+        "It stops. %n's soaked to the skin and reekin', and every nose in the yard is goin' to know.",
+        "The cuffs let go. %n squelches out of the rack, wet through, and leaves yellow footprints behind them.",
+        "When it's done %n's still dribblin' from the hair and the fingertips, warm and pungent and thoroughly marked."
+      ]);
+      P("milk", "cloud", S.milk.cloud, [
+        "The tank's still warm from the parlour and smells of cream and hay, and the spouts are beaded white.",
+        "Somebody's hooked the rack to the dairy line, and the first spurt is frothy and sweet as the top of the pail.",
+        "A label on the pipe says HERD, MORNIN', in chalk. It's still steamin' a little.",
+        "The rack hums, and the pipes swell, and warm milk starts to bead at every rose."
+      ]);
+      P("milk", "mild", S.milk.hit[0], [
+        "A warm gentle mist of milk settles over %n, and their skin goes soft and sweet-smellin' under it.",
+        "One spout splashes milk across %n's lips, and they lick it off before they think, and it's lovely.",
+        "{t}Warm milk runs over %n's tits and drips off the points like they're leakin' it themselves.",
+        "It sprinkles %n like a summer shower, warm and white, and beads in their eyelashes."
+      ]);
+      P("milk", "strong", S.milk.hit[1], [
+        "The spouts open and %n's bathed in it, warm white sheets of it, and a nozzle at their mouth keeps them drinkin'.",
+        "%n's soaked creamy to the skin, milk runnin' in rivers down their belly and thighs, and they're gulpin' between splashes.",
+        "{t}A cup-shaped nozzle squirts right on %n's nipples, warm and steady, till they're tingly and swollen like they've just been milked.",
+        "Milk fills %n's mouth faster than they can swallow and runs down their chin and chest, sweet and warm."
+      ]);
+      P("milk", "brutal", S.milk.hit[2], [
+        "A fat hose seals over %n's mouth and pumps, and their belly rounds out sloshin' full of the herd's milk while the rest drowns them white.",
+        "It comes down like a tipped churn, gallons of it, and %n's drinkin' because there's no other way to breathe.",
+        "%n's force-fed so much warm milk their belly's tight as a drum and gurglin', and it's still pourin' over them from every side.",
+        "They're soaked, glazed and gulpin', milk runnin' out of their nose when they cough, and the tank's barely touched."
+      ]);
+      P("milk", "after", S.milk.after, [
+        "The rack opens. %n waddles out of it sloshin', belly round, drippin' white and smellin' like the dairy.",
+        "It's over. %n's sticky-sweet from hair to toes, and every cat on the farm is followin' them.",
+        "%n's let go creamy and full, licks their lips, and burps, and blushes.",
+        "When the spouts stop %n's stood in a warm milk puddle, belly swollen, and they'd be quite happy to lie down in it."
+      ]);
+      P("slime", "cloud", S.slime.cloud, [
+        "The nozzles bulge, and what comes out stretches and wobbles and takes its time, green as a bottle and cool as a cellar.",
+        "It doesn't spray so much as reach. Long glossy ropes of green lean out of every spout toward %n.",
+        "The slime gurgles in the pipes like somethin' laughin' to itself.",
+        "Bright green goo drools out of the roses in thick slow strings, and the strings feel for the air like fingers."
+      ]);
+      P("slime", "mild", S.slime.hit[0], [
+        "A cold green rope drapes over %n's shoulder and slithers down their front, slow as treacle.",
+        "It lands on %n's head with a wet slap and oozes down over their ears.",
+        "A glob of slime settles in the small of %n's back and sits there, cool, wrigglin' a little.",
+        "{t}Green goo lands on %n's tits and creeps over them like a cold hand, cuppin'."
+      ]);
+      P("slime", "strong", S.slime.hit[1], [
+        "The slime coats %n from the neck down and moves on its own, slidin' into their armpits, their navel, between their thighs.",
+        "It's tacky as glue and cool as well water, and %n's arms stick to their sides and their knees stick together.",
+        "{c}A rope of slime winds itself round %n's cock like it's curious, and squeezes, and doesn't let go.",
+        "{v}The slime finds %n's pussy and slides in, cold and thick, and they gasp and it fills the gasp too."
+      ]);
+      P("slime", "brutal", S.slime.hit[2], [
+        "It pours over %n by the bucket and their clothes melt off them in green threads, and the slime keeps comin', pushin' cool and thick into every way in.",
+        "%n's packed in it like a jar of preserves, glued to the frame, and the slime is busy inside them, front and back, wrigglin'.",
+        "It plugs %n everywhere at once, mouth, ears, and both holes below, and wobbles there, cool and patient, and starts to move.",
+        "They're buried to the chin in thinkin' goo, bare, stuck fast, and somethin' in it is strokin' them all over from the inside out."
+      ]);
+      P("slime", "after", S.slime.after, [
+        "The rack lets go and %n peels off it in long green strings, gluey, stickin' to their own fingers.",
+        "It's done. %n squelches with every step and leaves a green trail like a snail.",
+        "When the spouts stop %n's shinin' green and cool and very slow, and bits of it still wiggle when they move.",
+        "%n's turned loose slimed to the eyebrows. It'll wear off. Some of it doesn't seem to want to."
+      ]);
+      P("oil", "cloud", S.oil.cloud, [
+        "Gold oil mists out of the spouts, warm as bathwater, smellin' of cloves and saddle leather and somethin' sweeter.",
+        "It's the oil they rub on show stock before the judgin', and it's hot, and it's comin' down.",
+        "A fine warm golden fog hangs in the rack, and it makes %n's skin shine before it's even touched them.",
+        "The pipes hum, and warm sweet oil starts to bead at every rose like honey off a comb."
+      ]);
+      P("oil", "mild", S.oil.hit[0], [
+        "A warm sheen settles over %n, and every place it touches wakes up and tingles.",
+        "The oil sinks into %n's skin, warm and slow, and their own hands feel twice as soft on them.",
+        "%n's lips go glossy, their shoulders go glossy, and a shiver runs down them from the top.",
+        "{c}A trickle of warm oil runs down %n's belly and finds their cock, and it twitches like it's been kissed."
+      ]);
+      P("oil", "strong", S.oil.hit[1], [
+        "The oil runs everywhere, and everywhere it runs it burns sweet, and %n's breathin' hard and flushed from their ears down.",
+        "{t}%n's tits shine like polished apples and their nipples throb, hard enough to ache, and the cuffs won't let them touch.",
+        "{v}Warm oil slides between %n's legs and pools there, and their clit stands up swollen and slick and achin' for a finger.",
+        "Every brush of air on %n's skin is like a tongue now. They squirm in the rack and that's worse, because squirmin' is touchin'."
+      ]);
+      P("oil", "brutal", S.oil.hit[2], [
+        "%n's basted like a feast-day roast, every inch of them, and a slim nozzle works it up inside them besides, and they're keenin' at the breeze.",
+        "{c}%n's cock is shinin' and stiff and leakin', and it jumps every time a drop of oil lands on it, and they're right at the edge with nothin' touchin' them at all.",
+        "{v}Oil drips off %n's swollen clit in a warm string, and their pussy's clenchin' on nothin', and they'd do anything for one stroke. Anything.",
+        "They're slick as an eel and burnin' up, and a fly landin' on %n's thigh makes them cry out and buck in the cuffs."
+      ]);
+      P("oil", "after", S.oil.after, [
+        "The rack opens. %n's gleamin' like a show winner, and so sensitive that walkin' makes them whimper.",
+        "It's over. %n shines gold from head to toe, flushed and achin', and their clothes feel like sandpaper.",
+        "When the spouts stop %n's slippery all over and breathin' through their mouth, and they're goin' to need somebody's hands on them soon.",
+        "%n's let go oiled and achin', and every person they pass wants to run a palm down them to see if they're as slick as they look."
+      ]);
+      P("ink", "cloud", S.ink.cloud, [
+        "The tank's full of the blue they put on a ewe after the ram's been, and it's thick, and it stains.",
+        "A tin of markin' dye's been tipped into the pipes, deep blue and smellin' of tar.",
+        "The spouts are crusted blue already. They've done this before. They're goin' to do it again.",
+        "Blue drips off every rose and spots the boards round %n's feet like rain on a slate roof."
+      ]);
+      P("ink", "mild", S.ink.hit[0], [
+        "One spout puts a neat blue thumbprint on %n's cheek, like a mark on a sale sheep.",
+        "A spray of blue freckles %n's shoulder and soaks in like it's been there all along.",
+        "A blue splat lands on %n's bum, one cheek, and stays. It's a tuppin' mark.",
+        "The dye catches %n across the belly in a stripe. On a ewe that's a count. They've been counted."
+      ]);
+      P("ink", "strong", S.ink.hit[1], [
+        "Blue over the chest, blue down the thighs, and the stencil thumps a word on %n's belly and lifts away, neat as print.",
+        "%n's dyed and tallied like stock at the auction ring, front and back, and the number on them means nothin' to them and everythin' to the farm.",
+        "The spouts paint %n's backside blue end to end, the way you mark a ewe that's been served, and they giggle while they do it.",
+        "A ring of blue goes round %n's throat like a collar, and a handprint on each hip, and the word stamped over their heart."
+      ]);
+      P("ink", "brutal", S.ink.hit[2], [
+        "%n's dyed blue from throat to knees, front and back, stamped and labelled, and nobody on the farm will mistake what they are from a field away.",
+        "They spray %n like a ewe after a long week with the ram: chest, belly, ass, thighs, blue on blue, and the stencil comes down twice.",
+        "%n's marked so thoroughly the blue's in their hair and under their nails, and the word on their chest is big enough to read from the road.",
+        "Blue handprints all over %n, as if a dozen studs have had them, and a stamp across the bum that says it plain."
+      ]);
+      P("ink", "after", S.ink.after, [
+        "The rack lets %n go, painted and labelled, and the blue's not comin' off without a stiff brush.",
+        "It's over. %n looks down at the word on their chest and goes red under the blue.",
+        "When the cuffs open %n walks out blue as a sale ewe, and the farmhands grin and read them out loud.",
+        "%n's turned loose dyed like stock. Anybody passin' knows where they've been."
+      ]);
+      P("hose", "cloud", S.hose.cloud, [
+        "The big rubber hose wakes up and swings round, drippin', and points at %n like a finger.",
+        "A brass nozzle the size of a fist clanks down, and the pipe behind it shudders with cold water.",
+        "It's the mornin' wash for the milkin' stalls. Ice cold, hard as a slap.",
+        "The pipe's sweatin' with cold. Whatever's in it came straight up from the bottom of the well."
+      ]);
+      P("hose", "mild", S.hose.hit[0], [
+        "Cold water slaps across %n's back and they yelp and dance on the spot, and it chases them.",
+        "The hose rinses %n down in quick cold sweeps, head to heels, and they come up pink and squeakin'.",
+        "Icy water runs off %n's chin and elbows, carryin' the day's mess down the drain in grey rivers.",
+        "A cold spray takes %n in the face, then the chest, then the bum, brisk as a farmhand with a scrubbing brush.",
+        "{t}The cold hits %n's tits and their nipples go hard as acorns, and they cover up with both arms, squealin'."
+      ]);
+      P("hose", "strong", S.hose.hit[1], [
+        "The jet's hard enough to sting. It scours every inch of %n, under the arms, behind the knees, between the legs, till they're clean and gaspin'.",
+        "%n's washed down like muddy stock at show time, water hammerin' off them, and nothin' sticks: not slime, not seed, not dye.",
+        "They hose %n against the wall and keep it there, cold and pummellin', till their teeth are chatterin' a tune.",
+        "The water's so cold it burns. %n hops and shrieks and twists in the cuffs, and the nozzle follows every twist.",
+        "Every drop of mess on %n gets blasted off and swirls away down the gutter, and %n's goosefleshed and shiny and furious."
+      ]);
+      P("hose", "brutal", S.hose.hit[2], [
+        "The full jet, point blank, cold as January. %n's scrubbed raw-clean and pink, shriekin', and the hose gets into places a hose has no business goin'.",
+        "It hammers %n against the frame, freezin', and turns them round by force of water, front, back and up between the legs, till there's nothin' left on them but goosebumps.",
+        "%n's hosed like a stall floor after a busy night: every inch, hard and cold, and twice over the dirty bits.",
+        "The nozzle's turned to STRAIGHT and it means it. %n's blasted clean, blue-lipped and hollerin', and the water swirls away clear.",
+        "It doesn't stop when they're clean. It does them again, cold and thorough, till %n's sobbin' with cold and spotless as a new pail."
+      ]);
+      P("hose", "after", S.hose.after, [
+        "The hose goes slack. %n drips, shivers, and hugs themselves, clean as a new pin, nipples like pebbles.",
+        "It's over. %n's pink, squeaky and blue at the lips, and there's nothin' on them at all now but water.",
+        "When the cuffs open %n stands steamin' faintly in the cold, scrubbed clean and teeth chatterin'.",
+        "%n's let go spotless and shakin', and somebody very kindly throws them a horse blanket."
+      ]);
+    }
+    {
+      const I = VARIANT_LINES.injector, P = (name, pool, l) => poolMore("injector", name, pool, l);
+      P("arm, caught", I.styles.arm[0], [
+        "%n reaches for a bridle hangin' on a hook, and the hook folds down into a padded clamp and closes on their wrist, and a brass arm swings round from behind the post.",
+        "Two jointed arms come out of the wall at hip height, quiet as cats, and hold %n by the waist, firm and polite, while a third lifts a syringe up into the lamplight.",
+        "A plate in the floor clicks, and a cuff on a spring arm snaps round %n's ankle, and another round their knee, and somethin' with a needle rises out of the straw.",
+        "%n leans on the stall partition and it leans back: a rubber-padded arm wraps their shoulders, snug as a hug, and the needle arm unfolds from behind it."
+      ]);
+      P("arm, lined up", I.styles.arm[1], [
+        "The arm presses a rubber thumb into the soft of %n's thigh, feelin' for the right spot, the way a vet feels a cow's flank before the jab.",
+        "It holds the needle a hair from %n's skin and waits, ticking, till they've stopped squirmin', because it's in no hurry at all.",
+        "A cold wet swab circles %n's hip, round and round, and the needle follows it in, closer every circle.",
+        "%n tries to twist away and the arm just turns with them, patient as a dance partner, and the point stays exactly where it was."
+      ]);
+      P("chair, caught", I.styles.chair[0], [
+        "A bench along the wall turns out to have arms, and the arms turn out to have buckles, and %n's sat down and strapped in before they've finished sittin'.",
+        "The floor tips %n backward into a padded chair that wasn't there a second ago, and straps whip round their thighs and spread them over the leg rests.",
+        "%n sits on a hay bale to rest, and the hay bale is a chair under a sack, and it has a strap for every limb they've got.",
+        "A leather seat drops out of the hayloft on chains, scoops %n up behind the knees, and buckles itself round them, swingin' gently, with a tray of glass rattlin' alongside."
+      ]);
+      P("chair, lined up", I.styles.chair[1], [
+        "The chair's arm picks a syringe off the tray, turns it in the lamplight like a jeweller, and puts it back, and picks a bigger one.",
+        "Somethin' cold dabs the crease of %n's thigh, then the soft of their belly, then their neck, tryin' each one like a taster.",
+        "The leg rests swing a little wider. A rubber finger pinches up a fold of skin high inside %n's thigh and holds it there, waitin' for the needle.",
+        "The lamp angles itself down onto %n, bright and warm, and the needle comes down through the light, glintin', slow as honey."
+      ]);
+      P("dart, caught", I.styles.dart[0], [
+        "Thwip. A dart with pink feathers sticks quiverin' in %n's bum, and somewhere up in the rafters a little brass barrel swivels to watch.",
+        "%n hears a soft click from the hayloft, turns, and takes the dart square in the hip instead of the back, which the trap seems fine with.",
+        "A row of knotholes in the barn wall turns out to be a row of tubes, and one of them puffs, and %n's got a dart in the thigh.",
+        "Somethin' stings %n in the soft of the arm, and they look down at a feathered dart and a glass barrel already drainin' into them."
+      ]);
+      P("dart, lined up", I.styles.dart[1], [
+        "%n's legs go heavy as wet sacks, and they sit down hard in the straw while the dart finishes its work, glug by glug.",
+        "They pluck at it, but the barbs hold, and the tip's already made their fingers too lazy to pull.",
+        "The first of it is somethin' to make them sleepy-soft, and %n sinks down onto their elbows, blinkin', while the rest goes in.",
+        "A second dart thwips in an inch from the first, because the trap likes things even."
+      ]);
+      P("collar, caught", I.styles.collar[0], [
+        "A heavy steel collar drops from a hook in the rafters and snaps shut round %n's throat with a click like a gate latch.",
+        "Somethin' cold slides round %n's neck from behind and locks, and they can feel little glass vials sittin' snug against their pulse.",
+        "A loop of leather and brass falls over %n's head and cinches, and a ring of tiny needles inside it settles against their skin, cold as dew.",
+        "The collar's hangin' on a peg like a horse's, and %n only touches it, and it's round their neck and buckled before they let go."
+      ]);
+      P("collar, lined up", I.styles.collar[1], [
+        "The collar warms against %n's neck, hummin', and a little needle presses just hard enough to say it's there.",
+        "A gauge on the buckle ticks from EMPTY toward FULL, and the vials round it start to glow, one after another.",
+        "It tightens, just a notch, so %n can feel their own heartbeat against the needles, and then it chooses one.",
+        "%n swallows, and the collar feels it, and ticks faster, like it's excited."
+      ]);
+      P("mild dose", I.fill[0], [
+        "Just a sip in the barrel, pale and pearly, hardly worth the needle.",
+        "It's half a thimble, no more, glintin' in the bottom of the glass.",
+        "The barrel's mostly air and a little cloud of somethin' pink at the tip.",
+        "A tiny dose, the kind for a first time. A taste of it. A start."
+      ]);
+      P("strong dose", I.fill[1], [
+        "The barrel fills to the line, thick and gold and warm, and then a little past it.",
+        "It's a proper dose: a full glass, slow and syrupy, with bubbles rising through it.",
+        "Two barrels side by side, both full, both cloudy, both meant for %n.",
+        "The syringe is as long as a hand and full to the stopper, and the plunger's already pressin'."
+      ]);
+      P("brutal dose", I.fill[2], [
+        "It's a drench gun, the kind for a herd bull, and it's full to the top with somethin' thick and glowin'.",
+        "The glass is as big as a milk bottle and it's sloshin', and the label just says ALL OF IT.",
+        "Three syringes, each one bigger than the last, lined up on the tray. The trap picks up all three.",
+        "The barrel's so full it bulges, and the needle's as long as %n's finger, and the stuff inside is pulsin' slow like it's alive."
+      ]);
+      P("mild shot", I.open[0], [
+        "A quick little prick and a cool trickle, and %n hardly feels it, and then they do.",
+        "The needle slips in and out like a hummingbird, and leaves a warm drop behind.",
+        "It's over before %n's done flinchin': a pinch, a push, and a tiny bead of warm under the skin.",
+        "The point barely kisses them, and the little dose goes in sweet and easy."
+      ]);
+      P("strong shot", I.open[1], [
+        "The needle sinks deep and the plunger drives down steady, and %n feels it go in like warm honey through a straw.",
+        "It goes in to the hilt and empties slow, and a warm swollen knot rises under the skin and starts to spread.",
+        "%n gasps as the dose floods in, heavy and hot, and they can feel it travellin' through them like a drink of whiskey on an empty belly.",
+        "The trap leans on the plunger, all of it, and the warmth goes off through %n in waves."
+      ]);
+      P("brutal shot", I.open[2], [
+        "The big needle punches in and the dose comes after it like a burst pipe, and %n's whole body goes hot from the inside out.",
+        "It pumps and pumps. %n can feel the stuff sloshin' under their skin, a lump the size of a fist, then spreadin' everywhere at once.",
+        "The trap empties all of it into %n, stroke after heavy stroke, and they sag in its grip, sweatin', as a dose for a stud bull starts to work on them.",
+        "It goes in so deep and so much that %n's leg goes numb, then their belly goes hot, then their whole body hums like a struck bell."
+      ]);
+      P("second needle", I.second, [
+        "Then it picks up another syringe, a different colour, and sticks %n again before the first one's settled.",
+        "There's a click, a whir, and a second needle comes round, like the trap's decided one thing at a time is no fun.",
+        "It isn't finished. A second barrel slots into place, and %n feels a fresh prick an inch from the first.",
+        "The tray turns. The trap selects another, holds it up to the light, nods to itself, and goes in again."
+      ]);
+      const WH = TRAPS3_LINES.wheel, Q = (name, pool, l) => poolMore("wheel", name, pool, l);
+      Q("strap", WH.strap, [
+        "%n trips on a hoop in the straw and it rises, and it's the rim of a great painted wheel, and cuffs snap round their wrists and ankles as it rights itself.",
+        "The barn doors swing open on a fairground wheel, painted red and gold with a dozen breeds round the rim, and two farmhands buckle %n onto the middle of it, spread like a star.",
+        `There's a crowd in the barn and a barker with a megaphone, and he points at %n and shouts "VOLUNTEER!" and the crowd carries them to the wheel.`,
+        "A big wooden wheel's been bolted to the barn wall, its rim painted with studs of every kind, and %n's strapped across the hub with their legs wide and their hips right at the height a stud would want.",
+        "Straps at the wrists, the ankles and round the waist, and %n is buckled spread-eagle across the breedin' wheel, and the barker spins it once, just to hear the crowd gasp."
+      ]);
+      Q("spin, in", WH.spinIn, [
+        "%i spin: the wheel ticks round and round and settles on a stud with a %c cock, and he grins, grips the rim in both hands and takes %n's %h in one long push.",
+        `%i stop. The arrow points at a %c stud, and the crowd chants "BREED, BREED, BREED!" while he does exactly that to %n's %h.`,
+        "The wheel clacks to a halt on %i spin, %n upside down, and a stud with a %c cock steps up anyway and fills their %h at that angle, which takes some doin'.",
+        "%i spin brings a %c stud, big and pleased with himself, and he holds the wheel still with one hand and ruts %n's %h with the other on their hip till he's finished.",
+        `Round and round, and %i stop lands on %c. He's quick, he's deep, and he leaves %n's %h full and drippin' when the barker shouts "SPIN!"`
+      ]);
+      Q("spin, over", WH.spinOver, [
+        "%i spin: a stud with a %c cock steps up, finds every way in shut, swears, and strokes himself off across %n's belly instead.",
+        "%i stop on the wheel: %c. There's no way in, so he takes himself in hand and paints %n's thighs and belly, and the wheel turns again.",
+        "The wheel lands on %c for %i spin. He looks %n over, shrugs, and finishes all over their chest with a groan the crowd cheers.",
+        "%i spin: a %c stud ruts between %n's thighs, can't get in, and spends himself over their belly in thick hot ropes.",
+        "%i stop, %c, and the stud has to make do: he grinds against %n till he spills across their hips, and steps back for the next.",
+        "Round goes the wheel, and %i stop is a %c stud who can't get in, so he makes very sure %n's wearin' it instead."
+      ]);
+      Q("end", WH.end, [
+        "The wheel creaks to its last stop. Three spins, three studs, %ml of three kinds of seed sloshin' in %n's %h, and they couldn't tell you which way is up.",
+        `The barker calls "THAT'S YOUR LOT!" and the farmhands unbuckle %n from the wheel, dizzy and dripping, %ml packed into their %h.`,
+        "%n comes off the wheel bred three ways over, %ml in their %h, and has to sit down in the straw because the barn won't stop spinnin'.",
+        "Three spins, three loads, %ml of it. %n's unstrapped with a round of applause and a rosette pinned on them that says BEST IN SHOW.",
+        "They let %n down off the breedin' wheel full to the brim, %ml leakin' out of their %h in three colours, and the crowd goes home happy.",
+        "The wheel stops, %n's let go, and %ml of mixed seed runs down their thighs as they wobble off, still seein' the rim go round."
+      ]);
+      Q("end, over", WH.endOver, [
+        "Three spins, three studs, and none of them got in, so %n's let down off the wheel striped and spattered from neck to knee.",
+        "The wheel stops for good, and %n's unstrapped plastered with three studs' worth of seed and dizzy as a top.",
+        "%n comes off the breedin' wheel painted three times over, drippin', and the barker gives them a consolation rosette.",
+        "No way in, so the studs made do, and %n's let go glazed in three kinds of seed with the crowd still cheerin'.",
+        "The wheel creaks to its last stop. %n's covered in other people's pleasure from collarbone to thighs, and the world's still spinnin'.",
+        "They unbuckle %n, wobbly and marked all over, and three studs tip their hats to them on the way out."
+      ]);
+      trapSceneMore(
+        "gas",
+        [
+          "Whatever colour it is, it's in %n's lungs now and spreadin', and they can taste it at the back of their throat every time they breathe.",
+          "The cloud swirls round %n like it's got somewhere to be and %n's where it is, and it clings to their skin in a fine damp bloom.",
+          "%n holds their breath as long as they can, cheeks puffed, and lets it go in a gasp, and the next breath is twice as deep.",
+          "The fumes find the warm places first: the backs of the knees, the inside of the elbows, the crease of the thighs, and they linger there."
+        ],
+        [
+          "%n's sat on the floor now, blinkin' at the boards, and the boards are blinkin' back. Whatever it was, it's workin'.",
+          "A farmhand comes in, sniffs once, backs out, and holds the door shut from outside, grinnin' through the crack.",
+          "The cloud's thinnin' at the top but it's thick as ever round %n, pooled round them like they're the plug in a bath.",
+          "The valve under the boards gives one last long hiss, and %n gets every bit of it full in the face."
+        ]
+      );
+      trapSceneMore(
+        "spray",
+        [
+          "The spouts work round %n like a farmhand groomin' a show animal, every side, every crease, nothin' missed.",
+          "The arms turn %n round to face the wall, and the spouts get to work on their back and bum, and then turn them back again.",
+          "%n tries to close their legs and a padded bar slides between their knees and stops them, so the spouts can reach.",
+          "The rack lifts %n up on their toes, arms high, so there's nowhere on them that isn't facin' a nozzle."
+        ],
+        [
+          "%n's drippin' from the elbows and the chin and the tips of their hair, and the drain at their feet is gurglin' happily.",
+          "The farmhands have come to lean on the rail and watch, and one of them gives the tank a friendly thump to keep it goin'.",
+          "A spout runs out, coughs, and refills, and comes back round to %n like it's missed them.",
+          "Everything on %n's slick and shinin' and runnin', and the spouts give them one more slow pass from head to toe to be sure."
+        ]
+      );
+      trapSceneMore(
+        "injector",
+        [
+          "The trap holds %n very still and very close, and they can hear it countin' under its breath, tick, tick, tick, like a clock.",
+          "A gauge on the side of the post swings from EMPTY to READY, and somethin' inside the post starts to warm up.",
+          "A little brass funnel lowers itself over the needle and drips somethin' sweet on the point, a kindness, like sugar on the medicine.",
+          "%n can see themselves in the curve of the glass barrel, stretched and gold, with whatever's inside it waitin' to be part of them."
+        ],
+        [
+          "The warmth spreads past the place the needle went in, down one leg and up into the belly, and keeps goin'.",
+          "%n's pulse is thumpin' in their ears, and every thump pushes the dose a little further in, a little deeper.",
+          "{t}%n's tits throb in time with their heart, warm and heavy, like somethin's fillin' them from the inside.",
+          "{v}A slow wet heat pools between %n's legs and doesn't drain away, and their pussy goes soft and swollen and slick.",
+          "{c}%n's balls draw up tight and their cock stands without bein' asked, and both are achin' by the time the trap lets go."
+        ]
+      );
+      trapSceneMore(
+        "wheel",
+        [
+          "The barker leans on the wheel between spins and gives it a slow lazy turn so the crowd can see every angle of %n.",
+          "Somebody in the front row's keepin' a tally on a slate: which stud, which spin, how long he lasted.",
+          "%n's hair is hangin' down one minute and up the next, and the cuffs creak, and the rim clicks past breed after breed.",
+          "The crowd's takin' bets on the next stop, coins slappin' on a hay bale, and %n's the only one who doesn't get a say."
+        ],
+        [
+          "Seed's runnin' out of %n in a slow circle now, and every turn of the wheel flings a few drops at the front row.",
+          "The next stud's already waitin' by the wheel, stripped and ready, watchin' the arrow like a hawk.",
+          `"Faster!" somebody hollers, and the barker obliges, and %n's world goes round in a blur of painted breeds and grinnin' faces.`,
+          "%n's lost count of the turns. They know what's in them, and they know there's more comin', and that's about all they know."
+        ]
+      );
+      trapSceneMore(
+        "tentacle",
+        [
+          "The water round %n churns white, and every arm of it's slidin', squeezin', explorin', learnin' every curve of them by touch.",
+          "Suckers kiss their way up the backs of %n's thighs, one after another, wet little pulls that leave red rings behind.",
+          "An arm coils round %n's throat, soft and loose, not chokin', just holdin', like a hand at the back of the neck.",
+          "%n's lifted off their feet and turned in the water, slow, like somethin' admirin' what it's caught."
+        ],
+        [
+          "Slime froths round every place it's in them, and runs down %n's legs into the water in long pearly strings.",
+          "{t}The suckers on %n's tits are pullin' in rhythm now, and their nipples are swollen red and stretched long in the cups.",
+          "{c}The hollow arm round %n's cock squeezes and ripples root to tip, and it doesn't stop when they cum. It drinks it.",
+          "Its arms tighten everywhere at once, a long full-body squeeze, and %n feels every inch of them filled and held and owned."
+        ]
+      );
+    }
+    {
+      const P = (form, part, l) => {
+        const F = WATER_FORMS[form];
+        if (F && F.lines && F.lines[part]) poolMore("tentacle", form + " " + part, F.lines[part], l);
+      };
+      P("bloom", "grab", [
+        "The pond goes the soft blue of a gas lamp, and a ring of glowin' threads rises round %n like a curtain bein' drawn, and closes.",
+        "Somethin' brushes %n's ankle, feather-light, and fizzes. Then a whole veil of see-through threads drifts up their legs, tinglin' everywhere it touches.",
+        "A pale lit bell the size of a wagon wheel rises under %n and lifts them off their feet, and its threads fold round them, soft as wet silk.",
+        "The bloom drifts in on the current, slow and glowin', and wraps %n in its trailin' threads before they've noticed it isn't moonlight on the water."
+      ]);
+      P("bloom", "take", [
+        "A clear tendril, thick as a wrist, presses into %n's %h and keeps comin', and they can see the glow of it movin' up inside them.",
+        "It slips into %n's %h cool and wobblin', warms as it goes, and every inch of it buzzes like a lip after a kiss.",
+        "%n watches through the water as a see-through arm parts them and fills their %h, and it looks like glass and feels like warm honey.",
+        "The bloom feeds itself into %n's %h slow, glowin' brighter the deeper it gets, until their belly's lit faint blue from the inside.",
+        "A soft tendril, ridged with tiny glowin' beads, slides up into %n's %h, and each bead fizzes as it passes."
+      ]);
+      P("bloom", "sig", [
+        "{t}The threads coil round %n's tits and sting them all over, a hundred tiny sweet bites, till their nipples are standin' red and throbbin'.",
+        "{c}A glowin' thread winds up %n's cock from root to tip and stings it, gentle, over and over, till it's achin' and leakin' and lit pink.",
+        "{v}Fine threads find %n's clit and sting it, tiny and sweet, and the heat blooms out through their whole pussy in a rush.",
+        "Every sting leaves a warm spot, and the warm spots join up, till %n's one big glowin' blush and can't stop comin'."
+      ]);
+      P("bloom", "swell", [
+        "The bloom flares bright, and %n sees a soft glowin' egg slide down the tendril toward them, and then another behind it, and another.",
+        "Eggs like pale lanterns travel down the clear arm into %n, each one a cool stretch and then a warm glow settlin' low.",
+        "It lays in time with its own pulsin', a glowin' egg on every flash, and %n's belly lights up a little brighter each time.",
+        "%n can watch every egg go in through the see-through tendril, round and pale, and feel each one settle, and it makes them moan.",
+        "The bloom hums, and a long string of soft glowin' eggs slips up into %n like pearls off a broken necklace."
+      ]);
+      P("bloom", "end", [
+        "The bloom lets go a thread at a time and drifts off into the deep, dimmin', and leaves %n on the bank with %x glowin' eggs in their %h and stings that keep on tinglin'.",
+        "%x soft glowin' eggs, and %n's belly shines through their skin like a lamp under a quilt. The bloom fades into the dark. The heat it left doesn't.",
+        "It sets %n down in the shallows, stung pink all over, %x eggs heavier, and sinks away like a moon goin' down.",
+        "The pond goes dark again. %n doesn't: there's %x little lights in their %h and a warm buzz under every inch of skin.",
+        "%n's left floatin' on their back with %x eggs glowin' in them, stung, tingly, and so warm they don't want to get out of the water."
+      ]);
+      P("bloom", "endHyper", [
+        "It doesn't stop layin' till %n's belly's swollen huge and glowin' bright as a harvest lantern, %x eggs, and every sting on them burnin' sweet.",
+        "%x eggs. %n's belly lights the whole bank up blue, round and tight, and the stings have them pantin' in heat before they can sit up.",
+        "The bloom packs %n with %x glowin' eggs till they float, belly up and shinin', and leaves them bobbin' in the shallows like a lit buoy.",
+        "%x of them. %n's so full of glowin' eggs you can see them through their skin, packed tight, and they're too stung and too heavy to stand.",
+        "It fills %n till their belly's a moon, %x eggs glowin' through, and lowers them to the bank shiverin' with heat from every sting.",
+        "%x eggs, and %n glows like a lantern festival from hip to ribs, and the tinglin' won't let them lie still."
+      ]);
+      P("eel", "grab", [
+        "The mud at the bottom moves, and it's not mud, it's a nest of slick black eels all tied into one creature, and it rises round %n like a coil of rope.",
+        "%n feels a cold slippery length slide between their ankles, and another, and another, and then the knot pulls tight and they go down into the water.",
+        "Eels pour out of a hole in the bank, dozens of them, braidin' together as they come, and they wrap %n from the shins up before they can climb out.",
+        "A long black shape winds once round %n's waist and squeezes, and then a dozen more join it, and the eel-knot has them."
+      ]);
+      P("eel", "take", [
+        "A slick eel-arm noses at %n's %h and slides in, and then turns, and another follows, and they knot themselves round each other inside.",
+        "The eel-knot fills %n's %h with three slippery arms at once and ties them off inside like a sailor's knot, too big to slip back out.",
+        "It twists its way into %n's %h, squirmin', a slick corkscrew that keeps windin' deeper and thicker every turn.",
+        "One eel-arm slips into %n's %h, then doubles back on itself inside and swells, and %n's stretched round a knot in a heartbeat.",
+        "The eels braid into one fat rope and push into %n's %h, and every strand of it wriggles on its own once it's in."
+      ]);
+      P("eel", "sig", [
+        "The knot inside %n gives a slow twist, and %n's whole body twists with it, and they moan into the water.",
+        "{c}A slim eel ties itself round the base of %n's cock and squeezes, snug as a ring, and won't let them finish till it says so.",
+        "{t}Two eels coil round %n's tits in tight spirals and squeeze in time with the knot below, and %n's chest heaves with it.",
+        "%n tugs once, and the knot inside them tugs back, harder, and they learn very fast not to pull."
+      ]);
+      P("eel", "swell", [
+        "The eggs come down the braid squeezed long and slick, and pop through the knot one at a time, each one makin' %n buck.",
+        "The knot loosens a hair, and an egg slips through it into %n, and it tightens again, and loosens, and another.",
+        "Eggs travel down the twisted eel-arms like beads on a string, and the knot inside %n swallows every one.",
+        "%n can feel every egg wrigglin' through the knot, slow and slippery, and settlin' deep behind it where it can't get back out.",
+        "It lays slow and tight, the knot holdin' each egg in place before lettin' the next one by, till %n's full and locked."
+      ]);
+      P("eel", "end", [
+        "The eel-knot unties itself inside %n strand by strand, slow and wriggly, and slithers off into the mud, leavin' %x eggs locked in their %h.",
+        "%x eggs, tied in. When the last eel slips out of %n's %h, %n's left gapin', twitchin' and rocked to their toes.",
+        "It lets go knot by knot and leaves %n in the shallows with %x eggs in them and a slick stretch that's goin' to ache all evenin'.",
+        "The knot comes loose with a long wet slither, and %n's left on the bank, %x eggs heavier, still feelin' the shape of it.",
+        "%x eggs, and the eels take their time leavin', each one squirmin' out on its own, and every one makes %n jump."
+      ]);
+      P("eel", "endHyper", [
+        "It keeps layin' behind the knot till %n's belly's huge and tight, %x eggs, and when it finally unties there's no room for them to go anywhere.",
+        "%x eggs, every one held in by the knot till the very end, and %n's belly's so round and heavy the eels have to roll them up the bank.",
+        "The eel-knot packs %n with %x eggs and ties off so long and so tight that they come out of the water stretched, stuffed and shakin'.",
+        "%x of its eggs locked in %n, belly swollen near to burstin', and the knot unties so slow %n's cummin' again before it's out.",
+        "It knots and lays, knots and lays, till %n's belly's a barrel with %x eggs in it, and slithers off leavin' them too full to sit.",
+        "%x eggs. %n's belly sticks out like a full grain sack and still squirms where the last of the eels was knotted."
+      ]);
+      P("mother", "grab", [
+        "The water swells up like a hill and keeps comin', and the mother rises, older than the farm, and lifts %n out of the pond like they weigh nothin'.",
+        "A wave comes across the still pond with nothin' behind it but a great dark shape, and the shape opens into a hundred arms, and every one reaches for %n.",
+        "%n's foot slips off the bank into somethin' warm, wide and slow-breathin'. It's the mother, and she's already wrapped round them to the shoulders.",
+        "The frogs go silent. The reeds lie flat. Somethin' as big as the barn surfaces in the middle of the pond, and an arm thick as a tree trunk curls round %n's waist.",
+        "The mother comes up gentle, for all her size, and folds %n into her arms the way you'd scoop up a hen to check her eggs."
+      ]);
+      P("mother", "take", [
+        "She presses one vast arm to %n's %h and waits, patient as the seasons, until they open for her. Then she fills them so deep they forget to breathe.",
+        "An arm thick as a fence post sinks into %n's %h, slow and steady, and %n's belly swells with the shape of her as she goes in.",
+        "The mother doesn't push. She simply arrives, inch by inch, into %n's %h, wide as anything they've ever taken and warm right through.",
+        "%n's %h is stretched round her so full and so tight they can feel her heartbeat in it, slow and enormous.",
+        "She slides in deeper than deep, and %n's belly lifts and rounds out over her, and she rumbles, pleased, somewhere down in the water."
+      ]);
+      P("mother", "sig", [
+        "She rocks %n in the water like the tide rocks a boat, slow and endless, every arm holdin' a different part of them.",
+        "{t}Her little arms find %n's tits and hold them, gentle and firm, and draw on them in slow deep pulls like she's thirsty.",
+        "%n's lifted right out of the water, held up in her arms, every inch of them touched, stroked or filled, and she hums to them the whole time.",
+        "The mother's in no hurry at all. She breeds %n so slow and so deep that each stroke is a whole long minute, and %n's sobbin' with it by the third."
+      ]);
+      P("mother", "swell", [
+        "Her eggs come slow and heavy, each one as big as a fist, each one a long deep stretch and a warm settlin' thud inside %n.",
+        "The mother lays, and lays, and %n's belly rounds out under her arms like dough risin', egg by enormous egg.",
+        "A great egg works its way up her arm toward %n, a slow bulge travellin' through the water, and when it reaches them it opens them wide and drops in.",
+        "She lays in time with her own slow heartbeat, one egg a beat, and %n's belly grows with every one, round and tight and hot.",
+        "Every egg she gives %n is warm as a sun-baked stone and twice as heavy, and %n moans as each one sinks home."
+      ]);
+      P("mother", "end", [
+        "The mother of the pond leaves %x of her eggs in %n's %h, lays them on the bank as carefully as somethin' precious, touches their belly once, and goes down into the deep.",
+        "%x eggs. She lets %n go so gently they hardly feel the arms leave, and the pond closes over her, and %n's left holdin' the biggest belly they've ever had.",
+        "The mother sinks away slow, the water smoothin' over her, and %n lies on the bank with %x of her eggs warm and heavy in their %h.",
+        "She strokes %n's swollen belly with the tip of one huge arm, %x eggs in it, and rumbles somethin' that sounds like approval, and goes.",
+        "%x eggs from the mother herself. %n's lowered onto the grass, round as a rain barrel, and the pond goes still as glass behind them."
+      ]);
+      P("mother", "endHyper", [
+        "She doesn't stop at a clutch. She doesn't stop at two. %x eggs, and %n's belly's so huge and hard the mother has to carry them up the bank and set them down on their side.",
+        "%x of the mother's eggs, and %n's swollen past anythin' they thought a body could hold, and she holds them a long while in the water till they stop tremblin'.",
+        "The mother fills %n with %x eggs, slow and certain, till their belly's round as a hay bale, and lays them on the bank like her own.",
+        "%x eggs. %n can't close their legs, can't sit up, can't do a thing but lie there round and heavy and full of the mother's brood.",
+        "She lays %x eggs in %n and keeps them held till every one's settled, and leaves them on the grass enormous, glowin' and too full to move.",
+        "%x eggs, and %n's belly's so big it hides their knees, and the mother sinks away leavin' them lyin' in the shallows like a beached boat."
+      ]);
+      P("hungry", "grab", [
+        "Every sucker on the thing that comes up out of the water is openin' and closin' like a mouth, and they all turn toward %n at once.",
+        "A ring of soft pursed suckers breaks the surface by %n's knees, smackin' wetly, and the arms they're on come for the fullest parts of them first.",
+        "It's starvin', whatever it is. The arms shoot up the bank, wrap %n round the hips and chest, and the suckers start kissin' before they're even settled.",
+        "%n hears it before they see it: a wet, eager slurpin' under the water, gettin' closer. Then arms, and suckers, and it latches on everywhere.",
+        "The hungry one surfaces with its arms already reachin', and every sucker on them is wet and puckered and lookin' for somethin' to drink."
+      ]);
+      P("hungry", "sig", [
+        "{t}It drinks from %n's tits in long greedy pulls, suckers sealed tight, and every pull drags another hot spurt out of them and makes their back arch.",
+        "{c}The sleeve on %n's cock ripples and sucks, and when they cum it drinks every drop and keeps pullin' for more, hungry as ever.",
+        "Suckers seal over %n everywhere at once and pull in rhythm, and %n can feel themselves bein' drunk, a mouthful at a time.",
+        "It drinks so hard and so long that %n goes light-headed and soft in its arms, and the hungry one shivers with every swallow."
+      ]);
+      P("hungry", "end", [
+        "The hungry one drinks the last drop out of %n, smacks every sucker, and leaves %x eggs in their %h for the trouble. %n's emptied up top and full below.",
+        "It's had its fill. It lays %x eggs in %n's %h, gives them a last long suck for good measure, and slides off into the deep.",
+        "%n's drunk dry and bred full: %x eggs in their %h and not a drop left to give, and the hungry one goes off satisfied.",
+        "It leaves %n tingly, drained and sore from the suckers, with rings on their skin and %x eggs in their %h, and sinks away burpin' bubbles.",
+        "The hungry one lets go with a dozen wet pops, %x eggs heavier on %n's side of the bargain, and every drop of them on its."
+      ]);
+      P("siren", "grab", [
+        "There's a voice on the water with no words in it, and it says %n's name anyway. They wade in to answer, smilin', and the arms come up to meet them.",
+        "The singin' starts low under the reeds, so sweet %n's eyes fill, and they're walkin' into the pond before they've decided anything.",
+        "%n hears hummin', and it's the most beautiful thing they've ever heard, and they don't notice the water's at their hips till the soft arms close round them.",
+        "A tune floats up off the pond, slow and swayin', and %n sways with it, and the singin' one gathers them in like a partner at a barn dance."
+      ]);
+      P("siren", "take", [
+        "The song dips low and so does an arm, and it slips into %n's %h on the long note, and %n sighs it in.",
+        "%n's so lost in the tune they don't feel it enter their %h, only the warm fullness after, and the song swellin' to match.",
+        "It hums against %n's skin as it fills their %h, and the hum goes right through them, inside and out.",
+        "The singin' one takes %n's %h slow and sweet, and the song tells them that's what they wanted, and they agree.",
+        "On the high note it pushes deep into %n's %h, and %n's voice joins the song in a long helpless moan."
+      ]);
+      P("siren", "sig", [
+        "The tune goes round and round in %n's head, and their hips go round with it, and they can't remember anythin' else.",
+        "%n's hummin' the song with their mouth full of water and pleasure, eyes rolled up, swayin' in its arms.",
+        "Every verse of the song is a little slower and a little deeper, and %n follows it down and down.",
+        "It sings %n a word that isn't a word, and %n cums on it, and it sings it again, and they cum again."
+      ]);
+      P("siren", "swell", [
+        "Each egg comes on a long low note, and %n sighs as each one slides into them, hummin' along.",
+        "The song goes soft and slow and sleepy, and the eggs come with it, one on every beat.",
+        "%n doesn't notice the eggs until there are a lot of them. The song made sure of that.",
+        "It hums the eggs into %n one by one, and each one settles warm and heavy, and the tune never falters.",
+        "The singin' one lays in time with its tune, and %n's belly rises with the melody, round and full.",
+        "Its song swells, and the arm in %n swells, and the eggs come up it like notes up a scale."
+      ]);
+      P("siren", "end", [
+        "The song fades out on a long sweet note, and %n wakes on the bank with %x eggs in their %h and the tune still goin' round in their head.",
+        "%x eggs, and %n can't remember gettin' out of the water. They can remember every note of the song.",
+        "The singin' one sinks away hummin', and %n sits up %x eggs heavier, dreamy-eyed, singin' quietly to themselves.",
+        "When the song stops %n's lyin' in the reeds with %x eggs in them, smilin' up at the sky, still swayin' a little.",
+        "It leaves %n with %x eggs and a tune they'll be hummin' at milkin' time for a week."
+      ]);
+      P("siren", "endHyper", [
+        "The song keeps %n smilin' and swayin' while the singin' one lays %x eggs in them, till their belly's huge, and they don't notice until they try to stand.",
+        "%x eggs, every one sung into %n, and their belly's round as a rain barrel, and they're still hummin' when they're carried up the bank.",
+        "It sang so long and laid so much that %n's belly's enormous, %x eggs, and they float on their back blissed out and humming.",
+        "%x of its eggs in %n, and the song left them so far under they think it's the nicest thing that's ever happened to them. Their belly agrees.",
+        "The singin' one fills %n with %x eggs, verse after verse, and leaves them on the bank round, dazed and hummin' the chorus.",
+        "%x eggs. %n wakes from the song with a belly so big they laugh, and then hum, and then can't stop hummin'.",
+        "It sings %n so full of eggs, %x of them, that they slosh in time with the tune when they're helped up the bank."
+      ]);
+      P("reeds", "grab", [
+        "The reeds rustle, and there's no wind, and a hundred soft feelin' tips turn toward %n like heads at a dance.",
+        "%n parts the reeds to get to the water and the reeds part them back: thin feelers slidin' over their arms, their neck, their thighs, curious.",
+        "A dozen slim green-brown feelers lift out of the reed bed and stroke %n's legs, gentle as fingertips, and then a hundred more join them.",
+        "The reed bed sways toward %n and wraps round them, every reed a soft-tipped feeler, and they're held, and tickled, and held.",
+        "%n steps into the reeds and they close like a curtain, and inside it's all soft tips, everywhere, explorin'."
+      ]);
+      P("reeds", "take", [
+        "A bundle of fine feelers twines together and slips into %n's %h, then unwinds inside them and spreads out in every direction.",
+        "Thin tips find %n's %h one by one, a dozen of them, each slippin' in alongside the last, till they're full of wrigglin' reeds.",
+        "The reed-thing threads itself into %n's %h like a needle through cloth, and keeps threadin', and every thread wiggles.",
+        "%n feels them slip in, slim as straws, so many they lose count, and every one ticklin' a different spot inside.",
+        "A sheaf of soft feelers presses into %n's %h, slow, and blossoms open inside them like a flower."
+      ]);
+      P("reeds", "sig", [
+        "{c}A ring of feather-light tips circles the head of %n's cock, round and round, and never once grips.",
+        "{v}Tiny tips flicker over %n's clit, quick and light, a hundred little touches, and stop dead just as they start to shake.",
+        "The feelers tickle the soles of %n's feet while the ones inside stroke slow, and %n laughs and sobs at the same time.",
+        "Every time %n's breath catches the reeds go still and wait, swayin', for it to settle. Then they start again."
+      ]);
+      P("reeds", "swell", [
+        "Little eggs come down every feeler at once, small as peas, and patter into %n like rain into a barrel.",
+        "The reed-thing seeds %n slow and thorough, tiny egg after tiny egg, till they can feel them shiftin' like beans in a bag.",
+        "A trickle of tiny eggs runs down the bundle into %n, cool and round, dozens and dozens of them.",
+        "The feelers inside %n swell with little eggs and let them go one at a time, every one a tiny push.",
+        "Every reed lays at once, and %n feels a hundred little eggs settle inside them like seed into a furrow.",
+        "Tiny round eggs slip into %n by the handful, and the feelers tuck each one in place, careful as a gardener."
+      ]);
+      P("reeds", "end", [
+        "The feelers slip out one by one and stand back up in the bed, innocent, and %n's left in the shallows with %x tiny eggs and nowhere near done.",
+        "%x little eggs planted, and %n left right on the edge, achin', twitchin', with the reeds swayin' and rustlin' like they're laughin'.",
+        "It lets %n go %x eggs fuller and miles from finished, and they crawl out of the reeds beggin' the empty bank for a hand.",
+        "The reed-thing withdraws, tip by tip, and leaves %n sprawled and shakin', %x eggs in their %h, on the very brink and kept there.",
+        "%x tiny eggs, and %n's every nerve hummin' and denied, and the reeds go back to bein' reeds."
+      ]);
+      P("reeds", "endHyper", [
+        "%x tiny eggs, so many their belly's round and rattlin', and the reed-thing leaves them right on the edge, sobbin' to be let over.",
+        "It seeds %n with %x eggs till they're swollen tight, and edges them the whole time, and leaves them there: full, round and denied.",
+        "%x of them. %n's belly's big and lumpy with tiny eggs and their whole body's one long ache, and the reeds just sway.",
+        "The reed-thing lays %x eggs in %n and doesn't let them cum once, and they stagger out of the reeds round-bellied and wild-eyed.",
+        "%x eggs, each no bigger than a pea, and together they've swollen %n's belly huge, and every one shifts when they beg.",
+        "It plants %x eggs in %n and keeps them on the edge so long they've forgotten what the other side feels like.",
+        "%x tiny eggs, and %n's left full, round, edged and denied, pressin' their thighs together on the bank and whimperin'."
+      ]);
+      P("ink", "grab", [
+        "Somethin' black spurts out of the water and hits %n in the chest, warm and thick, and while they're lookin' down at it the arms come up and take them.",
+        "The pond goes dark round %n's legs as if a cloud's passed over, and then the cloud has arms, and they're inky, and they're everywhere.",
+        "A jet of black catches %n across the eyes, and they're blind and sputterin' and wrapped up in slick dark arms before they can wipe it away.",
+        "The ink-spitter rises in a bloom of its own black, and it smells of the deep and of iron, and it pulls %n into the cloud with it.",
+        "%n kneels to drink and the water's black, and the black reaches up, and it has suckers."
+      ]);
+      P("ink", "take", [
+        "A black arm smeared with ink slides into %n's %h, and when it moves out it leaves them stained and shinin'.",
+        "It pushes into %n's %h and squirts as it goes, and they're filled with warm ink a breath before they're filled with the rest of it.",
+        "The ink-spitter takes %n's %h with an arm so black it looks like a hole in the water, and it's hot inside them.",
+        "Ink runs out round the arm in %n's %h with every stroke and darkens the water, and %n can't see what's fuckin' them, only feel it.",
+        "It fills %n's %h with one fat inky arm and marks them inside as thoroughly as out."
+      ]);
+      P("ink", "sig", [
+        "{t}It squirts ink over %n's tits and rubs it in with its suckers, round and round, till they're glossy black and achin'.",
+        "{c}An arm wraps %n's cock and coats it in ink, strokin', and when they cum it comes out black-streaked and the thing seems very pleased.",
+        "It paints %n with its arms like a brush, slow black strokes up their belly and down their thighs, and signs them across the chest.",
+        "Inside the black cloud %n can't see their own hand. They can only feel the arms, and the thrusts, and the warm wet squirts landin' everywhere."
+      ]);
+      P("ink", "swell", [
+        "Dark glossy eggs come out of the black, slick with ink, and squeeze into %n one after another.",
+        "The eggs are black as coal and warm as bathwater, and they slide up the arm into %n leavin' an inky trail.",
+        "It lays in the dark, egg after inky egg, and %n can feel each one but can't see a thing.",
+        "Each egg comes with a squirt of ink behind it, so %n's stuffed and stained at the same time.",
+        "Black eggs travel up the black arm like knots in a rope, and every knot ends up inside %n.",
+        "The ink-spitter fills %n with its dark eggs and seals each one in with a warm squirt of black."
+      ]);
+      P("ink", "end", [
+        "The ink-spitter fades into its own black cloud and leaves %n on the bank stained from head to toe, %x dark eggs in their %h.",
+        "%x eggs, and %n's so inked they look painted in tar. The water clears. %n doesn't.",
+        "It signs %n with one last squirt across the belly and sinks, and %n's left blackened and full, %x eggs heavier.",
+        "%n crawls out of the black water inky to the eyebrows, with %x eggs in them and black handprints of suckers all over.",
+        "%x dark eggs, and %n's ink-streaked everywhere, inside and out, and the pond goes clear like nothin' ever happened."
+      ]);
+      P("ink", "endHyper", [
+        "It lays %x black eggs in %n, till their belly's huge and streaked like a thundercloud, and leaves them sat in a puddle of its ink.",
+        "%x eggs, dark and heavy, and %n's belly's round and black-smeared and so tight it shines.",
+        "The ink-spitter fills %n with %x eggs and paints every inch of their swollen belly black, and sinks away into the dark.",
+        "%x of them. %n's belly sticks out round and inky, and they leave black prints on the grass crawlin' out.",
+        "It packs %n with %x dark eggs and coats them in ink till they're glossy as a beetle and too full to stand.",
+        "%x eggs, and %n's a round black-painted thing on the bank, drippin' ink, belly heavin'.",
+        "%x inky eggs, and %n's so stuffed and so stained they look like they've been dipped, belly first."
+      ]);
+      P("warm", "grab", [
+        "The water round %n gets warmer, and warmer, till it's like a bath somebody's run for them, and soft arms slide round their waist like a lover's.",
+        "Steam curls off the spring, and somethin' in it rises slow, and holds out its arms, and %n walks into them without knowin' why.",
+        "A warm current wraps %n's legs, and then it isn't a current, it's arms, soft and heavy and gentle, drawin' them in.",
+        "%n dips a toe in the warm spring and somethin' kisses it. Then their ankle. Then their knee. Then they're in, and held.",
+        "The warm one rises like a bubble in a pot, unhurried, and folds %n into itself, and it's like bein' wrapped in a hot towel."
+      ]);
+      P("warm", "take", [
+        "It eases into %n's %h a fraction at a time, waitin' every time they tense, strokin' their belly till they soften again.",
+        "A warm soft arm slides into %n's %h like it was made to fit there, and %n lets out a sigh they didn't know they were holdin'.",
+        "It fills %n's %h slow and full and stays still a long moment, just holdin' them open, warm as a hearth.",
+        "The warm one takes %n's %h so gently it's more like bein' held from the inside than bein' fucked.",
+        "%n's %h opens round it in the warm water like a flower in the sun, and it slides home and sighs."
+      ]);
+      P("warm", "sig", [
+        "{t}Soft arms cup %n's tits and hold them, warm, strokin' the nipples with a slow thumb-like tip till %n's meltin'.",
+        "{c}The warm one wraps %n's cock in somethin' soft and hot and holds it, barely movin', till they spill without meanin' to.",
+        "It moves so slow inside %n it's like the tide, in and out, and each wave leaves them a little looser and a little happier.",
+        "The warm one kisses %n's neck with a soft tip, and their shoulder, and the back of their ear, and keeps on fuckin' them sweet and slow."
+      ]);
+      P("warm", "swell", [
+        "Its eggs are warm as fresh bread and slide into %n without a fuss, one after another.",
+        "Each egg comes slow and settles soft, warm against %n's insides like a hot water bottle on a cold night.",
+        "It lays gentle, waitin' for %n to breathe out before each one, and every egg's a warm little weight.",
+        "The warm one tucks its eggs into %n one at a time, careful and slow, strokin' their belly after each.",
+        "Warm eggs slip into %n like stones off a sunny wall, and %n hums, full and sleepy.",
+        "%n hardly notices the eggs comin'. They're warm, they're slow, and it holds them close for every one."
+      ]);
+      P("warm", "end", [
+        "The warm one lays %x eggs in %n's %h and then just holds them, warm, for a long time, before it lets them float up to the bank.",
+        "%x warm eggs, and %n comes out of the spring pink, loose and smilin' like they've had the best bath of their life.",
+        "It sets %n on the warm stones by the spring with %x eggs in their %h and a last soft stroke of their hair, and sinks back under the steam.",
+        "%n's lifted out %x eggs heavier, glowin', every muscle gone soft, and the warm one hums them a goodbye.",
+        "%x eggs, warm as hearthstones, and %n's lyin' in the shallows half asleep, smilin', with the spring lappin' at them."
+      ]);
+      P("warm", "endHyper", [
+        "It lays %x warm eggs in %n, slow and patient, till their belly's round as a harvest moon, then holds them in the water till their shiverin' stops.",
+        "%x eggs, and %n's belly's huge and warm and heavy, and the warm one carries them up the bank like somethin' precious.",
+        "The warm one fills %n so slow they barely notice, %x eggs, till they're round and tight and dozin' in its arms.",
+        "%x warm eggs. %n floats on their back in the steamin' spring, belly risin' out of the water like an island, too content to move.",
+        "It leaves %n swollen with %x warm eggs, lyin' on the hot stones by the spring, and strokes their belly till they fall asleep.",
+        "%x eggs, and the warm one kept every one of them comin' gentle, and %n's huge and pink and blissed out on the bank.",
+        "It packs %n full with %x warm eggs and wraps them up in its arms after, belly and all, a long time, just holdin'."
+      ]);
+      P("twins", "grab", [
+        "Two dark shapes come up out of the pond side by side, matchin' each other move for move, and reach for %n with the same arm at the same time.",
+        "%n kicks free of one tentacle and kicks straight into another off a second creature, and the two of them share a look, somehow, and close in.",
+        "There's a ripple on the left and a ripple on the right, and then there's an arm on each of %n's ankles, and they're pulled in two directions and into the middle.",
+        "The twins surface together, one either side of %n, and wind their arms round them and round each other like a pair of hands clasped.",
+        "Two of them. They take %n between them in the water like two dancers takin' a partner, and they don't let go."
+      ]);
+      P("twins", "take", [
+        "Both twins reach for %n's %h at once, jostle, and one gets there first, and the other doesn't sulk, it finds another way in.",
+        "One twin slides into %n's %h and the other presses in behind it, and the two of them start a rhythm with %n between.",
+        "The twins take %n's %h in turns, a stroke each, as if they've agreed it, and %n's never empty for a heartbeat.",
+        "A twin fills %n's %h, slow, while the other holds them still, and then they swap, and the second's thicker.",
+        "The twins push in at once, one in %n's %h and one wherever's left, and they meet in the middle and rub."
+      ]);
+      P("twins", "sig", [
+        "{t}Each twin takes one of %n's tits and pulls it in a different rhythm, and %n's chest heaves tryin' to follow both.",
+        "{c}The twins wrap %n's cock together, one arm each, and stroke it in opposite directions till they're howlin'.",
+        "The twins toss %n back and forth between them in the water like a ball in a game, and every catch comes with a thrust.",
+        "One twin fucks %n slow and the other fast, and %n's body can't decide which one to follow and comes from both."
+      ]);
+      P("twins", "swell", [
+        "Eggs come from both sides at once, two arms layin' into %n together, and their belly swells twice as quick.",
+        "The twins take turns layin', one egg each, back and forth, and %n can feel which twin gave which.",
+        "Both of them lay at once and it's a race, egg after egg from two directions, and %n's the finish line.",
+        "The twins fill %n between them, one with big round eggs and one with long slim ones, and %n's belly gets lumpy fast.",
+        "Two strings of eggs, one from each twin, and they meet inside %n and pack in tight together.",
+        "One twin holds %n open while the other lays, then they trade places and do it again."
+      ]);
+      P("twins", "end", [
+        "The twins let %n go together, the way they took them, and leave %x eggs in their %h, half each, and sink away side by side.",
+        "%x eggs from the pair of them, and %n's left on the bank gapin', dazed and full, unsure which twin had them last.",
+        "Both twins give %n's swollen belly a pat, %x eggs in it, and slide back under the water in step.",
+        "%n's set on the grass by two sets of arms at once, %x eggs heavier, and the twins vanish like they were never there.",
+        "%x eggs between them, and %n's still feelin' both of them, one on each side, long after they're gone."
+      ]);
+      P("twins", "endHyper", [
+        "With two of them layin', %n's belly's enormous before either of them stops, %x eggs, and the twins have to carry them out together.",
+        "%x eggs from the twins, and %n's swollen huge and round, and they're still bickerin' over who laid the most.",
+        "The twins fill %n with %x eggs from both sides till they're round as a barrel, and lift them onto the bank between them.",
+        "%x of them, half each, and %n's belly sticks out so far they can't see their own toes, and the twins seem very proud of themselves.",
+        "%x eggs. The twins packed %n so full that both of them have to hold their belly up while they set them down.",
+        "Two of them layin' in turns made %x eggs, and %n's huge, heavy and drippin', lyin' between two sets of retreatin' ripples.",
+        "%x eggs from the twins, and %n's belly's tight as a drum with two kinds of egg rollin' against each other inside."
+      ]);
+      const T = TRAP_LINES.tentacle, O = (part, l) => {
+        if (T[part]) poolMore("tentacle", "classic " + part, T[part], l);
+      };
+      O("takeShut", ["Every way in's plugged or locked, so it strokes the plugs instead, and the straps, and the skin round them, slow and covetous, till %n's shakin'."]);
+      O("wrap", ["It winds round %n from the knees to the ribs like a vine round a post, and squeezes, and everything inside them squeezes back."]);
+      O("muzzle", ["%n's mouth is already stopped up, so it strokes their cheeks and their throat instead, slow, as if it's waitin' its turn."]);
+      O("endHyper", ["It lays and lays till %n's belly's huge, %x eggs packed in their %h, and they float there round and helpless while it slides away."]);
+      O("churn", [
+        "Every arm inside %n twists the same way at once, slow, like a spoon in a bowl, and %n's eyes roll back.",
+        "The tentacles inside %n coil and uncoil against each other, and %n can feel them knottin' and loosenin' through their belly."
+      ]);
+    }
+    {
+      const P = (kind, part, i, l) => {
+        const T = ANTHRO_LINES[kind], pool = T && (i == null ? T[part] : T[part] && T[part][i]);
+        poolMore(kind, part + (i == null ? "" : " " + i), pool, l);
+      };
+      P("wolves", "beats", 0, [
+        "%n hears a soft chuff of breath behind them in the lane, and another to the left, and another up on the bank. The wolf-men have been walkin' alongside them for a while.",
+        "The den door's ajar and there's a warm, musky dark inside, and a voice in it says %n's name like it's been practisin'."
+      ]);
+      P("wolves", "beats", 1, [
+        "Two of them take an arm each, easy, grinnin', and the big grey one walks round %n slow, lookin' them over like a buyer at the sale ring.",
+        "They nose and nip and herd %n into the middle of the den, bumpin' them with their shoulders, till the back of their knees hits the straw and they go down."
+      ]);
+      P("wolves", "beats", 2, [
+        "The grey one kneels behind %n, one clawed hand flat on their spine, and the others settle round in a ring to watch and wait their turn.",
+        `"Tail up," the alpha says, and a pair of hands lifts %n's hips for him while he gets himself lined up, hot and heavy against them.`,
+        "There's a growl from the alpha and the rest drop back on their haunches. He takes his time gettin' comfortable over %n's back."
+      ]);
+      P("wolves", "in", 0, [
+        "{v}He drives into %n's pussy to the root and ruts hard, and %n feels the knot thicken against them with every stroke till it shoves through and locks.",
+        "He's quick and he's mean about it, in the best way, ruttin' into %n's %h with short hard snaps of his hips until the knot catches and ties them tight.",
+        "The alpha buries himself in %n's %h and holds there, growlin' low, as the knot swells and swells inside them and they feel themselves locked fast to him."
+      ]);
+      P("wolves", "in", 1, [
+        "A wolf kneels at %n's head and lifts their chin with two claws, and they open their mouth for him, and he's in, and the alpha ruts them forward onto him.",
+        "Hands everywhere: one in their hair, one on each tit, a cock rubbin' hot along their cheek, and the alpha's knot holdin' them still for all of it.",
+        "The pack can't keep their hands off. While %n's tied, they're stroked, licked, groped and kissed by whoever can reach."
+      ]);
+      P("wolves", "in", 2, [
+        "The next wolf noses the last one's load as it runs out of %n, grins, and mounts up into the mess of it.",
+        "A knot slips loose with a wet pop and the next wolf's in before %n's %h has even started to close, and his knot's bigger.",
+        "They go down the pack like it's a chore list, one after the other, every one of them knottin' %n's %h and holdin' them tied.",
+        "The third wolf ruts slow, takin' his time, enjoyin' how sloppy and full %n is already, and ties them so tight they whimper."
+      ]);
+      P("wolves", "in", 3, [
+        "The den's hot with breath and steam, and %n's lyin' in a puddle of wolf seed with yet another weight across their back.",
+        "Even the ones who've had a turn come back round for another, and the alpha lets them, because %n's takin' it so well.",
+        "By the end %n's belly sticks out round and hard with knotted loads, and every new tie squeezes a hot gush out round its edges."
+      ]);
+      P("wolves", "over", 0, [
+        "They take turns rubbin' off between %n's squeezed-together thighs, knots bumpin' against them, teeth in their scruff, growlin'.",
+        "With no way in, the pack paints %n instead, one after another: over their back, their thighs, their bum, their hair.",
+        "The alpha grinds his knot against %n's thighs till it pulses, and then pins them down while the next one does the same.",
+        "Every wolf in the den has a go at %n's thighs and back, and the den fills with the smell of them, and %n's soaked in it.",
+        "They nip, they lick, they rut against every bit of %n they can reach, and leave their scent and their seed on all of it.",
+        "Nobody gets in, so the pack makes up for it by makin' very sure %n's wearin' every one of them home."
+      ]);
+      trapSceneMore(
+        "wolves",
+        [
+          "A grizzled old wolf at the edge of the den watches %n with one eye open and his chin on his paws, and grins every time they yelp.",
+          "{v}A wolf drags his tongue up %n's pussy from behind while the alpha's still tied, slow and rough, and they howl.",
+          "The pack's hot breath is everywhere at once: on %n's neck, their back, the backs of their knees.",
+          "One of the pack starts a low howl and the rest take it up, and %n can feel it through every body pressed against them."
+        ],
+        [
+          "%n's belly's round and warm and gurglin', and a wolf lays his ear against it and laughs.",
+          "{c}%n's cock is drippin' onto the straw with every knot, and a wolf licks it clean between turns, just to make them squirm.",
+          "The den's thick with steam and musk and the slap of fur on skin, and the next knot's already pressin'.",
+          "The alpha lies down nose to nose with %n while the others take their turns, and licks their face whenever they whimper."
+        ]
+      );
+      P("stallion", "beats", 0, [
+        "The stallion's stall smells of saddle soap and horse and hot breath, and when %n leans in to see, the dark at the back of it stands up on two legs.",
+        "%n's leadin' the black horse in from the paddock, they think, until the lead rope goes slack and the horse turns round on two hooves and smiles at them."
+      ]);
+      P("stallion", "beats", 1, [
+        "He tips %n over a saddle on its stand and buckles the girth round their waist, like he's tackin' up, and pats their rump.",
+        `"Stand," he says again, softer, and runs a huge hand down the back of %n's thigh, and their knees go weak and spread on their own.`
+      ]);
+      P("stallion", "beats", 2, [
+        "He lifts it with one hand and lays it along %n's spine so they can feel the weight of it, heavy as a fence rail, and the heat.",
+        "When he presses the flat of the flare against them it's wider than their palm, and %n can feel their own pulse thuddin' against it."
+      ]);
+      P("stallion", "in", 0, [
+        "He nickers, low, encouragin', and keeps up the pressure, and %n's %h opens round the flare with a long helpless groan."
+      ]);
+      P("stallion", "in", 1, [
+        "%n's belly swells out with the shape of him, a long hard ridge under the skin, and he lays a hand on it as if to feel himself.",
+        "He bottoms out somewhere deep and still there's a hand's width of him outside, and he grinds there, slow, and %n sobs.",
+        "They're stuffed so full of stallion that breathin' in makes them feel every inch, and breathin' out makes him slip deeper."
+      ]);
+      P("stallion", "in", 2, [
+        "His stall shakes. Tack rattles on its hooks. He ruts %n so deep and so long that they're liftin' off the floor on every stroke and droppin' back on every draw.",
+        "He snorts hot down %n's back and goes faster, and the flare swells inside them till they feel it like a fist openin'."
+      ]);
+      P("stallion", "over", 0, [
+        "He ruts the whole heavy length of himself along %n's back, slow, and the flare bumps the nape of their neck on every stroke.",
+        "Nothin' fits, so he lays it between %n's thighs and lets them hold it there, squeezed, while he works himself back and forth.",
+        "He presses %n's thighs together round himself and ruts, and the flare pushes out past their knees on every stroke.",
+        "He's so big the tip of him slaps %n's belly from underneath as he ruts between their thighs, and pre runs down their legs in sheets.",
+        "He lays himself in the small of %n's back and works himself there, snortin', till their whole back's slick and shinin'.",
+        "He makes %n wrap both hands round him and ruts through their fists like a sleeve, slow and heavy, breathin' through his teeth."
+      ]);
+      trapSceneMore(
+        "stallion",
+        [
+          "He drags the flared head of himself slow along the crease of %n's thigh, back and forth, and pre runs warm down their leg.",
+          "He snorts and stamps, and the whole stall shakes, and he shifts his grip on %n's hips to somethin' firmer.",
+          "{c}He reaches under and takes %n's cock in his huge fist, and it disappears in there, and he squeezes, slow, in time.",
+          "The stall's hot with the smell of him: horse and leather and somethin' rich and heavy that makes %n's head swim."
+        ],
+        [
+          "He leans down and mouths at %n's ear with big soft lips, and whickers, and rocks his hips in a slow heavy circle.",
+          "{v}%n's pussy's stretched round him so tight it's shiny, and every draw back pulls them half out after him.",
+          "He holds still, buried, and lets %n feel him pulse, and the bulge in their belly jumps with every throb.",
+          '"Good mare," he rumbles, and pats their flank, and %n moans like one.'
+        ]
+      );
+      P("bull", "beats", 0, [
+        `A brass bell rings over the milk-room door when %n steps through it, and somewhere behind the stalls a deep voice says, "That'll be the new one."`,
+        "%n puts their head through the gap in the fence to reach a dropped glove, and the gap closes round their neck with a clank."
+      ]);
+      P("bull", "beats", 1, [
+        `He sets his stool down behind %n, sits, and spits on his palms. "Right," he says. "Let's have a look at your yield."`,
+        "The bull-man is wide as a hay wagon and slow as a summer afternoon, and he scratches the curl of hair between his horns while he looks %n over."
+      ]);
+      P("bull", "beats", 2, [
+        "He finds %n's rhythm before they do: a long firm pull, a pause, a long firm pull. Their whole chest throbs in time with his hands."
+      ]);
+      P("bull", "in", 0, [
+        "He drops his great weight over %n's back without a word and sinks into their %h, thick as his own wrist, and goes back to his milkin'."
+      ]);
+      P("bull", "in", 1, [
+        "He pushes in to the root and stays, his balls restin' heavy against %n, and milks them slow while they get used to the size of him.",
+        "His balls are as heavy as a pair of full pails and they swing against %n on every thrust, slap, slap, while the milk hisses into the bucket.",
+        `"Stand quiet," he rumbles, and pushes deep, and holds, and %n's let-down comes in a rush that rings the pail.`
+      ]);
+      P("bull", "in", 2, [
+        "The pail's near full and he's swappin' hands, and %n's bein' rocked against the bars in long heavy strokes, bawlin' and drippin' at both ends.",
+        "His breath steams on %n's back in the cold barn, and he grunts every time he bottoms out, and every grunt squeezes a jet into the pail."
+      ]);
+      P("bull", "over", 0, [
+        "He grinds the whole thick length of himself along the cleft of %n's backside while he strips them, slow and patient, like it's all part of the milkin'.",
+        `"Shut tight, are you?" He chuckles, and ruts between %n's thighs instead, the stanchion rattlin', the pail ringin'.`,
+        "He strokes himself with one hand and strips %n with the other in the same slow rhythm, and he doesn't miss a pull either side.",
+        "He presses %n's thighs together with his knee and ruts through them, heavy, blunt, hot, while his hands keep the milk comin'.",
+        "His big blunt cock lies hot along %n's spine, pulsin', while he works their teats dry one pull at a time.",
+        "He leans his whole weight on %n's back, grindin' slow against their bum, and milks them till they're beggin' him to finish."
+      ]);
+      trapSceneMore(
+        "bull",
+        [
+          "He swaps hands on %n's teats without breakin' rhythm, the way a man does who's been milkin' since before dawn every day of his life.",
+          "The pail rings, and fills, and goes quiet as the milk gets deep, and he hums an old milkin' tune under his breath.",
+          "His nose ring knocks against the stanchion bars as he leans over %n, and his breath is hot and sweet as cud.",
+          "{nt}He rolls %n's nipples between his huge thumbs and fingers, patient as anything, until even their flat chest is dribblin'."
+        ],
+        [
+          `"Nearly there," he rumbles, and he isn't, and he goes on ruttin' and milkin' both, slow and sure and deep.`,
+          "{c}He reaches under and strips %n's cock like a teat, long firm pulls, and it spurts into the pail with everything else.",
+          "%n's knees are shakin' in the stanchion, and he props them up with one great arm round their middle and keeps goin'.",
+          "The bars rattle, the stool creaks, and the bull-man's grunts get deeper and closer together."
+        ]
+      );
+      P("warren", "beats", 0, [
+        "%n sits down on a soft mound in the meadow for a rest, and the mound sighs, and opens, and they drop through it into a burrow full of whiskers.",
+        "A hole opens in the haystack right where %n's leanin', and a dozen soft hands pull them backwards into the dark, gigglin'."
+      ]);
+      P("warren", "beats", 1, [
+        "Paws tug at %n's clothes from every side, quick and nimble, and in a few seconds they're bare and bein' passed hand to hand toward the middle of the burrow.",
+        "A big grey buck with a scar across his nose looks %n up and down and thumps his foot, and the whole warren cheers."
+      ]);
+      P("warren", "beats", 2, [
+        `A doe pats a soft mossy spot on the burrow floor. "Here, love. Lie back. They'll come to you."`,
+        "The bucks have started a tally on the earth wall with a stick, and they're already arguin' over the marks.",
+        "%n's laid out on a bed of hay and clover, and the line of bucks stretches back down the tunnel further than they can see.",
+        `"Line up, line up," a doe calls, clappin' her hands, and the bucks scramble into somethin' like a queue.`
+      ]);
+      P("warren", "in", 0, [
+        "The first buck's so quick %n hardly knows he was there till he's hopped off, squeakin', and the warm spill of him's runnin' out.",
+        "A buck jumps on, ruts like a woodpecker, freezes, squeaks, and tumbles off sideways, grinnin', and the next one's already there.",
+        "{v}A buck slides into %n's pussy and goes so fast it buzzes, and it's over in a heartbeat, and the next one's pushin' into his mess.",
+        "{nv}A buck mounts %n's ass and ruts so fast it hums, and before %n can gasp he's done, and there's another in line."
+      ]);
+      P("warren", "in", 1, [
+        "Two bucks try to mount at once, tumble into a heap, and the does laugh and sort them out while a third slips in past both of them.",
+        "Every buck that finishes gets a pat and a carrot from the does, and goes to the back of the queue to wait.",
+        "{t}A buck nibbles %n's nipple while he ruts them, quick little nips, and another's got the other one in his mouth."
+      ]);
+      P("warren", "in", 2, [
+        "It's a blur of fur and squeakin' and wet little thrusts, one after another, and %n's %h is sloppy and gapin' and still bein' filled.",
+        "The does change the clover under %n twice. It keeps gettin' soaked.",
+        "By the twentieth buck %n can't tell where one load ends and the next begins. It's just warm, and wet, and more.",
+        "Somebody's started a song down the tunnel, and the bucks are hoppin' on in time to it."
+      ]);
+      P("warren", "in", 3, [
+        "%n's belly is round and full and gurglin', and the does rub it and coo, and the bucks don't slow down.",
+        "Some of the bucks have fallen asleep in heaps along the walls, and the ones who haven't are linin' up again.",
+        "A doe props %n's hips up on a cushion of moss so it'll all stay in, and waves the next one forward."
+      ]);
+      P("warren", "over", 0, [
+        "They line up anyway and hump %n's thighs and belly one after another, quick as a heartbeat each, squeakin' happily.",
+        "A buck at every limb and two at the hips, all ruttin' against whatever they can find, and %n's slick and sticky in a minute.",
+        "The does hold %n's thighs together for the bucks to rut between, and keep count, and lose count.",
+        "Every buck in the warren has his quick little go against %n somewhere, and leaves a quick little load behind.",
+        "They paint %n from ankles to collarbone, buck after buck, while the does hand out carrots and giggle.",
+        "No way in, so the bucks make do with everything else, and there's an awful lot of everything else, and an awful lot of bucks."
+      ]);
+      trapSceneMore(
+        "warren",
+        [
+          "A doe dabs %n's forehead with a cool damp cloth between bucks, kind as a nurse at a fair.",
+          "The burrow's warm and dim and smells of clover and earth and rabbit, and the line shuffles forward.",
+          "{c}One of the does takes %n's cock in her soft paw and strokes it, absent-minded, while she keeps the count.",
+          "{v}A doe parts %n's lips with two soft fingers to make it easier for the next one, and smiles at them, kind."
+        ],
+        [
+          "%n's lost track of everything except warm, quick, wet, next.",
+          "The does are knittin' in the corner, needles clickin' in time with the bucks.",
+          "The old torn-eared buck comes back round for a second go, and the does let him cut the line out of respect.",
+          "A doe pats %n's swollen belly and says it'll be a big litter, and the bucks cheer."
+        ]
+      );
+      P("boar", "beats", 0, [
+        "There's a lovely ripe windfall apple by the sty gate. %n bends for it. The gate swings in, and so do they, face first into the warm muck.",
+        "%n leans on the sty wall to watch the pigs, and the wall's mud, and it gives, and they slide on their bum right into the wallow beside somethin' enormous and bristly."
+      ]);
+      P("boar", "beats", 1, [
+        `He sits up out of the muck like a hill gettin' up, mud slidin' off his shoulders, tusks yellow and grin wide. "Come to visit, have you?"`,
+        `"Messy little thing," the boar-man says fondly, and rubs a big handful of mud into %n's hair like he's givin' them a wash.`
+      ]);
+      P("boar", "beats", 2, [
+        "He settles his belly on %n's back like a warm sack of grain and noses their hair out of the way, snortin' happily.",
+        "The boar shoves %n's knees apart with his own and sinks them deeper into the wallow, belly first, and climbs on.",
+        '"Stay low," he grunts, and keeps them low, his whole weight on them, warm and heavy and bristly.'
+      ]);
+      P("boar", "in", 0, [
+        "It corkscrews into %n's %h slow, turn by turn, and they can feel it windin' deeper and deeper till it catches somewhere and won't come out.",
+        "He screws himself into %n like a farmer augerin' a fence post, twist by twist, and grunts happy when it locks.",
+        "The twisted tip of him searches about inside %n's %h, pokin', till it finds the spot it wants and locks there."
+      ]);
+      P("boar", "in", 1, [
+        "He settles in with a long contented groan and the mud squelches up round %n's chest, warm and thick.",
+        "The lean one comes round and squats in the mud by %n's face and strokes their hair, waitin' his turn, tusks shinin'.",
+        "The boar grunts in %n's ear, a low happy rumble, and the tip of him gives a twitch deep inside them and starts to pump."
+      ]);
+      P("boar", "in", 2, [
+        "It goes on so long the mud starts to dry on %n's back. Gush. Gush. Gush. The boar's barely breathin' hard.",
+        "%n's belly swells under them, pressin' into the mud, rounder by the minute, and he doesn't move an inch.",
+        `A sow-woman leans on the rail with her chin on her hands. "He'll be a while yet, love," she says. "Get comfy."`,
+        "He empties into %n like a barrel tipped into a trough, steady and endless, and they groan into the wallow."
+      ]);
+      P("boar", "in", 3, [
+        "The lean boar takes his turn at last and screws himself in just as deep, and the whole slow fillin' starts over.",
+        "%n's so full they can feel it slosh when the boar shifts, and he shifts on purpose, just to hear them moan.",
+        "Mud to the eyebrows, belly draggin', locked to a hog that doesn't know the meanin' of done. %n stops countin' minutes."
+      ]);
+      P("boar", "over", 0, [
+        "He grinds his twisted length along %n's mud-slick backside, slow and heavy, gruntin' in their ear, pinnin' them down in the muck.",
+        "He ruts between %n's thighs in the wallow, mud squelchin', and spends himself over their back in a long hot gush.",
+        "The boar's twisted cock slides between %n's bum cheeks, back and forth, slick with mud, and he grunts like it's the best thing ever.",
+        "With no way in, he lies on %n and grinds, and grinds, and pumps himself all over their muddy back.",
+        "He rubs himself against %n's thighs, slow, gruntin', till the mud between their legs is warm and slick with more than mud.",
+        "Both boars take a turn ruttin' %n's muddy thighs, gruntin' and snortin', and leave them glazed under the dirt."
+      ]);
+      trapSceneMore(
+        "boar",
+        [
+          "The boar roots at %n's neck with his wet bristly snout, snufflin', and grunts approval at what he finds.",
+          "Warm mud squelches between %n's fingers and toes, and every time they try to get a grip the boar leans on them harder.",
+          "{v}His twisted tip finds somethin' deep in %n's pussy and nudges it, over and over, and %n squeals into the mud.",
+          "The sty smells of earth and pig and summer, and the boar's belly is hot as a hearth on %n's back."
+        ],
+        [
+          `"Good sow," he grunts, and pats %n's flank, and keeps pumpin'.`,
+          "The other pigs root round the edge of the wallow, uninterested, and the boar keeps on fillin' %n like nothin' else matters.",
+          "{c}%n's cock is trapped in the warm mud under them, and every grind of the boar's hips rubs it, and they're leakin' into the wallow.",
+          "His tusks rest on %n's shoulder, cool and smooth, and his breath is hot and smells of windfall apples."
+        ]
+      );
+      P("toms", "beats", 0, [
+        "%n climbs the loft ladder for a bale and comes eye to eye with a tomcat-man lyin' along the top rung, chin on his arms, grinnin'.",
+        "A ball of twine rolls out of the hayloft and stops at %n's feet. They pick it up. Two pairs of green eyes light up in the dark above."
+      ]);
+      P("toms", "beats", 1, [
+        "The orange tom stretches long and lazy on a hay bale, claws out, then in, then out, watchin' %n with half-closed eyes.",
+        "They purr, both of them, and it fills the loft, and %n's feet carry them toward the sound without askin'."
+      ]);
+      P("toms", "beats", 2, [
+        "The grey tom drapes himself along %n's back, warm and heavy, and closes his teeth on the back of their neck, and they freeze.",
+        `"Hips up, mouse," the orange one purrs, and taps the small of %n's back with one claw, and up they go.`
+      ]);
+      P("toms", "in", 0, [
+        "He slips in smooth and quick and stops, and %n holds their breath, knowin' what's comin', and he draws back slow, and every barb catches."
+      ]);
+      P("toms", "in", 1, [
+        "{t}The grey tom kneads %n's tits with both hands, claws pricklin', while the orange one rakes them slow from behind.",
+        "%n's yowlin' like a queen on the roof now, and the toms purr louder every time they do it."
+      ]);
+      P("toms", "in", 2, [
+        "The heat the barbs leave behind is crawlin' all through %n now, and they're pushin' back onto each tom before he's even asked.",
+        "They take %n turn and turn about, never lettin' them cool off, and every backstroke makes them scream and beg in the same breath."
+      ]);
+      P("toms", "over", 0, [
+        "The toms rub their cheeks on %n, then everything else, ruttin' between their thighs and purrin' like engines.",
+        "No way in, so the toms settle for markin' every inch of %n with their scent and their seed, slow and thorough as cats washin'.",
+        "The orange tom ruts against %n's bum while the grey one licks their face with that rasp of a tongue, and they're both purrin'.",
+        "They take turns rubbin' off on %n's thighs, barbs pricklin' the skin, until %n's sticky and smellin' of tomcat from top to toe.",
+        "The toms pin %n in the hay by the scruff and grind against them, one, then the other, yowlin' when they finish.",
+        "They mark %n like they'd mark a fence post, cheek and chin and hips, and then spill hot over their back and lick it in."
+      ]);
+      trapSceneMore(
+        "toms",
+        [
+          "The grey tom washes %n's ear with his rough tongue while the orange one works, like it's a perfectly ordinary afternoon.",
+          "{c}A tom bats at %n's cock with his paw, curious, claws in, and laughs when it bobs.",
+          "Dust floats gold in the light through the loft door, and the toms' purrin' fills it like a hum in a hive.",
+          "{v}The barbs scrape slow along the inside of %n's pussy on the backstroke, and they gush, and the tom purrs at the smell."
+        ],
+        [
+          "The toms swap without a word, and the new one's barbs drag fresh, and %n's yowl goes up into the rafters.",
+          "%n's rubbin' their face on the hay like a cat in heat, rump up, beggin' for the next one.",
+          "One tom holds %n's scruff while the other takes his time, and they trade grins over %n's back.",
+          "A pigeon flaps off the beam, startled by %n's yowlin', and the toms don't even look up."
+        ]
+      );
+      P("drake", "beats", 0, [
+        "The hayloft's full of a warm glow like a banked fire, and when %n climbs up to see, the glow has scales and is lookin' straight at them.",
+        "%n reaches for a gold coin glintin' in a crack in the barn wall, and a scaled hand closes round theirs from the other side."
+      ]);
+      P("drake", "beats", 1, [
+        "The drake rises up out of his hoard with coins slidin' off his scales like water, and his eyes are molten and pleased.",
+        `"You've been eyein' my hoard," the drake says, smoke curlin' from his smile. "Fair's fair. I'll be eyein' you."`
+      ]);
+      P("drake", "beats", 2, [
+        "He lays %n on a bed of gold coins and silk, warm from his own body, and runs one claw from their throat to their thigh, slow.",
+        "He breathes warm across %n's thighs until they fall open, and murmurs somethin' in a language like a fire cracklin'."
+      ]);
+      P("drake", "in", 0, [
+        "The ridges on him are smooth as polished horn and hot as stones in a fire, and each one sinks into %n's %h with a jolt and a gasp."
+      ]);
+      P("drake", "in", 1, [
+        "He wraps his tail round %n's thigh and lifts it, so he can go deeper, and every ridge drags in and out of their %h in a slow hot rhythm.",
+        "Smoke curls from his nostrils across %n's face, warm and smellin' of cedar, and he ruts slow, enjoyin' every jolt."
+      ]);
+      P("drake", "in", 2, [
+        "He mantles his wings over %n like a tent of warm leather, and in the dark under them they feel the first egg start to move.",
+        '"Take them," he rumbles, "and keep them warm for me," and the root of him swells as the clutch starts.'
+      ]);
+      P("drake", "over", 0, [
+        "He ruts his ridged length along %n's thighs, each ridge bumpin' over their skin, hot as a poker, his tail coiled tight round their waist.",
+        "Nothin' opens for him, so the drake grinds against %n's belly in his nest, slow and scaldin', hummin' like a kettle.",
+        "He presses %n's thighs together with his tail and ruts through them, every ridge rubbin', smoke curlin' from his grin.",
+        "He drapes himself over %n on the hoard and grinds, scales warm against their skin, until he spills across them scaldin' hot.",
+        "The drake rubs his ridged heat along the cleft of %n's bum, slow, and every ridge makes them jump.",
+        "He holds %n down in the nest with one claw and ruts against their belly, ridged and hot, rumblin' with satisfaction."
+      ]);
+      trapSceneMore(
+        "drake",
+        [
+          "His hoard clinks and shifts under %n's back as he moves, coins slidin' cool against hot skin.",
+          "{v}Every ridge on him rubs %n's pussy on the way in and again on the way out, and they're drippin' onto his gold.",
+          "He licks a slow line up %n's throat with a long forked tongue, and it's as hot as the rest of him.",
+          "Smoke drifts from his nostrils and hangs under the rafters in a warm haze that smells of cedar and coal."
+        ],
+        [
+          "{c}He wraps his warm scaled hand round %n's cock and strokes it, slow, ridges of his palm catchin' on every inch.",
+          "His wings close round %n completely, and in the warm leathery dark it's just heat and ridges and his rumble.",
+          `"Mine," he murmurs against %n's neck, and the word's warm as the rest of him.`,
+          "The eggs are comin' one after another now, and the drake purrs like a banked fire at every one."
+        ]
+      );
+      P("naga", "beats", 0, [
+        "The feed room's warm and quiet and smells of grain, and somethin' long and cool is draped along the top of every sack.",
+        "%n reaches into the oat bin for a scoop, and the oats shift, and a smooth cool coil rises out of them and wraps their arm."
+      ]);
+      P("naga", "in", 0, [
+        "She slides both of herself into %n together, smooth and cool and tapered, and gives a long pleased hiss as they stretch round her."
+      ]);
+      P("naga", "beats", 1, [
+        "She's beautiful and enormous, patterned green and gold, and her eyes are kind and very, very hungry.",
+        `"Shh," the naga says, windin' a coil round %n's waist and another round their chest, "you're warm, and I'm cold, and this'll fix both."`
+      ]);
+      P("naga", "beats", 2, [
+        "Her tail tip slides between %n's knees and parts them, gentle, and two slick heads nudge up from between her scales.",
+        "She squeezes, all over, slow, and %n's whole body goes soft in her coils, and she smiles and lines herself up."
+      ]);
+      P("naga", "in", 1, [
+        "{t}A coil slides up between %n's tits and squeezes them together while both of her slide in and out below.",
+        "She ripples, and both of her inside %n ripple with her, a slow rollin' wave that %n feels from the inside out."
+      ]);
+      P("naga", "in", 2, [
+        "Her coils tighten in a slow wave from %n's ankles to their ribs, and both of her push deeper at the top of every wave.",
+        "She hums against %n's neck, low and rich, and the hum goes down through her and into them, both ends."
+      ]);
+      P("naga", "over", 0, [
+        "She threads both her cocks between %n's thighs and squeezes the coils, so they're stroked along her whole length at once.",
+        "Nothin' opens, so the naga coils %n tight and rubs both of herself along their belly, slow, slick, cool.",
+        "She wraps %n up to the chin and ripples, and both of her slide back and forth in the soft crease of their thighs.",
+        "Her two slick cocks press into the cleft of %n's bum and slide, one above the other, while her coils squeeze in time.",
+        "She tastes %n's skin with her tongue and grinds both of herself against them, coils tightenin', till she spills cool over their thighs.",
+        "With no way in, the naga makes a sleeve of her coils and %n's thighs, and fucks it slow, hummin'."
+      ]);
+      trapSceneMore(
+        "naga",
+        [
+          "Her scales are cool and dry and smooth as river glass, and they slide over %n's skin with a soft whisper.",
+          "She lifts %n up level with her face and kisses them, long and cool, tongue flickin' at the corners of their mouth.",
+          "{v}Both of her stretch %n so full that the thin wall between them is rubbed from both sides, and %n's eyes roll.",
+          "Her coils have %n so tightly that only their face, hands and the place she's in them show at all."
+        ],
+        [
+          "{c}A narrow loop of her tail winds round %n's cock and ripples, scales strokin' it from root to tip.",
+          "She's hummin' a slow tune now, and her coils pulse in time with it, and %n pulses with them.",
+          "%n can't move a finger. They can only take it, and feel both of her movin' in them, and moan.",
+          '"Warm," she sighs, "so warm," and wraps another coil round them for the pleasure of it.'
+        ]
+      );
+      P("kennel", "beats", 0, [
+        "%n hears a low, friendly rumble from the big kennel, and bends to look in, and a big hand with a leather collar in it comes out to meet them.",
+        "The kennel's been left open with a fresh blanket inside and a biscuit on it. %n crawls in after the biscuit. The door's on a spring."
+      ]);
+      P("kennel", "beats", 1, [
+        `He leans in close and breathes %n in, long and slow, and his tail starts to thump the boards. "Oh, you'll do. You'll do fine."`,
+        'He settles back on his heels and pats the blanket in front of him. "Come on. Good. Closer."'
+      ]);
+      P("kennel", "beats", 2, [
+        `He takes hold of %n's hips in two big soft hands and sets them just so, and pats their rump. "Stay."`,
+        `"Easy," he rumbles, and licks the back of %n's neck, slow and warm, and they go limp.`
+      ]);
+      P("kennel", "in", 0, [
+        "He rocks into %n's %h, patient, workin' the knot against them in slow circles, till they're stretched and gaspin' and it slips inside."
+      ]);
+      P("kennel", "in", 1, [
+        "The knot sits snug inside %n, throbbin', and the mastiff pants softly against their neck, perfectly content to wait.",
+        '"There," he rumbles, "see? Not so bad," and pulses another warm spurt deep into them.',
+        "He rocks gently, testin' the tie, and %n gasps at the tug of it, and he chuckles and does it again."
+      ]);
+      P("kennel", "in", 2, [
+        'When the knot slips free he waits, patient, while %n catches their breath. Then he pats the blanket. "Again."',
+        "The third time %n pushes back onto the knot all by themselves, and the mastiff thumps his tail against the kennel wall, delighted."
+      ]);
+      P("kennel", "over", 0, [
+        "He grinds his knot against %n's thighs, patient as anything, until it swells and throbs and he spills on the blanket.",
+        "No way in, so he ruts between %n's thighs, slow and heavy, knot pressin' against them from outside like a promise.",
+        "He holds %n's thighs together with one big hand and works himself through them, pantin', tongue lollin'.",
+        "He rubs his thick red length along the cleft of %n's bum, slow, and the knot bumps against them every stroke.",
+        "The mastiff lies over %n's back and ruts against their thighs, warm and heavy, rumblin' approval when they squeeze.",
+        "He grinds against %n till his knot swells fat between their thighs and pulses, and he holds them there till it's done."
+      ]);
+      trapSceneMore(
+        "kennel",
+        [
+          "The kennel's warm and close and smells of straw and dog and him, and there's no room to do anything but take it.",
+          "He rests his heavy jowls on %n's shoulder and pants, slow and warm, and the knot throbs inside them.",
+          "{c}He reaches under and gives %n's cock a squeeze, like a vet checkin' a paw, and rumbles pleased when it twitches.",
+          "{v}His knot's stretched %n's pussy so wide round him their lips are tight and shinin', and every throb tugs at them."
+        ],
+        [
+          `"Good," he rumbles, and gives the back of their neck a long slow lick. "Good. You're learnin'."`,
+          "The knot's goin' down a little, and %n can feel it, and they whimper, and he pushes in a bit to keep it snug.",
+          "Outside the kennel the yard goes about its business, and inside it %n is tied and stretched and full.",
+          "He shifts, and the tie tugs, and %n gasps, and he does it again, very slowly, because he likes the sound."
+        ]
+      );
+      P("hive", "beats", 0, [
+        "%n stops to watch the bees in the clover, and the bees stop to watch %n, and then a big soft drone takes their hand and leads them off.",
+        "A drone with a tiny gold crown on its antenna waits at the orchard gate with a cup of honey, and offers it to %n with a bow."
+      ]);
+      P("hive", "beats", 1, [
+        "She rises from her throne of comb with a soft buzz of folded wings, and four arms open for %n like she's been waitin' all day.",
+        `"Little guest," she hums, and two hands take %n's hands and two more take their waist, and she draws them in.`
+      ]);
+      P("hive", "beats", 2, [
+        "She feeds %n a drop of royal jelly from her fingertip, and it's like swallowin' summer, and their knees fold.",
+        "The drones lay %n back on a cushion of warm wax, and the queen leans over them, smilin', honey on her lips."
+      ]);
+      P("hive", "in", 0, [
+        "Her ovipositor slides into %n's %h slick and slow, warm with honey, and keeps goin' until they can feel it nudgin' somewhere deep."
+      ]);
+      P("hive", "in", 1, [
+        "Each egg's a soft round stretch and a warm little settle, and the queen hums and counts them in her own language.",
+        "The drones fan their wings to keep %n cool while the queen lays, and every egg goes in with a sticky sweet sigh.",
+        "{t}A drone drips honey on %n's tits and licks it off while the queen lays, slow and tidy as a bee at a flower."
+      ]);
+      P("hive", "in", 2, [
+        "%n's so drunk on royal jelly the eggs feel like warm honey bein' poured into them, slow and endless and lovely.",
+        "The queen strokes %n's swellin' belly with two hands and holds their hands with the other two, and lays and lays."
+      ]);
+      P("hive", "over", 0, [
+        "She lays her eggs in a cell of warm wax beside %n instead, and has the drones paint %n with honey from head to toe while she does.",
+        "No way in, so the queen kisses %n till they're dizzy and strokes them with all four hands, and the drones lick the honey off.",
+        "The drones drizzle honey over %n in slow gold ribbons while the queen strokes every sticky inch of them.",
+        "She feeds %n royal jelly from her lips until they're limp and glowin' and hummin' along with the hive.",
+        "Four hands and a dozen drones, and every one of them is busy makin' %n sticky, sweet and very, very happy.",
+        "The queen wraps %n in her arms and buzzes against them, a deep warm hum that goes right through, until they shiver to pieces."
+      ]);
+      trapSceneMore(
+        "hive",
+        [
+          "The hall of wax glows gold all round them, and the air's so thick with honey %n can taste it on every breath.",
+          "{v}Honey drips down %n's thighs and into their pussy, and a drone tidies it up with a quick neat tongue.",
+          "The queen's antennae brush %n's face, feathery and soft, and she smells of every flower in the orchard.",
+          "{c}A drone holds %n's cock very carefully and drizzles it with honey, and then cleans it, very carefully."
+        ],
+        [
+          "The whole hive hums one long low note, and the eggs come faster, and %n's belly rises under the queen's hands.",
+          `"Sweet," the queen says, pressin' her cheek to %n's belly to listen. "So sweet. They'll do well."`,
+          "%n's floatin' in honey and hum and the warm weight of eggs, and they've stopped wantin' anything else.",
+          "Two drones hold a cup of honey to %n's lips and they drink, and it runs down their chin, and the queen kisses it off."
+        ]
+      );
+      P("goat", "beats", 0, [
+        "%n leans on the goat-pen fence and it bleats at them. The fence doesn't bleat. The billy leanin' on the other side of it does.",
+        "There's a hand-written sign on the goat post: KNEEL HERE. %n's still readin' it when a horn hooks the back of their knee."
+      ]);
+      P("goat", "beats", 1, [
+        `He chews a long stalk of hay, slow, yellow eyes on %n, and spits it out. "Right. You'll do. Knees."`,
+        "The billy smells like a hot afternoon in a buck pen, and he's grinnin' like he knows exactly what that does to people."
+      ]);
+      P("goat", "beats", 2, [
+        `He grabs both of %n's ears like handlebars and steers their face where he wants it. "Say aah."`,
+        '"Mouth open, eyes up," he says, and slaps his thin pink cock against their cheek, twice, for luck.'
+      ]);
+      P("goat", "in", 0, [
+        "He's in %n's %h in a blink and humpin' like the fence is on fire, bleatin' happily with every jab.",
+        "{v}He spins %n round, has a quick go at their pussy just to see, bleats, and spins them back to their mouth because he likes that better."
+      ]);
+      P("goat", "in", 1, [
+        "He grabs a horn-hold on %n's hair and jabs deep and quick, so the buck stink of his belly hits them every time their nose bumps it.",
+        "He holds %n's head still with both hands and jabs, quick and deep, and his beard swings in their eyes every stroke.",
+        "%n's nose is buried in his wiry belly fur, and the buck stink of him fills every breath, and he won't let them pull back."
+      ]);
+      P("goat", "in", 2, [
+        "He's bleatin' louder and louder, tail goin' like a flag, and %n can't breathe for laughin' and gaggin' at once.",
+        `"Ohh, that's the stuff," he wheezes, "that's a proper nanny," and goes faster.`
+      ]);
+      P("goat", "over", 0, [
+        "He rubs his thin hot cock all over %n's face, cheeks and lips and eyelids, bleatin', without ever lettin' them take it.",
+        "No mouth to use, so he ruts against %n's cheek and neck and hair, quick and greedy, and paints them when he's done.",
+        "He grinds against %n's lips and won't let them open, laughin', till he spurts across their nose.",
+        "The billy humps %n's ear, then their cheek, then their collarbone, bleatin' happily, not fussy at all.",
+        "He slaps himself against %n's face over and over, laughin', and spatters them before they can blink.",
+        "He rubs off on %n's cheek like he's rubbin' his horns on a post, rough and quick and very pleased with himself."
+      ]);
+      trapSceneMore(
+        "goat",
+        [
+          "He leans his whole weight on %n's head, both hands, and bleats at the sky, very pleased with himself.",
+          "{c}He gives %n's cock a rough tug with his hoof-hard hand, laughs when they jump, and goes back to their mouth.",
+          "%n's eyes are streamin' and their nose is full of buck, and he's tellin' them in great detail how good they are.",
+          "His beard tickles %n's forehead with every jab, and he tugs it out of their eyes with a grin."
+        ],
+        [
+          "He goes for a second time without even pullin' out, because he's a goat and goats don't wait.",
+          "{v}He reaches back and gives %n's pussy a rough fond pat, like slappin' a good nanny's flank.",
+          `"Don't stop now," he says, though %n hasn't got any say in it, and grabs their ears again.`,
+          "Two of the nannies lean on the fence to watch and shake their heads at him, and he winks at them."
+        ]
+      );
+      P("sow", "beats", 0, [
+        '"Come here, you." The voice is warm and huge and smells of fresh milk, and a pair of soft arms gather %n up before they can say no.',
+        `The farrowin' shed door opens and a vast pink sow-woman fills it, wipin' her hands on her apron. "There you are. You look done in. Come and sit."`
+      ]);
+      P("sow", "beats", 1, [
+        "She settles into her big chair and arranges %n across her soft lap, and it's like sinkin' into a feather bed in front of the stove.",
+        `"Look at you, all tired out," she says, and tucks %n against her huge soft front like she's done it a hundred times.`
+      ]);
+      P("sow", "beats", 2, [
+        `She unbuttons her apron bib with one hand and draws %n's head down to a fat warm teat. "There. Have a drink, love."`,
+        `"Go on," she says, warm as an oven, and presses a drippin' teat to %n's lips until they open.`
+      ]);
+      P("sow", "in", 0, [
+        "%n drinks, and it's sweet and thick and heavy, and their limbs go warm and slow, and somethin' fat and blunt rises up hot against them from under her apron.",
+        "By the time %n's belly's warm with her milk, their legs have gone soft, and she's liftin' her apron with a slow wicked smile."
+      ]);
+      P("sow", "in", 1, [
+        "She rocks, slow and deep, and every rock settles %n further down on her, and every swallow makes them softer round her.",
+        "%n's suckin' greedy now, milk runnin' down their chin, and she's grindin' up into them slow as a churn."
+      ]);
+      P("sow", "in", 2, [
+        '"Take your time, love," she says, and she means the milk, and she means the rest of it too, and she rocks.',
+        "She lifts %n by the hips and settles them back down on her, fat and slow and deep, and the chair creaks in time."
+      ]);
+      P("sow", "over", 0, [
+        "%n nurses on her, drowsy, while she rubs herself slow and fat against their thigh under the apron, sighin'.",
+        "No way in, so she lets %n drink and drink, and grinds against them under her apron, slow and warm, till she spills.",
+        "She rocks %n in her lap, feedin' them, and ruts slow against the back of their thighs, hummin' an old milkin' song.",
+        "Her fat cock presses hot against %n's belly under the apron while they nurse, and she rocks, and rocks, and grunts softly.",
+        "She keeps %n's mouth full of teat and rubs herself between their thighs in slow, contented strokes.",
+        '"Never mind, love," she says, and lets them nurse, and finishes against their hip with a happy little grunt.'
+      ]);
+      trapSceneMore(
+        "sow",
+        [
+          "The stove's warm and the chair creaks and %n's belly is full and heavy with her milk, and their eyes are closin'.",
+          "{c}She reaches down and strokes %n's cock with her big soft hand, slow, fond, while they nurse.",
+          "She switches %n to the other teat, and it's just as full, and just as sweet, and she sinks a little deeper into them.",
+          `"That's it," she murmurs, "all of it," and %n drinks, and drinks.`
+        ],
+        [
+          "Milk and cock and the slow creak of the chair. %n's whole world is warm and soft and full at both ends.",
+          "{v}She rocks slow and deep into %n's pussy, fat and blunt, and %n moans round the teat.",
+          "She pats %n's bottom in time with the rockin', and hums, and every so often grinds a little deeper.",
+          "%n's milk-drunk and limp and stuffed, and she wipes their chin with her apron, and keeps goin'."
+        ]
+      );
+    }
     const CHATLOG = { live: /* @__PURE__ */ new Map(), who: /* @__PURE__ */ new Map(), lastSave: 0, hourKey: "" };
     const logHour = (t) => {
       const d = new Date(t);

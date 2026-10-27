@@ -286,7 +286,7 @@
     A.goat.end.push("He jams in, quivers all over, and squirts %ml down %n's %h. Then he licks their cheek, long and rank, and bounces off over the fence.",
                     "%ml, quick as a sneeze, down %n's %h. He burps, scratches, and saunters away, leavin' them to cough.");
     more(A.sow.beats,
-      ["\"There you are, piglet. I've been callin'.\" %n hasn't heard anybody callin'. They're picked up anyway.",
+      ["\"There you are, love. I've been callin'.\" %n hasn't heard anybody callin'. They're picked up anyway.",
        "A warm, enormous softness closes round %n from behind and a voice like fresh bread says, \"Oh, you poor hungry thing.\""],
       ["She's got an apron on over nothin' much, and she's built like a feather bed. %n sinks into her lap and it's the most comfortable they've been all week.",
        "She tucks %n's head into the crook of her arm and starts to rock, creak, creak, before they can object."],

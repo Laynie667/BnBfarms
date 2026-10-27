@@ -136,7 +136,7 @@
              "{c}Her cold fingers wrap round %n's cock and stroke, and the cold makes it feel twice as hot.",
              "{v}She slides two chilly fingers into %n's pussy and curls them, and smiles with her fangs out when they clench.",
              "She licks the two little marks on %n's neck clean, slow, and it sends a shiver all the way to their toes."]],
-    tender: ["Her bite never hurts. She makes sure of that, and asks before every one.", "She cradles %n's head in her hand the whole time, like somethin' precious.", "She hums an old lullaby against their neck while she drinks."],
+    tender: ["Her bite never hurts. She makes sure of that, and asks before every one.", "She cradles %n's head in her hand the whole time, like somethin' precious.", "She hums an old slow tune against their neck while she drinks."],
     filthy: ["She drinks from %n like a juice box and fucks them like she's makin' up for two hundred years.", "%n's the countess's snack and her cocksleeve, and she tells them so, sweetly, in three languages.",
              "She leaves bite marks in places nobody but her will ever see, and %n begs for more of them."],
     depth: ["held", "breed", "tease"], tw: ["night", "alone", "milk"], places: ["cabin", "office", "stalls"], sound: "creak", tags: ["monsters"],

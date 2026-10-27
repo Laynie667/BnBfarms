@@ -126,7 +126,7 @@
      "%n's hand is busy between their legs, slow, in time with the light, and they're drooling, and they're smiling.",
      "\"When you wake you'll feel warm whenever somebody calls you good,\" says the lantern. %n nods. They'll remember. They won't know why."]);
   trapScene("tentacle",
-    ["More arms rise out of the water, slow and lazy, and wind round %n's arms and pull them out wide like they're bein' crucified on the surface.",
+    ["More arms rise out of the water, slow and lazy, and wind round %n's arms and pull them out wide like a star floatin' on the surface.",
      "A thin arm explores %n's ear, their mouth, the hollow of their throat, gentle and curious, tastin' everything.",
      "{t}Two arms wrap round %n's tits and squeeze, and the suckers along them latch on all over, pulling, kissing.",
      "{c}A hollow arm swallows %n's cock and starts to suck, rippling, wet and cool and endless."],
@@ -247,7 +247,7 @@
   trapScene("wolves",
     ["The pack circles, close and closer, and every one of them gets a sniff and a lick, between %n's legs, under their arms, behind their ears.",
      "The alpha takes %n by the scruff in his teeth and growls low, and the whole pack goes still to watch.",
-     "{t}A young wolf noses at %n's tits and licks them, rough-tongued and slow, while the others wait their turn.",
+     "{t}A lean wolf noses at %n's tits and licks them, rough-tongued and slow, while the others wait their turn.",
      "{c}A wolf licks %n's cock from root to tip, once, curious, and then again because of the noise they make."],
     ["Every wolf that's had a turn lies down close by to watch the next one, panting, pleased.",
      "%n's knees are scraped and their back's slick with the alpha's drool and they're rocking back to meet every one.",
@@ -344,14 +344,14 @@
      "He gets bored of %n's mouth and spins them round and has a go at the other end, just as fast.",
      "He bleats and bucks and %n has to hold on to his knees so they don't go over."]);
   trapScene("sow",
-    ["She hums an old lullaby while she rocks, and %n's eyes go heavy and their mouth goes slack round the teat.",
+    ["She hums an old slow tune while she rocks, and %n's eyes go heavy and their mouth goes slack round the teat.",
      "Her milk is warm and endless and it makes %n's belly round and sleepy.",
      "{t}She squeezes one of %n's tits with her big soft hand, fond, and a bead of milk comes up. \"Look at you. Takin' after me.\"",
      "She smooths %n's hair and pats their bottom, and rocks, and rocks."],
     ["She's in no hurry. The rocking chair creaks and her cock rocks with it, deep and slow and fat.",
      "%n's pressed into her soft round belly, warm and full at both ends, and they've never felt so looked after.",
      "Every so often she shifts them to the other teat, and grinds a little deeper while she does.",
-     "\"There's a good piglet,\" she says, every few minutes, and every time %n squeezes round her."]);
+     "\"That's the way, love,\" she says, every few minutes, and every time %n squeezes round her."]);
   trapScene("pillory",
     ["A farmhand comes along with a jar of grease and a paddle and gets %n ready for visitors, slow and thorough, behind where they can't see.",
      "Somebody pins a paper tag to %n's rump. They can't read it. They can hear people laughing at it.",

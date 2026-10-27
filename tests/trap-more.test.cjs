@@ -82,6 +82,41 @@ const LEAK=/\{(nv|nc|nt|fu|fb|nb|ok|v|c|t|f|m)\}|%[a-z]{1,8}\b|\bundefined\b|\bN
   const hInScene=KINDS.flatMap(k=>[...(SC[k]||[]), ...Object.values(SF[k]||{}).flatMap(F=>F.scene||[])].flat()).filter(l=>/%h\b/.test(l));
   ok(!hInScene.length, 'the beats of their own never name a hole (they can fall before or after it\'s chosen)'+(hInScene.length?' ('+hInScene.slice(0,2).join(' | ')+')':''));
 
+  // ── the pools grown another way: the gas and spray by kind and strength, the needle, the wheel, the things in the water ──
+  const PM=W.__poolMore||[], PK=[...new Set(PM.map(p=>p.kind))];
+  out('pools grown another way:', PM.length, 'in', PK.join(', ')+',', PM.reduce((a,p)=>a+p.lines.length,0), 'new lines');
+  ok(PM.length>=150 && ['gas','spray','injector','wheel','tentacle'].every(k=>PK.includes(k)), 'the gas, the spray, the needle, the wheel and the things in the water have had theirs grown');
+  const thinPool=PM.filter(p=>p.pool.length<8).map(p=>p.kind+' '+p.name+' '+p.pool.length);
+  ok(!thinPool.length, '...every one of those pools eight lines or more'+(thinPool.length?' ('+thinPool.slice(0,6).join(' | ')+')':''));
+  const asSpun=l=>l.replace(/%i\b/g,'First');   // the wheel writes its spin in before the line's filled
+  const badP=[]; for (const p of PM) for (const l of p.lines) for (const mn of [500,600,700,800]){ const t=W.__tFill(W.__pickFor(mn,'x',[asSpun(l)]),mn,{ml:'60 mL',c:'thick',h:'ass',x:'7'}); if (LEAK.test(t)) badP.push(p.name+': '+t.slice(0,70)); }
+  ok(!badP.length, '...every new line of them fills in for every body'+(badP.length?' ('+badP.slice(0,4).join(' | ')+')':''));
+  const untaggedP=PM.flatMap(p=>p.lines).filter(l=>COCK.test(l) && !/\{(c|m|fu|fb)\}/.test((l.match(/^(\{[a-z]+\})+/)||[''])[0]));
+  ok(!untaggedP.length, '...and only somebody with a cock hears about their own'+(untaggedP.length?' ('+untaggedP.slice(0,3).map(s=>s.slice(0,60)).join(' | ')+')':''));
+  const thinSceneP=PK.flatMap(k=>(SC[k]||[]).map((p,i)=>p.length<8?k+' ['+i+'] '+p.length:null)).filter(Boolean);
+  ok(!thinSceneP.length, '...and their two beats of their own'+(thinSceneP.length?' ('+thinSceneP.join(', ')+')':''));
+
+  // every kind of gas and spray, at every strength, on every body: each beat as it runs
+  const GAS=['heat','milk','musk','needy','giggle','haze','rut','ripen','moo'], SPRAY=['seed','piss','milk','slime','oil','ink','hose'];
+  const vthin=[]; let vseen=0;
+  W.__onTrapBeats=(mn,kind,beats)=>{ if (!['gas','spray','injector','wheel'].includes(kind)) return; vseen++; beats.forEach((b,i)=>{ const n=Array.isArray(b)?b.length:1; if (n<8) vthin.push(kind+' ['+i+'] '+n+': '+String(Array.isArray(b)?b[0]:b).slice(0,40)); }); };
+  for (const [kind,list] of [['gas',GAS],['spray',SPRAY],['injector',[null]]]) for (const variant of list) for (const sev of [1,2,3]){ W.__variantForce={[kind]:{variant,sev}}; await spring(kind); }
+  W.__variantForce=null; await spring('wheel'); await spring('wheel');
+  W.__onTrapBeats=null;
+  ok(vseen>=150 && !vthin.length, 'every gas, spray and needle, at every strength, and the wheel, run eight lines or more a beat ('+vseen+' runs)'+(vthin.length?' ('+[...new Set(vthin)].slice(0,6).join(' | ')+')':''));
+
+  // the whole story, for a few of them and for every thing in the water, on three bodies
+  const vtold=[]; const tell=async(mn,kind,force)=>{ free(mn); W.__st().lastCmd&&W.__st().lastCmd.clear(); if (kind==='tentacle') W.__waterForce=force; else W.__variantForce=force?{[kind]:force}:null; const n=sent.length; await say(221397,'?trap spring '+P(mn).name+' '+kind,200); await done(mn,300); vtold.push([P(mn).name,kind+(force?' '+(force.variant||force):''),all(n)]); free(mn); };
+  const runs=[['gas',{variant:'heat',sev:3}],['gas',{variant:'rut',sev:2}],['gas',{variant:'ripen',sev:3}],['gas',{variant:'milk',sev:3}],['gas',{variant:'haze',sev:2}],['spray',{variant:'seed',sev:3}],['spray',{variant:'oil',sev:2}],['spray',{variant:'hose',sev:3}],['injector',{variant:null,sev:3}],['wheel',null],
+    ...Object.keys(W.__waterForms()).map(f=>['tentacle',f])];
+  for (const mn of [500,600,700]) for (const [k,f] of runs) await tell(mn,k,f);
+  W.__waterForce=null; W.__variantForce=null;
+  const vwrong=vtold.filter(([nm,,t])=>nm!=='Moo' && new RegExp(nm+"'s (pussy|cunt|womb|clit|slit)","i").test(t));
+  const vshort=vtold.filter(([,,t])=>t.length<200).map(([nm,k])=>nm+' '+k);
+  ok(!vshort.length && !vwrong.length, 'those stories run whole, and a male or a femboy is never told about a pussy'+(vshort.length?' (short: '+vshort.slice(0,4).join(', ')+')':'')+(vwrong.length?' ('+vwrong[0][0]+' '+vwrong[0][1]+')':''));
+  const vleak=vtold.filter(([,,t])=>LEAK.test(t));
+  ok(!vleak.length, '...and every line of them fills in'+(vleak.length?' ('+vleak[0][1]+': '+(vleak[0][2].match(LEAK)||[''])[0]+')':''));
+
   // ── the whole story, told to Rex (male) and Pip (femboy): nobody hears about a pussy or a womb they haven't got ──
   const told=[]; const sample=['maze','stag','sowing','nixie','groomstand','vampire','crate','mistletoe','hollyking','bunnysuit','fairyring','cornmaiden'].filter(k=>TM[k]);
   for (const mn of [600,700]) for (const k of sample){ free(mn); W.__st().lastCmd&&W.__st().lastCmd.clear(); const n=sent.length; await say(221397,'?trap spring '+P(mn).name+' '+k,200); await done(mn,300); told.push([P(mn).name,all(n)]); free(mn); }

@@ -104,8 +104,8 @@
           "Somethin' enormous and gentle pushes into %n's %h and stretches them wider than anythin' ever has, slow, so slow, till they're full to the brim.",
         ],
         sig: [
-          "The mother hums, deep enough to feel in the bones, and every arm round %n squeezes in time, cradlin' them, rockin' them while she fills them.",
-          "She's in no hurry. She holds %n in the water, strokin' their belly, their hair, their thighs, the way you'd settle a nervous heifer before a breedin'.",
+          "The mother hums, deep enough to feel in the bones, and every arm round %n squeezes in time, holdin' them close, rockin' them while she fills them.",
+          "She's in no hurry. She holds %n in the water, strokin' their belly, their hair, their thighs, the way you'd settle nervous stock before a breedin'.",
           "Smaller arms come up off her, dozens of them, and every one finds somewhere on %n to hold or stroke or fill.",
           "%n can feel the mother's heartbeat through the arm inside them, slow and huge, and their own starts to match it.",
         ],
@@ -117,7 +117,7 @@
         end: [
           "The mother of the pond has laid %x eggs in %n's %h by the time she's done. She sets them on the bank so carefully, strokes their swollen belly once, and sinks away into the deep.",
           "%x eggs. The mother lets %n go like somethin' precious and slides back down, and the pond goes still and dark. %n's belly is the biggest it's ever been.",
-          "She leaves %x of her eggs in %n's %h and a smear of somethin' like a blessin' across their belly, and the pond swallows her up again. Folk will talk about this one.",
+          "She leaves %x of her eggs in %n's %h and a smear of somethin' warm and shinin' across their belly, and the pond swallows her up again. Folk will talk about this one.",
         ],
         endHyper: [
           "The mother fills %n till there's no room left, and then makes room: %x eggs, packed so tight %n's belly's hard as a barrel, and she has to carry them up the bank herself.",
@@ -172,7 +172,7 @@
         ],
         swell: [
           "The tune swells and so does the arm in %n, and the eggs come in time with the music, one on every long low note.",
-          "It sings %n a lullaby while it lays in them, egg by egg, and %n sways along, eyes heavy, belly fillin'.",
+          "It sings %n somethin' slow and sleepy while it lays in them, egg by egg, and %n sways along, eyes heavy, belly fillin'.",
         ],
         end: [
           "The song fades out. When %n comes to, they're sat on the bank with %x eggs in their %h and no idea how long they've been there. The tune's still in their head.",
@@ -277,7 +277,7 @@
           "It leaves %x eggs nestled warm in %n's %h and strokes their belly till they doze off on the bank. Warm eggs come sooner, folk say.",
         ],
         endHyper: [
-          "It lays %x warm eggs in %n, slow and careful, till they're round as a harvest moon, then cradles them in the water till they stop tremblin'.",
+          "It lays %x warm eggs in %n, slow and careful, till they're round as a harvest moon, then holds them close in the water till they stop tremblin'.",
         ],
       } },
     twins: { name: "the twins", w: 6, eggsX: 1.5, fillX: 1.4,

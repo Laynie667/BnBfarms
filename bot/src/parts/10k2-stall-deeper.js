@@ -34,7 +34,7 @@
   STALL_STORY.atmos.push(
     "Down the line, somebody else's pump coughs and settles, and a contented moo drifts over the partition.",
     "A farmhand hums as they walk the row, checking cans, sliding each full one out and a clean one in.",
-    "Rain on the dairy roof, the drone of the pumps, the warm smell of milk and straw: the barn's own lullaby.",
+    "Rain on the dairy roof, the drone of the pumps, the warm smell of milk and straw: the barn's own slow song.",
     "A barn swallow darts in through the high window, circles once, and goes out again.",
     "The radio in the office plays something old and slow, faint through the wall.",
     "Somebody's mucking out the next stall over, and the scrape of the shovel keeps time with the pump.",

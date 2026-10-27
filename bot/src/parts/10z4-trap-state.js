@@ -125,7 +125,7 @@
             "Somethin' in %n kicks, hard, right at the worst moment, and %n lets out a startled little noise that makes everybody grin."],
       breed: ["Round with one litter, %n's bred for the next anyway: slow, deep strokes that rock their full belly and make it bump soft against whatever's under them.",
               "Whoever's breedin' %n has both hands on their pregnant belly, holdin' it, feelin' it rock with every thrust.",
-              "%n's belly is so round now it lifts them up off whatever they're bent over, and every push from behind rocks them on it like a cradle.",
+              "%n's belly is so round now it lifts them up off whatever they're bent over, and every push from behind rocks them on it like a rockin' chair.",
               "\"Already full,\" somebody murmurs, sinkin' in deep, \"and you still want it. You just love bein' bred, don't you.\""],
       held: ["Whatever's holdin' %n was never made for somebody carryin', and the swell of their belly presses tight against it at every point.",
              "%n's held with their pregnant belly hangin' heavy and on show, and every passin' hand gives it a rub."],

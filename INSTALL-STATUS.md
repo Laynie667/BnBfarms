@@ -5,7 +5,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 | Script | File in `dist/` | Where it runs | Current |
 |---|---|---|---|
-| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.59.0** |
+| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.60.0** |
 | Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.10.0** |
 | Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.2.1** |
 | Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **1.1.0** |
@@ -24,6 +24,16 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 ## Latest changes (newest first)
 
+- **Bot 0.60.0: the farm's everyday traps and the first twelve studs tell their own story in eight lines a beat.** No Companion update needed.
+  - **The gas, every kind at every strength:** pink heat, white milk, gold musk, violet need, yellow giggles, blue haze, red rut, green ripenin' and the moo gas. Each cloud, each mild, strong and brutal hit, and each after now picks from eight lines or more.
+  - **The spray rack, every kind at every strength:** seed, piss (only with ?watersports on), milk, slime, oil, markin' dye and the cold hose.
+  - **The needle:** all four ways it catches you (the arm, the chair, the dart, the collar), every size of dose, the shot goin' in, and the second needle.
+  - **The breedin' wheel:** bein' strapped on, every spin (in or over), and both endings.
+  - **All ten things in the water:** the old one and the jelly bloom, the eel-knot, the mother of the pond, the hungry one, the singin' one, the reed-thing, the ink-spitter, the warm one and the twins. How each one takes you, gets in, does its own thing, lays, and leaves you (and leaves you when it overdoes it).
+  - **The first twelve studs:** the wolf pack, the stallion, the bull, the buck rabbits, the boar, the barn toms, the drake, the naga, the mastiff, the hive queen, the billy and the old sow.
+  - About 1,050 new lines, each one fitted to the body it's about.
+  - **A few words changed:** nobody in a scene is called young or half-grown any more (the boar's and the pack's second fellas are "lean" now). The old sow calls you "love" and "sweet thing" instead of "baby" or "piglet". Lullabies are slow tunes now, and "like a cradle" is "like a hammock". The thing in the water spreads you out "like a star", not crucified.
+  - **Next:** the newer studs and all their versions (minotaur, werewolf, fox den, lion pride, ram, the wolves' lone wolf, hunt and snow pack), then the machines and the rest.
 - **Bot 0.59.0: 45 more traps tell their own story in eight lines a beat.** Same job as 0.58.0, next batch. No Companion update needed.
   - About 1,250 new lines, every beat of these traps picks from eight or more, and their two beats of their own from eight. Each line fits the body it's about.
   - **The traps:** the rest of Halloween (the cauldron, the broomstick, the candy apple, the taffy pull, the mummy, the haunted house, the costume trunk), the crate, all of winter (the frozen pond, the gingerbread, the mistletoe, the yeti, the gift wrap, the stockin', the sauna, the cocoa stand, the frost fae, the snowman), all of Yule (the Yule log, the Holly King, the wassail, the ivy, the longest night), the rest of Ostara (the March hares, the Green Man, the egg dyein', the balance), all of Easter (the hidden eggs, the chocolate fountain, the bunny suit, the basket, the marshmallow, the egg roll, the bonnet, the chocolate bunny), the rest of Litha (the Oak King, the fairy ring, the sun wheel, the mead, Puck) and the rest of Mabon (the corn maiden, the grape stomp, the cider press, the harvest crown, the harvest supper).

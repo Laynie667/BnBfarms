@@ -226,7 +226,7 @@
              "{v}His thumb rubs %n's clit in slow circles, and for somethin' that big he's very, very gentle.",
              "He licks %n's neck, slow and rough, and the warmth of it goes all the way down."]],
     tender: ["He wraps %n up in his arms and his fur so not one inch of them is cold.", "He's slow and patient, and he stops and rumbles a question every time %n gasps.",
-             "He hums somethin' low and soft the whole time, like a lullaby made of avalanches."],
+             "He hums somethin' low and soft the whole time, like a slow song made of avalanches."],
     filthy: ["The yeti breeds %n like he means to have them carryin' by spring, and %n's beggin' him to.", "%n's stretched round a monster cock in a cave in the snow, moanin' loud enough to bring the drifts down.",
              "He fills %n so full they slosh, and then fills 'em again for the cold."],
     gear: [{ when: "after", slot: "device", label: "Yeti's Fur Wrap", items: ["FurBlanketWrap"], mins: 20, desc: "One of the yeti's own white furs, wrapped round them snug as a cocoon and tied off. Warm as anything. Not easy to get out of." }],

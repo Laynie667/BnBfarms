@@ -7,7 +7,8 @@
      A beat is found by how its first line starts, so a trap whose story branches (milk or seed, in or over) gets the
      right lines on the right branch. trapSceneMore(kind, [more for its first extra beat], [more for its second])
      grows the two beats of its own in 10ue-trap-scenes.js (or the season's file), and studSceneMore(kind, version, ...)
-     a stud version's own two.
+     a stud version's own two. poolMore(kind, "what it is", pool, [more]) grows a pool that's picked from some other
+     way (the gas and spray by kind and strength, the needle, the breedin' wheel, the things in the water).
      %n who's in it · %h the hole it's in · %c how big the cock is · and the rest as the trap's own lines have them.
   */
   const TRAP_MORE = {};
@@ -24,6 +25,13 @@
     const F = STUD_FORMS[kind] && STUD_FORMS[kind][form]; if (!F || !F.scene) return;
     pools.forEach((p, i) => { if (F.scene[i] && p && p.length) F.scene[i] = F.scene[i].concat(p); });
   }
+  // a pool that isn't one of a trap's beats as such (the gas by kind and strength, a needle's dose, the wheel's spins,
+  // a thing in the water's own lines): its more lines go straight into it, and it's kept here so the test can find it
+  const POOL_MORE = [];
+  function poolMore(kind, name, pool, lines){
+    if (!Array.isArray(pool) || !lines || !lines.length) return;
+    pool.push(...lines); POOL_MORE.push({ kind, name, pool, lines });
+  }
   // a trap's own beats, each with its more lines added (trapRun, 10u-traps.js)
   function moreBeats(kind, beats){
     const L = TRAP_MORE[kind];
@@ -34,4 +42,4 @@
       return more.length ? pool.concat(more) : b;
     });
   }
-  if (W.__FARMHAND_TEST__) Object.assign(W, { __trapMore: TRAP_MORE, __moreBeats: moreBeats, __trapScene: TRAP_SCENE });
+  if (W.__FARMHAND_TEST__) Object.assign(W, { __trapMore: TRAP_MORE, __poolMore: POOL_MORE, __moreBeats: moreBeats, __trapScene: TRAP_SCENE });

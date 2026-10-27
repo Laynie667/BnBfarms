@@ -151,7 +151,7 @@
 
     // ── the old sow ──
     more(A.sow.beats[0], [
-      "%n stops to scratch a piglet behind the ears. A pair of enormous soft arms scoops them up from behind. \"There's my baby.\"",
+      "%n stops to scratch a piglet behind the ears. A pair of enormous soft arms scoops them up from behind. \"There's my sweet thing.\"",
       "\"Look how thin you are.\" The voice is warm as an oven and the arms round %n are warmer. Their feet leave the ground."]);
     more(A.sow.beats[1], [
       "The old sow settles into her chair with a creak and a sigh and tucks %n into her lap like she's done it a thousand times. She has.",
@@ -167,7 +167,7 @@
       "{nv}She settles %n down on her cock, slow, and it stretches their ass round it like a ring on a thick finger. She rocks. Milk and cock, in time.",
       "She rocks the chair, and every rock pushes her a little deeper into %n, and %n suckles harder without meanin' to."]);
     more(A.sow.in[2], [
-      "\"Good piglet.\" She lifts and lowers %n by the hips, patient as a churn, and keeps their mouth full of teat the whole time.",
+      "\"That's it, love.\" She lifts and lowers %n by the hips, patient as a churn, and keeps their mouth full of teat the whole time.",
       "The chair creaks, the milk flows, and %n's whole world is warm softness at both ends."]);
     more(A.sow.over[0], [
       "She lets %n nurse till they're drowsy, rubbin' herself slow against their thigh under her apron, and grunts happily when she spills."]);

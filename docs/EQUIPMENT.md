@@ -26,6 +26,15 @@ The bakery bench: piped with frosting, sprinkled, and served.
   - **Bakery Bench** (device, while the trap holds them). Game items: BondageBench, Table, WoodenStocks. A long floured baker's bench with leather straps at wrist, waist and knee, built to hold something still while it's decorated.
   - **Price Tag** (tag, after the trap, for 20 min). Game items: CollarNameTag, CollarBell, CollarNameTagLivestock. A little card tag on a ribbon at the collar, in the baker's curly hand: FRESH TODAY, ONE SLICE PER CUSTOMER.
 
+### ⚖️ balance
+
+The equinox see-saw: the day on one end and the night on the other, and you're what balances them, sat down on the post in the middle.
+
+- **How to get it:** a tile named `trap-balance`.
+- **Ruled out by limits mentioning:** toy, dildo, tease, edg, denial, public.
+- **Equipment:**
+  - **See-Saw Straps** (legs, while the trap holds them). Game items: HempRope, LeatherLegCuffs. Gold and black straps round their thighs, holdin' them sat on the middle post of the equinox see-saw.
+
 ### 🌾 bale
 
 Baled in tight with your rump out, and anybody passin' can use you.
@@ -34,6 +43,16 @@ Baled in tight with your rump out, and anybody passin' can use you.
 - **Ruled out by limits mentioning:** stuck, public, free use, bale.
 - **Equipment:**
   - **Bale Twine** (ropeFeet, after the trap, for a while). Game items: HempRope. Baling twine knotted round the ankles to keep the legs apart and the rump right where it is, sticking out of the hay.
+
+### 🧺 basket
+
+The giant Easter basket: tied in a nest of paper grass in a basket as big as a bathtub, bow and all, and delivered to somebody's door.
+
+- **How to get it:** a tile named `trap-basket`.
+- **Ruled out by limits mentioning:** bondage, restrain, tied, gift, present.
+- **Equipment:**
+  - **Basket Ribbon (arms)** (arms, while the trap holds them). Game items: Ribbons, HempRope, LeatherCuffs. Pastel pink ribbon round their wrists, tied in a bow, keepin' them nested in the Easter basket.
+  - **Basket Ribbon (legs)** (legs, while the trap holds them). Game items: Ribbons, HempRope, LeatherLegCuffs. Pastel blue ribbon round their ankles, so they stay curled up in the paper grass till they're unwrapped.
 
 ### 🐻 bearskin
 
@@ -91,6 +110,23 @@ The inflatable body bag: zipped in, pumped up tight, and teased through the rubb
 - **Equipment:**
   - **Inflatable Body Bag** (device, while the trap holds them). Game items: InflatableBodyBag, WoodenStocks. A thick black rubber bag zipped up to the chin and pumped till it hugs like a fist. Every squeeze from outside lands everywhere at once.
 
+### 🔥 bonfire
+
+Leapin' the midsummer bonfire: jump it for luck, and whoever's waitin' on the far side catches you and carries you off into the dark.
+
+- **How to get it:** a tile named `trap-bonfire`.
+- **Ruled out by limits mentioning:** stranger, carry, outdoor, fire.
+- **Equipment:** none yet.
+
+### 👒 bonnet
+
+The bonnet parade: paraded round the yard in an Easter bonnet and not much else, and judged on every inch, slowly.
+
+- **How to get it:** a tile named `trap-bonnet`.
+- **Ruled out by limits mentioning:** public, exhibit, humiliat, nud, naked, judg.
+- **Equipment:**
+  - **Parade Bonnet** (hat, while the trap holds them). Game items: Bonnet1, Bonnet2, FlowerCrown. An Easter bonnet covered in silk primroses and ribbons, tied under the chin. The most dressed bit of them.
+
 ### 🎟️ booth
 
 The peep booth: a window, a coin slot, and holes in the walls.
@@ -134,6 +170,18 @@ A bull-man who locks your neck in the gate and milks you while he ruts you.
 - **How to get it:** a tile named `trap-bull`.
 - **Equipment:** none yet.
 
+### 🐰 bunnysuit
+
+The bunny suit rack: zipped into a bunny girl suit, ears and cuffs and a tail plug, and set out on the Easter display for the fair to play with.
+
+- **How to get it:** a tile named `trap-bunnysuit`.
+- **Ruled out by limits mentioning:** costume, plug, anal, public, display, objectif.
+- **Equipment:**
+  - **Bunny Girl Suit** (suit, while the trap holds them). Game items: BunnySuit, LatexCatsuit. A tight satin bunny girl suit, cut low and high, with a big bow at the throat.
+  - **Bunny Suit Ears** (ears, while the trap holds them). Game items: BunnyEars1, BunnyEars2. Tall satin bunny ears on a band, pink inside.
+  - **Bunny Collar and Cuffs** (cloak, while the trap holds them). Game items: BunnyCollarCuffs. A white collar with a bow tie, and white cuffs, the proper bunny girl kind.
+  - **Bunny Tail Plug** (plug, while the trap holds them). Game items: BunnyTailPlug1, BunnyTailPlug2, InflVibeButtPlug, BlackButtPlug, ButtPlug. A round white fluffy bunny tail on a plug, slid in and given a little tug to check.
+
 ### 🧈 buttermill
 
 The butter churn: strapped to it and churned till there's butter everywhere.
@@ -175,6 +223,26 @@ The witch's cauldron: stewed in her bubblin' brew, and it does somethin' to you.
 - **Equipment:**
   - **The Witch's Cauldron** (device, while the trap holds them). Game items: MilkCan, WoodenStocks. A great black iron pot, big enough to sit in up to the chin, bubblin' with somethin' warm and purple that smells of plums and spice.
 
+### 🍫 chocbunny
+
+The chocolate bunny mould: pressed into the big mould, set in a shell of chocolate in the cold room, and broken out a bite at a time.
+
+- **How to get it:** a tile named `trap-chocbunny`.
+- **Ruled out by limits mentioning:** food, messy, confin, enclo, bondage, bite.
+- **Mess it leaves:** chocolate on the chest and tummy and thighs.
+- **Equipment:**
+  - **Mould Straps** (legs, while the trap holds them). Game items: HempRope, LeatherLegCuffs. The chocolate bunny mould's leather straps, buckled round their legs to hold the two halves shut while it sets.
+
+### 🍫 chocfountain
+
+The chocolate fountain at the Easter fair: dipped in warm chocolate up to the neck, and licked clean by everybody with a sweet tooth.
+
+- **How to get it:** a tile named `trap-chocfountain`.
+- **Ruled out by limits mentioning:** food, messy, sticky, public, lick.
+- **Mess it leaves:** chocolate on the chest and tummy and face.
+- **Equipment:**
+  - **Fountain Ribbon** (legs, while the trap holds them). Game items: Ribbons, HempRope, LeatherLegCuffs. A brown satin ribbon round their knees, tied to the rim of the chocolate fountain.
+
 ### 🌽 chute
 
 A feed funnel in your mouth and mash till your belly's tight.
@@ -184,6 +252,15 @@ A feed funnel in your mouth and mash till your belly's tight.
 - **Mess it leaves:** mash on the face and chest.
 - **Equipment:**
   - **Feed Chute** (funnel, while the trap holds them). Game items: FunnelGag. A wide rubber funnel strapped between the teeth, throat held open, with a hopper of warm sweet mash pouring down until this belly is tight as a drum.
+
+### 🍎 ciderpress
+
+The cider press: laid in the press among the apples and pressed slow, and if you make milk it's milked into the cider.
+
+- **How to get it:** a tile named `trap-ciderpress`.
+- **Ruled out by limits mentioning:** milk, lactat, pres, squeez, messy, bondage.
+- **Equipment:**
+  - **Press Strap** (arms, while the trap holds them). Game items: LeatherCuffs, HempRope. The cider press's leather strap, buckled over their wrists so they lie still among the apples while it's wound down.
 
 ### 🚫 clamp
 
@@ -221,6 +298,16 @@ For studs: the collection bench, milked into the vat.
 - **Mess it leaves:** cum on the tummy.
 - **Equipment:**
   - **Collection Bench** (device, while the trap holds them). Game items: BondageBench, WoodenStocks. The collection bench: strapped face down, hips up, with a jar waiting underneath and a sign that reads VAT COLLECTION.
+
+### 🌽 cornmaiden
+
+The corn maiden: woven into a corn dolly of straw, hung from the barn rafters for luck, and set at the head of the harvest table.
+
+- **How to get it:** a tile named `trap-cornmaiden`.
+- **Ruled out by limits mentioning:** bondage, suspen, hang, objectif, doll, tease, edg.
+- **Equipment:**
+  - **Corn Dolly Plaits** (ropeArms, while the trap holds them). Game items: HempRope. Gold straw plaited tight round their arms in the old corn dolly patterns, so they hang like a corn maiden.
+  - **Corn Dolly Plaits (legs)** (legs, while the trap holds them). Game items: HempRope, LeatherLegCuffs. Straw plaits round their legs, plaited together at the knees, a red ribbon at the ankle.
 
 ### 👗 costumetrunk
 
@@ -306,6 +393,25 @@ A dragon-man who breeds you on his nest and leaves a clutch.
 - **How to get it:** a tile named `trap-drake`.
 - **Equipment:** none yet.
 
+### 🥚 eggdye
+
+The egg-dyein' tubs: dunked in one colour after another till you're as pastel as the eggs, and the dyers paint flowers on you while you dry.
+
+- **How to get it:** a tile named `trap-eggdye`.
+- **Ruled out by limits mentioning:** messy, paint, wet, dunk, public.
+- **Mess it leaves:** dye on the chest and tummy and face and thighs.
+- **Equipment:**
+  - **Dye-Tub Ribbon** (arms, while the trap holds them). Game items: Ribbons, HempRope, LeatherCuffs. A pastel pink ribbon round their wrists, tied to the edge of the dye tub so they don't float off.
+
+### 🎨 eggroll
+
+Egg rollin': sealed in a giant painted egg and rolled down the big hill, and whoever catches it at the bottom gets to open it.
+
+- **How to get it:** a tile named `trap-eggroll`.
+- **Ruled out by limits mentioning:** bondage, enclo, confin, dizz, stranger.
+- **Equipment:**
+  - **Egg-Roll Ribbon** (legs, while the trap holds them). Game items: Ribbons, HempRope, LeatherLegCuffs. A pastel yellow ribbon round their ankles, so they roll nice and round inside the giant painted egg.
+
 ### 🥚 eggs
 
 A post rises up under you and lays a clutch in you.
@@ -314,6 +420,15 @@ A post rises up under you and lays a clutch in you.
 - **Ruled out by limits mentioning:** egg, ovipo, clutch.
 - **Equipment:**
   - **Egg Post Plug** (the hole they have (a dildo slot with a pussy, a plug slot without), after the trap, for 15 min). Game items: EggVibePlugXXL, PenisDildo. The egg post's parting gift: a thick ridged plug seated deep behind a fresh clutch, holding every egg in a stretched, slick hole while they settle.
+
+### 🍄 fairyring
+
+The fairy ring: step into the ring of toadstools on Midsummer's Eve, and the fae folk dance you round till dawn and every one of them takes a turn.
+
+- **How to get it:** a tile named `trap-fairyring`.
+- **Ruled out by limits mentioning:** gang, fae, fairy, ie, monster, magic, dance, trance.
+- **Equipment:**
+  - **Fae Ribbon** (ropeArms, while the trap holds them). Game items: Ribbons, HempRope. A pale green ribbon that wasn't there a moment ago, round their wrists, and it won't untie till the music stops.
 
 ### 👜 feedbag
 
@@ -456,6 +571,26 @@ A goblin raiding party: caught, tied and taken turns on by every one of them.
   - **Goblin Rope** (ropeArms, while the trap holds them). Game items: HempRope. Far too much rope, tied with far too many knots, by a dozen goblins who all wanted to help.
   - **Goblin Trophy Token** (tag, after the trap, for 30 min). Game items: CollarNameTag, CollarBell, CollarNameTagLivestock. A carved bone token on a thong round the neck: the raiding party's mark, meaning CAUGHT.
 
+### 🍇 grapestomp
+
+Treadin' the grapes: tipped into the wine vat with the treaders, slippin' and slidin' in the grapes till you're purple to the eyebrows.
+
+- **How to get it:** a tile named `trap-grapestomp`.
+- **Ruled out by limits mentioning:** messy, wet, slip, food, public.
+- **Mess it leaves:** grape on the chest and tummy and thighs and face.
+- **Equipment:**
+  - **Vintner's Ribbon** (arms, while the trap holds them). Game items: Ribbons, HempRope, LeatherCuffs. A purple ribbon round their wrists, tied to the rim of the grape vat so they can't climb out before the treadin's done.
+
+### 🍃 greenman
+
+The Green Man: a farmhand in a mask of new leaves steps out of the hedge and claims the first bloom of spring, and crowns you with it after.
+
+- **How to get it:** a tile named `trap-greenman`.
+- **Ruled out by limits mentioning:** mask, stranger, outdoor.
+- **Equipment:**
+  - **Ivy Bands** (ropeArms, while the trap holds them). Game items: HempRope. Ivy, wound round their wrists by the Green Man and tied to a hawthorn root.
+  - **First Bloom Crown** (hat, after the trap, for 30 min). Game items: FlowerCrown. A crown of violets and primroses the Green Man wove for the first bloom of spring.
+
 ### 🪣 groombucket
 
 The farm girl's wash bucket: knelt down and scrubbed clean, and then she uses your mouth.
@@ -490,6 +625,26 @@ The farm girl's tail brush: she brushes you down to the rump, then takes your as
 - **Ruled out by limits mentioning:** futa, groom, anal, breed.
 - **Equipment:** none yet.
 
+### 👑 harvestcrown
+
+Crowned at the harvest home: paraded on the last wagon in the harvest crown, and given to the harvesters at the supper.
+
+- **How to get it:** a tile named `trap-harvestcrown`.
+- **Ruled out by limits mentioning:** gang, public, parade, exhibit, double.
+- **Equipment:**
+  - **Wagon Ribbon** (ropeArms, while the trap holds them). Game items: Ribbons, HempRope. A red ribbon round their wrists, tied to the rail of the last wagon so the crowned one doesn't fall off the sheaves.
+  - **The Harvest Crown** (hat, after the trap, for 30 min). Game items: PoppyCrown, FlowerCrown. A crown of red poppies and wheat ears, for the one the harvesters crowned. Worn the rest of the night.
+
+### 🍽️ harvestsupper
+
+The harvest supper: laid down the middle of the long table as the centrepiece, the feast heaped on you, and everyone eats off you.
+
+- **How to get it:** a tile named `trap-harvestsupper`.
+- **Ruled out by limits mentioning:** food, messy, public, objectif, lick, platter.
+- **Mess it leaves:** honey on the chest and tummy and thighs.
+- **Equipment:**
+  - **Table Ribbons** (arms, while the trap holds them). Game items: Ribbons, HempRope, LeatherCuffs. Gold harvest ribbons round their wrists, tied to the legs of the long table so the centrepiece stays put.
+
 ### 🏚️ hauntedhouse
 
 The haunted house: hands in the walls, a paddle in the dark, and a hole in the wall where somebody's waitin'.
@@ -523,6 +678,16 @@ A pack of hellhounds behind the burnt chapel: two-legged, ember-eyed, and their 
 - **How to get it:** a tile named `trap-hellhounds`.
 - **Ruled out by limits mentioning:** knot, gang, demon, monster, hellhound.
 - **Equipment:** none yet.
+
+### 🥚 hiddeneggs
+
+The egg hunt: stuffed with chocolate eggs and hidden in the straw for the herd to find, and the hunters find every last one.
+
+- **How to get it:** a tile named `trap-hiddeneggs`.
+- **Ruled out by limits mentioning:** insert, stuff, plug, public.
+- **Mess it leaves:** chocolate on the tummy and thighs.
+- **Equipment:**
+  - **Easter Egg Plug** (plug, not when eggs are in their limits, while the trap holds them). Game items: EggVibePlugXXL. A big round egg plug, pastel and smooth, keepin' the chocolate eggs in till the hunt starts.
 
 ### 🐝 hive
 
@@ -633,6 +798,16 @@ A swingin' light you can't look away from, and a head full of fog.
 - **Ruled out by limits mentioning:** hypno, trance, mind.
 - **Equipment:** none yet.
 
+### 🌾 lastsheaf
+
+The last sheaf: bound up in the last sheaf of the harvest with twine, and every reaper takes a turn for luck.
+
+- **How to get it:** a tile named `trap-lastsheaf`.
+- **Ruled out by limits mentioning:** gang, bondage, tied, public, outdoor.
+- **Equipment:**
+  - **Sheaf Twine** (arms, while the trap holds them). Game items: HempRope, LeatherCuffs. Harvest twine, bindin' the last wheat round them at the chest and hips, arms bound in among the stalks.
+  - **Sheaf Twine (legs)** (legs, while the trap holds them). Game items: HempRope, LeatherLegCuffs. More harvest twine, round the wheat at their knees, so the sheaf holds its shape.
+
 ### 🦮 leashpost
 
 Clipped to the post in the dog yard and left for anybody passin'.
@@ -672,6 +847,24 @@ The longest night: tied in the ring of candles that has to burn till dawn, and t
   - **Vigil Cord (arms)** (arms, while the trap holds them). Game items: HempRope, LeatherCuffs. Red cord round their wrists, tied out to a peg at the edge of the ring of candles.
   - **Vigil Cord (legs)** (legs, while the trap holds them). Game items: HempRope, LeatherLegCuffs. Red cord round their ankles, tied out to the pegs, holdin' them spread in the middle of the candles.
 
+### 🐇 marchhares
+
+The March hares: two hare-men boxin' in the long grass over who gets you first, and the loser doesn't really lose.
+
+- **How to get it:** a tile named `trap-marchhares`.
+- **Ruled out by limits mentioning:** gang, rabbit, bunn, hare, threesome.
+- **Equipment:** none yet.
+
+### 🍬 marshmallow
+
+The marshmallow vat: dunked in warm marshmallow fluff, rolled in pastel sugar like a marshmallow chick, and nibbled.
+
+- **How to get it:** a tile named `trap-marshmallow`.
+- **Ruled out by limits mentioning:** food, messy, sticky, lick, bite.
+- **Mess it leaves:** marshmallow on the chest and tummy and face.
+- **Equipment:**
+  - **Sugar Twine** (ropeArms, while the trap holds them). Game items: HempRope. Pink candy-striped baker's twine round their wrists, holdin' them in the marshmallow vat.
+
 ### 🌽 maze
 
 The corn maze, and somethin' in the corn huntin' you.
@@ -679,6 +872,16 @@ The corn maze, and somethin' in the corn huntin' you.
 - **How to get it:** a tile named `trap-maze`.
 - **Ruled out by limits mentioning:** hunt, chase, maze, monster.
 - **Equipment:** none yet.
+
+### 🍯 mead
+
+The mead hall: bent over the barrel, the midsummer mead poured down your back, and the brewers lick off every drop to taste the batch.
+
+- **How to get it:** a tile named `trap-mead`.
+- **Ruled out by limits mentioning:** food, messy, sticky, drunk, alcohol, public, lick.
+- **Mess it leaves:** honey on the chest and tummy and thighs.
+- **Equipment:**
+  - **Barrel Rope** (ropeArms, while the trap holds them). Game items: HempRope. Rope round their wrists, tied off to the iron hoops of the mead barrel so they stay bent over it.
 
 ### 🥛 milker
 
@@ -788,6 +991,25 @@ A net out of the hayloft and a long dangle in the rafters.
 - **Equipment:**
   - **Hayloft Net** (device, while the trap holds them). Game items: Net, WoodenStocks. A coarse rope net hauled up into the rafters, its catch dangling and turning slowly, every curve pushed out through the mesh.
 
+### 🌊 nixie
+
+The thaw-brook nixie: the spring brook's water spirit pulls you in, cold hands and colder kisses, and leaves a clutch of her pearly spawn.
+
+- **How to get it:** a tile named `trap-nixie`.
+- **Ruled out by limits mentioning:** egg, monster, water, spirit, cold, tentacle.
+- **Equipment:**
+  - **Waterweed** (ropeArms, while the trap holds them). Game items: HempRope. Long green waterweed out of the nixie's hair, wound round their wrists and holdin' them in the deep pool.
+
+### 👑 oakking
+
+The midsummer play: the Holly King comes to win the year back from the Oak King, two farmhands crowned for it, and the prize is you, shared.
+
+- **How to get it:** a tile named `trap-oakking`.
+- **Ruled out by limits mentioning:** double, both hole, gang, public, threesome.
+- **Equipment:**
+  - **Midsummer Ribbon** (ropeArms, while the trap holds them). Game items: Ribbons, HempRope. Yellow ribbon round their wrists, tyin' them to the pole in the middle of the midsummer ring.
+  - **Oak King's Crown** (hat, after the trap, for 30 min). Game items: FlowerCrown. The Oak King's crown of oak leaves and acorns, put on their head after the play. Till Yule.
+
 ### 🏓 paddle
 
 A paddle wheel: twenty strokes, counted for the whole yard.
@@ -842,6 +1064,15 @@ A price written on your ass, and the farm girl callin' the sale.
 
 - **How to get it:** a tile named `trap-pricetag`.
 - **Ruled out by limits mentioning:** sale, sold, auction, humiliat, writ.
+- **Equipment:** none yet.
+
+### 🌸 puck
+
+Robin Goodfellow's mischief: the trickster sprite squeezes love-in-idleness on your eyelids while you doze in the meadow, and you wake up wantin' the first one you see.
+
+- **How to get it:** a tile named `trap-puck`.
+- **Ruled out by limits mentioning:** trance, charm, magic, drug, aphrodi, love.potion.
+- **Mess it leaves:** pollen on the face and chest.
 - **Equipment:** none yet.
 
 ### 🎈 pump
@@ -1025,6 +1256,16 @@ A big matron who nurses you drowsy, then breeds you with what's under her apron.
 - **Ruled out by limits mentioning:** nur, futa.
 - **Equipment:** none yet.
 
+### 🌱 sowing
+
+The first sowin': laid in the first furrow of spring and tied to the plough, and the sowers sow you before they sow the field.
+
+- **How to get it:** a tile named `trap-sowing`.
+- **Ruled out by limits mentioning:** gang, public, mud, dirt, outdoor.
+- **Mess it leaves:** mud on the tummy and chest.
+- **Equipment:**
+  - **Plough Rope** (legs, while the trap holds them). Game items: HempRope, LeatherLegCuffs. The plough's own rope, round their ankles and tied off to the handles, holdin' them spread across the first furrow.
+
 ### 🕷️ spider
 
 The spider queen in the hayloft: webbed up, silk-tied, and a clutch of her eggs.
@@ -1115,6 +1356,16 @@ A patch of livin' latex that spreads over you for hours, stage by stage, and tak
 - **How to get it:** a tile named `trap-suit`.
 - **Ruled out by limits mentioning:** latex, suit, enca, parasit.
 - **Equipment:** none yet.
+
+### ☀️ sunwheel
+
+The sun wheel: tied spread on the great wooden wheel on the green, garlanded with flowers, and turned with the sun all afternoon.
+
+- **How to get it:** a tile named `trap-sunwheel`.
+- **Ruled out by limits mentioning:** bondage, restrain, spread, public, dizz, tease.
+- **Equipment:**
+  - **The Sun Wheel** (device, while the trap holds them). Game items: WheelFortune, LuckyWheel, WoodenStocks. A great wooden wheel painted gold, spokes like sunbeams, with them tied spread across it like the sun in the middle.
+  - **Rose Garlands** (arms, while the trap holds them). Game items: Ribbons, HempRope, LeatherCuffs. Garlands of yellow roses tied round their wrists, fastened to the rim of the sun wheel.
 
 ### 🍁 syruptap
 
@@ -1516,13 +1767,13 @@ Each mess is drawn by the Companion on top of the game's own splatters. `?wash` 
 
 - **cake** #FFD8E6: taffy
 - **cream** #FFF4DC: stocks, buttermill, pieeat
-- **honey** #E0A030: from its own traps or the shelf
+- **honey** #E0A030: mead, harvestsupper
 - **maple** #8B4A1C: syruptap
-- **chocolate** #4A2A18: from its own traps or the shelf
+- **chocolate** #4A2A18: hiddeneggs, chocfountain, chocbunny
 - **strawberry** #E04A6A: tomatoes
 - **milk** #F7F7F0: milker, cups, carousel, milkinghole, yoke
 - **slime** #5FAE3A: vines, clutch, ivy
-- **mud** #6B4A2B: plow, mudpit, hogtie, goblincart, mudslide
+- **mud** #6B4A2B: plow, mudpit, hogtie, goblincart, mudslide, sowing
 - **mash** #D8C08A: chute, slop, feedbag
 - **pumpkin** #E07A1F: headless, pumpkinpatch
 - **caramel** #B8702A: candyapple
@@ -1535,6 +1786,10 @@ Each mess is drawn by the Companion on top of the game's own splatters. `?wash` 
 - **eggnog** #F1E0AA: from its own traps or the shelf
 - **peppermint** #E23A52: from its own traps or the shelf
 - **wax** #A3162B: longnight
+- **dye** #E7A3C8: eggdye
+- **pollen** #F2C230: puck
+- **marshmallow** #FCE6EF: marshmallow
+- **grape** #5B2245: grapestomp
 - **cum**: the breeding traps pump, saddle, wheel, scarecrow, crate, kissgate, collection, leashpost, whelping, bearskin, hottub, stag, booth, goblinraid, goblinpit, warband, minotaur, werewolf, foxden, lionpride, ramstud, studchair, every load in the stalls, and the seed shower
 
 ## The mess shelf

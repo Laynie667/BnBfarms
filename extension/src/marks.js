@@ -141,7 +141,14 @@ const FARM_NAMES = ["Parasite Lips", "Parasite Belt", "Pump Bung", "Egg Post Plu
   "Frozen Fast", "Bakery Ribbon", "Mistletoe Ribbon", "Yeti's Fur Wrap", "Gift Ribbon (arms)", "Gift Ribbon (legs)", "Gift Box", "The Big Stockin'", "Stockin' Stuffer",
   "Cocoa Stand Ribbon", "Frost Lace", "The Farmyard Snowman", "Winter Hat", "Winter Shawl", "Fur Gloves",
   "Yule Log Ribbons", "Solstice Ribbon", "Holly King's Crown", "The Hunt's Rope", "Wassail Ribbons", "Ivy (arms)", "Ivy (legs)", "Vigil Cord (arms)",
-  "Vigil Cord (legs)", "Holly Crown", "Yule Cloak"];
+  "Vigil Cord (legs)", "Holly Crown", "Yule Cloak",
+  // Oct 27: the spring, summer and autumn seasons' (Ostara, Easter, Litha, Mabon)
+  "Ivy Bands", "First Bloom Crown", "Plough Rope", "Dye-Tub Ribbon", "See-Saw Straps", "Waterweed", "Spring Crown", "Hare Ears", "Hare's Tail",
+  "Easter Egg Plug", "Fountain Ribbon", "Bunny Girl Suit", "Bunny Suit Ears", "Bunny Collar and Cuffs", "Bunny Tail Plug", "Basket Ribbon (arms)",
+  "Basket Ribbon (legs)", "Sugar Twine", "Egg-Roll Ribbon", "Parade Bonnet", "Mould Straps", "Easter Bonnet", "Bunny Ears", "Bunny Tail",
+  "Midsummer Ribbon", "Oak King's Crown", "Fae Ribbon", "The Sun Wheel", "Rose Garlands", "Barrel Rope", "Midsummer Crown",
+  "Sheaf Twine", "Sheaf Twine (legs)", "Corn Dolly Plaits", "Corn Dolly Plaits (legs)", "Vintner's Ribbon", "Press Strap", "Wagon Ribbon",
+  "The Harvest Crown", "Table Ribbons", "Harvest Crown", "Harvest Apron"];
 // slot → where it can go and which game item it is: the first that this game has; the pattern is a fallback
 export const GEAR_SLOTS = {
   plug:     { groups: ["ItemButt"], names: ["InflVibeButtPlug", "BlackButtPlug", "ButtPlug", "ButtPump"], re: /ButtPlug|Plug/, color: "#2B2B2B" },

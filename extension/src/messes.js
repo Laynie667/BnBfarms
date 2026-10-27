@@ -29,7 +29,8 @@ const others = new Map();                       // member → { list, at }
 const BY_COLOR = { "#fff4dc": "cream", "#e0a030": "honey", "#8b4a1c": "maple", "#4a2a18": "chocolate", "#e04a6a": "strawberry", "#f7f7f0": "milk",
   "#5fae3a": "slime", "#6b4a2b": "mud", "#d8c08a": "mash", "#d9c13a": "piss", "#ffd8e6": "cake",
   "#e07a1f": "pumpkin", "#b8702a": "caramel", "#7fead0": "ecto", "#d9902e": "cider", "#7a3fb0": "brew", "#15121c": "ink",
-  "#fffdf8": "icing", "#6e4128": "cocoa", "#f1e0aa": "eggnog", "#e23a52": "peppermint", "#a3162b": "wax" };
+  "#fffdf8": "icing", "#6e4128": "cocoa", "#f1e0aa": "eggnog", "#e23a52": "peppermint", "#a3162b": "wax",
+  "#e7a3c8": "dye", "#f2c230": "pollen", "#fce6ef": "marshmallow", "#5b2245": "grape" };
 const AREA_OF = { face: "face", forehead: "forehead", chest: "chest", tummy: "tummy", hair: "hair", thighs: "thighL", back: "back" };
 
 function load() { try { const v = JSON.parse(W.localStorage.getItem(KEY)); if (Array.isArray(v)) mine = v.filter(ok).slice(-MAX); } catch (e) { mine = []; } }
@@ -45,7 +46,7 @@ export function messFromMark(m) {
   const a = [];
   for (const x of m.splat) { const k = AREA_OF[x]; if (k && !a.includes(k)) a.push(k); }
   // a wet mess runs: from the belly onto the thighs, now and then
-  if (a.includes("tummy") && ["cum", "piss", "milk", "honey", "maple", "chocolate", "strawberry", "slime", "caramel", "ecto", "cider", "brew", "ink", "cocoa", "eggnog", "peppermint"].includes(kind) && Math.random() < 0.4) a.push(Math.random() < 0.5 ? "thighL" : "thighR");
+  if (a.includes("tummy") && ["cum", "piss", "milk", "honey", "maple", "chocolate", "strawberry", "slime", "caramel", "ecto", "cider", "brew", "ink", "cocoa", "eggnog", "peppermint", "dye", "grape"].includes(kind) && Math.random() < 0.4) a.push(Math.random() < 0.5 ? "thighL" : "thighR");
   if (!a.length) a.push("chest");
   const amt = Number(m.amount) > 0 ? Math.max(0.5, Math.min(3, Number(m.amount))) : 1;   // a bigger load, a bigger mess
   mine.push({ k: kind, a, s: (Math.random() * 1e9) | 0, t: Date.now(), m: Math.round(amt * 10) / 10 });

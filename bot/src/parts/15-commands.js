@@ -1611,6 +1611,7 @@ Welcome to B&B Farm, hon. 🌾`);
       case "seasons": case "calendar": seasonCommand(sender, args, R); break;   // the farm's seasons (10y9m-seasons.js; ?season is the Breedin' add-on's)
       case "trickortreat": case "tot": trickOrTreat(sender, args, R); break;   // knockin' on the farm girl's door at Halloween (10y9n-halloween.js)
       case "stocking": case "stockings": stockingCommand(sender, args, R); break;   // what's in your stockin' on the hearth, in winter (10y9u-winter.js)
+      case "egghunt": eggHuntCommand(sender, args, R); break;   // huntin' for eggs round the farm at Easter, and the board (10y9x-easter.js)
       case "rate": rateCommand(sender, args, R); break;   // how a trap went for them (10y9o-trap-ratings.js)
       case "renew": case "renewal": case "renewals": renewCommand(sender, args, R); break;   // another contract when this one ends (10y9t-renewals.js)
       case "struggle": case "free": case "goad": case "hunt": case "lay": case "gather": case "pack": extrasCommand(cmd, sender, args, R); break;   // 10x-trap-extras.js

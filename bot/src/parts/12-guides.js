@@ -496,6 +496,7 @@ TRAPS (your own switch)
   ?seasons · the farm's calendar, and what's on (?calendar too)
   ?trickortreat · Halloween: knock on the farm girl's door
   ?stocking · winter: what's in your stockin' on the hearth
+  ?egghunt · Easter: hunt the farm for eggs (?egghunt board)
   ?quiet [minutes] · an hour where nothin' new starts on you
   ?tend <who> · help somebody lay (a ribbon in it)
   ?brood · your brood book: what's bred you, what you carried

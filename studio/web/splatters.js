@@ -52,6 +52,13 @@
     eggnog:     { style: "run", tint: "#F5E6B8", stampAlpha: 0.85, narrow: [0.8, 1.1], long: 1.15, turn: 0.35, texture: "milky", base: "#F1E0AA", edge: "#C9B27A", gloss: "#FFF8E0", alpha: 0.78, run: 1.2, width: 0.95, beads: 0.5, specks: "#8A5A2B" },
     peppermint: { style: "run", tint: "#E8435A", stampAlpha: 0.88, narrow: [0.9, 1.2], long: 1.1, turn: 0.3, texture: "candy", base: "#E23A52", edge: "#9E1A2C", gloss: "#FFE0E6", alpha: 0.82, run: 1.1, width: 1.0, beads: 0.7 },
     wax:        { style: "run", tint: "#B01E32", stampAlpha: 0.95, narrow: [0.7, 1.0], long: 0.7, turn: 0.25, texture: "shine", base: "#A3162B", edge: "#5E0A16", gloss: "#FF8A9A", alpha: 0.96, run: 0.5, width: 0.9, beads: 1.2 },
+    // spring's, summer's and autumn's (Oct 27): watery Easter egg dye that runs in pastel bands the way a dipped egg
+    // does, a dust of yellow pollen with no shine to it, sticky marshmallow fluff with white patches and little bits in,
+    // and dark grape juice from the stompin' tub, with bits of skin in it
+    dye:        { style: "run", tint: "#EBA9CD", stampAlpha: 0.6, narrow: [0.5, 0.8], long: 1.3, turn: 0.3, texture: "pastel", base: "#E7A3C8", edge: "#B86A98", gloss: "#FFE6F3", alpha: 0.42, run: 1.5, width: 0.75, beads: 0.3, droplets: 1.3 },
+    pollen:     { style: "smear", smudge: 1.3, base: "#F2C230", edge: "#D3A11A", gloss: "#F7D45A", alpha: 0.42, run: 0.05, width: 1.35, specks: "#E4A900", droplets: 0.2 },
+    marshmallow: { style: "smear", smudge: 0.5, base: "#FCE6EF", edge: "#E2BCCB", gloss: "#FFFFFF", alpha: 0.95, run: 0.25, width: 1.25, patches: "#FFFFFF", crumbs: ["#FFFFFF", "#FCE6EF", "#E3F1FF", "#FFF4D6"] },
+    grape:      { style: "run", tint: "#6A2A52", stampAlpha: 0.85, narrow: [0.8, 1.1], long: 1.2, turn: 0.35, texture: "sheen", base: "#5B2245", edge: "#2E0E22", gloss: "#C88AB0", alpha: 0.7, run: 1.3, width: 0.95, beads: 0.5, droplets: 1.3, crumbs: ["#3E1430", "#4E1A3C", "#6A2A52"] },
   };
 
   // a ribbon down a path of points, each with its own width; it ends where the last point is
@@ -237,6 +244,8 @@
     milky: (x, w, h, r) => { x.globalAlpha = 0.4; x.fillStyle = "#FFFFFF"; x.fillRect(0, 0, w, h); },
     // peppermint's candy-cane stripes, white and slantin'
     candy: (x, w, h, r) => { x.globalAlpha = 0.55; x.strokeStyle = "#FFFFFF"; x.lineWidth = 1.4; for (let i = -h; i < w + h; i += 5) { x.beginPath(); x.moveTo(i, 0); x.lineTo(i + h * 0.6, h); x.stroke(); } },
+    // egg dye's pastel bands down the run, pink into blue into yellow into green, like a dipped egg
+    pastel: (x, w, h, r) => { x.globalAlpha = 0.5; const c = ["#E7A3C8", "#A3C8E7", "#F2E27A", "#A8E0B0"], o = Math.floor(r() * 4); for (let i = 0; i < 4; i++) { x.fillStyle = c[(i + o) % 4]; x.fillRect(0, h * i / 4, w, h / 4 + 1); } },
   };
   // a stamp, varied: turned, flipped (mirrored), narrowed or stretched, sized, each substance its own way
   function stamp(ctx, r, K, x, y, size) {

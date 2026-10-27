@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.48.0
+// @version      0.49.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -230,7 +230,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.48.0";
+  var VERSION = "0.49.0";
 
   // shared/species.js
   var WORDS = {
@@ -4592,7 +4592,14 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
       cocoa: { style: "run", tint: "#7A4A2E", stampAlpha: 0.8, narrow: [0.7, 1], long: 1.25, turn: 0.35, texture: "sheen", base: "#6E4128", edge: "#3E2414", gloss: "#D8B090", alpha: 0.74, run: 1.4, width: 0.9, beads: 0.5, droplets: 1, crumbs: ["#FFFFFF", "#F8F2EA", "#FFF9F2"] },
       eggnog: { style: "run", tint: "#F5E6B8", stampAlpha: 0.85, narrow: [0.8, 1.1], long: 1.15, turn: 0.35, texture: "milky", base: "#F1E0AA", edge: "#C9B27A", gloss: "#FFF8E0", alpha: 0.78, run: 1.2, width: 0.95, beads: 0.5, specks: "#8A5A2B" },
       peppermint: { style: "run", tint: "#E8435A", stampAlpha: 0.88, narrow: [0.9, 1.2], long: 1.1, turn: 0.3, texture: "candy", base: "#E23A52", edge: "#9E1A2C", gloss: "#FFE0E6", alpha: 0.82, run: 1.1, width: 1, beads: 0.7 },
-      wax: { style: "run", tint: "#B01E32", stampAlpha: 0.95, narrow: [0.7, 1], long: 0.7, turn: 0.25, texture: "shine", base: "#A3162B", edge: "#5E0A16", gloss: "#FF8A9A", alpha: 0.96, run: 0.5, width: 0.9, beads: 1.2 }
+      wax: { style: "run", tint: "#B01E32", stampAlpha: 0.95, narrow: [0.7, 1], long: 0.7, turn: 0.25, texture: "shine", base: "#A3162B", edge: "#5E0A16", gloss: "#FF8A9A", alpha: 0.96, run: 0.5, width: 0.9, beads: 1.2 },
+      // spring's, summer's and autumn's (Oct 27): watery Easter egg dye that runs in pastel bands the way a dipped egg
+      // does, a dust of yellow pollen with no shine to it, sticky marshmallow fluff with white patches and little bits in,
+      // and dark grape juice from the stompin' tub, with bits of skin in it
+      dye: { style: "run", tint: "#EBA9CD", stampAlpha: 0.6, narrow: [0.5, 0.8], long: 1.3, turn: 0.3, texture: "pastel", base: "#E7A3C8", edge: "#B86A98", gloss: "#FFE6F3", alpha: 0.42, run: 1.5, width: 0.75, beads: 0.3, droplets: 1.3 },
+      pollen: { style: "smear", smudge: 1.3, base: "#F2C230", edge: "#D3A11A", gloss: "#F7D45A", alpha: 0.42, run: 0.05, width: 1.35, specks: "#E4A900", droplets: 0.2 },
+      marshmallow: { style: "smear", smudge: 0.5, base: "#FCE6EF", edge: "#E2BCCB", gloss: "#FFFFFF", alpha: 0.95, run: 0.25, width: 1.25, patches: "#FFFFFF", crumbs: ["#FFFFFF", "#FCE6EF", "#E3F1FF", "#FFF4D6"] },
+      grape: { style: "run", tint: "#6A2A52", stampAlpha: 0.85, narrow: [0.8, 1.1], long: 1.2, turn: 0.35, texture: "sheen", base: "#5B2245", edge: "#2E0E22", gloss: "#C88AB0", alpha: 0.7, run: 1.3, width: 0.95, beads: 0.5, droplets: 1.3, crumbs: ["#3E1430", "#4E1A3C", "#6A2A52"] }
     };
     function ribbon(ctx3, pts) {
       const L = [], R = [];
@@ -4943,6 +4950,15 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
           x.lineTo(i + h2 * 0.6, h2);
           x.stroke();
         }
+      },
+      // egg dye's pastel bands down the run, pink into blue into yellow into green, like a dipped egg
+      pastel: (x, w, h2, r) => {
+        x.globalAlpha = 0.5;
+        const c = ["#E7A3C8", "#A3C8E7", "#F2E27A", "#A8E0B0"], o = Math.floor(r() * 4);
+        for (let i = 0; i < 4; i++) {
+          x.fillStyle = c[(i + o) % 4];
+          x.fillRect(0, h2 * i / 4, w, h2 / 4 + 1);
+        }
       }
     };
     function stamp(ctx3, r, K, x, y, size) {
@@ -5135,7 +5151,11 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     "#6e4128": "cocoa",
     "#f1e0aa": "eggnog",
     "#e23a52": "peppermint",
-    "#a3162b": "wax"
+    "#a3162b": "wax",
+    "#e7a3c8": "dye",
+    "#f2c230": "pollen",
+    "#fce6ef": "marshmallow",
+    "#5b2245": "grape"
   };
   var AREA_OF = { face: "face", forehead: "forehead", chest: "chest", tummy: "tummy", hair: "hair", thighs: "thighL", back: "back" };
   function load2() {
@@ -5164,7 +5184,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
       const k = AREA_OF[x];
       if (k && !a.includes(k)) a.push(k);
     }
-    if (a.includes("tummy") && ["cum", "piss", "milk", "honey", "maple", "chocolate", "strawberry", "slime", "caramel", "ecto", "cider", "brew", "ink", "cocoa", "eggnog", "peppermint"].includes(kind) && Math.random() < 0.4) a.push(Math.random() < 0.5 ? "thighL" : "thighR");
+    if (a.includes("tummy") && ["cum", "piss", "milk", "honey", "maple", "chocolate", "strawberry", "slime", "caramel", "ecto", "cider", "brew", "ink", "cocoa", "eggnog", "peppermint", "dye", "grape"].includes(kind) && Math.random() < 0.4) a.push(Math.random() < 0.5 ? "thighL" : "thighR");
     if (!a.length) a.push("chest");
     const amt = Number(m.amount) > 0 ? Math.max(0.5, Math.min(3, Number(m.amount))) : 1;
     mine2.push({ k: kind, a, s: Math.random() * 1e9 | 0, t: Date.now(), m: Math.round(amt * 10) / 10 });
@@ -9923,7 +9943,50 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     "Vigil Cord (arms)",
     "Vigil Cord (legs)",
     "Holly Crown",
-    "Yule Cloak"
+    "Yule Cloak",
+    // Oct 27: the spring, summer and autumn seasons' (Ostara, Easter, Litha, Mabon)
+    "Ivy Bands",
+    "First Bloom Crown",
+    "Plough Rope",
+    "Dye-Tub Ribbon",
+    "See-Saw Straps",
+    "Waterweed",
+    "Spring Crown",
+    "Hare Ears",
+    "Hare's Tail",
+    "Easter Egg Plug",
+    "Fountain Ribbon",
+    "Bunny Girl Suit",
+    "Bunny Suit Ears",
+    "Bunny Collar and Cuffs",
+    "Bunny Tail Plug",
+    "Basket Ribbon (arms)",
+    "Basket Ribbon (legs)",
+    "Sugar Twine",
+    "Egg-Roll Ribbon",
+    "Parade Bonnet",
+    "Mould Straps",
+    "Easter Bonnet",
+    "Bunny Ears",
+    "Bunny Tail",
+    "Midsummer Ribbon",
+    "Oak King's Crown",
+    "Fae Ribbon",
+    "The Sun Wheel",
+    "Rose Garlands",
+    "Barrel Rope",
+    "Midsummer Crown",
+    "Sheaf Twine",
+    "Sheaf Twine (legs)",
+    "Corn Dolly Plaits",
+    "Corn Dolly Plaits (legs)",
+    "Vintner's Ribbon",
+    "Press Strap",
+    "Wagon Ribbon",
+    "The Harvest Crown",
+    "Table Ribbons",
+    "Harvest Crown",
+    "Harvest Apron"
   ];
   var GEAR_SLOTS = {
     plug: { groups: ["ItemButt"], names: ["InflVibeButtPlug", "BlackButtPlug", "ButtPlug", "ButtPump"], re: /ButtPlug|Plug/, color: "#2B2B2B" },

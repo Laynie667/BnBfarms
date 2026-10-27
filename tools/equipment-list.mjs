@@ -34,7 +34,7 @@ const piece = (x) => {
   const S = typeof x.slot === "string" ? GEAR_SLOTS[x.slot] : null;
   const items = (x.items || []).concat(S && S.names ? S.names.filter((n) => !(x.items || []).includes(n)).slice(0, 3) : []);
   const when = x.when === "after" ? "after the trap, for " + (typeof x.mins === "number" ? x.mins + " min" : "a while") : x.when === "hold" ? "while the trap holds them" : "on";
-  return "  - **" + (x.label || x.name) + "** (" + slotName(x.slot) + ", " + when + "). Game items: " + (items.join(", ") || "none") + ". " + (x.desc || "");
+  return "  - **" + (x.label || x.name) + "** (" + (x.slotNote || slotName(x.slot)) + ", " + when + "). Game items: " + (items.join(", ") || "none") + ". " + (x.desc || "");
 };
 const out = [];
 out.push("# B&B Farm equipment", "", "Everything the farm puts on somebody, built from the bot " + (W.__cfg && W.__cfg.VERSION ? W.__cfg.VERSION : "") + " on " + new Date().toISOString().slice(0, 10) + ".", "",

@@ -5,7 +5,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 | Script | File in `dist/` | Where it runs | Current |
 |---|---|---|---|
-| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.54.0** |
+| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.55.0** |
 | Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.10.0** |
 | Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.2.1** |
 | Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **1.1.0** |
@@ -13,7 +13,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 | Map tools, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.4** |
 | Dairy | `farmhand-dairy.user.js` | the bot's PC | **1.1.0** |
 | Shows | `farmhand-shows.user.js` | the bot's PC | **1.1.0** |
-| Farmhand Companion | `farmhand-companion.user.js` | each player, and the bot's own tab | **0.48.0** |
+| Farmhand Companion | `farmhand-companion.user.js` | each player, and the bot's own tab | **0.49.0** |
 | Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.4** |
 
 ## Sending a watch report
@@ -24,6 +24,16 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 ## Latest changes (newest first)
 
+- **Bot 0.55.0 + Companion 0.49.0: Ostara, Easter and the egg hunt, Litha, Mabon.** Laynie, Oct 27: "winter pack yes, easter, yes, soltice and equinox based packs with pagan/wiccan themes would be cool."
+  - **Update the bot's own tab to Companion 0.49 too.** The farm girl's costumes, the bunny suit and the new messes need it.
+  - **Ostara (Mar 17 to 23, the spring equinox): 6 traps.** The March hares (two hare-men boxin' over who gets you first), the Green Man out of the hedge (a farmhand in a mask of new leaves; a crown of violets and a dustin' of pollen after), the first sowin' (tied to the plough in the first furrow), the egg-dyein' tubs (every pastel colour, and flowers painted on), the equinox see-saw (sat on the middle post and kept right on the edge), and the thaw-brook nixie (a clutch of her pearly spawn). The warren, the egg posts, the seed shower, the vines and the plough come round more, and a tile named `trap-ostara` (or `trap-spring`) springs only Ostara's. The farm girl wears a spring flower crown, hare's ears and a hare's tail.
+  - **Easter (the Sunday before Easter Sunday to Easter Monday, so it moves every year: Mar 21 to 29 in 2027): 8 traps.** The egg hunt (chocolate eggs hidden in you, or on you if eggs are in your limits, and the hunters find every one), the chocolate fountain at the fair, the bunny suit rack (a real bunny girl suit, ears, collar and cuffs and a tail plug, out on the Easter display), the giant Easter basket (delivered to somebody's door), the marshmallow vat, egg rollin' down the big hill, the bonnet parade, and the chocolate bunny mould. The warren, the egg posts, the bakery bench, the creamery, the pie contest and the honey pot come round more. The farm girl wears an Easter bonnet, bunny ears and a bunny tail.
+  - **`?egghunt`** all Easter week: hunt for the eggs hidden round the farm, once every 20 minutes. A chocolate egg (it works like one of the sweet potions), a soft one that goes all over you (with "Farm can mark my body"), now and then a golden egg worth a ribbon (once a day at most), or a trick: a strange jelly bean, or, with your traps on, an egg that was bait for one of Easter's traps. `?egghunt board`: who's found the most this Easter.
+  - **Litha (Jun 18 to 24, the summer solstice): 6 traps.** The midsummer play (the Holly King comes back for the year, as he promised at Yule; the two kings share the prize, and you wear the Oak King's crown after), the fairy ring on Midsummer's Eve (the fae dance you round till dawn), leapin' the midsummer bonfire (whoever catches you keeps you till sunrise), the sun wheel (the real Wheel of Fortune: tied spread and turned with the sun all afternoon), the mead hall (bent over the barrel and licked clean), and Robin Goodfellow's flower (you wake wantin' the first one you see, and you're in heat after, unless heat's in your limits). The hay bales, the honey pot, the corn maze, the windmill, the washin' line and the hot tub come round more. The farm girl wears a crown of midsummer roses.
+  - **Mabon (Sep 19 to 25, the autumn equinox, the harvest home): 6 traps.** The last sheaf (bound up in it, and every reaper takes a turn for luck), the corn maiden (woven into a straw corn dolly, hung in the rafters and kept on the edge), treadin' the grapes, the cider press (milked into the cider if you make milk), the harvest crown (paraded on the last wagon and shared out at the supper), and the harvest supper (the feast laid out on you). The scarecrow, the bales, the corn maze, the plough, the windmill, the butter churn and the pie contest come round more. The farm girl wears a crown of poppies and a harvest apron.
+  - **Any time, too:** `?seasons start ostara` (or `spring`), `easter`, `litha` (or `midsummer`), `mabon` (or `harvest`), or `?seasons start all` for all seven at once.
+  - **New messes the Companion draws:** Easter egg dye (it runs in pastel bands), pollen (a dusty gold), marshmallow (sticky, with little bits in) and grape juice (dark purple, with bits of skin). `?wash` takes them off like the rest.
+  - **Guides:** `?help` lists `?egghunt`.
 - **Bot 0.54.0 + Companion 0.48.0: on the reins, holdin' somebody's place, welcome home, another contract?, winter and Yule.** Laynie, Oct 27: "I love the features ideas, minus the daily report ... winter pack yes ... soltice and equinox based packs with pagan/wiccan themes would be cool."
   - **Update the bot's own tab to Companion 0.48 too.** The winter costume, the new messes, the reins and the renewal cards need it.
   - **On the reins.** `?reins <who> [minutes]`: a herd leader (or a proprietor) leads one of their own herd at heel on the map. They follow a step behind wherever the leader walks, at their own pace (their Companion walks them; without one, or with "Walk me places" off, I hop them along). An hour unless you say, 5 minutes to 4 hours. While a trap, the stocks, a pen, the bench, the milkin' stall or a knot has them they stay put, and the reins pick up again after. `?reins off [who]`, their safeword, either of them leavin' the room or the time runnin' out lets go. In the Companion: a chip for the one on the reins, a "Let go" card for the leader, and a Reins button on the Herd tab. (`?walk` is still the old lead.)

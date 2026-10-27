@@ -5,7 +5,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 | Script | File in `dist/` | Where it runs | Current |
 |---|---|---|---|
-| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.60.0** |
+| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.61.0** |
 | Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.10.0** |
 | Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.2.1** |
 | Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **1.1.0** |
@@ -24,6 +24,17 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 ## Latest changes (newest first)
 
+- **Bot 0.61.0: every stud and every version of him tells his own story in eight lines a beat.** No Companion update needed.
+  - **The minotaur:** the usual one, the bull of the maze, the old herd bull, the hothead and the show bull.
+  - **The werewolf:** the usual one, the grizzled alpha, the new-turned farmhand who keeps sayin' sorry, the blood moon wolf and the moon brothers.
+  - **The fox den:** the usual brothers, the silver fox (supper, wine and the fire), the hen-house raid and the guessin' game.
+  - **The lion pride:** the usual king, the challenger, the lazy king (you do all the work) and the black-maned king.
+  - **The ram:** the usual tup, the tup in his raddle (the shepherd counts), the black ram of the hills and the two tups.
+  - **The wolf pack's versions:** the lone wolf, the hunt and the snow pack.
+  - How each one finds you, sizes you up, gets you where he wants you, takes you (or makes do when he can't), and fills you now picks from eight lines or more, and so does every beat of his own. About 1,020 new lines, each one fitted to the body it's about.
+  - Every stud, in every version, has been run whole on a cow-girl, a male pup and a femboy to check every line fills in and nobody's told about parts they haven't got.
+  - **A few words changed:** the lioness carries you up "gentle as anythin'", and the minotaur calls you "good stock", not a heifer.
+  - **Next:** how each stud leaves you (his endings), then the machines and the rest of the farm's traps.
 - **Bot 0.60.0: the farm's everyday traps and the first twelve studs tell their own story in eight lines a beat.** No Companion update needed.
   - **The gas, every kind at every strength:** pink heat, white milk, gold musk, violet need, yellow giggles, blue haze, red rut, green ripenin' and the moo gas. Each cloud, each mild, strong and brutal hit, and each after now picks from eight lines or more.
   - **The spray rack, every kind at every strength:** seed, piss (only with ?watersports on), milk, slime, oil, markin' dye and the cold hose.

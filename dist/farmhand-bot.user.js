@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.60.0
+// @version      0.61.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -2748,7 +2748,7 @@
   ];
 
   // bot/src/version.js
-  var VERSION = "0.60.0";
+  var VERSION = "0.61.0";
   var COMPANION_VERSION = "0.50.0";
 
   // bot-parts:farmhand-bot-parts
@@ -18969,7 +18969,7 @@
           ],
           [
             "The lionesses herd %n up onto the flat rock where the pride's lion-man lies, huge, golden, maned, lazily licking a paw.",
-            "A lioness takes %n by the scruff, gentle as a mother cat, and carries them up to the lion."
+            "A lioness takes %n by the scruff, gentle as anythin', and carries them up to the lion."
           ],
           [
             "He rolls to his feet and stretches, and two of the lionesses hold %n down on the warm stone for him.",
@@ -37484,7 +37484,7 @@
                 "Five times, all afternoon, and he never once gets up. The lionesses bring %n water and fan them with big leaves, and laugh."
               ]
             ],
-            over: [["%n grinds on the lazy king's belly all afternoon, and he cums across their tummy every so often and falls back asleep."]],
+            over: [["%n grinds on the lazy king's belly all afternoon, and he cums up their front every so often and falls back asleep."]],
             end: [
               "At sunset the lazy king finally sits up, stretches, licks %n's face once, and wanders off for his supper. %n's left on the warm rock with %ml of him in their %h and very tired thighs.",
               "%n climbs down off the lazy lion with %ml of him in their %h, legs like jelly after an afternoon's work, and he hasn't moved an inch."
@@ -50709,6 +50709,1460 @@
           "{v}She rocks slow and deep into %n's pussy, fat and blunt, and %n moans round the teat.",
           "She pats %n's bottom in time with the rockin', and hums, and every so often grinds a little deeper.",
           "%n's milk-drunk and limp and stuffed, and she wipes their chin with her apron, and keeps goin'."
+        ]
+      );
+    }
+    {
+      const S = (kind, form, part, i, l) => {
+        const T = form ? STUD_FORMS[kind] && STUD_FORMS[kind][form] && STUD_FORMS[kind][form].lines : ANTHRO_LINES[kind];
+        const pool = T && (Array.isArray(T[part] && T[part][0]) ? T[part][i] : T[part]);
+        poolMore(kind, (form || "usual") + " " + part + " " + i, pool, l);
+      };
+      S("minotaur", null, "beats", 0, [
+        "The ground starts to shake under %n's boots, a slow heavy drum, and the chickens in the yard scatter like they know somethin'.",
+        "%n's crossin' the back paddock for a shortcut when a shadow falls over them from behind, horns and all, and blots out the sun.",
+        "The barn doors bang open on their own, and out of the dark inside comes a snort like a bellows and a smell of hay and hot bull.",
+        "A bale of hay sails over %n's head and lands in the mud. Somethin' threw it. Somethin' big. And it's comin' to see where it landed.",
+        "%n hears the creak of the paddock gate and the jingle of a nose ring, and turns, and has to tip their head all the way back to see his face.",
+        "There's a hoofprint in the mud the size of a dinner plate, and another, and another, leadin' round the side of the barn, and they're fresh."
+      ]);
+      S("minotaur", null, "beats", 1, [
+        "He lowers his huge horned head until his nose is level with %n's, and breathes them in, slow and deep, and his eyes go dark.",
+        "Up close he's a wall of brown fur and muscle, chest heavin', nose ring swingin', and he smells like sun-hot hide and somethin' that makes %n's knees go soft.",
+        "He walks round %n once, slow, hooves thuddin', lookin' them over like the best of the stock at the sale, and snorts approval.",
+        "He reaches out one huge hand and takes %n by the back of the neck, gentle as you like, and there's no gettin' loose from it at all.",
+        "He paws the ground and tosses his horns, showin' off, and then leans in close and rumbles somethin' that shakes %n down to the bones.",
+        `"Mine," he says, in a voice like a cart goin' over a wooden bridge, and that's the end of the discussion.`
+      ]);
+      S("minotaur", null, "beats", 2, [
+        "He bends %n over the paddock fence with one hand flat between their shoulders, and the rail creaks under the weight of his other hand beside them.",
+        "He lifts %n by the hips like they're a bag of feed and sets them down knees-first in the straw, ass in the air, and kneels behind them.",
+        "He lays %n back over a bale and spreads their knees with his own, and looks down the long way at them, breathin' hard.",
+        "A hand on %n's back, a hoof nudgin' their ankles apart, and he's settled behind them before they've got their footin'.",
+        "He pins %n against the barn wall, face to the boards, and %n feels the heat and weight of him land along their spine.",
+        "He drapes %n over his own bent knee like a saddle over a rail and runs a broad palm down their back, slow, all the way down."
+      ]);
+      S("minotaur", null, "in", 0, [
+        "{v}He sets the head of himself to %n's pussy and pushes, and their lips spread round him wider and wider till he sinks in, and %n's whole body goes taut.",
+        "{nv}He presses into %n's ass, slow and heavy, his whole weight behind it, and their ring gives a little at a time round the size of him till he's in.",
+        "He's so thick %n can feel every vein of him openin' their %h, and he grunts like a bull leanin' on a gate, and keeps leanin'.",
+        "The minotaur hilts in %n's %h in one long push that seems to go on for ever, and their belly lifts with the shape of him.",
+        "He ruts %n's %h slow at first, testin', and then the bull in him takes over and the hay bale starts creepin' across the barn.",
+        "Inch by stretchin' inch he fills %n's %h, and when he's in to the root he holds there, snortin', lettin' them feel all of it."
+      ]);
+      S("minotaur", null, "in", 1, [
+        "He cums like a bull at the breedin' stand, a great hot flood that rounds out %n's belly, and he doesn't even pull out before he starts again.",
+        "His bellow goes out over the farm when he fills %n, and every cow in the meadow lifts her head, and %n's belly swells with it.",
+        "He floods %n, rests his chin on their shoulder, snorts, and starts to rut again before they've caught their breath.",
+        "The first load swells %n's belly tight; the second sloshes; the third has them leakin' round him in thick white streams.",
+        "He breeds %n till their belly's round as a full pail and keeps goin', slow and heavy, like he's got all day.",
+        "Load after load, each one bigger than any stud %n's ever had, and the minotaur rumbles happily every time their belly grows."
+      ]);
+      S("minotaur", null, "over", 0, [
+        "He lays the great heavy length of himself along %n's back and ruts slow, and when he cums it's like a bucket tipped over their shoulders.",
+        "No way in, so he ruts between %n's squeezed thighs, his cock pokin' out past their knees, and bellows when he floods the straw.",
+        "He grinds against %n's backside, huge and hot, and pins them down while he empties himself across their back in thick heavy ropes.",
+        "He makes %n hold him with both hands and ruts through their fists, and the tip of him is near their chin, and he cums in their hair.",
+        "The minotaur rubs himself along %n's spine like a bull on a scratchin' post, and soaks them through when he's done.",
+        "He slides himself between %n's thighs and back and forth, slow, and when he's done the hay under them is soaked white.",
+        "No way in, so he paints %n instead, from their nape to their heels, with more than they'd have thought one body could hold."
+      ]);
+      trapSceneMore(
+        "minotaur",
+        [
+          "His nose ring knocks against %n's shoulder blade with every breath, cold brass against hot skin.",
+          "{v}He grinds deep into %n's pussy and holds, and their whole body shakes round the size of him.",
+          "{c}He wraps one massive hand round %n's cock and it disappears, and he squeezes, slow, in time with his hips.",
+          "The barn's hot with the smell of him, hay and hide and bull, and every breath %n takes is full of it."
+        ],
+        [
+          "He lowers his head and rests his horns either side of %n, pinnin' them in a cage of bone while he ruts.",
+          "%n's belly is round and heavy and swingin' under them, and he lays a hand under it like he's weighin' it.",
+          "He snorts a cloud of steam in the cold barn air, and slams deep, and %n's eyes roll back.",
+          '"Good," he rumbles, "good stock," and %n moans like they agree.'
+        ]
+      );
+      S("minotaur", "maze", "beats", 0, [
+        "Somebody's chalked arrows on the hedges of the maze. %n follows them. They all point inward. They were never meant to lead out.",
+        "The maze hedge rustles beside %n though there's no wind, and a long horn tip slides out through the leaves and taps their shoulder, and withdraws.",
+        "%n goes into the hedge maze after a runaway hat, and the hat's sittin' on a gravel path just round the next corner, and the next, and the next.",
+        "There's a ball of red thread tied to the maze gate, like in the old story. %n picks it up and follows it in. The other end's in the middle, in a big hand.",
+        "The hedges in the maze are higher than they were this mornin'. %n's sure of it. And the hoofprints in the gravel are fresh.",
+        "A bell rings somewhere deep in the maze, slow, three times, and %n's feet take them in through the gate before they've decided anything."
+      ]);
+      S("minotaur", "maze", "beats", 1, [
+        "He's always one hedge ahead. %n hears his breathin' through the leaves, slow and patient, and every path they choose bends back toward the middle.",
+        "%n runs, and finds a dead end, and turns, and he's standin' at the open end of it, blockin' the light, and he doesn't move. He doesn't need to.",
+        "They hear him hummin' as he walks, an old tune, and it's always just the other side of the hedge, keepin' pace.",
+        "Every corner has a hoofprint in the gravel, fresh, pointin' the way %n's about to go. He's not chasin' them. He's leadin'.",
+        "%n doubles back three times and comes out at the same stone statue every time, and the third time the statue's breathin'.",
+        "The paths get narrower and the hedges get higher, until %n's squeezin' through, and then there's a gap, and a clearin', and him."
+      ]);
+      S("minotaur", "maze", "beats", 2, [
+        `He sits on the old bench and pats his knee. "Come here," he says, "you've walked a long way," and %n comes, because there's nowhere else to go.`,
+        "The middle's quiet and green and warm, a little lawn with the stone bench in it, and he lifts %n onto the bench as easy as settin' down a lamp.",
+        "He takes %n's chin in his big hand and looks at them a long moment, like he's decidin' which way to start, and then bends them over the cool stone.",
+        `"Everybody finds the middle in the end," he says, unbucklin', and the hedges rustle all round like they're nodding.`,
+        "He lays %n back along the bench, and the stone's warm from the sun, and he leans over them with the sky behind his horns.",
+        "He turns %n round by the shoulders and presses them face down across the bench, and they can feel the tally marks in the stone under their cheek."
+      ]);
+      S("minotaur", "maze", "in", 0, [
+        "{v}He opens %n's pussy on the head of himself, slow, and the stone bench is cold under their cheek and he is very, very warm.",
+        "{nv}He works into %n's ass a slow inch at a time, patient as the hedges grow, till he's buried and they're gaspin' at the sky.",
+        "He takes %n's %h deep and slow, like he's got all the time in the world, and in the middle of the maze he has.",
+        "The minotaur ruts %n's %h in long, unhurried strokes, and every one pushes them along the smooth stone and he pulls them back by the hips.",
+        "He sinks into %n's %h to the root and stays, breathin' slow, and the hedges whisper all round them like a crowd.",
+        "He fucks %n's %h so slow and deep the stone bench creaks under them, and somewhere far off in the maze another lost visitor calls out and gets no answer."
+      ]);
+      S("minotaur", "maze", "in", 1, [
+        "He fills %n, and holds them on the bench while it settles, and then fills them again, and the little square of sky above goes from blue to gold.",
+        "He breeds %n and waits, breeds them and waits, strokin' their belly between, and every load stretches them a little rounder.",
+        "Nobody comes to look for %n. Nobody can find the middle. He takes his time, and fills them, and takes his time again.",
+        "His load fills %n so deep they feel it under their ribs, and he holds them through every pulse of it, rumblin' in their ear.",
+        "Three times he breeds %n in the middle of the maze, and three times he scratches a new tally in the stone with his horn.",
+        "He fills %n till their belly sits round on the bench under them, and then lifts them into his lap to look at it."
+      ]);
+      S("minotaur", "maze", "over", 0, [
+        "He grinds against %n's thighs on the cool stone, slow and endless, and floods the bench, and doesn't mind at all.",
+        "No way in, so he ruts along %n's back in the middle of the maze, and the hedges hide every sound they make.",
+        "He has %n squeeze their thighs round him on the bench and ruts slow, and paints them from shoulder to heel.",
+        "The bull of the maze lays himself along %n's spine and grinds, and spills across them till the stone runs white.",
+        "He presses %n's thighs together with one hand and works himself between them, unhurried, till he soaks them both.",
+        "He holds %n on his lap on the bench and rubs himself along their belly, and when he's done they're glazed to the chin.",
+        "Nothin' opens, so he takes his time with what does, and leaves %n painted and sticky in the middle of the maze."
+      ]);
+      studSceneMore(
+        "minotaur",
+        "maze",
+        [
+          "A sparrow lands on the hedge, looks at them, and flies off to tell nobody, because nobody can find the middle.",
+          "{c}He wraps his warm hand round %n's cock and strokes it slow, like he's got all afternoon. He has.",
+          "The gravel paths all round the middle crunch under nobody's feet. It's just him, and %n, and the bench.",
+          "He hums the old tune again, low, and %n can feel it through his chest into their back."
+        ],
+        [
+          "The shadows of the hedges stretch long across the lawn, and he's still goin', slow and patient.",
+          "{v}He grinds deep into %n's pussy and holds, and the stone bench is wet under them now.",
+          "%n's clutchin' the edge of the bench with both hands, and he laughs low, because it won't help.",
+          "He breathes slow against %n's neck and says somethin' about the others who found the middle, and how they came back."
+        ]
+      );
+      S("minotaur", "oldbull", "beats", 0, [
+        "There's a hill in the far meadow that wasn't there yesterday. %n walks round it. It's breathin'. It's got horns.",
+        "%n goes out to the far meadow to fetch the cows in, and the cows are all lyin' round the big oak in a ring, and in the middle of the ring somethin' huge and grey-muzzled lifts its head.",
+        "The oldest farmhand tells %n not to go near the big oak today, and then, when %n goes anyway, just nods like he expected it.",
+        "A deep low sound rolls over the far meadow like thunder a long way off. It's the old bull, callin'. %n's feet go toward it on their own.",
+        "The far meadow's gone very still, not a bird singin', and under the big oak there's a shape so big %n first takes it for a haystack, until it sighs.",
+        "%n finds hoofprints in the soft ground by the stream as deep as buckets, old and slow and certain, leadin' off toward the big oak."
+      ]);
+      S("minotaur", "oldbull", "beats", 1, [
+        "His muzzle's gone white and his horns are worn smooth as old bannisters, and his eyes are the warmest brown %n's ever seen, and they're fixed on them.",
+        "He moves like a season changin': slow, and certain, and there's no point at all in tryin' to get out of the way.",
+        "He breathes %n in, a long slow breath that goes on and on, and lets it out warm over their face, and rumbles.",
+        "Close up he's bigger than the oak's lowest bough, and the grass round his hooves is flattened in a circle like a crop ring.",
+        "He reaches out and lays one great hand on top of %n's head, and it covers it like a hat, and he keeps it there, gentle, decidin'.",
+        '"Been a while," the old bull says, slow as dripping honey, "since one came out this far," and he smiles.'
+      ]);
+      S("minotaur", "oldbull", "beats", 2, [
+        "He lowers himself to his knees in the long grass, which takes a while, and gathers %n in against him like gatherin' an armful of hay.",
+        "He lays %n on their back under the oak, the leaves movin' overhead, and spreads them with one great gentle hand on each knee.",
+        "He turns %n over in the grass and lifts their hips to the height he wants, and holds them there, steady as a stone wall.",
+        "The old bull settles behind %n slow as a sunset, and the ground under them both sinks a little with his weight.",
+        "He arranges %n over the fallen bough with the patience of somethin' that's done this every summer for a hundred years.",
+        "He lies down on his side in the grass and pulls %n back against his belly, and lifts their leg over his arm."
+      ]);
+      S("minotaur", "oldbull", "in", 0, [
+        "{v}The old bull eases into %n's pussy so slow they feel every inch arrive, and by the time he's in they've forgotten how to breathe.",
+        "{nv}He presses into %n's ass with a patience that doesn't end, and it opens, because there's nothin' else it can do.",
+        "He moves in %n's %h like a tide comin' in: slow, then slower, then all the way, and their belly rises with him.",
+        "Every inch of him that goes into %n's %h is a stretch they feel in their teeth and their toes, and there are a great many inches.",
+        "He seats himself in %n's %h and stays, rumblin', and lets them get used to him, and it takes a long, long time.",
+        "He doesn't thrust so much as roll, slow and deep, and %n's %h is stretched round him so tight they can feel his heartbeat."
+      ]);
+      S("minotaur", "oldbull", "in", 1, [
+        "He cums the way the river floods in spring: slow to start and then everywhere at once, and %n's belly swells till it's tight and shinin'.",
+        "It goes on so long the sun moves a hand's width across the sky, and %n's belly keeps risin', and he keeps one hand on it the whole time.",
+        "When he finally lets go it's one long rumblin' groan, and the flood of him fills %n so deep they can feel it under their ribs.",
+        "The old bull's load is the size of a bucket, and every drop of it goes into %n, and they're round as a barrel at the end of it.",
+        "He holds %n still through every slow pulse, and there are so many pulses, and %n's belly is a hill under his hand by the end.",
+        `"There," he rumbles, when it's done, and it's taken so long %n's half asleep, full and warm and swollen under the oak.`
+      ]);
+      S("minotaur", "oldbull", "over", 0, [
+        "No way in, so the old bull lays the whole great length of himself between %n's thighs and rocks, slow as the seasons, till he floods the grass.",
+        "He ruts slow along %n's back under the oak, and when he spills it soaks them from neck to heels like a summer storm.",
+        "He presses %n's thighs round him with one great hand and moves, and it's like bein' rocked by the earth itself.",
+        "The old bull grinds against %n so slow and so long they're nearly asleep when he finally finishes, and the flood wakes them.",
+        "He holds %n against his belly in the long grass and rubs himself along them, rumblin', until they're soaked through.",
+        "He's patient even with what he can't have, and he takes a long sweet time over %n's thighs and back before he spills.",
+        "The old bull leaves %n lyin' in a warm white pool in the long grass, and lies down beside them, and pats their hip."
+      ]);
+      studSceneMore(
+        "minotaur",
+        "oldbull",
+        [
+          "A bee drones past in the warm shade, and the old bull's tail swishes it away without him even noticin'.",
+          "His great old chest rises and falls against %n's back like a slow bellows, warm and steady.",
+          "He noses at %n's hair and breathes them in, a breath so long and deep it seems to go on for a minute.",
+          "The far meadow's so quiet %n can hear the stream at the bottom of it, and the old bull's slow heart, and nothin' else."
+        ],
+        [
+          "He hums somethin' deep and tuneless while he moves, the way a man hums at a job he's done all his life.",
+          "%n's fingers dig into the long grass and pull up handfuls of it, and the old bull doesn't hurry for them, not one bit.",
+          "The sun moves round the oak, and the shade moves with it, and the old bull shifts them both into it without stoppin'.",
+          "Every slow stroke pushes %n a little further into the soft grass, till they're lyin' in a nest of it the shape of them."
+        ]
+      );
+      S("minotaur", "hothead", "beats", 0, [
+        "Somethin' smashes through the fence behind %n in a shower of splinters, and a stocky bull-man with stubby horns skids to a stop, panting, grinnin', very pleased with himself.",
+        `There's a crash from the next field and a farmhand runnin' the other way shoutin' "He's out again!", and then a horned head pops up over the hedge right next to %n.`,
+        "%n hears a snort, a stamp, and then the sound of a gate comin' off its hinges, and a bull-man with too much energy and not enough sense comes chargin' round the barn.",
+        "The new minotaur's been kickin' his stall door all mornin'. %n walks past it just as the bolt gives.",
+        "Somethin' bangs into the side of the barn so hard the swallows fly out of the eaves, and a minotaur with more muscle than manners comes round the corner rubbin' his horns.",
+        "%n's crossin' the yard when a bucket goes flyin' past their head, then a hay fork, then the minotaur who threw them, chargin' straight at them and grinnin'."
+      ]);
+      S("minotaur", "hothead", "beats", 1, [
+        "He circles %n so fast he trips over his own hooves, picks himself up, snorts like it was on purpose, and grabs them.",
+        "He can't stand still. He paws, he stamps, he tosses his horns, he breathes on %n, he walks off, he walks back, and then he just picks them up.",
+        "He's all muscle and no patience, and he looks at %n like a bull looks at a red rag.",
+        `"You," he says, out of breath already, "you, come here, now," and doesn't wait for them to come.`,
+        "He shows off: flexes, bellows, kicks a bucket over the fence, and then looks at %n to see if they're impressed.",
+        "He snorts in %n's face, hot and eager, and his nose ring jangles, and he's already hard and achin' and doesn't care who knows it."
+      ]);
+      S("minotaur", "hothead", "beats", 2, [
+        "He tips %n over the nearest thing, which is a wheelbarrow, and it rolls, and he chases it, and catches it, and holds it still with his knee.",
+        "He throws %n down on a hay bale so eager the bale bursts, and they land in a cloud of hay, and he dives in after them.",
+        "He shoves %n against the fence and the fence groans, and he's on them before it's stopped groanin'.",
+        "He can't decide how he wants them, so he tries three ways in ten seconds and settles on bent over the trough.",
+        "He grabs %n's hips and yanks them back against him so hard their feet leave the ground.",
+        `"Stay," he says, and then can't wait for them to stay, and pins them down himself.`
+      ]);
+      S("minotaur", "hothead", "in", 0, [
+        "{v}He shoves into %n's pussy all at once, far too eager, and bellows about how good it is, and hammers away like he's tryin' to break down a door.",
+        "{nv}He crams himself into %n's ass in one greedy shove and ruts like a bull at a gate, all strength and no sense.",
+        "He's in %n's %h and ruttin' before they've caught their breath, fast and wild and noisy, and the barn shakes with it.",
+        "He takes %n's %h like he's late for somethin', and he cums almost straight away, and then looks surprised, and keeps goin' anyway.",
+        "He ruts %n's %h so hard the trough sloshes over, and he doesn't notice, and he doesn't slow down.",
+        "He fucks %n's %h with all the finesse of a bull through a hedge, and somehow it's exactly what they needed."
+      ]);
+      S("minotaur", "hothead", "in", 1, [
+        "He finishes, gasps, and is hard again before he's pulled out, and goes again, faster.",
+        "Three loads in ten minutes and he's still not done, and %n's belly's rounder after every one.",
+        "He breeds %n again, and again, each time quicker and messier than the last, and grins like a fool every time.",
+        "He can't stop. He cums, he snorts, he shakes his head, and he's off again, and %n's leakin' round him by the bucket.",
+        '"One more," he pants, and then says it again, and again, and means it every time.',
+        "The farmhands are runnin' up with a rope by the time he's on his fifth, and he's still not slowin' down."
+      ]);
+      S("minotaur", "hothead", "over", 0, [
+        "No way in, and he doesn't care: he ruts against %n's thighs like a bull at a fence post and sprays everything in sight, twice.",
+        "He grinds against %n's backside so hard they skid along the trough, and spills, and goes again straight away.",
+        "He humps %n's thighs in a frenzy, cums, snorts, and does it all over again, and again.",
+        "The hothead ruts against every bit of %n he can reach, too fast to aim, and they're soaked from hair to heels in a minute.",
+        "He can't get in, so he gets everywhere else, three times over, bellowin' about it.",
+        "He ruts along %n's back so eager he slips off twice, and the third time he finishes over the fence into the nettles.",
+        "No way in, so he paints %n with four loads in a row, and looks very proud of himself about all four."
+      ]);
+      S("minotaur", "show", "beats", 0, [
+        `The tannoy crackles: "Next in the ring, the minotaur class, and we'll need a volunteer from the crowd," and every finger in the stand points at %n.`,
+        `%n's queuin' for a toffee apple at the farm show when a handler in a white coat taps their shoulder and says, "You'll do nicely for the class."`,
+        "The farm show's in full swing, flags and bunting and the smell of fried onions, and the handler of the prize minotaur is lookin' right at %n through the crowd.",
+        "A judge with a clipboard walks along the rail, stops in front of %n, looks them up and down, and ticks somethin'.",
+        "There's a rosette on %n's chest before they know what's happened, and a handler's hand on their elbow, steerin' them toward the show ring.",
+        `The loudspeaker calls for "the minotaur's partner, please, to the main ring," and a steward with a rosette comes straight through the crowd for %n.`
+      ]);
+      S("minotaur", "show", "beats", 1, [
+        "He's been brushed till he gleams, his hooves blacked, his horns polished to mirrors, and he walks the ring like he owns it, and he looks %n over like they're the prize.",
+        "The handler leads the show bull out on a red rope, and the crowd claps, and the bull stops in front of %n and lowers his polished horns, very formal.",
+        "The show bull poses for the judges, side on, then front on, then turns his head to look at %n, and snorts, and the crowd laughs.",
+        `"Look at the depth on him," the handler tells the judges, and the judges write it down, and look at %n, and write somethin' else down.`,
+        "He parades round %n in a slow circle, the rosettes on his harness flutterin', and the crowd goes quiet and leans forward.",
+        "The handler hands %n a ribbon to hold, very solemn, and the show bull steps up close and breathes on it."
+      ]);
+      S("minotaur", "show", "beats", 2, [
+        "They kneel %n on a clean bale of straw in the middle of the ring, and the judges each take a corner to watch from.",
+        'The handler positions %n like a show animal, hips just so, chin up, "for the photograph," and steps back.',
+        '"Present," says the head judge, and the handler gently bends %n forward over the rail, and the crowd hushes.',
+        "A farmhand with a brush gives %n a quick tidy, like they're bein' shown too, and then steps back out of the ring.",
+        "%n's set on the judges' table in the middle of the ring, and the judges move their teacups out of the way.",
+        "The handler clips a little numbered card to %n's collar, number seven, and pats their rump, and the show bull steps up."
+      ]);
+      S("minotaur", "show", "in", 0, [
+        `{v}The show bull sinks into %n's pussy with a long slow push for the judges to see, and the crowd goes "Ooh" all together.`,
+        "{nv}He takes %n's ass slow and proper, an inch at a time, turned side on so the stands get a good view.",
+        "He breeds %n's %h with perfect long strokes, every one shown off to the stands, and the judges nod along like it's a dressage test.",
+        "The handler calls the strokes like a ringmaster, and the show bull matches every call into %n's %h, and the crowd counts along.",
+        "He works %n's %h for the judges with a showman's patience, never hurried, never sloppy, and somebody in the front row fans themselves.",
+        "He takes %n's %h at a slow parade-ground pace, every stroke exactly the same length, and the judges hold their pencils still to watch."
+      ]);
+      S("minotaur", "show", "in", 1, [
+        "He floods %n in front of the whole show, and holds them still while it settles, and turns them so the crowd can see their belly swell.",
+        "The judges ask to see it again. He obliges. %n's belly rounds out to applause.",
+        "He breeds %n twice, perfectly, and the second time a photographer from the county paper gets it on film.",
+        "He cums with a bellow that sets every cow at the show mooin', and %n's belly swells and the judges make a note.",
+        `"Lovely yield," says one judge, watchin' it run down %n's thighs, and writes a number on her card.`,
+        "He gives the judges two loads and an encore, and the encore gets a standing ovation."
+      ]);
+      S("minotaur", "show", "over", 0, [
+        "No way in, so the show bull ruts along %n's back for the judges, slow and showy, and finishes across them with a flourish.",
+        "He works himself between %n's thighs in front of the stands and paints them, and the crowd applauds the technique.",
+        "The show bull grinds against %n's backside, turned for the stands, and spills across their back in a long gleamin' arc.",
+        "He ruts %n's squeezed thighs slow and stately, and the judges lean in, and he finishes over the front row's shoes.",
+        "With the way shut, he makes a show of what he can do outside, and %n's glazed from shoulder to heel for the judges.",
+        "He takes his bow first, then paints %n with a load the whole show can see, then takes another bow.",
+        "No way in, so he puts on a show of a different sort, and %n's left drippin' in the sawdust to polite applause."
+      ]);
+      studSceneMore(
+        "minotaur",
+        "show",
+        [
+          "A small brass band strikes up somewhere at the edge of the showground, and the show bull ruts in time.",
+          "{c}A judge reaches under %n with a gloved hand to check their cock, very professional, and makes a note.",
+          "The handler mops the show bull's brow with a cloth between strokes, and the crowd chuckles.",
+          "{v}The show bull turns %n so the stands can see him slide in and out of their pussy, and someone gasps."
+        ],
+        [
+          "The head judge holds up a card: 9.5. The crowd boos. It deserved a ten.",
+          "A stray balloon floats up from the far end of the showground, and nobody in the ring notices.",
+          "The show bull leans down and licks %n's ear, and the crowd melts.",
+          '"Hold him there," says the photographer, and the show bull holds very still inside %n, and %n holds very still too.'
+        ]
+      );
+    }
+    {
+      const S = (kind, form, part, i, l) => {
+        const T = form ? STUD_FORMS[kind] && STUD_FORMS[kind][form] && STUD_FORMS[kind][form].lines : ANTHRO_LINES[kind];
+        const pool = T && (Array.isArray(T[part] && T[part][0]) ? T[part][i] : T[part]);
+        poolMore(kind, (form || "usual") + " " + part + " " + i, pool, l);
+      };
+      S("werewolf", null, "beats", 0, [
+        "The full moon's so bright tonight %n can see their own shadow on the path, and then a second shadow, much bigger, fallin' in step behind it.",
+        "Somethin' howls off in the trees, long and low, and every dog on the farm starts barkin' at once, and then every one of them stops.",
+        "%n's fetchin' a bucket from the well when the moon slides out from behind a cloud, and somethin' in the orchard snaps a branch clean in half.",
+        "There's a smell on the night air, wet fur and pine and somethin' hot underneath, and it's comin' from right behind %n.",
+        "The farm's gone very quiet. No crickets, no owls, nothin', just the full moon and the sound of somethin' heavy breathin' in the hedge.",
+        "%n steps off the lane to cut through the woods, and there are fresh claw marks gouged in the bark of the first oak they pass, higher than their head."
+      ]);
+      S("werewolf", null, "beats", 1, [
+        "He drops off the bank onto the path in front of %n: seven foot of grey fur and muscle, silver in the moonlight, steam pourin' off him, eyes fixed on them.",
+        "He prowls out of the bracken on all fours, rises up slow on two, and keeps risin', and %n has to tip their head right back to see the moon between his ears.",
+        "His nose works, scentin' %n from three paces off, and his lips peel back off his teeth, and his tail swings, slow, once.",
+        "He's on %n in two bounds, a hot furred weight that bowls them over into the ferns, and his growl goes right through their ribs.",
+        "He snuffles along %n's throat and down their front and lower, rough and greedy, nosin' through their clothes like they're hidin' somethin' from him.",
+        "Whatever %n's wearin' doesn't last long: one claw, one slow pull, and it's rags on the moss, and he growls at what's underneath."
+      ]);
+      S("werewolf", null, "beats", 2, [
+        "He shoves %n down on hands and knees in the leaf litter and straddles them, and somethin' thick and hot slaps against the back of their thigh: his %c cock, out of the sheath and drippin'.",
+        "He sets his jaws round the back of %n's neck, not bitin', just holdin', and grinds the whole %c length of himself along them till they shake.",
+        "A paw on %n's back pins them to the earth, and his other hand drags their hips back to meet him, and the red tip of his %c cock is already slick.",
+        "He mounts %n from behind like the wolf he is, chest to their back, arms locked round their waist, hips huntin' for the way in.",
+        "He hauls %n up against a tree trunk, bark under their palms, kicks their feet apart, and his breath comes hot on the back of their neck.",
+        "His %c cock's out, red and glossy, swellin' thick at the base where the knot's already startin', and he wants %n to get a good look at it before he uses it."
+      ]);
+      S("werewolf", null, "in", 0, [
+        "{v}He shoves into %n's pussy in one go and starts to pound, and his swellin' knot thumps against their lips every stroke till it pops inside and locks.",
+        "{nv}He forces into %n's ass, slick and relentless, and their ring's barely got used to him before the knot's batterin' at it, and then it's in and they're tied.",
+        "He ruts %n's %h with short, brutal, quick strokes, so fast they can't breathe between them, and the knot grows and grows till it won't come out.",
+        "He sinks into %n's %h to the root and stays there, grindin', and %n feels the knot swell inside them like a fist slowly openin'.",
+        "Every thrust drives %n forward through the leaves, and every thrust his knot's bigger, and then one thrust it goes in and doesn't come back out.",
+        "He takes %n's %h like the moon's tellin' him to, mindless and deep, howlin' through his teeth, and ties them to him with a knot as big as a fist."
+      ]);
+      S("werewolf", null, "in", 1, [
+        "He cums tied, in long hot pulses %n can feel through their whole belly, and every pulse he growls, and every growl he pushes deeper.",
+        "Tied in %n's %h, he turns, rump to rump like the wild ones do, and they're stuck there under the moon while he empties into them.",
+        "The knot holds them together the best part of an hour, and the werewolf pumps the whole time, and %n's belly swells with it, slow and round.",
+        "He licks %n's neck and shoulders while he floods them, rough tongue and hot breath, and the moon slides across the sky and the knot doesn't budge.",
+        "When it finally slips loose a flood comes with it, and he growls at the waste and shoves back in and knots them again to keep the next lot in.",
+        "He breeds %n till the moon's halfway down the sky, knot after knot, and by the last one their belly's tight and sloshin' and they've stopped countin'."
+      ]);
+      S("werewolf", null, "over", 0, [
+        "He can't get in, so he ruts %n's thighs, his knot swellin' against their skin, and howls when he paints them silver from nape to knees.",
+        "He makes %n grip his knot in both hands like they're the ones tyin' him, and ruts their fists, and floods the leaves and their belly.",
+        "He humps against %n's backside, huge and frantic, and cums hot across the small of their back and down their thighs in thick ropes that steam in the cold.",
+        "He rolls %n over and ruts across their belly, knot pressed hot against them, and empties himself till it pools in the hollow of their throat.",
+        "He settles for %n's thighs squeezed tight round him and fucks them till his knot's caught between their legs and he's floodin' the moss.",
+        "He drags his cock up and down %n's back like he's markin' territory, which he is, and when he cums it's all over them, hair and all.",
+        "He tucks himself between %n's legs and ruts there under the moon, slow and then savage, and leaves them drippin' silver down to their ankles."
+      ]);
+      trapSceneMore(
+        "werewolf",
+        [
+          "Somethin' in the woods answers his howl, far off, and he growls a warnin' back and holds %n tighter.",
+          "Moonlight flashes on his teeth when he grins down at %n, and there are a lot of teeth.",
+          "He sniffs every inch of %n like he's memorisin' them, and he is: he'll find them again next full moon, wherever they hide.",
+          "{v}He noses between %n's thighs and licks them open, one long rough stripe, and %n's knees give."
+        ],
+        [
+          "Tied and pantin', he licks the sweat off the back of %n's neck and rumbles somethin' that's almost a word.",
+          "Every time the knot tugs, %n gasps, and every time they gasp he grinds deeper, like he likes the sound of it.",
+          "Leaves in %n's hair, earth on their knees, moonlight on their back and a wolf locked inside them: there are worse ways to spend a night.",
+          "The werewolf howls again, right over %n's head, and the whole wood goes silent to listen."
+        ]
+      );
+      S("werewolf", "alpha", "beats", 0, [
+        `A grey shape's lyin' across the path like a fallen log, head on its paws, and it lifts its head when %n's footsteps stop. "There you are," it says.`,
+        "%n smells pipe smoke and old pine under the trees, and there he is, the old grey wolf, leanin' on an oak with his arms folded, watchin' the moon come up over them both.",
+        "Every other werewolf in the wood goes quiet at once, like a room when somebody important walks in. Then the old one walks out of the dark toward %n.",
+        "There's a ring of flat stones in the clearin' that wasn't there last moon, and an old grey werewolf sittin' in the middle of it, waitin'.",
+        `"Don't run," says a voice like gravel at the bottom of a river. "My knees aren't what they were, and I'd only catch you anyway."`,
+        "The old alpha's waitin' where the path forks, silver fur shinin' in the moon, one ear torn, and he tips his head at %n like an old friend."
+      ]);
+      S("werewolf", "alpha", "beats", 1, [
+        "He takes %n's chin in one scarred hand and turns their face to the moonlight, and looks at them a long time, the way an old farmer judges prize stock at the fair.",
+        "He walks round %n slow, breathin' them in, and every scar on his old grey hide is a story, and he looks like he means to tell them every one.",
+        `"You'll do," he says at last, and his voice is so deep %n feels it in their teeth.`,
+        "He runs one claw down %n's front, throat to belly, not breakin' the skin, just slow, and everythin' they're wearin' falls open behind it.",
+        "Up close he smells of moss and smoke and age, and the heat comin' off him is like standin' in front of a banked fire.",
+        "He growls once, low, and %n's knees fold on their own. Some wolves have to fight for it. This one never has."
+      ]);
+      S("werewolf", "alpha", "beats", 2, [
+        "He settles behind %n on the moss and takes their hips in both hands, and there's the hot %c weight of his cock restin' along their spine, takin' its time like the rest of him.",
+        `"Down," he says, and %n goes down, chest to the moss, and he kneels over them like a mountain settlin'.`,
+        "He lifts %n into his lap like they weigh nothin', back to his chest, and lets them feel how %c he is underneath them while he nuzzles their ear.",
+        "His old knot's already thick at the base of him, and he presses it against %n's thigh so they know what's comin', and lets them shiver about it.",
+        "He holds %n down with one hand spread between their shoulder blades, no weight in it at all, and they couldn't get up if the barn was on fire.",
+        "He takes his time linin' up, nudgin' the %c head of his cock against %n slow and patient, again and again, till they're the one pushin' back."
+      ]);
+      S("werewolf", "alpha", "in", 0, [
+        "{v}He presses into %n's pussy so slow it's almost cruel, lettin' them feel every inch, and grunts approval when they open up for him.",
+        "{nv}He eases into %n's ass a little at a time, pausin' every inch to let them breathe, and it's still almost too much when he's all the way in.",
+        "He rocks into %n's %h like an old tree swayin' in the wind, slow and steady and unstoppable, and the knot comes in on a long, low groan from both of them.",
+        "He fucks %n's %h with long, deep, patient strokes, a hundred years of practice in every one of them, and he never once speeds up, and that's worse than if he did.",
+        `"Breathe out," he rumbles, and %n does, and the knot slides into their %h, and the old wolf sighs like a man sinkin' into a hot bath.`,
+        "He takes %n's %h slow and he takes it deep, and he talks the whole time, low in their ear, about how good they feel and how they'll learn to take more."
+      ]);
+      S("werewolf", "alpha", "in", 1, [
+        "He floods %n slow, pulse after heavy pulse, his chin restin' on top of their head, and tells them to count, and they lose count at twenty.",
+        "Tied together on the moss, he wraps round %n like a fur cloak and rocks, gentle, fillin' them every few minutes till their belly's round and warm.",
+        "The knot holds them for hours. He doesn't mind. He's got the patience of a standin' stone, and every so often he pumps another load into %n just to keep it warm.",
+        "He pours into %n's %h till it's leakin' round the knot, and then plugs them tighter with a lazy roll of his hips and keeps pourin'.",
+        "When the knot slips he doesn't let them go: he turns them over, takes them again face to face, slow, and knots them again with his forehead pressed to theirs.",
+        "He breeds %n under the moon like it's a chore he's very fond of, steady and thorough, and by the end their belly's swollen tight with old wolf."
+      ]);
+      S("werewolf", "alpha", "over", 0, [
+        "He settles for %n's thighs without a word of complaint, slidin' slow between them, and when he finally cums it runs all the way down to their knees.",
+        "He has %n hold him in both hands, knot and all, and guides them stroke by patient stroke till he spills over their chest and belly.",
+        "He ruts slow along the small of %n's back, his old knot swellin' against them, and paints them silver from neck to knees.",
+        `"Never mind," he rumbles, and makes do with the cleft of %n's ass and the tight squeeze of their thighs, and soaks them all the same.`,
+        "He lies along %n on the moss and grinds, unhurried, for what feels like an hour, and when he cums it's a long slow flood that warms their whole back.",
+        "He curls round %n and ruts between their thighs like he's got all night, which he has, and empties himself over their belly three times before moonset.",
+        "He paints %n slow and careful, like an old craftsman at his bench, and every inch of their back's marked silver by the time he's done."
+      ]);
+      S("werewolf", "newturned", "beats", 0, [
+        "There's a yelp in the dark, and a thump, and a lot of swearin', and a werewolf rolls out of a bramble patch onto the path at %n's feet, all elbows.",
+        "Somethin' howls at the moon, tries again, gets it wrong, and sneezes. Then it smells %n and comes crashin' through the hedge.",
+        "%n finds a pair of trousers in the lane, split right up the back, and then a shirt in rags, and then the farmhand who was wearin' them, who isn't much of a farmhand tonight.",
+        "A big shaggy werewolf's sittin' in the middle of the turnip field lookin' at his own paws like he's never seen them before. Then he looks at %n.",
+        "There's a werewolf stuck in the gate, half through, tail wavin', whinin'. When %n goes over, he gets loose all at once and lands right on them.",
+        "%n hears pantin', and a tail thumpin' a barrel, before they see him: the new wolf, crouched behind the cider shed, very obviously hidin' and very obviously hard."
+      ]);
+      S("werewolf", "newturned", "beats", 1, [
+        `His ears go up, then flat, then up again. "You smell," he starts, and stops, and buries his face in %n's neck and breathes, and whines.`,
+        "He tries to say somethin' polite and it comes out a growl, and he looks mortified, and then his nose drops between %n's legs and stays there.",
+        `"I'm so sorry," he says, already pullin' at %n's clothes with paws that don't work like hands any more, "I'm so sorry, I'll, I'll make it up to you."`,
+        "He's all legs and tail and enthusiasm, lickin' %n's face, sniffin' everywhere, tryin' to do everythin' at once and gettin' tangled up in himself.",
+        "He's very big and very fluffy and very obviously ready, and very, very embarrassed about all three.",
+        `"I'm not s'posed to," he pants, nose pushin' at %n's thighs, tail goin' like a windmill. "The old one said. Sorry. Sorry. You smell so good."`
+      ]);
+      S("werewolf", "newturned", "beats", 2, [
+        `He climbs on %n the wrong way round first, realises, says "sorry," turns round and gets it right the second time, his %c cock pokin' everywhere but where it should.`,
+        `He hasn't worked out the knot yet and it's already swellin', and he looks down at it, then at %n, in real panic. "Is that, is it meant to?"`,
+        "He clutches %n's hips with both paws and humps at the air, at their thigh, at the small of their back, whinin', his %c cock slappin' about wet and eager.",
+        "He gets them on their knees and then gets distracted lickin' them, everywhere, and has to start over, and says sorry about that too.",
+        `His tail's goin' so hard it's knockin' leaves off the hedge. "Can I," he pants, "can I, please, sorry, can I," and doesn't really wait for the answer.`,
+        "He knocks %n into a pile of hay with a big clumsy hug and ends up on top of them, %c cock trapped hot between them, and freezes like he's been caught at somethin'."
+      ]);
+      S("werewolf", "newturned", "in", 0, [
+        "{v}He finds %n's pussy on the fourth try and sinks in with a howl of pure relief, and then the hips take over and he's ruttin' like a mad thing.",
+        `{nv}He shoves into %n's ass all at once, yelps "sorry!" and keeps goin', faster, because he can't stop, he really can't.`,
+        "His hips go like a fiddler's elbow, all speed and no rhythm, and %n's %h gets pounded so fast they can't tell one stroke from the next.",
+        `He gets his knot into %n's %h by accident and they both freeze, tied, and he looks over his shoulder at it, amazed. "Oh," he says. "Oh, that's what that's for."`,
+        "He ruts %n's %h like it's the first time anybody's ever done it, wild and hungry and whimperin', and he's knotted inside them before either of them's ready.",
+        "He fucks %n's %h in great sloppy desperate humps, pantin' apologies into their hair, tail thumpin' the ground, knot swellin' bigger every stroke."
+      ]);
+      S("werewolf", "newturned", "in", 1, [
+        "He cums before he's even properly tied, then again once he is, then a third time out of sheer excitement, and %n's belly swells with every one.",
+        'Tied, he tries to turn round like the wild wolves do, gets it wrong, tangles them both up, and they roll over in the leaves together still knotted. "Sorry."',
+        "The knot goes down. He's hard again in about a minute. He looks at %n hopefully. They don't have to answer: he's already back on them.",
+        "He fills %n's %h so many times their belly rounds out and sloshes, and he noses at it, proud and amazed, and then goes again.",
+        "Every time he cums he howls, and every time he howls it cracks in the middle, and every time it cracks he says sorry and keeps pumpin'.",
+        "By the fifth knot he's figured out the rhythm, and he's very pleased with himself about it, and %n's stuffed so full they can feel every slosh."
+      ]);
+      S("werewolf", "newturned", "over", 0, [
+        "He tries and tries to get in and can't, and gives up and humps %n's thighs instead, whinin', and floods the backs of their legs and says sorry three times.",
+        "He mounts %n's hip by mistake and ruts there in a frenzy, and cums all over their side, and then looks down at it like he's done somethin' wrong.",
+        "He gets all tangled up and ends up ruttin' between %n's thighs, and cums before he's worked out it isn't the right place, and then again after.",
+        "His knot swells up between %n's legs and he can't do anythin' with it, so he humps and whines and cums and cums all over their belly and the hay.",
+        `He paints %n's back so many times they're dizzy from it, and between every load comes a lick and a very small "sorry".`,
+        "He humps at %n's backside in a clumsy frenzy, never once findin' the way in, and empties all over them anyway, again and again.",
+        "In the end %n takes pity on him and lets him rut their fist, and he cums so hard he falls over, and keeps sayin' sorry from the ground."
+      ]);
+      S("werewolf", "bloodmoon", "beats", 0, [
+        "The moon rises red as a fresh brand over the hills, and the woods smell of iron and smoke, and somethin' out there has been waitin' a long time for %n.",
+        "Everythin' on the farm is hidin' tonight. The barn cats are under the floor, the hens won't come off the roost. Only %n's out, under the red moon.",
+        "The blood moon turns the pond the colour of wine, and somethin' black and huge stands up out of the reeds on the far side, and looks at %n.",
+        "There's no howl tonight, just a growl, low and endless, comin' from every direction at once as %n walks under the red-lit trees.",
+        "Two red lights open in the dark under the hedge, level with %n's face, and they don't blink.",
+        "The red moon's so close it seems to sit on the treetops, and somethin' black slips between the trunks, keepin' pace with %n, never quite seen."
+      ]);
+      S("werewolf", "bloodmoon", "beats", 1, [
+        "He steps into the red moonlight and he's taller than the hayloft door, black as a burned field, and his breath smokes like a forge.",
+        "His eyes catch the moon and burn, and when he grins at %n there's red on his teeth too. Just the light. Just the moon. Probably.",
+        "He doesn't growl or howl. He just looks at %n, and the look goes all the way through them and comes out somewhere low and hot and wantin'.",
+        "Heat comes off him like an open oven, and where his paws touch the grass it curls and goes brown, and he reaches for %n.",
+        "He circles %n once, slow, and everywhere his breath touches, their skin prickles hot, like they've been sittin' too close to the fire.",
+        "He takes %n's jaw in one black clawed hand and tips their head back to bare their throat, and studies it like he's choosin' the spot."
+      ]);
+      S("werewolf", "bloodmoon", "beats", 2, [
+        "He forces %n down on their hands and knees, a hot black weight on their back, and the %c cock draggin' along their thigh is hot as a poker.",
+        "He tears what %n's wearin' off in two strokes of his claws and pins them face down, and growls till the ground hums under them.",
+        "His %c cock's out of the sheath, dark and glossy and steamin' in the night air, and the knot's already swellin' angry at the base.",
+        "He hauls %n's hips up and back against him, and they can feel his heartbeat thunderin' through his chest into their spine.",
+        "He closes his teeth on the back of %n's neck, just holdin', and the heat of his breath runs down their spine like hot wax, and they go limp.",
+        "He sets the scorchin' tip of his %c cock to %n and holds it there, burnin', till they're whimperin' and pushin' back on their own."
+      ]);
+      S("werewolf", "bloodmoon", "in", 0, [
+        "{v}He drives into %n's pussy, so hot it's like bein' filled with a coal, and ruts deep and furious, his knot poundin' at them till it forces in.",
+        "{nv}He shoves into %n's ass in one hard thrust, black and burnin', and %n cries out into the leaves, and he only goes harder.",
+        "He pounds %n's %h under the red moon like he's tryin' to drive them into the earth, and the knot goes in with a thump %n feels in their teeth.",
+        "He fucks %n's %h savage and deep, growlin' with every stroke, and the heat of him spreads up through their belly till they're sweatin' in the cold night.",
+        "His knot's in %n's %h before they even feel it comin', swellin' hot and huge, and he grinds against it, locked in, and snarls at the moon.",
+        "He ruts %n's %h wild and hungry and endless, red eyes rolled back, and every stroke leaves them hotter and wetter and more his."
+      ]);
+      S("werewolf", "bloodmoon", "in", 1, [
+        "He floods %n with a load so hot it feels like it's boilin', and the bite on their shoulder throbs in time with every pulse of him.",
+        "Tied in %n's %h, he licks the fresh bite on their shoulder, slow, and with every lick the burnin' in their blood gets worse, and better.",
+        "He cums and cums, fillin' %n's belly till it's round and tight and hot as a stone left in the sun, and still the knot holds.",
+        "The bite burns, his load burns, and %n can't tell where the heat ends and they begin, only that they want more of it.",
+        "He knots %n three times before the red moon sets, and bites them once more each time, and by the third bite they're beggin' for it.",
+        "Locked deep in %n's %h, he howls at the blood moon, and every howl comes with another hot pulse, and their belly swells with it."
+      ]);
+      S("werewolf", "bloodmoon", "over", 0, [
+        "He grinds his burnin' cock between %n's thighs and floods them so hot they gasp, and sinks his teeth into their shoulder as he does it.",
+        "He ruts against %n's backside, black and furious, and paints them from neck to knees with a load that steams in the cold air.",
+        "He has %n hold the knot in both hands while he ruts their grip, and it's so hot they nearly let go, and he cums across their chest.",
+        "He can't get in and it makes him wild: he humps between %n's legs hard enough to lift them off the ground, and soaks them through.",
+        "He marks %n's back with his load and then licks it into their skin, slow, and wherever his tongue goes it burns sweet.",
+        "He lays %n on their back in the leaves and ruts across their belly, and the hot flood pools in their navel and burns there.",
+        "He paints %n under the red moon, back and thighs and the bite on their shoulder, and growls when it hisses on their skin."
+      ]);
+      S("werewolf", "brothers", "beats", 0, [
+        "A grey werewolf steps onto the path in front of %n and grins. %n turns to run and walks right into a brown one, who grins exactly the same way.",
+        "Two howls go up from the woods, one high and one low, and then laughter, real laughter, and then two big shapes come boundin' through the bracken toward %n.",
+        `%n hears two sets of paws in the leaves behind them, and two lots of pantin', and a growl that sounds a lot like "I saw them first."`,
+        "There's a grey werewolf sat on the stile and a brown one sat on the gate, and %n has to get past one of them to get home.",
+        "The brothers are wrestlin' in the clearin' under the moon, rollin' and snappin' and laughin', and they both stop dead when they smell %n.",
+        "Somethin' tugs %n's sleeve from the left, and somethin' tugs their other sleeve from the right, and they look round, and it's a werewolf both ways."
+      ]);
+      S("werewolf", "brothers", "beats", 1, [
+        "The grey one sniffs %n's neck and the brown one sniffs lower, and they look at each other over %n's shoulder and grin like they've found a pie coolin' on a windowsill.",
+        '"Mine," growls the brown one. "Ours," says the grey one, and cuffs him round the ear, and that settles it.',
+        "They pass %n between them like a parcel, each one havin' a good long sniff, each one rumblin' approval to the other.",
+        "They peel %n's clothes off between them, one from the top and one from the bottom, racin', and laugh when they meet in the middle.",
+        "The grey one's bigger, the brown one's quicker, they're both hard, they both want %n, and they've clearly got a system worked out.",
+        "They sit %n down on a fallen log between them and nuzzle them from both sides, warm and furry and pantin', growlin' sweet nothin's in wolf."
+      ]);
+      S("werewolf", "brothers", "beats", 2, [
+        "The brown one lies back in the moss and pulls %n down on top of him, and the grey one kneels behind them, and %n can feel a %c cock in front and another behind.",
+        "The grey one holds %n's arms, the brown one holds their ankles, and they argue about who goes first all the way to the soft bit of the bank.",
+        "They lay %n down on a bed of fern between them, and the moonlight shines on two knots already swellin', and two tails waggin'.",
+        "The brown one holds %n's face and licks their mouth while the grey one hoists their hips up, and his %c cock is hot as a hearthstone against them.",
+        `"You go," says the grey one. "No, you," says the brown one. %n's bent over the log between them the whole time they argue, ass in the air, gettin' cold.`,
+        "They toss a coin. Somehow, a werewolf tosses a coin. The brown one wins, and grins, and the grey one holds %n still for him."
+      ]);
+      S("werewolf", "brothers", "in", 0, [
+        "{v}The brown one takes %n's pussy first, fast and greedy, and the grey one holds their chin up and watches their face the whole time his brother's in them.",
+        "{nv}The grey one takes %n's ass first, slow and heavy, and the brown one lies under them and licks their mouth and their neck and laughs at every gasp.",
+        "One brother ruts %n's %h while the other kneels in front and lets them suck his fingers, his ears, his tongue, anythin' to keep their mouth busy.",
+        "The brown one knots %n's %h quick and ties, and the grey one can't wait, and ruts between %n's thighs alongside his brother while they're stuck.",
+        "They take it in turns, %n's %h passed between them, one ruttin' while the other licks and holds and pants, and neither one ever lets them go.",
+        "The grey one's knot goes into %n's %h with a pop, and the brown one howls like it's him, and leans in to kiss %n through it."
+      ]);
+      S("werewolf", "brothers", "in", 1, [
+        "The brown one fills %n, the knot slips, and the grey one's in before a drop can escape, and they both seem very proud of that.",
+        "They keep count by scratchin' marks in a tree, one for each knot, and by moonset there are six marks, three each, and %n's belly's round as a pumpkin.",
+        "Tied to one brother, %n's held and kissed by the other, and then the knots swap, and the kisses swap, and it goes round and round till dawn.",
+        "Both brothers fill %n's %h before moonset, over and over, and they share the job of lickin' up whatever leaks out between knots.",
+        "The grey one breeds %n slow while the brown one holds them and whispers filthy things in their ear, and then they swap and it's the other way round.",
+        "They take it in turns till neither of them can tell who's winnin' any more, and %n's packed full of both of them, sloshin' every time they move."
+      ]);
+      S("werewolf", "brothers", "over", 0, [
+        "They can't get in, so one ruts between %n's thighs while the other ruts their fist, and they cum together, and %n's soaked from both sides.",
+        "The brothers take turns grindin' along %n's back, one after the other, till it's hard to say whose load is whose.",
+        "They make %n kneel between them and hold them both, a knot in each hand, and paint them silver from either side at once.",
+        "The grey one ruts the cleft of %n's ass, the brown one ruts their thighs, and they cum within a breath of each other and howl about it.",
+        "Two loads across %n's back, then two across their belly, then two more just because, and the brothers lick them clean in between.",
+        "They squeeze %n between them like a pillow and rut, one in front and one behind, never in, and leave them drippin' from nape to ankle.",
+        "The brown one cums on %n's back and the grey one cums on top of that, and then they argue about who made more mess."
+      ]);
+    }
+    {
+      const S = (kind, form, part, i, l) => {
+        const T = form ? STUD_FORMS[kind] && STUD_FORMS[kind][form] && STUD_FORMS[kind][form].lines : ANTHRO_LINES[kind];
+        const pool = T && (Array.isArray(T[part] && T[part][0]) ? T[part][i] : T[part]);
+        poolMore(kind, (form || "usual") + " " + part + " " + i, pool, l);
+      };
+      S("foxden", null, "beats", 0, [
+        "Somebody's left a trail of sweets across the yard, one every few steps, and %n's eaten four of them before they notice the trail ends at a hole under the hedge.",
+        'A red tail flicks round the corner of the barn, then another, and a voice giggles "come and see, come and see," and %n, who should know better, goes to see.',
+        "%n trips over a ribbon stretched ankle-high across the path, and before they hit the ground there are paws catchin' them, lots of paws, all very pleased.",
+        "There's a hole in the bank by the stream that wasn't there yesterday, with a little painted sign over it that says WELCOME, and the welcome's lined with cushions.",
+        "%n reaches into the hay for a dropped glove and a paw grabs their wrist and pulls, and they slide down a chute of straw into somewhere warm and dark and gigglin'.",
+        "A fox-man pops his head out of the hedge, winks at %n, and pops back in. Then another does it a bit further along. Then a third. They're very obviously waitin'."
+      ]);
+      S("foxden", null, "beats", 1, [
+        "The den's lined with stolen things, silk scarves, cushions, somebody's good quilt, a dozen ribbons, and now %n, set down on the softest pile like the best prize of the lot.",
+        "The brothers crowd round %n, sniffin' and gigglin', red tails swishin', and every one of them's got a feather or a ribbon in his paw and a look in his eye.",
+        '"Look what we found," says one. "We found it," says another. "I found it," says a third, and they all pile on %n at once to prove it.',
+        "Quick clever paws undo every button and buckle %n's got before they've finished sayin' hello, and the brothers pass their clothes round like trophies.",
+        "They're all grins and whiskers and quick red fur, all talkin' at once, and every time %n turns to look at one, another one pinches them from behind.",
+        "One fox ties a ribbon round %n's wrist and another ties the other end round his own, and they all think that's hilarious, and nobody's untyin' it."
+      ]);
+      S("foxden", null, "beats", 2, [
+        "They pin %n's arms over their head and go for the ribs, all of them, quick little fingers everywhere, and %n's shriekin' and kickin' and helpless in seconds.",
+        "A feather down the soles of %n's feet, another along the backs of their knees, a third tracin' slow circles low on their belly, and the brothers watch them squirm.",
+        "They tickle %n till they're breathless and pink and limp, and then one of them leans in and licks their neck, and the laugh turns into somethin' else.",
+        "Every time %n squirms away from one fox they squirm right into another, and that one's got a feather too, and he's not shy about where he uses it.",
+        "Four fox tails brush over %n at once, soft as thistledown, from throat to thighs, and they can't stop laughin' or shiverin' or both.",
+        "The brothers roll %n onto their belly in the cushions, still gigglin', and one of them kneels behind with his %c cock out while the rest keep the feathers goin'."
+      ]);
+      S("foxden", null, "in", 0, [
+        "{v}The first fox slips into %n's pussy quick as a thief and ruts fast and clever, his brothers ticklin' them all the while so they buck and clench round him.",
+        "{nv}The first brother slides into %n's ass, quick and slick, and every time a feather finds their ribs they clench on him so tight he yips.",
+        "They mount %n one after another, fast and greedy, and every one of them knots %n's %h with a little yip of triumph while the others cheer him on.",
+        "The foxes are quick: in, ruttin', knotted, done, next, and %n's %h has barely noticed one's gone before the next is in, laughin'.",
+        "One fox ruts %n's %h while another tickles their feet, and every giggle squeezes him tighter, and he yips and knots them on the spot.",
+        "The brothers take %n's %h in turns, each one quicker and cheekier than the last, and the knots come so close together it's like one long tie."
+      ]);
+      S("foxden", null, "in", 1, [
+        "Tied to one fox, %n gets tickled by the other three, and every laugh milks the knot, and the fox inside them yips and fills them again.",
+        "They knot %n so many times their belly rounds out with fox, and the brothers take turns pokin' at it and gigglin' when it sloshes.",
+        "One by one the foxes empty into %n's %h and roll off laughin', and the den gets warmer and fuller and smells more of fox every time.",
+        "By the fourth knot %n's laughin' so hard they're cryin', and stuffed so full they can feel every giggle slosh inside them.",
+        "The brothers keep %n tied and tickled and full all afternoon, swappin' places so quick and so often %n can't tell if it's the same fox twice.",
+        "When the last knot slips the brothers lie round %n in a pile of red fur, pantin' and gigglin', and one of them starts ticklin' again just to see what happens."
+      ]);
+      S("foxden", null, "over", 0, [
+        "The brothers can't get in, so they take turns ruttin' %n's thighs, quick and gigglin', and each one leaves a sticky stripe and a feather behind.",
+        "Four foxes, four quick hot loads across %n's back and belly, and a lot of yippin' and gigglin' while they do it.",
+        "They tickle %n till they're helpless and then rut their squirmin' thighs, one after another, till %n's sticky from hip to knee.",
+        "One fox ruts %n's fist while another tickles their feet, and when he cums it goes everywhere, and they all think that's hilarious.",
+        "They mark %n like stolen goods, one fox after another across their back, and sign it with a feather stuck in the mess.",
+        "The brothers rut against %n from every side, never quite in, and finish all over them, then roll them in the cushions to see what sticks.",
+        "They cum over %n one after another, laughin', and tickle them through every one, till %n doesn't know if they're laughin' or cummin' either."
+      ]);
+      trapSceneMore(
+        "foxden",
+        [
+          "A fox stuffs a silk scarf in %n's mouth to hush their gigglin', then takes it out again because he misses the noise.",
+          "Somebody's put a ribbon bow on %n's ankle and another on their wrist, and they're arguin' about where the third one goes.",
+          "The brothers tickle %n in turns, keepin' score of who gets the loudest squeal, and cheatin' outrageously.",
+          "A fox drapes himself across %n's legs to hold them still, grins, and wiggles his whiskers against their thigh."
+        ],
+        [
+          "A fox finishes, yips, and rolls off into the cushions, and his brother's on %n before he's stopped pantin'.",
+          "Feathers stick to every damp inch of %n, and the foxes pick them off one at a time, slowly, gigglin'.",
+          "Somebody counts knots out loud, loses count, and starts again, and the others boo him.",
+          "%n's so full of fox they can hear it when they giggle, and the brothers can hear it too, and that sets them all off."
+        ]
+      );
+      S("foxden", "silver", "beats", 0, [
+        "A little silver bell rings somewhere at the edge of the wood, and there's a lantern hangin' on a branch over a round green door in the hill, and the door's open, just for %n.",
+        `%n finds a single red rose on their pillow with a card tied to it: "Supper at eight. Do wear something you won't mind losing. S."`,
+        "A very polite cough comes from the hedge, and a silver-furred fox-man steps out, tips a hat older than the farm, and offers %n his arm.",
+        "There's a path of candles in jam jars leadin' off the lane into the wood, and at the end of it a door in the hillside with a brass knocker shaped like a fox.",
+        `"You'll catch your death out here," says a warm voice behind %n, and a velvet coat settles round their shoulders, smellin' of woodsmoke and cologne.`,
+        "The silver fox is leanin' on the stile at dusk with two glasses and a bottle, like he knew exactly when %n would come by. Of course he did."
+      ]);
+      S("foxden", "silver", "beats", 1, [
+        "His den's a burrow of wonders: shelves of old books, a clock that chimes like birdsong, a fire that never smokes, and a rug so deep %n's feet disappear in it.",
+        "He feeds %n little things from silver plates, cheese and figs and honey on bread, with his own clever fingers, and watches their mouth every time.",
+        "He compliments %n's eyes, their hands, their laugh, their taste in wine, and somehow every compliment lands a little lower than the last.",
+        "He sits beside %n on the settee, close, his silver tail across both their laps like a blanket, and tells them a story about a fox and a farmer that's very rude by the end.",
+        "He takes %n's hand to look at their palm and tells their fortune, and the fortune's mostly about tonight, and in very specific detail.",
+        "He dances with %n in front of the fire to a gramophone record that crackles, slow, his paw low on their back and gettin' lower."
+      ]);
+      S("foxden", "silver", "beats", 2, [
+        "He undresses %n one piece at a time, foldin' each one neatly over the back of a chair, and kisses each bit of skin as he uncovers it.",
+        'He lays %n back on the rug, kneels between their knees, takes off his spectacles very deliberately, and says, "Now then."',
+        "His smokin' jacket comes off, then his waistcoat, then everythin' else, and under it all he's silver and lean and very %c and very ready.",
+        `"Turn over for me, would you," he murmurs, like he's askin' them to pass the salt, and %n does, and he purrs like a fox shouldn't be able to.`,
+        "He licks %n slow and thorough from the back of their knee upward, like a gentleman with a fine wine, until they're shakin' on the rug.",
+        "He pours a little wine into the small of %n's back and drinks it from there, slow, and then his %c cock's restin' hot where the wine was."
+      ]);
+      S("foxden", "silver", "in", 0, [
+        "{v}He slides into %n's pussy like he's comin' home, slow and sure, and keeps up a soft stream of compliments the whole way in.",
+        "{nv}He eases into %n's ass with endless patience and a little warm oil from a bottle on the mantel, and asks very politely if they're comfortable.",
+        "He makes love to %n's %h like it's an art he's spent his whole life perfectin', and it shows in every slow deep roll of his hips.",
+        "He fucks %n's %h by the firelight in long, savourin' strokes, stops now and then for a sip of wine, and starts again just as they're about to beg.",
+        "He takes %n's %h slow, then slower, then so slow they're grindin' back on him and pleadin', and only then does he give them what they want.",
+        "He brings %n to the edge three times and lets them back down, murmurin' apologies he doesn't mean, before he finally lets them cum on him."
+      ]);
+      S("foxden", "silver", "in", 1, [
+        "His knot swells slow and certain and ties them on the rug, and he keeps %n there, strokin' their hair and pourin' into them, while the clock chimes the hour.",
+        "Tied, he reads %n a chapter of somethin' scandalous, doin' all the voices, and every time they laugh he rolls his hips and fills them again.",
+        "He cums deep in %n's %h with a long, contented sigh, like a man pullin' his boots off after a long day, and the knot holds them warm together.",
+        "He keeps %n knotted till the fire's down to embers, fillin' them slow and steady, and feeds them grapes between pulses.",
+        "Twice, three times, the silver fox knots %n before midnight, each one slower and deeper than the last, and thanks them very sincerely each time.",
+        'He fills %n so thoroughly their belly rounds out under his paw, and he strokes it and says, "Marvellous," and means it.'
+      ]);
+      S("foxden", "silver", "over", 0, [
+        "He settles for %n's thighs with perfect grace, rocks slow between them by the fire, and finishes across the small of their back with a satisfied sigh.",
+        "He has %n take him in hand, guidin' their fingers with his own, and spills over their chest in the firelight, murmurin' his thanks.",
+        "He ruts the cleft of %n's ass with long, slow, unhurried strokes, paints their back, and then cleans them with a warm cloth and kisses each shoulder.",
+        `"Never you mind," he says, and makes perfectly lovely use of %n's thighs instead, and finishes on the rug, and doesn't mind the stain at all.`,
+        "He kneels over %n by the fire and strokes himself slow, watchin' them, and finishes over their belly in long ropes, sayin' their name.",
+        "He grinds against %n slow as a waltz and finishes over their back and thighs, and then pours them a fresh glass as if nothin' happened.",
+        "Ever so polite, he spends himself between %n's thighs, then across their back, then apologises for the mess and doesn't clean it up."
+      ]);
+      studSceneMore(
+        "foxden",
+        "silver",
+        [
+          "He feeds %n a strawberry dipped in cream, then kisses the cream off their lip, then off their chin, then lower.",
+          "The gramophone runs down and starts hissin', and neither of them gets up to change the record.",
+          "He traces a line of wine down %n's spine with one claw and follows it with his tongue.",
+          `"You've no idea," he murmurs, "how long I've wanted to do this," and then shows them exactly how long.`
+        ],
+        [
+          "He stops to take off his spectacles, fold them, and set them very carefully on the mantel, and then he doesn't stop again.",
+          "%n's fingers dig into the deep rug, and the silver fox praises them for it, in detail.",
+          "The fire's down to embers and the fox is still goin', slow and steady, like a clock that's never once stopped.",
+          "He whispers somethin' in %n's ear in French, or somethin' like French, and whatever it meant, it works."
+        ]
+      );
+      S("foxden", "raid", "beats", 0, [
+        "The hen house goes mad at midnight, squawkin' and flappin' and a lantern swingin' and a lot of gigglin' foxes. %n runs to see, and runs right into a sack.",
+        "%n's lockin' up the hens for the night when the latch lifts on its own, and four pairs of eyes glint in the dark behind the nestin' boxes.",
+        "A trail of spilled corn leads out of the hen house, and %n follows it round the back, and a sack comes down over them from the roof.",
+        "There's a fox-man in the hen house with an egg in each paw and one in his mouth, and he stops dead when he sees %n, and grins round the egg.",
+        `%n hears the hens raise the alarm and the whisper of a sack bein' opened, and "that one, that one, the big one," and the big one turns out to be them.`,
+        'The fox brothers come over the fence in a line, sacks over their shoulders, and stop at the sight of %n. "Ooh," says the first one. "Change of plan."'
+      ]);
+      S("foxden", "raid", "beats", 1, [
+        "They sling %n over a shoulder, sack and all, and run off across the moonlit fields, the others carryin' a hen each under their arms just for show.",
+        "%n bounces along in the sack across the ploughed field, hearin' the brothers pant and giggle and argue about who gets the first go.",
+        "They tie the sack with a fancy ribbon, like a present, and pass it hand to hand over a stile and under a hedge and down into the dark.",
+        'One fox sits on %n while the others tie them up in the sack, and somebody shouts "the farmer!" and they all bolt with %n slung between them.',
+        `They haul %n through a gap in the hedge, sack scrapin', whisperin' "quiet, quiet," and laughin' far too loud to be quiet at all.`,
+        "%n's carried off like stolen goods, bumped and jostled and gigglin' in spite of everythin', across two fields and down a hole in the bank."
+      ]);
+      S("foxden", "raid", "beats", 2, [
+        "The den's piled high with loot, eggs, a ham, somebody's washin' off the line, and now %n, tipped out of the sack onto the stolen quilts.",
+        "They untie the sack from the bottom up, slowly, like unwrappin' a present, and cheer at every inch of %n that appears.",
+        `"Best thing we've ever nicked," says one fox, and the others nod very solemnly, and then all four pounce.`,
+        "They draw straws for %n with stalks of hay, and the winner whoops and kneels between their legs with his %c cock already out.",
+        "They pull the sack off over %n's head and leave it bunched round their waist, so their ass is bare and their arms are stuck, and step back to admire it.",
+        "The brothers sniff %n all over, checkin' their loot, and decide it's very fresh and very good and wants enjoyin' right away."
+      ]);
+      S("foxden", "raid", "in", 0, [
+        "{v}The first thief takes %n's pussy fast and greedy, like the farmer might burst in any second, and knots them before his brothers can complain.",
+        "{nv}The first fox takes %n's ass quick and slick and gigglin', ruttin' like a burglar on a deadline, and ties them with a yip.",
+        "They take %n's %h one after another, quick and thievin', each one keepin' watch at the den door till it's his turn.",
+        "They share their prize fair and square, one knot each in %n's %h, and the ones waitin' feed %n stolen cream off their fingers.",
+        "Each fox takes %n's %h like it's the best thing he's ever pinched, quick and hungry, and leaves a knot behind to prove he was there.",
+        `Somebody shouts "farmer!" for a joke while a brother's knotted in %n's %h, and he panics and pumps them full on the spot, and they all fall about laughin'.`
+      ]);
+      S("foxden", "raid", "in", 1, [
+        "Four foxes, four knots, and %n's belly's as round as a sack of stolen apples, and the brothers pat it proudly.",
+        "They keep %n tied in the den all night, passin' them round like the best of the loot, fillin' them each time and countin' their haul.",
+        "Every time a knot slips, another fox is there to plug %n back up, because thieves don't waste anythin' they've stolen.",
+        "By the last brother %n's full of fox and covered in feathers and straw, and the brothers say they've never had a better raid.",
+        "They fill %n till they slosh, then stand round countin' knots on their paws and arguin' whose turn's next, and whoever's next doesn't wait.",
+        "The brothers fill their prize so full %n can barely move, then curl up round them like a heap of foxes guardin' their treasure."
+      ]);
+      S("foxden", "raid", "over", 0, [
+        "The thieves rut %n's thighs one after another, quick and gigglin', each one leavin' a sticky mark like a signature on stolen goods.",
+        "They hold %n in the sack and take turns finishin' over their bare back, then argue about who made the biggest mess.",
+        `Four brothers, four quick loads across %n's back and belly, and every one of them yips "mine!" as he does it.`,
+        "They rut against %n's backside in the den, never in, and leave them glazed and feathered and smellin' of fox.",
+        "One fox ruts %n's fist while another holds the sack open, and when he finishes they all cheer like they've won at the county fair.",
+        "They paint %n from neck to knees and roll them in the den's straw and feathers, laughin', till %n looks like a raided hen house.",
+        "They mark their loot thoroughly, one after another, and then tie a ribbon round %n's ankle like a price tag."
+      ]);
+      S("foxden", "guess", "beats", 0, [
+        `"Fancy a game?" says a fox at %n's elbow, and before they can answer there's silk over their eyes and somebody's knottin' it at the back.`,
+        `%n's walkin' past the den when four foxes pop out together, all holdin' the same blindfold, all sayin' "guessin' game!" at once.`,
+        `A silk scarf drops over %n's eyes from behind, a voice says, "No peekin'," and four voices giggle.`,
+        "The fox brothers challenge %n to a game, winner takes all, and %n's already blindfolded before they find out what the game is.",
+        `"We've got a new one," whisper the brothers, crowdin' round %n in the den and holdin' up a velvet blindfold. "You'll be ever so good at it."`,
+        "There's a sign on the den door: GUESSIN' GAME TONIGHT, ALL WELCOME. Underneath, smaller: ESPECIALLY %n."
+      ]);
+      S("foxden", "guess", "beats", 1, [
+        "Blind, %n can only feel: a paw on their ankle, a nose at their neck, a tail brushin' their belly, and they can't tell which fox is which.",
+        "They lay %n down blindfolded on the den cushions, and somebody puts a ribbon in their hand to hold, and somebody else takes it away again.",
+        "%n hears them shufflin' round, swappin' places, gigglin' and shushin' each other, and somebody's very obviously countin' to three.",
+        "The brothers take turns kissin' %n blindfolded and ask after each one who it was, and %n's wrong every single time.",
+        "They spin %n round and round till the den's spinnin' too, then lie them down and go so quiet %n can hear their own heart.",
+        "They make all their voices the same, all whisperin' the same words in the same soft accent, so %n can't tell a thing."
+      ]);
+      S("foxden", "guess", "beats", 2, [
+        `A paw slides up %n's thigh. "Who's this, then?" %n guesses. "Wrong!" says a different voice, and the paw slides higher.`,
+        `Somebody kneels between %n's legs and somebody else holds their wrists, and four voices together say, "Guess."`,
+        "They let %n feel a %c cock with their hand and guess whose it is, and they're wrong, and the brothers cheer like it's the cup final.",
+        "A tongue, then a feather, then a paw, then the tip of a %c cock, and %n's supposed to say which fox each one belongs to.",
+        `"Clue," says somebody, and tickles %n's ribs. "That's not a clue," says another one, and tickles them too.`,
+        "They roll %n onto their belly in the cushions and somebody lifts their hips, and the den goes very quiet and very eager."
+      ]);
+      S("foxden", "guess", "in", 0, [
+        "{v}A fox slides into %n's pussy and ruts quick and greedy, and makes them guess who it is before he'll knot, and they guess wrong, and he knots them anyway.",
+        "{nv}Somebody takes %n's ass, slow at first then fast, and won't say a word the whole time in case they know his voice.",
+        "One of the brothers takes %n's %h, and they guess, and they're wrong, and the forfeit is he keeps goin'.",
+        `A fox knots %n's %h and holds still. "Well?" %n guesses. Wrong. Another fox takes his place the second he's free.`,
+        "They take %n's %h in an order %n can't follow, swappin' in and out so fast it might be one fox or all of them.",
+        "Every fox that takes %n's %h does it a little differently, just to be confusin', and then they all do it the same, which is worse."
+      ]);
+      S("foxden", "guess", "in", 1, [
+        "Round after round, knot after knot, %n guesses wrong every time, and the brothers fill them every time, and the den's full of gigglin'.",
+        `%n finally guesses right, they're sure of it, and the fox inside them says "nope" in somebody else's voice and floods them.`,
+        "They play best of five, then best of seven, then best of eleven, and %n's belly's round with fox long before anybody's won.",
+        "Tied and blind and full, %n hears them arguin' over whose turn it is, and realises they've been keepin' score in charcoal on %n's thighs.",
+        "By the end %n couldn't name a fox if their life depended on it, and they're so full of them it doesn't matter.",
+        "The brothers declare the game a draw, which means everybody has another go, and %n gets knotted and filled all over again."
+      ]);
+      S("foxden", "guess", "over", 0, [
+        "Every wrong guess, a fox ruts %n's thighs and finishes across them, and the guesses keep comin' wronger and wronger.",
+        "They make %n hold a fox in each hand and guess which is which, and both of them finish over %n's chest while they're thinkin' about it.",
+        "%n guesses wrong, and a hot load lands across their back. Wrong again, and another. They stop tryin' to get it right.",
+        "Blindfolded, %n feels each fox finish over them in turn, back, belly, thighs, and has to guess from the aim. They can't.",
+        "The forfeit for every wrong guess is a load across %n's belly, and they lose so often the brothers run out before %n does.",
+        "They rut against %n blind, from every side, and finish together, and ask %n to guess how many. %n guesses three. It was four.",
+        "%n loses every round, and every round leaves them stickier, and by the end the blindfold's the only clean thing on them."
+      ]);
+    }
+    {
+      const S = (kind, form, part, i, l) => {
+        const T = form ? STUD_FORMS[kind] && STUD_FORMS[kind][form] && STUD_FORMS[kind][form].lines : ANTHRO_LINES[kind];
+        const pool = T && (Array.isArray(T[part] && T[part][0]) ? T[part][i] : T[part]);
+        poolMore(kind, (form || "usual") + " " + part + " " + i, pool, l);
+      };
+      S("lionpride", null, "beats", 0, [
+        "The afternoon's so hot the air shimmers over the big flat rocks, and somethin' golden's sprawled across the top of them, and somethin' else golden's slinkin' down toward %n.",
+        "%n hears a purr as loud as a threshin' machine comin' from the rocks past the orchard, and goes to look, because of course they do.",
+        "A lion-woman drops off a ledge right in front of %n, lands soft as a cat, and looks them up and down with very interested golden eyes.",
+        "There are paw prints in the dust round the water trough, big ones, and a tuft of tawny fur caught on the fence, and a lazy roar from somewhere up on the rocks.",
+        "The lionesses are stalkin' somethin' through the long grass by the orchard, low and silent, tails twitchin', and %n realises a moment too late that it's them.",
+        "%n stops to rest on a warm rock in the sun, and when they look round there are four lion-women lyin' on the next rock along, watchin'."
+      ]);
+      S("lionpride", null, "beats", 1, [
+        "Three lionesses fall in round %n, one each side and one behind, and walk them up the rocks with their shoulders, pushin' gently, never lettin' them turn back.",
+        "The lion's sprawled across the top rock like he owns the whole farm, which in his head he does, golden mane spread in the sun, and he opens one eye at %n.",
+        "The lionesses nudge %n up onto the hot flat rock and set them down in front of the lion the way they'd lay down a prize, and sit back, proud.",
+        "He's huge and gold and lazy, mane as thick as a haystack, and when he stretches every muscle in him rolls under the fur, and %n forgets how to breathe.",
+        "The lion lifts his great head off his paws and sniffs the air toward %n, and his lip curls back off his teeth in that grin big cats get when somethin' smells very interestin'.",
+        "The lionesses groom %n on the way up, rough tongues on their neck and arms, gettin' the dust off them, makin' them nice for the king."
+      ]);
+      S("lionpride", null, "beats", 2, [
+        "He rolls to his feet, slow, and pads round behind %n, and the lionesses press them flat on the warm rock and hold their hips up for him.",
+        "He crouches over %n like a cat over a mouse, huge and golden, and his %c cock, ridged with soft barbs, drags along their thigh.",
+        "Two lionesses lie across %n's shoulders to pin them, purrin', while the lion noses their hips up and gets himself settled.",
+        "He licks %n once from the back of their knee to their neck with a tongue like a rasp, and %n squeals, and he grins.",
+        "He drapes himself over %n's back, mane fallin' round their face like a curtain, and they're lost in hot gold fur that smells of sun and dust.",
+        "He growls a short, bored order, and the lionesses spread %n's knees on the stone for him and step back, and his %c cock's already out and twitchin'."
+      ]);
+      S("lionpride", null, "in", 0, [
+        "{v}He slides into %n's pussy quick and deep, and every time he pulls back the soft barbs drag at them, and they gasp, and he does it again faster.",
+        "{nv}He drives into %n's ass in short hard thrusts, barbs rakin' every pull, his teeth in the scruff of their neck to hold them still.",
+        "He ruts %n's %h the way lions do, fast and hard and over quick, with a snarl and a bite on the back of the neck that keeps them pinned.",
+        "His hips snap against %n's %h fast as a heartbeat, and every pull back drags those barbs till %n's yowlin' along with him.",
+        "He takes %n's %h in quick fierce bursts, pausin' to growl, then goin' again, and the lionesses purr louder every time %n cries out.",
+        "He mates %n's %h like a king, fierce and short and certain, and finishes with a roar that sends the birds up out of the orchard."
+      ]);
+      S("lionpride", null, "in", 1, [
+        "He cums with a roar and a hot gush, then flops down beside %n in the sun, and twenty minutes later he's up and mountin' them again.",
+        "He mounts %n again and again all afternoon, short and fierce every time, and every time he finishes he roars and the lionesses roar back.",
+        "Between rounds the lionesses lick %n clean, slow and thorough, and the lion watches with half-shut eyes till he's ready again.",
+        "By the fourth time %n's belly's warm and round and they're limp on the hot stone, and the lion's still not done.",
+        "He fills %n quick and hot and lies on them after, heavy as a sack of grain, purrin' so deep it rattles their bones.",
+        "Lions do it often, it turns out, and this one's no different: every half hour he's up, he's on %n, he's roarin', and they're fuller."
+      ]);
+      S("lionpride", null, "over", 0, [
+        "He ruts %n's squeezed thighs, short and fierce, then roars and soaks the rock and their back, and flops down to doze.",
+        "He grinds his barbed cock along %n's backside till he roars, and paints them from neck to knees in the hot sun.",
+        "He has the lionesses hold %n still and ruts against their back, quick and hard, and finishes across them with a snarl.",
+        "Every half hour he's back, ruttin' %n's thighs, and every time he leaves them stickier, and the lionesses lick them clean between.",
+        "He mounts %n and can't get in and doesn't care, just ruts between their legs and roars and floods the stone under them.",
+        "He drags his cock along %n's spine and finishes over their shoulders, then licks the back of their neck where his teeth were.",
+        "He ruts across %n's belly with them pinned on their back, quick and fierce, and finishes up their chest with a roar that rattles the rocks."
+      ]);
+      trapSceneMore(
+        "lionpride",
+        [
+          "A lioness rubs her cheek along %n's, markin' them, and another does the same on the other side, and now %n smells like the pride.",
+          "The lion lies with his chin on his paws and watches the lionesses get %n ready, tail flickin', in no hurry at all.",
+          "Sun on %n's back, hot rock under their belly, rough tongues everywhere, and the low purr of the whole pride round them like a hive.",
+          "{v}A lioness licks between %n's thighs with a tongue like a rasp, and %n jerks against the paws holdin' them."
+        ],
+        [
+          "The lion snarls through every short fierce round and purrs through every rest, and %n learns to tell which is comin'.",
+          "Scratches on %n's shoulders, a bite on their neck, the rock hot under them, and the lion already eyein' them for the next go.",
+          "A lioness brings %n a mouthful of water in her cupped hands between rounds, and the lion growls at her to hurry up.",
+          "The lion roars at the sky every time he finishes, and down on the farm the cows stop chewin' to listen."
+        ]
+      );
+      S("lionpride", "rival", "beats", 0, [
+        "Two roars go up from the rocks at once, and they're not answerin' each other, they're arguin', and %n walks round the orchard right into the middle of it.",
+        "A lean, scarred lion-man with a tattered mane comes up out of the long grass toward the rocks, and the pride's lion stands to meet him, and both of them stop to look at %n.",
+        "The lionesses are all sat up on the rocks like a crowd at the fair, ears pricked, and down below two lions are circlin' each other, and %n's wandered in between.",
+        "There's fur on the ground by the orchard wall and the scrub's flattened in a big circle, and in the middle of it two lion-men pantin' and glarin', and a lioness waves %n over.",
+        `%n's sittin' on the warm rocks when a stranger lion pads up, all ribs and scars and swagger, and says, "Whose is this one?" and the pride's lion says, "Mine," and that's how it starts.`,
+        "The nomad's come to take the pride, the lionesses say, and the pride's lion's come to stop him, and the winner gets the rock and the shade and, they add, lookin' at %n, the guest."
+      ]);
+      S("lionpride", "rival", "beats", 1, [
+        "They go at each other in a storm of claws and mane and dust, and the lionesses hold %n back by the arms and whisper bets about who'll win.",
+        "The fight rolls right past %n, so close they feel the wind of a swipe, and when it stops both lions are lookin' at them, chests heavin'.",
+        "They circle and roar and swipe and circle, and neither will give, and in the end they both sit down hard in the dust and look at %n like it's %n's fault.",
+        "The nomad gets the pride's lion pinned for a second, the pride's lion throws him off, and they both stand there bleedin' a little and grinnin' a little.",
+        "The lionesses get bored of the fight and drag %n up between the two of them, as if to say: look, there's plenty, sort it out.",
+        "It's all roars and dust and flyin' fur till the nomad catches %n's scent on the wind and stops dead, and the pride's lion smells it too."
+      ]);
+      S("lionpride", "rival", "beats", 2, [
+        `"First go," growls the pride's lion. "Fine," growls the nomad. "Second's mine. And third." And the lionesses lay %n on the rock between them.`,
+        "The two of them kneel either side of %n, tails lashin', each with a %c barbed cock and somethin' to prove.",
+        "The nomad grabs %n's ankle and the pride's lion grabs their wrist and they glare at each other across them like two cats with one cushion.",
+        "The lionesses settle it with a coin toss, an actual coin, and the pride's lion grins and lifts %n's hips while the nomad paces and growls.",
+        "They pin %n between them on the warm stone, a mane on either side, and %n's never been so wanted, or so outnumbered.",
+        `"Watch and learn," says the pride's lion, mountin' %n, and the nomad snorts and says, "I'll show you how it's done after."`
+      ]);
+      S("lionpride", "rival", "in", 0, [
+        "{v}The pride's lion takes %n's pussy first, quick and barbed and showin' off, and the nomad watches with his arms folded and his tail lashin'.",
+        "{nv}The nomad takes %n's ass first, fierce and lean, rakin' every pull back, and the pride's lion paces round them both, growlin'.",
+        "They take %n's %h in turns, each one tryin' to make %n louder than the last, and %n's soon very loud indeed.",
+        "One lion fucks %n's %h while the other holds their face and growls in their ear about how much better he'll be, and then they swap and the other one says it.",
+        "The nomad ruts %n's %h like a starvin' thing, quick and hungry and barbed, and the pride's lion can't stand it and shoves him off to take his turn.",
+        "They take %n's %h one after the other, each round shorter and fiercer than the last, and both roar at the end like they've won."
+      ]);
+      S("lionpride", "rival", "in", 1, [
+        "They fill %n in turns, each tryin' to fill them more, and %n's belly swells between the two of them like a contest they're both winnin'.",
+        "Somewhere in the third round the growlin' turns to purrin', and the two lions are lyin' either side of %n, nuzzlin' them, nuzzlin' each other.",
+        "The nomad roars, the pride's lion roars louder, and %n gets bred by both of them over and over till neither can be bothered to roar any more.",
+        "One floods %n, then the other, then the first again, and the lionesses lick %n clean between and keep score on the rock in chalk.",
+        "By sundown they've both had %n four times and they're tangled together with %n in the middle, purrin', the fight long forgotten.",
+        "They share %n so thoroughly that by the end the nomad's lickin' the pride's lion's ear and the lionesses are rollin' their eyes."
+      ]);
+      S("lionpride", "rival", "over", 0, [
+        "The two lions rut %n's thighs in turns, roarin' at each other over their head, and leave them soaked from both sides.",
+        "One finishes across %n's back, the other across their belly, and then they argue about who made more.",
+        "They take turns grindin' along %n's spine, each one quicker and fiercer than the last, and soak them through in the sun.",
+        "The nomad ruts %n's fist while the pride's lion ruts their thighs, and they finish at the same moment and glare at each other.",
+        "The rivals take it in turns to rut over %n, each one roarin' louder, till %n's drippin' and the whole farm's heard them.",
+        "Pinned between them on the warm rock, %n gets painted by both lions over and over, and by the end they're too tired to fight.",
+        "They finish on %n together, one either side, and then lie down in the sun and start growlin' about a rematch."
+      ]);
+      S("lionpride", "lazy", "beats", 0, [
+        "The pride's lion has found the one patch of shade on the rocks and he's not movin' out of it for anybody, and the lionesses are wavin' %n over to it.",
+        "A tremendous snore comes off the top of the rocks, loud as a tractor, and a lioness rolls her eyes at %n and beckons them up.",
+        "The lazy king's lyin' on his back in the sun with one leg propped against a rock, belly to the sky, and he hasn't moved since breakfast.",
+        "%n finds the pride's lion asleep right across the path with his tail twitchin', and there's no way round him, and one of his eyes has just opened.",
+        `"He's in one of his moods," sighs a lioness, and points %n at the huge golden lion sprawled on the rocks, snorin', paws in the air.`,
+        "The lion-king's yawnin' in the sun when %n comes by, a yawn so wide it shows every tooth, and he pats the rock beside him without openin' his eyes."
+      ]);
+      S("lionpride", "lazy", "beats", 1, [
+        "The lionesses boost %n up onto his belly like they're helpin' them onto a horse, and he purrs under them without wakin'.",
+        'He opens one golden eye, looks at %n sat on him, says "Mm," and closes it again. That seems to mean yes.',
+        "He's warm as a hearthstone and soft as a feather bed, and %n sinks into his belly fur, and he rumbles happily without movin' a muscle.",
+        "He stretches out a paw, slow as treacle, and hooks %n closer by the hip, and that's all the effort he's makin' today.",
+        `"Wake me when it's good," he mumbles, and settles his head on a rock, and a lioness hands %n a leaf to fan him with.`,
+        "The lionesses arrange %n on top of him the way they want them, knees either side, and step back to admire it, and he snores through all of it."
+      ]);
+      S("lionpride", "lazy", "beats", 2, [
+        "His %c cock's stirrin' in the sun even while he snores, barbed and golden at the base, and the lionesses look at %n like, well, go on then.",
+        `"Up a bit," he mumbles. "Down a bit. There." He hasn't opened his eyes once.`,
+        '%n has to line him up themselves, both hands, while he purrs and dozes and says "good, good" to nobody in particular.',
+        "He lies back with his paws behind his head like a man in a hammock and lets his %c cock do the askin'.",
+        "A lioness holds him steady for %n, very matter-of-fact about it, like she's done this a hundred times, and she probably has.",
+        "He gives one lazy push upward to show willin', then flops back, worn out by the effort, and leaves the rest to %n."
+      ]);
+      S("lionpride", "lazy", "in", 0, [
+        "{v}%n sinks their pussy down on him slow in the hot sun, barbs prickin' as they lift, and he purrs without openin' his eyes.",
+        `{nv}%n eases their ass down onto the lazy king an inch at a time, and he sighs "oh, that's nice" and goes back to snorin'.`,
+        `%n rides the lazy king's %c cock till their thighs burn, rockin' their %h down on him, and every so often he rumbles "faster" in his sleep.`,
+        "%n bounces on him in the sun, sweatin', and the barbs catch every lift, and the lazy king just lies there purrin' like a well-fed cat.",
+        "When %n slows down he grabs their hips in both paws and bounces them on his cock three times, hard, then lets go and dozes off again.",
+        "%n grinds their %h on the lazy king in slow circles, and he purrs louder, and louder, and then starts snorin' right in the middle of it."
+      ]);
+      S("lionpride", "lazy", "in", 1, [
+        `He cums without warnin', a lazy hot flood up into %n, says "mm, good," and is snorin' again before they've stopped shakin'.`,
+        "All afternoon %n rides him, and every so often he fills them without even wakin' up, and their belly gets rounder and rounder.",
+        "The lionesses take turns fannin' %n and bringin' them water, and the lazy king cums in them every hour or so, regular as a clock.",
+        "He floods %n, yawns, scratches his belly, nearly knocks them off, and goes back to sleep still hard inside them.",
+        "By sunset %n's ridden the lazy king six times and he's filled them every one, and he still hasn't sat up.",
+        "He wakes once, properly, holds %n down on him with both paws and pumps them full, roarin' like a proper king, and then he's asleep again."
+      ]);
+      S("lionpride", "lazy", "over", 0, [
+        "%n grinds on the lazy king's belly in the sun, and he cums up across their chest without openin' his eyes, and purrs.",
+        '%n strokes him with both hands while he dozes, and he spills hot over their fingers and his own belly and says "thank you" in his sleep.',
+        "%n rubs against him all afternoon, and every so often he cums lazy and warm across their belly and goes back to snorin'.",
+        "He makes %n do all the work with their thighs squeezed tight round him, and floods them without movin' a whisker.",
+        "%n grinds slow on the lazy king's cock without takin' him in, and he cums so hard he wakes himself up, looks surprised, and nods off again.",
+        "The lazy king lets %n rut against him in the shade, purrin', and finishes across their chest, then pulls them down for a nap on his belly.",
+        "%n works him with their hands and thighs till their arms ache, and he finishes all over the both of them and calls it a good day's work."
+      ]);
+      studSceneMore(
+        "lionpride",
+        "lazy",
+        [
+          "A fly lands on the lazy king's nose and he twitches it off without wakin', and his cock twitches inside %n at the same time.",
+          "The lionesses have brought out a bowl of figs and are eatin' them while they watch, like it's a play.",
+          "%n's sweatin' in the sun on top of him, and he's purrin' so loud it hums up through their whole body.",
+          "He scratches his ear with one paw, slow, and somehow makes it look like hard work."
+        ],
+        [
+          "He snores right in the middle of cummin', which %n didn't know was possible.",
+          "A lioness pours a little water over %n's head to cool them, and the lazy king complains that it dripped on him.",
+          `%n's legs are wobblin', and the lazy king opens one eye just to say, "Don't you dare stop."`,
+          "The sun moves round, the shade moves with it, and the lazy king rolls over into it, takin' %n with him, without wakin' up."
+        ]
+      );
+      S("lionpride", "blackmane", "beats", 0, [
+        "Every bird in the orchard goes up at once, the lionesses on the rocks drop flat, and over the top of the hill comes a lion-man with a mane as black as pitch.",
+        "%n feels the roar before they hear it, in their chest, in the ground, and when they look up the black-maned king is standin' on the rocks lookin' straight at them.",
+        "The pride's gone very quiet on the rocks, all of them lyin' low with their ears flat, and %n wanders up to see why, and finds out.",
+        "A shadow longer than a cart passes over %n on the path, and they look up at a black mane against the sun and two gold eyes lookin' down.",
+        "There are paw prints in the dust as big as dinner plates, comin' over the hill from somewhere a long way off, and at the end of them, waitin' on the rocks, the black-maned king.",
+        `%n's climbin' the rocks to sit in the sun when a lioness grabs their arm and hisses, "Don't. He's back," and then it's too late, because he's seen them.`
+      ]);
+      S("lionpride", "blackmane", "beats", 1, [
+        "He's twice the size of the pride's lion, black mane fallin' to his waist, and he stands over %n so the sun's behind him and all they can see is his shape.",
+        "He sniffs %n from their hair to their feet, slow, and then lifts his head and roars so the whole valley knows what he's found.",
+        "The lionesses whisper that he only comes every few years, and the last one he chose still talks about it, and %n's knees go weak.",
+        "He walks round %n once, the black mane brushin' them, and every lioness on the rock rolls over for him, but he only looks at %n.",
+        "He takes %n's chin in a paw big enough to cover their whole face and tips it up, and his gold eyes look straight into them, and he growls once, soft.",
+        "Up close he smells of far-off hills and hot stone and somethin' wild that makes %n dizzy, and his black mane's as warm as a fleece."
+      ]);
+      S("lionpride", "blackmane", "beats", 2, [
+        "He puts %n down on the highest rock with the whole valley spread out below and the whole pride watchin', and kneels behind them like he's claimin' a throne.",
+        "His %c barbed cock is as black as his mane and twice as impressive, and he drags it slow along %n's thigh so they can feel every soft barb.",
+        "He drapes the black mane over %n's back like a cloak and growls in their ear, and the lionesses pin %n's arms flat to the warm stone.",
+        "He bites the scruff of %n's neck and lifts them up into position with his jaws alone, and holds them there.",
+        '"Mine," he rumbles, the only word he says all day, and presses %n down with a paw that covers their whole back.',
+        "The lionesses spread %n's knees on the stone for him without bein' asked, and the black-maned king rumbles approval and settles over them."
+      ]);
+      S("lionpride", "blackmane", "in", 0, [
+        "{v}He drives into %n's pussy with a roar that echoes off the hills, and the barbs rake every pull back, and %n cries out into the hot stone.",
+        "{nv}He forces into %n's ass, huge and black and barbed, his teeth in the back of their neck, and ruts them so hard the pride flinches.",
+        "He takes %n's %h like the king he is, fierce and deep and roarin', and every stroke drags those barbs till %n's sobbin' with it.",
+        "He mounts %n on top of the rock where the whole valley can see and fucks their %h hard enough to scrape their knees on the stone.",
+        "He ruts %n's %h in deep brutal strokes, mane fallin' round them both like a black tent, and growls so low it shakes through their spine.",
+        "The black-maned king takes %n's %h fast and fierce and takes his time between, and every round he roars at the sky to say whose they are now."
+      ]);
+      S("lionpride", "blackmane", "in", 1, [
+        "He floods %n with a roar, hot and heavy, holdin' them down by the neck, and stays buried in them till the last pulse is spent.",
+        "He breeds %n three times before the sun's halfway down, every time fiercer, every time a roar, and the lionesses lick %n clean between.",
+        "Every time he cums in %n the lionesses roar with him, the whole pride at once, and the sound rolls out over the farm like thunder.",
+        "He fills %n so full their belly rounds out under them on the warm stone, and he licks the back of their neck where his teeth have been.",
+        "He lies over %n between rounds like a great black blanket, heavy and hot and purrin', and when he's ready again he doesn't ask.",
+        "By the end %n's so full of the black-maned king they can feel him slosh, and he's still not finished, and he roars to say so."
+      ]);
+      S("lionpride", "blackmane", "over", 0, [
+        "He ruts %n's thighs on top of the rock, black mane fallin' round them, and roars as he floods their back.",
+        "He grinds his barbed cock along %n's spine and finishes over their shoulders and hair, roarin', and the valley echoes it back.",
+        "He has the lionesses hold %n still and ruts against their back till he paints them from neck to knees in the sun.",
+        "He rolls %n onto their back on the warm rock and ruts across their belly, and when he roars and finishes it reaches their chin.",
+        "He takes %n's thighs three times, a roar every time, and leaves them so soaked the rock under them's slick.",
+        "He ruts against %n's backside so hard their knees scrape the stone, and soaks them through, and bites their neck as he does it.",
+        "The black-maned king marks %n from shoulders to thighs, slow and thorough and roarin', so no lion on the hills will mistake whose they are."
+      ]);
+    }
+    {
+      const S = (kind, form, part, i, l) => {
+        const T = form ? STUD_FORMS[kind] && STUD_FORMS[kind][form] && STUD_FORMS[kind][form].lines : ANTHRO_LINES[kind];
+        const pool = T && (Array.isArray(T[part] && T[part][0]) ? T[part][i] : T[part]);
+        poolMore(kind, (form || "usual") + " " + part + " " + i, pool, l);
+      };
+      S("ramstud", null, "beats", 0, [
+        "%n's takin' a shortcut through the sheep paddock when the gate clangs shut behind them, and somethin' heavy starts stampin' at the far end.",
+        "There's a sign on the paddock gate that says MIND THE RAM, and somebody's crossed out MIND and written ENJOY.",
+        "The sheep scatter across the field like somebody's kicked a dandelion clock, and through the middle of them comes the ram-man, head down, at a trot.",
+        "%n leans on the paddock fence to watch the sheep, and a heavy curled horn hooks the back of their collar from behind, and tugs.",
+        "A deep bleatin' grunt comes from behind the hay feeder, and the ram-man steps out stretchin', and spots %n, and stops stretchin'.",
+        "%n bends to pick up a dropped bucket in the paddock, and across the grass the ram-man's head comes up like he's been waitin' all week for exactly that."
+      ]);
+      S("ramstud", null, "beats", 1, [
+        "He's built like a stone wall with a fleece on, shoulders thick as gateposts, horns curled tight round his ears, and he's walkin' straight at %n.",
+        "He stamps once, twice, then lowers his head and trots at %n, and stops a hair short, and snorts warm breath all over them.",
+        "He sniffs %n over with his lip curled back, then rubs his horns on their shoulder like he's markin' a post.",
+        "He crowds %n back with his chest, step by step, his fleece warm and greasy with lanolin, till the fence rail's at their back.",
+        "His eyes are gold with long sideways pupils, and they don't blink, and they don't leave %n for a second.",
+        "He gives %n a shove with his horns, not hard, just enough to say who's in charge of this paddock, and then another to make sure they heard."
+      ]);
+      S("ramstud", null, "beats", 2, [
+        "He turns %n round and bends them over the top rail, and his %c cock's already out of its sheath and pressin' hot against them.",
+        "One butt to the backs of %n's knees and they're down on all fours in the trampled grass, and he's straddlin' them.",
+        "He hooks his horns under %n's arms and heaves them onto the hay feeder like a sack, and kicks their legs apart.",
+        "He presses %n into the fence with his whole weight, horns clackin' on the posts either side, and grinds his %c cock against them, impatient.",
+        "He shoves %n down over a hay bale and holds them there with a hand on the back of their neck, gruntin', in a hurry.",
+        "He nudges %n's hips up with his knee and lines himself up, quick and businesslike, like he's done this a hundred times this season."
+      ]);
+      S("ramstud", null, "in", 0, [
+        "{v}He drives into %n's pussy in one short hard thrust and goes at them like a ram at a gate, short and fast, bangin' the fence with every one.",
+        "{nv}He forces into %n's ass with a grunt, short and stubborn, and every thrust is a little butt from his hips that knocks them forward.",
+        "He tups %n's %h in quick hard jolts, like he's tryin' to knock them through the fence, and the whole paddock hears it.",
+        "He ruts %n's %h fast and rough, gruntin' with every stroke, his fleece rubbin' their back raw and greasy.",
+        "He takes %n's %h the way a ram goes at a rival, head down, all shove and stubbornness, and they can't do anythin' but hold the rail.",
+        "He hammers %n's %h with short deep strokes, his horns knockin' the post beside their head, and grunts louder every time."
+      ]);
+      S("ramstud", null, "in", 1, [
+        "He finishes with a hard shove and a bleat like a foghorn, deep in %n, and holds there pantin', and then starts again almost at once.",
+        "Rams don't need much rest in the season, and this one needs none at all: he fills %n, shakes himself, and goes again.",
+        "He tups %n three times runnin', fillin' them every time, and only stops because the farmhand bangs a bucket on the gate.",
+        "He floods %n quick and hot, stamps, snorts, and mounts them again before they've got their breath back.",
+        "By the third time %n's belly's warm and full and they're hangin' off the fence like washin', and he's lookin' at them like there's time for a fourth.",
+        "He fills %n so fast and so often their knees give, and he just hoists them back up by the hips and keeps goin'."
+      ]);
+      S("ramstud", null, "over", 0, [
+        "He ruts %n's thighs, short and fast and stubborn, and finishes all over their back with a bleat that sends the sheep runnin'.",
+        "He grinds against %n's backside in hard jolts, rattlin' the fence, and soaks them from the waist down.",
+        "He shoves his cock between %n's squeezed thighs and tups them like that, and empties onto the trampled grass and their knees.",
+        "He ruts against %n's back, fleece rubbin', horns clackin', and finishes up between their shoulders in thick hot spurts.",
+        "He takes %n's thighs three times in a row, never quite in, and leaves them drippin' and smellin' of ram.",
+        "He grunts and ruts across %n's ass and splashes them and the feed trough both, and looks very pleased with himself.",
+        "He has %n hold him while he ruts their fists, and when he finishes he butts them gently in the chest like a thank you."
+      ]);
+      trapSceneMore(
+        "ramstud",
+        [
+          "He hooks a horn round %n's waist and drags them where he wants them, and they go, because there's no arguin' with horns.",
+          "The fleece on his chest is thick and warm and smells of hot wool and hay, and %n's face is pressed right into it.",
+          "He grunts in %n's ear, low and impatient, and stamps a hoof, and the fence shakes.",
+          "The sheep have all gathered at the far fence to watch, chewin', and one of them bleats like she's cheerin'."
+        ],
+        [
+          "He bangs %n against the rail so hard a post comes loose, and he doesn't notice, and neither do they.",
+          "Grease from his fleece is all over %n's back and thighs, shinin' in the sun.",
+          "He finishes, bleats, stamps, butts %n's hip to get them back in position, and goes again.",
+          "Every so often he stops to rub his horns on the post like he's sharpenin' them, and then he's back on %n, harder."
+        ]
+      );
+      S("ramstud", "raddle", "beats", 0, [
+        "The shepherd's leanin' on the tup paddock gate with a little book and a pencil, and the ram-man inside has a fat blue crayon strapped to his chest, and the shepherd looks up at %n and licks the pencil.",
+        "%n finds a blue smear on the paddock gate, then another on the fence post, then the tup himself, harness creakin', blue block on his chest, sniffin' the air their way.",
+        "TUPPIN' WEEK, says the chalkboard on the barn door, and underneath somebody's written %n's name with a question mark, and the question mark's been rubbed out.",
+        "The tup's pacin' the paddock fence in his raddle harness, blue crayon on his chest, and every time he passes the gate he looks at %n and stamps.",
+        `"Fresh crayon on him this mornin'," says the shepherd, holdin' the gate open for %n. "Let's see who's first."`,
+        "There's blue all over the paddock, on the posts, on the gate, on the hay rack, and the tup in the middle of it all is lookin' for somethin' new to mark, and finds %n."
+      ]);
+      S("ramstud", "raddle", "beats", 1, [
+        "He sniffs %n over thoroughly, lips curled back, and rumbles, and the blue block on his chest bumps their shoulder and leaves a stripe.",
+        `The shepherd checks the buckles on the tup's harness and slaps him on the shoulder. "Go on, lad." The tup goes on.`,
+        "He's thick through the neck and woolly to the waist and his curly horns gleam, and he walks round %n once, markin' them blue with every brush of his chest.",
+        `"He likes you," says the shepherd, which is obvious, because the tup's already got his chin on %n's shoulder and his hands on their hips.`,
+        "He presses %n back against the rail with his crayon chest and holds them there, and the blue rubs off on their front in a big smudge.",
+        "The shepherd flips to a fresh page in the tuppin' book, writes %n's name at the top, and draws a little box beside it, ready."
+      ]);
+      S("ramstud", "raddle", "beats", 2, [
+        "He turns %n round and bends them over the rail, the raddle block pressed square in the middle of their back, and his %c cock's already out.",
+        "He nudges %n down on all fours in the straw with his horns and kneels behind them, and the blue crayon hangs right over their spine.",
+        `"Make it a good one, mind," says the shepherd. "I can't count a smudge." The tup grunts and settles in behind %n.`,
+        "He grips %n's hips and drags them back against him, raddle to spine, and his %c cock's hot and heavy against them.",
+        "He hooks his horns over %n's shoulders to hold them still and grinds, and blue smears down their back in a long streak before he's even started.",
+        "The shepherd holds %n's wrists over the rail, matter-of-fact as anythin', so the tup can get on with it."
+      ]);
+      S("ramstud", "raddle", "in", 0, [
+        "{v}He tups %n's pussy in short hard shoves, and every shove rubs the raddle across their back, bluer and bluer.",
+        "{nv}He takes %n's ass hard and steady, and every thrust grinds the blue block into the small of their back.",
+        "He covers %n's %h quick and heavy, harness creakin', and the shepherd leans over the gate to check the mark's comin' through.",
+        "He tups %n's %h like they're the last of the season, deep and determined, and the blue spreads across their back like ink on blottin' paper.",
+        "He ruts %n's %h with his chest pressed down on their back, and the raddle paints them from shoulder to shoulder with every stroke.",
+        "Every grunt, every shove into %n's %h, another stripe of blue, and the shepherd ticks the air with his pencil, countin'."
+      ]);
+      S("ramstud", "raddle", "in", 1, [
+        `He finishes deep in %n with a bleat and steps back, and the shepherd squints at the blue on their back and says, "Aye, that's a cover," and writes it down.`,
+        "He tups %n again and the mark goes darker, and the shepherd writes a little 2 in the box beside their name.",
+        "He fills %n, holds, grunts, and then goes again because the mark's not dark enough yet, and the shepherd agrees.",
+        "By the third cover %n's back is blue from neck to tail and their belly's warm and full, and the shepherd's very pleased with his book.",
+        "He fills %n deep, and the shepherd swaps the crayon for a red one before the next go, so he can tell which was which. The tup approves.",
+        "He tups and fills %n till the crayon's worn down to a stub, and the shepherd has to fetch a new block from the barn."
+      ]);
+      S("ramstud", "raddle", "over", 0, [
+        "He ruts %n's thighs and the raddle rubs their back blue all the same, and the shepherd says that'll do for the book.",
+        "He grinds against %n's back till he finishes there, and the blue and the white mix into somethin' very messy and very marked.",
+        "He tups between %n's squeezed thighs, raddle scrapin' their spine, and floods the straw, and the shepherd still ticks the box.",
+        `"Doesn't count," says the shepherd, so the tup does it again, on %n's back this time, and the shepherd says that doesn't count either.`,
+        "He ruts against %n's backside, harness creakin', and marks them blue and white in one go.",
+        `He has a go at %n's thighs three times, leavin' three blue streaks and three sticky ones, and the shepherd writes "keen" in the margin.`,
+        `He finishes across %n's back, and the shepherd leans in close, looks at the mess and the blue, and says, "Covered. Near enough."`
+      ]);
+      S("ramstud", "blackram", "beats", 0, [
+        "Rain's comin' sideways off the hills, and the drystone wall at the top field's got a gap in it, a fresh one, and black wool snagged on every stone.",
+        "%n's bringin' in the washin' when thunder rolls off the tops, and somethin' black comes over the wall with it, horns first.",
+        "The farm's sheep are all bunched in the corner of the field, nervy, lookin' at the hill, and up on the skyline a black shape's watchin' %n.",
+        "There's a smell of heather and wet stone blowin' down off the moor, and with it the clack of hooves on rock, gettin' closer.",
+        "The shepherd's dog won't go up the top field tonight, won't go past the gate, just whines at it. %n goes instead.",
+        "A black ram-man drops off the top of the wall in front of %n, lands in the mud, and rises up drippin', horns curled twice round, eyes like a goat's."
+      ]);
+      S("ramstud", "blackram", "beats", 1, [
+        "He's all sinew and black fleece, soaked with rain, his breath comin' in great clouds, and he looks at %n like the hills sent him down for them.",
+        "His horns are scarred and chipped and curled tight as a fist, and he swings them low at %n, testin', and doesn't miss by much.",
+        "He stamps in the mud and the water jumps, and he lets out a bleat like a horn on the moor, and every sheep on the farm answers.",
+        "He doesn't trot or circle like the farm's ram: he walks straight at %n through the rain, unstoppable, and they back up into the stones.",
+        "Up close he's hot as a stove in spite of the rain, and he smells of peat smoke and wet wool and somethin' wilder.",
+        "He shakes himself like a dog and soaks %n to the skin, then grins with a mouthful of square teeth and goes for them."
+      ]);
+      S("ramstud", "blackram", "beats", 2, [
+        "He bends %n over the tumbled stones of the wall, face in the wet moss, and his %c cock's hot as a coal against them in the cold rain.",
+        "He butts %n down into the heather and pins them with a knee in their back, and the rain runs down his horns onto their neck.",
+        "He slings %n over his shoulder like a sack of peat, carries them up onto the moor, dumps them in the heather, and kneels.",
+        "He drags %n back against him by the hips, rough, and his black fleece is soakin' wet and warm on their back.",
+        "He presses %n against the wall with his horns either side of them, wet stone at their front and wild ram at their back, and growls.",
+        "He's got no patience at all: %n's barely on their knees in the bracken before his %c cock's pushin' at them."
+      ]);
+      S("ramstud", "blackram", "in", 0, [
+        "{v}He forces into %n's pussy with one wild shove and tups them hard and fast in the rain, mud splashin' up their legs.",
+        "{nv}He takes %n's ass wild and rough in short hard drives, and the rain beats down on both of them, and he doesn't care.",
+        "He ruts %n's %h like a storm on the tops, all fury and wind and noise, and the stones of the wall shift under them.",
+        "He hammers %n's %h in the heather, wild and stubborn, horns knockin' the rocks, bleatin' at the thunder.",
+        "He tups %n's %h hard enough to drive them into the peat, and every stroke's a shove from somethin' that's never once been fenced.",
+        "He takes %n's %h fast and rough and endless, wet fleece slappin' their back, and the rain can't cool either of them down."
+      ]);
+      S("ramstud", "blackram", "in", 1, [
+        "He floods %n with a bleat that echoes off the hills, hot as anythin' in the cold rain, and goes again before the echo's stopped.",
+        "He fills %n three times in the heather, wild every time, and between them he licks the rain off the back of their neck.",
+        "He finishes deep, nips %n's shoulder, shakes the rain off his horns, and mounts them again, because up on the hills nobody tells him to stop.",
+        "By the last time %n's belly's full and warm and they're half sunk in wet heather, and the black ram's lookin' at the hill like he might take them with him.",
+        "He breeds %n under the thunder till the storm blows over, and when the sun comes out he's still at it.",
+        "He fills %n so full they're leakin' into the peat, and he bleats at the sky about it, and the hills bleat back."
+      ]);
+      S("ramstud", "blackram", "over", 0, [
+        "He ruts %n's thighs wild in the rain and finishes across their back, hot in the cold, and bleats at the thunder.",
+        "He grinds against %n in the heather, rough and wet, and soaks them from neck to knees, and the rain washes none of it off.",
+        "He shoves between %n's thighs against the wall and finishes on the stones and their legs, and nips their ear for good measure.",
+        "He ruts %n's backside like a gale, short hard shoves, and empties himself across them in a hot rush.",
+        "He takes %n's thighs three times in the bracken, wild every time, and leaves them muddy and soaked and smellin' of ram.",
+        "He finishes over %n's back and then shakes himself, so they get rain and ram both, and grins about it.",
+        "He marks %n across the back like a squall comin' over the tops, quick and wild, and he's over the wall and gone before they turn round."
+      ]);
+      S("ramstud", "tups", "beats", 0, [
+        "There's a crack like a pistol shot from the paddock, then another: two ram-men buttin' heads by the feeder, and they stop dead when %n opens the gate.",
+        "%n's sent to fill the hay rack in the tup paddock, and nobody mentions there are two of them in there today, both in a mood.",
+        `Two curly heads pop up over the paddock wall at once as %n walks past, and both of them grin, and both of them say "mornin'."`,
+        "The tups have been fightin' all mornin', the shepherd says, and he's hopin' %n can calm them down. Then he shuts the gate behind them.",
+        "%n finds two ram-men stood nose to nose in the mud, horns locked, shovin', and one of them catches %n's scent and the shovin' stops.",
+        "There's hoof-churned mud all over the paddock and a broken hurdle, and two ram-men pantin' at either end of it, and %n's climbed in right between them."
+      ]);
+      S("ramstud", "tups", "beats", 1, [
+        "They walk round %n in opposite directions, sniffin', one high and one low, and meet at the front and glare at each other.",
+        '"Best of three," says the bigger one. "Best of five," says the other. Nobody asks %n how many.',
+        "They butt heads once, hard, right over %n's head, and the crack makes their ears ring, and then they both look down at them and grin.",
+        "One's grey-fleeced and broad and the other's brown and quick, and they're both hard, and they're both lookin' at %n.",
+        "They each grab one of %n's hands and pull, like a tug of war, till %n's stretched between them and the shepherd yells at them to share.",
+        "They herd %n between them toward the hay feeder, shoulder to shoulder for once, and only start arguin' again when they get there."
+      ]);
+      S("ramstud", "tups", "beats", 2, [
+        "They toss a horseshoe for it, and the grey one wins, and bends %n over the trough while the brown one sulks and paws the mud.",
+        "One holds %n down over the hay bale by the shoulders, the other kneels behind with his %c cock out, and they swap glares over %n's back.",
+        "They pin %n between them against the fence, a fleece at their front and a fleece at their back, horns clackin' over their head.",
+        `"Watch this," says the brown one, linin' up behind %n, and the grey one folds his arms and says, "Go on then, show me."`,
+        "They push %n down into the straw on all fours and stand over them, both of them %c and ready, arguin' about who's first right up to the last second.",
+        "The bigger tup lifts %n's hips and the other one holds their face, and both of them are gruntin' at each other the whole time."
+      ]);
+      S("ramstud", "tups", "in", 0, [
+        "{v}The grey tup takes %n's pussy first, hard and proud, and every shove he gives the brown one a look, like: see?",
+        "{nv}The brown tup takes %n's ass first, quick and stubborn, and the grey one paws the mud and counts the strokes out loud.",
+        "They take turns at %n's %h, one shovin' the other off to get his go, each one tuppin' harder to make a point.",
+        "One tups %n's %h while the other holds them over the trough, and they swap so often %n's %h doesn't get a second's rest.",
+        "The grey tup ruts %n's %h slow and deep to show off, and the brown one shoves him aside and ruts them fast and short to show him up.",
+        "They tup %n's %h in turns, buttin' heads between goes, and every crack of horns makes %n flinch and clench."
+      ]);
+      S("ramstud", "tups", "in", 1, [
+        "They fill %n one after the other, then argue about who filled them more, and settle it by fillin' them again.",
+        "Four covers each by noon, and %n's belly's round and full of two rams, and the tups are still arguin' over the score.",
+        "One floods %n and steps back, and the other's in before a drop escapes, gruntin' that it doesn't count if it spills.",
+        "By the end they've forgotten what the fight was about and they're nuzzlin' each other's necks over %n's back, still takin' turns.",
+        "They call it a draw, and do it again, and call it a draw again, and %n's full to the brim of two very stubborn rams.",
+        "The tups go round and round on %n till the shepherd comes to bring them in, and even then they want one more go each."
+      ]);
+      S("ramstud", "tups", "over", 0, [
+        "The two tups take turns ruttin' %n's thighs, buttin' each other aside, and soak them from both directions.",
+        "One finishes across %n's back, the other across their thighs, and they glare at each other over the mess.",
+        "They rut against %n from either side, horns clackin', and finish within a breath of each other, and both claim the win.",
+        "The grey one ruts %n's thighs while the brown one ruts their fist, and the shepherd says it's the most peaceful they've been all week.",
+        "They mark %n in turns, back and thighs and belly, till there's no room left for either of them and they start on the trough.",
+        "Two rams, three goes each, and every one of them ends across %n, and every one of them gets argued about.",
+        "They finish over %n together, side by side for once, and look at each other and nod, and then start arguin' about who finished first."
+      ]);
+    }
+    {
+      const S = (kind, form, part, i, l) => {
+        const T = form ? STUD_FORMS[kind] && STUD_FORMS[kind][form] && STUD_FORMS[kind][form].lines : ANTHRO_LINES[kind];
+        const pool = T && (Array.isArray(T[part] && T[part][0]) ? T[part][i] : T[part]);
+        poolMore(kind, (form || "usual") + " " + part + " " + i, pool, l);
+      };
+      S("wolves", "lone", "beats", 0, [
+        "%n ducks into the wolf den and there's nobody about but one big black wolf-man lyin' across the back of it, and he doesn't move to let them past. He doesn't move to let them out, either.",
+        "The pack's scattered in the woods today, and the ones %n passes on the path won't meet their eye, and they all keep glancin' toward the den like somethin's waitin' there.",
+        "There's a black wolf sat alone on the rock above the den, watchin' %n come up the path, and he stands up and follows them in.",
+        `"He's in," whispers a grey wolf at the edge of the clearin', backin' away from the den, and that's all %n gets before a black arm reaches out of the doorway for them.`,
+        "The den smells different today: one wolf, strong as smoke, and every bit of straw's been dragged into one big bed at the back, and he's sittin' on it.",
+        "%n hears a low growl from inside the den, one voice, not a pack's, and when they look in there's just him: scarred, black, waitin', and he's been waitin' a while."
+      ]);
+      S("wolves", "lone", "beats", 1, [
+        "He walks right round %n, close, breathin' them in, every scar on him silver in the dim light, and growls once at the doorway, just in case.",
+        "He hooks one claw in the neck of %n's clothes and pulls them in close, nose to nose, and holds them there a long breath, decidin'.",
+        "He rubs his jaw along %n's cheek and neck and shoulder, slow, markin' them, makin' sure any wolf who comes near later will know.",
+        `"Mine," he says, quiet, and it's not a question and it's not a threat, it's just a fact, like the weather.`,
+        "He strips %n with careful claws, nothin' torn, nothin' rushed, and puts every piece outside the doorway where nobody'll touch it.",
+        "One of the pack sticks his head in the doorway, and the black wolf doesn't even turn round, just growls, and the head vanishes."
+      ]);
+      S("wolves", "lone", "beats", 2, [
+        "He lays %n back on his bed of straw and kneels between their thighs, and his %c cock rests heavy on their belly while he looks at them.",
+        "He gathers %n up in his arms and lies down with them face to face, the whole length of him pressed along them, hard as a branch.",
+        "He holds %n's wrists together over their head in one hand and spreads their knees with his own, slow, lookin' them in the eye the whole while.",
+        "He presses his forehead to %n's and breathes with them, slow, and the hot %c length of him nudges at them, patient.",
+        "He settles over %n like a black blanket, heavy and warm, and growls so low it's almost a purr.",
+        "He licks %n's mouth, slow, and their throat, and lower, and comes back up to look at them before he lines himself up."
+      ]);
+      S("wolves", "lone", "in", 0, [
+        `{v}He sinks into %n's pussy face to face, slow and deep, never once lookin' away, and growls "mine" when he's all the way in.`,
+        "{nv}He eases into %n's ass on his bed of straw, holdin' their legs up and open, lookin' them in the eye, and doesn't stop till he's buried.",
+        "He takes %n's %h deep and slow and possessive, every stroke a claim, and his knot grows till it's pressin' at them like a fist.",
+        "He ruts %n's %h face to face with a hand on their throat, gentle, just feelin' them swallow, and the knot goes in on a long growl.",
+        "He fucks %n's %h like he means to keep them, slow and heavy and endless, and when the knot locks he holds them so tight they can't tell where he stops.",
+        "He takes %n's %h with his mouth on theirs, swallowin' every sound they make, and ties them with the biggest knot they've ever felt."
+      ]);
+      S("wolves", "lone", "in", 1, [
+        "Tied face to face, he holds %n's cheek in his palm and pumps them full, slow, and watches every bit of it on their face.",
+        "The knot holds them an hour, and he never loosens his arms once, just floods %n every few minutes and growls at the door between.",
+        "He fills %n till their belly's round against his, and puts his hand on it, and growls, satisfied, like a man lookin' over his own field.",
+        "When the knot slips he doesn't let go: he waits, holdin' them, and when he's ready he takes them again, slow, and ties them again.",
+        "He breeds %n deep and possessive in the dark, knot after knot, and every time he finishes he licks their neck and says it again: mine.",
+        "By the second knot %n's so full of the lone wolf they can feel him slosh when he breathes, and he hasn't let go of them once."
+      ]);
+      S("wolves", "lone", "over", 0, [
+        "He ruts slow between %n's thighs, face to face, never lookin' away, and finishes across their belly and chest, and rubs it in.",
+        "He makes %n hold him while he ruts their hands, slow and heavy, and marks them from throat to belly so the whole pack will smell it.",
+        "He grinds against %n on his bed of straw, possessive, and when he finishes he rubs his scent into every inch of them with his jaw.",
+        "He ruts between %n's thighs from behind, holdin' them so tight against him they can barely breathe, and soaks them, and growls at the door.",
+        "He covers %n in his load and then in his scent, slow and thorough, till no wolf in the wood would dare come near them.",
+        "He spends himself over %n twice, face to face, and licks them clean between, and won't let any other wolf near the doorway.",
+        "He ruts slow against %n's belly, his knot pressed hard into them, and finishes with a growl that's half their name."
+      ]);
+      studSceneMore(
+        "wolves",
+        "lone",
+        [
+          "He runs one claw down the middle of %n's chest, slow, not hard enough to mark, just enough to say he could.",
+          "He nips %n's lip, then their jaw, then the side of their neck, little claimin' bites, one after another.",
+          "%n hears a wolf sniffin' at the doorway, and the lone wolf growls without lookin', and the sniffin' stops.",
+          "He holds %n's face in both hands and just looks, a long time, like he's makin' sure he'll know them anywhere."
+        ],
+        [
+          "He keeps one hand flat on %n's chest the whole time, over their heart, like he's countin' it.",
+          "His growl never stops, low and steady as a millwheel, the whole time he's in them.",
+          "He rubs his scarred cheek against %n's, slow, and their skin smells of him now, and always will a little.",
+          "The pack howls outside, and he doesn't howl back. He doesn't need to. He's got what he wants."
+        ]
+      );
+      S("wolves", "hunt", "beats", 0, [
+        `The whole pack's sat in a ring in the clearin', grinnin', tongues out, and the biggest one points at %n, then at the trees. "Head start," he says. "Use it."`,
+        `A wolf drops a strip of red ribbon in %n's hand. "Tie that on," he says, "so we know who we're chasin'." Behind him, the pack starts to howl.`,
+        `%n's on the woodland path when a howl goes up ahead of them, then behind, then either side, and somebody close by laughs and says, "Run."`,
+        "There's a huntin' horn hangin' on a nail outside the wolf den, and the biggest wolf takes it down and blows it, and the pack comes out pantin'.",
+        `"We're bored," says the pack leader, stretchin'. "You're quick. Let's find out how quick." And the others start countin', loud, together.`,
+        "The wolves are pacin' at the edge of the woods, restless as dogs at a gate, and when they see %n every ear goes up at once."
+      ]);
+      S("wolves", "hunt", "beats", 1, [
+        "%n runs till their lungs burn, through the beeches and down the bank and along the stream, and the howls are always just behind, never closer, never further.",
+        "They hear the pack split in the trees, some left, some right, and realise too late they're bein' driven toward a dead end.",
+        `%n hides in a hollow tree and holds their breath, and one by one the pantin' gets closer, and stops right outside, and a wolf says, "Found you."`,
+        "Every time %n thinks they've lost them, a wolf steps out of the trees ahead, grins, and steps back in, and the chase turns again.",
+        "They let %n run till they're half wild with it, laughin' and gaspin' and covered in scratches, and the wolves are laughin' too.",
+        "%n doubles back through a bramble patch and nearly makes the farm fence before a grey blur cuts them off, and another, and another."
+      ]);
+      S("wolves", "hunt", "beats", 2, [
+        "A wolf tackles %n into a drift of dead leaves and the rest pile in after, pantin', grinnin', every one of them hard from the chase.",
+        "They run %n into a clearin' with nowhere left to go, and make a ring round them, and close it, slow, one step at a time.",
+        "The fastest wolf takes %n down by the ankle and drags them back through the leaves, laughin', and his %c cock's already out and wet.",
+        "They catch %n in a ditch and haul them out by the arms and legs, and argue all the way to the soft ground about who caught them first.",
+        "%n trips on a root and rolls, and when they stop rollin' they're lookin' up at a whole ring of wolves, tongues out, and one already kneelin'.",
+        "The leader pins %n by the scruff in the bracken, and the rest sit round to wait their turn, tails thumpin' the ground."
+      ]);
+      S("wolves", "hunt", "in", 0, [
+        "{v}The wolf who caught %n mounts them right there in the leaves and drives into their pussy, wild and pantin', and knots them before the rest have caught up.",
+        "{nv}The first wolf takes %n's ass hard and quick in the bracken, still breathless from the run, and ties them with a howl.",
+        "They take %n's %h in the order they caught up, first to last, and every one of them's wild from the chase and knots like he means it.",
+        "The pack breeds %n's %h in the hollow one after another, each one quicker and fiercer than the last, and the ones waitin' howl them on.",
+        "He takes %n's %h like a prize he's run down, fast and fierce and pantin', and his knot locks in so hard it lifts them off the leaves.",
+        "Wolf after wolf takes %n's %h in the bracken, hot from the run, and none of them lasts long and none of them needs to."
+      ]);
+      S("wolves", "hunt", "in", 1, [
+        `Every wolf in the pack ties %n before sunset, and every one of them pants "good chase" in their ear while he's knotted in them.`,
+        "They breed %n in the leaves till they're full and shakin', then carry them back to the den between them and do it all again.",
+        "Knot after knot, the pack fills %n, and the last wolf has to wait so long he nearly falls asleep, and then goes twice to make up for it.",
+        "They fill %n so full of wolf they slosh when they're carried, and the pack seems very proud of that.",
+        "By the end of the hunt %n's been tied by every wolf in the pack and their belly's round with it, and the leader's talkin' about tomorrow.",
+        "The pack takes turns till dusk, and between knots they lick %n's scratches clean and tell them they nearly got away. They didn't."
+      ]);
+      S("wolves", "hunt", "over", 0, [
+        "The pack rings %n in the leaves and takes turns ruttin' their thighs, still pantin' from the chase, and marks them as caught.",
+        "Every wolf finishes over %n in turn, back, belly, thighs, and the last one finishes in their hair, and that's the hunt done.",
+        "They pin %n in the bracken and rut against them one after another, wild from the run, till %n's soaked and laughin'.",
+        "The fastest wolf ruts %n's thighs first, and the rest go in the order they arrived, and by the end there's not a dry inch on them.",
+        "They make %n hold two of them at once and rut their fists, and the rest wait their turn, and nobody's left out.",
+        "The pack marks %n like a trophy, every one of them across their back, and carries them home between them, drippin'.",
+        "Wolf after wolf ruts against %n in the hollow and spends himself across them, every one of them still pantin' from the chase."
+      ]);
+      S("wolves", "snow", "beats", 0, [
+        "The snow's fallin' so thick %n can't see the farm behind them, and then a white shape rises out of a drift right in front of them: a wolf-man, snow on his shoulders, holdin' out a hand.",
+        "%n's lost in the white, teeth chatterin', when they smell woodsmoke and wet fur and see a doorway glowin' in a snowbank.",
+        "There are big white wolf tracks in the fresh snow by the barn, leadin' off toward the woods, and a howl comes back down them, soft and low, like an invitation.",
+        "Snow's blowin' sideways off the fells, and a white wolf-man steps out of it, wraps %n in his arms without a word, and carries them off toward the den.",
+        `The wolf den's buried to the top in snow, all but a little tunnel, and out of the tunnel comes warm air and a voice sayin', "Quick, in, you're lettin' the cold in."`,
+        `%n's slippin' on the ice by the pond when a pair of big white arms catch them, and a nose touches their cold cheek, and somebody says, "You're freezin'. Come on."`
+      ]);
+      S("wolves", "snow", "beats", 1, [
+        "Inside it's a heap of white wolves, all fur and breath and sleepy warmth, and the heap shifts and takes %n in like a wave.",
+        "Big warm hands peel %n's frozen clothes off one piece at a time and hang them by the little fire to dry, and then pull %n into the fur.",
+        "The white wolves press round %n from every side till they stop shiverin', and somebody tucks a tail under their chin like a scarf.",
+        "They rub %n's hands and feet between their big paws till the feelin' comes back, slow, and somebody licks their cold ear warm.",
+        "It's dim and warm and smells of snow and fur and pine, and the wolves breathe slow and deep all round %n, eyes half closed.",
+        "One of them pulls %n's back against his chest and another curls round their front, and they're wrapped up so warm they nearly fall asleep."
+      ]);
+      S("wolves", "snow", "beats", 2, [
+        "The wolf at %n's back shifts, slow, and there's a warm %c cock nudgin' between their thighs, and he hums a question into their hair.",
+        "Nobody grabs. Somebody just rolls %n gently onto their side, and somebody else lifts their knee, and it's all very slow and very warm.",
+        "The wolf in front of %n kisses them, slow and sleepy, while the wolf behind them presses close and hard and patient.",
+        "They shuffle %n round in the heap till they're lyin' on a big white chest, with another white wolf settlin' in behind them, warm as a stove.",
+        "One of them noses at %n's neck and rumbles, low and soft, and his %c cock's warm against their thigh, and the heap hums round them.",
+        "%n's so warm and drowsy they barely notice the heap rearrangin' itself round them, until there's a wolf lined up behind them, waitin'."
+      ]);
+      S("wolves", "snow", "in", 0, [
+        "{v}He slides into %n's pussy slow and warm, lyin' on his side behind them, and the heap hums round them both.",
+        "{nv}He eases into %n's ass in the warm heap, an inch at a time, his breath slow on their neck, and nobody's in any hurry.",
+        "He rocks into %n's %h slow as snow fallin', and the knot comes in so gently they only notice when they're tied.",
+        "He takes %n's %h in long, lazy, warm strokes, and the wolves on either side keep strokin' %n's arms and hair.",
+        "He moves in %n's %h like a slow tide, and the knot grows and locks, and then they just lie there together, warm, while the snow falls.",
+        "One white wolf takes %n's %h, slow and drowsy, and the others doze round them, and every so often somebody's tail thumps."
+      ]);
+      S("wolves", "snow", "in", 1, [
+        "Tied in the warm heap, he pumps %n full, slow and steady, and %n dozes off with him still knotted inside them.",
+        "When one knot slips, another white wolf's there, warm and patient, and ties them again before the cold can get in.",
+        "They fill %n slow all through the long white night, one after another, and the snow piles up outside, and the den gets warmer and warmer.",
+        "%n's belly's round and warm with snow pack by midnight, and they're asleep in the middle of the heap with a wolf still tied in them.",
+        "The knot holds so long %n falls asleep and wakes up and it's still there, and the wolf's still pumpin' slow, and it's still snowin'.",
+        "Every wolf in the heap ties %n at some point in the night, slow and warm and sleepy, and they lose count somewhere round the fourth."
+      ]);
+      S("wolves", "snow", "over", 0, [
+        "He ruts slow between %n's thighs in the warm heap and finishes warm across their belly, and somebody pulls a fur over them both.",
+        "The white wolves take turns ruttin' slow against %n's back, and each one leaves them warmer and stickier and sleepier.",
+        "He grinds slow against %n's backside, half asleep, finishes with a sigh, and goes straight to sleep against them.",
+        "They keep %n warm between them and spend themselves across their thighs and back, slow, one by one, all night.",
+        "He has %n hold him under the fur while he ruts their hand, slow as snowfall, and finishes warm over their fingers and belly.",
+        "One white wolf after another ruts slow against %n in the heap, and by mornin' they're glazed from neck to knees and toasty warm.",
+        "He ruts lazily between %n's thighs while the wind howls, finishes, tucks his tail over them, and that's that."
+      ]);
+      studSceneMore(
+        "wolves",
+        "snow",
+        [
+          "The little fire pops, and the heap sighs, and somebody's breath stirs the hair on %n's neck.",
+          "Snow ticks against the door, and in here it's so warm %n's cheeks are pink.",
+          "Somebody's big paw strokes %n's hair, slow, over and over, and they don't know whose it is and don't care.",
+          "The white wolves smell of snow and pine and warm fur, and the smell's all over %n now."
+        ],
+        [
+          "The heap breathes together, in and out, slow, and %n's breathin' with it before they notice.",
+          "Somebody snores, somebody else nudges him, and the heap shifts and settles warmer round %n.",
+          "The wind howls outside, and one of the white wolves howls softly back, and it's almost a song.",
+          "%n's never been so warm or so full or so sleepy, and outside the snow just keeps on fallin'."
         ]
       );
     }

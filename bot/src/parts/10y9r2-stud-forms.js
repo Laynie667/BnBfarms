@@ -454,7 +454,7 @@
             ["He cums every so often all afternoon, little lazy floods, and every time he does he says \"good\" and falls asleep again, and %n's still on him at sunset.",
              "Five times, all afternoon, and he never once gets up. The lionesses bring %n water and fan them with big leaves, and laugh."],
           ],
-          over: [["%n grinds on the lazy king's belly all afternoon, and he cums across their tummy every so often and falls back asleep."]],
+          over: [["%n grinds on the lazy king's belly all afternoon, and he cums up their front every so often and falls back asleep."]],
           end: ["At sunset the lazy king finally sits up, stretches, licks %n's face once, and wanders off for his supper. %n's left on the warm rock with %ml of him in their %h and very tired thighs.",
                 "%n climbs down off the lazy lion with %ml of him in their %h, legs like jelly after an afternoon's work, and he hasn't moved an inch."],
           endOver: ["%n gets off the lazy king at sunset glazed with %ml of him from belly to chin, and he's still asleep."],

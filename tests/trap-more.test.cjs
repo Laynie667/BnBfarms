@@ -117,6 +117,24 @@ const LEAK=/\{(nv|nc|nt|fu|fb|nb|ok|v|c|t|f|m)\}|%[a-z]{1,8}\b|\bundefined\b|\bN
   const vleak=vtold.filter(([,,t])=>LEAK.test(t));
   ok(!vleak.length, '...and every line of them fills in'+(vleak.length?' ('+vleak[0][1]+': '+(vleak[0][2].match(LEAK)||[''])[0]+')':''));
 
+  // ── every stud and every version of him, on three bodies: each beat as it runs, his two beats of his own, the whole story ──
+  const STUDS=['wolves','stallion','bull','warren','boar','toms','drake','naga','kennel','hive','goat','sow','minotaur','werewolf','foxden','lionpride','ramstud'];
+  const sthin=[], stold=[]; let scur='';
+  W.__onTrapBeats=(mn,kind,beats)=>{ if (!STUDS.includes(kind)) return; beats.forEach((b,i)=>{ const n=Array.isArray(b)?b.length:1; if (n<8) sthin.push(scur+' ['+i+'] '+n+': '+String(Array.isArray(b)?b[0]:b).slice(0,40)); }); };
+  for (const k of STUDS) for (const f of (SF[k] ? Object.keys(SF[k]) : [null])) for (const mn of [500,600,700]){
+    scur=k+'/'+(f||'usual'); W.__studForce=f?{[k]:f}:null; free(mn); W.__st().lastCmd&&W.__st().lastCmd.clear();
+    const n=sent.length; await say(221397,'?trap spring '+P(mn).name+' '+k,200); await done(mn,300); stold.push([P(mn).name,scur,all(n)]); free(mn);
+  }
+  W.__studForce=null; W.__onTrapBeats=null;
+  out('stud stories told:', stold.length);
+  ok(stold.length>=100 && !sthin.length, 'every stud, in every version, on every body, runs eight lines or more a beat'+(sthin.length?' ('+[...new Set(sthin)].slice(0,4).join(' | ')+')':''));
+  const sScene=STUDS.flatMap(k=>[...(SC[k]||[]).map((p,i)=>[k+' ['+i+']',p]), ...Object.entries(SF[k]||{}).flatMap(([f,F])=>(F.scene||[]).map((p,i)=>[k+'/'+f+' ['+i+']',p]))]);
+  const sThinScene=sScene.filter(([,p])=>p.length<8).map(([w,p])=>w+' '+p.length);
+  const sSceneBad=[]; for (const [w,p] of sScene) for (const l of p){ if (/%h\b/.test(l)) sSceneBad.push(w+' names a hole'); for (const mn of [500,600,700,800]){ const t=W.__tFill(W.__pickFor(mn,'x',[l]),mn,{ml:'60 mL',c:'thick'}); if (LEAK.test(t)) sSceneBad.push(w+': '+t.slice(0,60)); } }
+  ok(!sThinScene.length && !sSceneBad.length, '...his two beats of his own eight lines or more, every version\'s too, never namin\' a hole, every line fillin\' in'+(sThinScene.length?' ('+sThinScene.slice(0,4).join(', ')+')':'')+(sSceneBad.length?' ('+sSceneBad.slice(0,3).join(' | ')+')':''));
+  const swrong=stold.filter(([nm,,t])=>nm!=='Moo' && new RegExp(nm+"'s (pussy|cunt|womb|clit|slit)","i").test(t)), sshort=stold.filter(([,,t])=>t.length<200).map(([nm,w])=>nm+' '+w), sleak=stold.filter(([,,t])=>LEAK.test(t));
+  ok(!sshort.length && !swrong.length && !sleak.length, '...and every one of their stories runs whole, fills in, and never tells a male or a femboy about a pussy'+(sshort.length?' (short: '+sshort.slice(0,4).join(', ')+')':'')+(swrong.length?' ('+swrong[0][0]+' '+swrong[0][1]+')':'')+(sleak.length?' ('+sleak[0][1]+': '+(sleak[0][2].match(LEAK)||[''])[0]+')':''));
+
   // ── the whole story, told to Rex (male) and Pip (femboy): nobody hears about a pussy or a womb they haven't got ──
   const told=[]; const sample=['maze','stag','sowing','nixie','groomstand','vampire','crate','mistletoe','hollyking','bunnysuit','fairyring','cornmaiden'].filter(k=>TM[k]);
   for (const mn of [600,700]) for (const k of sample){ free(mn); W.__st().lastCmd&&W.__st().lastCmd.clear(); const n=sent.length; await say(221397,'?trap spring '+P(mn).name+' '+k,200); await done(mn,300); told.push([P(mn).name,all(n)]); free(mn); }

@@ -174,7 +174,7 @@
         ["Out on the warm rocks past the orchard, the pride of lion-folk is sunning itself, and the lionesses lift their heads as %n wanders by.",
          "%n climbs the rocks to look at the view and finds a lion-woman looking back, and then three more."],
         ["The lionesses herd %n up onto the flat rock where the pride's lion-man lies, huge, golden, maned, lazily licking a paw.",
-         "A lioness takes %n by the scruff, gentle as a mother cat, and carries them up to the lion."],
+         "A lioness takes %n by the scruff, gentle as anythin', and carries them up to the lion."],
         ["He rolls to his feet and stretches, and two of the lionesses hold %n down on the warm stone for him.",
          "The lion sniffs %n over, rumbles approval, and the lionesses pin %n flat with their paws."],
       ],

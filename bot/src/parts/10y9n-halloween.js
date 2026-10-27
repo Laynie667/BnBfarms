@@ -6,7 +6,7 @@
      This file: the season, and the ten traps with somebody waitin' in them (10u3-anthro-traps.js runs those):
        headless     the headless horseman at the covered bridge (his horse stays out of it: it's only how he gets about)
        vampire      the vampire countess in the cellar, who drinks your milk if you've got it, and what's under her gown
-       hellhounds   a pack of hellhounds by the burnt chapel: two-legged, ember-eyed, and their knots run hot
+       hellhounds   a pack of hellhounds by the burnt mill: two-legged, ember-eyed, and their knots run hot
        demon        the demon in the root cellar: a bargain, a ridged cock, and little horns for half an hour after
        spider       the spider queen in the hayloft: webbed up, silk-tied, and a clutch of eggs
        ghost        the ghost in the old milkin' parlour: cold hands, and a glowin' mess where it passed through
@@ -145,10 +145,10 @@
                          "{t}Before she lets them go the countess has one more drink: %ml of %n's milk, sucked from each tit in turn, and she sighs like it's fine wine.",
                          "The countess takes her nightcap from %n's chest, %ml of warm milk, and dabs her mouth with lace after."];
 
-  // ── the pack from the burnt chapel ──
+  // ── the pack from the burnt mill ──
   seasonTrap("halloween", "hellhounds", {
-    icon: "🔥", what: "a pack of hellhounds behind the burnt chapel: two-legged, ember-eyed, and their knots run hot", limit: /\b(knot|gang|demon|monster|hellhound)/i,
-    stud: { sire: -62, name: "the hellhounds", type: "canine", loads: 3, ml: 170, hold: 9, hole: "vulva", bonus: 1.7, where: "the burnt chapel", litter: [3, 6],
+    icon: "🔥", what: "a pack of hellhounds behind the burnt mill: two-legged, ember-eyed, and their knots run hot", limit: /\b(knot|gang|demon|monster|hellhound)/i,
+    stud: { sire: -62, name: "the hellhounds", type: "canine", loads: 3, ml: 170, hold: 9, hole: "vulva", bonus: 1.7, where: "the burnt mill", litter: [3, 6],
             after(mn, v, hole){
               // one knot stays: a stopper the heat of it, for twenty minutes (real gear, for those who let the farm put it on them)
               if (hole === "vulva" || hole === "butt")
@@ -156,9 +156,9 @@
             } },
     lines: {
       beats: [
-        ["Behind the burnt-out chapel there's a glow in the ruins, like coals, and the coals are eyes, and the eyes stand up.",
-         "%n smells smoke where there's no fire, and then the hellhounds come over the chapel wall: three of them, black-furred, walkin' on two legs, sparks drippin' off their jaws.",
-         "Somethin' howls in the churchyard, and the howl has an echo of flame in it. By the time %n turns round, the pack's all around them."],
+        ["Behind the burnt-out mill there's a glow in the ruins, like coals, and the coals are eyes, and the eyes stand up.",
+         "%n smells smoke where there's no fire, and then the hellhounds come over the mill wall: three of them, black-furred, walkin' on two legs, sparks drippin' off their jaws.",
+         "Somethin' howls in the millyard, and the howl has an echo of flame in it. By the time %n turns round, the pack's all around them."],
         ["The biggest one takes %n by the scruff and shoves them down on all fours in the cinders. The others sniff them over, and the air round them is hot as a forge.",
          "They circle %n, tails lashin', black fur smokin' at the tips, and one of them licks a long hot stripe up the back of %n's neck.",
          "A paw like a blacksmith's glove pins %n to the warm ash, and the pack argues in growls about who goes first."],
@@ -174,15 +174,15 @@
       ],
       over: [["They rut against %n one after another, over their back and between their thighs, and their seed steams where it lands on %n's skin.",
               "The pack marks %n all over, hot and sticky, and the cinders hiss under them."]],
-      end: ["The hellhounds slink back into the ruins one by one, and %n crawls out of the churchyard with %ml of hot hound seed knotted into their %h, belly glowin' like a coal.",
+      end: ["The hellhounds slink back into the ruins one by one, and %n crawls out of the millyard with %ml of hot hound seed knotted into their %h, belly glowin' like a coal.",
             "When the last knot slips, %n's left in the warm ash, stuffed with %ml, steam curlin' off the mess between their legs.",
-            "The pack licks %n's face, all three of them, rough and hot, and leaves them by the chapel wall with %ml churnin' warm in their %h."],
-      endOver: ["The pack leaves %n by the chapel wall, painted with %ml of steamin' hound seed and smellin' of brimstone.",
+            "The pack licks %n's face, all three of them, rough and hot, and leaves them by the mill wall with %ml churnin' warm in their %h."],
+      endOver: ["The pack leaves %n by the mill wall, painted with %ml of steamin' hound seed and smellin' of brimstone.",
                 "%n stumbles home with %ml of the hellhounds dryin' on their back and cinders in their hair."],
     },
     scene: [["The ash under %n is warm as a hearth, and every time they're shoved forward a little puff of sparks goes up.",
              "One of the waitin' hounds lies down by %n's head and pants, and its breath smells like a struck match.",
-             "The chapel's cracked bell sways in the wind and clanks, slow, like it's countin' the strokes.",
+             "The mill's cracked bell sways in the wind and clanks, slow, like it's countin' the strokes.",
              "Their fur smokes where %n grabs it, but it doesn't burn. It's just hot, everywhere, all the time."],
             ["{c}One of the hounds noses under %n and licks their cock, one long hot drag of a tongue, and %n nearly cums on the spot.",
              "{v}A hot tongue finds %n's clit while they're bein' ridden, and the two heats together are almost too much.",
@@ -373,7 +373,7 @@
               "They hold %n in the middle of the ring and take turns grindin' on them, and paint them by firelight."]],
       end: ["The fire burns down to coals and the revellers drift off into the dark, and %n's left by the embers with antlers on their head and %ml of the Samhain dance in their %h.",
             "Dawn comes grey over the field. %n wakes by the cold fire, crowned with antlers, sticky with cider and %ml of the revellers, and the masks are gone.",
-            "\"Blessed Samhain,\" somebody whispers, and kisses %n's forehead, and leaves them by the fire with %ml in their %h and the antlers still on."],
+            "\"Good Samhain,\" somebody whispers, and kisses %n's forehead, and leaves them by the fire with %ml in their %h and the antlers still on."],
       endOver: ["The revellers go home in their masks, and %n's left by the embers wearin' antlers and %ml of the dance.",
                 "%n wakes by the cold fire, antlers on their head, painted with %ml and smellin' of woodsmoke and cider."],
     },

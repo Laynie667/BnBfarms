@@ -162,7 +162,7 @@
       over: [["They don't take them. They kneel round %n in the furrow and stroke themselves over them, one after another, and sow the earth and %n both."]],
       end: ["The sowers untie %n from the plough and help them up out of the furrow, earthy to the knees, %ml of the sowers in their %h, and then they go off to sow the rest of the field, singin'.",
             "%n climbs out of the first furrow with %ml in their %h, soil on their knees and seed in their hair, and the sowers tip their hats and get back to work.",
-            "The head sower pats %n's belly. \"That's the field blessed,\" he says, and %n waddles off home with %ml in their %h and the whole field to walk across first."],
+            "The head sower pats %n's belly. \"That's the field sown,\" he says, and %n waddles off home with %ml in their %h and the whole field to walk across first."],
       endOver: ["%n's let up out of the furrow sown all over with %ml of seed, and the sowers go back to the field cheerin'.",
                 "The sowers untie %n, dusty and spattered with %ml of them, and call it the best start to a spring they've had."],
     },
@@ -181,7 +181,7 @@
     mess: ["mud", ["tummy", "chest"]],
     gear: [{ when: "hold", slot: "legs", label: "Plough Rope", items: ["HempRope"], color: "#7A5A3A", desc: "The plough's own rope, round their ankles and tied off to the handles, holdin' them spread across the first furrow." }],
     depth: ["breed", "held", "watched"], tw: ["day", "breed"], places: ["pasture"], sound: "rope", tags: ["restraint", "public"],
-    writes: ["SOWN", "FIRST FURROW", "BLESSED FIELD", "PLANTED DEEP"],
+    writes: ["SOWN", "FIRST FURROW", "SOWN FIELD", "PLANTED DEEP"],
   });
 
   // ── the egg-dyein' tubs ──

@@ -358,7 +358,7 @@
     after(mn){ arouse(mn, 40, 92); face(mn, "afterglow", 90); return null; },
     scene: [["The bonnet's covered in silk primroses and ribbons, and it's much the most dressed bit of %n.",
              "Somebody at the fence holds up a scorecard with a ten on it every time %n goes by.",
-             "The other entrants in the parade are all in their Sunday best, and keep glancin' at %n and then at each other.",
+             "The other entrants in the parade are all in their best clothes, and keep glancin' at %n and then at each other.",
              "A breeze picks up the bonnet ribbons and flutters them, and that's the only thing coverin' anythin' for a moment."],
             ["{t}A judge cups %n's tits from behind to check how they sit, and takes much longer about it than she needs.",
              "{c}A judge measures %n's cock against the side of his clipboard and writes the number down.",

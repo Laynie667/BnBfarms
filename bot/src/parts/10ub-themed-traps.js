@@ -45,7 +45,7 @@
          "The kennel girl takes %n by the collar, says \"Champion's ready for you,\" and walks them into the whelping box like it's the most ordinary thing in the world."],
         ["The stud's a big rangy hound-man with a show ribbon still pinned to his collar, and he's been waiting all week. He circles %n twice, sniffing, tail going.",
          "He's the kennel's champion, all lean muscle and long legs, and he looks at %n the way he looks at his dinner bowl. His sheath's already swelling."],
-        ["Two kennel hands kneel on either side and hold %n square in the straw, rump high, the way the breed book says. \"Steady,\" one of them croons, to %n or the dog, it isn't clear.",
+        ["Two kennel hands kneel on either side and hold %n square in the straw, rump high, the way the breed book says. \"Steady,\" one of them croons, to %n or the champion, it isn't clear.",
          "A hand presses %n's shoulders flat, another lifts their tail out of the way, and the champion is guided up and over like a mare at the stand.",
          "Hands press %n's shoulders flat and lift their rump, and the champion's guided up and over them the way the breed book says."],
       ],

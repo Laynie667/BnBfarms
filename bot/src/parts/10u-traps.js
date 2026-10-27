@@ -108,6 +108,8 @@
   // a trap's story, a beat at a time, then what it leaves behind
   function trapRun(mn, kind, beats, done, v, opts){   // opts.scene: this one's own two extra beats instead of the kind's (a stud's version: 10y9r2)
     state.trapRuns = state.trapRuns || new Map();
+    beats = moreBeats(kind, beats);         // each beat with more of its own lines (10z5-trap-more.js and the batches after it)
+    if (W.__FARMHAND_TEST__ && W.__onTrapBeats) try { W.__onTrapBeats(mn, kind, beats, opts); } catch(e){}   // (tests: the trap's own beats, as they'll run)
     beats = sceneBeats(kind, beats, opts && opts.scene);        // the trap's own two extra beats, before its last (10ue-trap-scenes.js)
     beats = deepenBeats(mn, kind, beats);   // two or three more beats in the middle, from what kind of trap it is (10ud-trap-depth.js)
     beats = stateBeats(mn, kind, beats);    // and one about the state they're in: carryin', full, in heat, what they wear, their kind (10z4-trap-state.js)

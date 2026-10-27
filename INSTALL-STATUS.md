@@ -5,7 +5,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 | Script | File in `dist/` | Where it runs | Current |
 |---|---|---|---|
-| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.57.0** |
+| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.58.0** |
 | Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.10.0** |
 | Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.2.1** |
 | Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **1.1.0** |
@@ -24,6 +24,11 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 ## Latest changes (newest first)
 
+- **Bot 0.58.0: the first 34 traps tell their own story in eight lines a beat, not two.** Laynie, Oct 27: "3-4 seems like a paltry amount". No Companion update needed.
+  - Every beat of these traps now picks from eight lines or more (most had two), and their two beats of their own from eight (most had four). About 1,300 new lines, each one fitted to the body it's about: a line about tits, a cock or a pussy only goes to somebody who has them.
+  - **The traps:** the corn maze, the kissin' gate, the tomato stocks, the bearskin rug, the hot tub, the peep booth, the stag (all four versions: the usual one, the twelve-pointer, the shy stag and the white hart), the goblin raid, the goblin pit, the warband, the stud chair, the clutch, the three groomin' tiles, the whelpin' shed, the mud pit (win or lose), the scarecrow, and from the seasons the trick-or-treat door, the vampire, the hellhounds, the spider, the revel, the hayride, the pumpkin patch, apple bobbin', the headless horseman, the demon, the ghost, the Wild Hunt, the spring sowin', the nixie, the midsummer bonfire and the last sheaf.
+  - **A few words changed:** the hellhounds' burnt chapel is a burnt mill now, a spring line and a harvest line lost their church words, and the Easter parade wears "their best clothes".
+  - **Next:** the winter, Yule, Easter and summer traps, then the farm's everyday ones (gas, wheel, spray, injector, tentacles), then the other studs' versions.
 - **Bot 0.57.0 + Companion 0.50.0: the whole rubber pup, eight parasite strains that spread over you, and every trap meetin' the state you're in.** Laynie, Oct 27: "They should be immersive, detailed, non-clinical, expansive message pools for all traps ... like gender, equipment, species, fullness, and all those variables. Plus the rubberpup trap should really feature a full outfit. I think the parasites would benefit from more strains and fuller outfits to spread into."
   - **Update every Companion to 0.50, the bot's own tab too.** The pup's collar, petsuit and tail and the parasites' new clothes need it.
   - **The rubber kennel dresses you as a whole rubber pup** (with "Farm can put real gear on me"): a latex catsuit (body and legs), the latex pup hood, the padded-paw petsuit (arms and legs), a dog collar with a GOOD PUP bone tag, a leash clipped to it, and a puppy tail plug. If anal or plugs are in your limits, or your back's already filled, it's a strapped-on tail instead. The collar and tag stay on 30 minutes after. If you already wear a collar, yours stays, and the leash and tag clip to it. The trap's story is rewritten round the outfit: suited up, hooded and put in the petsuit, taught to beg, played with (four beats of 8 to 10 lines each, 8 endings, and its own tender and filthy lines).

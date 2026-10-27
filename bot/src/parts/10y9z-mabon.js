@@ -60,7 +60,7 @@
         ["The first reaper takes %n's %h through the gap in the stalks, slow and deep, and the wheat rustles round them both with every thrust.",
          "One after another the reapers kneel at the last sheaf and take %n's %h, every one of them deep and steady, the way you gather a field in."],
         ["Every reaper has their turn, and some have two, and the head reaper finishes last with a shout that carries all the way down to the farmhouse.",
-         "Four reapers, four loads, and the last sheaf's well and truly blessed, and the reapers lie back in the stubble laughin'."],
+         "Four reapers, four loads, and the last sheaf's luck is well and truly made, and the reapers lie back in the stubble laughin'."],
       ],
       over: [["They don't take them. They stand round the last sheaf and stroke themselves over it, one after another, and spill across the gold wheat and %n inside it."]],
       end: ["The reapers carry the last sheaf down to the farmhouse on their shoulders with %n still in it, %ml of them in %n's %h, and stand it by the door for luck, and only then cut the twine.",

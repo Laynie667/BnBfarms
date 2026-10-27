@@ -290,7 +290,7 @@
          "{v}%n's womb throbs in time with the incense smoke, empty and hungry.",
          "Their skin flushes and their thighs press together. Whatever the shrine's blessing is, it's working."],
       ],
-      end: ["%n stumbles out of the stone ring in heat, blessed, ripe, and desperate to be bred.",
+      end: ["%n stumbles out of the stone ring in heat, ripe, achin' and desperate to be bred.",
             "The incense burns out. %n leaves the shrine flushed and aching, their belly crying out for a stud."],
     },
     buttermill: {

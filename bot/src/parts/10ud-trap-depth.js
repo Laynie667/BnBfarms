@@ -97,7 +97,7 @@
     watched: [
       "A little crowd has gathered. Somebody's eating an apple. Somebody else has brought a stool.",
       "%n can hear them talking about them like stock at a fair: the shape of their rump, the noise they make, whether they'll take.",
-      "A farm kid points and asks a question, and a farm hand answers it in loving detail.",
+      "A new farmhand points and asks a question, and an old one answers it in loving detail.",
       "Every gasp %n makes gets a little murmur from the onlookers, and that makes it so much worse, and better.",
       "Somebody takes bets on how long %n will last. The odds are not in %n's favour.",
       "Passers-by slow down, look, and stop. Nobody moves on.",

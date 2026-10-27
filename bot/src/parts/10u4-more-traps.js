@@ -195,6 +195,7 @@
     if (w.kind === "mirror"){ trance(mn, 0); if (how === "gave"){ goUnder(mn, 2); if (r.hypno) later(() => { try { echsAsk(mn, CFG.BOT_MEMBER, "mirror"); } catch(e){} }, 8000); } }   // (ECHS: 10uj-echs.js)
     if (charFor(mn)) emote(TRAP_KINDS[w.kind].icon+" "+moreLine(w.kind, how === "gave" ? "gave" : "held", mn), mn);
     if (how === "held") later(() => earnRibbons(mn, 1, "holdin' out against the "+(w.kind === "tickle" ? "tickle rack" : "mirror box")), 2000);
+    try { if (charFor(mn)) trapEnded(mn, w.kind, null); } catch(e){ warn("trap ended:", e); }   // how was it (10y9o-trap-ratings.js)
     syncCompanions(true);
     return true;
   }

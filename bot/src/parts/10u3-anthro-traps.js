@@ -75,6 +75,7 @@
       if (kind === "sow"){ const fed = trapFill(mn, "mouth", 200, CFG.TRAP_OVERFULL); if (fed > 0) p.milk = Math.min(milkCap(mn), p.milk + fed * CFG.PROD.SWALLOW_TO_MILK); }
       face(mn, hole ? "bred" : "afterglow", 120); arouse(mn, 40);
       r.anthro = r.anthro || {}; r.anthro[kind] = (r.anthro[kind] || 0) + 1;
+      if (A.after) try { A.after(mn, v, hole); } catch(e){ warn("trap "+kind+":", e); }   // what a season's studs leave behind besides (10y9n-halloween.js…)
     }, v);
   }
 
@@ -286,7 +287,7 @@
          "Somebody butts %n square in the backside, horns first, and they go down on their knees in the yard."],
         ["The billy goat stands over them: wiry, yellow-eyed, a beard to his chest and horns curlin' back from his brow, and a smell on him you could lean on. He grins with all his teeth.",
          "It's the billy. Rank, cocky, slot-pupilled and proud of every bit of it. He hooks a horn under %n's chin and tips their face up."],
-        ["He takes %n by the hair in both hands. \"Open up, kid.\"",
+        ["He takes %n by the hair in both hands. \"Open up, sweetheart.\"",
          "He plants a hoof either side of %n's knees and wags what he's got in their face. It's long, thin, pink and already drippin'."],
       ],
       in: [

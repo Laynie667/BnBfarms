@@ -158,7 +158,7 @@
      "The carousel speeds up. %n's head spins, the cups pull, the post pumps, and the farm whirls by in a blur.",
      "{c}At one stop a sleeve swallows %n's cock and pulls hard and fast, and lets go just before they finish, and the carousel turns."],
     ["%n's milked so many times their chest is numb and throbbin', and filled so many times they slosh when they move.",
-     "The farm kids wave from the fence every lap. %n tries to wave back and gets the post again instead.",
+     "The stable girls wave from the fence every lap. %n tries to wave back and gets the post again instead.",
      "Round and round. Milk out, cream in, a spank, a squeeze. %n can't remember what it was like to not be on the carousel.",
      "Somebody bets %n will last ten more laps. Somebody else bets twenty. The carousel doesn't care."]);
   trapScene("teatcheck",
@@ -475,7 +475,7 @@
      "{c}%n's cock pokes through a gap in the mesh, and somebody below gives it a tug, just to see what happens.",
      "%n turns slowly on the rope, legs spread through the net, and there's nothing they can do to cover anything."],
     ["A farmhand climbs the ladder, hooks the net to a beam at just the right height, and has a go at whatever's poking through.",
-     "The farm kids throw hay at the net and the farm hands throw worse, and %n swings and squirms and drips.",
+     "The milkmaids throw hay at the net and the farm hands throw worse, and %n swings and squirms and drips.",
      "Somebody lowers the net a few feet, so it's at the perfect height for anybody walking past, and leaves it there.",
      "%n's spun so many times they're dizzy, and the hands from below have stopped bothering to ask."]);
   trapScene("bell",

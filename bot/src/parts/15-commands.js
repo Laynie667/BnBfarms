@@ -1607,6 +1607,9 @@ Welcome to B&B Farm, hon. 🌾`);
       case "whistle": case "send": case "dose": case "herdtraps": case "sit": case "broody": case "album": case "holes": case "vat": keepersCommand(cmd, sender, args, R); break;   // 10y6-keepers.js
       case "stalldial": case "bringin": case "bedrest": case "callme": case "nevercall": case "intensity": case "keep": case "kept": uddersCommand(cmd, sender, args, R); break;   // 10y7-udders.js
       case "eager": trapCommand("traps", sender, ["eager"].concat(args), R); break;   // the no-cooldown switch, as its own command (and a Toggles switch)
+      case "seasons": case "calendar": seasonCommand(sender, args, R); break;   // (?season is the Breedin' add-on's)   // the farm's seasons (10y9m-seasons.js)
+      case "trickortreat": case "tot": trickOrTreat(sender, args, R); break;   // knockin' on the farm girl's door at Halloween (10y9n-halloween.js)
+      case "rate": rateCommand(sender, args, R); break;   // how a trap went for them (10y9o-trap-ratings.js)
       case "struggle": case "free": case "goad": case "hunt": case "lay": case "gather": case "pack": extrasCommand(cmd, sender, args, R); break;   // 10x-trap-extras.js
       case "feedback": case "suggest": case "idea": case "bug": case "meh": case "more": feedbackCommand(cmd, sender, args, rest, R); break;   // the suggestion box (10q)
 

@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.46.0
+// @version      0.47.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -230,7 +230,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.46.0";
+  var VERSION = "0.47.0";
 
   // shared/species.js
   var WORDS = {
@@ -4576,7 +4576,15 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
       cream: { style: "smear", base: "#FFF6E4", edge: "#E2D4B4", gloss: "#FFFFFF", alpha: 0.96, run: 0.35, width: 1.2 },
       cake: { style: "smear", smudge: 0.3, sprinkleN: 30, base: "#FFD8E6", edge: "#E3A9BC", gloss: "#FFFFFF", alpha: 0.97, run: 0.2, width: 1.3, patches: "#FFFFFF", crumbs: ["#E8C27A", "#D9A85B", "#C98F45", "#7A4A2A"], sprinkles: ["#FF5C8A", "#5CC8FF", "#FFE05C", "#7CE07C"] },
       mud: { style: "smear", base: "#6B4A2B", edge: "#45301A", gloss: "#9C7A55", alpha: 0.9, run: 0.5, width: 1.2, specks: "#3A2614", also: "run" },
-      mash: { style: "smear", base: "#D9C28C", edge: "#B09860", gloss: "#F5E8C2", alpha: 0.95, run: 0.25, width: 1.2, specks: "#A88A4A" }
+      mash: { style: "smear", base: "#D9C28C", edge: "#B09860", gloss: "#F5E8C2", alpha: 0.95, run: 0.25, width: 1.2, specks: "#A88A4A" },
+      // Halloween's (Oct 27): pumpkin guts with pale seeds in, a caramel run with a hard shine, glowin' ghost slime, a thin
+      // amber run of cider, the witch's bubblin' purple brew, and the water's black ink
+      pumpkin: { style: "smear", base: "#E07A1F", edge: "#A24E0C", gloss: "#FFC27A", alpha: 0.94, run: 0.3, width: 1.25, seeds: "#F4E6C0", specks: "#B65A12" },
+      caramel: { style: "run", tint: "#C27A30", stampAlpha: 0.92, narrow: [1, 1.35], long: 1.05, turn: 0.3, texture: "shine", base: "#B8702A", edge: "#6E3E10", gloss: "#FFD9A0", alpha: 0.9, run: 0.9, width: 1.25, beads: 0.9 },
+      ecto: { style: "smear", tint: "#8FF5DC", stampAlpha: 0.6, narrow: [1.1, 1.5], long: 0.95, turn: 1.1, texture: "bubbles", stampToo: true, base: "#7FEAD0", edge: "#38A88E", gloss: "#E6FFF9", alpha: 0.5, run: 1, width: 1.1, beads: 0.6, bubbles: true, also: "run" },
+      cider: { style: "run", tint: "#E3A23E", stampAlpha: 0.55, narrow: [0.5, 0.8], long: 1.3, turn: 0.3, texture: "sheen", base: "#D9902E", edge: "#A8661A", gloss: "#FFE6B0", alpha: 0.38, run: 1.5, width: 0.75, beads: 0.3, droplets: 1.4 },
+      brew: { style: "run", tint: "#8E4FCB", stampAlpha: 0.85, narrow: [0.9, 1.25], long: 1.1, turn: 0.4, texture: "bubbles", base: "#7A3FB0", edge: "#47206E", gloss: "#E6CCFF", alpha: 0.72, run: 1.2, width: 1, beads: 0.7, bubbles: true },
+      ink: { style: "run", tint: "#2A2433", stampAlpha: 0.95, narrow: [0.9, 1.25], long: 1.15, turn: 0.4, texture: "sheen", base: "#15121C", edge: "#000000", gloss: "#6E6880", alpha: 0.92, run: 1.2, width: 1.05, beads: 0.7, droplets: 1.2 }
     };
     function ribbon(ctx3, pts) {
       const L = [], R = [];
@@ -5096,7 +5104,13 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     "#6b4a2b": "mud",
     "#d8c08a": "mash",
     "#d9c13a": "piss",
-    "#ffd8e6": "cake"
+    "#ffd8e6": "cake",
+    "#e07a1f": "pumpkin",
+    "#b8702a": "caramel",
+    "#7fead0": "ecto",
+    "#d9902e": "cider",
+    "#7a3fb0": "brew",
+    "#15121c": "ink"
   };
   var AREA_OF = { face: "face", forehead: "forehead", chest: "chest", tummy: "tummy", hair: "hair", thighs: "thighL", back: "back" };
   function load2() {
@@ -5125,7 +5139,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
       const k = AREA_OF[x];
       if (k && !a.includes(k)) a.push(k);
     }
-    if (a.includes("tummy") && ["cum", "piss", "milk", "honey", "maple", "chocolate", "strawberry", "slime"].includes(kind) && Math.random() < 0.4) a.push(Math.random() < 0.5 ? "thighL" : "thighR");
+    if (a.includes("tummy") && ["cum", "piss", "milk", "honey", "maple", "chocolate", "strawberry", "slime", "caramel", "ecto", "cider", "brew", "ink"].includes(kind) && Math.random() < 0.4) a.push(Math.random() < 0.5 ? "thighL" : "thighR");
     if (!a.length) a.push("chest");
     const amt = Number(m.amount) > 0 ? Math.max(0.5, Math.min(3, Number(m.amount))) : 1;
     mine2.push({ k: kind, a, s: Math.random() * 1e9 | 0, t: Date.now(), m: Math.round(amt * 10) / 10 });
@@ -6009,6 +6023,39 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
       h("div", null, btn("My tally", () => ctx3.send("tally")), btn("Eggs", () => ctx3.send("eggs")), btn("Wash up", () => ctx3.send("wash")), btn("Pedigree", () => ctx3.send("pedigree")))
     ];
   }
+  function trapThemesCard(ctx3) {
+    const list = ctx3.s.trapThemes || [];
+    if (!list.length) return null;
+    return card(
+      title("Kinds of trap"),
+      muted("Switch a whole kind off and not one of those traps springs for you, not even one a proprietor springs by hand. A trap that's two kinds is off if either is." + (ctx3.s.trapCard ? "" : " (They only matter once your traps are on.)")),
+      list.map((t) => toggle(t.icon + " " + t.label, t.desc, !!t.on, () => ctx3.send("traps theme " + t.id + " " + (t.on ? "off" : "on"))))
+    );
+  }
+  function seasonsCard(ctx3) {
+    const sa = ctx3.s.seasonsAdmin;
+    if (!sa || !sa.rows || !sa.rows.length) return null;
+    const till = (t) => new Date(t).toLocaleString([], t - Date.now() < 20 * 36e5 ? { hour: "2-digit", minute: "2-digit" } : { weekday: "short", hour: "2-digit", minute: "2-digit" });
+    return card(
+      title("\u{1F5D3}\uFE0F Seasons"),
+      muted("Start any season's traps whenever you like: for a party, a special day, or just because. While one's on, about a third of what the plain trap tiles spring is from its pack, and the farm girl dresses for it. Anybody with their Seasonal packs switch off never gets them."),
+      sa.rows.map((x) => h(
+        "div",
+        { class: "fhc-kv" },
+        h("span", null, x.icon + " " + x.label + " \xB7 " + (x.on ? x.hand ? x.open ? "on till you stop it" : "on till " + till(x.until) : "on, its time of year" : x.dates)),
+        h("span", null, x.on ? btn("Stop", () => ctx3.send("seasons stop " + x.id)) : [btn("2 hours", () => ctx3.send("seasons start " + x.id + " 2h")), btn("Till I stop it", () => ctx3.send("seasons start " + x.id + " on"))])
+      )),
+      h(
+        "div",
+        null,
+        btn("All of them, 2 hours", () => ctx3.send("seasons start all 2h")),
+        btn("Stop the ones I started", () => ctx3.send("seasons stop")),
+        btn(sa.costume ? "Her costume: on" : "Her costume: off", () => ctx3.send("seasons costume " + (sa.costume ? "off" : "on"))),
+        btn("The calendar", () => ctx3.send("seasons"))
+      ),
+      muted("Other lengths, or several at once: ?seasons start halloween 3d \xB7 ?seasons start halloween winter on")
+    );
+  }
   function traps(ctx3) {
     const s = ctx3.s, tc = s.trapCard, ad = s.trapAdmin, gear = s.farmGear || [];
     return [
@@ -6020,6 +6067,8 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
         muted(tc.left + " kind" + (tc.left === 1 ? "" : "s") + " still to find" + (tc.eggs ? " \xB7 " + tc.eggs + " eggs laid" : "") + (tc.paused ? " \xB7 traps paused" : "") + (tc.eager ? " \xB7 eager (no waits)" : "") + (tc.danger ? " \xB7 Danger Draught in you" : "")),
         tc.corr || tc.under ? bar("Corruption", tc.corr + " of 100" + (tc.under ? " \xB7 gone under, depth " + tc.under : ""), tc.corr, "alert") : null,
         tc.hunt && muted("\u{1F514} The hunt is on: get to " + tc.hunt.goal),
+        tc.today && muted("\u{1F3AF} Trap of the day: " + tc.today.icon + " " + tc.today.kind + ", " + tc.today.what + (tc.today.paid ? ". It's paid you its ribbon today." : ". Twice as likely today, and a ribbon the first time it has you.")),
+        tc.rated && muted("Your ratings: \u{1F496} " + tc.rated.loved + " \xB7 \u{1F44D} " + tc.rated.fine + " \xB7 \u{1F645} " + tc.rated.no + (tc.rateAsk ? "" : " \xB7 not askin' after each trap")),
         h(
           "div",
           null,
@@ -6028,9 +6077,12 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
           btn(tc.eager ? "Eager: on" : "Eager: off", () => ctx3.send("traps eager " + (tc.eager ? "off" : "on"))),
           btn("What's out there", () => ctx3.send("traps")),
           btn("Lay (at the nest)", () => ctx3.send("lay")),
-          btn("My brood book", () => ctx3.send("brood"))
+          btn("My brood book", () => ctx3.send("brood")),
+          btn("My ratings", () => ctx3.send("rate")),
+          btn(tc.rateAsk === false ? "Ask how each was: off" : "Ask how each was: on", () => ctx3.send("rate ask " + (tc.rateAsk === false ? "on" : "off")))
         )
       ) : card(title("Traps"), muted("The farm's traps are off for you, so you can walk right over them. Switch them on and every trap spot on the farm can spring for you."), h("div", null, btn("Switch traps on", () => ctx3.send("traps on")))),
+      tc ? trapThemesCard(ctx3) : null,
       card(
         title("On you right now"),
         gear.length ? gear.map((g) => h("div", { style: { marginTop: "6px" } }, h("div", { class: "fhc-kv" }, h("b", null, g.name), h("span", { class: "fhc-muted" }, Math.max(0, Math.ceil((g.until - Date.now()) / 6e4)) + " min")), muted(gearLore(g.name) || g.desc || ""))) : muted("No farm gear on you."),
@@ -6049,6 +6101,8 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
       ) : null,
       ad && card(
         h("div", { class: "fhc-kv" }, title("Proprietor: traps"), chip(ad.subjects.length + " with traps on", "acc")),
+        ad.today && muted("\u{1F3AF} Trap of the day: " + ad.today.icon + " " + ad.today.kind),
+        ad.ratings && (ad.ratings.loved.length || ad.ratings.no.length) ? muted("\u{1F496} Most loved: " + (ad.ratings.loved.map((x) => x.icon + " " + x.kind + " (" + x.n + ")").join(", ") || "none yet") + ' \xB7 \u{1F645} Most "not for me": ' + (ad.ratings.no.map((x) => x.icon + " " + x.kind + " (" + x.n + ")").join(", ") || "none yet")) : null,
         ad.subjects.length ? ad.subjects.map((x) => h("div", { class: "fhc-kv" }, h("span", null, (x.here ? "\u25CF " : "") + x.name), h("span", { class: "fhc-muted" }, x.n + " sprung" + (x.paused ? " \xB7 paused" : "")))) : muted("Nobody's switched their traps on yet."),
         muted("Trap spots: " + (ad.spots.length ? ad.spots.join(", ") : "none yet (?spot set trap-<kind>)")),
         muted("Water: " + (ad.water.length ? ad.water.join(", ") : "none yet (?spot set pond)") + (ad.nest ? " \xB7 " + ad.nest + " eggs in the nest" : "") + (ad.pack ? " \xB7 pack at " + ad.pack : "")),
@@ -6059,9 +6113,11 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
           btn("Kinds & spots", () => ctx3.send("traps")),
           btn("Subjects", () => ctx3.send("subject")),
           btn(ad.hunt ? "Stop the hunt" : "Start a hunt", () => ctx3.send(ad.hunt ? "hunt stop" : "hunt start")),
-          btn("Gather eggs", () => ctx3.send("gather"))
+          btn("Gather eggs", () => ctx3.send("gather")),
+          btn("Ratings", () => ctx3.send("traps ratings"))
         )
-      )
+      ),
+      seasonsCard(ctx3)
     ];
   }
   function inbox(ctx3) {
@@ -6331,6 +6387,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     return [
       drawnBodyCard(ctx3),
       card(title("Farm settings"), muted("Saved by the farm girl. Your limits still win."), farmSwitches(ctx3, SWITCH_INFO)),
+      trapThemesCard(ctx3),
       extraSwitches(ctx3),
       card(
         title("Gender"),
@@ -8428,6 +8485,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
         h("div", null, ["myherd", "herdcall", "herdsummon", "roster", "stock", "queue"].map((c) => btn(c, () => ctx3.send(c)))),
         h("div", null, btn("Summon to me", act("summon")), btn("Claim", act("claim")), btn("Turn out", act("turnout")), btn("Let up", act("letup")))
       ),
+      seasonsCard(ctx3),
       latest(ctx3)
     ];
   }
@@ -9315,6 +9373,29 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
         ),
         h("div", { class: "fhc-muted" }, "Straight to the farm, past any gag or speech rule.")
       ));
+      const rt = this.s.rateTrap;
+      if (rt && rt.until > Date.now() && this.rated !== rt.kind + ":" + rt.until) {
+        const rate = (v) => {
+          this.rated = rt.kind + ":" + rt.until;
+          this.ask("rate " + rt.kind + " " + v, true);
+          this.render();
+        };
+        out.push(h(
+          "div",
+          { class: "fhc-box ask" },
+          h(
+            "div",
+            { class: "fhc-kv", style: { borderBottom: "none", padding: "0" } },
+            h("b", null, rt.icon + " How was the " + rt.kind + "?"),
+            h("button", { type: "button", class: "fhc-pill", "aria-label": "Dismiss", onclick: () => {
+              this.rated = rt.kind + ":" + rt.until;
+              this.render();
+            } }, "\u2715")
+          ),
+          h("div", { style: { marginTop: "6px" } }, btn("\u{1F496} Loved it", () => rate("loved"), true), btn("\u{1F44D} Fine", () => rate("fine")), btn("\u{1F645} Not for me", () => rate("no"))),
+          h("div", { class: "fhc-muted" }, "Loved it: it finds you a bit more often. Not for me: less often, but never not at all (?traps skip " + rt.kind + " does that).")
+        ));
+      }
       for (const a of this.asks) out.push(h(
         "div",
         { class: "fhc-box ask" },
@@ -9746,7 +9827,29 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     "Livin' Latex (body)",
     "Livin' Latex (heels)",
     "Milk Moss",
-    "Milk Moss (bloom)"
+    "Milk Moss (bloom)",
+    // Oct 27: Halloween's (and the farm girl's costume)
+    "Horseman's Rope",
+    "Hellhound's Knot",
+    "Demon's Horns",
+    "Spider's Web",
+    "Spider Silk",
+    "Samhain Antlers",
+    "The Great Pumpkin",
+    "Bobbin' Ties",
+    "The Witch's Cauldron",
+    "Broom Ties",
+    "Candy Stick",
+    "Taffy Hooks (arms)",
+    "Taffy Hooks (legs)",
+    "Mummy Wraps (arms)",
+    "Mummy Wraps (body)",
+    "Mummy Wraps (legs)",
+    "Costume Ears",
+    "Costume Tail",
+    "Witch's Hat",
+    "Black Cat Ears",
+    "Black Cat Tail"
   ];
   var GEAR_SLOTS = {
     plug: { groups: ["ItemButt"], names: ["InflVibeButtPlug", "BlackButtPlug", "ButtPlug", "ButtPump"], re: /ButtPlug|Plug/, color: "#2B2B2B" },
@@ -9778,7 +9881,12 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     hood: { groups: ["ItemHood"], names: ["LatexHood"], re: /^(LatexHood|TransparentLatexHood|LatexDogHood|VacHood)$/, color: "#121214" },
     mitts: { groups: ["ItemHands"], names: ["LatexBondageMitts"], re: /^LatexBondageMitts$/, color: "#121214" },
     // the parasite's suckers and the trough leeches (Laynie, Oct 26: "switch the parasites lactation pumps for the forbidden chastity bra")
-    chestbra: { groups: ["ItemBreast"], names: ["ForbiddenChastityBra", "PolishedChastityBra", "MetalChastityBra"], re: /ChastityBra$/ }
+    chestbra: { groups: ["ItemBreast"], names: ["ForbiddenChastityBra", "PolishedChastityBra", "MetalChastityBra"], re: /ChastityBra$/ },
+    // costume pieces (Oct 27: Halloween's cat ears and tails, a demon's horns, the farm girl dressed for the season). These
+    // only ever put on the item the piece names, so there's no stand-in: if this game hasn't got it, nothin' goes on
+    ears: { groups: ["HairAccessory2"], names: [], re: /^$/, takeover: true },
+    horns: { groups: ["HairAccessory1"], names: [], re: /^$/, takeover: true },
+    tail: { groups: ["TailStraps"], names: [], re: /^$/, takeover: true }
   };
   var GEAR_OPT = {
     "ItemArms:LeatherCuffs": "Wrist",
@@ -9820,7 +9928,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
       return false;
     }
   }
-  function gearAsset(group, slot, prefer) {
+  function gearAsset(group, slot, prefer, only) {
     const fam = P3().AssetFamily, get2 = (n) => {
       try {
         return typeof window.AssetGet === "function" ? window.AssetGet(fam, group, n) : null;
@@ -9829,6 +9937,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
       }
     };
     for (const n of Array.isArray(prefer) ? prefer.map(String) : []) if (/^[A-Za-z0-9_]{2,40}$/.test(n) && get2(n)) return n;
+    if (only) return typeof window.AssetGet !== "function" && Array.isArray(prefer) && prefer.length ? String(prefer[0]) : null;
     for (const n of slot.names) if (get2(n)) return n;
     const all = Array.isArray(window.Asset) ? window.Asset : [];
     const hit = all.find((a) => a && a.Group && a.Group.Name === group && slot.re.test(a.Name) && !a.OwnerOnly && !a.LoverOnly && !a.FamilyOnly);
@@ -9904,7 +10013,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
         }
       }
       if (!group) continue;
-      if (!item) item = gearAsset(group, slot, g.items);
+      if (!item) item = gearAsset(group, slot, g.items, !!g.only);
       if (!item) {
         if (was) next.push(was);
         continue;

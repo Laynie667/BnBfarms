@@ -210,7 +210,7 @@
          "%n is locked into the stocks in the middle of the square, and a hand-painted sign goes up: ONE COPPER A THROW."],
         ["The first tomato bursts on %n's forehead. The crowd cheers. A queue forms.",
          "Splat. A soft tomato right on the cheek, and juice runs into %n's eyes. Then a plum. Then a lot more."],
-        ["Children aim for the face, farmhands aim lower, and somebody brings a basket of overripe berries.",
+        ["The milkmaids aim for the face, the farmhands aim lower, and somebody brings a basket of overripe berries.",
          "%n gets pelted till they're dripping red and pulp from hair to chin, seeds in their ears, and still the coppers keep coming."],
       ],
       end: ["When the cart's empty, %n is let out of the stocks dripping with tomato and berry juice, the square cheering.",

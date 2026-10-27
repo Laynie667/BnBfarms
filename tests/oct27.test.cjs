@@ -72,11 +72,12 @@ const all=n=>sent.slice(n).filter(([e,d])=>d&&(typeof d.Content==='string'||e===
   // ── an outdated Companion is told to update (Laynie, Oct 27) ──
   delete P(700).updateTold; n=sent.length; hello(700,{ver:'0.40.0'}); await wait(10500);
   const told=to(700,'notice',n).map(x=>x.text).join(' ');
-  ok(/v0\.40\.0/.test(told) && /0\.46\.0 is out/.test(told) && /Check for userscript updates/.test(told), 'a Companion older than this release gets a notice to update ('+told.slice(0,90)+')');
+  const CUR=JSON.parse(fs.readFileSync(path.join(__dirname,'..','package.json'),'utf8')).versions.companion;   // (whatever this release's Companion is)
+  ok(/v0\.40\.0/.test(told) && told.includes(CUR+' is out') && /Check for userscript updates/.test(told), 'a Companion older than this release gets a notice to update ('+told.slice(0,90)+')');
   ok(sent.slice(n).some(([e,d])=>e==='AccountBeep'&&d.MemberNumber===700&&/is out/.test(d.Message)), '...and a real beep, since the bot can reach them');
   n=sent.length; hello(700,{ver:'0.40.0',again:true}); await wait(10500);
   ok(!to(700,'notice',n).some(x=>/is out/.test(x.text)), 'not again the same day');
-  n=sent.length; hello(900,{ver:'0.46.0'}); await wait(10500);
+  n=sent.length; hello(900,{ver:CUR}); await wait(10500);
   ok(!to(900,'notice',n).some(x=>/is out/.test(x.text)), 'an up-to-date Companion hears nothin\' about it');
 
   // ── the whitelist stops re-askin' for one that never sticks ──

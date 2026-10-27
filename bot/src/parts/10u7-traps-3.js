@@ -24,9 +24,9 @@
     vines: ["slime", ["tummy"]], saddle: ["cream", ["tummy"]], wheel: ["cream", ["tummy", "chest"]], scarecrow: ["cream", ["tummy", "chest"]],
     crate: ["cream", ["tummy"]], kissgate: ["cream", ["face", "tummy"]], collection: ["cream", ["tummy"]],
   };
-  function trapMess(mn, kind, what){
+  function trapMess(mn, kind, what, given){   // given: [mess, [where]] (the water's own: 10y9r-water-beast.js)
     try {
-      let m = what ? [what, ["face", "chest", "tummy"]] : MESS_BY_TRAP[kind];
+      let m = given || (what ? [what, ["face", "chest", "tummy"]] : MESS_BY_TRAP[kind]);
       if (kind === "stocks" && Math.random() < 0.5) m = ["cake", m[1]];   // some of the pies are cake
       if (!m || (!MESS[m[0]] && m[0] !== "cum")) return false;
       return bodyMark(mn, Object.assign({ splat: m[1], mess: m[0] }, MESS[m[0]] ? { color: MESS[m[0]] } : {}));   // (cum keeps the game's own white splatters)
@@ -313,7 +313,7 @@
          "Pie after pie, and %n's face is a mask of cream and crust before long."],
         ["The queue for pies runs right round the fairground. %n can't see, can't wipe, can only lick their lips.",
          "Somebody throws a pie, then licks some cream off %n's cheek, then throws another.",
-         "A child's sticky little pie bounces off %n's nose, and the crowd applauds the effort."],
+         "A dairymaid's sticky little tart bounces off %n's nose, and the crowd applauds the effort."],
       ],
       end: ["The stocks open. %n stands up drippin', %x pies' worth of cream on them, and takes a bow.",
             "%x pies, and every one found its mark. %n is let out of the stocks creamed from the hair to the hips.",

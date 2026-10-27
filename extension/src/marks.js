@@ -132,7 +132,11 @@ const FARM_NAMES = ["Parasite Lips", "Parasite Belt", "Pump Bung", "Egg Post Plu
   "Windmill Sails", "Kissin' Gate", "The Fence", "Collection Bench", "Auction Block",
   "Vacuum Bed", "Vat Skin", "Vat Skin (hands)", "Doll Hood", "Doll Binder", "Doll Tag", "Stall Sheath", "Rubber Cups", "Inflatable Body Bag",
   "Dairymaid's Mitts", "Dairymaid's Muzzle", "Black Pool Latex (legs)", "Black Pool Latex (arms)", "Rubber Pup Hood", "Rubber Paws",
-  "Livin' Latex (hands)", "Livin' Latex (arms)", "Livin' Latex (feet)", "Livin' Latex (legs)", "Livin' Latex (body)", "Livin' Latex (heels)", "Milk Moss", "Milk Moss (bloom)"];
+  "Livin' Latex (hands)", "Livin' Latex (arms)", "Livin' Latex (feet)", "Livin' Latex (legs)", "Livin' Latex (body)", "Livin' Latex (heels)", "Milk Moss", "Milk Moss (bloom)",
+  // Oct 27: Halloween's (and the farm girl's costume)
+  "Horseman's Rope", "Hellhound's Knot", "Demon's Horns", "Spider's Web", "Spider Silk", "Samhain Antlers", "The Great Pumpkin", "Bobbin' Ties", "The Witch's Cauldron",
+  "Broom Ties", "Candy Stick", "Taffy Hooks (arms)", "Taffy Hooks (legs)", "Mummy Wraps (arms)", "Mummy Wraps (body)", "Mummy Wraps (legs)", "Costume Ears", "Costume Tail",
+  "Witch's Hat", "Black Cat Ears", "Black Cat Tail"];
 // slot → where it can go and which game item it is: the first that this game has; the pattern is a fallback
 export const GEAR_SLOTS = {
   plug:     { groups: ["ItemButt"], names: ["InflVibeButtPlug", "BlackButtPlug", "ButtPlug", "ButtPump"], re: /ButtPlug|Plug/, color: "#2B2B2B" },
@@ -164,6 +168,11 @@ export const GEAR_SLOTS = {
   mitts:    { groups: ["ItemHands"], names: ["LatexBondageMitts"], re: /^LatexBondageMitts$/, color: "#121214" },
   // the parasite's suckers and the trough leeches (Laynie, Oct 26: "switch the parasites lactation pumps for the forbidden chastity bra")
   chestbra: { groups: ["ItemBreast"], names: ["ForbiddenChastityBra", "PolishedChastityBra", "MetalChastityBra"], re: /ChastityBra$/ },
+  // costume pieces (Oct 27: Halloween's cat ears and tails, a demon's horns, the farm girl dressed for the season). These
+  // only ever put on the item the piece names, so there's no stand-in: if this game hasn't got it, nothin' goes on
+  ears:     { groups: ["HairAccessory2"], names: [], re: /^$/, takeover: true },
+  horns:    { groups: ["HairAccessory1"], names: [], re: /^$/, takeover: true },
+  tail:     { groups: ["TailStraps"], names: [], re: /^$/, takeover: true },
 };
 // HOW EACH PIECE IS SET (Laynie, Oct 19: "I had a knee spreader described as being a knee spreader, but it was just hemp
 // rope and the cuffs weren't restraining me at all with their configuration"). The game puts most restraints on in their
@@ -196,9 +205,11 @@ function setGearOpt(group, name, want) {
     return true;
   } catch (e) { console.warn("[Farmhand Companion] gear setting:", e); return false; }
 }
-function gearAsset(group, slot, prefer) {
+// only: the piece's own items or nothin' (a witch's hat the game might not have mustn't turn into a flower crown)
+function gearAsset(group, slot, prefer, only) {
   const fam = P().AssetFamily, get = (n) => { try { return typeof window.AssetGet === "function" ? window.AssetGet(fam, group, n) : null; } catch (e) { return null; } };
   for (const n of (Array.isArray(prefer) ? prefer.map(String) : [])) if (/^[A-Za-z0-9_]{2,40}$/.test(n) && get(n)) return n;   // the piece's own choice, if this game has it there
+  if (only) return typeof window.AssetGet !== "function" && Array.isArray(prefer) && prefer.length ? String(prefer[0]) : null;
   for (const n of slot.names) if (get(n)) return n;
   const all = Array.isArray(window.Asset) ? window.Asset : [];
   const hit = all.find((a) => a && a.Group && a.Group.Name === group && slot.re.test(a.Name) && !a.OwnerOnly && !a.LoverOnly && !a.FamilyOnly);
@@ -246,7 +257,7 @@ export function syncFarmGear(list, allow) {
       if (group) { was = next.find((b) => b.Group === group); next = next.filter((b) => b !== was); }
     }
     if (!group) continue;                                                              // that spot's taken: it's on the farm's books just the same
-    if (!item) item = gearAsset(group, slot, g.items);
+    if (!item) item = gearAsset(group, slot, g.items, !!g.only);
     if (!item) { if (was) next.push(was); continue; }   // (nothing to put there after all: theirs stays)
     const color = (typeof g.color === "string" && /^#[0-9a-fA-F]{6}$/.test(g.color) ? g.color : null) || slot.color || "Default";
     const it = { Group: group, Name: item, Difficulty: 20, Property: {},

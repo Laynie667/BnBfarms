@@ -273,7 +273,7 @@
                     "%x, capped and safe. The queen strokes %n's swellin' teats with a feathered hand. \"You'll feed them well.\" The drones hum agreement.");
     more(A.goat.beats,
       ["\"Oi. Down here.\" %n looks down. The billy's lyin' on the hay bales with his hands behind his head and everything else on show.",
-       "A horn hooks %n's collar from behind and tugs. \"Not so fast, kid.\""],
+       "A horn hooks %n's collar from behind and tugs. \"Not so fast, darlin'.\""],
       ["He stinks, and he knows it, and he flares his nostrils like it's cologne. \"That's buck, that is. You'll get to like it.\"",
        "He walks round %n once on his clickin' hooves, flappin' his tongue, and stops in front."],
       ["He taps %n's bottom lip with one finger. \"That. I want that.\"",

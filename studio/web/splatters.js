@@ -36,6 +36,14 @@
     cake:       { style: "smear", smudge: 0.3, sprinkleN: 30, base: "#FFD8E6", edge: "#E3A9BC", gloss: "#FFFFFF", alpha: 0.97, run: 0.2, width: 1.3, patches: "#FFFFFF", crumbs: ["#E8C27A", "#D9A85B", "#C98F45", "#7A4A2A"], sprinkles: ["#FF5C8A", "#5CC8FF", "#FFE05C", "#7CE07C"] },
     mud:        { style: "smear", base: "#6B4A2B", edge: "#45301A", gloss: "#9C7A55", alpha: 0.9, run: 0.5, width: 1.2, specks: "#3A2614", also: "run" },
     mash:       { style: "smear", base: "#D9C28C", edge: "#B09860", gloss: "#F5E8C2", alpha: 0.95, run: 0.25, width: 1.2, specks: "#A88A4A" },
+    // Halloween's (Oct 27): pumpkin guts with pale seeds in, a caramel run with a hard shine, glowin' ghost slime, a thin
+    // amber run of cider, the witch's bubblin' purple brew, and the water's black ink
+    pumpkin:    { style: "smear", base: "#E07A1F", edge: "#A24E0C", gloss: "#FFC27A", alpha: 0.94, run: 0.3, width: 1.25, seeds: "#F4E6C0", specks: "#B65A12" },
+    caramel:    { style: "run", tint: "#C27A30", stampAlpha: 0.92, narrow: [1.0, 1.35], long: 1.05, turn: 0.3, texture: "shine", base: "#B8702A", edge: "#6E3E10", gloss: "#FFD9A0", alpha: 0.9, run: 0.9, width: 1.25, beads: 0.9 },
+    ecto:       { style: "smear", tint: "#8FF5DC", stampAlpha: 0.6, narrow: [1.1, 1.5], long: 0.95, turn: 1.1, texture: "bubbles", stampToo: true, base: "#7FEAD0", edge: "#38A88E", gloss: "#E6FFF9", alpha: 0.5, run: 1.0, width: 1.1, beads: 0.6, bubbles: true, also: "run" },
+    cider:      { style: "run", tint: "#E3A23E", stampAlpha: 0.55, narrow: [0.5, 0.8], long: 1.3, turn: 0.3, texture: "sheen", base: "#D9902E", edge: "#A8661A", gloss: "#FFE6B0", alpha: 0.38, run: 1.5, width: 0.75, beads: 0.3, droplets: 1.4 },
+    brew:       { style: "run", tint: "#8E4FCB", stampAlpha: 0.85, narrow: [0.9, 1.25], long: 1.1, turn: 0.4, texture: "bubbles", base: "#7A3FB0", edge: "#47206E", gloss: "#E6CCFF", alpha: 0.72, run: 1.2, width: 1.0, beads: 0.7, bubbles: true },
+    ink:        { style: "run", tint: "#2A2433", stampAlpha: 0.95, narrow: [0.9, 1.25], long: 1.15, turn: 0.4, texture: "sheen", base: "#15121C", edge: "#000000", gloss: "#6E6880", alpha: 0.92, run: 1.2, width: 1.05, beads: 0.7, droplets: 1.2 },
   };
 
   // a ribbon down a path of points, each with its own width; it ends where the last point is

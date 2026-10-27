@@ -5,7 +5,7 @@
 // The staff panel: duty, the Office (lookups about other people land here), contracts, the barn, guides, switches.
 import { h, card, title, muted, btn, chip, toggle } from "../dom.js";
 import { guidesTab } from "./common.js";
-import { panelPrefs, panelPrefsOrLink, drawnBodyCard } from "./livestock.js";
+import { panelPrefs, panelPrefsOrLink, drawnBodyCard, seasonsCard } from "./livestock.js";
 import { DURATIONS } from "../../../shared/bcplus.js";
 import { summonReady } from "../addons.js";
 import { herd, zones, voice, shift } from "./staffdata.js";
@@ -116,6 +116,7 @@ function barn(ctx) {
       h("div", null, btn("Breed from a jar…", () => ctx.fillBox("inseminate " + (who() ? who() + " " : ""))))),
     card(title("Herd"), h("div", null, ["myherd", "herdcall", "herdsummon", "roster", "stock", "queue"].map((c) => btn(c, () => ctx.send(c)))),
       h("div", null, btn("Summon to me", act("summon")), btn("Claim", act("claim")), btn("Turn out", act("turnout")), btn("Let up", act("letup")))),
+    seasonsCard(ctx),
     latest(ctx),
   ];
 }

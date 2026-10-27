@@ -486,6 +486,15 @@ TRAPS (your own switch)
   ?traps on · they spring for you · ?traps off · they never do
   ?traps · what's out there · ?traps <name> · what one does
   ?traps skip <kind> · rule one out · ?traps allow <kind>
+  ?traps theme · whole kinds, on or off: furry, monsters, goblins,
+     pregnancy, milking, messy, restraint, latex, public, seasonal
+     ?traps theme <kind> on|off · ?traps theme all on
+  ?rate · what you've rated · ?rate <trap> loved|fine|no
+     Loved it comes round more. Not for me comes round less (said
+     twice, a lot less), but never stops it: ?traps skip does that.
+     ?rate ask off · stop askin' after each one
+  ?seasons · the farm's calendar, and what's on (?calendar too)
+  ?trickortreat · Halloween: knock on the farm girl's door
   ?quiet [minutes] · an hour where nothin' new starts on you
   ?tend <who> · help somebody lay (a ribbon in it)
   ?brood · your brood book: what's bred you, what you carried
@@ -734,6 +743,11 @@ RIBBONS, POTIONS, DARES, THE CORRAL
      only for people who said ?bench on · bench spots:
      ?spot set bench (bench-2, bench-3…)
   ?subject · proprietors: who has traps switched on
+  ?traps ratings · the herd's favourite traps, and the ones passed on
+  ?seasons start <name|all> [2h, 3d, on] · proprietors: any season
+     any time, for a party, a special day, or just because (on: till
+     you stop it; several at once: ?seasons start halloween winter)
+     ?seasons stop [name|all] · ?seasons costume on|off
   ?traps · the kinds, the spots, the water
      trap spots: ?spot set trap-<kind> (trap-milker-2…), or a
      plain ?spot set trap for pot luck. A pillory, a tickle rack

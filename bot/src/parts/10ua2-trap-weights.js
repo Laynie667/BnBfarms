@@ -48,11 +48,12 @@
   }
   // pick one of the kinds they can have, weighted by the moment → { kind, why }
   function trapWeighted(mn, can){
-    const facts = trapFactors(mn), recent = ((rec(mn) || {}).trapLog || []).slice(-TW_RECENT).map(x => x.kind);
+    const facts = trapFactors(mn), recent = ((rec(mn) || {}).trapLog || []).slice(-TW_RECENT).map(x => x.kind), today = trapOfDay();
     const w = can.map(k => {
       let x = 1;
       for (const [f] of facts) if (TW[f].kinds.includes(k)) x += TW[f].x;
       if (recent.includes(k)) x *= TW_RECENT_X;
+      x *= trapRateX(mn, k) * (k === today ? CFG.TRAP_DAY_X : 1);   // what they said about it, and the trap of the day (10y9o-trap-ratings.js)
       return x;
     });
     let r = Math.random() * w.reduce((a, b) => a + b, 0), i = 0;
@@ -60,7 +61,7 @@
     const kind = can[i];
     // the strongest reason that fits the trap it picked
     const f = facts.find(([n]) => TW[n].kinds.includes(kind) && TW[n].why);
-    const why = !f ? "" : typeof TW[f[0]].why === "string" ? TW[f[0]].why : TW[f[0]].why[f[1]] || "";
+    const why = !f ? (kind === today ? "It's the trap of the day, sugar." : "") : typeof TW[f[0]].why === "string" ? TW[f[0]].why : TW[f[0]].why[f[1]] || "";
     return { kind, why };
   }
   if (W.__FARMHAND_TEST__) Object.assign(W, { __trapWeighted: (m, c) => trapWeighted(m, c), __trapFactors: (m) => trapFactors(m).map(f => f.join(":")) });

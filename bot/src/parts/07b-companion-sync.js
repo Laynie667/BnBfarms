@@ -75,6 +75,9 @@
       part("trap card", () => { const tc = trapCardFor(mn); if (tc) s.trapCard = tc; });   // the trap card (10x-trap-extras.js)
       part("farm gear", () => { const fg = farmGearFor(mn); if (fg.length) s.farmGear = fg; });   // real gear their Companion keeps on them (10y-farm-gear.js)
       part("trap admin", () => { if (isProprietor(mn)) s.trapAdmin = trapAdminFor(); });
+      part("trap ratings", () => rateStateFor(mn, s));   // how was it, the trap of the day (10y9o-trap-ratings.js)
+      part("trap kinds", () => trapThemeStateFor(mn, s));   // whole kinds of trap switched off (10y9q-trap-switches.js)
+      part("seasons", () => seasonsStateFor(mn, s));        // proprietors: the Seasons card, any season any time (10y9m-seasons.js)
       part("under", () => { const u = underOf(mn); if (u >= 2) s.under = u; if (r.corrWord) s.corrWord = r.corrWord; if (r.corrNoise) s.corrNoise = r.corrNoise; });   // simpler words, and the word that slips out (10y4-corruption.js)
       part("keepsakes", () => keepersStateFor(mn, s));
       part("udders", () => uddersStateFor(mn, s));   // the dial, their words, intensity, kept (10y7-udders.js)   // the album, trained holes, the vat, sittin' the nest (10y6-keepers.js)

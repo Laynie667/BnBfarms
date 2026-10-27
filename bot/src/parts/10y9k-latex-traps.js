@@ -280,7 +280,7 @@
      "She paints a little number on the back of %n's neck in white, and writes it in her ledger too.",
      "She checks every buckle twice, slow, like a farmer checkin' the gate's latched, and gives %n's rump a pat when she's done."],
     ["A customer in the window asks if the doll is real. The dollmaker pinches %n's ass and they squeak, and the customer laughs.",
-     "{t}A child's teasin' finger is stopped at the glass, but a grown hand reaches in and tweaks a nipple, and the dollmaker allows it.",
+     "{t}A customer's teasin' finger taps the glass, then reaches in round it and tweaks a nipple, and the dollmaker allows it.",
      "{c}One customer can't stop playin' with the doll's cock, and the dollmaker charges them for the polish after.",
      "Somebody bends the doll over to see how far it goes, and the answer is quite a long way."]);
   trapScene("rubberstall",

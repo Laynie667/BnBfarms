@@ -83,7 +83,7 @@
     ["When the pies run out, the crowd switches to cream straight from the can, and a can goes over %n's head.",
      "A farmhand licks a long stripe of cream off %n's neck, and then their ear, and then their mouth.",
      "%n's dripping cream from every inch above the boards, and somebody behind them is paying attention to every inch below.",
-     "Kids line up for a throw. Grown-ups line up for something else."]);
+     "The milkmaids line up for a throw. The farmhands line up for something else."]);
   trapScene("kissgate",
     ["The toll's paid both ways at once: somebody kissing %n deep on the field side while somebody pays at the other.",
      "Every walker that comes through reads the sign aloud: TOLL, ONE KISS OR ONE TURN. Most of them can count.",
@@ -180,7 +180,7 @@
   trapScene("tomatoes",
     ["The crowd gets into it. Rotten tomatoes, soft plums, an egg or two, and it all runs down %n's face and into their mouth.",
      "{t}Somebody takes aim at %n's tits, and gets them, and the juice runs off their nipples.",
-     "A child throws a grape. Then a farmhand throws a melon. The melon makes a sound %n won't forget.",
+     "A milkmaid throws a grape. Then a farmhand throws a melon. The melon makes a sound %n won't forget.",
      "%n gets the hang of it and starts catching the soft ones in their mouth, and the crowd goes wild."],
     ["Somebody comes round the back of the stocks, while %n's face is full of fruit, and there's a different sort of throwing going on back there.",
      "%n's plastered red and pink and gold, juice running down their chin and between their legs, and the cart's still half full.",

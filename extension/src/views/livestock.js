@@ -116,6 +116,29 @@ function breeding(ctx) {
 }
 
 // 🧪 Traps: a test subject's trap card, what the farm has on them right now, and the proprietors' own card
+// whole kinds of trap, each its own switch (the farm's 10y9q-trap-switches.js)
+export function trapThemesCard(ctx) {
+  const list = ctx.s.trapThemes || [];
+  if (!list.length) return null;
+  return card(title("Kinds of trap"),
+    muted("Switch a whole kind off and not one of those traps springs for you, not even one a proprietor springs by hand. A trap that's two kinds is off if either is." + (ctx.s.trapCard ? "" : " (They only matter once your traps are on.)")),
+    list.map((t) => toggle(t.icon + " " + t.label, t.desc, !!t.on, () => ctx.send("traps theme " + t.id + " " + (t.on ? "off" : "on")))));
+}
+// the proprietors' Seasons card (the farm's 10y9m-seasons.js): any season's traps, any time of year
+export function seasonsCard(ctx) {
+  const sa = ctx.s.seasonsAdmin;
+  if (!sa || !sa.rows || !sa.rows.length) return null;
+  const till = (t) => new Date(t).toLocaleString([], t - Date.now() < 20 * 3600000 ? { hour: "2-digit", minute: "2-digit" } : { weekday: "short", hour: "2-digit", minute: "2-digit" });
+  return card(title("🗓️ Seasons"),
+    muted("Start any season's traps whenever you like: for a party, a special day, or just because. While one's on, about a third of what the plain trap tiles spring is from its pack, and the farm girl dresses for it. Anybody with their Seasonal packs switch off never gets them."),
+    sa.rows.map((x) => h("div", { class: "fhc-kv" },
+      h("span", null, x.icon + " " + x.label + " · " + (x.on ? (x.hand ? (x.open ? "on till you stop it" : "on till " + till(x.until)) : "on, its time of year") : x.dates)),
+      h("span", null, x.on ? btn("Stop", () => ctx.send("seasons stop " + x.id))
+        : [btn("2 hours", () => ctx.send("seasons start " + x.id + " 2h")), btn("Till I stop it", () => ctx.send("seasons start " + x.id + " on"))]))),
+    h("div", null, btn("All of them, 2 hours", () => ctx.send("seasons start all 2h")), btn("Stop the ones I started", () => ctx.send("seasons stop")),
+      btn(sa.costume ? "Her costume: on" : "Her costume: off", () => ctx.send("seasons costume " + (sa.costume ? "off" : "on"))), btn("The calendar", () => ctx.send("seasons"))),
+    muted("Other lengths, or several at once: ?seasons start halloween 3d · ?seasons start halloween winter on"));
+}
 function traps(ctx) {
   const s = ctx.s, tc = s.trapCard, ad = s.trapAdmin, gear = s.farmGear || [];
   return [
@@ -126,9 +149,13 @@ function traps(ctx) {
       muted(tc.left + " kind" + (tc.left === 1 ? "" : "s") + " still to find" + (tc.eggs ? " · " + tc.eggs + " eggs laid" : "") + (tc.paused ? " · traps paused" : "") + (tc.eager ? " · eager (no waits)" : "") + (tc.danger ? " · Danger Draught in you" : "")),
       (tc.corr || tc.under) ? bar("Corruption", tc.corr + " of 100" + (tc.under ? " · gone under, depth " + tc.under : ""), tc.corr, "alert") : null,
       tc.hunt && muted("🔔 The hunt is on: get to " + tc.hunt.goal),
+      tc.today && muted("🎯 Trap of the day: " + tc.today.icon + " " + tc.today.kind + ", " + tc.today.what + (tc.today.paid ? ". It's paid you its ribbon today." : ". Twice as likely today, and a ribbon the first time it has you.")),
+      tc.rated && muted("Your ratings: 💖 " + tc.rated.loved + " · 👍 " + tc.rated.fine + " · 🙅 " + tc.rated.no + (tc.rateAsk ? "" : " · not askin' after each trap")),
       h("div", null, btn("Struggle", () => ctx.send("struggle")), btn("Switch traps off", () => ctx.send("traps off")),
-        btn(tc.eager ? "Eager: on" : "Eager: off", () => ctx.send("traps eager " + (tc.eager ? "off" : "on"))), btn("What's out there", () => ctx.send("traps")), btn("Lay (at the nest)", () => ctx.send("lay")), btn("My brood book", () => ctx.send("brood"))))
+        btn(tc.eager ? "Eager: on" : "Eager: off", () => ctx.send("traps eager " + (tc.eager ? "off" : "on"))), btn("What's out there", () => ctx.send("traps")), btn("Lay (at the nest)", () => ctx.send("lay")), btn("My brood book", () => ctx.send("brood")),
+        btn("My ratings", () => ctx.send("rate")), btn(tc.rateAsk === false ? "Ask how each was: off" : "Ask how each was: on", () => ctx.send("rate ask " + (tc.rateAsk === false ? "on" : "off")))))
        : card(title("Traps"), muted("The farm's traps are off for you, so you can walk right over them. Switch them on and every trap spot on the farm can spring for you."), h("div", null, btn("Switch traps on", () => ctx.send("traps on")))),
+    tc ? trapThemesCard(ctx) : null,
     card(title("On you right now"), gear.length ? gear.map((g) => h("div", { style: { marginTop: "6px" } }, h("div", { class: "fhc-kv" }, h("b", null, g.name), h("span", { class: "fhc-muted" }, Math.max(0, Math.ceil((g.until - Date.now()) / 60000)) + " min")), muted(gearLore(g.name) || g.desc || "")))
       : muted("No farm gear on you."),
       !ctx.prefs.gear && muted("Trap gear only goes on for real with \"Farm can put real gear on me\" switched on (Toggles → This panel).")),
@@ -140,13 +167,17 @@ function traps(ctx) {
       s.album.map((e) => h("div", { style: { marginTop: "6px" } }, h("div", { class: "fhc-kv" }, h("b", null, e.i + " " + e.h), h("span", { class: "fhc-muted" }, new Date(e.t).toLocaleDateString())), muted(e.x))),
       muted("Only you can open this album.")) : null,
     ad && card(h("div", { class: "fhc-kv" }, title("Proprietor: traps"), chip(ad.subjects.length + " with traps on", "acc")),
+      ad.today && muted("🎯 Trap of the day: " + ad.today.icon + " " + ad.today.kind),
+      ad.ratings && (ad.ratings.loved.length || ad.ratings.no.length) ? muted("💖 Most loved: " + (ad.ratings.loved.map((x) => x.icon + " " + x.kind + " (" + x.n + ")").join(", ") || "none yet") +
+        " · 🙅 Most \"not for me\": " + (ad.ratings.no.map((x) => x.icon + " " + x.kind + " (" + x.n + ")").join(", ") || "none yet")) : null,
       ad.subjects.length ? ad.subjects.map((x) => h("div", { class: "fhc-kv" }, h("span", null, (x.here ? "● " : "") + x.name), h("span", { class: "fhc-muted" }, x.n + " sprung" + (x.paused ? " · paused" : ""))))
         : muted("Nobody's switched their traps on yet."),
       muted("Trap spots: " + (ad.spots.length ? ad.spots.join(", ") : "none yet (?spot set trap-<kind>)")),
       muted("Water: " + (ad.water.length ? ad.water.join(", ") : "none yet (?spot set pond)") + (ad.nest ? " · " + ad.nest + " eggs in the nest" : "") + (ad.pack ? " · pack at " + ad.pack : "")),
       ad.hunt && muted("🔔 Hunt on: finish at " + ad.hunt.goal + ", " + ad.hunt.done + " home"),
       h("div", null, btn("Kinds & spots", () => ctx.send("traps")), btn("Subjects", () => ctx.send("subject")), btn(ad.hunt ? "Stop the hunt" : "Start a hunt", () => ctx.send(ad.hunt ? "hunt stop" : "hunt start")),
-        btn("Gather eggs", () => ctx.send("gather")))),
+        btn("Gather eggs", () => ctx.send("gather")), btn("Ratings", () => ctx.send("traps ratings")))),
+    seasonsCard(ctx),
   ];
 }
 export function inbox(ctx) {
@@ -304,6 +335,7 @@ function extraSwitches(ctx) {
 function toggles(ctx) {
   return [drawnBodyCard(ctx),
           card(title("Farm settings"), muted("Saved by the farm girl. Your limits still win."), farmSwitches(ctx, SWITCH_INFO)),
+          trapThemesCard(ctx),
           extraSwitches(ctx),
           card(title("Gender"), muted("How the farm sees you. It picks your farm outfit."),
             h("div", { style: { marginTop: "6px" } }, ["female", "male", "futa", "femboy", "nonbinary"].map((g) =>

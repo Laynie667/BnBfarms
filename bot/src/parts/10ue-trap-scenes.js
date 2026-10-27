@@ -9,8 +9,8 @@
   const TRAP_SCENE = {};
   const trapScene = (kind, ...pools) => { TRAP_SCENE[kind] = (TRAP_SCENE[kind] || []).concat(pools); };
   // the trap's own story, with its extra beats put in before the last one
-  function sceneBeats(kind, beats){
-    const add = TRAP_SCENE[kind];
+  function sceneBeats(kind, beats, own){
+    const add = own || TRAP_SCENE[kind];
     if (!add || !Array.isArray(beats) || beats.length < 2) return beats;
     return beats.slice(0, -1).concat(add.map(p => p.slice()), [beats[beats.length - 1]]);
   }

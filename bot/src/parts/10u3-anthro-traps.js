@@ -38,7 +38,7 @@
   });
 
   function anthroScene(mn, kind, spot){
-    const A = ANTHRO[kind], T = ANTHRO_LINES[kind], r = rec(mn), p = prodOf(mn), P = CFG.PENIS_TYPES[A.type];
+    const F = studForm(mn, kind), A = studDef(kind, F), T = studLines(kind, F), r = rec(mn), p = prodOf(mn), P = CFG.PENIS_TYPES[A.type];   // which one of him it is this time (10y9r2-stud-forms.js)
     const hole = r.breedable ? openHole(mn, A.hole) : null, v = { c: P.label, h: hole ? TRAP_HOLE[hole] : "" };
     trapHold(mn, A.hold, A.where);
     trapRun(mn, kind, T.beats.concat(hole ? T.in : T.over), () => {
@@ -59,7 +59,7 @@
         const [lo, hi] = CFG.EGG_COUNT, hyper = hyperEggs(mn, 0.1);
         v.x = String(layClutch(mn, (lo + Math.floor(Math.random()*(hi - lo + 1))) * (hyper ? 3 : 1), A.sire));
       }
-      emote(icon+" "+tFill(pickFor(mn, "trap:"+kind+":end", hole ? T.end : T.endOver), mn, v)+(took === "new" ? " "+tFill(pickFor(mn, "trap:anthro:took", ANTHRO_TOOK), mn, v) : ""), mn);
+      emote(icon+" "+tFill(pickFor(mn, "trap:"+kind+":end"+(F.id === "classic" ? "" : ":"+F.id), hole ? T.end : T.endOver), mn, v)+(took === "new" ? " "+tFill(pickFor(mn, "trap:anthro:took", ANTHRO_TOOK), mn, v) : ""), mn);
       if (hole) splatBody(mn, hole); else { splatBody(mn, "back"); splatBody(mn, "face"); }
       // what each one leaves behind besides
       if (kind === "bull" && makesMilk(mn)) drainMilk(mn, p.milk);
@@ -76,7 +76,8 @@
       face(mn, hole ? "bred" : "afterglow", 120); arouse(mn, 40);
       r.anthro = r.anthro || {}; r.anthro[kind] = (r.anthro[kind] || 0) + 1;
       if (A.after) try { A.after(mn, v, hole); } catch(e){ warn("trap "+kind+":", e); }   // what a season's studs leave behind besides (10y9n-halloween.js…)
-    }, v);
+      studFormAfter(mn, kind, F, v, hole);   // and which one of him it was
+    }, v, F.scene ? { scene: F.scene } : null);
   }
 
   const ANTHRO_TOOK = ["And from the way %n's belly tightens after, that one took.", "Somethin' catches, low in %n's belly. They're carryin' now.", "That'll be a litter. %n just doesn't know it yet."];

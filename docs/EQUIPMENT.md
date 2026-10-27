@@ -829,7 +829,7 @@ Fat leeches out of the trough, latched on your teats and anywhere else that's so
 
 ### 🦁 lionpride
 
-The pride's lion, and a lioness who holds you down for him.
+The pride's lion-man, and the lionesses who hold you down for him.
 
 - **How to get it:** a tile named `trap-lionpride`.
 - **Ruled out by limits mentioning:** breed, beast, anthro, barb.

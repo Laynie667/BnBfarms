@@ -106,9 +106,9 @@
     .replace(/%ml of /g, "a flood of ").replace(/with %ml\b/g, "with a flood").replace(/%ml/g, "more than they could hold");
   const tFill = (t, mn, v) => bodyWords(mn, mlWords(t, v)).replace(/%n/g, plainName(mn)).replace(/%ml/g, (v && v.ml) || "").replace(/%c/g, (v && v.c) || "").replace(/%h/g, (v && v.h) || "").replace(/%x/g, (v && v.x) || "");
   // a trap's story, a beat at a time, then what it leaves behind
-  function trapRun(mn, kind, beats, done, v){
+  function trapRun(mn, kind, beats, done, v, opts){   // opts.scene: this one's own two extra beats instead of the kind's (a stud's version: 10y9r2)
     state.trapRuns = state.trapRuns || new Map();
-    beats = sceneBeats(kind, beats);        // the trap's own two extra beats, before its last (10ue-trap-scenes.js)
+    beats = sceneBeats(kind, beats, opts && opts.scene);        // the trap's own two extra beats, before its last (10ue-trap-scenes.js)
     beats = deepenBeats(mn, kind, beats);   // two or three more beats in the middle, from what kind of trap it is (10ud-trap-depth.js)
     const run = { kind, i: 0, timer: null, beats: (beats = beats.slice()) };   // (a copy: ?struggle can add to it)
     const before = { pissed: (rec(mn) || {}).pissed || 0, eggs: ((prodOf(mn) || {}).eggs || {}).n || 0, held: heldNow(mn), milk: (prodOf(mn) || {}).milk || 0, heat: inHeat(prodOf(mn)), t: Date.now() };
@@ -572,7 +572,7 @@
         R(trapRatingsText()); return true;   // (10y9o-trap-ratings.js)
       }
       if (a0 === "today" || a0 === "day"){ R(trapDayLine() || "🎯 No trap of the day yet: the farm hasn't any traps out."); return true; }
-      if (a0 && TRAP_KINDS[a0]){ R(trapAbout(a0)+(a0 === "tentacle" ? " "+waterFormsText(sender) : "")); return true; }   // ?traps bearskin: what that one does   // which traps each place springs (10ua-trap-themes.js)
+      if (a0 && TRAP_KINDS[a0]){ R(trapAbout(a0)+(a0 === "tentacle" ? " "+waterFormsText(sender) : STUD_FORMS[a0] ? " "+studFormsText(sender, a0) : "")); return true; }   // ?traps bearskin: what that one does   // which traps each place springs (10ua-trap-themes.js)
       if (a0 === "on" || a0 === "off"){
         const was = isSubject(sender);
         r.trapsOn = a0 === "on"; r.trapsOff = false; if (!r.trapsOn) trapStop(sender, 0); r.trapQuiet = 0; saveLedger(); audit(sender, "TRAPS", a0); syncCompanions(true);

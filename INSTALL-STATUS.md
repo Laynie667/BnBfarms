@@ -5,7 +5,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 | Script | File in `dist/` | Where it runs | Current |
 |---|---|---|---|
-| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.55.0** |
+| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.56.0** |
 | Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.10.0** |
 | Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.2.1** |
 | Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **1.1.0** |
@@ -24,6 +24,17 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 ## Latest changes (newest first)
 
+- **Bot 0.56.0: the furry studs come in more than one version.** Laynie, Oct 27: "more trap versions, like the water beast could use alot more versions."
+  - Like the water beast, the farm's furry studs aren't always the same one now. Most times it's the usual, but sometimes it's another, each with its own story and its own way of leavin' you. No Companion update needed.
+  - **The werewolf:** the grizzled alpha (ties you longer, and fills you more), the new-turned one (a farmhand on his first full moon: six quick knots, and sorry about every one), the blood moon wolf (likelier after dark; his bite puts you in heat, unless heat's in your limits) and the moon brothers (two werewolves who share).
+  - **The minotaur:** the bull of the maze (chases you to the middle of the hedge maze and keeps you longer), the old herd bull (one load, but what a load), the hothead (four quick ones) and the show bull (bred in front of the judges, with BEST IN SHOW written on you after).
+  - **The stag:** the white hart (rare, and likelier to take), the twelve-pointer (more of him) and the shy stag.
+  - **The fox brothers:** the silver fox (one old charmer, two big knots), the hen-house raid (carried off in a sack) and the guessin' game (blindfolded: six knots, six wrong guesses).
+  - **The pride's lion:** the challenger (two lions, four loads), the lazy king (you do all the work, five times) and the black-maned king (more of him, and likelier to take).
+  - **The ram:** the tup in his raddle (TUPPED written on you after), the black ram of the hills (three times, wild) and the two tups (four loads between them).
+  - **The wolf den:** the lone wolf (two huge knots, and he doesn't share), the hunt (chased down first, and kept longer) and the snow pack (slow and warm).
+  - The whisper after says which one it was. `?traps werewolf` (or any of them) lists them all, and which ones have had you.
+  - The pride's lion and the fox brothers' own lines now say plainly that they're lion-folk and fox-men, like the rest.
 - **Bot 0.55.0 + Companion 0.49.0: Ostara, Easter and the egg hunt, Litha, Mabon.** Laynie, Oct 27: "winter pack yes, easter, yes, soltice and equinox based packs with pagan/wiccan themes would be cool."
   - **Update the bot's own tab to Companion 0.49 too.** The farm girl's costumes, the bunny suit and the new messes need it.
   - **Ostara (Mar 17 to 23, the spring equinox): 6 traps.** The March hares (two hare-men boxin' over who gets you first), the Green Man out of the hedge (a farmhand in a mask of new leaves; a crown of violets and a dustin' of pollen after), the first sowin' (tied to the plough in the first furrow), the egg-dyein' tubs (every pastel colour, and flowers painted on), the equinox see-saw (sat on the middle post and kept right on the edge), and the thaw-brook nixie (a clutch of her pearly spawn). The warren, the egg posts, the seed shower, the vines and the plough come round more, and a tile named `trap-ostara` (or `trap-spring`) springs only Ostara's. The farm girl wears a spring flower crown, hare's ears and a hare's tail.

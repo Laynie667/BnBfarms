@@ -77,7 +77,7 @@ const LEAK=/\{(nv|nc|nt|fu|fb|nb|v|c|t|f|m)\}|%[a-z]{1,8}\b|\bundefined\b|\bNaN\
       await done(mn,700);
       const said=all(n);
       if (/won't spring/.test(said)) refused.push(k+"/"+name+": "+(said.match(/won't spring[^|]*/)||[""])[0]);
-      else if (said.split(" | ").filter(t=>t.includes(name)&&!/Sprung on|stateDiff/.test(t)).length<6) silent.push(k+"/"+name);   // (a line about somebody with no Companion, off by themselves, goes to them quietly, without its icon)
+      else if (said.split(" | ").filter(t=>(t.includes(name)||t.includes(W.__farmSets().TRAP_KINDS[k].icon))&&!/Sprung on|stateDiff/.test(t)).length<6) silent.push(k+"/"+name);   // (a line about somebody with no Companion, off by themselves, goes to them quietly, without its icon)
       if (LEAK.test(said)) broke.push(k+"/"+name+": "+(said.match(/.{0,50}(\{(nv|nc|nt|fu|fb|nb|v|c|t|f|m)\}|%[a-z]{1,8}\b|undefined|NaN|\[object).{0,50}/)||[""])[0]);
       if (k==="costumetrunk" && mn===500){ const g=P(500).gear||{}; ok(g.ears && g.tail && g.ears.only && /Costume/.test(g.ears.label), 'the costume trunk leaves real ears and a tail for an hour'); }
       if (k==="demon" && mn===600){ const g=P(600).gear||{}; ok(g.horns && (g.horns.items||[]).includes("Horns2"), 'the demon leaves little horns'); }

@@ -147,7 +147,7 @@
     ["The mash comes faster. %n gulps and gulps, and it keeps comin', thick and warm and sweet as porridge.",
      "A strap under %n's chin keeps their jaw up and the funnel deep, and all they can do is swallow.",
      "%n's belly gurgles and swells, pressing out against their thighs, round and heavy and tight.",
-     "A farmhand strokes %n's throat with two fingers to help it down, the way you'd dose a calf."],
+     "A farmhand strokes %n's throat with two fingers to help it down, the way you'd dose a goat."],
     ["%n's belly is a hard round drum now, and the funnel's still half full. They whine round it, and swallow.",
      "Somebody slaps %n's swollen belly and it wobbles, and the farmhands laugh, and the funnel keeps pourin'.",
      "{v}The fullness presses down on everything below, and %n squirms on the stool, wet and achin' from it.",
@@ -377,7 +377,7 @@
      "{t}A farmhand gives %n's tits a fond bounce as the chain drags them past, and laughs at the noise they make."],
     ["The chain stops by the feed bins. A farmhand bends %n over the nearest one and has them, quick, and the chain starts up again.",
      "At every stop someone gets a feel, a squeeze, a slap, and the chain moves on before %n can catch their breath.",
-     "%n is led round the barn like a yearlin' at market, and every stall gets a look at them.",
+     "%n is led round the barn like show stock at market, and every stall gets a look at them.",
      "The chain winds them up on tiptoe and leaves them there, stretched, exposed, while the barn goes about its business."]);
   trapScene("glue",
     ["Every struggle only plasters %n down harder. Their hands are stuck, their knees are stuck, and their ass is up in the air.",

@@ -55,7 +55,7 @@
     M.vines.in.push([
       "The stem pumps sap as it plants, thick and sticky, and it tingles where it touches. %n's %h grips at it, and thin little tendrils curl out from its sides inside them to hold it fast.",
       "Each pod is the size of a hen's egg, slick with sap, and the vine pushes them up %n's %h one by one with slow strong squeezes. They feel every one pass and bed down.",
-      "%n is held open in the leaves, shakin', while the plant feeds itself into them. A tendril has found their clit and is strokin' it, encouragin', like you'd gentle a mare."]);
+      "%n is held open in the leaves, shakin', while the plant feeds itself into them. A tendril has found their clit and is strokin' it, encouragin', like you'd gentle somethin' skittish."]);
     M.wall.in.splice(1, 0, [
       "Hands spread %n's cheeks from behind and somebody spits. Then a cock shoves up their %h to the root in one go, and a belt buckle starts slappin' their ass in time.",
       "The one at %n's face pinches their nose till they open, and feeds it in over their tongue to the back of their throat. They gag. He likes that, and does it slower.",

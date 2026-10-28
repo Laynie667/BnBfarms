@@ -5,7 +5,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 | Script | File in `dist/` | Where it runs | Current |
 |---|---|---|---|
-| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.62.0** |
+| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.63.0** |
 | Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.10.0** |
 | Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.2.1** |
 | Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **1.1.0** |
@@ -24,6 +24,12 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 ## Latest changes (newest first)
 
+- **Bot 0.63.0: thirty more of the farm's traps tell their full stories, eight lines a beat.** No Companion update needed.
+  - **The machines:** the egg post, the lantern, the pillory, the brandin' arm, the winch, the glue floor, the growth cups, the feed chute, the vines, the slime, the tickle rack, the mirror box, the paddle wheel, the fence, the mister, the stud weights, the price tag, the buckin' saddle, the hayloft net, the cowbell, the weigh-in, the teasin' stall, the sheep dip, the milkin' carousel, the plow, the hay bale, the washin' line, the auction block, the honey pot, the incubator lamp and the collection bench.
+  - Every beat of each one now picks from eight lines or more, and so do the two beats of its own. About 700 new lines, each one fitted to the body it's about (tits, cock, pussy, flat chest), so a male pup never hears about parts they haven't got.
+  - **The honey pot's lickers are farm folk now:** the cat-eared milkmaids, the goat-folk off the hill and the kennel hands, never the barn's actual animals. The barn cats still follow you home.
+  - **A few words changed:** stock instead of heifer, calf, yearlin', mare or ewe wherever one of those meant you; the teasin' stall's dummy wears a pretty saddle blanket; the wallow's farmhand grunts at your tits, not the pigs.
+  - **Next:** the stocks, windmill, fountain, bakery, creamery, seed shower and the rest, then the shrine, goblin, rubber and messy traps.
 - **Bot 0.62.0: every stud leaves you his own way, and the first farm machines get their full stories.** No Companion update needed.
   - **How each stud leaves you:** every one of the eighteen studs, and every version of him (the alpha, the silver fox, the lazy king, the snow pack and the rest), now picks from eight lines or more for how he finishes and leaves you, and eight more for how he leaves you when he made do on the outside. About 420 new lines, each one fitted to the body it's about. The made-do endings never name a hole.
   - **The first farm machines:** the milker (cups and sleeve), the breedin' frame, the snare, the hog wallow, the strippin' wire, the clamp and the belly pump. Every beat now picks from eight lines or more, and so do the two beats of their own. About 145 new lines.

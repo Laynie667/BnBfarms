@@ -59,13 +59,13 @@
      "%n's lost in the corn, lost in him, and the stalks overhead sway in time."]);
   trapScene("honey",
     ["The syrup runs down %n's back and between their cheeks, warm and slow, and pools wherever they bend.",
-     "A barn cat finds %n first and licks a sticky stripe up their calf with its rough little tongue.",
+     "A cat-eared milkmaid finds %n first and licks a sticky stripe up their calf with her rough little tongue.",
      "{t}It drips off the ends of %n's nipples in long golden strings, and a farmhand catches one on a finger and tastes it.",
-     "A billy goat wanders in, sniffs, and starts on %n's toes, then works upward with great dedication."],
-    ["Every critter on the farm has found %n now, and they're all licking, rough and wet, in every sticky place at once.",
+     "A goat-man off the hill strolls in, sniffs, and starts on %n's toes, then works upward with great dedication."],
+    ["Every hand on the farm has found %n now, and they're all licking, rough and wet, in every sticky place at once.",
      "{v}A big warm tongue works the syrup out from between %n's legs, deep and patient, and keeps going long after it's clean.",
      "{c}A tongue cleans %n's cock from root to tip, again, and again, much more often than it needs.",
-     "%n is squirming in a pool of syrup, licked raw and sweet, and the critters keep queuing up."]);
+     "%n is squirming in a pool of syrup, licked raw and sweet, and the farm folk keep queuing up."]);
   trapScene("wheel",
     ["Between stops the wheel spins, and %n's whole world spins with it, and every time it stops a new one's waiting.",
      "The crowd chants the spins. \"Bull! Bull! Bull!\" The wheel clicks past and stops on somethin' else.",

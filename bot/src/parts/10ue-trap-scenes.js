@@ -36,7 +36,7 @@
      "{t}Their nipples are drawn out long and swollen past anything they've seen, glossy with milk, and every pull makes %n squeal.",
      "%n's knees are shakin', their whole body slick with sweat and milk, and the machine just keeps wringin' them like a wet rag."]);
   trapScene("breeder",
-    ["A strap cinches %n's tail up out of the way and a second one hobbles their knees wider, the way you'd ready a yearlin' that kicks.",
+    ["A strap cinches %n's tail up out of the way and a second one hobbles their knees wider, the way you'd ready a breeder that kicks.",
      "Somebody comes along with a pot of grease and a wooden paddle and slathers %n's hole, thick and warm and thorough, and doesn't look them in the eye.",
      "The machine's cock is fat and blunt and veined, and it's been greased till it shines. It rests against %n's thigh, heavy and warm, while the arm finds its angle.",
      "A brass plate on the frame reads FOR MARES THAT WON'T STAND. %n is standin'. They haven't got a choice."],

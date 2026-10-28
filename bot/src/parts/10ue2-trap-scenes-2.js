@@ -160,10 +160,10 @@
      "The champion is led round and given another go, because the book says three ties, and the book is never wrong."]);
   trapScene("leashpost",
     ["The leash is short, and %n can only kneel or stand bent, and everyone who walks past the dog yard gets an eyeful.",
-     "A kennel dog wanders over and sniffs %n thoroughly, front and back, and wags.",
+     "A kennel hand wanders over and looks %n over thoroughly, front and back, and grins.",
      "Somebody stops, unbuckles, and has %n quick against the post, and doesn't say a word.",
      "{t}A passer-by gives %n's tits a slap on the way past, like you'd pat a good dog."],
-    ["The next one's slower. Takes their time. Talks to %n the whole way, calls them a good dog, a good bitch, a good pet.",
+    ["The next one's slower. Takes their time. Talks to %n the whole way, calls them a good dog, a good pup, a good pet.",
      "%n's knees are muddy and their thighs are dripping and the leash hasn't moved.",
      "Three in a row now, and %n's stopped looking round to see who. They just tilt their hips up when they hear boots.",
      "A kennel hand checks the post on the way past, sees %n's state, and leaves them there a while longer."]);
@@ -216,10 +216,10 @@
   // ── the sty ──
   trapScene("slop",
     ["The slop is warm and thick and it's in %n's hair, their ears, their mouth when they gasp.",
-     "The pigs root at %n with their wet snouts, snuffling into every crease, looking for scraps.",
+     "The pigs shove and grunt round %n's knees, snufflin' up every scrap that drops off them.",
      "A pig roots a bit of turnip out of %n's hair and squeals about it.",
      "The pig keeper pours another pail right over %n's head, laughing, and calls the pigs."],
-    ["%n's being rooted over by six pigs at once, and the pig keeper has pulled up a stool to watch.",
+    ["%n's being jostled by six pigs at once, all after the slop, and the pig keeper has pulled up a stool to watch.",
      "%n gives up trying to climb out and just wallows in it, filthy, squealing like one of them.",
      "The boar-man who keeps the sty leans on the rail on two legs, looks %n over, and decides they're the sweetest thing in the trough.",
      "The pig keeper leans over the rail and slaps %n's slop-covered rump. \"There's my best piggy.\""]);

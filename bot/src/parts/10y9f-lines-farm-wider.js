@@ -112,7 +112,7 @@
       "The bucket comes up too heavy and too soon, and it isn't water in it. It's an arm, and it's got %n's wrist."]);
     more(B.wellDeep, [
       "Down here the dark is total, and warm, and wet, and alive. Coils slide over %n from every side, curious, unhurried, explorin' every inch.",
-      "The shaft echoes %n's gasps back up at them. Somethin' cradles them in the black, turnin' them slowly, as if lookin' them over by touch."]);
+      "The shaft echoes %n's gasps back up at them. Somethin' holds them in the black, turnin' them slowly, as if lookin' them over by touch."]);
 
     // ── the mystery box ──
     more(C.open_plug, [

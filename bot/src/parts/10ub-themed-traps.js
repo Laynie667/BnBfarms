@@ -145,12 +145,12 @@
   const THEMED_LINES = {
     groomer: {
       beats: [
-        ["The kennel girl whistles, and before %n can ask why they're up on the grooming table with a noose-loop round their neck and a strap round their middle.",
+        ["The kennel girl whistles, and before %n can ask why they're up on the grooming table with a groomin' loop round their neck and a strap round their middle.",
          "%n is lifted onto the steel grooming table by two kennel hands, clipped in at the collar and the waist, and told to stand pretty."],
         ["A warm hose, a bucket of suds, and a stiff brush everywhere: behind the ears, under the arms, between the toes, between everything else.",
          "{t}The kennel girl soaps %n's tits with both hands, thorough as a show groomer, and rinses them twice to be sure.",
          "{c}%n's cock is soaped, rinsed and soaped again, the kennel girl humming along like it's just another coat.",
-         "{v}The brush goes between %n's legs too, soft and quick, and the kennel girl says \"There's a good girl\" without looking up."],
+         "{v}The brush goes between %n's legs too, soft and quick, and the kennel girl says \"There's a good one\" without looking up."],
         ["Then the dryer, then the comb, then a spritz of something that smells like show day, and a bow on the collar.",
          "The kennel girl blow-dries %n till they're fluffed, combs them out, and clips a little rosette to their collar."],
         ["\"Walk,\" she says, and leads %n up and down the kennel aisle on a short show lead while the hands judge their gait.",
@@ -163,7 +163,7 @@
       beats: [
         ["A hand on %n's collar, a click, and they're clipped to the iron post in the dog yard on a lead just long enough to kneel.",
          "%n wanders into the dog yard and a kennel hand clips them to the post. \"Wait,\" he says, and leaves."],
-        ["It's a busy yard. Farmhands cut through it, dogs trot past, and every one of them stops to look at what's tied to the post.",
+        ["It's a busy yard. Farmhands cut through it, kennel hands trot past, and every one of them stops to look at what's tied to the post.",
          "The first passer-by pats %n's head. The second gives their ass a slap. The third stops a good while longer."],
         ["Folks start using %n as they go by, the way you'd use a water trough: a quick drink, and on with the day.",
          "{v}Somebody bends %n over the post and has a quick go at their pussy, then whistles on his way.",
@@ -234,7 +234,7 @@
         ["A bucket tips from the sty rail and the whole slop pail goes over %n's head: peelings, mash, sour milk, all of it.",
          "%n slips on the sty boards and lands in the slop trough just as the pig girl pours the next pail in."],
         ["The pigs hear the slop hit and come running, snorting, rooting, and %n is covered in what they want.",
-         "Snouts everywhere: under %n's arms, in their hair, round their ankles, snuffling the slop off them."],
+         "Snouts everywhere round %n's ankles and knees, shovin' and gruntin' after every peelin' that drops off them."],
         ["{t}The pig girl hops the rail, scoops the mash off %n's tits with both hands, and takes her time about it.",
          "The pigs root %n over in the muck till they're rolled in it, and the pig girl just laughs at the rail.",
          "{nt}The pig girl hops the rail, scoops the mash off %n's chest and belly with both hands, and takes her sweet time about it."],
@@ -245,9 +245,9 @@
     hogtie: {
       beats: [
         ["Ropes snap tight around %n's wrists and ankles, then the wrists to the ankles, and they're dropped belly down in the sty's softest mud.",
-         "The pig girl hogties %n fast as a calf at a rodeo and rolls them into the wallow."],
+         "The pig girl hogties %n quick as a rodeo hand and rolls them into the wallow."],
         ["The mud's warm and deep, and %n sinks in up to their chin, rocking, unable to do anything but wriggle.",
-         "Hogtied in the muck, %n can only rock and squirm while the pigs gather round to sniff."],
+         "Hogtied in the muck, %n can only rock and squirm while the pigs watch from the trough, chewin'."],
         ["Then the boar comes over, the boar-man who keeps the sty, heavy and slow on two legs, and stands over %n in the mud, grunting.",
          "The boar-man takes a long interested look at the trussed thing in his wallow and scratches his belly."],
         ["{v}He kneels in the mud and runs a thick hand between %n's bound legs, and the pig girl doesn't call him off.",

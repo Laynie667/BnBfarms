@@ -59,8 +59,8 @@
   const SWAP_FLAT = [[/\btits\b/g, "chest"], [/\btit\b/g, "nipple"], [/\btitties\b/g, "chest"], [/\bbreasts\b/g, "chest"], [/\bbreast\b/g, "chest"], [/\budders\b/g, "chest"], [/\budder\b/g, "chest"], [/\bteats\b/g, "nipples"], [/\bteat\b/g, "nipple"], [/\bcleavage\b/g, "chest"]];
   const SWAP_FEMBOY = [[/\btits\b/g, "soft little chest"], [/\btitties\b/g, "soft little chest"], [/\bbreasts\b/g, "soft little chest"], [/\bbreast\b/g, "chest"], [/\budders\b/g, "puffy nipples"], [/\budder\b/g, "chest"], [/\bteats\b/g, "puffy nipples"], [/\bteat\b/g, "nipple"], [/\bcleavage\b/g, "chest"]];
   // (the farm girl stays the farm girl whoever she's talkin' about: "the farm boy brushes Rex" was her, Oct 26)
-  const SWAP_NB = [[/\bgood girl\b/g, "good pet"], [/(?<!(?:farm|kennel|dairy|milk|pig|feed|stable|breeding|creamery) )\bgirl\b/g, "darlin'"], [/\bheifer\b/g, "yearlin'"], [/\bbroodmare\b/g, "breeder"], [/\bmare\b/g, "breeder"]];
-  const SWAP_MALE = [[/\bgood girl\b/g, "good boy"], [/(?<!(?:farm|kennel|dairy|milk|pig|feed|stable|breeding|creamery) )\bgirl\b/g, "boy"], [/\bheifer\b/g, "steer"], [/\bbroodmare\b/g, "stud"], [/\bmare\b/g, "colt"]];
+  const SWAP_NB = [[/\bgood girl\b/g, "good pet"], [/(?<!(?:farm|kennel|dairy|milk|pig|feed|stable|breeding|creamery) )\bgirl\b/g, "darlin'"], [/\bheifer\b/g, "beast"], [/\bbroodmare\b/g, "breeder"], [/\bmare\b/g, "breeder"]];
+  const SWAP_MALE = [[/\bgood girl\b/g, "good boy"], [/(?<!(?:farm|kennel|dairy|milk|pig|feed|stable|breeding|creamery) )\bgirl\b/g, "boy"], [/\bheifer\b/g, "steer"], [/\bbroodmare\b/g, "stud"], [/\bmare\b/g, "stallion"]];
   function bodyWords(mn, text){
     try {
       const written = BODY_TAG.test(String(text));   // a tagged line was written for the body it's shown to: no swappin'

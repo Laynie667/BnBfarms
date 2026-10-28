@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.63.0
+// @version      0.64.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -2748,7 +2748,7 @@
   ];
 
   // bot/src/version.js
-  var VERSION = "0.63.0";
+  var VERSION = "0.64.0";
   var COMPANION_VERSION = "0.50.0";
 
   // bot-parts:farmhand-bot-parts
@@ -18337,14 +18337,14 @@
       groomer: {
         beats: [
           [
-            "The kennel girl whistles, and before %n can ask why they're up on the grooming table with a noose-loop round their neck and a strap round their middle.",
+            "The kennel girl whistles, and before %n can ask why they're up on the grooming table with a groomin' loop round their neck and a strap round their middle.",
             "%n is lifted onto the steel grooming table by two kennel hands, clipped in at the collar and the waist, and told to stand pretty."
           ],
           [
             "A warm hose, a bucket of suds, and a stiff brush everywhere: behind the ears, under the arms, between the toes, between everything else.",
             "{t}The kennel girl soaps %n's tits with both hands, thorough as a show groomer, and rinses them twice to be sure.",
             "{c}%n's cock is soaped, rinsed and soaped again, the kennel girl humming along like it's just another coat.",
-            `{v}The brush goes between %n's legs too, soft and quick, and the kennel girl says "There's a good girl" without looking up.`
+            `{v}The brush goes between %n's legs too, soft and quick, and the kennel girl says "There's a good one" without looking up.`
           ],
           [
             "Then the dryer, then the comb, then a spritz of something that smells like show day, and a bow on the collar.",
@@ -18367,7 +18367,7 @@
             '%n wanders into the dog yard and a kennel hand clips them to the post. "Wait," he says, and leaves.'
           ],
           [
-            "It's a busy yard. Farmhands cut through it, dogs trot past, and every one of them stops to look at what's tied to the post.",
+            "It's a busy yard. Farmhands cut through it, kennel hands trot past, and every one of them stops to look at what's tied to the post.",
             "The first passer-by pats %n's head. The second gives their ass a slap. The third stops a good while longer."
           ],
           [
@@ -18478,7 +18478,7 @@
           ],
           [
             "The pigs hear the slop hit and come running, snorting, rooting, and %n is covered in what they want.",
-            "Snouts everywhere: under %n's arms, in their hair, round their ankles, snuffling the slop off them."
+            "Snouts everywhere round %n's ankles and knees, shovin' and gruntin' after every peelin' that drops off them."
           ],
           [
             "{t}The pig girl hops the rail, scoops the mash off %n's tits with both hands, and takes her time about it.",
@@ -18495,11 +18495,11 @@
         beats: [
           [
             "Ropes snap tight around %n's wrists and ankles, then the wrists to the ankles, and they're dropped belly down in the sty's softest mud.",
-            "The pig girl hogties %n fast as a calf at a rodeo and rolls them into the wallow."
+            "The pig girl hogties %n quick as a rodeo hand and rolls them into the wallow."
           ],
           [
             "The mud's warm and deep, and %n sinks in up to their chin, rocking, unable to do anything but wriggle.",
-            "Hogtied in the muck, %n can only rock and squirm while the pigs gather round to sniff."
+            "Hogtied in the muck, %n can only rock and squirm while the pigs watch from the trough, chewin'."
           ],
           [
             "Then the boar comes over, the boar-man who keeps the sty, heavy and slow on two legs, and stands over %n in the mud, grunting.",
@@ -18744,7 +18744,7 @@
       foxden: { icon: "\u{1F98A}", what: "the fox-brothers' den: teased silly, then shared", limit: /\b(tickl|gang|breed|anthro)/i },
       lionpride: { icon: "\u{1F981}", what: "the pride's lion-man, and the lionesses who hold you down for him", limit: /\b(breed|beast|anthro|barb)/i },
       ramstud: { icon: "\u{1F40F}", what: "the ram in the paddock, rutting for the season", limit: /\b(breed|beast|anthro|rut)/i },
-      shrine: { icon: "\u{1FA94}", what: "the fertility shrine: incense, a blessing, and a womb that won't stay empty", limit: /\b(heat|pregnan|breed|fertil)/i },
+      shrine: { icon: "\u{1FA94}", what: "the fertility shrine: incense, a warm charm, and a womb that won't stay empty", limit: /\b(heat|pregnan|breed|fertil)/i },
       studchair: { icon: "\u{1FA91}", what: "the breeding chair, and a line of studs with appointments", limit: /\b(breed|gang|pregnan)/i },
       clutch: { icon: "\u{1F95A}", what: "the thing in the pond that lays its eggs in whoever wades in", limit: /\b(eggs?|ovipos|tentacl)/i },
       buttermill: { icon: "\u{1F9C8}", what: "the butter churn: strapped to it and churned till there's butter everywhere", limit: /\b(food|messy|milk|splosh)/i },
@@ -19148,7 +19148,7 @@
           [
             "The warmth spreads and blooms. Their belly tightens, empty and wanting, aching to be filled.",
             "{v}%n's womb throbs in time with the incense smoke, empty and hungry.",
-            "Their skin flushes and their thighs press together. Whatever the shrine's blessing is, it's working."
+            "Their skin flushes and their thighs press together. Whatever the shrine's charm is, it's working."
           ]
         ],
         end: [
@@ -19169,7 +19169,7 @@
           [
             `When it's butter, the dairy girl scoops it out and spreads the first pat on %n's lips. "Taste your work."`,
             "{t}The dairy girl smears fresh butter on %n's tits, laughing, and polishes them till they shine.",
-            "The leftover buttermilk goes over %n's head, and the dairy girl calls it a christening."
+            "The leftover buttermilk goes over %n's head, and the dairy girl calls it the finishin' rinse."
           ]
         ],
         end: [
@@ -19740,7 +19740,7 @@
     trapScene(
       "breeder",
       [
-        "A strap cinches %n's tail up out of the way and a second one hobbles their knees wider, the way you'd ready a yearlin' that kicks.",
+        "A strap cinches %n's tail up out of the way and a second one hobbles their knees wider, the way you'd ready a breeder that kicks.",
         "Somebody comes along with a pot of grease and a wooden paddle and slathers %n's hole, thick and warm and thorough, and doesn't look them in the eye.",
         "The machine's cock is fat and blunt and veined, and it's been greased till it shines. It rests against %n's thigh, heavy and warm, while the arm finds its angle.",
         "A brass plate on the frame reads FOR MARES THAT WON'T STAND. %n is standin'. They haven't got a choice."
@@ -20791,12 +20791,12 @@
       "leashpost",
       [
         "The leash is short, and %n can only kneel or stand bent, and everyone who walks past the dog yard gets an eyeful.",
-        "A kennel dog wanders over and sniffs %n thoroughly, front and back, and wags.",
+        "A kennel hand wanders over and looks %n over thoroughly, front and back, and grins.",
         "Somebody stops, unbuckles, and has %n quick against the post, and doesn't say a word.",
         "{t}A passer-by gives %n's tits a slap on the way past, like you'd pat a good dog."
       ],
       [
-        "The next one's slower. Takes their time. Talks to %n the whole way, calls them a good dog, a good bitch, a good pet.",
+        "The next one's slower. Takes their time. Talks to %n the whole way, calls them a good dog, a good pup, a good pet.",
         "%n's knees are muddy and their thighs are dripping and the leash hasn't moved.",
         "Three in a row now, and %n's stopped looking round to see who. They just tilt their hips up when they hear boots.",
         "A kennel hand checks the post on the way past, sees %n's state, and leaves them there a while longer."
@@ -20881,12 +20881,12 @@
       "slop",
       [
         "The slop is warm and thick and it's in %n's hair, their ears, their mouth when they gasp.",
-        "The pigs root at %n with their wet snouts, snuffling into every crease, looking for scraps.",
+        "The pigs shove and grunt round %n's knees, snufflin' up every scrap that drops off them.",
         "A pig roots a bit of turnip out of %n's hair and squeals about it.",
         "The pig keeper pours another pail right over %n's head, laughing, and calls the pigs."
       ],
       [
-        "%n's being rooted over by six pigs at once, and the pig keeper has pulled up a stool to watch.",
+        "%n's being jostled by six pigs at once, all after the slop, and the pig keeper has pulled up a stool to watch.",
         "%n gives up trying to climb out and just wallows in it, filthy, squealing like one of them.",
         "The boar-man who keeps the sty leans on the rail on two legs, looks %n over, and decides they're the sweetest thing in the trough.",
         `The pig keeper leans over the rail and slaps %n's slop-covered rump. "There's my best piggy."`
@@ -31210,11 +31210,11 @@
         filthy: ["Tied up in the dirt and every goblin in the raid takes a turn, then another.", "They're passed round the war party, filled at both ends, and cackled over.", "By the time the raid's done there's goblin cum in every hole and it's still comin'."]
       },
       goblinpit: {
-        tender: ["The pit's lined with soft furs and the goblins are surprisingly patient.", "They stroke %n's belly and mutter blessings.", "The oldest one brings them water in a cup made of a skull."],
+        tender: ["The pit's lined with soft furs and the goblins are surprisingly patient.", "They stroke %n's belly and mutter little goblin charms.", "The oldest one brings them water in a cup made of a skull."],
         filthy: ["Down in the pit and the goblins swarm them, breedin' them in turns till they're bulgin'.", "Every one of them wants their brood in %n and every one of them gets a go.", "Left in the pit drippin' and moanin' for the night shift."]
       },
       goblinmarket: {
-        tender: ["The bids are shiny stones and every one's offered with a bow.", "The winner pets them like a new kitten.", "They're given the best cushion in the camp."],
+        tender: ["The bids are shiny stones and every one's offered with a bow.", "The winner strokes their hair and calls them treasure.", "They're given the best cushion in the camp."],
         filthy: ["Haggled over like a cow at market, and the goblins test the goods as they bid.", "Sold for a rusty spoon and used right there in the stall.", "Passed round the market as a sample before the sale's done."]
       },
       goblincart: {
@@ -31246,8 +31246,8 @@
         filthy: ["The ram mounts them in the paddock and ruts them till their knees give out.", "Every round he bleats and shoves deeper.", "Bred like a ewe, and left in the grass for the next round."]
       },
       shrine: {
-        tender: ["The incense is sweet, and the blessing is said softly, with a hand on their belly.", "Warmth spreads through them like sunlight.", "They leave feelin' blessed and full."],
-        filthy: ["The shrine's blessing turns their womb into somethin' that won't stop wantin' to be filled.", "They're on their back on the altar beggin' for a stud.", "Blessed, bred and still beggin' for more."]
+        tender: ["The incense is sweet, and the old words are said softly, with a hand on their belly.", "Warmth spreads through them like sunlight.", "They leave feelin' warm and full."],
+        filthy: ["The shrine's charm turns their womb into somethin' that won't stop wantin' to be filled.", "They're on their back on the mossy stone beggin' for a stud.", "Charmed, bred and still beggin' for more."]
       },
       studchair: {
         tender: ["The chair is padded, and every stud has an appointment and keeps it gently.", "Between each one somebody brings them water.", "They're told they're the farm's finest breeder."],
@@ -31422,8 +31422,8 @@
     const SWAP_NO_VULVA = [[/\bpussies\b/g, "asses"], [/\bpussy\b/g, "ass"], [/\bcunts\b/g, "holes"], [/\bcunt\b/g, "hole"], [/\bslit\b/g, "crack"], [/\bwomb\b/g, "belly"], [/\bcervix\b/g, "guts"], [/\bclit\b/g, "cock"]];
     const SWAP_FLAT = [[/\btits\b/g, "chest"], [/\btit\b/g, "nipple"], [/\btitties\b/g, "chest"], [/\bbreasts\b/g, "chest"], [/\bbreast\b/g, "chest"], [/\budders\b/g, "chest"], [/\budder\b/g, "chest"], [/\bteats\b/g, "nipples"], [/\bteat\b/g, "nipple"], [/\bcleavage\b/g, "chest"]];
     const SWAP_FEMBOY = [[/\btits\b/g, "soft little chest"], [/\btitties\b/g, "soft little chest"], [/\bbreasts\b/g, "soft little chest"], [/\bbreast\b/g, "chest"], [/\budders\b/g, "puffy nipples"], [/\budder\b/g, "chest"], [/\bteats\b/g, "puffy nipples"], [/\bteat\b/g, "nipple"], [/\bcleavage\b/g, "chest"]];
-    const SWAP_NB = [[/\bgood girl\b/g, "good pet"], [/(?<!(?:farm|kennel|dairy|milk|pig|feed|stable|breeding|creamery) )\bgirl\b/g, "darlin'"], [/\bheifer\b/g, "yearlin'"], [/\bbroodmare\b/g, "breeder"], [/\bmare\b/g, "breeder"]];
-    const SWAP_MALE = [[/\bgood girl\b/g, "good boy"], [/(?<!(?:farm|kennel|dairy|milk|pig|feed|stable|breeding|creamery) )\bgirl\b/g, "boy"], [/\bheifer\b/g, "steer"], [/\bbroodmare\b/g, "stud"], [/\bmare\b/g, "colt"]];
+    const SWAP_NB = [[/\bgood girl\b/g, "good pet"], [/(?<!(?:farm|kennel|dairy|milk|pig|feed|stable|breeding|creamery) )\bgirl\b/g, "darlin'"], [/\bheifer\b/g, "beast"], [/\bbroodmare\b/g, "breeder"], [/\bmare\b/g, "breeder"]];
+    const SWAP_MALE = [[/\bgood girl\b/g, "good boy"], [/(?<!(?:farm|kennel|dairy|milk|pig|feed|stable|breeding|creamery) )\bgirl\b/g, "boy"], [/\bheifer\b/g, "steer"], [/\bbroodmare\b/g, "stud"], [/\bmare\b/g, "stallion"]];
     function bodyWords(mn, text) {
       try {
         const written = BODY_TAG.test(String(text));
@@ -31718,7 +31718,7 @@
       ]);
       more(B.wellDeep, [
         "Down here the dark is total, and warm, and wet, and alive. Coils slide over %n from every side, curious, unhurried, explorin' every inch.",
-        "The shaft echoes %n's gasps back up at them. Somethin' cradles them in the black, turnin' them slowly, as if lookin' them over by touch."
+        "The shaft echoes %n's gasps back up at them. Somethin' holds them in the black, turnin' them slowly, as if lookin' them over by touch."
       ]);
       more(C2.open_plug, [
         "%n tips the box and a glossy black plug rolls into their palm, warm as skin. It squirms. Then it's gone, and %n's eyes go very wide.",
@@ -54380,6 +54380,1334 @@
         "%n's sweatin' on the bench, the straps creakin' with every buck, and the collection hand pats their flank between loads.",
         "{c}The collection hand slips a gloved finger into %n's ass and finds the spot and presses, and the next load's out of them so hard the jar jumps.",
         "The farm girl comes in to read the vat and stays to watch the last load go in, arms folded, smilin'."
+      ]
+    );
+    trapMore(
+      "stocks",
+      "The fair stocks slam shut on %n's neck and wrists",
+      [
+        "%n stops at the fairground to read a poster, and the poster's nailed to the stocks, and the top board comes down while they're still on the second line.",
+        `A cheerful farm girl with a pie tin under each arm says "oh good, a volunteer," and pops %n's head and hands into the stocks before they can say they're not.`,
+        "The ring-toss stall tips sideways as %n passes, and somehow they end up kneelin' with their neck and wrists in the stocks behind it, and the bell on top rings.",
+        "{t}The stocks are set a little low, so %n's bent right over with their tits hangin' down below the boards, and a pie stall's set up right in front of them.",
+        "Somebody's chalked a target round the hole for %n's face, and as soon as the board locks the first customer pays their penny."
+      ],
+      "SPLAT. The first pie hits %n square in the face",
+      [
+        "The second pie comes from the left and catches %n on the ear, and cream goes up their nose, and they sneeze a little cloud of it.",
+        "A custard tart lands with a wet slap on the top of %n's head and sits there like a hat, and slowly, slowly slides down.",
+        "A big lemon meringue gets planted in %n's face by hand, held there a long second and twisted, and the crowd cheers the twist.",
+        "Somebody's got a pie in each hand and claps them together on both of %n's cheeks at once, and the cream squirts out the sides."
+      ],
+      "The queue for pies runs right round the fairground.",
+      [
+        "%n's tongue keeps findin' cream at the corners of their mouth, and they've stopped pretendin' they don't like the taste.",
+        `A pie-maker comes out from behind the stall with a fresh tray, says "on the house", and drops one straight on %n's head.`,
+        "The cream's runnin' down %n's chin and drippin' off in long white strings, and somebody in the queue whistles at the sight.",
+        "Somebody pays double to throw from close, walks right up, and smears the pie slow round %n's mouth like they're paintin' it.",
+        "{t}Somebody throws low on purpose and the pie bursts on %n's tits under the board, and two more follow it to the same spot."
+      ]
+    );
+    trapSceneMore(
+      "stocks",
+      [
+        "A pie goes in %n's face, and a hand wipes the cream off their eyes, gentle, so they can see the next one comin'.",
+        "Somebody cuts a slice of the pie they were goin' to throw and feeds it to %n instead, bite by bite, and then throws the rest.",
+        "{c}Somebody behind the stocks has been aimin' low, and %n's cock's drippin' cream onto the boards.",
+        "%n licks their lips and the queue cheers, and the next three pies come at once to reward them.",
+        "The cream's gone warm in the sun and smells of vanilla, and it's in %n's hair, their ears, down the back of their neck."
+      ],
+      [
+        "The pie stall runs out of pies and starts throwin' the cream straight out of the bowl, by the handful.",
+        "Somebody comes round behind the stocks with a can of whipped cream and draws a big swirl on %n's rump, and then eats it off, slow.",
+        "%n's face is so thick with cream there are two little holes for eyes and one for a mouth, and the mouth's busy.",
+        "{v}Somebody round the back fills a hand with cream and slides it between %n's legs and keeps it there, slow, while the pies keep comin' at the front.",
+        "When the last pie's thrown somebody pours a bucket of milk over %n to rinse them, and it only makes the cream run further."
+      ]
+    );
+    trapMore(
+      "windmill",
+      "Ropes catch %n and hoist them up onto one of the windmill's sails",
+      [
+        "%n leans on the windmill's sail to catch their breath, and the brake slips, and the sail lifts them off their feet, and two ropes whip round their wrists to keep them.",
+        `The miller says "hold this a minute, would you," and hands %n the end of a rope, and the rope's tied to the sail, and the sail's already turnin'.`,
+        "A gust of wind catches %n and drags them up against the slats of a sail, and straps on the slats find their wrists and ankles.",
+        "%n's lifted by a pulley in the mill tower and lowered out of a little window onto the sail, and tied down spread like washin' on a frame.",
+        "{t}A broad strap goes round %n's chest just under their tits and cinches them to the sail's centre bar, and their arms are tied out along the slats."
+      ],
+      "The sails turn, slow and creakin'",
+      [
+        "The sail climbs, and %n's feet leave the ground and keep leavin' it, and the yard gets smaller and smaller, and then they're at the top with the sky under their feet.",
+        "Round they go, slow as a clock's hand, and at the top they can see the whole valley, and at the bottom they can see the miller grinnin'.",
+        "The sails pick up speed, and %n's stomach goes over before the rest of them does, and they let out a whoop they didn't mean to.",
+        "Every time the sail swings down past the mill door %n's nearly close enough to touch the ground, and then up they go again.",
+        "The wind changes and the mill turns its head, and %n's carried round the other way, lookin' down at the duck pond this time."
+      ],
+      "Folks gather below to watch %n go round.",
+      [
+        "Somebody below has started takin' bets on how many turns before %n squeals, and the answer is three.",
+        "A little crowd's spread a blanket and opened a picnic basket on the grass under the mill to watch, and somebody's brought lemonade.",
+        "Every time %n comes round, somebody below throws a flower up at them, and a few stick in the ropes.",
+        "At the bottom of every turn somebody reaches up and gives %n's foot a squeeze, or their thigh, or higher, quick, before the sail carries them off."
+      ]
+    );
+    trapSceneMore(
+      "windmill",
+      [
+        "The wind's warm and steady and it gets everywhere, between %n's legs and under their arms, and it never stops touchin'.",
+        "At the top of the turn there's a moment where everything goes quiet but the wind and the creak of the sails, and %n hangs there, spread, alone with the sky.",
+        "{c}%n's cock's hard from the rush of it and bobs in the wind, and every time they come round the crowd points.",
+        "The miller rings the mill bell every time %n comes over the top, so the whole farm knows what turn they're on.",
+        "{v}The wind blows cool between %n's spread legs at the top of every turn, right across their pussy, and they shiver and drip."
+      ],
+      [
+        "The miller stops the sails with %n at just the right height, and a farmhand who's been waitin' climbs up on a barrel and has them right there on the sail.",
+        "%n's been round so many times they've stopped tellin' up from down, and they're gigglin' and moanin', both at once.",
+        "The sails stop with %n sideways, and somebody stands on the mill steps and takes their time with %n's mouth while the wind holds them still.",
+        "Each time the sail comes down somebody different is waitin' at the bottom, and every one of them gets about as long as a slow turn takes.",
+        "{t}%n's tits swing so hard at the bottom of every turn that the folks below have started catchin' them, one in each hand, as they go past."
+      ]
+    );
+    trapMore(
+      "fountain",
+      "The path tips %n forward into the base of the great chocolate fountain",
+      [
+        "%n leans in for a taste of the chocolate fountain at the fair, and two warm brass hands on the rim take their wrists and pull them gently all the way in.",
+        "A little cart carries %n across the yard on a tray, like a dessert bein' served, and tips them out under the fountain's spout.",
+        "The fountain gurgles, coughs, and sends a great warm wave of chocolate over the rim and over %n, and the floor of the bowl turns sticky and holds their knees.",
+        "{t}A pair of warm cuffs lock %n's wrists behind their back at the fountain's rim and tip them forward, so the chocolate pours over their head and runs down between their tits.",
+        "%n's lifted in a sling under the arms and dipped, slow, like a strawberry on a fork, up to the shoulders, and then set down kneelin' under the flow."
+      ],
+      "It runs everywhere: down the back of the neck",
+      [
+        "It's warm as a bath and thick as gravy, and it creeps into every crease of %n so slow they can feel each one fill.",
+        "The chocolate sets a little at the edges as it cools, so %n's wearin' a thin glossy shell that cracks when they move.",
+        "A second spout opens over %n's back and pours white chocolate down their spine, so they're brown at the front and cream at the back."
+      ],
+      "Then the farm hands come with their spoons",
+      [
+        "A dairy hand starts at %n's fingers and works up the arm, lickin', and meets another comin' down from the shoulder, and they kiss in the middle, chocolate and all.",
+        "Somebody presses %n's chocolate-covered hand to their own mouth and sucks each finger clean, slow, one at a time, watchin' %n's face.",
+        "The farm girl hands out little wooden spoons and everybody gets a scrape, and they all give up on the spoons halfway down %n's belly."
+      ]
+    );
+    trapSceneMore(
+      "fountain",
+      [
+        "The fountain gurgles over %n's head like warm rain, and the smell is so thick and sweet it makes their head swim.",
+        "Chocolate runs into %n's mouth every time they breathe, and they've stopped tryin' to keep it out and started swallowin'.",
+        "{nt}The chocolate runs down %n's flat chest in a glossy sheet and beads on their nipples, and a farmhand licks each bead off with the tip of their tongue.",
+        "Somebody dips a finger in the bowl and writes their name in chocolate on %n's back, and then licks it off, letter by letter.",
+        "{v}A thick drip of chocolate runs down %n's belly and between their legs, and a farmhand follows it all the way down with their mouth."
+      ],
+      [
+        "%n's licked clean in one place just in time to be dipped there again, and the farm folk cheer every time, and start over.",
+        "Two of them hold %n up under the spout by the arms, and a third kneels in front, and nobody's in any hurry.",
+        "{c}Somebody dips %n's cock in the fountain like a strawberry, lifts it out, sucks it clean, and dips it again.",
+        "%n's sticky from hair to toes and so licked their skin's gone pink under the chocolate, and they're moanin' with their mouth full.",
+        "{t}Somebody holds %n's tits up under the spout, one in each hand, lettin' the chocolate pour over them, and then licks them clean in long slow strokes."
+      ]
+    );
+    trapMore(
+      "bakery",
+      "A floury pair of hands steers %n onto the long bakery bench",
+      [
+        "The bakery's back door swings open as %n passes and a warm gust of bread and sugar pulls them in by the nose, and a floury apron and two strong arms do the rest.",
+        "%n's lifted onto a big wooden peel like a loaf goin' into the oven, and slid along the counter onto a coolin' rack, and the baker straps them down there instead.",
+        `The baker looks %n up and down, says "you'll do for the window," and lays them on the bench with a sprinkle of flour underneath so they don't stick.`,
+        "{t}A cake stand rises out of the bakery floor, wide and round and turnin', and %n's sat on it and leaned back, and their tits are dusted with icin' sugar like the first layer of somethin'.",
+        "%n tries a free sample off a tray by the bakery door, and the tray tips them onto a trolley, and the trolley wheels them in behind the counter."
+      ],
+      "The baker fills a piping bag and starts at the collarbones",
+      [
+        "A thin line of chocolate gets piped across %n's ribs in loops like lace, and the baker bites their tongue in concentration.",
+        "The baker pipes little leaves and vines in green round %n's hips, and a row of tiny frostin' flowers along the inside of each thigh.",
+        "{nt}The baker pipes a neat swirl round each of %n's nipples and dots the middle with a silver ball, very pleased with the symmetry."
+      ],
+      "Sprinkles come next, a whole jar of them",
+      [
+        "A sieve of icin' sugar gets shaken over %n from head to toe, and they sneeze, and the baker tuts and shakes some more.",
+        "Little sugar pearls get pressed into the frostin' one by one with a pair of tweezers, round %n's navel, along their collarbones, down to their hips.",
+        "The baker writes FRESH TODAY across %n's belly in curly red letters, with a little heart at the end.",
+        "A paper doily goes under %n's head and a sprig of mint behind their ear, and the baker steps back and calls it art.",
+        "{c}A ring of candied cherries goes round the base of %n's cock like a garland, and a sugar flower on the tip."
+      ],
+      "Customers come in.",
+      [
+        "A farmer in a straw hat buys a slice and asks for it to go, and the baker sends them off with a scoop of %n's frostin' in a paper bag and a lick of the spoon.",
+        "Somebody orders a corner piece and the baker points at %n's hip, and they eat it right there, slow, and leave a perfect clean patch.",
+        "The bakery bell jingles every few seconds now. %n's lost track of the customers and found every single tongue.",
+        "Two farmhands share a slice from %n's thigh, one from the top and one from the bottom, and meet in the middle.",
+        "{t}Somebody buys both the cherries off %n's tits and eats them without usin' their hands, and then goes back for the frostin' underneath."
+      ]
+    );
+    trapSceneMore(
+      "bakery",
+      [
+        "The baker's pipin' bag squeaks with every squeeze, and every squeeze lays a cold sweet ribbon on %n's warm skin.",
+        "Somebody dusts cocoa through a little stencil onto %n's thigh, lifts it off, and there's a perfect heart.",
+        "{v}The baker pipes a ring of tiny stars round %n's pussy and a big one right on top, and steps back, beamin'.",
+        "The frostin' starts to soften on %n's warm skin and slide, and the baker hurries to finish before it runs.",
+        "A row of glac\xE9 cherries goes down %n's middle like buttons, and the baker counts them out loud as they go on."
+      ],
+      [
+        "A customer asks for a taste before they buy, and gets one, and buys three more.",
+        "The baker's had to put up a sign that says ONE LICK PER COIN, and the queue's doin' sums.",
+        "{c}Somebody buys the cherry off the end of %n's cock and eats it slow, and then the frostin', and then keeps goin' after the frostin's gone.",
+        "Somebody presses their face right into the frostin' on %n's belly and comes up laughin' with a pink nose.",
+        "When the last slice is sold the baker licks the knife, and then %n, and then turns the sign to CLOSED and gets to work on the leftovers."
+      ]
+    );
+    trapMore(
+      "creamery",
+      "The creamery door swings shut behind %n",
+      [
+        "%n steps into the creamery to cool off, and the floor's wet and the tiles are slippy, and they slide right into the arms of two milkmaids with a hose.",
+        `A bell over the creamery door tinkles, somebody inside sings out "order up!", and %n's taken by the elbows and backed against the cold counter.`,
+        "The creamery's churns all start up at once as %n passes, and the cream cannon swings its brass mouth round and coughs a warnin' puff.",
+        "{t}Two creamery girls in white aprons take %n by the wrists and stand them against the cold steel, and look at their tits, and look at each other, and grin.",
+        "%n's sat on the creamery's big marble counter and slid back till they're lyin' on it, cold under their back, and somebody's fetchin' the cannon."
+      ],
+      "Whipped cream comes out in great cool billows",
+      [
+        "The cream goes on in great cold swooshes that make %n gasp, and then it warms on their skin and goes soft and slippy.",
+        "The creamery girls shape the cream with spatulas as it lands, smoothin' it into neat peaks down %n's arms and legs.",
+        "A great dollop lands on %n's head and settles there like a hat, and somebody plants a cherry on it."
+      ],
+      "Then the strawberries: a bowl of them",
+      [
+        "A handful of raspberries gets scattered over %n's belly and pressed in, and they burst sharp and sweet in the cream.",
+        "Somebody squeezes a strawberry over %n's mouth till the juice runs down their chin, and then feeds them the rest.",
+        "A jug of warm chocolate sauce gets drizzled in long lines over all the white, and runs, and pools in the dip of %n's belly.",
+        "Chopped nuts, a spoon of jam, a sprinkle of sugar, a wafer stuck in at a jaunty angle: %n's a sundae, and the creamery girls step back to admire it.",
+        "{v}A strawberry gets pressed right into the cream between %n's legs, firm, and left there for whoever's brave enough to fetch it."
+      ],
+      "Somebody hungry comes in from the fields",
+      [
+        `A farmhand comes in sunburnt and starvin', looks at %n, says "oh, thank goodness", and eats half of them before they've said hello.`,
+        "Somebody eats a slow path from %n's knee all the way up their thigh, and stops at the top, and looks up, and keeps goin'.",
+        "Two hungry mouths start at %n's ankles and race each other up, and the creamery girls cheer whichever's winnin'.",
+        "{t}Somebody buries their face between %n's tits and eats their way out, and comes up with cream on their nose and a strawberry in their teeth."
+      ]
+    );
+    trapSceneMore(
+      "creamery",
+      [
+        "The cannon gives a wet cough and a great fat dollop lands right on %n's face, and they splutter, and lick, and the creamery girls laugh.",
+        "Somebody pipes a little cream moustache on %n's lip and kisses it off.",
+        "The cream's piled so high on %n it's slidin' off in soft white lumps, and the creamery girls scoop it back up and pile it on again.",
+        "{nt}A neat swirl of cream gets piped round each of %n's nipples and a raspberry set in the middle, and somebody bites each one off.",
+        "{v}Cream gets piled between %n's thighs and smoothed in with a spatula, slow, and they shiver at the cold of it."
+      ],
+      [
+        "Somebody licks a long clean stripe down the middle of %n, throat to belly button, and the cream on either side slumps in after it.",
+        "Two of them are feedin' %n strawberries dipped in the cream off their own body, and every one comes with a kiss.",
+        "{c}%n's cock's been dug out of the cream and cleaned and buried again three times now, and they're shakin' with it.",
+        "The creamery girls run out of spoons, then give up pretendin' they ever needed them.",
+        "When the cream's finally all gone %n's sticky and pink and smells like a summer fete, and somebody fetches the cannon one more time anyway."
+      ]
+    );
+    trapMore(
+      "seedshower",
+      "Round the back of the barn there's a ring of straw",
+      [
+        `A farmhand leads %n round the back of the barn by the hand, very sweet, "there's somethin' you'll like," and there's a ring of straw, and a crowd, and a cushion to kneel on.`,
+        "%n opens what they think is the tack room door, and it's full of strangers, and they all turn round, and the door shuts behind them.",
+        "A collar clips onto a short chain in the middle of the threshin' floor, %n's pulled down to their knees by it, and the barn doors roll open to let the crowd in.",
+        "{t}Somebody unbuttons %n's top on the way in, pushes it down off their shoulders, and kneels them in the straw with their tits out for the ring.",
+        "A bell rings in the yard, the way it does at feedin' time, and %n's knelt in the middle of the straw ring before they've worked out who's bein' fed."
+      ],
+      "Every one of them is stroking, slow, eyes on %n",
+      [
+        "They shuffle in close, shoulder to shoulder, and the ring's so tight now %n can feel the heat comin' off them, and smell them, and hear every stroke.",
+        `Somebody tips a cup of water to %n's lips first, kind as anythin', "you'll need it," and then steps back into the ring and gets to work.`,
+        "Somebody runs the head of a cock along %n's cheek, slow, from ear to lip, just to let them feel how close they are.",
+        "The strangers don't say much. Just the wet sound of hands, and breathin', and now and then somebody sayin' %n's name like they're tastin' it.",
+        `{c}%n's own cock's hard and achin' in the middle of it all, and one of the strangers notices and laughs and says "you'll get your turn last."`
+      ],
+      "The first one finishes across %n's face with a grunt",
+      [
+        "Two of them go at once, one each side, and %n's face is striped from both ends, and they gasp, and get a mouthful of the third.",
+        "One of them takes %n's jaw in his hand and finishes slow across their tongue, a little at a time, makin' them hold it there.",
+        "Somebody aims for %n's hair and gets it, a hot heavy load that soaks through to their scalp and runs down the back of their neck."
+      ],
+      "More come in from the yard.",
+      [
+        "%n's knees have sunk into the straw and they're drippin' onto it, a little white puddle spreadin' round them, and the ring shuffles closer to keep their feet clean.",
+        "Somebody holds a mirror up so %n can see what they look like now. They look for a long time.",
+        `The last one in the ring steps up, looks at the state of %n, says "oh, there's no room left," and finds some anyway.`,
+        "{nt}%n's flat chest is painted white from collarbone to belly, and it runs in slow lines down to their lap, and the last few aim there on purpose."
+      ]
+    );
+    trapSceneMore(
+      "seedshower",
+      [
+        "Somebody gets impatient and goes early, and it lands on %n's shoulder, and the ring laughs at them, and they go to the back of the queue red-faced.",
+        "%n's told to keep their hands behind their back and their mouth open, and they do both, very well, and somebody tells them so.",
+        "{c}A stranger crouches to give %n's cock a few slow pulls while the ring waits, then stands and adds to the mess on their face.",
+        "The air in the ring is thick and hot and smells of sweat and straw and spunk, and %n breathes it in great gulps between loads.",
+        "{nt}A load lands across %n's flat chest and runs down their belly, hot, and the stranger who left it rubs it in with two fingers."
+      ],
+      [
+        "%n's drippin' from their chin in long strings that sway when they breathe, and nobody's offered a towel, and nobody's goin' to.",
+        "Somebody tells %n to look up and smile, and they do, glazed and blinkin', and the ring cheers.",
+        "Somebody tips %n's head back and finishes straight down into their open mouth, and holds their nose till they swallow, and lets go, and pats their cheek.",
+        "{t}%n's tits are so thick with it they shine, and it's drippin' off their nipples onto their thighs, and two more step up to add to it.",
+        "When the ring finally breaks up %n's left kneelin' in the straw, painted white from hairline to lap, too dazed to do anythin' but lick their lips."
+      ]
+    );
+    trapMore(
+      "groomer",
+      "The kennel girl whistles, and before %n can ask why",
+      [
+        "A kennel hand with a towel over one shoulder scoops %n up under the arms and plonks them on the groomin' table, and the loop on the arm overhead drops round their neck, snug, not tight.",
+        `%n's nose leads them into the groomin' shed, warm and smellin' of shampoo, and the door swings shut, and somebody says "oh good, the two o'clock."`,
+        "The table rises up out of the floor right under %n like a lift and stops at hip height, and a strap clips round their middle to keep them standin'.",
+        "%n's lured up the little ramp onto the groomin' table with a treat held out at nose height, and they've eaten it before the strap's done up.",
+        "{t}A kennel hand lifts %n onto the table, tips them forward onto all fours, and clips one strap under their belly and another under their tits, so they stand square.",
+        'The kennel girl takes one look at the state of %n and says "oh no, no, no," and has them on the table and clipped in before they can argue.'
+      ],
+      "A warm hose, a bucket of suds, and a stiff brush everywhere",
+      [
+        "The shampoo smells of oatmeal and honey, and the kennel girl works it into a thick lather all over %n with her fingers, scritchin' as she goes.",
+        "A soft rubber brush goes round and round %n's back and flanks in little circles, and it feels so nice one of their legs starts to go.",
+        "The hose gets turned to a fine warm spray and played slow over every inch, and the kennel girl lifts each of %n's arms and legs to get underneath.",
+        "{c}The kennel girl rinses %n's cock and balls under the warm spray, liftin' them, very matter-of-fact, and gives them a pat when she's done."
+      ],
+      "Then the dryer, then the comb",
+      [
+        "A big warm dryer on a stalk blows %n's hair every which way, and the kennel girl combs it straight as it dries, one long stroke at a time.",
+        "The kennel girl trims round %n's ears with little snippin' scissors, tongue between her teeth, and steps back, and trims one more bit.",
+        "A slicker brush goes over %n top to bottom, fluffin' as it goes, till they're soft all over and smell like a flower shop.",
+        "A dab of somethin' glossy goes on %n's nose and lips and a little blush on their cheeks, and the kennel girl turns their face to the light to check it.",
+        "A ribbon gets tied in %n's hair, a bow on their collar, and a little spritz of perfume behind each ear, and they're turned round for the hands to see.",
+        "{t}The kennel girl rubs a shine cream into %n's tits till they gleam, and ties a little bow under each one, very proud."
+      ],
+      '"Walk," she says, and leads %n up and down',
+      [
+        '"Trot," she says, and %n trots, up and back, while the kennel hands watch their hips and nod at each other.',
+        `"Sit. Down. Roll over." %n does each one, cheeks burnin', and gets a treat and a rub for every one.`,
+        "A kennel hand plays judge, walks round %n slow, lifts their chin, runs a hand down their back, and checks their teeth with a thumb.",
+        "%n's made to hold a stack while the kennel girl walks round them with a camera for the catalogue, and she takes her time findin' their good side.",
+        `{c}"And the judges always check here," the kennel girl says, and lifts %n's cock and balls in one gloved hand, weighs them, and makes a note.`,
+        `At the end the kennel girl pins a blue ribbon to %n's collar and says "best in show", and everybody claps, and %n can't stop waggin' their hips.`
+      ]
+    );
+    trapSceneMore(
+      "groomer",
+      [
+        "The kennel girl blows the fluffy bits behind %n's knees dry and they kick, and she laughs and does it again.",
+        "A soft brush works slow circles on %n's belly, and they tip their hips up into it without bein' asked.",
+        "{v}The kennel girl rinses between %n's legs with a soft cloth, slow and thorough, and %n's whimperin' by the end of it.",
+        "Somebody holds a treat just out of %n's reach to keep them standin' still, and they stand very still, drippin' with longin'.",
+        "{nt}A soft brush goes over %n's flat chest in little circles, round each nipple, till they're pink and pointed and %n's pantin'."
+      ],
+      [
+        "The judge runs a gloved hand slow down %n's spine and between their cheeks and writes EXCELLENT on the clipboard.",
+        `"Stand," the groomer says, and %n stands, and the groomer's hand slides between their thighs from behind, and stays there, and %n stands very still indeed.`,
+        "%n's shown off to every hand in the kennels one by one, turned this way and that, and every one of them gets to give them a rub.",
+        "{t}The judge lifts each of %n's tits, weighs it in a palm, and pinches the tip to see how it stands, and writes it all down.",
+        "When it's all done %n's put back in a clean pen with a fresh blanket and their ribbon, glossy and fluffy and so petted they can hardly stand."
+      ]
+    );
+    trapMore(
+      "leashpost",
+      "A hand on %n's collar, a click",
+      [
+        `A kennel hand clips a lead to %n's collar, walks them out into the dog yard, loops the lead round the post twice and clips it off. "Stay."`,
+        "%n stops at the dog yard post to tie a lace, and the post's chain jumps up and clicks onto their collar like it's been waitin'.",
+        "Somebody whistles from the dog yard, two short notes, and %n's feet take them over to the post before the rest of them has thought about it, and a clip clicks shut.",
+        "A chain comes snakin' across the yard on its own, finds %n's ankle, climbs, clicks onto their collar, and reels them in to the post.",
+        "A collar drops round %n's neck from behind with a lead already on it, and the other end's already clipped round the iron post.",
+        '{t}A kennel hand leads %n to the post by their collar, clips them on short, and gives their tits a pat. "Good. Wait here."'
+      ],
+      "It's a busy yard.",
+      [
+        `Somebody stops to give %n a scratch behind the ear, and another under the chin, says "who's a good one", and walks on.`,
+        "A pair of farmhands lean on the dog yard fence for their tea break, and look at %n, and talk about them like they're not there.",
+        "A kennel hand comes by with a bowl of water and sets it down by the post, and watches %n drink from it, and pats their head.",
+        "The lead's just long enough for %n to reach the edge of the shade, and just too short to get out of sight of the lane.",
+        "Somebody walkin' past pats %n's rump like they're checkin' a melon, and keeps their hand there, and keeps walkin', and their hand slides off slow.",
+        `{c}Somebody stops and gives %n's cock a long thoughtful squeeze, like they're checkin' it's real, says "huh," and moves on.`
+      ],
+      "Folks start using %n as they go by",
+      [
+        "A farmhand on their way to the milkin' sheds stops, has %n's mouth for a minute, wipes off, and is gone before the bell.",
+        "Somebody pins %n to the post with their hips and has them standin', slow and deep, and kisses the back of their neck on the way out.",
+        "Two of them stop at once, and have a short polite argument about who was first, and settle it by both bein' first.",
+        "{t}Somebody kneels in the mud in front of %n, takes a tit in each hand and sucks one, then the other, and goes off whistlin' with a wet chin."
+      ]
+    );
+    trapSceneMore(
+      "leashpost",
+      [
+        "%n's lead clinks on the post every time they move, and every time it clinks somebody looks over.",
+        "The mud round the post's churned up from all the boots stoppin' there, and %n's knees are black with it.",
+        "{c}Somebody steps on %n's lead to keep them still, crouches, and strokes their cock till they come in the mud, and then lets them up.",
+        "Somebody ties a little ribbon round %n's lead, then somebody else adds one, and by noon the lead's a rainbow.",
+        "{v}A passer-by slides two fingers into %n's pussy from behind as they walk past, without slowin' down, and leaves them gaspin'."
+      ],
+      [
+        "%n's lost count of the hands and they're past carin', and every time a shadow falls across them they're already liftin' their hips.",
+        "Somebody sits on the fence and watches %n for a long time before they come over, and when they do, they take their time.",
+        "A kennel hand comes by with a towel, wipes %n down from face to thighs, and clips them back to the post for the afternoon.",
+        "{t}Somebody hooks a finger through %n's collar, pulls them up to their feet, and has them with their tits pressed against the cold iron post.",
+        "When the kennel hand finally unclips the lead %n's too wobbly to stand, so they're carried in and laid down in the straw like somethin' precious."
+      ]
+    );
+    trapMore(
+      "teatcheck",
+      '"Teat check," the dairy girl calls',
+      [
+        `The dairy girl comes down the line of stalls rattlin' a tin cup against the bars, "mornin', mornin', check time," and the gate on %n's stall swings shut.`,
+        "%n's led into the check stall by a dairy hand with a clipboard, and their chest is pushed through a padded gap in the front so it's out on show.",
+        "A bell rings in the dairy, a stanchion clicks shut round %n's neck, and a warm wet cloth starts washin' their chest.",
+        `{t}The dairy girl backs %n into the check stall, lifts each of their tits in turn like she's weighin' fruit, and says "right, let's see what we've got."`
+      ],
+      "Each teat is squeezed, rolled and pulled till it gives a drop",
+      [
+        "The dairy girl measures each of %n's nipples with a little brass ruler, length and width, and calls the numbers to a hand with a chalkboard.",
+        "A cold swab, a warm squeeze, and a little glass dish held under each tip, and the dairy girl tips the dish to the light to read it.",
+        "{t}The dairy girl rolls %n's teats between her thumb and two fingers, slow, feelin' for lumps, and then gives each a little tug to see how they let down.",
+        "{nt}The dairy girl tugs %n's nipples out long between finger and thumb, one at a time, measures how far they stretch, and writes it down."
+      ],
+      "Then she strips them out by hand",
+      [
+        "She strips them in long slow pulls, one hand after the other, like ringin' a bell, and the pail rings with every stream.",
+        "The dairy girl hums while she strips %n out, a little work song, and her hands keep time, and %n's breathin' starts keepin' it too.",
+        "She finishes each quarter with a little twist and a flick to get the last drop, and %n jumps every time.",
+        "A dairy hand holds the pail and the dairy girl strips %n between them, and the pail's passed down the line to be weighed.",
+        "{t}She strips %n's tits till they're soft and empty and swingin', and then cups each one and gives it a fond little bounce.",
+        "{nt}She milks %n's nipples with her thumb and finger till they're puffy and sore and leakin' a thin drop, and holds the drop up, triumphant."
+      ]
+    );
+    trapSceneMore(
+      "teatcheck",
+      [
+        "The dairy girl's hands are warm from the balm and strong from the work, and she doesn't hurry, and she doesn't stop.",
+        "She writes a grade on a little card, A, B or C, and clips it to %n's collar where everybody can read it.",
+        "A little cup on a hose gets pressed to one nipple while she strips the other, so %n's bein' milked by hand and machine at once.",
+        "{t}She lifts %n's tit by the nipple, slow, till it's hangin' from her fingers, lets it drop, watches it bounce, and writes somethin' down.",
+        "{c}She strips %n's cock in long firm pulls the same as she would a teat, thumb and fingers, and the pail rings just the same."
+      ],
+      [
+        `"Good let-down," she says, and pats %n's flank, and %n flushes so hot the dairy hands laugh.`,
+        "She checks each quarter twice, and then a third time, just to be sure, and the third time is very slow.",
+        "%n's leaned into the head gate with their eyes shut and their mouth open, and every squeeze makes them moan.",
+        "{t}When she's done she rubs a fat dab of balm into each of %n's teats, slow, round and round, till they're glossy and achin'.",
+        `"Same time tomorrow," she says, and writes %n's name on the chart for the mornin' list, and opens the gate.`
+      ]
+    );
+    trapMore(
+      "wax",
+      "Strapped flat on the bench, %n watches the farmhand light",
+      [
+        "The farmhouse lamps go out one by one till there's only a single fat candle on the table, and %n's on their back next to it, wrists tied to the table legs.",
+        "%n's laid face down across a padded bench in the tack room, straps over their back and thighs, and somebody behind them strikes a match.",
+        'A farmhand with a box of candles under one arm pats the bench. "Up you get." Then the buckles, then the matches.',
+        "{t}%n's strapped on their back with a bolster under their shoulders, so their tits are pushed up high, and the candles are lined up on a shelf above them, lit and waitin'.",
+        "The bench tilts %n back till their head's lower than their hips, and a ring of little candles in jars is set round them on the floor, glowin'.",
+        "Somebody blindfolds %n with a soft scarf, and the only clue is the smell of a match and somethin' sweet meltin'."
+      ],
+      "The first drop lands on %n's belly.",
+      [
+        "A drop lands on %n's hip bone, hot and sharp, and fades to warm, and they're still gaspin' when the next one comes.",
+        "The farmhand holds the candle high, so every drop cools a little on the way down, and then lower, so it doesn't.",
+        "A slow line of drops walks down the inside of %n's arm, wrist to elbow, and every one makes their fingers twitch.",
+        "{nt}Drops land on %n's flat chest one at a time, round and round each nipple, closer every time, till the last one lands right on the tip and they cry out."
+      ],
+      "When %n's covered in hardened red",
+      [
+        "The farmhand runs an ice cube over a fresh patch of wax, and the cold after the hot makes %n arch off the bench.",
+        "A flat wooden spatula slides under the wax and lifts it off in long sheets, slow, and %n's skin underneath is pink and tinglin'.",
+        "The farmhand pours from two candles at once now, one from each side, two lines of wax meetin' in the middle of %n's belly.",
+        "When the wax is peeled the farmhand rubs warm oil into the pink skin underneath, slow, and then reaches for the candle again.",
+        "A drip lands, and another, and the farmhand blows on each one to set it, and their breath's almost as hot.",
+        "{v}The farmhand peels the wax off %n's mound last, a little at a time, and every tug makes them whimper and squirm."
+      ]
+    );
+    trapSceneMore(
+      "wax",
+      [
+        "The candle flame wavers every time %n gasps, and the farmhand cups a hand round it and waits for them to settle.",
+        "A drop lands on the inside of %n's knee and they kick, and the strap holds, and the farmhand drips another on the same spot.",
+        "{c}A ring of wax gets dripped round the base of %n's cock, slow, all the way round, and sets like a little red collar.",
+        "The wax pools in %n's belly button and spills over, and the farmhand catches the overflow with the candle and draws it lower.",
+        "{nt}The wax runs across %n's flat chest in little red rivers and sets, and the farmhand traces each one with a fingertip."
+      ],
+      [
+        "The farmhand switches to a cool white candle and a hot black one, and makes %n guess which is which before every drop.",
+        `%n's covered from collarbone to knee in red and white drips, and the farmhand steps back and says "pretty", and lights another.`,
+        "{t}Wax drips off the curve of %n's tits in long red teardrops and sets hangin' there, and the farmhand flicks each one off with a finger.",
+        "The farmhand cracks the wax off %n's thighs with the flat of a paddle, smack by smack, and the pieces scatter across the floor like petals.",
+        "When the last candle's burned down %n's left pink and tender and glowin' all over, and so sensitive the farmhand's breath makes them shiver."
+      ]
+    );
+    trapMore(
+      "trophy",
+      "The trapper hoists %n onto the trophy wall",
+      [
+        `%n steps into the trapper's cabin out of the rain, and the trapper looks up from the fire, looks them up and down, and says "oh, you'll go lovely over the mantel."`,
+        "A snare in the woods by the cabin takes %n by the ankle, and the trapper comes along whistlin', slings them over one shoulder, and carries them home.",
+        "The trapper's big hands lift %n off their feet and set them against the wall on a little ledge, and the straps go on one after another, wrists, waist, knees, ankles.",
+        "%n's tied spread to a wooden board on the cabin floor, and two of the trapper's friends lift the board and hang it on the wall.",
+        "{t}The trapper straps %n to the planks with a wide band under their tits to hold them up, and stands back with his hands on his hips, admirin' his work.",
+        "%n's mounted high on the wall over the fireplace, arms out like they've been caught mid-leap, and the warmth from the fire comes up between their legs."
+      ],
+      "A brass plate is screwed in underneath",
+      [
+        "Word gets round the woods, and by sundown there are boots on the porch and visitors at the door, wantin' to see the trapper's new catch.",
+        "The trapper puts on his good waistcoat and pours drinks and tells the story of the catch, and it gets bigger every time he tells it.",
+        `A visitor leans close and inspects %n with a little magnifyin' glass, every inch, hummin', and pronounces them "very fine".`,
+        "The trapper's friends sit round the fire and look up at %n and argue about which is the better trophy, %n or the bear.",
+        `Somebody runs a hand slow down %n's leg from hip to ankle like they're feelin' the nap of a fur, and says "soft".`,
+        `{c}A visitor gives %n's cock a gentle lift with one finger and says "now that's a fine set of antlers," and the cabin roars.`
+      ],
+      "{t}One of them gives %n's tits a squeeze.",
+      [
+        "One of the visitors gets up for a closer look and stays up, standin' right between %n's spread knees, and the others stop talkin' to watch.",
+        "The trapper's friends take turns gettin' up to give %n a pat, a squeeze, a stroke, and then sit back down with their drinks, grinnin'.",
+        "Somebody hangs their hat on %n's foot, and somebody else hangs a coat off their wrist, and %n's a coat rack for the evenin'.",
+        `{v}A visitor slips two fingers into %n's pussy, slow, and holds them up to the firelight, wet, and says "fresh, this one".`,
+        "The trapper takes %n down off the wall for a while so a visitor can have them on the bearskin rug, and then hangs them back up."
+      ]
+    );
+    trapSceneMore(
+      "trophy",
+      [
+        "The fire crackles and the shadows jump across %n's bare skin, and the cabin smells of pine smoke and leather and whiskey.",
+        "The trapper dusts %n with a feather duster, slow and careful, the same as he does all his trophies, and lingers in all the same places.",
+        "{c}A visitor hangs a little brass bell off %n's cock with a ribbon, and it tinkles every time they twitch, and the cabin laughs.",
+        "%n's been mounted so long their arms ache and their thighs tremble, and the trapper comes and rubs their legs with warm oil to keep them lookin' fresh.",
+        "{nt}The trapper rubs a little oil into %n's flat chest with his thumbs till it shines in the firelight."
+      ],
+      [
+        "Somebody brings a lantern up close to %n's face for a better look, and %n can feel the heat of it on their cheek, and somebody else's hand between their legs.",
+        "The visitors start a game: anybody who misses at the dartboard has to go up and give the trophy a kiss, wherever they're told.",
+        "%n's had by three of the trapper's friends in turn, right there against the wall, and the trapper keeps a tally on the doorframe with his knife.",
+        "{t}Somebody hangs a pair of little brass weights off %n's nipples to improve the display, and the cabin agrees it's very much improved.",
+        "When the last visitor's gone home the trapper takes %n down off the wall, wraps them in a fur, and sits them by the fire with a cup of somethin' warm."
+      ]
+    );
+    trapMore(
+      "slop",
+      "A bucket tips from the sty rail",
+      [
+        `%n leans on the sty rail to watch the pigs, and the pig girl comes up behind them with a full pail and says "oops" before she's even tipped it.`,
+        "%n's sittin' on an upturned bucket by the sty when the bucket turns out to be the slop bucket, and they find out from underneath.",
+        "A chute from the kitchen window opens right over %n's head, and the whole day's peelin's and dregs come slidin' down it onto them.",
+        "%n trips on a hose and lands in the trough just as the boar-man who keeps the sty swings the evenin' slop in with both arms.",
+        "{t}A pail of warm mash goes straight down the front of %n, slides down between their tits and into their lap, and the pig girl laughs so hard she drops the pail.",
+        `The pig girl dumps the slop pail over %n's head like a hat, pats it twice, and says "there, now you match."`
+      ],
+      "The pigs hear the slop hit and come running",
+      [
+        "The whole sty comes runnin' at once, a squealin' wall of pink, and %n's knocked onto their rump in the muck in the middle of it.",
+        "The pigs crowd round %n's knees, shovin' and gruntin' after every peelin' that falls, and there's nowhere to stand but where they're shovin'.",
+        `%n tries to climb out and a big old sow leans her whole weight on the rail, chewin', and won't budge, and the pig girl says "she likes you."`,
+        "The pig girl hops into the trough with %n, ankle-deep, and starts scrapin' the slop off them with her hands, back into the trough for the pigs.",
+        'The boar-man leans over the rail, sniffs, and grins. "Smells like supper," he says, and climbs over.',
+        "The muck's warm and deep and it sucks at %n's knees every time they try to rise, and the pigs root happily round the edges."
+      ],
+      "{t}The pig girl hops the rail",
+      [
+        "The boar-man kneels in the muck behind %n, big hands on their slop-slick hips, and pulls them back onto him with a happy grunt.",
+        "The pig girl smears a handful of mash slow across %n's mouth and then kisses it off, sloppy and laughin'.",
+        "%n's rolled onto their back in the trough and the pig girl straddles them, slick with slop, and rubs herself against them till they're both moanin'.",
+        "{c}The pig girl finds %n's cock in all the muck and gives it a slow slippery stroke, and another, and doesn't stop.",
+        "The boar-man lifts %n out of the trough by the waist like they weigh nothin', bends them over the rail, and has them there, slop and all, while the pigs eat round their feet."
+      ]
+    );
+    trapSceneMore(
+      "slop",
+      [
+        "The slop slides down %n's back and between their cheeks, warm and lumpy, and the pig girl follows it down with her hand.",
+        "The pigs shove at the backs of %n's knees to get at the trough, and every shove pushes them a little further into the pig girl's arms.",
+        "A carrot top's stuck in %n's hair like a feather in a hat, and the boar-man plucks it out and eats it, and grins.",
+        "{v}The pig girl's hand slides through the slop between %n's legs and finds them hot and slick under it, and stays.",
+        "The pig keeper tips a jug of sour milk over %n's head to rinse the mash off, and it only makes it worse, and everybody laughs."
+      ],
+      [
+        "The boar-man takes %n right there in the muck, slow and heavy, gruntin' in their ear, and the pigs don't even look up from their supper.",
+        "%n's slick from hair to toes and they've stopped carin', and they're lyin' in the warm slop with their mouth open, laughin' and moanin'.",
+        "The pig girl and the boar-man take turns with %n in the trough, and the pig keeper keeps tippin' on more slop so nobody gets clean.",
+        "{t}The pig girl scoops up a double handful of mash and claps it onto %n's tits, and squeezes, and it squishes out between her fingers.",
+        "When it's over the pig keeper hoses %n down by the sty, cold and hard, and they come out pink and gaspin' and still smellin' faintly of turnips."
+      ]
+    );
+    trapMore(
+      "hogtie",
+      "Ropes snap tight around %n's wrists and ankles",
+      [
+        "The pig girl comes at %n with a coil of rope over her shoulder and a grin, and they run, and she lassos them by the ankle on the third throw.",
+        "%n trips over the sty's water hose, and before they've stopped slidin' the pig girl's knee is in the small of their back and the rope's goin' round.",
+        "A loop drops round %n's wrists from the rail and another round their ankles from the trough, and the two ropes are hauled together till they meet behind them.",
+        "The boar-man catches %n by the waist on their way past the sty, tucks them under one arm like a sack of feed, and hands them to the pig girl to tie.",
+        "{t}The pig girl ties %n's wrists to their ankles behind their back, then runs a turn of rope round their chest above and below their tits for good measure, and tugs it snug.",
+        "The pig girl's rope work is quick as a rodeo hand's: wrists, ankles, wrists to ankles, a half hitch and a pat, and %n's flopped down into the muck."
+      ],
+      "The mud's warm and deep",
+      [
+        "%n tries to roll over and gets halfway, and the mud sucks them back down onto their belly with a long wet noise.",
+        "The muck oozes up between %n's thighs and round their hips, warm as a bath and twice as thick, and every wriggle sinks them deeper.",
+        "The rope creaks every time %n moves, and every time it creaks the pig girl looks over from the rail and smiles.",
+        "%n's tied so their back's bowed and their chest's off the ground and their rump's up, and the only way to rest is to give in and sag into the mud.",
+        "{c}%n's cock's pressed into the warm mud under them, and every rock of their hips drags it through the muck, and it's gettin' hard whether they like it or not.",
+        "The pigs wander over to see what the noise is, have a look, and wander back to the trough. The boar-man stays."
+      ],
+      "Then the boar comes over",
+      [
+        "The boar-man steps down into the wallow up to his shins, slow, and the whole sty goes quiet the way a sty does when he moves.",
+        "He's huge up close, bristle-backed and tusked and broad as a door, and he crouches down by %n's head and tips their chin up out of the mud with one thick finger.",
+        "The boar-man sniffs at the back of %n's neck, long and slow, and makes a low pleased sound deep in his chest.",
+        "He tests the pig girl's knots with a tug, grunts approval, and gives %n's rope a little lift so they rock forward on their belly in the mud.",
+        "The boar-man rolls %n onto their side with one hand to have a proper look at the front, and rolls them back again, satisfied.",
+        '"Nice work," the boar-man rumbles to the pig girl, and the pig girl curtsies on the rail, and the boar-man kneels in the mud behind %n.'
+      ],
+      "{v}He kneels in the mud and runs a thick hand",
+      [
+        "He works a big thumb slow into %n, mud and all, and holds it there while they squirm and squeal against the ropes.",
+        "He hauls %n back by the rope between their wrists and ankles like a handle, settles them on his knees, and the mud drips off them in long sheets.",
+        "His bristly belly presses down on %n's bound back, heavy and hot, and his breath snorts warm in their ear, and he's in no hurry at all.",
+        "{t}He reaches under %n and finds their tits in the mud and squeezes, and the mud squelches out between his fingers, and %n moans.",
+        "The boar-man rolls %n onto their back on the rope, so they're bowed up and open, and kneels between their knees, and grunts."
+      ]
+    );
+    trapSceneMore(
+      "hogtie",
+      [
+        "The mud's in %n's hair and ears and mouth, and they spit and gasp, and the pig girl laughs and wipes their face with a handful of straw.",
+        "The pig keeper tips a bucket of warm water over %n's rump to wash a patch clean, so the boar-man can see what he's doin'.",
+        "{v}A big hand slides through the mud between %n's thighs and finds them hot and soakin' under it.",
+        "%n rocks on their belly in the muck, and every rock makes the rope tug at their wrists and ankles, and their whole body's sore and wantin'.",
+        "{nt}%n's flat chest is pressed into the mud, nipples draggin' through it every time they rock, stiff and sore."
+      ],
+      [
+        "The boar-man has %n slow and deep in the wallow, and every thrust rocks them forward in the mud and the rope rocks them back.",
+        "He grunts somethin' that might be 'good', and %n's past carin' what it means, mud in their mouth and moanin' through it.",
+        "When he finishes he stays, heavy and hot on top of them, breathin' slow, and %n can feel his heartbeat through their back.",
+        "{c}The boar-man reaches round and takes %n's muddy cock in his fist and strokes, slow, in time with himself, till they're both gruntin'.",
+        "The pig girl unties %n at last and they stay where they are, flat in the warm mud, too wrung out to climb out, and the boar-man pats their rump."
+      ]
+    );
+    trapMore(
+      "milkinghole",
+      "A hole in the wall at chest height, a padded rim, and a sign",
+      [
+        "%n reads a little card by the dairy wall that says PRESS HERE FOR A TREAT, and presses, and the wall opens round them and closes again, padded and snug.",
+        "A dairy hand walks %n up to the wall by the elbow, very polite, and tucks them through the hole like postin' a letter, and there's a click.",
+        "The board in front of %n slides open at just the right height, and a warm draught from the other side smells of milk and hay and somebody's soap.",
+        "%n leans on what they think is a fence, and their chest goes through a gap in it, and somethin' soft and padded closes round their ribs and holds.",
+        "{t}%n's tits are guided through two round padded holes in the dairy wall by a pair of gentle hands, one at a time, and the holes close up snug behind them.",
+        "A sign on the wall says THIS SIDE FOR THE COW. %n's on that side before they've worked out what the other side's for."
+      ],
+      "On the other side, hands.",
+      [
+        "Somebody on the other side washes %n first, a warm wet cloth, slow and careful, and then a pair of hands warms up with some balm.",
+        "Fingers find %n through the wall and explore, slow, the way you learn a new tool, and then settle in to work.",
+        "There's a hiss and a pull, and somethin' on the other side's latched on, and it's either a machine or a very greedy mouth, and %n can't tell which.",
+        `{nt}Somebody on the other side rolls %n's nipples between their fingers, says "oh, they're little ones," and keeps at it anyway, patient.`
+      ],
+      "It milks %n till there's nothing left",
+      [
+        "Every time %n thinks they're done, the hands on the other side find a little more, coax it out, and say thank you through the wall.",
+        "%n can hear the pail fillin', a high ring and then a lower one as it fills, and every change in the note makes them blush harder.",
+        "The milkin' stops for a moment and %n sags against the wall, and then a fresh pair of hands takes over, and it starts all over.",
+        "Somebody on the other side's singin' while they milk, an old dairy song, and %n's hips are swayin' to it before they know it.",
+        "{t}%n's tits are milked soft and empty and swingin', and still the mouth on the other side keeps suckin', just for the taste.",
+        "When the rim finally loosens %n slides out of the wall shaky and drained, with a little paper ticket pinned to them that says THANK YOU FOR YOUR DONATION."
+      ]
+    );
+    trapSceneMore(
+      "milkinghole",
+      [
+        "Somebody on the other side taps the wall twice, the way you'd knock on a door, and then a warm mouth's on %n before they can answer.",
+        "A hand on the other side holds %n steady while another works, and the boards creak every time %n jerks.",
+        "%n can feel breath on their skin through the hole, warm and quick, and then lips, and then teeth, gentle.",
+        "{v}Somethin' on %n's side of the wall nudges between their legs, a padded bar that rises and settles snug against their pussy, and hums.",
+        "{nt}A pair of little cups latch onto %n's nipples through the wall and pull, steady, and the person on the other side hums along with the pump."
+      ],
+      [
+        "%n hears a little bell ring on the other side each time the pail's full, and it's rung three times now.",
+        "Somebody on the other side says %n's name, soft, like they've only just read it on the wall, and says it again every time they squeeze.",
+        "%n's forehead's pressed to the wall and their knees are shakin', and every pull goes straight through them and down to their toes.",
+        "{c}The hand on %n's cock pulls in time with the mouth on their chest, and %n spills into a pail they'll never see.",
+        "A cup of somethin' warm and creamy is passed back through a little hatch for %n to drink, with a sprig of mint in it and a note that says WELL DONE."
+      ]
+    );
+    trapMore(
+      "feedbag",
+      "A canvas feedbag goes over %n's face before they can duck",
+      [
+        `The feed girl comes out of the barn swingin' a canvas bag on a strap, sees %n, says "there you are, it's supper time," and has it buckled on before they can argue.`,
+        "%n bends to sniff at a bag hangin' from a nail, and the strap slips over the back of their head and pulls snug, and the bag's warm and heavy and smells of oats.",
+        `A farmhand catches %n by the collar, says "you look peaky, you need feedin' up," and straps a bulgin' feedbag over their nose and mouth.`,
+        "The feedbag drops off a hook in the rafters right over %n's face, and the strap's elastic, and it snaps round behind their ears and holds.",
+        "{t}The feed girl buckles the bag on %n, then a second strap round their chest under their tits to keep them still, and steps back to watch them eat.",
+        "Two padded clamps catch %n's wrists to a post behind them, and the feedbag goes on after, so there's no pushin' it off."
+      ],
+      "There's nothing to do but eat.",
+      [
+        "The mash is warm and sweet with molasses, and every mouthful sticks to %n's lips and teeth, and there's always more pressin' in behind it.",
+        "%n breathes through their nose in little huffs between mouthfuls, and the bag puffs out and in with every breath.",
+        "The feed girl tips the bag up from the bottom so the mash slides toward %n's mouth, and holds it there till they've taken it.",
+        "Every so often the feed girl lifts the bag an inch to check %n's chewin' properly, and lets it drop back with a soft thump.",
+        "The mash is mixed with somethin' that makes %n warm and drowsy and hungry all at once, and they find themselves eatin' faster.",
+        "{c}Somethin' in the mash goes straight to %n's cock, and it's standin' hard against their belly while they chew, and the feed girl notices and laughs."
+      ],
+      "%n's belly rounds out with every mouthful.",
+      [
+        "Their belly's pushin' out round and heavy over their lap now, and the feed girl measures it with a bit of string and ties a knot to mark it.",
+        `%n's belly gurgles, loud, and the feed girl pats it and says "room for more," and shakes the bag.`,
+        "The feed girl tops up the bag from a bucket with a scoop, and %n whines into the mash, and swallows.",
+        "%n's so full their belly's tight and shiny and they have to lean back to make room for each new mouthful.",
+        `A farmhand comes by with another bag and asks if this one needs a second, and the feed girl looks at %n's belly and says "oh, I think so."`
+      ]
+    );
+    trapSceneMore(
+      "feedbag",
+      [
+        "The mash is warm against %n's face and the oats tickle their nose, and every breath smells of molasses and hay.",
+        "The feed girl strokes %n's throat with two fingers while they swallow, slow and soothin', like she's helpin' it down.",
+        "%n's lips are smeared sweet and sticky from the bag, and when the feed girl lifts it to check, she kisses the stickiness off.",
+        "{c}%n's cock's hard and bobbin' under their swellin' belly, and the feed girl gives it a pat every time she tops up the bag.",
+        "{v}The fuller %n gets the more it presses down on everything below, and they're squirmin' and wet and achin' from it."
+      ],
+      [
+        "%n's belly's so round now it rests on their thighs, and every swallow they can feel land in it, heavy and warm.",
+        'The feed girl unbuckles the bag at last, looks inside, and buckles it back on. "Not empty yet."',
+        "%n's eyes have gone heavy and dreamy, and they're nuzzlin' into the bag now instead of away from it, and the feed girl coos.",
+        "{t}The feed girl hefts %n's tits one at a time, then their belly, and makes a happy little noise at how heavy everything's gettin'.",
+        "When the bag finally comes off empty %n's too stuffed to stand, round as a pumpkin, lickin' mash off their lips with a silly, sleepy smile."
+      ]
+    );
+    trapMore(
+      "desk",
+      '"In my office," says the overseer',
+      [
+        "A bell rings on the office wall with %n's name chalked under it, and a farmhand points them to the door with a face that says good luck.",
+        `The overseer's voice comes out of the horn on the barn post: "%n. Office. Now." The whole barn goes quiet and looks at them.`,
+        "%n's marched up the office steps by a hand at the back of their collar and walked straight round to the far side of the desk, and pressed down over it.",
+        `The overseer doesn't look up from the ledger. "Shut the door. Bend over the desk. Hands flat." %n does all three.`,
+        "{t}%n's bent over the desk so their tits are pressed flat on the cold leather blotter, and a paperweight's moved out of the way with great care.",
+        "A padded strap's been screwed to each side of the overseer's desk, and %n finds out what they're for about two seconds after they're through the door."
+      ],
+      '"Your numbers are down," the overseer says',
+      [
+        "The overseer runs a finger down a column in the ledger, slow, and every time it stops the ruler taps %n's rump, once, as a promise.",
+        `"Milk: short. Chores: late. Attitude..." The overseer looks over their glasses. "We'll start with attitude."`,
+        "The overseer reads %n's file aloud in a dry flat voice, every slip and every cheek, and every line ends with a smack of the ruler.",
+        "A little brass bell on the desk gets rung, the ledger's opened at %n's page, and the ruler's lifted off its hook on the wall.",
+        `"Count them for me," the overseer says, "and if you lose count we start again." The first one lands before %n's ready.`,
+        `{c}"And the stud book says you've been wastin' it," the overseer says, and the ruler comes down on the backs of %n's thighs, close enough to their balls to make them yelp.`
+      ],
+      "Each stroke is entered in the ledger in neat red ink.",
+      [
+        "The overseer blots each entry before the next stroke, and the little rockin' noise of the blotter is the worst sound %n's ever heard.",
+        "When the count's done the overseer lays a cool hand on %n's hot backside and leaves it there a long moment, very still.",
+        '"Better," says the overseer, and closes the ledger, and leans back in the big leather chair, and looks at %n over steepled fingers.',
+        "{v}The overseer slides two fingers between %n's thighs from behind, checks how wet they've got, and writes that down too.",
+        "The overseer pours themselves a cup of tea, doesn't pour %n one, and drinks it slowly while %n stays bent and glowin'."
+      ],
+      "%n spends the rest of the audit under the desk",
+      [
+        "%n's pointed under the desk with the end of the ruler, and they crawl in, and the chair rolls up close, and the knees part.",
+        "There's a cushion under the desk already, worn in two dents just the size of a pair of knees, and %n kneels on it.",
+        "Above the desk the pen scratches and the pages turn, and below it %n's mouth is busy, and every so often a hand comes down to stroke their hair.",
+        `The overseer takes a call on the telephone with %n under the desk, says "no, no, I'm not busy," and %n has to work very quietly.`,
+        `"Slower," says the overseer without lookin' down, and turns a page, and %n goes slower.`,
+        `When the overseer finally pushes the chair back %n's let out from under the desk with wet lips and stiff knees and a pat on the cheek. "Dismissed."`
+      ]
+    );
+    trapSceneMore(
+      "desk",
+      [
+        "The office clock ticks, loud, and every tick is a gap between strokes that %n spends waitin' for the next one.",
+        "The overseer straightens %n's hands on the desk with the tip of the ruler, so they're flat and neat, before carryin' on.",
+        `{c}"Excess wastage in the collection shed," says the overseer, and taps %n's balls with the ruler, very light, which is somehow worse.`,
+        '"Lift," says the overseer, and %n lifts their hips off the desk, and the ruler comes down exactly where they lifted.',
+        "The farm's ledger lies open under %n's cheek, and they can read their own name, and every mark next to it."
+      ],
+      [
+        "The overseer's hand tightens in %n's hair whenever a figure doesn't add up and loosens when it does, and %n learns to work while they count.",
+        "The overseer finishes, sighs, signs the bottom of the page with a flourish, and holds %n's chin to make them look up and swallow.",
+        'A clerk knocks with the post, and the overseer says "come in," and %n stays exactly where they are.',
+        "{t}The overseer reaches down and rolls %n's nipple between finger and thumb while they read, absent-minded, the way some people click a pen.",
+        `"Same time next week," says the overseer, and writes it in the diary, and %n's name is underlined twice.`
+      ]
+    );
+    trapMore(
+      "inspection",
+      "A clipboard, a tape measure, and an office clerk",
+      [
+        "A notice on the barn door says ALL STOCK REPORT FOR INSPECTION, and %n's name is at the top of the list, and the clerk's waitin' with her pen already clicked.",
+        `%n's walked into the office in a line with three others, and the others are sent back out, and the clerk says "not you".`,
+        'The clerk peers at %n over her glasses, makes a little tick on her form, and points at a chalk circle on the floor. "Stand there. Arms up."',
+        "A curtain's drawn round %n in the corner of the office, a lamp swings round to light them, and the clerk snaps on a pair of gloves.",
+        "{t}The clerk stands %n against a measurin' board on the wall and pulls their shoulders back with two fingers, so their tits stand out for the tape.",
+        `The clerk reads %n's name off a form, then looks at %n, then at the form, and frowns like one of them must be wrong. "Clothes off, please."`
+      ],
+      "Height, weight, hips, chest, every hole and every inch",
+      [
+        "The clerk measures the gap between %n's thighs with a pair of calipers, writes it down, then pushes their knees wider and measures again.",
+        "A tape goes round %n's neck, wrist, ankle and waist, and the clerk reads each number out loud in a flat bored voice, like a shoppin' list.",
+        "{nt}The clerk measures each of %n's nipples with a little brass gauge, writes NIPPLES: PRESENT in the box, and underlines it.",
+        "The clerk shines a little torch into %n's mouth and ears and makes them say ah, then makes them turn round and shines it somewhere else."
+      ],
+      "Teeth, gait, temperament",
+      [
+        `"Walk to the door. Turn. Walk back." The clerk watches %n's hips the whole way and writes GOOD MOVER.`,
+        `"Touch your toes." %n does. "Hold it." %n holds it, and the clerk takes her time with whatever she's lookin' at back there.`,
+        "The clerk taps %n's knee with a little rubber hammer, and the other knee, and then taps somewhere else entirely, to see what jumps.",
+        `"Temperament," the clerk says, and pinches %n's rump, sharp, and writes down exactly what noise they make.`,
+        "The clerk has %n kneel, stand, sit, kneel again and present, and makes a little mark for each one like she's markin' a test.",
+        "{c}The clerk lifts %n's balls with the back of her pen, weighs them with her eyes, and writes a number down without a word."
+      ]
+    );
+    trapSceneMore(
+      "inspection",
+      [
+        "The clerk's pen scratches and scratches, and every time it stops %n holds their breath for whatever the next instruction's goin' to be.",
+        `"Breathe in," says the clerk, with a cold stethoscope on %n's chest. "And out. And again." She listens for longer than she needs to.`,
+        `{v}"Hold still," says the clerk, and parts %n's pussy with two cold fingers, slides a little speculum in, and has a good long look.`,
+        "The clerk shakes her head at somethin' on the form, crosses it out, and measures %n again, very slowly.",
+        "{nt}The clerk tweaks each of %n's nipples to check the response, and writes RESPONSIVE in big letters."
+      ],
+      [
+        '"Second opinion," the clerk says, and the second inspector kneels to take a closer look at the parts the first one was unsure about.',
+        "%n's told to cough, and then to cough again, and the clerk has a hand somewhere that makes the cough come out a squeak.",
+        "The clerk stamps the form PASSED, then looks at it again, frowns, and says they'll have to do the whole thing over just to be sure.",
+        "{t}The clerk lifts %n's tits one at a time and lets them drop, timin' the bounce with a stopwatch, and writes it down to the second.",
+        `At the end the clerk files %n's form in a drawer, stamps INSPECTED on the back of their hand, and says "next."`
+      ]
+    );
+    trapMore(
+      "stamp",
+      "The office clerk pulls %n over by the collar and inks",
+      [
+        "%n leans on the office counter to ask a question, and the clerk takes their wrist, turns their hand over, and stamps it before they've finished the question.",
+        "A tray of rubber stamps and an ink pad slide out of the wall at hip height, and an arm with a stamp in it waves hello.",
+        `The clerk looks up from her desk, says "oh, you're not filed," and comes round with a stamp in each hand.`,
+        "%n's lifted onto the office counter by two farmhands and laid out on it face down, like a parcel waitin' to be posted.",
+        "{t}The clerk stands %n against the wall, tilts their chin up with a ruler, and considers the space across their tits like it's a blank page.",
+        "A little rubber stamp on a spring pops out of the post box as %n passes and thwacks APPROVED onto their rump, and the office door swings open for more."
+      ],
+      "Thunk. APPROVED across %n's ass.",
+      [
+        "Thunk. RECEIVED on the inside of %n's wrist. Thunk. CHECKED on their hip. The clerk counts each one under her breath.",
+        "The clerk stamps a neat line of little hearts down %n's spine, one per knob of bone, and inks them in red.",
+        "{c}A long thin stamp gets rolled down the length of %n's cock, PROPERTY OF THE FARM, and the clerk blows on it gently to dry.",
+        "The clerk stamps PAID across one of %n's cheeks and OWED across the other, and laughs at her own joke.",
+        "{v}A little stamp, very precise, goes on the soft skin just above %n's pussy: CHECKED HERE, and an arrow."
+      ],
+      "Then the date stamp, the farm's seal",
+      [
+        "A big brass seal is pressed into a blob of warm red wax on %n's hip, and it sets with the farm's crest in it, and the clerk taps it to make sure.",
+        "The clerk turns %n round and round, checkin' every stamp is straight and dry, and redoes the crooked ones with a sigh.",
+        "A paper tag on a string goes round %n's ankle with a number on it, matchin' the number on the back of their neck.",
+        "The clerk takes a photograph of %n for the file, front and back, and staples the prints to a folder with their name on the tab.",
+        "The clerk stamps RETURN TO SENDER on %n's rump, then crosses it out, and stamps KEEP under it.",
+        "{t}The clerk adds one more stamp on each of %n's nipples, a tiny round O.K., very neat, and declares them filed."
+      ]
+    );
+    trapSceneMore(
+      "stamp",
+      [
+        "The ink's cold and wet and smells of vinegar, and every stamp leaves a little sting of cold that fades slow.",
+        "The clerk rocks each stamp heel to toe so the ink takes properly, and holds %n's skin flat under it with her other hand.",
+        "The clerk picks a stamp, holds it up to %n's face so they can read it backwards, and puts it on them somewhere they can't see.",
+        "{nt}The clerk stamps a neat row of little ticks down %n's flat chest, one under the other, like a checklist.",
+        "{v}The clerk stamps INSPECTED on the inside of each of %n's thighs, close, and then a little star right in the middle."
+      ],
+      [
+        "Every inch of %n that faces forward has a stamp on it now, and the clerk's started on the inches that face backwards.",
+        "The clerk fetches the big stamp from the top shelf, the one with the farm's whole name on it, and needs both hands to press it down across %n's back.",
+        "Somebody from the dairy comes in with a form to be stamped, and the clerk stamps the form, and then %n, out of habit.",
+        "{c}The clerk stamps APPROVED on %n's cock, then INSPECTED under it, then a little date, and %n's hard as a rollin' pin from all the attention.",
+        `When the clerk's done %n's walked to the filin' cabinet, and the clerk opens the bottom drawer, looks at %n, closes it, and says "too big. Wait in the corridor."`
+      ]
+    );
+    trapMore(
+      "goblinmarket",
+      "Goblin hands haul %n up onto an upturned crate",
+      [
+        "A goblin with a sack and a very big grin follows %n down the lane for a mile, and when they turn round to ask what he wants, the sack comes down over their head.",
+        "%n wanders into the goblin camp after a smell of fried onions, and there's a sudden hush, and every goblin in the market turns and looks at them like they're a fat purse.",
+        "Three goblins on each other's shoulders under a long coat ask %n for directions, and the coat falls open, and the rope's round %n's wrists before they've finished pointin'.",
+        "%n's hauled into the market on a handcart with a price chalked on their forehead, and the price has been crossed out and made bigger twice already.",
+        "{t}The goblins stand %n on the sellin' block and tie a red ribbon round their middle, right under their tits, so they're served up like a present.",
+        'A goblin auctioneer in a moth-eaten top hat bangs his spoon on a pan and bellows "lot number one! Lot number ONE!" and points the spoon straight at %n.'
+      ],
+      '"Fine big beast! Good teeth!',
+      [
+        `The auctioneer walks round and round %n on the crate, slappin' each bit he sells: "Sturdy legs! Broad back! Good strong rump, look, LOOK at it!"`,
+        `{v}The auctioneer slides a stubby green finger into %n's pussy, holds it up glistenin' for the crowd, and shouts "juicy!"`,
+        "A goblin in spectacles climbs up with a measurin' string and measures %n everywhere, very serious, and whispers each number to the auctioneer, who shouts it.",
+        "The goblins make %n turn round slow on the crate, then bend over, then turn back, and every time they bend the bids go up.",
+        `{nt}The auctioneer pinches %n's nipples and tugs, and %n squeaks, and he shouts "and a good singer too!" and the market roars.`
+      ],
+      "The bidding goes wild",
+      [
+        "Two goblins bid against each other so long they start biddin' their own trousers, and the winner climbs up onto the crate in nothin' but his hat.",
+        "The hammer comes down on a bid of one pickled egg and a very big promise, and the winnin' goblin drags %n off the crate by the ankle, cacklin'.",
+        "Nobody can agree who won, so the auctioneer sells %n to all of them, by the hour, and starts a queue.",
+        "%n's sold to a goblin matron with a basket on her arm, who pinches their rump, ties a string round their wrist, and leads them off through the market like a bag of shoppin'.",
+        "The winnin' bidder tries %n out right there on the crate to make sure he hasn't been cheated, and the crowd shouts advice the whole time.",
+        "{c}The winnin' goblin ties a little price tag to %n's cock with SOLD on it, and leads them off the block by it, very gently, to a big cheer."
+      ]
+    );
+    trapSceneMore(
+      "goblinmarket",
+      [
+        "The market smells of woodsmoke, fryin' fat and goblin, and every stall-keeper leans out to get a better look at the big new lot on the block.",
+        `A goblin climbs up the back of the crate, hangs off %n's shoulders, sniffs their hair with great interest, and shouts "fresh!" to the crowd.`,
+        "{v}A biddin' goblin wants to check the goods are ripe, and the auctioneer holds %n's knees apart while he does, with two fingers, slow and thorough.",
+        "{nt}A goblin with a jeweller's eyeglass weighs each of %n's nipples between finger and thumb, frowns, and argues they should go cheaper."
+      ],
+      [
+        "The auctioneer has to stop the sale twice to pull goblins off %n, and the second time he doesn't try very hard.",
+        "Somebody bids a whole cartwheel of cheese, and the market gasps, and the goblin with the cheese gets a free try while the others turn out their pockets.",
+        "{t}The goblins lift %n's tits on a pair of wooden spoons for the back of the crowd to see, and the bids go up with every jiggle.",
+        "{c}A goblin gives %n's cock a long slow pull to prove it works, and when it does the whole market cheers and the price doubles."
+      ]
+    );
+    trapMore(
+      "goblincart",
+      "Ropes, lots of them, badly tied but very many",
+      [
+        'A rickety cart with one square wheel rolls up behind %n, the goblins on it shout "GET IN!", and about twelve grabby pairs of hands make sure they do.',
+        "The goblins catch %n in a fishin' net, roll them up in it like a carpet, and heave the whole bundle up onto the cart.",
+        "%n's tied to the cart bed with a washin' line, three belts, a ball of wool and some goblin's braces, all knotted into one enormous tangle.",
+        "{t}The goblins tie %n down spread on the cart with a rope crossin' between their tits, round and back, and argue about the knot for ages.",
+        'A goblin chief points at %n from the top of a barrel and squeaks "THAT one for the parade!", and the goblins swarm.',
+        "%n's lured onto the cart by a sign that says FREE RIDE, which is true, and nobody mentions the ropes."
+      ],
+      "Then the parade: round and round the goblin camp",
+      [
+        "A goblin in a feathered hat sits up front on %n's chest, holdin' the reins of the two goblins pullin' the cart, and steers with his heels.",
+        "The goblins sing a marchin' song with about four words in it, over and over, and every time they get to the last word they all slap %n.",
+        "The cart squeaks and jolts and lurches, and every jolt jiggles %n against the ropes, and every jiggle gets a cheer.",
+        "Goblin women run alongside throwin' petals and sticky sweets, and the sweets stick to %n wherever they land, and the goblin women eat them back off.",
+        "The parade goes round the camp so many times the goblins start a second parade goin' the other way, and the two meet at the cookin' fire with a crash.",
+        "{v}A goblin rides on %n's hips like a jockey, bouncin' with the cart, and his hands keep slippin' down between their legs for balance."
+      ],
+      "Every lap, the cart stops and anyone who wants a feel",
+      [
+        "At the cookin' fire the cart stops, and a goblin cook dips a spoon in the stew, tastes it, and then tastes %n too, to compare.",
+        "The goblins at the gate stop the cart and demand a toll, and the toll's paid on the spot, by %n, while the others hold the ropes.",
+        "At each tent the cart passes, a goblin climbs aboard, has a quick go, hops off and waves the cart on, and the next tent's already waitin'.",
+        "{nt}A goblin paints little suns round %n's nipples with berry juice for luck, and the next one licks them off, also for luck."
+      ]
+    );
+    trapSceneMore(
+      "goblincart",
+      [
+        "The ropes creak and the cart bed groans, and %n can feel every rut in the road through their back, and every goblin hand in between.",
+        "A goblin swings from the cart's side rail and kisses %n upside down, loud and wet, then drops off to the cheers of his mates.",
+        "{c}A goblin balances a flower on the tip of %n's cock, and the whole parade's job is to keep it there over the bumps.",
+        "{v}A goblin rides between %n's spread knees with his hand flat on their pussy, rubbin' in time with the cart's squeak."
+      ],
+      [
+        "The cart stops by the camp's muddy pond, and the goblins splash %n till they're drippin', then decorate them all over again.",
+        "%n's hoarse from moanin' and the goblins are hoarse from cheerin', and the cart's still goin' round.",
+        "{t}A goblin sits with his back against %n's tits like they're a pillow, eatin' an apple, and says it's the best seat in the parade.",
+        "A goblin with a drum walks behind beatin' time, and the goblin on top of %n keeps time with the drum, and the drummer speeds up on purpose."
+      ]
+    );
+    trapMore(
+      "shrine",
+      "A ring of standing stones in the orchard",
+      [
+        "There's a path behind the orchard %n's never noticed, worn smooth by bare feet, and it leads through the apple trees to an old ring of stones and a thread of sweet smoke.",
+        "%n follows a trail of little clay figures set along the hedge, each one rounder in the belly than the last, and at the end of the trail there's the shrine.",
+        "A wreath of wheat and poppies hangs on the orchard gate, and %n steps through it, and the air on the other side is warm and heavy and smells of honey and smoke.",
+        "The orchard's bees have all gone quiet. In the middle of the trees there's a mossy stone with a bowl of milk and a cone of incense on it, burnin' slow.",
+        "%n sits down on a soft mossy stone in the orchard to rest their feet, and the stone's warm, and there's smoke curlin' up from a little dish beside it.",
+        "A garland of flowers drops round %n's neck from a low branch, and a ribbon on it leads off between the trees to the ring of old stones and the smoke."
+      ],
+      "The smoke is sweet and thick",
+      [
+        "The smoke smells of honey and musk and somethin' warm underneath, and the more %n breathes, the more they want to breathe.",
+        "Every breath goes down to %n's belly and pools there, heavy and warm, like they've swallowed a mouthful of sunshine.",
+        "%n tries to step back out of the smoke and their feet won't take them, and the smoke wraps round their hips like an arm and draws them close.",
+        "The smoke makes %n's skin prickle and flush, all down their chest and across their belly, and every breath of wind on it makes them gasp.",
+        "{t}%n's tits go heavy and tight in the smoke, and their nipples ache, and every breath makes them swell a little fuller.",
+        "{c}%n's balls draw up heavy and full in the smoke, achin', and their cock stands up and throbs in time with it."
+      ],
+      "The warmth spreads and blooms.",
+      [
+        "The warmth sinks down through %n's belly and settles there, and they can feel themselves openin' up for it, ripe and achin' and empty.",
+        "%n's hands end up on their own belly without them meanin' to, rubbin' slow circles, picturin' it round and heavy.",
+        "Their breath comes short and hot, and their hips rock on their own, and the only thought left in their head is 'fill me'.",
+        "{v}%n's pussy's wet and swollen and achin', and the ache goes deep, right down to their womb, and it won't stop sayin' 'breed'.",
+        "{c}%n's cock leaks and leaks in the smoke, and their balls feel heavy as plums, and every inch of them wants to breed somethin'."
+      ]
+    );
+    trapSceneMore(
+      "shrine",
+      [
+        "The standin' stones are warm to the touch, like they've been in the sun all day, and %n finds themselves leanin' on one, cheek and chest and belly pressed to it.",
+        "The incense smoke goes in slow spirals round %n, and every spiral goes a little lower, over their belly and between their legs.",
+        "{t}The smoke settles on %n's tits like warm hands, and their nipples stand stiff and achin', and a bead of milk wells up at each tip.",
+        "Somebody's left a bowl of honey on the shrine stone, and %n's fingers find it, and then their mouth, and it tastes like the smoke smells."
+      ],
+      [
+        "%n's on their back in the soft moss inside the stone ring, knees up and apart, and the smoke pours down over them like a warm blanket.",
+        "%n can hear their own heartbeat in their belly, slow and heavy, and every beat says the same thing.",
+        "{v}%n's fingers are deep in their own pussy, rockin', and it's not enough, and it's never goin' to be enough until somebody breeds them.",
+        "{c}%n's strokin' themselves slow in the moss, and every stroke makes their balls ache fuller, and they can't stop.",
+        "Footsteps in the orchard: a farm stud, drawn by the smell of the smoke, stands at the edge of the stone ring and looks at %n like they're the ripest thing he's ever seen."
+      ]
+    );
+    trapMore(
+      "buttermill",
+      "The dairy girl buckles %n into the harness of the old butter churn",
+      [
+        `%n's walked into the old dairy by the dairy girl, who says she needs "a strong pair of legs", and the harness on the churn arm's already open and waitin'.`,
+        "The churn's arm swings round as %n passes the dairy door and catches them across the middle, and the dairy girl buckles the harness before they've got their breath back.",
+        "A sign on the dairy door says BUTTER DAY: VOLUNTEERS WANTED, and somebody's written %n's name underneath in the dairy girl's round handwritin'.",
+        `%n's stripped to the skin first, "no sense spoilin' your clothes", and then buckled into the churn harness with a strap round each thigh and one across their back.`,
+        "{t}The dairy girl crosses the harness straps between %n's tits, buckles them snug, and gives the chest strap a tug to make everything bounce.",
+        `The dairy girl hands %n a cup of buttermilk, says "drink up, you'll need it," and while they're drinkin' the harness clicks shut round their hips.`
+      ],
+      "Round and round, pushing the arm",
+      [
+        "The plunger goes up and down, thump, slosh, thump, slosh, and every slosh flings a fat splash of cream across %n's belly and thighs.",
+        "The churn arm's heavier with every lap, and %n's leanin' into the harness with their whole weight, bare feet slippin' on the creamy floor.",
+        `The dairy girl walks alongside with a ladle, and every few laps she tips another ladle of cream over %n's shoulders "to keep them cool".`,
+        "Cream runs down %n's back and between their cheeks and down the backs of their thighs, and every step squelches.",
+        "{t}%n's tits swing and bounce with every push of the arm, slick with cream, and the dairy girl stops the churn now and then just to watch them settle.",
+        "{c}%n's cock bobs and slaps against their belly with every step round the churn, glossy with cream, and the dairy girl keeps count of the slaps."
+      ],
+      "When it's butter, the dairy girl scoops it out",
+      [
+        "The dairy girl takes the paddle and pats a slab of fresh butter into a neat block on %n's belly, shapin' it with little slaps, and stamps it with the dairy's thistle.",
+        "The dairy girl rubs butter into %n's shoulders and back with both hands, slow and firm, till they're gleamin' gold all over.",
+        `{v}The dairy girl works a fat dab of fresh butter between %n's legs with her fingers, slow, round and in, and calls it "seein' how it spreads".`,
+        "{c}The dairy girl strokes fresh butter up and down %n's cock with her fist till it's slick and shinin' and twitchin', and calls it her best batch.",
+        "The farmhands come in for the new butter with bread and knives, and the dairy girl tells them to help themselves, and they spread it straight off %n."
+      ]
+    );
+    trapSceneMore(
+      "buttermill",
+      [
+        "The old dairy's warm and close and smells of cream and sweat, and the only sound is the thump of the churn and %n's breathin'.",
+        "The dairy girl rides on the churn arm for a lap, perched sideways with her skirts hitched, kickin' her heels, and %n has to push the both of them.",
+        "{v}The harness has a little padded bar under %n's hips, and every lap it rubs, and by the tenth lap they're wet and moanin' into the work.",
+        "{nt}Cream splashes across %n's flat chest and runs, and the dairy girl smears it round each nipple with a thumb as she passes."
+      ],
+      [
+        `The butter's so close %n can hear it, a heavy slap inside the churn, and the dairy girl says "twenty more" and doesn't count.`,
+        "The dairy girl licks a stripe of cream off %n's neck, says it needs more salt, sprinkles a pinch on, and licks again.",
+        "{t}%n's tits are slathered thick and yellow, and every bounce flicks butter off the tips onto the dairy floor.",
+        "When the churn's finally done %n's unbuckled and drops onto a stack of clean sacks, slick and glowin' and too tired to lift a finger, and the dairy girl brings them a slice of warm bread."
+      ]
+    );
+    trapMore(
+      "syruptap",
+      "Out in the maple grove the taps are running",
+      [
+        "The sugar shack's door is propped open and the steam's pourin' out sweet, and %n walks into the grove to have a look and a rope catches them round the waist.",
+        `%n's walked into the maple grove by two farmhands with buckets, "you can help us collect," and finds out what they're collectin' with when they're tied to the tree.`,
+        "The grove's full of trees with taps and buckets, and one tree has a tap, a bucket and a pair of cuffs on a chain, and %n's walked right up to it.",
+        "{t}A farmhand ties %n's back to a fat old maple with a rope across their middle and another over their chest between their tits, so they're served up for the bucket.",
+        "%n's hung by their wrists from a low maple branch, toes just brushin' the leaves, and somebody shifts a full bucket to the branch above them.",
+        "A sign on the sugar shack says FRESH TODAY, POUR YOUR OWN, and the farmhands take that as an invitation and tie %n to the tree under it."
+      ],
+      "Warm maple syrup glugs down over %n's head",
+      [
+        "The syrup comes down slow and warm as bathwater and coats %n from their crown to their chin, then their chest, then everythin', thick as honey.",
+        "A farmhand bores a fresh tap right above %n's head with a hand drill, and the sap starts drippin' down one sweet drop at a time onto their nose.",
+        "A whole bucket of hot syrup from the sugar shack goes over %n at once, and they gasp, and their mouth fills, and it's the sweetest thing they've ever tasted.",
+        "The syrup gets into everything, between %n's fingers, behind their ears, between their thighs, and every move makes a sticky little sound.",
+        "{t}The syrup runs down %n's front and puddles on top of their tits, and then spills off the tips in two slow amber strings.",
+        "{c}Syrup drips off the tip of %n's cock in long slow strings, and they twitch every time one lets go, and the farmhands watch every one fall."
+      ],
+      "Then the bees find them.",
+      [
+        "The farmhands start at %n's fingers and work inward, lickin' and suckin' and nibblin', and nobody's in a hurry, and the syrup's in no hurry to come off.",
+        "Somebody brings a pat of butter and smears it on %n's belly, and the farmhands eat their breakfast off %n right there, syrup and butter and all.",
+        "{v}A farmhand kneels and laps the syrup out from between %n's thighs, slow and thorough, till it's all gone and %n's wet with somethin' sweeter.",
+        "{nt}A farmhand sucks the syrup off %n's nipples one at a time, slow and greedy, then pours a little more on and does it again.",
+        "The bees give up and go home. The farmhands don't."
+      ]
+    );
+    trapSceneMore(
+      "syruptap",
+      [
+        "The grove's quiet except for the drip of the taps and the creak of the rope, and every drip lands somewhere on %n.",
+        "The syrup's warm where it lands and cools as it runs, and goes tacky, and %n's hair's glued to their cheeks and their thighs are glued together.",
+        "{v}Syrup runs slow down %n's belly and into their pussy, and a farmhand watches it go with their tongue between their teeth.",
+        "{nt}Two little amber streams run round %n's nipples and drip off, and a farmhand catches each drop on a fingertip and feeds it to them."
+      ],
+      [
+        "%n's licked clean in one place and syruped again in another, over and over, and the farmhands seem determined never to finish.",
+        "A farmhand pours syrup into %n's open mouth and kisses them while it's still there, and the kiss goes on and on.",
+        "{t}A farmhand cups %n's sticky tits and squeezes, and the syrup squishes between their fingers, and they lick their fingers, and squeeze again.",
+        "{c}A farmhand wraps a syrup-sticky hand round %n's cock and strokes it slow and slick, and the stickiness tugs at every stroke."
+      ]
+    );
+    trapMore(
+      "pieeat",
+      "A long table at the fair, a row of pies",
+      [
+        "The fair's pie tent smells of hot pastry and cream, and %n wanders in for a sample and comes out of it a contestant, number pinned to their chest.",
+        `A judge in a big rosette points at %n across the fairground and shouts "we're one short!", and two farmhands frogmarch them to the table.`,
+        `%n's hands are tied behind them with a tea towel, their hair's tucked behind their ears "for fairness", and a pie the size of a hat is set in front of them.`,
+        `{t}%n's knelt at the contest table stripped to the waist, "so you don't spoil your top", with a bib tied round their neck that doesn't cover anythin'.`,
+        "%n's sat at the very end of the pie table between two of the biggest eaters on the farm, both of them already crackin' their knuckles.",
+        'The baker sets a pie in front of %n, then another, then a third, and the judge says "all yours, love" and ties their hands behind the chair.'
+      ],
+      `"GO!" and a hand on the back of %n's head`,
+      [
+        "The whistle goes, %n goes face down into cherry and cream, and the judge keeps a hand on their head so they don't come up too soon.",
+        "The pie's still warm in the middle and cold on top, and %n's whole face sinks in, and the crowd counts out loud.",
+        "%n comes up gaspin' with their face white and red and runny, and somebody pushes them straight back down into the second pie.",
+        "The judge holds %n's hair in one fist and steers them round the pie like a plough, so they get every bit.",
+        "Somebody tips the pie up into %n's face instead of the other way round, and holds it there, and slides it slowly up and down.",
+        "{t}%n's tits are pressed down into the second pie by the hand on their back, and they come up with crust stuck to their nipples and cream to their chin."
+      ],
+      "Cream up the nose, berries in the ears",
+      [
+        "The judge scrapes a spoon down %n's face and holds it up for the crowd: more on the spoon than in their mouth, so the judge says keep goin'.",
+        "%n's so full of cream their belly's rounded and tight, and the baker pats it and brings another pie anyway.",
+        "Somebody at the next table loses on purpose and comes over to help %n finish, lickin' the cream off their cheek.",
+        "{c}A pie slides off the table into %n's lap and squishes round their cock, and the crowd roars, and the judge says it counts.",
+        "The contest's over but nobody's told %n, and the baker keeps settin' pies down, and the crowd keeps cheerin'."
+      ]
+    );
+    trapSceneMore(
+      "pieeat",
+      [
+        "The crowd's pressed in round the table so tight %n can feel their breath, and every time %n comes up for air there's a cheer and a fresh pie.",
+        "A judge with a stopwatch kneels by %n and times how long they can keep their face in, and the record keeps goin' up.",
+        "{v}A pie slides down off the table between %n's knees, and somebody pushes it up into their lap with a boot and grinds it in.",
+        "{nt}Custard runs down %n's flat chest and drips off their nipples, and the judge wipes it up with a finger and feeds it back to them."
+      ],
+      [
+        "%n's face is glazed so thick with cream they can only see out of one eye, and they're laughin' and gaspin' and still eatin'.",
+        "The judge holds up a pie-shaped mask of cream and crust, peeled right off %n's face, and the crowd votes it the best at the fair.",
+        "{t}The baker pipes cream onto %n's tits to see if they'll eat it off themselves, and they can't reach, and the crowd helps.",
+        "When it's finally over %n's given a little ribbon that says LAST PLACE, BEST FACE, and hosed off behind the pie tent with cold water."
+      ]
+    );
+    trapMore(
+      "mudslide",
+      "The bottom field's turned into one long slick slope of mud",
+      [
+        "It's rained three days straight and the bottom field's a river of mud, and the farmhands have made a slide of it with a hose and a lot of enthusiasm, and they've been waitin' for %n.",
+        "%n's walkin' the top of the bank when the turf gives under one foot, and they sit down hard, and then they're slidin' and there's no stoppin'.",
+        "Two farmhands take %n by the wrists and ankles, swing them, one, two, THREE, and let go at the top of the slide.",
+        `{t}%n's stripped to the skin at the top of the slope, "you'll thank us," and laid belly-down on a greased feed sack, tits and all, and pushed.`,
+        'A farmhand at the top of the slide says "race you," and %n says "no," and the farmhand gives them a shove and a head start anyway.',
+        "%n's sat on a tin tray at the top of the bank by a laughin' farmhand, who gives them a big push and a cheer, and the tray goes one way and %n the other."
+      ],
+      "Mud sprays up over %n's face",
+      [
+        "%n hits a bump halfway down and spins, and goes the rest of the way backwards, arms wavin', mud sprayin' out either side like a bow wave.",
+        "The mud's so slick %n picks up speed all the way down, and every bump flings a sheet of it up over their chest and into their face.",
+        "%n tries to dig their heels in and only sprays more mud over themselves, and the farmhands at the bottom cheer every splash.",
+        "Mud squishes up between %n's thighs and up their back and into their hair as they slide, cold on top and warm underneath.",
+        "%n lands at the bottom with a great wet SPLOOSH that soaks everyone stood watchin', and they all cheer like it's a goal.",
+        "{t}%n's tits plough two furrows down the slope as they go, belly-down and fast, and they come up at the bottom with mud packed round every curve."
+      ],
+      "The farmhands at the bottom haul %n out",
+      [
+        "A farmhand fetches %n out of the pool by the wrists and drags them back up the bank, slippin', laughin', and lays them down for another go.",
+        "The farmhands make a game of it: anybody who catches %n at the bottom gets to keep them till the next slide.",
+        "{c}%n's cock's caked thick and shapeless with mud, and a farmhand washes it clean with a squirt of the hose and a slow hand, then sends them back up.",
+        "{v}A farmhand's muddy hand slips between %n's thighs as they're hauled out, and stays there, and it's hard to tell the mud from how wet they are.",
+        "By the fifth go %n's goin' down the slide on purpose, whoopin', and the farmhands are goin' down after them."
+      ]
+    );
+    trapSceneMore(
+      "mudslide",
+      [
+        "The mud's thick and warm and it sucks at %n's knees and elbows, and every time they try to stand it pulls them back down onto their rump.",
+        "A farmhand slides down after %n on purpose and lands on top of them with a great splash, and doesn't get off.",
+        "{nt}A farmhand paints mud round and round %n's flat chest with two fingers, slow, till each nipple's a little brown peak.",
+        "{v}Mud squishes up between %n's legs when they sit up, warm and thick, and a farmhand pats it in with the flat of their hand."
+      ],
+      [
+        "%n's so slick with mud that the farmhand on top of them keeps slidin' off, and has to hold on by their hips, and doesn't mind at all.",
+        "%n's had in the mud pool with their face in the muck and a farmhand's hands on their hips, slow and slippery, and the queue at the top of the slide cheers.",
+        "{c}A farmhand strokes %n's muddy cock slow and slippery in the warm pool, and the mud makes it slide like nothin' else.",
+        "When the sun goes down the farmhands hose %n off by the gate, cold and hard, front and back, and they come out pink and shiverin' and grinnin'."
+      ]
+    );
+    trapMore(
+      "squeezechute",
+      "%n walks into the cattle chute and the side panels squeeze in",
+      [
+        `%n's herded into the chute along a line of hurdles by two farmhands with flags, "go on, go on, hup," and the gate swings shut behind them.`,
+        "%n stops at the end of the chute to read a little sign that says VET TODAY, and the panels close on them while they're readin' it.",
+        `A farmhand leads %n into the chute by their collar, very kind, "in you go, it's nothin'," and the squeeze panels hiss shut before the gate's even latched.`,
+        "{t}The squeeze panels close in on %n's sides, high and snug, and press their tits together and out between the bars.",
+        "The head gate's a padded yoke with a hole for the neck and two for the wrists, and %n's put in it, and it drops, and clicks."
+      ],
+      "Hands come through the bars from both sides.",
+      [
+        "The vet works down %n from head to tail, through every gap in the bars, feelin', pressin', countin' ribs and checkin' joints, hummin' all the while.",
+        'A farmhand reads off a card while the vet checks: "ears, teeth, eyes, feet, coat, rump," and at each word a hand goes there.',
+        `The vet lifts %n's lip with a thumb, looks at their teeth, then runs a gloved finger slow round the inside of their mouth and says "good."`,
+        "{nt}The vet tugs each of %n's nipples through the bars and holds them out long, checkin' for let-down, and writes NONE in the box.",
+        "A gloved hand presses firm on %n's belly through the bars, feelin' about slow, and the vet frowns, and feels some more."
+      ],
+      "The squeeze tightens another notch",
+      [
+        "The vet slaps a sticker on %n's flank that says CHECKED, then a second one that says AGAIN TOMORROW.",
+        "An ear tag gets clipped on %n's ear with a cold little click, and the vet checks the number against the list and nods.",
+        "The farmhands go to lunch and leave %n squeezed in the chute, and come back an hour later with crumbs on their shirts to see if they're still there.",
+        "The panels squeeze in another notch, and another, till %n can feel their own heartbeat against the boards, and then they just stay there.",
+        `{v}The vet slides a gloved hand into %n's pussy from behind through the chute's back gate, slow, and feels around for a long time, and says "ripe."`,
+        `{c}The vet milks a little drop from the tip of %n's cock onto a slide, looks at it under a lens, and says "good strong swimmers."`
+      ]
+    );
+    trapSceneMore(
+      "squeezechute",
+      [
+        "The chute smells of iron and hay and other beasts, and every time a panel creaks %n's heart jumps into their throat.",
+        "The farmhands lean on the rails while the vet works and chat about the weather, and every so often reach through and give %n a pat.",
+        "{v}The vet's two gloved fingers go in slow from behind, curl, and press, and %n's knees give, and the squeeze is the only thing keepin' them up.",
+        "{nt}The vet rolls %n's nipples between finger and thumb through the bars to see how they stand, and makes a mark on the form."
+      ],
+      [
+        "The vet takes their gloves off, washes their hands, and puts on a fresh pair, which can only mean one thing, and %n squirms against the panels.",
+        "Every farmhand on the course gets a turn at checkin' %n through the bars while the vet talks them through it, step by step.",
+        "{t}The vet milks %n's tits through the bars, quick and practised, into a little tin cup, and holds the cup to the light to check the colour.",
+        `{c}The vet weighs %n's balls in a gloved palm, rolls them, gives them a squeeze, and writes "good size, good weight" and underlines it.`
+      ]
+    );
+    trapMore(
+      "twine",
+      "Up in the hayloft somebody's waiting with a ball of orange baler twine",
+      [
+        `%n climbs the ladder into the hayloft after a dropped glove, and at the top a farmhand's sat on a bale windin' twine round one hand, and says "there you are."`,
+        `The loft's warm and dusty and smells of summer, and a voice behind the bales says "lie down on your front, I've been practisin'."`,
+        "%n trips over a loop of twine laid across the loft floor, and it pulls tight round their ankle, and the other end's in somebody's hand.",
+        "{t}A farmhand sits %n down on a bale, kneels behind them, and starts the first loop of twine round their chest, just above their tits, slow and neat.",
+        "A trap door in the loft floor swings open under %n, and they drop onto a pile of soft hay, and somebody's there with a ball of twine before they've stopped bouncin'.",
+        "%n's handed a ball of twine and asked to hold it, and the farmhand ties the loose end round %n's wrist, and walks round them, and round, and round."
+      ],
+      "Loop after loop: wrists to elbows",
+      [
+        "The twine bites a little, rough and hairy, and every loop leaves a faint pink line, and the farmhand checks each knot with a finger slid underneath.",
+        "The farmhand ties %n's wrists behind them, then their elbows, then laces their arms together all the way up, so their shoulders are pulled back and their chest's pushed out.",
+        "Each of %n's ankles gets tied to its own thigh, knees bent, so they can kneel and nothin' else, and the farmhand pats each knot as it's done.",
+        "{v}A strand of twine goes down %n's front and between their legs and up their back, with a fat knot right where it'll rub, and gets pulled snug.",
+        "{nt}The twine goes round %n's chest in a tight criss-cross, close above and below each nipple, so they stand out pink and pointed between the strands."
+      ],
+      "Then they're hauled up off the hay by a rope over the beam",
+      [
+        "The farmhand hooks %n's harness to the hay hoist and winches them up slow, inch by inch, till they're swingin' face down in the warm dusty air.",
+        "%n's tied in a neat ball, knees to chest, and rolled onto the hay like a parcel, and the farmhand ties on a label with their name and SEND TO DAIRY.",
+        "The farmhand ties a last length of twine from %n's ankles to a hook in the beam, so they're stretched long on the bale and can't curl up.",
+        "%n's left hangin' from the beam, turnin' slow in the shaft of sunlight from the loft door, and the dust swirls round them like little stars.",
+        "The farmhand stands back, wipes their hands, admires the knots, and then goes and fetches two more farmhands to admire them too.",
+        "{c}A last bit of twine goes from the bow round %n's balls up to their collar, short, so every time they lift their head it tugs."
+      ]
+    );
+    trapSceneMore(
+      "twine",
+      [
+        "The farmhand works slow and quiet, tongue between their teeth, and every knot's finished with a little tug, like they're wrappin' a present.",
+        "The rough twine scratches with every breath, and %n's skin goes pink round every strand, and the farmhand runs a thumb along each pink line.",
+        "{nt}A loop of twine is tied round each of %n's nipples, very small and very snug, and the ends are tied together across their chest.",
+        "A farmhand ties %n's big toes together for no reason except to see if they can, and then adds a little bow."
+      ],
+      [
+        "%n swings slow on the rope, and every time they swing past the farmhand they get a little push, and a little touch somewhere new.",
+        "The farmhand tugs the knot between %n's legs, very gentle, back and forth like a saw, and %n's moanin' into the hay.",
+        "{t}The farmhand pinches %n's nipples where they poke out of the twine diamond and rolls them, slow, and %n's tits throb in their harness.",
+        "When the farmhand finally lets %n down they're laid in the hay and every knot's undone one by one, slow, with a kiss on each mark the twine left."
+      ]
+    );
+    trapMore(
+      "yoke",
+      "The milkmaid's yoke drops across %n's shoulders",
+      [
+        "The milkmaid's sprained her wrist, she says, very sorry for herself, and could %n just carry the pails up to the house, and the yoke's locked on before %n's said yes.",
+        "%n's stood at the dairy door with their arms out like a scarecrow while the milkmaid fits the yoke across their shoulders and locks a cuff round each wrist.",
+        "A farmhand drops the heavy oak yoke onto %n's shoulders from behind, the padded notch settles round their neck, and two pails of milk are hooked on, full to the brim.",
+        `{t}The milkmaid ties %n's top off first, "you'll only soak it," then lowers the yoke onto their bare shoulders and hangs a pail at each end, right by their tits.`,
+        "%n's handed a pail to carry in each hand, and then a yoke's put across their shoulders, and then the pails are hooked onto it, and then two more pails.",
+        'The cook bangs on the kitchen window and shouts "MILK!", and the milkmaid looks round for someone to send, and finds %n, and fetches the yoke.'
+      ],
+      "%n staggers across the yard with the pails swinging",
+      [
+        "The pails swing out on every step and come back hard, and %n has to walk slow and stiff with their hips swayin' to keep them steady.",
+        "The yard's cobbled and the cobbles are wet, and %n creeps across them barefoot, an inch at a time, with the milk sloshin' at the brims.",
+        "A farmhand walks right in front of %n backwards, keepin' pace, just to watch their face every time a pail slops.",
+        "The milk's cold and it soaks %n's thighs and runs down into their shoes, and every step squelches.",
+        "{t}The yoke pushes %n's shoulders back and their chest out, and their tits sway with the pails, and the milk splashes up onto them with every swing.",
+        "{c}Every slosh of cold milk runs down %n's front and drips off their cock, and it's twitchin' and hard from the cold before they're halfway."
+      ],
+      "Halfway there they stumble, and the pails tip",
+      [
+        "A farmhand sticks a foot out, very casual, and %n trips, and both pails swing round and empty themselves over %n's head.",
+        "%n gets to the kitchen door with half a pail each side, and the cook peers in, tuts, and points back down the hill.",
+        "The yoke catches on the gatepost and swings %n round, and one pail tips down their back and the other down their front, and they're soaked from both sides.",
+        "{v}A whole pail goes down %n's front and between their legs, cold, and they gasp, and the milk drips off them onto the cobbles.",
+        "When they finally get both full pails to the house the cook gives %n a biscuit and a slap on the rump, and tips the milk back into the pails for the next trip."
+      ]
+    );
+    trapSceneMore(
+      "yoke",
+      [
+        "The yoke creaks on %n's shoulders with every step, and the cuffs rattle, and the milk slaps the sides of the pails like a little tide.",
+        "The milkmaid walks alongside and tops up whichever pail's lighter, so they're always level and always full.",
+        "{nt}Cold milk splashes across %n's flat chest and their nipples go tight as buttons, and the farmhands on the fence whistle.",
+        "{v}Milk runs down %n's belly and between their thighs, and every step rubs it in, and somehow it's makin' them wet."
+      ],
+      [
+        `%n stops to rest and the milkmaid says "no rests," and tips a ladle of milk over their head, and they start walkin' again.`,
+        "A farmhand steps in front of %n on the path and kisses them, slow, while they stand there with the pails and can't do a thing about it.",
+        "{t}A farmhand dips a cloth in the pail and wrings it out over %n's tits, and wipes, and wrings it out again, and wipes.",
+        "{c}A farmhand stops %n on the path, takes their milk-wet cock in hand, and strokes till %n's shakin' so hard the pails slop, then sends them on."
+      ]
+    );
+    trapMore(
+      "ponycart",
+      "A bridle, a bit, blinkers, a harness",
+      [
+        "The stable girl comes out with a bridle over one shoulder and a carrot in her hand, and holds the carrot out to %n, and when they reach for it the bridle goes on.",
+        `%n's led into the tack room by the stable hand, who looks them over, says "fourteen hands, about," and starts takin' down harness.`,
+        "The pony cart's shafts are lyin' on the ground when %n walks past, and they're lifted on either side of them, and the stable girl buckles the traces before they can step out.",
+        "{t}The stable hand buckles a padded breast collar across %n's chest, right under their tits, hooks the traces to it, and pats their flank.",
+        "%n's fitted with a pair of hoof boots, a plumed headpiece, a tail and a bit, and then backed into the shafts, and the stable girl claps.",
+        "A farmhand drives up with the cart, unhitches the pony, and hitches %n in its place, and the pony gets the afternoon off in the paddock."
+      ],
+      'A flick of the reins. "Walk on."',
+      [
+        `"Walk on," and %n walks, the cart creakin' behind them, the reins tuggin' gently at the bit every time they drift.`,
+        "The stable girl sits up in the cart with the reins in one hand and the long whip in the other, and just lets the tip of it trail across %n's back.",
+        "%n pulls the cart down the lane past the dairy, and the milkmaids all come out to wave, and one of them blows a kiss.",
+        `The lane's uphill and the cart's heavy, and %n leans into the breast collar and digs in, and the stable girl says "good pony" and doesn't get out.`,
+        "{t}The harness bounces %n's tits up and down with every stride, and the stable girl sits back to enjoy the view down the shafts.",
+        "{c}The stable girl's tied a ribbon to %n's cock to match the one in their hair, and it bobs and flutters with every step."
+      ],
+      '"Trot!" and the crop again.',
+      [
+        '"Canter!" says the stable girl, and %n tries, and the cart rattles and bounces and nearly tips, and the stable girl laughs and holds on to her hat.',
+        "The stable girl drives them round the show ring, figure of eight, and makes %n high-step every time they pass the judges' bench.",
+        "%n's foamin' at the bit and blowin' hard, and the stable girl lets them walk for a bit, and reaches down to pat their sweaty rump.",
+        "{v}The crotch strap of the harness rubs with every stride, and every stride's makin' %n wetter, and the stable girl can tell from the way they're movin'.",
+        "The stable girl takes the cart through the duck pond on purpose, and the water splashes up to %n's thighs, cold, and they shy, and get the crop for it."
+      ]
+    );
+    trapSceneMore(
+      "ponycart",
+      [
+        "The bit tastes of leather and steel, and every tug of the reins pulls %n's head round, and they follow it whether they mean to or not.",
+        "The blinkers mean %n can only see the lane straight ahead, and the crowd's cheers come from nowhere, and every touch is a surprise.",
+        "{c}The stable girl leans forward and flicks %n's cock with the very tip of the whip, light as a fly, and laughs when they jump in the shafts.",
+        "{nt}The breast collar's rubbed %n's flat chest pink, and the stable girl leans down to rub a little balm into it at the next stop."
+      ],
+      [
+        "At the water trough the stable girl lets %n drink, then unhitches the cart and leads them into the stable by the bridle for a rub down.",
+        "The stable girl brushes %n down in the stall with a soft brush, all over, and lingers in the places the harness rubbed.",
+        "{t}The stable girl unbuckles the harness strap by strap, and runs her hands over %n's tits where the straps crossed, slow, and %n leans into it.",
+        "{v}In the stall the stable girl slides two fingers into %n's pussy from behind while they're still in the bridle, and they stamp and whinny round the bit."
       ]
     );
     const CHATLOG = { live: /* @__PURE__ */ new Map(), who: /* @__PURE__ */ new Map(), lastSave: 0, hourKey: "" };

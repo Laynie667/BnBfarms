@@ -5,7 +5,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 | Script | File in `dist/` | Where it runs | Current |
 |---|---|---|---|
-| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.63.0** |
+| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.64.0** |
 | Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.10.0** |
 | Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.2.1** |
 | Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **1.1.0** |
@@ -24,6 +24,15 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 ## Latest changes (newest first)
 
+- **Bot 0.64.0: thirty more traps tell their full stories, eight lines a beat.** No Companion update needed.
+  - **The fair, the kitchen and the barn:** the fair stocks, the windmill, the chocolate fountain, the bakery bench, the creamery, the seed shower, the groomin' table, the leash post, the teat check, the wax bench, the trapper's trophy wall, the slop bucket, the hogtie, the milkin' hole and the feedbag.
+  - **The office:** the overseer's desk, the clipboard inspection and the office stamps.
+  - **The goblins and the orchard:** the goblin market, the goblin cart and the old shrine in the orchard.
+  - **The messy and the restraint ones:** the butter churn, the maple taps, the pie-eatin' contest, the mudslide, the squeeze chute, the baler twine, the milkmaid's yoke and the pony cart.
+  - Every beat of each one now picks from eight lines or more, and so do the two beats of its own. About 750 new lines, each one fitted to the body it's about.
+  - **The animals stay animals:** at the slop bucket and the hogtie the pigs only want the slop, at the leash post the passers-by are kennel hands, not dogs. The pig girl, the boar-man and the farm folk do everything else.
+  - **A few words changed:** the groomin' loop (not a noose), "good one" and "good pup" instead of "good girl" and "bitch", "quick as a rodeo hand", the shrine works by a warm charm (no blessings, no altar), the buttermilk is a finishin' rinse, and nonbinary players are a fine beast, never a yearlin'. Male players get stallion where a line says mare, never colt.
+  - **Next:** the rubber traps (leeches, suit, vac bed, rubber vat, dollmaker, rubber stall, body bag, rubber maid, black pool), the well and the trough.
 - **Bot 0.63.0: thirty more of the farm's traps tell their full stories, eight lines a beat.** No Companion update needed.
   - **The machines:** the egg post, the lantern, the pillory, the brandin' arm, the winch, the glue floor, the growth cups, the feed chute, the vines, the slime, the tickle rack, the mirror box, the paddle wheel, the fence, the mister, the stud weights, the price tag, the buckin' saddle, the hayloft net, the cowbell, the weigh-in, the teasin' stall, the sheep dip, the milkin' carousel, the plow, the hay bale, the washin' line, the auction block, the honey pot, the incubator lamp and the collection bench.
   - Every beat of each one now picks from eight lines or more, and so do the two beats of its own. About 700 new lines, each one fitted to the body it's about (tits, cock, pussy, flat chest), so a male pup never hears about parts they haven't got.

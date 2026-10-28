@@ -139,7 +139,7 @@
              "Somebody licks the chocolate off %n's lips and then kisses them, which wasn't on the sign."]],
     tender: ["The chocolate's warm, never hot, and the keeper checks it on her wrist before every dip.", "Every fair-goer says please before they lick, and thank you after.",
              "The keeper keeps a hand on %n's shoulder the whole time and asks if they'd like a sip of water."],
-    filthy: ["%n's dipped like a strawberry and licked like a lollipop by everybody at the fair, and they're moanin' for the next tongue.", "%n's a glossy, sticky, chocolate-covered treat for the whole queue, and the queue's goin' round twice.",
+    filthy: ["%n's dipped like a strawberry and licked like a candy apple by everybody at the fair, and they're moanin' for the next tongue.", "%n's a glossy, sticky, chocolate-covered treat for the whole queue, and the queue's goin' round twice.",
              "The fair laps %n clean and the keeper dips them again, and %n's beggin' for both."],
     mess: ["chocolate", ["chest", "tummy", "face"]],
     gear: [{ when: "hold", slot: "legs", label: "Fountain Ribbon", items: ["Ribbons"], color: "#5A321C", desc: "A brown satin ribbon round their knees, tied to the rim of the chocolate fountain." }],

@@ -226,7 +226,7 @@
       ],
       over: [["The studs finish across %n's belly one by one, and the breeding girl tuts at the waste."]],
       end: ["The straps open at last. %n is unbuckled with %ml in their %h, an appointment card for a scan in two weeks.",
-            "%n climbs out of the breeding chair, %ml heavier, and the breeding girl hands them a lollipop for being good."],
+            "%n climbs out of the breeding chair, %ml heavier, and the breeding girl hands them a cold drink and a towel."],
       endOver: ["%n is unbuckled glazed with %ml across their belly and an appointment to try again tomorrow."],
     },
     clutch: {

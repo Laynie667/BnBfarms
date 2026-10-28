@@ -1,7 +1,7 @@
   /* WHAT'S IN THIS FILE (10z5zu-trap-more-47.js)
      The farm's traps, batch 22 (10z5-trap-more.js): the golden trough (only for somebody who said ?watersports on)
-     and the thing in the well. The trough's streams come from the farm folk at the stall rails above, never the
-     barn's animals. Every beat eight lines or more, and each one's two beats of its own (10ue-trap-scenes.js) from
+     and the thing in the well. The trough's streams come from the folk at the stall rails above.
+     Every beat eight lines or more, and each one's two beats of its own (10ue-trap-scenes.js) from
      four to eight; the well's grab and its dark (10y2-brood.js) grow by poolMore, the rest of its story is the thing
      in the water's (10z5p-trap-more-16.js). %n their name
   */

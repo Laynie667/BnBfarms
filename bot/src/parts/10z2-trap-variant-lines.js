@@ -88,7 +88,7 @@
            "%n claps a hand over their mouth. It's no good. Everything's funny and everything tickles."],
           ["%n doubles over hootin', hiccuppin' between the laughs, slappin' at their own ribs where the air touches. They can't get a word out.",
            "It's got %n good. They're shriekin', tears runnin', jumpin' every time a straw brushes their ankle."],
-          ["%n is on the floor, howlin', kickin', every inch of them alive with ticklin' they can't get away from. They've laughed themselves weak as a kitten, and a wet patch is spreadin' under them.",
+          ["%n is on the floor, howlin', kickin', every inch of them alive with ticklin' they can't get away from. They've laughed themselves weak as wet straw, and a wet patch is spreadin' under them.",
            "%n can't breathe for laughin'. They roll in the straw, hiccuppin', squealin', pissin' themselves a little, and it only makes it funnier."],
         ],
         after: ["The yellow fades. %n lies there wheezin', and the next breeze sets them off again.",

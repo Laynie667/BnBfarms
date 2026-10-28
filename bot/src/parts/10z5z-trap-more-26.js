@@ -108,7 +108,7 @@
       "The wallow swallows %n to the shoulders with a long greedy slurp, warm as a bath and thick as porridge, and holds on."],
     "It's in everything. Mud oozes between %n's cheeks", [
       "Every squirm works the mud further in: up the backs of their thighs, into the crease of their ass, between their legs, warm and slick and everywhere.",
-      "{t}%n's tits come up out of the wallow caked and shinin', mud slidin' off them in fat warm sheets, and the farmhand at the rail grunts appreciatively.",
+      "{t}%n's tits come up out of the wallow caked and shinin', mud slidin' off them in fat warm sheets, and the pig-folk at the rail grunt appreciatively.",
       "{c}The mud's got into %n's lap and packed itself warm round their cock and balls, and every move squishes it about, and they're half hard from it."],
     "A couple of the pigs wander over to snuffle", [
       "%n gives up on standin' and just crawls, slow and slippin', with the whole sty and half the farm watchin' them do it.",

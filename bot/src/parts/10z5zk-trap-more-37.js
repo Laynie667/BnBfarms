@@ -1,7 +1,7 @@
   /* WHAT'S IN THIS FILE (10z5zk-trap-more-37.js)
      The farm's traps, batch 12 (10z5-trap-more.js): the wax bench, the trapper's trophy wall and the slop bucket.
      Every beat eight lines or more, and each one's two beats of its own (10ue-trap-scenes.js) from four to eight.
-     The pigs at the slop are only ever after the slop: the pig girl, the boar-man and the farmhands do the rest.
+     The pig girl, the boar-man, the pig-folk and the farmhands at the slop.
      %n their name
   */
   // ── the wax bench ──

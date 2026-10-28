@@ -5,7 +5,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 | Script | File in `dist/` | Where it runs | Current |
 |---|---|---|---|
-| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.65.0** |
+| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.66.0** |
 | Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.10.0** |
 | Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.2.1** |
 | Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **1.1.0** |
@@ -24,13 +24,18 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 ## Latest changes (newest first)
 
+- **Bot 0.66.0: every trap's endin' now picks from eight lines or more.** No Companion update needed.
+  - **How each trap lets you go:** the last line of every trap (full, emptied over you, run dry, teased, bred or not) now has eight or more to pick from, for the old farm machines, the barn and yard traps, the messy, themed, goblin, fair and mud pit ones, the rubber traps, and every Halloween, winter, Yule, Easter, summer and harvest trap.
+  - **The last few thin beats:** the ones a trap only shows some bodies (the carousel's cock sleeve and teasin' stop, the heat lamp when you're already carryin', the cocoa stand and the cider press when you make milk, the ivy and the egg hunt when they only tease, and the auction block when it's busy) grew to eight too.
+  - About 720 new lines, each one fitted to the body it's about. That finishes the job: every trap beat, scene and endin' on the farm now has eight lines or more.
+  - **A few words changed:** the breeding chair hands you a cold drink and a towel; the treat door and the candy apple stall compare you to the best candy at the fair; the costume trunk's cat ears are a cat's; the tickle rack leaves you weak as wet straw; the witch scritches you like a naughty cat; the groomin' table smells of kennel shampoo; you come off the carousel dizzy as a top.
+  - **The animal folk are back:** the farm's animals in these scenes were always anthro, and the last few releases had wrongly pushed some of them out. They're back where they were, named as folk so nobody reads them as plain animals: the pig-folk at the slop pen, the hogtie and the wallow, the kennel's dog-folk at the leash post, the cat-folk, goat-folk and hound-folk at the honey pot, and the beast-folk on the golden trough's row.
 - **Bot 0.65.0: the rubber traps, the well and the golden trough tell their full stories, eight lines a beat.** No Companion update needed.
   - **The rubber traps:** the trough leeches, the livin' suit, the vacuum bed, the rubber vat, the doll press, the rubber milkin' stall, the body bag, the rubber dairymaid and the black pool in the woods.
   - **The thing in the well:** more ways it catches you at the well mouth, more of the dark down the shaft, and more of its two beats of its own.
   - **The golden trough** (only for somebody who said `?watersports on`): every beat grown too. The streams come from the farm folk at the stall rails above, never the barn's animals.
   - Every beat of each one now picks from eight lines or more, and so do the two beats of its own. About 290 new lines, each one fitted to the body it's about.
   - **A few words changed:** the leeches latch on like milkin' cups (not calves); the trough leaves you marked by every stall on the row.
-  - **Next:** every trap's endin' lines, grown the same way.
 - **Bot 0.64.0: thirty more traps tell their full stories, eight lines a beat.** No Companion update needed.
   - **The fair, the kitchen and the barn:** the fair stocks, the windmill, the chocolate fountain, the bakery bench, the creamery, the seed shower, the groomin' table, the leash post, the teat check, the wax bench, the trapper's trophy wall, the slop bucket, the hogtie, the milkin' hole and the feedbag.
   - **The office:** the overseer's desk, the clipboard inspection and the office stamps.

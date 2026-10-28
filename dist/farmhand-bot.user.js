@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.65.0
+// @version      0.66.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -2748,7 +2748,7 @@
   ];
 
   // bot/src/version.js
-  var VERSION = "0.65.0";
+  var VERSION = "0.66.0";
   var COMPANION_VERSION = "0.50.0";
 
   // bot-parts:farmhand-bot-parts
@@ -16473,7 +16473,7 @@
             "They kneel there and take it, piss sheetin' off their tits, hair plastered down, a puddle risin' to their lap."
           ],
           [
-            "The pipes dribble out. The bars lift. %n climbs out of the trough drenched, stinkin', drippin' yellow, marked by every stall on the row.",
+            "The pipes dribble out. The bars lift. %n climbs out of the trough drenched, stinkin', drippin' yellow, marked by every one of the beast-folk on the row.",
             "Done. %n is let up, wet to the skin and reekin', with gold runnin' off their chin. Everybody they pass is goin' to know.",
             "The last spout sputters over %n's face and stops. They step out of the trough soaked and steamin', and leave wet footprints all the way down the lane."
           ]
@@ -16939,7 +16939,7 @@
         ],
         end: [
           "The carousel grinds to a halt at last and drops %n off at the gate, wobbly, with %ml milked out of them and somethin' sloshin' in their belly.",
-          "The wheel stops. The straps let go. %n stumbles off the carousel milked down by %ml and dizzy as a calf.",
+          "The wheel stops. The straps let go. %n stumbles off the carousel milked down by %ml and dizzy as a top.",
           "Last lap done: %ml in the jars, and %n tipped off the platform onto the straw, spinnin' still."
         ]
       },
@@ -17417,21 +17417,21 @@
             "A spigot opens over %n and a slow golden river of %x pours over them, coatin' every inch."
           ],
           [
-            "Then the farm folk smell it. The cat-eared milkmaids come first, then the goat-folk off the hill, then the kennel hands, all of them lickin'.",
-            "Tongues find %n from every side: a milkmaid on their fingers, a goat-man on their neck, a kennel hand on their belly.",
+            "Then the farm's animal folk smell it. The cat-folk from the barn come first, then the goat-folk off the hill, then the hound-folk from the kennel, all of them lickin'.",
+            "Rough tongues find %n from every side: the cat-folk on their fingers, a goat-man on their neck, the hound-folk on their belly.",
             "{t}Somebody with a very warm tongue finds the %x pooled between %n's tits and licks it clean, slow and thorough.",
-            "{c}A cat-eared milkmaid licks the %x off %n's cock with great concentration, and %n can't keep still.",
+            "{c}One of the barn's cat-folk licks the %x off %n's cock with great concentration, and %n can't keep still.",
             "{v}A warm, wide tongue licks the %x out from between %n's legs, and comes back for more."
           ],
           [
-            "The lickin' doesn't stop till every drop is gone, and some of the farm folk keep goin' after.",
+            "The lickin' doesn't stop till every drop is gone, and some of the animal folk keep goin' after.",
             "%n squirms and giggles and moans by turns, held sticky in place while the whole barn cleans them up.",
             "Somebody fetches a spoon. The farm girl tells them off. Then fetches her own."
           ]
         ],
         end: [
           "%n is let go at last, licked mostly clean, sticky where the tongues missed and smellin' of %x.",
-          "When the farm folk wander off, %n is left glazed and tacky with %x, every step a sticky little peel.",
+          "When the animal folk wander off, %n is left glazed and tacky with %x, every step a sticky little peel.",
           "%n peels themselves off the boards, still shinin' with %x, and the barn cats follow them home."
         ]
       },
@@ -18356,7 +18356,7 @@
           ]
         ],
         end: [
-          "%n is unclipped, groomed to a shine and smelling of puppy shampoo, with a ribbon on their collar that says BEST IN KENNEL.",
+          "%n is unclipped, groomed to a shine and smelling of kennel shampoo, with a ribbon on their collar that says BEST IN KENNEL.",
           'The kennel girl gives %n a treat and a pat. "Prettiest thing in the kennels today." They smell like a show dog for hours.'
         ]
       },
@@ -18367,7 +18367,7 @@
             '%n wanders into the dog yard and a kennel hand clips them to the post. "Wait," he says, and leaves.'
           ],
           [
-            "It's a busy yard. Farmhands cut through it, kennel hands trot past, and every one of them stops to look at what's tied to the post.",
+            "It's a busy yard. Farmhands cut through it, the kennel's dog-folk trot past, and every one of them stops to look at what's tied to the post.",
             "The first passer-by pats %n's head. The second gives their ass a slap. The third stops a good while longer."
           ],
           [
@@ -18478,7 +18478,7 @@
           ],
           [
             "The pigs hear the slop hit and come running, snorting, rooting, and %n is covered in what they want.",
-            "Snouts everywhere round %n's ankles and knees, shovin' and gruntin' after every peelin' that drops off them."
+            "The pig-folk's snouts are everywhere: under %n's arms, in their hair, round their ankles, snufflin' the slop off them."
           ],
           [
             "{t}The pig girl hops the rail, scoops the mash off %n's tits with both hands, and takes her time about it.",
@@ -18487,7 +18487,7 @@
           ]
         ],
         end: [
-          "%n climbs out of the sty plastered in slop and mud, rooted over by every pig on the farm.",
+          "%n climbs out of the sty plastered in slop and mud, rooted over by every one of the farm's pig-folk.",
           "The pig girl hoses %n off just enough to see their face. The rest of them smells like the sty."
         ]
       },
@@ -18499,7 +18499,7 @@
           ],
           [
             "The mud's warm and deep, and %n sinks in up to their chin, rocking, unable to do anything but wriggle.",
-            "Hogtied in the muck, %n can only rock and squirm while the pigs watch from the trough, chewin'."
+            "Hogtied in the muck, %n can only rock and squirm while the pig-folk gather round to sniff."
           ],
           [
             "Then the boar comes over, the boar-man who keeps the sty, heavy and slow on two legs, and stands over %n in the mud, grunting.",
@@ -19053,7 +19053,7 @@
         over: [["The studs finish across %n's belly one by one, and the breeding girl tuts at the waste."]],
         end: [
           "The straps open at last. %n is unbuckled with %ml in their %h, an appointment card for a scan in two weeks.",
-          "%n climbs out of the breeding chair, %ml heavier, and the breeding girl hands them a lollipop for being good."
+          "%n climbs out of the breeding chair, %ml heavier, and the breeding girl hands them a cold drink and a towel."
         ],
         endOver: ["%n is unbuckled glazed with %ml across their belly and an appointment to try again tomorrow."]
       },
@@ -20626,15 +20626,15 @@
       "honey",
       [
         "The syrup runs down %n's back and between their cheeks, warm and slow, and pools wherever they bend.",
-        "A cat-eared milkmaid finds %n first and licks a sticky stripe up their calf with her rough little tongue.",
+        "One of the barn's cat-folk finds %n first and licks a sticky stripe up their calf with a rough little tongue.",
         "{t}It drips off the ends of %n's nipples in long golden strings, and a farmhand catches one on a finger and tastes it.",
         "A goat-man off the hill strolls in, sniffs, and starts on %n's toes, then works upward with great dedication."
       ],
       [
-        "Every hand on the farm has found %n now, and they're all licking, rough and wet, in every sticky place at once.",
+        "Every one of the farm's animal folk has found %n now, and they're all licking, rough and wet, in every sticky place at once.",
         "{v}A big warm tongue works the syrup out from between %n's legs, deep and patient, and keeps going long after it's clean.",
         "{c}A tongue cleans %n's cock from root to tip, again, and again, much more often than it needs.",
-        "%n is squirming in a pool of syrup, licked raw and sweet, and the farm folk keep queuing up."
+        "%n is squirming in a pool of syrup, licked raw and sweet, and the animal folk keep queuing up."
       ]
     );
     trapScene(
@@ -20791,7 +20791,7 @@
       "leashpost",
       [
         "The leash is short, and %n can only kneel or stand bent, and everyone who walks past the dog yard gets an eyeful.",
-        "A kennel hand wanders over and looks %n over thoroughly, front and back, and grins.",
+        "One of the kennel's dog-folk wanders over and sniffs %n thoroughly, front and back, and wags.",
         "Somebody stops, unbuckles, and has %n quick against the post, and doesn't say a word.",
         "{t}A passer-by gives %n's tits a slap on the way past, like you'd pat a good dog."
       ],
@@ -20881,12 +20881,12 @@
       "slop",
       [
         "The slop is warm and thick and it's in %n's hair, their ears, their mouth when they gasp.",
-        "The pigs shove and grunt round %n's knees, snufflin' up every scrap that drops off them.",
+        "The pig-folk root at %n with their wet snouts, snufflin' into every crease, lookin' for scraps.",
         "A pig roots a bit of turnip out of %n's hair and squeals about it.",
         "The pig keeper pours another pail right over %n's head, laughing, and calls the pigs."
       ],
       [
-        "%n's being jostled by six pigs at once, all after the slop, and the pig keeper has pulled up a stool to watch.",
+        "%n's being rooted over by six of the pig-folk at once, and the pig keeper has pulled up a stool to watch.",
         "%n gives up trying to climb out and just wallows in it, filthy, squealing like one of them.",
         "The boar-man who keeps the sty leans on the rail on two legs, looks %n over, and decides they're the sweetest thing in the trough.",
         `The pig keeper leans over the rail and slaps %n's slop-covered rump. "There's my best piggy."`
@@ -35033,7 +35033,7 @@
       filthy: [
         "The witch stews %n like a dumplin' and feels up every inch of the meat.",
         "%n's soakin' in a cauldron of sex magic with a witch's fingers in them, and they've never been hornier.",
-        "She tells %n they'll make a lovely familiar, and scritches them under the chin like a naughty kitten."
+        "She tells %n they'll make a lovely familiar, and scritches them under the chin like a naughty cat."
       ],
       mess: ["brew", ["chest", "tummy", "face"]],
       gear: [{ when: "hold", slot: "device", label: "The Witch's Cauldron", items: ["MilkCan"], color: "#1A1A1A", desc: "A great black iron pot, big enough to sit in up to the chin, bubblin' with somethin' warm and purple that smells of plums and spice." }],
@@ -35168,7 +35168,7 @@
         ],
         [
           "{t}A tongue circles each of %n's nipples, round and round, till the caramel's gone and the nipple's hard and pink.",
-          "{c}Somebody sucks the caramel off the tip of %n's cock like a lollipop, and %n's knees buckle.",
+          "{c}Somebody sucks the caramel off the tip of %n's cock like it's the sweetest apple at the fair, and %n's knees buckle.",
           "{v}A tongue digs for caramel between %n's legs and finds somethin' sweeter.",
           "Somebody licks the caramel off %n's neck and nibbles, and pays extra for the nibble."
         ]
@@ -35422,7 +35422,7 @@
       tags: ["public"]
     });
     const COSTUMES = [
-      { x: "kitten", sp: /kitt|cat/, ears: "KittenEars2", tail: "KittenTailStrap1", color: "#1A1A1A" },
+      { x: "cat", sp: /kitt|cat/, ears: "KittenEars2", tail: "KittenTailStrap1", color: "#1A1A1A" },
       { x: "bunny", sp: /bun|rabbit/, ears: "BunnyEars1", tail: "BunnyTailStrap" },
       { x: "fox", sp: /fox/, ears: "FoxEars1", tail: "FoxTailsStrap" },
       { x: "puppy", sp: /pup|dog|wolf/, ears: "PuppyEars1", tail: "PuppyTailStrap" },
@@ -35501,7 +35501,7 @@
       ],
       // (before() picks the costume each time; this is the one the equipment list shows)
       gear: [
-        { when: "after", slot: "ears", label: "Costume Ears", items: ["KittenEars2"], color: "#1A1A1A", mins: 60, only: true, desc: "A pair of costume ears out of the attic's trunk: a kitten's, a bunny's, a fox's, a pup's, a pony's, a mouse's or a cow's. They come off in an hour." },
+        { when: "after", slot: "ears", label: "Costume Ears", items: ["KittenEars2"], color: "#1A1A1A", mins: 60, only: true, desc: "A pair of costume ears out of the attic's trunk: a cat's, a bunny's, a fox's, a pup's, a pony's, a mouse's or a cow's. They come off in an hour." },
         { when: "after", slot: "tail", label: "Costume Tail", items: ["KittenTailStrap1"], color: "#1A1A1A", mins: 60, only: true, desc: "The tail to go with the ears, strapped on snug. It wags a little on its own." }
       ],
       depth: ["held", "tease"],
@@ -35536,7 +35536,7 @@
         ],
         treat2: [
           "Hands from the other side of the door undo %n's clothes, gentle, and a warm mouth kisses its way down their belly.",
-          "{c}A mouth on the other side of the cat flap finds %n's cock and sucks, slow and sweet, like a lollipop.",
+          "{c}A mouth on the other side of the cat flap finds %n's cock and sucks, slow and sweet, like the best candy in the bag.",
           "{v}A tongue through the letterbox licks %n's pussy, slow, like it's the treat and not them.",
           "{t}The door's knocker turns into a hand and cups %n's tit, and the letterbox purrs."
         ],
@@ -40450,7 +40450,7 @@
         "The keeper keeps a hand on %n's shoulder the whole time and asks if they'd like a sip of water."
       ],
       filthy: [
-        "%n's dipped like a strawberry and licked like a lollipop by everybody at the fair, and they're moanin' for the next tongue.",
+        "%n's dipped like a strawberry and licked like a candy apple by everybody at the fair, and they're moanin' for the next tongue.",
         "%n's a glossy, sticky, chocolate-covered treat for the whole queue, and the queue's goin' round twice.",
         "The fair laps %n clean and the keeper dips them again, and %n's beggin' for both."
       ],
@@ -42443,7 +42443,7 @@
               "It's got %n good. They're shriekin', tears runnin', jumpin' every time a straw brushes their ankle."
             ],
             [
-              "%n is on the floor, howlin', kickin', every inch of them alive with ticklin' they can't get away from. They've laughed themselves weak as a kitten, and a wet patch is spreadin' under them.",
+              "%n is on the floor, howlin', kickin', every inch of them alive with ticklin' they can't get away from. They've laughed themselves weak as wet straw, and a wet patch is spreadin' under them.",
               "%n can't breathe for laughin'. They roll in the straw, hiccuppin', squealin', pissin' themselves a little, and it only makes it funnier."
             ]
           ],
@@ -52899,7 +52899,7 @@
       "It's in everything. Mud oozes between %n's cheeks",
       [
         "Every squirm works the mud further in: up the backs of their thighs, into the crease of their ass, between their legs, warm and slick and everywhere.",
-        "{t}%n's tits come up out of the wallow caked and shinin', mud slidin' off them in fat warm sheets, and the farmhand at the rail grunts appreciatively.",
+        "{t}%n's tits come up out of the wallow caked and shinin', mud slidin' off them in fat warm sheets, and the pig-folk at the rail grunt appreciatively.",
         "{c}The mud's got into %n's lap and packed itself warm round their cock and balls, and every move squishes it about, and they're half hard from it."
       ],
       "A couple of the pigs wander over to snuffle",
@@ -54261,7 +54261,7 @@
         "%n sits down on a bench that's been brushed thick with %x, and two arms with big pastry brushes come up from behind and finish the job.",
         "{t}A ladle on a jointed arm scoops %x out of a steamin' pot and pours it right down the front of %n, between their tits, slow, and then goes back for another scoop."
       ],
-      "Then the farm folk smell it.",
+      "Then the farm's animal folk smell it.",
       [
         "A dairy hand with big soft ears kneels down and licks the %x off the back of %n's knee, slow and serious, like they're cleanin' a spoon.",
         "Two farmhands take an arm each and lick %n's fingers clean one at a time, and then their wrists, and then they keep goin'.",
@@ -56220,6 +56220,1035 @@
         "Somebody up at the top of the well drops a bucket, and it splashes down beside %n and floats, and nobody comes, and the thing doesn't let go."
       ]
     );
+    {
+      const end = (tab, kind, key, lines) => poolMore(kind, key, tab[kind] && tab[kind][key], lines);
+      end(MESS_LINES, "fountain", "end", [
+        "The cuffs click open and %n slides down off the fountain's rim onto the grass, glazed to the knees, and lies there lickin' their own fingers.",
+        "%n's helped out of the bowl by the last two lickers, who clean them a little on the way with their tongues and send them off with a chocolate kiss on each cheek.",
+        "{t}%n's let go with their tits still coated thick and glossy, and a little queue of lickers follows them halfway down the lane, hopeful.",
+        "The fountain gurgles to a stop and %n climbs out brown and sticky and hummin' with sugar, leavin' sweet footprints all across the fair.",
+        "{c}%n walks away from the fountain with their cock still dipped in chocolate like a strawberry, and everybody they pass wants a bite."
+      ]);
+      end(MESS_LINES, "bakery", "end", [
+        `The baker boxes up the frostin' scraped off %n, ties it with string, and hands it to them on the way out. "For later."`,
+        "%n climbs down off the bakery bench with icin' in their hair and pipin' on their hips, and the whole queue claps them out the door.",
+        "{t}%n leaves the bakery with two candied cherries still stuck to their tits and a doily stuck to their back, and doesn't find the doily till supper.",
+        "The baker turns the sign back to OPEN, wipes down the bench, and %n's sent out the back door warm and sugary and licked half clean.",
+        "{c}%n's let off the bench with a ring of sugar flowers still round the base of their cock, and the baker says to bring it back when it's wilted."
+      ]);
+      end(MESS_LINES, "creamery", "end", [
+        "The creamery girls hose %n down with warm water in the yard, and the last of the cream runs off them in pink and white rivers into the drain.",
+        "%n's walked to the creamery door between the two girls, an arm round each, and sent off with a wafer tucked behind one ear.",
+        "{t}%n leaves with a strawberry still balanced on each of their tits, and walks very carefully all the way to the barn so neither one falls.",
+        "%n's let go sticky to the elbows, smellin' of vanilla and jam, and every bee on the farm finds them on the way home.",
+        "{v}%n walks out of the creamery with cream still squishin' between their thighs, and every step reminds them it's there."
+      ]);
+      end(MESS_LINES, "seedshower", "end", [
+        "The ring breaks up, and somebody tips a bucket of warm water over %n's head on the way out, which only spreads it about, and %n's left to drip dry in the sun.",
+        "%n's helped to their feet by the last stranger in the ring, who wipes their eyes clear with a thumb, kisses their sticky forehead and goes.",
+        "%n walks back to the barn painted and drippin', %ml of strangers dryin' to a shine on their skin, and leaves a trail of white drops behind them.",
+        "{t}%n gets up off their knees with their tits glazed white and drippin' off the tips, and doesn't bother wipin' them, and nobody asks them to.",
+        "{c}%n's last of all, like the stranger promised: one quick hand on their cock at the end, and %n adds their own to the mess and sags back into the straw."
+      ]);
+      end(THEMED_LINES, "groomer", "end", [
+        "%n's set down off the groomin' table fluffed and glossy, smellin' of oatmeal and honey, and every hand in the kennels wants to pet them on the way out.",
+        "The kennel girl clips a fresh lead on %n's collar, walks them twice round the yard to show them off, and lets them go at the gate with a kiss on the nose.",
+        "{t}%n's sent off with a bow under each of their tits and a blue rosette pinned to their collar, and they keep catchin' sight of themselves in windows.",
+        "%n comes out of the groomin' shed so clean they squeak and so petted they're hummin', and walks the whole way home with their chin up.",
+        "{c}%n's let off the table with a little bow tied round the base of their cock to match the one in their hair, and the kennel girl says it's regulation.",
+        "The kennel girl takes a photograph of %n for the wall of champions, pins it up, and turns them loose, glossy and pink and very pleased with themselves."
+      ]);
+      end(THEMED_LINES, "leashpost", "end", [
+        "The kennel hand unclips the lead at sundown, and %n just sits there in the mud a moment longer, sticky and dazed and smilin', before they remember they can go.",
+        "%n's unclipped and walked inside by the collar, wiped down with a warm rag in the kennel, and given a bowl of water and a long pet.",
+        "Somebody passin' at dusk finally unclips %n, out of pity or habit, and %n walks home bow-legged with the lead still trailin' off their collar.",
+        "{t}%n comes off the post with handprints on their tits and their knees black with mud, and the yard waves them off like an old friend.",
+        "{v}%n's let off the post drippin' down both thighs from a whole day's passers-by, and they walk home slow, legs apart, too sore to hurry.",
+        "The kennel hand counts the ribbons tied on %n's lead, whistles, and hangs the lead on the wall as a trophy before lettin' them go."
+      ]);
+      end(THEMED_LINES, "teatcheck", "end", [
+        `The dairy girl rubs a last dab of balm into each of %n's nipples, pats their flank, and opens the head gate. "Next."`,
+        "%n's let out of the check stall with a little paper ticket clipped to their collar: CHECKED, the date, and a grade circled in red.",
+        "{t}%n's tits are left soft and emptied and tinglin' from all the strippin', and they cup them all the way back to the barn.",
+        "The dairy girl writes %n's yield on the chalkboard by the door, and it's the highest on the board, and the dairy hands whistle.",
+        "{c}The dairy girl strips the last drop off the tip of %n's cock, writes it down with a little tick, and lets them go with a wink."
+      ]);
+      end(THEMED_LINES, "wax", "end", [
+        "The farmhand peels off the last big flake of wax and hands it to %n as a keepsake, a perfect red print of their own hip.",
+        "%n's unbuckled and wrapped in a soft blanket, every inch of them tinglin' like a sunburn, and sat by the fire with somethin' sweet to drink.",
+        "{t}%n gets up off the bench with their tits still dotted in little red drops like freckles, and picks at them all the way back to the barn.",
+        "The farmhand rubs cool aloe into %n's pink skin, slow and gentle all over, and %n's so sensitive by the end that even that makes them moan.",
+        "{c}%n's let off the bench with a little ring of set red wax still round the base of their cock, and they decide to leave it there a while.",
+        "The candles are snuffed one by one, and %n's unstrapped in the dark, and finds their way out by the warm smell of wax on their own skin."
+      ]);
+      end(THEMED_LINES, "tomatoes", "end", [
+        "The stocks swing open and %n straightens up slow, tomato seeds in their hair and berry juice down their back, and the crowd gives them a round of applause.",
+        "%n's let out of the stocks and sent to the pump, and a farmhand with a sponge follows them all the way there, grinnin'.",
+        "{t}The last tomato of the day burst right between %n's tits, and they walk away with the juice still runnin' down their belly.",
+        "%n's let out at the end of market day pulpy and red and drippin', and the stall-holders throw a few last soft pears after them for luck.",
+        "The bailiff unlocks the stocks, wipes the worst off %n's face with a hanky, and tells them they were the best target in years.",
+        "%n leaves the square sticky to the ankles, with a squashed plum in one ear and a little fortune in coins somebody's tucked into their collar."
+      ]);
+      end(THEMED_LINES, "trophy", "end", [
+        "The trapper lifts %n down off the wall at dawn, rubs warm oil into their stiff arms and legs, and sits them by the fire with a mug of coffee.",
+        "%n's taken down for the season and laid on the trapper's big pile of furs, and told they'll be wanted back on the wall come spring.",
+        "{t}%n's unbuckled from the planks with the strap marks still pressed under their tits, and the trapper traces them with a thumb, very proud.",
+        "The visitors' boots are gone from the porch and the fire's down to coals when the trapper finally unhooks %n and carries them to the rug.",
+        "%n's let go with the brass plate unscrewed from under them and handed over to keep, engraved with their name and FINEST CATCH.",
+        "{c}%n's taken down with the little brass bell still tied to their cock, and it jingles the whole way home through the woods."
+      ]);
+      end(THEMED_LINES, "slop", "end", [
+        "The pig keeper hoses %n down by the sty gate, cold and hard, front and back, till they come out pink and gaspin' and still smellin' faintly of turnips.",
+        "%n's helped out of the trough by the boar-man, who lifts them over the rail like a sack of feed and sets them down on the grass, slop and all.",
+        "{t}%n climbs out of the sty with mash still packed under their tits and a carrot top in their hair, and the pig girl waves them off laughin'.",
+        "%n's let go at the trough with the pig girl's handprints all over them in muck, and walks back to the barn leavin' a trail of slop.",
+        "The pigs finish the last of the slop and wander off to sleep it off, and %n's left sittin' in the empty trough, sticky and dazed and grinnin'.",
+        "{v}%n climbs out of the trough with slop between their thighs and somethin' warmer under it, and walks home very slowly."
+      ]);
+      end(THEMED_LINES, "hogtie", "end", [
+        "The pig girl unties %n knot by knot, rubs their wrists and ankles warm again, and leaves them lyin' in the mud a while longer because they look so comfy.",
+        "%n's hauled out of the wallow by the rope between their wrists and ankles like a sack, set down by the trough, and the pig girl tips a bucket over them.",
+        "{t}%n's let go with rope marks above and below their tits and mud dried in the lines, and they don't wash them off for a day.",
+        "The boar-man lifts %n out of the mud when he's done, still tied, carries them to the pump and washes them down himself, slow and thorough, before he cuts the rope.",
+        "%n's untied at last and sits up in the wallow, caked and steamin', and the pig girl hands them a hot potato from her apron pocket and grins.",
+        "{v}%n's untied and staggers out of the wallow with the boar-man's seed runnin' down their muddy thighs, and the pig girl whistles."
+      ]);
+      end(THEMED_LINES, "milkinghole", "end", [
+        "The padded rim loosens and %n slides back out of the wall, empty and shiny and shaky, and a hand reaches through and pats their cheek.",
+        "%n's let out of the wall with a little paper bag of mints pushed through the hatch after them, and a card that says SEE YOU TOMORROW.",
+        "{t}%n's tits come out of the wall soft and emptied and pink from all the hands, and they hold them all the way home.",
+        "The board slides shut, and %n stands there a long moment with their forehead still on the wall before they can walk.",
+        "{c}%n's let out of the hole milked dry in every way there is, and their cock's still twitchin' as they walk off.",
+        "%n hears the pail bein' carried away on the other side, sloshin' heavy, and somebody whistlin', and then the rim lets go."
+      ]);
+      end(THEMED_LINES, "feedbag", "end", [
+        `The feed girl unbuckles the empty bag, wipes the mash off %n's face with her apron, and pats their round belly. "Good eater."`,
+        "%n's helped up off the post so full they waddle, and the feed girl walks them to the hay and lets them lie down to sleep it off.",
+        "{t}%n's let go with mash dried on their chin and their tits, and their belly so round it rests on their thighs when they sit.",
+        "The feed girl measures %n's belly with her bit of string one last time, ties the knot further along than ever, and pins it to the barn wall.",
+        "%n waddles back to the barn rubbin' their belly and hiccupin' oats, and the feed girl calls after them that supper's at six.",
+        "{c}%n's unbuckled with their cock still hard under their swollen belly, and the feed girl gives it a fond little flick on the way out."
+      ]);
+      end(THEMED_LINES, "desk", "end", [
+        `The overseer closes the ledger, files %n's page, and points at the door with the ruler. "Same time next week." %n walks out very carefully.`,
+        "%n's sent out of the office glowin' red behind and wet at the mouth, and the clerk in the corridor doesn't look up, but does smile.",
+        "{t}%n leaves the office with the ruler's print across their tits and the overseer's signature on a slip pinned to their collar.",
+        "The overseer stands, straightens their jacket, and holds the door for %n very politely, and swats them once more on the way through it.",
+        "%n's dismissed with a cup of tea at last, which they drink standin' up, because sittin' is out of the question.",
+        "{v}%n walks out of the office slick between the thighs from bein' bent over that desk so long, and the overseer writes that in the ledger too."
+      ]);
+      end(THEMED_LINES, "inspection", "end", [
+        "The clerk snaps off her gloves, stamps the form PASSED, and tells %n they can get dressed now, and watches while they do.",
+        "%n's handed a little card with all their measurements on it, height to hips to every inch, and told to keep it on them for next time.",
+        "{t}%n leaves the office with INSPECTED stamped on their hand and a grade pencilled under each of their tits, and they keep checkin' it.",
+        "The clerk files %n's form in the cabinet under GOOD STOCK, and %n's let out into the corridor flushed from head to toe.",
+        "{c}%n's let go with a little paper tag tied round their cock that says MEASURED, and the clerk says not to take it off till Thursday.",
+        "The second inspector shakes %n's hand on the way out, very formal, and says it was a pleasure, and means it."
+      ]);
+      end(THEMED_LINES, "stamp", "end", [
+        "The clerk blows on the last stamp, checks it's dry, pins a little ribbon on %n that says FILED, and sends them out into the sunshine.",
+        "%n's walked out of the office in a long line of stamps, APPROVED down one leg and RECEIVED down the other, and every farmhand they pass reads them.",
+        "{t}%n leaves the office with a tiny O.K. on each nipple and the farm's seal across their chest, and the ink takes three baths to fade.",
+        "The clerk gives %n a receipt for themselves, carbon copy and all, and keeps the top sheet for the files.",
+        "{c}%n's let go stamped from root to tip, PROPERTY OF THE FARM and a little date, and they can't stop readin' it upside down.",
+        "%n leaves the office smellin' of ink and vinegar, with the farm's crest in red wax on their hip, very officially somebody's."
+      ]);
+    }
+    {
+      const end = (tab, kind, key, lines) => poolMore(kind, key, tab[kind] && tab[kind][key], lines);
+      end(BATCH2_LINES, "goblinmarket", "end", [
+        "The goblin who bought %n gets bored by teatime and swaps them for a shiny button, and the button's owner swaps them back to the farm for a pie.",
+        "%n's walked out of the goblin camp at dusk by the goblin matron, who gives them a pat, a pickled egg for the road, and a little shove toward home.",
+        "{t}%n's let go with SOLD painted across their tits in goblin red, and a goblin handprint on each one for a receipt.",
+        "The market packs up its stalls and somebody forgets %n on the crate, so they climb down on their own and walk home in the goblin's hat.",
+        "{c}%n's ransomed back to the farm with the little SOLD tag still tied to their cock, and they decide to keep it.",
+        "%n's handed back over the farm fence by three goblins with a sack of turnips for their trouble, and a note that says GOOD BEAST, WOULD BUY AGAIN."
+      ]);
+      end(BATCH2_LINES, "goblincart", "end", [
+        "The parade ends at the edge of the goblin camp, and the goblins cut %n loose with a lot of arguin' over whose knife it is, and send them home with a garland on.",
+        "%n's rolled off the cart into a heap of hay and left there, sticky with flower juice and goblin fingerprints, while the goblins go off to plan the next parade.",
+        "{t}%n's untied with petals stuck all over their tits and two berry-juice suns still painted round the nipples, and the goblins wave them off cheerin'.",
+        "The cart's square wheel finally falls off, and that's the end of the parade, and the goblins untie %n and use the rope for a tug of war.",
+        "{v}%n climbs down off the cart with goblin seed runnin' down the insides of their thighs and a flower crown slipped down over one eye.",
+        "%n walks home from the goblin camp still trailin' ribbons, string, three belts and somebody's braces, and the farmhands pick them off one by one."
+      ]);
+      end(BATCH2_LINES, "shrine", "end", [
+        "The smoke thins and blows away through the apple trees, and %n gets up off the moss with green knees and a belly achin' for a stud.",
+        "%n walks out of the stone ring flushed to the ears, and every step makes the ache between their legs worse, and every farmhand they pass looks twice.",
+        "{t}%n leaves the shrine with their tits heavy and their nipples hard and leakin', and they can't stop cuppin' them all the way home.",
+        "{c}%n leaves the orchard with their balls achin' full and their cock hard against their belly, and nothin' in their head but breedin'.",
+        "The last of the incense crumbles to ash, and %n finds themselves back at the orchard gate with no memory of walkin' there, warm and ripe and wantin'.",
+        "{v}%n stumbles out of the stone ring slick down both thighs, achin' and hollow, and the first stud they see is the only thing they can think about."
+      ]);
+      end(BATCH2_LINES, "buttermill", "end", [
+        "The dairy girl unbuckles the harness, wraps the new butter in muslin, and hands %n a slice of warm bread with the first pat on it.",
+        "%n comes off the churn arm so tired their legs shake, and the dairy girl sits them on a sack and fans them with her apron.",
+        "{t}%n's let go with butter still rubbed shiny into their tits, and they leave greasy little prints on everything they lean on for an hour.",
+        "The farmhands come in to fetch the butter and find %n asleep on the dairy floor, gold and glossy and smellin' like a bakery.",
+        "{c}%n's let off the churn with their cock still slick and gleamin' with butter, and the dairy girl calls it her finest work.",
+        "%n walks out of the dairy so greasy they slip on the step, and the dairy girl laughs and helps them up with buttery hands."
+      ]);
+      end(BATCH2_LINES, "syruptap", "end", [
+        "The farmhands cut %n down off the maple and carry them to the pump, and the syrup comes off in long amber strings, and some of it never does.",
+        "%n's untied at sundown, glazed and sticky, and walks back to the barn with leaves and twigs stuck all over them like a walkin' bird's nest.",
+        "{t}%n's let go with syrup set hard in two little amber drips off their nipples, and the farmhands argue about who gets to lick them off.",
+        `The last farmhand licks the last of the syrup off %n's chin, says "best breakfast I've had," and unties the rope.`,
+        "{c}%n's let go with syrup still settin' on their cock in a glossy shell, and every time they move it cracks a little.",
+        "%n peels their thighs apart with a sticky noise, and their arms off their sides, and walks home very slowly, sweet as a toffee apple."
+      ]);
+      end(BATCH2_LINES, "pieeat", "end", [
+        "The judge hands %n a ribbon that says TRIED VERY HARD, pins it to their creamy collar, and points them to the hose.",
+        "%n's untied from the chair with crust in their hair and jam in their ears, and the winner comes over and shakes their sticky hand.",
+        "{t}%n leaves the pie tent with custard still slidin' down between their tits, and a little crowd follows them, hopin' it'll drip.",
+        "The baker gives %n the leftover pies to take home, a whole stack of them, and %n can't look at a single one.",
+        "{c}%n walks out of the pie tent with whipped cream still piled on their cock like a sundae, and a cherry somebody put on top.",
+        "%n's hosed off behind the pie tent and comes out pink and clean and still somehow smellin' of cherries."
+      ]);
+      end(BATCH2_LINES, "mudslide", "end", [
+        "The farmhands line up at the bottom of the slide and give %n a round of applause as they crawl out for the last time, brown and grinnin'.",
+        "%n's hosed off by the gate in the evenin' sun, and the mud runs off them in long brown sheets, and there's still more under it.",
+        "{t}%n's let go with mud packed under their tits and dried in their hair, and they leave little brown flakes everywhere they sit.",
+        "The farmhands wrap %n in an old horse blanket and walk them back to the barn, all of them squelchin' together and laughin'.",
+        "{v}%n climbs out of the mud pool with somethin' warmer than mud runnin' down their thighs, and couldn't tell you whose.",
+        "%n's let go at the top of the bank, and slips, and goes down the slide one more time on their own, and the farmhands cheer."
+      ]);
+      end(BATCH2_LINES, "squeezechute", "end", [
+        "The vet signs the chart, the panels sigh open, and %n walks out of the chute with a new ear tag and a sticker that says HEALTHY.",
+        "%n's let out of the chute into the holdin' pen with a fresh number on their rump and a pat from every farmhand on the course.",
+        "{t}%n's let go with the vet's crayon marks on each of their tits, and the word CHECKED underlined twice.",
+        "The head gate lifts, and %n's so used to bein' held they stand there a moment longer, waitin', before they remember to walk.",
+        "{c}%n's let out with a little tag clipped to their collar that says GOOD SIZE, GOOD WEIGHT, and the vet's initials.",
+        `{v}%n walks out of the chute with their knees wobblin' and still wet from the vet's last check, and the vet says "see you at breedin' time."`
+      ]);
+      end(BATCH2_LINES, "twine", "end", [
+        "The farmhand snips the last knot, rubs the pink lines with a thumb, and wraps %n in a blanket in the hay to come round.",
+        "%n's untied slow, one knot at a time, with a kiss on each mark, and by the end they're so floppy they can't sit up.",
+        "{t}%n's let go with the twine diamond still pressed red round their tits, and they keep tracin' it with a fingertip all evenin'.",
+        `The farmhand winds the twine back into a neat ball and tucks it in %n's hand to keep. "Next time you can tie me."`,
+        "{c}%n's let down with the little twine bow still round their balls, and the farmhand says to leave it, it suits them.",
+        "%n climbs down the loft ladder on shaky legs, criss-crossed in red lines like a waffle, with straw caught in every one."
+      ]);
+      end(BATCH2_LINES, "yoke", "end", [
+        "The milkmaid unlocks the cuffs, lifts the yoke off, and rubs %n's shoulders where it pressed, slow, while the last of the milk drips off them.",
+        "%n's let out of the yoke at the kitchen door, and the cook gives them a cup of the milk they carried, still cold, and a biscuit.",
+        "{t}%n's let go soaked to the skin, their tits cold and wet and tight from the milk, and the farmhands on the fence give them a cheer.",
+        "The yoke goes back on its hook in the dairy, and %n walks back down the hill light as a feather and sticky to the knees.",
+        "{c}%n's let out of the yoke with their cock still hard and drippin' cold milk, and the milkmaid flicks the drips off with a finger.",
+        "%n's hosed down by the dairy, and the milk runs off them white into the drain, and the barn cats come runnin' for it."
+      ]);
+      end(BATCH2_LINES, "ponycart", "end", [
+        "The stable girl unhitches %n from the shafts, takes the bit out, and walks them up and down the yard to cool off, one hand on their neck.",
+        "%n's turned out in the paddock for the evenin' with the harness off and a rug over their back, and the stable girl leans on the gate to watch.",
+        "{t}%n's let go with the breast collar's pink marks still under their tits, and the stable girl rubs liniment into them, slow.",
+        "The stable girl takes off the blinkers and the plume, kisses %n on the nose, and gives them a whole carrot this time.",
+        "{c}%n's let out of the harness with the ribbon still on their cock, a little limp from the ride, and the stable girl says it's a winner's ribbon.",
+        "%n's brushed down in the stall, given a bucket of water and a scoop of oats, and left to rest in the straw like a good pony."
+      ]);
+      end(TRAPS3_LINES, "stocks", "end", [
+        "The stocks swing open and %n straightens up slow, %x pies' worth of cream slidin' off them, and the whole fair gives them a cheer.",
+        "%x pies, a crowd of laughin' farmhands, and a mouth full of cream: %n's let out of the stocks and handed a towel that's already too small.",
+        "{t}%n's let go with %x pies' worth of cream still piled on their tits, and they walk off with it slidin' slow down their front.",
+        "The fair stocks open, the baker counts the empty tins (%x), and %n's sent off to the pump with cream drippin' off their chin.",
+        "%n's let out after %x pies, cream in their ears and crust in their hair, and somebody pins a little rosette on them that says BULLSEYE."
+      ]);
+      end(TRAPS3_LINES, "windmill", "end", [
+        "The sails creak to a stop and %n's untied and set on the grass, and lies there laughin' at the sky till it stops spinnin'.",
+        "%n's let down off the windmill and has to hold a farmhand's arm all the way to the gate, because the gate keeps movin'.",
+        "{t}%n's lowered off the sails with their tits still swingin' from the last turn and their hair stood on end from the wind.",
+        "The miller ties off the sails and helps %n down, and sits them on a flour sack with a drink of water till the world settles.",
+        "%n's untied dizzy and giddy and dusted white with flour from the mill, and walks home in a long wobbly curve."
+      ]);
+      end(TRAPS3_LINES, "honey", "end", [
+        "The farm folk drift off lickin' their lips, and %n's left on the boards in the sun, glazed in %x and buzzin' a little.",
+        "%n's helped up by the last licker, who takes them to the pump and rinses the %x off with cool water, mostly.",
+        "{t}%n's let go with %x still settin' in sticky drips off their nipples, and the bees find them before they're halfway home.",
+        "%n walks back to the barn sticky with %x, every step peelin', and leaves a sweet smell behind them all the way down the lane.",
+        "{v}%n's let go with %x still slick between their thighs where the tongues didn't quite finish, and they feel it with every step."
+      ]);
+      end(TRAPS3_LINES, "incubator", "endEggs", [
+        "The lamp clicks off and %n climbs out heavy and slow, %x eggs warm and ripenin' in them, one hand under their belly.",
+        `%n's helped out of the incubator by the hen-wife, who presses an ear to their round belly, hears the clutch shift, and nods. "%x. Soon."`,
+        "%n waddles out into the cool air with %x eggs packed snug and warm in their belly, and has to sit down on the first hay bale they find.",
+        "{t}%n leaves the incubator with their belly round and tight and their tits heavy and leakin' with it, %x eggs ready to come.",
+        "The incubator lid lifts on %n curled round their swollen belly in the straw, %x eggs inside, nestin' and broody and not wantin' to leave.",
+        "%n's walked out of the hen house slow, %x warm eggs shiftin' inside them, and the hen-wife chalks the date on the board."
+      ]);
+      end(TRAPS3_LINES, "incubator", "endEmpty", [
+        "The lamp clicks off and %n climbs out pink and flushed and broody, lookin' round the barn for somebody to fill them.",
+        "%n's let out of the incubator achin' and empty and warm all through, and they nest in the first pile of straw they find, waitin'.",
+        "{v}%n comes out of the incubator wet and swollen between the legs, ripe as fruit, and every stud on the farm can smell it.",
+        "{c}%n stumbles out of the incubator with their balls heavy and full, achin' to breed somethin', anythin'.",
+        "%n leaves the hen house with their belly achin' empty and their hips rockin', in a heat that won't let them think of anythin' else.",
+        `The hen-wife lifts the lid, looks at %n's flushed face, says "oh, you're ready," and sends them out to find a stud.`
+      ]);
+      end(TRAPS3_LINES, "collection", "end", [
+        "The bench lets go and %n slides off it light-headed and wrung out, %ml lighter, and the jar's carried off with their name on the label.",
+        "%n's unstrapped and given a cup of sweet tea and a biscuit, while %ml of them is poured into the farm's big vat.",
+        `The collection hand holds the jar up to the light, %ml, nods, and pats %n's thigh. "Good donor."`,
+        "{c}%n's let off the bench with their cock spent and twitchin' and %ml of them in the farm's jar, and they can barely stand.",
+        "%n's let go shakin' and dazed, %ml collected and corked, and the collection hand says to drink plenty of water and come back Thursday.",
+        "%n leaves the collection room %ml emptier, with a little sticker on their collar that says DONATED TODAY."
+      ]);
+      end(TRAPS3_LINES, "mudpit", "endBred", [
+        "%c wins fair and square and takes the prize right there in the mud, %ml in %x's %h, and the crowd bangs on the fence rails.",
+        "%c pins %x on their back in the mud and breeds them slow and deep, %ml in their %h, and the farm girl calls it the best bout of the season.",
+        "The farm girl rings the bell, and %c claims %x in the mud on their hands and knees, %ml in their %h, while the crowd counts every thrust.",
+        "%c has %x in the mud with the whole fence watchin', fills their %h with %ml, and then helps them up and kisses their muddy cheek.",
+        "%c drags %x into the deepest part of the pit and has them there, %ml in their %h, and they both come up so muddy nobody can tell who won.",
+        "%x is pinned and bred in the warm mud, %ml of %c in their %h, and left lyin' there to catch their breath while %c takes a bow."
+      ]);
+      end(TRAPS3_LINES, "mudpit", "endPinned", [
+        "%c sits on %x's back in the mud and won't get off till the farm girl rings the bell twice, and the crowd cheers every wriggle.",
+        "%c pins %x face down in the mud and grinds on them, slow and smug, till %x is moanin' into the muck.",
+        "%c wins, and makes %x say so, out loud, three times, with their face in the mud, before they let them up.",
+        "%c keeps %x pinned on their back and kisses them, muddy and long, while the crowd hollers and the farm girl counts to a hundred.",
+        "%c holds %x down in the warm mud with their hands all over them, every inch, till %x is gaspin' and squirmin' and beggin'.",
+        "The farm girl hauls %c off %x at last, and %x lies in the mud, filthy and flushed and achin', while %c takes a muddy bow."
+      ]);
+      end(LATEX_LINES, "vacbed", "end", [
+        "The zip comes round and the top sheet's peeled back, and %n's lifted out pink and slick and printed with rubber creases, too limp to stand.",
+        "%n's let out of the vacuum bed and wrapped in a warm towel, and the stable hand rubs them down slow till they stop shiverin'.",
+        "{t}%n's peeled out of the bed with their nipples still stiff and their tits printed with the rubber's shine, and the cool air makes them gasp.",
+        "The pump goes quiet and the stable hand unzips %n, kisses their sweaty forehead, and holds a cup of water to their lips.",
+        "{c}%n's let out of the bed with their cock still pressed flat and pink from the rubber, and it springs up the moment the sheet's off."
+      ]);
+      end(LATEX_LINES, "rubbervat", "end", [
+        "%n's let out of the rubber shed in their new black skin, squeakin' with every step, and every farmhand in the yard stops work to look.",
+        "The farm hands buff %n one last time, hang a little tag on their wrist that says CURED, and send them out shinin'.",
+        "{t}%n leaves the shed with their tits glossy and black and held high by the set rubber, and they keep touchin' them to hear the squeak.",
+        "%n's sent home sealed in black from neck to toe, warm and tight and shiny, with orders to come back tomorrow to be peeled.",
+        "{c}%n's let go with their cock sealed in a glossy black sheath of its own, and every step makes it squeak against their thigh."
+      ]);
+      end(LATEX_LINES, "dollmaker", "end", [
+        "The dollmaker takes %n out of the window at closin' time, unlaces the boots, peels off the mittens, and gives them a cup of cocoa.",
+        "%n's unwrapped like a present, layer by layer, and the dollmaker folds each piece away in tissue paper for next time.",
+        "{t}%n's let go with the stiff bra unbuckled and their tits pink and printed from it, and the dollmaker rubs them warm again.",
+        `The dollmaker takes the hood off last and holds %n's dazed face in both hands. "There you are. Good as new."`,
+        "%n's let out of the shop with their little doll's card still on a ribbon round their neck, and a ticket for a fittin' next week."
+      ]);
+      end(LATEX_LINES, "rubberstall", "end", [
+        "The milkmaid rolls the sheath off %n like a stockin', wipes them down with a warm cloth, and carries off %ml in a jug with their name on it.",
+        "%n's let out of the rubber stall %ml lighter, pink and steamin' and smellin' of talc and milk, and so relaxed they nearly fall over.",
+        "{t}%n's tits come out of the sheath soft and sore and glossy, %ml emptier, and the milkmaid dabs balm on each tip.",
+        "The milkmaid holds the jug up to the light, %ml, and says it's the best she's had out of the rubber stall all month.",
+        "{c}%n's peeled out of the sheath with their cock still red and achin' from the squeeze, and %ml in the jug."
+      ]);
+      end(LATEX_LINES, "bodybag", "end", [
+        "The air goes out with a long sigh, the zip comes down, and %n's lifted out limp and pink and steamin', and laid on a pile of straw.",
+        "%n's unzipped and helped out, and they wobble on their feet like they've been at sea for a week.",
+        "{t}%n's peeled out of the bag with their tits pink and printed from the rubber, and the farm hand rubs them warm with both hands.",
+        "The farm hand lets %n lie in the open bag a while longer, just unzipped, coolin' off, before they help them out.",
+        "{c}%n's let out of the bag with their cock flushed and achin' from bein' pinned so long, and the farm hand gives it a kind squeeze."
+      ]);
+      end(LATEX_LINES, "rubbermaid", "end", [
+        "The rubber dairymaid unbuckles the mitts and the muzzle, wipes %n's face with a cool cloth, and sends them off with a pat on the rump.",
+        "%n's let go with the little belled collar still on, and it jingles all the way back to the barn, and everyone knows where they've been.",
+        "{t}%n's tits are left glossy with oil and pink from her rubber hands, and they can still feel her fingers on them hours later.",
+        "The rubber dairymaid squeaks off up the stairs with her pail, and %n's left slumped on the dairy stool, shiny and spent.",
+        "{c}%n's let go with their cock spent and slick, and the pail under the stool has somethin' in it at last, and she's very pleased."
+      ]);
+      end(LATEX_LINES, "blackpool", "end", [
+        "The black slides off %n in one long warm sheet and pours itself back into the pool, and %n's left lyin' on the moss, glossy and full and dazed.",
+        "%n crawls out of the black pool on their hands and knees, belly round and heavy with it, and the surface goes still and dark behind them.",
+        "{t}%n's let go with their tits still slick and shinin' black where the little mouths were, and they tingle all the way home.",
+        "The pool lets %n go at dawn, and they walk out of the woods with a glossy black sheen on their skin that won't wash off for a day.",
+        "{v}%n's set down on the bank with the pool's warmth still sloshin' inside them, %ml of it, and it seals itself in, snug."
+      ]);
+    }
+    {
+      const end = (tab, kind, key, lines) => poolMore(kind, key, tab[kind] && tab[kind][key], lines);
+      end(TRAP_LINES, "milker", "end", [
+        "The pump sighs down to nothin', the cups and sleeve let go one after the other, and %n's left slumped over the bar with %ml in the farm's can and nothin' left in them.",
+        "{t}The cups pop off and %n's tits swing free, soft and emptied and pink at the tips, %ml lighter and still achin' for the pull.",
+        "{c}The sleeve slides off %n's cock with a wet sound, %ml collected, and it twitches a few more times at nothin' before it gives up."
+      ]);
+      end(TRAP_LINES, "breeder", "end", [
+        "The machine grinds deep, shudders, and empties itself into %n's %h, %ml of it, hot and heavy, and holds there till the frame clicks open and lets them slide off.",
+        "One last long stroke and a gush: %ml packed into %n's %h. The rail retracts, the hobbles drop, and %n crawls off the frame on shakin' knees, leakin' with every move.",
+        "%ml, pumped into %n's %h in slow thick pulses, and a plug pops out of the frame and seals it in. The cuffs let go. %n's left full, corked and dazed in the straw."
+      ]);
+      end(TRAP_LINES, "breeder", "endOver", [
+        "The machine pulls back at the last second and paints %n from the small of their back to the backs of their knees, %ml of it, hot and thick, and the frame lets go.",
+        "It shudders and sprays %ml across %n's ass in heavy ropes, then rubs the tip slow through the mess like it's signin' its name, and retracts.",
+        "%ml, all over %n's back and rump, warm and drippin'. The cuffs open and %n's left kneelin' in the straw, glazed and achin' and empty.",
+        "{v}It ruts the last few strokes along %n's slit and lets go, %ml splashed up their belly and thighs, and the frame opens with a sigh.",
+        "The arm jerks and empties itself between %n's cheeks and down their thighs, %ml in thick warm stripes, and the hobbles click open."
+      ]);
+      end(TRAP_LINES, "snare", "end", [
+        "The ropes give all at once and drop %n in a heap, achin' and unfinished and so wound up that the straw against their skin makes them gasp.",
+        "{v}The snare lets %n down slick and swollen and unfinished, and they lie there squirmin' in the straw, hips rockin' at nothin'.",
+        "{c}The loops slip free and %n's set down hard and achin', their cock still standin' and leakin' with nothin' to show for it."
+      ]);
+      end(TRAP_LINES, "pump", "end", [
+        "The nozzle pulls free with a slurp and a plug's pushed in after it, and %n's let go with %ml sloshin' inside them and a belly round as a pumpkin.",
+        "%ml, pumped in till %n's belly's tight as a drum. The straps let go and they stand with both hands on it, feelin' it slosh and settle.",
+        "The pump coughs, the gauge reads %ml, and %n eases off the hose a careful inch at a time, belly swayin' heavy in front of them."
+      ]);
+      end(TRAP_LINES, "eggs", "end", [
+        "%x eggs bedded deep in %n's %h, and the post seals them in with a warm gob of jelly and sinks back into the floor with a contented hum.",
+        "The dingin' stops at %x. %n's let go with their belly lumpy and heavy, and every step makes the clutch shift and click inside them.",
+        "%x of them, laid neat and snug. %n stands up careful, one hand under their belly, and walks off very slowly so nothin' moves."
+      ]);
+      end(TRAP_LINES, "eggs", "endHyper", [
+        "%x eggs, and the post only stops because there's not a single gap left in %n's %h. They're let go round and tight and knobbly, too heavy to walk straight.",
+        "The post lays and lays till %n's belly's pushed out huge and knobbled, %x eggs, and they have to be helped off it by two farmhands.",
+        "%x eggs crammed into %n, and the post pats their swollen belly with its little brass arm before it sinks away. %n can't see their own feet."
+      ]);
+      end(TRAP_LINES, "injector", "open", [
+        "A cold swab, a quick pinch, and the needle slides into %n's thigh, and they watch the plunger sink all the way down before the arm lets go.",
+        "The trap's arm holds %n still with a padded cuff while the needle does its work, slow and steady, till the barrel's empty and the cuff clicks open.",
+        "The needle's in and out before %n can flinch, and the warmth spreads out from the spot like honey through their blood."
+      ]);
+      end(TRAP_LINES, "lantern", "thought", [
+        "You come back to yourself in the straw with a soft hum in your head, and the hum has words in it: you're here to be milked and bred, and you love it.",
+        "Somethin' the lantern said is still glowin' behind your eyes: good stock doesn't say no, good stock says more. You feel like very good stock today."
+      ]);
+      end(MORE_LINES, "brand", "end", [
+        "The arm retracts with a whirr, and %n's let go with %x written on them in neat black capitals, still tacky, and every farmhand they pass reads it out loud.",
+        "The straps fall away and %n twists round to read it: %x. The machine's underlined it twice, for emphasis.",
+        "It stamps the farm's seal under the word for good measure and lets %n go, and %x's there for everybody to read, plain as a sign on a gate."
+      ]);
+      end(MORE_LINES, "winch", "end", [
+        "The chain lowers %n over the corral fence and lets go, and they land in the straw, and the gate's already bolted from the outside.",
+        "The winch parks %n in the pen with a little jingle, like a shop bell, and trundles off to fetch the next one.",
+        "%n's dropped in the pen with the collar still warm round their neck and the chain rattlin' away overhead, and the latch is well out of reach."
+      ]);
+      end(MORE_LINES, "winch", "endNone", [
+        "The rail runs out by the duck pond and the collar pops open, and %n's left standin' there rubbin' their neck, a long walk from anywhere.",
+        "The chain hauls %n right round the farm and back to where it started, and lets them go exactly where it found them, which somehow feels worse.",
+        "The winch gets halfway across the yard, jams, and unclips %n with a sulky clank, and they walk the rest of the way on their own.",
+        "The collar lets go at the far end of the rail, and %n's left by the back fence, pink round the throat, with no idea which way the barn is."
+      ]);
+      end(MORE_LINES, "cups", "end", [
+        "The cups let go with a long suckin' sigh, and %n's left holdin' %x, swollen and hot and shiny, with milk beadin' at the tips.",
+        "The harness unbuckles and %n's chest drops heavy into their hands, %x now, achin' and full and drippin' down their belly.",
+        "{t}The cups pop off and %n's tits bounce free, %x and so heavy they sway with every breath, nipples dark and puffy and leakin'."
+      ]);
+      end(MORE_LINES, "chute", "end", [
+        "The funnel slides out, the strap comes off, and %n sits back with %ml of warm mash in them and a belly round and drum-tight under their hands.",
+        "%ml of feed, and the chute finally lets %n go. They burp, blush, and waddle off with one hand under their swollen belly.",
+        "The chute clanks shut and %n's let up, stuffed with %ml, so full and drowsy they curl up in the straw right there and doze off."
+      ]);
+      end(MORE_LINES, "vines", "end", [
+        "The vines lay %n down in the soft grass with %x pods tucked warm in their %h, and the last flower brushes their cheek and closes.",
+        "%x pods planted deep in %n's %h, and the patch lets them go with a shiver of leaves. %n walks off flushed and full and achin' for more.",
+        "The green slides out of %n slow and leaves %x pods behind in their %h, and the pollen's still hummin' in them, sweet and hot."
+      ]);
+      end(MORE_LINES, "weights", "end", [
+        "{c}The sleeve lets go with a pop, %ml drained into the tank, and the weights stay clipped on another minute, just to stretch them a little more.",
+        "{c}%n's unclipped %ml lighter, with a pair that hangs heavier than ever and swings with every step, already fillin' back up.",
+        "{c}The tank reads %ml, the sleeve slides off, and %n walks away bow-legged with their balls swollen and tender and achin' for the next milkin'."
+      ]);
+      end(MORE_LINES, "pricetag", "call", [
+        "Roll up, roll up! On the block: %n, freshly scrubbed and very obligin'. %x ribbons for the day. Who'll start me off?",
+        "Bargain of the week at the sale block: %n, %x ribbons, comes with a bow on. Step right up and have a squeeze!",
+        "Now here's a fine lot: %n, quiet to handle and easy to lead. %x ribbons, folks, and you'd be a fool to pass it up!"
+      ]);
+      end(MORE_LINES, "pricetag", "end", [
+        "The block lets %n down with %x RIBBONS still on their rump and a little queue of farmhands already countin' their coins.",
+        "%n's let off the block, and somebody's added OR NEAR OFFER under the %x RIBBONS on their backside in a different pen.",
+        "The farm girl hollers %x RIBBONS one last time and lets %n down, and they walk off with the price swingin' along behind them for everyone to read."
+      ]);
+      end(MORE_LINES, "tickle", "gave", [
+        "%n begs so hard the words come out in hiccups, and the rack winds down with a satisfied little purr and lets them slide off in a heap.",
+        `"Please, please, please," and the feathers stop mid-stroke. The cuffs open. %n lies there gaspin' and gigglin' at the rafters.`,
+        "The moment the beg's out of %n's mouth the brushes fold away like they were never there, and %n's left pink and wet-eyed and twitchin' all over.",
+        "%n begs, and the rack gives one last little flick under their arm, just because, and lets them go."
+      ]);
+      end(MORE_LINES, "tickle", "held", [
+        "%n bites their lip through the whole thing and never says it once, and when the cuffs finally open they roll off the rack wheezin' and triumphant.",
+        "The rack runs out of time before %n runs out of stubborn. The feathers fold away, and %n lies there laughin' at nothin', ribs achin', unbeaten.",
+        "Not a single please. The straps let go and %n slides off the bench limp and red-faced, and the rack makes a small disappointed noise.",
+        "%n outlasts the rack, just. They're let go hoarse and teary and gigglin', and they swagger out of the barn as best they can on shaky legs."
+      ]);
+      end(MORE_LINES, "mirror", "loop", [
+        `The glass shows %n a hundred times over, every one of them sayin' it. "Your turn, pet. %x."`,
+        `"Nobody's listenin' but me," the voice says, warm as a bath. "Say it. %x."`
+      ]);
+      end(MORE_LINES, "mirror", "count", [
+        '"Mm. Good." The mirrors shimmer. %x more.',
+        `"Lovely. That one went right through you, didn't it?" %x to go.`,
+        `The voice hums, pleased. "Keep goin'." %x left.`
+      ]);
+      end(MORE_LINES, "mirror", "gave", [
+        "On the fifth time the mirrors go soft and gold, the door swings open, and %n steps out with the words still warm in their mouth, and smiles.",
+        `"That's my good one," the voice purrs on the last time, and the box lets %n go, flushed and floaty and sayin' it once more under their breath.`,
+        "The fifth time %n says it they mean it, and the box can tell, and the door opens with a little chime like a bell.",
+        "The mirrors dim, satisfied. %n walks out of the box dazed and pink, catches their own eye in a puddle on the way home, and says it again."
+      ]);
+      end(MORE_LINES, "mirror", "held", [
+        "%n's jaw aches from clenchin' it, but they never say it, and the mirrors go dark and sulky and the door creaks open.",
+        `Time's up. "Another day," says the voice, soft, very sure of itself, and %n steps out with the words circlin' just behind their lips.`,
+        "%n stares down every one of their reflections and keeps quiet, and the box gives up with a sigh and lets them out.",
+        `The door opens and %n walks out with their mouth still shut tight and their cheeks hot, and the voice calls after them, "I'll be here."`
+      ]);
+      end(MORE_LINES, "wall", "end", [
+        "The board lifts at last and %n slides out of the fence on wobbly knees, %ml of strangers in their %h, and not one face to put to any of it.",
+        "%n's let out of the glory fence sticky and gapin', %ml in their %h, and a little pile of ribbons in the gravel on the far side.",
+        "The fence lets go and %n sits back in the grass, %ml in their %h and more drippin' off their chin, and listens to the boots walkin' away."
+      ]);
+      end(MORE_LINES, "wall", "endOver", [
+        "The board lifts and %n backs out of the fence glazed from chin to thighs, %ml of strangers dryin' on their skin.",
+        "%ml, painted all over %n through a hole in a fence, and they never saw a single face. The board lifts and they sit in the dust, drippin'.",
+        "The fence lets %n go sticky front and back, %ml of it, and they find a ribbon stuck to their thigh along with the rest.",
+        "{t}%n slides out of the fence with %ml of strangers' seed stripin' their tits and belly, and they don't wipe it off on the way home.",
+        "{c}%n's let out of the fence with their cock still hard and %ml of strangers splashed across their belly, and none of it went inside.",
+        "The board lifts on %n kneelin' in the gravel, glazed with %ml from a whole lane of strangers, and the lane's already movin' on."
+      ]);
+      end(MORE_LINES, "mister", "dud", [
+        "The mister hisses, coughs, and spits out a puff of plain water. %n stands there damp and waitin' for somethin' to happen. Nothin' does.",
+        "The bulb squeezes, and there's nothin' in it but air. %n's let go with a damp nose and a very suspicious look.",
+        "The mister sprays %n with somethin' that smells of roses and does absolutely nothin' else. Somebody's idea of a joke.",
+        "The nozzle sputters dry. %n waits, and waits, and checks themselves all over, and it really was empty.",
+        "A puff of mist, a tickle in the nose, a sneeze. That's all. %n walks off still not quite trustin' it.",
+        "The mister wheezes and gives up halfway. %n's left with one damp cheek and a racin' heart, and nothin' to show for it."
+      ]);
+      end(NEW_TRAP_LINES, "saddle", "end", [
+        "The steel horse rocks to a stop and %n's unbuckled, and they slide off into the hay and lie there with their thighs still twitchin' and a grin a mile wide.",
+        "The fence rail cheers as the straps let go, and %n's helped off the saddle by two farmhands, legs like jelly, ridden raw.",
+        "{v}%n's unstrapped from the saddle slick and swollen between the thighs from all that grindin', and they walk off very, very carefully.",
+        "{c}%n slides off the saddle with their cock still hard and achin' from bein' bounced against the leather all that time, and the rail whistles."
+      ]);
+      end(NEW_TRAP_LINES, "net", "end", [
+        "The net's let down slow onto the hay, and %n crawls out of the tangle with mesh lines pressed all over them like a waffle.",
+        "The farm girl lowers %n into the straw, untangles them one limb at a time, and leaves the net in a heap with a bow on top.",
+        "{t}%n's let out of the net with diamond marks pressed into their tits from hangin' in it, and the farm girl traces one with a fingertip, laughin'.",
+        "The rope runs out and %n drops the last foot into the hay with a soft whump, net and all, and lies there spinnin' gently."
+      ]);
+      end(NEW_TRAP_LINES, "bell", "end", [
+        "The bell's padlocked on for half an hour. Every step %n takes is goin' to ring across the whole farm till then.",
+        "Half an hour of clangin' ahead: the bell collar's locked on %n tight, and the key's gone back in the farm girl's apron.",
+        "%n tries one careful step. CLANK. That's how the next half hour's goin' to go.",
+        "The little padlock clicks shut on %n's bell collar. Thirty minutes of everybody knowin' exactly where they are.",
+        "%n's belled for the next half hour, and the barn cats have already started followin' the noise."
+      ]);
+      end(NEW_TRAP_LINES, "bell", "off", [
+        "Half an hour on the dot, and the bell collar unlocks itself and drops off %n into the straw with one last mournful clonk.",
+        "The padlock pops, the bell falls, and %n tiptoes away in sudden silence, which feels very strange.",
+        "Click. The bell's off. %n walks three steps and keeps hearin' it anyway.",
+        "The bell's half hour is up. It drops off %n's neck and rolls away under a hay bale, still dingin' faintly.",
+        `%n's bell collar lets go at last, and somewhere across the yard somebody says "aw" like they'll miss it.`
+      ]);
+      end(NEW_TRAP_LINES, "scale", "call", [
+        "Weigh-in results, folks! %n: %x. Somebody's been eatin' well.",
+        "Fresh off the scale and read out loud for everyone: %n, %x. Make a note of it.",
+        "The scale's needle settles and the farm girl hollers it to the whole yard: %n, %x!",
+        "Today's weigh-in, for the record: %n comes in at %x. Fine figure of stock."
+      ]);
+      end(NEW_TRAP_LINES, "scale", "end", [
+        "The bars lift and %n steps off the scale with their figures chalked on their rump and every ear on the farm full of them.",
+        "%n's let off the scale and given a ticket with their numbers on it, which the farm girl also pins to the barn board.",
+        "{t}%n's let go with their cup size chalked across their chest where the farm girl wrote it, for anybody who missed the announcement.",
+        "The scale sinks back into the floor and %n slinks away, measured, weighed, read out and very pink.",
+        "The farm girl rubs out yesterday's numbers on the board and chalks up %n's, and lets them go with a pat on their newly weighed rump."
+      ]);
+      end(NEW_TRAP_LINES, "teaser", "end", [
+        "{c}The stall door swings open and %n stumbles out achin' and swollen and full fit to burst, and every step makes their balls throb.",
+        "{c}%n's let out of the teasin' stall so pent up their cock's drippin' with every heartbeat, and the next stud's job is goin' to be very easy.",
+        "{c}The teasers back off and the gate opens, and %n leans on the post with their balls drawn up tight and heavy and nowhere to put it all.",
+        "{v}%n's let out of the teasin' stall swollen and drippin' and achin' to be filled, and every stud in the barn turns his head as they pass.",
+        "The gate opens and %n staggers out flushed and shakin', wound so tight that the brush of their own thighs makes them gasp."
+      ]);
+      end(NEW_TRAP_LINES, "dip", "end", [
+        "The dip lets %n go pink and scrubbed and smellin' of lavender soap, and the farm girl fluffs them dry with a big towel.",
+        "%n climbs out of the sheep dip squeaky clean, every mark and drip on them gone, and their skin tinglin' from the brushes.",
+        "The brushes fold away and %n's tipped out onto clean straw, glowin' and damp and so clean they feel brand new.",
+        "%n's let out of the dip with their hair in soapy spikes and not a single mark left on them anywhere, and the farm girl calls it a fresh start.",
+        "Out of the trough comes %n, rinsed and scrubbed and fluffed, smellin' of lavender, ready to be got filthy all over again."
+      ]);
+      end(TRAPS2_LINES, "carousel", "end", [
+        "The carousel creaks to a halt and the straps let go, and %n wobbles off the platform with %ml milked out of them and their belly sloshin' warm.",
+        "Last lap. The wheel stops, %ml sloshes in the jars, and %n's tipped off at the gate still spinnin' in their head.",
+        "%n's unbuckled at the gate after the last lap, %ml lighter and somethin' heavier, and has to hold the fence to stay upright.",
+        "The farm girl waves %n off the carousel with the jars full, %ml of them, and %n staggers away in a long dizzy curve.",
+        "{t}%n's let off the carousel with their tits milked soft and swingin', %ml in the jars, and the world still goin' round."
+      ]);
+      end(TRAPS2_LINES, "plow", "end", [
+        "The farmhand unhitches %n at the end of the last row, rubs their shoulders, and gives them a long drink from the water bucket.",
+        "%n's let out of the harness at the headland, filthy and sweat-slick and blowin', and the field behind them's turned as neat as a quilt.",
+        "{t}%n's unbuckled with the harness straps' red marks crossed over their tits, and the farmhand rubs liniment into them, slow.",
+        "The traces drop and %n sinks to their knees in the warm turned earth, done in, while the farmhands lean on the gate and clap.",
+        "%n's walked back to the barn by the halter, muddy to the knees and achin' all over, and given a rubdown and a bucket of oats."
+      ]);
+      end(TRAPS2_LINES, "washline", "end", [
+        "The pegs come off one by one, every one a little sting, and %n's let down onto the grass pink-dotted and smellin' of sun-dried linen.",
+        "%n's unpegged and folded over the farm girl's arm like a sheet, carried in, and set down by the fire.",
+        "{t}The last two pegs come off %n's nipples with a sharp sting each, and they're let down off the line gaspin' and rubbin' them.",
+        "The line's lowered and %n flops onto the grass, every pinched spot throbbin', and lies there in the sun to recover.",
+        "{v}The farm girl takes the last peg off from between %n's legs, slow, and %n yelps, and is let down off the line shakin'."
+      ]);
+      end(TRAPS3_LINES, "auction", "open", [
+        "Roll up! %n's on the auction block, y'all! ?bid your ribbons, and the highest bidder walks them through three traps of their pickin'. Three minutes on the clock!",
+        "LOT ON THE BLOCK: %n, fine stock, easy to handle. ?bid now: the winner picks three traps for them. Three minutes, folks!",
+        "Bids open on %n! Three minutes, and the top bid chooses three traps to walk them through. ?bid your ribbons!",
+        "The auction bell's ringin' for %n! ?bid your ribbons in the next three minutes, and the winner sends them through three traps of their choosin'.",
+        "Who'll start me off? %n's up on the block for the evenin'. ?bid, folks: highest bid picks three traps for them, three minutes to go!"
+      ]);
+      end(TRAPS3_LINES, "maze", "near", [
+        "Heavy breathin', just the other side of the stalks. Don't stop.",
+        "A stalk snaps behind you, then another, closer.",
+        "You catch a glimpse of somethin' big between the rows, and then it's gone. It's circlin'.",
+        "Somethin' laughs, low and pleased, somewhere in the corn. It's enjoyin' this."
+      ]);
+      end(TRAPS3_LINES, "maze", "escaped", [
+        "%n tumbles out of the corn at the exit with leaves in their hair and their heart poundin', and the growl behind them stops dead at the edge of the field.",
+        "%n bursts through the last row into the open, gaspin', and turns round just in time to see a big shape melt back into the corn.",
+        "Out! %n stumbles out of the maze and collapses on the grass at the exit, laughin', and somethin' in the corn huffs, disappointed.",
+        "%n finds the way out with seconds to spare and leans on the exit post gaspin', and the farm girl ties a ribbon on them for makin' it.",
+        "%n runs the last stretch flat out and bursts out of the maze, and the stalks behind them rustle and go still.",
+        "%n slips out of the maze exit just ahead of whatever's in there, and doesn't look back till they're well past the gate."
+      ]);
+    }
+    {
+      const end = (tab, kind, key, lines) => poolMore(kind, key, tab[kind] && tab[kind][key], lines);
+      end(SEASON_LINES, "cauldron", "end", [
+        "The witch hauls %n out by the armpits and stands them drippin' on the flagstones, purple to the collarbones, and watches them over her spectacles while the brew starts to work.",
+        `{t}%n's lifted out of the pot with purple brew runnin' off the tips of their tits in two thin streams, and the witch catches a drop on her finger, tastes it, and nods. "That's took."`,
+        "The brew goes still the moment it's done its work, and the witch tips the cauldron on its side and %n slides out in a warm purple rush onto the grass, steamin' and fizzin' under the skin.",
+        `"Out you come, my dumplin'," says the witch, and towels %n off with her own shawl, slow, takin' her time over every inch, and the tingle under their skin's only gettin' stronger.`,
+        `{c}%n's fished out with the ladle hooked under one arm, their cock stiff and stained purple to the root, and the witch flicks it once with a fingernail. "Oh yes. That's workin'."`
+      ]);
+      end(SEASON_LINES, "cauldron", "dud", [
+        `The witch peers into %n's eyes, then their ears, then lifts each arm and has a sniff. "Nothin'. Not a flicker." She fishes them out, purple and fizzin', and sulks on their behalf.`,
+        `"Well, that's a waste of good toadstool," mutters the witch, and tips %n out of the pot onto the grass, purple to the neck, soft and well stewed and otherwise exactly the same.`,
+        "The brew goes flat and grey round %n all at once, and the witch sighs and pulls the plug in the bottom of the cauldron, and %n's left sittin' in the empty pot, purple and pruny.",
+        `The witch stirs and stirs and finally gives up, hauls %n out by the wrist and smacks their wet bottom with the ladle for spoilin' her brew. "Next full moon," she says. "Again."`,
+        "Nothin' happens, and keeps not happenin', and the witch writes DUD in her book and underlines it twice, and lets %n climb out drippin' purple and very, very well stirred.",
+        `{t}The witch gives each of %n's tits a test squeeze as she lifts them out, frowns, squeezes again. "Nothin'," she says, and lets go a good while later than she needed to.`
+      ]);
+      end(SEASON_LINES, "broomstick", "end", [
+        "The broom comes in low over the pumpkin patch and tips %n off into a heap of leaves, and flies on without them, and %n lies there in the leaves, shakin' and hummin' and so close it hurts.",
+        'The witch catches the broom by its bristles as it lands and unties %n one knot at a time, slow, and every time %n twitches she clicks her tongue. "Not tonight, sweet thing."',
+        "{c}They come down by the barn, and %n's untied with their cock stiff and leakin' down the broom handle, and the witch wipes the handle clean with her sleeve and won't let them touch.",
+        "{v}The broom lands and the witch slides %n off it, and the handle comes away slick, and %n's pussy's still throbbin' from every buck and hum, and she pats it once, very lightly, as if to say no.",
+        "The broom does one last slow loop of the moon and settles on the porch rail, and the witch helps %n down with windswept hair and frozen cheeks and a fire between their legs nobody's goin' to put out."
+      ]);
+      end(SEASON_LINES, "candyapple", "end", [
+        "The stall keeper cuts %n down off the post at closin' and sets them on the counter to drip, glazed amber in all the places tongues couldn't get at, licked raw and shiny where they could.",
+        "{t}The last tongue of the night works the caramel off %n's nipples slow, one and then the other, and then the stall keeper unties them, sticky everywhere else and achin' there.",
+        "{c}%n's untied from the post with caramel set hard round the base of their cock where nobody quite finished the job, and the stall keeper offers to finish it, and does, slow, with her tongue.",
+        "The fair packs up round them, and %n's still on their post, sugar-crusted and pink and laughin' weakly, until the stall keeper remembers them and comes back with a bucket of warm water.",
+        "%n's let down off the post at last with caramel strung from their hair to their shoulders, and they walk home stiff-legged and sticky as a toffee apple left out in the rain."
+      ]);
+      end(SEASON_LINES, "taffy", "end", [
+        "The arms slow, and stop, and lower %n into a heap on the sugared table, folded and pulled and pulled again, soft as warm taffy, giggles still comin' out of them in hiccups.",
+        "{t}The hooks let go and %n flops on the slab, and the candy maker brushes the sugar off their tits with a pastry brush, very thorough, very slow, and %n's squirmin' again.",
+        "The candy maker unhooks %n's wrists, then their ankles, and rubs the stretch out of every limb with buttery hands, and %n's limp and sugared and laughin' into the slab.",
+        `"Perfect pull," says the candy maker, and lifts %n off the puller and sits them on the coolin' rack, sticky and dusted pink, while the arms tick to a stop behind them.`,
+        "%n's let down off the taffy puller stretched long and pink, and their legs won't work, so the candy maker wraps them in waxed paper like a sweet and carries them out to the cart."
+      ]);
+      end(SEASON_LINES, "mummy", "end", [
+        "The mummy unwinds the last strip from %n's eyes, and they blink in the lamplight, still wrapped everywhere else, bare and pink in all the places the linen left open, and the mummy bows.",
+        "{t}The linen comes off %n's chest last of all, slow, one turn and then another, and the mummy kisses each nipple as it's bared, very formal, like an old royal custom.",
+        "{c}The mummy unbinds %n's cock last, turn by turn, and it springs up stiff after an hour bound tight, and the mummy strokes it once, dry and dusty, and lets them go.",
+        "At the stroke of midnight the mummy lifts its consort out of the sarcophagus in its arms and sets %n on their feet, wrapped to the knees still, and they have to hop for the door.",
+        "%n stumbles out of the crypt trailin' a long strip of linen behind them like a bridal train, pink and sweaty and thoroughly handled, and the sarcophagus lid grinds shut."
+      ]);
+      end(SEASON_LINES, "hauntedhouse", "end", [
+        "Whatever's in the wall drives deep one last time and empties %ml into %n's %h, and the hole closes up behind it like a mouth, and %n's on their knees on the bare boards, drippin'.",
+        "The hands let go of %n's hips all at once, %ml left warm in their %h, and the floor tips and slides them down a chute and out onto the lawn, blinkin' at the moon.",
+        "The thing behind the wall finishes with a groan that echoes down every corridor, %ml of it pumped into %n's %h, and the portraits on the walls all look away politely.",
+        "%n crawls out from under the haunted stairs with %ml runnin' out of their %h and a paddle-print glowin' on each cheek, and a cold hand gives them one last pat on the way out.",
+        "The lights come up, the walls go still, and %n's left bent over the window ledge with %ml in their %h and a cobweb in their hair. Somewhere upstairs, somebody laughs."
+      ]);
+      end(SEASON_LINES, "hauntedhouse", "endOver", [
+        "Whatever's in the wall pulls out and paints %ml up %n's back in hot stripes, and the hands set them on their feet and give them a push toward the door.",
+        "%ml splashes across %n's bottom from the hole in the wall, and the lights snap on, and the house is just an old house again with a very messy guest in the hall.",
+        "The thing behind the wall finishes over %n's thighs, %ml of it, and the floorboards creak like they're laughin', and the front door swings open on its own.",
+        "{t}A hand in the wall turns %n round and %ml of somebody splashes over their tits, hot in the cold hall, and then every hand lets go at once.",
+        "%n comes out of the haunted house with %ml drippin' off their back and their bottom paddled pink, and a candle in the window snuffs itself out behind them.",
+        "The hands hold %n still while %ml spills down the backs of their legs, and then the whole house breathes out, and %n's standin' on the porch, sticky, with no memory of the door."
+      ]);
+      end(SEASON_LINES, "costumetrunk", "end", [
+        "The trunk lid creaks up and %n climbs out a %x, ears twitchin' on their head and a tail swishin' behind, rumpled and pink and smellin' of mothballs and lace.",
+        "%n tumbles out of the costume trunk onto the dusty boards as a %x, with fur in all the wrong places and lace in the right ones, and the trunk coughs a feather out after them.",
+        "The sleeves push %n out of the trunk all done up as a %x, from the ears on their head to the tail strapped snug behind, and pat them on the bottom to send them down the attic stairs.",
+        "%n's let out of the trunk a %x, flushed from an hour of bein' dressed and undressed and dressed again in the dark, and the ears won't come off however they pull.",
+        "{t}The trunk spits %n out a %x, ears up and tail out, and their tits are pink and tinglin' from an hour of costumes tryin' them on for size."
+      ]);
+      end(SEASON_LINES, "treatdoor", "endTreat", [
+        "The door hands out one last caramel through the letterbox, sticky and warm, and closes soft as a kiss, and %n's left leanin' on it, melted and grinnin' and chocolate-mouthed.",
+        `"That's your treat," says the door, and %n's left on the step with their clothes in a heap beside them and a foil-wrapped toffee in each hand, glowin' like a jack-o'-lantern.`,
+        "The door shuts with a satisfied click, and the brass knocker winks, and when %n turns round it's gone, just a candy wrapper blowin' across the yard and their knees still shakin'.",
+        "{c}The mouth behind the door gives %n's cock one last slow lick and the cat flap swings shut, and %n stands there on the step, emptied, with a treat bag in their hand that wasn't there before.",
+        "{v}The tongue in the letterbox gives %n one last lick, slow, and the door hums like it's very pleased with itself, and %n slides down the wood to sit on the step, wobbly and sweet."
+      ]);
+      end(SEASON_LINES, "treatdoor", "endTrick", [
+        "Whoever's on the yard side gives one last hard push and fills %n's %h with %ml, and the door lets go of their waist and they spill through it onto a floor that isn't there anymore.",
+        "%ml of the trick ends up in %n's %h, and the door spits them out into the pumpkin patch face down, bottom up, red and drippin', and the jack-o'-lanterns all grin.",
+        `The door lets go and %n drops onto the step, %ml runnin' out of their %h and pumpkin seeds stuck to their back, and the knocker says, "Same time next year."`,
+        "Somebody finishes deep in %n's %h, %ml of it, and gives them a farewell slap, and the door creaks open and dumps them in the leaves with pumpkin guts for a crown.",
+        "%n's let go of with %ml in their %h and a red handprint on each cheek, and the door folds itself up flat like a card and blows away down the lane, cacklin'."
+      ]);
+      end(SEASON_LINES, "treatdoor", "endTrickOver", [
+        "Whoever's behind %n pulls out and spills %ml up their back, and the door lets go, and %n slides out onto the step in a sticky heap of pumpkin and giggles.",
+        "%ml of somebody splashes across %n's red bottom, and the door creaks with laughter and lets them tumble back into the yard, sticky and pumpkin-hatted.",
+        "The trick ends in %ml down the backs of %n's thighs, and the door opens with a bow and lets them go, and it's just a door again, leanin' on nothin' in the frosty yard.",
+        "Somebody on the yard side finishes over %n's back, %ml of it, and the door pushes them out with a pat on the head and a candy corn stuck to their bottom.",
+        "%n's let go of with %ml painted across their bottom and pumpkin seeds in their hair, and the door slams so hard the jack-o'-lantern on the step jumps.",
+        "Whoever's behind %n spills %ml down the crack of their ass and across the step, and the door coughs %n out after it, red-bottomed and grinnin'."
+      ]);
+      end(SEASON_LINES, "frozenpond", "end", [
+        "The last skater on the pond comes to a stop behind %n in a spray of ice and empties %ml into their %h, and the farmhands chip the skates free while %n's still shakin'.",
+        "%n's thawed loose with a kettle of warm water and lifted off the ice by two farmhands, %ml of somebody snug in their %h and their knees knockin' from more than the cold.",
+        "By the time the moon's up every skater's had their turn, %ml warm in %n's %h, and the ice cracks free round their boots and they slide gently into the reeds on their bottom.",
+        "{t}The last skater groans into %n's neck and fills their %h with %ml, both hands on %n's tits for warmth, and the farmhands come out with the kettle and a blanket.",
+        "The skates come free with a crack and %n glides helplessly across the pond with %ml in their %h, leavin' a little steamin' trail on the ice, and fetches up in the bulrushes."
+      ]);
+      end(SEASON_LINES, "frozenpond", "endOver", [
+        "The last skater pulls out and paints %ml across %n's back, steamin' in the frost, and the farmhands pour the kettle round their boots till the ice lets go.",
+        "%ml of the last skater freezes in white streaks down %n's thighs before the farmhands even reach them, and %n's carried off the pond wrapped in a horse blanket.",
+        "Somebody finishes over %n's bottom, hot enough to steam, %ml of it, and the ice gives a great crack and lets their skates go, and they sit down hard on the pond.",
+        "{t}The last skater twists %n round at the waist and spills %ml over their tits, and it goes cold and sticky in the air, and then the kettle comes and %n's free.",
+        "%n's chipped free of the ice with %ml frozen across the small of their back like frost on a window, and every skater on the pond waves as they wobble to the bank.",
+        "The farmhands come with the kettle at sundown, and %n's still stood in the middle of the pond with %ml of somebody drippin' off their bottom and their cheeks red from slaps and cold."
+      ]);
+      end(SEASON_LINES, "mistletoe", "end", [
+        "The queue's done, and the last kiss was the longest, and the farmhand cuts the ribbon off %n's wrists and kisses their knuckles for good measure. %n's mouth is swollen and their head's swimmin'.",
+        "%n's untied from under the mistletoe kissed breathless and stained every shade of lipstick on the farm, neck, chest and lower, and they stagger off down the lane hummin'.",
+        "{t}The last of the queue kisses %n's mouth, then each of their tits, then their mouth again, and the farmhand lets them out of the kissin' gate pink to the ears and glazed.",
+        "The mistletoe's bare of berries by dusk, every one plucked for a kiss, and %n's let out of the gate with their lips tingly and numb and their knees gone to jelly.",
+        "{c}The queue's done, and the last kiss was nowhere near %n's mouth, and they're untied from the gate with their cock still slick and pink with somebody's lipstick."
+      ]);
+      end(SEASON_LINES, "stocking", "end", [
+        "The farmhands lift the stockin' off its hook and peel it down off %n like a sock off a foot, and out tumble sweets and ribbons and a very flushed, very sticky %n onto the hearth rug.",
+        "%n's lifted out of the stockin' at last, toes curlin', with sugar mice and walnuts and toffees stuck to them everywhere the wool was tight, and the little egg still hummin' away inside.",
+        "Down comes the stockin', and %n spills out on the rug by the fire in a heap, damp with sweat and warm as toast, and the whole farmhouse claps.",
+        "{c}The stockin' comes down and %n's cock comes out of it last, stiff and wrapped in a red ribbon somebody tied on halfway through, and the farmhand unties it with a flourish.",
+        "%n's tipped out of the stockin' onto the hearth rug and left to cool off by the fire, sweets and all, still hummin' from the egg and grinnin' at the ceilin'."
+      ]);
+      end(SEASON_LINES, "sauna", "end", [
+        "The sauna keepers roll %n in the snow one last time, steamin' and shriekin', and haul them up into a big wool blanket, glowin' pink from their scalp to their toes.",
+        "%n's let out of the sauna with birch leaves stuck all over them and every inch of skin hummin', and the bearded keeper pours a bucket of cold pond water over their head to finish.",
+        "{t}The last switchin' leaves %n's tits pink and stingin' and wonderful, and the sauna keepers wrap them in a towel and sit them on the bench outside to watch the snow fall.",
+        "They carry %n out of the steam limp as a wrung towel and lay them in the snowbank, and %n lies there starin' at the sky, every nerve singin', not cold at all.",
+        "The sauna door opens on the frost and %n stumbles out in a cloud of steam, switched rosy and sweaty and grinnin', and the keepers hand them a mug of hot berry juice and a slap on the bottom."
+      ]);
+      end(SEASON_LINES, "frostfae", "end", [
+        "Dawn comes, and the fae go thin and silver and laughin', and then they're just frost on the hedge, and %n's left tied there with lace meltin' off them and their whole body beggin'.",
+        "The tallest of the fae kisses %n once on the mouth, cold as well water in January, and blows the frost lace off their wrists, and they're gone, and %n's on their knees in the hoarfrost, achin'.",
+        "{t}The fae leave a curl of frost on each of %n's nipples as a keepsake, stiff and silver and stingin', and drift off down the lane, and the frost doesn't melt till noon.",
+        "{c}The fae leave %n's cock rimed in frost lace, stiff and achin' and cold as ice, and laugh their bright cold laugh, and blow away into the mornin' like snow off a roof.",
+        "The game ends when the fae say it ends, and they say it ends with %n right on the edge, so that's where they leave them: tied in the hedgerow, shakin', with ice in their lashes."
+      ]);
+      end(SEASON_LINES, "snowman", "end", [
+        "The farmhands shovel %n out of the snowman's middle at teatime, pink and tingly and shiverin' and grinnin', and the snowman's carrot nose falls off in sympathy.",
+        "%n's dug out of the snowman by a crowd of farmhands with shovels and warm mittens, and rubbed down by the stove till they're steamin', and somebody wraps a scarf round them.",
+        "{t}They dig %n's tits out of the snow last, red and cold and hard at the tips, and two warm mouths warm them back up before the blanket goes on.",
+        "The snowman slumps in the noon sun and %n slides out of its belly in a rush of slush, and lands on their back in the snow, laughin', with the whole yard clappin'.",
+        "%n's thawed out of the snowman with buckets of warm water, and the snowman's left with a big hole in its middle and a very surprised look on its coal face."
+      ]);
+      end(SEASON_LINES, "yulelog", "end", [
+        "The log's dragged over the farmhouse step and set down by the hearth, and %n's untied from it with bark on their thighs and the old knot's shape pressed into them, wound tight as a spring.",
+        "%n's lifted off the Yule log as it's rolled into the hearth, legs wobblin', and somebody hands them a cup of hot spiced cider before they've even found their feet.",
+        `{v}%n's untied at the hearth with their pussy throbbin' from a mile of the knot grindin' against it, slick all down the bark, and nobody lets them finish. "Luck's in the wantin'," says the head farmhand.`,
+        "{c}They untie %n at the farmhouse door with their cock stiff and achin' from every bump of the track, and the head farmhand flicks it for luck and sends them in to warm up.",
+        "The log goes on the fire with %n's sweat still on the bark, and the farm cheers the year in, and %n sits on the hearth rug red-thighed and wound up and glowin' in the firelight."
+      ]);
+      end(SEASON_LINES, "wassail", "end", [
+        "The first wassailer finishes with a shout into %n's %h, %ml of the year's luck, and the orchard roars and bangs its pans, and the wassail master cuts the cords.",
+        "%n's untied from the oldest tree in the orchard with %ml warm in their %h, cider-soaked toast in their hair and the bark's print on their front, and the orchard toasts them.",
+        "The first wassailer takes the luck in %n's %h, %ml of it, with the whole orchard singin' the old song, and a farmhand pours the last of the cider over the roots and over %n.",
+        "{t}The wassailer fills %n's %h with %ml, hands full of %n's cider-slick tits, and the robins scatter from the branches, and the master says it's the best luck in years.",
+        "%n slides down the trunk with %ml in their %h when the cords come off, and sits in the frosty grass among the roots, sticky with cider and luck, while the pans clang on."
+      ]);
+      end(SEASON_LINES, "wassail", "endOver", [
+        "The first wassailer pulls out and spills %ml up %n's back against the old bark, and the orchard cheers anyway, and the master says the trees aren't fussy.",
+        "%ml of the luck lands over %n's bottom and runs down into the roots, and the wassail master says that's the old way too, and cuts them loose.",
+        "{t}The first wassailer turns %n round against the trunk and spills %ml over their tits, and the orchard bangs its pans, and somebody sticks a bit of cider toast in %n's hair.",
+        "The luck goes all down %n's thighs, %ml of it, and soaks into the frosty grass at the tree's feet, and the orchard toasts the roots and then toasts %n.",
+        "%n's untied from the apple tree with %ml of the year's luck streaked across their back, and the wassail master pours a cup of cider over it, for the trees.",
+        "The first wassailer finishes across the small of %n's back, %ml of it steamin' in the cold, and the singers all cheer, and the cords come off, and %n sags against the bark."
+      ]);
+      end(SEASON_LINES, "giftwrap", "endUsed", [
+        "Whoever unwrapped %n leaves %ml in their %h and a kiss on the back of their neck, and tucks the ribbon back round them, very neat, and puts the lid back on the box.",
+        "%n's let out of the box at suppertime with %ml of somebody's present runnin' out of their %h and the paper all torn at the best end, and the farm girl says that's what presents are for.",
+        "The ribbons come off and %n climbs out of the box with %ml in their %h, the bow askew on their hip, and the gift tag on their bottom now says OPENED in big letters.",
+        "{t}%n's let out of the box with %ml in their %h and the ribbon round their tits so loose now it slips straight off, and the farm girl winds it up for next year.",
+        "Whoever opened the present leaves %ml in %n's %h and a thank-you note tucked under the bow, and %n reads it at suppertime, sticky and pink, and it just says DELICIOUS."
+      ]);
+      end(SEASON_LINES, "giftwrap", "endUsedOver", [
+        "Whoever unwrapped %n pulls out and spills %ml across the ribbons, and wraps them back up a bit sticky, and leaves them under the tree for the farm girl to find.",
+        "%ml of somebody's present ends up over %n's bottom and the tissue paper, and %n's let out at suppertime with the bow glued to them in a very sticky way.",
+        "{t}Whoever opened the box spills %ml over %n's tits and the bow between them, and the farm girl lets them out at suppertime and says the bow's ruined, but %n isn't.",
+        "The present's opened and used and finished over, %ml of it across %n's back and the gift tag, and %n climbs out of the box at suppertime sticky as a toffee wrapper.",
+        "Whoever unwrapped %n spills %ml down their thighs into the bottom of the box, and %n's let out at suppertime kneelin' in it, ribbons tangled and grinnin'.",
+        "%n's lifted out of the box with %ml painted across their ribbons and the paper stuck to them in patches, and the farm girl peels it off them a strip at a time."
+      ]);
+      end(SEASON_LINES, "giftwrap", "endTease", [
+        "The farm girl pulls the big bow at suppertime and the ribbon unwinds off %n in one long slither, and they're left kneelin' in the box, squeezed and shaken and never opened, achin' for it.",
+        "%n's let out of the box at suppertime with ribbon marks criss-crossin' their skin and every guess still tinglin', and not one person was allowed to open them.",
+        "{t}The ribbon round %n's tits comes off last, slow, and it's been tugged and retied so often their nipples are standin' up like little red bows of their own.",
+        "{c}The little red bow comes off %n's cock last of all, after an evenin' of flicks and strokes, and %n's so wound up the untyin' nearly finishes the job.",
+        `"Maybe next year you'll get opened," says the farm girl, and lifts %n out of the box in the last of the ribbon, shaken and squeezed and so ready it hurts, and sends them in to supper.`
+      ]);
+      end(SEASON_LINES, "cocoastand", "endMilk", [
+        "The keeper strips the last drops out of %n into the copper pot, %ml of them in the cocoa all told, and helps them down off the counter sore and light, with a cocoa moustache of their own.",
+        "{t}%n's tits are soft and empty and pink at the tips when the stand closes, %ml of them stirred into the cocoa, and the keeper rubs them with warm butter before she buttons them up.",
+        "%ml of %n's milk went into the pot, and the queue's drunk every drop, and the keeper chalks %n's name on the board as WINTER'S BEST COCOA and lets them down off the counter.",
+        "By the last mug the pot's half %n, %ml of them, and the keeper wraps them in her own shawl, sits them by the stove and hands them the scrapin's of the pot.",
+        "%n's helped down off the counter %ml lighter, nipples tinglin' in the cold air, and every person in the queue shakes their hand and thanks them for the cocoa."
+      ]);
+      end(SEASON_LINES, "cocoastand", "endDry", [
+        "The keeper squeezes and squeezes and gets nothin' but a sigh out of %n, so she buttons them back up, kisses each sore nipple through the shirt and sends them off with a free mug.",
+        "Not a drop left, and the queue groans, and the keeper laughs and hands %n down off the counter, sore and tinglin' and drained, with a marshmallow for their trouble.",
+        "%n's milked dry before the pot's half full, and the keeper tops it up from a churn and doesn't tell anybody, and winks at %n as she lets them down.",
+        `"That's all you've got, sweetheart," says the keeper, givin' one last hopeful squeeze, and wraps %n in a blanket and sits them by the stove with the last mug.`,
+        "{t}The keeper squeezes %n's tits one more time and nothin' comes, and she pats them, very fond, and helps %n off the counter achin' and empty.",
+        "The pot's still pale and thin when %n runs dry, and the keeper sighs and hangs a sign on the stand, BACK SOON, and helps %n down to go and drink some water."
+      ]);
+      end(SEASON_LINES, "cocoastand", "endPour", [
+        "The keeper wraps %n in a cocoa-stained apron and helps them down off the counter, licked and sticky and smellin' like the whole winter fair.",
+        "%n's let down at closin' with cocoa dried in every crease and whipped cream in their eyebrows, and the last customer licks a stripe off their neck on the way past.",
+        "{t}The keeper licks the last marshmallow off one of %n's nipples herself, slow, and says that one was hers, and helps them down off the counter.",
+        "{c}%n's helped down off the counter with cocoa still dried round the base of their cock where the tongues got bored, and the keeper wipes it with her cloth, very carefully.",
+        "The stand closes and the keeper rinses %n down with a pail of warm water out the back, and they steam in the frost, licked clean in most places and chocolate in the rest."
+      ]);
+      end(SEASON_LINES, "ivy", "end", [
+        "The vine pulls out of %n's %h slow, leavin' %x glossy pods behind, and the ivy unwinds from their wrists and lowers them into the frosty grass at the foot of the wall.",
+        "%n's let down off the barn wall belly-round and berry-stained, %x of the ivy's pods packed warm in their %h, and the leaves pat their cheek as they go.",
+        "{t}The tendrils unwind from %n's tits last, leavin' leaf-shaped marks round each one, and %n slides down the wall with %x pods sittin' heavy in their %h.",
+        "The ivy sets %n on their feet, gentle as a gardener, %x pods in their %h and sap down their thighs, and pulls back into the wall, rustlin' to itself.",
+        "%n stumbles away from the old barn with %x of the ivy's pods in their %h, sticky to the knees with sap, and a single dark leaf tucked behind their ear."
+      ]);
+      end(SEASON_LINES, "ivy", "endTease", [
+        "The ivy loses interest all at once and drops %n in a heap at the foot of the wall, sap-slick and shiverin' and so wound up they claw at the frosty grass.",
+        "The tendrils let go one by one, slow, slidin' off %n's skin like they're sorry, and %n's left leanin' on the barn with nothin' inside them and everythin' achin'.",
+        "{t}The ivy gives %n's nipples one last tug, unwinds, and lets them go, and %n slides down the stones with leaf prints on their tits and their legs shakin'.",
+        "{c}The tendril round %n's cock squeezes once more, slow, root to tip, and lets go, and the ivy draws back into the wall, and %n's left throbbin' in the cold.",
+        "The ivy pulls back into the wall like it's been called away, and %n's left standin' bare in the frost with sap all over them and their whole body hummin', unfinished.",
+        "{v}The tendril slides out of %n's pussy, slick and slow, and the ivy settles back on the barn wall like it never moved, and %n's left drippin' and achin' and empty."
+      ]);
+      end(SEASON_LINES, "longnight", "end", [
+        "The last candle gutters out just as the sun clears the hill, and the farmhands untie %n, speckled red with wax from collarbone to knee and tremblin', and the farm cheers the sun home.",
+        "Dawn. The ring of candles is all stubs and puddles, and %n's untied from the middle of it, picked clean of wax by gentle fingers, and wrapped in the warmest blanket on the farm.",
+        "{t}The farm girl picks the wax off %n's nipples last, flake by flake, slow, while the sun comes up through the barn door, and kisses each one when it's bare.",
+        "The sun comes back, the way it always does, and %n's untied stiff and spotted red and glowin', and given the first warm bread of the new year straight out of the oven.",
+        "When the light comes, the farmhands blow out the candles one by one and untie %n, and they're red-starred and shakin' and so wide awake they could sing."
+      ]);
+    }
+    {
+      const end = (tab, kind, key, lines) => poolMore(kind, key, tab[kind] && tab[kind][key], lines);
+      end(SEASON_LINES, "eggdye", "end", [
+        "The dyers lift %n out of the last tub and set them on the dryin' rack, every colour of spring from their toes to their hair, and paint a little daisy on their bottom as a signature.",
+        "%n's untied off the egg rack dyed pink and yellow and duck-egg blue in stripes, and the dyers walk round them admirin' and tuttin' over a smudge on one hip.",
+        "{t}The last dyer finishes the flowers on %n's tits, a ring of tiny violets round each nipple, and blows on them to dry, and then they're let up off the rack.",
+        "The dye's set, the flowers are painted, and %n's let off the rack lookin' like the prettiest egg in the basket, flushed pink underneath the pastel in a way that isn't dye.",
+        "{c}%n's let up off the egg rack with their cock dyed a very cheerful shade of spring green, and the dyers swear it'll wash out in a week or two."
+      ]);
+      end(SEASON_LINES, "balance", "end", [
+        "The see-saw settles level as the sun touches the hill, day and night even, and the farmhands lift %n off the post shakin' and wet and right at the edge, and set them on the grass.",
+        "%n's unstrapped from the middle of the see-saw at sundown, every tilt still swayin' through them, and nobody lets them finish. That's what keeps it balanced, they say.",
+        "{v}They lift %n off the polished post with a slow wet sound, their pussy throbbin' from a day of slidin' up and down it, and they're so close they whimper at the breeze.",
+        "{c}%n's lifted down off the see-saw at sundown with their cock stiff and leakin' and achin', and the farmhands won't touch it. The night has to be as long as the day.",
+        "The two ends come down even at last, and the farmhands cheer, and %n slumps off the post into their arms, edgy and shakin' and so wound up they can barely stand."
+      ]);
+      end(SEASON_LINES, "hiddeneggs", "end", [
+        "The hunters count the baskets: %x eggs, every one found and fished out of %n, warm and melty, and they give %n the biggest one to eat and help them out of the straw.",
+        "%n pushes the last of %x chocolate eggs out into a hunter's waitin' hand and slumps back in the straw, sticky and empty and grinnin', and the loft cheers the find.",
+        "{v}The last of the %x eggs slides out of %n's pussy into a hunter's basket, melted soft at the edges, and the hunter kisses %n's knee and calls it the best hunt on the farm.",
+        "All %x found, and the hunters help %n down the hayloft ladder with melted chocolate down the backs of their thighs and foil wrappers stuck to their knees.",
+        "The hunt's won by whoever found the most of the %x eggs, and the winner gets to carry %n down out of the hayloft, sticky and glowin', and set them by the pump to wash."
+      ]);
+      end(SEASON_LINES, "hiddeneggs", "endTease", [
+        "Every egg tucked on %n is found, with fingers and with mouths, and the hunters help them out of the straw smeared with chocolate and squirmin' and very, very thoroughly searched.",
+        "The last egg was tucked in the crook of %n's knee, and findin' it took three hunters and a long while, and %n's let out of the straw flushed and laughin' and sticky.",
+        "{t}The last egg comes out from between %n's tits on a hunter's tongue, and the loft cheers, and %n's helped out of the straw with chocolate smeared all over their chest.",
+        "{c}The hunters find the last egg tucked against %n's balls, melted half away, and lick up what's left of it, and %n's helped out of the straw shakin'.",
+        "The hunt's over, every wrapper collected, and %n climbs out of the hay sticky in every dip and fold, and the hunters give them the last egg for bein' the best hidin' place.",
+        "%n's left in the straw when the hunters go, picked clean of eggs and chocolate-smeared and tinglin' from an hour of searchin' hands, and they lie there grinnin' at the rafters."
+      ]);
+      end(SEASON_LINES, "chocfountain", "end", [
+        "The fountain gurgles to a stop and %n's lifted out of the chocolate, glossy brown to the neck and licked pale in stripes, and the keeper towels them off with a cloth that's mostly cocoa.",
+        "{t}The last sweet tooth of the fair licks the chocolate off %n's nipples slow, and the keeper lets them down off the fountain sticky everywhere else and achin' there.",
+        "{c}%n's let down off the fountain with their cock licked clean and shinin' and everythin' else still glossy with chocolate, and the keeper says that's about right for the fair.",
+        "The keeper hoses %n down round the back of the stall, warm water and chocolate swirlin' round their feet, and they stand in it laughin', licked and sticky and very well tasted.",
+        "%n's let off the fountain with strawberries stuck to them in odd places and chocolate set hard in their hair, and they're still findin' the strawberries on the walk home."
+      ]);
+      end(SEASON_LINES, "bunnysuit", "end", [
+        "At sundown the farmhand unzips %n out of the bunny suit, cuff by cuff, and pulls the tail out slow, and %n sags onto the hay bale with the ears still on and their knees gone soft.",
+        "%n's let off the display with their ears askew and their cuffs undone and their tail a bit wonky from all the fair's fondlin', and the farmhand lets them keep the suit too.",
+        "{t}The bunny suit's peeled down off %n's tits last, slow, and their nipples are pink and sore from an afternoon of strokes through the satin, and the farmhand blows on them.",
+        "{c}The bunny suit comes off and %n's cock springs free after an afternoon bulgin' at the satin while the whole fair petted it, and the farmhand gives it one pat, for the display.",
+        "The display's packed away into crates, the other bunnies are long gone, and %n's last off the hay bale, flushed and petted and grinnin', with the fluffy tail in their hand."
+      ]);
+      end(SEASON_LINES, "marshmallow", "end", [
+        "The cook peels the last of the marshmallow off %n in sticky ribbons and hoses them down by the pump, and they're still pastel-sugared in their hair and between their toes.",
+        "{t}The kitchen's nibbled the marshmallow off %n's tits last, and their nipples are pink and tender and sugary, and the cook dabs them with a cold cloth and lets them go.",
+        "%n's lifted out of the sugar tray at the end of the day, nibble-marked all over and sticky as warm fluff, and the cook sends them home with a bag of sweets.",
+        "{c}The last of the marshmallow is licked off %n's cock by the cook herself, slow, and she pronounces it the best batch of the season, and wraps %n in a sugary towel.",
+        "%n walks out of the kitchen dusted pink and lemon and lilac, nibbled and sticky and very sweet, leavin' a trail of sugar behind them all the way across the yard."
+      ]);
+      end(SEASON_LINES, "bonnet", "end", [
+        "The judges hand %n's clothes back with a pastel rosette pinned to the bonnet and a scorecard full of tens, and %n walks out of the ring pink from the ears down.",
+        "%n's paraded round one last time to the cheers of the yard and handed a rosette for Best Ribbons, and nobody could say with a straight face they were lookin' at the ribbons.",
+        "{t}The head judge pins %n's rosette on the bonnet, not on their chest, though she looks at their tits a long while decidin', and %n walks out of the ring scarlet.",
+        "{c}%n gets Highly Commended, and the head judge says it's mostly for the bonnet, and looks straight at %n's cock as she says it, and the crowd laughs.",
+        "The parade's over, and %n's bonnet is wilted and their face is burnin', and they're handed their clothes in a bundle with the scorecard on top: nine for the bonnet, ten for the rest."
+      ]);
+      end(SEASON_LINES, "chocbunny", "end", [
+        "The last bite of chocolate comes off %n's ears and they're helped down off the cake stand bare and smeared brown and very well eaten, and the cook hands them a cup of cold milk.",
+        "{t}The chocolate shell's eaten off %n's tits last, bite by slow bite, and the cook licks the melt from their nipples and helps them down off the stand.",
+        "{c}The kitchen saves the chocolate round %n's cock for last and breaks it off in tiny bites, and %n's helped off the cake stand shakin' and sticky and grinnin'.",
+        "Nothin's left of the bunny but a few shards on the cake stand and a very sticky %n in the middle of them, and the kitchen hands give them a round of applause and a bowl of warm water.",
+        "%n climbs down off the stand with chocolate in every crease and bite marks on their thighs, and the cook says it's the first chocolate bunny she's made that liked bein' eaten."
+      ]);
+      end(SEASON_LINES, "puck", "endHeat", [
+        "%n stands up out of the clover still burnin', the love juice glintin' on their lids, and every farmhand they pass on the way home looks like the best idea they've ever had.",
+        "The farmhand's spent, and %n isn't, and the purple juice keeps workin' long after, and %n walks home through the meadow in heat with clover in their hair and wantin' everybody.",
+        "Somewhere in the hawthorn the sprite's still laughin' as %n picks themself up out of the long grass, in heat and achin' and lookin' round for the next pair of eyes.",
+        "{v}%n gets up off the farmhand flushed and drippin' and still in heat, the love-in-idleness hummin' in their blood, and their pussy aches every time somebody looks their way.",
+        "{c}%n rolls off the farmhand with their cock still stiff and wantin', the juice on their eyelids glintin', and they're in heat all the way home, and every face is the loveliest yet."
+      ]);
+      end(SEASON_LINES, "puck", "endPlain", [
+        "The spell wears thin with the sunset, and %n sits up in the clover blinkin' at the farmhand beside them, very well tumbled, and they both start laughin'.",
+        "%n wakes in the meadow at dusk, flushed and loose-limbed and sticky, with the farmhand's coat over them and no idea how long they were under the sprite's spell.",
+        "The love juice dries on %n's eyelids and flakes away, and they're just themselves again, lyin' in the clover with grass stains on their knees and a very satisfied ache.",
+        "The farmhand helps %n up out of the clover and picks the petals out of their hair, and %n's head's clear now, and they're blushin', and they don't let go of the farmhand's hand.",
+        "%n walks home through the long grass with the farmhand at sunset, purple stains on their eyelids and clover in their hair, and from up in the hawthorn the sprite blows them a kiss.",
+        "The magic fades, and %n remembers every second of it, and lies back in the clover with an arm over their eyes, grinnin' like a fool."
+      ]);
+      end(SEASON_LINES, "sunwheel", "end", [
+        "The wheel creaks to a stop with the last of the sun, and %n's untied with the flower garlands crushed against their skin and their whole body singin' and unfinished.",
+        "%n's let down off the great wheel dizzy as a weathervane, petals stuck to their sweat and so wound up that the crowd's cheerin' makes them shiver.",
+        "{t}The garlands come off %n's tits last, and they're sun-pink and hard at the tips and tender, and the farm girl presses a cool wet cloth to each before she unties their wrists.",
+        "{c}They untie %n from the sun wheel with their cock achin' from an afternoon of bein' turned and touched and never finished, and the farm girl tucks a rose behind their ear instead.",
+        "The sun's down and the wheel's still, and %n's lifted off it by four farmhands, crowned in roses and flushed from head to toe, and the green dances round them for the longest day."
+      ]);
+      end(SEASON_LINES, "mead", "end", [
+        "The head brewer pronounces the batch perfect and unbuckles %n from the barrel, licked to a shine and sticky in every crease, and pours them a horn of the very mead they were washed in.",
+        "%n's helped up off the barrel with honey in their hair and the brewers' tongues still tinglin' on their skin, and the whole mead hall raises a cup to them.",
+        "{t}The last brewer licks the last drop of mead from %n's nipple, slow, and says that's the best taste of the batch, and unbuckles them off the barrel.",
+        "{c}The brewers save the mead that ran down to %n's cock for last and lick it up between them, slow, and %n's unbuckled from the barrel shakin'.",
+        "%n's let off the barrel tipsy on the smell alone, gold and sticky to the knees, and they walk out into the summer evenin' glowin' and hummin'."
+      ]);
+      end(SEASON_LINES, "cornmaiden", "end", [
+        "The weaver unpicks the last plait from round %n's wrists at midnight, and they come out of the corn dolly straw-printed, flushed and achin', and the straw shell goes back up in the rafters.",
+        "%n's cut out of the corn maiden after the harvest supper, every lucky hand's touch still hummin' in them, and they're so wound up the weaver has to hold them steady.",
+        "{t}The plaits round %n's tits come off last, slow, leavin' little criss-cross marks, and the weaver brushes the straw dust off their nipples with her thumb.",
+        "{c}The weaver unweaves the straw round %n's cock last, after a night of the whole table touchin' it for luck, and %n's so close they gasp at the rustle.",
+        "%n climbs out of the corn maiden scratched and straw-printed and nowhere near finished, and the weaver ties the red ribbon round their wrist and says the luck's in them now."
+      ]);
+      end(SEASON_LINES, "grapestomp", "end", [
+        "The vat's trodden down to a purple sludge and the treaders lift %n out, slippery as a fish, stained to the eyebrows and laughin' so hard they can hardly stand.",
+        "{t}%n's lifted out of the vat with purple juice runnin' off the tips of their tits, and a treader licks one clean to taste the vintage, and nods, and licks the other.",
+        "%n sits on the rim of the vat at sunset with their legs danglin' in the crushed grapes, purple and sticky and well trodden, and the vintner hands them the first cup of the juice.",
+        "{c}%n climbs out of the grape vat purple to the eyebrows, their cock stained a deep plum colour, and the treaders swear the wine will taste of them.",
+        "The juice runs off into the barrels and the treaders carry %n out of the vat between them, purple and slick and limp with laughin', and dunk them in the rain barrel to rinse."
+      ]);
+      end(SEASON_LINES, "harvestsupper", "end", [
+        "The last crumb's licked off %n and the plates are cleared, and the cook unties them from the long table and helps them down, honey-sticky and butter-shiny and well fed upon.",
+        "%n's lifted off the harvest table at midnight with gravy dried on their ribs and apple crumble in their navel, and the farm raises its glasses to the centrepiece.",
+        "{t}The last of the cream is licked off %n's tits by the cook herself, slow, after everyone else is full, and then she unties them and sets them on their feet.",
+        "{c}The puddin' course was served on %n's cock, and the table took its time over it, and %n's untied at the end of the supper shakin' and sticky and very well fed on.",
+        "The candles burn low and the farm sits back, stuffed and happy, and %n's helped down off the long table glistenin' and licked clean and smellin' of the whole harvest."
+      ]);
+      end(SEASON_LINES, "ciderpress", "endMilk", [
+        "The cider man winds the screw back and lifts the board off %n, milked of %ml into the trough and sticky with apple from head to toe, and that batch gets the ribbon.",
+        `{t}%n's let out of the press with their tits soft and empty and pink at the tips, %ml of them gone into the cider, and the cider man taps the barrel. "Sweetest yet."`,
+        "%ml of %n's milk is in the cider by the time the press is wound back, and the cider man helps them up out of the apples, light and sticky and dazed with the smell.",
+        "The cider man milks the last drop out of %n through the slats, %ml in the trough all told, and lifts them out of the press onto a bed of clean straw to drip.",
+        "%n climbs out of the press %ml lighter and apple-sticky to the hair, and the cider man pours the first cup from the trough and drinks it lookin' straight at them."
+      ]);
+      end(SEASON_LINES, "ciderpress", "endDry", [
+        "The cider man squeezes and squeezes and nothin' more comes, so he winds the press back and lifts %n out of the apples, sore at the nipples and sticky all over.",
+        "%n's milked dry long before the trough's full, and the cider man says the apples'll have to do the rest, and helps them out of the press with a pat on the bottom.",
+        "Not a drop left in %n, however the cider man coaxes, and he laughs and lets them out of the press sticky with apple and achin' at the chest.",
+        "The cider man gives one last hopeful squeeze through the slats, gets nothin', and winds the screw back, and %n climbs out of the press emptied and smellin' like an orchard.",
+        "%n runs dry with the trough half full, and the cider man tops it up with plain apple juice and makes %n promise not to tell the judges.",
+        "{t}The cider man cups %n's tits one more time and squeezes and nothin' comes, and he sighs very fondly and lets them out of the press, sore and sweet and apple-sticky."
+      ]);
+      end(SEASON_LINES, "ciderpress", "endPress", [
+        "The board lifts and the cider man helps %n up out of the pulp, juice runnin' off them in sheets, pressed warm and sticky and smellin' like the whole orchard in October.",
+        "{t}The cider man licks the apple juice off %n's tits one more time before he lets them out of the press, slow, and says it's the best tastin' he's ever done.",
+        "{c}%n's let out of the press with their cock sticky and shinin' with apple juice, and the cider man wipes it with his thumb and tastes it and grins.",
+        "The cider man winds the press back and %n sits up in the crushed apples, sticky to the eyebrows, with apple pips in their hair and juice in every crease.",
+        "%n's helped out of the cider press onto the barn floor, slippery with juice, and the cider man wraps them in sackcloth and says the batch'll be named after them."
+      ]);
+    }
+    {
+      const more = (tab, kind, key, lines) => poolMore(kind, key, tab[kind] && tab[kind][key], lines);
+      more(TRAPS2_LINES, "carousel", "sleeve", [
+        "{c}First stop, and a ribbed sleeve drops onto %n's cock, warm as a mouth, and starts pumpin' in long slow strokes as the platform creaks round.",
+        "{c}The carousel jolts to the first station and a soft wet sleeve slides over %n's cock right to the root, and squeezes, and a glass jar below it waits to fill.",
+        "{c}At the first stop a sleeve closes round %n's cock and a little cup closes round their balls, and the two of them milk in turns while the wheel goes round.",
+        "{c}The milker at the first station takes %n's cock in a slick rubber sleeve and pulls, root to tip, root to tip, and the line under it goes cloudy.",
+        "{c}First stop: a sleeve so warm and tight it makes %n gasp, workin' their cock with a slow wet suck that doesn't let up till the next station's in sight."
+      ]);
+      more(TRAPS2_LINES, "carousel", "tease", [
+        "Second stop. A ring of soft rubber fingers comes up under %n and strokes between their legs, slow and light, never quite enough, all the way round.",
+        "At the second station a warm oiled pad presses up between %n's thighs and rubs in slow circles while the wheel creaks, and lifts away just as they push down on it.",
+        "{v}The second stop is a little buzzin' paddle that nudges right up against %n's clit and hums there, and the carousel moves on before it's done anythin' but tease.",
+        "{t}At the next station soft brushes spin against %n's tits, round and round over the nipples, till they're pink and achin' and the wheel moves on.",
+        "The carousel stops at a station full of feathers on long arms, and they flick and tickle every inch of %n's bare skin, and %n's squirmin' in the straps by the time it moves."
+      ]);
+      more(TRAPS3_LINES, "incubator", "eggs", [
+        "The lamp's glow sinks right through %n's skin, and they can feel every egg inside them, each one warm and round and growin' a little heavier with every minute.",
+        "%n lies curled under the incubator lamp with a hand on their belly, and the clutch inside shifts and settles and swells, and it's like bein' filled slowly from the inside.",
+        "The heat makes the eggs in %n ripen fast, their shells firmin' up, and %n's belly rounds out under the lamp till it's taut and shiny.",
+        "{v}Low in %n, packed up against their womb, the clutch swells in the heat, and every egg presses a little harder, and it's so full it aches sweet.",
+        "%n's belly creaks and stretches under the lamp, and they can feel new eggs crowdin' in among the old ones, more than they went in with, and the lamp hums on."
+      ]);
+      more(SEASON_LINES, "cocoastand", "milk1", [
+        "The keeper sits %n on the counter with their legs either side of the big copper pot and warms her hands on the steam before she reaches for them, and the first squeeze makes them gasp.",
+        "{t}The keeper lifts %n's top up over their tits and gives each one a slow knead before she starts, and when she squeezes, the milk comes in a long hot rope straight into the chocolate.",
+        "{nt}The keeper pinches and rolls %n's nipples between finger and thumb, coaxin', and the first thin streams come, and she grins and aims them at the pot.",
+        "Up on the counter goes %n, shirt open, and the keeper strips the first milk into the cocoa with quick practised fingers, and the queue leans in to see it hiss and swirl.",
+        "The keeper ties an apron round %n's waist and nothin' above it, sits them over the pot, and starts to milk them, slow and practised, while the chocolate bubbles under them."
+      ]);
+      more(SEASON_LINES, "cocoastand", "milk2", [
+        "Squeeze, pull, and stir. The keeper finds a rhythm and keeps it, and %n's milk rings off the copper in steady spurts while the queue stamps its feet in the cold.",
+        "{t}A customer at the front asks if they can try, and the keeper lets them, and now there's a stranger's warm hand on one of %n's tits and the keeper's on the other, milkin' in turns.",
+        "The cocoa goes from dark to milky brown to pale caramel, and the keeper tastes it off the ladle, smacks her lips, and goes back to %n for more.",
+        "{t}%n's tits are pink and heavy and tinglin' from all the handlin', and every squeeze sends a fine hot spray into the pot, and some of it down the keeper's apron.",
+        "The keeper milks %n with one hand and holds a mug under them with the other, and hands the warm mug straight to the first in the queue, still foamin'."
+      ]);
+      more(SEASON_LINES, "cocoastand", "drink", [
+        "Every mug that goes over the counter, the drinker gets a good look at where it came from, and some of them give %n's chest an approvin' pat while they wait for their change.",
+        "The queue goes right round the green, and every one of them gets a mug of %n, and they stand about in the snow sippin' and starin' and lickin' their lips.",
+        'A farmhand drinks their cocoa in one go, wipes their mouth, leans over the counter and kisses %n full on the lips. "Thank you," they say, and they get back in line.',
+        "{t}Somebody drinks their mug right in front of %n, slow, eyes on their tits the whole time, and then holds out the empty mug for a refill straight from the source.",
+        "The keeper chalks the price up on the board, then crosses it out and doubles it, and the queue doesn't get any shorter, and %n's nipples don't get any rest."
+      ]);
+      more(SEASON_LINES, "ivy", "tease", [
+        "The ivy plays with %n for hours, curlin' and uncurlin', squeezin' and lettin' go, and every time they're close it goes still and waits for them to calm down.",
+        "Little tendrils slip in behind %n's ears and under their arms and round the backs of their knees, ticklin', and the ivy rustles every time they squirm.",
+        "{t}The vines lift %n's tits and let them drop, lift and let them drop, and the tiny tendrils at the nipples tug in time, slow, like the barn's breathin'.",
+        "{c}A tendril strokes %n's cock from root to tip, slow as sap risin', and then another joins it, and they take turns, and never once go fast enough.",
+        "Sap beads on the leaves and drips onto %n's skin, warm and sticky and tinglin', and wherever it lands a tendril comes to lick it up."
+      ]);
+      more(SEASON_LINES, "hiddeneggs", "tease", [
+        "The farmhands lay %n out in the hay and hide the eggs on them one by one: one in each armpit, one under the chin, one between the toes, and they snicker over every hidin' place.",
+        "{t}A foil egg goes between %n's tits, and they're told to squeeze to keep it there, and another goes on top of it, and another, and %n's holdin' a whole stack.",
+        "{c}They tuck a chocolate egg under %n's balls and another either side of their cock, snug, and tell them very sternly not to let any melt.",
+        "The eggs go everywhere there's a fold or a dip on %n, in the bend of each elbow and the backs of their knees and the small of their back, warm from the farmhands' pockets.",
+        `"No peekin'," says the farmhand, and ties a ribbon over %n's eyes, and then the eggs go on, cool and smooth, in places %n can only guess at.`,
+        "{v}A little foil egg gets tucked right between %n's pussy lips, just the tip of it peekin' out, and the farmhand says that one's the prize egg and pats it."
+      ]);
+      more(SEASON_LINES, "ciderpress", "milk1", [
+        "The cider man rolls up his sleeves, reaches in through the slats of the press and finds %n's chest, warm and full, and starts to milk them into the juice trough in long slow pulls.",
+        "{t}Big rough hands close round %n's tits through the slats and squeeze, and the milk spurts down onto the crushed apples and runs off with the juice into the trough.",
+        "{nt}The cider man rolls %n's nipples between his fingers through the slats, patient, coaxin', till the first thin streams come and drip down into the apple pulp.",
+        "The press holds %n snug and still, and the cider man milks them the old way, one hand for the squeeze and one to catch it, and tips each cupped handful into the trough.",
+        "The smell of apples is so thick %n can taste it, and the cider man's hands work at their chest, slow and steady, and the milk joins the juice with a soft patter."
+      ]);
+      more(SEASON_LINES, "ciderpress", "milk2", [
+        "Another turn of the screw squeezes the apples round %n, and the cider man squeezes %n in the same rhythm, and juice and milk run out together, pale gold.",
+        "{t}%n's tits are slick with apple juice now and the cider man's hands slide on them, and he has to squeeze harder, and the milk comes harder too.",
+        "The cider man tastes the trough with a wooden spoon, and his eyes close, and he winds the screw another half turn and goes back to milkin' %n with fresh enthusiasm.",
+        "{c}Somewhere in all the squeezin' the cider man's other hand finds %n's cock through the slats, and he strokes it slow in time with the milkin', and %n moans into the apples.",
+        "The pressin' board creaks down another notch, snug, and %n's pinned there among the apples, milked and pressed and milked again, while the trough runs creamier by the minute."
+      ]);
+      more(TRAPS3_LINES, "auction", "busy", [
+        `The block's already got somebody on it, mid-sale, and the auctioneer waves %n off with his gavel. "Wait your turn, sugar." The cuffs fall open.`,
+        `The cuffs snap shut on %n's wrists and then pop right open again, and the farm girl shrugs. "Block's full today. You'll keep."`,
+        "%n's halfway up the block steps when the bell rings for a sale already goin', and a farmhand catches them by the elbow and walks them back down.",
+        `"One at a time," says the auctioneer, pointin' his gavel at the poor soul already on the block, and %n's let go with a pat on the bottom and a wink.`,
+        "The trapdoor drops %n into the auction ring, but the ring's busy, and the farm girl helps them up, dusts them off and says she'll save them a place next time.",
+        `The bidders are all busy shoutin' over somebody else, and nobody even looks round when %n's cuffed, so the farm girl sighs and lets them go. "Not today, then."`,
+        "%n's led up to the block and stood there, and then the auctioneer remembers the farm's already got a sale on, and sends them off with a ribbon tag that says NEXT."
+      ]);
+    }
     const CHATLOG = { live: /* @__PURE__ */ new Map(), who: /* @__PURE__ */ new Map(), lastSave: 0, hourKey: "" };
     const logHour = (t) => {
       const d = new Date(t);

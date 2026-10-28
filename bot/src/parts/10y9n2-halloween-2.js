@@ -58,7 +58,7 @@
     tender: ["The brew is warm as a bath, and the witch keeps %n's chin above it with one gentle hand.", "She hums while she stirs, and it's the most peaceful %n's felt all week.",
              "She checks the heat with her elbow, the way you'd check a bath, and adds a little cold."],
     filthy: ["The witch stews %n like a dumplin' and feels up every inch of the meat.", "%n's soakin' in a cauldron of sex magic with a witch's fingers in them, and they've never been hornier.",
-             "She tells %n they'll make a lovely familiar, and scritches them under the chin like a naughty kitten."],
+             "She tells %n they'll make a lovely familiar, and scritches them under the chin like a naughty cat."],
     mess: ["brew", ["chest", "tummy", "face"]],
     gear: [{ when: "hold", slot: "device", label: "The Witch's Cauldron", items: ["MilkCan"], color: "#1A1A1A", desc: "A great black iron pot, big enough to sit in up to the chin, bubblin' with somethin' warm and purple that smells of plums and spice." }],
     depth: ["held", "tease", "mess"], tw: ["night"], places: ["cabin", "trough", "wildlife"], sound: "wet", soundEnd: "wet", tags: ["messy"],
@@ -135,7 +135,7 @@
              "The smell of warm caramel and roasted nuts carries right across the fair, and the line gets longer.",
              "Somebody dribbles a little more caramel over %n's shoulders, for the ones at the back of the queue."],
             ["{t}A tongue circles each of %n's nipples, round and round, till the caramel's gone and the nipple's hard and pink.",
-             "{c}Somebody sucks the caramel off the tip of %n's cock like a lollipop, and %n's knees buckle.",
+             "{c}Somebody sucks the caramel off the tip of %n's cock like it's the sweetest apple at the fair, and %n's knees buckle.",
              "{v}A tongue digs for caramel between %n's legs and finds somethin' sweeter.",
              "Somebody licks the caramel off %n's neck and nibbles, and pays extra for the nibble."]],
     tender: ["Every lick is soft and slow and sweet, and every customer says thank you.", "The stall keeper gives %n sips of cold cider between customers.",
@@ -270,7 +270,7 @@
 
   // the costume trunk: what they come out as (only pieces the game has, checked in the farm's own outfits)
   const COSTUMES = [
-    { x: "kitten", sp: /kitt|cat/, ears: "KittenEars2", tail: "KittenTailStrap1", color: "#1A1A1A" },
+    { x: "cat", sp: /kitt|cat/, ears: "KittenEars2", tail: "KittenTailStrap1", color: "#1A1A1A" },
     { x: "bunny",  sp: /bun|rabbit/, ears: "BunnyEars1", tail: "BunnyTailStrap" },
     { x: "fox",    sp: /fox/, ears: "FoxEars1", tail: "FoxTailsStrap" },
     { x: "puppy",  sp: /pup|dog|wolf/, ears: "PuppyEars1", tail: "PuppyTailStrap" },
@@ -322,7 +322,7 @@
     filthy: ["Groped by every costume in the trunk at once, %n's the dress-up doll the attic's been waitin' for.", "The gloves finger %n open and the boa rubs them raw, and %n's moanin' into a mask.",
              "%n comes out of that trunk dressed for the party and drippin' like they've already been to it."],
     // (before() picks the costume each time; this is the one the equipment list shows)
-    gear: [{ when: "after", slot: "ears", label: "Costume Ears", items: ["KittenEars2"], color: "#1A1A1A", mins: 60, only: true, desc: "A pair of costume ears out of the attic's trunk: a kitten's, a bunny's, a fox's, a pup's, a pony's, a mouse's or a cow's. They come off in an hour." },
+    gear: [{ when: "after", slot: "ears", label: "Costume Ears", items: ["KittenEars2"], color: "#1A1A1A", mins: 60, only: true, desc: "A pair of costume ears out of the attic's trunk: a cat's, a bunny's, a fox's, a pup's, a pony's, a mouse's or a cow's. They come off in an hour." },
            { when: "after", slot: "tail", label: "Costume Tail", items: ["KittenTailStrap1"], color: "#1A1A1A", mins: 60, only: true, desc: "The tail to go with the ears, strapped on snug. It wags a little on its own." }],
     depth: ["held", "tease"], tw: ["alone"], places: ["office", "cabin", "rubber"], sound: "creak", soundEnd: "unlock", tags: [],
   });
@@ -338,7 +338,7 @@
       treat1: ["The door opens a crack and a hand comes out holdin' a candy wrapped in orange foil. \"Treat,\" says the voice. \"Come closer for the rest of it.\"",
                "\"Treat!\" says the door, and swings open, and there's nobody behind it, just warm air and the smell of chocolate, and somethin' pulls %n through."],
       treat2: ["Hands from the other side of the door undo %n's clothes, gentle, and a warm mouth kisses its way down their belly.",
-               "{c}A mouth on the other side of the cat flap finds %n's cock and sucks, slow and sweet, like a lollipop.",
+               "{c}A mouth on the other side of the cat flap finds %n's cock and sucks, slow and sweet, like the best candy in the bag.",
                "{v}A tongue through the letterbox licks %n's pussy, slow, like it's the treat and not them.",
                "{t}The door's knocker turns into a hand and cups %n's tit, and the letterbox purrs."],
       treat3: ["The door hums and the mouth keeps goin', sweet and slow, until %n's meltin' against the wood like warm toffee.",

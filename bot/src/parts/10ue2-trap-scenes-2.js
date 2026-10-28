@@ -59,13 +59,13 @@
      "%n's lost in the corn, lost in him, and the stalks overhead sway in time."]);
   trapScene("honey",
     ["The syrup runs down %n's back and between their cheeks, warm and slow, and pools wherever they bend.",
-     "A cat-eared milkmaid finds %n first and licks a sticky stripe up their calf with her rough little tongue.",
+     "One of the barn's cat-folk finds %n first and licks a sticky stripe up their calf with a rough little tongue.",
      "{t}It drips off the ends of %n's nipples in long golden strings, and a farmhand catches one on a finger and tastes it.",
      "A goat-man off the hill strolls in, sniffs, and starts on %n's toes, then works upward with great dedication."],
-    ["Every hand on the farm has found %n now, and they're all licking, rough and wet, in every sticky place at once.",
+    ["Every one of the farm's animal folk has found %n now, and they're all licking, rough and wet, in every sticky place at once.",
      "{v}A big warm tongue works the syrup out from between %n's legs, deep and patient, and keeps going long after it's clean.",
      "{c}A tongue cleans %n's cock from root to tip, again, and again, much more often than it needs.",
-     "%n is squirming in a pool of syrup, licked raw and sweet, and the farm folk keep queuing up."]);
+     "%n is squirming in a pool of syrup, licked raw and sweet, and the animal folk keep queuing up."]);
   trapScene("wheel",
     ["Between stops the wheel spins, and %n's whole world spins with it, and every time it stops a new one's waiting.",
      "The crowd chants the spins. \"Bull! Bull! Bull!\" The wheel clicks past and stops on somethin' else.",
@@ -160,7 +160,7 @@
      "The champion is led round and given another go, because the book says three ties, and the book is never wrong."]);
   trapScene("leashpost",
     ["The leash is short, and %n can only kneel or stand bent, and everyone who walks past the dog yard gets an eyeful.",
-     "A kennel hand wanders over and looks %n over thoroughly, front and back, and grins.",
+     "One of the kennel's dog-folk wanders over and sniffs %n thoroughly, front and back, and wags.",
      "Somebody stops, unbuckles, and has %n quick against the post, and doesn't say a word.",
      "{t}A passer-by gives %n's tits a slap on the way past, like you'd pat a good dog."],
     ["The next one's slower. Takes their time. Talks to %n the whole way, calls them a good dog, a good pup, a good pet.",
@@ -216,10 +216,10 @@
   // ── the sty ──
   trapScene("slop",
     ["The slop is warm and thick and it's in %n's hair, their ears, their mouth when they gasp.",
-     "The pigs shove and grunt round %n's knees, snufflin' up every scrap that drops off them.",
+     "The pig-folk root at %n with their wet snouts, snufflin' into every crease, lookin' for scraps.",
      "A pig roots a bit of turnip out of %n's hair and squeals about it.",
      "The pig keeper pours another pail right over %n's head, laughing, and calls the pigs."],
-    ["%n's being jostled by six pigs at once, all after the slop, and the pig keeper has pulled up a stool to watch.",
+    ["%n's being rooted over by six of the pig-folk at once, and the pig keeper has pulled up a stool to watch.",
      "%n gives up trying to climb out and just wallows in it, filthy, squealing like one of them.",
      "The boar-man who keeps the sty leans on the rail on two legs, looks %n over, and decides they're the sweetest thing in the trough.",
      "The pig keeper leans over the rail and slaps %n's slop-covered rump. \"There's my best piggy.\""]);

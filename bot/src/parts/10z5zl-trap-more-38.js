@@ -1,7 +1,7 @@
   /* WHAT'S IN THIS FILE (10z5zl-trap-more-38.js)
      The farm's traps, batch 13 (10z5-trap-more.js): the hogtie in the sty, the milkin' hole and the feedbag. Every
-     beat eight lines or more, and each one's two beats of its own (10ue-trap-scenes.js) from four to eight. The pigs
-     only watch: the pig girl, the boar-man and the pig keeper do the rest. %n their name
+     beat eight lines or more, and each one's two beats of its own (10ue-trap-scenes.js) from four to eight. %n their
+     name
   */
   // ── the hogtie ──
   trapMore("hogtie",

@@ -36,7 +36,7 @@
       "A row of little jars on a shelf tip over one after another, plop, plop, plop, down %n's back, till they're drippin' %x from the neck down.",
       "%n sits down on a bench that's been brushed thick with %x, and two arms with big pastry brushes come up from behind and finish the job.",
       "{t}A ladle on a jointed arm scoops %x out of a steamin' pot and pours it right down the front of %n, between their tits, slow, and then goes back for another scoop."],
-    "Then the farm folk smell it.", [
+    "Then the farm's animal folk smell it.", [
       "A dairy hand with big soft ears kneels down and licks the %x off the back of %n's knee, slow and serious, like they're cleanin' a spoon.",
       "Two farmhands take an arm each and lick %n's fingers clean one at a time, and then their wrists, and then they keep goin'.",
       "A goat-man off the hill gets %n by the ankle and licks a long sticky line all the way up the inside of their leg, and stops, grinnin', right at the top."],

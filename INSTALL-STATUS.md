@@ -5,7 +5,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 | Script | File in `dist/` | Where it runs | Current |
 |---|---|---|---|
-| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.64.0** |
+| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.65.0** |
 | Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.10.0** |
 | Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.2.1** |
 | Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **1.1.0** |
@@ -24,6 +24,13 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 ## Latest changes (newest first)
 
+- **Bot 0.65.0: the rubber traps, the well and the golden trough tell their full stories, eight lines a beat.** No Companion update needed.
+  - **The rubber traps:** the trough leeches, the livin' suit, the vacuum bed, the rubber vat, the doll press, the rubber milkin' stall, the body bag, the rubber dairymaid and the black pool in the woods.
+  - **The thing in the well:** more ways it catches you at the well mouth, more of the dark down the shaft, and more of its two beats of its own.
+  - **The golden trough** (only for somebody who said `?watersports on`): every beat grown too. The streams come from the farm folk at the stall rails above, never the barn's animals.
+  - Every beat of each one now picks from eight lines or more, and so do the two beats of its own. About 290 new lines, each one fitted to the body it's about.
+  - **A few words changed:** the leeches latch on like milkin' cups (not calves); the trough leaves you marked by every stall on the row.
+  - **Next:** every trap's endin' lines, grown the same way.
 - **Bot 0.64.0: thirty more traps tell their full stories, eight lines a beat.** No Companion update needed.
   - **The fair, the kitchen and the barn:** the fair stocks, the windmill, the chocolate fountain, the bakery bench, the creamery, the seed shower, the groomin' table, the leash post, the teat check, the wax bench, the trapper's trophy wall, the slop bucket, the hogtie, the milkin' hole and the feedbag.
   - **The office:** the overseer's desk, the clipboard inspection and the office stamps.

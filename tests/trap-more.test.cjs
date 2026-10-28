@@ -51,11 +51,12 @@ const LEAK=/\{(nv|nc|nt|fu|fb|nb|ok|v|c|t|f|m)\}|%[a-z]{1,8}\b|\bundefined\b|\bN
   const spring=async(k)=>{ for (const mn of [500,600,700,800]){ free(mn); W.__st().lastCmd&&W.__st().lastCmd.clear(); await say(221397,'?trap spring '+P(mn).name+' '+k,100); free(mn); } };
   const missing=k=>TM[k].filter(([h])=>!Object.keys(res[k]||{}).some(p=>p.startsWith(h))).map(([h])=>h);
   for (const k of KINDS){
+    for (const mn of [500,600,700,800]) P(mn).watersports = k==='trough';   // the golden trough only springs for somebody who said ?watersports on
     for (const f of (SF[k] ? Object.keys(SF[k]) : [null])){ cur=f; W.__studForce=f?{[k]:f}:null; await spring(k); await spring(k); }
     // a story that branches (trick or treat, win or lose) takes a few more goes to see every branch
     for (let t=0; t<8 && missing(k).length; t++){ for (const f of (SF[k] ? Object.keys(SF[k]) : [null])){ cur=f; W.__studForce=f?{[k]:f}:null; await spring(k); } }
   }
-  W.__studForce=null; W.__onTrapBeats=null;
+  W.__studForce=null; W.__onTrapBeats=null; for (const mn of [500,600,700,800]) P(mn).watersports=false;
   out('traps with more of their own lines:', KINDS.length);
   ok(KINDS.length>=79, 'at least the first 79 traps have had their beats grown');
 

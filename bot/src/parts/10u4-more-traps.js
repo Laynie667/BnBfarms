@@ -468,7 +468,7 @@
         ["It pools round %n's knees and climbs. They're soaked, they're steamin', it's in their mouth, and it's still comin'.",
          "%n gasps and gets a mouthful. Swallows before they think. The trough's fillin' up round their thighs.",
          "They kneel there and take it, piss sheetin' off their tits, hair plastered down, a puddle risin' to their lap."],
-        ["The pipes dribble out. The bars lift. %n climbs out of the trough drenched, stinkin', drippin' yellow, marked by every animal on the row.",
+        ["The pipes dribble out. The bars lift. %n climbs out of the trough drenched, stinkin', drippin' yellow, marked by every stall on the row.",
          "Done. %n is let up, wet to the skin and reekin', with gold runnin' off their chin. Everybody they pass is goin' to know.",
          "The last spout sputters over %n's face and stops. They step out of the trough soaked and steamin', and leave wet footprints all the way down the lane."],
       ],

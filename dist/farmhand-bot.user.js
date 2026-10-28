@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.64.0
+// @version      0.65.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -2748,7 +2748,7 @@
   ];
 
   // bot/src/version.js
-  var VERSION = "0.64.0";
+  var VERSION = "0.65.0";
   var COMPANION_VERSION = "0.50.0";
 
   // bot-parts:farmhand-bot-parts
@@ -16473,7 +16473,7 @@
             "They kneel there and take it, piss sheetin' off their tits, hair plastered down, a puddle risin' to their lap."
           ],
           [
-            "The pipes dribble out. The bars lift. %n climbs out of the trough drenched, stinkin', drippin' yellow, marked by every animal on the row.",
+            "The pipes dribble out. The bars lift. %n climbs out of the trough drenched, stinkin', drippin' yellow, marked by every stall on the row.",
             "Done. %n is let up, wet to the skin and reekin', with gold runnin' off their chin. Everybody they pass is goin' to know.",
             "The last spout sputters over %n's face and stops. They step out of the trough soaked and steamin', and leave wet footprints all the way down the lane."
           ]
@@ -27967,7 +27967,7 @@
         ],
         [
           "Leeches. Big ones. Two find %n's nipples before they can straighten up and latch on with soft round mouths, and start to suck, slow and strong.",
-          "They fasten on %n's teats like calves, cool and slick, and begin to feed. Each pull goes right through to the root of them."
+          "They fasten on %n's teats like milkin' cups, cool and slick, and begin to feed. Each pull goes right through to the root of them."
         ],
         [
           "More of them inch up %n's thighs, lookin' for somewhere soft. One settles over their clit and seals on. %n's legs fold.",
@@ -55708,6 +55708,516 @@
         "The stable girl brushes %n down in the stall with a soft brush, all over, and lingers in the places the harness rubbed.",
         "{t}The stable girl unbuckles the harness strap by strap, and runs her hands over %n's tits where the straps crossed, slow, and %n leans into it.",
         "{v}In the stall the stable girl slides two fingers into %n's pussy from behind while they're still in the bridle, and they stamp and whinny round the bit."
+      ]
+    );
+    trapMore(
+      "leeches",
+      "%n leans over the trough for a drink. The water isn't empty.",
+      [
+        "%n sits on the edge of the old horse trough to cool their feet, and somethin' soft and heavy curls round their ankle under the water and starts to climb.",
+        "The trough's gone dark and still, and when %n leans in to look, a glossy black shape the length of their forearm lifts out of the water and lands on their collarbone with a wet smack.",
+        "A farmhand splashes %n from the trough for a joke, and the splash isn't all water: three fat leeches come with it, and they land and stick.",
+        "{t}%n bends over the trough to wash, and their tits dip into the cool water, and when they straighten up there's somethin' black and glossy hangin' from each one."
+      ],
+      "Leeches. Big ones.",
+      [
+        "The leeches are soft and cool and heavy as wet silk, and when their mouths seal on it's not a bite, it's a kiss that keeps on pullin'.",
+        "Each leech pulses as it drinks, a slow squeeze and release, and %n can feel every swallow tug a little deeper.",
+        "{t}The leeches on %n's tits draw the nipples deep into their soft mouths and pull, and a thin trickle of milk runs out round the seal, and the leeches swell."
+      ],
+      "More of them inch up %n's thighs, lookin' for somewhere soft.",
+      [
+        "A leech slides up the crease of %n's thigh, slow, leavin' a cool wet trail, and stops right where they're warmest, and stays.",
+        "{v}A long leech nudges between the lips of %n's pussy, finds the wet, and drinks from it, and with every pull it works a little deeper.",
+        "{c}A fat leech wraps itself round %n's balls like a warm wet hand, seals its mouth to the skin underneath, and starts to suck."
+      ],
+      "%n kneels by the trough with a leech on each tit",
+      [
+        "The leeches swell fat and glossy and heavy on %n, and every one of them pulses on its own rhythm, so there's never a moment's rest.",
+        "%n tips back against the trough with their knees apart and their eyes half shut, and lets the leeches drink, and moans every time one tugs.",
+        "One by one the leeches drop off full and roll back into the trough, and %n's left pink and puffy and tinglin' everywhere they were.",
+        "{c}The leech on %n's cock pulls and pulls in slow waves, and %n spills into it, and it drinks that too, and keeps goin'."
+      ]
+    );
+    trapSceneMore(
+      "leeches",
+      [
+        "The leeches' mouths are ringed with tiny soft ridges that ripple as they suck, and %n can feel every ripple.",
+        "A leech crawls slow up %n's belly, leavin' a glossy trail, and settles in the dip of their navel to drink.",
+        "{nt}The leeches on %n's nipples tug them out long and puffy, and every pulse makes %n arch their back.",
+        "{v}A leech settles over %n's clit and pulses, slow and steady, and %n's hips start to rock in time with it."
+      ],
+      [
+        "%n's covered in fat glossy leeches now, a dozen of them, and every one is drinkin', and %n's stopped countin'.",
+        "The trough water's gone still again, but %n can see more dark shapes driftin' up from the bottom, waitin' their turn.",
+        "{t}The leeches on %n's tits have swollen to the size of plums, and their weight drags the nipples down, and %n whimpers.",
+        "When the last leech lets go %n's sore and swollen everywhere one fed, and so sensitive that a breath of wind makes them shiver."
+      ]
+    );
+    trapMore(
+      "suit",
+      "Somethin' drips from the rafters onto %n's thigh",
+      [
+        "%n reaches into a bucket of what they think is tar for the fence posts, and it's warm, and it holds their hand, and when they pull free a glossy black glove's still on their fingers.",
+        "A drop of black falls from the barn roof onto the back of %n's neck, warm as breath, and spreads into a little shiny collar before they can reach it.",
+        "%n finds a glossy black puddle in the straw that wasn't there yesterday, and steps over it, and it reaches up after their ankle.",
+        'A farmhand hands %n a shiny black glove they found in the tack room, "this yours?", and when %n takes it, it closes round their hand by itself.'
+      ],
+      "They try to wipe it off. It doesn't smear.",
+      [
+        "%n tries to scrape it off with a fingernail and the black ripples away from the nail and comes back, and somehow there's a little more of it.",
+        "The patch is warm and smooth as a polished boot, and when %n presses it, it presses back, gently, the way a hand would.",
+        "%n washes it under the pump, cold and hard, and the black just gleams brighter and creeps another finger's width further.",
+        "{t}A thin glossy line runs up from the patch, over %n's hip and up their side toward their tits, like a vine growin' along a wall."
+      ],
+      "%n scrubs at it with a handful of straw.",
+      [
+        "The black's reached %n's waist now and wrapped round it like a belt, warm and snug, and it squeezes a little whenever they breathe in.",
+        "It flows down over %n's knee and calf and wraps their foot, and when they put the foot down it's a shiny black boot with a heel.",
+        "{c}The black slides over %n's balls and wraps them snug in a glossy pouch, warm and tight, and gives them a slow squeeze.",
+        "{v}The black slicks down between %n's thighs and covers their pussy in a glossy seal, and then it starts to press in, slow and warm."
+      ]
+    );
+    trapSceneMore(
+      "suit",
+      [
+        "The suit's crept up over %n's belly and round their back, and it shines in the light like a wet stone, and moves when they breathe.",
+        "Where the black meets bare skin it's soft and clingin', like a kiss that won't let go, and every minute it's a little further on.",
+        "{nt}The black slicks over %n's flat chest and shrinks tight, every rib and both nipples printed in gloss.",
+        "%n's whole leg's black and shinin' from hip to toe now, and it's warm, and they can feel every brush of straw against it twice as hard."
+      ],
+      [
+        "The suit tightens everywhere at once, a long slow squeeze from neck to toes, and lets go, and %n gasps like they've been hugged hard.",
+        "It's crept up to %n's collar and wrapped their throat in a glossy black band, snug, and it's started up over their jaw.",
+        "{t}The suit squeezes %n's tits in slow pulses like a milkin' hand, and the shiny black over the tips goes damp.",
+        "{c}The black sheath round %n's cock ripples from root to tip, over and over, like it's swallowin', and %n's knees go weak."
+      ]
+    );
+    trapMore(
+      "vacbed",
+      "The rubber shed door swings shut behind %n",
+      [
+        `%n's walked into the rubber shed by a stable hand in a black apron, who says "you've been workin' too hard, have a lie down," and points at the frame.`,
+        "The rubber shed's warm and smells of talc and latex, and the vacuum bed's laid out on its table like a big black envelope, unzipped and waitin'.",
+        "Two hands in black gloves lift %n by the arms and legs and lay them in the open vacuum bed, flat on their back, arms out a little from their sides.",
+        "{t}The stable hand dusts %n all over with talc first, slow and thorough, lingerin' on their tits, and then lays them down on the bottom sheet.",
+        "A sign on the rubber shed door says NAP ROOM, which turns out to be technically true."
+      ],
+      "The zip runs all the way round",
+      [
+        "The top sheet's laid over %n slow, from their feet to their chin, cool and heavy, and smoothed down with gloved hands so there's not a crease.",
+        "The zip purrs round the edge, past %n's feet, up one side, round their head, down the other, and closes with a little click.",
+        `%n's arms are laid just so, palms flat, fingers spread, and the stable hand says "stay like that," and soon they won't have a choice.`,
+        "The breathin' tube's fitted between %n's lips, and the stable hand taps it twice and listens, and nods, and reaches for the pump switch.",
+        "{c}The stable hand lays %n's cock flat up their belly before the top sheet goes on, and smooths the latex down over it carefully."
+      ],
+      "The pump starts.",
+      [
+        "The latex comes down slow, first on %n's chest, then their belly, then their thighs, and then all at once everywhere, and they can't even curl a toe.",
+        "%n can feel the rubber pull into the hollow of their throat and the creases of their elbows and between each finger, holdin' them in a perfect print.",
+        "Every breath %n takes is a little one, through the tube, and the latex lifts a hair's breadth with it and settles back, tighter.",
+        "{t}The latex sucks down over %n's tits and moulds round every curve, and their nipples poke up through the black, stiff and shiny."
+      ],
+      "The hand runs gloved fingers over the sheet",
+      [
+        "The stable hand rests a warm palm flat on the latex over %n's belly and leaves it there, and %n can feel the heat soak through and nothin' else.",
+        "Somebody sits on the edge of the frame and reads the paper while %n lies sealed beside them, and turns a page now and then, and pats the latex.",
+        "A feather goes slow down the sheet from %n's throat to their toes, and they can feel every barb of it through the rubber, and can't flinch.",
+        "{v}The wand settles on the latex between %n's legs, pressed down firm, and the hand turns it up one click at a time, and %n can't move away.",
+        "{c}A gloved hand rubs slow circles on the latex over the head of %n's cock, and %n can't buck or squirm, only shake."
+      ]
+    );
+    trapSceneMore(
+      "vacbed",
+      [
+        "The shed's quiet except for the hum of the pump and the squeak of latex, and %n's own breath whistlin' in the tube.",
+        "{t}A gloved fingertip traces round each of %n's nipples through the sheet, round and round, slow, and they can't even arch into it.",
+        "The stable hand switches the pump off for a moment, and the latex sighs and loosens, and %n gasps, and then it comes on again.",
+        "{v}Every throb between %n's legs presses them into the rubber, and the rubber presses back, and it's like bein' held exactly where they ache.",
+        "{nt}The latex sucks tight over %n's flat chest, and their nipples stand up through it, and somebody taps each one with a fingernail."
+      ],
+      [
+        "A crowd from the dairy come in on their break and stand round the bed with their tea, and take turns pressin' their hands to the sheet.",
+        "%n's been flat so long they've stopped knowin' where they end and the rubber begins, and every touch lands everywhere.",
+        "When the pump finally stops and the zip comes open, %n's lifted out pink and shiny and limp and laid on a towel, and the cool air feels like ice.",
+        "Somebody kneels by %n's head and kisses them through the latex, a soft rubbery press on their mouth, and stays."
+      ]
+    );
+    trapMore(
+      "rubbervat",
+      "There's a vat in the rubber shed as big as a horse trough",
+      [
+        "The rubber shed's hot and close and smells of warm latex, and the vat in the middle burps one slow black bubble as %n walks past, like it's sayin' hello.",
+        `%n's stood on a little wooden platform over the vat by a farm hand who says "arms up," and when they lift them a sling's slipped round their middle and the platform folds away.`,
+        "A sign on the vat says DO NOT LEAN, and %n leans to read the small print, and the small print says SEE?",
+        "{t}The farm hands strap %n into a dippin' harness, a band under their tits and another round their hips, and swing them out over the vat on a little crane.",
+        `%n's stripped, oiled all over "so it peels nice later," and walked up the steps to the vat with a farm hand holdin' each elbow.`
+      ],
+      "It's warm as a bath and thick as honey",
+      [
+        "The latex creeps up %n's thighs as they sink, heavy and warm, and it fills every gap between their skin and itself without leavin' a bubble.",
+        "%n's lowered slow, an inch at a time, and the latex climbs them like a tide, past their knees, past their hips, up over their belly, and holds.",
+        "The vat's so thick %n doesn't sink so much as get swallowed, and when they kick, the latex just hugs their legs tighter.",
+        "{c}The latex wraps round %n's cock and balls as they go under, warm and heavy, and squeezes them like a fist made of syrup.",
+        "{v}The warm latex slides up between %n's thighs and presses into every fold, and when it starts to set it's like bein' held there by a warm hand."
+      ],
+      "Up they come, glistening",
+      [
+        "Each coat goes on thinner and sets quicker, and with each one the rubber pulls a little tighter, till %n can feel it hug them when they breathe.",
+        "Between coats the farm hands fan %n with big flat paddles to set the latex, and the cool air on the warm rubber makes them shiver all over.",
+        "The last dip's to the chin, and when they bring %n up the rubber's set smooth over every curve, with not a wrinkle or a bubble anywhere.",
+        "{t}%n's tits come up out of the last dip round and heavy in their black coat, and the drips run off the tips in long glossy strings."
+      ],
+      "A hand with a rag and a bottle of polish goes over every inch",
+      [
+        "The farm hands take %n off the hook and stand them in front of the long mirror, and %n can't stop lookin' at the shiny black stranger lookin' back.",
+        "Somebody fetches a pair of shears and snips the drips off %n's toes and fingertips, neat, like trimmin' a candle.",
+        "%n's walked round the shed for the other hands to see, squeakin' with every step, and every hand that touches them comes away shiny.",
+        "{v}A farm hand presses two gloved fingers against the rubber between %n's legs, and it's so thin and tight %n feels every ridge of the glove.",
+        "{c}A farm hand wraps a polishin' rag round %n's sheathed cock and buffs it to a mirror shine, stroke after slow stroke."
+      ]
+    );
+    trapSceneMore(
+      "rubbervat",
+      [
+        "The latex is still warm and soft as it sets, and every time %n moves it squeaks and clings, and the sound goes straight through them.",
+        "A farm hand runs a wide brush down %n's back from neck to rump in one long stroke, smoothin' the coat, and %n arches into it like a cat.",
+        "The vat burps and bubbles under %n's danglin' feet, and every so often they're lowered back in up to the knees, just to keep it fresh.",
+        "{nt}The latex sets over %n's flat chest so tight their nipples stand out like rivets, and a farm hand taps each one with a fingernail.",
+        "{t}The coat's set so thick over %n's tits it squeezes them, and every breath makes them strain against the black."
+      ],
+      [
+        "The new skin's so tight and thin %n can feel every breath of air on it, every touch, twice as sharp as before.",
+        "The farm hands argue over whether %n needs one more coat, and settle it by givin' them one more coat.",
+        "%n's set on a stool by the shed door to finish curin' in the sun, and the black warms till it's like bein' wrapped in a hot hand.",
+        "When the latex is finally peeled off at the end of the day it comes away in one long slow sheet, and %n's skin underneath is pink and tinglin' and so sensitive the air makes them gasp."
+      ]
+    );
+    trapMore(
+      "dollmaker",
+      "A woman in a latex apron looks %n up and down",
+      [
+        "There's a shop window by the dairy full of rubber dolls in pretty poses, and one of the stands is empty, and the dollmaker's waitin' in the doorway, lookin' at %n.",
+        "%n's measured, weighed and photographed at the dollmaker's counter before they've worked out it isn't the post office.",
+        `The dollmaker's assistant catches %n by the elbow on the lane, says "you're late for your fittin'," and steers them inside.`,
+        "{t}The dollmaker measures round %n's tits with her tape, tuts, measures again, and writes the number in her book with a little star next to it.",
+        "%n's handed a catalogue of dolls to look at while they wait, and every page has a photo of somebody who looks very, very calm."
+      ],
+      "The binder comes first",
+      [
+        "A thin black catsuit's rolled up %n's legs and over their hips and up their arms and zipped at the back, and smoothed down with talc so it fits like skin.",
+        "Mittens go on next, smooth and fingerless, buckled at the wrist, so %n's hands are just two little black paws.",
+        "A tall collar goes round %n's throat, stiff and polished, so their chin's held high and they can't look down at themselves.",
+        "{t}The dollmaker fits a stiff latex bra over the catsuit that lifts %n's tits high and round, doll-perfect, and buckles it at the back.",
+        "Ballet boots are laced up %n's calves, pointed toes and all, so they stand on tiptoe like a dancer on a music box."
+      ],
+      "She polishes %n all over with a soft cloth",
+      [
+        "She paints the mouth on %n's hood with a little brush, red and bow-shaped, and blows on it, and adds lashes round the eye holes.",
+        "She ties a big satin bow round %n's collar, and fluffs it, and stands back to see.",
+        "{v}She smooths the rubber flat between %n's legs with her thumb, slow, firm, back and forth, till it's perfect and %n's tremblin'.",
+        "{nt}She buffs %n's flat chest till it shines like a mirror and their nipples stand up stiff under the rubber, and nods."
+      ],
+      "%n is carried to the shop window and set on a little stand",
+      [
+        "The card round %n's neck says DISPLAY ONLY, and somebody's crossed out ONLY and written PLEASE, and the dollmaker hasn't noticed.",
+        'A customer asks to see the doll in a different pose, and the dollmaker takes %n off the stand and bends them over the counter, and the customer says "yes, that one."',
+        "%n's dusted every hour with a feather duster, all over, slow, and every time the dollmaker reaches the bottom of them they twitch, and she tuts.",
+        `{t}A customer weighs %n's tits in their hands through the rubber, squeezes, and says "very lifelike," and the dollmaker agrees.`,
+        "When the shop shuts the dollmaker lays %n in a velvet-lined case for the night, bow straight, arms folded, and leaves the lid propped open a crack."
+      ]
+    );
+    trapSceneMore(
+      "dollmaker",
+      [
+        "Every time the dollmaker moves one of %n's limbs it stays put, and %n holds it, tremblin', because she said a good doll doesn't move.",
+        "The rubber squeaks when the dollmaker turns %n round, so she oils the joints, elbows and knees and the backs of the thighs, slow, with a little brush.",
+        "{c}She polishes %n's cock with a soft cloth till it shines, and poses it, and frowns, and poses it again.",
+        "{v}She slips a gloved finger into %n through a little hidden slit in the rubber, checks, closes the slit back up, and writes somethin' down.",
+        "The dollmaker hums to herself while she works, a tinkly tune like a music box, and %n finds they're breathin' in time with it."
+      ],
+      [
+        "A customer's allowed to hold the doll for five minutes, and spends every one of them with %n in their lap, squeakin' their hands up and down the rubber.",
+        "The dollmaker changes %n's pose for the afternoon window: on their knees, hands behind, mouth open, and the queue at the door gets longer.",
+        "{t}A customer cups %n's tits through the rubber and squeezes slowly, watchin' the doll's painted face, and %n moans behind it.",
+        "{v}A customer's gloved hand finds the little slit in the doll's rubber and slips in, and the doll squirms on its stand, and the dollmaker allows it."
+      ]
+    );
+    trapMore(
+      "rubberstall",
+      "The stall at the end of the barn is lined in black rubber",
+      [
+        `The milkmaid looks at %n's chart, frowns, and says "you're due in the rubber stall," and takes them by the collar before they can ask what that means.`,
+        "%n's herded down the barn past the ordinary milkin' stalls to the last one, which is black and shiny inside and smells of talc, and the gate swings shut behind them.",
+        "A rubber sheath on a hook by the stall's gate is turned inside out, held open like a sack, dropped over %n's head and pulled down.",
+        "{t}The milkmaid rolls a black sheath up %n's body from their ankles, slow, and when it reaches their chest she guides each tit through its hole with gentle fingers.",
+        "The gate on the rubber stall has a sign that says FOR THE GOOD MILKERS, and %n's led through it to a little round of applause."
+      ],
+      "It seals at the throat and the hip",
+      [
+        "The sheath's thick and tight and warm, and it squeezes %n everywhere evenly, like a hug that doesn't stop, and pushes everything outward toward the holes.",
+        "The milkmaid runs a rubber spatula down the sheath to smooth out the air, and every pocket she chases goes pushin' up toward %n's chest.",
+        "{c}A little hole's been cut for %n's cock too, and the latex squeezes snug round the base so it stands out hard and full against the shine.",
+        "The stall's head gate closes on %n's neck over the sheath, padded, and they're stood square with their chest pushed out through the gap."
+      ],
+      "The cups go on: black rubber, warm",
+      [
+        "The cups latch on with a little wet pop, one, two, and start to pulse, and the pulses go right through the sheath into %n's whole body.",
+        "The milkmaid turns the dial up slow, a click at a time, and with every click %n's breath goes a little shorter.",
+        "{t}The cups draw %n's teats in long and deep, and the sheath squeezes their tits from the base, and the milk comes down in long hot pulls.",
+        "{nt}The cups suck %n's nipples in long and puffy, and the sheath squeezes from round them, and they leak a thin sweet drip at every pull.",
+        "Somewhere under the sheath %n's sweatin', and the sweat makes the rubber slide on their skin with every pulse, slick and warm."
+      ],
+      "Squeezed in rubber, sucked at by the cups",
+      [
+        "The milkmaid lays her cheek against the warm rubber over %n's belly and listens, like she's checkin' a churn, and pats it when she's happy.",
+        "%n's milked so long and so steady they've gone quiet and dreamy in the sheath, sayin' nothin', just lettin' the cups pull.",
+        "A second milkmaid comes in to change the jug and stays to watch, and then to help, and then the two of them are strippin' %n out together.",
+        "{v}The sheath has a bulge of rubber built in right between %n's legs, and every pulse of the cups presses it in, and %n's ridin' it before they know.",
+        `When the cups finally come off %n's teats are glossy and puffy and achin', and the milkmaid wipes them with a warm cloth and says "same time tomorrow."`
+      ]
+    );
+    trapSceneMore(
+      "rubberstall",
+      [
+        'The rubber creaks and squeaks every time %n shifts their weight, and the milkmaid says "stand," and they stand.',
+        "The milkmaid squeezes the sheath at %n's waist, then their ribs, then under their arms, slow, like pushin' toothpaste, and the cups fill faster.",
+        "{t}%n's tits strain round and tight out of their holes in the sheath, shiny with milk, and the milkmaid can't help givin' each a pat.",
+        "{c}The cock hole in the sheath squeezes %n so tight they're achin' and leakin', and the milkmaid catches the drips on her glove.",
+        "{nt}The sheath squeezes everythin' toward %n's nipples, and they stand out red and swollen in the cups, and the milkmaid hums her approval."
+      ],
+      [
+        "The jug's full, and the milkmaid holds it up to the window and swirls it, and says it's the best colour she's seen all week.",
+        "The milkmaid leans on the stall gate, chin on her hand, and just watches %n bein' milked, smilin' like it's a sunset.",
+        "{v}The milkmaid peels back a flap of the sheath between %n's legs, slides two gloved fingers in, and works them in time with the cups.",
+        "When it's done the milkmaid peels the sheath off %n slow, from the neck down, and the air on their damp skin is so cool and sweet they groan."
+      ]
+    );
+    trapMore(
+      "bodybag",
+      "Two farm hands catch %n by the ankles and wrists",
+      [
+        `There's a black rubber bag laid out on the shed floor like a sleepin' bag, unzipped and open, and a farm hand pats it and says "lie down a bit," and %n's too tired to argue.`,
+        "%n's rolled up in a tarp by two laughin' farm hands, carried into the rubber shed like a rug, and unrolled straight into the open body bag.",
+        "A farm hand holds the bag open at the shed door like a coat for %n to step into, and %n steps in, and the farm hand pulls it up over their shoulders and smiles.",
+        "{t}The farm hand lays %n down in the bag and arranges them just so, arms at their sides, legs together, tits smoothed flat under the inner sheet, and reaches for the zip.",
+        `%n's told to lie down in the bag "just to try it for size," and it's exactly their size, which is the worryin' part.`
+      ],
+      "The zip runs up past their chin and the pump goes on",
+      [
+        "The bag's double-walled, and the air goes in between the walls, and it presses in on %n from every side like a hug that won't stop gettin' harder.",
+        "The pump chugs, and the bag puffs up round %n's shoulders and hips first, and then everywhere, till they're held fast in a pillowy black fist.",
+        "%n can feel their own heartbeat thumpin' back at them from the rubber, and every breath they take the bag takes back a little more room.",
+        "A hood's pulled up over %n's head and zipped to the main bag, with a little hole to breathe through, and the pump goes on and fills that too.",
+        "{c}The bag swells tight round %n's hips and presses their cock flat against their belly, and every pump stroke squeezes it a little harder."
+      ],
+      "A hand presses on the bag over %n's belly",
+      [
+        "A farm hand drums their fingers on the bag, light and quick, and the patter runs all through the rubber like rain on a roof, and %n shivers inside.",
+        "Somebody rolls a heavy rollin' pin slow down the length of the bag, head to toe, and the pressure walks down %n like a wave.",
+        "The farm hand lets a little air out, and %n gasps at the loosenin', and then the pump goes on again, and they whimper as it closes back in.",
+        "{v}The wand's pressed into the bag between %n's thighs, and the bag squeezes their legs together round it, so there's nowhere to go but closer.",
+        "{c}A palm presses down on the bulge of %n's cock through the rubber and rocks, slow, and the bag carries it all through them."
+      ],
+      "They roll %n over and do it again from the other side",
+      [
+        "The farm hands stand the bag up against the wall like a black glossy statue and take turns pressin' themselves against it, and %n feels every one.",
+        "Somebody brings a stool and sits by the bag with their lunch, and every few bites they reach over and give it a squeeze.",
+        "%n's lost track of time inside the bag, warm and dark and held tight everywhere, and every touch from outside comes as a lovely shock.",
+        "{t}A farm hand kneads the bag over %n's tits like bread dough, slow and deep, and the rubber rubs their nipples raw and achin'.",
+        "When the air finally goes out the bag sighs and loosens, and %n's lifted out pink and sweat-slick and limp as a wrung cloth, and set on a pile of straw to come round."
+      ]
+    );
+    trapSceneMore(
+      "bodybag",
+      [
+        "The bag creaks and squeaks with every tiny wriggle, and the farm hands laugh at the noises, and %n can't stop makin' them.",
+        "Somebody presses an ear to the bag over %n's chest and listens to their heartbeat, and taps out the same rhythm with a finger.",
+        "{v}The farm hand slides the wand slow up and down the bag between %n's legs, and the rubber carries every hum right where it counts.",
+        "{nt}A thumb finds where each of %n's nipples presses up against the inside of the bag, and circles, slow, through the rubber.",
+        "The pump coughs once more, and the bag goes tighter, and %n lets out a long muffled squeal into the dark."
+      ],
+      [
+        "%n's carried round the shed in the bag like a big black parcel, squeezed by everybody who passes, and set down on the workbench.",
+        "A farm hand lies right on top of the bag, full length, warm and heavy, and %n's pressed so snug between them and the floor they go limp and dreamy.",
+        "{t}Two hands squeeze where %n's tits are pinned, and let go, and squeeze, slow as breathin', and %n's breathin' starts to follow.",
+        "{c}The wand's tucked in against the bag right over %n's cock and taped there, and the farm hands go off for their tea and leave it hummin'."
+      ]
+    );
+    trapMore(
+      "rubbermaid",
+      "A dairymaid in head-to-toe black latex catches %n by the collar",
+      [
+        "There's a squeak of rubber on the dairy stairs, and the rubber dairymaid comes down them slow, smoothin' her apron, and her eyes find %n and stay.",
+        "%n opens the dairy door and the rubber dairymaid's right there, shiny from collar to heels, with a pail on her arm and a pair of black mitts danglin' from her fingers.",
+        "The rubber dairymaid crooks a gloved finger at %n from across the yard, and %n finds their feet goin' to her without bein' asked.",
+        `{t}The rubber dairymaid looks %n up and down, slow, lingers on their tits, and says "oh, you'll milk lovely," and takes them by the wrist.`,
+        `%n's sent to the dairy with a message, and the rubber dairymaid reads it, folds it, tucks it into her apron and says "you'll do instead."`
+      ],
+      "She straps round black mitts over %n's hands first",
+      [
+        "She rolls a pair of long black stockings up %n's legs, slow, smoothin' every inch with her gloved palms, and snaps the tops.",
+        "She ties a little latex apron round %n's waist to match her own, and steps back, and says they look a proper pair.",
+        "A rubber collar with a little bell goes round %n's throat, and she rings it with a fingertip, and smiles at the sound.",
+        "{t}She pulls a black latex bodice down over %n's head and laces it at the back, tight, so their tits are pushed up high and round and shiny over the top.",
+        "She buckles a short lead to %n's collar and wraps the end round her wrist, twice, and gives it a little tug to see that it works."
+      ],
+      "Then her hands.",
+      [
+        "She oils her gloves till they drip, and starts at %n's shoulders, and works down slow, and nothin' gets missed.",
+        "Her slick rubber palms slide down %n's back and over their rump and squeeze, and the squeak makes them both shiver.",
+        "She stands close behind %n, her latex pressed all along their back, and her gloved hands wander wherever she likes.",
+        "{nt}She pinches %n's nipples between slick rubber fingertips and rolls them, slow, till they're stiff and red and %n's whimperin' into the muzzle."
+      ],
+      "She bends %n over the dairy table and keeps goin'",
+      [
+        "She lays %n on the cool dairy table on their back and climbs up after them, all squeakin' black, and straddles their hips.",
+        "She sits %n on her lap on the milkin' stool, their back to her chest, and works them with both slick hands while she whispers in their ear.",
+        "She fetches a pail and sets it under %n, matter-of-fact, and says she's not finishin' till it's got somethin' in it.",
+        "{v}She works three slick fingers into %n and curls them, slow, and pumps, in time with the old dairy clock, and doesn't hurry it.",
+        "{c}She milks %n's cock into the pail, long slow strokes from root to tip, and when they spill she strips the last drops out like it's a teat."
+      ]
+    );
+    trapSceneMore(
+      "rubbermaid",
+      [
+        "Every move she makes squeaks, and the dairy's so quiet %n can hear every one, and every one makes them twitch.",
+        "She leans in close enough that %n can smell the latex and the oil and her perfume, and breathes on their neck, and doesn't touch, yet.",
+        "{t}She lifts %n's tits in her gloved hands and lets them fall, and lifts them, and lets them fall, watchin' them bounce.",
+        "{v}She draws one slick fingertip slow along %n's slit, top to bottom, just the once, and wipes it on their cheek.",
+        "{c}She draws one slick fingertip from the root of %n's cock to the tip, just the once, and licks it."
+      ],
+      [
+        "She lets the muzzle off for a moment so she can hear %n beg properly, and then buckles it back on, satisfied.",
+        "She holds %n right at the edge and chats about the weather, and the price of butter, and the new churn, and doesn't let them over.",
+        "{t}She milks %n's tits into a little jug, a squeeze on each, and holds the jug up to their face so they can see how much.",
+        "When she's done she wipes her gloves on a towel, finger by finger, unbuckles %n's mitts, and gives them a cup of fresh cream to drink."
+      ]
+    );
+    trapMore(
+      "blackpool",
+      "There's a pool in the woods that doesn't reflect anything",
+      [
+        "The path through the woods goes dark and quiet, and there's a pool across it that wasn't there last week, black and still and smellin' faintly sweet.",
+        "%n stops by the black pool because there's somethin' glintin' at the bottom, and reaches in, and the pool closes round their wrist like a mouth.",
+        "A rope of black latex lifts out of the pool as %n passes, slow, like a hand risin' from a bath, and wraps round their waist and pulls.",
+        "{t}%n leans over the pool and their tits brush the surface, and it rises to meet them and closes over them, warm and clingin', and won't let go.",
+        "The pool's edge creeps out over the moss toward %n's boots while they're watchin' a bird, and by the time they look down it's to their ankles."
+      ],
+      "It climbs. Warm as skin, slick as oil",
+      [
+        "The black closes over %n's legs and pulls them together, smooth and tight, so they're stood in one glossy black column from the hips down.",
+        "It flows up %n's back in a slow sheet and over their shoulders, warm, and where it touches it sets glossy and smooth like a second skin.",
+        "%n tries to pull free and the latex stretches with them and snaps them back, gentle, like it's teachin' them not to.",
+        "{c}A smooth black sheath rises up round %n's cock and closes over it, warm and wet, and squeezes, slow, in waves.",
+        "{nt}The latex flows over %n's flat chest, and two little mouths open in it over their nipples and suck, soft and steady."
+      ],
+      "Then it finds its way in.",
+      [
+        "It's patient. It presses, and waits, and presses again, and every time %n relaxes it slides in a little deeper and swells to keep its place.",
+        "The thing inside %n is warm and smooth and shapes itself to them, and then it starts to ripple, slow, from the inside.",
+        "Another slick tendril finds %n's mouth and slides in, gentle and warm and faintly sweet, and fills them there too.",
+        "{v}It fills %n's pussy so full they can feel it in their belly, and then it starts to pulse, slow, deep, like it's got a heartbeat of its own."
+      ],
+      "It pours itself into them, warm and thick",
+      [
+        "%n's belly swells round and tight and glossy, and the black sheen spreads over the curve of it, and squeezes, gently.",
+        "It fills them and fills them, slow, until %n's moanin' at every pulse and their belly's sloshin' warm and heavy.",
+        "The pool rises up %n's body and holds them in it to the chin, warm and black and hummin', and sways with them, slow, like the sea.",
+        "{t}The mouths on %n's tits draw milk while the rest of it fills them, and %n can feel the pool take and give at once.",
+        "When it finally lets go it slides out of %n slow and sinks back into the pool, and leaves them glossy and full and dazed on the moss at the edge."
+      ]
+    );
+    trapSceneMore(
+      "blackpool",
+      [
+        "The pool's warm as blood and smells sweet, like burnt sugar, and the deeper %n sinks the warmer it gets.",
+        "The black creeps up %n's throat to their jaw and stops, and holds there, snug as a collar, and pulses.",
+        "{v}The latex inside %n's pussy shifts and swells and ripples, and %n can feel every ripple from their belly to their toes.",
+        "{nv}The latex inside %n's ass shifts and swells and ripples, and %n's toes curl in the black.",
+        "{nt}The little mouths on %n's nipples suck in waves, and the black round them tightens and loosens like it's breathin'."
+      ],
+      [
+        "%n's floatin' in the pool now, held up by the black, filled and sealed and stroked from every side, and they've stopped tryin' to climb out.",
+        "The pool hums louder, and every part of it that's touchin' %n hums too, inside and out, and they come apart in it.",
+        "{v}The tendril in %n's pussy gives one long slow pulse and floods them warm, and the black seals over them and holds it in.",
+        "The black lets go of %n's limbs one by one, slow, and leaves a glossy sheen on them that tingles for hours."
+      ]
+    );
+    trapMore(
+      "trough",
+      "The boards tip, and %n slides down on their knees into a long tin trough",
+      [
+        "%n's walkin' the duckboards behind the stalls when one tips under them, and they slide down a slick chute and land on their knees in the long tin trough, and a bar swings down across their shoulders.",
+        `A farmhand leads %n round the back of the stalls by the hand, sweet as anythin', and kneels them in the trough "just for a minute," and the cuffs click.`,
+        "%n's sent to fetch a bucket from the gutter under the stalls, and bends to pick it up, and the gate swings shut behind them and the bars come down.",
+        "{t}%n's knelt in the tin trough with their top pulled down and their tits out, and a bar's locked across their back so they have to stay leanin' forward, chest out.",
+        "The sign on the gutter gate says MIND THE DRAIN, and %n minds it so carefully they don't see the trapdoor, and they're in the trough on their knees before they've finished readin'."
+      ],
+      "It starts as a trickle on their shoulder, warm.",
+      [
+        "Up at the stall rails above, the farm folk unbuckle one after another, and the first warm stream patters on the tin beside %n, then finds them.",
+        "It comes from every side at once, warm and gold, splashin' off the tin and off %n and back again, and the steam rises round them sharp and salty.",
+        "A farmhand leans right over the rail above %n, takes aim, and draws a slow hot line from their forehead down to their chin, very careful about it.",
+        "{t}Two streams find %n's tits at once and play over them, one each, round and round the nipples, hot, till they're shinin' and drippin'.",
+        "{c}A hot stream plays down %n's belly and over their cock, and it twitches and stiffens in the warm splash, and the folk above laugh and aim for it."
+      ],
+      "It pools round %n's knees and climbs.",
+      [
+        "%n's soaked so thoroughly now the wet's run warm into every crease, and the gold's at their thighs and still risin'.",
+        "The streams slow, then the next row of farm folk lean over, and it starts again, and %n just tips their head back and lets it come.",
+        'Somebody above calls "open up," and %n opens up, and holds it, and is told to swallow, and does, and the rail cheers.',
+        "{v}A hot stream finds the gap between %n's knees and plays right between their legs, and they gasp, and lean forward into it.",
+        "%n's hair is plastered flat and drippin' gold, and their eyelashes are beaded with it, and every breath tastes of it, and they're flushed hot all over."
+      ],
+      "The pipes dribble out. The bars lift.",
+      [
+        "The bars lift and a farmhand helps %n up out of the trough by both hands, drippin' and steamin', and wraps a rough towel round their shoulders.",
+        "The drain at the end of the trough opens with a gulp and the gold swirls away round %n's knees, and they're left kneelin' in the warm tin, glistenin'.",
+        "The farm folk up top buckle up and wander off, and %n's left to climb out on their own, wet to the skin and shiny and smellin' of the whole row.",
+        "A farmhand turns the cold hose on %n before they're let out, front and back, and it's a shock after all that warm, and they yelp.",
+        "%n's let out of the trough with a little brass tag clipped to their collar that says MARKED, and everyone they pass on the lane knows exactly what it means."
+      ]
+    );
+    trapSceneMore(
+      "trough",
+      [
+        "The tin's warm under %n's knees and the steam's thick round them, and the pipes over their head drip and gurgle like they're thinkin' about it.",
+        "Somebody up on the rail tips a bucket of warm gold over %n's head all at once, and they come up splutterin', and the rail cheers.",
+        "{v}A stream plays slow down %n's belly and between their thighs, and they spread their knees for it before they think.",
+        "{nt}A stream plays across %n's flat chest, and their nipples go stiff in the warm splash, and the farmhand aimin' grins."
+      ],
+      [
+        "%n's knelt in it so long the gold's gone lukewarm round their knees, and every new stream that hits them is hot by comparison.",
+        "A farmhand climbs down off the rail and stands right in front of %n, close, and takes their chin and tips their face up to aim.",
+        "{t}Hot gold sheets off %n's tits and drips from their nipples into the trough, and they can hear every drip.",
+        "{c}A farmhand aims straight at %n's cock and keeps it there, warm and steady, till %n's leakin' into the trough too."
+      ]
+    );
+    poolMore("well", "grab", BROOD_LINES.wellGrab, [
+      "%n sits on the well's edge to rest, and the stones are wet and cold, and somethin' slides up out of the shaft behind them and wraps round their waist like an arm, and leans back.",
+      "The well's winch starts turnin' on its own, creak, creak, and the rope's comin' up, and there's no bucket on the end of it, just somethin' wet and many-armed that reaches for %n.",
+      "%n hears their own name echo up out of the well, soft, like somebody callin' from the bottom, and leans over to answer, and the dark comes up to meet them."
+    ]);
+    poolMore("well", "the dark", BROOD_LINES.wellDeep, [
+      "The water down here is warm, warmer than it's any right to be, and the thing holds %n in it to the chest, and its arms move over them slow as weed in a current.",
+      "Somethin' smooth and broad presses against %n's back, the body of it, and it's big, bigger than the well should hold, and it hums.",
+      "The arms test every bit of %n in turn, soft tips explorin', curlin', squeezin', like it's countin' them, and it doesn't miss a single inch.",
+      "Far up the shaft the circle of sky's gone to a pinprick, and down here there's only the warm water and the slow coils and %n's own breathin', loud in the stone."
+    ]);
+    trapSceneMore(
+      "well",
+      [
+        "The coils hold %n up off the bottom, slow and patient, and every so often one tightens round their thigh or their belly, just to remind them it's there.",
+        "Little suckers on the arms kiss along %n's skin as they slide, one after another, a trail of soft wet pulls from ankle to throat.",
+        "{t}Two thin arms wind round %n's tits from the base, round and round, and squeeze, and the tips curl over the nipples and suckle.",
+        "{c}A soft arm coils round %n's cock from root to tip and squeezes in slow waves, like it's learnin' the shape of it."
+      ],
+      [
+        "A smooth round shape slides up the arm inside %n, and another behind it, and %n feels each one settle deep and warm, and the thing purrs.",
+        "The coils sway %n slow in the dark water, filled and held, and the thing's hum goes deep into their bones.",
+        "{v}The arm in %n's pussy swells and pulses, and they can feel the eggs pass along it, one, two, three, each one stretchin' them a little wider.",
+        "Somebody up at the top of the well drops a bucket, and it splashes down beside %n and floats, and nobody comes, and the thing doesn't let go."
       ]
     );
     const CHATLOG = { live: /* @__PURE__ */ new Map(), who: /* @__PURE__ */ new Map(), lastSave: 0, hourKey: "" };

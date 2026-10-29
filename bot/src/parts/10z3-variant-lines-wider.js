@@ -166,7 +166,7 @@
     more(S.milk.hit[2], [
       "A hose fills %n's mouth and doesn't stop, and their belly swells round and sloshin' with the herd's milk while the rest pours over them.",
       "They're drowned in it and force-fed it, gallons of warm milk, till %n's belly's tight and they're coughin' white."]);
-    more(S.milk.after, ["The rack lets %n go sticky and sweet and sloshin', smellin' like a newborn calf."]);
+    more(S.milk.after, ["The rack lets %n go sticky and sweet and sloshin', smellin' like the dairy."]);
     more(S.slime.cloud, ["The nozzles fill with somethin' green that doesn't so much pour as decide to come out."]);
     more(S.slime.hit[0], [
       "{nt}A cold glob lands on %n's chest and slithers slowly south.",

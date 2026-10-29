@@ -35,7 +35,8 @@
 
       keepalive();
       runWaiting(); pump();        // safety net: waitin' commands and messages move even if a timer was lost
-      if (Date.now() - (state.lastMutualAsk||0) > 60000){ state.lastMutualAsk = Date.now(); askMutual(); }
+      // who's online and friends both ways: every 2 minutes, or every minute while a summonable pet is out (Oct 27)
+      if (Date.now() - (state.lastMutualAsk||0) > (roamWatching() ? 60000 : 120000)){ state.lastMutualAsk = Date.now(); askMutual(); }
       nudge();
       expireHerdClaims();
       snapshotRoom(false);
@@ -59,7 +60,7 @@
       gearTick();
       homeTick();
       lifeTick();
-      ribbonTick(); potionTick(); dareTick(); penTick(); benchTick(); lingerTick(); contractWatchTick(); trapTick(); parasiteTick(); symbioteTick(); farmLookTick(); friendCheckTick(); tempOutfitTick();   // ribbons, potions, dares, the corral (10l, 10m), the use bench (10o)
+      ribbonTick(); potionTick(); dareTick(); penTick(); benchTick(); lingerTick(); contractWatchTick(); trapTick(); parasiteTick(); symbioteTick(); farmLookTick(); friendCheckTick(); awayTick(); tempOutfitTick(); tileCareTick(); seasonTick(); trapDayTick();   // ribbons, potions, dares, the corral (10l, 10m), the use bench (10o)
       workTick();
       if (Date.now() - (state.wlTick||0) > 5*60000){ state.wlTick = Date.now(); whitelistSync(true); }   // the room whitelist follows the books
       leadTick();                  // people being led who never arrived get teleported after all

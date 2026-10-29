@@ -163,11 +163,11 @@ THE STOCKS
     barn: `🥛 THE BARN 🥛
 
 COMMANDS
-  ?stats · your milk, semen, sizes, how full you are
+  ?stats · your milk, cum, sizes, how full you are
   ?board · today's and this week's yield, and top sires
   ?milkable on|off · make milk (stock does by default)
   ?seedmilk on|off · the stall and milkin' traps take your seed too (on)
-  ?futa on|off · make milk and semen both
+  ?futa on|off · make milk and cum both
   ?quota · your daily milk quota and streak
 
 GETTIN' MILKED
@@ -179,7 +179,7 @@ GETTIN' MILKED
   • Everybody sees milkin' and nursin' as a room emote.
 
 FILLIN' UP
-  • Milk and semen fill by the hour, even while you're away. Cows fill
+  • Milk and cum fill by the hour, even while you're away. Cows fill
     twice as fast; pregnancy and a fresh birth faster still.
   • Full for a whole day and you start leakin', and everybody sees it.
 
@@ -190,7 +190,7 @@ QUOTA · stock owes the pail 1 L a day (staff can change yours)
 
 MILK GRADE (A+ to D) · the average of your last 5 milkin's
   Helps: milked every 6–16 hours, higher tier, fresh birth, heat,
-         a lactation shot or item
+         a milk-maker shot, or a "lactation" item
   Hurts: milked again inside 2 hours, left over 36 hours, leakin'
          for a day, a punishment tier`,
 
@@ -204,6 +204,8 @@ OPT IN FIRST · nobody gets bred who hasn't, sweetie
   ?yes / ?no · answer a stud or staff member who asked (whisper or beep works too)
   ?tally on|off · your tally marks on ?who and the board
   ?wash · clean off a paintin'
+  (standin' in the water or a trough rinses a third of the mess off every few minutes)
+  ?grooming on|off · the farm girl brushes you down when you stand next to her
   ?drain · empty yourself into the bucket (?drain butt for one hole)
   ?drain <who> · drain somebody beside you; they say yes first
   ?services · the farm's services: the vet, a salt soak, coaxin'
@@ -300,7 +302,7 @@ I read words in a crafted item's name or description, like LSCG does.
 INJECTORS · use Inject on someone
   Production
     lactation · milk doubles for a day
-    virility · semen doubles for a day
+    virility · cum doubles for a day
     fertility · catchin' doubles for a day
     contraceptive · no catchin' for two days
     egg laying (or clutch) · any stud can leave a clutch of eggs, 3x as likely
@@ -314,7 +316,7 @@ INJECTORS · use Inject on someone
     (worn, those two work for as long as you wear the item)
     heat inducer · heat now  ·  suppressant · heat ends
   Stackin'
-    Doses stack. A second lactation shot while the first is still
+    Doses stack. A second dose of the same while the first is still
       workin' makes it triple, a third four times, up to five deep.
     Put x2 to x5 on the needle for that many doses in one go:
       "lactation x3", "udder growth x2", "hyper pregnancy x2".
@@ -339,7 +341,7 @@ TOYS THAT ACT ON THEIR OWN · crafted words on what you wear
       pussy · ass (anal) · throat
     grow: grow, growth, enlarger, swell, gape, stretch, trainer…
     shrink: shrink, reducer, tightener, restorer…
-    e.g. "Shrink Penis", "Grow Balls", "Big Tit Growth Serum",
+    e.g. "Shrink Cock", "Grow Balls", "Big Tit Growth Serum",
     "Pussy Stretching Shot". Each one is a step, with a room emote.
   Cocks · canine, equine, feline (barbed), draconic, double cock,
     humanizer, knotting, knot remover · see ?help cocks
@@ -359,29 +361,29 @@ GOOD TO KNOW
 
 COMMANDS
   ?size · your sizes (only the parts you've got)
-  ?size <part> <size> · set one, e.g. ?size udder DD · ?size penis 9
+  ?size <part> <size> · set one, e.g. ?size udder DD · ?size cock 9
   ?measure · I measure you out loud for the room
-  ?futa on|off · cock and vulva both, milk and semen both
+  ?futa on|off · cock and pussy both, milk and cum both
   ?gender female|male|futa|femboy|nonbinary · how the farm sees you (picks your outfit)
   ?chest flat|tits · what's up top, as the farm's lines see you (nonbinary goes by your body otherwise)
 
 THE PARTS
   Udder · bra cup, AA to H. Bigger makes and holds more milk.
   Balls · 1 to 10. Bigger makes bigger loads.
-  Penis · inches, up to 14". Too big for a hole stretches it.
-  Vulva / Butt · tight, snug, slightly gaped, gaped, loose… ruined.
+  Cock · inches, up to 14". Too big for a hole stretches it.
+  Pussy / Ass · tight, snug, slightly gaped, gaped, loose… ruined.
     Stretched holes tighten a level a day; looser drains faster.
   Throat · gaggy to bottomless. Too big gags some back up, and every
     3 of those trains it a level.
   Cock and balls only show if you've got 'em; udder if you're milkable
-  or have a vulva. ?help cocks for types and knots.
+  or have a pussy. ?help cocks for types and knots.
 
 ✨ HYPER (shots only)
-  • Udder to an R cup, balls, gape and throat to 20, penis to 30".
+  • Udder to an R cup, balls, gape and throat to 20, cock to 30".
   • A P cup or size-17 balls pins you where you stand till a reducer.
 
 GOOD TO KNOW
-  • Pent up: semen full for a day (12h caged) and your next load
+  • Pent up: balls full for a day (12h caged) and your next load
     empties everything, half again more, and extra fertile.
   • Stamina: past 3 loads in an hour each one's smaller.
   • Swallow a big load and you fill faster for an hour.`,
@@ -389,9 +391,9 @@ GOOD TO KNOW
     cocks: `🍆 COCKS, KNOTS & CUMFLATION 🍆
 
 COMMANDS
-  ?penis · your cock (?cock works too)
-  ?penis types · the list
-  ?penis <type> · set yours, e.g. ?penis equine
+  ?cock · your cock (?penis works too)
+  ?cock types · the list
+  ?cock <type> · set yours, e.g. ?cock equine
 
 THE TYPES
   human · the usual
@@ -487,6 +489,17 @@ TRAPS (your own switch)
   ?traps on · they spring for you · ?traps off · they never do
   ?traps · what's out there · ?traps <name> · what one does
   ?traps skip <kind> · rule one out · ?traps allow <kind>
+  ?traps theme · whole kinds, on or off: furry, monsters, goblins,
+     pregnancy, milking, messy, restraint, latex, public, seasonal
+     ?traps theme <kind> on|off · ?traps theme all on
+  ?rate · what you've rated · ?rate <trap> loved|fine|no
+     Loved it comes round more. Not for me comes round less (said
+     twice, a lot less), but never stops it: ?traps skip does that.
+     ?rate ask off · stop askin' after each one
+  ?seasons · the farm's calendar, and what's on (?calendar too)
+  ?trickortreat · Halloween: knock on the farm girl's door
+  ?stocking · winter: what's in your stockin' on the hearth
+  ?egghunt · Easter: hunt the farm for eggs (?egghunt board)
   ?quiet [minutes] · an hour where nothin' new starts on you
   ?tend <who> · help somebody lay (a ribbon in it)
   ?brood · your brood book: what's bred you, what you carried
@@ -517,9 +530,16 @@ THE PARASITE · ?parasite on
   mouth for 12 hours. It feeds you serum every half hour
   (fertility, growth, hyper pregnancy, capacity; the growth is
   for keeps) and turns every load you swallow into more.
-  It comes in four strains, blooms over its twelve hours (lips,
-  then teats, then below), gets urges, lays its own eggs at the
-  end, and passes by a kiss or by nursin'.
+  It comes in eight strains (Breeder, Grower, Glutton, Tyrant,
+  Oozer, Weaver, Deep, Gloss), blooms over its twelve hours
+  (lips, teats, below, each strain in its own order), gets
+  urges, lays its own eggs at the end, and passes by a kiss or
+  by nursin'. As it blooms it spreads over you as real clothes
+  with the Companion: a tail, sleeves and stockings; the Oozer
+  and the Gloss grow into a whole second skin, the Weaver spins
+  a silk harness (and cocoons your arms now and then), the Deep
+  wraps you in tentacles. Your limits rule strains out: slime,
+  spider, tentacle, latex.
   ?parasite · how long is left. Your safeword takes it off.
   Gettin' it off the farm way: ?service purge (the vet, 3 ribbons),
   ?service soak (stand in the water with salt, 10 minutes), or a
@@ -553,6 +573,11 @@ REAL GEAR
   is put on your character for real, and taken off when its
   time's up. Pull it off early and it goes back. Your safeword
   takes all of it off. The parasite needs no second switch.
+  Some traps dress you head to toe: the rubber kennel zips you
+  into a whole rubber pup (catsuit, pup hood, padded-paw petsuit,
+  collar with a bone tag, leash, and a tail), and the collar and
+  tag stay on half an hour after. Your own collar is never
+  swapped; the leash and tag clip to yours.
 
 CARRYIN' SLOWS YOU DOWN
   A pumped belly, a late litter or a clutch of eggs makes you
@@ -566,7 +591,7 @@ COMMANDS
 
 THE CLASSES
   show · stock only, staff judge 1 to 10, best average wins
-  udder, balls, penis, gape, throat · I measure everyone at the
+  udder, balls, cock, gape, throat · I measure everyone at the
     close; biggest wins, judges' scores break a tie
   load · studs ?enter, then ?cum; biggest single load wins
 
@@ -598,7 +623,14 @@ RECORDS
      aftercare, notes, or app.<question>; clear empties one
   ?signed <who> · flip their contract signed or not
   ?addfriend <who> · friend 'em so my beeps reach 'em
-  ?unregister <who> · archive (herdmasters and up)`,
+  ?unregister <who> · archive (herdmasters and up)
+  ?away · who's been off the farm longest. Livestock and guests
+     two weeks away come off the books on their own (never staff,
+     the proprietors or a permanent contract)
+  ?away hold <who> 30d [why] · pause their two weeks (a trip,
+     exams, a hospital stay); it carries on after. off ends it
+  ?renew · who'd like their contract again · ?renew offer <who>
+     offers them the same one again (herdmasters and up)`,
 
     herd: `🐄 YOUR HERD (staff)
 
@@ -617,6 +649,10 @@ YOUR HERD
 
 HANDLIN' 'EM
   ?walk <who> · leash them to you; say it again to let go
+  ?reins <who> [minutes] · lead them at heel: they walk a step
+     behind you wherever you go (their Companion walks them, or
+     I hop them along). ?reins off [who] lets go; so does their
+     safeword. An hour unless you say (up to 4)
   ?brand <who> <mark> · up to 12 characters, shows on ?who
      ?brand <who> clear takes it off
   ?turnout <who> [note] · keep claimed staff out in pasture
@@ -641,7 +677,7 @@ CARDS
 
 MILKIN' & COLLECTIN'
   ?milk <who> [mL] · milk 'em by hand (all of it if left out)
-  ?collect <who> [mL] · collect semen, bottled as a seed jar
+  ?collect <who> [mL] · collect their cum, bottled as a seed jar
   ?stats <who> · anybody's numbers
 
 SEED JARS
@@ -735,6 +771,11 @@ RIBBONS, POTIONS, DARES, THE CORRAL
      only for people who said ?bench on · bench spots:
      ?spot set bench (bench-2, bench-3…)
   ?subject · proprietors: who has traps switched on
+  ?traps ratings · the herd's favourite traps, and the ones passed on
+  ?seasons start <name|all> [2h, 3d, on] · proprietors: any season
+     any time, for a party, a special day, or just because (on: till
+     you stop it; several at once: ?seasons start halloween winter)
+     ?seasons stop [name|all] · ?seasons costume on|off
   ?traps · the kinds, the spots, the water
      trap spots: ?spot set trap-<kind> (trap-milker-2…), or a
      plain ?spot set trap for pot luck. A pillory, a tickle rack
@@ -829,7 +870,7 @@ THE FARM
   ?notice <text> · ?notice clear
   ?feeding on|off · ?curfew on|off (leave it out to flip)
   ?fair open [class] [title] · ?fair close
-     classes: show, udder, balls, penis, gape, throat, load
+     classes: show, udder, balls, cock, gape, throat, load
      e.g. ?fair open udder Moo Off
 
 YOU

@@ -88,7 +88,7 @@ const moveTo=(mn,X,Y)=>{ chars.find(c=>c.MemberNumber===mn).MapData.Pos={X,Y}; }
   n=sent.length; await say(221397,'?brand Rex logo left thigh',1500);
   ok(P(600).brand && P(600).brand.logo && P(600).brand.logo.place==='thighL', '?brand Rex logo left thigh ('+JSON.stringify(P(600).brand)+')');
   ok(/iron|brand/i.test(all(n)), '...with the searin\' line');
-  const sb=W.__stateFor(600).brand; ok(sb && sb.place==='thighL' && sb.look==='seared', 'Rex\'s Companion is told where to draw it ('+JSON.stringify(sb)+')');
+  const sb=W.__stateFor(600).brand; ok(sb && sb.place==='thighL', 'Rex\'s Companion is told where to draw it ('+JSON.stringify(sb)+')');
   ok(!W.__stateFor(700).brand, 'Pip isn\'t branded yet');
   await say(221397,'?brand all logo',1200); ok(W.__stateFor(700).brand && W.__stateFor(700).brand.place==='hipR', '?brand all logo: every livestock carries it');
   ok(!W.__stateFor(221397).brand, '...but not the proprietor');

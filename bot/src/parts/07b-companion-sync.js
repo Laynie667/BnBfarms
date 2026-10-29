@@ -75,6 +75,11 @@
       part("trap card", () => { const tc = trapCardFor(mn); if (tc) s.trapCard = tc; });   // the trap card (10x-trap-extras.js)
       part("farm gear", () => { const fg = farmGearFor(mn); if (fg.length) s.farmGear = fg; });   // real gear their Companion keeps on them (10y-farm-gear.js)
       part("trap admin", () => { if (isProprietor(mn)) s.trapAdmin = trapAdminFor(); });
+      part("trap ratings", () => rateStateFor(mn, s));   // how was it, the trap of the day (10y9o-trap-ratings.js)
+      part("reins", () => reinsStateFor(mn, s));         // on somebody's reins, or somebody on yours (10y9s-reins.js)
+      part("renewals", () => renewStateFor(mn, s));      // staff: who'd like their contract again (10y9t-renewals.js)
+      part("trap kinds", () => trapThemeStateFor(mn, s));   // whole kinds of trap switched off (10y9q-trap-switches.js)
+      part("seasons", () => seasonsStateFor(mn, s));        // proprietors: the Seasons card, any season any time (10y9m-seasons.js)
       part("under", () => { const u = underOf(mn); if (u >= 2) s.under = u; if (r.corrWord) s.corrWord = r.corrWord; if (r.corrNoise) s.corrNoise = r.corrNoise; });   // simpler words, and the word that slips out (10y4-corruption.js)
       part("keepsakes", () => keepersStateFor(mn, s));
       part("udders", () => uddersStateFor(mn, s));   // the dial, their words, intensity, kept (10y7-udders.js)   // the album, trained holes, the vat, sittin' the nest (10y6-keepers.js)
@@ -106,7 +111,7 @@
       const r = rec(m), p = prodOf(m);
       return { mn: m, name: plainName(m), role: (r.roles[0]||"").toLowerCase(), where: whereName(m) || "",
                milk: makesMilk(m) ? Math.round(100*p.milk/Math.max(1, milkCap(m))) : null, heat: inHeat(p) && !p.heat.quiet, preg: !!p.preg,
-               denied: milkDenied(m), mine: herdLeaderOf(m) === mn, onDuty: r.onDuty !== false };
+               denied: milkDenied(m), mine: herdLeaderOf(m) === mn, onDuty: r.onDuty !== false, reins: !!(r.reins && r.reins.by === mn && r.reins.until > Date.now()) };
     });
     const r = rec(mn), wk = weekKey(), week = (r.shift && r.shift.week && r.shift.week.key === wk) ? r.shift.week.ms : 0;
     out.shift = { clocked: clockedIn(mn), weekH: Math.round(10*(week + (clockedIn(mn) ? Date.now() - r.shift.in : 0))/3600000)/10,
@@ -135,14 +140,52 @@
   }
 
   // send each connected Companion its state, if it changed since last time (force: send anyway)
-  function syncCompanions(force){
+  // LAG (Laynie, Oct 26: "Is there more that we can do to improve the companion and the lag situation?"): a "forced" sync
+  // used to send EVERY Companion its whole panel again, changed or not, and about 80 things force one (a trap, gear, a
+  // potion…): one person's trap meant a full panel to everybody in the room, through the bot's one send queue, so the
+  // bot's own replies waited behind them. Now a burst of syncs in the same moment is gathered into one, and a panel goes
+  // only to the Companions whose panel actually changed.
+  function syncCompanions(){
+    if (state.syncPending) return;
+    state.syncPending = true;
+    later(() => { state.syncPending = false; syncNow(); }, 250);
+  }
+  // the store's shelf was 11 KB of every 13 KB panel: a Companion 0.45+ gets it on its own, only when it changes
+  const storeApart = (c) => { const m = /^(\d+)\.(\d+)\./.exec(String((c && c.ver) || "")); return !!m && (+m[1] > 0 || +m[2] >= 45); };
+  // a short fingerprint of the shelf: a Companion 0.46+ keeps the store it was sent (even over a reload) and says which
+  // one in its hello, so the 11 KB only goes again when a price or an item really changed
+  function shelfHash(text){
+    let h = 2166136261;
+    for (let i = 0; i < text.length; i++){ h ^= text.charCodeAt(i); h = Math.imul(h, 16777619); }
+    return (h >>> 0).toString(36)+"."+text.length.toString(36);
+  }
+  function syncNow(){
     for (const [mn, c] of state.companions){
       if (!hasCompanion(mn)) continue;
       let s; try { s = stateFor(mn); } catch(e){ warn("state for "+mn+":", e); continue; }   // one bad record never stalls everyone's panel
+      if (storeApart(c) && s.store){
+        const sk = JSON.stringify(s.store), h = shelfHash(sk); delete s.store;
+        if (c.lastStoreH !== h){ c.lastStoreH = h; enqueue(makeMsg("store", { items: JSON.parse(sk), h }, mn)); }
+      }
       const key = JSON.stringify(Object.assign({}, s, { at: 0 }));
-      if (!force && c.lastState === key) continue;
+      if (c.lastState === key) continue;
+      // every panel I send gets a number; a patch says which panel it goes on (base), so a Companion that missed one asks
+      // for a whole panel instead of patchin' the wrong one
+      const seq = ++state.syncSeq;
+      // a 0.45+ Companion that has a panel already gets only the parts that changed
+      if (storeApart(c) && c.lastParts){
+        const set = {}, del = [], parts = {};
+        for (const k of Object.keys(s)){ const v = JSON.stringify(s[k]); parts[k] = v; if (k !== "at" && c.lastParts[k] !== v) set[k] = s[k]; }
+        for (const k of Object.keys(c.lastParts)) if (!(k in s)) del.push(k);
+        c.lastState = key; c.lastParts = parts;
+        enqueue(makeMsg("stateDiff", { set, del, base: c.seq || 0, seq }, mn));
+        c.seq = seq;
+        continue;
+      }
       c.lastState = key;
-      enqueue(makeMsg("state", { state: s }, mn));
+      if (storeApart(c)){ c.lastParts = {}; for (const k of Object.keys(s)) c.lastParts[k] = JSON.stringify(s[k]); }
+      enqueue(makeMsg("state", { state: s, seq }, mn));
+      c.seq = seq;
     }
   }
 

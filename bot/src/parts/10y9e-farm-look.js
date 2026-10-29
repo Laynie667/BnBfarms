@@ -29,12 +29,14 @@
       if (L.drawnFarm && JSON.stringify(L.drawnFarm.body) === JSON.stringify(b)) return;
       L.drawnFarm = { at: Date.now(), body: b }; saveLedger();
       log("The farm's look for the drawn body changed (cup "+b.cup+"); tellin' the Companions.");
-      if (state.companions && state.companions.size) enqueue(makeMsg("bodyFarm", { at: L.drawnFarm.at, body: b }));
+      // (no longer sent round the room: the look is built into the Companion since Oct 26, tools/farm-look-bake.mjs.
+      // Only a Companion older than that still asks, once, and gets it.)
     } catch(e){ warn("farm look:", e); }
   }
   // a Companion asking for it (it says which one it has)
   function farmLookAsk(mn, m){
     if (!L.drawnFarm || !L.drawnFarm.body) return;
+    { const c = state.companions.get(mn); if (c && !/^0\.([0-3]\d|4[0-3])\./.test(String(c.ver || "")) && c.ver !== "?") return; }   // 0.44+ has it built in
     if (Number(m && m.at) === L.drawnFarm.at) return;   // it already has this one
     enqueue(makeMsg("bodyFarm", { at: L.drawnFarm.at, body: L.drawnFarm.body }, mn));
   }

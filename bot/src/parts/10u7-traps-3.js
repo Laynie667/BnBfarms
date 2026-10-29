@@ -24,9 +24,9 @@
     vines: ["slime", ["tummy"]], saddle: ["cream", ["tummy"]], wheel: ["cream", ["tummy", "chest"]], scarecrow: ["cream", ["tummy", "chest"]],
     crate: ["cream", ["tummy"]], kissgate: ["cream", ["face", "tummy"]], collection: ["cream", ["tummy"]],
   };
-  function trapMess(mn, kind, what){
+  function trapMess(mn, kind, what, given){   // given: [mess, [where]] (the water's own: 10y9r-water-beast.js)
     try {
-      let m = what ? [what, ["face", "chest", "tummy"]] : MESS_BY_TRAP[kind];
+      let m = given || (what ? [what, ["face", "chest", "tummy"]] : MESS_BY_TRAP[kind]);
       if (kind === "stocks" && Math.random() < 0.5) m = ["cake", m[1]];   // some of the pies are cake
       if (!m || (!MESS[m[0]] && m[0] !== "cum")) return false;
       return bodyMark(mn, Object.assign({ splat: m[1], mess: m[0] }, MESS[m[0]] ? { color: MESS[m[0]] } : {}));   // (cum keeps the game's own white splatters)
@@ -235,17 +235,17 @@
         ["A bucket tips from a beam over %n's head and they're drenched in %x, thick and warm, from their hair to their toes.",
          "%n steps on a board that tips them face first into a vat of %x. They come up sputterin', coated head to foot.",
          "A spigot opens over %n and a slow golden river of %x pours over them, coatin' every inch."],
-        ["Then the farm's critters smell it. The barn cats come first, then the goats, then the farm dogs, all of them lickin'.",
-         "Rough little tongues find %n from every side: the cats on their fingers, the goats on their neck, the pups on their belly.",
-         "{t}Somethin' with a very warm tongue finds the %x pooled between %n's tits and licks it clean, slow and thorough.",
-         "{c}A barn cat licks the %x off %n's cock with great concentration, and %n can't keep still.",
+        ["Then the farm's animal folk smell it. The cat-folk from the barn come first, then the goat-folk off the hill, then the hound-folk from the kennel, all of them lickin'.",
+         "Rough tongues find %n from every side: the cat-folk on their fingers, a goat-man on their neck, the hound-folk on their belly.",
+         "{t}Somebody with a very warm tongue finds the %x pooled between %n's tits and licks it clean, slow and thorough.",
+         "{c}One of the barn's cat-folk licks the %x off %n's cock with great concentration, and %n can't keep still.",
          "{v}A warm, wide tongue licks the %x out from between %n's legs, and comes back for more."],
-        ["The lickin' doesn't stop till every drop is gone, and some of the critters keep goin' after.",
+        ["The lickin' doesn't stop till every drop is gone, and some of the animal folk keep goin' after.",
          "%n squirms and giggles and moans by turns, held sticky in place while the whole barn cleans them up.",
          "Somebody fetches a spoon. The farm girl tells them off. Then fetches her own."],
       ],
-      end: ["%n is let go at last, licked mostly clean, sticky where the critters missed and smellin' of %x.",
-            "When the critters wander off, %n is left glazed and tacky with %x, every step a sticky little peel.",
+      end: ["%n is let go at last, licked mostly clean, sticky where the tongues missed and smellin' of %x.",
+            "When the animal folk wander off, %n is left glazed and tacky with %x, every step a sticky little peel.",
             "%n peels themselves off the boards, still shinin' with %x, and the barn cats follow them home."],
     },
     incubator: {
@@ -313,7 +313,7 @@
          "Pie after pie, and %n's face is a mask of cream and crust before long."],
         ["The queue for pies runs right round the fairground. %n can't see, can't wipe, can only lick their lips.",
          "Somebody throws a pie, then licks some cream off %n's cheek, then throws another.",
-         "A child's sticky little pie bounces off %n's nose, and the crowd applauds the effort."],
+         "A dairymaid's sticky little tart bounces off %n's nose, and the crowd applauds the effort."],
       ],
       end: ["The stocks open. %n stands up drippin', %x pies' worth of cream on them, and takes a bow.",
             "%x pies, and every one found its mark. %n is let out of the stocks creamed from the hair to the hips.",

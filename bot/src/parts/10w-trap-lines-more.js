@@ -273,7 +273,7 @@
                     "%x, capped and safe. The queen strokes %n's swellin' teats with a feathered hand. \"You'll feed them well.\" The drones hum agreement.");
     more(A.goat.beats,
       ["\"Oi. Down here.\" %n looks down. The billy's lyin' on the hay bales with his hands behind his head and everything else on show.",
-       "A horn hooks %n's collar from behind and tugs. \"Not so fast, kid.\""],
+       "A horn hooks %n's collar from behind and tugs. \"Not so fast, darlin'.\""],
       ["He stinks, and he knows it, and he flares his nostrils like it's cologne. \"That's buck, that is. You'll get to like it.\"",
        "He walks round %n once on his clickin' hooves, flappin' his tongue, and stops in front."],
       ["He taps %n's bottom lip with one finger. \"That. I want that.\"",
@@ -286,7 +286,7 @@
     A.goat.end.push("He jams in, quivers all over, and squirts %ml down %n's %h. Then he licks their cheek, long and rank, and bounces off over the fence.",
                     "%ml, quick as a sneeze, down %n's %h. He burps, scratches, and saunters away, leavin' them to cough.");
     more(A.sow.beats,
-      ["\"There you are, piglet. I've been callin'.\" %n hasn't heard anybody callin'. They're picked up anyway.",
+      ["\"There you are, love. I've been callin'.\" %n hasn't heard anybody callin'. They're picked up anyway.",
        "A warm, enormous softness closes round %n from behind and a voice like fresh bread says, \"Oh, you poor hungry thing.\""],
       ["She's got an apron on over nothin' much, and she's built like a feather bed. %n sinks into her lap and it's the most comfortable they've been all week.",
        "She tucks %n's head into the crook of her arm and starts to rock, creak, creak, before they can object."],
@@ -297,8 +297,8 @@
        "By the third swallow %n has stopped wantin' to leave. By the tenth, they wouldn't notice the barn burnin' down. Under them, somethin' stiff and thick is pressin' up."],
       ["\"Just you keep drinkin'.\" She lifts %n by the hips and settles them down on her cock, inch by fat inch, into their %h.",
        "She rocks, and it slides deeper into %n's %h, and they whimper round the teat, and she says, \"I know, sweet thing. I know. Take all of it.\""]);
-    A.sow.end.push("She breeds %n's %h slow and cums the same way: %ml, in long lazy pulses, hummin' an old milkin' song. Then she rocks them till the milk's gone down, and carries them out to the straw.",
-                   "%ml, deep in %n's %h, and a belly full of sow's milk on top. She kisses their forehead. \"Sleep now. You'll be hungry again by supper.\"");
+    A.sow.end.push("She breeds %n's %h slow and cums the same way: %ml, in long lazy pulses, hummin' an old milkin' song. Then she holds them close till the milk's gone down, and walks them out to the straw.",
+                   "%ml, deep in %n's %h, and a belly full of sow's milk on top. She kisses their forehead. \"Rest up. You'll be hungry again by supper.\"");
 
     // ── the parasite ──
     G.latch.push("The stranger grunts, finishes, and pulls back. What follows him through the hole isn't him: a soft pink mouth with no face round it, which fits itself over %n's lips and sinks a root down their throat like a key in a lock.",

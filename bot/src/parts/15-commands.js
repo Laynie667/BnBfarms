@@ -243,7 +243,7 @@
       case "ruin": {
         // staff: ?ruin <stud> — waste a load
         const t = resolveTarget(args[0]);
-        if (!t || !rec(t) || !makesSemen(t)){ R("Whose load are we ruinin', sugar? ?ruin <stud>, somebody who makes semen. For example: ?ruin Rex"); break; }
+        if (!t || !rec(t) || !makesSemen(t)){ R("Whose load are we ruinin', sugar? ?ruin <stud>, somebody who makes cum. For example: ?ruin Rex"); break; }
         if (!onMap(t)){ R(plainName(t)+" needs to be here on the map for that, hon."); break; }
         prodTick();
         const p = prodOf(t), lost = p.semen * CFG.PROD.LOAD_SHARE;
@@ -290,7 +290,7 @@
             const live = L.contracts.filter(x => x.status === "signed" || x.status === "offered" || x.status === "releasing");
             R("📜 FARM CONTRACTS\nReady-made: fun · deep · nhl"+(saved.length ? "\nYours: "+saved.join(" · ") : "")+
               "\n\nIN FORCE OR OFFERED\n"+(live.length ? live.map(contractLine).join("\n") : "  none right now")+
-              "\n\n?contract show <name> [who] · ?contract offer <name> <who> <1h|12h|1d|1w|2w|1m|perm> · ?contract release <who> · ?contract check <who>"+
+              "\n\n?contract show <name> [who] · ?contract offer <name> <who> <12h|1d|1w|2w|1m|perm> · ?contract release <who> · ?contract check <who> · ?renew (who'd like theirs again)"+
               (owner ? "\n?contract new <name> [from fun|deep|nhl] · add · set · remove · title · terms · policy · delete · ?contract rules"+
                        "\nMade for each person when offered: {name} {Species} {species} {pet} in any text, like nickname=\"BnB {Species} {name}\" → BnB Cow Vicky" : ""));
             break;
@@ -644,8 +644,8 @@
         r.jarok = on;
         if (!on) state.jarAsks.delete(sender);
         saveLedger(); audit(sender, "JAROK", on ? "on" : "off");
-        R(on ? "💉 Jar insemination: ON. Staff still have to ask you every single time, and no is always a fine answer."
-             : "💉 Jar insemination: OFF. Nobody puts a jar in you, and staff can't even ask. ?jarok on turns it back on.");
+        R(on ? "💉 Jar breedin': ON. Staff still have to ask you every single time, and no is always a fine answer."
+             : "💉 Jar breedin': OFF. Nobody puts a jar in you, and staff can't even ask. ?jarok on turns it back on.");
         break;
       }
 
@@ -691,7 +691,7 @@
           tell(t, "🔏 "+(sub === "allow" ? plainName(held.stud)+" is lettin' "+plainName(o)+" breed you too, sugar." : plainName(o)+" can't catch you anymore, hon."));
           break;
         }
-        if (!makesSemen(sender)){ R("Breedin' rights are for studs, hon. You'd need a penis (or ?futa on)."); break; }
+        if (!makesSemen(sender)){ R("Breedin' rights are for studs, hon. You'd need a cock (or ?futa on)."); break; }
         const days = args[1] ? parseFloat(args[1]) : CFG.RIGHTS_DAYS;
         if (!(days > 0 && days <= CFG.RIGHTS_MAX_DAYS)){ R("How many days, sugar? 1 to "+CFG.RIGHTS_MAX_DAYS+", or leave it out for "+CFG.RIGHTS_DAYS+". For example: ?rights "+plainName(t)+" 14"); break; }
         state.rightsAsk = state.rightsAsk || new Map();
@@ -718,18 +718,18 @@
         // ?penis → yours · ?penis types · ?penis <type> · staff: ?penis <who> <type> [knotted|unknotted]
         const types = Object.keys(CFG.PENIS_TYPES);
         const help = "Types: "+types.map(k => CFG.PENIS_TYPES[k].label === k ? k : k+" ("+CFG.PENIS_TYPES[k].label+")").join(", ")+
-                     ". Set yours with ?penis <type>, like ?penis equine. Any of 'em can carry a knot: a crafted shot with \"knotting\" gives one (canine comes knotted). "+
+                     ". Set yours with ?cock <type>, like ?cock equine. Any of 'em can carry a knot: a crafted shot with \"knotting\" gives one (canine comes knotted). "+
                      "Shots with canine, equine, feline (or barbed), draconic, double cock or humanizer change the type.";
         let t = sender, a = args.slice();
         if (a.length > 1 || (a.length === 1 && !types.includes(a[0].toLowerCase()) && !/^(types|list)$/i.test(a[0]))){
           const w = resolveTarget(a[0]);
           if (w && w !== sender){
-            if (!isStaff(sender)){ R("Only staff can change somebody else's cock, sugar. ?penis <type> sets yours."); break; }
+            if (!isStaff(sender)){ R("Only staff can change somebody else's cock, sugar. ?cock <type> sets yours."); break; }
             t = w; a = a.slice(1);
           }
         }
         if (!rec(t) || !rec(t).roles.length){ R("You'll need to be on the books first, hon. ?apply! "+help); break; }
-        if (!makesSemen(t) && !/^(types|list)$/i.test(a[0]||"")){ R("🍆 "+(t === sender ? "You haven't" : plainName(t)+" hasn't")+" got a cock right now, hon. Wear one, or ?futa on, and then ?penis <type> picks the kind. ?penis types shows 'em."); break; }
+        if (!makesSemen(t) && !/^(types|list)$/i.test(a[0]||"")){ R("🍆 "+(t === sender ? "You haven't" : plainName(t)+" hasn't")+" got a cock right now, hon. Wear one, or ?futa on, and then ?cock <type> picks the kind. ?cock types shows 'em."); break; }
         if (!a.length){ R("🍆 "+plainName(t)+": "+sizeName(t,"penis")+", "+penisLabel(t)+(knotted(t) ? ", knot "+sizeName(t,"knot") : "")+". "+help); break; }
         if (/^(types|list)$/i.test(a[0])){ R("🍆 "+help); break; }
         const type = a[0].toLowerCase();
@@ -1214,6 +1214,7 @@
         try { parasiteOff(sender, "safe"); } catch(e){ warn("safeword parasite:", e); }
         try { symOff(sender, "safe"); } catch(e){ warn("safeword symbiote:", e); }
         try { tempOutfitEnd(sender, "safe"); } catch(e){ warn("safeword outfit wheel:", e); }   // a wheel or Wrong Barn outfit comes off (10un-outfit-wheel.js)
+        try { reinsLet(sender, "safe"); } catch(e){ warn("safeword reins:", e); }   // off anybody's reins (10y9s-reins.js)
         say("🔴 PAUSE CALLED. Everything stops, right now, everybody.", true, sender);   // I go stand by them, so everyone near them hears it
         beep(sender, "I've got you, "+plainName(sender)+". Everything's stopped and I'm fetchin' somebody for you right now. You don't owe anybody an explanation. 🔴", true);
         notifyStaff("🔴 SAFEWORD from "+plainName(sender)+" ("+sender+"). Please go to them now.", false);
@@ -1411,6 +1412,8 @@ Welcome to B&B Farm, hon. 🌾`);
         beep(t,"I had a look at your paperwork, "+plainName(t)+", and it ain't quite a fit for us right now. No hard feelin's, sweetie. The gate's always open for a visit.");
         break;
       }
+
+      case "away": awayCommand(sender, args, R); break;   // who's been off the farm longest (10uo-away-books.js)
 
       case "unregister": {
         // ?unregister <who> · off the books entirely (and off the room whitelist)
@@ -1612,6 +1615,12 @@ Welcome to B&B Farm, hon. 🌾`);
       case "whistle": case "send": case "dose": case "herdtraps": case "sit": case "broody": case "album": case "holes": case "vat": keepersCommand(cmd, sender, args, R); break;   // 10y6-keepers.js
       case "stalldial": case "bringin": case "bedrest": case "callme": case "nevercall": case "intensity": case "keep": case "kept": uddersCommand(cmd, sender, args, R); break;   // 10y7-udders.js
       case "eager": trapCommand("traps", sender, ["eager"].concat(args), R); break;   // the no-cooldown switch, as its own command (and a Toggles switch)
+      case "seasons": case "calendar": seasonCommand(sender, args, R); break;   // the farm's seasons (10y9m-seasons.js; ?season is the Breedin' add-on's)
+      case "trickortreat": case "tot": trickOrTreat(sender, args, R); break;   // knockin' on the farm girl's door at Halloween (10y9n-halloween.js)
+      case "stocking": case "stockings": stockingCommand(sender, args, R); break;   // what's in your stockin' on the hearth, in winter (10y9u-winter.js)
+      case "egghunt": eggHuntCommand(sender, args, R); break;   // huntin' for eggs round the farm at Easter, and the board (10y9x-easter.js)
+      case "rate": rateCommand(sender, args, R); break;   // how a trap went for them (10y9o-trap-ratings.js)
+      case "renew": case "renewal": case "renewals": renewCommand(sender, args, R); break;   // another contract when this one ends (10y9t-renewals.js)
       case "struggle": case "free": case "goad": case "hunt": case "lay": case "gather": case "pack": extrasCommand(cmd, sender, args, R); break;   // 10x-trap-extras.js
       case "feedback": case "suggest": case "idea": case "bug": case "meh": case "more": feedbackCommand(cmd, sender, args, rest, R); break;   // the suggestion box (10q)
 
@@ -1892,6 +1901,7 @@ Welcome to B&B Farm, hon. 🌾`);
       }
 
       case "outfitwheel": case "dresswheel": case "wheeloutfit": outfitWheelCommand(sender, args, R); break;
+      case "grooming": groomingCommand(sender, args, R); break;
       case "seedmilk": { const r = rec(sender); if (!r || !r.roles.length){ R("You'll need to be on the books first, hon. ?apply and we'll get you sorted. 🌾"); break; } seedMilkCommand(sender, r, String(args[0]||"").toLowerCase(), R); break; }
 
       case "gender": {
@@ -1907,7 +1917,7 @@ Welcome to B&B Farm, hon. 🌾`);
         const was = r.gender; r.gender = g;
         if (g === "futa") r.futa = true; else if (was === "futa") r.futa = false;
         prodOf(t); saveLedger(); audit(sender, "GENDER", t+" "+g);
-        R("🌸 "+(t === sender ? "You're" : plainName(t)+" is")+" down as "+g+" now, sugar."+(g === "futa" ? " Futa makes milk and semen both." : "")+
+        R("🌸 "+(t === sender ? "You're" : plainName(t)+" is")+" down as "+g+" now, sugar."+(g === "futa" ? " Futa makes milk and cum both." : "")+
           (g === "nonbinary" ? " Your body's whatever your character has (?futa on for both), and ?chest flat or ?chest tits says which up top." : "")+" It picks your farm outfit, too.");
         break;
       }
@@ -1929,7 +1939,7 @@ Welcome to B&B Farm, hon. 🌾`);
         const on = v === "on" || v === "yes";
         if (on && limitBlocks(sender,"futa")){ R("Your hard limits rule that out, sugar, so I'll keep it off. If you want it, change your limits with staff first."); break; }
         r.futa = on; prodOf(sender); saveLedger(); audit(sender,"FUTA",on?"on":"off");
-        R(on ? "🌸 Futa it is, darlin'! You'll make milk and semen both, you can breed with ?breed and ?cum, and you can be bred in the vulva too (if you've said ?breedable on). ?futa off whenever you like."
+        R(on ? "🌸 Futa it is, darlin'! You'll make milk and cum both, you can breed with ?breed and ?cum, and you can be bred in the pussy too (if you've said ?breedable on). ?futa off whenever you like."
              : "Alrighty, futa's off. I'll go by what you're wearin' again, sugar. 💛");
         break;
       }
@@ -1949,10 +1959,10 @@ Welcome to B&B Farm, hon. 🌾`);
           const mine = bodyParts(t);
           const label = k => k === "penis" ? "Cock" : CFG.SIZES[k].label;
           const lines = mine.map(k => "  "+label(k)+": "+sizeName(t,k)+(k === "penis" ? ", "+penisLabel(t) : ""));
-          const ex = { udder:"udder DD", penis:"penis 9", testes:"balls 5", vulva:"vulva snug", butt:"butt 3", throat:"throat 2" };
+          const ex = { udder:"udder DD", penis:"cock 9", testes:"balls 5", vulva:"pussy snug", butt:"ass 3", throat:"throat 2" };
           const eg = mine.filter(k => ex[k]).slice(0,2).map(k => "?size "+ex[k]).join(" or ");
           R("📏 "+plainName(t).toUpperCase()+"'S SIZES\n"+lines.join("\n")+"\n\nSet one with ?size <part> <size>, like "+eg+". "+
-            "Your parts: "+mine.filter(k => k !== "knot").map(k => k === "testes" ? "balls" : k).join(", ")+". ✨Hyper sizes only come from shots. ?help body tells what they do.");
+            "Your parts: "+mine.filter(k => k !== "knot").map(k => ({ testes:"balls", penis:"cock", vulva:"pussy", butt:"ass" })[k] || k).join(", ")+". ✨Hyper sizes only come from shots. ?help body tells what they do.");
           break;
         }
         const part = partFrom(a[0]), S = part && CFG.SIZES[part];
@@ -1967,9 +1977,9 @@ Welcome to B&B Farm, hon. 🌾`);
         const top = S && S.natural;   // hyper only comes from shots
         if (!S || !(lvl >= 1 && lvl <= S.max)){
           R("Here's how, sugar: ?size, the part, then a size. Udder (or breasts, boobs, tits, chest) goes by cup, AA up to "+CFG.SIZES.udder.cups[CFG.SIZES.udder.natural-1]+" (or 1 to "+CFG.SIZES.udder.natural+"). "+
-            "Balls (or testes, testicles, nuts), vulva (or pussy, cunt), butt (or ass, anus, anal) and throat (or mouth, oral) go from 1 to "+CFG.SIZES.udder.natural+
-            " (or the name, like loose); penis (or cock, dick, shaft) goes by inches, 1 to "+CFG.SIZES.penis.natural+". "+
-            "For example: ?size udder DD  or  ?size butt slightly gaped  or  ?size penis 9. Plain ?size shows 'em all."); break;
+            "Balls (or nuts), pussy (or cunt), ass (or butt, anal) and throat (or mouth) go from 1 to "+CFG.SIZES.udder.natural+
+            " (or the name, like loose); cock (or dick) goes by inches, 1 to "+CFG.SIZES.penis.natural+". "+
+            "For example: ?size udder DD  or  ?size ass slightly gaped  or  ?size cock 9. Plain ?size shows 'em all."); break;
         }
         if (lvl > top){ R("Whoa, that's ✨hyper, hon! "+S.label+" only goes past "+S.natural+(S.inches?"\"":"")+" with shots. Try an injector with \""+
                            (CFG.SIZE_TAGS[part] ? CFG.SIZE_TAGS[part].up[0] : "growth")+"\" on it."); break; }
@@ -2192,7 +2202,7 @@ Welcome to B&B Farm, hon. 🌾`);
         const who = holeArg ? args.slice(0,-1) : args;
         const rest2 = who.map(resolveTarget).filter(t => t && t !== stud);
         if (!rest2.length){ R("Who're we breedin', sugar? Say ?breed, a name or member number (more than one is fine, separated by spaces), then the hole if you like. You're the stud. "+
-                             "The hole can be vulva (or pussy, cunt), butt (or ass, anus, anal), or mouth (or throat, oral). Leave it out and it's vulva. "+
+                             "The hole can be pussy (or cunt), ass (or butt, anal), or mouth (or throat). Leave it out and it's the pussy. "+
                              "For example: ?breed Bessie  or  ?breed Bessie butt  or  ?breed Bessie Daisy 123456 mouth. "+
                              "While it's open, just roleplay: say cum (or orgasm, climax, breed, fill them up) in your chat or emotes and I'll fill 'em. ?breed stop ends it."); break; }
         if (!rec(stud)){ R("You need to be on the books to breed the stock, sugar. Say ?apply first!"); break; }
@@ -2221,7 +2231,7 @@ Welcome to B&B Farm, hon. 🌾`);
         if (t && t !== stud && args[1] && PAINT_AREAS[String(args[1]).toLowerCase()] && !holeFrom(args[1])){ paint(stud, t, args[1], R); break; }
         const holes = args[1] ? holesFrom(args.slice(1).join("")) : ["vulva"];
         if (!t || t === stud || !holes){ R("Here's how, sugar: ?cum, then who (a name or member number, not yourself), then the hole. You're the stud. "+
-                                                      "The hole can be vulva (or pussy, cunt), butt (or ass, anus, anal), or mouth (or throat, oral). Leave it out and it's vulva. "+
+                                                      "The hole can be pussy (or cunt), ass (or butt, anal), or mouth (or throat). Leave it out and it's the pussy. "+
                                                       "For example: ?cum Bessie butt  or  ?cum 123456"); break; }
         cumInto(stud, t, holes, R, false);
         break;
@@ -2229,7 +2239,7 @@ Welcome to B&B Farm, hon. 🌾`);
 
       case "milk": case "collect": {
         const t = resolveTarget(args[0]);
-        if (!t || !rec(t)){ R("Here's how, sugar: ?milk (for milk) or ?collect (for semen), their name or member number, then an amount in mL if you like. Leave the amount out to take it all. "+
+        if (!t || !rec(t)){ R("Here's how, sugar: ?milk (for milk) or ?collect (for cum), their name or member number, then an amount in mL if you like. Leave the amount out to take it all. "+
                            "For example: ?milk Bessie  or  ?milk Bessie 500  or  ?collect 123456 20"); break; }
         const amt = args[1] ? parseFloat(args[1]) : Infinity;
         if (!(amt > 0)){ R("Give me an amount in mL, sugar, or leave it out to take it all. For example: ?milk Bessie 500  or  ?collect 123456 20"); break; }
@@ -2363,6 +2373,8 @@ Welcome to B&B Farm, hon. 🌾`);
         break;
       }
 
+      case "reins": reinsCommand(sender, args, R); break;   // a pet at heel, a step behind (10y9s-reins.js)
+
       case "walk": {
         const t = resolveTarget(args[0]);
         if (!t){ R("Walk who, sugar? Say ?walk and the name or member number of stock in your own herd, like ?walk Bessie or ?walk 123456. Say the same thing again to let go of the lead."); break; }
@@ -2370,6 +2382,7 @@ Welcome to B&B Farm, hon. 🌾`);
         if (!membership(t, sender) && !isProprietor(sender)){ R("You can only walk stock in your own "+herdWord(sender)+", sugar."); break; }
         if (!charFor(t) || !charFor(sender)){ R("You both need to be here on the farm for that, hon."); break; }
         if (stockedNow(t)){ R("They're in the stocks right now, sugar. ?unstock 'em first."); break; }
+        if (reinsOf(t)){ R("They're on "+plainName(reinsOf(t).by)+"'s reins right now, sugar. ?reins off first."); break; }
         state.leashes.set(t, sender); audit(sender,"WALK",String(t));
         say("🦮 "+plainName(sender)+" clips a lead on "+plainName(t)+". Aww!", false, t);
         whisper(t, "You're on "+plainName(sender)+"'s lead now, sweetie. Wherever they go, you go. Safeword ends it.");
@@ -2557,6 +2570,7 @@ Welcome to B&B Farm, hon. 🌾`);
         if (sub === "open"){
           if (!isProprietor(sender)){ R("Only the proprietors can open the fair, sugar."); break; }
           let cls = String(args[1]||"").toLowerCase(), rest = args.slice(2);
+          if (cls === "cock" || cls === "dick") cls = "penis";
           if (!CFG.FAIR_CLASSES.includes(cls)){ cls = "show"; rest = args.slice(1); }
           const CLASS_TITLE = { show:"County Fair", udder:"Biggest Udder", balls:"Biggest Balls", penis:"Biggest Cock",
                                 gape:"Best Gape", throat:"Deepest Throat", load:"Biggest Load" };
@@ -2591,7 +2605,7 @@ Welcome to B&B Farm, hon. 🌾`);
           announce("🎪🏆 And the "+F.title+" goes to... "+plainName(win)+" ("+shown(win, score)+")! Blue ribbon"+(r.tierUntil?" and prize tier for a week":"")+"."+
               (ranked[1] ? " Runner-up: "+plainName(ranked[1][0])+" ("+shown(ranked[1][0], ranked[1][1])+")." : ""));
         } else {
-          if (!F || !F.open){ R("There's no fair runnin' right now, sugar. Proprietors can start one with ?fair open, a class if they like (show, udder, balls, penis, gape, throat or load), and a title, like ?fair open Harvest Show or ?fair open udder Moo Off."); break; }
+          if (!F || !F.open){ R("There's no fair runnin' right now, sugar. Proprietors can start one with ?fair open, a class if they like (show, udder, balls, cock, gape, throat or load), and a title, like ?fair open Harvest Show or ?fair open udder Moo Off."); break; }
           R("🎪 "+F.title+" — here's who's entered:\n\n"+Object.keys(F.entrants).map(m=>{
             const e = F.entrants[m], s = Object.values(e.scores);
             return "  • "+plainName(parseInt(m,10))+" — "+s.length+" score(s)";
@@ -2605,7 +2619,7 @@ Welcome to B&B Farm, hon. 🌾`);
         const cls = F.cls || "show";
         if (cls === "show" && !hasRole(sender, ROLE.LIVESTOCK)){ R("The show ring's just for stock, sugar."); break; }
         if (!rec(sender) || !rec(sender).roles.length){ R("You'll need to be on the books to enter, sugar. ?apply first!"); break; }
-        if ((cls === "load" || cls === "balls" || cls === "penis") && !makesSemen(sender)){ R("This one's for folks with a penis, hon (or futa: ?futa on)."); break; }
+        if ((cls === "load" || cls === "balls" || cls === "penis") && !makesSemen(sender)){ R("This one's for folks with a cock, hon (or futa: ?futa on)."); break; }
         if (cls === "udder" && !makesMilk(sender)){ R("This one's for milkers, hon. Say ?milkable on first!"); break; }
         F.entrants[sender] = F.entrants[sender] || { scores:{} }; saveLedger();
         say("🎪 Lookin' good! "+plainName(sender)+" steps into the show ring.", false, sender);

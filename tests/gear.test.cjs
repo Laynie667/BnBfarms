@@ -86,6 +86,6 @@ const roomText=s=>{ const d=s&&s[1]; if(!d) return null;
   handlers.ChatRoomMessage({Sender:500,Type:'Hidden',Content:'FarmhandMsg',Dictionary:{v:2,type:'hello',ver:'0.5.0'}}); await wait(1500);
   n=sent.length; W.__sync(true); await wait(300);
   const st=(sent.slice(n).filter(s=>s[1]&&s[1].Target===500&&s[1].Dictionary&&s[1].Dictionary.type==='state').pop()||[0,{Dictionary:{}}])[1].Dictionary.state||{};
-  out('7 state shows the pump ->', st.gear&&st.gear.milk&&st.gear.milk.name==='lactation pump'&&st.gear.milk.ml===40);
+  out('7 state shows the pump ->', st.gear&&st.gear.milk&&st.gear.milk.name==='milk pump'&&st.gear.milk.ml===40);
   process.exit(0);
 })();

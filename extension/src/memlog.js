@@ -8,6 +8,15 @@ import { messMemory } from "./messes.js";
 import { trimStats } from "./trimpics.js";
 import { VERSION } from "./version.js";
 import { messDiag } from "./messes.js";
+import { lookSent } from "./look.js";
+import { screenSkipped, screenLight } from "./botscreen.js";
+// what this page has sent of your look since it opened (look.js), and on the bot's account how much drawin' it skipped
+function sentLine() {
+  let t = "";
+  try { const x = lookSent(); t = "Your look sent to the room: " + x.items + " single pieces, " + x.whole + " whole, " + x.merged + " changes gathered together"; } catch (e) { /* fine */ }
+  try { if (screenLight()) t += " · the farm girl's screen skipped drawin' people " + screenSkipped() + " times"; } catch (e) { /* fine */ }
+  return t;
+}
 
 const W = window, KEY = "farmhand-memlog", MAX = 120;
 let log = [];
@@ -59,7 +68,7 @@ export function initMemlog() {
   if (typeof W.CommandCombine === "function") {
     W.CommandCombine([{ Tag: "farmmem", Description: ": the Farmhand Companion's memory log (the last hour), and copies it", Action: () => {
       tick();
-      const text = "Companion v" + VERSION + "\n" + memlogText(24) + (lastPage.length ? "\nThe last seconds of the page before this one:\n" + lastPage.map(quickLine).join("\n") : "");
+      const text = "Companion v" + VERSION + "\n" + sentLine() + "\n" + memlogText(24) + (lastPage.length ? "\nThe last seconds of the page before this one:\n" + lastPage.map(quickLine).join("\n") : "");
       try { W.navigator.clipboard.writeText(JSON.stringify(log)); } catch (e) { /* no clipboard: fine */ }
       if (typeof W.ChatRoomSendLocal === "function") W.ChatRoomSendLocal("Farmhand memory log (copied, paste it to Claude):\n" + text, 120000);
       else console.log(text);

@@ -58,7 +58,7 @@ for (const t of targets) {
     charset: "ascii",   // emoji and accents written as \u escapes: the scripts read right whatever encoding the browser guesses at install
     legalComments: "none",
     banner: { js: header },
-    define: { __FARMHAND_VERSION__: JSON.stringify(t.version) },
+    define: { __FARMHAND_VERSION__: JSON.stringify(t.version), __COMPANION_VERSION__: JSON.stringify(pkg.versions.companion) },   // (the bot knows which Companion came out with it)
     outfile: t.out,
     plugins: t.plugins || [],
     logLevel: "info",

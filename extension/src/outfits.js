@@ -9,6 +9,7 @@
 //      and nothin' already locked on them is moved
 //   3. every piece that was locked in the saved outfit gets a high security padlock keyed to the farm
 import { BOT_MEMBER } from "./config.js";
+import { commitLook } from "./look.js";
 const BACKUP_KEY = "fhc-outfit-backup";
 // lock details are never saved or copied: the farm puts its own locks on
 const LOCK_FIELDS = ["LockedBy", "LockMemberNumber", "LockMemberName", "LockMessage", "CombinationNumber", "Password", "Hint", "LockSet",
@@ -25,11 +26,8 @@ function unlocked(prop) {
   if (Array.isArray(c.Effect)) c.Effect = c.Effect.filter((e) => e !== "Lock");
   return c;
 }
-function commit(bundle) {
-  window.ServerAppearanceLoadFromBundle(P(), P().AssetFamily, bundle, P().MemberNumber);
-  if (typeof window.CharacterRefresh === "function") window.CharacterRefresh(P());
-  window.ChatRoomCharacterUpdate(P());
-}
+// on you at once; the room hears it once, with whatever else changed on you in the same moment (look.js)
+const commit = (bundle) => commitLook(bundle);
 
 // what they're wearin' now, as a farm outfit: { data, items, locks }
 export function captureOutfit() {

@@ -134,10 +134,10 @@
   const PUBLIC_CMDS = ["help","commands","info","guide","rules","consent","tour","species","luxury","doors",
                        "ping","apply","record","keys","who","herd","safe","safeword","red","report",
                        "staff","stuck","friend","notice","teaseme","tease","dressme","dress","hypnotize","hypnotise","allow","letgo","echs","roam",
-                       "stats","board","pedigree","breedable","fertile","mpreg","naturalheat","breed","cum","milkable","seedmilk","outfitwheel","dresswheel","wheeloutfit","futa","size","sizes","measure","penis","cock","rights","accept",
+                       "stats","board","pedigree","breedable","fertile","mpreg","naturalheat","breed","cum","milkable","seedmilk","outfitwheel","dresswheel","wheeloutfit","grooming","futa","size","sizes","measure","penis","cock","rights","accept",
                        "freeuse","jarok","gender","outfit","outfits","uniform","hypno","tally","eggs","yes","no","wash","quota","praise","degrade",
                        "weather","feeding","curfew","beg","please","fair","enter","addons","addon",
-                       "ribbons","ribbon","store","buy","messes","ownoutfit","myoutfit","chest","gift","potions","potion","dares","dare","dared","bench","use","feedback","suggest","idea","bug","meh","more","today","subject","subjects","traps","trap","watersports","parasite","symbiote","symbiotes","struggle","free","goad","hunt","lay","gather","pack","watersport","parasites","eager","quiet","tend","brood","bet","cleanse","corruption","gauntlet","lend","bid","route","mysterybox","suit","whistle","send","dose","herdtraps","sit","broody","album","holes","vat","stalldial","bringin","bedrest","callme","nevercall","intensity","keep","kept","services","service","coax","nursery","little","care"];
+                       "ribbons","ribbon","store","buy","messes","ownoutfit","myoutfit","chest","gift","potions","potion","dares","dare","dared","bench","use","feedback","suggest","idea","bug","meh","more","today","subject","subjects","traps","trap","watersports","parasite","symbiote","symbiotes","struggle","free","goad","hunt","lay","gather","pack","watersport","parasites","eager","quiet","tend","brood","bet","cleanse","corruption","gauntlet","lend","bid","route","mysterybox","suit","whistle","send","dose","herdtraps","sit","broody","album","holes","vat","stalldial","bringin","bedrest","callme","nevercall","intensity","keep","kept","seasons","calendar","trickortreat","tot","stocking","stockings","egghunt","rate","renew","renewal","renewals","services","service","coax","nursery","little","care"];
   const STAFF_CMDS  = ["queue","app","approve","deny","register","unregister","grant","revoke",
                        "claim","release","myherd","herdname","herdcall","herdsummon","turnout","letup","goldkey",
                        "pasture","onduty","cover","staffadd","staffremove",
@@ -146,9 +146,9 @@
                        "forced","summon","health",
                        "tier","vet","brand","spot","spots","appclear",
                        "milk","collect","heat","heatline","shotlog",
-                       "stocks","unstock","walk","tourstop","clockin","clockout","hours","done","chore","chores",
+                       "stocks","unstock","walk","reins","tourstop","clockin","clockout","hours","done","chore","chores",
                        "wheel","spin","begphrase","score","drain","denial","ruin","jars","inseminate","nomilk","inspect","edge",
-                       "contract","contracts","zone","zones","voice","machine","edit","corral","uncorral","unbench","purge"];
+                       "contract","contracts","zone","zones","voice","machine","edit","corral","uncorral","unbench","purge","away"];
 
   const SAFETY_CMDS = ["safe","safeword","red","stuck"];
   // staff commands that stock can also use on other stock, with a yes from them first (15-commands.js)
@@ -206,7 +206,7 @@
     if (staffView && r.prod && r.prod.held){
       const p = prodOf(mn), cap = capacity(mn), held = heldTotal(p);
       const parts = HOLES.filter(h => h !== "vulva" || hasVulva(mn) || (p.held.vulva||0) > 0)
-                         .map(h => ({ vulva:"Vulva", butt:"Butt", mouth:"Stomach" })[h]+" "+ml(p.held[h]||0));
+                         .map(h => ({ vulva:"Pussy", butt:"Ass", mouth:"Swallowed" })[h]+" "+ml(p.held[h]||0));
       o += "\n\n🫙 Holding: "+parts.join(" · ")+" ("+Math.round(100*held/Math.max(1, cap))+"% full)";
     }
     // the application they filled in, kept when they were approved (staff, and they themselves)

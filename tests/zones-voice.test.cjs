@@ -48,8 +48,8 @@ const C=mn=>chars.find(c=>c.MemberNumber===mn);
   out('2 ?voice says it is retired, and keeps nothing ->', /retired/.test(lastTo(700)) || farmTo(700,'reply').some(d => /retired/.test(d.text)), !(L().voice&&L().voice.herd&&L().voice.herd[700]&&L().voice.herd[700].lines.length));
   let n;
   // 3. staff state for the Companion
-  n=sent.length; W.__sync(true); await wait(300);
-  const st=(farmTo(700,'state',n).pop()||{}).state||{};
+  // (since Oct 26 an unchanged panel isn't sent again, so this reads the panel the bot would send)
+  const st=W.__stateFor(700)||{};
   const moo=(st.herd||[]).find(x=>x.mn===500)||{};
   out('3 herd list with where and mine ->', moo.where==='barn', moo.mine===true);
   out('3 zones in state ->', !!(st.zones&&st.zones['barn-1']));

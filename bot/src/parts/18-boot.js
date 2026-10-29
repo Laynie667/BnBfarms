@@ -20,7 +20,7 @@
       log("Using setInterval — may throttle in background tabs.");
     }
     every(watchdog, 60000);
-    every(()=>{ try { if (inRoom()) leashTick(); } catch(e){ warn("leash:",e); } }, CFG.LEASH_TICK_MS);
+    every(()=>{ try { if (inRoom()) leashTick(); } catch(e){ warn("leash:",e); } try { if (inRoom()) reinsTick(); } catch(e){ warn("reins:",e); } }, CFG.LEASH_TICK_MS);
     later(heartbeat, 3000);
 
     // keep the page from being considered idle by the browser

@@ -1,0 +1,60 @@
+{
+ "id": "96553188",
+ "saved": "2026-10-14T23:37:16.273Z",
+ "body": {
+  "cup": 12,
+  "breast": {
+   "full": 1,
+   "hang": 1,
+   "apart": 1,
+   "x": 0,
+   "y": 0,
+   "nip": 1,
+   "nipY": 0,
+   "nipX": 0
+  },
+  "wear": {},
+  "belly": {
+   "std": {
+    "on": true,
+    "rx": 92,
+    "ry": 112,
+    "sag": 0.28,
+    "x": 0,
+    "y": -20,
+    "behind": false,
+    "flat": false,
+    "cut": 0.74
+   },
+   "AllFours": {
+    "on": false,
+    "rx": 70,
+    "ry": 80,
+    "sag": 0.22,
+    "x": 0,
+    "y": -60,
+    "behind": true,
+    "flat": false,
+    "cut": 0.74
+   },
+   "Hogtied": {
+    "on": false,
+    "rx": 70,
+    "ry": 80,
+    "sag": 0.22,
+    "x": 0,
+    "y": -75,
+    "behind": true,
+    "flat": false,
+    "cut": 0.74
+   }
+  },
+  "auto": true,
+  "tuck": true,
+  "dress": true,
+  "mould": {
+   "items": [],
+   "mode": {}
+  }
+ }
+}

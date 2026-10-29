@@ -288,7 +288,7 @@
       ["%n leans over the trough for a drink. The water isn't empty. Somethin' black and soft and long as a hand loops up out of it and slaps wetly onto their chest.",
        "The trough water stirs as %n bends to it. A dozen fat dark shapes rise to the surface, and the nearest ones jump."],
       ["Leeches. Big ones. Two find %n's nipples before they can straighten up and latch on with soft round mouths, and start to suck, slow and strong.",
-       "They fasten on %n's teats like calves, cool and slick, and begin to feed. Each pull goes right through to the root of them."],
+       "They fasten on %n's teats like milkin' cups, cool and slick, and begin to feed. Each pull goes right through to the root of them."],
       ["More of them inch up %n's thighs, lookin' for somewhere soft. One settles over their clit and seals on. %n's legs fold.",
        "A third leech works its way between %n's legs and finds what it wants. It doesn't bite. It suckles, and it does not let go."],
       ["%n kneels by the trough with a leech on each tit and one between their legs, all three pulsin' in time, drinkin' them and swellin' fat. They can't pull them off. They've stopped tryin'.",

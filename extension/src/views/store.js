@@ -37,7 +37,7 @@ export function storeTab(ctx) {
           s.vat && (it.kind || /^shot-/.test(it.id)) ? btn("Pay with milk", () => ctx.send("buy " + it.id + " with milk")) : null,
           it.gift ? btn("Gift it", () => (who() ? ctx.send("buy " + it.id + " for " + who()) : ctx.hint("Type who it's for in the box above the potions first."))) : null));
   const shelf = (label, list) => list.length ? card(title(label), list.map(row)) : null;
-  const potions = items.filter((it) => it.kind), shots = items.filter((it) => /^shot-/.test(it.id)), messes = items.filter((it) => it.shelf === "mess"), treats = items.filter((it) => !it.kind && !/^shot-/.test(it.id) && it.shelf !== "mess");
+  const potions = items.filter((it) => it.kind), shots = items.filter((it) => /^shot-/.test(it.id) && it.shelf !== "shrink"), shrink = items.filter((it) => it.shelf === "shrink"), messes = items.filter((it) => it.shelf === "mess"), treats = items.filter((it) => !it.kind && !/^shot-/.test(it.id) && it.shelf !== "mess" && it.shelf !== "shrink");
   // the mess shelf (Laynie, Oct 19: "I didnt see the options to buy... to gift messes to people"): on you, or on somebody
   const messWho = () => String(ctx.ui.messWho || "").trim();
   const messRow = (it) => h("div", { class: "fhc-box", style: { padding: "8px", marginTop: "6px" } },
@@ -56,6 +56,7 @@ export function storeTab(ctx) {
     messCard,
     shelf("🛍️ Treats and favors", treats),
     shelf("💉 Shots", shots),
+    shelf("🔻 Shrinkin' shots", shrink),   // a size back down, for good (Oct 27)
     potions.length ? card(title("🧪 Potions"),
       muted("Gifts always ask them first, and you only pay if they say yes. They need Potions switched on in their Toggles."),
       h("label", { class: "fhc-label" }, "Gift to (name or member number)",

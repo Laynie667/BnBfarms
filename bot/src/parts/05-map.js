@@ -90,10 +90,19 @@
     // what was just asked for isn't asked again for 2 minutes, even if the room's list hasn't caught up yet
     state.wlSent = state.wlSent || new Map();
     const recent = (mn, act) => { const s = state.wlSent.get(mn); return s && s.act === act && Date.now() - s.at < 120000; };
-    const ask = (mn, act) => { send("ChatRoomAdmin", { MemberNumber: mn, Action: act }); state.wlSent.set(mn, { act, at: Date.now() }); changed++; };
+    // one that never sticks (the room's list full, or the server sayin' no) isn't asked for again and again: every ask
+    // makes the server send the whole room's settings (the map too) to everybody in it (Oct 27). Three tries, then an hour off.
+    state.wlTries = state.wlTries || new Map();
+    const tired = (mn) => { const t = state.wlTries.get(mn); return !!(t && t.n >= 3 && Date.now() - t.at < 3600000); };
+    const ask = (mn, act) => {
+      if (tired(mn)) return;
+      send("ChatRoomAdmin", { MemberNumber: mn, Action: act }); state.wlSent.set(mn, { act, at: Date.now() }); changed++;
+      const t = state.wlTries.get(mn); state.wlTries.set(mn, t && Date.now() - t.at < 3600000 ? { n: t.n + 1, at: t.at } : { n: 1, at: Date.now() });
+    };
     const people = new Set(Object.keys(L.people).map(Number).concat(CFG.PROPRIETORS));
     for (const mn of people){
       if (changed >= 15) break;   // a few at a time; the rest next time round
+      if (isOnBooks(mn) && wl.has(mn)) state.wlTries.delete(mn);   // (it stuck)
       if (isOnBooks(mn) && !wl.has(mn)){
         L.wlAdded[mn] = L.wlAdded[mn] || Date.now(); wl.add(mn);
         if (!recent(mn, "Whitelist")) ask(mn, "Whitelist");

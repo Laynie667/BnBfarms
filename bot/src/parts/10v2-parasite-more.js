@@ -58,6 +58,7 @@
   function parasiteGone(mn, g, how){
     const r = rec(mn), p = prodOf(mn);
     if (g && g.strain === "tyrant" && p) p.deniedUntil = Math.min(p.deniedUntil || 0, Date.now());
+    strainGoneMore(mn, g);   // a Weaver's cocoon comes off with it (10v6)
     if (how === "done" && r.parasiteOn && Math.random() < CFG.PARASITE_SEED_CHANCE) r.parasiteSeed = Date.now() + (2 + Math.random()*18)*3600000;
   }
   // every heartbeat, for each host that's here
@@ -67,7 +68,7 @@
     if (P.stage > (g.stageTold || 1)){
       g.stageTold = P.stage; saveLedger();
       const grew = g.form === "belt" ? (P.stage === 2 ? "suckers" : "lipsLate") : bloomWhat(g, P.stage);
-      emote("👄 "+pmLine("bloom_"+grew, mn), mn); arouse(mn, 20); syncCompanions(true);
+      emote("👄 "+pmLine(PARASITE_MORE[strainKey(g)+"_bloom_"+grew] ? strainKey(g)+"_bloom_"+grew : "bloom_"+grew, mn), mn); arouse(mn, 20); syncCompanions(true);
       { const st = P.stage; later(() => { if (parasiteOn(mn)) tell(mn, "👄 "+strainBloomTell(mn, st)); }, 7000); }
     }
     strainTick(mn, r, now);   // the Breeder's first clutch, the Tyrant's edges (10v3-parasite-strains.js)
@@ -87,6 +88,7 @@
       privateLine(mn, pmLine(PARASITE_MORE[strainKey(g)+"_urgeFail"] ? strainKey(g)+"_urgeFail" : "urgeFail", mn), "emote"); arouse(mn, 40, 94); saveLedger(); syncCompanions(true);
     } else if (g.urge && g.urge.kind === "glory" && Object.keys(L.spots || {}).some(n => /^glory-\d+$/.test(n) && onSpot(mn, n, 0))) parasiteUrgeDone(mn, "glory");
     else if (g.urge && g.urge.kind === "nest" && nestSpots().some(n => onSpot(mn, n, 0))) parasiteUrgeDone(mn, "nest");
+    else if (g.urge && g.urge.kind === "water" && waterSpots().some(([n]) => onSpot(mn, n, 1))) parasiteUrgeDone(mn, "water");   // (the Deep: 10v6)
     else if (g.urge && g.urge.kind === "kneel" && kneelingNow(mn)){ g.urge.knelt = (g.urge.knelt || 0) + 1; if (g.urge.knelt >= 3) parasiteUrgeDone(mn, "kneel"); else saveLedger(); }   // (three heartbeats on their knees, a minute or so)
     else if (!g.urge && now >= (g.urgeAt || 0) && !quietNow(mn) && !heldByTrap(mn) && !r.benched && !r.penned && !(p && p.stall)){
       const kinds = urgeKinds(mn, g, P);
@@ -113,6 +115,7 @@
       k === "swallow" ? !!P.lips && !holeBlocked(mn, "mouth") :
       k === "glory"   ? glory :
       k === "nest"    ? nestSpots().length > 0 :
+      k === "water"   ? waterSpots().length > 0 :
       k === "bred"    ? !limitBlocks(mn, "breed") :
       k === "milked"  ? (makesMilk(mn) && !limitBlocks(mn, "milk")) || makesSemen(mn) :
       true);
@@ -123,7 +126,7 @@
     return { kiss: "kiss somebody on the mouth", swallow: "swallow a load", glory: "get yourself into a glory stall", nest: "go and settle yourself in the nest",
              bred: v ? "take a load in your pussy or your ass" : "take a load up your ass",
              milked: makesMilk(mn) && !limitBlocks(mn, "milk") ? "get yourself milked" : "get your cock milked",
-             kneel: "get down on your knees and stay there", beg: "beg for it, out loud, where folks can hear you" }[kind] || "do as it says";
+             kneel: "get down on your knees and stay there", water: "go and get yourself in the water", beg: "beg for it, out loud, where folks can hear you" }[kind] || "do as it says";
   }
   // on their knees (or all fours) in the game right now
   function kneelingNow(mn){ const C = charFor(mn); if (!C) return false; const a = [].concat(C.ActivePose || [], C.Pose || []); return a.some(p => /^(Kneel|KneelingSpread|AllFours)$/.test(String(p))); }
@@ -156,7 +159,9 @@
   // a Tyrant eats what they reach for
   function parasiteClimax(mn){
     const r = rec(mn), g = r && r.parasite;
-    if (!g || !parasiteOn(mn) || g.strain !== "tyrant") return;
+    if (!g || !parasiteOn(mn)) return;
+    if (g.strain === "gloss") return glossClimax(mn, g);   // a Gloss wants it, and pays for it (10v6)
+    if (g.strain !== "tyrant") return;
     const now = Date.now(); if (now - (g.ateAt || 0) < 60000) return;
     g.ateAt = now; g.eaten = (g.eaten || 0) + 1;
     parasiteDose(mn, 1, pmLine("tyrant", mn));
@@ -198,7 +203,7 @@
   // the thing in the water knows its own
   function parasiteKin(mn, now){
     const r = rec(mn);
-    if (!parasiteOn(mn) || now - (r.kinAt || 0) < 30*60000) return false;
+    if (!parasiteOn(mn) || now - (r.kinAt || 0) < (strainKey(r.parasite) === "deep" ? CFG.DEEP_KIN_MIN : 30)*60000) return false;   // (the Deep is kin twice over: 10v6)
     r.kinAt = now; return true;
   }
 

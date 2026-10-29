@@ -145,7 +145,7 @@
   }
   async function saveBrand() {
     try { const r = await fetch("/__studio/fits/brand.json", { method: "POST", body: JSON.stringify({ v: 1, saved: new Date().toISOString(), art: BRAND.art, look: BRAND.look, size: BRAND.size, places: BRAND.places }, null, 1) }); if (!r.ok) throw new Error(await r.text());
-      say("Saved to studio\\fits\\brand.json. On the bot's PC, the Companion's \"Get my studio's settings\" makes it the farm's brand for everybody."); }
+      say("Saved to studio\\fits\\brand.json. To make it the farm's brand for everybody: node tools/farm-look-bake.mjs, then release the Companion."); }
     catch (e) { say("It didn't save: " + (e && e.message || e), true); }
   }
   async function loadBrand(tell) {

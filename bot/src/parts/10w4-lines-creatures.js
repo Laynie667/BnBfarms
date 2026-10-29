@@ -24,7 +24,7 @@
       "{nv}He mounts %n's ass in one long shove and ruts like he's late for somethin'. The knot bumps at them, swellin', and then it pops through and %n is tied fast.",
       "He's fast and he's deep and he doesn't stop till the knot's locked in %n's %h. Then he just holds them and empties himself, pant, pulse, pant."]);
     more(A.wolves.in[1], [
-      "A younger wolf crouches by %n's head, cock bobbin', and they take him in their mouth because there's nothin' else to do with it. The alpha growls approval behind them.",
+      "A lean wolf crouches by %n's head, cock bobbin', and they take him in their mouth because there's nothin' else to do with it. The alpha growls approval behind them.",
       "The pack crowds close. Paws in %n's hair, a cock in their mouth, another rubbin' wet along their cheek, while the one in their %h holds them tied."]);
     more(A.wolves.in[2], [
       "The knot slips free with a wet pop and %n barely has time to gasp before the next wolf is nosin' in, mountin' and pushin' and tyin' all over again.",
@@ -166,7 +166,7 @@
       "They play with %n the way cats play with a mouse: a shove, a trip, a paw in the small of the back, and every time %n gets up they're a little more undressed.",
       "The orange one rubs his cheek along %n's jaw, markin' them, and the grey one does the same from behind. %n smells of tomcat now."]);
     more(A.toms.beats[2], [
-      "The grey tom bites down on the back of %n's neck and %n goes still all over, like a kitten carried by the scruff. He purrs round the mouthful.",
+      "The grey tom bites down on the back of %n's neck and %n goes still all over, like a cat carried by the scruff. He purrs round the mouthful.",
       "\"Down,\" says the orange one, and kneads %n's back with both hands until they sink, hips high, head on the hay."]);
     more(A.toms.in[0], [
       "{v}He slides into %n's pussy easy and quick, and then he pulls back, and every one of those little barbs rakes them on the way out and %n yowls.",

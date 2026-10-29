@@ -59,13 +59,13 @@
      "%n's lost in the corn, lost in him, and the stalks overhead sway in time."]);
   trapScene("honey",
     ["The syrup runs down %n's back and between their cheeks, warm and slow, and pools wherever they bend.",
-     "A barn cat finds %n first and licks a sticky stripe up their calf with its rough little tongue.",
+     "One of the barn's cat-folk finds %n first and licks a sticky stripe up their calf with a rough little tongue.",
      "{t}It drips off the ends of %n's nipples in long golden strings, and a farmhand catches one on a finger and tastes it.",
-     "A billy goat wanders in, sniffs, and starts on %n's toes, then works upward with great dedication."],
-    ["Every critter on the farm has found %n now, and they're all licking, rough and wet, in every sticky place at once.",
+     "A goat-man off the hill strolls in, sniffs, and starts on %n's toes, then works upward with great dedication."],
+    ["Every one of the farm's animal folk has found %n now, and they're all licking, rough and wet, in every sticky place at once.",
      "{v}A big warm tongue works the syrup out from between %n's legs, deep and patient, and keeps going long after it's clean.",
      "{c}A tongue cleans %n's cock from root to tip, again, and again, much more often than it needs.",
-     "%n is squirming in a pool of syrup, licked raw and sweet, and the critters keep queuing up."]);
+     "%n is squirming in a pool of syrup, licked raw and sweet, and the animal folk keep queuing up."]);
   trapScene("wheel",
     ["Between stops the wheel spins, and %n's whole world spins with it, and every time it stops a new one's waiting.",
      "The crowd chants the spins. \"Bull! Bull! Bull!\" The wheel clicks past and stops on somethin' else.",
@@ -83,7 +83,7 @@
     ["When the pies run out, the crowd switches to cream straight from the can, and a can goes over %n's head.",
      "A farmhand licks a long stripe of cream off %n's neck, and then their ear, and then their mouth.",
      "%n's dripping cream from every inch above the boards, and somebody behind them is paying attention to every inch below.",
-     "Kids line up for a throw. Grown-ups line up for something else."]);
+     "The milkmaids line up for a throw. The farmhands line up for something else."]);
   trapScene("kissgate",
     ["The toll's paid both ways at once: somebody kissing %n deep on the field side while somebody pays at the other.",
      "Every walker that comes through reads the sign aloud: TOLL, ONE KISS OR ONE TURN. Most of them can count.",
@@ -160,10 +160,10 @@
      "The champion is led round and given another go, because the book says three ties, and the book is never wrong."]);
   trapScene("leashpost",
     ["The leash is short, and %n can only kneel or stand bent, and everyone who walks past the dog yard gets an eyeful.",
-     "A kennel dog wanders over and sniffs %n thoroughly, front and back, and wags.",
+     "One of the kennel's dog-folk wanders over and sniffs %n thoroughly, front and back, and wags.",
      "Somebody stops, unbuckles, and has %n quick against the post, and doesn't say a word.",
      "{t}A passer-by gives %n's tits a slap on the way past, like you'd pat a good dog."],
-    ["The next one's slower. Takes their time. Talks to %n the whole way, calls them a good dog, a good bitch, a good pet.",
+    ["The next one's slower. Takes their time. Talks to %n the whole way, calls them a good dog, a good pup, a good pet.",
      "%n's knees are muddy and their thighs are dripping and the leash hasn't moved.",
      "Three in a row now, and %n's stopped looking round to see who. They just tilt their hips up when they hear boots.",
      "A kennel hand checks the post on the way past, sees %n's state, and leaves them there a while longer."]);
@@ -180,7 +180,7 @@
   trapScene("tomatoes",
     ["The crowd gets into it. Rotten tomatoes, soft plums, an egg or two, and it all runs down %n's face and into their mouth.",
      "{t}Somebody takes aim at %n's tits, and gets them, and the juice runs off their nipples.",
-     "A child throws a grape. Then a farmhand throws a melon. The melon makes a sound %n won't forget.",
+     "A milkmaid throws a grape. Then a farmhand throws a melon. The melon makes a sound %n won't forget.",
      "%n gets the hang of it and starts catching the soft ones in their mouth, and the crowd goes wild."],
     ["Somebody comes round the back of the stocks, while %n's face is full of fruit, and there's a different sort of throwing going on back there.",
      "%n's plastered red and pink and gold, juice running down their chin and between their legs, and the cart's still half full.",
@@ -216,10 +216,10 @@
   // ── the sty ──
   trapScene("slop",
     ["The slop is warm and thick and it's in %n's hair, their ears, their mouth when they gasp.",
-     "The pigs root at %n with their wet snouts, snuffling into every crease, looking for scraps.",
+     "The pig-folk root at %n with their wet snouts, snufflin' into every crease, lookin' for scraps.",
      "A pig roots a bit of turnip out of %n's hair and squeals about it.",
      "The pig keeper pours another pail right over %n's head, laughing, and calls the pigs."],
-    ["%n's being rooted over by six pigs at once, and the pig keeper has pulled up a stool to watch.",
+    ["%n's being rooted over by six of the pig-folk at once, and the pig keeper has pulled up a stool to watch.",
      "%n gives up trying to climb out and just wallows in it, filthy, squealing like one of them.",
      "The boar-man who keeps the sty leans on the rail on two legs, looks %n over, and decides they're the sweetest thing in the trough.",
      "The pig keeper leans over the rail and slaps %n's slop-covered rump. \"There's my best piggy.\""]);

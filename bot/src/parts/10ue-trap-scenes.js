@@ -9,8 +9,8 @@
   const TRAP_SCENE = {};
   const trapScene = (kind, ...pools) => { TRAP_SCENE[kind] = (TRAP_SCENE[kind] || []).concat(pools); };
   // the trap's own story, with its extra beats put in before the last one
-  function sceneBeats(kind, beats){
-    const add = TRAP_SCENE[kind];
+  function sceneBeats(kind, beats, own){
+    const add = own || TRAP_SCENE[kind];
     if (!add || !Array.isArray(beats) || beats.length < 2) return beats;
     return beats.slice(0, -1).concat(add.map(p => p.slice()), [beats[beats.length - 1]]);
   }
@@ -36,7 +36,7 @@
      "{t}Their nipples are drawn out long and swollen past anything they've seen, glossy with milk, and every pull makes %n squeal.",
      "%n's knees are shakin', their whole body slick with sweat and milk, and the machine just keeps wringin' them like a wet rag."]);
   trapScene("breeder",
-    ["A strap cinches %n's tail up out of the way and a second one hobbles their knees wider, the way you'd ready a yearlin' that kicks.",
+    ["A strap cinches %n's tail up out of the way and a second one hobbles their knees wider, the way you'd ready a breeder that kicks.",
      "Somebody comes along with a pot of grease and a wooden paddle and slathers %n's hole, thick and warm and thorough, and doesn't look them in the eye.",
      "The machine's cock is fat and blunt and veined, and it's been greased till it shines. It rests against %n's thigh, heavy and warm, while the arm finds its angle.",
      "A brass plate on the frame reads FOR MARES THAT WON'T STAND. %n is standin'. They haven't got a choice."],
@@ -126,7 +126,7 @@
      "%n's hand is busy between their legs, slow, in time with the light, and they're drooling, and they're smiling.",
      "\"When you wake you'll feel warm whenever somebody calls you good,\" says the lantern. %n nods. They'll remember. They won't know why."]);
   trapScene("tentacle",
-    ["More arms rise out of the water, slow and lazy, and wind round %n's arms and pull them out wide like they're bein' crucified on the surface.",
+    ["More arms rise out of the water, slow and lazy, and wind round %n's arms and pull them out wide like a star floatin' on the surface.",
      "A thin arm explores %n's ear, their mouth, the hollow of their throat, gentle and curious, tastin' everything.",
      "{t}Two arms wrap round %n's tits and squeeze, and the suckers along them latch on all over, pulling, kissing.",
      "{c}A hollow arm swallows %n's cock and starts to suck, rippling, wet and cool and endless."],
@@ -147,7 +147,7 @@
     ["The mash comes faster. %n gulps and gulps, and it keeps comin', thick and warm and sweet as porridge.",
      "A strap under %n's chin keeps their jaw up and the funnel deep, and all they can do is swallow.",
      "%n's belly gurgles and swells, pressing out against their thighs, round and heavy and tight.",
-     "A farmhand strokes %n's throat with two fingers to help it down, the way you'd dose a calf."],
+     "A farmhand strokes %n's throat with two fingers to help it down, the way you'd dose a goat."],
     ["%n's belly is a hard round drum now, and the funnel's still half full. They whine round it, and swallow.",
      "Somebody slaps %n's swollen belly and it wobbles, and the farmhands laugh, and the funnel keeps pourin'.",
      "{v}The fullness presses down on everything below, and %n squirms on the stool, wet and achin' from it.",
@@ -158,7 +158,7 @@
      "The carousel speeds up. %n's head spins, the cups pull, the post pumps, and the farm whirls by in a blur.",
      "{c}At one stop a sleeve swallows %n's cock and pulls hard and fast, and lets go just before they finish, and the carousel turns."],
     ["%n's milked so many times their chest is numb and throbbin', and filled so many times they slosh when they move.",
-     "The farm kids wave from the fence every lap. %n tries to wave back and gets the post again instead.",
+     "The stable girls wave from the fence every lap. %n tries to wave back and gets the post again instead.",
      "Round and round. Milk out, cream in, a spank, a squeeze. %n can't remember what it was like to not be on the carousel.",
      "Somebody bets %n will last ten more laps. Somebody else bets twenty. The carousel doesn't care."]);
   trapScene("teatcheck",
@@ -247,7 +247,7 @@
   trapScene("wolves",
     ["The pack circles, close and closer, and every one of them gets a sniff and a lick, between %n's legs, under their arms, behind their ears.",
      "The alpha takes %n by the scruff in his teeth and growls low, and the whole pack goes still to watch.",
-     "{t}A young wolf noses at %n's tits and licks them, rough-tongued and slow, while the others wait their turn.",
+     "{t}A lean wolf noses at %n's tits and licks them, rough-tongued and slow, while the others wait their turn.",
      "{c}A wolf licks %n's cock from root to tip, once, curious, and then again because of the noise they make."],
     ["Every wolf that's had a turn lies down close by to watch the next one, panting, pleased.",
      "%n's knees are scraped and their back's slick with the alpha's drool and they're rocking back to meet every one.",
@@ -344,14 +344,14 @@
      "He gets bored of %n's mouth and spins them round and has a go at the other end, just as fast.",
      "He bleats and bucks and %n has to hold on to his knees so they don't go over."]);
   trapScene("sow",
-    ["She hums an old lullaby while she rocks, and %n's eyes go heavy and their mouth goes slack round the teat.",
+    ["She hums an old slow tune while she rocks, and %n's eyes go heavy and their mouth goes slack round the teat.",
      "Her milk is warm and endless and it makes %n's belly round and sleepy.",
      "{t}She squeezes one of %n's tits with her big soft hand, fond, and a bead of milk comes up. \"Look at you. Takin' after me.\"",
      "She smooths %n's hair and pats their bottom, and rocks, and rocks."],
     ["She's in no hurry. The rocking chair creaks and her cock rocks with it, deep and slow and fat.",
      "%n's pressed into her soft round belly, warm and full at both ends, and they've never felt so looked after.",
      "Every so often she shifts them to the other teat, and grinds a little deeper while she does.",
-     "\"There's a good piglet,\" she says, every few minutes, and every time %n squeezes round her."]);
+     "\"That's the way, love,\" she says, every few minutes, and every time %n squeezes round her."]);
   trapScene("pillory",
     ["A farmhand comes along with a jar of grease and a paddle and gets %n ready for visitors, slow and thorough, behind where they can't see.",
      "Somebody pins a paper tag to %n's rump. They can't read it. They can hear people laughing at it.",
@@ -377,7 +377,7 @@
      "{t}A farmhand gives %n's tits a fond bounce as the chain drags them past, and laughs at the noise they make."],
     ["The chain stops by the feed bins. A farmhand bends %n over the nearest one and has them, quick, and the chain starts up again.",
      "At every stop someone gets a feel, a squeeze, a slap, and the chain moves on before %n can catch their breath.",
-     "%n is led round the barn like a yearlin' at market, and every stall gets a look at them.",
+     "%n is led round the barn like show stock at market, and every stall gets a look at them.",
      "The chain winds them up on tiptoe and leaves them there, stretched, exposed, while the barn goes about its business."]);
   trapScene("glue",
     ["Every struggle only plasters %n down harder. Their hands are stuck, their knees are stuck, and their ass is up in the air.",
@@ -475,7 +475,7 @@
      "{c}%n's cock pokes through a gap in the mesh, and somebody below gives it a tug, just to see what happens.",
      "%n turns slowly on the rope, legs spread through the net, and there's nothing they can do to cover anything."],
     ["A farmhand climbs the ladder, hooks the net to a beam at just the right height, and has a go at whatever's poking through.",
-     "The farm kids throw hay at the net and the farm hands throw worse, and %n swings and squirms and drips.",
+     "The milkmaids throw hay at the net and the farm hands throw worse, and %n swings and squirms and drips.",
      "Somebody lowers the net a few feet, so it's at the perfect height for anybody walking past, and leaves it there.",
      "%n's spun so many times they're dizzy, and the hands from below have stopped bothering to ask."]);
   trapScene("bell",

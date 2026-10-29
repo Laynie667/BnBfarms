@@ -5,8 +5,8 @@
        ?brand <who> logo [place]   staff on their herd, proprietors on anybody: the iron goes on
        ?brand <who> clear          takes it off (whoever put it there, or a proprietor), the same as the old letter brands
        ?brand all logo [place]     proprietors: every livestock on the books carries it; ?brand all clear
-     The look (size, seared or healed or inked, nudges) is the farm's, set in the studio and handed round with the rest of
-     the farm's look (10y9e-farm-look.js: body.brand). Each player can hide their own from their Companion's Toggles.
+     The look (size, seared or healed or inked, nudges) is the farm's, set in the studio and baked into the Companion with
+     the rest of the farm's look (tools/farm-look-bake.mjs). Each player can hide their own from their Companion's Toggles.
   */
   const BRAND_PLACE_KEYS = ["hipL", "hipR", "thighL", "thighR", "mons", "tummy", "chestL", "chestR", "shoulderL", "shoulderR"];
   const BRAND_PLACE_NAMES = { hipL: "left hip", hipR: "right hip", thighL: "left thigh", thighR: "right thigh", mons: "low on the belly", tummy: "tummy",
@@ -50,7 +50,5 @@
     let place = r.brand && r.brand.logo ? r.brand.logo.place : null;
     if (!place && L.brandAll && hasRole(mn, ROLE.LIVESTOCK) && !(r.brand && r.brand.mark && !r.brand.logo)) place = L.brandAll.place;
     if (!place) return null;
-    const look = (L.drawnFarm && L.drawnFarm.body && L.drawnFarm.body.brand) || {};
-    const per = (look.places || {})[place] || {};
-    return { art: look.art || "mark", place, size: per.size || look.size || 46, angle: per.angle || 0, dx: per.dx || 0, dy: per.dy || 0, look: look.look || "seared" };
+    return { place };   // (the Companion knows the farm's look for it)
   }

@@ -66,9 +66,11 @@
   function trapWhyNot(mn, kind){
     const r = rec(mn), K = TRAP_KINDS[kind];
     if (!r || !K) return "no such trap";
+    if (SEASON_OF[kind] && !state.trapByHand && !seasonOnFor(kind)) return "it's not the season for that one";   // (10y9m-seasons.js)
     if (!isSubject(mn)) return "they haven't switched traps on (?traps on)";
     if (r.trapsOff) return "they've paused the traps";
     if ((r.trapSkip || []).includes(kind)) return "they've ruled that one out";
+    { const th = trapThemeOff(mn, kind); if (th) return "they've switched off "+th; }   // a whole kind of trap, off (10y9q-trap-switches.js)
     if ((r.trapQuiet || 0) > Date.now()) return "they called their safeword not long ago";
     if (quietNow(mn)) return "they've asked for quiet";
     const lim = String(r.limits || "");
@@ -80,7 +82,7 @@
     if (ANTHRO[kind] && limitBlocks(mn, "breed")) return "their limits rule it out";
     if (TRAP_NEEDS[kind]){ const w = TRAP_NEEDS[kind](mn); if (w) return w; }
     if (r.trapWait) return "a trap already has them";
-    if (ANTHRO[kind] && /\b(anthro|furr|beast)/i.test(lim)) return "their limits rule it out";
+    if (ANTHRO[kind] && !ANTHRO[kind].person && /\b(anthro|furr|beast)/i.test(lim)) return "their limits rule it out";   // (the farm girl's a person: 10y9l)
     if (benchedNow(mn) || stockedNow(mn) || r.penned || (prodOf(mn) && prodOf(mn).stall)) return "they're held somewhere already";
     if (state.trapRuns && state.trapRuns.has(mn)) return "a trap already has them";
     return null;
@@ -104,12 +106,15 @@
     .replace(/%ml of /g, "a flood of ").replace(/with %ml\b/g, "with a flood").replace(/%ml/g, "more than they could hold");
   const tFill = (t, mn, v) => bodyWords(mn, mlWords(t, v)).replace(/%n/g, plainName(mn)).replace(/%ml/g, (v && v.ml) || "").replace(/%c/g, (v && v.c) || "").replace(/%h/g, (v && v.h) || "").replace(/%x/g, (v && v.x) || "");
   // a trap's story, a beat at a time, then what it leaves behind
-  function trapRun(mn, kind, beats, done, v){
+  function trapRun(mn, kind, beats, done, v, opts){   // opts.scene: this one's own two extra beats instead of the kind's (a stud's version: 10y9r2)
     state.trapRuns = state.trapRuns || new Map();
-    beats = sceneBeats(kind, beats);        // the trap's own two extra beats, before its last (10ue-trap-scenes.js)
+    beats = moreBeats(kind, beats);         // each beat with more of its own lines (10z5-trap-more.js and the batches after it)
+    if (W.__FARMHAND_TEST__ && W.__onTrapBeats) try { W.__onTrapBeats(mn, kind, beats, opts); } catch(e){}   // (tests: the trap's own beats, as they'll run)
+    beats = sceneBeats(kind, beats, opts && opts.scene);        // the trap's own two extra beats, before its last (10ue-trap-scenes.js)
     beats = deepenBeats(mn, kind, beats);   // two or three more beats in the middle, from what kind of trap it is (10ud-trap-depth.js)
+    beats = stateBeats(mn, kind, beats);    // and one about the state they're in: carryin', full, in heat, what they wear, their kind (10z4-trap-state.js)
     const run = { kind, i: 0, timer: null, beats: (beats = beats.slice()) };   // (a copy: ?struggle can add to it)
-    const before = { pissed: (rec(mn) || {}).pissed || 0, eggs: ((prodOf(mn) || {}).eggs || {}).n || 0 };
+    const before = { pissed: (rec(mn) || {}).pissed || 0, eggs: ((prodOf(mn) || {}).eggs || {}).n || 0, held: heldNow(mn), milk: (prodOf(mn) || {}).milk || 0, heat: inHeat(prodOf(mn)), t: Date.now() };
     try { offerBets(mn, kind); } catch(e){ warn("bets:", e); }   // watchers get a flutter (10y3-trap-ranks.js)
     // it never lets go before its story's told
     { const r0 = rec(mn); if (r0 && r0.penned && r0.penned.trap) r0.penned.until = Math.max(r0.penned.until, Date.now() + (beats.length + 1)*CFG.TRAP_BEAT_S*1000); }
@@ -119,7 +124,7 @@
       if (state.trapRuns.get(mn) !== run) return;
       if (run.i < beats.length && charFor(mn)){
         const b = beats[run.i++];
-        emote(TRAP_KINDS[kind].icon+" "+tFill(pickFor(mn, "trap:"+kind+":"+run.i, Array.isArray(b) ? b : [b]), mn, v)+(intensityTail(mn, run.i, beats.length, kind) || bodyTail(mn, kind, run.i)), mn);
+        emote(TRAP_KINDS[kind].icon+" "+tFill(pickFor(mn, "trap:"+kind+":"+run.i, Array.isArray(b) ? b : [b]), mn, v)+(intensityTail(mn, run.i, beats.length, kind) || bodyTail(mn, kind, run.i) || stateTail(mn, kind, run.i)), mn);
         toysBeat(mn, run.i, beats.length);   // any buzzin' toy they're wearin' follows the scene (10y6-keepers.js)
         run.timer = setTimeout(step, CFG.TRAP_BEAT_S*1000);
         return;
@@ -132,7 +137,8 @@
       try { if (charFor(mn) && TRAP_SOUND_END[kind]) sound(mn, TRAP_SOUND_END[kind]); } catch(e){}   // ...and when it lets go   // the album card; toys go still or back how they were (10y6-keepers.js)
       try { if (charFor(mn)) trapAfter(mn, kind, before); } catch(e){ warn("trap after:", e); }
       try { if (charFor(mn)) symbioteAfterTrap(mn, kind); } catch(e){ warn("trap symbiote:", e); }
-      try { if (charFor(mn)) trapMess(mn, kind); } catch(e){ warn("trap mess:", e); }   // the mess its equipment leaves (10u7-traps-3.js)   // somethin' waitin' in it (10v4-symbiotes.js)   // ranks, bets, bein' handed on (10y3-trap-ranks.js)   // (what they're left wearin': 10x-trap-extras.js)
+      try { if (charFor(mn)) trapMess(mn, kind); } catch(e){ warn("trap mess:", e); }
+      try { if (charFor(mn)) trapEnded(mn, kind, before); } catch(e){ warn("trap ended:", e); }   // how was it, the trap of the day, how they're left (10y9o, 10y9p)   // the mess its equipment leaves (10u7-traps-3.js)   // somethin' waitin' in it (10v4-symbiotes.js)   // ranks, bets, bein' handed on (10y3-trap-ranks.js)   // (what they're left wearin': 10x-trap-extras.js)
       trapFree(mn); saveLedger(); syncCompanions(true);
     };
     step();
@@ -218,16 +224,18 @@
     let drewBy = "";
     if (kind === "random"){
       // a tile in a place springs that place's traps (10ua-trap-themes.js); nothin' fits there, or no place: any trap
-      const placed = spot ? themePool(mn, spot) : [];
-      const can = placed.length ? placed : Object.keys(TRAP_KINDS).filter(k => k !== "tentacle" && !trapWhyNot(mn, k));
+      // in season, about a third of the time it's from the season's own pack instead (10y9m-seasons.js)
+      const sp = spot ? seasonPick(mn, spot) : null;
+      const placed = sp ? sp.kinds : spot ? themePool(mn, spot) : [];
+      const can = placed.length ? placed : Object.keys(TRAP_KINDS).filter(k => k !== "tentacle" && !SEASON_OF[k] && !trapWhyNot(mn, k));
       if (!can.length) return "nothin' they can spring right now";
       const pk = trapWeighted(mn, can);   // the moment makes some likelier: full udders, heat, the hour, a crowd (10ua2-trap-weights.js)
-      kind = pk.kind; drewBy = pk.why;
+      kind = pk.kind; drewBy = (sp && sp.why) || pk.why;
     }
     const why = trapWhyNot(mn, kind);
     if (why) return why;
     const r = rec(mn), p = prodOf(mn), T = TRAP_LINES[kind], v = {};
-    r.trapLog = (r.trapLog || []).concat({ t: Date.now(), kind, spot: spot || "" }).slice(-20);
+    r.trapLog = (r.trapLog || []).concat(Object.assign({ t: Date.now(), kind, spot: spot || "" }, state.trapByHand ? { hand: 1 } : {})).slice(-20);
     r.trapN = (r.trapN || 0) + 1;
     trapSprung(mn, kind, spot);   // tallies, the trap card, bait (10x-trap-extras.js)
     audit(BOTMN(), "TRAP", mn+" "+kind+(spot ? " at "+spot : "")+(force ? " (by hand)" : ""));
@@ -366,26 +374,37 @@
     return null;
   }
 
-  // the thing in the water: five scenes, and it always leaves eggs
+  // the thing in the water: five scenes, and it always leaves eggs. It isn't always the same thing in there: the jelly
+  // bloom, the eel-knot, the mother, the hungry one, the singin' one… each with lines and a way of its own (10y9r-water-beast.js)
   function tentacleScene(mn, spot, deep){   // deep: the thing in the well (it keeps them longer, and lays more)
     const r = rec(mn), p = prodOf(mn), T = TRAP_LINES.tentacle, v = {};
+    const F = deep ? Object.assign({ id: "well" }, WATER_FORMS.classic) : waterForm(mn), FL = F.lines || {}, own = (k) => FL[k] || T[k];
     const lower = openHole(mn, "vulva"), back = !holeBlocked(mn, "butt") && lower !== "butt" ? "butt" : null, mouth = !holeBlocked(mn, "mouth");
     v.h = lower && lower !== "mouth" ? TRAP_HOLE[lower] : "belly";
     const kin = parasiteOn(mn);   // it knows its own: a gentler comin', and double the clutch
-    const beats = (kin ? [PARASITE_MORE.kin] : []).concat(deep ? [BROOD_LINES.wellGrab, BROOD_LINES.wellDeep] : [T.grab], [T.strip, lower && lower !== "mouth" ? T.take : T.takeShut, back ? T.second : T.wrap, mouth ? T.mouth : T.muzzle], T.churn ? [T.churn] : [], [T.swell]);   // (churn: 10w2-trap-lines-deeper.js)
-    trapHold(mn, deep ? 10 : 6, deep ? "the well" : "the water");
+    const beats = (kin ? [PARASITE_MORE.kin] : []).concat(deep ? [BROOD_LINES.wellGrab, BROOD_LINES.wellDeep] : [own("grab")], [T.strip, lower && lower !== "mouth" ? own("take") : T.takeShut, back ? T.second : T.wrap, mouth ? T.mouth : T.muzzle], FL.sig ? [FL.sig] : [], T.churn ? [T.churn] : [], [own("swell")]);   // (churn: 10w2-trap-lines-deeper.js)
+    trapHold(mn, deep ? 10 : F.hold || 6, deep ? "the well" : "the water");
+    try { if (F.start) F.start(mn, v); } catch(e){ warn("water form:", e); }
     trapRun(mn, "tentacle", beats, () => {
-      const [lo, hi] = CFG.EGG_COUNT, hyper = hyperEggs(mn, CFG.TENTACLE_HYPER_CHANCE);
-      const n = layClutch(mn, (lo + 2 + Math.floor(Math.random()*(hi - lo + 1))) * (hyper ? 3 + Math.floor(Math.random()*2) : 1) * (kin ? 2 : 1) * (deep ? 1.5 : 1), TENTACLE_SIRE);
+      const [lo, hi] = CFG.EGG_COUNT, hyper = hyperEggs(mn, CFG.TENTACLE_HYPER_CHANCE * (F.hyperX || 1));
+      const n = layClutch(mn, (lo + 2 + Math.floor(Math.random()*(hi - lo + 1))) * (hyper ? 3 + Math.floor(Math.random()*2) : 1) * (kin ? 2 : 1) * (deep ? 1.5 : 1) * (F.eggsX || 1), TENTACLE_SIRE);
       v.x = String(n);
-      if (lower && lower !== "mouth") trapFill(mn, lower, 250 + Math.random()*250, CFG.TRAP_OVERFULL);
-      if (back) trapFill(mn, "butt", 150 + Math.random()*200, CFG.TRAP_OVERFULL);
+      const fx = F.fillX || 1;
+      if (lower && lower !== "mouth") trapFill(mn, lower, (250 + Math.random()*250)*fx, CFG.TRAP_OVERFULL);
+      if (back) trapFill(mn, "butt", (150 + Math.random()*200)*fx, CFG.TRAP_OVERFULL);
       if (mouth) trapFill(mn, "mouth", 120, CFG.TRAP_OVERFULL);
       tally(mn);
-      emote("🥚 "+tFill(pickFor(mn, "trap:tentacle:end", hyper ? T.endHyper : T.end), mn, v), mn);
-      tell(mn, "🥚 "+(hyper ? "It packed you till you couldn't hold another one: " : "It left ")+n+" eggs in your "+v.h+", sugar. You'll be layin' in a few days, and you'll be slow on your feet till then.");
-      bodyMark(mn, { splat: ["tummy", "chest", "face"] }); face(mn, "afterglow", 180); arouse(mn, 50);
+      emote("🥚 "+tFill(pickFor(mn, "trap:tentacle:end:"+F.id, hyper ? own("endHyper") : own("end")), mn, v), mn);
+      let more = "";
+      try { more = (F.after && F.after(mn, v, n)) || ""; } catch(e){ warn("water form:", e); }
+      const who = F.id === "classic" || F.id === "well" ? "It" : F.name.charAt(0).toUpperCase() + F.name.slice(1);
+      tell(mn, "🥚 "+who+(hyper ? " packed you till you couldn't hold another one: " : " left ")+n+" eggs in your "+v.h+", sugar. You'll be layin' in a few days, and you'll be slow on your feet till then."+
+        [more, F.tell].filter(Boolean).map(x => " "+x).join(""));
+      if (!F.noSplat) bodyMark(mn, { splat: ["tummy", "chest", "face"] });
+      if (F.mess) trapMess(mn, "tentacle", null, F.mess);
+      face(mn, "afterglow", 180); arouse(mn, 50);
       r.tentacled = (r.tentacled || 0) + 1;
+      if (!deep){ r.waterForms = r.waterForms || {}; r.waterForms[F.id] = (r.waterForms[F.id] || 0) + 1; }
     }, v);
   }
 
@@ -408,6 +427,7 @@
         r.spotTrapAt = r.spotTrapAt || {};
         if (!r.trapEager && !onGauntlet(mn) && now - (r.spotTrapAt[here] || 0) < CFG.TRAP_RESET_MIN*60000*nightX().reset/dangerX(mn).chance/rankX(mn).reset) continue;   // each trap takes a while to reset (half as long after dark)
         const kind = trapKindOf(here);
+        if (kind !== "random" && rateLetsBy(mn, kind)){ r.spotTrapAt[here] = now; saveLedger(); continue; }   // one they said isn't for them lets them by now and then (10y9o-trap-ratings.js)
         if (!springTrap(mn, kind, here)){ r.trapAt = now; r.spotTrapAt[here] = now; saveLedger(); }
       } else {
         // water: a slim chance when they wade in, and again every few minutes they linger
@@ -415,7 +435,7 @@
         if (!fresh && now - (st.rolled || 0) < CFG.TENTACLE_LINGER_MIN*60000/(potionOn(mn, "tentaclemusk") ? 5 : 1)) continue;   // (with Tentacle Musk on, it looks again every minute)
         st.rolled = now;
         const wk = waterKindOf(here);   // tentacles, leeches, the well, or slime (10y2-brood.js)
-        if (((wk === "tentacle" && parasiteKin(mn, now)) || Math.random() < Math.min(1, CFG.TENTACLE_CHANCE*nightX().water*dangerX(mn).chance*rankX(mn).water*(corrHas(mn, 10) ? 1.25 : 1)*(potionOn(mn, "tentaclemusk") ? CFG.MUSK_WATER_X : 1))) && !springTrap(mn, wk, here)){ r.trapAt = now; saveLedger(); }   // (three times as hungry after dark)
+        if (((wk === "tentacle" && parasiteKin(mn, now)) || Math.random() < Math.min(1, CFG.TENTACLE_CHANCE*nightX().water*dangerX(mn).chance*rankX(mn).water*(corrHas(mn, 10) ? 1.25 : 1)*(potionOn(mn, "tentaclemusk") ? CFG.MUSK_WATER_X : 1)*waterDayX(mn, wk))) && !springTrap(mn, wk, here)){ r.trapAt = now; saveLedger(); }   // (three times as hungry after dark)
       }
     }
     toyTick(); moreTrapTick(); newTrapTick(); mazeTick(); trapExtrasTick(); farmGearTick(Date.now()); broodTick(); corruptionTick(); cursedTick(); keepersTick(); uddersTick();
@@ -513,8 +533,9 @@
   function trapsList(){
     const placed = new Set(), out = [];
     for (const T of Object.values(TRAP_THEMES)){ const ks = T.kinds.filter(k => TRAP_KINDS[k]); ks.forEach(k => placed.add(k)); if (ks.length) out.push(T.label+": "+ks.join(", ")); }
-    const rest = Object.keys(TRAP_KINDS).filter(k => !placed.has(k) && !/^keep-|^custom/.test(k));
+    const rest = Object.keys(TRAP_KINDS).filter(k => !placed.has(k) && !SEASON_OF[k] && !/^keep-|^custom/.test(k));
     if (rest.length) out.push("anywhere: "+rest.join(", "));
+    { const sl = seasonsTrapList(); if (sl) out.push(sl); }   // (10y9m-seasons.js)
     return out.join("\n")+"\n?traps <name> says what one does.";
   }
   function trapAbout(k){
@@ -547,8 +568,14 @@
       return true;
     }
     if (cmd === "traps" || cmd === "trap"){
-      if (a0 === "themes" || a0 === "places"){ R(themesText()); return true; }
-      if (a0 && TRAP_KINDS[a0]){ R(trapAbout(a0)); return true; }   // ?traps bearskin: what that one does   // which traps each place springs (10ua-trap-themes.js)
+      if (a0 === "themes" || a0 === "places"){ R(themesText()+(isSubject(sender) ? "\n\n"+trapThemeSummary(sender) : "")); return true; }
+      if (a0 === "theme" || a0 === "kinds" || a0 === "kind"){ trapThemeCommand(sender, args.slice(1), R); return true; }   // whole kinds of trap on or off (10y9q-trap-switches.js)
+      if (a0 === "ratings" || a0 === "rated" || a0 === "rates"){
+        if (!isStaff(sender)){ R("The herd's ratings are for staff, sugar. ?rate shows your own."); return true; }
+        R(trapRatingsText()); return true;   // (10y9o-trap-ratings.js)
+      }
+      if (a0 === "today" || a0 === "day"){ R(trapDayLine() || "🎯 No trap of the day yet: the farm hasn't any traps out."); return true; }
+      if (a0 && TRAP_KINDS[a0]){ R(trapAbout(a0)+(a0 === "tentacle" ? " "+waterFormsText(sender) : STUD_FORMS[a0] ? " "+studFormsText(sender, a0) : "")); return true; }   // ?traps bearskin: what that one does   // which traps each place springs (10ua-trap-themes.js)
       if (a0 === "on" || a0 === "off"){
         const was = isSubject(sender);
         r.trapsOn = a0 === "on"; r.trapsOff = false; if (!r.trapsOn) trapStop(sender, 0); r.trapQuiet = 0; saveLedger(); audit(sender, "TRAPS", a0); syncCompanions(true);
@@ -603,7 +630,8 @@
         const t = resolveTarget(args[1]), k = String(args[2] || "random").toLowerCase();
         if (!t || (k !== "random" && !TRAP_KINDS[k])){ R("?trap spring <who> <kind>, sugar. Kinds: "+Object.keys(TRAP_KINDS).join(", ")+". Leave the kind off for pot luck."); return true; }
         if (!charFor(t)){ R(plainName(t)+" isn't here, sugar."); return true; }
-        const why = springTrap(t, k, "", true);
+        state.trapByHand = true; let why;
+        try { why = springTrap(t, k, "", true); } finally { state.trapByHand = false; }   // (a proprietor can spring the farm girl's own: 10y9l)
         if (!why){ const tr = rec(t); tr.trapAt = Date.now(); saveLedger(); }
         R(why ? "🧪 That trap won't spring on "+plainName(t)+": "+why+"." : "🧪 Sprung on "+plainName(t)+"."); return true;
       }
@@ -615,10 +643,13 @@
           "\nWater the thing lives in: "+(water.length ? water.map(([n]) => n).join(", ") : "none yet (?spot set pond, pool, creek, water, well, bath…)")+
           "\n?trap load <spot> <words> · ?trap bait <spot> <ribbons> · ?trap spring <who> <kind> · ?subject for who has them on"+
           "\n?trap make <name> <what it does>… builds one of your own (?trap made) · ?whistle <which> <who> calls one of the farm's own to them"+
-          "\n?hunt start [minutes] · ?pack on|off · nest spots (?spot set nest) and ?gather · crate spots (?spot set crate)");
+          "\n?hunt start [minutes] · ?pack on|off · nest spots (?spot set nest) and ?gather · crate spots (?spot set crate) · ?traps ratings"+
+          (trapDayLine() ? "\n"+trapDayLine() : ""));
       else if (isSubject(sender))
         R("🧪 WHAT'S OUT THERE FOR YOU\n"+trapsList()+"\n\nThere are "+spots.length+" trap"+(spots.length === 1 ? "" : "s")+" hidden on the farm"+(water.length ? ", and somethin' lives in the water" : "")+". I'm not tellin' you where."+
-          "\n?struggle when one has you (one try) · ?traps eager on skips the waits · ?traps off switches them off · ?traps skip <kind> rules one out"+((r.trapSkip || []).length ? " (you skip: "+r.trapSkip.join(", ")+")" : "")+" · your safeword stops one cold.");
+          "\n?struggle when one has you (one try) · ?traps eager on skips the waits · ?traps off switches them off · ?traps skip <kind> rules one out"+((r.trapSkip || []).length ? " (you skip: "+r.trapSkip.join(", ")+")" : "")+
+          " · ?traps theme <kind> off rules out a whole kind (furry, monsters, messy…)"+((r.trapThemesOff || []).length ? " (off: "+r.trapThemesOff.join(", ")+")" : "")+
+          " · ?rate says how one was · your safeword stops one cold."+(trapDayLine() ? "\n"+trapDayLine() : ""));
       else R("🧪 Your traps are off, sugar, so you can walk right over 'em. ?traps on and every trap on the farm springs for you (your limits and your safeword still rule). Here's what's out there:\n"+trapsList());
       return true;
     }

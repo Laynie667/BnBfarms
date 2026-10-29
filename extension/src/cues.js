@@ -1,6 +1,6 @@
 /* WHAT'S IN THIS FILE (cues.js)
    Things the Companion does on YOUR screen for the farm, so the farm girl needn't move or whisper:
-   • sight:    when it changes (and every 2 minutes), tells the bot who you can see and hear, so private farm lines reach
+   • sight:    when it changes (at most every 8 s, and every 2 minutes), tells the bot who you can see and hear, so private farm lines reach
                exactly the people around you.
    • lead:     walks you somewhere step by step (pathfindin', at your own speed, slower when you're bound)
                instead of you bein' teleported. If there's no way through, the bot teleports you after all.
@@ -18,7 +18,7 @@
 const W = window;
 let ctx = null;   // { toBot, panel, local }
 
-export function initCues(c) { ctx = c; setInterval(sightTick, 4000); setInterval(feelTick, 60000); }
+export function initCues(c) { ctx = c; setInterval(sightTick, 4000); setInterval(feelTick, 60000); setInterval(heelTick, 500); }
 const pref = (k) => !ctx.panel.prefs[k];   // every cue is on unless switched off
 export const cueOff = () => ({ face: !pref("noFace") || undefined, sound: !pref("noSound") || undefined, trance: !pref("noTrance") || undefined,
   lead: !pref("noLead") || undefined, slow: !pref("noSlow") || undefined, stir: (ctx.panel.prefs.stir ? undefined : true), gear: (ctx.panel.prefs.gear ? undefined : true) });
@@ -36,8 +36,10 @@ function sightTick() {
     const LS = W.Player && W.Player.LSCG, S = LS && LS.SplatterModule;
     const splat = S ? !!(S.enabled && S.taker !== false && (!LS.GlobalModule || LS.GlobalModule.enabled !== false)) : undefined;
     const key = see.join(",") + "|" + hear.join(",") + "|" + splat;
-    // send when it changes (checked every 4 s), and every 2 minutes anyway so the bot knows it's still fresh
+    // send when it changes (checked every 4 s, sent at most every 8: walkin' about changed it every check, and every one
+    // landed on the farm girl's connection, Oct 27), and every 2 minutes anyway so the bot knows it's still fresh
     if (key === lastSight && Date.now() - (sightTick.at || 0) < 120000) return;
+    if (Date.now() - (sightTick.at || 0) < 8000) return;
     lastSight = key; sightTick.at = Date.now();
     ctx.toBot("sight", splat === undefined ? { see, hear } : { see, hear, splat });
   } catch (e) { console.warn("[Farmhand Companion] sight:", e); }
@@ -69,31 +71,72 @@ function findPath(from, to) {
   return null;
 }
 export function lead(m) {
-  const no = () => { walk = null; ctx.toBot("leadNo", { id: m.id }); };
+  const no = () => { if (walk && !walk.heel) walk = null; ctx.toBot("leadNo", { id: m.id }); };
   if (!pref("noLead") || !mapOn() || typeof W.ChatRoomMapViewMove !== "function") return no();
   const from = W.Player.MapData.Pos, to = { X: m.X, Y: m.Y };
   const path = findPath(from, to);
   if (!path) return no();
   if (!path.length) { ctx.toBot("leadOk", { id: m.id }); return; }
   ctx.local("You're led " + (m.why ? m.why : "along") + "…", "#c9a35b", true);
-  walk = { id: m.id, to, path, i: 0, last: { X: from.X, Y: from.Y }, stuck: Date.now(), retried: false };
-  stepWalk();
+  startWalk({ id: m.id, to, path, i: 0, last: { X: from.X, Y: from.Y }, stuck: Date.now(), retried: false });
 }
+// one walk at a time, one step loop at a time (the reins start a fresh walk every time the leader moves on)
+let stepping = false;
+function startWalk(w) { walk = w; if (!stepping) { stepping = true; stepWalk(); } }
 function stepWalk() {
-  if (!walk) return;
   const w = walk, p = W.Player && W.Player.MapData && W.Player.MapData.Pos;
-  if (!p) { walk = null; return; }
+  // done: the farm hears how it went (a walk on the reins says nothin', it just stops)
+  const end = (ok) => { if (walk === w) walk = null; stepping = false; if (w && !w.heel) ctx.toBot(ok ? "leadOk" : "leadNo", { id: w.id }); };
+  if (!w) { stepping = false; return; }
+  if (!p) { walk = null; stepping = false; return; }
   if (p.X !== w.last.X || p.Y !== w.last.Y) { w.last = { X: p.X, Y: p.Y }; w.stuck = Date.now(); w.i++; }
-  if (w.i >= w.path.length || Math.max(Math.abs(p.X - w.to.X), Math.abs(p.Y - w.to.Y)) <= 0) { walk = null; ctx.toBot("leadOk", { id: w.id }); return; }
+  if (w.i >= w.path.length || Math.max(Math.abs(p.X - w.to.X), Math.abs(p.Y - w.to.Y)) <= 0) return end(true);
   // somebody stepped in the way, or they wandered: work out a fresh path once
   if (Date.now() - w.stuck > 3000) {
-    if (w.retried) { walk = null; ctx.toBot("leadNo", { id: w.id }); return; }
+    if (w.retried) return end(false);
     const path = findPath(p, w.to);
-    if (!path) { walk = null; ctx.toBot("leadNo", { id: w.id }); return; }
+    if (!path) return end(false);
     Object.assign(w, { path, i: 0, stuck: Date.now(), retried: true });
   }
   if (W.ChatRoomMapViewMovement == null) { try { W.ChatRoomMapViewMove(w.path[w.i]); } catch (e) { /* the game says no: the stuck timer handles it */ } }
   setTimeout(stepWalk, 150);
+}
+
+// ── on the reins (?reins): at heel, a step behind whoever holds them ──
+// The farm says who (your panel's "reins"); this walks you, at your own pace, to the tile just behind them: the side
+// they came from. It waits while somethin' else of the farm's has hold of you (hold), and stops when the reins come off.
+let heel = null;
+export function reinsState(r) {
+  const on = r && Number(r.mn) && !r.hold && Number(r.until || 0) > Date.now();
+  if (!on) {
+    if (heel && !(r && r.hold)) ctx.local("🐴 The reins come off.", "#c9a35b", true);
+    heel = (r && r.hold && heel) ? Object.assign(heel, { hold: true }) : null;
+    if (walk && walk.heel) walk = null;
+    return;
+  }
+  if (!heel || heel.mn !== Number(r.mn)) ctx.local("🐴 You're on " + String(r.name || "somebody") + "'s reins: you'll follow a step behind them till they let go. Your safeword frees you.", "#c9a35b", true);
+  if (!heel || heel.mn !== Number(r.mn)) heel = { mn: Number(r.mn), trail: [] };
+  heel.hold = false; heel.until = Number(r.until);
+}
+function heelTick() {
+  try {
+    if (!heel || heel.hold || W.CurrentScreen !== "ChatRoom" || !mapOn() || !pref("noLead") || typeof W.ChatRoomMapViewMove !== "function") return;
+    if (heel.until && heel.until < Date.now()) { heel = null; return; }
+    const C = others().find((c) => c.MemberNumber === heel.mn), lp = C && C.MapData && C.MapData.Pos;
+    if (!lp || lp.X < 0) return;
+    const t = heel.trail, last = t[t.length - 1];
+    if (!last || last.X !== lp.X || last.Y !== lp.Y) { t.push({ X: lp.X, Y: lp.Y }); if (t.length > 4) t.shift(); }
+    const me = W.Player.MapData.Pos;
+    if (Math.max(Math.abs(me.X - lp.X), Math.abs(me.Y - lp.Y)) <= 1) { if (walk && walk.heel) walk = null; return; }   // at heel
+    if (walk && !walk.heel) return;   // the farm's walkin' you somewhere else just now
+    // a step behind: next to them, on the side they came from (or wherever's free beside them)
+    const from = t.length > 1 ? t[t.length - 2] : me, dx = Math.sign(from.X - lp.X), dy = Math.sign(from.Y - lp.Y);
+    const to = (dx || dy) && canStep(lp.X + dx, lp.Y + dy) ? { X: lp.X + dx, Y: lp.Y + dy } : { X: lp.X, Y: lp.Y };
+    if (walk && walk.heel && walk.to.X === to.X && walk.to.Y === to.Y) return;
+    const path = findPath(me, to);
+    if (!path || !path.length) return;
+    startWalk({ id: 0, heel: true, to, path, i: 0, last: { X: me.X, Y: me.Y }, stuck: Date.now(), retried: false });
+  } catch (e) { console.warn("[Farmhand Companion] reins:", e); }
 }
 
 // ── your face ──────────────────────────────────────────────

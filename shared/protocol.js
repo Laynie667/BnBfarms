@@ -5,9 +5,15 @@
 // BCX ("BCXMsg"), BC+ ("BCP"), LSCG ("LSCGMsg"), ECHS ("HypnoMsg") and friends.
 //
 //   bot  -> everyone   ping     { ver }                       "anyone runnin' the companion?"
-//   ext  -> bot        hello    { ver }                       "I am!"
+//   ext  -> bot        hello    { ver, relay, off, seq, sh, w, again }
+//                                                             "I am!" (0.46+: seq = the panel I hold, sh = the store I
+//                                                             hold, w = already welcomed; again = send me a whole panel)
 //   bot  -> ext        welcome  { ver, proto, name, staff }   "howdy, here's who you are to me"
-//   bot  -> ext        state    { state }                     your roles, keys, switches and numbers (v2)
+//   bot  -> ext        state    { state, seq }                your roles, keys, switches and numbers (v2)
+//   bot  -> ext        stateDiff { set, del, base, seq }      only what changed, patched onto panel `base` (0.45+)
+//   bot  -> ext        store    { items, h }                  the store's shelf and its fingerprint (0.45+)
+//   bot  -> ext        roomline { text, kind }                a farm line shown in your chat like a room line
+//   bot  -> room       roomlines { to, text, kind }           the same line for several people at once (0.46+)
 //   ext  -> bot        cmd      { text }                      a command, same as typin' ?stats
 //   bot  -> ext        reply    { text, id, part, of }        an answer to a command
 //   bot  -> ext        notice   { text, id, part, of }        anything I'd normally beep or whisper

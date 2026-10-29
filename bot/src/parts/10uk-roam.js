@@ -42,6 +42,14 @@
     const w = state.where && state.where.get(mn);
     return w && w.room === CFG.ROOM_NAME ? "here" : "away";
   }
+  // is a pet under a summonin' contract online but off the farm? Then the bot asks who's where every minute, not every two
+  function roamWatching(){
+    try {
+      const m = state.mutual; if (!CFG.ROAM_ON || !m || !m.set || !L.contracts) return false;
+      const now = Date.now();
+      return L.contracts.some(x => x.status === "signed" && (!x.until || x.until > now) && (x.rules || []).includes("other.summon") && m.set.has(x.mn) && !charFor(x.mn));
+    } catch(e){ return false; }
+  }
   function roamKeptIn(mn){ return !!(L.contracts && L.contracts.some(x => x.mn === mn && x.status === "signed" && (!x.until || x.until > Date.now()) && (x.rules || []).includes("chat.forbidLeaving"))); }
   function roamStart(mn, auto){
     const g = roamOf(mn); if (!g) return false;

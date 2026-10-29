@@ -93,7 +93,7 @@ const done=async(mn,ms)=>{ for(let i=0;i<60;i++){ await wait(250); if(!(W.__st()
   await say(700,'?gender enby',600); ok(P(700).gender==="nonbinary", '...enby works too');
   const b=W.__body(700); ok(b.g==="nonbinary" && b.vulva && !b.cock && b.tits, 'a nonbinary body goes by what they have ('+JSON.stringify(b)+')');
   await say(700,'?chest flat',600); ok(W.__body(700).tits===false, '?chest flat');
-  ok(W.__bodyWords(700,"Such a good girl, a fine heifer.")==="Such a good pet, a fine yearlin'.", 'no girl words for them ('+W.__bodyWords(700,"Such a good girl, a fine heifer.")+')');
+  ok(W.__bodyWords(700,"Such a good girl, a fine heifer.")==="Such a good pet, a fine beast.", 'no girl words for them ('+W.__bodyWords(700,"Such a good girl, a fine heifer.")+')');
   { const got=W.__pickFor(700,"t:nb",["{f}A girl line.","{nb}Their own line.","{m}A boy line."]); ok(/Their own line/.test(got), '{nb} lines are theirs ('+got+')'); }
   // ── the mess shelf in the panel's state ──
   const st=W.__stateFor(500); ok((st.store||[]).some(it=>it.shelf==="mess" && it.id==="creampie") && st.messesOn===false, 'the store sends the mess shelf to the panel');

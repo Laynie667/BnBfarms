@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.44.0
+// @version      0.51.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -230,7 +230,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.44.0";
+  var VERSION = "0.51.0";
 
   // shared/species.js
   var WORDS = {
@@ -353,8 +353,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
   function speciesKeyOf(text) {
     const low = String(text || "").toLowerCase().replace(/[^a-z\s\/-]/g, " ").replace(/\s+/g, " ").trim();
     if (!low) return null;
-    const whole = low.replace(/[\s\/-]+/g, "");
-    if (known(whole)) return known(whole);
+    const whole2 = low.replace(/[\s\/-]+/g, "");
+    if (known(whole2)) return known(whole2);
     const words = low.split(/[\s\/-]+/).filter(Boolean);
     for (const w of words) {
       const k = known(w);
@@ -630,12 +630,12 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
   }
   function guidesTab(ctx3, staff) {
     const q2 = (ctx3.ui.search || "").toLowerCase();
-    const groups = PUBLIC_GROUPS.concat(
+    const groups2 = PUBLIC_GROUPS.concat(
       staff ? STAFF_GROUPS : [],
       staff && ctx3.s.proprietor ? OWNER_GROUPS : [],
       (ctx3.s.addonCmds || []).map((g) => ({ name: "\u{1F9E9} " + g.name, cmds: (g.cmds || []).map(String) }))
     );
-    const shown = groups.map((g) => ({ name: g.name, cmds: g.cmds.filter((c) => !q2 || c.includes(q2) || g.name.toLowerCase().includes(q2)) })).filter((g) => g.cmds.length);
+    const shown = groups2.map((g) => ({ name: g.name, cmds: g.cmds.filter((c) => !q2 || c.includes(q2) || g.name.toLowerCase().includes(q2)) })).filter((g) => g.cmds.length);
     const input2 = h("input", {
       class: "fhc-in",
       placeholder: "milk, breed, keys\u2026",
@@ -716,7 +716,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
       )
     );
     const shelf = (label, list) => list.length ? card(title(label), list.map(row)) : null;
-    const potions = items.filter((it) => it.kind), shots = items.filter((it) => /^shot-/.test(it.id)), messes = items.filter((it) => it.shelf === "mess"), treats = items.filter((it) => !it.kind && !/^shot-/.test(it.id) && it.shelf !== "mess");
+    const potions = items.filter((it) => it.kind), shots = items.filter((it) => /^shot-/.test(it.id) && it.shelf !== "shrink"), shrink = items.filter((it) => it.shelf === "shrink"), messes = items.filter((it) => it.shelf === "mess"), treats = items.filter((it) => !it.kind && !/^shot-/.test(it.id) && it.shelf !== "mess" && it.shelf !== "shrink");
     const messWho = () => String(ctx3.ui.messWho || "").trim();
     const messRow = (it) => h(
       "div",
@@ -751,6 +751,8 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
       messCard,
       shelf("\u{1F6CD}\uFE0F Treats and favors", treats),
       shelf("\u{1F489} Shots", shots),
+      shelf("\u{1F53B} Shrinkin' shots", shrink),
+      // a size back down, for good (Oct 27)
       potions.length ? card(
         title("\u{1F9EA} Potions"),
         muted("Gifts always ask them first, and you only pay if they say yes. They need Potions switched on in their Toggles."),
@@ -763,6 +765,62 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
         potions.map(row)
       ) : null
     ];
+  }
+
+  // extension/src/views/extras.js
+  function modsFor(ctx3, view) {
+    const mods = ctx3.s.mods || {};
+    return Object.entries(mods).filter(([, m]) => m && typeof m === "object" && (!Array.isArray(m.views) || m.views.includes(view)) && Array.isArray(m.cards)).map(([name, m]) => [name, Object.assign({}, m, { cards: m.cards.filter((c) => c && (view === "staff" ? true : !c.staff && !c.me)) })]).filter(([, m]) => m.cards.length);
+  }
+  function meCards(ctx3) {
+    const out = [];
+    for (const [name, m] of Object.entries(ctx3.s.mods || {})) {
+      if (!m || typeof m !== "object" || !Array.isArray(m.cards)) continue;
+      m.cards.forEach((c, i) => {
+        if (c && c.me && !c.staff) out.push(drawCard(ctx3, name, c, i));
+      });
+    }
+    return out;
+  }
+  function drawCard(ctx3, name, c, i) {
+    const key = "x_" + name + "_" + i;
+    return card(
+      c.title && title(String(c.title)),
+      c.text && h("div", { class: "fhc-card", style: { whiteSpace: "pre-wrap" } }, String(c.text)),
+      Array.isArray(c.lines) && c.lines.map((l) => h("div", { class: "fhc-kv" }, h("span", null, String(l[0] ?? l)), l[1] !== void 0 ? h("b", null, String(l[1])) : null)),
+      Array.isArray(c.bars) && c.bars.map((b) => bar(String(b.label || ""), String(b.value ?? ""), Number(b.pct) || 0, b.kind)),
+      Array.isArray(c.chips) && c.chips.length ? h("div", null, c.chips.map((x) => chip(String(x.text ?? x), x.kind))) : null,
+      Array.isArray(c.toggles) && c.toggles.map((t) => toggle(String(t.label || ""), t.desc ? String(t.desc) : "", !!t.on, () => ctx3.send(String(t.cmd)))),
+      c.input && h(
+        "div",
+        null,
+        h("input", { class: "fhc-in", placeholder: String(c.input.placeholder || ""), value: ctx3.ui[key] || "", oninput: (e) => ctx3.setUi({ [key]: e.target.value }, true) }),
+        btn(String(c.input.label || "Send"), () => {
+          const v = (ctx3.ui[key] || "").trim();
+          if (!v) return ctx3.hint("Type somethin' in the box first.");
+          ctx3.send(String(c.input.cmd) + " " + v);
+          ctx3.setUi({ [key]: "" });
+        }, true)
+      ),
+      Array.isArray(c.buttons) && c.buttons.length ? h("div", { style: { marginTop: "6px" } }, c.buttons.map((b) => btn(String(b.label || b.cmd), () => ctx3.send(String(b.cmd)), !!b.accent))) : null,
+      c.note && muted(String(c.note))
+    );
+  }
+  function render(ctx3, view) {
+    const list = modsFor(ctx3, view);
+    if (!list.length) return [muted("No farm extras for you right now.")];
+    return list.map(([name, m]) => h(
+      "div",
+      null,
+      h("div", { class: "fhc-muted", style: { margin: "8px 2px 2px" } }, "\u{1F9E9} " + String(m.label || name)),
+      m.cards.map((c, i) => drawCard(ctx3, name, c, i))
+    ));
+  }
+  function withExtras(tabs, view, ctx3) {
+    if (!modsFor(ctx3, view).length) return tabs;
+    const t = { id: "extras", label: "Farm extras", render: (c) => render(c, view) };
+    const at = tabs.findIndex((x) => x.id === "guides");
+    return at < 0 ? tabs.concat(t) : tabs.slice(0, at).concat(t, tabs.slice(at));
   }
 
   // extension/src/gearlore.js
@@ -948,8 +1006,8 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     };
     inp.click();
   }
-  function initLocalSave(version, changed) {
-    if (typeof changed === "function") onChange = changed;
+  function initLocalSave(version, changed2) {
+    if (typeof changed2 === "function") onChange = changed2;
     get("dir").then(async (d) => {
       if (!d) return;
       S.dir = d;
@@ -965,6 +1023,46 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     setInterval(() => {
       writeNow(version, false);
     }, 6e4);
+  }
+
+  // extension/src/botscreen.js
+  var W2 = window;
+  var prefs = () => ({});
+  var skipped = 0;
+  var wasRoom = false;
+  var onBot = () => !!(W2.Player && W2.Player.MemberNumber === BOT_MEMBER);
+  var screenLight = () => onBot() && !prefs().drawRoom;
+  var screenSkipped = () => skipped;
+  function redraw(list) {
+    for (const C of list) {
+      try {
+        if (C && typeof W2.CharacterLoadCanvas === "function") W2.CharacterLoadCanvas(C);
+      } catch (e) {
+      }
+    }
+  }
+  function redrawRoom() {
+    redraw([W2.Player].concat(W2.ChatRoomCharacter || []));
+  }
+  function initBotScreen(mod2, getPrefs) {
+    prefs = getPrefs;
+    try {
+      mod2.hookFunction("CommonDrawAppearanceBuild", 20, (args, next) => {
+        if (W2.CurrentScreen === "ChatRoom" && screenLight()) {
+          skipped++;
+          return void 0;
+        }
+        return next(args);
+      });
+    } catch (e) {
+      console.warn("[Farmhand Companion] light bot screen unavailable:", e);
+      return;
+    }
+    setInterval(() => {
+      const inRoom = W2.CurrentScreen === "ChatRoom";
+      if (wasRoom && !inRoom && screenLight()) redraw([W2.Player, W2.InformationSheetSelection].filter(Boolean));
+      wasRoom = inRoom;
+    }, 1e3);
   }
 
   // studio/web/breasts-drawing.js
@@ -1042,7 +1140,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
         draw2();
         g.restore();
       };
-      const whole = (s) => {
+      const whole2 = (s) => {
         g.beginPath();
         path(g, S3, s, 0, Math.PI * 2, ox, oy);
         g.closePath();
@@ -1052,7 +1150,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
         g.translate(0, 5 + S3.r * 0.04);
         g.filter = "blur(4px)";
         g.fillStyle = "rgba(120,60,50,0.22)";
-        whole(s);
+        whole2(s);
         g.fill();
         g.restore();
       });
@@ -1063,10 +1161,10 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
         grad.addColorStop(0.55, rgb2(skin, 1));
         grad.addColorStop(1, rgb2([skin[0], skin[1] * 0.93, skin[2] * 0.92], 0.94));
         g.fillStyle = grad;
-        whole(s);
+        whole2(s);
         g.fill();
         g.save();
-        whole(s);
+        whole2(s);
         g.clip();
         const under = g.createLinearGradient(0, low + S3.r * 0.2, 0, oy + S3.by + S3.r * (1 + S3.sag));
         under.addColorStop(0, "rgba(150,70,60,0)");
@@ -1263,11 +1361,11 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
       }
       const MOULD = { ver: 0, lies: /* @__PURE__ */ new Set(), span: /* @__PURE__ */ new Map(), cover: /* @__PURE__ */ new Map(), items: /* @__PURE__ */ new Set(), mode: /* @__PURE__ */ new Map(), ext: /* @__PURE__ */ new Map(), img: /* @__PURE__ */ new Map(), prof: /* @__PURE__ */ new Map(), out: /* @__PURE__ */ new Map(), M: 150 };
       const mouldKey = (it) => it.Asset.Group.Name + "/" + it.Asset.Name;
-      const W11 = window;
-      const takesDrawings = () => typeof W11.GLDrawLoadTransient === "function";
+      const W13 = window;
+      const takesDrawings = () => typeof W13.GLDrawLoadTransient === "function";
       const mapSrc = host.mapSrc || ((src) => {
-        if (typeof W11.DrawGetImage !== "function") return src;
-        const lists = [typeof DrawCacheImage !== "undefined" ? DrawCacheImage : W11.DrawCacheImage, W11.DrawImageCache].filter((c) => c && typeof c.get === "function");
+        if (typeof W13.DrawGetImage !== "function") return src;
+        const lists = [typeof DrawCacheImage !== "undefined" ? DrawCacheImage : W13.DrawCacheImage, W13.DrawImageCache].filter((c) => c && typeof c.get === "function");
         if (!lists.length) return src;
         let seen2 = null;
         const kept2 = lists.map((c) => [c, Object.prototype.hasOwnProperty.call(c, "get"), c.get]);
@@ -1276,7 +1374,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
             if (seen2 == null) seen2 = k;
             return { isLoaded: () => false, data: void 0, complete: false };
           };
-          W11.DrawGetImage(src);
+          W13.DrawGetImage(src);
         } catch (e) {
         } finally {
           for (const [c, own, g] of kept2) {
@@ -1653,7 +1751,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
         }
         const ol = ctx3.outline || (ctx3.outline = outline(ctx3));
         if (!ol) return null;
-        let changed = false;
+        let changed2 = false;
         if (mode === "over" && ext) {
           const br = bellyRows(ctx3), from = br ? Math.max(ext.top, br.top) : 0, to = br ? br.bottom - 2 : 0;
           if (br && ext.bottom > from + 4 && ext.bottom < to) {
@@ -1666,7 +1764,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
             if (b + 1 < h2) tg.drawImage(im, 0, b + 1, w, h2 - b - 1, 0, b2 + 1, w, h2 - b - 1);
             im = tall;
             h2 = tall.height;
-            changed = true;
+            changed2 = true;
           }
         }
         const c = document.createElement("canvas");
@@ -1760,11 +1858,11 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
             if (gr - gl < (strappy ? Math.max(6, bw / n2 * 0.45) : 6) || nl2 >= gl - 0.5 && nr <= gr + 0.5) continue;
             const k = (nr - nl2) / (gr - gl), sa = Math.max(0, gl - x), sb = Math.min(w, gr - x + 1);
             if (sb - sa < 1) continue;
-            changed = true;
+            changed2 = true;
             g.clearRect(M + nl2 - x - 1, j, nr - nl2 + 2, 1);
             g.drawImage(im, sa, j, sb - sa, 1, M + (nl2 - x) + (sa - (gl - x)) * k, j, (sb - sa) * k, 1);
           }
-          const res2 = changed ? c : false;
+          const res2 = changed2 ? c : false;
           keepIn(MOULD.out, key2, res2);
           return res2;
         }
@@ -1774,13 +1872,13 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
             g.drawImage(im, 0, j, w, 1, M, j, w, 1);
             continue;
           }
-          changed = true;
+          changed2 = true;
           const l0 = Math.max(0, Math.min(w - 1, Math.round(o.l - x))), r0 = Math.max(l0, Math.min(w - 1, Math.round(o.r - x))), l1 = Math.round(n.l - x), r1 = Math.round(n.r - x);
           if (l0 > 0) g.drawImage(im, 0, j, l0, 1, M + (l1 - l0), j, l0, 1);
           g.drawImage(im, l0, j, r0 - l0 + 1, 1, M + l1, j, r1 - l1 + 1, 1);
           if (r0 + 1 < w) g.drawImage(im, r0 + 1, j, w - r0 - 1, 1, M + r1 + 1, j, w - r0 - 1, 1);
         }
-        return keep2(changed ? c : false);
+        return keep2(changed2 ? c : false);
       }
       const BUDGET = host && host.budget || 256e6;
       const bytesOf = (v) => {
@@ -2302,7 +2400,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
                   }
                   g.drawImage(B.mask, MX + B.mx - x, MY + B.my - y);
                   g.globalCompositeOperation = "source-over";
-                  const ho = herOutline(B), W12 = fm.width, rgb2 = (q2, k) => "rgb(" + q2.map((u) => Math.max(0, Math.min(255, Math.round(u * k)))).join(",") + ")";
+                  const ho = herOutline(B), W14 = fm.width, rgb2 = (q2, k) => "rgb(" + q2.map((u) => Math.max(0, Math.min(255, Math.round(u * k)))).join(",") + ")";
                   for (const hv of ho) {
                     const sv = fm.sides.find((q2) => q2.sd === hv.sd);
                     if (!sv) continue;
@@ -2311,7 +2409,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
                     for (let k = 0; k <= FRAME_N; k++) {
                       const a = k % FRAME_N, ta = a / FRAME_N * Math.PI * 2, on2 = !!sv.hit[a] && hv.edge[a] > 0 && Math.sin(ta) < 0.3 && Math.cos(ta) > -0.6;
                       if (on2) {
-                        const t = a / FRAME_N * Math.PI * 2, ux = Math.cos(t) * hv.sd, uy = Math.sin(t), rr = hv.edge[a] - W12 * 0.45;
+                        const t = a / FRAME_N * Math.PI * 2, ux = Math.cos(t) * hv.sd, uy = Math.sin(t), rr = hv.edge[a] - W14 * 0.45;
                         (cur || (cur = [])).push([MX + hv.cx - x + ux * rr, MY + hv.cy - y + uy * rr]);
                       } else if (cur) {
                         segs.push(cur);
@@ -2330,26 +2428,26 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
                     g.lineCap = "round";
                     g.lineJoin = "round";
                     for (const at of sv.att || []) {
-                      const t = at.a / FRAME_N * Math.PI * 2, ux = Math.cos(t) * hv.sd, uy = Math.sin(t), rr = hv.edge[at.a] - W12 * 0.45;
+                      const t = at.a / FRAME_N * Math.PI * 2, ux = Math.cos(t) * hv.sd, uy = Math.sin(t), rr = hv.edge[at.a] - W14 * 0.45;
                       segs.push([[MX + at.x, MY + at.y], [MX + hv.cx - x + ux * rr, MY + hv.cy - y + uy * rr]]);
                     }
                     for (const pts of segs) {
                       if (pts.length < 2) continue;
                       path(pts);
                       g.strokeStyle = rgb2(fm.col, 0.55);
-                      g.lineWidth = W12 + 1.5;
+                      g.lineWidth = W14 + 1.5;
                       g.stroke();
                       path(pts);
                       g.strokeStyle = rgb2(fm.col, 1);
-                      g.lineWidth = W12;
+                      g.lineWidth = W14;
                       g.stroke();
                       path(pts.map((p, i) => {
                         const q2 = pts[Math.min(pts.length - 1, i + 1)], pp = pts[Math.max(0, i - 1)], dx = q2[0] - pp[0], dy = q2[1] - pp[1], L = Math.hypot(dx, dy) || 1;
-                        return [p[0] - dy / L * W12 * 0.18, p[1] + dx / L * W12 * 0.18];
+                        return [p[0] - dy / L * W14 * 0.18, p[1] + dx / L * W14 * 0.18];
                       }));
                       g.globalAlpha = 0.55;
                       g.strokeStyle = rgb2(fm.hi, 1);
-                      g.lineWidth = Math.max(1, W12 * 0.22);
+                      g.lineWidth = Math.max(1, W14 * 0.22);
                       g.stroke();
                       g.globalAlpha = 1;
                     }
@@ -2617,7 +2715,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
                     }
                     let alpha = at;
                     if (mag > 1.15) {
-                      const w2 = Math.max(0.06, Math.min(0.5, 0.3 / mag)), P4 = [p00, p10, p01, p11];
+                      const w2 = Math.max(0.06, Math.min(0.5, 0.3 / mag)), P5 = [p00, p10, p01, p11];
                       const b00 = spb[p00 + 3] * (1 - ax) * (1 - ay), b10 = spb[p10 + 3] * ax * (1 - ay), b01 = spb[p01 + 3] * (1 - ax) * ay, b11 = spb[p11 + 3] * ax * ay, bt = b00 + b10 + b01 + b11;
                       let amin = 255, amax = 0, aEnds = 0, aN = 0;
                       for (let yy = iy - 1; yy <= iy + 2; yy++) for (let xx = ix - 1; xx <= ix + 2; xx++) {
@@ -2902,7 +3000,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
                         let sr = 0, sg2 = 0, sb = 0, sw = 0, sw2 = 0;
                         for (const [di, dj, bwt] of [[0, 0, (1 - du) * (1 - dv)], [1, 0, du * (1 - dv)], [0, 1, (1 - du) * dv], [1, 1, du * dv]]) {
                           if (bwt <= 1e-3) continue;
-                          const P4 = pick(ci + di, cj + dj), cx = (ci + di + 0.5) * S4, cy = (cj + dj + 0.5) * S4, sx = P4[0] + (qx - cx), sy = P4[1] + (qy - cy);
+                          const P5 = pick(ci + di, cj + dj), cx = (ci + di + 0.5) * S4, cy = (cj + dj + 0.5) * S4, sx = P5[0] + (qx - cx), sy = P5[1] + (qy - cy);
                           if (!cleanAt(sx, sy)) continue;
                           const p = (Math.round(sy) * CW + Math.round(sx)) * 4;
                           sr += bwt * (sp[p] - spL[p]);
@@ -3115,14 +3213,14 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
                   c.MX = MX;
                   c.MY = MY;
                   const g = c.getContext("2d"), ox = MX + B.rx - x, oy = MY + B.ry - y;
-                  const P4 = (sd, t) => {
+                  const P5 = (sd, t) => {
                     const p = FarmBreasts.point(S22, sd, t);
                     return [ox + p[0], oy + p[1]];
                   };
                   const arc = (sd, from, to) => {
                     g.beginPath();
                     for (let j = 0; j <= 60; j++) {
-                      const p = P4(sd, from + (to - from) * j / 60);
+                      const p = P5(sd, from + (to - from) * j / 60);
                       if (j) g.lineTo(p[0], p[1]);
                       else g.moveTo(p[0], p[1]);
                     }
@@ -3197,7 +3295,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
                     if (R.cross) {
                       const wd = R.cross * grow;
                       for (const sd of [-1, 1]) strap(wd, () => {
-                        const a = P4(sd, -Math.PI / 2), b = P4(-sd, Math.PI * (sd > 0 ? 0.72 : 0.28));
+                        const a = P5(sd, -Math.PI / 2), b = P5(-sd, Math.PI * (sd > 0 ? 0.72 : 0.28));
                         g.beginPath();
                         g.moveTo(a[0], a[1]);
                         g.lineTo(b[0], b[1]);
@@ -3458,14 +3556,14 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
             }
           }
           if (finish && seenNow) {
-            const sig = Object.keys(seenNow).sort().join("|");
-            if (sig !== BREAST.holdSig) {
+            const sig2 = Object.keys(seenNow).sort().join("|");
+            if (sig2 !== BREAST.holdSig) {
               BREAST.holds = seenNow;
               BREAST.on = {};
               for (const k of Object.keys(seenNow)) if (k.startsWith("on:")) BREAST.on[k.slice(3)] = true;
               BREAST.solid = {};
               for (const k of Object.keys(seenNow)) if (k.startsWith("solid:")) BREAST.solid[k.slice(6)] = true;
-              BREAST.holdSig = sig;
+              BREAST.holdSig = sig2;
               clearTimeout(BREAST.holdT);
               BREAST.holdT = setTimeout(bellyDraw, 40);
             }
@@ -3513,7 +3611,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
   })();
 
   // extension/src/belly.js
-  var W2 = window;
+  var W3 = window;
   var SKIN_TOP = 12;
   var trial = 0;
   var SIZES = [null, { rx: 50, ry: 54, sag: 0.16 }, { rx: 70, ry: 80, sag: 0.22, lift: 5 }, { rx: 92, ry: 112, sag: 0.28, lift: 20 }];
@@ -3542,7 +3640,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     cv.width = w;
     cv.height = hgt;
     const g = cv.getContext("2d");
-    const whole = () => {
+    const whole2 = () => {
       g.beginPath();
       bellyPath(g, S3, cx, cy, 0, Math.PI * 2);
       g.closePath();
@@ -3552,10 +3650,10 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     grad.addColorStop(0.55, rgb(skin, 1));
     grad.addColorStop(1, rgb([skin[0], skin[1] * 0.93, skin[2] * 0.92], 0.94));
     g.fillStyle = grad;
-    whole();
+    whole2();
     g.fill();
     g.save();
-    whole();
+    whole2();
     g.clip();
     const under = g.createLinearGradient(0, low + S3.ry * 0.25, 0, cy + S3.ry + pad);
     under.addColorStop(0, "rgba(150,70,60,0)");
@@ -3701,7 +3799,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     let n = 0;
     try {
       for (const name of ["DrawImageCache", "GLDrawImageCache"]) {
-        const m = W2[name];
+        const m = W3[name];
         if (m && typeof m.forEach === "function" && typeof m.delete === "function") {
           const bad = [];
           m.forEach((v, k) => {
@@ -3755,7 +3853,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
       }
       skinSeen.set(key, c);
       try {
-        if (trial && W2.Player && typeof W2.CharacterLoadCanvas === "function") W2.CharacterLoadCanvas(W2.Player);
+        if (trial && W3.Player && typeof W3.CharacterLoadCanvas === "function") W3.CharacterLoadCanvas(W3.Player);
       } catch (e) {
       }
     };
@@ -3776,14 +3874,14 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
         let finish = null;
         try {
           const C = args[0], cb = args[1];
-          if (trial && !W2.__farmDrawnBody && C && W2.Player && C.MemberNumber === W2.Player.MemberNumber && cb && typeof cb.drawImage === "function") {
+          if (trial && !W3.__farmDrawnBody && C && W3.Player && C.MemberNumber === W3.Player.MemberNumber && cb && typeof cb.drawImage === "function") {
             let upper = null, lower = false, done = false;
             const gate = skinGate(C);
             const prio = (src) => {
               const m = new RegExp("(?:^|/)Assets/[^/]+/(?:Override/[^/]+/)?([^/]+)/").exec(src);
               if (!m) return 99;
               try {
-                const g = W2.AssetGroupGet && W2.AssetGroupGet(C.AssetFamily, m[1]);
+                const g = W3.AssetGroupGet && W3.AssetGroupGet(C.AssetFamily, m[1]);
                 return g && typeof g.DrawingPriority === "number" ? g.DrawingPriority : 99;
               } catch (e) {
                 return 99;
@@ -3856,50 +3954,50 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     trial = Math.max(0, Math.min(3, Math.round(Number(n)) || 0));
     scrubCache();
     if (trial) hookBelly(sdk);
-    const redraw2 = () => {
+    const redraw3 = () => {
       try {
-        if (W2.Player && typeof W2.CharacterLoadCanvas === "function") W2.CharacterLoadCanvas(W2.Player);
+        if (W3.Player && typeof W3.CharacterLoadCanvas === "function") W3.CharacterLoadCanvas(W3.Player);
       } catch (e) {
         console.warn("[Farmhand Companion] belly redraw:", e);
       }
     };
-    redraw2();
-    setTimeout(redraw2, 500);
-    setTimeout(redraw2, 1800);
+    redraw3();
+    setTimeout(redraw3, 500);
+    setTimeout(redraw3, 1800);
     if (say) say(trial ? "Belly test: " + ["", "small", "medium", "large"][trial] + ". Look at your character with nothing over your middle. Only you can see it. Tell Claude how it looks: the shape, the colour match, where it sits." : "Belly test off.");
   }
 
   // extension/src/bcr.js
-  var W3 = window;
+  var W4 = window;
   var warned = false;
   var kept = /* @__PURE__ */ new Map();
   function bcrOverBreast(C, bc, bx, by) {
     try {
-      if (typeof W3.BodyMarksZonesOf !== "function" || typeof W3.BodyMarksDrawZone !== "function" || typeof W3.BodyMarksZoneBox !== "function") return null;
+      if (typeof W4.BodyMarksZonesOf !== "function" || typeof W4.BodyMarksDrawZone !== "function" || typeof W4.BodyMarksZoneBox !== "function") return null;
       const ZONES = typeof BodyMarksZones !== "undefined" ? BodyMarksZones : null;
       if (!ZONES || !ZONES.Breasts || !C || C.MemberNumber == null) return null;
-      const zones2 = W3.BodyMarksZonesOf(C), state = zones2 && zones2.Breasts;
+      const zones2 = W4.BodyMarksZonesOf(C), state = zones2 && zones2.Breasts;
       if (!state) return null;
       const measured = typeof BodyMarksMeasured !== "undefined" && BodyMarksMeasured.get ? BodyMarksMeasured.get(C.MemberNumber) : void 0;
-      const def = ZONES.Breasts, box2 = W3.BodyMarksZoneBox(C, def, measured);
+      const def = ZONES.Breasts, box2 = W4.BodyMarksZoneBox(C, def, measured);
       if (!box2 || box2.Hidden) return null;
-      const size = typeof W3.BodyMarksSizeOf === "function" ? W3.BodyMarksSizeOf(C, def) || 1 : 1;
+      const size = typeof W4.BodyMarksSizeOf === "function" ? W4.BodyMarksSizeOf(C, def) || 1 : 1;
       const key = JSON.stringify(state) + "|" + bc.width + "x" + bc.height + "|" + Math.round(bx) + "," + Math.round(by) + "|" + Math.round(box2.Top) + "|" + size;
       const was = kept.get(C.MemberNumber);
       if (was && was.key === key) return was.res;
       const H = (typeof CanvasDrawHeight !== "undefined" ? CanvasDrawHeight : 0) || C.Canvas && C.Canvas.height || 1700;
-      const raw = W3.document.createElement("canvas");
+      const raw = W4.document.createElement("canvas");
       raw.width = 500;
       raw.height = H;
       const prev = MainCanvas;
       MainCanvas = raw.getContext("2d");
       try {
-        W3.BodyMarksDrawZone(C, "Breasts", state);
+        W4.BodyMarksDrawZone(C, "Breasts", state);
       } finally {
         MainCanvas = prev;
       }
       const sx = 250 + (box2.X || 0) - 130 * size, sw = 260 * size, sy = box2.Top - box2.Height * 0.35, sh = box2.Height * 1.9;
-      const out = W3.document.createElement("canvas");
+      const out = W4.document.createElement("canvas");
       out.width = bc.width;
       out.height = bc.height;
       const g = out.getContext("2d");
@@ -3926,8 +4024,70 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     }
   }
 
+  // shared/farm-look.json
+  var farm_look_default = {
+    id: "96553188",
+    saved: "2026-10-14T23:37:16.273Z",
+    body: {
+      cup: 12,
+      breast: {
+        full: 1,
+        hang: 1,
+        apart: 1,
+        x: 0,
+        y: 0,
+        nip: 1,
+        nipY: 0,
+        nipX: 0
+      },
+      wear: {},
+      belly: {
+        std: {
+          on: true,
+          rx: 92,
+          ry: 112,
+          sag: 0.28,
+          x: 0,
+          y: -20,
+          behind: false,
+          flat: false,
+          cut: 0.74
+        },
+        AllFours: {
+          on: false,
+          rx: 70,
+          ry: 80,
+          sag: 0.22,
+          x: 0,
+          y: -60,
+          behind: true,
+          flat: false,
+          cut: 0.74
+        },
+        Hogtied: {
+          on: false,
+          rx: 70,
+          ry: 80,
+          sag: 0.22,
+          x: 0,
+          y: -75,
+          behind: true,
+          flat: false,
+          cut: 0.74
+        }
+      },
+      auto: true,
+      tuck: true,
+      dress: true,
+      mould: {
+        items: [],
+        mode: {}
+      }
+    }
+  };
+
   // extension/src/drawnbody.js
-  var W4 = window;
+  var W5 = window;
   var KEY = "farmhand-drawn-body";
   var SEE_KEY = "farmhand-drawn-body-see";
   var FARM_KEY = "farmhand-drawn-body-farm";
@@ -3939,24 +4099,25 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
   var hooked2 = false;
   var seeOthers = true;
   var farm = null;
+  var onBot2 = () => !!(W5.Player && W5.Player.MemberNumber === BOT_MEMBER);
   var mine = { S: null, E: null };
   var others = /* @__PURE__ */ new Map();
   function load() {
     try {
-      const d = JSON.parse(W4.localStorage.getItem(KEY));
+      const d = JSON.parse(W5.localStorage.getItem(KEY));
       if (d && typeof d === "object") S2 = Object.assign(DEFAULTS(), d);
     } catch (e) {
     }
     try {
-      seeOthers = W4.localStorage.getItem(SEE_KEY) !== "0";
+      seeOthers = W5.localStorage.getItem(SEE_KEY) !== "0";
     } catch (e) {
     }
+    {
+      const b = clean(farm_look_default && farm_look_default.body);
+      if (b) farm = { at: String(farm_look_default.id || "built-in"), body: b };
+    }
     try {
-      const f = JSON.parse(W4.localStorage.getItem(FARM_KEY));
-      if (f && typeof f.at === "number" && f.body) {
-        const b = clean(f.body);
-        if (b) farm = { at: f.at, body: b };
-      }
+      W5.localStorage.removeItem(FARM_KEY);
     } catch (e) {
     }
     mine.S = S2;
@@ -3992,12 +4153,12 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     farmMe = { cup, belly };
     if (!S2.on) return;
     if (mine.E) apply(mine.E, eff());
-    redraw(60);
+    redraw2(60);
     tell(true);
   }
   function save() {
     try {
-      W4.localStorage.setItem(KEY, JSON.stringify(S2));
+      W5.localStorage.setItem(KEY, JSON.stringify(S2));
     } catch (e) {
     }
   }
@@ -4038,7 +4199,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
       made.set(cv, p);
       return null;
     }
-    const c = W4.document.createElement("canvas");
+    const c = W5.document.createElement("canvas");
     c.width = x1 - x0 + 1;
     c.height = y1 - y0 + 1;
     c.getContext("2d").drawImage(cv, -x0, -y0);
@@ -4057,17 +4218,17 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
       gone.add(src);
       n++;
       try {
-        const m = W4.GLDrawImageCache;
+        const m = W5.GLDrawImageCache;
         if (m && typeof m.delete === "function") m.delete(src);
       } catch (e) {
       }
       try {
-        const m = W4.DrawImageCache;
+        const m = W5.DrawImageCache;
         if (m && typeof m.delete === "function") m.delete(src);
       } catch (e) {
       }
       try {
-        const gl = W4.GLDrawCanvas && W4.GLDrawCanvas.GL, tc = gl && gl.textureCache;
+        const gl = W5.GLDrawCanvas && W5.GLDrawCanvas.GL, tc = gl && gl.textureCache;
         const t2 = tc && tc.get(src);
         if (t2) {
           if (t2.texture) gl.deleteTexture(t2.texture);
@@ -4081,7 +4242,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     for (const [mn, o] of others) if (o.E && Date.now() - o.at > 12e4 && !charOf(mn)) o.E = null;
     return n;
   }
-  var charOf = (mn) => W4.Player && W4.Player.MemberNumber === mn ? W4.Player : (W4.ChatRoomCharacter || []).find((c) => c && c.MemberNumber === mn) || null;
+  var charOf = (mn) => W5.Player && W5.Player.MemberNumber === mn ? W5.Player : (W5.ChatRoomCharacter || []).find((c) => c && c.MemberNumber === mn) || null;
   var itemOf = (C, g) => C && Array.isArray(C.Appearance) ? C.Appearance.find((a) => a && a.Asset && a.Asset.Group && a.Asset.Group.Name === g) : void 0;
   var againT = /* @__PURE__ */ new Map();
   function redrawMn(mn, soon) {
@@ -4089,20 +4250,20 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     againT.set(mn, setTimeout(() => {
       try {
         const C = charOf(mn);
-        if (C && typeof W4.CharacterLoadCanvas === "function") W4.CharacterLoadCanvas(C);
+        if (C && typeof W5.CharacterLoadCanvas === "function") W5.CharacterLoadCanvas(C);
       } catch (e) {
         console.warn("[Farmhand Companion] drawn body redraw:", e);
       }
     }, soon || 60));
   }
-  var redraw = (soon) => {
-    if (W4.Player) redrawMn(W4.Player.MemberNumber, soon);
+  var redraw2 = (soon) => {
+    if (W5.Player) redrawMn(W5.Player.MemberNumber, soon);
   };
   function makeEngine(mn) {
-    if (!W4.FarmBelly) W4.FarmBelly = bellyDrawing;
-    if (typeof W4.FarmBodyEngine !== "function" || !W4.FarmBreasts) return null;
-    const who = mn == null ? () => W4.Player || null : () => charOf(mn);
-    return W4.FarmBodyEngine({
+    if (!W5.FarmBelly) W5.FarmBelly = bellyDrawing;
+    if (typeof W5.FarmBodyEngine !== "function" || !W5.FarmBreasts) return null;
+    const who = mn == null ? () => W5.Player || null : () => charOf(mn);
+    return W5.FarmBodyEngine({
       S: { get C() {
         return who();
       } },
@@ -4110,7 +4271,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
       setBody: () => {
       },
       // never: their body items are theirs
-      redraw: () => mn == null ? redraw(60) : redrawMn(mn, 60),
+      redraw: () => mn == null ? redraw2(60) : redrawMn(mn, 60),
       picture,
       overBreast: bcrOverBreast,
       // BCR's marks on the drawn breasts (bcr.js)
@@ -4119,14 +4280,14 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     });
   }
   function engine() {
-    if (!mine.E && W4.Player) mine.E = makeEngine(null);
+    if (!mine.E && W5.Player) mine.E = makeEngine(null);
     if (mine.E) apply(mine.E, eff());
     return mine.E;
   }
   function apply(E, s) {
     if (!E) return;
     const B = E.BREAST, b = s.breast || {};
-    B.cup = Math.max(0, Math.min(W4.FarmBreasts.CUPS.length - 1, Math.round(Number(s.cup) || 0)));
+    B.cup = Math.max(0, Math.min(W5.FarmBreasts.CUPS.length - 1, Math.round(Number(s.cup) || 0)));
     for (const k of ["full", "hang", "apart", "x", "y", "nip", "nipY", "nipX"]) if (typeof b[k] === "number" && isFinite(b[k])) B[k] = b[k];
     B.wear = s.wear && typeof s.wear === "object" ? Object.assign({}, s.wear) : {};
     B.out.clear();
@@ -4184,27 +4345,45 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
   var shareOf = (s) => ({ cup: s.cup, breast: s.breast, wear: s.wear, belly: s.belly, auto: s.auto, tuck: s.tuck, dress: s.dress, mould: s.mould });
   var send = (type, data) => {
     try {
-      if (W4.ServerSend && W4.ServerPlayerIsInChatRoom && W4.ServerPlayerIsInChatRoom()) W4.ServerSend("ChatRoomChat", makeMsg(type, data));
+      if (W5.ServerSend && W5.ServerPlayerIsInChatRoom && W5.ServerPlayerIsInChatRoom()) W5.ServerSend("ChatRoomChat", makeMsg(type, data));
     } catch (e) {
     }
   };
   var toldAt = 0;
   var askedAt = 0;
+  var bellyStage = () => {
+    const m = bellyMode();
+    return m === "off" ? 0 : m === "on" ? 3 : Math.max(0, Math.min(4, Math.round(Number(farmMe && farmMe.belly) || 0)));
+  };
+  var lastTold = "";
   function tell(force) {
+    if (onBot2()) return;
     if (!force && Date.now() - toldAt < 8e3) return;
+    const msg = !S2.on ? { on: false } : S2.saved || !farm ? { on: true, body: shareOf(eff()) } : { on: true, farm: farm.at, cup: eff().cup, bm: bellyMode(), bs: bellyStage() };
+    const sig2 = JSON.stringify(msg);
+    if (!force && sig2 === lastTold) return;
     toldAt = Date.now();
-    send("body", S2.on ? { on: true, body: shareOf(eff()) } : { on: false });
+    lastTold = sig2;
+    send("body", msg);
+  }
+  function fromFarm(m) {
+    if (!farm) return null;
+    const s = clean(farm.body);
+    if (!s) return null;
+    s.cup = Math.round(Math.max(0, Math.min(20, Number(m.cup) || 0)));
+    s.belly = m.bm === "studio" ? farm.body.belly : bellyAt(farm.body.belly, Math.max(0, Math.min(4, Math.round(Number(m.bs) || 0))));
+    return s;
   }
   function ask() {
-    if (Date.now() - askedAt < 8e3) return;
+    if (onBot2() || Date.now() - askedAt < 8e3) return;
     askedAt = Date.now();
     send("bodyAsk", {});
   }
   function onBodyMsg(m) {
     const mn = m.from;
-    if (!mn || W4.Player && mn === W4.Player.MemberNumber) return;
+    if (!mn || W5.Player && mn === W5.Player.MemberNumber || onBot2()) return;
     if (m.type === "bodyAsk") {
-      if (S2.on) setTimeout(() => tell(), 300 + Math.random() * 1500);
+      if (S2.on) setTimeout(() => tell(true), 300 + Math.random() * 1500);
       return;
     }
     if (m.type !== "body") return;
@@ -4212,9 +4391,13 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
       if (others.delete(mn)) redrawMn(mn, 60);
       return;
     }
-    const s = clean(m.body);
+    const s = m.farm ? fromFarm(m) : clean(m.body);
     if (!s) return;
     let o = others.get(mn);
+    if (o && JSON.stringify(o.S) === JSON.stringify(s)) {
+      o.at = Date.now();
+      return;
+    }
     if (!o) {
       o = { S: s, E: makeEngine(mn), at: Date.now() };
       others.set(mn, o);
@@ -4233,9 +4416,9 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     try {
       sdk2.hookFunction("CommonDrawAppearanceBuild", 2, (args, next) => {
         const C = args[0];
-        if (!C) return next(args);
+        if (!C || onBot2()) return next(args);
         let E = null;
-        if (C === W4.Player) {
+        if (C === W5.Player) {
           if (S2.on) E = mine.E || engine();
         } else if (seeOthers && typeof C.MemberNumber === "number") {
           const o = others.get(C.MemberNumber);
@@ -4286,8 +4469,8 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     setInterval(prune, 2e4);
     setTimeout(() => {
       if (S2.on && engine()) {
-        W4.__farmDrawnBody = true;
-        redraw(500);
+        W5.__farmDrawnBody = true;
+        redraw2(500);
       }
       hook();
       if (S2.on) tell(true);
@@ -4295,7 +4478,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     }, 3e3);
   }
   function drawnBodyState() {
-    const up = itemOf(W4.Player, "BodyUpper"), cups = W4.FarmBreasts && W4.FarmBreasts.CUPS || [], e = eff();
+    const up = itemOf(W5.Player, "BodyUpper"), cups = W5.FarmBreasts && W5.FarmBreasts.CUPS || [], e = eff();
     return {
       on: !!S2.on,
       cup: e.cup,
@@ -4313,32 +4496,17 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
       othersHere: Array.from(others.keys()).filter((mn) => charOf(mn)).length
     };
   }
-  function farmLookWanted(look) {
-    const at = Number(look) || 0;
-    return at && (!farm || farm.at !== at) ? farm ? farm.at : 0 : null;
+  function farmLookWanted() {
+    return null;
   }
-  function onFarmLook(m) {
-    const at = Number(m && m.at), b = clean(m && m.body);
-    if (!at || !b) return;
-    if (farm && farm.at === at) return;
-    farm = { at, body: b };
-    try {
-      W4.localStorage.setItem(FARM_KEY, JSON.stringify(farm));
-    } catch (e) {
-    }
-    if (S2.saved) return;
-    if (mine.E) apply(mine.E, eff());
-    if (S2.on) {
-      redraw(60);
-      tell(true);
-    }
+  function onFarmLook() {
   }
   function drawnBodyBelly(mode, say) {
     S2.bellyMode = ["farm", "on", "off", "studio"].includes(mode) ? mode : "farm";
     delete S2.bellyOn;
     save();
     if (mine.E) apply(mine.E, eff());
-    redraw(60);
+    redraw2(60);
     tell(true);
     if (say) say({ farm: "Your belly follows the farm: it shows, and grows, as you fill up or get bred.", on: "Belly always on.", off: "Belly off.", studio: "Your belly is the one your own studio has." }[S2.bellyMode]);
   }
@@ -4347,9 +4515,9 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     S2.cupSet = false;
     save();
     if (mine.E) apply(mine.E, eff());
-    redraw(60);
+    redraw2(60);
     tell(true);
-    if (say) say(farm ? "Back to the farm's look." : "Back to the farm's look: it comes from the farm girl when you're in her room.");
+    if (say) say("Back to the farm's look.");
   }
   function drawnBodySet(on2, say) {
     S2.on = !!on2;
@@ -4361,12 +4529,12 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
         return say && say("The drawn body didn't load. Reload the page and try again.");
       }
       bellyTrial(0);
-      W4.__farmDrawnBody = true;
+      W5.__farmDrawnBody = true;
       hook();
-    } else W4.__farmDrawnBody = false;
+    } else W5.__farmDrawnBody = false;
     tell(true);
-    redraw(60);
-    setTimeout(() => redraw(0), 800);
+    redraw2(60);
+    setTimeout(() => redraw2(0), 800);
     if (say) {
       const st2 = drawnBodyState();
       if (!S2.on) say("Drawn body off. You're the game's own picture again, for you and everybody else.");
@@ -4377,7 +4545,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
   function drawnBodySeeOthers(on2, say) {
     seeOthers = !!on2;
     try {
-      W4.localStorage.setItem(SEE_KEY, on2 ? "1" : "0");
+      W5.localStorage.setItem(SEE_KEY, on2 ? "1" : "0");
     } catch (e) {
     }
     for (const mn of others.keys()) redrawMn(mn, 60);
@@ -4388,12 +4556,12 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     if (say) say(on2 ? "You'll see other people's drawn bodies." : "Other people are drawn the game's own way on your screen.");
   }
   function drawnBodyCup(i, say) {
-    const n = W4.FarmBreasts ? W4.FarmBreasts.CUPS.length : 21;
+    const n = W5.FarmBreasts ? W5.FarmBreasts.CUPS.length : 21;
     if (i === "auto") {
       S2.cupSet = false;
       save();
       if (mine.E) apply(mine.E, eff());
-      redraw(60);
+      redraw2(60);
       tell(true);
       if (say) say("Your cup follows the farm: " + drawnBodyState().cupName + " now, and it changes as you grow.");
       return;
@@ -4402,7 +4570,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     S2.cupSet = true;
     save();
     if (mine.E) apply(mine.E, eff());
-    redraw(60);
+    redraw2(60);
     tell(true);
     if (say) say("Cup: " + drawnBodyState().cupName + ", whatever the farm does. Pick Follow the farm to have it grow with you again.");
   }
@@ -4419,7 +4587,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     mine.S = S2;
     save();
     if (mine.E) apply(mine.E, eff());
-    redraw(60);
+    redraw2(60);
     tell(true);
     if (say) say("Settings " + from + " put in: " + drawnBodyState().cupName + " cup" + (S2.belly.std && S2.belly.std.on ? ", your belly" : "") + ", " + Object.keys(S2.wear).length + " piece choices. " + (S2.on ? "" : "Switch the drawn body on to see it."));
     return true;
@@ -4428,7 +4596,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     try {
       const t = String(text || "").trim();
       if (!t.startsWith(CODE_HEAD)) throw new Error("that isn't a code from the studio (it starts with " + CODE_HEAD + ")");
-      const raw = W4.LZString && typeof W4.LZString.decompressFromBase64 === "function" ? W4.LZString.decompressFromBase64(t.slice(CODE_HEAD.length)) : null;
+      const raw = W5.LZString && typeof W5.LZString.decompressFromBase64 === "function" ? W5.LZString.decompressFromBase64(t.slice(CODE_HEAD.length)) : null;
       const d = raw && JSON.parse(raw);
       if (!d || typeof d !== "object" || d.v !== 1) throw new Error("the code is damaged or from a newer studio");
       return take(d, say, "from the code");
@@ -4492,7 +4660,30 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
       cream: { style: "smear", base: "#FFF6E4", edge: "#E2D4B4", gloss: "#FFFFFF", alpha: 0.96, run: 0.35, width: 1.2 },
       cake: { style: "smear", smudge: 0.3, sprinkleN: 30, base: "#FFD8E6", edge: "#E3A9BC", gloss: "#FFFFFF", alpha: 0.97, run: 0.2, width: 1.3, patches: "#FFFFFF", crumbs: ["#E8C27A", "#D9A85B", "#C98F45", "#7A4A2A"], sprinkles: ["#FF5C8A", "#5CC8FF", "#FFE05C", "#7CE07C"] },
       mud: { style: "smear", base: "#6B4A2B", edge: "#45301A", gloss: "#9C7A55", alpha: 0.9, run: 0.5, width: 1.2, specks: "#3A2614", also: "run" },
-      mash: { style: "smear", base: "#D9C28C", edge: "#B09860", gloss: "#F5E8C2", alpha: 0.95, run: 0.25, width: 1.2, specks: "#A88A4A" }
+      mash: { style: "smear", base: "#D9C28C", edge: "#B09860", gloss: "#F5E8C2", alpha: 0.95, run: 0.25, width: 1.2, specks: "#A88A4A" },
+      // Halloween's (Oct 27): pumpkin guts with pale seeds in, a caramel run with a hard shine, glowin' ghost slime, a thin
+      // amber run of cider, the witch's bubblin' purple brew, and the water's black ink
+      pumpkin: { style: "smear", base: "#E07A1F", edge: "#A24E0C", gloss: "#FFC27A", alpha: 0.94, run: 0.3, width: 1.25, seeds: "#F4E6C0", specks: "#B65A12" },
+      caramel: { style: "run", tint: "#C27A30", stampAlpha: 0.92, narrow: [1, 1.35], long: 1.05, turn: 0.3, texture: "shine", base: "#B8702A", edge: "#6E3E10", gloss: "#FFD9A0", alpha: 0.9, run: 0.9, width: 1.25, beads: 0.9 },
+      ecto: { style: "smear", tint: "#8FF5DC", stampAlpha: 0.6, narrow: [1.1, 1.5], long: 0.95, turn: 1.1, texture: "bubbles", stampToo: true, base: "#7FEAD0", edge: "#38A88E", gloss: "#E6FFF9", alpha: 0.5, run: 1, width: 1.1, beads: 0.6, bubbles: true, also: "run" },
+      cider: { style: "run", tint: "#E3A23E", stampAlpha: 0.55, narrow: [0.5, 0.8], long: 1.3, turn: 0.3, texture: "sheen", base: "#D9902E", edge: "#A8661A", gloss: "#FFE6B0", alpha: 0.38, run: 1.5, width: 0.75, beads: 0.3, droplets: 1.4 },
+      brew: { style: "run", tint: "#8E4FCB", stampAlpha: 0.85, narrow: [0.9, 1.25], long: 1.1, turn: 0.4, texture: "bubbles", base: "#7A3FB0", edge: "#47206E", gloss: "#E6CCFF", alpha: 0.72, run: 1.2, width: 1, beads: 0.7, bubbles: true },
+      ink: { style: "run", tint: "#2A2433", stampAlpha: 0.95, narrow: [0.9, 1.25], long: 1.15, turn: 0.4, texture: "sheen", base: "#15121C", edge: "#000000", gloss: "#6E6880", alpha: 0.92, run: 1.2, width: 1.05, beads: 0.7, droplets: 1.2 },
+      // winter's and Yule's (Oct 27): royal icin' piped thick and white with red and green sprinkles, a milky cocoa run with
+      // little marshmallows in, pale eggnog with nutmeg dust, candy-cane peppermint syrup with white stripes, and red candle
+      // wax that runs a little way and sets in beads
+      icing: { style: "smear", smudge: 0.35, sprinkleN: 10, base: "#FFFDF8", edge: "#E4DCCD", gloss: "#FFFFFF", alpha: 0.97, run: 0.15, width: 0.95, patches: "#FFFFFF", sprinkles: ["#D62B3A", "#2E8B47", "#FFFFFF"] },
+      cocoa: { style: "run", tint: "#7A4A2E", stampAlpha: 0.8, narrow: [0.7, 1], long: 1.25, turn: 0.35, texture: "sheen", base: "#6E4128", edge: "#3E2414", gloss: "#D8B090", alpha: 0.74, run: 1.4, width: 0.9, beads: 0.5, droplets: 1, crumbs: ["#FFFFFF", "#F8F2EA", "#FFF9F2"] },
+      eggnog: { style: "run", tint: "#F5E6B8", stampAlpha: 0.85, narrow: [0.8, 1.1], long: 1.15, turn: 0.35, texture: "milky", base: "#F1E0AA", edge: "#C9B27A", gloss: "#FFF8E0", alpha: 0.78, run: 1.2, width: 0.95, beads: 0.5, specks: "#8A5A2B" },
+      peppermint: { style: "run", tint: "#E8435A", stampAlpha: 0.88, narrow: [0.9, 1.2], long: 1.1, turn: 0.3, texture: "candy", base: "#E23A52", edge: "#9E1A2C", gloss: "#FFE0E6", alpha: 0.82, run: 1.1, width: 1, beads: 0.7 },
+      wax: { style: "run", tint: "#B01E32", stampAlpha: 0.95, narrow: [0.7, 1], long: 0.7, turn: 0.25, texture: "shine", base: "#A3162B", edge: "#5E0A16", gloss: "#FF8A9A", alpha: 0.96, run: 0.5, width: 0.9, beads: 1.2 },
+      // spring's, summer's and autumn's (Oct 27): watery Easter egg dye that runs in pastel bands the way a dipped egg
+      // does, a dust of yellow pollen with no shine to it, sticky marshmallow fluff with white patches and little bits in,
+      // and dark grape juice from the stompin' tub, with bits of skin in it
+      dye: { style: "run", tint: "#EBA9CD", stampAlpha: 0.6, narrow: [0.5, 0.8], long: 1.3, turn: 0.3, texture: "pastel", base: "#E7A3C8", edge: "#B86A98", gloss: "#FFE6F3", alpha: 0.42, run: 1.5, width: 0.75, beads: 0.3, droplets: 1.3 },
+      pollen: { style: "smear", smudge: 1.3, base: "#F2C230", edge: "#D3A11A", gloss: "#F7D45A", alpha: 0.42, run: 0.05, width: 1.35, specks: "#E4A900", droplets: 0.2 },
+      marshmallow: { style: "smear", smudge: 0.5, base: "#FCE6EF", edge: "#E2BCCB", gloss: "#FFFFFF", alpha: 0.95, run: 0.25, width: 1.25, patches: "#FFFFFF", crumbs: ["#FFFFFF", "#FCE6EF", "#E3F1FF", "#FFF4D6"] },
+      grape: { style: "run", tint: "#6A2A52", stampAlpha: 0.85, narrow: [0.8, 1.1], long: 1.2, turn: 0.35, texture: "sheen", base: "#5B2245", edge: "#2E0E22", gloss: "#C88AB0", alpha: 0.7, run: 1.3, width: 0.95, beads: 0.5, droplets: 1.3, crumbs: ["#3E1430", "#4E1A3C", "#6A2A52"] }
     };
     function ribbon(ctx3, pts) {
       const L = [], R = [];
@@ -4709,14 +4900,14 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
       c.height = img2.height;
       const x = c.getContext("2d");
       x.drawImage(img2, 0, 0);
-      const W11 = c.width, H = c.height, d = x.getImageData(0, 0, W11, H).data, seen2 = new Uint8Array(W11 * H), out = [];
-      for (let i = 0; i < W11 * H; i++) {
+      const W13 = c.width, H = c.height, d = x.getImageData(0, 0, W13, H).data, seen2 = new Uint8Array(W13 * H), out = [];
+      for (let i = 0; i < W13 * H; i++) {
         if (seen2[i] || d[i * 4 + 3] < 16) continue;
         const q2 = [i];
         seen2[i] = 1;
-        let x0 = W11, y0 = H, x1 = 0, y1 = 0, n = 0;
+        let x0 = W13, y0 = H, x1 = 0, y1 = 0, n = 0;
         while (q2.length) {
-          const p = q2.pop(), px = p % W11, py = p / W11 | 0;
+          const p = q2.pop(), px = p % W13, py = p / W13 | 0;
           n++;
           if (px < x0) x0 = px;
           if (px > x1) x1 = px;
@@ -4724,8 +4915,8 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
           if (py > y1) y1 = py;
           for (let dy = -2; dy <= 2; dy++) for (let dx = -2; dx <= 2; dx++) {
             const nx = px + dx, ny = py + dy;
-            if (nx < 0 || ny < 0 || nx >= W11 || ny >= H) continue;
-            const k = ny * W11 + nx;
+            if (nx < 0 || ny < 0 || nx >= W13 || ny >= H) continue;
+            const k = ny * W13 + nx;
             if (!seen2[k] && d[k * 4 + 3] >= 16) {
               seen2[k] = 1;
               q2.push(k);
@@ -4831,6 +5022,27 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
         x.globalAlpha = 0.4;
         x.fillStyle = "#FFFFFF";
         x.fillRect(0, 0, w, h2);
+      },
+      // peppermint's candy-cane stripes, white and slantin'
+      candy: (x, w, h2, r) => {
+        x.globalAlpha = 0.55;
+        x.strokeStyle = "#FFFFFF";
+        x.lineWidth = 1.4;
+        for (let i = -h2; i < w + h2; i += 5) {
+          x.beginPath();
+          x.moveTo(i, 0);
+          x.lineTo(i + h2 * 0.6, h2);
+          x.stroke();
+        }
+      },
+      // egg dye's pastel bands down the run, pink into blue into yellow into green, like a dipped egg
+      pastel: (x, w, h2, r) => {
+        x.globalAlpha = 0.5;
+        const c = ["#E7A3C8", "#A3C8E7", "#F2E27A", "#A8E0B0"], o = Math.floor(r() * 4);
+        for (let i = 0; i < 4; i++) {
+          x.fillStyle = c[(i + o) % 4];
+          x.fillRect(0, h2 * i / 4, w, h2 / 4 + 1);
+        }
       }
     };
     function stamp(ctx3, r, K, x, y, size) {
@@ -5082,14 +5294,14 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
       if (!b) return false;
       const s = stamp(b);
       if (!s) return false;
-      const P4 = BRAND_PLACES[b.place].at, x = P4[0] + b.dx + (ox || 0), y = P4[1] + b.dy + (over || 0) + (oy || 0);
+      const P5 = BRAND_PLACES[b.place].at, x = P5[0] + b.dx + (ox || 0), y = P5[1] + b.dy + (over || 0) + (oy || 0);
       const W0 = g.canvas.width, H0 = g.canvas.height;
       const t = document.createElement("canvas");
       t.width = W0;
       t.height = H0;
       const tg = t.getContext("2d");
       tg.translate(x, y);
-      tg.rotate((P4[2] + b.angle) * Math.PI / 180);
+      tg.rotate((P5[2] + b.angle) * Math.PI / 180);
       if (b.flip) tg.scale(-1, 1);
       tg.drawImage(s, -s.width / 2, -s.height / 2);
       tg.setTransform(1, 0, 0, 1, 0, 0);
@@ -5105,18 +5317,23 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
   })();
 
   // extension/src/messes.js
-  var cleanBrand = (b) => W5.FarmBrand.clean(b);
-  var brandReady = (b) => W5.FarmBrand.ready(b);
-  var paintBrand = (...a) => W5.FarmBrand.paint(...a);
-  var W5 = window;
+  var cleanBrand = (b) => W6.FarmBrand.clean(b);
+  var brandReady = (b) => W6.FarmBrand.ready(b);
+  var paintBrand = (...a) => W6.FarmBrand.paint(...a);
+  var W6 = window;
   var KEY2 = "farmhand-messes";
   var MAX = 60;
+  var onBot3 = () => !!(W6.Player && W6.Player.MemberNumber === BOT_MEMBER);
   var sdk3 = null;
   var hooked3 = false;
   var mine2 = [];
   var myBrand = null;
+  function brandLook(b) {
+    const look = farm_look_default && farm_look_default.brand || {}, per = (look.places || {})[b.place] || {};
+    return Object.assign({ art: look.art || "mark", look: look.look || "seared", size: per.size || look.size || 46, angle: per.angle || 0, dx: per.dx || 0, dy: per.dy || 0 }, b);
+  }
   function messBrand(b) {
-    const nb = b ? cleanBrand(b) : null;
+    const nb = b && b.place ? cleanBrand(brandLook(b)) : null;
     if (JSON.stringify(nb) === JSON.stringify(myBrand)) return;
     myBrand = nb;
     tell2(true);
@@ -5136,12 +5353,27 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     "#6b4a2b": "mud",
     "#d8c08a": "mash",
     "#d9c13a": "piss",
-    "#ffd8e6": "cake"
+    "#ffd8e6": "cake",
+    "#e07a1f": "pumpkin",
+    "#b8702a": "caramel",
+    "#7fead0": "ecto",
+    "#d9902e": "cider",
+    "#7a3fb0": "brew",
+    "#15121c": "ink",
+    "#fffdf8": "icing",
+    "#6e4128": "cocoa",
+    "#f1e0aa": "eggnog",
+    "#e23a52": "peppermint",
+    "#a3162b": "wax",
+    "#e7a3c8": "dye",
+    "#f2c230": "pollen",
+    "#fce6ef": "marshmallow",
+    "#5b2245": "grape"
   };
   var AREA_OF = { face: "face", forehead: "forehead", chest: "chest", tummy: "tummy", hair: "hair", thighs: "thighL", back: "back" };
   function load2() {
     try {
-      const v = JSON.parse(W5.localStorage.getItem(KEY2));
+      const v = JSON.parse(W6.localStorage.getItem(KEY2));
       if (Array.isArray(v)) mine2 = v.filter(ok).slice(-MAX);
     } catch (e) {
       mine2 = [];
@@ -5149,23 +5381,23 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
   }
   function save2() {
     try {
-      W5.localStorage.setItem(KEY2, JSON.stringify(mine2));
+      W6.localStorage.setItem(KEY2, JSON.stringify(mine2));
     } catch (e) {
     }
   }
-  var ok = (e) => e && typeof e.k === "string" && W5.FarmMess && W5.FarmMess.KINDS[e.k] && Array.isArray(e.a) && Number.isFinite(e.s);
-  var clean2 = (list) => Array.isArray(list) ? list.filter(ok).slice(-MAX).map((e) => ({ k: e.k, a: e.a.filter((x) => typeof x === "string" && W5.FarmMess.AREAS[x]).slice(0, 6), s: e.s | 0, t: +e.t || 0, m: Math.max(0.5, Math.min(3, Number(e.m) || 1)) })) : [];
+  var ok = (e) => e && typeof e.k === "string" && W6.FarmMess && W6.FarmMess.KINDS[e.k] && Array.isArray(e.a) && Number.isFinite(e.s);
+  var clean2 = (list) => Array.isArray(list) ? list.filter(ok).slice(-MAX).map((e) => ({ k: e.k, a: e.a.filter((x) => typeof x === "string" && W6.FarmMess.AREAS[x]).slice(0, 6), s: e.s | 0, t: +e.t || 0, m: Math.max(0.5, Math.min(3, Number(e.m) || 1)) })) : [];
   function messFromMark(m) {
-    DIAG.marks.push({ at: Date.now(), mess: m && m.mess, splat: m && m.splat, farmMess: !!W5.FarmMess });
+    DIAG.marks.push({ at: Date.now(), mess: m && m.mess, splat: m && m.splat, farmMess: !!W6.FarmMess });
     if (DIAG.marks.length > 5) DIAG.marks.shift();
-    if (!m || !Array.isArray(m.splat) || !m.splat.length || !W5.FarmMess) return false;
-    const kind = typeof m.mess === "string" && W5.FarmMess.KINDS[m.mess] ? m.mess : (typeof m.color === "string" ? BY_COLOR[m.color.toLowerCase()] : null) || "cum";
+    if (!m || !Array.isArray(m.splat) || !m.splat.length || !W6.FarmMess) return false;
+    const kind = typeof m.mess === "string" && W6.FarmMess.KINDS[m.mess] ? m.mess : (typeof m.color === "string" ? BY_COLOR[m.color.toLowerCase()] : null) || "cum";
     const a = [];
     for (const x of m.splat) {
       const k = AREA_OF[x];
       if (k && !a.includes(k)) a.push(k);
     }
-    if (a.includes("tummy") && ["cum", "piss", "milk", "honey", "maple", "chocolate", "strawberry", "slime"].includes(kind) && Math.random() < 0.4) a.push(Math.random() < 0.5 ? "thighL" : "thighR");
+    if (a.includes("tummy") && ["cum", "piss", "milk", "honey", "maple", "chocolate", "strawberry", "slime", "caramel", "ecto", "cider", "brew", "ink", "cocoa", "eggnog", "peppermint", "dye", "grape"].includes(kind) && Math.random() < 0.4) a.push(Math.random() < 0.5 ? "thighL" : "thighR");
     if (!a.length) a.push("chest");
     const amt = Number(m.amount) > 0 ? Math.max(0.5, Math.min(3, Number(m.amount))) : 1;
     mine2.push({ k: kind, a, s: Math.random() * 1e9 | 0, t: Date.now(), m: Math.round(amt * 10) / 10 });
@@ -5183,9 +5415,17 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     redrawMe();
     return true;
   }
+  function messRinse() {
+    if (!mine2.length) return false;
+    mine2 = mine2.slice(Math.max(1, Math.ceil(mine2.length / 3)));
+    save2();
+    tell2(true);
+    redrawMe();
+    return true;
+  }
   var send2 = (type, data) => {
     try {
-      if (W5.ServerSend && W5.ServerPlayerIsInChatRoom && W5.ServerPlayerIsInChatRoom()) W5.ServerSend("ChatRoomChat", makeMsg(type, data));
+      if (W6.ServerSend && W6.ServerPlayerIsInChatRoom && W6.ServerPlayerIsInChatRoom()) W6.ServerSend("ChatRoomChat", makeMsg(type, data));
     } catch (e) {
     }
   };
@@ -5197,13 +5437,13 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     send2("mess", myBrand ? { list: mine2, brand: myBrand } : { list: mine2 });
   }
   function ask2() {
-    if (Date.now() - askedAt2 < 8e3) return;
+    if (onBot3() || Date.now() - askedAt2 < 8e3) return;
     askedAt2 = Date.now();
     send2("messAsk", {});
   }
   function onMessMsg(m) {
     const mn = m.from;
-    if (!mn || W5.Player && mn === W5.Player.MemberNumber) return;
+    if (!mn || W6.Player && mn === W6.Player.MemberNumber || onBot3()) return;
     if (m.type === "messAsk") {
       if (mine2.length || myBrand) setTimeout(() => tell2(), 300 + Math.random() * 1500);
       return;
@@ -5219,23 +5459,23 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     redrawMn2(mn);
     if (brand && !brandReady(brand)) setTimeout(() => redrawMn2(mn), 600);
   }
-  var charOf2 = (mn) => W5.Player && W5.Player.MemberNumber === mn ? W5.Player : (W5.ChatRoomCharacter || []).find((c) => c && c.MemberNumber === mn) || null;
+  var charOf2 = (mn) => W6.Player && W6.Player.MemberNumber === mn ? W6.Player : (W6.ChatRoomCharacter || []).find((c) => c && c.MemberNumber === mn) || null;
   var againT2 = /* @__PURE__ */ new Map();
   function redrawMn2(mn, soon) {
     clearTimeout(againT2.get(mn));
     againT2.set(mn, setTimeout(() => {
       try {
         const C = charOf2(mn);
-        if (C && typeof W5.CharacterLoadCanvas === "function") W5.CharacterLoadCanvas(C);
+        if (C && typeof W6.CharacterLoadCanvas === "function") W6.CharacterLoadCanvas(C);
       } catch (e) {
       }
     }, soon || 80));
   }
   var redrawMe = () => {
-    if (W5.Player) redrawMn2(W5.Player.MemberNumber);
+    if (W6.Player) redrawMn2(W6.Player.MemberNumber);
   };
-  var listFor = (C) => C === W5.Player ? mine2 : (others2.get(C.MemberNumber) || {}).list || [];
-  var brandFor = (C) => C === W5.Player ? myBrand : (others2.get(C.MemberNumber) || {}).brand || null;
+  var listFor = (C) => C === W6.Player ? mine2 : (others2.get(C.MemberNumber) || {}).list || [];
+  var brandFor = (C) => C === W6.Player ? myBrand : (others2.get(C.MemberNumber) || {}).brand || null;
   var imgs = /* @__PURE__ */ new Map();
   function img(src, mn) {
     let i = imgs.get(src);
@@ -5246,7 +5486,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     imgs.set(src, i);
     return null;
   }
-  if (W5.FarmMess && W5.FarmMess.loadStamps) W5.FarmMess.loadStamps("").then((n) => {
+  if (W6.FarmMess && W6.FarmMess.loadStamps) W6.FarmMess.loadStamps("").then((n) => {
     if (n) {
       redrawMe();
       for (const mn of others2.keys()) redrawMn2(mn);
@@ -5260,17 +5500,17 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     setTimeout(() => {
       for (const p of made2.values()) if (p.src === src) return;
       try {
-        const m = W5.GLDrawImageCache;
+        const m = W6.GLDrawImageCache;
         if (m && typeof m.delete === "function") m.delete(src);
       } catch (e) {
       }
       try {
-        const m = W5.DrawImageCache;
+        const m = W6.DrawImageCache;
         if (m && typeof m.delete === "function") m.delete(src);
       } catch (e) {
       }
       try {
-        const gl = W5.GLDrawCanvas && W5.GLDrawCanvas.GL, tc = gl && gl.textureCache;
+        const gl = W6.GLDrawCanvas && W6.GLDrawCanvas.GL, tc = gl && gl.textureCache;
         const t2 = tc && tc.get(src);
         if (t2) {
           if (t2.texture) gl.deleteTexture(t2.texture);
@@ -5286,7 +5526,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     if (was && was.src && was.src !== p.src) forget(was.src);
   }
   function messPicture(C, list, body2, brand) {
-    const over = W5.CanvasUpperOverflow || 700, h2 = C.Canvas && C.Canvas.height || 1e3 + over;
+    const over = W6.CanvasUpperOverflow || 700, h2 = C.Canvas && C.Canvas.height || 1e3 + over;
     const up = body2.find((b) => /\/BodyUpper\//.test(b[0])), ox = up ? up[1] : 0, oy = up ? up[2] - over : 0;
     const age = (e) => Math.min(5, Math.floor((Date.now() - (e.t || 0)) / 6e4));
     const key = JSON.stringify(list) + "|" + JSON.stringify(brand) + (brand && brandReady(brand) ? "+" : "-") + "|" + list.map(age).join("") + "|" + body2.map((b) => b[0] + "@" + b[1] + "," + b[2]).join(";");
@@ -5294,7 +5534,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     if (was && was.key === key) return was;
     let mask = null;
     if (body2.length) {
-      mask = W5.document.createElement("canvas");
+      mask = W6.document.createElement("canvas");
       mask.width = 500;
       mask.height = h2;
       const mg = mask.getContext("2d");
@@ -5304,12 +5544,12 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
         mg.drawImage(i, x, y);
       }
     }
-    const c = W5.document.createElement("canvas");
+    const c = W6.document.createElement("canvas");
     c.width = 500;
     c.height = h2;
     const g = c.getContext("2d");
     const at = (names) => names.map((n) => {
-      const A = W5.FarmMess.AREAS[n];
+      const A = W6.FarmMess.AREAS[n];
       return [A[0] + ox, A[1] + over + oy, A[2]];
     });
     if (brand) try {
@@ -5317,8 +5557,8 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     } catch (e) {
       console.warn("[Farmhand Companion] brand:", e);
     }
-    for (const e of list) W5.FarmMess.paintOn(g, mask, e.k, { at: at(e.a), seed: e.s, amount: e.m || 1, runX: 0.55 + 0.09 * age(e) });
-    if (typeof W5.GLDrawLoadTransient === "function") {
+    for (const e of list) W6.FarmMess.paintOn(g, mask, e.k, { at: at(e.a), seed: e.s, amount: e.m || 1, runX: 0.55 + 0.09 * age(e) });
+    if (typeof W6.GLDrawLoadTransient === "function") {
       const p2 = { key, src: c, dx: 0, dy: 0 };
       keep(C.MemberNumber, p2);
       return p2;
@@ -5336,7 +5576,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
       keep(C.MemberNumber, p2);
       return p2;
     }
-    const t = W5.document.createElement("canvas");
+    const t = W6.document.createElement("canvas");
     t.width = x1 - x0 + 1;
     t.height = y1 - y0 + 1;
     t.getContext("2d").drawImage(c, -x0, -y0);
@@ -5352,9 +5592,9 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
       const groupRe = /(?:^|\/)Assets\/[^/]+\/(?:Override\/[^/]+\/)?([^/]+)\//;
       sdk3.hookFunction("CommonDrawAppearanceBuild", 3, (args, next) => {
         const C = args[0], real = args[1];
-        if (!C || !real || typeof real.drawImage !== "function" || !W5.FarmMess) return next(args);
+        if (!C || !real || typeof real.drawImage !== "function" || !W6.FarmMess || onBot3()) return next(args);
         const list = listFor(C), brand = brandFor(C);
-        if (C === W5.Player) DIAG.got++;
+        if (C === W6.Player) DIAG.got++;
         if (!list.length && !brand) return next(args);
         const body2 = [], all = [], sample = [];
         let canv = 0, done = false;
@@ -5369,7 +5609,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
               have.add(b[0]);
             }
             const p = messPicture(C, list, body2, brand);
-            if (C === W5.Player) {
+            if (C === W6.Player) {
               DIAG.draws++;
               DIAG.draw = { at: Date.now(), list: list.length, body: body2.map((b) => String(b[0]).replace(/^.*Assets\/[^/]+\//, "") + "@" + b[1] + "," + b[2]), sample: sample.slice(), canv, pic: p ? p.src ? typeof p.src === "string" ? "picture" : "drawing " + p.src.width + "x" + p.src.height : "empty" : "waiting for the body pictures" };
             }
@@ -5389,7 +5629,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
           }
         };
         const seen2 = (name) => (src, x, y, ...rest) => {
-          if (C === W5.Player) {
+          if (C === W6.Player) {
             if (typeof src === "string") {
               if (sample.length < 6) sample.push(src.replace(/^.*\/(?=[^/]+\/[^/]+$)/, ""));
             } else canv++;
@@ -5456,7 +5696,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
   function messDiag() {
     const ago = (t) => t ? Math.round((Date.now() - t) / 1e3) + "s ago" : "never";
     const L = [];
-    L.push("hooked: " + hooked3 + " \xB7 splatter kit: " + !!W5.FarmMess + (W5.FarmMess && W5.FarmMess.KINDS ? " (" + Object.keys(W5.FarmMess.KINDS).length + " kinds)" : ""));
+    L.push("hooked: " + hooked3 + " \xB7 splatter kit: " + !!W6.FarmMess + (W6.FarmMess && W6.FarmMess.KINDS ? " (" + Object.keys(W6.FarmMess.KINDS).length + " kinds)" : ""));
     L.push("on you now: " + mine2.length + (mine2.length ? " \xB7 newest " + mine2[mine2.length - 1].k + " on " + mine2[mine2.length - 1].a.join("+") + ", " + ago(mine2[mine2.length - 1].t) : ""));
     L.push("marks from the bot: " + (DIAG.marks.length ? DIAG.marks.map((x) => (x.mess || "?") + " " + ago(x.at)).join(", ") : "none since this page opened"));
     L.push("your body drawn: " + DIAG.got + " times, with a mess " + DIAG.draws + " times");
@@ -5467,7 +5707,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
   }
 
   // extension/src/trimpics.js
-  var W6 = window;
+  var W7 = window;
   var LIMIT = 38e7;
   var TARGET = 26e7;
   var IDLE = 5 * 6e4;
@@ -5481,7 +5721,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     return n;
   }
   function trimPictures(force, idle, target) {
-    const gl = W6.GLDrawCanvas && W6.GLDrawCanvas.GL, tc = gl && gl.textureCache, cache = W6.GLDrawImageCache;
+    const gl = W7.GLDrawCanvas && W7.GLDrawCanvas.GL, tc = gl && gl.textureCache, cache = W7.GLDrawImageCache;
     if (!cache || typeof cache.purge === "function") return 0;
     if (!tc || typeof tc.forEach !== "function") return 0;
     let total = bytes(tc);
@@ -5517,7 +5757,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
   }
   function initTrim(mod2) {
     sdk4 = mod2;
-    W6.__farmTrim = trimPictures;
+    W7.__farmTrim = trimPictures;
     try {
       sdk4.hookFunction("GLDrawLoadImage", 0, (args, next) => {
         if (typeof args[1] === "string") seen.set(args[1], Date.now());
@@ -5536,13 +5776,94 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     }, 6e4);
   }
 
+  // extension/src/look.js
+  var W8 = window;
+  var P = () => W8.Player;
+  var WAIT_MS = 900;
+  var MAX_MS = 3e3;
+  var FEW = 3;
+  var timer = null;
+  var firstAt = 0;
+  var groups = /* @__PURE__ */ new Set();
+  var whole = false;
+  var SENT = { items: 0, whole: 0, merged: 0 };
+  var lookSent = () => Object.assign({}, SENT);
+  var sig = (b) => JSON.stringify([b.Name, b.Color, b.Difficulty, b.Property, b.Craft]);
+  function changed(before, after) {
+    const a = new Map(before.map((b) => [b.Group, sig(b)])), z = new Map(after.map((b) => [b.Group, sig(b)]));
+    const out = /* @__PURE__ */ new Set();
+    for (const [g, k] of a) if (z.get(g) !== k) out.add(g);
+    for (const g of z.keys()) if (!a.has(g)) out.add(g);
+    return out;
+  }
+  function commitLook(next) {
+    const C = P();
+    const before = W8.ServerAppearanceBundle(C.Appearance);
+    W8.ServerAppearanceLoadFromBundle(C, C.AssetFamily, next, C.MemberNumber);
+    if (typeof W8.CharacterRefresh === "function") W8.CharacterRefresh(C);
+    let ch;
+    try {
+      ch = changed(before, W8.ServerAppearanceBundle(C.Appearance));
+    } catch (e) {
+      ch = null;
+    }
+    if (ch && !ch.size) return;
+    if (!ch) whole = true;
+    else for (const g of ch) groups.add(g);
+    if (groups.size > FEW || typeof W8.ChatRoomCharacterItemUpdate !== "function" || W8.CurrentScreen !== "ChatRoom") whole = true;
+    if (whole) {
+      flushLook();
+      return;
+    }
+    if (firstAt) SENT.merged++;
+    else firstAt = Date.now();
+    clearTimeout(timer);
+    timer = setTimeout(flushLook, Math.max(0, Math.min(WAIT_MS, firstAt + MAX_MS - Date.now())));
+  }
+  function flushLook() {
+    clearTimeout(timer);
+    timer = null;
+    if (!groups.size && !whole) return;
+    const C = P(), list = [...groups], all = whole;
+    firstAt = 0;
+    groups = /* @__PURE__ */ new Set();
+    whole = false;
+    if (!C) return;
+    try {
+      if (!all && W8.CurrentScreen === "ChatRoom" && typeof W8.ChatRoomCharacterItemUpdate === "function") {
+        for (const g of list) W8.ChatRoomCharacterItemUpdate(C, g);
+        SENT.items += list.length;
+        return;
+      }
+      if (typeof W8.ChatRoomCharacterUpdate === "function") {
+        W8.ChatRoomCharacterUpdate(C);
+        SENT.whole++;
+      }
+    } catch (e) {
+      console.warn("[Farmhand Companion] sending your look:", e);
+    }
+  }
+
   // extension/src/memlog.js
-  var W7 = window;
+  function sentLine() {
+    let t = "";
+    try {
+      const x = lookSent();
+      t = "Your look sent to the room: " + x.items + " single pieces, " + x.whole + " whole, " + x.merged + " changes gathered together";
+    } catch (e) {
+    }
+    try {
+      if (screenLight()) t += " \xB7 the farm girl's screen skipped drawin' people " + screenSkipped() + " times";
+    } catch (e) {
+    }
+    return t;
+  }
+  var W9 = window;
   var KEY3 = "farmhand-memlog";
   var MAX2 = 120;
   var log = [];
   try {
-    const v = JSON.parse(W7.localStorage.getItem(KEY3));
+    const v = JSON.parse(W9.localStorage.getItem(KEY3));
     if (Array.isArray(v)) log = v.slice(-MAX2);
   } catch (e) {
     log = [];
@@ -5550,11 +5871,11 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
   function snap() {
     const s = { t: Date.now() };
     try {
-      if (W7.performance && W7.performance.memory) s.heapMB = Math.round(W7.performance.memory.usedJSHeapSize / 1e6);
+      if (W9.performance && W9.performance.memory) s.heapMB = Math.round(W9.performance.memory.usedJSHeapSize / 1e6);
     } catch (e) {
     }
     try {
-      const c0 = W7.GLDrawImageCache, m = c0 && c0.cache instanceof Map ? c0.cache : c0;
+      const c0 = W9.GLDrawImageCache, m = c0 && c0.cache instanceof Map ? c0.cache : c0;
       if (m && typeof m.keys === "function") {
         s.gamePics = m.size;
         let d = 0, dk = 0;
@@ -5565,7 +5886,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
         s.madePics = d;
         s.madePicsKB = Math.round(dk / 1e3);
       }
-      const gl = W7.GLDrawCanvas && W7.GLDrawCanvas.GL, tc = gl && gl.textureCache;
+      const gl = W9.GLDrawCanvas && W9.GLDrawCanvas.GL, tc = gl && gl.textureCache;
       if (tc) {
         let px = 0;
         for (const v of tc.values()) px += (v.width || 0) * (v.height || 0);
@@ -5598,15 +5919,15 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     } catch (e) {
     }
     try {
-      s.room = (W7.ChatRoomCharacter || []).length;
-      s.screen = W7.CurrentScreen;
+      s.room = (W9.ChatRoomCharacter || []).length;
+      s.screen = W9.CurrentScreen;
     } catch (e) {
     }
     return s;
   }
   function save3() {
     try {
-      W7.localStorage.setItem(KEY3, JSON.stringify(log));
+      W9.localStorage.setItem(KEY3, JSON.stringify(log));
     } catch (e) {
       log = log.slice(-30);
     }
@@ -5623,7 +5944,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
   var born = Date.now();
   var fast = [];
   try {
-    const v = JSON.parse(W7.localStorage.getItem(FAST));
+    const v = JSON.parse(W9.localStorage.getItem(FAST));
     if (Array.isArray(v)) fast = v.slice(-40);
   } catch (e) {
     fast = [];
@@ -5632,23 +5953,23 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
   function quick() {
     const x = { t: Date.now() };
     try {
-      if (W7.performance && W7.performance.memory) x.h = Math.round(W7.performance.memory.usedJSHeapSize / 1e6);
+      if (W9.performance && W9.performance.memory) x.h = Math.round(W9.performance.memory.usedJSHeapSize / 1e6);
     } catch (e) {
     }
     try {
-      const gl = W7.GLDrawCanvas && W7.GLDrawCanvas.GL, tc = gl && gl.textureCache, c0 = W7.GLDrawImageCache;
+      const gl = W9.GLDrawCanvas && W9.GLDrawCanvas.GL, tc = gl && gl.textureCache, c0 = W9.GLDrawImageCache;
       x.p = tc ? tc.size : c0 && c0.cache instanceof Map ? c0.cache.size : void 0;
     } catch (e) {
     }
     try {
-      x.r = (W7.ChatRoomCharacter || []).length;
-      x.s = W7.CurrentScreen;
+      x.r = (W9.ChatRoomCharacter || []).length;
+      x.s = W9.CurrentScreen;
     } catch (e) {
     }
     fast.push(x);
     if (fast.length > 40) fast = fast.slice(-40);
     try {
-      W7.localStorage.setItem(FAST, JSON.stringify(fast));
+      W9.localStorage.setItem(FAST, JSON.stringify(fast));
     } catch (e) {
     }
   }
@@ -5660,15 +5981,15 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     setTimeout(tick, 2e4);
     setInterval(tick, 3e4);
     setInterval(quick, 3e3);
-    if (typeof W7.CommandCombine === "function") {
-      W7.CommandCombine([{ Tag: "farmmem", Description: ": the Farmhand Companion's memory log (the last hour), and copies it", Action: () => {
+    if (typeof W9.CommandCombine === "function") {
+      W9.CommandCombine([{ Tag: "farmmem", Description: ": the Farmhand Companion's memory log (the last hour), and copies it", Action: () => {
         tick();
-        const text = "Companion v" + VERSION + "\n" + memlogText(24) + (lastPage.length ? "\nThe last seconds of the page before this one:\n" + lastPage.map(quickLine).join("\n") : "");
+        const text = "Companion v" + VERSION + "\n" + sentLine() + "\n" + memlogText(24) + (lastPage.length ? "\nThe last seconds of the page before this one:\n" + lastPage.map(quickLine).join("\n") : "");
         try {
-          W7.navigator.clipboard.writeText(JSON.stringify(log));
+          W9.navigator.clipboard.writeText(JSON.stringify(log));
         } catch (e) {
         }
-        if (typeof W7.ChatRoomSendLocal === "function") W7.ChatRoomSendLocal("Farmhand memory log (copied, paste it to Claude):\n" + text, 12e4);
+        if (typeof W9.ChatRoomSendLocal === "function") W9.ChatRoomSendLocal("Farmhand memory log (copied, paste it to Claude):\n" + text, 12e4);
         else console.log(text);
       } }, { Tag: "farmmess", Description: ": where the farm's messes on you got to (for Claude)", Action: () => {
         let text = "";
@@ -5679,22 +6000,22 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
         }
         text = "Companion v" + VERSION + "\n" + text;
         try {
-          W7.navigator.clipboard.writeText(text);
+          W9.navigator.clipboard.writeText(text);
         } catch (e) {
         }
-        if (typeof W7.ChatRoomSendLocal === "function") W7.ChatRoomSendLocal("Farmhand messes (copied, paste it to Claude):\n" + text, 12e4);
+        if (typeof W9.ChatRoomSendLocal === "function") W9.ChatRoomSendLocal("Farmhand messes (copied, paste it to Claude):\n" + text, 12e4);
         else console.log(text);
       } }]);
     }
   }
 
   // extension/src/settings.js
-  var W8 = window;
+  var W10 = window;
   var ID = "FarmhandCompanion";
   var panel = null;
   var box = null;
   var tab = "switches";
-  var settingsAvailable = () => typeof W8.PreferenceRegisterExtensionSetting === "function";
+  var settingsAvailable = () => typeof W10.PreferenceRegisterExtensionSetting === "function";
   function ctx() {
     const c = panel.ctx();
     return Object.assign({}, c, {
@@ -5746,7 +6067,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
         !p.off,
         () => c.setPref("off", !p.off)
       ),
-      p.off ? h("div", { style: { marginTop: "6px" } }, btn("Reload now", () => W8.location.reload(), true)) : null
+      p.off ? h("div", { style: { marginTop: "6px" } }, btn("Reload now", () => W10.location.reload(), true)) : null
     )];
     return [drawnBodyCard(c), panelPrefs(c)];
   }
@@ -5759,7 +6080,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
         { style: { display: "flex", alignItems: "center", gap: "10px", marginBottom: "8px" } },
         h("h2", { style: { margin: "0", flex: "1" } }, "\u{1F33E} Farmhand Companion"),
         btn("Back", () => {
-          if (typeof W8.PreferenceSubscreenExtensionsClear === "function") W8.PreferenceSubscreenExtensionsClear();
+          if (typeof W10.PreferenceSubscreenExtensionsClear === "function") W10.PreferenceSubscreenExtensionsClear();
           else close();
         }, true)
       ),
@@ -5773,9 +6094,9 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
   }
   function open() {
     close();
-    box = W8.document.createElement("div");
+    box = W10.document.createElement("div");
     box.id = "fhc-settings";
-    W8.document.body.appendChild(box);
+    W10.document.body.appendChild(box);
     draw();
   }
   function close() {
@@ -5788,7 +6109,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     panel = p;
     if (!settingsAvailable()) return false;
     try {
-      W8.PreferenceRegisterExtensionSetting({
+      W10.PreferenceRegisterExtensionSetting({
         Identifier: ID,
         ButtonText: "Farmhand Companion",
         load: () => open(),
@@ -5811,8 +6132,8 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
   function openSettings(which) {
     if (which) tab = which;
     try {
-      if (typeof W8.PreferenceSubscreenExtensionsOpen === "function") {
-        W8.PreferenceSubscreenExtensionsOpen(ID);
+      if (typeof W10.PreferenceSubscreenExtensionsOpen === "function") {
+        W10.PreferenceSubscreenExtensionsOpen(ID);
         return true;
       }
     } catch (e) {
@@ -5872,6 +6193,8 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
         s.heatUntil && muted("In heat for " + hoursLeft(s.heatUntil) + " more hours"),
         s.preg && muted("Carryin' for " + s.preg.sires.join(" & ") + " \xB7 due in " + Math.max(0, Math.ceil((s.preg.due - Date.now()) / 864e5)) + " day(s)")
       ),
+      ...meCards(ctx3),
+      // add-on cards meant for here: barn life's food, water and grooming (extras.js)
       (s.body || []).length && card(title("Body"), h(
         "div",
         { class: "fhc-grid" },
@@ -5912,7 +6235,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
         h("div", { class: "fhc-kv" }, h("b", null, g.milk.name), h("span", null, g.milk.ml + " mL a minute")),
         steps(g.milk.level),
         muted(["", "Gentle", "Steady", "Hard", "Max"][g.milk.level] + (g.milk.kind === "echo" ? " \xB7 the more worked up you are, the faster it draws" : ""))
-      ] : muted("No pump on right now. A lactation pump, Echo's portable pump, the milk vendor or a milkin' stall all milk you here."),
+      ] : muted("No pump on right now. A milk pump (the game's Lactation Pump), Echo's portable pump, the milk vendor or a milkin' stall all milk you here."),
       g.machine && h("div", { class: "fhc-kv" }, h("span", null, "\u2699\uFE0F " + g.machine.name), h("span", { class: "fhc-muted" }, g.machine.intensity < 0 ? "off" : "intensity " + g.machine.intensity)),
       g.funnel && h("div", { class: "fhc-kv" }, h("span", null, "Funnel gag"), h("span", { class: "fhc-muted" }, "fitted, and it counts as open"))
     );
@@ -5949,7 +6272,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     const rows2 = [
       ["Breedable", sw.breedable],
       ["Fertile", sw.fertile],
-      ["Jar insemination", sw.jarok ? "asks first" : "never"],
+      ["Jar breedin'", sw.jarok ? "asks first" : "never"],
       ["Free use", sw.freeuse],
       ["Natural heat", sw.naturalheat]
     ];
@@ -5965,6 +6288,39 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
       h("div", null, btn("My tally", () => ctx3.send("tally")), btn("Eggs", () => ctx3.send("eggs")), btn("Wash up", () => ctx3.send("wash")), btn("Pedigree", () => ctx3.send("pedigree")))
     ];
   }
+  function trapThemesCard(ctx3) {
+    const list = ctx3.s.trapThemes || [];
+    if (!list.length) return null;
+    return card(
+      title("Kinds of trap"),
+      muted("Switch a whole kind off and not one of those traps springs for you, not even one a proprietor springs by hand. A trap that's two kinds is off if either is." + (ctx3.s.trapCard ? "" : " (They only matter once your traps are on.)")),
+      list.map((t) => toggle(t.icon + " " + t.label, t.desc, !!t.on, () => ctx3.send("traps theme " + t.id + " " + (t.on ? "off" : "on"))))
+    );
+  }
+  function seasonsCard(ctx3) {
+    const sa = ctx3.s.seasonsAdmin;
+    if (!sa || !sa.rows || !sa.rows.length) return null;
+    const till = (t) => new Date(t).toLocaleString([], t - Date.now() < 20 * 36e5 ? { hour: "2-digit", minute: "2-digit" } : { weekday: "short", hour: "2-digit", minute: "2-digit" });
+    return card(
+      title("\u{1F5D3}\uFE0F Seasons"),
+      muted("Start any season's traps whenever you like: for a party, a special day, or just because. While one's on, about a third of what the plain trap tiles spring is from its pack, and the farm girl dresses for it. Anybody with their Seasonal packs switch off never gets them."),
+      sa.rows.map((x) => h(
+        "div",
+        { class: "fhc-kv" },
+        h("span", null, x.icon + " " + x.label + " \xB7 " + (x.on ? x.hand ? x.open ? "on till you stop it" : "on till " + till(x.until) : "on, its time of year" : x.dates)),
+        h("span", null, x.on ? btn("Stop", () => ctx3.send("seasons stop " + x.id)) : [btn("2 hours", () => ctx3.send("seasons start " + x.id + " 2h")), btn("Till I stop it", () => ctx3.send("seasons start " + x.id + " on"))])
+      )),
+      h(
+        "div",
+        null,
+        btn("All of them, 2 hours", () => ctx3.send("seasons start all 2h")),
+        btn("Stop the ones I started", () => ctx3.send("seasons stop")),
+        btn(sa.costume ? "Her costume: on" : "Her costume: off", () => ctx3.send("seasons costume " + (sa.costume ? "off" : "on"))),
+        btn("The calendar", () => ctx3.send("seasons"))
+      ),
+      muted("Other lengths, or several at once: ?seasons start halloween 3d \xB7 ?seasons start halloween winter on")
+    );
+  }
   function traps(ctx3) {
     const s = ctx3.s, tc = s.trapCard, ad = s.trapAdmin, gear = s.farmGear || [];
     return [
@@ -5976,6 +6332,8 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
         muted(tc.left + " kind" + (tc.left === 1 ? "" : "s") + " still to find" + (tc.eggs ? " \xB7 " + tc.eggs + " eggs laid" : "") + (tc.paused ? " \xB7 traps paused" : "") + (tc.eager ? " \xB7 eager (no waits)" : "") + (tc.danger ? " \xB7 Danger Draught in you" : "")),
         tc.corr || tc.under ? bar("Corruption", tc.corr + " of 100" + (tc.under ? " \xB7 gone under, depth " + tc.under : ""), tc.corr, "alert") : null,
         tc.hunt && muted("\u{1F514} The hunt is on: get to " + tc.hunt.goal),
+        tc.today && muted("\u{1F3AF} Trap of the day: " + tc.today.icon + " " + tc.today.kind + ", " + tc.today.what + (tc.today.paid ? ". It's paid you its ribbon today." : ". Twice as likely today, and a ribbon the first time it has you.")),
+        tc.rated && muted("Your ratings: \u{1F496} " + tc.rated.loved + " \xB7 \u{1F44D} " + tc.rated.fine + " \xB7 \u{1F645} " + tc.rated.no + (tc.rateAsk ? "" : " \xB7 not askin' after each trap")),
         h(
           "div",
           null,
@@ -5984,9 +6342,12 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
           btn(tc.eager ? "Eager: on" : "Eager: off", () => ctx3.send("traps eager " + (tc.eager ? "off" : "on"))),
           btn("What's out there", () => ctx3.send("traps")),
           btn("Lay (at the nest)", () => ctx3.send("lay")),
-          btn("My brood book", () => ctx3.send("brood"))
+          btn("My brood book", () => ctx3.send("brood")),
+          btn("My ratings", () => ctx3.send("rate")),
+          btn(tc.rateAsk === false ? "Ask how each was: off" : "Ask how each was: on", () => ctx3.send("rate ask " + (tc.rateAsk === false ? "on" : "off")))
         )
       ) : card(title("Traps"), muted("The farm's traps are off for you, so you can walk right over them. Switch them on and every trap spot on the farm can spring for you."), h("div", null, btn("Switch traps on", () => ctx3.send("traps on")))),
+      tc ? trapThemesCard(ctx3) : null,
       card(
         title("On you right now"),
         gear.length ? gear.map((g) => h("div", { style: { marginTop: "6px" } }, h("div", { class: "fhc-kv" }, h("b", null, g.name), h("span", { class: "fhc-muted" }, Math.max(0, Math.ceil((g.until - Date.now()) / 6e4)) + " min")), muted(gearLore(g.name) || g.desc || ""))) : muted("No farm gear on you."),
@@ -6005,6 +6366,8 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
       ) : null,
       ad && card(
         h("div", { class: "fhc-kv" }, title("Proprietor: traps"), chip(ad.subjects.length + " with traps on", "acc")),
+        ad.today && muted("\u{1F3AF} Trap of the day: " + ad.today.icon + " " + ad.today.kind),
+        ad.ratings && (ad.ratings.loved.length || ad.ratings.no.length) ? muted("\u{1F496} Most loved: " + (ad.ratings.loved.map((x) => x.icon + " " + x.kind + " (" + x.n + ")").join(", ") || "none yet") + ' \xB7 \u{1F645} Most "not for me": ' + (ad.ratings.no.map((x) => x.icon + " " + x.kind + " (" + x.n + ")").join(", ") || "none yet")) : null,
         ad.subjects.length ? ad.subjects.map((x) => h("div", { class: "fhc-kv" }, h("span", null, (x.here ? "\u25CF " : "") + x.name), h("span", { class: "fhc-muted" }, x.n + " sprung" + (x.paused ? " \xB7 paused" : "")))) : muted("Nobody's switched their traps on yet."),
         muted("Trap spots: " + (ad.spots.length ? ad.spots.join(", ") : "none yet (?spot set trap-<kind>)")),
         muted("Water: " + (ad.water.length ? ad.water.join(", ") : "none yet (?spot set pond)") + (ad.nest ? " \xB7 " + ad.nest + " eggs in the nest" : "") + (ad.pack ? " \xB7 pack at " + ad.pack : "")),
@@ -6015,9 +6378,11 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
           btn("Kinds & spots", () => ctx3.send("traps")),
           btn("Subjects", () => ctx3.send("subject")),
           btn(ad.hunt ? "Stop the hunt" : "Start a hunt", () => ctx3.send(ad.hunt ? "hunt stop" : "hunt start")),
-          btn("Gather eggs", () => ctx3.send("gather"))
+          btn("Gather eggs", () => ctx3.send("gather")),
+          btn("Ratings", () => ctx3.send("traps ratings"))
         )
-      )
+      ),
+      seasonsCard(ctx3)
     ];
   }
   function inbox(ctx3) {
@@ -6039,9 +6404,9 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     ["breedable", "Breedable", "You can be bred and filled"],
     ["fertile", "Fertile", "You can catch"],
     ["mpreg", "Mpreg", "A load in your ass can take too, no item needed (with Breedable and Fertile on)"],
-    ["jarok", "Jar insemination", "On: staff still ask every time \xB7 Off: never"],
+    ["jarok", "Jar breedin'", "On: staff still ask every time \xB7 Off: never"],
     ["freeuse", "Free use", "Any stud may have you without askin'"],
-    ["futa", "Futa", "Cock and vulva both, milk and semen both"],
+    ["futa", "Futa", "Cock and pussy both, milk and cum both"],
     ["milkable", "Milkable", "Make milk"],
     ["seedmilk", "Milk my seed", "The stall, the milkin' traps and ?collect take your seed as well as your milk. Off: they milk you up top and leave your cock and balls be"],
     ["naturalheat", "Natural heat", "Come into heat on your own every 7 days"],
@@ -6077,10 +6442,28 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
       }, true)
     );
   }
+  function botScreenPrefs(ctx3) {
+    if (!(window.Player && window.Player.MemberNumber === BOT_MEMBER)) return null;
+    return h(
+      "div",
+      {},
+      toggle(
+        "Draw the room on the farm girl's screen",
+        "Off (the default), this tab doesn't draw anybody in the room: no pictures downloaded for what people wear, far less work and memory on this computer. The farm runs the same either way. Switch it on to watch the room or click on people from here.",
+        !!ctx3.prefs.drawRoom,
+        () => {
+          const on2 = !ctx3.prefs.drawRoom;
+          ctx3.setPref("drawRoom", on2);
+          if (on2) setTimeout(redrawRoom, 50);
+        }
+      )
+    );
+  }
   function panelPrefs(ctx3) {
     return card(
       title("This panel"),
       muted("Only on your computer."),
+      botScreenPrefs(ctx3),
       [
         ["chatToo", "Farm messages in chat too", "Tease lines, heat, summons and other farm messages also show in your chat log"],
         ["compact", "Compact cards", "Smaller text, more on screen"],
@@ -6278,6 +6661,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     return [
       drawnBodyCard(ctx3),
       card(title("Farm settings"), muted("Saved by the farm girl. Your limits still win."), farmSwitches(ctx3, SWITCH_INFO)),
+      trapThemesCard(ctx3),
       extraSwitches(ctx3),
       card(
         title("Gender"),
@@ -7954,7 +8338,8 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
           btn("Milk", act("milk", x)),
           btn("Drain", act("drain", x)),
           btn("Edge", act("edge", x)),
-          btn("Summon to me", act("summon", x))
+          btn("Summon to me", act("summon", x)),
+          x.mine && (x.reins ? btn("\u{1F434} Let go", act("reins off", x)) : btn("\u{1F434} Reins", act("reins", x)))
         )
       )) : muted("Nobody matches right now.")
     ];
@@ -7964,8 +8349,8 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     const zs = ctx3.s.zones;
     if (!zs) return [muted("The farm map is for staff.")];
     const canEdit = ctx3.s.mapEdit !== false;
-    const groups = [...new Set(Object.values(zs).map((z) => z.group))];
-    const color = (g) => COLORS[groups.indexOf(g) % COLORS.length];
+    const groups2 = [...new Set(Object.values(zs).map((z) => z.group))];
+    const color = (g) => COLORS[groups2.indexOf(g) % COLORS.length];
     const sel = ctx3.ui.zone && zs[ctx3.ui.zone] ? ctx3.ui.zone : Object.keys(zs)[0];
     const name = () => (ctx3.ui.zoneName || sel || "").trim().toLowerCase();
     return [
@@ -8005,7 +8390,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
             }
           }))
         ),
-        h("div", { style: { marginTop: "6px" } }, groups.map((g) => h("span", { class: "fhc-chip", style: { borderColor: color(g) } }, g)))
+        h("div", { style: { marginTop: "6px" } }, groups2.map((g) => h("span", { class: "fhc-chip", style: { borderColor: color(g) } }, g)))
       ),
       card(
         title("Zones"),
@@ -8301,7 +8686,20 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     };
     const sel = (key, opts) => h("select", { class: "fhc-sel", onchange: (e) => ctx3.setUi({ [key]: e.target.value }, true) }, opts.map(([v, l]) => h("option", { value: v, selected: (ctx3.ui[key] || "") === v ? "selected" : null }, l)));
     const timeIn = (key) => h("input", { class: "fhc-in", type: "time", value: ctx3.ui[key] || "", style: { width: "110px" }, oninput: (e) => ctx3.setUi({ [key]: e.target.value }, true) });
+    const rn = ctx3.s.renewals || [], hrs = (t) => Math.max(1, Math.round((t - Date.now()) / 36e5)) + " h";
+    const renewCard = rn.length ? card(
+      title("\u{1F4DC} Renewals"),
+      muted("A day before a timed contract ends, the farm asks if they'd like another. Offer it gives them the same one again, the same length (they need to be in the room)."),
+      rn.map((r) => h(
+        "div",
+        { class: "fhc-kv" },
+        h("span", null, h("b", null, r.name), ' \xB7 "' + r.title + '"' + (r.dur ? " (" + r.dur + ")" : "") + " \xB7 " + (r.ended ? "ended" : "ends in " + hrs(r.until))),
+        r.said === "yes" && !r.offered ? r.here && ctx3.s.herdmaster ? btn("Offer it", () => ctx3.send("renew offer " + r.mn), true) : chip(r.here ? "said yes" : "said yes \xB7 not here", "acc") : chip(r.offered ? "offered again" : r.said === "no" ? "said no" : "asked", r.said === "no" ? "" : "acc")
+      )),
+      h("div", null, btn("All renewals", () => ctx3.send("renew")))
+    ) : null;
     return [
+      renewCard,
       card(
         title("Offer a BC+ contract"),
         muted("They read it in their own BC+ and only sign if they want it. Herdmasters and proprietors can offer."),
@@ -8367,14 +8765,15 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
       card(
         title("Jars"),
         btn("The jar shelf", () => ctx3.send("jars")),
-        muted("To inseminate: ?inseminate <who> <jar> [hole]. They always get asked first, and anyone with jar insemination off can't be."),
-        h("div", null, btn("Inseminate\u2026", () => ctx3.fillBox("inseminate " + (who() ? who() + " " : ""))))
+        muted("To breed somebody from a jar: ?inseminate <who> <jar> [hole]. They always get asked first, and anyone with jar breedin' off can't be."),
+        h("div", null, btn("Breed from a jar\u2026", () => ctx3.fillBox("inseminate " + (who() ? who() + " " : ""))))
       ),
       card(
         title("Herd"),
         h("div", null, ["myherd", "herdcall", "herdsummon", "roster", "stock", "queue"].map((c) => btn(c, () => ctx3.send(c)))),
         h("div", null, btn("Summon to me", act("summon")), btn("Claim", act("claim")), btn("Turn out", act("turnout")), btn("Let up", act("letup")))
       ),
+      seasonsCard(ctx3),
       latest(ctx3)
     ];
   }
@@ -8769,52 +9168,6 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     { id: "records", label: "Records", render: records },
     { id: "suggestions", label: "\u{1F4A1} Suggestions", render: suggestions, badge: (ctx3) => (ctx3.s.feedback || []).filter((x) => x.status === "open").length }
   ];
-
-  // extension/src/views/extras.js
-  function modsFor(ctx3, view) {
-    const mods = ctx3.s.mods || {};
-    return Object.entries(mods).filter(([, m]) => m && typeof m === "object" && (!Array.isArray(m.views) || m.views.includes(view)) && Array.isArray(m.cards)).map(([name, m]) => [name, Object.assign({}, m, { cards: m.cards.filter((c) => c && (view === "staff" ? true : !c.staff)) })]).filter(([, m]) => m.cards.length);
-  }
-  function drawCard(ctx3, name, c, i) {
-    const key = "x_" + name + "_" + i;
-    return card(
-      c.title && title(String(c.title)),
-      c.text && h("div", { class: "fhc-card", style: { whiteSpace: "pre-wrap" } }, String(c.text)),
-      Array.isArray(c.lines) && c.lines.map((l) => h("div", { class: "fhc-kv" }, h("span", null, String(l[0] ?? l)), l[1] !== void 0 ? h("b", null, String(l[1])) : null)),
-      Array.isArray(c.bars) && c.bars.map((b) => bar(String(b.label || ""), String(b.value ?? ""), Number(b.pct) || 0, b.kind)),
-      Array.isArray(c.chips) && c.chips.length ? h("div", null, c.chips.map((x) => chip(String(x.text ?? x), x.kind))) : null,
-      Array.isArray(c.toggles) && c.toggles.map((t) => toggle(String(t.label || ""), t.desc ? String(t.desc) : "", !!t.on, () => ctx3.send(String(t.cmd)))),
-      c.input && h(
-        "div",
-        null,
-        h("input", { class: "fhc-in", placeholder: String(c.input.placeholder || ""), value: ctx3.ui[key] || "", oninput: (e) => ctx3.setUi({ [key]: e.target.value }, true) }),
-        btn(String(c.input.label || "Send"), () => {
-          const v = (ctx3.ui[key] || "").trim();
-          if (!v) return ctx3.hint("Type somethin' in the box first.");
-          ctx3.send(String(c.input.cmd) + " " + v);
-          ctx3.setUi({ [key]: "" });
-        }, true)
-      ),
-      Array.isArray(c.buttons) && c.buttons.length ? h("div", { style: { marginTop: "6px" } }, c.buttons.map((b) => btn(String(b.label || b.cmd), () => ctx3.send(String(b.cmd)), !!b.accent))) : null,
-      c.note && muted(String(c.note))
-    );
-  }
-  function render(ctx3, view) {
-    const list = modsFor(ctx3, view);
-    if (!list.length) return [muted("No farm extras for you right now.")];
-    return list.map(([name, m]) => h(
-      "div",
-      null,
-      h("div", { class: "fhc-muted", style: { margin: "8px 2px 2px" } }, "\u{1F9E9} " + String(m.label || name)),
-      m.cards.map((c, i) => drawCard(ctx3, name, c, i))
-    ));
-  }
-  function withExtras(tabs, view, ctx3) {
-    if (!modsFor(ctx3, view).length) return tabs;
-    const t = { id: "extras", label: "Farm extras", render: (c) => render(c, view) };
-    const at = tabs.findIndex((x) => x.id === "guides");
-    return at < 0 ? tabs.concat(t) : tabs.slice(0, at).concat(t, tabs.slice(at));
-  }
 
   // extension/src/views/nursery.js
   var N = (ctx3) => ctx3.s.nursery || {};
@@ -9540,6 +9893,37 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
         ),
         h("div", { class: "fhc-muted" }, "Straight to the farm, past any gag or speech rule.")
       ));
+      const rt = this.s.rateTrap;
+      if (rt && rt.until > Date.now() && this.rated !== rt.kind + ":" + rt.until) {
+        const rate = (v) => {
+          this.rated = rt.kind + ":" + rt.until;
+          this.ask("rate " + rt.kind + " " + v, true);
+          this.render();
+        };
+        out.push(h(
+          "div",
+          { class: "fhc-box ask" },
+          h(
+            "div",
+            { class: "fhc-kv", style: { borderBottom: "none", padding: "0" } },
+            h("b", null, rt.icon + " How was the " + rt.kind + "?"),
+            h("button", { type: "button", class: "fhc-pill", "aria-label": "Dismiss", onclick: () => {
+              this.rated = rt.kind + ":" + rt.until;
+              this.render();
+            } }, "\u2715")
+          ),
+          h("div", { style: { marginTop: "6px" } }, btn("\u{1F496} Loved it", () => rate("loved"), true), btn("\u{1F44D} Fine", () => rate("fine")), btn("\u{1F645} Not for me", () => rate("no"))),
+          h("div", { class: "fhc-muted" }, "Loved it: it finds you a bit more often. Not for me: less often, but never not at all (?traps skip " + rt.kind + " does that).")
+        ));
+      }
+      const rm = (this.s.reinsMine || []).filter((x) => x.until > Date.now());
+      if (rm.length) out.push(h(
+        "div",
+        { class: "fhc-box" },
+        h("b", null, "\u{1F434} On your reins: " + rm.map((x) => x.name).join(", ")),
+        h("div", { class: "fhc-muted" }, "They follow a step behind you wherever you walk. Their safeword lets go too."),
+        h("div", { style: { marginTop: "6px" } }, rm.map((x) => btn("Let go of " + x.name, () => this.ask("reins off " + x.mn, true))))
+      ));
       for (const a of this.asks) out.push(h(
         "div",
         { class: "fhc-box ask" },
@@ -9632,26 +10016,22 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     "MemberNumberListKeys",
     "RemoveOnUnlock"
   ];
-  var P = () => window.Player;
-  var groupOf = (name) => typeof window.AssetGroupGet === "function" ? window.AssetGroupGet(P().AssetFamily, name) : null;
+  var P2 = () => window.Player;
+  var groupOf = (name) => typeof window.AssetGroupGet === "function" ? window.AssetGroupGet(P2().AssetFamily, name) : null;
   var isClothes = (g) => !!(g && g.Clothing);
   var isItem = (g) => !!(g && g.Category === "Item");
-  var lockedGroups = () => new Set(P().Appearance.filter((it) => it.Property && it.Property.LockedBy).map((it) => it.Asset.Group.Name));
+  var lockedGroups = () => new Set(P2().Appearance.filter((it) => it.Property && it.Property.LockedBy).map((it) => it.Asset.Group.Name));
   function unlocked(prop) {
     const c = Object.assign({}, prop || {});
     for (const k of LOCK_FIELDS) delete c[k];
     if (Array.isArray(c.Effect)) c.Effect = c.Effect.filter((e) => e !== "Lock");
     return c;
   }
-  function commit(bundle3) {
-    window.ServerAppearanceLoadFromBundle(P(), P().AssetFamily, bundle3, P().MemberNumber);
-    if (typeof window.CharacterRefresh === "function") window.CharacterRefresh(P());
-    window.ChatRoomCharacterUpdate(P());
-  }
+  var commit = (bundle3) => commitLook(bundle3);
   function captureOutfit() {
     const items = [];
     let locks = 0;
-    for (const it of P().Appearance) {
+    for (const it of P2().Appearance) {
       const g = it.Asset && it.Asset.Group;
       if (!g || !(isClothes(g) || isItem(g))) continue;
       const b = window.ServerBundledItemFromAppearanceItem(it);
@@ -9663,7 +10043,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
   }
   function canLock(it) {
     try {
-      const A = window.AssetGet && window.AssetGet(P().AssetFamily || "Female3DCG", it.Group, it.Name);
+      const A = window.AssetGet && window.AssetGet(P2().AssetFamily || "Female3DCG", it.Group, it.Name);
       if (!A) return false;
       const tr = it.Property && it.Property.TypeRecord;
       if (A.AllowLockType && tr && typeof tr === "object") return Object.entries(tr).some(([k, i]) => A.AllowLockType[k] && A.AllowLockType[k].has && A.AllowLockType[k].has(i));
@@ -9675,7 +10055,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
   function wearOutfit(data, keys) {
     const outfit = JSON.parse(window.LZString.decompressFromBase64(String(data)) || "null");
     if (!outfit || !Array.isArray(outfit.items)) return { ok: false, why: "that outfit didn't come through right" };
-    const cur = window.ServerAppearanceBundle(P().Appearance), stuck = lockedGroups();
+    const cur = window.ServerAppearanceBundle(P2().Appearance), stuck = lockedGroups();
     const mine3 = new Set(outfit.items.map((i) => i.Group));
     const next = cur.filter((b) => {
       if (stuck.has(b.Group)) return true;
@@ -9683,19 +10063,19 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
       if (isClothes(g)) return false;
       return !mine3.has(b.Group);
     });
-    let worn = 0, locks = 0, skipped = 0;
+    let worn = 0, locks = 0, skipped2 = 0;
     const added = [];
     for (const it of outfit.items) {
       const g = groupOf(it.Group);
       if (!g || !(isClothes(g) || isItem(g))) continue;
       if (stuck.has(it.Group)) {
-        skipped++;
+        skipped2++;
         continue;
       }
       const b = { Group: it.Group, Name: it.Name, Color: it.Color, Difficulty: it.Difficulty, Craft: it.Craft, Property: unlocked(it.Property) };
       if ((it.locked || canLock(it)) && keys && keys.length) {
         b.Property.Effect = (b.Property.Effect || []).concat(["Lock"]);
-        Object.assign(b.Property, { LockedBy: "HighSecurityPadlock", LockMemberNumber: P().MemberNumber, MemberNumberListKeys: keys.join(",") });
+        Object.assign(b.Property, { LockedBy: "HighSecurityPadlock", LockMemberNumber: P2().MemberNumber, MemberNumberListKeys: keys.join(",") });
         locks++;
       }
       next.push(b);
@@ -9707,7 +10087,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     } catch (e) {
     }
     commit(next);
-    return { ok: true, worn, locks, skipped };
+    return { ok: true, worn, locks, skipped: skipped2 };
   }
   function changeBack(opts) {
     let bk = null;
@@ -9717,11 +10097,11 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     }
     if (!bk || !Array.isArray(bk.bundle)) return { ok: false, why: "I don't have your own clothes saved on this computer" };
     const stuck = lockedGroups();
-    if (opts && opts.farmLocks) for (const it of P().Appearance) {
+    if (opts && opts.farmLocks) for (const it of P2().Appearance) {
       const pr = it.Property || {}, g = it.Asset.Group.Name, keys = String(pr.MemberNumberListKeys || "").split(",").map(Number);
-      if (pr.LockedBy === "HighSecurityPadlock" && pr.LockMemberNumber === P().MemberNumber && keys.includes(BOT_MEMBER) && ((bk.added || []).includes(g) || isClothes(groupOf(g)))) stuck.delete(g);
+      if (pr.LockedBy === "HighSecurityPadlock" && pr.LockMemberNumber === P2().MemberNumber && keys.includes(BOT_MEMBER) && ((bk.added || []).includes(g) || isClothes(groupOf(g)))) stuck.delete(g);
     }
-    const next = window.ServerAppearanceBundle(P().Appearance).filter((b) => {
+    const next = window.ServerAppearanceBundle(P2().Appearance).filter((b) => {
       if (stuck.has(b.Group)) return true;
       const g = groupOf(b.Group);
       if (isClothes(g)) return false;
@@ -9759,7 +10139,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
   var AREAS2 = { forehead: ["a", "b", "c"], face: ["d", "e", "f"], chest: ["g", "h", "i", "j"], tummy: ["k", "l", "m", "n"] };
   var SPILL = { forehead: "face", face: "chest", chest: "tummy", tummy: "chest" };
   var SPILL_CHANCE = 0.35;
-  var P2 = () => window.Player;
+  var P3 = () => window.Player;
   var load3 = () => {
     try {
       return JSON.parse(window.localStorage.getItem(KEY4)) || {};
@@ -9773,20 +10153,16 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     } catch (e) {
     }
   };
-  var groupOf2 = (name) => typeof window.AssetGroupGet === "function" ? window.AssetGroupGet(P2().AssetFamily, name) : null;
-  var bundle = () => window.ServerAppearanceBundle(P2().Appearance);
-  var lockedGroups2 = () => new Set(P2().Appearance.filter((it) => it.Property && it.Property.LockedBy).map((it) => it.Asset.Group.Name));
-  function commit2(next) {
-    window.ServerAppearanceLoadFromBundle(P2(), P2().AssetFamily, next, P2().MemberNumber);
-    if (typeof window.CharacterRefresh === "function") window.CharacterRefresh(P2());
-    window.ChatRoomCharacterUpdate(P2());
-  }
+  var groupOf2 = (name) => typeof window.AssetGroupGet === "function" ? window.AssetGroupGet(P3().AssetFamily, name) : null;
+  var bundle = () => window.ServerAppearanceBundle(P3().Appearance);
+  var lockedGroups2 = () => new Set(P3().Appearance.filter((it) => it.Property && it.Property.LockedBy).map((it) => it.Asset.Group.Name));
+  var commit2 = (next) => commitLook(next);
   var cleanText = (t) => String(t || "").replace(/[^A-Za-z0-9 !?.,'&#*+-]/g, "").slice(0, 20);
-  function markBody(m, prefs) {
-    if (!P2() || !Array.isArray(P2().Appearance) || typeof window.ServerAppearanceBundle !== "function") return { ok: false, why: "not in a room" };
+  function markBody(m, prefs2) {
+    if (!P3() || !Array.isArray(P3().Appearance) || typeof window.ServerAppearanceBundle !== "function") return { ok: false, why: "not in a room" };
     const did = [];
     if (m.wash) return washMarks();
-    if (!prefs.marks) return { ok: false, why: "off" };
+    if (!prefs2.marks) return { ok: false, why: "off" };
     let next = bundle(), mem = load3();
     const has = (g) => next.find((b) => b.Group === g);
     if (Array.isArray(m.splat) && m.splat.length) {
@@ -9979,7 +10355,134 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     "Livin' Latex (body)",
     "Livin' Latex (heels)",
     "Milk Moss",
-    "Milk Moss (bloom)"
+    "Milk Moss (bloom)",
+    // Oct 27: Halloween's (and the farm girl's costume)
+    "Horseman's Rope",
+    "Hellhound's Knot",
+    "Demon's Horns",
+    "Spider's Web",
+    "Spider Silk",
+    "Samhain Antlers",
+    "The Great Pumpkin",
+    "Bobbin' Ties",
+    "The Witch's Cauldron",
+    "Broom Ties",
+    "Candy Stick",
+    "Taffy Hooks (arms)",
+    "Taffy Hooks (legs)",
+    "Mummy Wraps (arms)",
+    "Mummy Wraps (body)",
+    "Mummy Wraps (legs)",
+    "Costume Ears",
+    "Costume Tail",
+    "Witch's Hat",
+    "Black Cat Ears",
+    "Black Cat Tail",
+    // Oct 27: winter's and Yule's
+    "Frozen Fast",
+    "Bakery Ribbon",
+    "Mistletoe Ribbon",
+    "Yeti's Fur Wrap",
+    "Gift Ribbon (arms)",
+    "Gift Ribbon (legs)",
+    "Gift Box",
+    "The Big Stockin'",
+    "Stockin' Stuffer",
+    "Cocoa Stand Ribbon",
+    "Frost Lace",
+    "The Farmyard Snowman",
+    "Winter Hat",
+    "Winter Shawl",
+    "Fur Gloves",
+    "Yule Log Ribbons",
+    "Solstice Ribbon",
+    "Holly King's Crown",
+    "The Hunt's Rope",
+    "Wassail Ribbons",
+    "Ivy (arms)",
+    "Ivy (legs)",
+    "Vigil Cord (arms)",
+    "Vigil Cord (legs)",
+    "Holly Crown",
+    "Yule Cloak",
+    // Oct 27: the spring, summer and autumn seasons' (Ostara, Easter, Litha, Mabon)
+    "Ivy Bands",
+    "First Bloom Crown",
+    "Plough Rope",
+    "Dye-Tub Ribbon",
+    "See-Saw Straps",
+    "Waterweed",
+    "Spring Crown",
+    "Hare Ears",
+    "Hare's Tail",
+    "Easter Egg Plug",
+    "Fountain Ribbon",
+    "Bunny Girl Suit",
+    "Bunny Suit Ears",
+    "Bunny Collar and Cuffs",
+    "Bunny Tail Plug",
+    "Basket Ribbon (arms)",
+    "Basket Ribbon (legs)",
+    "Sugar Twine",
+    "Egg-Roll Ribbon",
+    "Parade Bonnet",
+    "Mould Straps",
+    "Easter Bonnet",
+    "Bunny Ears",
+    "Bunny Tail",
+    "Midsummer Ribbon",
+    "Oak King's Crown",
+    "Fae Ribbon",
+    "The Sun Wheel",
+    "Rose Garlands",
+    "Barrel Rope",
+    "Midsummer Crown",
+    "Sheaf Twine",
+    "Sheaf Twine (legs)",
+    "Corn Dolly Plaits",
+    "Corn Dolly Plaits (legs)",
+    "Vintner's Ribbon",
+    "Press Strap",
+    "Wagon Ribbon",
+    "The Harvest Crown",
+    "Table Ribbons",
+    "Harvest Crown",
+    "Harvest Apron",
+    // Oct 27: the whole rubber pup, and the parasite strains' fuller outfits (10y9k-latex-traps.js, 10v6-parasite-strains-more.js)
+    "Rubber Pup Skin",
+    "Rubber Pup Skin (legs)",
+    "Rubber Petsuit",
+    "Rubber Petsuit (legs)",
+    "Kennel Collar",
+    "Good Pup Tag",
+    "Kennel Leash",
+    "Pup's Tail Plug",
+    "Rubber Pup Tail",
+    "Parasite Tail",
+    "Parasite Sleeves",
+    "Parasite Stockings",
+    "Ooze Gloves",
+    "Ooze Sleeves",
+    "Ooze Stockings",
+    "Ooze Skin (legs)",
+    "Ooze Skin (body)",
+    "Ooze Sleeve",
+    "Silk Harness",
+    "Silk Gloves",
+    "Silk Stockings",
+    "Weaver's Cocoon",
+    "Deep's Tail",
+    "Deep's Sleeves",
+    "Deep's Stockings",
+    "Deep's Embrace",
+    "Deep's Coil",
+    "Gloss Gloves",
+    "Gloss Sleeves",
+    "Gloss Stockings",
+    "Gloss Skin (legs)",
+    "Gloss Skin (body)",
+    "Gloss Heels",
+    "Gloss Sheath"
   ];
   var GEAR_SLOTS = {
     plug: { groups: ["ItemButt"], names: ["InflVibeButtPlug", "BlackButtPlug", "ButtPlug", "ButtPump"], re: /ButtPlug|Plug/, color: "#2B2B2B" },
@@ -10011,7 +10514,17 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     hood: { groups: ["ItemHood"], names: ["LatexHood"], re: /^(LatexHood|TransparentLatexHood|LatexDogHood|VacHood)$/, color: "#121214" },
     mitts: { groups: ["ItemHands"], names: ["LatexBondageMitts"], re: /^LatexBondageMitts$/, color: "#121214" },
     // the parasite's suckers and the trough leeches (Laynie, Oct 26: "switch the parasites lactation pumps for the forbidden chastity bra")
-    chestbra: { groups: ["ItemBreast"], names: ["ForbiddenChastityBra", "PolishedChastityBra", "MetalChastityBra"], re: /ChastityBra$/ }
+    chestbra: { groups: ["ItemBreast"], names: ["ForbiddenChastityBra", "PolishedChastityBra", "MetalChastityBra"], re: /ChastityBra$/ },
+    // costume pieces (Oct 27: Halloween's cat ears and tails, a demon's horns, the farm girl dressed for the season). These
+    // only ever put on the item the piece names, so there's no stand-in: if this game hasn't got it, nothin' goes on
+    ears: { groups: ["HairAccessory2"], names: [], re: /^$/, takeover: true },
+    horns: { groups: ["HairAccessory1"], names: [], re: /^$/, takeover: true },
+    tail: { groups: ["TailStraps"], names: [], re: /^$/, takeover: true },
+    // the farm girl's winter shawl and Yule cloak (Oct 27): the same, over her own clothes' accessory spot
+    cloak: { groups: ["ClothAccessory"], names: [], re: /^$/, takeover: true },
+    // a collar (Oct 27: the rubber pup's). Only the item a piece names, and never in place of a collar of yours: if you're
+    // wearin' one, the leash and the tag clip to it instead
+    collar: { groups: ["ItemNeck"], names: [], re: /^$/ }
   };
   var GEAR_OPT = {
     "ItemArms:LeatherCuffs": "Wrist",
@@ -10035,26 +10548,26 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
   };
   function itemHome(name, slot, taken) {
     const all = Array.isArray(window.Asset) ? window.Asset : [];
-    const homes = all.filter((a) => a && a.Name === name && a.Group && a.Group.Family === P2().AssetFamily && /^Item/.test(a.Group.Name)).map((a) => a.Group.Name);
-    return homes.find((g) => slot.groups.includes(g) && !taken(g)) || homes.find((g) => !taken(g)) || null;
+    const homes = all.filter((a) => a && a.Name === name && a.Group && a.Group.Family === P3().AssetFamily && /^Item/.test(a.Group.Name)).map((a) => a.Group.Name);
+    return homes.find((g) => slot.groups.includes(g) && !taken(g)) || (slot.takeover ? null : homes.find((g) => !taken(g))) || null;
   }
   function setGearOpt(group, name, want) {
     try {
-      const it = typeof window.InventoryGet === "function" ? window.InventoryGet(P2(), group) : null;
+      const it = typeof window.InventoryGet === "function" ? window.InventoryGet(P3(), group) : null;
       if (!it || it.Asset.Name !== name || typeof window.ExtendedItemGetData !== "function" || typeof window.ExtendedItemSetOptionByRecord !== "function") return false;
       const data = window.ExtendedItemGetData(it.Asset, it.Asset.Archetype);
       if (!data || data.archetype !== "typed" || !Array.isArray(data.options)) return false;
       const i = data.options.findIndex((o) => o.Name === want);
       if (i < 0) return false;
-      window.ExtendedItemSetOptionByRecord(P2(), it, { typed: i }, { push: true, refresh: true, C_Source: P2() });
+      window.ExtendedItemSetOptionByRecord(P3(), it, { typed: i }, { push: true, refresh: true, C_Source: P3() });
       return true;
     } catch (e) {
       console.warn("[Farmhand Companion] gear setting:", e);
       return false;
     }
   }
-  function gearAsset(group, slot, prefer) {
-    const fam = P2().AssetFamily, get2 = (n) => {
+  function gearAsset(group, slot, prefer, only) {
+    const fam = P3().AssetFamily, get2 = (n) => {
       try {
         return typeof window.AssetGet === "function" ? window.AssetGet(fam, group, n) : null;
       } catch (e) {
@@ -10062,6 +10575,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
       }
     };
     for (const n of Array.isArray(prefer) ? prefer.map(String) : []) if (/^[A-Za-z0-9_]{2,40}$/.test(n) && get2(n)) return n;
+    if (only) return typeof window.AssetGet !== "function" && Array.isArray(prefer) && prefer.length ? String(prefer[0]) : null;
     for (const n of slot.names) if (get2(n)) return n;
     const all = Array.isArray(window.Asset) ? window.Asset : [];
     const hit = all.find((a) => a && a.Group && a.Group.Name === group && slot.re.test(a.Name) && !a.OwnerOnly && !a.LoverOnly && !a.FamilyOnly);
@@ -10084,7 +10598,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
   };
   var isFarmGear = (b) => {
     const c = b.Craft, d = c ? String(c.Description || "") : "";
-    return !!(c && (d.includes(FARM_TAG) || d.includes(OLD_TAG) || knownNames().includes(c.Name) && (!c.MemberNumber || c.MemberNumber === P2().MemberNumber)));
+    return !!(c && (d.includes(FARM_TAG) || d.includes(OLD_TAG) || knownNames().includes(c.Name) && (!c.MemberNumber || c.MemberNumber === P3().MemberNumber)));
   };
   var GEAR_KEY = "fhc-gear";
   var gearMem = () => {
@@ -10102,8 +10616,8 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
   };
   var gearNameOf = (b, mem) => isFarmGear(b) ? b.Craft.Name : Object.keys(mem).find((n) => mem[n].group === b.Group && mem[n].item === b.Name && (!(b.Craft && b.Craft.Name) || b.Craft.Name === n)) || null;
   function syncFarmGear(list, allow) {
-    if (!P2() || !Array.isArray(P2().Appearance) || typeof window.ServerAppearanceBundle !== "function") return { on: [], off: [] };
-    const want = (Array.isArray(list) ? list : []).filter((g) => g && GEAR_SLOTS[g.slot] && (g.always || allow) && (!g.until || g.until > Date.now()));
+    if (!P3() || !Array.isArray(P3().Appearance) || typeof window.ServerAppearanceBundle !== "function") return { on: [], off: [] };
+    const want = (Array.isArray(list) ? list : []).filter((g) => g && GEAR_SLOTS[g.slot] && (g.always || allow) && (!g.until || g.until > Date.now())).sort((a, b) => (GEAR_SLOTS[a.slot].needs ? 1 : 0) - (GEAR_SLOTS[b.slot].needs ? 1 : 0));
     const cur = bundle(), stuck = lockedGroups2(), did = { on: [], off: [] }, mem = gearMem(), setLater = [];
     let next = cur.slice();
     for (const b of cur) {
@@ -10137,7 +10651,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
         }
       }
       if (!group) continue;
-      if (!item) item = gearAsset(group, slot, g.items);
+      if (!item) item = gearAsset(group, slot, g.items, !!g.only);
       if (!item) {
         if (was) next.push(was);
         continue;
@@ -10156,8 +10670,8 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
           Color: Array.isArray(color) ? color.join(",") : color,
           Lock: "",
           Private: true,
-          MemberNumber: P2().MemberNumber,
-          MemberName: P2().Name,
+          MemberNumber: P3().MemberNumber,
+          MemberName: P3().Name,
           ItemProperty: {},
           Type: null,
           TypeRecord: null
@@ -10179,7 +10693,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
   var SHAPES = { BodyUpper: ["FlatSmall", "FlatMedium", "Small", "Normal", "Large", "XLarge"], BodyLower: ["Small", "Normal", "Large", "XLarge"] };
   var SHAPE_KEY = "fhc-shape";
   function syncShape(shape, allow) {
-    if (!P2() || !Array.isArray(P2().Appearance) || typeof window.ServerAppearanceBundle !== "function") return [];
+    if (!P3() || !Array.isArray(P3().Appearance) || typeof window.ServerAppearanceBundle !== "function") return [];
     let mem;
     try {
       mem = JSON.parse(window.localStorage.getItem(SHAPE_KEY)) || {};
@@ -10195,7 +10709,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
       const at = order.indexOf(own);
       if (at < 0) continue;
       const want = order[Math.max(0, Math.min(order.length - 1, at + Math.round(steps)))];
-      if (typeof window.AssetGet === "function" && !window.AssetGet(P2().AssetFamily, group, want)) continue;
+      if (typeof window.AssetGet === "function" && !window.AssetGet(P3().AssetFamily, group, want)) continue;
       if (want !== b.Name) {
         b.Name = want;
         did.push(group + " " + want);
@@ -10213,7 +10727,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
   var TRIAL_CLEAN = ["BodyUpper", "BodyLower", "Bra", "ItemNipples", "ItemBreast", "ItemTorso"];
   function scaleTrialCleanup() {
     try {
-      const C = P2();
+      const C = P3();
       if (!C || !Array.isArray(C.Appearance)) return false;
       let n = 0;
       for (const it of C.Appearance) {
@@ -10246,8 +10760,16 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     commit2(next);
     return { ok: true, did: ["wash"] };
   }
-  function stripMe(prefs) {
-    if (!prefs.strip) return { ok: false, why: "off" };
+  function rinseMarks() {
+    const stuck = lockedGroups2(), cur = bundle();
+    const i = cur.findIndex((b) => b.Name === "Splatters" && SPLAT_GROUPS.includes(b.Group) && !stuck.has(b.Group));
+    if (i < 0) return { ok: true, did: [] };
+    cur.splice(i, 1);
+    commit2(cur);
+    return { ok: true, did: ["rinse"] };
+  }
+  function stripMe(prefs2) {
+    if (!prefs2.strip) return { ok: false, why: "off" };
     const cur = bundle(), stuck = lockedGroups2();
     if (!window.localStorage.getItem(STRIP_KEY)) {
       try {
@@ -10285,7 +10807,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
   }
 
   // extension/src/chatlog.js
-  var W9 = window;
+  var W11 = window;
   var KEY5 = "farmhand-chatlog";
   var MAX3 = 1500;
   var CHUNK = 6e3;
@@ -10297,7 +10819,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
   var saveT = null;
   var recent = /* @__PURE__ */ new Map();
   try {
-    const v = JSON.parse(W9.localStorage.getItem(KEY5));
+    const v = JSON.parse(W11.localStorage.getItem(KEY5));
     if (Array.isArray(v)) rows = v.slice(-MAX3);
   } catch (e) {
     rows = [];
@@ -10306,7 +10828,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     clearTimeout(saveT);
     saveT = setTimeout(() => {
       try {
-        W9.localStorage.setItem(KEY5, JSON.stringify(rows));
+        W11.localStorage.setItem(KEY5, JSON.stringify(rows));
       } catch (e) {
         rows = rows.slice(-300);
       }
@@ -10334,7 +10856,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     }
   }
   function flush() {
-    if (!on() || !rows.length || !botHere() || typeof W9.ServerSend !== "function") return;
+    if (!on() || !rows.length || !botHere() || typeof W11.ServerSend !== "function") return;
     let sent = 0;
     for (let part = 0; part < 4 && rows.length; part++) {
       const batch = [];
@@ -10346,7 +10868,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
         size += s;
       }
       try {
-        W9.ServerSend("ChatRoomChat", makeMsg("chatlog", { rows: batch }, botMn));
+        W11.ServerSend("ChatRoomChat", makeMsg("chatlog", { rows: batch }, botMn));
         sent += batch.length;
       } catch (e) {
         rows = batch.concat(rows);
@@ -10411,7 +10933,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
 
   // extension/src/nursery.js
   var KEY6 = "fhc-nursery";
-  var P3 = () => window.Player;
+  var P4 = () => window.Player;
   var load4 = () => {
     try {
       return JSON.parse(window.localStorage.getItem(KEY6)) || {};
@@ -10425,15 +10947,15 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     } catch (e) {
     }
   };
-  var ready = () => P3() && Array.isArray(P3().Appearance) && typeof window.ServerAppearanceBundle === "function" && typeof window.ServerAppearanceLoadFromBundle === "function";
-  var bundle2 = () => window.ServerAppearanceBundle(P3().Appearance);
+  var ready = () => P4() && Array.isArray(P4().Appearance) && typeof window.ServerAppearanceBundle === "function" && typeof window.ServerAppearanceLoadFromBundle === "function";
+  var bundle2 = () => window.ServerAppearanceBundle(P4().Appearance);
   function commit3(next) {
-    window.ServerAppearanceLoadFromBundle(P3(), P3().AssetFamily, next, P3().MemberNumber);
-    if (typeof window.CharacterRefresh === "function") window.CharacterRefresh(P3());
-    if (typeof window.ChatRoomCharacterUpdate === "function") window.ChatRoomCharacterUpdate(P3());
+    window.ServerAppearanceLoadFromBundle(P4(), P4().AssetFamily, next, P4().MemberNumber);
+    if (typeof window.CharacterRefresh === "function") window.CharacterRefresh(P4());
+    if (typeof window.ChatRoomCharacterUpdate === "function") window.ChatRoomCharacterUpdate(P4());
   }
-  var locked = (g) => P3().Appearance.some((it) => it.Asset && it.Asset.Group && it.Asset.Group.Name === g && it.Property && it.Property.LockedBy);
-  var exists = (g, n) => typeof window.AssetGet !== "function" || !!window.AssetGet(P3().AssetFamily, g, n);
+  var locked = (g) => P4().Appearance.some((it) => it.Asset && it.Asset.Group && it.Asset.Group.Name === g && it.Property && it.Property.LockedBy);
+  var exists = (g, n) => typeof window.AssetGet !== "function" || !!window.AssetGet(P4().AssetFamily, g, n);
   function nurseryWear(g) {
     if (!ready()) return { ok: false, why: "not in a room" };
     if (!g || !g.group || !g.name) return { ok: false, why: "nothin' to put on" };
@@ -10453,9 +10975,9 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
   function nurseryOff(group) {
     if (!ready()) return { ok: false, why: "not in a room" };
     const mem = load4(), gear = mem.gear || {};
-    const groups = group ? [group] : Object.keys(gear);
-    const next = bundle2().filter((b) => !(groups.includes(b.Group) && gear[b.Group] === b.Name && !locked(b.Group)));
-    for (const g of groups) delete gear[g];
+    const groups2 = group ? [group] : Object.keys(gear);
+    const next = bundle2().filter((b) => !(groups2.includes(b.Group) && gear[b.Group] === b.Name && !locked(b.Group)));
+    for (const g of groups2) delete gear[g];
     mem.gear = gear;
     save5(mem);
     commit3(next);
@@ -10512,7 +11034,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
       if (A && A.stats) {
         out.abcl = true;
         try {
-          out.diaper = !!A.raw.hasDiaper(P3());
+          out.diaper = !!A.raw.hasDiaper(P4());
         } catch (e) {
           out.diaper = false;
         }
@@ -10533,12 +11055,12 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
       const LC = window.LITTLISH_CLUB;
       if (LC) {
         try {
-          const m = LC.getMommyOf(P3());
+          const m = LC.getMommyOf(P4());
           if (m && Number.isInteger(m.id)) out.mommy = m.id;
         } catch (e) {
         }
         try {
-          out.carers = (LC.getCaregiversOf(P3()) || []).filter(Number.isInteger).slice(0, 12);
+          out.carers = (LC.getCaregiversOf(P4()) || []).filter(Number.isInteger).slice(0, 12);
         } catch (e) {
         }
       }
@@ -10548,12 +11070,13 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
   }
 
   // extension/src/cues.js
-  var W10 = window;
+  var W12 = window;
   var ctx2 = null;
   function initCues(c) {
     ctx2 = c;
     setInterval(sightTick, 4e3);
     setInterval(feelTick, 6e4);
+    setInterval(heelTick, 500);
   }
   var pref = (k) => !ctx2.panel.prefs[k];
   var cueOff = () => ({
@@ -10565,18 +11088,19 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     stir: ctx2.panel.prefs.stir ? void 0 : true,
     gear: ctx2.panel.prefs.gear ? void 0 : true
   });
-  var mapOn = () => typeof W10.ChatRoomMapViewIsActive === "function" && W10.ChatRoomMapViewIsActive() && W10.Player && W10.Player.MapData && W10.Player.MapData.Pos;
-  var others3 = () => (W10.ChatRoomCharacter || []).filter((c) => c && c.MemberNumber !== (W10.Player && W10.Player.MemberNumber));
+  var mapOn = () => typeof W12.ChatRoomMapViewIsActive === "function" && W12.ChatRoomMapViewIsActive() && W12.Player && W12.Player.MapData && W12.Player.MapData.Pos;
+  var others3 = () => (W12.ChatRoomCharacter || []).filter((c) => c && c.MemberNumber !== (W12.Player && W12.Player.MemberNumber));
   var lastSight = "";
   function sightTick() {
     try {
-      if (W10.CurrentScreen !== "ChatRoom" || !mapOn() || typeof W10.ChatRoomMapViewCharacterIsVisible !== "function") return;
-      const see = others3().filter((c) => W10.ChatRoomMapViewCharacterIsVisible(c)).map((c) => c.MemberNumber).sort();
-      const hear = others3().filter((c) => typeof W10.ChatRoomMapViewCharacterIsHearable === "function" && W10.ChatRoomMapViewCharacterIsHearable(c)).map((c) => c.MemberNumber).sort();
-      const LS = W10.Player && W10.Player.LSCG, S3 = LS && LS.SplatterModule;
+      if (W12.CurrentScreen !== "ChatRoom" || !mapOn() || typeof W12.ChatRoomMapViewCharacterIsVisible !== "function") return;
+      const see = others3().filter((c) => W12.ChatRoomMapViewCharacterIsVisible(c)).map((c) => c.MemberNumber).sort();
+      const hear = others3().filter((c) => typeof W12.ChatRoomMapViewCharacterIsHearable === "function" && W12.ChatRoomMapViewCharacterIsHearable(c)).map((c) => c.MemberNumber).sort();
+      const LS = W12.Player && W12.Player.LSCG, S3 = LS && LS.SplatterModule;
       const splat = S3 ? !!(S3.enabled && S3.taker !== false && (!LS.GlobalModule || LS.GlobalModule.enabled !== false)) : void 0;
       const key = see.join(",") + "|" + hear.join(",") + "|" + splat;
       if (key === lastSight && Date.now() - (sightTick.at || 0) < 12e4) return;
+      if (Date.now() - (sightTick.at || 0) < 8e3) return;
       lastSight = key;
       sightTick.at = Date.now();
       ctx2.toBot("sight", splat === void 0 ? { see, hear } : { see, hear, splat });
@@ -10588,13 +11112,13 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
   var DIRS = [["North", 0, -1], ["South", 0, 1], ["West", -1, 0], ["East", 1, 0]];
   function canStep(x, y) {
     try {
-      return W10.ChatRoomMapViewCanEnterTile(x, y) > 0;
+      return W12.ChatRoomMapViewCanEnterTile(x, y) > 0;
     } catch (e) {
       return false;
     }
   }
   function findPath(from, to) {
-    const wide = W10.ChatRoomMapViewWidth || 40, high = W10.ChatRoomMapViewHeight || 40, key = (x, y) => x + "," + y;
+    const wide = W12.ChatRoomMapViewWidth || 40, high = W12.ChatRoomMapViewHeight || 40, key = (x, y) => x + "," + y;
     const goal = (x, y) => Math.max(Math.abs(x - to.X), Math.abs(y - to.Y)) <= (canStep(to.X, to.Y) ? 0 : 1);
     const prev = /* @__PURE__ */ new Map([[key(from.X, from.Y), null]]), q2 = [[from.X, from.Y]];
     while (q2.length) {
@@ -10621,11 +11145,11 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
   }
   function lead(m) {
     const no = () => {
-      walk = null;
+      if (walk && !walk.heel) walk = null;
       ctx2.toBot("leadNo", { id: m.id });
     };
-    if (!pref("noLead") || !mapOn() || typeof W10.ChatRoomMapViewMove !== "function") return no();
-    const from = W10.Player.MapData.Pos, to = { X: m.X, Y: m.Y };
+    if (!pref("noLead") || !mapOn() || typeof W12.ChatRoomMapViewMove !== "function") return no();
+    const from = W12.Player.MapData.Pos, to = { X: m.X, Y: m.Y };
     const path = findPath(from, to);
     if (!path) return no();
     if (!path.length) {
@@ -10633,14 +11157,30 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
       return;
     }
     ctx2.local("You're led " + (m.why ? m.why : "along") + "\u2026", "#c9a35b", true);
-    walk = { id: m.id, to, path, i: 0, last: { X: from.X, Y: from.Y }, stuck: Date.now(), retried: false };
-    stepWalk();
+    startWalk({ id: m.id, to, path, i: 0, last: { X: from.X, Y: from.Y }, stuck: Date.now(), retried: false });
+  }
+  var stepping = false;
+  function startWalk(w) {
+    walk = w;
+    if (!stepping) {
+      stepping = true;
+      stepWalk();
+    }
   }
   function stepWalk() {
-    if (!walk) return;
-    const w = walk, p = W10.Player && W10.Player.MapData && W10.Player.MapData.Pos;
+    const w = walk, p = W12.Player && W12.Player.MapData && W12.Player.MapData.Pos;
+    const end = (ok2) => {
+      if (walk === w) walk = null;
+      stepping = false;
+      if (w && !w.heel) ctx2.toBot(ok2 ? "leadOk" : "leadNo", { id: w.id });
+    };
+    if (!w) {
+      stepping = false;
+      return;
+    }
     if (!p) {
       walk = null;
+      stepping = false;
       return;
     }
     if (p.X !== w.last.X || p.Y !== w.last.Y) {
@@ -10648,32 +11188,64 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
       w.stuck = Date.now();
       w.i++;
     }
-    if (w.i >= w.path.length || Math.max(Math.abs(p.X - w.to.X), Math.abs(p.Y - w.to.Y)) <= 0) {
-      walk = null;
-      ctx2.toBot("leadOk", { id: w.id });
-      return;
-    }
+    if (w.i >= w.path.length || Math.max(Math.abs(p.X - w.to.X), Math.abs(p.Y - w.to.Y)) <= 0) return end(true);
     if (Date.now() - w.stuck > 3e3) {
-      if (w.retried) {
-        walk = null;
-        ctx2.toBot("leadNo", { id: w.id });
-        return;
-      }
+      if (w.retried) return end(false);
       const path = findPath(p, w.to);
-      if (!path) {
-        walk = null;
-        ctx2.toBot("leadNo", { id: w.id });
-        return;
-      }
+      if (!path) return end(false);
       Object.assign(w, { path, i: 0, stuck: Date.now(), retried: true });
     }
-    if (W10.ChatRoomMapViewMovement == null) {
+    if (W12.ChatRoomMapViewMovement == null) {
       try {
-        W10.ChatRoomMapViewMove(w.path[w.i]);
+        W12.ChatRoomMapViewMove(w.path[w.i]);
       } catch (e) {
       }
     }
     setTimeout(stepWalk, 150);
+  }
+  var heel = null;
+  function reinsState(r) {
+    const on2 = r && Number(r.mn) && !r.hold && Number(r.until || 0) > Date.now();
+    if (!on2) {
+      if (heel && !(r && r.hold)) ctx2.local("\u{1F434} The reins come off.", "#c9a35b", true);
+      heel = r && r.hold && heel ? Object.assign(heel, { hold: true }) : null;
+      if (walk && walk.heel) walk = null;
+      return;
+    }
+    if (!heel || heel.mn !== Number(r.mn)) ctx2.local("\u{1F434} You're on " + String(r.name || "somebody") + "'s reins: you'll follow a step behind them till they let go. Your safeword frees you.", "#c9a35b", true);
+    if (!heel || heel.mn !== Number(r.mn)) heel = { mn: Number(r.mn), trail: [] };
+    heel.hold = false;
+    heel.until = Number(r.until);
+  }
+  function heelTick() {
+    try {
+      if (!heel || heel.hold || W12.CurrentScreen !== "ChatRoom" || !mapOn() || !pref("noLead") || typeof W12.ChatRoomMapViewMove !== "function") return;
+      if (heel.until && heel.until < Date.now()) {
+        heel = null;
+        return;
+      }
+      const C = others3().find((c) => c.MemberNumber === heel.mn), lp = C && C.MapData && C.MapData.Pos;
+      if (!lp || lp.X < 0) return;
+      const t = heel.trail, last = t[t.length - 1];
+      if (!last || last.X !== lp.X || last.Y !== lp.Y) {
+        t.push({ X: lp.X, Y: lp.Y });
+        if (t.length > 4) t.shift();
+      }
+      const me4 = W12.Player.MapData.Pos;
+      if (Math.max(Math.abs(me4.X - lp.X), Math.abs(me4.Y - lp.Y)) <= 1) {
+        if (walk && walk.heel) walk = null;
+        return;
+      }
+      if (walk && !walk.heel) return;
+      const from = t.length > 1 ? t[t.length - 2] : me4, dx = Math.sign(from.X - lp.X), dy = Math.sign(from.Y - lp.Y);
+      const to = (dx || dy) && canStep(lp.X + dx, lp.Y + dy) ? { X: lp.X + dx, Y: lp.Y + dy } : { X: lp.X, Y: lp.Y };
+      if (walk && walk.heel && walk.to.X === to.X && walk.to.Y === to.Y) return;
+      const path = findPath(me4, to);
+      if (!path || !path.length) return;
+      startWalk({ id: 0, heel: true, to, path, i: 0, last: { X: me4.X, Y: me4.Y }, stuck: Date.now(), retried: false });
+    } catch (e) {
+      console.warn("[Farmhand Companion] reins:", e);
+    }
   }
   var FACES = {
     milkdrunk: { Eyes: "Dazed", Blush: "Medium", Mouth: "HalfOpen" },
@@ -10687,12 +11259,12 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
   };
   function face(m) {
     const f = FACES[m.mood];
-    if (!f || !pref("noFace") || typeof W10.CharacterSetFacialExpression !== "function" || !W10.Player) return;
+    if (!f || !pref("noFace") || typeof W12.CharacterSetFacialExpression !== "function" || !W12.Player) return;
     const secs = m.mood === "clear" ? null : Math.max(5, Math.min(1800, Number(m.secs) || 30));
     for (const [g, e] of Object.entries(f)) {
       try {
-        W10.CharacterSetFacialExpression(W10.Player, g, e, secs);
-        if (g === "Eyes") W10.CharacterSetFacialExpression(W10.Player, "Eyes2", e, secs);
+        W12.CharacterSetFacialExpression(W12.Player, g, e, secs);
+        if (g === "Eyes") W12.CharacterSetFacialExpression(W12.Player, "Eyes2", e, secs);
       } catch (e2) {
       }
     }
@@ -10741,35 +11313,35 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
   var QUIET = { stall: 0.35, latch: 0.35, unlatch: 0.35, pump: 0.4, machine: 0.4, inflate: 0.4, hiss: 0.4, buzz: 0.3, zap: 0.35, clamp: 0.45, softgate: 0.4 };
   function sound(m) {
     const f = SOUNDS[m.name];
-    if (!f || !pref("noSound") || typeof W10.AudioPlayInstantSound !== "function") return;
-    const vol = W10.Player && W10.Player.AudioSettings && W10.Player.AudioSettings.Volume || 0;
+    if (!f || !pref("noSound") || typeof W12.AudioPlayInstantSound !== "function") return;
+    const vol = W12.Player && W12.Player.AudioSettings && W12.Player.AudioSettings.Volume || 0;
     try {
-      W10.AudioPlayInstantSound("Audio/" + f + ".mp3", vol * (QUIET[m.name] || 0.6));
+      W12.AudioPlayInstantSound("Audio/" + f + ".mp3", vol * (QUIET[m.name] || 0.6));
     } catch (e) {
     }
   }
   function trance(m) {
-    let el = W10.document.getElementById("fhc-trance");
+    let el = W12.document.getElementById("fhc-trance");
     const lvl = pref("noTrance") ? Math.max(0, Math.min(3, Number(m.level) || 0)) : 0;
     if (!lvl) {
       if (el) el.remove();
       return;
     }
     if (!el) {
-      el = W10.document.createElement("div");
+      el = W12.document.createElement("div");
       el.id = "fhc-trance";
       el.style.cssText = "position:fixed;inset:0;pointer-events:none;z-index:9998;transition:opacity 4s;opacity:0;animation:fhcTrance 6s ease-in-out infinite";
-      if (!W10.document.getElementById("fhc-trance-css")) {
-        const s = W10.document.createElement("style");
+      if (!W12.document.getElementById("fhc-trance-css")) {
+        const s = W12.document.createElement("style");
         s.id = "fhc-trance-css";
         s.textContent = "@keyframes fhcTrance{0%,100%{filter:brightness(1)}50%{filter:brightness(0.85)}}";
-        W10.document.head.appendChild(s);
+        W12.document.head.appendChild(s);
       }
-      W10.document.body.appendChild(el);
+      W12.document.body.appendChild(el);
     }
     const edge = [0, 0.25, 0.45, 0.65][lvl], inner = [0, 55, 42, 30][lvl];
     el.style.background = "radial-gradient(ellipse at center, transparent " + inner + "%, rgba(70,20,90," + edge + ") 100%)";
-    (W10.requestAnimationFrame || ((f) => setTimeout(f, 16)))(() => {
+    (W12.requestAnimationFrame || ((f) => setTimeout(f, 16)))(() => {
       el.style.opacity = "1";
     });
   }
@@ -10841,13 +11413,13 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
   var recentFeel = [];
   function feelTick() {
     try {
-      if (!pref("noFeelings") || W10.CurrentScreen !== "ChatRoom" || !W10.Player || !ctx2.panel.s || !ctx2.panel.s.onBooks) return;
+      if (!pref("noFeelings") || W12.CurrentScreen !== "ChatRoom" || !W12.Player || !ctx2.panel.s || !ctx2.panel.s.onBooks) return;
       if (Date.now() < (feelTick.next || 0)) return;
       feelTick.next = Date.now() + (7 + Math.random() * 6) * 6e4;
-      const s = ctx2.panel.s, items = (W10.Player.Appearance || []).filter((x) => x && x.Asset && x.Asset.Group);
+      const s = ctx2.panel.s, items = (W12.Player.Appearance || []).filter((x) => x && x.Asset && x.Asset.Group);
       const grp = (g) => items.find((x) => x.Asset.Group.Name === g);
       const eff2 = (x) => [].concat(x.Property && x.Property.Effect || [], x.Asset.Effect || []);
-      const arousal = W10.Player.ArousalSettings && W10.Player.ArousalSettings.Progress || 0;
+      const arousal = W12.Player.ArousalSettings && W12.Player.ArousalSettings.Progress || 0;
       const kinds = [];
       if (grp("ItemButt")) kinds.push("plug");
       if (items.some((x) => eff2(x).includes("Chaste")) && arousal > 40) kinds.push("chaste");
@@ -10871,11 +11443,11 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
   function drawMarkers() {
     try {
       const s = ctx2.panel.s;
-      if (!s || !s.staff || !Array.isArray(s.herd) || !pref("noMarkers") || !mapOn() || typeof W10.DrawText !== "function") return;
-      const R = W10.ChatRoomMapViewPerceptionRange || 6, tile = 1e3 / (R * 2 + 1), me4 = W10.Player.MapData.Pos;
+      if (!s || !s.staff || !Array.isArray(s.herd) || !pref("noMarkers") || !mapOn() || typeof W12.DrawText !== "function") return;
+      const R = W12.ChatRoomMapViewPerceptionRange || 6, tile = 1e3 / (R * 2 + 1), me4 = W12.Player.MapData.Pos;
       for (const x of s.herd) {
-        const C = (W10.ChatRoomCharacter || []).find((c) => c.MemberNumber === x.mn);
-        if (!C || !C.MapData || !C.MapData.Pos || !W10.ChatRoomMapViewCharacterIsVisible(C)) continue;
+        const C = (W12.ChatRoomCharacter || []).find((c) => c.MemberNumber === x.mn);
+        if (!C || !C.MapData || !C.MapData.Pos || !W12.ChatRoomMapViewCharacterIsVisible(C)) continue;
         const tags = [];
         if (x.milk !== null && x.milk >= 75) tags.push(["M", "#7fa8c9"]);
         if (x.heat) tags.push(["H", "#d9534f"]);
@@ -10884,7 +11456,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
         if (!tags.length) continue;
         const sx = (C.MapData.Pos.X - me4.X + R) * tile, sy = (C.MapData.Pos.Y - me4.Y) * tile + R * tile;
         if (sx < 0 || sy < 0 || sx > 1e3 || sy > 1e3) continue;
-        tags.forEach(([t, col], i) => W10.DrawText(t, sx + tile * 0.2 + i * tile * 0.22, sy + tile * 0.15, col, "black"));
+        tags.forEach(([t, col], i) => W12.DrawText(t, sx + tile * 0.2 + i * tile * 0.22, sy + tile * 0.15, col, "black"));
       }
     } catch (e) {
     }
@@ -10901,11 +11473,11 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
   }
   function arouse(m) {
     try {
-      if (!stirOn() || !W10.Player || !W10.Player.ArousalSettings || typeof W10.ActivitySetArousal !== "function") return;
-      if (W10.Player.ArousalSettings.Active === "Inactive" || W10.Player.ArousalSettings.Active === "NoMeter") return;
-      const cur = Number(W10.Player.ArousalSettings.Progress) || 0, cap = Math.max(0, Math.min(deniedNow() ? 94 : 100, Number(m.cap) || 100));
+      if (!stirOn() || !W12.Player || !W12.Player.ArousalSettings || typeof W12.ActivitySetArousal !== "function") return;
+      if (W12.Player.ArousalSettings.Active === "Inactive" || W12.Player.ArousalSettings.Active === "NoMeter") return;
+      const cur = Number(W12.Player.ArousalSettings.Progress) || 0, cap = Math.max(0, Math.min(deniedNow() ? 94 : 100, Number(m.cap) || 100));
       const next = Math.max(0, Math.min(cap, cur + (Number(m.add) || 0)));
-      if (next > cur || m.add < 0) W10.ActivitySetArousal(W10.Player, next);
+      if (next > cur || m.add < 0) W12.ActivitySetArousal(W12.Player, next);
     } catch (e) {
       console.warn("[Farmhand Companion] arouse:", e);
     }
@@ -10913,11 +11485,11 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
   var VIBE_MODE = ["Low", "Medium", "High", "Maximum"];
   var vibeWas = null;
   var vibeTimer = null;
-  var vibeToys = () => (W10.Player && Array.isArray(W10.Player.Appearance) ? W10.Player.Appearance : []).filter((it) => it && it.Asset && it.Asset.Group && it.Property && typeof it.Property.Intensity === "number" && !(it.Property.LockedBy && typeof W10.DialogCanUnlock === "function" && !W10.DialogCanUnlock(W10.Player, it)));
+  var vibeToys = () => (W12.Player && Array.isArray(W12.Player.Appearance) ? W12.Player.Appearance : []).filter((it) => it && it.Asset && it.Asset.Group && it.Property && typeof it.Property.Intensity === "number" && !(it.Property.LockedBy && typeof W12.DialogCanUnlock === "function" && !W12.DialogCanUnlock(W12.Player, it)));
   function vibePush(toys) {
-    if (typeof W10.CharacterRefresh === "function") W10.CharacterRefresh(W10.Player, false);
-    if (typeof W10.ChatRoomCharacterItemUpdate === "function") toys.forEach((it) => W10.ChatRoomCharacterItemUpdate(W10.Player, it.Asset.Group.Name));
-    else if (typeof W10.ChatRoomCharacterUpdate === "function") W10.ChatRoomCharacterUpdate(W10.Player);
+    if (typeof W12.CharacterRefresh === "function") W12.CharacterRefresh(W12.Player, false);
+    if (typeof W12.ChatRoomCharacterItemUpdate === "function") toys.forEach((it) => W12.ChatRoomCharacterItemUpdate(W12.Player, it.Asset.Group.Name));
+    else if (typeof W12.ChatRoomCharacterUpdate === "function") W12.ChatRoomCharacterUpdate(W12.Player);
   }
   function vibeSet(it, level, mode) {
     it.Property.Intensity = level;
@@ -10973,7 +11545,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
         const t = next(args);
         try {
           const f = slowFactor();
-          return t > 0 && f > 1 && !(typeof W10.ChatRoomMapViewHasSuperPowers === "function" && W10.ChatRoomMapViewHasSuperPowers()) ? t * f : t;
+          return t > 0 && f > 1 && !(typeof W12.ChatRoomMapViewHasSuperPowers === "function" && W12.ChatRoomMapViewHasSuperPowers()) ? t * f : t;
         } catch (e) {
           return t;
         }
@@ -11077,16 +11649,39 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     if (direct() && window.Farmhand.own(Object.assign({}, data, { type }))) return;
     window.ServerSend("ChatRoomChat", makeMsg(type, data, BOT_MEMBER));
   }
-  function hello() {
+  function hello(again) {
     st.lastHello = Date.now();
-    toBot("hello", { ver: VERSION, relay: !(st.panel && st.panel.prefs.noRelay), off: st.panel ? cueOff() : {} });
+    if (again) st.seq = 0;
+    toBot("hello", { ver: VERSION, relay: !(st.panel && st.panel.prefs.noRelay), off: st.panel ? cueOff() : {}, seq: st.seq || 0, sh: st.storeH || "", w: !!st.welcomed, again: !!again });
+  }
+  function askWhole() {
+    if (Date.now() - (st.wholeAt || 0) < 8e3) return;
+    st.wholeAt = Date.now();
+    hello(true);
+  }
+  var STORE_KEY = "fhc-store";
+  function loadStore() {
+    try {
+      const o = JSON.parse(window.localStorage.getItem(STORE_KEY) || "null");
+      if (o && Array.isArray(o.items) && typeof o.h === "string") {
+        st.store = o.items;
+        st.storeH = o.h;
+      }
+    } catch (e) {
+    }
+  }
+  function keepStore() {
+    try {
+      if (st.storeH) window.localStorage.setItem(STORE_KEY, JSON.stringify({ h: st.storeH, items: st.store }));
+    } catch (e) {
+    }
   }
   var EMOJI = /(?:\p{Extended_Pictographic}|\p{Regional_Indicator}|[\uFE0F\u200D\u20E3])/gu;
   var forChat = (s) => String(s).replace(EMOJI, "").replace(/[ \t]{2,}/g, " ").replace(/^([*]?)[ \t]+/gm, "$1").trim();
   var inCharacter = (s) => String(s).replace(/\(/g, "[").replace(/\)/g, "]");
   function relay(m) {
     const text = inCharacter(forChat(m.text || "")).slice(0, 900);
-    const P4 = window.Player || {}, names = [P4.Nickname, P4.Name].filter(Boolean).map((n) => String(n).toLowerCase());
+    const P5 = window.Player || {}, names = [P5.Nickname, P5.Name].filter(Boolean).map((n) => String(n).toLowerCase());
     const now = Date.now();
     st.relayed = (st.relayed || []).filter((t) => now - t < 6e4);
     const blocked = typeof window.ChatRoomOwnerPresenceRule === "function" && (() => {
@@ -11191,7 +11786,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
       return;
     }
     if (m.from !== BOT_MEMBER) return;
-    if (m.type !== "ping" && m.type !== "state") st.lastHeard = Date.now();
+    if (!/^(ping|state|stateDiff|store|roomlines)$/.test(m.type)) st.lastHeard = Date.now();
     switch (m.type) {
       case "ping":
         hello();
@@ -11221,8 +11816,51 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
           console.warn("[Farmhand Companion] farm look:", e);
         }
         break;
+      case "store":
+        if (Array.isArray(m.items)) {
+          st.store = m.items;
+          st.storeH = typeof m.h === "string" ? m.h : "";
+          keepStore();
+          if (st.lastState) {
+            st.lastState = Object.assign({}, st.lastState, { store: st.store });
+            st.panel.setState(st.lastState);
+          }
+        }
+        break;
+      case "stateDiff":
+        if (st.lastState && m.set && typeof m.set === "object" && (m.base == null || m.base === st.seq)) {
+          const s = Object.assign({}, st.lastState, m.set);
+          for (const k of Array.isArray(m.del) ? m.del : []) delete s[k];
+          if (st.store) s.store = st.store;
+          if (m.seq != null) st.seq = m.seq;
+          st.lastState = s;
+          st.panel.setState(s);
+          parasiteSync();
+          try {
+            if ("drawn" in m.set) drawnBodyFarmState(s.drawn);
+          } catch (e) {
+          }
+          if ("brand" in m.set || (m.del || []).includes("brand")) {
+            try {
+              messBrand(st.panel.prefs.brandOff ? null : s.brand);
+            } catch (e) {
+              console.warn("[Farmhand Companion] brand:", e);
+            }
+          }
+          if ("reins" in m.set || (m.del || []).includes("reins")) {
+            try {
+              reinsState(s.reins);
+            } catch (e) {
+              console.warn("[Farmhand Companion] reins:", e);
+            }
+          }
+        } else askWhole();
+        break;
       case "state":
+        if (m.state && typeof m.state === "object" && !("store" in m.state) && st.store) m.state.store = st.store;
         if (m.state && typeof m.state === "object") {
+          st.seq = m.seq != null ? m.seq : 0;
+          st.lastState = m.state;
           st.gotState = true;
           st.panel.setState(m.state);
           parasiteSync();
@@ -11235,6 +11873,11 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
             drawnBodyFarmState(m.state.drawn);
           } catch (e) {
             console.warn("[Farmhand Companion] drawn body size:", e);
+          }
+          try {
+            reinsState(m.state.reins);
+          } catch (e) {
+            console.warn("[Farmhand Companion] reins:", e);
           }
         }
         break;
@@ -11279,7 +11922,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
       case "mark": {
         let r = { ok: false };
         try {
-          const prefs = m.asked ? Object.assign({}, st.panel.prefs, { marks: true }) : st.panel.prefs;
+          const prefs2 = m.asked ? Object.assign({}, st.panel.prefs, { marks: true }) : st.panel.prefs;
           if (m.wash) {
             try {
               messWash();
@@ -11292,17 +11935,30 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
               console.warn("[Farmhand Companion] wash splatters:", e);
               r = { ok: true, did: ["mess"], why: e.message };
             }
-          } else if (m.strip) r = stripMe(prefs);
+          } else if (m.rinse) {
+            let d = [];
+            try {
+              if (messRinse()) d.push("mess");
+            } catch (e) {
+              console.warn("[Farmhand Companion] rinse:", e);
+            }
+            try {
+              d = d.concat(rinseMarks().did || []);
+            } catch (e) {
+              console.warn("[Farmhand Companion] rinse splatters:", e);
+            }
+            r = { ok: true, did: d };
+          } else if (m.strip) r = stripMe(prefs2);
           else if (m.dress) r = dressMe();
           else {
             let drew = false;
             try {
-              if (prefs.marks && Array.isArray(m.splat) && m.splat.length) drew = messFromMark(m);
+              if (prefs2.marks && Array.isArray(m.splat) && m.splat.length) drew = messFromMark(m);
             } catch (e) {
               console.warn("[Farmhand Companion] mess:", e);
             }
             try {
-              r = markBody(m, prefs);
+              r = markBody(m, prefs2);
             } catch (e) {
               console.warn("[Farmhand Companion] splatters:", e);
               r = { ok: drew, did: drew ? ["mess"] : [], why: e.message };
@@ -11356,6 +12012,9 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
         if (!toChat("[Voice] " + line3, "#a67fd4", true)) st.panel.add("[Voice] " + line3, "notice");
         break;
       }
+      case "roomlines":
+        if (!Array.isArray(m.to) || !window.Player || !m.to.includes(window.Player.MemberNumber)) break;
+      // falls through
       case "roomline": {
         const line3 = String(m.text || "").slice(0, 1200);
         if (typeof window.ChatRoomSendLocal === "function") {
@@ -11511,6 +12170,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     return true;
   }
   function start() {
+    loadStore();
     st.panel = new Panel(sendCommand, api);
     initSettings(st.panel);
     if (st.panel.prefs.off) {
@@ -11528,6 +12188,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     initBelly(mod);
     initDrawnBody(mod);
     initMesses(mod);
+    initBotScreen(mod, () => st.panel && st.panel.prefs || {});
     initChatlog(mod, { on: () => !!(st.panel && st.panel.s && st.panel.s.logMust) || !!(st.panel && st.panel.prefs.chatlog), botMn: BOT_MEMBER, botHere: botHere2 });
     initMemlog();
     initLocalSave(VERSION, () => st.panel && st.panel.render && st.panel.render());

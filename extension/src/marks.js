@@ -7,6 +7,7 @@
      "Farm can strip me"       your clothes come off when the farm says so; they're kept so you can dress again
    ?wash (or the Companion's Wash up) takes off the splatters and the writing the farm put on you.
 */
+import { commitLook } from "./look.js";
 const KEY = "fhc-marks";            // { splatGroup, writeGroup }: where the farm put things, so ?wash only takes those
 const STRIP_KEY = "fhc-strip-backup";
 const SPLAT_GROUPS = ["Mask", "FaceMarkings", "BodyMarkings"];     // Splatters fits any of these; the first free one is used
@@ -29,11 +30,8 @@ const save = (v) => { try { window.localStorage.setItem(KEY, JSON.stringify(v));
 const groupOf = (name) => (typeof window.AssetGroupGet === "function" ? window.AssetGroupGet(P().AssetFamily, name) : null);
 const bundle = () => window.ServerAppearanceBundle(P().Appearance);
 const lockedGroups = () => new Set(P().Appearance.filter((it) => it.Property && it.Property.LockedBy).map((it) => it.Asset.Group.Name));
-function commit(next) {
-  window.ServerAppearanceLoadFromBundle(P(), P().AssetFamily, next, P().MemberNumber);
-  if (typeof window.CharacterRefresh === "function") window.CharacterRefresh(P());
-  window.ChatRoomCharacterUpdate(P());
-}
+// on you at once; the room hears only the spots that changed, gathered with anything else in the same moment (look.js)
+const commit = (next) => commitLook(next);
 // game text boxes take letters, numbers, spaces and a little punctuation, 20 characters a line
 const cleanText = (t) => String(t || "").replace(/[^A-Za-z0-9 !?.,'&#*+-]/g, "").slice(0, 20);
 
@@ -134,7 +132,29 @@ const FARM_NAMES = ["Parasite Lips", "Parasite Belt", "Pump Bung", "Egg Post Plu
   "Windmill Sails", "Kissin' Gate", "The Fence", "Collection Bench", "Auction Block",
   "Vacuum Bed", "Vat Skin", "Vat Skin (hands)", "Doll Hood", "Doll Binder", "Doll Tag", "Stall Sheath", "Rubber Cups", "Inflatable Body Bag",
   "Dairymaid's Mitts", "Dairymaid's Muzzle", "Black Pool Latex (legs)", "Black Pool Latex (arms)", "Rubber Pup Hood", "Rubber Paws",
-  "Livin' Latex (hands)", "Livin' Latex (arms)", "Livin' Latex (feet)", "Livin' Latex (legs)", "Livin' Latex (body)", "Livin' Latex (heels)", "Milk Moss", "Milk Moss (bloom)"];
+  "Livin' Latex (hands)", "Livin' Latex (arms)", "Livin' Latex (feet)", "Livin' Latex (legs)", "Livin' Latex (body)", "Livin' Latex (heels)", "Milk Moss", "Milk Moss (bloom)",
+  // Oct 27: Halloween's (and the farm girl's costume)
+  "Horseman's Rope", "Hellhound's Knot", "Demon's Horns", "Spider's Web", "Spider Silk", "Samhain Antlers", "The Great Pumpkin", "Bobbin' Ties", "The Witch's Cauldron",
+  "Broom Ties", "Candy Stick", "Taffy Hooks (arms)", "Taffy Hooks (legs)", "Mummy Wraps (arms)", "Mummy Wraps (body)", "Mummy Wraps (legs)", "Costume Ears", "Costume Tail",
+  "Witch's Hat", "Black Cat Ears", "Black Cat Tail",
+  // Oct 27: winter's and Yule's
+  "Frozen Fast", "Bakery Ribbon", "Mistletoe Ribbon", "Yeti's Fur Wrap", "Gift Ribbon (arms)", "Gift Ribbon (legs)", "Gift Box", "The Big Stockin'", "Stockin' Stuffer",
+  "Cocoa Stand Ribbon", "Frost Lace", "The Farmyard Snowman", "Winter Hat", "Winter Shawl", "Fur Gloves",
+  "Yule Log Ribbons", "Solstice Ribbon", "Holly King's Crown", "The Hunt's Rope", "Wassail Ribbons", "Ivy (arms)", "Ivy (legs)", "Vigil Cord (arms)",
+  "Vigil Cord (legs)", "Holly Crown", "Yule Cloak",
+  // Oct 27: the spring, summer and autumn seasons' (Ostara, Easter, Litha, Mabon)
+  "Ivy Bands", "First Bloom Crown", "Plough Rope", "Dye-Tub Ribbon", "See-Saw Straps", "Waterweed", "Spring Crown", "Hare Ears", "Hare's Tail",
+  "Easter Egg Plug", "Fountain Ribbon", "Bunny Girl Suit", "Bunny Suit Ears", "Bunny Collar and Cuffs", "Bunny Tail Plug", "Basket Ribbon (arms)",
+  "Basket Ribbon (legs)", "Sugar Twine", "Egg-Roll Ribbon", "Parade Bonnet", "Mould Straps", "Easter Bonnet", "Bunny Ears", "Bunny Tail",
+  "Midsummer Ribbon", "Oak King's Crown", "Fae Ribbon", "The Sun Wheel", "Rose Garlands", "Barrel Rope", "Midsummer Crown",
+  "Sheaf Twine", "Sheaf Twine (legs)", "Corn Dolly Plaits", "Corn Dolly Plaits (legs)", "Vintner's Ribbon", "Press Strap", "Wagon Ribbon",
+  "The Harvest Crown", "Table Ribbons", "Harvest Crown", "Harvest Apron",
+  // Oct 27: the whole rubber pup, and the parasite strains' fuller outfits (10y9k-latex-traps.js, 10v6-parasite-strains-more.js)
+  "Rubber Pup Skin", "Rubber Pup Skin (legs)", "Rubber Petsuit", "Rubber Petsuit (legs)", "Kennel Collar", "Good Pup Tag", "Kennel Leash",
+  "Pup's Tail Plug", "Rubber Pup Tail", "Parasite Tail", "Parasite Sleeves", "Parasite Stockings", "Ooze Gloves", "Ooze Sleeves", "Ooze Stockings",
+  "Ooze Skin (legs)", "Ooze Skin (body)", "Ooze Sleeve", "Silk Harness", "Silk Gloves", "Silk Stockings", "Weaver's Cocoon", "Deep's Tail",
+  "Deep's Sleeves", "Deep's Stockings", "Deep's Embrace", "Deep's Coil", "Gloss Gloves", "Gloss Sleeves", "Gloss Stockings", "Gloss Skin (legs)",
+  "Gloss Skin (body)", "Gloss Heels", "Gloss Sheath"];
 // slot → where it can go and which game item it is: the first that this game has; the pattern is a fallback
 export const GEAR_SLOTS = {
   plug:     { groups: ["ItemButt"], names: ["InflVibeButtPlug", "BlackButtPlug", "ButtPlug", "ButtPump"], re: /ButtPlug|Plug/, color: "#2B2B2B" },
@@ -166,6 +186,16 @@ export const GEAR_SLOTS = {
   mitts:    { groups: ["ItemHands"], names: ["LatexBondageMitts"], re: /^LatexBondageMitts$/, color: "#121214" },
   // the parasite's suckers and the trough leeches (Laynie, Oct 26: "switch the parasites lactation pumps for the forbidden chastity bra")
   chestbra: { groups: ["ItemBreast"], names: ["ForbiddenChastityBra", "PolishedChastityBra", "MetalChastityBra"], re: /ChastityBra$/ },
+  // costume pieces (Oct 27: Halloween's cat ears and tails, a demon's horns, the farm girl dressed for the season). These
+  // only ever put on the item the piece names, so there's no stand-in: if this game hasn't got it, nothin' goes on
+  ears:     { groups: ["HairAccessory2"], names: [], re: /^$/, takeover: true },
+  horns:    { groups: ["HairAccessory1"], names: [], re: /^$/, takeover: true },
+  tail:     { groups: ["TailStraps"], names: [], re: /^$/, takeover: true },
+  // the farm girl's winter shawl and Yule cloak (Oct 27): the same, over her own clothes' accessory spot
+  cloak:    { groups: ["ClothAccessory"], names: [], re: /^$/, takeover: true },
+  // a collar (Oct 27: the rubber pup's). Only the item a piece names, and never in place of a collar of yours: if you're
+  // wearin' one, the leash and the tag clip to it instead
+  collar:   { groups: ["ItemNeck"], names: [], re: /^$/ },
 };
 // HOW EACH PIECE IS SET (Laynie, Oct 19: "I had a knee spreader described as being a knee spreader, but it was just hemp
 // rope and the cuffs weren't restraining me at all with their configuration"). The game puts most restraints on in their
@@ -184,7 +214,8 @@ export const GEAR_OPT = {
 function itemHome(name, slot, taken) {
   const all = Array.isArray(window.Asset) ? window.Asset : [];
   const homes = all.filter((a) => a && a.Name === name && a.Group && a.Group.Family === P().AssetFamily && /^Item/.test(a.Group.Name)).map((a) => a.Group.Name);
-  return homes.find((g) => slot.groups.includes(g) && !taken(g)) || homes.find((g) => !taken(g)) || null;
+  // (clothes never go anywhere but their own spot: a tentacle TAIL is not the game's tentacles for the arms, Oct 27)
+  return homes.find((g) => slot.groups.includes(g) && !taken(g)) || (slot.takeover ? null : homes.find((g) => !taken(g))) || null;
 }
 // set an item the way GEAR_OPT (or the piece) says, through the game's own extended-item setter
 function setGearOpt(group, name, want) {
@@ -198,9 +229,11 @@ function setGearOpt(group, name, want) {
     return true;
   } catch (e) { console.warn("[Farmhand Companion] gear setting:", e); return false; }
 }
-function gearAsset(group, slot, prefer) {
+// only: the piece's own items or nothin' (a witch's hat the game might not have mustn't turn into a flower crown)
+function gearAsset(group, slot, prefer, only) {
   const fam = P().AssetFamily, get = (n) => { try { return typeof window.AssetGet === "function" ? window.AssetGet(fam, group, n) : null; } catch (e) { return null; } };
   for (const n of (Array.isArray(prefer) ? prefer.map(String) : [])) if (/^[A-Za-z0-9_]{2,40}$/.test(n) && get(n)) return n;   // the piece's own choice, if this game has it there
+  if (only) return typeof window.AssetGet !== "function" && Array.isArray(prefer) && prefer.length ? String(prefer[0]) : null;
   for (const n of slot.names) if (get(n)) return n;
   const all = Array.isArray(window.Asset) ? window.Asset : [];
   const hit = all.find((a) => a && a.Group && a.Group.Name === group && slot.re.test(a.Name) && !a.OwnerOnly && !a.LoverOnly && !a.FamilyOnly);
@@ -219,7 +252,8 @@ const gearNameOf = (b, mem) => (isFarmGear(b) ? b.Craft.Name : (Object.keys(mem)
 // list: [{ slot, name, desc, color, always }] · allow: trap gear is switched on. Returns what it did.
 export function syncFarmGear(list, allow) {
   if (!P() || !Array.isArray(P().Appearance) || typeof window.ServerAppearanceBundle !== "function") return { on: [], off: [] };
-  const want = (Array.isArray(list) ? list : []).filter((g) => g && GEAR_SLOTS[g.slot] && (g.always || allow) && (!g.until || g.until > Date.now()));
+  const want = (Array.isArray(list) ? list : []).filter((g) => g && GEAR_SLOTS[g.slot] && (g.always || allow) && (!g.until || g.until > Date.now()))
+    .sort((a, b) => (GEAR_SLOTS[a.slot].needs ? 1 : 0) - (GEAR_SLOTS[b.slot].needs ? 1 : 0));   // (the collar first, then the leash and the tag that clip to it)
   const cur = bundle(), stuck = lockedGroups(), did = { on: [], off: [] }, mem = gearMem(), setLater = [];
   let next = cur.slice();
   // off: ours, and not on the list any more
@@ -248,7 +282,7 @@ export function syncFarmGear(list, allow) {
       if (group) { was = next.find((b) => b.Group === group); next = next.filter((b) => b !== was); }
     }
     if (!group) continue;                                                              // that spot's taken: it's on the farm's books just the same
-    if (!item) item = gearAsset(group, slot, g.items);
+    if (!item) item = gearAsset(group, slot, g.items, !!g.only);
     if (!item) { if (was) next.push(was); continue; }   // (nothing to put there after all: theirs stays)
     const color = (typeof g.color === "string" && /^#[0-9a-fA-F]{6}$/.test(g.color) ? g.color : null) || slot.color || "Default";
     const it = { Group: group, Name: item, Difficulty: 20, Property: {},
@@ -317,6 +351,15 @@ export function washMarks() {
   save({});
   commit(next);
   return { ok: true, did: ["wash"] };
+}
+
+// a rinse at the water (Oct 26): one patch of the farm's splatters comes off (never the writing)
+export function rinseMarks() {
+  const stuck = lockedGroups(), cur = bundle();
+  const i = cur.findIndex((b) => b.Name === "Splatters" && SPLAT_GROUPS.includes(b.Group) && !stuck.has(b.Group));
+  if (i < 0) return { ok: true, did: [] };
+  cur.splice(i, 1); commit(cur);
+  return { ok: true, did: ["rinse"] };
 }
 
 // strip: clothes off (locked ones stay), kept on this computer · dress: back on

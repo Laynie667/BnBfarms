@@ -195,6 +195,7 @@
     if (w.kind === "mirror"){ trance(mn, 0); if (how === "gave"){ goUnder(mn, 2); if (r.hypno) later(() => { try { echsAsk(mn, CFG.BOT_MEMBER, "mirror"); } catch(e){} }, 8000); } }   // (ECHS: 10uj-echs.js)
     if (charFor(mn)) emote(TRAP_KINDS[w.kind].icon+" "+moreLine(w.kind, how === "gave" ? "gave" : "held", mn), mn);
     if (how === "held") later(() => earnRibbons(mn, 1, "holdin' out against the "+(w.kind === "tickle" ? "tickle rack" : "mirror box")), 2000);
+    try { if (charFor(mn)) trapEnded(mn, w.kind, null); } catch(e){ warn("trap ended:", e); }   // how was it (10y9o-trap-ratings.js)
     syncCompanions(true);
     return true;
   }
@@ -244,7 +245,7 @@
          "Straps whip round %n's wrists and pull them up over their head. Somethin' whirs, and a little brass arm tipped with an inkin' needle swings round to look them over.",
          "%n is tipped back onto a slanted board and buckled down. A lamp clicks on. Above them an arm like a seamstress's machine starts to hum."],
         ["It takes its time choosin' where. The nib trails cold across %n's belly, their hip, the top of their thigh, and stops.",
-         "It wipes a patch of %n's skin clean with a little pad, real businesslike, the way you'd prep a calf for the iron.",
+         "It wipes a patch of %n's skin clean with a little pad, real businesslike, the way you'd prep stock for the iron.",
          "The pen hovers. %n holds their breath. Then it touches down and starts to write, slow, in big neat capitals."],
       ],
       end: ["The arm folds itself away and the clamp lets go. Written across %n's skin, where it'll take a good scrub to shift: %x.",
@@ -258,7 +259,7 @@
          "%n hears a rattle in the rafters, looks up, and gets a collar round the neck for their trouble. It locks itself."],
         ["The chain goes taut and starts to move. %n can walk with it or be dragged; it doesn't mind which.",
          "Tick, tick, tick. The rail pulls %n along at a steady stroll, up on their toes, both hands on the collar, past everybody.",
-         "It leads %n across the yard like a heifer to market, and no amount of diggin' their heels in slows it one bit."],
+         "It leads %n across the yard like prize stock to market, and no amount of diggin' their heels in slows it one bit."],
       ],
       end: ["The rail ends at the pen. The collar pops open, the gate swings shut, and %n is left inside with the latch on the far side.",
             "It walks %n right into the pen, drops them there and reels itself back up into the roof. The gate clicks.",
@@ -467,7 +468,7 @@
         ["It pools round %n's knees and climbs. They're soaked, they're steamin', it's in their mouth, and it's still comin'.",
          "%n gasps and gets a mouthful. Swallows before they think. The trough's fillin' up round their thighs.",
          "They kneel there and take it, piss sheetin' off their tits, hair plastered down, a puddle risin' to their lap."],
-        ["The pipes dribble out. The bars lift. %n climbs out of the trough drenched, stinkin', drippin' yellow, marked by every animal on the row.",
+        ["The pipes dribble out. The bars lift. %n climbs out of the trough drenched, stinkin', drippin' yellow, marked by every one of the beast-folk on the row.",
          "Done. %n is let up, wet to the skin and reekin', with gold runnin' off their chin. Everybody they pass is goin' to know.",
          "The last spout sputters over %n's face and stops. They step out of the trough soaked and steamin', and leave wet footprints all the way down the lane."],
       ],

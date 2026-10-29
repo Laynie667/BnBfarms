@@ -279,7 +279,7 @@
   }
   function trapCardFor(mn){
     const r = rec(mn); if (!isSubject(mn)) return null;
-    const k = r.trapKinds || {}, all = Object.keys(TRAP_KINDS);
+    const k = r.trapKinds || {}, all = Object.keys(TRAP_KINDS).filter(x => k[x] || !SEASON_OF[x] || seasonOnFor(x));   // (out of season, the ones they haven't found yet don't count: 10y9m)
     return { total: r.trapN || 0, kinds: all.filter(x => k[x]).map(x => ({ kind: x, icon: TRAP_KINDS[x].icon, n: k[x] })), left: all.filter(x => !k[x]).length,
              eggs: (prodOf(mn).offspring || {}).eggs || 0, paused: !!r.trapsOff, eager: !!r.trapEager, danger: dangerX(mn).on, corr: corruptionOf(mn), under: underOf(mn), rank: SUBJECT_RANKS[rankOfSubject(mn)].name, nextRank: (SUBJECT_RANKS[rankOfSubject(mn) + 1] || {}).at || 0, hunt: huntOn() ? { until: L.hunt.until, goal: L.hunt.goal } : null };
   }

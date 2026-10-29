@@ -10,8 +10,18 @@ import { h, card, title, muted, btn, chip, bar, toggle } from "../dom.js";
 function modsFor(ctx, view) {
   const mods = ctx.s.mods || {};
   return Object.entries(mods).filter(([, m]) => m && typeof m === "object" && (!Array.isArray(m.views) || m.views.includes(view)) && Array.isArray(m.cards))
-    .map(([name, m]) => [name, Object.assign({}, m, { cards: m.cards.filter((c) => c && (view === "staff" ? true : !c.staff)) })])
+    .map(([name, m]) => [name, Object.assign({}, m, { cards: m.cards.filter((c) => c && (view === "staff" ? true : !c.staff && !c.me)) })])
     .filter(([, m]) => m.cards.length);
+}
+// me: true cards (barn life's food, water and grooming) go on the Livestock panel's Me tab instead (Laynie, Oct 27:
+// "can you put the barnlife stats on the livestock panels me tab?")
+export function meCards(ctx) {
+  const out = [];
+  for (const [name, m] of Object.entries(ctx.s.mods || {})) {
+    if (!m || typeof m !== "object" || !Array.isArray(m.cards)) continue;
+    m.cards.forEach((c, i) => { if (c && c.me && !c.staff) out.push(drawCard(ctx, name, c, i)); });
+  }
+  return out;
 }
 
 function drawCard(ctx, name, c, i) {

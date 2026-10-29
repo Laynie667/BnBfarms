@@ -45,7 +45,7 @@ const LOOK = { v: 1, on: true, cup: 15, saved: "2026-10-14T22:00:00Z", breast: {
     n = sent.length; W.__farmLookTick(); await wait(400);
     const bc = farmMsgs(n).find((m) => m.Dictionary.type === "bodyFarm");
     ok(L().drawnFarm.body.cup === 17 && L().drawnFarm.at > at0, "Laynie changes it on the bot: the farm's look changes");
-    ok(bc && !bc.Target && bc.Dictionary.body.cup === 17, "...and every Companion in the room is told");
+    ok(!bc, "...but it isn't sent round the room any more (built into the Companion since Oct 26)");
     const sd = W.__stateFor(500).drawn;
     ok(sd && sd.cup === 3 && sd.belly === 0, "a player's panel says their cup as the farm counts it and their belly (" + JSON.stringify(sd) + ")");
     const errs = warns.filter((w) => /farm look|TypeError|ReferenceError/i.test(w)); ok(!errs.length, "no errors in the bot " + errs.join(" | ").slice(0, 200));
@@ -65,33 +65,39 @@ const LOOK = { v: 1, on: true, cup: 15, saved: "2026-10-14T22:00:00Z", breast: {
     await wait(3500);
     const bot = (d) => w.ChatRoomMessage({ Sender: 260239, Type: "Hidden", Content: "FarmhandMsg", Dictionary: Object.assign({ v: 2 }, d) });
     const mine = (n, type) => sent.slice(n).map((s) => s[1]).filter((m) => m && m.Content === "FarmhandMsg" && m.Dictionary.type === type);
-    let n = sent.length; bot({ type: "welcome", ver: "0.30.2", name: "Moo", proto: 2, look: 1111 }); await wait(300);
-    const ask = mine(n, "bodyFarmAsk")[0];
-    ok(ask && ask.Target === 260239 && ask.Dictionary.at === 0, "told the farm has a look it hasn't got: it asks for it");
-    n = sent.length; bot({ type: "bodyFarm", at: 1111, body: Object.assign({}, LOOK, { on: undefined, saved: undefined }) }); await wait(300);
-    const kept = JSON.parse(w.localStorage.getItem("farmhand-drawn-body-farm") || "null");
-    ok(kept && kept.at === 1111 && kept.body.cup === 15, "it keeps the farm's look");
-    const told = mine(n, "body")[0];
-    ok(told && told.Dictionary.on && told.Dictionary.body.cup === 15 && told.Dictionary.body.breast.full === 12, "...draws with it, and tells the room so");
-    ok(told && !(told.Dictionary.body.belly.std && told.Dictionary.body.belly.std.on), "...with no belly till they switch theirs on");
-    n = sent.length; bot({ type: "welcome", ver: "0.30.2", name: "Moo", proto: 2, look: 1111 }); await wait(300);
-    ok(!mine(n, "bodyFarmAsk").length, "a welcome with the look it has: no asking again");
-    w.ChatRoomMessage({ Sender: 777, Type: "Hidden", Content: "FarmhandMsg", Dictionary: { v: 2, type: "bodyFarm", at: 2222, body: { cup: 3 } } }); await wait(200);
-    ok(JSON.parse(w.localStorage.getItem("farmhand-drawn-body-farm")).at === 1111, "a farm look from anybody but the farm girl is ignored");
-    // her size follows the farm (Laynie: "the belly sizes in game need to automatically adjust", "same for tit sizes and growth")
+    // Oct 26: the farm's look is built in. Nothin' is asked for, and only the cup and belly go round the room
+    const FL = JSON.parse(fs.readFileSync(path.join(__dirname, "../shared/farm-look.json"), "utf8"));
+    let n = sent.length; bot({ type: "welcome", ver: "0.50.1", name: "Moo", proto: 2, look: 1111 }); await wait(300);
+    ok(!mine(n, "bodyFarmAsk").length, "the farm's look is built in: it never asks the bot for it");
     const STATE = (drawn) => ({ name: "Moo", onBooks: true, roles: ["LIVESTOCK"], tier: "", species: "cow", gender: "female", staff: false, herdmaster: false, proprietor: false, mandated: false, onDuty: true, onCall: false, keys: [], switches: {}, drawn });
     n = sent.length; bot({ type: "state", state: STATE({ cup: 14, belly: 2 }) }); await wait(300);
     let t2 = mine(n, "body").pop();
-    ok(t2 && t2.Dictionary.body.cup === 14, "the farm has grown her to an L: she's drawn an L");
-    ok(t2 && t2.Dictionary.body.belly.std && t2.Dictionary.body.belly.std.on && t2.Dictionary.body.belly.std.rx === Math.round(90 * 70 / 92), "...with a middling belly while she's that full: the farm look's belly, in proportion (" + JSON.stringify(t2 && t2.Dictionary.body.belly.std) + ")");
-    n = sent.length; bot({ type: "state", state: STATE({ cup: 16, belly: 4 }) }); await wait(300);
-    t2 = mine(n, "body").pop();
-    ok(t2 && t2.Dictionary.body.cup === 16 && t2.Dictionary.body.belly.std.rx > 100, "she grows, and so does her belly");
+    ok(t2 && t2.Dictionary.on && t2.Dictionary.farm === FL.id && t2.Dictionary.cup === 14 && t2.Dictionary.bs === 2 && !t2.Dictionary.body, "the farm grows her: the room hears only her cup and belly, not the whole look (" + JSON.stringify(t2 && t2.Dictionary) + ")");
+    ok(t2 && JSON.stringify(t2.Dictionary).length < 200, "...a tiny message (" + (t2 ? JSON.stringify(t2.Dictionary).length : 0) + " characters)");
     n = sent.length; bot({ type: "state", state: STATE({ cup: 16, belly: 0 }) }); await wait(300);
     t2 = mine(n, "body").pop();
-    ok(t2 && !t2.Dictionary.body.belly.std.on, "emptied out: the belly goes");
+    ok(t2 && t2.Dictionary.cup === 16 && t2.Dictionary.bs === 0, "emptied out: the belly goes");
     n = sent.length; bot({ type: "state", state: STATE({ cup: 16, belly: 0 }) }); await wait(300);
     ok(!mine(n, "body").length, "the same size again: nothing new said");
+    n = sent.length; bot({ type: "bodyFarm", at: 3333, body: { cup: 3 } }); await wait(300);
+    ok(!mine(n, "body").length, "an old bot still sendin' a look: ignored, the built-in one stays");
+    // somebody else's Companion tells us their cup and belly: drawn with our own copy of the look, once
+    n = sent.length; w.ChatRoomMessage({ Sender: 777, Type: "Hidden", Content: "FarmhandMsg", Dictionary: { v: 2, type: "body", on: true, farm: FL.id, cup: 10, bm: "farm", bs: 1 } }); await wait(200);
+    ok(!sent.slice(n).some((s) => s[1] && s[1].Content === "FarmhandMsg" && /bodyAsk|body/.test(s[1].Dictionary.type)), "hearing somebody's size says nothin' back");
+  }
+  // ── the bot's own account: draws nobody and says nothin' about bodies ──
+  {
+    const { JSDOM } = require("jsdom");
+    const dom = new JSDOM("<!doctype html><html><head></head><body></body></html>", { runScripts: "outside-only", url: "https://bondageprojects.elementfx.com/" });
+    const w = dom.window, sent = [];
+    w.TextEncoder = TextEncoder; w.TextDecoder = TextDecoder;
+    w.CurrentScreen = "ChatRoom"; w.Player = { MemberNumber: 260239, Appearance: [] }; w.ChatRoomCharacter = [{ MemberNumber: 260239 }];
+    w.ServerSend = (ev, d) => sent.push([ev, d]); w.ServerPlayerIsInChatRoom = () => true;
+    w.ChatRoomMessage = () => {}; w.CommandCombine = () => {};
+    w.localStorage.setItem("farmhand-drawn-body", JSON.stringify({ v: 1, on: true, cup: 12 }));
+    w.eval(fs.readFileSync(path.join(__dirname, "../dist/farmhand-companion.user.js"), "utf8"));
+    await wait(3500);
+    ok(!sent.some((s) => s[1] && s[1].Content === "FarmhandMsg" && ["body", "bodyAsk"].includes(s[1].Dictionary && s[1].Dictionary.type)), "the bot's own Companion never sends or asks for drawn bodies");
   }
   out(fails ? "\n❌ " + fails + " failed" : "\n✅ all good"); process.exit(fails ? 1 : 0);
 })();

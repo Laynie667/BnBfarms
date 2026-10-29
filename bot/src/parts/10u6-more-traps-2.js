@@ -99,7 +99,7 @@
       ],
       end: [
         "The carousel grinds to a halt at last and drops %n off at the gate, wobbly, with %ml milked out of them and somethin' sloshin' in their belly.",
-        "The wheel stops. The straps let go. %n stumbles off the carousel milked down by %ml and dizzy as a calf.",
+        "The wheel stops. The straps let go. %n stumbles off the carousel milked down by %ml and dizzy as a top.",
         "Last lap done: %ml in the jars, and %n tipped off the platform onto the straw, spinnin' still.",
       ],
     },

@@ -90,6 +90,9 @@ const beepsTo=(k,mn)=>sent.slice(k).filter(([e,d])=>e==='AccountBeep'&&d.MemberN
   const st=W.__stateFor(500); ok(st.mods && st.mods['glory-stalls'] && st.mods['glory-stalls'].cards.length>=1, 'the Companion state carries the add-on cards');
   const errs=warns.filter(w=>/add-on/.test(w)); ok(!errs.length, 'no add-on errors logged '+errs.join(' | '));
   // live: face and back shots counted as loads inside. A pull-out is a splatter: no hole, nothing held, cum-covered
+  // (Moo steps off the stall first: with the squeezed timers a simulated scene could otherwise finish in her mouth
+  // during the wait below, and that's the only way this check ever came out false)
+  chars[2].MapData.Pos={X:9,Y:9}; await wait(500);
   { const me=d().people['500'], mouthBefore=me.holes.mouth||0, heldBefore=L().people[500].prod.held.mouth||0, totalBefore=me.total;
     const kS=sent.length;
     W.__gloryFinish('1', 500, 'mouth', 25, false, {type:'human',size:'thick'});

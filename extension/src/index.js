@@ -14,17 +14,18 @@ import { speciesKeyOf } from "../../shared/species.js";
 import { BOT_MEMBER, HELLO_EVERY_MS } from "./config.js";
 import { Panel } from "./panel.js";
 import { captureOutfit, wearOutfit, changeBack, hasBackup } from "./outfits.js";
-import { markBody, washMarks, stripMe, dressMe, syncFarmGear, syncShape, scaleTrialCleanup } from "./marks.js";
+import { markBody, washMarks, rinseMarks, stripMe, dressMe, syncFarmGear, syncShape, scaleTrialCleanup } from "./marks.js";
 import { initBelly } from "./belly.js";
 import { initDrawnBody, onBodyMsg, onFarmLook, farmLookWanted, drawnBodyFarmState } from "./drawnbody.js";
-import { initMesses, onMessMsg, messFromMark, messWash, messBrand } from "./messes.js";
+import { initMesses, onMessMsg, messFromMark, messWash, messRinse, messBrand } from "./messes.js";
 import { initMemlog } from "./memlog.js";
+import { initBotScreen } from "./botscreen.js";
 import { initTrim } from "./trimpics.js";
 import { initLocalSave } from "./localsave.js";
 import { initChatlog, logRow } from "./chatlog.js";
 import { initSettings } from "./settings.js";
 import { nurseryWear, nurseryOff, nurseryWorn, nurseryChange, nurseryPowderTick, nurseryStatsNow } from "./nursery.js";
-import { initCues, cueOff, lead, face, sound, trance, drawMarkers, arouse, vibe, initBody } from "./cues.js";
+import { initCues, cueOff, lead, face, sound, trance, drawMarkers, arouse, vibe, initBody, reinsState } from "./cues.js";
 
 // the SDK ships as an old-style module; this digs the real thing out either way
 const bcModSdk = sdkModule.default || sdkModule;
@@ -92,10 +93,27 @@ function toBot(type, data) {
   window.ServerSend("ChatRoomChat", makeMsg(type, data, BOT_MEMBER));
 }
 
-function hello() {
+// again: the panel I have doesn't match what the farm girl's patchin' (or I have none): ask for a whole one
+function hello(again) {
   st.lastHello = Date.now();
+  if (again) st.seq = 0;
   // relay: whether this Companion posts farm emotes about you as your own (Toggles, on unless you switch it off)
-  toBot("hello", { ver: VERSION, relay: !(st.panel && st.panel.prefs.noRelay), off: st.panel ? cueOff() : {} });
+  // seq and sh: which panel and which store I hold, so she doesn't send them again if they're still right (Oct 27)
+  toBot("hello", { ver: VERSION, relay: !(st.panel && st.panel.prefs.noRelay), off: st.panel ? cueOff() : {}, seq: st.seq || 0, sh: st.storeH || "", w: !!st.welcomed, again: !!again });
+}
+// a patch that doesn't fit: ask once, not once per patch while the whole panel is on its way
+function askWhole() {
+  if (Date.now() - (st.wholeAt || 0) < 8000) return;
+  st.wholeAt = Date.now();
+  hello(true);
+}
+// the store's shelf, kept on this computer: after a reload she only sends it if it changed (11 KB saved each time)
+const STORE_KEY = "fhc-store";
+function loadStore() {
+  try { const o = JSON.parse(window.localStorage.getItem(STORE_KEY) || "null"); if (o && Array.isArray(o.items) && typeof o.h === "string") { st.store = o.items; st.storeH = o.h; } } catch (e) { /* none saved */ }
+}
+function keepStore() {
+  try { if (st.storeH) window.localStorage.setItem(STORE_KEY, JSON.stringify({ h: st.storeH, items: st.store })); } catch (e) { /* full or blocked: she'll send it again */ }
 }
 
 // emojis break in BC's chat, and round brackets make a line out-of-character (seen map-wide): chat lines get neither
@@ -194,7 +212,7 @@ function onFarmMsg(m) {
   if (m.type === "body" || m.type === "bodyAsk") { try { onBodyMsg(m); } catch (e) { console.warn("[Farmhand Companion] drawn body:", e); } return; }   // another Companion's drawn body (drawnbody.js)
   if (m.type === "mess" || m.type === "messAsk") { try { onMessMsg(m); } catch (e) { console.warn("[Farmhand Companion] messes:", e); } return; }   // another Companion's messes (messes.js)
   if (m.from !== BOT_MEMBER) return;     // only the farm bot gets to talk to the panel
-  if (m.type !== "ping" && m.type !== "state") st.lastHeard = Date.now();
+  if (!/^(ping|state|stateDiff|store|roomlines)$/.test(m.type)) st.lastHeard = Date.now();   // (an answer to somethin' you sent)
   switch (m.type) {
     case "ping": hello(); break;
     case "welcome":
@@ -215,8 +233,26 @@ function onFarmMsg(m) {
     case "bodyFarm":
       try { if (!onBotAccount()) onFarmLook(m); } catch (e) { console.warn("[Farmhand Companion] farm look:", e); }   // (on the bot's own account, its settings ARE the farm's look)
       break;
+    case "store":   // the store's shelf, on its own and only when it changes (Oct 26: it was most of every panel update)
+      if (Array.isArray(m.items)) {
+        st.store = m.items; st.storeH = typeof m.h === "string" ? m.h : ""; keepStore();
+        if (st.lastState) { st.lastState = Object.assign({}, st.lastState, { store: st.store }); st.panel.setState(st.lastState); }
+      }
+      break;
+    case "stateDiff":   // only the parts of your panel that changed (Oct 26)
+      // base: the panel this patch goes on. Missed one (or have none)? Ask for a whole panel instead (Oct 27)
+      if (st.lastState && m.set && typeof m.set === "object" && (m.base == null || m.base === st.seq)) {
+        const s = Object.assign({}, st.lastState, m.set); for (const k of (Array.isArray(m.del) ? m.del : [])) delete s[k];
+        if (st.store) s.store = st.store;
+        if (m.seq != null) st.seq = m.seq;
+        st.lastState = s; st.panel.setState(s); parasiteSync(); try { if ("drawn" in m.set) drawnBodyFarmState(s.drawn); } catch (e) { /* fine */ }
+        if ("brand" in m.set || (m.del || []).includes("brand")) { try { messBrand(st.panel.prefs.brandOff ? null : s.brand); } catch (e) { console.warn("[Farmhand Companion] brand:", e); } }   // the farm's brand (messes.js)
+        if ("reins" in m.set || (m.del || []).includes("reins")) { try { reinsState(s.reins); } catch (e) { console.warn("[Farmhand Companion] reins:", e); } }   // on somebody's reins (cues.js)
+      } else askWhole();
+      break;
     case "state":
-      if (m.state && typeof m.state === "object") { st.gotState = true; st.panel.setState(m.state); parasiteSync(); try { messBrand(st.panel.prefs.brandOff ? null : m.state.brand); } catch (e) { console.warn("[Farmhand Companion] brand:", e); } try { drawnBodyFarmState(m.state.drawn); } catch (e) { console.warn("[Farmhand Companion] drawn body size:", e); } }
+      if (m.state && typeof m.state === "object" && !("store" in m.state) && st.store) m.state.store = st.store;
+      if (m.state && typeof m.state === "object") { st.seq = m.seq != null ? m.seq : 0; st.lastState = m.state; st.gotState = true; st.panel.setState(m.state); parasiteSync(); try { messBrand(st.panel.prefs.brandOff ? null : m.state.brand); } catch (e) { console.warn("[Farmhand Companion] brand:", e); } try { drawnBodyFarmState(m.state.drawn); } catch (e) { console.warn("[Farmhand Companion] drawn body size:", e); } try { reinsState(m.state.reins); } catch (e) { console.warn("[Farmhand Companion] reins:", e); } }
       break;
     case "reply":
     case "notice": {
@@ -258,6 +294,7 @@ function onFarmMsg(m) {
         // the farm's own messes first, on their own: if takin' the game's splatters off failed on somebody's outfit, the
         // messes stayed on and ?wash "wouldn't let me clean all the messes on me" (Laynie, Oct 22)
         if (m.wash) { try { messWash(); } catch (e) { console.warn("[Farmhand Companion] wash:", e); } try { r = washMarks(); } catch (e) { console.warn("[Farmhand Companion] wash splatters:", e); r = { ok: true, did: ["mess"], why: e.message }; } }
+        else if (m.rinse) { let d = []; try { if (messRinse()) d.push("mess"); } catch (e) { console.warn("[Farmhand Companion] rinse:", e); } try { d = d.concat(rinseMarks().did || []); } catch (e) { console.warn("[Farmhand Companion] rinse splatters:", e); } r = { ok: true, did: d }; }
         else if (m.strip) r = stripMe(prefs);
         else if (m.dress) r = dressMe();
         else {
@@ -291,6 +328,9 @@ function onFarmMsg(m) {
       if (!toChat("[Voice] " + line, "#a67fd4", true)) st.panel.add("[Voice] " + line, "notice");
       break;
     }
+    case "roomlines":   // the same line for several people at once, sent to the whole room once: only the ones it names show it (Oct 27)
+      if (!Array.isArray(m.to) || !window.Player || !m.to.includes(window.Player.MemberNumber)) break;
+    // falls through
     case "roomline": {
       // a farm line said from a speaker spot near you: shown in your chat like any emote or chat line
       const line = String(m.text || "").slice(0, 1200);
@@ -390,6 +430,7 @@ function pickClick() {
 }
 
 function start() {
+  loadStore();
   st.panel = new Panel(sendCommand, api);
   initSettings(st.panel);   // Preferences → Extensions → Farmhand Companion (settings.js)
   // switched off on that page: nothin' else starts (the page stays, to switch it back on)
@@ -401,6 +442,7 @@ function start() {
   initBelly(mod);  // the drawn-belly test (belly.js)
   initDrawnBody(mod);  // the drawn body from the outfit studio, on your own character (drawnbody.js)
   initMesses(mod);     // the farm's own messes on everybody (messes.js)
+  initBotScreen(mod, () => (st.panel && st.panel.prefs) || {});   // on the bot's own account the room isn't drawn (botscreen.js)
   // the record: what lands in your chat, your beeps and your commands, to the farm girl by the hour (chatlog.js).
   // Always for the proprietors; anybody else only with Toggles → "Send a record..." on.
   initChatlog(mod, { on: () => !!(st.panel && st.panel.s && st.panel.s.logMust) || !!(st.panel && st.panel.prefs.chatlog), botMn: BOT_MEMBER, botHere });

@@ -39,7 +39,7 @@ const said=n=>sent.slice(n).filter(([e,d])=>e==='ChatRoomChat'&&d&&typeof d.Cont
   penetrate(195939, 221397, 'ItemVulva'); await wait(1500);
   orgasm(195939); await wait(3500);
   await wait(4000); const s=said(n);
-  ok(/N195939 empties .* into N221397's vulva/.test(s), "the stud's real orgasm while inside fills them ("+(s.match(/N195939 empties[^|]*/)||[''])[0].slice(0,90)+")");
+  ok(/N195939 empties .* into N221397's pussy/.test(s), "the stud's real orgasm while inside fills them ("+(s.match(/N195939 empties[^|]*/)||[''])[0].slice(0,90)+")");
   ok(!/a little dribble/.test(s), "a brand-new stud comes in full, not with a dribble");
   ok(!/wasted seed/.test(s), "the load isn't counted as wasted");
   ok(splats(n,221397).includes('ChatOther-ItemVulva-LSCG_Splat'), 'an LSCG splatter lands on the hole it went in');
@@ -48,7 +48,7 @@ const said=n=>sent.slice(n).filter(([e,d])=>e==='ChatRoomChat'&&d&&typeof d.Cont
   n=sent.length;
   penetrate(600, 500, 'ItemButt'); await wait(1500);
   orgasm(600); await wait(7500);
-  ok(/N600 empties .* into N500's butt/.test(said(n)), 'a second stud fills Moo');
+  ok(/N600 empties .* into N500's ass/.test(said(n)), 'a second stud fills Moo');
   ok(splats(n,500).length===0, "no splatter for someone whose LSCG has them off");
   // the Companion can say it too
   W.__st().lscgSeen.delete(500); L().people[500].lscgSplat=false;

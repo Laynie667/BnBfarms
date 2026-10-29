@@ -53,7 +53,7 @@
       "%n puts a hand on a shiny gold rail to steady themselves. The rail is not a rail. It's a long smear of the stuff, and now their hand is part of it.",
       "Somebody spilled honey here. That's what %n thinks right up until they kneel in it."]);
     more(M.glue.beats[1], [
-      "Every twist makes it worse. %n ends up bent over in it, palms and knees stuck fast, presentin' to the whole lane like a heifer at the fence.",
+      "Every twist makes it worse. %n ends up bent over in it, palms and knees stuck fast, presentin' to the whole lane like stock at the fence.",
       "It creeps. Slow as syrup, it climbs %n's calves and pulls them down onto their hands, and holds, and doesn't let go."]);
     more(M.glue.beats[2], [
       "Somebody finally comes by with a bucket of warm water. %n is soaked loose, inch by inch, and squelches off with gold strings swingin' off their knees.",
@@ -125,7 +125,7 @@
       "%n reaches into a trough for a drink. The water's thick, warm, and green, and it takes hold of their wrist and climbs.",
       "Somethin' glossy drips off the eaves onto %n's neck and doesn't run off. It spreads."]);
     more(M.slime.beats[1], [
-      "It eats %n's clothes the way a calf eats a carrot, slow, slurpy and thorough, and the bare skin it leaves behind it coats in shine.",
+      "It eats %n's clothes the way a goat eats a carrot, slow, slurpy and thorough, and the bare skin it leaves behind it coats in shine.",
       "Every thread it touches dissolves. %n tries to hold their clothes together and ends up holdin' a handful of green and nothin' else."]);
     more(M.slime.beats[2], [
       "It finds every way into %n and takes all of them at once, pushin' in thick and cool, and goes warm the moment it's inside.",
@@ -260,7 +260,7 @@
       "%n steps on a scale by the sale ring. The scale has opinions. Up they go, onto the block, cuffed and turned to face the crowd."]);
     more(M.pricetag.beats[1], [
       "A stamp on a jointed arm thumps a big inky number onto %n's rump, then another on their belly for good measure.",
-      "A wet brush paints a price across %n's backside in red, the way you'd mark a ewe for the buyer."]);
+      "A wet brush paints a price across %n's backside in red, the way you'd mark stock for the buyer."]);
     more(M.pricetag.call, [
       "Fresh on the block: one %n, well-handled and eager. %x ribbons and they're yours for the day. Who's buyin'?",
       "Here's a bargain for the discernin' farmer: %n, good teeth, good holes, %x ribbons. Don't be shy!"]);

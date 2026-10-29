@@ -244,8 +244,8 @@
     saveLedger(); audit(by || CFG.BOT_MEMBER, "POTION", mn+" "+id+(how ? " ("+how+")" : ""));
     tell(mn, "🧪 "+P.name+(how ? " ("+how+")" : "")+": "+bodyWords(mn, P.drink)+" "+P.desc+(was ? (stacked ? " That's bottle number "+f.x+" on top of the last: it hits harder and runs longer." : " You're as deep in that one as it goes, so it just runs longer.") : "")+" Your safeword pours it out.");
     // (breathed in off a trap's gas or spray, it wasn't drunk: the trap already told the room, and "drinks the Needy
-    // Nectar" after a cloud of pink gas made no sense. Laynie, Oct 20)
-    if (onMap(mn) && !/^(gas|spray|from a trap)$/.test(how || "")) emote("🧪 "+tFill(pickFor(mn, "potion-seen:"+P.id, [P.seen].concat(POTION_SEEN[P.id] || [])), mn), mn);
+    // Nectar" after a cloud of pink gas made no sense. Laynie, Oct 20. The same for a Halloween candy or the witch's brew)
+    if (onMap(mn) && !/^(gas|spray|from a trap)$/.test(how || "") && !/candy|brew|treat door/.test(how || "")) emote("🧪 "+tFill(pickFor(mn, "potion-seen:"+P.id, [P.seen].concat(POTION_SEEN[P.id] || [])), mn), mn);
     syncCompanions(true);
     return true;
   }
@@ -268,7 +268,7 @@
       const kinds = Object.keys(CFG.SPECIES).filter(k => k !== "default" && k !== speciesKey(mn));
       const to = kinds[Math.floor(Math.random()*kinds.length)];
       f.was = r.species; f.to = (SHOWN_SPECIES[to] || to); r.species = f.to;
-      later(() => { try { wrongBarnOutfit(mn, f.to, P.mins); } catch(e){ warn("wrong barn outfit:", e); } }, 1500);   // and its clothes, for the hour (10un-outfit-wheel.js)
+      later(() => { try { wrongBarnOutfit(mn, f.to, P.mins, f.by); } catch(e){ warn("wrong barn outfit:", e); } }, 1500);   // and its clothes, for the hour (10un-outfit-wheel.js)
     }
     if (P.id === "bigbritches" || P.id === "shrink"){
       const part = potionPart(mn);

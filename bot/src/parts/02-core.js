@@ -21,7 +21,7 @@
   const ALL_TIERS = ["bronze","silver","gold"];
 
   const state = {
-    companions:new Map(), lastPing:0,
+    companions:new Map(), lastPing:0, syncSeq:Date.now(),   // (panel numbers start at the clock, so they never repeat after a restart)
     booted:false, loginTried:0, lastLoginAttempt:0, loginSent:false, lastRoomAttempt:0,
     greeted:new Map(), cooldowns:new Map(), queue:[], urgent:[], sending:false, badge:null,
     lastSnapshot:0,

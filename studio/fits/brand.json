@@ -1,0 +1,69 @@
+{
+ "v": 1,
+ "saved": "2026-10-29T07:36:51.333Z",
+ "art": "mark",
+ "look": "seared",
+ "size": 46,
+ "places": {
+  "hipR": {
+   "size": 46,
+   "angle": 0,
+   "dx": -3,
+   "dy": 30
+  },
+  "hipL": {
+   "size": 46,
+   "angle": 0,
+   "dx": 1,
+   "dy": 39
+  },
+  "thighL": {
+   "size": 46,
+   "angle": 0,
+   "dx": -10,
+   "dy": -35
+  },
+  "thighR": {
+   "size": 46,
+   "angle": 0,
+   "dx": 13,
+   "dy": -44
+  },
+  "mons": {
+   "size": 46,
+   "angle": 0,
+   "dx": 0,
+   "dy": -1
+  },
+  "tummy": {
+   "size": 46,
+   "angle": 0,
+   "dx": 0,
+   "dy": -65
+  },
+  "chestL": {
+   "size": 46,
+   "angle": 0,
+   "dx": 0,
+   "dy": 31
+  },
+  "chestR": {
+   "size": 46,
+   "angle": 0,
+   "dx": 0,
+   "dy": 18
+  },
+  "shoulderL": {
+   "size": 46,
+   "angle": 0,
+   "dx": 0,
+   "dy": 0
+  },
+  "shoulderR": {
+   "size": 46,
+   "angle": 0,
+   "dx": 0,
+   "dy": 0
+  }
+ }
+}

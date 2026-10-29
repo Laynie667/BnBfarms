@@ -68,17 +68,24 @@
     log("Ledger v5 loaded. Registered: " + Object.keys(L.people).length);
   }
 
-  let saveTimer = null;
+  // LAG (Oct 27): the books are big, and a busy farm changed them every second or two, so the whole of them was turned
+  // into text and written twice (Tampermonkey and the browser's database) every 1.5 s, on the bot's own PC. Now a burst of
+  // changes still saves once, but never sooner than 5 s after the last save; the database copy (the spare) is
+  // written at most once a minute; and closin' the tab saves whatever's waitin'.
+  let saveTimer = null, savedAt = 0;
   function saveLedger(){
     if (state.dormant || STORE.restoring) return;   // a quiet copy (wrong account, or another copy in charge) never writes the books, nor one puttin' a backup back
     if (saveTimer) return;
-    saveTimer = later(()=>{
-      saveTimer = null;
-      if (!officeCheck() || STORE.restoring) return;   // checked again at the moment of writing: a copy that just opened never saves over the one in charge
-      let json = ""; try { json = JSON.stringify(L); GM_setValue(LEDGER_KEY, json); } catch(e){ warn("save:",e); }
-      if (json) storeMirror(json);   // and into the browser's own database (03b-storage.js)
-    }, 1500);   // a burst of changes saves once (the ledger gets big)
+    saveTimer = later(writeLedger, Math.max(1500, savedAt + 5000 - Date.now()));   // a burst of changes saves once (the ledger gets big)
   }
+  function writeLedger(){
+    saveTimer = null;
+    if (state.dormant || !officeCheck() || STORE.restoring) return;   // checked again at the moment of writing: a copy that just opened never saves over the one in charge
+    savedAt = Date.now();
+    let json = ""; try { json = JSON.stringify(L); GM_setValue(LEDGER_KEY, json); } catch(e){ warn("save:",e); }
+    if (json) storeMirror(json);   // and into the browser's own database (03b-storage.js), once a minute at most
+  }
+  try { W.addEventListener("pagehide", () => { if (saveTimer) writeLedger(); }); } catch(e){}   // (a closed or reloaded tab keeps its last changes)
 
   function newRecord(mn){
     return { mn, name:"", roles:[], onDuty:true, forced:false,

@@ -9,7 +9,7 @@ export const GAIT = {
   deer: ["bounds", "springs", "darts"], pig: ["trots", "scurries", "hurtles"], pup: ["scrambles", "bounds", "tears"], dog: ["bounds", "tears", "races"],
   kitt: ["streaks", "darts", "pounces"], cat: ["streaks", "darts", "slinks"], goblin: ["scuttles", "scrambles", "cackles"], bunny: ["hops", "bounds", "zigzags"],
   rabbit: ["hops", "bounds", "zigzags"], fox: ["darts", "streaks", "bounds"], wolf: ["lopes", "races", "tears"], goat: ["clatters", "bounds", "skitters"],
-  sheep: ["trots", "bundles", "bounces"], rat: ["scurries", "scampers", "skitters"], default: ["runs", "dashes", "races"],
+  sheep: ["trots", "bundles", "bounces"], rat: ["scurries", "scampers", "skitters"], dragon: ["swoops", "lunges", "stalks"], default: ["runs", "dashes", "races"],
 };
 export const ENTER = {
   udder: [

@@ -79,7 +79,7 @@
 
   // the command they probably meant: a stray letter in front ("a-addons"), or one or two letters off ("adons")
   function nearestCommand(cmd, sender){
-    const pool = PUBLIC_CMDS.concat(isStaff(sender) ? STAFF_CMDS : [], [...ADDON_CMDS].filter(([, x]) => addonVisible(x.addon, sender)).map(([w]) => w));
+    const pool = PUBLIC_CMDS.filter(c => !NURSERY_CMDS.includes(c) || !nurseryHidden(sender)).concat(isStaff(sender) ? STAFF_CMDS : [], [...ADDON_CMDS].filter(([, x]) => addonVisible(x.addon, sender)).map(([w]) => w));   // (the nursery's words only for nursery folk)
     const strip = cmd.replace(/^[a-z][-.]/, "");
     if (strip !== cmd && pool.includes(strip)) return strip;
     if (cmd.length < 4) return null;
@@ -137,7 +137,7 @@
                        "stats","board","pedigree","breedable","fertile","mpreg","naturalheat","breed","cum","milkable","seedmilk","outfitwheel","dresswheel","wheeloutfit","futa","size","sizes","measure","penis","cock","rights","accept",
                        "freeuse","jarok","gender","outfit","outfits","uniform","hypno","tally","eggs","yes","no","wash","quota","praise","degrade",
                        "weather","feeding","curfew","beg","please","fair","enter","addons","addon",
-                       "ribbons","ribbon","store","buy","messes","ownoutfit","myoutfit","chest","gift","potions","potion","dares","dare","dared","bench","use","feedback","suggest","idea","bug","meh","more","today","subject","subjects","traps","trap","watersports","parasite","symbiote","symbiotes","struggle","free","goad","hunt","lay","gather","pack","watersport","parasites","eager","quiet","tend","brood","bet","cleanse","corruption","gauntlet","lend","bid","route","mysterybox","suit","whistle","send","dose","herdtraps","sit","broody","album","holes","vat","stalldial","bringin","bedrest","callme","nevercall","intensity","keep","kept"];
+                       "ribbons","ribbon","store","buy","messes","ownoutfit","myoutfit","chest","gift","potions","potion","dares","dare","dared","bench","use","feedback","suggest","idea","bug","meh","more","today","subject","subjects","traps","trap","watersports","parasite","symbiote","symbiotes","struggle","free","goad","hunt","lay","gather","pack","watersport","parasites","eager","quiet","tend","brood","bet","cleanse","corruption","gauntlet","lend","bid","route","mysterybox","suit","whistle","send","dose","herdtraps","sit","broody","album","holes","vat","stalldial","bringin","bedrest","callme","nevercall","intensity","keep","kept","services","service","coax","nursery","little","care"];
   const STAFF_CMDS  = ["queue","app","approve","deny","register","unregister","grant","revoke",
                        "claim","release","myherd","herdname","herdcall","herdsummon","turnout","letup","goldkey",
                        "pasture","onduty","cover","staffadd","staffremove",
@@ -152,7 +152,7 @@
 
   const SAFETY_CMDS = ["safe","safeword","red","stuck"];
   // staff commands that stock can also use on other stock, with a yes from them first (15-commands.js)
-  const STOCK_PLAY = ["milk","edge"];
+  const STOCK_PLAY = ["milk","edge","drain"];   // (drain: Oct 29, so nobody waits on staff to be emptied)
   function stockPlayOk(by, t){
     const r = rec(t); if (r && r.freeuse) return true;
     state.playOk = state.playOk || new Map();

@@ -11,6 +11,8 @@
      redraw   () → draw the character again (once a picture has loaded, or once what's worn on the chest is known)
      picture  (canvas) → { src, dx, dy }, optional: how a drawing of ours is handed to the game. Without it the drawing
               itself is handed over (the game's newest code takes that; the live game wants a picture's name).
+     overBreast (C, breasts canvas, x, y) → { cv, x, y } or null, optional: somethin' to lay over the drawn breasts once
+              they're down (the Companion's BCR marks: extension/src/bcr.js)
    It needs window.FarmBelly (the belly drawing) and window.FarmBreasts (breasts-drawing.js) loaded first.
    draw(C, cb, game) is the step itself: game(cb) is the game's own drawing, with whatever brushes it's handed.
 */
@@ -500,6 +502,8 @@ window.FarmBodyEngine = function (host) {
                 bc = BREAST.flat;
               }
               put("drawImage", bc, rx - bc.ax, ry - bc.ay, {}); if (typeof real.drawImageBlink === "function") put("drawImageBlink", bc, rx - bc.ax, ry - bc.ay, {});
+              // marks another mod keeps on the chest (BCR's welts and bruises), moved onto the drawn breasts
+              if (typeof host.overBreast === "function") { try { const o = host.overBreast(C, bc, rx - bc.ax, ry - bc.ay); if (o && o.cv) { put("drawImage", o.cv, o.x, o.y, {}); if (typeof real.drawImageBlink === "function") put("drawImageBlink", o.cv, o.x, o.y, {}); } } catch (e) { console.warn("[body] over the breasts:", e); } }
               ctx.breast = { fit: FarmBreasts.fitOf(S3, FarmBelly.bellyPose(upper[2]), [bc.nips[1][0] + br.nipX, bc.nips[1][1] + br.nipY]), held: isHeld, upperSrc: upper[2], ux: upper[0], pose: bpose, ground: bpose === "AllFours" ? ground : Infinity, S: S3, rx, ry, uy: upper[1], mask: bc.mask, mx: rx - bc.ax, my: ry - bc.ay, nips: bc.nips.map((p, i) => [rx + p[0] + (i ? 1 : -1) * br.nipX, ry + p[1] + br.nipY]), k: FarmBreasts.shape(br.cup, br).k, kN: (1 + 0.45 * FarmBreasts.shape(br.cup, br).k) * br.nip, sig: key + "|" + Math.round(rx) + "," + Math.round(ry) + "|" + [br.nip, br.nipX, br.nipY].join(","), mid: upper[0] + 250 };
               // (a pose where the game paints the nipples into the body itself, all fours, gives us none to move: ours then)
               if (!held.length) {

@@ -92,6 +92,70 @@
   // step into the game's drawing of our character
   function hookBelly() { const game = CommonDrawAppearanceBuild; CommonDrawAppearanceBuild = function (C, cb) { fresh = false; const out = E.draw(C, cb, (cb2) => game(C, cb2)); if (fresh) setTimeout(() => bellyDraw(), 250); return out; }; }   // (a new picture takes a moment to load: drawn again then)
 
+  // ── the farm's brand (Laynie, Oct 29: "add our logo as a brand for our livestock, with studio support") ──
+  // Placed and sized here for each spot on the body; Save puts it in studio/fits/brand.json, the Companion on the bot's
+  // account takes it with the rest ("Get my studio's settings"), and from there it's the farm's look for every brand.
+  // Here it's drawn last, over everything, so it can be seen while placin' it; in the game it goes on the skin, under clothes.
+  const BRAND = { show: true, art: "mark", look: "seared", size: 46, place: "hipR", places: {} };
+  const brandNow = () => { const p = BRAND.places[BRAND.place] || {}; return { art: BRAND.art, look: BRAND.look, place: BRAND.place, size: p.size || BRAND.size, angle: p.angle || 0, dx: p.dx || 0, dy: p.dy || 0 }; };
+  function hookBrand() {
+    const prev = CommonDrawAppearanceBuild, BODY = /\/(BodyUpper|BodyLower)\//;
+    CommonDrawAppearanceBuild = function (C, cb) {
+      if (C !== S.C || !BRAND.show || !window.FarmBrand || !cb || typeof cb.drawImage !== "function") return prev(C, cb);
+      const body = [], wrap = Object.assign({}, cb);
+      for (const n of ["drawImage", "drawImageColorize"]) if (typeof cb[n] === "function") wrap[n] = (src, x, y, ...r) => { if (typeof src === "string" && BODY.test(src) && !body.some((b) => b[0] === src)) body.push([src, x, y]); return cb[n](src, x, y, ...r); };
+      const out = prev(C, wrap);
+      try {
+        const over = window.CanvasUpperOverflow || 700, h = (C.Canvas && C.Canvas.height) || 1000 + over;
+        const up = body.find((b) => /\/BodyUpper\//.test(b[0])), ox = up ? up[1] : 0, oy = up ? up[2] - over : 0;
+        const mask = document.createElement("canvas"); mask.width = 500; mask.height = h; const mg = mask.getContext("2d"); let ok = true;
+        for (const [src, x, y] of body) { const im = typeof DrawGetImage === "function" ? DrawGetImage(src) : null; if (!im || !(im.naturalWidth || im.width)) { ok = false; break; } mg.drawImage(im, x, y); }
+        const c = document.createElement("canvas"); c.width = 500; c.height = h;
+        if (window.FarmBrand.paint(c.getContext("2d"), ok && body.length ? mask : null, brandNow(), ox, oy, over)) {
+          const p = window.__studioLive ? picture(c) : { src: c, dx: 0, dy: 0 };
+          if (p && p.src) cb.drawImage(p.src, p.dx, p.dy, {});
+        } else setTimeout(() => bellyDraw(), 300);   // (the logo takes a moment to load the first time)
+        if (!ok) setTimeout(() => bellyDraw(), 300);
+      } catch (e) { console.warn("[studio] brand:", e); }
+      return out;
+    };
+  }
+  function brandPanel() {
+    const box = $("div", { id: "fh-brand" });
+    const fill = () => {
+      const FB = window.FarmBrand; if (!FB) { box.replaceChildren($("p", { className: "note", textContent: "The brand drawing didn't load." })); return; }
+      const P = BRAND.places[BRAND.place] = BRAND.places[BRAND.place] || { size: BRAND.size, angle: 0, dx: 0, dy: 0 };
+      const pick = (list, cur, set) => list.map(([k, label]) => $("button", { type: "button", className: k === cur ? "on" : "", textContent: label, onclick: () => { set(k); fill(); bellyDraw(); } }));
+      box.replaceChildren(...[
+        $("p", { className: "note", textContent: "The B&B logo, seared on. Pick each spot and place it; every spot keeps its own size and nudge. Here it's drawn over everything so you can see it; in the game it sits on the skin, under clothes. ?brand <who> logo <place> puts it on somebody; ?brand all logo <place> on every livestock." }),
+        $("div", { className: "row" }, $("button", { type: "button", className: BRAND.show ? "on" : "", textContent: BRAND.show ? "Brand: showing" : "Brand: hidden", onclick: () => { BRAND.show = !BRAND.show; fill(); bellyDraw(); } })),
+        $("div", { className: "row" }, $("label", { textContent: "Where:" }), pick(Object.entries(FB.PLACES).map(([k, v]) => [k, v.label]), BRAND.place, (k) => { BRAND.place = k; })),
+        $("div", { className: "row" }, $("label", { textContent: "Look:" }), pick(Object.entries(FB.LOOKS), BRAND.look, (k) => { BRAND.look = k; })),
+        $("div", { className: "row" }, $("label", { textContent: "Art:" }), pick([["mark", "The BB and the bell"], ["full", "The whole logo"]], BRAND.art, (k) => { BRAND.art = k; })),
+        [["size", "Size (tall)", 16, 200, 1], ["angle", "Turn", -180, 180, 1], ["dx", "Left / right", -80, 80, 1], ["dy", "Up / down", -80, 80, 1]].map(([k, label, min, max, step]) => {
+          const val = $("span", { className: "fh-val", textContent: String(P[k]) });
+          return $("div", { className: "fh-slide" }, $("label", { textContent: label }), $("input", { type: "range", min, max, step, value: P[k], oninput: (e) => { P[k] = Number(e.target.value); if (k === "size") BRAND.size = P[k]; val.textContent = String(P[k]); bellyDraw(); } }), val);
+        }),
+        $("div", { className: "row" },
+          $("button", { type: "button", className: "go", textContent: "Save the brand", onclick: saveBrand }),
+          $("button", { type: "button", textContent: "Put the saved one back", onclick: () => loadBrand(true) }))].flat(Infinity));
+    };
+    BRAND.fill = fill; fill();
+    return box;
+  }
+  async function saveBrand() {
+    try { const r = await fetch("/__studio/fits/brand.json", { method: "POST", body: JSON.stringify({ v: 1, saved: new Date().toISOString(), art: BRAND.art, look: BRAND.look, size: BRAND.size, places: BRAND.places }, null, 1) }); if (!r.ok) throw new Error(await r.text());
+      say("Saved to studio\\fits\\brand.json. On the bot's PC, the Companion's \"Get my studio's settings\" makes it the farm's brand for everybody."); }
+    catch (e) { say("It didn't save: " + (e && e.message || e), true); }
+  }
+  async function loadBrand(tell) {
+    try {
+      const d = await (await fetch("/__studio/fits/brand.json", { cache: "no-store" })).json();
+      if (d && typeof d === "object") { for (const k of ["art", "look", "size"]) if (d[k] != null) BRAND[k] = d[k]; if (d.places && typeof d.places === "object") BRAND.places = d.places; if (BRAND.fill) BRAND.fill(); bellyDraw(); if (tell) say("The saved brand is back."); }
+      else if (tell) say("No brand saved yet.");
+    } catch (e) { if (tell) say("I couldn't read the saved brand: " + (e && e.message || e), true); }
+  }
+
   // ── pose ──
   const POSES = [["Arms", ["BaseUpper", "Yoked", "OverTheHead", "BackBoxTie", "BackElbowTouch", "BackCuffs"]], ["Legs", ["BaseLower", "Kneel", "KneelingSpread", "LegsClosed", "Spread"]], ["Whole body", ["AllFours", "Hogtied"]]];
   function setPose(name) {
@@ -598,6 +662,7 @@
       $("h2", { textContent: "Breasts" }), breastPanel(),
       $("h2", { textContent: "Belly" }), bellyPanel(),
       $("h2", { textContent: "Between the legs" }), genPanel(),
+      $("h2", { textContent: "The farm's brand" }), brandPanel(),
       $("h2", { textContent: "Chest" }), $("div", { className: "row" }, sizes("BodyUpper", ["FlatSmall", "FlatMedium", "Small", "Normal", "Large", "XLarge"])),
       $("h2", { textContent: "Hips and legs" }), $("div", { className: "row" }, sizes("BodyLower", ["Small", "Normal", "Large", "XLarge"])),
       $("h2", { textContent: "Skin" }), $("div", { className: "row" }, ["White", "Asian", "Black"].map((t) => toggle(t, () => { const u = bodyItem("BodyUpper"); const c = u && (Array.isArray(u.Color) ? u.Color[0] : u.Color); return c === t; }, () => setSkin(t)))),
@@ -680,6 +745,7 @@
     CurrentScreenFunctions = { Run: run, Draw: none, Click: none, MouseDown: none, MouseUp: none, MouseMove: none, MouseWheel: none, Load: async () => {}, Unload: none, Resize: none, KeyDown: () => false, KeyUp: () => false, Exit: none, Paste: none };
     try { hookDrawn(); } catch (e) { console.warn("[studio] drawn parts:", e); }
     if (window.FarmBelly) hookBelly(); else console.warn("[studio] the belly drawing didn't load: no belly section");
+    hookBrand();   // (around the belly's step: the brand goes on last here, to be seen while placin' it)
     S.C = CharacterLoadSimple("FarmStudio");
     // (a character made here has no arousal settings, which a signed-in one always has. A piece that reads them when it
     // draws, Echo's Portable Breast Pump, failed, and the whole character vanished with it. Laynie, Oct 14.)
@@ -688,7 +754,7 @@
     for (const k of ["Zone", "Activity", "Fetish"]) if (typeof S.C.ArousalSettings[k] !== "string") S.C.ArousalSettings[k] = "";
     CharacterAppearanceSetDefault(S.C);
     CharacterRefresh(S.C, false, false);
-    panel(); S.ready = true; loadFits(false); loadItemFits(); loadBreasts(false);
+    panel(); S.ready = true; loadFits(false); loadItemFits(); loadBreasts(false); loadBrand(false);
     // the stamps cut from Laynie's references (studio/web/_stamps, never in the repo): as each kind's come in, draw again
     if (window.FarmCock && FarmCock.loadStamps) FarmCock.loadStamps("/__studio/_stamps/", () => { GEN.cvKey = ""; bellyDraw(); if (GEN.fill) GEN.fill(); });
     window.FarmStudio = { S, wear, decode, encode, setBody, setSkin, setPose, redraw, putOn, tint, slots, BELLY, bellyDraw, saveFits, loadFits, FIT, select, saveFit, fitSet, fitDraw, orderSet, orderNow, colourSet, colourLayers, configure, configureDone, stashFits, MOULD, BREAST, catalogue, CAT_SLOTS, GEN, genSet, genHardSet, genFit, chestAudit, setCup, cupNow, saveBreasts, loadBreasts };   // for poking at from the console

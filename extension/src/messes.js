@@ -13,11 +13,22 @@
      moves with you when you kneel or go on all fours.
 */
 import "../../studio/web/splatters.js";
+import "../../studio/web/brand-drawing.js";   // window.FarmBrand: the farm's brand
+const cleanBrand = (b) => W.FarmBrand.clean(b), brandReady = (b) => W.FarmBrand.ready(b), paintBrand = (...a) => W.FarmBrand.paint(...a);
 import { makeMsg } from "../../shared/protocol.js";
 
 const W = window, KEY = "farmhand-messes", MAX = 60;
 let sdk = null, hooked = false;
 let mine = [];
+// THE FARM'S BRAND (Laynie, Oct 29): the logo, seared on where the farm put it (?brand <who> logo), drawn with the messes
+// (under them, on the skin, under clothes) for everybody with a Companion. myBrand comes from the farm; others tell us theirs.
+let myBrand = null;
+export function messBrand(b) {
+  const nb = b ? cleanBrand(b) : null;
+  if (JSON.stringify(nb) === JSON.stringify(myBrand)) return;
+  myBrand = nb; tell(true); redrawMe();
+  if (nb && !brandReady(nb)) setTimeout(redrawMe, 600);   // (the picture takes a moment the first time)
+}
 // what happened last, for /farmmess (Laynie, Oct 20: a mess drawn on everybody but her)
 const DIAG = { marks: [], draw: null, draws: 0, lastErr: "", got: 0 };                                  // [{ k: kind, a: [areas], s: seed, t: when }]
 const others = new Map();                       // member → { list, at }
@@ -53,15 +64,16 @@ export function messCount() { return mine.length; }
 // ── telling the room, and hearing from it ──
 const send = (type, data) => { try { if (W.ServerSend && W.ServerPlayerIsInChatRoom && W.ServerPlayerIsInChatRoom()) W.ServerSend("ChatRoomChat", makeMsg(type, data)); } catch (e) { /* not in a room */ } };
 let toldAt = 0, askedAt = 0;
-function tell(force) { if (!force && Date.now() - toldAt < 8000) return; toldAt = Date.now(); send("mess", { list: mine }); }
+function tell(force) { if (!force && Date.now() - toldAt < 8000) return; toldAt = Date.now(); send("mess", myBrand ? { list: mine, brand: myBrand } : { list: mine }); }
 function ask() { if (Date.now() - askedAt < 8000) return; askedAt = Date.now(); send("messAsk", {}); }
 export function onMessMsg(m) {
   const mn = m.from; if (!mn || (W.Player && mn === W.Player.MemberNumber)) return;
-  if (m.type === "messAsk") { if (mine.length) setTimeout(() => tell(), 300 + Math.random() * 1500); return; }
+  if (m.type === "messAsk") { if (mine.length || myBrand) setTimeout(() => tell(), 300 + Math.random() * 1500); return; }
   if (m.type !== "mess") return;
-  const list = clean(m.list);
-  if (!list.length) { if (others.delete(mn)) redrawMn(mn); return; }
-  others.set(mn, { list, at: Date.now() }); hook(); redrawMn(mn);
+  const list = clean(m.list), brand = m.brand ? cleanBrand(m.brand) : null;
+  if (!list.length && !brand) { if (others.delete(mn)) redrawMn(mn); return; }
+  others.set(mn, { list, brand, at: Date.now() }); hook(); redrawMn(mn);
+  if (brand && !brandReady(brand)) setTimeout(() => redrawMn(mn), 600);
 }
 
 // ── drawing ──
@@ -70,6 +82,7 @@ const againT = new Map();
 function redrawMn(mn, soon) { clearTimeout(againT.get(mn)); againT.set(mn, setTimeout(() => { try { const C = charOf(mn); if (C && typeof W.CharacterLoadCanvas === "function") W.CharacterLoadCanvas(C); } catch (e) { /* fine */ } }, soon || 80)); }
 const redrawMe = () => { if (W.Player) redrawMn(W.Player.MemberNumber); };
 const listFor = (C) => (C === W.Player ? mine : (others.get(C.MemberNumber) || {}).list || []);
+const brandFor = (C) => (C === W.Player ? myBrand : (others.get(C.MemberNumber) || {}).brand || null);
 // the body's own pictures, loaded once each (for keeping a mess on the skin)
 const imgs = new Map();
 function img(src, mn) {
@@ -96,17 +109,18 @@ function forget(src) {
   }, 5000);
 }
 function keep(mn, p) { const was = made.get(mn); made.set(mn, p); if (was && was.src && was.src !== p.src) forget(was.src); }
-function messPicture(C, list, body) {
+function messPicture(C, list, body, brand) {
   const over = W.CanvasUpperOverflow || 700, h = (C.Canvas && C.Canvas.height) || 1000 + over;
   const up = body.find((b) => /\/BodyUpper\//.test(b[0])), ox = up ? up[1] : 0, oy = up ? up[2] - over : 0;
   const age = (e) => Math.min(5, Math.floor((Date.now() - (e.t || 0)) / 60000));
-  const key = JSON.stringify(list) + "|" + list.map(age).join("") + "|" + body.map((b) => b[0] + "@" + b[1] + "," + b[2]).join(";");
+  const key = JSON.stringify(list) + "|" + JSON.stringify(brand) + (brand && brandReady(brand) ? "+" : "-") + "|" + list.map(age).join("") + "|" + body.map((b) => b[0] + "@" + b[1] + "," + b[2]).join(";");
   const was = made.get(C.MemberNumber); if (was && was.key === key) return was;
   let mask = null;
   if (body.length) { mask = W.document.createElement("canvas"); mask.width = 500; mask.height = h; const mg = mask.getContext("2d");
     for (const [src, x, y] of body) { const i = img(src, C.MemberNumber); if (!i) return was || null; mg.drawImage(i, x, y); } }
   const c = W.document.createElement("canvas"); c.width = 500; c.height = h; const g = c.getContext("2d");
   const at = (names) => names.map((n) => { const A = W.FarmMess.AREAS[n]; return [A[0] + ox, A[1] + over + oy, A[2]]; });
+  if (brand) try { paintBrand(g, mask, brand, ox, oy, over); } catch (e) { console.warn("[Farmhand Companion] brand:", e); }   // the brand first: messes land on top of it
   for (const e of list) W.FarmMess.paintOn(g, mask, e.k, { at: at(e.a), seed: e.s, amount: e.m || 1, runX: 0.55 + 0.09 * age(e) });
   // R133 on: the drawing itself goes to the game (nothing made, nothing kept)
   if (typeof W.GLDrawLoadTransient === "function") { const p = { key, src: c, dx: 0, dy: 0 }; keep(C.MemberNumber, p); return p; }
@@ -129,7 +143,7 @@ function hook() {
     sdk.hookFunction("CommonDrawAppearanceBuild", 3, (args, next) => {
       const C = args[0], real = args[1];
       if (!C || !real || typeof real.drawImage !== "function" || !W.FarmMess) return next(args);
-      const list = listFor(C); if (C === W.Player) DIAG.got++; if (!list.length) return next(args);
+      const list = listFor(C), brand = brandFor(C); if (C === W.Player) DIAG.got++; if (!list.length && !brand) return next(args);
       const body = [], all = [], sample = []; let canv = 0, done = false;
       const before = skinOf.get(C.MemberNumber) || [];
       const lay = () => {
@@ -138,7 +152,7 @@ function hook() {
           // this drawing's skin so far, and the rest from the last whole drawing
           const have = new Set(body.map((b) => b[0]));
           for (const b of before) if (!have.has(b[0])) { body.push(b); have.add(b[0]); }
-          const p = messPicture(C, list, body);
+          const p = messPicture(C, list, body, brand);
           if (C === W.Player) { DIAG.draws++; DIAG.draw = { at: Date.now(), list: list.length, body: body.map((b) => String(b[0]).replace(/^.*Assets\/[^/]+\//, "") + "@" + b[1] + "," + b[2]), sample: sample.slice(), canv, pic: p ? (p.src ? (typeof p.src === "string" ? "picture" : "drawing " + p.src.width + "x" + p.src.height) : "empty") : "waiting for the body pictures" }; }
           if (p && p.src) {
             real.drawImage(p.src, p.dx, p.dy, {}); if (typeof real.drawImageBlink === "function") real.drawImageBlink(p.src, p.dx, p.dy, {});
@@ -175,7 +189,7 @@ export function initMesses(mod) {
     if (fresh(mine)) redrawMe();
     for (const [mn, o] of others) if (fresh(o.list)) redrawMn(mn);
   }, 60000);
-  setTimeout(() => { hook(); if (mine.length) { tell(true); redrawMe(); } ask(); }, 3500);
+  setTimeout(() => { hook(); if (mine.length || myBrand) { tell(true); redrawMe(); } ask(); }, 3500);
 }
 
 // ── how much it's holding (memlog.js) ──

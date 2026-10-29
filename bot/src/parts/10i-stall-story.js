@@ -21,6 +21,7 @@
     fox:["a high, needy yip","a soft whine","a breathless little yip"], wolf:["a low, wavering howl","a needy whine","a rough, shaky growl"],
     goat:["a shaky bleat","a wavering little maa","a breathless bleat"], sheep:["a soft, wobbly baa","a needy little baa","a breathy bleat"],
     rat:["a high, needy squeak","a breathless chitter","a shaky little squeak"],
+    dragon:["a low, rumbling growl","a hot, hissing breath","a ragged little rawr"],
     default:["a soft moan","a needy whimper","a shaky gasp"]
   };
 

@@ -9,9 +9,9 @@ import { outfitPieces, outfitSpeciesOf } from "./farm-outfits.js";
 // [name, the blurb] for each species, by gender. The blurb is the look; the piece list after it is worked out.
 const NAMES = {
   cow: {
-    female:    ["Dairy Darling", "Pastel pink and cream, a cowbell that rings with every crawl, and udders cupped and pumpin' on a slow, steady draw. Made for the milkin' line."],
+    female:    ["Dairy Darling", "Pastel pink and cream, a cowbell that rings with every crawl, and heavy udders in cow print. Made for the milkin' line."],
     male:      ["Brass-Bell Bullock", "A jockstrap, a cognac chest harness and a cowbell on a locked collar: a young bull on all fours, caged and kept for the herd."],
-    futa:      ["Cream Queen", "Everything a dairy girl wears, cow-print and milkin' cups, and nothin' locked between the legs to get in the way of breedin'."],
+    futa:      ["Cream Queen", "Everything a dairy girl wears, cow-print top to bottom, and nothin' locked between the legs to get in the way of breedin'."],
     femboy:    ["Buttercup Milkmaid", "A frilly pink maid bikini and a ribbon cincher on a crawlin' little cow, bell ringin', cage locked."],
     nonbinary: ["Clover Heifer", "Pastel lingerie under a padded cream petsuit, horns, a nose ring and a cowbell, belted and locked."],
   },
@@ -71,6 +71,13 @@ const NAMES = {
     femboy:    ["Piglet Pink", "A pink maid bikini and tulle skirt on a little piglet in trotters, snout hooked and caged."],
     nonbinary: ["Rosy Trotter", "A corset bikini in rose under the petsuit and rope harness, snout hooked, belted."],
   },
+  dragon: {
+    female:    ["Hoard Queen", "Emerald latex and a gold-tagged collar, swept-back horns, dragon wings and a long scaled tail: the farm's own dragon, claws out, cuffed and hobbled on a gold chain."],
+    male:      ["Chained Drake", "A jockstrap and harness on a horned, winged drake, claws and tail and all, collared in gold, leashed and caged."],
+    futa:      ["Wyrm in Heat", "The dragon's emerald latex and gold with nothin' locked below: horns, wings, tail and claws, cuffed and ready to breed a clutch."],
+    femboy:    ["Little Drakeling", "A pink maid bikini and tulle skirt on a tiny dragon with horns, wings and a swishin' tail, claws out, cuffed, hobbled and caged."],
+    nonbinary: ["Gilded Wyvern", "Emerald latex and a gold collar on a horned, winged wyvern with its claws and tail, cuffed, hobbled and belted."],
+  },
   rat: {
     female:    ["Gutter Sweetheart", "A dusty grey latex corset over a harness bra and crotchless latex, round mouse ears and a long pink tail: the barn's own ratslut, tagged, cuffed and hobbled."],
     male:      ["Sewer Buck", "A jockstrap and harness on a tagged, cuffed rat in fishnets and thigh boots, leashed and caged."],
@@ -87,7 +94,7 @@ const NAMES = {
   },
   // their own sets (Oct 26)
   bull: {
-    female:    ["Herd Matriarch", "Black and cognac, dark horns, a cowbell and a brass nose ring, cow-print and cups for the milkin', wrists cuffed and ankles hobbled."],
+    female:    ["Herd Matriarch", "Black and cognac, dark horns, a cowbell and a brass nose ring, cow-print for the milkin' line, wrists cuffed and ankles hobbled."],
     male:      ["Prize Stud Bull", "A jockstrap and harness on a horned, nose-ringed bull, belled, cuffed and hobbled, led by the ring and caged between breedings."],
     futa:      ["Breeding Line Bull", "Latex under the cow-print, horns, ring and bell, and nothin' locked below: the herd's own breeder."],
     femboy:    ["Little Bull Calf", "A pink maid bikini and tulle skirt on a horned little calf with a nose ring and a bell, cuffed and caged."],
@@ -147,6 +154,8 @@ const SAY = {
   "HairAccessory1:CowHorns": "cow horns", "HairAccessory1:Horns2": "goat horns", "HairAccessory2:BunnyEars1": "bunny ears", "HairAccessory2:CowEars": "cow ears",
   "HairAccessory2:Ears2": "soft ears", "HairAccessory2:ElfEars": "goblin ears", "HairAccessory2:FoxEars1": "fox ears", "HairAccessory2:KittenEars2": "kitten ears",
   "HairAccessory2:PonyEars1": "pony ears", "HairAccessory2:MouseEars2": "round mouse ears", "TailStraps:MouseTailStrap1": "long bare rat tail",
+  "HairAccessory1:Horns5": "swept-back dragon horns", "Wings:DragonWings": "dragon wings", "TailStraps:DragonTailStrap1": "a dragon's scaled tail",
+  "HandAccessoryLeft:Claws": "claws on both hands", "HandAccessoryRight:Claws": "claws on both hands",
   "ItemNeckAccessories:CollarNameTagLivestock": "livestock tag", "Garters:HipHarness": "hip harness", "HairAccessory2:PuppyEars1": "puppy ears", "HairAccessory2:PuppyEars2": "floppy ears", "HairAccessory3:Ribbons1": "hair ribbons",
   "Hat:ReindeerBand": "antler band", "ItemArms:LeatherCuffs": "leather wrist cuffs", "ItemArms:PawPaddedPetsuitArms": "padded petsuit arms",
   "ItemBoots:PonyBoots": "pony boots", "ItemFeet:LeatherAnkleCuffs": "ankle cuffs chained together", "ItemHands:ElbowLengthMittens": "long mittens",
@@ -174,5 +183,5 @@ export function outfitDesc(species, gender) {
   const e = entry(species, gender), pieces = outfitPieces(species, gender);
   if (!e || !pieces) return null;
   const locked = pieces.filter(p => p.locked).map(say);
-  return e[1] + "\nIn it: " + list(pieces.map(say)) + "." + (locked.length ? "\nPadlocked: " + list(locked) + "." : "");
+  return e[1] + "\nIn it: " + list([...new Set(pieces.map(say))]) + "." + (locked.length ? "\nPadlocked: " + list(locked) + "." : "");
 }

@@ -3,7 +3,7 @@
    contract's pet sounds and everything else agree (Laynie, Oct 26: "the cat outfit and cat sounds dont get applied to
    someone who chose kitty, need to maybe make sure the outfits and rules try to smart match"). Records say "kitty" out
    loud while the outfits were keyed "kitt", so a kitty fell through to a cow's moo and no outfit at all.
-   speciesKeyOf("Kitty") → "kitt" · ("catgirl") → "kitt" · ("hucow slut") → "cow" · ("ratslut") → "rat" · ("dragon") → null
+   speciesKeyOf("Kitty") → "kitt" · ("catgirl") → "kitt" · ("hucow slut") → "cow" · ("ratslut") → "rat" · ("dragon") → "dragon"
 */
 // every word the farm knows, to its key. The keys are the farm's kinds (bot CFG.SPECIES)
 const WORDS = {
@@ -24,6 +24,7 @@ const WORDS = {
   wolf: "wolf", lupine: "wolf", wolfie: "wolf",
   goat: "goat", nanny: "goat", billy: "goat", kid: "goat",
   sheep: "sheep", lamb: "sheep", ewe: "sheep", ram: "sheep",
+  dragon: "dragon", dragoness: "dragon", drake: "dragon", wyrm: "dragon", wyvern: "dragon", draconic: "dragon", drakeling: "dragon", kobold: "dragon", dragonborn: "dragon",
   rat: "rat", ratty: "rat", rattie: "rat", ratgirl: "rat", ratboy: "rat", ratslut: "rat", rodent: "rat", mouse: "rat", mousey: "rat", mice: "rat",
 };
 // the endings people put on an animal ("cowgirl", "ratslut", "puppies", "kittens")

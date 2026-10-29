@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm add-on: Barn life
 // @namespace    bnbfarm
-// @version      1.2.1
+// @version      1.2.2
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-barn-life.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-barn-life.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -122,6 +122,7 @@
     goat: { f: "nanny", m: "billy", young: ["kid", "kids"], call: "bleat", sound: ["a shaky bleat", "a soft bleat", "a loud, startled bleat"] },
     rat: { f: "rat", m: "rat", young: ["pinkie", "pinkies"], call: "squeak", sound: ["a high, needy squeak", "a breathless little squeak", "a shaky chitter"] },
     sheep: { f: "ewe", m: "ram", young: ["lamb", "lambs"], call: "baa", sound: ["a soft baa", "a trembling baa"] },
+    dragon: { f: "dragoness", m: "drake", young: ["hatchling", "hatchlings"], call: "growl", sound: ["a low, rumbling growl", "a hot, hissing breath", "a ragged little rawr"] },
     default: { f: "animal", m: "animal", young: ["little one", "little ones"], call: "moan", sound: ["a soft moan", "a needy whimper", "a shaky gasp"] }
   };
   var KIN = {
@@ -217,6 +218,10 @@
       "%name% stuffs their cheeks full and squirrels the rest away in a corner of the stall for later.",
       "%name% picks through the feed with greedy little hands and eats the crumbs nobody else wanted."
     ],
+    dragon: [
+      "%name% tears into the feed like it's a kill, tail curled round the trough so nobody else gets near it.",
+      "%name% eats in big, careful bites, then breathes a little warm smoke over what's left, like they're keepin' it."
+    ],
     goblin: [
       "%name% eats with both hands and no manners, grinnin' through a mouthful.",
       "%name% stuffs their pockets with feed for later, then eats what's left."
@@ -247,6 +252,7 @@
     wolf: ["%name% laps the water loud and long, then shakes their head and showers everybody nearby."],
     deer: ["%name% drinks with their head low and their eyes up, startin' at every creak of the barn."],
     rat: ["%name% sips at the very edge of the trough, whiskers wet, then washes their face with their hands."],
+    dragon: ["%name% drinks long and deep, and the water steams a little where their breath hits it."],
     goblin: ["%name% drinks straight from the trough with both hands, gulpin' and slurpin', and wipes their mouth on their arm."]
   };
   var DRINK_BOUND = [
@@ -308,6 +314,10 @@
     rat: [
       "%by% brushes %name%'s fur smooth and cleans behind their round little ears, and %name% chitters the whole time.",
       "%by% gives %name%'s long tail a wipe-down and a brush, and %name% grooms their own whiskers to match."
+    ],
+    dragon: [
+      "%by% oils %name%'s scales one by one till they shine like the hoard, and %name% rumbles like a purrin' furnace.",
+      "%by% brushes out the webbing of %name%'s wings, gentle, and %name% stretches them out wide for more."
     ],
     goblin: ["%by% scrubs the mud off %name% with a stiff brush, and %name% complains about every inch of it, grinnin'."]
   };

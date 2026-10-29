@@ -34,7 +34,7 @@
                             hasPenis:false, last:Date.now(), lastHeatEmote:0, nextHeatAt:0 };
     return r.prod;
   }
-  function limitBlocks(mn, kind){ const r = rec(mn); return !!(r && LIMIT_WORDS[kind||"breed"].test(r.limits||"")); }
+  function limitBlocks(mn, kind){ const r = rec(mn); if (r && r.nursery && r.nursery.role === "little" && r.nursery.space) return true;   /* little space rules out every grown-up thing (10up2-nursery.js) */ return !!(r && LIMIT_WORDS[kind||"breed"].test(r.limits||"")); }
   function speciesKey(mn){
     const s = String((rec(mn)||{}).species||"").toLowerCase();
     const k0 = speciesKeyOf(s); if (k0 && CFG.SPECIES[k0]) return k0;   // "Kitty", "catgirl", "ratslut" (shared/species.js)

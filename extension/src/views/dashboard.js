@@ -97,7 +97,7 @@ function addons(ctx) {
   ];
 }
 
-const SPECIES = ["cow", "bull", "pony", "horse", "goat", "sheep", "pig", "bunny", "rabbit", "pup", "dog", "kitt", "cat", "fox", "wolf", "deer", "goblin", "rat"];
+const SPECIES = ["cow", "bull", "pony", "horse", "goat", "sheep", "pig", "bunny", "rabbit", "pup", "dog", "kitt", "cat", "fox", "wolf", "deer", "goblin", "rat", "dragon"];
 const GENDERS = ["female", "male", "futa", "femboy", "nonbinary"];
 const KEYS_TEXT = { staff: "farm staff + their herd leader", leader: "their herd leader only", owners: "the proprietors only" };
 

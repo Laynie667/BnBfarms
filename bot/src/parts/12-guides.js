@@ -204,6 +204,9 @@ OPT IN FIRST · nobody gets bred who hasn't, sweetie
   ?yes / ?no · answer a stud or staff member who asked (whisper or beep works too)
   ?tally on|off · your tally marks on ?who and the board
   ?wash · clean off a paintin'
+  ?drain · empty yourself into the bucket (?drain butt for one hole)
+  ?drain <who> · drain somebody beside you; they say yes first
+  ?services · the farm's services: the vet, a salt soak, coaxin'
   ?praise on|off · ?degrade on|off · let staff's words count
   Hard limits always win.
 
@@ -518,6 +521,9 @@ THE PARASITE · ?parasite on
   then teats, then below), gets urges, lays its own eggs at the
   end, and passes by a kiss or by nursin'.
   ?parasite · how long is left. Your safeword takes it off.
+  Gettin' it off the farm way: ?service purge (the vet, 3 ribbons),
+  ?service soak (stand in the water with salt, 10 minutes), or a
+  friend's ?coax <you> (it might hop onto them instead).
 
 SYMBIOTES · ?symbiote on
   A livin' thing that bonds to you and gives somethin' back for
@@ -759,6 +765,8 @@ RIBBONS, POTIONS, DARES, THE CORRAL
   ?gauntlet pot <n> · proprietors (ends: gauntlet-start, -end)
   ?purge <who> · take a parasite off them
   ?parasite give <who> · proprietors (they need ?parasite on)
+  ?brand <who> logo [place] · sear the B&B logo on (hip, thigh, belly, breast, shoulder)
+  ?brand all logo [place] · proprietors: every livestock carries it · ?brand all clear
   ?symbiote give <who|me> latex|moss|nestling · proprietors, staff
   ?store approve|reject <who> · a bought greetin'
 

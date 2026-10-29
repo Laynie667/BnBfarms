@@ -18,7 +18,8 @@
     piggy:"pig", piglet:"pig", sow:"pig", hog:"pig", swine:"pig", oink:"pig", lamb:"sheep", ewe:"sheep", doe:"deer", fawn:"deer",
     mare:"horse", stallion:"horse", filly:"pony", foal:"pony", colt:"pony", equine:"horse", vixen:"fox", bunny:"bunny", bun:"bunny",
     feline:"cat", canine:"dog", gob:"goblin", nanny:"goat", billy:"goat", kid:"goat", lupine:"wolf",
-    ratslut:"rat", ratty:"rat", rattie:"rat", rodent:"rat", mouse:"rat", mousey:"rat" };
+    ratslut:"rat", ratty:"rat", rattie:"rat", rodent:"rat", mouse:"rat", mousey:"rat",
+    dragoness:"dragon", drake:"dragon", wyrm:"dragon", wyvern:"dragon", draconic:"dragon", kobold:"dragon" };
   // words that mean "I'm not stock" (staff, guests, people who don't want to pick)
   const NOT_STOCK = /\b(no|nope|nah|not stock|not livestock|not an animal|not one|human|person|staff|farmhand|guest|luxury|visitor|none|skip|n\/?a)\b/;
   // words that are never an animal on their own ("yes", "ok"...): asked again instead of becomin' their species
@@ -39,7 +40,7 @@
     const words = low.split(/[\s\/-]+/).filter(Boolean);
     for (const w of words){ const k = known(w); if (k) return SHOWN_SPECIES[k] || k; }
     { const k = speciesKeyOf(low); if (k && kinds.includes(k)) return SHOWN_SPECIES[k] || k; }   // "catgirl", "neko", "vixen", "kitsune", "ponygirl" (shared/species.js)
-    // somethin' we don't have a kind for, said plainly ("dragon", "red panda"): it's theirs
+    // somethin' we don't have a kind for, said plainly ("red panda"): it's theirs
     const filler = new Set(["i","im","am","a","an","the","my","please","pls","just","really","think","maybe","so"]);
     const rest = words.filter(w => !filler.has(w));
     if (rest.length >= 1 && rest.length <= 2 && !NOT_ANIMAL.test(rest.join(" ")) && rest.every(w => w.length >= 2)) return rest.join(" ");

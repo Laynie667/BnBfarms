@@ -141,6 +141,10 @@
       "%n's whiskers twitch and their long tail curls tight round the rail.",
       "%n squeaks and chitters in the stall, little hands gripping the padding.",
       "%n's round ears flatten back, then twitch forward again, every time the machine changes pace."] },
+    draco: { part:"any", when:(mn) => speciesKey(mn) === "dragon", lines:[
+      "%n's wings flex and flare against the stall walls every time the machine pulls.",
+      "%n's tail lashes the boards and a hot, smoky breath rolls out of them.",
+      "%n digs their claws into the padded rail and growls, low, from somewhere deep in the chest."] },
     goblin: { part:"any", when:(mn) => speciesKey(mn) === "goblin", lines:[
       "%n cackles breathlessly, then moans, then cackles again.",
       "%n's long ears droop and twitch as the stall works them.",

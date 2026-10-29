@@ -44,6 +44,8 @@ export const EAT_KIND = {
   rat: ["%name% nibbles at everything in the trough, one quick bite of each, whiskers twitchin'.",
         "%name% stuffs their cheeks full and squirrels the rest away in a corner of the stall for later.",
         "%name% picks through the feed with greedy little hands and eats the crumbs nobody else wanted."],
+  dragon: ["%name% tears into the feed like it's a kill, tail curled round the trough so nobody else gets near it.",
+           "%name% eats in big, careful bites, then breathes a little warm smoke over what's left, like they're keepin' it."],
   goblin: ["%name% eats with both hands and no manners, grinnin' through a mouthful.",
            "%name% stuffs their pockets with feed for later, then eats what's left."],
 };
@@ -72,6 +74,7 @@ export const DRINK_KIND = {
   wolf: ["%name% laps the water loud and long, then shakes their head and showers everybody nearby."],
   deer: ["%name% drinks with their head low and their eyes up, startin' at every creak of the barn."],
   rat: ["%name% sips at the very edge of the trough, whiskers wet, then washes their face with their hands."],
+  dragon: ["%name% drinks long and deep, and the water steams a little where their breath hits it."],
   goblin: ["%name% drinks straight from the trough with both hands, gulpin' and slurpin', and wipes their mouth on their arm."],
 };
 export const DRINK_BOUND = [
@@ -123,6 +126,8 @@ export const GROOM_KIND = {
   deer: ["%by% brushes %name% down slow and gentle, and %name% stops tremblin' halfway through."],
   rat: ["%by% brushes %name%'s fur smooth and cleans behind their round little ears, and %name% chitters the whole time.",
         "%by% gives %name%'s long tail a wipe-down and a brush, and %name% grooms their own whiskers to match."],
+  dragon: ["%by% oils %name%'s scales one by one till they shine like the hoard, and %name% rumbles like a purrin' furnace.",
+           "%by% brushes out the webbing of %name%'s wings, gentle, and %name% stretches them out wide for more."],
   goblin: ["%by% scrubs the mud off %name% with a stiff brush, and %name% complains about every inch of it, grinnin'."],
 };
 // what they're wearin' gets seen to as well

@@ -8,7 +8,7 @@
      variables, like equipment for its message pools so someone doesnt get messages that doesnt match what they have or are").
      Lines carry tags on the front, and a line is only used when every tag fits:
        their body, the usual way (10y9d-body-fit.js): {v} {nv} {c} {nc} {t} {nt} {f} {m} {fu} {fb} {nb}
-       their kind: [cow] [pony] [pup] [kitt] [bunny] [goat] [deer] [pig] [fox] [goblin] [rat] · [tail] any kind with a tail
+       their kind: [cow] [pony] [pup] [kitt] [bunny] [goat] [deer] [pig] [fox] [goblin] [rat] [dragon] · [tail] any kind with a tail
        what they've got on: [fours] on all fours (a petsuit, frog-tied) · [walk] on their own two feet · [bound] arms or
                             hands tied · [gag] somethin' in the mouth · [cage] a cock cage · [belt] a chastity belt ·
                             [latex] livin' latex or the livin' suit
@@ -37,6 +37,8 @@
       "[fox]%n gets the fox treatment: a farmhand on each side and the gate shut, because a fox will try to slip off wet.",
       "[goblin]A goblin at the wash trough is a rare sight, and two farmhands hold %n there while a third fills the bucket.",
       "[rat]%n gets fished out of the hayloft by the tail and dunked in the wash tub, squeakin' all the way down.",
+      "[dragon]%n gets coaxed into the big wash tub, wings folded tight, steam already curlin' off their scales where the water hits.",
+      "[dragon]It takes two farmhands and the big tub for %n: wings, tail and all, hissin' at the cold till it warms up round them.",
       "[gag]%n can't say much round what's in their mouth, so the farmhand does the talkin': \"In you get. This won't take long.\"",
       "[mud]%n's so caked in mud that the farmhand hoses them off at the gate before they're allowed anywhere near the clean water.",
       "[cum]%n comes up to the trough drippin' and sticky, and the farmhand just shakes their head and reaches for the big bar of soap.",
@@ -74,6 +76,8 @@
       "[fox]%n's scrubbed head to tail, and the farmhand fluffs their tail up in the suds just to watch it get huge.",
       "[goblin]It takes two goes with the brush to find out what colour %n actually is under all that, and the farmhand's surprised.",
       "[rat]%n gets scrubbed behind the ears and down the tail with a little bristle brush, squeakin' indignant the whole time.",
+      "[dragon]The farmhand scrubs %n scale by scale with a stiff brush, round the horns, under the wings and all the way down the tail, and %n rumbles low the whole time.",
+      "[dragon]%n spreads one wing, then the other, so the brush can get the webbing, and growls when it tickles.",
       "[fours]%n stays on all fours on the slab while the farmhand scrubs them from neck to rump, like washin' down any other farm animal.",
       "[bound]The farmhand washes round every strap and rope on %n, liftin' each one, scrubbin' under it, and settlin' it back.",
       "[gag]Suds run down round the gag in %n's mouth, and the farmhand wipes their chin with the cloth, quick and kind.",
@@ -123,6 +127,7 @@
       "[fox]%n's tail is towelled into a huge orange puff, and they strut off like it was their idea.",
       "[goblin]%n is dried off and looks almost respectable, which won't last the hour.",
       "[rat]%n is rubbed dry in a scrap of towel, whiskers and all, and scampers off clean for once.",
+      "[dragon]%n shakes out their wings and showers the whole wash room, then stands there steamin' dry, scales gleamin' like the hoard.",
       "[fours]%n is towelled off where they stand, on all fours, and sent trottin' out of the stall with a pat on the rump.",
       "[bound]The farmhand dries %n off, straps and ropes and all, and leads them out by the arm, because %n's not wavin' anyone goodbye.",
       "[latex]The farmhand towels the bare skin round the livin' latex and leaves the latex to dry itself, which it does, smug.",
@@ -131,7 +136,7 @@
   };
   // what's true about them right now, for the [tags]
   const WASH_KIND = { cow: "cow", bull: "cow", pony: "pony", horse: "pony", pup: "pup", dog: "pup", wolf: "pup", kitt: "kitt", cat: "kitt",
-                      bunny: "bunny", rabbit: "bunny", goat: "goat", sheep: "goat", deer: "deer", pig: "pig", fox: "fox", goblin: "goblin", rat: "rat" };
+                      bunny: "bunny", rabbit: "bunny", goat: "goat", sheep: "goat", deer: "deer", pig: "pig", fox: "fox", goblin: "goblin", rat: "rat", dragon: "dragon" };
   const SWEET = /^(honey|maple|chocolate|strawberry|cake|cream|mash)$/;
   function washFacts(mn){
     const f = new Set(), r = rec(mn) || {}, now = Date.now();

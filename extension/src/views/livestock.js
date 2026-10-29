@@ -225,6 +225,8 @@ export function panelPrefs(ctx) {
     // these two are OFF until you turn them on, and anybody can: the farm changin' what your character looks like (marks.js)
     toggle("Farm can mark my body", "Loads leave the game's own splatters on your face, chest or tummy, wherever there's room, and farm words can be written on your body. ?wash takes them off.",
       !!ctx.prefs.marks, () => ctx.setPref("marks", !ctx.prefs.marks)),
+    ctx.s.brand ? toggle("Show my farm brand", "The B&B logo the farm seared on you, on your " + ({ hipL: "left hip", hipR: "right hip", thighL: "left thigh", thighR: "right thigh", mons: "low belly", tummy: "tummy", chestL: "left breast", chestR: "right breast", shoulderL: "left shoulder", shoulderR: "right shoulder" }[ctx.s.brand.place] || "hip") + ". Off hides it on every screen (it's still on your record).",
+      !ctx.prefs.brandOff, () => { ctx.setPref("brandOff", !ctx.prefs.brandOff); ctx.api.brandSync && ctx.api.brandSync(); }) : null,
     toggle("Farm can strip me", "When the farm says so, your clothes come off (locked pieces stay). They're kept on this computer so you can dress again.",
       !!ctx.prefs.strip, () => ctx.setPref("strip", !ctx.prefs.strip)),
     // (the scale trial and the belly experiment are gone: the drawn body does both. Laynie, Oct 14: "can also remove the

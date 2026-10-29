@@ -119,6 +119,11 @@
     if ((cmd === "contract" || cmd === "contracts") && !isStaff(sender)){ reply(sender, myContractsText(sender), channel === "chat" ? (canBeep(sender) ? "beep" : "whisper") : channel); return; }
     // somebody not on the books tryin' to sign themselves up (live, Oct 7: "Register stock", "?register", "stock"
     // got "just for farm staff" and then silence): point them at ?apply
+    // a little in their little space: grown-up commands aimed at them, or from them, wait (10up2-nursery.js)
+    { const no = nurseryGate(sender, cmd, args); if (no){ reply(sender, no, channel === "chat" ? (canBeep(sender) ? "beep" : "whisper") : channel); return; } }
+    // ?drain on yourself needs nobody (Laynie, Oct 29): ?drain, ?drain me, ?drain butt, ?drain <your own name>
+    const drainSelf = cmd === "drain" && !isStaff(sender) && (!args[0] || /^(me|myself|self)$/i.test(args[0]) || !!holesFrom(args[0]) || (() => { try { return resolveTarget(args[0]) === sender; } catch(e){ return false; } })());
+    if (drainSelf){ const hole = args[0] && holesFrom(args[0]) ? args[0] : args[1]; selfDrain(sender, hole, (txt) => reply(sender, txt, channel === "chat" ? (canBeep(sender) ? "beep" : "whisper") : channel)); return; }
     const joining = ["register","stock","approve","grant","claim"].includes(cmd) && !(rec(sender) && (rec(sender).roles || []).length);
     // STOCK ON STOCK: ?milk and ?edge are open to anybody on the books, on somebody else on the books who's said
     // yes to them (asked once, good for a couple of hours; never asked with ?freeuse on). Staff aren't asked about.
@@ -129,14 +134,14 @@
       const a = posOf(sender), b = posOf(t);
       if (!a || !b || Math.max(Math.abs(a.X - b.X), Math.abs(a.Y - b.Y)) > 1){ huh("Get right up next to "+plainName(t)+" first, sugar."); return; }
       if (!stockPlayOk(sender, t)){
-        const what = cmd === "milk" ? "milk you by hand" : "edge you";
+        const what = cmd === "milk" ? "milk you by hand" : cmd === "drain" ? "drain you into the bucket" : "edge you";
         addonAsks.set(t, { addon: null, at: Date.now(), cb: (yes) => {
           if (!yes){ tell(sender, plainName(t)+" said no, sugar. Leave 'em be."); return; }
           state.playOk.set(t+":"+sender, Date.now() + CFG.BREED_OK_H*3600000);
           tell(sender, plainName(t)+" said yes. Go on, sugar.");
           handleCommand(sender, raw, channel, true);
         } });
-        askCard(t, "play", (cmd === "milk" ? "🥛 " : "😈 ")+plainName(sender)+" wants to "+what+", sugar. Say yes or no (?yes or ?no works too).");
+        askCard(t, "play", (cmd === "milk" ? "🥛 " : cmd === "drain" ? "🪣 " : "😈 ")+plainName(sender)+" wants to "+what+", sugar. Say yes or no (?yes or ?no works too).");
         reply(sender, "I've asked "+plainName(t)+" first, sugar. Once they say yes, it'll happen.", channel); return;
       }
     } else
@@ -215,7 +220,7 @@
         if (out < 1){ R(plainName(t)+" isn't holdin' anything to drain, hon."); break; }
         if (p.pin && !sizePinned(t)) p.pin = null;
         saveLedger(); audit(sender, "DRAIN", t+" "+Math.round(out));
-        if (charFor(t)) emote("🪣 "+plainName(sender)+" presses down on "+plainName(t)+"'s belly and pumps 'em out: "+ml(out)+" of seed gushes into the bucket, splashin' everywhere. What a beautiful mess.", t);
+        if (charFor(t)) emote(t === sender ? "🪣 "+selfDrainLine(t, hs, out) : !isStaff(sender) ? friendDrainLine(sender, t, out) : "🪣 "+plainName(sender)+" presses down on "+plainName(t)+"'s belly and pumps 'em out: "+ml(out)+" of seed gushes into the bucket, splashin' everywhere. What a beautiful mess.", t);
         else R("🪣 Drained "+ml(out)+" out of "+plainName(t)+".");
         break;
       }
@@ -1594,6 +1599,8 @@ Welcome to B&B Farm, hon. 🌾`);
       case "corral": case "uncorral": penCommand(cmd === "corral" ? "pen" : "unpen", sender, args, R); break;
       case "bench": case "unbench": case "use": benchCommand(cmd, sender, args, R); break;
       case "subject": case "subjects": case "traps": case "trap": case "watersports": case "watersport": trapCommand(cmd === "watersport" ? "watersports" : cmd, sender, args, R); break;   // 10u-traps.js
+      case "nursery": case "little": case "care": nurseryCommand(cmd, sender, args, R, huh); break;   // 10up2-nursery.js
+      case "services": case "service": case "coax": serviceCommand(cmd, sender, args, R); break;   // 10uo-services.js
       case "parasite": case "parasites": case "purge": parasiteCommand(cmd === "parasites" ? "parasite" : cmd, sender, args, R); break;   // 10v-parasite.js
       case "symbiote": case "symbiotes": symbioteCommand(sender, args, R); break;   // 10v4-symbiotes.js
       case "messes": messesCommand(sender, args, R); break;
@@ -1801,6 +1808,16 @@ Welcome to B&B Farm, hon. 🌾`);
 
       /* ── BRANDS ── */
       case "brand": {
+        // THE FARM'S LOGO (Laynie, Oct 29): ?brand <who> logo [place] sears the B&B brand on, drawn on them by every
+        // Companion (10uq-brand.js). ?brand all logo [place] (proprietors): every livestock carries it. ?brand all clear.
+        if (/^all$/i.test(args[0] || "")){
+          if (!isProprietor(sender)){ R("Only proprietors brand the whole herd, sugar."); break; }
+          if (/^(clear|off|none)$/i.test(args[1] || "")){ L.brandAll = null; saveLedger(); syncCompanions(true); R("🔥 The herd's brand is off. Anybody branded on their own keeps theirs."); break; }
+          if (!/^logo$/i.test(args[1] || "")){ R("?brand all logo [place] puts the farm's brand on every livestock, ?brand all clear takes it off. Places: "+BRAND_PLACE_WORDS+"."); break; }
+          L.brandAll = { place: brandPlaceFrom(args.slice(2).join(" ")) || "hipR", by: sender, at: Date.now() }; saveLedger(); syncCompanions(true); audit(sender, "BRAND_ALL", L.brandAll.place);
+          R("🔥 Every livestock on the books carries the B&B brand now ("+brandPlaceName(L.brandAll.place)+"). Players see it with the Companion; ?brand all clear takes it off."); break;
+        }
+        if (/^logo$/i.test(args[1] || "")){ brandLogo(sender, resolveTarget(args[0]), args.slice(2).join(" "), R); break; }
         const t = resolveTarget(args[0]);
         const r = t ? rec(t) : null;
         if (!r){ R("Here's how, sugar: ?brand, their name or member number, then the mark (up to 12 characters: initials, a symbol, a word). "+

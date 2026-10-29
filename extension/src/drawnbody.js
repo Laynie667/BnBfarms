@@ -26,6 +26,7 @@ import "../../studio/web/breasts-drawing.js";   // window.FarmBreasts: the breas
 import "../../studio/web/body-engine.js";       // window.FarmBodyEngine: the studio's drawing
 import { bellyDrawing, bellyTrial } from "./belly.js";
 import { makeMsg } from "../../shared/protocol.js";
+import { bcrOverBreast } from "./bcr.js";
 
 const W = window;
 const KEY = "farmhand-drawn-body", SEE_KEY = "farmhand-drawn-body-see", FARM_KEY = "farmhand-drawn-body-farm";
@@ -144,6 +145,7 @@ function makeEngine(mn) {
     setBody: () => {},          // never: their body items are theirs
     redraw: () => (mn == null ? redraw(60) : redrawMn(mn, 60)),
     picture,
+    overBreast: bcrOverBreast,   // BCR's marks on the drawn breasts (bcr.js)
     budget: mn == null ? 192e6 : 96e6,   // how much of its drawings it keeps between drawings (body-engine.js): yours more, everybody else's less
   });
 }
@@ -176,6 +178,12 @@ function clean(d) {
   s.auto = d.auto !== false; s.tuck = d.tuck !== false; s.dress = d.dress !== false;
   s.mould = { items: (Array.isArray(d.mould && d.mould.items) ? d.mould.items : []).filter((k) => typeof k === "string" && /^[\w/ -]{1,80}$/.test(k)).slice(0, 60), mode: {} };
   for (const [k, m] of Object.entries((d.mould && d.mould.mode) || {})) if (s.mould.items.includes(k) && ["wide", "over", "under"].includes(m)) s.mould.mode[k] = m;
+  // the farm's brand, as the studio placed it (on the bot's account this becomes the farm's: 10y9e-farm-look.js, 10uq-brand.js)
+  if (d.brand && typeof d.brand === "object") {
+    const b = d.brand, places = {};
+    for (const [k, p] of Object.entries(b.places || {})) if (/^(hip|thigh|chest|shoulder)[LR]$|^(mons|tummy)$/.test(k) && p && typeof p === "object") places[k] = { size: num(p.size, 16, 200, 46), angle: num(p.angle, -180, 180, 0), dx: num(p.dx, -80, 80, 0), dy: num(p.dy, -80, 80, 0) };
+    s.brand = { art: b.art === "full" ? "full" : "mark", look: ["seared", "healed", "ink"].includes(b.look) ? b.look : "seared", size: num(b.size, 16, 200, 46), places };
+  }
   return s;
 }
 // what's shared with the room: the settings, no more
@@ -309,9 +317,9 @@ export function drawnBodyPaste(text, say) {
 export async function drawnBodyFromStudio(say) {
   try {
     const get = async (f) => { const r = await fetch(STUDIO + "/__studio/fits/" + f, { cache: "no-store" }); if (!r.ok) throw new Error(f + ": " + r.status); return r.json(); };
-    const [br, be, it] = await Promise.all([get("breasts.json"), get("belly.json").catch(() => null), get("items.json").catch(() => null)]);
+    const [br, be, it, bd] = await Promise.all([get("breasts.json"), get("belly.json").catch(() => null), get("items.json").catch(() => null), get("brand.json").catch(() => null)]);
     if (!br) throw new Error("the studio hasn't saved any breasts yet (Save the breasts)");
-    return take({ cup: br.cup, breast: br, wear: br.wear, belly: be && be.fits, tuck: br.tuck, dress: br.dress, mould: it ? { items: it.mould || [], mode: it.mouldMode || {} } : null, saved: br.saved }, say, "from your studio");
+    return take({ cup: br.cup, breast: br, wear: br.wear, belly: be && be.fits, tuck: br.tuck, dress: br.dress, mould: it ? { items: it.mould || [], mode: it.mouldMode || {} } : null, brand: bd || null, saved: br.saved }, say, "from your studio");
   } catch (e) { if (say) say("I couldn't reach your studio (" + (e && e.message || e) + "). Is it running? Start the studio.bat, then try again. Or use its Copy for the Companion button and paste the code here."); return false; }
 }
 

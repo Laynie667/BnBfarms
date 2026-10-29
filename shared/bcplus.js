@@ -54,7 +54,7 @@ export function depthFrom(text) {
 const ANIMALS = { cow: "Cow", bull: "Cow", pony: "Pony", horse: "Pony", pup: "Dog", dog: "Dog", kitt: "Cat", cat: "Cat",
                   bunny: "Bunny", rabbit: "Bunny", fox: "Fox", wolf: "Wolf", mouse: "Mouse", rat: "Mouse" };
 const SOUNDS = { pig: ["oink", "snort", "squee", "grunt"], goat: ["maa", "meh-eh", "bleat"], sheep: ["baa", "baaah", "meh"],
-                 deer: ["bleat", "snort", "huff"], goblin: ["heh", "gnuk", "skree", "hrrk"] };
+                 deer: ["bleat", "snort", "huff"], goblin: ["heh", "gnuk", "skree", "hrrk"], dragon: ["rawr", "grrr", "hsss", "rrrh"] };
 export function petFor(species) {
   const s = speciesKeyOf(species) || String(species || "").toLowerCase();   // "Kitty", "catgirl", "ratslut" (shared/species.js)
   if (ANIMALS[s]) return { animal: ANIMALS[s], sounds: [] };

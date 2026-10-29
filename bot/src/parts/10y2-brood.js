@@ -16,7 +16,7 @@
      • WHAT'S HAPPENIN' TO ME: a few plain lines for the Companion about whatever has them right now.
   */
   const bLine = (key, mn, v) => tFill(pickFor(mn, "brood:"+key, BROOD_LINES[key]), mn, v);
-  function quietNow(mn){ const r = rec(mn); return !!(r && r.quietUntil > Date.now()); }
+  function quietNow(mn){ const r = rec(mn); return !!(r && (r.quietUntil > Date.now() || (r.nursery && r.nursery.role === "little" && r.nursery.space))); }   // (a little in their little space, too: 10up2-nursery.js)
 
   // a little story about one person, a beat at a time (the same pace as the traps); the safeword stops it
   function sceneRun(mn, icon, beats, done, v){

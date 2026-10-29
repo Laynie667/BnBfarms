@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm add-on: Glory stalls
 // @namespace    bnbfarm
-// @version      1.10.0
+// @version      1.10.1
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-glory-stalls.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-glory-stalls.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -110,6 +110,7 @@
     goat: { f: "nanny", m: "billy", young: ["kid", "kids"], call: "bleat", sound: ["a shaky bleat", "a soft bleat", "a loud, startled bleat"] },
     rat: { f: "rat", m: "rat", young: ["pinkie", "pinkies"], call: "squeak", sound: ["a high, needy squeak", "a breathless little squeak", "a shaky chitter"] },
     sheep: { f: "ewe", m: "ram", young: ["lamb", "lambs"], call: "baa", sound: ["a soft baa", "a trembling baa"] },
+    dragon: { f: "dragoness", m: "drake", young: ["hatchling", "hatchlings"], call: "growl", sound: ["a low, rumbling growl", "a hot, hissing breath", "a ragged little rawr"] },
     default: { f: "animal", m: "animal", young: ["little one", "little ones"], call: "moan", sound: ["a soft moan", "a needy whimper", "a shaky gasp"] }
   };
   var KIN = {
@@ -394,6 +395,11 @@
       "%n's long tail curls tight round their own thigh, and they chitter and push back for more like a greedy little gutter rat.",
       "%n's round ears flatten back, and they squeak so needy the next stall over starts laughin'."
     ],
+    dragon: [
+      "%n growls low through the boards on every thrust, claws scrapin' the wood, tail lashin' behind them.",
+      "%n's wings press flat against the stall walls and shiver, and a hot, smoky breath fogs the hole.",
+      "%n lets out a ragged little rawr and pushes back for more like a dragon guardin' its hoard."
+    ],
     goblin: [
       "%n cackles and moans by turns, enjoying themselves far too much for somebody stuck in a stall.",
       "%n mutters filthy goblin encouragement through the wall, and the stranger takes it to heart."
@@ -417,7 +423,8 @@
     sheep: KIND_POOLS.goat,
     deer: KIND_POOLS.deer,
     goblin: KIND_POOLS.goblin,
-    rat: KIND_POOLS.rat
+    rat: KIND_POOLS.rat,
+    dragon: KIND_POOLS.dragon
   };
   var SOUND = [
     "Out of %n comes %snd, loud enough to carry down the row.",

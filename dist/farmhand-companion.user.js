@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.43.0
+// @version      0.44.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -230,7 +230,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.43.0";
+  var VERSION = "0.44.0";
 
   // shared/species.js
   var WORDS = {
@@ -317,6 +317,15 @@ One of mods you are using is using an old version of SDK. It will work for now b
     lamb: "sheep",
     ewe: "sheep",
     ram: "sheep",
+    dragon: "dragon",
+    dragoness: "dragon",
+    drake: "dragon",
+    wyrm: "dragon",
+    wyvern: "dragon",
+    draconic: "dragon",
+    drakeling: "dragon",
+    kobold: "dragon",
+    dragonborn: "dragon",
     rat: "rat",
     ratty: "rat",
     rattie: "rat",
@@ -1254,23 +1263,23 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
       }
       const MOULD = { ver: 0, lies: /* @__PURE__ */ new Set(), span: /* @__PURE__ */ new Map(), cover: /* @__PURE__ */ new Map(), items: /* @__PURE__ */ new Set(), mode: /* @__PURE__ */ new Map(), ext: /* @__PURE__ */ new Map(), img: /* @__PURE__ */ new Map(), prof: /* @__PURE__ */ new Map(), out: /* @__PURE__ */ new Map(), M: 150 };
       const mouldKey = (it) => it.Asset.Group.Name + "/" + it.Asset.Name;
-      const W10 = window;
-      const takesDrawings = () => typeof W10.GLDrawLoadTransient === "function";
+      const W11 = window;
+      const takesDrawings = () => typeof W11.GLDrawLoadTransient === "function";
       const mapSrc = host.mapSrc || ((src) => {
-        if (typeof W10.DrawGetImage !== "function") return src;
-        const lists = [typeof DrawCacheImage !== "undefined" ? DrawCacheImage : W10.DrawCacheImage, W10.DrawImageCache].filter((c) => c && typeof c.get === "function");
+        if (typeof W11.DrawGetImage !== "function") return src;
+        const lists = [typeof DrawCacheImage !== "undefined" ? DrawCacheImage : W11.DrawCacheImage, W11.DrawImageCache].filter((c) => c && typeof c.get === "function");
         if (!lists.length) return src;
         let seen2 = null;
-        const kept = lists.map((c) => [c, Object.prototype.hasOwnProperty.call(c, "get"), c.get]);
+        const kept2 = lists.map((c) => [c, Object.prototype.hasOwnProperty.call(c, "get"), c.get]);
         try {
-          for (const [c] of kept) c.get = function(k) {
+          for (const [c] of kept2) c.get = function(k) {
             if (seen2 == null) seen2 = k;
             return { isLoaded: () => false, data: void 0, complete: false };
           };
-          W10.DrawGetImage(src);
+          W11.DrawGetImage(src);
         } catch (e) {
         } finally {
-          for (const [c, own, g] of kept) {
+          for (const [c, own, g] of kept2) {
             if (own) c.get = g;
             else delete c.get;
           }
@@ -2012,6 +2021,17 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
                   }
                   put2("drawImage", bc, rx - bc.ax, ry - bc.ay, {});
                   if (typeof real.drawImageBlink === "function") put2("drawImageBlink", bc, rx - bc.ax, ry - bc.ay, {});
+                  if (typeof host.overBreast === "function") {
+                    try {
+                      const o = host.overBreast(C, bc, rx - bc.ax, ry - bc.ay);
+                      if (o && o.cv) {
+                        put2("drawImage", o.cv, o.x, o.y, {});
+                        if (typeof real.drawImageBlink === "function") put2("drawImageBlink", o.cv, o.x, o.y, {});
+                      }
+                    } catch (e) {
+                      console.warn("[body] over the breasts:", e);
+                    }
+                  }
                   ctx3.breast = { fit: FarmBreasts.fitOf(S32, FarmBelly.bellyPose(upper[2]), [bc.nips[1][0] + br.nipX, bc.nips[1][1] + br.nipY]), held: isHeld, upperSrc: upper[2], ux: upper[0], pose: bpose, ground: bpose === "AllFours" ? ground : Infinity, S: S32, rx, ry, uy: upper[1], mask: bc.mask, mx: rx - bc.ax, my: ry - bc.ay, nips: bc.nips.map((p, i) => [rx + p[0] + (i ? 1 : -1) * br.nipX, ry + p[1] + br.nipY]), k: FarmBreasts.shape(br.cup, br).k, kN: (1 + 0.45 * FarmBreasts.shape(br.cup, br).k) * br.nip, sig: key + "|" + Math.round(rx) + "," + Math.round(ry) + "|" + [br.nip, br.nipX, br.nipY].join(","), mid: upper[0] + 250 };
                   if (!held.length) {
                     const B = ctx3.breast, sk = bellySkin(upper[2], upper[3], bpose), rad = 7 * B.kN, ncKey = rad.toFixed(2) + "|" + sk.join(",");
@@ -2282,7 +2302,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
                   }
                   g.drawImage(B.mask, MX + B.mx - x, MY + B.my - y);
                   g.globalCompositeOperation = "source-over";
-                  const ho = herOutline(B), W11 = fm.width, rgb2 = (q2, k) => "rgb(" + q2.map((u) => Math.max(0, Math.min(255, Math.round(u * k)))).join(",") + ")";
+                  const ho = herOutline(B), W12 = fm.width, rgb2 = (q2, k) => "rgb(" + q2.map((u) => Math.max(0, Math.min(255, Math.round(u * k)))).join(",") + ")";
                   for (const hv of ho) {
                     const sv = fm.sides.find((q2) => q2.sd === hv.sd);
                     if (!sv) continue;
@@ -2291,7 +2311,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
                     for (let k = 0; k <= FRAME_N; k++) {
                       const a = k % FRAME_N, ta = a / FRAME_N * Math.PI * 2, on2 = !!sv.hit[a] && hv.edge[a] > 0 && Math.sin(ta) < 0.3 && Math.cos(ta) > -0.6;
                       if (on2) {
-                        const t = a / FRAME_N * Math.PI * 2, ux = Math.cos(t) * hv.sd, uy = Math.sin(t), rr = hv.edge[a] - W11 * 0.45;
+                        const t = a / FRAME_N * Math.PI * 2, ux = Math.cos(t) * hv.sd, uy = Math.sin(t), rr = hv.edge[a] - W12 * 0.45;
                         (cur || (cur = [])).push([MX + hv.cx - x + ux * rr, MY + hv.cy - y + uy * rr]);
                       } else if (cur) {
                         segs.push(cur);
@@ -2310,26 +2330,26 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
                     g.lineCap = "round";
                     g.lineJoin = "round";
                     for (const at of sv.att || []) {
-                      const t = at.a / FRAME_N * Math.PI * 2, ux = Math.cos(t) * hv.sd, uy = Math.sin(t), rr = hv.edge[at.a] - W11 * 0.45;
+                      const t = at.a / FRAME_N * Math.PI * 2, ux = Math.cos(t) * hv.sd, uy = Math.sin(t), rr = hv.edge[at.a] - W12 * 0.45;
                       segs.push([[MX + at.x, MY + at.y], [MX + hv.cx - x + ux * rr, MY + hv.cy - y + uy * rr]]);
                     }
                     for (const pts of segs) {
                       if (pts.length < 2) continue;
                       path(pts);
                       g.strokeStyle = rgb2(fm.col, 0.55);
-                      g.lineWidth = W11 + 1.5;
+                      g.lineWidth = W12 + 1.5;
                       g.stroke();
                       path(pts);
                       g.strokeStyle = rgb2(fm.col, 1);
-                      g.lineWidth = W11;
+                      g.lineWidth = W12;
                       g.stroke();
                       path(pts.map((p, i) => {
                         const q2 = pts[Math.min(pts.length - 1, i + 1)], pp = pts[Math.max(0, i - 1)], dx = q2[0] - pp[0], dy = q2[1] - pp[1], L = Math.hypot(dx, dy) || 1;
-                        return [p[0] - dy / L * W11 * 0.18, p[1] + dx / L * W11 * 0.18];
+                        return [p[0] - dy / L * W12 * 0.18, p[1] + dx / L * W12 * 0.18];
                       }));
                       g.globalAlpha = 0.55;
                       g.strokeStyle = rgb2(fm.hi, 1);
-                      g.lineWidth = Math.max(1, W11 * 0.22);
+                      g.lineWidth = Math.max(1, W12 * 0.22);
                       g.stroke();
                       g.globalAlpha = 1;
                     }
@@ -2597,7 +2617,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
                     }
                     let alpha = at;
                     if (mag > 1.15) {
-                      const w2 = Math.max(0.06, Math.min(0.5, 0.3 / mag)), P3 = [p00, p10, p01, p11];
+                      const w2 = Math.max(0.06, Math.min(0.5, 0.3 / mag)), P4 = [p00, p10, p01, p11];
                       const b00 = spb[p00 + 3] * (1 - ax) * (1 - ay), b10 = spb[p10 + 3] * ax * (1 - ay), b01 = spb[p01 + 3] * (1 - ax) * ay, b11 = spb[p11 + 3] * ax * ay, bt = b00 + b10 + b01 + b11;
                       let amin = 255, amax = 0, aEnds = 0, aN = 0;
                       for (let yy = iy - 1; yy <= iy + 2; yy++) for (let xx = ix - 1; xx <= ix + 2; xx++) {
@@ -2882,7 +2902,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
                         let sr = 0, sg2 = 0, sb = 0, sw = 0, sw2 = 0;
                         for (const [di, dj, bwt] of [[0, 0, (1 - du) * (1 - dv)], [1, 0, du * (1 - dv)], [0, 1, (1 - du) * dv], [1, 1, du * dv]]) {
                           if (bwt <= 1e-3) continue;
-                          const P3 = pick(ci + di, cj + dj), cx = (ci + di + 0.5) * S4, cy = (cj + dj + 0.5) * S4, sx = P3[0] + (qx - cx), sy = P3[1] + (qy - cy);
+                          const P4 = pick(ci + di, cj + dj), cx = (ci + di + 0.5) * S4, cy = (cj + dj + 0.5) * S4, sx = P4[0] + (qx - cx), sy = P4[1] + (qy - cy);
                           if (!cleanAt(sx, sy)) continue;
                           const p = (Math.round(sy) * CW + Math.round(sx)) * 4;
                           sr += bwt * (sp[p] - spL[p]);
@@ -3095,14 +3115,14 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
                   c.MX = MX;
                   c.MY = MY;
                   const g = c.getContext("2d"), ox = MX + B.rx - x, oy = MY + B.ry - y;
-                  const P3 = (sd, t) => {
+                  const P4 = (sd, t) => {
                     const p = FarmBreasts.point(S22, sd, t);
                     return [ox + p[0], oy + p[1]];
                   };
                   const arc = (sd, from, to) => {
                     g.beginPath();
                     for (let j = 0; j <= 60; j++) {
-                      const p = P3(sd, from + (to - from) * j / 60);
+                      const p = P4(sd, from + (to - from) * j / 60);
                       if (j) g.lineTo(p[0], p[1]);
                       else g.moveTo(p[0], p[1]);
                     }
@@ -3177,7 +3197,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
                     if (R.cross) {
                       const wd = R.cross * grow;
                       for (const sd of [-1, 1]) strap(wd, () => {
-                        const a = P3(sd, -Math.PI / 2), b = P3(-sd, Math.PI * (sd > 0 ? 0.72 : 0.28));
+                        const a = P4(sd, -Math.PI / 2), b = P4(-sd, Math.PI * (sd > 0 ? 0.72 : 0.28));
                         g.beginPath();
                         g.moveTo(a[0], a[1]);
                         g.lineTo(b[0], b[1]);
@@ -3211,8 +3231,8 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
                   c.height = h2 + MY * 2;
                   c.MX = MX;
                   c.MY = MY;
-                  const g = c.getContext("2d"), N = B.nips.map((p) => [p[0] - x, p[1] - y]);
-                  const jx = (N[0][0] + N[1][0]) / 2, jy = Math.min(PUMP.pumpTop - 90, Math.max(N[0][1], N[1][1]) + 40 + 30 * B.k);
+                  const g = c.getContext("2d"), N2 = B.nips.map((p) => [p[0] - x, p[1] - y]);
+                  const jx = (N2[0][0] + N2[1][0]) / 2, jy = Math.min(PUMP.pumpTop - 90, Math.max(N2[0][1], N2[1][1]) + 40 + 30 * B.k);
                   g.drawImage(im, 0, PUMP.pumpTop, w, h2 - PUMP.pumpTop, MX, MY + PUMP.pumpTop, w, h2 - PUMP.pumpTop);
                   for (let yy = Math.round(jy); yy < PUMP.pumpTop; yy++) {
                     const t = (yy - jy) / (PUMP.pumpTop - jy), sy = PUMP.join[1] + t * (PUMP.pumpTop - PUMP.join[1]);
@@ -3225,12 +3245,12 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
                     g.lineWidth = wd;
                     for (let i = 0; i < 2; i++) {
                       g.beginPath();
-                      g.moveTo(MX + N[i][0], MY + N[i][1] + 10);
-                      g.quadraticCurveTo(MX + N[i][0] + (jx - N[i][0]) * 0.25, MY + jy - 6, MX + jx, MY + jy + 4);
+                      g.moveTo(MX + N2[i][0], MY + N2[i][1] + 10);
+                      g.quadraticCurveTo(MX + N2[i][0] + (jx - N2[i][0]) * 0.25, MY + jy - 6, MX + jx, MY + jy + 4);
                       g.stroke();
                     }
                   }
-                  PUMP.cups.forEach(([sx, sy, sw, sh], i) => g.drawImage(im, sx, sy, sw, sh, MX + N[i][0] - (PUMP.cupMid[i][0] - sx), MY + N[i][1] - (PUMP.cupMid[i][1] - sy), sw, sh));
+                  PUMP.cups.forEach(([sx, sy, sw, sh], i) => g.drawImage(im, sx, sy, sw, sh, MX + N2[i][0] - (PUMP.cupMid[i][0] - sx), MY + N2[i][1] - (PUMP.cupMid[i][1] - sy), sw, sh));
                   keepIn(BREAST.out, key, c);
                 }
                 put2(name, c, x - c.MX, y - c.MY, o);
@@ -3261,10 +3281,10 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
                   const g = c.getContext("2d");
                   [[0, split], [split, w - split]].forEach(([sx, sw], i) => {
                     if (sw <= 0) return;
-                    const N = ctx3.native && ctx3.native[i] || own[i] && [x + own[i][0], y + own[i][1]];
-                    if (!N) return;
+                    const N2 = ctx3.native && ctx3.native[i] || own[i] && [x + own[i][0], y + own[i][1]];
+                    if (!N2) return;
                     const T = B.nips[i];
-                    g.drawImage(im, sx, 0, sw, h2, MX + (T[0] - x) + (sx + x - N[0]) * kN, MY + (T[1] - y) + (y - N[1]) * kN, sw * kN, h2 * kN);
+                    g.drawImage(im, sx, 0, sw, h2, MX + (T[0] - x) + (sx + x - N2[0]) * kN, MY + (T[1] - y) + (y - N2[1]) * kN, sw * kN, h2 * kN);
                   });
                   keepIn(BREAST.out, key, c);
                 }
@@ -3849,8 +3869,65 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     if (say) say(trial ? "Belly test: " + ["", "small", "medium", "large"][trial] + ". Look at your character with nothing over your middle. Only you can see it. Tell Claude how it looks: the shape, the colour match, where it sits." : "Belly test off.");
   }
 
-  // extension/src/drawnbody.js
+  // extension/src/bcr.js
   var W3 = window;
+  var warned = false;
+  var kept = /* @__PURE__ */ new Map();
+  function bcrOverBreast(C, bc, bx, by) {
+    try {
+      if (typeof W3.BodyMarksZonesOf !== "function" || typeof W3.BodyMarksDrawZone !== "function" || typeof W3.BodyMarksZoneBox !== "function") return null;
+      const ZONES = typeof BodyMarksZones !== "undefined" ? BodyMarksZones : null;
+      if (!ZONES || !ZONES.Breasts || !C || C.MemberNumber == null) return null;
+      const zones2 = W3.BodyMarksZonesOf(C), state = zones2 && zones2.Breasts;
+      if (!state) return null;
+      const measured = typeof BodyMarksMeasured !== "undefined" && BodyMarksMeasured.get ? BodyMarksMeasured.get(C.MemberNumber) : void 0;
+      const def = ZONES.Breasts, box2 = W3.BodyMarksZoneBox(C, def, measured);
+      if (!box2 || box2.Hidden) return null;
+      const size = typeof W3.BodyMarksSizeOf === "function" ? W3.BodyMarksSizeOf(C, def) || 1 : 1;
+      const key = JSON.stringify(state) + "|" + bc.width + "x" + bc.height + "|" + Math.round(bx) + "," + Math.round(by) + "|" + Math.round(box2.Top) + "|" + size;
+      const was = kept.get(C.MemberNumber);
+      if (was && was.key === key) return was.res;
+      const H = (typeof CanvasDrawHeight !== "undefined" ? CanvasDrawHeight : 0) || C.Canvas && C.Canvas.height || 1700;
+      const raw = W3.document.createElement("canvas");
+      raw.width = 500;
+      raw.height = H;
+      const prev = MainCanvas;
+      MainCanvas = raw.getContext("2d");
+      try {
+        W3.BodyMarksDrawZone(C, "Breasts", state);
+      } finally {
+        MainCanvas = prev;
+      }
+      const sx = 250 + (box2.X || 0) - 130 * size, sw = 260 * size, sy = box2.Top - box2.Height * 0.35, sh = box2.Height * 1.9;
+      const out = W3.document.createElement("canvas");
+      out.width = bc.width;
+      out.height = bc.height;
+      const g = out.getContext("2d");
+      g.drawImage(raw, sx, sy, sw, sh, 0, bc.height * 0.08, bc.width, bc.height * 0.84);
+      g.globalCompositeOperation = "destination-in";
+      g.drawImage(bc, 0, 0);
+      g.globalCompositeOperation = "source-over";
+      const d = g.getImageData(0, 0, out.width, out.height).data;
+      let any = false;
+      for (let i = 3; i < d.length; i += 16) if (d[i]) {
+        any = true;
+        break;
+      }
+      const res = any ? { cv: out, x: bx, y: by } : null;
+      kept.set(C.MemberNumber, { key, res });
+      if (kept.size > 40) kept.delete(kept.keys().next().value);
+      return res;
+    } catch (e) {
+      if (!warned) {
+        warned = true;
+        console.warn("[Farmhand Companion] BCR marks on the drawn breasts:", e);
+      }
+      return null;
+    }
+  }
+
+  // extension/src/drawnbody.js
+  var W4 = window;
   var KEY = "farmhand-drawn-body";
   var SEE_KEY = "farmhand-drawn-body-see";
   var FARM_KEY = "farmhand-drawn-body-farm";
@@ -3866,16 +3943,16 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
   var others = /* @__PURE__ */ new Map();
   function load() {
     try {
-      const d = JSON.parse(W3.localStorage.getItem(KEY));
+      const d = JSON.parse(W4.localStorage.getItem(KEY));
       if (d && typeof d === "object") S2 = Object.assign(DEFAULTS(), d);
     } catch (e) {
     }
     try {
-      seeOthers = W3.localStorage.getItem(SEE_KEY) !== "0";
+      seeOthers = W4.localStorage.getItem(SEE_KEY) !== "0";
     } catch (e) {
     }
     try {
-      const f = JSON.parse(W3.localStorage.getItem(FARM_KEY));
+      const f = JSON.parse(W4.localStorage.getItem(FARM_KEY));
       if (f && typeof f.at === "number" && f.body) {
         const b = clean(f.body);
         if (b) farm = { at: f.at, body: b };
@@ -3920,7 +3997,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
   }
   function save() {
     try {
-      W3.localStorage.setItem(KEY, JSON.stringify(S2));
+      W4.localStorage.setItem(KEY, JSON.stringify(S2));
     } catch (e) {
     }
   }
@@ -3961,7 +4038,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
       made.set(cv, p);
       return null;
     }
-    const c = W3.document.createElement("canvas");
+    const c = W4.document.createElement("canvas");
     c.width = x1 - x0 + 1;
     c.height = y1 - y0 + 1;
     c.getContext("2d").drawImage(cv, -x0, -y0);
@@ -3980,17 +4057,17 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
       gone.add(src);
       n++;
       try {
-        const m = W3.GLDrawImageCache;
+        const m = W4.GLDrawImageCache;
         if (m && typeof m.delete === "function") m.delete(src);
       } catch (e) {
       }
       try {
-        const m = W3.DrawImageCache;
+        const m = W4.DrawImageCache;
         if (m && typeof m.delete === "function") m.delete(src);
       } catch (e) {
       }
       try {
-        const gl = W3.GLDrawCanvas && W3.GLDrawCanvas.GL, tc = gl && gl.textureCache;
+        const gl = W4.GLDrawCanvas && W4.GLDrawCanvas.GL, tc = gl && gl.textureCache;
         const t2 = tc && tc.get(src);
         if (t2) {
           if (t2.texture) gl.deleteTexture(t2.texture);
@@ -4004,7 +4081,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     for (const [mn, o] of others) if (o.E && Date.now() - o.at > 12e4 && !charOf(mn)) o.E = null;
     return n;
   }
-  var charOf = (mn) => W3.Player && W3.Player.MemberNumber === mn ? W3.Player : (W3.ChatRoomCharacter || []).find((c) => c && c.MemberNumber === mn) || null;
+  var charOf = (mn) => W4.Player && W4.Player.MemberNumber === mn ? W4.Player : (W4.ChatRoomCharacter || []).find((c) => c && c.MemberNumber === mn) || null;
   var itemOf = (C, g) => C && Array.isArray(C.Appearance) ? C.Appearance.find((a) => a && a.Asset && a.Asset.Group && a.Asset.Group.Name === g) : void 0;
   var againT = /* @__PURE__ */ new Map();
   function redrawMn(mn, soon) {
@@ -4012,20 +4089,20 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     againT.set(mn, setTimeout(() => {
       try {
         const C = charOf(mn);
-        if (C && typeof W3.CharacterLoadCanvas === "function") W3.CharacterLoadCanvas(C);
+        if (C && typeof W4.CharacterLoadCanvas === "function") W4.CharacterLoadCanvas(C);
       } catch (e) {
         console.warn("[Farmhand Companion] drawn body redraw:", e);
       }
     }, soon || 60));
   }
   var redraw = (soon) => {
-    if (W3.Player) redrawMn(W3.Player.MemberNumber, soon);
+    if (W4.Player) redrawMn(W4.Player.MemberNumber, soon);
   };
   function makeEngine(mn) {
-    if (!W3.FarmBelly) W3.FarmBelly = bellyDrawing;
-    if (typeof W3.FarmBodyEngine !== "function" || !W3.FarmBreasts) return null;
-    const who = mn == null ? () => W3.Player || null : () => charOf(mn);
-    return W3.FarmBodyEngine({
+    if (!W4.FarmBelly) W4.FarmBelly = bellyDrawing;
+    if (typeof W4.FarmBodyEngine !== "function" || !W4.FarmBreasts) return null;
+    const who = mn == null ? () => W4.Player || null : () => charOf(mn);
+    return W4.FarmBodyEngine({
       S: { get C() {
         return who();
       } },
@@ -4035,19 +4112,21 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
       // never: their body items are theirs
       redraw: () => mn == null ? redraw(60) : redrawMn(mn, 60),
       picture,
+      overBreast: bcrOverBreast,
+      // BCR's marks on the drawn breasts (bcr.js)
       budget: mn == null ? 192e6 : 96e6
       // how much of its drawings it keeps between drawings (body-engine.js): yours more, everybody else's less
     });
   }
   function engine() {
-    if (!mine.E && W3.Player) mine.E = makeEngine(null);
+    if (!mine.E && W4.Player) mine.E = makeEngine(null);
     if (mine.E) apply(mine.E, eff());
     return mine.E;
   }
   function apply(E, s) {
     if (!E) return;
     const B = E.BREAST, b = s.breast || {};
-    B.cup = Math.max(0, Math.min(W3.FarmBreasts.CUPS.length - 1, Math.round(Number(s.cup) || 0)));
+    B.cup = Math.max(0, Math.min(W4.FarmBreasts.CUPS.length - 1, Math.round(Number(s.cup) || 0)));
     for (const k of ["full", "hang", "apart", "x", "y", "nip", "nipY", "nipX"]) if (typeof b[k] === "number" && isFinite(b[k])) B[k] = b[k];
     B.wear = s.wear && typeof s.wear === "object" ? Object.assign({}, s.wear) : {};
     B.out.clear();
@@ -4095,12 +4174,17 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     s.dress = d.dress !== false;
     s.mould = { items: (Array.isArray(d.mould && d.mould.items) ? d.mould.items : []).filter((k) => typeof k === "string" && /^[\w/ -]{1,80}$/.test(k)).slice(0, 60), mode: {} };
     for (const [k, m] of Object.entries(d.mould && d.mould.mode || {})) if (s.mould.items.includes(k) && ["wide", "over", "under"].includes(m)) s.mould.mode[k] = m;
+    if (d.brand && typeof d.brand === "object") {
+      const b = d.brand, places = {};
+      for (const [k, p] of Object.entries(b.places || {})) if (/^(hip|thigh|chest|shoulder)[LR]$|^(mons|tummy)$/.test(k) && p && typeof p === "object") places[k] = { size: num(p.size, 16, 200, 46), angle: num(p.angle, -180, 180, 0), dx: num(p.dx, -80, 80, 0), dy: num(p.dy, -80, 80, 0) };
+      s.brand = { art: b.art === "full" ? "full" : "mark", look: ["seared", "healed", "ink"].includes(b.look) ? b.look : "seared", size: num(b.size, 16, 200, 46), places };
+    }
     return s;
   }
   var shareOf = (s) => ({ cup: s.cup, breast: s.breast, wear: s.wear, belly: s.belly, auto: s.auto, tuck: s.tuck, dress: s.dress, mould: s.mould });
   var send = (type, data) => {
     try {
-      if (W3.ServerSend && W3.ServerPlayerIsInChatRoom && W3.ServerPlayerIsInChatRoom()) W3.ServerSend("ChatRoomChat", makeMsg(type, data));
+      if (W4.ServerSend && W4.ServerPlayerIsInChatRoom && W4.ServerPlayerIsInChatRoom()) W4.ServerSend("ChatRoomChat", makeMsg(type, data));
     } catch (e) {
     }
   };
@@ -4118,7 +4202,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
   }
   function onBodyMsg(m) {
     const mn = m.from;
-    if (!mn || W3.Player && mn === W3.Player.MemberNumber) return;
+    if (!mn || W4.Player && mn === W4.Player.MemberNumber) return;
     if (m.type === "bodyAsk") {
       if (S2.on) setTimeout(() => tell(), 300 + Math.random() * 1500);
       return;
@@ -4151,7 +4235,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
         const C = args[0];
         if (!C) return next(args);
         let E = null;
-        if (C === W3.Player) {
+        if (C === W4.Player) {
           if (S2.on) E = mine.E || engine();
         } else if (seeOthers && typeof C.MemberNumber === "number") {
           const o = others.get(C.MemberNumber);
@@ -4202,7 +4286,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     setInterval(prune, 2e4);
     setTimeout(() => {
       if (S2.on && engine()) {
-        W3.__farmDrawnBody = true;
+        W4.__farmDrawnBody = true;
         redraw(500);
       }
       hook();
@@ -4211,7 +4295,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     }, 3e3);
   }
   function drawnBodyState() {
-    const up = itemOf(W3.Player, "BodyUpper"), cups = W3.FarmBreasts && W3.FarmBreasts.CUPS || [], e = eff();
+    const up = itemOf(W4.Player, "BodyUpper"), cups = W4.FarmBreasts && W4.FarmBreasts.CUPS || [], e = eff();
     return {
       on: !!S2.on,
       cup: e.cup,
@@ -4239,7 +4323,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     if (farm && farm.at === at) return;
     farm = { at, body: b };
     try {
-      W3.localStorage.setItem(FARM_KEY, JSON.stringify(farm));
+      W4.localStorage.setItem(FARM_KEY, JSON.stringify(farm));
     } catch (e) {
     }
     if (S2.saved) return;
@@ -4277,9 +4361,9 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
         return say && say("The drawn body didn't load. Reload the page and try again.");
       }
       bellyTrial(0);
-      W3.__farmDrawnBody = true;
+      W4.__farmDrawnBody = true;
       hook();
-    } else W3.__farmDrawnBody = false;
+    } else W4.__farmDrawnBody = false;
     tell(true);
     redraw(60);
     setTimeout(() => redraw(0), 800);
@@ -4293,7 +4377,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
   function drawnBodySeeOthers(on2, say) {
     seeOthers = !!on2;
     try {
-      W3.localStorage.setItem(SEE_KEY, on2 ? "1" : "0");
+      W4.localStorage.setItem(SEE_KEY, on2 ? "1" : "0");
     } catch (e) {
     }
     for (const mn of others.keys()) redrawMn(mn, 60);
@@ -4304,7 +4388,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     if (say) say(on2 ? "You'll see other people's drawn bodies." : "Other people are drawn the game's own way on your screen.");
   }
   function drawnBodyCup(i, say) {
-    const n = W3.FarmBreasts ? W3.FarmBreasts.CUPS.length : 21;
+    const n = W4.FarmBreasts ? W4.FarmBreasts.CUPS.length : 21;
     if (i === "auto") {
       S2.cupSet = false;
       save();
@@ -4344,7 +4428,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     try {
       const t = String(text || "").trim();
       if (!t.startsWith(CODE_HEAD)) throw new Error("that isn't a code from the studio (it starts with " + CODE_HEAD + ")");
-      const raw = W3.LZString && typeof W3.LZString.decompressFromBase64 === "function" ? W3.LZString.decompressFromBase64(t.slice(CODE_HEAD.length)) : null;
+      const raw = W4.LZString && typeof W4.LZString.decompressFromBase64 === "function" ? W4.LZString.decompressFromBase64(t.slice(CODE_HEAD.length)) : null;
       const d = raw && JSON.parse(raw);
       if (!d || typeof d !== "object" || d.v !== 1) throw new Error("the code is damaged or from a newer studio");
       return take(d, say, "from the code");
@@ -4360,24 +4444,24 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
         if (!r.ok) throw new Error(f + ": " + r.status);
         return r.json();
       };
-      const [br, be, it] = await Promise.all([get2("breasts.json"), get2("belly.json").catch(() => null), get2("items.json").catch(() => null)]);
+      const [br, be, it, bd] = await Promise.all([get2("breasts.json"), get2("belly.json").catch(() => null), get2("items.json").catch(() => null), get2("brand.json").catch(() => null)]);
       if (!br) throw new Error("the studio hasn't saved any breasts yet (Save the breasts)");
-      return take({ cup: br.cup, breast: br, wear: br.wear, belly: be && be.fits, tuck: br.tuck, dress: br.dress, mould: it ? { items: it.mould || [], mode: it.mouldMode || {} } : null, saved: br.saved }, say, "from your studio");
+      return take({ cup: br.cup, breast: br, wear: br.wear, belly: be && be.fits, tuck: br.tuck, dress: br.dress, mould: it ? { items: it.mould || [], mode: it.mouldMode || {} } : null, brand: bd || null, saved: br.saved }, say, "from your studio");
     } catch (e) {
       if (say) say("I couldn't reach your studio (" + (e && e.message || e) + "). Is it running? Start the studio.bat, then try again. Or use its Copy for the Companion button and paste the code here.");
       return false;
     }
   }
   function drawnBodyMemory() {
-    let kept = 0, engines = 0;
+    let kept2 = 0, engines = 0;
     for (const E of [mine.E, ...Array.from(others.values()).map((o) => o.E)]) if (E) {
       engines++;
       try {
-        kept += E.keptBytes ? E.keptBytes() : 0;
+        kept2 += E.keptBytes ? E.keptBytes() : 0;
       } catch (e) {
       }
     }
-    return { engines, others: others.size, pictures: used.size, keptMB: Math.round(kept / 1e6) };
+    return { engines, others: others.size, pictures: used.size, keptMB: Math.round(kept2 / 1e6) };
   }
 
   // studio/web/splatters.js
@@ -4625,14 +4709,14 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
       c.height = img2.height;
       const x = c.getContext("2d");
       x.drawImage(img2, 0, 0);
-      const W10 = c.width, H = c.height, d = x.getImageData(0, 0, W10, H).data, seen2 = new Uint8Array(W10 * H), out = [];
-      for (let i = 0; i < W10 * H; i++) {
+      const W11 = c.width, H = c.height, d = x.getImageData(0, 0, W11, H).data, seen2 = new Uint8Array(W11 * H), out = [];
+      for (let i = 0; i < W11 * H; i++) {
         if (seen2[i] || d[i * 4 + 3] < 16) continue;
         const q2 = [i];
         seen2[i] = 1;
-        let x0 = W10, y0 = H, x1 = 0, y1 = 0, n = 0;
+        let x0 = W11, y0 = H, x1 = 0, y1 = 0, n = 0;
         while (q2.length) {
-          const p = q2.pop(), px = p % W10, py = p / W10 | 0;
+          const p = q2.pop(), px = p % W11, py = p / W11 | 0;
           n++;
           if (px < x0) x0 = px;
           if (px > x1) x1 = px;
@@ -4640,8 +4724,8 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
           if (py > y1) y1 = py;
           for (let dy = -2; dy <= 2; dy++) for (let dx = -2; dx <= 2; dx++) {
             const nx = px + dx, ny = py + dy;
-            if (nx < 0 || ny < 0 || nx >= W10 || ny >= H) continue;
-            const k = ny * W10 + nx;
+            if (nx < 0 || ny < 0 || nx >= W11 || ny >= H) continue;
+            const k = ny * W11 + nx;
             if (!seen2[k] && d[k * 4 + 3] >= 16) {
               seen2[k] = 1;
               q2.push(k);
@@ -4907,13 +4991,138 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     root.FarmMess = { KINDS: KINDS2, AREAS: AREAS3, paint, paintOn, rng, loadStamps, STAMPS };
   })(typeof window !== "undefined" ? window : globalThis);
 
+  // studio/web/brand-drawing.js
+  (() => {
+    const BRAND_ART = {
+      mark: { src: "data:image/png;base64,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", w: 205, h: 220 },
+      full: { src: "data:image/png;base64,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", w: 299, h: 360 }
+    };
+    const BRAND_PLACES = {
+      hipL: { label: "Left hip", at: [192, 528, -12] },
+      hipR: { label: "Right hip", at: [308, 528, 12] },
+      thighL: { label: "Left thigh", at: [212, 640, -4] },
+      thighR: { label: "Right thigh", at: [288, 640, 4] },
+      mons: { label: "Low on the belly", at: [250, 515, 0] },
+      tummy: { label: "Tummy", at: [250, 455, 0] },
+      chestL: { label: "Left breast, up top", at: [205, 288, -6] },
+      chestR: { label: "Right breast, up top", at: [295, 288, 6] },
+      shoulderL: { label: "Left shoulder", at: [170, 262, -18] },
+      shoulderR: { label: "Right shoulder", at: [330, 262, 18] }
+    };
+    const BRAND_LOOKS = { seared: "Fresh and seared", healed: "Healed, pale and raised", ink: "Inked black" };
+    const BRAND_DEFAULT = { art: "mark", place: "hipR", size: 46, angle: 0, dx: 0, dy: 0, look: "seared", flip: false };
+    function cleanBrand2(b) {
+      if (!b || typeof b !== "object") return null;
+      const n = (v, lo, hi, d) => Number.isFinite(+v) ? Math.max(lo, Math.min(hi, +v)) : d;
+      return {
+        art: b.art === "full" ? "full" : "mark",
+        place: BRAND_PLACES[b.place] ? b.place : BRAND_DEFAULT.place,
+        size: n(b.size, 16, 200, BRAND_DEFAULT.size),
+        angle: n(b.angle, -180, 180, 0),
+        dx: n(b.dx, -80, 80, 0),
+        dy: n(b.dy, -80, 80, 0),
+        look: BRAND_LOOKS[b.look] ? b.look : "seared",
+        flip: !!b.flip
+      };
+    }
+    const imgs2 = {};
+    function art(which) {
+      const A = BRAND_ART[which] || BRAND_ART.mark;
+      let i = imgs2[which];
+      if (!i) {
+        i = imgs2[which] = new Image();
+        i.src = A.src;
+      }
+      return i.complete && i.naturalWidth ? i : null;
+    }
+    const brandReady2 = (b) => !!art(b && b.art || "mark");
+    const made3 = /* @__PURE__ */ new Map();
+    function stamp(b) {
+      const key = b.art + "|" + b.look + "|" + Math.round(b.size), was = made3.get(key);
+      if (was) return was;
+      const i = art(b.art);
+      if (!i) return null;
+      const h2 = Math.round(b.size), w = Math.round(i.naturalWidth * h2 / i.naturalHeight), pad = 6;
+      const c = document.createElement("canvas");
+      c.width = w + pad * 2;
+      c.height = h2 + pad * 2;
+      const g = c.getContext("2d");
+      const tint = (color, alpha, blur, grow) => {
+        const t = document.createElement("canvas");
+        t.width = c.width;
+        t.height = c.height;
+        const tg = t.getContext("2d");
+        if (blur) tg.filter = "blur(" + blur + "px)";
+        const gw = w * (grow || 1), gh = h2 * (grow || 1);
+        tg.drawImage(i, pad + (w - gw) / 2, pad + (h2 - gh) / 2, gw, gh);
+        tg.filter = "none";
+        tg.globalCompositeOperation = "source-in";
+        tg.fillStyle = color;
+        tg.fillRect(0, 0, t.width, t.height);
+        g.globalAlpha = alpha;
+        g.drawImage(t, 0, 0);
+        g.globalAlpha = 1;
+      };
+      if (b.look === "ink") tint("#16120f", 0.85, 0.4);
+      else if (b.look === "healed") {
+        tint("#e7b6a6", 0.55, 2.2, 1.04);
+        tint("#f3d2c4", 0.75, 0.6);
+        tint("#ffffff", 0.18, 0);
+      } else {
+        tint("#c8574a", 0.5, 3, 1.06);
+        tint("#7a2418", 0.85, 0.8);
+        tint("#3a120c", 0.55, 0.3);
+      }
+      made3.set(key, c);
+      if (made3.size > 24) made3.delete(made3.keys().next().value);
+      return c;
+    }
+    function paintBrand2(g, mask, brand, ox, oy, over) {
+      const b = cleanBrand2(brand);
+      if (!b) return false;
+      const s = stamp(b);
+      if (!s) return false;
+      const P4 = BRAND_PLACES[b.place].at, x = P4[0] + b.dx + (ox || 0), y = P4[1] + b.dy + (over || 0) + (oy || 0);
+      const W0 = g.canvas.width, H0 = g.canvas.height;
+      const t = document.createElement("canvas");
+      t.width = W0;
+      t.height = H0;
+      const tg = t.getContext("2d");
+      tg.translate(x, y);
+      tg.rotate((P4[2] + b.angle) * Math.PI / 180);
+      if (b.flip) tg.scale(-1, 1);
+      tg.drawImage(s, -s.width / 2, -s.height / 2);
+      tg.setTransform(1, 0, 0, 1, 0, 0);
+      if (mask) {
+        tg.globalCompositeOperation = "destination-in";
+        tg.drawImage(mask, 0, 0);
+        tg.globalCompositeOperation = "source-over";
+      }
+      g.drawImage(t, 0, 0);
+      return true;
+    }
+    window.FarmBrand = { ART: BRAND_ART, PLACES: BRAND_PLACES, LOOKS: BRAND_LOOKS, DEFAULT: BRAND_DEFAULT, clean: cleanBrand2, paint: paintBrand2, ready: brandReady2 };
+  })();
+
   // extension/src/messes.js
-  var W4 = window;
+  var cleanBrand = (b) => W5.FarmBrand.clean(b);
+  var brandReady = (b) => W5.FarmBrand.ready(b);
+  var paintBrand = (...a) => W5.FarmBrand.paint(...a);
+  var W5 = window;
   var KEY2 = "farmhand-messes";
   var MAX = 60;
   var sdk3 = null;
   var hooked3 = false;
   var mine2 = [];
+  var myBrand = null;
+  function messBrand(b) {
+    const nb = b ? cleanBrand(b) : null;
+    if (JSON.stringify(nb) === JSON.stringify(myBrand)) return;
+    myBrand = nb;
+    tell2(true);
+    redrawMe();
+    if (nb && !brandReady(nb)) setTimeout(redrawMe, 600);
+  }
   var DIAG = { marks: [], draw: null, draws: 0, lastErr: "", got: 0 };
   var others2 = /* @__PURE__ */ new Map();
   var BY_COLOR = {
@@ -4932,7 +5141,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
   var AREA_OF = { face: "face", forehead: "forehead", chest: "chest", tummy: "tummy", hair: "hair", thighs: "thighL", back: "back" };
   function load2() {
     try {
-      const v = JSON.parse(W4.localStorage.getItem(KEY2));
+      const v = JSON.parse(W5.localStorage.getItem(KEY2));
       if (Array.isArray(v)) mine2 = v.filter(ok).slice(-MAX);
     } catch (e) {
       mine2 = [];
@@ -4940,17 +5149,17 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
   }
   function save2() {
     try {
-      W4.localStorage.setItem(KEY2, JSON.stringify(mine2));
+      W5.localStorage.setItem(KEY2, JSON.stringify(mine2));
     } catch (e) {
     }
   }
-  var ok = (e) => e && typeof e.k === "string" && W4.FarmMess && W4.FarmMess.KINDS[e.k] && Array.isArray(e.a) && Number.isFinite(e.s);
-  var clean2 = (list) => Array.isArray(list) ? list.filter(ok).slice(-MAX).map((e) => ({ k: e.k, a: e.a.filter((x) => typeof x === "string" && W4.FarmMess.AREAS[x]).slice(0, 6), s: e.s | 0, t: +e.t || 0, m: Math.max(0.5, Math.min(3, Number(e.m) || 1)) })) : [];
+  var ok = (e) => e && typeof e.k === "string" && W5.FarmMess && W5.FarmMess.KINDS[e.k] && Array.isArray(e.a) && Number.isFinite(e.s);
+  var clean2 = (list) => Array.isArray(list) ? list.filter(ok).slice(-MAX).map((e) => ({ k: e.k, a: e.a.filter((x) => typeof x === "string" && W5.FarmMess.AREAS[x]).slice(0, 6), s: e.s | 0, t: +e.t || 0, m: Math.max(0.5, Math.min(3, Number(e.m) || 1)) })) : [];
   function messFromMark(m) {
-    DIAG.marks.push({ at: Date.now(), mess: m && m.mess, splat: m && m.splat, farmMess: !!W4.FarmMess });
+    DIAG.marks.push({ at: Date.now(), mess: m && m.mess, splat: m && m.splat, farmMess: !!W5.FarmMess });
     if (DIAG.marks.length > 5) DIAG.marks.shift();
-    if (!m || !Array.isArray(m.splat) || !m.splat.length || !W4.FarmMess) return false;
-    const kind = typeof m.mess === "string" && W4.FarmMess.KINDS[m.mess] ? m.mess : (typeof m.color === "string" ? BY_COLOR[m.color.toLowerCase()] : null) || "cum";
+    if (!m || !Array.isArray(m.splat) || !m.splat.length || !W5.FarmMess) return false;
+    const kind = typeof m.mess === "string" && W5.FarmMess.KINDS[m.mess] ? m.mess : (typeof m.color === "string" ? BY_COLOR[m.color.toLowerCase()] : null) || "cum";
     const a = [];
     for (const x of m.splat) {
       const k = AREA_OF[x];
@@ -4976,7 +5185,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
   }
   var send2 = (type, data) => {
     try {
-      if (W4.ServerSend && W4.ServerPlayerIsInChatRoom && W4.ServerPlayerIsInChatRoom()) W4.ServerSend("ChatRoomChat", makeMsg(type, data));
+      if (W5.ServerSend && W5.ServerPlayerIsInChatRoom && W5.ServerPlayerIsInChatRoom()) W5.ServerSend("ChatRoomChat", makeMsg(type, data));
     } catch (e) {
     }
   };
@@ -4985,7 +5194,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
   function tell2(force) {
     if (!force && Date.now() - toldAt2 < 8e3) return;
     toldAt2 = Date.now();
-    send2("mess", { list: mine2 });
+    send2("mess", myBrand ? { list: mine2, brand: myBrand } : { list: mine2 });
   }
   function ask2() {
     if (Date.now() - askedAt2 < 8e3) return;
@@ -4994,37 +5203,39 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
   }
   function onMessMsg(m) {
     const mn = m.from;
-    if (!mn || W4.Player && mn === W4.Player.MemberNumber) return;
+    if (!mn || W5.Player && mn === W5.Player.MemberNumber) return;
     if (m.type === "messAsk") {
-      if (mine2.length) setTimeout(() => tell2(), 300 + Math.random() * 1500);
+      if (mine2.length || myBrand) setTimeout(() => tell2(), 300 + Math.random() * 1500);
       return;
     }
     if (m.type !== "mess") return;
-    const list = clean2(m.list);
-    if (!list.length) {
+    const list = clean2(m.list), brand = m.brand ? cleanBrand(m.brand) : null;
+    if (!list.length && !brand) {
       if (others2.delete(mn)) redrawMn2(mn);
       return;
     }
-    others2.set(mn, { list, at: Date.now() });
+    others2.set(mn, { list, brand, at: Date.now() });
     hook2();
     redrawMn2(mn);
+    if (brand && !brandReady(brand)) setTimeout(() => redrawMn2(mn), 600);
   }
-  var charOf2 = (mn) => W4.Player && W4.Player.MemberNumber === mn ? W4.Player : (W4.ChatRoomCharacter || []).find((c) => c && c.MemberNumber === mn) || null;
+  var charOf2 = (mn) => W5.Player && W5.Player.MemberNumber === mn ? W5.Player : (W5.ChatRoomCharacter || []).find((c) => c && c.MemberNumber === mn) || null;
   var againT2 = /* @__PURE__ */ new Map();
   function redrawMn2(mn, soon) {
     clearTimeout(againT2.get(mn));
     againT2.set(mn, setTimeout(() => {
       try {
         const C = charOf2(mn);
-        if (C && typeof W4.CharacterLoadCanvas === "function") W4.CharacterLoadCanvas(C);
+        if (C && typeof W5.CharacterLoadCanvas === "function") W5.CharacterLoadCanvas(C);
       } catch (e) {
       }
     }, soon || 80));
   }
   var redrawMe = () => {
-    if (W4.Player) redrawMn2(W4.Player.MemberNumber);
+    if (W5.Player) redrawMn2(W5.Player.MemberNumber);
   };
-  var listFor = (C) => C === W4.Player ? mine2 : (others2.get(C.MemberNumber) || {}).list || [];
+  var listFor = (C) => C === W5.Player ? mine2 : (others2.get(C.MemberNumber) || {}).list || [];
+  var brandFor = (C) => C === W5.Player ? myBrand : (others2.get(C.MemberNumber) || {}).brand || null;
   var imgs = /* @__PURE__ */ new Map();
   function img(src, mn) {
     let i = imgs.get(src);
@@ -5035,7 +5246,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     imgs.set(src, i);
     return null;
   }
-  if (W4.FarmMess && W4.FarmMess.loadStamps) W4.FarmMess.loadStamps("").then((n) => {
+  if (W5.FarmMess && W5.FarmMess.loadStamps) W5.FarmMess.loadStamps("").then((n) => {
     if (n) {
       redrawMe();
       for (const mn of others2.keys()) redrawMn2(mn);
@@ -5049,17 +5260,17 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     setTimeout(() => {
       for (const p of made2.values()) if (p.src === src) return;
       try {
-        const m = W4.GLDrawImageCache;
+        const m = W5.GLDrawImageCache;
         if (m && typeof m.delete === "function") m.delete(src);
       } catch (e) {
       }
       try {
-        const m = W4.DrawImageCache;
+        const m = W5.DrawImageCache;
         if (m && typeof m.delete === "function") m.delete(src);
       } catch (e) {
       }
       try {
-        const gl = W4.GLDrawCanvas && W4.GLDrawCanvas.GL, tc = gl && gl.textureCache;
+        const gl = W5.GLDrawCanvas && W5.GLDrawCanvas.GL, tc = gl && gl.textureCache;
         const t2 = tc && tc.get(src);
         if (t2) {
           if (t2.texture) gl.deleteTexture(t2.texture);
@@ -5074,16 +5285,16 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     made2.set(mn, p);
     if (was && was.src && was.src !== p.src) forget(was.src);
   }
-  function messPicture(C, list, body2) {
-    const over = W4.CanvasUpperOverflow || 700, h2 = C.Canvas && C.Canvas.height || 1e3 + over;
+  function messPicture(C, list, body2, brand) {
+    const over = W5.CanvasUpperOverflow || 700, h2 = C.Canvas && C.Canvas.height || 1e3 + over;
     const up = body2.find((b) => /\/BodyUpper\//.test(b[0])), ox = up ? up[1] : 0, oy = up ? up[2] - over : 0;
     const age = (e) => Math.min(5, Math.floor((Date.now() - (e.t || 0)) / 6e4));
-    const key = JSON.stringify(list) + "|" + list.map(age).join("") + "|" + body2.map((b) => b[0] + "@" + b[1] + "," + b[2]).join(";");
+    const key = JSON.stringify(list) + "|" + JSON.stringify(brand) + (brand && brandReady(brand) ? "+" : "-") + "|" + list.map(age).join("") + "|" + body2.map((b) => b[0] + "@" + b[1] + "," + b[2]).join(";");
     const was = made2.get(C.MemberNumber);
     if (was && was.key === key) return was;
     let mask = null;
     if (body2.length) {
-      mask = W4.document.createElement("canvas");
+      mask = W5.document.createElement("canvas");
       mask.width = 500;
       mask.height = h2;
       const mg = mask.getContext("2d");
@@ -5093,16 +5304,21 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
         mg.drawImage(i, x, y);
       }
     }
-    const c = W4.document.createElement("canvas");
+    const c = W5.document.createElement("canvas");
     c.width = 500;
     c.height = h2;
     const g = c.getContext("2d");
     const at = (names) => names.map((n) => {
-      const A = W4.FarmMess.AREAS[n];
+      const A = W5.FarmMess.AREAS[n];
       return [A[0] + ox, A[1] + over + oy, A[2]];
     });
-    for (const e of list) W4.FarmMess.paintOn(g, mask, e.k, { at: at(e.a), seed: e.s, amount: e.m || 1, runX: 0.55 + 0.09 * age(e) });
-    if (typeof W4.GLDrawLoadTransient === "function") {
+    if (brand) try {
+      paintBrand(g, mask, brand, ox, oy, over);
+    } catch (e) {
+      console.warn("[Farmhand Companion] brand:", e);
+    }
+    for (const e of list) W5.FarmMess.paintOn(g, mask, e.k, { at: at(e.a), seed: e.s, amount: e.m || 1, runX: 0.55 + 0.09 * age(e) });
+    if (typeof W5.GLDrawLoadTransient === "function") {
       const p2 = { key, src: c, dx: 0, dy: 0 };
       keep(C.MemberNumber, p2);
       return p2;
@@ -5120,7 +5336,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
       keep(C.MemberNumber, p2);
       return p2;
     }
-    const t = W4.document.createElement("canvas");
+    const t = W5.document.createElement("canvas");
     t.width = x1 - x0 + 1;
     t.height = y1 - y0 + 1;
     t.getContext("2d").drawImage(c, -x0, -y0);
@@ -5136,10 +5352,10 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
       const groupRe = /(?:^|\/)Assets\/[^/]+\/(?:Override\/[^/]+\/)?([^/]+)\//;
       sdk3.hookFunction("CommonDrawAppearanceBuild", 3, (args, next) => {
         const C = args[0], real = args[1];
-        if (!C || !real || typeof real.drawImage !== "function" || !W4.FarmMess) return next(args);
-        const list = listFor(C);
-        if (C === W4.Player) DIAG.got++;
-        if (!list.length) return next(args);
+        if (!C || !real || typeof real.drawImage !== "function" || !W5.FarmMess) return next(args);
+        const list = listFor(C), brand = brandFor(C);
+        if (C === W5.Player) DIAG.got++;
+        if (!list.length && !brand) return next(args);
         const body2 = [], all = [], sample = [];
         let canv = 0, done = false;
         const before = skinOf.get(C.MemberNumber) || [];
@@ -5152,8 +5368,8 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
               body2.push(b);
               have.add(b[0]);
             }
-            const p = messPicture(C, list, body2);
-            if (C === W4.Player) {
+            const p = messPicture(C, list, body2, brand);
+            if (C === W5.Player) {
               DIAG.draws++;
               DIAG.draw = { at: Date.now(), list: list.length, body: body2.map((b) => String(b[0]).replace(/^.*Assets\/[^/]+\//, "") + "@" + b[1] + "," + b[2]), sample: sample.slice(), canv, pic: p ? p.src ? typeof p.src === "string" ? "picture" : "drawing " + p.src.width + "x" + p.src.height : "empty" : "waiting for the body pictures" };
             }
@@ -5173,7 +5389,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
           }
         };
         const seen2 = (name) => (src, x, y, ...rest) => {
-          if (C === W4.Player) {
+          if (C === W5.Player) {
             if (typeof src === "string") {
               if (sample.length < 6) sample.push(src.replace(/^.*\/(?=[^/]+\/[^/]+$)/, ""));
             } else canv++;
@@ -5225,7 +5441,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     }, 6e4);
     setTimeout(() => {
       hook2();
-      if (mine2.length) {
+      if (mine2.length || myBrand) {
         tell2(true);
         redrawMe();
       }
@@ -5240,7 +5456,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
   function messDiag() {
     const ago = (t) => t ? Math.round((Date.now() - t) / 1e3) + "s ago" : "never";
     const L = [];
-    L.push("hooked: " + hooked3 + " \xB7 splatter kit: " + !!W4.FarmMess + (W4.FarmMess && W4.FarmMess.KINDS ? " (" + Object.keys(W4.FarmMess.KINDS).length + " kinds)" : ""));
+    L.push("hooked: " + hooked3 + " \xB7 splatter kit: " + !!W5.FarmMess + (W5.FarmMess && W5.FarmMess.KINDS ? " (" + Object.keys(W5.FarmMess.KINDS).length + " kinds)" : ""));
     L.push("on you now: " + mine2.length + (mine2.length ? " \xB7 newest " + mine2[mine2.length - 1].k + " on " + mine2[mine2.length - 1].a.join("+") + ", " + ago(mine2[mine2.length - 1].t) : ""));
     L.push("marks from the bot: " + (DIAG.marks.length ? DIAG.marks.map((x) => (x.mess || "?") + " " + ago(x.at)).join(", ") : "none since this page opened"));
     L.push("your body drawn: " + DIAG.got + " times, with a mess " + DIAG.draws + " times");
@@ -5251,7 +5467,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
   }
 
   // extension/src/trimpics.js
-  var W5 = window;
+  var W6 = window;
   var LIMIT = 38e7;
   var TARGET = 26e7;
   var IDLE = 5 * 6e4;
@@ -5265,7 +5481,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     return n;
   }
   function trimPictures(force, idle, target) {
-    const gl = W5.GLDrawCanvas && W5.GLDrawCanvas.GL, tc = gl && gl.textureCache, cache = W5.GLDrawImageCache;
+    const gl = W6.GLDrawCanvas && W6.GLDrawCanvas.GL, tc = gl && gl.textureCache, cache = W6.GLDrawImageCache;
     if (!cache || typeof cache.purge === "function") return 0;
     if (!tc || typeof tc.forEach !== "function") return 0;
     let total = bytes(tc);
@@ -5301,7 +5517,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
   }
   function initTrim(mod2) {
     sdk4 = mod2;
-    W5.__farmTrim = trimPictures;
+    W6.__farmTrim = trimPictures;
     try {
       sdk4.hookFunction("GLDrawLoadImage", 0, (args, next) => {
         if (typeof args[1] === "string") seen.set(args[1], Date.now());
@@ -5321,12 +5537,12 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
   }
 
   // extension/src/memlog.js
-  var W6 = window;
+  var W7 = window;
   var KEY3 = "farmhand-memlog";
   var MAX2 = 120;
   var log = [];
   try {
-    const v = JSON.parse(W6.localStorage.getItem(KEY3));
+    const v = JSON.parse(W7.localStorage.getItem(KEY3));
     if (Array.isArray(v)) log = v.slice(-MAX2);
   } catch (e) {
     log = [];
@@ -5334,11 +5550,11 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
   function snap() {
     const s = { t: Date.now() };
     try {
-      if (W6.performance && W6.performance.memory) s.heapMB = Math.round(W6.performance.memory.usedJSHeapSize / 1e6);
+      if (W7.performance && W7.performance.memory) s.heapMB = Math.round(W7.performance.memory.usedJSHeapSize / 1e6);
     } catch (e) {
     }
     try {
-      const c0 = W6.GLDrawImageCache, m = c0 && c0.cache instanceof Map ? c0.cache : c0;
+      const c0 = W7.GLDrawImageCache, m = c0 && c0.cache instanceof Map ? c0.cache : c0;
       if (m && typeof m.keys === "function") {
         s.gamePics = m.size;
         let d = 0, dk = 0;
@@ -5349,7 +5565,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
         s.madePics = d;
         s.madePicsKB = Math.round(dk / 1e3);
       }
-      const gl = W6.GLDrawCanvas && W6.GLDrawCanvas.GL, tc = gl && gl.textureCache;
+      const gl = W7.GLDrawCanvas && W7.GLDrawCanvas.GL, tc = gl && gl.textureCache;
       if (tc) {
         let px = 0;
         for (const v of tc.values()) px += (v.width || 0) * (v.height || 0);
@@ -5382,15 +5598,15 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     } catch (e) {
     }
     try {
-      s.room = (W6.ChatRoomCharacter || []).length;
-      s.screen = W6.CurrentScreen;
+      s.room = (W7.ChatRoomCharacter || []).length;
+      s.screen = W7.CurrentScreen;
     } catch (e) {
     }
     return s;
   }
   function save3() {
     try {
-      W6.localStorage.setItem(KEY3, JSON.stringify(log));
+      W7.localStorage.setItem(KEY3, JSON.stringify(log));
     } catch (e) {
       log = log.slice(-30);
     }
@@ -5407,7 +5623,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
   var born = Date.now();
   var fast = [];
   try {
-    const v = JSON.parse(W6.localStorage.getItem(FAST));
+    const v = JSON.parse(W7.localStorage.getItem(FAST));
     if (Array.isArray(v)) fast = v.slice(-40);
   } catch (e) {
     fast = [];
@@ -5416,23 +5632,23 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
   function quick() {
     const x = { t: Date.now() };
     try {
-      if (W6.performance && W6.performance.memory) x.h = Math.round(W6.performance.memory.usedJSHeapSize / 1e6);
+      if (W7.performance && W7.performance.memory) x.h = Math.round(W7.performance.memory.usedJSHeapSize / 1e6);
     } catch (e) {
     }
     try {
-      const gl = W6.GLDrawCanvas && W6.GLDrawCanvas.GL, tc = gl && gl.textureCache, c0 = W6.GLDrawImageCache;
+      const gl = W7.GLDrawCanvas && W7.GLDrawCanvas.GL, tc = gl && gl.textureCache, c0 = W7.GLDrawImageCache;
       x.p = tc ? tc.size : c0 && c0.cache instanceof Map ? c0.cache.size : void 0;
     } catch (e) {
     }
     try {
-      x.r = (W6.ChatRoomCharacter || []).length;
-      x.s = W6.CurrentScreen;
+      x.r = (W7.ChatRoomCharacter || []).length;
+      x.s = W7.CurrentScreen;
     } catch (e) {
     }
     fast.push(x);
     if (fast.length > 40) fast = fast.slice(-40);
     try {
-      W6.localStorage.setItem(FAST, JSON.stringify(fast));
+      W7.localStorage.setItem(FAST, JSON.stringify(fast));
     } catch (e) {
     }
   }
@@ -5444,15 +5660,15 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     setTimeout(tick, 2e4);
     setInterval(tick, 3e4);
     setInterval(quick, 3e3);
-    if (typeof W6.CommandCombine === "function") {
-      W6.CommandCombine([{ Tag: "farmmem", Description: ": the Farmhand Companion's memory log (the last hour), and copies it", Action: () => {
+    if (typeof W7.CommandCombine === "function") {
+      W7.CommandCombine([{ Tag: "farmmem", Description: ": the Farmhand Companion's memory log (the last hour), and copies it", Action: () => {
         tick();
         const text = "Companion v" + VERSION + "\n" + memlogText(24) + (lastPage.length ? "\nThe last seconds of the page before this one:\n" + lastPage.map(quickLine).join("\n") : "");
         try {
-          W6.navigator.clipboard.writeText(JSON.stringify(log));
+          W7.navigator.clipboard.writeText(JSON.stringify(log));
         } catch (e) {
         }
-        if (typeof W6.ChatRoomSendLocal === "function") W6.ChatRoomSendLocal("Farmhand memory log (copied, paste it to Claude):\n" + text, 12e4);
+        if (typeof W7.ChatRoomSendLocal === "function") W7.ChatRoomSendLocal("Farmhand memory log (copied, paste it to Claude):\n" + text, 12e4);
         else console.log(text);
       } }, { Tag: "farmmess", Description: ": where the farm's messes on you got to (for Claude)", Action: () => {
         let text = "";
@@ -5463,22 +5679,22 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
         }
         text = "Companion v" + VERSION + "\n" + text;
         try {
-          W6.navigator.clipboard.writeText(text);
+          W7.navigator.clipboard.writeText(text);
         } catch (e) {
         }
-        if (typeof W6.ChatRoomSendLocal === "function") W6.ChatRoomSendLocal("Farmhand messes (copied, paste it to Claude):\n" + text, 12e4);
+        if (typeof W7.ChatRoomSendLocal === "function") W7.ChatRoomSendLocal("Farmhand messes (copied, paste it to Claude):\n" + text, 12e4);
         else console.log(text);
       } }]);
     }
   }
 
   // extension/src/settings.js
-  var W7 = window;
+  var W8 = window;
   var ID = "FarmhandCompanion";
   var panel = null;
   var box = null;
   var tab = "switches";
-  var settingsAvailable = () => typeof W7.PreferenceRegisterExtensionSetting === "function";
+  var settingsAvailable = () => typeof W8.PreferenceRegisterExtensionSetting === "function";
   function ctx() {
     const c = panel.ctx();
     return Object.assign({}, c, {
@@ -5530,7 +5746,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
         !p.off,
         () => c.setPref("off", !p.off)
       ),
-      p.off ? h("div", { style: { marginTop: "6px" } }, btn("Reload now", () => W7.location.reload(), true)) : null
+      p.off ? h("div", { style: { marginTop: "6px" } }, btn("Reload now", () => W8.location.reload(), true)) : null
     )];
     return [drawnBodyCard(c), panelPrefs(c)];
   }
@@ -5543,7 +5759,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
         { style: { display: "flex", alignItems: "center", gap: "10px", marginBottom: "8px" } },
         h("h2", { style: { margin: "0", flex: "1" } }, "\u{1F33E} Farmhand Companion"),
         btn("Back", () => {
-          if (typeof W7.PreferenceSubscreenExtensionsClear === "function") W7.PreferenceSubscreenExtensionsClear();
+          if (typeof W8.PreferenceSubscreenExtensionsClear === "function") W8.PreferenceSubscreenExtensionsClear();
           else close();
         }, true)
       ),
@@ -5557,9 +5773,9 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
   }
   function open() {
     close();
-    box = W7.document.createElement("div");
+    box = W8.document.createElement("div");
     box.id = "fhc-settings";
-    W7.document.body.appendChild(box);
+    W8.document.body.appendChild(box);
     draw();
   }
   function close() {
@@ -5572,7 +5788,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     panel = p;
     if (!settingsAvailable()) return false;
     try {
-      W7.PreferenceRegisterExtensionSetting({
+      W8.PreferenceRegisterExtensionSetting({
         Identifier: ID,
         ButtonText: "Farmhand Companion",
         load: () => open(),
@@ -5595,8 +5811,8 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
   function openSettings(which) {
     if (which) tab = which;
     try {
-      if (typeof W7.PreferenceSubscreenExtensionsOpen === "function") {
-        W7.PreferenceSubscreenExtensionsOpen(ID);
+      if (typeof W8.PreferenceSubscreenExtensionsOpen === "function") {
+        W8.PreferenceSubscreenExtensionsOpen(ID);
         return true;
       }
     } catch (e) {
@@ -5931,6 +6147,15 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
         !!ctx3.prefs.marks,
         () => ctx3.setPref("marks", !ctx3.prefs.marks)
       ),
+      ctx3.s.brand ? toggle(
+        "Show my farm brand",
+        "The B&B logo the farm seared on you, on your " + ({ hipL: "left hip", hipR: "right hip", thighL: "left thigh", thighR: "right thigh", mons: "low belly", tummy: "tummy", chestL: "left breast", chestR: "right breast", shoulderL: "left shoulder", shoulderR: "right shoulder" }[ctx3.s.brand.place] || "hip") + ". Off hides it on every screen (it's still on your record).",
+        !ctx3.prefs.brandOff,
+        () => {
+          ctx3.setPref("brandOff", !ctx3.prefs.brandOff);
+          ctx3.api.brandSync && ctx3.api.brandSync();
+        }
+      ) : null,
       toggle(
         "Farm can strip me",
         "When the farm says so, your clothes come off (locked pieces stay). They're kept on this computer so you can dress again.",
@@ -7914,7 +8139,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
   function logTab(ctx3) {
     const ui = ctx3.ui, who = ctx3.s.logWho || [], res = ui.logRows;
     const ask3 = () => ctx3.api.logAsk({ who: Number(ui.logWho) || 0, hours: Number(ui.logHours) || 3, kind: ui.logKind || "", q: String(ui.logQ || "").trim().slice(0, 80) });
-    const save5 = () => {
+    const save6 = () => {
       try {
         const blob = new Blob([(res.rows || []).map(line2).join("\n")], { type: "text/plain" }), a = document.createElement("a");
         a.href = URL.createObjectURL(blob);
@@ -7958,7 +8183,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
             if (e.key === "Enter") ask3();
           } })
         ),
-        h("div", { style: { marginTop: "6px" } }, btn("Show", ask3, true), res && (res.rows || []).length ? btn("Save as a file", save5) : null)
+        h("div", { style: { marginTop: "6px" } }, btn("Show", ask3, true), res && (res.rows || []).length ? btn("Save as a file", save6) : null)
       ),
       res ? card(
         title(res.busy ? "Lookin'\u2026" : (res.total || 0) + " lines" + (res.total > (res.rows || []).length ? ", the newest " + res.rows.length + " shown" : "")),
@@ -8340,7 +8565,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
       card(title("Comin' soon"), muted("Echo's pumps and milk vendor, outfits by species and gender with high security locks, and the farm's own Listen to my voice (ECHS first)."))
     ];
   }
-  var SPECIES = ["cow", "bull", "pony", "horse", "goat", "sheep", "pig", "bunny", "rabbit", "pup", "dog", "kitt", "cat", "fox", "wolf", "deer", "goblin", "rat"];
+  var SPECIES = ["cow", "bull", "pony", "horse", "goat", "sheep", "pig", "bunny", "rabbit", "pup", "dog", "kitt", "cat", "fox", "wolf", "deer", "goblin", "rat", "dragon"];
   var GENDERS = ["female", "male", "futa", "femboy", "nonbinary"];
   var KEYS_TEXT = { staff: "farm staff + their herd leader", leader: "their herd leader only", owners: "the proprietors only" };
   function outfits(ctx3) {
@@ -8591,6 +8816,235 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     return at < 0 ? tabs.concat(t) : tabs.slice(0, at).concat(t, tabs.slice(at));
   }
 
+  // extension/src/views/nursery.js
+  var N = (ctx3) => ctx3.s.nursery || {};
+  var ACT_LABEL = {
+    story: "\u{1F4D6} Story",
+    nap: "\u{1F634} Nap",
+    snack: "\u{1F36A} Snack",
+    colour: "\u{1F58D}\uFE0F Colourin'",
+    blocks: "\u{1F9F1} Blocks",
+    bubbles: "\u{1FAE7} Bubbles",
+    sing: "\u{1F3B5} Sing-song",
+    puzzle: "\u{1F9E9} Puzzle",
+    teaparty: "\u{1FAD6} Tea party",
+    dance: "\u{1F483} Dance",
+    swing: "\u{1F333} Swing",
+    sandbox: "\u{1F3D6}\uFE0F Sandbox",
+    puppets: "\u{1F9E6} Puppets",
+    dressup: "\u{1F451} Dress-up",
+    chalk: "\u{1F58D}\uFE0F Chalk",
+    ducks: "\u{1F986} Feed the ducks",
+    animals: "\u{1F411} Baby animals",
+    hay: "\u{1F33E} Hay pile",
+    tractor: "\u{1F69C} Pedal tractor",
+    garden: "\u{1F353} Strawberries",
+    stars: "\u2B50 Stars"
+  };
+  var CARE_LABEL = {
+    cuddle: "\u{1F917} Cuddle",
+    praise: "\u{1F31F} Praise",
+    pat: "\u270B Head pats",
+    tuck: "\u{1F6CF}\uFE0F Tuck in",
+    story: "\u{1F4D6} Story",
+    bottle: "\u{1F37C} Bottle",
+    snack: "\u{1F36A} Snack",
+    check: "\u{1F50D} Check",
+    change: "\u{1F9F7} Change",
+    bath: "\u{1F6C1} Bath",
+    rock: "\u{1FA91} Rock",
+    sing: "\u{1F3B5} Lullaby",
+    kiss: "\u{1F48B} Forehead kiss",
+    tickle: "\u{1FAB6} Tickle",
+    play: "\u{1F9F8} Play",
+    wipe: "\u{1F9FD} Wipe face",
+    stuffie: "\u{1F9F8} Give a stuffie"
+  };
+  var ASK_LABEL = {
+    cuddle: "\u{1F917} A cuddle",
+    change: "\u{1F9F7} A change",
+    story: "\u{1F4D6} A story",
+    snack: "\u{1F36A} A snack",
+    play: "\u{1F9F8} Play with me",
+    nap: "\u{1F634} I'm sleepy",
+    bath: "\u{1F6C1} A bath",
+    bottle: "\u{1F37C} A bottle",
+    help: "\u{1F64B} Help"
+  };
+  var WET = ["dry", "a little damp", "soggy", "leaking!"];
+  var MESS = { cake: "cake", cream: "cream", honey: "honey", maple: "syrup", chocolate: "chocolate", strawberry: "strawberry", mud: "mud", slime: "slime" };
+  var grid = (items) => h("div", { style: { display: "flex", flexWrap: "wrap", gap: "4px" } }, items);
+  function stars(ctx3) {
+    const n = N(ctx3);
+    return chip("\u2B50 " + (n.stars || 0) + " of " + (n.cap || 0) + " today", "acc");
+  }
+  function offerCard(ctx3) {
+    const o = ctx3.ui.nurseryOffer;
+    if (!o) return null;
+    const g = (N(ctx3).gear || []).find((x) => x.id === o.gear);
+    return card(
+      title("\u{1F9F8} " + o.from + " is holdin' out a " + o.label),
+      h(
+        "div",
+        null,
+        btn("Hold it", () => {
+          const r = g && ctx3.api.nurseryWear ? ctx3.api.nurseryWear(g) : { ok: false, why: "no Companion helper" };
+          ctx3.hint(r.ok ? "You're holdin' the " + o.label + "." : "Couldn't: " + r.why + ".");
+          ctx3.setUi({ nurseryOffer: null });
+        }, true),
+        btn("No thanks", () => ctx3.setUi({ nurseryOffer: null }))
+      )
+    );
+  }
+  function playTab(ctx3) {
+    const n = N(ctx3);
+    const space = card(
+      h("div", { class: "fhc-kv" }, title(n.space ? "\u{1F9F8} You're little right now" : "\u{1F9F8} Little space"), stars(ctx3)),
+      muted(n.space ? "The farm's grown-up things leave you be till you switch it off. Only nursery folk see what happens in here." : "Switch it on whenever you want to be little. While it's on, traps, breedin', milkin' and the rest of the grown-up farm leave you be."),
+      btn(n.space ? "Grow back up" : "Go little", () => ctx3.send(n.space ? "little off" : "little on"), !n.space)
+    );
+    if (!n.space) return [offerCard(ctx3), space];
+    const w = n.wet || 0;
+    const status = card(
+      title("How you're doin'"),
+      h(
+        "div",
+        null,
+        n.abcl ? chip("Paddin': " + WET[w], w >= 2 ? "warn" : w ? "acc" : "good") : null,
+        (n.messes || []).map((m) => chip("Messy: " + (MESS[m] || m), "acc"))
+      ),
+      (n.messes || []).length ? h("div", null, btn("\u{1F6C1} Bath time", () => ctx3.send("little bath"))) : null,
+      !n.abcl ? muted("With the ABCL mod, the nursery can tell when your paddin' needs a change.") : null
+    );
+    return [
+      offerCard(ctx3),
+      space,
+      status,
+      card(title("Things to do"), grid((n.acts || Object.keys(ACT_LABEL)).map((a) => btn(ACT_LABEL[a] || a, () => ctx3.send("little " + a)))), muted("A gold star (a ribbon) now and then, a few a day."))
+    ];
+  }
+  function gamesTab(ctx3) {
+    const n = N(ctx3);
+    if (!n.space) return [card(title("\u{1F3B2} Games"), muted("Go little first (Play tab), then come play."))];
+    const g = (name, picks, label, desc) => card(title(label), muted(desc), grid(picks.map(([p, l]) => btn(l, () => ctx3.send("little game " + name + (p ? " " + p : ""))))));
+    return [
+      g("rps", [["rock", "\u{1FAA8} Rock"], ["paper", "\u{1F4C4} Paper"], ["scissors", "\u2702\uFE0F Scissors"]], "Rock, paper, scissors", "Against the farm girl."),
+      g("guess", [["left", "\u{1F448} Left hand"], ["right", "\u{1F449} Right hand"]], "Which hand?", "There's a sweetie in one of 'em."),
+      g("crayon", [["red", "\u{1F534} Red"], ["blue", "\u{1F535} Blue"], ["green", "\u{1F7E2} Green"], ["yellow", "\u{1F7E1} Yellow"]], "Guess the crayon", "She's hidin' one behind her back."),
+      g("dice", [["", "\u{1F3B2} Roll"]], "Dice", "Higher roll wins."),
+      g("catch", [["", "\u26BD Catch!"]], "Catch", "She tosses, you catch. Hopefully."),
+      g("peekaboo", [["", "\u{1F648} Peekaboo"]], "Peekaboo", "Always a winner.")
+    ];
+  }
+  function gearTab(ctx3) {
+    const n = N(ctx3), worn = ctx3.api.nurseryWorn ? ctx3.api.nurseryWorn() : {};
+    const list = n.gear || [];
+    const row = (kind, label) => card(title(label), grid(list.filter((x) => x.kind === kind).map((x) => {
+      const on2 = worn[x.group] === x.name;
+      return btn((on2 ? "\u2713 " : "") + x.label, () => {
+        const r = on2 ? ctx3.api.nurseryOff(x.group) : ctx3.api.nurseryWear(x);
+        ctx3.hint(r.ok ? (on2 ? "Took off the " : "On: the ") + x.label + "." : "Couldn't: " + r.why + ".");
+        ctx3.setUi({});
+      }, on2);
+    })));
+    return [
+      offerCard(ctx3),
+      muted("These go on your own character, only when you press them, and come off the same way. Nothin' here is ever locked."),
+      row("stuffie", "\u{1F9F8} Stuffies"),
+      row("mouth", "\u{1F37C} Pacifier and bottle"),
+      row("wear", "\u{1F380} Baby things"),
+      btn("Take all of it off", () => {
+        const r = ctx3.api.nurseryOff ? ctx3.api.nurseryOff() : { ok: false };
+        ctx3.hint(r.ok ? "All the nursery things are off." : "Couldn't.");
+        ctx3.setUi({});
+      })
+    ];
+  }
+  function grownUpsTab(ctx3) {
+    const n = N(ctx3), cs = n.carers || [];
+    return [
+      card(title("\u{1F49E} My grown-ups"), cs.length ? cs.map((c) => h("div", { class: "fhc-kv" }, h("span", null, c.name), chip(c.here ? "here" : "away", c.here ? "good" : ""))) : muted("Nobody's paired with you yet. A caregiver can ask with ?nursery pair, and your Littlish Club grown-ups count too.")),
+      n.space ? card(title("Ask a grown-up for\u2026"), grid((n.asks || Object.keys(ASK_LABEL)).map((a) => btn(ASK_LABEL[a] || a, () => ctx3.send("little ask " + a)))), muted("Only grown-ups who are here hear it.")) : muted("Go little first to ask your grown-ups for things.")
+    ];
+  }
+  function littleSettings(ctx3) {
+    const n = N(ctx3);
+    return [card(
+      title("Nursery settings"),
+      toggle("Nursery traps", "Ball pits, bubbles, playpens and the like on the nursery's spots, while you're little.", !!n.traps, () => ctx3.send("nursery traps " + (n.traps ? "off" : "on"))),
+      h("div", { style: { marginTop: "8px" } }, btn("What can I do?", () => ctx3.send("nursery")), btn("Leave the nursery", () => ctx3.send("nursery leave")))
+    )];
+  }
+  function littlesTab(ctx3) {
+    const n = N(ctx3), ls = n.littles || [];
+    if (!ls.length) return [card(title("\u{1F9F8} Littles"), muted("No littles here right now. Littles who are here, and the ones you're paired with, show up in this tab."), stars(ctx3))];
+    const pick = ctx3.ui.nurseryLittle && ls.find((l) => l.mn === ctx3.ui.nurseryLittle) ? ctx3.ui.nurseryLittle : (ls.find((l) => l.here && l.space) || ls[0]).mn;
+    const L = ls.find((l) => l.mn === pick);
+    return [
+      card(
+        h("div", { class: "fhc-kv" }, title("\u{1F9F8} Littles"), stars(ctx3)),
+        h("div", null, ls.map((l) => h("button", { type: "button", class: "fhc-pill" + (l.mn === pick ? " on" : ""), onclick: () => ctx3.setUi({ nurseryLittle: l.mn }) }, l.name + (l.mine ? " \u{1F49E}" : ""))))
+      ),
+      card(
+        title(L.name),
+        h(
+          "div",
+          null,
+          chip(L.here ? "here" : "away", L.here ? "good" : ""),
+          chip(L.space ? "little now" : "not little right now", L.space ? "acc" : ""),
+          L.wet ? chip("Paddin': " + WET[L.wet], L.wet >= 2 ? "warn" : "acc") : null,
+          (L.messes || []).map((m) => chip("Messy: " + (MESS[m] || m), "acc"))
+        ),
+        L.here && L.space ? grid((n.cares || Object.keys(CARE_LABEL)).map((c) => btn(CARE_LABEL[c] || c, () => ctx3.send("care " + c + " " + L.mn), c === "change" && L.wet >= 2 || c === "bath" && (L.messes || []).length))) : muted(L.here ? "They're not in their little space right now." : "They're not at the farm right now."),
+        L.mine ? null : h("div", null, btn("Ask to be their grown-up", () => ctx3.send("nursery pair " + L.mn)))
+      )
+    ];
+  }
+  function inviteTab(ctx3) {
+    const box2 = h("input", { class: "fhc-in", placeholder: "Their name or member number", value: ctx3.ui.nurseryWho || "", oninput: (e) => ctx3.setUi({ nurseryWho: e.target.value }, true) });
+    const go = (cmd) => {
+      const v = (ctx3.ui.nurseryWho || "").trim();
+      if (!v) return ctx3.hint("Type their name first.");
+      ctx3.send(cmd + " " + v);
+    };
+    return [
+      card(
+        title("\u2795 Invite a little"),
+        muted("They get a Yes / Not now card first. Once they say yes, they're in the nursery and paired with you."),
+        box2,
+        h("div", { style: { marginTop: "6px" } }, btn("Invite as a little", () => go("nursery add"), true), btn("Ask to be their grown-up", () => go("nursery pair")))
+      ),
+      ctx3.s.proprietor ? card(
+        title("Proprietors"),
+        muted("Add a caregiver with ?nursery add <who> caregiver. ?nursery list shows everyone; ?nursery remove <who> takes them off."),
+        h("div", null, btn("Add as a caregiver", () => {
+          const v = (ctx3.ui.nurseryWho || "").trim();
+          if (!v) return ctx3.hint("Type their name first.");
+          ctx3.send("nursery add " + v + " caregiver");
+        }), btn("The list", () => ctx3.send("nursery list")))
+      ) : null
+    ];
+  }
+  function carerSettings(ctx3) {
+    return [card(
+      title("Nursery settings"),
+      muted("Everything you do here is seen only by nursery folk."),
+      h("div", null, btn("What can I do?", () => ctx3.send("nursery")), btn("The list", () => ctx3.send("nursery list")), btn("Leave the nursery", () => ctx3.send("nursery leave")))
+    )];
+  }
+  var show = (role) => (ctx3) => N(ctx3).role === role;
+  var NURSERY_TABS = [
+    { id: "play", label: "\u{1F9F8} Play", show: show("little"), render: playTab },
+    { id: "games", label: "\u{1F3B2} Games", show: show("little"), render: gamesTab },
+    { id: "gear", label: "\u{1F380} Gear", show: show("little"), render: gearTab },
+    { id: "grownups", label: "\u{1F49E} Grown-ups", show: show("little"), render: grownUpsTab },
+    { id: "littles", label: "\u{1F9F8} Littles", show: show("caregiver"), render: littlesTab },
+    { id: "invite", label: "\u2795 Invite", show: show("caregiver"), render: inviteTab },
+    { id: "inbox", label: "\u{1F4EC} Inbox", render: inbox },
+    { id: "nsettings", label: "\u2699\uFE0F Nursery", render: (ctx3) => N(ctx3).role === "little" ? littleSettings(ctx3) : carerSettings(ctx3) },
+    { id: "safety", label: "\u{1F198} Safety", render: safetyTab, offRow: true }
+  ];
+
   // extension/src/panel.js
   var left = (t) => {
     const m = Math.max(0, Math.ceil((t - Date.now()) / 6e4));
@@ -8600,7 +9054,9 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     guest: { label: "Guest", tabs: GUEST_TABS },
     livestock: { label: "Livestock", tabs: LIVESTOCK_TABS },
     staff: { label: "Staff", tabs: STAFF_TABS },
-    dashboard: { label: "Dashboard", tabs: DASHBOARD_TABS }
+    dashboard: { label: "Dashboard", tabs: DASHBOARD_TABS },
+    nursery: { label: "\u{1F9F8} Nursery", tabs: NURSERY_TABS }
+    // only for people on the nursery list (views/nursery.js)
   };
   function loadPrefs() {
     try {
@@ -8858,6 +9314,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
       const s = this.s, v = [s.onBooks ? "livestock" : "guest"];
       if (s.staff) v.push("staff");
       if (s.proprietor) v.push("dashboard");
+      if (s.nursery && s.nursery.role) v.push("nursery");
       return v;
     }
     view() {
@@ -8928,7 +9385,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     render() {
       this.pending = false;
       const ctx3 = this.ctx(), view = this.view(), V = VIEWS[view];
-      const tabs = (view === "guest" ? V.tabs : withExtras(V.tabs, view, ctx3)).filter((t) => !t.show || t.show(ctx3));
+      const tabs = (view === "guest" || view === "nursery" ? V.tabs : withExtras(V.tabs, view, ctx3)).filter((t) => !t.show || t.show(ctx3));
       const tabKey = "tab_" + view, tab2 = tabs.find((t) => t.id === this.ui[tabKey]) || tabs[0];
       const scroll = this.el.querySelector(".fhc-body"), keep2 = scroll ? scroll.scrollTop : 0;
       const nav0 = this.el.querySelector("nav.fhc-tabs"), navKeep = nav0 ? nav0.scrollLeft : 0;
@@ -9186,8 +9643,8 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     if (Array.isArray(c.Effect)) c.Effect = c.Effect.filter((e) => e !== "Lock");
     return c;
   }
-  function commit(bundle2) {
-    window.ServerAppearanceLoadFromBundle(P(), P().AssetFamily, bundle2, P().MemberNumber);
+  function commit(bundle3) {
+    window.ServerAppearanceLoadFromBundle(P(), P().AssetFamily, bundle3, P().MemberNumber);
     if (typeof window.CharacterRefresh === "function") window.CharacterRefresh(P());
     window.ChatRoomCharacterUpdate(P());
   }
@@ -9198,9 +9655,9 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
       const g = it.Asset && it.Asset.Group;
       if (!g || !(isClothes(g) || isItem(g))) continue;
       const b = window.ServerBundledItemFromAppearanceItem(it);
-      const locked = !!(it.Property && it.Property.LockedBy);
-      if (locked) locks++;
-      items.push(Object.assign({}, b, { Property: unlocked(b.Property), locked }));
+      const locked2 = !!(it.Property && it.Property.LockedBy);
+      if (locked2) locks++;
+      items.push(Object.assign({}, b, { Property: unlocked(b.Property), locked: locked2 }));
     }
     return { data: window.LZString.compressToBase64(JSON.stringify({ v: 1, items })), items: items.length, locks };
   }
@@ -9828,7 +10285,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
   }
 
   // extension/src/chatlog.js
-  var W8 = window;
+  var W9 = window;
   var KEY5 = "farmhand-chatlog";
   var MAX3 = 1500;
   var CHUNK = 6e3;
@@ -9840,7 +10297,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
   var saveT = null;
   var recent = /* @__PURE__ */ new Map();
   try {
-    const v = JSON.parse(W8.localStorage.getItem(KEY5));
+    const v = JSON.parse(W9.localStorage.getItem(KEY5));
     if (Array.isArray(v)) rows = v.slice(-MAX3);
   } catch (e) {
     rows = [];
@@ -9849,7 +10306,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     clearTimeout(saveT);
     saveT = setTimeout(() => {
       try {
-        W8.localStorage.setItem(KEY5, JSON.stringify(rows));
+        W9.localStorage.setItem(KEY5, JSON.stringify(rows));
       } catch (e) {
         rows = rows.slice(-300);
       }
@@ -9877,7 +10334,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     }
   }
   function flush() {
-    if (!on() || !rows.length || !botHere() || typeof W8.ServerSend !== "function") return;
+    if (!on() || !rows.length || !botHere() || typeof W9.ServerSend !== "function") return;
     let sent = 0;
     for (let part = 0; part < 4 && rows.length; part++) {
       const batch = [];
@@ -9889,7 +10346,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
         size += s;
       }
       try {
-        W8.ServerSend("ChatRoomChat", makeMsg("chatlog", { rows: batch }, botMn));
+        W9.ServerSend("ChatRoomChat", makeMsg("chatlog", { rows: batch }, botMn));
         sent += batch.length;
       } catch (e) {
         rows = batch.concat(rows);
@@ -9952,8 +10409,146 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     setTimeout(flush, 15e3);
   }
 
+  // extension/src/nursery.js
+  var KEY6 = "fhc-nursery";
+  var P3 = () => window.Player;
+  var load4 = () => {
+    try {
+      return JSON.parse(window.localStorage.getItem(KEY6)) || {};
+    } catch (e) {
+      return {};
+    }
+  };
+  var save5 = (v) => {
+    try {
+      window.localStorage.setItem(KEY6, JSON.stringify(v));
+    } catch (e) {
+    }
+  };
+  var ready = () => P3() && Array.isArray(P3().Appearance) && typeof window.ServerAppearanceBundle === "function" && typeof window.ServerAppearanceLoadFromBundle === "function";
+  var bundle2 = () => window.ServerAppearanceBundle(P3().Appearance);
+  function commit3(next) {
+    window.ServerAppearanceLoadFromBundle(P3(), P3().AssetFamily, next, P3().MemberNumber);
+    if (typeof window.CharacterRefresh === "function") window.CharacterRefresh(P3());
+    if (typeof window.ChatRoomCharacterUpdate === "function") window.ChatRoomCharacterUpdate(P3());
+  }
+  var locked = (g) => P3().Appearance.some((it) => it.Asset && it.Asset.Group && it.Asset.Group.Name === g && it.Property && it.Property.LockedBy);
+  var exists = (g, n) => typeof window.AssetGet !== "function" || !!window.AssetGet(P3().AssetFamily, g, n);
+  function nurseryWear(g) {
+    if (!ready()) return { ok: false, why: "not in a room" };
+    if (!g || !g.group || !g.name) return { ok: false, why: "nothin' to put on" };
+    if (!exists(g.group, g.name)) return { ok: false, why: "the game doesn't have that one" };
+    if (locked(g.group)) return { ok: false, why: "there's somethin' locked there" };
+    const mem = load4();
+    mem.gear = mem.gear || {};
+    let next = bundle2();
+    const there = next.find((b) => b.Group === g.group);
+    if (there && mem.gear[g.group] !== there.Name) return { ok: false, why: g.group === "ItemHandheld" ? "your hands are full" : "you've already got somethin' on there" };
+    next = next.filter((b) => b.Group !== g.group).concat([{ Group: g.group, Name: g.name }]);
+    commit3(next);
+    mem.gear[g.group] = g.name;
+    save5(mem);
+    return { ok: true };
+  }
+  function nurseryOff(group) {
+    if (!ready()) return { ok: false, why: "not in a room" };
+    const mem = load4(), gear = mem.gear || {};
+    const groups = group ? [group] : Object.keys(gear);
+    const next = bundle2().filter((b) => !(groups.includes(b.Group) && gear[b.Group] === b.Name && !locked(b.Group)));
+    for (const g of groups) delete gear[g];
+    mem.gear = gear;
+    save5(mem);
+    commit3(next);
+    return { ok: true };
+  }
+  var nurseryWorn = () => Object.assign({}, load4().gear || {});
+  function nurseryChange() {
+    const A = window.ABCL, did = [];
+    try {
+      if (A && A.stats) {
+        A.stats.WetnessValue = 0;
+        A.stats.SoilinessValue = 0;
+        did.push("dry");
+        try {
+          A.raw.updateDiaperColor();
+        } catch (e) {
+        }
+        try {
+          A.raw.sendUpdateMyData();
+        } catch (e) {
+        }
+      }
+    } catch (e) {
+      console.warn("[Farmhand Companion] nursery change:", e);
+    }
+    try {
+      if (ready() && exists("BodyMarkings", "BabyPowderDust") && !bundle2().some((b) => b.Group === "BodyMarkings")) {
+        commit3(bundle2().concat([{ Group: "BodyMarkings", Name: "BabyPowderDust" }]));
+        const mem = load4();
+        mem.powderUntil = Date.now() + 10 * 6e4;
+        save5(mem);
+        did.push("powder");
+      }
+    } catch (e) {
+      console.warn("[Farmhand Companion] baby powder:", e);
+    }
+    return did;
+  }
+  function nurseryPowderTick() {
+    try {
+      const mem = load4();
+      if (!mem.powderUntil || Date.now() < mem.powderUntil || !ready()) return;
+      const next = bundle2().filter((b) => !(b.Group === "BodyMarkings" && b.Name === "BabyPowderDust"));
+      mem.powderUntil = 0;
+      save5(mem);
+      commit3(next);
+    } catch (e) {
+    }
+  }
+  function nurseryStatsNow() {
+    const out = {};
+    try {
+      const A = window.ABCL;
+      if (A && A.stats) {
+        out.abcl = true;
+        try {
+          out.diaper = !!A.raw.hasDiaper(P3());
+        } catch (e) {
+          out.diaper = false;
+        }
+        try {
+          out.wet = Math.round((Number(A.stats.WetnessPercentage) || 0) * 100) / 100;
+        } catch (e) {
+          out.wet = 0;
+        }
+        try {
+          out.leak = !!A.raw.isLeaking("pee");
+        } catch (e) {
+          out.leak = false;
+        }
+      }
+    } catch (e) {
+    }
+    try {
+      const LC = window.LITTLISH_CLUB;
+      if (LC) {
+        try {
+          const m = LC.getMommyOf(P3());
+          if (m && Number.isInteger(m.id)) out.mommy = m.id;
+        } catch (e) {
+        }
+        try {
+          out.carers = (LC.getCaregiversOf(P3()) || []).filter(Number.isInteger).slice(0, 12);
+        } catch (e) {
+        }
+      }
+    } catch (e) {
+    }
+    return out;
+  }
+
   // extension/src/cues.js
-  var W9 = window;
+  var W10 = window;
   var ctx2 = null;
   function initCues(c) {
     ctx2 = c;
@@ -9970,15 +10565,15 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     stir: ctx2.panel.prefs.stir ? void 0 : true,
     gear: ctx2.panel.prefs.gear ? void 0 : true
   });
-  var mapOn = () => typeof W9.ChatRoomMapViewIsActive === "function" && W9.ChatRoomMapViewIsActive() && W9.Player && W9.Player.MapData && W9.Player.MapData.Pos;
-  var others3 = () => (W9.ChatRoomCharacter || []).filter((c) => c && c.MemberNumber !== (W9.Player && W9.Player.MemberNumber));
+  var mapOn = () => typeof W10.ChatRoomMapViewIsActive === "function" && W10.ChatRoomMapViewIsActive() && W10.Player && W10.Player.MapData && W10.Player.MapData.Pos;
+  var others3 = () => (W10.ChatRoomCharacter || []).filter((c) => c && c.MemberNumber !== (W10.Player && W10.Player.MemberNumber));
   var lastSight = "";
   function sightTick() {
     try {
-      if (W9.CurrentScreen !== "ChatRoom" || !mapOn() || typeof W9.ChatRoomMapViewCharacterIsVisible !== "function") return;
-      const see = others3().filter((c) => W9.ChatRoomMapViewCharacterIsVisible(c)).map((c) => c.MemberNumber).sort();
-      const hear = others3().filter((c) => typeof W9.ChatRoomMapViewCharacterIsHearable === "function" && W9.ChatRoomMapViewCharacterIsHearable(c)).map((c) => c.MemberNumber).sort();
-      const LS = W9.Player && W9.Player.LSCG, S3 = LS && LS.SplatterModule;
+      if (W10.CurrentScreen !== "ChatRoom" || !mapOn() || typeof W10.ChatRoomMapViewCharacterIsVisible !== "function") return;
+      const see = others3().filter((c) => W10.ChatRoomMapViewCharacterIsVisible(c)).map((c) => c.MemberNumber).sort();
+      const hear = others3().filter((c) => typeof W10.ChatRoomMapViewCharacterIsHearable === "function" && W10.ChatRoomMapViewCharacterIsHearable(c)).map((c) => c.MemberNumber).sort();
+      const LS = W10.Player && W10.Player.LSCG, S3 = LS && LS.SplatterModule;
       const splat = S3 ? !!(S3.enabled && S3.taker !== false && (!LS.GlobalModule || LS.GlobalModule.enabled !== false)) : void 0;
       const key = see.join(",") + "|" + hear.join(",") + "|" + splat;
       if (key === lastSight && Date.now() - (sightTick.at || 0) < 12e4) return;
@@ -9993,13 +10588,13 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
   var DIRS = [["North", 0, -1], ["South", 0, 1], ["West", -1, 0], ["East", 1, 0]];
   function canStep(x, y) {
     try {
-      return W9.ChatRoomMapViewCanEnterTile(x, y) > 0;
+      return W10.ChatRoomMapViewCanEnterTile(x, y) > 0;
     } catch (e) {
       return false;
     }
   }
   function findPath(from, to) {
-    const wide = W9.ChatRoomMapViewWidth || 40, high = W9.ChatRoomMapViewHeight || 40, key = (x, y) => x + "," + y;
+    const wide = W10.ChatRoomMapViewWidth || 40, high = W10.ChatRoomMapViewHeight || 40, key = (x, y) => x + "," + y;
     const goal = (x, y) => Math.max(Math.abs(x - to.X), Math.abs(y - to.Y)) <= (canStep(to.X, to.Y) ? 0 : 1);
     const prev = /* @__PURE__ */ new Map([[key(from.X, from.Y), null]]), q2 = [[from.X, from.Y]];
     while (q2.length) {
@@ -10029,8 +10624,8 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
       walk = null;
       ctx2.toBot("leadNo", { id: m.id });
     };
-    if (!pref("noLead") || !mapOn() || typeof W9.ChatRoomMapViewMove !== "function") return no();
-    const from = W9.Player.MapData.Pos, to = { X: m.X, Y: m.Y };
+    if (!pref("noLead") || !mapOn() || typeof W10.ChatRoomMapViewMove !== "function") return no();
+    const from = W10.Player.MapData.Pos, to = { X: m.X, Y: m.Y };
     const path = findPath(from, to);
     if (!path) return no();
     if (!path.length) {
@@ -10043,7 +10638,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
   }
   function stepWalk() {
     if (!walk) return;
-    const w = walk, p = W9.Player && W9.Player.MapData && W9.Player.MapData.Pos;
+    const w = walk, p = W10.Player && W10.Player.MapData && W10.Player.MapData.Pos;
     if (!p) {
       walk = null;
       return;
@@ -10072,9 +10667,9 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
       }
       Object.assign(w, { path, i: 0, stuck: Date.now(), retried: true });
     }
-    if (W9.ChatRoomMapViewMovement == null) {
+    if (W10.ChatRoomMapViewMovement == null) {
       try {
-        W9.ChatRoomMapViewMove(w.path[w.i]);
+        W10.ChatRoomMapViewMove(w.path[w.i]);
       } catch (e) {
       }
     }
@@ -10092,12 +10687,12 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
   };
   function face(m) {
     const f = FACES[m.mood];
-    if (!f || !pref("noFace") || typeof W9.CharacterSetFacialExpression !== "function" || !W9.Player) return;
+    if (!f || !pref("noFace") || typeof W10.CharacterSetFacialExpression !== "function" || !W10.Player) return;
     const secs = m.mood === "clear" ? null : Math.max(5, Math.min(1800, Number(m.secs) || 30));
     for (const [g, e] of Object.entries(f)) {
       try {
-        W9.CharacterSetFacialExpression(W9.Player, g, e, secs);
-        if (g === "Eyes") W9.CharacterSetFacialExpression(W9.Player, "Eyes2", e, secs);
+        W10.CharacterSetFacialExpression(W10.Player, g, e, secs);
+        if (g === "Eyes") W10.CharacterSetFacialExpression(W10.Player, "Eyes2", e, secs);
       } catch (e2) {
       }
     }
@@ -10146,35 +10741,35 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
   var QUIET = { stall: 0.35, latch: 0.35, unlatch: 0.35, pump: 0.4, machine: 0.4, inflate: 0.4, hiss: 0.4, buzz: 0.3, zap: 0.35, clamp: 0.45, softgate: 0.4 };
   function sound(m) {
     const f = SOUNDS[m.name];
-    if (!f || !pref("noSound") || typeof W9.AudioPlayInstantSound !== "function") return;
-    const vol = W9.Player && W9.Player.AudioSettings && W9.Player.AudioSettings.Volume || 0;
+    if (!f || !pref("noSound") || typeof W10.AudioPlayInstantSound !== "function") return;
+    const vol = W10.Player && W10.Player.AudioSettings && W10.Player.AudioSettings.Volume || 0;
     try {
-      W9.AudioPlayInstantSound("Audio/" + f + ".mp3", vol * (QUIET[m.name] || 0.6));
+      W10.AudioPlayInstantSound("Audio/" + f + ".mp3", vol * (QUIET[m.name] || 0.6));
     } catch (e) {
     }
   }
   function trance(m) {
-    let el = W9.document.getElementById("fhc-trance");
+    let el = W10.document.getElementById("fhc-trance");
     const lvl = pref("noTrance") ? Math.max(0, Math.min(3, Number(m.level) || 0)) : 0;
     if (!lvl) {
       if (el) el.remove();
       return;
     }
     if (!el) {
-      el = W9.document.createElement("div");
+      el = W10.document.createElement("div");
       el.id = "fhc-trance";
       el.style.cssText = "position:fixed;inset:0;pointer-events:none;z-index:9998;transition:opacity 4s;opacity:0;animation:fhcTrance 6s ease-in-out infinite";
-      if (!W9.document.getElementById("fhc-trance-css")) {
-        const s = W9.document.createElement("style");
+      if (!W10.document.getElementById("fhc-trance-css")) {
+        const s = W10.document.createElement("style");
         s.id = "fhc-trance-css";
         s.textContent = "@keyframes fhcTrance{0%,100%{filter:brightness(1)}50%{filter:brightness(0.85)}}";
-        W9.document.head.appendChild(s);
+        W10.document.head.appendChild(s);
       }
-      W9.document.body.appendChild(el);
+      W10.document.body.appendChild(el);
     }
     const edge = [0, 0.25, 0.45, 0.65][lvl], inner = [0, 55, 42, 30][lvl];
     el.style.background = "radial-gradient(ellipse at center, transparent " + inner + "%, rgba(70,20,90," + edge + ") 100%)";
-    (W9.requestAnimationFrame || ((f) => setTimeout(f, 16)))(() => {
+    (W10.requestAnimationFrame || ((f) => setTimeout(f, 16)))(() => {
       el.style.opacity = "1";
     });
   }
@@ -10246,13 +10841,13 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
   var recentFeel = [];
   function feelTick() {
     try {
-      if (!pref("noFeelings") || W9.CurrentScreen !== "ChatRoom" || !W9.Player || !ctx2.panel.s || !ctx2.panel.s.onBooks) return;
+      if (!pref("noFeelings") || W10.CurrentScreen !== "ChatRoom" || !W10.Player || !ctx2.panel.s || !ctx2.panel.s.onBooks) return;
       if (Date.now() < (feelTick.next || 0)) return;
       feelTick.next = Date.now() + (7 + Math.random() * 6) * 6e4;
-      const s = ctx2.panel.s, items = (W9.Player.Appearance || []).filter((x) => x && x.Asset && x.Asset.Group);
+      const s = ctx2.panel.s, items = (W10.Player.Appearance || []).filter((x) => x && x.Asset && x.Asset.Group);
       const grp = (g) => items.find((x) => x.Asset.Group.Name === g);
       const eff2 = (x) => [].concat(x.Property && x.Property.Effect || [], x.Asset.Effect || []);
-      const arousal = W9.Player.ArousalSettings && W9.Player.ArousalSettings.Progress || 0;
+      const arousal = W10.Player.ArousalSettings && W10.Player.ArousalSettings.Progress || 0;
       const kinds = [];
       if (grp("ItemButt")) kinds.push("plug");
       if (items.some((x) => eff2(x).includes("Chaste")) && arousal > 40) kinds.push("chaste");
@@ -10276,11 +10871,11 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
   function drawMarkers() {
     try {
       const s = ctx2.panel.s;
-      if (!s || !s.staff || !Array.isArray(s.herd) || !pref("noMarkers") || !mapOn() || typeof W9.DrawText !== "function") return;
-      const R = W9.ChatRoomMapViewPerceptionRange || 6, tile = 1e3 / (R * 2 + 1), me4 = W9.Player.MapData.Pos;
+      if (!s || !s.staff || !Array.isArray(s.herd) || !pref("noMarkers") || !mapOn() || typeof W10.DrawText !== "function") return;
+      const R = W10.ChatRoomMapViewPerceptionRange || 6, tile = 1e3 / (R * 2 + 1), me4 = W10.Player.MapData.Pos;
       for (const x of s.herd) {
-        const C = (W9.ChatRoomCharacter || []).find((c) => c.MemberNumber === x.mn);
-        if (!C || !C.MapData || !C.MapData.Pos || !W9.ChatRoomMapViewCharacterIsVisible(C)) continue;
+        const C = (W10.ChatRoomCharacter || []).find((c) => c.MemberNumber === x.mn);
+        if (!C || !C.MapData || !C.MapData.Pos || !W10.ChatRoomMapViewCharacterIsVisible(C)) continue;
         const tags = [];
         if (x.milk !== null && x.milk >= 75) tags.push(["M", "#7fa8c9"]);
         if (x.heat) tags.push(["H", "#d9534f"]);
@@ -10289,7 +10884,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
         if (!tags.length) continue;
         const sx = (C.MapData.Pos.X - me4.X + R) * tile, sy = (C.MapData.Pos.Y - me4.Y) * tile + R * tile;
         if (sx < 0 || sy < 0 || sx > 1e3 || sy > 1e3) continue;
-        tags.forEach(([t, col], i) => W9.DrawText(t, sx + tile * 0.2 + i * tile * 0.22, sy + tile * 0.15, col, "black"));
+        tags.forEach(([t, col], i) => W10.DrawText(t, sx + tile * 0.2 + i * tile * 0.22, sy + tile * 0.15, col, "black"));
       }
     } catch (e) {
     }
@@ -10306,11 +10901,11 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
   }
   function arouse(m) {
     try {
-      if (!stirOn() || !W9.Player || !W9.Player.ArousalSettings || typeof W9.ActivitySetArousal !== "function") return;
-      if (W9.Player.ArousalSettings.Active === "Inactive" || W9.Player.ArousalSettings.Active === "NoMeter") return;
-      const cur = Number(W9.Player.ArousalSettings.Progress) || 0, cap = Math.max(0, Math.min(deniedNow() ? 94 : 100, Number(m.cap) || 100));
+      if (!stirOn() || !W10.Player || !W10.Player.ArousalSettings || typeof W10.ActivitySetArousal !== "function") return;
+      if (W10.Player.ArousalSettings.Active === "Inactive" || W10.Player.ArousalSettings.Active === "NoMeter") return;
+      const cur = Number(W10.Player.ArousalSettings.Progress) || 0, cap = Math.max(0, Math.min(deniedNow() ? 94 : 100, Number(m.cap) || 100));
       const next = Math.max(0, Math.min(cap, cur + (Number(m.add) || 0)));
-      if (next > cur || m.add < 0) W9.ActivitySetArousal(W9.Player, next);
+      if (next > cur || m.add < 0) W10.ActivitySetArousal(W10.Player, next);
     } catch (e) {
       console.warn("[Farmhand Companion] arouse:", e);
     }
@@ -10318,11 +10913,11 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
   var VIBE_MODE = ["Low", "Medium", "High", "Maximum"];
   var vibeWas = null;
   var vibeTimer = null;
-  var vibeToys = () => (W9.Player && Array.isArray(W9.Player.Appearance) ? W9.Player.Appearance : []).filter((it) => it && it.Asset && it.Asset.Group && it.Property && typeof it.Property.Intensity === "number" && !(it.Property.LockedBy && typeof W9.DialogCanUnlock === "function" && !W9.DialogCanUnlock(W9.Player, it)));
+  var vibeToys = () => (W10.Player && Array.isArray(W10.Player.Appearance) ? W10.Player.Appearance : []).filter((it) => it && it.Asset && it.Asset.Group && it.Property && typeof it.Property.Intensity === "number" && !(it.Property.LockedBy && typeof W10.DialogCanUnlock === "function" && !W10.DialogCanUnlock(W10.Player, it)));
   function vibePush(toys) {
-    if (typeof W9.CharacterRefresh === "function") W9.CharacterRefresh(W9.Player, false);
-    if (typeof W9.ChatRoomCharacterItemUpdate === "function") toys.forEach((it) => W9.ChatRoomCharacterItemUpdate(W9.Player, it.Asset.Group.Name));
-    else if (typeof W9.ChatRoomCharacterUpdate === "function") W9.ChatRoomCharacterUpdate(W9.Player);
+    if (typeof W10.CharacterRefresh === "function") W10.CharacterRefresh(W10.Player, false);
+    if (typeof W10.ChatRoomCharacterItemUpdate === "function") toys.forEach((it) => W10.ChatRoomCharacterItemUpdate(W10.Player, it.Asset.Group.Name));
+    else if (typeof W10.ChatRoomCharacterUpdate === "function") W10.ChatRoomCharacterUpdate(W10.Player);
   }
   function vibeSet(it, level, mode) {
     it.Property.Intensity = level;
@@ -10378,7 +10973,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
         const t = next(args);
         try {
           const f = slowFactor();
-          return t > 0 && f > 1 && !(typeof W9.ChatRoomMapViewHasSuperPowers === "function" && W9.ChatRoomMapViewHasSuperPowers()) ? t * f : t;
+          return t > 0 && f > 1 && !(typeof W10.ChatRoomMapViewHasSuperPowers === "function" && W10.ChatRoomMapViewHasSuperPowers()) ? t * f : t;
         } catch (e) {
           return t;
         }
@@ -10454,6 +11049,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     deer: ["bleat", "mweh"],
     goblin: ["heh", "nngh"],
     rat: ["squeak", "eek", "chitter"],
+    dragon: ["rawr", "grr", "hsss"],
     kitt: ["mew", "nya", "mrrp"]
   };
   function mooify(text, species) {
@@ -10490,7 +11086,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
   var inCharacter = (s) => String(s).replace(/\(/g, "[").replace(/\)/g, "]");
   function relay(m) {
     const text = inCharacter(forChat(m.text || "")).slice(0, 900);
-    const P3 = window.Player || {}, names = [P3.Nickname, P3.Name].filter(Boolean).map((n) => String(n).toLowerCase());
+    const P4 = window.Player || {}, names = [P4.Nickname, P4.Name].filter(Boolean).map((n) => String(n).toLowerCase());
     const now = Date.now();
     st.relayed = (st.relayed || []).filter((t) => now - t < 6e4);
     const blocked = typeof window.ChatRoomOwnerPresenceRule === "function" && (() => {
@@ -10561,6 +11157,22 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
       console.warn("[Farmhand Companion] farm gear:", e);
     }
   }
+  var nurseryLast = "";
+  var nurseryLastAt = 0;
+  function nurseryStatsSend(force) {
+    try {
+      const n = st.panel && st.panel.s && st.panel.s.nursery;
+      if (!n || n.role !== "little" || !botHere2()) return;
+      const s = nurseryStatsNow(), key = JSON.stringify(s);
+      if (!force && key === nurseryLast && Date.now() - nurseryLastAt < 10 * 6e4) return;
+      if (!s.abcl && !s.mommy && !(s.carers || []).length && !force) return;
+      nurseryLast = key;
+      nurseryLastAt = Date.now();
+      toBot("nurseryStats", s);
+    } catch (e) {
+      console.warn("[Farmhand Companion] nursery stats:", e);
+    }
+  }
   function onFarmMsg(m) {
     if (m.type === "body" || m.type === "bodyAsk") {
       try {
@@ -10614,6 +11226,11 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
           st.gotState = true;
           st.panel.setState(m.state);
           parasiteSync();
+          try {
+            messBrand(st.panel.prefs.brandOff ? null : m.state.brand);
+          } catch (e) {
+            console.warn("[Farmhand Companion] brand:", e);
+          }
           try {
             drawnBodyFarmState(m.state.drawn);
           } catch (e) {
@@ -10696,6 +11313,18 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
           r = { ok: false, why: e.message };
         }
         toBot("markDone", { ok: !!r.ok, did: r.did || [], why: r.why || "" });
+        break;
+      }
+      case "nursery": {
+        if (m.do === "change") {
+          const did = nurseryChange();
+          if (did.length) toChat("\u{1F9F7} Fresh and dry" + (did.includes("powder") ? ", with a puff of baby powder" : "") + ".", "#d98bb5", true);
+          nurseryStatsSend(true);
+        } else if (m.do === "offer") {
+          st.panel.ui.nurseryOffer = { gear: String(m.gear || ""), label: String(m.label || "stuffie"), from: String(m.from || "A grown-up") };
+          st.panel.renderSoon();
+          toChat("\u{1F9F8} " + String(m.from || "A grown-up") + " is holdin' out a " + String(m.label || "stuffie") + " for you. Hold it from your \u{1F33E} panel's Nursery.", "#d98bb5", true);
+        }
         break;
       }
       case "relay":
@@ -10788,6 +11417,35 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     back() {
       onFarmMsg({ from: BOT_MEMBER, type: "outfitBack" });
     },
+    brandSync() {
+      try {
+        messBrand(st.panel.prefs.brandOff ? null : st.panel.s.brand);
+      } catch (e) {
+        console.warn("[Farmhand Companion] brand:", e);
+      }
+    },
+    // the nursery's stuffies and baby things, on your own character (nursery.js)
+    nurseryWear(g) {
+      try {
+        return nurseryWear(g);
+      } catch (e) {
+        return { ok: false, why: e.message };
+      }
+    },
+    nurseryOff(group) {
+      try {
+        return nurseryOff(group);
+      } catch (e) {
+        return { ok: false, why: e.message };
+      }
+    },
+    nurseryWorn() {
+      try {
+        return nurseryWorn();
+      } catch (e) {
+        return {};
+      }
+    },
     save(slot) {
       let c;
       try {
@@ -10863,6 +11521,10 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     st.panel.setStatus("waitin' for the farm girl");
     initCues({ toBot, panel: st.panel, local: toChat });
     setInterval(parasiteSync, 6e4);
+    setInterval(() => {
+      nurseryPowderTick();
+      nurseryStatsSend(false);
+    }, 3e4);
     initBelly(mod);
     initDrawnBody(mod);
     initMesses(mod);

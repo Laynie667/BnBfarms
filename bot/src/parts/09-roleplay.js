@@ -14,7 +14,7 @@
   const NAME_FILLER = new Set(("the and of for with bnb b&b farm farms miss mister mistress master lady lord sir madam " +
     "little big good bad pet doll thing princess queen king girl boy babe baby " +
     "cow cows bull heifer pony horse mare stallion dog pup puppy doggy pig piglet sow cat kitty kitten kitt bunny rabbit " +
-    "goat sheep ewe fox vixen wolf deer doe goblin hucow slave toy").split(" "));
+    "goat sheep ewe fox vixen wolf deer doe goblin hucow slave toy rat dragon drake").split(" "));
   function namedIn(text, list){
     const low = " "+text.toLowerCase().replace(/[^a-z0-9'\s]/g," ")+" ";
     const has = w => w.length > 1 && (low.includes(" "+w+" ") || low.includes(" "+w+"'s "));

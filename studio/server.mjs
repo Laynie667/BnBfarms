@@ -96,7 +96,7 @@ createServer(async (req, res) => {
       const idx = await gameFile("index.html"); if (!idx) { res.writeHead(502).end("the game's page couldn't be fetched"); return; }
       let html = await readFile(idx, "utf8");
       if (LIVE) html = html.replace("</head>", "<script>window.__studioLive = " + JSON.stringify(LIVE.ver) + ";</script>\n</head>");   // (studio.js: the live game's own drawing is used as it is)
-      html = html.replace("</body>", `<link rel="stylesheet" href="/__studio/studio.css">\n<script src="/__studio/belly-drawing.js"></script>\n<script src="/__studio/breasts-drawing.js"></script>\n<script src="/__studio/cock-drawing.js"></script>\n<script src="/__studio/body-engine.js"></script>\n<script src="/__studio/splatters.js"></script>\n<script src="/__studio/studio.js"></script>\n</body>`).replace("<title>Bondage Club</title>", "<title>B&B outfit studio</title>");
+      html = html.replace("</body>", `<link rel="stylesheet" href="/__studio/studio.css">\n<script src="/__studio/belly-drawing.js"></script>\n<script src="/__studio/breasts-drawing.js"></script>\n<script src="/__studio/cock-drawing.js"></script>\n<script src="/__studio/body-engine.js"></script>\n<script src="/__studio/splatters.js"></script>\n<script src="/__studio/brand-drawing.js"></script>\n<script src="/__studio/studio.js"></script>\n</body>`).replace("<title>Bondage Club</title>", "<title>B&B outfit studio</title>");
       res.writeHead(200, { "Content-Type": TYPES[".html"], "Cache-Control": "no-cache" }).end(html);
       return;
     }

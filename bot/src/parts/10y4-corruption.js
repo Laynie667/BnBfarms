@@ -57,7 +57,7 @@
   // heat lasts longer for the corrupted (used where the traps start a heat)
   function corrHeatX(mn){ return ((rec(mn) || {}).corrMarks || []).includes(20) ? 1.5 : 1; }
   function ruined(mn){ return ((rec(mn) || {}).corrMarks || []).includes(100); }
-  const CORR_NOISE = { cow: "moo", bull: "moo", pony: "neigh", horse: "neigh", pup: "woof", dog: "woof", wolf: "awoo", kitt: "mew", kitty: "mew", cat: "mew", bunny: "squeak", rabbit: "squeak", goat: "baa", sheep: "baa", pig: "oink", deer: "bleat", fox: "yip", goblin: "hehe", rat: "squeak" };
+  const CORR_NOISE = { cow: "moo", bull: "moo", pony: "neigh", horse: "neigh", pup: "woof", dog: "woof", wolf: "awoo", kitt: "mew", kitty: "mew", cat: "mew", bunny: "squeak", rabbit: "squeak", goat: "baa", sheep: "baa", pig: "oink", deer: "bleat", fox: "yip", goblin: "hehe", rat: "squeak", dragon: "rawr" };
   const CORR_BRANDS = ["FARM PROPERTY", "BREEDING STOCK", "USE ME", "BRED", "RUINED STOCK", "FARM ANIMAL"];
   const MARK_NAME = { 10: "the traps' hunger for you", 20: "the easy heats", 30: "the night whispers", 40: "the size the farm gave you", 50: "the brand",
     60: "the cravin'", 70: "the animal in your voice", 80: "the word in your mouth", 90: "the lingerin' haze", 100: "Ruined" };

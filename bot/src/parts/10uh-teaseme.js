@@ -132,6 +132,8 @@
            "Standin' in the meadow waitin' for a stag to find you, little deer?"],
     fox: ["Sly little fox. You think you'll slip away. You won't.", "Every fox gets caught sooner or later, sugar. Then it gets bred.",
           "Swish that big tail for me, fox."],
+    dragon: ["Big scary dragon, and look at you. Leashed and drippin'.", "All that fire, sugar, and you still kneel when you're told.",
+             "A dragon's hoard is gold. Yours is every load the farm gives you."],
     rat: ["Squeak for me, ratslut. Nice and high.", "Greedy little gutter rat, always sniffin' round for scraps. Here's somethin' to chew on.",
           "Twitch those whiskers for me, rat. Somebody's settin' a trap with your name on it."],
     goblin: ["Filthy little goblin. Rags and mud and that grin. Come here.", "Goblins are made for the dirty jobs, sugar. Guess what job needs doin'.",

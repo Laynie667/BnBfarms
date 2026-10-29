@@ -17,7 +17,7 @@
       const raw = W.localStorage && W.localStorage.getItem(FARM_LOOK_KEY);
       if (!raw || raw.length > 60000) return null;
       const d = JSON.parse(raw); if (!d || typeof d !== "object" || Array.isArray(d)) return null;
-      const body = {}; for (const k of ["cup", "breast", "wear", "belly", "auto", "tuck", "dress", "mould"]) if (d[k] !== undefined) body[k] = d[k];
+      const body = {}; for (const k of ["cup", "breast", "wear", "belly", "auto", "tuck", "dress", "mould", "brand"]) if (d[k] !== undefined) body[k] = d[k];
       return typeof body.cup === "number" ? body : null;
     } catch(e){ return null; }
   }

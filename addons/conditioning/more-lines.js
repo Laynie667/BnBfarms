@@ -13,6 +13,7 @@ export const SPECIES_MORE = {
   wolf:   { a: "wolf",   s: "howl",   p: "thick ruff",       act: "heel and obey",       pose: "kneeling up, paws tucked",        names: ["good wolf", "farm wolf", "obedient wolf", "dumb tame wolf"] },
   deer:   { a: "doe",    s: "bleat",  p: "soft flanks",      act: "stand still and wait", pose: "on all fours, head low",         names: ["sweet doe", "farm doe", "tame doe", "dumb little doe"] },
   rat:    { a: "rat",    s: "squeak", p: "twitching whiskers", act: "scurry and serve",  pose: "crouched low, hands tucked under your chin", names: ["sweet ratslut", "farm rat", "greedy little rat", "dumb gutter rat"] },
+  dragon: { a: "dragon", s: "growl",  p: "folded wings",     act: "guard and obey",      pose: "crouched low, wings folded, tail curled round you", names: ["good dragon", "farm dragon", "tame dragon", "dumb little dragon"] },
   goblin: { a: "goblin", s: "giggle", p: "greedy hands",     act: "fetch and serve",     pose: "squatting low, hands on the floor", names: ["good goblin", "farm goblin", "useful goblin", "dumb goblin"] },
 };
 export const MALE = {
@@ -26,6 +27,7 @@ export const MALE = {
   fox:   { a: "fox",      names: ["sweet fox", "farm fox", "eager fox", "dumb little fox"] },
   deer:  { a: "buck",     names: ["sweet buck", "farm buck", "tame buck", "dumb little buck"] },
   dog:   { names: ["good dog", "farm dog", "obedient mutt", "dumb mutt"] },
+  dragon:{ a: "drake",    names: ["good drake", "farm drake", "tame drake", "dumb little drake"] },
   pup:   { names: ["good pup", "farm pup", "obedient pup", "dumb mutt"] },
 };
 // a cow's "heavy udders" (and a goat's) only for somebody with tits; a cock gets "heavy balls", anybody else their body

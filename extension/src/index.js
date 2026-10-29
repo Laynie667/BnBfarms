@@ -17,12 +17,13 @@ import { captureOutfit, wearOutfit, changeBack, hasBackup } from "./outfits.js";
 import { markBody, washMarks, stripMe, dressMe, syncFarmGear, syncShape, scaleTrialCleanup } from "./marks.js";
 import { initBelly } from "./belly.js";
 import { initDrawnBody, onBodyMsg, onFarmLook, farmLookWanted, drawnBodyFarmState } from "./drawnbody.js";
-import { initMesses, onMessMsg, messFromMark, messWash } from "./messes.js";
+import { initMesses, onMessMsg, messFromMark, messWash, messBrand } from "./messes.js";
 import { initMemlog } from "./memlog.js";
 import { initTrim } from "./trimpics.js";
 import { initLocalSave } from "./localsave.js";
 import { initChatlog, logRow } from "./chatlog.js";
 import { initSettings } from "./settings.js";
+import { nurseryWear, nurseryOff, nurseryWorn, nurseryChange, nurseryPowderTick, nurseryStatsNow } from "./nursery.js";
 import { initCues, cueOff, lead, face, sound, trance, drawMarkers, arouse, vibe, initBody } from "./cues.js";
 
 // the SDK ships as an old-style module; this digs the real thing out either way
@@ -56,7 +57,7 @@ const st = { panel: null, welcomed: false, lastHello: 0, parts: new Map() };
 const NOISES = { cow: ["moo", "mooo", "mrrrm"], bull: ["moo", "hrrmph"], pony: ["neigh", "nicker", "whinny"], horse: ["neigh", "whinny", "nicker"],
   pup: ["arf", "woof", "awoo"], dog: ["woof", "arf", "ruff"], kitty: ["mew", "nya", "mrrp"], cat: ["meow", "mrrp", "purr"], bunny: ["squeak", "eep"],
   rabbit: ["squeak", "eep"], pig: ["oink", "snrk"], goat: ["baa", "maa"], sheep: ["baa", "baaa"], fox: ["yip", "ack"], wolf: ["awoo", "grr"],
-  deer: ["bleat", "mweh"], goblin: ["heh", "nngh"], rat: ["squeak", "eek", "chitter"], kitt: ["mew", "nya", "mrrp"] };
+  deer: ["bleat", "mweh"], goblin: ["heh", "nngh"], rat: ["squeak", "eek", "chitter"], dragon: ["rawr", "grr", "hsss"], kitt: ["mew", "nya", "mrrp"] };
 function mooify(text, species) {
   const say = NOISES[String(species || "").toLowerCase()] || NOISES[speciesKeyOf(species)] || NOISES.cow;   // "catgirl", "ratslut" (shared/species.js)
   return String(text).replace(/[A-Za-z']{3,}/g, (w) => {
@@ -176,6 +177,19 @@ function parasiteSync() {
     for (const n of did.off) toChat(n + " comes off.", "#c9a35b", true);
   } catch (e) { console.warn("[Farmhand Companion] farm gear:", e); }
 }
+// a little's paddin' (ABCL) and Littlish Club grown-ups, sent to the farm when it changes (only for littles on the nursery list)
+let nurseryLast = "", nurseryLastAt = 0;
+function nurseryStatsSend(force) {
+  try {
+    const n = st.panel && st.panel.s && st.panel.s.nursery;
+    if (!n || n.role !== "little" || !botHere()) return;
+    const s = nurseryStatsNow(), key = JSON.stringify(s);
+    if (!force && key === nurseryLast && Date.now() - nurseryLastAt < 10 * 60000) return;
+    if (!s.abcl && !s.mommy && !(s.carers || []).length && !force) return;
+    nurseryLast = key; nurseryLastAt = Date.now();
+    toBot("nurseryStats", s);
+  } catch (e) { console.warn("[Farmhand Companion] nursery stats:", e); }
+}
 function onFarmMsg(m) {
   if (m.type === "body" || m.type === "bodyAsk") { try { onBodyMsg(m); } catch (e) { console.warn("[Farmhand Companion] drawn body:", e); } return; }   // another Companion's drawn body (drawnbody.js)
   if (m.type === "mess" || m.type === "messAsk") { try { onMessMsg(m); } catch (e) { console.warn("[Farmhand Companion] messes:", e); } return; }   // another Companion's messes (messes.js)
@@ -202,7 +216,7 @@ function onFarmMsg(m) {
       try { if (!onBotAccount()) onFarmLook(m); } catch (e) { console.warn("[Farmhand Companion] farm look:", e); }   // (on the bot's own account, its settings ARE the farm's look)
       break;
     case "state":
-      if (m.state && typeof m.state === "object") { st.gotState = true; st.panel.setState(m.state); parasiteSync(); try { drawnBodyFarmState(m.state.drawn); } catch (e) { console.warn("[Farmhand Companion] drawn body size:", e); } }
+      if (m.state && typeof m.state === "object") { st.gotState = true; st.panel.setState(m.state); parasiteSync(); try { messBrand(st.panel.prefs.brandOff ? null : m.state.brand); } catch (e) { console.warn("[Farmhand Companion] brand:", e); } try { drawnBodyFarmState(m.state.drawn); } catch (e) { console.warn("[Farmhand Companion] drawn body size:", e); } }
       break;
     case "reply":
     case "notice": {
@@ -256,6 +270,12 @@ function onFarmMsg(m) {
         }
       } catch (e) { r = { ok: false, why: e.message }; }
       toBot("markDone", { ok: !!r.ok, did: r.did || [], why: r.why || "" });
+      break;
+    }
+    case "nursery": {
+      // the nursery (nursery.js): a grown-up changed you, or is offerin' you a stuffie
+      if (m.do === "change") { const did = nurseryChange(); if (did.length) toChat("🧷 Fresh and dry" + (did.includes("powder") ? ", with a puff of baby powder" : "") + ".", "#d98bb5", true); nurseryStatsSend(true); }
+      else if (m.do === "offer") { st.panel.ui.nurseryOffer = { gear: String(m.gear || ""), label: String(m.label || "stuffie"), from: String(m.from || "A grown-up") }; st.panel.renderSoon(); toChat("🧸 " + String(m.from || "A grown-up") + " is holdin' out a " + String(m.label || "stuffie") + " for you. Hold it from your 🌾 panel's Nursery.", "#d98bb5", true); }
       break;
     }
     case "relay": relay(m); break;
@@ -324,6 +344,11 @@ const api = {
     return true;
   },
   back() { onFarmMsg({ from: BOT_MEMBER, type: "outfitBack" }); },
+  brandSync() { try { messBrand(st.panel.prefs.brandOff ? null : st.panel.s.brand); } catch (e) { console.warn("[Farmhand Companion] brand:", e); } },
+  // the nursery's stuffies and baby things, on your own character (nursery.js)
+  nurseryWear(g) { try { return nurseryWear(g); } catch (e) { return { ok: false, why: e.message }; } },
+  nurseryOff(group) { try { return nurseryOff(group); } catch (e) { return { ok: false, why: e.message }; } },
+  nurseryWorn() { try { return nurseryWorn(); } catch (e) { return {}; } },
   save(slot) {
     let c;
     try { c = captureOutfit(); } catch (e) { st.panel.add("👗 Couldn't read what you're wearin': " + e.message, "notice"); return; }
@@ -372,6 +397,7 @@ function start() {
   st.panel.setStatus("waitin' for the farm girl");
   initCues({ toBot, panel: st.panel, local: toChat });
   setInterval(parasiteSync, 60000);
+  setInterval(() => { nurseryPowderTick(); nurseryStatsSend(false); }, 30000);   // a little's paddin' (ABCL) for the nursery, and the baby powder brushin' off
   initBelly(mod);  // the drawn-belly test (belly.js)
   initDrawnBody(mod);  // the drawn body from the outfit studio, on your own character (drawnbody.js)
   initMesses(mod);     // the farm's own messes on everybody (messes.js)

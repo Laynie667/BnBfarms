@@ -51,6 +51,7 @@
       try { teaseMeTick(); } catch(e){ warn("tease:", e); }
       try { echsTick(); } catch(e){ warn("echs:", e); }
       try { roamTick(); } catch(e){ warn("roam:", e); }
+      try { nurseryTick(); } catch(e){ warn("nursery:", e); }
       rutTick();
       quotaTick();
       prodTick();

@@ -1,19 +1,19 @@
 # What to install (current versions)
 
-Updated 2026-10-26. Every file is in the `dist/` folder (it syncs through OneDrive, so the phone app has it too).
+Updated 2026-10-29. Every file is in the `dist/` folder (it syncs through OneDrive, so the phone app has it too).
 In Tampermonkey's dashboard, compare each script's version with this list. Anything already at these versions is up to date.
 
 | Script | File in `dist/` | Where it runs | Current |
 |---|---|---|---|
-| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.50.0** |
-| Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.10.0** |
-| Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.2.1** |
-| Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **1.1.0** |
-| Barn life | `farmhand-barn-life.user.js` | the bot's PC | **1.2.1** |
+| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.51.0** |
+| Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.10.1** |
+| Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.2.2** |
+| Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **1.1.1** |
+| Barn life | `farmhand-barn-life.user.js` | the bot's PC | **1.2.2** |
 | Map tools, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.4** |
-| Dairy | `farmhand-dairy.user.js` | the bot's PC | **1.1.0** |
-| Shows | `farmhand-shows.user.js` | the bot's PC | **1.1.0** |
-| Farmhand Companion | `farmhand-companion.user.js` | each player | **0.43.0** |
+| Dairy | `farmhand-dairy.user.js` | the bot's PC | **1.1.1** |
+| Shows | `farmhand-shows.user.js` | the bot's PC | **1.1.1** |
+| Farmhand Companion | `farmhand-companion.user.js` | each player | **0.44.0** |
 | Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.4** |
 
 ## Sending a watch report
@@ -23,6 +23,31 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 - Running the watcher on more than one game at once (the bot, yours, a tester's) lets Claude line them up into one timeline.
 
 ## Latest changes (newest first)
+
+- **Bot 0.51.0 + Companion 0.44.0 (glory stalls 1.10.1, breeding 1.2.2, conditioning 1.1.1, barn life 1.2.2, dairy 1.1.1, shows 1.1.1): Oct 29 batch.** Laynie, Oct 29: a nursery for her ABDL players, no pumps on the outfits, dragon outfits, a role-play way to get parasites off, and drainin' without staff.
+  - **The nursery** (bot/src/parts/10up-nursery-lines.js, 10up2-nursery.js; Companion views/nursery.js, nursery.js). A safe list of littles and caregivers: proprietors add anybody (`?nursery add <who> little|caregiver`), caregivers can invite littles, and everybody gets a Yes / Not now card first. `?nursery leave` takes yourself off; `?nursery remove <who>` (proprietors); `?nursery list`; `?nursery pair <little>` / `unpair`.
+    - **Private.** Every nursery line goes only to people on the list who are in the room, as a line in their own chat. To anybody else the commands don't exist, and their panel has no Nursery.
+    - **Little space** (`?little on|off`). While it's on, the farm's grown-up machinery leaves them be: no traps, urges, teasin', breedin', milkin', eggs or glory stalls, and grown-up commands aimed at them (?milk, ?drain, ?breed, ?dose…) are turned away without them ever bein' asked. Their own grown-up commands wait till they switch it off. It can't start while somethin' grown-up holds them (a trap, the bench, a parasite…).
+    - **Play.** 21 things to do (`?little story`, nap, snack, colour, blocks, bubbles, ducks, baby animals, the hay pile, the pedal tractor…), six games against the farm girl (rock-paper-scissors, which hand, dice, guess the crayon, catch, peekaboo), `?little ask cuddle|change|story|…` to their grown-ups, and `?little bath`.
+    - **Caregivers** (`?care <action> <little>`): cuddle, praise, head pats, tuck in, story, bottle, snack, check, change, bath, rock, lullaby, forehead kiss, tickle, play, wipe face, give a stuffie. Their own littles straight away; anybody else's little says yes first (good for two hours).
+    - **Nursery traps** on spots named `nursery-<kind>` (`?spot set nursery-ballpit`): playpen, ballpit, bubbles, blocks, fort, music, swing, tickle, sticker, sandbox, rockinghorse, slide, bouncy, confetti, lambs, chicks. Littles can switch them off (`?nursery traps off`).
+    - **Stars:** a gold star is one ribbon, three a day for a little, two for a caregiver.
+    - **ABCL:** the little's Companion reads their paddin' and the farm teases them, kindly, when it's damp, soggy or leakin' (never the messy kind). A caregiver's change sets ABCL back to dry on their screen, with a puff of baby powder for ten minutes. **Littlish Club:** their mommy and caregivers, if they're on the list, are paired with them automatically.
+    - **Messes:** the farm's cake, cream, honey, syrup, chocolate, strawberry, mud and slime get noticed in the nursery's words. The grown-up messes are never named. Bath time washes everything off.
+    - **Gear:** stuffies (bunny, fox, plushie, dragon, teddy), pacifier, bottle, bib, bonnet, giant bow, baby dress and a poofy diaper. They go on the little's own character only when they press the button, and come off the same way. A caregiver's stuffie arrives as a "hold it?" card.
+  - **No milkin' pumps** on the cow and bull outfits any more (their blurbs changed to match).
+  - **Dragons**: a new kind with five outfits (Hoard Queen, Chained Drake, Wyrm in Heat, Little Drakeling, Gilded Wyvern): emerald and gold, swept-back horns, dragon wings, a dragon's tail and claws. "Dragon", "dragoness", "drake", "wyrm", "wyvern", "kobold" all count. Contract sounds rawr, grrr, hsss; their own wash, tease, stall, glory, barn life, conditioning and show lines.
+  - **The farm's brand** (Laynie: "add our logo as a brand for our livestock, with studio support"). The B&B logo, cut from `reference/image reference/logo.jpg` (`shared/brand/`): the big BB with the paw-print cowbell, seared on.
+    - `?brand <who> logo [place]` (staff on their herd, proprietors on anybody), with a searin' line. Places: hips, thighs, low belly, tummy, breasts, shoulders. `?brand all logo [place]` (proprietors) brands every livestock; `?brand all clear`. The old letter brands still work.
+    - Every Companion draws it on the skin, under clothes, with the messes, and it follows the body when they kneel or go on all fours. Each player can hide their own from Toggles ("Show my farm brand").
+    - **Studio:** a new "The farm's brand" panel to place it on each spot (size, turn, nudges), pick the look (fresh and seared, healed and raised, or inked) and the art (the BB and bell, or the whole logo). Save the brand → `studio/fits/brand.json`. On the bot's PC, the Companion's "Get my studio's settings" makes it the farm's look for everybody.
+  - **BCR marks on the drawn breasts** (gitlab.com/mrhappy-bcr/bcr). BCR's welts and bruises on the chest used to end up under our drawn breasts. Now the Companion asks BCR to paint its breast marks and lays them on the drawn breasts, stretched to their size and kept to their shape. It does nothin' when BCR isn't there.
+  - **Farm services** (`?services`, 10uo-services.js):
+    - `?drain` empties yourself into the bucket, no staff needed (`?drain butt` for one hole).
+    - `?drain <who>` works for anybody on the books, on somebody right beside them who says yes first.
+    - `?service purge`: the farm vet takes a parasite off (3 ribbons).
+    - `?service soak`: stand in the water or at a trough for 10 minutes and it lets go (free).
+    - `?coax <who>`: a friend tempts it off with honey or cream (they say yes first; it might hop onto the friend instead if they've got ?parasite on).
 
 - **Bot 0.50.0 + Companion 0.43.0: Oct 26 batch.** Laynie, Oct 26: ?stuck teleports, kitty outfits/sounds, ratsluts, help leaking the private add-on, ?wash fitted, a seed-milking switch, friend the bot or come off the books, and "sometimes the outfit doesnt apply on contract signing".
   - **?stuck** always moves them to the `rescue` spot straight away; staff are told where they went.

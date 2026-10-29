@@ -82,6 +82,7 @@ const PIG_SUIT = petsuit(C.pinkpig, C.rose, C.cognac, C.rose, C.hoof, C.cognac, 
 const DOG_SUIT = petsuit(C.cognac, C.cream, C.hoof, C.cream, C.cream, C.hoof, C.brass);   // (tan with cream paws)
 const WOLF_SUIT = petsuit("#4A4A52", C.silver, C.black, C.silver, C.silver, C.black, C.silver);   // (storm grey and silver)
 const CAT_SUIT = petsuit(C.black, C.wine, C.plum, C.wine, C.black, C.black, C.silver);   // (a black cat)
+const EMERALD = "#1F5A44", GOLD = "#C9A23A";   // (the dragons: emerald scale and hoard gold)
 const RABBIT_LEGS = petsuit(C.mint, C.cream, C.cognac, C.cream, C.cream, C.cognac, C.brass).legs;
 const SHEEP_LEGS = petsuit(C.cream, C.lilac, C.lav, C.lilac, C.hoof, C.cognac, C.brass).legs;
 const GOAT_LEGS = petsuit(C.blue, C.cream, C.cognac, C.cream, C.hoof, C.cognac, C.brass).legs;
@@ -97,7 +98,7 @@ const KIT = {
       ["ItemNeck", "LeatherCollar", C.cognac, L], ["ItemNeckAccessories", "CollarCowBell", "Default"], ["ItemNose", "NoseRing", C.brass],
       ["ItemNeckRestraints", "CollarLeash", [C.pink, C.cognac, C.brass]], ["ItemMouth", "RingGag", C.pink],
       ["ItemArms", "PawPaddedPetsuitArms", COW_SUIT.arms, false, "Padding"], ["ItemLegs", "PawPaddedPetsuitLegs", COW_SUIT.legs, false, "Padding"]],
-    tits: [["Bra", "CowPrintedBra", "Default"], ["ItemNipples", "LactationPump", "Default", false, "MediumSuction"]],
+    tits: [["Bra", "CowPrintedBra", "Default"]],   /* (no milkin' pumps on the outfits: Laynie, Oct 29) */
     pussy: [["Panties", "CowPrintedPanties", "Default"]] },
   kitt: { label: "Kitty", look: "pastel", pal: { a: C.lav, b: C.pink, leg: C.lilac },
     pieces: [["HairAccessory2", "KittenEars2", C.lav], ["TailStraps", "KittenTailStrap1", "#7650B5"]   /* (drawn paler than the ears: mixed deeper to match) */, ["ItemNeck", "LeatherCollarBell", C.pink, L],
@@ -159,7 +160,7 @@ const KIT = {
       ["ItemNeck", "LeatherCollar", C.cognac, L], ["ItemNeckAccessories", "CollarCowBell", "Default"], ["ItemNose", "NoseRing", C.brass],
       ["ItemNeckRestraints", "CollarLeash", [C.black, C.cognac, C.brass]], ["ItemMouth", "RingGag", C.black],
       ["ItemArms", "LeatherCuffs", [C.cognac, C.brass], L, "Both"], ["ItemFeet", "LeatherAnkleCuffs", [C.brass, C.cognac, C.brass], false, "Chained"]],
-    tits: [["Bra", "CowPrintedBra", "Default"], ["ItemNipples", "LactationPump", "Default", false, "MediumSuction"]],
+    tits: [["Bra", "CowPrintedBra", "Default"]],   /* (no milkin' pumps on the outfits: Laynie, Oct 29) */
     pussy: [["Panties", "CowPrintedPanties", "Default"]] },
   // horses: chestnut and cream show tack (a pony's goth black, but in a big horse's colours)
   horse: { label: "Horse", look: "goth", pal: { a: "#5A3420", b: C.cream, leg: "#5A3420" },
@@ -195,6 +196,15 @@ const KIT = {
       ["ItemHands", "PonyMittensBinder", mitts(C.cream, C.hoof, C.lav, C.brass), L, "Chained"],
       ["ItemLegs", "PawPaddedPetsuitLegs", SHEEP_LEGS, false, "Padding"]] },
 };
+// dragons (Laynie, Oct 29: "i need a dragon set of outfits"): the goth look in emerald and hoard gold, swept-back
+// horns, dragon wings and a dragon's tail, claws on both hands, a gold-tagged collar on a chain lead, cuffed and hobbled
+// like the farm's other big beasts. (Horns5 is the game's swept, ridged pair; Horns4 reads as a ram's.)
+KIT.dragon = { label: "Dragon", look: "goth", pal: { a: EMERALD, b: GOLD, leg: C.black },
+  pieces: [["HairAccessory1", "Horns5", C.hoof], ["Wings", "DragonWings", ["#2E7A5C", EMERALD, GOLD, GOLD, C.black]]   /* Webbing, Supports, Points, Buckles, Straps */, ["TailStraps", "DragonTailStrap1", [EMERALD, GOLD]],
+    ["HandAccessoryLeft", "Claws", C.black], ["HandAccessoryRight", "Claws", C.black],
+    ["ItemNeck", "LeatherCollar", GOLD, L], ["ItemNeckAccessories", "CollarNameTagLivestock", "Default"],
+    ["ItemNeckRestraints", "CollarLeash", [GOLD, C.black, GOLD]], ["ItemMouth", "RingGag", EMERALD],
+    ["ItemArms", "LeatherCuffs", [C.black, GOLD], L, "Both"], ["ItemFeet", "LeatherAnkleCuffs", [GOLD, C.black, GOLD], false, "Chained"]] };
 export const OUTFIT_SPECIES = Object.keys(KIT);
 // the farm's other kinds wear their cousins' outfits
 const ALIAS = { mouse: "rat" };   // (every other kind has its own set since Oct 26)

@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.50.0
+// @version      0.51.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -1670,6 +1670,15 @@
     lamb: "sheep",
     ewe: "sheep",
     ram: "sheep",
+    dragon: "dragon",
+    dragoness: "dragon",
+    drake: "dragon",
+    wyrm: "dragon",
+    wyvern: "dragon",
+    draconic: "dragon",
+    drakeling: "dragon",
+    kobold: "dragon",
+    dragonborn: "dragon",
     rat: "rat",
     ratty: "rat",
     rattie: "rat",
@@ -1766,7 +1775,8 @@
     goat: ["maa", "meh-eh", "bleat"],
     sheep: ["baa", "baaah", "meh"],
     deer: ["bleat", "snort", "huff"],
-    goblin: ["heh", "gnuk", "skree", "hrrk"]
+    goblin: ["heh", "gnuk", "skree", "hrrk"],
+    dragon: ["rawr", "grrr", "hsss", "rrrh"]
   };
   function petFor(species) {
     const s = speciesKeyOf(species) || String(species || "").toLowerCase();
@@ -2011,9 +2021,9 @@
   // shared/farm-outfit-names.js
   var NAMES = {
     cow: {
-      female: ["Dairy Darling", "Pastel pink and cream, a cowbell that rings with every crawl, and udders cupped and pumpin' on a slow, steady draw. Made for the milkin' line."],
+      female: ["Dairy Darling", "Pastel pink and cream, a cowbell that rings with every crawl, and heavy udders in cow print. Made for the milkin' line."],
       male: ["Brass-Bell Bullock", "A jockstrap, a cognac chest harness and a cowbell on a locked collar: a young bull on all fours, caged and kept for the herd."],
-      futa: ["Cream Queen", "Everything a dairy girl wears, cow-print and milkin' cups, and nothin' locked between the legs to get in the way of breedin'."],
+      futa: ["Cream Queen", "Everything a dairy girl wears, cow-print top to bottom, and nothin' locked between the legs to get in the way of breedin'."],
       femboy: ["Buttercup Milkmaid", "A frilly pink maid bikini and a ribbon cincher on a crawlin' little cow, bell ringin', cage locked."],
       nonbinary: ["Clover Heifer", "Pastel lingerie under a padded cream petsuit, horns, a nose ring and a cowbell, belted and locked."]
     },
@@ -2073,6 +2083,13 @@
       femboy: ["Piglet Pink", "A pink maid bikini and tulle skirt on a little piglet in trotters, snout hooked and caged."],
       nonbinary: ["Rosy Trotter", "A corset bikini in rose under the petsuit and rope harness, snout hooked, belted."]
     },
+    dragon: {
+      female: ["Hoard Queen", "Emerald latex and a gold-tagged collar, swept-back horns, dragon wings and a long scaled tail: the farm's own dragon, claws out, cuffed and hobbled on a gold chain."],
+      male: ["Chained Drake", "A jockstrap and harness on a horned, winged drake, claws and tail and all, collared in gold, leashed and caged."],
+      futa: ["Wyrm in Heat", "The dragon's emerald latex and gold with nothin' locked below: horns, wings, tail and claws, cuffed and ready to breed a clutch."],
+      femboy: ["Little Drakeling", "A pink maid bikini and tulle skirt on a tiny dragon with horns, wings and a swishin' tail, claws out, cuffed, hobbled and caged."],
+      nonbinary: ["Gilded Wyvern", "Emerald latex and a gold collar on a horned, winged wyvern with its claws and tail, cuffed, hobbled and belted."]
+    },
     rat: {
       female: ["Gutter Sweetheart", "A dusty grey latex corset over a harness bra and crotchless latex, round mouse ears and a long pink tail: the barn's own ratslut, tagged, cuffed and hobbled."],
       male: ["Sewer Buck", "A jockstrap and harness on a tagged, cuffed rat in fishnets and thigh boots, leashed and caged."],
@@ -2089,7 +2106,7 @@
     },
     // their own sets (Oct 26)
     bull: {
-      female: ["Herd Matriarch", "Black and cognac, dark horns, a cowbell and a brass nose ring, cow-print and cups for the milkin', wrists cuffed and ankles hobbled."],
+      female: ["Herd Matriarch", "Black and cognac, dark horns, a cowbell and a brass nose ring, cow-print for the milkin' line, wrists cuffed and ankles hobbled."],
       male: ["Prize Stud Bull", "A jockstrap and harness on a horned, nose-ringed bull, belled, cuffed and hobbled, led by the ring and caged between breedings."],
       futa: ["Breeding Line Bull", "Latex under the cow-print, horns, ring and bell, and nothin' locked below: the herd's own breeder."],
       femboy: ["Little Bull Calf", "A pink maid bikini and tulle skirt on a horned little calf with a nose ring and a bell, cuffed and caged."],
@@ -2165,6 +2182,11 @@
     "HairAccessory2:PonyEars1": "pony ears",
     "HairAccessory2:MouseEars2": "round mouse ears",
     "TailStraps:MouseTailStrap1": "long bare rat tail",
+    "HairAccessory1:Horns5": "swept-back dragon horns",
+    "Wings:DragonWings": "dragon wings",
+    "TailStraps:DragonTailStrap1": "a dragon's scaled tail",
+    "HandAccessoryLeft:Claws": "claws on both hands",
+    "HandAccessoryRight:Claws": "claws on both hands",
     "ItemNeckAccessories:CollarNameTagLivestock": "livestock tag",
     "Garters:HipHarness": "hip harness",
     "HairAccessory2:PuppyEars1": "puppy ears",
@@ -2237,7 +2259,7 @@
     const e = entry(species, gender), pieces = outfitPieces(species, gender);
     if (!e || !pieces) return null;
     const locked = pieces.filter((p) => p.locked).map(say);
-    return e[1] + "\nIn it: " + list(pieces.map(say)) + "." + (locked.length ? "\nPadlocked: " + list(locked) + "." : "");
+    return e[1] + "\nIn it: " + list([...new Set(pieces.map(say))]) + "." + (locked.length ? "\nPadlocked: " + list(locked) + "." : "");
   }
 
   // shared/farm-outfits.js
@@ -2361,6 +2383,8 @@
   var DOG_SUIT = petsuit(C.cognac, C.cream, C.hoof, C.cream, C.cream, C.hoof, C.brass);
   var WOLF_SUIT = petsuit("#4A4A52", C.silver, C.black, C.silver, C.silver, C.black, C.silver);
   var CAT_SUIT = petsuit(C.black, C.wine, C.plum, C.wine, C.black, C.black, C.silver);
+  var EMERALD = "#1F5A44";
+  var GOLD = "#C9A23A";
   var RABBIT_LEGS = petsuit(C.mint, C.cream, C.cognac, C.cream, C.cream, C.cognac, C.brass).legs;
   var SHEEP_LEGS = petsuit(C.cream, C.lilac, C.lav, C.lilac, C.hoof, C.cognac, C.brass).legs;
   var GOAT_LEGS = petsuit(C.blue, C.cream, C.cognac, C.cream, C.hoof, C.cognac, C.brass).legs;
@@ -2382,7 +2406,8 @@
         ["ItemArms", "PawPaddedPetsuitArms", COW_SUIT.arms, false, "Padding"],
         ["ItemLegs", "PawPaddedPetsuitLegs", COW_SUIT.legs, false, "Padding"]
       ],
-      tits: [["Bra", "CowPrintedBra", "Default"], ["ItemNipples", "LactationPump", "Default", false, "MediumSuction"]],
+      tits: [["Bra", "CowPrintedBra", "Default"]],
+      /* (no milkin' pumps on the outfits: Laynie, Oct 29) */
       pussy: [["Panties", "CowPrintedPanties", "Default"]]
     },
     kitt: {
@@ -2570,7 +2595,8 @@
         ["ItemArms", "LeatherCuffs", [C.cognac, C.brass], L, "Both"],
         ["ItemFeet", "LeatherAnkleCuffs", [C.brass, C.cognac, C.brass], false, "Chained"]
       ],
-      tits: [["Bra", "CowPrintedBra", "Default"], ["ItemNipples", "LactationPump", "Default", false, "MediumSuction"]],
+      tits: [["Bra", "CowPrintedBra", "Default"]],
+      /* (no milkin' pumps on the outfits: Laynie, Oct 29) */
       pussy: [["Panties", "CowPrintedPanties", "Default"]]
     },
     // horses: chestnut and cream show tack (a pony's goth black, but in a big horse's colours)
@@ -2670,6 +2696,24 @@
       ]
     }
   };
+  KIT.dragon = {
+    label: "Dragon",
+    look: "goth",
+    pal: { a: EMERALD, b: GOLD, leg: C.black },
+    pieces: [
+      ["HairAccessory1", "Horns5", C.hoof],
+      ["Wings", "DragonWings", ["#2E7A5C", EMERALD, GOLD, GOLD, C.black]],
+      ["TailStraps", "DragonTailStrap1", [EMERALD, GOLD]],
+      ["HandAccessoryLeft", "Claws", C.black],
+      ["HandAccessoryRight", "Claws", C.black],
+      ["ItemNeck", "LeatherCollar", GOLD, L],
+      ["ItemNeckAccessories", "CollarNameTagLivestock", "Default"],
+      ["ItemNeckRestraints", "CollarLeash", [GOLD, C.black, GOLD]],
+      ["ItemMouth", "RingGag", EMERALD],
+      ["ItemArms", "LeatherCuffs", [C.black, GOLD], L, "Both"],
+      ["ItemFeet", "LeatherAnkleCuffs", [GOLD, C.black, GOLD], false, "Chained"]
+    ]
+  };
   var OUTFIT_SPECIES = Object.keys(KIT);
   var ALIAS2 = { mouse: "rat" };
   function outfitSpeciesOf(species) {
@@ -2748,7 +2792,7 @@
   ];
 
   // bot/src/version.js
-  var VERSION = "0.50.0";
+  var VERSION = "0.51.0";
 
   // bot-parts:farmhand-bot-parts
   (function() {
@@ -3555,6 +3599,8 @@
         sheep: { milk: 1, fert: 1, litter: [1, 2] },
         rat: { milk: 1, fert: 1.7, litter: [6, 12] },
         // (Oct 26: the ratsluts)
+        dragon: { milk: 1, fert: 0.8, litter: [1, 3] },
+        // (Oct 29: the dragons; their own seed leaves clutches anyway)
         default: { milk: 1, fert: 1, litter: [1, 2] }
       },
       // keywords in a crafted item's name or description (worn, or on an injector)
@@ -5522,6 +5568,14 @@
         companionSaid(mn, m);
         return;
       }
+      if (m.type === "nurseryStats") {
+        try {
+          nurseryStats(mn, m);
+        } catch (e) {
+          warn("nursery stats:", e);
+        }
+        return;
+      }
       if (m.type === "cmd") {
         const text = String(m.text || "").trim().replace(/^[?\-!.\/]+/, "").slice(0, 2e3);
         if (!text) return;
@@ -5934,6 +5988,11 @@
         });
         part("keepsakes", () => keepersStateFor(mn, s));
         part("udders", () => uddersStateFor(mn, s));
+        part("nursery", () => nurseryStateFor(mn, s));
+        part("brand", () => {
+          const b = brandFor(mn);
+          if (b) s.brand = b;
+        });
         part("roam", () => {
           const x = roamState(mn);
           if (x) s.roam = x;
@@ -6082,6 +6141,7 @@
     }
     function limitBlocks(mn, kind) {
       const r = rec(mn);
+      if (r && r.nursery && r.nursery.role === "little" && r.nursery.space) return true;
       return !!(r && LIMIT_WORDS[kind || "breed"].test(r.limits || ""));
     }
     function speciesKey(mn) {
@@ -7956,7 +8016,7 @@
       }
       return doCum(stud, t, holes[0], R, auto, o2);
     }
-    const NAME_FILLER = new Set("the and of for with bnb b&b farm farms miss mister mistress master lady lord sir madam little big good bad pet doll thing princess queen king girl boy babe baby cow cows bull heifer pony horse mare stallion dog pup puppy doggy pig piglet sow cat kitty kitten kitt bunny rabbit goat sheep ewe fox vixen wolf deer doe goblin hucow slave toy".split(" "));
+    const NAME_FILLER = new Set("the and of for with bnb b&b farm farms miss mister mistress master lady lord sir madam little big good bad pet doll thing princess queen king girl boy babe baby cow cows bull heifer pony horse mare stallion dog pup puppy doggy pig piglet sow cat kitty kitten kitt bunny rabbit goat sheep ewe fox vixen wolf deer doe goblin hucow slave toy rat dragon drake".split(" "));
     function namedIn(text, list2) {
       const low = " " + text.toLowerCase().replace(/[^a-z0-9'\s]/g, " ") + " ";
       const has = (w) => w.length > 1 && (low.includes(" " + w + " ") || low.includes(" " + w + "'s "));
@@ -10118,6 +10178,7 @@
       goat: ["a shaky bleat", "a wavering little maa", "a breathless bleat"],
       sheep: ["a soft, wobbly baa", "a needy little baa", "a breathy bleat"],
       rat: ["a high, needy squeak", "a breathless chitter", "a shaky little squeak"],
+      dragon: ["a low, rumbling growl", "a hot, hissing breath", "a ragged little rawr"],
       default: ["a soft moan", "a needy whimper", "a shaky gasp"]
     };
     const STALL_STORY = {
@@ -10654,6 +10715,11 @@
         "%n's whiskers twitch and their long tail curls tight round the rail.",
         "%n squeaks and chitters in the stall, little hands gripping the padding.",
         "%n's round ears flatten back, then twitch forward again, every time the machine changes pace."
+      ] },
+      draco: { part: "any", when: (mn) => speciesKey(mn) === "dragon", lines: [
+        "%n's wings flex and flare against the stall walls every time the machine pulls.",
+        "%n's tail lashes the boards and a hot, smoky breath rolls out of them.",
+        "%n digs their claws into the padded rail and growls, low, from somewhere deep in the chest."
       ] },
       goblin: { part: "any", when: (mn) => speciesKey(mn) === "goblin", lines: [
         "%n cackles breathlessly, then moans, then cackles again.",
@@ -21031,6 +21097,8 @@
         "[fox]%n gets the fox treatment: a farmhand on each side and the gate shut, because a fox will try to slip off wet.",
         "[goblin]A goblin at the wash trough is a rare sight, and two farmhands hold %n there while a third fills the bucket.",
         "[rat]%n gets fished out of the hayloft by the tail and dunked in the wash tub, squeakin' all the way down.",
+        "[dragon]%n gets coaxed into the big wash tub, wings folded tight, steam already curlin' off their scales where the water hits.",
+        "[dragon]It takes two farmhands and the big tub for %n: wings, tail and all, hissin' at the cold till it warms up round them.",
         `[gag]%n can't say much round what's in their mouth, so the farmhand does the talkin': "In you get. This won't take long."`,
         "[mud]%n's so caked in mud that the farmhand hoses them off at the gate before they're allowed anywhere near the clean water.",
         "[cum]%n comes up to the trough drippin' and sticky, and the farmhand just shakes their head and reaches for the big bar of soap.",
@@ -21068,6 +21136,8 @@
         "[fox]%n's scrubbed head to tail, and the farmhand fluffs their tail up in the suds just to watch it get huge.",
         "[goblin]It takes two goes with the brush to find out what colour %n actually is under all that, and the farmhand's surprised.",
         "[rat]%n gets scrubbed behind the ears and down the tail with a little bristle brush, squeakin' indignant the whole time.",
+        "[dragon]The farmhand scrubs %n scale by scale with a stiff brush, round the horns, under the wings and all the way down the tail, and %n rumbles low the whole time.",
+        "[dragon]%n spreads one wing, then the other, so the brush can get the webbing, and growls when it tickles.",
         "[fours]%n stays on all fours on the slab while the farmhand scrubs them from neck to rump, like washin' down any other farm animal.",
         "[bound]The farmhand washes round every strap and rope on %n, liftin' each one, scrubbin' under it, and settlin' it back.",
         "[gag]Suds run down round the gag in %n's mouth, and the farmhand wipes their chin with the cloth, quick and kind.",
@@ -21117,6 +21187,7 @@
         "[fox]%n's tail is towelled into a huge orange puff, and they strut off like it was their idea.",
         "[goblin]%n is dried off and looks almost respectable, which won't last the hour.",
         "[rat]%n is rubbed dry in a scrap of towel, whiskers and all, and scampers off clean for once.",
+        "[dragon]%n shakes out their wings and showers the whole wash room, then stands there steamin' dry, scales gleamin' like the hoard.",
         "[fours]%n is towelled off where they stand, on all fours, and sent trottin' out of the stall with a pat on the rump.",
         "[bound]The farmhand dries %n off, straps and ropes and all, and leads them out by the arm, because %n's not wavin' anyone goodbye.",
         "[latex]The farmhand towels the bare skin round the livin' latex and leaves the latex to dry itself, which it does, smug.",
@@ -21141,7 +21212,8 @@
       pig: "pig",
       fox: "fox",
       goblin: "goblin",
-      rat: "rat"
+      rat: "rat",
+      dragon: "dragon"
     };
     const SWEET = /^(honey|maple|chocolate|strawberry|cake|cream|mash)$/;
     function washFacts(mn) {
@@ -21395,6 +21467,11 @@
         "Sly little fox. You think you'll slip away. You won't.",
         "Every fox gets caught sooner or later, sugar. Then it gets bred.",
         "Swish that big tail for me, fox."
+      ],
+      dragon: [
+        "Big scary dragon, and look at you. Leashed and drippin'.",
+        "All that fire, sugar, and you still kneel when you're told.",
+        "A dragon's hoard is gold. Yours is every load the farm gives you."
       ],
       rat: [
         "Squeak for me, ratslut. Nice and high.",
@@ -21893,6 +21970,14 @@
         "Yip for me, fox. Just a little one.",
         "Sly foxes end up on leashes too.",
         "Sneakin' around the henhouse again? Somebody'll catch you at it."
+      ],
+      dragon: [
+        "Fold those wings, dragon. You're not flyin' anywhere.",
+        "Rawr for me, little dragon. Let's hear how fierce you are.",
+        "Dragons hoard what they love. Guess what you hoard.",
+        "Swish that tail, dragon. Somebody's watchin'.",
+        "A tame dragon on a gold chain. Prettiest thing on the farm.",
+        "Dragons lay clutches, sugar. Let's get you started on one."
       ],
       rat: [
         "Scurry over here, rat. On all fours, quick.",
@@ -22753,6 +22838,1262 @@
       tempOutfitStart(mn, slot, mins, "wrongbarn", true, "Wrong Barn, for " + tmpMins(mins));
     }
     if (W.__FARMHAND_TEST__) Object.assign(W, { __tempOutfitTick: () => tempOutfitTick() });
+    CFG.SERVICES = CFG.SERVICES || { PURGE_COST: 3, SOAK_MIN: 10, BEAT_S: 30, HOP_CHANCE: 0.25, COAX_RIBBON: 1 };
+    const svc = () => state.services = state.services || /* @__PURE__ */ new Map();
+    const svcName = (mn) => plainName(mn);
+    const svcFill = (t, mn, v) => String(t).replace(/%n/g, svcName(mn)).replace(/%by/g, v && v.by ? svcName(v.by) : "the farmhand").replace(/%ml/g, v && v.ml ? v.ml : "");
+    const SERVICE_LINES = {
+      // ── drainin' yourself ──
+      selfDrain: [
+        "%n squats over the drain bucket, presses both hands flat on their belly and pushes: %ml of seed splashes out into it, warm and thick.",
+        "%n braces on the stall rail, bears down, and empties out over the bucket, %ml of it, gaspin' with every gush.",
+        "{v}%n spreads their pussy with two fingers and lets it all run out, %ml of other people's seed patterin' into the bucket.",
+        "%n kneels over the drain grate and works their belly with the heel of their hand till %ml has run out of them.",
+        "%n squeezes and pushes and squeezes again, and %ml of seed comes out of them in long, sloppy rushes. The bucket's nearly full."
+      ],
+      friendDrain: [
+        "%by kneads %n's belly with both hands, firm and slow, and %ml of seed gushes out into the bucket between their knees.",
+        "%by holds %n bent over the rail and presses down low on their belly till %ml has run out of them, sloppy and warm.",
+        "%by pumps %n out like a well, push after push, %ml of seed splashin' into the bucket, and gives their rump a pat when they're empty."
+      ],
+      // ── the vet's purge ──
+      purgeMouth: [
+        `The farm vet sets down her bag beside %n and snaps on a glove. "Hold still, darlin'. Let's get that thing off your face."`,
+        "She paints a cold, bitter salve round the edge of the livin' lips. They twitch. They don't like it one bit.",
+        "Slow and patient, she works a flat little spatula under the seal and teases the tentacle up out of %n's throat, inch by wet inch.",
+        `With a wet pop it comes free. The vet drops it in a jar, screws the lid tight and pats %n's cheek. "There. All yours again."`
+      ],
+      purgeBelt: [
+        `The farm vet kneels by %n's hips and snaps on a glove. "That belt's comin' off, darlin'. Breathe for me."`,
+        "She paints the bitter salve all along the livin' belt's edge, and it tightens, sulky, then starts to loosen.",
+        "Slow and careful, she coaxes the root down out of %n and peels the belt away from their skin a little at a time.",
+        `It lets go all at once and the vet catches it in a jar, quick as anything. "Done. You'll feel empty for a bit. That's normal."`
+      ],
+      // ── a salt soak ──
+      soakStart: [
+        "%n wades into the water with a handful of rock salt from the barn and settles in. Whatever's latched on them goes very still.",
+        "%n tips a scoop of salt into the water at their feet and stands there in it. The parasite on them twitches, unhappy."
+      ],
+      soakMid: [
+        "The salt stings. The parasite on %n squirms and loosens its grip, just a little.",
+        "%n stays put in the salt water. Whatever's on them has started to let go at the edges.",
+        "The parasite on %n gives a sullen little shudder. It doesn't like the salt one bit."
+      ],
+      soakDone: [
+        "The parasite lets go of %n all at once and drops into the water, where it curls up and sinks. %n is their own again.",
+        "With one last sulky twitch the parasite peels off %n and slides away into the water. Gone."
+      ],
+      soakLeft: "\u{1F9C2} You stepped out of the salt water, sugar, so the parasite's still on. Go stand back in it (?service soak) and it'll start over.",
+      // ── coaxed off by a friend ──
+      coaxMouth: [
+        "%by kneels by %n with a fingerful of honey and holds it right up to the livin' lips. They twitch. They're interested.",
+        "%by draws the honey away, slow, an inch at a time, and the parasite stretches after it, loosenin' off %n's mouth.",
+        "The tentacle slides up out of %n's throat to follow the sweet, and %by flicks the whole thing off into a bucket. Done."
+      ],
+      coaxBelt: [
+        "%by kneels by %n's hips with a dish of warm cream and sets it right where the livin' belt can smell it.",
+        "%by strokes along the belt's edge, slow and patient, and it loosens, reachin' for the cream.",
+        "The root slides out of %n and the belt slips off after the cream, and %by claps a lid on the dish. Done."
+      ],
+      coaxHop: ["...and the parasite takes one look at %by, hops right off %n and onto them instead. Well. It liked the look of 'em."]
+    };
+    const svcLine = (key, mn, v) => svcFill(pickFor(mn, "svc:" + key, SERVICE_LINES[key]), mn, v);
+    const svcBelt = (mn) => {
+      const g = (rec(mn) || {}).parasite;
+      return !!(g && g.form === "belt");
+    };
+    function svcRun(mn, job) {
+      const S = svc();
+      if (S.get(mn)) return false;
+      job.i = 0;
+      job.at = Date.now();
+      S.set(mn, job);
+      const step = () => {
+        const j = svc().get(mn);
+        if (j !== job) return;
+        if (!charFor(mn) || !parasiteOn(mn) || job.stay && !job.stay()) {
+          svc().delete(mn);
+          if (job.off && parasiteOn(mn) && charFor(mn)) tell(mn, job.off);
+          return;
+        }
+        if (job.i >= job.beats.length) {
+          svc().delete(mn);
+          job.done();
+          return;
+        }
+        emote((job.icon || "\u{1FA7A}") + " " + job.beats[job.i++], mn);
+        later(step, (job.gap || CFG.SERVICES.BEAT_S) * 1e3);
+      };
+      step();
+      return true;
+    }
+    const inWater = (mn) => Object.keys(L2.spots || {}).some((n) => /^(water|trough)(-|$)/.test(n) && onSpot(mn, n, 0));
+    function servicesText() {
+      return "\u{1F6CE}\uFE0F Farm services, sugar:\n\u2022 ?drain \xB7 drain yourself into the bucket (?drain butt, ?drain vulva for just one). Free.\n\u2022 ?drain <who> \xB7 drain somebody right beside you. They say yes first.\n\u2022 ?service purge \xB7 the farm vet takes a parasite off you, nice and careful. " + CFG.SERVICES.PURGE_COST + " ribbons.\n\u2022 ?service soak \xB7 stand in the water or at a trough with a scoop of salt, " + CFG.SERVICES.SOAK_MIN + " minutes, and the parasite lets go. Free.\n\u2022 ?coax <who> \xB7 tempt a parasite off somebody next to you. They say yes first. Careful: it might like you better.\nYour safeword still takes anything off you at once.";
+    }
+    function serviceCommand(cmd, sender, args, R) {
+      const r = rec(sender), a0 = String(args[0] || "").toLowerCase();
+      if (cmd === "services" || cmd === "service" && !a0) {
+        R(servicesText());
+        return;
+      }
+      if (!r || !(r.roles || []).length) {
+        R("Farm services are for folks on the books, sugar.");
+        return;
+      }
+      if (cmd === "coax") return coaxCommand(sender, args, R);
+      if (a0 === "drain") {
+        handleCommand(sender, "?drain " + args.slice(1).join(" "), "beep", true);
+        return;
+      }
+      if (a0 !== "purge" && a0 !== "vet" && a0 !== "soak" && a0 !== "salt") {
+        R("I don't know that service, sugar. " + servicesText());
+        return;
+      }
+      if (!parasiteOn(sender)) {
+        R("You haven't got a parasite on you, sugar. Nothin' to take off.");
+        return;
+      }
+      if (!charFor(sender)) {
+        R("Come to the farm first, sugar. The services are done here.");
+        return;
+      }
+      if (svc().get(sender)) {
+        R("One thing at a time, sugar. You're already bein' seen to.");
+        return;
+      }
+      if (a0 === "purge" || a0 === "vet") {
+        const cost = CFG.SERVICES.PURGE_COST;
+        if (!spendRibbons(sender, cost, "the vet's purge")) {
+          R("The vet's purge is " + cost + " ribbons, sugar, and you've got " + ribbonsOf(sender) + ". The salt soak's free: ?service soak.");
+          return;
+        }
+        audit(sender, "SERVICE", "purge");
+        R("\u{1FA7A} The vet's on her way. " + cost + " ribbons, paid. Stay put, it takes a couple of minutes.");
+        const belt = svcBelt(sender);
+        svcRun(sender, {
+          beats: (belt ? SERVICE_LINES.purgeBelt : SERVICE_LINES.purgeMouth).map((t) => svcFill(t, sender)),
+          icon: "\u{1FA7A}",
+          off: "\u{1FA7A} You wandered off before the vet was done, sugar. The ribbons are spent; say ?service purge again when you're ready.",
+          done: () => parasiteOff(sender, "service")
+        });
+        return;
+      }
+      if (!inWater(sender)) {
+        R("\u{1F9C2} Go stand in the water or at a trough first, sugar, then say ?service soak again.");
+        return;
+      }
+      const mins = CFG.SERVICES.SOAK_MIN, beats = [svcLine("soakStart", sender)];
+      for (let i = 1; i < 4; i++) beats.push(svcLine("soakMid", sender));
+      audit(sender, "SERVICE", "soak");
+      R("\u{1F9C2} Salt in the water. Stay right where you are for " + mins + " minutes and it'll let go.");
+      svcRun(sender, {
+        beats,
+        icon: "\u{1F9C2}",
+        gap: mins * 60 / 4,
+        stay: () => inWater(sender),
+        off: SERVICE_LINES.soakLeft,
+        done: () => {
+          emote("\u{1F9C2} " + svcLine("soakDone", sender), sender);
+          parasiteOff(sender, "service");
+        }
+      });
+    }
+    function coaxCommand(sender, args, R) {
+      const t = resolveTarget(args[0]);
+      if (!t || !rec(t)) {
+        R("Coax it off who, sugar? ?coax <who>, somebody right beside you.");
+        return;
+      }
+      if (t === sender) {
+        R("You can't coax it off yourself, sugar. It knows your tricks. Try ?service soak, or ask a friend.");
+        return;
+      }
+      if (!parasiteOn(t)) {
+        R(svcName(t) + " hasn't got a parasite on them, sugar.");
+        return;
+      }
+      const a = posOf(sender), b = posOf(t);
+      if (!a || !b || Math.max(Math.abs(a.X - b.X), Math.abs(a.Y - b.Y)) > 1) {
+        R("Get right up next to " + svcName(t) + " first, sugar.");
+        return;
+      }
+      if (svc().get(t)) {
+        R(svcName(t) + "'s already bein' seen to, sugar.");
+        return;
+      }
+      addonAsks.set(t, { addon: null, at: Date.now(), cb: (yes) => {
+        if (!yes) {
+          tell(sender, svcName(t) + " said no, sugar. They're keepin' it for now.");
+          return;
+        }
+        const belt = svcBelt(t), beats = (belt ? SERVICE_LINES.coaxBelt : SERVICE_LINES.coaxMouth).map((x) => svcFill(x, t, { by: sender }));
+        audit(sender, "SERVICE", "coax " + t);
+        svcRun(t, {
+          beats,
+          icon: "\u{1F36F}",
+          stay: () => {
+            const p = posOf(sender), q = posOf(t);
+            return !!(p && q && Math.max(Math.abs(p.X - q.X), Math.abs(p.Y - q.Y)) <= 2);
+          },
+          off: "\u{1F36F} " + svcName(sender) + " stepped away before it let go, sugar. It's still on you.",
+          done: () => {
+            const rs = rec(sender) || {};
+            const hop = rs.parasiteOn && !parasiteOn(sender) && !(rs.parasiteNext > Date.now()) && Math.random() < CFG.SERVICES.HOP_CHANCE;
+            parasiteOff(t, "service");
+            if (hop) {
+              emote("\u{1F36F} " + svcFill(SERVICE_LINES.coaxHop[0], t, { by: sender }), t);
+              parasiteLatch(sender, "hop");
+              return;
+            }
+            earnRibbons(sender, CFG.SERVICES.COAX_RIBBON, "coaxin' a parasite off " + svcName(t));
+          }
+        });
+      } });
+      askCard(t, "play", "\u{1F36F} " + svcName(sender) + " wants to coax that parasite off you, sugar. Say yes or no (?yes or ?no works too).");
+      R("I've asked " + svcName(t) + " first, sugar. Once they say yes, get your honey ready.");
+    }
+    function selfDrain(sender, holeArg, R) {
+      if (!rec(sender) || !(rec(sender).roles || []).length) {
+        R("That's for folks on the books, sugar.");
+        return;
+      }
+      const hs = holeArg ? holesFrom(holeArg) : HOLES;
+      if (!hs) {
+        R("Which hole, sugar? ?drain vulva, ?drain butt, ?drain mouth, or just ?drain for all of it.");
+        return;
+      }
+      const p = prodOf(sender);
+      if (p.tieUntil > Date.now()) {
+        R("Not while you're still knotted, sugar! Wait for " + plainName(p.tiedTo) + "'s knot to go down.");
+        return;
+      }
+      prodTick();
+      let out = 0;
+      for (const h of hs) {
+        out += p.held[h] || 0;
+        p.held[h] = 0;
+      }
+      if (out < 1) {
+        R("You're not holdin' anything to drain, sugar. Empty as a fresh pail.");
+        return;
+      }
+      if (p.pin && !sizePinned(sender)) p.pin = null;
+      saveLedger();
+      audit(sender, "DRAIN", "self " + Math.round(out));
+      if (charFor(sender)) emote("\u{1FAA3} " + selfDrainLine(sender, hs, out), sender);
+      else R("\u{1FAA3} You drained " + ml(out) + " out of yourself.");
+    }
+    function selfDrainLine(mn, hs, out) {
+      const pool = SERVICE_LINES.selfDrain.filter((t) => !/^\{v\}/.test(t) || hs.includes("vulva") && hasVulva(mn));
+      return svcFill(pickFresh("svc:selfDrain", pool).replace(/^\{v\}/, ""), mn, { ml: ml(out) });
+    }
+    function friendDrainLine(by, t, out) {
+      return "\u{1FAA3} " + svcFill(pickFor(t, "svc:friendDrain", SERVICE_LINES.friendDrain), t, { by, ml: ml(out) });
+    }
+    if (W.__FARMHAND_TEST__) Object.assign(W, { __latch: (m, h) => parasiteLatch(m, h), __svc: () => svc() });
+    const NURSERY_LINES = {
+      // ── little space, on and off ──
+      spaceOn: [
+        "%n's shoulders drop, their voice goes soft, and they're little now. The whole nursery goes gentle round them.",
+        "%n tucks their thumbs into their fists and gives a shy little smile. Little time.",
+        "Something in %n just lets go. Big worries can wait outside the nursery door.",
+        "%n curls up small for a second, then peeks out, wide-eyed and little and ready to play.",
+        "%n's little now. The farm's busy grown-up business doesn't come anywhere near them while they are."
+      ],
+      spaceOff: [
+        "%n stretches, blinks, and grows back up. Little time's over for now.",
+        "%n gives their stuffie one last squeeze and puts their big-kid face back on.",
+        "%n's back to grown-up business. The nursery'll keep their spot warm."
+      ],
+      // ── stickers and praise ──
+      star: [
+        "\u2B50 A shiny gold star sticker for %n! Right on the back of their hand, where they can look at it.",
+        "\u2B50 %n earned a sparkly sticker. It's a rainbow one. The best kind.",
+        "\u2B50 Gold star for %n! Somebody's doin' so well today.",
+        "\u2B50 %n gets a sticker with a little smiling sun on it. They earned every bit of that sunshine.",
+        "\u2B50 A puffy heart sticker for %n, pressed on extra careful so it stays."
+      ],
+      praise: [
+        "Such a good little one, %n. The whole nursery's proud of you.",
+        "Look at you go, %n! Clever, clever.",
+        "%n's doin' so well today. Big gold-star energy.",
+        "That was so brave, %n. You should be proud.",
+        "Who's the sweetest little thing on the whole farm? %n is.",
+        "%n tried their very best, and their very best is wonderful.",
+        "So gentle and so good, %n. That's exactly right.",
+        "%n remembered all by themselves! What a smart cookie."
+      ],
+      encourage: [
+        "You can do it, %n. One more try, nice and slow.",
+        "It's okay if it's tricky, %n. Tricky things take practice.",
+        "Deep breath, %n. You're doin' fine. Better than fine.",
+        "Nobody gets it right the first time, sweetpea. Not even the grown-ups.",
+        "Wobbly is okay, %n. Wobbly is how everybody starts."
+      ],
+      // ── wet, from the ABCL mod (never the messy kind) ──
+      wet1: [
+        "Uh-oh. Is %n's padding a little squishy? Somebody's been too busy playin' to notice.",
+        "%n's doin' a tiny wiggle. Hmm. Might be time for a check soon, little one.",
+        "Somebody's a teeny bit damp, %n. It's okay. That's what the padding's for.",
+        "%n's paused, gone pink in the cheeks, and is very carefully not lookin' at anybody. Mm-hm."
+      ],
+      wet2: [
+        "That's a soggy waddle if ever the nursery saw one, %n! Somebody needs a change.",
+        "%n crinkles with every step now. Squish, squish. Time to find a grown-up, little one.",
+        "Oh dear, %n. That padding's well and truly soggy. No sittin' on the good cushions!",
+        "Somebody's padding is gettin' awfully full, %n. Did we forget to tell a grown-up?",
+        "%n's tryin' to waddle off like nothin's wrong. The squishing gives it away."
+      ],
+      wet3: [
+        "Uh-oh, uh-oh! %n's sprung a leak! Grown-ups, a change, quick!",
+        "That padding's given up, %n. Little puddle on the floor. Let's get you sorted.",
+        "Too full to hold any more, %n! Somebody fetch the changin' mat."
+      ],
+      // ── the farm's messes, in the nursery's words (sweet things, mud, slime: never the grown-up ones) ──
+      mess: {
+        cake: [
+          "%n's got frosting on their nose! And their cheek. And somehow their elbow.",
+          "Somebody's been in the birthday cake, %n. There are sprinkles stuck everywhere.",
+          "%n's covered in cake crumbs and lookin' VERY pleased with themselves."
+        ],
+        cream: ["%n's wearin' a whipped-cream beard. Very distinguished, sweetpea.", "A big blob of cream on %n's nose. Boop."],
+        honey: ["%n's sticky! Honey on the fingers, honey on the chin, honey on everything they touch.", "Somebody's been in the honey pot, %n. You're stickin' to your stuffie!"],
+        maple: ["%n's all syrupy and sweet. Like a pancake. A very sticky pancake.", "Syrup drippin' off %n's fingers. Don't touch the walls, little one!"],
+        chocolate: ["%n's got a chocolate moustache. And chocolate fingerprints all over.", "Chocolate on %n's cheeks! Somebody found the sweeties."],
+        strawberry: ["%n's pink and sticky with strawberry, like a little jam tart.", "Strawberry drips on %n's tummy. Somebody's a messy eater!"],
+        mud: ["%n's been splashin' in the mud! Muddy knees, muddy hands, muddy nose.", "A mud monster! Oh wait, no, that's just %n."],
+        slime: ["%n's all gooey with green slime and gigglin' about it.", "Slime in %n's hair! Wiggly, wobbly, everywhere."]
+      },
+      messBath: "There's only one cure for that much mess, %n: bath time.",
+      // ── caregivers (%c) lookin' after a little (%n) ──
+      care: {
+        cuddle: [
+          "%c scoops %n up into a big, warm cuddle and doesn't let go for a long, long time.",
+          "%c wraps %n up in their arms and rocks side to side, humming, till %n goes all soft.",
+          "%n gets pulled into %c's lap for the squishiest cuddle in the whole nursery.",
+          "%c gives %n a cuddle so big their feet come right off the ground. Giggles everywhere."
+        ],
+        praise: [
+          `%c crouches down to %n's level. "I'm so proud of you, little one. You're doin' so well."`,
+          `%c ruffles %n's hair. "Who's the best? You are. Yes, you."`,
+          '"Look at you!" %c says to %n, all warm. "Clever, kind, and very, very good."'
+        ],
+        pat: [
+          "%c gives %n three soft pats on the head. Pat, pat, pat. Good little one.",
+          "%c smooths %n's hair down and gives them a gentle head pat.",
+          "Head pats for %n from %c. Lots and lots of head pats."
+        ],
+        tuck: [
+          '%c tucks %n in under a soft blanket, right up to the chin, and smooths it flat. "Sleepy time."',
+          "%c fluffs %n's pillow, tucks the blanket in tight all round, and sets %s right beside them.",
+          "%c dims the lantern, tucks %n in snug, and leaves a little night light glowin'."
+        ],
+        story: [
+          "%c opens a big picture book and reads %n a story about a little lamb who got lost and found her way home.",
+          "%c does all the voices for %n's story: a growly bear, a squeaky mouse, and a very silly goose.",
+          "%c reads %n the one about the moon and the cow, and %n's eyes get heavier with every page.",
+          "%c tells %n a story they make up on the spot, about a brave little farm kid and a dragon who just wanted a friend."
+        ],
+        bottle: [
+          "%c settles %n in the crook of their arm with a warm bottle, and %n drinks it slow and sleepy.",
+          "%c tests the bottle on their wrist first, then gives it to %n. Just right.",
+          "A bottle of warm milk for %n, held steady by %c till every drop's gone."
+        ],
+        snack: [
+          "%c cuts %n's sandwich into little triangles, crusts off, exactly how they like it.",
+          "Apple slices and a cookie for %n, from %c. A cookie! Special treat.",
+          "%c brings %n a snack on the little plate with the ducks on it."
+        ],
+        check: [
+          "%c gives %n's padding a quick, gentle check. %m",
+          `"Let's just check," %c says, and peeks at %n's padding. %m`
+        ],
+        change: [
+          "%c lays %n down on the changin' mat, chats to them the whole time, and has them fresh and dry in no time. A puff of powder to finish.",
+          '%c changes %n quick and gentle, blows a raspberry on their tummy, and pats the fresh padding. "All better."',
+          "Fresh padding for %n, a sprinkle of baby powder, and %c tickles their toes to keep 'em still."
+        ],
+        bath: [
+          "%c fills the little tub with warm water and bubbles and pops %n right in.",
+          "Rubber duckies, bubbles up to the chin, and %c with a soft washcloth. %n's bath time.",
+          "%c scrubs %n's hands and face and behind the ears, very thorough, very gentle."
+        ],
+        bathMid: [
+          "%c makes a bubble beard on %n's chin and %n laughs so hard they splash everyone.",
+          "%n plays with the rubber ducks while %c washes their hair, careful of their eyes.",
+          "%c rinses %n off with a cup of warm water, pour by pour, till every bit's clean."
+        ],
+        bathEnd: [
+          "%c wraps %n up in a big fluffy towel with a hood and ears. Clean as a whistle, every last bit.",
+          "%n comes out of the bath pink and warm and squeaky clean, all wrapped up in a towel by %c."
+        ],
+        rock: [
+          "%c rocks %n slow in the big rockin' chair, back and forth, back and forth, till their eyes droop.",
+          "Creak, creak goes the rockin' chair, with %n curled up in %c's arms."
+        ],
+        sing: [
+          "%c sings %n a soft lullaby, the one about the stars, low and sweet.",
+          "%c hums %n a little song and sways with them. %n hums along, mostly the wrong notes."
+        ],
+        kiss: ["%c drops a kiss on %n's forehead. Mwah.", "A kiss on the nose for %n from %c. Boop. Mwah.", "%c kisses %n's cheek and makes a big silly smacking sound."],
+        tickle: [
+          "%c goes for %n's tummy and the tickle monster is ON. Giggle, squeal, giggle.",
+          "%c tickles %n's toes one by one: this little piggy went to market\u2026",
+          "Tickle attack! %c finds every giggly spot %n has, and %n can't stop laughin'."
+        ],
+        play: [
+          "%c sits on the floor with %n and they build the tallest block tower ever. Then %n knocks it down. Again!",
+          "%c plays peekaboo with %n till they're both giggling.",
+          "%c and %n have a tea party with all the stuffies. %c pours very small, very polite cups of pretend tea."
+        ],
+        wipe: ["%c gets a warm cloth and wipes %n's sticky face and fingers clean.", "Spit on a hanky and %c rubs the smudge off %n's cheek. %n wrinkles their nose."],
+        stuffie: ["%c hands %n a soft %s to hold. %n squeezes it tight.", "%c tucks a %s into %n's arms. Instant best friend."]
+      },
+      // bath time with no grown-up (?little bath): start, middle, end
+      selfBath: [
+        ["%n fills the little tub themselves, way too many bubbles, and climbs in.", "%n tips in the whole bottle of bubble bath. Bubbles to the ceiling! In they go."],
+        ["%n plays with the rubber ducks and makes a bubble beard, splashin' happily.", "%n scrubs their own hands and face with the duck sponge, very serious about it."],
+        ["%n climbs out all wrinkly-fingered and wraps up in a big towel. Clean as a whistle, every last bit.", "%n drips across the floor to the towels, squeaky clean from top to toe."]
+      ],
+      checkDry: ["All dry. Good job, little one!", "Dry as a bone. Gold star!", "Still nice and dry. Look at you!"],
+      checkDamp: ["A little damp, but not too bad yet.", "Hmm, a bit squishy. We'll change you soon.", "Gettin' there. A change in a little while."],
+      checkSoggy: ["Ooh, that's soggy. Change time, right now.", "Very, very wet! Let's get you fresh.", "Soggy bottom! Changin' mat, here we come."],
+      checkNone: ["Everything looks just fine.", "All good in there, little one.", "Comfy and fine. Off you go."],
+      // a little askin' their grown-ups (they see it; the little's told it went)
+      ask: {
+        cuddle: "\u{1F9F8} %n is holdin' their arms up for a cuddle.",
+        change: "\u{1F9F8} %n tugs a sleeve and whispers that they need a change.",
+        story: "\u{1F9F8} %n's brought over a picture book and is lookin' at you hopefully.",
+        snack: "\u{1F9F8} %n's tummy is rumblin'. Snack time?",
+        play: "\u{1F9F8} %n wants somebody to play with.",
+        nap: "\u{1F9F8} %n's rubbin' their eyes. Somebody's sleepy.",
+        help: "\u{1F9F8} %n needs a grown-up, please.",
+        bath: "\u{1F9F8} %n's so messy they're askin' for a bath. Well. Pointin' at the tub, anyway.",
+        bottle: "\u{1F9F8} %n wants a bottle, please."
+      },
+      // ── the nursery's own traps, on spots called nursery-<kind> (the gentle kind) ──
+      trap: {
+        playpen: [["The playpen gate clicks shut behind %n with a soft little latch. In you go, little one.", "Soft blocks, a squeaky giraffe and a pile of cushions. %n's got everything they need in here.", "Somebody'll come lift %n out when they're ready. No rush. Playpens are cozy."]],
+        ballpit: [["%n steps on the edge of the ball pit and tumbles right in. Splash! Red, blue, yellow everywhere.", "%n sinks up to their shoulders in plastic balls and starts throwin' them up in the air.", "Only %n's giggles and the top of their head are left showin'."]],
+        bubbles: [["The bubble machine whirrs to life as %n walks past. Bubbles! Hundreds of 'em!", "%n chases the bubbles round in circles, poppin' them with their fingers and their nose.", "One big wobbly bubble lands right on %n's head and sits there. %n doesn't dare move."]],
+        blocks: [["%n trips over a pile of wooden blocks and sits right down among them. Oops!", "Well, since they're here: %n starts buildin'. A wall. A tower. A very wonky castle.", "%n knocks the whole thing down with a happy CRASH and starts again."]],
+        fort: [["%n crawls under a blanket draped over two chairs. A fort! A secret one!", "Inside it's all cushions and a little lantern and a stuffed bear on guard.", "%n declares it a grown-ups-must-knock fort and settles in, very important."]],
+        music: [["A music box on the shelf starts tinklin' as %n comes near. A dancing bunny turns round and round.", "%n sways along to the tune, then spins, then spins again, arms out.", "The song winds down slow, and %n is dizzy and grinnin'."]],
+        swing: [["There's a little swing hangin' from the barn beam, and %n's on it before anyone can say so.", "Higher! Higher! %n kicks their feet and the swing goes up and up.", "%n swings slow at the end, toes draggin' in the straw, happy as anything."]],
+        tickle: [["A feather duster on a spring pops out of the hay as %n passes and tickles their nose!", "%n sneezes, then giggles, then gets tickled under the chin.", "The tickle trap gets %n good and squealin' before it springs back into the hay."]],
+        sticker: [["A sticker dispenser on the wall spits out a sticker as %n walks by. It's a dinosaur!", "%n sticks it right on their own nose, very proud.", "Then their cheek. Then their hand. It's a very good dinosaur."]],
+        sandbox: [["%n steps into the sandbox and plops right down. Bucket! Spade! Castle time!", "%n builds a lumpy sandcastle and decorates it with a feather and a bottle cap.", "Sand in their socks, sand in their hair, and the biggest grin on the farm."]],
+        rockinghorse: [["A painted rockin' horse sits in the corner and %n climbs right on. Giddy-up!", "%n rocks so fast the horse squeaks on its runners. Gallop, gallop!", "They ride all the way to pretend-town and back, and pat the horse's nose to thank it."]],
+        slide: [["%n climbs up the little slide's ladder, one, two, three steps.", "Wheee! Down they go, and land in a heap of cushions at the bottom.", "Again! %n's already back on the ladder."]],
+        bouncy: [["A bouncy castle! %n kicks off their shoes and climbs in.", "Boing, boing, boing! %n bounces till their hair's stickin' up in every direction.", "%n flops on their back in the middle and gets bounced by the walls, giggling."]],
+        confetti: [["A little cannon in the corner goes POP as %n walks by! Confetti everywhere!", "Paper stars in %n's hair, in their collar, in their shoes.", "%n stands there blinkin', sparkly from head to toe, and then bursts out laughin'."]],
+        lambs: [["The baby animals' pen is right here, and a wobbly little lamb comes over to sniff %n's fingers.", "%n gets to give it a bottle, holdin' on tight while it slurps and wiggles its tail.", "The lamb bleats a thank-you and %n says it back, very politely."]],
+        chicks: [["A basket of fluffy yellow chicks peeps at %n from under the heat lamp.", "%n is allowed to hold one, very gently, in both cupped hands. It's so soft!", "The chick falls asleep in %n's hands, and %n doesn't dare move a muscle."]],
+        generic: [["Something soft and fun is waitin' for %n here.", "%n plays happily for a little while, humming to themselves.", "When they're done, %n's all smiles."]]
+      },
+      // ── things a little does by themselves (?little <activity>) ──
+      play: {
+        story: [
+          ["%n picks a picture book off the shelf, the one with the cows on the cover.", "They sit cross-legged and turn the pages, tellin' themselves the story from the pictures.", "The end! %n claps, and goes to pick another one."],
+          ["%n curls up on the beanbag with a book about a little dragon who couldn't breathe fire, only bubbles.", "%n reads it in a whisper, doin' the bubble noises.", "The dragon makes a friend in the end. %n hugs the book."]
+        ],
+        nap: [
+          ["%n drags their blanket to the nap corner and curls up with their stuffie.", "Little snores. A twitch of the toes. Dreamin' of somethin' nice.", "%n wakes up all rumpled and pink-cheeked and very, very cozy."],
+          ["%n lies down in a patch of sunshine on the hay like a little cat.", "Eyes closed, thumb wanderin' close to their mouth, breathin' slow.", "A proper nap. %n wakes up yawnin' a yawn bigger than their whole face."]
+        ],
+        snack: [
+          ["%n finds the snack basket: apple slices, crackers and one very important cookie.", "They line everything up on the little plate first. Cookie last. Cookie's the best.", "Crumbs everywhere, and one happy little one."],
+          ["%n gets a cup of juice with a lid on, just in case.", "Sip, sip, sip, with both hands on the cup.", "Empty! %n holds it up to show everyone."]
+        ],
+        colour: [
+          ["%n gets out the big box of crayons and a colourin' book.", "They colour a cow purple, the sky green and the grass yellow. Perfect.", "%n signs it with a big wobbly letter and holds it up for everyone to see."],
+          ["%n draws a picture of the whole farm, with everybody in it as stick people.", "There's a sun with sunglasses on in the corner. Very cool sun.", "%n wants it on the fridge. Somebody find a magnet!"]
+        ],
+        blocks: [["%n tips out the block bucket with a big clatter.", "A tower, taller and taller, wobblin' a little near the top.", "One more block\u2026 CRASH! %n laughs and starts again."]],
+        bubbles: [["%n gets the bubble wand and blows. A whole stream of bubbles floats across the nursery.", "They chase them, catch one on the wand, and blow it bigger.", "The last bubble pops on %n's nose. Boop."]],
+        sing: [["%n sings the song about the old farmer and his animals, makin' every animal noise extra loud.", "Moo here, oink there, a very enthusiastic quack.", "%n takes a bow at the end."]],
+        puzzle: [["%n tips out a puzzle with big chunky pieces: a picture of a barn and a horse.", "One piece won't fit\u2026 then it does! %n gasps.", "All done! %n points at the finished horse, very proud."]],
+        teaparty: [["%n sets out the little teacups for all their stuffies, one by one.", "Pretend tea for everyone, and a pretend biscuit, and a very polite chat about the weather.", "The bear spills his tea. %n forgives him."]],
+        dance: [["%n puts on some music and starts to dance, arms flappin', feet stompin'.", "Spinnin' round and round till the room spins too.", "%n flops down in a dizzy, giggly heap."]],
+        swing: [["%n climbs on the swing and pushes off with their toes.", "Up and back, up and back, hair flyin'.", "%n lets the swing slow down all by itself and just sits, happy."]],
+        sandbox: [["%n gets the bucket and spade and heads for the sandbox.", "A sandcastle with a moat, and a twig for a flag.", "%n stomps it flat for fun and builds another."]],
+        puppets: [["%n puts a sock puppet on each hand: a cow and a duck.", "The cow and the duck have an argument about who's the best farm animal.", "They make up and kiss. Mwah. %n laughs at their own joke."]],
+        dressup: [["%n opens the dress-up box and pulls out a crown, a cape and one cowboy boot.", "They put on all three and announce themself the Queen of the Barn.", "The stuffies all bow. Well, %n bows them."]],
+        chalk: [["%n gets the big fat chalk and draws on the barn floor: a hopscotch, a sun, a cat.", "Hop, hop, hop, jump! All the way to ten.", "Chalk dust on their knees and a very colourful floor."]],
+        ducks: [["%n takes a bag of oats down to the water to feed the ducks.", "Quack! The ducks come paddlin' over, and one brave one eats right from %n's hand.", "%n says goodbye to every single duck by name. They named them all."]],
+        animals: [["%n goes to see the baby animals: a calf, two lambs and a basket of kittens.", "The calf licks %n's whole hand with its big rough tongue. Eww! Again!", "%n gives every one of them a pat and a whisper before they go."]],
+        hay: [["%n finds the big pile of hay in the barn and jumps right in. FLUMP!", "They climb out and jump again. And again. Hay in every pocket.", "%n lies on top of the pile, starin' at the rafters, pickin' hay out of their hair."]],
+        tractor: [["%n climbs onto the little pedal tractor and pedals as hard as they can.", "Brrrm, brrrm! Round the barn, beepin' at everybody to get out of the way.", "They park it very carefully, exactly where it was. Good drivin'."]],
+        garden: [["%n goes out to the strawberry patch with a little basket.", "One for the basket\u2026 one for %n\u2026 one for the basket\u2026 two for %n\u2026", "%n comes back with a half-full basket and a very red mouth."]],
+        stars: [["%n lies on their back by the window to look at the stars.", "They count them: one, two, three, lots.", "%n makes a wish on the brightest one and won't tell anybody what it was."]]
+      },
+      activityName: {
+        story: "story time",
+        nap: "a nap",
+        snack: "snack time",
+        colour: "colourin'",
+        blocks: "blocks",
+        bubbles: "bubbles",
+        sing: "a sing-song",
+        puzzle: "a puzzle",
+        teaparty: "a tea party",
+        dance: "a dance",
+        swing: "the swing",
+        sandbox: "the sandbox",
+        puppets: "puppets",
+        dressup: "dress-up",
+        chalk: "chalk drawin'",
+        ducks: "feedin' the ducks",
+        animals: "the baby animals",
+        hay: "the hay pile",
+        tractor: "the pedal tractor",
+        garden: "the strawberry patch",
+        stars: "lookin' at stars",
+        bath: "bath time"
+      },
+      // ── games (?little game <name> [pick]) against the farm girl ──
+      game: {
+        rpsWin: ["%n picked %x and the farm girl picked %y. %n wins! A happy little dance.", "%x beats %y! %n wins and does a victory lap."],
+        rpsLose: ["%n picked %x, but the farm girl picked %y. Aww. Best of three?", "%y beats %x. The farm girl wins this time. %n demands a rematch."],
+        rpsDraw: ["Both picked %x! Again, again!", "%x and %x. A tie! Go again."],
+        guessWin: ["The farm girl holds out two fists. %n picks the %x one\u2026 and there's a sweetie in it! Yay!", "%x hand! %n guessed right!"],
+        guessLose: ["%n picks the %x hand\u2026 empty! The sweetie was in the other one. Next time!", "Not the %x one! The farm girl wiggles the other hand and grins."],
+        diceWin: ["%n rolls a %x and the farm girl rolls a %y. %n wins!", "A %x for %n, only a %y for the farm girl. Winner!"],
+        diceLose: ["%n rolls a %x, the farm girl rolls a %y. So close!", "%y beats %x. The farm girl wins. Roll again?"],
+        diceDraw: ["Both roll a %x! Tie! Roll again!"],
+        crayonWin: ["The farm girl's hidin' a crayon behind her back. %n guesses %x\u2026 and it IS %x! Clever!", "%x! Right first time, %n!"],
+        crayonLose: ["%n guesses %x, but it was %y. Ooh, close.", "Not %x, it was %y! Guess again?"],
+        peekaboo: ["Where's %n? Where's %n gone? \u2026PEEKABOO! There they are!", "Hands over eyes\u2026 peek\u2026 BOO! %n squeals every single time.", "The farm girl hides behind the hay bale. %n finds her. Then %n hides. Badly. Feet stickin' out. Found you!"],
+        catchWin: ["The farm girl tosses the soft ball and %n catches it! Both hands! Hooray!", "Catch! %n got it, and throws it back almost straight."],
+        catchLose: ["The ball bonks %n gently on the tummy and rolls away. Oops! Try again.", "Whoops, the ball sails right over %n's head. Fetch it!"]
+      },
+      // ── when something grown-up is still goin' on and they try to go little ──
+      notYet: "Somethin' grown-up still has hold of you right now, sweetpea (%x). Once that's done, or your safeword's ended it, you can go little.",
+      blockedOther: "%n isn't available for that right now, sugar.",
+      blockedSelf: "You're in your little space right now, sweetpea. Say ?little off first if you want grown-up farm things."
+    };
+    const NURSERY_GEAR = {
+      bunny: { label: "bunny plushie", group: "ItemHandheld", name: "BunPlush", kind: "stuffie" },
+      fox: { label: "fox plushie", group: "ItemHandheld", name: "FoxPlush", kind: "stuffie" },
+      plushie: { label: "soft plushie", group: "ItemHandheld", name: "Plushie", kind: "stuffie" },
+      dragon: { label: "dragon plushie", group: "ItemHandheld", name: "DragonPlush", kind: "stuffie" },
+      teddy: { label: "teddy bear", group: "ItemMisc", name: "TeddyBear", kind: "stuffie" },
+      paci: { label: "pacifier", group: "ItemMouth3", name: "PacifierGag", kind: "mouth" },
+      bottle: { label: "bottle", group: "ItemMouth3", name: "MilkBottle", kind: "mouth" },
+      bib: { label: "bib", group: "ClothAccessory", name: "Bib", kind: "wear" },
+      bonnet: { label: "bonnet", group: "Hat", name: "Bonnet1", kind: "wear" },
+      bow: { label: "giant bow", group: "HairAccessory3", name: "GiantBow1", kind: "wear" },
+      dress: { label: "baby dress", group: "Cloth", name: "AdultBabyDress1", kind: "wear" },
+      diaper: { label: "poofy diaper", group: "Panties", name: "PoofyDiaper", kind: "wear" }
+    };
+    CFG.NURSERY = CFG.NURSERY || { STARS_DAY: 3, CARE_DAY: 2, STAR_CHANCE: 0.35, BEAT_S: 12, TRAP_MIN: 10, MESS_MIN: 20, OK_H: 2 };
+    const NURSERY_CMDS = ["nursery", "little", "care"];
+    const nrec = (mn) => {
+      const r = rec(mn);
+      return r && r.nursery && r.nursery.role ? r.nursery : null;
+    };
+    const nurseryOn = (mn) => !!nrec(mn);
+    const isLittle = (mn) => (nrec(mn) || {}).role === "little";
+    const isCarer = (mn) => (nrec(mn) || {}).role === "caregiver";
+    function littleNow(mn) {
+      const n = nrec(mn);
+      return !!(n && n.role === "little" && n.space);
+    }
+    const nName = (mn) => plainName(mn);
+    const nFill = (t, v) => String(t).replace(/%n/g, v.n ? nName(v.n) : "").replace(/%c/g, v.c ? nName(v.c) : "a grown-up").replace(/%s/g, v.s || "stuffie").replace(/%m/g, v.m || "").replace(/%x/g, v.x || "").replace(/%y/g, v.y || "");
+    const nPick = (key, pool) => pickFresh("nursery:" + key, pool);
+    function nurseryHere() {
+      return (W.ChatRoomCharacter || []).map((c) => c.MemberNumber).filter((m) => m !== CFG.BOT_MEMBER && nurseryOn(m));
+    }
+    function nurserySay(about, text) {
+      const to = new Set(nurseryHere());
+      if (about) to.add(about);
+      for (const m of to) if (charFor(m) || m === about) privateLine(m, text, "emote");
+    }
+    function nurseryTell(mn, text) {
+      privateLine(mn, text, "chat");
+    }
+    function carersHere(little) {
+      const n = nrec(little) || {}, here = nurseryHere().filter(isCarer);
+      const mine = here.filter((m) => (n.carers || []).includes(m));
+      return mine.length ? mine : here;
+    }
+    function nurseryStar(mn, why) {
+      const n = nrec(mn);
+      if (!n) return;
+      const d = dayKey();
+      if (!n.stars || n.stars.d !== d) n.stars = { d, n: 0 };
+      const cap = n.role === "caregiver" ? CFG.NURSERY.CARE_DAY : CFG.NURSERY.STARS_DAY;
+      if (n.stars.n >= cap) return;
+      const got = earnRibbons(mn, 1, why, 0, true);
+      if (!got) return;
+      n.stars.n += got;
+      saveLedger();
+      if (n.role === "little") nurserySay(mn, nFill(nPick("star", NURSERY_LINES.star), { n: mn }));
+      nurseryTell(mn, "\u{1F380} +1 ribbon for " + why + " (" + n.stars.n + " of " + cap + " today).");
+    }
+    function nurseryScene(mn, beats, icon, done) {
+      state.nurseryRuns = state.nurseryRuns || /* @__PURE__ */ new Map();
+      if (state.nurseryRuns.get(mn) > Date.now()) return false;
+      state.nurseryRuns.set(mn, Date.now() + beats.length * CFG.NURSERY.BEAT_S * 1e3 + 3e3);
+      beats.forEach((b, i) => later(() => {
+        if (!charFor(mn)) return;
+        nurserySay(mn, icon + " " + b);
+        if (i === beats.length - 1) {
+          state.nurseryRuns.delete(mn);
+          if (done) try {
+            done();
+          } catch (e) {
+            warn("nursery:", e);
+          }
+        }
+      }, i * CFG.NURSERY.BEAT_S * 1e3));
+      return true;
+    }
+    function grownUpHold(mn) {
+      const r = rec(mn) || {}, p = prodOf(mn) || {};
+      if (heldByTrap(mn)) return "a trap";
+      if (benchedNow(mn)) return "the bench";
+      if (stockedNow(mn)) return "the stocks";
+      if (r.penned) return "the pen";
+      if (parasiteOn(mn)) return "a parasite";
+      if (symOn(mn)) return "a symbiote";
+      if (p.stall) return "a milkin' stall";
+      if (p.tieUntil > Date.now()) return "a knot";
+      return null;
+    }
+    const NURSERY_MESS = ["cake", "cream", "honey", "maple", "chocolate", "strawberry", "mud", "slime"];
+    function nurseryMesses(mn) {
+      const m = (rec(mn) || {}).messKinds || {}, now = Date.now();
+      return NURSERY_MESS.filter((k) => m[k] > now - 3 * 36e5);
+    }
+    function wetLevel(n) {
+      const w = n && n.wet;
+      if (!w || !w.diaper) return 0;
+      return w.leak || w.pct >= 1 ? 3 : w.pct >= 0.6 ? 2 : w.pct >= 0.25 ? 1 : 0;
+    }
+    function nurseryStats(mn, m) {
+      const n = nrec(mn);
+      if (!n || n.role !== "little") return;
+      if (m.abcl) {
+        const pct = Math.max(0, Math.min(2, Number(m.wet) || 0)), was = wetLevel(n);
+        n.wet = { pct, diaper: !!m.diaper, leak: !!m.leak, at: Date.now(), told: (n.wet || {}).told || 0 };
+        const lvl = wetLevel(n);
+        if (lvl < 1) n.wet.told = 0;
+        else if (lvl > (n.wet.told || 0) && lvl > was && n.space && charFor(mn)) {
+          n.wet.told = lvl;
+          nurserySay(mn, "\u{1F9F7} " + nFill(nPick("wet" + lvl, NURSERY_LINES["wet" + lvl]), { n: mn }));
+        }
+      }
+      const lc = [].concat(m.mommy ? [Number(m.mommy)] : [], Array.isArray(m.carers) ? m.carers.map(Number) : []).filter((x) => Number.isInteger(x) && x > 0);
+      n.lc = lc.slice(0, 12);
+      for (const c of n.lc) if (isCarer(c) && !(n.carers || []).includes(c)) {
+        n.carers = (n.carers || []).concat(c);
+        audit(mn, "NURSERY", "paired with " + c + " (Littlish Club)");
+        nurseryTell(mn, "\u{1F9F8} " + nName(c) + " is one of your Littlish Club grown-ups, so they're your nursery grown-up here too.");
+        if (charFor(c)) nurseryTell(c, "\u{1F9F8} You're " + nName(mn) + "'s grown-up in Littlish Club, so you're paired in the farm's nursery too.");
+      }
+      saveLedger();
+      syncCompanions();
+    }
+    function nurseryTick() {
+      const now = Date.now();
+      if (now - (state.nurseryAt || 0) < 4e3) return;
+      state.nurseryAt = now;
+      for (const mn of nurseryHere()) {
+        if (!littleNow(mn)) continue;
+        const n = nrec(mn);
+        if (n.traps !== false && !(state.nurseryRuns && state.nurseryRuns.get(mn) > now)) {
+          const spot = Object.keys(L2.spots || {}).find((s) => /^nursery-/.test(s) && onSpot(mn, s, 0));
+          if (spot) {
+            const kind = spot.replace(/^nursery-/, "").replace(/-\d+$/, ""), pool = NURSERY_LINES.trap[kind] || NURSERY_LINES.trap.generic;
+            n.trapAt = n.trapAt || {};
+            if (now - (n.trapAt[kind] || 0) > CFG.NURSERY.TRAP_MIN * 6e4) {
+              n.trapAt[kind] = now;
+              saveLedger();
+              const beats = pool[Math.floor(Math.random() * pool.length)].map((t) => nFill(t, { n: mn }));
+              nurseryScene(mn, beats, "\u{1F9F8}", () => {
+                if (Math.random() < CFG.NURSERY.STAR_CHANCE) nurseryStar(mn, "playin' in the nursery");
+              });
+              continue;
+            }
+          }
+        }
+        const ms = nurseryMesses(mn).filter((k) => now - ((n.messTold || {})[k] || 0) > CFG.NURSERY.MESS_MIN * 6e4);
+        if (ms.length && Math.random() < 0.08) {
+          const k = ms[Math.floor(Math.random() * ms.length)];
+          n.messTold = n.messTold || {};
+          n.messTold[k] = now;
+          saveLedger();
+          nurserySay(mn, "\u{1F9C1} " + nFill(nPick("mess:" + k, NURSERY_LINES.mess[k]), { n: mn }));
+        }
+      }
+    }
+    const GROWN_UP_CMDS = [
+      "milk",
+      "collect",
+      "drain",
+      "edge",
+      "denial",
+      "ruin",
+      "inseminate",
+      "breed",
+      "cum",
+      "use",
+      "bench",
+      "inspect",
+      "dose",
+      "send",
+      "whistle",
+      "brand",
+      "heat",
+      "stocks",
+      "walk",
+      "freeuse",
+      "breedable",
+      "fertile",
+      "milkable",
+      "seedmilk",
+      "parasite",
+      "symbiote",
+      "traps",
+      "trap",
+      "eager",
+      "potion",
+      "potions",
+      "dare",
+      "dares",
+      "outfitwheel",
+      "wheel",
+      "spin",
+      "purge",
+      "coax",
+      "lend",
+      "bid",
+      "gauntlet",
+      "mysterybox",
+      "suit",
+      "keep",
+      "vat",
+      "sit",
+      "herdtraps",
+      "goad",
+      "hunt",
+      "lay",
+      "gather",
+      "pack",
+      "cleanse",
+      "corruption"
+    ];
+    const SAFE_BUYS = /\b(cake|honey|maple|choc\w*|strawberr\w*|berry|slime|mud)\b/i;
+    function nurseryGate(sender, cmd, args) {
+      try {
+        if (!GROWN_UP_CMDS.includes(cmd) && cmd !== "buy" && cmd !== "gift") return null;
+        if (littleNow(sender) && GROWN_UP_CMDS.includes(cmd) && !/^(off|no|stop)$/i.test(String(args[0] || ""))) return NURSERY_LINES.blockedSelf;
+        for (const a of args) {
+          let t = null;
+          try {
+            t = resolveTarget(String(a));
+            state.ambiguous = null;
+          } catch (e) {
+            t = null;
+          }
+          if (!t || t === sender || !littleNow(t)) continue;
+          if ((cmd === "buy" || cmd === "gift") && SAFE_BUYS.test(args.join(" "))) return null;
+          return nFill(NURSERY_LINES.blockedOther, { n: t });
+        }
+      } catch (e) {
+        warn("nursery gate:", e);
+      }
+      return null;
+    }
+    function nurseryHidden(sender) {
+      return !nurseryOn(sender) && !isProprietor(sender);
+    }
+    function nurseryCommand(cmd, sender, args, R, huh) {
+      if (nurseryHidden(sender)) {
+        huh("I don't know ?" + cmd + ", hon. ?help lists what I can do.");
+        return;
+      }
+      if (cmd === "nursery") return nurseryAdmin(sender, args, R);
+      if (cmd === "little") return littleCommand(sender, args, R);
+      if (cmd === "care") return careCommand(sender, args, R);
+    }
+    function nurseryHelp(sender) {
+      const n = nrec(sender) || {};
+      const lines = ["\u{1F9F8} THE NURSERY" + (n.role ? " \xB7 you're a " + n.role : "") + "\nOnly nursery folk ever see what happens here."];
+      if (n.role === "little") lines.push("?little on / ?little off \xB7 your little space (the farm's grown-up things leave you be while it's on)\n?little <activity> \xB7 " + Object.keys(NURSERY_LINES.play).join(", ") + "\n?little game rps|guess|dice|crayon|peekaboo|catch [pick]\n?little ask cuddle|change|story|snack|play|nap|bath|bottle|help\n?nursery traps on|off \xB7 the nursery's gentle traps");
+      if (n.role === "caregiver") lines.push("?care <action> <little> \xB7 " + Object.keys(NURSERY_LINES.care).join(", ") + "\n?nursery add <who> little \xB7 invite a little (they say yes first)\n?nursery pair <little> \xB7 ask to be their grown-up \xB7 ?nursery unpair <who>");
+      if (isProprietor(sender)) lines.push("Proprietors: ?nursery add <who> little|caregiver \xB7 ?nursery remove <who> \xB7 ?nursery list");
+      lines.push("?nursery leave \xB7 take yourself off the list. Your safeword works here like everywhere.");
+      return lines.join("\n\n");
+    }
+    function nurseryInvite(by, t, role, R) {
+      if (!t || !rec(t) || !(rec(t).roles || []).length) {
+        R("Who, sweetpea? They need to be on the farm's books.");
+        return;
+      }
+      if (nurseryOn(t) && nrec(t).role === role) {
+        R(nName(t) + " is already in the nursery as a " + role + ".");
+        return;
+      }
+      addonAsks.set(t, { addon: null, at: Date.now(), cb: (yes) => {
+        if (!yes) {
+          tell(by, "\u{1F9F8} " + nName(t) + " said not now. That's okay.");
+          return;
+        }
+        const r = rec(t);
+        r.nursery = { role, by, at: Date.now(), space: false, traps: true, carers: role === "little" && isCarer(by) ? [by] : [] };
+        saveLedger();
+        audit(by, "NURSERY", "add " + t + " " + role);
+        syncCompanions(true);
+        tell(by, "\u{1F9F8} " + nName(t) + " is in the nursery now, as a " + role + ".");
+        tell(t, "\u{1F9F8} Welcome to the nursery, " + nName(t) + "! There's a \u{1F9F8} Nursery panel in your \u{1F33E} Companion now. " + (role === "little" ? "Say ?little on whenever you want your little space." : "?nursery shows what you can do."));
+      } });
+      askCard(t, "nursery", "\u{1F9F8} " + nName(by) + " would like to add you to the farm's nursery as a " + role + ". It's a soft, private space: only nursery folk see what happens there" + (role === "little" ? ", and while you're in your little space the farm's grown-up things leave you be" : "") + ". Yes or no? (?yes or ?no works too)");
+      R("\u{1F9F8} I've asked " + nName(t) + ". Once they say yes, they're in.");
+    }
+    function nurseryAdmin(sender, args, R) {
+      const a0 = String(args[0] || "").toLowerCase(), n = nrec(sender);
+      if (!a0 || a0 === "help") {
+        R(nurseryHelp(sender));
+        return;
+      }
+      if (a0 === "add" || a0 === "invite") {
+        const t = resolveTarget(args[1]), role = /^care/i.test(args[2] || "") ? "caregiver" : "little";
+        if (!isProprietor(sender) && !(isCarer(sender) && role === "little")) {
+          R("Only proprietors add caregivers, sweetpea. Caregivers can invite littles: ?nursery add <who> little.");
+          return;
+        }
+        nurseryInvite(sender, t, role, R);
+        return;
+      }
+      if (a0 === "remove") {
+        if (!isProprietor(sender)) {
+          R("Proprietors take folks off the list. You can take yourself off with ?nursery leave.");
+          return;
+        }
+        const t = resolveTarget(args[1]);
+        if (!t || !nurseryOn(t)) {
+          R("They're not in the nursery.");
+          return;
+        }
+        rec(t).nursery = null;
+        for (const p of Object.values(L2.people || {})) if (p && p.nursery && Array.isArray(p.nursery.carers)) p.nursery.carers = p.nursery.carers.filter((x) => x !== t);
+        saveLedger();
+        audit(sender, "NURSERY", "remove " + t);
+        syncCompanions(true);
+        R("\u{1F9F8} " + nName(t) + " is off the nursery list.");
+        return;
+      }
+      if (a0 === "leave") {
+        if (!n) {
+          R("You're not on the nursery list.");
+          return;
+        }
+        rec(sender).nursery = null;
+        for (const p of Object.values(L2.people || {})) if (p && p.nursery && Array.isArray(p.nursery.carers)) p.nursery.carers = p.nursery.carers.filter((x) => x !== sender);
+        saveLedger();
+        audit(sender, "NURSERY", "left");
+        syncCompanions(true);
+        R("\u{1F9F8} You're off the nursery list. Come back any time.");
+        return;
+      }
+      if (a0 === "list") {
+        if (!isProprietor(sender) && !isCarer(sender)) {
+          R(nurseryHelp(sender));
+          return;
+        }
+        const ppl = Object.values(L2.people || {}).filter((p) => p && p.nursery && p.nursery.role);
+        if (!ppl.length) {
+          R("\u{1F9F8} Nobody's in the nursery yet.");
+          return;
+        }
+        R("\u{1F9F8} THE NURSERY\n" + ppl.map((p) => "\u2022 " + (p.name || p.mn) + " \xB7 " + p.nursery.role + (p.nursery.role === "little" ? (p.nursery.space ? " \xB7 little now" : "") + ((p.nursery.carers || []).length ? " \xB7 grown-ups: " + p.nursery.carers.map(nName).join(", ") : "") : "")).join("\n"));
+        return;
+      }
+      if (a0 === "pair") {
+        if (!isCarer(sender)) {
+          R("Only caregivers pair up with littles.");
+          return;
+        }
+        const t = resolveTarget(args[1]);
+        if (!t || !isLittle(t)) {
+          R("Pair with which little, sweetpea?");
+          return;
+        }
+        if ((nrec(t).carers || []).includes(sender)) {
+          R("You're already one of " + nName(t) + "'s grown-ups.");
+          return;
+        }
+        addonAsks.set(t, { addon: null, at: Date.now(), cb: (yes) => {
+          if (!yes) {
+            tell(sender, "\u{1F9F8} " + nName(t) + " said not now.");
+            return;
+          }
+          const nt = nrec(t);
+          if (!nt) return;
+          nt.carers = (nt.carers || []).concat(sender);
+          saveLedger();
+          syncCompanions(true);
+          tell(sender, "\u{1F9F8} You're one of " + nName(t) + "'s grown-ups now.");
+          tell(t, "\u{1F9F8} " + nName(sender) + " is one of your grown-ups now.");
+        } });
+        askCard(t, "nursery", "\u{1F9F8} " + nName(sender) + " would like to be one of your nursery grown-ups. Yes or no?");
+        R("\u{1F9F8} I've asked " + nName(t) + ".");
+        return;
+      }
+      if (a0 === "unpair") {
+        const t = resolveTarget(args[1]);
+        if (!t || !nurseryOn(t)) {
+          R("Unpair from who?");
+          return;
+        }
+        const lit = isLittle(sender) ? sender : t, car = isLittle(sender) ? t : sender, nl = nrec(lit);
+        if (!nl || !(nl.carers || []).includes(car)) {
+          R("You two aren't paired.");
+          return;
+        }
+        nl.carers = nl.carers.filter((x) => x !== car);
+        saveLedger();
+        syncCompanions(true);
+        R("\u{1F9F8} Unpaired.");
+        return;
+      }
+      if (a0 === "traps") {
+        if (!isLittle(sender)) {
+          R("The nursery's traps are for littles.");
+          return;
+        }
+        const on = !/^(off|no)$/i.test(args[1] || "");
+        n.traps = on;
+        saveLedger();
+        syncCompanions(true);
+        R("\u{1F9F8} Nursery traps: " + (on ? "ON. Ball pits, bubbles and playpens might find you on the nursery's spots." : "off."));
+        return;
+      }
+      R(nurseryHelp(sender));
+    }
+    function littleCommand(sender, args, R) {
+      const n = nrec(sender), a0 = String(args[0] || "").toLowerCase();
+      if (!n || n.role !== "little") {
+        R(nurseryHelp(sender));
+        return;
+      }
+      if (!a0) {
+        R(nurseryHelp(sender));
+        return;
+      }
+      if (a0 === "on" || a0 === "off") {
+        if (a0 === "on") {
+          if (n.space) {
+            R("\u{1F9F8} You're already little, sweetpea.");
+            return;
+          }
+          const hold = grownUpHold(sender);
+          if (hold) {
+            R(nFill(NURSERY_LINES.notYet, { x: hold }));
+            return;
+          }
+          n.space = true;
+          n.spaceAt = Date.now();
+          saveLedger();
+          audit(sender, "NURSERY", "little space on");
+          syncCompanions(true);
+          if (charFor(sender)) nurserySay(sender, "\u{1F9F8} " + nFill(nPick("spaceOn", NURSERY_LINES.spaceOn), { n: sender }));
+          for (const c of carersHere(sender)) if (c !== sender) nurseryTell(c, "\u{1F9F8} " + nName(sender) + " is in their little space now.");
+          R("\u{1F9F8} Little space: ON. The farm's grown-up things leave you be. ?little off when you're ready to grow back up.");
+        } else {
+          if (!n.space) {
+            R("\u{1F9F8} You're not in your little space right now.");
+            return;
+          }
+          n.space = false;
+          saveLedger();
+          audit(sender, "NURSERY", "little space off");
+          syncCompanions(true);
+          if (charFor(sender)) nurserySay(sender, "\u{1F9F8} " + nFill(nPick("spaceOff", NURSERY_LINES.spaceOff), { n: sender }));
+          R("\u{1F9F8} Little space: off. Back to farm business.");
+        }
+        return;
+      }
+      if (!n.space) {
+        R("\u{1F9F8} Go little first, sweetpea: ?little on.");
+        return;
+      }
+      if (!charFor(sender)) {
+        R("\u{1F9F8} Come to the farm first, sweetpea.");
+        return;
+      }
+      if (a0 === "game") return littleGame(sender, String(args[1] || "").toLowerCase(), String(args[2] || "").toLowerCase(), R);
+      if (a0 === "ask") {
+        const what = String(args[1] || "").toLowerCase(), line = NURSERY_LINES.ask[what];
+        if (!line) {
+          R("Ask for what, sweetpea? " + Object.keys(NURSERY_LINES.ask).join(", ") + ".");
+          return;
+        }
+        const cs = carersHere(sender).filter((c) => c !== sender);
+        if (!cs.length) {
+          R("\u{1F9F8} There's no grown-up here right now, sweetpea. Ask again when one comes by.");
+          return;
+        }
+        for (const c of cs) nurseryTell(c, nFill(line, { n: sender }) + "  (?care " + (what === "help" ? "cuddle" : what === "nap" ? "tuck" : what) + " " + nName(sender) + ")");
+        R("\u{1F9F8} You asked. " + cs.map(nName).join(" and ") + (cs.length > 1 ? " know" : " knows") + ".");
+        return;
+      }
+      if (a0 === "bath") {
+        return bathTime(sender, null, R);
+      }
+      const beatsList = NURSERY_LINES.play[a0];
+      if (!beatsList) {
+        R("\u{1F9F8} I don't know that one, sweetpea. Try: " + Object.keys(NURSERY_LINES.play).join(", ") + ", or bath.");
+        return;
+      }
+      const beats = beatsList[Math.floor(Math.random() * beatsList.length)].map((t) => nFill(t, { n: sender }));
+      if (!nurseryScene(sender, beats, "\u{1F9F8}", () => {
+        if (Math.random() < CFG.NURSERY.STAR_CHANCE) nurseryStar(sender, NURSERY_LINES.activityName[a0] || "playin'");
+      })) {
+        R("\u{1F9F8} One thing at a time, sweetpea.");
+        return;
+      }
+      R("\u{1F9F8} " + (NURSERY_LINES.activityName[a0] || a0).replace(/^./, (c) => c.toUpperCase()) + "!");
+    }
+    function littleGame(mn, game, pick, R) {
+      const G = NURSERY_LINES.game, rnd = (a) => a[Math.floor(Math.random() * a.length)];
+      let line = null, won = false;
+      if (game === "rps") {
+        const opts = ["rock", "paper", "scissors"], x = opts.includes(pick) ? pick : rnd(opts), y = rnd(opts);
+        const beats = { rock: "scissors", paper: "rock", scissors: "paper" };
+        won = beats[x] === y;
+        line = nFill(rnd(x === y ? G.rpsDraw : won ? G.rpsWin : G.rpsLose), { n: mn, x, y });
+      } else if (game === "guess") {
+        const x = pick === "left" || pick === "right" ? pick : rnd(["left", "right"]);
+        won = Math.random() < 0.5;
+        line = nFill(rnd(won ? G.guessWin : G.guessLose), { n: mn, x });
+      } else if (game === "dice") {
+        const x = 1 + Math.floor(Math.random() * 6), y = 1 + Math.floor(Math.random() * 6);
+        won = x > y;
+        line = nFill(rnd(x === y ? G.diceDraw : won ? G.diceWin : G.diceLose), { n: mn, x: String(x), y: String(y) });
+      } else if (game === "crayon") {
+        const cols = ["red", "blue", "green", "yellow"], x = cols.includes(pick) ? pick : rnd(cols), y = rnd(cols);
+        won = x === y;
+        line = nFill(rnd(won ? G.crayonWin : G.crayonLose), { n: mn, x, y });
+      } else if (game === "peekaboo") {
+        won = true;
+        line = nFill(rnd(G.peekaboo), { n: mn });
+      } else if (game === "catch") {
+        won = Math.random() < 0.6;
+        line = nFill(rnd(won ? G.catchWin : G.catchLose), { n: mn });
+      } else {
+        R("\u{1F3B2} Which game, sweetpea? rps (rock, paper or scissors), guess (left or right), dice, crayon (red, blue, green or yellow), peekaboo, catch.");
+        return;
+      }
+      state.nurseryGameAt = state.nurseryGameAt || /* @__PURE__ */ new Map();
+      if (Date.now() - (state.nurseryGameAt.get(mn) || 0) < 8e3) {
+        R("\u{1F3B2} Slow down, sweetpea! One game at a time.");
+        return;
+      }
+      state.nurseryGameAt.set(mn, Date.now());
+      nurserySay(mn, "\u{1F3B2} " + line);
+      if (won && Math.random() < CFG.NURSERY.STAR_CHANCE) later(() => nurseryStar(mn, "winnin' a game"), 1500);
+    }
+    function bathTime(little, carer, R) {
+      const C2 = NURSERY_LINES.care, v = { n: little, c: carer };
+      const beats = [nFill(nPick("bath", C2.bath), v), nFill(nPick("bathMid", C2.bathMid), v), nFill(nPick("bathEnd", C2.bathEnd), v)];
+      if (!carer) [0, 1, 2].forEach((i) => {
+        beats[i] = nFill(nPick("selfBath" + i, NURSERY_LINES.selfBath[i]), v);
+      });
+      if (!nurseryScene(little, beats, "\u{1F6C1}", () => {
+        washNow(little);
+        if (carer) nurseryStar(carer, "lookin' after a little");
+      })) {
+        R("\u{1F6C1} One thing at a time, sweetpea.");
+        return;
+      }
+      R("\u{1F6C1} Bath time!");
+    }
+    function careCommand(sender, args, R) {
+      if (!isCarer(sender)) {
+        R(nurseryHelp(sender));
+        return;
+      }
+      const what = String(args[0] || "").toLowerCase(), t = resolveTarget(args[1]);
+      if (!NURSERY_LINES.care[what] || ["bathMid", "bathEnd"].includes(what)) {
+        R("\u{1F9F8} ?care <action> <little>. Actions: " + Object.keys(NURSERY_LINES.care).filter((k) => !/^bath(Mid|End)$/.test(k)).join(", ") + ".");
+        return;
+      }
+      if (!t || !isLittle(t)) {
+        R("\u{1F9F8} Which little, sweetpea? ?care " + what + " <little>.");
+        return;
+      }
+      if (!charFor(t) || !charFor(sender)) {
+        R("\u{1F9F8} You both need to be at the farm.");
+        return;
+      }
+      if (!littleNow(t)) {
+        R("\u{1F9F8} " + nName(t) + " isn't in their little space right now.");
+        return;
+      }
+      const n = nrec(t), paired = (n.carers || []).includes(sender);
+      state.nurseOk = state.nurseOk || /* @__PURE__ */ new Map();
+      const okUntil = state.nurseOk.get(t + ":" + sender) || 0;
+      if (!paired && okUntil < Date.now()) {
+        addonAsks.set(t, { addon: null, at: Date.now(), cb: (yes) => {
+          if (!yes) {
+            tell(sender, "\u{1F9F8} " + nName(t) + " said not now.");
+            return;
+          }
+          state.nurseOk.set(t + ":" + sender, Date.now() + CFG.NURSERY.OK_H * 36e5);
+          careDo(sender, t, what, R);
+        } });
+        askCard(t, "nursery", "\u{1F9F8} " + nName(sender) + " would like to look after you (" + what + "). Yes or no?");
+        R("\u{1F9F8} You're not " + nName(t) + "'s grown-up yet, so I've asked them first.");
+        return;
+      }
+      careDo(sender, t, what, R);
+    }
+    function careDo(c, t, what, R) {
+      const C2 = NURSERY_LINES.care, n = nrec(t), v = { n: t, c };
+      if (what === "bath") return bathTime(t, c, R);
+      if (what === "stuffie") {
+        const kinds = Object.entries(NURSERY_GEAR).filter(([, g2]) => g2.kind === "stuffie"), [id, g] = kinds[Math.floor(Math.random() * kinds.length)];
+        v.s = g.label;
+        nurserySay(t, "\u{1F9F8} " + nFill(nPick("care:stuffie", C2.stuffie), v));
+        if (hasCompanion(t)) enqueue(makeMsg("nursery", { do: "offer", gear: id, label: g.label, from: nName(c) }, t));
+        R("\u{1F9F8} You gave " + nName(t) + " a " + g.label + ".");
+        return;
+      }
+      if (what === "check") {
+        const lvl = wetLevel(n), word = !(n.wet && n.wet.diaper) ? nPick("checkNone", NURSERY_LINES.checkNone) : lvl === 0 ? nPick("checkDry", NURSERY_LINES.checkDry) : lvl === 1 ? nPick("checkDamp", NURSERY_LINES.checkDamp) : nPick("checkSoggy", NURSERY_LINES.checkSoggy);
+        v.m = word;
+      }
+      if (what === "change") {
+        if (hasCompanion(t)) enqueue(makeMsg("nursery", { do: "change" }, t));
+        if (n.wet) {
+          n.wet.pct = 0;
+          n.wet.leak = false;
+          n.wet.told = 0;
+        }
+        saveLedger();
+      }
+      v.s = "stuffie";
+      if (what === "wipe") {
+        const ms = nurseryMesses(t);
+        if (ms.length) {
+          const r = rec(t);
+          for (const k of ms) if (r.messKinds) delete r.messKinds[k];
+        }
+      }
+      nurserySay(t, "\u{1F9F8} " + nFill(nPick("care:" + what, C2[what]), v));
+      if (what === "praise" && Math.random() < 0.5) later(() => nurseryStar(t, "bein' so good"), 1500);
+      if (Math.random() < 0.3) later(() => nurseryStar(c, "lookin' after a little"), 2e3);
+      state.nurseryCareAt = state.nurseryCareAt || /* @__PURE__ */ new Map();
+      state.nurseryCareAt.set(t, Date.now());
+      R("\u{1F9F8} Done.");
+    }
+    function nurseryStateFor(mn, s) {
+      const n = nrec(mn);
+      if (!n) return;
+      const here = new Set(nurseryHere());
+      const o = {
+        role: n.role,
+        space: !!n.space,
+        traps: n.traps !== false,
+        stars: n.stars && n.stars.d === dayKey() ? n.stars.n : 0,
+        cap: n.role === "caregiver" ? CFG.NURSERY.CARE_DAY : CFG.NURSERY.STARS_DAY,
+        acts: Object.keys(NURSERY_LINES.play),
+        cares: Object.keys(NURSERY_LINES.care).filter((k) => !/^bath(Mid|End)$/.test(k)),
+        asks: Object.keys(NURSERY_LINES.ask),
+        gear: Object.entries(NURSERY_GEAR).map(([id, g]) => ({ id, label: g.label, kind: g.kind, group: g.group, name: g.name }))
+      };
+      if (n.role === "little") {
+        o.carers = (n.carers || []).map((c) => ({ mn: c, name: nName(c), here: here.has(c) }));
+        o.wet = wetLevel(n);
+        o.abcl = !!(n.wet && n.wet.at);
+        o.messes = nurseryMesses(mn);
+      } else {
+        const mine = Object.values(L2.people || {}).filter((p) => p && p.nursery && p.nursery.role === "little" && ((p.nursery.carers || []).includes(mn) || here.has(p.mn)));
+        o.littles = mine.map((p) => ({ mn: p.mn, name: nName(p.mn), here: here.has(p.mn), space: !!p.nursery.space, mine: (p.nursery.carers || []).includes(mn), wet: wetLevel(p.nursery), messes: nurseryMesses(p.mn) }));
+      }
+      s.nursery = o;
+    }
+    if (W.__FARMHAND_TEST__) Object.assign(W, { __nurseryTick: () => {
+      state.nurseryAt = 0;
+      nurseryTick();
+    }, __littleNow: (m) => littleNow(m), __nurseryStats: (m, x) => nurseryStats(m, x) });
+    const BRAND_PLACE_KEYS = ["hipL", "hipR", "thighL", "thighR", "mons", "tummy", "chestL", "chestR", "shoulderL", "shoulderR"];
+    const BRAND_PLACE_NAMES = {
+      hipL: "left hip",
+      hipR: "right hip",
+      thighL: "left thigh",
+      thighR: "right thigh",
+      mons: "low on the belly",
+      tummy: "tummy",
+      chestL: "left breast",
+      chestR: "right breast",
+      shoulderL: "left shoulder",
+      shoulderR: "right shoulder"
+    };
+    const BRAND_PLACE_WORDS = "hip, left hip, thigh, left thigh, belly, tummy, breast, left breast, shoulder, left shoulder";
+    const brandPlaceName = (k) => BRAND_PLACE_NAMES[k] || "hip";
+    function brandPlaceFrom(text) {
+      const t = String(text || "").toLowerCase().replace(/[^a-z]/g, "");
+      if (!t) return null;
+      const exact = BRAND_PLACE_KEYS.find((k) => k.toLowerCase() === t);
+      if (exact) return exact;
+      const left = /^(l|left)/.test(t), side = left ? "L" : "R", body = t.replace(/^(left|right|l|r)/, "");
+      if (/^hip|^flank|^rump|^ass|^butt/.test(body)) return "hip" + side;
+      if (/^thigh|^leg/.test(body)) return "thigh" + side;
+      if (/^breast|^chest|^tit|^boob|^udder/.test(body)) return "chest" + side;
+      if (/^shoulder|^arm/.test(body)) return "shoulder" + side;
+      if (/^belly|^mons|^womb|^low/.test(body)) return "mons";
+      if (/^tummy|^stomach/.test(body)) return "tummy";
+      return null;
+    }
+    const BRAND_SEAR = [
+      "\u{1F525} %b heats the farm's iron till it glows, and presses it to %t's %p. A hiss, a yelp, the smell of it, and the B&B brand is on 'em for good.",
+      "\u{1F525} %b holds %t still with one hand and lays the iron to their %p with the other. When it comes away, the big BB and the little bell are burned in clean.",
+      "\u{1F525} The iron comes out of the coals and %b doesn't hesitate: %t's %p, three heartbeats, done. B&B stock, and everybody can see it."
+    ];
+    function brandLogo(by, t, placeText, R) {
+      const r = t ? rec(t) : null;
+      if (!r) {
+        R("Brand who, sugar? ?brand <who> logo [place]. Places: " + BRAND_PLACE_WORDS + ".");
+        return;
+      }
+      if (!isProprietor(by) && !membership(t, by)) {
+        R("You can only brand stock in your own " + herdWord(by) + ", hon.");
+        return;
+      }
+      if (/\bbrand/i.test(r.limits || "")) {
+        R(plainName(t) + "'s limits rule out a brand, sugar.");
+        return;
+      }
+      const place = brandPlaceFrom(placeText) || r.brand && r.brand.logo && r.brand.logo.place || "hipR";
+      if (placeText && !brandPlaceFrom(placeText)) {
+        R("I don't know where that is, sugar. Places: " + BRAND_PLACE_WORDS + ".");
+        return;
+      }
+      r.brand = { mark: "B&B", logo: { place }, by, at: Date.now() };
+      saveLedger();
+      audit(by, "BRAND", t + " logo " + place);
+      syncCompanions(true);
+      const line = pickFresh("brand:sear", BRAND_SEAR).replace(/%b/g, plainName(by)).replace(/%t/g, plainName(t)).replace(/%p/g, brandPlaceName(place));
+      if (charFor(t)) emote(line, t);
+      R("\u{1F525} " + plainName(t) + " carries the B&B brand now, on their " + brandPlaceName(place) + ".");
+      tell(t, "\u{1F525} " + plainName(by) + " branded you with the farm's mark, on your " + brandPlaceName(place) + ". It shows on you for everybody with the Companion (your Toggles can hide it on your own screen).");
+    }
+    function brandFor(mn) {
+      const r = rec(mn);
+      if (!r) return null;
+      let place = r.brand && r.brand.logo ? r.brand.logo.place : null;
+      if (!place && L2.brandAll && hasRole(mn, ROLE.LIVESTOCK) && !(r.brand && r.brand.mark && !r.brand.logo)) place = L2.brandAll.place;
+      if (!place) return null;
+      const look = L2.drawnFarm && L2.drawnFarm.body && L2.drawnFarm.body.brand || {};
+      const per = (look.places || {})[place] || {};
+      return { art: look.art || "mark", place, size: per.size || look.size || 46, angle: per.angle || 0, dx: per.dx || 0, dy: per.dy || 0, look: look.look || "seared" };
+    }
     const PARASITE_SERUMS = ["growth", "fertility", "growth", "hyper pregnancy", "growth", "capacity"];
     const PARASITE_GROWS = ["udder", "penis", "testes", "butt"];
     function parasiteChance(mn) {
@@ -22793,19 +24134,20 @@
       const belt = r.parasiteN > CFG.PARASITE_BELT_AFTER;
       r.parasite = { since: now, until: now + CFG.PARASITE_HOURS * 36e5, next: now + CFG.PARASITE_DOSE_MIN * 6e4, n: 0, fed: 0, form: belt ? "belt" : "lips" };
       parasiteBorn(mn);
-      const via = /^kissed/.test(how || "") ? "kiss" : /^nursed/.test(how || "") ? "nurse" : how === "grew back" ? "regrow" : /^hatched/.test(how || "") ? "hatch" : how === "given" ? "given" : "glory";
+      const via = /^kissed/.test(how || "") ? "kiss" : /^nursed/.test(how || "") ? "nurse" : how === "grew back" ? "regrow" : /^hatched/.test(how || "") ? "hatch" : how === "given" ? "given" : how === "hop" ? "hop" : "glory";
       const came = {
         glory: "Somethin' came through the hole with that last cock, sugar",
         kiss: "That kiss left somethin' behind, sugar",
         nurse: "Somethin' came down with that milk, sugar",
         regrow: "The last one left a seed in you, sugar, and it's grown back",
         hatch: "That egg in the nest had one of 'em curled up in it, sugar",
-        given: "The farm girl's put one on you, sugar"
+        given: "The farm girl's put one on you, sugar",
+        hop: "It hopped off the one you were coaxin' and onto you, sugar"
       }[via];
       if (belt) {
         saveLedger();
         audit(CFG.BOT_MEMBER, "PARASITE", mn + " latched as a belt" + (how ? " (" + how + ")" : ""));
-        emote("\u{1F444} " + paraLine(via === "glory" ? "latchBelt" : "latchBeltAny", mn), mn);
+        if (via !== "hop") emote("\u{1F444} " + paraLine(via === "glory" ? "latchBelt" : "latchBeltAny", mn), mn);
         tell(mn, "\u{1F444} " + came + ", and it knows you now. This time it didn't stop at your mouth: it slid down your body and closed round your hips, a livin' belt with a root up inside you. " + CFG.PARASITE_HOURS + " hours. It feeds you its serum, regular, and now it's every load you take in your " + (hasVulva(mn) ? "pussy or your ass" : "ass") + " that it drinks and turns into more. Your safeword takes it off right now.");
         face(mn, "edged", 60);
         arouse(mn, 25);
@@ -22814,7 +24156,7 @@
       }
       saveLedger();
       audit(CFG.BOT_MEMBER, "PARASITE", mn + " latched" + (how ? " (" + how + ")" : ""));
-      if (via !== "regrow") emote("\u{1F444} " + paraLine(via === "glory" ? "latch" : "latch_" + via, mn), mn);
+      if (via !== "regrow" && via !== "hop") emote("\u{1F444} " + paraLine(via === "glory" ? "latch" : "latch_" + via, mn), mn);
       tell(mn, "\u{1F444} " + came + (via === "regrow" ? " over your mouth" : ", and it's sealed itself over your mouth") + ": a pair of fat, livin' lips with a tentacle down your throat. It'll feed you its serum, regular, for the next " + CFG.PARASITE_HOURS + " hours, and every load you swallow, it turns into more. It gets hungry, and so will you. Kiss somebody who said ?parasite on and it'll bud onto them. It drops off on its own when it's done. Your safeword takes it off right now.");
       face(mn, "edged", 60);
       arouse(mn, 20);
@@ -22838,7 +24180,7 @@
       saveLedger();
       audit(CFG.BOT_MEMBER, "PARASITE", mn + " off (" + (how || "done") + ")");
       if (how === "safe" || !was && how !== "done") return true;
-      if (charFor(mn)) emote("\u{1F444} " + paraLine(wasBelt ? "offBelt" : how === "purge" ? "purge" : "off", mn), mn);
+      if (charFor(mn) && how !== "service") emote("\u{1F444} " + paraLine(wasBelt ? "offBelt" : how === "purge" ? "purge" : "off", mn), mn);
       tell(mn, "\u{1F444} The parasite's off you, sugar. It gave you " + n + " dose" + (n === 1 ? "" : "s") + " and drank " + fed + " load" + (fed === 1 ? "" : "s") + " through you while it was on.");
       syncCompanions(true);
       return true;
@@ -26592,7 +27934,7 @@
     const bLine = (key, mn, v) => tFill(pickFor(mn, "brood:" + key, BROOD_LINES[key]), mn, v);
     function quietNow(mn) {
       const r = rec(mn);
-      return !!(r && r.quietUntil > Date.now());
+      return !!(r && (r.quietUntil > Date.now() || r.nursery && r.nursery.role === "little" && r.nursery.space));
     }
     function sceneRun(mn, icon, beats, done, v) {
       state.sceneRuns = state.sceneRuns || /* @__PURE__ */ new Map();
@@ -27295,7 +28637,7 @@
     function ruined(mn) {
       return ((rec(mn) || {}).corrMarks || []).includes(100);
     }
-    const CORR_NOISE = { cow: "moo", bull: "moo", pony: "neigh", horse: "neigh", pup: "woof", dog: "woof", wolf: "awoo", kitt: "mew", kitty: "mew", cat: "mew", bunny: "squeak", rabbit: "squeak", goat: "baa", sheep: "baa", pig: "oink", deer: "bleat", fox: "yip", goblin: "hehe", rat: "squeak" };
+    const CORR_NOISE = { cow: "moo", bull: "moo", pony: "neigh", horse: "neigh", pup: "woof", dog: "woof", wolf: "awoo", kitt: "mew", kitty: "mew", cat: "mew", bunny: "squeak", rabbit: "squeak", goat: "baa", sheep: "baa", pig: "oink", deer: "bleat", fox: "yip", goblin: "hehe", rat: "squeak", dragon: "rawr" };
     const CORR_BRANDS = ["FARM PROPERTY", "BREEDING STOCK", "USE ME", "BRED", "RUINED STOCK", "FARM ANIMAL"];
     const MARK_NAME = {
       10: "the traps' hunger for you",
@@ -30554,7 +31896,7 @@
         const d = JSON.parse(raw);
         if (!d || typeof d !== "object" || Array.isArray(d)) return null;
         const body = {};
-        for (const k of ["cup", "breast", "wear", "belly", "auto", "tuck", "dress", "mould"]) if (d[k] !== void 0) body[k] = d[k];
+        for (const k of ["cup", "breast", "wear", "belly", "auto", "tuck", "dress", "mould", "brand"]) if (d[k] !== void 0) body[k] = d[k];
         return typeof body.cup === "number" ? body : null;
       } catch (e) {
         return null;
@@ -33484,6 +34826,9 @@ OPT IN FIRST \xB7 nobody gets bred who hasn't, sweetie
   ?yes / ?no \xB7 answer a stud or staff member who asked (whisper or beep works too)
   ?tally on|off \xB7 your tally marks on ?who and the board
   ?wash \xB7 clean off a paintin'
+  ?drain \xB7 empty yourself into the bucket (?drain butt for one hole)
+  ?drain <who> \xB7 drain somebody beside you; they say yes first
+  ?services \xB7 the farm's services: the vet, a salt soak, coaxin'
   ?praise on|off \xB7 ?degrade on|off \xB7 let staff's words count
   Hard limits always win.
 
@@ -33791,6 +35136,9 @@ THE PARASITE \xB7 ?parasite on
   then teats, then below), gets urges, lays its own eggs at the
   end, and passes by a kiss or by nursin'.
   ?parasite \xB7 how long is left. Your safeword takes it off.
+  Gettin' it off the farm way: ?service purge (the vet, 3 ribbons),
+  ?service soak (stand in the water with salt, 10 minutes), or a
+  friend's ?coax <you> (it might hop onto them instead).
 
 SYMBIOTES \xB7 ?symbiote on
   A livin' thing that bonds to you and gives somethin' back for
@@ -34024,6 +35372,8 @@ RIBBONS, POTIONS, DARES, THE CORRAL
   ?gauntlet pot <n> \xB7 proprietors (ends: gauntlet-start, -end)
   ?purge <who> \xB7 take a parasite off them
   ?parasite give <who> \xB7 proprietors (they need ?parasite on)
+  ?brand <who> logo [place] \xB7 sear the B&B logo on (hip, thigh, belly, breast, shoulder)
+  ?brand all logo [place] \xB7 proprietors: every livestock carries it \xB7 ?brand all clear
   ?symbiote give <who|me> latex|moss|nestling \xB7 proprietors, staff
   ?store approve|reject <who> \xB7 a bought greetin'
 
@@ -34346,7 +35696,13 @@ Say ?apply and pick 'luxury guest'.
       rattie: "rat",
       rodent: "rat",
       mouse: "rat",
-      mousey: "rat"
+      mousey: "rat",
+      dragoness: "dragon",
+      drake: "dragon",
+      wyrm: "dragon",
+      wyvern: "dragon",
+      draconic: "dragon",
+      kobold: "dragon"
     };
     const NOT_STOCK = /\b(no|nope|nah|not stock|not livestock|not an animal|not one|human|person|staff|farmhand|guest|luxury|visitor|none|skip|n\/?a)\b/;
     const NOT_ANIMAL = /^(yes|yeah|yep|ok|okay|sure|maybe|what|huh|help|hi|hello|stock|livestock|animal|both|me|it|idk)$/;
@@ -34719,7 +36075,7 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
       return null;
     }
     function nearestCommand(cmd, sender) {
-      const pool = PUBLIC_CMDS.concat(isStaff(sender) ? STAFF_CMDS : [], [...ADDON_CMDS].filter(([, x]) => addonVisible(x.addon, sender)).map(([w]) => w));
+      const pool = PUBLIC_CMDS.filter((c) => !NURSERY_CMDS.includes(c) || !nurseryHidden(sender)).concat(isStaff(sender) ? STAFF_CMDS : [], [...ADDON_CMDS].filter(([, x]) => addonVisible(x.addon, sender)).map(([w]) => w));
       const strip = cmd.replace(/^[a-z][-.]/, "");
       if (strip !== cmd && pool.includes(strip)) return strip;
       if (cmd.length < 4) return null;
@@ -34925,7 +36281,13 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
       "nevercall",
       "intensity",
       "keep",
-      "kept"
+      "kept",
+      "services",
+      "service",
+      "coax",
+      "nursery",
+      "little",
+      "care"
     ];
     const STAFF_CMDS = [
       "queue",
@@ -35012,7 +36374,7 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
       "purge"
     ];
     const SAFETY_CMDS = ["safe", "safeword", "red", "stuck"];
-    const STOCK_PLAY = ["milk", "edge"];
+    const STOCK_PLAY = ["milk", "edge", "drain"];
     function stockPlayOk(by, t) {
       const r = rec(t);
       if (r && r.freeuse) return true;
@@ -35301,6 +36663,25 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
         reply(sender, myContractsText(sender), channel === "chat" ? canBeep(sender) ? "beep" : "whisper" : channel);
         return;
       }
+      {
+        const no = nurseryGate(sender, cmd, args);
+        if (no) {
+          reply(sender, no, channel === "chat" ? canBeep(sender) ? "beep" : "whisper" : channel);
+          return;
+        }
+      }
+      const drainSelf = cmd === "drain" && !isStaff(sender) && (!args[0] || /^(me|myself|self)$/i.test(args[0]) || !!holesFrom(args[0]) || (() => {
+        try {
+          return resolveTarget(args[0]) === sender;
+        } catch (e) {
+          return false;
+        }
+      })());
+      if (drainSelf) {
+        const hole = args[0] && holesFrom(args[0]) ? args[0] : args[1];
+        selfDrain(sender, hole, (txt) => reply(sender, txt, channel === "chat" ? canBeep(sender) ? "beep" : "whisper" : channel));
+        return;
+      }
       const joining = ["register", "stock", "approve", "grant", "claim"].includes(cmd) && !(rec(sender) && (rec(sender).roles || []).length);
       if (STOCK_PLAY.includes(cmd) && !isStaff(sender) && rec(sender) && (rec(sender).roles || []).length) {
         const t = resolveTarget(args[0]);
@@ -35318,7 +36699,7 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
           return;
         }
         if (!stockPlayOk(sender, t)) {
-          const what = cmd === "milk" ? "milk you by hand" : "edge you";
+          const what = cmd === "milk" ? "milk you by hand" : cmd === "drain" ? "drain you into the bucket" : "edge you";
           addonAsks.set(t, { addon: null, at: Date.now(), cb: (yes) => {
             if (!yes) {
               tell(sender, plainName(t) + " said no, sugar. Leave 'em be.");
@@ -35328,7 +36709,7 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
             tell(sender, plainName(t) + " said yes. Go on, sugar.");
             handleCommand(sender, raw, channel, true);
           } });
-          askCard(t, "play", (cmd === "milk" ? "\u{1F95B} " : "\u{1F608} ") + plainName(sender) + " wants to " + what + ", sugar. Say yes or no (?yes or ?no works too).");
+          askCard(t, "play", (cmd === "milk" ? "\u{1F95B} " : cmd === "drain" ? "\u{1FAA3} " : "\u{1F608} ") + plainName(sender) + " wants to " + what + ", sugar. Say yes or no (?yes or ?no works too).");
           reply(sender, "I've asked " + plainName(t) + " first, sugar. Once they say yes, it'll happen.", channel);
           return;
         }
@@ -35444,7 +36825,7 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
           if (p2.pin && !sizePinned(t)) p2.pin = null;
           saveLedger();
           audit(sender, "DRAIN", t + " " + Math.round(out));
-          if (charFor(t)) emote("\u{1FAA3} " + plainName(sender) + " presses down on " + plainName(t) + "'s belly and pumps 'em out: " + ml(out) + " of seed gushes into the bucket, splashin' everywhere. What a beautiful mess.", t);
+          if (charFor(t)) emote(t === sender ? "\u{1FAA3} " + selfDrainLine(t, hs, out) : !isStaff(sender) ? friendDrainLine(sender, t, out) : "\u{1FAA3} " + plainName(sender) + " presses down on " + plainName(t) + "'s belly and pumps 'em out: " + ml(out) + " of seed gushes into the bucket, splashin' everywhere. What a beautiful mess.", t);
           else R("\u{1FAA3} Drained " + ml(out) + " out of " + plainName(t) + ".");
           break;
         }
@@ -37440,6 +38821,18 @@ Welcome to B&B Farm, hon. \u{1F33E}`
           trapCommand(cmd === "watersport" ? "watersports" : cmd, sender, args, R);
           break;
         // 10u-traps.js
+        case "nursery":
+        case "little":
+        case "care":
+          nurseryCommand(cmd, sender, args, R, huh);
+          break;
+        // 10up2-nursery.js
+        case "services":
+        case "service":
+        case "coax":
+          serviceCommand(cmd, sender, args, R);
+          break;
+        // 10uo-services.js
         case "parasite":
         case "parasites":
         case "purge":
@@ -37815,6 +39208,33 @@ Welcome to B&B Farm, hon. \u{1F33E}`
         }
         /* ── BRANDS ── */
         case "brand": {
+          if (/^all$/i.test(args[0] || "")) {
+            if (!isProprietor(sender)) {
+              R("Only proprietors brand the whole herd, sugar.");
+              break;
+            }
+            if (/^(clear|off|none)$/i.test(args[1] || "")) {
+              L2.brandAll = null;
+              saveLedger();
+              syncCompanions(true);
+              R("\u{1F525} The herd's brand is off. Anybody branded on their own keeps theirs.");
+              break;
+            }
+            if (!/^logo$/i.test(args[1] || "")) {
+              R("?brand all logo [place] puts the farm's brand on every livestock, ?brand all clear takes it off. Places: " + BRAND_PLACE_WORDS + ".");
+              break;
+            }
+            L2.brandAll = { place: brandPlaceFrom(args.slice(2).join(" ")) || "hipR", by: sender, at: Date.now() };
+            saveLedger();
+            syncCompanions(true);
+            audit(sender, "BRAND_ALL", L2.brandAll.place);
+            R("\u{1F525} Every livestock on the books carries the B&B brand now (" + brandPlaceName(L2.brandAll.place) + "). Players see it with the Companion; ?brand all clear takes it off.");
+            break;
+          }
+          if (/^logo$/i.test(args[1] || "")) {
+            brandLogo(sender, resolveTarget(args[0]), args.slice(2).join(" "), R);
+            break;
+          }
           const t = resolveTarget(args[0]);
           const r = t ? rec(t) : null;
           if (!r) {
@@ -39447,6 +40867,11 @@ Welcome to B&B Farm, hon. \u{1F33E}`
           roamTick();
         } catch (e) {
           warn("roam:", e);
+        }
+        try {
+          nurseryTick();
+        } catch (e) {
+          warn("nursery:", e);
         }
         rutTick();
         quotaTick();

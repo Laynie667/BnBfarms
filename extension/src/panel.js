@@ -16,12 +16,14 @@ import { GUEST_TABS } from "./views/guest.js";
 import { STAFF_TABS } from "./views/staff.js";
 import { DASHBOARD_TABS } from "./views/dashboard.js";
 import { withExtras } from "./views/extras.js";
+import { NURSERY_TABS } from "./views/nursery.js";
 
 const VIEWS = {
   guest: { label: "Guest", tabs: GUEST_TABS },
   livestock: { label: "Livestock", tabs: LIVESTOCK_TABS },
   staff: { label: "Staff", tabs: STAFF_TABS },
   dashboard: { label: "Dashboard", tabs: DASHBOARD_TABS },
+  nursery: { label: "🧸 Nursery", tabs: NURSERY_TABS },   // only for people on the nursery list (views/nursery.js)
 };
 
 function loadPrefs() { try { return JSON.parse(window.localStorage.getItem(PREFS_KEY)) || {}; } catch (e) { return {}; } }
@@ -186,6 +188,7 @@ export class Panel {
     const s = this.s, v = [s.onBooks ? "livestock" : "guest"];
     if (s.staff) v.push("staff");
     if (s.proprietor) v.push("dashboard");
+    if (s.nursery && s.nursery.role) v.push("nursery");
     return v;
   }
   view() { const v = this.views(); return v.includes(this.prefs.view) ? this.prefs.view : v[v.length > 1 && this.s.staff ? 1 : 0]; }
@@ -213,7 +216,7 @@ export class Panel {
   render() {
     this.pending = false;
     const ctx = this.ctx(), view = this.view(), V = VIEWS[view];
-    const tabs = (view === "guest" ? V.tabs : withExtras(V.tabs, view, ctx)).filter((t) => !t.show || t.show(ctx));   // + "Farm extras" when an add-on has somethin'; a tab with show() only when it says so (the Log tab)
+    const tabs = (view === "guest" || view === "nursery" ? V.tabs : withExtras(V.tabs, view, ctx)).filter((t) => !t.show || t.show(ctx));   // + "Farm extras" when an add-on has somethin'; a tab with show() only when it says so (the Log tab)
     const tabKey = "tab_" + view, tab = tabs.find((t) => t.id === this.ui[tabKey]) || tabs[0];
     const scroll = this.el.querySelector(".fhc-body"), keep = scroll ? scroll.scrollTop : 0;
     const nav0 = this.el.querySelector("nav.fhc-tabs"), navKeep = nav0 ? nav0.scrollLeft : 0;

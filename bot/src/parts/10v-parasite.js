@@ -52,18 +52,18 @@
     parasiteBorn(mn);   // its strain, its first urge (10v2-parasite-more.js)
     // how it got on them: the line the room sees and the first words they're told both follow it. Only the glory hole
     // comes with a cock; a kiss, a teat, an egg, a seed or the farm girl's hand each tell it their own way.
-    const via = /^kissed/.test(how || "") ? "kiss" : /^nursed/.test(how || "") ? "nurse" : how === "grew back" ? "regrow" : /^hatched/.test(how || "") ? "hatch" : how === "given" ? "given" : "glory";
+    const via = /^kissed/.test(how || "") ? "kiss" : /^nursed/.test(how || "") ? "nurse" : how === "grew back" ? "regrow" : /^hatched/.test(how || "") ? "hatch" : how === "given" ? "given" : how === "hop" ? "hop" : "glory";
     const came = { glory: "Somethin' came through the hole with that last cock, sugar", kiss: "That kiss left somethin' behind, sugar", nurse: "Somethin' came down with that milk, sugar",
-                   regrow: "The last one left a seed in you, sugar, and it's grown back", hatch: "That egg in the nest had one of 'em curled up in it, sugar", given: "The farm girl's put one on you, sugar" }[via];
+                   regrow: "The last one left a seed in you, sugar, and it's grown back", hatch: "That egg in the nest had one of 'em curled up in it, sugar", given: "The farm girl's put one on you, sugar", hop: "It hopped off the one you were coaxin' and onto you, sugar" }[via];
     if (belt){
       saveLedger(); audit(CFG.BOT_MEMBER, "PARASITE", mn+" latched as a belt"+(how ? " ("+how+")" : ""));
-      emote("👄 "+paraLine(via === "glory" ? "latchBelt" : "latchBeltAny", mn), mn);
+      if (via !== "hop") emote("👄 "+paraLine(via === "glory" ? "latchBelt" : "latchBeltAny", mn), mn);
       tell(mn, "👄 "+came+", and it knows you now. This time it didn't stop at your mouth: it slid down your body and closed round your hips, a livin' belt with a root up inside you. "+CFG.PARASITE_HOURS+" hours. It feeds you its serum, regular, and now it's every load you take in your "+(hasVulva(mn) ? "pussy or your ass" : "ass")+" that it drinks and turns into more. Your safeword takes it off right now.");
       face(mn, "edged", 60); arouse(mn, 25); syncCompanions(true);
       return;
     }
     saveLedger(); audit(CFG.BOT_MEMBER, "PARASITE", mn+" latched"+(how ? " ("+how+")" : ""));
-    if (via !== "regrow") emote("👄 "+paraLine(via === "glory" ? "latch" : "latch_"+via, mn), mn);   // (a seed growin' back has its own line already)
+    if (via !== "regrow" && via !== "hop") emote("👄 "+paraLine(via === "glory" ? "latch" : "latch_"+via, mn), mn);   // (a seed growin' back has its own line already)
     tell(mn, "👄 "+came+(via === "regrow" ? " over your mouth" : ", and it's sealed itself over your mouth")+": a pair of fat, livin' lips with a tentacle down your throat. It'll feed you its serum, regular, for the next "+CFG.PARASITE_HOURS+" hours, and every load you swallow, it turns into more. It gets hungry, and so will you. Kiss somebody who said ?parasite on and it'll bud onto them. "+
              "It drops off on its own when it's done. Your safeword takes it off right now.");
     face(mn, "edged", 60); arouse(mn, 20);
@@ -81,7 +81,7 @@
     else r.crave = how === "safe" ? null : { until: Date.now() + CFG.CRAVE_HOURS*3600000, ate: Date.now(), told: Date.now() };   // the cravin' it leaves behind
     saveLedger(); audit(CFG.BOT_MEMBER, "PARASITE", mn+" off ("+(how || "done")+")");
     if (how === "safe" || !was && how !== "done") return true;
-    if (charFor(mn)) emote("👄 "+paraLine(wasBelt ? "offBelt" : how === "purge" ? "purge" : "off", mn), mn);
+    if (charFor(mn) && how !== "service") emote("👄 "+paraLine(wasBelt ? "offBelt" : how === "purge" ? "purge" : "off", mn), mn);
     tell(mn, "👄 The parasite's off you, sugar. It gave you "+n+" dose"+(n === 1 ? "" : "s")+" and drank "+fed+" load"+(fed === 1 ? "" : "s")+" through you while it was on.");
     syncCompanions(true);
     return true;

@@ -460,6 +460,7 @@
     if (milkDenied(mn)) return 0;
     const take = Math.min(p.milk, amount);
     if (!(take >= 1)) return 0;
+    try { shotTrigger(mn, "milked"); } catch(e){ warn("milked trigger:", e); }   // (10ur-shots-more.js)
     const now = Date.now();
     if (!nursing){
       const d = dayKey(); if (!p.mday || p.mday.day !== d) p.mday = { day:d, ml:0 };
@@ -555,8 +556,9 @@
     if (p.preg) chance *= CFG.PROD.EXTRA_SIRE_X;
     chance *= dangerX(mother).chance;
     chance *= openX(mother);            // wide open for an hour after a birth or a layin' (10y7-udders.js)   // a Danger Draught (10z-trap-variants.js)
-    chance = Math.min(0.95, chance);
+    chance = boosted(p, "ripe") ? 1 : Math.min(0.95, chance);   // ripe from a shot: the next load that can take, takes (10ur-shots-more.js)
     if (Math.random() >= chance) return null;
+    if (p.boosts && p.boosts.ripe) delete p.boosts.ripe;
     if (p.preg){ p.preg.sires.push(stud); return "extra"; }
     const [lo,hi] = speciesInfo(mother).litter;
     let count = lo + Math.floor(Math.random()*(hi-lo+1));
@@ -566,6 +568,8 @@
       const [a, b] = CFG.HYPER_LITTER_X, hx = 1 + 0.5*Math.max(0, boostLevel(p, "hyper") - 1);   // stacked hyper shots: bigger yet
       count = Math.min(CFG.HYPER_MAX, Math.max(count + 2, Math.round(count * (a + Math.random()*(b - a)) * hx)));
     }
+    // a twins shot: double, a triple dose triples (10ur-shots-more.js)
+    if (boosted(p, "twins")){ count = Math.min(CFG.HYPER_MAX, count * (1 + ((p.boostX && p.boostX.twins) || 1))); delete p.boosts.twins; }
     p.preg = { since:now, due: now + CFG.PROD.PREG_DAYS*86400000, sires:[stud], count, warned:false };
     try { bredBack(mother); } catch(e){ warn("bred back:", e); }
     if (hole === "butt") p.preg.via = "butt";   // carried in the ass (mpreg)
@@ -1025,6 +1029,7 @@
       if (pent){ sp.pentUp = false; sp.semenFullSince = 0; }
       load = base * (T.loadX || 1);            // a flared or ridged cock pumps more than it drains
       if (sp.edges){ load *= 1 + CFG.EDGE_X * Math.min(sp.edges, CFG.EDGE_MAX); opt.edged = sp.edges; sp.edges = 0; }
+      load *= floodX(sp);   // a flood serum (10ur-shots-more.js)
       // stamina: a stud who's been busy this hour runs drier (pent up or a virility shot skips it)
       sp.fills = (sp.fills||[]).filter(x => Date.now() - x < 3600000);
       if (!pent && !boosted(sp,"semen") && sp.fills.length >= CFG.STAMINA_FILLS)

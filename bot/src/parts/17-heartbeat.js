@@ -53,6 +53,7 @@
       try { echsTick(); } catch(e){ warn("echs:", e); }
       try { roamTick(); } catch(e){ warn("roam:", e); }
       try { nurseryTick(); } catch(e){ warn("nursery:", e); }
+      try { shotsMoreTick(); } catch(e){ warn("shots more:", e); }
       rutTick();
       quotaTick();
       prodTick();

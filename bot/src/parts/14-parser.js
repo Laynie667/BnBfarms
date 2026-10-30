@@ -137,7 +137,7 @@
                        "stats","board","pedigree","breedable","fertile","mpreg","naturalheat","breed","cum","milkable","seedmilk","outfitwheel","dresswheel","wheeloutfit","grooming","futa","size","sizes","measure","penis","cock","rights","accept",
                        "freeuse","jarok","gender","outfit","outfits","uniform","hypno","tally","eggs","yes","no","wash","quota","praise","degrade",
                        "weather","feeding","curfew","beg","please","fair","enter","addons","addon",
-                       "ribbons","ribbon","store","buy","messes","ownoutfit","myoutfit","chest","gift","potions","potion","dares","dare","dared","bench","use","feedback","suggest","idea","bug","meh","more","today","subject","subjects","traps","trap","watersports","parasite","symbiote","symbiotes","struggle","free","goad","hunt","lay","gather","pack","watersport","parasites","eager","quiet","tend","brood","bet","cleanse","corruption","gauntlet","lend","bid","route","mysterybox","suit","whistle","send","dose","herdtraps","sit","broody","album","holes","vat","stalldial","bringin","bedrest","callme","nevercall","intensity","keep","kept","seasons","calendar","trickortreat","tot","stocking","stockings","egghunt","rate","renew","renewal","renewals","services","service","coax","nursery","little","care"];
+                       "ribbons","ribbon","store","buy","messes","ownoutfit","myoutfit","chest","gift","potions","potion","dares","dare","dared","bench","use","feedback","suggest","idea","bug","meh","more","today","subject","subjects","traps","trap","watersports","parasite","symbiote","symbiotes","struggle","free","goad","hunt","lay","gather","pack","watersport","parasites","eager","quiet","tend","brood","bet","cleanse","corruption","gauntlet","lend","bid","route","mysterybox","suit","whistle","send","dose","herdtraps","sit","broody","album","holes","vat","stalldial","bringin","bedrest","callme","nevercall","intensity","keep","kept","seasons","calendar","trickortreat","tot","stocking","stockings","egghunt","rate","renew","renewal","renewals","services","service","coax","nursery","little","care","kryptonite","myshots","shotsin"];
   const STAFF_CMDS  = ["queue","app","approve","deny","register","unregister","grant","revoke",
                        "claim","release","myherd","herdname","herdcall","herdsummon","turnout","letup","goldkey",
                        "pasture","onduty","cover","staffadd","staffremove",
@@ -158,7 +158,7 @@
     state.playOk = state.playOk || new Map();
     const u = state.playOk.get(t+":"+by); return !!(u && u > Date.now());
   }
-  const PRIVATE_REPLY = ["today","feedback","suggest","idea","bug","meh","more","record","keys","find","app","queue","roster","stock","health",
+  const PRIVATE_REPLY = ["kryptonite","myshots","shotsin","today","feedback","suggest","idea","bug","meh","more","record","keys","find","app","queue","roster","stock","health",
                          "myherd","herd","stucklog","keydump","summon","where","cover",
                          "vet","spot","spots","tease","teaseme","stats","pedigree",
                          "hours","chores","wheel","tourstop","quota","contract","contracts"];

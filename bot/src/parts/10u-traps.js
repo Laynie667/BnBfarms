@@ -30,7 +30,7 @@
   function isSubject(mn){
     const r = rec(mn); if (!r) return false;
     if (Array.isArray(r.roles) && r.roles.includes(ROLE.SUBJECT)){ r.roles = r.roles.filter(x => x !== ROLE.SUBJECT); if (r.trapsOn === undefined) r.trapsOn = !r.trapsOff; r.trapsOff = false; }
-    return !!r.trapsOn;
+    return !!r.trapsOn || kryptoNow(mn);   // a proprietor down to stock by their kryptonite (10ur-shots-more.js)
   }
   const TRAP_KINDS = {
     injector: { icon: "💉", what: "a needle on a spring arm: a dose of whatever it's loaded with", limit: null },
@@ -221,6 +221,7 @@
   function hyperEggs(mn, luck){ const p = prodOf(mn); return wornTags(mn).has("hyper") || boosted(p, "hyper") || Math.random() < (luck || 0); }
 
   function springTrap(mn, kind, spot, force){
+    try { shotTrigger(mn, "trap"); } catch(e){ warn("trap trigger:", e); }   // an injector that answers a trap (10ur-shots-more.js)
     let drewBy = "";
     if (kind === "random"){
       // a tile in a place springs that place's traps (10ua-trap-themes.js); nothin' fits there, or no place: any trap
@@ -470,8 +471,10 @@
         if (!text || !/^Item/.test(g)) continue;
         const due = (k, mins) => { const t = p.toyAt[k+key]; if (!t){ p.toyAt[k+key] = now + mins*60000*(0.3 + Math.random()*0.4); return false; } if (now < t) return false; p.toyAt[k+key] = now + mins*60000*(0.8 + Math.random()*0.4); return true; };
         // an auto-injector: whatever else the item says, every half hour
-        if (hasWord(text, AUTO_INJECT) && due("inj", CFG.AUTOINJECT_MIN)){
-          const ok = applyShot(mn, BOTMN(), text, { open: tFill(pickFor(mn, "toy:inj", TOY_LINES.inject), mn, { c: itemName(it) }), from: "your "+itemName(it)+"'s dose", heatH: 1 });
+        // a drip keeps it topped up instead; one with a trigger waits for its moment (10ur-shots-more.js)
+        if (isDrip(text) && due("drip", CFG.SHOTS2.DRIP_MIN)) shotDrip(mn, it, text);
+        else if (hasWord(text, AUTO_INJECT) && !isDrip(text) && !triggerOf(text).length && due("inj", CFG.AUTOINJECT_MIN)){
+          const ok = applyShot(mn, BOTMN(), isRoulette(text) ? rouletteText(mn, text) : text, { auto: true, open: tFill(pickFor(mn, "toy:inj", TOY_LINES.inject), mn, { c: itemName(it) }), from: "your "+itemName(it)+"'s dose", heatH: 1 });
           if (ok) audit(BOTMN(), "AUTOINJECT", mn+" "+itemName(it));
         }
         // an ovipositor on a gag, a belt, a plug or a dildo
@@ -525,6 +528,7 @@
     if (makesMilk(mn) && p.milk >= milkCap(mn)*0.95) s += 0.2;                              // udders fit to burst
     const r = rec(mn); if (r && r.penned && !r.penned.trap) s += 0.3;                       // hobbled in the pen
     if (r && r.gluedUntil > now) s += 0.6;                                                  // glue or slime still on their feet
+    if (boosted(p, "sedate")) s += 0.8;                                                     // a sedative in 'em (10ur-shots-more.js)
     return Math.round(Math.min(CFG.SLOW_MAX, s) * 10) / 10;
   }
 

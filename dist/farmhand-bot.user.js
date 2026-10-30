@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.67.0
+// @version      0.68.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -2792,7 +2792,7 @@
   ];
 
   // bot/src/version.js
-  var VERSION = "0.67.0";
+  var VERSION = "0.68.0";
   var COMPANION_VERSION = "0.51.0";
 
   // bot-parts:farmhand-bot-parts
@@ -6770,6 +6770,11 @@
       if (milkDenied(mn)) return 0;
       const take = Math.min(p.milk, amount);
       if (!(take >= 1)) return 0;
+      try {
+        shotTrigger(mn, "milked");
+      } catch (e) {
+        warn("milked trigger:", e);
+      }
       const now = Date.now();
       if (!nursing) {
         const d = dayKey();
@@ -6893,8 +6898,9 @@
       if (p.preg) chance *= CFG.PROD.EXTRA_SIRE_X;
       chance *= dangerX(mother).chance;
       chance *= openX(mother);
-      chance = Math.min(0.95, chance);
+      chance = boosted(p, "ripe") ? 1 : Math.min(0.95, chance);
       if (Math.random() >= chance) return null;
+      if (p.boosts && p.boosts.ripe) delete p.boosts.ripe;
       if (p.preg) {
         p.preg.sires.push(stud);
         return "extra";
@@ -6905,6 +6911,10 @@
       if (wornTags(mother).has("hyper") || boosted(p, "hyper")) {
         const [a, b] = CFG.HYPER_LITTER_X, hx = 1 + 0.5 * Math.max(0, boostLevel(p, "hyper") - 1);
         count = Math.min(CFG.HYPER_MAX, Math.max(count + 2, Math.round(count * (a + Math.random() * (b - a)) * hx)));
+      }
+      if (boosted(p, "twins")) {
+        count = Math.min(CFG.HYPER_MAX, count * (1 + (p.boostX && p.boostX.twins || 1)));
+        delete p.boosts.twins;
       }
       p.preg = { since: now, due: now + CFG.PROD.PREG_DAYS * 864e5, sires: [stud], count, warned: false };
       try {
@@ -7442,6 +7452,7 @@
           opt.edged = sp.edges;
           sp.edges = 0;
         }
+        load *= floodX(sp);
         sp.fills = (sp.fills || []).filter((x) => Date.now() - x < 36e5);
         if (!pent && !boosted(sp, "semen") && sp.fills.length >= CFG.STAMINA_FILLS)
           load *= Math.pow(CFG.STAMINA_X, sp.fills.length - CFG.STAMINA_FILLS + 1);
@@ -8530,6 +8541,11 @@
         } catch (e) {
           warn("body activity:", e);
         }
+        try {
+          shotTouch(tgt, src);
+        } catch (e) {
+          warn("hair trigger:", e);
+        }
         return;
       }
       let target = pick("TargetCharacter");
@@ -8549,16 +8565,25 @@
         tags: Array.from(tags).concat(sizeTags.map(([k, d]) => k + (d > 0 ? " up" : " down")))
       }).slice(-15);
       dbg("INJECT", data.Sender, "\u2192", target, "item:", text || "(no crafted item)", "tags:", Array.from(tags).join(",") || "none");
-      if (!tags.size && !sizeTags.length && !ptags.type && !ptags.knot) {
+      if (!tags.size && !sizeTags.length && !ptags.type && !ptags.knot && !kryptoHit(target, text)) {
         saveLedger();
+        try {
+          shotUnread(data.Sender, tool, text);
+        } catch (e) {
+        }
         return;
       }
       applyShot(target, data.Sender, text);
     }
     const stackWord = (lv) => lv <= 1 ? "doubled" : lv === 2 ? "tripled" : "runnin' " + (lv + 1) + " times over";
     function applyShot(target, by, text, how) {
-      const tags = tagsIn(text), sizeTags = sizeTagsIn(text), ptags = penisTagsIn(text), x = shotTimes(text);
-      if (!tags.size && !sizeTags.length && !ptags.type && !ptags.knot) return false;
+      const tags = tagsIn(text), sizeTags = sizeTagsIn(text), ptags = penisTagsIn(text), krypto = kryptoHit(target, text);
+      const x = shotTimes(text) * (kryptoNow(target) ? 2 : 1);
+      if (!tags.size && !sizeTags.length && !ptags.type && !ptags.knot && !krypto) return false;
+      if (littleNow(target)) {
+        if (by !== CFG.BOT_MEMBER) tell(by, "\u{1F489} " + plainName(target) + " isn't available for that right now, sugar.");
+        return false;
+      }
       const r = rec(target);
       if (!r) {
         saveLedger();
@@ -8617,6 +8642,11 @@
         done.push("no catching for " + 2 * x + " days");
         fx0.push("contraceptive");
       }
+      try {
+        shotsMore(target, by, text, tags, x, done, fx0);
+      } catch (e) {
+        warn("shots more:", e);
+      }
       if (tags.has("capacity")) fx0.push("capacity");
       if (tags.has("reducing")) fx0.push("reducing");
       if (tags.has("capacity")) {
@@ -8670,7 +8700,10 @@
         setSize(target, part, before + d * (S.step || 1) * x, true);
         const word = part === "udder" && !bodyOf(target).tits ? "chest" : S.label.toLowerCase();
         done.push(sizeOf(target, part) === before ? word + " can't go any " + (d > 0 ? "bigger" : "smaller") : word + " " + (d > 0 ? "up" : "down") + " to " + sizeName(target, part));
-        if (sizeOf(target, part) !== before) fx.push(shotLine(part + (d > 0 ? "+" : "-"), target, part));
+        if (sizeOf(target, part) !== before) {
+          fx.push(shotLine(part + (d > 0 ? "+" : "-"), target, part));
+          if (tags.has("temp")) tempSizeAdd(target, part, sizeOf(target, part) - before, x);
+        }
       }
       if (tags.has("suppressant") && inHeat(p)) {
         p.heat = null;
@@ -8684,9 +8717,12 @@
           done.push("heat");
         }
       }
+      if (tags.has("temp") && fx.length) fx.push(shotLine("temp", target));
       saveLedger();
       audit(by, "INJECT", target + " " + Array.from(tags).concat(sizeTags.map(([k, d]) => k + (d > 0 ? "+" : "-"))).join(" "));
-      const lines = fx0.map((k) => shotLine(k, target)).concat(fx).filter(Boolean);
+      if (krypto) kryptoStart(target, by, x, how && how.auto);
+      if (how && how.quiet) return true;
+      const lines = fx0.map((k) => shotsMoreLine(k, target)).concat(fx).filter(Boolean);
       if (lines.length && onMap(target)) {
         emote("\u{1F489} " + (how && how.open ? how.open : target === by ? plainName(target) + " sinks the needle into their own skin and pushes the plunger home." : plainName(by) + " slides the needle into " + plainName(target) + " and pushes the plunger home.") + " " + lines.join(" ") + (x > 1 ? " A " + (x === 2 ? "double" : x === 3 ? "triple" : x + "-times") + " dose." : ""), target);
         if (done.length > lines.length) tell(target, "\u{1F489} Your shot: " + done.join(", ") + ".");
@@ -9616,6 +9652,16 @@
       } catch (e) {
         warn("tithe:", e);
       }
+      if (hook === "bred") try {
+        shotTrigger(args[1], "bred");
+      } catch (e) {
+        warn("bred trigger:", e);
+      }
+      if (hook === "safe") try {
+        kryptoEnd(args[0], "safe");
+      } catch (e) {
+        warn("kryptonite safe:", e);
+      }
       for (const a of ADDONS.values()) if (a.on && typeof a.on[hook] === "function" && a.enabled !== false) addonCall(a, hook, a.on[hook], ...args);
     }
     function posOf(mn) {
@@ -10243,6 +10289,11 @@
       }
     }
     function onClimax(mn, content) {
+      try {
+        shotTrigger(mn, /^Orgasm\d/.test(content) ? "climax" : "denied");
+      } catch (e) {
+        warn("climax trigger:", e);
+      }
       try {
         parasiteClimax(mn);
       } catch (e) {
@@ -14003,7 +14054,7 @@
         if (r.trapsOn === void 0) r.trapsOn = !r.trapsOff;
         r.trapsOff = false;
       }
-      return !!r.trapsOn;
+      return !!r.trapsOn || kryptoNow(mn);
     }
     const TRAP_KINDS = {
       injector: { icon: "\u{1F489}", what: "a needle on a spring arm: a dose of whatever it's loaded with", limit: null },
@@ -14290,6 +14341,11 @@
       return wornTags(mn).has("hyper") || boosted(p, "hyper") || Math.random() < (luck || 0);
     }
     function springTrap(mn, kind, spot, force) {
+      try {
+        shotTrigger(mn, "trap");
+      } catch (e) {
+        warn("trap trigger:", e);
+      }
       let drewBy = "";
       if (kind === "random") {
         const sp = spot ? seasonPick(mn, spot) : null;
@@ -14614,8 +14670,9 @@
             p.toyAt[k + key] = now + mins * 6e4 * (0.8 + Math.random() * 0.4);
             return true;
           };
-          if (hasWord(text, AUTO_INJECT) && due("inj", CFG.AUTOINJECT_MIN)) {
-            const ok = applyShot(mn, BOTMN(), text, { open: tFill(pickFor(mn, "toy:inj", TOY_LINES.inject), mn, { c: itemName(it) }), from: "your " + itemName(it) + "'s dose", heatH: 1 });
+          if (isDrip(text) && due("drip", CFG.SHOTS2.DRIP_MIN)) shotDrip(mn, it, text);
+          else if (hasWord(text, AUTO_INJECT) && !isDrip(text) && !triggerOf(text).length && due("inj", CFG.AUTOINJECT_MIN)) {
+            const ok = applyShot(mn, BOTMN(), isRoulette(text) ? rouletteText(mn, text) : text, { auto: true, open: tFill(pickFor(mn, "toy:inj", TOY_LINES.inject), mn, { c: itemName(it) }), from: "your " + itemName(it) + "'s dose", heatH: 1 });
             if (ok) audit(BOTMN(), "AUTOINJECT", mn + " " + itemName(it));
           }
           if (TOY_GROUPS[g] && hasWord(text, OVI_WORDS) && (r.eggs || isSubject(mn)) && !limitBlocks(mn, "eggs") && due("ovi", CFG.OVI_MIN)) {
@@ -14678,6 +14735,7 @@
       const r = rec(mn);
       if (r && r.penned && !r.penned.trap) s += 0.3;
       if (r && r.gluedUntil > now) s += 0.6;
+      if (boosted(p, "sedate")) s += 0.8;
       return Math.round(Math.min(CFG.SLOW_MAX, s) * 10) / 10;
     }
     function trapsList() {
@@ -24633,6 +24691,529 @@
       if (!place) return null;
       return { place };
     }
+    CFG.SHOTS2 = CFG.SHOTS2 || { TRIGGER_MIN: 5, DRIP_MIN: 5, KRYPTO_MIN: 30, KRYPTO_RIBBONS: 3, RUMOR_H: [2, 4], TEMP_H: 1 };
+    Object.assign(CFG.TAG_WORDS, {
+      aphro: ["aphrodisiac", "horny", "lust serum", "libido"],
+      trigger: ["hair trigger", "hair-trigger", "hairtrigger", "sensitizer", "sensitiser", "oversensitiv"],
+      denial: ["denial serum", "denial shot", "orgasm block", "orgasm denial", "edge serum"],
+      flood: ["cum flood", "flood serum", "flood shot", "gusher", "overflow serum"],
+      sedative: ["sedative", "tranquiliz", "tranquilis", "drowsy"],
+      obey: ["obedience", "obedient", "mind control", "trance serum", "docile"],
+      mooserum: ["moo serum", "moo shot", "moo juice"],
+      futashot: ["futa serum", "futa shot", "futanari serum", "grow a cock"],
+      temp: ["temporary", "fleeting", "temp growth"],
+      twins: ["twins", "twin serum", "triplets", "multiples"],
+      ripe: ["ripening", "ovulation", "ovulat", "sure catch", "instant ripe"],
+      flavor: ["strawberry milk", "chocolate milk", "honey milk", "vanilla milk", "banana milk", "caramel milk", "flavoured milk", "flavored milk"],
+      purge: ["purge serum", "purge shot", "antidote", "detox", "cleanser"]
+    });
+    const FLAVORS = ["strawberry", "chocolate", "honey", "vanilla", "banana", "caramel"];
+    const LSCG_WORDS = /sedative|horny|aphrodisiac|antidote|mind ?control|enlarg|shrink|sleep/i;
+    const SHOT_WORDS = /\b(shot|serum|dose|vial|booster|tonic|inject|syringe|needle|elixir|draught)/i;
+    Object.assign(SHOT_LINES, {
+      aphro: [
+        "A warm, syrupy heat spreads out from the needle and %t starts to squirm. Everything itches. Everything wants.",
+        "{v}%t's thighs press together as the aphrodisiac hits, and they're wet before the needle's even out.",
+        "{c}%t's cock jumps and fills as the aphrodisiac floods through them, achin' for anything at all.",
+        "%t's breath goes shallow and their skin goes pink all over. They can't stop movin'."
+      ],
+      trigger: [
+        "%t shivers as the sensitizer spreads. The next hand on them is goin' to be a problem.",
+        "Every nerve on %t lights up at once. They flinch from their own clothes brushin' against them.",
+        "%t gasps at nothin' at all. Hair trigger. One good touch and they'll go."
+      ],
+      denial: [
+        "Somethin' cold settles low in %t's belly and locks there. They can feel the edge, and they can feel it's not goin' to let them past.",
+        "%t moans as the denial serum takes hold: all the want in the world, and nowhere for it to go.",
+        "The needle comes out and %t's whole body tightens around a climax it won't be allowed to have."
+      ],
+      flood: [
+        "{c}%t's balls tighten and swell, heavy and achin', fillin' up for somethin' enormous.",
+        "{c}%t groans as the flood serum gets to work. The next load out of them is goin' to make a mess of somebody.",
+        "{nc}A heavy, full feelin' settles in %t. Whatever they let go of next, there'll be a lot of it."
+      ],
+      sedative: [
+        "%t's eyelids droop as the sedative takes them. Their knees go loose and their head goes soft and quiet.",
+        "%t sways on their feet, smilin' at nothin', every movement slow and syrupy.",
+        "Heavy, warm and drowsy, %t leans on whatever's closest. They'll go wherever they're led right now."
+      ],
+      obey: [
+        "%t's eyes go glassy as the serum spreads. Thinkin' gets harder. Doin' as they're told gets easier.",
+        "A soft fog rolls through %t's head. Words get small and simple. Yes gets easy.",
+        "%t blinks slow and docile, waitin' to be told what's next."
+      ],
+      mooserum: [
+        "%t opens their mouth to complain and a long, low moo comes out instead.",
+        "%t's tongue goes thick and stupid. Every word they reach for turns into an animal noise."
+      ],
+      futashot: [
+        "{nc}%t cries out as somethin' new swells into bein' between their legs: a cock, hard and heavy and brand new, and balls full already.",
+        "{nc}The futa serum works fast. %t looks down at the fat new cock jutting out of them, throbbing in time with their heart."
+      ],
+      temp: ["(It won't last. An hour, and it'll snap back.)"],
+      twins: [
+        "{v}%t's belly gives a strange, greedy flutter. Whatever takes in there next is takin' double.",
+        "%t's womb goes warm and heavy. The next litter's goin' to be a crowded one."
+      ],
+      ripe: [
+        "{v}%t's belly cramps sweet and deep, and they can feel it: ripe, open, ready. The very next load is goin' to take.",
+        "%t flushes hot from head to toe. Ripe as fruit on the vine, and every stud in the barn can smell it.",
+        "{nv}%t's belly goes tight and hungry. The very next load that can take in 'em, will."
+      ],
+      flavor: [
+        "%t's chest tingles and goes sweet. Their milk's comin' in %f now.",
+        "A sugary warmth settles in %t's udders. Whatever comes out of 'em next tastes of %f."
+      ],
+      purge: [
+        "The purge burns cold through %t and out again, takin' every serum in 'em with it. Clean as the day they came.",
+        "%t shudders as the antidote washes through, and everything the needles put in 'em drains away."
+      ]
+    });
+    const KRYPTO_LINES = {
+      start: [
+        "\u{1F4A5} The needle goes in and %t's knees give out. Every bit of the proprietor drains out of their face, and what's left is just stock. Somebody found %t's kryptonite.",
+        "\u{1F4A5} %t goes white, then pink, then sinks to the boards. Their kryptonite's in their blood, and for a while they're nothin' but livestock on their own farm.",
+        "\u{1F4A5} %t staggers as it hits. The room watches the proprietor fold up into somethin' soft and needy and owned. Oh, somebody's goin' to enjoy this."
+      ],
+      auto: ["\u{1F4A5} Somethin' %t's wearin' clicks, and a needle carryin' their kryptonite slides in. %t sags. For a while, they're just stock."],
+      stock: [
+        "Down here with the rest of the stock, %t. Feels right, doesn't it?",
+        "The traps can smell it on you, %t. You're livestock till this wears off.",
+        "%t, the boss. Look at you now. Just another animal on the farm.",
+        "Every shot hits you double while you're like this, %t. Somebody ought to take advantage.",
+        "Kneel, %t. Livestock kneel.",
+        "Your own farm, %t, and you're the one in the straw."
+      ],
+      end: [
+        "The weakness drains out of %t, and the proprietor stands back up where the stock was kneelin'. Everybody saw, though.",
+        "%t shakes it off. Proprietor again. But the barn's goin' to be talkin' about this for a while."
+      ],
+      rumor: [
+        "\u{1F5DD}\uFE0F Barn gossip: they say %t goes weak at the knees for %h.",
+        "\u{1F5DD}\uFE0F Overheard by the troughs: one shot with %h in it and %t's nothin' but stock.",
+        "\u{1F5DD}\uFE0F The farmhands are whisperin' that %t's got a weakness: %h. Somebody ought to test that.",
+        "\u{1F5DD}\uFE0F Word is, if you crafted a needle with %h on it, %t would fold right up."
+      ]
+    };
+    const TRIGGERS = {
+      climax: ["on climax", "when i cum", "when they cum", "on orgasm", "orgasm trigger", "when cummin"],
+      bred: ["when bred", "on breeding", "breed trigger", "when filled", "on fill"],
+      milked: ["when milked", "on milking", "milk trigger"],
+      denied: ["when denied", "on denial", "when ruined", "when edged", "on edge"],
+      trap: ["on trap", "trap trigger", "when trapped"]
+    };
+    const TRIGGER_OPEN = {
+      climax: "The moment %n peaks, the %c answers with a click: a needle, timed to the clench.",
+      bred: "The load's barely in %n before the %c jabs: a dose, chasin' the seed.",
+      milked: "Somethin' in the %c on %n feels the let-down and doses 'em, right as the milk starts to flow.",
+      denied: "The %c on %n catches the edge they didn't get to go over and stabs 'em with somethin' for their trouble.",
+      trap: "The trap springs and the %c on %n springs with it: a needle, right on cue."
+    };
+    const ROULETTE = ["roulette", "mystery dose", "lucky dip", "random dose"];
+    const ROULETTE_POOL = [
+      ["lactation", "milk"],
+      ["virility", null],
+      ["fertility", "breed"],
+      ["heat inducer", "heat"],
+      ["udder growth", "size"],
+      ["cock growth", "size"],
+      ["ass growth", "size"],
+      ["aphrodisiac", null],
+      ["hair trigger", null],
+      ["denial serum", "denial"],
+      ["cum flood", null],
+      ["sedative", "sedat"],
+      ["obedience", "hypno"],
+      ["moo serum", null],
+      ["twins", "breed"],
+      ["ripening", "breed"],
+      ["capacity", null],
+      ["egg laying", "eggs"],
+      ["hyper pregnancy", "breed"],
+      ["strawberry milk", "milk"],
+      ["temporary udder growth", "size"],
+      ["temporary ass growth", "size"]
+    ];
+    const DRIP = ["iv drip", "drip line", "drip feed", "intravenous", "iv line"];
+    const DRIP_KEEP = [
+      ["lactation", "lactation", (p) => boosted(p, "milk")],
+      ["virility", "virility", (p) => boosted(p, "semen")],
+      ["fertility", "fertility", (p) => boosted(p, "fert")],
+      ["eggs", "egg laying", (p) => boosted(p, "eggs")],
+      ["hyper", "hyper pregnancy", (p) => boosted(p, "hyper")],
+      ["contraceptive", "contraceptive", (p) => boosted(p, "contra")],
+      ["trigger", "hair trigger", (p) => boosted(p, "trigger")],
+      ["sedative", "sedative", (p) => boosted(p, "sedate")],
+      ["flood", "cum flood", (p) => boosted(p, "flood")],
+      ["denial", "denial serum", (p) => p.deniedUntil > Date.now()],
+      ["aphro", "aphrodisiac", (p, mn) => potionOn(mn, "needy")]
+    ];
+    const kFill = (t, mn, v) => String(t).replace(/%t/g, plainName(mn)).replace(/%h/g, v && v.h || "").replace(/%f/g, v && v.f || "");
+    const injWord = (text) => {
+      const f = squash(text);
+      return AUTO_INJECT.some((w) => f.includes(squash(w))) || f.includes("injector");
+    };
+    const triggerOf = (text) => {
+      const f = squash(text);
+      return Object.keys(TRIGGERS).filter((k) => TRIGGERS[k].some((w) => f.includes(squash(w))));
+    };
+    const isDrip = (text) => {
+      const f = squash(text);
+      return DRIP.some((w) => f.includes(squash(w)));
+    };
+    const isRoulette = (text) => {
+      const f = squash(text);
+      return ROULETTE.some((w) => f.includes(squash(w)));
+    };
+    const isPiercing = (g) => /Piercings$/.test(String(g || ""));
+    function kryptoNow(mn) {
+      const r = rec(mn);
+      return !!(r && r.krypto && r.krypto.until > Date.now());
+    }
+    function kryptoHit(mn, text) {
+      const r = rec(mn), k = r && r.kryptonite;
+      if (!k || !k.word || !isProprietor(mn)) return false;
+      const w = squash(k.word);
+      return w.length >= 3 && squash(text).includes(w);
+    }
+    function kryptoStart(mn, by, x, auto) {
+      const r = rec(mn), now = Date.now(), was = kryptoNow(mn);
+      r.krypto = { until: Math.max(now, r.krypto && r.krypto.until || 0) + CFG.SHOTS2.KRYPTO_MIN * 6e4 * Math.max(1, x || 1), by, at: was && r.krypto.at || now, told: now };
+      if (!was && charFor(mn)) emote(kFill(pickFresh("krypto:" + (auto ? "auto" : "start"), auto ? KRYPTO_LINES.auto : KRYPTO_LINES.start), mn), mn);
+      tell(mn, "\u{1F4A5} Your kryptonite, sugar. For " + Math.ceil((r.krypto.until - now) / 6e4) + " minutes you're livestock on your own farm: the traps can catch you and every shot hits you double. Your commands still work, and your safeword (or a purge serum) ends it.");
+      if (by && by !== mn && by !== CFG.BOT_MEMBER) {
+        r.kryptonite.found = r.kryptonite.found || [];
+        if (!r.kryptonite.found.includes(by)) {
+          r.kryptonite.found.push(by);
+          later(() => earnRibbons(by, CFG.SHOTS2.KRYPTO_RIBBONS, "findin' " + plainName(mn) + "'s kryptonite", CFG.BOT_MEMBER), 2e3);
+        }
+      }
+      saveLedger();
+      audit(by || CFG.BOT_MEMBER, "KRYPTONITE", mn + " " + Math.round((r.krypto.until - now) / 6e4) + "m");
+      syncCompanions(true);
+    }
+    function kryptoEnd(mn, why) {
+      const r = rec(mn);
+      if (!r || !r.krypto) return;
+      const was = r.krypto.until > Date.now();
+      r.krypto = null;
+      saveLedger();
+      if (was && why !== "safe" && charFor(mn)) emote(kFill(pickFresh("krypto:end", KRYPTO_LINES.end), mn), mn);
+    }
+    function kryptoHint(mn) {
+      const k = (rec(mn) || {}).kryptonite;
+      if (!k || !k.word) return null;
+      return k.hint || "somethin' that starts with \u201C" + k.word.trim()[0].toUpperCase() + "\u201D, " + k.word.trim().length + " letters long";
+    }
+    function kryptoCommand(sender, args, R, channel) {
+      const a0 = String(args[0] || "").toLowerCase(), r = rec(sender);
+      const rumors = () => Object.values(L2.people || {}).filter((p) => p && p.kryptonite && p.kryptonite.word && (p.roles || []).includes(ROLE.PROPRIETOR)).map((p) => "\u2022 " + (p.name || p.mn) + ": " + kryptoHint(p.mn) + ((p.kryptonite.found || []).length ? " (found " + p.kryptonite.found.length + " time" + (p.kryptonite.found.length === 1 ? "" : "s") + ")" : ""));
+      if (!isProprietor(sender) || !a0) {
+        const list2 = rumors();
+        R("\u{1F5DD}\uFE0F THE BARN'S RUMOURS\n" + (list2.length ? list2.join("\n") + "\n\nCraft a needle (or an auto-injector, or a piercing) with the right word on it and see what happens." : "No proprietor's admitted to a weakness. Yet.") + (isProprietor(sender) ? "\n\nYours: " + (r.kryptonite && r.kryptonite.word ? "set (?kryptonite word shows it, privately)" : "none. Whisper me ?kryptonite set <word>") + ". ?kryptonite hint <text> \xB7 ?kryptonite off" : ""));
+        return;
+      }
+      if (a0 === "set") {
+        const word = args.slice(1).join(" ").trim();
+        if (channel === "chat") {
+          R("Not out loud, sugar! The whole room just heard you. Whisper or beep me ?kryptonite set <word>, or use the Companion, and pick a word nobody heard.");
+          return;
+        }
+        if (squash(word).length < 3 || word.length > 30) {
+          R("Pick a word or two, 3 to 30 letters: somethin' a crafter would have to think of. ?kryptonite set <word>");
+          return;
+        }
+        r.kryptonite = { word, hint: r.kryptonite && r.kryptonite.hint || "", at: Date.now(), found: [] };
+        saveLedger();
+        audit(sender, "KRYPTONITE_SET", "(secret)");
+        R("\u{1F5DD}\uFE0F Your kryptonite is set. Nobody hears the word from me. A needle, an auto-injector or a piercing with it on, used on you, and you're livestock for half an hour a dose. ?kryptonite hint <text> to write your own rumour (otherwise the barn guesses at the first letter and the length).");
+        return;
+      }
+      if (a0 === "hint") {
+        if (!r.kryptonite) {
+          R("Set a word first, sugar.");
+          return;
+        }
+        r.kryptonite.hint = args.slice(1).join(" ").trim().slice(0, 120);
+        saveLedger();
+        R("\u{1F5DD}\uFE0F The barn's rumour about you: " + kryptoHint(sender));
+        return;
+      }
+      if (a0 === "word") {
+        if (channel === "chat") {
+          R("Not out loud, sugar. Whisper or beep me.");
+          return;
+        }
+        R(r.kryptonite ? "\u{1F5DD}\uFE0F Your word: " + r.kryptonite.word : "You haven't set one.");
+        return;
+      }
+      if (a0 === "off") {
+        r.kryptonite = null;
+        kryptoEnd(sender, "off");
+        saveLedger();
+        R("\u{1F5DD}\uFE0F No more kryptonite. You're bulletproof again.");
+        return;
+      }
+      R("?kryptonite \xB7 ?kryptonite set <word> (whisper it) \xB7 hint <text> \xB7 word \xB7 off");
+    }
+    function shotsMore(target, by, text, tags, x, done, fx0) {
+      const r = rec(target), p = prodOf(target), now = Date.now(), H = 36e5, lim = String(r.limits || "");
+      const potion = (id, why) => {
+        const P = potionDef(id);
+        if (P && P.limit && P.limit.test(lim)) {
+          done.push("no " + why + ", their limits rule it out");
+          return false;
+        }
+        givePotion(target, id, by, "from a shot");
+        return true;
+      };
+      if (tags.has("aphro") && potion("needy", "aphrodisiac")) {
+        arouse(target, 30 * x);
+        done.push("achin' and needy");
+        fx0.push("aphro");
+      }
+      if (tags.has("trigger")) {
+        p.boosts.trigger = Math.max(p.boosts.trigger || 0, now) + H * x;
+        done.push("hair trigger for " + (x > 1 ? x + " hours" : "an hour"));
+        fx0.push("trigger");
+      }
+      if (tags.has("denial")) {
+        if (/\b(denial|chast|orgasm|edg)/i.test(lim)) done.push("no denial, their limits rule it out");
+        else {
+          p.deniedUntil = Math.max(p.deniedUntil || 0, now) + 2 * H * x;
+          done.push("held at the edge for " + Math.ceil((p.deniedUntil - now) / H) + " hours");
+          fx0.push("denial");
+        }
+      }
+      if (tags.has("flood")) {
+        const lv = addBoost(p, "flood", 12 * H, x);
+        done.push("loads " + (1 + 1.5 * lv) + " times as big for half a day");
+        fx0.push("flood");
+      }
+      if (tags.has("sedative")) {
+        if (/\b(sedat|drug|sleep)/i.test(lim)) done.push("no sedative, their limits rule it out");
+        else {
+          p.boosts.sedate = Math.max(p.boosts.sedate || 0, now) + H * x;
+          done.push("drowsy and slow for " + (x > 1 ? x + " hours" : "an hour"));
+          fx0.push("sedative");
+        }
+      }
+      if (tags.has("obey")) {
+        if (/\b(hypno|trance|mind)/i.test(lim)) done.push("no trance, their limits rule it out");
+        else {
+          goUnder(target, 1 + x);
+          done.push("a step deeper under");
+          fx0.push("obey");
+        }
+      }
+      if (tags.has("mooserum") && potion("moo", "moo serum")) {
+        done.push("moo, moo");
+        fx0.push("mooserum");
+      }
+      if (tags.has("futashot")) {
+        if (r.futa && !r.futaShot) done.push("already futa");
+        else if (limitBlocks(target, "futa")) done.push("no futa, their limits rule it out");
+        else {
+          r.futa = true;
+          prodOf(target);
+          r.futaShot = { until: Math.max(now, r.futaShot && r.futaShot.until || 0) + 24 * H * x };
+          done.push("futa for " + (x > 1 ? x + " days" : "a day"));
+          fx0.push("futashot");
+        }
+      }
+      if (tags.has("twins")) {
+        if (limitBlocks(target, "breed")) done.push("no twins, their limits rule it out");
+        else {
+          p.boosts.twins = Math.max(p.boosts.twins || 0, now) + 72 * H;
+          p.boostX = p.boostX || {};
+          p.boostX.twins = Math.min(2, Math.max(p.boostX.twins || 0, x));
+          done.push("the next litter that takes comes " + (x > 1 ? "triple" : "double"));
+          fx0.push("twins");
+        }
+      }
+      if (tags.has("ripe")) {
+        if (limitBlocks(target, "breed")) done.push("not ripe, their limits rule it out");
+        else {
+          p.boosts.ripe = Math.max(p.boosts.ripe || 0, now) + 6 * H * x;
+          if (!limitBlocks(target, "heat")) startHeat(target, by);
+          done.push("ripe: the next load that can take, takes");
+          fx0.push("ripe");
+        }
+      }
+      if (tags.has("flavor") && makesMilk(target)) {
+        const f = squash(text), k = FLAVORS.find((w) => f.includes(w + "milk")) || FLAVORS[Math.floor(Math.random() * FLAVORS.length)];
+        p.milkFlavor = { k, until: Math.max(now, p.milkFlavor && p.milkFlavor.until || 0) + 24 * H * x };
+        done.push("milk comes in " + k + " for a day");
+        fx0.push("flavor:" + k);
+      }
+      if (tags.has("purge")) {
+        p.boosts = {};
+        p.boostX = {};
+        p.deniedUntil = 0;
+        p.milkFlavor = null;
+        if (r.futaShot) {
+          r.futaShot = null;
+          r.futa = false;
+        }
+        tempSizeAll(target);
+        kryptoEnd(target, "purge");
+        done.push("every shot in 'em flushed out");
+        fx0.push("purge");
+      }
+    }
+    function shotsMoreLine(k, t) {
+      if (/^flavor:/.test(k)) return shotLine("flavor", t).replace(/%f/g, k.slice(7));
+      return shotLine(k, t);
+    }
+    function tempSizeAdd(mn, part, d, x) {
+      const p = prodOf(mn);
+      p.tempSize = (p.tempSize || []).concat({ part, d, until: Date.now() + CFG.SHOTS2.TEMP_H * 36e5 * Math.max(1, x || 1) });
+    }
+    function tempSizeAll(mn) {
+      const p = prodOf(mn);
+      for (const t of p.tempSize || []) setSize(mn, t.part, sizeOf(mn, t.part) - t.d, true);
+      p.tempSize = [];
+    }
+    function shotsMoreTick() {
+      const now = Date.now();
+      if (now - (state.shots2At || 0) < 2e4) return;
+      state.shots2At = now;
+      for (const [k, r] of Object.entries(L2.people || {})) {
+        const mn = Number(k);
+        if (!r || !r.prod) continue;
+        const p = r.prod;
+        if (p.tempSize && p.tempSize.length) {
+          const due = p.tempSize.filter((t) => t.until <= now);
+          if (due.length) {
+            for (const t of due) {
+              setSize(mn, t.part, sizeOf(mn, t.part) - t.d, true);
+              if (charFor(mn)) tell(mn, "\u{1F489} Your " + ((CFG.SIZES[t.part] || {}).label || t.part).toLowerCase() + " snaps back to " + sizeName(mn, t.part) + ". It was only ever temporary, sugar.");
+            }
+            p.tempSize = p.tempSize.filter((t) => t.until > now);
+            saveLedger();
+            syncCompanions(true);
+          }
+        }
+        if (r.futaShot && r.futaShot.until <= now) {
+          r.futaShot = null;
+          r.futa = false;
+          saveLedger();
+          syncCompanions(true);
+          if (charFor(mn)) tell(mn, "\u{1F489} The futa serum's run its course, sugar. That cock's gone the way it came.");
+        }
+        if (p.milkFlavor && p.milkFlavor.until <= now) p.milkFlavor = null;
+        if (r.krypto) {
+          if (r.krypto.until <= now) kryptoEnd(mn, "done");
+          else if (charFor(mn) && now - (r.krypto.told || 0) > (6 + Math.random() * 4) * 6e4) {
+            r.krypto.told = now;
+            privateLine(mn, kFill(pickFresh("krypto:stock", KRYPTO_LINES.stock), mn), "chat");
+          }
+        }
+        if (boosted(p, "sedate") && charFor(mn) && now - (p.sedTold || 0) > 9 * 6e4 && Math.random() < 0.3) {
+          p.sedTold = now;
+          privateLine(mn, kFill(pickFresh("sed", SHOT_LINES.sedative), mn), "emote");
+        }
+      }
+      if (now >= (state.kryptoRumorAt || 0)) {
+        state.kryptoRumorAt = now + (CFG.SHOTS2.RUMOR_H[0] + Math.random() * (CFG.SHOTS2.RUMOR_H[1] - CFG.SHOTS2.RUMOR_H[0])) * 36e5;
+        const here = (W.ChatRoomCharacter || []).map((c) => c.MemberNumber).filter((m) => m !== CFG.BOT_MEMBER);
+        const props = here.filter((m) => isProprietor(m) && kryptoHint(m) && !kryptoNow(m));
+        if (props.length && here.length >= 3) {
+          const t = props[Math.floor(Math.random() * props.length)];
+          emote(kFill(pickFresh("krypto:rumor", KRYPTO_LINES.rumor), t, { h: kryptoHint(t) }));
+        }
+      }
+    }
+    function shotTouch(tgt, src) {
+      const p = prodOf(tgt);
+      if (!p || !boosted(p, "trigger") || tgt === src) return;
+      arouse(tgt, 45);
+      if (Math.random() < 0.3 && Date.now() - (p.trigTold || 0) > 6e4) {
+        p.trigTold = Date.now();
+        privateLine(tgt, "\u26A1 That touch nearly sets you off, " + plainName(tgt) + ". Hair trigger. Another one like that and you're gone.", "chat");
+      }
+    }
+    const floodX = (sp) => boosted(sp, "flood") ? 1 + 1.5 * boostLevel(sp, "flood") : 1;
+    const FLAVOR_BIT = {
+      strawberry: "It comes out pink and strawberry-sweet, like a milkshake.",
+      chocolate: "It comes out pale brown and tastes like chocolate milk.",
+      honey: "It comes out golden-tinged and honey-sweet.",
+      vanilla: "It smells of vanilla and tastes like melted ice cream.",
+      banana: "It comes out banana-sweet, thick as a smoothie.",
+      caramel: "It tastes of caramel, rich and buttery."
+    };
+    function milkFlavorBit(mn) {
+      const f = (prodOf(mn) || {}).milkFlavor;
+      return f && f.until > Date.now() && FLAVOR_BIT[f.k] ? " " + FLAVOR_BIT[f.k] : "";
+    }
+    function shotTrigger(mn, kind) {
+      const C2 = charFor(mn), r = rec(mn);
+      if (!C2 || !r || !(r.roles || []).length || !Array.isArray(C2.Appearance) || quietNow(mn)) return;
+      const p = prodOf(mn), now = Date.now();
+      p.toyAt = p.toyAt || {};
+      for (const it of C2.Appearance) {
+        if (!it || !it.Craft || !it.Asset || !it.Asset.Group || !/^Item/.test(it.Asset.Group.Name)) continue;
+        const text = craftText(it);
+        if (!text || !triggerOf(text).includes(kind)) continue;
+        const key = "trig:" + kind + ":" + it.Asset.Group.Name;
+        if (now < (p.toyAt[key] || 0)) continue;
+        p.toyAt[key] = now + CFG.SHOTS2.TRIGGER_MIN * 6e4;
+        const dose = isRoulette(text) ? rouletteText(mn, text) : text;
+        const ok = applyShot(mn, CFG.BOT_MEMBER, dose, { open: TRIGGER_OPEN[kind].replace(/%n/g, plainName(mn)).replace(/%c/g, itemName(it)), from: "your " + itemName(it) + "'s dose", heatH: 1, auto: true });
+        if (ok) audit(CFG.BOT_MEMBER, "TRIGGERINJECT", mn + " " + kind + " " + itemName(it));
+      }
+    }
+    function rouletteText(mn, text) {
+      const lim = String((rec(mn) || {}).limits || "");
+      const ok = ROULETTE_POOL.filter(([w, k]) => !k || (k === "size" ? !/\b(size|growth|grow)/i.test(lim) : k === "sedat" ? !/\b(sedat|drug|sleep)/i.test(lim) : k === "hypno" ? !/\b(hypno|trance|mind)/i.test(lim) : k === "denial" ? !/\b(denial|chast|orgasm|edg)/i.test(lim) : !limitBlocks(mn, k)));
+      const pick = ok.length ? ok[Math.floor(Math.random() * ok.length)][0] : "capacity";
+      return pick + (kryptoHit(mn, text) ? " " + rec(mn).kryptonite.word : "");
+    }
+    function shotDrip(mn, it, text) {
+      const p = prodOf(mn), tags = tagsIn(text), need = DRIP_KEEP.filter(([t, , on]) => tags.has(t) && !on(p, mn)).map(([, w]) => w);
+      if (kryptoHit(mn, text) && !kryptoNow(mn)) need.push(rec(mn).kryptonite.word);
+      if (!need.length) return;
+      applyShot(mn, CFG.BOT_MEMBER, need.join(" "), { open: "The drip in the " + itemName(it) + " on " + plainName(mn) + " ticks over and keeps 'em topped up.", from: "your " + itemName(it) + "'s drip", heatH: 1, auto: true, quiet: true });
+    }
+    function myShotsText(mn) {
+      const r = rec(mn), p = prodOf(mn), now = Date.now();
+      if (!r || !p) return "That's for folks on the books, sugar.";
+      const left = (t) => {
+        const m = Math.ceil((t - now) / 6e4);
+        return m >= 90 ? Math.round(m / 60) + "h" : m + " min";
+      };
+      const lv = (k) => boostLevel(p, k) > 1 ? " (" + stackWord(boostLevel(p, k) - 1) + ")" : "";
+      const B = [
+        ["milk", "\u{1F37C} Milk boosted"],
+        ["semen", "\u{1F4A6} Cum boosted"],
+        ["fert", "\u{1F95A} Fertility boosted"],
+        ["eggs", "\u{1F95A} Any stud can leave a clutch"],
+        ["hyper", "\u{1F930} Hyper pregnancy"],
+        ["contra", "\u{1F6AB} No catchin'"],
+        ["mpreg", "\u{1F351} Mpreg"],
+        ["flood", "\u{1F30A} Flood loads"],
+        ["trigger", "\u26A1 Hair trigger"],
+        ["sedate", "\u{1F634} Sedated"],
+        ["twins", "\u{1F46F} Twins next"],
+        ["ripe", "\u{1F351} Ripe: the next load takes"]
+      ];
+      const out = B.filter(([k]) => boosted(p, k)).map(([k, l]) => l + lv(k) + " \xB7 " + left(p.boosts[k]));
+      if (p.deniedUntil > now) out.push("\u{1F6AB} Held at the edge \xB7 " + left(p.deniedUntil));
+      if (r.futaShot && r.futaShot.until > now) out.push("\u{1F346} Futa serum \xB7 " + left(r.futaShot.until));
+      for (const t of p.tempSize || []) out.push("\u{1F4CF} " + ((CFG.SIZES[t.part] || {}).label || t.part) + " " + (t.d > 0 ? "grown" : "shrunk") + " for now \xB7 " + left(t.until));
+      if (p.milkFlavor && p.milkFlavor.until > now) out.push("\u{1F353} " + p.milkFlavor.k + " milk \xB7 " + left(p.milkFlavor.until));
+      if (kryptoNow(mn)) out.push("\u{1F4A5} Your kryptonite \xB7 " + left(r.krypto.until));
+      for (const f of activePotions(mn)) out.push("\u{1F9EA} " + ((potionDef(f.id) || {}).name || f.id) + " \xB7 " + left(f.until));
+      return "\u{1F489} WHAT'S IN YOU RIGHT NOW\n" + (out.length ? out.join("\n") : "Nothin'. Clean as a whistle, sugar.") + "\n\n?help shots lists every word a needle can carry.";
+    }
+    function shotUnread(by, tool, text) {
+      if (!tool || !tool.Craft || by === CFG.BOT_MEMBER || !SHOT_WORDS.test(text) || LSCG_WORDS.test(text)) return;
+      tell(by, "\u{1F489} I couldn't read a farm word on " + itemName(tool) + ", sugar, so it did nothin' on the farm's side. ?help shots lists the words: lactation, fertility, udder growth, aphrodisiac, cum flood and the rest.");
+    }
+    if (W.__FARMHAND_TEST__) Object.assign(W, { __shotsTick: () => {
+      state.shots2At = 0;
+      shotsMoreTick();
+    }, __shotTrigger: (m, k) => shotTrigger(m, k), __kryptoNow: (m) => kryptoNow(m), __applyShot: (t, b, x, h) => applyShot(t, b, x, h), __myShots: (m) => myShotsText(m) });
     const PARASITE_SERUMS = ["growth", "fertility", "growth", "hyper pregnancy", "growth", "capacity"];
     const PARASITE_GROWS = ["udder", "penis", "testes", "butt"];
     function parasiteChance(mn) {
@@ -59109,6 +59690,23 @@ INJECTORS \xB7 use Inject on someone
       description lets a cock through: it does not close the hole.
     (worn, those two work for as long as you wear the item)
     heat inducer \xB7 heat now  \xB7  suppressant \xB7 heat ends
+  Feelin's and more
+    aphrodisiac (or horny) \xB7 achin' and needy (Needy Nectar)
+    hair trigger (or sensitizer) \xB7 an hour where every touch nearly sets you off
+    denial serum \xB7 held at the edge, no cummin', two hours
+    cum flood (or gusher) \xB7 your next loads come out enormous
+    sedative \xB7 drowsy, heavy and slow for an hour
+    obedience (or mind control) \xB7 a step deeper under
+    moo serum \xB7 Moo Juice from the needle
+    futa serum \xB7 a cock and all that comes with it, for a day
+    twins (or triplets) \xB7 the next litter that takes comes double
+    ripening (or ovulation) \xB7 heat, and the next load that can take, takes
+    strawberry milk (chocolate, honey, vanilla, banana, caramel) \xB7
+      flavoured milk for a day
+    purge serum (or antidote) \xB7 every shot in you flushed out
+    temporary, with a size \xB7 the growth or shrinkin' lasts an hour
+    (LSCG reads sedative, aphrodisiac, antidote and mind control
+     too: one needle does both.)
   Stackin'
     Doses stack. A second dose of the same while the first is still
       workin' makes it triple, a third four times, up to five deep.
@@ -59119,7 +59717,18 @@ INJECTORS \xB7 use Inject on someone
 
 TOYS THAT ACT ON THEIR OWN \xB7 crafted words on what you wear
     auto-injector \xB7 the item doses you every half hour with the
-      other words on it: "auto-injector lactation x2"
+      other words on it: "auto-injector lactation x2". Piercings
+      work too: a nipple or clit piercing crafted as one does
+      every shot there is.
+    triggered \xB7 "when bred", "on climax", "when milked",
+      "when denied" or "on trap" on it: it doses you when that
+      happens instead of on a clock
+    roulette (or mystery dose) \xB7 a random shot every dose
+    iv drip (or drip line) \xB7 keeps every timed effect on it
+      topped up, quietly
+    ?myshots \xB7 what's in you right now, and for how long
+    ?kryptonite \xB7 the barn's rumours about the proprietors'
+      weaknesses. Find the word, put it on a needle\u2026
     ovipositor \xB7 on a gag, belt, plug or dildo: it lays a clutch in
       you now and then (needs ?eggs on, or your traps on)
     auto-feed \xB7 on a funnel gag: a bellyful poured down you every
@@ -60515,7 +61124,10 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
       "coax",
       "nursery",
       "little",
-      "care"
+      "care",
+      "kryptonite",
+      "myshots",
+      "shotsin"
     ];
     const STAFF_CMDS = [
       "queue",
@@ -60613,6 +61225,9 @@ Welcome to B&B Farm. Mind the ruts! \u{1F33E}`,
       return !!(u && u > Date.now());
     }
     const PRIVATE_REPLY = [
+      "kryptonite",
+      "myshots",
+      "shotsin",
       "today",
       "feedback",
       "suggest",
@@ -63060,6 +63675,14 @@ Welcome to B&B Farm, hon. \u{1F33E}`
           trapCommand(cmd === "watersport" ? "watersports" : cmd, sender, args, R);
           break;
         // 10u-traps.js
+        case "kryptonite":
+          kryptoCommand(sender, args, R, channel);
+          break;
+        // 10ur-shots-more.js
+        case "myshots":
+        case "shotsin":
+          R(myShotsText(sender));
+          break;
         case "nursery":
         case "little":
         case "care":
@@ -64219,6 +64842,10 @@ Welcome to B&B Farm, hon. \u{1F33E}`
             R("\u{1FAD9} Bottled as jar #" + L2.nextJar + " (" + ml(got) + " of " + plainName(t) + "'s). Staff can ?inseminate <who> " + L2.nextJar + " [hole] within " + CFG.JAR_DAYS + " days.");
           }
           const scene = (cmd === "milk" ? "milk" : "collect") + (t === sender ? "Self" : "");
+          if (cmd === "milk") {
+            const fb = milkFlavorBit(t);
+            if (fb) later(() => emote("\u{1F37C}" + fb.replace(/^ It/, " " + plainName(t) + "'s milk"), t), 1800);
+          }
           if (!runScene(scene, t, { n: plainName(t), b: plainName(sender), bMn: sender, ml: ml(got), icon: cmd === "milk" ? "\u{1F95B}" : "\u{1F9EA}" }))
             emote(cmd === "milk" ? "\u{1F95B} " + (t === sender ? plainName(t) + " milks " + ml(got) + " into the pail" : plainName(sender) + " milks " + plainName(t) + ": " + ml(got) + " into the pail") + ". Good job, hon!" : "\u{1F9EA} " + (t === sender ? plainName(t) + " fills the collection jar with " + ml(got) : plainName(sender) + " collects " + ml(got) + " from " + plainName(t)) + ". Good job, hon!", t);
           break;
@@ -65152,6 +65779,11 @@ Welcome to B&B Farm, hon. \u{1F33E}`
           nurseryTick();
         } catch (e) {
           warn("nursery:", e);
+        }
+        try {
+          shotsMoreTick();
+        } catch (e) {
+          warn("shots more:", e);
         }
         rutTick();
         quotaTick();

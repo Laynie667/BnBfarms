@@ -76,6 +76,7 @@
        OrgasmResist0-9              they held it back: an edge
        OrgasmFailTimeout/Surrender  ruined: counts as an edge too, with a sad dribble  */
   function onClimax(mn, content){
+    try { shotTrigger(mn, /^Orgasm\d/.test(content) ? "climax" : "denied"); } catch(e){ warn("climax trigger:", e); }   // (10ur-shots-more.js)
     try { parasiteClimax(mn); } catch(e){ warn("parasite climax:", e); }   // a Tyrant eats it (10v2-parasite-more.js)
     try { symbioteFed(mn, "climax"); } catch(e){ warn("symbiote climax:", e); }   // so does the latex (10v4-symbiotes.js)
     const r = rec(mn), p = r && prodOf(mn);

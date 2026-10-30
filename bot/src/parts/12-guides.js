@@ -315,6 +315,23 @@ INJECTORS · use Inject on someone
       description lets a cock through: it does not close the hole.
     (worn, those two work for as long as you wear the item)
     heat inducer · heat now  ·  suppressant · heat ends
+  Feelin's and more
+    aphrodisiac (or horny) · achin' and needy (Needy Nectar)
+    hair trigger (or sensitizer) · an hour where every touch nearly sets you off
+    denial serum · held at the edge, no cummin', two hours
+    cum flood (or gusher) · your next loads come out enormous
+    sedative · drowsy, heavy and slow for an hour
+    obedience (or mind control) · a step deeper under
+    moo serum · Moo Juice from the needle
+    futa serum · a cock and all that comes with it, for a day
+    twins (or triplets) · the next litter that takes comes double
+    ripening (or ovulation) · heat, and the next load that can take, takes
+    strawberry milk (chocolate, honey, vanilla, banana, caramel) ·
+      flavoured milk for a day
+    purge serum (or antidote) · every shot in you flushed out
+    temporary, with a size · the growth or shrinkin' lasts an hour
+    (LSCG reads sedative, aphrodisiac, antidote and mind control
+     too: one needle does both.)
   Stackin'
     Doses stack. A second dose of the same while the first is still
       workin' makes it triple, a third four times, up to five deep.
@@ -325,7 +342,18 @@ INJECTORS · use Inject on someone
 
 TOYS THAT ACT ON THEIR OWN · crafted words on what you wear
     auto-injector · the item doses you every half hour with the
-      other words on it: "auto-injector lactation x2"
+      other words on it: "auto-injector lactation x2". Piercings
+      work too: a nipple or clit piercing crafted as one does
+      every shot there is.
+    triggered · "when bred", "on climax", "when milked",
+      "when denied" or "on trap" on it: it doses you when that
+      happens instead of on a clock
+    roulette (or mystery dose) · a random shot every dose
+    iv drip (or drip line) · keeps every timed effect on it
+      topped up, quietly
+    ?myshots · what's in you right now, and for how long
+    ?kryptonite · the barn's rumours about the proprietors'
+      weaknesses. Find the word, put it on a needle…
     ovipositor · on a gag, belt, plug or dildo: it lays a clutch in
       you now and then (needs ?eggs on, or your traps on)
     auto-feed · on a funnel gag: a bellyful poured down you every

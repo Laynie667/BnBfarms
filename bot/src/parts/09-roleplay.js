@@ -290,6 +290,7 @@
       if (typeof tgt !== "number"){ const old = dict.find(d => d && d.Tag === "TargetCharacter"); tgt = old && old.MemberNumber; }
       const focus = pick("FocusGroupName") || (String(data.Content||"").split("-")[1]);
       try { onBodyActivity(String(act||""), focus, src, tgt); } catch(e){ warn("body activity:", e); }
+      try { shotTouch(tgt, src); } catch(e){ warn("hair trigger:", e); }   // a hair-trigger shot (10ur-shots-more.js)
       return;
     }
     // BC puts the target in the dictionary as { TargetCharacter: <member number> }
@@ -307,15 +308,17 @@
                   item: tool ? ((tool.Craft && tool.Craft.Name) || tool.Asset.Name) : "(nothing in hand)",
                   tags: Array.from(tags).concat(sizeTags.map(([k,d]) => k+(d>0?" up":" down"))) }).slice(-15);
     dbg("INJECT", data.Sender, "→", target, "item:", text || "(no crafted item)", "tags:", Array.from(tags).join(",") || "none");
-    if (!tags.size && !sizeTags.length && !ptags.type && !ptags.knot){ saveLedger(); return; }   // a plain injector: LSCG's business, not ours
+    if (!tags.size && !sizeTags.length && !ptags.type && !ptags.knot && !kryptoHit(target, text)){ saveLedger(); try { shotUnread(data.Sender, tool, text); } catch(e){} return; }   // a plain injector: LSCG's business, not ours (10ur-shots-more.js says so when it looked like a farm shot)
     applyShot(target, data.Sender, text);
   }
   const stackWord = lv => lv <= 1 ? "doubled" : lv === 2 ? "tripled" : "runnin' "+(lv + 1)+" times over";
   // one dose of whatever a crafted item's words say. by: who gave it (the bot, for a trap or a toy that doses on its own)
   // how: nothin' for a needle in the hand, or { open: the line that opens the emote, from: "the auto-injector's dose", heatH }
   function applyShot(target, by, text, how){
-    const tags = tagsIn(text), sizeTags = sizeTagsIn(text), ptags = penisTagsIn(text), x = shotTimes(text);
-    if (!tags.size && !sizeTags.length && !ptags.type && !ptags.knot) return false;
+    const tags = tagsIn(text), sizeTags = sizeTagsIn(text), ptags = penisTagsIn(text), krypto = kryptoHit(target, text);
+    const x = shotTimes(text) * (kryptoNow(target) ? 2 : 1);   // a proprietor down to stock takes every shot double (10ur-shots-more.js)
+    if (!tags.size && !sizeTags.length && !ptags.type && !ptags.knot && !krypto) return false;
+    if (littleNow(target)){ if (by !== CFG.BOT_MEMBER) tell(by, "💉 "+plainName(target)+" isn't available for that right now, sugar."); return false; }   // little space (10up2-nursery.js)
     const r = rec(target);
     if (!r){ saveLedger(); if (by !== CFG.BOT_MEMBER) tell(by, "💉 That shot didn't take with me, hon: "+plainName(target)+" isn't on the farm books yet."); return false; }
     const p = prodOf(target), now = Date.now(), H = 3600000, done = [];
@@ -327,6 +330,7 @@
     if (tags.has("mpreg"))       { p.boosts.mpreg = Math.max(p.boosts.mpreg || 0, now) + 7*24*H*x; done.push("a load in the ass can take for "+(x > 1 ? x+" weeks" : "a week")+" (mpreg)"); fx0.push("mpreg"); }
     if (tags.has("hyper"))       { { const lv = addBoost(p, "hyper", 24*H, x); done.push("hyper pregnancy for a day: huge litters"+(lv > 1 ? ", level "+lv : "")); }; fx0.push("hyper"); }
     if (tags.has("contraceptive")){ p.boosts.contra = Math.max(p.boosts.contra || 0, now) + 48*H*x; done.push("no catching for "+(2*x)+" days"); fx0.push("contraceptive"); }
+    try { shotsMore(target, by, text, tags, x, done, fx0); } catch(e){ warn("shots more:", e); }   // aphrodisiac, denial, flood, futa, twins… (10ur-shots-more.js)
     if (tags.has("capacity")) fx0.push("capacity");
     if (tags.has("reducing")) fx0.push("reducing");
     if (tags.has("capacity"))    { const b = p.capBonus; p.capBonus = Math.min(CFG.PROD.MAX_CAPACITY - CFG.PROD.BASE_CAPACITY, b + CFG.PROD.INJECT_CAPACITY*x);
@@ -350,15 +354,18 @@
       const word = part === "udder" && !bodyOf(target).tits ? "chest" : S.label.toLowerCase();   // (a flat chest is a chest, whatever the farm calls it)
       done.push(sizeOf(target, part) === before ? word+" can't go any "+(d>0?"bigger":"smaller")
                                                 : word+" "+(d>0?"up":"down")+" to "+sizeName(target, part));
-      if (sizeOf(target, part) !== before) fx.push(shotLine(part+(d>0?"+":"-"), target, part));
+      if (sizeOf(target, part) !== before){ fx.push(shotLine(part+(d>0?"+":"-"), target, part)); if (tags.has("temp")) tempSizeAdd(target, part, sizeOf(target, part) - before, x); }   // temporary: it snaps back in an hour
     }
     if (tags.has("suppressant") && inHeat(p)){ p.heat = null; done.push("heat broken"); fx0.push("suppressant"); }
     if (tags.has("heat")){
       if (limitBlocks(target,"heat")) done.push("no heat, though, 'cause their limits rule it out");
       else { startHeat(target, by, how && how.heatH); done.push("heat"); }
     }
+    if (tags.has("temp") && fx.length) fx.push(shotLine("temp", target));
     saveLedger(); audit(by,"INJECT",target+" "+Array.from(tags).concat(sizeTags.map(([k,d]) => k+(d>0?"+":"-"))).join(" "));
-    const lines = fx0.map(k => shotLine(k, target)).concat(fx).filter(Boolean);
+    if (krypto) kryptoStart(target, by, x, how && how.auto);   // their secret weakness, in the needle (10ur-shots-more.js)
+    if (how && how.quiet) return true;   // a drip toppin' 'em up: no fuss
+    const lines = fx0.map(k => shotsMoreLine(k, target)).concat(fx).filter(Boolean);
     if (lines.length && onMap(target)){
       emote("💉 "+(how && how.open ? how.open : target === by ? plainName(target)+" sinks the needle into their own skin and pushes the plunger home."
                                          : plainName(by)+" slides the needle into "+plainName(target)+" and pushes the plunger home.")+" "+lines.join(" ")+(x > 1 ? " A "+(x === 2 ? "double" : x === 3 ? "triple" : x+"-times")+" dose." : ""), target);

@@ -1,11 +1,11 @@
 # What to install (current versions)
 
-Updated 2026-10-29. Every file is in the `dist/` folder (it syncs through OneDrive, so the phone app has it too).
+Updated 2026-10-30. Every file is in the `dist/` folder (it syncs through OneDrive, so the phone app has it too).
 In Tampermonkey's dashboard, compare each script's version with this list. Anything already at these versions is up to date.
 
 | Script | File in `dist/` | Where it runs | Current |
 |---|---|---|---|
-| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.67.0** |
+| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.68.0** |
 | Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.10.1** |
 | Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.2.2** |
 | Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **1.1.1** |
@@ -23,6 +23,34 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 - Running the watcher on more than one game at once (the bot, yours, a tester's) lets Claude line them up into one timeline.
 
 ## Latest changes (newest first)
+
+- **Bot 0.68.0: more in the needle.** Laynie, Oct 30: "love the new injector ideas. plus the new effects. the kryptonite effect should be usable with a auto-injector. I think if a piercing is made with auto-injector, it should be able to use all shot effects." No Companion update needed. (bot/src/parts/10ur-shots-more.js)
+  - **New shot words** (on a needle, an auto-injector, or a piercing crafted as one; they stack and take x2 to x5 like the rest):
+    - aphrodisiac (horny) gives Needy Nectar.
+    - hair trigger (sensitizer): for an hour every touch nearly sets them off.
+    - denial serum: held at the edge for two hours.
+    - cum flood (gusher): their next loads come out 2.5 times as big, more stacked.
+    - sedative: drowsy and slow for an hour.
+    - obedience (mind control): a step deeper under.
+    - moo serum gives Moo Juice.
+    - futa serum: futa for a day.
+    - twins or triplets: the next litter that takes comes double or triple.
+    - ripening (ovulation): heat, and the next load that can take, takes.
+    - Flavoured milk for a day: strawberry, chocolate, honey, vanilla, banana or caramel, shown when they're hand-milked.
+    - purge serum (antidote): flushes every shot.
+    - temporary, with a size word: the growth or shrinkin' snaps back in an hour.
+    - LSCG reads sedative, aphrodisiac, antidote and mind control too, so one needle does both. Limits rule as always, and nothin' takes on a little in their little space.
+  - **New injectors:**
+    - Triggered: "when bred", "on climax", "when milked", "when denied" or "on trap" on the item, and it doses when that happens instead of on a clock.
+    - Roulette (mystery dose): a random shot each time, from what their limits allow.
+    - IV drip (drip line): keeps every timed effect on it topped up, quietly.
+    - Piercings crafted as auto-injectors do every shot there is.
+  - **Kryptonite for proprietors:**
+    - A proprietor whispers `?kryptonite set <word>` (out loud is refused) and can write their own rumour with `?kryptonite hint <text>`.
+    - A needle, auto-injector or piercing carryin' that word, used on them, makes them livestock for 30 minutes a dose: traps catch them, every shot hits double, and the farm talks to them like stock.
+    - The first to land it gets 3 ribbons. `?kryptonite` shows the barn's rumours, and the farm gossips hints every few hours.
+    - Their safeword or a purge serum ends it, and they keep every command they have.
+  - **Fixes:** a crafted needle the farm couldn't read used to do nothin', silently; now whoever held it is told (not for LSCG's own needles). `?myshots` shows anybody what's workin' in them and for how long.
 
 - **Bot 0.67.0 + Companion 0.51.0 (glory stalls 1.10.1, breeding 1.2.2, conditioning 1.1.1, barn life 1.4.1, dairy 1.1.1, shows 1.1.1): Oct 29 batch.** Laynie, Oct 29: a nursery for her ABDL players, no pumps on the outfits, dragon outfits, a role-play way to get parasites off, and drainin' without staff.
   - **The nursery** (bot/src/parts/10up-nursery-lines.js, 10up2-nursery.js; Companion views/nursery.js, nursery.js). A safe list of littles and caregivers: proprietors add anybody (`?nursery add <who> little|caregiver`), caregivers can invite littles, and everybody gets a Yes / Not now card first. `?nursery leave` takes yourself off; `?nursery remove <who>` (proprietors); `?nursery list`; `?nursery pair <little>` / `unpair`.

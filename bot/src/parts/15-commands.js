@@ -1602,6 +1602,8 @@ Welcome to B&B Farm, hon. 🌾`);
       case "corral": case "uncorral": penCommand(cmd === "corral" ? "pen" : "unpen", sender, args, R); break;
       case "bench": case "unbench": case "use": benchCommand(cmd, sender, args, R); break;
       case "subject": case "subjects": case "traps": case "trap": case "watersports": case "watersport": trapCommand(cmd === "watersport" ? "watersports" : cmd, sender, args, R); break;   // 10u-traps.js
+      case "kryptonite": kryptoCommand(sender, args, R, channel); break;   // 10ur-shots-more.js
+      case "myshots": case "shotsin": R(myShotsText(sender)); break;
       case "nursery": case "little": case "care": nurseryCommand(cmd, sender, args, R, huh); break;   // 10up2-nursery.js
       case "services": case "service": case "coax": serviceCommand(cmd, sender, args, R); break;   // 10uo-services.js
       case "parasite": case "parasites": case "purge": parasiteCommand(cmd === "parasites" ? "parasite" : cmd, sender, args, R); break;   // 10v-parasite.js
@@ -2260,6 +2262,7 @@ Welcome to B&B Farm, hon. 🌾`);
         }
         // a little scene, beat by beat (10g-scenes.js); if one's already playin' for them, just the one line
         const scene = (cmd === "milk" ? "milk" : "collect") + (t === sender ? "Self" : "");
+        if (cmd === "milk"){ const fb = milkFlavorBit(t); if (fb) later(() => emote("🍼"+fb.replace(/^ It/, " "+plainName(t)+"'s milk"), t), 1800); }   // a flavoured-milk shot (10ur-shots-more.js)
         if (!runScene(scene, t, { n: plainName(t), b: plainName(sender), bMn: sender, ml: ml(got), icon: cmd === "milk" ? "🥛" : "🧪" }))
           emote(cmd === "milk" ? "🥛 "+(t === sender ? plainName(t)+" milks "+ml(got)+" into the pail" : plainName(sender)+" milks "+plainName(t)+": "+ml(got)+" into the pail")+". Good job, hon!"
                                : "🧪 "+(t === sender ? plainName(t)+" fills the collection jar with "+ml(got) : plainName(sender)+" collects "+ml(got)+" from "+plainName(t))+". Good job, hon!", t);

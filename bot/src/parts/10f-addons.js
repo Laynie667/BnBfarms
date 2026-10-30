@@ -35,7 +35,9 @@
   }
   // tell every add-on about a game event
   function addonsEmit(hook, ...args){
-    if (hook === "bred") try { titheBred(args[0], args[1], args[2]); } catch(e){ warn("tithe:", e); }   // the size-stealin' potions (10ul-tithes.js)
+    if (hook === "bred") try { titheBred(args[0], args[1], args[2]); } catch(e){ warn("tithe:", e); }
+    if (hook === "bred") try { shotTrigger(args[1], "bred"); } catch(e){ warn("bred trigger:", e); }   // an injector that answers a breedin' (10ur-shots-more.js)
+    if (hook === "safe") try { kryptoEnd(args[0], "safe"); } catch(e){ warn("kryptonite safe:", e); }   // the size-stealin' potions (10ul-tithes.js)
     for (const a of ADDONS.values()) if (a.on && typeof a.on[hook] === "function" && a.enabled !== false) addonCall(a, hook, a.on[hook], ...args);
   }
 

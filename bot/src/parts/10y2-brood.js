@@ -181,6 +181,7 @@
     uddersHappening(mn, out);   // overdue, bedded down, wide open, twice bred (10y7-udders.js)   // broodin' on the nest (10y6-keepers.js)
     const sc = state.sceneRuns && state.sceneRuns.get(mn);
     if (sc) out.push("🥚 It's comin': part "+Math.min(sc.i, sc.n)+" of "+sc.n+".");
+    if (r.krypto && r.krypto.until > now) out.push("💥 Your kryptonite has you: livestock for "+mins(r.krypto.until)+" more min. Your Staff and Dashboard panels are locked till it's over. Your safeword or a purge serum ends it.");
     if (r.trapWait) out.push(TRAP_KINDS[r.trapWait.kind].icon+" "+(r.trapWait.kind === "tickle" ? "The tickle rack has you till you ?beg" : "The mirror box wants its line "+(5 - (r.trapWait.n || 0))+" more times")+", or "+mins(r.trapWait.until)+" min.");
     if (r.benched && r.benched.until > now) out.push("🪵 "+(r.benched.trap ? "Locked in the pillory" : "On the use bench")+": "+mins(r.benched.until)+" min left, used "+r.benched.uses+" time"+(r.benched.uses === 1 ? "" : "s")+".");
     if (r.penned && r.penned.until > now && !run && !sc) out.push("🚧 Held at "+r.penned.name+": "+mins(r.penned.until)+" min left.");

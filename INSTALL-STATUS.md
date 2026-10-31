@@ -1,11 +1,11 @@
 # What to install (current versions)
 
-Updated 2026-10-30. Every file is in the `dist/` folder (it syncs through OneDrive, so the phone app has it too).
+Updated 2026-10-31. Every file is in the `dist/` folder (it syncs through OneDrive, so the phone app has it too).
 In Tampermonkey's dashboard, compare each script's version with this list. Anything already at these versions is up to date.
 
 | Script | File in `dist/` | Where it runs | Current |
 |---|---|---|---|
-| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.68.0** |
+| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.68.1** |
 | Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.10.1** |
 | Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.2.2** |
 | Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **1.1.1** |
@@ -24,6 +24,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 ## Latest changes (newest first)
 
+- **Bot 0.68.1: kryptonite locks the panels.** Laynie, Oct 31: "kryptonite, when active should disable the staff and proprieter panels til it runs out or is purged." While a proprietor's (or staff member's) kryptonite has them, their Companion drops the Staff and Dashboard panels and shows only Livestock, with a line sayin' why and how long. They come back the moment it wears off, a purge serum clears it, or their safeword ends it. No Companion update needed.
 - **Bot 0.68.0: more in the needle.** Laynie, Oct 30: "love the new injector ideas. plus the new effects. the kryptonite effect should be usable with a auto-injector. I think if a piercing is made with auto-injector, it should be able to use all shot effects." No Companion update needed. (bot/src/parts/10ur-shots-more.js)
   - **New shot words** (on a needle, an auto-injector, or a piercing crafted as one; they stack and take x2 to x5 like the rest):
     - aphrodisiac (horny) gives Needy Nectar.
@@ -49,7 +50,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
     - A proprietor whispers `?kryptonite set <word>` (out loud is refused) and can write their own rumour with `?kryptonite hint <text>`.
     - A needle, auto-injector or piercing carryin' that word, used on them, makes them livestock for 30 minutes a dose: traps catch them, every shot hits double, and the farm talks to them like stock.
     - The first to land it gets 3 ribbons. `?kryptonite` shows the barn's rumours, and the farm gossips hints every few hours.
-    - Their safeword or a purge serum ends it, and they keep every command they have.
+    - Their safeword or a purge serum ends it. While it lasts, their Companion shows only the Livestock panel: the Staff and Dashboard panels are locked (Bot 0.68.1, Oct 31).
   - **Fixes:** a crafted needle the farm couldn't read used to do nothin', silently; now whoever held it is told (not for LSCG's own needles). `?myshots` shows anybody what's workin' in them and for how long.
 
 - **Bot 0.67.0 + Companion 0.51.0 (glory stalls 1.10.1, breeding 1.2.2, conditioning 1.1.1, barn life 1.4.1, dairy 1.1.1, shows 1.1.1): Oct 29 batch.** Laynie, Oct 29: a nursery for her ABDL players, no pumps on the outfits, dragon outfits, a role-play way to get parasites off, and drainin' without staff.

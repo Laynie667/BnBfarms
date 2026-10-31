@@ -36,6 +36,10 @@
       keys: keysOf(mn), herdLeader: herdLeaderOf(mn) ? plainName(herdLeaderOf(mn)) : null,
       switches: {}
     });
+    // a proprietor or staff member down to stock by their kryptonite: no Staff or Dashboard panel till it's over
+    // (Laynie, Oct 31: "kryptonite, when active should disable the staff and proprieter panels til it runs out or is purged")
+    const downed = kryptoNow(mn);
+    if (downed){ s.staff = s.herdmaster = s.proprietor = s.mandated = s.onCall = false; s.krypto = Math.ceil(r.krypto.until / 60000) * 60000; }
     for (const k in SWITCH_CMDS) s.switches[SWITCH_CMDS[k]] =
       k === "jarok" ? r.jarok !== false : k === "trapsOn" ? isSubject(mn) : k === "teaseMe" ? !!teaseRate(r) : k === "milkable" ? makesMilk(mn) : k === "seedMilk" ? r.seedMilk !== false : !!r[k];
     try {
@@ -74,10 +78,10 @@
       part("symbiote", () => { if (symOn(mn)){ const g = r.symbiote; s.symbiote = { kind: g.kind, name: SYMBIOTES[g.kind].name, stage: g.stage, of: SYMBIOTES[g.kind].stages, until: g.until, hungry: Date.now() - g.fedAt > CFG.SYM.HUNGRY_MIN*60000 }; } });
       part("trap card", () => { const tc = trapCardFor(mn); if (tc) s.trapCard = tc; });   // the trap card (10x-trap-extras.js)
       part("farm gear", () => { const fg = farmGearFor(mn); if (fg.length) s.farmGear = fg; });   // real gear their Companion keeps on them (10y-farm-gear.js)
-      part("trap admin", () => { if (isProprietor(mn)) s.trapAdmin = trapAdminFor(); });
+      part("trap admin", () => { if (isProprietor(mn) && !downed) s.trapAdmin = trapAdminFor(); });
       part("trap ratings", () => rateStateFor(mn, s));   // how was it, the trap of the day (10y9o-trap-ratings.js)
       part("reins", () => reinsStateFor(mn, s));         // on somebody's reins, or somebody on yours (10y9s-reins.js)
-      part("renewals", () => renewStateFor(mn, s));      // staff: who'd like their contract again (10y9t-renewals.js)
+      if (!downed) part("renewals", () => renewStateFor(mn, s));      // staff: who'd like their contract again (10y9t-renewals.js)
       part("trap kinds", () => trapThemeStateFor(mn, s));   // whole kinds of trap switched off (10y9q-trap-switches.js)
       part("seasons", () => seasonsStateFor(mn, s));        // proprietors: the Seasons card, any season any time (10y9m-seasons.js)
       part("under", () => { const u = underOf(mn); if (u >= 2) s.under = u; if (r.corrWord) s.corrWord = r.corrWord; if (r.corrNoise) s.corrNoise = r.corrNoise; });   // simpler words, and the word that slips out (10y4-corruption.js)
@@ -90,10 +94,10 @@
       part("happening", () => { const hp = happeningFor(mn); if (hp.length) s.happening = hp; if (quietNow(mn)) s.quietUntil = Math.ceil(r.quietUntil / 60000) * 60000; });   // what has them right now (10y2-brood.js)
       const bh = benchHereFor(mn); if (bh.length) s.benchHere = bh;   // tap-to-use bench buttons
       s.at = now;
-      if (isStaff(mn)) Object.assign(s, staffStateFor(mn));
+      if (isStaff(mn) && !downed) Object.assign(s, staffStateFor(mn));
       const mods = addonStateFor(mn); if (mods) s.mods = mods;
       const ac = addonCommandGroups(mn); if (ac.length) s.addonCmds = ac;   // the Guides tab lists these too   // add-on cards for the "Farm extras" tab
-      if (isProprietor(mn)){   // the Dashboard's outfit slots (no outfit data, just what's there)
+      if (isProprietor(mn) && !downed){   // the Dashboard's outfit slots (no outfit data, just what's there)
         outfitsLedger();
         s.outfits = {}; for (const [k, o] of Object.entries(L.outfits)) s.outfits[k] = { items: o.items, locks: o.locks, at: o.at };
         s.outfitRules = Object.assign({}, L.outfitRules);

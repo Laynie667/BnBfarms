@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.68.0
+// @version      0.68.1
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -2792,7 +2792,7 @@
   ];
 
   // bot/src/version.js
-  var VERSION = "0.68.0";
+  var VERSION = "0.68.1";
   var COMPANION_VERSION = "0.51.0";
 
   // bot-parts:farmhand-bot-parts
@@ -5987,6 +5987,11 @@
         herdLeader: herdLeaderOf(mn) ? plainName(herdLeaderOf(mn)) : null,
         switches: {}
       });
+      const downed = kryptoNow(mn);
+      if (downed) {
+        s.staff = s.herdmaster = s.proprietor = s.mandated = s.onCall = false;
+        s.krypto = Math.ceil(r.krypto.until / 6e4) * 6e4;
+      }
       for (const k in SWITCH_CMDS) s.switches[SWITCH_CMDS[k]] = k === "jarok" ? r.jarok !== false : k === "trapsOn" ? isSubject(mn) : k === "teaseMe" ? !!teaseRate(r) : k === "milkable" ? makesMilk(mn) : k === "seedMilk" ? r.seedMilk !== false : !!r[k];
       try {
         const p = prodOf(mn), now = Date.now();
@@ -6050,11 +6055,11 @@
           if (fg.length) s.farmGear = fg;
         });
         part("trap admin", () => {
-          if (isProprietor(mn)) s.trapAdmin = trapAdminFor();
+          if (isProprietor(mn) && !downed) s.trapAdmin = trapAdminFor();
         });
         part("trap ratings", () => rateStateFor(mn, s));
         part("reins", () => reinsStateFor(mn, s));
-        part("renewals", () => renewStateFor(mn, s));
+        if (!downed) part("renewals", () => renewStateFor(mn, s));
         part("trap kinds", () => trapThemeStateFor(mn, s));
         part("seasons", () => seasonsStateFor(mn, s));
         part("under", () => {
@@ -6086,12 +6091,12 @@
         const bh = benchHereFor(mn);
         if (bh.length) s.benchHere = bh;
         s.at = now;
-        if (isStaff(mn)) Object.assign(s, staffStateFor(mn));
+        if (isStaff(mn) && !downed) Object.assign(s, staffStateFor(mn));
         const mods = addonStateFor(mn);
         if (mods) s.mods = mods;
         const ac = addonCommandGroups(mn);
         if (ac.length) s.addonCmds = ac;
-        if (isProprietor(mn)) {
+        if (isProprietor(mn) && !downed) {
           outfitsLedger();
           s.outfits = {};
           for (const [k, o] of Object.entries(L2.outfits)) s.outfits[k] = { items: o.items, locks: o.locks, at: o.at };
@@ -24880,7 +24885,7 @@
       const r = rec(mn), now = Date.now(), was = kryptoNow(mn);
       r.krypto = { until: Math.max(now, r.krypto && r.krypto.until || 0) + CFG.SHOTS2.KRYPTO_MIN * 6e4 * Math.max(1, x || 1), by, at: was && r.krypto.at || now, told: now };
       if (!was && charFor(mn)) emote(kFill(pickFresh("krypto:" + (auto ? "auto" : "start"), auto ? KRYPTO_LINES.auto : KRYPTO_LINES.start), mn), mn);
-      tell(mn, "\u{1F4A5} Your kryptonite, sugar. For " + Math.ceil((r.krypto.until - now) / 6e4) + " minutes you're livestock on your own farm: the traps can catch you and every shot hits you double. Your commands still work, and your safeword (or a purge serum) ends it.");
+      tell(mn, "\u{1F4A5} Your kryptonite, sugar. For " + Math.ceil((r.krypto.until - now) / 6e4) + " minutes you're livestock on your own farm: the traps can catch you, every shot hits you double, and your Staff and Dashboard panels are locked till it's over. Your safeword (or a purge serum) ends it.");
       if (by && by !== mn && by !== CFG.BOT_MEMBER) {
         r.kryptonite.found = r.kryptonite.found || [];
         if (!r.kryptonite.found.includes(by)) {
@@ -24898,6 +24903,7 @@
       const was = r.krypto.until > Date.now();
       r.krypto = null;
       saveLedger();
+      syncCompanions(true);
       if (was && why !== "safe" && charFor(mn)) emote(kFill(pickFresh("krypto:end", KRYPTO_LINES.end), mn), mn);
     }
     function kryptoHint(mn) {
@@ -29736,6 +29742,7 @@
       uddersHappening(mn, out);
       const sc = state.sceneRuns && state.sceneRuns.get(mn);
       if (sc) out.push("\u{1F95A} It's comin': part " + Math.min(sc.i, sc.n) + " of " + sc.n + ".");
+      if (r.krypto && r.krypto.until > now) out.push("\u{1F4A5} Your kryptonite has you: livestock for " + mins(r.krypto.until) + " more min. Your Staff and Dashboard panels are locked till it's over. Your safeword or a purge serum ends it.");
       if (r.trapWait) out.push(TRAP_KINDS[r.trapWait.kind].icon + " " + (r.trapWait.kind === "tickle" ? "The tickle rack has you till you ?beg" : "The mirror box wants its line " + (5 - (r.trapWait.n || 0)) + " more times") + ", or " + mins(r.trapWait.until) + " min.");
       if (r.benched && r.benched.until > now) out.push("\u{1FAB5} " + (r.benched.trap ? "Locked in the pillory" : "On the use bench") + ": " + mins(r.benched.until) + " min left, used " + r.benched.uses + " time" + (r.benched.uses === 1 ? "" : "s") + ".");
       if (r.penned && r.penned.until > now && !run && !sc) out.push("\u{1F6A7} Held at " + r.penned.name + ": " + mins(r.penned.until) + " min left.");

@@ -26,7 +26,7 @@
        KRYPTONITE: a proprietor whispers ?kryptonite set <word>; a needle, injector or piercing that carries that word,
          on them, drops them to livestock for half an hour a dose (traps catch them, shots hit double, the farm talks to
          them like stock). ?kryptonite shows the barn's rumours; the farm gossips hints now and then; the first to land it
-         gets ribbons. Their safeword ends it; a purge serum does too. They keep every command they have.
+         gets ribbons. Their safeword ends it; a purge serum does too. Their Staff and Dashboard panels are locked till it's over (Oct 31).
        ?myshots · everything a shot or a potion is doin' to you right now, and for how long.
   */
   CFG.SHOTS2 = CFG.SHOTS2 || { TRIGGER_MIN: 5, DRIP_MIN: 5, KRYPTO_MIN: 30, KRYPTO_RIBBONS: 3, RUMOR_H: [2, 4], TEMP_H: 1 };
@@ -144,7 +144,7 @@
     const r = rec(mn), now = Date.now(), was = kryptoNow(mn);
     r.krypto = { until: Math.max(now, (r.krypto && r.krypto.until) || 0) + CFG.SHOTS2.KRYPTO_MIN * 60000 * Math.max(1, x || 1), by, at: (was && r.krypto.at) || now, told: now };
     if (!was && charFor(mn)) emote(kFill(pickFresh("krypto:" + (auto ? "auto" : "start"), auto ? KRYPTO_LINES.auto : KRYPTO_LINES.start), mn), mn);
-    tell(mn, "💥 Your kryptonite, sugar. For " + Math.ceil((r.krypto.until - now) / 60000) + " minutes you're livestock on your own farm: the traps can catch you and every shot hits you double. Your commands still work, and your safeword (or a purge serum) ends it.");
+    tell(mn, "💥 Your kryptonite, sugar. For " + Math.ceil((r.krypto.until - now) / 60000) + " minutes you're livestock on your own farm: the traps can catch you, every shot hits you double, and your Staff and Dashboard panels are locked till it's over. Your safeword (or a purge serum) ends it.");
     // the first to land it gets a reward (a hand on the needle, not a toy)
     if (by && by !== mn && by !== CFG.BOT_MEMBER){
       r.kryptonite.found = r.kryptonite.found || [];
@@ -154,7 +154,7 @@
   }
   function kryptoEnd(mn, why){
     const r = rec(mn); if (!r || !r.krypto) return;
-    const was = r.krypto.until > Date.now(); r.krypto = null; saveLedger();
+    const was = r.krypto.until > Date.now(); r.krypto = null; saveLedger(); syncCompanions(true);   // (their panels come back)
     if (was && why !== "safe" && charFor(mn)) emote(kFill(pickFresh("krypto:end", KRYPTO_LINES.end), mn), mn);
   }
   function kryptoHint(mn){

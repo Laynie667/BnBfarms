@@ -61,7 +61,9 @@ const shot=(t,text)=>W.__applyShot(t,600,text);
   ok(W.__kryptoNow(221397), 'a needle with her word: Laynie is stock');
   ok((P(600).ribbons||0)>rb, 'Rex gets ribbons for findin\' it');
   shot(221397,'Lactation'); ok(prod(221397).boostX && prod(221397).boostX.milk>=2, 'while she\'s down, a shot hits double');
+  { const s=W.__stateFor(221397); ok(!s.staff && !s.proprietor && s.onBooks && s.krypto, 'while she\'s down, no Staff or Dashboard panel'); }
   W.__addons('safe',221397); ok(!W.__kryptoNow(221397), 'her safeword ends it');
+  { const s=W.__stateFor(221397); ok(s.staff && s.proprietor && !s.krypto, '...and the panels come back'); }
   // on an auto-injector piercing
   cfg.AUTOINJECT_MIN=0.0005; cfg.SHOTS2.DRIP_MIN=0.0005; wear(221397,'ItemNipplesPiercings','Honeybee Auto-Injector Ring');
   W.__trapTick(); await wait(200); W.__trapTick(); await wait(200);

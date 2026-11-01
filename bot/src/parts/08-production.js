@@ -96,6 +96,9 @@
     const out = new Set();
     for (const [tag, words] of Object.entries(CFG.TAG_WORDS))
       if (words.some(w => flat.includes(squash(w)))) out.add(tag);
+    // and the way a description says it, in whole words (10ur-shots-more.js: "keeps her lactating", "makes him virile")
+    const plain = String(partShots(text).rest || text || "").toLowerCase();
+    for (const [tag, re] of Object.entries(CFG.TAG_RE || {})) if (re.test(plain)) out.add(tag);
     return out;
   }
   // a message that reaches them anywhere on the map: beep if we're friends, whisper otherwise

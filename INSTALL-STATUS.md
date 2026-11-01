@@ -5,7 +5,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 | Script | File in `dist/` | Where it runs | Current |
 |---|---|---|---|
-| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.68.1** |
+| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.69.0** |
 | Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.10.1** |
 | Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.2.2** |
 | Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **1.1.1** |
@@ -24,6 +24,18 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 ## Latest changes (newest first)
 
+- **Bot 0.69.0: the farm reads descriptions properly, and the IV drip never lets up.** Laynie, Oct 31: "need better checking inside the descriptions of items, not just the names on them. the iv drip for instance should be a constant top up". No Companion update needed.
+  - **Descriptions in plain words.** Shot words were already read from descriptions, but only as exact phrases, so a description saying it the way people write missed. Now word forms and sentences count, for example:
+    - "keeps her lactating", "makes him virile", "more fertile", "arousing", "sedates", "lays eggs in her"
+    - Injectors: "injects the wearer with…", "doses her with…"
+    - Drips: "an IV line that slowly drips … into her", "a steady drip", "intravenous", "infusion"
+    - Triggers: "whenever she's bred", "every time they cum", "while she's milked", "each time she's edged"
+    - Roulette: "random doses", "mystery serum"
+    - Ovipositors: "lays a clutch in her"; feeders: "feeds her", "force-feeds"
+    - A gag that just "drips drool" isn't taken for a drip.
+  - **The IV drip is constant.** Every minute it holds each effect it carries full, at the strength on the bag (x2 to x5): milk, cum, fertility, eggs, hyper, no-catchin', hair trigger, sedative, flood, denial, heat, aphrodisiac, moo, futa, flavoured milk and kryptonite. Everything lasts about ten minutes after it comes off, instead of a day's dose.
+    - A temporary size on a drip stays grown while it's in and snaps back after.
+    - One-off things (cock types, permanent sizes, capacity, twins, ripening, purge) go in once, when it's first put on.
 - **Bot 0.68.1: kryptonite locks the panels.** Laynie, Oct 31: "kryptonite, when active should disable the staff and proprieter panels til it runs out or is purged." While a proprietor's (or staff member's) kryptonite has them, their Companion drops the Staff and Dashboard panels and shows only Livestock, with a line sayin' why and how long. They come back the moment it wears off, a purge serum clears it, or their safeword ends it. No Companion update needed.
 - **Bot 0.68.0: more in the needle.** Laynie, Oct 30: "love the new injector ideas. plus the new effects. the kryptonite effect should be usable with a auto-injector. I think if a piercing is made with auto-injector, it should be able to use all shot effects." No Companion update needed. (bot/src/parts/10ur-shots-more.js)
   - **New shot words** (on a needle, an auto-injector, or a piercing crafted as one; they stack and take x2 to x5 like the rest):

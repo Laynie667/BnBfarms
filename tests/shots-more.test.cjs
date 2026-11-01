@@ -78,7 +78,30 @@ const shot=(t,text)=>W.__applyShot(t,600,text);
   shot(500,'Purge Serum'); wear(500,'ItemNipplesPiercings','IV drip lactation virility');
   n=sent.length; W.__trapTick(); await wait(100); W.__trapTick(); await wait(300);
   ok(prod(500).boosts.milk>now(), 'a drip tops her up');
+  ok(prod(500).boosts.milk<now()+11*60000, '...held full while it\'s in, not a whole day\'s dose');
   ok(!sent.slice(n).some(x=>/drip/.test(txt(x)) && x[1].Type==='Emote'), '...quietly');
+  prod(500).boosts.milk=now()+60000; W.__trapTick(); await wait(1300); W.__trapTick(); await wait(200);
+  ok(prod(500).boosts.milk>now()+9*60000, '...and topped straight back up, constantly');
+  chars.find(c=>c.MemberNumber===500).Appearance=[];
+  // ── descriptions, the way people write them (Oct 31) ──
+  const wearD=(mn,group,name,desc)=>{ chars.find(c=>c.MemberNumber===mn).Appearance.push({Asset:{Name:'Thing',Group:{Name:group}},Craft:{Name:name,Description:desc}}); };
+  shot(500,'Purge Serum');
+  W.__applyShot(500,600,'Pink Bottle | keeps her lactating and fertile for days'); ok(prod(500).boosts.milk>now() && prod(500).boosts.fert>now(), 'a description: "keeps her lactating and fertile"');
+  shot(500,'Purge Serum');
+  wearD(500,'ItemNipplesPiercings','Pink Bag','An IV line that slowly drips aphrodisiac into her, all day long.');
+  W.__trapTick(); await wait(1300); W.__trapTick(); await wait(300);
+  ok(W.__potionOn(500,'needy'), 'a drip from its description: "an IV line that slowly drips aphrodisiac into her"');
+  chars.find(c=>c.MemberNumber===500).Appearance=[]; shot(500,'Purge Serum');
+  wearD(500,'ItemVulvaPiercings','Little Ring','Whenever she\'s bred, it pricks her with something to make her more fertile.');
+  prod(500).toyAt={}; W.__shotTrigger(500,'bred'); ok(prod(500).boosts.fert>now(), 'a trigger from its description: "whenever she\'s bred… more fertile"');
+  chars.find(c=>c.MemberNumber===500).Appearance=[]; shot(500,'Purge Serum');
+  wearD(500,'ItemNeckAccessories','Cute Charm','A charm that injects the wearer with sedative now and then.');
+  for (let i=0;i<4;i++){ W.__trapTick(); await wait(150); }
+  ok(prod(500).boosts.sedate>now(), 'an injector from its description: "injects the wearer with sedative"');
+  chars.find(c=>c.MemberNumber===500).Appearance=[];
+  wearD(500,'ItemMouth','Drool Gag','It drips drool steadily down her chin.');
+  n=sent.length; for (let i=0;i<4;i++){ W.__trapTick(); await wait(150); }
+  ok(!/starts its drip/.test(all(n)), 'a gag that only drips drool isn\'t a drip');
   chars.find(c=>c.MemberNumber===500).Appearance=[];
   wear(600,'ItemNipplesPiercings','Roulette Auto-Injector');
   const before=JSON.stringify(prod(600).boosts)+JSON.stringify(prod(600).size)+JSON.stringify(P(600).fx||{})+P(600).futa;

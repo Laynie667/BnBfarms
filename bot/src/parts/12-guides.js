@@ -349,8 +349,11 @@ TOYS THAT ACT ON THEIR OWN · crafted words on what you wear
       "when denied" or "on trap" on it: it doses you when that
       happens instead of on a clock
     roulette (or mystery dose) · a random shot every dose
-    iv drip (or drip line) · keeps every timed effect on it
-      topped up, quietly
+    iv drip (or drip line) · holds every effect on it full,
+      constantly, while it's in; it fades ten minutes after
+    Descriptions count, in plain words: "an IV that drips
+      lactation into her", "injects the wearer with sedative",
+      "whenever she's bred it makes her more fertile"
     ?myshots · what's in you right now, and for how long
     ?kryptonite · the barn's rumours about the proprietors'
       weaknesses. Find the word, put it on a needle…

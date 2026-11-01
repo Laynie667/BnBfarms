@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.68.1
+// @version      0.69.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -2792,7 +2792,7 @@
   ];
 
   // bot/src/version.js
-  var VERSION = "0.68.1";
+  var VERSION = "0.69.0";
   var COMPANION_VERSION = "0.51.0";
 
   // bot-parts:farmhand-bot-parts
@@ -6348,6 +6348,8 @@
       const out = /* @__PURE__ */ new Set();
       for (const [tag, words] of Object.entries(CFG.TAG_WORDS))
         if (words.some((w) => flat.includes(squash(w)))) out.add(tag);
+      const plain = String(partShots(text).rest || text || "").toLowerCase();
+      for (const [tag, re] of Object.entries(CFG.TAG_RE || {})) if (re.test(plain)) out.add(tag);
       return out;
     }
     function tell(mn, text) {
@@ -13411,9 +13413,9 @@
       tally(t);
       const b = rt.benched;
       b.uses++;
-      const W0 = benchWeek();
-      W0.n[t] = (W0.n[t] || 0) + 1;
-      W0.by[sender] = (W0.by[sender] || 0) + 1;
+      const W02 = benchWeek();
+      W02.n[t] = (W02.n[t] || 0) + 1;
+      W02.by[sender] = (W02.by[sender] || 0) + 1;
       saveLedger();
       audit(sender, "BENCH_USE", t + " " + hole + (load ? " " + Math.round(load) + "mL" : ""));
       {
@@ -14676,11 +14678,11 @@
             return true;
           };
           if (isDrip(text) && due("drip", CFG.SHOTS2.DRIP_MIN)) shotDrip(mn, it, text);
-          else if (hasWord(text, AUTO_INJECT) && !isDrip(text) && !triggerOf(text).length && due("inj", CFG.AUTOINJECT_MIN)) {
+          else if (isInjector(text) && !isDrip(text) && !triggerOf(text).length && due("inj", CFG.AUTOINJECT_MIN)) {
             const ok = applyShot(mn, BOTMN(), isRoulette(text) ? rouletteText(mn, text) : text, { auto: true, open: tFill(pickFor(mn, "toy:inj", TOY_LINES.inject), mn, { c: itemName(it) }), from: "your " + itemName(it) + "'s dose", heatH: 1 });
             if (ok) audit(BOTMN(), "AUTOINJECT", mn + " " + itemName(it));
           }
-          if (TOY_GROUPS[g] && hasWord(text, OVI_WORDS) && (r.eggs || isSubject(mn)) && !limitBlocks(mn, "eggs") && due("ovi", CFG.OVI_MIN)) {
+          if (TOY_GROUPS[g] && isOvi(text) && (r.eggs || isSubject(mn)) && !limitBlocks(mn, "eggs") && due("ovi", CFG.OVI_MIN)) {
             const [lo, hi] = CFG.EGG_COUNT, hyper = tagsIn(text).has("hyper") || hyperEggs(mn, 0);
             const n0 = (lo + Math.floor(Math.random() * (hi - lo + 1))) * shotTimes(text) * (hyper ? 3 : 1);
             const n = layClutch(mn, n0, TOY_SIRE), hole = TOY_GROUPS[g];
@@ -14688,7 +14690,7 @@
             tell(mn, "\u{1F95A} Your " + itemName(it) + " just laid " + n0 + " eggs in you, sugar. You're carryin' " + n + " now.");
             arouse(mn, 20);
           }
-          if (TOY_GROUPS[g] === "mouth" && hasWord(text, FEED_WORDS) && due("feed", CFG.AUTOFEED_MIN)) {
+          if (TOY_GROUPS[g] === "mouth" && isFeeder(text) && due("feed", CFG.AUTOFEED_MIN)) {
             const piss = !!r.watersports && /piss|golden|urin/.test(text);
             const kept = trapFill(mn, "mouth", CFG.AUTOFEED_ML * shotTimes(text), CFG.TRAP_OVERFULL);
             if (kept >= 1) {
@@ -14700,7 +14702,7 @@
               tell(mn, "\u{1F37C} Your " + itemName(it) + " gurgles, but there's not room for another drop in you, sugar.");
             }
           }
-          if ((g === "ItemVulva" || g === "ItemButt" || g === "ItemPelvis" || g === "ItemDevices") && !hasWord(text, OVI_WORDS) && !hasWord(text, AUTO_INJECT)) {
+          if ((g === "ItemVulva" || g === "ItemButt" || g === "ItemPelvis" || g === "ItemDevices") && !isOvi(text) && !isInjector(text) && !isDrip(text)) {
             const tc = toyCock(text, it.Asset.Name);
             if (tc && due("cock", CFG.TOYCOCK_MIN)) {
               const where = g === "ItemButt" ? "ass" : g === "ItemDevices" ? hasVulva(mn) ? "pussy" : "ass" : hasVulva(mn) ? "pussy" : "ass";
@@ -24696,7 +24698,7 @@
       if (!place) return null;
       return { place };
     }
-    CFG.SHOTS2 = CFG.SHOTS2 || { TRIGGER_MIN: 5, DRIP_MIN: 5, KRYPTO_MIN: 30, KRYPTO_RIBBONS: 3, RUMOR_H: [2, 4], TEMP_H: 1 };
+    CFG.SHOTS2 = CFG.SHOTS2 || { TRIGGER_MIN: 5, DRIP_MIN: 1, DRIP_HOLD_MIN: 10, KRYPTO_MIN: 30, KRYPTO_RIBBONS: 3, RUMOR_H: [2, 4], TEMP_H: 1 };
     Object.assign(CFG.TAG_WORDS, {
       aphro: ["aphrodisiac", "horny", "lust serum", "libido"],
       trigger: ["hair trigger", "hair-trigger", "hairtrigger", "sensitizer", "sensitiser", "oversensitiv"],
@@ -24712,6 +24714,51 @@
       flavor: ["strawberry milk", "chocolate milk", "honey milk", "vanilla milk", "banana milk", "caramel milk", "flavoured milk", "flavored milk"],
       purge: ["purge serum", "purge shot", "antidote", "detox", "cleanser"]
     });
+    const W0 = "(?:\\w+\\W+){0,3}?";
+    CFG.TAG_RE = {
+      lactation: /\b(lactat\w*|milk[- ](?:inducing|producing|production|maker|making)|(?:makes?|keeps?|fills?)\W+(?:\w+\W+){0,3}?(?:milky|full of milk|leaking milk)|produce\w* (?:more )?milk|start\w* (?:her |him |them )?milking)\b/,
+      virility: /\b(virile|virility|potency|cum production|(?:more|extra|bigger) (?:cum|loads?|seed))\b/,
+      fertility: /\b(fertil\w*|ultra[- ]fertile|easier to (?:breed|knock up|impregnate))\b/,
+      contraceptive: /\b(contracept\w*|birth control)\b/,
+      heat: /\b(induces? heat|into (?:a )?heat|in heat|estrus|oestrus|rut(?:ting)? inducer)\b/,
+      eggs: /\b(lays? eggs|egg[- ]?laying|oviposit\w*|clutch of eggs|fill\w* (?:her |him |them )?with eggs)\b/,
+      hyper: /\b(hyper[- ]?pregnan\w*|hyper[- ]?fertil\w*|brood ?mother|huge litters?|litters? of (?:a )?dozen)\b/,
+      aphro: /\b(aphrodisiac\w*|horny|arous(?:al|ing|es)|libido|lust(?:ful)?)\b/,
+      trigger: /\b(hair[- ]?trigger|sensiti[sz](?:er|ing|es)|over[- ]?sensitive|hyper[- ]?sensitive)\b/,
+      denial: /\b(denial serum|orgasm (?:block\w*|denial)|(?:no|denies|denying|blocks?) (?:her |him |them )?(?:orgasms?|cumming|climax\w*)|held at the edge|edge serum)\b/,
+      flood: /\b(cum flood|flood\w* (?:her |him |them )?with cum|gushers?|huge loads?|enormous loads?)\b/,
+      sedative: /\b(sedat\w*|tranquili[sz]\w*|drowsy|sleepy serum)\b/,
+      obey: /\b(obedien\w*|mind[- ]?control\w*|docil\w*|trance serum|brainwash\w*)\b/,
+      futashot: /\b(futa(?:nari)? (?:serum|shot)|grows? (?:her |them )?a (?:cock|dick))\b/,
+      temp: /\b(temporar\w*|fleeting|for an hour)\b/,
+      twins: /\b(twins|triplets|multiples)\b/,
+      ripe: /\b(ripening|ovulat\w*|sure catch|guarantee\w* (?:to )?(?:catch|take|conceive))\b/,
+      purge: /\b(purge serum|antidote|detox\w*|flush(?:es)? (?:out )?every)\b/
+    };
+    const INJ_RE = /\b(auto[- ]?inject\w*|self[- ]?inject\w*|injects?\b|injecting|auto[- ]?dos\w*|(?:doses|dosing) (?:her|him|them|the wearer)|needle(?:s)? (?:slides?|sinks?|jabs?|pricks?))/;
+    const DRIP_RE = new RegExp("\\b(?:i\\.?v\\.?(?:\\s|$)|intravenous\\w*|infusion|cannula)|\\bdrip(?:s|ping|ped)?\\W+" + W0 + "(?:line|bag|feed|tube|into|serum|dose|steady|steadily|constant(?:ly)?)\\b|\\b(?:constant|steady|slow|endless)\\W+drip");
+    const ROULETTE_RE = /\b(roulette|random(?:ly)?\W+(?:\w+\W+)?(?:shots?|doses?|serums?|effects?)|mystery (?:shot|dose|serum)|lucky dip|surprise (?:shot|dose|serum))\b/;
+    const TRIGGER_RE = {
+      climax: new RegExp("\\b(?:when(?:ever)?|each time|every time|as soon as|after)\\W+" + W0 + "(?:cums?|comes|cumming|climax\\w*|orgasms?)\\b|\\bon (?:climax|orgasm)\\b"),
+      bred: new RegExp("\\b(?:when(?:ever)?|each time|every time|as soon as|after)\\W+" + W0 + "(?:bred|breeds?|filled|creampied|mounted|knotted|inseminated)\\b|\\bon (?:breeding|fill)\\b"),
+      milked: new RegExp("\\b(?:when(?:ever)?|each time|every time|as soon as|after|while)\\W+" + W0 + "(?:milked|milking|pumped|nursed|nursing)\\b|\\bon milking\\b"),
+      denied: new RegExp("\\b(?:when(?:ever)?|each time|every time|as soon as|after)\\W+" + W0 + "(?:denied|edged|ruined)\\b|\\bon (?:denial|edge)\\b"),
+      trap: new RegExp("\\b(?:when(?:ever)?|each time|every time|as soon as)\\W+" + W0 + "(?:trapped|caught|traps? springs?)\\b|\\bon trap\\b")
+    };
+    const OVI_RE = /\b(oviposit\w*|lays? (?:a clutch|eggs)|egg[- ]?layer|pumps? (?:her |him |them )?full of eggs)\b/;
+    const FEED_RE = /\b(auto[- ]?feed\w*|self[- ]?feed\w*|force[- ]?feed\w*|feeds? (?:her|him|them|the wearer)\b|pours? \w+ (?:down|into) (?:her|his|their) throat)/;
+    function isInjector(text) {
+      const f = squash(text);
+      return AUTO_INJECT.some((w) => f.includes(squash(w))) || INJ_RE.test(String(text || ""));
+    }
+    function isOvi(text) {
+      const f = squash(text);
+      return OVI_WORDS.some((w) => f.includes(squash(w))) || OVI_RE.test(String(text || ""));
+    }
+    function isFeeder(text) {
+      const f = squash(text);
+      return FEED_WORDS.some((w) => f.includes(squash(w))) || FEED_RE.test(String(text || ""));
+    }
     const FLAVORS = ["strawberry", "chocolate", "honey", "vanilla", "banana", "caramel"];
     const LSCG_WORDS = /sedative|horny|aphrodisiac|antidote|mind ?control|enlarg|shrink|sleep/i;
     const SHOT_WORDS = /\b(shot|serum|dose|vial|booster|tonic|inject|syringe|needle|elixir|draught)/i;
@@ -24840,35 +24887,18 @@
       ["temporary ass growth", "size"]
     ];
     const DRIP = ["iv drip", "drip line", "drip feed", "intravenous", "iv line"];
-    const DRIP_KEEP = [
-      ["lactation", "lactation", (p) => boosted(p, "milk")],
-      ["virility", "virility", (p) => boosted(p, "semen")],
-      ["fertility", "fertility", (p) => boosted(p, "fert")],
-      ["eggs", "egg laying", (p) => boosted(p, "eggs")],
-      ["hyper", "hyper pregnancy", (p) => boosted(p, "hyper")],
-      ["contraceptive", "contraceptive", (p) => boosted(p, "contra")],
-      ["trigger", "hair trigger", (p) => boosted(p, "trigger")],
-      ["sedative", "sedative", (p) => boosted(p, "sedate")],
-      ["flood", "cum flood", (p) => boosted(p, "flood")],
-      ["denial", "denial serum", (p) => p.deniedUntil > Date.now()],
-      ["aphro", "aphrodisiac", (p, mn) => potionOn(mn, "needy")]
-    ];
     const kFill = (t, mn, v) => String(t).replace(/%t/g, plainName(mn)).replace(/%h/g, v && v.h || "").replace(/%f/g, v && v.f || "");
-    const injWord = (text) => {
-      const f = squash(text);
-      return AUTO_INJECT.some((w) => f.includes(squash(w))) || f.includes("injector");
-    };
     const triggerOf = (text) => {
-      const f = squash(text);
-      return Object.keys(TRIGGERS).filter((k) => TRIGGERS[k].some((w) => f.includes(squash(w))));
+      const f = squash(text), t = String(text || "");
+      return Object.keys(TRIGGERS).filter((k) => TRIGGERS[k].some((w) => f.includes(squash(w))) || TRIGGER_RE[k].test(t));
     };
     const isDrip = (text) => {
       const f = squash(text);
-      return DRIP.some((w) => f.includes(squash(w)));
+      return DRIP.some((w) => f.includes(squash(w))) || DRIP_RE.test(String(text || ""));
     };
     const isRoulette = (text) => {
       const f = squash(text);
-      return ROULETTE.some((w) => f.includes(squash(w)));
+      return ROULETTE.some((w) => f.includes(squash(w))) || ROULETTE_RE.test(String(text || ""));
     };
     const isPiercing = (g) => /Piercings$/.test(String(g || ""));
     function kryptoNow(mn) {
@@ -25176,10 +25206,102 @@
       return pick + (kryptoHit(mn, text) ? " " + rec(mn).kryptonite.word : "");
     }
     function shotDrip(mn, it, text) {
-      const p = prodOf(mn), tags = tagsIn(text), need = DRIP_KEEP.filter(([t, , on]) => tags.has(t) && !on(p, mn)).map(([, w]) => w);
-      if (kryptoHit(mn, text) && !kryptoNow(mn)) need.push(rec(mn).kryptonite.word);
-      if (!need.length) return;
-      applyShot(mn, CFG.BOT_MEMBER, need.join(" "), { open: "The drip in the " + itemName(it) + " on " + plainName(mn) + " ticks over and keeps 'em topped up.", from: "your " + itemName(it) + "'s drip", heatH: 1, auto: true, quiet: true });
+      const r = rec(mn), p = prodOf(mn), now = Date.now(), hold = now + CFG.SHOTS2.DRIP_HOLD_MIN * 6e4, x = shotTimes(text), tags = tagsIn(text), lim = String(r.limits || "");
+      if (!tags.size && !sizeTagsIn(text).length && !kryptoHit(mn, text) && !penisTagsIn(text).type && !penisTagsIn(text).knot) return;
+      const key = "drip:" + it.Asset.Group.Name + ":" + (it.Craft && it.Craft.Name || it.Asset.Name);
+      p.drips = p.drips || {};
+      const first = !p.drips[key] || p.drips[key].seen < now - 5 * 6e4;
+      p.drips[key] = { seen: now, at: first ? now : p.drips[key].at };
+      const got = [];
+      const keep = (k) => {
+        p.boosts = p.boosts || {};
+        p.boostX = p.boostX || {};
+        if (!(p.boosts[k] > now)) got.push(k);
+        p.boosts[k] = Math.max(p.boosts[k] || 0, hold);
+        p.boostX[k] = Math.max(Math.min(p.boostX[k] || 0, CFG.STACK_MAX), x);
+      };
+      const potionKeep = (id) => {
+        const P = potionDef(id);
+        if (!P || P.limit && P.limit.test(lim)) return;
+        if (!potionOn(mn, id)) {
+          givePotion(mn, id, CFG.BOT_MEMBER, "from a drip");
+          got.push(id);
+        } else r.fx[id].until = Math.max(r.fx[id].until, hold);
+      };
+      if (tags.has("lactation") && makesMilk(mn)) keep("milk");
+      if (tags.has("virility") && makesSemen(mn)) keep("semen");
+      if (tags.has("fertility")) keep("fert");
+      if (tags.has("eggs") && !limitBlocks(mn, "eggs")) keep("eggs");
+      if (tags.has("hyper") && !limitBlocks(mn, "breed")) keep("hyper");
+      if (tags.has("contraceptive")) keep("contra");
+      if (tags.has("trigger")) keep("trigger");
+      if (tags.has("sedative") && !/\b(sedat|drug|sleep)/i.test(lim)) keep("sedate");
+      if (tags.has("flood")) keep("flood");
+      if (tags.has("denial") && !/\b(denial|chast|orgasm|edg)/i.test(lim)) {
+        if (!(p.deniedUntil > now)) got.push("denial");
+        p.deniedUntil = Math.max(p.deniedUntil || 0, hold);
+      }
+      if (tags.has("aphro")) potionKeep("needy");
+      if (tags.has("mooserum")) potionKeep("moo");
+      if (tags.has("heat") && !limitBlocks(mn, "heat")) {
+        if (inHeat(p)) p.heat.until = Math.max(p.heat.until, hold);
+        else {
+          startHeat(mn, CFG.BOT_MEMBER, 1);
+          got.push("heat");
+        }
+      }
+      if (tags.has("flavor") && makesMilk(mn)) {
+        const f = squash(text), k = FLAVORS.find((w) => f.includes(w + "milk")) || p.milkFlavor && p.milkFlavor.k || FLAVORS[0];
+        p.milkFlavor = { k, until: Math.max(p.milkFlavor && p.milkFlavor.until || 0, hold) };
+      }
+      if (tags.has("futashot") && !limitBlocks(mn, "futa") && (!r.futa || r.futaShot)) {
+        if (!r.futa) {
+          r.futa = true;
+          prodOf(mn);
+          got.push("futa");
+        }
+        r.futaShot = { until: Math.max(r.futaShot && r.futaShot.until || 0, hold) };
+      }
+      if (kryptoHit(mn, text)) {
+        if (!kryptoNow(mn)) kryptoStart(mn, CFG.BOT_MEMBER, x, true);
+        else r.krypto.until = Math.max(r.krypto.until, hold);
+      }
+      if (tags.has("temp")) {
+        for (const [part, d] of sizeTagsIn(text)) {
+          if (!hasPart(mn, part)) continue;
+          const was = (p.tempSize || []).find((t) => t.src === key && t.part === part);
+          if (was) was.until = Math.max(was.until, hold);
+          else {
+            const before = sizeOf(mn, part);
+            setSize(mn, part, before + d * ((CFG.SIZES[part] || {}).step || 1) * x, true);
+            const moved = sizeOf(mn, part) - before;
+            if (moved) {
+              p.tempSize = (p.tempSize || []).concat({ part, d: moved, until: hold, src: key });
+              got.push(part);
+            }
+          }
+        }
+      }
+      if (first) {
+        const ONCE = { capacity: "capacity", reducing: "reducing", purge: "purge serum", twins: "twins", ripe: "ripening", obey: "obedience", suppressant: "suppressant" };
+        const words = Array.from(tags).filter((t) => ONCE[t]).map((t) => ONCE[t]), pt = penisTagsIn(text);
+        if (!tags.has("temp")) for (const [part, d] of sizeTagsIn(text)) {
+          const T = CFG.SIZE_TAGS[part];
+          if (T) words.push(d > 0 ? T.up[0] : T.down[0]);
+        }
+        if (pt.type) words.push(CFG.PENIS_TYPE_TAGS[pt.type][0]);
+        if (pt.knot) words.push(pt.knot > 0 ? CFG.KNOT_ADD_TAGS[0] : CFG.KNOT_REMOVE_TAGS[0]);
+        if (words.length) applyShot(mn, CFG.BOT_MEMBER, words.join(" ") + (x > 1 ? " x" + x : ""), { auto: true, quiet: true });
+      }
+      if (got.length || first) {
+        saveLedger();
+        syncCompanions(true);
+        if (first) privateLine(mn, "\u{1F4A7} The " + itemName(it) + " starts its drip: a slow, steady trickle into you that never lets up while it's in.", "emote");
+      }
+      if (!first && now - (p.dripTold || 0) > 30 * 6e4 && Math.random() < 0.15) {
+        p.dripTold = now;
+        privateLine(mn, "\u{1F4A7} Drip\u2026 drip\u2026 the " + itemName(it) + " keeps you topped right up.", "emote");
+      }
     }
     function myShotsText(mn) {
       const r = rec(mn), p = prodOf(mn), now = Date.now();
@@ -59731,8 +59853,11 @@ TOYS THAT ACT ON THEIR OWN \xB7 crafted words on what you wear
       "when denied" or "on trap" on it: it doses you when that
       happens instead of on a clock
     roulette (or mystery dose) \xB7 a random shot every dose
-    iv drip (or drip line) \xB7 keeps every timed effect on it
-      topped up, quietly
+    iv drip (or drip line) \xB7 holds every effect on it full,
+      constantly, while it's in; it fades ten minutes after
+    Descriptions count, in plain words: "an IV that drips
+      lactation into her", "injects the wearer with sedative",
+      "whenever she's bred it makes her more fertile"
     ?myshots \xB7 what's in you right now, and for how long
     ?kryptonite \xB7 the barn's rumours about the proprietors'
       weaknesses. Find the word, put it on a needle\u2026

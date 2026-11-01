@@ -473,12 +473,12 @@
         // an auto-injector: whatever else the item says, every half hour
         // a drip keeps it topped up instead; one with a trigger waits for its moment (10ur-shots-more.js)
         if (isDrip(text) && due("drip", CFG.SHOTS2.DRIP_MIN)) shotDrip(mn, it, text);
-        else if (hasWord(text, AUTO_INJECT) && !isDrip(text) && !triggerOf(text).length && due("inj", CFG.AUTOINJECT_MIN)){
+        else if (isInjector(text) && !isDrip(text) && !triggerOf(text).length && due("inj", CFG.AUTOINJECT_MIN)){
           const ok = applyShot(mn, BOTMN(), isRoulette(text) ? rouletteText(mn, text) : text, { auto: true, open: tFill(pickFor(mn, "toy:inj", TOY_LINES.inject), mn, { c: itemName(it) }), from: "your "+itemName(it)+"'s dose", heatH: 1 });
           if (ok) audit(BOTMN(), "AUTOINJECT", mn+" "+itemName(it));
         }
         // an ovipositor on a gag, a belt, a plug or a dildo
-        if (TOY_GROUPS[g] && hasWord(text, OVI_WORDS) && (r.eggs || isSubject(mn)) && !limitBlocks(mn, "eggs") && due("ovi", CFG.OVI_MIN)){
+        if (TOY_GROUPS[g] && isOvi(text) && (r.eggs || isSubject(mn)) && !limitBlocks(mn, "eggs") && due("ovi", CFG.OVI_MIN)){
           const [lo, hi] = CFG.EGG_COUNT, hyper = tagsIn(text).has("hyper") || hyperEggs(mn, 0);
           const n0 = (lo + Math.floor(Math.random()*(hi - lo + 1))) * shotTimes(text) * (hyper ? 3 : 1);
           const n = layClutch(mn, n0, TOY_SIRE), hole = TOY_GROUPS[g];
@@ -487,7 +487,7 @@
           arouse(mn, 20);
         }
         // a funnel gag (or any gag) that feeds on its own
-        if (TOY_GROUPS[g] === "mouth" && hasWord(text, FEED_WORDS) && due("feed", CFG.AUTOFEED_MIN)){
+        if (TOY_GROUPS[g] === "mouth" && isFeeder(text) && due("feed", CFG.AUTOFEED_MIN)){
           const piss = !!r.watersports && /piss|golden|urin/.test(text);
           const kept = trapFill(mn, "mouth", CFG.AUTOFEED_ML * shotTimes(text), CFG.TRAP_OVERFULL);
           if (kept >= 1){
@@ -497,7 +497,7 @@
           } else if (now - (p.toyAt.fullTold || 0) > 30*60000){ p.toyAt.fullTold = now; tell(mn, "🍼 Your "+itemName(it)+" gurgles, but there's not room for another drop in you, sugar."); }
         }
         // a toy crafted as a cock: the farm talks about it like one
-        if ((g === "ItemVulva" || g === "ItemButt" || g === "ItemPelvis" || g === "ItemDevices") && !hasWord(text, OVI_WORDS) && !hasWord(text, AUTO_INJECT)){
+        if ((g === "ItemVulva" || g === "ItemButt" || g === "ItemPelvis" || g === "ItemDevices") && !isOvi(text) && !isInjector(text) && !isDrip(text)){
           const tc = toyCock(text, it.Asset.Name);
           if (tc && due("cock", CFG.TOYCOCK_MIN)){
             const where = g === "ItemButt" ? "ass" : g === "ItemDevices" ? (hasVulva(mn) ? "pussy" : "ass") : hasVulva(mn) ? "pussy" : "ass";

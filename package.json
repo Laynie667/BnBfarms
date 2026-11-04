@@ -11,7 +11,9 @@
   "scripts": {
     "build": "node build.mjs",
     "watch": "node build.mjs --watch",
-    "test": "node tests/run-all.mjs"
+    "test": "node tests/run-all.mjs",
+    "release": "node tools/release.mjs",
+    "test:only": "node tests/run-all.mjs --no-build"
   },
   "devDependencies": {
     "bondage-club-mod-sdk": "1.2.0",

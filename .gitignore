@@ -27,3 +27,6 @@ bnb-ledger-*.json
 # reference pictures copied in for the studio to look at (Oct 24): never on GitHub
 studio/web/_refs/
 studio/web/_stamps/
+
+# where the studio finds reference/ and scratch-previews/ on this computer (studio/server.mjs)
+studio/local.json

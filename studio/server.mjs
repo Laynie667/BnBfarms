@@ -10,20 +10,23 @@
 // version players are on (and the Echo mod, made for it, behaves as in the game). Needs the internet the first time.
 import { createServer } from "node:http";
 import { readFile, stat, writeFile, mkdir, rename } from "node:fs/promises";
-import { existsSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { dirname, extname, join, normalize, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const HERE = fileURLToPath(new URL(".", import.meta.url));
+// where reference/ and scratch-previews/ live: two folders up, as it always was, unless studio/local.json says
+// { "home": "C:/…/Bondageproject" } (Nov 3: the project moved out of OneDrive, the reference folder stayed in it)
+const HOME = (() => { try { const h = JSON.parse(readFileSync(join(HERE, "local.json"), "utf8")).home; if (h && existsSync(h)) return h; } catch (e) { /* none */ } return join(HERE, "../.."); })();
 const ARG = String(process.argv[2] || "");
-const GAME = resolve(ARG && !/^live/i.test(ARG) ? ARG : join(HERE, "../../reference/Bondage-College-new/Bondage-College-master/BondageClub"));
+const GAME = resolve(ARG && !/^live/i.test(ARG) ? ARG : join(HOME, "reference/Bondage-College-new/Bondage-College-master/BondageClub"));
 const LIVE_SITE = "https://www.bondageprojects.elementfx.com/";
 let LIVE = null;   // { ver, base, dir, missing, busy } when the game comes from its site
 const PORT = Number(process.argv[3] || process.env.PORT || 4780);
 const WEB = join(HERE, "web");
 const FITS = join(HERE, "fits");                                  // what the sliders save: one small JSON file per body part
 const BELLY_SRC = join(HERE, "../extension/src/belly.js");
-const ECHO_RES = (() => { const p = join(HERE, "../../reference/addons/echocloth-new/resources"); return existsSync(p) ? p : null; })();   // the Echo clothing mod's pictures, if a copy is here        // the Companion's own belly drawing: the studio draws with the very same code
+const ECHO_RES = (() => { const p = join(HOME, "reference/addons/echocloth-new/resources"); return existsSync(p) ? p : null; })();   // the Echo clothing mod's pictures, if a copy is here        // the Companion's own belly drawing: the studio draws with the very same code
 const TYPES = { ".html": "text/html; charset=utf-8", ".js": "text/javascript; charset=utf-8", ".mjs": "text/javascript; charset=utf-8", ".css": "text/css; charset=utf-8", ".json": "application/json",
   ".png": "image/png", ".jpg": "image/jpeg", ".jpeg": "image/jpeg", ".gif": "image/gif", ".svg": "image/svg+xml", ".webp": "image/webp", ".mp3": "audio/mpeg", ".ogg": "audio/ogg", ".wav": "audio/wav",
   ".csv": "text/csv; charset=utf-8", ".txt": "text/plain; charset=utf-8", ".ttf": "font/ttf", ".woff": "font/woff", ".woff2": "font/woff2", ".ico": "image/x-icon" };
@@ -125,7 +128,7 @@ createServer(async (req, res) => {
       if (!/^[a-z0-9-]{1,60}\.png$/.test(name)) { res.writeHead(400).end("bad name"); return; }
       let body = ""; for await (const chunk of req) { body += chunk; if (body.length > 12000000) { res.writeHead(413).end("too big"); return; } }
       const m = /^data:image\/png;base64,([A-Za-z0-9+/=]+)$/.exec(body.trim()); if (!m) { res.writeHead(400).end("not a png"); return; }
-      const dir = join(HERE, "..", "..", "scratch-previews"); await mkdir(dir, { recursive: true });
+      const dir = join(HOME, "scratch-previews"); await mkdir(dir, { recursive: true });
       await writeFile(join(dir, name), Buffer.from(m[1], "base64"));
       res.writeHead(200, { "Content-Type": "text/plain" }).end("saved"); return;
     }

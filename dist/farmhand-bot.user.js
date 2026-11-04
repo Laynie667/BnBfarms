@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.69.0
+// @version      0.69.1
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -2792,7 +2792,7 @@
   ];
 
   // bot/src/version.js
-  var VERSION = "0.69.0";
+  var VERSION = "0.69.1";
   var COMPANION_VERSION = "0.51.0";
 
   // bot-parts:farmhand-bot-parts
@@ -24908,6 +24908,7 @@
     function kryptoHit(mn, text) {
       const r = rec(mn), k = r && r.kryptonite;
       if (!k || !k.word || !isProprietor(mn)) return false;
+      if ((r.kryptoSafe || 0) > Date.now()) return false;
       const w = squash(k.word);
       return w.length >= 3 && squash(text).includes(w);
     }
@@ -24929,7 +24930,9 @@
     }
     function kryptoEnd(mn, why) {
       const r = rec(mn);
-      if (!r || !r.krypto) return;
+      if (!r) return;
+      if (why === "safe") r.kryptoSafe = Date.now() + 60 * 6e4;
+      if (!r.krypto) return;
       const was = r.krypto.until > Date.now();
       r.krypto = null;
       saveLedger();

@@ -1,11 +1,11 @@
 # What to install (current versions)
 
-Updated 2026-10-31. Every file is in the `dist/` folder (it syncs through OneDrive, so the phone app has it too).
+Updated 2026-11-03. Every file is in the `dist/` folder (it syncs through OneDrive, so the phone app has it too).
 In Tampermonkey's dashboard, compare each script's version with this list. Anything already at these versions is up to date.
 
 | Script | File in `dist/` | Where it runs | Current |
 |---|---|---|---|
-| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.69.0** |
+| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.69.1** |
 | Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.10.1** |
 | Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.2.2** |
 | Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **1.1.1** |
@@ -24,6 +24,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 ## Latest changes (newest first)
 
+- **Bot 0.69.1: the safeword holds kryptonite off for an hour.** Laynie, Nov 3: yes. After a proprietor's safeword, nothin' carryin' their word (a needle, an injector, a piercing or a drip) can drop them again for an hour. No Companion update needed.
 - **Bot 0.69.0: the farm reads descriptions properly, and the IV drip never lets up.** Laynie, Oct 31: "need better checking inside the descriptions of items, not just the names on them. the iv drip for instance should be a constant top up". No Companion update needed.
   - **Descriptions in plain words.** Shot words were already read from descriptions, but only as exact phrases, so a description saying it the way people write missed. Now word forms and sentences count, for example:
     - "keeps her lactating", "makes him virile", "more fertile", "arousing", "sedates", "lays eggs in her"

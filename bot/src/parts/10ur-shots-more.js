@@ -170,6 +170,7 @@
   function kryptoHit(mn, text){
     const r = rec(mn), k = r && r.kryptonite;
     if (!k || !k.word || !isProprietor(mn)) return false;
+    if ((r.kryptoSafe || 0) > Date.now()) return false;   // their safeword holds it off an hour, drips and all (Laynie, Nov 3)
     const w = squash(k.word); return w.length >= 3 && squash(text).includes(w);
   }
   function kryptoStart(mn, by, x, auto){
@@ -185,7 +186,9 @@
     saveLedger(); audit(by || CFG.BOT_MEMBER, "KRYPTONITE", mn + " " + Math.round((r.krypto.until - now) / 60000) + "m"); syncCompanions(true);
   }
   function kryptoEnd(mn, why){
-    const r = rec(mn); if (!r || !r.krypto) return;
+    const r = rec(mn); if (!r) return;
+    if (why === "safe") r.kryptoSafe = Date.now() + 60 * 60000;   // an hour where nothin' carryin' their word can take
+    if (!r.krypto) return;
     const was = r.krypto.until > Date.now(); r.krypto = null; saveLedger(); syncCompanions(true);   // (their panels come back)
     if (was && why !== "safe" && charFor(mn)) emote(kFill(pickFresh("krypto:end", KRYPTO_LINES.end), mn), mn);
   }

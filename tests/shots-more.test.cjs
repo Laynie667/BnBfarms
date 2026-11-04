@@ -65,10 +65,12 @@ const shot=(t,text)=>W.__applyShot(t,600,text);
   W.__addons('safe',221397); ok(!W.__kryptoNow(221397), 'her safeword ends it');
   { const s=W.__stateFor(221397); ok(s.staff && s.proprietor && !s.krypto, '...and the panels come back'); }
   // on an auto-injector piercing
-  cfg.AUTOINJECT_MIN=0.0005; cfg.SHOTS2.DRIP_MIN=0.0005; wear(221397,'ItemNipplesPiercings','Honeybee Auto-Injector Ring');
+  P(221397).kryptoSafe=0; cfg.AUTOINJECT_MIN=0.0005; cfg.SHOTS2.DRIP_MIN=0.0005; wear(221397,'ItemNipplesPiercings','Honeybee Auto-Injector Ring');
   W.__trapTick(); await wait(200); W.__trapTick(); await wait(200);
   ok(W.__kryptoNow(221397), 'an auto-injector piercing with her word works too');
-  W.__addons('safe',221397); chars.find(c=>c.MemberNumber===221397).Appearance=[];
+  W.__addons('safe',221397); for (let i=0;i<4;i++){ W.__trapTick(); await wait(150); }
+  ok(!W.__kryptoNow(221397), 'after her safeword, the injector can\x27t put it back for an hour');
+  chars.find(c=>c.MemberNumber===221397).Appearance=[]; P(221397).kryptoSafe=0;
   // ── triggered, roulette, drip ──
   shot(500,'Purge Serum');
   wear(500,'ItemVulvaPiercings','Breeder\'s Ring, when bred: fertility');

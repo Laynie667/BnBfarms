@@ -4,7 +4,7 @@
 // wrong person. Each one listed should pass its person explicitly: emote(text, who) / say(text, urgent, who).
 import { readFileSync, readdirSync, existsSync } from "node:fs";
 
-const files = readdirSync("bot/src/parts").filter((f) => f.endsWith(".js")).map((f) => "bot/src/parts/" + f)
+const files = readdirSync("bot/src/parts", { recursive: true }).map((f) => f.replace(/\\/g, "/")).filter((f) => f.endsWith(".js")).map((f) => "bot/src/parts/" + f)
   .concat(readdirSync("addons").filter((d) => !d.startsWith("_") && existsSync("addons/" + d + "/index.js")).map((d) => "addons/" + d + "/index.js"));
 
 const rows = [];

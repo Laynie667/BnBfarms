@@ -30,6 +30,9 @@ const all=n=>sent.slice(n).filter(([e,d])=>d&&(typeof d.Content==='string'||e===
 const say=async(mn,msg,ms)=>{ handlers.ChatRoomMessage({Sender:mn,Type:'Whisper',Content:msg,Target:260239}); await wait(ms||2400); };
 const moveTo=(mn,X,Y)=>{ chars.find(c=>c.MemberNumber===mn).MapData.Pos={X,Y}; };
 const rnd=Math.random;
+// one of these lines was said (its longest plain stretch, past %n and the like), give or take the send queue
+const saidAny=(n,pool)=>(pool||[]).some(line=>{ const bits=line.replace(/^(\{[a-z]+\})+/,'').split(/%[a-z]+|"/).map(x=>x.trim()).filter(x=>x.length>=12).sort((a,b)=>b.length-a.length); return bits.length>0 && all(n).includes(bits[0]); });
+const heard=async(n,pool)=>{ for(let i=0;i<24;i++){ if(saidAny(n,pool)) return true; await wait(250); } return false; };
 (async()=>{ await wait(3500); const cfg=W.__cfg; cfg.USER_COOLDOWN_S=0; cfg.TRAP_BEAT_S=0.12; cfg.TRAP_COOLDOWN_MIN=0; cfg.CHAIN_CHANCE=0;
   ['Laynie','Moo','Hana','Pip'].forEach((nm,i)=>chars[i+1].Name=nm);
   await say(500,'?stats'); await say(600,'?stats'); await say(221397,'?stats'); await say(800,'?stats');
@@ -66,7 +69,7 @@ const rnd=Math.random;
   W.__ms(); W.__ms();
   ok(p.stall && Math.abs(p.stall.total.m-full)<1, 'on punishing the stall means to take every drop');
   n=sent.length; const got0=p.stall.got.m; W.__milkCum(500); await wait(1500);
-  ok(P(500).milkCums===1 && p.stall.got.m>got0 && /cum|let down|lettin' down|tips Moo|There it is/.test(all(n)), 'cummin\' in the stall brings a bigger let-down, a line, and a mark on the record');
+  ok(P(500).milkCums===1 && p.stall.got.m>got0 && await heard(n, W.__lines().UDDER_LINES.cumMilk), 'cummin\' in the stall brings a bigger let-down, a line, and a mark on the record');
   ok(W.__album(500).some(e=>/Milked till you came/.test(e.h)), '...and the first time goes in the album');
   const st=p.stall; p.milk=0.5; W.__ms();
   ok(!p.stall && p.sensitiveUntil>now(), 'milked past empty leaves them sensitive for an hour');

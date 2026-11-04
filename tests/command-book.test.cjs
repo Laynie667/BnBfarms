@@ -51,7 +51,7 @@ const INTERVIEW=["help","rules","consent","tour","species","luxury","doors","saf
   same(e=>e.words, WORDS, 'the free-text commands are the same');
   same(e=>e.interview, INTERVIEW, 'the mid-application ones are the same');
   // somebody answers every one: its own part (run) or a case in the big switch
-  const sw=fs.readFileSync(path.join(__dirname,'../bot/src/parts/15-commands.js'),'utf8');
+  const sw=fs.readFileSync(path.join(__dirname,'../bot/src/parts/core/15-commands.js'),'utf8');
   const orphan=[...B.keys()].filter(w=>!B.get(w).run && !sw.includes('case "'+w+'":'));
   ok(!orphan.length, 'every command is answered (by its part, or the switch): '+orphan.join(' '));
   const twice=[...B.keys()].filter(w=>B.get(w).run && sw.includes('case "'+w+'":'));

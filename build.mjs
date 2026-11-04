@@ -6,19 +6,28 @@ import { resolve, basename } from "node:path";
 
 const pkg = JSON.parse(readFileSync("package.json", "utf8"));
 
-// The bot lives in bot/src/parts/, one topic per file. They're pieces of one big function, so they're
-// joined back together in file-name order (00-open.js … 18-boot.js) before bundling.
+// The bot lives in bot/src/parts/, in folders by topic (core, farm, traps …), one piece per file. They're pieces of
+// one big function, so they're joined back together in FILE-NAME order (00-open.js … 18-boot.js), whatever folder
+// each is in, before bundling. Two files can't share a name.
 const PARTS_DIR = "bot/src/parts";
+const partFiles = () => {
+  const files = readdirSync(PARTS_DIR, { recursive: true }).map((f) => f.replace(/\\/g, "/")).filter((f) => f.endsWith(".js"))
+    .sort((a, b) => (basename(a) < basename(b) ? -1 : basename(a) > basename(b) ? 1 : 0));
+  const twice = files.filter((f, i) => files.findIndex((g) => basename(g) === basename(f)) !== i);
+  if (twice.length) throw new Error("two bot parts with the same name: " + twice.join(", "));
+  return files;
+};
 const botParts = {
   name: "bot-parts",
   setup(build) {
     build.onResolve({ filter: /^farmhand-bot-parts$/ }, () => ({ path: "farmhand-bot-parts", namespace: "bot-parts" }));
     build.onLoad({ filter: /.*/, namespace: "bot-parts" }, () => {
-      const files = readdirSync(PARTS_DIR).filter((f) => f.endsWith(".js")).sort();
+      const files = partFiles();
       return {
         contents: files.map((f) => readFileSync(PARTS_DIR + "/" + f, "utf8")).join(""),
         resolveDir: resolve("bot/src"),
         watchFiles: files.map((f) => resolve(PARTS_DIR, f)),
+        watchDirs: [...new Set(files.map((f) => resolve(PARTS_DIR, f, "..")))],   // (a new file in a folder rebuilds too)
         loader: "js",
       };
     });

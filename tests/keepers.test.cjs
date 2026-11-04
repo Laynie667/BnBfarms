@@ -30,6 +30,9 @@ const all=n=>sent.slice(n).filter(([e,d])=>d&&(typeof d.Content==='string'||e===
 const raw=n=>JSON.stringify(sent.slice(n));
 const say=async(mn,msg,ms)=>{ handlers.ChatRoomMessage({Sender:mn,Type:'Whisper',Content:msg,Target:260239}); await wait(ms||2400); };
 const moveTo=(mn,X,Y)=>{ chars.find(c=>c.MemberNumber===mn).MapData.Pos={X,Y}; };
+// one of these lines was said (its longest plain stretch, past %n and the like), give or take the send queue
+const saidAny=(n,pool)=>(pool||[]).some(line=>{ const bits=line.replace(/^(\{[a-z]+\})+/,'').split(/%[a-z]+|"/).map(x=>x.trim()).filter(x=>x.length>=12).sort((a,b)=>b.length-a.length); return bits.length>0 && all(n).includes(bits[0]); });
+const heard=async(n,pool)=>{ for(let i=0;i<24;i++){ if(saidAny(n,pool)) return true; await wait(250); } return false; };
 (async()=>{ await wait(3500); const cfg=W.__cfg; cfg.USER_COOLDOWN_S=0; cfg.TRAP_BEAT_S=0.12; cfg.TRAP_COOLDOWN_MIN=0; cfg.CHAIN_CHANCE=0;
   ['Laynie','Moo','Hana','Fern'].forEach((nm,i)=>chars[i+1].Name=nm);
   await say(500,'?stats'); await say(600,'?stats'); await say(221397,'?stats'); await say(700,'?stats');
@@ -83,7 +86,7 @@ const moveTo=(mn,X,Y)=>{ chars.find(c=>c.MemberNumber===mn).MapData.Pos={X,Y}; }
   ok(P(500).sitting && P(500).sitting.n===8 && L().nest.eggs===0 && P(500).penned && P(500).penned.sit, '?sit takes the clutch under them and keeps them on the nest');
   ok(W.__happening(500).some(t=>/sittin' 8 eggs/.test(t)), '"what\'s happenin\' to me" says so');
   W.__keepTick(); await wait(900);
-  ok(/mash|bottle|feeds/.test(all(n)), 'they are fed by hand where they sit');
+  ok(await heard(n, W.__lines().KEEP_LINES.sitFed), 'they are fed by hand where they sit');
   await wait(7000); n=sent.length; W.__keepTick(); await wait(900);
   ok(!P(500).sitting && !P(500).penned && P(500).brooded===8 && (P(500).ribbons||0)>rb, 'when they hatch the brood is theirs, and it pays');
   ok((P(600).ribbons||0)>lead, '...and their herd leader takes a share');

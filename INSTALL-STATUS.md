@@ -24,6 +24,11 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 ## Latest changes (newest first)
 
+- **No new versions: the bot's parts sorted into folders (Phase 2 of the plan).** Laynie, Nov 4: no cloud threads editing bot files, so go ahead. Nothing to install: the built bot comes out byte for byte the same.
+  - **185 files, 13 folders by topic** in `bot/src/parts/`: core, office, farm, looks, voice, ribbons, parasites, nursery, seasons, and traps (with traps/lines, traps/more and traps/ends). Each folder has a README saying what every file in it holds; the one at the top says which folder has what.
+  - **The names didn't change**, only the folders. The build joins the parts by file name whatever folder they're in, and stops if two files ever share a name. git kept each file's history through the move.
+  - tools/who-audit.mjs and the command-book test read the new folders.
+  - **Two more shaky tests fixed for good:** keepers (fed by hand where they sit) and udders (the let-down after cummin' in the stall) looked for a few words some newer lines don't use. They now take any line from their own pool.
 - **Bot 0.70.1: the command book (Phase 1 of the plan).** Laynie, Nov 4: "we are good to proceed". Under the hood only: every command answers exactly as before. No Companion update needed.
   - **One place for every ?command.** `bot/src/parts/01b-commands.js` writes each command down once: its words, who may use it (staff or everybody), whether the answer stays private when asked in the room, whether it never waits its turn (safety), whether it takes free text, whether it works mid-application, and whether staff lookups land in the Office tab. Before, that was seven lists kept by hand in three files.
   - **Parts answer their own commands.** The store, potions and dares, the bench, traps, shots and kryptonite, feats, the nursery, services, parasites and symbiotes, messes, your own outfit, the brood, bets, corruption, cursed suits, keepers, udders, the seasons, trick-or-treat, stockings, the egg hunt, trap ratings, renewals and the suggestion box each write their commands into the book next to the code that runs them. 97 hand-off lines left the big switch in 15-commands.js.

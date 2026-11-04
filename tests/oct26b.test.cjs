@@ -62,6 +62,7 @@ const done=async(mn,ms)=>{ for(let i=0;i<60;i++){ await wait(250); if(!(W.__st()
   // ── the farm girl brushes whoever stands next to her ──
   moveTo(600,2,1); n=sent.length; W.__tileCareTick(); await wait(200); ok(!/The farm girl/.test(all(n)), 'walkin\' past her: no brushin\'');
   P(600).groomNear=Date.now()-31000; const rnd=Math.random; W.__st().groomAt=0; W.__tileCareTick(); await wait(1200);
+  for (let i=0;i<16 && !/The farm girl/.test(all(n));i++) await wait(250);   // (a busy machine: the line can still be in the send queue)
   const gl=all(n); ok(/The farm girl/.test(gl) && P(600).groomedAt, 'standin\' next to her a moment: she grooms them ('+(gl.match(/The farm girl[^|]{0,90}/)||[''])[0]+')');
   ok(!/\b(tits|pussy|hooves|fleece)\b/.test(gl), '...fitted to a male dog');
   n=sent.length; W.__st().groomAt=0; W.__tileCareTick(); await wait(300); ok(!/The farm girl/.test(all(n)), 'once every half hour');

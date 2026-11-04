@@ -84,7 +84,7 @@ function companion(mn) {
 connect({
   name: "map-tools",
   label: "Map tools",
-  version: "1.0.0",
+  version: __ADDON_VERSION__,   // (its addon.json's, put in by the build)
   guide: "Pens: staff ?pen <who> <zone> (or off). With ?fence on, wandering out tugs you back with a naughty mark. Staff: ?busy shows where people spend time and where things happen this week.",
   setup(a) { api = a; D(); },
   commands: {

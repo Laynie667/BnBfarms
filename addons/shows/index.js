@@ -233,7 +233,7 @@ function companion(mn) {
 connect({
   name: "shows",
   label: "Shows",
-  version: "1.0.0",
+  version: __ADDON_VERSION__,   // (its addon.json's, put in by the build)
   guide: "Staff: ?show open udder | breeding | race | obedience, ?show score <who> <1-10>, ?show cue <who> <cue>, ?show go (race), ?show close. Stock: ?show enter. " +
     "Ribbons stay on your record (?prizes); your latest one gets shown off. Placards: ?sign by a placard spot; staff ?sign set <name> <text>.",
   setup(a) { api = a; D(); },

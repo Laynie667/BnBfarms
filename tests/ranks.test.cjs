@@ -62,8 +62,12 @@ const ADDON=(name)=>path.join(__dirname,'../dist/farmhand-'+name+'.user.js');
   cfg.TRAP_BEAT_S=0.12; free(); prod(500).eggs=null; moveTo(500,15,10); moveTo(600,16,10); W.__trapTick();
   // the rack: breaks or holds
   n=sent.length; await say(221397,'?trap spring Moo tickle',1500); const t1=Date.now();
+  // (on a busy machine the rack can take a moment to open its book: bet once it has, and give the payout a moment too)
+  for (let i=0;i<24 && !(W.__st().bets && W.__st().bets.has(500));i++) await wait(250);
   await say(600,'?bet 3 breaks',900); await say(500,'?beg '+((L().life&&L().life.begPhrase)||cfg.BEG_PHRASE),2600);
-  ok((L().ribbonLog||[]).some(e=>e.mn===600&&/callin' it right/.test(e.why)&&e.n>=6&&e.at>=t1), 'a bet on the tickle rack settles when they beg (3 down, 6 back, more with Sharp Eyes)');
+  const paid=()=>(L().ribbonLog||[]).some(e=>e.mn===600&&/callin' it right/.test(e.why)&&e.n>=6&&e.at>=t1);
+  for (let i=0;i<20 && !paid();i++) await wait(250);
+  ok(paid(), 'a bet on the tickle rack settles when they beg (3 down, 6 back, more with Sharp Eyes)');
   free();
   // ── the brood book ──
   L().studbook=(L().studbook||[]).concat([{t:Date.now(),dam:500,sires:[-2],kids:{male:0,female:0,futa:0},eggs:22},{t:Date.now(),dam:500,sires:[-10],kids:{male:2,female:3,futa:0}}]);

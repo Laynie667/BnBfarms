@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm add-on: Shows
 // @namespace    bnbfarm
-// @version      1.1.1
+// @version      1.1.2
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-shows.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-shows.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -489,7 +489,8 @@
   connect({
     name: "shows",
     label: "Shows",
-    version: "1.0.0",
+    version: "1.1.2",
+    // (its addon.json's, put in by the build)
     guide: "Staff: ?show open udder | breeding | race | obedience, ?show score <who> <1-10>, ?show cue <who> <cue>, ?show go (race), ?show close. Stock: ?show enter. Ribbons stay on your record (?prizes); your latest one gets shown off. Placards: ?sign by a placard spot; staff ?sign set <name> <text>.",
     setup(a) {
       api = a;

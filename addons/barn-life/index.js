@@ -276,7 +276,7 @@ function companion(mn) {
 connect({
   name: "barn-life",
   label: "Barn life",
-  version: "1.0.0",
+  version: __ADDON_VERSION__,   // (its addon.json's, put in by the build)
   guide: "?needs on to get hungry, thirsty and scruffy while you're on the farm (?needs off stops it). Eat at a trough spot with ?eat, drink at a water spot with ?drink " +
     "(BC+ and MPA bowl activities count there too). Staff: ?groom <who> next to them, ?refill <trough> next to it. Drinking milk makes you content, then sleepy, then milk-drunk. " +
     "Proprietors: ?needs farm on|off." + HERD_GUIDE,

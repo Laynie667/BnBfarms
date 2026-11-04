@@ -5,14 +5,14 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 | Script | File in `dist/` | Where it runs | Current |
 |---|---|---|---|
-| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.70.3** |
-| Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.10.1** |
-| Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.2.2** |
-| Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **1.1.1** |
-| Barn life | `farmhand-barn-life.user.js` | the bot's PC | **1.4.1** |
-| Map tools, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.4** |
-| Dairy | `farmhand-dairy.user.js` | the bot's PC | **1.1.1** |
-| Shows | `farmhand-shows.user.js` | the bot's PC | **1.1.1** |
+| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.70.4** |
+| Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.10.2** |
+| Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.2.3** |
+| Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **1.1.2** |
+| Barn life | `farmhand-barn-life.user.js` | the bot's PC | **1.4.2** |
+| Map tools, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.5** |
+| Dairy | `farmhand-dairy.user.js` | the bot's PC | **1.1.2** |
+| Shows | `farmhand-shows.user.js` | the bot's PC | **1.1.2** |
 | Farmhand Companion | `farmhand-companion.user.js` | each player, and the bot's own tab | **0.54.0** |
 | Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.4** |
 
@@ -24,6 +24,16 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 ## Latest changes (newest first)
 
+- **Bot 0.70.4 and every part of the farm girl: the parts' manifests, a starter part, and one line checker (Phases 4 and 5 of the plan).** Laynie, Nov 4: "phase 4 and 5 sound innocent enough, go ahead". Nothin' changes in play except four lines worded better. Install the parts' updates along with the bot (Tampermonkey picks them up).
+  - **Every part tells the bot its real version now.** Each one had said 1.0.0 (or close) for months while the release bumped its addon.json: glory stalls was really 1.10.1, barn life 1.4.1. The build now puts the addon.json version into the script, so the Dashboard's 🧩 Bot parts tab shows the right numbers, and they can't drift again.
+  - **A starter part:** `addons/_template` is a whole, workin' part (a command, a game event, a Companion card, lines that fit) with a README listin' everything a part can hand the bot: its commands, the game events it can hear, its cards, rates, lines and vetoes. Copy the folder to make a new one.
+  - **tests/bot-parts.test.cjs:** every part's addon.json is whole, each part plugs in under its folder's name with its addon.json's version, none takes a word the bot or another part has, and the starter builds, plugs in, answers ?wave and shows its card.
+  - **One line checker, on every release (tests/lines.test.cjs):** it reads every pool of lines twice, from the source (the bot's parts and every part, not the private one) and from the pools the runnin' bot holds (so lines added later are read too): about 17,000 lines. Every line must have no clinical word, no {tag} that would show, no tag the bot doesn't know, no odd quote mark, no "the the", no "undefined", and not be in its own pool twice. The line reader is shared with tools/pool-audit.mjs, which still lists the softer things (a body word with no tag, a "her" that may be the farm girl) for somebody to read.
+  - **What it caught, reworded the farm's way (Laynie read each one):** two filthy trap lines ("for one orgasm right now" is now "for the chance to cum right now, and it still wouldn't let them"; "can't finish one orgasm" is now "can't finish cummin'"), "very aroused" is "so worked up" in a conditioning line, and "a rush of fluid" is "a warm wet rush" at the farrowin'.
+  - **"Orgasm" isn't on the clinical list.** The parasite's line was reworded to "the whole climb" and put straight back: Laynie, "misleading and super vague. it was honestly better with the word orgasm". A plain, exact word beats a vague one.
+  - **The lone wolf gives three loads now, not two** (Laynie: "can always boost the base amount of loads, so it always gaurentees there is enough"). Each is as big as before, and his two lines that count them say "Three knots, an hour each" and "He ties %n three times". The wolf den never gives fewer than three.
+  - **Four shaky tests fixed for good** (they only passed on a second try): the tickle-rack bet now waits for the rack to open its book; the grooming line and a trap handin' somebody on get a little longer on a busy machine; and the dairy stall's line is matched against every line the dairy part has (its more-lines file too), not a few words.
+  - **Left out on purpose:** movin' the lines into separate data files, and loadin' the seasons only in their season. The seasons are about a tenth of the bot's script, the page crashes were the game's pictures not the script, and loadin' them later would mean the bot fetchin' from GitHub while it runs: one more way to break, for little gain. And a part's ?commands stay in their own list rather than the command book, so a private part stays invisible to everybody else; they keep the book's rules all the same.
 - **Bot 0.70.3 + Companion 0.54.0: the Staff panel and the Dashboard tidied too (Phase 3 of the plan, second half).** Laynie, Nov 4: "tidying like that would be good across all panels". Same look as the Livestock panel: four tabs across the top, and when a panel has more, the rest are under ⋯ at the end of the strip. The 🧸 Nursery keeps its own look.
   - **Staff:** 🗂 Office · 📝 Queue · 🐑 Herd · 📜 Contracts, then under ⋯ 🏚 Barn · ⏱ Shift · 🗺 Zones · 📒 Log (221397 only, as before) and the farm extras.
     - The Office opens on **Look somebody up**: type a name, then Record, Milk, Drain, Inspect, Vet or Quota (or type the whole thing, like "vet Bessie", and press Enter). Safeword calls stay on top.

@@ -157,7 +157,7 @@ function companion(mn) {
 connect({
   name: "dairy",
   label: "Dairy",
-  version: "1.0.0",
+  version: __ADDON_VERSION__,   // (its addon.json's, put in by the build)
   guide: "Warmer, more varied milking lines (pumps, Echo's pump and vendor, the milking stall), with a touch of praise or degradation if you switched those on. " +
     "Every week you get a milk certificate with your grade and how much you gave; the new one replaces last week's. ?cert shows yours.",
   setup(a) { api = a; D(); },

@@ -89,7 +89,7 @@ async function run(kind, id, mn, name, pre){
   { const R=await run("minotaur","hothead",500,"Moo"); ok(R.loads===4, 'the hothead goes four times ('+R.loads+')'); }
   { const R=await run("foxden","guess",500,"Moo"); ok(R.loads===6, 'the guessin\' game is six rounds ('+R.loads+')'); }
   { const R=await run("lionpride","lazy",500,"Moo"); ok(R.loads===5, 'the lazy king: five times, all afternoon ('+R.loads+')'); }
-  { const R=await run("wolves","lone",500,"Moo"); ok(R.loads===2 && W.__studDef("wolves","lone").ml > 2*W.__studDef("wolves","classic").ml, 'the lone wolf: two huge knots ('+R.loads+')');
+  { const R=await run("wolves","lone",500,"Moo"); ok(R.loads===3 && W.__studDef("wolves","lone").ml > 2*W.__studDef("wolves","classic").ml, 'the lone wolf: three huge knots (Nov 4: never fewer than a den should give) ('+R.loads+')');
     ok(!/The pack circles|passed round the pack|Every wolf that's had a turn|alpha takes %n by the scruff/.test(R.said), '...and he doesn\'t borrow the pack\'s middle'); }
   // the ones with a middle of their own don't borrow the usual one's
   { const R=await run("foxden","silver",500,"Moo");

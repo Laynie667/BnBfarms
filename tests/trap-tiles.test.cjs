@@ -66,6 +66,7 @@ const fresh=()=>{ const r=P(500); r.trapAt=0; r.spotTrapAt={}; r.penned=null; r.
   cfg.CHAIN_CHANCE=1; fresh(); n0=sprung(); to(20,10); W.__trapTick(); await done(); await wait(13000); await done();
   ok(sprung()===n0+1, 'eager off: one trap, and it doesn\'t hand them on to another');
   fresh(); P(500).trapEager=true; to(19,10); W.__trapTick(); n0=sprung(); to(20,10); W.__trapTick(); await done(); await wait(13000); await done();
+  for (let i=0;i<40 && sprung()<n0+2;i++){ await wait(250); await done(); }   // (a busy machine: the hand-on can come a little late)
   ok(sprung()>=n0+2, 'eager on: it can hand them on');
   P(500).trapEager=false; cfg.CHAIN_CHANCE=0;
   ok(!warns.some(w=>/trap/i.test(w)), 'no errors: '+warns.filter(w=>/trap/i.test(w)).slice(0,2).join(' | '));

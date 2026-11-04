@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.70.3
+// @version      0.70.4
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -2793,7 +2793,7 @@
   ];
 
   // bot/src/version.js
-  var VERSION = "0.70.3";
+  var VERSION = "0.70.4";
   var COMPANION_VERSION = "0.54.0";
 
   // bot-parts:farmhand-bot-parts
@@ -30481,7 +30481,7 @@
         "A long deep push rolls through %n and doesn't stop. They grab the rail, spread their knees, and holler. The litter's comin', and it's comin' now."
       ],
       farrowCrown: [
-        "The first one crowns, stretchin' %n wider than any stud ever did. They pant, push, pant, and with a rush of fluid it slides out into the farm girl's waitin' hands.",
+        "The first one crowns, stretchin' %n wider than any stud ever did. They pant, push, pant, and with a warm wet rush it slides out into the farm girl's waitin' hands.",
         "%n strains till the cords stand out in their neck, and the first of the litter comes, slick and squallin'. The farm girl wipes it down and lays it in the straw by their teats."
       ],
       farrowMid: [
@@ -33488,7 +33488,7 @@
       },
       clamp: {
         tender: ["It closes over %n snug and warm, and what's inside is soft as a tongue.", "It denies them so sweetly it's almost a kindness.", "It hushes %n right at the edge, and holds them there, and holds them."],
-        filthy: ["%n's cunt is locked in a box that licks it and stops, and they're fuckin' the air like an animal.", "They'd suck off the whole bunkhouse for one orgasm right now and it wouldn't get them one.", "Drippin' through the vents of it, beggin' steel for mercy, edged till they drool."]
+        filthy: ["%n's cunt is locked in a box that licks it and stops, and they're fuckin' the air like an animal.", "They'd suck off the whole bunkhouse for the chance to cum right now, and it still wouldn't let them.", "Drippin' through the vents of it, beggin' steel for mercy, edged till they drool."]
       },
       pump: {
         tender: ["The nozzle's warmed and slick, and it goes in easy.", "It fills %n slow enough to feel their belly round out a breath at a time.", "Somethin' rubs that tight belly while it swells, and %n moans soft."],
@@ -33520,7 +33520,7 @@
       },
       warren: {
         tender: ["The bucks are quick but they're sweet about it, nuzzlin' and soft-furred.", "Each one snuggles in a moment after, before the next.", "%n's laughin', breathless, by the fourth."],
-        filthy: ["Ten bucks, ten loads, no break: %n's cunt is a foamin' mess and there's a queue.", "They're fucked so fast they can't finish one orgasm before the next buck's in them.", "Bred like a hutch doe till it's bubblin' out of them on every stroke."]
+        filthy: ["Ten bucks, ten loads, no break: %n's cunt is a foamin' mess and there's a queue.", "They're fucked so fast they can't finish cummin' before the next buck's in them.", "Bred like a hutch doe till it's bubblin' out of them on every stroke."]
       },
       boar: {
         tender: ["The mud's warm and the boar-man is slow and heavy and oddly gentle with them.", "The tie is long, and he just lies on %n and breathes.", "He grunts soft in their ear the whole time."],
@@ -40259,8 +40259,9 @@
         lone: {
           name: "the lone wolf",
           w: 8,
-          loads: 2,
+          loads: 3,
           mlX: 2.6,
+          // (three, Nov 4: never fewer loads than a den should give)
           tell: "The lone wolf doesn't share. The pack can smell him on you.",
           scene: [
             [
@@ -40297,8 +40298,8 @@
                 "He sinks his %c cock into %n's %h like he's stakin' a claim, and ruts deep and steady and possessive till his huge knot locks them together."
               ],
               [
-                "Two knots, an hour each, and he doesn't let go of %n once in all that time, just holds them, and pumps, and growls at the door whenever a shadow crosses it.",
-                "He ties %n twice and fills them so full their belly swells, and both times he holds them tight against his chest till the knot goes down."
+                "Three knots, an hour each, and he doesn't let go of %n once in all that time, just holds them, and pumps, and growls at the door whenever a shadow crosses it.",
+                "He ties %n three times and fills them so full their belly swells, and every time he holds them tight against his chest till the knot goes down."
               ]
             ],
             over: [["He ruts against %n slow and possessive, face to face, and covers them in his scent and his seed, and growls at the door the whole time."]],

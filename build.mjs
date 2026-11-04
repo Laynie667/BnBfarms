@@ -48,6 +48,9 @@ for (const dir of readdirSync("addons", { withFileTypes: true })) {
   if (!dir.isDirectory() || dir.name.startsWith("_") || !existsSync("addons/" + dir.name + "/addon.json")) continue;
   const meta = JSON.parse(readFileSync("addons/" + dir.name + "/addon.json", "utf8"));
   targets.push({ name: "add-on " + dir.name, entry: "addons/" + dir.name + "/index.js", out: "dist/farmhand-" + dir.name + ".user.js", version: meta.version,
+    // the part tells the bot the version in its addon.json (Nov 4: they'd said 1.0.0 for months while the release bumped
+    // the file; the Dashboard's Bot parts tab shows this one)
+    define: { __ADDON_VERSION__: JSON.stringify(meta.version) },
     // a private add-on (addons/private-*) never auto-updates from GitHub: it isn't there
     headerText: (meta.private ? addonHeader.replace(/^\/\/ @(updateURL|downloadURL|homepageURL).*\r?\n/gm, "") : addonHeader)
       .replace("{{LABEL}}", meta.label).replace("{{DESCRIPTION}}", meta.description || "") });
@@ -67,7 +70,7 @@ for (const t of targets) {
     charset: "ascii",   // emoji and accents written as \u escapes: the scripts read right whatever encoding the browser guesses at install
     legalComments: "none",
     banner: { js: header },
-    define: { __FARMHAND_VERSION__: JSON.stringify(t.version), __COMPANION_VERSION__: JSON.stringify(pkg.versions.companion) },   // (the bot knows which Companion came out with it)
+    define: Object.assign({ __FARMHAND_VERSION__: JSON.stringify(t.version), __COMPANION_VERSION__: JSON.stringify(pkg.versions.companion) }, t.define || {}),   // (the bot knows which Companion came out with it)
     outfile: t.out,
     plugins: t.plugins || [],
     logLevel: "info",

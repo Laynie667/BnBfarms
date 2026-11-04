@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm add-on: Barn life
 // @namespace    bnbfarm
-// @version      1.4.1
+// @version      1.4.2
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-barn-life.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-barn-life.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -940,7 +940,8 @@
   connect({
     name: "barn-life",
     label: "Barn life",
-    version: "1.0.0",
+    version: "1.4.2",
+    // (its addon.json's, put in by the build)
     guide: "?needs on to get hungry, thirsty and scruffy while you're on the farm (?needs off stops it). Eat at a trough spot with ?eat, drink at a water spot with ?drink (BC+ and MPA bowl activities count there too). Staff: ?groom <who> next to them, ?refill <trough> next to it. Drinking milk makes you content, then sleepy, then milk-drunk. Proprietors: ?needs farm on|off." + HERD_GUIDE,
     setup(a) {
       api2 = a;

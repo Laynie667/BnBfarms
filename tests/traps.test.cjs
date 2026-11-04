@@ -87,7 +87,8 @@ const C=mn=>chars.find(c=>c.MemberNumber===mn);
   // ── the ones with somebody waitin' in them ──
   await say(400,'?traps on'); P(400).breedable=true; P(400).fertile=true; await say(400,'?stats');
   n=sent.length; await say(221397,'?trap spring Hand wolves'); await wait(1800);
-  ok(/wolf/i.test(all(n)) && P(400).prod.held.vulva > 100 && W.__stateFor(400).today.tally >= 3, 'the wolf den: three loads, three on the tally');
+  // (the den is sometimes the lone wolf since the stud forms, Oct 27: three big loads since Nov 4, five from the pack)
+  ok(/wolf/i.test(all(n)) && P(400).prod.held.vulva > 100 && W.__stateFor(400).today.tally >= 3, 'the wolf den: three loads or more, every one on the tally');
   cfg.TRAP_COOLDOWN_MIN=0; cfg.CHAIN_CHANCE=0; P(400).prod.held={vulva:0,butt:0,mouth:0}; P(400).prod.preg=null;
   n=sent.length; await say(221397,'?trap spring Hand drake'); await wait(1800);
   ok(P(400).prod.eggs && P(400).prod.eggs.by === -16 && /drake|dragon|nest/.test(all(n)), 'the drake leaves a clutch, in the book under his name');

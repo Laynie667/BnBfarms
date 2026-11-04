@@ -168,7 +168,7 @@ function companion(mn) {
 connect({
   name: "work",
   label: "Work",
-  version: "1.0.0",
+  version: __ADDON_VERSION__,   // (its addon.json's, put in by the build)
   guide: "?top shows staff points this week (chores done at their place, refills, grooming, midwifing, bookings, inspections, glory stalls). " +
     "Herdmasters and proprietors: ?wu <who> <what> (only you and they can read it), ?insp start [minutes] / pass|fail <what> / end. Staff: ?insp on|off.",
   setup(a) { api = a; D(); },

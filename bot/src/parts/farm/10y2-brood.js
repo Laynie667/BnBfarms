@@ -249,7 +249,7 @@
       "%n drops to their knees in the farrowin' straw and bears down with everything they have. Their belly's gone hard as a drum and low as it'll go. It's time.",
       "A long deep push rolls through %n and doesn't stop. They grab the rail, spread their knees, and holler. The litter's comin', and it's comin' now."],
     farrowCrown: [
-      "The first one crowns, stretchin' %n wider than any stud ever did. They pant, push, pant, and with a rush of fluid it slides out into the farm girl's waitin' hands.",
+      "The first one crowns, stretchin' %n wider than any stud ever did. They pant, push, pant, and with a warm wet rush it slides out into the farm girl's waitin' hands.",
       "%n strains till the cords stand out in their neck, and the first of the litter comes, slick and squallin'. The farm girl wipes it down and lays it in the straw by their teats."],
     farrowMid: [
       "No rest. The next one's right behind, and %n is pushin' again before they've caught their breath. Their milk's lettin' down already, runnin' in streams with every heave.",

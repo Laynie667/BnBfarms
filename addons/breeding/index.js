@@ -360,7 +360,7 @@ function companion(mn) {
 connect({
   name: "breeding",
   label: "Breeding",
-  version: "1.1.0",
+  version: __ADDON_VERSION__,   // (its addon.json's, put in by the build)
   guide: "Pregnancy now has stages (early, showin', heavy, nestin') with a belly size 1–5, cravings, and kicks nearby people can see. " +
     "Breedin' season is the 15th–21st of each month: ?season on to come into heat for it (studs fill faster and get pent up sooner). Every breedin' goes in the stud book, read out each night from 9 pm; the most-bred is crowned on the last night (10 ribbons, 5 for the busiest stud). ?season book shows it. Staff: ?book <stud> <who>, ?book, ?book done <#>, and ?midwife <who> during labour." + PAIRS_GUIDE,
   setup(a) { api = a; D(); pairsSetup(a, D); },

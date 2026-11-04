@@ -558,7 +558,7 @@
     // ── the wolf den ──
     wolves: {
       classic: { name: "the wolf pack", w: 24 },
-      lone: { name: "the lone wolf", w: 8, loads: 2, mlX: 2.6,
+      lone: { name: "the lone wolf", w: 8, loads: 3, mlX: 2.6,   // (three, Nov 4: never fewer loads than a den should give)
         tell: "The lone wolf doesn't share. The pack can smell him on you.",
         scene: [["He breathes %n in at the throat, long and slow, like he's learnin' them by heart.",
                  "Somewhere outside the pack howls, and he growls back at the doorway without lookin' up from %n.",
@@ -580,8 +580,8 @@
           in: [
             ["He takes %n's %h face to face, slow and heavy, lookin' them in the eye the whole time, and when the knot goes in it's the biggest %n's ever taken, and he growls \"mine\" against their mouth.",
              "He sinks his %c cock into %n's %h like he's stakin' a claim, and ruts deep and steady and possessive till his huge knot locks them together."],
-            ["Two knots, an hour each, and he doesn't let go of %n once in all that time, just holds them, and pumps, and growls at the door whenever a shadow crosses it.",
-             "He ties %n twice and fills them so full their belly swells, and both times he holds them tight against his chest till the knot goes down."],
+            ["Three knots, an hour each, and he doesn't let go of %n once in all that time, just holds them, and pumps, and growls at the door whenever a shadow crosses it.",
+             "He ties %n three times and fills them so full their belly swells, and every time he holds them tight against his chest till the knot goes down."],
           ],
           over: [["He ruts against %n slow and possessive, face to face, and covers them in his scent and his seed, and growls at the door the whole time."]],
           end: ["The lone wolf lets %n go at last with %ml of him packed into their %h and his scent on them so strong the rest of the pack won't touch them for a week.",

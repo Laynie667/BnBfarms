@@ -393,7 +393,7 @@ function companion(mn) {
 connect({
   name: "glory-stalls",
   label: "Glory stalls",
-  version: "1.0.0",
+  version: __ADDON_VERSION__,   // (its addon.json's, put in by the build)
   guide: "Stand on a glory stall spot (glory-1, glory-2…) after ?glory on, and strangers come by every 10–30 minutes. " +
     "Each visit is about five minutes of private emotes only you see, and it counts on your record. A real visitor on the stall's visitor spot can ?stall use mouth|pussy|ass. " +
     "?stalls is the board. Staff: ?stall shift <who> <minutes>, ?stall punish <who> <minutes>, ?stall release <who>. Step off the spot to stop; ?safe always works.",

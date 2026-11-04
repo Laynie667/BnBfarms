@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm add-on: Breeding
 // @namespace    bnbfarm
-// @version      1.2.2
+// @version      1.2.3
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-breeding.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-breeding.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -853,7 +853,8 @@
   connect({
     name: "breeding",
     label: "Breeding",
-    version: "1.1.0",
+    version: "1.2.3",
+    // (its addon.json's, put in by the build)
     guide: "Pregnancy now has stages (early, showin', heavy, nestin') with a belly size 1\u20135, cravings, and kicks nearby people can see. Breedin' season is the 15th\u201321st of each month: ?season on to come into heat for it (studs fill faster and get pent up sooner). Every breedin' goes in the stud book, read out each night from 9 pm; the most-bred is crowned on the last night (10 ribbons, 5 for the busiest stud). ?season book shows it. Staff: ?book <stud> <who>, ?book, ?book done <#>, and ?midwife <who> during labour." + PAIRS_GUIDE,
     setup(a) {
       api2 = a;

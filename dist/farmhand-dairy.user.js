@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm add-on: Dairy
 // @namespace    bnbfarm
-// @version      1.1.1
+// @version      1.1.2
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-dairy.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-dairy.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -477,7 +477,8 @@
   connect({
     name: "dairy",
     label: "Dairy",
-    version: "1.0.0",
+    version: "1.1.2",
+    // (its addon.json's, put in by the build)
     guide: "Warmer, more varied milking lines (pumps, Echo's pump and vendor, the milking stall), with a touch of praise or degradation if you switched those on. Every week you get a milk certificate with your grade and how much you gave; the new one replaces last week's. ?cert shows yours.",
     setup(a) {
       api = a;

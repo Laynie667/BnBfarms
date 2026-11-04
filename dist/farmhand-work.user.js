@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm add-on: Work
 // @namespace    bnbfarm
-// @version      1.0.4
+// @version      1.0.5
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-work.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-work.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -216,7 +216,8 @@
   connect({
     name: "work",
     label: "Work",
-    version: "1.0.0",
+    version: "1.0.5",
+    // (its addon.json's, put in by the build)
     guide: "?top shows staff points this week (chores done at their place, refills, grooming, midwifing, bookings, inspections, glory stalls). Herdmasters and proprietors: ?wu <who> <what> (only you and they can read it), ?insp start [minutes] / pass|fail <what> / end. Staff: ?insp on|off.",
     setup(a) {
       api = a;

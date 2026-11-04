@@ -100,7 +100,7 @@ const SCRIPT = {
 // ECHS's own phrases for each level, worked into a session that runs through ECHS (its src/voice.ts wording)
 const ECHS_LINES = {
   fun: ["You cannot move now, sugar. Stay right there, still as a post.", "Kneel for me. Knees down in the straw, nice and easy.", "Hands behind your back, neat as a bow."],
-  deep: ["You hear only my voice now. Everything else in the barn is just the wind.", "Kneel spread for me, knees wide, the way a good {a} waits.", "You are very aroused, achin' and warm, and it only builds.", "You cannot cum. Not one drop till the farm says so."],
+  deep: ["You hear only my voice now. Everything else in the barn is just the wind.", "Kneel spread for me, knees wide, the way a good {a} waits.", "You are so worked up, achin' and warm, and it only builds.", "You cannot cum. Not one drop till the farm says so."],
   nhl: ["You cannot speak now. A {a} doesn't need words.", "Get on your hands and knees, down where a {a} belongs.", "You will not notice being undressed. Clothes don't matter to a {a}.", "You are right on the edge, and that's where you stay.", "You cannot cum. The farm decides when, and it hasn't."],
 };
 // ECHS reads "feel" as a touch (its wiki: "your arms feel heavy" can become a caress), so a line goin' to ECHS doesn't say it
@@ -271,7 +271,7 @@ function companion(mn) {
 connect({
   name: "conditioning",
   label: "Conditioning",
-  version: "1.2.0",
+  version: __ADDON_VERSION__,   // (its addon.json's, put in by the build)
   guide: "Guided trance sessions written for your species, in the farm's voice. Needs ?hypno on; ?depth fun|deep|nhl sets the deepest you allow. " +
     "Your herd leader runs them with ?hyp <who> [level] [say <their own words>], or take yourself under with ?hyp me. With ECHS: ?hypnotize me (or ?hyp <who> [level] echs) and the session runs through it. Sessions count toward conditioning tiers (3, 7, 15, 30). ?wake or ?safe ends one at once. Works alongside ECHS.",
   setup(a) { api = a; D(); },

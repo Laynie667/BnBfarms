@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm add-on: Map tools
 // @namespace    bnbfarm
-// @version      1.0.4
+// @version      1.0.5
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-map-tools.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-map-tools.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -125,7 +125,8 @@
   connect({
     name: "map-tools",
     label: "Map tools",
-    version: "1.0.0",
+    version: "1.0.5",
+    // (its addon.json's, put in by the build)
     guide: "Pens: staff ?pen <who> <zone> (or off). With ?fence on, wandering out tugs you back with a naughty mark. Staff: ?busy shows where people spend time and where things happen this week.",
     setup(a) {
       api = a;

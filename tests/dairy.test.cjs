@@ -45,7 +45,12 @@ const roomText=s=>{ const d=s&&s[1]; if(!d) return null;
   W.__ms(); W.__ms(); if (p.stall) p.stall.nextOpen=0;   // latches on the second look; the room line is due now
   k=sent.length; W.__ms(); await drain();
   const em=sent.slice(k).map(s=>roomText(s)).filter(Boolean).join(' | ');
-  ok(/udder|teats|bucket|moo|rail/.test(em) && /Moo/.test(em), 'the milking stall uses a dairy line ('+em.slice(0,140)+')');
+  // one of the dairy part's own lines (its longest plain stretch, past the %name% and the like): a few words from the first
+  // lines missed the ones written later ("Moo stands quiet in the stall, eyes half shut…")
+  const dairySrc=fs.readdirSync(path.join(__dirname,'../addons/dairy')).filter(f=>f.endsWith('.js')).map(f=>fs.readFileSync(path.join(__dirname,'../addons/dairy',f),'utf8')).join('\n');   // (index.js and more-lines.js)
+  const dairyLines=[...dairySrc.matchAll(/"((?:[^"\\]|\\.){30,})"/g)].map(m=>m[1]);
+  const fromDairy=dairyLines.some(l=>{ const bits=l.replace(/^(\{[a-z]+\})+/,'').split(/%\w+%?|\{\w+\}/).map(x=>x.trim()).filter(x=>x.length>=14).sort((a,b)=>b.length-a.length); return bits.length>0 && em.includes(bits[0]); });
+  ok(fromDairy && /Moo/.test(em), 'the milking stall uses a dairy line ('+em.slice(0,140)+')');
   ok(!/\b(lactat|mammary|secret)/i.test(em), 'no medical words');
   // certificate: a week passes
   const d=()=>L().mods['dairy'];

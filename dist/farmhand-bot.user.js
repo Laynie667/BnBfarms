@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.70.2
+// @version      0.70.3
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -2793,8 +2793,8 @@
   ];
 
   // bot/src/version.js
-  var VERSION = "0.70.2";
-  var COMPANION_VERSION = "0.53.0";
+  var VERSION = "0.70.3";
+  var COMPANION_VERSION = "0.54.0";
 
   // bot-parts:farmhand-bot-parts
   (function() {
@@ -6260,6 +6260,10 @@
           for (const [k, o] of Object.entries(L2.outfits)) s.outfits[k] = { items: o.items, locks: o.locks, at: o.at };
           s.outfitRules = Object.assign({}, L2.outfitRules);
           s.feedback = fbLedger().slice(-60).reverse().map((f) => ({ id: f.id, t: f.t, name: f.name, mn: f.mn, kind: f.kind, text: f.text, why: f.why || "", status: f.status, note: f.note || "" }));
+          part("bot parts", () => {
+            s.botParts = addonPartsFor(mn);
+            s.featsWeek = featsWeekFor();
+          });
         }
       } catch (e) {
         s.stateErr = (s.stateErr ? s.stateErr + " \xB7 " : "") + "panel: " + String(e && e.message || e).slice(0, 80);
@@ -10228,6 +10232,17 @@
       if (exact) return exact;
       const hits = all.filter((a) => norm(a.name).startsWith(norm(q)) || norm(a.label).startsWith(norm(q)));
       return hits.length === 1 ? hits[0] : null;
+    }
+    function addonPartsFor(mn) {
+      return [...ADDONS.values()].filter((a) => addonVisible(a, mn)).map((a) => ({
+        name: a.name,
+        label: a.label,
+        version: a.version,
+        on: a.enabled !== false,
+        errors: a.errors || 0,
+        cmds: Object.keys(a.commands).length,
+        mine: !!a.only
+      }));
     }
     function addonsText(topic, mn) {
       if (topic) {
@@ -25703,6 +25718,17 @@
         earnRibbons(mn, g.t, "the " + g.F.name + " " + TIER_NAME[g.t] + " feat", CFG.BOT_MEMBER);
       }
       return got;
+    }
+    function featsWeekFor() {
+      const since = Date.now() - 7 * 864e5, out = [];
+      for (const e of (L2.ribbonLog || []).slice().reverse()) {
+        if (!(e.at >= since)) continue;
+        const m = /^the (.+) (I|II|III|IV|V) feat$/.exec(e.why || ""), F = m && FEATS.find((f) => f.name === m[1]);
+        if (!F || F.nursery) continue;
+        out.push({ name: plainName(e.mn), feat: F.icon + " " + F.name + " " + m[2] });
+        if (out.length >= 12) break;
+      }
+      return out;
     }
     const bestOf = (got) => {
       const m = /* @__PURE__ */ new Map();

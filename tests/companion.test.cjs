@@ -28,6 +28,8 @@ const bare = (t) => t.trim().replace(/^[^\p{L}\d?]+/u, "");
 const click = (label) => { const b = [...D.querySelectorAll("#fhc-panel button")].find((x) => x.textContent.trim().startsWith(label)) || (bare(label) && [...D.querySelectorAll("#fhc-panel button")].find((x) => bare(x.textContent).startsWith(bare(label)))); if (b) b.click(); return !!b; };
 const text = () => D.getElementById("fhc-panel").textContent;
 // Nov 4: the switches live behind ⚙ in the header (here, with no game settings page, the panel's own), on pages
+// a tab under ⋯ (more than four on a panel): open ⋯ first
+const tab = (label) => click(label) || (!!D.querySelector("#fhc-panel .fhc-seg-more") && (D.querySelector("#fhc-panel .fhc-seg-more").click(), click(label)));
 const settings = (page) => { D.querySelector('#fhc-panel button[aria-label="Settings"]').click(); if (page) click(page); };
 
 const STATE = { name: "Laynie", onBooks: true, roles: ["PROPRIETOR", "LIVESTOCK"], tier: "prize", species: "cow", gender: "female",
@@ -82,7 +84,7 @@ const STATE = { name: "Laynie", onBooks: true, roles: ["PROPRIETOR", "LIVESTOCK"
 
   click("Staff");
   bot({ type: "doc", text: "🩺 VET CARD · Bessie", id: 3, part: 1, of: 1, kind: "vet", who: "Bessie", about: 500 });
-  out("5 doc lands in the Office ->", /VET CARD · Bessie/.test(text()), pills().some((p) => p.classList.contains("on") && /Office/.test(p.textContent)));
+  out("5 doc lands in the Office ->", /VET CARD · Bessie/.test(text()), [...D.querySelectorAll("#fhc-panel nav button.on")].some((p) => /Office/.test(p.textContent)));
   click("Refresh"); out("5 Refresh re-asks ->", cmds().includes("vet 500"));
   bot({ type: "notice", text: "🔴 SAFEWORD from Daisy (600). Please go to them now.", id: 4, part: 1, of: 1 });
   click("Office"); out("5 safeword card in the Office ->", /SAFEWORD from Daisy/.test(text()) && /Nothin' has been released/.test(text()));
@@ -99,21 +101,21 @@ const STATE = { name: "Laynie", onBooks: true, roles: ["PROPRIETOR", "LIVESTOCK"
     shift: { clocked: false, weekH: 6.5, onDuty: ["Laynie"], onCall: [{ name: "Hand", mandated: true, here: false }] },
     log: [{ t: Date.now(), a: "TEASE_ADD", by: "Laynie", d: "" }] });
   bot({ type: "state", state: STAFF5B });
-  click("Herd"); out("5b herd shows where and flags ->", /barn/.test(text()), /in heat/.test(text()));
+  click("Herd"); click("Bessie"); out("5b herd shows where and flags ->", /barn/.test(text()), /in heat/.test(text()));
   click("Summon to me"); out("5b summon from herd ->", cmds().includes("summon 500"));
   out("5b tease lines retired (Oct 19) ->", ![...D.querySelectorAll("#fhc-panel button")].some((b) => b.textContent === "Tease lines"));
-  click("Zones"); out("5b zone map drawn ->", !!D.querySelector('#fhc-panel button[aria-label="barn-1"]'));
+  tab("Zones"); out("5b zone map drawn ->", !!D.querySelector('#fhc-panel button[aria-label="barn-1"]'));
   click("Set A where I stand"); out("5b zone corner ->", cmds().includes("zone a barn-1"));
   // a farmhand sees the map, zones and spots, but nothing to change them with
   bot({ type: "state", state: Object.assign({}, STATE, { herdmaster: false, proprietor: false, mapEdit: false,
     zones: { "barn-1": { a: { X: 2, Y: 2 }, b: { X: 5, Y: 4 }, group: "barn" } }, spots: { "milking1": { X: 3, Y: 3 } } }) });
-  click("Zones");
+  tab("Zones");
   const btns = [...D.querySelectorAll("#fhc-panel button")].map((b) => b.textContent);
   out("5b farmhand sees the map ->", !!D.querySelector('#fhc-panel button[aria-label="barn-1"]'), /milking1/.test(text()), btns.includes("Who's where"));
   out("5b ...but can't change it ->", !btns.some((b) => /Draw it on the map|Set A where I stand|Delete|Clear|Pick|Click it on the map|Set where I stand/.test(b)), /set by herdmasters and proprietors/.test(text()));
   bot({ type: "state", state: STAFF5B });   // back to a herdmaster for the rest
-  click("ECHS"); out("5b voice lines retired, the ECHS card stays ->", !/\[Voice\]/.test(text()) && /ECHS sessions by depth/.test(text()));
-  click("Shift"); out("5b shift and log ->", /6\.5 h this week/.test(text()), /TEASE_ADD/.test(text()));
+  settings("Staff tools"); out("5b voice lines retired, the ECHS card stays (⚙ Settings › Staff tools) ->", !/\[Voice\]/.test(text()) && /ECHS sessions by depth/.test(text()));
+  click("Staff"); tab("Shift"); out("5b shift and log ->", /6\.5 h this week/.test(text()), /TEASE_ADD/.test(text()));
   bot({ type: "voice", text: "Moo for me." });
 
   click("Dashboard");
@@ -131,7 +133,7 @@ const STATE = { name: "Laynie", onBooks: true, roles: ["PROPRIETOR", "LIVESTOCK"
   kind.value = "Settings"; kind.dispatchEvent(new w.Event("change"));
   const r2 = [...D.querySelectorAll("#fhc-panel select")][1]; r2.value = "settings.safeword"; r2.dispatchEvent(new w.Event("change"));
   out("6 safeword rule can't be added ->", /never uses this one/.test(text()), ![...D.querySelectorAll("#fhc-panel button")].some((b) => /^Add to/.test(b.textContent)));
-  click("Other addons"); out("6 BC+ version matches ->", /BC\+ 0\.14\.0 matches the farm/.test(text()));
+  tab("Bot parts"); out("6 BC+ version matches ->", /BC\+ 0\.14\.0 matches the farm/.test(text()));
 
   const box = D.getElementById("fhc-input"); box.value = "half typed"; box.focus();
   bot({ type: "notice", text: "a new notice", id: 5, part: 1, of: 1 });
@@ -342,7 +344,7 @@ const STATE = { name: "Laynie", onBooks: true, roles: ["PROPRIETOR", "LIVESTOCK"
   bot({ type: "state", state: Object.assign({}, STATE, { mods: { x: { label: "Test add-on", cards: [{ title: "Staff thing", staff: true, text: "staff only bits" }, { title: "Mine", text: "for everybody" }] } } }) });
   click("Livestock"); click("Me"); click("Farm extras");
   out("16 the Livestock panel shows add-on cards (a row on Me) but not staff ones ->", /for everybody/.test(text()), !/staff only bits/.test(text()));
-  click("Staff"); click("Farm extras");
+  click("Staff"); tab("Farm extras");
   out("16 the Staff panel shows the staff ones ->", /staff only bits/.test(text()));
   out("15 ?wash takes the splatters and writing off ->", !(loaded || []).some((b) => b.Name === "Splatters" || b.Name === "BodyWritings"), (loaded || []).some((b) => b.Group === "HairFront"));
   // 17. Oct 22, on a phone: news from the farm doesn't redraw the panel mid-swipe (it jumped back to the top), and catches up after
@@ -352,6 +354,7 @@ const STATE = { name: "Laynie", onBooks: true, roles: ["PROPRIETOR", "LIVESTOCK"
   const held = D.querySelector("#fhc-panel .fhc-body") === body0;
   await wait(1600);
   out("17 a farm update waits while they scroll, then catches up ->", held, D.querySelector("#fhc-panel .fhc-body") !== body0);
+  click("Contracts");   // (a tab with titled cards: the Office opens on the lookups since Nov 4)
   out("17 the cards fold, and the 🆘 button is always in the header ->", !!D.querySelector("#fhc-panel .fhc-fold"), !!D.querySelector('#fhc-panel .fhc-head button.sos[aria-label="Safety"]'));
   // 18. Oct 23, Say it: the line a trap wants is a button on every tab, and the box in Safety; both go to the farm hidden
   await wait(1700);

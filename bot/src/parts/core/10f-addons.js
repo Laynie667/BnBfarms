@@ -291,6 +291,12 @@
     const hits = all.filter(a => norm(a.name).startsWith(norm(q)) || norm(a.label).startsWith(norm(q)));
     return hits.length === 1 ? hits[0] : null;
   }
+  // the Dashboard's 🧩 Bot parts tab (Nov 4; Laynie: "they are just parts of the bot, seperated into seperate scripts for
+  // easy editing"): every part this proprietor may see. A private one shows to its own people only (hers, to 221397).
+  function addonPartsFor(mn){
+    return [...ADDONS.values()].filter(a => addonVisible(a, mn)).map(a => ({ name: a.name, label: a.label, version: a.version,
+      on: a.enabled !== false, errors: a.errors || 0, cmds: Object.keys(a.commands).length, mine: !!a.only }));
+  }
   function addonsText(topic, mn){
     if (topic){
       const a0 = findAddon(topic), a = a0 && (mn === undefined || addonVisible(a0, mn)) ? a0 : null;   // somebody else's private add-on: as if it isn't there

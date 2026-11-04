@@ -78,7 +78,9 @@ const done=async(mn,ms)=>{ for(let i=0;i<60;i++){ await wait(250); if(!(W.__st()
     const said=all(n), icon=W.__farmSets().TRAP_KINDS[k].icon;
     if ((said.split(icon).length-1)+(said.split('(*').length-1)<5 || !/sprung a trap/.test(said)) silent.push(k+'/'+mn+': '+said.length+' '+(said.split('(*').length-1)+' '+said.slice(-300));
     if (/%[nchxs]|\{[a-z]{1,2}\}|undefined|NaN/.test(said)) broke.push(k+': '+(said.match(/.{0,40}(%[nchxs]|\{[a-z]{1,2}\}|undefined|NaN).{0,40}/)||[""])[0]);
-    if (mn===600 && /\b(pussy|tits|womb)\b/.test(said.replace(/Moo/g,''))) broke.push(k+' male: '+(said.match(/.{0,40}\b(pussy|tits|womb)\b.{0,40}/)||[''])[0]);
+    // (a message that names Moo is about her: the tail of her own run, or the room seein' her after, can land in Rex's window)
+    const forRex = said.split(' | ').filter((x) => !/Moo/.test(x)).join(' | ');
+    if (mn===600 && /\b(pussy|tits|womb)\b/.test(forRex)) broke.push(k+' male: '+(forRex.match(/.{0,40}\b(pussy|tits|womb)\b.{0,40}/)||[''])[0]);
   }
   ok(!silent.length, 'each grooming trap runs its whole story ('+silent.join(' ; ').slice(0,400)+')');
   ok(!broke.length, '...every line filled and fitted ('+broke.join(' ; ')+')');

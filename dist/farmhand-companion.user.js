@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.53.0
+// @version      0.54.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -230,7 +230,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.53.0";
+  var VERSION = "0.54.0";
 
   // shared/species.js
   var WORDS = {
@@ -467,6 +467,9 @@ nav.fhc-seg{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);m
 nav.fhc-seg button{min-height:38px;padding:0 4px;border:none;border-right:1px solid var(--fh-line);background:transparent;color:var(--fh-text);font-weight:600;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 nav.fhc-seg button:last-child{border-right:none}
 nav.fhc-seg button.on{background:var(--fh-accent);color:var(--fh-ground);font-weight:700}
+nav.fhc-seg.more{grid-auto-flow:row;grid-template-columns:repeat(4,minmax(0,1fr)) minmax(44px,auto)}
+nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
+.fhc-tabmenu{margin:6px 12px 0}
 .fhc-back{align-self:flex-start;min-height:30px;padding:0 10px;border-radius:8px;border:1px solid var(--fh-line);background:transparent;color:var(--fh-muted);font-weight:600}
 .fhc-sum{background:var(--fh-card);border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:9px}
 .fhc-sum-top{display:flex;align-items:baseline;gap:8px}
@@ -496,6 +499,7 @@ nav.fhc-seg button.on{background:var(--fh-accent);color:var(--fh-ground);font-we
 .fhc-qa .fhc-b.on{border-color:var(--fh-accent)}
 .fhc-menu{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;margin-top:6px;padding:8px;border:1px solid var(--fh-accent);border-radius:10px;background:var(--fh-card)}
 .fhc-menu .fhc-b{margin:0;text-align:left;background:transparent;border-color:var(--fh-line)}
+.fhc-menu .fhc-b.on{border-color:var(--fh-accent);color:var(--fh-accent)}
 .fhc-sec{display:flex;flex-direction:column;gap:6px;padding:0 0 12px;border-bottom:1px solid var(--fh-line)}
 .fhc-sec:last-child{border-bottom:none}
 .fhc-sh{display:flex;align-items:baseline;gap:8px;font-family:Bitter,Georgia,serif;font-weight:700;color:var(--fh-accent);font-size:15px}
@@ -925,7 +929,7 @@ nav.fhc-seg button.on{background:var(--fh-accent);color:var(--fh-ground);font-we
   }
   function withExtras(tabs, view, ctx3) {
     if (!modsFor(ctx3, view).length) return tabs;
-    const t = { id: "extras", label: "Farm extras", render: (c) => render(c, view) };
+    const t = { id: "extras", label: "\u{1F9E9} Farm extras", render: (c) => render(c, view) };
     const at = tabs.findIndex((x) => x.id === "guides");
     return at < 0 ? tabs.concat(t) : tabs.slice(0, at).concat(t, tabs.slice(at));
   }
@@ -1511,16 +1515,16 @@ nav.fhc-seg button.on{background:var(--fh-accent);color:var(--fh-ground);font-we
         return p;
       }
       function outline(ctx3) {
-        const parts = [];
+        const parts2 = [];
         for (const b of ctx3.bodies) {
           const p = edgesOf(b.src);
           if (!p) return null;
-          parts.push({ p, x: b.x, y: b.y });
+          parts2.push({ p, x: b.x, y: b.y });
         }
         const bp = ctx3.belly.prof || (ctx3.belly.prof = edges(ctx3.belly.cv, ctx3.belly.cv.width, ctx3.belly.cv.height));
         const row = (yy, withBelly) => {
           let l = Infinity, r = -Infinity;
-          for (const q2 of parts) {
+          for (const q2 of parts2) {
             const j = yy - Math.round(q2.y);
             if (j >= 0 && j < q2.p.h && q2.p.L[j] >= 0) {
               l = Math.min(l, q2.x + q2.p.L[j]);
@@ -6116,900 +6120,177 @@ nav.fhc-seg button.on{background:var(--fh-accent);color:var(--fh-ground);font-we
     }
   }
 
-  // extension/src/views/settingspages.js
-  var pick = (...ids) => ids.map((id) => SWITCH_INFO.find((x) => x[0] === id)).filter(Boolean);
-  var FARM_GROUPS = [
-    ["\u{1F402} Breedin'", ["breedable", "fertile", "futa", "mpreg", "freeuse", "naturalheat"]],
-    ["\u{1F95B} Milk", ["milkable", "seedmilk", "jarok"]],
-    ["\u{1FAA4} Traps and play", ["traps", "eager", "bench", "potions", "dares"]],
-    ["\u{1FAB1} Things that latch on", ["parasite", "symbiote", "watersports"]]
-  ];
-  var pref = (ctx3, key, label, desc, after) => toggle(label, desc, !!ctx3.prefs[key], () => {
-    ctx3.setPref(key, !ctx3.prefs[key]);
-    if (after) after();
-  });
-  var prefNot = (ctx3, key, label, desc) => toggle(label, desc, !ctx3.prefs[key], () => {
-    ctx3.setPref(key, !ctx3.prefs[key]);
-    ctx3.api.rehello && ctx3.api.rehello();
-  });
-  var rehello = (ctx3) => () => ctx3.api.rehello && ctx3.api.rehello();
-  function farmPage(ctx3) {
-    const s = ctx3.s;
-    if (!s.onBooks) return [card(
-      title("\u{1F404} Farm switches"),
-      muted("Once you're on the books, your milkin', breedin', trap and teasin' switches show up here."),
-      btn("Apply to join", () => ctx3.send("apply"), true)
-    )];
+  // extension/src/views/staffdata.js
+  var MAP = 40;
+  var PX = 7;
+  var COLORS = ["#8fbf6a", "#c9a35b", "#b8403a", "#7fa8c9", "#c48bd9", "#d98c6a"];
+  function zones(ctx3) {
+    const zs = ctx3.s.zones;
+    if (!zs) return [muted("The farm map is for staff.")];
+    const canEdit = ctx3.s.mapEdit !== false;
+    const groups2 = [...new Set(Object.values(zs).map((z) => z.group))];
+    const color = (g) => COLORS[groups2.indexOf(g) % COLORS.length];
+    const sel = ctx3.ui.zone && zs[ctx3.ui.zone] ? ctx3.ui.zone : Object.keys(zs)[0];
+    const name = () => (ctx3.ui.zoneName || sel || "").trim().toLowerCase();
     return [
-      muted("Saved by the farm girl, so they follow you to any computer. Your limits still win, and your safeword stops everything."),
-      FARM_GROUPS.map(([head, ids]) => card(title(head), farmSwitches(ctx3, pick(...ids)))),
-      trapThemesCard(ctx3),
-      extraSwitches(ctx3)
-    ];
-  }
-  function bodyPage(ctx3) {
-    const s = ctx3.s, brandAt = { hipL: "left hip", hipR: "right hip", thighL: "left thigh", thighR: "right thigh", mons: "low belly", tummy: "tummy", chestL: "left breast", chestR: "right breast", shoulderL: "left shoulder", shoulderR: "right shoulder" };
-    return [
-      drawnBodyCard(ctx3),
       card(
-        title("\u{1F4CF} Body shape"),
-        pref(ctx3, "shape", "Farm can change my body shape", "Your chest grows a size on your character for every two udder sizes the farm gives you (up to the game's biggest), and your hips widen with a growin' ass or a heavy belly. Everything you're wearin' is redrawn to fit. Your own shape is remembered and comes back when the growth goes, when you switch this off, and for an hour after your safeword.", rehello(ctx3))
+        title("Farm map"),
+        h(
+          "div",
+          { style: { position: "relative", width: MAP * PX + "px", height: MAP * PX + "px", margin: "6px auto 0", background: "var(--fh-well)", border: "1px solid var(--fh-line)", borderRadius: "6px" } },
+          Object.entries(zs).filter(([, z]) => z.a && z.b).map(([n, z]) => h("button", {
+            type: "button",
+            title: n,
+            "aria-label": n,
+            onclick: () => ctx3.setUi({ zone: n }),
+            style: {
+              position: "absolute",
+              padding: "0",
+              left: Math.min(z.a.X, z.b.X) * PX + "px",
+              top: Math.min(z.a.Y, z.b.Y) * PX + "px",
+              width: (Math.abs(z.a.X - z.b.X) + 1) * PX + "px",
+              height: (Math.abs(z.a.Y - z.b.Y) + 1) * PX + "px",
+              background: color(z.group) + "44",
+              border: n === sel ? "3px solid var(--fh-text)" : "1px solid " + color(z.group)
+            }
+          })),
+          // spots: little dots, hover for the name
+          Object.entries(ctx3.s.spots || {}).filter(([, p]) => p && Number.isFinite(p.X)).map(([n, p]) => h("span", {
+            title: n + " \xB7 " + p.X + "," + p.Y,
+            style: {
+              position: "absolute",
+              left: p.X * PX + 1 + "px",
+              top: p.Y * PX + 1 + "px",
+              width: PX - 2 + "px",
+              height: PX - 2 + "px",
+              borderRadius: "50%",
+              background: /^speaker/.test(n) ? "#7fa8c9" : n === "home" ? "#c9a35b" : "var(--fh-text)",
+              pointerEvents: "auto"
+            }
+          }))
+        ),
+        h("div", { style: { marginTop: "6px" } }, groups2.map((g) => h("span", { class: "fhc-chip", style: { borderColor: color(g) } }, g)))
       ),
-      s.brand ? card(
-        title("\u{1F525} The farm's brand"),
-        toggle(
-          "Show my farm brand",
-          "The B&B logo the farm seared on you, on your " + (brandAt[s.brand.place] || "hip") + ". Off hides it on every screen (it's still on your record).",
-          !ctx3.prefs.brandOff,
-          () => {
-            ctx3.setPref("brandOff", !ctx3.prefs.brandOff);
-            ctx3.api.brandSync && ctx3.api.brandSync();
-          }
+      card(
+        title("Zones"),
+        Object.keys(zs).length ? Object.entries(zs).map(([n, z]) => h(
+          "button",
+          { type: "button", class: "fhc-doc" + (n === sel ? " on" : ""), style: { width: "100%", marginBottom: "4px" }, onclick: () => ctx3.setUi({ zone: n }) },
+          h("b", null, n),
+          h("div", { class: "fhc-muted" }, "part of " + z.group + " \xB7 A " + (z.a ? z.a.X + "," + z.a.Y : "\u2014") + " \u2192 B " + (z.b ? z.b.X + "," + z.b.Y : "\u2014"))
+        )) : muted("No zones yet."),
+        btn("Who's where", () => ctx3.send("zone who"))
+      ),
+      canEdit ? card(
+        title(sel ? "Editin' " + sel : "New zone"),
+        h("label", { class: "fhc-label" }, "Zone name (one word)", h("input", { class: "fhc-in", value: ctx3.ui.zoneName || sel || "", oninput: (e) => ctx3.setUi({ zoneName: e.target.value }, true) })),
+        h("div", null, btn("Draw it on the map", () => {
+          const n = name();
+          if (!n) return ctx3.hint("Name the zone first.");
+          ctx3.api.pickTiles(2, "zone '" + n + "'", ([a, b]) => ctx3.send("zone box " + n + " " + a.X + " " + a.Y + " " + b.X + " " + b.Y));
+        }, true)),
+        muted("Or walk it: stand on one corner, then the other."),
+        h("div", null, btn("Set A where I stand", () => name() ? ctx3.send("zone a " + name()) : ctx3.hint("Name the zone first.")), btn("Set B where I stand", () => name() ? ctx3.send("zone b " + name()) : ctx3.hint("Name the zone first."))),
+        h("label", { class: "fhc-label" }, "Pair with (one place, odd shapes)", h("input", { class: "fhc-in", placeholder: "barn", value: ctx3.ui.zonePair || "", oninput: (e) => ctx3.setUi({ zonePair: e.target.value }, true) })),
+        h(
+          "div",
+          null,
+          btn("Pair", () => name() && ctx3.ui.zonePair ? ctx3.send("zone pair " + name() + " " + ctx3.ui.zonePair.trim().toLowerCase()) : ctx3.hint("Name the zone, and the place to pair it with.")),
+          btn("Unpair", () => name() ? ctx3.send("zone unpair " + name()) : ctx3.hint("Name the zone first.")),
+          btn("Delete", () => name() ? ctx3.send("zone clear " + name()) : ctx3.hint("Name the zone first."))
         )
       ) : null,
-      s.onBooks ? card(
-        title("\u{1F43E} Your animal"),
-        muted("How the farm sees you. It picks your farm outfit."),
-        h("div", { style: { marginTop: "6px" } }, ["female", "male", "futa", "femboy", "nonbinary"].map((g) => h("button", { type: "button", class: "fhc-pill" + (s.gender === g ? " on" : ""), onclick: () => ctx3.send("gender " + g) }, g))),
-        farmSwitches(ctx3, pick("ownoutfit"))
-      ) : null,
-      card(
-        title("\u{1F457} Farm outfit"),
-        muted("Dress me puts back on the outfit your record calls for (your species and gender, or your uniform while you're clocked in), in case it's come off or been changed."),
-        btn("Dress me", () => ctx3.send("dressme"), true),
-        ctx3.api.hasBackup && ctx3.api.hasBackup() ? h("div", null, muted("Your own clothes are kept on this computer."), btn("Change back into my own clothes", () => ctx3.api.back && ctx3.api.back())) : null
-      )
+      canEdit ? spotsCard(ctx3) : spotsList(ctx3),
+      canEdit ? null : muted("Zones and spots are set by herdmasters and proprietors.")
     ];
   }
-  function gearPage(ctx3) {
-    return [
-      card(
-        title("\u26D3 On your character"),
-        muted("All of these are off until you switch them on. Your safeword takes everything off."),
-        pref(ctx3, "gear", "Farm can put real gear on me", "A trap that plugs, cups, clamps, chains, ropes or funnels you puts the real item on your character, and takes it off again when its time's up. Pull one off early and it goes back. Your safeword takes it all off. (The parasite doesn't need this: ?parasite on is its switch.)", rehello(ctx3)),
-        pref(ctx3, "marks", "Farm can mark my body", "Loads leave the game's own splatters on your face, chest or tummy, wherever there's room, and farm words can be written on your body. ?wash takes them off."),
-        pref(ctx3, "strip", "Farm can strip me", "When the farm says so, your clothes come off (locked pieces stay). They're kept on this computer so you can dress again."),
-        pref(ctx3, "stir", "Farm can stir me up", "Traps, toys and scenes nudge your arousal meter up, and while the farm has you denied you're held at the edge instead of cummin'. A buzzin' toy you're wearin' follows a trap too: low while it teases, high when it breeds you, still while you're denied, then back how you had it. Your safeword still stops everything.", rehello(ctx3))
-      ),
-      // the farm's little cues on your own screen (cues.js); each one on unless you switch it off
-      card(
-        title("\u2728 On your screen"),
-        muted("Only you see and hear these. Each is on unless you switch it off."),
-        prefNot(ctx3, "noLead", "Lead me instead of teleportin'", "When the farm moves you (feedin' time, the stocks, a summon), you walk there yourself, step by step"),
-        prefNot(ctx3, "noFace", "Farm can set my face", "Dazed when milk-drunk, flushed in heat, a trance stare\u2026 for a little while"),
-        prefNot(ctx3, "noSound", "Farm sounds", "The pump, the stall door, the feedin' bell. Only you hear them, at your game volume"),
-        prefNot(ctx3, "noTrance", "Trance haze", "A soft haze at the edges of your screen during conditioning sessions"),
-        prefNot(ctx3, "noSlow", "Carryin' slows me down", "The fuller you are (a pumped belly, a late litter, a clutch of eggs), the slower you walk on the map"),
-        ctx3.s.staff ? prefNot(ctx3, "noMarkers", "Map markers (staff)", "Small badges over stock on your map: M needs milkin', H in heat, B expectin', X teats capped") : null
-      )
-    ];
+  function spotsList(ctx3) {
+    const sp = Object.entries(ctx3.s.spots || {});
+    return card(title("Spots"), sp.length ? sp.map(([n, p]) => h("div", { class: "fhc-kv" }, h("b", null, n), h("span", { class: "fhc-muted" }, p.X + "," + p.Y))) : muted("No spots yet."));
   }
-  function messagesPage(ctx3) {
-    const s = ctx3.s;
-    return [
-      card(
-        title("\u{1F4AC} Where the farm talks to you"),
-        pref(ctx3, "chatToo", "Farm messages in chat too", "Tease lines, heat, summons and other farm messages also show in your chat log, not just the panel"),
-        pref(ctx3, "chime", "Chime on notices", "A soft sound when the farm messages you"),
-        pref(ctx3, "popopen", "Open on new notice", "Pop the panel open by itself. Off: just the red number on \u{1F33E}"),
-        toggle(
-          "Farm emotes about me come from me",
-          "Belly kicks, milkin', breedin'\u2026 are posted as your own emote (no name in front), so the people who can see you see them and the farm girl needn't move. Only lines about you.",
-          !ctx3.prefs.noRelay,
-          () => {
-            ctx3.setPref("noRelay", !ctx3.prefs.noRelay);
-            ctx3.api.rehello && ctx3.api.rehello();
-          }
-        ),
-        prefNot(ctx3, "noFeelings", "Private feelings", "Now and then, a line only you see about what you're feelin' (your gear, your arousal, how full you are)")
-      ),
-      s.onBooks ? card(title("\u{1F5E3} What the farm says"), muted("Saved by the farm girl."), farmSwitches(ctx3, pick("teaseme", "hypno", "praise", "degrade"))) : null,
-      s.intensity ? card(
-        title("\u{1F336} How the farm talks to you"),
-        h("div", null, [["tender", "Tender"], ["rough", "Rough"], ["filthy", "Filthy"]].map(([id, label]) => h("button", { type: "button", class: "fhc-pill" + (s.intensity === id ? " on" : ""), onclick: () => ctx3.send("intensity " + id) }, label))),
-        muted(s.intensity === "tender" ? "Softer words, and the traps lean mild." : s.intensity === "filthy" ? "Dirtier words, and the traps lean brutal." : "As written."),
-        muted("It calls you: " + (((s.words || {}).call || []).join(", ") || "whatever comes to mind") + " \xB7 never: " + (((s.words || {}).never || []).join(", ") || "nothin' ruled out")),
-        h("div", null, btn("Names I love\u2026", () => ctx3.fillBox("callme ")), btn("Never call me\u2026", () => ctx3.fillBox("nevercall ")))
-      ) : null
-    ];
-  }
-  function privacyPage(ctx3) {
-    const s = ctx3.s;
-    return [
-      card(
-        title("\u{1F512} Privacy and record"),
-        // the record (chatlog.js): off unless they switch it on. Laynie, Nov 4, the exact words: "It only should say 'This option
-        // sends a copy of what the companion recieves and sends for bug squashing. Completely voluntary participation.'"
-        s.logMust ? muted("\u{1F4DC} As a proprietor, your Companion always sends its record. There's no switch for it.") : toggle(
-          "Send a record of what I see",
-          "This option sends a copy of what the companion receives and sends for bug squashing. Completely voluntary participation.",
-          !!ctx3.prefs.chatlog,
-          () => ctx3.setPref("chatlog", !ctx3.prefs.chatlog)
-        ),
-        s.onBooks ? farmSwitches(ctx3, pick("tally")) : null
-      ),
-      saveCard(ctx3)
-    ];
-  }
-  function saveCard(ctx3) {
-    const ls = localSaveState(), say = (t2) => ctx3.hint(t2), t = (ms) => new Date(ms).toTimeString().slice(0, 5);
-    const line3 = !ls.folder ? ls.can ? "Not saving to a folder yet." : "This browser can't save to a folder (Chrome and Edge can). You can still load a file." : ls.perm !== "granted" ? "Saving to " + ls.folder + " is paused till you reconnect it (the browser asks again after a restart)." : ls.err ? "Trouble saving to " + ls.folder + ": " + ls.err : "Saving to " + ls.folder + " every minute" + (ls.at ? ", last at " + t(ls.at) : "") + ", as " + ls.file + ".";
+  function spotsCard(ctx3) {
+    const sp = Object.entries(ctx3.s.spots || {});
+    const nm = () => (ctx3.ui.spotName || "").trim().toLowerCase();
+    const ok2 = () => /^[a-z][a-z0-9_-]{1,19}$/.test(nm()) || (ctx3.hint("Give the spot a one-word name, like speaker-barn, trough-1 or glory-1."), false);
     return card(
-      title("\u{1F4BE} Your settings file"),
-      muted("Your settings as a file on this computer: everything on these pages, your drawn body, your messes and the memory log. It survives a crash, a cleared browser or a new one. " + line3),
-      h(
-        "div",
-        { style: { marginTop: "6px" } },
-        ls.folder && ls.perm !== "granted" ? btn("Reconnect " + ls.folder, () => localSaveReconnect(VERSION)) : null,
-        ls.can ? btn(ls.folder ? "Save to a different folder" : "Save my settings to a folder\u2026", () => localSavePick(VERSION)) : null,
-        ls.folder && ls.perm === "granted" ? btn("Save now", () => localSaveNow(VERSION).then(() => say("Saved."))) : null,
-        btn("Load my settings from a file\u2026", () => {
-          say("Pick the farmhand-companion file to load\u2026");
-          localSaveLoad(say);
-        })
-      )
-    );
-  }
-  function advancedPage(ctx3) {
-    const bot = window.Player && window.Player.MemberNumber === BOT_MEMBER;
-    return [
-      card(
-        title("\u{1F9F0} This panel"),
-        muted("Only on this computer."),
-        bot ? toggle(
-          "Draw the room on the farm girl's screen",
-          "Off (the default), this tab doesn't draw anybody in the room: no pictures downloaded for what people wear, far less work and memory on this computer. The farm runs the same either way. Switch it on to watch the room or click on people from here.",
-          !!ctx3.prefs.drawRoom,
-          () => {
-            const on2 = !ctx3.prefs.drawRoom;
-            ctx3.setPref("drawRoom", on2);
-            if (on2) setTimeout(redrawRoom, 50);
-          }
-        ) : null,
-        pref(ctx3, "compact", "Compact cards", "Smaller text, more on screen"),
-        pref(ctx3, "btnPinned", "Pin the \u{1F33E} button", "Unpinned, you can drag it anywhere (mouse or finger). Pin it so it stays put."),
-        h("div", { style: { marginTop: "6px" } }, btn("Put the button and panel back (size and full screen too)", () => ctx3.resetPlaces && ctx3.resetPlaces()))
-      ),
-      card(
-        title("\u{1F9E0} Memory log"),
-        muted("For chasing a page that runs out of room: how big things were, every half minute, for the last hour. /farmmem in chat shows it too."),
-        h("pre", { style: { whiteSpace: "pre-wrap", fontSize: "11px", maxHeight: "300px", overflowY: "auto" } }, memlogText(12) || "Nothing yet.")
-      )
-    ];
-  }
-  function aboutPage(ctx3) {
-    const p = ctx3.prefs;
-    return [card(
-      title("\u{1F33E} Farmhand Companion v" + VERSION),
-      muted("The B&B Farm's helper: the \u{1F33E} panel, the drawn body, the farm's messes and gear on you, and your switches. It only talks to the farm girl."),
-      toggle(
-        "Farmhand Companion on",
-        "Switched off, the Companion stays quiet after your next reload: no panel, no drawn body, no messes or farm gear on you, nothing sent to the farm. The game's settings page stays, so you can switch it back on.",
-        !p.off,
-        () => ctx3.setPref("off", !p.off)
-      ),
-      p.off ? h("div", { style: { marginTop: "6px" } }, btn("Reload now", () => window.location.reload(), true)) : null
-    )];
-  }
-  var SETTINGS_PAGES = [
-    { id: "switches", label: "\u{1F404} Farm switches", render: farmPage },
-    { id: "body", label: "\u{1FA9E} Body and look", render: bodyPage },
-    { id: "gear", label: "\u26D3 Gear and marks", render: gearPage },
-    { id: "messages", label: "\u{1F4AC} Messages", render: messagesPage },
-    { id: "privacy", label: "\u{1F512} Privacy and record", render: privacyPage },
-    { id: "guides", label: "\u{1F4D6} Guides", render: (ctx3) => guidesTab(ctx3, !!ctx3.s.staff) },
-    { id: "advanced", label: "\u{1F9F0} Advanced", render: advancedPage },
-    { id: "about", label: "\u2139 About", render: aboutPage }
-  ];
-  var drawPage = (p, ctx3) => {
-    try {
-      return p.render(ctx3);
-    } catch (e) {
-      console.warn("[Farmhand Companion]", e);
-      return card(title(p.label), muted("This page hit a snag. The others still work."));
-    }
-  };
-  function findResults(ctx3, q2) {
-    const out = [], want = q2.trim().toLowerCase();
-    for (const p of SETTINGS_PAGES) {
-      if (p.id === "guides") continue;
-      const box2 = h("div", null, drawPage(p, ctx3));
-      const hits = [...box2.querySelectorAll(".fhc-tog")].filter((t) => t.textContent.toLowerCase().includes(want));
-      if (hits.length) out.push(card(title(p.label), hits));
-    }
-    return out.length ? out : [muted(`Nothin' matches "` + q2.trim() + '". Try fewer letters, or look through the pages.')];
-  }
-  function settingsView(ctx3, page2, setPage) {
-    const cur = SETTINGS_PAGES.find((p) => p.id === page2) || SETTINGS_PAGES[0];
-    const results = h("div", { class: "fhc-set-body" });
-    const find = ctx3.ui.setFind || "";
-    const fill = (q2) => results.replaceChildren(...[].concat(q2.trim() ? findResults(ctx3, q2) : drawPage(cur, ctx3)).flat(Infinity).filter(Boolean));
-    fill(find);
-    const input2 = h("input", {
-      class: "fhc-in",
-      type: "search",
-      placeholder: "Find a setting\u2026",
-      "aria-label": "Find a setting",
-      value: find,
-      style: { width: "100%" },
-      oninput: (e) => {
-        ctx3.setUi({ setFind: e.target.value }, true);
-        fill(e.target.value);
-      }
-    });
-    return h(
-      "div",
-      null,
-      h("div", { style: { margin: "0 0 10px" } }, input2),
-      h(
-        "div",
-        { class: "fhc-set" },
-        h("nav", { class: "fhc-set-nav", "aria-label": "Settings pages" }, SETTINGS_PAGES.map((p) => h("button", { type: "button", class: p === cur && !find.trim() ? "on" : "", onclick: () => {
-          ctx3.setUi({ setFind: "" }, true);
-          setPage(p.id);
-        } }, p.label))),
-        results
-      )
-    );
-  }
-
-  // extension/src/settings.js
-  var W10 = window;
-  var ID = "FarmhandCompanion";
-  var panel = null;
-  var box = null;
-  var page = "switches";
-  var settingsAvailable = () => typeof W10.PreferenceRegisterExtensionSetting === "function";
-  function ctx() {
-    const c = panel.ctx();
-    return Object.assign({}, c, {
-      setPref: (k, v) => {
-        c.setPref(k, v);
-        draw();
-      },
-      setUi: (p, quiet) => {
-        c.setUi(p, true);
-        if (!quiet) draw();
-      },
-      send: (cmd) => {
-        c.send(cmd);
-        setTimeout(draw, 1500);
-      },
-      hint: (m) => {
-        c.hint(m);
-        note(m);
-      }
-    });
-  }
-  function note(m) {
-    const n = box && box.querySelector("#fhc-set-note");
-    if (n) {
-      n.textContent = m;
-      n.style.display = "block";
-    }
-  }
-  function draw() {
-    if (!box) return;
-    const c = ctx();
-    box.replaceChildren(
-      h(
-        "div",
-        { style: { display: "flex", alignItems: "center", gap: "10px", marginBottom: "8px" } },
-        h("h2", { style: { margin: "0", flex: "1" } }, "\u{1F33E} Farmhand Companion"),
-        btn("Back", () => {
-          if (typeof W10.PreferenceSubscreenExtensionsClear === "function") W10.PreferenceSubscreenExtensionsClear();
-          else close();
-        }, true)
-      ),
-      h("div", { id: "fhc-set-note", style: { display: "none", margin: "6px 0", color: "#c9a35b" } }),
-      settingsView(c, page, (p) => {
-        page = p;
-        draw();
-      })
-    );
-  }
-  function open() {
-    close();
-    box = W10.document.createElement("div");
-    box.id = "fhc-settings";
-    W10.document.body.appendChild(box);
-    draw();
-  }
-  function close() {
-    if (box) {
-      box.remove();
-      box = null;
-    }
-  }
-  function initSettings(p) {
-    panel = p;
-    if (!settingsAvailable()) return false;
-    try {
-      W10.PreferenceRegisterExtensionSetting({
-        Identifier: ID,
-        ButtonText: "Farmhand Companion",
-        load: () => open(),
-        run: () => {
-        },
-        click: () => {
-        },
-        exit: () => {
-          close();
-          return true;
-        },
-        unload: () => close()
-      });
-      return true;
-    } catch (e) {
-      console.warn("[Farmhand Companion] settings page unavailable:", e);
-      return false;
-    }
-  }
-  function openSettings(which) {
-    if (which) page = which === "files" ? "privacy" : which;
-    try {
-      if (typeof W10.PreferenceSubscreenExtensionsOpen === "function") {
-        W10.PreferenceSubscreenExtensionsOpen(ID);
-        return true;
-      }
-    } catch (e) {
-    }
-    return false;
-  }
-
-  // extension/src/views/livestock.js
-  var pct = (a, b) => b ? 100 * a / b : 0;
-  var hoursLeft = (t) => Math.max(0, Math.ceil((t - Date.now()) / 36e5));
-  var minsLeft2 = (t) => Math.max(0, Math.ceil((t - Date.now()) / 6e4));
-  var till = (t) => {
-    const m = minsLeft2(t);
-    return m >= 1440 ? Math.floor(m / 1440) + " d " + Math.floor(m % 1440 / 60) + " h" : m >= 60 ? Math.floor(m / 60) + " h" : m + " m";
-  };
-  var clock = (t) => new Date(t).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-  var of = (a, b) => b >= 1e3 ? (a / 1e3).toFixed(1) + " / " + (b / 1e3).toFixed(1) + " L" : Math.round(a) + " / " + Math.round(b) + " mL";
-  var plain = (label) => String(label || "").replace(/^[^\p{L}\p{N}]+/u, "");
-  function goSettings(ctx3, page2) {
-    if (settingsAvailable() && openSettings(page2)) return;
-    ctx3.setUi({ setPage: page2, setFind: "", goTab: "settings" });
-  }
-  var errCard = (s) => s.stateErr && card(title("Somethin' broke on the farm girl's end"), muted("Part of your panel didn't arrive. Tell the proprietors this line: " + s.stateErr));
-  function happening(ctx3) {
-    const s = ctx3.s, hp = s.happening || [], quiet = s.quietUntil && s.quietUntil > Date.now();
-    return [
-      hp.length ? hp.map((t) => h("div", { style: { margin: "3px 0" } }, t)) : muted("Nothin' has hold of you right now."),
-      h(
-        "div",
-        null,
-        quiet ? btn("End the quiet", () => ctx3.send("quiet off")) : btn("An hour's quiet", () => ctx3.send("quiet 60")),
-        muted(quiet ? "Nothin' new starts on you till it's over." : "Quiet: no new traps, urges, scents or teasin' for an hour. It doesn't stop what already has you; the safe word does.")
-      )
-    ];
-  }
-  function me2(ctx3) {
-    const s = ctx3.s, x = mePieces(ctx3), now = Date.now();
-    const quiet = s.quietUntil && s.quietUntil > now;
-    const sub = [
-      [s.tier, s.species].filter(Boolean).join(" "),
-      s.herdLeader && s.herdLeader + "'s herd",
-      s.contract && (s.contract.until ? "contract " + till(s.contract.until) : "contract for good")
-    ].filter(Boolean).join(" \xB7 ");
-    const chips = (s.now || []).filter((n) => !n.until || n.until > now).map((n) => chip(n.icon + " " + n.text + (n.until ? " \xB7 " + till(n.until) : ""), /🚫|🪵|⛓️|🚧|🔥/.test(n.icon) ? "alert" : "")).concat(x.chips.map((c) => chip(String(c.text ?? c), c.kind === "alert" ? "alert" : "")), quiet ? [chip("\u{1F92B} quiet \xB7 " + till(s.quietUntil))] : []);
-    const sum = h(
-      "div",
-      { class: "fhc-sum" },
-      h("div", { class: "fhc-sum-top" }, h("span", { class: "fhc-nm" }, s.name), h("span", { class: "fhc-purse", title: "Your ribbons" }, "\u{1F380} " + (s.ribbons || 0))),
-      sub ? h("div", { class: "fhc-muted", style: { marginTop: "-6px" } }, sub) : null,
-      chips.length ? h("div", { class: "fhc-chips", "aria-label": "Right now" }, chips) : null,
-      meters([
-        s.milk && { label: "Milk", right: String(s.milk.grade || ""), value: of(s.milk.ml, s.milk.cap), pct: pct(s.milk.ml, s.milk.cap) },
-        s.quota && { label: "Quota", right: s.quota.streak ? "\xD7" + s.quota.streak : "", value: of(s.quota.ml, s.quota.goal), pct: pct(s.quota.ml, s.quota.goal), kind: "good" },
-        s.semen && { label: "Seed", value: of(s.semen.ml, s.semen.cap), pct: pct(s.semen.ml, s.semen.cap) },
-        s.holding && s.holding.ml > 0 && { label: "Holding", value: ml(s.holding.ml), pct: pct(s.holding.ml, s.holding.cap), kind: "alert" },
-        ...x.bars.map((b) => ({ label: plain(b.label), value: String(b.value ?? ""), pct: Number(b.pct) || 0, kind: b.kind === "good" || b.kind === "alert" ? b.kind : "" }))
-      ])
-    );
-    const fresh2 = ctx3.feed.filter((m) => m.kind !== "mine" && m.at > (ctx3.ui.inboxSeen || 0)).length;
-    const F = ctx3.s.feats, next = F && Array.isArray(F.tracks) ? F.tracks.filter((t) => t.next).map((t) => Object.assign({ p: pct(t.n - (t.prev || 0), t.next - (t.prev || 0)) }, t)).sort((a, b) => b.p - a.p)[0] : null;
-    const hp = s.happening || [];
-    return [
-      errCard(s),
-      sum,
-      rows(ctx3, "me", [
-        {
-          id: "inbox",
-          label: "\u{1F4EC} Inbox",
-          dot: fresh2 > 0,
-          sum: fresh2 ? fresh2 + " new" : ctx3.feed.length ? "nothin' new" : "empty",
-          body: () => {
-            ctx3.ui.inboxSeen = Date.now();
-            return inbox(ctx3);
-          }
-        },
-        hp.length && { id: "now", label: "\u{1F300} What's got you", sum: hp.length === 1 ? String(hp[0]).slice(0, 40) : hp.length + " things", body: () => happening(ctx3) },
-        (s.preg || s.eggs) && {
-          id: "carry",
-          label: "\u{1F37C} Carryin'",
-          sum: [s.preg && s.preg.sires.join(" & ") + "'s, due in " + Math.max(0, Math.ceil((s.preg.due - now) / 864e5)) + " d", s.eggs && s.eggs.n + " eggs"].filter(Boolean).join(" \xB7 "),
-          body: () => [
-            s.preg && h("div", null, "Carryin' for " + s.preg.sires.join(" & ") + " \xB7 due in " + Math.max(0, Math.ceil((s.preg.due - now) / 864e5)) + " day(s)"),
-            s.eggs && h("div", null, "\u{1F95A} " + s.eggs.n + " eggs in you. ", h("span", { class: "fhc-muted" }, "?lay at the nest, or they come when they're due.")),
-            h("div", null, btn("Pedigree", () => ctx3.send("pedigree")), btn("Eggs", () => ctx3.send("eggs")), btn("Body tab \u203A", () => ctx3.setUi({ goTab: "body" })))
-          ]
-        },
-        (s.body || []).length && {
-          id: "body",
-          label: "\u{1F4CF} Body",
-          sum: s.body.map((b) => b.size).slice(0, 3).join(" \xB7 "),
-          body: () => [
-            h("div", { class: "fhc-grid" }, s.body.map((b) => h("div", null, muted(b.label), h("div", { style: { fontWeight: 600 } }, b.size)))),
-            h("div", null, btn("Measure", () => ctx3.send("measure")))
-          ]
-        },
-        s.today && {
-          id: "marks",
-          label: "\u270D\uFE0F Today's marks",
-          sum: "used " + s.today.tally + " \xB7 " + s.today.naughty + " naughty \xB7 praised " + s.today.praised,
-          body: () => [
-            pairs([["Used today", String(s.today.tally)], ["Naughty marks", String(s.today.naughty)], ["Praised", String(s.today.praised)], ["Degraded", s.today.degraded ? String(s.today.degraded) : null]]),
-            h("div", null, btn("My tally", () => ctx3.send("tally")))
-          ]
-        },
-        s.kept && {
-          id: "kept",
-          label: "\u{1F3F7}\uFE0F Kept by " + s.kept.by,
-          sum: Math.max(1, Math.ceil((s.kept.until - now) / 864e5)) + " day(s) left",
-          body: () => [
-            s.kept.tag ? muted("Your tag: " + s.kept.tag) : null,
-            s.kept.name ? muted("This week you're called: " + s.kept.name) : null,
-            (s.kept.milk || []).length ? muted("Milked at " + s.kept.milk.map((x2) => x2 + ":00").join(" and ")) : null,
-            h("div", null, btn("What that means", () => ctx3.send("kept")), btn("End it", () => ctx3.send("kept off")))
-          ]
-        },
-        s.roam && { id: "roam", label: "\u{1F9ED} Roam", sum: s.roam.until ? "out till " + clock(s.roam.until) : s.roam.left + " pass" + (s.roam.left === 1 ? "" : "es"), body: () => roamBody(ctx3) },
-        next && {
-          id: "feat",
-          label: "\u{1F3C5} Next feat",
-          sum: next.name + " " + TIER[next.tier + 1] + " \xB7 " + Math.round(next.p) + "%",
-          body: () => [
-            bar(next.icon + " " + next.name + ": tier " + TIER[next.tier + 1], next.n + " of " + next.next + " " + next.unit, next.p, "acc"),
-            muted("Perk: " + next.perk + ", " + next.desc),
-            h("div", null, btn("All my feats \u203A", () => ctx3.setUi({ goTab: "ribbons", open_rib: "feats" })))
-          ]
-        },
-        x.cards.length && { id: "extras", label: "\u{1F9E9} Farm extras", sum: x.labels.slice(0, 2).join(" \xB7 "), body: () => x.cards }
-      ]),
-      quick(ctx3, "me", [
-        ["\u{1F6BF} Wash", () => ctx3.send("wash")],
-        ["\u{1F489} Shots", () => ctx3.send("myshots")],
-        // ?drain with their own number: them and nobody else, staff or stock (15-commands.js drainSelf)
-        ["\u{1FAA3} Drain", () => ctx3.send("drain " + (window.Player && window.Player.MemberNumber || "me"))]
-      ], [
-        ["\u{1F4CA} Stats", () => ctx3.send("stats")],
-        ["\u{1F4D0} Measure", () => ctx3.send("measure")],
-        ["\u{1F4CB} Record", () => ctx3.send("record")],
-        ["\u{1F333} Pedigree", () => ctx3.send("pedigree")],
-        ["\u{1F511} Keys", () => ctx3.send("keys")],
-        ["\u{1F457} Dress me", () => ctx3.send("dressme")],
-        quiet ? ["\u{1F92B} End the quiet", () => ctx3.send("quiet off")] : ["\u{1F92B} Quiet hour", () => ctx3.send("quiet 60")]
-      ])
-    ];
-  }
-  function roamBody(ctx3) {
-    const r = ctx3.s.roam;
-    return [
-      r.until ? muted("Roamin' now: back on the farm by " + clock(r.until) + ", or the farm girl fetches you.") : muted(r.left ? "An hour off the farm each; the whole map is yours either way. Walk out the door and a pass starts. Late back costs you." : "The farm gate's shut till you have a pass. The whole map is still yours to wander."),
-      h(
-        "div",
-        null,
-        r.until ? btn("I'm back", () => ctx3.send("roam back")) : r.left ? btn("Roam for an hour", () => ctx3.send("roam start"), true) : null,
-        r.until ? null : btn("Buy a pass \xB7 " + (r.price || 30) + " \u{1F380}", () => ctx3.send("buy roampass"))
-      )
-    ];
-  }
-  function body(ctx3) {
-    const s = ctx3.s, sw = s.switches || {}, g = s.gear || {}, onoff = (v) => v === true ? "on" : v === false ? "off" : v;
-    const steps = (lv) => h("div", { class: "fhc-steps" }, [1, 2, 3, 4].map((n) => h("div", { class: n <= lv ? "on" : "" })));
-    const milk = s.milk ? section(
-      "\u{1F95B} Milk",
-      "grade " + s.milk.grade,
-      bar("In your udder", ml(s.milk.ml) + " of " + ml(s.milk.cap) + (s.milk.lastAt ? " \xB7 milked " + Math.round((Date.now() - s.milk.lastAt) / 6e4) + " min ago" : ""), pct(s.milk.ml, s.milk.cap)),
-      s.quota && bar("Today's quota", ml(s.quota.ml) + " of " + ml(s.quota.goal) + (s.quota.streak ? " \xB7 streak " + s.quota.streak : ""), pct(s.quota.ml, s.quota.goal), "good"),
-      // what you're hooked up to right now, read off you by the farm
-      g.milk ? [
-        h("div", { class: "fhc-kv", style: { border: "none", padding: "0" } }, h("span", null, g.milk.name), h("span", { class: "fhc-muted" }, ["", "Gentle", "Steady", "Hard", "Max"][g.milk.level] + " \xB7 " + g.milk.ml + " mL a minute")),
-        steps(g.milk.level),
-        g.milk.kind === "echo" ? muted("The more worked up you are, the faster it draws.") : null
-      ] : muted("No pump on right now. A milk pump (the game's Lactation Pump), Echo's portable pump, the milk vendor or a milkin' stall all milk you."),
-      g.machine && h("div", { class: "fhc-kv" }, h("span", null, "\u2699\uFE0F " + g.machine.name), h("span", { class: "fhc-muted" }, g.machine.intensity < 0 ? "off" : "intensity " + g.machine.intensity)),
-      g.funnel && h("div", { class: "fhc-kv" }, h("span", null, "Funnel gag"), h("span", { class: "fhc-muted" }, "fitted, and it counts as open")),
-      s.stallUntil && h("div", { class: "fhc-kv" }, h("span", null, "Milkin' stall"), chip(minsLeft2(s.stallUntil) + " min left", "acc")),
-      s.dial && h(
-        "div",
-        null,
-        muted("The stall dial" + (s.milkCums ? " \xB7 milked till you came \xD7 " + s.milkCums : "")),
-        h("div", null, [["gentle", "Gentle"], ["steady", "Steady"], ["hard", "Hard"], ["punishing", "Punishin'"]].map(([id, label]) => h("button", { type: "button", class: "fhc-pill" + (s.dial === id ? " on" : ""), onclick: () => ctx3.send("stalldial " + id) }, label))),
-        muted({ gentle: "Slow and sweet. It leaves you a third.", steady: "It drains you to a quarter.", hard: "Fast and deep, down to an eighth, and sore teats after.", punishing: "Past empty. You'll be sensitive for an hour after." }[s.dial] || "")
-      ),
-      h("div", null, btn("Quota", () => ctx3.send("quota")), btn("Milk board", () => ctx3.send("board")))
-    ) : section("\u{1F95B} Milk", null, muted("You're not makin' milk right now. Milkable is in \u2699 Settings \u203A Farm switches."), h("div", null, btn("Farm switches", () => goSettings(ctx3, "switches"))));
-    const breed = section(
-      "\u{1F402} Breedin'",
-      [sw.fertile ? "fertile" : null, s.heatUntil ? "in heat " + hoursLeft(s.heatUntil) + " h" : null].filter(Boolean).join(" \xB7 "),
-      pairs([
-        ["Breedable", onoff(sw.breedable)],
-        ["Fertile", onoff(sw.fertile)],
-        ["Jar breedin'", sw.jarok ? "asks first" : "never"],
-        ["Free use", onoff(sw.freeuse)],
-        ["Natural heat", onoff(sw.naturalheat)],
-        ["Carryin'", s.preg ? s.preg.sires.join(" & ") + "'s, due in " + Math.max(0, Math.ceil((s.preg.due - Date.now()) / 864e5)) + " d" : null],
-        ["Eggs in you", s.eggs ? s.eggs.n + " \xB7 lay at the nest" : null]
-      ]),
-      h("div", null, btn("My tally", () => ctx3.send("tally")), btn("Eggs", () => ctx3.send("eggs")), btn("Pedigree", () => ctx3.send("pedigree")))
-    );
-    const hold = s.holding && s.holding.cap ? section(
-      "\u{1FAD9} Holdin'",
-      Math.round(pct(s.holding.ml, s.holding.cap)) + "% full",
-      bar("In you", ml(s.holding.ml) + " of " + ml(s.holding.cap), pct(s.holding.ml, s.holding.cap), "alert"),
-      h("div", null, btn("\u{1FAA3} Drain", () => ctx3.send("drain " + (window.Player && window.Player.MemberNumber || "me"))), btn("\u{1F6BF} Wash", () => ctx3.send("wash")))
-    ) : null;
-    const seed = s.semen ? section("\u{1F4A6} Seed", null, bar("Stored", ml(s.semen.ml) + " of " + ml(s.semen.cap), pct(s.semen.ml, s.semen.cap))) : section("\u{1F4A6} Seed", null, muted("You're not makin' seed. Want a turn as a stud? Futa's in \u2699 Settings \u203A Farm switches."), h("div", null, btn("Farm switches", () => goSettings(ctx3, "switches"))));
-    return [milk, breed, hold, seed];
-  }
-  function trapThemesCard(ctx3) {
-    const list = ctx3.s.trapThemes || [];
-    if (!list.length) return null;
-    return card(title("Kinds of trap"), trapThemes(ctx3));
-  }
-  function trapThemes(ctx3) {
-    const list = ctx3.s.trapThemes || [];
-    return [
-      muted("Switch a whole kind off and not one of those traps springs for you, not even one a proprietor springs by hand. A trap that's two kinds is off if either is." + (ctx3.s.trapCard ? "" : " (They only matter once your traps are on.)")),
-      list.map((t) => toggle(t.icon + " " + t.label, t.desc, !!t.on, () => ctx3.send("traps theme " + t.id + " " + (t.on ? "off" : "on"))))
-    ];
-  }
-  function seasonsCard(ctx3) {
-    const b = seasons(ctx3);
-    return b ? card(title("\u{1F5D3}\uFE0F Seasons"), b) : null;
-  }
-  function seasons(ctx3) {
-    const sa = ctx3.s.seasonsAdmin;
-    if (!sa || !sa.rows || !sa.rows.length) return null;
-    const at = (t) => new Date(t).toLocaleString([], t - Date.now() < 20 * 36e5 ? { hour: "2-digit", minute: "2-digit" } : { weekday: "short", hour: "2-digit", minute: "2-digit" });
-    return [
-      muted("Start any season's traps whenever you like: for a party, a special day, or just because. While one's on, about a third of what the plain trap tiles spring is from its pack, and the farm girl dresses for it. Anybody with their Seasonal packs switch off never gets them."),
-      sa.rows.map((x) => h(
+      title("Spots"),
+      muted("home \xB7 speaker-\u2026 (the bot talks from these) \xB7 trough-\u2026 \xB7 water-\u2026 \xB7 glory-1 and glory-1-visitor \xB7 placard-\u2026"),
+      sp.length ? sp.map(([n, p]) => h(
         "div",
         { class: "fhc-kv" },
-        h("span", null, x.icon + " " + x.label + " \xB7 " + (x.on ? x.hand ? x.open ? "on till you stop it" : "on till " + at(x.until) : "on, its time of year" : x.dates)),
-        h("span", null, x.on ? btn("Stop", () => ctx3.send("seasons stop " + x.id)) : [btn("2 hours", () => ctx3.send("seasons start " + x.id + " 2h")), btn("Till I stop it", () => ctx3.send("seasons start " + x.id + " on"))])
-      )),
+        h("span", null, h("b", null, n), " ", h("span", { class: "fhc-muted" }, p.X + "," + p.Y)),
+        h(
+          "span",
+          null,
+          h("button", { type: "button", class: "fhc-b", onclick: () => ctx3.setUi({ spotName: n }) }, "Pick"),
+          h("button", { type: "button", class: "fhc-b", onclick: () => ctx3.send("spot clear " + n) }, "Clear")
+        )
+      )) : muted("No spots yet."),
+      h("label", { class: "fhc-label" }, "Spot name", h("input", { class: "fhc-in", placeholder: "speaker-barn", value: ctx3.ui.spotName || "", oninput: (e) => ctx3.setUi({ spotName: e.target.value }, true) })),
       h(
         "div",
         null,
-        btn("All of them, 2 hours", () => ctx3.send("seasons start all 2h")),
-        btn("Stop the ones I started", () => ctx3.send("seasons stop")),
-        btn(sa.costume ? "Her costume: on" : "Her costume: off", () => ctx3.send("seasons costume " + (sa.costume ? "off" : "on"))),
-        btn("The calendar", () => ctx3.send("seasons"))
+        btn("Click it on the map", () => {
+          if (!ok2()) return;
+          const n = nm();
+          ctx3.api.pickTiles(1, "spot '" + n + "'", ([p]) => ctx3.send("spot place " + n + " " + p.X + " " + p.Y));
+        }, true),
+        btn("Set where I stand", () => ok2() && ctx3.send("spot set " + nm()))
       ),
-      muted("Other lengths, or several at once: ?seasons start halloween 3d \xB7 ?seasons start halloween winter on")
-    ];
-  }
-  function play(ctx3) {
-    const s = ctx3.s, tc = s.trapCard, ad = s.trapAdmin, gear = s.farmGear || [], st2 = storeParts(ctx3), themes = s.trapThemes || [];
-    const traps = tc ? section(
-      "\u{1FAA4} Traps" + (tc.rank ? " \xB7 " + tc.rank : ""),
-      tc.total + " sprung" + (tc.nextRank ? " \xB7 next rank at " + tc.nextRank : ""),
-      tc.kinds.length ? h("div", { class: "fhc-chips" }, tc.kinds.map((k) => chip(k.kind + " \xD7" + k.n))) : muted("Nothin's caught you yet. Give it time."),
-      muted(tc.left + " kind" + (tc.left === 1 ? "" : "s") + " still to find" + (tc.eggs ? " \xB7 " + tc.eggs + " eggs laid" : "") + (tc.paused ? " \xB7 traps paused" : "") + (tc.eager ? " \xB7 eager (no waits)" : "") + (tc.danger ? " \xB7 Danger Draught in you" : "")),
-      tc.corr || tc.under ? bar("Corruption", tc.corr + " of 100" + (tc.under ? " \xB7 gone under, depth " + tc.under : ""), tc.corr, "alert") : null,
-      tc.hunt && muted("\u{1F514} The hunt is on: get to " + tc.hunt.goal),
-      tc.today && muted("\u{1F3AF} Trap of the day: " + tc.today.icon + " " + tc.today.kind + ", " + tc.today.what + (tc.today.paid ? ". It's paid you its ribbon today." : ". Twice as likely today, and a ribbon the first time it has you.")),
-      tc.rated && muted("Your ratings: \u{1F496} " + tc.rated.loved + " \xB7 \u{1F44D} " + tc.rated.fine + " \xB7 \u{1F645} " + tc.rated.no + (tc.rateAsk ? "" : " \xB7 not askin' after each trap")),
-      quick(ctx3, "traps", [["Struggle", () => ctx3.send("struggle")], ["What's out there", () => ctx3.send("traps")]], [
-        ["Switch traps off", () => ctx3.send("traps off")],
-        [tc.eager ? "Eager: on" : "Eager: off", () => ctx3.send("traps eager " + (tc.eager ? "off" : "on"))],
-        ["Lay (at the nest)", () => ctx3.send("lay")],
-        ["My brood book", () => ctx3.send("brood")],
-        ["My ratings", () => ctx3.send("rate")],
-        [tc.rateAsk === false ? "Ask how each was: off" : "Ask how each was: on", () => ctx3.send("rate ask " + (tc.rateAsk === false ? "on" : "off"))]
-      ])
-    ) : section("\u{1FAA4} Traps", "off", muted("The farm's traps are off for you, so you can walk right over them. Switch them on and every trap spot on the farm can spring for you."), h("div", null, btn("Switch traps on", () => ctx3.send("traps on"))));
-    const offKinds = themes.filter((t) => !t.on).length;
-    return [
-      errCard(s),
-      traps,
-      rows(ctx3, "play", [
-        {
-          id: "gear",
-          label: "\u26D3 On you right now",
-          sum: gear.length ? gear.length + " piece" + (gear.length === 1 ? "" : "s") : "nothin'",
-          body: () => [
-            gear.length ? gear.map((g) => h("div", null, h("div", { class: "fhc-kv" }, h("b", null, g.name), h("span", { class: "fhc-muted" }, minsLeft2(g.until) + " min")), muted(gearLore(g.name) || g.desc || ""))) : muted("No farm gear on you."),
-            !ctx3.prefs.gear && muted('Trap gear only goes on for real with "Farm can put real gear on me" switched on (\u2699 Settings \u203A Gear and marks).')
-          ]
-        },
-        themes.length && tc && { id: "kinds", label: "\u{1F9EC} Kinds of trap", sum: offKinds ? offKinds + " off" : "all on", body: () => trapThemes(ctx3) },
-        st2.now && { id: "fx", label: "\u{1F9EA} In you right now", sum: (s.fx || []).length + " potion" + ((s.fx || []).length === 1 ? "" : "s"), body: () => st2.now },
-        st2.dare && { id: "dare", label: s.dare.reckless ? "\u{1F3B2} A reckless dare" : "\u{1F3B2} Your dare", sum: minsLeft2(s.dare.until) + " min left", body: () => st2.dare },
-        st2.pen && { id: "pen", label: "\u{1F6A7} Corralled", sum: minsLeft2(s.penned.until) + " min", body: () => st2.pen },
-        s.sitting && { id: "nest", label: "\u{1FABA} Sittin' the nest", sum: s.sitting.n + " eggs", body: () => [muted(s.sitting.n + " eggs under you. They hatch in about " + Math.max(1, minsLeft2(s.sitting.until)) + " min."), h("div", null, btn("Get up", () => ctx3.send("sit up")))] },
-        s.holes && s.holes.length && {
-          id: "holes",
-          label: "\u{1F573} What you've taken",
-          sum: s.holes.map((x) => x.rank).slice(0, 2).join(" \xB7 "),
-          body: () => [
-            s.holes.map((x) => h("div", { class: "fhc-kv" }, h("span", null, "Your " + x.hole + " \xB7 " + x.rank), h("span", { class: "fhc-muted" }, x.loads + " loads" + (x.knots ? " \xB7 " + x.knots + " knots" : "") + (x.next ? " \xB7 next at " + x.next : "")))),
-            muted("Every step a hole is trained, you hold more for good and the traps pour more into it.")
-          ]
-        },
-        s.album && s.album.length && {
-          id: "album",
-          label: "\u{1F4D4} Keepsakes",
-          sum: s.album.length + "",
-          body: () => [
-            s.album.map((e) => h("div", null, h("div", { class: "fhc-kv" }, h("b", null, e.i + " " + e.h), h("span", { class: "fhc-muted" }, new Date(e.t).toLocaleDateString())), muted(e.x))),
-            muted("Only you can open this album.")
-          ]
-        },
-        s.onBooks && { id: "shots", label: "\u{1F489} Shots in you", sum: "?myshots", go: () => ctx3.send("myshots") },
-        ad && { id: "admin", label: "\u{1F6E0} Proprietor: traps", sum: ad.subjects.length + " with traps on", body: () => trapAdmin(ctx3) },
-        ctx3.s.seasonsAdmin && ctx3.s.seasonsAdmin.rows && ctx3.s.seasonsAdmin.rows.length && { id: "seasons", label: "\u{1F5D3}\uFE0F Seasons", sum: ctx3.s.seasonsAdmin.rows.filter((x) => x.on).map((x) => x.icon).join(" ") || "none on", body: () => seasons(ctx3) }
-      ])
-    ];
-  }
-  function trapAdmin(ctx3) {
-    const ad = ctx3.s.trapAdmin;
-    return [
-      ad.today && muted("\u{1F3AF} Trap of the day: " + ad.today.icon + " " + ad.today.kind),
-      ad.ratings && (ad.ratings.loved.length || ad.ratings.no.length) ? muted("\u{1F496} Most loved: " + (ad.ratings.loved.map((x) => x.icon + " " + x.kind + " (" + x.n + ")").join(", ") || "none yet") + ' \xB7 \u{1F645} Most "not for me": ' + (ad.ratings.no.map((x) => x.icon + " " + x.kind + " (" + x.n + ")").join(", ") || "none yet")) : null,
-      ad.subjects.length ? ad.subjects.map((x) => h("div", { class: "fhc-kv" }, h("span", null, (x.here ? "\u25CF " : "") + x.name), h("span", { class: "fhc-muted" }, x.n + " sprung" + (x.paused ? " \xB7 paused" : "")))) : muted("Nobody's switched their traps on yet."),
-      muted("Trap spots: " + (ad.spots.length ? ad.spots.join(", ") : "none yet (?spot set trap-<kind>)")),
-      muted("Water: " + (ad.water.length ? ad.water.join(", ") : "none yet (?spot set pond)") + (ad.nest ? " \xB7 " + ad.nest + " eggs in the nest" : "") + (ad.pack ? " \xB7 pack at " + ad.pack : "")),
-      ad.hunt && muted("\u{1F514} Hunt on: finish at " + ad.hunt.goal + ", " + ad.hunt.done + " home"),
-      h(
+      // clearin' old ones: everything with a name startin' like the box (speaker- clears every speaker), or all, with a second press
+      sp.length ? h(
         "div",
-        null,
-        btn("Kinds & spots", () => ctx3.send("traps")),
-        btn("Subjects", () => ctx3.send("subject")),
-        btn(ad.hunt ? "Stop the hunt" : "Start a hunt", () => ctx3.send(ad.hunt ? "hunt stop" : "hunt start")),
-        btn("Gather eggs", () => ctx3.send("gather")),
-        btn("Ratings", () => ctx3.send("traps ratings"))
-      )
-    ];
-  }
-  var TIER = ["\u2013", "I", "II", "III", "IV", "V"];
-  function feats(ctx3) {
-    const F = ctx3.s.feats;
-    if (!F || !Array.isArray(F.tracks)) return [muted("Your feats show here once the farm girl's sent your panel. ?feats works from chat too.")];
-    return [
-      muted("Every track counts somethin' you do on the farm. Each new tier is a feat and grows that track's perk; perks stack and work on their own."),
-      F.tracks.map((t) => h(
-        "div",
-        { class: "fhc-box" },
-        h("div", { class: "fhc-kv" }, h("b", null, t.icon + " " + t.name + " " + TIER[t.tier]), t.tier ? chip(t.perk + (t.off ? " (off)" : ""), t.off ? "" : "good") : null),
-        t.next ? bar("Next: tier " + TIER[t.tier + 1], t.n + " of " + t.next + " " + t.unit, pct(t.n - (t.prev || 0), t.next - (t.prev || 0)), "acc") : muted("Every tier earned. " + t.n + " " + t.unit + "."),
-        muted(t.tier ? t.perk + ": " + t.desc : "Perk: " + t.perk + ", " + t.desc),
-        t.tier ? toggle("Use " + t.perk, "Switch it off and it stays earned.", !t.off, () => ctx3.send("perks " + (t.off ? "on " : "off ") + t.key)) : null
-      ))
-    ];
-  }
-  function ribbons(ctx3) {
-    const s = ctx3.s, st2 = storeParts(ctx3), F = s.feats, tiers = F && Array.isArray(F.tracks) ? F.tracks.reduce((n, t) => n + (t.tier || 0), 0) : 0;
-    const log2 = s.ribbonLog || [];
-    return [
-      h(
-        "div",
-        { class: "fhc-sum" },
-        h("div", { class: "fhc-sum-top" }, h("span", { class: "fhc-nm" }, "\u{1F380} Your ribbons"), h("span", { class: "fhc-purse", style: { fontSize: "22px" } }, String(s.ribbons || 0))),
-        s.quotaGrace ? h("div", null, chip("quota grace \xD7 " + s.quotaGrace, "good")) : null,
-        st2.vat,
-        muted("Earn 'em: your milk quota, a full stall session, chores, glory shifts, dares, shows, best of the week, and staff who think you've been good.")
-      ),
-      rows(ctx3, "rib", [
-        log2.length && { id: "log", label: "\u{1F4D2} Where they came from", sum: (log2[0].n > 0 ? "+" : "") + log2[0].n + " " + log2[0].why, body: () => st2.logList },
-        ...st2.shelves.map((sh) => ({ id: sh.id, label: sh.label, sum: sh.n + " on the shelf", body: sh.body })),
-        { id: "feats", label: "\u{1F3C5} Feats", sum: F && Array.isArray(F.tracks) ? tiers + " tier" + (tiers === 1 ? "" : "s") + " earned" : "", body: () => feats(ctx3) },
-        F && F.titles && F.titles.length && { id: "titles", label: "\u{1F396}\uFE0F Titles", sum: String(F.titles.length), body: () => [muted(F.titles.join(" \xB7 "))] }
-      ]),
-      h("div", null, btn("This week's board", () => ctx3.send("ribbons top")))
-    ];
-  }
-  function inbox(ctx3) {
-    const f = ctx3.ui.filter || "all";
-    const items = ctx3.feed.filter((x) => f === "all" || x.kind === f);
-    return [
-      h("div", null, [["all", "All"], ["notice", "From the farm"], ["reply", "Answers"], ["mine", "You asked"]].map(([id, label]) => h("button", { type: "button", class: "fhc-pill" + (f === id ? " on" : ""), onclick: () => ctx3.setUi({ filter: id }) }, label))),
-      items.length ? items.slice().reverse().map((x) => h(
-        "div",
-        { class: "fhc-card " + x.kind },
-        h("span", { class: "fhc-time" }, new Date(x.at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) + (x.kind === "notice" ? " \xB7 from the farm" : x.kind === "mine" ? " \xB7 you asked" : "")),
-        x.text
-      )) : muted("Nothin' here yet.")
-    ];
-  }
-  var SWITCH_INFO = [
-    ["hypno", "Hypno", "Conditioning's trance sessions can take you, in the farm's voice, never deeper than your ?depth (fun, deep or no human left). ?wake ends one"],
-    ["teaseme", "Tease me", "The farm whispers you a tease 3 or 4 times an hour while you're here, about whatever's goin' on with you: full udders, a load still in you, a heat, a mess. ?teaseme steady or needy for more. Your herd leader can switch it for you too"],
-    ["breedable", "Breedable", "You can be bred and filled"],
-    ["fertile", "Fertile", "You can catch"],
-    ["mpreg", "Mpreg", "A load in your ass can take too, no item needed (with Breedable and Fertile on)"],
-    ["jarok", "Jar breedin'", "On: staff still ask every time \xB7 Off: never"],
-    ["freeuse", "Free use", "Any stud may have you without askin'"],
-    // Laynie, Nov 4: "also need the futa toggle, just in case a female wants to temporaily be a stud"
-    ["futa", "Futa", "A cock of your own as well: cock and pussy both, milk and cum both. Be a stud for a while, and flip it back whenever you like"],
-    ["milkable", "Milkable", "Make milk"],
-    ["seedmilk", "Milk my seed", "The stall, the milkin' traps and ?collect take your seed as well as your milk. Off: they milk you up top and leave your cock and balls be"],
-    ["naturalheat", "Natural heat", "Come into heat on your own every 7 days"],
-    ["praise", "Praise", "Let staff's praise count"],
-    ["degrade", "Degrade", "Let staff's degradin' count"],
-    ["tally", "Tally marks", "Show your tally on ?who and the board"],
-    ["potions", "Potions", "Staff and the wheel can give you potions, and others can gift you one (you're asked first). Your limits still rule some out"],
-    ["dares", "Dares", "Staff and the wheel can hand you a dare to do in half an hour"],
-    ["watersports", "Watersports", "Piss play can find you: the spray trap, a feeder crafted for it, and the scenes that have it. Off until you say so"],
-    ["parasite", "Parasite", "Swallow at the glory stalls and, rarely, a pair of livin' lips seals over your mouth for 12 hours: it feeds you fertility, growth, hyper pregnancy and capacity serum and turns every load you swallow into more"],
-    ["symbiote", "Symbiotes", "Livin' latex, milk moss or the nestling can bond to you. Each gives you somethin' for as long as it's fed: room to hold more, more milk, an easier catch. They grow into real clothes on you (latex, moss), and they spread: latex by a touch, moss in the milk, the nestling by a breedin', to others who switched this on. Your safeword sends it away"],
-    ["traps", "Traps", "The farm's traps spring for you: step on a trap spot and it might dose, drain, breed, strip, pump or fill you with eggs, and the water's not safe either. Off: you walk right over them. Your limits and your safeword still rule"],
-    ["ownoutfit", "Bring my own outfit", "Keep the look you came in when you sign a contract. Off: your first contract dresses you, once, in the farm's outfit for your kind, and nothin' changes it back after"],
-    ["eager", "Traps: no cooldown", "With traps on: no breather between traps and no wait for a trap to reset. Step off and back on and it springs again"],
-    ["bench", "Use bench", "Staff and the wheel can sentence you to time strapped over the use bench, where anybody can use you. Your safeword ends it at once"]
-  ];
-  var NEEDS = { freeuse: ["breedable", "Turn Breedable on first"] };
-  function farmSwitches(ctx3, list) {
-    const sw = ctx3.s.switches || {};
-    return list.map(([cmd, label, desc]) => {
-      const need = NEEDS[cmd];
-      if (need && !sw[need[0]] && !sw[cmd]) return toggle(label, need[1] + " \xB7 " + desc, false, () => ctx3.send(cmd + " on"));
-      return toggle(label, desc, !!sw[cmd], () => ctx3.send(cmd + " " + (sw[cmd] ? "off" : "on")));
-    });
-  }
-  function panelPrefsOrLink(ctx3) {
-    return card(
-      title("Your switches, this panel, your settings file and the full guides"),
-      muted(settingsAvailable() ? "They're in the game's own settings: Preferences \u2192 Extensions \u2192 Farmhand Companion. The \u2699 at the top of this panel opens them." : "They're behind the \u2699 at the top of this panel."),
-      btn("Open the settings", () => goSettings(ctx3, "switches"), true)
+        { style: { marginTop: "6px" } },
+        btn("Clear all startin' with the name", () => {
+          const n = nm();
+          if (!n) return ctx3.hint("Type the start of the names first, like speaker-");
+          ctx3.send("spot clear " + n + "*");
+        }),
+        ctx3.s.proprietor && (ctx3.ui.clearAllSpots ? btn("Yes, clear all " + sp.length + " spots", () => {
+          ctx3.setUi({ clearAllSpots: false });
+          ctx3.send("spot clear all yes");
+        }, true) : btn("Clear all spots\u2026", () => ctx3.setUi({ clearAllSpots: true })))
+      ) : null
     );
   }
-  function drawnBodyCard(ctx3) {
-    const st2 = drawnBodyState(), say = (t) => ctx3.hint(t);
-    const code = h("textarea", { class: "fhc-in", rows: 2, placeholder: "\u2026or paste the code from the studio's Copy for the Companion button" });
-    return card(
-      title("Drawn body (outfit studio)"),
-      toggle(
-        "Show my drawn body",
-        "Breasts from DD to R in your own skin, your belly, and what you wear fitted to them, on your character. Everyone here with the Companion sees it; people without it see the game's own picture of you. Off takes it away.",
-        st2.on,
-        () => {
-          drawnBodySet(!st2.on, say);
-          ctx3.setPref("drawnBody", !st2.on);
-        }
-      ),
-      h(
-        "div",
-        { class: "fhc-kv", style: { marginTop: "6px" } },
-        muted("Cup"),
-        h(
-          "select",
-          { class: "fhc-sel", onchange: (e) => {
-            const v = e.target.value;
-            drawnBodyCup(v === "auto" ? "auto" : Number(v), say);
-            ctx3.setPref("drawnBodyCup", v);
-          } },
-          [h("option", { value: "auto", selected: !st2.cupSet }, "Follow the farm" + (st2.farmCup ? " (" + (st2.cups[st2.farmCup] || "?") + " now)" : ""))].concat(
-            st2.cups.map((c, i) => i < 6 ? null : h("option", { value: String(i), selected: st2.cupSet && i === st2.cup }, c))
-          )
-        )
-      ),
-      st2.on && st2.cup >= 6 && st2.chest && st2.chest !== "XLarge" ? muted("Your chest is set to " + st2.chest + " in the wardrobe. Set it to the biggest for the drawn breasts to show.") : null,
-      h(
-        "div",
-        { class: "fhc-kv", style: { marginTop: "6px" } },
-        muted("Belly"),
-        h(
-          "select",
-          { class: "fhc-sel", onchange: (e) => {
-            drawnBodyBelly(e.target.value, say);
-            ctx3.setPref("drawnBodyBelly", e.target.value);
-          } },
-          [["farm", "Follow the farm" + (st2.farmBelly ? " (showing now)" : " (flat now)")], ["on", "Always"], ["off", "Never"]].concat(st2.fromStudio ? [["studio", "As my studio has it"]] : []).map(([v, label]) => h("option", { value: v, selected: st2.bellyMode === v }, label))
-        )
-      ),
-      muted("Following the farm, your cup is the size the farm has grown your udder to, and your belly shows and grows as you fill up, carry eggs or get bred."),
-      muted(st2.fromStudio ? "Using your own studio settings." : st2.fromFarm ? "Using the farm's look, with your own cup and belly." : "The farm's look comes from the farm girl once you're in her room; plain settings till then."),
-      st2.fromStudio ? btn("Use the farm's look instead", () => {
-        drawnBodyUseFarm(say);
-        ctx3.setPref("drawnBodyAt", Date.now());
-      }) : null,
-      h("div", { style: { marginTop: "8px" } }, muted("Got an outfit studio of your own? Bring its settings over:")),
-      h("div", { style: { marginTop: "4px" } }, btn("Get my studio's settings", () => {
-        drawnBodyFromStudio(say).then((ok2) => {
-          if (ok2) ctx3.setPref("drawnBodyAt", Date.now());
-        });
-      }, true)),
-      muted("Works while the studio is running on this computer: it takes what you last saved there (Save the breasts, Save all the fits)."),
-      h("div", { style: { marginTop: "6px" } }, code),
-      btn("Put in the pasted code", () => {
-        if (drawnBodyPaste(code.value, say)) ctx3.setPref("drawnBodyAt", Date.now());
-      }),
-      toggle(
-        "See other people's drawn bodies",
-        "Draw other Companion users the way their studio settings say" + (st2.othersHere ? " (" + st2.othersHere + " here now)" : "") + ". Off: everybody else is the game's own picture on your screen.",
-        st2.seeOthers,
-        () => {
-          drawnBodySeeOthers(!st2.seeOthers, say);
-          ctx3.setPref("drawnBodySee", !st2.seeOthers);
-        }
-      )
-    );
-  }
-  function extraSwitches(ctx3) {
-    const list = [];
-    for (const m of Object.values(ctx3.s.mods || {})) for (const c of (m.cards || []).filter((c2) => c2 && !c2.staff)) for (const t of c.toggles || []) list.push([m.label, t]);
-    if (!list.length) return null;
-    return card(
-      title("\u{1F9E9} Farm extras"),
-      muted("The farm's add-ons. Each one is off until you switch it on."),
-      list.map(([label, t]) => toggle(String(t.label), (t.desc ? String(t.desc) + " " : "") + "(" + label + ")", !!t.on, () => ctx3.send(String(t.cmd))))
-    );
-  }
-  var LIVESTOCK_TABS = [
-    { id: "me", label: "\u{1F404} Me", render: me2 },
-    { id: "body", label: "\u{1F95B} Body", render: body },
-    { id: "play", label: "\u{1FAA4} Play", render: play },
-    { id: "ribbons", label: "\u{1F380} Ribbons", render: ribbons },
-    { id: "safety", label: "\u{1F198} Safety", render: safetyTab, offRow: true }
-    // (the 🆘 button in the header opens it)
-  ];
-
-  // extension/src/views/guest.js
-  var GUEST_TABS = [
-    { id: "welcome", label: "\u{1F44B} Welcome", render: (ctx3) => [
+  function voice() {
+    return [
       card(
-        h("div", { class: "fhc-title" }, "Howdy, " + (ctx3.welcome.name || "sugar") + "!"),
-        h("p", null, "Welcome to B&B Farm. Everybody here chose to be here and signed to say so. Have a look around, mind the ruts, and holler if you need a hand."),
-        btn("Take the tour", () => ctx3.send("tour"), true),
-        btn("Apply to join", () => ctx3.send("apply")),
-        btn("Luxury stay", () => ctx3.send("luxury")),
-        btn("Dress me", () => ctx3.send("dressme"))
-      ),
-      card(title("Your keys"), muted("Guests don't carry keys. Staff can let you through any door."))
-    ] },
-    { id: "farm", label: "\u{1F33E} The farm", render: () => AREAS.map(([n, key, d]) => card(h("div", { class: "fhc-kv" }, h("b", null, n), h("span", { class: "fhc-muted" }, key)), muted(d))) },
-    { id: "rules", label: "\u{1F4CF} Rules", render: (ctx3) => [
-      h(
+        title("ECHS sessions by depth"),
+        muted("Still their ECHS: they agree to every induction, and their own switches and safeword win."),
+        [
+          ["Fun", "Drifting \xB7 Yielding", "Not noticin' clothes or touches, posture, can't touch yourself, made to act"],
+          ["Deep", "Entranced", "Follow and leash, made to speak, hears only your voice, arousal and orgasm"],
+          ["No human left", "Deep \xB7 Blank", "Clothing illusion, planted triggers, suggestions that last after wakin'"]
+        ].map(([a, b, c]) => h("div", { class: "fhc-kv", style: { display: "block" } }, h("b", null, a + " \xB7 "), h("span", { style: { color: "var(--fh-accent)" } }, b), muted(c)))
+      )
+    ];
+  }
+  function shift(ctx3) {
+    const sh = ctx3.s.shift || {};
+    return [
+      card(h(
         "div",
-        { class: "fhc-box alert" },
-        h("b", null, "Safe word stops everything"),
-        muted("Anywhere, from anybody. No contract overrides it. Beepin' the farm girl works from anywhere on the property, too.")
+        { class: "fhc-kv" },
+        h("div", null, title("Your shift"), muted((sh.clocked ? "On the clock" : "Off the clock") + " \xB7 " + (sh.weekH || 0) + " h this week")),
+        btn(sh.clocked ? "Clock out" : "Clock in", () => ctx3.send(sh.clocked ? "clockout" : "clockin"), !sh.clocked)
+      )),
+      card(title("On duty"), (sh.onDuty || []).length ? sh.onDuty.map((n) => chip(n)) : muted("Nobody on duty here.")),
+      card(
+        title("On call"),
+        muted("Mandated farmhands, plus staff who switched it on. Only these can be pulled in from other rooms."),
+        (sh.onCall || []).length ? sh.onCall.map((o) => chip(o.name + (o.mandated ? " \xB7 mandated" : "") + (o.here ? " \xB7 here" : " \xB7 away"), o.here ? "good" : null)) : muted("Nobody's on call.")
       ),
-      card(title("On consent"), h("p", null, "Every animal and every hand here chose to be here, and signed for it. What you see in the pens, stalls and barn was asked for. The contract's a fence that holds both ways: what ain't in it, don't happen.")),
-      h("div", null, btn("Full rules", () => ctx3.send("rules")), btn("Consent", () => ctx3.send("consent")), btn("What opens what", () => ctx3.send("doors")))
-    ] },
-    { id: "inbox", label: "\u{1F4EC} Inbox", render: inbox },
-    { id: "guides", label: "\u{1F4D6} Guides", render: (ctx3) => guidesTab(ctx3, false) },
-    { id: "safety", label: "\u{1F198} Safety", render: safetyTab, offRow: true }
-    // (the 🆘 button in the header opens it)
-    // (the Settings tab is gone, Nov 4: the ⚙ in the header has the drawn body, this panel's switches and the rest)
-  ];
+      ctx3.s.log && card(title("Farm log"), ctx3.s.log.map((e) => h(
+        "div",
+        { class: "fhc-kv", style: { fontFamily: "ui-monospace,Consolas,monospace", fontSize: "11px" } },
+        h("span", { class: "fhc-muted" }, new Date(e.t).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })),
+        h("span", { style: { color: "var(--fh-accent)" } }, e.a),
+        h("span", null, e.by + (e.d ? " \xB7 " + e.d : ""))
+      ))),
+      h("div", null, btn("Hours", () => ctx3.send("hours")), btn("Chores", () => ctx3.send("chores")), btn("Spin the wheel", () => ctx3.send("spin")))
+    ];
+  }
 
   // shared/bcplus-rules.json
   var bcplus_rules_default = {
@@ -8597,212 +7878,6 @@ nav.fhc-seg button.on{background:var(--fh-accent);color:var(--fh-ground);font-we
     }
   }
 
-  // extension/src/views/staffdata.js
-  var MAP = 40;
-  var PX = 7;
-  function herd(ctx3) {
-    const f = ctx3.ui.herdF || "all", list = (ctx3.s.herd || []).filter((x) => f === "all" || f === "mine" && x.mine || f === "milk" && x.milk !== null && x.milk >= 75 || f === "heat" && x.heat);
-    const act = (c, x) => () => ctx3.send(c + " " + x.mn);
-    return [
-      h("div", null, [["all", "On the map"], ["mine", "My herd"], ["milk", "Needs milkin'"], ["heat", "In heat"]].map(([id, l]) => h("button", { type: "button", class: "fhc-pill" + (f === id ? " on" : ""), onclick: () => ctx3.setUi({ herdF: id }) }, l))),
-      list.length ? list.map((x) => card(
-        h("div", { class: "fhc-kv" }, h("b", null, x.name), h("span", { class: "fhc-muted" }, x.role + (x.where ? " \xB7 " + x.where : ""))),
-        x.milk !== null ? h(
-          "div",
-          { class: "fhc-bar-track", style: { margin: "6px 0" } },
-          h("div", { class: "fhc-bar-fill" + (x.milk >= 75 ? " fhc-fill-alert" : ""), style: { width: Math.min(100, x.milk) + "%" } })
-        ) : null,
-        h(
-          "div",
-          null,
-          x.mine && chip("my herd", "acc"),
-          x.heat && chip("in heat", "alert"),
-          x.preg && chip("carryin'", "good"),
-          x.denied && chip("teats capped", "alert"),
-          x.milk !== null && chip(x.milk + "% full")
-        ),
-        h(
-          "div",
-          { style: { marginTop: "6px" } },
-          btn("Record", act("record", x), true),
-          btn("Milk", act("milk", x)),
-          btn("Drain", act("drain", x)),
-          btn("Edge", act("edge", x)),
-          btn("Summon to me", act("summon", x)),
-          x.mine && (x.reins ? btn("\u{1F434} Let go", act("reins off", x)) : btn("\u{1F434} Reins", act("reins", x)))
-        )
-      )) : muted("Nobody matches right now.")
-    ];
-  }
-  var COLORS = ["#8fbf6a", "#c9a35b", "#b8403a", "#7fa8c9", "#c48bd9", "#d98c6a"];
-  function zones(ctx3) {
-    const zs = ctx3.s.zones;
-    if (!zs) return [muted("The farm map is for staff.")];
-    const canEdit = ctx3.s.mapEdit !== false;
-    const groups2 = [...new Set(Object.values(zs).map((z) => z.group))];
-    const color = (g) => COLORS[groups2.indexOf(g) % COLORS.length];
-    const sel = ctx3.ui.zone && zs[ctx3.ui.zone] ? ctx3.ui.zone : Object.keys(zs)[0];
-    const name = () => (ctx3.ui.zoneName || sel || "").trim().toLowerCase();
-    return [
-      card(
-        title("Farm map"),
-        h(
-          "div",
-          { style: { position: "relative", width: MAP * PX + "px", height: MAP * PX + "px", margin: "6px auto 0", background: "var(--fh-well)", border: "1px solid var(--fh-line)", borderRadius: "6px" } },
-          Object.entries(zs).filter(([, z]) => z.a && z.b).map(([n, z]) => h("button", {
-            type: "button",
-            title: n,
-            "aria-label": n,
-            onclick: () => ctx3.setUi({ zone: n }),
-            style: {
-              position: "absolute",
-              padding: "0",
-              left: Math.min(z.a.X, z.b.X) * PX + "px",
-              top: Math.min(z.a.Y, z.b.Y) * PX + "px",
-              width: (Math.abs(z.a.X - z.b.X) + 1) * PX + "px",
-              height: (Math.abs(z.a.Y - z.b.Y) + 1) * PX + "px",
-              background: color(z.group) + "44",
-              border: n === sel ? "3px solid var(--fh-text)" : "1px solid " + color(z.group)
-            }
-          })),
-          // spots: little dots, hover for the name
-          Object.entries(ctx3.s.spots || {}).filter(([, p]) => p && Number.isFinite(p.X)).map(([n, p]) => h("span", {
-            title: n + " \xB7 " + p.X + "," + p.Y,
-            style: {
-              position: "absolute",
-              left: p.X * PX + 1 + "px",
-              top: p.Y * PX + 1 + "px",
-              width: PX - 2 + "px",
-              height: PX - 2 + "px",
-              borderRadius: "50%",
-              background: /^speaker/.test(n) ? "#7fa8c9" : n === "home" ? "#c9a35b" : "var(--fh-text)",
-              pointerEvents: "auto"
-            }
-          }))
-        ),
-        h("div", { style: { marginTop: "6px" } }, groups2.map((g) => h("span", { class: "fhc-chip", style: { borderColor: color(g) } }, g)))
-      ),
-      card(
-        title("Zones"),
-        Object.keys(zs).length ? Object.entries(zs).map(([n, z]) => h(
-          "button",
-          { type: "button", class: "fhc-doc" + (n === sel ? " on" : ""), style: { width: "100%", marginBottom: "4px" }, onclick: () => ctx3.setUi({ zone: n }) },
-          h("b", null, n),
-          h("div", { class: "fhc-muted" }, "part of " + z.group + " \xB7 A " + (z.a ? z.a.X + "," + z.a.Y : "\u2014") + " \u2192 B " + (z.b ? z.b.X + "," + z.b.Y : "\u2014"))
-        )) : muted("No zones yet."),
-        btn("Who's where", () => ctx3.send("zone who"))
-      ),
-      canEdit ? card(
-        title(sel ? "Editin' " + sel : "New zone"),
-        h("label", { class: "fhc-label" }, "Zone name (one word)", h("input", { class: "fhc-in", value: ctx3.ui.zoneName || sel || "", oninput: (e) => ctx3.setUi({ zoneName: e.target.value }, true) })),
-        h("div", null, btn("Draw it on the map", () => {
-          const n = name();
-          if (!n) return ctx3.hint("Name the zone first.");
-          ctx3.api.pickTiles(2, "zone '" + n + "'", ([a, b]) => ctx3.send("zone box " + n + " " + a.X + " " + a.Y + " " + b.X + " " + b.Y));
-        }, true)),
-        muted("Or walk it: stand on one corner, then the other."),
-        h("div", null, btn("Set A where I stand", () => name() ? ctx3.send("zone a " + name()) : ctx3.hint("Name the zone first.")), btn("Set B where I stand", () => name() ? ctx3.send("zone b " + name()) : ctx3.hint("Name the zone first."))),
-        h("label", { class: "fhc-label" }, "Pair with (one place, odd shapes)", h("input", { class: "fhc-in", placeholder: "barn", value: ctx3.ui.zonePair || "", oninput: (e) => ctx3.setUi({ zonePair: e.target.value }, true) })),
-        h(
-          "div",
-          null,
-          btn("Pair", () => name() && ctx3.ui.zonePair ? ctx3.send("zone pair " + name() + " " + ctx3.ui.zonePair.trim().toLowerCase()) : ctx3.hint("Name the zone, and the place to pair it with.")),
-          btn("Unpair", () => name() ? ctx3.send("zone unpair " + name()) : ctx3.hint("Name the zone first.")),
-          btn("Delete", () => name() ? ctx3.send("zone clear " + name()) : ctx3.hint("Name the zone first."))
-        )
-      ) : null,
-      canEdit ? spotsCard(ctx3) : spotsList(ctx3),
-      canEdit ? null : muted("Zones and spots are set by herdmasters and proprietors.")
-    ];
-  }
-  function spotsList(ctx3) {
-    const sp = Object.entries(ctx3.s.spots || {});
-    return card(title("Spots"), sp.length ? sp.map(([n, p]) => h("div", { class: "fhc-kv" }, h("b", null, n), h("span", { class: "fhc-muted" }, p.X + "," + p.Y))) : muted("No spots yet."));
-  }
-  function spotsCard(ctx3) {
-    const sp = Object.entries(ctx3.s.spots || {});
-    const nm = () => (ctx3.ui.spotName || "").trim().toLowerCase();
-    const ok2 = () => /^[a-z][a-z0-9_-]{1,19}$/.test(nm()) || (ctx3.hint("Give the spot a one-word name, like speaker-barn, trough-1 or glory-1."), false);
-    return card(
-      title("Spots"),
-      muted("home \xB7 speaker-\u2026 (the bot talks from these) \xB7 trough-\u2026 \xB7 water-\u2026 \xB7 glory-1 and glory-1-visitor \xB7 placard-\u2026"),
-      sp.length ? sp.map(([n, p]) => h(
-        "div",
-        { class: "fhc-kv" },
-        h("span", null, h("b", null, n), " ", h("span", { class: "fhc-muted" }, p.X + "," + p.Y)),
-        h(
-          "span",
-          null,
-          h("button", { type: "button", class: "fhc-b", onclick: () => ctx3.setUi({ spotName: n }) }, "Pick"),
-          h("button", { type: "button", class: "fhc-b", onclick: () => ctx3.send("spot clear " + n) }, "Clear")
-        )
-      )) : muted("No spots yet."),
-      h("label", { class: "fhc-label" }, "Spot name", h("input", { class: "fhc-in", placeholder: "speaker-barn", value: ctx3.ui.spotName || "", oninput: (e) => ctx3.setUi({ spotName: e.target.value }, true) })),
-      h(
-        "div",
-        null,
-        btn("Click it on the map", () => {
-          if (!ok2()) return;
-          const n = nm();
-          ctx3.api.pickTiles(1, "spot '" + n + "'", ([p]) => ctx3.send("spot place " + n + " " + p.X + " " + p.Y));
-        }, true),
-        btn("Set where I stand", () => ok2() && ctx3.send("spot set " + nm()))
-      ),
-      // clearin' old ones: everything with a name startin' like the box (speaker- clears every speaker), or all, with a second press
-      sp.length ? h(
-        "div",
-        { style: { marginTop: "6px" } },
-        btn("Clear all startin' with the name", () => {
-          const n = nm();
-          if (!n) return ctx3.hint("Type the start of the names first, like speaker-");
-          ctx3.send("spot clear " + n + "*");
-        }),
-        ctx3.s.proprietor && (ctx3.ui.clearAllSpots ? btn("Yes, clear all " + sp.length + " spots", () => {
-          ctx3.setUi({ clearAllSpots: false });
-          ctx3.send("spot clear all yes");
-        }, true) : btn("Clear all spots\u2026", () => ctx3.setUi({ clearAllSpots: true })))
-      ) : null
-    );
-  }
-  function voice() {
-    return [
-      card(
-        title("ECHS sessions by depth"),
-        muted("Still their ECHS: they agree to every induction, and their own switches and safeword win."),
-        [
-          ["Fun", "Drifting \xB7 Yielding", "Not noticin' clothes or touches, posture, can't touch yourself, made to act"],
-          ["Deep", "Entranced", "Follow and leash, made to speak, hears only your voice, arousal and orgasm"],
-          ["No human left", "Deep \xB7 Blank", "Clothing illusion, planted triggers, suggestions that last after wakin'"]
-        ].map(([a, b, c]) => h("div", { class: "fhc-kv", style: { display: "block" } }, h("b", null, a + " \xB7 "), h("span", { style: { color: "var(--fh-accent)" } }, b), muted(c)))
-      )
-    ];
-  }
-  function shift(ctx3) {
-    const sh = ctx3.s.shift || {};
-    return [
-      card(h(
-        "div",
-        { class: "fhc-kv" },
-        h("div", null, title("Your shift"), muted((sh.clocked ? "On the clock" : "Off the clock") + " \xB7 " + (sh.weekH || 0) + " h this week")),
-        btn(sh.clocked ? "Clock out" : "Clock in", () => ctx3.send(sh.clocked ? "clockout" : "clockin"), !sh.clocked)
-      )),
-      card(title("On duty"), (sh.onDuty || []).length ? sh.onDuty.map((n) => chip(n)) : muted("Nobody on duty here.")),
-      card(
-        title("On call"),
-        muted("Mandated farmhands, plus staff who switched it on. Only these can be pulled in from other rooms."),
-        (sh.onCall || []).length ? sh.onCall.map((o) => chip(o.name + (o.mandated ? " \xB7 mandated" : "") + (o.here ? " \xB7 here" : " \xB7 away"), o.here ? "good" : null)) : muted("Nobody's on call.")
-      ),
-      ctx3.s.log && card(title("Farm log"), ctx3.s.log.map((e) => h(
-        "div",
-        { class: "fhc-kv", style: { fontFamily: "ui-monospace,Consolas,monospace", fontSize: "11px" } },
-        h("span", { class: "fhc-muted" }, new Date(e.t).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })),
-        h("span", { style: { color: "var(--fh-accent)" } }, e.a),
-        h("span", null, e.by + (e.d ? " \xB7 " + e.d : ""))
-      ))),
-      h("div", null, btn("Hours", () => ctx3.send("hours")), btn("Chores", () => ctx3.send("chores")), btn("Spin the wheel", () => ctx3.send("spin")))
-    ];
-  }
-
   // extension/src/views/log.js
   var KINDS = [["", "Everything"], ["whisper", "Whispers"], ["beep", "Beeps"], ["cmd", "Commands"], ["farm", "The farm"], ["chat", "Chat"], ["emote", "Emotes"], ["action", "Actions"]];
   var two = (n) => String(n).padStart(2, "0");
@@ -8883,33 +7958,68 @@ nav.fhc-seg button.on{background:var(--fh-accent);color:var(--fh-ground);font-we
     { class: "fhc-sel", onchange: (e) => ctx3.setUi({ [key]: e.target.value }, true) },
     opts.map(([v, l]) => h("option", { value: v, selected: (ctx3.ui[key] || opts[0][0]) === v ? "selected" : null }, l))
   );
-  function me3(ctx3) {
+  function duty(ctx3) {
     const s = ctx3.s;
+    return h(
+      "div",
+      { class: "fhc-sum" },
+      h("div", { class: "fhc-sum-top" }, h("span", { class: "fhc-nm" }, s.name), h("span", { class: "fhc-purse" }, s.onDuty ? "\u25CF on duty" : "out to pasture")),
+      h(
+        "div",
+        { class: "fhc-chips" },
+        (s.roles || []).map((r) => chip(r.toLowerCase())),
+        (s.keys || []).map((k) => chip(k + " key")),
+        s.onCall && chip("on call", "alert"),
+        s.herdLeader && chip("herd: " + s.herdLeader)
+      ),
+      h(
+        "div",
+        { class: "fhc-kv", style: { border: "none", padding: "0" } },
+        muted(s.onDuty ? "Silver and gold keys out." : "Bronze key only. Your Livestock panel is yours."),
+        s.pastureLock ? chip("kept out by " + s.pastureLock, "alert") : btn(s.onDuty ? "Go to pasture" : "Back on duty", () => ctx3.send(s.onDuty ? "pasture" : "onduty"), !s.onDuty)
+      ),
+      muted("Pasture puts your silver and gold keys away, makes you livestock for the visit, and takes you off call (mandated staff stay summonable). It doesn't lock you out. Only a ?turnout from your herd leader does that.")
+    );
+  }
+  function shiftTab(ctx3) {
+    return [duty(ctx3), shift(ctx3), h("div", null, ["record", "myherd", "keys"].map((c) => btn(c === "myherd" ? "My herd" : c[0].toUpperCase() + c.slice(1), () => ctx3.send(c)))), latest(ctx3)];
+  }
+  function herd(ctx3) {
+    const f = ctx3.ui.herdF || "all", list = (ctx3.s.herd || []).filter((x) => f === "all" || f === "mine" && x.mine || f === "milk" && x.milk !== null && x.milk >= 75 || f === "heat" && x.heat);
+    const act = (c, x) => () => ctx3.send(c + " " + x.mn);
     return [
-      card(
-        h("div", { class: "fhc-title" }, s.name),
-        h(
-          "div",
-          { style: { marginTop: "6px" } },
-          (s.roles || []).map((r) => chip(r.toLowerCase(), "acc")),
-          (s.keys || []).map((k) => chip(k + " key")),
-          s.onCall && chip("on call", "alert"),
-          s.herdLeader && chip("herd: " + s.herdLeader)
-        )
-      ),
-      card(
-        h(
-          "div",
-          { class: "fhc-kv" },
-          h("div", null, title("Duty"), muted(s.onDuty ? "On duty \xB7 silver and gold keys out" : "Out to pasture \xB7 bronze key only \xB7 your Livestock panel is yours")),
-          s.pastureLock ? chip("kept out by " + s.pastureLock, "alert") : btn(s.onDuty ? "Go to pasture" : "Back on duty", () => ctx3.send(s.onDuty ? "pasture" : "onduty"), !s.onDuty)
-        ),
-        muted("Pasture puts your silver and gold keys away, makes you livestock for the visit, and takes you off call (mandated staff stay summonable). It doesn't lock you out. Only a ?turnout from your herd leader does that.")
-      ),
-      h("div", null, ["record", "hours", "myherd", "keys", "chores"].map((c) => btn(c[0].toUpperCase() + c.slice(1), () => ctx3.send(c)))),
-      latest(ctx3)
+      h("div", null, [["all", "On the map"], ["mine", "My herd"], ["milk", "Needs milkin'"], ["heat", "In heat"]].map(([id, l]) => h("button", { type: "button", class: "fhc-pill" + (f === id ? " on" : ""), onclick: () => ctx3.setUi({ herdF: id }) }, l))),
+      list.length ? rows(ctx3, "herd", list.map((x) => ({
+        id: "h" + x.mn,
+        label: (x.mine ? "\u2605 " : "") + x.name,
+        dot: x.milk !== null && x.milk >= 75,
+        sum: [x.role, x.where, x.milk !== null ? x.milk + "%" : null, x.heat ? "\u{1F525}" : null, x.preg ? "\u{1F37C}" : null, x.denied ? "capped" : null].filter(Boolean).join(" \xB7 "),
+        body: () => [
+          x.milk !== null ? h("div", { class: "fhc-bar-track" }, h("div", { class: "fhc-bar-fill" + (x.milk >= 75 ? " fhc-fill-alert" : ""), style: { width: Math.min(100, x.milk) + "%" } })) : null,
+          h(
+            "div",
+            { class: "fhc-chips" },
+            x.mine && chip("my herd", "acc"),
+            x.heat && chip("in heat", "alert"),
+            x.preg && chip("carryin'", "good"),
+            x.denied && chip("teats capped", "alert"),
+            x.milk !== null && chip(x.milk + "% full")
+          ),
+          h(
+            "div",
+            null,
+            btn("Record", act("record", x), true),
+            btn("Milk", act("milk", x)),
+            btn("Drain", act("drain", x)),
+            btn("Edge", act("edge", x)),
+            btn("Summon to me", act("summon", x)),
+            x.mine && (x.reins ? btn("\u{1F434} Let go", act("reins off", x)) : btn("\u{1F434} Reins", act("reins", x)))
+          )
+        ]
+      }))) : muted("Nobody matches right now.")
     ];
   }
+  var LOOKUPS = ["record", "milk", "drain", "inspect", "vet", "quota", "stats", "keys", "size", "pedigree"];
   function safeCards(ctx3) {
     const recent2 = ctx3.feed.filter((x) => x.kind === "notice" && /SAFEWORD/.test(x.text) && Date.now() - x.at < 60 * 6e4 && !ctx3.ui["done" + x.at]);
     return recent2.map((x) => h(
@@ -8928,21 +8038,33 @@ nav.fhc-seg button.on{background:var(--fh-accent);color:var(--fh-ground);font-we
   function office(ctx3) {
     const docs = ctx3.docs.slice().reverse();
     const sel = docs.find((d) => d.id === ctx3.ui.doc) || docs[0];
+    const who = () => String(ctx3.ui.look || "").trim();
+    const look = (c) => () => who() ? ctx3.send(c + " " + who()) : ctx3.hint("Type who first, in the Look somebody up box.");
+    const typed = () => {
+      const v = who();
+      if (!v) return;
+      ctx3.send(LOOKUPS.includes(v.split(/\s+/)[0].toLowerCase()) && /\s/.test(v) ? v : "record " + v);
+      ctx3.setUi({ look: "" });
+    };
     return [
       safeCards(ctx3),
-      muted("Anything you look up about somebody else lands here, not in the chat: record, stats, vet, quota, keys, size, pedigree."),
-      h("div", null, h("input", {
-        class: "fhc-in",
-        placeholder: "Look somebody up: vet Bessie",
-        value: ctx3.ui.look || "",
-        oninput: (e) => ctx3.setUi({ look: e.target.value }, true),
-        onkeydown: (e) => {
-          if (e.key === "Enter" && ctx3.ui.look) {
-            ctx3.send(ctx3.ui.look);
-            ctx3.setUi({ look: "" });
+      h(
+        "div",
+        { class: "fhc-sec" },
+        h("div", { class: "fhc-sh" }, "Look somebody up"),
+        h("input", {
+          class: "fhc-in",
+          placeholder: "Bessie, or a member number",
+          "aria-label": "Look somebody up",
+          value: ctx3.ui.look || "",
+          oninput: (e) => ctx3.setUi({ look: e.target.value }, true),
+          onkeydown: (e) => {
+            if (e.key === "Enter") typed();
           }
-        }
-      })),
+        }),
+        h("div", null, LOOKUPS.slice(0, 6).map((c) => btn(c[0].toUpperCase() + c.slice(1), look(c), c === "record"))),
+        muted("What you look up lands here, not in the chat. Stats, keys, size and pedigree work too: type ?stats Bessie in the box at the bottom.")
+      ),
       docs.length ? h(
         "div",
         { class: "fhc-split" },
@@ -9101,34 +8223,918 @@ nav.fhc-seg button.on{background:var(--fh-accent);color:var(--fh-ground);font-we
     if (r === null) return muted("BCX isn't loaded here. If you use BC+'s Ready to be summoned instead, add the farm bot (" + BOT_MEMBER + ") to it.");
     return h("div", { class: "fhc-kv" }, h("span", null, "Summon rule"), chip(r.ok ? "ready" : r.why, r.ok ? "good" : "alert"));
   }
-  function toggles(ctx3) {
+  function workCard(ctx3) {
     const s = ctx3.s, sw = s.switches || {};
+    return card(
+      title("\u23F1 On call"),
+      muted("Most staff leave this off. Mandated farmhands are always on call."),
+      s.mandated ? h("div", { class: "fhc-kv" }, h("span", null, "On call"), chip("always (mandated)", "alert")) : toggle("On call", "Let the office summon you from anywhere with BCX or BC+ summoning", !!sw.forced, () => ctx3.send("forced")),
+      s.onCall && summonCheck()
+    );
+  }
+  var STAFF_TABS = [
+    { id: "office", label: "\u{1F5C2} Office", render: office, badge: (ctx3) => ctx3.docs.length },
+    { id: "queue", label: "\u{1F4DD} Queue", render: queue, badge: (ctx3) => (ctx3.s.apps || []).length },
+    { id: "herd", label: "\u{1F411} Herd", render: herd },
+    { id: "contracts", label: "\u{1F4DC} Contracts", render: contracts },
+    { id: "barn", label: "\u{1F3DA} Barn", render: barn },
+    { id: "shift", label: "\u23F1 Shift", render: shiftTab },
+    { id: "zones", label: "\u{1F5FA} Zones", render: zones },
+    // (on the panel, not in ⚙: drawin' a zone needs the map in view)
+    { id: "log", label: "\u{1F4D2} Log", render: logTab, show: (ctx3) => !!ctx3.s.logReader }
+    // the record (chatlog.js), for whoever may read it (221397)
+  ];
+
+  // extension/src/views/settingspages.js
+  var pick = (...ids) => ids.map((id) => SWITCH_INFO.find((x) => x[0] === id)).filter(Boolean);
+  var FARM_GROUPS = [
+    ["\u{1F402} Breedin'", ["breedable", "fertile", "futa", "mpreg", "freeuse", "naturalheat"]],
+    ["\u{1F95B} Milk", ["milkable", "seedmilk", "jarok"]],
+    ["\u{1FAA4} Traps and play", ["traps", "eager", "bench", "potions", "dares"]],
+    ["\u{1FAB1} Things that latch on", ["parasite", "symbiote", "watersports"]]
+  ];
+  var pref = (ctx3, key, label, desc, after) => toggle(label, desc, !!ctx3.prefs[key], () => {
+    ctx3.setPref(key, !ctx3.prefs[key]);
+    if (after) after();
+  });
+  var prefNot = (ctx3, key, label, desc) => toggle(label, desc, !ctx3.prefs[key], () => {
+    ctx3.setPref(key, !ctx3.prefs[key]);
+    ctx3.api.rehello && ctx3.api.rehello();
+  });
+  var rehello = (ctx3) => () => ctx3.api.rehello && ctx3.api.rehello();
+  function farmPage(ctx3) {
+    const s = ctx3.s;
+    if (!s.onBooks) return [card(
+      title("\u{1F404} Farm switches"),
+      muted("Once you're on the books, your milkin', breedin', trap and teasin' switches show up here."),
+      btn("Apply to join", () => ctx3.send("apply"), true)
+    )];
+    return [
+      muted("Saved by the farm girl, so they follow you to any computer. Your limits still win, and your safeword stops everything."),
+      FARM_GROUPS.map(([head, ids]) => card(title(head), farmSwitches(ctx3, pick(...ids)))),
+      trapThemesCard(ctx3),
+      extraSwitches(ctx3)
+    ];
+  }
+  function bodyPage(ctx3) {
+    const s = ctx3.s, brandAt = { hipL: "left hip", hipR: "right hip", thighL: "left thigh", thighR: "right thigh", mons: "low belly", tummy: "tummy", chestL: "left breast", chestR: "right breast", shoulderL: "left shoulder", shoulderR: "right shoulder" };
     return [
       drawnBodyCard(ctx3),
       card(
-        title("Work"),
-        muted("Most staff leave this off. Mandated farmhands are always on call."),
-        s.mandated ? h("div", { class: "fhc-kv" }, h("span", null, "On call"), chip("always (mandated)", "alert")) : toggle("On call", "Let the office summon you from anywhere with BCX or BC+ summoning", !!sw.forced, () => ctx3.send("forced")),
-        s.onCall && summonCheck()
+        title("\u{1F4CF} Body shape"),
+        pref(ctx3, "shape", "Farm can change my body shape", "Your chest grows a size on your character for every two udder sizes the farm gives you (up to the game's biggest), and your hips widen with a growin' ass or a heavy belly. Everything you're wearin' is redrawn to fit. Your own shape is remembered and comes back when the growth goes, when you switch this off, and for an hour after your safeword.", rehello(ctx3))
       ),
-      muted("Your own milkin' and breedin' switches are on your Livestock panel."),
-      panelPrefsOrLink(ctx3)
+      s.brand ? card(
+        title("\u{1F525} The farm's brand"),
+        toggle(
+          "Show my farm brand",
+          "The B&B logo the farm seared on you, on your " + (brandAt[s.brand.place] || "hip") + ". Off hides it on every screen (it's still on your record).",
+          !ctx3.prefs.brandOff,
+          () => {
+            ctx3.setPref("brandOff", !ctx3.prefs.brandOff);
+            ctx3.api.brandSync && ctx3.api.brandSync();
+          }
+        )
+      ) : null,
+      s.onBooks ? card(
+        title("\u{1F43E} Your animal"),
+        muted("How the farm sees you. It picks your farm outfit."),
+        h("div", { style: { marginTop: "6px" } }, ["female", "male", "futa", "femboy", "nonbinary"].map((g) => h("button", { type: "button", class: "fhc-pill" + (s.gender === g ? " on" : ""), onclick: () => ctx3.send("gender " + g) }, g))),
+        farmSwitches(ctx3, pick("ownoutfit"))
+      ) : null,
+      card(
+        title("\u{1F457} Farm outfit"),
+        muted("Dress me puts back on the outfit your record calls for (your species and gender, or your uniform while you're clocked in), in case it's come off or been changed."),
+        btn("Dress me", () => ctx3.send("dressme"), true),
+        ctx3.api.hasBackup && ctx3.api.hasBackup() ? h("div", null, muted("Your own clothes are kept on this computer."), btn("Change back into my own clothes", () => ctx3.api.back && ctx3.api.back())) : null
+      )
     ];
   }
-  var STAFF_TABS = [
-    { id: "me", label: "\u{1F9D1}\u200D\u{1F33E} Me", render: me3 },
-    { id: "shift", label: "\u23F1\uFE0F Shift", render: shift },
-    { id: "herd", label: "\u{1F411} Herd", render: herd },
-    { id: "queue", label: "\u{1F4DD} Queue", render: queue, badge: (ctx3) => (ctx3.s.apps || []).length },
-    { id: "office", label: "\u{1F5C2}\uFE0F Office", render: office, badge: (ctx3) => ctx3.docs.length },
-    { id: "contracts", label: "\u{1F4DC} Contracts", render: contracts },
-    { id: "barn", label: "\u{1F3DA}\uFE0F Barn", render: barn },
-    { id: "zones", label: "\u{1F5FA}\uFE0F Zones", render: zones },
-    { id: "voice", label: "\u{1F50A} ECHS", render: voice },
-    { id: "toggles", label: "\u2699\uFE0F Toggles", render: toggles },
-    { id: "guides", label: "\u{1F4D6} Guides", render: (ctx3) => guidesTab(ctx3, true) },
-    { id: "log", label: "\u{1F4D2} Log", render: logTab, show: (ctx3) => !!ctx3.s.logReader }
-    // the record (chatlog.js), for whoever may read it
+  function gearPage(ctx3) {
+    return [
+      card(
+        title("\u26D3 On your character"),
+        muted("All of these are off until you switch them on. Your safeword takes everything off."),
+        pref(ctx3, "gear", "Farm can put real gear on me", "A trap that plugs, cups, clamps, chains, ropes or funnels you puts the real item on your character, and takes it off again when its time's up. Pull one off early and it goes back. Your safeword takes it all off. (The parasite doesn't need this: ?parasite on is its switch.)", rehello(ctx3)),
+        pref(ctx3, "marks", "Farm can mark my body", "Loads leave the game's own splatters on your face, chest or tummy, wherever there's room, and farm words can be written on your body. ?wash takes them off."),
+        pref(ctx3, "strip", "Farm can strip me", "When the farm says so, your clothes come off (locked pieces stay). They're kept on this computer so you can dress again."),
+        pref(ctx3, "stir", "Farm can stir me up", "Traps, toys and scenes nudge your arousal meter up, and while the farm has you denied you're held at the edge instead of cummin'. A buzzin' toy you're wearin' follows a trap too: low while it teases, high when it breeds you, still while you're denied, then back how you had it. Your safeword still stops everything.", rehello(ctx3))
+      ),
+      // the farm's little cues on your own screen (cues.js); each one on unless you switch it off
+      card(
+        title("\u2728 On your screen"),
+        muted("Only you see and hear these. Each is on unless you switch it off."),
+        prefNot(ctx3, "noLead", "Lead me instead of teleportin'", "When the farm moves you (feedin' time, the stocks, a summon), you walk there yourself, step by step"),
+        prefNot(ctx3, "noFace", "Farm can set my face", "Dazed when milk-drunk, flushed in heat, a trance stare\u2026 for a little while"),
+        prefNot(ctx3, "noSound", "Farm sounds", "The pump, the stall door, the feedin' bell. Only you hear them, at your game volume"),
+        prefNot(ctx3, "noTrance", "Trance haze", "A soft haze at the edges of your screen during conditioning sessions"),
+        prefNot(ctx3, "noSlow", "Carryin' slows me down", "The fuller you are (a pumped belly, a late litter, a clutch of eggs), the slower you walk on the map"),
+        ctx3.s.staff ? prefNot(ctx3, "noMarkers", "Map markers (staff)", "Small badges over stock on your map: M needs milkin', H in heat, B expectin', X teats capped") : null
+      )
+    ];
+  }
+  function messagesPage(ctx3) {
+    const s = ctx3.s;
+    return [
+      card(
+        title("\u{1F4AC} Where the farm talks to you"),
+        pref(ctx3, "chatToo", "Farm messages in chat too", "Tease lines, heat, summons and other farm messages also show in your chat log, not just the panel"),
+        pref(ctx3, "chime", "Chime on notices", "A soft sound when the farm messages you"),
+        pref(ctx3, "popopen", "Open on new notice", "Pop the panel open by itself. Off: just the red number on \u{1F33E}"),
+        toggle(
+          "Farm emotes about me come from me",
+          "Belly kicks, milkin', breedin'\u2026 are posted as your own emote (no name in front), so the people who can see you see them and the farm girl needn't move. Only lines about you.",
+          !ctx3.prefs.noRelay,
+          () => {
+            ctx3.setPref("noRelay", !ctx3.prefs.noRelay);
+            ctx3.api.rehello && ctx3.api.rehello();
+          }
+        ),
+        prefNot(ctx3, "noFeelings", "Private feelings", "Now and then, a line only you see about what you're feelin' (your gear, your arousal, how full you are)")
+      ),
+      s.onBooks ? card(title("\u{1F5E3} What the farm says"), muted("Saved by the farm girl."), farmSwitches(ctx3, pick("teaseme", "hypno", "praise", "degrade"))) : null,
+      s.intensity ? card(
+        title("\u{1F336} How the farm talks to you"),
+        h("div", null, [["tender", "Tender"], ["rough", "Rough"], ["filthy", "Filthy"]].map(([id, label]) => h("button", { type: "button", class: "fhc-pill" + (s.intensity === id ? " on" : ""), onclick: () => ctx3.send("intensity " + id) }, label))),
+        muted(s.intensity === "tender" ? "Softer words, and the traps lean mild." : s.intensity === "filthy" ? "Dirtier words, and the traps lean brutal." : "As written."),
+        muted("It calls you: " + (((s.words || {}).call || []).join(", ") || "whatever comes to mind") + " \xB7 never: " + (((s.words || {}).never || []).join(", ") || "nothin' ruled out")),
+        h("div", null, btn("Names I love\u2026", () => ctx3.fillBox("callme ")), btn("Never call me\u2026", () => ctx3.fillBox("nevercall ")))
+      ) : null
+    ];
+  }
+  function privacyPage(ctx3) {
+    const s = ctx3.s;
+    return [
+      card(
+        title("\u{1F512} Privacy and record"),
+        // the record (chatlog.js): off unless they switch it on. Laynie, Nov 4, the exact words: "It only should say 'This option
+        // sends a copy of what the companion recieves and sends for bug squashing. Completely voluntary participation.'"
+        s.logMust ? muted("\u{1F4DC} As a proprietor, your Companion always sends its record. There's no switch for it.") : toggle(
+          "Send a record of what I see",
+          "This option sends a copy of what the companion receives and sends for bug squashing. Completely voluntary participation.",
+          !!ctx3.prefs.chatlog,
+          () => ctx3.setPref("chatlog", !ctx3.prefs.chatlog)
+        ),
+        s.onBooks ? farmSwitches(ctx3, pick("tally")) : null
+      ),
+      saveCard(ctx3)
+    ];
+  }
+  function saveCard(ctx3) {
+    const ls = localSaveState(), say = (t2) => ctx3.hint(t2), t = (ms) => new Date(ms).toTimeString().slice(0, 5);
+    const line3 = !ls.folder ? ls.can ? "Not saving to a folder yet." : "This browser can't save to a folder (Chrome and Edge can). You can still load a file." : ls.perm !== "granted" ? "Saving to " + ls.folder + " is paused till you reconnect it (the browser asks again after a restart)." : ls.err ? "Trouble saving to " + ls.folder + ": " + ls.err : "Saving to " + ls.folder + " every minute" + (ls.at ? ", last at " + t(ls.at) : "") + ", as " + ls.file + ".";
+    return card(
+      title("\u{1F4BE} Your settings file"),
+      muted("Your settings as a file on this computer: everything on these pages, your drawn body, your messes and the memory log. It survives a crash, a cleared browser or a new one. " + line3),
+      h(
+        "div",
+        { style: { marginTop: "6px" } },
+        ls.folder && ls.perm !== "granted" ? btn("Reconnect " + ls.folder, () => localSaveReconnect(VERSION)) : null,
+        ls.can ? btn(ls.folder ? "Save to a different folder" : "Save my settings to a folder\u2026", () => localSavePick(VERSION)) : null,
+        ls.folder && ls.perm === "granted" ? btn("Save now", () => localSaveNow(VERSION).then(() => say("Saved."))) : null,
+        btn("Load my settings from a file\u2026", () => {
+          say("Pick the farmhand-companion file to load\u2026");
+          localSaveLoad(say);
+        })
+      )
+    );
+  }
+  function advancedPage(ctx3) {
+    const bot = window.Player && window.Player.MemberNumber === BOT_MEMBER;
+    return [
+      card(
+        title("\u{1F9F0} This panel"),
+        muted("Only on this computer."),
+        bot ? toggle(
+          "Draw the room on the farm girl's screen",
+          "Off (the default), this tab doesn't draw anybody in the room: no pictures downloaded for what people wear, far less work and memory on this computer. The farm runs the same either way. Switch it on to watch the room or click on people from here.",
+          !!ctx3.prefs.drawRoom,
+          () => {
+            const on2 = !ctx3.prefs.drawRoom;
+            ctx3.setPref("drawRoom", on2);
+            if (on2) setTimeout(redrawRoom, 50);
+          }
+        ) : null,
+        pref(ctx3, "compact", "Compact cards", "Smaller text, more on screen"),
+        pref(ctx3, "btnPinned", "Pin the \u{1F33E} button", "Unpinned, you can drag it anywhere (mouse or finger). Pin it so it stays put."),
+        h("div", { style: { marginTop: "6px" } }, btn("Put the button and panel back (size and full screen too)", () => ctx3.resetPlaces && ctx3.resetPlaces()))
+      ),
+      card(
+        title("\u{1F9E0} Memory log"),
+        muted("For chasing a page that runs out of room: how big things were, every half minute, for the last hour. /farmmem in chat shows it too."),
+        h("pre", { style: { whiteSpace: "pre-wrap", fontSize: "11px", maxHeight: "300px", overflowY: "auto" } }, memlogText(12) || "Nothing yet.")
+      )
+    ];
+  }
+  function aboutPage(ctx3) {
+    const p = ctx3.prefs;
+    return [card(
+      title("\u{1F33E} Farmhand Companion v" + VERSION),
+      muted("The B&B Farm's helper: the \u{1F33E} panel, the drawn body, the farm's messes and gear on you, and your switches. It only talks to the farm girl."),
+      toggle(
+        "Farmhand Companion on",
+        "Switched off, the Companion stays quiet after your next reload: no panel, no drawn body, no messes or farm gear on you, nothing sent to the farm. The game's settings page stays, so you can switch it back on.",
+        !p.off,
+        () => ctx3.setPref("off", !p.off)
+      ),
+      p.off ? h("div", { style: { marginTop: "6px" } }, btn("Reload now", () => window.location.reload(), true)) : null
+    )];
+  }
+  var SETTINGS_PAGES = [
+    { id: "switches", label: "\u{1F404} Farm switches", render: farmPage },
+    { id: "body", label: "\u{1FA9E} Body and look", render: bodyPage },
+    { id: "gear", label: "\u26D3 Gear and marks", render: gearPage },
+    { id: "messages", label: "\u{1F4AC} Messages", render: messagesPage },
+    { id: "privacy", label: "\u{1F512} Privacy and record", render: privacyPage },
+    // staff only: on call and the ECHS card (Staff panel tabs till Nov 4). Zones stayed on the Staff panel: drawin' one
+    // needs the map in view, and the game's settings screen covers it.
+    { id: "staff", label: "\u{1F9D1}\u200D\u{1F33E} Staff tools", show: (ctx3) => !!ctx3.s.staff, render: (ctx3) => [workCard(ctx3), voice()] },
+    { id: "guides", label: "\u{1F4D6} Guides", render: (ctx3) => guidesTab(ctx3, !!ctx3.s.staff) },
+    { id: "advanced", label: "\u{1F9F0} Advanced", render: advancedPage },
+    { id: "about", label: "\u2139 About", render: aboutPage }
+  ];
+  var pagesFor = (ctx3) => SETTINGS_PAGES.filter((p) => !p.show || p.show(ctx3));
+  var drawPage = (p, ctx3) => {
+    try {
+      return p.render(ctx3);
+    } catch (e) {
+      console.warn("[Farmhand Companion]", e);
+      return card(title(p.label), muted("This page hit a snag. The others still work."));
+    }
+  };
+  function findResults(ctx3, q2) {
+    const out = [], want = q2.trim().toLowerCase();
+    for (const p of pagesFor(ctx3)) {
+      if (p.id === "guides") continue;
+      const box2 = h("div", null, drawPage(p, ctx3));
+      const hits = [...box2.querySelectorAll(".fhc-tog")].filter((t) => t.textContent.toLowerCase().includes(want));
+      if (hits.length) out.push(card(title(p.label), hits));
+    }
+    return out.length ? out : [muted(`Nothin' matches "` + q2.trim() + '". Try fewer letters, or look through the pages.')];
+  }
+  function settingsView(ctx3, page2, setPage) {
+    const pages = pagesFor(ctx3), cur = pages.find((p) => p.id === page2) || pages[0];
+    const results = h("div", { class: "fhc-set-body" });
+    const find = ctx3.ui.setFind || "";
+    const fill = (q2) => results.replaceChildren(...[].concat(q2.trim() ? findResults(ctx3, q2) : drawPage(cur, ctx3)).flat(Infinity).filter(Boolean));
+    fill(find);
+    const input2 = h("input", {
+      class: "fhc-in",
+      type: "search",
+      placeholder: "Find a setting\u2026",
+      "aria-label": "Find a setting",
+      value: find,
+      style: { width: "100%" },
+      oninput: (e) => {
+        ctx3.setUi({ setFind: e.target.value }, true);
+        fill(e.target.value);
+      }
+    });
+    return h(
+      "div",
+      null,
+      h("div", { style: { margin: "0 0 10px" } }, input2),
+      h(
+        "div",
+        { class: "fhc-set" },
+        h("nav", { class: "fhc-set-nav", "aria-label": "Settings pages" }, pages.map((p) => h("button", { type: "button", class: p === cur && !find.trim() ? "on" : "", onclick: () => {
+          ctx3.setUi({ setFind: "" }, true);
+          setPage(p.id);
+        } }, p.label))),
+        results
+      )
+    );
+  }
+
+  // extension/src/settings.js
+  var W10 = window;
+  var ID = "FarmhandCompanion";
+  var panel = null;
+  var box = null;
+  var page = "switches";
+  var settingsAvailable = () => typeof W10.PreferenceRegisterExtensionSetting === "function";
+  function ctx() {
+    const c = panel.ctx();
+    return Object.assign({}, c, {
+      setPref: (k, v) => {
+        c.setPref(k, v);
+        draw();
+      },
+      setUi: (p, quiet) => {
+        c.setUi(p, true);
+        if (!quiet) draw();
+      },
+      send: (cmd) => {
+        c.send(cmd);
+        setTimeout(draw, 1500);
+      },
+      hint: (m) => {
+        c.hint(m);
+        note(m);
+      }
+    });
+  }
+  function note(m) {
+    const n = box && box.querySelector("#fhc-set-note");
+    if (n) {
+      n.textContent = m;
+      n.style.display = "block";
+    }
+  }
+  function draw() {
+    if (!box) return;
+    const c = ctx();
+    box.replaceChildren(
+      h(
+        "div",
+        { style: { display: "flex", alignItems: "center", gap: "10px", marginBottom: "8px" } },
+        h("h2", { style: { margin: "0", flex: "1" } }, "\u{1F33E} Farmhand Companion"),
+        btn("Back", () => {
+          if (typeof W10.PreferenceSubscreenExtensionsClear === "function") W10.PreferenceSubscreenExtensionsClear();
+          else close();
+        }, true)
+      ),
+      h("div", { id: "fhc-set-note", style: { display: "none", margin: "6px 0", color: "#c9a35b" } }),
+      settingsView(c, page, (p) => {
+        page = p;
+        draw();
+      })
+    );
+  }
+  function open() {
+    close();
+    box = W10.document.createElement("div");
+    box.id = "fhc-settings";
+    W10.document.body.appendChild(box);
+    draw();
+  }
+  function close() {
+    if (box) {
+      box.remove();
+      box = null;
+    }
+  }
+  function initSettings(p) {
+    panel = p;
+    if (!settingsAvailable()) return false;
+    try {
+      W10.PreferenceRegisterExtensionSetting({
+        Identifier: ID,
+        ButtonText: "Farmhand Companion",
+        load: () => open(),
+        run: () => {
+        },
+        click: () => {
+        },
+        exit: () => {
+          close();
+          return true;
+        },
+        unload: () => close()
+      });
+      return true;
+    } catch (e) {
+      console.warn("[Farmhand Companion] settings page unavailable:", e);
+      return false;
+    }
+  }
+  function openSettings(which) {
+    if (which) page = which === "files" ? "privacy" : which;
+    try {
+      if (typeof W10.PreferenceSubscreenExtensionsOpen === "function") {
+        W10.PreferenceSubscreenExtensionsOpen(ID);
+        return true;
+      }
+    } catch (e) {
+    }
+    return false;
+  }
+
+  // extension/src/views/livestock.js
+  var pct = (a, b) => b ? 100 * a / b : 0;
+  var hoursLeft = (t) => Math.max(0, Math.ceil((t - Date.now()) / 36e5));
+  var minsLeft2 = (t) => Math.max(0, Math.ceil((t - Date.now()) / 6e4));
+  var till = (t) => {
+    const m = minsLeft2(t);
+    return m >= 1440 ? Math.floor(m / 1440) + " d " + Math.floor(m % 1440 / 60) + " h" : m >= 60 ? Math.floor(m / 60) + " h" : m + " m";
+  };
+  var clock = (t) => new Date(t).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+  var of = (a, b) => b >= 1e3 ? (a / 1e3).toFixed(1) + " / " + (b / 1e3).toFixed(1) + " L" : Math.round(a) + " / " + Math.round(b) + " mL";
+  var plain = (label) => String(label || "").replace(/^[^\p{L}\p{N}]+/u, "");
+  function goSettings(ctx3, page2) {
+    if (settingsAvailable() && openSettings(page2)) return;
+    ctx3.setUi({ setPage: page2, setFind: "", goTab: "settings" });
+  }
+  var errCard = (s) => s.stateErr && card(title("Somethin' broke on the farm girl's end"), muted("Part of your panel didn't arrive. Tell the proprietors this line: " + s.stateErr));
+  function happening(ctx3) {
+    const s = ctx3.s, hp = s.happening || [], quiet = s.quietUntil && s.quietUntil > Date.now();
+    return [
+      hp.length ? hp.map((t) => h("div", { style: { margin: "3px 0" } }, t)) : muted("Nothin' has hold of you right now."),
+      h(
+        "div",
+        null,
+        quiet ? btn("End the quiet", () => ctx3.send("quiet off")) : btn("An hour's quiet", () => ctx3.send("quiet 60")),
+        muted(quiet ? "Nothin' new starts on you till it's over." : "Quiet: no new traps, urges, scents or teasin' for an hour. It doesn't stop what already has you; the safe word does.")
+      )
+    ];
+  }
+  function me2(ctx3) {
+    const s = ctx3.s, x = mePieces(ctx3), now = Date.now();
+    const quiet = s.quietUntil && s.quietUntil > now;
+    const sub = [
+      [s.tier, s.species].filter(Boolean).join(" "),
+      s.herdLeader && s.herdLeader + "'s herd",
+      s.contract && (s.contract.until ? "contract " + till(s.contract.until) : "contract for good")
+    ].filter(Boolean).join(" \xB7 ");
+    const chips = (s.now || []).filter((n) => !n.until || n.until > now).map((n) => chip(n.icon + " " + n.text + (n.until ? " \xB7 " + till(n.until) : ""), /🚫|🪵|⛓️|🚧|🔥/.test(n.icon) ? "alert" : "")).concat(x.chips.map((c) => chip(String(c.text ?? c), c.kind === "alert" ? "alert" : "")), quiet ? [chip("\u{1F92B} quiet \xB7 " + till(s.quietUntil))] : []);
+    const sum = h(
+      "div",
+      { class: "fhc-sum" },
+      h("div", { class: "fhc-sum-top" }, h("span", { class: "fhc-nm" }, s.name), h("span", { class: "fhc-purse", title: "Your ribbons" }, "\u{1F380} " + (s.ribbons || 0))),
+      sub ? h("div", { class: "fhc-muted", style: { marginTop: "-6px" } }, sub) : null,
+      chips.length ? h("div", { class: "fhc-chips", "aria-label": "Right now" }, chips) : null,
+      meters([
+        s.milk && { label: "Milk", right: String(s.milk.grade || ""), value: of(s.milk.ml, s.milk.cap), pct: pct(s.milk.ml, s.milk.cap) },
+        s.quota && { label: "Quota", right: s.quota.streak ? "\xD7" + s.quota.streak : "", value: of(s.quota.ml, s.quota.goal), pct: pct(s.quota.ml, s.quota.goal), kind: "good" },
+        s.semen && { label: "Seed", value: of(s.semen.ml, s.semen.cap), pct: pct(s.semen.ml, s.semen.cap) },
+        s.holding && s.holding.ml > 0 && { label: "Holding", value: ml(s.holding.ml), pct: pct(s.holding.ml, s.holding.cap), kind: "alert" },
+        ...x.bars.map((b) => ({ label: plain(b.label), value: String(b.value ?? ""), pct: Number(b.pct) || 0, kind: b.kind === "good" || b.kind === "alert" ? b.kind : "" }))
+      ])
+    );
+    const fresh2 = ctx3.feed.filter((m) => m.kind !== "mine" && m.at > (ctx3.ui.inboxSeen || 0)).length;
+    const F = ctx3.s.feats, next = F && Array.isArray(F.tracks) ? F.tracks.filter((t) => t.next).map((t) => Object.assign({ p: pct(t.n - (t.prev || 0), t.next - (t.prev || 0)) }, t)).sort((a, b) => b.p - a.p)[0] : null;
+    const hp = s.happening || [];
+    return [
+      errCard(s),
+      sum,
+      rows(ctx3, "me", [
+        {
+          id: "inbox",
+          label: "\u{1F4EC} Inbox",
+          dot: fresh2 > 0,
+          sum: fresh2 ? fresh2 + " new" : ctx3.feed.length ? "nothin' new" : "empty",
+          body: () => {
+            ctx3.ui.inboxSeen = Date.now();
+            return inbox(ctx3);
+          }
+        },
+        hp.length && { id: "now", label: "\u{1F300} What's got you", sum: hp.length === 1 ? String(hp[0]).slice(0, 40) : hp.length + " things", body: () => happening(ctx3) },
+        (s.preg || s.eggs) && {
+          id: "carry",
+          label: "\u{1F37C} Carryin'",
+          sum: [s.preg && s.preg.sires.join(" & ") + "'s, due in " + Math.max(0, Math.ceil((s.preg.due - now) / 864e5)) + " d", s.eggs && s.eggs.n + " eggs"].filter(Boolean).join(" \xB7 "),
+          body: () => [
+            s.preg && h("div", null, "Carryin' for " + s.preg.sires.join(" & ") + " \xB7 due in " + Math.max(0, Math.ceil((s.preg.due - now) / 864e5)) + " day(s)"),
+            s.eggs && h("div", null, "\u{1F95A} " + s.eggs.n + " eggs in you. ", h("span", { class: "fhc-muted" }, "?lay at the nest, or they come when they're due.")),
+            h("div", null, btn("Pedigree", () => ctx3.send("pedigree")), btn("Eggs", () => ctx3.send("eggs")), btn("Body tab \u203A", () => ctx3.setUi({ goTab: "body" })))
+          ]
+        },
+        (s.body || []).length && {
+          id: "body",
+          label: "\u{1F4CF} Body",
+          sum: s.body.map((b) => b.size).slice(0, 3).join(" \xB7 "),
+          body: () => [
+            h("div", { class: "fhc-grid" }, s.body.map((b) => h("div", null, muted(b.label), h("div", { style: { fontWeight: 600 } }, b.size)))),
+            h("div", null, btn("Measure", () => ctx3.send("measure")))
+          ]
+        },
+        s.today && {
+          id: "marks",
+          label: "\u270D\uFE0F Today's marks",
+          sum: "used " + s.today.tally + " \xB7 " + s.today.naughty + " naughty \xB7 praised " + s.today.praised,
+          body: () => [
+            pairs([["Used today", String(s.today.tally)], ["Naughty marks", String(s.today.naughty)], ["Praised", String(s.today.praised)], ["Degraded", s.today.degraded ? String(s.today.degraded) : null]]),
+            h("div", null, btn("My tally", () => ctx3.send("tally")))
+          ]
+        },
+        s.kept && {
+          id: "kept",
+          label: "\u{1F3F7}\uFE0F Kept by " + s.kept.by,
+          sum: Math.max(1, Math.ceil((s.kept.until - now) / 864e5)) + " day(s) left",
+          body: () => [
+            s.kept.tag ? muted("Your tag: " + s.kept.tag) : null,
+            s.kept.name ? muted("This week you're called: " + s.kept.name) : null,
+            (s.kept.milk || []).length ? muted("Milked at " + s.kept.milk.map((x2) => x2 + ":00").join(" and ")) : null,
+            h("div", null, btn("What that means", () => ctx3.send("kept")), btn("End it", () => ctx3.send("kept off")))
+          ]
+        },
+        s.roam && { id: "roam", label: "\u{1F9ED} Roam", sum: s.roam.until ? "out till " + clock(s.roam.until) : s.roam.left + " pass" + (s.roam.left === 1 ? "" : "es"), body: () => roamBody(ctx3) },
+        next && {
+          id: "feat",
+          label: "\u{1F3C5} Next feat",
+          sum: next.name + " " + TIER[next.tier + 1] + " \xB7 " + Math.round(next.p) + "%",
+          body: () => [
+            bar(next.icon + " " + next.name + ": tier " + TIER[next.tier + 1], next.n + " of " + next.next + " " + next.unit, next.p, "acc"),
+            muted("Perk: " + next.perk + ", " + next.desc),
+            h("div", null, btn("All my feats \u203A", () => ctx3.setUi({ goTab: "ribbons", open_rib: "feats" })))
+          ]
+        },
+        x.cards.length && { id: "extras", label: "\u{1F9E9} Farm extras", sum: x.labels.slice(0, 2).join(" \xB7 "), body: () => x.cards }
+      ]),
+      quick(ctx3, "me", [
+        ["\u{1F6BF} Wash", () => ctx3.send("wash")],
+        ["\u{1F489} Shots", () => ctx3.send("myshots")],
+        // ?drain with their own number: them and nobody else, staff or stock (15-commands.js drainSelf)
+        ["\u{1FAA3} Drain", () => ctx3.send("drain " + (window.Player && window.Player.MemberNumber || "me"))]
+      ], [
+        ["\u{1F4CA} Stats", () => ctx3.send("stats")],
+        ["\u{1F4D0} Measure", () => ctx3.send("measure")],
+        ["\u{1F4CB} Record", () => ctx3.send("record")],
+        ["\u{1F333} Pedigree", () => ctx3.send("pedigree")],
+        ["\u{1F511} Keys", () => ctx3.send("keys")],
+        ["\u{1F457} Dress me", () => ctx3.send("dressme")],
+        quiet ? ["\u{1F92B} End the quiet", () => ctx3.send("quiet off")] : ["\u{1F92B} Quiet hour", () => ctx3.send("quiet 60")]
+      ])
+    ];
+  }
+  function roamBody(ctx3) {
+    const r = ctx3.s.roam;
+    return [
+      r.until ? muted("Roamin' now: back on the farm by " + clock(r.until) + ", or the farm girl fetches you.") : muted(r.left ? "An hour off the farm each; the whole map is yours either way. Walk out the door and a pass starts. Late back costs you." : "The farm gate's shut till you have a pass. The whole map is still yours to wander."),
+      h(
+        "div",
+        null,
+        r.until ? btn("I'm back", () => ctx3.send("roam back")) : r.left ? btn("Roam for an hour", () => ctx3.send("roam start"), true) : null,
+        r.until ? null : btn("Buy a pass \xB7 " + (r.price || 30) + " \u{1F380}", () => ctx3.send("buy roampass"))
+      )
+    ];
+  }
+  function body(ctx3) {
+    const s = ctx3.s, sw = s.switches || {}, g = s.gear || {}, onoff = (v) => v === true ? "on" : v === false ? "off" : v;
+    const steps = (lv) => h("div", { class: "fhc-steps" }, [1, 2, 3, 4].map((n) => h("div", { class: n <= lv ? "on" : "" })));
+    const milk = s.milk ? section(
+      "\u{1F95B} Milk",
+      "grade " + s.milk.grade,
+      bar("In your udder", ml(s.milk.ml) + " of " + ml(s.milk.cap) + (s.milk.lastAt ? " \xB7 milked " + Math.round((Date.now() - s.milk.lastAt) / 6e4) + " min ago" : ""), pct(s.milk.ml, s.milk.cap)),
+      s.quota && bar("Today's quota", ml(s.quota.ml) + " of " + ml(s.quota.goal) + (s.quota.streak ? " \xB7 streak " + s.quota.streak : ""), pct(s.quota.ml, s.quota.goal), "good"),
+      // what you're hooked up to right now, read off you by the farm
+      g.milk ? [
+        h("div", { class: "fhc-kv", style: { border: "none", padding: "0" } }, h("span", null, g.milk.name), h("span", { class: "fhc-muted" }, ["", "Gentle", "Steady", "Hard", "Max"][g.milk.level] + " \xB7 " + g.milk.ml + " mL a minute")),
+        steps(g.milk.level),
+        g.milk.kind === "echo" ? muted("The more worked up you are, the faster it draws.") : null
+      ] : muted("No pump on right now. A milk pump (the game's Lactation Pump), Echo's portable pump, the milk vendor or a milkin' stall all milk you."),
+      g.machine && h("div", { class: "fhc-kv" }, h("span", null, "\u2699\uFE0F " + g.machine.name), h("span", { class: "fhc-muted" }, g.machine.intensity < 0 ? "off" : "intensity " + g.machine.intensity)),
+      g.funnel && h("div", { class: "fhc-kv" }, h("span", null, "Funnel gag"), h("span", { class: "fhc-muted" }, "fitted, and it counts as open")),
+      s.stallUntil && h("div", { class: "fhc-kv" }, h("span", null, "Milkin' stall"), chip(minsLeft2(s.stallUntil) + " min left", "acc")),
+      s.dial && h(
+        "div",
+        null,
+        muted("The stall dial" + (s.milkCums ? " \xB7 milked till you came \xD7 " + s.milkCums : "")),
+        h("div", null, [["gentle", "Gentle"], ["steady", "Steady"], ["hard", "Hard"], ["punishing", "Punishin'"]].map(([id, label]) => h("button", { type: "button", class: "fhc-pill" + (s.dial === id ? " on" : ""), onclick: () => ctx3.send("stalldial " + id) }, label))),
+        muted({ gentle: "Slow and sweet. It leaves you a third.", steady: "It drains you to a quarter.", hard: "Fast and deep, down to an eighth, and sore teats after.", punishing: "Past empty. You'll be sensitive for an hour after." }[s.dial] || "")
+      ),
+      h("div", null, btn("Quota", () => ctx3.send("quota")), btn("Milk board", () => ctx3.send("board")))
+    ) : section("\u{1F95B} Milk", null, muted("You're not makin' milk right now. Milkable is in \u2699 Settings \u203A Farm switches."), h("div", null, btn("Farm switches", () => goSettings(ctx3, "switches"))));
+    const breed = section(
+      "\u{1F402} Breedin'",
+      [sw.fertile ? "fertile" : null, s.heatUntil ? "in heat " + hoursLeft(s.heatUntil) + " h" : null].filter(Boolean).join(" \xB7 "),
+      pairs([
+        ["Breedable", onoff(sw.breedable)],
+        ["Fertile", onoff(sw.fertile)],
+        ["Jar breedin'", sw.jarok ? "asks first" : "never"],
+        ["Free use", onoff(sw.freeuse)],
+        ["Natural heat", onoff(sw.naturalheat)],
+        ["Carryin'", s.preg ? s.preg.sires.join(" & ") + "'s, due in " + Math.max(0, Math.ceil((s.preg.due - Date.now()) / 864e5)) + " d" : null],
+        ["Eggs in you", s.eggs ? s.eggs.n + " \xB7 lay at the nest" : null]
+      ]),
+      h("div", null, btn("My tally", () => ctx3.send("tally")), btn("Eggs", () => ctx3.send("eggs")), btn("Pedigree", () => ctx3.send("pedigree")))
+    );
+    const hold = s.holding && s.holding.cap ? section(
+      "\u{1FAD9} Holdin'",
+      Math.round(pct(s.holding.ml, s.holding.cap)) + "% full",
+      bar("In you", ml(s.holding.ml) + " of " + ml(s.holding.cap), pct(s.holding.ml, s.holding.cap), "alert"),
+      h("div", null, btn("\u{1FAA3} Drain", () => ctx3.send("drain " + (window.Player && window.Player.MemberNumber || "me"))), btn("\u{1F6BF} Wash", () => ctx3.send("wash")))
+    ) : null;
+    const seed = s.semen ? section("\u{1F4A6} Seed", null, bar("Stored", ml(s.semen.ml) + " of " + ml(s.semen.cap), pct(s.semen.ml, s.semen.cap))) : section("\u{1F4A6} Seed", null, muted("You're not makin' seed. Want a turn as a stud? Futa's in \u2699 Settings \u203A Farm switches."), h("div", null, btn("Farm switches", () => goSettings(ctx3, "switches"))));
+    return [milk, breed, hold, seed];
+  }
+  function trapThemesCard(ctx3) {
+    const list = ctx3.s.trapThemes || [];
+    if (!list.length) return null;
+    return card(title("Kinds of trap"), trapThemes(ctx3));
+  }
+  function trapThemes(ctx3) {
+    const list = ctx3.s.trapThemes || [];
+    return [
+      muted("Switch a whole kind off and not one of those traps springs for you, not even one a proprietor springs by hand. A trap that's two kinds is off if either is." + (ctx3.s.trapCard ? "" : " (They only matter once your traps are on.)")),
+      list.map((t) => toggle(t.icon + " " + t.label, t.desc, !!t.on, () => ctx3.send("traps theme " + t.id + " " + (t.on ? "off" : "on"))))
+    ];
+  }
+  function seasonsCard(ctx3) {
+    const b = seasons(ctx3);
+    return b ? card(title("\u{1F5D3}\uFE0F Seasons"), b) : null;
+  }
+  function seasons(ctx3) {
+    const sa = ctx3.s.seasonsAdmin;
+    if (!sa || !sa.rows || !sa.rows.length) return null;
+    const at = (t) => new Date(t).toLocaleString([], t - Date.now() < 20 * 36e5 ? { hour: "2-digit", minute: "2-digit" } : { weekday: "short", hour: "2-digit", minute: "2-digit" });
+    return [
+      muted("Start any season's traps whenever you like: for a party, a special day, or just because. While one's on, about a third of what the plain trap tiles spring is from its pack, and the farm girl dresses for it. Anybody with their Seasonal packs switch off never gets them."),
+      sa.rows.map((x) => h(
+        "div",
+        { class: "fhc-kv" },
+        h("span", null, x.icon + " " + x.label + " \xB7 " + (x.on ? x.hand ? x.open ? "on till you stop it" : "on till " + at(x.until) : "on, its time of year" : x.dates)),
+        h("span", null, x.on ? btn("Stop", () => ctx3.send("seasons stop " + x.id)) : [btn("2 hours", () => ctx3.send("seasons start " + x.id + " 2h")), btn("Till I stop it", () => ctx3.send("seasons start " + x.id + " on"))])
+      )),
+      h(
+        "div",
+        null,
+        btn("All of them, 2 hours", () => ctx3.send("seasons start all 2h")),
+        btn("Stop the ones I started", () => ctx3.send("seasons stop")),
+        btn(sa.costume ? "Her costume: on" : "Her costume: off", () => ctx3.send("seasons costume " + (sa.costume ? "off" : "on"))),
+        btn("The calendar", () => ctx3.send("seasons"))
+      ),
+      muted("Other lengths, or several at once: ?seasons start halloween 3d \xB7 ?seasons start halloween winter on")
+    ];
+  }
+  function play(ctx3) {
+    const s = ctx3.s, tc = s.trapCard, ad = s.trapAdmin, gear = s.farmGear || [], st2 = storeParts(ctx3), themes = s.trapThemes || [];
+    const traps = tc ? section(
+      "\u{1FAA4} Traps" + (tc.rank ? " \xB7 " + tc.rank : ""),
+      tc.total + " sprung" + (tc.nextRank ? " \xB7 next rank at " + tc.nextRank : ""),
+      tc.kinds.length ? h("div", { class: "fhc-chips" }, tc.kinds.map((k) => chip(k.kind + " \xD7" + k.n))) : muted("Nothin's caught you yet. Give it time."),
+      muted(tc.left + " kind" + (tc.left === 1 ? "" : "s") + " still to find" + (tc.eggs ? " \xB7 " + tc.eggs + " eggs laid" : "") + (tc.paused ? " \xB7 traps paused" : "") + (tc.eager ? " \xB7 eager (no waits)" : "") + (tc.danger ? " \xB7 Danger Draught in you" : "")),
+      tc.corr || tc.under ? bar("Corruption", tc.corr + " of 100" + (tc.under ? " \xB7 gone under, depth " + tc.under : ""), tc.corr, "alert") : null,
+      tc.hunt && muted("\u{1F514} The hunt is on: get to " + tc.hunt.goal),
+      tc.today && muted("\u{1F3AF} Trap of the day: " + tc.today.icon + " " + tc.today.kind + ", " + tc.today.what + (tc.today.paid ? ". It's paid you its ribbon today." : ". Twice as likely today, and a ribbon the first time it has you.")),
+      tc.rated && muted("Your ratings: \u{1F496} " + tc.rated.loved + " \xB7 \u{1F44D} " + tc.rated.fine + " \xB7 \u{1F645} " + tc.rated.no + (tc.rateAsk ? "" : " \xB7 not askin' after each trap")),
+      quick(ctx3, "traps", [["Struggle", () => ctx3.send("struggle")], ["What's out there", () => ctx3.send("traps")]], [
+        ["Switch traps off", () => ctx3.send("traps off")],
+        [tc.eager ? "Eager: on" : "Eager: off", () => ctx3.send("traps eager " + (tc.eager ? "off" : "on"))],
+        ["Lay (at the nest)", () => ctx3.send("lay")],
+        ["My brood book", () => ctx3.send("brood")],
+        ["My ratings", () => ctx3.send("rate")],
+        [tc.rateAsk === false ? "Ask how each was: off" : "Ask how each was: on", () => ctx3.send("rate ask " + (tc.rateAsk === false ? "on" : "off"))]
+      ])
+    ) : section("\u{1FAA4} Traps", "off", muted("The farm's traps are off for you, so you can walk right over them. Switch them on and every trap spot on the farm can spring for you."), h("div", null, btn("Switch traps on", () => ctx3.send("traps on"))));
+    const offKinds = themes.filter((t) => !t.on).length;
+    return [
+      errCard(s),
+      traps,
+      rows(ctx3, "play", [
+        {
+          id: "gear",
+          label: "\u26D3 On you right now",
+          sum: gear.length ? gear.length + " piece" + (gear.length === 1 ? "" : "s") : "nothin'",
+          body: () => [
+            gear.length ? gear.map((g) => h("div", null, h("div", { class: "fhc-kv" }, h("b", null, g.name), h("span", { class: "fhc-muted" }, minsLeft2(g.until) + " min")), muted(gearLore(g.name) || g.desc || ""))) : muted("No farm gear on you."),
+            !ctx3.prefs.gear && muted('Trap gear only goes on for real with "Farm can put real gear on me" switched on (\u2699 Settings \u203A Gear and marks).')
+          ]
+        },
+        themes.length && tc && { id: "kinds", label: "\u{1F9EC} Kinds of trap", sum: offKinds ? offKinds + " off" : "all on", body: () => trapThemes(ctx3) },
+        st2.now && { id: "fx", label: "\u{1F9EA} In you right now", sum: (s.fx || []).length + " potion" + ((s.fx || []).length === 1 ? "" : "s"), body: () => st2.now },
+        st2.dare && { id: "dare", label: s.dare.reckless ? "\u{1F3B2} A reckless dare" : "\u{1F3B2} Your dare", sum: minsLeft2(s.dare.until) + " min left", body: () => st2.dare },
+        st2.pen && { id: "pen", label: "\u{1F6A7} Corralled", sum: minsLeft2(s.penned.until) + " min", body: () => st2.pen },
+        s.sitting && { id: "nest", label: "\u{1FABA} Sittin' the nest", sum: s.sitting.n + " eggs", body: () => [muted(s.sitting.n + " eggs under you. They hatch in about " + Math.max(1, minsLeft2(s.sitting.until)) + " min."), h("div", null, btn("Get up", () => ctx3.send("sit up")))] },
+        s.holes && s.holes.length && {
+          id: "holes",
+          label: "\u{1F573} What you've taken",
+          sum: s.holes.map((x) => x.rank).slice(0, 2).join(" \xB7 "),
+          body: () => [
+            s.holes.map((x) => h("div", { class: "fhc-kv" }, h("span", null, "Your " + x.hole + " \xB7 " + x.rank), h("span", { class: "fhc-muted" }, x.loads + " loads" + (x.knots ? " \xB7 " + x.knots + " knots" : "") + (x.next ? " \xB7 next at " + x.next : "")))),
+            muted("Every step a hole is trained, you hold more for good and the traps pour more into it.")
+          ]
+        },
+        s.album && s.album.length && {
+          id: "album",
+          label: "\u{1F4D4} Keepsakes",
+          sum: s.album.length + "",
+          body: () => [
+            s.album.map((e) => h("div", null, h("div", { class: "fhc-kv" }, h("b", null, e.i + " " + e.h), h("span", { class: "fhc-muted" }, new Date(e.t).toLocaleDateString())), muted(e.x))),
+            muted("Only you can open this album.")
+          ]
+        },
+        s.onBooks && { id: "shots", label: "\u{1F489} Shots in you", sum: "?myshots", go: () => ctx3.send("myshots") },
+        ad && { id: "admin", label: "\u{1F6E0} Proprietor: traps", sum: ad.subjects.length + " with traps on", body: () => trapAdmin(ctx3) },
+        ctx3.s.seasonsAdmin && ctx3.s.seasonsAdmin.rows && ctx3.s.seasonsAdmin.rows.length && { id: "seasons", label: "\u{1F5D3}\uFE0F Seasons", sum: ctx3.s.seasonsAdmin.rows.filter((x) => x.on).map((x) => x.icon).join(" ") || "none on", body: () => seasons(ctx3) }
+      ])
+    ];
+  }
+  function trapAdmin(ctx3) {
+    const ad = ctx3.s.trapAdmin;
+    return [
+      ad.today && muted("\u{1F3AF} Trap of the day: " + ad.today.icon + " " + ad.today.kind),
+      ad.ratings && (ad.ratings.loved.length || ad.ratings.no.length) ? muted("\u{1F496} Most loved: " + (ad.ratings.loved.map((x) => x.icon + " " + x.kind + " (" + x.n + ")").join(", ") || "none yet") + ' \xB7 \u{1F645} Most "not for me": ' + (ad.ratings.no.map((x) => x.icon + " " + x.kind + " (" + x.n + ")").join(", ") || "none yet")) : null,
+      ad.subjects.length ? ad.subjects.map((x) => h("div", { class: "fhc-kv" }, h("span", null, (x.here ? "\u25CF " : "") + x.name), h("span", { class: "fhc-muted" }, x.n + " sprung" + (x.paused ? " \xB7 paused" : "")))) : muted("Nobody's switched their traps on yet."),
+      muted("Trap spots: " + (ad.spots.length ? ad.spots.join(", ") : "none yet (?spot set trap-<kind>)")),
+      muted("Water: " + (ad.water.length ? ad.water.join(", ") : "none yet (?spot set pond)") + (ad.nest ? " \xB7 " + ad.nest + " eggs in the nest" : "") + (ad.pack ? " \xB7 pack at " + ad.pack : "")),
+      ad.hunt && muted("\u{1F514} Hunt on: finish at " + ad.hunt.goal + ", " + ad.hunt.done + " home"),
+      h(
+        "div",
+        null,
+        btn("Kinds & spots", () => ctx3.send("traps")),
+        btn("Subjects", () => ctx3.send("subject")),
+        btn(ad.hunt ? "Stop the hunt" : "Start a hunt", () => ctx3.send(ad.hunt ? "hunt stop" : "hunt start")),
+        btn("Gather eggs", () => ctx3.send("gather")),
+        btn("Ratings", () => ctx3.send("traps ratings"))
+      )
+    ];
+  }
+  var TIER = ["\u2013", "I", "II", "III", "IV", "V"];
+  function feats(ctx3) {
+    const F = ctx3.s.feats;
+    if (!F || !Array.isArray(F.tracks)) return [muted("Your feats show here once the farm girl's sent your panel. ?feats works from chat too.")];
+    return [
+      muted("Every track counts somethin' you do on the farm. Each new tier is a feat and grows that track's perk; perks stack and work on their own."),
+      F.tracks.map((t) => h(
+        "div",
+        { class: "fhc-box" },
+        h("div", { class: "fhc-kv" }, h("b", null, t.icon + " " + t.name + " " + TIER[t.tier]), t.tier ? chip(t.perk + (t.off ? " (off)" : ""), t.off ? "" : "good") : null),
+        t.next ? bar("Next: tier " + TIER[t.tier + 1], t.n + " of " + t.next + " " + t.unit, pct(t.n - (t.prev || 0), t.next - (t.prev || 0)), "acc") : muted("Every tier earned. " + t.n + " " + t.unit + "."),
+        muted(t.tier ? t.perk + ": " + t.desc : "Perk: " + t.perk + ", " + t.desc),
+        t.tier ? toggle("Use " + t.perk, "Switch it off and it stays earned.", !t.off, () => ctx3.send("perks " + (t.off ? "on " : "off ") + t.key)) : null
+      ))
+    ];
+  }
+  function ribbons(ctx3) {
+    const s = ctx3.s, st2 = storeParts(ctx3), F = s.feats, tiers = F && Array.isArray(F.tracks) ? F.tracks.reduce((n, t) => n + (t.tier || 0), 0) : 0;
+    const log2 = s.ribbonLog || [];
+    return [
+      h(
+        "div",
+        { class: "fhc-sum" },
+        h("div", { class: "fhc-sum-top" }, h("span", { class: "fhc-nm" }, "\u{1F380} Your ribbons"), h("span", { class: "fhc-purse", style: { fontSize: "22px" } }, String(s.ribbons || 0))),
+        s.quotaGrace ? h("div", null, chip("quota grace \xD7 " + s.quotaGrace, "good")) : null,
+        st2.vat,
+        muted("Earn 'em: your milk quota, a full stall session, chores, glory shifts, dares, shows, best of the week, and staff who think you've been good.")
+      ),
+      rows(ctx3, "rib", [
+        log2.length && { id: "log", label: "\u{1F4D2} Where they came from", sum: (log2[0].n > 0 ? "+" : "") + log2[0].n + " " + log2[0].why, body: () => st2.logList },
+        ...st2.shelves.map((sh) => ({ id: sh.id, label: sh.label, sum: sh.n + " on the shelf", body: sh.body })),
+        { id: "feats", label: "\u{1F3C5} Feats", sum: F && Array.isArray(F.tracks) ? tiers + " tier" + (tiers === 1 ? "" : "s") + " earned" : "", body: () => feats(ctx3) },
+        F && F.titles && F.titles.length && { id: "titles", label: "\u{1F396}\uFE0F Titles", sum: String(F.titles.length), body: () => [muted(F.titles.join(" \xB7 "))] }
+      ]),
+      h("div", null, btn("This week's board", () => ctx3.send("ribbons top")))
+    ];
+  }
+  function inbox(ctx3) {
+    const f = ctx3.ui.filter || "all";
+    const items = ctx3.feed.filter((x) => f === "all" || x.kind === f);
+    return [
+      h("div", null, [["all", "All"], ["notice", "From the farm"], ["reply", "Answers"], ["mine", "You asked"]].map(([id, label]) => h("button", { type: "button", class: "fhc-pill" + (f === id ? " on" : ""), onclick: () => ctx3.setUi({ filter: id }) }, label))),
+      items.length ? items.slice().reverse().map((x) => h(
+        "div",
+        { class: "fhc-card " + x.kind },
+        h("span", { class: "fhc-time" }, new Date(x.at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) + (x.kind === "notice" ? " \xB7 from the farm" : x.kind === "mine" ? " \xB7 you asked" : "")),
+        x.text
+      )) : muted("Nothin' here yet.")
+    ];
+  }
+  var SWITCH_INFO = [
+    ["hypno", "Hypno", "Conditioning's trance sessions can take you, in the farm's voice, never deeper than your ?depth (fun, deep or no human left). ?wake ends one"],
+    ["teaseme", "Tease me", "The farm whispers you a tease 3 or 4 times an hour while you're here, about whatever's goin' on with you: full udders, a load still in you, a heat, a mess. ?teaseme steady or needy for more. Your herd leader can switch it for you too"],
+    ["breedable", "Breedable", "You can be bred and filled"],
+    ["fertile", "Fertile", "You can catch"],
+    ["mpreg", "Mpreg", "A load in your ass can take too, no item needed (with Breedable and Fertile on)"],
+    ["jarok", "Jar breedin'", "On: staff still ask every time \xB7 Off: never"],
+    ["freeuse", "Free use", "Any stud may have you without askin'"],
+    // Laynie, Nov 4: "also need the futa toggle, just in case a female wants to temporaily be a stud"
+    ["futa", "Futa", "A cock of your own as well: cock and pussy both, milk and cum both. Be a stud for a while, and flip it back whenever you like"],
+    ["milkable", "Milkable", "Make milk"],
+    ["seedmilk", "Milk my seed", "The stall, the milkin' traps and ?collect take your seed as well as your milk. Off: they milk you up top and leave your cock and balls be"],
+    ["naturalheat", "Natural heat", "Come into heat on your own every 7 days"],
+    ["praise", "Praise", "Let staff's praise count"],
+    ["degrade", "Degrade", "Let staff's degradin' count"],
+    ["tally", "Tally marks", "Show your tally on ?who and the board"],
+    ["potions", "Potions", "Staff and the wheel can give you potions, and others can gift you one (you're asked first). Your limits still rule some out"],
+    ["dares", "Dares", "Staff and the wheel can hand you a dare to do in half an hour"],
+    ["watersports", "Watersports", "Piss play can find you: the spray trap, a feeder crafted for it, and the scenes that have it. Off until you say so"],
+    ["parasite", "Parasite", "Swallow at the glory stalls and, rarely, a pair of livin' lips seals over your mouth for 12 hours: it feeds you fertility, growth, hyper pregnancy and capacity serum and turns every load you swallow into more"],
+    ["symbiote", "Symbiotes", "Livin' latex, milk moss or the nestling can bond to you. Each gives you somethin' for as long as it's fed: room to hold more, more milk, an easier catch. They grow into real clothes on you (latex, moss), and they spread: latex by a touch, moss in the milk, the nestling by a breedin', to others who switched this on. Your safeword sends it away"],
+    ["traps", "Traps", "The farm's traps spring for you: step on a trap spot and it might dose, drain, breed, strip, pump or fill you with eggs, and the water's not safe either. Off: you walk right over them. Your limits and your safeword still rule"],
+    ["ownoutfit", "Bring my own outfit", "Keep the look you came in when you sign a contract. Off: your first contract dresses you, once, in the farm's outfit for your kind, and nothin' changes it back after"],
+    ["eager", "Traps: no cooldown", "With traps on: no breather between traps and no wait for a trap to reset. Step off and back on and it springs again"],
+    ["bench", "Use bench", "Staff and the wheel can sentence you to time strapped over the use bench, where anybody can use you. Your safeword ends it at once"]
+  ];
+  var NEEDS = { freeuse: ["breedable", "Turn Breedable on first"] };
+  function farmSwitches(ctx3, list) {
+    const sw = ctx3.s.switches || {};
+    return list.map(([cmd, label, desc]) => {
+      const need = NEEDS[cmd];
+      if (need && !sw[need[0]] && !sw[cmd]) return toggle(label, need[1] + " \xB7 " + desc, false, () => ctx3.send(cmd + " on"));
+      return toggle(label, desc, !!sw[cmd], () => ctx3.send(cmd + " " + (sw[cmd] ? "off" : "on")));
+    });
+  }
+  function drawnBodyCard(ctx3) {
+    const st2 = drawnBodyState(), say = (t) => ctx3.hint(t);
+    const code = h("textarea", { class: "fhc-in", rows: 2, placeholder: "\u2026or paste the code from the studio's Copy for the Companion button" });
+    return card(
+      title("Drawn body (outfit studio)"),
+      toggle(
+        "Show my drawn body",
+        "Breasts from DD to R in your own skin, your belly, and what you wear fitted to them, on your character. Everyone here with the Companion sees it; people without it see the game's own picture of you. Off takes it away.",
+        st2.on,
+        () => {
+          drawnBodySet(!st2.on, say);
+          ctx3.setPref("drawnBody", !st2.on);
+        }
+      ),
+      h(
+        "div",
+        { class: "fhc-kv", style: { marginTop: "6px" } },
+        muted("Cup"),
+        h(
+          "select",
+          { class: "fhc-sel", onchange: (e) => {
+            const v = e.target.value;
+            drawnBodyCup(v === "auto" ? "auto" : Number(v), say);
+            ctx3.setPref("drawnBodyCup", v);
+          } },
+          [h("option", { value: "auto", selected: !st2.cupSet }, "Follow the farm" + (st2.farmCup ? " (" + (st2.cups[st2.farmCup] || "?") + " now)" : ""))].concat(
+            st2.cups.map((c, i) => i < 6 ? null : h("option", { value: String(i), selected: st2.cupSet && i === st2.cup }, c))
+          )
+        )
+      ),
+      st2.on && st2.cup >= 6 && st2.chest && st2.chest !== "XLarge" ? muted("Your chest is set to " + st2.chest + " in the wardrobe. Set it to the biggest for the drawn breasts to show.") : null,
+      h(
+        "div",
+        { class: "fhc-kv", style: { marginTop: "6px" } },
+        muted("Belly"),
+        h(
+          "select",
+          { class: "fhc-sel", onchange: (e) => {
+            drawnBodyBelly(e.target.value, say);
+            ctx3.setPref("drawnBodyBelly", e.target.value);
+          } },
+          [["farm", "Follow the farm" + (st2.farmBelly ? " (showing now)" : " (flat now)")], ["on", "Always"], ["off", "Never"]].concat(st2.fromStudio ? [["studio", "As my studio has it"]] : []).map(([v, label]) => h("option", { value: v, selected: st2.bellyMode === v }, label))
+        )
+      ),
+      muted("Following the farm, your cup is the size the farm has grown your udder to, and your belly shows and grows as you fill up, carry eggs or get bred."),
+      muted(st2.fromStudio ? "Using your own studio settings." : st2.fromFarm ? "Using the farm's look, with your own cup and belly." : "The farm's look comes from the farm girl once you're in her room; plain settings till then."),
+      st2.fromStudio ? btn("Use the farm's look instead", () => {
+        drawnBodyUseFarm(say);
+        ctx3.setPref("drawnBodyAt", Date.now());
+      }) : null,
+      h("div", { style: { marginTop: "8px" } }, muted("Got an outfit studio of your own? Bring its settings over:")),
+      h("div", { style: { marginTop: "4px" } }, btn("Get my studio's settings", () => {
+        drawnBodyFromStudio(say).then((ok2) => {
+          if (ok2) ctx3.setPref("drawnBodyAt", Date.now());
+        });
+      }, true)),
+      muted("Works while the studio is running on this computer: it takes what you last saved there (Save the breasts, Save all the fits)."),
+      h("div", { style: { marginTop: "6px" } }, code),
+      btn("Put in the pasted code", () => {
+        if (drawnBodyPaste(code.value, say)) ctx3.setPref("drawnBodyAt", Date.now());
+      }),
+      toggle(
+        "See other people's drawn bodies",
+        "Draw other Companion users the way their studio settings say" + (st2.othersHere ? " (" + st2.othersHere + " here now)" : "") + ". Off: everybody else is the game's own picture on your screen.",
+        st2.seeOthers,
+        () => {
+          drawnBodySeeOthers(!st2.seeOthers, say);
+          ctx3.setPref("drawnBodySee", !st2.seeOthers);
+        }
+      )
+    );
+  }
+  function extraSwitches(ctx3) {
+    const list = [];
+    for (const m of Object.values(ctx3.s.mods || {})) for (const c of (m.cards || []).filter((c2) => c2 && !c2.staff)) for (const t of c.toggles || []) list.push([m.label, t]);
+    if (!list.length) return null;
+    return card(
+      title("\u{1F9E9} Farm extras"),
+      muted("The farm's add-ons. Each one is off until you switch it on."),
+      list.map(([label, t]) => toggle(String(t.label), (t.desc ? String(t.desc) + " " : "") + "(" + label + ")", !!t.on, () => ctx3.send(String(t.cmd))))
+    );
+  }
+  var LIVESTOCK_TABS = [
+    { id: "me", label: "\u{1F404} Me", render: me2 },
+    { id: "body", label: "\u{1F95B} Body", render: body },
+    { id: "play", label: "\u{1FAA4} Play", render: play },
+    { id: "ribbons", label: "\u{1F380} Ribbons", render: ribbons },
+    { id: "safety", label: "\u{1F198} Safety", render: safetyTab, offRow: true }
+    // (the 🆘 button in the header opens it)
+  ];
+
+  // extension/src/views/guest.js
+  var GUEST_TABS = [
+    { id: "welcome", label: "\u{1F44B} Welcome", render: (ctx3) => [
+      card(
+        h("div", { class: "fhc-title" }, "Howdy, " + (ctx3.welcome.name || "sugar") + "!"),
+        h("p", null, "Welcome to B&B Farm. Everybody here chose to be here and signed to say so. Have a look around, mind the ruts, and holler if you need a hand."),
+        btn("Take the tour", () => ctx3.send("tour"), true),
+        btn("Apply to join", () => ctx3.send("apply")),
+        btn("Luxury stay", () => ctx3.send("luxury")),
+        btn("Dress me", () => ctx3.send("dressme"))
+      ),
+      card(title("Your keys"), muted("Guests don't carry keys. Staff can let you through any door."))
+    ] },
+    { id: "farm", label: "\u{1F33E} The farm", render: () => AREAS.map(([n, key, d]) => card(h("div", { class: "fhc-kv" }, h("b", null, n), h("span", { class: "fhc-muted" }, key)), muted(d))) },
+    { id: "rules", label: "\u{1F4CF} Rules", render: (ctx3) => [
+      h(
+        "div",
+        { class: "fhc-box alert" },
+        h("b", null, "Safe word stops everything"),
+        muted("Anywhere, from anybody. No contract overrides it. Beepin' the farm girl works from anywhere on the property, too.")
+      ),
+      card(title("On consent"), h("p", null, "Every animal and every hand here chose to be here, and signed for it. What you see in the pens, stalls and barn was asked for. The contract's a fence that holds both ways: what ain't in it, don't happen.")),
+      h("div", null, btn("Full rules", () => ctx3.send("rules")), btn("Consent", () => ctx3.send("consent")), btn("What opens what", () => ctx3.send("doors")))
+    ] },
+    { id: "inbox", label: "\u{1F4EC} Inbox", render: inbox },
+    { id: "guides", label: "\u{1F4D6} Guides", render: (ctx3) => guidesTab(ctx3, false) },
+    { id: "safety", label: "\u{1F198} Safety", render: safetyTab, offRow: true }
+    // (the 🆘 button in the header opens it)
+    // (the Settings tab is gone, Nov 4: the ⚙ in the header has the drawn body, this panel's switches and the rest)
   ];
 
   // extension/src/views/dashboard.js
@@ -9238,20 +9244,38 @@ nav.fhc-seg button.on{background:var(--fh-accent);color:var(--fh-ground);font-we
       latest(ctx3)
     ];
   }
-  function addons(ctx3) {
-    const b = bcplusStatus(), s = summonReady(BOT_MEMBER);
+  function parts(ctx3) {
+    const list = ctx3.s.botParts, fw = ctx3.s.featsWeek || [], b = bcplusStatus(), su = summonReady(BOT_MEMBER);
     return [
-      card(
-        title("BC+"),
-        chip(b.text, b.has ? b.match ? "good" : "alert" : "alert"),
-        muted("Contracts are checked against BC+ " + BCPLUS_VERSION + ". If the club's BC+ moves on, re-run the catalog tool and rebuild.")
+      muted("Each part is a piece of the farm girl kept in its own script for easy editin'. Tap one for its guide, or to switch it off."),
+      !Array.isArray(list) ? muted("The farm girl sends this list with your next panel update.") : list.length ? rows(ctx3, "parts", list.map((p) => ({
+        id: p.name,
+        label: (p.mine ? "\u{1F512} " : "") + p.label,
+        dot: !!p.errors,
+        sum: "v" + p.version + (p.on ? "" : " \xB7 off") + (p.errors ? " \xB7 " + p.errors + " errors" : ""),
+        // (a private part has no buttons: ?addons never finds it by name, for anybody, so it can't be switched off from here)
+        body: () => p.mine ? [muted("Only you can see or use this one. Nobody else's panel or ?addons ever lists it.")] : [
+          muted(p.cmds + " command" + (p.cmds === 1 ? "" : "s") + " \xB7 ?addons " + p.name + " lists them"),
+          h(
+            "div",
+            null,
+            btn("Its guide", () => ctx3.send("addons " + p.name)),
+            btn(p.on ? "Switch it off" : "Switch it on", () => ctx3.send("addons " + (p.on ? "off " : "on ") + p.name), !p.on)
+          )
+        ]
+      }))) : muted("No parts are runnin' right now."),
+      section(
+        "\u{1F3C5} Feats this week",
+        fw.length ? String(fw.length) : null,
+        fw.length ? fw.map((f) => h("div", { class: "fhc-kv" }, h("span", null, f.name), h("span", { class: "fhc-muted" }, f.feat))) : muted("Nobody's earned a feat this week yet.")
       ),
-      card(
-        title("BCX summoning (you)"),
-        s === null ? muted("BCX isn't loaded here.") : chip(s.ok ? "Ready to be summoned \xB7 the farm bot is allowed" : s.why, s.ok ? "good" : "alert"),
-        muted("On-call staff see the same check on their Staff panel.")
-      ),
-      card(title("Comin' soon"), muted("Echo's pumps and milk vendor, outfits by species and gender with high security locks, and the farm's own Listen to my voice (ECHS first)."))
+      section(
+        "\u{1F50C} What the farm leans on",
+        null,
+        h("div", { class: "fhc-kv" }, h("span", null, "BC+"), chip(b.text, b.has ? b.match ? "good" : "alert" : "alert")),
+        muted("Contracts are checked against BC+ " + BCPLUS_VERSION + ". If the club's BC+ moves on, re-run the catalog tool and rebuild."),
+        h("div", { class: "fhc-kv" }, h("span", null, "BCX summoning (you)"), su === null ? muted("BCX isn't loaded here.") : chip(su.ok ? "ready \xB7 the farm bot is allowed" : su.why, su.ok ? "good" : "alert"))
+      )
     ];
   }
   var SPECIES = ["cow", "bull", "pony", "horse", "goat", "sheep", "pig", "bunny", "rabbit", "pup", "dog", "kitt", "cat", "fox", "wolf", "deer", "goblin", "rat", "dragon"];
@@ -9452,11 +9476,11 @@ nav.fhc-seg button.on{background:var(--fh-accent);color:var(--fh-ground);font-we
     ];
   }
   var DASHBOARD_TABS = [
-    { id: "contracts", label: "BC+ contracts", render: contracts2 },
-    { id: "outfits", label: "Outfits", render: outfits },
-    { id: "addons", label: "Other addons", render: addons },
-    { id: "records", label: "Records", render: records },
-    { id: "suggestions", label: "\u{1F4A1} Suggestions", render: suggestions, badge: (ctx3) => (ctx3.s.feedback || []).filter((x) => x.status === "open").length }
+    { id: "contracts", label: "\u{1F4DC} BC+ contracts", render: contracts2 },
+    { id: "outfits", label: "\u{1F457} Outfits", render: outfits },
+    { id: "records", label: "\u{1F5C3} Records", render: records },
+    { id: "suggestions", label: "\u{1F4A1} Suggestions", render: suggestions, badge: (ctx3) => (ctx3.s.feedback || []).filter((x) => x.status === "open").length },
+    { id: "parts", label: "\u{1F9E9} Bot parts", render: parts }
   ];
 
   // extension/src/views/nursery.js
@@ -9699,8 +9723,8 @@ nav.fhc-seg button.on{background:var(--fh-accent);color:var(--fh-ground);font-we
     // (its add-on cards are a row on the Me tab)
     staff: { label: "Staff", tabs: STAFF_TABS },
     dashboard: { label: "Dashboard", tabs: DASHBOARD_TABS },
-    nursery: { label: "\u{1F9F8} Nursery", tabs: NURSERY_TABS }
-    // only for people on the nursery list (views/nursery.js)
+    nursery: { label: "\u{1F9F8} Nursery", tabs: NURSERY_TABS, keepRow: true }
+    // only for people on the nursery list (views/nursery.js); its own look
   };
   function loadPrefs() {
     try {
@@ -10058,19 +10082,39 @@ nav.fhc-seg button.on{background:var(--fh-accent);color:var(--fh-ground);font-we
       const nav0 = this.el.querySelector("nav.fhc-tabs"), navKeep = nav0 ? nav0.scrollLeft : 0;
       this.el.classList.toggle("compact", !!this.prefs.compact);
       const full = !!this.prefs.full;
-      const onRow = tabs.filter((t) => !t.offRow), seg = onRow.length <= 5;
+      const onRow = tabs.filter((t) => !t.offRow), seg = !VIEWS[view].keepRow;
+      const front = seg && onRow.length > 4 ? onRow.slice(0, 4) : onRow, rest = onRow.filter((t) => !front.includes(t));
+      const badge = (t) => t.badge ? t.badge(ctx3) : 0;
       const tabBtn = (t) => {
-        const n = t.badge ? t.badge(ctx3) : 0;
+        const n = badge(t);
         return h("button", {
           type: "button",
           class: seg ? t === tab ? "on" : "" : "fhc-pill" + (t === tab ? " on" : ""),
           "aria-current": t === tab ? "page" : null,
           onclick: () => {
             this.ui[tabKey] = t.id;
+            this.ui.tabsMore = false;
             this.render();
           }
         }, t.label + (n ? " \xB7 " + n : ""));
       };
+      const inRest = rest.includes(tab), moreOpen = !!this.ui.tabsMore;
+      const moreBtn = rest.length ? h(
+        "button",
+        {
+          type: "button",
+          class: "fhc-seg-more" + (inRest ? " on" : ""),
+          "aria-label": "More tabs",
+          "aria-expanded": moreOpen ? "true" : "false",
+          title: rest.map((t) => t.label).join(" \xB7 "),
+          onclick: () => {
+            this.ui.tabsMore = !moreOpen;
+            this.render();
+          }
+        },
+        (inRest ? String(tab.label).split(" ")[0] + " " : "") + "\u22EF",
+        rest.some((t) => badge(t)) && !inRest ? h("span", { class: "fhc-dot" }) : null
+      ) : null;
       const ib = (label, icon, fn, cls) => h("button", { type: "button", class: "fhc-ib" + (cls ? " " + cls : ""), title: label, "aria-label": label, onclick: fn }, icon);
       this.top.replaceChildren(...[
         h(
@@ -10099,7 +10143,15 @@ nav.fhc-seg button.on{background:var(--fh-accent);color:var(--fh-ground);font-we
           } }, VIEWS[v].label))
         ),
         // Safe word, I'm stuck and Call staff live in the Safety tab (Guest and Livestock panels; staff reach it from Livestock)
-        seg ? h("nav", { class: "fhc-seg", "aria-label": "Panel sections" }, onRow.map(tabBtn)) : h("nav", { class: "fhc-row fhc-tabs", "aria-label": "Panel sections" }, tabs.filter((t) => !t.offRow || t === tab).map(tabBtn)),
+        seg ? h("nav", { class: "fhc-seg" + (rest.length ? " more" : ""), "aria-label": "Panel sections" }, front.map(tabBtn), moreBtn) : h("nav", { class: "fhc-row fhc-tabs", "aria-label": "Panel sections" }, tabs.filter((t) => !t.offRow || t === tab).map(tabBtn)),
+        seg && rest.length && moreOpen ? h("div", { class: "fhc-menu fhc-tabmenu", role: "menu", "aria-label": "More tabs" }, rest.map((t) => {
+          const n = badge(t);
+          return h("button", { type: "button", role: "menuitem", class: "fhc-b" + (t === tab ? " on" : ""), onclick: () => {
+            this.ui[tabKey] = t.id;
+            this.ui.tabsMore = false;
+            this.render();
+          } }, t.label + (n ? " \xB7 " + n : ""));
+        })) : null,
         h(
           "div",
           { class: "fhc-body" },
@@ -11551,18 +11603,18 @@ nav.fhc-seg button.on{background:var(--fh-accent);color:var(--fh-ground);font-we
         t.push({ X: lp.X, Y: lp.Y });
         if (t.length > 4) t.shift();
       }
-      const me4 = W12.Player.MapData.Pos;
-      if (Math.max(Math.abs(me4.X - lp.X), Math.abs(me4.Y - lp.Y)) <= 1) {
+      const me3 = W12.Player.MapData.Pos;
+      if (Math.max(Math.abs(me3.X - lp.X), Math.abs(me3.Y - lp.Y)) <= 1) {
         if (walk && walk.heel) walk = null;
         return;
       }
       if (walk && !walk.heel) return;
-      const from = t.length > 1 ? t[t.length - 2] : me4, dx = Math.sign(from.X - lp.X), dy = Math.sign(from.Y - lp.Y);
+      const from = t.length > 1 ? t[t.length - 2] : me3, dx = Math.sign(from.X - lp.X), dy = Math.sign(from.Y - lp.Y);
       const to = (dx || dy) && canStep(lp.X + dx, lp.Y + dy) ? { X: lp.X + dx, Y: lp.Y + dy } : { X: lp.X, Y: lp.Y };
       if (walk && walk.heel && walk.to.X === to.X && walk.to.Y === to.Y) return;
-      const path = findPath(me4, to);
+      const path = findPath(me3, to);
       if (!path || !path.length) return;
-      startWalk({ id: 0, heel: true, to, path, i: 0, last: { X: me4.X, Y: me4.Y }, stuck: Date.now(), retried: false });
+      startWalk({ id: 0, heel: true, to, path, i: 0, last: { X: me3.X, Y: me3.Y }, stuck: Date.now(), retried: false });
     } catch (e) {
       console.warn("[Farmhand Companion] reins:", e);
     }
@@ -11764,7 +11816,7 @@ nav.fhc-seg button.on{background:var(--fh-accent);color:var(--fh-ground);font-we
     try {
       const s = ctx2.panel.s;
       if (!s || !s.staff || !Array.isArray(s.herd) || !pref2("noMarkers") || !mapOn() || typeof W12.DrawText !== "function") return;
-      const R = W12.ChatRoomMapViewPerceptionRange || 6, tile = 1e3 / (R * 2 + 1), me4 = W12.Player.MapData.Pos;
+      const R = W12.ChatRoomMapViewPerceptionRange || 6, tile = 1e3 / (R * 2 + 1), me3 = W12.Player.MapData.Pos;
       for (const x of s.herd) {
         const C = (W12.ChatRoomCharacter || []).find((c) => c.MemberNumber === x.mn);
         if (!C || !C.MapData || !C.MapData.Pos || !W12.ChatRoomMapViewCharacterIsVisible(C)) continue;
@@ -11774,7 +11826,7 @@ nav.fhc-seg button.on{background:var(--fh-accent);color:var(--fh-ground);font-we
         if (x.preg) tags.push(["B", "#8fbf6a"]);
         if (x.denied) tags.push(["X", "#c9a35b"]);
         if (!tags.length) continue;
-        const sx = (C.MapData.Pos.X - me4.X + R) * tile, sy = (C.MapData.Pos.Y - me4.Y) * tile + R * tile;
+        const sx = (C.MapData.Pos.X - me3.X + R) * tile, sy = (C.MapData.Pos.Y - me3.Y) * tile + R * tile;
         if (sx < 0 || sy < 0 || sx > 1e3 || sy > 1e3) continue;
         tags.forEach(([t, col], i) => W12.DrawText(t, sx + tile * 0.2 + i * tile * 0.22, sy + tile * 0.15, col, "black"));
       }

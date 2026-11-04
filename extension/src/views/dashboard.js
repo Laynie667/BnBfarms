@@ -1,11 +1,12 @@
 /* WHAT'S IN THIS FILE (dashboard.js)
    The proprietors' Dashboard: the BC+ contract builder (every rule and setting from BC+'s own list),
-   Outfits & uniforms, Other addons.
+   Outfits & uniforms, Records, Suggestions, and 🧩 Bot parts (Nov 4: each part of the farm girl kept in its own
+   script, its version, and the mods the farm leans on). Proprietors only, as always.
 */
 // The proprietors' dashboard: write BC+ contracts rule by rule, and check the addons the farm leans on.
 // The rule picker is built from BC+'s own rule list (shared/bcplus-rules.json), so every setting gets
 // the right kind of control and only values BC+ accepts.
-import { h, card, title, muted, btn, chip } from "../dom.js";
+import { h, card, title, muted, btn, chip, rows, section } from "../dom.js";
 import { RULES, NEVER, BCPLUS_VERSION } from "../../../shared/bcplus.js";
 import { bcplusStatus, summonReady } from "../addons.js";
 import { latest } from "./staff.js";
@@ -86,14 +87,30 @@ function contracts(ctx) {
   ];
 }
 
-function addons(ctx) {
-  const b = bcplusStatus(), s = summonReady(BOT_MEMBER);
+// 🧩 BOT PARTS (Laynie, Nov 4: "I know we call them addons, but they are just parts of the bot, seperated into seperate
+// scripts for easy editing"): each part, its version, on or off. A private part only ever reaches its own people (the bot
+// leaves it out of everybody else's panel), so "only you" here means only you. Lists the parts for proprietors only (the
+// Dashboard is theirs).
+function parts(ctx) {
+  const list = ctx.s.botParts, fw = ctx.s.featsWeek || [], b = bcplusStatus(), su = summonReady(BOT_MEMBER);
   return [
-    card(title("BC+"), chip(b.text, b.has ? (b.match ? "good" : "alert") : "alert"),
-      muted("Contracts are checked against BC+ " + BCPLUS_VERSION + ". If the club's BC+ moves on, re-run the catalog tool and rebuild.")),
-    card(title("BCX summoning (you)"), s === null ? muted("BCX isn't loaded here.") : chip(s.ok ? "Ready to be summoned · the farm bot is allowed" : s.why, s.ok ? "good" : "alert"),
-      muted("On-call staff see the same check on their Staff panel.")),
-    card(title("Comin' soon"), muted("Echo's pumps and milk vendor, outfits by species and gender with high security locks, and the farm's own Listen to my voice (ECHS first).")),
+    muted("Each part is a piece of the farm girl kept in its own script for easy editin'. Tap one for its guide, or to switch it off."),
+    !Array.isArray(list) ? muted("The farm girl sends this list with your next panel update.")
+      : list.length ? rows(ctx, "parts", list.map((p) => ({ id: p.name,
+          label: (p.mine ? "🔒 " : "") + p.label, dot: !!p.errors,
+          sum: "v" + p.version + (p.on ? "" : " · off") + (p.errors ? " · " + p.errors + " errors" : ""),
+          // (a private part has no buttons: ?addons never finds it by name, for anybody, so it can't be switched off from here)
+          body: () => p.mine ? [muted("Only you can see or use this one. Nobody else's panel or ?addons ever lists it.")] : [
+            muted(p.cmds + " command" + (p.cmds === 1 ? "" : "s") + " · ?addons " + p.name + " lists them"),
+            h("div", null, btn("Its guide", () => ctx.send("addons " + p.name)),
+              btn(p.on ? "Switch it off" : "Switch it on", () => ctx.send("addons " + (p.on ? "off " : "on ") + p.name), !p.on))] })))
+      : muted("No parts are runnin' right now."),
+    section("🏅 Feats this week", fw.length ? String(fw.length) : null,
+      fw.length ? fw.map((f) => h("div", { class: "fhc-kv" }, h("span", null, f.name), h("span", { class: "fhc-muted" }, f.feat))) : muted("Nobody's earned a feat this week yet.")),
+    section("🔌 What the farm leans on", null,
+      h("div", { class: "fhc-kv" }, h("span", null, "BC+"), chip(b.text, b.has ? (b.match ? "good" : "alert") : "alert")),
+      muted("Contracts are checked against BC+ " + BCPLUS_VERSION + ". If the club's BC+ moves on, re-run the catalog tool and rebuild."),
+      h("div", { class: "fhc-kv" }, h("span", null, "BCX summoning (you)"), su === null ? muted("BCX isn't loaded here.") : chip(su.ok ? "ready · the farm bot is allowed" : su.why, su.ok ? "good" : "alert"))),
   ];
 }
 
@@ -198,9 +215,9 @@ function suggestions(ctx) {
 }
 
 export const DASHBOARD_TABS = [
-  { id: "contracts", label: "BC+ contracts", render: contracts },
-  { id: "outfits", label: "Outfits", render: outfits },
-  { id: "addons", label: "Other addons", render: addons },
-  { id: "records", label: "Records", render: records },
+  { id: "contracts", label: "📜 BC+ contracts", render: contracts },
+  { id: "outfits", label: "👗 Outfits", render: outfits },
+  { id: "records", label: "🗃 Records", render: records },
   { id: "suggestions", label: "💡 Suggestions", render: suggestions, badge: (ctx) => (ctx.s.feedback || []).filter((x) => x.status === "open").length },
+  { id: "parts", label: "🧩 Bot parts", render: parts },
 ];

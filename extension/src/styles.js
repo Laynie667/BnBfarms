@@ -89,6 +89,9 @@ nav.fhc-seg{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);m
 nav.fhc-seg button{min-height:38px;padding:0 4px;border:none;border-right:1px solid var(--fh-line);background:transparent;color:var(--fh-text);font-weight:600;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 nav.fhc-seg button:last-child{border-right:none}
 nav.fhc-seg button.on{background:var(--fh-accent);color:var(--fh-ground);font-weight:700}
+nav.fhc-seg.more{grid-auto-flow:row;grid-template-columns:repeat(4,minmax(0,1fr)) minmax(44px,auto)}
+nav.fhc-seg .fhc-seg-more{padding:0 8px;font-size:15px}
+.fhc-tabmenu{margin:6px 12px 0}
 .fhc-back{align-self:flex-start;min-height:30px;padding:0 10px;border-radius:8px;border:1px solid var(--fh-line);background:transparent;color:var(--fh-muted);font-weight:600}
 .fhc-sum{background:var(--fh-card);border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:9px}
 .fhc-sum-top{display:flex;align-items:baseline;gap:8px}
@@ -118,6 +121,7 @@ nav.fhc-seg button.on{background:var(--fh-accent);color:var(--fh-ground);font-we
 .fhc-qa .fhc-b.on{border-color:var(--fh-accent)}
 .fhc-menu{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;margin-top:6px;padding:8px;border:1px solid var(--fh-accent);border-radius:10px;background:var(--fh-card)}
 .fhc-menu .fhc-b{margin:0;text-align:left;background:transparent;border-color:var(--fh-line)}
+.fhc-menu .fhc-b.on{border-color:var(--fh-accent);color:var(--fh-accent)}
 .fhc-sec{display:flex;flex-direction:column;gap:6px;padding:0 0 12px;border-bottom:1px solid var(--fh-line)}
 .fhc-sec:last-child{border-bottom:none}
 .fhc-sh{display:flex;align-items:baseline;gap:8px;font-family:Bitter,Georgia,serif;font-weight:700;color:var(--fh-accent);font-size:15px}

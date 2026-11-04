@@ -15,6 +15,8 @@ import { memlogText } from "../memlog.js";
 import { VERSION } from "../version.js";
 import { BOT_MEMBER } from "../config.js";
 import { redrawRoom } from "../botscreen.js";
+import { voice } from "./staffdata.js";
+import { workCard } from "./staff.js";
 
 // the farm switches by what they're about (the commands and words are SWITCH_INFO's, livestock.js)
 const pick = (...ids) => ids.map((id) => SWITCH_INFO.find((x) => x[0] === id)).filter(Boolean);
@@ -158,10 +160,14 @@ export const SETTINGS_PAGES = [
   { id: "gear", label: "⛓ Gear and marks", render: gearPage },
   { id: "messages", label: "💬 Messages", render: messagesPage },
   { id: "privacy", label: "🔒 Privacy and record", render: privacyPage },
+  // staff only: on call and the ECHS card (Staff panel tabs till Nov 4). Zones stayed on the Staff panel: drawin' one
+  // needs the map in view, and the game's settings screen covers it.
+  { id: "staff", label: "🧑‍🌾 Staff tools", show: (ctx) => !!ctx.s.staff, render: (ctx) => [workCard(ctx), voice()] },
   { id: "guides", label: "📖 Guides", render: (ctx) => guidesTab(ctx, !!ctx.s.staff) },
   { id: "advanced", label: "🧰 Advanced", render: advancedPage },
   { id: "about", label: "ℹ About", render: aboutPage },
 ];
+const pagesFor = (ctx) => SETTINGS_PAGES.filter((p) => !p.show || p.show(ctx));
 
 // one page drawn safely: a page that breaks says so, and the rest still work
 const drawPage = (p, ctx) => { try { return p.render(ctx); } catch (e) { console.warn("[Farmhand Companion]", e); return card(title(p.label), muted("This page hit a snag. The others still work.")); } };
@@ -169,7 +175,7 @@ const drawPage = (p, ctx) => { try { return p.render(ctx); } catch (e) { console
 // "Find a setting": every switch on every page whose words have it, with the page it's on
 function findResults(ctx, q) {
   const out = [], want = q.trim().toLowerCase();
-  for (const p of SETTINGS_PAGES) {
+  for (const p of pagesFor(ctx)) {
     if (p.id === "guides") continue;   // (the guides have their own search)
     const box = h("div", null, drawPage(p, ctx));
     const hits = [...box.querySelectorAll(".fhc-tog")].filter((t) => t.textContent.toLowerCase().includes(want));
@@ -180,7 +186,7 @@ function findResults(ctx, q) {
 
 // the whole thing: the search box, the list of pages, and the page they're on. page/setPage: which one (kept by the caller)
 export function settingsView(ctx, page, setPage) {
-  const cur = SETTINGS_PAGES.find((p) => p.id === page) || SETTINGS_PAGES[0];
+  const pages = pagesFor(ctx), cur = pages.find((p) => p.id === page) || pages[0];
   const results = h("div", { class: "fhc-set-body" });
   const find = ctx.ui.setFind || "";
   const fill = (q) => results.replaceChildren(...[].concat(q.trim() ? findResults(ctx, q) : drawPage(cur, ctx)).flat(Infinity).filter(Boolean));
@@ -191,7 +197,7 @@ export function settingsView(ctx, page, setPage) {
   return h("div", null,
     h("div", { style: { margin: "0 0 10px" } }, input),
     h("div", { class: "fhc-set" },
-      h("nav", { class: "fhc-set-nav", "aria-label": "Settings pages" }, SETTINGS_PAGES.map((p) =>
+      h("nav", { class: "fhc-set-nav", "aria-label": "Settings pages" }, pages.map((p) =>
         h("button", { type: "button", class: p === cur && !find.trim() ? "on" : "", onclick: () => { ctx.setUi({ setFind: "" }, true); setPage(p.id); } }, p.label))),
       results));
 }

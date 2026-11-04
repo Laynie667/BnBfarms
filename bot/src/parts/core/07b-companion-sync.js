@@ -106,6 +106,8 @@
         s.outfitRules = Object.assign({}, L.outfitRules);
         // the suggestion box, newest first (the Dashboard's Suggestions tab; 10q-feedback.js)
         s.feedback = fbLedger().slice(-60).reverse().map(f => ({ id: f.id, t: f.t, name: f.name, mn: f.mn, kind: f.kind, text: f.text, why: f.why || "", status: f.status, note: f.note || "" }));
+        // the Dashboard's 🧩 Bot parts tab: each part and its version (a private one only to its own people), and the week's feats
+        part("bot parts", () => { s.botParts = addonPartsFor(mn); s.featsWeek = featsWeekFor(); });
       }
     } catch(e){ s.stateErr = (s.stateErr ? s.stateErr+" · " : "")+"panel: "+String(e && e.message || e).slice(0, 80); stateWarn(mn, "panel", e); }
     return s;

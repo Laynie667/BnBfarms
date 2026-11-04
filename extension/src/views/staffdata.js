@@ -1,29 +1,10 @@
 /* WHAT'S IN THIS FILE (staffdata.js)
-   Staff tabs built from live bot data: Herd, Tease lines, Zones (the little map), Voice, Shift.
+   Staff pieces built from live bot data: Tease lines, Zones (the little map), Voice (the ECHS card), Shift.
+   (The Herd tab is in staff.js since the Nov 4 tidy; Zones and ECHS are on ⚙ Settings › Staff tools.)
 */
-// Staff tabs that show the farm's live picture: who's here, tease lines, zones, voice lines, shifts.
 import { h, card, title, muted, btn, chip } from "../dom.js";
 
 const MAP = 40, PX = 7;   // BC maps are 40 × 40 tiles; 7 px a tile fits the panel
-
-export function herd(ctx) {
-  const f = ctx.ui.herdF || "all", list = (ctx.s.herd || []).filter((x) =>
-    f === "all" || (f === "mine" && x.mine) || (f === "milk" && x.milk !== null && x.milk >= 75) || (f === "heat" && x.heat));
-  const act = (c, x) => () => ctx.send(c + " " + x.mn);
-  return [
-    h("div", null, [["all", "On the map"], ["mine", "My herd"], ["milk", "Needs milkin'"], ["heat", "In heat"]].map(([id, l]) =>
-      h("button", { type: "button", class: "fhc-pill" + (f === id ? " on" : ""), onclick: () => ctx.setUi({ herdF: id }) }, l))),
-    list.length ? list.map((x) => card(
-      h("div", { class: "fhc-kv" }, h("b", null, x.name), h("span", { class: "fhc-muted" }, x.role + (x.where ? " · " + x.where : ""))),
-      x.milk !== null ? h("div", { class: "fhc-bar-track", style: { margin: "6px 0" } },
-        h("div", { class: "fhc-bar-fill" + (x.milk >= 75 ? " fhc-fill-alert" : ""), style: { width: Math.min(100, x.milk) + "%" } })) : null,
-      h("div", null, x.mine && chip("my herd", "acc"), x.heat && chip("in heat", "alert"), x.preg && chip("carryin'", "good"),
-        x.denied && chip("teats capped", "alert"), x.milk !== null && chip(x.milk + "% full")),
-      h("div", { style: { marginTop: "6px" } }, btn("Record", act("record", x), true), btn("Milk", act("milk", x)), btn("Drain", act("drain", x)),
-        btn("Edge", act("edge", x)), btn("Summon to me", act("summon", x)),
-        x.mine && (x.reins ? btn("🐴 Let go", act("reins off", x)) : btn("🐴 Reins", act("reins", x)))))) : muted("Nobody matches right now."),
-  ];
-}
 
 export function tease(ctx) {
   const lines = ctx.s.tease;

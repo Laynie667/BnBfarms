@@ -5,7 +5,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 | Script | File in `dist/` | Where it runs | Current |
 |---|---|---|---|
-| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.70.2** |
+| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.70.3** |
 | Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.10.1** |
 | Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.2.2** |
 | Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **1.1.1** |
@@ -13,7 +13,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 | Map tools, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.4** |
 | Dairy | `farmhand-dairy.user.js` | the bot's PC | **1.1.1** |
 | Shows | `farmhand-shows.user.js` | the bot's PC | **1.1.1** |
-| Farmhand Companion | `farmhand-companion.user.js` | each player, and the bot's own tab | **0.53.0** |
+| Farmhand Companion | `farmhand-companion.user.js` | each player, and the bot's own tab | **0.54.0** |
 | Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.4** |
 
 ## Sending a watch report
@@ -24,6 +24,21 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 ## Latest changes (newest first)
 
+- **Bot 0.70.3 + Companion 0.54.0: the Staff panel and the Dashboard tidied too (Phase 3 of the plan, second half).** Laynie, Nov 4: "tidying like that would be good across all panels". Same look as the Livestock panel: four tabs across the top, and when a panel has more, the rest are under ⋯ at the end of the strip. The 🧸 Nursery keeps its own look.
+  - **Staff:** 🗂 Office · 📝 Queue · 🐑 Herd · 📜 Contracts, then under ⋯ 🏚 Barn · ⏱ Shift · 🗺 Zones · 📒 Log (221397 only, as before) and the farm extras.
+    - The Office opens on **Look somebody up**: type a name, then Record, Milk, Drain, Inspect, Vet or Quota (or type the whole thing, like "vet Bessie", and press Enter). Safeword calls stay on top.
+    - **The Herd is one line each:** name, where, how full, 🔥 for heat, 🍼 for carryin'. Tap one for its buttons. A red dot means they need milkin'.
+    - **Your duty and pasture** moved to the top of ⏱ Shift (the old 🧑‍🌾 Me tab).
+    - **On call and the ECHS card** moved to ⚙ Settings › 🧑‍🌾 Staff tools (staff only). The guides are in ⚙ Settings › Guides.
+    - **Zones stayed on the panel** (not in Settings like the mockup had it): drawin' a zone means clickin' the map, and the game's settings screen covers the map.
+  - **Dashboard (proprietors only, same as now):** 📜 BC+ contracts · 👗 Outfits · 🗃 Records · 💡 Suggestions, and 🧩 **Bot parts** under ⋯ (it was "Other addons").
+    - **Bot parts lists every part of the farm girl** with its version, on or off, and any errors. Tap one for its guide or to switch it off.
+    - **Laynie's own part shows only on 221397's Dashboard**, with a 🔒 and no buttons. The bot leaves it out of every other panel.
+    - **🏅 Feats this week:** who earned which (the gold-star ones stay in the nursery).
+    - BC+ and BCX summoning checks are at the bottom. The old "Comin' soon" card is gone: all of it came.
+  - The Guest panel: Welcome · The farm · Rules · Inbox, with Guides under ⋯.
+  - Bot: proprietors' panels carry the bot parts and the week's feats.
+  - Tests: the Companion test follows the new Staff and Dashboard tabs; the lookout test checks the private part is listed for its owner only and that the other proprietor can't switch it off by name. A shaky check in oct26b (a line about Moo arrivin' late, during Rex's turn) now only looks at lines about Rex.
 - **Bot 0.70.2 + Companion 0.53.0: the tidy Livestock panel and the settings pages (Phase 3 of the plan, first half).** Laynie, Nov 4, on the mockups: "thats so much cleaner, and i like the aesthetic of the livestock panels", and "tidying like that would be good across all panels". Nothing was taken away: it moved, or it folds into a row you tap.
   - **Four tabs that fit the width:** 🐄 Me · 🥛 Body · 🪤 Play · 🎀 Ribbons (it was ten).
   - **🐄 Me is one card and some rows.** The card has your name and ribbons, a line with your kind, your herd and how long your contract has left, chips for what's on you right now, and small meters: milk, quota, seed, holding, and barn life's food, water and grooming. Under it, one line each for the inbox (a red dot when there's somethin' new), what's got you, carryin', body, today's marks, kept, roam, your next feat and the farm extras. Tap one and it opens right there; tap it again and it folds. Only what's happenin' shows: no kept, no kept row.

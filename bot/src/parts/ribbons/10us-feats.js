@@ -74,6 +74,19 @@
     }
     return got;
   }
+  // the Dashboard's "feats this week" (Nov 4): who earned which, newest first, read off the ribbon log (every feat pays
+  // its tier in ribbons). The gold-star ones stay in the nursery.
+  function featsWeekFor(){
+    const since = Date.now() - 7 * 86400000, out = [];
+    for (const e of (L.ribbonLog || []).slice().reverse()){
+      if (!(e.at >= since)) continue;
+      const m = /^the (.+) (I|II|III|IV|V) feat$/.exec(e.why || ""), F = m && FEATS.find(f => f.name === m[1]);
+      if (!F || F.nursery) continue;
+      out.push({ name: plainName(e.mn), feat: F.icon + " " + F.name + " " + m[2] });
+      if (out.length >= 12) break;
+    }
+    return out;
+  }
   const bestOf = (got) => { const m = new Map(); for (const g of got) if (!m.has(g.F.key) || m.get(g.F.key).t < g.t) m.set(g.F.key, g); return [...m.values()]; };
   function featsTick(){
     const now = Date.now(); if (now - (state.featsAt || 0) < 120000) return; state.featsAt = now;

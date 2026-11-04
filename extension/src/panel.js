@@ -25,7 +25,7 @@ const VIEWS = {
   livestock: { label: "Livestock", tabs: LIVESTOCK_TABS, extrasInside: true },   // (its add-on cards are a row on the Me tab)
   staff: { label: "Staff", tabs: STAFF_TABS },
   dashboard: { label: "Dashboard", tabs: DASHBOARD_TABS },
-  nursery: { label: "🧸 Nursery", tabs: NURSERY_TABS },   // only for people on the nursery list (views/nursery.js)
+  nursery: { label: "🧸 Nursery", tabs: NURSERY_TABS, keepRow: true },   // only for people on the nursery list (views/nursery.js); its own look
 };
 
 function loadPrefs() { try { return JSON.parse(window.localStorage.getItem(PREFS_KEY)) || {}; } catch (e) { return {}; } }
@@ -242,11 +242,18 @@ export class Panel {
     const nav0 = this.el.querySelector("nav.fhc-tabs"), navKeep = nav0 ? nav0.scrollLeft : 0;
     this.el.classList.toggle("compact", !!this.prefs.compact);
     const full = !!this.prefs.full;
-    // the tidy look (Nov 4): a few tabs fit the width as one strip; more than five keep the row that scrolls sideways
-    const onRow = tabs.filter((t) => !t.offRow), seg = onRow.length <= 5;
-    const tabBtn = (t) => { const n = t.badge ? t.badge(ctx) : 0;
+    // the tidy look (Nov 4): the tabs fit the width as one strip, four at most; more than that, the rest are under ⋯ at
+    // its end. (The 🧸 Nursery keeps its own row: "the nursery still plugs in like it does now".)
+    const onRow = tabs.filter((t) => !t.offRow), seg = !VIEWS[view].keepRow;
+    const front = seg && onRow.length > 4 ? onRow.slice(0, 4) : onRow, rest = onRow.filter((t) => !front.includes(t));
+    const badge = (t) => (t.badge ? t.badge(ctx) : 0);
+    const tabBtn = (t) => { const n = badge(t);
       return h("button", { type: "button", class: seg ? (t === tab ? "on" : "") : "fhc-pill" + (t === tab ? " on" : ""), "aria-current": t === tab ? "page" : null,
-        onclick: () => { this.ui[tabKey] = t.id; this.render(); } }, t.label + (n ? " · " + n : "")); };
+        onclick: () => { this.ui[tabKey] = t.id; this.ui.tabsMore = false; this.render(); } }, t.label + (n ? " · " + n : "")); };
+    const inRest = rest.includes(tab), moreOpen = !!this.ui.tabsMore;
+    const moreBtn = rest.length ? h("button", { type: "button", class: "fhc-seg-more" + (inRest ? " on" : ""), "aria-label": "More tabs", "aria-expanded": moreOpen ? "true" : "false",
+      title: rest.map((t) => t.label).join(" · "), onclick: () => { this.ui.tabsMore = !moreOpen; this.render(); } },
+      (inRest ? String(tab.label).split(" ")[0] + " " : "") + "⋯", rest.some((t) => badge(t)) && !inRest ? h("span", { class: "fhc-dot" }) : null) : null;
     const ib = (label, icon, fn, cls) => h("button", { type: "button", class: "fhc-ib" + (cls ? " " + cls : ""), title: label, "aria-label": label, onclick: fn }, icon);
     // (filtered: replaceChildren writes a false as the word "false", which showed under the header for anybody with only
     // one panel, ever since v0.2.0)
@@ -261,8 +268,10 @@ export class Panel {
       this.views().length > 1 && h("div", { class: "fhc-row" }, h("span", { class: "fhc-grow fhc-muted" }, "Panel"),
         this.views().map((v) => h("button", { type: "button", class: "fhc-pill" + (v === view ? " on" : ""), onclick: () => { this.prefs.view = v; savePrefs(this.prefs); this.render(); } }, VIEWS[v].label))),
       // Safe word, I'm stuck and Call staff live in the Safety tab (Guest and Livestock panels; staff reach it from Livestock)
-      seg ? h("nav", { class: "fhc-seg", "aria-label": "Panel sections" }, onRow.map(tabBtn))
+      seg ? h("nav", { class: "fhc-seg" + (rest.length ? " more" : ""), "aria-label": "Panel sections" }, front.map(tabBtn), moreBtn)
           : h("nav", { class: "fhc-row fhc-tabs", "aria-label": "Panel sections" }, tabs.filter((t) => !t.offRow || t === tab).map(tabBtn)),
+      seg && rest.length && moreOpen ? h("div", { class: "fhc-menu fhc-tabmenu", role: "menu", "aria-label": "More tabs" }, rest.map((t) => { const n = badge(t);
+        return h("button", { type: "button", role: "menuitem", class: "fhc-b" + (t === tab ? " on" : ""), onclick: () => { this.ui[tabKey] = t.id; this.ui.tabsMore = false; this.render(); } }, t.label + (n ? " · " + n : "")); }) ) : null,
       h("div", { class: "fhc-body" },
         // a tab off the strip (Safety, Settings, the Inbox on some panels) has a way back
         seg && tab.offRow ? h("button", { type: "button", class: "fhc-back", onclick: () => { this.ui[tabKey] = onRow[0].id; this.render(); } }, "‹ Back to " + onRow[0].label) : null,

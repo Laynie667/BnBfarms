@@ -67,7 +67,7 @@ function render(ctx, view) {
 // adds the tab (just before Guides) only when an add-on has somethin' to show here
 export function withExtras(tabs, view, ctx) {
   if (!modsFor(ctx, view).length) return tabs;
-  const t = { id: "extras", label: "Farm extras", render: (c) => render(c, view) };
+  const t = { id: "extras", label: "🧩 Farm extras", render: (c) => render(c, view) };
   const at = tabs.findIndex((x) => x.id === "guides");
   return at < 0 ? tabs.concat(t) : tabs.slice(0, at).concat(t, tabs.slice(at));
 }

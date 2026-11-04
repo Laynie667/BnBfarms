@@ -74,6 +74,12 @@ const say=async(mn,msg,ms)=>{ handlers.ChatRoomMessage({Sender:mn,Type:'Whisper'
   ok(!JSON.stringify(W.__stateFor(221397).addonCmds||[]).includes('secret'), 'its commands aren\'t listed in anybody\'s guides');
   n=sent.length; await say(500,'?secre');
   ok(!/secret/.test(to(500,n)), 'nobody else is told "did you mean ?secret"');
+  // Nov 4: the Dashboard's Bot parts tab lists it for its owner only, and nobody can switch it off by name (it's never found)
+  chars.push(at(232922,12,10));
+  const parts=(mn)=>(W.__stateFor(mn).botParts||[]).map(p=>p.name+(p.mine?'*':''));
+  ok(parts(221397).includes('private-test*') && !parts(232922).some(p=>/private-test/.test(p)), 'Bot parts: the private part shows for its owner, marked hers, and not for the other proprietor');
+  n=sent.length; await say(232922,'?addons off private-test');
+  ok(/no add-on called/.test(to(232922,n)) && !(L().addonsOff||{})['private-test'], '...and the other proprietor can\'t switch it off by name');
   const errs=warns.filter(w=>/add-on|lookout|bench/.test(w)); ok(!errs.length, 'no errors logged '+errs.join(' | '));
   out(fails ? fails+' FAILED' : 'ALL PASSED'); process.exit(fails?1:0);
 })();

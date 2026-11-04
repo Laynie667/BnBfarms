@@ -1,14 +1,14 @@
 /* WHAT'S IN THIS FILE (staff.js)
-   The Staff panel: Me (duty and pasture), Office (lookups and safeword cards), Contracts, Barn,
-   Guides, Toggles (on call and the summon check).
+   The Staff panel, tidied Nov 4 like the Livestock one (Laynie: "tidying like that would be good across all panels"):
+   🗂 Office (safeword calls, look somebody up, what you looked up) · 📝 Queue · 🐑 Herd · 📜 Contracts, and under ⋯:
+   🏚 Barn · ⏱ Shift (your duty and pasture too) · 🗺 Zones · 📒 Log (whoever may read it). On call and the ECHS card
+   went to ⚙ Settings › Staff tools (settingspages.js), the guides to ⚙ Settings › Guides.
 */
-// The staff panel: duty, the Office (lookups about other people land here), contracts, the barn, guides, switches.
-import { h, card, title, muted, btn, chip, toggle } from "../dom.js";
-import { guidesTab } from "./common.js";
-import { panelPrefsOrLink, drawnBodyCard, seasonsCard } from "./livestock.js";
+import { h, card, title, muted, btn, chip, toggle, rows } from "../dom.js";
+import { seasonsCard } from "./livestock.js";
 import { DURATIONS } from "../../../shared/bcplus.js";
 import { summonReady } from "../addons.js";
-import { herd, zones, voice, shift } from "./staffdata.js";
+import { shift, zones } from "./staffdata.js";
 import { logTab } from "./log.js";
 import { BOT_MEMBER } from "../config.js";
 
@@ -22,21 +22,43 @@ const input = (ph, key, ctx) => h("input", { class: "fhc-in", placeholder: ph, v
 const select = (key, opts, ctx) => h("select", { class: "fhc-sel", onchange: (e) => ctx.setUi({ [key]: e.target.value }, true) },
   opts.map(([v, l]) => h("option", { value: v, selected: (ctx.ui[key] || opts[0][0]) === v ? "selected" : null }, l)));
 
-function me(ctx) {
+// you on the job: your roles and keys, on duty or out to pasture (the top of the Shift tab)
+function duty(ctx) {
   const s = ctx.s;
+  return h("div", { class: "fhc-sum" },
+    h("div", { class: "fhc-sum-top" }, h("span", { class: "fhc-nm" }, s.name), h("span", { class: "fhc-purse" }, s.onDuty ? "● on duty" : "out to pasture")),
+    h("div", { class: "fhc-chips" }, (s.roles || []).map((r) => chip(r.toLowerCase())), (s.keys || []).map((k) => chip(k + " key")),
+      s.onCall && chip("on call", "alert"), s.herdLeader && chip("herd: " + s.herdLeader)),
+    h("div", { class: "fhc-kv", style: { border: "none", padding: "0" } }, muted(s.onDuty ? "Silver and gold keys out." : "Bronze key only. Your Livestock panel is yours."),
+      s.pastureLock ? chip("kept out by " + s.pastureLock, "alert")
+        : btn(s.onDuty ? "Go to pasture" : "Back on duty", () => ctx.send(s.onDuty ? "pasture" : "onduty"), !s.onDuty)),
+    muted("Pasture puts your silver and gold keys away, makes you livestock for the visit, and takes you off call (mandated staff stay summonable). It doesn't lock you out. Only a ?turnout from your herd leader does that."));
+}
+function shiftTab(ctx) {
+  return [duty(ctx), shift(ctx), h("div", null, ["record", "myherd", "keys"].map((c) => btn(c === "myherd" ? "My herd" : c[0].toUpperCase() + c.slice(1), () => ctx.send(c)))), latest(ctx)];
+}
+// 🐑 who's here: one line each (milk, heat, carryin'), opens to their buttons
+function herd(ctx) {
+  const f = ctx.ui.herdF || "all", list = (ctx.s.herd || []).filter((x) =>
+    f === "all" || (f === "mine" && x.mine) || (f === "milk" && x.milk !== null && x.milk >= 75) || (f === "heat" && x.heat));
+  const act = (c, x) => () => ctx.send(c + " " + x.mn);
   return [
-    card(h("div", { class: "fhc-title" }, s.name),
-      h("div", { style: { marginTop: "6px" } }, (s.roles || []).map((r) => chip(r.toLowerCase(), "acc")), (s.keys || []).map((k) => chip(k + " key")),
-        s.onCall && chip("on call", "alert"), s.herdLeader && chip("herd: " + s.herdLeader))),
-    card(h("div", { class: "fhc-kv" }, h("div", null, title("Duty"), muted(s.onDuty ? "On duty · silver and gold keys out" : "Out to pasture · bronze key only · your Livestock panel is yours")),
-        s.pastureLock ? chip("kept out by " + s.pastureLock, "alert")
-          : btn(s.onDuty ? "Go to pasture" : "Back on duty", () => ctx.send(s.onDuty ? "pasture" : "onduty"), !s.onDuty)),
-      muted("Pasture puts your silver and gold keys away, makes you livestock for the visit, and takes you off call (mandated staff stay summonable). It doesn't lock you out. Only a ?turnout from your herd leader does that.")),
-    h("div", null, ["record", "hours", "myherd", "keys", "chores"].map((c) => btn(c[0].toUpperCase() + c.slice(1), () => ctx.send(c)))),
-    latest(ctx),
+    h("div", null, [["all", "On the map"], ["mine", "My herd"], ["milk", "Needs milkin'"], ["heat", "In heat"]].map(([id, l]) =>
+      h("button", { type: "button", class: "fhc-pill" + (f === id ? " on" : ""), onclick: () => ctx.setUi({ herdF: id }) }, l))),
+    list.length ? rows(ctx, "herd", list.map((x) => ({ id: "h" + x.mn,
+      label: (x.mine ? "★ " : "") + x.name, dot: x.milk !== null && x.milk >= 75,
+      sum: [x.role, x.where, x.milk !== null ? x.milk + "%" : null, x.heat ? "🔥" : null, x.preg ? "🍼" : null, x.denied ? "capped" : null].filter(Boolean).join(" · "),
+      body: () => [
+        x.milk !== null ? h("div", { class: "fhc-bar-track" }, h("div", { class: "fhc-bar-fill" + (x.milk >= 75 ? " fhc-fill-alert" : ""), style: { width: Math.min(100, x.milk) + "%" } })) : null,
+        h("div", { class: "fhc-chips" }, x.mine && chip("my herd", "acc"), x.heat && chip("in heat", "alert"), x.preg && chip("carryin'", "good"),
+          x.denied && chip("teats capped", "alert"), x.milk !== null && chip(x.milk + "% full")),
+        h("div", null, btn("Record", act("record", x), true), btn("Milk", act("milk", x)), btn("Drain", act("drain", x)),
+          btn("Edge", act("edge", x)), btn("Summon to me", act("summon", x)),
+          x.mine && (x.reins ? btn("🐴 Let go", act("reins off", x)) : btn("🐴 Reins", act("reins", x))))] }))) : muted("Nobody matches right now."),
   ];
 }
 
+const LOOKUPS = ["record", "milk", "drain", "inspect", "vet", "quota", "stats", "keys", "size", "pedigree"];
 // safeword calls sit at the top of the Office till someone says they're handled
 function safeCards(ctx) {
   const recent = ctx.feed.filter((x) => x.kind === "notice" && /SAFEWORD/.test(x.text) && Date.now() - x.at < 60 * 60000 && !ctx.ui["done" + x.at]);
@@ -49,11 +71,18 @@ function safeCards(ctx) {
 function office(ctx) {
   const docs = ctx.docs.slice().reverse();
   const sel = docs.find((d) => d.id === ctx.ui.doc) || docs[0];
+  // look somebody up: a name (then a button), or the whole thing typed ("vet Bessie") and Enter
+  const who = () => String(ctx.ui.look || "").trim();
+  const look = (c) => () => (who() ? ctx.send(c + " " + who()) : ctx.hint("Type who first, in the Look somebody up box."));
+  const typed = () => { const v = who(); if (!v) return; ctx.send(LOOKUPS.includes(v.split(/\s+/)[0].toLowerCase()) && /\s/.test(v) ? v : "record " + v); ctx.setUi({ look: "" }); };
   return [
     safeCards(ctx),
-    muted("Anything you look up about somebody else lands here, not in the chat: record, stats, vet, quota, keys, size, pedigree."),
-    h("div", null, h("input", { class: "fhc-in", placeholder: "Look somebody up: vet Bessie", value: ctx.ui.look || "", oninput: (e) => ctx.setUi({ look: e.target.value }, true),
-      onkeydown: (e) => { if (e.key === "Enter" && ctx.ui.look) { ctx.send(ctx.ui.look); ctx.setUi({ look: "" }); } } })),
+    h("div", { class: "fhc-sec" },
+      h("div", { class: "fhc-sh" }, "Look somebody up"),
+      h("input", { class: "fhc-in", placeholder: "Bessie, or a member number", "aria-label": "Look somebody up", value: ctx.ui.look || "", oninput: (e) => ctx.setUi({ look: e.target.value }, true),
+        onkeydown: (e) => { if (e.key === "Enter") typed(); } }),
+      h("div", null, LOOKUPS.slice(0, 6).map((c) => btn(c[0].toUpperCase() + c.slice(1), look(c), c === "record"))),
+      muted("What you look up lands here, not in the chat. Stats, keys, size and pedigree work too: type ?stats Bessie in the box at the bottom.")),
     docs.length ? h("div", { class: "fhc-split" },
       h("div", { class: "fhc-docs" }, docs.map((d) => h("button", { type: "button", class: "fhc-doc" + (sel && d.id === sel.id ? " on" : ""), onclick: () => ctx.setUi({ doc: d.id }) },
         h("b", null, d.who), h("div", { class: "fhc-muted" }, d.kind + " · " + new Date(d.at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }))))),
@@ -158,30 +187,22 @@ function summonCheck() {
   if (r === null) return muted("BCX isn't loaded here. If you use BC+'s Ready to be summoned instead, add the farm bot (" + BOT_MEMBER + ") to it.");
   return h("div", { class: "fhc-kv" }, h("span", null, "Summon rule"), chip(r.ok ? "ready" : r.why, r.ok ? "good" : "alert"));
 }
-function toggles(ctx) {
+// ⚙ Settings › Staff tools: on call (settingspages.js)
+export function workCard(ctx) {
   const s = ctx.s, sw = s.switches || {};
-  return [
-    drawnBodyCard(ctx),
-    card(title("Work"), muted("Most staff leave this off. Mandated farmhands are always on call."),
-      s.mandated ? h("div", { class: "fhc-kv" }, h("span", null, "On call"), chip("always (mandated)", "alert"))
-        : toggle("On call", "Let the office summon you from anywhere with BCX or BC+ summoning", !!sw.forced, () => ctx.send("forced")),
-      s.onCall && summonCheck()),
-    muted("Your own milkin' and breedin' switches are on your Livestock panel."),
-    panelPrefsOrLink(ctx),
-  ];
+  return card(title("⏱ On call"), muted("Most staff leave this off. Mandated farmhands are always on call."),
+    s.mandated ? h("div", { class: "fhc-kv" }, h("span", null, "On call"), chip("always (mandated)", "alert"))
+      : toggle("On call", "Let the office summon you from anywhere with BCX or BC+ summoning", !!sw.forced, () => ctx.send("forced")),
+    s.onCall && summonCheck());
 }
 
 export const STAFF_TABS = [
-  { id: "me", label: "🧑‍🌾 Me", render: me },
-  { id: "shift", label: "⏱️ Shift", render: shift },
-  { id: "herd", label: "🐑 Herd", render: herd },
+  { id: "office", label: "🗂 Office", render: office, badge: (ctx) => ctx.docs.length },
   { id: "queue", label: "📝 Queue", render: queue, badge: (ctx) => (ctx.s.apps || []).length },
-  { id: "office", label: "🗂️ Office", render: office, badge: (ctx) => ctx.docs.length },
+  { id: "herd", label: "🐑 Herd", render: herd },
   { id: "contracts", label: "📜 Contracts", render: contracts },
-  { id: "barn", label: "🏚️ Barn", render: barn },
-  { id: "zones", label: "🗺️ Zones", render: zones },
-  { id: "voice", label: "🔊 ECHS", render: voice },
-  { id: "toggles", label: "⚙️ Toggles", render: toggles },
-  { id: "guides", label: "📖 Guides", render: (ctx) => guidesTab(ctx, true) },
-  { id: "log", label: "📒 Log", render: logTab, show: (ctx) => !!ctx.s.logReader },   // the record (chatlog.js), for whoever may read it
+  { id: "barn", label: "🏚 Barn", render: barn },
+  { id: "shift", label: "⏱ Shift", render: shiftTab },
+  { id: "zones", label: "🗺 Zones", render: zones },   // (on the panel, not in ⚙: drawin' a zone needs the map in view)
+  { id: "log", label: "📒 Log", render: logTab, show: (ctx) => !!ctx.s.logReader },   // the record (chatlog.js), for whoever may read it (221397)
 ];

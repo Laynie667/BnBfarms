@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Companion
 // @namespace    bnbfarm
-// @version      0.52.0
+// @version      0.53.0
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-companion.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -230,7 +230,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
 
   // extension/src/version.js
-  var VERSION = "0.52.0";
+  var VERSION = "0.53.0";
 
   // shared/species.js
   var WORDS = {
@@ -459,6 +459,58 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
 .fhc-doc{text-align:left;min-height:40px;padding:5px 8px;border-radius:8px;border:1px solid var(--fh-line);background:transparent;color:var(--fh-text)}
 .fhc-doc.on{border-color:var(--fh-accent);background:var(--fh-card)}
 .fhc-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+/* the tidy panel (Nov 4): quiet header icons, tabs that fit the width, one card, rows that open where they sit */
+.fhc-ib{width:34px;height:34px;min-height:34px;padding:0;border-radius:8px;border:1px solid transparent;background:transparent;color:var(--fh-muted);font-size:15px;flex-shrink:0}
+.fhc-ib:hover{background:var(--fh-card)}
+.fhc-ib.sos{border-color:var(--fh-alert);color:var(--fh-text)}
+nav.fhc-seg{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);margin:8px 12px 2px;border:1px solid var(--fh-line);border-radius:10px;overflow:hidden;padding:0}
+nav.fhc-seg button{min-height:38px;padding:0 4px;border:none;border-right:1px solid var(--fh-line);background:transparent;color:var(--fh-text);font-weight:600;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+nav.fhc-seg button:last-child{border-right:none}
+nav.fhc-seg button.on{background:var(--fh-accent);color:var(--fh-ground);font-weight:700}
+.fhc-back{align-self:flex-start;min-height:30px;padding:0 10px;border-radius:8px;border:1px solid var(--fh-line);background:transparent;color:var(--fh-muted);font-weight:600}
+.fhc-sum{background:var(--fh-card);border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:9px}
+.fhc-sum-top{display:flex;align-items:baseline;gap:8px}
+.fhc-nm{font-family:Bitter,Georgia,serif;font-weight:700;font-size:17px;flex:1;min-width:0;overflow-wrap:anywhere}
+.fhc-purse{font-weight:700;color:var(--fh-accent);white-space:nowrap}
+.fhc-sum .fhc-chip{margin:0;background:var(--fh-well);border-color:transparent}
+.fhc-sum .fhc-chip-alert{box-shadow:inset 0 0 0 1px var(--fh-alert)}
+.fhc-chips{display:flex;flex-wrap:wrap;gap:5px}
+.fhc-meters{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px 12px}
+.fhc-m-l{display:flex;justify-content:space-between;gap:4px;font-size:12px;color:var(--fh-muted)}
+.fhc-m-v{font-weight:600;font-size:13px;margin:1px 0 4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fhc-m-t{height:5px;border-radius:3px;background:var(--fh-line);overflow:hidden}
+.fhc-m-t>div{height:100%;background:var(--fh-accent)}
+.fhc-m-t>div.fhc-fill-good{background:var(--fh-good)}.fhc-m-t>div.fhc-fill-alert{background:var(--fh-alert)}
+.fhc-rows{border-top:1px solid var(--fh-line);display:flex;flex-direction:column}
+.fhc-r{display:flex;align-items:center;gap:10px;width:100%;min-height:42px;padding:0 4px;border:none;border-bottom:1px solid var(--fh-line);background:transparent;color:var(--fh-text);text-align:left}
+.fhc-r-k{flex:1;font-weight:600;min-width:0}
+.fhc-r-s{color:var(--fh-muted);font-size:13px;text-align:right;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:62%}
+.fhc-r-c{color:var(--fh-line);font-size:16px;width:12px;text-align:center}
+.fhc-r.open{background:var(--fh-card);border-radius:10px 10px 0 0;border-bottom:none;padding:0 10px}
+.fhc-r.open .fhc-r-c{color:var(--fh-accent)}
+.fhc-open{background:var(--fh-card);border-radius:0 0 10px 10px;padding:4px 10px 10px;margin-bottom:6px;display:flex;flex-direction:column;gap:6px}
+.fhc-open .fhc-box{background:var(--fh-ground)}
+.fhc-dot{display:inline-block;width:8px;height:8px;border-radius:4px;background:var(--fh-alert);margin-left:6px;vertical-align:middle}
+.fhc-qa{display:flex;gap:6px}
+.fhc-qa .fhc-b{flex:1;margin:0;padding:0 6px;background:var(--fh-card);border-color:var(--fh-line);white-space:nowrap}
+.fhc-qa .fhc-b.on{border-color:var(--fh-accent)}
+.fhc-menu{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;margin-top:6px;padding:8px;border:1px solid var(--fh-accent);border-radius:10px;background:var(--fh-card)}
+.fhc-menu .fhc-b{margin:0;text-align:left;background:transparent;border-color:var(--fh-line)}
+.fhc-sec{display:flex;flex-direction:column;gap:6px;padding:0 0 12px;border-bottom:1px solid var(--fh-line)}
+.fhc-sec:last-child{border-bottom:none}
+.fhc-sh{display:flex;align-items:baseline;gap:8px;font-family:Bitter,Georgia,serif;font-weight:700;color:var(--fh-accent);font-size:15px}
+.fhc-sh-x{font:400 12px "Source Sans 3","Segoe UI",sans-serif;color:var(--fh-muted)}
+.fhc-pairs{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;font-size:13px}
+.fhc-pairs>:nth-child(even){text-align:right}
+.fhc-steps{display:flex;gap:4px}.fhc-steps>div{flex:1;height:7px;border-radius:3px;background:var(--fh-line)}.fhc-steps>div.on{background:var(--fh-accent)}
+/* the settings pages (the game's Extensions page, or the panel's \u2699 where the game has no such page) */
+.fhc-set{display:flex;gap:16px;align-items:flex-start}
+.fhc-set-nav{width:190px;flex-shrink:0;display:flex;flex-direction:column;gap:2px}
+.fhc-set-nav button{text-align:left;min-height:36px;padding:0 10px;border-radius:8px;border:none;background:transparent;color:var(--fh-text);font-weight:600}
+.fhc-set-nav button.on{background:var(--fh-card);color:var(--fh-accent)}
+.fhc-set-body{flex:1;min-width:0;display:flex;flex-direction:column;gap:12px}
+@media (max-width:700px){.fhc-set{flex-direction:column}.fhc-set-nav{width:auto;flex-direction:row;flex-wrap:wrap}.fhc-set-nav button{min-height:32px;border:1px solid var(--fh-line);border-radius:999px}}
+#fhc-panel .fhc-set{flex-direction:column}#fhc-panel .fhc-set-nav{width:auto;flex-direction:row;flex-wrap:wrap}#fhc-panel .fhc-set-nav button{min-height:32px;border:1px solid var(--fh-line);border-radius:999px}
 `;
 
   // extension/src/dom.js
@@ -551,6 +603,68 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     );
   }
   var ml = (n) => n >= 1e3 ? (n / 1e3).toFixed(1) + " L" : Math.round(n) + " mL";
+  var meters = (list) => {
+    const ms = list.filter(Boolean);
+    return ms.length ? h("div", { class: "fhc-meters" }, ms.map((m) => h(
+      "div",
+      { class: "fhc-m" },
+      h("div", { class: "fhc-m-l" }, h("span", null, m.label), m.right ? h("span", null, m.right) : null),
+      h("div", { class: "fhc-m-v" }, m.value),
+      h("div", { class: "fhc-m-t" }, h("div", { class: m.kind ? "fhc-fill-" + m.kind : "", style: { width: Math.max(0, Math.min(100, m.pct || 0)) + "%" } }))
+    ))) : null;
+  };
+  function rows(ctx3, key, list) {
+    const items = list.filter(Boolean), openId = ctx3.ui["open_" + key];
+    if (!items.length) return null;
+    return h("div", { class: "fhc-rows" }, items.map((r) => {
+      const open2 = r.id === openId && r.body;
+      const head = h(
+        "button",
+        {
+          type: "button",
+          class: "fhc-r" + (open2 ? " open" : ""),
+          "aria-expanded": r.body ? open2 ? "true" : "false" : null,
+          onclick: () => r.go ? r.go() : ctx3.setUi({ ["open_" + key]: open2 ? null : r.id })
+        },
+        h("span", { class: "fhc-r-k" }, r.label, r.dot ? h("span", { class: "fhc-dot", "aria-label": "new" }) : null),
+        r.sum ? h("span", { class: "fhc-r-s" }, r.sum) : null,
+        h("span", { class: "fhc-r-c", "aria-hidden": "true" }, open2 ? "\u2304" : "\u203A")
+      );
+      return open2 ? [head, h("div", { class: "fhc-open" }, r.body())] : head;
+    }));
+  }
+  function quick(ctx3, key, list, more) {
+    const isOpen = !!ctx3.ui["more_" + key];
+    return h(
+      "div",
+      null,
+      h(
+        "div",
+        { class: "fhc-qa" },
+        list.filter(Boolean).map(([label, fn]) => h("button", { type: "button", class: "fhc-b", onclick: fn }, label)),
+        more && more.length ? h("button", {
+          type: "button",
+          class: "fhc-b" + (isOpen ? " on" : ""),
+          "aria-expanded": isOpen ? "true" : "false",
+          onclick: () => ctx3.setUi({ ["more_" + key]: !isOpen })
+        }, isOpen ? "More \u25B4" : "More \u25BE") : null
+      ),
+      isOpen ? h("div", { class: "fhc-menu", role: "menu", "aria-label": "More" }, more.filter(Boolean).map(([label, fn]) => h("button", { type: "button", role: "menuitem", class: "fhc-b", onclick: () => {
+        ctx3.setUi({ ["more_" + key]: false }, true);
+        fn();
+      } }, label))) : null
+    );
+  }
+  var section = (head, right, ...kids) => h(
+    "div",
+    { class: "fhc-sec" },
+    h("div", { class: "fhc-sh" }, head, right ? h("span", { class: "fhc-sh-x" }, right) : null),
+    ...kids
+  );
+  var pairs = (list) => {
+    const ps = list.filter((p) => p && p[1] !== void 0 && p[1] !== null && p[1] !== "" && p[1] !== false);
+    return ps.length ? h("div", { class: "fhc-pairs" }, ps.map(([k, v]) => [h("span", { class: "fhc-muted" }, k), h("span", null, v)])) : null;
+  };
 
   // shared/guides.js
   var BOOKS = [["Rules", "rules"], ["Consent", "consent"], ["Tour", "tour"], ["Doors", "doors"], ["Species", "species"], ["Help", "help"]];
@@ -670,33 +784,25 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
   // extension/src/views/store.js
   var minsLeft = (t) => Math.max(0, Math.ceil((t - Date.now()) / 6e4));
   var KIND = { reward: "\u{1F36C}", punish: "\u{1F53B}", silly: "\u{1F3AD}" };
-  function storeTab(ctx3) {
+  function storeParts(ctx3) {
     const s = ctx3.s, items = s.store || [], fx = s.fx || [], log2 = s.ribbonLog || [];
-    const purse = card(
-      title("\u{1F380} Your ribbons"),
-      h("div", { style: { fontSize: "28px", fontWeight: "700", margin: "4px 0" } }, String(s.ribbons || 0)),
-      s.quotaGrace ? chip("quota grace \xD7 " + s.quotaGrace, "good") : null,
-      log2.length ? h("div", { style: { marginTop: "6px" } }, log2.map((e) => h("div", { class: "fhc-kv" }, h("span", null, e.why), h("b", null, (e.n > 0 ? "+" : "") + e.n)))) : null,
-      muted("Earn 'em: your milk quota, a full stall session, chores, glory shifts, dares, shows, best of the week, and staff who think you've been good."),
-      h("div", { style: { marginTop: "6px" } }, btn("This week's board", () => ctx3.send("ribbons top")))
-    );
-    const vat = s.vat ? card(
-      title("\u{1F95B} Your vat"),
-      h("div", { style: { fontSize: "20px", fontWeight: "700", margin: "4px 0" } }, s.vat >= 1e3 ? (s.vat / 1e3).toFixed(1) + " L" : s.vat + " ml"),
+    const vat = s.vat ? h(
+      "div",
+      null,
+      h("div", { class: "fhc-kv" }, h("span", null, "\u{1F95B} Your vat"), h("b", null, s.vat >= 1e3 ? (s.vat / 1e3).toFixed(1) + " L" : s.vat + " ml")),
       muted("Everything milked and collected from you. It buys potions and shots at " + (s.vatPer || 500) + ' ml for each ribbon of the price: "Pay with milk" on the shelf.')
     ) : null;
-    const now = fx.length ? card(
-      title("\u{1F9EA} In you right now"),
+    const logList = log2.length ? log2.map((e) => h("div", { class: "fhc-kv" }, h("span", null, e.why), h("b", null, (e.n > 0 ? "+" : "") + e.n))) : null;
+    const now = fx.length ? [
       fx.map((f) => h("div", { class: "fhc-kv" }, h("span", null, f.name), h("b", null, minsLeft(f.until) + " min"))),
       muted("Your safeword pours every one of them out.")
-    ) : null;
-    const dare = s.dare ? card(
-      title(s.dare.reckless ? "\u{1F3B2} A reckless dare" : "\u{1F3B2} Your dare"),
-      h("p", null, s.dare.text),
+    ] : null;
+    const dare = s.dare ? [
+      h("p", { style: { margin: "0" } }, s.dare.text),
       muted(minsLeft(s.dare.until) + " minutes left."),
       h("div", null, btn("I did it", () => ctx3.send("dared"), true), btn("Chicken out (1 ribbon)", () => ctx3.send("dare skip")))
-    ) : null;
-    const pen = s.penned ? card(title("\u{1F6A7} Corralled"), muted("At " + s.penned.at + " for " + minsLeft(s.penned.until) + " more minutes. Wander off and you'll be walked back.")) : null;
+    ] : null;
+    const pen = s.penned ? muted("At " + s.penned.at + " for " + minsLeft(s.penned.until) + " more minutes. Wander off and you'll be walked back.") : null;
     const who = () => String(ctx3.ui.giftWho || "").trim();
     const row = (it) => h(
       "div",
@@ -716,7 +822,6 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
         it.gift ? btn("Gift it", () => who() ? ctx3.send("buy " + it.id + " for " + who()) : ctx3.hint("Type who it's for in the box above the potions first.")) : null
       )
     );
-    const shelf = (label, list) => list.length ? card(title(label), list.map(row)) : null;
     const potions = items.filter((it) => it.kind), shots = items.filter((it) => /^shot-/.test(it.id) && it.shelf !== "shrink"), shrink = items.filter((it) => it.shelf === "shrink"), messes = items.filter((it) => it.shelf === "mess"), treats = items.filter((it) => !it.kind && !/^shot-/.test(it.id) && it.shelf !== "mess" && it.shelf !== "shrink");
     const messWho = () => String(ctx3.ui.messWho || "").trim();
     const messRow = (it) => h(
@@ -731,32 +836,13 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
         btn("On me", () => ctx3.send("buy " + it.id))
       )
     );
-    const messCard = messes.length ? card(
-      title("\u{1F4A6} Messes"),
-      muted(`Put a mess on somebody: they're asked first, unless they've said ?messes on. Their limits count. It shows on them with "Farm can mark my body" switched on, and ?wash cleans it off.`),
-      h(
-        "label",
-        { class: "fhc-label" },
-        "For (name or member number)",
-        h("input", { class: "fhc-in", value: ctx3.ui.messWho || "", oninput: (e) => ctx3.setUi({ messWho: e.target.value }, true) })
-      ),
-      h("div", { style: { marginTop: "4px" } }, btn(s.messesOn ? "Messes on me: no askin' (switch off)" : "Let anybody mess me up without askin'", () => ctx3.send("messes " + (s.messesOn ? "off" : "on")))),
-      messes.map(messRow)
-    ) : null;
-    return [
-      purse,
-      vat,
-      now,
-      dare,
-      pen,
-      messCard,
-      shelf("\u{1F6CD}\uFE0F Treats and favors", treats),
-      shelf("\u{1F489} Shots", shots),
-      shelf("\u{1F53B} Shrinkin' shots", shrink),
+    const shelves = [
+      treats.length && { id: "treats", label: "\u{1F6CD}\uFE0F Treats and favors", n: treats.length, body: () => treats.map(row) },
+      shots.length && { id: "shots", label: "\u{1F489} Shots", n: shots.length, body: () => shots.map(row) },
+      shrink.length && { id: "shrink", label: "\u{1F53B} Shrinkin' shots", n: shrink.length, body: () => shrink.map(row) },
       // a size back down, for good (Oct 27)
-      potions.length ? card(
-        title("\u{1F9EA} Potions"),
-        muted("Gifts always ask them first, and you only pay if they say yes. They need Potions switched on in their Toggles."),
+      potions.length && { id: "potions", label: "\u{1F9EA} Potions", n: potions.length, body: () => [
+        muted("Gifts always ask them first, and you only pay if they say yes. They need Potions switched on in their farm switches."),
         h(
           "label",
           { class: "fhc-label" },
@@ -764,8 +850,20 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
           h("input", { class: "fhc-in", value: ctx3.ui.giftWho || "", oninput: (e) => ctx3.setUi({ giftWho: e.target.value }, true) })
         ),
         potions.map(row)
-      ) : null
-    ];
+      ] },
+      messes.length && { id: "messes", label: "\u{1F4A6} Messes", n: messes.length, body: () => [
+        muted(`Put a mess on somebody: they're asked first, unless they've said ?messes on. Their limits count. It shows on them with "Farm can mark my body" switched on, and ?wash cleans it off.`),
+        h(
+          "label",
+          { class: "fhc-label" },
+          "For (name or member number)",
+          h("input", { class: "fhc-in", value: ctx3.ui.messWho || "", oninput: (e) => ctx3.setUi({ messWho: e.target.value }, true) })
+        ),
+        h("div", { style: { marginTop: "4px" } }, btn(s.messesOn ? "Messes on me: no askin' (switch off)" : "Let anybody mess me up without askin'", () => ctx3.send("messes " + (s.messesOn ? "off" : "on")))),
+        messes.map(messRow)
+      ] }
+    ].filter(Boolean);
+    return { vat, logList, now, dare, pen, shelves };
   }
 
   // extension/src/views/extras.js
@@ -773,15 +871,23 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     const mods = ctx3.s.mods || {};
     return Object.entries(mods).filter(([, m]) => m && typeof m === "object" && (!Array.isArray(m.views) || m.views.includes(view)) && Array.isArray(m.cards)).map(([name, m]) => [name, Object.assign({}, m, { cards: m.cards.filter((c) => c && (view === "staff" ? true : !c.staff && !c.me)) })]).filter(([, m]) => m.cards.length);
   }
-  function meCards(ctx3) {
-    const out = [];
+  function mePieces(ctx3) {
+    const bars = [], chips = [], cards = [], labels = [];
     for (const [name, m] of Object.entries(ctx3.s.mods || {})) {
       if (!m || typeof m !== "object" || !Array.isArray(m.cards)) continue;
       m.cards.forEach((c, i) => {
-        if (c && c.me && !c.staff) out.push(drawCard(ctx3, name, c, i));
+        if (!c || !c.me || c.staff) return;
+        if (Array.isArray(c.bars)) bars.push(...c.bars);
+        if (Array.isArray(c.chips)) chips.push(...c.chips);
+        cards.push(drawCard(ctx3, name, Object.assign({}, c, { bars: null, chips: null }), i));
+        labels.push(String(c.title || m.label || name));
       });
     }
-    return out;
+    for (const [name, m] of modsFor(ctx3, "livestock")) {
+      labels.push(String(m.label || name));
+      cards.push(h("div", null, h("div", { class: "fhc-muted", style: { margin: "4px 2px 2px" } }, "\u{1F9E9} " + String(m.label || name)), m.cards.map((c, i) => drawCard(ctx3, name, c, i))));
+    }
+    return { bars, chips, cards, labels: [...new Set(labels)] };
   }
   function drawCard(ctx3, name, c, i) {
     const key = "x_" + name + "_" + i;
@@ -1024,46 +1130,6 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     setInterval(() => {
       writeNow(version, false);
     }, 6e4);
-  }
-
-  // extension/src/botscreen.js
-  var W2 = window;
-  var prefs = () => ({});
-  var skipped = 0;
-  var wasRoom = false;
-  var onBot = () => !!(W2.Player && W2.Player.MemberNumber === BOT_MEMBER);
-  var screenLight = () => onBot() && !prefs().drawRoom;
-  var screenSkipped = () => skipped;
-  function redraw(list) {
-    for (const C of list) {
-      try {
-        if (C && typeof W2.CharacterLoadCanvas === "function") W2.CharacterLoadCanvas(C);
-      } catch (e) {
-      }
-    }
-  }
-  function redrawRoom() {
-    redraw([W2.Player].concat(W2.ChatRoomCharacter || []));
-  }
-  function initBotScreen(mod2, getPrefs) {
-    prefs = getPrefs;
-    try {
-      mod2.hookFunction("CommonDrawAppearanceBuild", 20, (args, next) => {
-        if (W2.CurrentScreen === "ChatRoom" && screenLight()) {
-          skipped++;
-          return void 0;
-        }
-        return next(args);
-      });
-    } catch (e) {
-      console.warn("[Farmhand Companion] light bot screen unavailable:", e);
-      return;
-    }
-    setInterval(() => {
-      const inRoom = W2.CurrentScreen === "ChatRoom";
-      if (wasRoom && !inRoom && screenLight()) redraw([W2.Player, W2.InformationSheetSelection].filter(Boolean));
-      wasRoom = inRoom;
-    }, 1e3);
   }
 
   // studio/web/breasts-drawing.js
@@ -2974,7 +3040,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
                         const ax = fx - ix, ay = fy - iy, p = (iy * CW + ix) * 4 + k;
                         return A[p] * (1 - ax) * (1 - ay) + A[p + 4] * ax * (1 - ay) + A[p + CW * 4] * (1 - ax) * ay + A[p + CW * 4 + 4] * ax * ay;
                       };
-                      const pick = (ci, cj) => {
+                      const pick2 = (ci, cj) => {
                         let hsh = ci * 73856093 ^ cj * 19349663 ^ srcs.length;
                         hsh = Math.imul(hsh ^ hsh >>> 13, 1540483477);
                         hsh ^= hsh >>> 15;
@@ -3001,7 +3067,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
                         let sr = 0, sg2 = 0, sb = 0, sw = 0, sw2 = 0;
                         for (const [di, dj, bwt] of [[0, 0, (1 - du) * (1 - dv)], [1, 0, du * (1 - dv)], [0, 1, (1 - du) * dv], [1, 1, du * dv]]) {
                           if (bwt <= 1e-3) continue;
-                          const P5 = pick(ci + di, cj + dj), cx = (ci + di + 0.5) * S4, cy = (cj + dj + 0.5) * S4, sx = P5[0] + (qx - cx), sy = P5[1] + (qy - cy);
+                          const P5 = pick2(ci + di, cj + dj), cx = (ci + di + 0.5) * S4, cy = (cj + dj + 0.5) * S4, sx = P5[0] + (qx - cx), sy = P5[1] + (qy - cy);
                           if (!cleanAt(sx, sy)) continue;
                           const p = (Math.round(sy) * CW + Math.round(sx)) * 4;
                           sr += bwt * (sp[p] - spL[p]);
@@ -3612,7 +3678,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
   })();
 
   // extension/src/belly.js
-  var W3 = window;
+  var W2 = window;
   var SKIN_TOP = 12;
   var trial = 0;
   var SIZES = [null, { rx: 50, ry: 54, sag: 0.16 }, { rx: 70, ry: 80, sag: 0.22, lift: 5 }, { rx: 92, ry: 112, sag: 0.28, lift: 20 }];
@@ -3800,7 +3866,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     let n = 0;
     try {
       for (const name of ["DrawImageCache", "GLDrawImageCache"]) {
-        const m = W3[name];
+        const m = W2[name];
         if (m && typeof m.forEach === "function" && typeof m.delete === "function") {
           const bad = [];
           m.forEach((v, k) => {
@@ -3854,7 +3920,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
       }
       skinSeen.set(key, c);
       try {
-        if (trial && W3.Player && typeof W3.CharacterLoadCanvas === "function") W3.CharacterLoadCanvas(W3.Player);
+        if (trial && W2.Player && typeof W2.CharacterLoadCanvas === "function") W2.CharacterLoadCanvas(W2.Player);
       } catch (e) {
       }
     };
@@ -3875,14 +3941,14 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
         let finish = null;
         try {
           const C = args[0], cb = args[1];
-          if (trial && !W3.__farmDrawnBody && C && W3.Player && C.MemberNumber === W3.Player.MemberNumber && cb && typeof cb.drawImage === "function") {
+          if (trial && !W2.__farmDrawnBody && C && W2.Player && C.MemberNumber === W2.Player.MemberNumber && cb && typeof cb.drawImage === "function") {
             let upper = null, lower = false, done = false;
             const gate = skinGate(C);
             const prio = (src) => {
               const m = new RegExp("(?:^|/)Assets/[^/]+/(?:Override/[^/]+/)?([^/]+)/").exec(src);
               if (!m) return 99;
               try {
-                const g = W3.AssetGroupGet && W3.AssetGroupGet(C.AssetFamily, m[1]);
+                const g = W2.AssetGroupGet && W2.AssetGroupGet(C.AssetFamily, m[1]);
                 return g && typeof g.DrawingPriority === "number" ? g.DrawingPriority : 99;
               } catch (e) {
                 return 99;
@@ -3957,7 +4023,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     if (trial) hookBelly(sdk);
     const redraw3 = () => {
       try {
-        if (W3.Player && typeof W3.CharacterLoadCanvas === "function") W3.CharacterLoadCanvas(W3.Player);
+        if (W2.Player && typeof W2.CharacterLoadCanvas === "function") W2.CharacterLoadCanvas(W2.Player);
       } catch (e) {
         console.warn("[Farmhand Companion] belly redraw:", e);
       }
@@ -3969,36 +4035,36 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
   }
 
   // extension/src/bcr.js
-  var W4 = window;
+  var W3 = window;
   var warned = false;
   var kept = /* @__PURE__ */ new Map();
   function bcrOverBreast(C, bc, bx, by) {
     try {
-      if (typeof W4.BodyMarksZonesOf !== "function" || typeof W4.BodyMarksDrawZone !== "function" || typeof W4.BodyMarksZoneBox !== "function") return null;
+      if (typeof W3.BodyMarksZonesOf !== "function" || typeof W3.BodyMarksDrawZone !== "function" || typeof W3.BodyMarksZoneBox !== "function") return null;
       const ZONES = typeof BodyMarksZones !== "undefined" ? BodyMarksZones : null;
       if (!ZONES || !ZONES.Breasts || !C || C.MemberNumber == null) return null;
-      const zones2 = W4.BodyMarksZonesOf(C), state = zones2 && zones2.Breasts;
+      const zones2 = W3.BodyMarksZonesOf(C), state = zones2 && zones2.Breasts;
       if (!state) return null;
       const measured = typeof BodyMarksMeasured !== "undefined" && BodyMarksMeasured.get ? BodyMarksMeasured.get(C.MemberNumber) : void 0;
-      const def = ZONES.Breasts, box2 = W4.BodyMarksZoneBox(C, def, measured);
+      const def = ZONES.Breasts, box2 = W3.BodyMarksZoneBox(C, def, measured);
       if (!box2 || box2.Hidden) return null;
-      const size = typeof W4.BodyMarksSizeOf === "function" ? W4.BodyMarksSizeOf(C, def) || 1 : 1;
+      const size = typeof W3.BodyMarksSizeOf === "function" ? W3.BodyMarksSizeOf(C, def) || 1 : 1;
       const key = JSON.stringify(state) + "|" + bc.width + "x" + bc.height + "|" + Math.round(bx) + "," + Math.round(by) + "|" + Math.round(box2.Top) + "|" + size;
       const was = kept.get(C.MemberNumber);
       if (was && was.key === key) return was.res;
       const H = (typeof CanvasDrawHeight !== "undefined" ? CanvasDrawHeight : 0) || C.Canvas && C.Canvas.height || 1700;
-      const raw = W4.document.createElement("canvas");
+      const raw = W3.document.createElement("canvas");
       raw.width = 500;
       raw.height = H;
       const prev = MainCanvas;
       MainCanvas = raw.getContext("2d");
       try {
-        W4.BodyMarksDrawZone(C, "Breasts", state);
+        W3.BodyMarksDrawZone(C, "Breasts", state);
       } finally {
         MainCanvas = prev;
       }
       const sx = 250 + (box2.X || 0) - 130 * size, sw = 260 * size, sy = box2.Top - box2.Height * 0.35, sh = box2.Height * 1.9;
-      const out = W4.document.createElement("canvas");
+      const out = W3.document.createElement("canvas");
       out.width = bc.width;
       out.height = bc.height;
       const g = out.getContext("2d");
@@ -4088,7 +4154,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
   };
 
   // extension/src/drawnbody.js
-  var W5 = window;
+  var W4 = window;
   var KEY = "farmhand-drawn-body";
   var SEE_KEY = "farmhand-drawn-body-see";
   var FARM_KEY = "farmhand-drawn-body-farm";
@@ -4100,17 +4166,17 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
   var hooked2 = false;
   var seeOthers = true;
   var farm = null;
-  var onBot2 = () => !!(W5.Player && W5.Player.MemberNumber === BOT_MEMBER);
+  var onBot = () => !!(W4.Player && W4.Player.MemberNumber === BOT_MEMBER);
   var mine = { S: null, E: null };
   var others = /* @__PURE__ */ new Map();
   function load() {
     try {
-      const d = JSON.parse(W5.localStorage.getItem(KEY));
+      const d = JSON.parse(W4.localStorage.getItem(KEY));
       if (d && typeof d === "object") S2 = Object.assign(DEFAULTS(), d);
     } catch (e) {
     }
     try {
-      seeOthers = W5.localStorage.getItem(SEE_KEY) !== "0";
+      seeOthers = W4.localStorage.getItem(SEE_KEY) !== "0";
     } catch (e) {
     }
     {
@@ -4118,7 +4184,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
       if (b) farm = { at: String(farm_look_default.id || "built-in"), body: b };
     }
     try {
-      W5.localStorage.removeItem(FARM_KEY);
+      W4.localStorage.removeItem(FARM_KEY);
     } catch (e) {
     }
     mine.S = S2;
@@ -4154,12 +4220,12 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     farmMe = { cup, belly };
     if (!S2.on) return;
     if (mine.E) apply(mine.E, eff());
-    redraw2(60);
+    redraw(60);
     tell(true);
   }
   function save() {
     try {
-      W5.localStorage.setItem(KEY, JSON.stringify(S2));
+      W4.localStorage.setItem(KEY, JSON.stringify(S2));
     } catch (e) {
     }
   }
@@ -4200,7 +4266,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
       made.set(cv, p);
       return null;
     }
-    const c = W5.document.createElement("canvas");
+    const c = W4.document.createElement("canvas");
     c.width = x1 - x0 + 1;
     c.height = y1 - y0 + 1;
     c.getContext("2d").drawImage(cv, -x0, -y0);
@@ -4219,17 +4285,17 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
       gone.add(src);
       n++;
       try {
-        const m = W5.GLDrawImageCache;
+        const m = W4.GLDrawImageCache;
         if (m && typeof m.delete === "function") m.delete(src);
       } catch (e) {
       }
       try {
-        const m = W5.DrawImageCache;
+        const m = W4.DrawImageCache;
         if (m && typeof m.delete === "function") m.delete(src);
       } catch (e) {
       }
       try {
-        const gl = W5.GLDrawCanvas && W5.GLDrawCanvas.GL, tc = gl && gl.textureCache;
+        const gl = W4.GLDrawCanvas && W4.GLDrawCanvas.GL, tc = gl && gl.textureCache;
         const t2 = tc && tc.get(src);
         if (t2) {
           if (t2.texture) gl.deleteTexture(t2.texture);
@@ -4243,7 +4309,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     for (const [mn, o] of others) if (o.E && Date.now() - o.at > 12e4 && !charOf(mn)) o.E = null;
     return n;
   }
-  var charOf = (mn) => W5.Player && W5.Player.MemberNumber === mn ? W5.Player : (W5.ChatRoomCharacter || []).find((c) => c && c.MemberNumber === mn) || null;
+  var charOf = (mn) => W4.Player && W4.Player.MemberNumber === mn ? W4.Player : (W4.ChatRoomCharacter || []).find((c) => c && c.MemberNumber === mn) || null;
   var itemOf = (C, g) => C && Array.isArray(C.Appearance) ? C.Appearance.find((a) => a && a.Asset && a.Asset.Group && a.Asset.Group.Name === g) : void 0;
   var againT = /* @__PURE__ */ new Map();
   function redrawMn(mn, soon) {
@@ -4251,20 +4317,20 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     againT.set(mn, setTimeout(() => {
       try {
         const C = charOf(mn);
-        if (C && typeof W5.CharacterLoadCanvas === "function") W5.CharacterLoadCanvas(C);
+        if (C && typeof W4.CharacterLoadCanvas === "function") W4.CharacterLoadCanvas(C);
       } catch (e) {
         console.warn("[Farmhand Companion] drawn body redraw:", e);
       }
     }, soon || 60));
   }
-  var redraw2 = (soon) => {
-    if (W5.Player) redrawMn(W5.Player.MemberNumber, soon);
+  var redraw = (soon) => {
+    if (W4.Player) redrawMn(W4.Player.MemberNumber, soon);
   };
   function makeEngine(mn) {
-    if (!W5.FarmBelly) W5.FarmBelly = bellyDrawing;
-    if (typeof W5.FarmBodyEngine !== "function" || !W5.FarmBreasts) return null;
-    const who = mn == null ? () => W5.Player || null : () => charOf(mn);
-    return W5.FarmBodyEngine({
+    if (!W4.FarmBelly) W4.FarmBelly = bellyDrawing;
+    if (typeof W4.FarmBodyEngine !== "function" || !W4.FarmBreasts) return null;
+    const who = mn == null ? () => W4.Player || null : () => charOf(mn);
+    return W4.FarmBodyEngine({
       S: { get C() {
         return who();
       } },
@@ -4272,7 +4338,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
       setBody: () => {
       },
       // never: their body items are theirs
-      redraw: () => mn == null ? redraw2(60) : redrawMn(mn, 60),
+      redraw: () => mn == null ? redraw(60) : redrawMn(mn, 60),
       picture,
       overBreast: bcrOverBreast,
       // BCR's marks on the drawn breasts (bcr.js)
@@ -4281,14 +4347,14 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     });
   }
   function engine() {
-    if (!mine.E && W5.Player) mine.E = makeEngine(null);
+    if (!mine.E && W4.Player) mine.E = makeEngine(null);
     if (mine.E) apply(mine.E, eff());
     return mine.E;
   }
   function apply(E, s) {
     if (!E) return;
     const B = E.BREAST, b = s.breast || {};
-    B.cup = Math.max(0, Math.min(W5.FarmBreasts.CUPS.length - 1, Math.round(Number(s.cup) || 0)));
+    B.cup = Math.max(0, Math.min(W4.FarmBreasts.CUPS.length - 1, Math.round(Number(s.cup) || 0)));
     for (const k of ["full", "hang", "apart", "x", "y", "nip", "nipY", "nipX"]) if (typeof b[k] === "number" && isFinite(b[k])) B[k] = b[k];
     B.wear = s.wear && typeof s.wear === "object" ? Object.assign({}, s.wear) : {};
     B.out.clear();
@@ -4346,7 +4412,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
   var shareOf = (s) => ({ cup: s.cup, breast: s.breast, wear: s.wear, belly: s.belly, auto: s.auto, tuck: s.tuck, dress: s.dress, mould: s.mould });
   var send = (type, data) => {
     try {
-      if (W5.ServerSend && W5.ServerPlayerIsInChatRoom && W5.ServerPlayerIsInChatRoom()) W5.ServerSend("ChatRoomChat", makeMsg(type, data));
+      if (W4.ServerSend && W4.ServerPlayerIsInChatRoom && W4.ServerPlayerIsInChatRoom()) W4.ServerSend("ChatRoomChat", makeMsg(type, data));
     } catch (e) {
     }
   };
@@ -4358,7 +4424,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
   };
   var lastTold = "";
   function tell(force) {
-    if (onBot2()) return;
+    if (onBot()) return;
     if (!force && Date.now() - toldAt < 8e3) return;
     const msg = !S2.on ? { on: false } : S2.saved || !farm ? { on: true, body: shareOf(eff()) } : { on: true, farm: farm.at, cup: eff().cup, bm: bellyMode(), bs: bellyStage() };
     const sig2 = JSON.stringify(msg);
@@ -4376,13 +4442,13 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     return s;
   }
   function ask() {
-    if (onBot2() || Date.now() - askedAt < 8e3) return;
+    if (onBot() || Date.now() - askedAt < 8e3) return;
     askedAt = Date.now();
     send("bodyAsk", {});
   }
   function onBodyMsg(m) {
     const mn = m.from;
-    if (!mn || W5.Player && mn === W5.Player.MemberNumber || onBot2()) return;
+    if (!mn || W4.Player && mn === W4.Player.MemberNumber || onBot()) return;
     if (m.type === "bodyAsk") {
       if (S2.on) setTimeout(() => tell(true), 300 + Math.random() * 1500);
       return;
@@ -4417,9 +4483,9 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     try {
       sdk2.hookFunction("CommonDrawAppearanceBuild", 2, (args, next) => {
         const C = args[0];
-        if (!C || onBot2()) return next(args);
+        if (!C || onBot()) return next(args);
         let E = null;
-        if (C === W5.Player) {
+        if (C === W4.Player) {
           if (S2.on) E = mine.E || engine();
         } else if (seeOthers && typeof C.MemberNumber === "number") {
           const o = others.get(C.MemberNumber);
@@ -4470,8 +4536,8 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     setInterval(prune, 2e4);
     setTimeout(() => {
       if (S2.on && engine()) {
-        W5.__farmDrawnBody = true;
-        redraw2(500);
+        W4.__farmDrawnBody = true;
+        redraw(500);
       }
       hook();
       if (S2.on) tell(true);
@@ -4479,7 +4545,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     }, 3e3);
   }
   function drawnBodyState() {
-    const up = itemOf(W5.Player, "BodyUpper"), cups = W5.FarmBreasts && W5.FarmBreasts.CUPS || [], e = eff();
+    const up = itemOf(W4.Player, "BodyUpper"), cups = W4.FarmBreasts && W4.FarmBreasts.CUPS || [], e = eff();
     return {
       on: !!S2.on,
       cup: e.cup,
@@ -4507,7 +4573,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     delete S2.bellyOn;
     save();
     if (mine.E) apply(mine.E, eff());
-    redraw2(60);
+    redraw(60);
     tell(true);
     if (say) say({ farm: "Your belly follows the farm: it shows, and grows, as you fill up or get bred.", on: "Belly always on.", off: "Belly off.", studio: "Your belly is the one your own studio has." }[S2.bellyMode]);
   }
@@ -4516,7 +4582,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     S2.cupSet = false;
     save();
     if (mine.E) apply(mine.E, eff());
-    redraw2(60);
+    redraw(60);
     tell(true);
     if (say) say("Back to the farm's look.");
   }
@@ -4530,12 +4596,12 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
         return say && say("The drawn body didn't load. Reload the page and try again.");
       }
       bellyTrial(0);
-      W5.__farmDrawnBody = true;
+      W4.__farmDrawnBody = true;
       hook();
-    } else W5.__farmDrawnBody = false;
+    } else W4.__farmDrawnBody = false;
     tell(true);
-    redraw2(60);
-    setTimeout(() => redraw2(0), 800);
+    redraw(60);
+    setTimeout(() => redraw(0), 800);
     if (say) {
       const st2 = drawnBodyState();
       if (!S2.on) say("Drawn body off. You're the game's own picture again, for you and everybody else.");
@@ -4546,7 +4612,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
   function drawnBodySeeOthers(on2, say) {
     seeOthers = !!on2;
     try {
-      W5.localStorage.setItem(SEE_KEY, on2 ? "1" : "0");
+      W4.localStorage.setItem(SEE_KEY, on2 ? "1" : "0");
     } catch (e) {
     }
     for (const mn of others.keys()) redrawMn(mn, 60);
@@ -4557,12 +4623,12 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     if (say) say(on2 ? "You'll see other people's drawn bodies." : "Other people are drawn the game's own way on your screen.");
   }
   function drawnBodyCup(i, say) {
-    const n = W5.FarmBreasts ? W5.FarmBreasts.CUPS.length : 21;
+    const n = W4.FarmBreasts ? W4.FarmBreasts.CUPS.length : 21;
     if (i === "auto") {
       S2.cupSet = false;
       save();
       if (mine.E) apply(mine.E, eff());
-      redraw2(60);
+      redraw(60);
       tell(true);
       if (say) say("Your cup follows the farm: " + drawnBodyState().cupName + " now, and it changes as you grow.");
       return;
@@ -4571,7 +4637,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     S2.cupSet = true;
     save();
     if (mine.E) apply(mine.E, eff());
-    redraw2(60);
+    redraw(60);
     tell(true);
     if (say) say("Cup: " + drawnBodyState().cupName + ", whatever the farm does. Pick Follow the farm to have it grow with you again.");
   }
@@ -4588,7 +4654,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     mine.S = S2;
     save();
     if (mine.E) apply(mine.E, eff());
-    redraw2(60);
+    redraw(60);
     tell(true);
     if (say) say("Settings " + from + " put in: " + drawnBodyState().cupName + " cup" + (S2.belly.std && S2.belly.std.on ? ", your belly" : "") + ", " + Object.keys(S2.wear).length + " piece choices. " + (S2.on ? "" : "Switch the drawn body on to see it."));
     return true;
@@ -4597,7 +4663,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     try {
       const t = String(text || "").trim();
       if (!t.startsWith(CODE_HEAD)) throw new Error("that isn't a code from the studio (it starts with " + CODE_HEAD + ")");
-      const raw = W5.LZString && typeof W5.LZString.decompressFromBase64 === "function" ? W5.LZString.decompressFromBase64(t.slice(CODE_HEAD.length)) : null;
+      const raw = W4.LZString && typeof W4.LZString.decompressFromBase64 === "function" ? W4.LZString.decompressFromBase64(t.slice(CODE_HEAD.length)) : null;
       const d = raw && JSON.parse(raw);
       if (!d || typeof d !== "object" || d.v !== 1) throw new Error("the code is damaged or from a newer studio");
       return take(d, say, "from the code");
@@ -5318,13 +5384,13 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
   })();
 
   // extension/src/messes.js
-  var cleanBrand = (b) => W6.FarmBrand.clean(b);
-  var brandReady = (b) => W6.FarmBrand.ready(b);
-  var paintBrand = (...a) => W6.FarmBrand.paint(...a);
-  var W6 = window;
+  var cleanBrand = (b) => W5.FarmBrand.clean(b);
+  var brandReady = (b) => W5.FarmBrand.ready(b);
+  var paintBrand = (...a) => W5.FarmBrand.paint(...a);
+  var W5 = window;
   var KEY2 = "farmhand-messes";
   var MAX = 60;
-  var onBot3 = () => !!(W6.Player && W6.Player.MemberNumber === BOT_MEMBER);
+  var onBot2 = () => !!(W5.Player && W5.Player.MemberNumber === BOT_MEMBER);
   var sdk3 = null;
   var hooked3 = false;
   var mine2 = [];
@@ -5374,7 +5440,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
   var AREA_OF = { face: "face", forehead: "forehead", chest: "chest", tummy: "tummy", hair: "hair", thighs: "thighL", back: "back" };
   function load2() {
     try {
-      const v = JSON.parse(W6.localStorage.getItem(KEY2));
+      const v = JSON.parse(W5.localStorage.getItem(KEY2));
       if (Array.isArray(v)) mine2 = v.filter(ok).slice(-MAX);
     } catch (e) {
       mine2 = [];
@@ -5382,17 +5448,17 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
   }
   function save2() {
     try {
-      W6.localStorage.setItem(KEY2, JSON.stringify(mine2));
+      W5.localStorage.setItem(KEY2, JSON.stringify(mine2));
     } catch (e) {
     }
   }
-  var ok = (e) => e && typeof e.k === "string" && W6.FarmMess && W6.FarmMess.KINDS[e.k] && Array.isArray(e.a) && Number.isFinite(e.s);
-  var clean2 = (list) => Array.isArray(list) ? list.filter(ok).slice(-MAX).map((e) => ({ k: e.k, a: e.a.filter((x) => typeof x === "string" && W6.FarmMess.AREAS[x]).slice(0, 6), s: e.s | 0, t: +e.t || 0, m: Math.max(0.5, Math.min(3, Number(e.m) || 1)) })) : [];
+  var ok = (e) => e && typeof e.k === "string" && W5.FarmMess && W5.FarmMess.KINDS[e.k] && Array.isArray(e.a) && Number.isFinite(e.s);
+  var clean2 = (list) => Array.isArray(list) ? list.filter(ok).slice(-MAX).map((e) => ({ k: e.k, a: e.a.filter((x) => typeof x === "string" && W5.FarmMess.AREAS[x]).slice(0, 6), s: e.s | 0, t: +e.t || 0, m: Math.max(0.5, Math.min(3, Number(e.m) || 1)) })) : [];
   function messFromMark(m) {
-    DIAG.marks.push({ at: Date.now(), mess: m && m.mess, splat: m && m.splat, farmMess: !!W6.FarmMess });
+    DIAG.marks.push({ at: Date.now(), mess: m && m.mess, splat: m && m.splat, farmMess: !!W5.FarmMess });
     if (DIAG.marks.length > 5) DIAG.marks.shift();
-    if (!m || !Array.isArray(m.splat) || !m.splat.length || !W6.FarmMess) return false;
-    const kind = typeof m.mess === "string" && W6.FarmMess.KINDS[m.mess] ? m.mess : (typeof m.color === "string" ? BY_COLOR[m.color.toLowerCase()] : null) || "cum";
+    if (!m || !Array.isArray(m.splat) || !m.splat.length || !W5.FarmMess) return false;
+    const kind = typeof m.mess === "string" && W5.FarmMess.KINDS[m.mess] ? m.mess : (typeof m.color === "string" ? BY_COLOR[m.color.toLowerCase()] : null) || "cum";
     const a = [];
     for (const x of m.splat) {
       const k = AREA_OF[x];
@@ -5426,7 +5492,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
   }
   var send2 = (type, data) => {
     try {
-      if (W6.ServerSend && W6.ServerPlayerIsInChatRoom && W6.ServerPlayerIsInChatRoom()) W6.ServerSend("ChatRoomChat", makeMsg(type, data));
+      if (W5.ServerSend && W5.ServerPlayerIsInChatRoom && W5.ServerPlayerIsInChatRoom()) W5.ServerSend("ChatRoomChat", makeMsg(type, data));
     } catch (e) {
     }
   };
@@ -5438,13 +5504,13 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     send2("mess", myBrand ? { list: mine2, brand: myBrand } : { list: mine2 });
   }
   function ask2() {
-    if (onBot3() || Date.now() - askedAt2 < 8e3) return;
+    if (onBot2() || Date.now() - askedAt2 < 8e3) return;
     askedAt2 = Date.now();
     send2("messAsk", {});
   }
   function onMessMsg(m) {
     const mn = m.from;
-    if (!mn || W6.Player && mn === W6.Player.MemberNumber || onBot3()) return;
+    if (!mn || W5.Player && mn === W5.Player.MemberNumber || onBot2()) return;
     if (m.type === "messAsk") {
       if (mine2.length || myBrand) setTimeout(() => tell2(), 300 + Math.random() * 1500);
       return;
@@ -5460,23 +5526,23 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     redrawMn2(mn);
     if (brand && !brandReady(brand)) setTimeout(() => redrawMn2(mn), 600);
   }
-  var charOf2 = (mn) => W6.Player && W6.Player.MemberNumber === mn ? W6.Player : (W6.ChatRoomCharacter || []).find((c) => c && c.MemberNumber === mn) || null;
+  var charOf2 = (mn) => W5.Player && W5.Player.MemberNumber === mn ? W5.Player : (W5.ChatRoomCharacter || []).find((c) => c && c.MemberNumber === mn) || null;
   var againT2 = /* @__PURE__ */ new Map();
   function redrawMn2(mn, soon) {
     clearTimeout(againT2.get(mn));
     againT2.set(mn, setTimeout(() => {
       try {
         const C = charOf2(mn);
-        if (C && typeof W6.CharacterLoadCanvas === "function") W6.CharacterLoadCanvas(C);
+        if (C && typeof W5.CharacterLoadCanvas === "function") W5.CharacterLoadCanvas(C);
       } catch (e) {
       }
     }, soon || 80));
   }
   var redrawMe = () => {
-    if (W6.Player) redrawMn2(W6.Player.MemberNumber);
+    if (W5.Player) redrawMn2(W5.Player.MemberNumber);
   };
-  var listFor = (C) => C === W6.Player ? mine2 : (others2.get(C.MemberNumber) || {}).list || [];
-  var brandFor = (C) => C === W6.Player ? myBrand : (others2.get(C.MemberNumber) || {}).brand || null;
+  var listFor = (C) => C === W5.Player ? mine2 : (others2.get(C.MemberNumber) || {}).list || [];
+  var brandFor = (C) => C === W5.Player ? myBrand : (others2.get(C.MemberNumber) || {}).brand || null;
   var imgs = /* @__PURE__ */ new Map();
   function img(src, mn) {
     let i = imgs.get(src);
@@ -5487,7 +5553,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     imgs.set(src, i);
     return null;
   }
-  if (W6.FarmMess && W6.FarmMess.loadStamps) W6.FarmMess.loadStamps("").then((n) => {
+  if (W5.FarmMess && W5.FarmMess.loadStamps) W5.FarmMess.loadStamps("").then((n) => {
     if (n) {
       redrawMe();
       for (const mn of others2.keys()) redrawMn2(mn);
@@ -5501,17 +5567,17 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     setTimeout(() => {
       for (const p of made2.values()) if (p.src === src) return;
       try {
-        const m = W6.GLDrawImageCache;
+        const m = W5.GLDrawImageCache;
         if (m && typeof m.delete === "function") m.delete(src);
       } catch (e) {
       }
       try {
-        const m = W6.DrawImageCache;
+        const m = W5.DrawImageCache;
         if (m && typeof m.delete === "function") m.delete(src);
       } catch (e) {
       }
       try {
-        const gl = W6.GLDrawCanvas && W6.GLDrawCanvas.GL, tc = gl && gl.textureCache;
+        const gl = W5.GLDrawCanvas && W5.GLDrawCanvas.GL, tc = gl && gl.textureCache;
         const t2 = tc && tc.get(src);
         if (t2) {
           if (t2.texture) gl.deleteTexture(t2.texture);
@@ -5527,7 +5593,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     if (was && was.src && was.src !== p.src) forget(was.src);
   }
   function messPicture(C, list, body2, brand) {
-    const over = W6.CanvasUpperOverflow || 700, h2 = C.Canvas && C.Canvas.height || 1e3 + over;
+    const over = W5.CanvasUpperOverflow || 700, h2 = C.Canvas && C.Canvas.height || 1e3 + over;
     const up = body2.find((b) => /\/BodyUpper\//.test(b[0])), ox = up ? up[1] : 0, oy = up ? up[2] - over : 0;
     const age = (e) => Math.min(5, Math.floor((Date.now() - (e.t || 0)) / 6e4));
     const key = JSON.stringify(list) + "|" + JSON.stringify(brand) + (brand && brandReady(brand) ? "+" : "-") + "|" + list.map(age).join("") + "|" + body2.map((b) => b[0] + "@" + b[1] + "," + b[2]).join(";");
@@ -5535,7 +5601,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     if (was && was.key === key) return was;
     let mask = null;
     if (body2.length) {
-      mask = W6.document.createElement("canvas");
+      mask = W5.document.createElement("canvas");
       mask.width = 500;
       mask.height = h2;
       const mg = mask.getContext("2d");
@@ -5545,12 +5611,12 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
         mg.drawImage(i, x, y);
       }
     }
-    const c = W6.document.createElement("canvas");
+    const c = W5.document.createElement("canvas");
     c.width = 500;
     c.height = h2;
     const g = c.getContext("2d");
     const at = (names) => names.map((n) => {
-      const A = W6.FarmMess.AREAS[n];
+      const A = W5.FarmMess.AREAS[n];
       return [A[0] + ox, A[1] + over + oy, A[2]];
     });
     if (brand) try {
@@ -5558,8 +5624,8 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     } catch (e) {
       console.warn("[Farmhand Companion] brand:", e);
     }
-    for (const e of list) W6.FarmMess.paintOn(g, mask, e.k, { at: at(e.a), seed: e.s, amount: e.m || 1, runX: 0.55 + 0.09 * age(e) });
-    if (typeof W6.GLDrawLoadTransient === "function") {
+    for (const e of list) W5.FarmMess.paintOn(g, mask, e.k, { at: at(e.a), seed: e.s, amount: e.m || 1, runX: 0.55 + 0.09 * age(e) });
+    if (typeof W5.GLDrawLoadTransient === "function") {
       const p2 = { key, src: c, dx: 0, dy: 0 };
       keep(C.MemberNumber, p2);
       return p2;
@@ -5577,7 +5643,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
       keep(C.MemberNumber, p2);
       return p2;
     }
-    const t = W6.document.createElement("canvas");
+    const t = W5.document.createElement("canvas");
     t.width = x1 - x0 + 1;
     t.height = y1 - y0 + 1;
     t.getContext("2d").drawImage(c, -x0, -y0);
@@ -5593,9 +5659,9 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
       const groupRe = /(?:^|\/)Assets\/[^/]+\/(?:Override\/[^/]+\/)?([^/]+)\//;
       sdk3.hookFunction("CommonDrawAppearanceBuild", 3, (args, next) => {
         const C = args[0], real = args[1];
-        if (!C || !real || typeof real.drawImage !== "function" || !W6.FarmMess || onBot3()) return next(args);
+        if (!C || !real || typeof real.drawImage !== "function" || !W5.FarmMess || onBot2()) return next(args);
         const list = listFor(C), brand = brandFor(C);
-        if (C === W6.Player) DIAG.got++;
+        if (C === W5.Player) DIAG.got++;
         if (!list.length && !brand) return next(args);
         const body2 = [], all = [], sample = [];
         let canv = 0, done = false;
@@ -5610,7 +5676,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
               have.add(b[0]);
             }
             const p = messPicture(C, list, body2, brand);
-            if (C === W6.Player) {
+            if (C === W5.Player) {
               DIAG.draws++;
               DIAG.draw = { at: Date.now(), list: list.length, body: body2.map((b) => String(b[0]).replace(/^.*Assets\/[^/]+\//, "") + "@" + b[1] + "," + b[2]), sample: sample.slice(), canv, pic: p ? p.src ? typeof p.src === "string" ? "picture" : "drawing " + p.src.width + "x" + p.src.height : "empty" : "waiting for the body pictures" };
             }
@@ -5630,7 +5696,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
           }
         };
         const seen2 = (name) => (src, x, y, ...rest) => {
-          if (C === W6.Player) {
+          if (C === W5.Player) {
             if (typeof src === "string") {
               if (sample.length < 6) sample.push(src.replace(/^.*\/(?=[^/]+\/[^/]+$)/, ""));
             } else canv++;
@@ -5697,7 +5763,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
   function messDiag() {
     const ago = (t) => t ? Math.round((Date.now() - t) / 1e3) + "s ago" : "never";
     const L = [];
-    L.push("hooked: " + hooked3 + " \xB7 splatter kit: " + !!W6.FarmMess + (W6.FarmMess && W6.FarmMess.KINDS ? " (" + Object.keys(W6.FarmMess.KINDS).length + " kinds)" : ""));
+    L.push("hooked: " + hooked3 + " \xB7 splatter kit: " + !!W5.FarmMess + (W5.FarmMess && W5.FarmMess.KINDS ? " (" + Object.keys(W5.FarmMess.KINDS).length + " kinds)" : ""));
     L.push("on you now: " + mine2.length + (mine2.length ? " \xB7 newest " + mine2[mine2.length - 1].k + " on " + mine2[mine2.length - 1].a.join("+") + ", " + ago(mine2[mine2.length - 1].t) : ""));
     L.push("marks from the bot: " + (DIAG.marks.length ? DIAG.marks.map((x) => (x.mess || "?") + " " + ago(x.at)).join(", ") : "none since this page opened"));
     L.push("your body drawn: " + DIAG.got + " times, with a mess " + DIAG.draws + " times");
@@ -5708,7 +5774,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
   }
 
   // extension/src/trimpics.js
-  var W7 = window;
+  var W6 = window;
   var LIMIT = 38e7;
   var TARGET = 26e7;
   var IDLE = 5 * 6e4;
@@ -5722,7 +5788,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     return n;
   }
   function trimPictures(force, idle, target) {
-    const gl = W7.GLDrawCanvas && W7.GLDrawCanvas.GL, tc = gl && gl.textureCache, cache = W7.GLDrawImageCache;
+    const gl = W6.GLDrawCanvas && W6.GLDrawCanvas.GL, tc = gl && gl.textureCache, cache = W6.GLDrawImageCache;
     if (!cache || typeof cache.purge === "function") return 0;
     if (!tc || typeof tc.forEach !== "function") return 0;
     let total = bytes(tc);
@@ -5758,7 +5824,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
   }
   function initTrim(mod2) {
     sdk4 = mod2;
-    W7.__farmTrim = trimPictures;
+    W6.__farmTrim = trimPictures;
     try {
       sdk4.hookFunction("GLDrawLoadImage", 0, (args, next) => {
         if (typeof args[1] === "string") seen.set(args[1], Date.now());
@@ -5778,8 +5844,8 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
   }
 
   // extension/src/look.js
-  var W8 = window;
-  var P = () => W8.Player;
+  var W7 = window;
+  var P = () => W7.Player;
   var WAIT_MS = 900;
   var MAX_MS = 3e3;
   var FEW = 3;
@@ -5799,19 +5865,19 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
   }
   function commitLook(next) {
     const C = P();
-    const before = W8.ServerAppearanceBundle(C.Appearance);
-    W8.ServerAppearanceLoadFromBundle(C, C.AssetFamily, next, C.MemberNumber);
-    if (typeof W8.CharacterRefresh === "function") W8.CharacterRefresh(C);
+    const before = W7.ServerAppearanceBundle(C.Appearance);
+    W7.ServerAppearanceLoadFromBundle(C, C.AssetFamily, next, C.MemberNumber);
+    if (typeof W7.CharacterRefresh === "function") W7.CharacterRefresh(C);
     let ch;
     try {
-      ch = changed(before, W8.ServerAppearanceBundle(C.Appearance));
+      ch = changed(before, W7.ServerAppearanceBundle(C.Appearance));
     } catch (e) {
       ch = null;
     }
     if (ch && !ch.size) return;
     if (!ch) whole = true;
     else for (const g of ch) groups.add(g);
-    if (groups.size > FEW || typeof W8.ChatRoomCharacterItemUpdate !== "function" || W8.CurrentScreen !== "ChatRoom") whole = true;
+    if (groups.size > FEW || typeof W7.ChatRoomCharacterItemUpdate !== "function" || W7.CurrentScreen !== "ChatRoom") whole = true;
     if (whole) {
       flushLook();
       return;
@@ -5831,18 +5897,58 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     whole = false;
     if (!C) return;
     try {
-      if (!all && W8.CurrentScreen === "ChatRoom" && typeof W8.ChatRoomCharacterItemUpdate === "function") {
-        for (const g of list) W8.ChatRoomCharacterItemUpdate(C, g);
+      if (!all && W7.CurrentScreen === "ChatRoom" && typeof W7.ChatRoomCharacterItemUpdate === "function") {
+        for (const g of list) W7.ChatRoomCharacterItemUpdate(C, g);
         SENT.items += list.length;
         return;
       }
-      if (typeof W8.ChatRoomCharacterUpdate === "function") {
-        W8.ChatRoomCharacterUpdate(C);
+      if (typeof W7.ChatRoomCharacterUpdate === "function") {
+        W7.ChatRoomCharacterUpdate(C);
         SENT.whole++;
       }
     } catch (e) {
       console.warn("[Farmhand Companion] sending your look:", e);
     }
+  }
+
+  // extension/src/botscreen.js
+  var W8 = window;
+  var prefs = () => ({});
+  var skipped = 0;
+  var wasRoom = false;
+  var onBot3 = () => !!(W8.Player && W8.Player.MemberNumber === BOT_MEMBER);
+  var screenLight = () => onBot3() && !prefs().drawRoom;
+  var screenSkipped = () => skipped;
+  function redraw2(list) {
+    for (const C of list) {
+      try {
+        if (C && typeof W8.CharacterLoadCanvas === "function") W8.CharacterLoadCanvas(C);
+      } catch (e) {
+      }
+    }
+  }
+  function redrawRoom() {
+    redraw2([W8.Player].concat(W8.ChatRoomCharacter || []));
+  }
+  function initBotScreen(mod2, getPrefs) {
+    prefs = getPrefs;
+    try {
+      mod2.hookFunction("CommonDrawAppearanceBuild", 20, (args, next) => {
+        if (W8.CurrentScreen === "ChatRoom" && screenLight()) {
+          skipped++;
+          return void 0;
+        }
+        return next(args);
+      });
+    } catch (e) {
+      console.warn("[Farmhand Companion] light bot screen unavailable:", e);
+      return;
+    }
+    setInterval(() => {
+      const inRoom = W8.CurrentScreen === "ChatRoom";
+      if (wasRoom && !inRoom && screenLight()) redraw2([W8.Player, W8.InformationSheetSelection].filter(Boolean));
+      wasRoom = inRoom;
+    }, 1e3);
   }
 
   // extension/src/memlog.js
@@ -5951,7 +6057,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     fast = [];
   }
   var lastPage = fast.filter((x) => x.t < born).slice(-12);
-  function quick() {
+  function quick2() {
     const x = { t: Date.now() };
     try {
       if (W9.performance && W9.performance.memory) x.h = Math.round(W9.performance.memory.usedJSHeapSize / 1e6);
@@ -5981,7 +6087,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
   function initMemlog() {
     setTimeout(tick, 2e4);
     setInterval(tick, 3e4);
-    setInterval(quick, 3e3);
+    setInterval(quick2, 3e3);
     if (typeof W9.CommandCombine === "function") {
       W9.CommandCombine([{ Tag: "farmmem", Description: ": the Farmhand Companion's memory log (the last hour), and copies it", Action: () => {
         tick();
@@ -6010,12 +6116,269 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     }
   }
 
+  // extension/src/views/settingspages.js
+  var pick = (...ids) => ids.map((id) => SWITCH_INFO.find((x) => x[0] === id)).filter(Boolean);
+  var FARM_GROUPS = [
+    ["\u{1F402} Breedin'", ["breedable", "fertile", "futa", "mpreg", "freeuse", "naturalheat"]],
+    ["\u{1F95B} Milk", ["milkable", "seedmilk", "jarok"]],
+    ["\u{1FAA4} Traps and play", ["traps", "eager", "bench", "potions", "dares"]],
+    ["\u{1FAB1} Things that latch on", ["parasite", "symbiote", "watersports"]]
+  ];
+  var pref = (ctx3, key, label, desc, after) => toggle(label, desc, !!ctx3.prefs[key], () => {
+    ctx3.setPref(key, !ctx3.prefs[key]);
+    if (after) after();
+  });
+  var prefNot = (ctx3, key, label, desc) => toggle(label, desc, !ctx3.prefs[key], () => {
+    ctx3.setPref(key, !ctx3.prefs[key]);
+    ctx3.api.rehello && ctx3.api.rehello();
+  });
+  var rehello = (ctx3) => () => ctx3.api.rehello && ctx3.api.rehello();
+  function farmPage(ctx3) {
+    const s = ctx3.s;
+    if (!s.onBooks) return [card(
+      title("\u{1F404} Farm switches"),
+      muted("Once you're on the books, your milkin', breedin', trap and teasin' switches show up here."),
+      btn("Apply to join", () => ctx3.send("apply"), true)
+    )];
+    return [
+      muted("Saved by the farm girl, so they follow you to any computer. Your limits still win, and your safeword stops everything."),
+      FARM_GROUPS.map(([head, ids]) => card(title(head), farmSwitches(ctx3, pick(...ids)))),
+      trapThemesCard(ctx3),
+      extraSwitches(ctx3)
+    ];
+  }
+  function bodyPage(ctx3) {
+    const s = ctx3.s, brandAt = { hipL: "left hip", hipR: "right hip", thighL: "left thigh", thighR: "right thigh", mons: "low belly", tummy: "tummy", chestL: "left breast", chestR: "right breast", shoulderL: "left shoulder", shoulderR: "right shoulder" };
+    return [
+      drawnBodyCard(ctx3),
+      card(
+        title("\u{1F4CF} Body shape"),
+        pref(ctx3, "shape", "Farm can change my body shape", "Your chest grows a size on your character for every two udder sizes the farm gives you (up to the game's biggest), and your hips widen with a growin' ass or a heavy belly. Everything you're wearin' is redrawn to fit. Your own shape is remembered and comes back when the growth goes, when you switch this off, and for an hour after your safeword.", rehello(ctx3))
+      ),
+      s.brand ? card(
+        title("\u{1F525} The farm's brand"),
+        toggle(
+          "Show my farm brand",
+          "The B&B logo the farm seared on you, on your " + (brandAt[s.brand.place] || "hip") + ". Off hides it on every screen (it's still on your record).",
+          !ctx3.prefs.brandOff,
+          () => {
+            ctx3.setPref("brandOff", !ctx3.prefs.brandOff);
+            ctx3.api.brandSync && ctx3.api.brandSync();
+          }
+        )
+      ) : null,
+      s.onBooks ? card(
+        title("\u{1F43E} Your animal"),
+        muted("How the farm sees you. It picks your farm outfit."),
+        h("div", { style: { marginTop: "6px" } }, ["female", "male", "futa", "femboy", "nonbinary"].map((g) => h("button", { type: "button", class: "fhc-pill" + (s.gender === g ? " on" : ""), onclick: () => ctx3.send("gender " + g) }, g))),
+        farmSwitches(ctx3, pick("ownoutfit"))
+      ) : null,
+      card(
+        title("\u{1F457} Farm outfit"),
+        muted("Dress me puts back on the outfit your record calls for (your species and gender, or your uniform while you're clocked in), in case it's come off or been changed."),
+        btn("Dress me", () => ctx3.send("dressme"), true),
+        ctx3.api.hasBackup && ctx3.api.hasBackup() ? h("div", null, muted("Your own clothes are kept on this computer."), btn("Change back into my own clothes", () => ctx3.api.back && ctx3.api.back())) : null
+      )
+    ];
+  }
+  function gearPage(ctx3) {
+    return [
+      card(
+        title("\u26D3 On your character"),
+        muted("All of these are off until you switch them on. Your safeword takes everything off."),
+        pref(ctx3, "gear", "Farm can put real gear on me", "A trap that plugs, cups, clamps, chains, ropes or funnels you puts the real item on your character, and takes it off again when its time's up. Pull one off early and it goes back. Your safeword takes it all off. (The parasite doesn't need this: ?parasite on is its switch.)", rehello(ctx3)),
+        pref(ctx3, "marks", "Farm can mark my body", "Loads leave the game's own splatters on your face, chest or tummy, wherever there's room, and farm words can be written on your body. ?wash takes them off."),
+        pref(ctx3, "strip", "Farm can strip me", "When the farm says so, your clothes come off (locked pieces stay). They're kept on this computer so you can dress again."),
+        pref(ctx3, "stir", "Farm can stir me up", "Traps, toys and scenes nudge your arousal meter up, and while the farm has you denied you're held at the edge instead of cummin'. A buzzin' toy you're wearin' follows a trap too: low while it teases, high when it breeds you, still while you're denied, then back how you had it. Your safeword still stops everything.", rehello(ctx3))
+      ),
+      // the farm's little cues on your own screen (cues.js); each one on unless you switch it off
+      card(
+        title("\u2728 On your screen"),
+        muted("Only you see and hear these. Each is on unless you switch it off."),
+        prefNot(ctx3, "noLead", "Lead me instead of teleportin'", "When the farm moves you (feedin' time, the stocks, a summon), you walk there yourself, step by step"),
+        prefNot(ctx3, "noFace", "Farm can set my face", "Dazed when milk-drunk, flushed in heat, a trance stare\u2026 for a little while"),
+        prefNot(ctx3, "noSound", "Farm sounds", "The pump, the stall door, the feedin' bell. Only you hear them, at your game volume"),
+        prefNot(ctx3, "noTrance", "Trance haze", "A soft haze at the edges of your screen during conditioning sessions"),
+        prefNot(ctx3, "noSlow", "Carryin' slows me down", "The fuller you are (a pumped belly, a late litter, a clutch of eggs), the slower you walk on the map"),
+        ctx3.s.staff ? prefNot(ctx3, "noMarkers", "Map markers (staff)", "Small badges over stock on your map: M needs milkin', H in heat, B expectin', X teats capped") : null
+      )
+    ];
+  }
+  function messagesPage(ctx3) {
+    const s = ctx3.s;
+    return [
+      card(
+        title("\u{1F4AC} Where the farm talks to you"),
+        pref(ctx3, "chatToo", "Farm messages in chat too", "Tease lines, heat, summons and other farm messages also show in your chat log, not just the panel"),
+        pref(ctx3, "chime", "Chime on notices", "A soft sound when the farm messages you"),
+        pref(ctx3, "popopen", "Open on new notice", "Pop the panel open by itself. Off: just the red number on \u{1F33E}"),
+        toggle(
+          "Farm emotes about me come from me",
+          "Belly kicks, milkin', breedin'\u2026 are posted as your own emote (no name in front), so the people who can see you see them and the farm girl needn't move. Only lines about you.",
+          !ctx3.prefs.noRelay,
+          () => {
+            ctx3.setPref("noRelay", !ctx3.prefs.noRelay);
+            ctx3.api.rehello && ctx3.api.rehello();
+          }
+        ),
+        prefNot(ctx3, "noFeelings", "Private feelings", "Now and then, a line only you see about what you're feelin' (your gear, your arousal, how full you are)")
+      ),
+      s.onBooks ? card(title("\u{1F5E3} What the farm says"), muted("Saved by the farm girl."), farmSwitches(ctx3, pick("teaseme", "hypno", "praise", "degrade"))) : null,
+      s.intensity ? card(
+        title("\u{1F336} How the farm talks to you"),
+        h("div", null, [["tender", "Tender"], ["rough", "Rough"], ["filthy", "Filthy"]].map(([id, label]) => h("button", { type: "button", class: "fhc-pill" + (s.intensity === id ? " on" : ""), onclick: () => ctx3.send("intensity " + id) }, label))),
+        muted(s.intensity === "tender" ? "Softer words, and the traps lean mild." : s.intensity === "filthy" ? "Dirtier words, and the traps lean brutal." : "As written."),
+        muted("It calls you: " + (((s.words || {}).call || []).join(", ") || "whatever comes to mind") + " \xB7 never: " + (((s.words || {}).never || []).join(", ") || "nothin' ruled out")),
+        h("div", null, btn("Names I love\u2026", () => ctx3.fillBox("callme ")), btn("Never call me\u2026", () => ctx3.fillBox("nevercall ")))
+      ) : null
+    ];
+  }
+  function privacyPage(ctx3) {
+    const s = ctx3.s;
+    return [
+      card(
+        title("\u{1F512} Privacy and record"),
+        // the record (chatlog.js): off unless they switch it on. Laynie, Nov 4, the exact words: "It only should say 'This option
+        // sends a copy of what the companion recieves and sends for bug squashing. Completely voluntary participation.'"
+        s.logMust ? muted("\u{1F4DC} As a proprietor, your Companion always sends its record. There's no switch for it.") : toggle(
+          "Send a record of what I see",
+          "This option sends a copy of what the companion receives and sends for bug squashing. Completely voluntary participation.",
+          !!ctx3.prefs.chatlog,
+          () => ctx3.setPref("chatlog", !ctx3.prefs.chatlog)
+        ),
+        s.onBooks ? farmSwitches(ctx3, pick("tally")) : null
+      ),
+      saveCard(ctx3)
+    ];
+  }
+  function saveCard(ctx3) {
+    const ls = localSaveState(), say = (t2) => ctx3.hint(t2), t = (ms) => new Date(ms).toTimeString().slice(0, 5);
+    const line3 = !ls.folder ? ls.can ? "Not saving to a folder yet." : "This browser can't save to a folder (Chrome and Edge can). You can still load a file." : ls.perm !== "granted" ? "Saving to " + ls.folder + " is paused till you reconnect it (the browser asks again after a restart)." : ls.err ? "Trouble saving to " + ls.folder + ": " + ls.err : "Saving to " + ls.folder + " every minute" + (ls.at ? ", last at " + t(ls.at) : "") + ", as " + ls.file + ".";
+    return card(
+      title("\u{1F4BE} Your settings file"),
+      muted("Your settings as a file on this computer: everything on these pages, your drawn body, your messes and the memory log. It survives a crash, a cleared browser or a new one. " + line3),
+      h(
+        "div",
+        { style: { marginTop: "6px" } },
+        ls.folder && ls.perm !== "granted" ? btn("Reconnect " + ls.folder, () => localSaveReconnect(VERSION)) : null,
+        ls.can ? btn(ls.folder ? "Save to a different folder" : "Save my settings to a folder\u2026", () => localSavePick(VERSION)) : null,
+        ls.folder && ls.perm === "granted" ? btn("Save now", () => localSaveNow(VERSION).then(() => say("Saved."))) : null,
+        btn("Load my settings from a file\u2026", () => {
+          say("Pick the farmhand-companion file to load\u2026");
+          localSaveLoad(say);
+        })
+      )
+    );
+  }
+  function advancedPage(ctx3) {
+    const bot = window.Player && window.Player.MemberNumber === BOT_MEMBER;
+    return [
+      card(
+        title("\u{1F9F0} This panel"),
+        muted("Only on this computer."),
+        bot ? toggle(
+          "Draw the room on the farm girl's screen",
+          "Off (the default), this tab doesn't draw anybody in the room: no pictures downloaded for what people wear, far less work and memory on this computer. The farm runs the same either way. Switch it on to watch the room or click on people from here.",
+          !!ctx3.prefs.drawRoom,
+          () => {
+            const on2 = !ctx3.prefs.drawRoom;
+            ctx3.setPref("drawRoom", on2);
+            if (on2) setTimeout(redrawRoom, 50);
+          }
+        ) : null,
+        pref(ctx3, "compact", "Compact cards", "Smaller text, more on screen"),
+        pref(ctx3, "btnPinned", "Pin the \u{1F33E} button", "Unpinned, you can drag it anywhere (mouse or finger). Pin it so it stays put."),
+        h("div", { style: { marginTop: "6px" } }, btn("Put the button and panel back (size and full screen too)", () => ctx3.resetPlaces && ctx3.resetPlaces()))
+      ),
+      card(
+        title("\u{1F9E0} Memory log"),
+        muted("For chasing a page that runs out of room: how big things were, every half minute, for the last hour. /farmmem in chat shows it too."),
+        h("pre", { style: { whiteSpace: "pre-wrap", fontSize: "11px", maxHeight: "300px", overflowY: "auto" } }, memlogText(12) || "Nothing yet.")
+      )
+    ];
+  }
+  function aboutPage(ctx3) {
+    const p = ctx3.prefs;
+    return [card(
+      title("\u{1F33E} Farmhand Companion v" + VERSION),
+      muted("The B&B Farm's helper: the \u{1F33E} panel, the drawn body, the farm's messes and gear on you, and your switches. It only talks to the farm girl."),
+      toggle(
+        "Farmhand Companion on",
+        "Switched off, the Companion stays quiet after your next reload: no panel, no drawn body, no messes or farm gear on you, nothing sent to the farm. The game's settings page stays, so you can switch it back on.",
+        !p.off,
+        () => ctx3.setPref("off", !p.off)
+      ),
+      p.off ? h("div", { style: { marginTop: "6px" } }, btn("Reload now", () => window.location.reload(), true)) : null
+    )];
+  }
+  var SETTINGS_PAGES = [
+    { id: "switches", label: "\u{1F404} Farm switches", render: farmPage },
+    { id: "body", label: "\u{1FA9E} Body and look", render: bodyPage },
+    { id: "gear", label: "\u26D3 Gear and marks", render: gearPage },
+    { id: "messages", label: "\u{1F4AC} Messages", render: messagesPage },
+    { id: "privacy", label: "\u{1F512} Privacy and record", render: privacyPage },
+    { id: "guides", label: "\u{1F4D6} Guides", render: (ctx3) => guidesTab(ctx3, !!ctx3.s.staff) },
+    { id: "advanced", label: "\u{1F9F0} Advanced", render: advancedPage },
+    { id: "about", label: "\u2139 About", render: aboutPage }
+  ];
+  var drawPage = (p, ctx3) => {
+    try {
+      return p.render(ctx3);
+    } catch (e) {
+      console.warn("[Farmhand Companion]", e);
+      return card(title(p.label), muted("This page hit a snag. The others still work."));
+    }
+  };
+  function findResults(ctx3, q2) {
+    const out = [], want = q2.trim().toLowerCase();
+    for (const p of SETTINGS_PAGES) {
+      if (p.id === "guides") continue;
+      const box2 = h("div", null, drawPage(p, ctx3));
+      const hits = [...box2.querySelectorAll(".fhc-tog")].filter((t) => t.textContent.toLowerCase().includes(want));
+      if (hits.length) out.push(card(title(p.label), hits));
+    }
+    return out.length ? out : [muted(`Nothin' matches "` + q2.trim() + '". Try fewer letters, or look through the pages.')];
+  }
+  function settingsView(ctx3, page2, setPage) {
+    const cur = SETTINGS_PAGES.find((p) => p.id === page2) || SETTINGS_PAGES[0];
+    const results = h("div", { class: "fhc-set-body" });
+    const find = ctx3.ui.setFind || "";
+    const fill = (q2) => results.replaceChildren(...[].concat(q2.trim() ? findResults(ctx3, q2) : drawPage(cur, ctx3)).flat(Infinity).filter(Boolean));
+    fill(find);
+    const input2 = h("input", {
+      class: "fhc-in",
+      type: "search",
+      placeholder: "Find a setting\u2026",
+      "aria-label": "Find a setting",
+      value: find,
+      style: { width: "100%" },
+      oninput: (e) => {
+        ctx3.setUi({ setFind: e.target.value }, true);
+        fill(e.target.value);
+      }
+    });
+    return h(
+      "div",
+      null,
+      h("div", { style: { margin: "0 0 10px" } }, input2),
+      h(
+        "div",
+        { class: "fhc-set" },
+        h("nav", { class: "fhc-set-nav", "aria-label": "Settings pages" }, SETTINGS_PAGES.map((p) => h("button", { type: "button", class: p === cur && !find.trim() ? "on" : "", onclick: () => {
+          ctx3.setUi({ setFind: "" }, true);
+          setPage(p.id);
+        } }, p.label))),
+        results
+      )
+    );
+  }
+
   // extension/src/settings.js
   var W10 = window;
   var ID = "FarmhandCompanion";
   var panel = null;
   var box = null;
-  var tab = "switches";
+  var page = "switches";
   var settingsAvailable = () => typeof W10.PreferenceRegisterExtensionSetting === "function";
   function ctx() {
     const c = panel.ctx();
@@ -6045,33 +6408,6 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
       n.style.display = "block";
     }
   }
-  var TABS = [
-    ["switches", "Switches"],
-    ["guides", "Guides"],
-    ["files", "Your settings file"],
-    ["about", "About"]
-  ];
-  function body(c) {
-    const p = c.prefs, s = c.s || {};
-    if (tab === "guides") return guidesTab(c, !!s.staff);
-    if (tab === "files") return [card(
-      title("\u{1F9E0} Memory log"),
-      muted("For chasing a page that runs out of room: how big things were, every half minute, for the last hour. /farmmem in chat shows it too."),
-      h("pre", { style: { whiteSpace: "pre-wrap", fontSize: "11px", maxHeight: "300px", overflowY: "auto" } }, memlogText(12) || "Nothing yet.")
-    )];
-    if (tab === "about") return [card(
-      title("\u{1F33E} Farmhand Companion v" + VERSION),
-      muted("The B&B Farm's helper: the \u{1F33E} panel, the drawn body, the farm's messes and gear on you, and your switches. It only talks to the farm girl."),
-      toggle(
-        "Farmhand Companion on",
-        "Switched off, the Companion stays quiet after your next reload: no panel, no drawn body, no messes or farm gear on you, nothing sent to the farm. This page stays, so you can switch it back on.",
-        !p.off,
-        () => c.setPref("off", !p.off)
-      ),
-      p.off ? h("div", { style: { marginTop: "6px" } }, btn("Reload now", () => W10.location.reload(), true)) : null
-    )];
-    return [drawnBodyCard(c), panelPrefs(c)];
-  }
   function draw() {
     if (!box) return;
     const c = ctx();
@@ -6085,12 +6421,11 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
           else close();
         }, true)
       ),
-      h("nav", { class: "fhc-row" }, TABS.map(([id, label]) => h("button", { type: "button", class: "fhc-pill" + (tab === id ? " on" : ""), onclick: () => {
-        tab = id;
-        draw();
-      } }, label))),
       h("div", { id: "fhc-set-note", style: { display: "none", margin: "6px 0", color: "#c9a35b" } }),
-      h("div", { style: { marginTop: "8px" } }, body(c))
+      settingsView(c, page, (p) => {
+        page = p;
+        draw();
+      })
     );
   }
   function open() {
@@ -6131,7 +6466,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     }
   }
   function openSettings(which) {
-    if (which) tab = which;
+    if (which) page = which === "files" ? "privacy" : which;
     try {
       if (typeof W10.PreferenceSubscreenExtensionsOpen === "function") {
         W10.PreferenceSubscreenExtensionsOpen(ID);
@@ -6145,11 +6480,22 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
   // extension/src/views/livestock.js
   var pct = (a, b) => b ? 100 * a / b : 0;
   var hoursLeft = (t) => Math.max(0, Math.ceil((t - Date.now()) / 36e5));
-  function happeningCard(ctx3) {
+  var minsLeft2 = (t) => Math.max(0, Math.ceil((t - Date.now()) / 6e4));
+  var till = (t) => {
+    const m = minsLeft2(t);
+    return m >= 1440 ? Math.floor(m / 1440) + " d " + Math.floor(m % 1440 / 60) + " h" : m >= 60 ? Math.floor(m / 60) + " h" : m + " m";
+  };
+  var clock = (t) => new Date(t).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+  var of = (a, b) => b >= 1e3 ? (a / 1e3).toFixed(1) + " / " + (b / 1e3).toFixed(1) + " L" : Math.round(a) + " / " + Math.round(b) + " mL";
+  var plain = (label) => String(label || "").replace(/^[^\p{L}\p{N}]+/u, "");
+  function goSettings(ctx3, page2) {
+    if (settingsAvailable() && openSettings(page2)) return;
+    ctx3.setUi({ setPage: page2, setFind: "", goTab: "settings" });
+  }
+  var errCard = (s) => s.stateErr && card(title("Somethin' broke on the farm girl's end"), muted("Part of your panel didn't arrive. Tell the proprietors this line: " + s.stateErr));
+  function happening(ctx3) {
     const s = ctx3.s, hp = s.happening || [], quiet = s.quietUntil && s.quietUntil > Date.now();
-    if (!hp.length && !s.onBooks) return null;
-    return card(
-      h("div", { class: "fhc-kv" }, title("What's happenin' to you"), quiet ? chip("quiet", "acc") : null),
+    return [
       hp.length ? hp.map((t) => h("div", { style: { margin: "3px 0" } }, t)) : muted("Nothin' has hold of you right now."),
       h(
         "div",
@@ -6157,158 +6503,204 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
         quiet ? btn("End the quiet", () => ctx3.send("quiet off")) : btn("An hour's quiet", () => ctx3.send("quiet 60")),
         muted(quiet ? "Nothin' new starts on you till it's over." : "Quiet: no new traps, urges, scents or teasin' for an hour. It doesn't stop what already has you; the safe word does.")
       )
-    );
+    ];
   }
   function me2(ctx3) {
-    const s = ctx3.s;
-    const chips = [
-      s.tier && chip(s.tier, "acc"),
-      s.species && chip(s.species),
-      s.gender && chip(s.gender),
-      ...(s.keys || []).map((k) => chip(k + " key")),
-      s.heatUntil && chip("in heat", "alert"),
-      s.preg && chip("carryin'", "good")
-    ];
-    const bars = [
-      s.milk && bar("Milk", ml(s.milk.ml) + " of " + ml(s.milk.cap) + " \xB7 grade " + s.milk.grade, pct(s.milk.ml, s.milk.cap)),
-      s.quota && bar("Today's quota", ml(s.quota.ml) + " of " + ml(s.quota.goal) + (s.quota.streak ? " \xB7 streak " + s.quota.streak : ""), pct(s.quota.ml, s.quota.goal), "good"),
-      s.semen && bar("Seed", ml(s.semen.ml) + " of " + ml(s.semen.cap), pct(s.semen.ml, s.semen.cap)),
-      s.holding && s.holding.ml > 0 && bar("Holding", ml(s.holding.ml) + " of " + ml(s.holding.cap), pct(s.holding.ml, s.holding.cap), "alert")
-    ];
-    return [
-      card(h("div", { class: "fhc-title" }, s.name), h("div", { style: { marginTop: "6px" } }, chips)),
-      happeningCard(ctx3),
-      s.roam && card(
-        h("div", { class: "fhc-kv" }, title("\u{1F9ED} Roam passes"), chip(s.roam.left + " held", s.roam.left ? "acc" : "alert")),
-        s.roam.until ? muted("Roamin' now: back on the farm by " + new Date(s.roam.until).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) + ", or the farm girl fetches you.") : muted(s.roam.left ? "An hour off the farm each; the whole map is yours either way. Walk out the door and a pass starts. Late back costs you." : "The farm gate's shut till you have a pass. The whole map is still yours to wander."),
-        h(
-          "div",
-          null,
-          s.roam.until ? btn("I'm back", () => ctx3.send("roam back")) : s.roam.left ? btn("Roam for an hour", () => ctx3.send("roam start"), true) : null,
-          s.roam.until ? null : btn("Buy a pass \xB7 " + (s.roam.price || 30) + " \u{1F380}", () => ctx3.send("buy roampass"))
-        )
-      ),
-      bars.some(Boolean) && card(
-        title("Today"),
-        bars,
-        s.heatUntil && muted("In heat for " + hoursLeft(s.heatUntil) + " more hours"),
-        s.preg && muted("Carryin' for " + s.preg.sires.join(" & ") + " \xB7 due in " + Math.max(0, Math.ceil((s.preg.due - Date.now()) / 864e5)) + " day(s)")
-      ),
-      ...meCards(ctx3),
-      // add-on cards meant for here: barn life's food, water and grooming (extras.js)
-      (s.body || []).length && card(title("Body"), h(
-        "div",
-        { class: "fhc-grid" },
-        s.body.map((b) => h("div", null, muted(b.label), h("div", { style: { fontWeight: 600 } }, b.size)))
-      )),
-      s.today && card(title("Marks"), h(
-        "div",
-        { class: "fhc-grid" },
-        [["Used today", s.today.tally], ["Naughty marks", s.today.naughty], ["Praised", s.today.praised]].map(([k, v]) => h("div", null, muted(k), h("div", { style: { fontWeight: 600 } }, v)))
-      )),
-      s.kept && card(
-        h("div", { class: "fhc-kv" }, title("\u{1F3F7}\uFE0F Kept by " + s.kept.by), chip(Math.max(1, Math.ceil((s.kept.until - Date.now()) / 864e5)) + " day(s)", "acc")),
-        s.kept.tag ? muted("Your tag: " + s.kept.tag) : null,
-        s.kept.name ? muted("This week you're called: " + s.kept.name) : null,
-        (s.kept.milk || []).length ? muted("Milked at " + s.kept.milk.map((x) => x + ":00").join(" and ")) : null,
-        h("div", null, btn("What that means", () => ctx3.send("kept")), btn("End it", () => ctx3.send("kept off")))
-      ),
-      s.intensity && card(
-        title("How the farm talks to you"),
-        h("div", null, [["tender", "Tender"], ["rough", "Rough"], ["filthy", "Filthy"]].map(([id, label]) => h("button", { type: "button", class: "fhc-pill" + (s.intensity === id ? " on" : ""), onclick: () => ctx3.send("intensity " + id) }, label))),
-        muted(s.intensity === "tender" ? "Softer words, and the traps lean mild." : s.intensity === "filthy" ? "Dirtier words, and the traps lean brutal." : "As written."),
-        muted("It calls you: " + (((s.words || {}).call || []).join(", ") || "whatever comes to mind") + " \xB7 never: " + (((s.words || {}).never || []).join(", ") || "nothin' ruled out")),
-        h("div", null, btn("Names I love\u2026", () => ctx3.fillBox("callme ")), btn("Never call me\u2026", () => ctx3.fillBox("nevercall ")))
-      ),
-      h("div", { class: "fhc-quick" }, ["stats", "measure", "record", "pedigree", "keys"].map((c) => btn(c[0].toUpperCase() + c.slice(1), () => ctx3.send(c))), btn("Dress me", () => ctx3.send("dressme")))
-    ];
-  }
-  function gearCard(s) {
-    const g = s.gear || {};
-    const steps = (lv) => h(
+    const s = ctx3.s, x = mePieces(ctx3), now = Date.now();
+    const quiet = s.quietUntil && s.quietUntil > now;
+    const sub = [
+      [s.tier, s.species].filter(Boolean).join(" "),
+      s.herdLeader && s.herdLeader + "'s herd",
+      s.contract && (s.contract.until ? "contract " + till(s.contract.until) : "contract for good")
+    ].filter(Boolean).join(" \xB7 ");
+    const chips = (s.now || []).filter((n) => !n.until || n.until > now).map((n) => chip(n.icon + " " + n.text + (n.until ? " \xB7 " + till(n.until) : ""), /🚫|🪵|⛓️|🚧|🔥/.test(n.icon) ? "alert" : "")).concat(x.chips.map((c) => chip(String(c.text ?? c), c.kind === "alert" ? "alert" : "")), quiet ? [chip("\u{1F92B} quiet \xB7 " + till(s.quietUntil))] : []);
+    const sum = h(
       "div",
-      { style: { display: "flex", gap: "4px", marginTop: "6px" } },
-      [1, 2, 3, 4].map((n) => h("div", { style: { flex: "1", height: "9px", borderRadius: "3px", background: n <= lv ? "var(--fh-accent)" : "var(--fh-line)" } }))
+      { class: "fhc-sum" },
+      h("div", { class: "fhc-sum-top" }, h("span", { class: "fhc-nm" }, s.name), h("span", { class: "fhc-purse", title: "Your ribbons" }, "\u{1F380} " + (s.ribbons || 0))),
+      sub ? h("div", { class: "fhc-muted", style: { marginTop: "-6px" } }, sub) : null,
+      chips.length ? h("div", { class: "fhc-chips", "aria-label": "Right now" }, chips) : null,
+      meters([
+        s.milk && { label: "Milk", right: String(s.milk.grade || ""), value: of(s.milk.ml, s.milk.cap), pct: pct(s.milk.ml, s.milk.cap) },
+        s.quota && { label: "Quota", right: s.quota.streak ? "\xD7" + s.quota.streak : "", value: of(s.quota.ml, s.quota.goal), pct: pct(s.quota.ml, s.quota.goal), kind: "good" },
+        s.semen && { label: "Seed", value: of(s.semen.ml, s.semen.cap), pct: pct(s.semen.ml, s.semen.cap) },
+        s.holding && s.holding.ml > 0 && { label: "Holding", value: ml(s.holding.ml), pct: pct(s.holding.ml, s.holding.cap), kind: "alert" },
+        ...x.bars.map((b) => ({ label: plain(b.label), value: String(b.value ?? ""), pct: Number(b.pct) || 0, kind: b.kind === "good" || b.kind === "alert" ? b.kind : "" }))
+      ])
     );
-    return card(
-      title("Milkin' gear"),
-      g.milk ? [
-        h("div", { class: "fhc-kv" }, h("b", null, g.milk.name), h("span", null, g.milk.ml + " mL a minute")),
-        steps(g.milk.level),
-        muted(["", "Gentle", "Steady", "Hard", "Max"][g.milk.level] + (g.milk.kind === "echo" ? " \xB7 the more worked up you are, the faster it draws" : ""))
-      ] : muted("No pump on right now. A milk pump (the game's Lactation Pump), Echo's portable pump, the milk vendor or a milkin' stall all milk you here."),
-      g.machine && h("div", { class: "fhc-kv" }, h("span", null, "\u2699\uFE0F " + g.machine.name), h("span", { class: "fhc-muted" }, g.machine.intensity < 0 ? "off" : "intensity " + g.machine.intensity)),
-      g.funnel && h("div", { class: "fhc-kv" }, h("span", null, "Funnel gag"), h("span", { class: "fhc-muted" }, "fitted, and it counts as open"))
-    );
-  }
-  function milking(ctx3) {
-    const s = ctx3.s;
-    if (!s.milk && !s.semen) return [card(title("Milking"), muted("You're not makin' milk right now. Flip Milkable on in Toggles if you'd like to."))];
+    const fresh2 = ctx3.feed.filter((m) => m.kind !== "mine" && m.at > (ctx3.ui.inboxSeen || 0)).length;
+    const F = ctx3.s.feats, next = F && Array.isArray(F.tracks) ? F.tracks.filter((t) => t.next).map((t) => Object.assign({ p: pct(t.n - (t.prev || 0), t.next - (t.prev || 0)) }, t)).sort((a, b) => b.p - a.p)[0] : null;
+    const hp = s.happening || [];
     return [
-      s.milk && card(
-        title("Milk"),
-        bar("In your udder", ml(s.milk.ml) + " of " + ml(s.milk.cap), pct(s.milk.ml, s.milk.cap)),
-        muted("Grade " + s.milk.grade + (s.milk.lastAt ? " \xB7 last milked " + Math.round((Date.now() - s.milk.lastAt) / 6e4) + " min ago" : ""))
-      ),
-      s.quota && card(title("Quota"), bar("Today", ml(s.quota.ml) + " of " + ml(s.quota.goal), pct(s.quota.ml, s.quota.goal), "good")),
-      s.semen && card(title("Seed"), bar("Stored", ml(s.semen.ml) + " of " + ml(s.semen.cap), pct(s.semen.ml, s.semen.cap))),
-      gearCard(s),
-      s.stallUntil && card(h(
+      errCard(s),
+      sum,
+      rows(ctx3, "me", [
+        {
+          id: "inbox",
+          label: "\u{1F4EC} Inbox",
+          dot: fresh2 > 0,
+          sum: fresh2 ? fresh2 + " new" : ctx3.feed.length ? "nothin' new" : "empty",
+          body: () => {
+            ctx3.ui.inboxSeen = Date.now();
+            return inbox(ctx3);
+          }
+        },
+        hp.length && { id: "now", label: "\u{1F300} What's got you", sum: hp.length === 1 ? String(hp[0]).slice(0, 40) : hp.length + " things", body: () => happening(ctx3) },
+        (s.preg || s.eggs) && {
+          id: "carry",
+          label: "\u{1F37C} Carryin'",
+          sum: [s.preg && s.preg.sires.join(" & ") + "'s, due in " + Math.max(0, Math.ceil((s.preg.due - now) / 864e5)) + " d", s.eggs && s.eggs.n + " eggs"].filter(Boolean).join(" \xB7 "),
+          body: () => [
+            s.preg && h("div", null, "Carryin' for " + s.preg.sires.join(" & ") + " \xB7 due in " + Math.max(0, Math.ceil((s.preg.due - now) / 864e5)) + " day(s)"),
+            s.eggs && h("div", null, "\u{1F95A} " + s.eggs.n + " eggs in you. ", h("span", { class: "fhc-muted" }, "?lay at the nest, or they come when they're due.")),
+            h("div", null, btn("Pedigree", () => ctx3.send("pedigree")), btn("Eggs", () => ctx3.send("eggs")), btn("Body tab \u203A", () => ctx3.setUi({ goTab: "body" })))
+          ]
+        },
+        (s.body || []).length && {
+          id: "body",
+          label: "\u{1F4CF} Body",
+          sum: s.body.map((b) => b.size).slice(0, 3).join(" \xB7 "),
+          body: () => [
+            h("div", { class: "fhc-grid" }, s.body.map((b) => h("div", null, muted(b.label), h("div", { style: { fontWeight: 600 } }, b.size)))),
+            h("div", null, btn("Measure", () => ctx3.send("measure")))
+          ]
+        },
+        s.today && {
+          id: "marks",
+          label: "\u270D\uFE0F Today's marks",
+          sum: "used " + s.today.tally + " \xB7 " + s.today.naughty + " naughty \xB7 praised " + s.today.praised,
+          body: () => [
+            pairs([["Used today", String(s.today.tally)], ["Naughty marks", String(s.today.naughty)], ["Praised", String(s.today.praised)], ["Degraded", s.today.degraded ? String(s.today.degraded) : null]]),
+            h("div", null, btn("My tally", () => ctx3.send("tally")))
+          ]
+        },
+        s.kept && {
+          id: "kept",
+          label: "\u{1F3F7}\uFE0F Kept by " + s.kept.by,
+          sum: Math.max(1, Math.ceil((s.kept.until - now) / 864e5)) + " day(s) left",
+          body: () => [
+            s.kept.tag ? muted("Your tag: " + s.kept.tag) : null,
+            s.kept.name ? muted("This week you're called: " + s.kept.name) : null,
+            (s.kept.milk || []).length ? muted("Milked at " + s.kept.milk.map((x2) => x2 + ":00").join(" and ")) : null,
+            h("div", null, btn("What that means", () => ctx3.send("kept")), btn("End it", () => ctx3.send("kept off")))
+          ]
+        },
+        s.roam && { id: "roam", label: "\u{1F9ED} Roam", sum: s.roam.until ? "out till " + clock(s.roam.until) : s.roam.left + " pass" + (s.roam.left === 1 ? "" : "es"), body: () => roamBody(ctx3) },
+        next && {
+          id: "feat",
+          label: "\u{1F3C5} Next feat",
+          sum: next.name + " " + TIER[next.tier + 1] + " \xB7 " + Math.round(next.p) + "%",
+          body: () => [
+            bar(next.icon + " " + next.name + ": tier " + TIER[next.tier + 1], next.n + " of " + next.next + " " + next.unit, next.p, "acc"),
+            muted("Perk: " + next.perk + ", " + next.desc),
+            h("div", null, btn("All my feats \u203A", () => ctx3.setUi({ goTab: "ribbons", open_rib: "feats" })))
+          ]
+        },
+        x.cards.length && { id: "extras", label: "\u{1F9E9} Farm extras", sum: x.labels.slice(0, 2).join(" \xB7 "), body: () => x.cards }
+      ]),
+      quick(ctx3, "me", [
+        ["\u{1F6BF} Wash", () => ctx3.send("wash")],
+        ["\u{1F489} Shots", () => ctx3.send("myshots")],
+        // ?drain with their own number: them and nobody else, staff or stock (15-commands.js drainSelf)
+        ["\u{1FAA3} Drain", () => ctx3.send("drain " + (window.Player && window.Player.MemberNumber || "me"))]
+      ], [
+        ["\u{1F4CA} Stats", () => ctx3.send("stats")],
+        ["\u{1F4D0} Measure", () => ctx3.send("measure")],
+        ["\u{1F4CB} Record", () => ctx3.send("record")],
+        ["\u{1F333} Pedigree", () => ctx3.send("pedigree")],
+        ["\u{1F511} Keys", () => ctx3.send("keys")],
+        ["\u{1F457} Dress me", () => ctx3.send("dressme")],
+        quiet ? ["\u{1F92B} End the quiet", () => ctx3.send("quiet off")] : ["\u{1F92B} Quiet hour", () => ctx3.send("quiet 60")]
+      ])
+    ];
+  }
+  function roamBody(ctx3) {
+    const r = ctx3.s.roam;
+    return [
+      r.until ? muted("Roamin' now: back on the farm by " + clock(r.until) + ", or the farm girl fetches you.") : muted(r.left ? "An hour off the farm each; the whole map is yours either way. Walk out the door and a pass starts. Late back costs you." : "The farm gate's shut till you have a pass. The whole map is still yours to wander."),
+      h(
         "div",
-        { class: "fhc-kv" },
-        title("Milkin' stall"),
-        chip(Math.max(0, Math.round((s.stallUntil - Date.now()) / 6e4)) + " min left", "acc")
-      ), muted("It drains you down to a quarter of what you hold, then lets go.")),
-      s.dial && card(
-        h("div", { class: "fhc-kv" }, title("The stall dial"), s.milkCums ? chip("milked till you came \xD7 " + s.milkCums, "acc") : null),
+        null,
+        r.until ? btn("I'm back", () => ctx3.send("roam back")) : r.left ? btn("Roam for an hour", () => ctx3.send("roam start"), true) : null,
+        r.until ? null : btn("Buy a pass \xB7 " + (r.price || 30) + " \u{1F380}", () => ctx3.send("buy roampass"))
+      )
+    ];
+  }
+  function body(ctx3) {
+    const s = ctx3.s, sw = s.switches || {}, g = s.gear || {}, onoff = (v) => v === true ? "on" : v === false ? "off" : v;
+    const steps = (lv) => h("div", { class: "fhc-steps" }, [1, 2, 3, 4].map((n) => h("div", { class: n <= lv ? "on" : "" })));
+    const milk = s.milk ? section(
+      "\u{1F95B} Milk",
+      "grade " + s.milk.grade,
+      bar("In your udder", ml(s.milk.ml) + " of " + ml(s.milk.cap) + (s.milk.lastAt ? " \xB7 milked " + Math.round((Date.now() - s.milk.lastAt) / 6e4) + " min ago" : ""), pct(s.milk.ml, s.milk.cap)),
+      s.quota && bar("Today's quota", ml(s.quota.ml) + " of " + ml(s.quota.goal) + (s.quota.streak ? " \xB7 streak " + s.quota.streak : ""), pct(s.quota.ml, s.quota.goal), "good"),
+      // what you're hooked up to right now, read off you by the farm
+      g.milk ? [
+        h("div", { class: "fhc-kv", style: { border: "none", padding: "0" } }, h("span", null, g.milk.name), h("span", { class: "fhc-muted" }, ["", "Gentle", "Steady", "Hard", "Max"][g.milk.level] + " \xB7 " + g.milk.ml + " mL a minute")),
+        steps(g.milk.level),
+        g.milk.kind === "echo" ? muted("The more worked up you are, the faster it draws.") : null
+      ] : muted("No pump on right now. A milk pump (the game's Lactation Pump), Echo's portable pump, the milk vendor or a milkin' stall all milk you."),
+      g.machine && h("div", { class: "fhc-kv" }, h("span", null, "\u2699\uFE0F " + g.machine.name), h("span", { class: "fhc-muted" }, g.machine.intensity < 0 ? "off" : "intensity " + g.machine.intensity)),
+      g.funnel && h("div", { class: "fhc-kv" }, h("span", null, "Funnel gag"), h("span", { class: "fhc-muted" }, "fitted, and it counts as open")),
+      s.stallUntil && h("div", { class: "fhc-kv" }, h("span", null, "Milkin' stall"), chip(minsLeft2(s.stallUntil) + " min left", "acc")),
+      s.dial && h(
+        "div",
+        null,
+        muted("The stall dial" + (s.milkCums ? " \xB7 milked till you came \xD7 " + s.milkCums : "")),
         h("div", null, [["gentle", "Gentle"], ["steady", "Steady"], ["hard", "Hard"], ["punishing", "Punishin'"]].map(([id, label]) => h("button", { type: "button", class: "fhc-pill" + (s.dial === id ? " on" : ""), onclick: () => ctx3.send("stalldial " + id) }, label))),
-        muted({ gentle: "Slow and sweet. It leaves you a third.", steady: "It drains you to a quarter.", hard: "Fast and deep, down to an eighth, and sore teats after.", punishing: "Past empty. You'll be sensitive for an hour after." }[s.dial] || ""),
-        muted("Run hot enough in the stall and the cups will tip you over.")
+        muted({ gentle: "Slow and sweet. It leaves you a third.", steady: "It drains you to a quarter.", hard: "Fast and deep, down to an eighth, and sore teats after.", punishing: "Past empty. You'll be sensitive for an hour after." }[s.dial] || "")
       ),
       h("div", null, btn("Quota", () => ctx3.send("quota")), btn("Milk board", () => ctx3.send("board")))
-    ];
-  }
-  function breeding(ctx3) {
-    const s = ctx3.s, sw = s.switches || {};
-    const rows2 = [
-      ["Breedable", sw.breedable],
-      ["Fertile", sw.fertile],
-      ["Jar breedin'", sw.jarok ? "asks first" : "never"],
-      ["Free use", sw.freeuse],
-      ["Natural heat", sw.naturalheat]
-    ];
-    return [
-      card(
-        title("Breedin'"),
-        rows2.map(([k, v]) => h("div", { class: "fhc-kv" }, h("span", null, k), h("span", { class: "fhc-muted" }, v === true ? "on" : v === false ? "off" : v))),
-        s.heatUntil && muted("\u{1F525} In heat \xB7 " + hoursLeft(s.heatUntil) + " h left"),
-        s.preg && muted("\u{1F37C} Carryin' for " + s.preg.sires.join(" & ")),
-        s.eggs && muted("\u{1F95A} Carryin' " + s.eggs.n + " eggs \xB7 ?lay at the nest, or they come when they're due")
-      ),
-      s.trapCard && muted("\u{1F9EA} Your trap card is on the Traps tab."),
-      h("div", null, btn("My tally", () => ctx3.send("tally")), btn("Eggs", () => ctx3.send("eggs")), btn("Wash up", () => ctx3.send("wash")), btn("Pedigree", () => ctx3.send("pedigree")))
-    ];
+    ) : section("\u{1F95B} Milk", null, muted("You're not makin' milk right now. Milkable is in \u2699 Settings \u203A Farm switches."), h("div", null, btn("Farm switches", () => goSettings(ctx3, "switches"))));
+    const breed = section(
+      "\u{1F402} Breedin'",
+      [sw.fertile ? "fertile" : null, s.heatUntil ? "in heat " + hoursLeft(s.heatUntil) + " h" : null].filter(Boolean).join(" \xB7 "),
+      pairs([
+        ["Breedable", onoff(sw.breedable)],
+        ["Fertile", onoff(sw.fertile)],
+        ["Jar breedin'", sw.jarok ? "asks first" : "never"],
+        ["Free use", onoff(sw.freeuse)],
+        ["Natural heat", onoff(sw.naturalheat)],
+        ["Carryin'", s.preg ? s.preg.sires.join(" & ") + "'s, due in " + Math.max(0, Math.ceil((s.preg.due - Date.now()) / 864e5)) + " d" : null],
+        ["Eggs in you", s.eggs ? s.eggs.n + " \xB7 lay at the nest" : null]
+      ]),
+      h("div", null, btn("My tally", () => ctx3.send("tally")), btn("Eggs", () => ctx3.send("eggs")), btn("Pedigree", () => ctx3.send("pedigree")))
+    );
+    const hold = s.holding && s.holding.cap ? section(
+      "\u{1FAD9} Holdin'",
+      Math.round(pct(s.holding.ml, s.holding.cap)) + "% full",
+      bar("In you", ml(s.holding.ml) + " of " + ml(s.holding.cap), pct(s.holding.ml, s.holding.cap), "alert"),
+      h("div", null, btn("\u{1FAA3} Drain", () => ctx3.send("drain " + (window.Player && window.Player.MemberNumber || "me"))), btn("\u{1F6BF} Wash", () => ctx3.send("wash")))
+    ) : null;
+    const seed = s.semen ? section("\u{1F4A6} Seed", null, bar("Stored", ml(s.semen.ml) + " of " + ml(s.semen.cap), pct(s.semen.ml, s.semen.cap))) : section("\u{1F4A6} Seed", null, muted("You're not makin' seed. Want a turn as a stud? Futa's in \u2699 Settings \u203A Farm switches."), h("div", null, btn("Farm switches", () => goSettings(ctx3, "switches"))));
+    return [milk, breed, hold, seed];
   }
   function trapThemesCard(ctx3) {
     const list = ctx3.s.trapThemes || [];
     if (!list.length) return null;
-    return card(
-      title("Kinds of trap"),
+    return card(title("Kinds of trap"), trapThemes(ctx3));
+  }
+  function trapThemes(ctx3) {
+    const list = ctx3.s.trapThemes || [];
+    return [
       muted("Switch a whole kind off and not one of those traps springs for you, not even one a proprietor springs by hand. A trap that's two kinds is off if either is." + (ctx3.s.trapCard ? "" : " (They only matter once your traps are on.)")),
       list.map((t) => toggle(t.icon + " " + t.label, t.desc, !!t.on, () => ctx3.send("traps theme " + t.id + " " + (t.on ? "off" : "on"))))
-    );
+    ];
   }
   function seasonsCard(ctx3) {
+    const b = seasons(ctx3);
+    return b ? card(title("\u{1F5D3}\uFE0F Seasons"), b) : null;
+  }
+  function seasons(ctx3) {
     const sa = ctx3.s.seasonsAdmin;
     if (!sa || !sa.rows || !sa.rows.length) return null;
-    const till = (t) => new Date(t).toLocaleString([], t - Date.now() < 20 * 36e5 ? { hour: "2-digit", minute: "2-digit" } : { weekday: "short", hour: "2-digit", minute: "2-digit" });
-    return card(
-      title("\u{1F5D3}\uFE0F Seasons"),
+    const at = (t) => new Date(t).toLocaleString([], t - Date.now() < 20 * 36e5 ? { hour: "2-digit", minute: "2-digit" } : { weekday: "short", hour: "2-digit", minute: "2-digit" });
+    return [
       muted("Start any season's traps whenever you like: for a party, a special day, or just because. While one's on, about a third of what the plain trap tiles spring is from its pack, and the farm girl dresses for it. Anybody with their Seasonal packs switch off never gets them."),
       sa.rows.map((x) => h(
         "div",
         { class: "fhc-kv" },
-        h("span", null, x.icon + " " + x.label + " \xB7 " + (x.on ? x.hand ? x.open ? "on till you stop it" : "on till " + till(x.until) : "on, its time of year" : x.dates)),
+        h("span", null, x.icon + " " + x.label + " \xB7 " + (x.on ? x.hand ? x.open ? "on till you stop it" : "on till " + at(x.until) : "on, its time of year" : x.dates)),
         h("span", null, x.on ? btn("Stop", () => ctx3.send("seasons stop " + x.id)) : [btn("2 hours", () => ctx3.send("seasons start " + x.id + " 2h")), btn("Till I stop it", () => ctx3.send("seasons start " + x.id + " on"))])
       )),
       h(
@@ -6320,85 +6712,126 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
         btn("The calendar", () => ctx3.send("seasons"))
       ),
       muted("Other lengths, or several at once: ?seasons start halloween 3d \xB7 ?seasons start halloween winter on")
-    );
+    ];
+  }
+  function play(ctx3) {
+    const s = ctx3.s, tc = s.trapCard, ad = s.trapAdmin, gear = s.farmGear || [], st2 = storeParts(ctx3), themes = s.trapThemes || [];
+    const traps = tc ? section(
+      "\u{1FAA4} Traps" + (tc.rank ? " \xB7 " + tc.rank : ""),
+      tc.total + " sprung" + (tc.nextRank ? " \xB7 next rank at " + tc.nextRank : ""),
+      tc.kinds.length ? h("div", { class: "fhc-chips" }, tc.kinds.map((k) => chip(k.kind + " \xD7" + k.n))) : muted("Nothin's caught you yet. Give it time."),
+      muted(tc.left + " kind" + (tc.left === 1 ? "" : "s") + " still to find" + (tc.eggs ? " \xB7 " + tc.eggs + " eggs laid" : "") + (tc.paused ? " \xB7 traps paused" : "") + (tc.eager ? " \xB7 eager (no waits)" : "") + (tc.danger ? " \xB7 Danger Draught in you" : "")),
+      tc.corr || tc.under ? bar("Corruption", tc.corr + " of 100" + (tc.under ? " \xB7 gone under, depth " + tc.under : ""), tc.corr, "alert") : null,
+      tc.hunt && muted("\u{1F514} The hunt is on: get to " + tc.hunt.goal),
+      tc.today && muted("\u{1F3AF} Trap of the day: " + tc.today.icon + " " + tc.today.kind + ", " + tc.today.what + (tc.today.paid ? ". It's paid you its ribbon today." : ". Twice as likely today, and a ribbon the first time it has you.")),
+      tc.rated && muted("Your ratings: \u{1F496} " + tc.rated.loved + " \xB7 \u{1F44D} " + tc.rated.fine + " \xB7 \u{1F645} " + tc.rated.no + (tc.rateAsk ? "" : " \xB7 not askin' after each trap")),
+      quick(ctx3, "traps", [["Struggle", () => ctx3.send("struggle")], ["What's out there", () => ctx3.send("traps")]], [
+        ["Switch traps off", () => ctx3.send("traps off")],
+        [tc.eager ? "Eager: on" : "Eager: off", () => ctx3.send("traps eager " + (tc.eager ? "off" : "on"))],
+        ["Lay (at the nest)", () => ctx3.send("lay")],
+        ["My brood book", () => ctx3.send("brood")],
+        ["My ratings", () => ctx3.send("rate")],
+        [tc.rateAsk === false ? "Ask how each was: off" : "Ask how each was: on", () => ctx3.send("rate ask " + (tc.rateAsk === false ? "on" : "off"))]
+      ])
+    ) : section("\u{1FAA4} Traps", "off", muted("The farm's traps are off for you, so you can walk right over them. Switch them on and every trap spot on the farm can spring for you."), h("div", null, btn("Switch traps on", () => ctx3.send("traps on"))));
+    const offKinds = themes.filter((t) => !t.on).length;
+    return [
+      errCard(s),
+      traps,
+      rows(ctx3, "play", [
+        {
+          id: "gear",
+          label: "\u26D3 On you right now",
+          sum: gear.length ? gear.length + " piece" + (gear.length === 1 ? "" : "s") : "nothin'",
+          body: () => [
+            gear.length ? gear.map((g) => h("div", null, h("div", { class: "fhc-kv" }, h("b", null, g.name), h("span", { class: "fhc-muted" }, minsLeft2(g.until) + " min")), muted(gearLore(g.name) || g.desc || ""))) : muted("No farm gear on you."),
+            !ctx3.prefs.gear && muted('Trap gear only goes on for real with "Farm can put real gear on me" switched on (\u2699 Settings \u203A Gear and marks).')
+          ]
+        },
+        themes.length && tc && { id: "kinds", label: "\u{1F9EC} Kinds of trap", sum: offKinds ? offKinds + " off" : "all on", body: () => trapThemes(ctx3) },
+        st2.now && { id: "fx", label: "\u{1F9EA} In you right now", sum: (s.fx || []).length + " potion" + ((s.fx || []).length === 1 ? "" : "s"), body: () => st2.now },
+        st2.dare && { id: "dare", label: s.dare.reckless ? "\u{1F3B2} A reckless dare" : "\u{1F3B2} Your dare", sum: minsLeft2(s.dare.until) + " min left", body: () => st2.dare },
+        st2.pen && { id: "pen", label: "\u{1F6A7} Corralled", sum: minsLeft2(s.penned.until) + " min", body: () => st2.pen },
+        s.sitting && { id: "nest", label: "\u{1FABA} Sittin' the nest", sum: s.sitting.n + " eggs", body: () => [muted(s.sitting.n + " eggs under you. They hatch in about " + Math.max(1, minsLeft2(s.sitting.until)) + " min."), h("div", null, btn("Get up", () => ctx3.send("sit up")))] },
+        s.holes && s.holes.length && {
+          id: "holes",
+          label: "\u{1F573} What you've taken",
+          sum: s.holes.map((x) => x.rank).slice(0, 2).join(" \xB7 "),
+          body: () => [
+            s.holes.map((x) => h("div", { class: "fhc-kv" }, h("span", null, "Your " + x.hole + " \xB7 " + x.rank), h("span", { class: "fhc-muted" }, x.loads + " loads" + (x.knots ? " \xB7 " + x.knots + " knots" : "") + (x.next ? " \xB7 next at " + x.next : "")))),
+            muted("Every step a hole is trained, you hold more for good and the traps pour more into it.")
+          ]
+        },
+        s.album && s.album.length && {
+          id: "album",
+          label: "\u{1F4D4} Keepsakes",
+          sum: s.album.length + "",
+          body: () => [
+            s.album.map((e) => h("div", null, h("div", { class: "fhc-kv" }, h("b", null, e.i + " " + e.h), h("span", { class: "fhc-muted" }, new Date(e.t).toLocaleDateString())), muted(e.x))),
+            muted("Only you can open this album.")
+          ]
+        },
+        s.onBooks && { id: "shots", label: "\u{1F489} Shots in you", sum: "?myshots", go: () => ctx3.send("myshots") },
+        ad && { id: "admin", label: "\u{1F6E0} Proprietor: traps", sum: ad.subjects.length + " with traps on", body: () => trapAdmin(ctx3) },
+        ctx3.s.seasonsAdmin && ctx3.s.seasonsAdmin.rows && ctx3.s.seasonsAdmin.rows.length && { id: "seasons", label: "\u{1F5D3}\uFE0F Seasons", sum: ctx3.s.seasonsAdmin.rows.filter((x) => x.on).map((x) => x.icon).join(" ") || "none on", body: () => seasons(ctx3) }
+      ])
+    ];
+  }
+  function trapAdmin(ctx3) {
+    const ad = ctx3.s.trapAdmin;
+    return [
+      ad.today && muted("\u{1F3AF} Trap of the day: " + ad.today.icon + " " + ad.today.kind),
+      ad.ratings && (ad.ratings.loved.length || ad.ratings.no.length) ? muted("\u{1F496} Most loved: " + (ad.ratings.loved.map((x) => x.icon + " " + x.kind + " (" + x.n + ")").join(", ") || "none yet") + ' \xB7 \u{1F645} Most "not for me": ' + (ad.ratings.no.map((x) => x.icon + " " + x.kind + " (" + x.n + ")").join(", ") || "none yet")) : null,
+      ad.subjects.length ? ad.subjects.map((x) => h("div", { class: "fhc-kv" }, h("span", null, (x.here ? "\u25CF " : "") + x.name), h("span", { class: "fhc-muted" }, x.n + " sprung" + (x.paused ? " \xB7 paused" : "")))) : muted("Nobody's switched their traps on yet."),
+      muted("Trap spots: " + (ad.spots.length ? ad.spots.join(", ") : "none yet (?spot set trap-<kind>)")),
+      muted("Water: " + (ad.water.length ? ad.water.join(", ") : "none yet (?spot set pond)") + (ad.nest ? " \xB7 " + ad.nest + " eggs in the nest" : "") + (ad.pack ? " \xB7 pack at " + ad.pack : "")),
+      ad.hunt && muted("\u{1F514} Hunt on: finish at " + ad.hunt.goal + ", " + ad.hunt.done + " home"),
+      h(
+        "div",
+        null,
+        btn("Kinds & spots", () => ctx3.send("traps")),
+        btn("Subjects", () => ctx3.send("subject")),
+        btn(ad.hunt ? "Stop the hunt" : "Start a hunt", () => ctx3.send(ad.hunt ? "hunt stop" : "hunt start")),
+        btn("Gather eggs", () => ctx3.send("gather")),
+        btn("Ratings", () => ctx3.send("traps ratings"))
+      )
+    ];
   }
   var TIER = ["\u2013", "I", "II", "III", "IV", "V"];
   function feats(ctx3) {
     const F = ctx3.s.feats;
-    if (!F || !Array.isArray(F.tracks)) return [card(title("\u{1F3C5} Feats"), muted("Your feats show here once the farm girl's sent your panel. ?feats works from chat too."))];
+    if (!F || !Array.isArray(F.tracks)) return [muted("Your feats show here once the farm girl's sent your panel. ?feats works from chat too.")];
     return [
       muted("Every track counts somethin' you do on the farm. Each new tier is a feat and grows that track's perk; perks stack and work on their own."),
-      F.tracks.map((t) => card(
-        h("div", { class: "fhc-kv" }, title(t.icon + " " + t.name + " " + TIER[t.tier]), t.tier ? chip(t.perk + (t.off ? " (off)" : ""), t.off ? "" : "good") : null),
+      F.tracks.map((t) => h(
+        "div",
+        { class: "fhc-box" },
+        h("div", { class: "fhc-kv" }, h("b", null, t.icon + " " + t.name + " " + TIER[t.tier]), t.tier ? chip(t.perk + (t.off ? " (off)" : ""), t.off ? "" : "good") : null),
         t.next ? bar("Next: tier " + TIER[t.tier + 1], t.n + " of " + t.next + " " + t.unit, pct(t.n - (t.prev || 0), t.next - (t.prev || 0)), "acc") : muted("Every tier earned. " + t.n + " " + t.unit + "."),
         muted(t.tier ? t.perk + ": " + t.desc : "Perk: " + t.perk + ", " + t.desc),
         t.tier ? toggle("Use " + t.perk, "Switch it off and it stays earned.", !t.off, () => ctx3.send("perks " + (t.off ? "on " : "off ") + t.key)) : null
-      )),
-      F.titles && F.titles.length ? card(title("\u{1F396}\uFE0F Titles"), muted(F.titles.join(" \xB7 "))) : null
+      ))
     ];
   }
-  function traps(ctx3) {
-    const s = ctx3.s, tc = s.trapCard, ad = s.trapAdmin, gear = s.farmGear || [];
+  function ribbons(ctx3) {
+    const s = ctx3.s, st2 = storeParts(ctx3), F = s.feats, tiers = F && Array.isArray(F.tracks) ? F.tracks.reduce((n, t) => n + (t.tier || 0), 0) : 0;
+    const log2 = s.ribbonLog || [];
     return [
-      happeningCard(ctx3),
-      s.stateErr && card(title("Somethin' broke on the farm girl's end"), muted("Part of your panel didn't arrive. Tell the proprietors this line: " + s.stateErr)),
-      tc ? card(
-        h("div", { class: "fhc-kv" }, title("Trap card" + (tc.rank ? " \xB7 " + tc.rank : "")), chip(tc.total + " sprung" + (tc.nextRank ? " \xB7 next rank at " + tc.nextRank : ""), "acc")),
-        tc.kinds.length ? h("div", null, tc.kinds.map((k) => chip(k.kind + " \xD7" + k.n))) : muted("Nothin's caught you yet. Give it time."),
-        muted(tc.left + " kind" + (tc.left === 1 ? "" : "s") + " still to find" + (tc.eggs ? " \xB7 " + tc.eggs + " eggs laid" : "") + (tc.paused ? " \xB7 traps paused" : "") + (tc.eager ? " \xB7 eager (no waits)" : "") + (tc.danger ? " \xB7 Danger Draught in you" : "")),
-        tc.corr || tc.under ? bar("Corruption", tc.corr + " of 100" + (tc.under ? " \xB7 gone under, depth " + tc.under : ""), tc.corr, "alert") : null,
-        tc.hunt && muted("\u{1F514} The hunt is on: get to " + tc.hunt.goal),
-        tc.today && muted("\u{1F3AF} Trap of the day: " + tc.today.icon + " " + tc.today.kind + ", " + tc.today.what + (tc.today.paid ? ". It's paid you its ribbon today." : ". Twice as likely today, and a ribbon the first time it has you.")),
-        tc.rated && muted("Your ratings: \u{1F496} " + tc.rated.loved + " \xB7 \u{1F44D} " + tc.rated.fine + " \xB7 \u{1F645} " + tc.rated.no + (tc.rateAsk ? "" : " \xB7 not askin' after each trap")),
-        h(
-          "div",
-          null,
-          btn("Struggle", () => ctx3.send("struggle")),
-          btn("Switch traps off", () => ctx3.send("traps off")),
-          btn(tc.eager ? "Eager: on" : "Eager: off", () => ctx3.send("traps eager " + (tc.eager ? "off" : "on"))),
-          btn("What's out there", () => ctx3.send("traps")),
-          btn("Lay (at the nest)", () => ctx3.send("lay")),
-          btn("My brood book", () => ctx3.send("brood")),
-          btn("My ratings", () => ctx3.send("rate")),
-          btn(tc.rateAsk === false ? "Ask how each was: off" : "Ask how each was: on", () => ctx3.send("rate ask " + (tc.rateAsk === false ? "on" : "off")))
-        )
-      ) : card(title("Traps"), muted("The farm's traps are off for you, so you can walk right over them. Switch them on and every trap spot on the farm can spring for you."), h("div", null, btn("Switch traps on", () => ctx3.send("traps on")))),
-      tc ? trapThemesCard(ctx3) : null,
-      card(
-        title("On you right now"),
-        gear.length ? gear.map((g) => h("div", { style: { marginTop: "6px" } }, h("div", { class: "fhc-kv" }, h("b", null, g.name), h("span", { class: "fhc-muted" }, Math.max(0, Math.ceil((g.until - Date.now()) / 6e4)) + " min")), muted(gearLore(g.name) || g.desc || ""))) : muted("No farm gear on you."),
-        !ctx3.prefs.gear && muted('Trap gear only goes on for real with "Farm can put real gear on me" switched on (Toggles \u2192 This panel).')
+      h(
+        "div",
+        { class: "fhc-sum" },
+        h("div", { class: "fhc-sum-top" }, h("span", { class: "fhc-nm" }, "\u{1F380} Your ribbons"), h("span", { class: "fhc-purse", style: { fontSize: "22px" } }, String(s.ribbons || 0))),
+        s.quotaGrace ? h("div", null, chip("quota grace \xD7 " + s.quotaGrace, "good")) : null,
+        st2.vat,
+        muted("Earn 'em: your milk quota, a full stall session, chores, glory shifts, dares, shows, best of the week, and staff who think you've been good.")
       ),
-      s.sitting && card(title("\u{1FABA} Sittin' the nest"), muted(s.sitting.n + " eggs under you. They hatch in about " + Math.max(1, Math.ceil((s.sitting.until - Date.now()) / 6e4)) + " min."), h("div", null, btn("Get up", () => ctx3.send("sit up")))),
-      s.holes && s.holes.length ? card(
-        title("What you've taken"),
-        s.holes.map((x) => h("div", { class: "fhc-kv" }, h("span", null, "Your " + x.hole + " \xB7 " + x.rank), h("span", { class: "fhc-muted" }, x.loads + " loads" + (x.knots ? " \xB7 " + x.knots + " knots" : "") + (x.next ? " \xB7 next at " + x.next : "")))),
-        muted("Every step a hole is trained, you hold more for good and the traps pour more into it.")
-      ) : null,
-      s.album && s.album.length ? card(
-        title("\u{1F4D4} Keepsakes"),
-        s.album.map((e) => h("div", { style: { marginTop: "6px" } }, h("div", { class: "fhc-kv" }, h("b", null, e.i + " " + e.h), h("span", { class: "fhc-muted" }, new Date(e.t).toLocaleDateString())), muted(e.x))),
-        muted("Only you can open this album.")
-      ) : null,
-      ad && card(
-        h("div", { class: "fhc-kv" }, title("Proprietor: traps"), chip(ad.subjects.length + " with traps on", "acc")),
-        ad.today && muted("\u{1F3AF} Trap of the day: " + ad.today.icon + " " + ad.today.kind),
-        ad.ratings && (ad.ratings.loved.length || ad.ratings.no.length) ? muted("\u{1F496} Most loved: " + (ad.ratings.loved.map((x) => x.icon + " " + x.kind + " (" + x.n + ")").join(", ") || "none yet") + ' \xB7 \u{1F645} Most "not for me": ' + (ad.ratings.no.map((x) => x.icon + " " + x.kind + " (" + x.n + ")").join(", ") || "none yet")) : null,
-        ad.subjects.length ? ad.subjects.map((x) => h("div", { class: "fhc-kv" }, h("span", null, (x.here ? "\u25CF " : "") + x.name), h("span", { class: "fhc-muted" }, x.n + " sprung" + (x.paused ? " \xB7 paused" : "")))) : muted("Nobody's switched their traps on yet."),
-        muted("Trap spots: " + (ad.spots.length ? ad.spots.join(", ") : "none yet (?spot set trap-<kind>)")),
-        muted("Water: " + (ad.water.length ? ad.water.join(", ") : "none yet (?spot set pond)") + (ad.nest ? " \xB7 " + ad.nest + " eggs in the nest" : "") + (ad.pack ? " \xB7 pack at " + ad.pack : "")),
-        ad.hunt && muted("\u{1F514} Hunt on: finish at " + ad.hunt.goal + ", " + ad.hunt.done + " home"),
-        h(
-          "div",
-          null,
-          btn("Kinds & spots", () => ctx3.send("traps")),
-          btn("Subjects", () => ctx3.send("subject")),
-          btn(ad.hunt ? "Stop the hunt" : "Start a hunt", () => ctx3.send(ad.hunt ? "hunt stop" : "hunt start")),
-          btn("Gather eggs", () => ctx3.send("gather")),
-          btn("Ratings", () => ctx3.send("traps ratings"))
-        )
-      ),
-      seasonsCard(ctx3)
+      rows(ctx3, "rib", [
+        log2.length && { id: "log", label: "\u{1F4D2} Where they came from", sum: (log2[0].n > 0 ? "+" : "") + log2[0].n + " " + log2[0].why, body: () => st2.logList },
+        ...st2.shelves.map((sh) => ({ id: sh.id, label: sh.label, sum: sh.n + " on the shelf", body: sh.body })),
+        { id: "feats", label: "\u{1F3C5} Feats", sum: F && Array.isArray(F.tracks) ? tiers + " tier" + (tiers === 1 ? "" : "s") + " earned" : "", body: () => feats(ctx3) },
+        F && F.titles && F.titles.length && { id: "titles", label: "\u{1F396}\uFE0F Titles", sum: String(F.titles.length), body: () => [muted(F.titles.join(" \xB7 "))] }
+      ]),
+      h("div", null, btn("This week's board", () => ctx3.send("ribbons top")))
     ];
   }
   function inbox(ctx3) {
@@ -6422,7 +6855,8 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     ["mpreg", "Mpreg", "A load in your ass can take too, no item needed (with Breedable and Fertile on)"],
     ["jarok", "Jar breedin'", "On: staff still ask every time \xB7 Off: never"],
     ["freeuse", "Free use", "Any stud may have you without askin'"],
-    ["futa", "Futa", "Cock and pussy both, milk and cum both"],
+    // Laynie, Nov 4: "also need the futa toggle, just in case a female wants to temporaily be a stud"
+    ["futa", "Futa", "A cock of your own as well: cock and pussy both, milk and cum both. Be a stud for a while, and flip it back whenever you like"],
     ["milkable", "Milkable", "Make milk"],
     ["seedmilk", "Milk my seed", "The stall, the milkin' traps and ?collect take your seed as well as your milk. Off: they milk you up top and leave your cock and balls be"],
     ["naturalheat", "Natural heat", "Come into heat on your own every 7 days"],
@@ -6449,146 +6883,10 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     });
   }
   function panelPrefsOrLink(ctx3) {
-    if (!settingsAvailable()) return panelPrefs(ctx3);
     return card(
-      title("This panel, your settings file and the full guides"),
-      muted("They're in the game's own settings now: Preferences \u2192 Extensions \u2192 Farmhand Companion."),
-      btn("Open the Farmhand settings", () => {
-        if (!openSettings("switches")) ctx3.hint("Open the game's Preferences, then Extensions, then Farmhand Companion.");
-      }, true)
-    );
-  }
-  function botScreenPrefs(ctx3) {
-    if (!(window.Player && window.Player.MemberNumber === BOT_MEMBER)) return null;
-    return h(
-      "div",
-      {},
-      toggle(
-        "Draw the room on the farm girl's screen",
-        "Off (the default), this tab doesn't draw anybody in the room: no pictures downloaded for what people wear, far less work and memory on this computer. The farm runs the same either way. Switch it on to watch the room or click on people from here.",
-        !!ctx3.prefs.drawRoom,
-        () => {
-          const on2 = !ctx3.prefs.drawRoom;
-          ctx3.setPref("drawRoom", on2);
-          if (on2) setTimeout(redrawRoom, 50);
-        }
-      )
-    );
-  }
-  function panelPrefs(ctx3) {
-    return card(
-      title("This panel"),
-      muted("Only on your computer."),
-      botScreenPrefs(ctx3),
-      [
-        ["chatToo", "Farm messages in chat too", "Tease lines, heat, summons and other farm messages also show in your chat log"],
-        ["compact", "Compact cards", "Smaller text, more on screen"],
-        ["chime", "Chime on notices", "A soft sound when the farm messages you"],
-        ["popopen", "Open on new notice", "Pop the panel open by itself"],
-        ["btnPinned", "Pin the \u{1F33E} button", "Unpinned, you can drag it anywhere (mouse or finger). Pin it so it stays put."]
-      ].map(([k, label, desc]) => toggle(label, desc, !!ctx3.prefs[k], () => ctx3.setPref(k, !ctx3.prefs[k]))),
-      toggle(
-        "Farm emotes about me come from me",
-        "Belly kicks, milkin', breedin'\u2026 are posted as your own emote (no name in front), so the people who can see you see them and the farm girl needn't move. Only lines about you.",
-        !ctx3.prefs.noRelay,
-        () => {
-          ctx3.setPref("noRelay", !ctx3.prefs.noRelay);
-          ctx3.api.rehello && ctx3.api.rehello();
-        }
-      ),
-      // the farm's little cues on your own screen (cues.js); each one on unless you switch it off
-      [
-        ["noLead", "Lead me instead of teleportin'", "When the farm moves you (feedin' time, the stocks, a summon), you walk there yourself, step by step"],
-        ["noFace", "Farm can set my face", "Dazed when milk-drunk, flushed in heat, a trance stare\u2026 for a little while"],
-        ["noSound", "Farm sounds", "The pump, the stall door, the feedin' bell. Only you hear them, at your game volume"],
-        ["noTrance", "Trance haze", "A soft haze at the edges of your screen during conditioning sessions"],
-        ["noFeelings", "Private feelings", "Now and then, a line only you see about what you're feelin' (your gear, your arousal, how full you are)"],
-        ["noSlow", "Carryin' slows me down", "The fuller you are (a pumped belly, a late litter, a clutch of eggs), the slower you walk on the map"],
-        ["noMarkers", "Map markers (staff)", "Small badges over stock on your map: M needs milkin', H in heat, B expectin', X teats capped"]
-      ].map(([k, label, desc]) => toggle(label, desc, !ctx3.prefs[k], () => {
-        ctx3.setPref(k, !ctx3.prefs[k]);
-        ctx3.api.rehello && ctx3.api.rehello();
-      })),
-      // OFF until you turn it on: the farm touchin' your arousal meter (cues.js)
-      toggle(
-        "Farm can stir me up",
-        "Traps, toys and scenes nudge your arousal meter up, and while the farm has you denied you're held at the edge instead of cummin'. A buzzin' toy you're wearin' follows a trap too: low while it teases, high when it breeds you, still while you're denied, then back how you had it. Your safeword still stops everything.",
-        !!ctx3.prefs.stir,
-        () => {
-          ctx3.setPref("stir", !ctx3.prefs.stir);
-          ctx3.api.rehello && ctx3.api.rehello();
-        }
-      ),
-      // OFF until you turn it on: real items from the traps (marks.js)
-      toggle(
-        "Farm can put real gear on me",
-        "A trap that plugs, cups, clamps, chains, ropes or funnels you puts the real item on your character, and takes it off again when its time's up. Pull one off early and it goes back. Your safeword takes it all off. (The parasite doesn't need this: ?parasite on is its switch.)",
-        !!ctx3.prefs.gear,
-        () => {
-          ctx3.setPref("gear", !ctx3.prefs.gear);
-          ctx3.api.rehello && ctx3.api.rehello();
-        }
-      ),
-      // OFF until you turn it on: your character's own chest and hips growin' with the farm's sizes (marks.js)
-      toggle(
-        "Farm can change my body shape",
-        "Your chest grows a size on your character for every two udder sizes the farm gives you (up to the game's biggest), and your hips widen with a growin' ass or a heavy belly. Everything you're wearin' is redrawn to fit. Your own shape is remembered and comes back when the growth goes, when you switch this off, and for an hour after your safeword.",
-        !!ctx3.prefs.shape,
-        () => {
-          ctx3.setPref("shape", !ctx3.prefs.shape);
-          ctx3.api.rehello && ctx3.api.rehello();
-        }
-      ),
-      // these two are OFF until you turn them on, and anybody can: the farm changin' what your character looks like (marks.js)
-      toggle(
-        "Farm can mark my body",
-        "Loads leave the game's own splatters on your face, chest or tummy, wherever there's room, and farm words can be written on your body. ?wash takes them off.",
-        !!ctx3.prefs.marks,
-        () => ctx3.setPref("marks", !ctx3.prefs.marks)
-      ),
-      ctx3.s.brand ? toggle(
-        "Show my farm brand",
-        "The B&B logo the farm seared on you, on your " + ({ hipL: "left hip", hipR: "right hip", thighL: "left thigh", thighR: "right thigh", mons: "low belly", tummy: "tummy", chestL: "left breast", chestR: "right breast", shoulderL: "left shoulder", shoulderR: "right shoulder" }[ctx3.s.brand.place] || "hip") + ". Off hides it on every screen (it's still on your record).",
-        !ctx3.prefs.brandOff,
-        () => {
-          ctx3.setPref("brandOff", !ctx3.prefs.brandOff);
-          ctx3.api.brandSync && ctx3.api.brandSync();
-        }
-      ) : null,
-      toggle(
-        "Farm can strip me",
-        "When the farm says so, your clothes come off (locked pieces stay). They're kept on this computer so you can dress again.",
-        !!ctx3.prefs.strip,
-        () => ctx3.setPref("strip", !ctx3.prefs.strip)
-      ),
-      // (the scale trial and the belly experiment are gone: the drawn body does both. Laynie, Oct 14: "can also remove the
-      // scaling test from earlier from the companion")
-      btn("Put the button and panel back (size and full screen too)", () => ctx3.resetPlaces && ctx3.resetPlaces()),
-      // everything above, and the drawn body, messes and memory log, kept as a file on this computer too (localsave.js)
-      saveCard(ctx3),
-      // the record (chatlog.js): opt-in, at the very bottom. Proprietors are always recorded, so they get no switch.
-      ctx3.s.logMust ? muted("\u{1F4DC} Your chat, beeps and commands are recorded for the farm (always, for proprietors).") : toggle(
-        "Send a record of commands sent to and received from the bot",
-        "Everything that lands in your chat (whispers, beeps, the farm's lines and answers) and the commands you send go to the farm girl once a minute, privately, and she keeps them by the hour. It helps staff find what went wrong when somethin' does. The same line from two places is kept once. Off unless you switch it on.",
-        !!ctx3.prefs.chatlog,
-        () => ctx3.setPref("chatlog", !ctx3.prefs.chatlog)
-      )
-    );
-  }
-  function saveCard(ctx3) {
-    const ls = localSaveState(), say = (t2) => ctx3.hint(t2), t = (ms) => new Date(ms).toTimeString().slice(0, 5);
-    const line3 = !ls.folder ? ls.can ? "Not saving to a folder yet." : "This browser can't save to a folder (Chrome and Edge can). You can still load a file." : ls.perm !== "granted" ? "Saving to " + ls.folder + " is paused till you reconnect it (the browser asks again after a restart)." : ls.err ? "Trouble saving to " + ls.folder + ": " + ls.err : "Saving to " + ls.folder + " every minute" + (ls.at ? ", last at " + t(ls.at) : "") + ", as " + ls.file + ".";
-    return h(
-      "div",
-      {},
-      muted("Your settings as a file on this computer: everything here, your drawn body, your messes and the memory log. It survives a crash, a cleared browser or a new one. " + line3),
-      ls.folder && ls.perm !== "granted" ? btn("Reconnect " + ls.folder, () => localSaveReconnect(VERSION)) : null,
-      ls.can ? btn(ls.folder ? "Save to a different folder" : "Save my settings to a folder\u2026", () => localSavePick(VERSION)) : null,
-      ls.folder && ls.perm === "granted" ? btn("Save now", () => localSaveNow(VERSION).then(() => say("Saved."))) : null,
-      btn("Load my settings from a file\u2026", () => {
-        say("Pick the farmhand-companion file to load\u2026");
-        localSaveLoad(say);
-      })
+      title("Your switches, this panel, your settings file and the full guides"),
+      muted(settingsAvailable() ? "They're in the game's own settings: Preferences \u2192 Extensions \u2192 Farmhand Companion. The \u2699 at the top of this panel opens them." : "They're behind the \u2699 at the top of this panel."),
+      btn("Open the settings", () => goSettings(ctx3, "switches"), true)
     );
   }
   function drawnBodyCard(ctx3) {
@@ -6668,41 +6966,16 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     for (const m of Object.values(ctx3.s.mods || {})) for (const c of (m.cards || []).filter((c2) => c2 && !c2.staff)) for (const t of c.toggles || []) list.push([m.label, t]);
     if (!list.length) return null;
     return card(
-      title("Farm extras"),
+      title("\u{1F9E9} Farm extras"),
       muted("The farm's add-ons. Each one is off until you switch it on."),
       list.map(([label, t]) => toggle(String(t.label), (t.desc ? String(t.desc) + " " : "") + "(" + label + ")", !!t.on, () => ctx3.send(String(t.cmd))))
     );
   }
-  function toggles(ctx3) {
-    return [
-      drawnBodyCard(ctx3),
-      card(title("Farm settings"), muted("Saved by the farm girl. Your limits still win."), farmSwitches(ctx3, SWITCH_INFO)),
-      trapThemesCard(ctx3),
-      extraSwitches(ctx3),
-      card(
-        title("Gender"),
-        muted("How the farm sees you. It picks your farm outfit."),
-        h("div", { style: { marginTop: "6px" } }, ["female", "male", "futa", "femboy", "nonbinary"].map((g) => h("button", { type: "button", class: "fhc-pill" + (ctx3.s.gender === g ? " on" : ""), onclick: () => ctx3.send("gender " + g) }, g)))
-      ),
-      card(
-        title("Farm outfit"),
-        muted("Dress me puts back on the outfit your record calls for (your species and gender, or your uniform while you're clocked in), in case it's come off or been changed."),
-        btn("Dress me", () => ctx3.send("dressme"), true),
-        ctx3.api.hasBackup && ctx3.api.hasBackup() ? h("div", null, muted("Your own clothes are kept on this computer."), btn("Change back into my own clothes", () => ctx3.api.back && ctx3.api.back())) : null
-      ),
-      panelPrefsOrLink(ctx3)
-    ];
-  }
   var LIVESTOCK_TABS = [
     { id: "me", label: "\u{1F404} Me", render: me2 },
-    { id: "milk", label: "\u{1F95B} Milking", render: milking },
-    { id: "breed", label: "\u{1F402} Breeding", render: breeding },
-    { id: "traps", label: "\u{1F9EA} Traps", render: traps },
-    { id: "store", label: "\u{1F380} Store", render: storeTab },
-    { id: "feats", label: "\u{1F3C5} Feats", render: feats },
-    { id: "inbox", label: "\u{1F4EC} Inbox", render: inbox },
-    { id: "toggles", label: "\u2699\uFE0F Toggles", render: toggles },
-    { id: "guides", label: "\u{1F4D6} Guides", render: (ctx3) => guidesTab(ctx3, false) },
+    { id: "body", label: "\u{1F95B} Body", render: body },
+    { id: "play", label: "\u{1FAA4} Play", render: play },
+    { id: "ribbons", label: "\u{1F380} Ribbons", render: ribbons },
     { id: "safety", label: "\u{1F198} Safety", render: safetyTab, offRow: true }
     // (the 🆘 button in the header opens it)
   ];
@@ -6733,9 +7006,9 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     ] },
     { id: "inbox", label: "\u{1F4EC} Inbox", render: inbox },
     { id: "guides", label: "\u{1F4D6} Guides", render: (ctx3) => guidesTab(ctx3, false) },
-    { id: "safety", label: "\u{1F198} Safety", render: safetyTab, offRow: true },
+    { id: "safety", label: "\u{1F198} Safety", render: safetyTab, offRow: true }
     // (the 🆘 button in the header opens it)
-    { id: "settings", label: "\u2699\uFE0F Settings", render: (ctx3) => [card(title("Farm settings"), muted("Once you're on the books, your milkin', breedin' and teasin' switches show up here."), btn("Apply to join", () => ctx3.send("apply"), true)), drawnBodyCard(ctx3), panelPrefsOrLink(ctx3)] }
+    // (the Settings tab is gone, Nov 4: the ⚙ in the header has the drawn body, this panel's switches and the rest)
   ];
 
   // shared/bcplus-rules.json
@@ -8828,7 +9101,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     if (r === null) return muted("BCX isn't loaded here. If you use BC+'s Ready to be summoned instead, add the farm bot (" + BOT_MEMBER + ") to it.");
     return h("div", { class: "fhc-kv" }, h("span", null, "Summon rule"), chip(r.ok ? "ready" : r.why, r.ok ? "good" : "alert"));
   }
-  function toggles2(ctx3) {
+  function toggles(ctx3) {
     const s = ctx3.s, sw = s.switches || {};
     return [
       drawnBodyCard(ctx3),
@@ -8852,7 +9125,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     { id: "barn", label: "\u{1F3DA}\uFE0F Barn", render: barn },
     { id: "zones", label: "\u{1F5FA}\uFE0F Zones", render: zones },
     { id: "voice", label: "\u{1F50A} ECHS", render: voice },
-    { id: "toggles", label: "\u2699\uFE0F Toggles", render: toggles2 },
+    { id: "toggles", label: "\u2699\uFE0F Toggles", render: toggles },
     { id: "guides", label: "\u{1F4D6} Guides", render: (ctx3) => guidesTab(ctx3, true) },
     { id: "log", label: "\u{1F4D2} Log", render: logTab, show: (ctx3) => !!ctx3.s.logReader }
     // the record (chatlog.js), for whoever may read it
@@ -8892,14 +9165,14 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     }
   }
   function addCommand(ctx3, name, rule) {
-    const pairs = rule.settings.map((s) => {
+    const pairs2 = rule.settings.map((s) => {
       const key = "set:" + rule.id + ":" + s.name;
       let v = ctx3.ui[key];
       if (v === void 0) v = s.type === "checkbox" ? s.default ? "on" : "off" : s.type === "members" ? "farm" : Array.isArray(s.default) ? s.default.join("\n") : s.default;
       if (s.type === "stringList") v = String(v).split("\n").map((x) => x.trim()).filter(Boolean).join("|");
       return s.name + "=" + q(v);
     });
-    return ("contract add " + name + " " + rule.id + " " + pairs.join(" ")).trim();
+    return ("contract add " + name + " " + rule.id + " " + pairs2.join(" ")).trim();
   }
   function contracts2(ctx3) {
     const nm = () => (ctx3.ui.dName || "").trim().toLowerCase();
@@ -9348,12 +9621,12 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
   function littlesTab(ctx3) {
     const n = N(ctx3), ls = n.littles || [];
     if (!ls.length) return [card(title("\u{1F9F8} Littles"), muted("No littles here right now. Littles who are here, and the ones you're paired with, show up in this tab."), stars(ctx3))];
-    const pick = ctx3.ui.nurseryLittle && ls.find((l) => l.mn === ctx3.ui.nurseryLittle) ? ctx3.ui.nurseryLittle : (ls.find((l) => l.here && l.space) || ls[0]).mn;
-    const L = ls.find((l) => l.mn === pick);
+    const pick2 = ctx3.ui.nurseryLittle && ls.find((l) => l.mn === ctx3.ui.nurseryLittle) ? ctx3.ui.nurseryLittle : (ls.find((l) => l.here && l.space) || ls[0]).mn;
+    const L = ls.find((l) => l.mn === pick2);
     return [
       card(
         h("div", { class: "fhc-kv" }, title("\u{1F9F8} Littles"), stars(ctx3)),
-        h("div", null, ls.map((l) => h("button", { type: "button", class: "fhc-pill" + (l.mn === pick ? " on" : ""), onclick: () => ctx3.setUi({ nurseryLittle: l.mn }) }, l.name + (l.mine ? " \u{1F49E}" : ""))))
+        h("div", null, ls.map((l) => h("button", { type: "button", class: "fhc-pill" + (l.mn === pick2 ? " on" : ""), onclick: () => ctx3.setUi({ nurseryLittle: l.mn }) }, l.name + (l.mine ? " \u{1F49E}" : ""))))
       ),
       card(
         title(L.name),
@@ -9422,7 +9695,8 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
   };
   var VIEWS = {
     guest: { label: "Guest", tabs: GUEST_TABS },
-    livestock: { label: "Livestock", tabs: LIVESTOCK_TABS },
+    livestock: { label: "Livestock", tabs: LIVESTOCK_TABS, extrasInside: true },
+    // (its add-on cards are a row on the Me tab)
     staff: { label: "Staff", tabs: STAFF_TABS },
     dashboard: { label: "Dashboard", tabs: DASHBOARD_TABS },
     nursery: { label: "\u{1F9F8} Nursery", tabs: NURSERY_TABS }
@@ -9752,44 +10026,67 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
       }
       this.render();
     }
+    // the tabs this view shows: + "Farm extras" when an add-on has somethin' (not on the Livestock panel: there it's a row
+    // on Me); a tab with show() only when it says so (the Log tab); and ⚙ Settings in the panel where the game has no
+    // settings page of its own
+    tabsFor(view, ctx3) {
+      const V = VIEWS[view];
+      const tabs = (view === "guest" || view === "nursery" || V.extrasInside ? V.tabs : withExtras(V.tabs, view, ctx3)).filter((t) => !t.show || t.show(ctx3));
+      if (!settingsAvailable() && !tabs.some((t) => t.id === "settings"))
+        tabs.push({ id: "settings", label: "\u2699 Settings", offRow: true, render: (c) => settingsView(c, c.ui.setPage || "switches", (p) => c.setUi({ setPage: p })) });
+      return tabs;
+    }
+    // ⚙: the game's own settings page (Preferences → Extensions → Farmhand Companion), or the panel's own where there's none
+    goSettings(page2) {
+      if (settingsAvailable() && openSettings(page2 || "switches")) return;
+      this.ui["tab_" + this.view()] = "settings";
+      if (page2) this.ui.setPage = page2;
+      this.ui.setFind = "";
+      this.render();
+    }
     render() {
       this.pending = false;
-      const ctx3 = this.ctx(), view = this.view(), V = VIEWS[view];
-      const tabs = (view === "guest" || view === "nursery" ? V.tabs : withExtras(V.tabs, view, ctx3)).filter((t) => !t.show || t.show(ctx3));
-      const tabKey = "tab_" + view, tab2 = tabs.find((t) => t.id === this.ui[tabKey]) || tabs[0];
+      const ctx3 = this.ctx(), view = this.view();
+      const tabs = this.tabsFor(view, ctx3);
+      const tabKey = "tab_" + view;
+      if (this.ui.goTab) {
+        this.ui[tabKey] = this.ui.goTab;
+        delete this.ui.goTab;
+      }
+      const tab = tabs.find((t) => t.id === this.ui[tabKey]) || tabs[0];
       const scroll = this.el.querySelector(".fhc-body"), keep2 = scroll ? scroll.scrollTop : 0;
       const nav0 = this.el.querySelector("nav.fhc-tabs"), navKeep = nav0 ? nav0.scrollLeft : 0;
       this.el.classList.toggle("compact", !!this.prefs.compact);
       const full = !!this.prefs.full;
-      this.top.replaceChildren(
+      const onRow = tabs.filter((t) => !t.offRow), seg = onRow.length <= 5;
+      const tabBtn = (t) => {
+        const n = t.badge ? t.badge(ctx3) : 0;
+        return h("button", {
+          type: "button",
+          class: seg ? t === tab ? "on" : "" : "fhc-pill" + (t === tab ? " on" : ""),
+          "aria-current": t === tab ? "page" : null,
+          onclick: () => {
+            this.ui[tabKey] = t.id;
+            this.render();
+          }
+        }, t.label + (n ? " \xB7 " + n : ""));
+      };
+      const ib = (label, icon, fn, cls) => h("button", { type: "button", class: "fhc-ib" + (cls ? " " + cls : ""), title: label, "aria-label": label, onclick: fn }, icon);
+      this.top.replaceChildren(...[
         h(
           "div",
-          { class: "fhc-head", style: { touchAction: "none" }, onpointerdown: (e) => this.drag(e) },
-          h("div", null, h("div", { class: "fhc-title" }, "\u{1F33E} B&B Farm"), h("div", { id: "fhc-status", class: "fhc-muted" }, this.status)),
-          h(
-            "div",
-            { style: { display: "flex", gap: "6px" } },
-            h("button", {
-              type: "button",
-              class: "fhc-pill fhc-sos",
-              title: "Safety: safe word, I'm stuck, call staff",
-              "aria-label": "Safety",
-              onclick: () => this.goSafety()
-            }, "\u{1F198}"),
-            h("button", {
-              type: "button",
-              class: "fhc-pill",
-              title: full ? "Back to a panel" : "Full screen",
-              "aria-label": full ? "Back to a panel" : "Full screen",
-              onclick: () => {
-                this.prefs.full = !full;
-                savePrefs(this.prefs);
-                this.placePanel();
-                this.render();
-              }
-            }, full ? "\u{1F5D7}" : "\u26F6"),
-            h("button", { type: "button", class: "fhc-pill", "aria-label": "Close the panel", onclick: () => this.toggle(false) }, "\u2715")
-          )
+          { class: "fhc-head", style: { touchAction: "none", gap: "4px" }, onpointerdown: (e) => this.drag(e) },
+          h("div", { class: "fhc-grow", style: { minWidth: "0" } }, h("div", { class: "fhc-title" }, "\u{1F33E} B&B Farm"), h("div", { id: "fhc-status", class: "fhc-muted" }, this.status)),
+          ib("Settings", "\u2699", () => this.goSettings()),
+          ib(full ? "Back to a panel" : "Full screen", full ? "\u{1F5D7}" : "\u26F6", () => {
+            this.prefs.full = !full;
+            savePrefs(this.prefs);
+            this.placePanel();
+            this.render();
+          }),
+          // only 🆘 keeps a red edge
+          ib("Safety", "\u{1F198}", () => this.goSafety(), "sos"),
+          ib("Close the panel", "\u2715", () => this.toggle(false))
         ),
         this.views().length > 1 && h(
           "div",
@@ -9802,17 +10099,22 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
           } }, VIEWS[v].label))
         ),
         // Safe word, I'm stuck and Call staff live in the Safety tab (Guest and Livestock panels; staff reach it from Livestock)
-        h("nav", { class: "fhc-row fhc-tabs", "aria-label": "Panel sections" }, tabs.filter((t) => !t.offRow || t === tab2).map((t) => {
-          const n = t.badge ? t.badge(ctx3) : 0;
-          return h("button", { type: "button", class: "fhc-pill" + (t === tab2 ? " on" : ""), onclick: () => {
-            this.ui[tabKey] = t.id;
+        seg ? h("nav", { class: "fhc-seg", "aria-label": "Panel sections" }, onRow.map(tabBtn)) : h("nav", { class: "fhc-row fhc-tabs", "aria-label": "Panel sections" }, tabs.filter((t) => !t.offRow || t === tab).map(tabBtn)),
+        h(
+          "div",
+          { class: "fhc-body" },
+          // a tab off the strip (Safety, Settings, the Inbox on some panels) has a way back
+          seg && tab.offRow ? h("button", { type: "button", class: "fhc-back", onclick: () => {
+            this.ui[tabKey] = onRow[0].id;
             this.render();
-          } }, t.label + (n ? " \xB7 " + n : ""));
-        })),
-        h("div", { class: "fhc-body" }, this.banners(), safeRender(tab2, ctx3))
-      );
-      const body2 = this.el.querySelector(".fhc-body");
-      if (body2) body2.scrollTop = keep2;
+          } }, "\u2039 Back to " + onRow[0].label) : null,
+          this.banners(),
+          safeRender(tab, ctx3)
+        )
+      ].filter(Boolean));
+      const here = view + ":" + tab.id, body2 = this.el.querySelector(".fhc-body");
+      if (body2) body2.scrollTop = here === this.lastTab ? keep2 : 0;
+      this.lastTab = here;
       const nav = this.el.querySelector("nav.fhc-tabs");
       if (nav) {
         nav.scrollLeft = navKeep;
@@ -9837,9 +10139,10 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     // questions waitin' on you, on every tab
     banners() {
       const out = [];
-      const view = this.view(), tabNow = this.ui["tab_" + view];
+      const view = this.view(), tabNow = this.ui["tab_" + view] || (this.tabsFor(view, this.ctx())[0] || {}).id;
+      const meCard = view === "livestock" && tabNow === "me", inboxOpen = tabNow === "inbox" || meCard && this.ui.open_me === "inbox";
       const now = (this.s.now || []).filter((x) => !x.until || x.until > Date.now());
-      if (now.length) out.push(h(
+      if (now.length && !meCard) out.push(h(
         "div",
         { class: "fhc-row", style: { flexWrap: "wrap", gap: "4px", margin: "0 0 6px" }, "aria-label": "Right now" },
         now.map((x) => chip(x.icon + " " + x.text + (x.until ? " \xB7 " + left(x.until) : ""), /🚫|🪵|⛓️|🚧|🔥/.test(x.icon) ? "alert" : "acc"))
@@ -9851,7 +10154,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
         h("div", { style: { marginTop: "6px" } }, (b.holes || []).map((hole) => btn({ mouth: "Use their mouth", vulva: "Use their pussy", butt: "Use their ass" }[hole], () => this.ask("use " + b.mn + " " + { mouth: "mouth", vulva: "pussy", butt: "ass" }[hole]), true))),
         h("div", { class: "fhc-muted" }, "Get within a couple of steps of the bench first.")
       ));
-      if (this.fresh && tabNow !== "inbox") out.push(h(
+      if (this.fresh && !inboxOpen) out.push(h(
         "div",
         { class: "fhc-box", style: { borderColor: this.fresh.kind === "notice" ? "var(--fh-good)" : "var(--fh-accent)" } },
         h(
@@ -10004,9 +10307,9 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
       return false;
     }
   }
-  function safeRender(tab2, ctx3) {
+  function safeRender(tab, ctx3) {
     try {
-      return tab2.render(ctx3);
+      return tab.render(ctx3);
     } catch (e) {
       console.warn("[Farmhand Companion]", e);
       return h("div", { class: "fhc-box alert" }, "This tab hit a snag. The rest of the panel still works.");
@@ -10236,8 +10539,8 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
             did.push("tally");
           }
           if (m.write && cleanText(m.write.line)) {
-            const pref2 = T_AREAS[m.write.area] || (m.write.pos !== void 0 ? [Math.min(14, Number(m.write.pos))] : [13, 10, 4, 1, 7]);
-            const all = [...pref2, ...Array.from({ length: 15 }, (_, i) => i).filter((i) => !pref2.includes(i) && i !== TALLY_PLACE)];
+            const pref3 = T_AREAS[m.write.area] || (m.write.pos !== void 0 ? [Math.min(14, Number(m.write.pos))] : [13, 10, 4, 1, 7]);
+            const all = [...pref3, ...Array.from({ length: 15 }, (_, i) => i).filter((i) => !pref3.includes(i) && i !== TALLY_PLACE)];
             let spot = null;
             for (const pl of all) {
               for (const ln of [1, 2, 3]) if (!pr["Text" + (pl * 3 + ln)]) {
@@ -10246,7 +10549,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
               }
               if (spot) break;
             }
-            if (!spot) spot = [pref2[0], 1 + Math.floor(Math.random() * 3)];
+            if (!spot) spot = [pref3[0], 1 + Math.floor(Math.random() * 3)];
             put2(spot[0], spot[1], m.write.line);
             did.push("writing");
           }
@@ -10828,7 +11131,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
   var KEY5 = "farmhand-chatlog";
   var MAX3 = 1500;
   var CHUNK = 6e3;
-  var rows = [];
+  var rows2 = [];
   var sdk5 = null;
   var on = () => false;
   var botMn = 0;
@@ -10837,17 +11140,17 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
   var recent = /* @__PURE__ */ new Map();
   try {
     const v = JSON.parse(W11.localStorage.getItem(KEY5));
-    if (Array.isArray(v)) rows = v.slice(-MAX3);
+    if (Array.isArray(v)) rows2 = v.slice(-MAX3);
   } catch (e) {
-    rows = [];
+    rows2 = [];
   }
   function saveSoon() {
     clearTimeout(saveT);
     saveT = setTimeout(() => {
       try {
-        W11.localStorage.setItem(KEY5, JSON.stringify(rows));
+        W11.localStorage.setItem(KEY5, JSON.stringify(rows2));
       } catch (e) {
-        rows = rows.slice(-300);
+        rows2 = rows2.slice(-300);
       }
     }, 2e3);
   }
@@ -10866,29 +11169,29 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
           for (const [kk, tt] of recent) if (now - tt > 9e4) recent.delete(kk);
         }
       }
-      rows.push({ t: now, k: String(k).slice(0, 12), f: Number(f) || 0, x: x.slice(0, 600) });
-      if (rows.length > MAX3) rows = rows.slice(-MAX3);
+      rows2.push({ t: now, k: String(k).slice(0, 12), f: Number(f) || 0, x: x.slice(0, 600) });
+      if (rows2.length > MAX3) rows2 = rows2.slice(-MAX3);
       saveSoon();
     } catch (e) {
     }
   }
   function flush() {
-    if (!on() || !rows.length || !botHere() || typeof W11.ServerSend !== "function") return;
+    if (!on() || !rows2.length || !botHere() || typeof W11.ServerSend !== "function") return;
     let sent = 0;
-    for (let part = 0; part < 4 && rows.length; part++) {
+    for (let part = 0; part < 4 && rows2.length; part++) {
       const batch = [];
       let size = 0;
-      while (rows.length && batch.length < 120) {
-        const r = rows[0], s = JSON.stringify(r).length;
+      while (rows2.length && batch.length < 120) {
+        const r = rows2[0], s = JSON.stringify(r).length;
         if (size + s > CHUNK && batch.length) break;
-        batch.push(rows.shift());
+        batch.push(rows2.shift());
         size += s;
       }
       try {
         W11.ServerSend("ChatRoomChat", makeMsg("chatlog", { rows: batch }, botMn));
         sent += batch.length;
       } catch (e) {
-        rows = batch.concat(rows);
+        rows2 = batch.concat(rows2);
         break;
       }
     }
@@ -11095,13 +11398,13 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
     setInterval(feelTick, 6e4);
     setInterval(heelTick, 500);
   }
-  var pref = (k) => !ctx2.panel.prefs[k];
+  var pref2 = (k) => !ctx2.panel.prefs[k];
   var cueOff = () => ({
-    face: !pref("noFace") || void 0,
-    sound: !pref("noSound") || void 0,
-    trance: !pref("noTrance") || void 0,
-    lead: !pref("noLead") || void 0,
-    slow: !pref("noSlow") || void 0,
+    face: !pref2("noFace") || void 0,
+    sound: !pref2("noSound") || void 0,
+    trance: !pref2("noTrance") || void 0,
+    lead: !pref2("noLead") || void 0,
+    slow: !pref2("noSlow") || void 0,
     stir: ctx2.panel.prefs.stir ? void 0 : true,
     gear: ctx2.panel.prefs.gear ? void 0 : true
   });
@@ -11165,7 +11468,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
       if (walk && !walk.heel) walk = null;
       ctx2.toBot("leadNo", { id: m.id });
     };
-    if (!pref("noLead") || !mapOn() || typeof W12.ChatRoomMapViewMove !== "function") return no();
+    if (!pref2("noLead") || !mapOn() || typeof W12.ChatRoomMapViewMove !== "function") return no();
     const from = W12.Player.MapData.Pos, to = { X: m.X, Y: m.Y };
     const path = findPath(from, to);
     if (!path) return no();
@@ -11236,7 +11539,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
   }
   function heelTick() {
     try {
-      if (!heel || heel.hold || W12.CurrentScreen !== "ChatRoom" || !mapOn() || !pref("noLead") || typeof W12.ChatRoomMapViewMove !== "function") return;
+      if (!heel || heel.hold || W12.CurrentScreen !== "ChatRoom" || !mapOn() || !pref2("noLead") || typeof W12.ChatRoomMapViewMove !== "function") return;
       if (heel.until && heel.until < Date.now()) {
         heel = null;
         return;
@@ -11276,7 +11579,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
   };
   function face(m) {
     const f = FACES[m.mood];
-    if (!f || !pref("noFace") || typeof W12.CharacterSetFacialExpression !== "function" || !W12.Player) return;
+    if (!f || !pref2("noFace") || typeof W12.CharacterSetFacialExpression !== "function" || !W12.Player) return;
     const secs = m.mood === "clear" ? null : Math.max(5, Math.min(1800, Number(m.secs) || 30));
     for (const [g, e] of Object.entries(f)) {
       try {
@@ -11330,7 +11633,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
   var QUIET = { stall: 0.35, latch: 0.35, unlatch: 0.35, pump: 0.4, machine: 0.4, inflate: 0.4, hiss: 0.4, buzz: 0.3, zap: 0.35, clamp: 0.45, softgate: 0.4 };
   function sound(m) {
     const f = SOUNDS[m.name];
-    if (!f || !pref("noSound") || typeof W12.AudioPlayInstantSound !== "function") return;
+    if (!f || !pref2("noSound") || typeof W12.AudioPlayInstantSound !== "function") return;
     const vol = W12.Player && W12.Player.AudioSettings && W12.Player.AudioSettings.Volume || 0;
     try {
       W12.AudioPlayInstantSound("Audio/" + f + ".mp3", vol * (QUIET[m.name] || 0.6));
@@ -11339,7 +11642,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
   }
   function trance(m) {
     let el = W12.document.getElementById("fhc-trance");
-    const lvl = pref("noTrance") ? Math.max(0, Math.min(3, Number(m.level) || 0)) : 0;
+    const lvl = pref2("noTrance") ? Math.max(0, Math.min(3, Number(m.level) || 0)) : 0;
     if (!lvl) {
       if (el) el.remove();
       return;
@@ -11430,7 +11733,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
   var recentFeel = [];
   function feelTick() {
     try {
-      if (!pref("noFeelings") || W12.CurrentScreen !== "ChatRoom" || !W12.Player || !ctx2.panel.s || !ctx2.panel.s.onBooks) return;
+      if (!pref2("noFeelings") || W12.CurrentScreen !== "ChatRoom" || !W12.Player || !ctx2.panel.s || !ctx2.panel.s.onBooks) return;
       if (Date.now() < (feelTick.next || 0)) return;
       feelTick.next = Date.now() + (7 + Math.random() * 6) * 6e4;
       const s = ctx2.panel.s, items = (W12.Player.Appearance || []).filter((x) => x && x.Asset && x.Asset.Group);
@@ -11460,7 +11763,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
   function drawMarkers() {
     try {
       const s = ctx2.panel.s;
-      if (!s || !s.staff || !Array.isArray(s.herd) || !pref("noMarkers") || !mapOn() || typeof W12.DrawText !== "function") return;
+      if (!s || !s.staff || !Array.isArray(s.herd) || !pref2("noMarkers") || !mapOn() || typeof W12.DrawText !== "function") return;
       const R = W12.ChatRoomMapViewPerceptionRange || 6, tile = 1e3 / (R * 2 + 1), me4 = W12.Player.MapData.Pos;
       for (const x of s.herd) {
         const C = (W12.ChatRoomCharacter || []).find((c) => c.MemberNumber === x.mn);
@@ -11485,7 +11788,7 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
   };
   function slowFactor() {
     const s = ctx2 && ctx2.panel && ctx2.panel.s;
-    if (!s || !pref("noSlow") || !(s.slow > 1)) return 1;
+    if (!s || !pref2("noSlow") || !(s.slow > 1)) return 1;
     return Math.max(1, Math.min(3, Number(s.slow) || 1));
   }
   function arouse(m) {

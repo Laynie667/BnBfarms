@@ -1,10 +1,10 @@
 /* WHAT'S IN THIS FILE (guest.js)
-   The Guest panel for folks not on the books yet: Welcome, The farm, Rules, Inbox, Guides, Settings.
+   The Guest panel for folks not on the books yet: Welcome, The farm, Rules, Inbox, Guides (settings: the ⚙ in the header).
 */
 // The guest panel: for anybody not on the books yet.
 import { h, card, title, muted, btn } from "../dom.js";
 import { guidesTab, safetyTab, AREAS } from "./common.js";
-import { inbox, panelPrefsOrLink, drawnBodyCard } from "./livestock.js";
+import { inbox } from "./livestock.js";
 
 export const GUEST_TABS = [
   { id: "welcome", label: "👋 Welcome", render: (ctx) => [
@@ -22,5 +22,5 @@ export const GUEST_TABS = [
   { id: "inbox", label: "📬 Inbox", render: inbox },
   { id: "guides", label: "📖 Guides", render: (ctx) => guidesTab(ctx, false) },
   { id: "safety", label: "🆘 Safety", render: safetyTab, offRow: true },   // (the 🆘 button in the header opens it)
-  { id: "settings", label: "⚙️ Settings", render: (ctx) => [card(title("Farm settings"), muted("Once you're on the books, your milkin', breedin' and teasin' switches show up here."), btn("Apply to join", () => ctx.send("apply"), true)), drawnBodyCard(ctx), panelPrefsOrLink(ctx)] },
+  // (the Settings tab is gone, Nov 4: the ⚙ in the header has the drawn body, this panel's switches and the rest)
 ];

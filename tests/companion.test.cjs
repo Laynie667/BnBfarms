@@ -27,6 +27,8 @@ const pills = () => [...D.querySelectorAll("#fhc-panel .fhc-pill")];
 const bare = (t) => t.trim().replace(/^[^\p{L}\d?]+/u, "");
 const click = (label) => { const b = [...D.querySelectorAll("#fhc-panel button")].find((x) => x.textContent.trim().startsWith(label)) || (bare(label) && [...D.querySelectorAll("#fhc-panel button")].find((x) => bare(x.textContent).startsWith(bare(label)))); if (b) b.click(); return !!b; };
 const text = () => D.getElementById("fhc-panel").textContent;
+// Nov 4: the switches live behind ⚙ in the header (here, with no game settings page, the panel's own), on pages
+const settings = (page) => { D.querySelector('#fhc-panel button[aria-label="Settings"]').click(); if (page) click(page); };
 
 const STATE = { name: "Laynie", onBooks: true, roles: ["PROPRIETOR", "LIVESTOCK"], tier: "prize", species: "cow", gender: "female",
   staff: true, herdmaster: true, proprietor: true, mandated: false, onDuty: true, onCall: false, keys: ["bronze", "silver", "gold"],
@@ -49,14 +51,14 @@ const STATE = { name: "Laynie", onBooks: true, roles: ["PROPRIETOR", "LIVESTOCK"
   const views = pills().map((p) => p.textContent);
   out("2 panel switch shows all three ->", ["Livestock", "Staff", "Dashboard"].every((v) => views.includes(v)));
   click("Livestock"); click("Me");
-  out("2 livestock Me shows milk ->", /1\.8 L of 3\.0 L/.test(text()), /C cup/.test(text()));
-  D.querySelector(".fhc-quick button").click();
+  out("2 livestock Me shows milk ->", /1\.8 \/ 3\.0 L/.test(text()), /C cup/.test(text()));
+  click("More"); click("Stats");
   out("2 Stats button sends ?stats ->", cmds().includes("stats"));
-  click("Toggles");
+  settings("Farm switches");
   const jar = [...D.querySelectorAll(".fhc-tog")].find((t) => /Jar breedin'/.test(t.textContent));
   jar.querySelector("button").click();
   out("2 jar switch sends jarok off ->", cmds().includes("jarok off"));
-  click("femboy"); out("2 gender pill sends ->", cmds().includes("gender femboy"));
+  click("Body and look"); click("femboy"); out("2 gender pill sends ->", cmds().includes("gender femboy"));
 
   bot({ type: "ask", kind: "jar", text: "💉 Hand wants to inseminate you from jar #3", id: 7 });
   out("3 yes/no banner ->", /jar #3/.test(text()));
@@ -68,7 +70,7 @@ const STATE = { name: "Laynie", onBooks: true, roles: ["PROPRIETOR", "LIVESTOCK"
   bot({ type: "reply", text: "📋 LAYNIE'S CARD", id: 1, part: 1, of: 1 });
   bot({ type: "reply", text: "part two", id: 2, part: 2, of: 2 });
   bot({ type: "reply", text: "part one", id: 2, part: 1, of: 2 });
-  click("Inbox");
+  click("Me"); click("Inbox");
   const cards = [...D.querySelectorAll(".fhc-card")].map((c) => c.textContent);
   out("4 inbox shows replies ->", cards.some((c) => c.includes("LAYNIE'S CARD")));
   out("4 pieces glued in order ->", cards.some((c) => c.includes("part one\npart two")));
@@ -214,7 +216,7 @@ const STATE = { name: "Laynie", onBooks: true, roles: ["PROPRIETOR", "LIVESTOCK"
   out("10 dragged button moves and is remembered ->", fb.style.left === "195px", !!saved.btnPos);
   const wasOpen = D.getElementById("fhc-panel").classList.contains("open");
   fb.click(); out("10 a plain tap still opens/closes ->", D.getElementById("fhc-panel").classList.contains("open") !== wasOpen);
-  click("Livestock"); click("Toggles");
+  click("Livestock"); settings("Advanced");
   const pin = [...D.querySelectorAll(".fhc-tog")].find((t) => /Pin the/.test(t.textContent)); pin.querySelector("button").click();
   ev("pointerdown", 200, 150, fb); ev("pointermove", 400, 400); ev("pointerup", 400, 400);
   out("10 pinned button stays put ->", fb.style.left === "195px");
@@ -233,9 +235,9 @@ const STATE = { name: "Laynie", onBooks: true, roles: ["PROPRIETOR", "LIVESTOCK"
   out("11 a line about her is posted as her emote ->", posted.length === 1 && posted[0][1].Content === "*Laynie's belly jumps as the litter kicks [hard].", posted[0] && posted[0][1].Content);
   n0 = sent.length; bot({ type: "relay", id: 42, text: "Moo's belly jumps." });
   out("11 a line not about her is refused, and the bot told ->", !sent.slice(n0).some((s) => s[1].Type === "Emote") && toBot("relayNo").some((s) => s[1].Dictionary.id === 42));
-  click("Toggles"); await wait(100);
+  settings("Messages"); await wait(100);
   const sw = [...D.querySelectorAll("#fhc-panel .fhc-tog")].find((x) => /come from me/.test(x.textContent));
-  out("11 the switch is in Toggles ->", !!sw);
+  out("11 the switch is in Settings › Messages ->", !!sw);
   if (sw) sw.querySelector("button").click();
   await wait(100);
   out("11 switching it off tells the bot ->", toBot("hello").slice(-1)[0][1].Dictionary.relay === false);
@@ -279,9 +281,9 @@ const STATE = { name: "Laynie", onBooks: true, roles: ["PROPRIETOR", "LIVESTOCK"
   out("12 hello lists which cues are on ->", typeof toBot("hello").slice(-1)[0][1].Dictionary.off === "object");
   // 13. add-on switches (?glory and friends) show in the Toggles tab too
   bot({ type: "state", state: Object.assign({}, STATE, { mods: { "glory-stalls": { label: "Glory stalls", cards: [{ title: "Glory stalls", toggles: [{ label: "Glory stalls: strangers can use me", on: false, cmd: "glory on" }] }] } } }) });
-  click("Livestock"); await wait(50); click("Toggles"); await wait(100);
+  click("Livestock"); await wait(50); settings("Farm switches"); await wait(100);
   const gsw = [...D.querySelectorAll("#fhc-panel .fhc-tog")].find((x) => /Glory stalls: strangers can use me/.test(x.textContent));
-  out("13 the glory switch is in Toggles ->", !!gsw);
+  out("13 the glory switch is in Settings › Farm switches ->", !!gsw);
   const n13 = cmds().length; if (gsw) gsw.querySelector("button").click(); await wait(100);
   out("13 flipping it sends ?glory on ->", cmds().slice(n13).includes("glory on"));
 
@@ -290,7 +292,7 @@ const STATE = { name: "Laynie", onBooks: true, roles: ["PROPRIETOR", "LIVESTOCK"
     { id: 2, t: Date.now(), name: "Moo", mn: 500, kind: "idea", text: "A hayride on Sundays", status: "open", note: "" },
     { id: 1, t: Date.now(), name: "Rex", mn: 600, kind: "bug", text: "The stall never let me go", status: "done", note: "Fixed!" }] }) });
   click("Dashboard");
-  out("14 the Suggestions tab shows how many are open ->", [...D.querySelectorAll("#fhc-panel .fhc-pill")].some((b) => /Suggestions · 1/.test(b.textContent)));
+  out("14 the Suggestions tab shows how many are open ->", [...D.querySelectorAll("#fhc-panel nav button")].some((b) => /Suggestions · 1/.test(b.textContent)));
   click("💡 Suggestions");
   out("14 open ones are listed ->", /A hayride on Sundays/.test(text()), !/The stall never let me go/.test(text()));
   const note14 = [...D.querySelectorAll("#fhc-panel input")].find((i) => /a note back to Moo/.test(i.placeholder));
@@ -307,7 +309,7 @@ const STATE = { name: "Laynie", onBooks: true, roles: ["PROPRIETOR", "LIVESTOCK"
   loaded = null;
   bot({ type: "mark", splat: ["face"] }); await wait(50);
   out("15 nothin' happens with the switch off ->", loaded === null);
-  bot({ type: "state", state: STATE }); click("Livestock"); click("Toggles");
+  bot({ type: "state", state: STATE }); click("Livestock"); settings("Gear and marks");
   const sw15 = (label) => [...D.querySelectorAll("#fhc-panel .fhc-tog")].find((t) => t.textContent.includes(label));
   sw15("Farm can mark my body").querySelector("button").click(); await wait(50);
   bot({ type: "mark", splat: ["face"] }); await wait(50);
@@ -338,8 +340,8 @@ const STATE = { name: "Laynie", onBooks: true, roles: ["PROPRIETOR", "LIVESTOCK"
   delete G.BodyMarkings2_Luzi;
   // 16. staff cards from add-ons only on the Staff panel's Farm extras
   bot({ type: "state", state: Object.assign({}, STATE, { mods: { x: { label: "Test add-on", cards: [{ title: "Staff thing", staff: true, text: "staff only bits" }, { title: "Mine", text: "for everybody" }] } } }) });
-  click("Livestock"); click("Farm extras");
-  out("16 the Livestock panel shows add-on cards but not staff ones ->", /for everybody/.test(text()), !/staff only bits/.test(text()));
+  click("Livestock"); click("Me"); click("Farm extras");
+  out("16 the Livestock panel shows add-on cards (a row on Me) but not staff ones ->", /for everybody/.test(text()), !/staff only bits/.test(text()));
   click("Staff"); click("Farm extras");
   out("16 the Staff panel shows the staff ones ->", /staff only bits/.test(text()));
   out("15 ?wash takes the splatters and writing off ->", !(loaded || []).some((b) => b.Name === "Splatters" || b.Name === "BodyWritings"), (loaded || []).some((b) => b.Group === "HairFront"));
@@ -350,7 +352,7 @@ const STATE = { name: "Laynie", onBooks: true, roles: ["PROPRIETOR", "LIVESTOCK"
   const held = D.querySelector("#fhc-panel .fhc-body") === body0;
   await wait(1600);
   out("17 a farm update waits while they scroll, then catches up ->", held, D.querySelector("#fhc-panel .fhc-body") !== body0);
-  out("17 the cards fold, and the 🆘 button is always in the header ->", !!D.querySelector("#fhc-panel .fhc-fold"), !!D.querySelector("#fhc-panel .fhc-head .fhc-sos"));
+  out("17 the cards fold, and the 🆘 button is always in the header ->", !!D.querySelector("#fhc-panel .fhc-fold"), !!D.querySelector('#fhc-panel .fhc-head button.sos[aria-label="Safety"]'));
   // 18. Oct 23, Say it: the line a trap wants is a button on every tab, and the box in Safety; both go to the farm hidden
   await wait(1700);
   bot({ type: "state", state: Object.assign({}, STATE, { wants: [{ icon: "🪞", label: "The mirror box wants it said out loud, 5 more times", say: "I am a good cow" }] }) });
@@ -359,7 +361,7 @@ const STATE = { name: "Laynie", onBooks: true, roles: ["PROPRIETOR", "LIVESTOCK"
   let n18 = sent.length; const tapped = click("Say it"); await wait(50);
   const s1 = saidOf(n18);
   out("18 the line a trap wants is a button, sent hidden to the farm ->", /mirror box wants it said/.test(text()), tapped, !!s1 && s1.text === "I am a good cow" && s1.to === "farm");
-  D.querySelector("#fhc-panel .fhc-sos").click(); await wait(50);
+  D.querySelector('#fhc-panel .fhc-head button[aria-label="Safety"]').click(); await wait(50);
   const sayBox = D.querySelector("#fhc-panel textarea");
   if (sayBox) { sayBox.value = "please let me out, my legs are numb"; sayBox.dispatchEvent(new w.Event("input", { bubbles: true })); }
   n18 = sent.length; click("Tell staff"); await wait(50);

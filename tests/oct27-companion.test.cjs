@@ -48,15 +48,15 @@ const STATE = { name: "Moo", onBooks: true, roles: ["LIVESTOCK"], species: "cow"
   await wait(200);
   const D = g.w.document, text = () => D.getElementById("fhc-panel").textContent;
   const click = (label) => { const b = [...D.querySelectorAll("#fhc-panel button")].find((x) => x.textContent.trim().startsWith(label)); if (b) b.click(); return !!b; };
-  click("🎀 Store");
+  click("🎀 Ribbons"); click("🛍️ Treats and favors");
   ok(/A spin of the wheel/.test(text()), "the saved shelf shows in the store without the bot sendin' it");
   g.bot({ type: "stateDiff", set: { ribbons: 9 }, del: [], base: 10, seq: 11 });
-  await wait(100); click("🎀 Store");
+  await wait(100); click("🎀 Ribbons");
   ok(/ribbons\s*9(?!\d)/.test(text()), "a patch onto the panel it holds is put on");
   let n = g.toBot("hello").length;
   g.bot({ type: "stateDiff", set: { ribbons: 40 }, del: [], base: 99, seq: 100 });
   g.bot({ type: "stateDiff", set: { ribbons: 41 }, del: [], base: 100, seq: 101 });
-  await wait(100); click("🎀 Store");
+  await wait(100); click("🎀 Ribbons");
   const again = g.toBot("hello").slice(n);
   ok(/ribbons\s*9(?!\d)/.test(text()) && again.length === 1 && again[0].again === true && again[0].relay !== undefined && again[0].off, "a patch for a panel it doesn't hold is left off, and it asks once for a whole panel (with its switches)");
   g.bot({ type: "store", items: [{ id: "bell", name: "A brass bell", price: 4, desc: "Ding.", gift: false, kind: "" }], h: "xyz.2" });
@@ -79,8 +79,9 @@ const STATE = { name: "Moo", onBooks: true, roles: ["LIVESTOCK"], species: "cow"
   g.bot({ type: "stateDiff", set: { mods }, del: [], base: 200, seq: 201 });
   await wait(100); click("🐄 Me");
   ok(/Food/.test(text()) && /62%/.test(text()) && /Water/.test(text()) && /milk-drunk/.test(text()), "the Me tab shows barn life: food, water, grooming and milk-drunk");
-  click("Farm extras");
-  ok(/Turn-out/.test(text()) && !/62%/.test(text()), "...and Farm extras keeps the rest, without showin' it twice");
+  click("🧩 Farm extras");
+  const xrow = (D.querySelector("#fhc-panel .fhc-open") || {}).textContent || "";
+  ok(/Turn-out/.test(xrow) && !/62%/.test(xrow), "...and the Farm extras row keeps the rest, without showin' it twice");
 
   // shared room lines
   const nl = g.local.length;
@@ -119,6 +120,8 @@ const STATE = { name: "Moo", onBooks: true, roles: ["LIVESTOCK"], species: "cow"
   ok(!!reg, "the Farmhand settings page is there");
   if (reg) {
     reg.load();
+    // (Nov 4: on the settings' Advanced page)
+    const adv = [...b.w.document.querySelectorAll("#fhc-settings nav button")].find((x) => /Advanced/.test(x.textContent)); if (adv) adv.click();
     const sw = [...b.w.document.querySelectorAll("#fhc-settings button")].find((x) => x.getAttribute("aria-label") === "Draw the room on the farm girl's screen");
     ok(!!sw && sw.getAttribute("aria-pressed") === "false", "the bot's account has the switch, off to begin with");
     if (sw) sw.click();

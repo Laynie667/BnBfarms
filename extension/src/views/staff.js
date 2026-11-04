@@ -5,7 +5,7 @@
 // The staff panel: duty, the Office (lookups about other people land here), contracts, the barn, guides, switches.
 import { h, card, title, muted, btn, chip, toggle } from "../dom.js";
 import { guidesTab } from "./common.js";
-import { panelPrefs, panelPrefsOrLink, drawnBodyCard, seasonsCard } from "./livestock.js";
+import { panelPrefsOrLink, drawnBodyCard, seasonsCard } from "./livestock.js";
 import { DURATIONS } from "../../../shared/bcplus.js";
 import { summonReady } from "../addons.js";
 import { herd, zones, voice, shift } from "./staffdata.js";

@@ -14,14 +14,26 @@ function modsFor(ctx, view) {
     .filter(([, m]) => m.cards.length);
 }
 // me: true cards (barn life's food, water and grooming) go on the Livestock panel's Me tab instead (Laynie, Oct 27:
-// "can you put the barnlife stats on the livestock panels me tab?")
-export function meCards(ctx) {
-  const out = [];
+// "can you put the barnlife stats on the livestock panels me tab?"). Since the tidy panel (Nov 4) their bars are
+// meters in the Me card and their chips sit with the rest; what's left of them, and every other add-on card for the
+// Livestock panel, goes under the Me tab's 🧩 Farm extras row.
+export function mePieces(ctx) {
+  const bars = [], chips = [], cards = [], labels = [];
   for (const [name, m] of Object.entries(ctx.s.mods || {})) {
     if (!m || typeof m !== "object" || !Array.isArray(m.cards)) continue;
-    m.cards.forEach((c, i) => { if (c && c.me && !c.staff) out.push(drawCard(ctx, name, c, i)); });
+    m.cards.forEach((c, i) => {
+      if (!c || !c.me || c.staff) return;
+      if (Array.isArray(c.bars)) bars.push(...c.bars);
+      if (Array.isArray(c.chips)) chips.push(...c.chips);
+      cards.push(drawCard(ctx, name, Object.assign({}, c, { bars: null, chips: null }), i));
+      labels.push(String(c.title || m.label || name));
+    });
   }
-  return out;
+  for (const [name, m] of modsFor(ctx, "livestock")) {
+    labels.push(String(m.label || name));
+    cards.push(h("div", null, h("div", { class: "fhc-muted", style: { margin: "4px 2px 2px" } }, "🧩 " + String(m.label || name)), m.cards.map((c, i) => drawCard(ctx, name, c, i))));
+  }
+  return { bars, chips, cards, labels: [...new Set(labels)] };
 }
 
 function drawCard(ctx, name, c, i) {

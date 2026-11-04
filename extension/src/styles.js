@@ -81,4 +81,56 @@ nav.fhc-row.fhc-tabs{flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:cont
 .fhc-doc{text-align:left;min-height:40px;padding:5px 8px;border-radius:8px;border:1px solid var(--fh-line);background:transparent;color:var(--fh-text)}
 .fhc-doc.on{border-color:var(--fh-accent);background:var(--fh-card)}
 .fhc-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+/* the tidy panel (Nov 4): quiet header icons, tabs that fit the width, one card, rows that open where they sit */
+.fhc-ib{width:34px;height:34px;min-height:34px;padding:0;border-radius:8px;border:1px solid transparent;background:transparent;color:var(--fh-muted);font-size:15px;flex-shrink:0}
+.fhc-ib:hover{background:var(--fh-card)}
+.fhc-ib.sos{border-color:var(--fh-alert);color:var(--fh-text)}
+nav.fhc-seg{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);margin:8px 12px 2px;border:1px solid var(--fh-line);border-radius:10px;overflow:hidden;padding:0}
+nav.fhc-seg button{min-height:38px;padding:0 4px;border:none;border-right:1px solid var(--fh-line);background:transparent;color:var(--fh-text);font-weight:600;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+nav.fhc-seg button:last-child{border-right:none}
+nav.fhc-seg button.on{background:var(--fh-accent);color:var(--fh-ground);font-weight:700}
+.fhc-back{align-self:flex-start;min-height:30px;padding:0 10px;border-radius:8px;border:1px solid var(--fh-line);background:transparent;color:var(--fh-muted);font-weight:600}
+.fhc-sum{background:var(--fh-card);border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:9px}
+.fhc-sum-top{display:flex;align-items:baseline;gap:8px}
+.fhc-nm{font-family:Bitter,Georgia,serif;font-weight:700;font-size:17px;flex:1;min-width:0;overflow-wrap:anywhere}
+.fhc-purse{font-weight:700;color:var(--fh-accent);white-space:nowrap}
+.fhc-sum .fhc-chip{margin:0;background:var(--fh-well);border-color:transparent}
+.fhc-sum .fhc-chip-alert{box-shadow:inset 0 0 0 1px var(--fh-alert)}
+.fhc-chips{display:flex;flex-wrap:wrap;gap:5px}
+.fhc-meters{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px 12px}
+.fhc-m-l{display:flex;justify-content:space-between;gap:4px;font-size:12px;color:var(--fh-muted)}
+.fhc-m-v{font-weight:600;font-size:13px;margin:1px 0 4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fhc-m-t{height:5px;border-radius:3px;background:var(--fh-line);overflow:hidden}
+.fhc-m-t>div{height:100%;background:var(--fh-accent)}
+.fhc-m-t>div.fhc-fill-good{background:var(--fh-good)}.fhc-m-t>div.fhc-fill-alert{background:var(--fh-alert)}
+.fhc-rows{border-top:1px solid var(--fh-line);display:flex;flex-direction:column}
+.fhc-r{display:flex;align-items:center;gap:10px;width:100%;min-height:42px;padding:0 4px;border:none;border-bottom:1px solid var(--fh-line);background:transparent;color:var(--fh-text);text-align:left}
+.fhc-r-k{flex:1;font-weight:600;min-width:0}
+.fhc-r-s{color:var(--fh-muted);font-size:13px;text-align:right;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:62%}
+.fhc-r-c{color:var(--fh-line);font-size:16px;width:12px;text-align:center}
+.fhc-r.open{background:var(--fh-card);border-radius:10px 10px 0 0;border-bottom:none;padding:0 10px}
+.fhc-r.open .fhc-r-c{color:var(--fh-accent)}
+.fhc-open{background:var(--fh-card);border-radius:0 0 10px 10px;padding:4px 10px 10px;margin-bottom:6px;display:flex;flex-direction:column;gap:6px}
+.fhc-open .fhc-box{background:var(--fh-ground)}
+.fhc-dot{display:inline-block;width:8px;height:8px;border-radius:4px;background:var(--fh-alert);margin-left:6px;vertical-align:middle}
+.fhc-qa{display:flex;gap:6px}
+.fhc-qa .fhc-b{flex:1;margin:0;padding:0 6px;background:var(--fh-card);border-color:var(--fh-line);white-space:nowrap}
+.fhc-qa .fhc-b.on{border-color:var(--fh-accent)}
+.fhc-menu{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;margin-top:6px;padding:8px;border:1px solid var(--fh-accent);border-radius:10px;background:var(--fh-card)}
+.fhc-menu .fhc-b{margin:0;text-align:left;background:transparent;border-color:var(--fh-line)}
+.fhc-sec{display:flex;flex-direction:column;gap:6px;padding:0 0 12px;border-bottom:1px solid var(--fh-line)}
+.fhc-sec:last-child{border-bottom:none}
+.fhc-sh{display:flex;align-items:baseline;gap:8px;font-family:Bitter,Georgia,serif;font-weight:700;color:var(--fh-accent);font-size:15px}
+.fhc-sh-x{font:400 12px "Source Sans 3","Segoe UI",sans-serif;color:var(--fh-muted)}
+.fhc-pairs{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;font-size:13px}
+.fhc-pairs>:nth-child(even){text-align:right}
+.fhc-steps{display:flex;gap:4px}.fhc-steps>div{flex:1;height:7px;border-radius:3px;background:var(--fh-line)}.fhc-steps>div.on{background:var(--fh-accent)}
+/* the settings pages (the game's Extensions page, or the panel's ⚙ where the game has no such page) */
+.fhc-set{display:flex;gap:16px;align-items:flex-start}
+.fhc-set-nav{width:190px;flex-shrink:0;display:flex;flex-direction:column;gap:2px}
+.fhc-set-nav button{text-align:left;min-height:36px;padding:0 10px;border-radius:8px;border:none;background:transparent;color:var(--fh-text);font-weight:600}
+.fhc-set-nav button.on{background:var(--fh-card);color:var(--fh-accent)}
+.fhc-set-body{flex:1;min-width:0;display:flex;flex-direction:column;gap:12px}
+@media (max-width:700px){.fhc-set{flex-direction:column}.fhc-set-nav{width:auto;flex-direction:row;flex-wrap:wrap}.fhc-set-nav button{min-height:32px;border:1px solid var(--fh-line);border-radius:999px}}
+#fhc-panel .fhc-set{flex-direction:column}#fhc-panel .fhc-set-nav{width:auto;flex-direction:row;flex-wrap:wrap}#fhc-panel .fhc-set-nav button{min-height:32px;border:1px solid var(--fh-line);border-radius:999px}
 `;

@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BnB Farm — Farmhand Bot
 // @namespace    bnbfarm
-// @version      0.70.1
+// @version      0.70.2
 // @updateURL    https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @downloadURL  https://raw.githubusercontent.com/Laynie667/BnBfarms/main/dist/farmhand-bot.user.js
 // @homepageURL  https://github.com/Laynie667/BnBfarms#install
@@ -2793,8 +2793,8 @@
   ];
 
   // bot/src/version.js
-  var VERSION = "0.70.1";
-  var COMPANION_VERSION = "0.52.0";
+  var VERSION = "0.70.2";
+  var COMPANION_VERSION = "0.53.0";
 
   // bot-parts:farmhand-bot-parts
   (function() {
@@ -6231,6 +6231,11 @@
         part("roam", () => {
           const x = roamState(mn);
           if (x) s.roam = x;
+        });
+        part("contract", () => {
+          contractsLedger();
+          const c = L2.contracts.filter((x) => x.mn === mn && x.status === "signed" && (!x.until || x.until > now)).slice(-1)[0];
+          if (c) s.contract = { title: String(c.title || ""), until: c.until ? Math.ceil(c.until / 6e4) * 6e4 : 0 };
         });
         part("wants", () => {
           const w = wantsFor(mn);

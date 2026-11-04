@@ -57,7 +57,8 @@ async function press(mn, cmd){
   out('1 staff on-call switch flips ->', !!(latestState(800).switches||{}).forced !== f0);
 
   // 2. every button on the livestock panel
-  for (const c of ['stats','measure','record','pedigree','keys','quota','board','tally','eggs','wash','gender femboy','outfit back','rules','consent','tour','doors','species','help'])
+  for (const c of ['stats','measure','record','pedigree','keys','quota','board','tally','eggs','wash','gender femboy','outfit back','rules','consent','tour','doors','species','help',
+                   'myshots','drain 500','quiet 60','quiet off'])   // (Nov 4: the Me tab's Shots, Drain and Quiet hour)
     await press(500, c);
   // 3. every button on the staff panel (Me, Herd, Office, Barn, Contracts, Tease, Voice, Zones, Shift)
   for (const c of ['record','hours','myherd','keys','chores','pasture','onduty',

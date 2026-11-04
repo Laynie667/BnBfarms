@@ -17,10 +17,12 @@ import { STAFF_TABS } from "./views/staff.js";
 import { DASHBOARD_TABS } from "./views/dashboard.js";
 import { withExtras } from "./views/extras.js";
 import { NURSERY_TABS } from "./views/nursery.js";
+import { settingsAvailable, openSettings } from "./settings.js";
+import { settingsView } from "./views/settingspages.js";
 
 const VIEWS = {
   guest: { label: "Guest", tabs: GUEST_TABS },
-  livestock: { label: "Livestock", tabs: LIVESTOCK_TABS },
+  livestock: { label: "Livestock", tabs: LIVESTOCK_TABS, extrasInside: true },   // (its add-on cards are a row on the Me tab)
   staff: { label: "Staff", tabs: STAFF_TABS },
   dashboard: { label: "Dashboard", tabs: DASHBOARD_TABS },
   nursery: { label: "🧸 Nursery", tabs: NURSERY_TABS },   // only for people on the nursery list (views/nursery.js)
@@ -213,34 +215,62 @@ export class Panel {
   }
   later() { clearTimeout(this.laterT); if (this.pending) this.laterT = setTimeout(() => { if (!this.pending) return; if (this.busy()) return this.later(); this.render(); }, 350); }
   renderSoon() { if (this.busy()) { this.pending = true; this.later(); return; } this.render(); }
+  // the tabs this view shows: + "Farm extras" when an add-on has somethin' (not on the Livestock panel: there it's a row
+  // on Me); a tab with show() only when it says so (the Log tab); and ⚙ Settings in the panel where the game has no
+  // settings page of its own
+  tabsFor(view, ctx) {
+    const V = VIEWS[view];
+    const tabs = (view === "guest" || view === "nursery" || V.extrasInside ? V.tabs : withExtras(V.tabs, view, ctx)).filter((t) => !t.show || t.show(ctx));
+    if (!settingsAvailable() && !tabs.some((t) => t.id === "settings"))
+      tabs.push({ id: "settings", label: "⚙ Settings", offRow: true, render: (c) => settingsView(c, c.ui.setPage || "switches", (p) => c.setUi({ setPage: p })) });
+    return tabs;
+  }
+  // ⚙: the game's own settings page (Preferences → Extensions → Farmhand Companion), or the panel's own where there's none
+  goSettings(page) {
+    if (settingsAvailable() && openSettings(page || "switches")) return;
+    this.ui["tab_" + this.view()] = "settings"; if (page) this.ui.setPage = page; this.ui.setFind = ""; this.render();
+  }
   render() {
     this.pending = false;
-    const ctx = this.ctx(), view = this.view(), V = VIEWS[view];
-    const tabs = (view === "guest" || view === "nursery" ? V.tabs : withExtras(V.tabs, view, ctx)).filter((t) => !t.show || t.show(ctx));   // + "Farm extras" when an add-on has somethin'; a tab with show() only when it says so (the Log tab)
-    const tabKey = "tab_" + view, tab = tabs.find((t) => t.id === this.ui[tabKey]) || tabs[0];
+    const ctx = this.ctx(), view = this.view();
+    const tabs = this.tabsFor(view, ctx);
+    const tabKey = "tab_" + view;
+    // a button inside a tab can send them to another tab (Me's "Body tab ›", "All my feats ›", a settings link)
+    if (this.ui.goTab) { this.ui[tabKey] = this.ui.goTab; delete this.ui.goTab; }
+    const tab = tabs.find((t) => t.id === this.ui[tabKey]) || tabs[0];
     const scroll = this.el.querySelector(".fhc-body"), keep = scroll ? scroll.scrollTop : 0;
     const nav0 = this.el.querySelector("nav.fhc-tabs"), navKeep = nav0 ? nav0.scrollLeft : 0;
     this.el.classList.toggle("compact", !!this.prefs.compact);
     const full = !!this.prefs.full;
-    this.top.replaceChildren(
-      h("div", { class: "fhc-head", style: { touchAction: "none" }, onpointerdown: (e) => this.drag(e) },
-        h("div", null, h("div", { class: "fhc-title" }, "🌾 B&B Farm"), h("div", { id: "fhc-status", class: "fhc-muted" }, this.status)),
-        h("div", { style: { display: "flex", gap: "6px" } },
-          h("button", { type: "button", class: "fhc-pill fhc-sos", title: "Safety: safe word, I'm stuck, call staff", "aria-label": "Safety",
-            onclick: () => this.goSafety() }, "🆘"),
-          h("button", { type: "button", class: "fhc-pill", title: full ? "Back to a panel" : "Full screen", "aria-label": full ? "Back to a panel" : "Full screen",
-            onclick: () => { this.prefs.full = !full; savePrefs(this.prefs); this.placePanel(); this.render(); } }, full ? "🗗" : "⛶"),
-          h("button", { type: "button", class: "fhc-pill", "aria-label": "Close the panel", onclick: () => this.toggle(false) }, "✕"))),
+    // the tidy look (Nov 4): a few tabs fit the width as one strip; more than five keep the row that scrolls sideways
+    const onRow = tabs.filter((t) => !t.offRow), seg = onRow.length <= 5;
+    const tabBtn = (t) => { const n = t.badge ? t.badge(ctx) : 0;
+      return h("button", { type: "button", class: seg ? (t === tab ? "on" : "") : "fhc-pill" + (t === tab ? " on" : ""), "aria-current": t === tab ? "page" : null,
+        onclick: () => { this.ui[tabKey] = t.id; this.render(); } }, t.label + (n ? " · " + n : "")); };
+    const ib = (label, icon, fn, cls) => h("button", { type: "button", class: "fhc-ib" + (cls ? " " + cls : ""), title: label, "aria-label": label, onclick: fn }, icon);
+    // (filtered: replaceChildren writes a false as the word "false", which showed under the header for anybody with only
+    // one panel, ever since v0.2.0)
+    this.top.replaceChildren(...[
+      h("div", { class: "fhc-head", style: { touchAction: "none", gap: "4px" }, onpointerdown: (e) => this.drag(e) },
+        h("div", { class: "fhc-grow", style: { minWidth: "0" } }, h("div", { class: "fhc-title" }, "🌾 B&B Farm"), h("div", { id: "fhc-status", class: "fhc-muted" }, this.status)),
+        ib("Settings", "⚙", () => this.goSettings()),
+        ib(full ? "Back to a panel" : "Full screen", full ? "🗗" : "⛶", () => { this.prefs.full = !full; savePrefs(this.prefs); this.placePanel(); this.render(); }),
+        // only 🆘 keeps a red edge
+        ib("Safety", "🆘", () => this.goSafety(), "sos"),
+        ib("Close the panel", "✕", () => this.toggle(false))),
       this.views().length > 1 && h("div", { class: "fhc-row" }, h("span", { class: "fhc-grow fhc-muted" }, "Panel"),
         this.views().map((v) => h("button", { type: "button", class: "fhc-pill" + (v === view ? " on" : ""), onclick: () => { this.prefs.view = v; savePrefs(this.prefs); this.render(); } }, VIEWS[v].label))),
       // Safe word, I'm stuck and Call staff live in the Safety tab (Guest and Livestock panels; staff reach it from Livestock)
-
-      h("nav", { class: "fhc-row fhc-tabs", "aria-label": "Panel sections" }, tabs.filter((t) => !t.offRow || t === tab).map((t) => {
-        const n = t.badge ? t.badge(ctx) : 0;
-        return h("button", { type: "button", class: "fhc-pill" + (t === tab ? " on" : ""), onclick: () => { this.ui[tabKey] = t.id; this.render(); } }, t.label + (n ? " · " + n : ""));
-      })),
-      h("div", { class: "fhc-body" }, this.banners(), safeRender(tab, ctx)));
-    const body = this.el.querySelector(".fhc-body"); if (body) body.scrollTop = keep;
+      seg ? h("nav", { class: "fhc-seg", "aria-label": "Panel sections" }, onRow.map(tabBtn))
+          : h("nav", { class: "fhc-row fhc-tabs", "aria-label": "Panel sections" }, tabs.filter((t) => !t.offRow || t === tab).map(tabBtn)),
+      h("div", { class: "fhc-body" },
+        // a tab off the strip (Safety, Settings, the Inbox on some panels) has a way back
+        seg && tab.offRow ? h("button", { type: "button", class: "fhc-back", onclick: () => { this.ui[tabKey] = onRow[0].id; this.render(); } }, "‹ Back to " + onRow[0].label) : null,
+        this.banners(), safeRender(tab, ctx))].filter(Boolean));
+    // the same tab keeps its place when it's redrawn; another tab starts at its top
+    const here = view + ":" + tab.id, body = this.el.querySelector(".fhc-body");
+    if (body) body.scrollTop = here === this.lastTab ? keep : 0;
+    this.lastTab = here;
     const nav = this.el.querySelector("nav.fhc-tabs");
     if (nav) { nav.scrollLeft = navKeep; const on = nav.querySelector(".fhc-pill.on");
       if (on && (on.offsetLeft < nav.scrollLeft || on.offsetLeft + on.offsetWidth > nav.scrollLeft + nav.clientWidth)) nav.scrollLeft = Math.max(0, on.offsetLeft - 12); }
@@ -254,10 +284,12 @@ export class Panel {
   // questions waitin' on you, on every tab
   banners() {
     const out = [];
-    const view = this.view(), tabNow = this.ui["tab_" + view];
+    const view = this.view(), tabNow = this.ui["tab_" + view] || (this.tabsFor(view, this.ctx())[0] || {}).id;
+    // (the Livestock Me tab has these in its own card, and its inbox as a row)
+    const meCard = view === "livestock" && tabNow === "me", inboxOpen = tabNow === "inbox" || (meCard && this.ui.open_me === "inbox");
     // RIGHT NOW: everything with a clock on it (heat, the bench, the stall, potions, a dare…), on every tab
     const now = (this.s.now || []).filter((x) => !x.until || x.until > Date.now());
-    if (now.length) out.push(h("div", { class: "fhc-row", style: { flexWrap: "wrap", gap: "4px", margin: "0 0 6px" }, "aria-label": "Right now" },
+    if (now.length && !meCard) out.push(h("div", { class: "fhc-row", style: { flexWrap: "wrap", gap: "4px", margin: "0 0 6px" }, "aria-label": "Right now" },
       now.map((x) => chip(x.icon + " " + x.text + (x.until ? " · " + left(x.until) : ""), /🚫|🪵|⛓️|🚧|🔥/.test(x.icon) ? "alert" : "acc"))));
     // somebody's on the use bench: tap to use them
     for (const b of (this.s.benchHere || [])) out.push(h("div", { class: "fhc-box" },
@@ -265,7 +297,7 @@ export class Panel {
       h("div", { style: { marginTop: "6px" } }, (b.holes || []).map((hole) =>
         btn({ mouth: "Use their mouth", vulva: "Use their pussy", butt: "Use their ass" }[hole], () => this.ask("use " + b.mn + " " + ({ mouth: "mouth", vulva: "pussy", butt: "ass" }[hole])), true))),
       h("div", { class: "fhc-muted" }, "Get within a couple of steps of the bench first.")));
-    if (this.fresh && tabNow !== "inbox") out.push(h("div", { class: "fhc-box", style: { borderColor: this.fresh.kind === "notice" ? "var(--fh-good)" : "var(--fh-accent)" } },
+    if (this.fresh && !inboxOpen) out.push(h("div", { class: "fhc-box", style: { borderColor: this.fresh.kind === "notice" ? "var(--fh-good)" : "var(--fh-accent)" } },
       h("div", { class: "fhc-kv", style: { borderBottom: "none", padding: "0" } },
         h("span", { class: "fhc-muted" }, this.fresh.kind === "notice" ? "From the farm" : "Answer"),
         h("button", { type: "button", class: "fhc-pill", "aria-label": "Dismiss", onclick: () => { this.fresh = null; this.render(); } }, "✕")),

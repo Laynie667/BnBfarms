@@ -90,6 +90,9 @@
       part("feats", () => featsStateFor(mn, s));   // the 🏅 Feats tab (10us-feats.js)
       part("brand", () => { const b = brandFor(mn); if (b) s.brand = b; });   // the farm's logo, seared on (10uq-brand.js)   // the 🧸 Nursery panel, for nursery folk only (10up2-nursery.js)
       part("roam", () => { const x = roamState(mn); if (x) s.roam = x; });   // roam passes (10uk-roam.js)
+      // the contract they're under, for the Me card's top line (Nov 4 tidy panel): its name and when it ends (none: for good)
+      part("contract", () => { contractsLedger(); const c = L.contracts.filter(x => x.mn === mn && x.status === "signed" && (!x.until || x.until > now)).slice(-1)[0];
+        if (c) s.contract = { title: String(c.title || ""), until: c.until ? Math.ceil(c.until / 60000) * 60000 : 0 }; });
       part("wants", () => { const w = wantsFor(mn); if (w.length) s.wants = w; });   // what the farm is waitin' to hear from them: Say it buttons (10ui-say.js)
       part("happening", () => { const hp = happeningFor(mn); if (hp.length) s.happening = hp; if (quietNow(mn)) s.quietUntil = Math.ceil(r.quietUntil / 60000) * 60000; });   // what has them right now (10y2-brood.js)
       const bh = benchHereFor(mn); if (bh.length) s.benchHere = bh;   // tap-to-use bench buttons

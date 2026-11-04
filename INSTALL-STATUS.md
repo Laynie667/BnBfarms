@@ -5,7 +5,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 | Script | File in `dist/` | Where it runs | Current |
 |---|---|---|---|
-| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.70.1** |
+| Farmhand Bot | `farmhand-bot.user.js` | the bot's PC (account 260239) | **0.70.2** |
 | Glory stalls | `farmhand-glory-stalls.user.js` | the bot's PC | **1.10.1** |
 | Breeding | `farmhand-breeding.user.js` | the bot's PC | **1.2.2** |
 | Conditioning | `farmhand-conditioning.user.js` | the bot's PC | **1.1.1** |
@@ -13,7 +13,7 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 | Map tools, Work | `farmhand-<name>.user.js` | the bot's PC | **1.0.4** |
 | Dairy | `farmhand-dairy.user.js` | the bot's PC | **1.1.1** |
 | Shows | `farmhand-shows.user.js` | the bot's PC | **1.1.1** |
-| Farmhand Companion | `farmhand-companion.user.js` | each player, and the bot's own tab | **0.52.0** |
+| Farmhand Companion | `farmhand-companion.user.js` | each player, and the bot's own tab | **0.53.0** |
 | Farm Watcher (diagnostics) | `farm-watcher.user.js` | whoever is recording | **1.0.4** |
 
 ## Sending a watch report
@@ -24,6 +24,21 @@ In Tampermonkey's dashboard, compare each script's version with this list. Anyth
 
 ## Latest changes (newest first)
 
+- **Bot 0.70.2 + Companion 0.53.0: the tidy Livestock panel and the settings pages (Phase 3 of the plan, first half).** Laynie, Nov 4, on the mockups: "thats so much cleaner, and i like the aesthetic of the livestock panels", and "tidying like that would be good across all panels". Nothing was taken away: it moved, or it folds into a row you tap.
+  - **Four tabs that fit the width:** 🐄 Me · 🥛 Body · 🪤 Play · 🎀 Ribbons (it was ten).
+  - **🐄 Me is one card and some rows.** The card has your name and ribbons, a line with your kind, your herd and how long your contract has left, chips for what's on you right now, and small meters: milk, quota, seed, holding, and barn life's food, water and grooming. Under it, one line each for the inbox (a red dot when there's somethin' new), what's got you, carryin', body, today's marks, kept, roam, your next feat and the farm extras. Tap one and it opens right there; tap it again and it folds. Only what's happenin' shows: no kept, no kept row.
+  - **Quick buttons on Me:** 🚿 Wash, 💉 Shots, 🪣 Drain (yourself, nobody needed), and More ▾ for stats, measure, record, pedigree, keys, dress me and the quiet hour.
+  - **🥛 Body:** milk (udder, quota, the pump you're on, the stall dial), breedin', holdin' with Drain and Wash, and seed. Not makin' seed? It points you to the Futa switch.
+  - **🪤 Play:** your trap card with Struggle and What's out there (the rest under More ▾), then rows for what's on you, kinds of trap, potions in you, a dare, the corral, the nest, what you've taken, keepsakes and your shots; proprietors get their trap and Seasons rows here too.
+  - **🎀 Ribbons:** your ribbons and the vat, then a row for where they came from, each shelf of the store, your feats and titles.
+  - **⚙ Settings, in the header,** opens Preferences → Extensions → Farmhand Companion, now in eight pages: 🐄 Farm switches · 🪞 Body and look · ⛓ Gear and marks · 💬 Messages · 🔒 Privacy and record · 📖 Guides · 🧰 Advanced · ℹ About, with a **Find a setting** box that looks through all of them. "How the farm talks to you" is on Messages. Where the game has no settings page, the same pages open inside the panel.
+  - **The record switch says exactly what Laynie asked:** "Send a record of what I see: This option sends a copy of what the companion receives and sends for bug squashing. Completely voluntary participation." Only 221397 can read the logs, the same as before.
+  - **The Futa switch** says what it's for now: a cock of your own, to be a stud for a while and flip it back.
+  - **Quieter header:** small ⚙ ⛶ 🆘 ✕ icons; only 🆘 keeps its red edge. Drag, resize and full screen work as before.
+  - **Fixed:** anybody with only one panel saw the word "false" under the header (since v0.2.0). And a tab you switch to now starts at its top instead of where the last one was scrolled.
+  - The Guest panel's Settings tab is gone (the ⚙ has it all). Staff, the Dashboard and the Guest panel get the same tidyin' next; the 🧸 Nursery stays as it is.
+  - Bot: each panel now carries the contract you're under and when it ends, for the Me card.
+  - tests/tidy-panel.test.cjs: the four tabs, the card, rows that open and fold, the quick buttons, every old switch found on a settings page, her exact record wording, Find a setting, and no switch for a proprietor's record. The Companion, store and Oct 27 tests follow the new layout; the buttons audit presses ?myshots, a self ?drain and ?quiet.
 - **No new versions: the bot's parts sorted into folders (Phase 2 of the plan).** Laynie, Nov 4: no cloud threads editing bot files, so go ahead. Nothing to install: the built bot comes out byte for byte the same.
   - **185 files, 13 folders by topic** in `bot/src/parts/`: core, office, farm, looks, voice, ribbons, parasites, nursery, seasons, and traps (with traps/lines, traps/more and traps/ends). Each folder has a README saying what every file in it holds; the one at the top says which folder has what.
   - **The names didn't change**, only the folders. The build joins the parts by file name whatever folder they're in, and stops if two files ever share a name. git kept each file's history through the move.
